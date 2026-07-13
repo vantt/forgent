@@ -1,6 +1,10 @@
 # Upstream source clones — cursors tracked in docs/distillery/, re-clone as needed
 /upstreams/
 
+# forgent state layer — events.jsonl is truth (committed); state.json is a derived view
+.fgos/state.json
+node_modules/
+
 # BEE:START
 .bee/state.json
 .bee/reservations.json

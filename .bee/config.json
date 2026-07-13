@@ -21,6 +21,7 @@
     }
   },
   "commands": {
-    "verify": "node .claude/skills/distill/scripts/distill.mjs check"
+    "test": "npm test",
+    "verify": "npm test && node .claude/skills/distill/scripts/distill.mjs check"
   }
 }
