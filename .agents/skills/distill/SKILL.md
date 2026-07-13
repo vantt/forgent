@@ -44,6 +44,7 @@ Helper (all commands below): `node <skill-dir>/scripts/distill.mjs`
 | `/distill scan <source>` | the Extract lifecycle below (delta → inventory → extract → compare → seal → check) |
 | `/distill backfill <source>` | scan CURRENT snapshot for missing domains only, then `seal --domains` |
 | `/distill deep-dive <topic>` | follow `references/deep-dive-protocol.md` (ends with a synthesis) |
+| `/distill consult <feature-desc>` | follow `references/consult-protocol.md`: recall-first materials brief for designing a new host feature when you do NOT yet know the keywords — maps feature → taxonomy domains by DEFINITION, walks every mapped domain across ALL source indexes, ends with a coverage ledger (no domain silently skipped) |
 | `/distill rank` | script `rank`; present porting priorities + deep-dive picks |
 | `/distill find <term>` | script `find`; read matched entries, answer from them |
 | `/distill check` | script `check`; fix mechanical issues, report the rest |
@@ -117,6 +118,18 @@ files only — never re-scan a source. Output
 `docs/distillery/deep-dives/<topic>.md`, Bottom Line first, and it MUST end
 with a synthesis: a combined best-of design fitted to the host project, not
 just a comparison.
+
+## Consult mode
+
+When the human is designing a NEW host feature and does not yet know which
+keywords to search for, follow `references/consult-protocol.md`: map the
+feature onto taxonomy domains by their DEFINITIONS (not keywords), walk
+every mapped domain's section across ALL source indexes (recall is
+guaranteed by the backfill invariant — that is what makes this exhaustive
+without search infrastructure), overlay matrix/porting-log/deep-dives,
+keyword-sweep last, and END with a coverage ledger where every domain is
+either consulted or ruled out with a signed reason. Output is a report in
+the host's reports directory, not a distillery artifact.
 
 ## Headless mode
 
