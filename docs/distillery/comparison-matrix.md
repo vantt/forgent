@@ -76,6 +76,7 @@ Bối cảnh quan trọng: **bee chưng cất từ repository-harness** (cùng 6
 |---|---|---|---|---|
 | cross-system-protocol | ✗ (monolith, không producer/consumer split) | ✓ protocol v1 producer [→](sources/repository-harness.md#orchestration-protocol-v1) | hòa (producer+consumer) | harness ĐỊNH NGHĨA protocol v1; symphony là CONSUMER thực chứng [→](sources/symphony.md#typed-runtime-boundary) — hai nửa cùng contract, chứng minh boundary chạy qua ranh giới product. bee:dual-runtime-contract là portability một-codebase, KHÁC loại |
 | product-boundary-ownership | ✗ | ~ (spec-decomposition ngầm) | ✓ symphony [→](sources/symphony.md#product-boundary-non-goals) | symphony khai báo tường minh "owns X / KHÔNG owns Y" + 11 non-goals; kỷ luật product biết ranh giới mình |
+| multi-runtime-projection | ~ dual-runtime 2 belt [→](sources/beegog.md#dual-runtime-contract) | ✗ | ✓ fgOS [→](sources/marketing-cockpit.md#agent-agnostic-adapter-spec) | flavor thứ 3 của domain: MỘT framework core → N nền tảng (Claude/Gemini/Codex/OpenAI) qua adapter "4 required + 6 optional-with-fallback"; bee chỉ 2 runtime + không optional-capability degradation. Contract kiểu capability, không phải wire-protocol |
 ## context-memory
 
 | Feature | beegog | repository-harness | Best | Ghi chú |
@@ -87,6 +88,7 @@ Bối cảnh quan trọng: **bee chưng cất từ repository-harness** (cùng 6
 | pause-resume | ✓ HANDOFF 65% [→](sources/beegog.md#handoff-at-65-percent) | ✗ | beegog | never auto-resume |
 | settlement-capture | ✓ [→](sources/beegog.md#settlement-capture-unprompted) | ✗ | beegog | agent tự phát hiện "chốt" mỗi turn |
 | intervention-log | ~ (adopt-now, chưa build) | ✓ [→](sources/repository-harness.md#intervention-log) | harness | correction/override/escalation/approval là dữ liệu học |
+| memory-typing | ~ log-vs-state 2 loại | ✗ | ✓ fgOS 4 loại [→](sources/marketing-cockpit.md#four-memory-types) | fgOS phân working/episodic/semantic/procedural theo khoa học nhận thức + consolidation loop + importance-weighted forgetting; bee mới 2 physics (log/state) |
 ## planning
 
 | Feature | beegog | repository-harness | Best | Ghi chú |
@@ -181,3 +183,5 @@ Bối cảnh quan trọng: **bee chưng cất từ repository-harness** (cùng 6
 | behavior-pressure-tests | ✓ [→](sources/beegog.md#pressure-test-scenarios) | ✗ | beegog | 7 loại áp lực |
 | external-benchmark | ✗ | ✓ [→](sources/repository-harness.md#external-benchmark-repo) | harness | delta kỳ vọng khai báo trước |
 | infra-contract-tests | ✓ parity + byte-drift [→](sources/beegog.md#hook-contract-parity-tests) | ✓ CI release [→](sources/repository-harness.md#release-ci-verification) | beegog (depth) / harness (breadth) | |
+| llm-judge-eval | ✗ | ~ external benchmark (số) | ✓ fgOS cross-family [→](sources/marketing-cockpit.md#crossfamily-llm-judge) | fgOS: Claude chấm Gemini và ngược lại (chống self-bias) + rubric weighted + baseline regression; harness dùng benchmark số ngoài, khác cách |
+| output-quality-gate | ~ review severity | ✗ | ✓ fgOS default-FAIL [→](sources/marketing-cockpit.md#rigor-scaled-evaluation) | fgOS 3-tier (free→LLM→human) theo rigor + reviewer giả định FAIL; cùng tinh thần adversarial của bee-validating nhưng ở review output |
