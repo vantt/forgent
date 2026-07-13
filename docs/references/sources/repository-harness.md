@@ -42,7 +42,7 @@ domains_covered: [harness, skills, hooks, workflow, orchestration, context-memor
 
 ### maturity-ladder-h0-h5
 - **What:** Thang trưởng thành H0 (bare) → H5 (self-improving) với tiêu chí kiểm chứng được, file bắt buộc, và chỉ số benchmark từng mức; mỗi Phase roadmap nhắm một bậc.
-- **Where:** `docs/HARNESS_MATURITY.md`, `PHASE2-5.md`
+- **Where:** `docs/HARNESS_MATURITY.md`, `PHASE2.md`–`PHASE5.md`
 - **Notable:** tiến hóa harness được đo bằng benchmark ngoài (compliance %, trace quality, lane accuracy), không tự phán.
 - **Seen:** 14e6f10
 
@@ -262,7 +262,7 @@ domains_covered: [harness, skills, hooks, workflow, orchestration, context-memor
 
 ### installer-merge-modes
 - **What:** install-harness.sh/.ps1 với --merge (giữ cũ, thêm thiếu) / --override (backup + thay) / --refresh-agent-shim / --dry-run; payload khai báo trong harness-install-files.txt dùng chung 2 installer.
-- **Where:** `scripts/install-harness.sh|.ps1`, `scripts/harness-install-files.txt`
+- **Where:** `scripts/install-harness.sh`, `scripts/install-harness.ps1`, `scripts/harness-install-files.txt`
 - **Notable:** conflict handling là first-class option, không phải prompt ngẫu hứng.
 - **Seen:** 14e6f10
 
@@ -338,7 +338,7 @@ domains_covered: [harness, skills, hooks, workflow, orchestration, context-memor
 
 ### external-benchmark-repo
 - **What:** Repo `harness-benchmark` riêng đo từng phase: harness compliance %, trace quality score, lane accuracy (6/6), friction captured (N/6 tasks); phase chỉ được coi là đạt khi benchmark xác nhận.
-- **Where:** `PHASE2-5.md` (expected deltas), CHANGELOG
+- **Where:** `PHASE2.md`–`PHASE5.md` (expected deltas), CHANGELOG
 - **Notable:** eval harness bằng benchmark ngoài, có baseline và delta kỳ vọng khai báo trước — mức trưởng thành eval cao nhất trong 2 reference.
 - **Seen:** 14e6f10
 

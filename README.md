@@ -13,4 +13,4 @@ Forgent (fgOS) is the platform layer for building and running agent applications
 - [`docs/references/comparison-matrix.md`](docs/references/comparison-matrix.md) — so sánh tính năng giữa các nguồn
 - [`docs/references/porting-log.md`](docs/references/porting-log.md) — trạng thái porting (nguồn sự thật duy nhất)
 - [`docs/naming.md`](docs/naming.md) — brainstorm định vị & đặt tên (Forgent/fgOS)
-- `scripts/ref-delta.sh` — tính delta commit của một nguồn kể từ lần phân tích trước
+- [`.agents/skills/ref-scan/`](.agents/skills/ref-scan/SKILL.md) — skill portable vận hành vòng học (init/add/delta/seal/check, Node zero-dep)

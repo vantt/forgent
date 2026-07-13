@@ -1,0 +1,18 @@
+# Learning-domain taxonomy — one kebab-case domain per line, '#' comments allowed.
+# Machine-read by ref-scan (backfill detection). Definitions: docs/reference-learning-system.md
+harness
+skills
+hooks
+workflow
+orchestration
+context-memory
+planning
+quality-gates
+docs-style
+tooling
+config-packaging
+repo-layout
+safety
+self-improvement
+ux
+testing-evals
