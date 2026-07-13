@@ -75,6 +75,15 @@ Slug: kebab-case, stable forever. Cross-reference format: `<source>:<slug>`.
 - You may ADD `candidate` rows (a shortlist proposal) and fill evidence;
   moving anything past `candidate`, and all rejections, are HUMAN decisions.
 - `rejected` requires a written reason — it exists to prevent re-evaluation.
+- **Local column** — when a row reaches `ported`/`adapted`, fill `Local` with
+  the concept/artifact name it became in the host (keep the source slug when
+  unchanged) alongside the destination path. This is the two-way
+  source↔local bridge: `map [term]` answers both "what did X become here?"
+  and "where did this local thing come from?".
+- Delta discipline hook: when a delta scan updates an entry whose feature
+  appears in a `ported`/`adapted` row (`map <slug>` to check), note it in
+  that row's Ghi chú — the upstream evolved something we carry; the human
+  decides whether the local copy should follow.
 
 ## Impact scoring (per candidate row, Score column `R# E# F#`)
 

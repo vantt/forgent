@@ -48,6 +48,7 @@ Helper (all commands below): `node <skill-dir>/scripts/distill.mjs`
 | `/distill find <term>` | script `find`; read matched entries, answer from them |
 | `/distill check` | script `check`; fix mechanical issues, report the rest |
 | `/distill outcome <feature> <note>` | append `Outcome:` (confirmed/ineffective/adjusted) to that porting-log row |
+| `/distill map [term]` | script `map`; show source↔local mapping of ported features (both directions) |
 
 ## Learning area layout (created by `init`)
 

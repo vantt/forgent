@@ -93,10 +93,12 @@ So sánh cách triển khai khi khác biệt đáng kể giữa các project.
 
 ### 3. Porting log — `docs/distillery/porting-log.md`
 
+Cột **Score** (`R# E# F#`, chấm lúc tạo candidate) và **Local** (tên trong project ta khi đã port — cầu nối hai chiều source↔local, tra bằng `distill.mjs map`).
+
 ```markdown
-| Feature | Nguồn | Status | Đích trong forgent | Commit | Ghi chú / Lý do |
+| Feature | Nguồn | Status | Score | Local | Đích (path) | Commit | Ghi chú / Lý do |
 |---|---|---|---|---|---|
-| gate-workflow | beegog:gate-workflow | ported | skills/gates/ | abc1234 | adapt: bỏ gate 4 |
+| gate-workflow | beegog:gate-workflow | ported | R3 E2 F2 | gates | skills/gates/ | abc1234 | adapt: bỏ gate 4 |
 ```
 
 Status: `candidate` → `planned` → `in-progress` → `ported` / `adapted` (port có sửa) / `rejected` (kèm lý do bắt buộc).

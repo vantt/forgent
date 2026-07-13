@@ -13,6 +13,7 @@
 //   distill.mjs rank [--root <dir>]        # candidates by impact score R*E/F
 //   distill.mjs status [--json] [--root <dir>]  # learning-area dashboard (local view, no network)
 //   distill.mjs find <term> [--root <dir>] # print matching entry blocks + matrix rows
+//   distill.mjs map [term] [--root <dir>]  # source feature <-> local name for ported/adapted rows
 //
 // Refusal format: ERROR (rule) / WHY (reason) / FIX (next action).
 
@@ -217,10 +218,12 @@ So sánh tính năng giữa các learning sources. Mỗi domain một bảng; ô
 
 Nguồn sự thật duy nhất về trạng thái porting. Tính năng bị từ chối vẫn ghi lại kèm lý do.
 
-Status: \`candidate\` → \`planned\` → \`in-progress\` → \`ported\` / \`adapted\` / \`rejected\`
+- Status: \`candidate\` → \`planned\` → \`in-progress\` → \`ported\` / \`adapted\` / \`rejected\`
+- Score \`R# E# F#\` chấm một lần lúc tạo candidate; xếp hạng bằng \`distill.mjs rank\`.
+- Local = tên trong project ta sau khi port (bắt buộc khi ported/adapted); tra hai chiều bằng \`distill.mjs map\`.
 
-| Feature | Nguồn | Status | Đích | Commit | Ghi chú / Lý do |
-|---|---|---|---|---|---|
+| Feature | Nguồn | Status | Score | Local | Đích (path) | Commit | Ghi chú / Lý do |
+|---|---|---|---|---|---|---|---|
 `,
   source: (name, type, url) => {
     const cursor =
@@ -520,11 +523,42 @@ function cmdRank(args) {
   console.log(`\nDeep-dive hints: high R×E rows where the matrix shows sources diverging (hòa/~) — see deep-dive-protocol.md.`);
 }
 
+function cmdMap(args) {
+  const [term] = args._;
+  const root = requireRoot(args);
+  const logFile = path.join(root, REFS_DIR, "porting-log.md");
+  if (!fs.existsSync(logFile))
+    fail("porting-log.md not found", "map reads ported/adapted rows from the porting log", `run "distill.mjs init" first`);
+  const lines = fs.readFileSync(logFile, "utf8").split("\n").filter((l) => /^\|/.test(l));
+  const header = lines.find((l) => /feature/i.test(l));
+  if (!header) fail("porting-log has no table header", "column positions are resolved from the header row", "keep a header row containing 'Feature'");
+  const cols = header.split("|").map((c) => c.trim().toLowerCase());
+  const col = (...wants) => cols.findIndex((c) => wants.some((w) => c.startsWith(w)));
+  const [iF, iSrc, iSt, iLoc, iDest, iCommit] = [col("feature"), col("nguồn", "source"), col("status"), col("local"), col("đích", "dest"), col("commit")];
+  if (iLoc < 0)
+    fail("no 'Local' column in porting-log.md", "the source↔local mapping lives in that column", "add a Local column (see extract-rules.md §Porting-log rules)");
+  const rx = term ? new RegExp(term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i") : null;
+  const rows = [], missing = [];
+  for (const line of lines) {
+    if (line === header || /^\|\s*-/.test(line)) continue;
+    const c = line.split("|").map((x) => x.trim());
+    if (!/^(ported|adapted)$/.test(c[iSt] || "")) continue;
+    if (rx && !rx.test(line)) continue;
+    const row = { src: c[iSrc], feature: c[iF], local: c[iLoc], dest: c[iDest], commit: c[iCommit], status: c[iSt] };
+    if (!row.local || row.local === "—" || row.local === "-") missing.push(row.feature);
+    rows.push(row);
+  }
+  if (!rows.length) return console.log(term ? `No ported/adapted rows match "${term}".` : "Nothing ported/adapted yet — mappings appear once candidates ship.");
+  console.log("source feature  →  local name  (destination) [commit]");
+  for (const r of rows) console.log(`  ${r.src}\n    → ${r.local}  (${r.dest}) [${r.commit}, ${r.status}]`);
+  if (missing.length) console.log(`\nRows missing a Local name (fill them): ${missing.join(", ")}`);
+}
+
 // ---------- dispatch ----------
 
 const [cmd, ...rest] = process.argv.slice(2);
 const args = parseArgs(rest);
-const commands = { init: cmdInit, add: cmdAdd, delta: cmdDelta, seal: cmdSeal, check: cmdCheck, rank: cmdRank, status: cmdStatus, find: cmdFind };
+const commands = { init: cmdInit, add: cmdAdd, delta: cmdDelta, seal: cmdSeal, check: cmdCheck, rank: cmdRank, status: cmdStatus, find: cmdFind, map: cmdMap };
 if (!commands[cmd])
   fail(`unknown command "${cmd || ""}"`, "distill only automates the mechanical parts of the learning lifecycle", `use one of: ${Object.keys(commands).join(" | ")} (see header comment for flags)`);
 commands[cmd](args);
