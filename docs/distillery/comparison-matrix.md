@@ -4,7 +4,9 @@ So sánh tính năng giữa các learning sources. Ô có ✓ link về entry ch
 
 Bối cảnh quan trọng: **bee chưng cất từ repository-harness** (cùng 6 upstream khác — xem `sources/beegog.md#numbered-docs-progression`), nên nhiều tính năng harness xuất hiện trong bee ở dạng tinh gọn hơn. Cột Best đánh dấu bản triển khai đáng học nhất hiện tại.
 
-> **Delta @9cc306d (2026-07-13):** Symphony (worktree runner, auto mode, PR, web board) và các skill impeccable/intake-griller đã **tách khỏi repository-harness** sang repo `hoangnb24/symphony` (đang chờ triage trong intake queue). Ô đánh dấu `→sym` = từng có ở harness, nay sống ở symphony. Harness thêm loạt tính năng mới: request-authority, orchestration protocol v1, proposal lifecycle, proof-before-tag.
+> **Delta @9cc306d (2026-07-13):** Symphony (worktree runner, auto mode, PR, web board) và các skill impeccable/intake-griller đã **tách khỏi repository-harness** sang repo `hoangnb24/symphony`. Harness thêm loạt tính năng mới: request-authority, orchestration protocol v1, proposal lifecycle, proof-before-tag.
+>
+> **Symphony đã scan @2f0b257 (2026-07-13):** giờ là source thứ ba (`sources/symphony.md`, 18 entry). Là CONSUMER thực chứng của orchestration protocol v1 — standalone product nói chuyện với harness chỉ qua typed boundary. Ô `→sym` cũ nay trỏ về entry symphony thật. Matrix giữ 2 cột nguồn chính (beegog | repository-harness); nơi symphony là bản triển khai đáng học nhất, cột Best trỏ thẳng `sources/symphony.md`.
 
 ## harness
 
@@ -53,13 +55,12 @@ Bối cảnh quan trọng: **bee chưng cất từ repository-harness** (cùng 6
 
 | Feature | beegog | repository-harness | Best | Ghi chú |
 |---|---|---|---|---|
-| worktree-isolation | ✗ (deferred, docs/08 §adopt-later) | →sym [→](sources/repository-harness.md#symphony-isolated-runner) | symphony | worktree + db copy + changeset return; nay giao tiếp với harness qua protocol v1 |
+| worktree-isolation | ✗ (deferred, docs/08 §adopt-later) | ~ (gốc, [→](sources/repository-harness.md#symphony-isolated-runner)) | ✓ symphony [→](sources/symphony.md#isolated-run-contract) | symphony sở hữu: worktree + WAL-safe snapshot + RUN_CONTRACT.json v1 + result validation; harness chỉ còn ảnh chụp lúc tách |
 | parallel-worker-swarm | ✓ [→](sources/beegog.md#orchestrator-assigns-workers) | ~ single-run lock | beegog | wave analysis + goal-check frozen judge |
 | write-conflict-control | ✓ reservations [→](sources/beegog.md#file-reservations) | ~ (worktree thay thế) | tùy kiến trúc | lock cùng cây vs cô lập cây — hai trường phái |
 | model-tier-economy | ✓ [→](sources/beegog.md#model-tiers-cost-discipline) | ✗ (deferred) | beegog | ceiling/generation/extraction + advisor + presets |
 | stuck-worker-rescue | ✓ advisor consult [→](sources/beegog.md#advisor-consult-protocol) | ✗ | beegog | budget ≤2, advice-only |
-| pr-integration | ✗ | →sym [→](sources/repository-harness.md#pr-automation) | symphony | run → PR khép vòng |
-| consumer-protocol | ~ command catalog [→](sources/beegog.md#unified-dispatcher-command-registry) | ✓ protocol v1 [→](sources/repository-harness.md#orchestration-protocol-v1) | harness | versioned JSON contract + exit codes + discovery-before-mutation — chuẩn giao tiếp giữa 2 agent system |
+| pr-integration | ✗ | ~ (gốc [→](sources/repository-harness.md#pr-automation)) | ✓ symphony | run → PR create/retry với forbidden-files guard; nay ở symphony (pr.rs, xem [→](sources/symphony.md#web-board-recovery-actions)) |
 
 ## routing
 
@@ -69,6 +70,12 @@ Bối cảnh quan trọng: **bee chưng cất từ repository-harness** (cùng 6
 | state-transition-enforcement | ✓ phase/cell CLI-owned [→](sources/beegog.md#phase-machine-cli-owned) | ✓ single-door + CAS [→](sources/repository-harness.md#story-status-single-door) | beegog (gates) / harness (concurrency) | bee chặn agent tự tiện (precondition + write-guard); harness chặn race đa-orchestrator (expected-status trong cùng transaction) |
 | skill-chain-router | ✓ hive router + handoff + chain-nudge [→](sources/beegog.md#hive-first-skill-router) | ~ request-class chọn loop một lần ở cửa [→](sources/repository-harness.md#request-class-loop-dispatch) | beegog | bee route liên tục qua chain nhiều skill; harness là single-skill system nên chỉ cần route request class |
 
+## integration-contract
+
+| Feature | beegog | repository-harness | Best | Ghi chú |
+|---|---|---|---|---|
+| cross-system-protocol | ✗ (monolith, không producer/consumer split) | ✓ protocol v1 producer [→](sources/repository-harness.md#orchestration-protocol-v1) | hòa (producer+consumer) | harness ĐỊNH NGHĨA protocol v1; symphony là CONSUMER thực chứng [→](sources/symphony.md#typed-runtime-boundary) — hai nửa cùng contract, chứng minh boundary chạy qua ranh giới product. bee:dual-runtime-contract là portability một-codebase, KHÁC loại |
+| product-boundary-ownership | ✗ | ~ (spec-decomposition ngầm) | ✓ symphony [→](sources/symphony.md#product-boundary-non-goals) | symphony khai báo tường minh "owns X / KHÔNG owns Y" + 11 non-goals; kỷ luật product biết ranh giới mình |
 ## context-memory
 
 | Feature | beegog | repository-harness | Best | Ghi chú |
@@ -80,7 +87,6 @@ Bối cảnh quan trọng: **bee chưng cất từ repository-harness** (cùng 6
 | pause-resume | ✓ HANDOFF 65% [→](sources/beegog.md#handoff-at-65-percent) | ✗ | beegog | never auto-resume |
 | settlement-capture | ✓ [→](sources/beegog.md#settlement-capture-unprompted) | ✗ | beegog | agent tự phát hiện "chốt" mỗi turn |
 | intervention-log | ~ (adopt-now, chưa build) | ✓ [→](sources/repository-harness.md#intervention-log) | harness | correction/override/escalation/approval là dữ liệu học |
-
 ## planning
 
 | Feature | beegog | repository-harness | Best | Ghi chú |
@@ -120,9 +126,9 @@ Bối cảnh quan trọng: **bee chưng cất từ repository-harness** (cùng 6
 | support-cli | ✓ zero-dep Node [→](sources/beegog.md#zero-dep-vendored-helpers) | ✓ Rust + SQLite [→](sources/repository-harness.md#rust-cli-ddd-layering) | trade-off | vendorability vs query power |
 | machine-readable-cli-catalog | ✓ [→](sources/beegog.md#unified-dispatcher-command-registry) | ~ clap --help | beegog | schema + examples được test chạy thật |
 | tool-registry | ✗ | ✓ [→](sources/repository-harness.md#tool-registry-capability) | harness | "absent capability = clean skip" |
-| env-doctor | ~ onboard recheck | ✓ [→](sources/repository-harness.md#doctor-preflight) | harness | preflight cả PR capability |
+| env-doctor | ~ onboard recheck | ~ (gốc [→](sources/repository-harness.md#doctor-preflight)) | ✓ symphony 10 checks [→](sources/symphony.md#doctor-preflight-10-checks) | symphony tiến hóa: 10 check Pass/Warn/Fail + next-action, thêm changeset-sync + optional-provider |
+| observer-ui | ✗ | ~ (gốc [→](sources/repository-harness.md#symphony-web-board)) | ✓ symphony [→](sources/symphony.md#web-board-recovery-actions) | recovery-action tính từ run state, không phải nút tĩnh |
 | cost-visibility | ✓ statusline [→](sources/beegog.md#statusline-subagent-cost) | ✗ | beegog | token subagent theo model |
-| observer-ui | ✗ | ✓ web board [→](sources/repository-harness.md#symphony-web-board) | harness | |
 
 ## config-packaging
 

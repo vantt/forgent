@@ -5,7 +5,7 @@ url: https://github.com/hoangnb24/repository-harness
 local: upstreams/repository-harness
 last_analyzed_commit: 9cc306d
 last_analyzed_date: 2026-07-13
-domains_covered: [harness, skills, hooks, workflow, orchestration, context-memory, planning, quality-gates, docs-style, tooling, config-packaging, repo-layout, safety, self-improvement, ux, testing-evals, routing]
+domains_covered: [harness, skills, hooks, workflow, orchestration, context-memory, planning, quality-gates, docs-style, tooling, config-packaging, repo-layout, safety, self-improvement, ux, testing-evals, routing, integration-contract]
 ---
 
 # Repository Harness — Feature Index
@@ -152,8 +152,16 @@ domains_covered: [harness, skills, hooks, workflow, orchestration, context-memor
 ### protocol-next-action-table
 - **What:** Tầng 3 (cross-system routing): contract v1 khai báo next-action của external orchestrator thành bảng quyết định dữ liệu: `database_state` (missing → init tường minh, current → proceed, needs_migration → migrate rồi rediscover, unsupported → terminal); exit code 0/2/3/4/5 với "branch on error code, never on message"; mutation timeout = unknown outcome → rediscover + query status (vd `db changeset status`) trước khi retry.
 - **Where:** `docs/contracts/harness-orchestration-v1.md`, `crates/harness-cli/src/interface.rs`
-- **Notable:** routing tầng 3 ở dạng decision table trong contract chứ không phải router code — mọi bên gọi route giống nhau, upgrade CLI không đổi hành vi route; mặt routing của orchestration-protocol-v1 (tooling).
+- **Notable:** routing tầng 3 ở dạng decision table trong contract chứ không phải router code — mọi bên gọi route giống nhau, upgrade CLI không đổi hành vi route; mặt routing của orchestration-protocol-v1 (integration-contract).
 - **Keywords:** database_state, exit codes, rediscover
+- **Seen:** 9cc306d
+
+## integration-contract
+
+### orchestration-protocol-v1
+- **What:** Contract công khai versioned cho consumer ngoài (Symphony là consumer đầu tiên): discovery trước mutation (`query contract --json` — không auto-init), mỗi lệnh `--json` in đúng 1 JSON envelope ra stdout, exit codes cố định (0/2/3/4/5), timeout semantics ("mutation timeout = unknown outcome → rediscover trước khi retry"), forward-compat (unknown fields tolerated, unknown protocol version = hard fail), "branch on error `code`, never on message", output limit 16 MiB.
+- **Where:** `docs/contracts/harness-orchestration-v1.md`, `crates/harness-cli/src/interface.rs` (machine_mode)
+- **Notable:** đây là cách đúng để 2 agent system nói chuyện qua CLI — sinh ra từ chính nhu cầu tách Symphony; cấm path-dependency/submodule/fork, chỉ protocol + released artifacts. Bên consumer thực chứng: symphony:typed-runtime-boundary.
 - **Seen:** 9cc306d
 
 ## context-memory
@@ -255,12 +263,6 @@ domains_covered: [harness, skills, hooks, workflow, orchestration, context-memor
 - **Where:** `docs/TOOL_REGISTRY.md`, `scripts/schema/003/005-*.sql`
 - **Notable:** "Absent tool capability is a clean skip, never a failure" — degradation contract tường minh.
 - **Seen:** 14e6f10
-
-### orchestration-protocol-v1
-- **What:** Contract công khai versioned cho consumer ngoài (Symphony là consumer đầu tiên): discovery trước mutation (`query contract --json` — không auto-init), mỗi lệnh `--json` in đúng 1 JSON envelope ra stdout, exit codes cố định (0/2/3/4/5), timeout semantics ("mutation timeout = unknown outcome → rediscover trước khi retry"), forward-compat (unknown fields tolerated, unknown protocol version = hard fail), "branch on error `code`, never on message", output limit 16 MiB.
-- **Where:** `docs/contracts/harness-orchestration-v1.md`, `crates/harness-cli/src/interface.rs` (machine_mode)
-- **Notable:** đây là cách đúng để 2 agent system nói chuyện qua CLI — sinh ra từ chính nhu cầu tách Symphony; cấm path-dependency/submodule/fork, chỉ protocol + released artifacts.
-- **Seen:** 9cc306d
 
 ### epoch-fence-migration-guard
 - **What:** Guard chống ghi trong lúc migration lớn: file lock (fs2) + journal checksummed SHA-256 với state machine `fenced → switched_pending_validation → complete/compensated`; mọi lệnh mutate phải acquire guard trước khi chạy; journal incomplete → fail-closed.
