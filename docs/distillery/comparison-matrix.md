@@ -115,6 +115,7 @@ Bối cảnh quan trọng: **bee chưng cất từ repository-harness** (cùng 6
 |---|---|---|---|---|
 | glossary | ✗ | ✓ [→](sources/repository-harness.md#glossary-driven-vocab) | harness | chống drift ngữ nghĩa |
 | entry-point-shim | ✓ AGENTS.md BEE block + CLAUDE.md 1 dòng | ✓ CLAUDE.md @import shim [→](sources/repository-harness.md#claude-md-import-shim) | harness | shim + progressive disclosure theo phase |
+| always-loaded-doctrine | ✓ doctrine layer + anchor-suite [→](sources/beegog.md#doctrine-layer-always-loaded) | ~ AGENTS.md prose, không test | beegog | placement rule ("hold khi không stage nào chạy?") + anchors suite-tested + "transport rides with the order"; fgOS có họ hàng conventions-coverage (enforce-ability manifest) nhưng không anchor-test standing sheet |
 | navigation-map | ✓ reading-map [→](sources/beegog.md#spec-reading-map) | ✓ component taxonomy [→](sources/repository-harness.md#component-taxonomy-coverage) | harness (taxonomy) / beegog (map) | 11-responsibility framework đáng đối chiếu với taxonomy forgent |
 | decision-records | ✓ Status/Confidence/Alternatives | ✓ Context/Decision/Reasoning/Alternatives/Implications | beegog | bee thêm Confidence + event-sourced supersede |
 | communication-doctrine | ✓ gate presentation + silent bookkeeping [→](sources/beegog.md#gate-presentation-contract) | ~ lane output format | beegog | litmus "user restate được" |

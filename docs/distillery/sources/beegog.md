@@ -3,7 +3,7 @@ name: beegog
 type: git-repo
 url: https://github.com/vantt/beegog
 local: upstreams/beegog
-last_analyzed_commit: e70602a
+last_analyzed_commit: af4840c
 last_analyzed_date: 2026-07-13
 domains_covered: [harness, skills, hooks, workflow, orchestration, context-memory, planning, quality-gates, docs-style, tooling, config-packaging, repo-layout, safety, self-improvement, ux, testing-evals, routing, integration-contract]
 ---
@@ -79,10 +79,10 @@ Plugin suite "validate-first agentic development" cho Claude Code + Codex. Chưn
 - **Seen:** e70602a
 
 ### write-guard-four-checks
-- **What:** PreToolUse guard 4 lớp tuần tự: gate guard → reservation guard → privacy/scout guard → CLI-shape validation (validate flags bee_*.mjs theo JSON-Schema). Xử lý cả `apply_patch` envelope; target không chứng minh được → deny cả batch.
-- **Where:** `hooks/bee-write-guard.mjs`
-- **Notable:** batch write guard per-target; "one denied target denies the request".
-- **Seen:** e70602a
+- **What:** PreToolUse guard 4 lớp tuần tự: gate guard → reservation guard → privacy/scout guard → CLI-shape validation (validate flags bee_*.mjs theo JSON-Schema). Xử lý cả `apply_patch` envelope; target không chứng minh được → deny cả batch. Từ af4840c: intake gate test TẬP terminal states (`idle` VÀ `compounding-complete`), vá lỗ "guard test một state khi state model có N state tương đương" — post-feature edits từng lọt qua vì chỉ check idle.
+- **Where:** `hooks/bee-write-guard.mjs`, `docs/history/learnings/critical-patterns.md`
+- **Notable:** batch write guard per-target; "one denied target denies the request". Bài học kèm: "a guard that tests one state is a law with a hole" — và hook's silence is never permission (luật là AGENTS.md, hook chỉ bắt cái bạn quên).
+- **Seen:** af4840c
 
 ### injection-dedup
 - **What:** Prompt-context hook chỉ inject reminder khi state đổi hoặc >30 phút, qua `.bee/.inject-cache.json`.
@@ -291,6 +291,13 @@ Plugin suite "validate-first agentic development" cho Claude Code + Codex. Chưn
 - **Notable:** đối xử error message như contract có test.
 - **Seen:** e70602a
 
+### doctrine-layer-always-loaded
+- **What:** Tầng "doctrine" tách tường minh khỏi procedure references: standing instruction sheet (AGENTS.md block) nạp MỌI turn kể cả turn hội thoại thường; placement rule một câu — "rule này có cần hold khi không stage nào chạy không?" yes → standing sheet, no → reference. Mỗi doctrine rule có **anchor** (cụm từ đặc trưng) được suite assert theo tên — rule biến mất khỏi sheet là suite đỏ. Doctrine đến mọi project bằng COPY (onboard/upgrade thay block tại chỗ), không bằng reference.
+- **Where:** `docs/specs/doctrine-layer.md`, `skills/bee-hive/templates/AGENTS.block.md`, `docs/history/learnings/critical-patterns.md`
+- **Notable:** hai bài học failure-driven đắt giá: (1) "promote an order and its transport must ride along" — rule 13 (fan-out) lên doctrine nhưng CÁCH dispatch (tier marker) còn nằm ở reference chỉ nạp khi invoke skill → mọi dispatch đầu phiên bị model-guard deny, học transport lúc bị từ chối; standing sheet phải mang lệnh KÈM mức tối thiểu để tuân thủ ngay lần đầu. (2) Rule đặt sai nhà "behaves exactly like no rule at all" — vô hình từ chính text của rule. Anchor-suite là cơ chế chống doctrine tự rỗng dần duy nhất thấy trong 4 nguồn.
+- **Keywords:** doctrine, standing sheet, anchor, always-applies, transport
+- **Seen:** af4840c
+
 ### spec-reading-map
 - **What:** `docs/specs/reading-map.md` = index 1 dòng/vị trí "cái gì sống ở đâu", kèm mục "chưa specced" và "elsewhere" — bản đồ điều hướng cho agent lạ.
 - **Where:** `docs/specs/reading-map.md`
@@ -320,10 +327,10 @@ Plugin suite "validate-first agentic development" cho Claude Code + Codex. Chưn
 ## config-packaging
 
 ### onboarding-manifest-drift
-- **What:** `.bee/onboarding.json` ghi SHA256 từng file managed (22 file); onboard re-run idempotent, detect drift + heal, `blocked_downgrade` guard (không force khi version unknown), never overwrite state/decisions/cells.
+- **What:** `.bee/onboarding.json` ghi SHA256 từng file managed (22 file); onboard re-run idempotent, detect drift + heal, `blocked_downgrade` guard (không force khi version unknown), never overwrite state/decisions/cells. Từ af4840c: repo-hook wiring là **sticky opt-in** — đồng ý một lần, upgrade sau tự mang theo, không đòi re-consent mỗi lần (v0.1.31); kèm bài học "partial upgrade reports success" (upgrade nửa chừng không được báo thành công).
 - **Where:** `skills/bee-hive/scripts/onboard_bee.mjs`, spec `docs/specs/onboarding.md`
-- **Notable:** "managed versions" pattern — update = re-onboard, không phải copy tay.
-- **Seen:** e70602a
+- **Notable:** "managed versions" pattern — update = re-onboard, không phải copy tay; consent là trạng thái bền, không phải nghi thức lặp.
+- **Seen:** af4840c
 
 ### managed-block-markers
 - **What:** Nội dung bee trong file của host (AGENTS.md, .gitignore) nằm giữa marker BEE:START/END; mọi byte ngoài marker giữ nguyên tuyệt đối; dòng "giống marker" không bị coi là marker.

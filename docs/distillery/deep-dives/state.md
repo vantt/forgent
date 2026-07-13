@@ -1,11 +1,13 @@
 ---
 topic: state
 date: 2026-07-13
-based_on: [beegog@e70602a, repository-harness@9cc306d, symphony@2f0b257, marketing-cockpit@588d800]
+based_on: [beegog@af4840c, repository-harness@9cc306d, symphony@2f0b257, marketing-cockpit@588d800]
 entries: [beegog:state-vs-log-two-physics, beegog:phase-machine-cli-owned, beegog:cell-status-lifecycle, beegog:policy-vs-ops-split, beegog:docs-history-per-feature, repository-harness:durable-sqlite-layer, repository-harness:changeset-event-sourcing, repository-harness:story-status-single-door, repository-harness:epoch-fence-migration-guard, repository-harness:policy-vs-durable-separation, symphony:run-and-queue-state-machine, symphony:run-artifact-durability-split, symphony:changeset-content-sha-immutability, symphony:board-state-precedence-derivation, marketing-cockpit:four-memory-types, marketing-cockpit:procedural-memory-reinforcement, marketing-cockpit:four-zone-storage-separation, marketing-cockpit:task-signal-state-machines]
 ---
 
 # Deep-dive: state
+
+> Delta beegog e70602a→af4840c (2026-07-13, verified): không lật kết luận nào. Liên quan: write-guard vá lỗ "guard test một state khi state model có N terminal states" (idle + compounding-complete) — củng cố luận điểm transition/guard theo TẬP trạng thái; thêm doctrine-layer + anchor-suite (entry mới beegog:doctrine-layer-always-loaded, ngoài phạm vi dive này).
 
 **Bottom Line:** "State" trong 4 nguồn không phải một thứ mà là **bốn tầng tách biệt** thường bị gộp nhầm: (1) *state-shape* — mô hình vòng đời (FSM enum + precondition); (2) *store vật lý* — JSON zero-dep vs SQLite vs YAML; (3) *knowledge/memory* — cái gì overwrite theo reality vs cái gì append-only theo thời gian; (4) *durability* — "chạy xong ≠ đã merge ≠ đã bền". Insight nền tảng nhất, phát biểu tường minh chỉ ở bee, là **log-vs-state hai vật lý ngược nhau** — mọi thiết kế state đúng đắn bắt đầu từ việc phân loại mỗi mẩu dữ liệu vào một trong hai. fgOS (marketing-cockpit) đẩy trục memory xa nhất: 4 loại memory theo khoa học nhận thức + consolidation loop + quên có trọng số bằng chứng — đây là **candidate mới mạnh nhất deep-dive này tìm ra** (chưa có trong porting-log). Khuyến nghị cho forgent: khóa nguyên lý log-vs-state làm luật thiết kế state layer TRƯỚC khi chọn store; giữ store zero-dep JSON như bee cho tới khi query/aggregate thành nút thắt thật; và nếu forgent cần agent tự học qua nhiều session thì port mô hình typed-memory + consolidation của fgOS (đây là thứ bee/harness/symphony đều KHÔNG có). Mặt concurrency-safety của state (CAS/lock/fence) đã phân tích trong deep-dive `routing` §tầng-1 — ở đây chỉ tham chiếu, không lặp lại.
 
