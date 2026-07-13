@@ -1,0 +1,63 @@
+{
+  "id": "phase-1-state-layer-1",
+  "feature": "phase-1-state-layer",
+  "title": "Init: package + node:test + commands ghi nhận",
+  "lane": "standard",
+  "status": "capped",
+  "deps": [],
+  "decisions": [
+    "D2"
+  ],
+  "files": [
+    "package.json",
+    ".gitignore",
+    "test/smoke.test.mjs",
+    ".bee/config.json"
+  ],
+  "read_first": [
+    "docs/history/phase-1-state-layer/plan.md",
+    ".bee/config.json"
+  ],
+  "action": "Init lane: tạo package.json private (type module, engines node>=18, scripts.test = node --test, KHÔNG dependency nào — zero-dep per plan). Thêm test/smoke.test.mjs pass được. .gitignore: thêm .fgos/state.json (view D4, không commit) và node_modules/. Ghi commands.test = 'npm test' vào .bee/config.json: kiểm tra node .bee/bin/bee.mjs --help --json xem có verb config/commands không; có thì dùng verb đó, không có thì log friction qua node .bee/bin/bee_backlog.mjs add rồi mới sửa tay đúng key commands.test (quy ước harness: không sửa tay file .bee/ khi có verb CLI; đây là ngoại lệ .bee/ duy nhất per D2). Đồng thời ghi commands.verify = 'npm test && node .claude/skills/distill/scripts/distill.mjs check' (baseline gate chạy cả product suite lẫn distill check).",
+  "must_haves": {
+    "truths": [
+      "npm test chạy xanh từ clone sạch không cần cài gì ngoài Node 18+"
+    ],
+    "artifacts": [
+      {
+        "path": "package.json",
+        "substantive": "private, type module, scripts.test, zero dependencies"
+      }
+    ],
+    "key_links": [
+      ".bee/config.json commands.test = npm test",
+      ".bee/config.json commands.verify = npm test && distill check (chuỗi đầy đủ)"
+    ],
+    "prohibitions": [
+      "Không thêm dependency/devDependency nào",
+      "Không sửa key nào khác trong .bee/config.json ngoài commands"
+    ]
+  },
+  "verify": "npm test",
+  "trace": {
+    "worker": "Kevin",
+    "outcome": "Zero-dep package.json (private, type module, engines node>=18, scripts.test scoped to test/**/*.test.mjs to avoid scanning upstreams/); test/smoke.test.mjs passes via node:test; .gitignore adds .fgos/state.json + node_modules/; .bee/config.json commands.test/commands.verify recorded (no config verb exists in bee.mjs, hand-edited under documented D2 exception, friction logged).",
+    "files_changed": [
+      "package.json",
+      ".gitignore",
+      "test/smoke.test.mjs",
+      ".bee/config.json"
+    ],
+    "deviations": [],
+    "friction": null,
+    "capped_at": "2026-07-13T18:50:06.390Z",
+    "behavior_change": false,
+    "verification_evidence": null,
+    "verify_output": "\n> test\n> node --test test/**/*.test.mjs\n\n✔ node:test runner is wired up (0.388925ms)\nℹ tests 1\nℹ suites 0\nℹ pass 1\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 40.615184\n",
+    "verify_passed": true,
+    "claimed_at": "2026-07-13T18:47:35.432Z",
+    "verify_command": "npm test",
+    "verified_at": "2026-07-13T18:49:59.250Z"
+  },
+  "tier": "generation"
+}
