@@ -46,6 +46,12 @@ domains_covered: [harness, skills, hooks, workflow, orchestration, context-memor
 - **Notable:** tiến hóa harness được đo bằng benchmark ngoài (compliance %, trace quality, lane accuracy), không tự phán.
 - **Seen:** 14e6f10
 
+### instruction-level-enforcement
+- **What:** Trước E12, toàn bộ workflow (intake → story → trace) KHÔNG được enforce cơ học ở bất kỳ tầng nào — schema gần như không có FK bắt buộc, CLI không lệnh nào từ chối vì thiếu bước trước, không git hook, không CI gate. Mọi thứ chạy nhờ agent tự tuân thủ instruction; `audit`/`score-*` là observability chứ không phải gate. Repo tự nhận trong HARNESS_COMPONENTS.md: "Permissions are instruction-level only".
+- **Where:** deep-dive 11/07 (`plans/reports/deep-dive-qa-260711-*` §2, code-verified tại 14e6f10); E12 (@9cc306d) bắt đầu siết: SQL read-only, request authority, story-complete atomic
+- **Notable:** đối cực triết lý với bee (enforce bằng code); và quỹ đạo của harness đang tiến dần về phía enforce — xác nhận hướng bee chọn từ đầu là đúng.
+- **Seen:** 9cc306d
+
 ## skills
 
 ### intake-griller-interview
@@ -125,7 +131,7 @@ domains_covered: [harness, skills, hooks, workflow, orchestration, context-memor
 ### changeset-event-sourcing
 - **What:** Mọi run ghi semantic changeset JSONL (header + operations story.add/update, trace.add, decision.add...); idempotent replay; `db rebuild` dựng lại toàn bộ db từ changesets; db gitignored nhưng changesets committed. Từ 9cc306d: changeset mang `content_sha256` (conflict khi ID trùng mà content khác), thêm `db changeset status` (inspect không ghi) + `db snapshot` (SQLite online backup atomic, báo logical hash + file hash).
 - **Where:** `crates/harness-cli` (changeset apply/status, snapshot), `.harness/changesets/`, migration 013
-- **Notable:** giải bài toán "SQLite không diff được trong git" bằng event log commit được; content-addressed identity chống double-apply lệch nội dung.
+- **Notable:** giải bài toán "SQLite không diff được trong git" bằng event log commit được; content-addressed identity chống double-apply lệch nội dung. Chi tiết cơ chế (deep-dive 11/07 §6): changeset chỉ ghi khi env `HARNESS_RUN_ID` set, append JSONL **trong cùng SQLite transaction** (rollback chung), payload là full-record chứ không phải column diff. Cùng pattern với Beads (steveyegge) — hai bên hội tụ độc lập.
 - **Seen:** 9cc306d
 
 ### intervention-log
@@ -145,7 +151,7 @@ domains_covered: [harness, skills, hooks, workflow, orchestration, context-memor
 ### epic-story-hierarchy
 - **What:** `docs/stories/epics/E*/US-*/`; story dependencies + hierarchy trong schema (007/008 migrations). Từ 9cc306d: CLI verbs cycle-safe (`story dependency add/remove`, `story hierarchy add/remove`, DFS cycle detection), `query work-graph --json` trả stories + edges trong 1 transaction kèm revision hash, `story update` dạng compare-and-set với runnable precondition.
 - **Where:** `docs/stories/`, `scripts/schema/007-008-*.sql`, `crates/harness-cli/src/application.rs`
-- **Notable:** dependency là dữ liệu query được; work-graph snapshot nhất quán là nền cho external orchestrator.
+- **Notable:** dependency là dữ liệu query được; work-graph snapshot nhất quán là nền cho external orchestrator. Lịch sử thú vị: tại 14e6f10 hai bảng này là **schema mồ côi** — không CLI write path, không doc (deep-dive 11/07 §9); 2 ngày sau upstream tự vá đúng lỗ hổng đó — case study "schema built ahead of tooling" và giá trị của việc theo dõi delta.
 - **Seen:** 9cc306d
 
 ## quality-gates
