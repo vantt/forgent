@@ -11,6 +11,8 @@
 //   distill.mjs seal <name> [--domains all|d1,d2] [--version <v>] [--root <dir>]
 //   distill.mjs check [<name>] [--root <dir>]
 //   distill.mjs rank [--root <dir>]        # candidates by impact score R*E/F
+//   distill.mjs status [--json] [--root <dir>]  # learning-area dashboard (local view, no network)
+//   distill.mjs find <term> [--root <dir>] # print matching entry blocks + matrix rows
 //
 // Refusal format: ERROR (rule) / WHY (reason) / FIX (next action).
 
@@ -146,6 +148,37 @@ function cloneDir(root, name, meta) {
 
 function today() {
   return new Date().toISOString().slice(0, 10);
+}
+
+function listSourceNames(root) {
+  const dir = path.join(root, REFS_DIR, "sources");
+  return fs.existsSync(dir)
+    ? fs.readdirSync(dir).filter((f) => f.endsWith(".md")).map((f) => f.replace(/\.md$/, ""))
+    : [];
+}
+
+function currentCursor(meta) {
+  return meta.last_analyzed_commit || meta.last_analyzed_version || meta.extracted_date || null;
+}
+
+// Deep-dives pin the source cursors they analyzed (frontmatter based_on:
+// [name@cursor]); when a source moves past a pin, the dive is stale.
+function deepDiveStaleness(root) {
+  const dir = path.join(root, REFS_DIR, "deep-dives");
+  const stale = [];
+  if (!fs.existsSync(dir)) return stale;
+  for (const f of fs.readdirSync(dir).filter((f) => f.endsWith(".md"))) {
+    const fm = parseFrontmatter(fs.readFileSync(path.join(dir, f), "utf8"));
+    const based = Array.isArray(fm?.data.based_on) ? fm.data.based_on : [];
+    for (const pin of based) {
+      const [src, cursor] = pin.split("@");
+      const sf = sourcePath(root, src);
+      if (!fs.existsSync(sf)) { stale.push(`${f}: based_on unknown source "${src}"`); continue; }
+      const cur = currentCursor(parseFrontmatter(fs.readFileSync(sf, "utf8"))?.data || {});
+      if (cursor && cur && cursor !== cur) stale.push(`${f}: based on ${src}@${cursor}, source now @${cur}`);
+    }
+  }
+  return stale;
 }
 
 // ---------- templates (embedded so the script alone can bootstrap) ----------
@@ -378,7 +411,87 @@ function cmdCheck(args) {
     console.log(problems.length ? `✗ ${name}\n  - ${problems.join("\n  - ")}` : `✓ ${name}`);
     if (problems.length) bad++;
   }
+  if (!args._[0]) {
+    const stale = deepDiveStaleness(root);
+    if (stale.length) { console.log(`✗ deep-dives\n  - ${stale.join("\n  - ")}`); bad++; }
+  }
   process.exit(bad ? 1 : 0);
+}
+
+function cmdStatus(args) {
+  const root = requireRoot(args);
+  const taxonomy = loadTaxonomy(root);
+  const sources = [];
+  for (const name of listSourceNames(root)) {
+    const { meta } = loadSource(root, name);
+    const covered = Array.isArray(meta.domains_covered) ? meta.domains_covered : [];
+    const s = { name, type: meta.type, cursor: currentCursor(meta), backfill: taxonomy.filter((d) => !covered.includes(d)).length };
+    if (meta.type === "git-repo" && s.cursor) {
+      const repo = cloneDir(root, name, meta);
+      if (!fs.existsSync(path.join(repo, ".git"))) s.behind = "no-clone";
+      else {
+        const n = git(repo, ["rev-list", "--count", `${s.cursor}..HEAD`], { soft: true, quietErr: true });
+        s.behind = n === null ? "?" : Number(n);
+      }
+    }
+    sources.push(s);
+  }
+  const intakeFile = path.join(root, REFS_DIR, "intake.md");
+  const intake_pending = Math.max(0, fs.existsSync(intakeFile)
+    ? fs.readFileSync(intakeFile, "utf8").split("\n").filter((l) => /^\|/.test(l)).length - 2
+    : 0);
+  let candidates = 0, unscored = 0;
+  const logFile = path.join(root, REFS_DIR, "porting-log.md");
+  if (fs.existsSync(logFile))
+    for (const line of fs.readFileSync(logFile, "utf8").split("\n")) {
+      if (!/^\|/.test(line) || !/\|\s*candidate\s*\|/.test(line)) continue;
+      candidates++;
+      if (!/R[1-3]\s*E[1-3]\s*F[1-3]/.test(line)) unscored++;
+    }
+  const stale_deep_dives = deepDiveStaleness(root);
+  if (args.json)
+    return console.log(JSON.stringify({ sources, intake_pending, candidates, unscored, stale_deep_dives }, null, 2));
+  console.log("== distill status (local view — 'delta <name>' pulls upstream) ==");
+  for (const s of sources) {
+    const behind = s.behind === undefined ? "" : s.behind === 0 ? " · clone even with cursor" : ` · clone ${s.behind} commit(s) past cursor`;
+    console.log(`  ${s.cursor ? "●" : "○"} ${s.name} (${s.type}) cursor=${s.cursor || "never"}${behind}${s.backfill ? ` · backfill ${s.backfill} domains` : ""}`);
+  }
+  console.log(`  intake pending: ${intake_pending} · candidates: ${candidates}${unscored ? ` (${unscored} UNSCORED)` : ""}`);
+  if (stale_deep_dives.length) console.log(`  stale deep-dives:\n    - ${stale_deep_dives.join("\n    - ")}`);
+  const next = [];
+  if (intake_pending) next.push("triage intake");
+  for (const s of sources) {
+    if (!s.cursor) next.push(`full scan ${s.name}`);
+    else if (typeof s.behind === "number" && s.behind > 0) next.push(`extract delta of ${s.name}`);
+    if (s.backfill) next.push(`backfill ${s.name}`);
+  }
+  if (unscored) next.push("score unscored candidates");
+  if (stale_deep_dives.length) next.push("refresh stale deep-dives");
+  if (next.length) console.log(`  suggested next: ${next.slice(0, 4).join(" · ")}`);
+}
+
+function cmdFind(args) {
+  const [term] = args._;
+  if (!term) fail("find needs <term>", "it searches entry blocks, matrix rows and deep-dives for a term", "distill.mjs find reservation");
+  const root = requireRoot(args);
+  const rx = new RegExp(term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i");
+  let hits = 0;
+  const matrixFile = path.join(root, REFS_DIR, "comparison-matrix.md");
+  if (fs.existsSync(matrixFile)) {
+    const rows = fs.readFileSync(matrixFile, "utf8").split("\n").filter((l) => /^\|/.test(l) && rx.test(l));
+    if (rows.length) { console.log(`== comparison-matrix.md (${rows.length} rows) ==\n${rows.join("\n")}\n`); hits += rows.length; }
+  }
+  for (const sub of ["sources", "deep-dives"]) {
+    const dir = path.join(root, REFS_DIR, sub);
+    if (!fs.existsSync(dir)) continue;
+    for (const f of fs.readdirSync(dir).filter((f) => f.endsWith(".md")))
+      for (const block of fs.readFileSync(path.join(dir, f), "utf8").split(/^(?=#{2,3} )/m))
+        if (block.startsWith("### ") && rx.test(block)) {
+          console.log(`== ${sub}/${f} :: ${block.split("\n")[0].slice(4)} ==\n${block.trim()}\n`);
+          hits++;
+        }
+  }
+  if (!hits) console.log(`No matches for "${term}". Try a source's own vocabulary (Keywords lines exist for this) or a broader term.`);
 }
 
 function cmdRank(args) {
@@ -411,7 +524,7 @@ function cmdRank(args) {
 
 const [cmd, ...rest] = process.argv.slice(2);
 const args = parseArgs(rest);
-const commands = { init: cmdInit, add: cmdAdd, delta: cmdDelta, seal: cmdSeal, check: cmdCheck, rank: cmdRank };
+const commands = { init: cmdInit, add: cmdAdd, delta: cmdDelta, seal: cmdSeal, check: cmdCheck, rank: cmdRank, status: cmdStatus, find: cmdFind };
 if (!commands[cmd])
   fail(`unknown command "${cmd || ""}"`, "distill only automates the mechanical parts of the learning lifecycle", `use one of: ${Object.keys(commands).join(" | ")} (see header comment for flags)`);
 commands[cmd](args);

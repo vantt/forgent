@@ -34,6 +34,21 @@ project; the script only automates the mechanical steps.
 
 Helper (all commands below): `node <skill-dir>/scripts/distill.mjs`
 
+## Invocation routing (`/distill [subcommand]`)
+
+| Invocation | Workflow |
+|---|---|
+| `/distill` (no args) | run script `status`, present dashboard in work language, recommend next action |
+| `/distill setup` | script `init`, explain layout, offer to add first sources |
+| `/distill triage` | walk intake.md row by row: present + recommend, HUMAN decides; accept → script `add` + clone, drop the row; reject → delete row, reason goes to porting-log if it was feature-shaped |
+| `/distill scan <source>` | the Extract lifecycle below (delta → inventory → extract → compare → seal → check) |
+| `/distill backfill <source>` | scan CURRENT snapshot for missing domains only, then `seal --domains` |
+| `/distill deep-dive <topic>` | follow `references/deep-dive-protocol.md` (ends with a synthesis) |
+| `/distill rank` | script `rank`; present porting priorities + deep-dive picks |
+| `/distill find <term>` | script `find`; read matched entries, answer from them |
+| `/distill check` | script `check`; fix mechanical issues, report the rest |
+| `/distill outcome <feature> <note>` | append `Outcome:` (confirmed/ineffective/adjusted) to that porting-log row |
+
 ## Learning area layout (created by `init`)
 
 ```
@@ -76,7 +91,9 @@ Capture → Triage → Extract → Compare → Seal
    unsealed scan will be re-done from the old cursor next time.
 
 Run `check [<name>]` after sealing: it verifies cursors resolve, Where paths
-exist at HEAD, matrix anchors resolve, and lists domains needing backfill.
+exist at HEAD, matrix anchors resolve, deep-dives are not stale against
+source cursors, and lists domains needing backfill. `status --json` is the
+machine surface for future automation (session-start nudges, cron sweeps).
 
 ## Source types and cursors
 
