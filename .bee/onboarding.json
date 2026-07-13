@@ -32,17 +32,8 @@
       "state.mjs": "51f395609d132c98efbe950553f0e1c393b920fd368abc09c73b757310d32bfc",
       "validate-args.mjs": "bcdb59f528ec56b3290ee75bf63d7bb018cb22ec5d1381e85a5d2c0cf3b1dd23"
     },
-    "repo_hooks": {
-      "adapter.mjs": "b769b2372123b31e3bdca11f463574046a36669e8eaf2c39e2df83435d755a4b",
-      "bee-session-init.mjs": "0af43e130c8612cb906016de1b26ef87868d21c0ecb391a3038fa6e7400423e7",
-      "bee-prompt-context.mjs": "4a50dfeae57f70b95d9e7020df2deac5d980b09e059d0aae5a64dc2c1c338ca6",
-      "bee-write-guard.mjs": "515c9100225ae931d39dbad3f6376b0a965315859ddb67daa3e5939570c7c609",
-      "bee-state-sync.mjs": "2a0748bbd02884dbca87a494b825b350e0fcf149bb12a83c638a248d8619cbc4",
-      "bee-chain-nudge.mjs": "935c66e0916a3439579cfc387a81adb15cf66b83a7043688be56924425a70c41",
-      "bee-session-close.mjs": "98049c8bcd5aaf01d312c3633efbce70a7b3f4fcc89d0c6c849c63464339de4a",
-      "bee-model-guard.mjs": "229d7abe02ddb71a26a45df2b3f1173797d4348e264d903e52b8e3c95eab075d"
-    }
+    "repo_hooks": {}
   },
   "created_at": "2026-07-13T17:03:02.817Z",
-  "updated_at": "2026-07-13T17:03:02.817Z"
+  "updated_at": "2026-07-13T17:25:22.656Z"
 }

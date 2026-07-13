@@ -1,0 +1,1 @@
+{"ts":"2026-07-13T17:25:35.437Z","type":"friction","title":"No CLI verb to set .bee/config.json commands.verify","detail":"onboard notice asks for standard commands but bee.mjs has no config verb; hand-editing per hive law 12","severity":"P3","layer":"environment","feature":""}

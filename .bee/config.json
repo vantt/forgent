@@ -19,5 +19,8 @@
       "extraction": null,
       "generation": null
     }
+  },
+  "commands": {
+    "verify": "node .claude/skills/distill/scripts/distill.mjs check"
   }
 }
