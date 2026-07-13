@@ -5,6 +5,7 @@ skills
 hooks
 workflow
 orchestration
+routing
 context-memory
 planning
 quality-gates

@@ -154,10 +154,11 @@ Vì đây là hệ thống học tập, hai cơ chế này là đầu ra quan tr
 Danh sách máy-đọc (nguồn sự thật cho backfill detection): `docs/distillery/taxonomy.txt`. Định nghĩa chi tiết bên dưới — hai nơi phải khớp tên domain.
 
 - `harness` — vòng lặp agent chính, tool surface, permission model, sandbox
-- `skills` — cấu trúc skill, trigger description, progressive disclosure, routing
+- `skills` — cấu trúc skill, trigger description, progressive disclosure (routing *vào* 1 skill từ description — không phải cơ chế routing nội bộ, xem domain `routing`)
 - `hooks` — lifecycle events (session start, pre/post tool, privacy guard)
-- `workflow` — pipeline làm việc, gates, phases, chế độ go/auto
+- `workflow` — pipeline làm việc, gates, phases, chế độ go/auto (định nghĩa artifact/trạng thái pipeline — không phải cơ chế quyết định chuyển giữa chúng, xem domain `routing`)
 - `orchestration` — subagents, teams, swarm, phân vùng file ownership
+- `routing` — cơ chế quyết định "chạy gì kế tiếp", 3 tầng lồng nhau: (1) **state-routing** — chuyển state trong 1 task/workflow; (2) **task-routing** — chọn giữa nhiều task/workflow trong 1 skill; (3) **skill-routing** — điều phối qua lại giữa các skill trong hệ sinh thái (vd bee-hive: router kernel, bảng routing, state.json.phase, chain-nudge hook). Ranh giới: `workflow`/`skills` mô tả *artifact* (phases, gates, description); `routing` mô tả *cơ chế quyết định chuyển giữa các artifact đó*.
 - `context-memory` — memory files, compaction, journal, state & resume
 - `planning` — cấu trúc plan/phase/report, plan gates
 - `quality-gates` — review loops, adversarial verify, evals, TDD-for-skills

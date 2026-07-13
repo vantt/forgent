@@ -61,6 +61,14 @@ Bối cảnh quan trọng: **bee chưng cất từ repository-harness** (cùng 6
 | pr-integration | ✗ | →sym [→](sources/repository-harness.md#pr-automation) | symphony | run → PR khép vòng |
 | consumer-protocol | ~ command catalog [→](sources/beegog.md#unified-dispatcher-command-registry) | ✓ protocol v1 [→](sources/repository-harness.md#orchestration-protocol-v1) | harness | versioned JSON contract + exit codes + discovery-before-mutation — chuẩn giao tiếp giữa 2 agent system |
 
+## routing
+
+| Feature | beegog | repository-harness | Best | Ghi chú |
+|---|---|---|---|---|
+| next-work-derived-from-state | ✓ readyCells [→](sources/beegog.md#cell-status-lifecycle) | ✓ runnable predicate [→](sources/repository-harness.md#runnable-derived-dispatch) | hòa (hội tụ) | hai bên độc lập cùng đến "việc kế tiếp = truy vấn dẫn xuất từ deps+status", không phải danh sách tay; harness thêm cấm consumer tự suy lại |
+| state-transition-enforcement | ✓ phase/cell CLI-owned [→](sources/beegog.md#phase-machine-cli-owned) | ✓ single-door + CAS [→](sources/repository-harness.md#story-status-single-door) | beegog (gates) / harness (concurrency) | bee chặn agent tự tiện (precondition + write-guard); harness chặn race đa-orchestrator (expected-status trong cùng transaction) |
+| skill-chain-router | ✓ hive router + handoff + chain-nudge [→](sources/beegog.md#hive-first-skill-router) | ~ request-class chọn loop một lần ở cửa [→](sources/repository-harness.md#request-class-loop-dispatch) | beegog | bee route liên tục qua chain nhiều skill; harness là single-skill system nên chỉ cần route request class |
+
 ## context-memory
 
 | Feature | beegog | repository-harness | Best | Ghi chú |

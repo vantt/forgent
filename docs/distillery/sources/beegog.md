@@ -5,7 +5,7 @@ url: https://github.com/vantt/beegog
 local: upstreams/beegog
 last_analyzed_commit: e70602a
 last_analyzed_date: 2026-07-13
-domains_covered: [harness, skills, hooks, workflow, orchestration, context-memory, planning, quality-gates, docs-style, tooling, config-packaging, repo-layout, safety, self-improvement, ux, testing-evals]
+domains_covered: [harness, skills, hooks, workflow, orchestration, context-memory, planning, quality-gates, docs-style, tooling, config-packaging, repo-layout, safety, self-improvement, ux, testing-evals, routing]
 ---
 
 # Beegog (bee) — Feature Index
@@ -152,6 +152,45 @@ Plugin suite "validate-first agentic development" cho Claude Code + Codex. Chưn
 - **What:** Worker kẹt được hỏi model mạnh hơn: chỉ khi dispatch có Advisor line VÀ verify fail lần đầu; ≤2 consult/claim; evidence bundle inline; advice-only (không thẩm quyền gate); luôn re-run verify thật sau advice.
 - **Where:** `skills/bee-executing/SKILL.md`, decision 0013
 - **Notable:** rescue ladder có budget: more context → stronger tier → escalate user.
+- **Seen:** e70602a
+
+## routing
+
+### hive-first-skill-router
+- **What:** Tầng 3 (skill-routing): bee-hive là entry router — bảng "Request type → First skill" (vague/new → exploring, research clear-scope → planning/xia, review tường minh → reviewing, document → scribing, cleanup → grooming...); mỗi skill kết thúc bằng handoff sentence cố định gọi tên skill kế ("Invoke bee-X skill"), tạo chain khép kín ...swarming → scribing → compounding → hive; `.bee/HANDOFF.json` hiện diện → surface và chờ, never auto-resume.
+- **Where:** `skills/bee-hive/SKILL.md`, `skills/bee-hive/references/routing-and-contracts.md`, `hooks/bee-chain-nudge.mjs`
+- **Notable:** router hai nửa: bảng chọn cửa vào + câu handoff cuối mỗi skill; hook chain-nudge (SubagentStop) đọc phase và nhắc lại bước kế — chain được harness đẩy đi, không sống bằng trí nhớ agent. Mặt cơ chế của staged-chain-with-gates (workflow).
+- **Seen:** e70602a
+
+### phase-machine-cli-owned
+- **What:** Tầng 1 (state-routing, mức workflow): phase enum trong `.bee/state.json` (idle → exploring → planning → validating → swarming → scribing → compounding, alias terminal compounding-complete; `KNOWN_PHASES`), transition chỉ qua bee_state.mjs — write-guard deny hand-edit. `startFeature()` là transition có tiền điều kiện: chỉ từ idle/compounding-complete, chặn khi còn cell nonterminal, worker đăng ký, reservation active hoặc HANDOFF; một atomic write set feature/mode/phase và reset cả 4 gates về false.
+- **Where:** `skills/bee-hive/templates/lib/state.mjs`, `hooks/bee-write-guard.mjs`
+- **Notable:** chuyển phase là API có precondition chứ không phải câu văn; reset gates nằm trong cùng transition nên không có đường quên; phase lạ → agent-drift warning thay vì crash.
+- **Seen:** e70602a
+
+### cell-status-lifecycle
+- **What:** Tầng 1 (state-routing, mức task): cell status open → claimed → capped / blocked / dropped (capped, dropped terminal); `claimCell` đòi execution gate approved + mọi deps đã capped; `capCell` đòi verify pass được ghi nhận (+ red-failure evidence khi behavior_change); `readyCells()` suy ra tập cell chạy được từ deps-capped.
+- **Where:** `skills/bee-hive/templates/lib/cells.mjs`
+- **Notable:** "việc kế tiếp" là truy vấn dẫn xuất từ trạng thái, không phải danh sách tay — hội tụ độc lập với runnable predicate của harness (repository-harness:runnable-derived-dispatch).
+- **Seen:** e70602a
+
+### lane-routes-chain-shape
+- **What:** Tầng 2 (task-routing): lane từ mode gate (đếm flag cơ học — xem risk-lanes-mechanical) quyết định lối đi trong chain: docs → exit planning ngay; tiny/small → merged Gate 2+3 rồi thẳng bee-swarming solo, bee-validating không invoke riêng mà fold inline thành reality check 2 phút trong planning; standard → bee-validating đầy đủ; high-risk → validating scale plan-checker thành persona panel.
+- **Where:** `skills/bee-planning/SKILL.md`, `skills/bee-validating/SKILL.md`
+- **Notable:** đường tắt không bỏ bước mà "gấp bước vào trong" — mọi lane vẫn đi qua cùng invariants, chỉ đổi hình thức; handoff cuối planning rẽ nhánh theo lane (swarming vs validating).
+- **Seen:** e70602a
+
+### status-token-wave-dispatch
+- **What:** Tầng 2 (task-routing): vòng dispatch của orchestrator swarming — wave analysis (deps capped + không chung file → cùng wave), 1 cell/worker; parse token trả về: [DONE] → goal-check tự re-run verify (fail → re-dispatch cùng tier kèm output lỗi), [BLOCKED] → rescue ladder 3 nấc (more context → stronger tier → escalate user), wave sạch → wave kế; hết slice → quay bee-planning (slice sau) hoặc bee-scribing (slice cuối).
+- **Where:** `skills/bee-swarming/SKILL.md`, `skills/bee-swarming/references/swarming-reference.md`
+- **Notable:** routing hậu-worker máy móc hoàn toàn trên status token (cặp status-token-protocol, ux); rescue ladder là escalation routing có budget thay vì retry mù.
+- **Keywords:** wave, rescue ladder, goal-check
+- **Seen:** e70602a
+
+### mode-tables-trigger-dispatch
+- **What:** Tầng 2 (task-routing): skill đa mode chuẩn hóa dispatch thành bảng Mode | Trigger | Does — bee-scribing 5 mode (sync/capture/flush/harvest/bootstrap; trigger là sự kiện quan sát được: chain default, settlement signal, queue non-empty tại flush point, user ask, thiếu map file), bee-briefing 4 mode (render/refresh/walkthrough/on-demand); mode chọn bằng match trigger, không bằng phán đoán tự do.
+- **Where:** `skills/bee-scribing/SKILL.md`, `skills/bee-briefing/SKILL.md`
+- **Notable:** "routing table trong văn xuôi" lặp nhất quán khắp suite — bằng chứng tầng 2 được làm tường minh ở mọi skill đa mode, không chỉ trong code.
 - **Seen:** e70602a
 
 ## context-memory

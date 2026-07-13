@@ -29,6 +29,25 @@ Slug: kebab-case, stable forever. Cross-reference format: `<source>:<slug>`.
 - NEVER rename a slug. To restructure, add the new entry and mark the old one
   `Status: superseded-by-<new-slug>`.
 
+## New-domain discovery (concept fits no existing taxonomy domain)
+
+- Never silently skip the finding, and never edit `taxonomy.txt` unprompted —
+  both are structural decisions that belong to the human, same tier as
+  porting adoption and slug renames.
+- Extract the entry anyway, right now, under the closest-fit existing domain
+  (or a temporary `## unclassified` heading if nothing is close) — the
+  observation is never lost while a taxonomy decision is pending.
+- Surface it in the session report as a proposal, same shape as a porting
+  candidate: "found `<concept>` — no taxonomy domain fits, recommend adding
+  `<candidate-domain-name>`."
+- If the human approves: add the domain to `taxonomy.txt` yourself (this
+  marks every already-sealed source as needing backfill for it — `check`
+  will list them), then move the entry from its temporary home to the new
+  domain heading.
+- Still `seal` the source normally regardless — the open proposal does not
+  block sealing (same headless-mode principle: cursor moves, decisions
+  queue, nothing is lost).
+
 ## Delta discipline (incremental scans)
 
 - The commit log groups into themes first; extract per theme, not per commit.

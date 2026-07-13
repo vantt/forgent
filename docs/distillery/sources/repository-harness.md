@@ -5,7 +5,7 @@ url: https://github.com/hoangnb24/repository-harness
 local: upstreams/repository-harness
 last_analyzed_commit: 9cc306d
 last_analyzed_date: 2026-07-13
-domains_covered: [harness, skills, hooks, workflow, orchestration, context-memory, planning, quality-gates, docs-style, tooling, config-packaging, repo-layout, safety, self-improvement, ux, testing-evals]
+domains_covered: [harness, skills, hooks, workflow, orchestration, context-memory, planning, quality-gates, docs-style, tooling, config-packaging, repo-layout, safety, self-improvement, ux, testing-evals, routing]
 ---
 
 # Repository Harness — Feature Index
@@ -119,6 +119,42 @@ domains_covered: [harness, skills, hooks, workflow, orchestration, context-memor
 - **Notable:** khép vòng story → run → PR không rời CLI.
 - **Status:** moved-to-symphony @9cc306d
 - **Seen:** 14e6f10
+
+## routing
+
+### request-class-loop-dispatch
+- **What:** Tầng 2 (task-routing): quyết định đầu tiên của MỌI request — phân class read-only (answer/explain/review/diagnose/plan/status) vs change; class chọn cả vòng đời: read-only = inspect-only, cấm bootstrap/intake/trace/mutation; change = bootstrap → intake → query matrix → context theo lane → implement+validate → harness-delta → trace → backlog. CONTEXT_RULES mang bảng authority: class → mutation được phép + context mặc định.
+- **Where:** `AGENTS.md`, `docs/HARNESS.md`, `docs/CONTEXT_RULES.md`
+- **Notable:** routing đứng TRƯỚC mọi thao tác và chọn loop, không chỉ chặn quyền — mặt cơ chế của request-authority-model (harness).
+- **Keywords:** request class, read-only exemption
+- **Seen:** 9cc306d
+
+### story-status-single-door
+- **What:** Tầng 1 (state-routing): story lifecycle planned → in_progress/changed → implemented/retired enforce trong code: `implemented` chỉ vào được qua `story complete` — `reject_ordinary_story_implementation()` từ chối mọi update thường nhắm status đó; update là compare-and-set `--expected-status` (+ `--require-runnable`) so trạng thái trong cùng write transaction, lệch → CONFLICT exit 3, không ghi gì.
+- **Where:** `crates/harness-cli/src/infrastructure.rs`, `docs/contracts/harness-orchestration-v1.md`
+- **Notable:** CAS biến state-routing thành an toàn đa-orchestrator — story bị process khác đổi trạng thái thì lệnh sau conflict thay vì retire nhầm stale work; mặt transition của story-complete-atomic (quality-gates).
+- **Keywords:** compare-and-set, CAS, expected-status
+- **Seen:** 9cc306d
+
+### runnable-derived-dispatch
+- **What:** Tầng 2 (task-routing): "việc chạy được kế tiếp" là predicate SQL dẫn xuất — runnable = status planned AND verify_command non-empty AND mọi dependency blocker đã implemented; cycle bị chặn từ lúc insert dep/hierarchy (DFS); contract cấm consumer tự suy lại ("Consumers use this field and must not reproduce the SQL rules"); `query work-graph` trả stories + edges trong 1 transaction kèm revision hash.
+- **Where:** `crates/harness-cli/src/infrastructure.rs`, `docs/contracts/harness-orchestration-v1.md`
+- **Notable:** next-work do store tính và cam kết như contract — chống drift khi nhiều consumer; hội tụ độc lập với readyCells của bee (beegog:cell-status-lifecycle).
+- **Keywords:** runnable, work-graph
+- **Seen:** 9cc306d
+
+### mutates-state-command-gate
+- **What:** Tầng 2 (task-routing): mọi lệnh CLI phân loại tập trung bởi `Cli::mutates_state()` — per-variant lẫn per-flag (audit chỉ mutate khi record-evidence; propose khi --commit/--accept/--reject; db khi apply/rebuild, snapshot/status thì không). Phân loại này cấp phát epoch-fence guard: lệnh mutate bị chặn khi journal chưa terminal (complete/compensated), read-only được phép ở fenced/switched_pending_validation; journal hỏng/thiếu SHA → fail-closed.
+- **Where:** `crates/harness-cli/src/interface.rs`, `crates/harness-cli/src/epoch_fence.rs`
+- **Notable:** "được chạy hay không" gắn vào danh tính lệnh, không vào lời hứa caller — một classifier nuôi cả fence, SQL read-only (sql-read-only-enforcement) lẫn machine protocol.
+- **Seen:** 9cc306d
+
+### protocol-next-action-table
+- **What:** Tầng 3 (cross-system routing): contract v1 khai báo next-action của external orchestrator thành bảng quyết định dữ liệu: `database_state` (missing → init tường minh, current → proceed, needs_migration → migrate rồi rediscover, unsupported → terminal); exit code 0/2/3/4/5 với "branch on error code, never on message"; mutation timeout = unknown outcome → rediscover + query status (vd `db changeset status`) trước khi retry.
+- **Where:** `docs/contracts/harness-orchestration-v1.md`, `crates/harness-cli/src/interface.rs`
+- **Notable:** routing tầng 3 ở dạng decision table trong contract chứ không phải router code — mọi bên gọi route giống nhau, upgrade CLI không đổi hành vi route; mặt routing của orchestration-protocol-v1 (tooling).
+- **Keywords:** database_state, exit codes, rediscover
+- **Seen:** 9cc306d
 
 ## context-memory
 
