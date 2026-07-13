@@ -1,35 +1,30 @@
 # Porting Log
 
-Nguồn sự thật duy nhất về trạng thái porting. Mỗi tính năng đáng cân nhắc đều phải có mặt ở đây — kể cả khi từ chối (bắt buộc ghi lý do, tránh đánh giá lại).
+Nguồn sự thật duy nhất về trạng thái porting. Tính năng bị từ chối vẫn ghi lại kèm lý do — tránh đánh giá lại.
 
-Status: `candidate` → `planned` → `in-progress` → `ported` / `adapted` / `rejected`
+- Status: `candidate` → `planned` → `in-progress` → `ported` / `adapted` / `rejected`
+- **Score** `R# E# F#` chấm MỘT LẦN lúc tạo candidate (rubric: `.agents/skills/ref-scan/references/extract-rules.md`); tổng R×E/F không lưu — xem bảng xếp hạng bằng `ref-scan.mjs rank`. Re-score một dòng chỉ khi delta scan mang evidence mới.
+- Score cao + các nguồn giải khác nhau (matrix ô `hòa`/`~`) = ứng viên **deep-dive** cho human.
 
-Đề cử dưới đây từ full scan 2026-07-13 (agent đề xuất, chưa ai chốt — `candidate` = shortlist chờ triage, chưa phải cam kết). Xếp theo mức nền tảng giảm dần: nhóm đầu là nền móng nên quyết sớm vì các tính năng sau xây lên trên.
-
-| Feature | Nguồn | Status | Đích trong forgent | Commit | Ghi chú / Lý do |
-|---|---|---|---|---|---|
-| policy-vs-ops-split | beegog:policy-vs-ops-split + repository-harness:policy-vs-durable-separation | adapted | layout learning area (docs/references = policy, references/ = gitignored copies) | 29c4af3 | Đã thành quy ước sống trong ref-scan init; tổng quát hóa cho toàn forgent khi có state dir riêng |
-| trigger-only-descriptions | beegog:trigger-only-descriptions | adapted | .agents/skills/ref-scan/SKILL.md | 29c4af3 | Áp dụng cho skill đầu tiên; nâng thành chuẩn chung khi có skill thứ hai |
-| state-vs-log-two-physics | beegog:state-vs-log-two-physics | candidate | thiết kế memory/knowledge layer | — | Nguyên lý tổ chức tri thức; forgent mới chỉ có dạng log |
-| skill-conventions | beegog:skill-budgets-conventions | adapted | .agents/skills/ref-scan/ | 29c4af3 | <200 dòng + 1 tầng references/ + headless + red flags + handoff + CREATION-LOG; chưa port phần pressure-test (xem tdd-for-skills) |
-| tdd-for-skills-iron-law | beegog:tdd-for-skills-iron-law | candidate | quy trình viết skill + pressure-test templates | — | Kèm 7 pressure types; là cách duy nhất đã thấy để eval chất lượng skill |
-| error-why-fix-refusals | beegog:error-why-fix-refusals | adapted | .agents/skills/ref-scan/scripts/ref-scan.mjs (fail()) | 29c4af3 | Mọi refusal của script theo ERROR/WHY/FIX; nâng thành chuẩn chung khi forgent có CLI thứ hai |
-| six-questions-acceptance | repository-harness:repo-as-os-six-questions | candidate | acceptance test cho harness forgent | — | Dùng làm định nghĩa "done" cho platform layer |
-| context-rules-matrix | repository-harness:context-rules-matrix | candidate | context budget layer | — | Phase × lane × must/should/skip + token budgets; bee cũng chưa có bản tốt bằng |
-| fail-open-crash-wrappers | beegog:fail-open-crash-wrappers | candidate | hook runtime của forgent | — | Cùng adapter.mjs pattern (stdin normalize, repo-root discovery, crash log) |
-| hook-catalog-projection | beegog:hook-catalog-projection | candidate | hook layer nếu forgent hỗ trợ đa runtime | — | Chỉ đáng khi forgent chốt mục tiêu multi-runtime; đi cặp với parity tests |
-| verify-enforced-close | beegog:cell-task-unit | candidate | task unit của forgent | — | Cap-requires-proof + before-state evidence; tính năng chống-ảo-giác mạnh nhất trong scan |
-| tool-registry-capability | repository-harness:tool-registry-capability | candidate | tool/capability layer | — | "Absent capability = clean skip"; hợp định vị platform cung cấp tool cho agent apps |
-| maturity-ladder | repository-harness:maturity-ladder-h0-h5 | candidate | roadmap forgent (F0–F5?) | — | Cho forgent thang tiến hóa đo được thay vì feature list phẳng |
-| managed-block-markers | beegog:managed-block-markers | adapted | ref-scan.mjs init (.gitignore REF-SCAN:START/END) | 29c4af3 | Byte ngoài marker giữ nguyên tuyệt đối; mở rộng cho AGENTS.md khi forgent có onboarding |
-| changeset-event-sourcing | repository-harness:changeset-event-sourcing | candidate | durable layer nếu forgent dùng db | — | Chỉ liên quan khi chọn store dạng db; nếu chọn JSONL như bee thì không cần |
-| silent-bookkeeping | beegog:silent-bookkeeping | candidate | communication doctrine của forgent | — | Kèm gate-presentation-contract; UX khác biệt rõ nhất của bee |
-
-Bổ sung từ delta scan `14e6f10..9cc306d` (2026-07-13):
-
-| Feature | Nguồn | Status | Đích trong forgent | Commit | Ghi chú / Lý do |
-|---|---|---|---|---|---|
-| request-authority-model | repository-harness:request-authority-model | candidate | phân lớp quyền request trong harness forgent | — | Read-only vs change request — trị bệnh "hỏi cũng sinh nghi thức"; rất hợp triết lý YAGNI của anh |
-| orchestration-protocol-v1 | repository-harness:orchestration-protocol-v1 | candidate | chuẩn giao tiếp CLI giữa forgent và agent apps | — | Forgent là platform cho agent apps → cần đúng loại contract này (discovery, exit codes, forward-compat) |
-| proof-before-tag-promotion | repository-harness:proof-before-tag-promotion | candidate | release engineering của forgent | — | Frozen baseline vs current contract; failed tag bất biến — học từ sự cố thật của họ |
-| repo-separation-playbook | repository-harness:repo-separation-playbook | candidate | quy trình tách module→repo sau này | — | Chưa cần ngay (YAGNI) nhưng đáng ghi: khi forgent tách sub-product sẽ cần đúng playbook này |
+| Feature | Nguồn | Status | Score | Đích | Commit | Ghi chú / Lý do |
+|---|---|---|---|---|---|---|
+| policy-vs-ops-split | beegog:policy-vs-ops-split + repository-harness:policy-vs-durable-separation | adapted | — | layout learning area (docs/references = policy, references/ = gitignored copies) | 29c4af3 | Đã thành quy ước sống trong ref-scan init; tổng quát hóa khi forgent có state dir riêng |
+| trigger-only-descriptions | beegog:trigger-only-descriptions | adapted | — | .agents/skills/ref-scan/SKILL.md | 29c4af3 | Áp dụng cho skill đầu tiên; nâng thành chuẩn chung khi có skill thứ hai |
+| skill-conventions | beegog:skill-budgets-conventions | adapted | — | .agents/skills/ref-scan/ | 29c4af3 | <200 dòng + references/ + headless + red flags + handoff + CREATION-LOG; chưa port pressure-test (xem tdd-for-skills) |
+| error-why-fix-refusals | beegog:error-why-fix-refusals | adapted | — | ref-scan.mjs (fail()) | 29c4af3 | Mọi refusal theo ERROR/WHY/FIX; nâng chuẩn chung khi có CLI thứ hai |
+| managed-block-markers | beegog:managed-block-markers | adapted | — | ref-scan.mjs init (.gitignore REF-SCAN:START/END) | 29c4af3 | Byte ngoài marker giữ nguyên; mở rộng cho AGENTS.md khi có onboarding |
+| maturity-ladder | repository-harness:maturity-ladder-h0-h5 | candidate | R3 E2 F1 | roadmap forgent (F0–F5?) | — | Thang tiến hóa đo được thay vì feature list phẳng; E2: harness + benchmark thực chứng |
+| request-authority-model | repository-harness:request-authority-model | candidate | R3 E2 F1 | phân lớp quyền request trong harness forgent | — | Read-only vs change request; E2: harness E12 + bee docs-lane cùng hướng |
+| fail-open-crash-wrappers | beegog:fail-open-crash-wrappers | candidate | R2 E2 F1 | hook runtime forgent | — | Adapter pattern (stdin normalize, root discovery, crash log); E2: bee kế thừa claudekit, đã dogfood |
+| six-questions-acceptance | repository-harness:repo-as-os-six-questions | candidate | R3 E1 F1 | acceptance test cho harness forgent | — | Định nghĩa "done" cho platform layer |
+| state-vs-log-two-physics | beegog:state-vs-log-two-physics | candidate | R3 E2 F2 | thiết kế memory/knowledge layer | — | Nguyên lý nền tảng; E2: bee tường minh + harness ngầm (changesets vs docs) |
+| context-rules-matrix | repository-harness:context-rules-matrix | candidate | R3 E2 F2 | context budget layer | — | Phase × lane × must/should/skip + token budgets + score-context; E2: harness + NLAHs research |
+| verify-enforced-close | beegog:cell-task-unit + repository-harness:story-complete-atomic | candidate | R3 E3 F3 | task unit của forgent | — | **E3 hội tụ độc lập**: bee cap-requires-proof ↔ harness story-complete atomic — deep-dive candidate số một |
+| orchestration-protocol-v1 | repository-harness:orchestration-protocol-v1 | candidate | R3 E2 F2 | chuẩn giao tiếp CLI forgent ↔ agent apps | — | E2: harness protocol v1 + bee command-registry cùng họ; hợp định vị platform |
+| tdd-for-skills-iron-law | beegog:tdd-for-skills-iron-law | candidate | R2 E2 F2 | quy trình viết skill + pressure-test harness | — | E2: bee kế thừa superpowers; đang là debt của chính ref-scan (CREATION-LOG) |
+| tool-registry-capability | repository-harness:tool-registry-capability | candidate | R2 E2 F2 | tool/capability layer | — | "Absent capability = clean skip"; E2: harness + AHE research |
+| changeset-event-sourcing | repository-harness:changeset-event-sourcing | candidate | R2 E3 F3 | durable layer nếu forgent dùng db | — | **E3 hội tụ độc lập**: harness changesets ↔ beads JSONL-truth; chỉ liên quan khi chọn store db |
+| silent-bookkeeping | beegog:silent-bookkeeping | candidate | R2 E1 F1 | communication doctrine forgent | — | Kèm gate-presentation-contract; UX khác biệt rõ nhất của bee |
+| hook-catalog-projection | beegog:hook-catalog-projection | candidate | R2 E1 F2 | hook layer nếu forgent multi-runtime | — | Chỉ đáng khi chốt mục tiêu multi-runtime; đi cặp parity tests |
+| proof-before-tag-promotion | repository-harness:proof-before-tag-promotion | candidate | R1 E2 F2 | release engineering forgent | — | E2: sinh từ sự cố thật (run 29222332569); frozen baseline vs current contract |
+| repo-separation-playbook | repository-harness:repo-separation-playbook | candidate | R1 E1 F1 | quy trình tách module→repo sau này | — | YAGNI hiện tại nhưng đáng giữ; khi forgent tách sub-product sẽ cần |

@@ -136,6 +136,17 @@ Thêm domain mới vào `docs/references/taxonomy.txt` khiến `last_analyzed_co
 
 **Bậc leo thang khi chạm ngưỡng:** SQLite FTS5 (lexical, sinh tự động TỪ markdown — md vẫn là truth, db là cache rebuild được, theo đúng pattern harness-changesets/Beads) → embeddings chỉ khi FTS chứng minh recall vẫn thiếu.
 
+## Impact scoring & deep-dive (quyết định 2026-07-13)
+
+Vì đây là hệ thống học tập, hai cơ chế này là đầu ra quan trọng nhất: score chỉ cho human biết **chỗ nào đáng chú ý**, deep-dive biến chú ý thành **giải pháp tổng hợp**.
+
+**Scoring** — mỗi candidate trong porting log mang `R# E# F#` (Reach / Evidence / Effort, rubric trong skill `extract-rules.md`):
+- Chấm **một lần lúc tạo candidate** (context còn nóng — theo bài học `pain-computed-once` của bee: hai lần đọc phải cho cùng thứ hạng). **Không bao giờ batch re-evaluate toàn hệ thống**; re-score một dòng chỉ khi delta scan mang evidence mới (event-driven, gần như miễn phí vì delta vốn đã đọc phần đổi).
+- Tổng R×E/F **không lưu** — `ref-scan.mjs rank` derive lúc đọc (derived-never-stored). Độ hợp với roadmap hiện tại cũng không lưu — human phán lúc triage.
+- E3 (hội tụ độc lập giữa các nguồn) là tín hiệu mạnh nhất — hai ca đầu tiên đã bắt được: verify-enforced-close (bee ↔ harness), changeset-event-sourcing (harness ↔ beads).
+
+**Deep-dive** — khi human chọn theme để đào sâu (thường là hàng score cao mà các nguồn giải KHÁC nhau): protocol kim tự tháp trong skill `deep-dive-protocol.md` (assemble từ matrix/index → tái dùng inventory reports đã trả tiền → đọc đúng Where paths — không bao giờ re-scan nguồn). Output `docs/references/deep-dives/<topic>.md`, Bottom Line trước, **bắt buộc kết bằng Giải pháp tổng hợp** — ghép cái tốt nhất của từng approach thành design phù hợp bối cảnh mình, nêu rõ lấy gì từ đâu và bỏ gì vì sao. Sau khi port, ghi `Outcome:` vào dòng porting-log (vòng predicted→actual của harness).
+
 ## Taxonomy — các domain cần học
 
 Danh sách máy-đọc (nguồn sự thật cho backfill detection): `docs/references/taxonomy.txt`. Định nghĩa chi tiết bên dưới — hai nơi phải khớp tên domain.

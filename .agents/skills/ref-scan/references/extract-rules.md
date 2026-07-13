@@ -76,6 +76,33 @@ Slug: kebab-case, stable forever. Cross-reference format: `<source>:<slug>`.
   moving anything past `candidate`, and all rejections, are HUMAN decisions.
 - `rejected` requires a written reason — it exists to prevent re-evaluation.
 
+## Impact scoring (per candidate row, Score column `R# E# F#`)
+
+Score ONCE at candidate creation, while the feature is fresh in context —
+never batch re-evaluate the whole log (scores must stay reproducible;
+re-reading everything is exactly the cost this system avoids). Re-score a
+single row ONLY when a delta scan delivers new evidence for it. The total is
+derived, never stored: `ref-scan.mjs rank` computes R×E/F and sorts.
+
+- **R — Reach** (host impact breadth): 1 một component hẹp · 2 một
+  subsystem · 3 cross-cutting toàn platform (convention, layout, safety…)
+- **E — Evidence** (độ tin của bài học): 1 một nguồn, chưa có outcome ·
+  2 nhiều nguồn cùng có, HOẶC một nguồn đã dogfood/đo được ·
+  3 hội tụ độc lập (≥2 nguồn tự đến cùng cơ chế) hoặc bài học
+  falsified-by-data — tín hiệu mạnh nhất
+- **F — Effort to port**: 1 doc/convention/script nhỏ · 2 component ·
+  3 subsystem
+
+Two uses of the ranking: (a) porting priority; (b) **deep-dive selection** —
+high R×E rows where sources diverge in approach are where the human should
+spend deep attention (see deep-dive-protocol.md). Contextual fit with the
+host's current roadmap is judged by the human AT TRIAGE TIME and never
+persisted — it changes as the roadmap moves.
+
+After a candidate ships (`ported`/`adapted`), when its real value becomes
+visible, append an `Outcome:` note to the row (confirmed / ineffective /
+adjusted) — the predicted→actual loop that keeps scoring honest.
+
 ## Scaling guards
 
 - A source index approaching the host's doc size limit (default ~800 lines)

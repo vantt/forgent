@@ -10,6 +10,7 @@
 //   ref-scan.mjs delta <name> [--root <dir>]
 //   ref-scan.mjs seal <name> [--domains all|d1,d2] [--version <v>] [--root <dir>]
 //   ref-scan.mjs check [<name>] [--root <dir>]
+//   ref-scan.mjs rank [--root <dir>]        # candidates by impact score R*E/F
 //
 // Refusal format: ERROR (rule) / WHY (reason) / FIX (next action).
 
@@ -380,11 +381,37 @@ function cmdCheck(args) {
   process.exit(bad ? 1 : 0);
 }
 
+function cmdRank(args) {
+  const root = requireRoot(args);
+  const logFile = path.join(root, REFS_DIR, "porting-log.md");
+  if (!fs.existsSync(logFile))
+    fail("porting-log.md not found", "rank reads candidate rows from the porting log", `run "ref-scan.mjs init" or create ${REFS_DIR}/porting-log.md`);
+  const scored = [];
+  const unscored = [];
+  for (const line of fs.readFileSync(logFile, "utf8").split("\n")) {
+    if (!/^\|/.test(line) || !/\|\s*candidate\s*\|/.test(line)) continue;
+    const cells = line.split("|").map((c) => c.trim());
+    const feature = cells[1] || "?";
+    const m = line.match(/R([1-3])\s*E([1-3])\s*F([1-3])/);
+    if (m) {
+      const [r, e, f] = [Number(m[1]), Number(m[2]), Number(m[3])];
+      scored.push({ feature, r, e, f, score: (r * e) / f });
+    } else unscored.push(feature);
+  }
+  scored.sort((a, b) => b.score - a.score || a.f - b.f);
+  console.log("Candidates by impact (score = R×E/F — derived, never stored):");
+  for (const s of scored)
+    console.log(`  ${s.score.toFixed(1).padStart(4)}  R${s.r} E${s.e} F${s.f}  ${s.feature}`);
+  if (unscored.length)
+    console.log(`\nUnscored candidates (add "R# E# F#" to their Score cell):\n  - ${unscored.join("\n  - ")}`);
+  console.log(`\nDeep-dive hints: high R×E rows where the matrix shows sources diverging (hòa/~) — see deep-dive-protocol.md.`);
+}
+
 // ---------- dispatch ----------
 
 const [cmd, ...rest] = process.argv.slice(2);
 const args = parseArgs(rest);
-const commands = { init: cmdInit, add: cmdAdd, delta: cmdDelta, seal: cmdSeal, check: cmdCheck };
+const commands = { init: cmdInit, add: cmdAdd, delta: cmdDelta, seal: cmdSeal, check: cmdCheck, rank: cmdRank };
 if (!commands[cmd])
   fail(`unknown command "${cmd || ""}"`, "ref-scan only automates the mechanical parts of the learning lifecycle", `use one of: ${Object.keys(commands).join(" | ")} (see header comment for flags)`);
 commands[cmd](args);

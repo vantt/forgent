@@ -43,6 +43,7 @@ docs/references/
   sources/<name>.md     # per-source feature index + cursor frontmatter
   comparison-matrix.md  # curated cross-source comparison
   porting-log.md        # single source of truth for adoption decisions
+  deep-dives/<topic>.md # theme deep-dives across sources (on demand)
 references/<name>/      # source copies (clones/PDFs) — gitignored via managed block
 ```
 
@@ -67,7 +68,9 @@ Capture → Triage → Extract → Compare → Seal
    classification and judgment → you).
 4. **Compare** — new or changed features worth cross-referencing get a
    matrix row; porting-worthy ones get a `candidate` row in the porting log
-   (rejects are recorded WITH a reason — never silently dropped).
+   scored `R# E# F#` AT CREATION (rubric in extract-rules.md; rejects are
+   recorded WITH a reason — never silently dropped). `rank` derives the
+   priority view for the human — for both porting and deep-dive selection.
 5. **Seal** — `seal <name> [--domains all|d1,d2] [--version <v>]` writes the
    cursor atomically. MANDATORY last step of every analysis session; an
    unsealed scan will be re-done from the old cursor next time.
@@ -86,6 +89,16 @@ exist at HEAD, matrix anchors resolve, and lists domains needing backfill.
 Adding a domain to `taxonomy.txt` marks every sealed source as needing
 **backfill**: scan the CURRENT snapshot for that domain only (never replay
 history), then `seal <name> --domains <new-domain>`.
+
+## Deep-dive mode
+
+When the human names a theme to đào sâu ("how do the references solve X?"),
+follow `references/deep-dive-protocol.md`: assemble from matrix + indexes
+(free) → reuse existing inventory reports → targeted reads of cited `Where:`
+files only — never re-scan a source. Output
+`docs/references/deep-dives/<topic>.md`, Bottom Line first, and it MUST end
+with a synthesis: a combined best-of design fitted to the host project, not
+just a comparison.
 
 ## Headless mode
 
