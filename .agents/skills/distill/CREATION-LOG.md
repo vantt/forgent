@@ -1,4 +1,4 @@
-# CREATION-LOG — ref-scan
+# CREATION-LOG — distill
 
 ## Source material
 
@@ -14,7 +14,7 @@ the forgent repo (full scan of beegog + repository-harness, then a same-day
 
 ## Validation performed
 
-- `scripts/ref-scan.mjs` end-to-end sandbox run (init idempotency, add ×3
+- `scripts/distill.mjs` end-to-end sandbox run (init idempotency, add ×3
   types, delta never/current/behind, seal all types, check exit codes,
   managed gitignore block).
 - `check` against the real forgent learning area — caught 3 genuine

@@ -1,4 +1,4 @@
-# Deep-Dive Protocol — ref-scan
+# Deep-Dive Protocol — distill
 
 Theme-centric analysis across sources ("how do the references solve X?").
 This is the payoff step of the whole learning system: side-by-side
@@ -7,7 +7,7 @@ best-of design fitted to the host project, not just a comparison. Built on
 already-paid layers so depth stays cheap. Triggered by the human naming a
 topic; never self-initiated.
 
-**Picking what to dive into:** run `ref-scan.mjs rank`. Strong deep-dive
+**Picking what to dive into:** run `distill.mjs rank`. Strong deep-dive
 candidates are rows with high R×E where the matrix shows sources solving the
 same problem DIFFERENTLY (a `hòa`/trade-off verdict, or ~ cells) — divergence
 between strong sources is exactly where a combined solution beats copying.
@@ -24,7 +24,7 @@ between strong sources is exactly where a combined solution beats copying.
 Never re-scan a whole source for a deep-dive; if L0 finds no entries for the
 topic, that is a signal the topic needs a normal extract pass first.
 
-## Output — `docs/references/deep-dives/<topic-slug>.md`
+## Output — `docs/distillery/deep-dives/<topic-slug>.md`
 
 ```markdown
 ---

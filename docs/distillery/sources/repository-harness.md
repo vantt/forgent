@@ -2,7 +2,7 @@
 name: repository-harness
 type: git-repo
 url: https://github.com/hoangnb24/repository-harness
-local: references/repository-harness
+local: upstreams/repository-harness
 last_analyzed_commit: 9cc306d
 last_analyzed_date: 2026-07-13
 domains_covered: [harness, skills, hooks, workflow, orchestration, context-memory, planning, quality-gates, docs-style, tooling, config-packaging, repo-layout, safety, self-improvement, ux, testing-evals]

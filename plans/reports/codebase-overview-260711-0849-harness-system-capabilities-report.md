@@ -1,5 +1,5 @@
 > **Provenance:** copy 2026-07-13 từ `~/projects/research/repository-harness/plans/reports/` (phiên nghiên cứu 2026-07-11, repo tại commit `14e6f10`).
-> **Cảnh báo lỗi thời:** sau E11/E12 (`9cc306d`, 2026-07-13) Symphony đã tách sang repo `hoangnb24/symphony`; story dependency/hierarchy đã có CLI write path; enforcement được siết (request authority, SQL read-only). Đối chiếu `docs/references/sources/repository-harness.md`.
+> **Cảnh báo lỗi thời:** sau E11/E12 (`9cc306d`, 2026-07-13) Symphony đã tách sang repo `hoangnb24/symphony`; story dependency/hierarchy đã có CLI write path; enforcement được siết (request authority, SQL read-only). Đối chiếu `docs/distillery/sources/repository-harness.md`.
 
 # Research Report: Repository Harness System — Chức Năng & Kiến Trúc
 

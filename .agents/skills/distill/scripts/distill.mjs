@@ -1,16 +1,16 @@
 #!/usr/bin/env node
-// ref-scan — portable reference-learning helper. Zero npm deps, Node 18+.
-// Sets up and maintains a project-local learning area (docs/references/)
+// distill — portable reference-learning helper. Zero npm deps, Node 18+.
+// Sets up and maintains a project-local learning area (docs/distillery/)
 // with incremental cursors per source. Markdown stays the source of truth;
 // this script only computes deltas and performs mechanical, atomic updates.
 //
 // Usage:
-//   ref-scan.mjs init [--root <dir>]
-//   ref-scan.mjs add <name> --type git-repo|paper|living-doc --url <url> [--root <dir>]
-//   ref-scan.mjs delta <name> [--root <dir>]
-//   ref-scan.mjs seal <name> [--domains all|d1,d2] [--version <v>] [--root <dir>]
-//   ref-scan.mjs check [<name>] [--root <dir>]
-//   ref-scan.mjs rank [--root <dir>]        # candidates by impact score R*E/F
+//   distill.mjs init [--root <dir>]
+//   distill.mjs add <name> --type git-repo|paper|living-doc --url <url> [--root <dir>]
+//   distill.mjs delta <name> [--root <dir>]
+//   distill.mjs seal <name> [--domains all|d1,d2] [--version <v>] [--root <dir>]
+//   distill.mjs check [<name>] [--root <dir>]
+//   distill.mjs rank [--root <dir>]        # candidates by impact score R*E/F
 //
 // Refusal format: ERROR (rule) / WHY (reason) / FIX (next action).
 
@@ -19,10 +19,10 @@ import fs from "node:fs";
 import path from "node:path";
 import process from "node:process";
 
-const REFS_DIR = "docs/references";
-const CLONES_DIR = "references";
-const MARK_START = "# REF-SCAN:START";
-const MARK_END = "# REF-SCAN:END";
+const REFS_DIR = "docs/distillery";
+const CLONES_DIR = "upstreams";
+const MARK_START = "# DISTILL:START";
+const MARK_END = "# DISTILL:END";
 const TYPES = ["git-repo", "paper", "living-doc"];
 
 // ---------- small utils ----------
@@ -77,7 +77,7 @@ function requireRoot(args) {
     fail(
       `no learning area found upward from ${process.cwd()}`,
       `every command except init needs an existing ${REFS_DIR}/ directory`,
-      `run "ref-scan.mjs init" at the project root first, or pass --root <dir>`
+      `run "distill.mjs init" at the project root first, or pass --root <dir>`
     );
   return root;
 }
@@ -124,12 +124,12 @@ function loadSource(root, name) {
     const avail = fs.existsSync(path.join(root, REFS_DIR, "sources"))
       ? fs.readdirSync(path.join(root, REFS_DIR, "sources")).filter((f) => f.endsWith(".md")).map((f) => f.replace(/\.md$/, "")).join(", ")
       : "(none)";
-    fail(`unknown source "${name}"`, `no index file at ${file}`, `pick one of: ${avail} — or create it with "ref-scan.mjs add ${name} --type <t> --url <u>"`);
+    fail(`unknown source "${name}"`, `no index file at ${file}`, `pick one of: ${avail} — or create it with "distill.mjs add ${name} --type <t> --url <u>"`);
   }
   const text = fs.readFileSync(file, "utf8");
   const fm = parseFrontmatter(text);
   if (!fm || !fm.data.type)
-    fail(`source "${name}" has no parseable frontmatter with a "type" key`, `delta/seal/check need type + cursor fields to operate`, `fix the frontmatter of ${file} (see extract-rules.md in the ref-scan skill)`);
+    fail(`source "${name}" has no parseable frontmatter with a "type" key`, `delta/seal/check need type + cursor fields to operate`, `fix the frontmatter of ${file} (see extract-rules.md in the distill skill)`);
   return { file, text, meta: fm.data };
 }
 
@@ -171,7 +171,7 @@ testing-evals
 `,
   intake: `# Intake Queue
 
-Nguồn học mới chờ triage. Gặp gì hay — repo, paper, blog, docs — thả vào đây ngay. Triage: đáng học → \`ref-scan.mjs add <name> --type <t> --url <u>\` rồi xóa dòng; không đáng → xóa kèm lý do.
+Nguồn học mới chờ triage. Gặp gì hay — repo, paper, blog, docs — thả vào đây ngay. Triage: đáng học → \`distill.mjs add <name> --type <t> --url <u>\` rồi xóa dòng; không đáng → xóa kèm lý do.
 
 | Nguồn | Type (đoán) | URL | Ngày thêm | Vì sao đáng chú ý |
 |---|---|---|---|---|
@@ -196,7 +196,7 @@ Status: \`candidate\` → \`planned\` → \`in-progress\` → \`ported\` / \`ada
         : type === "paper"
           ? `extracted_date: null`
           : `last_analyzed_version: null\nlast_analyzed_date: null`;
-    return `---\nname: ${name}\ntype: ${type}\nurl: ${url}\n${cursor}\ndomains_covered: []\n---\n\n# ${name} — Feature Index\n\n> Chưa phân tích. Chạy \`ref-scan.mjs delta ${name}\` để bắt đầu.\n`;
+    return `---\nname: ${name}\ntype: ${type}\nurl: ${url}\n${cursor}\ndomains_covered: []\n---\n\n# ${name} — Feature Index\n\n> Chưa phân tích. Chạy \`distill.mjs delta ${name}\` để bắt đầu.\n`;
   },
   gitignoreBlock: `${MARK_START}\n/${CLONES_DIR}/\n${MARK_END}\n`,
 };
@@ -230,13 +230,13 @@ function cmdInit(args) {
     created.push(".gitignore (appended block)");
   }
   console.log(created.length ? `Initialized learning area at ${root}:\n  - ${created.join("\n  - ")}` : `Learning area at ${root} already up to date — nothing written.`);
-  console.log(`Next: drop candidate sources into ${REFS_DIR}/intake.md, then "ref-scan.mjs add <name> --type <t> --url <u>".`);
+  console.log(`Next: drop candidate sources into ${REFS_DIR}/intake.md, then "distill.mjs add <name> --type <t> --url <u>".`);
 }
 
 function cmdAdd(args) {
   const [name] = args._;
   if (!name || !args.type || !args.url)
-    fail("add needs <name> --type --url", "a source file cannot be scaffolded without its identity and cursor type", `ref-scan.mjs add beegog --type git-repo --url https://github.com/x/y`);
+    fail("add needs <name> --type --url", "a source file cannot be scaffolded without its identity and cursor type", `distill.mjs add beegog --type git-repo --url https://github.com/x/y`);
   if (!TYPES.includes(args.type))
     fail(`unknown type "${args.type}"`, `cursor semantics differ per type`, `use one of: ${TYPES.join(" | ")}`);
   const root = requireRoot(args);
@@ -245,9 +245,9 @@ function cmdAdd(args) {
     fail(`source "${name}" already exists`, `overwriting would destroy its cursor and entries`, `edit ${path.relative(root, file)} directly, or pick another name`);
   writeAtomic(file, T.source(name, args.type, args.url));
   console.log(`Created ${path.relative(root, file)} (type: ${args.type}).`);
-  if (args.type === "git-repo") console.log(`Next: git clone ${args.url} ${CLONES_DIR}/${name} && ref-scan.mjs delta ${name}`);
-  else if (args.type === "paper") console.log(`Next: save a copy under ${CLONES_DIR}/${name}/, extract once, then "ref-scan.mjs seal ${name}".`);
-  else console.log(`Next: fetch ${args.url}, extract, then "ref-scan.mjs seal ${name} --version <v>".`);
+  if (args.type === "git-repo") console.log(`Next: git clone ${args.url} ${CLONES_DIR}/${name} && distill.mjs delta ${name}`);
+  else if (args.type === "paper") console.log(`Next: save a copy under ${CLONES_DIR}/${name}/, extract once, then "distill.mjs seal ${name}".`);
+  else console.log(`Next: fetch ${args.url}, extract, then "distill.mjs seal ${name} --version <v>".`);
 }
 
 function deltaGitRepo(root, name, meta) {
@@ -263,20 +263,20 @@ function deltaGitRepo(root, name, meta) {
     return;
   }
   if (git(repo, ["rev-parse", "--short", `${last}^{commit}`], { soft: true, quietErr: true }) === null)
-    fail(`recorded cursor "${last}" is not a commit in the clone`, `the frontmatter was hand-edited badly or the clone was recreated with different history`, `verify history ("git -C ${path.relative(root, repo)} log"), then re-seal with "ref-scan.mjs seal ${name}" after a fresh full scan`);
+    fail(`recorded cursor "${last}" is not a commit in the clone`, `the frontmatter was hand-edited badly or the clone was recreated with different history`, `verify history ("git -C ${path.relative(root, repo)} log"), then re-seal with "distill.mjs seal ${name}" after a fresh full scan`);
   if (git(repo, ["rev-parse", "--short", last]) === head) {
     console.log(`== ${name}: up to date (last analyzed = HEAD = ${head}) ==`);
   } else {
     console.log(`== ${name}: commits since ${last} ==`);
     console.log(git(repo, ["log", "--format=%h %ad %s", "--date=short", `${last}..HEAD`]));
     console.log(`\n== changed files ==\n${git(repo, ["diff", "--stat", `${last}..HEAD`])}`);
-    console.log(`\nAfter analysis: ref-scan.mjs seal ${name}`);
+    console.log(`\nAfter analysis: distill.mjs seal ${name}`);
   }
 }
 
 function cmdDelta(args) {
   const [name] = args._;
-  if (!name) fail("delta needs <name>", "there is no default source", "ref-scan.mjs delta <name>");
+  if (!name) fail("delta needs <name>", "there is no default source", "distill.mjs delta <name>");
   const root = requireRoot(args);
   const { meta } = loadSource(root, name);
   // domain backfill check (skip when never analyzed — the full scan covers everything)
@@ -289,13 +289,13 @@ function cmdDelta(args) {
   if (meta.type === "paper")
     return console.log(meta.extracted_date
       ? `== ${name}: paper, extracted ${meta.extracted_date} — immutable, no delta ==`
-      : `== ${name}: paper, never extracted ==\nRead it once, extract entries, then: ref-scan.mjs seal ${name}`);
-  console.log(`== ${name}: living-doc ==\nrecorded: version=${meta.last_analyzed_version || "null"} date=${meta.last_analyzed_date || "null"}\nFetch ${meta.url}, compare changelog/version against the recorded cursor, extract what changed, then: ref-scan.mjs seal ${name} --version <new>`);
+      : `== ${name}: paper, never extracted ==\nRead it once, extract entries, then: distill.mjs seal ${name}`);
+  console.log(`== ${name}: living-doc ==\nrecorded: version=${meta.last_analyzed_version || "null"} date=${meta.last_analyzed_date || "null"}\nFetch ${meta.url}, compare changelog/version against the recorded cursor, extract what changed, then: distill.mjs seal ${name} --version <new>`);
 }
 
 function cmdSeal(args) {
   const [name] = args._;
-  if (!name) fail("seal needs <name>", "sealing writes a cursor into one source file", "ref-scan.mjs seal <name>");
+  if (!name) fail("seal needs <name>", "sealing writes a cursor into one source file", "distill.mjs seal <name>");
   const root = requireRoot(args);
   const { file, text, meta } = loadSource(root, name);
   const updates = {};
@@ -307,7 +307,7 @@ function cmdSeal(args) {
     updates.extracted_date = today();
   } else {
     if (!args.version && !meta.last_analyzed_version)
-      fail("living-doc seal needs --version <v>", "without a version/date cursor the next delta has nothing to compare against", `ref-scan.mjs seal ${name} --version <v> (use a changelog version or the fetch date)`);
+      fail("living-doc seal needs --version <v>", "without a version/date cursor the next delta has nothing to compare against", `distill.mjs seal ${name} --version <v> (use a changelog version or the fetch date)`);
     if (args.version) updates.last_analyzed_version = args.version;
     updates.last_analyzed_date = today();
   }
@@ -385,7 +385,7 @@ function cmdRank(args) {
   const root = requireRoot(args);
   const logFile = path.join(root, REFS_DIR, "porting-log.md");
   if (!fs.existsSync(logFile))
-    fail("porting-log.md not found", "rank reads candidate rows from the porting log", `run "ref-scan.mjs init" or create ${REFS_DIR}/porting-log.md`);
+    fail("porting-log.md not found", "rank reads candidate rows from the porting log", `run "distill.mjs init" or create ${REFS_DIR}/porting-log.md`);
   const scored = [];
   const unscored = [];
   for (const line of fs.readFileSync(logFile, "utf8").split("\n")) {
@@ -413,5 +413,5 @@ const [cmd, ...rest] = process.argv.slice(2);
 const args = parseArgs(rest);
 const commands = { init: cmdInit, add: cmdAdd, delta: cmdDelta, seal: cmdSeal, check: cmdCheck, rank: cmdRank };
 if (!commands[cmd])
-  fail(`unknown command "${cmd || ""}"`, "ref-scan only automates the mechanical parts of the learning lifecycle", `use one of: ${Object.keys(commands).join(" | ")} (see header comment for flags)`);
+  fail(`unknown command "${cmd || ""}"`, "distill only automates the mechanical parts of the learning lifecycle", `use one of: ${Object.keys(commands).join(" | ")} (see header comment for flags)`);
 commands[cmd](args);

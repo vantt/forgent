@@ -1,4 +1,4 @@
-# Extract Rules — ref-scan
+# Extract Rules — distill
 
 Operating manual for the Extract/Compare steps. The skill body tells you WHEN;
 this file tells you HOW.
@@ -54,7 +54,7 @@ Slug: kebab-case, stable forever. Cross-reference format: `<source>:<slug>`.
 ## Related-artifact lookup (no search infra)
 
 1. Grep the comparison matrix first — each canonical row IS the related-set.
-2. `grep -rn <term> docs/references/` for slugs/keywords.
+2. `grep -rn <term> docs/distillery/` for slugs/keywords.
 3. Read only the matched entries (~200 tokens each). Never re-read whole
    indexes; never build a vector/SQL index for this (decision 2026-07-13 —
    escalation thresholds live in the host's design doc if present).
@@ -82,7 +82,7 @@ Score ONCE at candidate creation, while the feature is fresh in context —
 never batch re-evaluate the whole log (scores must stay reproducible;
 re-reading everything is exactly the cost this system avoids). Re-score a
 single row ONLY when a delta scan delivers new evidence for it. The total is
-derived, never stored: `ref-scan.mjs rank` computes R×E/F and sorts.
+derived, never stored: `distill.mjs rank` computes R×E/F and sorts.
 
 - **R — Reach** (host impact breadth): 1 một component hẹp · 2 một
   subsystem · 3 cross-cutting toàn platform (convention, layout, safety…)
@@ -109,4 +109,4 @@ adjusted) — the predicted→actual loop that keeps scoring honest.
   splits by domain: `sources/<name>/<domain>.md` + a thin `<name>.md` keeping
   the frontmatter cursor. Do this only when actually hit.
 - Report files from inventory agents follow the host's report-naming
-  convention when one exists; otherwise `ref-scan-<source>-<scope>-<date>.md`.
+  convention when one exists; otherwise `distill-<source>-<scope>-<date>.md`.

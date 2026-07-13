@@ -1,5 +1,5 @@
 ---
-name: ref-scan
+name: distill
 description: >-
   Set up and run a project-local reference-learning area: extract notable
   features from reference sources (git repos, papers, living docs) into
@@ -17,7 +17,7 @@ metadata:
       kind: command
       command: node
       missing_effect: degraded
-      reason: scripts/ref-scan.mjs automates init/delta/seal/check; without node the lifecycle still works manually.
+      reason: scripts/distill.mjs automates init/delta/seal/check; without node the lifecycle still works manually.
     git:
       kind: command
       command: git
@@ -25,30 +25,30 @@ metadata:
       reason: git-repo sources need a local clone for delta computation.
 ---
 
-# ref-scan
+# distill
 
 Learning pipeline over reference sources: **observe** (per-source index) →
 **compare** (matrix) → **decide** (porting log), incremental by cursor so a
 source is never re-analyzed from scratch. All state is markdown in the host
 project; the script only automates the mechanical steps.
 
-Helper (all commands below): `node <skill-dir>/scripts/ref-scan.mjs`
+Helper (all commands below): `node <skill-dir>/scripts/distill.mjs`
 
 ## Learning area layout (created by `init`)
 
 ```
-docs/references/
+docs/distillery/
   taxonomy.txt          # learning domains, machine-read (host-editable)
   intake.md             # capture queue — sources awaiting triage
   sources/<name>.md     # per-source feature index + cursor frontmatter
   comparison-matrix.md  # curated cross-source comparison
   porting-log.md        # single source of truth for adoption decisions
   deep-dives/<topic>.md # theme deep-dives across sources (on demand)
-references/<name>/      # source copies (clones/PDFs) — gitignored via managed block
+upstreams/<name>/       # source copies (clones/PDFs) — gitignored via managed block
 ```
 
 `init` is idempotent: it never overwrites existing files and only manages the
-`# REF-SCAN:START/END` block in `.gitignore`, preserving every byte outside it.
+`# DISTILL:START/END` block in `.gitignore`, preserving every byte outside it.
 
 ## Lifecycle
 
@@ -60,7 +60,7 @@ Capture → Triage → Extract → Compare → Seal
    drops a row into `intake.md`. Ten seconds, no judgment.
 2. **Triage** — HUMAN decides what is worth learning. On accept:
    `add <name> --type git-repo|paper|living-doc --url <u>`, clone/save the
-   copy under `references/<name>/`, delete the intake row.
+   copy under `upstreams/<name>/`, delete the intake row.
 3. **Extract** — `delta <name>` tells you what to read (full scan on first
    run; commit range / version gap after). Follow
    `references/extract-rules.md` for entry format, update-vs-new rules, and
@@ -96,7 +96,7 @@ When the human names a theme to đào sâu ("how do the references solve X?"),
 follow `references/deep-dive-protocol.md`: assemble from matrix + indexes
 (free) → reuse existing inventory reports → targeted reads of cited `Where:`
 files only — never re-scan a source. Output
-`docs/references/deep-dives/<topic>.md`, Bottom Line first, and it MUST end
+`docs/distillery/deep-dives/<topic>.md`, Bottom Line first, and it MUST end
 with a synthesis: a combined best-of design fitted to the host project, not
 just a comparison.
 
@@ -120,6 +120,8 @@ structured markdown.
   updating an entry.
 - Porting status lives ONLY in porting-log.md; triage and porting decisions
   belong to the human — propose `candidate` rows, never decide adoption.
+  distill finds and scores what is worth porting; the actual port of a
+  chosen feature is a separate job (e.g. the `xia` skill when available).
 - Do not build search infrastructure for the learning area; the grep recipe
   in extract-rules.md is the supported lookup path.
 

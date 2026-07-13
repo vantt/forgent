@@ -14,7 +14,7 @@ Capture → Triage → Extract → Compare → Seal
 - **Triage** — định kỳ duyệt queue: nguồn nào đáng học, gán `type`, tạo source file. Đây là phán đoán của con người, không tự động hóa.
 - **Extract / Compare / Seal** — vòng phân tích incremental (chi tiết bên dưới).
 
-Phân vai: **harness quản lý nhịp** (hiện tại: chạy tay `ref-delta.sh` + skill `ref-scan`; khi nhịp ổn định: cron hoặc session-start hook nhắc "intake có N nguồn chưa triage, source X có delta"). **Con người quản lý chất lượng** (triage, quyết định đáng học/đáng port).
+Phân vai: **harness quản lý nhịp** (skill `distill` — chạy tay; khi nhịp ổn định: cron hoặc session-start hook nhắc "intake có N nguồn chưa triage, source X có delta"). **Con người quản lý chất lượng** (triage, quyết định đáng học/đáng port).
 
 ## Kiến trúc artifact
 
@@ -22,16 +22,16 @@ Mỗi artifact có một vai trò và một nguồn sự thật riêng — khôn
 
 | Artifact | Vai trò | Vị trí |
 |---|---|---|
-| Intake queue | **Capture** — nguồn mới chờ triage | `docs/references/intake.md` |
-| Per-source feature index | **Quan sát** — tính năng/ý tưởng của 1 nguồn, ghi con trỏ đã phân tích tới | `docs/references/sources/<name>.md` |
-| Comparison matrix | **So sánh** — tính năng nào, nguồn nào có, triển khai ra sao, ai làm hay hơn | `docs/references/comparison-matrix.md` |
-| Porting log | **Quyết định** — đã port gì, từ đâu, chưa port gì, từ chối gì và vì sao | `docs/references/porting-log.md` |
+| Intake queue | **Capture** — nguồn mới chờ triage | `docs/distillery/intake.md` |
+| Per-source feature index | **Quan sát** — tính năng/ý tưởng của 1 nguồn, ghi con trỏ đã phân tích tới | `docs/distillery/sources/<name>.md` |
+| Comparison matrix | **So sánh** — tính năng nào, nguồn nào có, triển khai ra sao, ai làm hay hơn | `docs/distillery/comparison-matrix.md` |
+| Porting log | **Quyết định** — đã port gì, từ đâu, chưa port gì, từ chối gì và vì sao | `docs/distillery/porting-log.md` |
 
 ## Loại nguồn và con trỏ incremental
 
 | `type` | Con trỏ | Cách delta |
 |---|---|---|
-| `git-repo` | `last_analyzed_commit` | `git log <last>..HEAD` (scripts/ref-delta.sh) |
+| `git-repo` | `last_analyzed_commit` | `git log <last>..HEAD` (`distill.mjs delta`) |
 | `paper` | `extracted_date` | bất biến — extract một lần, không có delta |
 | `living-doc` | `last_analyzed_version` + `last_analyzed_date` | so version/changelog entry mới kể từ lần trước (thủ công hoặc fetch) |
 
@@ -42,11 +42,11 @@ Nguyên tắc:
 - Trạng thái porting **chỉ** nằm trong porting log. Per-source index thuần quan sát, không ghi "đã port".
 - Feature ID ổn định, kebab-case. Tham chiếu chéo dạng `<source>:<slug>` (vd `beegog:gate-workflow`, `paper-x:reflexion-loop`).
 - Tính năng bị **từ chối port vẫn phải ghi lại kèm lý do** — tránh đánh giá lại lần sau.
-- Bản sao nguồn (clone git, PDF paper, snapshot doc) để trong `references/<name>/` (gitignored — URL/commit hash lưu trong docs đủ để lấy lại).
+- Bản sao nguồn (clone git, PDF paper, snapshot doc) để trong `upstreams/<name>/` (gitignored — URL/commit hash lưu trong docs đủ để lấy lại).
 
 ## Schema
 
-### 1. Per-source index — `docs/references/sources/<name>.md`
+### 1. Per-source index — `docs/distillery/sources/<name>.md`
 
 Frontmatter máy đọc được (cho CLI/skill parse). Trường chung: `name`, `type`, `url`, `domains_covered`. Con trỏ theo `type`:
 
@@ -55,7 +55,7 @@ Frontmatter máy đọc được (cho CLI/skill parse). Trường chung: `name`,
 name: beegog
 type: git-repo
 url: https://github.com/vantt/beegog
-local: references/beegog
+local: upstreams/beegog
 last_analyzed_commit: null   # commit HEAD tại lần phân tích gần nhất
 last_analyzed_date: null
 domains_covered: []          # domain đã extract; thiếu so với taxonomy → cần backfill
@@ -77,7 +77,7 @@ Thân file nhóm theo domain (xem taxonomy bên dưới), mỗi tính năng mộ
 - **Seen:** <commit ngắn> (commit lần đầu ghi nhận hoặc lần cập nhật gần nhất)
 ```
 
-### 2. Comparison matrix — `docs/references/comparison-matrix.md`
+### 2. Comparison matrix — `docs/distillery/comparison-matrix.md`
 
 Mỗi domain một bảng tổng quan (✓ / ✗ / ~), mỗi ô link về entry trong per-project index. Chỉ khi cần so sánh sâu mới thêm subsection deep-dive:
 
@@ -91,7 +91,7 @@ Mỗi domain một bảng tổng quan (✓ / ✗ / ~), mỗi ô link về entry 
 So sánh cách triển khai khi khác biệt đáng kể giữa các project.
 ```
 
-### 3. Porting log — `docs/references/porting-log.md`
+### 3. Porting log — `docs/distillery/porting-log.md`
 
 ```markdown
 | Feature | Nguồn | Status | Đích trong forgent | Commit | Ghi chú / Lý do |
@@ -103,17 +103,17 @@ Status: `candidate` → `planned` → `in-progress` → `ported` / `adapted` (po
 
 ## Vòng Extract → Compare → Seal (incremental)
 
-1. **Delta** — tính phần mới kể từ con trỏ: `ref-scan.mjs delta <name>` (git-repo: commit log + changed files, lần đầu → full scan; paper: một lần; living-doc: in con trỏ đã ghi để agent tự so với changelog/version mới).
+1. **Delta** — tính phần mới kể từ con trỏ: `distill.mjs delta <name>` (git-repo: commit log + changed files, lần đầu → full scan; paper: một lần; living-doc: in con trỏ đã ghi để agent tự so với changelog/version mới).
 2. **Extract** — đọc phần delta (hoặc toàn bộ nếu lần đầu), phân loại theo taxonomy, thêm/cập nhật entry trong per-source index.
 3. **Compare** — tính năng mới hoặc thay đổi đáng kể → cập nhật hàng tương ứng trong comparison matrix.
 4. **Decide** — tính năng đáng port → thêm dòng `candidate` vào porting log; không đáng → `rejected` + lý do.
-5. **Seal** — `ref-scan.mjs seal <name> [--domains ...]`: ghi con trỏ atomic (commit/date/version + `domains_covered`), không sửa tay frontmatter. **Bước này bắt buộc, luôn làm cuối phiên phân tích.** Sau seal chạy `ref-scan.mjs check` để verify (con trỏ resolve được, Where paths tồn tại, matrix anchors đúng, domain thiếu backfill).
+5. **Seal** — `distill.mjs seal <name> [--domains ...]`: ghi con trỏ atomic (commit/date/version + `domains_covered`), không sửa tay frontmatter. **Bước này bắt buộc, luôn làm cuối phiên phân tích.** Sau seal chạy `distill.mjs check` để verify (con trỏ resolve được, Where paths tồn tại, matrix anchors đúng, domain thiếu backfill).
 
 ### Domain backfill (khi taxonomy thêm domain mới)
 
-Thêm domain mới vào `docs/references/taxonomy.txt` khiến `last_analyzed_commit` không còn đủ nghĩa — domain đó chưa từng được extract dù con trỏ đã tiến xa. Xử lý:
+Thêm domain mới vào `docs/distillery/taxonomy.txt` khiến `last_analyzed_commit` không còn đủ nghĩa — domain đó chưa từng được extract dù con trỏ đã tiến xa. Xử lý:
 
-- `ref-scan.mjs delta/check` so sánh taxonomy.txt với `domains_covered` của từng nguồn → báo domain thiếu.
+- `distill.mjs delta/check` so sánh taxonomy.txt với `domains_covered` của từng nguồn → báo domain thiếu.
 - Backfill = quét **cây source tại HEAD** cho riêng domain thiếu (không replay lịch sử — snapshot hiện tại đã là kết quả tích lũy của mọi commit).
 - Xong thì thêm domain vào `domains_covered`; con trỏ commit giữ nguyên.
 - Replay lịch sử ("họ từng thử X rồi gỡ, vì sao?") chỉ làm opt-in khi có nghi vấn cụ thể, không phải mặc định.
@@ -125,7 +125,7 @@ Thêm domain mới vào `docs/references/taxonomy.txt` khiến `last_analyzed_co
 **Công thức quét related cho agent khi extract (rẻ, không đọc lại hết):**
 
 1. Grep **comparison matrix** trước — mỗi hàng canonical feature chính là cụm "related artifacts" giữa các nguồn.
-2. Grep slug/keyword trong `sources/*.md` (`grep -rn <term> docs/references/`).
+2. Grep slug/keyword trong `sources/*.md` (`grep -rn <term> docs/distillery/`).
 3. Chỉ đọc đúng các entry match (mỗi entry ~200 tokens), không đọc cả file.
 
 **Chống semantic gap** (nguồn dùng từ khác taxonomy: "file locks" vs "reservations"): thêm dòng `Keywords:` tùy chọn vào entry — không cần embeddings.
@@ -142,14 +142,14 @@ Vì đây là hệ thống học tập, hai cơ chế này là đầu ra quan tr
 
 **Scoring** — mỗi candidate trong porting log mang `R# E# F#` (Reach / Evidence / Effort, rubric trong skill `extract-rules.md`):
 - Chấm **một lần lúc tạo candidate** (context còn nóng — theo bài học `pain-computed-once` của bee: hai lần đọc phải cho cùng thứ hạng). **Không bao giờ batch re-evaluate toàn hệ thống**; re-score một dòng chỉ khi delta scan mang evidence mới (event-driven, gần như miễn phí vì delta vốn đã đọc phần đổi).
-- Tổng R×E/F **không lưu** — `ref-scan.mjs rank` derive lúc đọc (derived-never-stored). Độ hợp với roadmap hiện tại cũng không lưu — human phán lúc triage.
+- Tổng R×E/F **không lưu** — `distill.mjs rank` derive lúc đọc (derived-never-stored). Độ hợp với roadmap hiện tại cũng không lưu — human phán lúc triage.
 - E3 (hội tụ độc lập giữa các nguồn) là tín hiệu mạnh nhất — hai ca đầu tiên đã bắt được: verify-enforced-close (bee ↔ harness), changeset-event-sourcing (harness ↔ beads).
 
-**Deep-dive** — khi human chọn theme để đào sâu (thường là hàng score cao mà các nguồn giải KHÁC nhau): protocol kim tự tháp trong skill `deep-dive-protocol.md` (assemble từ matrix/index → tái dùng inventory reports đã trả tiền → đọc đúng Where paths — không bao giờ re-scan nguồn). Output `docs/references/deep-dives/<topic>.md`, Bottom Line trước, **bắt buộc kết bằng Giải pháp tổng hợp** — ghép cái tốt nhất của từng approach thành design phù hợp bối cảnh mình, nêu rõ lấy gì từ đâu và bỏ gì vì sao. Sau khi port, ghi `Outcome:` vào dòng porting-log (vòng predicted→actual của harness).
+**Deep-dive** — khi human chọn theme để đào sâu (thường là hàng score cao mà các nguồn giải KHÁC nhau): protocol kim tự tháp trong skill `deep-dive-protocol.md` (assemble từ matrix/index → tái dùng inventory reports đã trả tiền → đọc đúng Where paths — không bao giờ re-scan nguồn). Output `docs/distillery/deep-dives/<topic>.md`, Bottom Line trước, **bắt buộc kết bằng Giải pháp tổng hợp** — ghép cái tốt nhất của từng approach thành design phù hợp bối cảnh mình, nêu rõ lấy gì từ đâu và bỏ gì vì sao. Sau khi port, ghi `Outcome:` vào dòng porting-log (vòng predicted→actual của harness).
 
 ## Taxonomy — các domain cần học
 
-Danh sách máy-đọc (nguồn sự thật cho backfill detection): `docs/references/taxonomy.txt`. Định nghĩa chi tiết bên dưới — hai nơi phải khớp tên domain.
+Danh sách máy-đọc (nguồn sự thật cho backfill detection): `docs/distillery/taxonomy.txt`. Định nghĩa chi tiết bên dưới — hai nơi phải khớp tên domain.
 
 - `harness` — vòng lặp agent chính, tool surface, permission model, sandbox
 - `skills` — cấu trúc skill, trigger description, progressive disclosure, routing
@@ -170,11 +170,11 @@ Danh sách máy-đọc (nguồn sự thật cho backfill detection): `docs/refer
 
 Taxonomy mở — thêm domain mới khi gặp, nhưng phải dùng thống nhất ở cả 3 artifact.
 
-## Tự động hóa — skill `ref-scan` (đã triển khai 2026-07-13)
+## Tự động hóa — skill `distill` (đã triển khai 2026-07-13)
 
-Skill portable tại **`.agents/skills/ref-scan/`** (canonical, agent-neutral; thin wrapper: symlink `.claude/skills/ref-scan`). Gồm SKILL.md (lifecycle + gates), `references/extract-rules.md` (quy tắc extract/matrix/porting), và `scripts/ref-scan.mjs` (Node 18+ zero-dep, thay thế `ref-delta.sh` cũ) với các lệnh:
+Skill portable tại **`.agents/skills/distill/`** (canonical, agent-neutral; thin wrapper: symlink `.claude/skills/distill`). Gồm SKILL.md (lifecycle + gates), `references/extract-rules.md` (quy tắc extract/matrix/porting), và `scripts/distill.mjs` (Node 18+ zero-dep, thay thế `ref-delta.sh` cũ) với các lệnh:
 
-- `init` — scaffold learning area vào bất kỳ project nào (idempotent, managed gitignore block `REF-SCAN:START/END`)
+- `init` — scaffold learning area vào bất kỳ project nào (idempotent, managed gitignore block `DISTILL:START/END`)
 - `add <name> --type <t> --url <u>` — tạo source file khi triage chấp nhận (bước Triage vẫn là quyết định của người)
 - `delta <name>` — bước 1 của vòng lặp, theo type
 - `seal <name>` — bước 5, ghi con trỏ atomic

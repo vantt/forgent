@@ -1,2 +1,2 @@
-# Reference source clones — tracked via docs/references/ commit hashes, re-clone as needed
-/references/
+# Upstream source clones — cursors tracked in docs/distillery/, re-clone as needed
+/upstreams/

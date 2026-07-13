@@ -2,7 +2,7 @@
 name: beegog
 type: git-repo
 url: https://github.com/vantt/beegog
-local: references/beegog
+local: upstreams/beegog
 last_analyzed_commit: e70602a
 last_analyzed_date: 2026-07-13
 domains_covered: [harness, skills, hooks, workflow, orchestration, context-memory, planning, quality-gates, docs-style, tooling, config-packaging, repo-layout, safety, self-improvement, ux, testing-evals]
