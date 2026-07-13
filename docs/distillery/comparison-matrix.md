@@ -66,7 +66,7 @@ Bối cảnh quan trọng: **bee chưng cất từ repository-harness** (cùng 6
 
 | Feature | beegog | repository-harness | Best | Ghi chú |
 |---|---|---|---|---|
-| next-work-derived-from-state | ✓ readyCells [→](sources/beegog.md#cell-status-lifecycle) | ✓ runnable predicate [→](sources/repository-harness.md#runnable-derived-dispatch) | hòa (hội tụ) | hai bên độc lập cùng đến "việc kế tiếp = truy vấn dẫn xuất từ deps+status", không phải danh sách tay; harness thêm cấm consumer tự suy lại |
+| next-work-derived-from-state | ✓ readyCells [→](sources/beegog.md#cell-status-lifecycle) | ✓ runnable predicate [→](sources/repository-harness.md#runnable-derived-dispatch) | hòa (hội tụ ×5) | NĂM nguồn độc lập cùng đến "việc kế tiếp = truy vấn dẫn xuất": readyCells ↔ runnable ↔ symphony board-precedence ↔ fgOS signal-consume ↔ beads `bd ready` [→](sources/beads.md#ready-work-ten-dep-types); beads thêm taxonomy 10 dep types (4 blocking / 6 non-blocking) giàu nhất |
 | state-transition-enforcement | ✓ phase/cell CLI-owned [→](sources/beegog.md#phase-machine-cli-owned) | ✓ single-door + CAS [→](sources/repository-harness.md#story-status-single-door) | beegog (gates) / harness (concurrency) | bee chặn agent tự tiện (precondition + write-guard); harness chặn race đa-orchestrator (expected-status trong cùng transaction) |
 | skill-chain-router | ✓ hive router + handoff + chain-nudge [→](sources/beegog.md#hive-first-skill-router) | ~ request-class chọn loop một lần ở cửa [→](sources/repository-harness.md#request-class-loop-dispatch) | beegog | bee route liên tục qua chain nhiều skill; harness là single-skill system nên chỉ cần route request class |
 
@@ -84,11 +84,11 @@ Bối cảnh quan trọng: **bee chưng cất từ repository-harness** (cùng 6
 | context-rules-budget | ~ reading lists + depths | ✓ matrix + token budgets [→](sources/repository-harness.md#context-rules-matrix) | harness | phase × lane × must/should/skip + score-context đo compliance |
 | area-state-specs | ✓ BA-grade + rebuild bar [→](sources/beegog.md#ba-grade-specs-rebuild-bar) | ~ product docs | beegog | rebuild bar là acceptance test cho memory |
 | log-vs-state-model | ✓ [→](sources/beegog.md#state-vs-log-two-physics) | ~ (ngầm: changesets vs docs) | beegog | phát biểu tường minh thành nguyên lý |
-| event-sourcing | ✓ decisions.jsonl [→](sources/beegog.md#event-sourced-decisions) | ✓ changesets [→](sources/repository-harness.md#changeset-event-sourcing) | cả hai | mục đích khác: quyết định thiết kế vs thao tác dữ liệu; changesets giải git-diff cho SQLite |
+| event-sourcing | ✓ decisions.jsonl [→](sources/beegog.md#event-sourced-decisions) | ✓ changesets [→](sources/repository-harness.md#changeset-event-sourcing) | cả hai | mục đích khác: quyết định thiết kế vs thao tác dữ liệu; changesets giải git-diff cho SQLite. **Beads @303e263 rẽ hướng thứ ba**: Dolt-as-truth (VC trong store, bỏ JSONL-truth) khi multi-agent write thành tải chính [→](sources/beads.md#dolt-as-versioned-truth) |
 | pause-resume | ✓ HANDOFF 65% [→](sources/beegog.md#handoff-at-65-percent) | ✗ | beegog | never auto-resume |
 | settlement-capture | ✓ [→](sources/beegog.md#settlement-capture-unprompted) | ✗ | beegog | agent tự phát hiện "chốt" mỗi turn |
 | intervention-log | ~ (adopt-now, chưa build) | ✓ [→](sources/repository-harness.md#intervention-log) | harness | correction/override/escalation/approval là dữ liệu học |
-| memory-typing | ~ log-vs-state 2 loại | ✗ | ✓ fgOS 4 loại [→](sources/marketing-cockpit.md#four-memory-types) | fgOS phân working/episodic/semantic/procedural theo khoa học nhận thức + consolidation loop + importance-weighted forgetting; bee mới 2 physics (log/state) |
+| memory-typing | ~ log-vs-state 2 loại | ✗ | ✓ fgOS 4 loại [→](sources/marketing-cockpit.md#four-memory-types) | fgOS phân working/episodic/semantic/procedural + consolidation + importance-forgetting; bee mới 2 physics. Beads: memory-là-bead trong đồ thị việc [→](sources/beads.md#remember-prime-memory-loop) + quên bằng LLM-compaction giữ snapshot [→](sources/beads.md#llm-tier-compaction) — hai cách quên khác nhau (TTL-vứt vs nén-giữ-gốc) |
 ## planning
 
 | Feature | beegog | repository-harness | Best | Ghi chú |
