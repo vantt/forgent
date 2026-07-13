@@ -8,12 +8,12 @@ Status: `candidate` → `planned` → `in-progress` → `ported` / `adapted` / `
 
 | Feature | Nguồn | Status | Đích trong forgent | Commit | Ghi chú / Lý do |
 |---|---|---|---|---|---|
-| policy-vs-ops-split | beegog:policy-vs-ops-split + repository-harness:policy-vs-durable-separation | candidate | quy ước repo-layout của forgent | — | Quyết định nền móng: docs = policy, state dir = ops, gitignore ranh giới. Rẻ, nên chốt trước mọi thứ khác |
-| trigger-only-descriptions | beegog:trigger-only-descriptions | candidate | chuẩn viết skill của forgent | — | Doctrine 1 trang, giá trị/chi phí cao nhất trong toàn bộ scan |
+| policy-vs-ops-split | beegog:policy-vs-ops-split + repository-harness:policy-vs-durable-separation | adapted | layout learning area (docs/references = policy, references/ = gitignored copies) | 29c4af3 | Đã thành quy ước sống trong ref-scan init; tổng quát hóa cho toàn forgent khi có state dir riêng |
+| trigger-only-descriptions | beegog:trigger-only-descriptions | adapted | .agents/skills/ref-scan/SKILL.md | 29c4af3 | Áp dụng cho skill đầu tiên; nâng thành chuẩn chung khi có skill thứ hai |
 | state-vs-log-two-physics | beegog:state-vs-log-two-physics | candidate | thiết kế memory/knowledge layer | — | Nguyên lý tổ chức tri thức; forgent mới chỉ có dạng log |
-| skill-conventions | beegog:skill-budgets-conventions | candidate | chuẩn skill forgent (<200 dòng, headless, red flags, handoff) | — | Đi cùng trigger-only-descriptions thành bộ chuẩn skill hoàn chỉnh |
+| skill-conventions | beegog:skill-budgets-conventions | adapted | .agents/skills/ref-scan/ | 29c4af3 | <200 dòng + 1 tầng references/ + headless + red flags + handoff + CREATION-LOG; chưa port phần pressure-test (xem tdd-for-skills) |
 | tdd-for-skills-iron-law | beegog:tdd-for-skills-iron-law | candidate | quy trình viết skill + pressure-test templates | — | Kèm 7 pressure types; là cách duy nhất đã thấy để eval chất lượng skill |
-| error-why-fix-refusals | beegog:error-why-fix-refusals | candidate | chuẩn error message mọi tool/CLI forgent | — | Nhỏ, độc lập, nâng DX ngay |
+| error-why-fix-refusals | beegog:error-why-fix-refusals | adapted | .agents/skills/ref-scan/scripts/ref-scan.mjs (fail()) | 29c4af3 | Mọi refusal của script theo ERROR/WHY/FIX; nâng thành chuẩn chung khi forgent có CLI thứ hai |
 | six-questions-acceptance | repository-harness:repo-as-os-six-questions | candidate | acceptance test cho harness forgent | — | Dùng làm định nghĩa "done" cho platform layer |
 | context-rules-matrix | repository-harness:context-rules-matrix | candidate | context budget layer | — | Phase × lane × must/should/skip + token budgets; bee cũng chưa có bản tốt bằng |
 | fail-open-crash-wrappers | beegog:fail-open-crash-wrappers | candidate | hook runtime của forgent | — | Cùng adapter.mjs pattern (stdin normalize, repo-root discovery, crash log) |
@@ -21,7 +21,7 @@ Status: `candidate` → `planned` → `in-progress` → `ported` / `adapted` / `
 | verify-enforced-close | beegog:cell-task-unit | candidate | task unit của forgent | — | Cap-requires-proof + before-state evidence; tính năng chống-ảo-giác mạnh nhất trong scan |
 | tool-registry-capability | repository-harness:tool-registry-capability | candidate | tool/capability layer | — | "Absent capability = clean skip"; hợp định vị platform cung cấp tool cho agent apps |
 | maturity-ladder | repository-harness:maturity-ladder-h0-h5 | candidate | roadmap forgent (F0–F5?) | — | Cho forgent thang tiến hóa đo được thay vì feature list phẳng |
-| managed-block-markers | beegog:managed-block-markers | candidate | installer/onboarding forgent | — | Bắt buộc nếu forgent ghi vào file user-owned (AGENTS.md, .gitignore) |
+| managed-block-markers | beegog:managed-block-markers | adapted | ref-scan.mjs init (.gitignore REF-SCAN:START/END) | 29c4af3 | Byte ngoài marker giữ nguyên tuyệt đối; mở rộng cho AGENTS.md khi forgent có onboarding |
 | changeset-event-sourcing | repository-harness:changeset-event-sourcing | candidate | durable layer nếu forgent dùng db | — | Chỉ liên quan khi chọn store dạng db; nếu chọn JSONL như bee thì không cần |
 | silent-bookkeeping | beegog:silent-bookkeeping | candidate | communication doctrine của forgent | — | Kèm gate-presentation-contract; UX khác biệt rõ nhất của bee |
 
