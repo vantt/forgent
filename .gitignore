@@ -1,2 +1,15 @@
 # Upstream source clones — cursors tracked in docs/distillery/, re-clone as needed
 /upstreams/
+
+# BEE:START
+.bee/state.json
+.bee/reservations.json
+.bee/workers/
+.bee/logs/
+.bee/capture-queue.jsonl
+.bee/feedback-digest.json
+.bee/.inject-cache.json
+.bee/HANDOFF.json
+.bee/spikes/
+.bee/manifest-hash.json
+# BEE:END
