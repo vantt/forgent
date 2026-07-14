@@ -14,6 +14,7 @@
 //   3 conflict       — CAS conflict on the runner's own write (state-conflict)
 //   4 validation     — bad runner config, unknown tier, not a git repo
 //   5 corrupt-log    — the event log failed to parse
+//   6 busy           — another live runner holds .fgos/runner.lock
 //
 // The repo root is derived from the CURRENT WORKING DIRECTORY via git
 // (never from this file's own location), so the runner operates on the

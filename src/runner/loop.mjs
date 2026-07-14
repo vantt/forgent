@@ -33,6 +33,7 @@
 // operates on whatever repo it is invoked in, not on the repo that happens
 // to contain its source.
 
+import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync, spawnSync } from 'node:child_process';
 import {
@@ -54,6 +55,90 @@ import {
 } from './anti-loop.mjs';
 import { spawnWorker, modelForTier } from './dispatch.mjs';
 import { createWorktree, removeWorktree, listLeftovers, branchNameFor } from './worktree.mjs';
+
+/** Exit code for the `busy` outcome: another live runner already holds the
+ * inter-process lock. Deliberately outside the R4 category map — busy is not
+ * an error the store classifies, it is a clean "someone else has this repo"
+ * result — and distinct from every code already spoken for (0 ok, 1
+ * unexpected, 2-5 in store.mjs's EXIT_CODES). */
+export const EXIT_BUSY = 6;
+
+export const LOCK_FILE = 'runner.lock';
+
+/** Signal-0 liveness probe. EPERM means the pid exists but belongs to
+ * another user — still very much alive, so still busy. */
+function isPidAlive(pid) {
+  try {
+    process.kill(pid, 0);
+    return true;
+  } catch (err) {
+    return err.code === 'EPERM';
+  }
+}
+
+/**
+ * Take the exclusive inter-process lock: `.fgos/runner.lock`, created with
+ * `wx` (atomic fail-if-exists — the one primitive that makes two racing
+ * runners impossible on a local fs), holding this process's pid.
+ *
+ * When the file already exists, the pid inside decides: a live pid means a
+ * runner is genuinely working this repo — back off (`acquired: false`,
+ * never touch the holder's lock). A dead pid (or unreadable/non-positive
+ * content, which no live holder can prove ownership of) is a crash
+ * leftover: remove it and retry the `wx` create exactly once — losing that
+ * retry means someone else won the reclaim race, which is just `busy` again.
+ */
+export function acquireRunnerLock(dir, { pid = process.pid } = {}) {
+  const lockPath = path.join(dir, LOCK_FILE);
+  fs.mkdirSync(dir, { recursive: true });
+
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    try {
+      const fd = fs.openSync(lockPath, 'wx');
+      try {
+        fs.writeSync(fd, String(pid));
+      } finally {
+        fs.closeSync(fd);
+      }
+      return {
+        acquired: true,
+        lockPath,
+        release() {
+          try {
+            fs.unlinkSync(lockPath);
+          } catch (err) {
+            if (err.code !== 'ENOENT') throw err;
+          }
+        },
+      };
+    } catch (err) {
+      if (err.code !== 'EEXIST') throw err;
+    }
+
+    let holderPid;
+    try {
+      holderPid = parseInt(fs.readFileSync(lockPath, 'utf8').trim(), 10);
+    } catch (err) {
+      if (err.code === 'ENOENT') continue; // holder released in between — retry the create
+      throw err;
+    }
+
+    // pid must be a positive integer before probing: kill(0, 0) would probe
+    // our own process group and misread garbage content as "alive".
+    if (Number.isInteger(holderPid) && holderPid > 0 && isPidAlive(holderPid)) {
+      return { acquired: false, holderPid, lockPath };
+    }
+
+    try {
+      fs.unlinkSync(lockPath); // stale — dead holder; reclaim
+    } catch (err) {
+      if (err.code !== 'ENOENT') throw err;
+    }
+  }
+
+  // Lost the wx create twice in a row: a live contender keeps beating us.
+  return { acquired: false, holderPid: null, lockPath };
+}
 
 /** Resolve the repo root from `cwd` via git itself (never from __dirname —
  * the runner binary may live in a different repo than the one it runs on).
@@ -336,6 +421,16 @@ export function runOnce(options = {}) {
   const breaker = options.breaker ?? createMissBreaker(options.breakerThreshold ?? BREAKER_MISSES);
   const parked = [];
 
+  // Inter-process exclusivity BEFORE any store write or worktree op — the
+  // startup reap itself mutates state, so even it must not run concurrently.
+  // A busy result touches nothing: no reap, no claim, and never the live
+  // holder's lock file.
+  const lock = acquireRunnerLock(dir);
+  if (!lock.acquired) {
+    log(`fgos-runner: busy — another runner${lock.holderPid ? ` (pid ${lock.holderPid})` : ''} holds ${lock.lockPath}`);
+    return { outcome: 'busy', holderPid: lock.holderPid, parked, exitCode: EXIT_BUSY };
+  }
+
   try {
     const reap = startupReap({ repoRoot, dir, worktreeDir, verifyTimeoutMs: config?.timeoutMs, log, dryRun });
 
@@ -389,5 +484,7 @@ export function runOnce(options = {}) {
     const errorClass = category === 'conflict' ? 'state-conflict' : category;
     log(`fgos-runner: halting (${errorClass}): ${err.message}`);
     return { outcome: 'halted', errorClass, message: err.message, parked, exitCode };
+  } finally {
+    lock.release();
   }
 }

@@ -1,0 +1,145 @@
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { execFileSync, spawnSync } from 'node:child_process';
+import { initStore, addWork, listWork, readRawEvents, EXIT_CODES } from '../../src/state/store.mjs';
+import { acquireRunnerLock, runOnce, EXIT_BUSY, LOCK_FILE } from '../../src/runner/loop.mjs';
+
+// Inter-process exclusivity for the runner: `.fgos/runner.lock`. Every test
+// builds its own disposable git repo (git init in mkdtemp) with its own
+// `.fgos/` inside it; nothing here touches THIS repo (forgent itself).
+
+const noLog = () => {};
+
+function initTempRepo() {
+  const repoRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-lock-test-repo-'));
+  execFileSync('git', ['init', '-q'], { cwd: repoRoot });
+  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: repoRoot });
+  execFileSync('git', ['config', 'user.name', 'Test'], { cwd: repoRoot });
+  fs.writeFileSync(path.join(repoRoot, 'seed.txt'), 'seed\n');
+  execFileSync('git', ['add', 'seed.txt'], { cwd: repoRoot });
+  execFileSync('git', ['commit', '-q', '-m', 'init'], { cwd: repoRoot });
+  return repoRoot;
+}
+
+function setup() {
+  const repoRoot = initTempRepo();
+  const dir = path.join(repoRoot, '.fgos');
+  initStore(dir);
+  const worktreeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-lock-test-wt-'));
+  return { repoRoot, dir, worktreeDir };
+}
+
+function seedItem(dir, overrides = {}) {
+  addWork(dir, {
+    id: 'item-x',
+    title: 'Produce the output file',
+    kind: 'behavior_change',
+    status: 'todo',
+    deps: [],
+    risk: 'low',
+    refs: [],
+    verify: 'test -f output.txt',
+    ...overrides,
+  });
+}
+
+/** A pid that is guaranteed dead: a node child that already ran to
+ * completion (spawnSync only returns after the child exits). */
+function deadPid() {
+  const result = spawnSync(process.execPath, ['-e', ''], { encoding: 'utf8' });
+  assert.equal(result.status, 0);
+  return result.pid;
+}
+
+function fgwBranches(repoRoot) {
+  const out = execFileSync('git', ['branch', '--list', 'fgw/*'], { cwd: repoRoot, encoding: 'utf8' });
+  return out.split('\n').filter(Boolean);
+}
+
+// --- exit code contract ----------------------------------------------------
+
+test('EXIT_BUSY collides with no existing exit code (0 ok, 1 unexpected, R4 category map)', () => {
+  const taken = new Set([0, 1, ...Object.values(EXIT_CODES)]);
+  assert.equal(taken.has(EXIT_BUSY), false);
+});
+
+// --- overlapping runs ------------------------------------------------------
+
+test('second overlapping runOnce exits busy: zero store writes, zero worktree ops, holder lock untouched', () => {
+  const { repoRoot, dir, worktreeDir } = setup();
+  seedItem(dir);
+  // The "first runner" is simulated by its lock: a live pid (this very test
+  // process) holding runner.lock — exactly what a concurrent run leaves in
+  // place for its whole lifetime.
+  const lockPath = path.join(dir, LOCK_FILE);
+  fs.writeFileSync(lockPath, String(process.pid), { flag: 'wx' });
+  const eventsBefore = readRawEvents(dir).length;
+
+  const result = runOnce({ repoRoot, config: { timeoutMs: 5000 }, worktreeDir, log: noLog });
+
+  assert.equal(result.outcome, 'busy');
+  assert.equal(result.exitCode, EXIT_BUSY);
+  assert.equal(result.holderPid, process.pid);
+  // zero store writes: no reap, no claim — the seeded item never moved
+  assert.equal(readRawEvents(dir).length, eventsBefore);
+  assert.equal(listWork(dir).work['item-x'].status, 'todo');
+  // zero worktree ops: no fgw branch, no checkout directory
+  assert.deepEqual(fgwBranches(repoRoot), []);
+  assert.deepEqual(fs.readdirSync(worktreeDir), []);
+  // the live holder's lock survives the busy exit, pid intact
+  assert.equal(fs.readFileSync(lockPath, 'utf8'), String(process.pid));
+});
+
+test('stale lock (dead pid) is reclaimed: runOnce proceeds and releases the lock on the way out', () => {
+  const { repoRoot, dir, worktreeDir } = setup();
+  const lockPath = path.join(dir, LOCK_FILE);
+  fs.writeFileSync(lockPath, String(deadPid()), { flag: 'wx' });
+
+  // empty frontier: proceeding past the lock means reaching the idle path
+  const result = runOnce({ repoRoot, config: { timeoutMs: 5000 }, worktreeDir, log: noLog });
+
+  assert.equal(result.outcome, 'idle');
+  assert.equal(result.exitCode, 0);
+  assert.equal(fs.existsSync(lockPath), false);
+});
+
+test('garbage lock content (no live holder can prove ownership) is treated as stale', () => {
+  const { repoRoot, dir, worktreeDir } = setup();
+  const lockPath = path.join(dir, LOCK_FILE);
+  fs.writeFileSync(lockPath, 'not-a-pid\n', { flag: 'wx' });
+
+  const result = runOnce({ repoRoot, config: { timeoutMs: 5000 }, worktreeDir, log: noLog });
+
+  assert.equal(result.outcome, 'idle');
+  assert.equal(fs.existsSync(lockPath), false);
+});
+
+// --- acquire/release primitive --------------------------------------------
+
+test('acquireRunnerLock: wx create wins once, refuses a live holder, release removes the file', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-lock-test-dir-'));
+  const first = acquireRunnerLock(dir);
+  assert.equal(first.acquired, true);
+  assert.equal(fs.readFileSync(first.lockPath, 'utf8'), String(process.pid));
+
+  const second = acquireRunnerLock(dir);
+  assert.equal(second.acquired, false);
+  assert.equal(second.holderPid, process.pid);
+
+  first.release();
+  assert.equal(fs.existsSync(first.lockPath), false);
+  // released — a new acquire succeeds again
+  const third = acquireRunnerLock(dir);
+  assert.equal(third.acquired, true);
+  third.release();
+});
+
+test('release is idempotent when the lock file is already gone', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-lock-test-dir-'));
+  const lock = acquireRunnerLock(dir);
+  fs.unlinkSync(lock.lockPath);
+  lock.release(); // must not throw
+});
