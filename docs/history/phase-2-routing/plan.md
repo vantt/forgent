@@ -39,13 +39,13 @@ Slice queue: S1 (hiện tại, feasibility: sẵn — toàn nội bộ) → S2 (
 
 ## Current slice
 
-S1 — substrate D5/D6/D7. Entry: main sạch, 82/82. Exit: 5 trạng thái + tier + version chạy thật, fixture log Phase 1 replay đúng, cửa ghi lộ cạnh mới, suite xanh mở rộng. Files bounded: theo 3 cells. Verify tổng: `npm test`.
+S2 — cửa đọc: frontier derive + request-class (per D1, A2, R5). Entry: S1 capped (116/116). Exit: lệnh đọc trả frontier đúng trên deps đa tầng, FIFO seq, KHÔNG ghi event nào; suite xanh mở rộng. Files bounded: src/state/frontier.mjs (mới, thuần), bin/fgos.mjs + store facade (chỉ verb đọc), test. Verify tổng: `npm test`.
 
 ## Cells
 
-- `phase-2-routing-1` — schema + FSM proposed + event version
-- `phase-2-routing-2` — replay backward-compat + fixture binary 31c1300 (deps: 1)
-- `phase-2-routing-3` — cửa ghi proposed/--reason/--tier (deps: 1, 2)
+S1 (capped): `phase-2-routing-1..3`. S2:
+- `phase-2-routing-4` — frontier query thuần trên view (deps: 3 — S1, đã capped)
+- `phase-2-routing-5` — verb đọc `fgos ready` + request-class không-ghi (deps: 4)
 
 ## Out of scope
 

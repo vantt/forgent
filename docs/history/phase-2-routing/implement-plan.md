@@ -44,6 +44,8 @@ S1 = `phase-2-routing-1` (schema+FSM+version, không đụng replay/store) → `
 
 ## Validation Plan
 
+**Validating S2 đã chạy (2026-07-14) — bằng chứng: `reports/validation-s2.md`.** Kết quả: panel 2 lăng kính + cold-pickup, 0 BLOCKER; FIFO chứng minh bằng probe insertion-order (không cần sửa fold); `ready` thừa hưởng ngữ nghĩa đọc của `list` (dir trống → rỗng exit 0, không tạo `.fgos/`); facade chốt `store.readyWork`. Mọi WARNING/minor vá vào cells trong vòng. Verdict: READY WITH CONSTRAINTS.
+
 **Validating S1 đã chạy (2026-07-14) — bằng chứng: `reports/validation-s1.md`.** Kết quả: reality gate PASS; spike sinh-fixture-từ-31c1300 YES (×2 độc lập: orchestrator + feasibility persona); whole-suite scan xác nhận đúng MỘT test breaks-by-design (fsm.test.mjs:10 STATUSES deepEqual, thuộc scope cell 1); persona panel 3 lăng kính + cold-pickup: 0 BLOCKER, mọi WARNING vá trong vòng. Verdict: READY WITH CONSTRAINTS (1 test edit chủ đích duy nhất; worktree cleanup từ repo gốc; tier enum provisional reconcile tại E3). S3 giữ điều kiện chặn: probe `claude -p` thật + spike worktree TRƯỚC khi cell S3 tồn tại.
 
 ## Risks & Mitigation

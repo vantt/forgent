@@ -1,0 +1,62 @@
+{
+  "id": "phase-2-routing-5",
+  "feature": "phase-2-routing",
+  "title": "S2: verb đọc fgos ready + request-class không-ghi",
+  "lane": "high-risk",
+  "status": "open",
+  "deps": [
+    "phase-2-routing-4"
+  ],
+  "decisions": [
+    "D1"
+  ],
+  "files": [
+    "bin/fgos.mjs",
+    "src/state/store.mjs",
+    "test/cli/fgos.test.mjs",
+    "test/e2e/rebuild-determinism.test.mjs"
+  ],
+  "read_first": [
+    "src/state/frontier.mjs",
+    "bin/fgos.mjs",
+    "docs/specs/work-state.md",
+    "src/state/store.mjs",
+    "src/state/events.mjs"
+  ],
+  "action": "Verb `fgos ready`: đọc log → fold → frontier → in JSON (machine-readable như list). Request-class per D1: verb ĐỌC thuần — không ghi event, không đụng view file, không tạo .fgos/ nếu chưa có (log thiếu → kết quả rỗng hay lỗi? THEO PATTERN list hiện hành, khai báo trong report); corrupt log → corrupt-log mã 5 như list. Exit codes phạm trù giữ nguyên. Test CLI: ready đúng trên kịch bản deps thật qua binary; GOLDEN request-class test: chạy ready hai lần, so byte events.jsonl trước/sau — không đổi; e2e mở rộng: thêm bước ready vào journey rebuild-determinism. Đáp án pattern-list nằm sẵn: readEvents trả [] khi log thiếu, ném corrupt-log khi hỏng — tái dùng rebuildView/listWork là thừa hưởng đúng hành vi (log thiếu → kết quả rỗng, exit 0). Facade đã chốt (feasibility W2): store.mjs thêm export readyWork(dir) = frontier(rebuildView(logPath)) — bin CHỈ import từ store, không bao giờ import frontier.mjs trực tiếp. Golden test giữ nghiêm: so BYTE events.jsonl trước/sau hai lần ready (W3).",
+  "must_haves": {
+    "truths": [
+      "fgos ready không thêm dòng nào vào events.jsonl (so byte trước/sau)",
+      "Output machine-readable, dep proposed không mở việc",
+      "corrupt log → exit 5"
+    ],
+    "artifacts": [
+      {
+        "path": "bin/fgos.mjs",
+        "substantive": "verb ready qua store facade, không logic inline"
+      }
+    ],
+    "key_links": [
+      "bin/fgos.mjs verb ready gọi store.readyWork — không import frontier.mjs trực tiếp",
+      "readyWork là export thêm duy nhất trên store"
+    ],
+    "prohibitions": [
+      "Không verb ghi mới",
+      "Không đổi giá trị exit-code",
+      "Test không ghi .fgos/ trong repo"
+    ]
+  },
+  "verify": "npm test",
+  "trace": {
+    "worker": null,
+    "outcome": null,
+    "files_changed": [],
+    "deviations": [],
+    "friction": null,
+    "capped_at": null,
+    "behavior_change": true,
+    "verification_evidence": null,
+    "verify_output": null,
+    "verify_passed": null
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "id": "phase-2-routing-4",
+  "feature": "phase-2-routing",
+  "title": "S2: frontier query thuần — todo + deps done + FIFO seq",
+  "lane": "high-risk",
+  "status": "open",
+  "deps": [
+    "phase-2-routing-3"
+  ],
+  "decisions": [
+    "D1",
+    "D5"
+  ],
+  "files": [
+    "src/state/frontier.mjs",
+    "test/state/frontier.test.mjs"
+  ],
+  "read_first": [
+    "docs/history/phase-2-routing/CONTEXT.md",
+    "src/state/replay.mjs",
+    "src/state/work.mjs",
+    "docs/specs/work-state.md"
+  ],
+  "action": "Hàm thuần frontier(view) → danh sách work item sẵn-sàng: status todo VÀ mọi dep có status done (done = đã duyệt/merge per D5 — dep ở proposed/doing/blocked KHÔNG mở), thứ tự FIFO theo seq sự kiện khai item (per A2; view cần giữ seq khai — nếu view hiện chưa lưu, derive từ fold trong frontier.mjs bằng cách nhận events hoặc mở rộng fold NHẸ NHẤT có thể, khai báo lựa chọn trong report). Thuần: không fs, không side effect (pattern fsm/replay). Test: deps đa tầng (A←B←C), dep proposed không mở, dep done mở, item không deps luôn sẵn, FIFO đúng theo thứ tự khai, item blocked/doing/proposed/done loại khỏi frontier, view rỗng → frontier rỗng. CHỐT đường FIFO (cold-pickup): dùng insertion-order của view.work — foldEvents dựng key theo thứ tự event, key kebab không-numeric nên JS giữ nguyên thứ tự, work.move không đổi vị trí key; NÊU tường minh reliance này trong comment frontier.mjs + một test khóa thứ tự sau nhiều move. KHÔNG sửa replay.mjs (ngoài files) — đường view-only là bắt buộc, escape hatch bỏ. Test FIFO PHẢI dùng id có thứ tự khai KHÁC thứ tự chữ cái (vd khai zeta trước alpha) — nếu không, insertion-order và sort-theo-id không phân biệt được (false-green, feasibility W1); frontier không bao giờ sort theo id. Guard defensive: view.work[dep]?.status.",
+  "must_haves": {
+    "truths": [
+      "Dep ở proposed KHÔNG mở việc phụ thuộc (per D5)",
+      "FIFO theo seq khai item, deterministic",
+      "frontier là hàm thuần — không import fs",
+      "Test FIFO dùng add-order phi-lexical (zeta trước alpha) và pass"
+    ],
+    "artifacts": [
+      {
+        "path": "src/state/frontier.mjs",
+        "substantive": "query derive thật, không danh sách tay (R5)"
+      }
+    ],
+    "key_links": [
+      "frontier đứng trên view/fold của replay.mjs, không đọc file trực tiếp"
+    ],
+    "prohibitions": [
+      "Không sửa store.mjs/bin (cell 5)",
+      "Không thêm trường schema mới",
+      "Test không ghi .fgos/ trong repo",
+      "Không sửa replay.mjs"
+    ]
+  },
+  "verify": "npm test",
+  "trace": {
+    "worker": null,
+    "outcome": null,
+    "files_changed": [],
+    "deviations": [],
+    "friction": null,
+    "capped_at": null,
+    "behavior_change": true,
+    "verification_evidence": null,
+    "verify_output": null,
+    "verify_passed": null
+  },
+  "tier": "generation"
+}
