@@ -1,0 +1,62 @@
+{
+  "id": "phase-2-routing-3",
+  "feature": "phase-2-routing",
+  "title": "S1: cửa ghi cho proposed + reason + tier qua CLI",
+  "lane": "high-risk",
+  "status": "open",
+  "deps": [
+    "phase-2-routing-1",
+    "phase-2-routing-2"
+  ],
+  "decisions": [
+    "D5",
+    "D6"
+  ],
+  "files": [
+    "src/state/store.mjs",
+    "bin/fgos.mjs",
+    "test/cli/fgos.test.mjs"
+  ],
+  "read_first": [
+    "src/state/fsm.mjs",
+    "src/state/store.mjs",
+    "bin/fgos.mjs",
+    "docs/history/phase-2-routing/CONTEXT.md"
+  ],
+  "action": "Lộ cạnh mới qua một cửa hiện hành: move hỗ trợ --to proposed/todo theo bảng fsm mới; proposed→todo nhận --reason (bắt buộc khi từ chối? — theo D5 event mang lý do: --reason bắt buộc cho cạnh proposed→todo, thiếu → validation 4); add nhận --tier optional (validate tập giá trị, default khi thiếu); list hiển thị tier + proposed. KHÔNG verb frontier/ready ở S1 (E2). Giữ event-trước-view-sau, exit-code phạm trù, guard cờ trống như hiện hành (kể cả --reason/--tier trống). Test: đủ cạnh mới qua CLI thật, CAS trên proposed, reason vào event payload, exit codes. Quy ước default: add luôn ghi tier vào event (explicit hoặc default từ work.mjs DEFAULTS) — nhất quán với cell 1/2.",
+  "must_haves": {
+    "truths": [
+      "move x --to todo (từ proposed) thiếu --reason → exit 4; có reason → event mang reason",
+      "add --tier ngoài tập → exit 4; thiếu --tier → default",
+      "Cạnh cấm qua CLI → exit 2, không event",
+      "Suite tổng pass"
+    ],
+    "artifacts": [
+      {
+        "path": "bin/fgos.mjs",
+        "substantive": "move/add mở rộng, không verb mới ngoài phạm vi"
+      }
+    ],
+    "key_links": [
+      "store vẫn chủ ghi duy nhất; bin chỉ import từ store facade"
+    ],
+    "prohibitions": [
+      "Không verb frontier/ready (S2)",
+      "Không đổi giá trị exit-code",
+      "Test không ghi .fgos/ trong repo"
+    ]
+  },
+  "verify": "npm test",
+  "trace": {
+    "worker": null,
+    "outcome": null,
+    "files_changed": [],
+    "deviations": [],
+    "friction": null,
+    "capped_at": null,
+    "behavior_change": true,
+    "verification_evidence": null,
+    "verify_output": null,
+    "verify_passed": null
+  }
+}

@@ -1,0 +1,71 @@
+{
+  "id": "phase-2-routing-1",
+  "feature": "phase-2-routing",
+  "title": "S1: schema work + FSM proposed + event version (D5/D6/D7c)",
+  "lane": "high-risk",
+  "status": "open",
+  "deps": [],
+  "decisions": [
+    "D5",
+    "D6",
+    "D7"
+  ],
+  "files": [
+    "src/state/work.mjs",
+    "src/state/fsm.mjs",
+    "src/state/events.mjs",
+    "test/state/work.test.mjs",
+    "test/state/fsm.test.mjs",
+    "test/state/events.test.mjs"
+  ],
+  "read_first": [
+    "docs/history/phase-2-routing/CONTEXT.md",
+    "docs/history/phase-2-routing/plan.md",
+    "docs/specs/work-state.md",
+    "src/state/work.mjs",
+    "src/state/fsm.mjs"
+  ],
+  "action": "Mở rộng nền dữ liệu đồng bộ, GIỮ mọi hành vi cũ: work.mjs — STATUSES thêm 'proposed' (giữ done terminal semantics), schema thêm trường tier (bắt buộc từ giờ khi add mới? KHÔNG — optional với default khai báo hằng, per D7b để item cũ hợp lệ; validate giá trị tier thuộc tập khai báo trong work.mjs), export DEFAULTS tường minh (tier default, version hiện hành). fsm.mjs — thêm đúng 3 cạnh: doing→proposed, proposed→done, proposed→todo; cạnh proposed→todo nhận reason (đi vào payload event); done vẫn không lối ra; mọi cạnh cấm mới (vd proposed→doing, todo→proposed) bị precondition. events.mjs — mỗi event mới appendEvent ghi thêm trường v = SCHEMA_VERSION (hằng export từ work.mjs hoặc events.mjs, một nguồn); readEvents chấp nhận event không có v (log cũ). Test trực tiếp từng điểm trên, kể cả bảng cạnh cấm quét đủ mọi cặp trạng thái. Tests dùng tmp dir. Tập giá trị tier là PROVISIONAL (tối thiểu, vd light/standard/heavy): ghi comment tường minh trong work.mjs rằng nó sẽ reconcile với bảng tier→model config ở E3 — một nguồn cuối cùng, tránh drift (scope-guardian W1). Khẳng định tường minh (coherence W4): cạnh doing→done CŨ GIỮ NGUYÊN — done có hai lối vào (doing→done thao tác tay, proposed→done duyệt đề xuất); test assert cả hai đều hợp lệ. Quy ước default xuyên cell (cold-pickup note): event work.add MỚI luôn ghi tier tường minh (user cung cấp hoặc default); default-tại-fold (cell 2) CHỈ dành cho event legacy thiếu trường. Sửa cùng lúc (feasibility W2): comment invariant ở fsm.mjs:8-10 ('exactly one entry to done') và tên test single-door — done giờ có HAI cửa vào (doing→done, proposed→done) nhưng vẫn KHÔNG cửa ra; viết lại lời hứa cho khớp thực tế.",
+  "must_haves": {
+    "truths": [
+      "Hành vi cũ pass nguyên vẹn: 82 test hiện hành xanh, NGOẠI LỆ hợp lệ duy nhất là assert deepEqual(STATUSES,[4 trạng thái]) trong fsm.test.mjs — cập nhật assert đó theo D5 (file trong scope), không nới lỏng assert nào khác",
+      "Đủ 3 cạnh mới hợp lệ và MỌI cặp cạnh khác ngoài bảng bị precondition (quét tổ hợp)",
+      "Event mới mang v; readEvents đọc được event không v",
+      "validateWorkShape chấp nhận item thiếu tier (default), từ chối tier ngoài tập"
+    ],
+    "artifacts": [
+      {
+        "path": "src/state/fsm.mjs",
+        "substantive": "bảng TRANSITIONS mới + reason cho proposed→todo"
+      },
+      {
+        "path": "src/state/work.mjs",
+        "substantive": "STATUSES 5 trạng thái + tier + DEFAULTS + SCHEMA_VERSION một nguồn"
+      }
+    ],
+    "key_links": [
+      "fsm import STATUSES từ work.mjs (giữ re-export cho consumer cũ)",
+      "appendEvent lấy SCHEMA_VERSION từ đúng một nguồn"
+    ],
+    "prohibitions": [
+      "Không đổi giá trị exit-code",
+      "Không sửa replay.mjs/store.mjs/bin (cell sau)",
+      "Không sửa/ghi đè event cũ (D7a)",
+      "Test không ghi .fgos/ trong repo"
+    ]
+  },
+  "verify": "npm test",
+  "trace": {
+    "worker": null,
+    "outcome": null,
+    "files_changed": [],
+    "deviations": [],
+    "friction": null,
+    "capped_at": null,
+    "behavior_change": true,
+    "verification_evidence": null,
+    "verify_output": null,
+    "verify_passed": null
+  },
+  "tier": "generation"
+}

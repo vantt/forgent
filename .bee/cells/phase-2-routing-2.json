@@ -1,0 +1,64 @@
+{
+  "id": "phase-2-routing-2",
+  "feature": "phase-2-routing",
+  "title": "S1: replay backward-compat + fixture log Phase 1 thật (D7b)",
+  "lane": "high-risk",
+  "status": "open",
+  "deps": [
+    "phase-2-routing-1"
+  ],
+  "decisions": [
+    "D7"
+  ],
+  "files": [
+    "src/state/replay.mjs",
+    "test/state/replay.test.mjs",
+    "test/fixtures/phase1-events.jsonl",
+    "test/state/backward-compat.test.mjs"
+  ],
+  "read_first": [
+    "docs/history/phase-2-routing/CONTEXT.md",
+    "src/state/replay.mjs",
+    "src/state/work.mjs"
+  ],
+  "action": "D7b: replay defaults-hóa tại fold — item/event log cũ thiếu tier/v nhận DEFAULTS từ work.mjs; fold log cũ thuần, log mới thuần, và log TRỘN (cũ trước mới sau) đều ra view hợp lệ deterministic. Fixture: SINH từ binary Phase 1 THẬT — dùng git worktree tạm checkout commit 31c1300, chạy bin/fgos.mjs của commit đó trong tmp dir tạo chuỗi init→add(có deps, unicode)→move→decision, copy events.jsonl thành test/fixtures/phase1-events.jsonl (commit làm fixture bất biến); ghi cách sinh vào comment đầu test backward-compat. Test backward-compat: replay fixture ra view đúng từng giá trị kỳ vọng (viết tay expected từ nội dung fixture), rebuild deterministic, list qua store đọc được (chỉ đọc — không sửa store).",
+  "must_haves": {
+    "truths": [
+      "Fixture là log sinh từ binary commit 31c1300, không viết tay",
+      "Replay fixture + log trộn cũ/mới ra view deterministic, item cũ mang tier default",
+      "Không dòng nào của fixture bị sửa bởi bất kỳ test nào",
+      "Log mới thuần (mọi event có v) replay đúng — không chỉ old+mixed"
+    ],
+    "artifacts": [
+      {
+        "path": "test/fixtures/phase1-events.jsonl",
+        "substantive": "log Phase 1 thật, đa dạng event (add/move/decision, unicode, deps)"
+      },
+      {
+        "path": "test/state/backward-compat.test.mjs",
+        "substantive": "expected viết tay đối chiếu từng trường"
+      }
+    ],
+    "key_links": [
+      "replay dùng DEFAULTS từ work.mjs, không hardcode default thứ hai"
+    ],
+    "prohibitions": [
+      "Không sửa store.mjs/bin (cell 3)",
+      "Không migration/ghi đè fixture (D7a)",
+      "Test không ghi .fgos/ trong repo"
+    ]
+  },
+  "verify": "npm test",
+  "trace": {
+    "worker": null,
+    "outcome": null,
+    "files_changed": [],
+    "deviations": [],
+    "friction": null,
+    "capped_at": null,
+    "behavior_change": true,
+    "verification_evidence": null,
+    "verify_output": null,
+    "verify_passed": null
+  }
+}
