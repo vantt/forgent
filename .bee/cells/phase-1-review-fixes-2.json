@@ -1,0 +1,62 @@
+{
+  "id": "phase-1-review-fixes-2",
+  "feature": "phase-1-review-fixes",
+  "title": "Gap tests F3: view-lệch, corrupt-middle, done-via-CLI, exit-5 mutation, dep-cycle",
+  "lane": "standard",
+  "status": "capped",
+  "deps": [
+    "phase-1-review-fixes-1"
+  ],
+  "decisions": [],
+  "files": [
+    "test/cli/fgos.test.mjs",
+    "test/state/events.test.mjs",
+    "test/e2e/rebuild-determinism.test.mjs"
+  ],
+  "read_first": [
+    "docs/history/phase-1-review-fixes/plan.md",
+    "docs/history/phase-1-state-layer/reports/review-session-findings.md",
+    "test/cli/fgos.test.mjs"
+  ],
+  "action": "Đóng F3 — 5 test mới theo đúng pattern tmp-dir hiện hành, không sửa src/: (1) view-LỆCH-còn-tồn-tại: seed log hợp lệ, ghi state.json cũ sai lệch (item thiếu/status cũ), chạy fgos rebuild → file deep-equal fold tươi từ log (đúng failure mode risk map, không phải rmSync); (2) corrupt GIỮA log đúng nghĩa: valid → corrupt → valid, assert phạm trù corrupt-log vẫn nổ; (3) done-terminal qua CLI thật: move ra khỏi done → exit 2 và không event mới; (4) mutation (add/move) trên log hỏng → exit 5, không event mới; (5) document dep-cycle bất khả thi: add a --deps b và add b --deps a đều exit 4. Đặt test vào file phù hợp pattern sẵn (CLI-level vào test/cli, lib-level vào test/state, journey vào e2e). Vị trí test hiện có (đã trace): test view-bị-xóa nằm ở test/cli/fgos.test.mjs:164 và test/e2e/rebuild-determinism.test.mjs:92 — đặt test view-lệch cạnh bản CLI, không trùng lặp.",
+  "must_haves": {
+    "truths": [
+      "Cả 5 test mới pass và fail được khi hành vi tương ứng bị phá (không tautology)",
+      "Suite tổng tăng số test, không giảm"
+    ],
+    "artifacts": [
+      {
+        "path": "test/cli/fgos.test.mjs",
+        "substantive": "các case mới có assert exit code + đếm event, không mock fs"
+      }
+    ],
+    "key_links": [
+      "test corrupt-middle nằm cạnh test corrupt hiện có trong events.test.mjs"
+    ],
+    "prohibitions": [
+      "Không sửa src/ (nếu test lộ bug thật thì BLOCKED, không tự sửa ngoài scope)",
+      "Không mock filesystem",
+      "Test không ghi .fgos/ trong repo"
+    ]
+  },
+  "verify": "npm test",
+  "trace": {
+    "worker": "Carl",
+    "outcome": null,
+    "files_changed": [
+      "test/cli/fgos.test.mjs",
+      "test/state/events.test.mjs"
+    ],
+    "deviations": [],
+    "friction": null,
+    "capped_at": "2026-07-14T01:45:49.048Z",
+    "behavior_change": false,
+    "verification_evidence": null,
+    "verify_output": "\n> test\n> node --test 'test/**/*.test.mjs'\n\n✔ init creates .fgos/ with an empty log and a rebuilt (empty) view, exit 0 (27.711881ms)\n✔ add creates exactly one work.add event and the view reflects the new item, exit 0 (23.199346ms)\n✔ add with a missing required field (--verify) is rejected as validation, exit 4, no event written (23.221154ms)\n✔ add with an invalid (non kebab-case) id is rejected as validation, exit 4 (23.686985ms)\n✔ add with a duplicate id is rejected as validation, exit 4, no extra event written (45.704257ms)\n✔ add with an unknown dep id is rejected as validation, exit 4 (22.681157ms)\n✔ move applies a legal transition, appends one event, and updates the view, exit 0 (51.210965ms)\n✔ move rejects an illegal transition as precondition, exit 2, no event written (45.888909ms)\n✔ move rejects a CAS expected-status mismatch as conflict, exit 3, no event written (68.540738ms)\n✔ move on a nonexistent id is rejected as validation (not-found), exit 4 (24.163663ms)\n✔ move with a bare --to (no value) is rejected as validation, exit 4, no event written (44.943679ms)\n✔ move with an empty --expect \"\" is rejected as validation, exit 4, no event written (46.75048ms)\n✔ move reports the real event seq in its message, not \"undefined\" (43.513672ms)\n✔ decision logs one event and appears in the view, exit 0 (47.992616ms)\n✔ decision without --text is rejected as validation, exit 4, no event written (46.753985ms)\n✔ list prints the current view as parseable JSON, exit 0 (49.235247ms)\n✔ rebuild reconstructs state.json from the log alone after the view file is deleted (87.919931ms)\n✔ rebuild reconstructs state.json from the log alone when the view file still exists but is stale (not deleted) (88.343638ms)\n✔ done is terminal via the real CLI: moving out of done is refused as precondition, exit 2, no event written (86.898589ms)\n✔ a mutation (add) attempted on an already-corrupt log is refused as corrupt-log, exit 5, no event written (46.833319ms)\n✔ a mutation (move) attempted on an already-corrupt log is refused as corrupt-log, exit 5, no event written (50.069598ms)\n✔ a dependency cycle is impossible to construct: add requires deps to already exist, so both sides of an attempted cycle are rejected as validation, exit 4 (44.875201ms)\n✔ a corrupt trailing line in the event log is reported as corrupt-log, exit 5 (45.306206ms)\n✔ an unknown verb is rejected as validation, exit 4 (21.966382ms)\n✔ add with no id at all is rejected as validation, exit 4 (23.099561ms)\n✔ rebuild-determinism: init, add work with deps + unicode title, move through statuses with --expect, decision, delete view, rebuild -> deep-equal view (311.700258ms)\n✔ rebuild-determinism: CAS conflict — a stale --expect on the second of two moves is refused, exit 3, no event written (91.346316ms)\n✔ rebuild-determinism: a truncated final event-log line is reported as corrupt-log, exit 5, message names the error (71.686585ms)\n✔ node:test runner is wired up (0.463763ms)\n✔ readEvents returns [] for a log that has not been initialized yet (1.685171ms)\n✔ appendEvent writes exactly one JSON line with an increasing seq and ISO ts (0.770258ms)\n✔ readEvents replays events back in append order (0.278209ms)\n✔ appendEvent never rewrites a previously appended line (0.292808ms)\n✔ readEvents detects a truncated last line as corrupt-log and does not swallow it (0.485133ms)\n✔ readEvents detects a corrupt line anywhere in the log, not only at the end (0.236662ms)\n✔ readEvents detects a corrupt line in the middle of the log — valid, corrupt, valid (0.200418ms)\n✔ appendEvent rejects a missing or blank type as a validation error (0.153821ms)\n✔ appendEvent refuses to append onto an already-corrupt log (0.210494ms)\n✔ STATUSES exposes the full flat status domain (5.195587ms)\n✔ transitionWork allows todo -> doing and returns a validated event (0.22159ms)\n✔ transitionWork allows doing -> done and returns a validated event (0.111594ms)\n✔ transitionWork allows todo -> blocked and returns a validated event (0.08747ms)\n✔ transitionWork allows doing -> blocked and returns a validated event (0.081032ms)\n✔ transitionWork allows blocked -> todo and returns a validated event (0.085532ms)\n✔ transitionWork allows blocked -> doing and returns a validated event (0.090252ms)\n✔ transitionWork rejects a transition not in the table and returns no event (0.511123ms)\n✔ done is terminal single-door: no transition out of done, no matter the target (0.41116ms)\n✔ done is reachable only through the doing -> done edge, never directly from todo or blocked (0.38626ms)\n✔ transitionWork rejects an unknown target status as precondition (0.226941ms)\n✔ transitionWork CAS: matching expectedStatus proceeds normally (0.209441ms)\n✔ transitionWork CAS: mismatched expectedStatus is refused as conflict, not precondition (0.193612ms)\n✔ transitionWork CAS mismatch takes priority over table lookup (conflict, not precondition, even for a bogus target) (0.188987ms)\n✔ transitionWork requires a work object (0.205306ms)\n✔ transitionWork requires a non-empty \"to\" (0.247659ms)\n✔ foldEvents on an empty log yields an empty view (1.552434ms)\n✔ foldEvents applies work.add then work.move to build current status (0.16317ms)\n✔ foldEvents folds multiple work items independently (0.100877ms)\n✔ foldEvents collects decision events into view.decisions, preserving the event ts (0.098308ms)\n✔ foldEvents ignores unknown event types instead of throwing (0.184701ms)\n✔ foldEvents ignores a work.move for an id that was never added (0.153049ms)\n✔ rebuildView reads through events.mjs readEvents and returns [] work for an uninitialized log (0.294111ms)\n✔ rebuildView twice from the same log produces deep-equal views (D3 determinism) (0.576304ms)\n✔ rebuildView preserves the historical ts from each event, never the current wall-clock time (0.496317ms)\n✔ validateWork accepts a well-formed work item with no deps (1.431711ms)\n✔ validateWork accepts learn as optional (absent, null, or a string) (0.176058ms)\n✔ validateWork rejects a non-object work item (0.29484ms)\n✔ validateWork rejects a missing required field: title (0.107411ms)\n✔ validateWork rejects a missing required field: kind (0.079852ms)\n✔ validateWork rejects a missing required field: status (0.080511ms)\n✔ validateWork rejects a missing required field: risk (0.085877ms)\n✔ validateWork rejects a missing required field: verify (0.075347ms)\n✔ validateWork rejects deps that is not an array (0.116685ms)\n✔ validateWork rejects refs that is not an array (0.146126ms)\n✔ validateWork rejects an unstable id format (0.117169ms)\n✔ validateWork accepts a stable kebab-case id (0.076765ms)\n✔ validateWork rejects a status outside the STATUSES domain (0.120654ms)\n✔ validateWork accepts every status in STATUSES (0.100652ms)\n✔ validateWork rejects a work item that lists itself as a dep (0.123003ms)\n✔ validateWorkShape passes without checking dep existence (0.091724ms)\n✔ validateDeps rejects a dep pointing at a non-existent id (0.129944ms)\n✔ validateDeps accepts a dep that exists in existingIds (Set or array) (0.076419ms)\n✔ validateWork runs full dep-existence check when existingIds is passed (0.127125ms)\nℹ tests 82\nℹ suites 0\nℹ pass 82\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 1172.004148\n",
+    "verify_passed": true,
+    "claimed_at": "2026-07-14T01:44:11.756Z",
+    "verify_command": "npm test",
+    "verified_at": "2026-07-14T01:45:46.720Z"
+  },
+  "tier": "generation"
+}
