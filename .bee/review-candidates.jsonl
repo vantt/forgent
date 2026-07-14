@@ -1,2 +1,3 @@
 {"id":"eac5b19b-e94a-404d-9009-dd56a7f7fbe7","type":"candidate","date":"2026-07-13T19:23:09.038Z","feature":"phase-1-state-layer","head":"31c13009e44d069091968346f2f93b3e6798703e","mode":"standard","baseline":null,"cells":[]}
 {"id":"bd7f8dd4-02b2-4895-bfa5-81acaa0c5821","type":"candidate","date":"2026-07-14T01:47:49.567Z","feature":"phase-1-review-fixes","head":"a05d71a36a5942921d860a9657ffedb4cbea83b4","mode":"standard","baseline":null,"cells":[]}
+{"id":"ba2749bc-ea0e-4f3a-a662-6fa6497323f1","type":"candidate","date":"2026-07-14T09:39:32.498Z","feature":"phase-2-routing","head":"06df4970f65c14b0702004fcc2e6edeb5a4b2089","mode":"high-risk","baseline":null,"cells":[]}

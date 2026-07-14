@@ -13,6 +13,7 @@ coverage: partial
 
 - platform-foundations — 8 luật thiết kế đã khóa đứng trên mọi code của compound stack; spec: platform-foundations.md
 - work-state — bộ nhớ công việc tự quản của forgent (cửa lệnh `fgos`, nhật ký sự kiện là truth, bản chiếu dựng lại được); spec: work-state.md
+- runner — vòng tự hành: lấy việc từ frontier, giao trợ lý nền trong nhánh cô lập, tự chấm, ghi đề xuất chờ duyệt; spec: runner.md
 - distillery — vùng học từ reference sources: index feature từng nguồn, so sánh chéo, porting log; spec: chưa có (harvest sẽ viết)
 - distill-skill — skill portable vận hành vòng học (init/add/delta/seal/check); spec: chưa có (harvest sẽ viết)
 
@@ -22,7 +23,7 @@ coverage: partial
 |---|---|---|
 | Nguồn tham chiếu (reference source) | Một repo/tài liệu ngoài được quét để học feature | distillery (owns), distill-skill (đọc/ghi index) |
 | Luật nền (platform law) | Một luật thiết kế đã khóa, có D-ID và ngưỡng xem lại | platform-foundations (owns); mọi area tương lai tuân theo |
-| Work item (`work`) | Đơn vị việc duy nhất của forgent: trạng thái FSM + deps phẳng, đủ trường trả lời sáu câu harness | work-state (owns) |
+| Work item (`work`) | Đơn vị việc duy nhất của forgent: trạng thái FSM + deps phẳng + tier, đủ trường trả lời sáu câu harness | work-state (owns), runner (đọc frontier, ghi chuyển trạng thái qua cửa work-state) |
 
 [unknown — các entity khác cần harvest interview; xem Open Gaps]
 
@@ -30,12 +31,15 @@ coverage: partial
 
 - Product owner (user) — khóa/supersede luật, duyệt gate, chốt quyết định sản phẩm.
 - Agent (Claude/Codex session) — đọc doctrine + spec, thi hành công việc, capture settlement.
+- Worker (trợ lý nền do runner phái) — làm MỘT việc trong nhánh cô lập, chỉ để lại commit; không ghi trạng thái, không sửa cây chính.
 
 [unknown — vai trò khác nếu có, cần harvest]
 
 ## Cross-Area Flows
 
-[unknown — vòng học distillery → porting → platform law là flow ứng viên rõ nhất, cần harvest xác nhận từng bước; xem Open Gaps]
+**Vòng tự hành việc (work-state ↔ runner):** người vận hành khai việc (`fgos add`) → runner `--once` lấy việc sẵn-sàng từ frontier → claim `doing` → trợ lý nền làm trong nhánh `fgw/` → runner tự chấm bằng proof của việc → đạt: `proposed` (đề xuất + nhánh) → NGƯỜI duyệt/merge → `done` → việc phụ thuộc mở khóa. Trượt/lỗi: bảng phục hồi → thử-lại/đỗ-lại/dừng.
+
+[unknown — vòng học distillery → porting → platform law cần harvest xác nhận từng bước; xem Open Gaps]
 
 ## Open Gaps
 
