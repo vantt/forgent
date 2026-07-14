@@ -92,6 +92,14 @@ function runVerb(verb, flags, positional, dir) {
         refs: parseListFlag(flags.refs),
         verify: flags.verify,
         learn: typeof flags.learn === 'string' ? flags.learn : undefined,
+        // Per D6: --tier is optional; a bare/empty flag is refused the same
+        // as any other malformed value (requireField's rule), while simply
+        // omitting --tier leaves this undefined so store.mjs's addWork
+        // applies work.mjs's declared DEFAULTS.tier. An out-of-domain value
+        // (e.g. --tier extreme) passes through unrejected here — work.mjs's
+        // validateWorkShape is the single source for the TIERS domain and
+        // rejects it as validation, so that rule is never duplicated here.
+        tier: optionalField(flags.tier, 'add --tier requires a tier value (e.g. light/standard/heavy); omit --tier entirely to use the default.'),
       };
       const { event } = addWork(dir, work);
       return `Added ${event.payload.id} (event #${event.seq})`;
@@ -101,7 +109,12 @@ function runVerb(verb, flags, positional, dir) {
       const id = requireField(positional[0] ?? flags.id, 'move requires an id: fgos move <id> --to <status> [--expect <status>]');
       const to = requireField(flags.to, 'move requires --to <status>');
       const expectedStatus = optionalField(flags.expect, 'move --expect requires a status value (omit --expect entirely to skip the CAS check)');
-      const { event } = moveWork(dir, { id, to, expectedStatus });
+      // --reason only matters on the proposed -> todo rejection edge (per
+      // D5); fsm.mjs is the single place that enforces "required there,
+      // ignored everywhere else" — this verb just forwards whatever the
+      // caller supplied.
+      const reason = optionalField(flags.reason, 'move --reason requires a non-empty reason value (omit --reason entirely when not rejecting a proposal)');
+      const { event } = moveWork(dir, { id, to, expectedStatus, reason });
       return `Moved ${id}: ${event.payload.from} -> ${event.payload.to} (event #${event.seq})`;
     }
 

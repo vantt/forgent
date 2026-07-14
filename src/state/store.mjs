@@ -24,7 +24,7 @@ import path from 'node:path';
 import { appendEvent } from './events.mjs';
 import { rebuildView } from './replay.mjs';
 import { transitionWork, FsmError } from './fsm.mjs';
-import { validateWork, WorkValidationError } from './work.mjs';
+import { validateWork, WorkValidationError, DEFAULTS } from './work.mjs';
 import { EventLogError } from './events.mjs';
 
 export { FsmError, WorkValidationError, EventLogError };
@@ -103,9 +103,17 @@ export function addWork(dir, work) {
   if (before.work[work?.id]) {
     throw new StoreError('validation', `work "${work.id}" already exists.`);
   }
-  validateWork(work, Object.keys(before.work));
 
-  const event = appendEvent(logPath, { type: 'work.add', payload: work });
+  // Per D6/D7b: every NEW work.add event carries `tier` explicitly — the
+  // caller's own value, or work.mjs's declared DEFAULTS.tier when omitted —
+  // so the event log itself (not only replay.mjs's fold) states what tier
+  // was in effect at write time. `??` only fills in when `tier` is missing
+  // or nullish; an explicit (even invalid) value passes through unchanged
+  // so validateWork below still rejects it as validation.
+  const item = { ...work, tier: work?.tier ?? DEFAULTS.tier };
+  validateWork(item, Object.keys(before.work));
+
+  const event = appendEvent(logPath, { type: 'work.add', payload: item });
   const view = refreshView(dir);
   return { event, view };
 }
@@ -115,7 +123,7 @@ export function addWork(dir, work) {
  * delegates the precondition/CAS decision to fsm.mjs (pure — never writes),
  * and only then appends the event it returns.
  */
-export function moveWork(dir, { id, to, expectedStatus } = {}) {
+export function moveWork(dir, { id, to, expectedStatus, reason } = {}) {
   const { logPath } = paths(dir);
   const before = rebuildView(logPath);
   const work = before.work[id];
@@ -123,7 +131,11 @@ export function moveWork(dir, { id, to, expectedStatus } = {}) {
     throw new StoreError('validation', `work "${id}" not found.`);
   }
 
-  const rawEvent = transitionWork({ work, to, expectedStatus }); // FsmError: precondition | conflict
+  // `reason` is only meaningful on the proposed -> todo rejection edge
+  // (per D5); fsm.mjs enforces that requirement and ignores `reason`
+  // entirely for every other edge — this facade never branches on `to`
+  // itself, it just forwards what the caller gave it.
+  const rawEvent = transitionWork({ work, to, expectedStatus, reason }); // FsmError: precondition | conflict
   const event = appendEvent(logPath, rawEvent); // captures the real seq; rawEvent itself has none
   const view = refreshView(dir);
   return { event, view };

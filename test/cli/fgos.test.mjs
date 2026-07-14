@@ -299,3 +299,139 @@ test('add with no id at all is rejected as validation, exit 4', () => {
   const result = run(cwd, ['add']);
   assert.equal(result.status, 4);
 });
+
+// --- D6 tier: --tier on `add` (phase-2-routing-3) ---
+
+test('add with --tier records the given tier explicitly in the view, exit 0', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['add', 'heavy-item', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--tier', 'heavy']);
+  assert.equal(result.status, 0);
+  assert.equal(stateView(cwd).work['heavy-item'].tier, 'heavy');
+});
+
+test('add without --tier defaults to work.mjs DEFAULTS.tier ("standard"), exit 0', () => {
+  const cwd = tmpCwd();
+  const result = addOk(cwd, 'default-tier-item');
+  assert.equal(result.status, 0);
+  assert.equal(stateView(cwd).work['default-tier-item'].tier, 'standard');
+});
+
+test('add explicitly writes the tier into the work.add event payload itself, not only the folded view', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'explicit-tier-item');
+  const lines = eventLines(cwd);
+  const addEvent = JSON.parse(lines[lines.length - 1]);
+  assert.equal(addEvent.type, 'work.add');
+  assert.equal(addEvent.payload.tier, 'standard');
+});
+
+test('add with a --tier outside the TIERS domain is rejected as validation, exit 4, no event written', () => {
+  const cwd = tmpCwd();
+  const before = eventLines(cwd).length;
+  const result = run(cwd, ['add', 'bad-tier-item', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--tier', 'extreme']);
+  assert.equal(result.status, 4);
+  assert.equal(eventLines(cwd).length, before);
+});
+
+test('add with a bare --tier (no value) is rejected as validation, exit 4, no event written', () => {
+  const cwd = tmpCwd();
+  const before = eventLines(cwd).length;
+  const result = run(cwd, ['add', 'bare-tier-item', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--tier']);
+  assert.equal(result.status, 4);
+  assert.equal(eventLines(cwd).length, before);
+});
+
+// --- D5 proposed: new edges + --reason on `move` (phase-2-routing-3) ---
+
+function toProposed(cwd, id) {
+  addOk(cwd, id);
+  run(cwd, ['move', id, '--to', 'doing']);
+  return run(cwd, ['move', id, '--to', 'proposed']);
+}
+
+test('move doing -> proposed applies via the real CLI, exit 0', () => {
+  const cwd = tmpCwd();
+  const result = toProposed(cwd, 'goal-checked');
+  assert.equal(result.status, 0);
+  assert.equal(stateView(cwd).work['goal-checked'].status, 'proposed');
+});
+
+test('move proposed -> done (approval) applies via the real CLI, exit 0', () => {
+  const cwd = tmpCwd();
+  toProposed(cwd, 'approved-item');
+  const result = run(cwd, ['move', 'approved-item', '--to', 'done']);
+  assert.equal(result.status, 0);
+  assert.equal(stateView(cwd).work['approved-item'].status, 'done');
+});
+
+test('move proposed -> todo (rejection) without --reason is refused as validation, exit 4, no event written', () => {
+  const cwd = tmpCwd();
+  toProposed(cwd, 'no-reason-item');
+  const before = eventLines(cwd).length;
+  const result = run(cwd, ['move', 'no-reason-item', '--to', 'todo']);
+  assert.equal(result.status, 4);
+  assert.equal(eventLines(cwd).length, before);
+  assert.equal(stateView(cwd).work['no-reason-item'].status, 'proposed');
+});
+
+test('move proposed -> todo with an empty --reason "" is rejected as validation, exit 4, no event written', () => {
+  const cwd = tmpCwd();
+  toProposed(cwd, 'empty-reason-item');
+  const before = eventLines(cwd).length;
+  const result = run(cwd, ['move', 'empty-reason-item', '--to', 'todo', '--reason', '']);
+  assert.equal(result.status, 4);
+  assert.equal(eventLines(cwd).length, before);
+});
+
+test('move proposed -> todo (rejection) with --reason carries the reason into the event payload, exit 0', () => {
+  const cwd = tmpCwd();
+  toProposed(cwd, 'rejected-item');
+  const result = run(cwd, ['move', 'rejected-item', '--to', 'todo', '--reason', 'flaky test coverage']);
+  assert.equal(result.status, 0);
+  assert.equal(stateView(cwd).work['rejected-item'].status, 'todo');
+
+  const lines = eventLines(cwd);
+  const lastEvent = JSON.parse(lines[lines.length - 1]);
+  assert.equal(lastEvent.type, 'work.move');
+  assert.equal(lastEvent.payload.reason, 'flaky test coverage');
+});
+
+test('move proposed -> doing is a forbidden edge (proposed is never a re-entry point for doing), exit 2, no event written', () => {
+  const cwd = tmpCwd();
+  toProposed(cwd, 'no-reentry-item');
+  const before = eventLines(cwd).length;
+  const result = run(cwd, ['move', 'no-reentry-item', '--to', 'doing']);
+  assert.equal(result.status, 2);
+  assert.equal(eventLines(cwd).length, before);
+});
+
+test('move proposed -> done rejects a CAS expected-status mismatch as conflict, exit 3, no event written', () => {
+  const cwd = tmpCwd();
+  toProposed(cwd, 'cas-proposed-item');
+  const before = eventLines(cwd).length;
+  const result = run(cwd, ['move', 'cas-proposed-item', '--to', 'done', '--expect', 'todo']);
+  assert.equal(result.status, 3);
+  assert.equal(eventLines(cwd).length, before);
+  assert.equal(stateView(cwd).work['cas-proposed-item'].status, 'proposed');
+});
+
+test('move --reason on a non-rejection edge is accepted but ignored, not embedded in the payload', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'reason-ignored-item');
+  const result = run(cwd, ['move', 'reason-ignored-item', '--to', 'doing', '--reason', 'not a rejection']);
+  assert.equal(result.status, 0);
+
+  const lines = eventLines(cwd);
+  const lastEvent = JSON.parse(lines[lines.length - 1]);
+  assert.equal(lastEvent.payload.reason, undefined);
+});
+
+test('list shows tier and the proposed status for the real CLI view, exit 0', () => {
+  const cwd = tmpCwd();
+  toProposed(cwd, 'listed-proposed');
+  const result = run(cwd, ['list']);
+  assert.equal(result.status, 0);
+  const parsed = JSON.parse(result.stdout);
+  assert.equal(parsed.work['listed-proposed'].status, 'proposed');
+  assert.equal(parsed.work['listed-proposed'].tier, 'standard');
+});
