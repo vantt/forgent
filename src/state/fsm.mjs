@@ -9,6 +9,8 @@
 // `to: 'done'`, and no entry has `from: 'done'` — so once a work item is
 // done, every further transitionWork() call for it throws 'precondition'.
 
+import { STATUSES } from './work.mjs';
+
 /** Error raised by this module. `category` is the CLI exit-code contract (R4). */
 export class FsmError extends Error {
   constructor(category, message) {
@@ -18,8 +20,9 @@ export class FsmError extends Error {
   }
 }
 
-/** The full status domain for `work` (per D4's single flat FSM). */
-export const STATUSES = Object.freeze(['todo', 'doing', 'blocked', 'done']);
+// Re-exported so existing consumers (e.g. test/state/fsm.test.mjs) keep
+// importing STATUSES from here; work.mjs is the sole owner of the list.
+export { STATUSES };
 
 // The transition table itself: every legal (from -> to) edge. `blocked` is
 // two-way with both `todo` and `doing` per the plan; `done` only has an

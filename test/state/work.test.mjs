@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { validateWork, validateWorkShape, validateDeps, WorkValidationError } from '../../src/state/work.mjs';
+import { validateWork, validateWorkShape, validateDeps, WorkValidationError, STATUSES } from '../../src/state/work.mjs';
 
 function baseWork(overrides = {}) {
   return {
@@ -55,6 +55,19 @@ test('validateWork rejects an unstable id format', () => {
 
 test('validateWork accepts a stable kebab-case id', () => {
   assert.doesNotThrow(() => validateWork(baseWork({ id: 'add-login-form' })));
+});
+
+test('validateWork rejects a status outside the STATUSES domain', () => {
+  assert.throws(
+    () => validateWork(baseWork({ status: 'archived' })),
+    (err) => err instanceof WorkValidationError && /STATUSES|status/.test(err.message),
+  );
+});
+
+test('validateWork accepts every status in STATUSES', () => {
+  for (const status of STATUSES) {
+    assert.doesNotThrow(() => validateWork(baseWork({ status })));
+  }
 });
 
 test('validateWork rejects a work item that lists itself as a dep', () => {

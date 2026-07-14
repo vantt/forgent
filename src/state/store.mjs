@@ -1,8 +1,8 @@
 // store.mjs — the single write door onto `.fgos/` (per D3/D5).
 //
-// This is the SOLE module in the state layer that resolves `.fgos/` paths
-// and writes to disk. Every other module here is a pure lib that takes an
-// explicit path (events.mjs) or no path at all (fsm.mjs, replay.mjs,
+// This is the sole module that resolves `.fgos/` paths; byte-level append is
+// delegated to events.mjs. Every other module here is a pure lib that takes
+// an explicit path (events.mjs) or no path at all (fsm.mjs, replay.mjs,
 // work.mjs) — this module is what wires "some directory" to the two files
 // that live in it: `events.jsonl` (truth, per D3) and `state.json` (view,
 // per D4).
@@ -12,13 +12,22 @@
 // only truth) already has the event — the view is merely stale, and
 // `rebuild()` below is the documented recovery path (per the plan's risk
 // map). The view is never written before the event that produced it exists.
+//
+// This module is also the CLI's single facade for the error-classification
+// contract (R4): EXIT_CODES + categoryOf are the one source for
+// category -> exit code, and the four error classes raised anywhere in the
+// state layer are re-exported from here so bin/fgos.mjs never needs to
+// import fsm.mjs/work.mjs/events.mjs directly.
 
 import fs from 'node:fs';
 import path from 'node:path';
 import { appendEvent } from './events.mjs';
 import { rebuildView } from './replay.mjs';
-import { transitionWork } from './fsm.mjs';
-import { validateWork } from './work.mjs';
+import { transitionWork, FsmError } from './fsm.mjs';
+import { validateWork, WorkValidationError } from './work.mjs';
+import { EventLogError } from './events.mjs';
+
+export { FsmError, WorkValidationError, EventLogError };
 
 /** Error raised by this module. `category` is the CLI exit-code contract (R4). */
 export class StoreError extends Error {
@@ -27,6 +36,26 @@ export class StoreError extends Error {
     this.name = 'StoreError';
     this.category = category;
   }
+}
+
+/** The one category -> exit-code map (R4). Values unchanged from the prior duplicate in bin/fgos.mjs. */
+export const EXIT_CODES = Object.freeze({
+  precondition: 2,
+  conflict: 3,
+  validation: 4,
+  'corrupt-log': 5,
+});
+
+/**
+ * Classify any error raised by this module's domain (StoreError, FsmError,
+ * WorkValidationError, EventLogError all set `.category`) by reading the
+ * property directly rather than an instanceof-chain — a new error class only
+ * needs to set `.category` to participate, nothing here has to change.
+ * Anything without a recognized `.category` falls back to 'unexpected'
+ * (callers map that to exit 1).
+ */
+export function categoryOf(err) {
+  return err && typeof err.category === 'string' ? err.category : 'unexpected';
 }
 
 function paths(dir) {
@@ -94,8 +123,8 @@ export function moveWork(dir, { id, to, expectedStatus } = {}) {
     throw new StoreError('validation', `work "${id}" not found.`);
   }
 
-  const event = transitionWork({ work, to, expectedStatus }); // FsmError: precondition | conflict
-  appendEvent(logPath, event);
+  const rawEvent = transitionWork({ work, to, expectedStatus }); // FsmError: precondition | conflict
+  const event = appendEvent(logPath, rawEvent); // captures the real seq; rawEvent itself has none
   const view = refreshView(dir);
   return { event, view };
 }

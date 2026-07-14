@@ -19,6 +19,13 @@ export class WorkValidationError extends Error {
 // Stable, file/CLI-safe id: lowercase kebab-case, starting with a letter.
 const ID_PATTERN = /^[a-z][a-z0-9]*(-[a-z0-9]+)*$/;
 
+/**
+ * The full status domain for `work` (per D4's single flat FSM). Owned here
+ * (schema owns domain) — fsm.mjs imports and re-exports this rather than
+ * defining its own copy, so there is exactly one list of legal statuses.
+ */
+export const STATUSES = Object.freeze(['todo', 'doing', 'blocked', 'done']);
+
 function requireNonEmptyString(work, field) {
   if (typeof work[field] !== 'string' || !work[field].trim()) {
     throw new WorkValidationError(`work.${field} is required and must be a non-empty string.`);
@@ -50,6 +57,11 @@ export function validateWorkShape(work) {
   requireNonEmptyString(work, 'title');
   requireNonEmptyString(work, 'kind');
   requireNonEmptyString(work, 'status');
+  if (!STATUSES.includes(work.status)) {
+    throw new WorkValidationError(
+      `work.status must be one of ${JSON.stringify(STATUSES)}, got: ${JSON.stringify(work.status)}`,
+    );
+  }
   requireArray(work, 'deps');
   for (const dep of work.deps) {
     if (typeof dep !== 'string' || !dep) {

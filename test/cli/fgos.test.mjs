@@ -132,6 +132,33 @@ test('move on a nonexistent id is rejected as validation (not-found), exit 4', (
   assert.equal(result.status, 4);
 });
 
+test('move with a bare --to (no value) is rejected as validation, exit 4, no event written', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'bare-to');
+  const before = eventLines(cwd).length;
+  const result = run(cwd, ['move', 'bare-to', '--to']);
+  assert.equal(result.status, 4);
+  assert.equal(eventLines(cwd).length, before);
+});
+
+test('move with an empty --expect "" is rejected as validation, exit 4, no event written', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'empty-expect');
+  const before = eventLines(cwd).length;
+  const result = run(cwd, ['move', 'empty-expect', '--to', 'doing', '--expect', '']);
+  assert.equal(result.status, 4);
+  assert.equal(eventLines(cwd).length, before);
+});
+
+test('move reports the real event seq in its message, not "undefined"', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'seq-check'); // event #1
+  const result = run(cwd, ['move', 'seq-check', '--to', 'doing']);
+  assert.equal(result.status, 0);
+  assert.match(result.stdout, /event #2\b/);
+  assert.doesNotMatch(result.stdout, /event #undefined/);
+});
+
 test('decision logs one event and appears in the view, exit 0', () => {
   const cwd = tmpCwd();
   run(cwd, ['init']);

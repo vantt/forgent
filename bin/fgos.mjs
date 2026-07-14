@@ -16,35 +16,29 @@
 // src/state/store.mjs, the sole write door.
 
 import path from 'node:path';
-import { initStore, addWork, moveWork, addDecision, listWork, rebuild, StoreError } from '../src/state/store.mjs';
-import { FsmError } from '../src/state/fsm.mjs';
-import { WorkValidationError } from '../src/state/work.mjs';
-import { EventLogError } from '../src/state/events.mjs';
-
-const EXIT_CODES = {
-  precondition: 2,
-  conflict: 3,
-  validation: 4,
-  'corrupt-log': 5,
-};
+import { initStore, addWork, moveWork, addDecision, listWork, rebuild, StoreError, EXIT_CODES, categoryOf } from '../src/state/store.mjs';
 
 function dataDir() {
   return path.join(process.cwd(), '.fgos');
 }
 
-function categoryOf(err) {
-  if (err instanceof StoreError) return err.category;
-  if (err instanceof FsmError) return err.category;
-  if (err instanceof WorkValidationError) return err.category;
-  if (err instanceof EventLogError) return err.category;
-  return 'unexpected';
-}
-
+// A bare `--flag` (no value) parses to boolean `true` (see parseArgs below);
+// treat that the same as an empty string — both mean "no value was given"
+// and must be refused as validation (exit 4), not passed downstream where a
+// lower layer might misclassify it as a different exit category.
 function requireField(value, message) {
-  if (value === undefined || value === null || value === '') {
+  if (value === undefined || value === null || value === '' || value === true) {
     throw new StoreError('validation', message);
   }
   return value;
+}
+
+// Same rule as requireField but for a flag that is legitimately optional
+// when omitted entirely — only a bare or empty value (given but malformed)
+// is refused.
+function optionalField(value, message) {
+  if (value === undefined) return undefined;
+  return requireField(value, message);
 }
 
 // Minimal argv parser: `--flag value` or bare `--flag` (boolean), plus
@@ -106,7 +100,8 @@ function runVerb(verb, flags, positional, dir) {
     case 'move': {
       const id = requireField(positional[0] ?? flags.id, 'move requires an id: fgos move <id> --to <status> [--expect <status>]');
       const to = requireField(flags.to, 'move requires --to <status>');
-      const { event } = moveWork(dir, { id, to, expectedStatus: flags.expect });
+      const expectedStatus = optionalField(flags.expect, 'move --expect requires a status value (omit --expect entirely to skip the CAS check)');
+      const { event } = moveWork(dir, { id, to, expectedStatus });
       return `Moved ${id}: ${event.payload.from} -> ${event.payload.to} (event #${event.seq})`;
     }
 
