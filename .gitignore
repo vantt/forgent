@@ -17,3 +17,16 @@ node_modules/
 .bee/spikes/
 .bee/manifest-hash.json
 # BEE:END
+
+# Workshop tree — untracked in the product repo (repo divorce)
+/.bee/
+/.claude/
+/.agents/
+/.codex/
+/plans/
+/upstreams/
+/scripts/
+/docs/history/
+/docs/distillery/
+/docs/reference-learning-system.md/
+/docs/naming.md/
