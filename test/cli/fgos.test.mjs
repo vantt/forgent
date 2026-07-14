@@ -203,6 +203,82 @@ test('rebuild reconstructs state.json from the log alone after the view file is 
   assert.deepEqual(stateView(cwd), before);
 });
 
+test('rebuild reconstructs state.json from the log alone when the view file still exists but is stale (not deleted)', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'a');
+  addOk(cwd, 'b');
+  run(cwd, ['move', 'a', '--to', 'doing']);
+  const freshFromLog = stateView(cwd);
+
+  // Corrupt the view IN PLACE (file still exists) rather than deleting it:
+  // wrong status for "a" and a missing item "b" — the exact failure mode
+  // the risk map called out (a stale-but-present view), not a removed file.
+  const stale = {
+    work: {
+      a: { ...freshFromLog.work.a, status: 'todo' },
+    },
+    decisions: [],
+  };
+  fs.writeFileSync(viewPath(cwd), `${JSON.stringify(stale, null, 2)}\n`, 'utf8');
+  assert.ok(fs.existsSync(viewPath(cwd)));
+  assert.notDeepEqual(stateView(cwd), freshFromLog);
+
+  const result = run(cwd, ['rebuild']);
+  assert.equal(result.status, 0);
+  assert.deepEqual(stateView(cwd), freshFromLog);
+});
+
+test('done is terminal via the real CLI: moving out of done is refused as precondition, exit 2, no event written', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'terminal-item');
+  run(cwd, ['move', 'terminal-item', '--to', 'doing']);
+  run(cwd, ['move', 'terminal-item', '--to', 'done']);
+  const before = eventLines(cwd).length;
+
+  const result = run(cwd, ['move', 'terminal-item', '--to', 'doing']);
+  assert.equal(result.status, 2);
+  assert.equal(eventLines(cwd).length, before);
+  assert.equal(stateView(cwd).work['terminal-item'].status, 'done');
+});
+
+test('a mutation (add) attempted on an already-corrupt log is refused as corrupt-log, exit 5, no event written', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'before-corruption');
+  fs.appendFileSync(logPath(cwd), 'not valid json\n', 'utf8');
+  const before = eventLines(cwd).length;
+
+  const result = run(cwd, ['add', 'after-corruption', '--title', 'X', '--kind', 'task', '--risk', 'low', '--verify', 'x']);
+  assert.equal(result.status, 5);
+  assert.equal(eventLines(cwd).length, before);
+});
+
+test('a mutation (move) attempted on an already-corrupt log is refused as corrupt-log, exit 5, no event written', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'move-target');
+  fs.appendFileSync(logPath(cwd), 'not valid json\n', 'utf8');
+  const before = eventLines(cwd).length;
+
+  const result = run(cwd, ['move', 'move-target', '--to', 'doing']);
+  assert.equal(result.status, 5);
+  assert.equal(eventLines(cwd).length, before);
+});
+
+test('a dependency cycle is impossible to construct: add requires deps to already exist, so both sides of an attempted cycle are rejected as validation, exit 4', () => {
+  const cwd = tmpCwd();
+  // "a" depends on "b", but "b" does not exist yet — validation, exit 4.
+  const firstAttempt = run(cwd, ['add', 'a', '--title', 'A', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--deps', 'b']);
+  assert.equal(firstAttempt.status, 4);
+  assert.equal(eventLines(cwd).length, 0);
+
+  // "b" depends on "a", but "a" was never added (the attempt above failed
+  // before writing anything) — so this is also validation, exit 4. There is
+  // no sequence of `add` calls that can ever produce a cycle, because a dep
+  // must reference an id that already exists at add-time.
+  const secondAttempt = run(cwd, ['add', 'b', '--title', 'B', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--deps', 'a']);
+  assert.equal(secondAttempt.status, 4);
+  assert.equal(eventLines(cwd).length, 0);
+});
+
 test('a corrupt trailing line in the event log is reported as corrupt-log, exit 5', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'before-corruption');

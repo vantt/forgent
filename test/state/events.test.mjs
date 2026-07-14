@@ -75,6 +75,25 @@ test('readEvents detects a corrupt line anywhere in the log, not only at the end
   );
 });
 
+test('readEvents detects a corrupt line in the middle of the log — valid, corrupt, valid', () => {
+  const logPath = tmpLogPath();
+  fs.writeFileSync(
+    logPath,
+    [
+      '{"seq":1,"ts":"2026-07-14T00:00:00.000Z","type":"work.add","payload":null}',
+      'not json either',
+      '{"seq":3,"ts":"2026-07-14T00:00:01.000Z","type":"work.move","payload":null}',
+      '',
+    ].join('\n'),
+    'utf8',
+  );
+
+  assert.throws(
+    () => readEvents(logPath),
+    (err) => err instanceof EventLogError && err.category === 'corrupt-log',
+  );
+});
+
 test('appendEvent rejects a missing or blank type as a validation error', () => {
   const logPath = tmpLogPath();
   assert.throws(
