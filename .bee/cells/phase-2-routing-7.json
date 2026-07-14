@@ -3,7 +3,7 @@
   "feature": "phase-2-routing",
   "title": "S3: dispatch lib — prompt builder + tier→model config + worktree lifecycle",
   "lane": "high-risk",
-  "status": "open",
+  "status": "capped",
   "deps": [
     "phase-2-routing-6"
   ],
@@ -56,15 +56,25 @@
   },
   "verify": "npm test",
   "trace": {
-    "worker": null,
-    "outcome": null,
-    "files_changed": [],
+    "worker": "Jorge",
+    "outcome": "Added src/runner/dispatch.mjs (buildPrompt with 4 framing sections, loadRunnerConfig/modelForTier/resolveExecutorCommand, spawnWorker via argv-only spawnSync) and src/runner/worktree.mjs (createWorktree with branch-reuse-on-retry, removeWorktree run from repoRoot, listLeftovers with {branch,aheadCount}), plus committed .fgos-runner.json (3-tier model map). 31 new tests, fake executors only, no real agent spawn, no writes to main repo .fgos/ or worktrees. Suite 214/214 green (baseline 183 + 31).",
+    "files_changed": [
+      "src/runner/dispatch.mjs",
+      "src/runner/worktree.mjs",
+      "test/runner/dispatch.test.mjs",
+      "test/runner/worktree.test.mjs",
+      ".fgos-runner.json"
+    ],
     "deviations": [],
     "friction": null,
-    "capped_at": null,
+    "capped_at": "2026-07-14T07:12:22.134Z",
     "behavior_change": true,
-    "verification_evidence": null,
-    "verify_output": null,
-    "verify_passed": null
-  }
+    "verification_evidence": "{\n  \"tests_inspected\": [\"test/runner/recovery.test.mjs\", \"test/runner/anti-loop.test.mjs\"],\n  \"tests_added_or_changed\": [\n    \"test/runner/dispatch.test.mjs (new, 20 cases: buildPrompt framing sections, loadRunnerConfig valid/malformed shapes, modelForTier incl. unknown-tier validation error, resolveExecutorCommand per-element argv substitution incl. shell-metachar/newline safety, spawnWorker success/tier-default/timeout/spawn-fail/non-zero-exit-not-thrown)\",\n    \"test/runner/worktree.test.mjs (new, 11 cases: createWorktree fresh branch, commit-survives-remove, retry-reuses-branch-fresh-dir, branch-checked-out-elsewhere hard fail, listLeftovers orphan vs proposal aheadCount, removeWorktree on bogus path)\"\n  ],\n  \"red_failure_evidence\": \"src/runner/dispatch.mjs and src/runner/worktree.mjs did not exist before this cell (deps: phase-2-routing-6 only added recovery.mjs/anti-loop.mjs). Empirically confirmed: temporarily moved both new src files aside and reran `node --test test/runner/dispatch.test.mjs test/runner/worktree.test.mjs` -> Error [ERR_MODULE_NOT_FOUND]: Cannot find module '.../src/runner/dispatch.mjs'. Restored files and reran: 31/31 pass.\",\n  \"verification_run\": \"npm test -> tests 214, pass 214, fail 0 (baseline 183 + 31 new). Also isolated: node --test test/runner/dispatch.test.mjs test/runner/worktree.test.mjs -> tests 31, pass 31, fail 0.\",\n  \"deliberate_exceptions\": []\n}\n",
+    "verify_output": "tests 214, pass 214, fail 0, cancelled 0, skipped 0, todo 0, duration_ms 2631.336117 (baseline 183 + 31 new: 20 dispatch.test.mjs + 11 worktree.test.mjs)",
+    "verify_passed": true,
+    "claimed_at": "2026-07-14T07:08:29.901Z",
+    "verify_command": "npm test",
+    "verified_at": "2026-07-14T07:11:51.947Z"
+  },
+  "tier": "generation"
 }

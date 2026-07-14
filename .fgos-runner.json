@@ -1,0 +1,12 @@
+{
+  "executor": {
+    "command": "claude",
+    "args": ["-p", "{prompt}", "--model", "{model}"]
+  },
+  "models": {
+    "light": "haiku",
+    "standard": "sonnet",
+    "heavy": "opus"
+  },
+  "timeoutMs": 300000
+}
