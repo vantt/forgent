@@ -286,6 +286,33 @@ test('startup reap: a crashed run\'s doing item with a committed, verify-passing
   assert.deepEqual(fs.readdirSync(worktreeDir), []);
 });
 
+test('startup reap reclaims an orphaned checkout left behind by a genuine crash (worktree teardown never ran) instead of dying raw', () => {
+  const { repoRoot, dir, worktreeDir } = setup();
+  const item = seedItem(dir, { id: 'item-orphaned-crash' });
+  // simulate a genuine process kill: claim, commit on the branch, but never
+  // call removeWorktree -- the runner died before its own `finally` ran, so
+  // fgw/item-orphaned-crash is still checked out at wt.path when reap starts
+  // and its own throwaway goal-check worktree would otherwise collide with it.
+  moveWork(dir, { id: item.id, to: 'doing', expectedStatus: 'todo' });
+  const wt = createWorktree(repoRoot, item.id, { worktreeDir });
+  fs.writeFileSync(path.join(wt.path, 'output.txt'), 'done before crash\n');
+  execFileSync('git', ['add', 'output.txt'], { cwd: wt.path });
+  execFileSync('git', ['commit', '-q', '-m', 'worker: output.txt'], { cwd: wt.path });
+  const config = {
+    executor: { command: '/no/such/executor-binary-xyz', args: ['{prompt}'] },
+    models: { standard: 'sonnet' },
+    timeoutMs: 30000,
+  };
+
+  const result = runOnce({ repoRoot, config, worktreeDir, log: noLog });
+
+  assert.deepEqual(result.reap.resolutions, [{ id: 'item-orphaned-crash', to: 'proposed', reason: null }]);
+  assert.equal(listWork(dir).work['item-orphaned-crash'].status, 'proposed');
+  assert.equal(result.outcome, 'idle');
+  // the orphaned checkout is reclaimed, not leaked
+  assert.equal(fs.existsSync(wt.path), false);
+});
+
 test('startup reap: a doing item with nothing on its branch is reclaimed to blocked (runner-crash-reclaim)', () => {
   const { repoRoot, dir, worktreeDir } = setup();
   seedItem(dir, { id: 'item-vanished' });

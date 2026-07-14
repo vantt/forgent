@@ -22,9 +22,25 @@
 // `-b`) whenever that branch already exists, and always allocates a FRESH
 // worktree directory (via `mkdtemp`) for the checkout. A retried dispatch of
 // the same work item therefore never collides with its own previous attempt
-// — same branch, new empty directory slot — and only a genuinely
-// irreconcilable state (e.g. the branch is checked out somewhere `git`
-// refuses to share) surfaces as a hard `worktree-fail`.
+// — same branch, new empty directory slot.
+//
+// CRASH RECLAIM (phase-2-routing-10): a normal teardown always runs
+// `removeWorktree` before a branch is ever reused, so under ordinary
+// operation the branch is never checked out anywhere when `createWorktree`
+// reuses it. But a genuine process kill (the runner itself SIGKILLed
+// mid-item) skips every `finally` — the worker's commit lands, yet the
+// worktree checkout is never torn down, so `fgw/<id>` stays checked out at
+// that now-orphaned path. The next `createWorktree` call for the same id
+// (e.g. the startup reap's own throwaway goal-check worktree) would
+// otherwise hit git's own "already checked out at <path>" refusal.
+// `reclaimOrphanedCheckout` runs first whenever the branch is being reused:
+// it finds any existing checkout of the branch via `git worktree list
+// --porcelain` and clears it — force-removing the directory if it still
+// exists on disk, or pruning git's own bookkeeping if the directory is
+// already gone — before the fresh worktree is added. The branch (and its
+// commit) survives; only the stale checkout directory is discarded, exactly
+// like an ordinary `removeWorktree` would have done had it run. Only a
+// genuinely irreconcilable state surfaces as a hard `worktree-fail`.
 
 import fs from 'node:fs';
 import os from 'node:os';
@@ -39,6 +55,10 @@ export class WorktreeError extends Error {
     super(message);
     this.name = 'WorktreeError';
     this.errorClass = 'worktree-fail';
+    // `.category` too (store.mjs's categoryOf contract, R4): any error that
+    // sets `.category` participates without store.mjs needing to know about
+    // this module specifically.
+    this.category = 'worktree-fail';
     Object.assign(this, details);
   }
 }
@@ -66,6 +86,66 @@ function branchExists(repoRoot, branch) {
 }
 
 /**
+ * Parse `git worktree list --porcelain` output and return the checkout
+ * path currently registered for `branch` (as `refs/heads/<branch>`), or
+ * `null` if the branch is not checked out anywhere. Porcelain records are
+ * blank-line-separated stanzas, each starting with a `worktree <path>`
+ * line followed by a `branch refs/heads/<name>` line (or `detached`).
+ */
+function findCheckoutPath(porcelainOutput, branch) {
+  const ref = `refs/heads/${branch}`;
+  let currentPath = null;
+  for (const line of porcelainOutput.split('\n')) {
+    if (line.startsWith('worktree ')) {
+      currentPath = line.slice('worktree '.length).trim();
+    } else if (line.startsWith('branch ')) {
+      if (line.slice('branch '.length).trim() === ref) return currentPath;
+    } else if (line === '') {
+      currentPath = null;
+    }
+  }
+  return null;
+}
+
+/**
+ * Reclaim `branch` from any existing checkout before it is reused (per
+ * CRASH RECLAIM in the module doc). Idempotent: a branch not checked out
+ * anywhere is a no-op. Returns `{ reclaimed, path }`.
+ */
+export function reclaimOrphanedCheckout(repoRoot, branch) {
+  let listing;
+  try {
+    listing = git(repoRoot, ['worktree', 'list', '--porcelain']);
+  } catch (err) {
+    throw new WorktreeError(`listing worktrees failed while reclaiming "${branch}": ${err.message}`, { branch });
+  }
+
+  const orphanPath = findCheckoutPath(listing, branch);
+  if (!orphanPath) return { reclaimed: false, path: null };
+
+  if (fs.existsSync(orphanPath)) {
+    try {
+      git(repoRoot, ['worktree', 'remove', '--force', orphanPath]);
+    } catch (err) {
+      throw new WorktreeError(
+        `reclaiming orphaned checkout of "${branch}" at "${orphanPath}" failed: ${err.message}`,
+        { branch, orphanPath },
+      );
+    }
+  } else {
+    try {
+      git(repoRoot, ['worktree', 'prune']);
+    } catch (err) {
+      throw new WorktreeError(
+        `pruning stale worktree registration for "${branch}" (path already gone: "${orphanPath}") failed: ${err.message}`,
+        { branch, orphanPath },
+      );
+    }
+  }
+  return { reclaimed: true, path: orphanPath };
+}
+
+/**
  * Create (or reuse, see module doc) an isolated worktree for work item `id`
  * inside `repoRoot`. Always allocates a fresh temp directory for the
  * checkout via `mkdtemp` (default base: `os.tmpdir()/fgos-worktrees`,
@@ -80,6 +160,7 @@ export function createWorktree(repoRoot, id, opts = {}) {
   const worktreePath = fs.mkdtempSync(path.join(baseDir, `${id}-`));
 
   const reused = branchExists(repoRoot, branch);
+  if (reused) reclaimOrphanedCheckout(repoRoot, branch);
   try {
     if (reused) {
       git(repoRoot, ['worktree', 'add', worktreePath, branch]);

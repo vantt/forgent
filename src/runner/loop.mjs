@@ -165,17 +165,32 @@ export function startupReap({ repoRoot, dir, worktreeDir, verifyTimeoutMs, log =
     }
 
     let verifyPassed = false;
+    let worktreeFailed = false;
     if (hasCommit) {
       let wt = null;
       try {
         wt = createWorktree(repoRoot, id, { worktreeDir });
         verifyPassed = runGoalCheck(item, wt.path, verifyTimeoutMs).passed;
+      } catch (err) {
+        // A worktree-fail here (e.g. this branch is irreconcilably checked
+        // out somewhere even after the reclaim in worktree.mjs) must never
+        // bubble past this loop and crash the whole reap raw: degrade this
+        // one item to a defined, reported state instead (per D5's blocked
+        // edge) and let the reap continue with the next stale item.
+        if (err?.errorClass === 'worktree-fail') {
+          worktreeFailed = true;
+          log(`fgos-runner: worktree-fail while reaping stale "doing" item "${id}": ${err.message}`);
+        } else {
+          throw err;
+        }
       } finally {
         if (wt) safeRemoveWorktree(repoRoot, wt.path, log);
       }
     }
 
-    const resolution = resolveStaleDoing({ hasCommit, verifyPassed });
+    const resolution = worktreeFailed
+      ? { to: 'blocked', reason: 'runner-crash-reclaim' }
+      : resolveStaleDoing({ hasCommit, verifyPassed });
     moveWork(dir, { id, to: resolution.to, expectedStatus: 'doing', reason: resolution.reason });
     log(`fgos-runner: reaped stale doing "${id}" -> ${resolution.to}${resolution.reason ? ` (${resolution.reason})` : ''}`);
     resolutions.push({ id, to: resolution.to, reason: resolution.reason ?? null });

@@ -4,7 +4,14 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { createWorktree, removeWorktree, listLeftovers, branchNameFor, WorktreeError } from '../../src/runner/worktree.mjs';
+import {
+  createWorktree,
+  removeWorktree,
+  listLeftovers,
+  branchNameFor,
+  reclaimOrphanedCheckout,
+  WorktreeError,
+} from '../../src/runner/worktree.mjs';
 
 // Every test here creates its own disposable git repo (git init in a
 // mkdtemp dir) — no test ever creates a worktree or branch in THIS repo
@@ -81,21 +88,79 @@ test('createWorktree retried for the same id reuses the existing branch into a f
   removeWorktree(repoRoot, second.path);
 });
 
-test('createWorktree throws worktree-fail when the branch is already checked out elsewhere and cannot be reused', () => {
+// --- crash reclaim (phase-2-routing-10) ------------------------------------
+//
+// A genuine process kill skips every `finally`, so a branch can be left
+// checked out at a now-orphaned path (the crashed run's own worktree,
+// never torn down). `createWorktree` must reclaim that checkout — not
+// throw — whenever it is about to reuse the branch, in both sub-cases: the
+// orphaned directory still exists on disk, or it is already gone and only
+// git's own bookkeeping needs pruning.
+
+test('createWorktree reclaims a branch already checked out at an orphaned path still on disk (crash recovery), instead of throwing', () => {
   const repoRoot = initTempRepo();
   const worktreeDir = mkWorktreeDir();
   const first = createWorktree(repoRoot, 'item-d', { worktreeDir });
+  commitOnWorktree(first.path, 'attempt-1.txt', 'orphaned attempt\n');
+  // no removeWorktree(first.path) here -- this simulates the crashed run:
+  // fgw/item-d stays checked out at first.path when the next createWorktree
+  // call for the same id comes in.
 
-  assert.throws(
-    () => createWorktree(repoRoot, 'item-d', { worktreeDir }),
-    (err) => {
-      assert.ok(err instanceof WorktreeError);
-      assert.equal(err.errorClass, 'worktree-fail');
-      return true;
-    },
-  );
+  const second = createWorktree(repoRoot, 'item-d', { worktreeDir });
 
-  removeWorktree(repoRoot, first.path);
+  assert.equal(second.branch, 'fgw/item-d');
+  assert.equal(second.reused, true);
+  assert.notEqual(second.path, first.path);
+  // the orphaned checkout was force-removed as part of the reclaim
+  assert.equal(fs.existsSync(first.path), false);
+  // the branch's prior commit survives -- reused, not recreated
+  assert.ok(fs.existsSync(path.join(second.path, 'attempt-1.txt')));
+
+  removeWorktree(repoRoot, second.path);
+});
+
+test('createWorktree reclaims a branch registered as checked out at a path that is already gone from disk (prune), instead of throwing', () => {
+  const repoRoot = initTempRepo();
+  const worktreeDir = mkWorktreeDir();
+  const first = createWorktree(repoRoot, 'item-e', { worktreeDir });
+  commitOnWorktree(first.path, 'attempt-1.txt', 'orphaned attempt\n');
+  // the checkout directory vanishes without git being told (e.g. a /tmp
+  // sweep) -- git worktree list --porcelain still reports it as checked
+  // out until pruned.
+  fs.rmSync(first.path, { recursive: true, force: true });
+
+  const second = createWorktree(repoRoot, 'item-e', { worktreeDir });
+
+  assert.equal(second.branch, 'fgw/item-e');
+  assert.equal(second.reused, true);
+  assert.ok(fs.existsSync(path.join(second.path, 'attempt-1.txt')));
+
+  removeWorktree(repoRoot, second.path);
+});
+
+test('reclaimOrphanedCheckout is a no-op when the branch is not checked out anywhere', () => {
+  const repoRoot = initTempRepo();
+  const worktreeDir = mkWorktreeDir();
+  const wt = createWorktree(repoRoot, 'item-f', { worktreeDir });
+  commitOnWorktree(wt.path, 'attempt.txt', 'real work\n');
+  removeWorktree(repoRoot, wt.path);
+
+  const result = reclaimOrphanedCheckout(repoRoot, 'fgw/item-f');
+
+  assert.deepEqual(result, { reclaimed: false, path: null });
+});
+
+test('reclaimOrphanedCheckout reports reclaimed:true and force-removes the still-existing checkout directory', () => {
+  const repoRoot = initTempRepo();
+  const worktreeDir = mkWorktreeDir();
+  const wt = createWorktree(repoRoot, 'item-g', { worktreeDir });
+  commitOnWorktree(wt.path, 'attempt.txt', 'real work\n');
+
+  const result = reclaimOrphanedCheckout(repoRoot, 'fgw/item-g');
+
+  assert.equal(result.reclaimed, true);
+  assert.equal(result.path, wt.path);
+  assert.equal(fs.existsSync(wt.path), false);
 });
 
 test('listLeftovers reports aheadCount 0 for a branch with no commits beyond base (orphan)', () => {
