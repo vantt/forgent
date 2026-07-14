@@ -53,6 +53,8 @@ Khi từ chối (`proposed → todo`), câu tương ứng:
 
 ## Ranh giới tin cậy
 
+Bất biến môi trường: mỗi agent khởi đầu tại project-root CỦA NÓ (git-root của cwd nó đứng); worker không bao giờ thấy harness phát triển của xưởng — cách ly vị trí đến từ worktree-trong-tmp, đo định kỳ bằng canary item (worker tự khai môi trường, verify assert). Diễn tập/canary không bao giờ ghi vào nhật ký sự kiện thật.
+
 Ba bất biến, tách bạch rõ để không ai đọc nhầm đây là sandbox:
 
 - **Containment bằng chỉ dẫn + nhánh vứt-được, KHÔNG PHẢI sandbox.** Worker
