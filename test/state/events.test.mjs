@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { appendEvent, readEvents, EventLogError } from '../../src/state/events.mjs';
+import { SCHEMA_VERSION } from '../../src/state/work.mjs';
 
 // Every test gets its own mkdtemp dir — never touch the repo's .fgos/.
 function tmpLogPath() {
@@ -113,4 +114,27 @@ test('appendEvent refuses to append onto an already-corrupt log', () => {
     () => appendEvent(logPath, { type: 'work.add', payload: { id: 'a' } }),
     (err) => err instanceof EventLogError && err.category === 'corrupt-log',
   );
+});
+
+test('appendEvent stamps every new event with v: SCHEMA_VERSION, from the single source in work.mjs (per D7c)', () => {
+  const logPath = tmpLogPath();
+  const event = appendEvent(logPath, { type: 'work.add', payload: { id: 'a' } });
+  assert.equal(event.v, SCHEMA_VERSION);
+
+  const [line] = fs.readFileSync(logPath, 'utf8').split('\n').filter(Boolean);
+  assert.equal(JSON.parse(line).v, SCHEMA_VERSION);
+});
+
+test('readEvents reads a pre-Phase-2 event with no v field at all, unmodified (per D7a: never rewritten)', () => {
+  const logPath = tmpLogPath();
+  fs.writeFileSync(
+    logPath,
+    `${JSON.stringify({ seq: 1, ts: '2026-07-13T00:00:00.000Z', type: 'work.add', payload: { id: 'legacy' } })}\n`,
+    'utf8',
+  );
+
+  const [event] = readEvents(logPath);
+  assert.equal(event.v, undefined);
+  assert.equal(event.type, 'work.add');
+  assert.equal(event.payload.id, 'legacy');
 });

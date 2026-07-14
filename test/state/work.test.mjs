@@ -1,6 +1,15 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { validateWork, validateWorkShape, validateDeps, WorkValidationError, STATUSES } from '../../src/state/work.mjs';
+import {
+  validateWork,
+  validateWorkShape,
+  validateDeps,
+  WorkValidationError,
+  STATUSES,
+  TIERS,
+  DEFAULTS,
+  SCHEMA_VERSION,
+} from '../../src/state/work.mjs';
 
 function baseWork(overrides = {}) {
   return {
@@ -102,4 +111,28 @@ test('validateWork runs full dep-existence check when existingIds is passed', ()
     () => validateWork(baseWork({ id: 'b', deps: ['ghost'] }), new Set(['a', 'b'])),
     WorkValidationError,
   );
+});
+
+test('validateWork accepts a work item missing tier (optional, defaulted by the caller per D7b)', () => {
+  const work = baseWork();
+  assert.equal(work.tier, undefined);
+  assert.doesNotThrow(() => validateWork(work));
+});
+
+test('validateWork accepts every tier in TIERS', () => {
+  for (const tier of TIERS) {
+    assert.doesNotThrow(() => validateWork(baseWork({ tier })));
+  }
+});
+
+test('validateWork rejects a tier outside the TIERS domain', () => {
+  assert.throws(
+    () => validateWork(baseWork({ tier: 'ultra-heavy' })),
+    (err) => err instanceof WorkValidationError && /tier/.test(err.message),
+  );
+});
+
+test('DEFAULTS.tier is itself a member of TIERS, and SCHEMA_VERSION is a positive integer', () => {
+  assert.ok(TIERS.includes(DEFAULTS.tier));
+  assert.ok(Number.isInteger(SCHEMA_VERSION) && SCHEMA_VERSION > 0);
 });

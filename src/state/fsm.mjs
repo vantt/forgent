@@ -5,9 +5,12 @@
 // the caller to append — disk writes belong to the store (cell
 // phase-1-state-layer-4's store.mjs), never here.
 //
-// "done" is terminal, single-door: exactly one entry in TRANSITIONS has
-// `to: 'done'`, and no entry has `from: 'done'` — so once a work item is
-// done, every further transitionWork() call for it throws 'precondition'.
+// "done" is terminal, no-exit: no entry in TRANSITIONS has `from: 'done'`,
+// so once a work item is done, every further transitionWork() call for it
+// throws 'precondition'. Per D5, `done` now has TWO entries (two doors in,
+// still zero doors out): `doing -> done` (an operator's direct hand-move)
+// and `proposed -> done` (approval/merge of a worker's proposal). Neither
+// is more canonical than the other — both are asserted by test.
 
 import { STATUSES } from './work.mjs';
 
@@ -25,8 +28,12 @@ export class FsmError extends Error {
 export { STATUSES };
 
 // The transition table itself: every legal (from -> to) edge. `blocked` is
-// two-way with both `todo` and `doing` per the plan; `done` only has an
-// incoming edge (from `doing`) and no outgoing edge (terminal).
+// two-way with both `todo` and `doing` per the plan; `done` has two incoming
+// edges (from `doing` and, per D5, from `proposed`) and no outgoing edge
+// (terminal). `proposed` (per D5) is entered only from `doing` (a worker's
+// goal-check pass) and leaves either to `done` (approved/merged) or back to
+// `todo` (rejected, with a reason — see transitionWork below); it is never a
+// re-entry point for `doing` directly.
 const TRANSITIONS = Object.freeze([
   Object.freeze({ from: 'todo', to: 'doing' }),
   Object.freeze({ from: 'doing', to: 'done' }),
@@ -34,6 +41,9 @@ const TRANSITIONS = Object.freeze([
   Object.freeze({ from: 'doing', to: 'blocked' }),
   Object.freeze({ from: 'blocked', to: 'todo' }),
   Object.freeze({ from: 'blocked', to: 'doing' }),
+  Object.freeze({ from: 'doing', to: 'proposed' }),
+  Object.freeze({ from: 'proposed', to: 'done' }),
+  Object.freeze({ from: 'proposed', to: 'todo' }),
 ]);
 
 /**
@@ -50,8 +60,15 @@ const TRANSITIONS = Object.freeze([
  * `from` is always the item's actual current status. An edge missing from
  * the table — including any edge out of `done`, or into an unknown status —
  * is refused with category 'precondition' and no event is returned.
+ *
+ * Rejection reason (per D5): the `proposed -> todo` edge is a rejection, and
+ * carries a `reason` explaining why. `reason` is required for exactly this
+ * edge — a missing or blank `reason` is refused with category 'validation'
+ * (checked only after the edge itself is confirmed legal, so an illegal
+ * edge still reports 'precondition' first). For every other edge, `reason`
+ * is ignored and never appears in the returned event's payload.
  */
-export function transitionWork({ work, to, expectedStatus } = {}) {
+export function transitionWork({ work, to, expectedStatus, reason } = {}) {
   if (!work || typeof work !== 'object' || Array.isArray(work)) {
     throw new FsmError('precondition', 'transitionWork: "work" must be a work item object.');
   }
@@ -78,5 +95,16 @@ export function transitionWork({ work, to, expectedStatus } = {}) {
     );
   }
 
-  return { type: 'work.move', payload: { id: work.id, from, to } };
+  const payload = { id: work.id, from, to };
+  if (from === 'proposed' && to === 'todo') {
+    if (typeof reason !== 'string' || !reason.trim()) {
+      throw new FsmError(
+        'validation',
+        `transitionWork: "reason" is required and must be a non-empty string when rejecting work "${work.id}" from proposed back to todo.`,
+      );
+    }
+    payload.reason = reason.trim();
+  }
+
+  return { type: 'work.move', payload };
 }

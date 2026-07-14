@@ -1,14 +1,24 @@
 // events.mjs — append-only event log (truth per D3, ≡ changeset per R3).
 //
-// Zero-dep, Node builtins only. Callers pass an explicit log path; this module
-// never resolves `.fgos/` itself — that resolution belongs to the CLI layer
+// Zero-dep, Node builtins only (SCHEMA_VERSION is imported from work.mjs,
+// itself zero-dep). Callers pass an explicit log path; this module never
+// resolves `.fgos/` itself — that resolution belongs to the CLI layer
 // (cell phase-1-state-layer-4), so this lib stays testable against a temp dir.
 //
 // Physics (R1): log. Mức bền (R8): D2 (committed, permanent truth) once the
 // caller writes the file under version control — this module only appends.
+//
+// Schema evolution (per D7): every event appended by this module from Phase
+// 2 onward carries `v: SCHEMA_VERSION` (D7c) — read from the single source
+// in work.mjs, never re-declared here. Events committed before Phase 2 have
+// no `v` field at all; readEvents below never requires it — it accepts
+// whatever object each line parses to, so a pre-Phase-2 log line without
+// `v` reads back exactly as it was written (D7a: never rewritten, never
+// migrated in place).
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { SCHEMA_VERSION } from './work.mjs';
 
 /**
  * Error raised by this module. `category` is a stable contract consumed by
@@ -65,9 +75,12 @@ export function readEvents(logPath) {
 
 /**
  * Append exactly one event to `logPath` as a single JSON line: `{ seq, ts,
- * type, payload }`. `seq` is derived from the current last event (1 if the
- * log is empty/absent) — never supplied by the caller, so events cannot be
- * reordered or double-numbered. `ts` is set here, always ISO-8601 UTC.
+ * type, payload, v }`. `seq` is derived from the current last event (1 if
+ * the log is empty/absent) — never supplied by the caller, so events cannot
+ * be reordered or double-numbered. `ts` is set here, always ISO-8601 UTC.
+ * `v` is always the current `SCHEMA_VERSION` (per D7c) — every event this
+ * module writes from now on carries it; there is no way to append an event
+ * without one.
  *
  * Reads the existing log first (via readEvents), so appending onto an
  * already-corrupt log fails loudly with the same 'corrupt-log' category
@@ -82,7 +95,7 @@ export function appendEvent(logPath, { type, payload = null } = {}) {
   const last = existing[existing.length - 1];
   const seq = last ? last.seq + 1 : 1;
 
-  const event = { seq, ts: new Date().toISOString(), type: type.trim(), payload };
+  const event = { seq, ts: new Date().toISOString(), type: type.trim(), payload, v: SCHEMA_VERSION };
 
   fs.mkdirSync(path.dirname(logPath), { recursive: true });
   fs.appendFileSync(logPath, `${JSON.stringify(event)}\n`, 'utf8');

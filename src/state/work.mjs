@@ -20,11 +20,42 @@ export class WorkValidationError extends Error {
 const ID_PATTERN = /^[a-z][a-z0-9]*(-[a-z0-9]+)*$/;
 
 /**
- * The full status domain for `work` (per D4's single flat FSM). Owned here
- * (schema owns domain) — fsm.mjs imports and re-exports this rather than
- * defining its own copy, so there is exactly one list of legal statuses.
+ * The full status domain for `work` (per D4's single flat FSM, extended by
+ * D5 with `proposed`: a goal-check pass sitting on a branch, awaiting
+ * approval/merge before it becomes `done`). Owned here (schema owns domain)
+ * — fsm.mjs imports and re-exports this rather than defining its own copy,
+ * so there is exactly one list of legal statuses.
  */
-export const STATUSES = Object.freeze(['todo', 'doing', 'blocked', 'done']);
+export const STATUSES = Object.freeze(['todo', 'doing', 'blocked', 'proposed', 'done']);
+
+/**
+ * Tier domain for `work.tier` (per D6) — the cost/cognitive weight a work
+ * item self-declares; the runner (Epic 3) maps tier -> model via a config
+ * table at dispatch time. PROVISIONAL: this is the minimal placeholder set
+ * for Phase 2's substrate slice. It must reconcile with the tier->model
+ * config table introduced alongside the runner — that config becomes the
+ * single source of truth for what a tier *means*; this list only bounds what
+ * a work item is allowed to *say*. Do not let the two drift apart.
+ */
+export const TIERS = Object.freeze(['light', 'standard', 'heavy']);
+
+/**
+ * Current schema/event version (per D7c): every event appended from Phase 2
+ * onward carries this as `v` (see src/state/events.mjs). Events committed
+ * before Phase 2 carry no `v` at all — absence of the field, not a lower
+ * number, is how a pre-Phase-2 event is recognized; backward-compatible
+ * replay for those events is cell phase-2-routing-2's concern, not this
+ * module's.
+ */
+export const SCHEMA_VERSION = 2;
+
+/**
+ * Declared defaults for optional fields (per D7b). This module only
+ * declares the values — applying them (to a newly-added item, or while
+ * folding a legacy event missing the field) is the caller's job, never
+ * this module's.
+ */
+export const DEFAULTS = Object.freeze({ tier: 'standard' });
 
 function requireNonEmptyString(work, field) {
   if (typeof work[field] !== 'string' || !work[field].trim()) {
@@ -73,6 +104,11 @@ export function validateWorkShape(work) {
   requireNonEmptyString(work, 'verify');
   if (work.learn !== undefined && work.learn !== null && typeof work.learn !== 'string') {
     throw new WorkValidationError('work.learn must be a string when present (it is optional).');
+  }
+  if (work.tier !== undefined && !TIERS.includes(work.tier)) {
+    throw new WorkValidationError(
+      `work.tier must be one of ${JSON.stringify(TIERS)} when present, got: ${JSON.stringify(work.tier)}`,
+    );
   }
 
   if (work.deps.includes(work.id)) {

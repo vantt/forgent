@@ -7,7 +7,7 @@ function work(status, overrides = {}) {
 }
 
 test('STATUSES exposes the full flat status domain', () => {
-  assert.deepEqual(STATUSES, ['todo', 'doing', 'blocked', 'done']);
+  assert.deepEqual(STATUSES, ['todo', 'doing', 'blocked', 'proposed', 'done']);
 });
 
 for (const [from, to] of [
@@ -23,6 +23,70 @@ for (const [from, to] of [
     assert.deepEqual(event, { type: 'work.move', payload: { id: 'w1', from, to } });
   });
 }
+
+for (const [from, to] of [
+  ['doing', 'proposed'],
+  ['proposed', 'done'],
+]) {
+  test(`transitionWork allows ${from} -> ${to} (per D5) and returns a validated event with no extra payload keys`, () => {
+    const event = transitionWork({ work: work(from), to });
+    assert.deepEqual(event, { type: 'work.move', payload: { id: 'w1', from, to } });
+  });
+}
+
+test('transitionWork allows proposed -> todo (rejection, per D5) and carries the reason in the payload', () => {
+  const event = transitionWork({ work: work('proposed'), to: 'todo', reason: 'goal-check failed twice' });
+  assert.deepEqual(event, {
+    type: 'work.move',
+    payload: { id: 'w1', from: 'proposed', to: 'todo', reason: 'goal-check failed twice' },
+  });
+});
+
+test('transitionWork rejects proposed -> todo without a reason as validation, not precondition', () => {
+  assert.throws(
+    () => transitionWork({ work: work('proposed'), to: 'todo' }),
+    (err) => err instanceof FsmError && err.category === 'validation',
+  );
+  assert.throws(
+    () => transitionWork({ work: work('proposed'), to: 'todo', reason: '   ' }),
+    (err) => err instanceof FsmError && err.category === 'validation',
+  );
+});
+
+test('reason is ignored (never appears in payload) for every edge other than proposed -> todo', () => {
+  const event = transitionWork({ work: work('todo'), to: 'doing', reason: 'should be dropped' });
+  assert.deepEqual(event, { type: 'work.move', payload: { id: 'w1', from: 'todo', to: 'doing' } });
+});
+
+test('every legal edge is exactly the declared table; every other status pair is precondition', () => {
+  const legalEdges = new Set([
+    'todo->doing',
+    'doing->done',
+    'todo->blocked',
+    'doing->blocked',
+    'blocked->todo',
+    'blocked->doing',
+    'doing->proposed',
+    'proposed->done',
+    'proposed->todo',
+  ]);
+  for (const from of STATUSES) {
+    for (const to of STATUSES) {
+      const key = `${from}->${to}`;
+      if (legalEdges.has(key)) {
+        const args = { work: work(from), to };
+        if (key === 'proposed->todo') args.reason = 'sweep-test reason';
+        assert.doesNotThrow(() => transitionWork(args), `expected ${key} to be legal`);
+      } else {
+        assert.throws(
+          () => transitionWork({ work: work(from), to }),
+          (err) => err instanceof FsmError && err.category === 'precondition',
+          `expected ${key} to be refused as precondition`,
+        );
+      }
+    }
+  }
+});
 
 test('transitionWork rejects a transition not in the table and returns no event', () => {
   assert.throws(
