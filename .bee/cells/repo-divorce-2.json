@@ -1,0 +1,61 @@
+{
+  "id": "repo-divorce-2",
+  "feature": "repo-divorce",
+  "title": "A: doctrine ×4 + reading-map ×2 staged",
+  "lane": "high-risk",
+  "status": "open",
+  "deps": [],
+  "decisions": [
+    "D2",
+    "D3"
+  ],
+  "files": [
+    "scripts/repo-divorce-staged/AGENTS.workshop.md",
+    "scripts/repo-divorce-staged/CLAUDE.workshop.md",
+    "scripts/repo-divorce-staged/AGENTS.repo.md",
+    "scripts/repo-divorce-staged/CLAUDE.repo.md",
+    "scripts/repo-divorce-staged/reading-map.repo.md",
+    "scripts/repo-divorce-staged/reading-map.workshop.md"
+  ],
+  "read_first": [
+    "AGENTS.md",
+    "CLAUDE.md",
+    "docs/specs/reading-map.md",
+    "docs/history/repo-divorce/CONTEXT.md",
+    "docs/platform-foundations.md"
+  ],
+  "action": "Soạn 6 file staged (CHƯA swap — script cell 1 swap lúc execute): AGENTS/CLAUDE xưởng = giữ nguyên khối bee managed-markers hiện tại + luật xưởng mới (A2: phiên dev mở tại GỐC XƯỞNG; bảng cắt D2 làm bản đồ nhanh; ghi chú ./repo là repo git độc lập); AGENTS/CLAUDE repo = THUẦN forgent (per L8: chỉ nói về sản phẩm — trỏ docs/specs/system-overview + reading-map + backlog + handoff-contract; KHÔNG một chuỗi bee/BEE marker nào; không khối GitNexus — per A3 re-index sau); reading-map.repo = chỉ path sản phẩm (tương đối trong repo); reading-map.workshop = bản đồ xưởng (bee, history, plans, distillery, upstreams, + một dòng trỏ ./repo). Nội dung phải đọc-duyệt được tại Gate 3.",
+  "must_haves": {
+    "truths": [
+      "AGENTS.repo.md không chứa chuỗi bee/BEE marker nào (grep sạch)",
+      "AGENTS.workshop.md giữ nguyên khối BEE markers hiện hành + luật A2 thành văn",
+      "Hai reading-map không dòng nào trỏ chéo sai bên (trừ dòng xưởng trỏ ./repo chủ đích)"
+    ],
+    "artifacts": [
+      {
+        "path": "scripts/repo-divorce-staged/AGENTS.repo.md",
+        "substantive": "doctrine sản phẩm tự đứng: 6 câu hỏi trả lời được từ specs"
+      }
+    ],
+    "key_links": [
+      "Nội dung khớp bảng D2 + A2 của CONTEXT"
+    ],
+    "prohibitions": [
+      "KHÔNG sửa AGENTS.md/CLAUDE.md/reading-map hiện hành (staged only)",
+      "Không mutation nào ngoài staged dir"
+    ]
+  },
+  "verify": "npm test && ! grep -q 'BEE:' scripts/repo-divorce-staged/AGENTS.repo.md && ! grep -qi 'gitnexus' scripts/repo-divorce-staged/AGENTS.repo.md && grep -q 'GỐC XƯỞNG' scripts/repo-divorce-staged/AGENTS.workshop.md",
+  "trace": {
+    "worker": null,
+    "outcome": null,
+    "files_changed": [],
+    "deviations": [],
+    "friction": null,
+    "capped_at": null,
+    "behavior_change": false,
+    "verification_evidence": null,
+    "verify_output": null,
+    "verify_passed": null
+  }
+}
