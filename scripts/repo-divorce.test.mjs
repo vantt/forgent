@@ -173,6 +173,32 @@ test('stepUntrack: refuses without confirmation and makes no commit', async () =
   assert.equal(journal.pointOfNoReturn, false);
 });
 
+test('stepUntrack: a wholly-ignored workshop dir (0 tracked files) does not fatal (rehearsal B finding)', async () => {
+  const root = mkTmp();
+  const repoDir = path.join(root, 'repo');
+  fs.mkdirSync(repoDir);
+  // .gitignore must exist before `git add -A` runs so upstreams/ never gets
+  // tracked at all — same shape as the real workspace (0 tracked files).
+  touch(repoDir, '.gitignore', '/upstreams/\n');
+  touch(repoDir, 'upstreams/some-lib/README.md', 'x');
+  initGitRepo(repoDir, { 'src/index.mjs': 'x', '.bee/config.json': '{}' });
+
+  const trackedUpstreams = execFileSync(
+    'git', ['-C', repoDir, 'ls-files', '--', 'upstreams'], { encoding: 'utf8' },
+  ).trim();
+  assert.equal(trackedUpstreams, '', 'fixture matches rehearsal B: upstreams/ has 0 tracked files');
+
+  const journal = new Journal(path.join(root, '.repo-divorce-checkpoint.json'));
+  await stepUntrack(root, journal, { yes: true }); // must not throw "did not match any files"
+
+  assert.equal(journal.pointOfNoReturn, true, 'untrack commit still ran for the tracked entries');
+  assert.ok(fs.existsSync(path.join(repoDir, 'upstreams/some-lib/README.md')), 'ignored dir left untouched on disk');
+
+  stepExtractWorkshop(root, journal);
+  assert.ok(fs.existsSync(path.join(root, 'upstreams/some-lib/README.md')), 'ignored workshop dir still extracted to the workshop');
+  assert.ok(fs.existsSync(path.join(root, '.bee/config.json')), 'tracked workshop dir also extracted');
+});
+
 // --- extract: filesystem-level, carries ignored workshop content ------------
 
 test('stepExtractWorkshop: moves workshop dirs (incl. ignored content) up, leaves product ignored in repo/', () => {

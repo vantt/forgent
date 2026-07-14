@@ -1,0 +1,61 @@
+{
+  "id": "repo-divorce-3",
+  "feature": "repo-divorce",
+  "title": "A-fix: untrack step chỉ git rm --cached path ĐANG tracked (rehearsal B finding)",
+  "lane": "high-risk",
+  "status": "capped",
+  "deps": [],
+  "files": [
+    "scripts/repo-divorce.mjs",
+    "scripts/repo-divorce.test.mjs"
+  ],
+  "read_first": [
+    "docs/history/repo-divorce/CONTEXT.md",
+    "scripts/repo-divorce.mjs",
+    "docs/history/repo-divorce/reports/validation-slice-a.md"
+  ],
+  "action": "Rehearsal B trên bản sao thật bắt được: bước untrack chạy `git rm -r --cached -- upstreams` chết fatal vì upstreams/ nằm trong .gitignore (0 file tracked) — workspace thật y hệt. Sửa bước untrack trong scripts/repo-divorce.mjs: trước khi git rm --cached từng workshop entry, lọc qua `git ls-files -- <entry>` (hoặc tương đương) và CHỈ untrack entry có ít nhất 1 file tracked; entry untracked/ignored được bỏ qua có log một dòng (nó vẫn được extract ở bước sau — phân loại filesystem-level không đổi). Thêm regression test: fixture repo có một workshop dir bị .gitignore (mô phỏng upstreams/) → execute qua bước untrack không fatal, dir ignored vẫn được extract sang xưởng. Không đổi thuật toán phân loại, không đổi trình tự 6 bước, không đổi giá trị exit code nào.",
+  "must_haves": {
+    "truths": [
+      "execute trên fixture có workshop-dir ignored đi qua bước untrack không fatal",
+      "dir ignored vẫn sang xưởng ở bước extract",
+      "14 test cũ của scripts/repo-divorce.test.mjs pass nguyên vẹn",
+      "npm test 234/234 pass"
+    ],
+    "artifacts": [
+      {
+        "path": "scripts/repo-divorce.mjs",
+        "substantive": "untrack lọc tracked-only qua git ls-files"
+      }
+    ],
+    "key_links": [
+      "phân loại filesystem-level giữ nguyên — untrack là thao tác git-index, extract là thao tác filesystem"
+    ],
+    "prohibitions": [
+      "Không đổi trình tự 6 bước",
+      "Không đổi exit codes",
+      "Test không ghi .fgos/ hay mutate repo thật"
+    ]
+  },
+  "verify": "npm test && node --test scripts/repo-divorce.test.mjs && node scripts/repo-divorce.mjs --dry-run",
+  "decisions": [],
+  "trace": {
+    "worker": "Bob",
+    "outcome": "stepUntrack now filters WORKSHOP_PATHS entries through git ls-files before git rm --cached, skipping (with a one-line log) any entry with 0 tracked files instead of hitting git's fatal pathspec error; classification, 6-step order, and exit codes unchanged",
+    "files_changed": [
+      "scripts/repo-divorce.mjs",
+      "scripts/repo-divorce.test.mjs"
+    ],
+    "deviations": [],
+    "friction": null,
+    "capped_at": "2026-07-14T11:47:44.694Z",
+    "behavior_change": false,
+    "verification_evidence": "{\n  \"tests_inspected\": [\"scripts/repo-divorce.test.mjs\"],\n  \"tests_added_or_changed\": [\"stepUntrack: a wholly-ignored workshop dir (0 tracked files) does not fatal (rehearsal B finding) (new, in scripts/repo-divorce.test.mjs)\"],\n  \"red_failure_evidence\": \"Rehearsal B on a disposable real-workspace copy: `--execute` died at the untrack step with `fatal: pathspec 'upstreams' did not match any files` from `git rm -r --cached --quiet -- upstreams`, because upstreams/ is in .gitignore (0 tracked files). Reproduced pre-fix in the new test fixture (git ls-files -- upstreams returns empty) prior to editing stepUntrack; the unmodified loop would have called git rm --cached on it unconditionally.\",\n  \"verification_run\": \"npm test -> 234/234 pass; node --test scripts/repo-divorce.test.mjs -> 15/15 pass (new test passes, logs the skip line, no fatal); node scripts/repo-divorce.mjs --dry-run on the real workspace -> exit 0, 0 unknown entries\",\n  \"deliberate_exceptions\": []\n}\n",
+    "verify_output": "npm test: 234/234 pass. node --test scripts/repo-divorce.test.mjs: 15/15 pass (incl. new regression test 'stepUntrack: a wholly-ignored workshop dir (0 tracked files) does not fatal (rehearsal B finding)', which logged 'step 3: skipping untrack (already untracked/ignored): upstreams' and did not throw). node scripts/repo-divorce.mjs --dry-run on real workspace: exit 0, plan printed (product 13, workshop 11, doctrine 2, git-meta 1, 0 unknown).",
+    "verify_passed": true,
+    "claimed_at": "2026-07-14T11:46:06.735Z",
+    "verify_command": "npm test && node --test scripts/repo-divorce.test.mjs && node scripts/repo-divorce.mjs --dry-run",
+    "verified_at": "2026-07-14T11:47:36.925Z"
+  },
+  "tier": "generation"
+}

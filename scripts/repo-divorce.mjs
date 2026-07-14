@@ -269,6 +269,16 @@ export async function stepUntrack(root, journal, opts) {
   const repoDir = path.join(root, 'repo');
   const workshopPresent = WORKSHOP_PATHS.filter((rel) => fs.existsSync(path.join(repoDir, rel)));
   for (const rel of workshopPresent) {
+    // Only entries with >=1 tracked file can be `git rm --cached`; an entry
+    // that's wholly untracked/ignored (e.g. upstreams/ via .gitignore) has
+    // nothing for git to untrack and `git rm --cached` on it is fatal
+    // ("did not match any files"). It still gets .gitignore'd below and still
+    // travels to the workshop at the filesystem-level extract step (step 4).
+    const tracked = git(repoDir, ['ls-files', '--', rel]).trim();
+    if (!tracked) {
+      process.stdout.write(`step 3: skipping untrack (already untracked/ignored): ${rel}\n`);
+      continue;
+    }
     git(repoDir, ['rm', '-r', '--cached', '--quiet', '--', rel]);
   }
   const ignoreFile = path.join(repoDir, '.gitignore');
