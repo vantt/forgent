@@ -435,3 +435,80 @@ test('list shows tier and the proposed status for the real CLI view, exit 0', ()
   assert.equal(parsed.work['listed-proposed'].status, 'proposed');
   assert.equal(parsed.work['listed-proposed'].tier, 'standard');
 });
+
+// --- `fgos ready` (phase-2-routing-5) ---
+
+test('ready prints the frontier as parseable, machine-readable JSON, exit 0', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'freestanding');
+  const result = run(cwd, ['ready']);
+  assert.equal(result.status, 0);
+  const parsed = JSON.parse(result.stdout);
+  assert.ok(Array.isArray(parsed));
+  assert.equal(parsed.length, 1);
+  assert.equal(parsed[0].id, 'freestanding');
+});
+
+test('ready excludes a todo item whose dep sits at proposed (proposed is not done): dep at proposed does NOT open dependent work', () => {
+  const cwd = tmpCwd();
+  toProposed(cwd, 'dep-in-proposed');
+  const result = run(cwd, ['add', 'blocked-on-proposed', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--deps', 'dep-in-proposed']);
+  assert.equal(result.status, 0);
+
+  const ready = JSON.parse(run(cwd, ['ready']).stdout);
+  assert.ok(!ready.some((item) => item.id === 'blocked-on-proposed'));
+  assert.ok(!ready.some((item) => item.id === 'dep-in-proposed'));
+});
+
+test('ready opens a todo item once its dep reaches done (approved, not merely proposed)', () => {
+  const cwd = tmpCwd();
+  toProposed(cwd, 'dep-approved');
+  assert.equal(run(cwd, ['move', 'dep-approved', '--to', 'done']).status, 0);
+  assert.equal(
+    run(cwd, ['add', 'unblocked-item', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--deps', 'dep-approved']).status,
+    0,
+  );
+
+  const ready = JSON.parse(run(cwd, ['ready']).stdout);
+  assert.ok(ready.some((item) => item.id === 'unblocked-item'));
+});
+
+test('ready on a directory with no log at all returns an empty result, exit 0 (a read never initializes .fgos/)', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['ready']);
+  assert.equal(result.status, 0);
+  assert.deepEqual(JSON.parse(result.stdout), []);
+  assert.ok(!fs.existsSync(path.join(cwd, '.fgos')));
+});
+
+test('ready on a corrupt log is refused as corrupt-log, exit 5', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'before-corruption-ready');
+  fs.appendFileSync(logPath(cwd), 'not valid json\n', 'utf8');
+
+  const result = run(cwd, ['ready']);
+  assert.equal(result.status, 5);
+});
+
+test('GOLDEN request-class: running ready twice never appends to events.jsonl, and the view file is untouched too', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'golden-a');
+  addOk(cwd, 'golden-b');
+  run(cwd, ['move', 'golden-b', '--to', 'doing']);
+
+  const logBefore = fs.readFileSync(logPath(cwd), 'utf8');
+  const viewExistedBefore = fs.existsSync(viewPath(cwd));
+  const viewBefore = viewExistedBefore ? fs.readFileSync(viewPath(cwd), 'utf8') : null;
+
+  const first = run(cwd, ['ready']);
+  assert.equal(first.status, 0);
+  const second = run(cwd, ['ready']);
+  assert.equal(second.status, 0);
+  assert.equal(first.stdout, second.stdout);
+
+  const logAfter = fs.readFileSync(logPath(cwd), 'utf8');
+  assert.equal(logAfter, logBefore, 'events.jsonl must be byte-identical before/after ready x2');
+
+  const viewAfter = fs.existsSync(viewPath(cwd)) ? fs.readFileSync(viewPath(cwd), 'utf8') : null;
+  assert.equal(viewAfter, viewBefore, 'state.json must be untouched by ready (read never writes the view)');
+});

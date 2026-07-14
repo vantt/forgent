@@ -26,6 +26,7 @@ import { rebuildView } from './replay.mjs';
 import { transitionWork, FsmError } from './fsm.mjs';
 import { validateWork, WorkValidationError, DEFAULTS } from './work.mjs';
 import { EventLogError } from './events.mjs';
+import { frontier } from './frontier.mjs';
 
 export { FsmError, WorkValidationError, EventLogError };
 
@@ -156,6 +157,21 @@ export function addDecision(dir, payload) {
 export function listWork(dir) {
   const { logPath } = paths(dir);
   return rebuildView(logPath);
+}
+
+/**
+ * Read-only (per D1 request-class: a read never writes): the work items
+ * ready to start right now — `todo` with every dep `done` (per D5, R5 —
+ * frontier is always derived, never a stored list). Same read shape as
+ * `listWork` above: rebuild the view fresh from the log, then derive.
+ * A missing log rebuilds to an empty view (`{ work: {}, decisions: [] }`),
+ * so `frontier` on it returns `[]` — never an error, exit 0, exactly like
+ * `listWork` on an uninitialized dir. A corrupt log throws the same
+ * `EventLogError('corrupt-log')` `rebuildView`/`listWork` already throw.
+ */
+export function readyWork(dir) {
+  const { logPath } = paths(dir);
+  return frontier(rebuildView(logPath));
 }
 
 /**

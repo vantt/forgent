@@ -81,6 +81,19 @@ test('rebuild-determinism: init, add work with deps + unicode title, move throug
 
   assert.equal(run(cwd, ['decision', '--text', 'locked D3: event log is truth, view is rebuilt']).status, 0);
 
+  // `ready` (per phase-2-routing-5): a pure read, exercised mid-journey —
+  // it must reflect the frontier at this exact point (only `a` is `done`;
+  // `b` is `doing`, `c` is `blocked`, neither is ready) and must never
+  // perturb the log the determinism check below depends on.
+  const logBeforeReady = fs.readFileSync(logPath(cwd), 'utf8');
+  const readyResult = run(cwd, ['ready']);
+  assert.equal(readyResult.status, 0);
+  const ready = JSON.parse(readyResult.stdout);
+  assert.ok(!ready.some((item) => item.id === 'a'), 'a is done, not todo — never in the frontier');
+  assert.ok(!ready.some((item) => item.id === 'b'), 'b is doing, not ready');
+  assert.ok(!ready.some((item) => item.id === 'c'), 'c is blocked, not ready');
+  assert.equal(fs.readFileSync(logPath(cwd), 'utf8'), logBeforeReady, 'ready must not append any event');
+
   const before = stateView(cwd);
   assert.equal(before.work.a.status, 'done');
   assert.equal(before.work.b.status, 'doing');

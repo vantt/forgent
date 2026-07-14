@@ -16,7 +16,7 @@
 // src/state/store.mjs, the sole write door.
 
 import path from 'node:path';
-import { initStore, addWork, moveWork, addDecision, listWork, rebuild, StoreError, EXIT_CODES, categoryOf } from '../src/state/store.mjs';
+import { initStore, addWork, moveWork, addDecision, listWork, readyWork, rebuild, StoreError, EXIT_CODES, categoryOf } from '../src/state/store.mjs';
 
 function dataDir() {
   return path.join(process.cwd(), '.fgos');
@@ -128,13 +128,21 @@ function runVerb(verb, flags, positional, dir) {
       return JSON.stringify(listWork(dir), null, 2);
     }
 
+    // Request-class per D1: a pure read — never appends an event, never
+    // touches state.json, never creates `.fgos/` if it's missing. Goes
+    // through store.readyWork only; this file never imports frontier.mjs
+    // directly (per this cell's key_links).
+    case 'ready': {
+      return JSON.stringify(readyWork(dir), null, 2);
+    }
+
     case 'rebuild': {
       const view = rebuild(dir);
       return `Rebuilt view: ${Object.keys(view.work).length} work item(s), ${view.decisions.length} decision(s).`;
     }
 
     default:
-      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <init|add|move|decision|list|rebuild> ...`);
+      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <init|add|move|decision|list|ready|rebuild> ...`);
   }
 }
 
