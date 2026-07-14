@@ -14,4 +14,5 @@ Forgent (fgOS) is the platform layer for building and running agent applications
 - [`docs/distillery/porting-log.md`](docs/distillery/porting-log.md) — trạng thái porting (nguồn sự thật duy nhất)
 - [`docs/naming.md`](docs/naming.md) — brainstorm định vị & đặt tên (Forgent/fgOS)
 - [`bin/fgos.mjs`](bin/fgos.mjs) + [`docs/history/phase-1-state-layer/`](docs/history/phase-1-state-layer/) — state layer: CLI `fgos`, event log + FSM + rebuild-view (Phase 1)
+- [`bin/fgos-runner.mjs`](bin/fgos-runner.mjs) + [`docs/routing-handoff-contract.md`](docs/routing-handoff-contract.md) — routing runner: frontier → dispatch → goal-check loop + agent↔agent handoff contract (Phase 2)
 - [`.agents/skills/distill/`](.agents/skills/distill/SKILL.md) — skill portable vận hành vòng học (init/add/delta/seal/check, Node zero-dep)
