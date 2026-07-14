@@ -1,0 +1,65 @@
+{
+  "id": "repo-divorce-4",
+  "feature": "repo-divorce",
+  "title": "A-fix 2: swap tiêu thụ staged phẳng + precheck trước-mutation (identity, staged, config) + ignore upstreams ở xưởng",
+  "lane": "high-risk",
+  "status": "capped",
+  "deps": [
+    "repo-divorce-3"
+  ],
+  "files": [
+    "scripts/repo-divorce.mjs",
+    "scripts/repo-divorce.test.mjs"
+  ],
+  "read_first": [
+    "docs/history/repo-divorce/CONTEXT.md",
+    "scripts/repo-divorce.mjs",
+    "scripts/repo-divorce-staged/"
+  ],
+  "action": "Ba lỗi rehearsal vòng 2 (bản sao thật): (F1) stepSwapDoctrine chờ stagedDir/repo/ + stagedDir/workshop/ nhưng cell 2 giao 6 file PHẲNG suffix-named → overlay no-op IM LẶNG, repo/AGENTS.md sau execute vẫn nguyên khối BEE. Sửa swap tiêu thụ layout phẳng với mapping tường minh: AGENTS.repo.md→repo/AGENTS.md, CLAUDE.repo.md→repo/CLAUDE.md, reading-map.repo.md→repo/docs/specs/reading-map.md, AGENTS.workshop.md→AGENTS.md (gốc xưởng), CLAUDE.workshop.md→CLAUDE.md (gốc), reading-map.workshop.md→docs/reading-map.md (gốc; mkdir -p, docs/ chưa extract ở bước 2). Thiếu BẤT KỲ file staged nào → throw ngay, cấm no-op im lặng. (F2) fatal 'Author identity unknown' tại commit init xưởng — SAU điểm-không-quay-đầu. Thêm PRECHECK bước 0 trước mọi mutation: resolve user.name+user.email (git -C root config, fallback global); không resolve được → fatal TRƯỚC bước 1; giá trị resolve được set repo-local vào git xưởng ở bước 5 trước commit. Precheck bước 0 cũng xác nhận: đủ 6 file staged, và 2 pattern text-edit của bước 6 tồn tại nguyên văn trong .bee/config.json — mọi throw của bước 5/6 phải chết được từ bước 0. (F3) .gitignore xưởng thiếu /upstreams/ → 5 embedded git repo bị add thành gitlink; thêm /upstreams/ (giữ semantics .gitignore gốc — upstreams vốn ignored). Không đổi thuật toán phân loại, không đổi trình tự 6 bước, không đổi exit codes.",
+  "must_haves": {
+    "truths": [
+      "fixture execute xong: repo/AGENTS.md KHÔNG chứa 'BEE:' và gốc xưởng AGENTS.md chứa khối bee",
+      "fixture thiếu 1 file staged → fatal trước khi có move nào (cây nguyên vẹn)",
+      "fixture không có git identity (env cô lập) → fatal TRƯỚC bước 1, không mutation",
+      "fixture có dir ignored kiểu upstreams chứa .git lồng → workshop git không có gitlink nào cho nó",
+      "15 test cũ + npm test 234 pass nguyên vẹn"
+    ],
+    "artifacts": [
+      {
+        "path": "scripts/repo-divorce.mjs",
+        "substantive": "precheck bước 0 + swap phẳng mapping tường minh + ignore upstreams"
+      }
+    ],
+    "key_links": [
+      "mapping swap khớp đúng 6 file cell 2 đã giao trong scripts/repo-divorce-staged/"
+    ],
+    "prohibitions": [
+      "Không đổi trình tự 6 bước",
+      "Không đổi exit codes",
+      "Không sửa nội dung 6 file staged",
+      "Test không mutate repo thật"
+    ]
+  },
+  "verify": "npm test && node --test scripts/repo-divorce.test.mjs && node scripts/repo-divorce.mjs --dry-run",
+  "decisions": [],
+  "trace": {
+    "worker": "Kevin",
+    "outcome": "Three rehearsal round-2 fixes to repo-divorce.mjs. F1: stepSwapDoctrine now consumes the 6 flat suffix-named staged files via explicit STAGED_MAP (AGENTS/CLAUDE/reading-map x repo|workshop), any missing file throws (no silent no-op). F2: new non-mutating step-0 stepPrecheck resolves git identity (repo-local then global) + asserts 6 staged files + 2 config patterns before any move; identity flows to step 5 and is set repo-local on the workshop repo before its commit. F3: workshop .gitignore now includes /upstreams/ so embedded upstream clones never stage as gitlinks. 6-step order, exit codes, and staged file contents unchanged. 20/20 script tests, 234/234 npm test.",
+    "files_changed": [
+      "scripts/repo-divorce.mjs",
+      "scripts/repo-divorce.test.mjs"
+    ],
+    "deviations": [],
+    "friction": null,
+    "capped_at": "2026-07-14T12:00:16.347Z",
+    "behavior_change": false,
+    "verification_evidence": null,
+    "verify_output": "Full chain EXIT 0. npm test: 234/234 pass. node --test scripts/repo-divorce.test.mjs: 20/20 pass (15 prior + 5 new). New: F1 fixture execute -> repo/AGENTS.md has no BEE block + workshop root AGENTS.md keeps it, both reading-maps placed; F1 missing staged file -> precheck fatal, no repo/ created; F2 no git identity (isolated GIT_CONFIG_GLOBAL/SYSTEM=/dev/null) -> fatal before step 1, top-level tree untouched, no repo/; resolveGitIdentity throws with no identity; F3 ignored upstreams/ with nested .git -> workshop repo has 0 tracked upstreams entries and 0 gitlink (160000) entries. dry-run on real workspace: exit 0, 0 unknown. Real workspace: no repo/ created, only scripts/ files changed by this cell (AGENTS/CLAUDE churn is pre-existing GitNexus re-index, out of scope).",
+    "verify_passed": true,
+    "claimed_at": "2026-07-14T11:56:02.676Z",
+    "verify_command": "npm test && node --test scripts/repo-divorce.test.mjs && node scripts/repo-divorce.mjs --dry-run",
+    "verified_at": "2026-07-14T12:00:08.147Z"
+  },
+  "tier": "ceiling"
+}
