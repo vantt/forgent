@@ -3,7 +3,7 @@
   "feature": "phase-2-routing",
   "title": "S2: frontier query thuần — todo + deps done + FIFO seq",
   "lane": "high-risk",
-  "status": "open",
+  "status": "capped",
   "deps": [
     "phase-2-routing-3"
   ],
@@ -47,16 +47,22 @@
   },
   "verify": "npm test",
   "trace": {
-    "worker": null,
-    "outcome": null,
-    "files_changed": [],
+    "worker": "Norbert",
+    "outcome": "Added pure frontier(view) query (todo + all deps done, FIFO by view.work insertion order); 16 new tests, 132/132 green, distill check clean",
+    "files_changed": [
+      "src/state/frontier.mjs",
+      "test/state/frontier.test.mjs"
+    ],
     "deviations": [],
     "friction": null,
-    "capped_at": null,
-    "behavior_change": true,
+    "capped_at": "2026-07-14T06:35:45.641Z",
+    "behavior_change": false,
     "verification_evidence": null,
-    "verify_output": null,
-    "verify_passed": null
+    "verify_output": "tests 132, pass 132, fail 0 (baseline 116 + 16 new frontier tests, per test/state/frontier.test.mjs); npm run verify: distill check all sources OK",
+    "verify_passed": true,
+    "claimed_at": "2026-07-14T06:34:21.711Z",
+    "verify_command": "npm test",
+    "verified_at": "2026-07-14T06:35:36.377Z"
   },
   "tier": "generation"
 }
