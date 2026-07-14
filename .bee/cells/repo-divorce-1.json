@@ -3,7 +3,7 @@
   "feature": "repo-divorce",
   "title": "A: script di trú checkpoint + dry-run/execute/rollback",
   "lane": "high-risk",
-  "status": "open",
+  "status": "capped",
   "deps": [],
   "decisions": [
     "D1",
@@ -44,15 +44,22 @@
   },
   "verify": "npm test && node --test scripts/repo-divorce.test.mjs && node scripts/repo-divorce.mjs --dry-run",
   "trace": {
-    "worker": null,
-    "outcome": null,
-    "files_changed": [],
+    "worker": "Kevin",
+    "outcome": "scripts/repo-divorce.mjs (zero-dep ESM): single classify algorithm (workshop deny-list / enumerated product / doctrine / git-meta / unknown->STOP-ASK, filesystem-level with docs/ split-parent recursion), 6-step --execute (whole-tree move->doctrine swap->untrack commit w/ point-of-no-return confirmation->workshop extract->workshop git init->targeted config text-edit), --dry-run (0 mutation), --rollback (LIFO reverse-move, refuses past point-of-no-return). Tests outside test/ tree. Verify green; --execute never run against this workspace.",
+    "files_changed": [
+      "scripts/repo-divorce.mjs",
+      "scripts/repo-divorce.test.mjs"
+    ],
     "deviations": [],
     "friction": null,
-    "capped_at": null,
+    "capped_at": "2026-07-14T11:37:41.533Z",
     "behavior_change": false,
     "verification_evidence": null,
-    "verify_output": null,
-    "verify_passed": null
-  }
+    "verify_output": "npm test: 234/234 pass, 0 fail. node --test scripts/repo-divorce.test.mjs: 14/14 pass, 0 fail (classify per group, docs split, unknown->STOP-ASK, planWorkspace unknown, real-workspace dry-run exit0+zero-mutation, unknown-entry CLI exit 2, stepUntrack refusal no-commit, stepExtractWorkshop filesystem-level incl ignored, whole-tree-move+rollback, rollback refuses past point-of-no-return). dry-run on real workspace: exit 0, plan = product(13)/workshop(11)/doctrine(2)/git-meta(1), 0 unknown. Full chain EXIT 0.",
+    "verify_passed": true,
+    "claimed_at": "2026-07-14T11:30:19.482Z",
+    "verify_command": "npm test && node --test scripts/repo-divorce.test.mjs && node scripts/repo-divorce.mjs --dry-run",
+    "verified_at": "2026-07-14T11:37:34.151Z"
+  },
+  "tier": "ceiling"
 }

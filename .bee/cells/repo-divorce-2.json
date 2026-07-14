@@ -3,7 +3,7 @@
   "feature": "repo-divorce",
   "title": "A: doctrine ×4 + reading-map ×2 staged",
   "lane": "high-risk",
-  "status": "open",
+  "status": "capped",
   "deps": [],
   "decisions": [
     "D2",
@@ -47,15 +47,30 @@
   },
   "verify": "npm test && ! grep -q 'BEE:' scripts/repo-divorce-staged/AGENTS.repo.md && ! grep -qi 'gitnexus' scripts/repo-divorce-staged/AGENTS.repo.md && grep -q 'GỐC XƯỞNG' scripts/repo-divorce-staged/AGENTS.workshop.md",
   "trace": {
-    "worker": null,
-    "outcome": null,
-    "files_changed": [],
-    "deviations": [],
+    "worker": "Stuart",
+    "outcome": "Staged 6 doctrine files under scripts/repo-divorce-staged/ (create-only, no swap): AGENTS.repo.md/CLAUDE.repo.md are pure product doctrine (six-questions definition of done from platform-foundations L5, pointers to specs/backlog/handoff-contract/decisions, zero bee/GitNexus strings); AGENTS.workshop.md/CLAUDE.workshop.md keep the bee managed-marker block verbatim and add A2 (dev sessions open at workshop root), the D2 cut-table quick map, and the ./repo-is-independent-git-repo note; reading-map.repo.md/reading-map.workshop.md split the current reading-map.md by D2 side, with exactly one workshop line pointing into ./repo. Verify: npm test 234/234 pass plus all 3 grep assertions true.",
+    "files_changed": [
+      "scripts/repo-divorce-staged/AGENTS.workshop.md",
+      "scripts/repo-divorce-staged/CLAUDE.workshop.md",
+      "scripts/repo-divorce-staged/AGENTS.repo.md",
+      "scripts/repo-divorce-staged/CLAUDE.repo.md",
+      "scripts/repo-divorce-staged/reading-map.repo.md",
+      "scripts/repo-divorce-staged/reading-map.workshop.md"
+    ],
+    "deviations": [
+      "## Deviations (discretionary, not blocking)",
+      "- Dropped the GitNexus block from both workshop-side staged files (AGENTS.workshop.md, CLAUDE.workshop.md), not only the repo-side ones. The dispatch only named the repo side as \"zero GitNexus blocks (re-index happens post-split)\", but CONTEXT.md Pinned Assumption A3 says the GitNexus block is removed from CLAUDE.md and re-analyzed in `./repo` after divorce — the indexed code (src/, bin/, test/) moves to `./repo`, so a stale GitNexus block referencing that code has no home at the workshop root either. Covered by CONTEXT.md's \"Agent's Discretion\" line (how to split the AGENTS.md/CLAUDE.md blocks), not a new decision.",
+      "- Assumed README.md moves to `./repo` (referenced from AGENTS.repo.md, not from the workshop files) since it describes the product itself. D2's table does not list README.md explicitly; this is an inference for doctrine-pointer purposes only — the actual migration classification (cell repo-divorce-1, from `git ls-files`) is unaffected and can override this if it disagrees."
+    ],
     "friction": null,
-    "capped_at": null,
+    "capped_at": "2026-07-14T11:35:12.848Z",
     "behavior_change": false,
     "verification_evidence": null,
-    "verify_output": null,
-    "verify_passed": null
-  }
+    "verify_output": "npm test: 234/234 pass, 0 fail. grep 'BEE:' AGENTS.repo.md: no match (pass, negated). grep -i 'gitnexus' AGENTS.repo.md: no match (pass, negated). grep 'GỐC XƯỞNG' AGENTS.workshop.md: 1 match found. Combined exit code: 0.",
+    "verify_passed": true,
+    "claimed_at": "2026-07-14T11:30:23.816Z",
+    "verify_command": "npm test && ! grep -q 'BEE:' scripts/repo-divorce-staged/AGENTS.repo.md && ! grep -qi 'gitnexus' scripts/repo-divorce-staged/AGENTS.repo.md && grep -q 'GỐC XƯỞNG' scripts/repo-divorce-staged/AGENTS.workshop.md",
+    "verified_at": "2026-07-14T11:34:50.783Z"
+  },
+  "tier": "generation"
 }
