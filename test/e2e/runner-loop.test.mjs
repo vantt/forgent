@@ -295,11 +295,18 @@ test('e2e crash-idempotency: runner killed mid-item (after doing, before propose
   assert.equal(branchExists(repoRoot, 'fgw/item-crash'), true);
   assert.equal(branchAheadCount(repoRoot, 'fgw/item-crash'), 1);
 
-  // Second --once: startup reap must resolve the stale `doing` item to a
-  // defined state (proposed, since the branch's commit passes verify) —
-  // idempotent crash recovery is the whole point of the startup reap.
+  // Second --once: the killed runner left its runner.lock behind, so this
+  // run cleans the stale lock and yields busy (exit 6) — the reclaimer
+  // never acquires on the path it just deleted (clean-and-yield).
   const second = runner(repoRoot, ['--once', '--config', path.join(repoRoot, '.fgos-runner.json')]);
-  assert.equal(second.status, 0, `second --once did not recover cleanly: ${second.stderr}`);
+  assert.equal(second.status, 6, `expected busy (stale lock cleaned): ${second.stderr}`);
+  assert.equal(fs.existsSync(path.join(repoRoot, '.fgos', 'runner.lock')), false);
+
+  // Third --once: acquires a clean lock; startup reap resolves the stale
+  // `doing` item to a defined state (proposed, since the branch's commit
+  // passes verify) — crash recovery lands within two ticks.
+  const third = runner(repoRoot, ['--once', '--config', path.join(repoRoot, '.fgos-runner.json')]);
+  assert.equal(third.status, 0, `post-clean --once did not recover cleanly: ${third.stderr}`);
 
   const finalStatus = stateView(repoRoot).work['item-crash'].status;
   assert.ok(

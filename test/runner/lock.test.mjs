@@ -93,28 +93,56 @@ test('second overlapping runOnce exits busy: zero store writes, zero worktree op
   assert.equal(fs.readFileSync(lockPath, 'utf8'), String(process.pid));
 });
 
-test('stale lock (dead pid) is reclaimed: runOnce proceeds and releases the lock on the way out', () => {
+test('stale lock (dead pid) is cleaned-and-yielded: first runOnce exits busy having removed it, the next run acquires and proceeds', () => {
   const { repoRoot, dir, worktreeDir } = setup();
   const lockPath = path.join(dir, LOCK_FILE);
   fs.writeFileSync(lockPath, String(deadPid()), { flag: 'wx' });
 
-  // empty frontier: proceeding past the lock means reaching the idle path
-  const result = runOnce({ repoRoot, config: { timeoutMs: 5000 }, worktreeDir, log: noLog });
+  const first = runOnce({ repoRoot, config: { timeoutMs: 5000 }, worktreeDir, log: noLog });
+  assert.equal(first.outcome, 'busy');
+  assert.equal(first.exitCode, EXIT_BUSY);
+  assert.equal(first.reclaimedStale, true);
+  // the stale lock is gone, but this call never acquired on the path it deleted
+  assert.equal(fs.existsSync(lockPath), false);
 
-  assert.equal(result.outcome, 'idle');
-  assert.equal(result.exitCode, 0);
+  // empty frontier: proceeding past the lock means reaching the idle path
+  const second = runOnce({ repoRoot, config: { timeoutMs: 5000 }, worktreeDir, log: noLog });
+  assert.equal(second.outcome, 'idle');
+  assert.equal(second.exitCode, 0);
   assert.equal(fs.existsSync(lockPath), false);
 });
 
-test('garbage lock content (no live holder can prove ownership) is treated as stale', () => {
+test('garbage lock content (no live holder can prove ownership) is treated as stale: cleaned, then next run proceeds', () => {
   const { repoRoot, dir, worktreeDir } = setup();
   const lockPath = path.join(dir, LOCK_FILE);
   fs.writeFileSync(lockPath, 'not-a-pid\n', { flag: 'wx' });
 
-  const result = runOnce({ repoRoot, config: { timeoutMs: 5000 }, worktreeDir, log: noLog });
-
-  assert.equal(result.outcome, 'idle');
+  const first = runOnce({ repoRoot, config: { timeoutMs: 5000 }, worktreeDir, log: noLog });
+  assert.equal(first.outcome, 'busy');
+  assert.equal(first.reclaimedStale, true);
   assert.equal(fs.existsSync(lockPath), false);
+
+  const second = runOnce({ repoRoot, config: { timeoutMs: 5000 }, worktreeDir, log: noLog });
+  assert.equal(second.outcome, 'idle');
+});
+
+test('reclaim never acquires in the deleting call: two racers over a stale lock both yield, a clean wx create wins afterwards', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-lock-test-dir-'));
+  const lockPath = path.join(dir, LOCK_FILE);
+  fs.writeFileSync(lockPath, String(deadPid()), { flag: 'wx' });
+
+  // racer 1 sees the stale lock: cleans it, yields, never holds it
+  const first = acquireRunnerLock(dir);
+  assert.equal(first.acquired, false);
+  assert.equal(first.reclaimedStale, true);
+  assert.equal(fs.existsSync(lockPath), false);
+
+  // racer 2 arriving after the clean finds an empty path and acquires via
+  // plain wx — the only way any process ever acquires
+  const second = acquireRunnerLock(dir);
+  assert.equal(second.acquired, true);
+  assert.equal(fs.readFileSync(lockPath, 'utf8'), String(process.pid));
+  second.release();
 });
 
 // --- acquire/release primitive --------------------------------------------

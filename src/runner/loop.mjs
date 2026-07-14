@@ -85,8 +85,17 @@ function isPidAlive(pid) {
  * runner is genuinely working this repo — back off (`acquired: false`,
  * never touch the holder's lock). A dead pid (or unreadable/non-positive
  * content, which no live holder can prove ownership of) is a crash
- * leftover: remove it and retry the `wx` create exactly once — losing that
- * retry means someone else won the reclaim race, which is just `busy` again.
+ * leftover: CLEAN AND YIELD — re-read the file immediately before the
+ * unlink (the slow liveness probe sat between the first read and now; if
+ * the content changed, a fresh holder took the path and nothing is
+ * deleted), remove it, and return busy with `reclaimedStale: true`. The
+ * reclaimer NEVER creates its own lock in the same call that deleted one:
+ * every acquisition is a bare `wx` create on an empty path, so two
+ * processes racing the same stale lock can each at worst clean-and-yield —
+ * neither can steal a lock the other just created (delete-then-create in
+ * one call was the TOCTOU the review flagged). The next invocation
+ * acquires cleanly; under a cron/loop cadence that costs one tick after a
+ * crash.
  */
 export function acquireRunnerLock(dir, { pid = process.pid } = {}) {
   const lockPath = path.join(dir, LOCK_FILE);
@@ -115,13 +124,14 @@ export function acquireRunnerLock(dir, { pid = process.pid } = {}) {
       if (err.code !== 'EEXIST') throw err;
     }
 
-    let holderPid;
+    let raw;
     try {
-      holderPid = parseInt(fs.readFileSync(lockPath, 'utf8').trim(), 10);
+      raw = fs.readFileSync(lockPath, 'utf8');
     } catch (err) {
       if (err.code === 'ENOENT') continue; // holder released in between — retry the create
       throw err;
     }
+    const holderPid = parseInt(raw.trim(), 10);
 
     // pid must be a positive integer before probing: kill(0, 0) would probe
     // our own process group and misread garbage content as "alive".
@@ -129,11 +139,32 @@ export function acquireRunnerLock(dir, { pid = process.pid } = {}) {
       return { acquired: false, holderPid, lockPath };
     }
 
+    // Stale. Re-read right before the delete: the liveness probe above is
+    // the slow window — a competitor may have cleaned this lock and a fresh
+    // holder created its own here since `raw` was read. Changed content is
+    // a live lock we must not touch.
+    let current;
     try {
-      fs.unlinkSync(lockPath); // stale — dead holder; reclaim
+      current = fs.readFileSync(lockPath, 'utf8');
+    } catch (err) {
+      if (err.code === 'ENOENT') {
+        // someone else already cleaned it — same yield, nothing deleted
+        return { acquired: false, holderPid: null, reclaimedStale: true, lockPath };
+      }
+      throw err;
+    }
+    if (current !== raw) {
+      const freshPid = parseInt(current.trim(), 10);
+      return { acquired: false, holderPid: Number.isInteger(freshPid) && freshPid > 0 ? freshPid : null, lockPath };
+    }
+
+    try {
+      fs.unlinkSync(lockPath); // stale — dead holder; clean…
     } catch (err) {
       if (err.code !== 'ENOENT') throw err;
     }
+    // …and yield: never wx-create on the path this call just deleted.
+    return { acquired: false, holderPid: null, reclaimedStale: true, lockPath };
   }
 
   // Lost the wx create twice in a row: a live contender keeps beating us.
@@ -427,8 +458,10 @@ export function runOnce(options = {}) {
   // holder's lock file.
   const lock = acquireRunnerLock(dir);
   if (!lock.acquired) {
-    log(`fgos-runner: busy — another runner${lock.holderPid ? ` (pid ${lock.holderPid})` : ''} holds ${lock.lockPath}`);
-    return { outcome: 'busy', holderPid: lock.holderPid, parked, exitCode: EXIT_BUSY };
+    log(lock.reclaimedStale
+      ? `fgos-runner: busy — stale lock at ${lock.lockPath} cleaned (dead holder); run again to acquire`
+      : `fgos-runner: busy — another runner${lock.holderPid ? ` (pid ${lock.holderPid})` : ''} holds ${lock.lockPath}`);
+    return { outcome: 'busy', holderPid: lock.holderPid, reclaimedStale: lock.reclaimedStale ?? false, parked, exitCode: EXIT_BUSY };
   }
 
   try {
