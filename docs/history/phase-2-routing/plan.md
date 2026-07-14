@@ -39,13 +39,15 @@ Slice queue: S1 (hiện tại, feasibility: sẵn — toàn nội bộ) → S2 (
 
 ## Current slice
 
-S2 — cửa đọc: frontier derive + request-class (per D1, A2, R5). Entry: S1 capped (116/116). Exit: lệnh đọc trả frontier đúng trên deps đa tầng, FIFO seq, KHÔNG ghi event nào; suite xanh mở rộng. Files bounded: src/state/frontier.mjs (mới, thuần), bin/fgos.mjs + store facade (chỉ verb đọc), test. Verify tổng: `npm test`.
+S3 — runner (per D2/D3/D4/D6, A1). Entry: S1+S2 capped (138/138); probes YES (claude -p headless exit 0; worktree branch lifecycle sạch). Exit: một work item thật chạy trọn vòng bằng executor giả trong test (ready → doing → worktree → dispatch → goal-check → proposed + nhánh fgw/), recovery matrix + anti-loop có test giả lập từng lớp, tier→model đọc từ config, handoff contract thành văn. Verify tổng: `npm test` (executor giả — KHÔNG đốt token agent thật trong suite).
 
 ## Cells
 
-S1 (capped): `phase-2-routing-1..3`. S2:
-- `phase-2-routing-4` — frontier query thuần trên view (deps: 3 — S1, đã capped)
-- `phase-2-routing-5` — verb đọc `fgos ready` + request-class không-ghi (deps: 4)
+S1+S2 (capped): `phase-2-routing-1..5`. S3:
+- `phase-2-routing-6` — recovery matrix + anti-loop counters (lib thuần, derive từ log)
+- `phase-2-routing-7` — dispatch lib: prompt builder + tier→model config + worktree lifecycle (deps: 6)
+- `phase-2-routing-8` — runner loop tuần tự `bin/fgos-runner.mjs` (deps: 6, 7)
+- `phase-2-routing-9` — e2e vòng trọn bằng executor giả + chain-handoff contract doc (deps: 8)
 
 ## Out of scope
 

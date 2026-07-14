@@ -1,0 +1,69 @@
+{
+  "id": "phase-2-routing-6",
+  "feature": "phase-2-routing",
+  "title": "S3: recovery matrix + anti-loop counters (lib thuần)",
+  "lane": "high-risk",
+  "status": "open",
+  "deps": [
+    "phase-2-routing-5"
+  ],
+  "decisions": [
+    "D2"
+  ],
+  "files": [
+    "src/runner/recovery.mjs",
+    "src/runner/anti-loop.mjs",
+    "test/runner/recovery.test.mjs",
+    "test/runner/anti-loop.test.mjs"
+  ],
+  "read_first": [
+    "docs/history/phase-2-routing/CONTEXT.md",
+    "docs/history/phase-2-routing/plan.md",
+    "src/state/replay.mjs",
+    "docs/specs/work-state.md"
+  ],
+  "action": "Hai lib thuần cho runner (per D2 — đồ bảo hộ testable trước khi có vòng): recovery.mjs — bảng RECOVERY máy-đọc-được lớp-lỗi → hành động, tối thiểu các lớp: worker-spawn-fail, worker-timeout, verify-miss, worktree-fail, corrupt-log, reject-returned (item quay lại từ proposed→todo); hành động ∈ {retry, park, halt} + ngưỡng retry mặc định khai hằng (vd tối đa 2 retry một claim); export resolveAction(errorClass, attempt). anti-loop.mjs — bộ đếm DERIVE TỪ EVENTS (per R3, không trường mới trên schema): visitCount(events, id) = số lần item vào doing; consecutiveMisses(events) toàn cục cho circuit breaker; ngưỡng khai hằng (MAX_VISITS mặc định 3, BREAKER_MISSES mặc định 3) — provisional, tuning sau khi có vận hành thật. Cả hai thuần: không fs, không spawn. Test từng lớp lỗi + từng ngưỡng biên (đúng ngưỡng, vượt ngưỡng). SỬA THEO RELIABILITY PANEL: (a) thêm lớp 'stale-doing' (runner chết giữa chừng — item kẹt doing): resolve theo trạng thái nhánh fgw/<id>: có commit + verify pass → hoàn tất doing→proposed (idempotent window-3); ngược lại → doing→blocked reason runner-crash-reclaim. (c) thêm lớp 'state-conflict' (CAS conflict trên chính write của runner): hành động halt — không bao giờ giành ghi với human. (d) BREAKER KHÔNG event-derived: consecutiveMisses là state in-memory PER-RUN (khớp A1/--once); cross-run persistence ngoài scope Phase 2, ghi rõ trong comment. visitCount VẪN derive từ events (số lần vào doing, bất kể ai ghi — semantic khai tường minh: human re-dispatch cũng tính là visit); test breaker: hai miss xen một event human không ảnh hưởng count in-memory.",
+  "must_haves": {
+    "truths": [
+      "resolveAction trả đúng hành động cho MỌI lớp lỗi khai báo; lớp lạ → halt (fail-safe, không mặc định retry)",
+      "visitCount đếm đúng từ log có move lặp; MAX_VISITS chặn ở biên",
+      "Hai lib không import fs/child_process",
+      "Item ở doing lúc loop start không worker sống được phân lớp stale-doing, không bao giờ vô hình",
+      "Lớp state-conflict → halt; lớp lạ → halt (fail-safe)",
+      "consecutiveMisses per-run in-memory; visitCount event-derived với semantic khai rõ"
+    ],
+    "artifacts": [
+      {
+        "path": "src/runner/recovery.mjs",
+        "substantive": "bảng đầy đủ 6 lớp + resolveAction"
+      },
+      {
+        "path": "src/runner/anti-loop.mjs",
+        "substantive": "counters derive từ events, ngưỡng hằng"
+      }
+    ],
+    "key_links": [
+      "anti-loop đọc events qua shape sự kiện hiện hành (work.move to doing), không thêm loại event mới"
+    ],
+    "prohibitions": [
+      "Không sửa src/state/*",
+      "Không trường schema mới",
+      "Không fs/spawn trong lib",
+      "Test không ghi .fgos/ repo"
+    ]
+  },
+  "verify": "npm test",
+  "trace": {
+    "worker": null,
+    "outcome": null,
+    "files_changed": [],
+    "deviations": [],
+    "friction": null,
+    "capped_at": null,
+    "behavior_change": true,
+    "verification_evidence": null,
+    "verify_output": null,
+    "verify_passed": null
+  },
+  "tier": "generation"
+}

@@ -1,0 +1,70 @@
+{
+  "id": "phase-2-routing-7",
+  "feature": "phase-2-routing",
+  "title": "S3: dispatch lib — prompt builder + tier→model config + worktree lifecycle",
+  "lane": "high-risk",
+  "status": "open",
+  "deps": [
+    "phase-2-routing-6"
+  ],
+  "decisions": [
+    "D3",
+    "D4",
+    "D6"
+  ],
+  "files": [
+    "src/runner/dispatch.mjs",
+    "src/runner/worktree.mjs",
+    "test/runner/dispatch.test.mjs",
+    "test/runner/worktree.test.mjs",
+    ".fgos-runner.json"
+  ],
+  "read_first": [
+    "docs/history/phase-2-routing/CONTEXT.md",
+    "src/state/work.mjs",
+    "docs/history/phase-2-routing/reports/validation-s2.md",
+    "src/runner/recovery.mjs"
+  ],
+  "action": "dispatch.mjs: buildPrompt(work) dựng prompt từ item (title/kind/refs/verify + khung handoff: mục tiêu, ranh giới worktree, proof kỳ vọng, cấm tự gọi fgos per D3); config runner đọc từ .fgos-runner.json committed ở repo root (policy D2-durability): { executor: { command: 'claude', args: ['-p','{prompt}','--model','{model}'] }, models: { light: 'haiku', standard: 'sonnet', heavy: 'opus' }, timeoutMs } — command template thay thế {prompt}/{model}, cho phép test cắm executor giả (script node/sh); spawnWorker(work, cfg, cwd) chạy executor trong cwd worktree, bắt stdout/exit, timeout (probe đã chứng minh claude -p exit 0 stdout sạch). worktree.mjs: createWorktree(repoRoot, id) → git worktree add -b fgw/<id> <tmp> (nhánh từ HEAD), removeWorktree an toàn (chạy git từ repoRoot, KHÔNG từ trong worktree — bài học probe: cwd biến mất; prune + xử lý nhánh tồn tại sẵn), listLeftovers. Test: prompt chứa đủ 4 phần khung; config parse + template substitution + model theo tier; spawn với executor giả echo; worktree add/commit/remove/branch-survives (subshell cwd), nhánh trùng tên → lỗi rõ ràng không nuốt. SỬA THEO RELIABILITY PANEL (b/e): createWorktree REUSE nhánh fgw/<id> nếu đã tồn tại (checkout vào worktree mới, KHÔNG -b) — retry là fresh-worktree-reused-branch, hết tự-va; chỉ lỗi cứng khi nhánh tồn tại mà không reuse được. listLeftovers trả {branch, aheadCount}: nhánh fgw/* không commit vượt base = orphan rỗng (sẽ bị loop prune), có commit = giữ cho human review — policy khai trong doc comment. SECURITY PANEL: spawn executor BẮT BUỘC argv array, không bao giờ shell:true / template string vào shell — item text không được có đường chạm shell qua substitution (chỉ verify của goal-check là shell CÓ CHỦ ĐÍCH, tầng khác). Doc comment trong dispatch.mjs ghi rõ: .fgos-runner.json là CONFIG THỰC THI ĐƯỢC (trusted input — ai sửa file này điều khiển process được spawn); và bất biến tin cậy: work item (nhất là verify) phải do chính user tạo — không bao giờ ingest item từ nguồn ngoài khi chưa có vòng kiểm. FEASIBILITY PANEL: substitution {prompt}/{model} PER-ELEMENT trên args array (probe: multi-line + ký tự shell round-trip nguyên vẹn, shell:false); doc comment ghi caveat spawnSync SIGTERM chỉ giết child trực tiếp — grandchild của agent thật là hạn chế đã biết Phase 2 (nâng cấp process-group kill khi cần).",
+  "must_haves": {
+    "truths": [
+      "Model chọn đúng theo tier từ config, tier lạ → validation error",
+      "Worktree: commit của worker sống trên nhánh fgw/<id> sau remove; remove chạy từ repoRoot không chết cwd",
+      "spawnWorker timeout giết process và trả lớp worker-timeout",
+      "createWorktree lần hai cùng id reuse nhánh cũ thành công (retry không tự-va); listLeftovers phân biệt orphan rỗng vs nhánh có hàng"
+    ],
+    "artifacts": [
+      {
+        "path": "src/runner/dispatch.mjs",
+        "substantive": "buildPrompt + config + spawn, executor template cắm được"
+      },
+      {
+        "path": ".fgos-runner.json",
+        "substantive": "config mặc định committed, models 3 tier"
+      }
+    ],
+    "key_links": [
+      "dispatch dùng lớp lỗi của recovery.mjs (cell 6) làm vocabulary chung"
+    ],
+    "prohibitions": [
+      "Không sửa src/state/*",
+      "Worker không bao giờ nhận đường tới .fgos/ chính (per D3)",
+      "Test không spawn agent thật — executor giả only",
+      "Test không ghi .fgos/ repo",
+      "spawn không bao giờ shell:true; prompt/model chỉ đi qua argv array"
+    ]
+  },
+  "verify": "npm test",
+  "trace": {
+    "worker": null,
+    "outcome": null,
+    "files_changed": [],
+    "deviations": [],
+    "friction": null,
+    "capped_at": null,
+    "behavior_change": true,
+    "verification_evidence": null,
+    "verify_output": null,
+    "verify_passed": null
+  }
+}

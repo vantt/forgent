@@ -1,0 +1,76 @@
+{
+  "id": "phase-2-routing-8",
+  "feature": "phase-2-routing",
+  "title": "S3: runner loop tuần tự bin/fgos-runner.mjs",
+  "lane": "high-risk",
+  "status": "open",
+  "deps": [
+    "phase-2-routing-6",
+    "phase-2-routing-7"
+  ],
+  "decisions": [
+    "D2",
+    "D3",
+    "D4",
+    "D5"
+  ],
+  "files": [
+    "bin/fgos-runner.mjs",
+    "src/runner/loop.mjs",
+    "test/runner/loop.test.mjs",
+    "src/state/store.mjs"
+  ],
+  "read_first": [
+    "src/runner/recovery.mjs",
+    "src/runner/dispatch.mjs",
+    "src/state/store.mjs",
+    "docs/history/phase-2-routing/CONTEXT.md",
+    "src/runner/anti-loop.mjs"
+  ],
+  "action": "loop.mjs + bin/fgos-runner.mjs: vòng TUẦN TỰ (per A1) — readyWork → lấy item ĐẦU (FIFO) → anti-loop check (visitCount < MAX_VISITS, breaker chưa mở; vi phạm → PARK BẰNG CẠNH SẴN CÓ todo→blocked --expect todo, reason anti-loop-max-visits — per D5, fsm.mjs:40 có cạnh này; item rời frontier thật sự, không lởn vởn ở đầu FIFO) → move todo→doing (claim, --expect todo) → createWorktree → spawnWorker → goal-check: chạy verify CỦA ITEM trong worktree bằng shell, RUNNER tự chạy (per D3, không tin exit worker) → pass: commit dở? worker phải tự commit trong worktree (prompt yêu cầu); runner kiểm nhánh có commit mới + verify xanh → move doing→proposed --expect doing, in báo cáo (nhánh, verify output tail); miss/lỗi: resolveAction theo lớp → retry (re-spawn cùng worktree hoặc worktree mới, tăng attempt) / park (move doing→blocked --expect doing nếu edge hợp lệ... doing→blocked hợp lệ ✓) / halt (dừng vòng, exit mã phạm trù). removeWorktree luôn chạy (nhánh giữ). Flags: --once (một item rồi dừng — mặc định cho Phase 2), --dry-run (in kế hoạch không làm). MỌI ghi qua store facade (một cửa call-graph per D3). Exit codes theo phạm trù hiện hành. Test loop với executor giả: happy path trọn vòng, verify-miss → retry rồi park, spawn-fail → theo bảng, anti-loop chặn ở MAX_VISITS, breaker toàn cục. SỬA THEO RELIABILITY PANEL: (a/e/f) STARTUP REAP trước khi tính frontier: quét item ở doing (lệch ≤1 do A1) → phân lớp stale-doing theo bảng cell 6 (nhánh có commit + verify pass → move doing→proposed; ngược lại → doing→blocked reason runner-crash-reclaim); quét listLeftovers → orphan rỗng prune, nhánh có hàng báo cáo. Reap làm --once idempotent sau crash. (b) retry = fresh worktree + REUSE branch (per cell 7), trước re-spawn reset worktree về head nhánh (không build trên rác); removeWorktree trong finally quanh MỌI đường per-item — happy/retry/park/halt/throw — không đường thoát nào rò worktree (test halt giữa item → worktree biến mất, nhánh còn). (c) CAS conflict trên write của runner (claim/park/propose) → bắt, phân lớp state-conflict, cleanup rồi halt sạch exit mã 3 — không bao giờ ghi đè mù. SECURITY PANEL: output runtime của worker/verify KHÔNG ghi vào cây committed — báo cáo chạy in stdout + (nếu cần lưu) file dưới .fgos/runs/ GITIGNORED (thêm pattern vào .gitignore nếu cần, khai trong report); verify output tail chỉ in console, không persist vào docs/. FEASIBILITY PANEL: thêm readRawEvents(dir) CHỈ-ĐỌC vào store.mjs (decision đã log) — loop lấy events cho anti-loop qua đó, không duplicate path literal, không import events.mjs trực tiếp từ loop. repoRoot derive từ cwd (git -C cwd rev-parse --show-toplevel), KHÔNG từ __dirname của binary.",
+  "must_haves": {
+    "truths": [
+      "--once chạy trọn: todo→doing→(worker giả commit)→goal-check pass→proposed, nhánh fgw/ tồn tại với commit",
+      "verify-miss: item về blocked (park) sau đủ retry, KHÔNG proposed",
+      "Worker không ghi .fgos/ — chỉ runner ghi (một cửa)",
+      "Loop start reap: item doing mồ côi được resolve (proposed nếu verify pass trên nhánh, blocked nếu không) trước khi tính frontier",
+      "removeWorktree chạy trong finally trên mọi đường kể cả halt (có test)",
+      "CAS conflict của chính runner → halt sạch sau cleanup, exit 3",
+      "Item quá MAX_VISITS bị move todo→blocked với reason anti-loop, rời khỏi frontier (test)"
+    ],
+    "artifacts": [
+      {
+        "path": "src/runner/loop.mjs",
+        "substantive": "vòng đầy đủ với recovery routing thật"
+      },
+      {
+        "path": "bin/fgos-runner.mjs",
+        "substantive": "--once/--dry-run, exit phạm trù"
+      }
+    ],
+    "key_links": [
+      "loop ghi CHỈ qua store facade; goal-check chạy verify item trong worktree cwd"
+    ],
+    "prohibitions": [
+      "Không song song (A1)",
+      "Không auto-merge nhánh (P9 backlog)",
+      "Không sửa src/state/* NGOẠI TRỪ thêm đúng một accessor chỉ-đọc readRawEvents vào store.mjs (decision log)",
+      "Test executor giả only, không agent thật",
+      "Test không ghi .fgos/ repo",
+      "Không ghi stdout worker/verify vào file committed (docs/ hay tracked path)"
+    ]
+  },
+  "verify": "npm test",
+  "trace": {
+    "worker": null,
+    "outcome": null,
+    "files_changed": [],
+    "deviations": [],
+    "friction": null,
+    "capped_at": null,
+    "behavior_change": true,
+    "verification_evidence": null,
+    "verify_output": null,
+    "verify_passed": null
+  }
+}

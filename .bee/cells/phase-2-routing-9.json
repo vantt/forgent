@@ -1,0 +1,65 @@
+{
+  "id": "phase-2-routing-9",
+  "feature": "phase-2-routing",
+  "title": "S3: e2e vòng trọn executor giả + chain-handoff contract doc",
+  "lane": "high-risk",
+  "status": "open",
+  "deps": [
+    "phase-2-routing-8"
+  ],
+  "decisions": [
+    "D1",
+    "D3"
+  ],
+  "files": [
+    "test/e2e/runner-loop.test.mjs",
+    "docs/routing-handoff-contract.md",
+    "README.md"
+  ],
+  "read_first": [
+    "bin/fgos-runner.mjs",
+    "src/runner/dispatch.mjs",
+    "docs/history/phase-2-routing/CONTEXT.md",
+    "docs/platform-foundations.md"
+  ],
+  "action": "e2e: repo git tạm (mkdtemp + git init + commit gốc) với .fgos khởi tạo + .fgos-runner.json trỏ executor giả (script node: tạo file theo yêu cầu prompt + git commit trong cwd); add 2 item có dep; chạy bin/fgos-runner.mjs --once qua child process thật → assert: item 1 proposed, nhánh fgw/ có commit worker, verify của item được runner chạy (bằng chứng trong output), events.jsonl đúng chuỗi (doing rồi proposed, mang v), item 2 CHƯA mở (dep proposed); chạy --once lần hai → item 2 vẫn không được dispatch (frontier rỗng). Case lỗi: executor giả cố tình không commit/verify đỏ → item về blocked sau retry theo bảng. docs/routing-handoff-contract.md: contract chuyển việc agent↔agent thành văn (per L4 prose-handoff): khung prompt 4 phần (mục tiêu/ranh giới/proof/cấm fgos), bảng entry-router cho skill forgent tương lai, câu handoff chuẩn; trích D-ID. README: một dòng trỏ runner + contract. LƯU Ý docs.maxLoc: contract ngắn gọn <150 dòng. SỬA THEO RELIABILITY PANEL (f): thêm e2e crash-idempotency: chạy --once với executor giả commit-rồi-treo/exit-nonzero bị kill sau move doing nhưng trước proposed; chạy --once lần hai → assert item được reap về trạng thái xác định (proposed nếu verify pass / blocked nếu không), nhánh có ĐÚNG MỘT commit worker (không double-commit), không worktree rò. SECURITY PANEL: contract doc thêm mục 'Ranh giới tin cậy' ngắn: chống đỡ bằng chỉ dẫn + nhánh-vứt-được (KHÔNG phải sandbox — worker chạy full quyền user); verify chạy như shell — bất biến: item do chính user tạo, không ingest từ nguồn lạ; .fgos-runner.json là config thực thi được. FEASIBILITY PANEL: verify của item trong e2e temp repo phải TỰ CHỨA (node -e / test -f) — temp repo không có suite, không npm test.",
+  "must_haves": {
+    "truths": [
+      "e2e chạy binary runner thật trong repo git tạm, trọn vòng ra proposed + nhánh",
+      "Dep ở proposed không được dispatch ở lần --once thứ hai",
+      "Case verify-đỏ ra blocked, không proposed",
+      "E2e crash giữa item: --once lần hai reap về trạng thái xác định, đúng một commit worker, không rò worktree"
+    ],
+    "artifacts": [
+      {
+        "path": "test/e2e/runner-loop.test.mjs",
+        "substantive": "child process thật, executor giả, không mock fs"
+      },
+      {
+        "path": "docs/routing-handoff-contract.md",
+        "substantive": "khung prompt + entry-router + câu handoff, trích D-ID"
+      }
+    ],
+    "key_links": [
+      "README trỏ runner + contract"
+    ],
+    "prohibitions": [
+      "Không agent thật trong suite",
+      "Không sửa src/",
+      "Test không ghi .fgos/ repo"
+    ]
+  },
+  "verify": "npm test",
+  "trace": {
+    "worker": null,
+    "outcome": null,
+    "files_changed": [],
+    "deviations": [],
+    "friction": null,
+    "capped_at": null,
+    "behavior_change": true,
+    "verification_evidence": null,
+    "verify_output": null,
+    "verify_passed": null
+  }
+}
