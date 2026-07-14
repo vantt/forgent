@@ -113,4 +113,4 @@ Not applicable — không có màn hình.
 - `src/state/work.mjs` — schema + validate (ID_PATTERN kebab-case)
 - `src/state/replay.mjs` — fold events → view, thuần
 - `.fgos/events.jsonl` (committed, truth) · `.fgos/state.json` (gitignored, view D4)
-- Test: `npm test` (71 test; e2e tại `test/e2e/rebuild-determinism.test.mjs`, chạy binary thật trong tmp dir)
+- Test: `npm test` (82 test; e2e tại `test/e2e/rebuild-determinism.test.mjs`, chạy binary thật trong tmp dir)
