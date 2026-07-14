@@ -24,6 +24,18 @@ const HOOK_NAME = "session-close";
 const NUDGE_ALLOWED = /^(\.bee\/|docs\/|plans\/|AGENTS\.md$)/;
 const DECISION_RECENT_MS = 6 * 3600 * 1000;
 
+// fresh-session-handoff fsh-6 (D4): a bound session's PHASE comes from its
+// lane via resolvePipeline; no session_id, an unbound session, or an
+// unresolvable binding all fall back to the default record — this hook is
+// advisory only and must never let a lane-resolution gap block the "hive
+// door open" warning (fail-open, matching the file's own documented
+// discipline).
+function getSessionId(payload) {
+  return typeof payload.session_id === "string" && payload.session_id.trim()
+    ? payload.session_id.trim()
+    : null;
+}
+
 async function maybeDecisionNudge(root) {
   try {
     const { execSync } = await import("node:child_process");
@@ -55,7 +67,7 @@ async function maybeDecisionNudge(root) {
     return (
       `bee decision review: ${changed.length} source file(s) changed with no bee flow active ` +
       "and no recent decision logged. Before finishing, ask the user: is there a durable " +
-      'decision or convention here worth recording? If yes: node .bee/bin/bee_decisions.mjs log ' +
+      'decision or convention here worth recording? If yes: node .bee/bin/bee.mjs decisions log ' +
       '--decision "..." --rationale "..." (or a dated learning in docs/history/learnings/). ' +
       "If not, carry on."
     );
@@ -170,7 +182,8 @@ async function main() {
       parts.push(captureMsg);
     }
     const state = stateLib.readState(root);
-    const phase = state.phase || "idle";
+    const pipeline = stateLib.resolvePipeline(root, { sessionId: getSessionId(ctx.payload) });
+    const phase = (pipeline.ok ? pipeline.record.phase : state.phase) || "idle";
     if (phase === "idle" || phase === "compounding-complete") {
       const decisionMsg = await maybeDecisionNudge(root);
       if (decisionMsg) {

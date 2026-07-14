@@ -38,12 +38,25 @@ function workerName(entry) {
     return entry;
   }
   if (entry && typeof entry === "object") {
-    // The state CLI (bee_state.mjs worker add) registers workers under
+    // The state CLI (bee.mjs state worker add) registers workers under
     // `nickname` (discovery.md Proved Gaps) — match that first; the generic
     // name|agent|worker fallback stays for foreign/legacy entries.
     return entry.nickname || entry.name || entry.agent || entry.worker || "";
   }
   return "";
+}
+
+// fresh-session-handoff fsh-6 (D4): a bound session's PHASE comes from its
+// lane via resolvePipeline; workers stay a global registry regardless (lane
+// records carry no `workers` field — cell registration is not lane-scoped).
+// No session_id, an unbound session, or an unresolvable binding all fall
+// back to the default record — this hook is advisory only and must never
+// let a lane-resolution gap block the nudge (fail-open, matching the file's
+// own documented discipline).
+function getSessionId(payload) {
+  return typeof payload.session_id === "string" && payload.session_id.trim()
+    ? payload.session_id.trim()
+    : null;
 }
 
 async function main() {
@@ -62,7 +75,8 @@ async function main() {
       return 0;
     }
     const state = stateLib.readState(root);
-    const phase = state.phase || "idle";
+    const pipeline = stateLib.resolvePipeline(root, { sessionId: getSessionId(ctx.payload) });
+    const phase = (pipeline.ok ? pipeline.record.phase : state.phase) || "idle";
     const agentName = getAgentName(ctx.payload);
     const workers = Array.isArray(state.workers) ? state.workers : [];
     const isRegisteredWorker =
@@ -80,8 +94,8 @@ async function main() {
       msg =
         `bee chain-nudge: ${who} returned - collect its [STATUS] token ` +
         "([DONE]/[BLOCKED]/[HANDOFF]/[NOOP]), update the cell " +
-        "(node .bee/bin/bee_cells.mjs), and check/release its reservations " +
-        "(node .bee/bin/bee_reservations.mjs list --active-only). " +
+        "(node .bee/bin/bee.mjs cells), and check/release its reservations " +
+        "(node .bee/bin/bee.mjs reservations list --active-only). " +
         "When the wave is clean, move to the next wave or the next chain step.";
       // Decision 0011: capture-mode spine — if behavior_change cells capped since
       // the last scribing run, nudge capture in-flight, not only at feature close.

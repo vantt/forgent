@@ -13,6 +13,8 @@ import {
   readState,
   readHandoff,
   readOnboarding,
+  resolvePipeline,
+  listLanes,
 } from './state.mjs';
 import { activeDecisions, datamark } from './decisions.mjs';
 import { readBacklogCounts } from './backlog.mjs';
@@ -97,10 +99,41 @@ function gatesLine(state) {
   ).join(' | ');
 }
 
-export function buildSessionPreamble(root) {
+// fresh-session-handoff fsh-6 (D4): OPTIONAL sessionId — omitted (today's
+// exact call shape) resolves to the default pipeline, byte-identical to
+// before this cell. A bound session's phase/mode/feature/gates come from its
+// lane record instead (resolvePipeline), plus a one-line summary naming any
+// OTHER active lanes (never the bound session's own). An unresolvable
+// binding (invalid/missing/corrupt lane) falls back to the default record —
+// this preamble is informational only, never a place to block a session on
+// a lane-resolution gap.
+//
+// fresh-session-handoff fsh-10 (D1, PURITY PIN panel W2): OPTIONAL
+// handoffOutcome — this builder stays a PURE renderer, it never mutates
+// anything and never calls adoptHandoff itself. The caller (the
+// SessionStart hook) performs the source-gated adoption attempt and passes
+// its typed result in. Contract:
+//   - handoffOutcome omitted/null: no adoption was even attempted (no
+//     sessionId, no handoff, or the handoff's kind isn't 'planned-next') —
+//     every existing handoff rendering (pause, or a missing/unknown kind
+//     normalized to pause) stays BYTE-IDENTICAL to before this cell. This is
+//     also what keeps a payload with no session_id byte-identical even when
+//     a planned-next handoff sits on disk (fsh-10 hook-contract row d).
+//   - handoffOutcome.ok === true (a real adoptHandoff success): the wait
+//     block is REPLACED by a start-now block naming the adopted cell, its
+//     lane, and its verify command — the fresh session begins that task
+//     without asking (D1).
+//   - handoffOutcome.ok === false (adoption was attempted and refused/lost,
+//     including a non-qualifying source or a same-session no-op — see the
+//     hook): the pause-style wait block renders exactly as it does for a
+//     genuine pause handoff, PLUS one extra line naming the refusal reason —
+//     still "present it and WAIT", never a fabricated start-now.
+export function buildSessionPreamble(root, { sessionId = null, handoffOutcome = null } = {}) {
   const state = readState(root);
   const onboarding = readOnboarding(root);
   const handoff = readHandoff(root);
+  const pipeline = resolvePipeline(root, { sessionId });
+  const pipelineRecord = pipeline.ok ? pipeline.record : state;
   const lines = [];
 
   lines.push(`## bee v${BEE_VERSION}`);
@@ -114,15 +147,45 @@ export function buildSessionPreamble(root) {
     lines.push(`- Onboarding: ok (bee ${onboarding.bee_version || BEE_VERSION})`);
   }
   lines.push(
-    `- Phase: ${state.phase} | Mode: ${state.mode ?? 'none'} | Feature: ${state.feature ?? 'none'}`,
+    `- Phase: ${pipelineRecord.phase} | Mode: ${pipelineRecord.mode ?? 'none'} | Feature: ${pipelineRecord.feature ?? 'none'}`,
   );
-  lines.push(`- Gates: ${gatesLine(state)}`);
+  lines.push(`- Gates: ${gatesLine(pipelineRecord)}`);
+  if (pipeline.ok && pipeline.source === 'lane') {
+    const others = listLanes(root).filter(
+      (lane) =>
+        lane.feature !== pipeline.feature && lane.phase !== 'idle' && lane.phase !== 'compounding-complete',
+    );
+    if (others.length > 0) {
+      lines.push(
+        `- ${others.length} other active lane(s): ${others.map((lane) => lane.feature).join(', ')}`,
+      );
+    }
+  }
   if (readConfig(root).gate_bypass === true) {
     lines.push(
       '- ⚡ GATE BYPASS ON — the agent auto-approves Gates 1-3 for tiny/small/standard work (records the recommended choice, logs it, continues). High-risk/hard-gate work, secret reads, and Gate 4 UAT still stop for the human. Turn off with the bee-bypass-gate skill.',
     );
   }
-  if (handoff) {
+  if (handoffOutcome && handoffOutcome.ok === true) {
+    // fsh-10 (D1): adoption succeeded — start-now, no confirmation needed.
+    // NOTE: adoptHandoff already cleared .bee/HANDOFF.json as part of the
+    // successful adopt (fsh-9's clear-after-adopt), so `handoff` above is
+    // already null by the time this renders — handoffOutcome (passed in by
+    // the hook) is the only surviving record of what happened, which is
+    // exactly why it is a parameter rather than re-derived here.
+    const nextCellId = handoffOutcome.next_cell ?? 'unknown';
+    const nextCell = readJson(path.join(root, '.bee', 'cells', `${nextCellId}.json`), null);
+    lines.push('');
+    lines.push('### PLANNED-NEXT ADOPTED — starting now, no confirmation needed (D1)');
+    lines.push(`- Cell: ${nextCellId}${nextCell?.title ? ` — ${nextCell.title}` : ''}`);
+    lines.push(`- Lane: ${nextCell?.lane ?? 'unknown'}`);
+    if (nextCell?.verify) lines.push(`- Verify: \`${nextCell.verify}\``);
+  } else if (handoff) {
+    // Byte-identical to before this cell whenever handoffOutcome is null
+    // (pause, a missing/unknown kind normalized to pause, or no adoption
+    // attempted at all — e.g. no session_id). A planned-next handoff whose
+    // adoption was attempted and refused/lost adds one reason line, still a
+    // wait block (fsh-10, D1).
     lines.push('');
     lines.push('### HANDOFF present — present it and WAIT — never auto-resume');
     lines.push(
@@ -132,6 +195,9 @@ export function buildSessionPreamble(root) {
       lines.push(`- Cells in flight: ${handoff.cells_in_flight.join(', ')}`);
     }
     if (handoff.next_action) lines.push(`- Saved next action: ${handoff.next_action}`);
+    if (handoff.kind === 'planned-next' && handoffOutcome && handoffOutcome.ok === false) {
+      lines.push(`- Adoption not applied: ${handoffOutcome.reason ?? handoffOutcome.code ?? 'unknown reason'}`);
+    }
   }
 
   const commands = readConfig(root).commands || {};
@@ -202,18 +268,23 @@ export function buildSessionPreamble(root) {
   }
 
   lines.push('');
-  lines.push('Run `node .bee/bin/bee_status.mjs --json` yourself for detail (agent-run — never hand bee commands to the user). Route via bee-hive.');
+  lines.push('Run `node .bee/bin/bee.mjs status --json` yourself for detail (agent-run — never hand bee commands to the user). Route via bee-hive.');
   return lines.join('\n');
 }
 
-export function buildPromptReminder(root) {
-  const state = readState(root);
+// fresh-session-handoff fsh-6 (D4): same optional-sessionId shape as
+// buildSessionPreamble above — omitted stays byte-identical to today; a bound
+// session's phase/mode/next_action/gate come from its lane, with the same
+// fail-open fallback to the default record on an unresolvable binding.
+export function buildPromptReminder(root, { sessionId = null } = {}) {
+  const pipeline = resolvePipeline(root, { sessionId });
+  const record = pipeline.ok ? pipeline.record : readState(root);
   const firstOpenGate =
-    GATE_NAMES.find((gate) => state.approved_gates?.[gate] !== true) ?? null;
+    GATE_NAMES.find((gate) => record.approved_gates?.[gate] !== true) ?? null;
   const fields = {
-    phase: state.phase,
-    mode: state.mode ?? null,
-    next_action: state.next_action ?? null,
+    phase: record.phase,
+    mode: record.mode ?? null,
+    next_action: record.next_action ?? null,
     first_open_gate: firstOpenGate,
   };
 
