@@ -10,12 +10,21 @@
 // the same log) twice always yields deep-equal views.
 
 import { readEvents } from './events.mjs';
+import { DEFAULTS } from './work.mjs';
 
 /**
  * Fold an ordered array of events (as returned by `readEvents`) into a state
  * view: `{ work: { [id]: workItem }, decisions: [...] }`. Unknown event
  * types are ignored rather than rejected, so the log can grow new event
  * types over time without breaking replay of older logs.
+ *
+ * Backward-compat (per D7b): a pre-Phase-2 `work.add` payload carries no
+ * `tier` at all (absence of the field, same signal `v` uses — see
+ * work.mjs's SCHEMA_VERSION doc). Folding applies `DEFAULTS` from work.mjs
+ * — the single declared source — for any field missing on the payload, so
+ * old and new logs (and a log mixing old events followed by new ones) all
+ * fold into a view shaped the same way. This module declares no default of
+ * its own.
  */
 export function foldEvents(events) {
   const view = { work: {}, decisions: [] };
@@ -30,7 +39,7 @@ function applyEvent(view, event) {
     case 'work.add': {
       const item = event.payload;
       if (item && typeof item === 'object' && typeof item.id === 'string') {
-        view.work[item.id] = { ...item };
+        view.work[item.id] = { ...DEFAULTS, ...item };
       }
       break;
     }
