@@ -15,7 +15,10 @@
 //
 // Execute is the 6-step sequence proven by the validating move-semantics probe
 // (TEST B): whole-tree move -> doctrine swap -> untrack commit (point of no
-// return) -> workshop extract -> workshop git init -> config patch.
+// return) -> workshop extract -> workshop git init -> config patch. A non-mutating
+// step-0 precheck runs first: it resolves the git identity and confirms the
+// staged files and config patterns exist, so anything that could throw in steps
+// 5/6 fails BEFORE the point of no return, leaving the tree pristine.
 
 import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
@@ -63,6 +66,32 @@ export const GIT_META_PATHS = ['.git'];
 
 const JOURNAL_BASENAME = '.repo-divorce-checkpoint.json';
 const BACKUP_BASENAME = '.repo-divorce-backup';
+
+// Cell 2 delivers doctrine as six flat, suffix-named files under
+// scripts/repo-divorce-staged/. Explicit mapping to their destinations: the
+// .repo.md files become the product's clean doctrine under ./repo; the
+// .workshop.md files become the workshop's doctrine at the workshop root
+// (docs/ is not extracted yet at swap time, so the destination dir is mkdir'd).
+export const STAGED_MAP = [
+  ['AGENTS.repo.md', 'repo/AGENTS.md'],
+  ['CLAUDE.repo.md', 'repo/CLAUDE.md'],
+  ['reading-map.repo.md', 'repo/docs/specs/reading-map.md'],
+  ['AGENTS.workshop.md', 'AGENTS.md'],
+  ['CLAUDE.workshop.md', 'CLAUDE.md'],
+  ['reading-map.workshop.md', 'docs/reading-map.md'],
+];
+export const STAGED_FILES = STAGED_MAP.map(([src]) => src);
+
+// Targeted command text-edits for step 6 (config is not strict JSON — trailing
+// comma — so never JSON.parse round-trip). Shared by the step-0 precheck (which
+// asserts both `from` patterns are present verbatim) and the patch itself.
+export const CONFIG_EDITS = [
+  ['"test": "npm test"', '"test": "cd repo && npm test"'],
+  [
+    '"verify": "npm test && node .claude/skills/distill/scripts/distill.mjs check"',
+    '"verify": "cd repo && npm test && node ../.claude/skills/distill/scripts/distill.mjs check"',
+  ],
+];
 
 function matchesAny(rel, prefixes) {
   return prefixes.some((p) => rel === p || rel.startsWith(p + '/'));
@@ -200,30 +229,67 @@ function assertLayoutIntact(repoDir) {
   }
 }
 
-function overlayDir(srcDir, destDir, journal, backupDir) {
-  if (!fs.existsSync(srcDir)) return;
-  for (const entry of fs.readdirSync(srcDir, { withFileTypes: true })) {
-    const src = path.join(srcDir, entry.name);
-    const dest = path.join(destDir, entry.name);
-    if (entry.isDirectory()) {
-      fs.mkdirSync(dest, { recursive: true });
-      overlayDir(src, dest, journal, backupDir);
-      continue;
-    }
-    if (fs.existsSync(dest)) {
-      fs.mkdirSync(backupDir, { recursive: true });
-      const backup = path.join(backupDir, `${Date.now()}-${Math.random().toString(36).slice(2)}`);
-      fs.copyFileSync(dest, backup);
-      journal.record({ type: 'overwrite', path: dest, backup });
-    } else {
-      fs.mkdirSync(path.dirname(dest), { recursive: true });
-      journal.record({ type: 'create', path: dest });
-    }
-    fs.copyFileSync(src, dest);
+function copyStagedFile(src, dest, journal, backupDir) {
+  fs.mkdirSync(path.dirname(dest), { recursive: true });
+  if (fs.existsSync(dest)) {
+    fs.mkdirSync(backupDir, { recursive: true });
+    const backup = path.join(backupDir, `${Date.now()}-${Math.random().toString(36).slice(2)}`);
+    fs.copyFileSync(dest, backup);
+    journal.record({ type: 'overwrite', path: dest, backup });
+  } else {
+    journal.record({ type: 'create', path: dest });
   }
+  fs.copyFileSync(src, dest);
+}
+
+// Resolve the committing identity (name + email). `git config` already resolves
+// repo-local then global then system, so one call per key covers the fallback.
+// Throws when neither is set — the workshop's own repo (step 5) has no identity
+// of its own, so an unresolvable identity would only surface as a fatal commit
+// past the point of no return; this lets it fail at step 0 instead.
+export function resolveGitIdentity(root) {
+  const read = (key) => {
+    try {
+      return git(root, ['config', key]).trim();
+    } catch {
+      return '';
+    }
+  };
+  const name = read('user.name');
+  const email = read('user.email');
+  if (!name || !email) {
+    throw new Error(
+      'step 0 precheck: git identity unresolvable (user.name/user.email empty in ' +
+        'repo-local and global config) — set them before executing',
+    );
+  }
+  return { name, email };
 }
 
 // --- Execute steps (each exported for unit testing on tmp trees) ------------
+
+// Step 0 (non-mutating) — fail fast, before any move, on everything that would
+// otherwise throw only in steps 5/6 past the point of no return: the git
+// identity, the six staged files, and the two config patterns. Returns the
+// resolved identity for step 5 to set repo-local on the workshop repo.
+export function stepPrecheck(root) {
+  const identity = resolveGitIdentity(root);
+
+  const stagedDir = path.join(root, 'scripts', 'repo-divorce-staged');
+  const missing = STAGED_FILES.filter((f) => !fs.existsSync(path.join(stagedDir, f)));
+  if (missing.length) {
+    throw new Error(`step 0 precheck: staged doctrine file(s) missing from ${stagedDir}: ${missing.join(', ')}`);
+  }
+
+  const configFile = path.join(root, '.bee', 'config.json');
+  const configText = fs.readFileSync(configFile, 'utf8');
+  for (const [from] of CONFIG_EDITS) {
+    if (!configText.includes(from)) {
+      throw new Error(`step 0 precheck: config command pattern not found in ${configFile} (drifted?): ${from}`);
+    }
+  }
+  return identity;
+}
 
 // Step 1 — move the whole workspace (every top-level entry, incl. .git) into
 // repo/. Only the whole-tree move keeps `git status` layout-intact (TEST B).
@@ -243,16 +309,20 @@ export function stepWholeTreeMove(root, journal) {
   return repoDir;
 }
 
-// Step 2 — swap doctrine + reading-map from the staged tree (cell 2 owns its
-// contents). Contract: stagedDir has repo/ (overlaid onto ./repo) and workshop/
-// (overlaid onto the root, where the workshop doctrine lives after extract).
+// Step 2 — swap doctrine + reading-map from the flat staged files (cell 2 owns
+// their contents) using the explicit STAGED_MAP. Any missing staged file throws
+// rather than silently no-op'ing, so a full BEE block can never survive into the
+// product's repo/AGENTS.md. Step 0 already precheck'd completeness; this guard
+// is the second line for a caller that skips the precheck.
 export function stepSwapDoctrine(root, journal, stagedDir) {
   const backupDir = path.join(root, BACKUP_BASENAME);
-  if (!fs.existsSync(stagedDir)) {
-    throw new Error(`step 2: staged doctrine dir not found: ${stagedDir}`);
+  for (const [srcName, destRel] of STAGED_MAP) {
+    const src = path.join(stagedDir, srcName);
+    if (!fs.existsSync(src)) {
+      throw new Error(`step 2: staged doctrine file missing: ${srcName} (expected in ${stagedDir})`);
+    }
+    copyStagedFile(src, path.join(root, destRel), journal, backupDir);
   }
-  overlayDir(path.join(stagedDir, 'repo'), path.join(root, 'repo'), journal, backupDir);
-  overlayDir(path.join(stagedDir, 'workshop'), root, journal, backupDir);
 }
 
 // Step 3 — untrack the workshop, write repo/.gitignore, make the single untrack
@@ -309,11 +379,18 @@ export function stepExtractWorkshop(root, journal) {
   }
 }
 
-// Step 5 — give the workshop its own light git repo; ./repo stays nested and
-// ignored so the two repos never swallow each other (D4).
-export function stepGitInitWorkshop(root) {
+// Step 5 — give the workshop its own light git repo; ./repo and upstreams/ stay
+// nested and ignored so the two repos never swallow each other (D4) and the
+// embedded upstream clones never get staged as gitlinks (they were ignored in
+// the original .gitignore). Identity is set repo-local before the commit — the
+// fresh workshop repo has none of its own.
+export function stepGitInitWorkshop(root, identity) {
   git(root, ['init', '--quiet']);
-  const ignore = ['repo/', 'node_modules/', JOURNAL_BASENAME, BACKUP_BASENAME + '/', ''].join('\n');
+  if (identity) {
+    git(root, ['config', 'user.name', identity.name]);
+    git(root, ['config', 'user.email', identity.email]);
+  }
+  const ignore = ['repo/', 'upstreams/', 'node_modules/', JOURNAL_BASENAME, BACKUP_BASENAME + '/', ''].join('\n');
   fs.writeFileSync(path.join(root, '.gitignore'), ignore);
   git(root, ['add', '-A']);
   git(root, ['commit', '--quiet', '-m', 'chore: initialize workshop repo']);
@@ -324,14 +401,7 @@ export function stepGitInitWorkshop(root) {
 export function stepPatchConfig(root) {
   const file = path.join(root, '.bee', 'config.json');
   let text = fs.readFileSync(file, 'utf8');
-  const edits = [
-    ['"test": "npm test"', '"test": "cd repo && npm test"'],
-    [
-      '"verify": "npm test && node .claude/skills/distill/scripts/distill.mjs check"',
-      '"verify": "cd repo && npm test && node ../.claude/skills/distill/scripts/distill.mjs check"',
-    ],
-  ];
-  for (const [from, to] of edits) {
+  for (const [from, to] of CONFIG_EDITS) {
     if (!text.includes(from)) {
       throw new Error(`step 6: config command not found (already patched or drifted?): ${from}`);
     }
@@ -407,12 +477,13 @@ async function runExecute(root, opts) {
   if (unknown.length) {
     throw new Error(`execute refused — unclassified top-level entries (STOP-ASK):\n  ${unknown.join('\n  ')}`);
   }
+  const identity = stepPrecheck(root); // step 0 — before ANY mutation
   const repoDir = stepWholeTreeMove(root, journal);
   const stagedDir = path.join(repoDir, 'scripts', 'repo-divorce-staged');
   stepSwapDoctrine(root, journal, stagedDir);
   await stepUntrack(root, journal, opts);
   stepExtractWorkshop(root, journal);
-  stepGitInitWorkshop(root);
+  stepGitInitWorkshop(root, identity);
   stepPatchConfig(root);
   journal.clear();
   fs.rmSync(path.join(root, BACKUP_BASENAME), { recursive: true, force: true });

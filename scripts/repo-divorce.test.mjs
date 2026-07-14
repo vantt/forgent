@@ -20,6 +20,10 @@ import {
   stepWholeTreeMove,
   stepUntrack,
   stepExtractWorkshop,
+  stepPrecheck,
+  resolveGitIdentity,
+  STAGED_FILES,
+  main,
 } from './repo-divorce.mjs';
 
 const SCRIPT = fileURLToPath(new URL('./repo-divorce.mjs', import.meta.url));
@@ -257,4 +261,140 @@ test('rollback refuses once the point of no return is recorded', () => {
   journal.markPointOfNoReturn();
 
   assert.throws(() => rollback(root), /point of no return/);
+});
+
+// --- Rehearsal round-2 fixture: a full --execute on a throwaway copy ---------
+
+// Build a realistic workspace: git repo with product + workshop trees, doctrine
+// carrying a BEE block, the six flat staged files cell 2 delivers, and an
+// optional gitignored upstreams/ clone with its own nested .git.
+function buildDivorceFixture(root, { withIdentity = true, withUpstreamsRepo = false } = {}) {
+  execFileSync('git', ['-C', root, 'init', '--quiet']);
+  if (withIdentity) {
+    execFileSync('git', ['-C', root, 'config', 'user.email', 'test@example.com']);
+    execFileSync('git', ['-C', root, 'config', 'user.name', 'Test']);
+  }
+  // Product tree.
+  touch(root, 'src/index.mjs', 'export const x = 1;\n');
+  touch(root, 'package.json', '{"name":"p"}\n');
+  touch(root, 'README.md', '# p\n');
+  touch(root, 'LICENSE', 'MIT\n');
+  touch(root, 'bin/p.mjs', '#!/usr/bin/env node\n');
+  touch(root, 'test/p.test.mjs', '');
+  touch(root, 'docs/specs/s.md', '# spec\n');
+  touch(root, '.gitignore', '/upstreams/\nnode_modules/\n');
+  // Workshop tree.
+  touch(root, '.bee/config.json', '{\n  "commands": {\n    "test": "npm test",\n    "verify": "npm test && node .claude/skills/distill/scripts/distill.mjs check"\n  }\n}\n');
+  touch(root, '.bee/bin/hooks/h.mjs', '');
+  touch(root, 'plans/p.md', '');
+  touch(root, 'docs/history/h.md', '');
+  // Doctrine: the original AGENTS.md carries the BEE block.
+  touch(root, 'AGENTS.md', '# forgent\n\n# BEE:START\nbee doctrine block\n# BEE:END\n');
+  touch(root, 'CLAUDE.md', '# CLAUDE original\n');
+  // Six flat staged files (cell 2's layout). Content here is fixture-only.
+  touch(root, 'scripts/repo-divorce-staged/AGENTS.repo.md', '# forgent (product only)\nno workshop block here\n');
+  touch(root, 'scripts/repo-divorce-staged/CLAUDE.repo.md', '# CLAUDE product\n');
+  touch(root, 'scripts/repo-divorce-staged/reading-map.repo.md', '# product reading map\n');
+  touch(root, 'scripts/repo-divorce-staged/AGENTS.workshop.md', '# workshop\n\n# BEE:START\nbee doctrine block\n# BEE:END\n');
+  touch(root, 'scripts/repo-divorce-staged/CLAUDE.workshop.md', '# CLAUDE workshop\n');
+  touch(root, 'scripts/repo-divorce-staged/reading-map.workshop.md', '# workshop reading map\n');
+  if (withUpstreamsRepo) {
+    const up = path.join(root, 'upstreams', 'lib');
+    fs.mkdirSync(up, { recursive: true });
+    execFileSync('git', ['-C', up, 'init', '--quiet']);
+    execFileSync('git', ['-C', up, 'config', 'user.email', 'u@example.com']);
+    execFileSync('git', ['-C', up, 'config', 'user.name', 'U']);
+    touch(up, 'readme.md', 'lib\n');
+    execFileSync('git', ['-C', up, 'add', '-A']);
+    execFileSync('git', ['-C', up, 'commit', '--quiet', '-m', 'lib init']);
+  }
+  if (withIdentity) {
+    execFileSync('git', ['-C', root, 'add', '-A']);
+    execFileSync('git', ['-C', root, 'commit', '--quiet', '-m', 'init']);
+  }
+}
+
+// F1 — the swap consumes the flat staged files: the product's doctrine is
+// stripped of the BEE block, the workshop keeps it.
+test('F1: execute swaps flat staged doctrine — repo/AGENTS.md loses the BEE block, workshop root keeps it', async () => {
+  const root = mkTmp();
+  buildDivorceFixture(root);
+
+  const code = await main(['--execute', '--yes', '--root', root]);
+  assert.equal(code, 0);
+
+  const repoAgents = fs.readFileSync(path.join(root, 'repo', 'AGENTS.md'), 'utf8');
+  assert.doesNotMatch(repoAgents, /BEE:/, 'product doctrine no longer carries the BEE block');
+  const workshopAgents = fs.readFileSync(path.join(root, 'AGENTS.md'), 'utf8');
+  assert.match(workshopAgents, /BEE:START/, 'workshop doctrine keeps the BEE block');
+  // Reading-map lands at both mapped destinations.
+  assert.ok(fs.existsSync(path.join(root, 'repo', 'docs/specs/reading-map.md')), 'product reading-map placed');
+  assert.ok(fs.existsSync(path.join(root, 'docs/reading-map.md')), 'workshop reading-map placed at root');
+});
+
+// F1 — a missing staged file fails at the step-0 precheck, before any move.
+test('F1: a missing staged file fatals at precheck, before any mutation', () => {
+  const root = mkTmp();
+  buildDivorceFixture(root);
+  fs.rmSync(path.join(root, 'scripts/repo-divorce-staged', STAGED_FILES[0]));
+
+  assert.throws(() => stepPrecheck(root), /staged doctrine file\(s\) missing/);
+  assert.equal(fs.existsSync(path.join(root, 'repo')), false, 'no repo/ created — tree untouched');
+});
+
+// F2 — an unresolvable git identity fatals at step 0, before step 1, no mutation.
+test('F2: no git identity fatals before step 1 with zero mutation', () => {
+  const root = mkTmp();
+  buildDivorceFixture(root, { withIdentity: false });
+  const beforeTop = fs.readdirSync(root).sort();
+
+  const env = { ...process.env, GIT_CONFIG_GLOBAL: '/dev/null', GIT_CONFIG_SYSTEM: '/dev/null' };
+  let code = 0;
+  let stderr = '';
+  try {
+    execFileSync('node', [SCRIPT, '--execute', '--yes', '--root', root], { env, encoding: 'utf8' });
+  } catch (err) {
+    code = err.status;
+    stderr = err.stderr ? err.stderr.toString() : '';
+  }
+  assert.notEqual(code, 0, 'execute refused');
+  assert.match(stderr, /identity unresolvable/);
+  assert.equal(fs.existsSync(path.join(root, 'repo')), false, 'no repo/ created before the fatal');
+  assert.deepEqual(fs.readdirSync(root).sort(), beforeTop, 'top-level tree untouched');
+});
+
+test('resolveGitIdentity throws when neither repo-local nor global identity is set', () => {
+  const root = mkTmp();
+  execFileSync('git', ['-C', root, 'init', '--quiet']);
+  const saved = { g: process.env.GIT_CONFIG_GLOBAL, s: process.env.GIT_CONFIG_SYSTEM };
+  process.env.GIT_CONFIG_GLOBAL = '/dev/null';
+  process.env.GIT_CONFIG_SYSTEM = '/dev/null';
+  try {
+    assert.throws(() => resolveGitIdentity(root), /identity unresolvable/);
+  } finally {
+    if (saved.g === undefined) delete process.env.GIT_CONFIG_GLOBAL;
+    else process.env.GIT_CONFIG_GLOBAL = saved.g;
+    if (saved.s === undefined) delete process.env.GIT_CONFIG_SYSTEM;
+    else process.env.GIT_CONFIG_SYSTEM = saved.s;
+  }
+});
+
+// F3 — a gitignored upstreams/ clone with its own nested .git never becomes a
+// gitlink in the workshop repo.
+test('F3: an ignored upstreams/ clone with a nested .git produces no gitlink in the workshop repo', async () => {
+  const root = mkTmp();
+  buildDivorceFixture(root, { withUpstreamsRepo: true });
+
+  const code = await main(['--execute', '--yes', '--root', root]);
+  assert.equal(code, 0);
+
+  // upstreams was extracted to the workshop root, its nested repo intact...
+  assert.ok(fs.existsSync(path.join(root, 'upstreams/lib/.git')), 'nested upstream repo present at workshop root');
+  // ...but the workshop git repo tracks nothing under it (no gitlink, no files).
+  const trackedUpstreams = execFileSync('git', ['-C', root, 'ls-files', '--', 'upstreams'], { encoding: 'utf8' }).trim();
+  assert.equal(trackedUpstreams, '', 'upstreams/ is not tracked in the workshop repo');
+  const gitlinks = execFileSync('git', ['-C', root, 'ls-files', '-s'], { encoding: 'utf8' })
+    .split('\n')
+    .filter((l) => l.startsWith('160000'));
+  assert.deepEqual(gitlinks, [], 'no gitlink entries anywhere in the workshop index');
 });
