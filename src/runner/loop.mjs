@@ -1,0 +1,378 @@
+// loop.mjs — the sequential runner loop (per D2/D3/D4/D5, A1): startup reap
+// → frontier → anti-loop gate → claim → isolated worktree → dispatch →
+// goal-check → propose/park/halt. One item at a time (A1), FIFO head first
+// (A2), and inside the dispatch loop the RUNNER is the only writer through
+// the store facade (per D3) — the worker's prompt forbids it from calling
+// `fgos`, and nothing here ever trusts the worker's own report: the runner
+// re-runs the item's `verify` itself in the worktree (goal-check).
+//
+// WRITE DISCIPLINE: every state mutation in this module goes through
+// store.mjs's moveWork (the single write door) with an explicit
+// `expectedStatus` (CAS). A CAS conflict on the runner's OWN write means
+// someone else (a human operator, another process) raced it — classified
+// `state-conflict`, and per the recovery matrix the runner never fights for
+// the write: it cleans up its worktree (the finally below) and halts with
+// the conflict exit code. It never overwrites blindly and never retries the
+// write.
+//
+// WORKTREE LIFECYCLE: `removeWorktree` runs in a `finally` around EVERY
+// per-item path — propose, retry, park, halt, and any throw — so no exit
+// path leaks a checkout. The branch (`fgw/<id>`) always survives teardown:
+// it is the durable D1-level proposal artifact (per D4). A retry never
+// builds on a previous attempt's debris: each attempt gets a FRESH worktree
+// directory checked out at the (reused) branch's head, plus an explicit
+// `reset --hard`/`clean -fd` belt-and-braces before re-spawn.
+//
+// OUTPUT DISCIPLINE (security panel): worker stdout/stderr and verify
+// output are surfaced on the console only (a tail, via `log`) — never
+// persisted to any committed path. This module writes no files at all
+// outside the store facade's own `.fgos/` writes.
+//
+// REPO ROOT: always derived from the caller's cwd (`git rev-parse
+// --show-toplevel`), never from this file's own location — the runner
+// operates on whatever repo it is invoked in, not on the repo that happens
+// to contain its source.
+
+import path from 'node:path';
+import { execFileSync, spawnSync } from 'node:child_process';
+import {
+  listWork,
+  moveWork,
+  readyWork,
+  readRawEvents,
+  categoryOf,
+  EXIT_CODES,
+} from '../state/store.mjs';
+import { DEFAULTS } from '../state/work.mjs';
+import { resolveAction, resolveStaleDoing } from './recovery.mjs';
+import {
+  visitCount,
+  hasExceededMaxVisits,
+  createMissBreaker,
+  MAX_VISITS,
+  BREAKER_MISSES,
+} from './anti-loop.mjs';
+import { spawnWorker, modelForTier } from './dispatch.mjs';
+import { createWorktree, removeWorktree, listLeftovers, branchNameFor } from './worktree.mjs';
+
+/** Resolve the repo root from `cwd` via git itself (never from __dirname —
+ * the runner binary may live in a different repo than the one it runs on).
+ * Throws with category 'validation' when `cwd` is not inside a git repo. */
+export function resolveRepoRoot(cwd = process.cwd()) {
+  try {
+    return execFileSync('git', ['rev-parse', '--show-toplevel'], {
+      cwd,
+      encoding: 'utf8',
+      shell: false,
+    }).trim();
+  } catch (err) {
+    const error = new Error(`fgos-runner must run inside a git repository (cwd: ${cwd}): ${err.message}`);
+    error.category = 'validation';
+    throw error;
+  }
+}
+
+function git(repoRoot, args) {
+  return execFileSync('git', args, { cwd: repoRoot, encoding: 'utf8', shell: false });
+}
+
+/** Branch facts the recovery matrix needs (stale-doing resolution, goal-
+ * check's has-a-commit requirement): does `fgw/<id>` exist, and how many
+ * commits does it carry beyond its merge-base with HEAD? */
+function branchFacts(repoRoot, branch) {
+  try {
+    execFileSync('git', ['rev-parse', '--verify', '--quiet', `refs/heads/${branch}`], {
+      cwd: repoRoot,
+      encoding: 'utf8',
+      shell: false,
+    });
+  } catch {
+    return { exists: false, aheadCount: 0 };
+  }
+  const mergeBase = git(repoRoot, ['merge-base', 'HEAD', branch]).trim();
+  const aheadCount = parseInt(git(repoRoot, ['rev-list', '--count', `${mergeBase}..${branch}`]).trim(), 10) || 0;
+  return { exists: true, aheadCount };
+}
+
+/** Goal-check (per D3): the RUNNER runs the item's own `verify` — the
+ * literal command string, via a shell, in the worktree checkout — and only
+ * its exit status decides. The worker's exit code/report is never trusted. */
+function runGoalCheck(item, cwd, timeoutMs) {
+  const result = spawnSync(item.verify, {
+    shell: true,
+    cwd,
+    encoding: 'utf8',
+    timeout: timeoutMs,
+    maxBuffer: 10 * 1024 * 1024,
+  });
+  return {
+    passed: result.status === 0,
+    status: result.status,
+    output: `${result.stdout ?? ''}${result.stderr ?? ''}`,
+  };
+}
+
+function tailLines(text, n = 10) {
+  const lines = String(text ?? '').trimEnd().split('\n');
+  return lines.slice(-n).join('\n');
+}
+
+/** Teardown that never masks the real outcome: a failed removal is logged
+ * and swallowed (the item's propose/park/halt result must still surface).
+ * `force` because a failed worker may leave the checkout dirty. */
+function safeRemoveWorktree(repoRoot, worktreePath, log) {
+  try {
+    removeWorktree(repoRoot, worktreePath, { force: true });
+  } catch (err) {
+    log(`fgos-runner: worktree cleanup failed for "${worktreePath}": ${err.message}`);
+  }
+}
+
+/**
+ * STARTUP REAP (reliability panel a/e/f): run BEFORE the frontier is even
+ * computed, so `--once` is idempotent after a crash.
+ *
+ * 1. Stale-doing resolution: any item sitting in `doing` (at most one under
+ *    A1, but all are handled) has no live worker — the runner that claimed
+ *    it is gone. Resolve per `resolveStaleDoing`: a branch carrying a commit
+ *    whose verify passes completes the work (`doing -> proposed`); anything
+ *    less reclaims it (`doing -> blocked`, reason runner-crash-reclaim).
+ *    The verify for the completed case runs in a throwaway worktree of the
+ *    item's own branch, torn down in a finally.
+ * 2. Orphan pruning: `fgw/*` branches with zero commits beyond their
+ *    merge-base with HEAD are worktree debris, deleted outright; branches
+ *    carrying real commits are proposals — always kept and reported, never
+ *    auto-deleted (per D4).
+ *
+ * With `dryRun` nothing is written, no worktree is created, no branch is
+ * deleted — only the planned resolutions are reported.
+ */
+export function startupReap({ repoRoot, dir, worktreeDir, verifyTimeoutMs, log = () => {}, dryRun = false } = {}) {
+  const view = listWork(dir);
+  const resolutions = [];
+
+  for (const id of Object.keys(view.work)) {
+    const item = view.work[id];
+    if (item.status !== 'doing') continue;
+
+    const branch = branchNameFor(id);
+    const facts = branchFacts(repoRoot, branch);
+    const hasCommit = facts.exists && facts.aheadCount > 0;
+
+    if (dryRun) {
+      resolutions.push({ id, planned: hasCommit ? 'verify-then-resolve' : 'blocked' });
+      continue;
+    }
+
+    let verifyPassed = false;
+    if (hasCommit) {
+      let wt = null;
+      try {
+        wt = createWorktree(repoRoot, id, { worktreeDir });
+        verifyPassed = runGoalCheck(item, wt.path, verifyTimeoutMs).passed;
+      } finally {
+        if (wt) safeRemoveWorktree(repoRoot, wt.path, log);
+      }
+    }
+
+    const resolution = resolveStaleDoing({ hasCommit, verifyPassed });
+    moveWork(dir, { id, to: resolution.to, expectedStatus: 'doing', reason: resolution.reason });
+    log(`fgos-runner: reaped stale doing "${id}" -> ${resolution.to}${resolution.reason ? ` (${resolution.reason})` : ''}`);
+    resolutions.push({ id, to: resolution.to, reason: resolution.reason ?? null });
+  }
+
+  const pruned = [];
+  const kept = [];
+  for (const { branch, aheadCount } of listLeftovers(repoRoot)) {
+    if (aheadCount === 0) {
+      if (!dryRun) {
+        git(repoRoot, ['branch', '-D', branch]);
+        log(`fgos-runner: pruned orphan branch ${branch} (no commits)`);
+      }
+      pruned.push(branch);
+    } else {
+      log(`fgos-runner: keeping ${branch} (${aheadCount} commit(s) — a proposal, never auto-deleted)`);
+      kept.push({ branch, aheadCount });
+    }
+  }
+
+  return { resolutions, pruned, kept };
+}
+
+/**
+ * Run one item through the full dispatch loop: claim it (`todo -> doing`,
+ * CAS on `todo` — a conflict here means someone raced the runner to it and
+ * bubbles up as a state-conflict halt), then dispatch. Per-claim attempt
+ * loop: each failure is
+ * classified into the recovery matrix's error-class vocabulary and routed
+ * through `resolveAction` — retry (fresh worktree, reused branch), park
+ * (`doing -> blocked`), or halt. The consecutive-miss breaker only counts
+ * goal-check misses (per anti-loop.mjs); when it trips, the item is parked
+ * first (never left dangling in `doing`) and the whole run halts.
+ */
+function processItem({ repoRoot, dir, item, config, worktreeDir, breaker, log }) {
+  moveWork(dir, { id: item.id, to: 'doing', expectedStatus: 'todo' });
+  log(`fgos-runner: claimed "${item.id}" (todo -> doing)`);
+
+  let attempt = 0;
+
+  while (true) {
+    attempt += 1;
+    let wt = null;
+    let failure = null;
+
+    try {
+      wt = createWorktree(repoRoot, item.id, { worktreeDir });
+      if (attempt > 1) {
+        // Retry never builds on debris: the fresh checkout is already at the
+        // reused branch's head, and this reset/clean makes that explicit.
+        execFileSync('git', ['reset', '--hard', 'HEAD'], { cwd: wt.path, encoding: 'utf8', shell: false });
+        execFileSync('git', ['clean', '-fdq'], { cwd: wt.path, encoding: 'utf8', shell: false });
+      }
+
+      const worker = spawnWorker(item, config, wt.path);
+      log(`fgos-runner: worker for "${item.id}" exited ${worker.status ?? `signal ${worker.signal}`} (tier ${worker.tier} -> ${worker.model})`);
+
+      const check = runGoalCheck(item, wt.path, config.timeoutMs);
+      const facts = branchFacts(repoRoot, wt.branch);
+
+      if (check.passed && facts.aheadCount > 0) {
+        breaker.recordHit();
+        moveWork(dir, { id: item.id, to: 'proposed', expectedStatus: 'doing' });
+        log(`fgos-runner: "${item.id}" proposed on branch ${wt.branch} (${facts.aheadCount} commit(s))`);
+        log(`fgos-runner: verify tail:\n${tailLines(check.output)}`);
+        return { outcome: 'proposed', id: item.id, branch: wt.branch, attempts: attempt, exitCode: 0 };
+      }
+
+      failure = {
+        errorClass: 'verify-miss',
+        message: check.passed
+          ? 'verify passed but the branch carries no commit — the worker must commit its work'
+          : `goal-check failed (exit ${check.status})`,
+      };
+      breaker.recordMiss();
+      log(`fgos-runner: goal-check miss for "${item.id}" (attempt ${attempt}): ${failure.message}`);
+      log(`fgos-runner: verify tail:\n${tailLines(check.output)}`);
+    } catch (err) {
+      if (typeof err?.errorClass === 'string') {
+        // DispatchError (worker-spawn-fail / worker-timeout) or WorktreeError
+        // (worktree-fail) — recovery-matrix vocabulary, routed below.
+        failure = { errorClass: err.errorClass, message: err.message };
+        log(`fgos-runner: ${err.errorClass} for "${item.id}" (attempt ${attempt}): ${err.message}`);
+      } else {
+        // Store/CAS/config errors bubble to runOnce's classifier — the
+        // finally below still removes the worktree on this path too.
+        throw err;
+      }
+    } finally {
+      if (wt) safeRemoveWorktree(repoRoot, wt.path, log);
+    }
+
+    const decision = resolveAction(failure.errorClass, attempt);
+    const tripped = breaker.isTripped();
+
+    if (decision.action === 'retry' && !tripped) {
+      log(`fgos-runner: retrying "${item.id}" (attempt ${attempt + 1}, fresh worktree, branch reused)`);
+      continue;
+    }
+
+    // Park before any halt so the item never dangles in `doing`. The FSM
+    // records the edge itself; the reason lives in the runner's report (the
+    // doing -> blocked edge carries no reason payload by design).
+    moveWork(dir, {
+      id: item.id,
+      to: 'blocked',
+      expectedStatus: 'doing',
+      reason: tripped ? 'breaker-tripped' : failure.errorClass,
+    });
+
+    if (tripped) {
+      log(`fgos-runner: halting — consecutive-miss breaker tripped (${breaker.consecutiveMisses} miss(es)); "${item.id}" parked`);
+      return { outcome: 'halted', reason: 'breaker-tripped', id: item.id, errorClass: failure.errorClass, attempts: attempt, exitCode: 1 };
+    }
+    if (decision.action === 'halt') {
+      log(`fgos-runner: halting on ${failure.errorClass} for "${item.id}"`);
+      return { outcome: 'halted', errorClass: failure.errorClass, id: item.id, attempts: attempt, exitCode: 1 };
+    }
+
+    log(`fgos-runner: parked "${item.id}" (${failure.errorClass}, ${attempt} attempt(s))`);
+    return { outcome: 'parked', id: item.id, errorClass: failure.errorClass, attempts: attempt, exitCode: 0 };
+  }
+}
+
+/**
+ * One sequential pass (per A1 — `--once` is Phase 2's only mode): reap,
+ * then take the frontier head (FIFO per A2), gate it through anti-loop, and
+ * run it to proposed/parked/halted. An item that trips max-visits is parked
+ * via the existing `todo -> blocked` edge (per D5) — it genuinely leaves
+ * the frontier, so the loop moves on to the next head instead of hovering.
+ *
+ * Returns a result object; never throws for a classified halt (the caller
+ * maps `exitCode` straight to the process exit).
+ */
+export function runOnce(options = {}) {
+  const log = options.log ?? ((...args) => console.log(...args));
+  const dryRun = options.dryRun ?? false;
+  const repoRoot = options.repoRoot ?? resolveRepoRoot(options.cwd ?? process.cwd());
+  const dir = options.dir ?? path.join(repoRoot, '.fgos');
+  const config = options.config;
+  const worktreeDir = options.worktreeDir;
+  const maxVisits = options.maxVisits ?? MAX_VISITS;
+  const breaker = options.breaker ?? createMissBreaker(options.breakerThreshold ?? BREAKER_MISSES);
+  const parked = [];
+
+  try {
+    const reap = startupReap({ repoRoot, dir, worktreeDir, verifyTimeoutMs: config?.timeoutMs, log, dryRun });
+
+    while (true) {
+      const frontierItems = readyWork(dir);
+      if (frontierItems.length === 0) {
+        log('fgos-runner: frontier empty — nothing to do.');
+        return { outcome: 'idle', reap, parked, exitCode: 0 };
+      }
+
+      const item = frontierItems[0];
+      const visits = visitCount(readRawEvents(dir), item.id);
+
+      if (hasExceededMaxVisits(visits, maxVisits)) {
+        if (dryRun) {
+          return {
+            outcome: 'dry-run',
+            plan: { park: item.id, reason: 'anti-loop-max-visits', visits },
+            reap,
+            parked,
+            exitCode: 0,
+          };
+        }
+        moveWork(dir, { id: item.id, to: 'blocked', expectedStatus: 'todo', reason: 'anti-loop-max-visits' });
+        log(`fgos-runner: parked "${item.id}" — anti-loop max-visits (${visits}/${maxVisits})`);
+        parked.push({ id: item.id, reason: 'anti-loop-max-visits', visits });
+        continue; // the parked item left the frontier; take the next head
+      }
+
+      if (dryRun) {
+        const tier = item.tier ?? DEFAULTS.tier;
+        const plan = {
+          dispatch: item.id,
+          tier,
+          model: modelForTier(config, tier),
+          branch: branchNameFor(item.id),
+          verify: item.verify,
+          visits,
+        };
+        log(`fgos-runner: dry-run — would dispatch "${item.id}" (tier ${plan.tier} -> ${plan.model}) on ${plan.branch}`);
+        return { outcome: 'dry-run', plan, reap, parked, exitCode: 0 };
+      }
+
+      const result = processItem({ repoRoot, dir, item, config, worktreeDir, breaker, log });
+      return { ...result, reap, parked };
+    }
+  } catch (err) {
+    const category = categoryOf(err);
+    const exitCode = EXIT_CODES[category];
+    if (exitCode === undefined) throw err; // a real bug — the caller exits 1
+    const errorClass = category === 'conflict' ? 'state-conflict' : category;
+    log(`fgos-runner: halting (${errorClass}): ${err.message}`);
+    return { outcome: 'halted', errorClass, message: err.message, parked, exitCode };
+  }
+}

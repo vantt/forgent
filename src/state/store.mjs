@@ -21,7 +21,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { appendEvent } from './events.mjs';
+import { appendEvent, readEvents } from './events.mjs';
 import { rebuildView } from './replay.mjs';
 import { transitionWork, FsmError } from './fsm.mjs';
 import { validateWork, WorkValidationError, DEFAULTS } from './work.mjs';
@@ -172,6 +172,20 @@ export function listWork(dir) {
 export function readyWork(dir) {
   const { logPath } = paths(dir);
   return frontier(rebuildView(logPath));
+}
+
+/**
+ * Read-only: the raw event array from the log, in append order (decision
+ * 14396a5c). This exists so the runner's anti-loop can derive visit counts
+ * from raw events WITHOUT resolving `.fgos/` paths itself — this module
+ * stays the one place that maps a dir to its files, and the single write
+ * door is untouched (this accessor never appends, never rebuilds the view).
+ * Same failure surface as any read here: a missing log reads as `[]`, a
+ * corrupt log throws EventLogError('corrupt-log').
+ */
+export function readRawEvents(dir) {
+  const { logPath } = paths(dir);
+  return readEvents(logPath);
 }
 
 /**
