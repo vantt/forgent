@@ -1,7 +1,7 @@
 ---
 area: system-overview
-updated: 2026-07-14
-decisions: [ca7de3cf, ae461c8b, ed953e09, 14ebeea9]
+updated: 2026-07-15
+decisions: [ca7de3cf, ae461c8b, ed953e09, 14ebeea9, 1a80b4d3]
 coverage: partial
 ---
 
@@ -24,6 +24,7 @@ coverage: partial
 | Nguồn tham chiếu (reference source) | Một repo/tài liệu ngoài được quét để học feature | distillery (owns), distill-skill (đọc/ghi index) |
 | Luật nền (platform law) | Một luật thiết kế đã khóa, có D-ID và ngưỡng xem lại | platform-foundations (owns); mọi area tương lai tuân theo |
 | Work item (`work`) | Đơn vị việc duy nhất của forgent: trạng thái FSM + deps phẳng + tier, đủ trường trả lời sáu câu harness | work-state (owns), runner (đọc frontier, ghi chuyển trạng thái qua cửa work-state) |
+| Bản ghi kết quả (outcome) | Bản ghi hai nửa gắn theo id work item — dự đoán lúc nhận việc, thực tế lúc việc tới trạng thái cuối (thành công lẫn thất bại) — cộng dồn theo id, không bao giờ đè nhau; nguồn tín hiệu cho vòng học compound | work-state (owns fold + đọc qua `fgos check`), runner (ghi cả hai nửa trong vòng dispatch) |
 
 [unknown — các entity khác cần harvest interview; xem Open Gaps]
 
@@ -37,7 +38,7 @@ coverage: partial
 
 ## Cross-Area Flows
 
-**Vòng tự hành việc (work-state ↔ runner):** người vận hành khai việc (`fgos add`) → runner `--once` lấy việc sẵn-sàng từ frontier → claim `doing` → trợ lý nền làm trong nhánh `fgw/` → runner tự chấm bằng proof của việc → đạt: `proposed` (đề xuất + nhánh) → NGƯỜI duyệt/merge → `done` → việc phụ thuộc mở khóa. Trượt/lỗi: bảng phục hồi → thử-lại/đỗ-lại/dừng.
+**Vòng tự hành việc (work-state ↔ runner):** người vận hành khai việc (`fgos add`) → runner `--once` lấy việc sẵn-sàng từ frontier → claim `doing` (runner ghi nửa dự đoán của bản ghi outcome) → trợ lý nền làm trong nhánh `fgw/` → runner tự chấm bằng proof của việc → đạt: `proposed` (đề xuất + nhánh, runner ghi nửa thực tế) → NGƯỜI duyệt/merge → `done` → việc phụ thuộc mở khóa. Trượt/lỗi: bảng phục hồi → thử-lại/đỗ-lại (ghi nửa thực tế)/dừng (ghi nửa thực tế). Cả hai nửa đọc lại được qua `fgos check` — nguồn của vòng học compound.
 
 [unknown — vòng học distillery → porting → platform law cần harvest xác nhận từng bước; xem Open Gaps]
 
