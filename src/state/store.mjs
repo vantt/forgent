@@ -124,7 +124,7 @@ export function addWork(dir, work) {
  * delegates the precondition/CAS decision to fsm.mjs (pure — never writes),
  * and only then appends the event it returns.
  */
-export function moveWork(dir, { id, to, expectedStatus, reason } = {}) {
+export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer } = {}) {
   const { logPath } = paths(dir);
   const before = rebuildView(logPath);
   const work = before.work[id];
@@ -132,14 +132,35 @@ export function moveWork(dir, { id, to, expectedStatus, reason } = {}) {
     throw new StoreError('validation', `work "${id}" not found.`);
   }
 
-  // `reason` is only meaningful on the proposed -> todo rejection edge
-  // (per D5); fsm.mjs enforces that requirement and ignores `reason`
-  // entirely for every other edge — this facade never branches on `to`
-  // itself, it just forwards what the caller gave it.
-  const rawEvent = transitionWork({ work, to, expectedStatus, reason }); // FsmError: precondition | conflict
+  // `reason`/`ask`/`answer` are each only meaningful on their own edge
+  // (per D5 for `reason`; async-human-gate D2/D5 for `ask`/`answer`);
+  // fsm.mjs enforces those requirements and ignores whichever of the three
+  // doesn't apply to the edge being taken — this facade never branches on
+  // `to` itself, it just forwards what the caller gave it.
+  const rawEvent = transitionWork({ work, to, expectedStatus, reason, ask, answer }); // FsmError: precondition | conflict
   const event = appendEvent(logPath, rawEvent); // captures the real seq; rawEvent itself has none
   const view = refreshView(dir);
   return { event, view };
+}
+
+/**
+ * Park a work item into `awaiting-human`, carrying the question it is
+ * waiting on (per D2/D5). Thin wrapper over `moveWork` — same
+ * append-then-refresh tail, same CAS/validation errors — fsm.mjs requires a
+ * non-empty `ask` on this edge.
+ */
+export function putInAwaiting(dir, { id, ask, expectedStatus } = {}) {
+  return moveWork(dir, { id, to: 'awaiting-human', expectedStatus, ask });
+}
+
+/**
+ * Resume a work item out of `awaiting-human` back to `todo`, carrying the
+ * answer it was waiting on (per D2/D5). Thin wrapper over `moveWork` — same
+ * append-then-refresh tail, same CAS/validation errors — fsm.mjs requires a
+ * non-empty `answer` on this edge.
+ */
+export function answerAwaiting(dir, { id, answer, expectedStatus } = {}) {
+  return moveWork(dir, { id, to: 'todo', expectedStatus, answer });
 }
 
 /** Log a decision event (no FSM/work validation — decisions are freeform). */

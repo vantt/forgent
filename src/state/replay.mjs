@@ -44,10 +44,29 @@ function applyEvent(view, event) {
       break;
     }
     case 'work.move': {
-      const { id, to } = event.payload ?? {};
+      const { id, to, ask, answer } = event.payload ?? {};
       const item = view.work[id];
       if (item) {
         item.status = to;
+      }
+      // Human-gate ask/answer (per async-human-gate D2/D5), mirroring the
+      // work.outcome lazy-key/merge-by-id precedent above: the ask (entry
+      // move into awaiting-human) and answer (exit move back to todo) ride
+      // as optional payload on the SAME work.move event rather than a
+      // separate event type, so this folds them into a lazy `gates` key
+      // merged by id instead of a new case. GUARDED on ask/answer actually
+      // being present — a gateless move never creates the key, and `gates`
+      // stays absent from the view entirely on any log with no gate events
+      // (mirrors the "no outcomes key" backward-compat guarantee).
+      if (ask || answer) {
+        if (!view.gates) {
+          view.gates = {};
+        }
+        view.gates[id] = {
+          ...view.gates[id],
+          ...(ask ? { ask } : {}),
+          ...(answer ? { answer } : {}),
+        };
       }
       break;
     }
