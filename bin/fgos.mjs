@@ -73,6 +73,36 @@ function parseListFlag(value) {
     .filter(Boolean);
 }
 
+// One block per item, always naming both halves explicitly (`predicted:` /
+// `actual:`) even when a half is still missing — this is what makes the
+// output real CoS evidence (per plan Approach S1) rather than a bare
+// "has outcome" flag: a reader (human or e2e assertion) sees the actual
+// predicted/actual VALUES, not just the words.
+function formatOutcomeBlock(id, entry) {
+  const predictedLine = entry?.predicted
+    ? `  predicted: ${JSON.stringify(entry.predicted)}`
+    : '  predicted: chưa có dữ liệu';
+  const actualLine = entry?.actual
+    ? `  actual: ${JSON.stringify(entry.actual)}`
+    : '  actual: chưa có dữ liệu';
+  return `${id}\n${predictedLine}\n${actualLine}`;
+}
+
+// Read-only formatter (per D1 request-class): folds `view.outcomes` (lazy
+// key — absent on any log with no work.outcome events, per replay.mjs) into
+// a predicted-vs-actual report. Never throws on missing data — an item with
+// no outcome yet, or a log with no `outcomes` key at all, both print
+// "chưa có dữ liệu" and the caller still exits 0 (this is a read, not a
+// validation failure).
+function formatCheck(view, id) {
+  const outcomes = view.outcomes ?? {};
+  const ids = id ? [id] : Object.keys(outcomes);
+  if (ids.length === 0) {
+    return 'chưa có dữ liệu';
+  }
+  return ids.map((itemId) => formatOutcomeBlock(itemId, outcomes[itemId])).join('\n\n');
+}
+
 function runVerb(verb, flags, positional, dir) {
   switch (verb) {
     case 'init': {
@@ -141,8 +171,18 @@ function runVerb(verb, flags, positional, dir) {
       return `Rebuilt view: ${Object.keys(view.work).length} work item(s), ${view.decisions.length} decision(s).`;
     }
 
+    // Request-class per D1 (same contract as `ready`/`list`): a pure read,
+    // never appends an event, never mutates state.json. Reports the
+    // predicted-vs-actual compound-learning signal (per Phase 3 plan
+    // Approach S1) folded from `listWork(dir).outcomes` — no new store
+    // export needed for reading, per this cell's action.
+    case 'check': {
+      const id = optionalField(positional[0] ?? flags.id, 'check --id requires a non-empty id value (omit --id entirely to check every item)');
+      return formatCheck(listWork(dir), id);
+    }
+
     default:
-      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <init|add|move|decision|list|ready|rebuild> ...`);
+      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <init|add|move|decision|list|ready|rebuild|check> ...`);
   }
 }
 

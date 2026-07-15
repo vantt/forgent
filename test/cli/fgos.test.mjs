@@ -5,6 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
+import { addOutcome } from '../../src/state/store.mjs';
 
 // The CLI under test, resolved by absolute path so it works regardless of
 // the spawned process's cwd (which every test below points at a fresh
@@ -511,4 +512,78 @@ test('GOLDEN request-class: running ready twice never appends to events.jsonl, a
 
   const viewAfter = fs.existsSync(viewPath(cwd)) ? fs.readFileSync(viewPath(cwd), 'utf8') : null;
   assert.equal(viewAfter, viewBefore, 'state.json must be untouched by ready (read never writes the view)');
+});
+
+// --- `fgos check` (phase-3-compound-learning-3): predicted-vs-actual report ---
+//
+// `check` is a pure read (per D1 request-class, same as `ready`/`list`) over
+// `listWork(dir).outcomes` — the CLI itself has no verb that WRITES a
+// work.outcome event (only the runner does, per plan Approach S1), so these
+// tests seed outcome data directly through store.mjs's addOutcome, the same
+// single write door the runner uses, then exercise the real `check` binary.
+
+test('check on an item with no recorded outcome prints "chưa có dữ liệu" for that id, exit 0, no throw', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'unchecked-item');
+  const result = run(cwd, ['check', 'unchecked-item']);
+  assert.equal(result.status, 0);
+  assert.match(result.stdout, /chưa có dữ liệu/);
+});
+
+test('check on a directory with no log at all prints "chưa có dữ liệu", exit 0 (a read never initializes .fgos/)', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['check']);
+  assert.equal(result.status, 0);
+  assert.match(result.stdout, /chưa có dữ liệu/);
+  assert.ok(!fs.existsSync(path.join(cwd, '.fgos')));
+});
+
+test('check prints BOTH predicted and actual values for an item with real outcome data, exit 0', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'checked-item');
+  const dir = path.join(cwd, '.fgos');
+  addOutcome(dir, { id: 'checked-item', predicted: { tier: 'standard', deps: 0, priorVisits: 0 } });
+  addOutcome(dir, {
+    id: 'checked-item',
+    actual: { outcome: 'proposed', passed: true, attempts: 1, errorClass: null, aheadCount: 1, visits: 1 },
+  });
+
+  const result = run(cwd, ['check', 'checked-item']);
+  assert.equal(result.status, 0);
+  assert.match(result.stdout, /checked-item/);
+  assert.match(result.stdout, /predicted/);
+  assert.match(result.stdout, /"tier":"standard"/);
+  assert.match(result.stdout, /actual/);
+  assert.match(result.stdout, /"outcome":"proposed"/);
+  assert.match(result.stdout, /"passed":true/);
+});
+
+test('check with no id given reports every item that has outcome data, exit 0', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'item-a');
+  addOk(cwd, 'item-b');
+  const dir = path.join(cwd, '.fgos');
+  addOutcome(dir, { id: 'item-a', predicted: { tier: 'light', deps: 0, priorVisits: 0 } });
+  addOutcome(dir, { id: 'item-a', actual: { outcome: 'proposed', passed: true, attempts: 1, errorClass: null, aheadCount: 1, visits: 1 } });
+
+  const result = run(cwd, ['check']);
+  assert.equal(result.status, 0);
+  assert.match(result.stdout, /item-a/);
+  assert.doesNotMatch(result.stdout, /item-b/, 'item-b has no outcome data yet, so it is not listed');
+});
+
+test('check never mutates state: events.jsonl and state.json are byte-identical before/after', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'read-only-item');
+  const dir = path.join(cwd, '.fgos');
+  addOutcome(dir, { id: 'read-only-item', predicted: { tier: 'standard', deps: 0, priorVisits: 0 } });
+
+  const logBefore = fs.readFileSync(logPath(cwd), 'utf8');
+  const viewBefore = fs.readFileSync(viewPath(cwd), 'utf8');
+
+  const result = run(cwd, ['check', 'read-only-item']);
+  assert.equal(result.status, 0);
+
+  assert.equal(fs.readFileSync(logPath(cwd), 'utf8'), logBefore, 'events.jsonl must be untouched by check');
+  assert.equal(fs.readFileSync(viewPath(cwd), 'utf8'), viewBefore, 'state.json must be untouched by check');
 });

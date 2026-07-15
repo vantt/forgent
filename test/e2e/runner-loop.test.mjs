@@ -262,6 +262,19 @@ test('e2e full journey: item1 (no deps) -> proposed with a worker commit on fgw/
   assert.match(second.stdout, /idle/);
   assert.equal(stateView(repoRoot).work.item2.status, 'todo');
   assert.equal(events(repoRoot).length, afterFirstEvents.length, 'the idle pass appended no event');
+
+  // CoS evidence (phase-3-compound-learning-3): after a REAL --once run (not
+  // fixture-only), `fgos check` reads the on-disk log and prints BOTH
+  // halves of the predicted->actual pair for item1 — real values, not just
+  // an "outcome exists" flag.
+  const check = fgos(repoRoot, ['check', 'item1']);
+  assert.equal(check.status, 0, `fgos check failed: ${check.stderr}`);
+  assert.match(check.stdout, /item1/);
+  assert.match(check.stdout, /predicted/);
+  assert.match(check.stdout, /"tier":"standard"/, 'predicted half carries the real claimed tier');
+  assert.match(check.stdout, /actual/);
+  assert.match(check.stdout, /"outcome":"proposed"/, 'actual half carries the real dispatch outcome');
+  assert.match(check.stdout, /"passed":true/);
 });
 
 // --- case 2: verify-red -> blocked, never proposed --------------------------
