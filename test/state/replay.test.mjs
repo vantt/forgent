@@ -78,6 +78,25 @@ test('rebuildView twice from the same log produces deep-equal views (D3 determin
   assert.equal(first.decisions.length, 1);
 });
 
+test('foldEvents merges predicted (claim) and actual (close) work.outcome events by id — never replaces', () => {
+  const events = [
+    { seq: 1, ts: '2026-07-15T00:00:00.000Z', type: 'work.outcome', payload: { id: 'a', predicted: { tier: 'standard' } } },
+    { seq: 2, ts: '2026-07-15T00:00:01.000Z', type: 'work.outcome', payload: { id: 'a', actual: { passed: true, attempts: 1 } } },
+  ];
+  const view = foldEvents(events);
+  assert.deepEqual(view.outcomes.a.predicted, { tier: 'standard' });
+  assert.deepEqual(view.outcomes.a.actual, { passed: true, attempts: 1 });
+});
+
+test('foldEvents on a log with no work.outcome events yields a view with no "outcomes" key', () => {
+  const events = [
+    { seq: 1, ts: '2026-07-14T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo' } },
+    { seq: 2, ts: '2026-07-14T00:00:01.000Z', type: 'decision', payload: { text: 'no outcomes yet' } },
+  ];
+  const view = foldEvents(events);
+  assert.equal('outcomes' in view, false);
+});
+
 test('rebuildView preserves the historical ts from each event, never the current wall-clock time', () => {
   const logPath = tmpLogPath();
   // A ts far in the past — if replay ever called Date.now() instead of using

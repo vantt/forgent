@@ -55,6 +55,25 @@ function applyEvent(view, event) {
       view.decisions.push({ ...event.payload, ts: event.ts });
       break;
     }
+    case 'work.outcome': {
+      // Additive event type (per D7 schema evolution / plan Approach S1):
+      // predicted (written at claim) and actual (written at close) are TWO
+      // separate work.outcome events sharing the same `id` — this MERGES by
+      // id rather than replacing, so a later actual-only payload folds
+      // alongside an earlier predicted-only payload instead of erasing it.
+      // `outcomes` is a LAZY key: never present on `view` until at least one
+      // work.outcome event folds (see foldEvents' initializer above) — this
+      // keeps replay of any log with no work.outcome events shaped exactly
+      // as before this event type existed (backward-compat.test).
+      const { id } = event.payload ?? {};
+      if (typeof id === 'string') {
+        if (!view.outcomes) {
+          view.outcomes = {};
+        }
+        view.outcomes[id] = { ...view.outcomes[id], ...event.payload };
+      }
+      break;
+    }
     default:
       // Forward-compatible: an event type this view does not (yet) know how
       // to fold is skipped, not an error — readEvents already guarantees

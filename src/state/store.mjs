@@ -153,6 +153,24 @@ export function addDecision(dir, payload) {
   return { event, view };
 }
 
+/**
+ * Log a work-outcome event (predicted at claim, actual at close — per plan
+ * Approach S1). No FSM/work validation beyond requiring the `id` the fold
+ * merges on; unlike `addDecision`, payload shape (predicted-only vs
+ * actual-only) is the caller's (runner's) concern, not this facade's — this
+ * is still the single write door (D3), same append-then-refresh tail as
+ * every other mutation here.
+ */
+export function addOutcome(dir, payload) {
+  const { logPath } = paths(dir);
+  if (!payload || typeof payload.id !== 'string' || !payload.id.trim()) {
+    throw new StoreError('validation', 'outcome requires a non-empty "id".');
+  }
+  const event = appendEvent(logPath, { type: 'work.outcome', payload });
+  const view = refreshView(dir);
+  return { event, view };
+}
+
 /** Read-only: the current view, rebuilt fresh from the log (never off a stale file). */
 export function listWork(dir) {
   const { logPath } = paths(dir);
