@@ -7,7 +7,7 @@ function work(status, overrides = {}) {
 }
 
 test('STATUSES exposes the full flat status domain', () => {
-  assert.deepEqual(STATUSES, ['todo', 'doing', 'blocked', 'proposed', 'done']);
+  assert.deepEqual(STATUSES, ['todo', 'doing', 'blocked', 'proposed', 'done', 'awaiting-human']);
 });
 
 for (const [from, to] of [
@@ -69,6 +69,9 @@ test('every legal edge is exactly the declared table; every other status pair is
     'doing->proposed',
     'proposed->done',
     'proposed->todo',
+    'todo->awaiting-human',
+    'doing->awaiting-human',
+    'awaiting-human->todo',
   ]);
   for (const from of STATUSES) {
     for (const to of STATUSES) {
@@ -76,6 +79,8 @@ test('every legal edge is exactly the declared table; every other status pair is
       if (legalEdges.has(key)) {
         const args = { work: work(from), to };
         if (key === 'proposed->todo') args.reason = 'sweep-test reason';
+        if (to === 'awaiting-human') args.ask = 'sweep-test ask';
+        if (key === 'awaiting-human->todo') args.answer = 'sweep-test answer';
         assert.doesNotThrow(() => transitionWork(args), `expected ${key} to be legal`);
       } else {
         assert.throws(
@@ -88,6 +93,75 @@ test('every legal edge is exactly the declared table; every other status pair is
   }
 });
 
+test('transitionWork allows todo -> awaiting-human and doing -> awaiting-human, carrying the ask in the payload', () => {
+  for (const from of ['todo', 'doing']) {
+    const event = transitionWork({ work: work(from), to: 'awaiting-human', ask: 'which auth method?' });
+    assert.deepEqual(event, {
+      type: 'work.move',
+      payload: { id: 'w1', from, to: 'awaiting-human', ask: 'which auth method?' },
+    });
+  }
+});
+
+test('transitionWork rejects entry into awaiting-human without a non-empty ask as validation, not precondition', () => {
+  for (const from of ['todo', 'doing']) {
+    assert.throws(
+      () => transitionWork({ work: work(from), to: 'awaiting-human' }),
+      (err) => err instanceof FsmError && err.category === 'validation',
+    );
+    assert.throws(
+      () => transitionWork({ work: work(from), to: 'awaiting-human', ask: '   ' }),
+      (err) => err instanceof FsmError && err.category === 'validation',
+    );
+  }
+});
+
+test('transitionWork allows awaiting-human -> todo (resume, per D5) and carries the answer in the payload', () => {
+  const event = transitionWork({ work: work('awaiting-human'), to: 'todo', answer: 'use OAuth' });
+  assert.deepEqual(event, {
+    type: 'work.move',
+    payload: { id: 'w1', from: 'awaiting-human', to: 'todo', answer: 'use OAuth' },
+  });
+});
+
+test('transitionWork rejects resuming from awaiting-human without a non-empty answer as validation, not precondition', () => {
+  assert.throws(
+    () => transitionWork({ work: work('awaiting-human'), to: 'todo' }),
+    (err) => err instanceof FsmError && err.category === 'validation',
+  );
+  assert.throws(
+    () => transitionWork({ work: work('awaiting-human'), to: 'todo', answer: '   ' }),
+    (err) => err instanceof FsmError && err.category === 'validation',
+  );
+});
+
+test('ask/answer are ignored (never appear in payload) for every edge other than the awaiting-human entry/exit edges', () => {
+  const event = transitionWork({ work: work('todo'), to: 'doing', ask: 'dropped ask', answer: 'dropped answer' });
+  assert.deepEqual(event, { type: 'work.move', payload: { id: 'w1', from: 'todo', to: 'doing' } });
+});
+
+test('there is no awaiting-human -> doing edge (single exit only, per D-edge)', () => {
+  assert.throws(
+    () => transitionWork({ work: work('awaiting-human'), to: 'doing' }),
+    (err) => err instanceof FsmError && err.category === 'precondition',
+  );
+});
+
+test('awaiting-human is not reachable from blocked, proposed, or done, and does not accept doing/blocked/proposed/done as a resume target', () => {
+  for (const from of ['blocked', 'proposed', 'done']) {
+    assert.throws(
+      () => transitionWork({ work: work(from), to: 'awaiting-human', ask: 'irrelevant' }),
+      (err) => err instanceof FsmError && err.category === 'precondition',
+    );
+  }
+  for (const to of ['doing', 'blocked', 'proposed', 'done']) {
+    assert.throws(
+      () => transitionWork({ work: work('awaiting-human'), to, answer: 'irrelevant' }),
+      (err) => err instanceof FsmError && err.category === 'precondition',
+    );
+  }
+});
+
 test('transitionWork rejects a transition not in the table and returns no event', () => {
   assert.throws(
     () => transitionWork({ work: work('todo'), to: 'done' }),
@@ -96,7 +170,7 @@ test('transitionWork rejects a transition not in the table and returns no event'
 });
 
 test('done is terminal single-door: no transition out of done, no matter the target', () => {
-  for (const to of ['todo', 'doing', 'blocked']) {
+  for (const to of ['todo', 'doing', 'blocked', 'awaiting-human']) {
     assert.throws(
       () => transitionWork({ work: work('done'), to }),
       (err) => err instanceof FsmError && err.category === 'precondition',

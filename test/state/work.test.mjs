@@ -79,6 +79,10 @@ test('validateWork accepts every status in STATUSES', () => {
   }
 });
 
+test('STATUSES includes awaiting-human (per async-human-gate D1/D3)', () => {
+  assert.ok(STATUSES.includes('awaiting-human'));
+});
+
 test('validateWork rejects a work item that lists itself as a dep', () => {
   assert.throws(
     () => validateWork(baseWork({ id: 'a', deps: ['a'] })),

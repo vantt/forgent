@@ -22,11 +22,14 @@ const ID_PATTERN = /^[a-z][a-z0-9]*(-[a-z0-9]+)*$/;
 /**
  * The full status domain for `work` (per D4's single flat FSM, extended by
  * D5 with `proposed`: a goal-check pass sitting on a branch, awaiting
- * approval/merge before it becomes `done`). Owned here (schema owns domain)
- * — fsm.mjs imports and re-exports this rather than defining its own copy,
- * so there is exactly one list of legal statuses.
+ * approval/merge before it becomes `done`; extended by async-human-gate D1/D3
+ * with `awaiting-human`: a single generic human-gate state, separate from
+ * `blocked`, that a work item parks in while waiting for a person to answer
+ * a question — see fsm.mjs for its transition edges). Owned here (schema
+ * owns domain) — fsm.mjs imports and re-exports this rather than defining
+ * its own copy, so there is exactly one list of legal statuses.
  */
-export const STATUSES = Object.freeze(['todo', 'doing', 'blocked', 'proposed', 'done']);
+export const STATUSES = Object.freeze(['todo', 'doing', 'blocked', 'proposed', 'done', 'awaiting-human']);
 
 /**
  * Tier domain for `work.tier` (per D6) — the cost/cognitive weight a work

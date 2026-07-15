@@ -11,6 +11,12 @@
 // still zero doors out): `doing -> done` (an operator's direct hand-move)
 // and `proposed -> done` (approval/merge of a worker's proposal). Neither
 // is more canonical than the other — both are asserted by test.
+//
+// async-human-gate D1/D3/D5: `awaiting-human` is a single generic park
+// state, entered from either `todo` or `doing` (the two states an item can
+// hold before parking) and left through exactly one exit, back to `todo`
+// (resume makes the item actionable again; no `awaiting-human -> doing`
+// edge — YAGNI, add only if a real consumer needs it).
 
 import { STATUSES } from './work.mjs';
 
@@ -44,6 +50,9 @@ const TRANSITIONS = Object.freeze([
   Object.freeze({ from: 'doing', to: 'proposed' }),
   Object.freeze({ from: 'proposed', to: 'done' }),
   Object.freeze({ from: 'proposed', to: 'todo' }),
+  Object.freeze({ from: 'todo', to: 'awaiting-human' }),
+  Object.freeze({ from: 'doing', to: 'awaiting-human' }),
+  Object.freeze({ from: 'awaiting-human', to: 'todo' }),
 ]);
 
 /**
@@ -67,8 +76,17 @@ const TRANSITIONS = Object.freeze([
  * (checked only after the edge itself is confirmed legal, so an illegal
  * edge still reports 'precondition' first). For every other edge, `reason`
  * is ignored and never appears in the returned event's payload.
+ *
+ * Human-gate ask/answer (per async-human-gate D2/D5), mirroring the `reason`
+ * mechanism above: entering `awaiting-human` (`todo -> awaiting-human` or
+ * `doing -> awaiting-human`) requires a non-empty `ask` explaining what the
+ * gate is waiting for; leaving it (`awaiting-human -> todo`) requires a
+ * non-empty `answer`. Both are refused with category 'validation' when
+ * missing or blank (checked only after the edge itself is confirmed legal).
+ * `ask`/`answer` are ignored and never appear in the payload for any other
+ * edge, exactly like `reason`.
  */
-export function transitionWork({ work, to, expectedStatus, reason } = {}) {
+export function transitionWork({ work, to, expectedStatus, reason, ask, answer } = {}) {
   if (!work || typeof work !== 'object' || Array.isArray(work)) {
     throw new FsmError('precondition', 'transitionWork: "work" must be a work item object.');
   }
@@ -104,6 +122,26 @@ export function transitionWork({ work, to, expectedStatus, reason } = {}) {
       );
     }
     payload.reason = reason.trim();
+  }
+
+  if (to === 'awaiting-human') {
+    if (typeof ask !== 'string' || !ask.trim()) {
+      throw new FsmError(
+        'validation',
+        `transitionWork: "ask" is required and must be a non-empty string when moving work "${work.id}" into awaiting-human.`,
+      );
+    }
+    payload.ask = ask.trim();
+  }
+
+  if (from === 'awaiting-human' && to === 'todo') {
+    if (typeof answer !== 'string' || !answer.trim()) {
+      throw new FsmError(
+        'validation',
+        `transitionWork: "answer" is required and must be a non-empty string when resuming work "${work.id}" from awaiting-human.`,
+      );
+    }
+    payload.answer = answer.trim();
   }
 
   return { type: 'work.move', payload };
