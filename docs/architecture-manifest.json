@@ -1,0 +1,20 @@
+{
+  "contract": "architecture-manifest.v1",
+  "map": "docs/architecture-map.md",
+  "layers": ["entry", "use-case", "infra", "domain", "kernel"],
+  "files": {
+    "bin/fgos.mjs": "entry",
+    "bin/fgos-runner.mjs": "entry",
+    "src/runner/loop.mjs": "use-case",
+    "src/runner/dispatch.mjs": "infra",
+    "src/runner/worktree.mjs": "infra",
+    "src/state/store.mjs": "infra",
+    "src/runner/recovery.mjs": "domain",
+    "src/runner/anti-loop.mjs": "domain",
+    "src/state/fsm.mjs": "domain",
+    "src/state/frontier.mjs": "domain",
+    "src/state/replay.mjs": "domain",
+    "src/state/events.mjs": "kernel",
+    "src/state/work.mjs": "kernel"
+  }
+}

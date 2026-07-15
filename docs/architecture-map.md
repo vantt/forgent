@@ -14,7 +14,7 @@ record kèm nâng version — supersede, không sửa ngầm.
 1. Thứ tự tầng sửa theo import graph THẬT: `Entry → Use-case → Infra → Domain →
    Kernel` (v0.1 đặt Domain trên Infra — bị chính đồ thị import bác bỏ).
 2. Host Adapter không còn là tầng đầu chuỗi — là **ổ cắm** (port + config) bên hông.
-3. Sổ component xây lại bottom-up từ inventory file: đủ 14 module (v0.1 thiếu 5),
+3. Sổ component xây lại bottom-up từ inventory file: đủ 13 module (v0.1 thiếu 5),
    tách hai loại row **component** (một nhà) và **slice** (lát dọc).
 4. Thêm contract **C9 · executor.v1** (biên model-gateway ↔ provider — đã live,
    trước đây vô danh); C6 hạ maturity `live` → `designed` cho đúng sự thật.
@@ -94,7 +94,7 @@ Vì sao kết cấu làm khung chính chứ không phải sáu vai (planes):
 ## 3 · Bản vẽ kết cấu — STRUCTURE (khung chính)
 
 Năm tầng lõi, phụ thuộc **một chiều xuống** — đo trên đồ thị import thật, toàn bộ
-14 module hiện hành tuân thủ. Host Adapter đứng ngoài chuỗi: nó là **ổ cắm**.
+13 module hiện hành tuân thủ. Host Adapter đứng ngoài chuỗi: nó là **ổ cắm**.
 
 ```mermaid
 flowchart TB
@@ -246,9 +246,11 @@ Chú ý cách mọi lời giải đều là **phép tách** — đó chính là 
 Hai loại row — **component** (một module, đúng một nhà) và **slice** (tính năng
 xuyên tầng, trỏ về các component). Cột maturity buộc sổ nói thật: `live` · `partial`
 · `planned` (có PBI) · `idea`. Sổ xây bottom-up từ `find src bin -name "*.mjs"` —
-**đủ 14/14 module**, và §9.3 giao cho máy giữ tình trạng "đủ" này.
+**đủ 13/13 module** (bản máy-đọc: `docs/architecture-manifest.json`), và §9.3 giao
+cho máy giữ tình trạng "đủ" này. (v0.2 lúc đầu khai "14/14" — chính phép đếm bằng
+máy bắt được lỗi đếm tay này.)
 
-### Component — live (14/14 file có thẻ)
+### Component — live (13/13 file có thẻ)
 
 | Module | Nhà | Physics | Vai | Contracts |
 |---|---|---|---|---|
@@ -393,11 +395,12 @@ lai (S2, P14, P17, P8) **đã có chỗ ngồi vẽ sẵn**.
 2. **Năm từ dành riêng.** `event` · `state` · `store` · `signal` · `run` chỉ mang
    nghĩa §4. Không đặt tên module, biến, khái niệm khác bằng năm từ này.
 3. **Bản đồ nói thật — và máy giữ lời.** Mọi row mang maturity; khát vọng ghi là
-   `planned`/`idea`. Kèm theo chấp nhận bản đồ là một cell nhỏ: **registry-manifest
-   máy-đọc + script hai phép kiểm trong verify** — (a) chiều import một-chiều-xuống
-   theo nhà đã khai; (b) **đủ sổ**: mọi file `src/**` `bin/**` có row. Hai phép kiểm
-   là hai mặt một script; v0.1 thiếu cả hai nên vừa sai chiều tầng vừa thiếu 5 module
-   mà không ai thấy.
+   `planned`/`idea`. Hiện thực (P20): **`docs/architecture-manifest.json`**
+   (file→tầng, contract `architecture-manifest.v1`) + **`test/architecture.test.mjs`**
+   chạy trong `npm test` — (a) chiều import một-chiều-xuống theo nhà đã khai;
+   (b) **đủ sổ**: mọi file `src/**` `bin/**` có row, một-một. Hai phép kiểm là hai
+   mặt một test; v0.1 thiếu cả hai nên vừa sai chiều tầng vừa thiếu 5 module mà
+   không ai thấy. Thêm module mới = thêm row manifest + row §6, không thì test đỏ.
 4. **Một nhà duy nhất cho component; slice khai là slice.** Tranh cãi "X để đâu"
    giải bằng thần chú §0; một *component* thật sự cần hai nhà = tách nó làm hai;
    một *tính năng* chạm nhiều nhà = nó là slice, khai đúng loại row.
