@@ -17,6 +17,14 @@
 
 import path from 'node:path';
 import { initStore, addWork, moveWork, addDecision, listWork, readyWork, rebuild, putInAwaiting, answerAwaiting, StoreError, EXIT_CODES, categoryOf } from '../src/state/store.mjs';
+import { deriveTitle, classify, generateId } from '../src/intake/classify.mjs';
+import { wrapEnvelope } from '../src/state/envelope.mjs';
+
+// D5: `verify` is a required non-empty field on every work item, but a
+// free-text submission has no verification plan yet — that is P15's job. The
+// submit verb fills a fixed sentinel so validation passes; it is always
+// overridable by a later edit.
+const SUBMIT_VERIFY_SENTINEL = 'chưa xác định — P15 bổ sung';
 
 function dataDir() {
   return path.join(process.cwd(), '.fgos');
@@ -198,6 +206,35 @@ function runVerb(verb, flags, positional, dir) {
       return `Added ${event.payload.id} (event #${event.seq})`;
     }
 
+    // Intake verb (P14, D1-D6): takes a single free-text blob, derives its
+    // title, mechanically classifies tier/kind/risk, auto-generates a
+    // collision-free id, and persists through the SAME addWork door as `add`
+    // (C2 — no second write door). Runs parallel to `add`, never replaces it.
+    // Output is wrapped in the fgos.v1 envelope (C1). Per D6, `mode` records
+    // whether the submitter stayed to collaborate (`sync`, default) or left
+    // (`async`/`--unattended`); P14 only writes the field, nothing branches
+    // on it here.
+    case 'submit': {
+      const text = requireField(positional[0], 'submit requires a free-text description: fgos submit "<description>" [--async|--unattended]');
+      const title = deriveTitle(text);
+      const { tier, kind, risk } = classify(text);
+      const id = generateId(title, Object.keys(listWork(dir).work));
+      const work = {
+        id,
+        title,
+        kind,
+        status: 'todo',
+        deps: [],
+        risk,
+        refs: [],
+        verify: SUBMIT_VERIFY_SENTINEL,
+        tier,
+        mode: flags.async || flags.unattended ? 'async' : 'sync',
+      };
+      const { event } = addWork(dir, work);
+      return JSON.stringify(wrapEnvelope(event.payload), null, 2);
+    }
+
     case 'move': {
       const id = requireField(positional[0] ?? flags.id, 'move requires an id: fgos move <id> --to <status> [--expect <status>]');
       const to = requireField(flags.to, 'move requires --to <status>');
@@ -269,7 +306,7 @@ function runVerb(verb, flags, positional, dir) {
     }
 
     default:
-      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <init|add|move|ask|answer|decision|list|ready|rebuild|check> ...`);
+      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <init|add|submit|move|ask|answer|decision|list|ready|rebuild|check> ...`);
   }
 }
 

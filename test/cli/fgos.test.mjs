@@ -706,3 +706,82 @@ test('check never mutates state: events.jsonl and state.json are byte-identical 
   assert.equal(fs.readFileSync(logPath(cwd), 'utf8'), logBefore, 'events.jsonl must be untouched by check');
   assert.equal(fs.readFileSync(viewPath(cwd), 'utf8'), viewBefore, 'state.json must be untouched by check');
 });
+
+// --- `fgos submit` (stage-intake-3): free-text intake verb (P14, D1-D6) ---
+//
+// e2e through the real binary (never a direct call to classify.mjs) per the
+// plan's Learnings Applied: id-collision retry and the C1 envelope must be
+// proven end-to-end. `submit` runs parallel to `add`, auto-derives title/id
+// and mechanically classifies tier/kind/risk, persists through the same
+// addWork door, and prints the fgos.v1 envelope.
+
+test('submit prints a well-formed fgos.v1 envelope: contract + generated_at + data_hash + data, exit 0', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['submit', 'Investigate the sluggish overview page']);
+  assert.equal(result.status, 0);
+  const envelope = JSON.parse(result.stdout);
+  assert.deepEqual(Object.keys(envelope).sort(), ['contract', 'data', 'data_hash', 'generated_at']);
+  assert.equal(envelope.contract, 'fgos.v1');
+  assert.match(envelope.data_hash, /^[0-9a-f]{64}$/);
+  assert.ok(!Number.isNaN(Date.parse(envelope.generated_at)));
+  assert.equal(typeof envelope.data.id, 'string');
+  assert.equal(envelope.data.status, 'todo');
+});
+
+test('two submits of the same text get different ids, both persist, no duplicate-id error (D3 collision retry)', () => {
+  const cwd = tmpCwd();
+  const text = 'Fix the broken login button';
+
+  const first = run(cwd, ['submit', text]);
+  assert.equal(first.status, 0);
+  const second = run(cwd, ['submit', text]);
+  assert.equal(second.status, 0);
+
+  const idA = JSON.parse(first.stdout).data.id;
+  const idB = JSON.parse(second.stdout).data.id;
+  assert.notEqual(idA, idB, 'a second submit of the same text must not collide on id');
+
+  const view = JSON.parse(run(cwd, ['list']).stdout);
+  assert.ok(view.work[idA], 'first submitted item persisted');
+  assert.ok(view.work[idB], 'second submitted item persisted');
+});
+
+test('submit without a mode flag records mode:"sync"; --async records mode:"async" — both visible via list (D6)', () => {
+  const cwd = tmpCwd();
+
+  const syncSubmit = run(cwd, ['submit', 'Investigate the sluggish overview page']);
+  assert.equal(syncSubmit.status, 0);
+  const syncId = JSON.parse(syncSubmit.stdout).data.id;
+
+  const asyncSubmit = run(cwd, ['submit', 'Rework the settings navigation flow', '--async']);
+  assert.equal(asyncSubmit.status, 0);
+  const asyncId = JSON.parse(asyncSubmit.stdout).data.id;
+
+  const view = JSON.parse(run(cwd, ['list']).stdout);
+  assert.equal(view.work[syncId].mode, 'sync');
+  assert.equal(view.work[asyncId].mode, 'async');
+});
+
+test('submit with --unattended is treated the same as --async: mode:"async" (D2)', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['submit', 'Draft the onboarding walkthrough', '--unattended']);
+  assert.equal(result.status, 0);
+  const id = JSON.parse(result.stdout).data.id;
+  assert.equal(JSON.parse(run(cwd, ['list']).stdout).work[id].mode, 'async');
+});
+
+test('submit of text matching no keyword falls back to tier:"standard" and persists, exit 0 (D1)', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['submit', 'Investigate the sluggish overview page']);
+  assert.equal(result.status, 0);
+  const item = JSON.parse(result.stdout).data;
+  assert.equal(item.tier, 'standard');
+  assert.equal(JSON.parse(run(cwd, ['list']).stdout).work[item.id].tier, 'standard');
+});
+
+test('submit with no text at all is rejected as validation, exit 4, no event written', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['submit']);
+  assert.equal(result.status, 4);
+  assert.equal(eventLines(cwd).length, 0);
+});
