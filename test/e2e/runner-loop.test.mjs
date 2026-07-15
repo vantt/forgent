@@ -305,10 +305,13 @@ test('e2e verify-red: a worker that commits the wrong thing fails goal-check on 
     'work.outcome:predicted',
     'work.move:blocked',
     'work.outcome:actual',
+    'work.friction:item-red',
   ]);
 
   // actual on the park terminal, real verify-red evidence — closes the
   // HIGH-risk "failures learn nothing" gap: a park must not be silent.
+  // work.friction (S2, kênh 2 của capture) rides alongside it, real e2e
+  // evidence the friction channel fires on a genuine dispatch, not just unit.
   const actualOutcomeEvent = redEvents.find((e) => e.type === 'work.outcome' && e.payload.actual);
   assert.equal(actualOutcomeEvent.payload.actual.outcome, 'parked');
   assert.equal(actualOutcomeEvent.payload.actual.passed, false);

@@ -192,6 +192,24 @@ export function addOutcome(dir, payload) {
   return { event, view };
 }
 
+/**
+ * Log a work-friction event — the friction channel of the 2-channel capture
+ * (per Phase 3 plan Slice 2 / lifecycle-vision §8): the runner writes one at
+ * the park/halt choke-point, self-attributed to a failure layer. Unlike
+ * `work.outcome` (two halves MERGED by id), frictions are occurrences — the
+ * fold APPENDS per id, a later record never erases an earlier one. Same
+ * single write door + append-then-refresh tail as every mutation here.
+ */
+export function addFriction(dir, payload) {
+  const { logPath } = paths(dir);
+  if (!payload || typeof payload.id !== 'string' || !payload.id.trim()) {
+    throw new StoreError('validation', 'friction requires a non-empty "id".');
+  }
+  const event = appendEvent(logPath, { type: 'work.friction', payload });
+  const view = refreshView(dir);
+  return { event, view };
+}
+
 /** Read-only: the current view, rebuilt fresh from the log (never off a stale file). */
 export function listWork(dir) {
   const { logPath } = paths(dir);

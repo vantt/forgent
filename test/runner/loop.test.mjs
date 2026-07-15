@@ -203,6 +203,16 @@ test('verify-miss: worker commits the wrong thing -> retry once, then park to bl
   assert.equal(actualEvent.payload.actual.passed, false);
   assert.equal(actualEvent.payload.actual.errorClass, 'verify-miss');
   assert.equal(actualEvent.payload.actual.attempts, 2);
+
+  // friction channel (S2 — kênh 2 của capture): the runner blames itself at
+  // the same park choke-point, layer attributed mechanically from the class.
+  const frictionEvent = events.find((e) => e.type === 'work.friction');
+  assert.ok(frictionEvent, 'work.friction written on the park branch');
+  assert.equal(frictionEvent.payload.disposition, 'parked');
+  assert.equal(frictionEvent.payload.errorClass, 'verify-miss');
+  assert.equal(frictionEvent.payload.layer, 'verification');
+  assert.equal(frictionEvent.payload.attempts, 2);
+  assert.ok(frictionEvent.payload.detail, 'friction carries the failure message');
 });
 
 test('verify passes but the worker never committed -> classified verify-miss, parked after retries', () => {
@@ -278,6 +288,14 @@ test('breaker trip: a goal-check miss at threshold parks the item and halts the 
   // removeWorktree ran in the finally even on the halt path
   assert.deepEqual(fs.readdirSync(worktreeDir), []);
   assert.equal(branchExists(repoRoot, 'fgw/item-breaker'), true);
+
+  // friction channel (S2): the HALT path writes friction too — a halt must
+  // not be silent any more than a park (ghi CẢ đường thất bại).
+  const frictionEvent = readRawEvents(dir).find((e) => e.type === 'work.friction');
+  assert.ok(frictionEvent, 'work.friction written on the halt branch');
+  assert.equal(frictionEvent.payload.disposition, 'halted');
+  assert.equal(frictionEvent.payload.errorClass, 'verify-miss');
+  assert.equal(frictionEvent.payload.layer, 'verification');
 });
 
 // --- startup reap: stale doing + orphan branches --------------------------

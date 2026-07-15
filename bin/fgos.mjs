@@ -97,10 +97,73 @@ function formatOutcomeBlock(id, entry) {
 function formatCheck(view, id) {
   const outcomes = view.outcomes ?? {};
   const ids = id ? [id] : Object.keys(outcomes);
-  if (ids.length === 0) {
+  const sections = [];
+  if (ids.length > 0) {
+    sections.push(ids.map((itemId) => formatOutcomeBlock(itemId, outcomes[itemId])).join('\n\n'));
+  }
+  const friction = formatFrictionSection(view, id);
+  if (friction) {
+    sections.push(friction);
+  }
+  const nag = formatMissingOutcomeNag(view, id);
+  if (nag) {
+    sections.push(nag);
+  }
+  if (sections.length === 0) {
     return 'chưa có dữ liệu';
   }
-  return ids.map((itemId) => formatOutcomeBlock(itemId, outcomes[itemId])).join('\n\n');
+  return sections.join('\n\n');
+}
+
+// Friction report cap (per porting lesson predicted-actual-feedback-store:
+// "gợi ý luôn CAP, không xả vô hạn") — counts are always full, the record
+// list shown is only the newest few.
+const FRICTION_DISPLAY_CAP = 5;
+
+// Friction channel section (kênh 2 của capture 2 kênh — Phase 3 Slice 2):
+// per-layer counts over ALL matching records, then the newest records capped
+// at FRICTION_DISPLAY_CAP. `frictions` is a lazy view key (replay.mjs) — a
+// log with no work.friction events has no key and this section disappears,
+// keeping `check` output byte-identical to pre-friction logs.
+function formatFrictionSection(view, id) {
+  const frictions = view.frictions ?? {};
+  const records = (id ? [id] : Object.keys(frictions)).flatMap((itemId) =>
+    (frictions[itemId] ?? []).map((r) => ({ ...r, id: r.id ?? itemId })),
+  );
+  if (records.length === 0) {
+    return '';
+  }
+  const byLayer = {};
+  for (const r of records) {
+    byLayer[r.layer] = (byLayer[r.layer] ?? 0) + 1;
+  }
+  const layerLine = Object.entries(byLayer)
+    .map(([layer, n]) => `${layer} ${n}`)
+    .join(' · ');
+  const recent = records
+    .sort((a, b) => ((a.ts ?? '') < (b.ts ?? '') ? -1 : 1))
+    .slice(-FRICTION_DISPLAY_CAP)
+    .reverse()
+    .map((r) =>
+      `  - [${r.disposition}] ${r.id} ${r.errorClass}/${r.layer} (attempts ${r.attempts}): ${r.detail ?? ''}`.trimEnd(),
+    );
+  return `friction (${records.length}):\n  theo lớp: ${layerLine}\n${recent.join('\n')}`;
+}
+
+// Outcome-lifecycle nag (per porting lesson porting-outcome-lifecycle: the
+// check surface reminds records that reached an end state without their
+// outcome). An item sitting in a final status should carry its actual half;
+// listing the ones that don't keeps the predicted→actual loop honest.
+function formatMissingOutcomeNag(view, id) {
+  const outcomes = view.outcomes ?? {};
+  const FINAL_STATUSES = new Set(['proposed', 'blocked', 'done']);
+  const missing = Object.values(view.work ?? {})
+    .filter((w) => (!id || w.id === id) && FINAL_STATUSES.has(w.status) && !outcomes[w.id]?.actual)
+    .map((w) => w.id);
+  if (missing.length === 0) {
+    return '';
+  }
+  return `nhắc: ${missing.length} item ở trạng thái cuối chưa có nửa actual: ${missing.join(', ')}`;
 }
 
 function runVerb(verb, flags, positional, dir) {

@@ -97,6 +97,29 @@ test('foldEvents on a log with no work.outcome events yields a view with no "out
   assert.equal('outcomes' in view, false);
 });
 
+test('foldEvents APPENDS work.friction records per id — two frictions on one id both survive, in order (never merged, never replaced)', () => {
+  const events = [
+    { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.friction', payload: { id: 'a', disposition: 'parked', errorClass: 'verify-miss', layer: 'verification', attempts: 2, detail: 'first' } },
+    { seq: 2, ts: '2026-07-16T00:00:01.000Z', type: 'work.friction', payload: { id: 'a', disposition: 'halted', errorClass: 'worker-timeout', layer: 'environment', attempts: 1, detail: 'second' } },
+  ];
+  const view = foldEvents(events);
+  assert.equal(view.frictions.a.length, 2);
+  assert.equal(view.frictions.a[0].detail, 'first');
+  assert.equal(view.frictions.a[1].detail, 'second');
+  assert.equal(view.frictions.a[1].layer, 'environment');
+  // event ts rides along for recency display (fgos check cap)
+  assert.equal(view.frictions.a[0].ts, '2026-07-16T00:00:00.000Z');
+});
+
+test('foldEvents on a log with no work.friction events yields a view with no "frictions" key (lazy key, backward-compat)', () => {
+  const events = [
+    { seq: 1, ts: '2026-07-14T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo' } },
+    { seq: 2, ts: '2026-07-14T00:00:01.000Z', type: 'work.outcome', payload: { id: 'a', predicted: { tier: 'standard' } } },
+  ];
+  const view = foldEvents(events);
+  assert.equal('frictions' in view, false);
+});
+
 test('foldEvents folds an ask-then-answer work.move pair into one gates[id]={ask,answer} — merge, never replace', () => {
   const events = [
     { seq: 1, ts: '2026-07-15T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo' } },

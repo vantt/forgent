@@ -42,6 +42,7 @@ import {
   readyWork,
   readRawEvents,
   addOutcome,
+  addFriction,
   categoryOf,
   EXIT_CODES,
 } from '../state/store.mjs';
@@ -56,6 +57,24 @@ import {
 } from './anti-loop.mjs';
 import { spawnWorker, modelForTier } from './dispatch.mjs';
 import { createWorktree, removeWorktree, listLeftovers, branchNameFor } from './worktree.mjs';
+
+// errorClass -> failure layer: 5-layer self-attribution (task-spec / context /
+// environment / verification / state) the runner stamps on every friction
+// record at the park/halt choke-point. The mapping is mechanical DATA, not a
+// judgment baked into logic — accumulated frictions are exactly the evidence
+// compound-learning later uses to recalibrate it (plan.md Slice 2 chi tiết).
+// An error class this map does not know falls back to 'task-spec' (the most
+// actionable default: re-read what the task asked for).
+const FRICTION_LAYER = Object.freeze({
+  'verify-miss': 'verification',
+  'worker-spawn-fail': 'environment',
+  'worker-timeout': 'environment',
+  'worktree-fail': 'environment',
+  'corrupt-log': 'state',
+  'stale-doing': 'state',
+  'state-conflict': 'state',
+  'reject-returned': 'context',
+});
 
 /** Exit code for the `busy` outcome: another live runner already holds the
  * inter-process lock. Deliberately outside the R4 category map — busy is not
@@ -458,6 +477,21 @@ function processItem({ repoRoot, dir, item, config, worktreeDir, breaker, log, p
         aheadCount: branchFacts(repoRoot, branchNameFor(item.id)).aheadCount,
         visits: visitCount(readRawEvents(dir), item.id),
       },
+    });
+
+    // Friction channel — kênh 2 của capture 2 kênh (Phase 3 Slice 2 /
+    // lifecycle-vision §8): the runner blames ITSELF at the same choke-point,
+    // one record per final failure exit, attributed to a failure layer via
+    // FRICTION_LAYER below. Emitted alongside (never instead of) the actual
+    // outcome half: outcome carries the numbers the predicted-half is scored
+    // against; friction carries the attribution compound-learning mines.
+    addFriction(dir, {
+      id: item.id,
+      disposition: tripped || decision.action === 'halt' ? 'halted' : 'parked',
+      errorClass: failure.errorClass,
+      layer: FRICTION_LAYER[failure.errorClass] ?? 'task-spec',
+      attempts: attempt,
+      detail: failure.message,
     });
 
     if (tripped) {

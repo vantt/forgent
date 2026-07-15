@@ -93,6 +93,28 @@ function applyEvent(view, event) {
       }
       break;
     }
+    case 'work.friction': {
+      // Additive event type (per D7 schema evolution, mirroring work.outcome
+      // above) — but with the OPPOSITE fold rule: one friction record per
+      // final failure exit (park/halt), and a single id can accumulate
+      // several across re-claims, so this APPENDS per id. It never merges
+      // and never replaces — each record is its own occurrence, and a later
+      // one erasing an earlier one would silently lose history (the exact
+      // fold-replace bug class critical-patterns records). `frictions` is a
+      // LAZY key exactly like `outcomes`/`gates`: absent from the view until
+      // the first work.friction event folds (backward-compat.test).
+      const { id } = event.payload ?? {};
+      if (typeof id === 'string') {
+        if (!view.frictions) {
+          view.frictions = {};
+        }
+        view.frictions[id] = [
+          ...(view.frictions[id] ?? []),
+          { ...event.payload, ts: event.ts },
+        ];
+      }
+      break;
+    }
     default:
       // Forward-compatible: an event type this view does not (yet) know how
       // to fold is skipped, not an error — readEvents already guarantees

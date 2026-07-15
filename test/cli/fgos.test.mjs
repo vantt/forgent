@@ -5,7 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
-import { addOutcome } from '../../src/state/store.mjs';
+import { addOutcome, addFriction } from '../../src/state/store.mjs';
 
 // The CLI under test, resolved by absolute path so it works regardless of
 // the spawned process's cwd (which every test below points at a fresh
@@ -570,6 +570,50 @@ test('check with no id given reports every item that has outcome data, exit 0', 
   assert.equal(result.status, 0);
   assert.match(result.stdout, /item-a/);
   assert.doesNotMatch(result.stdout, /item-b/, 'item-b has no outcome data yet, so it is not listed');
+});
+
+// --- friction channel in `check` (phase-3-compound-learning-4, S2) ---------
+//
+// Same write-door discipline as the outcome tests above: only the runner
+// writes work.friction in production, so these seed through store.mjs's
+// addFriction and exercise the real `check` binary read-side.
+
+test('check prints the friction section — per-layer counts + recent records — when friction data exists', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'fric-item');
+  const dir = path.join(cwd, '.fgos');
+  addFriction(dir, { id: 'fric-item', disposition: 'parked', errorClass: 'verify-miss', layer: 'verification', attempts: 2, detail: 'goal-check failed (exit 1)' });
+  addFriction(dir, { id: 'fric-item', disposition: 'halted', errorClass: 'worker-timeout', layer: 'environment', attempts: 1, detail: 'timed out' });
+
+  const result = run(cwd, ['check']);
+  assert.equal(result.status, 0);
+  assert.match(result.stdout, /friction \(2\)/);
+  assert.match(result.stdout, /verification 1/);
+  assert.match(result.stdout, /environment 1/);
+  assert.match(result.stdout, /\[parked\] fric-item verify-miss\/verification \(attempts 2\)/);
+  assert.match(result.stdout, /\[halted\] fric-item worker-timeout\/environment/);
+});
+
+test('check nags items sitting in a final status without their actual half (porting-outcome-lifecycle: no silent record)', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'nag-item');
+  toProposed(cwd, 'nag-item');
+
+  const result = run(cwd, ['check']);
+  assert.equal(result.status, 0);
+  assert.match(result.stdout, /nhắc: 1 item ở trạng thái cuối chưa có nửa actual: nag-item/);
+});
+
+test('check output on a log with no friction and no final-status gaps is unchanged — no friction section, no nag', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'clean-item');
+  const dir = path.join(cwd, '.fgos');
+  addOutcome(dir, { id: 'clean-item', predicted: { tier: 'standard', deps: 0, priorVisits: 0 } });
+
+  const result = run(cwd, ['check']);
+  assert.equal(result.status, 0);
+  assert.doesNotMatch(result.stdout, /friction/);
+  assert.doesNotMatch(result.stdout, /nhắc/);
 });
 
 // --- `fgos ask`/`fgos answer` (async-human-gate-3): the human-gate round-trip ---
