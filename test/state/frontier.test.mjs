@@ -118,3 +118,20 @@ test('frontier does not mutate the view it is given', () => {
   frontier(view);
   assert.deepEqual(view, before);
 });
+
+// --- D6 lock: `awaiting-human` never opens into the ready set (async-human-gate-3) ---
+
+test('LOCK (per D6): an item at status "awaiting-human" is never in the frontier', () => {
+  const view = { work: { a: item('a', 'awaiting-human') } };
+  assert.deepEqual(frontier(view), []);
+});
+
+test('LOCK (per D6): a todo item whose dep is "awaiting-human" is NOT ready (an awaiting dep does not unblock, mirrors the proposed-dep case)', () => {
+  const view = {
+    work: {
+      base: item('base', 'awaiting-human'),
+      dependent: item('dependent', 'todo', ['base']),
+    },
+  };
+  assert.deepEqual(frontier(view), []);
+});

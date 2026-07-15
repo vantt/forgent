@@ -16,7 +16,7 @@
 // src/state/store.mjs, the sole write door.
 
 import path from 'node:path';
-import { initStore, addWork, moveWork, addDecision, listWork, readyWork, rebuild, StoreError, EXIT_CODES, categoryOf } from '../src/state/store.mjs';
+import { initStore, addWork, moveWork, addDecision, listWork, readyWork, rebuild, putInAwaiting, answerAwaiting, StoreError, EXIT_CODES, categoryOf } from '../src/state/store.mjs';
 
 function dataDir() {
   return path.join(process.cwd(), '.fgos');
@@ -148,6 +148,30 @@ function runVerb(verb, flags, positional, dir) {
       return `Moved ${id}: ${event.payload.from} -> ${event.payload.to} (event #${event.seq})`;
     }
 
+    // Parks the item into `awaiting-human`, carrying the question it is
+    // waiting on (per D2/D5). Same CAS/precondition contract as `move` — the
+    // FSM enforces both the `todo|doing -> awaiting-human` edge and that
+    // `--text` is non-empty (per D2's `ask` requirement on the entry edge).
+    case 'ask': {
+      const id = requireField(positional[0] ?? flags.id, 'ask requires an id: fgos ask <id> --text "..." [--expect <status>]');
+      const text = requireField(flags.text, 'ask requires --text "..."');
+      const expectedStatus = optionalField(flags.expect, 'ask --expect requires a status value (omit --expect entirely to skip the CAS check)');
+      const { event } = putInAwaiting(dir, { id, ask: text, expectedStatus });
+      return `Parked ${id}: ${event.payload.from} -> ${event.payload.to} (event #${event.seq})`;
+    }
+
+    // Records the answer and resumes the item to `todo` (per D2/D5). Same
+    // CAS/precondition contract as `move` — the FSM enforces both the
+    // `awaiting-human -> todo` edge and that `--text` is non-empty (per D2's
+    // `answer` requirement on the exit edge).
+    case 'answer': {
+      const id = requireField(positional[0] ?? flags.id, 'answer requires an id: fgos answer <id> --text "..." [--expect <status>]');
+      const text = requireField(flags.text, 'answer requires --text "..."');
+      const expectedStatus = optionalField(flags.expect, 'answer --expect requires a status value (omit --expect entirely to skip the CAS check)');
+      const { event } = answerAwaiting(dir, { id, answer: text, expectedStatus });
+      return `Answered ${id}: ${event.payload.from} -> ${event.payload.to} (event #${event.seq})`;
+    }
+
     case 'decision': {
       const text = requireField(flags.text ?? (positional.length ? positional.join(' ') : undefined), 'decision requires --text "..."');
       const { event } = addDecision(dir, { text });
@@ -182,7 +206,7 @@ function runVerb(verb, flags, positional, dir) {
     }
 
     default:
-      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <init|add|move|decision|list|ready|rebuild|check> ...`);
+      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <init|add|move|ask|answer|decision|list|ready|rebuild|check> ...`);
   }
 }
 

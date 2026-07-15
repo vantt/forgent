@@ -572,6 +572,81 @@ test('check with no id given reports every item that has outcome data, exit 0', 
   assert.doesNotMatch(result.stdout, /item-b/, 'item-b has no outcome data yet, so it is not listed');
 });
 
+// --- `fgos ask`/`fgos answer` (async-human-gate-3): the human-gate round-trip ---
+//
+// e2e per D5/D6/D7: `ask` parks a work item into `awaiting-human` carrying
+// the question; while parked, `ready` must exclude it (D6) and `list` must
+// surface it — status + its question, via the existing view.gates fold, no
+// new formatter (D7); `answer` records the answer and resumes the item to
+// `todo`, at which point it is actionable again (back in `ready`).
+
+test('ask/answer round-trip: park removes from ready and surfaces the ask via list, answer resumes to todo and reopens ready (per D5/D6/D7)', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'gated-item');
+  assert.equal(run(cwd, ['move', 'gated-item', '--to', 'doing']).status, 0);
+
+  const askResult = run(cwd, ['ask', 'gated-item', '--text', 'OAuth or password?']);
+  assert.equal(askResult.status, 0);
+  assert.equal(stateView(cwd).work['gated-item'].status, 'awaiting-human');
+
+  // D7: list surfaces the parked item's status and its question, no new
+  // read command/formatter — the existing `view.gates` fold carries it.
+  const listedWhileAwaiting = JSON.parse(run(cwd, ['list']).stdout);
+  assert.equal(listedWhileAwaiting.work['gated-item'].status, 'awaiting-human');
+  assert.equal(listedWhileAwaiting.gates['gated-item'].ask, 'OAuth or password?');
+  assert.equal(listedWhileAwaiting.gates['gated-item'].answer, undefined);
+
+  // D6: a parked item is never in the ready set.
+  const readyWhileAwaiting = JSON.parse(run(cwd, ['ready']).stdout);
+  assert.ok(!readyWhileAwaiting.some((i) => i.id === 'gated-item'));
+
+  const answerResult = run(cwd, ['answer', 'gated-item', '--text', 'OAuth']);
+  assert.equal(answerResult.status, 0);
+  assert.equal(stateView(cwd).work['gated-item'].status, 'todo');
+
+  const listedAfterAnswer = JSON.parse(run(cwd, ['list']).stdout);
+  assert.equal(listedAfterAnswer.gates['gated-item'].ask, 'OAuth or password?');
+  assert.equal(listedAfterAnswer.gates['gated-item'].answer, 'OAuth');
+
+  const readyAfterAnswer = JSON.parse(run(cwd, ['ready']).stdout);
+  assert.ok(readyAfterAnswer.some((i) => i.id === 'gated-item'));
+});
+
+test('ask without --text is rejected as validation, exit 4, no event written, item stays in its prior status', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'no-text-ask');
+  run(cwd, ['move', 'no-text-ask', '--to', 'doing']);
+  const before = eventLines(cwd).length;
+
+  const result = run(cwd, ['ask', 'no-text-ask']);
+  assert.equal(result.status, 4);
+  assert.equal(eventLines(cwd).length, before);
+  assert.equal(stateView(cwd).work['no-text-ask'].status, 'doing');
+});
+
+test('answer on an item that is not awaiting-human is rejected as precondition, exit 2, no event written', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'never-parked');
+  const before = eventLines(cwd).length;
+
+  const result = run(cwd, ['answer', 'never-parked', '--text', 'irrelevant']);
+  assert.equal(result.status, 2);
+  assert.equal(eventLines(cwd).length, before);
+  assert.equal(stateView(cwd).work['never-parked'].status, 'todo');
+});
+
+test('ask rejects a CAS expected-status mismatch as conflict, exit 3, no event written', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'cas-ask-item');
+  run(cwd, ['move', 'cas-ask-item', '--to', 'doing']);
+  const before = eventLines(cwd).length;
+
+  const result = run(cwd, ['ask', 'cas-ask-item', '--text', 'ready?', '--expect', 'todo']);
+  assert.equal(result.status, 3);
+  assert.equal(eventLines(cwd).length, before);
+  assert.equal(stateView(cwd).work['cas-ask-item'].status, 'doing');
+});
+
 test('check never mutates state: events.jsonl and state.json are byte-identical before/after', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'read-only-item');
