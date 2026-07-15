@@ -224,12 +224,23 @@ test('e2e full journey: item1 (no deps) -> proposed with a worker commit on fgw/
   // carries the marker only `test -f output.txt && echo VERIFY_OK` prints.
   assert.match(first.stdout, /VERIFY_OK/);
 
-  // events.jsonl carries the real chain: two adds, then doing, then
-  // proposed for item1 only — and every event from Phase 2 on carries `v`.
+  // events.jsonl carries the real chain: two adds, then doing, then a
+  // predicted work.outcome (written at claim), then proposed for item1
+  // only, then an actual work.outcome (written on the pass terminal) —
+  // every event from Phase 2 on carries `v`.
   const afterFirstEvents = events(repoRoot);
   assert.deepEqual(
-    afterFirstEvents.map((e) => `${e.type}:${e.payload.id}:${e.payload.to ?? 'add'}`),
-    ['work.add:item1:add', 'work.add:item2:add', 'work.move:item1:doing', 'work.move:item1:proposed'],
+    afterFirstEvents.map((e) => (e.type === 'work.outcome'
+      ? `work.outcome:${e.payload.id}:${e.payload.predicted ? 'predicted' : 'actual'}`
+      : `${e.type}:${e.payload.id}:${e.payload.to ?? 'add'}`)),
+    [
+      'work.add:item1:add',
+      'work.add:item2:add',
+      'work.move:item1:doing',
+      'work.outcome:item1:predicted',
+      'work.move:item1:proposed',
+      'work.outcome:item1:actual',
+    ],
   );
   const doingEvent = afterFirstEvents.find((e) => e.type === 'work.move' && e.payload.to === 'doing');
   const proposedEvent = afterFirstEvents.find((e) => e.type === 'work.move' && e.payload.to === 'proposed');
@@ -237,6 +248,12 @@ test('e2e full journey: item1 (no deps) -> proposed with a worker commit on fgw/
   assert.equal(proposedEvent.payload.id, 'item1');
   assert.equal(typeof doingEvent.v, 'number', 'doing event carries a schema version');
   assert.equal(typeof proposedEvent.v, 'number', 'proposed event carries a schema version');
+  // actual is real dispatch evidence (real subprocess, real goal-check),
+  // sourced from the runner's own branchFacts — never the worker's report.
+  const actualOutcomeEvent = afterFirstEvents.find((e) => e.type === 'work.outcome' && e.payload.actual);
+  assert.equal(actualOutcomeEvent.payload.actual.outcome, 'proposed');
+  assert.equal(actualOutcomeEvent.payload.actual.passed, true);
+  assert.equal(actualOutcomeEvent.payload.actual.aheadCount, 1);
 
   // second --once: item2's dep (item1) is `proposed`, not `done` — the
   // frontier is empty, nothing gets dispatched a second time.
@@ -265,8 +282,24 @@ test('e2e verify-red: a worker that commits the wrong thing fails goal-check on 
   assert.notEqual(stateView(repoRoot).work['item-red'].status, 'proposed');
   assert.equal(branchExists(repoRoot, 'fgw/item-red'), true, 'the (wrong) attempt still leaves its branch behind');
 
-  const seq = events(repoRoot).map((e) => `${e.type}:${e.payload.to ?? e.payload.id ?? ''}`);
-  assert.deepEqual(seq, ['work.add:item-red', 'work.move:doing', 'work.move:blocked']);
+  const redEvents = events(repoRoot);
+  const seq = redEvents.map((e) => (e.type === 'work.outcome'
+    ? `work.outcome:${e.payload.predicted ? 'predicted' : 'actual'}`
+    : `${e.type}:${e.payload.to ?? e.payload.id ?? ''}`));
+  assert.deepEqual(seq, [
+    'work.add:item-red',
+    'work.move:doing',
+    'work.outcome:predicted',
+    'work.move:blocked',
+    'work.outcome:actual',
+  ]);
+
+  // actual on the park terminal, real verify-red evidence — closes the
+  // HIGH-risk "failures learn nothing" gap: a park must not be silent.
+  const actualOutcomeEvent = redEvents.find((e) => e.type === 'work.outcome' && e.payload.actual);
+  assert.equal(actualOutcomeEvent.payload.actual.outcome, 'parked');
+  assert.equal(actualOutcomeEvent.payload.actual.passed, false);
+  assert.equal(actualOutcomeEvent.payload.actual.errorClass, 'verify-miss');
 });
 
 // --- case 3: crash-idempotency ----------------------------------------------

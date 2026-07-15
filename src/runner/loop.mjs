@@ -41,6 +41,7 @@ import {
   moveWork,
   readyWork,
   readRawEvents,
+  addOutcome,
   categoryOf,
   EXIT_CODES,
 } from '../state/store.mjs';
@@ -340,10 +341,25 @@ export function startupReap({ repoRoot, dir, worktreeDir, verifyTimeoutMs, log =
  * (`doing -> blocked`), or halt. The consecutive-miss breaker only counts
  * goal-check misses (per anti-loop.mjs); when it trips, the item is parked
  * first (never left dangling in `doing`) and the whole run halts.
+ *
+ * COMPOUND-LEARNING (per Phase 3 D2/D3, plan Approach S1): a `predicted`
+ * `work.outcome` is written right after the claim, and an `actual`
+ * `work.outcome` is written at exactly the two TERMINAL exits below — the
+ * pass return and the park-move block (which covers both `parked` and
+ * `halted`, since every failure exit passes through that one `moveWork`
+ * first). The non-terminal goal-check miss never gets an `actual` — it may
+ * still retry, and recording one there would log a false `passed: false`
+ * for an attempt that later succeeds. Both payloads are sourced from the
+ * runner's own `runGoalCheck`/`branchFacts`, never the worker's own
+ * status/signal (D3) — the worker's report is never trusted on its own.
  */
-function processItem({ repoRoot, dir, item, config, worktreeDir, breaker, log }) {
+function processItem({ repoRoot, dir, item, config, worktreeDir, breaker, log, priorVisits }) {
   moveWork(dir, { id: item.id, to: 'doing', expectedStatus: 'todo' });
   log(`fgos-runner: claimed "${item.id}" (todo -> doing)`);
+  addOutcome(dir, {
+    id: item.id,
+    predicted: { tier: item.tier ?? DEFAULTS.tier, deps: item.deps.length, priorVisits },
+  });
 
   let attempt = 0;
 
@@ -372,6 +388,17 @@ function processItem({ repoRoot, dir, item, config, worktreeDir, breaker, log })
         moveWork(dir, { id: item.id, to: 'proposed', expectedStatus: 'doing' });
         log(`fgos-runner: "${item.id}" proposed on branch ${wt.branch} (${facts.aheadCount} commit(s))`);
         log(`fgos-runner: verify tail:\n${tailLines(check.output)}`);
+        addOutcome(dir, {
+          id: item.id,
+          actual: {
+            outcome: 'proposed',
+            passed: true,
+            attempts: attempt,
+            errorClass: null,
+            aheadCount: facts.aheadCount,
+            visits: visitCount(readRawEvents(dir), item.id),
+          },
+        });
         return { outcome: 'proposed', id: item.id, branch: wt.branch, attempts: attempt, exitCode: 0 };
       }
 
@@ -415,6 +442,22 @@ function processItem({ repoRoot, dir, item, config, worktreeDir, breaker, log })
       to: 'blocked',
       expectedStatus: 'doing',
       reason: tripped ? 'breaker-tripped' : failure.errorClass,
+    });
+
+    // Single ACTUAL emission covering BOTH `parked` and `halted` (every
+    // failure exit below already passed through the moveWork above) — per
+    // D3, sourced from the runner's own branchFacts, not the worker's
+    // status/signal.
+    addOutcome(dir, {
+      id: item.id,
+      actual: {
+        outcome: tripped || decision.action === 'halt' ? 'halted' : 'parked',
+        passed: false,
+        attempts: attempt,
+        errorClass: failure.errorClass,
+        aheadCount: branchFacts(repoRoot, branchNameFor(item.id)).aheadCount,
+        visits: visitCount(readRawEvents(dir), item.id),
+      },
     });
 
     if (tripped) {
@@ -507,7 +550,7 @@ export function runOnce(options = {}) {
         return { outcome: 'dry-run', plan, reap, parked, exitCode: 0 };
       }
 
-      const result = processItem({ repoRoot, dir, item, config, worktreeDir, breaker, log });
+      const result = processItem({ repoRoot, dir, item, config, worktreeDir, breaker, log, priorVisits: visits });
       return { ...result, reap, parked };
     }
   } catch (err) {

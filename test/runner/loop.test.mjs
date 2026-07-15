@@ -157,12 +157,22 @@ test('runOnce full circle: todo -> doing -> worker commit -> goal-check pass -> 
   // worktree torn down, branch survives (D4 proposal artifact)
   assert.deepEqual(fs.readdirSync(worktreeDir), []);
   // one door: the log carries exactly the runner's writes — the worker
-  // never touched .fgos/ (add + claim + propose, nothing else)
+  // never touched .fgos/ (add + claim + predicted + propose + actual,
+  // nothing else)
   const events = readRawEvents(dir);
   assert.deepEqual(
-    events.map((e) => `${e.type}:${e.payload.to ?? 'add'}`),
-    ['work.add:add', 'work.move:doing', 'work.move:proposed'],
+    events.map((e) => (e.type === 'work.outcome' ? `work.outcome:${e.payload.predicted ? 'predicted' : 'actual'}` : `${e.type}:${e.payload.to ?? 'add'}`)),
+    ['work.add:add', 'work.move:doing', 'work.outcome:predicted', 'work.move:proposed', 'work.outcome:actual'],
   );
+  // predicted is written right at claim time, before dispatch ever runs
+  const predictedEvent = events.find((e) => e.type === 'work.outcome' && e.payload.predicted);
+  assert.deepEqual(predictedEvent.payload.predicted, { tier: 'standard', deps: 0, priorVisits: 0 });
+  // actual is written on the pass terminal, sourced from the runner's own
+  // goal-check/branchFacts — never the worker's status/signal
+  const actualEvent = events.find((e) => e.type === 'work.outcome' && e.payload.actual);
+  assert.equal(actualEvent.payload.actual.outcome, 'proposed');
+  assert.equal(actualEvent.payload.actual.passed, true);
+  assert.equal(actualEvent.payload.actual.aheadCount, 1);
 });
 
 // --- verify-miss: retry then park ----------------------------------------
@@ -181,6 +191,18 @@ test('verify-miss: worker commits the wrong thing -> retry once, then park to bl
   assert.equal(countRuns(counterFile), 2); // retry really re-dispatched
   assert.equal(listWork(dir).work['item-miss'].status, 'blocked');
   assert.deepEqual(fs.readdirSync(worktreeDir), []);
+
+  // predicted at claim, and actual on the PARK branch (closes the HIGH-risk
+  // "failures learn nothing" gap — a park/halt must not be silent).
+  const events = readRawEvents(dir);
+  const predictedEvent = events.find((e) => e.type === 'work.outcome' && e.payload.predicted);
+  assert.ok(predictedEvent, 'predicted work.outcome written at claim');
+  const actualEvent = events.find((e) => e.type === 'work.outcome' && e.payload.actual);
+  assert.ok(actualEvent, 'actual work.outcome written on the park branch');
+  assert.equal(actualEvent.payload.actual.outcome, 'parked');
+  assert.equal(actualEvent.payload.actual.passed, false);
+  assert.equal(actualEvent.payload.actual.errorClass, 'verify-miss');
+  assert.equal(actualEvent.payload.actual.attempts, 2);
 });
 
 test('verify passes but the worker never committed -> classified verify-miss, parked after retries', () => {
