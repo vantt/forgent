@@ -1,13 +1,13 @@
 # Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký
 
-**Phiên bản:** v0.2. **Trạng thái:** ĐỀ XUẤT — chờ phản biện của chủ sản phẩm.
-**Ngày:** 2026-07-16.
+**Phiên bản:** v0.2. **Trạng thái:** CHUẨN — chấp nhận 2026-07-16, record
+[0010](decisions/0010-ban-do-kien-truc-la-ban-chuan.md).
 
 Chưng từ tài liệu bàn luận ở xưởng và hai deep-dive distillery (`work-item-management`,
 `work-item-schema-and-io-contracts`); v0.2 sửa theo hai vòng tự phản biện có kiểm
-chứng trên code (hồ sơ hai vòng lưu ở xưởng). Khi được chấp nhận, tài liệu này là
-**bản chuẩn kiến trúc của sản phẩm**: mọi ví dụ là thành phần fgOS. Thay đổi bản đồ
-về sau đi qua decision record kèm nâng version — supersede, không sửa ngầm.
+chứng trên code (hồ sơ hai vòng lưu ở xưởng). Tài liệu này là **bản chuẩn kiến trúc
+của sản phẩm**: mọi ví dụ là thành phần fgOS. Thay đổi bản đồ về sau đi qua decision
+record kèm nâng version — supersede, không sửa ngầm.
 
 **Changelog v0.1 → v0.2** (tóm tắt — chi tiết ở §11):
 
@@ -460,9 +460,8 @@ Ba bản ghi, ba câu hỏi, không giẫm chân:
 | `docs/backlog.md` | **SẮP LÀM GÌ** | PBI — mọi row `planned` §6 phải trỏ về một PBI ở đây |
 
 Entity xuất hiện ở cả hai bản đồ cross-link qua contract: work item ↔ C2 ·
-human-gate ↔ C4 · outcome ↔ C2 · handoff ↔ C6. Khi bản đồ được chấp nhận:
-thêm dòng vào `docs/specs/reading-map.md` + mục lục README (hôm nay chưa có — agent
-lạ theo L5 câu 1 chưa gặp được bản đồ này; đó là việc của decision chấp nhận).
+human-gate ↔ C4 · outcome ↔ C2 · handoff ↔ C6. Bản đồ nằm trong đường đọc
+chuẩn: `docs/specs/reading-map.md` + mục lục README (nối tại record 0010).
 
 ---
 
@@ -480,17 +479,16 @@ deploy/team, agent cắt theo kinh tế context-window và tính phi tất đị
 
 ---
 
-## Câu hỏi mở — mời phản biện
+## Câu hỏi mở — đã chốt tại record 0010 (chấp nhận không phản biện, theo đề xuất)
 
 1. **Đa tiến trình:** điểm yếu thật là **C2 một-cửa-ghi per-process** (JSONL + fs,
-   chưa lease/lock) — không phải ranh giới vai. Chấp nhận ghi nợ trong C2 và giải ở
-   PBI riêng khi swarm thật đến, hay phải giải trước P15?
-2. **Nghi thức thẻ-trước-code đi qua decision record chạm L5** (§9.1) — đồng ý xử
-   lý như một amendment L5, hay tách thành luật mới (L9)?
-3. **Nhà của `dispatch.mjs`:** v0.2 đặt Infra (cổng side-effect spawn + port
-   executor). Phương án khác: tách đôi — port definition (Use-case) / spawn thật
-   (Infra). Hiện một file làm cả hai; có đáng tách theo §9.4 không?
-4. **C1 part-live:** envelope hóa `fgos check` ngay tại S2 (nó là consumer máy-đọc
-   đầu tiên) thay vì đợi P14 — sớm một nhịp có đáng không?
-5. **Registry-manifest + 2 phép kiểm máy (§9.3):** gộp vào cell đầu của S2-friction
-   hay đứng riêng trước S2? (Đề xuất: đứng riêng trước — nó canh mọi feature sau.)
+   chưa lease/lock). **Chốt:** ghi nợ có tên trong C2; giải ở PBI riêng, bắt buộc
+   xong **trước P6 (fan-out)** — không chặn P15.
+2. **Nghi thức thẻ-trước-code chạm L5.** **Chốt:** hiệu lực như *phụ lục
+   definition-of-done* qua record 0010 — không sửa văn bản L5 tại chỗ, không mở
+   luật L9 mới; nếu L5 tới ngưỡng xem lại thì gộp chính thức khi supersede.
+3. **Nhà của `dispatch.mjs`.** **Chốt:** giữ một file ở Infra; chỉ tách port/spawn
+   khi P8 hoặc P16 thật sự cần hai nhịp đổi khác nhau (YAGNI).
+4. **C1 part-live.** **Chốt:** envelope đợi P14 như kế hoạch; S2 không kéo sớm.
+5. **Registry-manifest + 2 phép kiểm máy (§9.3).** **Chốt:** đứng riêng **trước
+   S2** — là PBI **P20** trong backlog; nó canh mọi feature sau.

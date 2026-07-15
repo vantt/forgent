@@ -31,6 +31,7 @@ tại chỗ (giữ đúng nguyên tắc bất-biến của platform-foundations)
 | [0007](0007-tien-hoa-schema-va-event.md) | Tiến hoá schema & event | Log đã commit bất khả xâm phạm; replay backward-compatible có test; event mang version. |
 | [0008](0008-routing-theo-audience.md) | Routing theo audience | Chọn kiểu giao tiếp theo audience của TỪNG interface, không áp một khuôn toàn cục. |
 | [0009](0009-chong-giao-thoa-luc-cai.md) | Chống giao thoa lúc cài | fgOS khi cài không được giao thoa tiến trình với harness khác (yêu cầu platform, chưa thực thi). |
+| [0010](0010-ban-do-kien-truc-la-ban-chuan.md) | Bản đồ kiến trúc là bản chuẩn | `docs/architecture-map.md` v0.2 (5 tầng E→U→I→D→K + 2 lớp phủ + 2 sổ) là chuẩn; thẻ-căn-cước-trước-code hiệu lực như phụ lục definition-of-done; 5 câu hỏi mở chốt kèm. |
 
 ## Truy vết nguồn (đầy đủ)
 

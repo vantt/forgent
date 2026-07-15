@@ -6,6 +6,7 @@ Forgent (fgOS) is the platform layer for building and running agent applications
 
 ## Documentation
 
+- [`docs/architecture-map.md`](docs/architecture-map.md) — bản chuẩn kiến trúc: 5 tầng + 2 lớp phủ + 2 sổ đăng ký (component, contract C1–C9)
 - [`docs/reference-learning-system.md`](docs/reference-learning-system.md) — thiết kế hệ thống học từ reference sources (lifecycle, schema, taxonomy)
 - [`docs/distillery/intake.md`](docs/distillery/intake.md) — hàng đợi nguồn học mới chờ triage
 - [`docs/distillery/sources/beegog.md`](docs/distillery/sources/beegog.md) — feature index: beegog (bee)

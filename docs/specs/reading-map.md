@@ -2,6 +2,7 @@
 
 - `docs/platform-foundations.md` — văn bản gốc 8 luật nền platform (L1–L8); spec: docs/specs/platform-foundations.md
 - `docs/backlog.md` — product backlog (PBI rows, scribing-owned)
+- `docs/architecture-map.md` — bản chuẩn kiến trúc (v0.2, record 0010): 5 tầng + 2 lớp phủ, sổ component + sổ contract (C1–C9), nghi thức thẻ-căn-cước-trước-code
 - `docs/work-item-lifecycle-vision.md` — tầm nhìn nền tảng: chu trình sống của work-item (mixed-autonomy, base-workflow + domain-extension); khung cho các PBI P14-P18
 - `docs/specs/` — state layer: area spec + system-overview + bản đồ này
 - `docs/routing-handoff-contract.md` — hợp đồng handoff agent↔agent + ranh giới tin cậy
