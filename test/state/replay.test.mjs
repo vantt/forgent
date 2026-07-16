@@ -206,6 +206,83 @@ test('foldEvents on a log with no work.discovery events yields a view with no "d
   assert.equal('discovery' in view, false);
 });
 
+// --- settlement channel (phase-3-compound-learning-5, S3-closeout) --------
+//
+// Three settling kinds derived from EXISTING event types (no new event type,
+// per D3/R3): 'clarify-pass' (work.stage -> executing), 'answer' (work.move
+// carrying an answer), 'close' (work.move -> done). `actor` rides on the
+// SAME event's payload (additive, optional) rather than a separate write.
+
+test('foldEvents derives a clarify-pass settlement from work.stage -> executing, carrying actor + verify as detail', () => {
+  const events = [
+    { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo', stage: 'clarify' }, v: 2 },
+    { seq: 2, ts: '2026-07-16T00:00:01.000Z', type: 'work.stage', payload: { id: 'a', from: 'clarify', to: 'executing', verify: 'npm test -- a', actor: 'runner' }, v: 2 },
+  ];
+  const view = foldEvents(events);
+  assert.equal(view.settlements.a.length, 1);
+  assert.deepEqual(view.settlements.a[0], { kind: 'clarify-pass', actor: 'runner', ts: '2026-07-16T00:00:01.000Z', detail: 'npm test -- a' });
+});
+
+test('foldEvents derives an answer settlement from a work.move carrying answer, with the answer text as detail', () => {
+  const events = [
+    { seq: 1, ts: '2026-07-15T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo' }, v: 2 },
+    { seq: 2, ts: '2026-07-15T00:00:01.000Z', type: 'work.move', payload: { id: 'a', from: 'todo', to: 'awaiting-human', ask: 'OAuth or password?' }, v: 2 },
+    { seq: 3, ts: '2026-07-15T00:00:02.000Z', type: 'work.move', payload: { id: 'a', from: 'awaiting-human', to: 'todo', answer: 'OAuth', actor: 'human' }, v: 2 },
+  ];
+  const view = foldEvents(events);
+  assert.equal(view.settlements.a.length, 1);
+  assert.deepEqual(view.settlements.a[0], { kind: 'answer', actor: 'human', ts: '2026-07-15T00:00:02.000Z', detail: 'OAuth' });
+});
+
+test('foldEvents derives a close settlement from a work.move -> done, with a null detail and actor', () => {
+  const events = [
+    { seq: 1, ts: '2026-07-15T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo' }, v: 2 },
+    { seq: 2, ts: '2026-07-15T00:00:01.000Z', type: 'work.move', payload: { id: 'a', from: 'doing', to: 'done', actor: 'human' }, v: 2 },
+  ];
+  const view = foldEvents(events);
+  assert.equal(view.settlements.a.length, 1);
+  assert.deepEqual(view.settlements.a[0], { kind: 'close', actor: 'human', ts: '2026-07-15T00:00:01.000Z', detail: null });
+});
+
+test('foldEvents settlement APPENDS across multiple settling transitions on the same id — none erase a prior one', () => {
+  const events = [
+    { seq: 1, ts: '2026-07-15T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo', stage: 'clarify' }, v: 2 },
+    { seq: 2, ts: '2026-07-15T00:00:01.000Z', type: 'work.stage', payload: { id: 'a', from: 'clarify', to: 'executing', verify: 'npm test', actor: 'runner' }, v: 2 },
+    { seq: 3, ts: '2026-07-15T00:00:02.000Z', type: 'work.move', payload: { id: 'a', from: 'todo', to: 'awaiting-human', ask: 'sure?' }, v: 2 },
+    { seq: 4, ts: '2026-07-15T00:00:03.000Z', type: 'work.move', payload: { id: 'a', from: 'awaiting-human', to: 'todo', answer: 'yes', actor: 'human' }, v: 2 },
+    { seq: 5, ts: '2026-07-15T00:00:04.000Z', type: 'work.move', payload: { id: 'a', from: 'doing', to: 'done', actor: 'human' }, v: 2 },
+  ];
+  const view = foldEvents(events);
+  assert.equal(view.settlements.a.length, 3);
+  assert.deepEqual(view.settlements.a.map((r) => r.kind), ['clarify-pass', 'answer', 'close']);
+});
+
+test('foldEvents settlement records fold with actor null when the event carries none (additive, actor optional)', () => {
+  const events = [
+    { seq: 1, ts: '2026-07-15T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo' }, v: 2 },
+    { seq: 2, ts: '2026-07-15T00:00:01.000Z', type: 'work.move', payload: { id: 'a', from: 'doing', to: 'done' }, v: 2 },
+  ];
+  const view = foldEvents(events);
+  assert.equal(view.settlements.a[0].actor, null);
+});
+
+test('foldEvents on a log with no settling transitions yields a view with no "settlements" key (lazy key, backward-compat)', () => {
+  const events = [
+    { seq: 1, ts: '2026-07-14T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo' } },
+    { seq: 2, ts: '2026-07-14T00:00:01.000Z', type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing' } },
+  ];
+  const view = foldEvents(events);
+  assert.equal('settlements' in view, false);
+});
+
+test('foldEvents ignores a settling work.move (-> done) for an id that was never added — ghost id stays a true no-op', () => {
+  const events = [
+    { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.move', payload: { id: 'ghost', from: 'doing', to: 'done' }, v: 2 },
+  ];
+  assert.doesNotThrow(() => foldEvents(events));
+  assert.equal('settlements' in foldEvents(events), false);
+});
+
 test('rebuildView preserves the historical ts from each event, never the current wall-clock time', () => {
   const logPath = tmpLogPath();
   // A ts far in the past — if replay ever called Date.now() instead of using

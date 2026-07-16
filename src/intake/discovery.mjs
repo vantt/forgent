@@ -117,8 +117,14 @@ export function judgeDiscovery(work, cfg) {
  * `FALLBACK_VERIFY` when it did not supply one — never the retired P14
  * placeholder). An unclear verdict parks the item in `awaiting-human` with
  * the verdict's question.
+ *
+ * `actor` (per Phase 3 S3-closeout settlement design) attributes WHO ran
+ * this pass — the two call sites disagree, so it is the caller's job to say:
+ * the runner's clarify sweep passes `'runner'`, the sync `discover` verb
+ * passes `'session'`. Optional; a clear verdict's `moveStage` only stamps it
+ * on the settlement record when a caller actually supplies it.
  */
-export function resolveDiscovery(dir, id, cfg) {
+export function resolveDiscovery(dir, id, cfg, actor) {
   const view = listWork(dir);
   const work = view.work[id];
   if (!work) {
@@ -134,6 +140,7 @@ export function resolveDiscovery(dir, id, cfg) {
       to: 'executing',
       expectedStage: 'clarify',
       verify: verdict.verify ?? FALLBACK_VERIFY,
+      actor,
     });
     return { outcome: 'clear', id, verdict };
   }

@@ -125,7 +125,7 @@ export function addWork(dir, work) {
  * delegates the precondition/CAS decision to fsm.mjs (pure — never writes),
  * and only then appends the event it returns.
  */
-export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer } = {}) {
+export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, actor } = {}) {
   const { logPath } = paths(dir);
   const before = rebuildView(logPath);
   const work = before.work[id];
@@ -139,6 +139,15 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer } = 
   // doesn't apply to the edge being taken — this facade never branches on
   // `to` itself, it just forwards what the caller gave it.
   const rawEvent = transitionWork({ work, to, expectedStatus, reason, ask, answer }); // FsmError: precondition | conflict
+  // Settlement actor attribution (per Phase 3 S3-closeout, vision §8):
+  // stamped onto the payload AFTER the pure transition already returned it —
+  // passing `actor` INTO transitionWork would be silently dropped, since
+  // fsm.mjs rebuilds `payload` itself from only the fields it knows about.
+  // Additive + optional: a caller that never supplies `actor` gets the
+  // exact payload shape transitionWork already produced, byte-for-byte.
+  if (actor !== undefined) {
+    rawEvent.payload.actor = actor;
+  }
   const event = appendEvent(logPath, rawEvent); // captures the real seq; rawEvent itself has none
   const view = refreshView(dir);
   return { event, view };
@@ -160,8 +169,8 @@ export function putInAwaiting(dir, { id, ask, expectedStatus } = {}) {
  * append-then-refresh tail, same CAS/validation errors — fsm.mjs requires a
  * non-empty `answer` on this edge.
  */
-export function answerAwaiting(dir, { id, answer, expectedStatus } = {}) {
-  return moveWork(dir, { id, to: 'todo', expectedStatus, answer });
+export function answerAwaiting(dir, { id, answer, expectedStatus, actor } = {}) {
+  return moveWork(dir, { id, to: 'todo', expectedStatus, answer, actor });
 }
 
 /**
@@ -170,7 +179,7 @@ export function answerAwaiting(dir, { id, answer, expectedStatus } = {}) {
  * log, delegates the precondition/CAS decision to stage.mjs (pure — never
  * writes), and only then appends the event it returns.
  */
-export function moveStage(dir, { id, to, expectedStage, verify } = {}) {
+export function moveStage(dir, { id, to, expectedStage, verify, actor } = {}) {
   const { logPath } = paths(dir);
   const before = rebuildView(logPath);
   const work = before.work[id];
@@ -179,6 +188,11 @@ export function moveStage(dir, { id, to, expectedStage, verify } = {}) {
   }
 
   const rawEvent = transitionStage({ work, to, expectedStage, verify }); // FsmError: precondition | conflict
+  // Same post-transition actor stamp as moveWork above — stage.mjs is pure
+  // and only ever returns the fields it knows about.
+  if (actor !== undefined) {
+    rawEvent.payload.actor = actor;
+  }
   const event = appendEvent(logPath, rawEvent);
   const view = refreshView(dir);
   return { event, view };

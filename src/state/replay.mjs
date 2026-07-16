@@ -44,7 +44,7 @@ function applyEvent(view, event) {
       break;
     }
     case 'work.move': {
-      const { id, to, ask, answer } = event.payload ?? {};
+      const { id, to, ask, answer, actor } = event.payload ?? {};
       const item = view.work[id];
       if (item) {
         item.status = to;
@@ -67,6 +67,44 @@ function applyEvent(view, event) {
           ...(ask ? { ask } : {}),
           ...(answer ? { answer } : {}),
         };
+      }
+      // Settlement channel (kênh 1 của capture 2 kênh, per Phase 3
+      // S3-closeout, vision §8) — two of the three settling kinds ride on
+      // work.move: 'answer' (an awaiting-human gate resolved by a person's
+      // decision) and 'close' (the item reaching the terminal `done`
+      // status, via either entry edge). No new event type (D3/R3 — the
+      // data already exists in the log); this only APPENDS a derived
+      // record, mirroring frictions/discovery below (never merge/replace —
+      // a settlement is a one-time occurrence per transition, and reusing
+      // the id for a later unrelated settlement must not erase this one).
+      // GUARDED on `item` (a real work item this move actually applied to)
+      // exactly like `item.status = to` above — a move for an id that was
+      // never added must stay a no-op in every respect (ghost-id test).
+      // ALSO guarded on `event.v` being present: a true pre-Phase-2 legacy
+      // event (per D7b/R11 — `v` absent entirely, the fixture's own shape)
+      // predates the schema-version regime itself, and backward-compat.test
+      // locks its fold to a byte-identical historical view with no
+      // `settlements` key at all. Any v-carrying log (Phase 2 onward,
+      // including logs written before this cell existed) mines normally —
+      // this is the exact D7c signal the repo already uses to draw that line.
+      if (item && event.v !== undefined) {
+        let kind = null;
+        let detail = null;
+        if (answer) {
+          kind = 'answer';
+          detail = answer;
+        } else if (to === 'done') {
+          kind = 'close';
+        }
+        if (kind) {
+          if (!view.settlements) {
+            view.settlements = {};
+          }
+          view.settlements[id] = [
+            ...(view.settlements[id] ?? []),
+            { kind, actor: actor ?? null, ts: event.ts, detail },
+          ];
+        }
       }
       break;
     }
@@ -103,13 +141,28 @@ function applyEvent(view, event) {
       // (read lazily as `executing` by consumers, per D8); this case only
       // ever runs for an item that already has a real `work.stage` event in
       // its history, at which point setting the field explicitly is correct.
-      const { id, to, verify } = event.payload ?? {};
+      const { id, to, verify, actor } = event.payload ?? {};
       const item = view.work[id];
       if (item) {
         item.stage = to;
         if (verify !== undefined) {
           item.verify = verify;
         }
+      }
+      // Settlement channel, third kind (mirrors the work.move case above):
+      // a clarify-pass (stage clarify -> executing) is the third settling
+      // event type per the S3-closeout design. Guarded on `to === 'executing'`
+      // rather than assuming every work.stage settles, so a future stage
+      // edge that isn't a clarify-pass doesn't wrongly count as one; guarded
+      // on `item` for the same ghost-id no-op reason as work.move above.
+      if (item && to === 'executing') {
+        if (!view.settlements) {
+          view.settlements = {};
+        }
+        view.settlements[id] = [
+          ...(view.settlements[id] ?? []),
+          { kind: 'clarify-pass', actor: actor ?? null, ts: event.ts, detail: verify ?? null },
+        ];
       }
       break;
     }

@@ -115,6 +115,10 @@ function formatCheck(view, id) {
   if (friction) {
     sections.push(friction);
   }
+  const settlement = formatSettlementSection(view, id);
+  if (settlement) {
+    sections.push(settlement);
+  }
   const nag = formatMissingOutcomeNag(view, id);
   if (nag) {
     sections.push(nag);
@@ -158,6 +162,40 @@ function formatFrictionSection(view, id) {
       `  - [${r.disposition}] ${r.id} ${r.errorClass}/${r.layer} (attempts ${r.attempts}): ${r.detail ?? ''}`.trimEnd(),
     );
   return `friction (${records.length}):\n  theo lớp: ${layerLine}\n${recent.join('\n')}`;
+}
+
+// Settlement report cap — same "always CAP, never unbounded" rule as
+// friction's cap above (porting lesson predicted-actual-feedback-store).
+const SETTLEMENT_DISPLAY_CAP = 5;
+
+// Settlement channel section (kênh 1 của capture 2 kênh — Phase 3
+// S3-closeout, vision §8): per-kind/actor counts over ALL matching records,
+// then the newest records capped at SETTLEMENT_DISPLAY_CAP. `settlements` is
+// a lazy view key (replay.mjs) — a log with no settling event has no key and
+// this section disappears, keeping `check` output byte-identical to
+// pre-settlement logs.
+function formatSettlementSection(view, id) {
+  const settlements = view.settlements ?? {};
+  const records = (id ? [id] : Object.keys(settlements)).flatMap((itemId) =>
+    (settlements[itemId] ?? []).map((r) => ({ ...r, id: itemId })),
+  );
+  if (records.length === 0) {
+    return '';
+  }
+  const byKindActor = {};
+  for (const r of records) {
+    const key = `${r.kind}/${r.actor ?? 'unknown'}`;
+    byKindActor[key] = (byKindActor[key] ?? 0) + 1;
+  }
+  const summaryLine = Object.entries(byKindActor)
+    .map(([key, n]) => `${key} ${n}`)
+    .join(' · ');
+  const recent = records
+    .sort((a, b) => ((a.ts ?? '') < (b.ts ?? '') ? -1 : 1))
+    .slice(-SETTLEMENT_DISPLAY_CAP)
+    .reverse()
+    .map((r) => `  - [${r.kind}] ${r.id} actor=${r.actor ?? 'unknown'}: ${r.detail ?? ''}`.trimEnd());
+  return `settlement (${records.length}):\n  theo kind/actor: ${summaryLine}\n${recent.join('\n')}`;
 }
 
 // Outcome-lifecycle nag (per porting lesson porting-outcome-lifecycle: the
@@ -251,7 +289,7 @@ function runVerb(verb, flags, positional, dir) {
       const id = requireField(positional[0] ?? flags.id, 'discover requires an id: fgos discover <id> [--config <path>]');
       const configPath = flags.config ?? path.join(process.cwd(), '.fgos-runner.json');
       const cfg = loadRunnerConfig(configPath);
-      const result = resolveDiscovery(dir, id, cfg);
+      const result = resolveDiscovery(dir, id, cfg, 'session');
       return JSON.stringify(wrapEnvelope(result), null, 2);
     }
 
@@ -264,7 +302,7 @@ function runVerb(verb, flags, positional, dir) {
       // ignored everywhere else" — this verb just forwards whatever the
       // caller supplied.
       const reason = optionalField(flags.reason, 'move --reason requires a non-empty reason value (omit --reason entirely when not rejecting a proposal)');
-      const { event } = moveWork(dir, { id, to, expectedStatus, reason });
+      const { event } = moveWork(dir, { id, to, expectedStatus, reason, actor: 'human' });
       return `Moved ${id}: ${event.payload.from} -> ${event.payload.to} (event #${event.seq})`;
     }
 
@@ -288,7 +326,7 @@ function runVerb(verb, flags, positional, dir) {
       const id = requireField(positional[0] ?? flags.id, 'answer requires an id: fgos answer <id> --text "..." [--expect <status>]');
       const text = requireField(flags.text, 'answer requires --text "..."');
       const expectedStatus = optionalField(flags.expect, 'answer --expect requires a status value (omit --expect entirely to skip the CAS check)');
-      const { event } = answerAwaiting(dir, { id, answer: text, expectedStatus });
+      const { event } = answerAwaiting(dir, { id, answer: text, expectedStatus, actor: 'human' });
       return `Answered ${id}: ${event.payload.from} -> ${event.payload.to} (event #${event.seq})`;
     }
 

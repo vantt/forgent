@@ -175,6 +175,66 @@ test('runOnce full circle: todo -> doing -> worker commit -> goal-check pass -> 
   assert.equal(actualEvent.payload.actual.aheadCount, 1);
 });
 
+// --- settlement actor attribution (phase-3-compound-learning-5,
+// S3-closeout): every moveWork call the runner itself makes stamps
+// actor:'runner' on the raw event payload (per vision §8 — the runner is
+// never a human/session). -------------------------------------------------
+
+test('runOnce stamps actor "runner" on every claim/propose work.move it writes', () => {
+  const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
+  seedItem(dir, { id: 'item-actor' });
+  const config = configFor(writeCommittingExecutor(scriptDir, counterFile));
+
+  runOnce({ repoRoot, config, worktreeDir, log: noLog });
+
+  const moves = readRawEvents(dir).filter((e) => e.type === 'work.move');
+  assert.ok(moves.length >= 2, 'claim (todo->doing) and propose (doing->proposed) both wrote a move');
+  for (const move of moves) {
+    assert.equal(move.payload.actor, 'runner');
+  }
+});
+
+/** A discovery-aware executor (stage-clarify D4/D5/D13, mirroring
+ * test/e2e/runner-loop.test.mjs's own helper): the same configured executor
+ * serves both the context-discovery verdict call (discovery.mjs's prompt,
+ * which always starts with "# Context-discovery") and the worker dispatch
+ * call — told apart by that fixed prefix. */
+function writeClearDiscoveryExecutor(scriptDir, counterFile, { verify, produce = 'output.txt' } = {}) {
+  const scriptPath = path.join(scriptDir, 'clear-discovery-executor.mjs');
+  fs.writeFileSync(
+    scriptPath,
+    `
+import fs from 'node:fs';
+import { execFileSync } from 'node:child_process';
+const prompt = process.argv[2] ?? '';
+if (prompt.startsWith('# Context-discovery')) {
+  process.stdout.write(JSON.stringify({ clear: true, verify: ${JSON.stringify(verify)} }));
+} else {
+  fs.appendFileSync(${JSON.stringify(counterFile)}, 'run\\n');
+  fs.writeFileSync(${JSON.stringify(produce)}, 'produced by worker\\n');
+  execFileSync('git', ['add', ${JSON.stringify(produce)}]);
+  execFileSync('git', ['commit', '-q', '-m', ${JSON.stringify('worker: output.txt')}]);
+}
+`,
+  );
+  return scriptPath;
+}
+
+test('runOnce clarify sweep records a clarify-pass settlement stamped actor "runner" (R19/D13 sweep)', () => {
+  const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
+  seedItem(dir, { id: 'item-clarify', stage: 'clarify', verify: 'test -f output.txt' });
+  const config = configFor(writeClearDiscoveryExecutor(scriptDir, counterFile, { verify: 'test -f output.txt' }));
+
+  const result = runOnce({ repoRoot, config, worktreeDir, log: noLog });
+
+  assert.equal(result.outcome, 'proposed', 'the sweep clears the item before the frontier dispatches it in the same pass');
+  const view = listWork(dir);
+  assert.equal(view.work['item-clarify'].stage, 'executing');
+  assert.equal(view.settlements['item-clarify'].length, 1);
+  assert.equal(view.settlements['item-clarify'][0].kind, 'clarify-pass');
+  assert.equal(view.settlements['item-clarify'][0].actor, 'runner');
+});
+
 // --- verify-miss: retry then park ----------------------------------------
 
 test('verify-miss: worker commits the wrong thing -> retry once, then park to blocked (never proposed)', () => {

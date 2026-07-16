@@ -853,3 +853,84 @@ test('discover with no id is rejected as validation, exit 4', () => {
   const result = run(cwd, ['discover']);
   assert.equal(result.status, 4);
 });
+
+// --- settlement channel actor attribution (phase-3-compound-learning-5,
+// S3-closeout) — real CLI call sites stamp `actor` per vision §8: the
+// `move`/`answer` verbs are always a human at the keyboard; `discover` is
+// the sync, session-driven call site (the async runner sweep is 'runner',
+// covered at the runner unit-test layer). ---------------------------------
+
+test('answer via the real CLI stamps actor "human" on the event payload and folds into an "answer" settlement', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'answer-actor-item');
+  run(cwd, ['move', 'answer-actor-item', '--to', 'doing']);
+  run(cwd, ['ask', 'answer-actor-item', '--text', 'OAuth or password?']);
+
+  const result = run(cwd, ['answer', 'answer-actor-item', '--text', 'OAuth']);
+  assert.equal(result.status, 0);
+
+  const lines = eventLines(cwd);
+  const lastEvent = JSON.parse(lines[lines.length - 1]);
+  assert.equal(lastEvent.payload.actor, 'human');
+
+  const view = stateView(cwd);
+  assert.equal(view.settlements['answer-actor-item'].length, 1);
+  assert.equal(view.settlements['answer-actor-item'][0].kind, 'answer');
+  assert.equal(view.settlements['answer-actor-item'][0].actor, 'human');
+});
+
+test('move to done via the real CLI stamps actor "human" on the event payload and folds into a "close" settlement', () => {
+  const cwd = tmpCwd();
+  toProposed(cwd, 'close-actor-item');
+
+  const result = run(cwd, ['move', 'close-actor-item', '--to', 'done']);
+  assert.equal(result.status, 0);
+
+  const lines = eventLines(cwd);
+  const lastEvent = JSON.parse(lines[lines.length - 1]);
+  assert.equal(lastEvent.payload.actor, 'human');
+
+  const view = stateView(cwd);
+  assert.equal(view.settlements['close-actor-item'].length, 1);
+  assert.equal(view.settlements['close-actor-item'][0].kind, 'close');
+  assert.equal(view.settlements['close-actor-item'][0].actor, 'human');
+});
+
+test('discover (sync verb) on a clear verdict stamps actor "session" on the work.stage event and folds into a clarify-pass settlement', () => {
+  const cwd = tmpCwd();
+  writeRunnerConfig(cwd, { clear: true, verify: 'npm test -- proven' });
+  const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
+
+  const result = run(cwd, ['discover', id]);
+  assert.equal(result.status, 0);
+
+  const lines = eventLines(cwd);
+  const stageEvent = lines.map((l) => JSON.parse(l)).find((e) => e.type === 'work.stage');
+  assert.equal(stageEvent.payload.actor, 'session');
+
+  const view = stateView(cwd);
+  assert.equal(view.settlements[id].length, 1);
+  assert.equal(view.settlements[id][0].kind, 'clarify-pass');
+  assert.equal(view.settlements[id][0].actor, 'session');
+});
+
+test('check prints the settlement section — per-kind/actor counts + recent records — when settlement data exists', () => {
+  const cwd = tmpCwd();
+  toProposed(cwd, 'settle-item');
+  run(cwd, ['move', 'settle-item', '--to', 'done']);
+
+  const result = run(cwd, ['check']);
+  assert.equal(result.status, 0);
+  assert.match(result.stdout, /settlement \(1\)/);
+  assert.match(result.stdout, /close\/human 1/);
+  assert.match(result.stdout, /\[close\] settle-item actor=human/);
+});
+
+test('check output on a log with no settling transitions is unchanged — no settlement section', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'no-settlement-item');
+
+  const result = run(cwd, ['check']);
+  assert.equal(result.status, 0);
+  assert.doesNotMatch(result.stdout, /settlement/);
+});

@@ -328,7 +328,7 @@ export function startupReap({ repoRoot, dir, worktreeDir, verifyTimeoutMs, log =
     const resolution = worktreeFailed
       ? { to: 'blocked', reason: 'runner-crash-reclaim' }
       : resolveStaleDoing({ hasCommit, verifyPassed });
-    moveWork(dir, { id, to: resolution.to, expectedStatus: 'doing', reason: resolution.reason });
+    moveWork(dir, { id, to: resolution.to, expectedStatus: 'doing', reason: resolution.reason, actor: 'runner' });
     log(`fgos-runner: reaped stale doing "${id}" -> ${resolution.to}${resolution.reason ? ` (${resolution.reason})` : ''}`);
     resolutions.push({ id, to: resolution.to, reason: resolution.reason ?? null });
   }
@@ -374,7 +374,7 @@ export function startupReap({ repoRoot, dir, worktreeDir, verifyTimeoutMs, log =
  * status/signal (D3) — the worker's report is never trusted on its own.
  */
 function processItem({ repoRoot, dir, item, config, worktreeDir, breaker, log, priorVisits }) {
-  moveWork(dir, { id: item.id, to: 'doing', expectedStatus: 'todo' });
+  moveWork(dir, { id: item.id, to: 'doing', expectedStatus: 'todo', actor: 'runner' });
   log(`fgos-runner: claimed "${item.id}" (todo -> doing)`);
   addOutcome(dir, {
     id: item.id,
@@ -405,7 +405,7 @@ function processItem({ repoRoot, dir, item, config, worktreeDir, breaker, log, p
 
       if (check.passed && facts.aheadCount > 0) {
         breaker.recordHit();
-        moveWork(dir, { id: item.id, to: 'proposed', expectedStatus: 'doing' });
+        moveWork(dir, { id: item.id, to: 'proposed', expectedStatus: 'doing', actor: 'runner' });
         log(`fgos-runner: "${item.id}" proposed on branch ${wt.branch} (${facts.aheadCount} commit(s))`);
         log(`fgos-runner: verify tail:\n${tailLines(check.output)}`);
         addOutcome(dir, {
@@ -462,6 +462,7 @@ function processItem({ repoRoot, dir, item, config, worktreeDir, breaker, log, p
       to: 'blocked',
       expectedStatus: 'doing',
       reason: tripped ? 'breaker-tripped' : failure.errorClass,
+      actor: 'runner',
     });
 
     // Single ACTUAL emission covering BOTH `parked` and `halted` (every
@@ -555,7 +556,7 @@ export function runOnce(options = {}) {
     if (!dryRun) {
       for (const item of Object.values(listWork(dir).work)) {
         if (item.stage === 'clarify' && item.status === 'todo') {
-          resolveDiscovery(dir, item.id, config);
+          resolveDiscovery(dir, item.id, config, 'runner');
           log(`fgos-runner: context-discovery swept clarify item "${item.id}"`);
         }
       }
@@ -581,7 +582,7 @@ export function runOnce(options = {}) {
             exitCode: 0,
           };
         }
-        moveWork(dir, { id: item.id, to: 'blocked', expectedStatus: 'todo', reason: 'anti-loop-max-visits' });
+        moveWork(dir, { id: item.id, to: 'blocked', expectedStatus: 'todo', reason: 'anti-loop-max-visits', actor: 'runner' });
         log(`fgos-runner: parked "${item.id}" — anti-loop max-visits (${visits}/${maxVisits})`);
         parked.push({ id: item.id, reason: 'anti-loop-max-visits', visits });
         continue; // the parked item left the frontier; take the next head
