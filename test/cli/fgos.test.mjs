@@ -1352,3 +1352,315 @@ test('return --timeout with a non-numeric or non-positive value is rejected as v
   assert.equal(result.status, 4);
   assert.equal(stateView(cwd).work['pull-return-bad-timeout'].status, 'doing', 'a rejected --timeout never runs verify or moves the item');
 });
+
+// --- pr-lifecycle S1-gate: review/approve/reject (pr-lifecycle-2) ---------
+//
+// Cổng duyệt PR nội bộ (D1/D4): `review` is a pure read over whichever diff
+// source classifySource resolves; `approve` merges (runner item) or
+// re-verifies on main (pull/legacy item) and only then closes to `done`;
+// `reject` is a pure FSM move that never touches git. `initGitCwdMain` pins
+// the trunk branch name to "main" (the shared `initGitCwd` above leaves it
+// at whatever the local git default happens to be) because merge.mjs's
+// runner-source diff/merge is written against the literal trunk name "main"
+// (per plan.md's locked Approach) — only the runner-source tests below need
+// it; pull/legacy tests reuse the existing `initGitCwd`/`tmpCwd` helpers
+// since their approve path never references a branch name at all.
+
+function initGitCwdMain() {
+  const cwd = tmpCwd();
+  execFileSync('git', ['init', '-q', '-b', 'main'], { cwd });
+  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd });
+  execFileSync('git', ['config', 'user.name', 'Test'], { cwd });
+  fs.writeFileSync(path.join(cwd, '.gitignore'), '.fgos/state.json\n');
+  fs.writeFileSync(path.join(cwd, 'seed.txt'), 'seed\n');
+  execFileSync('git', ['add', 'seed.txt', '.gitignore'], { cwd });
+  execFileSync('git', ['commit', '-q', '-m', 'seed'], { cwd });
+  return cwd;
+}
+
+function gitAtCwd(cwd, args) {
+  return execFileSync('git', args, { cwd, encoding: 'utf8' });
+}
+
+// `.fgos/events.jsonl` is tracked-but-uncommitted the moment any fgos verb
+// appends to it (same convention `commitFile` above already relies on for
+// take/return) — approve's runner path refuses a dirty main tree, so every
+// test that reaches a real merge must fold pending event-log changes into a
+// real commit first, exactly like a human would commit their own state
+// bookkeeping alongside code.
+function commitPending(cwd, message) {
+  execFileSync('git', ['add', '-A'], { cwd });
+  execFileSync('git', ['commit', '-q', '-m', message], { cwd });
+}
+
+// Simulates what the real runner (loop.mjs/worktree.mjs) leaves behind for a
+// runner-source proposed item: a live `fgw/<id>` branch carrying a real
+// commit, with the item's own status independently moved to `proposed`
+// through the normal doing -> proposed edge — these CLI tests never invoke
+// the real runner, only the git/state shape it produces.
+function makeRunnerProposedItem(cwd, id, extra = {}) {
+  addOk(cwd, id, extra);
+  run(cwd, ['move', id, '--to', 'doing']);
+  commitPending(cwd, `state: claim ${id}`);
+
+  gitAtCwd(cwd, ['checkout', '-b', `fgw/${id}`]);
+  fs.writeFileSync(path.join(cwd, `${id}-produced.txt`), 'ok\n');
+  gitAtCwd(cwd, ['add', '-A']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', `worker output for ${id}`]);
+  gitAtCwd(cwd, ['checkout', 'main']);
+
+  run(cwd, ['move', id, '--to', 'proposed']);
+  commitPending(cwd, `state: propose ${id}`);
+}
+
+test('review on a nonexistent id is rejected as validation, exit 4', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['review', 'ghost']);
+  assert.equal(result.status, 4);
+});
+
+test('review on a non-proposed item is rejected as precondition, exit 2', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'not-proposed-review');
+  const result = run(cwd, ['review', 'not-proposed-review']);
+  assert.equal(result.status, 2);
+});
+
+test('review of a runner-source proposed item prints the branch diff and no warnings, exit 0', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeRunnerProposedItem(cwd, 'review-runner-item');
+
+  const result = run(cwd, ['review', 'review-runner-item']);
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /source: runner/);
+  assert.match(result.stdout, /review-runner-item-produced\.txt/);
+  assert.doesNotMatch(result.stdout, /warning:/);
+});
+
+test('review of a pull-door proposed item prints the headAtTake..headAtReturn diff, exit 0', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  addOk(cwd, 'review-pull-item', { verify: 'test -f proof.txt' });
+  run(cwd, ['take', '--id', 'review-pull-item']);
+  commitFile(cwd, 'proof.txt');
+  run(cwd, ['return', 'review-pull-item']);
+
+  const result = run(cwd, ['review', 'review-pull-item']);
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /source: pull/);
+  assert.match(result.stdout, /proof\.txt/);
+  assert.doesNotMatch(result.stdout, /warning:/);
+});
+
+test('review of a legacy proposed item (no branch, no headAtTake/headAtReturn) degrades honestly — a warning, no throw, exit 0 (must_have: legacy degrade)', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'review-legacy-item');
+  run(cwd, ['move', 'review-legacy-item', '--to', 'doing']);
+  run(cwd, ['move', 'review-legacy-item', '--to', 'proposed']);
+
+  const result = run(cwd, ['review', 'review-legacy-item']);
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /source: legacy/);
+  assert.match(result.stdout, /warning: no live diff source/);
+});
+
+test('approve on a nonexistent id is rejected as validation, exit 4', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['approve', 'ghost']);
+  assert.equal(result.status, 4);
+});
+
+test('approve on a non-proposed item is rejected as precondition, exit 2', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'not-proposed-approve');
+  const result = run(cwd, ['approve', 'not-proposed-approve']);
+  assert.equal(result.status, 2);
+});
+
+test('approve of a runner item (happy path): merges fgw/<id> into main, verifies, proposed -> done with actor human, and cleans up the branch', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeRunnerProposedItem(cwd, 'approve-runner-item', { verify: 'test -f approve-runner-item-produced.txt' });
+
+  const result = run(cwd, ['approve', 'approve-runner-item']);
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /proposed -> done/);
+
+  const view = stateView(cwd);
+  assert.equal(view.work['approve-runner-item'].status, 'done');
+  assert.equal(view.settlements['approve-runner-item'][0].kind, 'close');
+  assert.equal(view.settlements['approve-runner-item'][0].actor, 'human');
+  assert.ok(fs.existsSync(path.join(cwd, 'approve-runner-item-produced.txt')), 'the merged file must be present on main');
+
+  const branches = gitAtCwd(cwd, ['for-each-ref', '--format=%(refname:short)', 'refs/heads/fgw/']);
+  assert.doesNotMatch(branches, /fgw\/approve-runner-item/, 'the fully-merged branch is cleaned up');
+});
+
+test('approve of a runner item that conflicts: aborts the merge, proposed -> blocked (reason merge-conflict), main left byte-for-byte unchanged (must_have: main never holds a broken merge commit)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  fs.writeFileSync(path.join(cwd, 'shared.txt'), 'base\n');
+  gitAtCwd(cwd, ['add', 'shared.txt']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', 'seed shared.txt']);
+
+  addOk(cwd, 'approve-conflict-item');
+  run(cwd, ['move', 'approve-conflict-item', '--to', 'doing']);
+  commitPending(cwd, 'state: claim approve-conflict-item');
+
+  gitAtCwd(cwd, ['checkout', '-b', 'fgw/approve-conflict-item']);
+  fs.writeFileSync(path.join(cwd, 'shared.txt'), 'branch-change\n');
+  gitAtCwd(cwd, ['add', 'shared.txt']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', 'branch changes shared.txt']);
+  gitAtCwd(cwd, ['checkout', 'main']);
+  fs.writeFileSync(path.join(cwd, 'shared.txt'), 'main-change\n');
+  gitAtCwd(cwd, ['add', 'shared.txt']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', 'main changes shared.txt']);
+
+  run(cwd, ['move', 'approve-conflict-item', '--to', 'proposed']);
+  commitPending(cwd, 'state: propose approve-conflict-item');
+
+  const headBefore = gitHead(cwd);
+  const result = run(cwd, ['approve', 'approve-conflict-item']);
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /blocked/);
+  assert.match(result.stdout, /merge-conflict/);
+
+  assert.equal(gitHead(cwd), headBefore, 'HEAD must be unchanged after an aborted merge');
+  assert.equal(fs.readFileSync(path.join(cwd, 'shared.txt'), 'utf8'), 'main-change\n', 'main content must be unchanged');
+
+  const view = stateView(cwd);
+  assert.equal(view.work['approve-conflict-item'].status, 'blocked');
+  assert.equal(view.frictions['approve-conflict-item'][0].errorClass, 'merge-conflict');
+});
+
+test('approve of a runner item whose staged merge fails its own verify: aborts, proposed -> blocked (reason verify-fail-post-merge), main left unchanged', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeRunnerProposedItem(cwd, 'approve-verify-fail-item', { verify: 'test -f file-never-produced.txt' });
+
+  const headBefore = gitHead(cwd);
+  const result = run(cwd, ['approve', 'approve-verify-fail-item']);
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /blocked/);
+  assert.match(result.stdout, /verify-fail-post-merge/);
+
+  assert.equal(gitHead(cwd), headBefore, 'HEAD must be unchanged after an aborted merge');
+  assert.equal(fs.existsSync(path.join(cwd, 'approve-verify-fail-item-produced.txt')), false, 'a staged-then-aborted merge must not leave its file behind');
+
+  const view = stateView(cwd);
+  assert.equal(view.work['approve-verify-fail-item'].status, 'blocked');
+  assert.equal(view.frictions['approve-verify-fail-item'][0].errorClass, 'verify-miss');
+});
+
+test('approve of a pull-door item (no merge, code already on main): re-verifies and closes proposed -> done with actor human', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  addOk(cwd, 'approve-pull-item', { verify: 'test -f proof.txt' });
+  run(cwd, ['take', '--id', 'approve-pull-item']);
+  commitFile(cwd, 'proof.txt');
+  run(cwd, ['return', 'approve-pull-item']);
+
+  const result = run(cwd, ['approve', 'approve-pull-item']);
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /proposed -> done/);
+
+  const view = stateView(cwd);
+  assert.equal(view.work['approve-pull-item'].status, 'done');
+  assert.equal(view.settlements['approve-pull-item'][0].actor, 'human');
+});
+
+test('approve of a legacy item with a failing verify: blocked (reason verify-fail), not merge-related, exit 0', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'approve-legacy-fail-item', { verify: 'false' });
+  run(cwd, ['move', 'approve-legacy-fail-item', '--to', 'doing']);
+  run(cwd, ['move', 'approve-legacy-fail-item', '--to', 'proposed']);
+
+  const result = run(cwd, ['approve', 'approve-legacy-fail-item']);
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /blocked/);
+  assert.match(result.stdout, /verify-fail\b/);
+  assert.doesNotMatch(result.stdout, /verify-fail-post-merge/);
+
+  const view = stateView(cwd);
+  assert.equal(view.work['approve-legacy-fail-item'].status, 'blocked');
+});
+
+test('approve of a legacy item with a passing verify closes it to done — legacy degrade never blocks approve/reject from working (must_have)', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'approve-legacy-ok-item', { verify: 'true' });
+  run(cwd, ['move', 'approve-legacy-ok-item', '--to', 'doing']);
+  run(cwd, ['move', 'approve-legacy-ok-item', '--to', 'proposed']);
+
+  const result = run(cwd, ['approve', 'approve-legacy-ok-item']);
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(stateView(cwd).work['approve-legacy-ok-item'].status, 'done');
+});
+
+test('approve twice: the second approve on an already-done item is rejected as precondition, exit 2 (done is terminal)', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'approve-twice-item', { verify: 'true' });
+  run(cwd, ['move', 'approve-twice-item', '--to', 'doing']);
+  run(cwd, ['move', 'approve-twice-item', '--to', 'proposed']);
+  assert.equal(run(cwd, ['approve', 'approve-twice-item']).status, 0);
+
+  const result = run(cwd, ['approve', 'approve-twice-item']);
+  assert.equal(result.status, 2);
+});
+
+test('reject on a nonexistent id is rejected as validation, exit 4', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['reject', 'ghost', '--reason', 'nope']);
+  assert.equal(result.status, 4);
+});
+
+test('reject without --reason is rejected as validation, exit 4, item stays proposed', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'reject-no-reason-item');
+  run(cwd, ['move', 'reject-no-reason-item', '--to', 'doing']);
+  run(cwd, ['move', 'reject-no-reason-item', '--to', 'proposed']);
+
+  const result = run(cwd, ['reject', 'reject-no-reason-item']);
+  assert.equal(result.status, 4);
+  assert.equal(stateView(cwd).work['reject-no-reason-item'].status, 'proposed');
+});
+
+test('reject on a non-proposed item is rejected as precondition, exit 2', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'reject-not-proposed-item');
+  const result = run(cwd, ['reject', 'reject-not-proposed-item', '--reason', 'nope']);
+  assert.equal(result.status, 2);
+});
+
+test('reject moves proposed -> todo with the reason recorded, actor human, and runs no git command at all — never a revert (D4)', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  addOk(cwd, 'reject-pull-item', { verify: 'test -f proof.txt' });
+  run(cwd, ['take', '--id', 'reject-pull-item']);
+  commitFile(cwd, 'proof.txt');
+  run(cwd, ['return', 'reject-pull-item']);
+
+  const headBefore = gitHead(cwd);
+  const result = run(cwd, ['reject', 'reject-pull-item', '--reason', 'needs more test coverage']);
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /proposed -> todo/);
+  assert.match(result.stdout, /no revert/);
+
+  assert.equal(gitHead(cwd), headBefore, 'reject must never touch git — HEAD unchanged');
+  assert.ok(fs.existsSync(path.join(cwd, 'proof.txt')), 'reject never reverts the code already on main (D4)');
+
+  const view = stateView(cwd);
+  assert.equal(view.work['reject-pull-item'].status, 'todo');
+
+  const lines = eventLines(cwd);
+  const lastEvent = JSON.parse(lines[lines.length - 1]);
+  assert.equal(lastEvent.payload.reason, 'needs more test coverage');
+  assert.equal(lastEvent.payload.actor, 'human');
+});
+
+test('the CLI usage message for an unknown verb lists review/approve/reject in the surface', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['bogus-verb']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /review\|approve\|reject/);
+});

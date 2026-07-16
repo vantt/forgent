@@ -26,6 +26,7 @@ import { resolveDiscovery } from '../src/intake/discovery.mjs';
 import { resolveDecompose } from '../src/intake/decompose.mjs';
 import { computeEntropy, computeCounts } from '../src/report/entropy.mjs';
 import { runGoalCheck } from '../src/runner/goal-check.mjs';
+import { classifySource, reviewDiff, mergeRunnerItem, cleanupMergedBranch, isWorkingTreeClean as isMainTreeClean } from '../src/runner/merge.mjs';
 import { visitCount } from '../src/runner/anti-loop.mjs';
 import { DEFAULTS } from '../src/state/work.mjs';
 
@@ -208,6 +209,24 @@ function formatFrictionSection(view, id) {
       `  - [${r.disposition}] ${r.id} ${r.errorClass}/${r.layer} (attempts ${r.attempts}): ${r.detail ?? ''}`.trimEnd(),
     );
   return `friction (${records.length}):\n  theo lớp: ${layerLine}\n${recent.join('\n')}`;
+}
+
+// `review`'s trace summary (pr-lifecycle-2 cell action: "kèm trace tóm tắt
+// (outcome/friction)"): reuses the SAME two sections `check` already prints
+// — no new formatter, no new data source — so a reviewer sees exactly the
+// outcome/friction history `fgos check <id>` would show, folded into the
+// review output instead of requiring a second command.
+function formatReviewTrace(view, id) {
+  const sections = [];
+  const outcomeEntry = view.outcomes?.[id];
+  if (outcomeEntry) {
+    sections.push(formatOutcomeBlock(id, outcomeEntry));
+  }
+  const friction = formatFrictionSection(view, id);
+  if (friction) {
+    sections.push(friction);
+  }
+  return sections.join('\n\n');
 }
 
 // Settlement report cap — same "always CAP, never unbounded" rule as
@@ -667,8 +686,149 @@ function runVerb(verb, flags, positional, dir) {
       return `Returned ${id}: doing -> blocked (verify failed, exit ${check.status})\n${check.output}`;
     }
 
+    // Cổng duyệt PR nội bộ (pr-lifecycle D1/D4): a proposed item's diff,
+    // shown from whichever source classifySource resolves (runner branch,
+    // pull-door head range, or legacy degrade — merge.mjs). A pure read —
+    // never appends an event, never mutates state.json, same D1 request-class
+    // as `ready`/`list`/`check`.
+    case 'review': {
+      const id = requireField(positional[0] ?? flags.id, 'review requires an id: fgos review <id>');
+      const view = listWork(dir);
+      const item = view.work[id];
+      if (!item) {
+        throw new StoreError('validation', `review: work "${id}" not found.`);
+      }
+      if (item.status !== 'proposed') {
+        throw new StoreError('precondition', `review: work "${id}" is "${item.status}", not "proposed" — nothing to review.`);
+      }
+
+      const { source, diff, warnings } = reviewDiff(process.cwd(), item);
+      const lines = [`${id} — source: ${source}`];
+      for (const warning of warnings) {
+        lines.push(`warning: ${warning}`);
+      }
+      if (diff !== null) {
+        lines.push('', diff.trim() === '' ? '(no changes)' : diff);
+      }
+      const trace = formatReviewTrace(view, id);
+      if (trace) {
+        lines.push('', trace);
+      }
+      return lines.join('\n');
+    }
+
+    // Cổng duyệt — approve (pr-lifecycle D3/D4): merges a runner item's
+    // branch into main (spike-proven mechanics: --no-commit --no-ff, verify
+    // on the staged tree, commit only on green — merge.mjs's mergeRunnerItem)
+    // or, for a pull-door/legacy item (code already on main), re-runs the
+    // item's OWN verify directly against the current tree. Every failure
+    // path (conflict, red verify) parks the item at `blocked` with a reason
+    // instead of leaving main mid-merge or the item silently in `proposed`
+    // (D3's "merge sạch → done tự động; conflict/đỏ → hủy sạch + blocked").
+    // `done`'s actor is always "human" (D3: the person who ran approve is
+    // the settlement, the merge itself is only the mechanical consequence).
+    case 'approve': {
+      const id = requireField(positional[0] ?? flags.id, 'approve requires an id: fgos approve <id> [--timeout <ms>]');
+      const timeoutFlag = optionalField(flags.timeout, 'approve --timeout requires a numeric millisecond value (omit --timeout entirely for no timeout)');
+      let timeoutMs;
+      if (timeoutFlag !== undefined) {
+        timeoutMs = Number(timeoutFlag);
+        if (!Number.isFinite(timeoutMs) || timeoutMs <= 0) {
+          throw new StoreError('validation', `approve --timeout must be a positive number of milliseconds (got "${timeoutFlag}").`);
+        }
+      }
+
+      const item = listWork(dir).work[id];
+      if (!item) {
+        throw new StoreError('validation', `approve: work "${id}" not found.`);
+      }
+      if (item.status !== 'proposed') {
+        throw new StoreError('precondition', `approve: work "${id}" is "${item.status}", not "proposed" — nothing to approve.`);
+      }
+
+      const repoRoot = process.cwd();
+      const source = classifySource(repoRoot, item);
+
+      if (source === 'runner') {
+        if (!isMainTreeClean(repoRoot)) {
+          throw new StoreError('validation', `approve: working tree at "${repoRoot}" is not clean — commit or stash pending changes before approving "${id}".`);
+        }
+
+        const result = mergeRunnerItem(repoRoot, item, { timeoutMs });
+
+        if (result.outcome === 'conflict') {
+          moveWork(dir, { id, to: 'blocked', expectedStatus: 'proposed', reason: 'merge-conflict' });
+          addFriction(dir, {
+            id,
+            disposition: 'blocked',
+            errorClass: 'merge-conflict',
+            layer: 'state',
+            attempts: 1,
+            detail: `git merge --no-commit --no-ff ${result.branch} conflicted; merge aborted, main unchanged`,
+          });
+          return `Approved ${id}: merge conflicted — proposed -> blocked (reason merge-conflict), main left unchanged`;
+        }
+
+        if (result.outcome === 'verify-fail') {
+          moveWork(dir, { id, to: 'blocked', expectedStatus: 'proposed', reason: 'verify-fail-post-merge' });
+          addFriction(dir, {
+            id,
+            disposition: 'blocked',
+            errorClass: 'verify-miss',
+            layer: 'verification',
+            attempts: 1,
+            detail: `goal-check failed on staged merge (exit ${result.check.status}); merge aborted, main unchanged`,
+          });
+          return `Approved ${id}: verify failed on staged merge (exit ${result.check.status}) — proposed -> blocked (reason verify-fail-post-merge), main left unchanged\n${result.check.output}`;
+        }
+
+        const { event } = moveWork(dir, { id, to: 'done', expectedStatus: 'proposed', actor: 'human' });
+        const cleanup = cleanupMergedBranch(repoRoot, result.branch);
+        const cleanupNote = cleanup.warnings.length ? `\ncleanup warning(s): ${cleanup.warnings.join('; ')}` : '';
+        return `Approved ${id}: merged ${result.branch} -> main, verified, proposed -> done (event #${event.seq})${cleanupNote}\n${result.check.output}`;
+      }
+
+      // pull-door or legacy proposal: code is already on main (D4) — no
+      // merge step, just re-run the item's own verify against the current
+      // tree, exactly the goal-check contract `return` already uses.
+      const check = runGoalCheck(item, repoRoot, timeoutMs);
+      if (!check.passed) {
+        moveWork(dir, { id, to: 'blocked', expectedStatus: 'proposed', reason: 'verify-fail' });
+        addFriction(dir, {
+          id,
+          disposition: 'blocked',
+          errorClass: 'verify-miss',
+          layer: 'verification',
+          attempts: 1,
+          detail: `goal-check failed on main (exit ${check.status})`,
+        });
+        return `Approved ${id}: verify failed on main (exit ${check.status}) — proposed -> blocked (reason verify-fail)\n${check.output}`;
+      }
+      const { event } = moveWork(dir, { id, to: 'done', expectedStatus: 'proposed', actor: 'human' });
+      return `Approved ${id}: verified on main, proposed -> done (event #${event.seq})\n${check.output}`;
+    }
+
+    // Cổng duyệt — reject (pr-lifecycle D4): proposed -> todo, reason
+    // mandatory (fsm.mjs already enforces this edge). NEVER runs a single git
+    // command — the code (if any landed on main via a pull-door item) is
+    // history, not something this verb rewrites; a human who wants it gone
+    // commits their own revert and still rejects (D4's "không auto-revert").
+    case 'reject': {
+      const id = requireField(positional[0] ?? flags.id, 'reject requires an id: fgos reject <id> --reason "..."');
+      const reason = requireField(flags.reason, 'reject requires --reason "..."');
+      const item = listWork(dir).work[id];
+      if (!item) {
+        throw new StoreError('validation', `reject: work "${id}" not found.`);
+      }
+      if (item.status !== 'proposed') {
+        throw new StoreError('precondition', `reject: work "${id}" is "${item.status}", not "proposed" — nothing to reject.`);
+      }
+      const { event } = moveWork(dir, { id, to: 'todo', expectedStatus: 'proposed', reason, actor: 'human' });
+      return `Rejected ${id}: proposed -> todo (reason: ${reason}) (event #${event.seq}) — no revert, main unchanged`;
+    }
+
     default:
-      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <init|add|submit|discover|move|ask|answer|decision|list|ready|rebuild|check|take|return> ...`);
+      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <init|add|submit|discover|move|ask|answer|decision|list|ready|rebuild|check|take|return|review|approve|reject> ...`);
   }
 }
 

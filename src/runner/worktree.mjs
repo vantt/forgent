@@ -72,7 +72,11 @@ function git(repoRoot, args) {
   return execFileSync('git', args, { cwd: repoRoot, encoding: 'utf8', shell: false });
 }
 
-function branchExists(repoRoot, branch) {
+// Exported (pr-lifecycle-2): the approval-gate merge engine (merge.mjs)
+// reuses this exact check to classify a proposed item as "runner" (a live
+// `fgw/<id>` branch) vs "pull"/"legacy" (no branch) — one existence check,
+// never a second implementation of "does this branch exist" elsewhere.
+export function branchExists(repoRoot, branch) {
   try {
     execFileSync('git', ['rev-parse', '--verify', '--quiet', `refs/heads/${branch}`], {
       cwd: repoRoot,
