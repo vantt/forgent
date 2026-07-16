@@ -934,3 +934,104 @@ test('check output on a log with no settling transitions is unchanged — no set
   assert.equal(result.status, 0);
   assert.doesNotMatch(result.stdout, /settlement/);
 });
+
+// --- entropy-trend + seal-digest in `check` (phase-3-compound-learning-6,
+// S3-closeout (b)) — a real event-backed store (never fixture-only, per this
+// cell's must_haves: repo has NO live .fgos to assume data from, confirmed
+// by `ls`), driven entirely through the real `fgos` binary so the trend
+// history file (entropy-history.jsonl, in the SAME data dir as
+// events.jsonl) is genuinely written and read back across two runs. ------
+
+test('check reports a nonzero baseline entropy score with an explainable part for a real event-backed store with a stale-doing item', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'entropy-item');
+  assert.equal(run(cwd, ['move', 'entropy-item', '--to', 'doing']).status, 0);
+
+  const result = run(cwd, ['check']);
+  assert.equal(result.status, 0);
+  assert.match(result.stdout, /entropy: \d+ \(baseline\)/);
+  assert.match(result.stdout, /stale-doing: 1 × 5 = 5/);
+
+  const scoreMatch = result.stdout.match(/entropy: (\d+) \(baseline\)/);
+  assert.ok(scoreMatch);
+  assert.notEqual(Number(scoreMatch[1]), 0, 'a doing item must contribute a nonzero baseline score');
+});
+
+test('check prints a seal-digest clause only for channels with real compound data, format "compounded: +N outcome" (per this cell action (3)), and never mentions a channel with no data', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'seal-digest-item');
+  const dir = path.join(cwd, '.fgos');
+  addOutcome(dir, { id: 'seal-digest-item', predicted: { tier: 'standard', deps: 0, priorVisits: 0 } });
+  addOutcome(dir, {
+    id: 'seal-digest-item',
+    actual: { outcome: 'proposed', passed: true, attempts: 1, errorClass: null, aheadCount: 1, visits: 1 },
+  });
+
+  const first = run(cwd, ['check']);
+  assert.equal(first.status, 0);
+  assert.match(first.stdout, /compounded: \+1 outcome/);
+  assert.doesNotMatch(first.stdout, /friction/);
+  assert.doesNotMatch(first.stdout, /compounded:[^\n]*settlement/);
+
+  // Second run over the same (unchanged) store: the outcome channel already
+  // has data, so its clause still appears, now with a zero delta — the
+  // digest is a live snapshot against the last checkpoint, not a one-shot
+  // "something changed" flag.
+  const second = run(cwd, ['check']);
+  assert.equal(second.status, 0);
+  assert.match(second.stdout, /compounded: \+0 outcome/);
+});
+
+test('check on a second consecutive run over the same store prints a real trend delta against the first run (not baseline again)', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'entropy-trend-item');
+  assert.equal(run(cwd, ['move', 'entropy-trend-item', '--to', 'doing']).status, 0);
+
+  const first = run(cwd, ['check']);
+  assert.equal(first.status, 0);
+  assert.match(first.stdout, /\(baseline\)/);
+
+  // Move the item out of "doing" (stale-suspect ×5) into "awaiting-human"
+  // (×2) between the two checks — the score must genuinely shift, not just
+  // repeat, so the delta printed on run 2 is real evidence of trend.
+  assert.equal(run(cwd, ['ask', 'entropy-trend-item', '--text', 'blocked on what?']).status, 0);
+
+  const second = run(cwd, ['check']);
+  assert.equal(second.status, 0);
+  assert.doesNotMatch(second.stdout, /\(baseline\)/);
+  assert.match(second.stdout, /entropy: \d+ \([+-]\d+ so lần trước\)/);
+
+  const deltaMatch = second.stdout.match(/entropy: \d+ \(([+-]\d+) so lần trước\)/);
+  assert.ok(deltaMatch);
+  assert.equal(Number(deltaMatch[1]), 2 - 5, 'doing(×5) -> awaiting-human(×2) must show a -3 delta');
+});
+
+test('entropy-history.jsonl is written in the SAME data dir as events.jsonl, not a hardcoded path, one line per check run', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'history-path-item');
+  run(cwd, ['move', 'history-path-item', '--to', 'doing']);
+
+  run(cwd, ['check']);
+  run(cwd, ['check']);
+
+  const historyPath = path.join(cwd, '.fgos', 'entropy-history.jsonl');
+  assert.ok(fs.existsSync(historyPath));
+  const lines = fs.readFileSync(historyPath, 'utf8').split('\n').filter(Boolean);
+  assert.equal(lines.length, 2);
+  for (const line of lines) {
+    const entry = JSON.parse(line);
+    assert.equal(typeof entry.score, 'number');
+    assert.equal(typeof entry.counts.outcomes, 'number');
+    assert.equal(typeof entry.counts.frictions, 'number');
+    assert.equal(typeof entry.counts.settlements, 'number');
+  }
+});
+
+test('check on a directory with no log at all still never initializes .fgos/ (entropy section stays absent, same as friction/settlement)', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['check']);
+  assert.equal(result.status, 0);
+  assert.match(result.stdout, /chưa có dữ liệu/);
+  assert.doesNotMatch(result.stdout, /entropy/);
+  assert.ok(!fs.existsSync(path.join(cwd, '.fgos')));
+});

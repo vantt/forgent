@@ -15,12 +15,14 @@
 // This file never writes to `.fgos/` itself — every mutation goes through
 // src/state/store.mjs, the sole write door.
 
+import fs from 'node:fs';
 import path from 'node:path';
 import { initStore, addWork, moveWork, addDecision, listWork, readyWork, rebuild, putInAwaiting, answerAwaiting, StoreError, EXIT_CODES, categoryOf } from '../src/state/store.mjs';
 import { deriveTitle, classify, generateId } from '../src/intake/classify.mjs';
 import { wrapEnvelope } from '../src/state/envelope.mjs';
 import { loadRunnerConfig } from '../src/runner/dispatch.mjs';
 import { resolveDiscovery } from '../src/intake/discovery.mjs';
+import { computeEntropy, computeCounts } from '../src/report/entropy.mjs';
 
 // D5: `verify` is a required non-empty field on every work item, but a
 // free-text submission has no verification plan yet — that is P15's job. The
@@ -104,7 +106,7 @@ function formatOutcomeBlock(id, entry) {
 // no outcome yet, or a log with no `outcomes` key at all, both print
 // "chưa có dữ liệu" and the caller still exits 0 (this is a read, not a
 // validation failure).
-function formatCheck(view, id) {
+function formatCheck(view, id, dir) {
   const outcomes = view.outcomes ?? {};
   const ids = id ? [id] : Object.keys(outcomes);
   const sections = [];
@@ -122,6 +124,14 @@ function formatCheck(view, id) {
   const nag = formatMissingOutcomeNag(view, id);
   if (nag) {
     sections.push(nag);
+  }
+  // Entropy-trend + seal-digest (per Phase 3 S3-closeout, plan Slice 3 (b)):
+  // a whole-work-state summary, not scoped to `id` like the sections above —
+  // it reports on the learning area as a whole even when `check <id>` was
+  // called for one item.
+  const entropy = formatEntropySection(view, dir);
+  if (entropy) {
+    sections.push(entropy);
   }
   if (sections.length === 0) {
     return 'chưa có dữ liệu';
@@ -212,6 +222,96 @@ function formatMissingOutcomeNag(view, id) {
     return '';
   }
   return `nhắc: ${missing.length} item ở trạng thái cuối chưa có nửa actual: ${missing.join(', ')}`;
+}
+
+// Entropy-trend history path (per this cell's action (2) / must_haves: MUST
+// live in the SAME data dir as the store's own events.jsonl — never
+// hardcoded to `repo/.fgos`). `dir` here is always the caller's resolved
+// data dir (dataDir() below, or a test's own tmp dir), the exact same value
+// every other verb in this file already threads through to store.mjs.
+function entropyHistoryPath(dir) {
+  return path.join(dir, 'entropy-history.jsonl');
+}
+
+// Reads only the LAST line of the trend history (the one prior checkpoint
+// entropy/seal-digest compare against) — never the whole file, and never
+// throws on a missing file/dir (mirrors readEvents' missing-log contract in
+// events.mjs): no history yet reads as `null`, the "baseline" case.
+function readLastHistoryEntry(dir) {
+  let raw;
+  try {
+    raw = fs.readFileSync(entropyHistoryPath(dir), 'utf8');
+  } catch (err) {
+    if (err.code === 'ENOENT') return null;
+    throw err;
+  }
+  const lines = raw.split('\n').filter(Boolean);
+  if (lines.length === 0) return null;
+  return JSON.parse(lines[lines.length - 1]);
+}
+
+// Appends exactly one history line per `check` run — same
+// append-then-nothing-else discipline as events.mjs's appendEvent, but this
+// file (unlike events.jsonl/state.json) is new per this cell and never
+// read by store.mjs/replay.mjs. Only ever called when formatEntropySection
+// has already confirmed there is work-state data to report on (below) —
+// so a `check` against an uninitialized dir never creates it.
+function appendHistoryEntry(dir, entry) {
+  fs.mkdirSync(dir, { recursive: true });
+  fs.appendFileSync(entropyHistoryPath(dir), `${JSON.stringify(entry)}\n`, 'utf8');
+}
+
+function signed(n) {
+  return n >= 0 ? `+${n}` : `${n}`;
+}
+
+// Builds one "<delta> <label>" seal-digest clause, but ONLY when that
+// channel actually has something to say — either a nonzero count right now
+// or a nonzero delta since the last checkpoint. This mirrors the
+// friction/settlement sections' own "absent data -> no section" rule one
+// level down (per clause instead of per section): `check`'s existing
+// contract on a clean log asserts the literal words "friction"/"settlement"
+// never appear when there is no such data at all (see the friction/
+// settlement section tests above), and a bare "+0 friction" clause would
+// violate that even though the NUMBER is accurate. Silence, not a zero, is
+// what "nothing happened on this channel" looks like here.
+function formatSealDigestClause(label, count, delta) {
+  if (count === 0 && delta === 0) {
+    return null;
+  }
+  return `${signed(delta)} ${label}`;
+}
+
+// Entropy-trend + seal-digest section (per this cell's action (2)/(3)):
+// reported only when at least one work item exists — an empty view (no log
+// at all) must keep `check`'s existing "chưa có dữ liệu" / never-initializes
+// contract byte-identical (the same "absent data -> no section" rule the
+// friction/settlement sections already follow), rather than writing a
+// zero-score checkpoint into a directory that was never initialized.
+function formatEntropySection(view, dir) {
+  if (Object.keys(view.work ?? {}).length === 0) {
+    return '';
+  }
+  const { score, parts } = computeEntropy(view);
+  const counts = computeCounts(view);
+  const prev = readLastHistoryEntry(dir);
+  appendHistoryEntry(dir, { ts: new Date().toISOString(), score, counts });
+
+  const trendLine = prev
+    ? `entropy: ${score} (${signed(score - prev.score)} so lần trước)`
+    : `entropy: ${score} (baseline)`;
+  const partsLines = parts
+    .filter((p) => p.count > 0)
+    .map((p) => `  - ${p.label}: ${p.count} × ${p.weight} = ${p.points}`);
+  const prevCounts = prev?.counts ?? { outcomes: 0, frictions: 0, settlements: 0 };
+  const sealClauses = [
+    formatSealDigestClause('outcome', counts.outcomes, counts.outcomes - prevCounts.outcomes),
+    formatSealDigestClause('friction', counts.frictions, counts.frictions - prevCounts.frictions),
+    formatSealDigestClause('settlement', counts.settlements, counts.settlements - prevCounts.settlements),
+  ].filter(Boolean);
+  const sealLine = sealClauses.length > 0 ? `compounded: ${sealClauses.join(' /')}` : null;
+
+  return [trendLine, ...partsLines, sealLine].filter(Boolean).join('\n');
 }
 
 function runVerb(verb, flags, positional, dir) {
@@ -360,7 +460,7 @@ function runVerb(verb, flags, positional, dir) {
     // export needed for reading, per this cell's action.
     case 'check': {
       const id = optionalField(positional[0] ?? flags.id, 'check --id requires a non-empty id value (omit --id entirely to check every item)');
-      return formatCheck(listWork(dir), id);
+      return formatCheck(listWork(dir), id, dir);
     }
 
     default:
