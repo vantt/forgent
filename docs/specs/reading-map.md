@@ -8,11 +8,12 @@
 - `docs/routing-handoff-contract.md` — hợp đồng handoff agent↔agent + ranh giới tin cậy
 - `docs/decisions/` — hồ sơ quyết định dài hạn cho người ngoài (decision records)
 - `bin/fgos.mjs` — CLI một cửa của work-state; chạy `node bin/fgos.mjs <verb>`; spec: docs/specs/work-state.md
-- `src/state/` — lõi work-state: events (nhật ký), work (schema — STATUSES + STAGES), fsm (bảng chuyển status + CAS), stage (bảng chuyển stage + CAS, chiều vĩ mô song song fsm), replay (fold), frontier (truy vấn sẵn-sàng — lọc cả status lẫn stage), store (chủ ghi duy nhất + readRawEvents), envelope (phong bì output C1, `wrapEnvelope`)
+- `src/state/` — lõi work-state: events (nhật ký), work (schema — STATUSES + STAGES + field `parent` lineage), fsm (bảng chuyển status + CAS), stage (bảng chuyển stage + CAS, chiều vĩ mô song song fsm; cạnh `clarify→decompose→executing`), replay (fold), frontier (truy vấn sẵn-sàng — lọc theo status, stage, VÀ lineage qua `parent`), store (chủ ghi duy nhất + readRawEvents), envelope (phong bì output C1, `wrapEnvelope`)
 - `src/intake/classify.mjs` — logic thuần của `fgos submit`: deriveTitle, classify (tier/kind/risk cơ học), generateId (slug+hash chống trùng)
-- `src/intake/discovery.mjs` — context-discovery của stage clarify: `judgeDiscovery` (gọi model, fail-safe) + `resolveDiscovery` (đọc-phán-ghi, dùng chung bởi verb `discover` và vòng tự hành)
-- `src/runner/` + `bin/fgos-runner.mjs` — vòng tự hành (loop/dispatch/worktree/recovery/anti-loop); config: `.fgos-runner.json`; spec: docs/specs/runner.md
+- `src/intake/discovery.mjs` — context-discovery của stage clarify: `judgeDiscovery` (gọi model, fail-safe) + `resolveDiscovery` (đọc-phán-ghi, dùng chung bởi verb `discover` và vòng tự hành); verdict đủ rõ chuyển item sang stage `decompose`
+- `src/intake/decompose.mjs` — phán chia-việc của stage decompose: `judgeDecompose` (gọi model, fail-safe) + `resolveDecompose` (đọc-phán-ghi, dùng chung bởi verb `discover` và vòng tự hành khi item ở stage `decompose`); sinh con qua lineage `parent`, không qua `deps`
+- `src/runner/` + `bin/fgos-runner.mjs` — vòng tự hành (loop/dispatch/worktree/recovery/anti-loop); loop chạy quét làm-rõ rồi quét chia-việc trước mọi dispatch thi công; config: `.fgos-runner.json`; spec: docs/specs/runner.md
 - `src/report/entropy.mjs` — tín hiệu entropy-trend + đếm compounding (thuần, đọc trên view work-state), surfaced qua `fgos check`; spec: docs/specs/runner.md
-- `test/` — node:test suite (`npm test`, 394 test): smoke + state + cli + runner + report + e2e (rebuild-determinism, runner-loop); benchmark ngoài suite (F4) tại `docs/history/phase-3-compound-learning/reports/f4-benchmark.md`
+- `test/` — node:test suite (`npm test`, 443 test): smoke + state + cli + runner + report + e2e (rebuild-determinism, runner-loop); benchmark ngoài suite (F4) tại `docs/history/phase-3-compound-learning/reports/f4-benchmark.md`
 - `.fgos/events.jsonl` — nhật ký sự kiện work-state (truth, committed); `.fgos/state.json` là view gitignored
 - `AGENTS.md`, `CLAUDE.md` — doctrine layer nạp mọi phiên agent (bản sản phẩm — thuần forgent)
