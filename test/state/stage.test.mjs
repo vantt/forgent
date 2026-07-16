@@ -39,6 +39,16 @@ test('transitionStage allows clarify -> executing and returns a validated event'
   assert.deepEqual(event, { type: 'work.stage', payload: { id: 'w1', from: 'clarify', to: 'executing' } });
 });
 
+test('transitionStage allows clarify -> decompose (per stage-decompose D2)', () => {
+  const event = transitionStage({ work: work('clarify'), to: 'decompose' });
+  assert.deepEqual(event, { type: 'work.stage', payload: { id: 'w1', from: 'clarify', to: 'decompose' } });
+});
+
+test('transitionStage allows decompose -> executing (per stage-decompose D4)', () => {
+  const event = transitionStage({ work: work('decompose'), to: 'executing' });
+  assert.deepEqual(event, { type: 'work.stage', payload: { id: 'w1', from: 'decompose', to: 'executing' } });
+});
+
 test('transitionStage reads a missing stage as "executing" (per D8 lazy default)', () => {
   assert.throws(
     () => transitionStage({ work: work(undefined), to: 'executing' }),
@@ -57,12 +67,15 @@ test('transitionStage carries verify in the payload when supplied (per D10), and
   assert.equal('verify' in withoutVerify.payload, false);
 });
 
-test('transitionStage rejects every edge other than clarify -> executing as precondition', () => {
+test('transitionStage rejects edges outside the three legal ones (clarify->executing, clarify->decompose, decompose->executing) as precondition', () => {
   const illegalPairs = [
     ['executing', 'clarify'],
     ['executing', 'executing'],
     ['clarify', 'clarify'],
     ['clarify', 'planning'],
+    ['decompose', 'clarify'],
+    ['decompose', 'decompose'],
+    ['executing', 'decompose'],
   ];
   for (const [from, to] of illegalPairs) {
     assert.throws(
@@ -138,6 +151,20 @@ test('moveStage then rebuild -> stage executing + verify replaced (per D10, one 
   const rebuilt = listWork(dir);
   assert.equal(rebuilt.work['item-x'].stage, 'executing');
   assert.equal(rebuilt.work['item-x'].verify, 'npm test -- item-x');
+});
+
+test('moveStage carries an item clarify -> decompose -> executing (per stage-decompose D2/D4)', () => {
+  const dir = tmpDir();
+  addSampleWork(dir);
+
+  const decomposed = moveStage(dir, { id: 'item-x', to: 'decompose', expectedStage: 'clarify' });
+  assert.equal(decomposed.view.work['item-x'].stage, 'decompose');
+
+  const { view } = moveStage(dir, { id: 'item-x', to: 'executing', expectedStage: 'decompose' });
+  assert.equal(view.work['item-x'].stage, 'executing');
+
+  const rebuilt = listWork(dir);
+  assert.equal(rebuilt.work['item-x'].stage, 'executing');
 });
 
 test('moveStage with a stale expectedStage -> conflict, no event appended (must_have)', () => {

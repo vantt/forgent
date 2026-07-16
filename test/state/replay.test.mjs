@@ -178,6 +178,15 @@ test('foldEvents work.stage without a verify leaves item.verify untouched', () =
   assert.equal(view.work.a.verify, 'original verify');
 });
 
+test('foldEvents applies work.stage to set item.stage to "decompose" (per stage-decompose D2)', () => {
+  const events = [
+    { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo', stage: 'clarify' } },
+    { seq: 2, ts: '2026-07-16T00:00:01.000Z', type: 'work.stage', payload: { id: 'a', from: 'clarify', to: 'decompose' } },
+  ];
+  const view = foldEvents(events);
+  assert.equal(view.work.a.stage, 'decompose');
+});
+
 test('foldEvents ignores a work.stage for an id that was never added', () => {
   const events = [
     { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.stage', payload: { id: 'ghost', from: 'clarify', to: 'executing' } },
@@ -221,6 +230,25 @@ test('foldEvents derives a clarify-pass settlement from work.stage -> executing,
   const view = foldEvents(events);
   assert.equal(view.settlements.a.length, 1);
   assert.deepEqual(view.settlements.a[0], { kind: 'clarify-pass', actor: 'runner', ts: '2026-07-16T00:00:01.000Z', detail: 'npm test -- a' });
+});
+
+test('foldEvents derives a clarify-pass settlement from work.stage clarify -> decompose too (re-guard per stage-decompose D2: settlement keys off leaving clarify, not landing on executing)', () => {
+  const events = [
+    { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo', stage: 'clarify' }, v: 2 },
+    { seq: 2, ts: '2026-07-16T00:00:01.000Z', type: 'work.stage', payload: { id: 'a', from: 'clarify', to: 'decompose', verify: 'npm test -- a', actor: 'runner' }, v: 2 },
+  ];
+  const view = foldEvents(events);
+  assert.equal(view.settlements.a.length, 1);
+  assert.deepEqual(view.settlements.a[0], { kind: 'clarify-pass', actor: 'runner', ts: '2026-07-16T00:00:01.000Z', detail: 'npm test -- a' });
+});
+
+test('foldEvents does NOT derive a settlement from work.stage decompose -> executing (it never leaves clarify)', () => {
+  const events = [
+    { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo', stage: 'decompose' }, v: 2 },
+    { seq: 2, ts: '2026-07-16T00:00:01.000Z', type: 'work.stage', payload: { id: 'a', from: 'decompose', to: 'executing' }, v: 2 },
+  ];
+  const view = foldEvents(events);
+  assert.equal('settlements' in view, false);
 });
 
 test('foldEvents derives an answer settlement from a work.move carrying answer, with the answer text as detail', () => {

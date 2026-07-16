@@ -163,3 +163,89 @@ test('a todo item at stage "clarify" whose deps are all done is still excluded (
   };
   assert.deepEqual(frontier(view), []);
 });
+
+// --- stage-decompose D4/D5: lineage-derived frontier filter (root blocked
+// by open descendants, never by `deps`) ---
+
+test('LOCK (per stage-decompose D4): a root item with an open (not-done) child is excluded from the frontier even though it has no deps of its own — the child itself is still dispatchable', () => {
+  const view = {
+    work: {
+      root: item('root', 'todo'),
+      child: { ...item('child', 'todo'), parent: 'root' },
+    },
+  };
+  assert.deepEqual(frontier(view).map((i) => i.id), ['child']);
+});
+
+test('a root item is included once every child reaches "done" (per stage-decompose D4)', () => {
+  const view = {
+    work: {
+      root: item('root', 'todo'),
+      child: { ...item('child', 'done'), parent: 'root' },
+    },
+  };
+  assert.deepEqual(frontier(view).map((i) => i.id), ['root']);
+});
+
+test('a root with two children is blocked while either one is still open, then released once both are done', () => {
+  const view = {
+    work: {
+      root: item('root', 'todo'),
+      childA: { ...item('childA', 'done'), parent: 'root' },
+      childB: { ...item('childB', 'doing'), parent: 'root' },
+    },
+  };
+  assert.deepEqual(frontier(view), []);
+  view.work.childB.status = 'done';
+  assert.deepEqual(frontier(view).map((i) => i.id), ['root']);
+});
+
+test('the lineage filter walks multiple generations: an open grandchild still blocks the root even though the direct child is already done', () => {
+  const view = {
+    work: {
+      root: item('root', 'todo'),
+      child: { ...item('child', 'done'), parent: 'root' },
+      grandchild: { ...item('grandchild', 'todo'), parent: 'child' },
+    },
+  };
+  // root: blocked by the still-open grandchild; child: done, excluded by
+  // status; grandchild: itself dispatchable.
+  assert.deepEqual(frontier(view).map((i) => i.id), ['grandchild']);
+});
+
+test('the lineage filter never touches deps: a root blocked by an open child is still excluded even if its own deps are all done, and children are never required in deps', () => {
+  const view = {
+    work: {
+      unrelated: item('unrelated', 'done'),
+      root: item('root', 'todo', ['unrelated']),
+      child: { ...item('child', 'todo'), parent: 'root' },
+    },
+  };
+  assert.equal(view.work.root.deps.includes('child'), false);
+  // root is blocked purely by lineage (its own deps are satisfied); child
+  // remains independently dispatchable.
+  assert.deepEqual(frontier(view).map((i) => i.id), ['child']);
+});
+
+test('EXPLICIT (must_have): frontier on a view with no "parent" field anywhere is deep-equal to the same view evaluated before the lineage filter existed', () => {
+  const view = {
+    work: {
+      base: item('base', 'done'),
+      dependent: item('dependent', 'todo', ['base']),
+      standalone: item('standalone', 'todo'),
+    },
+  };
+  // No item carries `parent` — the lineage filter must be a complete no-op,
+  // producing exactly the pre-existing deps+status+stage result.
+  assert.deepEqual(frontier(view).map((i) => i.id), ['dependent', 'standalone']);
+});
+
+test('a dangling parent id (child points at a parent not present in the view) never crashes and never blocks anything', () => {
+  const view = {
+    work: {
+      child: { ...item('child', 'todo'), parent: 'ghost-root' },
+    },
+  };
+  assert.doesNotThrow(() => frontier(view));
+  assert.deepEqual(frontier(view).map((i) => i.id), ['child']);
+});

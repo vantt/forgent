@@ -7,9 +7,11 @@
 // stage transition is legal and, if so, RETURNS the validated event for the
 // store to append — disk writes belong to store.mjs, never here.
 //
-// Only one edge exists today (D12): `clarify -> executing`. P16 will add a
-// `planning` stage in between, which is a new locked decision, not an
-// extension made freely here.
+// Three edges exist today: `clarify -> executing` (D12, kept for the
+// discovery engine until stage-decompose cell 3 retargets it), plus
+// `clarify -> decompose` and `decompose -> executing` (stage-decompose
+// D2/D4/D5) for the chia-việc stage that now sits between clarify and
+// executing.
 
 import { FsmError } from './fsm.mjs';
 
@@ -17,8 +19,14 @@ import { FsmError } from './fsm.mjs';
 // module's own name, mirroring fsm.mjs's re-export of STATUSES from work.mjs.
 export { FsmError };
 
-// The transition table: today, a single legal (from -> to) edge (D12).
-const STAGE_TRANSITIONS = Object.freeze([Object.freeze({ from: 'clarify', to: 'executing' })]);
+// The transition table: `clarify -> executing` (D12) stays until cell 3
+// retargets clarify-pass onto `decompose`; the other two edges (per
+// stage-decompose D2/D4/D5) carry an item through chia-việc.
+const STAGE_TRANSITIONS = Object.freeze([
+  Object.freeze({ from: 'clarify', to: 'executing' }),
+  Object.freeze({ from: 'clarify', to: 'decompose' }),
+  Object.freeze({ from: 'decompose', to: 'executing' }),
+]);
 
 /**
  * Decide whether `work` can move to stage `to`, and if so return the

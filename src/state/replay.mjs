@@ -162,7 +162,7 @@ function applyEvent(view, event) {
       // (read lazily as `executing` by consumers, per D8); this case only
       // ever runs for an item that already has a real `work.stage` event in
       // its history, at which point setting the field explicitly is correct.
-      const { id, to, verify, actor } = event.payload ?? {};
+      const { id, from, to, verify, actor } = event.payload ?? {};
       const item = view.work[id];
       if (item) {
         item.stage = to;
@@ -171,12 +171,17 @@ function applyEvent(view, event) {
         }
       }
       // Settlement channel, third kind (mirrors the work.move case above):
-      // a clarify-pass (stage clarify -> executing) is the third settling
-      // event type per the S3-closeout design. Guarded on `to === 'executing'`
-      // rather than assuming every work.stage settles, so a future stage
-      // edge that isn't a clarify-pass doesn't wrongly count as one; guarded
-      // on `item` for the same ghost-id no-op reason as work.move above.
-      if (item && to === 'executing') {
+      // a clarify-pass is the third settling event type per the S3-closeout
+      // design — settlement means "left clarify carrying a verify" (D10),
+      // which is what `from === 'clarify'` actually tests. Guarded on the
+      // origin rather than `to === 'executing'` (stage-decompose D2): once
+      // cell 3 retargets the discovery engine onto `clarify -> decompose`,
+      // that edge must still settle even though it no longer lands on
+      // `executing`; `decompose -> executing` does NOT settle here (it never
+      // carries a `from === 'clarify'`), so it stays undocumented until a
+      // future spec pass. Guarded on `item` for the same ghost-id no-op
+      // reason as work.move above.
+      if (item && from === 'clarify') {
         if (!view.settlements) {
           view.settlements = {};
         }

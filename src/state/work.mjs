@@ -43,16 +43,16 @@ export const STATUSES = Object.freeze(['todo', 'doing', 'blocked', 'proposed', '
 export const TIERS = Object.freeze(['light', 'standard', 'heavy']);
 
 /**
- * Stage domain for `work.stage` (per stage-clarify D1/D2/D8) — the
- * macro-level lifecycle stage of a work item (clarify -> executing; P16+
- * will extend with planning/review...), orthogonal to the FSM's micro-level
+ * Stage domain for `work.stage` (per stage-clarify D1/D2/D8, extended by
+ * stage-decompose D2) — the macro-level lifecycle stage of a work item
+ * (clarify -> decompose -> executing), orthogonal to the FSM's micro-level
  * `status` (fsm.mjs's TRANSITIONS is unchanged by this field). `stage` is
  * OPTIONAL and NOT in DEFAULTS (D8): a missing `stage` reads as `executing`
  * lazily wherever it is consumed (frontier.mjs, store.mjs), never injected
  * onto the record itself — this keeps every existing add/submit/legacy path
  * byte-for-byte unchanged.
  */
-export const STAGES = Object.freeze(['clarify', 'executing']);
+export const STAGES = Object.freeze(['clarify', 'decompose', 'executing']);
 
 /**
  * Current schema/event version (per D7c): every event appended from Phase 2
@@ -129,6 +129,23 @@ export function validateWorkShape(work) {
     throw new WorkValidationError(
       `work.stage must be one of ${JSON.stringify(STAGES)} when present, got: ${JSON.stringify(work.stage)}`,
     );
+  }
+  // Lineage (per stage-decompose D5, inherited verbatim from stage-clarify
+  // D11): a child work item carries `parent` — the id of the item it was
+  // decomposed from, NOT a `deps` entry (deps and lineage are deliberately
+  // separate relations; frontier.mjs derives the parent-blocking rule from
+  // this field alone). OPTIONAL and NOT in DEFAULTS, same additive shape as
+  // `stage` — absent on every item that predates this field or was never
+  // decomposed.
+  if (work.parent !== undefined && work.parent !== null) {
+    if (typeof work.parent !== 'string' || !work.parent.trim()) {
+      throw new WorkValidationError(
+        `work.parent must be a non-empty string when present, got: ${JSON.stringify(work.parent)}`,
+      );
+    }
+    if (work.parent === work.id) {
+      throw new WorkValidationError(`work "${work.id}" cannot list itself as its own parent.`);
+    }
   }
 
   if (work.deps.includes(work.id)) {

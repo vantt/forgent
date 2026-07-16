@@ -7,6 +7,7 @@ import {
   WorkValidationError,
   STATUSES,
   TIERS,
+  STAGES,
   DEFAULTS,
   SCHEMA_VERSION,
 } from '../../src/state/work.mjs';
@@ -139,4 +140,63 @@ test('validateWork rejects a tier outside the TIERS domain', () => {
 test('DEFAULTS.tier is itself a member of TIERS, and SCHEMA_VERSION is a positive integer', () => {
   assert.ok(TIERS.includes(DEFAULTS.tier));
   assert.ok(Number.isInteger(SCHEMA_VERSION) && SCHEMA_VERSION > 0);
+});
+
+test('STAGES includes "decompose" between clarify and executing (per stage-decompose D2)', () => {
+  assert.deepEqual(STAGES, ['clarify', 'decompose', 'executing']);
+});
+
+test('validateWork accepts every stage in STAGES', () => {
+  for (const stage of STAGES) {
+    assert.doesNotThrow(() => validateWork(baseWork({ stage })));
+  }
+});
+
+test('validateWork rejects a stage outside the STAGES domain', () => {
+  assert.throws(
+    () => validateWork(baseWork({ stage: 'planning' })),
+    (err) => err instanceof WorkValidationError && /stage/.test(err.message),
+  );
+});
+
+// --- lineage field `parent` (per stage-decompose D5, inherited from stage-clarify D11) ---
+
+test('validateWork accepts a work item missing parent (optional, additive lineage field)', () => {
+  const work = baseWork();
+  assert.equal(work.parent, undefined);
+  assert.doesNotThrow(() => validateWork(work));
+});
+
+test('validateWork accepts parent as a non-empty string', () => {
+  assert.doesNotThrow(() => validateWork(baseWork({ id: 'child-1', parent: 'setup-repo' })));
+});
+
+test('validateWork treats parent: null the same as absent', () => {
+  assert.doesNotThrow(() => validateWork(baseWork({ parent: null })));
+});
+
+test('validateWork rejects a non-string, non-empty parent', () => {
+  assert.throws(
+    () => validateWork(baseWork({ parent: 42 })),
+    (err) => err instanceof WorkValidationError && /parent/.test(err.message),
+  );
+  assert.throws(
+    () => validateWork(baseWork({ parent: '' })),
+    (err) => err instanceof WorkValidationError && /parent/.test(err.message),
+  );
+  assert.throws(
+    () => validateWork(baseWork({ parent: '   ' })),
+    (err) => err instanceof WorkValidationError && /parent/.test(err.message),
+  );
+});
+
+test('validateWork rejects a work item that lists itself as its own parent', () => {
+  assert.throws(
+    () => validateWork(baseWork({ id: 'a', parent: 'a' })),
+    (err) => err instanceof WorkValidationError && /own parent/.test(err.message),
+  );
+});
+
+test('validateWork does not require parent to point at an existing id (lineage existence is not deps existence)', () => {
+  assert.doesNotThrow(() => validateWork(baseWork({ id: 'b', parent: 'ghost-parent' }), new Set(['a', 'b'])));
 });
