@@ -1,8 +1,8 @@
 ---
 area: runner
 updated: 2026-07-16
-sources: [phase-2-routing, post-divorce-hardening, phase-3-compound-learning-s1, phase-3-compound-learning-s2, phase-3-compound-learning-s3-closeout, stage-clarify, stage-decompose-s1, stage-decompose-s2]
-decisions: [feed7428, 14396a5c, 1a80b4d3, 9a19eea5, 96a65365, a7c099af, 43f257ae, 44936500, e1218b22, 6f2cbc47, a30a3d3c]
+sources: [phase-2-routing, post-divorce-hardening, phase-3-compound-learning-s1, phase-3-compound-learning-s2, phase-3-compound-learning-s3-closeout, stage-clarify, stage-decompose-s1, stage-decompose-s2, pr-lifecycle-s1]
+decisions: [feed7428, 14396a5c, 1a80b4d3, 9a19eea5, 96a65365, a7c099af, 43f257ae, 44936500, e1218b22, 6f2cbc47, a30a3d3c, 1359ab5e]
 coverage: full
 ---
 
@@ -18,6 +18,7 @@ Vòng lặp tự hành của forgent: tự lấy việc sẵn-sàng từ work-st
 - Ngay sau gặt-lại, TRƯỚC khi tìm việc thi công: **quét làm-rõ** (clarify sweep) — xem "Quét làm-rõ trước dispatch" dưới
 - Ngay sau quét làm-rõ, CÙNG TRƯỚC khi tìm việc thi công: **quét chia-việc** (decompose sweep) — xem "Quét chia-việc trước dispatch" dưới
 - `fgos take`/`fgos return` (cửa pull, ngoài vòng runner — xem spec Work-State "Cửa pull giao–nhận việc") claim/trả việc qua đúng CAS + goal-check runner tự dùng; gặt-lại lúc khởi động BỎ QUA claim đến từ cửa pull — xem "Gặt-lại lúc khởi động" dưới
+- `fgos review <id>` / `fgos approve <id> [--timeout <ms>]` / `fgos reject <id> --reason "..."` (ngoài vòng runner, gọi bởi người vận hành) — cổng duyệt PR nội bộ cho một đề xuất `proposed` đã sẵn, MỘT cổng cho cả nguồn runner lẫn pull-door — xem "Cổng duyệt PR nội bộ" dưới
 
 ## Data Dictionary
 
@@ -110,6 +111,66 @@ settlement") mang thêm ai/cái gì đã ngã-ngũ nó:
 - **Afterwards:** ai đọc lại nhật ký (qua `fgos check`) biết chính xác AI đã
   đưa item qua từng ngã-ngũ của nó, không chỉ SỰ KIỆN gì đã xảy ra.
 
+### Cổng duyệt PR nội bộ (approval gate) — review/approve/reject
+
+MỘT cổng duyệt duy nhất cho MỌI đề xuất `proposed`, bất kể nguồn (per D4
+pr-lifecycle / 1359ab5e): một đề xuất do runner tự đề xuất (nhánh `fgw/<id>`
+còn sống) và một đề xuất đến qua cửa pull `take`/`return` (dải commit
+`headAtTake→headAtReturn`, xem spec Work-State) đi qua CÙNG ba verb, cùng
+luật. Trước khi `review`/`approve` hành động, đề xuất được PHÂN LOẠI đúng một
+trong ba nguồn: **runner** (nhánh `fgw/<id>` tồn tại — `git rev-parse
+--verify`), **pull** (không nhánh, nhưng mang cả `headAtTake` VÀ
+`headAtReturn`), hoặc **legacy** (không cả hai — đề xuất từ trước feature này,
+hoặc nhánh/dấu vết đã mất).
+
+- **Runs when:** người vận hành gọi `fgos review <id>` / `fgos approve <id>
+  [--timeout <ms>]` / `fgos reject <id> --reason "..."` trên một item đang
+  `proposed`.
+- **Blocked when:** item không tồn tại — `validation`; item không ở
+  `proposed` — `precondition` ("nothing to review/approve/reject"); `reject`
+  thiếu `--reason` — `validation` (bắt buộc, cùng khuôn `proposed→todo`);
+  `approve --timeout` không phải số dương — `validation`; `approve` trên
+  nguồn `runner` khi working tree của main KHÔNG sạch — `validation`. Không
+  nhánh chặn nào ghi sự kiện.
+- **What changes:**
+  - `review <id>` — thuần đọc (không sự kiện nào): in diff theo nguồn —
+    `runner` → `git diff main...fgw/<id>`; `pull` → `git diff
+    headAtTake..headAtReturn` (dải NÀY có thể chứa commit của một phiên khác
+    chen giữa `take`..`return` trong môi trường nhiều-phiên — CHẤP NHẬN
+    degrade trung thực: in thêm một cảnh báo đếm số commit lạ trong dải,
+    không bao giờ giấu); `legacy` → in cảnh báo "không có nguồn diff", KHÔNG
+    BAO GIỜ nổ. Kèm một trace tóm tắt (outcome/friction hiện có của item, tái
+    dùng định dạng của `check` sẵn có — không formatter mới).
+  - `approve <id>` — nguồn `runner`: `git merge --no-commit --no-ff
+    fgw/<id>` staging-only vào main (spike "nocommit-probe", xem
+    `docs/history/pr-lifecycle/reports/validation-s1-gate.md`); **conflict**
+    → `git merge --abort` (main nguyên vẹn byte-for-byte, spike
+    "merge-abort-probe") + `proposed → blocked` (reason `merge-conflict`) +
+    một bản ghi friction lớp `state`; **staged sạch** → chạy `verify` CỦA
+    ITEM (goal-check) trên chính cây đã staged, CHƯA commit — xanh → `git
+    commit` (hoàn tất merge) rồi `proposed → done` mang **actor `human`**
+    (D3: người chạy approve là ngã-ngũ, merge chỉ là hệ quả cơ học) + dọn
+    nhánh/worktree (best-effort); đỏ → `git merge --abort` (main nguyên vẹn)
+    + `proposed → blocked` (reason `verify-fail-post-merge`) + friction lớp
+    `verification`. Nguồn `pull`/`legacy` — KHÔNG có bước merge (code đã
+    trên main, D4): chạy thẳng `verify` của item trên main qua CÙNG hàm
+    `runGoalCheck` mà `return`/runner dùng — xanh → `done` actor human; đỏ →
+    `blocked` (reason `verify-fail`) + friction `verification`.
+  - `reject <id> --reason` — `proposed → todo` mang `reason` + actor human;
+    KHÔNG BAO GIỜ chạy một lệnh git nào (D4 "không auto-revert" — code của
+    một đề xuất pull-door đã trên main là lịch sử; `reject` chỉ là từ-chối
+    coi-là-xong, không đảo ngược lịch sử).
+- **Side effects:** `approve` nguồn `runner` chạy các tiến trình con git
+  (`merge --no-commit --no-ff`, `merge --abort` khi cần, `commit`) cộng một
+  lần chạy `verify` của item; `approve` nguồn `pull`/`legacy` chỉ chạy
+  `verify`; `review`/`reject` không có side effect ngoài đọc/ghi sự kiện
+  tương ứng.
+- **Afterwards:** merge sạch → item `done`, nhánh/worktree dọn, việc phụ
+  thuộc mở khóa như mọi `done` khác; merge/verify gãy → item `blocked` mang
+  reason cụ thể, đậu lại chờ người (không tự rebase, không halt cả vòng
+  runner); `reject` → item về `todo` mang reason, vào lại hàng chờ, chống-lặp
+  đếm bình thường như mọi lần trả về khác.
+
 ### Tín hiệu compounding qua check (entropy-trend + seal-digest)
 
 Ngoài mục outcome/friction/settlement/học đã có, `fgos check` (lệnh đọc-thuần
@@ -175,6 +236,9 @@ sức khỏe cho toàn bộ vòng compounding.
 - **R17 (quét chia-việc chạy ngay sau quét làm-rõ, trước dispatch, bất kể mode).** Mỗi lượt chạy, ngay sau quét làm-rõ và trước khi tìm việc thi công, runner đọc lại view tươi rồi quét TOÀN BỘ item `stage: decompose` + `status: todo` và tự chạy phán chia-việc — không đọc/không rẽ nhánh theo field `mode` của item. Never chạm item `awaiting-human` — cùng luật loại-trừ R6/R15 Work-State áp cho bước quét này. Đọc view tươi sau quét làm-rõ nghĩa là một item vừa rời clarify trong CÙNG lượt chạy vẫn được quét chia-việc ngay, không đợi lượt sau (per D2 stage-decompose / 43f257ae, xem spec Work-State "Giai đoạn Chia-việc").
 - **R18 (gặt-lại claim-actor-aware — không giẫm người/phiên cầm qua cửa pull).** Bước gặt-lại lúc khởi động CHỈ gặt claim mà chính runner đã tạo và crash giữa chừng; một item `doing` mang `claimActor` `human`/`session` (đến từ `fgos take` — spec Work-State "Cửa pull giao–nhận việc") không bao giờ bị reclaim, dù nó không mang commit/proof nào — người/phiên cầm việc vô thời hạn cho tới khi chính họ `fgos return`. Đây là một THU HẸP thuần túy của tập item vốn đã bị reap — không mở rộng, không giảm an toàn của gặt-lại cho claim của chính runner (per D1 stage-decompose, chốt tại validating sau 1 BLOCKER / 43f257ae, 6f2cbc47, a30a3d3c).
 - **R19 (`return` mirror trung thực contract `proposed` của runner, không tin lời).** Cửa pull `return` chỉ chuyển `doing → proposed` sau khi TỰ đo — không tin báo cáo của người gọi — cả ba: working tree host repo sạch, HEAD tiến so `headAtTake` ghi lúc `take`, và verify thật của item chạy xanh qua CÙNG hàm goal-check runner dùng (`runGoalCheck`, `src/runner/goal-check.mjs`) — mở rộng nguyên tắc "không tin lời trợ lý" đã khóa ở R3/R13 sang tác nhân cửa pull. Verify đỏ đi đúng đường `blocked` + friction lớp `verification`, y hệt đường đỗ chấm-trượt của chính runner; không sinh settlement ở `return` (settlement thuộc cạnh `→done`, per D4 stage-decompose — xem spec Work-State) (per D1 stage-decompose / 43f257ae, 6f2cbc47, a30a3d3c).
+- **R20 (cổng duyệt là cửa MỘT DUY NHẤT cho mọi đề xuất, bất kể nguồn).** `review`/`approve`/`reject` hành động trên CẢ hai nguồn đề xuất — runner (nhánh `fgw/<id>`) và pull-door (dải `headAtTake→headAtReturn`) — qua cùng một luật, không hai bộ quy tắc song song; đề xuất di sản (thiếu cả nhánh lẫn cặp head) degrade trung thực (một cảnh báo, không throw) thay vì bị từ chối hoàn toàn (per D4 pr-lifecycle / 1359ab5e).
+- **R21 (merge sạch → done tự động; gãy → hủy sạch merge dở + blocked có lý do).** `approve` trên nguồn runner không bao giờ để main ở trạng thái merge dở trên bất kỳ đường thoát nào: conflict hoặc verify đỏ sau merge đều `git merge --abort` (main nguyên vẹn byte-for-byte, chứng minh bằng spike + test thật) rồi đậu item ở `blocked` mang lý do cụ thể (`merge-conflict`/`verify-fail-post-merge`) — KHÔNG tự rebase, KHÔNG halt cả vòng runner. `done` qua approve luôn mang actor `human` (per D3 pr-lifecycle / 1359ab5e — người chạy approve là ngã-ngũ, merge chỉ là hệ quả cơ học, per vision §8 "người ở cổng").
+- **R22 (reject không bao giờ đảo lịch sử).** `reject` là một move FSM thuần `proposed→todo` mang `reason`; không bao giờ gọi một lệnh git nào, kể cả cho một đề xuất pull-door đã có code thật trên main — code đó ở lại như lịch sử, `reject` chỉ từ-chối coi-là-xong, không revert/rewrite (per D4 pr-lifecycle / 1359ab5e).
 
 ## Edge Cases Settled
 
@@ -196,10 +260,15 @@ sức khỏe cho toàn bộ vòng compounding.
 - Quét chia-việc với model trả lời rác/timeout, hoặc verdict chia có con thiếu verify: không crash vòng chạy — gốc ở nguyên trạng thái/stage hiện tại, không con nào được ghi, lượt chạy vẫn tiếp tục xử các item khác.
 - Gặt-lại lúc khởi động SKIP một item `doing` mang `claimActor` người/phiên (cửa pull), dù item đó không mang commit/proof nào — nhưng vẫn gặt bình thường một claim mồ côi của chính runner ở cùng lượt gặt (chọn lọc, không phải tắt hẳn gặt-lại) — chứng minh bằng test thật cả hai nhánh trong cùng một pass.
 - Một `fgos-runner --once` chạy song song trong khi một người đang cầm item qua cửa pull `take`: gặt-lại của lượt runner đó không đụng vào claim người, và runner cũng không dispatch lại item đã `doing` — chứng minh bằng e2e qua binary thật (submit → pass-through 2 stage → `take` người → `fgos-runner --once` song song → `return` xanh của người, không lượt nào giẫm lượt nào).
+- Vòng đủ của một item runner qua cổng duyệt: submit/add → runner dispatch → `proposed` → `review` → `approve` → merge → `done`, mang settlement actor human, bài học câu-6, và dọn nhánh/worktree đều được assert — chứng minh bằng e2e qua binary + git thật.
+- Merge conflict thật trên một main đã rẽ nhánh: sau `approve` bị hủy, cây làm việc NGUYÊN VẸN byte-for-byte (HEAD không đổi, tracked tree sạch, nội dung file không đổi) — chứng minh bằng e2e thật, không chỉ spike.
+- Vòng đủ của một item pull-door qua cổng duyệt: `take` → commit → `return` → `review` → `approve` (không bước merge, per D4) → `done` — chứng minh bằng e2e qua binary thật.
+- `reject` một item pull-door: commit của nó vẫn là lịch sử THẬT trên main sau reject (D4 no-auto-revert) — chứng minh bằng e2e thật.
 
 ## Open Gaps
 
 - Nhiều lượt `check` chạy đồng thời trên cùng một kho chưa có cơ chế khóa/chống-tranh-chấp cho dòng lịch sử xu hướng (khác với nhật ký sự kiện chính, vốn đã có CAS) — cùng tinh thần ngưỡng-chưa-tới của R10 Work-State, mở lại khi ghi đồng thời thành tải chính.
+- Tên nhánh trục (trunk) của cổng duyệt hiện là literal `"main"` (`merge.mjs`) — một host project dùng tên nhánh trục khác (vd `master`) sẽ gãy `approve`/`review`; đề xuất là tự phát hiện trunk lúc init/config thay vì literal (friction filed khi viết e2e cell pr-lifecycle-3, layer task-spec, severity P3 — xem `.bee/backlog.jsonl`).
 
 ## Visuals
 
@@ -214,7 +283,9 @@ Not applicable — không có màn hình.
 - `src/intake/decompose.mjs` — xem Pointers spec Work-State (module dùng chung giữa runner và verb `discover` khi item ở stage `decompose`); verb `discover` (phiên sống) truyền `'session'`
 - `src/report/entropy.mjs` — thuần, không fs/Date.now(): `computeEntropy(view)` → `{score, parts}` (5 tín hiệu có trọng số, mỗi phần giải thích được); `computeCounts(view)` → tổng phẳng outcome/friction/settlement cho seal-digest; đọc/ghi lịch sử xu hướng (`entropy-history.jsonl`, cùng thư mục dữ liệu với `events.jsonl`) và định dạng seal-digest là việc của `bin/fgos.mjs`'s verb `check`, không phải module này
 - `.fgos-runner.json` — config committed (executor template + models light/haiku, standard/sonnet, heavy/opus + timeoutMs)
-- `src/state/store.mjs` `readRawEvents` — accessor chỉ-đọc cho anti-loop (decision 14396a5c); `addOutcome` — cửa ghi outcome (mẫu `addDecision`); `moveStage`/`addDiscovery` — cửa ghi đổi-stage/bản-ghi-discovery (xem spec Work-State); `moveWork` gắn `actor` post-transition + compose bài học câu-6 khi `to==='done'` (xem Pointers spec Work-State); `moveWork` cũng nhận `headAtTake` cộng-thêm tùy chọn — chỉ cửa pull `take` truyền, runner không bao giờ truyền nên không đổi hành vi claim của chính nó
+- `src/state/store.mjs` `readRawEvents` — accessor chỉ-đọc cho anti-loop (decision 14396a5c); `addOutcome` — cửa ghi outcome (mẫu `addDecision`); `moveStage`/`addDiscovery` — cửa ghi đổi-stage/bản-ghi-discovery (xem spec Work-State); `moveWork` gắn `actor` post-transition + compose bài học câu-6 khi `to==='done'` (xem Pointers spec Work-State); `moveWork` cũng nhận `headAtTake` cộng-thêm tùy chọn — chỉ cửa pull `take` truyền, runner không bao giờ truyền nên không đổi hành vi claim của chính nó; cùng khuôn, nhận `headAtReturn` — chỉ `return` truyền (per pr-lifecycle D1)
 - `bin/fgos.mjs` verb `take`/`return` — cửa pull giao–nhận việc ngoài vòng runner, `return` gọi thẳng `runGoalCheck` ở trên (xem spec Work-State "Cửa pull giao–nhận việc" cho hợp đồng đầy đủ)
+- `src/runner/merge.mjs` — cỗ máy cơ chế của cổng duyệt (per D1-D5 pr-lifecycle / 1359ab5e), tách khỏi CLI cùng khuôn `worktree.mjs`/`goal-check.mjs`: `classifySource` (runner/pull/legacy — nhánh sống qua `worktree.mjs`'s `branchExists`, hay cặp `headAtTake`+`headAtReturn`, hay không cả hai); `reviewDiff` (diff theo nguồn + cảnh báo degrade trung thực); `mergeRunnerItem` (`git merge --no-commit --no-ff` → verify trên staged tree qua `runGoalCheck` → commit-hoặc-abort, spike-proven); `cleanupMergedBranch` (dọn nhánh/worktree sau merge sạch, best-effort). KHÔNG BAO GIỜ ghi `.fgos/` trực tiếp — mọi chuyển trạng thái (`proposed→done`/`proposed→blocked`) vẫn ở `bin/fgos.mjs` qua `store.mjs`. Manifest layer (`docs/architecture-manifest.json`): infra
+- `bin/fgos.mjs` verb `review`/`approve`/`reject` — cổng duyệt PR nội bộ, bề mặt CLI của cổng duyệt một-cửa (xem "Cổng duyệt PR nội bộ" trên cho hợp đồng đầy đủ)
 - `docs/routing-handoff-contract.md` — hợp đồng handoff + ranh giới tin cậy
-- Test: `test/runner/*` + `test/e2e/runner-loop.test.mjs` (executor giả, repo git tạm, bao gồm 3 kịch bản stage-clarify + 3 kịch bản stage-decompose: pass-through, chia-con-chặn-frontier, cần-người + 1 kịch bản S2-pull: `take` người + `fgos-runner --once` song song không giẫm + `return` xanh) + `test/cli/fgos.test.mjs` (unit CLI cho `take`/`return`: frontier-head claim, CAS conflict, dirty-tree/HEAD-chưa-tiến refusal, verify xanh/đỏ) + `test/state/replay.test.mjs` (fold `claimActor`/`headAtTake`) + `test/report/entropy.test.mjs` (entropy thuần) + benchmark ngoài suite `docs/history/phase-3-compound-learning/reports/f4-benchmark.md` (F4, real binaries, expected-delta khai trước run); 466 test toàn suite
+- Test: `test/runner/*` (gồm `test/runner/merge.test.mjs` — unit `classifySource`/`reviewDiff`/`mergeRunnerItem`/`cleanupMergedBranch`) + `test/e2e/runner-loop.test.mjs` (executor giả, repo git tạm, bao gồm 3 kịch bản stage-clarify + 3 kịch bản stage-decompose: pass-through, chia-con-chặn-frontier, cần-người + 1 kịch bản S2-pull: `take` người + `fgos-runner --once` song song không giẫm + `return` xanh) + `test/e2e/pr-gate.test.mjs` (4 kịch bản thật qua binary + git: runner item full loop review→approve→merge→done, merge conflict thật với tree nguyên vẹn sau abort, pull-door item full loop, reject pull-door giữ commit làm lịch sử) + `test/cli/fgos.test.mjs` (unit CLI cho `take`/`return`/`review`/`approve`/`reject`: frontier-head claim, CAS conflict, dirty-tree/HEAD-chưa-tiến refusal, verify xanh/đỏ, main-never-holds-broken-merge cho cả conflict lẫn verify-fail, legacy degrade) + `test/state/replay.test.mjs` (fold `claimActor`/`headAtTake`/`headAtReturn`) + `test/report/entropy.test.mjs` (entropy thuần) + benchmark ngoài suite `docs/history/phase-3-compound-learning/reports/f4-benchmark.md` (F4, real binaries, expected-delta khai trước run); 508 test toàn suite
