@@ -325,3 +325,61 @@ test('rebuildView preserves the historical ts from each event, never the current
   const view = rebuildView(logPath);
   assert.equal(view.decisions[0].ts, pastTs);
 });
+
+// --- claim attribution (stage-decompose S2-pull D1/cell action (4)) --------
+//
+// `claimActor` + `headAtTake` fold onto the item itself (not a settlement)
+// from a `work.move` claim (`to: 'doing'`) that carries them — this is what
+// lets startupReap tell a pull-door claim (human/session, never auto-reaped)
+// apart from a runner claim, and lets `fgos return` measure real progress
+// against the HEAD recorded at take time.
+
+test('foldEvents folds claimActor + headAtTake onto the item from a doing claim that carries them (pull-door take)', () => {
+  const events = [
+    { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo' }, v: 2 },
+    { seq: 2, ts: '2026-07-16T00:00:01.000Z', type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing', actor: 'human', headAtTake: 'deadbeef' }, v: 2 },
+  ];
+  const view = foldEvents(events);
+  assert.equal(view.work.a.claimActor, 'human');
+  assert.equal(view.work.a.headAtTake, 'deadbeef');
+});
+
+test('foldEvents folds claimActor "runner" with no headAtTake for a plain runner claim (runner claims never carry a headAtTake)', () => {
+  const events = [
+    { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo' }, v: 2 },
+    { seq: 2, ts: '2026-07-16T00:00:01.000Z', type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing', actor: 'runner' }, v: 2 },
+  ];
+  const view = foldEvents(events);
+  assert.equal(view.work.a.claimActor, 'runner');
+  assert.equal('headAtTake' in view.work.a, false);
+});
+
+test('foldEvents leaves claimActor/headAtTake absent from the item for a legacy doing claim with no actor at all (backward-compat)', () => {
+  const events = [
+    { seq: 1, ts: '2026-07-14T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo' } },
+    { seq: 2, ts: '2026-07-14T00:00:01.000Z', type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing' } },
+  ];
+  const view = foldEvents(events);
+  assert.equal('claimActor' in view.work.a, false);
+  assert.equal('headAtTake' in view.work.a, false);
+});
+
+test('foldEvents ignores claimActor/headAtTake on a doing move for an id that was never added — ghost id stays a true no-op', () => {
+  const events = [
+    { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.move', payload: { id: 'ghost', from: 'todo', to: 'doing', actor: 'human', headAtTake: 'deadbeef' }, v: 2 },
+  ];
+  assert.doesNotThrow(() => foldEvents(events));
+  const view = foldEvents(events);
+  assert.equal('ghost' in view.work, false);
+});
+
+test('foldEvents does not fold claimActor/headAtTake on a non-doing move even when the payload carries them (only the doing edge sets them)', () => {
+  const events = [
+    { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo' }, v: 2 },
+    { seq: 2, ts: '2026-07-16T00:00:01.000Z', type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing', actor: 'human', headAtTake: 'aaa' }, v: 2 },
+    { seq: 3, ts: '2026-07-16T00:00:02.000Z', type: 'work.move', payload: { id: 'a', from: 'doing', to: 'proposed', actor: 'human', headAtTake: 'ignored-on-this-edge' }, v: 2 },
+  ];
+  const view = foldEvents(events);
+  assert.equal(view.work.a.claimActor, 'human', 'the doing edge already set claimActor — a later non-doing move never touches it');
+  assert.equal(view.work.a.headAtTake, 'aaa', 'the proposed move carries headAtTake in its payload but it is not the doing edge, so it is never read');
+});

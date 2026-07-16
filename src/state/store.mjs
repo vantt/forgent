@@ -158,7 +158,7 @@ function composeLearning(view, id, closingSettlement) {
  * delegates the precondition/CAS decision to fsm.mjs (pure — never writes),
  * and only then appends the event it returns.
  */
-export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, actor } = {}) {
+export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, actor, headAtTake } = {}) {
   const { logPath } = paths(dir);
   const before = rebuildView(logPath);
   const work = before.work[id];
@@ -180,6 +180,14 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, act
   // exact payload shape transitionWork already produced, byte-for-byte.
   if (actor !== undefined) {
     rawEvent.payload.actor = actor;
+  }
+  // Pull-door claim marker (stage-decompose S2-pull D1): the host repo's HEAD
+  // at claim time, additive on the SAME `to === 'doing'` move `take` writes —
+  // never a separate event (single write door, D3). Ignored by fsm.mjs (pure,
+  // only knows the fields it destructures itself) exactly like `actor` above,
+  // so this is stamped post-transition the same way.
+  if (headAtTake !== undefined) {
+    rawEvent.payload.headAtTake = headAtTake;
   }
   // Câu-6 tự động (per Phase 3 S3-closeout (c), six-questions L5): BOTH doors
   // into `done` (doing->done and proposed->done) converge on this one

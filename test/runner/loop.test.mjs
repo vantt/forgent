@@ -442,6 +442,48 @@ test('startup reap: a doing item with nothing on its branch is reclaimed to bloc
   assert.equal(result.outcome, 'idle');
 });
 
+// --- startup reap never reclaims a pull-door (human/session) claim --------
+// (stage-decompose S2-pull D1/cell action (4)): a person holds `doing`
+// indefinitely — only a runner's own crashed claim is ever reaped.
+
+test('startup reap SKIPS a doing item claimed by a human (claimActor) — never reclaimed, even with no branch/commit at all', () => {
+  const { repoRoot, dir, worktreeDir } = setup();
+  const item = seedItem(dir, { id: 'item-human-held' });
+  moveWork(dir, { id: item.id, to: 'doing', expectedStatus: 'todo', actor: 'human', headAtTake: 'deadbeef' });
+  const config = {
+    executor: { command: '/no/such/executor-binary-xyz', args: ['{prompt}'] },
+    models: { standard: 'sonnet' },
+    timeoutMs: 30000,
+  };
+
+  const result = runOnce({ repoRoot, config, worktreeDir, log: noLog });
+
+  assert.deepEqual(result.reap.resolutions, [], 'the human-held item is never entered into the reap resolutions at all');
+  assert.equal(listWork(dir).work['item-human-held'].status, 'doing', 'still held — a person is working it, no auto-reclaim');
+  assert.equal(result.outcome, 'idle', 'the item stays out of the frontier too (status doing, not todo)');
+});
+
+test('startup reap SKIPS a doing item claimed by a session, but still reaps a plain runner claim in the SAME pass — selective, not a blanket disablement', () => {
+  const { repoRoot, dir, worktreeDir } = setup();
+  const held = seedItem(dir, { id: 'item-session-held' });
+  moveWork(dir, { id: held.id, to: 'doing', expectedStatus: 'todo', actor: 'session', headAtTake: 'cafebabe' });
+  const vanished = seedItem(dir, { id: 'item-runner-vanished' });
+  moveWork(dir, { id: vanished.id, to: 'doing', expectedStatus: 'todo', actor: 'runner' });
+  const config = {
+    executor: { command: '/no/such/executor-binary-xyz', args: ['{prompt}'] },
+    models: { standard: 'sonnet' },
+    timeoutMs: 30000,
+  };
+
+  const result = runOnce({ repoRoot, config, worktreeDir, log: noLog });
+
+  assert.deepEqual(result.reap.resolutions, [
+    { id: 'item-runner-vanished', to: 'blocked', reason: 'runner-crash-reclaim' },
+  ]);
+  assert.equal(listWork(dir).work['item-session-held'].status, 'doing', 'session claim untouched');
+  assert.equal(listWork(dir).work['item-runner-vanished'].status, 'blocked', 'runner claim still reclaimed');
+});
+
 test('startup reap: empty fgw/ orphan branches are pruned, branches carrying commits are kept', () => {
   const { repoRoot, dir, worktreeDir } = setup();
   // orphan: worktree created and torn down without a single commit

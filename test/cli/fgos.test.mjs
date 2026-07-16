@@ -4,8 +4,8 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { spawnSync } from 'node:child_process';
-import { addOutcome, addFriction } from '../../src/state/store.mjs';
+import { execFileSync, spawnSync } from 'node:child_process';
+import { addOutcome, addFriction, moveWork } from '../../src/state/store.mjs';
 
 // The CLI under test, resolved by absolute path so it works regardless of
 // the spawned process's cwd (which every test below points at a fresh
@@ -44,6 +44,41 @@ function stateView(cwd) {
 function addOk(cwd, id, extra = {}) {
   const flags = ['--title', extra.title ?? `Title ${id}`, '--kind', extra.kind ?? 'task', '--risk', extra.risk ?? 'low', '--verify', extra.verify ?? 'npm test'];
   return run(cwd, ['add', id, ...flags]);
+}
+
+// Git-backed cwd (stage-decompose S2-pull): `take`/`return` operate on the
+// real host repo directly (never a worktree) — a real HEAD, a real working
+// tree, and real commits are the whole point of D1's "mirror the runner's
+// own proposed contract" design. Every other verb in this file never needs
+// git at all, so this helper is scoped to only the take/return tests below.
+//
+// `.fgos/state.json` is gitignored (same convention this very repo's own
+// .gitignore declares: "state.json is a derived view") — `.fgos/events.jsonl`
+// is the truth log and IS committed, so "commit your work" for `return`
+// means the real files AND the log entries `take`/`add` already appended.
+function initGitCwd() {
+  const cwd = tmpCwd();
+  execFileSync('git', ['init', '-q'], { cwd });
+  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd });
+  execFileSync('git', ['config', 'user.name', 'Test'], { cwd });
+  fs.writeFileSync(path.join(cwd, '.gitignore'), '.fgos/state.json\n');
+  fs.writeFileSync(path.join(cwd, 'seed.txt'), 'seed\n');
+  execFileSync('git', ['add', 'seed.txt', '.gitignore'], { cwd });
+  execFileSync('git', ['commit', '-q', '-m', 'seed'], { cwd });
+  return cwd;
+}
+
+function gitHead(cwd) {
+  return execFileSync('git', ['rev-parse', 'HEAD'], { cwd, encoding: 'utf8' }).trim();
+}
+
+// Commits the produced file AND whatever `.fgos/events.jsonl` deltas are
+// pending (`git add -A`) — mirrors what a real "commit your work" step looks
+// like against a repo where the truth log rides alongside the code.
+function commitFile(cwd, filename, content = 'work\n') {
+  fs.writeFileSync(path.join(cwd, filename), content);
+  execFileSync('git', ['add', '-A'], { cwd });
+  execFileSync('git', ['commit', '-q', '-m', `work: ${filename}`], { cwd });
 }
 
 test('init creates .fgos/ with an empty log and a rebuilt (empty) view, exit 0', () => {
@@ -1115,4 +1150,203 @@ test('check on a log with no item ever reaching done is unchanged — no learnin
   const result = run(cwd, ['check']);
   assert.equal(result.status, 0);
   assert.doesNotMatch(result.stdout, /learning/);
+});
+
+// --- take/return: cửa pull giao–nhận việc (stage-decompose S2-pull D1) -----
+
+test('take with no --id claims the frontier head, defaults actor to human, records headAtTake, and writes a predicted outcome', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  addOk(cwd, 'pull-a', { verify: 'test -f done.txt' });
+  const headBefore = gitHead(cwd);
+
+  const result = run(cwd, ['take']);
+  assert.equal(result.status, 0, `take failed: ${result.stderr}`);
+  assert.match(result.stdout, /pull-a/);
+  assert.match(result.stdout, /actor=human/);
+
+  const view = stateView(cwd);
+  assert.equal(view.work['pull-a'].status, 'doing');
+  assert.equal(view.work['pull-a'].claimActor, 'human');
+  assert.equal(view.work['pull-a'].headAtTake, headBefore);
+  assert.equal(view.outcomes['pull-a'].predicted.actor, 'human');
+  assert.equal(view.outcomes['pull-a'].predicted.headAtTake, headBefore);
+  assert.equal(view.outcomes['pull-a'].predicted.tier, 'standard');
+});
+
+test('take --actor session records claimActor "session" instead of the default human', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  addOk(cwd, 'pull-session');
+
+  const result = run(cwd, ['take', '--actor', 'session']);
+  assert.equal(result.status, 0, `take failed: ${result.stderr}`);
+  assert.equal(stateView(cwd).work['pull-session'].claimActor, 'session');
+});
+
+test('take --actor with an invalid value is rejected as validation, exit 4, no event written', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  addOk(cwd, 'pull-bad-actor');
+  const before = eventLines(cwd).length;
+
+  const result = run(cwd, ['take', '--actor', 'robot']);
+  assert.equal(result.status, 4);
+  assert.equal(eventLines(cwd).length, before);
+});
+
+test('take on an empty frontier is rejected as validation, exit 4, no event written', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  const before = eventLines(cwd).length;
+
+  const result = run(cwd, ['take']);
+  assert.equal(result.status, 4);
+  assert.equal(eventLines(cwd).length, before);
+});
+
+test('take --id on a todo item outside the frontier (dep not done) is rejected as validation — take opens only the same set the runner would dispatch (D1)', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  addOk(cwd, 'pull-dep-source');
+  run(cwd, ['add', 'pull-dep-blocked', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'npm test', '--deps', 'pull-dep-source']);
+  const before = eventLines(cwd).length;
+
+  const result = run(cwd, ['take', '--id', 'pull-dep-blocked']);
+  assert.equal(result.status, 4);
+  assert.equal(eventLines(cwd).length, before, 'a rejected take never claims and never writes an event');
+  assert.equal(stateView(cwd).work['pull-dep-blocked'].status, 'todo');
+});
+
+test('take --id on an item already claimed (doing) falls through to moveWork\'s own CAS — conflict, exit 3, not a duplicated validation message', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  addOk(cwd, 'pull-double-take');
+  assert.equal(run(cwd, ['take', '--id', 'pull-double-take']).status, 0);
+
+  const result = run(cwd, ['take', '--id', 'pull-double-take']);
+  assert.equal(result.status, 3);
+  assert.equal(stateView(cwd).work['pull-double-take'].status, 'doing');
+});
+
+test('take --id not found is rejected as validation, exit 4', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  const result = run(cwd, ['take', '--id', 'no-such-item']);
+  assert.equal(result.status, 4);
+});
+
+test('return happy path: verify passes -> doing to proposed, actual outcome recorded, no settlement (settlement belongs to the -> done edge, D4)', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  addOk(cwd, 'pull-return-ok', { verify: 'test -f proof.txt' });
+  assert.equal(run(cwd, ['take', '--id', 'pull-return-ok']).status, 0);
+  commitFile(cwd, 'proof.txt');
+
+  const result = run(cwd, ['return', 'pull-return-ok']);
+  assert.equal(result.status, 0, `return failed: ${result.stderr}`);
+  assert.match(result.stdout, /proposed/);
+
+  const view = stateView(cwd);
+  assert.equal(view.work['pull-return-ok'].status, 'proposed');
+  assert.equal(view.outcomes['pull-return-ok'].actual.outcome, 'proposed');
+  assert.equal(view.outcomes['pull-return-ok'].actual.passed, true);
+  assert.equal(view.outcomes['pull-return-ok'].actual.aheadCount, 1);
+  assert.equal('settlements' in view, false, 'doing -> proposed never settles (D4: settlement belongs to the -> done edge)');
+});
+
+test('return refuses a dirty working tree (uncommitted changes) as validation, exit 4, item stays doing', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  addOk(cwd, 'pull-return-dirty', { verify: 'test -f proof.txt' });
+  assert.equal(run(cwd, ['take', '--id', 'pull-return-dirty']).status, 0);
+  fs.writeFileSync(path.join(cwd, 'proof.txt'), 'uncommitted\n'); // never git add/commit
+
+  const result = run(cwd, ['return', 'pull-return-dirty']);
+  assert.equal(result.status, 4);
+  assert.equal(stateView(cwd).work['pull-return-dirty'].status, 'doing');
+});
+
+test('return refuses when HEAD has not advanced past headAtTake — a clean tree with zero real progress — as validation, exit 4, item stays doing', () => {
+  // `.fgos/` entirely gitignored here (unlike initGitCwd's `.fgos/state.json`
+  // only) so the tree is genuinely clean right after `take` with no commit
+  // at all — isolating the HEAD-advance check from the tree-clean check,
+  // which a tracked events.jsonl would otherwise always fail together (this
+  // repo's own convention commits events.jsonl, so making the tree clean
+  // there always requires a commit that also advances HEAD).
+  const cwd = tmpCwd();
+  execFileSync('git', ['init', '-q'], { cwd });
+  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd });
+  execFileSync('git', ['config', 'user.name', 'Test'], { cwd });
+  fs.writeFileSync(path.join(cwd, '.gitignore'), '.fgos/\n');
+  fs.writeFileSync(path.join(cwd, 'seed.txt'), 'seed\n');
+  execFileSync('git', ['add', 'seed.txt', '.gitignore'], { cwd });
+  execFileSync('git', ['commit', '-q', '-m', 'seed'], { cwd });
+
+  run(cwd, ['init']);
+  addOk(cwd, 'pull-return-stale', { verify: 'test -f proof.txt' });
+  assert.equal(run(cwd, ['take', '--id', 'pull-return-stale']).status, 0);
+
+  const result = run(cwd, ['return', 'pull-return-stale']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /HEAD has not advanced/);
+  assert.equal(stateView(cwd).work['pull-return-stale'].status, 'doing');
+});
+
+test('return verify-fail: doing -> blocked + friction (verification layer), exit 0 (a defined outcome, not a CLI error) — mirrors the runner\'s own park path', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  addOk(cwd, 'pull-return-red', { verify: 'test -f proof.txt' });
+  assert.equal(run(cwd, ['take', '--id', 'pull-return-red']).status, 0);
+  commitFile(cwd, 'wrong-file.txt'); // advances HEAD, but never satisfies verify
+
+  const result = run(cwd, ['return', 'pull-return-red']);
+  assert.equal(result.status, 0, `return should exit 0 for a defined blocked outcome: ${result.stderr}`);
+  assert.match(result.stdout, /blocked/);
+
+  const view = stateView(cwd);
+  assert.equal(view.work['pull-return-red'].status, 'blocked');
+  assert.equal(view.outcomes['pull-return-red'].actual.outcome, 'blocked');
+  assert.equal(view.outcomes['pull-return-red'].actual.passed, false);
+  assert.equal(view.frictions['pull-return-red'][0].layer, 'verification');
+  assert.equal(view.frictions['pull-return-red'][0].errorClass, 'verify-miss');
+});
+
+test('return on an item that is not "doing" (still todo) is rejected as validation, exit 4', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  addOk(cwd, 'pull-return-not-doing');
+  const result = run(cwd, ['return', 'pull-return-not-doing']);
+  assert.equal(result.status, 4);
+});
+
+test('return on an item claimed by the runner (claimActor "runner", no headAtTake) is rejected as validation — return only completes a take', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  addOk(cwd, 'pull-return-runner-claim');
+  const dir = path.join(cwd, '.fgos');
+  moveWork(dir, { id: 'pull-return-runner-claim', to: 'doing', expectedStatus: 'todo', actor: 'runner' });
+
+  const result = run(cwd, ['return', 'pull-return-runner-claim']);
+  assert.equal(result.status, 4);
+  assert.equal(stateView(cwd).work['pull-return-runner-claim'].status, 'doing');
+});
+
+test('return with no id at all is rejected as validation, exit 4', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  const result = run(cwd, ['return']);
+  assert.equal(result.status, 4);
+});
+
+test('return --timeout with a non-numeric or non-positive value is rejected as validation, exit 4', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  addOk(cwd, 'pull-return-bad-timeout', { verify: 'test -f proof.txt' });
+  assert.equal(run(cwd, ['take', '--id', 'pull-return-bad-timeout']).status, 0);
+  commitFile(cwd, 'proof.txt');
+
+  const result = run(cwd, ['return', 'pull-return-bad-timeout', '--timeout', 'soon']);
+  assert.equal(result.status, 4);
+  assert.equal(stateView(cwd).work['pull-return-bad-timeout'].status, 'doing', 'a rejected --timeout never runs verify or moves the item');
 });

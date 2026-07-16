@@ -44,10 +44,30 @@ function applyEvent(view, event) {
       break;
     }
     case 'work.move': {
-      const { id, to, ask, answer, actor, learning } = event.payload ?? {};
+      const { id, to, ask, answer, actor, learning, headAtTake } = event.payload ?? {};
       const item = view.work[id];
       if (item) {
         item.status = to;
+      }
+      // Claim attribution (stage-decompose S2-pull D1/cell action (4)):
+      // fold the claiming `actor` onto the item itself as `claimActor` —
+      // separate from the settlement channel's per-transition `actor` below,
+      // this is a durable per-item field the reap guard reads (`item.status
+      // === 'doing' && item.claimActor is human/session` means a person is
+      // holding it, never auto-reclaimed). `headAtTake` (the host repo's HEAD
+      // at claim time, per D1's take verb) rides the same event additively
+      // so `fgos return` can later measure real progress against it. Both
+      // only ever get set on THIS claim's `to === 'doing'` move — a runner
+      // claim carries `actor: 'runner'` and no `headAtTake`, so this is a
+      // strict addition for the pull door, never a rewrite of the runner's
+      // own claim shape.
+      if (item && to === 'doing') {
+        if (actor !== undefined) {
+          item.claimActor = actor;
+        }
+        if (headAtTake !== undefined) {
+          item.headAtTake = headAtTake;
+        }
       }
       // Human-gate ask/answer (per async-human-gate D2/D5), mirroring the
       // work.outcome lazy-key/merge-by-id precedent above: the ask (entry

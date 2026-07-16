@@ -17,13 +17,17 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { initStore, addWork, moveWork, addDecision, listWork, readyWork, rebuild, putInAwaiting, answerAwaiting, StoreError, EXIT_CODES, categoryOf } from '../src/state/store.mjs';
+import { execFileSync } from 'node:child_process';
+import { initStore, addWork, moveWork, addDecision, addOutcome, addFriction, listWork, readyWork, readRawEvents, rebuild, putInAwaiting, answerAwaiting, StoreError, EXIT_CODES, categoryOf } from '../src/state/store.mjs';
 import { deriveTitle, classify, generateId } from '../src/intake/classify.mjs';
 import { wrapEnvelope } from '../src/state/envelope.mjs';
 import { loadRunnerConfig } from '../src/runner/dispatch.mjs';
 import { resolveDiscovery } from '../src/intake/discovery.mjs';
 import { resolveDecompose } from '../src/intake/decompose.mjs';
 import { computeEntropy, computeCounts } from '../src/report/entropy.mjs';
+import { runGoalCheck } from '../src/runner/goal-check.mjs';
+import { visitCount } from '../src/runner/anti-loop.mjs';
+import { DEFAULTS } from '../src/state/work.mjs';
 
 // D5: `verify` is a required non-empty field on every work item, but a
 // free-text submission has no verification plan yet — that is P15's job. The
@@ -33,6 +37,33 @@ const SUBMIT_VERIFY_SENTINEL = 'chưa xác định — P15 bổ sung';
 
 function dataDir() {
   return path.join(process.cwd(), '.fgos');
+}
+
+// Host-repo git helpers for the pull door (`take`/`return`, stage-decompose
+// D1): both verbs operate directly on `cwd` — never a worktree, same
+// assumption `dataDir()` above already makes (this CLI's `.fgos/` always
+// lives under the caller's own cwd). A git failure here (not a repo, no
+// commits yet) is reported as `validation` rather than escaping as an
+// "unexpected" (exit 1) — every other error surface in this file already
+// follows the R4 exit-code contract.
+function gitAt(cwd, args) {
+  try {
+    return execFileSync('git', args, { cwd, encoding: 'utf8', shell: false });
+  } catch (err) {
+    throw new StoreError('validation', `git ${args.join(' ')} failed in "${cwd}": ${err.message}`);
+  }
+}
+
+function currentHead(cwd) {
+  return gitAt(cwd, ['rev-parse', 'HEAD']).trim();
+}
+
+function isWorkingTreeClean(cwd) {
+  return gitAt(cwd, ['status', '--porcelain']).trim() === '';
+}
+
+function commitsSince(cwd, from, to) {
+  return parseInt(gitAt(cwd, ['rev-list', '--count', `${from}..${to}`]).trim(), 10) || 0;
 }
 
 // A bare `--flag` (no value) parses to boolean `true` (see parseArgs below);
@@ -513,8 +544,130 @@ function runVerb(verb, flags, positional, dir) {
       return formatCheck(listWork(dir), id, dir);
     }
 
+    // Cửa pull — take (stage-decompose S2-pull D1): a tác nhân ngoài runner
+    // (human by default, session for a live agent) claims exactly one item.
+    // No `--id` → the frontier head (readyWork — the EXACT set the runner
+    // would dispatch, D1: "cửa pull không mở tập riêng"). An explicit `--id`
+    // still must be in the frontier while it is genuinely `todo` (same-set
+    // rule); an id that is already claimed/blocked/etc. falls straight
+    // through to moveWork's own CAS below, which reports the real conflict
+    // (exit 3) rather than a duplicated custom message. `headAtTake` (the
+    // host repo's own current HEAD) rides the claim additively so `return`
+    // can later measure real progress against it.
+    case 'take': {
+      const explicitId = optionalField(positional[0] ?? flags.id, 'take --id requires a non-empty id value (omit --id entirely to take the frontier head)');
+      const actor = optionalField(flags.actor, 'take --actor requires "human" or "session" (omit --actor entirely to default to human)') ?? 'human';
+      if (actor !== 'human' && actor !== 'session') {
+        throw new StoreError('validation', `take --actor must be "human" or "session" (got "${actor}").`);
+      }
+
+      let id = explicitId;
+      if (!id) {
+        const [head] = readyWork(dir);
+        if (!head) {
+          throw new StoreError('validation', 'take: the frontier is empty — no item ready to take.');
+        }
+        id = head.id;
+      } else {
+        const item = listWork(dir).work[id];
+        if (!item) {
+          throw new StoreError('validation', `take: work "${id}" not found.`);
+        }
+        if (item.status === 'todo' && !readyWork(dir).some((w) => w.id === id)) {
+          throw new StoreError(
+            'validation',
+            `take: "${id}" is todo but not in the frontier yet (stage/deps/lineage) — take only opens the same set the runner would dispatch (D1).`,
+          );
+        }
+      }
+
+      const item = listWork(dir).work[id];
+      // Predicted half written right after the claim, mirroring the
+      // runner's own claim (D1's "đối xứng claim runner") — priorVisits is
+      // read BEFORE this claim's own work.move so it never counts itself.
+      const priorVisits = visitCount(readRawEvents(dir), id);
+      const headAtTake = currentHead(process.cwd());
+
+      const { event } = moveWork(dir, { id, to: 'doing', expectedStatus: 'todo', actor, headAtTake });
+      addOutcome(dir, {
+        id,
+        predicted: { tier: item.tier ?? DEFAULTS.tier, deps: item.deps.length, priorVisits, actor, headAtTake },
+      });
+      return `Took ${id}: todo -> doing (actor=${actor}, headAtTake=${headAtTake}) (event #${event.seq})`;
+    }
+
+    // Cửa pull — return (stage-decompose S2-pull D1/R13): KHÔNG tin lời
+    // người trả — this verb runs the item's OWN verify itself (the same
+    // goal-check helper the runner uses, per cell action (3)) and only its
+    // exit status decides. Mirrors the runner's own proposed contract
+    // exactly: working tree clean (work committed) + HEAD advanced past
+    // headAtTake (real progress, not a no-op) are both required BEFORE verify
+    // even runs; verify green -> doing->proposed (actual, no settlement —
+    // settlement belongs to the ->done edge, D4); verify red ->
+    // doing->blocked + friction (mirrors the runner's own park path).
+    case 'return': {
+      const id = requireField(positional[0] ?? flags.id, 'return requires an id: fgos return <id> [--timeout <ms>]');
+      const timeoutFlag = optionalField(flags.timeout, 'return --timeout requires a numeric millisecond value (omit --timeout entirely for no timeout)');
+      let timeoutMs;
+      if (timeoutFlag !== undefined) {
+        timeoutMs = Number(timeoutFlag);
+        if (!Number.isFinite(timeoutMs) || timeoutMs <= 0) {
+          throw new StoreError('validation', `return --timeout must be a positive number of milliseconds (got "${timeoutFlag}").`);
+        }
+      }
+
+      const item = listWork(dir).work[id];
+      if (!item) {
+        throw new StoreError('validation', `return: work "${id}" not found.`);
+      }
+      if (item.status !== 'doing') {
+        throw new StoreError('validation', `return: work "${id}" is "${item.status}", not "doing" — nothing to return.`);
+      }
+      if (item.claimActor !== 'human' && item.claimActor !== 'session') {
+        throw new StoreError(
+          'validation',
+          `return: work "${id}" was not taken through the pull door (claimed by "${item.claimActor ?? 'runner'}") — return only completes a take.`,
+        );
+      }
+      if (typeof item.headAtTake !== 'string' || !item.headAtTake) {
+        throw new StoreError('validation', `return: work "${id}" has no recorded headAtTake — cannot verify progress since take.`);
+      }
+
+      const cwd = process.cwd();
+      if (!isWorkingTreeClean(cwd)) {
+        throw new StoreError('validation', `return: working tree at "${cwd}" is not clean — commit the work for "${id}" before returning.`);
+      }
+      const head = currentHead(cwd);
+      const aheadCount = commitsSince(cwd, item.headAtTake, head);
+      if (aheadCount <= 0) {
+        throw new StoreError(
+          'validation',
+          `return: HEAD has not advanced past headAtTake for "${id}" (${item.headAtTake} -> ${head}) — commit the work before returning.`,
+        );
+      }
+
+      const check = runGoalCheck(item, cwd, timeoutMs);
+      if (check.passed) {
+        const { event } = moveWork(dir, { id, to: 'proposed', expectedStatus: 'doing' });
+        addOutcome(dir, { id, actual: { outcome: 'proposed', passed: true, attempts: 1, errorClass: null, aheadCount } });
+        return `Returned ${id}: doing -> proposed (verify passed, ${aheadCount} commit(s)) (event #${event.seq})\n${check.output}`;
+      }
+
+      moveWork(dir, { id, to: 'blocked', expectedStatus: 'doing', reason: 'verify-fail' });
+      addOutcome(dir, { id, actual: { outcome: 'blocked', passed: false, attempts: 1, errorClass: 'verify-miss', aheadCount } });
+      addFriction(dir, {
+        id,
+        disposition: 'blocked',
+        errorClass: 'verify-miss',
+        layer: 'verification',
+        attempts: 1,
+        detail: `goal-check failed (exit ${check.status})`,
+      });
+      return `Returned ${id}: doing -> blocked (verify failed, exit ${check.status})\n${check.output}`;
+    }
+
     default:
-      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <init|add|submit|discover|move|ask|answer|decision|list|ready|rebuild|check> ...`);
+      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <init|add|submit|discover|move|ask|answer|decision|list|ready|rebuild|check|take|return> ...`);
   }
 }
 

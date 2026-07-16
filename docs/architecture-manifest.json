@@ -8,6 +8,7 @@
     "src/runner/loop.mjs": "use-case",
     "src/runner/dispatch.mjs": "infra",
     "src/runner/worktree.mjs": "infra",
+    "src/runner/goal-check.mjs": "infra",
     "src/state/store.mjs": "infra",
     "src/runner/recovery.mjs": "domain",
     "src/runner/anti-loop.mjs": "domain",

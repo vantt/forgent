@@ -35,7 +35,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { execFileSync, spawnSync } from 'node:child_process';
+import { execFileSync } from 'node:child_process';
 import {
   listWork,
   moveWork,
@@ -57,6 +57,7 @@ import {
 } from './anti-loop.mjs';
 import { spawnWorker, modelForTier } from './dispatch.mjs';
 import { createWorktree, removeWorktree, listLeftovers, branchNameFor } from './worktree.mjs';
+import { runGoalCheck } from './goal-check.mjs';
 import { resolveDiscovery } from '../intake/discovery.mjs';
 import { resolveDecompose } from '../intake/decompose.mjs';
 
@@ -232,24 +233,6 @@ function branchFacts(repoRoot, branch) {
   return { exists: true, aheadCount };
 }
 
-/** Goal-check (per D3): the RUNNER runs the item's own `verify` — the
- * literal command string, via a shell, in the worktree checkout — and only
- * its exit status decides. The worker's exit code/report is never trusted. */
-function runGoalCheck(item, cwd, timeoutMs) {
-  const result = spawnSync(item.verify, {
-    shell: true,
-    cwd,
-    encoding: 'utf8',
-    timeout: timeoutMs,
-    maxBuffer: 10 * 1024 * 1024,
-  });
-  return {
-    passed: result.status === 0,
-    status: result.status,
-    output: `${result.stdout ?? ''}${result.stderr ?? ''}`,
-  };
-}
-
 function tailLines(text, n = 10) {
   const lines = String(text ?? '').trimEnd().split('\n');
   return lines.slice(-n).join('\n');
@@ -292,6 +275,15 @@ export function startupReap({ repoRoot, dir, worktreeDir, verifyTimeoutMs, log =
   for (const id of Object.keys(view.work)) {
     const item = view.work[id];
     if (item.status !== 'doing') continue;
+    // Pull-door claims never expire on their own (stage-decompose S2-pull
+    // D1/cell action (4)): a human/session claimant holds `doing`
+    // indefinitely — reap only reclaims a claim the RUNNER itself made and
+    // then crashed on. `claimActor` is folded onto the item by replay.mjs
+    // from the claiming `work.move`'s own `actor` field; a legacy log with
+    // no actor at all (or a runner claim, `actor: 'runner'`) is untouched —
+    // this is a strict narrowing of what already gets reaped, never a
+    // widening.
+    if (item.claimActor === 'human' || item.claimActor === 'session') continue;
 
     const branch = branchNameFor(id);
     const facts = branchFacts(repoRoot, branch);

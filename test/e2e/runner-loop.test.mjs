@@ -539,6 +539,96 @@ test('e2e stage-decompose (c) ambiguous verdict: decompose sweep parks the item 
   assert.ok(view.gates[submitted.id].ask.includes(reason));
 });
 
+// --- stage-decompose S2-pull e2e: cửa pull take/return through real fgos +
+// fgos-runner binaries (stage-decompose-4, cell action (5)) ----------------
+
+test('e2e S2-pull: submit pass-throughs 2 stages via discover, a human takes the frontier head, a concurrent fgos-runner --once never stomps the human-held claim, then the human commits real progress and returns to proposed', () => {
+  const repoRoot = initTempRepo();
+  const scriptDir = mkTempDir('fgos-runner-e2e-pull-');
+
+  // `.fgos/state.json` is a derived view (gitignored); `.fgos/events.jsonl`
+  // is the truth log and IS committed — same convention this very repo's own
+  // .gitignore already declares. "Commit your work" for `return` therefore
+  // covers both the real file AND the log deltas `take`/`discover` already
+  // appended.
+  fs.writeFileSync(path.join(repoRoot, '.gitignore'), '.fgos/state.json\n');
+  execFileSync('git', ['add', '.gitignore'], { cwd: repoRoot });
+  execFileSync('git', ['commit', '-q', '-m', 'gitignore'], { cwd: repoRoot });
+
+  assert.equal(fgos(repoRoot, ['init']).status, 0);
+  writeRunnerConfig(
+    repoRoot,
+    writeDecomposeAwareExecutor(scriptDir, {
+      discoveryVerify: 'test -f pull-done.txt && echo PULL_OK',
+      decomposeVerdict: { verdict: 'pass-through' },
+    }),
+  );
+
+  const submitted = submit(repoRoot, 'Rename a single config key, take by hand');
+  assert.equal(submitted.stage, 'clarify');
+
+  // Pass-through both stages via the SYNC session-actor `discover` verb
+  // (mirrors the existing "discover called a second time" CLI test) — this
+  // never touches the runner's own dispatch loop, so once the item reaches
+  // stage executing it is left sitting at status todo: the exact frontier
+  // head a human `take` picks up next, never auto-dispatched to a worker.
+  const firstDiscover = fgos(repoRoot, ['discover', submitted.id]);
+  assert.equal(firstDiscover.status, 0, `first discover failed: ${firstDiscover.stderr}`);
+  assert.equal(stateView(repoRoot).work[submitted.id].stage, 'decompose');
+
+  const secondDiscover = fgos(repoRoot, ['discover', submitted.id]);
+  assert.equal(secondDiscover.status, 0, `second discover failed: ${secondDiscover.stderr}`);
+  let view = stateView(repoRoot);
+  assert.equal(view.work[submitted.id].stage, 'executing', 'clarify->decompose->executing chained via discover alone');
+  assert.equal(view.work[submitted.id].status, 'todo', 'pass-through never dispatches — a human takes it next');
+  assert.equal(view.work[submitted.id].verify, 'test -f pull-done.txt && echo PULL_OK');
+
+  // A human takes the frontier head by hand.
+  const headAtTake = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: repoRoot, encoding: 'utf8' }).trim();
+  const taken = fgos(repoRoot, ['take']);
+  assert.equal(taken.status, 0, `take failed: ${taken.stderr}`);
+  assert.match(taken.stdout, new RegExp(submitted.id));
+
+  view = stateView(repoRoot);
+  assert.equal(view.work[submitted.id].status, 'doing');
+  assert.equal(view.work[submitted.id].claimActor, 'human');
+  assert.equal(view.work[submitted.id].headAtTake, headAtTake);
+
+  // A concurrent fgos-runner --once run right before return: the only item
+  // is `doing`, held by a human — the frontier is empty and the reap must
+  // never touch a human-held claim (cell action (4): reap skips human/
+  // session, only reclaims a crashed RUNNER claim).
+  const concurrent = runner(repoRoot, ['--once']);
+  assert.equal(concurrent.status, 0, `concurrent --once failed: ${concurrent.stderr}`);
+  assert.match(concurrent.stdout, /idle/);
+  view = stateView(repoRoot);
+  assert.equal(view.work[submitted.id].status, 'doing', 'the concurrent runner never reaped or reclaimed the human-held claim');
+  assert.equal(view.work[submitted.id].claimActor, 'human', 'still human-claimed after the concurrent run');
+
+  // The human does real work and commits it (the real file, plus whatever
+  // events.jsonl deltas take/discover already appended).
+  fs.writeFileSync(path.join(repoRoot, 'pull-done.txt'), 'done by hand\n');
+  execFileSync('git', ['add', '-A'], { cwd: repoRoot });
+  execFileSync('git', ['commit', '-q', '-m', 'human: pull-done.txt'], { cwd: repoRoot });
+
+  const returned = fgos(repoRoot, ['return', submitted.id]);
+  assert.equal(returned.status, 0, `return failed: ${returned.stderr}`);
+  assert.match(returned.stdout, /proposed/);
+  assert.match(returned.stdout, /PULL_OK/, 'the real goal-check ran and its output surfaced, not just a status word');
+
+  view = stateView(repoRoot);
+  assert.equal(view.work[submitted.id].status, 'proposed');
+  assert.equal(view.outcomes[submitted.id].actual.outcome, 'proposed');
+  assert.equal(view.outcomes[submitted.id].actual.passed, true);
+  assert.ok(view.outcomes[submitted.id].actual.aheadCount >= 1);
+
+  // No settlement from this doing -> proposed edge (D4: settlement belongs
+  // only to the -> done edge) — the earlier clarify-pass settlement (from
+  // the discover step) is the only one on record.
+  const settlementKinds = (view.settlements?.[submitted.id] ?? []).map((s) => s.kind);
+  assert.deepEqual(settlementKinds, ['clarify-pass']);
+});
+
 // --- case 1: full journey, two items with a dep -----------------------------
 
 test('e2e full journey: item1 (no deps) -> proposed with a worker commit on fgw/, item2 (dep on item1) stays closed while item1 is only proposed, second --once dispatches nothing', () => {
