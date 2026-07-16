@@ -121,6 +121,10 @@ function formatCheck(view, id, dir) {
   if (settlement) {
     sections.push(settlement);
   }
+  const learning = formatLearningSection(view, id);
+  if (learning) {
+    sections.push(learning);
+  }
   const nag = formatMissingOutcomeNag(view, id);
   if (nag) {
     sections.push(nag);
@@ -206,6 +210,44 @@ function formatSettlementSection(view, id) {
     .reverse()
     .map((r) => `  - [${r.kind}] ${r.id} actor=${r.actor ?? 'unknown'}: ${r.detail ?? ''}`.trimEnd());
   return `settlement (${records.length}):\n  theo kind/actor: ${summaryLine}\n${recent.join('\n')}`;
+}
+
+// Learning report cap — same "always CAP, never unbounded" rule as
+// friction/settlement's caps above (porting lesson predicted-actual-feedback-store).
+const LEARNING_DISPLAY_CAP = 5;
+
+// Câu-6 tự động section (per Phase 3 S3-closeout (c), six-questions L5): one
+// record per item that has reached `done`, composed mechanically by
+// store.mjs at close time (never here — this only reads and formats).
+// `learnings` is a lazy view key (replay.mjs) — a log with no item ever
+// closed has no key and this section disappears, keeping `check` output
+// byte-identical to pre-câu-6 logs, mirroring the friction/settlement
+// sections' own "absent data -> no section" rule.
+function formatLearningSection(view, id) {
+  const learnings = view.learnings ?? {};
+  const records = (id ? [id] : Object.keys(learnings)).flatMap((itemId) =>
+    (learnings[itemId] ?? []).map((r) => ({ ...r, id: itemId })),
+  );
+  if (records.length === 0) {
+    return '';
+  }
+  const recent = records
+    .sort((a, b) => ((a.ts ?? '') < (b.ts ?? '') ? -1 : 1))
+    .slice(-LEARNING_DISPLAY_CAP)
+    .reverse()
+    .map((r) => {
+      const outcomeStr = r.outcome
+        ? `disposition=${r.outcome.disposition ?? 'n/a'} attempts=${r.outcome.attempts ?? 'n/a'} errorClass=${r.outcome.errorClass ?? 'n/a'}`
+        : 'chưa có outcome';
+      const frictionEntries = Object.entries(r.frictions ?? {});
+      const frictionStr = frictionEntries.length ? frictionEntries.map(([k, n]) => `${k} ${n}`).join(' · ') : 'không';
+      const settlementEntries = Object.entries(r.settlements ?? {});
+      const settlementStr = settlementEntries.length
+        ? settlementEntries.map(([k, n]) => `${k} ${n}`).join(' · ')
+        : 'không';
+      return `  - ${r.id}: ${outcomeStr}; friction: ${frictionStr}; settlement: ${settlementStr}`;
+    });
+  return `learning (${records.length}):\n${recent.join('\n')}`;
 }
 
 // Outcome-lifecycle nag (per porting lesson porting-outcome-lifecycle: the

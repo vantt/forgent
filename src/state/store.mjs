@@ -121,6 +121,39 @@ export function addWork(dir, work) {
 }
 
 /**
+ * Compose a câu-6 ("learning gì để lại?") record MECHANICALLY from data
+ * already folded for `id` in `view` (the PRE-transition view — see moveWork
+ * below), plus the settlement this very transition is about to create (not
+ * yet in `view`, so passed in explicitly) — per Phase 3 S3-closeout (c) /
+ * six-questions L5. Zero-effort (D3 of this cell): only object/array
+ * bookkeeping, never a model call, never a spawn. An item with none of the
+ * three channels still gets a minimal-but-real record (empty groups, null
+ * outcome) — per this cell's action (2), "không nổ, không im lặng bỏ qua".
+ * PURE: no fs, no Date.now() — mirrors replay.mjs's own purity discipline.
+ */
+function composeLearning(view, id, closingSettlement) {
+  const actual = view.outcomes?.[id]?.actual ?? null;
+  const outcome = actual
+    ? { disposition: actual.outcome ?? null, attempts: actual.attempts ?? null, errorClass: actual.errorClass ?? null }
+    : null;
+
+  const frictions = {};
+  for (const record of view.frictions?.[id] ?? []) {
+    const layer = record.layer ?? 'unknown';
+    frictions[layer] = (frictions[layer] ?? 0) + 1;
+  }
+
+  const settlementRecords = [...(view.settlements?.[id] ?? []), closingSettlement];
+  const settlements = {};
+  for (const record of settlementRecords) {
+    const key = `${record.kind}/${record.actor ?? 'unknown'}`;
+    settlements[key] = (settlements[key] ?? 0) + 1;
+  }
+
+  return { outcome, frictions, settlements };
+}
+
+/**
  * Move a work item to a new status. Looks the item up fresh from the log,
  * delegates the precondition/CAS decision to fsm.mjs (pure — never writes),
  * and only then appends the event it returns.
@@ -147,6 +180,33 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, act
   // exact payload shape transitionWork already produced, byte-for-byte.
   if (actor !== undefined) {
     rawEvent.payload.actor = actor;
+  }
+  // Câu-6 tự động (per Phase 3 S3-closeout (c), six-questions L5): BOTH doors
+  // into `done` (doing->done and proposed->done) converge on this one
+  // `moveWork` call, so gating on `to === 'done'` here — rather than at each
+  // caller — covers both without duplication (must_haves truth 1).
+  //
+  // Deviation from the plan's illustrative "append a SEPARATE event" shape
+  // (recorded in this cell's trace.decisions): the learning record is
+  // attached as an ADDITIVE `learning` field on THIS SAME work.move event's
+  // payload instead — composed from `before` (the pre-transition view,
+  // already in hand) plus the close settlement this transition is about to
+  // create. A second appendEvent here would become the new "last event"
+  // after every `move --to done`, which the settlement-actor-attribution
+  // tests (phase-3-compound-learning-5) already assert IS the move event
+  // itself — an existing, unmodifiable test. One event, one extra field,
+  // is still exactly one write door (must_haves truth 3), just a tighter
+  // reading of it than the plan's illustration.
+  //
+  // Fail-safe (must_haves prohibition — mirrors discovery.mjs's
+  // judgeDiscovery fail-safe model-call pattern): a compose failure here
+  // must NEVER block the transition below. Best-effort, silently swallowed.
+  if (to === 'done') {
+    try {
+      rawEvent.payload.learning = composeLearning(before, id, { kind: 'close', actor: actor ?? null });
+    } catch {
+      // best-effort — see comment above.
+    }
   }
   const event = appendEvent(logPath, rawEvent); // captures the real seq; rawEvent itself has none
   const view = refreshView(dir);

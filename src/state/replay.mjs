@@ -44,7 +44,7 @@ function applyEvent(view, event) {
       break;
     }
     case 'work.move': {
-      const { id, to, ask, answer, actor } = event.payload ?? {};
+      const { id, to, ask, answer, actor, learning } = event.payload ?? {};
       const item = view.work[id];
       if (item) {
         item.status = to;
@@ -105,6 +105,27 @@ function applyEvent(view, event) {
             { kind, actor: actor ?? null, ts: event.ts, detail },
           ];
         }
+      }
+      // Câu-6 tự động (per Phase 3 S3-closeout (c), six-questions L5): the
+      // `done`-closing work.move carries an additive `learning` object
+      // composed by store.mjs (never here — replay only folds, per D3).
+      // Mirrors frictions/discovery's fold rule: APPENDED per id, never
+      // merged/replaced. `done` is terminal (fsm.mjs — no outgoing edge) so
+      // in practice at most one learning record ever accumulates per id, but
+      // the append shape stays consistent with the other occurrence-style
+      // channels. `learnings` is a LAZY key exactly like
+      // `outcomes`/`frictions`/`discovery`: absent until the first item
+      // closes with a `learning` payload (backward-compat.test) — a legacy
+      // event with no `learning` field (or, per the guard above, no `v` at
+      // all) never creates it.
+      if (item && to === 'done' && learning) {
+        if (!view.learnings) {
+          view.learnings = {};
+        }
+        view.learnings[id] = [
+          ...(view.learnings[id] ?? []),
+          { ...learning, ts: event.ts },
+        ];
       }
       break;
     }

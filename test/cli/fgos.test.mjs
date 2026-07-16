@@ -1035,3 +1035,47 @@ test('check on a directory with no log at all still never initializes .fgos/ (en
   assert.doesNotMatch(result.stdout, /entropy/);
   assert.ok(!fs.existsSync(path.join(cwd, '.fgos')));
 });
+
+// --- câu-6 tự động (phase-3-compound-learning-7, S3-closeout (c)) — the
+// learning record is composed mechanically by store.mjs at close time
+// (never here); these tests only exercise its surfacing through the real
+// `fgos check` binary. ------------------------------------------------------
+
+test('check prints the learning section — outcome/friction/settlement summary — for an item that reached done with real outcome+friction data', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'learning-item');
+  const dir = path.join(cwd, '.fgos');
+  run(cwd, ['move', 'learning-item', '--to', 'doing']);
+  addOutcome(dir, {
+    id: 'learning-item',
+    actual: { outcome: 'pass', passed: true, attempts: 1, errorClass: null, aheadCount: 0, visits: 1 },
+  });
+  addFriction(dir, {
+    id: 'learning-item',
+    disposition: 'parked',
+    errorClass: 'verify-miss',
+    layer: 'verification',
+    attempts: 1,
+    detail: 'miss',
+  });
+
+  const result = run(cwd, ['move', 'learning-item', '--to', 'done']);
+  assert.equal(result.status, 0);
+
+  const check = run(cwd, ['check']);
+  assert.equal(check.status, 0);
+  assert.match(check.stdout, /learning \(1\)/);
+  assert.match(check.stdout, /disposition=pass attempts=1 errorClass=n\/a/);
+  assert.match(check.stdout, /friction: verification 1/);
+  assert.match(check.stdout, /settlement: close\/human 1/);
+});
+
+test('check on a log with no item ever reaching done is unchanged — no learning section', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'no-learning-item');
+  run(cwd, ['move', 'no-learning-item', '--to', 'doing']);
+
+  const result = run(cwd, ['check']);
+  assert.equal(result.status, 0);
+  assert.doesNotMatch(result.stdout, /learning/);
+});
