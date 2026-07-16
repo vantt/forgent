@@ -1,7 +1,7 @@
 ---
 area: system-overview
-updated: 2026-07-15
-decisions: [ca7de3cf, ae461c8b, ed953e09, 14ebeea9, 1a80b4d3, 65c642a8]
+updated: 2026-07-16
+decisions: [ca7de3cf, ae461c8b, ed953e09, 14ebeea9, 1a80b4d3, 65c642a8, 43f257ae, 6f2cbc47, a30a3d3c]
 coverage: partial
 ---
 
@@ -40,6 +40,8 @@ coverage: partial
 ## Cross-Area Flows
 
 **Vòng tự hành việc (work-state ↔ runner):** người vận hành khai việc (`fgos add`) → runner `--once` lấy việc sẵn-sàng từ frontier → claim `doing` (runner ghi nửa dự đoán của bản ghi outcome) → trợ lý nền làm trong nhánh `fgw/` → runner tự chấm bằng proof của việc → đạt: `proposed` (đề xuất + nhánh, runner ghi nửa thực tế) → NGƯỜI duyệt/merge → `done` → việc phụ thuộc mở khóa. Trượt/lỗi: bảng phục hồi → thử-lại/đỗ-lại (ghi nửa thực tế)/dừng (ghi nửa thực tế). Cả hai nửa đọc lại được qua `fgos check` — nguồn của vòng học compound.
+
+**Cửa pull giao–nhận việc (work-state, thay thế runner cho MỘT item):** một tác nhân ngoài runner — người, một phiên đang sống, hay một runner thứ hai — `fgos take` đúng một item từ CÙNG tập frontier runner dùng, rồi tự `fgos return`; `return` không tin lời người gọi, tự đo working tree sạch + HEAD tiến + verify thật trước khi item thành `proposed` — mirror đúng contract `proposed` của runner. Gặt-lại lúc khởi động của runner không bao giờ giẫm lên claim này (xem docs/specs/work-state.md "Cửa pull giao–nhận việc", docs/specs/runner.md).
 
 [unknown — vòng học distillery → porting → platform law cần harvest xác nhận từng bước; xem Open Gaps]
 
