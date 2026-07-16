@@ -37,9 +37,14 @@ export { STATUSES };
 // two-way with both `todo` and `doing` per the plan; `done` has two incoming
 // edges (from `doing` and, per D5, from `proposed`) and no outgoing edge
 // (terminal). `proposed` (per D5) is entered only from `doing` (a worker's
-// goal-check pass) and leaves either to `done` (approved/merged) or back to
-// `todo` (rejected, with a reason — see transitionWork below); it is never a
-// re-entry point for `doing` directly.
+// goal-check pass) and leaves to `done` (approved/merged), back to `todo`
+// (rejected, with a reason — see transitionWork below), or, per pr-lifecycle
+// D3, to `blocked` (an approved proposal whose merge conflicted or whose
+// verify came back red on main after merge — the item parks with a reason
+// rather than being silently returned to the queue or auto-rebased; a human
+// resolves it, same as any other `blocked` item, via the existing
+// `blocked -> todo`/`blocked -> doing` doors below). It is never a re-entry
+// point for `doing` directly.
 const TRANSITIONS = Object.freeze([
   Object.freeze({ from: 'todo', to: 'doing' }),
   Object.freeze({ from: 'doing', to: 'done' }),
@@ -50,6 +55,7 @@ const TRANSITIONS = Object.freeze([
   Object.freeze({ from: 'doing', to: 'proposed' }),
   Object.freeze({ from: 'proposed', to: 'done' }),
   Object.freeze({ from: 'proposed', to: 'todo' }),
+  Object.freeze({ from: 'proposed', to: 'blocked' }),
   Object.freeze({ from: 'todo', to: 'awaiting-human' }),
   Object.freeze({ from: 'doing', to: 'awaiting-human' }),
   Object.freeze({ from: 'awaiting-human', to: 'todo' }),
@@ -71,11 +77,14 @@ const TRANSITIONS = Object.freeze([
  * is refused with category 'precondition' and no event is returned.
  *
  * Rejection reason (per D5): the `proposed -> todo` edge is a rejection, and
- * carries a `reason` explaining why. `reason` is required for exactly this
- * edge — a missing or blank `reason` is refused with category 'validation'
- * (checked only after the edge itself is confirmed legal, so an illegal
- * edge still reports 'precondition' first). For every other edge, `reason`
- * is ignored and never appears in the returned event's payload.
+ * carries a `reason` explaining why. Per pr-lifecycle D3, `proposed -> blocked`
+ * (an approved proposal whose merge or post-merge verify failed) carries the
+ * same `reason` requirement — the concrete failure, so a human resolving the
+ * park knows what broke. `reason` is required for exactly these two edges —
+ * a missing or blank `reason` is refused with category 'validation' (checked
+ * only after the edge itself is confirmed legal, so an illegal edge still
+ * reports 'precondition' first). For every other edge, `reason` is ignored
+ * and never appears in the returned event's payload.
  *
  * Human-gate ask/answer (per async-human-gate D2/D5), mirroring the `reason`
  * mechanism above: entering `awaiting-human` (`todo -> awaiting-human` or
@@ -114,11 +123,11 @@ export function transitionWork({ work, to, expectedStatus, reason, ask, answer }
   }
 
   const payload = { id: work.id, from, to };
-  if (from === 'proposed' && to === 'todo') {
+  if ((from === 'proposed' && to === 'todo') || (from === 'proposed' && to === 'blocked')) {
     if (typeof reason !== 'string' || !reason.trim()) {
       throw new FsmError(
         'validation',
-        `transitionWork: "reason" is required and must be a non-empty string when rejecting work "${work.id}" from proposed back to todo.`,
+        `transitionWork: "reason" is required and must be a non-empty string when moving work "${work.id}" from proposed to "${to}".`,
       );
     }
     payload.reason = reason.trim();

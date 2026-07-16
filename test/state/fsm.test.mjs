@@ -53,11 +53,40 @@ test('transitionWork rejects proposed -> todo without a reason as validation, no
   );
 });
 
-test('reason is ignored (never appears in payload) for every edge other than proposed -> todo', () => {
+// pr-lifecycle D3: proposed -> blocked (an approved proposal whose merge or
+// post-merge verify failed) requires a reason exactly like proposed -> todo.
+test('transitionWork allows proposed -> blocked (per pr-lifecycle D3) and carries the reason in the payload', () => {
+  const event = transitionWork({ work: work('proposed'), to: 'blocked', reason: 'merge conflict' });
+  assert.deepEqual(event, {
+    type: 'work.move',
+    payload: { id: 'w1', from: 'proposed', to: 'blocked', reason: 'merge conflict' },
+  });
+});
+
+test('transitionWork rejects proposed -> blocked without a reason as validation, not precondition', () => {
+  assert.throws(
+    () => transitionWork({ work: work('proposed'), to: 'blocked' }),
+    (err) => err instanceof FsmError && err.category === 'validation',
+  );
+  assert.throws(
+    () => transitionWork({ work: work('proposed'), to: 'blocked', reason: '   ' }),
+    (err) => err instanceof FsmError && err.category === 'validation',
+  );
+});
+
+// Changed (pr-lifecycle-1): was "... other than proposed -> todo" — now two
+// edges require reason (proposed -> todo, proposed -> blocked, per D3), so
+// the description and the edge exercised below are updated to name both.
+test('reason is ignored (never appears in payload) for every edge other than proposed -> todo/blocked', () => {
   const event = transitionWork({ work: work('todo'), to: 'doing', reason: 'should be dropped' });
   assert.deepEqual(event, { type: 'work.move', payload: { id: 'w1', from: 'todo', to: 'doing' } });
 });
 
+// Changed (pr-lifecycle-1): added 'proposed->blocked' to legalEdges (per D3's
+// new table entry) and to the reason-required branch below, alongside the
+// existing 'proposed->todo' — this sweep asserts the FULL table, so a new
+// edge left out here would silently pass as "still precondition" and hide
+// the addition.
 test('every legal edge is exactly the declared table; every other status pair is precondition', () => {
   const legalEdges = new Set([
     'todo->doing',
@@ -69,6 +98,7 @@ test('every legal edge is exactly the declared table; every other status pair is
     'doing->proposed',
     'proposed->done',
     'proposed->todo',
+    'proposed->blocked',
     'todo->awaiting-human',
     'doing->awaiting-human',
     'awaiting-human->todo',
@@ -78,7 +108,7 @@ test('every legal edge is exactly the declared table; every other status pair is
       const key = `${from}->${to}`;
       if (legalEdges.has(key)) {
         const args = { work: work(from), to };
-        if (key === 'proposed->todo') args.reason = 'sweep-test reason';
+        if (key === 'proposed->todo' || key === 'proposed->blocked') args.reason = 'sweep-test reason';
         if (to === 'awaiting-human') args.ask = 'sweep-test ask';
         if (key === 'awaiting-human->todo') args.answer = 'sweep-test answer';
         assert.doesNotThrow(() => transitionWork(args), `expected ${key} to be legal`);

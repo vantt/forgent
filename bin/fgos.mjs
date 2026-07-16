@@ -479,9 +479,10 @@ function runVerb(verb, flags, positional, dir) {
       const to = requireField(flags.to, 'move requires --to <status>');
       const expectedStatus = optionalField(flags.expect, 'move --expect requires a status value (omit --expect entirely to skip the CAS check)');
       // --reason only matters on the proposed -> todo rejection edge (per
-      // D5); fsm.mjs is the single place that enforces "required there,
-      // ignored everywhere else" — this verb just forwards whatever the
-      // caller supplied.
+      // D5) and the proposed -> blocked park edge (per pr-lifecycle D3);
+      // fsm.mjs is the single place that enforces "required there, ignored
+      // everywhere else" — this verb just forwards whatever the caller
+      // supplied.
       const reason = optionalField(flags.reason, 'move --reason requires a non-empty reason value (omit --reason entirely when not rejecting a proposal)');
       const { event } = moveWork(dir, { id, to, expectedStatus, reason, actor: 'human' });
       return `Moved ${id}: ${event.payload.from} -> ${event.payload.to} (event #${event.seq})`;
@@ -648,7 +649,7 @@ function runVerb(verb, flags, positional, dir) {
 
       const check = runGoalCheck(item, cwd, timeoutMs);
       if (check.passed) {
-        const { event } = moveWork(dir, { id, to: 'proposed', expectedStatus: 'doing' });
+        const { event } = moveWork(dir, { id, to: 'proposed', expectedStatus: 'doing', headAtReturn: head });
         addOutcome(dir, { id, actual: { outcome: 'proposed', passed: true, attempts: 1, errorClass: null, aheadCount } });
         return `Returned ${id}: doing -> proposed (verify passed, ${aheadCount} commit(s)) (event #${event.seq})\n${check.output}`;
       }

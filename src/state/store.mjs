@@ -158,7 +158,7 @@ function composeLearning(view, id, closingSettlement) {
  * delegates the precondition/CAS decision to fsm.mjs (pure — never writes),
  * and only then appends the event it returns.
  */
-export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, actor, headAtTake } = {}) {
+export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, actor, headAtTake, headAtReturn } = {}) {
   const { logPath } = paths(dir);
   const before = rebuildView(logPath);
   const work = before.work[id];
@@ -188,6 +188,19 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, act
   // so this is stamped post-transition the same way.
   if (headAtTake !== undefined) {
     rawEvent.payload.headAtTake = headAtTake;
+  }
+  // Pull-door return marker (pr-lifecycle D3/D4, mirrors headAtTake above):
+  // the host repo's HEAD at return time, additive on the SAME `to ===
+  // 'proposed'` move `return` writes when it goes green — never a separate
+  // event (single write door, D3). Together with the claim's own
+  // `headAtTake`, this gives the review gate an honest `headAtTake ->
+  // headAtReturn` diff range for a pull-door proposal, without depending on
+  // a live branch the way a runner proposal's `fgw/<id>` diff does. Ignored
+  // by fsm.mjs (pure, only knows the fields it destructures itself) exactly
+  // like `headAtTake`/`actor` above, so this is stamped post-transition the
+  // same way.
+  if (headAtReturn !== undefined) {
+    rawEvent.payload.headAtReturn = headAtReturn;
   }
   // Câu-6 tự động (per Phase 3 S3-closeout (c), six-questions L5): BOTH doors
   // into `done` (doing->done and proposed->done) converge on this one

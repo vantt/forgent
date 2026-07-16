@@ -44,7 +44,7 @@ function applyEvent(view, event) {
       break;
     }
     case 'work.move': {
-      const { id, to, ask, answer, actor, learning, headAtTake } = event.payload ?? {};
+      const { id, to, ask, answer, actor, learning, headAtTake, headAtReturn } = event.payload ?? {};
       const item = view.work[id];
       if (item) {
         item.status = to;
@@ -68,6 +68,15 @@ function applyEvent(view, event) {
         if (headAtTake !== undefined) {
           item.headAtTake = headAtTake;
         }
+      }
+      // Pull-door return marker (pr-lifecycle D3/D4): folds onto the item the
+      // same way `headAtTake` above folds on claim — durable per-item field,
+      // set only on THIS return's `to === 'proposed'` move (a runner's own
+      // `doing -> proposed` goal-check pass never carries `headAtReturn`, so
+      // this is a strict addition for the pull door, never a rewrite of the
+      // runner's own proposal shape).
+      if (item && to === 'proposed' && headAtReturn !== undefined) {
+        item.headAtReturn = headAtReturn;
       }
       // Human-gate ask/answer (per async-human-gate D2/D5), mirroring the
       // work.outcome lazy-key/merge-by-id precedent above: the ask (entry

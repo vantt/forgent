@@ -1243,6 +1243,7 @@ test('return happy path: verify passes -> doing to proposed, actual outcome reco
   assert.equal(run(cwd, ['take', '--id', 'pull-return-ok']).status, 0);
   commitFile(cwd, 'proof.txt');
 
+  const headAtReturn = gitHead(cwd);
   const result = run(cwd, ['return', 'pull-return-ok']);
   assert.equal(result.status, 0, `return failed: ${result.stderr}`);
   assert.match(result.stdout, /proposed/);
@@ -1252,6 +1253,7 @@ test('return happy path: verify passes -> doing to proposed, actual outcome reco
   assert.equal(view.outcomes['pull-return-ok'].actual.outcome, 'proposed');
   assert.equal(view.outcomes['pull-return-ok'].actual.passed, true);
   assert.equal(view.outcomes['pull-return-ok'].actual.aheadCount, 1);
+  assert.equal(view.work['pull-return-ok'].headAtReturn, headAtReturn, 'pr-lifecycle D3/D4: return records HEAD at green-return time, mirroring headAtTake at claim time');
   assert.equal('settlements' in view, false, 'doing -> proposed never settles (D4: settlement belongs to the -> done edge)');
 });
 

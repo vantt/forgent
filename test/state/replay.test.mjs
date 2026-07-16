@@ -383,3 +383,48 @@ test('foldEvents does not fold claimActor/headAtTake on a non-doing move even wh
   assert.equal(view.work.a.claimActor, 'human', 'the doing edge already set claimActor — a later non-doing move never touches it');
   assert.equal(view.work.a.headAtTake, 'aaa', 'the proposed move carries headAtTake in its payload but it is not the doing edge, so it is never read');
 });
+
+// --- return marker (pr-lifecycle D3/D4, mirrors headAtTake above) ---------
+//
+// `headAtReturn` folds onto the item from a `work.move` return (`to:
+// 'proposed'`) that carries it — together with the claim's own `headAtTake`
+// this gives the review gate an honest diff range for a pull-door proposal.
+
+test('foldEvents folds headAtReturn onto the item from a proposed move that carries it (pull-door return)', () => {
+  const events = [
+    { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo' }, v: 2 },
+    { seq: 2, ts: '2026-07-16T00:00:01.000Z', type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing', actor: 'human', headAtTake: 'deadbeef' }, v: 2 },
+    { seq: 3, ts: '2026-07-16T00:00:02.000Z', type: 'work.move', payload: { id: 'a', from: 'doing', to: 'proposed', headAtReturn: 'c0ffee' }, v: 2 },
+  ];
+  const view = foldEvents(events);
+  assert.equal(view.work.a.headAtTake, 'deadbeef');
+  assert.equal(view.work.a.headAtReturn, 'c0ffee');
+});
+
+test('foldEvents leaves headAtReturn absent for a runner proposal (doing -> proposed with no headAtReturn)', () => {
+  const events = [
+    { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo' }, v: 2 },
+    { seq: 2, ts: '2026-07-16T00:00:01.000Z', type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing', actor: 'runner' }, v: 2 },
+    { seq: 3, ts: '2026-07-16T00:00:02.000Z', type: 'work.move', payload: { id: 'a', from: 'doing', to: 'proposed' }, v: 2 },
+  ];
+  const view = foldEvents(events);
+  assert.equal('headAtReturn' in view.work.a, false);
+});
+
+test('foldEvents ignores headAtReturn on a non-proposed move even when the payload carries it (only the proposed edge sets it)', () => {
+  const events = [
+    { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo' }, v: 2 },
+    { seq: 2, ts: '2026-07-16T00:00:01.000Z', type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing', actor: 'human', headAtReturn: 'ignored-on-this-edge' }, v: 2 },
+  ];
+  const view = foldEvents(events);
+  assert.equal('headAtReturn' in view.work.a, false);
+});
+
+test('foldEvents ignores headAtReturn on a proposed move for an id that was never added — ghost id stays a true no-op', () => {
+  const events = [
+    { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.move', payload: { id: 'ghost', from: 'doing', to: 'proposed', headAtReturn: 'c0ffee' }, v: 2 },
+  ];
+  assert.doesNotThrow(() => foldEvents(events));
+  const view = foldEvents(events);
+  assert.equal('ghost' in view.work, false);
+});
