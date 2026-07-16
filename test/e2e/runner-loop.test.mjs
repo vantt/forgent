@@ -58,6 +58,14 @@ function add(cwd, id, extra = {}) {
   return result;
 }
 
+function submit(cwd, text, extra = {}) {
+  const flags = [];
+  if (extra.async) flags.push('--async');
+  const result = fgos(cwd, ['submit', text, ...flags]);
+  assert.equal(result.status, 0, `fgos submit failed: ${result.stderr}`);
+  return JSON.parse(result.stdout).data;
+}
+
 function logPath(cwd) {
   return path.join(cwd, '.fgos', 'events.jsonl');
 }
@@ -185,6 +193,159 @@ process.exit(1);
   );
   return scriptPath;
 }
+
+/** A discovery-aware executor (stage-clarify D4/D5/D13): the runner spawns
+ * the SAME configured executor for two different call sites — the
+ * context-discovery verdict call (`discovery.mjs`'s own prompt, which always
+ * starts with "# Context-discovery") and the worker dispatch call
+ * (`dispatch.mjs`'s `buildPrompt`, which always starts with "# Goal"). This
+ * script tells the two apart by that fixed prefix: on a discovery prompt it
+ * prints the fixed clear verdict; on a worker prompt it behaves exactly like
+ * `writeCommittingExecutor` (writes+commits the proof file). One real
+ * process serves both calls — nothing here stubs `resolveDiscovery` itself. */
+function writeClearDiscoveryExecutor(scriptDir, { verify, produce = 'output.txt' }) {
+  const scriptPath = path.join(scriptDir, 'clear-discovery-executor.mjs');
+  fs.writeFileSync(
+    scriptPath,
+    `
+import fs from 'node:fs';
+import { execFileSync } from 'node:child_process';
+const prompt = process.argv[2] ?? '';
+if (prompt.startsWith('# Context-discovery')) {
+  process.stdout.write(JSON.stringify({ clear: true, verify: ${JSON.stringify(verify)} }));
+} else {
+  fs.writeFileSync(${JSON.stringify(produce)}, 'produced by worker\\n');
+  execFileSync('git', ['add', ${JSON.stringify(produce)}]);
+  execFileSync('git', ['commit', '-q', '-m', ${JSON.stringify(`worker: ${produce}`)}]);
+}
+`,
+  );
+  return scriptPath;
+}
+
+/** Always reports an unclear verdict with a fixed question — a work item
+ * whose executor is this script never leaves clarify, so it never reaches
+ * the worker-prompt call site at all. */
+function writeUnclearDiscoveryExecutor(scriptDir, question) {
+  const scriptPath = path.join(scriptDir, 'unclear-discovery-executor.mjs');
+  fs.writeFileSync(
+    scriptPath,
+    `process.stdout.write(JSON.stringify({ clear: false, question: ${JSON.stringify(question)} }));`,
+  );
+  return scriptPath;
+}
+
+/** Simulates a misbehaving real model call: stdout that is not JSON at all.
+ * `judgeDiscovery`'s fail-safe (D4) must fold this into "not clear" without
+ * throwing past it — never a crash, never a silent stall. */
+function writeGarbageDiscoveryExecutor(scriptDir) {
+  const scriptPath = path.join(scriptDir, 'garbage-discovery-executor.mjs');
+  fs.writeFileSync(
+    scriptPath,
+    `process.stdout.write('not json at all, definitely garbage output from a misbehaving model call');`,
+  );
+  return scriptPath;
+}
+
+// --- stage-clarify e2e: 3 verdict scenarios through real fgos + fgos-runner
+// binaries (stage-clarify-4, per plan.md Risk Map "verdict parse phi tất
+// định" HIGH row) -------------------------------------------------------
+
+test('e2e stage-clarify (a) clear verdict: submit -> --once takes the item stage clarify->executing with the model-proposed verify replacing the submit sentinel, and the same run dispatches it on to proposed', () => {
+  const repoRoot = initTempRepo();
+  const scriptDir = mkTempDir('fgos-runner-e2e-discovery-');
+
+  assert.equal(fgos(repoRoot, ['init']).status, 0);
+  writeRunnerConfig(
+    repoRoot,
+    writeClearDiscoveryExecutor(scriptDir, { verify: 'test -f output.txt && echo VERIFY_OK' }),
+  );
+
+  const submitted = submit(repoRoot, 'Investigate the sluggish overview page');
+  assert.equal(submitted.stage, 'clarify');
+  assert.equal(submitted.verify, 'chưa xác định — P15 bổ sung', 'submit sentinel before discovery runs (D5 fgos.mjs)');
+
+  const first = runner(repoRoot, ['--once']);
+  assert.equal(first.status, 0, `--once failed: ${first.stderr}`);
+
+  const afterFirst = stateView(repoRoot);
+  const item = afterFirst.work[submitted.id];
+  assert.equal(item.stage, 'executing', 'a clear verdict moves the item out of clarify (D1/D12)');
+  assert.equal(item.verify, 'test -f output.txt && echo VERIFY_OK', 'the verdict verify replaced the submit sentinel, one event (D10)');
+
+  // sweep runs before the frontier is computed (loop.mjs), so this item —
+  // still status:todo the whole time — became the frontier head in the same
+  // tick and was dispatched to proposed via the SAME scripted executor's
+  // worker-prompt branch, all within this one --once call.
+  assert.equal(item.status, 'proposed');
+  assert.equal(branchExists(repoRoot, `fgw/${submitted.id}`), true);
+  assert.match(branchLog(repoRoot, `fgw/${submitted.id}`), /worker: output\.txt/);
+
+  const discovery = afterFirst.discovery[submitted.id];
+  assert.equal(discovery.length, 1);
+  assert.equal(discovery[0].clear, true);
+
+  // `fgos list` (the public read surface) confirms the same facts.
+  const list = JSON.parse(fgos(repoRoot, ['list']).stdout);
+  assert.equal(list.work[submitted.id].stage, 'executing');
+  assert.equal(list.work[submitted.id].verify, 'test -f output.txt && echo VERIFY_OK');
+});
+
+test('e2e stage-clarify (b) unclear verdict: submit -> --once parks the item in awaiting-human with the exact question (still stage clarify); answering it and running --once again resweeps discovery (D7 loop)', () => {
+  const repoRoot = initTempRepo();
+  const scriptDir = mkTempDir('fgos-runner-e2e-discovery-');
+  const question = 'Bạn muốn ưu tiên hiệu năng hay độ chính xác?';
+
+  assert.equal(fgos(repoRoot, ['init']).status, 0);
+  writeRunnerConfig(repoRoot, writeUnclearDiscoveryExecutor(scriptDir, question));
+
+  const submitted = submit(repoRoot, 'Do the ambiguous work');
+
+  const first = runner(repoRoot, ['--once']);
+  assert.equal(first.status, 0, `--once failed: ${first.stderr}`);
+
+  let view = stateView(repoRoot);
+  assert.equal(view.work[submitted.id].status, 'awaiting-human');
+  assert.equal(view.work[submitted.id].stage, 'clarify', 'an unclear verdict never advances stage (D7)');
+  assert.equal(view.gates[submitted.id].ask, question);
+  assert.equal(view.discovery[submitted.id].length, 1);
+  assert.equal(view.discovery[submitted.id][0].clear, false);
+  assert.equal(view.discovery[submitted.id][0].question, question);
+  assert.equal(branchExists(repoRoot, `fgw/${submitted.id}`), false, 'an item still in clarify is never dispatched');
+
+  const answered = fgos(repoRoot, ['answer', submitted.id, '--text', 'Ưu tiên độ chính xác.']);
+  assert.equal(answered.status, 0, `answer failed: ${answered.stderr}`);
+  assert.equal(stateView(repoRoot).work[submitted.id].status, 'todo', 'answering resumes to todo, still stage clarify (D7)');
+
+  const second = runner(repoRoot, ['--once']);
+  assert.equal(second.status, 0, `second --once failed: ${second.stderr}`);
+
+  view = stateView(repoRoot);
+  assert.equal(view.discovery[submitted.id].length, 2, 'the clarify loop reran context-discovery after the answer (D7)');
+  assert.equal(view.work[submitted.id].status, 'awaiting-human', 'the same scripted executor still returns unclear — parked again');
+  assert.equal(view.gates[submitted.id].ask, question);
+});
+
+test('e2e stage-clarify (c) garbage verdict: an executor that prints non-JSON stdout on the discovery call never crashes --once — the runner still exits 0 and the item lands in awaiting-human with the fixed fail-safe question (D4)', () => {
+  const repoRoot = initTempRepo();
+  const scriptDir = mkTempDir('fgos-runner-e2e-discovery-');
+
+  assert.equal(fgos(repoRoot, ['init']).status, 0);
+  writeRunnerConfig(repoRoot, writeGarbageDiscoveryExecutor(scriptDir));
+
+  const submitted = submit(repoRoot, 'Investigate the sluggish overview page');
+
+  const result = runner(repoRoot, ['--once']);
+  assert.equal(result.status, 0, `unparsable discovery stdout must not crash the runner: ${result.stderr}`);
+  assert.equal(result.signal, null);
+
+  const view = stateView(repoRoot);
+  assert.equal(view.work[submitted.id].status, 'awaiting-human', 'an unparsable verdict folds into "not clear", never a silent drop (D4)');
+  assert.equal(view.work[submitted.id].stage, 'clarify');
+  assert.equal(view.gates[submitted.id].ask, 'Không phán được rõ ràng — cần người xác nhận thủ công.');
+  assert.equal(view.discovery[submitted.id].length, 1);
+  assert.equal(view.discovery[submitted.id][0].clear, false);
+});
 
 // --- case 1: full journey, two items with a dep -----------------------------
 
