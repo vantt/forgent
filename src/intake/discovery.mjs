@@ -1,7 +1,14 @@
 // discovery.mjs — context-discovery engine for stage clarify (per
 // stage-clarify D4/D5/D10/D13). Use-case layer: judges whether a work item
-// carries enough real information to move into `stage: executing`, and
-// resolves that judgement into the store's clarify-loop transitions.
+// carries enough real information to leave clarify, and resolves that
+// judgement into the store's clarify-loop transitions.
+//
+// RETARGET (stage-decompose D2, cell 3): a clear verdict now lands the item
+// on stage `decompose`, not `executing` — chia-việc (decompose.mjs) is the
+// next stop before executing, and it is the one that produces children or
+// passes the item through. The clarify-pass settlement (replay.mjs) is
+// guarded on `from === 'clarify'`, not the destination, so it still fires
+// unchanged.
 //
 // TÁI DÙNG resolveExecutorCommand + modelForTier from dispatch.mjs (the same
 // tier -> model -> argv-substitution path spawnWorker uses) rather than
@@ -24,8 +31,8 @@ const DEFAULT_UNCLEAR_QUESTION =
   'Không phán được rõ ràng — cần người xác nhận thủ công.';
 
 // D10: when a clear verdict carries no `verify` (the model failed to propose
-// one despite being asked), this is the fallback the item moves into
-// `executing` with — a DIFFERENT string from the retired P14 sentinel
+// one despite being asked), this is the fallback the item moves out of
+// clarify with — a DIFFERENT string from the retired P14 sentinel
 // ("chưa xác định — P15 bổ sung"), so nothing from the old placeholder
 // survives past clarify (must_haves truth 3).
 const FALLBACK_VERIFY = 'chưa xác định — bổ sung thủ công';
@@ -113,10 +120,11 @@ export function judgeDiscovery(work, cfg) {
  *
  * Per D3/D6: the discovery record is written for BOTH outcomes (clear and
  * unclear), never only the failure path. A clear verdict moves the item to
- * `executing`, always carrying a `verify` (D10 — the model's proposal, or
- * `FALLBACK_VERIFY` when it did not supply one — never the retired P14
- * placeholder). An unclear verdict parks the item in `awaiting-human` with
- * the verdict's question.
+ * `decompose` (stage-decompose D2 retarget — chia-việc is the next stop,
+ * not `executing` directly), always carrying a `verify` (D10 — the model's
+ * proposal, or `FALLBACK_VERIFY` when it did not supply one — never the
+ * retired P14 placeholder). An unclear verdict parks the item in
+ * `awaiting-human` with the verdict's question.
  *
  * `actor` (per Phase 3 S3-closeout settlement design) attributes WHO ran
  * this pass — the two call sites disagree, so it is the caller's job to say:
@@ -137,7 +145,7 @@ export function resolveDiscovery(dir, id, cfg, actor) {
   if (verdict.clear) {
     moveStage(dir, {
       id,
-      to: 'executing',
+      to: 'decompose',
       expectedStage: 'clarify',
       verify: verdict.verify ?? FALLBACK_VERIFY,
       actor,

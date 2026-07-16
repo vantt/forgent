@@ -817,7 +817,13 @@ test('add leaves stage unset — the item reads as executing via the lazy defaul
   assert.equal(item.stage, undefined);
 });
 
-test('discover on a clear verdict moves the submitted item to stage executing with the model-proposed verify (D5/D10)', () => {
+// RETARGET (stage-decompose D2, cell 3): `discover` on a stage-`clarify`
+// item still only runs `resolveDiscovery` (one hop) — a clear verdict now
+// lands it on stage `decompose`, not `executing` directly, since chia-việc
+// is the next stop before executing. This assertion changed its expected
+// destination from `executing` to `decompose` for exactly that reason (per
+// D2, an intentional contract change, not a test nerf).
+test('discover on a clear verdict moves the submitted item to stage decompose with the model-proposed verify (D5/D10, stage-decompose D2 retarget)', () => {
   const cwd = tmpCwd();
   writeRunnerConfig(cwd, { clear: true, verify: 'npm test -- proven' });
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
@@ -829,8 +835,39 @@ test('discover on a clear verdict moves the submitted item to stage executing wi
   assert.equal(envelope.data.outcome, 'clear');
 
   const item = JSON.parse(run(cwd, ['list']).stdout).work[id];
-  assert.equal(item.stage, 'executing');
+  assert.equal(item.stage, 'decompose');
   assert.equal(item.verify, 'npm test -- proven');
+});
+
+// The sync path's second hop (stage-decompose D3 parity): calling `discover`
+// again on the same item, now sitting at stage `decompose`, dispatches to
+// `resolveDecompose` instead of `resolveDiscovery` — same verb, same actor
+// attribution, the engine picked by the item's CURRENT stage.
+test("discover called a second time, once the item sits at stage decompose, dispatches to resolveDecompose and pass-throughs it on to executing (D3 sync/async parity)", () => {
+  const cwd = tmpCwd();
+  writeRunnerConfig(cwd, { clear: true, verify: 'npm test -- proven' });
+  const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
+
+  run(cwd, ['discover', id]);
+  assert.equal(JSON.parse(run(cwd, ['list']).stdout).work[id].stage, 'decompose');
+
+  // Same scripted executor's `{clear:true, verify:...}` reply is not a
+  // valid chia-việc verdict shape (no `verdict` key) — judgeDecompose's
+  // fail-safe folds it to `invalid`, and resolveDecompose leaves the item
+  // exactly where it was for the next sweep/call to retry (mẫu C9).
+  const invalidAttempt = run(cwd, ['discover', id]);
+  assert.equal(invalidAttempt.status, 0);
+  assert.equal(JSON.parse(invalidAttempt.stdout).data.outcome, 'invalid');
+  assert.equal(JSON.parse(run(cwd, ['list']).stdout).work[id].stage, 'decompose', 'invalid verdict leaves the item untouched, not silently advanced');
+
+  // Rewrite the executor config with a real pass-through chia-việc verdict
+  // and call `discover` a third time — now it dispatches to resolveDecompose
+  // and carries the item the rest of the way.
+  writeRunnerConfig(cwd, { verdict: 'pass-through' });
+  const passThrough = run(cwd, ['discover', id]);
+  assert.equal(passThrough.status, 0);
+  assert.equal(JSON.parse(passThrough.stdout).data.outcome, 'pass-through');
+  assert.equal(JSON.parse(run(cwd, ['list']).stdout).work[id].stage, 'executing');
 });
 
 test('discover on an unclear verdict parks the submitted item in awaiting-human with the question, still stage clarify (D5/D7)', () => {

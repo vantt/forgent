@@ -22,6 +22,7 @@ import { deriveTitle, classify, generateId } from '../src/intake/classify.mjs';
 import { wrapEnvelope } from '../src/state/envelope.mjs';
 import { loadRunnerConfig } from '../src/runner/dispatch.mjs';
 import { resolveDiscovery } from '../src/intake/discovery.mjs';
+import { resolveDecompose } from '../src/intake/decompose.mjs';
 import { computeEntropy, computeCounts } from '../src/report/entropy.mjs';
 
 // D5: `verify` is a required non-empty field on every work item, but a
@@ -421,17 +422,24 @@ function runVerb(verb, flags, positional, dir) {
       return JSON.stringify(wrapEnvelope(event.payload), null, 2);
     }
 
-    // The sync branch's entry point into context-discovery (per D5): a live
-    // session runs the same `resolveDiscovery` the async runner sweep calls
-    // (D13) — one shared engine, two call sites. A clear verdict moves the
-    // item to `executing` (carrying a real verify, D10); an unclear verdict
-    // parks it in `awaiting-human`. The runner config (executor + tier
-    // models) is loaded the same way bin/fgos-runner.mjs loads it.
+    // The sync branch's entry point into context-discovery/chia-việc (per
+    // D5/stage-decompose D3): a live session runs the SAME engine the async
+    // runner sweep calls for whichever stage the item is currently sitting
+    // at — `resolveDiscovery` for `clarify`, `resolveDecompose` for
+    // `decompose` (D3's sync/async parity: identical trace either way, only
+    // the actor differs). A clear discovery verdict moves the item to
+    // `decompose` (carrying a real verify, D10); chia-việc then either
+    // passes it through to `executing`, splits it into children, or parks it
+    // in `awaiting-human` (D3). The runner config (executor + tier models)
+    // is loaded the same way bin/fgos-runner.mjs loads it.
     case 'discover': {
       const id = requireField(positional[0] ?? flags.id, 'discover requires an id: fgos discover <id> [--config <path>]');
       const configPath = flags.config ?? path.join(process.cwd(), '.fgos-runner.json');
       const cfg = loadRunnerConfig(configPath);
-      const result = resolveDiscovery(dir, id, cfg, 'session');
+      const stage = listWork(dir).work[id]?.stage;
+      const result = stage === 'decompose'
+        ? resolveDecompose(dir, id, cfg, 'session')
+        : resolveDiscovery(dir, id, cfg, 'session');
       return JSON.stringify(wrapEnvelope(result), null, 2);
     }
 

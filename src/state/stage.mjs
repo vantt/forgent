@@ -7,11 +7,16 @@
 // stage transition is legal and, if so, RETURNS the validated event for the
 // store to append — disk writes belong to store.mjs, never here.
 //
-// Three edges exist today: `clarify -> executing` (D12, kept for the
-// discovery engine until stage-decompose cell 3 retargets it), plus
+// Three edges exist today: `clarify -> executing` (D12), plus
 // `clarify -> decompose` and `decompose -> executing` (stage-decompose
 // D2/D4/D5) for the chia-việc stage that now sits between clarify and
-// executing.
+// executing. stage-decompose cell 3 retargeted the discovery engine
+// (discovery.mjs) onto `clarify -> decompose`, so no caller uses the first
+// edge anymore (grep-verified) — it is kept, legal but dormant, rather than
+// removed: deleting it would also require editing test/state/stage.test.mjs
+// (its own edge-count/precondition assertions), a file outside this cell's
+// reserved scope. A dormant legal edge is harmless; deleting it is a
+// follow-up for whichever cell next touches this file's test scope.
 
 import { FsmError } from './fsm.mjs';
 

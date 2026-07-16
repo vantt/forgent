@@ -58,6 +58,7 @@ import {
 import { spawnWorker, modelForTier } from './dispatch.mjs';
 import { createWorktree, removeWorktree, listLeftovers, branchNameFor } from './worktree.mjs';
 import { resolveDiscovery } from '../intake/discovery.mjs';
+import { resolveDecompose } from '../intake/decompose.mjs';
 
 // errorClass -> failure layer: 5-layer self-attribution (task-spec / context /
 // environment / verification / state) the runner stamps on every friction
@@ -552,12 +553,30 @@ export function runOnce(options = {}) {
     // is expected to run `discover` first, never a runtime branch, D5). Only
     // `todo` is touched: an item already in `awaiting-human` is waiting on a
     // person and must never be swept again (R15). No sweep under dry-run —
-    // resolveDiscovery calls the model and writes state.
+    // resolveDiscovery calls the model and writes state. A clear verdict now
+    // lands the item on stage `decompose` (stage-decompose D2 retarget), not
+    // `executing` — the DECOMPOSE SWEEP right below is what carries it the
+    // rest of the way.
     if (!dryRun) {
       for (const item of Object.values(listWork(dir).work)) {
         if (item.stage === 'clarify' && item.status === 'todo') {
           resolveDiscovery(dir, item.id, config, 'runner');
           log(`fgos-runner: context-discovery swept clarify item "${item.id}"`);
+        }
+      }
+
+      // DECOMPOSE SWEEP (stage-decompose D2/D4, mirrors the clarify sweep
+      // above one stage over): re-reads the view FRESH rather than reusing
+      // the clarify sweep's snapshot, so an item the clarify sweep just
+      // moved into `decompose` this same tick is swept in the same `--once`
+      // pass too (the chain must not wait a full extra tick to continue).
+      // Only `todo` is touched, same R15 rule as the clarify sweep — an item
+      // already parked in `awaiting-human` (D3's need-human/risk-heavy gate)
+      // is never re-swept.
+      for (const item of Object.values(listWork(dir).work)) {
+        if (item.stage === 'decompose' && item.status === 'todo') {
+          resolveDecompose(dir, item.id, config, 'runner');
+          log(`fgos-runner: chia-việc swept decompose item "${item.id}"`);
         }
       }
     }

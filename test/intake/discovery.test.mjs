@@ -187,7 +187,13 @@ function tmpStoreDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-resolve-discovery-'));
 }
 
-test('resolveDiscovery on a clear verdict writes the discovery record and moves stage to executing with the proposed verify', () => {
+// RETARGET (stage-decompose D2, cell 3): a clear verdict now lands the item
+// on stage `decompose`, not `executing` directly — chia-việc is the next
+// stop. The two assertions below changed their expected destination from
+// `executing` to `decompose` for exactly this reason (per D2, an intentional
+// contract change, not a test nerf).
+
+test('resolveDiscovery on a clear verdict writes the discovery record and moves stage to decompose with the proposed verify (stage-decompose D2 retarget)', () => {
   const scriptDir = mkTempDir();
   const scriptPath = writeVerdictExecutor(scriptDir, { clear: true, verify: 'npm test -- discovered' });
   const cfg = cfgFor([scriptPath, '{prompt}']);
@@ -199,13 +205,13 @@ test('resolveDiscovery on a clear verdict writes the discovery record and moves 
   assert.equal(result.outcome, 'clear');
 
   const view = listWork(storeDir);
-  assert.equal(view.work['item-x'].stage, 'executing');
+  assert.equal(view.work['item-x'].stage, 'decompose');
   assert.equal(view.work['item-x'].verify, 'npm test -- discovered');
   assert.equal(view.discovery['item-x'].length, 1);
   assert.equal(view.discovery['item-x'][0].clear, true);
 });
 
-test('resolveDiscovery on a clear verdict with no model-proposed verify falls back to a placeholder distinct from the retired P14 sentinel', () => {
+test('resolveDiscovery on a clear verdict with no model-proposed verify falls back to a placeholder distinct from the retired P14 sentinel (stage-decompose D2 retarget)', () => {
   const scriptDir = mkTempDir();
   const scriptPath = writeVerdictExecutor(scriptDir, { clear: true });
   const cfg = cfgFor([scriptPath, '{prompt}']);
@@ -215,7 +221,7 @@ test('resolveDiscovery on a clear verdict with no model-proposed verify falls ba
 
   resolveDiscovery(storeDir, 'item-x', cfg);
   const view = listWork(storeDir);
-  assert.equal(view.work['item-x'].stage, 'executing');
+  assert.equal(view.work['item-x'].stage, 'decompose');
   assert.notEqual(view.work['item-x'].verify, 'P15 will fill this in');
   assert.notEqual(view.work['item-x'].verify, 'chưa xác định — P15 bổ sung');
   assert.equal(typeof view.work['item-x'].verify, 'string');

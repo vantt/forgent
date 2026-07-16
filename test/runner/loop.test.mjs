@@ -194,11 +194,15 @@ test('runOnce stamps actor "runner" on every claim/propose work.move it writes',
   }
 });
 
-/** A discovery-aware executor (stage-clarify D4/D5/D13, mirroring
- * test/e2e/runner-loop.test.mjs's own helper): the same configured executor
- * serves both the context-discovery verdict call (discovery.mjs's prompt,
- * which always starts with "# Context-discovery") and the worker dispatch
- * call — told apart by that fixed prefix. */
+/** A discovery-and-chia-việc-aware executor (stage-clarify D4/D5/D13 +
+ * stage-decompose D2, mirroring test/e2e/runner-loop.test.mjs's own
+ * helper): the same configured executor serves THREE call sites — the
+ * context-discovery verdict call (discovery.mjs's prompt, "# Context-
+ * discovery"), the chia-việc verdict call (decompose.mjs's prompt, "#
+ * Chia-việc (decompose)" — answered pass-through here so a clarify-pass
+ * item chains straight on to `executing` in the same sweep, per
+ * stage-decompose D2), and the worker dispatch call — told apart by their
+ * fixed prefixes. */
 function writeClearDiscoveryExecutor(scriptDir, counterFile, { verify, produce = 'output.txt' } = {}) {
   const scriptPath = path.join(scriptDir, 'clear-discovery-executor.mjs');
   fs.writeFileSync(
@@ -209,6 +213,8 @@ import { execFileSync } from 'node:child_process';
 const prompt = process.argv[2] ?? '';
 if (prompt.startsWith('# Context-discovery')) {
   process.stdout.write(JSON.stringify({ clear: true, verify: ${JSON.stringify(verify)} }));
+} else if (prompt.startsWith('# Chia-việc (decompose)')) {
+  process.stdout.write(JSON.stringify({ verdict: 'pass-through' }));
 } else {
   fs.appendFileSync(${JSON.stringify(counterFile)}, 'run\\n');
   fs.writeFileSync(${JSON.stringify(produce)}, 'produced by worker\\n');
@@ -220,16 +226,20 @@ if (prompt.startsWith('# Context-discovery')) {
   return scriptPath;
 }
 
-test('runOnce clarify sweep records a clarify-pass settlement stamped actor "runner" (R19/D13 sweep)', () => {
+test('runOnce clarify sweep records a clarify-pass settlement stamped actor "runner" (R19/D13 sweep); the decompose sweep right after it (stage-decompose D2) pass-throughs the item on to executing in the same pass', () => {
   const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
   seedItem(dir, { id: 'item-clarify', stage: 'clarify', verify: 'test -f output.txt' });
   const config = configFor(writeClearDiscoveryExecutor(scriptDir, counterFile, { verify: 'test -f output.txt' }));
 
   const result = runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
-  assert.equal(result.outcome, 'proposed', 'the sweep clears the item before the frontier dispatches it in the same pass');
+  assert.equal(result.outcome, 'proposed', 'the clarify+decompose sweeps clear the item before the frontier dispatches it in the same pass');
   const view = listWork(dir);
   assert.equal(view.work['item-clarify'].stage, 'executing');
+  // must_haves truth 4: the clarify-pass settlement (cell 1's re-guard on
+  // from === 'clarify') still fires even though clarify's own destination is
+  // now `decompose`, not `executing` — this is what proves the re-guard,
+  // not the eventual (decompose-driven) stage the item lands on.
   assert.equal(view.settlements['item-clarify'].length, 1);
   assert.equal(view.settlements['item-clarify'][0].kind, 'clarify-pass');
   assert.equal(view.settlements['item-clarify'][0].actor, 'runner');
