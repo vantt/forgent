@@ -57,6 +57,7 @@ import {
 } from './anti-loop.mjs';
 import { spawnWorker, modelForTier } from './dispatch.mjs';
 import { createWorktree, removeWorktree, listLeftovers, branchNameFor } from './worktree.mjs';
+import { resolveDiscovery } from '../intake/discovery.mjs';
 
 // errorClass -> failure layer: 5-layer self-attribution (task-spec / context /
 // environment / verification / state) the runner stamps on every friction
@@ -543,6 +544,22 @@ export function runOnce(options = {}) {
 
   try {
     const reap = startupReap({ repoRoot, dir, worktreeDir, verifyTimeoutMs: config?.timeoutMs, log, dryRun });
+
+    // CLARIFY SWEEP (D13): the safety net for context-discovery. Before any
+    // executing item is dispatched, resolve every clarify+todo item —
+    // regardless of its `mode` (mode is a calling-convention signal about who
+    // is expected to run `discover` first, never a runtime branch, D5). Only
+    // `todo` is touched: an item already in `awaiting-human` is waiting on a
+    // person and must never be swept again (R15). No sweep under dry-run —
+    // resolveDiscovery calls the model and writes state.
+    if (!dryRun) {
+      for (const item of Object.values(listWork(dir).work)) {
+        if (item.stage === 'clarify' && item.status === 'todo') {
+          resolveDiscovery(dir, item.id, config);
+          log(`fgos-runner: context-discovery swept clarify item "${item.id}"`);
+        }
+      }
+    }
 
     while (true) {
       const frontierItems = readyWork(dir);

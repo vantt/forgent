@@ -19,6 +19,8 @@ import path from 'node:path';
 import { initStore, addWork, moveWork, addDecision, listWork, readyWork, rebuild, putInAwaiting, answerAwaiting, StoreError, EXIT_CODES, categoryOf } from '../src/state/store.mjs';
 import { deriveTitle, classify, generateId } from '../src/intake/classify.mjs';
 import { wrapEnvelope } from '../src/state/envelope.mjs';
+import { loadRunnerConfig } from '../src/runner/dispatch.mjs';
+import { resolveDiscovery } from '../src/intake/discovery.mjs';
 
 // D5: `verify` is a required non-empty field on every work item, but a
 // free-text submission has no verification plan yet — that is P15's job. The
@@ -230,9 +232,27 @@ function runVerb(verb, flags, positional, dir) {
         verify: SUBMIT_VERIFY_SENTINEL,
         tier,
         mode: flags.async || flags.unattended ? 'async' : 'sync',
+        // Per D8: every item entering through the public door starts in stage
+        // `clarify` — context-discovery must pass before it can be worked.
+        // `add` deliberately omits this (lazy default `executing`, D8).
+        stage: 'clarify',
       };
       const { event } = addWork(dir, work);
       return JSON.stringify(wrapEnvelope(event.payload), null, 2);
+    }
+
+    // The sync branch's entry point into context-discovery (per D5): a live
+    // session runs the same `resolveDiscovery` the async runner sweep calls
+    // (D13) — one shared engine, two call sites. A clear verdict moves the
+    // item to `executing` (carrying a real verify, D10); an unclear verdict
+    // parks it in `awaiting-human`. The runner config (executor + tier
+    // models) is loaded the same way bin/fgos-runner.mjs loads it.
+    case 'discover': {
+      const id = requireField(positional[0] ?? flags.id, 'discover requires an id: fgos discover <id> [--config <path>]');
+      const configPath = flags.config ?? path.join(process.cwd(), '.fgos-runner.json');
+      const cfg = loadRunnerConfig(configPath);
+      const result = resolveDiscovery(dir, id, cfg);
+      return JSON.stringify(wrapEnvelope(result), null, 2);
     }
 
     case 'move': {
@@ -306,7 +326,7 @@ function runVerb(verb, flags, positional, dir) {
     }
 
     default:
-      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <init|add|submit|move|ask|answer|decision|list|ready|rebuild|check> ...`);
+      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <init|add|submit|discover|move|ask|answer|decision|list|ready|rebuild|check> ...`);
   }
 }
 

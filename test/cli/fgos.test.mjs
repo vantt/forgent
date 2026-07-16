@@ -785,3 +785,71 @@ test('submit with no text at all is rejected as validation, exit 4, no event wri
   assert.equal(result.status, 4);
   assert.equal(eventLines(cwd).length, 0);
 });
+
+// --- stage `clarify` wiring (stage-clarify-3): submit tags the stage, add
+// does not, and the `discover` verb runs the sync branch's context-discovery
+// (D5/D8/D10). A scripted verdict-executor (a node script this test writes)
+// stands in for the real model — no agent CLI is ever invoked.
+
+function writeRunnerConfig(cwd, verdict) {
+  const scriptPath = path.join(cwd, 'verdict-executor.mjs');
+  fs.writeFileSync(scriptPath, `process.stdout.write(${JSON.stringify(JSON.stringify(verdict))}); process.exit(0);`);
+  const cfg = {
+    executor: { command: process.execPath, args: [scriptPath, '{prompt}'] },
+    models: { light: 'haiku', standard: 'sonnet', heavy: 'opus' },
+    timeoutMs: 5000,
+  };
+  fs.writeFileSync(path.join(cwd, '.fgos-runner.json'), JSON.stringify(cfg));
+}
+
+test("submit tags the new item with stage:'clarify' (D8), visible via list", () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['submit', 'Investigate the sluggish overview page']);
+  assert.equal(result.status, 0);
+  const id = JSON.parse(result.stdout).data.id;
+  assert.equal(JSON.parse(run(cwd, ['list']).stdout).work[id].stage, 'clarify');
+});
+
+test('add leaves stage unset — the item reads as executing via the lazy default (D8)', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'plain-add');
+  const item = JSON.parse(run(cwd, ['list']).stdout).work['plain-add'];
+  assert.equal(item.stage, undefined);
+});
+
+test('discover on a clear verdict moves the submitted item to stage executing with the model-proposed verify (D5/D10)', () => {
+  const cwd = tmpCwd();
+  writeRunnerConfig(cwd, { clear: true, verify: 'npm test -- proven' });
+  const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
+
+  const result = run(cwd, ['discover', id]);
+  assert.equal(result.status, 0);
+  const envelope = JSON.parse(result.stdout);
+  assert.equal(envelope.contract, 'fgos.v1');
+  assert.equal(envelope.data.outcome, 'clear');
+
+  const item = JSON.parse(run(cwd, ['list']).stdout).work[id];
+  assert.equal(item.stage, 'executing');
+  assert.equal(item.verify, 'npm test -- proven');
+});
+
+test('discover on an unclear verdict parks the submitted item in awaiting-human with the question, still stage clarify (D5/D7)', () => {
+  const cwd = tmpCwd();
+  writeRunnerConfig(cwd, { clear: false, question: 'Which service?' });
+  const id = JSON.parse(run(cwd, ['submit', 'Do the ambiguous work']).stdout).data.id;
+
+  const result = run(cwd, ['discover', id]);
+  assert.equal(result.status, 0);
+  assert.equal(JSON.parse(result.stdout).data.outcome, 'unclear');
+
+  const view = JSON.parse(run(cwd, ['list']).stdout);
+  assert.equal(view.work[id].status, 'awaiting-human');
+  assert.equal(view.work[id].stage, 'clarify');
+  assert.equal(view.gates[id].ask, 'Which service?');
+});
+
+test('discover with no id is rejected as validation, exit 4', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['discover']);
+  assert.equal(result.status, 4);
+});
