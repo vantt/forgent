@@ -8,8 +8,9 @@
 - `docs/routing-handoff-contract.md` — hợp đồng handoff agent↔agent + ranh giới tin cậy
 - `docs/decisions/` — hồ sơ quyết định dài hạn cho người ngoài (decision records)
 - `bin/fgos.mjs` — CLI một cửa của work-state; chạy `node bin/fgos.mjs <verb>`; spec: docs/specs/work-state.md
-- `src/state/` — lõi work-state: events (nhật ký), work (schema), fsm (bảng chuyển + CAS), replay (fold), frontier (truy vấn sẵn-sàng), store (chủ ghi duy nhất + readRawEvents), envelope (phong bì output C1, `wrapEnvelope`)
+- `src/state/` — lõi work-state: events (nhật ký), work (schema — STATUSES + STAGES), fsm (bảng chuyển status + CAS), stage (bảng chuyển stage + CAS, chiều vĩ mô song song fsm), replay (fold), frontier (truy vấn sẵn-sàng — lọc cả status lẫn stage), store (chủ ghi duy nhất + readRawEvents), envelope (phong bì output C1, `wrapEnvelope`)
 - `src/intake/classify.mjs` — logic thuần của `fgos submit`: deriveTitle, classify (tier/kind/risk cơ học), generateId (slug+hash chống trùng)
+- `src/intake/discovery.mjs` — context-discovery của stage clarify: `judgeDiscovery` (gọi model, fail-safe) + `resolveDiscovery` (đọc-phán-ghi, dùng chung bởi verb `discover` và vòng tự hành)
 - `src/runner/` + `bin/fgos-runner.mjs` — vòng tự hành (loop/dispatch/worktree/recovery/anti-loop); config: `.fgos-runner.json`; spec: docs/specs/runner.md
 - `test/` — node:test suite (`npm test`, 241 test): smoke + state + cli + runner + e2e (rebuild-determinism, runner-loop)
 - `.fgos/events.jsonl` — nhật ký sự kiện work-state (truth, committed); `.fgos/state.json` là view gitignored
