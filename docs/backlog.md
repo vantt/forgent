@@ -2,7 +2,7 @@
 
 | ID | Story | CoS | Status | Feature |
 |----|-------|-----|--------|---------|
-| P3 | Compound-learning trên routing (Phase 3): vòng predicted→actual, capture 2 kênh, entropy-trend, evolving human-gated | Vòng predicted→actual chạy thật với bằng chứng output (tiêu chí F4, luật L6) | in-flight | [phase-3-compound-learning](history/phase-3-compound-learning/) |
+| P3 | Compound-learning trên routing (Phase 3): vòng predicted→actual, capture 2 kênh, entropy-trend, evolving human-gated | Vòng predicted→actual chạy thật với bằng chứng output (tiêu chí F4, luật L6) | done | [phase-3-compound-learning](history/phase-3-compound-learning/) |
 | P4 | Distillery lên state layer làm consumer thứ hai (porting lifecycle thành FSM) | Trạng thái porting đọc/ghi qua cùng một cửa state layer, dựng lại được từ event log | proposed | — |
 | P5 | Xem xét thay bee bằng state layer của forgent — chỉ mở khi forgent đạt F3 (ngưỡng tên, per D2 phase-1-state-layer) | Quyết định có/không kèm case study vận hành song song | proposed | — |
 | P6 | Fan-out song song N worker trên frontier | Anti-loop đã chứng minh trong vòng chạy thật (ngưỡng A1 phase-2-routing); N worker không phá single-writer | proposed | — |

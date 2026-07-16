@@ -155,6 +155,14 @@ tiêu chí + chỉ số, không phải cảm giác:
 Mỗi bậc chỉ được tuyên bố khi có bằng chứng chạy thật (benchmark/check output),
 theo `repository-harness:maturity-ladder-h0-h5` — "không tự phán".
 
+**Claimed.** F4 — 2026-07-16, trên bằng chứng benchmark ngoài thật (real
+`fgos`/`fgos-runner` binaries, bản sao pristine, không fixture): vòng
+predicted→actual đủ 2 nửa; capture 2 kênh (settlement actor-attributed
+runner/human, friction 5-layer); entropy-trend + seal-digest qua hai lần
+`check`; câu-6 tự động lúc đóng. Chi tiết + toàn bộ output dán nguyên văn:
+`docs/history/phase-3-compound-learning/reports/f4-benchmark.md` (round 2,
+6/6 delta PASS).
+
 **Ngưỡng xem lại.** Nội dung từng bậc tinh chỉnh được khi vào phase tương ứng;
 cấu trúc thang giữ nguyên.
 
