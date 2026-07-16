@@ -6,6 +6,7 @@
 - `docs/work-item-lifecycle-vision.md` — tầm nhìn nền tảng: chu trình sống của work-item (mixed-autonomy, base-workflow + domain-extension); khung cho các PBI P14-P18
 - `docs/specs/` — state layer: area spec + system-overview + bản đồ này
 - `docs/routing-handoff-contract.md` — hợp đồng handoff agent↔agent + ranh giới tin cậy
+- `docs/coexistence.md` — doctrine chạy cạnh một harness agent khác (record 0009): lãnh địa, một-nhạc-trưởng-mỗi-phiên, nhường-nhịn lúc `init`, manifest `.fgos/coexistence.json`, Known Gaps chưa flip; `src/install/coexist.mjs` — cài đặt detection + manifest (read-only, không đè)
 - `docs/decisions/` — hồ sơ quyết định dài hạn cho người ngoài (decision records)
 - `bin/fgos.mjs` — CLI một cửa của work-state; chạy `node bin/fgos.mjs <verb>`; gồm verb `take`/`return` — cửa pull giao–nhận việc cho tác nhân ngoài runner; gồm verb `review`/`approve`/`reject` — cổng duyệt PR nội bộ, một cổng cho mọi đề xuất `proposed` (spec: docs/specs/runner.md); spec: docs/specs/work-state.md
 - `src/state/` — lõi work-state: events (nhật ký), work (schema — STATUSES + STAGES + field `parent` lineage), fsm (bảng chuyển status + CAS), stage (bảng chuyển stage + CAS, chiều vĩ mô song song fsm; cạnh `clarify→decompose→executing`), replay (fold), frontier (truy vấn sẵn-sàng — lọc theo status, stage, VÀ lineage qua `parent`), store (chủ ghi duy nhất + readRawEvents), envelope (phong bì output C1, `wrapEnvelope`)
