@@ -24,6 +24,7 @@ import path from 'node:path';
 import { appendEvent, readEvents } from './events.mjs';
 import { rebuildView } from './replay.mjs';
 import { transitionWork, FsmError } from './fsm.mjs';
+import { transitionStage } from './stage.mjs';
 import { validateWork, WorkValidationError, DEFAULTS } from './work.mjs';
 import { EventLogError } from './events.mjs';
 import { frontier } from './frontier.mjs';
@@ -161,6 +162,43 @@ export function putInAwaiting(dir, { id, ask, expectedStatus } = {}) {
  */
 export function answerAwaiting(dir, { id, answer, expectedStatus } = {}) {
   return moveWork(dir, { id, to: 'todo', expectedStatus, answer });
+}
+
+/**
+ * Move a work item to a new stage (per stage-clarify D1/D10/D12). Mirrors
+ * `moveWork` exactly, one dimension up: looks the item up fresh from the
+ * log, delegates the precondition/CAS decision to stage.mjs (pure — never
+ * writes), and only then appends the event it returns.
+ */
+export function moveStage(dir, { id, to, expectedStage, verify } = {}) {
+  const { logPath } = paths(dir);
+  const before = rebuildView(logPath);
+  const work = before.work[id];
+  if (!work) {
+    throw new StoreError('validation', `work "${id}" not found.`);
+  }
+
+  const rawEvent = transitionStage({ work, to, expectedStage, verify }); // FsmError: precondition | conflict
+  const event = appendEvent(logPath, rawEvent);
+  const view = refreshView(dir);
+  return { event, view };
+}
+
+/**
+ * Log a context-discovery verdict event (per stage-clarify D3/D6). Mirrors
+ * `addFriction` exactly: no FSM/work validation beyond requiring the `id`
+ * the fold appends by; each verdict is its own occurrence (pass or not) —
+ * the fold APPENDS per id, a later record never erases an earlier one. Same
+ * single write door + append-then-refresh tail as every mutation here.
+ */
+export function addDiscovery(dir, payload) {
+  const { logPath } = paths(dir);
+  if (!payload || typeof payload.id !== 'string' || !payload.id.trim()) {
+    throw new StoreError('validation', 'discovery requires a non-empty "id".');
+  }
+  const event = appendEvent(logPath, { type: 'work.discovery', payload });
+  const view = refreshView(dir);
+  return { event, view };
 }
 
 /** Log a decision event (no FSM/work validation — decisions are freeform). */

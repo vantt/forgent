@@ -150,6 +150,62 @@ test('foldEvents on a log with no gate (ask/answer) events yields a view with no
   assert.equal('gates' in view, false);
 });
 
+test('foldEvents applies work.stage to set item.stage (per stage-clarify D1)', () => {
+  const events = [
+    { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo', stage: 'clarify' } },
+    { seq: 2, ts: '2026-07-16T00:00:01.000Z', type: 'work.stage', payload: { id: 'a', from: 'clarify', to: 'executing' } },
+  ];
+  const view = foldEvents(events);
+  assert.equal(view.work.a.stage, 'executing');
+});
+
+test('foldEvents work.stage also sets item.verify when the event carries one (per D10 — one event does both)', () => {
+  const events = [
+    { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo', stage: 'clarify', verify: 'P15 will fill this in' } },
+    { seq: 2, ts: '2026-07-16T00:00:01.000Z', type: 'work.stage', payload: { id: 'a', from: 'clarify', to: 'executing', verify: 'npm test -- a' } },
+  ];
+  const view = foldEvents(events);
+  assert.equal(view.work.a.stage, 'executing');
+  assert.equal(view.work.a.verify, 'npm test -- a');
+});
+
+test('foldEvents work.stage without a verify leaves item.verify untouched', () => {
+  const events = [
+    { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo', stage: 'clarify', verify: 'original verify' } },
+    { seq: 2, ts: '2026-07-16T00:00:01.000Z', type: 'work.stage', payload: { id: 'a', from: 'clarify', to: 'executing' } },
+  ];
+  const view = foldEvents(events);
+  assert.equal(view.work.a.verify, 'original verify');
+});
+
+test('foldEvents ignores a work.stage for an id that was never added', () => {
+  const events = [
+    { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.stage', payload: { id: 'ghost', from: 'clarify', to: 'executing' } },
+  ];
+  assert.doesNotThrow(() => foldEvents(events));
+  assert.deepEqual(foldEvents(events), { work: {}, decisions: [] });
+});
+
+test('foldEvents APPENDS work.discovery records per id — two verdicts on one id both survive, in order (never merged, never replaced)', () => {
+  const events = [
+    { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.discovery', payload: { id: 'a', passed: false, question: 'which auth?' } },
+    { seq: 2, ts: '2026-07-16T00:00:01.000Z', type: 'work.discovery', payload: { id: 'a', passed: true, verify: 'npm test -- a' } },
+  ];
+  const view = foldEvents(events);
+  assert.equal(view.discovery.a.length, 2);
+  assert.equal(view.discovery.a[0].passed, false);
+  assert.equal(view.discovery.a[1].passed, true);
+  assert.equal(view.discovery.a[0].ts, '2026-07-16T00:00:00.000Z');
+});
+
+test('foldEvents on a log with no work.discovery events yields a view with no "discovery" key (lazy key, backward-compat)', () => {
+  const events = [
+    { seq: 1, ts: '2026-07-14T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo' } },
+  ];
+  const view = foldEvents(events);
+  assert.equal('discovery' in view, false);
+});
+
 test('rebuildView preserves the historical ts from each event, never the current wall-clock time', () => {
   const logPath = tmpLogPath();
   // A ts far in the past — if replay ever called Date.now() instead of using

@@ -6,8 +6,13 @@
 //
 // Ready = status 'todo' AND every dep's status is 'done' (per D5: done
 // means "accepted into the main tree" — a dep sitting at 'proposed',
-// 'doing', or 'blocked' does NOT unblock its dependents). Frontier is a
-// derived read (R5 — "derive, no danh sách tay"), never a stored list.
+// 'doing', or 'blocked' does NOT unblock its dependents) AND stage
+// 'executing' (per stage-clarify D1: an item still at stage `clarify` is not
+// yet "ready to start" no matter its status — `fgos ready` would otherwise
+// lie about items that have not passed context-discovery). `stage` is read
+// lazily — `item.stage ?? 'executing'` (D8) — so an item predating this
+// field behaves exactly as before. Frontier is a derived read (R5 — "derive,
+// no danh sách tay"), never a stored list.
 //
 // FIFO order (per A2, cold-pickup reliance — deliberately spelled out, not
 // left implicit):
@@ -31,6 +36,7 @@ export function frontier(view) {
   for (const id of Object.keys(work)) {
     const item = work[id];
     if (item.status !== 'todo') continue;
+    if ((item.stage ?? 'executing') !== 'executing') continue;
     const depsReady = item.deps.every((dep) => work[dep]?.status === 'done');
     if (depsReady) ready.push(item);
   }

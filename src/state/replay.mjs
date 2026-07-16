@@ -93,6 +93,44 @@ function applyEvent(view, event) {
       }
       break;
     }
+    case 'work.stage': {
+      // Additive event type (per stage-clarify D1/D3/D10): a clarify-pass
+      // moves `item.stage` and, when the discovery engine supplied one,
+      // fills in the item's real `verify` at the SAME time — one event,
+      // never two, so there is no window where the item reads `executing`
+      // with a stale placeholder verify (D10). `item.stage` itself is never
+      // defaulted here — a missing `stage` on the record stays missing
+      // (read lazily as `executing` by consumers, per D8); this case only
+      // ever runs for an item that already has a real `work.stage` event in
+      // its history, at which point setting the field explicitly is correct.
+      const { id, to, verify } = event.payload ?? {};
+      const item = view.work[id];
+      if (item) {
+        item.stage = to;
+        if (verify !== undefined) {
+          item.verify = verify;
+        }
+      }
+      break;
+    }
+    case 'work.discovery': {
+      // Additive event type (per stage-clarify D3/D6) — mirrors work.friction
+      // below: each context-discovery verdict is its own occurrence (pass or
+      // not), so this APPENDS per id rather than merging/replacing. `discovery`
+      // is a LAZY key exactly like `frictions`/`outcomes`/`gates`: absent from
+      // the view until the first work.discovery event folds (backward-compat).
+      const { id } = event.payload ?? {};
+      if (typeof id === 'string') {
+        if (!view.discovery) {
+          view.discovery = {};
+        }
+        view.discovery[id] = [
+          ...(view.discovery[id] ?? []),
+          { ...event.payload, ts: event.ts },
+        ];
+      }
+      break;
+    }
     case 'work.friction': {
       // Additive event type (per D7 schema evolution, mirroring work.outcome
       // above) — but with the OPPOSITE fold rule: one friction record per

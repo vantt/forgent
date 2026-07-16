@@ -43,6 +43,18 @@ export const STATUSES = Object.freeze(['todo', 'doing', 'blocked', 'proposed', '
 export const TIERS = Object.freeze(['light', 'standard', 'heavy']);
 
 /**
+ * Stage domain for `work.stage` (per stage-clarify D1/D2/D8) — the
+ * macro-level lifecycle stage of a work item (clarify -> executing; P16+
+ * will extend with planning/review...), orthogonal to the FSM's micro-level
+ * `status` (fsm.mjs's TRANSITIONS is unchanged by this field). `stage` is
+ * OPTIONAL and NOT in DEFAULTS (D8): a missing `stage` reads as `executing`
+ * lazily wherever it is consumed (frontier.mjs, store.mjs), never injected
+ * onto the record itself — this keeps every existing add/submit/legacy path
+ * byte-for-byte unchanged.
+ */
+export const STAGES = Object.freeze(['clarify', 'executing']);
+
+/**
  * Current schema/event version (per D7c): every event appended from Phase 2
  * onward carries this as `v` (see src/state/events.mjs). Events committed
  * before Phase 2 carry no `v` at all — absence of the field, not a lower
@@ -111,6 +123,11 @@ export function validateWorkShape(work) {
   if (work.tier !== undefined && !TIERS.includes(work.tier)) {
     throw new WorkValidationError(
       `work.tier must be one of ${JSON.stringify(TIERS)} when present, got: ${JSON.stringify(work.tier)}`,
+    );
+  }
+  if (work.stage !== undefined && !STAGES.includes(work.stage)) {
+    throw new WorkValidationError(
+      `work.stage must be one of ${JSON.stringify(STAGES)} when present, got: ${JSON.stringify(work.stage)}`,
     );
   }
 

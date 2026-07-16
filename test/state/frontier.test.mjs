@@ -135,3 +135,31 @@ test('LOCK (per D6): a todo item whose dep is "awaiting-human" is NOT ready (an 
   };
   assert.deepEqual(frontier(view), []);
 });
+
+// --- stage-clarify D1: an item at stage "clarify" is never in the frontier ---
+
+test('LOCK (per stage-clarify D1): a todo item with no dep-blockers but stage "clarify" is excluded from the frontier', () => {
+  const view = { work: { a: { ...item('a', 'todo'), stage: 'clarify' } } };
+  assert.deepEqual(frontier(view), []);
+});
+
+test('an item with stage "executing" (explicit) and status todo is ready, same as no stage at all', () => {
+  const view = { work: { a: { ...item('a', 'todo'), stage: 'executing' } } };
+  assert.deepEqual(frontier(view).map((i) => i.id), ['a']);
+});
+
+test('an item with no stage field at all defaults to "executing" (per D8 lazy default) and is ready', () => {
+  const view = { work: { a: item('a', 'todo') } };
+  assert.equal('stage' in view.work.a, false);
+  assert.deepEqual(frontier(view).map((i) => i.id), ['a']);
+});
+
+test('a todo item at stage "clarify" whose deps are all done is still excluded (stage gates independently of deps)', () => {
+  const view = {
+    work: {
+      base: item('base', 'done'),
+      dependent: { ...item('dependent', 'todo', ['base']), stage: 'clarify' },
+    },
+  };
+  assert.deepEqual(frontier(view), []);
+});

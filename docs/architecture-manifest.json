@@ -13,6 +13,7 @@
     "src/runner/anti-loop.mjs": "domain",
     "src/state/fsm.mjs": "domain",
     "src/state/frontier.mjs": "domain",
+    "src/state/stage.mjs": "domain",
     "src/state/replay.mjs": "domain",
     "src/state/events.mjs": "kernel",
     "src/state/work.mjs": "kernel",
