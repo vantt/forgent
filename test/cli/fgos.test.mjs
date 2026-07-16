@@ -1664,3 +1664,62 @@ test('the CLI usage message for an unknown verb lists review/approve/reject in t
   assert.equal(result.status, 4);
   assert.match(result.stderr, /review\|approve\|reject/);
 });
+
+// --- coexistence: harness marker detection + territory manifest -----------
+// (install-coexistence D2/D4/D6 — see src/install/coexist.mjs)
+
+function coexistPath(cwd) {
+  return path.join(cwd, '.fgos', 'coexistence.json');
+}
+
+test('init with no other harness present still writes .fgos/coexistence.json with an empty detected_harnesses', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['init']);
+  assert.equal(result.status, 0);
+  assert.doesNotMatch(result.stdout, /Detected other harness/);
+
+  const manifest = JSON.parse(fs.readFileSync(coexistPath(cwd), 'utf8'));
+  assert.equal(manifest.v, 1);
+  assert.deepEqual(manifest.detected_harnesses, []);
+});
+
+test('init in a project with a .bee/ marker detects it, reports it in the output, and leaves .bee/ byte/mtime unchanged (D4 read-only)', () => {
+  const cwd = tmpCwd();
+  const beeDir = path.join(cwd, '.bee');
+  fs.mkdirSync(beeDir);
+  const beeMarkerFile = path.join(beeDir, 'state.json');
+  fs.writeFileSync(beeMarkerFile, '{"phase":"idle"}');
+  const beforeStat = fs.statSync(beeMarkerFile);
+  const beforeContent = fs.readFileSync(beeMarkerFile);
+
+  const result = run(cwd, ['init']);
+  assert.equal(result.status, 0);
+  assert.match(result.stdout, /Detected other harness\(es\): bee/);
+
+  const manifest = JSON.parse(fs.readFileSync(coexistPath(cwd), 'utf8'));
+  assert.deepEqual(manifest.detected_harnesses, [{ name: 'bee', markers: ['.bee'] }]);
+
+  const afterStat = fs.statSync(beeMarkerFile);
+  assert.equal(afterStat.mtimeMs, beforeStat.mtimeMs);
+  assert.deepEqual(fs.readFileSync(beeMarkerFile), beforeContent);
+});
+
+test('init never creates a host AGENTS.md that did not already exist (D6)', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['init']);
+  assert.equal(result.status, 0);
+  assert.equal(fs.existsSync(path.join(cwd, 'AGENTS.md')), false);
+});
+
+test('init runs a second time (idempotent) and rewrites coexistence.json with the same content when nothing in the project changed', () => {
+  const cwd = tmpCwd();
+  fs.mkdirSync(path.join(cwd, '.claude'));
+
+  assert.equal(run(cwd, ['init']).status, 0);
+  const first = JSON.parse(fs.readFileSync(coexistPath(cwd), 'utf8'));
+
+  assert.equal(run(cwd, ['init']).status, 0);
+  const second = JSON.parse(fs.readFileSync(coexistPath(cwd), 'utf8'));
+
+  assert.deepEqual(second, first);
+});

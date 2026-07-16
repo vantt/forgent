@@ -11,6 +11,7 @@
     "src/runner/goal-check.mjs": "infra",
     "src/runner/merge.mjs": "infra",
     "src/state/store.mjs": "infra",
+    "src/install/coexist.mjs": "infra",
     "src/runner/recovery.mjs": "domain",
     "src/runner/anti-loop.mjs": "domain",
     "src/state/fsm.mjs": "domain",

@@ -29,6 +29,7 @@ import { runGoalCheck } from '../src/runner/goal-check.mjs';
 import { classifySource, reviewDiff, mergeRunnerItem, cleanupMergedBranch, isWorkingTreeClean as isMainTreeClean } from '../src/runner/merge.mjs';
 import { visitCount } from '../src/runner/anti-loop.mjs';
 import { DEFAULTS } from '../src/state/work.mjs';
+import { writeCoexistenceManifest } from '../src/install/coexist.mjs';
 
 // D5: `verify` is a required non-empty field on every work item, but a
 // free-text submission has no verification plan yet — that is P15's job. The
@@ -411,7 +412,19 @@ function runVerb(verb, flags, positional, dir) {
   switch (verb) {
     case 'init': {
       initStore(dir);
-      return `Initialized ${dir}`;
+      // D4: detection/manifest writing must never fail init — a permissions
+      // quirk or unexpected error here still leaves `.fgos/` initialized.
+      let coexistNote = '';
+      try {
+        const manifest = writeCoexistenceManifest(path.dirname(dir), dir);
+        if (manifest.detected_harnesses.length > 0) {
+          const names = manifest.detected_harnesses.map((h) => h.name).join(', ');
+          coexistNote = `\nDetected other harness(es): ${names} — leaving them untouched.`;
+        }
+      } catch {
+        // Swallowed by design (D4 fail-safe) — see comment above.
+      }
+      return `Initialized ${dir}${coexistNote}`;
     }
 
     case 'add': {
