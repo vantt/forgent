@@ -12,6 +12,7 @@
 - `src/intake/classify.mjs` — logic thuần của `fgos submit`: deriveTitle, classify (tier/kind/risk cơ học), generateId (slug+hash chống trùng)
 - `src/intake/discovery.mjs` — context-discovery của stage clarify: `judgeDiscovery` (gọi model, fail-safe) + `resolveDiscovery` (đọc-phán-ghi, dùng chung bởi verb `discover` và vòng tự hành)
 - `src/runner/` + `bin/fgos-runner.mjs` — vòng tự hành (loop/dispatch/worktree/recovery/anti-loop); config: `.fgos-runner.json`; spec: docs/specs/runner.md
-- `test/` — node:test suite (`npm test`, 241 test): smoke + state + cli + runner + e2e (rebuild-determinism, runner-loop)
+- `src/report/entropy.mjs` — tín hiệu entropy-trend + đếm compounding (thuần, đọc trên view work-state), surfaced qua `fgos check`; spec: docs/specs/runner.md
+- `test/` — node:test suite (`npm test`, 394 test): smoke + state + cli + runner + report + e2e (rebuild-determinism, runner-loop); benchmark ngoài suite (F4) tại `docs/history/phase-3-compound-learning/reports/f4-benchmark.md`
 - `.fgos/events.jsonl` — nhật ký sự kiện work-state (truth, committed); `.fgos/state.json` là view gitignored
 - `AGENTS.md`, `CLAUDE.md` — doctrine layer nạp mọi phiên agent (bản sản phẩm — thuần forgent)

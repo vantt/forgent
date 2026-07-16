@@ -1,8 +1,8 @@
 ---
 area: runner
-updated: 2026-07-15
-sources: [phase-2-routing, post-divorce-hardening, phase-3-compound-learning-s1, phase-3-compound-learning-s2, stage-clarify]
-decisions: [feed7428, 14396a5c, 1a80b4d3, 9a19eea5]
+updated: 2026-07-16
+sources: [phase-2-routing, post-divorce-hardening, phase-3-compound-learning-s1, phase-3-compound-learning-s2, phase-3-compound-learning-s3-closeout, stage-clarify]
+decisions: [feed7428, 14396a5c, 1a80b4d3, 9a19eea5, 96a65365, a7c099af]
 coverage: full
 ---
 
@@ -70,6 +70,56 @@ Vòng lặp tự hành của forgent: tự lấy việc sẵn-sàng từ work-st
 - Khi việc bị đỗ-lại (`parked`, hết trần thử lại hoặc lỗi không thử lại được) hoặc bị dừng vì cầu dao (`halted`, chấm-trượt-liên-tiếp), runner **CŨNG ghi nửa THỰC TẾ** của bản ghi outcome — thất bại được học, không chỉ thành công. Nửa thực tế KHÔNG được ghi ở một lượt-thử-còn-thử-lại-được (chỉ ghi đúng một lần, ở kết cục CUỐI của việc).
 - **Cùng lúc đó, runner ghi thêm một bản ghi friction** (kênh 2 của capture 2 kênh, Phase 3 Slice 2, xem spec Work-State): runner tự quy tội — dịch lớp lỗi thành một trong **5 lớp friction** cơ học: hỏng-spawn/quá-giờ/hỏng-worktree → `environment` · chấm-trượt → `verification` · nhật-ký-hỏng/việc-kẹt-do-crash/tranh-chấp-ghi → `state` · đề-xuất-bị-trả → `context` · lớp lạ → `task-spec` (mặc định). Bảng dịch là dữ liệu tĩnh, không phán xét — tích lũy friction là bằng chứng để hiệu chỉnh sau này, không phải kết luận tại chỗ.
 
+### Ai ngã-ngũ — actor trên settlement (Phase 3 S3-closeout)
+
+Mỗi ngã-ngũ (kênh 1 của capture 2 kênh — xem spec Work-State "Bản ghi
+settlement") mang thêm ai/cái gì đã ngã-ngũ nó:
+
+- **Runs when:** mọi ngã-ngũ mà chính runner tự ghi trong vòng dispatch của
+  nó — quét làm-rõ cho qua, nhận việc, đề xuất, đỗ.
+- **What changes:** ngã-ngũ đó mang `actor` = **runner**. Ngã-ngũ do một
+  phiên đang sống tự gọi tay context-discovery mang `actor` = **session**;
+  ngã-ngũ do người gọi qua một lệnh CLI (chuyển trạng thái tay, trả lời một
+  câu hỏi đang chờ) mang `actor` = **human** — ba giá trị này phủ hết mọi
+  đường ngã-ngũ hiện có.
+- **Afterwards:** ai đọc lại nhật ký (qua `fgos check`) biết chính xác AI đã
+  đưa item qua từng ngã-ngũ của nó, không chỉ SỰ KIỆN gì đã xảy ra.
+
+### Tín hiệu compounding qua check (entropy-trend + seal-digest)
+
+Ngoài mục outcome/friction/settlement/học đã có, `fgos check` (lệnh đọc-thuần
+dùng chung với Work-State — xem spec Work-State) còn tổng hợp một tín hiệu
+sức khỏe cho toàn bộ vòng compounding.
+
+- **Runs when:** mỗi lần `fgos check` được gọi (có id hay không).
+- **Blocked when:** không có điều kiện chặn riêng — cùng hợp đồng lỗi với
+  `check`, đọc thuần.
+- **What changes:** không có event nào vào nhật ký sự kiện (đây vẫn là một
+  lệnh đọc) — riêng lần chạy này tự thêm đúng MỘT dòng vào một lịch sử xu
+  hướng nằm CÙNG chỗ với dữ liệu của kho đang được đọc (không phải nhật ký sự
+  kiện, không đi qua cửa ghi work-state).
+- **Side effects:** một dòng mới trong lịch sử xu hướng; không có lời gọi
+  model nào.
+- **Afterwards:**
+  - Một **điểm entropy** có trọng số cho work-state hiện hành, cộng dồn từ
+    năm tín hiệu, mỗi tín hiệu luôn giải thích được (không bao giờ một con số
+    trần trụi): item ở trạng thái cuối (đề xuất/đỗ/xong) mà thiếu nửa
+    thực-tế của kết quả (trọng số nặng nhất), item hiện đang "doing" (snapshot
+    tại thời điểm check, không có ngưỡng thời gian riêng — trọng số nặng
+    ngang hàng), item còn ở stage `clarify` (trọng vừa), một bản ghi friction
+    chưa có settlement nào theo sau trên CÙNG id (trọng nhẹ), item đang đậu
+    chờ người (trọng nhẹ).
+  - Điểm này LUÔN đi kèm **so với lần `check` gần nhất** — lần đọc đầu tiên
+    là baseline (chưa có gì để so); mọi lần sau in kèm phần chênh lệch thật.
+  - Một dòng **seal-digest** tóm tắt những gì đã "gộp thêm" kể từ lần `check`
+    trước: số kết quả mới có nửa thực-tế, số friction mới, số settlement
+    mới — mỗi mệnh đề chỉ bị bỏ qua khi CẢ số đếm hiện tại VÀ phần chênh lệch
+    của nó đều bằng 0; một kênh có dữ liệu tồn tại nhưng không đổi từ lần
+    trước vẫn in ra, dưới dạng "không đổi" (giá trị 0), chỉ kênh thật sự
+    trống mới im lặng hoàn toàn.
+  - Kho chưa từng có việc nào → toàn bộ tín hiệu này vắng mặt, `check` không
+    tự khởi tạo bất cứ gì — giữ nguyên hợp đồng đọc-thuần.
+
 ## Actors & Access
 
 | Capability | Người vận hành | Runner | Worker (trợ lý nền) |
@@ -95,6 +145,8 @@ Vòng lặp tự hành của forgent: tự lấy việc sẵn-sàng từ work-st
 - **R12 (khoá liên-tiến-trình).** Mỗi kho chỉ một runner sống tại một thời điểm: đầu MỌI lần chạy (trước cả bước gặt-lại — gặt cũng ghi trạng thái), runner chiếm khoá độc quyền trong vùng trạng thái, ghi định danh tiến trình của mình. Kho đang có runner sống → lần chạy mới thoát «bận» bằng mã thoát riêng (không trùng mã nào hiện hành): không ghi trạng thái, không đụng worktree, không đụng khoá của người giữ. Khoá của runner đã chết (crash để lại, hoặc nội dung không chứng minh được chủ sống) → **dọn-rồi-nhường**: kiểm nội dung sát trước khi xoá (đổi rồi thì không đụng), xoá xong lượt đó vẫn lui ra «bận» — không lượt chạy nào vừa xoá khoá vừa tự chiếm trong cùng một lần, nên hai lượt cùng gặp khoá chết không thể cướp khoá mới của nhau; lượt kế tiếp chiếm khoá sạch (sau crash, phục hồi trọn trong hai lượt). Khoá luôn được nhả trên mọi đường thoát.
 - **R13 (vòng dự đoán-thực tế, học từ cả thành công lẫn thất bại).** Mỗi lần dispatch, runner ghi bản ghi outcome ở CẢ hai đầu: nửa dự đoán lúc nhận việc, nửa thực tế ở MỌI kết cục cuối — thành đề xuất, bị đỗ, hay bị dừng — không bao giờ chỉ ghi khi thành công. Giá trị thực tế luôn lấy từ phép đo goal-check/kiểm nhánh của chính runner, không bao giờ từ báo cáo tự khai của trợ lý (per D2/D3 phase-3-compound-learning / 1a80b4d3; mở rộng nguyên tắc "không tin lời trợ lý" đã khóa ở R3). Bản ghi outcome đọc lại được qua lệnh đọc-thuần `fgos check` của tầng Work-State — runner không có verb ghi riêng cho việc này.
 - **R14 (quét làm-rõ chạy trước dispatch, bất kể mode).** Mỗi lượt chạy, ngay sau gặt-lại và trước khi tìm việc thi công, runner quét TOÀN BỘ item `stage: clarify` + `status: todo` và tự chạy context-discovery — không đọc/không rẽ nhánh theo field `mode` của item (per D5/D13 stage-clarify / 9a19eea5, xem spec Work-State R17-R19). Never chạm item `awaiting-human` — cùng luật loại-trừ R6/R15 của tầng Work-State áp cho cả bước quét này. Đây là lưới đỡ: phiên submit sống chết giữa chừng không để lại việc kẹt vô hình.
+- **R15 (actor trên mọi ngã-ngũ tự động của runner).** Mọi ngã-ngũ mà runner TỰ ghi trong vòng dispatch (quét làm-rõ cho qua, nhận việc, đề xuất, đỗ) mang `actor` = `runner`; ngã-ngũ do phiên sống gọi tay context-discovery mang `actor` = `session`; ngã-ngũ do người gọi qua lệnh CLI mang `actor` = `human` — ba giá trị phủ hết mọi đường ngã-ngũ hiện có, không đường nào bị bỏ sót (per D2 phase-3-compound-learning S3-closeout / 96a65365; xem spec Work-State "Bản ghi settlement").
+- **R16 (điểm entropy luôn giải thích được + luôn kèm xu hướng).** Điểm entropy trên `check` không bao giờ là một con số đơn độc — luôn kèm các thành phần đã cộng nên nó, và luôn so với lần `check` gần nhất (lần đầu là baseline). Seal-digest chỉ im lặng một mệnh đề khi kênh đó thật sự không có gì để nói (số đếm hiện tại VÀ chênh lệch đều bằng 0) — một kênh có dữ liệu nhưng không đổi từ lần trước vẫn in ra "không đổi" (per D2 phase-3-compound-learning S3-closeout / 96a65365).
 
 ## Edge Cases Settled
 
@@ -107,10 +159,13 @@ Vòng lặp tự hành của forgent: tự lấy việc sẵn-sàng từ work-st
 - Việc bị đỗ-lại hoặc bị dừng cũng để lại bản ghi thực tế (outcome) — vòng học nhìn thấy thất bại, không chỉ thành công; đọc lại được qua `fgos check` — chứng minh bằng một lần dispatch thật (không chỉ fixture).
 - Quét làm-rõ với model trả lời rác/timeout: không crash vòng chạy — item rơi về `awaiting-human` với câu hỏi mặc định cố định, lượt chạy vẫn tiếp tục xử các item khác — chứng minh bằng một lần chạy thật với executor kịch bản in stdout không phải JSON.
 - Item vừa qua quét làm-rõ trong CÙNG lượt chạy: nếu deps cũng đã xong, vòng dispatch bên dưới nhặt được ngay, không cần đợi lượt chạy kế tiếp — chứng minh bằng e2e một lượt `--once` duy nhất đưa item từ `clarify` tới `proposed`.
+- Ngã-ngũ tự động của runner trong một lượt dispatch thật (quét làm-rõ, nhận việc, đề xuất, đỗ) đều mang đúng `actor` = `runner`; ngã-ngũ đóng tay qua CLI mang `actor` = `human` — chứng minh bằng benchmark F4 chạy qua binary thật (không chỉ fixture), round 2: 6/6 tiêu chí đạt.
+- `check` chạy hai lần liên tiếp trên cùng kho: lần hai luôn in phần chênh lệch entropy thật so lần một, kể cả khi điểm không đổi (in "+0 so lần trước", không im lặng) — chứng minh bằng benchmark thật.
+- Một kênh seal-digest có số đếm khác 0 nhưng chênh lệch bằng 0 (không có gì mới kể từ lần trước) vẫn in ra — chỉ kênh trống tuyệt đối (số đếm 0 VÀ chênh lệch 0) mới im lặng hoàn toàn (bài học rút ra từ một lần khai sai kỳ vọng ở benchmark F4 vòng 1, sửa lại đúng ở vòng 2).
 
 ## Open Gaps
 
-(none)
+- Nhiều lượt `check` chạy đồng thời trên cùng một kho chưa có cơ chế khóa/chống-tranh-chấp cho dòng lịch sử xu hướng (khác với nhật ký sự kiện chính, vốn đã có CAS) — cùng tinh thần ngưỡng-chưa-tới của R10 Work-State, mở lại khi ghi đồng thời thành tải chính.
 
 ## Visuals
 
@@ -119,9 +174,10 @@ Not applicable — không có màn hình.
 ## Pointers (implementation)
 
 - `bin/fgos-runner.mjs` — CLI (--once/--dry-run/--config), exit theo phạm trù
-- `src/runner/loop.mjs` — vòng + startup reap + khoá liên-tiến-trình `.fgos/runner.lock` (busy exit 6); NGAY SAU reap, TRƯỚC vòng dispatch: quét mọi item `stage==='clarify' && status==='todo'` (không đọc `item.mode`) và gọi `resolveDiscovery` (`src/intake/discovery.mjs`) cho từng item; ghi bản outcome dự đoán tại claim + thực tế ở cả hai lối ra cuối (thành đề xuất, hoặc đỗ/dừng) qua `addOutcome` của store; `dispatch.mjs` — prompt/config/spawn (argv-only, spawnSync timeout; caveat grandchild SIGTERM ghi trong doc comment) + `resolveExecutorCommand`/`modelForTier` (tái dùng bởi discovery.mjs cho lời gọi model phán); `worktree.mjs` — lifecycle + reclaimOrphanedCheckout; `recovery.mjs` — 8 lớp; `anti-loop.mjs` — visitCount/breaker
-- `src/intake/discovery.mjs` — xem Pointers spec Work-State (module dùng chung giữa runner và verb `discover`)
+- `src/runner/loop.mjs` — vòng + startup reap + khoá liên-tiến-trình `.fgos/runner.lock` (busy exit 6); NGAY SAU reap, TRƯỚC vòng dispatch: quét mọi item `stage==='clarify' && status==='todo'` (không đọc `item.mode`) và gọi `resolveDiscovery` (`src/intake/discovery.mjs`) cho từng item, truyền `'runner'`; ghi bản outcome dự đoán tại claim + thực tế ở cả hai lối ra cuối (thành đề xuất, hoặc đỗ/dừng) qua `addOutcome` của store; mọi `moveWork` runner tự gọi (claim/propose/park) truyền `actor:'runner'`; `dispatch.mjs` — prompt/config/spawn (argv-only, spawnSync timeout; caveat grandchild SIGTERM ghi trong doc comment) + `resolveExecutorCommand`/`modelForTier` (tái dùng bởi discovery.mjs cho lời gọi model phán); `worktree.mjs` — lifecycle + reclaimOrphanedCheckout; `recovery.mjs` — 8 lớp; `anti-loop.mjs` — visitCount/breaker
+- `src/intake/discovery.mjs` — xem Pointers spec Work-State (module dùng chung giữa runner và verb `discover`); verb `discover` (phiên sống) truyền `'session'`
+- `src/report/entropy.mjs` — thuần, không fs/Date.now(): `computeEntropy(view)` → `{score, parts}` (5 tín hiệu có trọng số, mỗi phần giải thích được); `computeCounts(view)` → tổng phẳng outcome/friction/settlement cho seal-digest; đọc/ghi lịch sử xu hướng (`entropy-history.jsonl`, cùng thư mục dữ liệu với `events.jsonl`) và định dạng seal-digest là việc của `bin/fgos.mjs`'s verb `check`, không phải module này
 - `.fgos-runner.json` — config committed (executor template + models light/haiku, standard/sonnet, heavy/opus + timeoutMs)
-- `src/state/store.mjs` `readRawEvents` — accessor chỉ-đọc cho anti-loop (decision 14396a5c); `addOutcome` — cửa ghi outcome (mẫu `addDecision`); `moveStage`/`addDiscovery` — cửa ghi đổi-stage/bản-ghi-discovery (xem spec Work-State)
+- `src/state/store.mjs` `readRawEvents` — accessor chỉ-đọc cho anti-loop (decision 14396a5c); `addOutcome` — cửa ghi outcome (mẫu `addDecision`); `moveStage`/`addDiscovery` — cửa ghi đổi-stage/bản-ghi-discovery (xem spec Work-State); `moveWork` gắn `actor` post-transition + compose bài học câu-6 khi `to==='done'` (xem Pointers spec Work-State)
 - `docs/routing-handoff-contract.md` — hợp đồng handoff + ranh giới tin cậy
-- Test: `test/runner/*` + `test/e2e/runner-loop.test.mjs` (executor giả, repo git tạm, bao gồm 3 kịch bản stage-clarify; 353 test toàn suite)
+- Test: `test/runner/*` + `test/e2e/runner-loop.test.mjs` (executor giả, repo git tạm, bao gồm 3 kịch bản stage-clarify) + `test/report/entropy.test.mjs` (entropy thuần) + benchmark ngoài suite `docs/history/phase-3-compound-learning/reports/f4-benchmark.md` (F4, real binaries, expected-delta khai trước run); 394 test toàn suite
