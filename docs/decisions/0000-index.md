@@ -32,6 +32,7 @@ tại chỗ (giữ đúng nguyên tắc bất-biến của platform-foundations)
 | [0008](0008-routing-theo-audience.md) | Routing theo audience | Chọn kiểu giao tiếp theo audience của TỪNG interface, không áp một khuôn toàn cục. |
 | [0009](0009-chong-giao-thoa-luc-cai.md) | Chống giao thoa lúc cài | fgOS khi cài không được giao thoa tiến trình với harness khác (yêu cầu platform, chưa thực thi). |
 | [0010](0010-ban-do-kien-truc-la-ban-chuan.md) | Bản đồ kiến trúc là bản chuẩn | `docs/architecture-map.md` v0.2 (5 tầng E→U→I→D→K + 2 lớp phủ + 2 sổ) là chuẩn; thẻ-căn-cước-trước-code hiệu lực như phụ lục definition-of-done; 5 câu hỏi mở chốt kèm. |
+| [0011](0011-version-tuong-minh-cho-moi-contract.md) | Version tường minh cho mọi contract | Mở rộng 0007: không chỉ event mà cả schema và artifact đều khai version trong định danh (`<name>/v<N>`), theo mẫu `artifact_contract: bee-plan/v1` bee đã dùng sống. |
 
 ## Truy vết nguồn (đầy đủ)
 
@@ -57,3 +58,4 @@ Sổ này chưng cất các quyết định **product-facing**. Bảng dưới l
 | `145a4b67` | ngoài phạm vi | Cơ chế tách kho phát triển ↔ sản phẩm. |
 | `ddd9e431` | ngoài phạm vi | Nhật ký thi hành tách kho. |
 | `47950429` | ngoài phạm vi | Kết quả kiểm khói quy trình phát triển. |
+| `13916523` | record | 0011 |
