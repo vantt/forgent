@@ -19,7 +19,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { initStore, addWork, moveWork, addDecision, addOutcome, addFriction, listWork, readyWork, readRawEvents, rebuild, putInAwaiting, answerAwaiting, StoreError, EXIT_CODES, categoryOf } from '../src/state/store.mjs';
+import { initStore, addWork, moveWork, editWork, addDecision, addOutcome, addFriction, listWork, readyWork, readRawEvents, rebuild, putInAwaiting, answerAwaiting, StoreError, EXIT_CODES, categoryOf } from '../src/state/store.mjs';
 import { repairTruncatedLastLine } from '../src/state/events.mjs';
 import { deriveTitle, classify, generateId } from '../src/intake/classify.mjs';
 import { wrapEnvelope } from '../src/state/envelope.mjs';
@@ -576,6 +576,36 @@ async function runVerb(verb, flags, positional, dir) {
       const reason = optionalField(flags.reason, 'move --reason requires a non-empty reason value (omit --reason entirely when not rejecting a proposal)');
       const { event } = moveWork(dir, { id, to, expectedStatus, reason, actor: 'human' });
       return `Moved ${id}: ${event.payload.from} -> ${event.payload.to} (event #${event.seq})`;
+    }
+
+    // Patches fields on an existing item (P23, D2-D5) — the "always
+    // overridable" door `submit`'s mechanical classification leaves open.
+    // Same D4 allowlist as store.mjs's editWork; a flag simply omitted
+    // leaves that field untouched (never included in `patch`), while an
+    // explicit `--refs ''`/`--deps ''` parses to `[]` and DOES clear the
+    // field — parseListFlag already makes that distinction for `add`, reused
+    // here unchanged.
+    case 'edit': {
+      const id = requireField(positional[0] ?? flags.id, 'edit requires an id: fgos edit <id> --<field> <value> [...]');
+      const patch = {};
+      for (const field of ['title', 'kind', 'risk', 'verify', 'tier']) {
+        if (flags[field] !== undefined) {
+          patch[field] = flags[field];
+        }
+      }
+      for (const field of ['refs', 'deps']) {
+        if (flags[field] !== undefined) {
+          patch[field] = parseListFlag(flags[field]);
+        }
+      }
+      if (Object.keys(patch).length === 0) {
+        throw new StoreError(
+          'validation',
+          'edit requires at least one field to change: --title/--kind/--risk/--verify/--tier/--refs/--deps.',
+        );
+      }
+      const { event } = editWork(dir, { id, patch, actor: 'human' });
+      return `Edited ${id}: ${Object.keys(patch).join(', ')} (event #${event.seq})`;
     }
 
     // Parks the item into `awaiting-human`, carrying the question it is
@@ -1263,7 +1293,7 @@ async function runVerb(verb, flags, positional, dir) {
     }
 
     default:
-      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <init|add|submit|discover|move|ask|answer|decision|list|ready|rebuild|repair|check|rollup|take|return|review|approve|reject|catchup|evolve> ...`);
+      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <init|add|submit|discover|move|edit|ask|answer|decision|list|ready|rebuild|repair|check|rollup|take|return|review|approve|reject|catchup|evolve> ...`);
   }
 }
 

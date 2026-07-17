@@ -5,7 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync, spawnSync } from 'node:child_process';
-import { addOutcome, addFriction, moveWork, addWork } from '../../src/state/store.mjs';
+import { addOutcome, addFriction, moveWork, addWork, editWork, StoreError } from '../../src/state/store.mjs';
 
 // The CLI under test, resolved by absolute path so it works regardless of
 // the spawned process's cwd (which every test below points at a fresh
@@ -190,6 +190,125 @@ test('move reports the real event seq in its message, not "undefined"', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'seq-check'); // event #1
   const result = run(cwd, ['move', 'seq-check', '--to', 'doing']);
+  assert.equal(result.status, 0);
+  assert.match(result.stdout, /event #2\b/);
+  assert.doesNotMatch(result.stdout, /event #undefined/);
+});
+
+test('edit changes only the targeted field, every other field unchanged, exit 0', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'edit-risk', { risk: 'low' });
+  const before = eventLines(cwd).length;
+  const result = run(cwd, ['edit', 'edit-risk', '--risk', 'high']);
+  assert.equal(result.status, 0);
+  assert.equal(eventLines(cwd).length, before + 1);
+  const item = stateView(cwd).work['edit-risk'];
+  assert.equal(item.risk, 'high');
+  assert.equal(item.title, 'Title edit-risk');
+  assert.equal(item.kind, 'task');
+  assert.equal(item.status, 'todo');
+});
+
+test('two sequential edits both land — the second patch does not undo the first', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'edit-twice');
+  run(cwd, ['edit', 'edit-twice', '--risk', 'high']);
+  const result = run(cwd, ['edit', 'edit-twice', '--verify', 'npm run check']);
+  assert.equal(result.status, 0);
+  const item = stateView(cwd).work['edit-twice'];
+  assert.equal(item.risk, 'high');
+  assert.equal(item.verify, 'npm run check');
+});
+
+test('edit on an unknown id is rejected as validation, exit 4, no event written', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['edit', 'never-added', '--risk', 'high']);
+  assert.equal(result.status, 4);
+  assert.equal(eventLines(cwd).length, 0);
+});
+
+test('edit with zero field flags is rejected as validation, exit 4, no event written', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'edit-no-flags');
+  const before = eventLines(cwd).length;
+  const result = run(cwd, ['edit', 'edit-no-flags']);
+  assert.equal(result.status, 4);
+  assert.equal(eventLines(cwd).length, before);
+});
+
+test('edit --deps pointing at an unknown id is rejected as validation, exit 4, no event written', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'edit-bad-dep');
+  const before = eventLines(cwd).length;
+  const result = run(cwd, ['edit', 'edit-bad-dep', '--deps', 'ghost-dep']);
+  assert.equal(result.status, 4);
+  assert.equal(eventLines(cwd).length, before);
+});
+
+test('edit rejects a patch targeting id/status/stage/domain, exit 4, no event written', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'edit-locked-fields');
+  const before = eventLines(cwd).length;
+  for (const field of ['status', 'stage', 'domain']) {
+    const result = run(cwd, ['edit', 'edit-locked-fields', `--${field}`, 'whatever']);
+    assert.equal(result.status, 4, `--${field} should be rejected`);
+  }
+  assert.equal(eventLines(cwd).length, before);
+  assert.equal(stateView(cwd).work['edit-locked-fields'].status, 'todo');
+});
+
+test('edit succeeds identically regardless of the item current status', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'edit-any-status');
+  run(cwd, ['move', 'edit-any-status', '--to', 'doing']);
+  const result = run(cwd, ['edit', 'edit-any-status', '--risk', 'high']);
+  assert.equal(result.status, 0);
+  const item = stateView(cwd).work['edit-any-status'];
+  assert.equal(item.risk, 'high');
+  assert.equal(item.status, 'doing');
+});
+
+test('a pre-existing event log with no work.edit events replays byte-identical', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'no-edit-here');
+  const before = stateView(cwd);
+  run(cwd, ['rebuild']);
+  assert.deepEqual(stateView(cwd), before);
+});
+
+test('edit omitting --refs/--deps leaves the field untouched; an explicit empty value clears it', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['add', 'edit-refs', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--refs', 'a,b']);
+  assert.equal(result.status, 0);
+
+  const untouched = run(cwd, ['edit', 'edit-refs', '--risk', 'high']);
+  assert.equal(untouched.status, 0);
+  assert.deepEqual(stateView(cwd).work['edit-refs'].refs, ['a', 'b']);
+
+  const cleared = run(cwd, ['edit', 'edit-refs', '--refs', '']);
+  assert.equal(cleared.status, 0);
+  assert.deepEqual(stateView(cwd).work['edit-refs'].refs, []);
+});
+
+test('editWork rejects a patch containing id/status/stage/domain as validation, before merge, no event written', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'edit-store-locked');
+  const dir = path.join(cwd, '.fgos');
+  const before = eventLines(cwd).length;
+  for (const key of ['id', 'status', 'stage', 'domain']) {
+    assert.throws(
+      () => editWork(dir, { id: 'edit-store-locked', patch: { [key]: 'whatever' } }),
+      (err) => err instanceof StoreError && err.category === 'validation',
+      `patch.${key} should be rejected`,
+    );
+  }
+  assert.equal(eventLines(cwd).length, before);
+});
+
+test('edit reports the real event seq in its message, not "undefined"', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'edit-seq-check'); // event #1
+  const result = run(cwd, ['edit', 'edit-seq-check', '--risk', 'high']);
   assert.equal(result.status, 0);
   assert.match(result.stdout, /event #2\b/);
   assert.doesNotMatch(result.stdout, /event #undefined/);

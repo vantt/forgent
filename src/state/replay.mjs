@@ -184,6 +184,19 @@ function applyEvent(view, event) {
       }
       break;
     }
+    case 'work.edit': {
+      // Additive fold (per D3/R11): merges ONLY the patched keys onto the
+      // existing item, mirroring how work.move folds partial fields
+      // (reason, headAtTake, ...) rather than replacing the whole record.
+      // Guarded on `item` for the same ghost-id no-op reason as every other
+      // case here — an edit for an id that was never added stays a no-op.
+      const { id, patch } = event.payload ?? {};
+      const item = view.work[id];
+      if (item && patch && typeof patch === 'object') {
+        Object.assign(item, patch);
+      }
+      break;
+    }
     case 'decision': {
       view.decisions.push({ ...event.payload, ts: event.ts });
       break;

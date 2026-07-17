@@ -126,6 +126,56 @@ export function addWork(dir, work) {
   return { event, view };
 }
 
+// D4/D5: the exact field set `edit` may patch. `id`, `status`, `stage`, and
+// `domain` are deliberately absent — each already has its own dedicated
+// write path (identity is immutable; `status` is `move`'s; `stage` is
+// `moveStage`'s) and mixing them into `edit` would open a second door onto
+// the same field.
+const EDITABLE_FIELDS = new Set(['title', 'kind', 'risk', 'verify', 'tier', 'refs', 'deps']);
+
+/**
+ * Patch fields on an existing work item, through the SAME single write door
+ * as `addWork`/`moveWork` (per D3). Unlike `addWork` (a full new record),
+ * `patch` is a PARTIAL set of fields — only the D4 allowlist above may
+ * appear in it; anything else (including a stray `id`/`status`/`stage`/
+ * `domain`) is rejected as `validation` before the merge even happens, so an
+ * over-broad patch never silently no-ops instead of failing loud. The merged
+ * candidate is validated by the SAME `validateWork` entry point `addWork`
+ * uses — no field rule is re-implemented here. The appended event carries
+ * only `{ id, patch }` (additive, per D3/R11) — never the full record — so
+ * replay can fold exactly the changed keys onto the item.
+ */
+export function editWork(dir, { id, patch, actor } = {}) {
+  const { logPath } = paths(dir);
+  const before = rebuildView(logPath);
+  const work = before.work[id];
+  if (!work) {
+    throw new StoreError('validation', `work "${id}" not found.`);
+  }
+  if (!patch || typeof patch !== 'object' || Array.isArray(patch) || Object.keys(patch).length === 0) {
+    throw new StoreError('validation', 'edit requires at least one field to change.');
+  }
+  for (const key of Object.keys(patch)) {
+    if (!EDITABLE_FIELDS.has(key)) {
+      throw new StoreError(
+        'validation',
+        `edit cannot change "${key}" — allowed fields are: ${[...EDITABLE_FIELDS].join(', ')}.`,
+      );
+    }
+  }
+
+  const candidate = { ...work, ...patch };
+  validateWork(candidate, Object.keys(before.work));
+
+  const payload = { id, patch };
+  if (actor !== undefined) {
+    payload.actor = actor;
+  }
+  const event = appendEvent(logPath, { type: 'work.edit', payload });
+  const view = refreshView(dir);
+  return { event, view };
+}
+
 /**
  * Compose a câu-6 ("learning gì để lại?") record MECHANICALLY from data
  * already folded for `id` in `view` (the PRE-transition view — see moveWork
