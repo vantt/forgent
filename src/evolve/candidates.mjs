@@ -18,7 +18,7 @@ import { listUnsettledFrictionsByWork, WEIGHTS } from '../report/entropy.mjs';
 // `ts` (D12). Friction records append per id in log order, so on equal `ts`
 // the later log entry wins — deterministic either way.
 function latestByTs(records) {
-  return records.reduce((latest, record) => (record.ts > latest.ts ? record : latest));
+  return records.reduce((latest, record) => (record.ts >= latest.ts ? record : latest));
 }
 
 /**

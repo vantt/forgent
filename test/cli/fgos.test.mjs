@@ -1941,6 +1941,17 @@ test('evolve with candidates prints the ranked list with every field id/disposit
   assert.match(result.stdout, /rank-item score=2 \[blocked\] verify-miss\/verification \(attempts 2\): goal-check failed \(exit 1\)/);
 });
 
+test('evolve with a candidate missing disposition/errorClass/layer/attempts never prints the literal "null"', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'sparse-item');
+  const dir = path.join(cwd, '.fgos');
+  addFriction(dir, { id: 'sparse-item' });
+
+  const result = run(cwd, ['evolve']);
+  assert.equal(result.status, 0);
+  assert.doesNotMatch(result.stdout, /null/);
+});
+
 test('evolve --pick <valid-id> prints that candidate\'s full friction record via the existing check formatter, no state change', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'pick-item');

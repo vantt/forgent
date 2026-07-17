@@ -470,7 +470,7 @@ function formatEntropySection(view, dir) {
 // subset" rule). Never capped (unlike FRICTION_DISPLAY_CAP) — Gate A must
 // show every open candidate, since the human is choosing among ALL of them.
 function formatCandidateLine(c) {
-  return `  - ${c.id} score=${c.score} [${c.disposition}] ${c.errorClass}/${c.layer} (attempts ${c.attempts}): ${c.detail ?? ''}`.trimEnd();
+  return `  - ${c.id} score=${c.score} [${c.disposition ?? 'n/a'}] ${c.errorClass ?? 'n/a'}/${c.layer ?? 'n/a'} (attempts ${c.attempts ?? 'n/a'}): ${c.detail ?? ''}`.trimEnd();
 }
 
 function formatCandidateList(candidates) {

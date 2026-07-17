@@ -107,6 +107,22 @@ test('multi-record id: a settlement between records drops only the records befor
   assert.equal(c.score, 1 * WEIGHTS.frictionUnsettled, 'only the post-settlement record stays unsettled');
 });
 
+test('equal-ts tie: the later-in-array record wins the displayed fields, matching log/append order', () => {
+  const view = {
+    frictions: {
+      a: [
+        friction('a', '2026-07-16T00:00:00.000Z', { errorClass: 'first-in-array', layer: 'environment', attempts: 1, detail: 'first' }),
+        friction('a', '2026-07-16T00:00:00.000Z', { errorClass: 'second-in-array', layer: 'verification', attempts: 2, detail: 'second' }),
+      ],
+    },
+  };
+  const [c] = rankCandidates(view);
+  assert.equal(c.errorClass, 'second-in-array', 'on an exact ts tie, the later-encountered record wins');
+  assert.equal(c.layer, 'verification');
+  assert.equal(c.attempts, 2);
+  assert.equal(c.detail, 'second');
+});
+
 test('cross-module regression: candidate scores sum to entropy.mjs\'s own unsettled-friction count for the same view', () => {
   const view = {
     work: { a: { id: 'a', status: 'todo' }, b: { id: 'b', status: 'todo' } },
