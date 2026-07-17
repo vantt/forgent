@@ -31,7 +31,7 @@ import { rankCandidates } from '../src/evolve/candidates.mjs';
 import { rankImpact } from '../src/state/impact.mjs';
 import { runGoalCheck } from '../src/runner/goal-check.mjs';
 import { classifySource, reviewDiff, mergeRunnerItem, cleanupMergedBranch, changedFiles, isWorkingTreeClean as isMainTreeClean, isFgosOnlyStatusLine, detectTrunk } from '../src/runner/merge.mjs';
-import { createGitHubPR, mergeGitHubPR } from '../src/runner/github-adapter.mjs';
+import { createGitHubPR, mergeGitHubPR, viewGitHubPRStatus } from '../src/runner/github-adapter.mjs';
 import { classifyIronLaw } from '../src/evolve/iron-law.mjs';
 import { branchNameFor, branchExists, createWorktree, removeWorktree } from '../src/runner/worktree.mjs';
 import { createSession, endSession, listSessions, SessionError } from '../src/runner/session.mjs';
@@ -1054,6 +1054,34 @@ async function runVerb(verb, flags, positional, dir) {
         if (source !== 'runner') {
           throw new StoreError('validation', `review --github: "${id}" is a ${source}-sourced item — GitHub review requires a runner-sourced item with a live fgw/${id} branch (no branch exists to attach a PR to for pull/legacy items).`);
         }
+
+        // GitHub-close detection (github-adapter D6/D4): `review <id> --github
+        // --pr <n>` skips PR creation and reports an existing PR's live status
+        // read-only. It classifies on `closed` (boolean) + `mergedAt` (null vs
+        // timestamp) only — never on the `state` string, whose closed/merged
+        // values S1's spike never observed. Like every review path it stays
+        // read-only: no moveWork/addFriction under any outcome, because a
+        // GitHub-side close is not itself an approval or reject action (D6);
+        // only local `fgos reject` moves the item. pollTimeoutMs:0 is
+        // load-bearing: this check reads only closed/mergedAt (unrelated to
+        // GitHub's async `mergeable` computation), so it must resolve after a
+        // single `gh pr view` instead of polling up to the default 10s while
+        // `mergeable` may stay "UNKNOWN" forever on a closed PR.
+        const prNumber = optionalField(flags.pr, 'review --github --pr requires a PR number: --pr <n>');
+        if (prNumber !== undefined) {
+          const result = await viewGitHubPRStatus(repoRoot, prNumber, { ...ghCommandOpts(), pollTimeoutMs: 0 });
+          if (result.outcome === 'blocked') {
+            return `Review ${id}: GitHub PR #${prNumber} status check failed (reason ${result.reason}) — no state change.\n${result.detail}`;
+          }
+          if (!result.closed) {
+            return `Review ${id}: GitHub PR #${prNumber} is still open — nothing to reconcile. Approve it after a GitHub-side review with \`fgos approve ${id} --github --pr ${prNumber}\`.`;
+          }
+          if (result.mergedAt) {
+            return `Review ${id}: GitHub PR #${prNumber} was merged (${result.mergedAt}) — informational only, no local state change made here.`;
+          }
+          return `Review ${id}: GitHub PR #${prNumber} was CLOSED WITHOUT MERGING — this is not itself a reject and changes nothing locally. Run \`fgos reject ${id} --reason "..."\` if you want the item back in the todo queue.`;
+        }
+
         const head = branchNameFor(id);
         const rootId = resolveRoot(view, id);
         // Leaf-vs-root base split mirrors approve/review's local path: a root

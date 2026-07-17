@@ -2665,6 +2665,19 @@ fs.writeFileSync(${JSON.stringify(markerPath)}, 'called');
 process.exit(0);`);
 }
 
+// A `pr view` fake for the read-only status check: logs each invocation's argv
+// to `logPath` (so a test can count invocations and prove pollTimeoutMs:0
+// collapses the poll loop to a single read even when `mergeable` is "UNKNOWN"),
+// then prints the given PR-status fields as JSON. `review --github --pr` only
+// ever calls `gh pr view`, so the JSON is emitted unconditionally.
+function writeViewFake(dir, name, logPath, fields) {
+  return writeFakeGh(dir, name,
+    `const fs = require('fs');
+fs.appendFileSync(${JSON.stringify(logPath)}, process.argv.slice(2).join(' ') + '\\n');
+process.stdout.write(${JSON.stringify(JSON.stringify(fields))});
+process.exit(0);`);
+}
+
 // Adds a plain filesystem bare repo as `origin` on the main checkout — no
 // network, no real GitHub. `git push` against it is a normal fast local op,
 // so `review --github`'s push step works against a real remote.
@@ -2811,6 +2824,108 @@ test('approve --github --pr on a fake gh merge failure transitions proposed -> b
   assert.equal(friction.errorClass, 'auth-failure');
   assert.equal(friction.layer, 'environment');
   assert.match(friction.detail, /Bad credentials/);
+});
+
+// --- `review --github --pr <n>` read-only status check (github-adapter D6/D4) ---
+//
+// Detection-only: reports an existing PR's live GitHub status and never mutates
+// FSM state or friction under any outcome (a GitHub-side close is not itself an
+// approval or reject action — only local `fgos reject` moves the item, D6).
+// Classification branches solely on `closed` + `mergedAt`, never the `state`
+// string (S1's spike never observed state's closed/merged values). Every gh is
+// the same subprocess-injected fake; no real gh binary, no network call.
+
+test('review --github --pr on a legacy (non-runner) item is the same runner-sourced validation error as without --pr, and no gh call is attempted', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeLegacyProposedItem(cwd, 'gh-status-legacy');
+  const marker = path.join(cwd, 'gh-was-called');
+  const fake = writeMarkerFake(cwd, marker);
+
+  const result = run(cwd, ['review', 'gh-status-legacy', '--github', '--pr', '9'], { FGOS_GH_COMMAND: fake });
+  assert.equal(result.status, 4, `${result.stdout}${result.stderr}`);
+  assert.match(result.stderr, /runner-sourced item/);
+  assert.equal(stateView(cwd).work['gh-status-legacy'].status, 'proposed');
+  assert.ok(!fs.existsSync(marker), 'the source gate must reject before any gh CLI call, --pr present or not');
+});
+
+test('review --github --pr on a still-open PR (closed:false) reports it is open and mutates neither FSM state nor friction', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeRunnerProposedItem(cwd, 'gh-status-open');
+  const ghLog = path.join(cwd, 'gh-view.log');
+  const fake = writeViewFake(cwd, 'gh-view-open.cjs', ghLog,
+    { state: 'OPEN', mergeable: 'MERGEABLE', mergeStateStatus: 'CLEAN', mergedAt: null, closed: false, closedAt: null });
+
+  const result = run(cwd, ['review', 'gh-status-open', '--github', '--pr', '11'], { FGOS_GH_COMMAND: fake });
+  assert.equal(result.status, 0, `${result.stdout}${result.stderr}`);
+  assert.match(result.stdout, /PR #11 is still open/);
+  // Crossed the real process boundary as a status read, never a create/push.
+  assert.match(fs.readFileSync(ghLog, 'utf8'), /pr view 11/);
+  const view = stateView(cwd);
+  assert.equal(view.work['gh-status-open'].status, 'proposed');
+  assert.equal(view.frictions?.['gh-status-open'], undefined, 'the status check never records friction');
+});
+
+test('review --github --pr on a merged PR (closed:true, mergedAt set) reports it merged, informational only, with no local state or friction change', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeRunnerProposedItem(cwd, 'gh-status-merged');
+  const ghLog = path.join(cwd, 'gh-view.log');
+  const fake = writeViewFake(cwd, 'gh-view-merged.cjs', ghLog,
+    { state: 'MERGED', mergeable: 'MERGEABLE', mergeStateStatus: 'CLEAN', mergedAt: '2026-07-17T10:00:00Z', closed: true, closedAt: '2026-07-17T10:00:00Z' });
+
+  const result = run(cwd, ['review', 'gh-status-merged', '--github', '--pr', '42'], { FGOS_GH_COMMAND: fake });
+  assert.equal(result.status, 0, `${result.stdout}${result.stderr}`);
+  assert.match(result.stdout, /PR #42 was merged/);
+  const view = stateView(cwd);
+  // This cell never reconciles a GitHub-side merge into FSM state (out of scope, D4/D6).
+  assert.equal(view.work['gh-status-merged'].status, 'proposed');
+  assert.equal(view.frictions?.['gh-status-merged'], undefined);
+});
+
+test('review --github --pr on a closed-without-merge PR names the PR, points to fgos reject, mutates nothing, and resolves in exactly one gh invocation with mergeable UNKNOWN — proving pollTimeoutMs:0', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeRunnerProposedItem(cwd, 'gh-status-closed');
+  const ghLog = path.join(cwd, 'gh-view.log');
+  // mergeable:"UNKNOWN" is the honest test: were pollTimeoutMs the default 10s
+  // (fix absent), viewGitHubPRStatus would re-invoke this fake on a poll loop
+  // while mergeable stays UNKNOWN. Exactly one logged invocation proves the
+  // pollTimeoutMs:0 override collapsed the loop to a single read.
+  const fake = writeViewFake(cwd, 'gh-view-closed.cjs', ghLog,
+    { state: 'CLOSED', mergeable: 'UNKNOWN', mergeStateStatus: 'UNKNOWN', mergedAt: null, closed: true, closedAt: '2026-07-17T09:00:00Z' });
+
+  const startedAt = Date.now();
+  const result = run(cwd, ['review', 'gh-status-closed', '--github', '--pr', '77'], { FGOS_GH_COMMAND: fake });
+  const elapsedMs = Date.now() - startedAt;
+
+  assert.equal(result.status, 0, `${result.stdout}${result.stderr}`);
+  assert.match(result.stdout, /PR #77 was CLOSED WITHOUT MERGING/);
+  assert.match(result.stdout, /fgos reject gh-status-closed --reason/);
+
+  const invocations = fs.readFileSync(ghLog, 'utf8').trim().split('\n').filter(Boolean);
+  assert.equal(invocations.length, 1, `expected exactly one gh invocation under pollTimeoutMs:0, got ${invocations.length}`);
+  assert.ok(elapsedMs < 5000, `status check must resolve well under the default 10s poll timeout, took ${elapsedMs}ms`);
+
+  const view = stateView(cwd);
+  assert.equal(view.work['gh-status-closed'].status, 'proposed', 'a GitHub-side close is not a reject — no FSM mutation');
+  assert.equal(view.frictions?.['gh-status-closed'], undefined, 'the status check never records friction');
+});
+
+test('review --github --pr reports a gh status-check failure as plain output with no state mutation or friction', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeRunnerProposedItem(cwd, 'gh-status-failed');
+  const fake = writeAuthFailFake(cwd);
+
+  const result = run(cwd, ['review', 'gh-status-failed', '--github', '--pr', '5'], { FGOS_GH_COMMAND: fake });
+  assert.equal(result.status, 0, `${result.stdout}${result.stderr}`);
+  assert.match(result.stdout, /status check failed \(reason auth-failure\)/);
+  assert.match(result.stdout, /no state change/);
+  const view = stateView(cwd);
+  assert.equal(view.work['gh-status-failed'].status, 'proposed');
+  assert.equal(view.frictions?.['gh-status-failed'], undefined);
 });
 
 // --- catchup (D6/D7/D11: unified catch-up-by-merge for a merge-related park) ---
