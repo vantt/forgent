@@ -98,6 +98,35 @@ function unlinkFgosSymlink(worktreePath) {
   }
 }
 
+/** After the `.fgos` symlink is unlinked, git still holds this worktree's
+ * committed `.fgos` content (events.jsonl et al. — git-tracked in this repo per
+ * D10) as DELETED on disk, since createSession removed the checked-out copy at
+ * creation time. That deleted-tracked state makes a PLAIN `git worktree remove`
+ * refuse ("contains modified or untracked files"), blocking every non-diverged
+ * endSession. Restore the tracked content from HEAD so the working tree honestly
+ * agrees with the index again — we keep git's real dirty-tree refusal as the
+ * safety net rather than bypassing it with --force. A genuine no-op when `.fgos`
+ * was never tracked at HEAD (the gitignored-.fgos case): the ls-tree gate skips
+ * cleanly, so existing behavior there is unchanged. Scoped strictly to THIS
+ * session's own worktree; the shared repoRoot `.fgos/` store is never touched,
+ * and only HEAD's committed content (never live events) is materialized, moments
+ * before the worktree is deleted wholesale. */
+function restoreTrackedFgos(worktreePath) {
+  let tracked;
+  try {
+    tracked = gitAt(worktreePath, ['ls-tree', 'HEAD', '--', '.fgos']).trim();
+  } catch {
+    return; // cannot inspect HEAD — leave git's own remove-time check as the arbiter
+  }
+  if (!tracked) return; // .fgos not tracked at HEAD — nothing to restore
+  try {
+    gitAt(worktreePath, ['checkout', '--', '.fgos']);
+  } catch {
+    // best-effort: if the restore did not fully clean the tree, the subsequent
+    // plain `git worktree remove` stays the honest arbiter and still refuses.
+  }
+}
+
 /** One attempt at the wx-atomic-create lock, mirroring loop.mjs's
  * `acquireRunnerLock` exactly. Returns whether the lock was taken, and — on a
  * live holder — its pid. NEVER creates the lock in the same attempt that
@@ -402,6 +431,7 @@ export function endSession(repoRoot, sessionId, { force = false } = {}) {
     }
 
     unlinkFgosSymlink(entry.worktreePath);
+    restoreTrackedFgos(entry.worktreePath);
     const args = ['worktree', 'remove', entry.worktreePath];
     if (force) args.push('--force');
     try {

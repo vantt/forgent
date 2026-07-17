@@ -288,6 +288,32 @@ test('endSession removes a non-diverged session via plain remove and clears its 
   }
 });
 
+test('endSession removes a non-diverged session without force when .fgos is git-tracked at HEAD', () => {
+  // Real product-repo condition (D10): .fgos/events.jsonl is committed into HEAD,
+  // so createSession checks out then removes a tracked .fgos copy. endSession must
+  // still remove a non-diverged session with a plain remove (no force), by
+  // restoring the tracked content before the removal.
+  const repoRoot = initTempRepoWithCommittedFgos();
+  const sessionsDir = mkSessionsDir();
+  try {
+    const sess = createSession(repoRoot, { sessionId: 'committed-fgos-end', sessionsDir });
+    assert.equal(listSessions(repoRoot).length, 1);
+
+    // non-diverged: no commits were made inside the session worktree
+    endSession(repoRoot, 'committed-fgos-end');
+
+    assert.equal(listSessions(repoRoot).length, 0, 'registry entry removed');
+    assert.ok(!fs.existsSync(sess.worktreePath), 'worktree directory genuinely gone');
+    const listed = execFileSync('git', ['worktree', 'list', '--porcelain'], { cwd: repoRoot, encoding: 'utf8' });
+    assert.ok(!listed.includes('detached'), 'no session worktree remains registered in git');
+
+    // the shared store's committed events.jsonl is untouched by the restore + remove
+    assert.equal(fs.readFileSync(path.join(repoRoot, '.fgos', 'events.jsonl'), 'utf8'), '{"seed":true}\n');
+  } finally {
+    cleanup(repoRoot, sessionsDir);
+  }
+});
+
 test('endSession refuses a diverged session without force, naming the dangling sha; force removes it', () => {
   const repoRoot = initTempRepo();
   const sessionsDir = mkSessionsDir();
