@@ -50,6 +50,7 @@ import { DEFAULTS } from '../state/work.mjs';
 import { resolveAction, resolveStaleDoing } from './recovery.mjs';
 import {
   visitCount,
+  visitsSinceLastHumanEvent,
   hasExceededMaxVisits,
   createMissBreaker,
   MAX_VISITS,
@@ -58,6 +59,8 @@ import {
 import { spawnWorker, modelForTier } from './dispatch.mjs';
 import { createWorktree, removeWorktree, listLeftovers, branchNameFor } from './worktree.mjs';
 import { runGoalCheck } from './goal-check.mjs';
+import { createWriteQueue } from './write-queue.mjs';
+import { createOwnershipStore, resolveRoot, claimRoot, steerFrontier } from './root-affinity.mjs';
 import { resolveDiscovery } from '../intake/discovery.mjs';
 import { resolveDecompose } from '../intake/decompose.mjs';
 
@@ -87,6 +90,60 @@ const FRICTION_LAYER = Object.freeze({
 export const EXIT_BUSY = 6;
 
 export const LOCK_FILE = 'runner.lock';
+
+/** Two-tier parallelism defaults (D10), applied when `.fgos-runner.json`
+ * declares no `parallel` block at all — every existing config keeps working
+ * with zero changes. `maxRoots` caps concurrent ROOTS in flight; the wave a
+ * single poll dispatches is bounded by `maxRoots * maxLeavesPerRoot`, and
+ * `min(cap, |ready|)` throughout. */
+export const DEFAULT_MAX_ROOTS = 4;
+export const DEFAULT_MAX_LEAVES_PER_ROOT = 4;
+
+/** P6 is single-machine (D14): one fixed owner identity for the entire
+ * drain-run, threaded through root-affinity's in-memory ownership store. A
+ * future P27 multi-machine deploy would pass a real machine/session id here;
+ * P6 needs only a constant — root-affinity never interprets it, only compares
+ * for equality. */
+export const RUNNER_OWNER_IDENTITY = 'local';
+
+function positiveIntOr(value, fallback) {
+  return Number.isInteger(value) && value > 0 ? value : fallback;
+}
+
+/** Read the two-tier cap (D10) from the runner config's OPTIONAL `parallel`
+ * block, falling back to the in-code defaults when it (or a field) is absent.
+ * dispatch.mjs's `loadRunnerConfig` already rejects a malformed block at load
+ * time, so this stays lenient: a hand-built test config with no `parallel`
+ * key behaves exactly like a real config that omits it. */
+function resolveParallel(config) {
+  const parallel = config?.parallel;
+  return {
+    maxRoots: positiveIntOr(parallel?.maxRoots, DEFAULT_MAX_ROOTS),
+    maxLeavesPerRoot: positiveIntOr(parallel?.maxLeavesPerRoot, DEFAULT_MAX_LEAVES_PER_ROOT),
+  };
+}
+
+/** Group the steered ready set by resolved root and take a bounded wave: up
+ * to `maxRoots` distinct roots (FIFO), and within each up to
+ * `maxLeavesPerRoot` of its ready items (D10). Frontier FIFO order is
+ * preserved — `steered` already arrives in frontier order and a `Map` keeps
+ * first-insertion root order. */
+function selectWave(steered, view, { maxRoots, maxLeavesPerRoot }) {
+  const byRoot = new Map();
+  for (const item of steered) {
+    const root = resolveRoot(view, item.id);
+    if (!byRoot.has(root)) byRoot.set(root, []);
+    byRoot.get(root).push(item);
+  }
+  const wave = [];
+  let rootsTaken = 0;
+  for (const items of byRoot.values()) {
+    if (rootsTaken >= maxRoots) break;
+    rootsTaken += 1;
+    for (const item of items.slice(0, maxLeavesPerRoot)) wave.push(item);
+  }
+  return wave;
+}
 
 /** Signal-0 liveness probe. EPERM means the pid exists but belongs to
  * another user — still very much alive, so still busy. */
@@ -268,7 +325,7 @@ function safeRemoveWorktree(repoRoot, worktreePath, log) {
  * With `dryRun` nothing is written, no worktree is created, no branch is
  * deleted — only the planned resolutions are reported.
  */
-export function startupReap({ repoRoot, dir, worktreeDir, verifyTimeoutMs, log = () => {}, dryRun = false } = {}) {
+export async function startupReap({ repoRoot, dir, worktreeDir, verifyTimeoutMs, log = () => {}, dryRun = false } = {}) {
   const view = listWork(dir);
   const resolutions = [];
 
@@ -300,7 +357,7 @@ export function startupReap({ repoRoot, dir, worktreeDir, verifyTimeoutMs, log =
       let wt = null;
       try {
         wt = createWorktree(repoRoot, id, { worktreeDir });
-        verifyPassed = runGoalCheck(item, wt.path, verifyTimeoutMs).passed;
+        verifyPassed = (await runGoalCheck(item, wt.path, verifyTimeoutMs)).passed;
       } catch (err) {
         // A worktree-fail here (e.g. this branch is irreconcilably checked
         // out somewhere even after the reclaim in worktree.mjs) must never
@@ -366,12 +423,57 @@ export function startupReap({ repoRoot, dir, worktreeDir, verifyTimeoutMs, log =
  * runner's own `runGoalCheck`/`branchFacts`, never the worker's own
  * status/signal (D3) — the worker's report is never trusted on its own.
  */
-function processItem({ repoRoot, dir, item, config, worktreeDir, breaker, log, priorVisits }) {
-  moveWork(dir, { id: item.id, to: 'doing', expectedStatus: 'todo', actor: 'runner' });
+/**
+ * Claim one item as a SINGLE atomic write-queue transaction (D13/D16): read a
+ * FRESH view, resolve the item's root, decide ownership, apply the owner set,
+ * and move `todo -> doing` — decide-and-apply-and-write all inside the one
+ * `enqueue()` body, never on a pre-read snapshot. This is exactly the shape
+ * the D13 2-actor race spike proved race-free: computing the decision on a
+ * stale snapshot outside the queue reopens the very race the single write-door
+ * exists to close.
+ *
+ * On single-machine P6 (one fixed `ownerIdentity`) the decision is always
+ * accepted — `claim` for a root's first leaf, `noop` for a later leaf of an
+ * already-owned root. The `reject` branch is real, working code (a different
+ * owner already holds the root) but never fires in-process; a rejected item is
+ * simply left in the frontier for a later poll rather than dispatched.
+ */
+async function claimItem({ dir, ownershipStore, queue, ownerIdentity, item }) {
+  return queue.enqueue(async () => {
+    const freshView = listWork(dir);
+    const decision = claimRoot(ownershipStore, freshView, item.id, ownerIdentity);
+    if (decision.action === 'claim') ownershipStore.setOwner(decision.root, ownerIdentity);
+    if (decision.accepted) {
+      moveWork(dir, { id: item.id, to: 'doing', expectedStatus: 'todo', actor: 'runner' });
+    }
+    return decision;
+  });
+}
+
+/**
+ * Run one ALREADY-CLAIMED item (`doing`) through the dispatch pipeline:
+ * predicted outcome, then the per-attempt loop (fresh worktree → async worker
+ * → goal-check → propose/park/halt). Every state mutation — the predicted
+ * outcome, the propose/park move, the actual outcome, the friction record —
+ * goes through the shared write-queue as its OWN atomic transaction, so N of
+ * these running concurrently never interleave a raw log write (D16). The
+ * worker spawn and goal-check run OUTSIDE the queue: that is where the real
+ * parallelism lives (the coordinator stays I/O-light).
+ *
+ * The consecutive-miss breaker is now keyed per item id (cell
+ * fan-out-parallel-5): concurrent items' misses never conflate. COMPOUND-
+ * LEARNING payloads are unchanged from the sequential version — predicted at
+ * claim, actual at the two terminal exits (pass, and the park/halt block that
+ * covers both `parked` and `halted`), sourced from the runner's own
+ * goal-check/branchFacts, never the worker's own status/signal (D3).
+ */
+async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, breaker, queue, log, priorVisits }) {
   log(`fgos-runner: claimed "${item.id}" (todo -> doing)`);
-  addOutcome(dir, {
-    id: item.id,
-    predicted: { tier: item.tier ?? DEFAULTS.tier, deps: item.deps.length, priorVisits },
+  await queue.enqueue(async () => {
+    addOutcome(dir, {
+      id: item.id,
+      predicted: { tier: item.tier ?? DEFAULTS.tier, deps: item.deps.length, priorVisits },
+    });
   });
 
   let attempt = 0;
@@ -390,27 +492,42 @@ function processItem({ repoRoot, dir, item, config, worktreeDir, breaker, log, p
         execFileSync('git', ['clean', '-fdq'], { cwd: wt.path, encoding: 'utf8', shell: false });
       }
 
-      const worker = spawnWorker(item, config, wt.path);
+      // Human feedback rides into the worker prompt (worker-feedback): the
+      // clarify answer and the latest reject/park reason are how a reject
+      // loop converges — without them the next round re-produces the same
+      // rejected proposal. Read fresh: `item` predates this claim's moves.
+      const feedbackView = listWork(dir);
+      const worker = await spawnWorker(item, config, wt.path, {
+        feedback: {
+          answer: feedbackView.gates?.[item.id]?.answer,
+          reason: feedbackView.work?.[item.id]?.reason,
+        },
+      });
       log(`fgos-runner: worker for "${item.id}" exited ${worker.status ?? `signal ${worker.signal}`} (tier ${worker.tier} -> ${worker.model})`);
 
-      const check = runGoalCheck(item, wt.path, config.timeoutMs);
+      const check = await runGoalCheck(item, wt.path, config.timeoutMs);
       const facts = branchFacts(repoRoot, wt.branch);
 
       if (check.passed && facts.aheadCount > 0) {
-        breaker.recordHit();
-        moveWork(dir, { id: item.id, to: 'proposed', expectedStatus: 'doing', actor: 'runner' });
+        breaker.recordHit(item.id);
+        await queue.enqueue(async () => {
+          moveWork(dir, { id: item.id, to: 'proposed', expectedStatus: 'doing', actor: 'runner' });
+        });
         log(`fgos-runner: "${item.id}" proposed on branch ${wt.branch} (${facts.aheadCount} commit(s))`);
         log(`fgos-runner: verify tail:\n${tailLines(check.output)}`);
-        addOutcome(dir, {
-          id: item.id,
-          actual: {
-            outcome: 'proposed',
-            passed: true,
-            attempts: attempt,
-            errorClass: null,
-            aheadCount: facts.aheadCount,
-            visits: visitCount(readRawEvents(dir), item.id),
-          },
+        const visits = visitCount(readRawEvents(dir), item.id);
+        await queue.enqueue(async () => {
+          addOutcome(dir, {
+            id: item.id,
+            actual: {
+              outcome: 'proposed',
+              passed: true,
+              attempts: attempt,
+              errorClass: null,
+              aheadCount: facts.aheadCount,
+              visits,
+            },
+          });
         });
         return { outcome: 'proposed', id: item.id, branch: wt.branch, attempts: attempt, exitCode: 0 };
       }
@@ -421,7 +538,7 @@ function processItem({ repoRoot, dir, item, config, worktreeDir, breaker, log, p
           ? 'verify passed but the branch carries no commit — the worker must commit its work'
           : `goal-check failed (exit ${check.status})`,
       };
-      breaker.recordMiss();
+      breaker.recordMiss(item.id);
       log(`fgos-runner: goal-check miss for "${item.id}" (attempt ${attempt}): ${failure.message}`);
       log(`fgos-runner: verify tail:\n${tailLines(check.output)}`);
     } catch (err) {
@@ -431,8 +548,8 @@ function processItem({ repoRoot, dir, item, config, worktreeDir, breaker, log, p
         failure = { errorClass: err.errorClass, message: err.message };
         log(`fgos-runner: ${err.errorClass} for "${item.id}" (attempt ${attempt}): ${err.message}`);
       } else {
-        // Store/CAS/config errors bubble to runOnce's classifier — the
-        // finally below still removes the worktree on this path too.
+        // Store/CAS/config errors bubble to claimAndDispatch's classifier —
+        // the finally below still removes the worktree on this path too.
         throw err;
       }
     } finally {
@@ -440,7 +557,7 @@ function processItem({ repoRoot, dir, item, config, worktreeDir, breaker, log, p
     }
 
     const decision = resolveAction(failure.errorClass, attempt);
-    const tripped = breaker.isTripped();
+    const tripped = breaker.isTripped(item.id);
 
     if (decision.action === 'retry' && !tripped) {
       log(`fgos-runner: retrying "${item.id}" (attempt ${attempt + 1}, fresh worktree, branch reused)`);
@@ -450,28 +567,34 @@ function processItem({ repoRoot, dir, item, config, worktreeDir, breaker, log, p
     // Park before any halt so the item never dangles in `doing`. The FSM
     // records the edge itself; the reason lives in the runner's report (the
     // doing -> blocked edge carries no reason payload by design).
-    moveWork(dir, {
-      id: item.id,
-      to: 'blocked',
-      expectedStatus: 'doing',
-      reason: tripped ? 'breaker-tripped' : failure.errorClass,
-      actor: 'runner',
+    await queue.enqueue(async () => {
+      moveWork(dir, {
+        id: item.id,
+        to: 'blocked',
+        expectedStatus: 'doing',
+        reason: tripped ? 'breaker-tripped' : failure.errorClass,
+        actor: 'runner',
+      });
     });
 
     // Single ACTUAL emission covering BOTH `parked` and `halted` (every
     // failure exit below already passed through the moveWork above) — per
     // D3, sourced from the runner's own branchFacts, not the worker's
     // status/signal.
-    addOutcome(dir, {
-      id: item.id,
-      actual: {
-        outcome: tripped || decision.action === 'halt' ? 'halted' : 'parked',
-        passed: false,
-        attempts: attempt,
-        errorClass: failure.errorClass,
-        aheadCount: branchFacts(repoRoot, branchNameFor(item.id)).aheadCount,
-        visits: visitCount(readRawEvents(dir), item.id),
-      },
+    const aheadCount = branchFacts(repoRoot, branchNameFor(item.id)).aheadCount;
+    const visits = visitCount(readRawEvents(dir), item.id);
+    await queue.enqueue(async () => {
+      addOutcome(dir, {
+        id: item.id,
+        actual: {
+          outcome: tripped || decision.action === 'halt' ? 'halted' : 'parked',
+          passed: false,
+          attempts: attempt,
+          errorClass: failure.errorClass,
+          aheadCount,
+          visits,
+        },
+      });
     });
 
     // Friction channel — kênh 2 của capture 2 kênh (Phase 3 Slice 2 /
@@ -480,17 +603,19 @@ function processItem({ repoRoot, dir, item, config, worktreeDir, breaker, log, p
     // FRICTION_LAYER below. Emitted alongside (never instead of) the actual
     // outcome half: outcome carries the numbers the predicted-half is scored
     // against; friction carries the attribution compound-learning mines.
-    addFriction(dir, {
-      id: item.id,
-      disposition: tripped || decision.action === 'halt' ? 'halted' : 'parked',
-      errorClass: failure.errorClass,
-      layer: FRICTION_LAYER[failure.errorClass] ?? 'task-spec',
-      attempts: attempt,
-      detail: failure.message,
+    await queue.enqueue(async () => {
+      addFriction(dir, {
+        id: item.id,
+        disposition: tripped || decision.action === 'halt' ? 'halted' : 'parked',
+        errorClass: failure.errorClass,
+        layer: FRICTION_LAYER[failure.errorClass] ?? 'task-spec',
+        attempts: attempt,
+        detail: failure.message,
+      });
     });
 
     if (tripped) {
-      log(`fgos-runner: halting — consecutive-miss breaker tripped (${breaker.consecutiveMisses} miss(es)); "${item.id}" parked`);
+      log(`fgos-runner: halting — consecutive-miss breaker tripped (${breaker.consecutiveMissesFor(item.id)} miss(es)); "${item.id}" parked`);
       return { outcome: 'halted', reason: 'breaker-tripped', id: item.id, errorClass: failure.errorClass, attempts: attempt, exitCode: 1 };
     }
     if (decision.action === 'halt') {
@@ -504,16 +629,57 @@ function processItem({ repoRoot, dir, item, config, worktreeDir, breaker, log, p
 }
 
 /**
- * One sequential pass (per A1 — `--once` is Phase 2's only mode): reap,
- * then take the frontier head (FIFO per A2), gate it through anti-loop, and
- * run it to proposed/parked/halted. An item that trips max-visits is parked
- * via the existing `todo -> blocked` edge (per D5) — it genuinely leaves
- * the frontier, so the loop moves on to the next head instead of hovering.
- *
- * Returns a result object; never throws for a classified halt (the caller
- * maps `exitCode` straight to the process exit).
+ * Claim then dispatch one item, mapping a store/CAS failure to a defined
+ * halted result exactly as the sequential runOnce's own catch used to (a
+ * `conflict` -> `state-conflict`, exit 3; other classified store categories
+ * to their own code). A genuinely unexpected (uncategorized) error is
+ * re-thrown so it surfaces as a rejected wave result and, through runOnce's
+ * outer catch, exits 1 like a real bug always did. `priorVisits` is read
+ * before the claim's own `doing` move, matching the sequential predicted
+ * payload.
  */
-export function runOnce(options = {}) {
+async function claimAndDispatch(ctx) {
+  const { dir, item, log } = ctx;
+  const priorVisits = visitCount(readRawEvents(dir), item.id);
+  try {
+    const decision = await claimItem(ctx);
+    if (!decision.accepted) {
+      log(`fgos-runner: claim for "${item.id}" rejected — root held by "${decision.currentOwner}"; left for a later poll`);
+      return { outcome: 'claim-rejected', id: item.id, currentOwner: decision.currentOwner, exitCode: 0 };
+    }
+    return await dispatchClaimedItem({ ...ctx, priorVisits });
+  } catch (err) {
+    const category = categoryOf(err);
+    const exitCode = EXIT_CODES[category];
+    if (exitCode === undefined) throw err; // a real bug — surfaces via runOnce's outer catch (exit 1)
+    const errorClass = category === 'conflict' ? 'state-conflict' : category;
+    log(`fgos-runner: halting (${errorClass}): ${err.message}`);
+    return { outcome: 'halted', errorClass, id: item.id, message: err.message, exitCode };
+  }
+}
+
+/**
+ * One bounded DRAIN-RUN (D10/D13/D14/D15): reap, sweep, then poll the FULL
+ * ready set, steer it through root-affinity (D13), and dispatch a bounded
+ * wave — up to `maxRoots × maxLeavesPerRoot` items (D10) — CONCURRENTLY. Each
+ * wave is awaited to settle, then the frontier is re-polled and the run
+ * refills up to the caps until nothing is in-flight AND the frontier is empty
+ * (D15's poll-on-completion, FIFO-by-seq, bounded terminating drain — not
+ * P8's persistent signal-driven reactor). One in-memory ownership store and
+ * one write-queue are created here per invocation and threaded through the
+ * whole drain-run (D16's in-process write-door); the store is never persisted.
+ *
+ * RETURN SHAPE (changed from the sequential single-item version): a real
+ * dispatch run returns `{ outcome: 'drained', dispatched: [...perItem],
+ * parked: [...anti-loop], reap, exitCode }`. `busy` (lock contention) and
+ * `idle` (nothing to drain) and `dry-run` keep their existing top-level
+ * shapes — they are pre-dispatch short-circuits with nothing to drain.
+ * `exitCode` follows the same contract: 0 normally, 1 on a halt, the store
+ * category code (e.g. 3 for a state-conflict) when a halt came from a CAS
+ * failure. An item that trips max-visits is still parked via `todo -> blocked`
+ * (per D5) and reported in `parked`; a per-item halt stops further refills.
+ */
+export async function runOnce(options = {}) {
   const log = options.log ?? ((...args) => console.log(...args));
   const dryRun = options.dryRun ?? false;
   const repoRoot = options.repoRoot ?? resolveRepoRoot(options.cwd ?? process.cwd());
@@ -537,7 +703,7 @@ export function runOnce(options = {}) {
   }
 
   try {
-    const reap = startupReap({ repoRoot, dir, worktreeDir, verifyTimeoutMs: config?.timeoutMs, log, dryRun });
+    const reap = await startupReap({ repoRoot, dir, worktreeDir, verifyTimeoutMs: config?.timeoutMs, log, dryRun });
 
     // CLARIFY SWEEP (D13): the safety net for context-discovery. Before any
     // executing item is dispatched, resolve every clarify+todo item —
@@ -573,49 +739,98 @@ export function runOnce(options = {}) {
       }
     }
 
-    while (true) {
+    // DRY-RUN preview keeps the sequential contract exactly: a preview reports
+    // just the FIRST planned item (or the first anti-loop park), never the real
+    // batch — dry-run's job is a preview, not the drain (cell action (6)).
+    if (dryRun) {
       const frontierItems = readyWork(dir);
       if (frontierItems.length === 0) {
         log('fgos-runner: frontier empty — nothing to do.');
-        return { outcome: 'idle', reap, parked, exitCode: 0 };
+        return { outcome: 'idle', reap, parked, dispatched: [], exitCode: 0 };
       }
-
       const item = frontierItems[0];
-      const visits = visitCount(readRawEvents(dir), item.id);
-
+      // Gate on the human-rounds D1 budget (resets on the item's own last
+      // human answer/reject-with-reason), not the lifetime visitCount above
+      // — see anti-loop.mjs's visitsSinceLastHumanEvent.
+      const visits = visitsSinceLastHumanEvent(readRawEvents(dir), item.id);
       if (hasExceededMaxVisits(visits, maxVisits)) {
-        if (dryRun) {
-          return {
-            outcome: 'dry-run',
-            plan: { park: item.id, reason: 'anti-loop-max-visits', visits },
-            reap,
-            parked,
-            exitCode: 0,
-          };
-        }
-        moveWork(dir, { id: item.id, to: 'blocked', expectedStatus: 'todo', reason: 'anti-loop-max-visits', actor: 'runner' });
-        log(`fgos-runner: parked "${item.id}" — anti-loop max-visits (${visits}/${maxVisits})`);
-        parked.push({ id: item.id, reason: 'anti-loop-max-visits', visits });
-        continue; // the parked item left the frontier; take the next head
+        return { outcome: 'dry-run', plan: { park: item.id, reason: 'anti-loop-max-visits', visits }, reap, parked, exitCode: 0 };
       }
-
-      if (dryRun) {
-        const tier = item.tier ?? DEFAULTS.tier;
-        const plan = {
-          dispatch: item.id,
-          tier,
-          model: modelForTier(config, tier),
-          branch: branchNameFor(item.id),
-          verify: item.verify,
-          visits,
-        };
-        log(`fgos-runner: dry-run — would dispatch "${item.id}" (tier ${plan.tier} -> ${plan.model}) on ${plan.branch}`);
-        return { outcome: 'dry-run', plan, reap, parked, exitCode: 0 };
-      }
-
-      const result = processItem({ repoRoot, dir, item, config, worktreeDir, breaker, log, priorVisits: visits });
-      return { ...result, reap, parked };
+      const tier = item.tier ?? DEFAULTS.tier;
+      const plan = {
+        dispatch: item.id,
+        tier,
+        model: modelForTier(config, tier),
+        branch: branchNameFor(item.id),
+        verify: item.verify,
+        visits,
+      };
+      log(`fgos-runner: dry-run — would dispatch "${item.id}" (tier ${plan.tier} -> ${plan.model}) on ${plan.branch}`);
+      return { outcome: 'dry-run', plan, reap, parked, exitCode: 0 };
     }
+
+    // DRAIN RUN. One ownership store + one write-queue for the whole run
+    // (D13/D16). Each wave is awaited to full settlement before the next poll,
+    // so "in-flight" is 0 at every poll boundary and the exit condition
+    // reduces to "no dispatchable wave remains" (D15).
+    const ownershipStore = createOwnershipStore();
+    const queue = options.queue ?? createWriteQueue();
+    const ownerIdentity = options.ownerIdentity ?? RUNNER_OWNER_IDENTITY;
+    const parallel = resolveParallel(config);
+    const dispatched = [];
+    let haltExitCode = null;
+
+    while (true) {
+      const frontierItems = readyWork(dir);
+
+      // Anti-loop max-visits parks every over-limit item (they genuinely
+      // leave the frontier via `todo -> blocked`, per D5), then re-polls —
+      // exactly the sequential loop's per-head guard, applied to the whole
+      // ready set before steering. Gated on the human-rounds D1 budget
+      // (visitsSinceLastHumanEvent), not the lifetime visitCount — a human's
+      // answer or reject-with-reason resets an item's own budget, per-item.
+      const overLimit = frontierItems.filter(
+        (it) => hasExceededMaxVisits(visitsSinceLastHumanEvent(readRawEvents(dir), it.id), maxVisits),
+      );
+      if (overLimit.length > 0) {
+        for (const it of overLimit) {
+          const visits = visitsSinceLastHumanEvent(readRawEvents(dir), it.id);
+          await queue.enqueue(async () => {
+            moveWork(dir, { id: it.id, to: 'blocked', expectedStatus: 'todo', reason: 'anti-loop-max-visits', actor: 'runner' });
+          });
+          log(`fgos-runner: parked "${it.id}" — anti-loop max-visits (${visits}/${maxVisits})`);
+          parked.push({ id: it.id, reason: 'anti-loop-max-visits', visits });
+        }
+        continue; // the parked items left the frontier; re-poll
+      }
+
+      const view = listWork(dir);
+      const steered = steerFrontier(frontierItems, view, ownershipStore, ownerIdentity);
+      const wave = selectWave(steered, view, parallel);
+      if (wave.length === 0) break; // nothing dispatchable — drain complete
+
+      const ctxBase = { repoRoot, dir, config, worktreeDir, breaker, queue, log, ownershipStore, ownerIdentity };
+      const settled = await Promise.allSettled(wave.map((item) => claimAndDispatch({ ...ctxBase, item })));
+
+      let progressed = false;
+      for (const s of settled) {
+        if (s.status === 'rejected') throw s.reason; // uncategorized real bug -> outer catch (exit 1)
+        const r = s.value;
+        if (r.outcome === 'claim-rejected') continue; // never dispatched; left for a later poll
+        progressed = true;
+        dispatched.push(r);
+        if (r.outcome === 'halted') haltExitCode = r.exitCode;
+      }
+
+      if (haltExitCode !== null) break; // a halt stops the whole drain-run
+      if (!progressed) break; // an all-rejected wave made no progress — never spin
+    }
+
+    if (dispatched.length === 0) {
+      log('fgos-runner: frontier empty — nothing to do.');
+      return { outcome: 'idle', reap, parked, dispatched, exitCode: 0 };
+    }
+    return { outcome: 'drained', dispatched, parked, reap, exitCode: haltExitCode ?? 0 };
   } catch (err) {
     const category = categoryOf(err);
     const exitCode = EXIT_CODES[category];

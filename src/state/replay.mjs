@@ -44,7 +44,7 @@ function applyEvent(view, event) {
       break;
     }
     case 'work.move': {
-      const { id, to, ask, answer, actor, learning, headAtTake, headAtReturn } = event.payload ?? {};
+      const { id, to, ask, answer, actor, learning, headAtTake, headAtReturn, branchHeadAtTake, branchHeadAtReturn, reason } = event.payload ?? {};
       const item = view.work[id];
       if (item) {
         item.status = to;
@@ -68,6 +68,22 @@ function applyEvent(view, event) {
         if (headAtTake !== undefined) {
           item.headAtTake = headAtTake;
         }
+        // Branch-source claim marker (human-rounds D2): the branch's OWN
+        // HEAD at take time, discriminator for a blocked-item-with-branch
+        // take — set only on THIS claim's `to === 'doing'` move, mirroring
+        // headAtTake exactly, never on a main-based take (which carries
+        // headAtTake instead).
+        if (branchHeadAtTake !== undefined) {
+          item.branchHeadAtTake = branchHeadAtTake;
+        }
+      }
+      // Latest human rationale on the item (worker-feedback): a `reason`
+      // rides reject (`proposed -> todo`) and park moves; fold the newest
+      // one onto the item (latest wins) so the next dispatch can hand the
+      // worker the human's actual objection. Lazy: items whose moves never
+      // carried a reason keep no `reason` key at all.
+      if (item && reason !== undefined) {
+        item.reason = reason;
       }
       // Pull-door return marker (pr-lifecycle D3/D4): folds onto the item the
       // same way `headAtTake` above folds on claim — durable per-item field,
@@ -77,6 +93,16 @@ function applyEvent(view, event) {
       // runner's own proposal shape).
       if (item && to === 'proposed' && headAtReturn !== undefined) {
         item.headAtReturn = headAtReturn;
+      }
+      // Branch-source return marker (human-rounds D2, mirrors headAtReturn
+      // above): folds onto the item from THIS return's `to === 'proposed'`
+      // move alone. A branch-source return never carries headAtReturn (CẤM
+      // per D2 — mixing the two markers would give reviewDiff a meaningless
+      // range), so the two fields are always mutually exclusive on a given
+      // item, but the fold itself imposes no such check — it just reads
+      // whichever field the move actually carried.
+      if (item && to === 'proposed' && branchHeadAtReturn !== undefined) {
+        item.branchHeadAtReturn = branchHeadAtReturn;
       }
       // Human-gate ask/answer (per async-human-gate D2/D5), mirroring the
       // work.outcome lazy-key/merge-by-id precedent above: the ask (entry

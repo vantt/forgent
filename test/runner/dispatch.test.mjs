@@ -95,6 +95,30 @@ test('buildPrompt degrades to "(không có)" when the work item has no descripti
   assert.match(prompt, /# Description\n\(không có\)/);
 });
 
+test('buildPrompt with no feedback stays byte-identical to the pre-feedback shape (no Human feedback section)', () => {
+  assert.equal(buildPrompt(sampleWork()), buildPrompt(sampleWork(), undefined));
+  assert.doesNotMatch(buildPrompt(sampleWork(), {}), /# Human feedback/);
+});
+
+test('buildPrompt embeds the human answer and latest rejection reason verbatim under Human feedback', () => {
+  const feedback = {
+    answer: 'CHỐT (a): detectTrunk — origin/HEAD rồi HEAD, fallback main.',
+    reason: 'Thiếu test master-trunk; giữ code, chỉ bổ sung test.',
+  };
+  const prompt = buildPrompt(sampleWork(), feedback);
+  assert.match(prompt, /# Human feedback/);
+  assert.ok(prompt.includes(feedback.answer));
+  assert.ok(prompt.includes(feedback.reason));
+  assert.match(prompt, /fix THIS before anything else/);
+});
+
+test('buildPrompt renders a reason-only feedback without an answer block', () => {
+  const prompt = buildPrompt(sampleWork(), { reason: 'only the objection' });
+  assert.match(prompt, /# Human feedback/);
+  assert.ok(prompt.includes('only the objection'));
+  assert.doesNotMatch(prompt, /Human answer/);
+});
+
 test('buildPrompt embeds title, kind, refs, and verify from the work item', () => {
   const work = sampleWork();
   const prompt = buildPrompt(work);
@@ -231,13 +255,13 @@ test('resolveExecutorCommand substitutes both placeholders even inside the same 
 
 // --- spawnWorker: fake executor, tier->model, cwd, timeout, spawn-fail --
 
-test('spawnWorker resolves tier -> model, runs in cwd, and passes the prompt via argv', () => {
+test('spawnWorker resolves tier -> model, runs in cwd, and passes the prompt via argv', async () => {
   const dir = mkTempDir();
   const scriptPath = writeEchoExecutor(dir);
   const cfg = baseConfig([scriptPath, '{prompt}', '--model', '{model}']);
   const runCwd = mkTempDir();
 
-  const result = spawnWorker(sampleWork({ tier: 'heavy' }), cfg, runCwd);
+  const result = await spawnWorker(sampleWork({ tier: 'heavy' }), cfg, runCwd);
 
   assert.equal(result.status, 0);
   assert.equal(result.tier, 'heavy');
@@ -249,21 +273,21 @@ test('spawnWorker resolves tier -> model, runs in cwd, and passes the prompt via
   assert.equal(fs.realpathSync(payload.cwd), fs.realpathSync(runCwd));
 });
 
-test('spawnWorker defaults to the standard tier when the work item omits tier', () => {
+test('spawnWorker defaults to the standard tier when the work item omits tier', async () => {
   const dir = mkTempDir();
   const scriptPath = writeEchoExecutor(dir);
   const cfg = baseConfig([scriptPath, '{prompt}']);
-  const result = spawnWorker(sampleWork(), cfg, mkTempDir());
+  const result = await spawnWorker(sampleWork(), cfg, mkTempDir());
   assert.equal(result.tier, 'standard');
   assert.equal(result.model, 'sonnet');
 });
 
-test('spawnWorker throws worker-timeout and kills the process when it runs past the time budget', () => {
+test('spawnWorker throws worker-timeout and kills the process when it runs past the time budget', async () => {
   const dir = mkTempDir();
   const scriptPath = writeHangingExecutor(dir);
   const cfg = baseConfig([scriptPath]);
 
-  assert.throws(
+  await assert.rejects(
     () => spawnWorker(sampleWork(), cfg, mkTempDir(), { timeoutMs: 200 }),
     (err) => {
       assert.ok(err instanceof DispatchError);
@@ -273,13 +297,13 @@ test('spawnWorker throws worker-timeout and kills the process when it runs past 
   );
 });
 
-test('spawnWorker throws worker-spawn-fail when the configured command does not exist', () => {
+test('spawnWorker throws worker-spawn-fail when the configured command does not exist', async () => {
   const cfg = {
     executor: { command: '/no/such/executor-binary-xyz', args: ['{prompt}'] },
     models: { standard: 'sonnet' },
     timeoutMs: 5000,
   };
-  assert.throws(
+  await assert.rejects(
     () => spawnWorker(sampleWork(), cfg, mkTempDir()),
     (err) => {
       assert.ok(err instanceof DispatchError);
@@ -296,11 +320,11 @@ test('spawnWorker throws a RunnerConfigError (not DispatchError) for an unconfig
   assert.throws(() => spawnWorker(sampleWork({ tier: 'standard' }), cfg, mkTempDir()), RunnerConfigError);
 });
 
-test('spawnWorker surfaces a non-zero exit status without throwing (goal-check is the runner\'s job, not dispatch\'s)', () => {
+test('spawnWorker surfaces a non-zero exit status without throwing (goal-check is the runner\'s job, not dispatch\'s)', async () => {
   const dir = mkTempDir();
   const scriptPath = path.join(dir, 'failing-executor.mjs');
   fs.writeFileSync(scriptPath, 'process.exit(7);');
   const cfg = baseConfig([scriptPath, '{prompt}']);
-  const result = spawnWorker(sampleWork(), cfg, mkTempDir());
+  const result = await spawnWorker(sampleWork(), cfg, mkTempDir());
   assert.equal(result.status, 7);
 });

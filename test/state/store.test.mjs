@@ -121,3 +121,44 @@ test('the learning record rides the SAME work.move event that closes the item �
   const rebuiltTwice = listWork(dir);
   assert.deepEqual(rebuiltTwice, rebuiltOnce, 'rebuilding the same log twice must be deep-equal (determinism)');
 });
+
+// --- branch-source take/return write-side stamp (human-rounds D2) ---------
+//
+// moveWork's destructure is a FIXED field list (never a `...rest` spread,
+// per the fold-allowlist critical pattern) — a caller passing a new field
+// that this facade does not also destructure gets it silently dropped
+// before the event is ever appended. This asserts the write side directly
+// (the exact gap a reviewer caught during validating): branchHeadAtTake/
+// branchHeadAtReturn must land on the appended event's own payload, not
+// only on replay.mjs's later fold.
+
+test('moveWork stamps branchHeadAtTake onto the appended event payload for a blocked -> doing move that carries it', () => {
+  const dir = tmpDir();
+  addSampleWork(dir, 'branch-take', { status: 'blocked' });
+
+  const { event } = moveWork(dir, { id: 'branch-take', to: 'doing', expectedStatus: 'blocked', actor: 'human', branchHeadAtTake: 'branch-deadbeef' });
+
+  assert.equal(event.payload.branchHeadAtTake, 'branch-deadbeef');
+  assert.equal('headAtTake' in event.payload, false, 'a branch take never also stamps the main-based headAtTake');
+});
+
+test('moveWork stamps branchHeadAtReturn onto the appended event payload for a doing -> proposed move that carries it, never headAtReturn', () => {
+  const dir = tmpDir();
+  addSampleWork(dir, 'branch-return', { status: 'blocked' });
+  moveWork(dir, { id: 'branch-return', to: 'doing', expectedStatus: 'blocked', actor: 'human', branchHeadAtTake: 'branch-deadbeef' });
+
+  const { event } = moveWork(dir, { id: 'branch-return', to: 'proposed', expectedStatus: 'doing', branchHeadAtReturn: 'branch-c0ffee' });
+
+  assert.equal(event.payload.branchHeadAtReturn, 'branch-c0ffee');
+  assert.equal('headAtReturn' in event.payload, false, 'a branch return never also stamps the main-based headAtReturn (D2 CẤM)');
+});
+
+test('moveWork omits branchHeadAtTake/branchHeadAtReturn entirely from the event payload when the caller never supplies them (byte-identical to the pre-D2 shape)', () => {
+  const dir = tmpDir();
+  addSampleWork(dir, 'branch-absent');
+
+  const { event } = moveWork(dir, { id: 'branch-absent', to: 'doing', expectedStatus: 'todo', actor: 'human', headAtTake: 'main-deadbeef' });
+
+  assert.equal('branchHeadAtTake' in event.payload, false);
+  assert.equal('branchHeadAtReturn' in event.payload, false);
+});

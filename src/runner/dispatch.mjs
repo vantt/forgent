@@ -34,7 +34,7 @@
 // until real operation shows it is needed.
 
 import fs from 'node:fs';
-import { spawnSync } from 'node:child_process';
+import { spawn } from 'node:child_process';
 import { DEFAULTS } from '../state/work.mjs';
 
 /** Raised for malformed runner config or an unresolvable tier -> model
@@ -71,8 +71,23 @@ export class DispatchError extends Error {
  * reproduced verbatim — never truncated — with "(không có)" when absent.
  * Nothing here reads or writes `.fgos/` — this is pure string assembly.
  */
-export function buildPrompt(work) {
+export function buildPrompt(work, feedback) {
   const refs = Array.isArray(work.refs) && work.refs.length ? work.refs.join(', ') : '(none)';
+
+  // Human feedback (worker-feedback): when the item carries a human answer
+  // (clarify gate) or the latest reject/park reason, the worker must see it —
+  // a reject loop can only converge if the objection reaches the next round.
+  // With no feedback at all the section is omitted entirely, keeping the
+  // prompt byte-identical to the pre-feedback shape for every other item.
+  let feedbackSection = '';
+  const answer = feedback && typeof feedback.answer === 'string' && feedback.answer.trim() ? feedback.answer : null;
+  const reason = feedback && typeof feedback.reason === 'string' && feedback.reason.trim() ? feedback.reason : null;
+  if (answer || reason) {
+    const lines = [];
+    if (answer) lines.push(`Human answer (binding decision):\n${answer}`);
+    if (reason) lines.push(`Latest human rejection/park reason (fix THIS before anything else):\n${reason}`);
+    feedbackSection = `\n# Human feedback\n${lines.join('\n\n')}\n`;
+  }
   const description = work.description ?? '(không có)';
 
   return `# Goal
@@ -80,7 +95,7 @@ ${work.title} (kind: ${work.kind})
 
 # Description
 ${description}
-
+${feedbackSection}
 # Worktree boundary
 You are running on an isolated git worktree, checked out on its own branch for
 this work item only. Stay inside this checkout — never touch the main
@@ -147,6 +162,22 @@ function validateRunnerConfigShape(cfg, sourceLabel) {
   if (typeof cfg.timeoutMs !== 'number' || !Number.isFinite(cfg.timeoutMs) || cfg.timeoutMs <= 0) {
     throw new RunnerConfigError(`runner config (${sourceLabel}) must declare a positive numeric "timeoutMs".`);
   }
+  // OPTIONAL `parallel` block (fan-out-parallel D10) — validated the same
+  // additive-optional way every field above is: absent entirely is fine (the
+  // runner falls back to in-code defaults), but when present it must be an
+  // object whose `maxRoots`/`maxLeavesPerRoot`, if given, are positive
+  // integers. This keeps every existing `.fgos-runner.json` valid untouched.
+  if (cfg.parallel !== undefined) {
+    if (!cfg.parallel || typeof cfg.parallel !== 'object' || Array.isArray(cfg.parallel)) {
+      throw new RunnerConfigError(`runner config (${sourceLabel}) "parallel" must be an object when present.`);
+    }
+    for (const key of ['maxRoots', 'maxLeavesPerRoot']) {
+      const value = cfg.parallel[key];
+      if (value !== undefined && (!Number.isInteger(value) || value <= 0)) {
+        throw new RunnerConfigError(`runner config (${sourceLabel}) "parallel.${key}" must be a positive integer when present.`);
+      }
+    }
+  }
 }
 
 /**
@@ -168,7 +199,7 @@ export function modelForTier(cfg, tier) {
 /**
  * Substitute `{prompt}` and `{model}` into `cfg.executor.args` — PER ARRAY
  * ELEMENT (never joined into one shell string, per the security panel).
- * Returns `{ command, args }`, ready to hand to `spawnSync(command, args,
+ * Returns `{ command, args }`, ready to hand to `spawn(command, args,
  * { shell: false })` unchanged.
  */
 export function resolveExecutorCommand(cfg, { prompt, model }) {
@@ -201,41 +232,118 @@ export function resolveExecutorCommand(cfg, { prompt, model }) {
  * status/report is never trusted on its own; only `verify` decides).
  */
 export function spawnWorker(work, cfg, cwd, opts = {}) {
+  // Setup stays synchronous and OUTSIDE the Promise below on purpose: a
+  // malformed tier/config (RunnerConfigError, via modelForTier/
+  // resolveExecutorCommand) must still throw synchronously, before any
+  // process is spawned — exactly like the spawnSync-based version, and
+  // exactly what dispatch.test.mjs's "throws a RunnerConfigError ... before
+  // any spawn" test pins.
   const tier = work.tier ?? DEFAULTS.tier;
   const model = modelForTier(cfg, tier);
-  const prompt = buildPrompt(work);
+  const prompt = buildPrompt(work, opts.feedback);
   const { command, args } = resolveExecutorCommand(cfg, { prompt, model });
   const timeoutMs = opts.timeoutMs ?? cfg.timeoutMs;
+  const maxBuffer = opts.maxBuffer ?? 10 * 1024 * 1024;
 
-  const result = spawnSync(command, args, {
-    cwd,
-    shell: false,
-    timeout: timeoutMs,
-    encoding: 'utf8',
-    maxBuffer: opts.maxBuffer ?? 10 * 1024 * 1024,
-  });
+  return new Promise((resolve, reject) => {
+    const child = spawn(command, args, { cwd, shell: false });
+    child.stdout.setEncoding('utf8');
+    child.stderr.setEncoding('utf8');
 
-  if (result.error) {
-    if (result.error.code === 'ETIMEDOUT') {
-      throw new DispatchError(
-        'worker-timeout',
-        `executor timed out after ${timeoutMs}ms for work "${work.id}".`,
-        { workId: work.id, tier, model },
-      );
+    let stdout = '';
+    let stderr = '';
+    let stdoutLen = 0;
+    let stderrLen = 0;
+    let settled = false;
+    let timedOut = false;
+    // MAXBUFFER DEVIATION (per this cell's action (1)): spawnSync enforces
+    // maxBuffer natively and surfaces overflow as `result.error` (falling
+    // into the worker-spawn-fail branch below, the same branch any other
+    // non-timeout spawn failure already used) — the event-based `spawn` API
+    // has no built-in equivalent, so accumulated stdout+stderr length is
+    // tracked by hand on every 'data' event and the child is killed the
+    // moment it crosses `maxBuffer`, reusing that same worker-spawn-fail
+    // outcome. The intent (never let one runaway worker exhaust memory)
+    // holds; the exact error text is not byte-for-byte identical to
+    // spawnSync's own maxBuffer message.
+    let maxBufferExceeded = false;
+    let timer = null;
+
+    const finish = (fn) => {
+      if (settled) return;
+      settled = true;
+      if (timer) clearTimeout(timer);
+      fn();
+    };
+
+    if (timeoutMs) {
+      timer = setTimeout(() => {
+        timedOut = true;
+        child.kill('SIGTERM');
+      }, timeoutMs);
     }
-    throw new DispatchError(
-      'worker-spawn-fail',
-      `executor failed to start for work "${work.id}": ${result.error.message}`,
-      { workId: work.id, tier, model, cause: result.error.message },
-    );
-  }
 
-  return {
-    status: result.status,
-    signal: result.signal,
-    stdout: result.stdout,
-    stderr: result.stderr,
-    tier,
-    model,
-  };
+    child.stdout.on('data', (chunk) => {
+      stdoutLen += Buffer.byteLength(chunk);
+      if (stdoutLen + stderrLen > maxBuffer) {
+        if (!maxBufferExceeded) {
+          maxBufferExceeded = true;
+          child.kill('SIGTERM');
+        }
+        return;
+      }
+      stdout += chunk;
+    });
+    child.stderr.on('data', (chunk) => {
+      stderrLen += Buffer.byteLength(chunk);
+      if (stdoutLen + stderrLen > maxBuffer) {
+        if (!maxBufferExceeded) {
+          maxBufferExceeded = true;
+          child.kill('SIGTERM');
+        }
+        return;
+      }
+      stderr += chunk;
+    });
+
+    child.on('error', (err) => {
+      finish(() => {
+        reject(new DispatchError(
+          'worker-spawn-fail',
+          `executor failed to start for work "${work.id}": ${err.message}`,
+          { workId: work.id, tier, model, cause: err.message },
+        ));
+      });
+    });
+
+    // 'exit' (fires once the spawned process itself terminates), never
+    // 'close' (waits for the stdio PIPES to fully close too) — matching
+    // spawnSync's own timeout semantics exactly (per the GRANDCHILD-SIGTERM
+    // CAVEAT above): spawnSync's timeout kills and returns based on the
+    // DIRECTLY-spawned child alone, never waiting on any grandchild process
+    // tree the executor itself may have started. Resolving on 'close'
+    // instead would make a killed timeout silently wait out however long a
+    // still-running grandchild keeps the pipe open — defeating the timeout.
+    child.on('exit', (code, signal) => {
+      finish(() => {
+        if (timedOut) {
+          reject(new DispatchError(
+            'worker-timeout',
+            `executor timed out after ${timeoutMs}ms for work "${work.id}".`,
+            { workId: work.id, tier, model },
+          ));
+          return;
+        }
+        if (maxBufferExceeded) {
+          reject(new DispatchError(
+            'worker-spawn-fail',
+            `executor for work "${work.id}" exceeded maxBuffer (${maxBuffer} bytes) and was killed.`,
+            { workId: work.id, tier, model, cause: 'maxBuffer exceeded' },
+          ));
+          return;
+        }
+        resolve({ status: code, signal, stdout, stderr, tier, model });
+      });
+    });
+  });
 }

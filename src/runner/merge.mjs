@@ -37,7 +37,8 @@
 // omitted, `detectTrunk` resolves the default (origin/HEAD's target, falling
 // back to a local `main`/`master` branch) instead of a hardcoded `'main'` —
 // this repo's own trunk is `main`, but nothing here assumes that literal
-// name anymore.
+// name anymore. Wiring an actual caller to pass a non-default trunk is out
+// of scope here (Epic 4's job); this only makes the primitive capable.
 
 import { execFileSync } from 'node:child_process';
 import { branchNameFor, branchExists, reclaimOrphanedCheckout } from './worktree.mjs';
@@ -172,7 +173,7 @@ export function reviewDiff(repoRoot, item, opts = {}) {
  * untouched. Only a failure to even run `git merge --abort` itself throws
  * (a real bug).
  */
-export function mergeRunnerItem(repoRoot, item, { timeoutMs } = {}) {
+export async function mergeRunnerItem(repoRoot, item, { timeoutMs } = {}) {
   const branch = branchNameFor(item.id);
 
   try {
@@ -186,7 +187,7 @@ export function mergeRunnerItem(repoRoot, item, { timeoutMs } = {}) {
     return { outcome: 'conflict', branch };
   }
 
-  const check = runGoalCheck(item, repoRoot, timeoutMs);
+  const check = await runGoalCheck(item, repoRoot, timeoutMs);
   if (!check.passed) {
     try {
       git(repoRoot, ['merge', '--abort']);

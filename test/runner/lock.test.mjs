@@ -68,7 +68,7 @@ test('EXIT_BUSY collides with no existing exit code (0 ok, 1 unexpected, R4 cate
 
 // --- overlapping runs ------------------------------------------------------
 
-test('second overlapping runOnce exits busy: zero store writes, zero worktree ops, holder lock untouched', () => {
+test('second overlapping runOnce exits busy: zero store writes, zero worktree ops, holder lock untouched', async () => {
   const { repoRoot, dir, worktreeDir } = setup();
   seedItem(dir);
   // The "first runner" is simulated by its lock: a live pid (this very test
@@ -78,7 +78,7 @@ test('second overlapping runOnce exits busy: zero store writes, zero worktree op
   fs.writeFileSync(lockPath, String(process.pid), { flag: 'wx' });
   const eventsBefore = readRawEvents(dir).length;
 
-  const result = runOnce({ repoRoot, config: { timeoutMs: 5000 }, worktreeDir, log: noLog });
+  const result = await runOnce({ repoRoot, config: { timeoutMs: 5000 }, worktreeDir, log: noLog });
 
   assert.equal(result.outcome, 'busy');
   assert.equal(result.exitCode, EXIT_BUSY);
@@ -93,12 +93,12 @@ test('second overlapping runOnce exits busy: zero store writes, zero worktree op
   assert.equal(fs.readFileSync(lockPath, 'utf8'), String(process.pid));
 });
 
-test('stale lock (dead pid) is cleaned-and-yielded: first runOnce exits busy having removed it, the next run acquires and proceeds', () => {
+test('stale lock (dead pid) is cleaned-and-yielded: first runOnce exits busy having removed it, the next run acquires and proceeds', async () => {
   const { repoRoot, dir, worktreeDir } = setup();
   const lockPath = path.join(dir, LOCK_FILE);
   fs.writeFileSync(lockPath, String(deadPid()), { flag: 'wx' });
 
-  const first = runOnce({ repoRoot, config: { timeoutMs: 5000 }, worktreeDir, log: noLog });
+  const first = await runOnce({ repoRoot, config: { timeoutMs: 5000 }, worktreeDir, log: noLog });
   assert.equal(first.outcome, 'busy');
   assert.equal(first.exitCode, EXIT_BUSY);
   assert.equal(first.reclaimedStale, true);
@@ -106,23 +106,23 @@ test('stale lock (dead pid) is cleaned-and-yielded: first runOnce exits busy hav
   assert.equal(fs.existsSync(lockPath), false);
 
   // empty frontier: proceeding past the lock means reaching the idle path
-  const second = runOnce({ repoRoot, config: { timeoutMs: 5000 }, worktreeDir, log: noLog });
+  const second = await runOnce({ repoRoot, config: { timeoutMs: 5000 }, worktreeDir, log: noLog });
   assert.equal(second.outcome, 'idle');
   assert.equal(second.exitCode, 0);
   assert.equal(fs.existsSync(lockPath), false);
 });
 
-test('garbage lock content (no live holder can prove ownership) is treated as stale: cleaned, then next run proceeds', () => {
+test('garbage lock content (no live holder can prove ownership) is treated as stale: cleaned, then next run proceeds', async () => {
   const { repoRoot, dir, worktreeDir } = setup();
   const lockPath = path.join(dir, LOCK_FILE);
   fs.writeFileSync(lockPath, 'not-a-pid\n', { flag: 'wx' });
 
-  const first = runOnce({ repoRoot, config: { timeoutMs: 5000 }, worktreeDir, log: noLog });
+  const first = await runOnce({ repoRoot, config: { timeoutMs: 5000 }, worktreeDir, log: noLog });
   assert.equal(first.outcome, 'busy');
   assert.equal(first.reclaimedStale, true);
   assert.equal(fs.existsSync(lockPath), false);
 
-  const second = runOnce({ repoRoot, config: { timeoutMs: 5000 }, worktreeDir, log: noLog });
+  const second = await runOnce({ repoRoot, config: { timeoutMs: 5000 }, worktreeDir, log: noLog });
   assert.equal(second.outcome, 'idle');
 });
 

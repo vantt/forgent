@@ -1735,3 +1735,159 @@ test('init runs a second time (idempotent) and rewrites coexistence.json with th
 
   assert.deepEqual(second, first);
 });
+
+// --- take/return: nguồn nhánh (human-rounds D2) — a second door for a
+// `blocked` item that already carries a live `fgw/<id>` branch (parked by
+// the runner after too many visits, or a rejected proposal whose branch
+// survives): `take` claims it via the existing blocked -> doing edge
+// (fsm.mjs:69), discriminated by `branchHeadAtTake` — the BRANCH's own HEAD,
+// never the main-based `headAtTake`; `return` verifies on the branch itself,
+// in a disposable DETACHED worktree, and never inspects or touches the
+// human's own main checkout (D2: "tree người là việc của người"). ----------
+
+// Leaves behind exactly what a real parked runner branch looks like: item at
+// `blocked`, a live `fgw/<id>` branch one commit ahead of main, the human's
+// own main tree/HEAD completely undisturbed — mirrors
+// `makeRunnerProposedItem`'s "simulate what the runner leaves behind"
+// discipline, but the item never reaches `proposed`; it stays `blocked`,
+// the D2 starting point.
+function makeBlockedBranchItem(cwd, id, extra = {}) {
+  addOk(cwd, id, extra);
+  // Commit the add BEFORE branching off (mirrors makeRunnerProposedItem's
+  // own ordering above) — otherwise the pending events.jsonl delta rides
+  // along into the branch's own commit and is lost from main the moment
+  // `checkout main` restores main's own (add-less) tracked state.
+  commitPending(cwd, `state: add ${id}`);
+
+  gitAtCwd(cwd, ['checkout', '-b', `fgw/${id}`]);
+  fs.writeFileSync(path.join(cwd, `${id}-attempt.txt`), 'worker attempt\n');
+  gitAtCwd(cwd, ['add', '-A']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', `worker attempt for ${id}`]);
+  gitAtCwd(cwd, ['checkout', 'main']);
+  run(cwd, ['move', id, '--to', 'blocked']);
+  commitPending(cwd, `state: park ${id}`);
+}
+
+test('take --id on a blocked item with a live fgw/<id> branch claims via blocked -> doing, recording branchHeadAtTake (the branch\'s own HEAD, never the main-based headAtTake)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeBlockedBranchItem(cwd, 'branch-take-a');
+  const branchHead = gitAtCwd(cwd, ['rev-parse', 'fgw/branch-take-a']).trim();
+  const mainHeadBefore = gitHead(cwd);
+  assert.notEqual(branchHead, mainHeadBefore, 'sanity: the branch really is ahead of main');
+
+  const result = run(cwd, ['take', '--id', 'branch-take-a']);
+  assert.equal(result.status, 0, `take failed: ${result.stderr}`);
+  assert.match(result.stdout, /blocked -> doing/);
+  assert.match(result.stdout, /fgw\/branch-take-a/);
+
+  const view = stateView(cwd);
+  assert.equal(view.work['branch-take-a'].status, 'doing');
+  assert.equal(view.work['branch-take-a'].claimActor, 'human');
+  assert.equal(view.work['branch-take-a'].branchHeadAtTake, branchHead);
+  assert.equal('headAtTake' in view.work['branch-take-a'], false, 'a branch take never records the main-based headAtTake');
+  assert.equal(view.outcomes['branch-take-a'].predicted.branchHeadAtTake, branchHead);
+  assert.equal(gitHead(cwd), mainHeadBefore, "take never touches the human's own main checkout");
+});
+
+test('take --id on a blocked item with NO live branch still falls through to the old todo-only CAS — conflict, exit 3, item stays blocked', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  addOk(cwd, 'blocked-no-branch');
+  run(cwd, ['move', 'blocked-no-branch', '--to', 'blocked']);
+
+  const result = run(cwd, ['take', '--id', 'blocked-no-branch']);
+  assert.equal(result.status, 3);
+  assert.equal(stateView(cwd).work['blocked-no-branch'].status, 'blocked');
+});
+
+test('return on a branch-source take: verify passes in a disposable detached worktree at the branch tip -> proposed, branchHeadAtReturn recorded (never headAtReturn), the human\'s own main checkout is untouched and no worktree is left behind', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeBlockedBranchItem(cwd, 'branch-return-ok', { verify: 'test -f proof.txt' });
+  assert.equal(run(cwd, ['take', '--id', 'branch-return-ok']).status, 0);
+  // take's own event lands on events.jsonl in the SAME main tree (take never
+  // uses a worktree) — commit that bookkeeping to main before switching
+  // branches, exactly like commitFile's own doc comment describes.
+  commitPending(cwd, 'state: take branch-return-ok');
+
+  // The human commits their fix ON THE BRANCH — never on main.
+  gitAtCwd(cwd, ['checkout', 'fgw/branch-return-ok']);
+  fs.writeFileSync(path.join(cwd, 'proof.txt'), 'fixed by hand\n');
+  gitAtCwd(cwd, ['add', '-A']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', 'human fix']);
+  const branchHeadAtReturn = gitAtCwd(cwd, ['rev-parse', 'fgw/branch-return-ok']).trim();
+  gitAtCwd(cwd, ['checkout', 'main']);
+  const mainHeadBefore = gitHead(cwd);
+  const worktreesBefore = gitAtCwd(cwd, ['worktree', 'list', '--porcelain']);
+
+  const result = run(cwd, ['return', 'branch-return-ok']);
+  assert.equal(result.status, 0, `return failed: ${result.stderr}`);
+  assert.match(result.stdout, /proposed/);
+
+  const view = stateView(cwd);
+  assert.equal(view.work['branch-return-ok'].status, 'proposed');
+  assert.equal(view.work['branch-return-ok'].branchHeadAtReturn, branchHeadAtReturn);
+  assert.equal('headAtReturn' in view.work['branch-return-ok'], false, 'a branch return never records the main-based headAtReturn (D2 CẤM)');
+  assert.equal(gitHead(cwd), mainHeadBefore, "return never advances or touches the human's own main checkout");
+  assert.equal(gitAtCwd(cwd, ['worktree', 'list', '--porcelain']), worktreesBefore, 'the disposable detached verify worktree is cleaned up — no leftover');
+});
+
+test('return on a branch-source take refuses when the branch has NOT advanced past branchHeadAtTake (no new commit) — validation, exit 4, item stays doing', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeBlockedBranchItem(cwd, 'branch-return-stale', { verify: 'test -f proof.txt' });
+  assert.equal(run(cwd, ['take', '--id', 'branch-return-stale']).status, 0);
+
+  const result = run(cwd, ['return', 'branch-return-stale']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /has not advanced past branchHeadAtTake/);
+  assert.equal(stateView(cwd).work['branch-return-stale'].status, 'doing');
+});
+
+test('return on a branch-source take never requires the human\'s own main tree to be clean (D2: "tree người là việc của người") — a dirty main tree never blocks it and is left untouched', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeBlockedBranchItem(cwd, 'branch-return-dirty-main', { verify: 'test -f proof.txt' });
+  assert.equal(run(cwd, ['take', '--id', 'branch-return-dirty-main']).status, 0);
+  commitPending(cwd, 'state: take branch-return-dirty-main');
+
+  gitAtCwd(cwd, ['checkout', 'fgw/branch-return-dirty-main']);
+  fs.writeFileSync(path.join(cwd, 'proof.txt'), 'fixed by hand\n');
+  gitAtCwd(cwd, ['add', '-A']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', 'human fix']);
+  gitAtCwd(cwd, ['checkout', 'main']);
+
+  // Dirty the human's own main working tree — untracked, uncommitted, and
+  // unrelated to this item entirely.
+  fs.writeFileSync(path.join(cwd, 'scratch.txt'), 'unrelated in-progress work\n');
+
+  const result = run(cwd, ['return', 'branch-return-dirty-main']);
+  assert.equal(result.status, 0, `return must never inspect the main tree for a branch-source item: ${result.stderr}`);
+  assert.equal(stateView(cwd).work['branch-return-dirty-main'].status, 'proposed');
+  assert.equal(fs.readFileSync(path.join(cwd, 'scratch.txt'), 'utf8'), 'unrelated in-progress work\n', "the human's own dirty scratch file is untouched");
+});
+
+test('return on a branch-source take: verify-fail -> doing -> blocked + friction (verification layer), exit 0 (a defined outcome, not a CLI error)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeBlockedBranchItem(cwd, 'branch-return-red', { verify: 'test -f proof.txt' });
+  assert.equal(run(cwd, ['take', '--id', 'branch-return-red']).status, 0);
+  commitPending(cwd, 'state: take branch-return-red');
+
+  gitAtCwd(cwd, ['checkout', 'fgw/branch-return-red']);
+  fs.writeFileSync(path.join(cwd, 'wrong-file.txt'), 'nope\n'); // advances the branch, never satisfies verify
+  gitAtCwd(cwd, ['add', '-A']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', 'wrong fix']);
+  gitAtCwd(cwd, ['checkout', 'main']);
+
+  const result = run(cwd, ['return', 'branch-return-red']);
+  assert.equal(result.status, 0, `return should exit 0 for a defined blocked outcome: ${result.stderr}`);
+  assert.match(result.stdout, /blocked/);
+
+  const view = stateView(cwd);
+  assert.equal(view.work['branch-return-red'].status, 'blocked');
+  assert.equal(view.outcomes['branch-return-red'].actual.outcome, 'blocked');
+  assert.equal(view.frictions['branch-return-red'][0].layer, 'verification');
+  assert.equal(view.frictions['branch-return-red'][0].errorClass, 'verify-miss');
+});

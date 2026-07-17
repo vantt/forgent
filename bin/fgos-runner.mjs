@@ -47,17 +47,26 @@ function parseArgs(args) {
   return flags;
 }
 
-function main() {
+async function main() {
   try {
     const flags = parseArgs(process.argv.slice(2));
     const repoRoot = resolveRepoRoot(process.cwd());
     const configPath = flags.config ?? path.join(repoRoot, '.fgos-runner.json');
     const config = loadRunnerConfig(configPath);
 
-    // `--once` is the default (and only) Phase 2 mode — the flag is
-    // accepted for explicitness; omitting it changes nothing.
-    const result = runOnce({ repoRoot, config, dryRun: flags.dryRun });
-    console.log(`fgos-runner: ${result.outcome}${result.id ? ` (${result.id})` : ''}`);
+    // `--once` runs one bounded drain-run over the frontier (D10/D15): it may
+    // now dispatch several items in parallel, so a `drained` result carries a
+    // per-item `dispatched` list — print one line per item so a single
+    // dispatch still prints e.g. "proposed (item1)". `busy`/`idle`/`dry-run`
+    // are pre-dispatch short-circuits and keep the single-line form.
+    const result = await runOnce({ repoRoot, config, dryRun: flags.dryRun });
+    if (result.outcome === 'drained') {
+      for (const d of result.dispatched) {
+        console.log(`fgos-runner: ${d.outcome}${d.id ? ` (${d.id})` : ''}`);
+      }
+    } else {
+      console.log(`fgos-runner: ${result.outcome}${result.id ? ` (${result.id})` : ''}`);
+    }
     process.exitCode = result.exitCode;
   } catch (err) {
     process.stderr.write(`fgos-runner: ${err.message}\n`);
