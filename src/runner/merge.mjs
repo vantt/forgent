@@ -31,11 +31,14 @@
 // state.json either.
 //
 // TRUNK PARAMETERIZATION (per D3, fan-out-parallel): `reviewDiff`'s "runner"
-// source diff trunk defaults to `main` (unchanged pr-lifecycle behavior) but
-// is now caller-parameterizable via `opts.trunk` — fan-out's per-root branch
-// tree (`fgw/<root>`) needs a leaf's diff computed against its parent branch
-// instead of `main`. Wiring an actual caller to pass a non-default trunk is
-// out of scope here (Epic 4's job); this only makes the primitive capable.
+// source diff trunk is caller-parameterizable via `opts.trunk` — fan-out's
+// per-root branch tree (`fgw/<root>`) needs a leaf's diff computed against
+// its parent branch instead of the repo's actual trunk. When `opts.trunk` is
+// omitted, `detectTrunk` resolves the default (origin/HEAD's target, falling
+// back to a local `main`/`master` branch) instead of a hardcoded `'main'` —
+// this repo's own trunk is `main`, but nothing here assumes that literal
+// name anymore. Wiring an actual caller to pass a non-default trunk is out
+// of scope here (Epic 4's job); this only makes the primitive capable.
 
 import { execFileSync } from 'node:child_process';
 import { branchNameFor, branchExists, reclaimOrphanedCheckout } from './worktree.mjs';
@@ -56,6 +59,33 @@ export class MergeError extends Error {
 
 function git(repoRoot, args) {
   return execFileSync('git', args, { cwd: repoRoot, encoding: 'utf8', shell: false });
+}
+
+/** Resolve `repoRoot`'s trunk branch name without assuming `'main'`: prefers
+ * the remote `origin/HEAD` target (what the repo host itself calls its
+ * default branch), then falls back to whichever of `main`/`master` exists
+ * locally as a branch, then to the literal `'main'` when neither signal is
+ * available (e.g. a brand-new repo with no commits yet on either name). */
+export function detectTrunk(repoRoot) {
+  try {
+    const ref = git(repoRoot, ['symbolic-ref', '--short', 'refs/remotes/origin/HEAD']).trim();
+    if (ref.startsWith('origin/')) {
+      return ref.slice('origin/'.length);
+    }
+  } catch {
+    // no origin remote, or origin/HEAD isn't set locally — fall through
+  }
+
+  for (const candidate of ['main', 'master']) {
+    try {
+      git(repoRoot, ['show-ref', '--verify', '--quiet', `refs/heads/${candidate}`]);
+      return candidate;
+    } catch {
+      // candidate branch doesn't exist locally — try the next one
+    }
+  }
+
+  return 'main';
 }
 
 /** Whether `repoRoot`'s working tree has no pending changes — checked before
@@ -79,12 +109,11 @@ export function classifySource(repoRoot, item) {
 /**
  * Build the human-viewable diff for a proposed item's `review` (never
  * throws on a legacy item — it degrades to a warning, no diff). For a
- * "runner" item, the trunk compared against defaults to `main` (this
- * feature's local-first PR model, same as worktree.mjs's `fgw/<id>`
- * branches) but is caller-parameterizable via `opts.trunk` (per D3,
- * fan-out-parallel) — a leaf's diff against its parent root branch instead
- * of `main`, without changing the default behavior for every existing
- * caller.
+ * "runner" item, the trunk compared against defaults to the repo's detected
+ * trunk (`detectTrunk` — no longer a hardcoded `'main'`) but is caller-
+ * parameterizable via `opts.trunk` (per D3, fan-out-parallel) — a leaf's
+ * diff against its parent root branch instead of the trunk, without
+ * changing the default behavior for every existing caller.
  *
  * Pull-door range (per plan's deferred-to-planning resolution): the range is
  * fixed at `headAtTake..headAtReturn`, so it never picks up commits landed
@@ -95,7 +124,7 @@ export function classifySource(repoRoot, item) {
  * every line in the diff to this one item.
  */
 export function reviewDiff(repoRoot, item, opts = {}) {
-  const { trunk = 'main' } = opts;
+  const { trunk = detectTrunk(repoRoot) } = opts;
   const source = classifySource(repoRoot, item);
 
   if (source === 'runner') {
