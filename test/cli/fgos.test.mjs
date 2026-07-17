@@ -1994,6 +1994,126 @@ test('evolve never touches git (no branch/worktree operation) — succeeds on a 
   assert.equal(pickResult.status, 0);
 });
 
+// --- `submit` extraction regression (self-improve-loop D15): the verb's
+// body was pulled out into a shared submitWork(dir, text, opts) so `evolve
+// --submit` below can reuse it without duplicating the work-object
+// construction. These combined-flag calls were never exercised together
+// pre-extraction (--async/--domain were each tested separately above) —
+// proving they still combine correctly is the regression coverage D15
+// requires.
+
+test('submit stays byte-identical after the submitWork extraction: a plain call and a call combining --async + --domain', () => {
+  const cwd = tmpCwd();
+
+  const plain = run(cwd, ['submit', 'Investigate the sluggish overview page']);
+  assert.equal(plain.status, 0);
+  const plainItem = JSON.parse(plain.stdout).data;
+  assert.equal(plainItem.status, 'todo');
+  assert.equal(plainItem.mode, 'sync');
+  assert.equal(plainItem.domain, undefined);
+  assert.equal(JSON.parse(run(cwd, ['list']).stdout).work[plainItem.id].stage, 'clarify');
+
+  const flagged = run(cwd, ['submit', 'Try the synthetic domain', '--async', '--domain', 'synthetic']);
+  assert.equal(flagged.status, 0);
+  const flaggedItem = JSON.parse(flagged.stdout).data;
+  assert.equal(flaggedItem.mode, 'async');
+  assert.equal(flaggedItem.domain, 'synthetic');
+  assert.equal(flaggedItem.stage, 'assembling');
+
+  const unattended = run(cwd, ['submit', 'Draft the onboarding walkthrough', '--unattended']);
+  assert.equal(unattended.status, 0);
+  assert.equal(JSON.parse(unattended.stdout).data.mode, 'async');
+});
+
+// --- `fgos evolve --submit <id>` (self-improve-loop P13 Slice 3, D15) ------
+//
+// The only mutating action on the whole evolve/Gate A surface: bridges a
+// ranked friction candidate into a real work item through the same
+// submitWork door `submit` uses. `evolve` (no flag) and `evolve --pick` stay
+// exactly as shipped in Slice 1 (asserted below too, not just by the golden
+// test above).
+
+test("evolve --submit <id> with a matching candidate creates exactly one new work item via submitWork, described from the candidate's fields", () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'submit-item');
+  const dir = path.join(cwd, '.fgos');
+  addFriction(dir, { id: 'submit-item', disposition: 'blocked', errorClass: 'verify-miss', layer: 'verification', attempts: 2, detail: 'goal-check failed (exit 1)' });
+
+  const before = eventLines(cwd).length;
+  const result = run(cwd, ['evolve', '--submit', 'submit-item']);
+  assert.equal(result.status, 0);
+  const envelope = JSON.parse(result.stdout);
+  assert.equal(envelope.contract, 'fgos.v1');
+  const item = envelope.data;
+  assert.equal(item.status, 'todo');
+  assert.equal(item.stage, 'clarify');
+  assert.match(item.description, /Self-improve candidate submit-item/);
+  assert.match(item.description, /blocked/);
+  assert.match(item.description, /verify-miss/);
+  assert.match(item.description, /layer verification/);
+  assert.match(item.description, /2 attempt\(s\)/);
+  assert.match(item.description, /goal-check failed \(exit 1\)/);
+
+  assert.equal(eventLines(cwd).length, before + 1, 'evolve --submit appends exactly one new event');
+  const view = JSON.parse(run(cwd, ['list']).stdout);
+  assert.ok(view.work[item.id], 'the new work item persisted');
+  assert.equal(view.work['submit-item'].status, 'todo', 'the candidate\'s own item is untouched');
+});
+
+test('evolve --submit <id> with no matching candidate creates no work item, prints a clean error, exits non-zero', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'exists-item-2');
+  const dir = path.join(cwd, '.fgos');
+  addFriction(dir, { id: 'exists-item-2', disposition: 'blocked', errorClass: 'verify-miss', layer: 'verification', attempts: 1, detail: 'x' });
+
+  const before = eventLines(cwd).length;
+  const result = run(cwd, ['evolve', '--submit', 'nonexistent-id']);
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /not an open candidate/);
+  assert.equal(eventLines(cwd).length, before, 'no event appended on an invalid --submit id');
+});
+
+test('evolve --submit with a bare flag (no value) is refused as validation, not a re-prompt', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'bare-submit-item');
+  const result = run(cwd, ['evolve', '--submit']);
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /evolve --submit requires a non-empty candidate id/);
+});
+
+test('evolve --submit composes its description gracefully around missing candidate fields, never printing the literal "undefined"', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'sparse-item');
+  const dir = path.join(cwd, '.fgos');
+  addFriction(dir, { id: 'sparse-item', disposition: 'blocked', attempts: 1 });
+
+  const result = run(cwd, ['evolve', '--submit', 'sparse-item']);
+  assert.equal(result.status, 0);
+  const description = JSON.parse(result.stdout).data.description;
+  assert.doesNotMatch(description, /undefined/);
+  assert.match(description, /Self-improve candidate sparse-item/);
+  assert.match(description, /blocked/);
+  assert.match(description, /1 attempt\(s\)/);
+});
+
+test('evolve (no flag) and evolve --pick remain unaffected by the new --submit path: same output, no event appended', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'unaffected-item');
+  const dir = path.join(cwd, '.fgos');
+  addFriction(dir, { id: 'unaffected-item', disposition: 'blocked', errorClass: 'verify-miss', layer: 'verification', attempts: 1, detail: 'goal-check failed' });
+
+  const before = eventLines(cwd).length;
+  const list = run(cwd, ['evolve']);
+  assert.equal(list.status, 0);
+  assert.match(list.stdout, /unaffected-item score=2 \[blocked\] verify-miss\/verification \(attempts 1\): goal-check failed/);
+
+  const pick = run(cwd, ['evolve', '--pick', 'unaffected-item']);
+  assert.equal(pick.status, 0);
+  assert.match(pick.stdout, /friction \(1\)/);
+
+  assert.equal(eventLines(cwd).length, before, 'evolve and evolve --pick still append no events');
+});
+
 test('review on a nonexistent id is rejected as validation, exit 4', () => {
   const cwd = tmpCwd();
   const result = run(cwd, ['review', 'ghost']);

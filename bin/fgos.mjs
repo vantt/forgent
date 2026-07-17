@@ -474,6 +474,71 @@ function formatRollup(view, id) {
   return lines.join('\n');
 }
 
+// Shared body of the `submit` verb (P14) — extracted per self-improve-loop
+// D15 so both `submit` and `evolve --submit <id>` construct the work item
+// through the exact same sequence: deriveTitle -> classify -> generateId ->
+// addWork -> wrapEnvelope. `opts.async`/`opts.domain` carry `submit`'s own
+// --async|--unattended/--domain flag handling; `evolve --submit` calls this
+// with the defaults (D15: no flag surface of its own, YAGNI).
+function submitWork(dir, text, opts = {}) {
+  const title = deriveTitle(text);
+  const { tier, kind, risk } = classify(text);
+  const id = generateId(title, Object.keys(listWork(dir).work));
+  const work = {
+    id,
+    title,
+    // Per P30 (discovery-context): the full submitted text, kept
+    // alongside the derived/truncated `title` so context-discovery can
+    // read the real ask instead of just the classified summary.
+    description: text,
+    kind,
+    status: 'todo',
+    deps: [],
+    risk,
+    refs: [],
+    verify: SUBMIT_VERIFY_SENTINEL,
+    tier,
+    mode: opts.async ? 'async' : 'sync',
+    // Per base-workflow-model D1-D4/S2: --domain is optional, same
+    // omitted-leaves-undefined shape as `add`'s --domain above; omitting
+    // it leaves work.domain undefined so store.mjs's addWork/
+    // validateWorkShape apply DEFAULT_DOMAIN's lazy default.
+    domain: opts.domain,
+    // Per D8: every item entering through the public door starts at its
+    // domain's Clarify-mapped stage — context-discovery must pass before
+    // it can be worked. Generalized from the hardcoded 'clarify' (D8) to
+    // stay domain-aware (base-workflow-model D1-D4/S2): byte-identical
+    // 'clarify' for the default/omitted (coding) case, since
+    // stageForStep(DOMAINS.coding, 'Clarify') === 'clarify'. A domain with
+    // no Clarify-mapped stage (e.g. 'synthetic') falls back to its own
+    // first declared stage. `add` deliberately omits this (lazy default,
+    // D8) — only `submit` needs an explicit entry stage.
+    stage: stageForStep(getDomain(opts.domain), 'Clarify') ?? getDomain(opts.domain).stages[0],
+  };
+  const { event } = addWork(dir, work);
+  return JSON.stringify(wrapEnvelope(event.payload), null, 2);
+}
+
+// Composes the human-readable description `evolve --submit` hands to
+// submitWork (self-improve-loop D15) from a ranked candidate object (the
+// exact shape `candidates.mjs`'s rankCandidates returns — id/disposition/
+// errorClass/layer/detail/attempts/score). Any field that is null/undefined
+// is omitted rather than printing the literal string "undefined".
+function describeCandidate(candidate) {
+  const meta = [];
+  if (candidate.disposition != null) meta.push(candidate.disposition);
+  const bracket = [candidate.errorClass != null ? candidate.errorClass : null, candidate.layer != null ? `layer ${candidate.layer}` : null].filter(Boolean);
+  if (bracket.length > 0) meta.push(`(${bracket.join(', ')})`);
+  if (candidate.attempts != null) meta.push(`${candidate.attempts} attempt(s)`);
+
+  let description = `Self-improve candidate ${candidate.id}`;
+  description += meta.length > 0 ? `: ${meta.join(' ')}.` : '.';
+  if (candidate.detail != null && candidate.detail !== '') {
+    description += ` ${candidate.detail}`;
+  }
+  return description;
+}
+
 async function runVerb(verb, flags, positional, dir) {
   switch (verb) {
     case 'init': {
@@ -538,42 +603,11 @@ async function runVerb(verb, flags, positional, dir) {
     // on it here.
     case 'submit': {
       const text = requireField(positional[0], 'submit requires a free-text description: fgos submit "<description>" [--async|--unattended]');
-      const title = deriveTitle(text);
-      const { tier, kind, risk } = classify(text);
-      const id = generateId(title, Object.keys(listWork(dir).work));
-      const work = {
-        id,
-        title,
-        // Per P30 (discovery-context): the full submitted text, kept
-        // alongside the derived/truncated `title` so context-discovery can
-        // read the real ask instead of just the classified summary.
-        description: text,
-        kind,
-        status: 'todo',
-        deps: [],
-        risk,
-        refs: [],
-        verify: SUBMIT_VERIFY_SENTINEL,
-        tier,
-        mode: flags.async || flags.unattended ? 'async' : 'sync',
-        // Per base-workflow-model D1-D4/S2: --domain is optional, same
-        // omitted-leaves-undefined shape as `add`'s --domain above; omitting
-        // it leaves work.domain undefined so store.mjs's addWork/
-        // validateWorkShape apply DEFAULT_DOMAIN's lazy default.
+      const opts = {
+        async: Boolean(flags.async || flags.unattended),
         domain: optionalField(flags.domain, 'submit --domain requires a domain name (e.g. coding/synthetic); omit --domain entirely to use the default.'),
-        // Per D8: every item entering through the public door starts at its
-        // domain's Clarify-mapped stage — context-discovery must pass before
-        // it can be worked. Generalized from the hardcoded 'clarify' (D8) to
-        // stay domain-aware (base-workflow-model D1-D4/S2): byte-identical
-        // 'clarify' for the default/omitted (coding) case, since
-        // stageForStep(DOMAINS.coding, 'Clarify') === 'clarify'. A domain with
-        // no Clarify-mapped stage (e.g. 'synthetic') falls back to its own
-        // first declared stage. `add` deliberately omits this (lazy default,
-        // D8) — only `submit` needs an explicit entry stage.
-        stage: stageForStep(getDomain(flags.domain), 'Clarify') ?? getDomain(flags.domain).stages[0],
       };
-      const { event } = addWork(dir, work);
-      return JSON.stringify(wrapEnvelope(event.payload), null, 2);
+      return submitWork(dir, text, opts);
     }
 
     // The sync branch's entry point into context-discovery/chia-việc (per
@@ -1307,8 +1341,22 @@ async function runVerb(verb, flags, positional, dir) {
     // bad `--pick` id (D11) — an unmatched id is a clean validation error.
     case 'evolve': {
       const pickId = optionalField(flags.pick, 'evolve --pick requires a non-empty candidate id value (omit --pick entirely to list every candidate)');
+      // Per D15: `--submit <id>` is the only mutating action across the
+      // whole evolve/Gate A surface — `evolve` (no flag) and `evolve --pick`
+      // above are unchanged from Slice 1.
+      const submitId = optionalField(flags.submit, 'evolve --submit requires a non-empty candidate id value');
       const view = listWork(dir);
       const candidates = rankCandidates(view);
+      if (submitId !== undefined) {
+        const picked = candidates.find((c) => c.id === submitId);
+        if (!picked) {
+          throw new StoreError(
+            'validation',
+            `evolve --submit: "${submitId}" is not an open candidate — run "fgos evolve" to see the current ranked list.`,
+          );
+        }
+        return submitWork(dir, describeCandidate(picked));
+      }
       if (pickId === undefined) {
         return formatCandidateList(candidates);
       }
