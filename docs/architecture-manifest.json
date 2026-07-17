@@ -26,6 +26,7 @@
     "src/state/impact.mjs": "domain",
     "src/state/stage.mjs": "domain",
     "src/state/replay.mjs": "domain",
+    "src/state/dep-graph.mjs": "domain",
     "src/intake/discovery.mjs": "use-case",
     "src/intake/decompose.mjs": "use-case",
     "src/report/entropy.mjs": "domain",

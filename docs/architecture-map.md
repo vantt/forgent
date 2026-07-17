@@ -250,7 +250,7 @@ xuyên tầng, trỏ về các component). Cột maturity buộc sổ nói thậ
 cho máy giữ tình trạng "đủ" này. (v0.2 lúc đầu khai "14/14" — chính phép đếm bằng
 máy bắt được lỗi đếm tay này.)
 
-### Component — live (13/13 file có thẻ)
+### Component — live (14/14 file có thẻ)
 
 | Module | Nhà | Physics | Vai | Contracts |
 |---|---|---|---|---|
@@ -265,6 +265,7 @@ máy bắt được lỗi đếm tay này.)
 | `src/state/fsm.mjs` — luật transition | Domain | — | memory | C2 |
 | `src/state/frontier.mjs` — truy vấn ready | Domain | state (derived) | control | — (nội bộ) |
 | `src/state/replay.mjs` — fold/rebuild view | Domain | state | memory | C2 |
+| `src/state/dep-graph.mjs` — kiểm tra chu trình trên quan hệ `deps` | Domain | — | governance | — (nội bộ) |
 | `src/state/events.mjs` — engine đọc/ghi log | Kernel | event | memory | C2 |
 | `src/state/work.mjs` — schema + DEFAULTS | Kernel | — (schema) | memory | C2 (schema v2) |
 | *(test/{state,runner,cli,e2e} — đi theo nhà module nó kiểm, không row riêng)* | | | | |
