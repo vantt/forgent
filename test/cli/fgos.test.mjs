@@ -1231,6 +1231,15 @@ test('submit with an unrecognized --domain value is rejected as validation, exit
   assert.equal(eventLines(cwd).length, before);
 });
 
+test('submit --domain <bad> produces exactly one stderr line (the validation error), no stray "folding to coding" warning — parity with add (review-20260717-self-improve-base-workflow f3)', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['submit', 'Try a bad domain again', '--domain', 'bogus']);
+  assert.equal(result.status, 4);
+  assert.doesNotMatch(result.stderr, /folding to "coding"/);
+  const stderrLines = result.stderr.split('\n').filter(Boolean);
+  assert.equal(stderrLines.length, 1, `expected exactly one stderr line, got: ${JSON.stringify(stderrLines)}`);
+});
+
 test('submit with a bare --domain (no value) is rejected as validation, exit 4, no event written', () => {
   const cwd = tmpCwd();
   const before = eventLines(cwd).length;

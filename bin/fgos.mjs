@@ -567,7 +567,18 @@ function submitWork(dir, text, opts = {}) {
     // no Clarify-mapped stage (e.g. 'synthetic') falls back to its own
     // first declared stage. `add` deliberately omits this (lazy default,
     // D8) — only `submit` needs an explicit entry stage.
-    stage: stageForStep(getDomain(opts.domain), 'Clarify') ?? getDomain(opts.domain).stages[0],
+    //
+    // A no-op onUnrecognized here (review-20260717-self-improve-base-workflow
+    // finding f3): an out-of-registry opts.domain is about to be rejected by
+    // addWork's validateWork below with a clean WorkValidationError anyway —
+    // getDomain's default console.warn fallback would fire a spurious
+    // "folding to coding" diagnostic first, describing a fold that never
+    // actually happens (the item is never persisted). `add`'s --domain
+    // handling never calls getDomain at all for this reason; `submit` still
+    // needs the eager stage lookup for a legal domain, so it silences the
+    // fallback rather than skip it.
+    stage: stageForStep(getDomain(opts.domain, { onUnrecognized: () => {} }), 'Clarify')
+      ?? getDomain(opts.domain, { onUnrecognized: () => {} }).stages[0],
   };
   const { event } = addWork(dir, work);
   return JSON.stringify(wrapEnvelope(event.payload), null, 2);
