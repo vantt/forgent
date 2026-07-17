@@ -3,8 +3,12 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { fork } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 import { appendEvent, readEvents, repairTruncatedLastLine, EventLogError } from '../../src/state/events.mjs';
 import { SCHEMA_VERSION } from '../../src/state/work.mjs';
+
+const EVENTS_MJS = path.resolve(fileURLToPath(import.meta.url), '../../../src/state/events.mjs');
 
 // Every test gets its own mkdtemp dir — never touch the repo's .fgos/.
 function tmpLogPath() {
@@ -209,4 +213,75 @@ test('readEvents reads a pre-Phase-2 event with no v field at all, unmodified (p
   assert.equal(event.v, undefined);
   assert.equal(event.type, 'work.add');
   assert.equal(event.payload.id, 'legacy');
+});
+
+// Cross-process regression (fgos-multi-session-checkout Epic 3): the real,
+// spike-confirmed corruption was two SEPARATE OS processes both reading the
+// same last seq and both writing seq+1 — an in-process test can never expose
+// it (one event loop serializes the appends for free). Mirroring the forced
+// spike's technique: fork several real child processes, synchronize them to a
+// shared start instant so their append bursts genuinely overlap, then assert
+// the append lock kept every seq unique, gapless, and strictly increasing.
+test('appendEvent under concurrent OS processes yields unique, gapless, strictly-increasing seqs', async () => {
+  const logPath = tmpLogPath();
+  const workDir = path.dirname(logPath);
+  fs.writeFileSync(logPath, '');
+
+  const N_PROC = 6;
+  const N_APPEND = 40;
+
+  // Each child imports the REAL appendEvent, waits until `startAt` (a shared
+  // wall-clock barrier a few hundred ms out) so all processes stampede the
+  // lock together, then fires N_APPEND appends back-to-back with no delay —
+  // maximizing read-then-write window overlap. A lock regression surfaces as a
+  // duplicate/gap in the assertions below; a genuine timeout surfaces as a
+  // non-zero child exit (asserted too).
+  const childScript = `
+import { appendEvent } from ${JSON.stringify(EVENTS_MJS)};
+const logPath = process.argv[2];
+const startAt = Number(process.argv[3]);
+const n = Number(process.argv[4]);
+const waitMs = startAt - Date.now();
+if (waitMs > 0) Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, waitMs);
+for (let i = 0; i < n; i += 1) {
+  appendEvent(logPath, { type: 'race-regression', payload: { i, pid: process.pid } });
+}
+`;
+  const childPath = path.join(workDir, 'race-child.mjs');
+  fs.writeFileSync(childPath, childScript);
+
+  const startAt = Date.now() + 300;
+  const exitCodes = await Promise.all(
+    Array.from({ length: N_PROC }, () =>
+      new Promise((resolve) => {
+        const child = fork(childPath, [logPath, String(startAt), String(N_APPEND)], { stdio: 'inherit' });
+        child.on('exit', (code) => resolve(code));
+      }),
+    ),
+  );
+
+  assert.deepEqual(
+    exitCodes,
+    Array(N_PROC).fill(0),
+    'every child must exit 0 — a non-zero exit means an append threw (e.g. a lock-timeout under contention)',
+  );
+
+  // readEvents itself throws corrupt-log if any line was interleaved/torn.
+  const events = readEvents(logPath);
+  assert.equal(events.length, N_PROC * N_APPEND, 'every append must have landed exactly once');
+
+  const seqs = events.map((e) => e.seq);
+  const expected = Array.from({ length: N_PROC * N_APPEND }, (_, i) => i + 1);
+  assert.deepEqual(
+    [...seqs].sort((a, b) => a - b),
+    expected,
+    'seqs must be unique, gapless, and cover 1..N with no duplicates',
+  );
+  // Append order on disk must also be strictly increasing (the lock serializes
+  // the whole read-compute-append, so the file is written in seq order).
+  for (let i = 1; i < seqs.length; i += 1) {
+    assert.ok(seqs[i] > seqs[i - 1], `seq at position ${i} (${seqs[i]}) must exceed the previous (${seqs[i - 1]})`);
+  }
+
+  fs.rmSync(workDir, { recursive: true, force: true });
 });

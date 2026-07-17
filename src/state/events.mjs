@@ -20,10 +20,44 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { SCHEMA_VERSION } from './work.mjs';
 
+// Cross-process append lock. `appendEvent` reads the log's last seq then
+// appends — a read-then-write window that, unguarded, lets two concurrent
+// processes both read seq N and both write N+1 (spike-confirmed duplicate-seq
+// corruption of the append-only log). A dedicated `.fgos/events.lock` beside
+// the log makes that window exclusive across processes.
+//
+// This is a THIRD, wholly independent instance of the same wx-atomic-create +
+// stale-pid-reclaim primitive already proven by loop.mjs's acquireRunnerLock
+// and session.mjs's acquireSessionsLock — deliberately NOT imported from
+// either (this module stays zero-dep, Node builtins only) and touching
+// neither runner.lock nor sessions.lock.
+//
+// POLICY: it mirrors acquireSessionsLock's BLOCKING retry-with-timeout, NOT
+// acquireRunnerLock's non-blocking "tries twice then backs off". appendEvent
+// is the single door every mutating verb funnels through and must EVENTUALLY
+// succeed — a non-blocking back-off would silently skip writing an event,
+// which is never acceptable here.
+//
+// HOT-PATH SIZING: appendEvent runs on every single mutation, often in a tight
+// automated-dispatch loop, and holds the lock only for one read-parse + one
+// appendFileSync (sub-millisecond to low-ms). So the retry interval is short
+// (10ms — responsive without hot-spinning) and the timeout is 2s — deliberately
+// NOT acquireSessionsLock's 10s session-lifecycle default. 2s is generous
+// headroom for genuine contention (dozens of serialized sub-ms holders) or a
+// slow disk, yet short enough that a truly stuck/deadlocked path surfaces as a
+// clear 'lock-timeout' error instead of hanging a CLI command indefinitely.
+const EVENTS_LOCK_FILE = 'events.lock';
+const EVENTS_LOCK_TIMEOUT_MS = 2000;
+const EVENTS_LOCK_RETRY_MS = 10;
+
 /**
  * Error raised by this module. `category` is a stable contract consumed by
- * the CLI's exit-code table (R4): 'corrupt-log' and 'validation' are the two
- * categories this module can raise.
+ * the CLI's exit-code table (R4): 'corrupt-log', 'validation', and
+ * 'lock-timeout' are the categories this module can raise. 'lock-timeout' is
+ * distinct on purpose: it means another process held the append lock past the
+ * timeout (retry the whole operation), NOT that the log is corrupt or the
+ * caller's input was invalid — a caller must be able to tell live contention
+ * apart from a real data problem.
  */
 export class EventLogError extends Error {
   constructor(category, message) {
@@ -93,6 +127,16 @@ function parsesAsJson(line) {
  * re-validated through `readEvents` before returning — a repair that somehow
  * left the log still unreadable surfaces as a thrown error, never a silent
  * "fixed" result.
+ *
+ * NO-CONCURRENT-PROCESSES REQUIREMENT: this is a whole-file rewrite
+ * (`fs.writeFileSync` after a backup copy) and it deliberately does NOT take
+ * the events.lock that guards `appendEvent`. It is a rare, operator-invoked
+ * recovery step, not part of the normal concurrent-append path — and it must
+ * only be run with no live fgos processes active. A concurrent `appendEvent`
+ * landing between this function's read and its `writeFileSync` would be
+ * silently overwritten (dropped). Guarding repair against that is out of scope
+ * here (see the Deferred Idea in this feature's CONTEXT.md); the requirement is
+ * documented, not enforced.
  */
 export function repairTruncatedLastLine(logPath) {
   let raw;
@@ -139,6 +183,114 @@ export function repairTruncatedLastLine(logPath) {
   return { backupPath, droppedLine: lastLine, eventCount: events.length };
 }
 
+/** Signal-0 liveness probe (mirrors loop.mjs/session.mjs's isPidAlive). EPERM
+ * means the pid exists under another user — still alive, still a holder. */
+function isPidAlive(pid) {
+  try {
+    process.kill(pid, 0);
+    return true;
+  } catch (err) {
+    return err.code === 'EPERM';
+  }
+}
+
+/** Synchronous backoff — keeps this module synchronous (no async lock window
+ * for the lock to leak), without a busy spin. */
+function sleepSync(ms) {
+  Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
+}
+
+/** One attempt at the wx-atomic-create lock, mirroring acquireRunnerLock /
+ * acquireSessionsLock exactly. On EEXIST: a live-pid holder backs off; a
+ * dead/garbage-pid leftover is re-read right before the unlink (the liveness
+ * probe is the slow window — changed content is a fresh holder we must not
+ * touch) then cleaned. It NEVER creates the lock in the same attempt that
+ * deleted a stale one (that delete-then-create was the TOCTOU the sibling
+ * locks' doc comments call out); a reclaim yields and the next attempt does
+ * the bare create. */
+function tryAcquireEventsLockOnce(lockPath, pid) {
+  try {
+    const fd = fs.openSync(lockPath, 'wx');
+    try {
+      fs.writeSync(fd, String(pid));
+    } finally {
+      fs.closeSync(fd);
+    }
+    return { acquired: true };
+  } catch (err) {
+    if (err.code !== 'EEXIST') throw err;
+  }
+
+  let raw;
+  try {
+    raw = fs.readFileSync(lockPath, 'utf8');
+  } catch (err) {
+    if (err.code === 'ENOENT') return { acquired: false, holderPid: null }; // released in between — retry create
+    throw err;
+  }
+  const holderPid = parseInt(raw.trim(), 10);
+
+  if (Number.isInteger(holderPid) && holderPid > 0 && isPidAlive(holderPid)) {
+    return { acquired: false, holderPid };
+  }
+
+  let current;
+  try {
+    current = fs.readFileSync(lockPath, 'utf8');
+  } catch (err) {
+    if (err.code === 'ENOENT') return { acquired: false, holderPid: null }; // already cleaned
+    throw err;
+  }
+  if (current !== raw) {
+    const freshPid = parseInt(current.trim(), 10);
+    return { acquired: false, holderPid: Number.isInteger(freshPid) && freshPid > 0 ? freshPid : null };
+  }
+  try {
+    fs.unlinkSync(lockPath);
+  } catch (err) {
+    if (err.code !== 'ENOENT') throw err;
+  }
+  return { acquired: false, holderPid: null }; // cleaned and yield; next attempt creates
+}
+
+/** Blocking exclusive acquire of `.fgos/events.lock` (derived from
+ * `path.dirname(logPath)`, so a caller passing a different log dir — e.g.
+ * porting-store.mjs — automatically gets its own dedicated lock). Retries the
+ * single-attempt primitive with a synchronous backoff until it wins or the
+ * timeout elapses, then throws `EventLogError('lock-timeout')`. Returns a
+ * handle with `release()`; the caller MUST release in a finally. */
+function acquireEventsLock(logPath, { pid = process.pid, timeoutMs = EVENTS_LOCK_TIMEOUT_MS, retryMs = EVENTS_LOCK_RETRY_MS } = {}) {
+  const dir = path.dirname(logPath);
+  fs.mkdirSync(dir, { recursive: true });
+  const lockPath = path.join(dir, EVENTS_LOCK_FILE);
+  const deadline = Date.now() + timeoutMs;
+
+  for (;;) {
+    const res = tryAcquireEventsLockOnce(lockPath, pid);
+    if (res.acquired) {
+      return {
+        lockPath,
+        release() {
+          try {
+            fs.unlinkSync(lockPath);
+          } catch (err) {
+            if (err.code !== 'ENOENT') throw err;
+          }
+        },
+      };
+    }
+    if (Date.now() >= deadline) {
+      throw new EventLogError(
+        'lock-timeout',
+        `appendEvent: timed out acquiring events.lock at "${lockPath}" after ${timeoutMs}ms` +
+          (res.holderPid ? ` (held by pid ${res.holderPid})` : '') +
+          ' — another process is writing; retry the operation.',
+      );
+    }
+    sleepSync(retryMs);
+  }
+}
+
 /**
  * Append exactly one event to `logPath` as a single JSON line: `{ seq, ts,
  * type, payload, v }`. `seq` is derived from the current last event (1 if
@@ -151,19 +303,36 @@ export function repairTruncatedLastLine(logPath) {
  * Reads the existing log first (via readEvents), so appending onto an
  * already-corrupt log fails loudly with the same 'corrupt-log' category
  * rather than silently continuing on top of unknown state.
+ *
+ * The read-seq/compute/append sequence runs under a cross-process
+ * `events.lock` (released in a finally on every exit path), so two concurrent
+ * processes never both read the same last seq and write a duplicate. SCOPE:
+ * this closes ONLY the duplicate/out-of-order seq race at the append itself.
+ * It does NOT make store.mjs's higher-level read-modify-write operations (e.g.
+ * addWork's existing-id check, moveWork's expectedStatus compare-and-swap)
+ * atomic across processes — those read state OUTSIDE this lock, so two
+ * interactive verbs can each pass a stale precondition and append a
+ * valid-but-logically-conflicting event. That residual is a separate, accepted,
+ * deferred concern (see this feature's CONTEXT.md Deferred Ideas), NOT solved
+ * here. The lock adds exclusivity; it does not alter the seq-numbering algorithm.
  */
 export function appendEvent(logPath, { type, payload = null } = {}) {
   if (typeof type !== 'string' || !type.trim()) {
     throw new EventLogError('validation', 'appendEvent: "type" is required and must be a non-empty string.');
   }
 
-  const existing = readEvents(logPath);
-  const last = existing[existing.length - 1];
-  const seq = last ? last.seq + 1 : 1;
+  const lock = acquireEventsLock(logPath);
+  try {
+    const existing = readEvents(logPath);
+    const last = existing[existing.length - 1];
+    const seq = last ? last.seq + 1 : 1;
 
-  const event = { seq, ts: new Date().toISOString(), type: type.trim(), payload, v: SCHEMA_VERSION };
+    const event = { seq, ts: new Date().toISOString(), type: type.trim(), payload, v: SCHEMA_VERSION };
 
-  fs.mkdirSync(path.dirname(logPath), { recursive: true });
-  fs.appendFileSync(logPath, `${JSON.stringify(event)}\n`, 'utf8');
-  return event;
+    fs.mkdirSync(path.dirname(logPath), { recursive: true });
+    fs.appendFileSync(logPath, `${JSON.stringify(event)}\n`, 'utf8');
+    return event;
+  } finally {
+    lock.release();
+  }
 }
