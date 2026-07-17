@@ -28,6 +28,7 @@ import { resolveDiscovery } from '../src/intake/discovery.mjs';
 import { resolveDecompose } from '../src/intake/decompose.mjs';
 import { computeEntropy, computeCounts } from '../src/report/entropy.mjs';
 import { rankCandidates } from '../src/evolve/candidates.mjs';
+import { rankImpact } from '../src/state/impact.mjs';
 import { runGoalCheck } from '../src/runner/goal-check.mjs';
 import { classifySource, reviewDiff, mergeRunnerItem, cleanupMergedBranch, isWorkingTreeClean as isMainTreeClean, isFgosOnlyStatusLine } from '../src/runner/merge.mjs';
 import { branchNameFor, branchExists, createWorktree, removeWorktree } from '../src/runner/worktree.mjs';
@@ -436,6 +437,16 @@ function formatCandidateList(candidates) {
     return 'evolve: không có friction chưa ngã-ngũ nào — không có candidate nào để chọn.';
   }
   return `candidates (${candidates.length}):\n${candidates.map(formatCandidateLine).join('\n')}`;
+}
+
+// Backlog-triage impact ranking (P21): blocking-fan-out ranked list, one line
+// per open item — `blocks` is how many other still-open items depend on it.
+function formatTriage(ranked) {
+  if (ranked.length === 0) {
+    return 'triage: không có việc mở nào để xếp hạng.';
+  }
+  const lines = ranked.map((r) => `${r.id} — ${r.title} (${r.status}) — blocks ${r.blocks}`);
+  return `triage (${ranked.length}):\n${lines.join('\n')}`;
 }
 
 // Rollup view (P24): direct children only (`w.parent === id`) — decompose
@@ -1292,8 +1303,15 @@ async function runVerb(verb, flags, positional, dir) {
       return formatFrictionSection(view, pickId);
     }
 
+    // Backlog-triage impact ranking (P21) — separate from P14's intake-time
+    // risk/lane classification: this ranks open work by blocking fan-out
+    // (how many other open items it unblocks), not by how risky it is.
+    case 'triage': {
+      return formatTriage(rankImpact(listWork(dir)));
+    }
+
     default:
-      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <init|add|submit|discover|move|edit|ask|answer|decision|list|ready|rebuild|repair|check|rollup|take|return|review|approve|reject|catchup|evolve> ...`);
+      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <init|add|submit|discover|move|edit|ask|answer|decision|list|ready|rebuild|repair|check|rollup|take|return|review|approve|reject|catchup|evolve|triage> ...`);
   }
 }
 

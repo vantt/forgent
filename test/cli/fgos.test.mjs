@@ -817,6 +817,54 @@ test('rollup never mutates state: no event is appended and no children of an unr
   assert.deepEqual(eventLines(cwd), before);
 });
 
+// --- backlog-triage impact ranking (P21) ------------------------------------
+//
+// Separate from P14's intake-time risk/lane classification: `triage` ranks
+// OPEN work by blocking fan-out (how many other still-open items depend on
+// it), highest first.
+
+test('triage on an empty backlog prints a "no open work" note, exit 0', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['triage']);
+  assert.equal(result.status, 0);
+  assert.match(result.stdout, /không có việc mở nào/);
+});
+
+test('triage ranks a base item above the items that depend on it', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'base');
+  run(cwd, ['add', 'dep1', '--title', 'Dep1', '--kind', 'task', '--risk', 'low', '--verify', 'npm test', '--deps', 'base']);
+  run(cwd, ['add', 'dep2', '--title', 'Dep2', '--kind', 'task', '--risk', 'low', '--verify', 'npm test', '--deps', 'base']);
+
+  const result = run(cwd, ['triage']);
+  assert.equal(result.status, 0);
+  assert.match(result.stdout, /base — Title base \(todo\) — blocks 2/);
+  assert.match(result.stdout, /dep1 — Dep1 \(todo\) — blocks 0/);
+});
+
+test('triage excludes a done item from ranking, and a done dependent never counts as blocked', () => {
+  const cwd = tmpCwd();
+  const dir = path.join(cwd, '.fgos');
+  addOk(cwd, 'base');
+  addWork(dir, { id: 'finished-dependent', title: 'Finished Dependent', kind: 'task', status: 'done', deps: ['base'], risk: 'low', refs: [], verify: 'npm test' });
+  addWork(dir, { id: 'done-item', title: 'Done Item', kind: 'task', status: 'done', deps: [], risk: 'low', refs: [], verify: 'npm test' });
+
+  const result = run(cwd, ['triage']);
+  assert.equal(result.status, 0);
+  assert.match(result.stdout, /base — Title base \(todo\) — blocks 0/);
+  assert.doesNotMatch(result.stdout, /done-item/);
+});
+
+test('triage never mutates state: no event is appended', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'base');
+
+  const before = eventLines(cwd);
+  const result = run(cwd, ['triage']);
+  assert.equal(result.status, 0);
+  assert.deepEqual(eventLines(cwd), before);
+});
+
 // --- friction channel in `check` (phase-3-compound-learning-4, S2) ---------
 //
 // Same write-door discipline as the outcome tests above: only the runner

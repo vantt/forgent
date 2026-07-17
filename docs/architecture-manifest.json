@@ -19,6 +19,7 @@
     "src/runner/root-affinity.mjs": "domain",
     "src/state/fsm.mjs": "domain",
     "src/state/frontier.mjs": "domain",
+    "src/state/impact.mjs": "domain",
     "src/state/stage.mjs": "domain",
     "src/state/replay.mjs": "domain",
     "src/intake/discovery.mjs": "use-case",
