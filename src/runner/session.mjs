@@ -307,10 +307,32 @@ export function createSession(repoRoot, opts = {}) {
       });
     }
 
+    // When `.fgos/` is git-tracked (this repo's own convention — events.jsonl
+    // et al. are committed, D10), `git worktree add --detach` checks a real
+    // `.fgos/` copy out into the fresh worktree, so symlinkSync would hit
+    // EEXIST. Remove that redundant checked-out copy first — it must never be
+    // read (only the symlinked shared store is truth, D10). Scoped strictly to
+    // THIS just-created worktree's own path; the real repoRoot .fgos/ (the
+    // symlink target) is never touched.
+    const worktreeFgos = path.join(worktreePath, '.fgos');
+    try {
+      fs.rmSync(worktreeFgos, { recursive: true, force: true });
+    } catch (err) {
+      try {
+        gitAt(repoRoot, ['worktree', 'remove', '--force', worktreePath]);
+      } catch {
+        // best-effort rollback of the just-created worktree.
+      }
+      throw new SessionError(
+        `removing checked-out .fgos in session "${sessionId}" worktree failed: ${err.message}`,
+        { sessionId, worktreePath },
+      );
+    }
+
     // D10: never copy .fgos/ — symlink it (absolute target, 'dir' type). fs
     // reads/writes are transparent through it (same inode; spike-confirmed).
     try {
-      fs.symlinkSync(fgosDir, path.join(worktreePath, '.fgos'), 'dir');
+      fs.symlinkSync(fgosDir, worktreeFgos, 'dir');
     } catch (err) {
       try {
         gitAt(repoRoot, ['worktree', 'remove', '--force', worktreePath]);

@@ -34,6 +34,23 @@ function initTempRepo() {
   return repoRoot;
 }
 
+// Like initTempRepo, but COMMITS .fgos content into HEAD — mirroring the real
+// product repo, where .fgos/events.jsonl (and friends) are git-tracked. This
+// makes `git worktree add --detach` check out a real .fgos/ dir into the new
+// worktree, the condition the gitignored-.fgos fixtures never exercised.
+function initTempRepoWithCommittedFgos() {
+  const repoRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-session-test-repo-'));
+  execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: repoRoot });
+  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: repoRoot });
+  execFileSync('git', ['config', 'user.name', 'Test'], { cwd: repoRoot });
+  fs.writeFileSync(path.join(repoRoot, 'seed.txt'), 'seed\n');
+  fs.mkdirSync(path.join(repoRoot, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(repoRoot, '.fgos', 'events.jsonl'), '{"seed":true}\n');
+  execFileSync('git', ['add', '-A'], { cwd: repoRoot });
+  execFileSync('git', ['commit', '-q', '-m', 'init with committed .fgos'], { cwd: repoRoot });
+  return repoRoot;
+}
+
 function mkSessionsDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-session-test-wt-'));
 }
@@ -120,6 +137,29 @@ test('.fgos inside the session worktree is a symlink to the shared store, not a 
     // and the reverse: write in main, read through the session symlink (same inode)
     fs.writeFileSync(path.join(repoRoot, '.fgos', 'probe2.txt'), 'from-main\n');
     assert.equal(fs.readFileSync(path.join(link, 'probe2.txt'), 'utf8'), 'from-main\n');
+  } finally {
+    cleanup(repoRoot, sessionsDir);
+  }
+});
+
+test('createSession succeeds when .fgos is git-committed into HEAD, still yielding a transparent symlink', () => {
+  const repoRoot = initTempRepoWithCommittedFgos();
+  const sessionsDir = mkSessionsDir();
+  try {
+    const sess = createSession(repoRoot, { sessionId: 'committed-fgos', sessionsDir });
+
+    const link = path.join(sess.worktreePath, '.fgos');
+    assert.ok(fs.lstatSync(link).isSymbolicLink(), '.fgos is a symlink, not the checked-out copy');
+    assert.equal(fs.realpathSync(link), fs.realpathSync(path.join(repoRoot, '.fgos')), 'symlink resolves to the shared store');
+
+    // still transparent to the real store: a write through the session symlink
+    // is immediately visible from the main worktree's real .fgos/.
+    fs.writeFileSync(path.join(link, 'probe.txt'), 'from-session\n');
+    assert.equal(fs.readFileSync(path.join(repoRoot, '.fgos', 'probe.txt'), 'utf8'), 'from-session\n');
+
+    // the removal only touched the worktree copy — the real repoRoot store's
+    // committed seed content is untouched.
+    assert.equal(fs.readFileSync(path.join(repoRoot, '.fgos', 'events.jsonl'), 'utf8'), '{"seed":true}\n');
   } finally {
     cleanup(repoRoot, sessionsDir);
   }
