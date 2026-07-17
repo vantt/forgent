@@ -1,8 +1,8 @@
 ---
 area: runner
-updated: 2026-07-16
-sources: [phase-2-routing, post-divorce-hardening, phase-3-compound-learning-s1, phase-3-compound-learning-s2, phase-3-compound-learning-s3-closeout, stage-clarify, stage-decompose-s1, stage-decompose-s2, pr-lifecycle-s1]
-decisions: [feed7428, 14396a5c, 1a80b4d3, 9a19eea5, 96a65365, a7c099af, 43f257ae, 44936500, e1218b22, 6f2cbc47, a30a3d3c, 1359ab5e]
+updated: 2026-07-17
+sources: [phase-2-routing, post-divorce-hardening, phase-3-compound-learning-s1, phase-3-compound-learning-s2, phase-3-compound-learning-s3-closeout, stage-clarify, stage-decompose-s1, stage-decompose-s2, pr-lifecycle-s1, discovery-context]
+decisions: [feed7428, 14396a5c, 1a80b4d3, 9a19eea5, 96a65365, a7c099af, 43f257ae, 44936500, e1218b22, 6f2cbc47, a30a3d3c, 1359ab5e, cfae0120]
 coverage: full
 ---
 
@@ -48,7 +48,11 @@ Vòng lặp tự hành của forgent: tự lấy việc sẵn-sàng từ work-st
   giá trị `mode` của item mang gì (mode chỉ là quy ước ai NÊN gọi trước,
   không phải điều kiện runner rẽ nhánh). Việc đang `awaiting-human` (đã hỏi,
   chưa ai trả lời) KHÔNG BAO GIỜ bị quét lại — cùng luật loại-trừ với dispatch
-  thường (xem R6 Work-State/R15).
+  thường (xem R6 Work-State/R15). Prompt phán mà runner gọi ở đây mang cùng
+  ngữ cảnh đầy đủ như lời gọi `fgos discover` tay — description gốc + cặp
+  hỏi-đáp mới nhất + các lần phán trước của item (per discovery-context P30
+  / cfae0120, xem spec Work-State "Giai đoạn Làm-rõ") — không phải một bản
+  rút gọn riêng cho vòng tự hành.
 - **Side effects:** một lời gọi model thật cho mỗi item quét được — không
   bao giờ throw ra ngoài dù model lỗi/timeout (fail-safe, xem spec
   Work-State).
@@ -279,7 +283,7 @@ Not applicable — không có màn hình.
 - `bin/fgos-runner.mjs` — CLI (--once/--dry-run/--config), exit theo phạm trù
 - `src/runner/loop.mjs` — vòng + startup reap (SKIP claim `human`/`session` — xem "Gặt-lại lúc khởi động") + khoá liên-tiến-trình `.fgos/runner.lock` (busy exit 6); NGAY SAU reap, TRƯỚC vòng dispatch: (1) quét mọi item `stage==='clarify' && status==='todo'` (không đọc `item.mode`) và gọi `resolveDiscovery` (`src/intake/discovery.mjs`) cho từng item, truyền `'runner'`; (2) đọc lại view tươi rồi quét mọi item `stage==='decompose' && status==='todo'` và gọi `resolveDecompose` (`src/intake/decompose.mjs`) cho từng item, cùng truyền `'runner'` — cùng lượt chạy có thể chaining cả hai sweep trên một item vừa rời clarify; ghi bản outcome dự đoán tại claim + thực tế ở cả hai lối ra cuối (thành đề xuất, hoặc đỗ/dừng) qua `addOutcome` của store; mọi `moveWork` runner tự gọi (claim/propose/park) truyền `actor:'runner'`; gọi `runGoalCheck` (từ `goal-check.mjs`, không còn tự triển khai) cho cả proof lúc dispatch lẫn proof lúc gặt-lại; `dispatch.mjs` — prompt/config/spawn (argv-only, spawnSync timeout; caveat grandchild SIGTERM ghi trong doc comment) + `resolveExecutorCommand`/`modelForTier` (tái dùng bởi discovery.mjs VÀ decompose.mjs cho lời gọi model phán); `worktree.mjs` — lifecycle + reclaimOrphanedCheckout; `recovery.mjs` — 8 lớp; `anti-loop.mjs` — visitCount/breaker
 - `src/runner/goal-check.mjs` — hàm goal-check dùng chung DUY NHẤT (`runGoalCheck(item, cwd, timeoutMs)`): chạy `item.verify` qua shell tại `cwd`, phán chỉ bằng exit status — trích xuất từ `loop.mjs` (stage-decompose S2-pull) để cả vòng tự hành LẪN cửa pull `fgos return` (spec Work-State) gọi đúng một bản logic, không bao giờ hai bản song song
-- `src/intake/discovery.mjs` — xem Pointers spec Work-State (module dùng chung giữa runner và verb `discover`); verb `discover` (phiên sống) truyền `'session'`; verdict đủ rõ nay `moveStage` tới `decompose`, không còn thẳng `executing`
+- `src/intake/discovery.mjs` — xem Pointers spec Work-State (module dùng chung giữa runner và verb `discover`); verb `discover` (phiên sống) truyền `'session'`; verdict đủ rõ nay `moveStage` tới `decompose`, không còn thẳng `executing`; `judgeDiscovery` nhận thêm `view` tùy chọn (per discovery-context P30) — cả sweep của runner LẪN verb `discover` truyền view đã đọc sẵn, không lời gọi nào cần đọc thêm
 - `src/intake/decompose.mjs` — xem Pointers spec Work-State (module dùng chung giữa runner và verb `discover` khi item ở stage `decompose`); verb `discover` (phiên sống) truyền `'session'`
 - `src/report/entropy.mjs` — thuần, không fs/Date.now(): `computeEntropy(view)` → `{score, parts}` (5 tín hiệu có trọng số, mỗi phần giải thích được); `computeCounts(view)` → tổng phẳng outcome/friction/settlement cho seal-digest; đọc/ghi lịch sử xu hướng (`entropy-history.jsonl`, cùng thư mục dữ liệu với `events.jsonl`) và định dạng seal-digest là việc của `bin/fgos.mjs`'s verb `check`, không phải module này
 - `.fgos-runner.json` — config committed (executor template + models light/haiku, standard/sonnet, heavy/opus + timeoutMs)
