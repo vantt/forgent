@@ -32,6 +32,8 @@ const MODULE_TRIP_CASES = [
   'bin/fgos.mjs',              // equals (whole entry file stands in for the evolve verb)
   'src/state/store.mjs',       // equals (D14)
   'src/state/fsm.mjs',         // equals (D14)
+  'src/intake/risk-keywords.mjs', // equals (review-20260717-self-improve-base-workflow f1)
+  'src/intake/classify.mjs',      // equals (review-20260717-self-improve-base-workflow f1)
 ];
 
 // --- iron-law: flag test (description) over every HEAVY_KEYWORDS entry ---
@@ -98,7 +100,7 @@ test('classifyIronLaw requires a fix from modules alone when description is abse
 
 test('classifyIronLaw returns required:false when neither test matches', () => {
   const result = classifyIronLaw({
-    filesChanged: ['src/intake/classify.mjs', 'docs/notes.md'],
+    filesChanged: ['src/intake/discovery.mjs', 'docs/notes.md'],
     description: 'an ordinary refactor with no risky words',
   });
   assert.deepEqual(result, { required: false, matchedFlags: [], matchedModules: [] });
