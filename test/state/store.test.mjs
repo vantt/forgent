@@ -252,3 +252,74 @@ test('a dep to an unknown id is still rejected by the existing existence check f
     /depends on unknown id/,
   );
 });
+
+// --- unified cycle guard: blocks + parent-child at the write door ----------
+// (work-graph-intelligence S2a, record 0012)
+//
+// The write door now rejects any add/edit that closes a cycle in the UNIFIED
+// graph (deps projected as `blocks` edges + `parent` projected as
+// `parent-child` edges), superseding the deps-only guard alone. A pure-deps
+// cycle keeps its S1 "dependency cycle" message (the two cases above); a cycle
+// that involves a parent-child edge reports the unified "graph cycle" message.
+// Edge direction is parent -> child: a parent waits for its descendants
+// (frontier.mjs `hasOpenDescendant`), so a `parent` field on child C yields
+// edge parent -> C. These cycles are INVISIBLE to the deps-only guard — the
+// point of the supersession.
+
+test('a MIXED cycle (deps edge + parent-child edge) is rejected at addWork — invisible to the deps-only guard', () => {
+  const dir = tmpDir();
+  addSampleWork(dir, 'mix-a', { deps: [] });
+  // mix-b declares mix-a as BOTH its parent (edge mix-a -> mix-b) and a dep
+  // (edge mix-b -> mix-a): the two edges close a cycle that only the unified
+  // graph sees. The deps-only guard walks mix-b -> mix-a and stops (mix-a has
+  // no deps back), so before S2a this add went straight through.
+  assert.throws(
+    () => addWork(dir, { id: 'mix-b', title: 'Mix B', kind: 'task', status: 'todo', parent: 'mix-a', deps: ['mix-a'], risk: 'low', refs: [], verify: 'npm test' }),
+    /would close a graph cycle/,
+  );
+  assert.equal(listWork(dir).work['mix-b'], undefined, 'the rejected add never landed');
+});
+
+test('a MIXED cycle closed by an editWork patch is rejected — the parent edge exists first, the deps edit closes the loop', () => {
+  const dir = tmpDir();
+  addSampleWork(dir, 'edit-mix-a', { deps: [] });
+  // edit-mix-b's parent is edit-mix-a -> edge edit-mix-a -> edit-mix-b. No
+  // cycle yet (a child pointing at its parent is a plain forward edge).
+  addWork(dir, { id: 'edit-mix-b', title: 'Edit Mix B', kind: 'task', status: 'todo', parent: 'edit-mix-a', deps: [], risk: 'low', refs: [], verify: 'npm test' });
+  assert.ok(listWork(dir).work['edit-mix-b']);
+
+  // Patching edit-mix-b.deps = [edit-mix-a] adds edge edit-mix-b -> edit-mix-a,
+  // closing edit-mix-a -> edit-mix-b -> edit-mix-a. `deps` is editable; `parent`
+  // is not — the parent edge was fixed at add time. The deps-only guard misses
+  // this (edit-mix-a has no deps), the unified guard catches it.
+  assert.throws(
+    () => editWork(dir, { id: 'edit-mix-b', patch: { deps: ['edit-mix-a'] } }),
+    /would close a graph cycle/,
+  );
+  assert.deepEqual(listWork(dir).work['edit-mix-b'].deps, [], 'the patch never landed');
+});
+
+test('a PURE parent-child cycle is rejected — reachable TODAY via a dangling forward parent (parent ids are never existence-checked)', () => {
+  const dir = tmpDir();
+  // pc-a names pc-b as its parent before pc-b exists. `validateDeps` checks
+  // deps existence only; nothing checks parent existence, so this dangling
+  // forward parent is accepted (edge pc-b -> pc-a is recorded, walkable).
+  addWork(dir, { id: 'pc-a', title: 'PC A', kind: 'task', status: 'todo', parent: 'pc-b', deps: [], risk: 'low', refs: [], verify: 'npm test' });
+  assert.ok(listWork(dir).work['pc-a'], 'a dangling forward parent is allowed on add');
+
+  // Now pc-b names pc-a as ITS parent -> edge pc-a -> pc-b, closing
+  // pc-a -> pc-b -> pc-a with zero deps anywhere. Rejected at pc-b's add.
+  assert.throws(
+    () => addWork(dir, { id: 'pc-b', title: 'PC B', kind: 'task', status: 'todo', parent: 'pc-a', deps: [], risk: 'low', refs: [], verify: 'npm test' }),
+    /would close a graph cycle/,
+  );
+  assert.equal(listWork(dir).work['pc-b'], undefined, 'the rejected add never landed');
+});
+
+test('a valid parent chain (no cycle) is still accepted — the unified guard has no false positive on a DAG with parent edges', () => {
+  const dir = tmpDir();
+  addSampleWork(dir, 'tree-root', { deps: [] });
+  addWork(dir, { id: 'tree-child', title: 'Tree Child', kind: 'task', status: 'todo', parent: 'tree-root', deps: [], risk: 'low', refs: [], verify: 'npm test' });
+  addWork(dir, { id: 'tree-grandchild', title: 'Tree Grandchild', kind: 'task', status: 'todo', parent: 'tree-child', deps: [], risk: 'low', refs: [], verify: 'npm test' });
+  assert.ok(listWork(dir).work['tree-grandchild'], 'a plain parent chain is a DAG, not a cycle');
+});

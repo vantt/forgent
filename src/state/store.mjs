@@ -34,7 +34,7 @@ import { transitionStage } from './stage.mjs';
 import { validateWork, WorkValidationError, DEFAULTS } from './work.mjs';
 import { EventLogError } from './events.mjs';
 import { frontier } from './frontier.mjs';
-import { assertNoCycle } from './dep-graph.mjs';
+import { assertNoCycle, assertNoUnifiedCycle } from './dep-graph.mjs';
 
 export { FsmError, WorkValidationError, EventLogError };
 
@@ -140,7 +140,19 @@ export function addWork(dir, work) {
   // validation — never a second validation path. assertNoCycle throws
   // WorkValidationError (category='validation'), already mapped to exit 4 by
   // categoryOf below; it is never wrapped or re-classified here.
+  //
+  // S2a (record 0012) extends that guarantee from the deps-only graph to the
+  // UNIFIED blocking graph (`deps` as `blocks` edges + `parent` as
+  // `parent-child` edges). The deps-only check runs FIRST so a pure-deps cycle
+  // keeps its S1 "dependency cycle" message; assertNoUnifiedCycle then catches
+  // any cycle that a `parent` edge participates in (a MIXED or pure
+  // parent-child cycle the deps-only walk cannot see — a parent id is never
+  // existence-checked, so a dangling forward parent makes such a cycle
+  // reachable today) and reports it as a "graph cycle". Same
+  // WorkValidationError / category='validation' / exit-4 contract; no schema
+  // change, SCHEMA_VERSION unchanged, legacy events replay untouched (R11).
   assertNoCycle(item, before.work);
+  assertNoUnifiedCycle(item, before.work);
 
   const event = appendEvent(logPath, { type: 'work.add', payload: item });
   const view = refreshView(dir);
@@ -187,11 +199,18 @@ export function editWork(dir, { id, patch, actor } = {}) {
 
   const candidate = { ...work, ...patch };
   validateWork(candidate, Object.keys(before.work));
-  // Same guard as addWork above (work-graph-intelligence S1) — this is the
-  // gap that used to close silently: a patch introducing an A<->B cycle
-  // through `deps` (an EDITABLE_FIELDS entry) went straight through, since
-  // validateDeps only checks existence, never acyclicity.
+  // Same guard pair as addWork above. deps-only first (work-graph-intelligence
+  // S1) — this is the gap that used to close silently: a patch introducing an
+  // A<->B cycle through `deps` (an EDITABLE_FIELDS entry) went straight
+  // through, since validateDeps only checks existence, never acyclicity — and
+  // it keeps the S1 "dependency cycle" message for that pure-deps case. Then
+  // the UNIFIED check (S2a, record 0012) catches a cycle that a `parent` edge
+  // participates in: `parent` is NOT editable, so an edit closes such a cycle
+  // only by patching `deps` into a loop against a parent edge fixed at add
+  // time (a MIXED cycle the deps-only walk cannot see), reported as a "graph
+  // cycle". Same validation/exit-4 contract; no schema change (R11).
   assertNoCycle(candidate, before.work);
+  assertNoUnifiedCycle(candidate, before.work);
 
   const payload = { id, patch };
   if (actor !== undefined) {

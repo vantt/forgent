@@ -162,11 +162,19 @@ export function validateWorkShape(work) {
   }
   // Lineage (per stage-decompose D5, inherited verbatim from stage-clarify
   // D11): a child work item carries `parent` — the id of the item it was
-  // decomposed from, NOT a `deps` entry (deps and lineage are deliberately
-  // separate relations; frontier.mjs derives the parent-blocking rule from
-  // this field alone). OPTIONAL and NOT in DEFAULTS, same additive shape as
-  // `stage` — absent on every item that predates this field or was never
-  // decomposed.
+  // decomposed from. `parent` stays its own stored field, NOT a `deps` entry;
+  // frontier.mjs derives the parent-blocking rule from it alone. But `deps`
+  // and `parent` are no longer separate for the acyclic guarantee: since S2a
+  // (record 0012, superseding the "deliberately separate relations" design of
+  // record 0002) both are projected into ONE derived typed-edge graph — `deps`
+  // as `blocks` edges, `parent` as `parent-child` edges (direction
+  // parent -> child: a parent waits for its descendants) — and the single
+  // write door (store.mjs) rejects any add/edit that would close a cycle in
+  // that unified graph, so `parent` now participates in acyclicity alongside
+  // `deps`. This is a read-projection only: zero stored `edges[]` field, no
+  // schema change, SCHEMA_VERSION unchanged. OPTIONAL and NOT in DEFAULTS,
+  // same additive shape as `stage` — absent on every item that predates this
+  // field or was never decomposed.
   if (work.parent !== undefined && work.parent !== null) {
     if (typeof work.parent !== 'string' || !work.parent.trim()) {
       throw new WorkValidationError(
