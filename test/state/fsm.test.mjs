@@ -17,12 +17,28 @@ for (const [from, to] of [
   ['doing', 'blocked'],
   ['blocked', 'todo'],
   ['blocked', 'doing'],
+  ['blocked', 'proposed'],
 ]) {
   test(`transitionWork allows ${from} -> ${to} and returns a validated event`, () => {
     const event = transitionWork({ work: work(from), to });
     assert.deepEqual(event, { type: 'work.move', payload: { id: 'w1', from, to } });
   });
 }
+
+// fan-out-parallel D18: blocked -> proposed is the mechanical reconcile
+// door (drift catch-up + re-verify, CONTEXT.md D7/D8/D11) that returns a
+// parked root to `proposed` WITHOUT re-entering `doing`. This matters
+// because `runner/anti-loop.mjs`'s `visitCount` counts a work item's visits
+// by scanning for `work.move` events whose `payload.to` is strictly
+// `'doing'` — so this edge's event (`payload.to === 'proposed'`) is
+// provably never counted as an anti-loop visit, no matter how many times a
+// root cycles through it.
+test('transitionWork allows blocked -> proposed (per fan-out-parallel D18) and its event is never counted by anti-loop.mjs (payload.to is "proposed", not "doing")', () => {
+  const event = transitionWork({ work: work('blocked'), to: 'proposed' });
+  assert.deepEqual(event, { type: 'work.move', payload: { id: 'w1', from: 'blocked', to: 'proposed' } });
+  assert.equal(event.payload.to, 'proposed');
+  assert.notEqual(event.payload.to, 'doing');
+});
 
 for (const [from, to] of [
   ['doing', 'proposed'],
@@ -95,6 +111,7 @@ test('every legal edge is exactly the declared table; every other status pair is
     'doing->blocked',
     'blocked->todo',
     'blocked->doing',
+    'blocked->proposed',
     'doing->proposed',
     'proposed->done',
     'proposed->todo',

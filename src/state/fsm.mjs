@@ -17,6 +17,19 @@
 // hold before parking) and left through exactly one exit, back to `todo`
 // (resume makes the item actionable again; no `awaiting-human -> doing`
 // edge — YAGNI, add only if a real consumer needs it).
+//
+// fan-out-parallel D18: `blocked -> proposed` is a third door out of
+// `blocked`, alongside the existing `blocked -> todo`/`blocked -> doing`
+// pair. It exists for fan-out-parallel's drift reconcile (CONTEXT.md
+// D7/D8/D11): a root parked via `proposed -> blocked` (reason
+// `integration-drift`) after a clean catch-up + re-verify needs to return to
+// `proposed` directly, without re-entering `doing`. Re-entering `doing`
+// would wrongly count as an anti-loop visit — `visitCount` in
+// `runner/anti-loop.mjs` counts any `work.move` event whose `payload.to` is
+// `'doing'`, and a mechanical reconcile retry is not the kind of rework that
+// counter is meant to bound. Like the other plain `blocked` edges, this one
+// carries no `reason`/`ask`/`answer` — it is not a rejection (that's
+// `proposed -> todo`/`proposed -> blocked`, which do require `reason`).
 
 import { STATUSES } from './work.mjs';
 
@@ -33,18 +46,20 @@ export class FsmError extends Error {
 // importing STATUSES from here; work.mjs is the sole owner of the list.
 export { STATUSES };
 
-// The transition table itself: every legal (from -> to) edge. `blocked` is
-// two-way with both `todo` and `doing` per the plan; `done` has two incoming
+// The transition table itself: every legal (from -> to) edge. `blocked` has
+// three doors out — `todo` and `doing` per the plan, plus `proposed` per
+// fan-out-parallel D18 (see the doc comment above); `done` has two incoming
 // edges (from `doing` and, per D5, from `proposed`) and no outgoing edge
 // (terminal). `proposed` (per D5) is entered only from `doing` (a worker's
-// goal-check pass) and leaves to `done` (approved/merged), back to `todo`
-// (rejected, with a reason — see transitionWork below), or, per pr-lifecycle
-// D3, to `blocked` (an approved proposal whose merge conflicted or whose
-// verify came back red on main after merge — the item parks with a reason
-// rather than being silently returned to the queue or auto-rebased; a human
-// resolves it, same as any other `blocked` item, via the existing
-// `blocked -> todo`/`blocked -> doing` doors below). It is never a re-entry
-// point for `doing` directly.
+// goal-check pass) or, per fan-out-parallel D18, from `blocked` (a
+// mechanical reconcile), and leaves to `done` (approved/merged), back to
+// `todo` (rejected, with a reason — see transitionWork below), or, per
+// pr-lifecycle D3, to `blocked` (an approved proposal whose merge conflicted
+// or whose verify came back red on main after merge — the item parks with a
+// reason rather than being silently returned to the queue or auto-rebased; a
+// human resolves it, same as any other `blocked` item, via the existing
+// `blocked -> todo`/`blocked -> doing`/`blocked -> proposed` doors below).
+// It is never a re-entry point for `doing` directly.
 const TRANSITIONS = Object.freeze([
   Object.freeze({ from: 'todo', to: 'doing' }),
   Object.freeze({ from: 'doing', to: 'done' }),
@@ -52,6 +67,7 @@ const TRANSITIONS = Object.freeze([
   Object.freeze({ from: 'doing', to: 'blocked' }),
   Object.freeze({ from: 'blocked', to: 'todo' }),
   Object.freeze({ from: 'blocked', to: 'doing' }),
+  Object.freeze({ from: 'blocked', to: 'proposed' }),
   Object.freeze({ from: 'doing', to: 'proposed' }),
   Object.freeze({ from: 'proposed', to: 'done' }),
   Object.freeze({ from: 'proposed', to: 'todo' }),
