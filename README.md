@@ -4,6 +4,18 @@
 
 Forgent (fgOS) is the platform layer for building and running agent applications — the infrastructure, skills, and automation that sit beneath every agent app, so developers can forge new agents instead of building everything from scratch.
 
+## Install
+
+```bash
+npm install -g github:vantt/forgent
+```
+
+Then initialize your project:
+
+```bash
+fgos init
+```
+
 ## Documentation
 
 - [`docs/architecture-map.md`](docs/architecture-map.md) — bản chuẩn kiến trúc: 5 tầng + 2 lớp phủ + 2 sổ đăng ký (component, contract C1–C9)

@@ -1,5 +1,6 @@
 {
   "name": "forgent",
+  "version": "0.1.0",
   "private": true,
   "type": "module",
   "engines": {
@@ -8,6 +9,7 @@
   "bin": {
     "fgos": "bin/fgos.mjs"
   },
+  "files": ["bin", "src", "README.md", "LICENSE"],
   "scripts": {
     "test": "node --test 'test/**/*.test.mjs'"
   }
