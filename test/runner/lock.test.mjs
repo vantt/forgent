@@ -66,6 +66,34 @@ test('EXIT_BUSY collides with no existing exit code (0 ok, 1 unexpected, R4 cate
   assert.equal(taken.has(EXIT_BUSY), false);
 });
 
+// A held events.lock (distinct from runner.lock above) is a transient,
+// documented-as-retryable condition (events.mjs's own EventLogError message:
+// "another process is writing; retry the operation") — NOT an uncategorized
+// bug. Before EXIT_CODES carried a 'lock-timeout' entry, categoryOf's
+// undefined-exitCode fallback made claimAndDispatch/runOnce re-throw it
+// exactly like a real crash: the whole drain-run aborted, losing every
+// already-dispatched item's structured result (review-unreviewed-260717,
+// corroborated by two independent reviewers). This proves the fix: runOnce
+// returns its structured result with the distinct exit code instead of
+// throwing. Real contention, not a mock — waits out the actual 2s timeout.
+test('a held events.lock halts the drain-run gracefully (lock-timeout exit code, no throw)', async () => {
+  const { repoRoot, dir, worktreeDir } = setup();
+  seedItem(dir);
+  const eventsLockPath = path.join(dir, 'events.lock');
+  fs.writeFileSync(eventsLockPath, String(process.pid)); // this test process: alive for the whole test
+
+  try {
+    const result = await runOnce({ repoRoot, dir, worktreeDir, log: noLog });
+    assert.equal(result.outcome, 'drained');
+    assert.equal(result.exitCode, EXIT_CODES['lock-timeout']);
+    assert.equal(result.dispatched.length, 1);
+    assert.equal(result.dispatched[0].outcome, 'halted');
+    assert.equal(result.dispatched[0].errorClass, 'lock-timeout');
+  } finally {
+    fs.rmSync(eventsLockPath, { force: true });
+  }
+});
+
 // --- overlapping runs ------------------------------------------------------
 
 test('second overlapping runOnce exits busy: zero store writes, zero worktree ops, holder lock untouched', async () => {

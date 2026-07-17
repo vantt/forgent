@@ -47,12 +47,26 @@ export class StoreError extends Error {
   }
 }
 
-/** The one category -> exit-code map (R4). Values unchanged from the prior duplicate in bin/fgos.mjs. */
+/**
+ * The one category -> exit-code map (R4). Values 2-5 unchanged from the
+ * prior duplicate in bin/fgos.mjs. 'lock-timeout' (events.mjs), 'session-fail'
+ * (session.mjs) and 'merge-fail' (merge.mjs) are distinct-on-purpose
+ * categories that were previously unmapped here, so any error carrying them
+ * fell through categoryOf's undefined-exitCode path and was treated as an
+ * uncategorized bug: the whole runOnce drain-run aborted (throw, not a
+ * graceful per-item halt) instead of returning its structured
+ * dispatched/parked result with an accurate exit code (review-unreviewed-260717,
+ * corroborated by two independent reviewers). 6 is reserved for loop.mjs's
+ * EXIT_BUSY — skip it here.
+ */
 export const EXIT_CODES = Object.freeze({
   precondition: 2,
   conflict: 3,
   validation: 4,
   'corrupt-log': 5,
+  'lock-timeout': 7,
+  'session-fail': 8,
+  'merge-fail': 9,
 });
 
 /**
