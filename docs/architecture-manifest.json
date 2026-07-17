@@ -29,6 +29,7 @@
     "src/state/dep-graph.mjs": "domain",
     "src/intake/discovery.mjs": "use-case",
     "src/intake/decompose.mjs": "use-case",
+    "src/cli/command-registry.mjs": "kernel",
     "src/report/entropy.mjs": "domain",
     "src/evolve/candidates.mjs": "domain",
     "src/evolve/iron-law.mjs": "domain",

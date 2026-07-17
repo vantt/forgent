@@ -40,6 +40,7 @@ import { visitCount } from '../src/runner/anti-loop.mjs';
 import { DEFAULTS } from '../src/state/work.mjs';
 import { getDomain, stageForStep } from '../src/state/domains.mjs';
 import { writeCoexistenceManifest } from '../src/install/coexist.mjs';
+import { SCHEMA_VERSION, COMMAND_REGISTRY } from '../src/cli/command-registry.mjs';
 
 // D5: `verify` is a required non-empty field on every work item, but a
 // free-text submission has no verification plan yet — that is P15's job. The
@@ -1523,8 +1524,58 @@ async function runVerb(verb, flags, positional, dir) {
   }
 }
 
+// ─── --help / --help --json: machine-readable verb manifest (P37 deliverable
+// b) — mirrors `.bee/bin/bee.mjs`'s publicManifestEntries/renderHelpText/
+// handleHelp exactly. The manifest itself is NEVER wrapped in the fgos.v1
+// envelope (wrapEnvelope) — it is metadata about the CLI's own verb surface,
+// not a verb's data payload, the same distinction bee.mjs draws for its own
+// `--help --json`.
+
+function publicManifestEntries() {
+  return COMMAND_REGISTRY.map(({ name, invoke, description, parameters, examples, access, deprecated }) => ({
+    name,
+    invoke,
+    description,
+    parameters,
+    examples,
+    access,
+    deprecated,
+  }));
+}
+
+function renderHelpText() {
+  const lines = [`fgos — the fgOS work-item CLI (schema_version ${SCHEMA_VERSION})`, ''];
+  for (const entry of publicManifestEntries()) {
+    lines.push(`${entry.invoke} [${entry.access}]`);
+    lines.push(`    ${entry.description}`);
+    const required = entry.parameters?.required || [];
+    if (required.length) lines.push(`    required: ${required.map((r) => `--${r}`).join(', ')}`);
+    if (entry.deprecated) {
+      lines.push(`    DEPRECATED since ${entry.deprecated.since} — use "${entry.deprecated.use_instead}" instead.`);
+    }
+    lines.push('');
+  }
+  return `${lines.join('\n').trimEnd()}\n`;
+}
+
+function handleHelp(json) {
+  if (json) {
+    const manifest = { schema_version: SCHEMA_VERSION, commands: publicManifestEntries() };
+    process.stdout.write(`${JSON.stringify(manifest, null, 2)}\n`);
+  } else {
+    process.stdout.write(renderHelpText());
+  }
+}
+
 async function main() {
   const [, , verb, ...rest] = process.argv;
+
+  if (verb === '--help') {
+    handleHelp(rest.includes('--json'));
+    process.exitCode = 0;
+    return;
+  }
+
   const { flags, positional } = parseArgs(rest);
 
   try {
