@@ -607,6 +607,69 @@ test('check with no id given reports every item that has outcome data, exit 0', 
   assert.doesNotMatch(result.stdout, /item-b/, 'item-b has no outcome data yet, so it is not listed');
 });
 
+// --- rollup view theo bộ (P24) ----------------------------------------------
+//
+// A root item's children carry `parent` (set by decompose, P16) — `add`
+// itself has no `--parent` flag, so these seed a child through store.mjs's
+// addWork directly, the same way decompose.mjs writes one in production.
+
+test('rollup on a root with n children, k done, prints k/n and lists every child with its own status, exit 0', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'root-item', { title: 'Root Item' });
+  const dir = path.join(cwd, '.fgos');
+  addWork(dir, { id: 'child-a', title: 'Child A', kind: 'task', status: 'done', deps: [], risk: 'low', refs: [], verify: 'npm test', parent: 'root-item' });
+  addWork(dir, { id: 'child-b', title: 'Child B', kind: 'task', status: 'todo', deps: [], risk: 'low', refs: [], verify: 'npm test', parent: 'root-item' });
+  addWork(dir, { id: 'child-c', title: 'Child C', kind: 'task', status: 'done', deps: [], risk: 'low', refs: [], verify: 'npm test', parent: 'root-item' });
+
+  const result = run(cwd, ['rollup', 'root-item']);
+  assert.equal(result.status, 0);
+  assert.match(result.stdout, /root-item — Root Item \(todo\)/);
+  assert.match(result.stdout, /2\/3 done/);
+  assert.match(result.stdout, /child-a: Child A \(done\)/);
+  assert.match(result.stdout, /child-b: Child B \(todo\)/);
+  assert.match(result.stdout, /child-c: Child C \(done\)/);
+});
+
+test('rollup on an item with no children prints 0/0 and a "no children" note, exit 0, no throw', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'lonely-item');
+
+  const result = run(cwd, ['rollup', 'lonely-item']);
+  assert.equal(result.status, 0);
+  assert.match(result.stdout, /0\/0 done/);
+  assert.match(result.stdout, /không có con/);
+});
+
+test('rollup on a nonexistent id is rejected as validation (not-found), exit 4', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'root-item');
+
+  const result = run(cwd, ['rollup', 'no-such-item']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /rollup: work "no-such-item" not found/);
+});
+
+test('rollup with no id at all is rejected as validation, exit 4', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['rollup']);
+  assert.equal(result.status, 4);
+});
+
+test('rollup never mutates state: no event is appended and no children of an unrelated item are counted', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'root-item');
+  const dir = path.join(cwd, '.fgos');
+  addWork(dir, { id: 'child-a', title: 'Child A', kind: 'task', status: 'done', deps: [], risk: 'low', refs: [], verify: 'npm test', parent: 'root-item' });
+  addOk(cwd, 'unrelated-item');
+
+  const before = eventLines(cwd);
+  const result = run(cwd, ['rollup', 'root-item']);
+  assert.equal(result.status, 0);
+  assert.match(result.stdout, /1\/1 done/);
+  assert.doesNotMatch(result.stdout, /unrelated-item/);
+  assert.deepEqual(eventLines(cwd), before);
+});
+
 // --- friction channel in `check` (phase-3-compound-learning-4, S2) ---------
 //
 // Same write-door discipline as the outcome tests above: only the runner
