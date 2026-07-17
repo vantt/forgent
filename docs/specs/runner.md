@@ -1,7 +1,7 @@
 ---
 area: runner
 updated: 2026-07-17
-sources: [phase-2-routing, post-divorce-hardening, phase-3-compound-learning-s1, phase-3-compound-learning-s2, phase-3-compound-learning-s3-closeout, stage-clarify, stage-decompose-s1, stage-decompose-s2, pr-lifecycle-s1, discovery-context, worker-execution, fan-out-parallel, human-rounds, worker-dispatch-log, self-improve-loop, base-workflow-model-s2]
+sources: [phase-2-routing, post-divorce-hardening, phase-3-compound-learning-s1, phase-3-compound-learning-s2, phase-3-compound-learning-s3-closeout, stage-clarify, stage-decompose-s1, stage-decompose-s2, pr-lifecycle-s1, discovery-context, worker-execution, fan-out-parallel, human-rounds, worker-dispatch-log, self-improve-loop, base-workflow-model-s2, fgos-multi-session-checkout]
 decisions: [feed7428, 14396a5c, 1a80b4d3, 9a19eea5, 96a65365, a7c099af, 43f257ae, 44936500, e1218b22, 6f2cbc47, a30a3d3c, 1359ab5e, cfae0120, 22699c61, 04a6cd05, 396d9d9e, 2e92b7a5, f0c40acc, 5a6900b2, 8575f1a3, c8df2479, cb09d6fd, b1aa1bdc, caecb9d1, 9b141173, a3176299, 140eb8a4, 76b7a36b, 8d04bba3, 1cd895e1, 38160a70]
 coverage: full
 ---
@@ -21,6 +21,7 @@ Vòng lặp tự hành của forgent: tự lấy việc sẵn-sàng từ work-st
 - `fgos review <id>` / `fgos approve <id> [--timeout <ms>]` / `fgos reject <id> --reason "..."` (ngoài vòng runner, gọi bởi người vận hành) — cổng duyệt PR nội bộ cho một đề xuất `proposed` đã sẵn, MỘT cổng cho cả nguồn runner lẫn pull-door — xem "Cổng duyệt PR nội bộ" dưới
 - `fgos catchup <id>` (ngoài vòng runner, gọi bởi người vận hành) — đồng bộ lại một việc đang đỗ (`blocked`) vì gãy nhập (xung đột, verify đỏ sau nhập, hoặc trôi tích hợp): kéo trạng thái mới nhất của đích vào nhánh riêng của việc rồi thử lại — xem "Đồng bộ lại một việc đỗ (catch-up)" dưới
 - `fgos evolve` / `fgos evolve --pick <id>` (ngoài vòng runner, gọi bởi người vận hành, on-demand — self-improve loop P13 Slice 1, D1/D3) — Gate A của vòng tự cải thiện: xếp hạng candidate từ friction chưa ngã-ngũ, người chọn một hoặc dừng; đọc-thuần tuyệt đối — xem "Gate A — xếp hạng candidate (evolve)" dưới
+- `fgos session start [--item <id>]` / `fgos session end <session-id> [--force]` / `fgos session list` (ngoài vòng runner, gọi bởi người vận hành/một tác nhân) — vòng đời phiên checkout đa-phiên tùy chọn: một worktree detached-HEAD mỗi phiên cho cây nguồn, dùng chung MỘT kho `.fgos/` qua symlink (D10); `end` từ chối một phiên đã rời commit khởi tạo trừ khi `--force` — xem "Phiên checkout đa-phiên" dưới
 
 ## Data Dictionary
 
@@ -375,6 +376,58 @@ sức khỏe cho toàn bộ vòng compounding.
     trống mới im lặng hoàn toàn.
   - Kho chưa từng có việc nào → toàn bộ tín hiệu này vắng mặt, `check` không
     tự khởi tạo bất cứ gì — giữ nguyên hợp đồng đọc-thuần.
+
+### Phiên checkout đa-phiên — session start / end / list
+
+Một **phiên** (session) là chỗ làm việc cô lập, TÙY CHỌN, gắn với đúng một
+việc: mỗi phiên có một git worktree riêng cho cây nguồn git-tracked, trong khi
+kho `.fgos/` (nhật ký sự kiện đã commit + view + logs) vẫn là MỘT chỗ vật lý
+duy nhất chia sẻ cho mọi phiên và cây chính. Sinh ra để nhiều phiên `fgos`
+chạy đồng thời trên cùng một checkout không còn thấy thay đổi chưa-commit của
+nhau qua phép kiểm cây-sạch (approve/return). Phiên là bề mặt của Epic 1: bản
+thân nó CHƯA nối các verb sẵn có (approve/return) vào phiên đang mở — đó là
+việc của lát sau; ở lát này chỉ có vòng đời worktree + sổ đăng ký.
+
+- **Runs when:** người vận hành/một tác nhân gọi `fgos session start
+  [--item <id>]` / `fgos session end <session-id> [--force]` / `fgos session
+  list`.
+- **Blocked when:** thiếu sub-verb, hoặc sub-verb lạ — `validation`; `session
+  end` thiếu session-id — `validation`; `session end <id>` với id không có
+  trong sổ (hoặc đã kết thúc) — `validation`; `session end <id>` khi HEAD của
+  worktree đã RỜI khỏi commit khởi tạo (có commit tạo ra TỪ TRONG worktree
+  detached — một commit lửng, không nhánh nào chứa) mà KHÔNG có `--force` —
+  `validation`, và thông báo nêu ĐÍCH DANH (các) sha lửng, tuyệt đối không xóa
+  âm thầm; mọi lỗi vòng đời phiên khác (git thất bại, v.v.) cũng quy về
+  `validation` (một mã thoát phân loại sạch, không bao giờ nổ trần).
+  `--force` bỏ qua phép kiểm rời-commit và vẫn gỡ.
+- **What changes:**
+  - `session start` — mở đúng MỘT worktree mới qua `git worktree add --detach`
+    trên HEAD hiện tại (KHÔNG nhánh mới — detached HEAD thật, khác hẳn
+    `fgw/<id>` của runner vốn luôn tạo nhánh mới), tại một đường tạm; tạo một
+    symlink `<worktree>/.fgos` trỏ về `.fgos/` thật của cây chính (D10 — KHÔNG
+    BAO GIỜ sao chép, luôn symlink); ghi một mục `{ sessionId, worktreePath,
+    itemId, startCommit, pid, startedAt }` vào sổ `.fgos/sessions.json`.
+    Phiên KHÔNG lồng nhau: gọi `start` từ TRONG một worktree phiên đã đăng ký
+    bị từ chối.
+  - `session end` — gỡ worktree và bỏ mục sổ của nó. Một phiên không rời-commit
+    gỡ bằng `git worktree remove` THƯỜNG (dựa vào chính phép từ-chối cây-bẩn
+    của git làm lưới an toàn nền); chỉ `--force` mới dùng `--force`. KHÔNG BAO
+    GIỜ xóa `.fgos/` — chỉ symlink (nằm trong worktree đang bị gỡ) biến mất
+    theo.
+  - `session list` — đọc thuần sổ đăng ký, in mỗi phiên một dòng (id / đường
+    worktree / item / thời điểm mở).
+- **Side effects:** mọi đọc-sửa-ghi `sessions.json` được canh bởi một khóa
+  RIÊNG `.fgos/sessions.lock` (tạo-nguyên-tử `wx` + đòi-lại-pid-chết, soi theo
+  `acquireRunnerLock` của loop.mjs như một cơ chế MỚI, TÁCH BẠCH — không bao
+  giờ đụng `runner.lock`) an toàn giữa nhiều tiến trình `fgos` độc lập; write-
+  queue trong-tiến-trình KHÔNG dùng ở đây (nó chỉ tuần tự hóa ghi async trong
+  MỘT tiến trình Node, cho zero bảo vệ liên-tiến-trình). `session start`/`end`
+  chạy `git worktree add/remove`; `list` không chạm git.
+- **Afterwards:** `session start` in đường worktree để tác nhân `cd` vào và một
+  session-id để về sau `end`; chạy `fgos` trực tiếp ở cây chính mà KHÔNG bao
+  giờ gọi `session start` vẫn hành xử y hệt hôm nay (D7 — tùy chọn, không có
+  phiên = không đổi gì); một commit lửng bị `end` giữ lại (chờ `--force`) để
+  người quyết định, không mất âm thầm.
 
 ## Actors & Access
 

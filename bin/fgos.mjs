@@ -33,6 +33,7 @@ import { runGoalCheck } from '../src/runner/goal-check.mjs';
 import { classifySource, reviewDiff, mergeRunnerItem, cleanupMergedBranch, changedFiles, isWorkingTreeClean as isMainTreeClean, isFgosOnlyStatusLine } from '../src/runner/merge.mjs';
 import { classifyIronLaw } from '../src/evolve/iron-law.mjs';
 import { branchNameFor, branchExists, createWorktree, removeWorktree } from '../src/runner/worktree.mjs';
+import { createSession, endSession, listSessions, SessionError } from '../src/runner/session.mjs';
 import { resolveRoot } from '../src/runner/root-affinity.mjs';
 import { visitCount } from '../src/runner/anti-loop.mjs';
 import { DEFAULTS } from '../src/state/work.mjs';
@@ -449,6 +450,20 @@ function formatTriage(ranked) {
   }
   const lines = ranked.map((r) => `${r.id} — ${r.title} (${r.status}) — blocks ${r.blocks}`);
   return `triage (${ranked.length}):\n${lines.join('\n')}`;
+}
+
+// Session registry list (fgos session list): the same "count header + one
+// line per record" plain-text shape triage/candidate lists use. Each line
+// carries the fields a human/agent needs to `cd` into a session's worktree
+// or end it — id, worktree path, bound item, start time.
+function formatSessions(entries) {
+  if (entries.length === 0) {
+    return 'session: không có phiên nào đang mở.';
+  }
+  const lines = entries.map(
+    (e) => `${e.sessionId} — ${e.worktreePath} — item ${e.itemId ?? '(none)'} — started ${e.startedAt}`,
+  );
+  return `sessions (${entries.length}):\n${lines.join('\n')}`;
 }
 
 // Rollup view (P24): direct children only (`w.parent === id`) — decompose
@@ -1403,8 +1418,47 @@ async function runVerb(verb, flags, positional, dir) {
       return formatTriage(rankImpact(listWork(dir)));
     }
 
+    // Opt-in per-session git worktree lifecycle (fgos-multi-session-checkout
+    // Epic 1, D6/D7): a first-class `session` verb family wiring session.mjs's
+    // createSession/endSession/listSessions. `start` opens a detached-HEAD
+    // worktree on the current HEAD (zero new branches) with a `.fgos` symlink
+    // back to the one shared store (D10) and prints where to `cd`; `end`
+    // removes it, refusing a diverged (dangling-commit) session without
+    // --force and naming the sha(s); `list` prints the registry. session.mjs
+    // raises SessionError for every lifecycle failure (unknown id, divergence
+    // refusal, git failure) — surfaced here as `validation` (exit 4) so a bad
+    // input is a clean categorized exit, never an uncaught crash. repoRoot is
+    // the caller's cwd, the same root every other git-backed verb uses.
+    case 'session': {
+      const sub = requireField(positional[0], 'session requires a sub-verb: fgos session <start|end|list> ...');
+      const repoRoot = process.cwd();
+      try {
+        if (sub === 'start') {
+          const itemId = optionalField(flags.item, 'session start --item requires a non-empty id value (omit --item entirely to start a session with no item bound)');
+          const entry = createSession(repoRoot, { itemId });
+          const itemNote = entry.itemId ? ` (item ${entry.itemId})` : '';
+          return `Started session ${entry.sessionId}${itemNote}\nworktree: ${entry.worktreePath}\ncd ${entry.worktreePath}`;
+        }
+        if (sub === 'end') {
+          const sessionId = requireField(positional[1], 'session end requires a session id: fgos session end <session-id> [--force]');
+          const entry = endSession(repoRoot, sessionId, { force: Boolean(flags.force) });
+          const forcedNote = flags.force ? ' (forced)' : '';
+          return `Ended session ${entry.sessionId}${forcedNote} — removed worktree ${entry.worktreePath}`;
+        }
+        if (sub === 'list') {
+          return formatSessions(listSessions(repoRoot));
+        }
+        throw new StoreError('validation', `unknown session sub-verb "${sub}". Usage: fgos session <start|end|list> ...`);
+      } catch (err) {
+        if (err instanceof SessionError) {
+          throw new StoreError('validation', err.message);
+        }
+        throw err;
+      }
+    }
+
     default:
-      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <init|add|submit|discover|move|edit|ask|answer|decision|list|ready|rebuild|repair|check|rollup|take|return|review|approve|reject|catchup|evolve|triage> ...`);
+      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <init|add|submit|discover|move|edit|ask|answer|decision|list|ready|rebuild|repair|check|rollup|take|return|review|approve|reject|catchup|evolve|triage|session> ...`);
   }
 }
 

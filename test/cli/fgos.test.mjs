@@ -2966,3 +2966,114 @@ test('return on a branch-source take: verify-fail -> doing -> blocked + friction
   assert.equal(view.frictions['branch-return-red'][0].layer, 'verification');
   assert.equal(view.frictions['branch-return-red'][0].errorClass, 'verify-miss');
 });
+
+// --- `fgos session` (fgos-multi-session-checkout Epic 1b) -------------------
+//
+// CLI-surface integration checks for the `session` verb family wiring
+// session.mjs's createSession/endSession/listSessions. The module's own
+// divergence/lock/worktree algorithm is proven by test/runner/session.test.mjs
+// (cell fgos-multi-session-checkout-1); these tests exercise only the CLI
+// dispatch, output shape, and exit-code surface. A session worktree is a real
+// `git worktree add --detach` on the repo's HEAD, so every test uses a
+// git-backed cwd; each started session is ended (plain or --force) so its
+// worktree never leaks.
+
+// Parses `session start`'s output into { result, sessionId, worktreePath }.
+function startSession(cwd, extraArgs = []) {
+  const result = run(cwd, ['session', 'start', ...extraArgs]);
+  const idMatch = result.stdout.match(/Started session (\S+)/);
+  const wtMatch = result.stdout.match(/worktree: (.+)/);
+  return {
+    result,
+    sessionId: idMatch ? idMatch[1] : null,
+    worktreePath: wtMatch ? wtMatch[1].trim() : null,
+  };
+}
+
+// Makes a commit from INSIDE a detached-HEAD session worktree, diverging its
+// HEAD from the recorded start commit (a genuinely dangling commit). Returns
+// the new commit sha. The worktree shares the repo's git config (user set by
+// initGitCwd), so the commit needs no extra setup.
+function commitInWorktree(worktreePath, filename, content = 'inside-session\n') {
+  fs.writeFileSync(path.join(worktreePath, filename), content);
+  execFileSync('git', ['add', filename], { cwd: worktreePath });
+  execFileSync('git', ['commit', '-q', '-m', `inside: ${filename}`], { cwd: worktreePath });
+  return execFileSync('git', ['rev-parse', 'HEAD'], { cwd: worktreePath, encoding: 'utf8' }).trim();
+}
+
+test('session start prints a session id and an existing worktree path, exit 0', () => {
+  const cwd = initGitCwd();
+  const { result, sessionId, worktreePath } = startSession(cwd);
+  assert.equal(result.status, 0, `session start should succeed: ${result.stderr}`);
+  assert.ok(sessionId, 'stdout names a session id');
+  assert.ok(worktreePath, 'stdout names a worktree path to cd into');
+  assert.ok(fs.existsSync(worktreePath), 'the worktree directory actually exists on disk');
+  assert.match(result.stdout, /cd /, 'output tells the caller where to cd');
+
+  run(cwd, ['session', 'end', sessionId]);
+});
+
+test('session list shows a started session, then omits it after it ends', () => {
+  const cwd = initGitCwd();
+  const { sessionId, worktreePath } = startSession(cwd, ['--item', 'work-x']);
+
+  const listed = run(cwd, ['session', 'list']);
+  assert.equal(listed.status, 0);
+  assert.match(listed.stdout, new RegExp(sessionId), 'the started session id is listed');
+  assert.match(listed.stdout, /work-x/, 'the bound item id is listed');
+  assert.ok(listed.stdout.includes(worktreePath), 'the worktree path is listed');
+
+  assert.equal(run(cwd, ['session', 'end', sessionId]).status, 0);
+  const listedAfter = run(cwd, ['session', 'list']);
+  assert.equal(listedAfter.status, 0);
+  assert.doesNotMatch(listedAfter.stdout, new RegExp(sessionId), 'ended session no longer listed');
+  assert.match(listedAfter.stdout, /không có phiên nào/, 'empty registry prints the no-sessions note');
+});
+
+test('session end removes a non-diverged session cleanly — exit 0, worktree gone', () => {
+  const cwd = initGitCwd();
+  const { sessionId, worktreePath } = startSession(cwd);
+  assert.ok(fs.existsSync(worktreePath));
+
+  const ended = run(cwd, ['session', 'end', sessionId]);
+  assert.equal(ended.status, 0, `clean end should succeed: ${ended.stderr}`);
+  assert.ok(!fs.existsSync(worktreePath), 'the worktree directory is removed from disk');
+});
+
+test('session end on a diverged session refuses at the CLI level and names the dangling sha, exit 4', () => {
+  const cwd = initGitCwd();
+  const { sessionId, worktreePath } = startSession(cwd);
+  const danglingSha = commitInWorktree(worktreePath, 'change.txt');
+
+  const ended = run(cwd, ['session', 'end', sessionId]);
+  assert.equal(ended.status, 4, 'a diverged session is refused as a clean validation error, not a crash');
+  assert.ok(ended.stderr.includes(danglingSha), `the refusal names the dangling commit sha: ${ended.stderr}`);
+  assert.ok(fs.existsSync(worktreePath), 'the worktree is left in place — no silent loss of the dangling commit');
+
+  // Cleanup: only --force can remove a diverged session.
+  run(cwd, ['session', 'end', sessionId, '--force']);
+});
+
+test('session end --force removes a diverged session anyway, exit 0', () => {
+  const cwd = initGitCwd();
+  const { sessionId, worktreePath } = startSession(cwd);
+  commitInWorktree(worktreePath, 'change.txt');
+
+  const forced = run(cwd, ['session', 'end', sessionId, '--force']);
+  assert.equal(forced.status, 0, `--force should override the divergence refusal: ${forced.stderr}`);
+  assert.ok(!fs.existsSync(worktreePath), 'the worktree directory is removed under --force');
+  assert.doesNotMatch(run(cwd, ['session', 'list']).stdout, new RegExp(sessionId));
+});
+
+test('session end on an unknown session id is a clean validation error, exit 4, no crash', () => {
+  const cwd = initGitCwd();
+  const result = run(cwd, ['session', 'end', 'no-such-session']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /unknown or already-ended session/);
+});
+
+test('session with no sub-verb, and an unknown sub-verb, are both rejected as validation, exit 4', () => {
+  const cwd = initGitCwd();
+  assert.equal(run(cwd, ['session']).status, 4);
+  assert.equal(run(cwd, ['session', 'bogus']).status, 4);
+});
