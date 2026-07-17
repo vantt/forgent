@@ -1030,8 +1030,137 @@ async function runVerb(verb, flags, positional, dir) {
       return `Rejected ${id}: proposed -> todo (reason: ${reason}) (event #${event.seq}) — no revert, main unchanged`;
     }
 
+    // Catch-up-by-merge (D6/D7/D11, fan-out-parallel): the unified mechanism
+    // that bounces a parked item — a root drift-parked at root->main (D7) or
+    // a leaf conflict-parked at leaf->parent (D11), same git mechanics
+    // either way per the real-conflict spike
+    // (.bee/spikes/fan-out-parallel/catchup-real-conflict-probe.sh) — by
+    // merging the current TARGET (main for a root/standalone item, the
+    // resolved parent's branch for a leaf) into the item's OWN branch,
+    // re-verifying, and either landing the merge (blocked -> proposed, D18's
+    // edge, mechanical/uncounted per D11) or aborting clean and leaving the
+    // item blocked for a human. Deliberately does NOT call mergeRunnerItem
+    // (merge.mjs) — that merges the item's branch INTO the caller's checkout,
+    // the opposite direction catchup needs, and its source ref is hardcoded
+    // to the item's own branch (main as a *source* cannot be expressed
+    // through it) — so the git sequence is written inline here instead,
+    // mirroring the spike's proven shape (merge --no-commit --no-ff ->
+    // verify -> commit-or-abort, verify strictly before any commit).
+    case 'catchup': {
+      const id = requireField(positional[0] ?? flags.id, 'catchup requires an id: fgos catchup <id> [--timeout <ms>]');
+      const timeoutFlag = optionalField(flags.timeout, 'catchup --timeout requires a numeric millisecond value (omit --timeout entirely for no timeout)');
+      let timeoutMs;
+      if (timeoutFlag !== undefined) {
+        timeoutMs = Number(timeoutFlag);
+        if (!Number.isFinite(timeoutMs) || timeoutMs <= 0) {
+          throw new StoreError('validation', `catchup --timeout must be a positive number of milliseconds (got "${timeoutFlag}").`);
+        }
+      }
+
+      const view = listWork(dir);
+      const item = view.work[id];
+      if (!item) {
+        throw new StoreError('validation', `catchup: work "${id}" not found.`);
+      }
+      if (item.status !== 'blocked') {
+        throw new StoreError('precondition', `catchup: work "${id}" is "${item.status}", not "blocked" — nothing to catch up.`);
+      }
+
+      // Only a merge-related park is something this mechanism can address —
+      // any other blocked reason (e.g. anti-loop-max-visits,
+      // runner-crash-reclaim) needs a human's real take/return rework
+      // instead, never an automated catch-up.
+      const CATCHUP_REASONS = new Set(['merge-conflict', 'verify-fail-post-merge', 'integration-drift']);
+      if (!CATCHUP_REASONS.has(item.reason)) {
+        throw new StoreError(
+          'validation',
+          `catchup: work "${id}" is blocked for reason "${item.reason ?? '(none)'}" — catchup only resolves a merge-related park (merge-conflict/verify-fail-post-merge/integration-drift); use take/return for a manual rework instead.`,
+        );
+      }
+
+      const repoRoot = process.cwd();
+      const ownBranch = branchNameFor(id);
+      // Guards against a human hand-forcing an inapplicable blocked state
+      // (e.g. `fgos move <id> --to blocked --reason integration-drift` on a
+      // branchless pull/legacy item) from silently creating a bogus branch
+      // instead of failing loudly — checked before any git operation runs.
+      if (!branchExists(repoRoot, ownBranch)) {
+        throw new StoreError(
+          'validation',
+          `catchup: work "${id}" has no live branch "${ownBranch}" — this blocked state was not produced by a merge-related park; refusing rather than creating a bogus branch.`,
+        );
+      }
+
+      // Leaf (resolved root is a DIFFERENT item) targets its parent's
+      // integration branch; a root/standalone item (resolved root is
+      // itself) targets main — the exact D3/D11 split `approve` already
+      // uses (resolveRoot).
+      const rootId = resolveRoot(view, id);
+      const target = rootId !== id ? branchNameFor(rootId) : 'main';
+
+      // Ephemeral worktree checked out on the item's OWN branch (confirmed
+      // to exist above, so this always takes the branch-reuse path — no
+      // baseRef needed, D17: only the branch is durable, every checkout is
+      // ephemeral). Removed on every exit path via the finally block below.
+      const ephemeral = createWorktree(repoRoot, id, {});
+      try {
+        let conflicted = false;
+        try {
+          execFileSync('git', ['merge', '--no-commit', '--no-ff', target], { cwd: ephemeral.path, encoding: 'utf8', shell: false });
+        } catch {
+          conflicted = true;
+        }
+
+        if (conflicted) {
+          let conflictedFiles = '';
+          try {
+            conflictedFiles = execFileSync('git', ['diff', '--name-only', '--diff-filter=U'], { cwd: ephemeral.path, encoding: 'utf8', shell: false }).trim();
+          } catch {
+            // best-effort — the message below still reports the conflict
+            // even if listing the conflicted files itself fails.
+          }
+          try {
+            execFileSync('git', ['merge', '--abort'], { cwd: ephemeral.path, encoding: 'utf8', shell: false });
+          } catch (abortErr) {
+            // A genuinely unexpected git failure (not a conflict, not a red
+            // verify) — a real bug, not a defined outcome; propagate as-is
+            // so it surfaces as "unexpected" (exit 1), never masked as a
+            // clean park.
+            throw abortErr;
+          }
+          // No automated conflict RESOLUTION per this cell's prohibitions —
+          // only detection + clean reporting; the item stays blocked
+          // (unchanged) for a human to resolve manually via the existing
+          // take/return branch flow.
+          return `Catch-up ${id}: merge of "${target}" into "${ownBranch}" conflicted (${conflictedFiles || 'unknown file(s)'}) — merge aborted, "${ownBranch}" left unchanged; resolve manually (take + merge + return).`;
+        }
+
+        // Clean merge staged (not yet committed) — the item's OWN verify
+        // runs on this staged tree BEFORE any commit, mirroring
+        // mergeRunnerItem's own verify-before-commit discipline exactly.
+        const check = await runGoalCheck(item, ephemeral.path, timeoutMs);
+        if (!check.passed) {
+          try {
+            execFileSync('git', ['merge', '--abort'], { cwd: ephemeral.path, encoding: 'utf8', shell: false });
+          } catch (abortErr) {
+            throw abortErr;
+          }
+          return `Catch-up ${id}: merge of "${target}" into "${ownBranch}" was clean but verify failed (exit ${check.status}) — merge aborted, "${ownBranch}" left unchanged; investigate manually.\n${check.output}`;
+        }
+
+        execFileSync('git', ['commit', '-m', `catch-up: merge ${target} into ${ownBranch}`], { cwd: ephemeral.path, encoding: 'utf8', shell: false });
+        // D18's edge: mechanical, uncounted reconcile-success — never
+        // touches 'doing', so anti-loop's visitCount never sees it. No
+        // reason/ask required on this edge (fsm.mjs).
+        const { event } = moveWork(dir, { id, to: 'proposed', expectedStatus: 'blocked', actor: 'runner' });
+        return `Catch-up ${id}: merged "${target}" -> "${ownBranch}", verified, blocked -> proposed (event #${event.seq})\n${check.output}`;
+      } finally {
+        removeWorktree(repoRoot, ephemeral.path, { force: true });
+      }
+    }
+
     default:
-      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <init|add|submit|discover|move|ask|answer|decision|list|ready|rebuild|check|take|return|review|approve|reject> ...`);
+      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <init|add|submit|discover|move|ask|answer|decision|list|ready|rebuild|check|take|return|review|approve|reject|catchup> ...`);
   }
 }
 

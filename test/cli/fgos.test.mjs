@@ -1846,6 +1846,164 @@ test('the CLI usage message for an unknown verb lists review/approve/reject in t
   assert.match(result.stderr, /review\|approve\|reject/);
 });
 
+// --- catchup (D6/D7/D11: unified catch-up-by-merge for a merge-related park) ---
+
+// Builds on makeRunnerProposedItem: proposes a ROOT/standalone runner item,
+// then parks it blocked with `reason` via the real proposed -> blocked edge
+// (fsm.mjs's own reason requirement on that edge, same as the existing
+// 'approve of a runner item that conflicts' test above) so item.reason is
+// genuine, not synthesized.
+function makeBlockedRunnerItem(cwd, id, reason, extra = {}) {
+  makeRunnerProposedItem(cwd, id, extra);
+  run(cwd, ['move', id, '--to', 'blocked', '--reason', reason]);
+  commitPending(cwd, `state: park ${id} (${reason})`);
+}
+
+// Same shape, for a leaf under a per-root branch tree (mirrors
+// makeRunnerProposedLeafItem above).
+function makeBlockedLeafItem(cwd, rootId, leafId, reason, extra = {}) {
+  makeRunnerProposedLeafItem(cwd, rootId, leafId, extra);
+  run(cwd, ['move', leafId, '--to', 'blocked', '--reason', reason]);
+  commitPending(cwd, `state: park ${leafId} (${reason})`);
+}
+
+test('catchup on a root parked with reason integration-drift, after a non-overlapping main-side change, merges main into fgw/<id> and bounces blocked -> proposed (D7)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeBlockedRunnerItem(cwd, 'catchup-root-drift', 'integration-drift', { verify: 'test -f catchup-root-drift-produced.txt' });
+
+  // A genuinely non-overlapping change lands on main AFTER the park
+  // (another root's own approve, simulated directly).
+  fs.writeFileSync(path.join(cwd, 'main-side-change.txt'), 'landed while parked\n');
+  gitAtCwd(cwd, ['add', 'main-side-change.txt']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', 'another root lands on main']);
+
+  const mainHeadBefore = gitHead(cwd);
+  const worktreesBefore = gitAtCwd(cwd, ['worktree', 'list', '--porcelain']);
+  const result = run(cwd, ['catchup', 'catchup-root-drift']);
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /blocked -> proposed/);
+
+  assert.equal(gitHead(cwd), mainHeadBefore, "catchup must never touch the human's own main checkout");
+  assert.equal(gitAtCwd(cwd, ['worktree', 'list', '--porcelain']), worktreesBefore, 'the ephemeral catchup worktree is cleaned up — no leftover');
+  assert.equal(stateView(cwd).work['catchup-root-drift'].status, 'proposed');
+
+  const branchLog = gitAtCwd(cwd, ['log', '--oneline', 'fgw/catchup-root-drift']);
+  assert.match(branchLog, /catch-up: merge main into fgw\/catchup-root-drift/);
+  const producedFile = gitAtCwd(cwd, ['show', 'fgw/catchup-root-drift:catchup-root-drift-produced.txt']);
+  assert.match(producedFile, /ok/);
+  const mainSideFile = gitAtCwd(cwd, ['show', 'fgw/catchup-root-drift:main-side-change.txt']);
+  assert.match(mainSideFile, /landed while parked/);
+});
+
+test('catchup on a leaf parked with reason merge-conflict targets its PARENT branch (fgw/<root>), not main, and succeeds the same way (D11)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeBlockedLeafItem(cwd, 'catchup-leaf-root', 'catchup-leaf-child', 'merge-conflict', { verify: 'test -f catchup-leaf-child-produced.txt' });
+
+  // A sibling leaf's own merge lands on fgw/<root> AFTER this leaf's park —
+  // non-overlapping (a different file).
+  gitAtCwd(cwd, ['checkout', 'fgw/catchup-leaf-root']);
+  fs.writeFileSync(path.join(cwd, 'sibling-produced.txt'), 'sibling ok\n');
+  gitAtCwd(cwd, ['add', '-A']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', 'sibling leaf merged into root']);
+  gitAtCwd(cwd, ['checkout', 'main']);
+
+  const mainHeadBefore = gitHead(cwd);
+  const worktreesBefore = gitAtCwd(cwd, ['worktree', 'list', '--porcelain']);
+  const result = run(cwd, ['catchup', 'catchup-leaf-child']);
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /blocked -> proposed/);
+  assert.match(result.stdout, /fgw\/catchup-leaf-root/, 'catchup must merge the PARENT branch, not main');
+
+  assert.equal(gitHead(cwd), mainHeadBefore, 'a leaf catchup must never touch main');
+  assert.equal(gitAtCwd(cwd, ['worktree', 'list', '--porcelain']), worktreesBefore, 'the ephemeral catchup worktree is cleaned up — no leftover');
+  assert.equal(stateView(cwd).work['catchup-leaf-child'].status, 'proposed');
+
+  const branchLog = gitAtCwd(cwd, ['log', '--oneline', 'fgw/catchup-leaf-child']);
+  assert.match(branchLog, /catch-up: merge fgw\/catchup-leaf-root into fgw\/catchup-leaf-child/);
+  const ownFile = gitAtCwd(cwd, ['show', 'fgw/catchup-leaf-child:catchup-leaf-child-produced.txt']);
+  assert.match(ownFile, /ok/);
+  const siblingFile = gitAtCwd(cwd, ['show', 'fgw/catchup-leaf-child:sibling-produced.txt']);
+  assert.match(siblingFile, /sibling ok/);
+});
+
+test('catchup on an item whose target has a REAL same-line conflict leaves it blocked, aborts cleanly (branch tip unchanged), and names the conflicted file', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  fs.writeFileSync(path.join(cwd, 'shared.txt'), 'base\n');
+  gitAtCwd(cwd, ['add', 'shared.txt']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', 'seed shared.txt']);
+
+  addOk(cwd, 'catchup-conflict-item');
+  run(cwd, ['move', 'catchup-conflict-item', '--to', 'doing']);
+  commitPending(cwd, 'state: claim catchup-conflict-item');
+
+  gitAtCwd(cwd, ['checkout', '-b', 'fgw/catchup-conflict-item']);
+  fs.writeFileSync(path.join(cwd, 'shared.txt'), 'branch-change\n');
+  gitAtCwd(cwd, ['add', 'shared.txt']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', 'branch changes shared.txt']);
+  gitAtCwd(cwd, ['checkout', 'main']);
+
+  run(cwd, ['move', 'catchup-conflict-item', '--to', 'proposed']);
+  commitPending(cwd, 'state: propose catchup-conflict-item');
+  run(cwd, ['move', 'catchup-conflict-item', '--to', 'blocked', '--reason', 'merge-conflict']);
+  commitPending(cwd, 'state: park catchup-conflict-item');
+
+  // main changes the SAME line differently after the park — a genuine
+  // conflict for catchup's merge (main into the branch) to detect.
+  fs.writeFileSync(path.join(cwd, 'shared.txt'), 'main-change\n');
+  gitAtCwd(cwd, ['add', 'shared.txt']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', 'main changes shared.txt']);
+
+  const mainHeadBefore = gitHead(cwd);
+  const branchHeadBefore = gitAtCwd(cwd, ['rev-parse', 'fgw/catchup-conflict-item']).trim();
+  const worktreesBefore = gitAtCwd(cwd, ['worktree', 'list', '--porcelain']);
+
+  const result = run(cwd, ['catchup', 'catchup-conflict-item']);
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /conflicted/);
+  assert.match(result.stdout, /shared\.txt/);
+
+  assert.equal(gitHead(cwd), mainHeadBefore, 'main must be unchanged by a failed catchup');
+  assert.equal(gitAtCwd(cwd, ['rev-parse', 'fgw/catchup-conflict-item']).trim(), branchHeadBefore, "the item's own branch tip must be unchanged after an aborted catchup");
+  assert.equal(gitAtCwd(cwd, ['worktree', 'list', '--porcelain']), worktreesBefore, 'the ephemeral catchup worktree is cleaned up even on abort — no leftover');
+  assert.equal(stateView(cwd).work['catchup-conflict-item'].status, 'blocked');
+});
+
+test('catchup on an item blocked for an unrelated reason (e.g. anti-loop-max-visits) is rejected with a validation error naming the actual reason, before any git operation runs', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'catchup-unrelated-reason');
+  run(cwd, ['move', 'catchup-unrelated-reason', '--to', 'doing']);
+  run(cwd, ['move', 'catchup-unrelated-reason', '--to', 'proposed']);
+  run(cwd, ['move', 'catchup-unrelated-reason', '--to', 'blocked', '--reason', 'anti-loop-max-visits']);
+
+  const result = run(cwd, ['catchup', 'catchup-unrelated-reason']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /anti-loop-max-visits/);
+  assert.equal(stateView(cwd).work['catchup-unrelated-reason'].status, 'blocked');
+});
+
+test('catchup on a nonexistent id is rejected as validation, exit 4', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['catchup', 'ghost']);
+  assert.equal(result.status, 4);
+});
+
+test('catchup on a status other than blocked is rejected as precondition, exit 2', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'catchup-not-blocked');
+  const result = run(cwd, ['catchup', 'catchup-not-blocked']);
+  assert.equal(result.status, 2);
+});
+
+test('the CLI usage message for an unknown verb lists catchup in the surface', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['bogus-verb']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /catchup/);
+});
+
 // --- coexistence: harness marker detection + territory manifest -----------
 // (install-coexistence D2/D4/D6 — see src/install/coexist.mjs)
 
