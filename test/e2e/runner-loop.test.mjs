@@ -26,9 +26,15 @@ function mkTempDir(prefix) {
   return fs.mkdtempSync(path.join(os.tmpdir(), prefix));
 }
 
+// Pinned to "main" (mirrors merge.test.mjs's initRepo(), and loop.test.mjs's
+// own initTempRepo() fixed by cell fan-out-parallel-9 for the same reason): a
+// leaf dispatch whose root has no branch yet forks fgw/<root> from literally
+// "main" (worktree.mjs's createBranchRef default) — a bare `git init` leaves
+// the default branch name to this machine's `init.defaultBranch`, which is
+// not reliably "main".
 function initTempRepo() {
   const repoRoot = mkTempDir('fgos-runner-e2e-repo-');
-  execFileSync('git', ['init', '-q'], { cwd: repoRoot });
+  execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: repoRoot });
   execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: repoRoot });
   execFileSync('git', ['config', 'user.name', 'Test'], { cwd: repoRoot });
   fs.writeFileSync(path.join(repoRoot, 'seed.txt'), 'seed\n');

@@ -57,7 +57,7 @@ import {
   BREAKER_MISSES,
 } from './anti-loop.mjs';
 import { spawnWorker, modelForTier } from './dispatch.mjs';
-import { createWorktree, removeWorktree, listLeftovers, branchNameFor } from './worktree.mjs';
+import { createWorktree, removeWorktree, listLeftovers, branchNameFor, createBranchRef } from './worktree.mjs';
 import { runGoalCheck } from './goal-check.mjs';
 import { createWriteQueue } from './write-queue.mjs';
 import { createOwnershipStore, resolveRoot, claimRoot, steerFrontier } from './root-affinity.mjs';
@@ -466,8 +466,22 @@ async function claimItem({ dir, ownershipStore, queue, ownerIdentity, item }) {
  * claim, actual at the two terminal exits (pass, and the park/halt block that
  * covers both `parked` and `halted`), sourced from the runner's own
  * goal-check/branchFacts, never the worker's own status/signal (D3).
+ *
+ * BRANCH TARGETING (cell fan-out-parallel-9, D3/D4/D17): `rootId` is the
+ * item's resolved root (`decision.root` from `claimItem`'s
+ * `claimRoot`/`resolveRoot` call — threaded down rather than re-read via a
+ * second `listWork`, since `claimAndDispatch` already has it). A LEAF
+ * (`rootId !== item.id`) first ensures its root's integration branch exists
+ * (`createBranchRef`, idempotent — a no-op if an earlier sibling leaf or the
+ * root's own prior dispatch already created it) and then forks its OWN
+ * worktree from that root branch's current tip, not from `main`. A ROOT or
+ * parent-less standalone item (`rootId === item.id`) is unchanged:
+ * `createWorktree`'s existing branch-reuse path already forks from
+ * `fgw/<item.id>`'s own tip if that branch already exists (e.g. from an
+ * earlier merged leaf), and forks fresh from `main`/current HEAD otherwise —
+ * byte-for-byte the pre-fan-out-parallel-9 single-item behavior.
  */
-async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, breaker, queue, log, priorVisits }) {
+async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, breaker, queue, log, priorVisits, rootId }) {
   log(`fgos-runner: claimed "${item.id}" (todo -> doing)`);
   await queue.enqueue(async () => {
     addOutcome(dir, {
@@ -484,7 +498,15 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
     let failure = null;
 
     try {
-      wt = createWorktree(repoRoot, item.id, { worktreeDir });
+      if (rootId !== item.id) {
+        // Leaf: idempotent — createBranchRef is a no-op if fgw/<rootId>
+        // already exists (an earlier sibling leaf, or the root's own prior
+        // dispatch, already created it).
+        createBranchRef(repoRoot, rootId, { baseRef: 'main' });
+        wt = createWorktree(repoRoot, item.id, { worktreeDir, baseRef: branchNameFor(rootId) });
+      } else {
+        wt = createWorktree(repoRoot, item.id, { worktreeDir });
+      }
       if (attempt > 1) {
         // Retry never builds on debris: the fresh checkout is already at the
         // reused branch's head, and this reset/clean makes that explicit.
@@ -647,7 +669,7 @@ async function claimAndDispatch(ctx) {
       log(`fgos-runner: claim for "${item.id}" rejected — root held by "${decision.currentOwner}"; left for a later poll`);
       return { outcome: 'claim-rejected', id: item.id, currentOwner: decision.currentOwner, exitCode: 0 };
     }
-    return await dispatchClaimedItem({ ...ctx, priorVisits });
+    return await dispatchClaimedItem({ ...ctx, priorVisits, rootId: decision.root });
   } catch (err) {
     const category = categoryOf(err);
     const exitCode = EXIT_CODES[category];

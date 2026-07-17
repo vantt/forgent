@@ -6,7 +6,7 @@ import path from 'node:path';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 import { initStore, addWork, moveWork, listWork, readRawEvents, readyWork } from '../../src/state/store.mjs';
-import { createWorktree, removeWorktree } from '../../src/runner/worktree.mjs';
+import { createWorktree, removeWorktree, createBranchRef, branchNameFor } from '../../src/runner/worktree.mjs';
 import { runOnce } from '../../src/runner/loop.mjs';
 
 // Fake executors only — every "worker" spawned here is a node script this
@@ -17,9 +17,16 @@ import { runOnce } from '../../src/runner/loop.mjs';
 
 const noLog = () => {};
 
+// Pinned to "main" (mirrors merge.test.mjs's initRepo()): cell fan-out-parallel-9
+// wires createBranchRef's default baseRef ('main', worktree.mjs) into a real
+// leaf dispatch path, so a leaf whose root has no branch yet forks it from
+// literally "main" — a bare `git init` leaves the default branch name to this
+// machine's `init.defaultBranch` (often not "main"), which would make that
+// codepath fail here even though the real forgent/repo (whose default branch
+// really is "main") is unaffected.
 function initTempRepo() {
   const repoRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-loop-test-repo-'));
-  execFileSync('git', ['init', '-q'], { cwd: repoRoot });
+  execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: repoRoot });
   execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: repoRoot });
   execFileSync('git', ['config', 'user.name', 'Test'], { cwd: repoRoot });
   fs.writeFileSync(path.join(repoRoot, 'seed.txt'), 'seed\n');
@@ -155,6 +162,35 @@ function branchExists(repoRoot, branch) {
 function countRuns(counterFile) {
   if (!fs.existsSync(counterFile)) return 0;
   return fs.readFileSync(counterFile, 'utf8').split('\n').filter(Boolean).length;
+}
+
+/** Plant a real commit directly on `branch` via a throwaway worktree
+ * checkout (mirrors worktree.test.mjs's `commitOnWorktree`), synthesizing
+ * "a branch that already carries content" without a real merge/dispatch —
+ * exactly what cell fan-out-parallel-9's own tests need to prove
+ * fork-from-tip/branch-reuse without the (still deferred) approve-side
+ * leaf-to-root merge mechanism. */
+function plantCommit(repoRoot, worktreeDir, id, filename, contents) {
+  const wt = createWorktree(repoRoot, id, { worktreeDir });
+  fs.writeFileSync(path.join(wt.path, filename), contents);
+  execFileSync('git', ['add', filename], { cwd: wt.path });
+  execFileSync('git', ['commit', '-q', '-m', `planted: ${filename}`], { cwd: wt.path });
+  removeWorktree(repoRoot, wt.path);
+}
+
+/** True when `ref` contains `filename` at its tip — used to prove a branch's
+ * ACTUAL fork point/content (which base ref its history includes), not just
+ * its name. */
+function fileAtRef(repoRoot, ref, filename) {
+  try {
+    // stderr silenced (mirrors branchExists's `--quiet` rev-parse above): a
+    // missing path is an expected, asserted-on outcome in these tests, not a
+    // real failure worth printing "fatal: path ... does not exist" for.
+    execFileSync('git', ['show', `${ref}:${filename}`], { cwd: repoRoot, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 function setup() {
@@ -362,6 +398,70 @@ test('two-tier cap: a root with three ready leaves dispatches maxLeavesPerRoot p
   // done), so the lineage filter keeps it off the frontier this whole run.
   assert.equal(listWork(dir).work['the-root'].status, 'todo');
   assert.equal(countRuns(counterFile), 3);
+});
+
+// --- D3 branch targeting: leaf fork-from-root-tip, root branch-reuse ------
+
+test('cell fan-out-parallel-9: a leaf whose root branch already carries a planted commit forks its own worktree from that root tip, not from main', async () => {
+  const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
+  seedItem(dir, { id: 'the-root', verify: 'test -f root.txt' });
+  seedItem(dir, { id: 'leaf-1', parent: 'the-root', verify: 'test -f leaf.txt' });
+
+  // Synthesize a root branch tip that differs from main: ensure fgw/the-root
+  // exists (ref-only, from main), then plant a real commit on it — mirrors
+  // "an earlier sibling leaf already merged into fgw/the-root", without the
+  // (still deferred) approve-side merge mechanism.
+  createBranchRef(repoRoot, 'the-root', { baseRef: 'main' });
+  plantCommit(repoRoot, worktreeDir, 'the-root', 'root-marker.txt', 'planted on the root branch\n');
+  assert.equal(fileAtRef(repoRoot, 'main', 'root-marker.txt'), false, 'main itself never got the planted commit');
+
+  const result = await runOnce({ repoRoot, config: configFor(writeCommittingExecutor(scriptDir, counterFile, 'leaf.txt')), worktreeDir, log: noLog });
+
+  assert.equal(result.outcome, 'drained');
+  assert.equal(result.dispatched[0].outcome, 'proposed');
+  assert.equal(listWork(dir).work['leaf-1'].status, 'proposed');
+
+  // The leaf's OWN branch carries the root's planted content — proof it
+  // forked from fgw/the-root's tip (D3 "leaf fork-from-tip-of-parent"), not
+  // from main, which never had root-marker.txt.
+  assert.equal(fileAtRef(repoRoot, branchNameFor('leaf-1'), 'root-marker.txt'), true, 'leaf branch forked from the root branch tip, carries its planted file');
+  assert.equal(fileAtRef(repoRoot, branchNameFor('leaf-1'), 'leaf.txt'), true, 'leaf branch also carries its own worker commit');
+});
+
+test('cell fan-out-parallel-9: a root-less item is unaffected (byte-for-byte regression) — its worktree still forks fresh from main, exactly as before this cell', async () => {
+  const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
+  seedItem(dir, { id: 'standalone', verify: 'test -f output.txt' });
+
+  const result = await runOnce({ repoRoot, config: configFor(writeCommittingExecutor(scriptDir, counterFile)), worktreeDir, log: noLog });
+
+  assert.equal(result.outcome, 'drained');
+  assert.equal(listWork(dir).work.standalone.status, 'proposed');
+  assert.equal(branchExists(repoRoot, 'fgw/standalone'), true);
+  const mergeBase = execFileSync('git', ['merge-base', 'main', 'fgw/standalone'], { cwd: repoRoot, encoding: 'utf8' }).trim();
+  const mainTip = execFileSync('git', ['rev-parse', 'main'], { cwd: repoRoot, encoding: 'utf8' }).trim();
+  assert.equal(mergeBase, mainTip, 'a parent-less item still forks fresh from main, same as pre-fan-out-parallel-9 behavior');
+});
+
+test('cell fan-out-parallel-9: a root whose own branch already carries a planted commit (simulating an earlier merged leaf) reuses it via the existing branch-reuse path — proves the mechanism, not a real leaf-to-root merge', async () => {
+  const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
+  seedItem(dir, { id: 'the-root2', verify: 'test -f root2.txt' });
+
+  // Simulate "an earlier leaf already merged into fgw/the-root2" — plant a
+  // commit directly on the root's own branch before it is ever dispatched.
+  plantCommit(repoRoot, worktreeDir, 'the-root2', 'child-merged.txt', 'from an earlier merged leaf\n');
+
+  const result = await runOnce({ repoRoot, config: configFor(writeCommittingExecutor(scriptDir, counterFile, 'root2.txt')), worktreeDir, log: noLog });
+
+  assert.equal(result.outcome, 'drained');
+  assert.equal(result.dispatched[0].outcome, 'proposed');
+  assert.equal(listWork(dir).work['the-root2'].status, 'proposed');
+
+  // Both the planted (pre-existing) content and the fresh worker commit are
+  // on the SAME branch — createWorktree's branch-reuse path (opts.baseRef
+  // ignored) forked the dispatch worktree from the branch's own tip, never
+  // discarding what was already there.
+  assert.equal(fileAtRef(repoRoot, 'fgw/the-root2', 'child-merged.txt'), true, 'the pre-existing planted commit survived (branch reused, not recreated)');
+  assert.equal(fileAtRef(repoRoot, 'fgw/the-root2', 'root2.txt'), true, 'the worker\'s own commit landed on the same, reused branch');
 });
 
 // --- verify-miss: retry then park ----------------------------------------
