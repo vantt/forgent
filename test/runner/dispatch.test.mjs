@@ -51,6 +51,43 @@ function writeHangingExecutor(dir) {
   return scriptPath;
 }
 
+/** Write a fake executor that writes to stdout/stderr, then hangs past any
+ * reasonable test timeout — for asserting the timeout path still captures
+ * whatever was buffered before the kill. */
+function writeHangingExecutorWithOutput(dir) {
+  const scriptPath = path.join(dir, 'hanging-executor-with-output.mjs');
+  fs.writeFileSync(
+    scriptPath,
+    `
+    process.stdout.write('partial stdout before hang');
+    process.stderr.write('partial stderr before hang');
+    const until = Date.now() + 30000;
+    while (Date.now() < until) { /* busy-wait past any test timeout */ }
+    process.exit(0);
+    `,
+  );
+  return scriptPath;
+}
+
+/** Write a fake executor that writes stdout well past a small maxBuffer,
+ * so spawnWorker's manual maxBuffer-exceeded kill path is exercised. */
+function writeChattyExecutor(dir) {
+  const scriptPath = path.join(dir, 'chatty-executor.mjs');
+  fs.writeFileSync(
+    scriptPath,
+    `
+    const chunk = 'x'.repeat(1024);
+    let i = 0;
+    const interval = setInterval(() => {
+      process.stdout.write(chunk);
+      i += 1;
+      if (i > 200) clearInterval(interval);
+    }, 5);
+    `,
+  );
+  return scriptPath;
+}
+
 function sampleWork(overrides = {}) {
   return {
     id: 'sample-work',
@@ -292,6 +329,27 @@ test('spawnWorker throws worker-timeout and kills the process when it runs past 
     (err) => {
       assert.ok(err instanceof DispatchError);
       assert.equal(err.errorClass, 'worker-timeout');
+      // Zero output captured before the kill still yields empty strings,
+      // not undefined/missing fields (per D2's must-have).
+      assert.equal(err.stdout, '');
+      assert.equal(err.stderr, '');
+      return true;
+    },
+  );
+});
+
+test('spawnWorker attaches stdout/stderr captured before a worker-timeout kill', async () => {
+  const dir = mkTempDir();
+  const scriptPath = writeHangingExecutorWithOutput(dir);
+  const cfg = baseConfig([scriptPath]);
+
+  await assert.rejects(
+    () => spawnWorker(sampleWork(), cfg, mkTempDir(), { timeoutMs: 200 }),
+    (err) => {
+      assert.ok(err instanceof DispatchError);
+      assert.equal(err.errorClass, 'worker-timeout');
+      assert.equal(err.stdout, 'partial stdout before hang');
+      assert.equal(err.stderr, 'partial stderr before hang');
       return true;
     },
   );
@@ -308,6 +366,29 @@ test('spawnWorker throws worker-spawn-fail when the configured command does not 
     (err) => {
       assert.ok(err instanceof DispatchError);
       assert.equal(err.errorClass, 'worker-spawn-fail');
+      // The process never started, so nothing was ever buffered — still
+      // empty strings, not undefined/missing fields.
+      assert.equal(err.stdout, '');
+      assert.equal(err.stderr, '');
+      return true;
+    },
+  );
+});
+
+test('spawnWorker throws worker-spawn-fail with stdout captured up to a maxBuffer kill', async () => {
+  const dir = mkTempDir();
+  const scriptPath = writeChattyExecutor(dir);
+  const cfg = baseConfig([scriptPath]);
+
+  await assert.rejects(
+    () => spawnWorker(sampleWork(), cfg, mkTempDir(), { maxBuffer: 2048 }),
+    (err) => {
+      assert.ok(err instanceof DispatchError);
+      assert.equal(err.errorClass, 'worker-spawn-fail');
+      assert.equal(err.cause, 'maxBuffer exceeded');
+      assert.equal(typeof err.stdout, 'string');
+      assert.ok(err.stdout.length > 0, 'expected some stdout captured before the maxBuffer kill');
+      assert.equal(err.stderr, '');
       return true;
     },
   );

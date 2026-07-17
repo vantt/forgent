@@ -311,7 +311,7 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
         reject(new DispatchError(
           'worker-spawn-fail',
           `executor failed to start for work "${work.id}": ${err.message}`,
-          { workId: work.id, tier, model, cause: err.message },
+          { workId: work.id, tier, model, cause: err.message, stdout, stderr },
         ));
       });
     });
@@ -330,7 +330,7 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
           reject(new DispatchError(
             'worker-timeout',
             `executor timed out after ${timeoutMs}ms for work "${work.id}".`,
-            { workId: work.id, tier, model },
+            { workId: work.id, tier, model, stdout, stderr },
           ));
           return;
         }
@@ -338,7 +338,7 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
           reject(new DispatchError(
             'worker-spawn-fail',
             `executor for work "${work.id}" exceeded maxBuffer (${maxBuffer} bytes) and was killed.`,
-            { workId: work.id, tier, model, cause: 'maxBuffer exceeded' },
+            { workId: work.id, tier, model, cause: 'maxBuffer exceeded', stdout, stderr },
           ));
           return;
         }
