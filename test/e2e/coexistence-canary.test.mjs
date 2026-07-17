@@ -43,8 +43,27 @@ import { execFileSync, spawnSync } from 'node:child_process';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '../..');
-const WORKSHOP_ROOT = path.resolve(REPO_ROOT, '..');
-const GUARD = path.join(WORKSHOP_ROOT, '.bee/bin/hooks/bee-write-guard.mjs');
+// Locate the workshop's bee installation by walking UP from this test file's
+// real location (import.meta-based — never cwd): in the workshop checkout the
+// parent of REPO_ROOT carries .bee/, but in a disposable tmpdir worktree
+// (fgos-worktrees) no ancestor does. The canary can only measure the REAL
+// guard, so when no bee installation exists these tests skip honestly
+// instead of failing every worktree verify run.
+function findWorkshopRoot(startDir, maxHops = 8) {
+  let dir = startDir;
+  for (let hop = 0; hop < maxHops; hop += 1) {
+    if (fs.existsSync(path.join(dir, '.bee/bin/hooks/bee-write-guard.mjs'))) {
+      return dir;
+    }
+    const parent = path.dirname(dir);
+    if (parent === dir) break;
+    dir = parent;
+  }
+  return null;
+}
+const WORKSHOP_ROOT = findWorkshopRoot(__dirname);
+const GUARD = WORKSHOP_ROOT ? path.join(WORKSHOP_ROOT, '.bee/bin/hooks/bee-write-guard.mjs') : null;
+const BEE_SKIP = WORKSHOP_ROOT ? false : 'bee installation not found — canary chỉ chạy trong checkout xưởng (worktree/checkout rời skip trung thực)';
 const FGOS = path.join(REPO_ROOT, 'bin/fgos.mjs');
 const RUNNER = path.join(REPO_ROOT, 'bin/fgos-runner.mjs');
 
@@ -141,7 +160,7 @@ function diffSnapshots(before, after) {
 
 // --- (i) bee->fgos: guard bee THẬT, 3 loại event, thực trạng D7 -------------
 
-test('canary (i) bee->fgos: real bee guard against 3 fgos-territory writes — D7 verdict-map (2 KNOWN-GAP deny, 1 allow)', () => {
+test('canary (i) bee->fgos: real bee guard against 3 fgos-territory writes — D7 verdict-map (2 KNOWN-GAP deny, 1 allow)', { skip: BEE_SKIP }, () => {
   const fx = makeFixture();
 
   // Bash `fgos <verb>` — ALLOWED (D7: "Bash fgos verbs qua").
@@ -211,7 +230,7 @@ function makeGitlessBeeFixture({ withOnboarding }) {
   return fx;
 }
 
-test('canary self-check: a git-less fixture WITHOUT onboarding.json fails open (all-allow) — proves the deny assertions above are not vacuous', () => {
+test('canary self-check: a git-less fixture WITHOUT onboarding.json fails open (all-allow) — proves the deny assertions above are not vacuous', { skip: BEE_SKIP }, () => {
   const fx = makeGitlessBeeFixture({ withOnboarding: false });
   fs.mkdirSync(path.join(fx, 'src'), { recursive: true });
 
@@ -224,7 +243,7 @@ test('canary self-check: a git-less fixture WITHOUT onboarding.json fails open (
   assert.equal(r.code, 0, 'missing onboarding.json (and no git repo) must fail-open — else the KNOWN-GAP denies above prove nothing about a real bee presence');
 });
 
-test('canary self-check control: the SAME git-less fixture WITH onboarding.json denies the identical src/ write — proves the fail-open above is about onboarding.json, not the git-less shape itself', () => {
+test('canary self-check control: the SAME git-less fixture WITH onboarding.json denies the identical src/ write — proves the fail-open above is about onboarding.json, not the git-less shape itself', { skip: BEE_SKIP }, () => {
   const fx = makeGitlessBeeFixture({ withOnboarding: true });
   fs.mkdirSync(path.join(fx, 'src'), { recursive: true });
 
@@ -239,7 +258,7 @@ test('canary self-check control: the SAME git-less fixture WITH onboarding.json 
 
 // --- (iii) init: detect + nhường --------------------------------------------
 
-test('canary (iii) fgos init detects bee and leaves it untouched (nhường-nhịn, D4/D6)', () => {
+test('canary (iii) fgos init detects bee and leaves it untouched (nhường-nhịn, D4/D6)', { skip: BEE_SKIP }, () => {
   const fx = makeFixture();
   const stateBefore = fs.readFileSync(path.join(fx, '.bee/state.json'));
   const agentsBefore = fs.readFileSync(path.join(fx, 'AGENTS.md'));
@@ -259,7 +278,7 @@ test('canary (iii) fgos init detects bee and leaves it untouched (nhường-nh�
 
 // --- (ii) footprint: real fgos round, snapshot diff -------------------------
 
-test('canary (ii) footprint: a real fgos round (init->submit->runner --once->proposed) writes no byte outside .fgos/ and the owned .git/ door (D2); bee-fixture files stay byte-identical; fgos->bee stays vacuous-by-absence', () => {
+test('canary (ii) footprint: a real fgos round (init->submit->runner --once->proposed) writes no byte outside .fgos/ and the owned .git/ door (D2); bee-fixture files stay byte-identical; fgos->bee stays vacuous-by-absence', { skip: BEE_SKIP }, () => {
   const fx = makeFixture();
   assert.equal(spawnSync(process.execPath, [FGOS, 'init'], { cwd: fx, encoding: 'utf8' }).status, 0);
 
