@@ -5,12 +5,14 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import {
+  detectTrunk,
   classifySource,
   reviewDiff,
   mergeRunnerItem,
   cleanupMergedBranch,
   isWorkingTreeClean,
 } from '../../src/runner/merge.mjs';
+import { branchNameFor } from '../../src/runner/worktree.mjs';
 
 // Every test here creates its own disposable git repo (mirrors
 // worktree.test.mjs's own initTempRepo) — never this repo's own checkout.
@@ -216,3 +218,40 @@ test('cleanupMergedBranch never throws even if the branch is already gone (idemp
   assert.equal(result.warnings.length, 1);
   assert.match(result.warnings[0], /branch delete failed/);
 });
+
+// --- detectTrunk on a master-trunk repo (human-added per reject reason, ---
+// --- dogfood item bo-hardcode-ten-trunk: the fix must hold when the     ---
+// --- host repo's trunk is named `master`, not `main`)                   ---
+
+function initMasterRepo() {
+  const repoRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-merge-test-master-'));
+  execFileSync('git', ['init', '-q', '-b', 'master'], { cwd: repoRoot });
+  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: repoRoot });
+  execFileSync('git', ['config', 'user.name', 'Test'], { cwd: repoRoot });
+  fs.writeFileSync(path.join(repoRoot, 'seed.txt'), 'seed\n');
+  execFileSync('git', ['add', 'seed.txt'], { cwd: repoRoot });
+  execFileSync('git', ['commit', '-q', '-m', 'seed'], { cwd: repoRoot });
+  return repoRoot;
+}
+
+test('detectTrunk resolves "master" on a repo whose only trunk branch is master (no origin remote)', () => {
+  const repoRoot = initMasterRepo();
+  assert.equal(detectTrunk(repoRoot), 'master');
+});
+
+test('reviewDiff diffs a runner branch against the detected master trunk (no hardcoded main)', () => {
+  const repoRoot = initMasterRepo();
+  const item = makeItem();
+  makeBranchWithCommitOn(repoRoot, 'master', branchNameFor(item.id), 'change.txt', 'branch change\n');
+  const out = reviewDiff(repoRoot, item);
+  assert.equal(out.source, 'runner');
+  assert.match(out.diff, /change\.txt/);
+});
+
+function makeBranchWithCommitOn(repoRoot, trunk, branch, filename, content) {
+  git(repoRoot, ['checkout', '-b', branch]);
+  fs.writeFileSync(path.join(repoRoot, filename), content);
+  git(repoRoot, ['add', filename]);
+  git(repoRoot, ['commit', '-q', '-m', `on ${branch}`]);
+  git(repoRoot, ['checkout', trunk]);
+}
