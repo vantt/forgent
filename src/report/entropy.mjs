@@ -22,7 +22,7 @@ const FINAL_STATUSES = new Set(['proposed', 'blocked', 'done']);
 // with no actual half, or work sitting in `doing` with nothing to show for
 // it) than for signals that are merely "still waiting" (awaiting-human,
 // stage clarify, an unsettled friction).
-const WEIGHTS = Object.freeze({
+export const WEIGHTS = Object.freeze({
   missingActual: 5,
   staleDoing: 5,
   stageClarify: 3,
@@ -46,18 +46,32 @@ function countMissingActual(view) {
 // settlements at all counts every one of its friction records; a
 // settlement that happened BEFORE the friction (an earlier resolution,
 // unrelated to this occurrence) does not count as having settled it.
-function countFrictionUnsettled(view) {
+//
+// The single owner of that settled-after comparison: every consumer that
+// needs "which frictions are still open" (this module's own entropy count,
+// and the evolve-loop candidate ranking) reads it from here instead of
+// re-deriving it. Returns a map of only the ids that still carry at least
+// one unsettled record, each mapped to that id's unsettled records (in log
+// order); an id whose every friction has since settled is omitted entirely.
+export function listUnsettledFrictionsByWork(view) {
   const frictions = view.frictions ?? {};
   const settlements = view.settlements ?? {};
-  let count = 0;
+  const result = {};
   for (const [id, records] of Object.entries(frictions)) {
     const settlementTimes = (settlements[id] ?? []).map((s) => s.ts);
-    for (const record of records) {
-      const settledAfter = settlementTimes.some((ts) => ts > record.ts);
-      if (!settledAfter) count += 1;
-    }
+    const unsettled = records.filter(
+      (record) => !settlementTimes.some((ts) => ts > record.ts),
+    );
+    if (unsettled.length > 0) result[id] = unsettled;
   }
-  return count;
+  return result;
+}
+
+function countFrictionUnsettled(view) {
+  return Object.values(listUnsettledFrictionsByWork(view)).reduce(
+    (count, records) => count + records.length,
+    0,
+  );
 }
 
 function countStaleDoing(view) {

@@ -24,6 +24,7 @@
     "src/intake/discovery.mjs": "use-case",
     "src/intake/decompose.mjs": "use-case",
     "src/report/entropy.mjs": "domain",
+    "src/evolve/candidates.mjs": "domain",
     "src/state/events.mjs": "kernel",
     "src/state/work.mjs": "kernel",
     "src/state/envelope.mjs": "kernel",
