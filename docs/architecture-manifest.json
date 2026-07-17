@@ -14,6 +14,7 @@
     "src/runner/merge.mjs": "infra",
     "src/runner/github-adapter.mjs": "infra",
     "src/state/store.mjs": "infra",
+    "src/state/porting-store.mjs": "infra",
     "src/install/coexist.mjs": "infra",
     "src/runner/recovery.mjs": "domain",
     "src/runner/anti-loop.mjs": "domain",
