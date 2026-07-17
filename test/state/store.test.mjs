@@ -15,7 +15,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { addWork, moveWork, addOutcome, addFriction, listWork } from '../../src/state/store.mjs';
+import { addWork, editWork, moveWork, addOutcome, addFriction, listWork } from '../../src/state/store.mjs';
 
 // Every test gets its own mkdtemp dir — never touch the repo's .fgos/.
 function tmpDir() {
@@ -161,4 +161,94 @@ test('moveWork omits branchHeadAtTake/branchHeadAtReturn entirely from the event
 
   assert.equal('branchHeadAtTake' in event.payload, false);
   assert.equal('branchHeadAtReturn' in event.payload, false);
+});
+
+// --- cycle guard at the write door (work-graph-intelligence S1) -----------
+//
+// dep-graph.mjs's findDepCycle/assertNoCycle are unit-tested directly in
+// test/state/dep-graph.test.mjs; these cases assert the guard is actually
+// WIRED into addWork/editWork — the single write door — not just present as
+// an unused import. `editWork` closes a live gap: before this cell, a patch
+// introducing an A<->B cycle through `deps` (deps is in EDITABLE_FIELDS)
+// passed straight through, since validateDeps only checks existence.
+
+// A genuine multi-node cycle can never actually reach assertNoCycle's check
+// from addWork's site: every dep on a NEW item must already exist (the
+// existence check), and nothing existing can already depend (even
+// transitively) on an id that is only being created right now — induction
+// on write order. The only shape addWork could ever hand assertNoCycle a
+// cycle for is a self-loop, and that is already rejected earlier in the same
+// validateWork() call (validateWorkShape's self-reference check) before
+// assertNoCycle ever runs. This asserts addWork's guard is wired at the
+// call site (matching the must_haves key_link) without asserting an
+// unreachable multi-node scenario; the real, reachable gap this cell closes
+// is editWork's (covered by the tests below), which patches deps onto an
+// item that already has neighbors.
+test('addWork still rejects a self-loop (defense-in-depth: caught by shape validation before the cycle guard runs, and the guard is wired at the same site regardless)', () => {
+  const dir = tmpDir();
+  assert.throws(
+    () => addWork(dir, { id: 'self-loop', title: 'Self Loop', kind: 'task', status: 'todo', deps: ['self-loop'], risk: 'low', refs: [], verify: 'npm test' }),
+    /cannot list itself as a dep/,
+  );
+  assert.equal(listWork(dir).work['self-loop'], undefined);
+});
+
+test('addWork accepts a forward-only chain built up one item at a time — no false positive from the new guard', () => {
+  const dir = tmpDir();
+  addSampleWork(dir, 'cyc-a', { deps: [] });
+  addSampleWork(dir, 'cyc-b', { deps: ['cyc-a'] });
+  addWork(dir, { id: 'cyc-c', title: 'Cyc C', kind: 'task', status: 'todo', deps: ['cyc-b'], risk: 'low', refs: [], verify: 'npm test' });
+  assert.ok(listWork(dir).work['cyc-c']);
+});
+
+test('a direct 2-node A<->B cycle is rejected once the second half is written — via addWork then editWork', () => {
+  const dir = tmpDir();
+  addSampleWork(dir, 'cyc-x', { deps: [] });
+  // cyc-x has no deps yet, so cyc-y -> cyc-x is a plain forward edge, not a cycle: accepted.
+  addWork(dir, { id: 'cyc-y', title: 'Cyc Y', kind: 'task', status: 'todo', deps: ['cyc-x'], risk: 'low', refs: [], verify: 'npm test' });
+  assert.ok(listWork(dir).work['cyc-y']);
+
+  // now closing it the other way (cyc-x -> cyc-y) would form A<->B: rejected.
+  assert.throws(
+    () => editWork(dir, { id: 'cyc-x', patch: { deps: ['cyc-y'] } }),
+    /would close a dependency cycle/,
+  );
+});
+
+test('editWork patch introducing an A<->B cycle is rejected — the live gap this cell closes', () => {
+  const dir = tmpDir();
+  addSampleWork(dir, 'edit-cyc-a', { deps: [] });
+  addSampleWork(dir, 'edit-cyc-b', { deps: ['edit-cyc-a'] });
+
+  assert.throws(
+    () => editWork(dir, { id: 'edit-cyc-a', patch: { deps: ['edit-cyc-b'] } }),
+    /would close a dependency cycle/,
+  );
+  // the item's deps must stay unchanged — the patch never landed
+  assert.deepEqual(listWork(dir).work['edit-cyc-a'].deps, []);
+});
+
+test('a valid DAG add and a valid DAG edit are still accepted unchanged through the write door', () => {
+  const dir = tmpDir();
+  addSampleWork(dir, 'dag-a', { deps: [] });
+  addWork(dir, { id: 'dag-b', title: 'Dag B', kind: 'task', status: 'todo', deps: ['dag-a'], risk: 'low', refs: [], verify: 'npm test' });
+  assert.ok(listWork(dir).work['dag-b']);
+
+  addSampleWork(dir, 'dag-c', { deps: [] });
+  editWork(dir, { id: 'dag-b', patch: { deps: ['dag-a', 'dag-c'] } });
+  assert.deepEqual(listWork(dir).work['dag-b'].deps, ['dag-a', 'dag-c']);
+});
+
+test('a dep to an unknown id is still rejected by the existing existence check first, before the cycle guard runs', () => {
+  const dir = tmpDir();
+  assert.throws(
+    () => addWork(dir, { id: 'ghost-dep', title: 'Ghost Dep', kind: 'task', status: 'todo', deps: ['no-such-id'], risk: 'low', refs: [], verify: 'npm test' }),
+    /depends on unknown id/,
+  );
+
+  addSampleWork(dir, 'exist-a', { deps: [] });
+  assert.throws(
+    () => editWork(dir, { id: 'exist-a', patch: { deps: ['no-such-id'] } }),
+    /depends on unknown id/,
+  );
 });

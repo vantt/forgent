@@ -34,6 +34,7 @@ import { transitionStage } from './stage.mjs';
 import { validateWork, WorkValidationError, DEFAULTS } from './work.mjs';
 import { EventLogError } from './events.mjs';
 import { frontier } from './frontier.mjs';
+import { assertNoCycle } from './dep-graph.mjs';
 
 export { FsmError, WorkValidationError, EventLogError };
 
@@ -120,6 +121,12 @@ export function addWork(dir, work) {
   // so validateWork below still rejects it as validation.
   const item = { ...work, tier: work?.tier ?? DEFAULTS.tier };
   validateWork(item, Object.keys(before.work));
+  // work-graph-intelligence S1 (D f176c18a): the acyclic invariant on `deps`
+  // is enforced at this SAME write door, right after shape/existence
+  // validation — never a second validation path. assertNoCycle throws
+  // WorkValidationError (category='validation'), already mapped to exit 4 by
+  // categoryOf below; it is never wrapped or re-classified here.
+  assertNoCycle(item, before.work);
 
   const event = appendEvent(logPath, { type: 'work.add', payload: item });
   const view = refreshView(dir);
@@ -166,6 +173,11 @@ export function editWork(dir, { id, patch, actor } = {}) {
 
   const candidate = { ...work, ...patch };
   validateWork(candidate, Object.keys(before.work));
+  // Same guard as addWork above (work-graph-intelligence S1) — this is the
+  // gap that used to close silently: a patch introducing an A<->B cycle
+  // through `deps` (an EDITABLE_FIELDS entry) went straight through, since
+  // validateDeps only checks existence, never acyclicity.
+  assertNoCycle(candidate, before.work);
 
   const payload = { id, patch };
   if (actor !== undefined) {
