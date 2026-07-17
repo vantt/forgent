@@ -49,3 +49,19 @@
 {"seq":49,"ts":"2026-07-17T04:48:35.947Z","type":"work.move","payload":{"id":"loai-tru-data-dir-39c","from":"doing","to":"blocked","actor":"runner"},"v":2}
 {"seq":50,"ts":"2026-07-17T04:48:35.953Z","type":"work.outcome","payload":{"id":"loai-tru-data-dir-39c","actual":{"outcome":"parked","passed":false,"attempts":2,"errorClass":"worker-timeout","aheadCount":0,"visits":1}},"v":2}
 {"seq":51,"ts":"2026-07-17T04:48:35.954Z","type":"work.friction","payload":{"id":"loai-tru-data-dir-39c","disposition":"parked","errorClass":"worker-timeout","layer":"environment","attempts":2,"detail":"executor timed out after 300000ms for work \"loai-tru-data-dir-39c\"."},"v":2}
+{"seq":52,"ts":"2026-07-17T04:49:11.242Z","type":"work.move","payload":{"id":"loai-tru-data-dir-39c","from":"blocked","to":"todo","actor":"human"},"v":2}
+{"seq":53,"ts":"2026-07-17T04:49:26.769Z","type":"work.move","payload":{"id":"loai-tru-data-dir-39c","from":"todo","to":"doing","actor":"runner"},"v":2}
+{"seq":54,"ts":"2026-07-17T04:49:26.770Z","type":"work.outcome","payload":{"id":"loai-tru-data-dir-39c","predicted":{"tier":"standard","deps":0,"priorVisits":1}},"v":2}
+{"seq":55,"ts":"2026-07-17T05:01:10.013Z","type":"work.move","payload":{"id":"loai-tru-data-dir-39c","from":"doing","to":"blocked","actor":"runner"},"v":2}
+{"seq":56,"ts":"2026-07-17T05:01:10.020Z","type":"work.outcome","payload":{"id":"loai-tru-data-dir-39c","actual":{"outcome":"parked","passed":false,"attempts":2,"errorClass":"verify-miss","aheadCount":1,"visits":2}},"v":2}
+{"seq":57,"ts":"2026-07-17T05:01:10.021Z","type":"work.friction","payload":{"id":"loai-tru-data-dir-39c","disposition":"parked","errorClass":"verify-miss","layer":"verification","attempts":2,"detail":"goal-check failed (exit 1)"},"v":2}
+{"seq":58,"ts":"2026-07-17T05:02:14.723Z","type":"work.move","payload":{"id":"loai-tru-data-dir-39c","from":"blocked","to":"todo","actor":"human"},"v":2}
+{"seq":59,"ts":"2026-07-17T05:02:14.772Z","type":"work.move","payload":{"id":"loai-tru-data-dir-39c","from":"todo","to":"doing","actor":"runner"},"v":2}
+{"seq":60,"ts":"2026-07-17T05:02:14.773Z","type":"work.outcome","payload":{"id":"loai-tru-data-dir-39c","predicted":{"tier":"standard","deps":0,"priorVisits":2}},"v":2}
+{"seq":61,"ts":"2026-07-17T05:04:35.919Z","type":"work.move","payload":{"id":"loai-tru-data-dir-39c","from":"doing","to":"blocked","actor":"runner"},"v":2}
+{"seq":62,"ts":"2026-07-17T05:04:35.926Z","type":"work.outcome","payload":{"id":"loai-tru-data-dir-39c","actual":{"outcome":"parked","passed":false,"attempts":2,"errorClass":"verify-miss","aheadCount":1,"visits":3}},"v":2}
+{"seq":63,"ts":"2026-07-17T05:04:35.926Z","type":"work.friction","payload":{"id":"loai-tru-data-dir-39c","disposition":"parked","errorClass":"verify-miss","layer":"verification","attempts":2,"detail":"goal-check failed (exit 1)"},"v":2}
+{"seq":64,"ts":"2026-07-17T05:07:46.622Z","type":"work.move","payload":{"id":"loai-tru-data-dir-39c","from":"blocked","to":"doing","actor":"human","branchHeadAtTake":"42415be9fc21018d48eda189a65103ad4c6fb484"},"v":2}
+{"seq":65,"ts":"2026-07-17T05:07:46.623Z","type":"work.outcome","payload":{"id":"loai-tru-data-dir-39c","predicted":{"tier":"standard","deps":0,"priorVisits":3,"actor":"human","branchHeadAtTake":"42415be9fc21018d48eda189a65103ad4c6fb484"}},"v":2}
+{"seq":66,"ts":"2026-07-17T05:08:36.175Z","type":"work.move","payload":{"id":"loai-tru-data-dir-39c","from":"doing","to":"proposed","branchHeadAtReturn":"66c73e389d9431e9b3cbf71c62c1c1451f9f7e19"},"v":2}
+{"seq":67,"ts":"2026-07-17T05:08:36.175Z","type":"work.outcome","payload":{"id":"loai-tru-data-dir-39c","actual":{"outcome":"proposed","passed":true,"attempts":1,"errorClass":null,"aheadCount":2}},"v":2}
