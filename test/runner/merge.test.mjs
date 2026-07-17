@@ -152,6 +152,31 @@ test('reviewDiff for a legacy item (no branch, no head markers) returns a null d
   assert.match(result.warnings[0], /no live diff source/);
 });
 
+// --- isWorkingTreeClean (.fgos/ exclusion) -------------------------------
+
+test('isWorkingTreeClean is true when the only pending change is inside .fgos/', () => {
+  const repoRoot = initRepo();
+  fs.mkdirSync(path.join(repoRoot, '.fgos'));
+  fs.writeFileSync(path.join(repoRoot, '.fgos', 'events.jsonl'), '{"seq":1}\n');
+  git(repoRoot, ['add', '.fgos/events.jsonl']);
+  git(repoRoot, ['commit', '-q', '-m', 'seed .fgos/events.jsonl']);
+
+  fs.appendFileSync(path.join(repoRoot, '.fgos', 'events.jsonl'), '{"seq":2}\n');
+  assert.equal(isWorkingTreeClean(repoRoot), true);
+});
+
+test('isWorkingTreeClean is false when a non-.fgos path is dirty, even alongside a dirty .fgos/', () => {
+  const repoRoot = initRepo();
+  fs.mkdirSync(path.join(repoRoot, '.fgos'));
+  fs.writeFileSync(path.join(repoRoot, '.fgos', 'events.jsonl'), '{"seq":1}\n');
+  git(repoRoot, ['add', '.fgos/events.jsonl']);
+  git(repoRoot, ['commit', '-q', '-m', 'seed .fgos/events.jsonl']);
+
+  fs.appendFileSync(path.join(repoRoot, '.fgos', 'events.jsonl'), '{"seq":2}\n');
+  fs.writeFileSync(path.join(repoRoot, 'scratch.txt'), 'uncommitted\n');
+  assert.equal(isWorkingTreeClean(repoRoot), false);
+});
+
 // --- mergeRunnerItem (spike-proven mechanics: --no-commit --no-ff, verify
 // on the staged tree BEFORE commit, --abort on any red path) --------------
 

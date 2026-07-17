@@ -1276,9 +1276,43 @@ test('return refuses a dirty working tree (uncommitted changes) as validation, e
   assert.equal(run(cwd, ['take', '--id', 'pull-return-dirty']).status, 0);
   fs.writeFileSync(path.join(cwd, 'proof.txt'), 'uncommitted\n'); // never git add/commit
 
+  // Sanity: `.fgos/` is ALSO dirty here (take's own event, never committed —
+  // reported collapsed as "?? .fgos/" since nothing inside it has ever been
+  // tracked yet) — proving the .fgos/ exclusion below does not accidentally
+  // mask this rejection; it's proof.txt, a real non-.fgos path, that trips it.
+  assert.match(execFileSync('git', ['status', '--porcelain'], { cwd, encoding: 'utf8' }), /\.fgos/);
+
   const result = run(cwd, ['return', 'pull-return-dirty']);
   assert.equal(result.status, 4);
   assert.equal(stateView(cwd).work['pull-return-dirty'].status, 'doing');
+});
+
+test('return succeeds when ONLY .fgos/ (the live event log) is dirty — its own take/return writes are excluded from the clean-tree gate (no more manual events.jsonl commit before every return)', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  addOk(cwd, 'pull-return-fgos-only-dirty', { verify: 'test -f proof.txt' });
+  assert.equal(run(cwd, ['take', '--id', 'pull-return-fgos-only-dirty']).status, 0);
+
+  // Commit ONLY the produced file — deliberately leave the take event's
+  // `.fgos/events.jsonl` delta uncommitted, unlike commitFile's `git add -A`
+  // which would fold both together and never isolate the exclusion.
+  fs.writeFileSync(path.join(cwd, 'proof.txt'), 'work\n');
+  execFileSync('git', ['add', 'proof.txt'], { cwd });
+  execFileSync('git', ['commit', '-q', '-m', 'work: proof.txt'], { cwd });
+
+  // `.fgos/` has never had a tracked file inside it in this fixture, so git
+  // reports it collapsed as a single untracked directory ("?? .fgos/")
+  // rather than listing events.jsonl individually — either shape must still
+  // count as "only .fgos/ dirty" for the exclusion below.
+  const statusLines = execFileSync('git', ['status', '--porcelain'], { cwd, encoding: 'utf8' })
+    .split('\n')
+    .filter(Boolean);
+  assert.equal(statusLines.length, 1, 'sanity: .fgos/ must be the ONLY dirty path at this point');
+  assert.match(statusLines[0], /\.fgos\/?$/);
+
+  const result = run(cwd, ['return', 'pull-return-fgos-only-dirty']);
+  assert.equal(result.status, 0, `return should succeed with only .fgos/ dirty: ${result.stderr}`);
+  assert.equal(stateView(cwd).work['pull-return-fgos-only-dirty'].status, 'proposed');
 });
 
 test('return refuses when HEAD has not advanced past headAtTake — a clean tree with zero real progress — as validation, exit 4, item stays doing', () => {
@@ -1590,6 +1624,41 @@ test('approve of a runner item (happy path): merges fgw/<id> into main, verifies
 
   const branches = gitAtCwd(cwd, ['for-each-ref', '--format=%(refname:short)', 'refs/heads/fgw/']);
   assert.doesNotMatch(branches, /fgw\/approve-runner-item/, 'the fully-merged branch is cleaned up');
+});
+
+test('approve of a runner item succeeds when ONLY .fgos/ (the live event log) is dirty on main — no more manual events.jsonl commit before every approve', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeRunnerProposedItem(cwd, 'approve-fgos-only-dirty', { verify: 'test -f approve-fgos-only-dirty-produced.txt' });
+
+  // Dirty ONLY `.fgos/events.jsonl` on main after the item is proposed —
+  // an unrelated `add` appends an event and never touches any other file —
+  // deliberately left uncommitted (unlike makeRunnerProposedItem's own
+  // commitPending calls, which fold everything together).
+  assert.equal(addOk(cwd, 'approve-fgos-only-dirty-noise').status, 0);
+
+  const statusLines = execFileSync('git', ['status', '--porcelain'], { cwd, encoding: 'utf8' })
+    .split('\n')
+    .filter(Boolean);
+  assert.equal(statusLines.length, 1, 'sanity: .fgos/events.jsonl must be the ONLY dirty path at this point');
+  assert.match(statusLines[0], /\.fgos\/events\.jsonl$/);
+
+  const result = run(cwd, ['approve', 'approve-fgos-only-dirty']);
+  assert.equal(result.status, 0, `approve should succeed with only .fgos/ dirty: ${result.stderr}`);
+  assert.equal(stateView(cwd).work['approve-fgos-only-dirty'].status, 'done');
+});
+
+test('approve of a runner item still refuses when a non-.fgos file on main is dirty, as validation, exit 4, item stays proposed', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeRunnerProposedItem(cwd, 'approve-real-dirty', { verify: 'test -f approve-real-dirty-produced.txt' });
+
+  fs.writeFileSync(path.join(cwd, 'scratch.txt'), 'unrelated uncommitted work\n'); // never git add/commit
+
+  const result = run(cwd, ['approve', 'approve-real-dirty']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /not clean/);
+  assert.equal(stateView(cwd).work['approve-real-dirty'].status, 'proposed');
 });
 
 test('approve of a leaf item with a clean merge lands the work on fgw/<root> (not main) via an ephemeral worktree, leaf -> done, fgw/<leaf> is actually deleted, fgw/<root> survives (D3/D4/D17)', () => {

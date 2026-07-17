@@ -324,7 +324,8 @@ dispatch (`fgos ready`) — cửa pull không mở một tập riêng.
 - **`fgos return <id> [--timeout <ms>]`** — trả kết quả, KHÔNG BAO GIỜ tin
   lời người gọi: verb tự đo đủ ba điều kiện, mirror TRUNG THỰC contract
   `proposed` của chính runner — (a) working tree của host repo phải SẠCH
-  (mọi việc đã commit), (b) HEAD phải tiến so `headAtTake` (tiến bộ THẬT,
+  (mọi việc đã commit, loại trừ `.fgos/` — store sống tự mutate bởi chính
+  take/return/approve nên không bao giờ tính là bẩn), (b) HEAD phải tiến so `headAtTake` (tiến bộ THẬT,
   không phải commit rỗng hay chưa commit gì), (c) verb TỰ CHẠY `verify`
   thật của item (goal-check — cùng một hàm runner dùng, xem spec Runner)
   tại HEAD đó, ngay trong thư mục làm việc hiện hành. Thiếu (a) hoặc (b) →
@@ -540,7 +541,7 @@ của `submit`. Số phận cuối cùng (giữ/xóa) chưa quyết — xem back
 ### Trả việc qua cửa pull (return)
 
 - **Runs when:** người/phiên đang cầm một item qua `take` gọi `fgos return <id> [--timeout <ms>]`.
-- **Blocked when:** item không tồn tại — `validation`; item không ở `doing` — `validation`; item đang `doing` nhưng `claimActor` không phải `human`/`session` (claim của runner) — `validation`, `return` chỉ hoàn tất một `take`; item thiếu `headAtTake` (claim di sản/không qua `take`) — `validation`; working tree host repo KHÔNG sạch — `validation`; HEAD chưa tiến so `headAtTake` — `validation`; `--timeout` không phải số dương — `validation`. KHÔNG có nhánh chặn nào ghi sự kiện.
+- **Blocked when:** item không tồn tại — `validation`; item không ở `doing` — `validation`; item đang `doing` nhưng `claimActor` không phải `human`/`session` (claim của runner) — `validation`, `return` chỉ hoàn tất một `take`; item thiếu `headAtTake` (claim di sản/không qua `take`) — `validation`; working tree host repo KHÔNG sạch (loại trừ `.fgos/` — store sống tự mutate bởi chính `return`, không bao giờ tính là bẩn) — `validation`; HEAD chưa tiến so `headAtTake` — `validation`; `--timeout` không phải số dương — `validation`. KHÔNG có nhánh chặn nào ghi sự kiện.
 - **What changes:** verb TỰ CHẠY `verify` thật của item (goal-check) tại HEAD hiện hành, trong thư mục làm việc hiện hành — không bao giờ tin lời người gọi. Verify xanh: một sự kiện chuyển-trạng-thái `doing → proposed` mang thêm `headAtReturn` (HEAD tại đúng thời điểm này, Data Dictionary #16, per pr-lifecycle D1 / 1359ab5e), cộng một sự kiện outcome nửa THỰC TẾ (kết cục `proposed`, đạt goal-check, số commit kể từ `headAtTake`). Verify đỏ: một sự kiện chuyển-trạng-thái `doing → blocked` (lý do `verify-fail`), cộng nửa thực tế (kết cục `blocked`, không đạt), cộng một bản ghi friction lớp `verification`.
 - **Side effects:** một tiến trình con chạy `verify` của item (shell, trong `cwd` hiện hành).
 - **Afterwards:** verify xanh → item ở `proposed` mang `headAtReturn`, chờ người duyệt qua cổng `review`/`approve`/`reject` như mọi đề xuất khác (xem spec Runner "Cổng duyệt PR nội bộ" — dải `headAtTake→headAtReturn` là nguồn diff của một đề xuất pull-door) — KHÔNG sinh settlement ở bước này (settlement thuộc cạnh `→done`); verify đỏ → item ở `blocked`, mang một bản ghi friction verification, đi lại đường `blocked → todo` thường như mọi item đỗ khác.
