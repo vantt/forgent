@@ -78,6 +78,13 @@ function stateView(cwd) {
   return JSON.parse(fs.readFileSync(viewPath(cwd), 'utf8'));
 }
 
+// Every verb's success path prints a single fgos.v1 envelope
+// {contract, generated_at, data_hash, data} — this unwraps it to the verb's
+// own structured data.
+function envelopeData(stdout) {
+  return JSON.parse(stdout).data;
+}
+
 function events(cwd) {
   return fs
     .readFileSync(path.join(cwd, '.fgos', 'events.jsonl'), 'utf8')
@@ -189,8 +196,9 @@ test('e2e pr-gate (a) runner item full loop: add -> runner dispatch -> proposed,
 
   const review = fgos(repoRoot, ['review', 'pr-a-item']);
   assert.equal(review.status, 0, `review failed: ${review.stderr}`);
-  assert.match(review.stdout, /source: runner/);
-  assert.match(review.stdout, /pr-a-produced\.txt/);
+  const reviewData = envelopeData(review.stdout);
+  assert.equal(reviewData.source, 'runner');
+  assert.match(reviewData.diff, /pr-a-produced\.txt/);
 
   // approve's runner path refuses a dirty main tree — fold the init/add/
   // dispatch log deltas into one real commit first.
@@ -198,8 +206,9 @@ test('e2e pr-gate (a) runner item full loop: add -> runner dispatch -> proposed,
 
   const approve = fgos(repoRoot, ['approve', 'pr-a-item']);
   assert.equal(approve.status, 0, `approve failed: ${approve.stderr}`);
-  assert.match(approve.stdout, /proposed -> done/);
-  assert.match(approve.stdout, /PR_A_OK/);
+  const approveData = envelopeData(approve.stdout);
+  assert.equal(approveData.to, 'done');
+  assert.match(approveData.output, /PR_A_OK/);
 
   const view = stateView(repoRoot);
   assert.equal(view.work['pr-a-item'].status, 'done');
@@ -241,8 +250,9 @@ test('e2e pr-gate (b) conflict: approving a runner item whose branch conflicts w
   const headBefore = currentHead(repoRoot);
   const approve = fgos(repoRoot, ['approve', 'pr-b-item']);
   assert.equal(approve.status, 0, `approve failed: ${approve.stderr}`);
-  assert.match(approve.stdout, /blocked/);
-  assert.match(approve.stdout, /merge-conflict/);
+  const approveData = envelopeData(approve.stdout);
+  assert.equal(approveData.to, 'blocked');
+  assert.equal(approveData.reason, 'merge-conflict');
 
   // must_haves truth 1 (HIGH risk): main is byte-for-byte intact. Scoped to
   // the real working tree, excluding `.fgos/` — approve legitimately appends
@@ -289,15 +299,17 @@ test('e2e pr-gate (c) pull-door item: take -> commit -> return -> proposed, revi
 
   const review = fgos(repoRoot, ['review', 'pr-c-item']);
   assert.equal(review.status, 0, `review failed: ${review.stderr}`);
-  assert.match(review.stdout, /source: pull/);
-  assert.match(review.stdout, /pr-c-proof\.txt/);
-  assert.doesNotMatch(review.stdout, /warning:/, 'a single-commit pull range carries no interleaving warning');
+  const reviewData = envelopeData(review.stdout);
+  assert.equal(reviewData.source, 'pull');
+  assert.match(reviewData.diff, /pr-c-proof\.txt/);
+  assert.deepEqual(reviewData.warnings, [], 'a single-commit pull range carries no interleaving warning');
 
   const approve = fgos(repoRoot, ['approve', 'pr-c-item']);
   assert.equal(approve.status, 0, `approve failed: ${approve.stderr}`);
-  assert.match(approve.stdout, /proposed -> done/);
-  assert.match(approve.stdout, /PULL_C_OK/);
-  assert.doesNotMatch(approve.stdout, /merge/i, 'a pull-door approve never merges — code is already on main (D4)');
+  const approveData = envelopeData(approve.stdout);
+  assert.equal(approveData.to, 'done');
+  assert.match(approveData.output, /PULL_C_OK/);
+  assert.equal(approveData.mode, 'verify-only', 'a pull-door approve never merges — code is already on main (D4)');
 
   const view = stateView(repoRoot);
   assert.equal(view.work['pr-c-item'].status, 'done');
@@ -331,8 +343,10 @@ test('e2e pr-gate (d) reject a pull-door item: proposed -> todo carries the reas
 
   const reject = fgos(repoRoot, ['reject', 'pr-d-item', '--reason', 'not needed right now']);
   assert.equal(reject.status, 0, `reject failed: ${reject.stderr}`);
-  assert.match(reject.stdout, /proposed -> todo/);
-  assert.match(reject.stdout, /no revert/);
+  const rejectData = envelopeData(reject.stdout);
+  assert.equal(rejectData.from, 'proposed');
+  assert.equal(rejectData.to, 'todo');
+  assert.equal(rejectData.reason, 'not needed right now');
 
   assert.equal(stateView(repoRoot).work['pr-d-item'].status, 'todo');
   const lines = events(repoRoot);
@@ -384,7 +398,9 @@ test('e2e pr-gate (e) branch-source item full loop: park (blocked + live branch)
 
   const taken = fgos(repoRoot, ['take', '--id', 'pr-e-item']);
   assert.equal(taken.status, 0, `take failed: ${taken.stderr}`);
-  assert.match(taken.stdout, /blocked -> doing/);
+  const takenData = envelopeData(taken.stdout);
+  assert.equal(takenData.from, 'blocked');
+  assert.equal(takenData.to, 'doing');
   commitPending(repoRoot, 'state: take pr-e-item');
 
   // The human's own fix, committed directly ON THE BRANCH — never on main.
@@ -397,7 +413,7 @@ test('e2e pr-gate (e) branch-source item full loop: park (blocked + live branch)
 
   const returned = fgos(repoRoot, ['return', 'pr-e-item']);
   assert.equal(returned.status, 0, `return failed: ${returned.stderr}`);
-  assert.match(returned.stdout, /proposed/);
+  assert.equal(envelopeData(returned.stdout).to, 'proposed');
   assert.equal(currentHead(repoRoot), mainHeadBeforeReturn, "return never advances the human's own main checkout");
   assert.equal(worktreeCount(repoRoot), 1, 'the disposable detached verify worktree is cleaned up — no leftover');
 
@@ -408,14 +424,15 @@ test('e2e pr-gate (e) branch-source item full loop: park (blocked + live branch)
 
   const review = fgos(repoRoot, ['review', 'pr-e-item']);
   assert.equal(review.status, 0, `review failed: ${review.stderr}`);
-  assert.match(review.stdout, /source: runner/, "D2: classifySource sees the live branch — review/approve treat this exactly like a normal runner-source item, no merge.mjs changes needed");
+  assert.equal(envelopeData(review.stdout).source, 'runner', "D2: classifySource sees the live branch — review/approve treat this exactly like a normal runner-source item, no merge.mjs changes needed");
 
   commitPending(repoRoot, 'state: propose pr-e-item');
 
   const approve = fgos(repoRoot, ['approve', 'pr-e-item']);
   assert.equal(approve.status, 0, `approve failed: ${approve.stderr}`);
-  assert.match(approve.stdout, /proposed -> done/);
-  assert.match(approve.stdout, /PR_E_OK/);
+  const approveEData = envelopeData(approve.stdout);
+  assert.equal(approveEData.to, 'done');
+  assert.match(approveEData.output, /PR_E_OK/);
 
   const view2 = stateView(repoRoot);
   assert.equal(view2.work['pr-e-item'].status, 'done');
@@ -455,7 +472,7 @@ test('e2e pr-gate (f) branch-source return never disturbs a checkout the human i
 
   const returned = fgos(repoRoot, ['return', 'pr-f-item']);
   assert.equal(returned.status, 0, `return failed (must never collide with the human's own live checkout): ${returned.stderr}`);
-  assert.match(returned.stdout, /proposed/);
+  assert.equal(envelopeData(returned.stdout).to, 'proposed');
 
   // The human's own worktree survives, untouched, still checked out on the
   // branch — this is the BLOCKER the validating gate caught: reclaiming or

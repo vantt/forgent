@@ -37,6 +37,13 @@ function stateView(cwd) {
   return JSON.parse(fs.readFileSync(viewPath(cwd), 'utf8'));
 }
 
+// Every verb's success path prints a single fgos.v1 envelope
+// {contract, generated_at, data_hash, data} — this unwraps it to the verb's
+// own structured data.
+function envelopeData(stdout) {
+  return JSON.parse(stdout).data;
+}
+
 function add(cwd, id, extra = {}) {
   const flags = [
     '--title', extra.title ?? `Title ${id}`,
@@ -88,7 +95,7 @@ test('rebuild-determinism: init, add work with deps + unicode title, move throug
   const logBeforeReady = fs.readFileSync(logPath(cwd), 'utf8');
   const readyResult = run(cwd, ['ready']);
   assert.equal(readyResult.status, 0);
-  const ready = JSON.parse(readyResult.stdout);
+  const ready = envelopeData(readyResult.stdout);
   assert.ok(!ready.some((item) => item.id === 'a'), 'a is done, not todo — never in the frontier');
   assert.ok(!ready.some((item) => item.id === 'b'), 'b is doing, not ready');
   assert.ok(!ready.some((item) => item.id === 'c'), 'c is blocked, not ready');

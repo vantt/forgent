@@ -265,7 +265,8 @@ test('canary (iii) fgos init detects bee and leaves it untouched (nhường-nh�
 
   const init = spawnSync(process.execPath, [FGOS, 'init'], { cwd: fx, encoding: 'utf8' });
   assert.equal(init.status, 0, `fgos init failed: ${init.stderr}`);
-  assert.match(init.stdout, /Detected other harness/);
+  const initData = JSON.parse(init.stdout).data;
+  assert.ok(initData.detectedHarnesses.some((h) => h.name === 'bee'));
 
   const manifest = JSON.parse(fs.readFileSync(path.join(fx, '.fgos/coexistence.json'), 'utf8'));
   const beeEntry = manifest.detected_harnesses.find((h) => h.name === 'bee');

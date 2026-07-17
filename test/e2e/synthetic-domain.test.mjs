@@ -184,7 +184,7 @@ test('e2e synthetic domain: add --domain synthetic (no --stage) dispatches throu
   assert.equal(coding.deps.length, 0);
 
   // `fgos list` (the public read surface) confirms the same facts.
-  const list = JSON.parse(fgos(repoRoot, ['list']).stdout);
+  const list = JSON.parse(fgos(repoRoot, ['list']).stdout).data;
   assert.equal(list.work['synth-item'].status, 'proposed');
   assert.equal(list.work['coding-item'].status, 'proposed');
 

@@ -37,6 +37,21 @@ function viewPath(cwd) {
   return path.join(cwd, '.fgos', 'state.json');
 }
 
+// Every verb's success path now prints a single fgos.v1 envelope
+// {contract, generated_at, data_hash, data} (the dispatcher choke-point in
+// main() wraps every verb's raw structured return value exactly once). This
+// helper asserts the envelope shape once per call site and hands back the
+// verb's own structured `data` payload, so each test below only needs to
+// assert the fields it actually cares about.
+function envelopeData(stdout) {
+  const envelope = JSON.parse(stdout);
+  assert.deepEqual(Object.keys(envelope).sort(), ['contract', 'data', 'data_hash', 'generated_at']);
+  assert.equal(envelope.contract, 'fgos.v1');
+  assert.match(envelope.data_hash, /^[0-9a-f]{64}$/);
+  assert.ok(!Number.isNaN(Date.parse(envelope.generated_at)));
+  return envelope.data;
+}
+
 function eventLines(cwd) {
   if (!fs.existsSync(logPath(cwd))) return [];
   return fs
@@ -194,13 +209,16 @@ test('move with an empty --expect "" is rejected as validation, exit 4, no event
   assert.equal(eventLines(cwd).length, before);
 });
 
-test('move reports the real event seq in its message, not "undefined"', () => {
+test('move reports the real event seq in its envelope data, not undefined', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'seq-check'); // event #1
   const result = run(cwd, ['move', 'seq-check', '--to', 'doing']);
   assert.equal(result.status, 0);
-  assert.match(result.stdout, /event #2\b/);
-  assert.doesNotMatch(result.stdout, /event #undefined/);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.seq, 2);
+  assert.equal(data.id, 'seq-check');
+  assert.equal(data.from, 'todo');
+  assert.equal(data.to, 'doing');
 });
 
 test('edit changes only the targeted field, every other field unchanged, exit 0', () => {
@@ -313,13 +331,15 @@ test('editWork rejects a patch containing id/status/stage/domain as validation, 
   assert.equal(eventLines(cwd).length, before);
 });
 
-test('edit reports the real event seq in its message, not "undefined"', () => {
+test('edit reports the real event seq in its envelope data, not undefined', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'edit-seq-check'); // event #1
   const result = run(cwd, ['edit', 'edit-seq-check', '--risk', 'high']);
   assert.equal(result.status, 0);
-  assert.match(result.stdout, /event #2\b/);
-  assert.doesNotMatch(result.stdout, /event #undefined/);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.seq, 2);
+  assert.equal(data.id, 'edit-seq-check');
+  assert.deepEqual(data.fields, ['risk']);
 });
 
 test('decision logs one event and appears in the view, exit 0', () => {
@@ -342,13 +362,13 @@ test('decision without --text is rejected as validation, exit 4, no event writte
   assert.equal(eventLines(cwd).length, before);
 });
 
-test('list prints the current view as parseable JSON, exit 0', () => {
+test('list prints the current view as parseable envelope data, exit 0', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'listed');
   const result = run(cwd, ['list']);
   assert.equal(result.status, 0);
-  const parsed = JSON.parse(result.stdout);
-  assert.ok(parsed.work.listed);
+  const data = envelopeData(result.stdout);
+  assert.ok(data.work.listed);
 });
 
 test('rebuild reconstructs state.json from the log alone after the view file is deleted', () => {
@@ -403,7 +423,7 @@ test('repair fixes a truncated final line via the real CLI, log becomes readable
 
   const list = run(cwd, ['list']);
   assert.equal(list.status, 0);
-  assert.ok(JSON.parse(list.stdout).work['before-truncation']);
+  assert.ok(envelopeData(list.stdout).work['before-truncation']);
 });
 
 test('repair refuses mid-file corruption via the real CLI (valid, corrupt, valid), exit 5, log left untouched', () => {
@@ -552,7 +572,7 @@ test('add --domain synthetic persists work.domain and the item\'s default stage 
   const item = stateView(cwd).work['synthetic-item'];
   assert.equal(item.domain, 'synthetic');
   assert.equal(item.stage, undefined, 'add still omits stage explicitly — the lazy per-domain default resolves it, not new fgos.mjs code');
-  assert.deepEqual(JSON.parse(run(cwd, ['ready']).stdout).map((w) => w.id), ['synthetic-item'], 'the item resolves to its domain\'s one Execute-mapped stage ("assembling") through the existing lazy default, so it is already frontier-ready');
+  assert.deepEqual(envelopeData(run(cwd, ['ready']).stdout).map((w) => w.id), ['synthetic-item'], 'the item resolves to its domain\'s one Execute-mapped stage ("assembling") through the existing lazy default, so it is already frontier-ready');
 });
 
 test('add --domain coding is explicit and behaves identically to omitting --domain, exit 0', () => {
@@ -683,22 +703,22 @@ test('list shows tier and the proposed status for the real CLI view, exit 0', ()
   toProposed(cwd, 'listed-proposed');
   const result = run(cwd, ['list']);
   assert.equal(result.status, 0);
-  const parsed = JSON.parse(result.stdout);
-  assert.equal(parsed.work['listed-proposed'].status, 'proposed');
-  assert.equal(parsed.work['listed-proposed'].tier, 'standard');
+  const data = envelopeData(result.stdout);
+  assert.equal(data.work['listed-proposed'].status, 'proposed');
+  assert.equal(data.work['listed-proposed'].tier, 'standard');
 });
 
 // --- `fgos ready` (phase-2-routing-5) ---
 
-test('ready prints the frontier as parseable, machine-readable JSON, exit 0', () => {
+test('ready prints the frontier as parseable, machine-readable envelope data, exit 0', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'freestanding');
   const result = run(cwd, ['ready']);
   assert.equal(result.status, 0);
-  const parsed = JSON.parse(result.stdout);
-  assert.ok(Array.isArray(parsed));
-  assert.equal(parsed.length, 1);
-  assert.equal(parsed[0].id, 'freestanding');
+  const data = envelopeData(result.stdout);
+  assert.ok(Array.isArray(data));
+  assert.equal(data.length, 1);
+  assert.equal(data[0].id, 'freestanding');
 });
 
 test('ready excludes a todo item whose dep sits at proposed (proposed is not done): dep at proposed does NOT open dependent work', () => {
@@ -707,7 +727,7 @@ test('ready excludes a todo item whose dep sits at proposed (proposed is not don
   const result = run(cwd, ['add', 'blocked-on-proposed', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--deps', 'dep-in-proposed']);
   assert.equal(result.status, 0);
 
-  const ready = JSON.parse(run(cwd, ['ready']).stdout);
+  const ready = envelopeData(run(cwd, ['ready']).stdout);
   assert.ok(!ready.some((item) => item.id === 'blocked-on-proposed'));
   assert.ok(!ready.some((item) => item.id === 'dep-in-proposed'));
 });
@@ -721,7 +741,7 @@ test('ready opens a todo item once its dep reaches done (approved, not merely pr
     0,
   );
 
-  const ready = JSON.parse(run(cwd, ['ready']).stdout);
+  const ready = envelopeData(run(cwd, ['ready']).stdout);
   assert.ok(ready.some((item) => item.id === 'unblocked-item'));
 });
 
@@ -729,7 +749,7 @@ test('ready on a directory with no log at all returns an empty result, exit 0 (a
   const cwd = tmpCwd();
   const result = run(cwd, ['ready']);
   assert.equal(result.status, 0);
-  assert.deepEqual(JSON.parse(result.stdout), []);
+  assert.deepEqual(envelopeData(result.stdout), []);
   assert.ok(!fs.existsSync(path.join(cwd, '.fgos')));
 });
 
@@ -756,7 +776,10 @@ test('GOLDEN request-class: running ready twice never appends to events.jsonl, a
   assert.equal(first.status, 0);
   const second = run(cwd, ['ready']);
   assert.equal(second.status, 0);
-  assert.equal(first.stdout, second.stdout);
+  // generated_at legitimately differs between the two envelopes (each is
+  // stamped at call time) — the golden byte-identical claim belongs to the
+  // underlying data, not the envelope wrapper.
+  assert.deepEqual(envelopeData(first.stdout), envelopeData(second.stdout));
 
   const logAfter = fs.readFileSync(logPath(cwd), 'utf8');
   assert.equal(logAfter, logBefore, 'events.jsonl must be byte-identical before/after ready x2');
@@ -773,23 +796,27 @@ test('GOLDEN request-class: running ready twice never appends to events.jsonl, a
 // tests seed outcome data directly through store.mjs's addOutcome, the same
 // single write door the runner uses, then exercise the real `check` binary.
 
-test('check on an item with no recorded outcome prints "chưa có dữ liệu" for that id, exit 0, no throw', () => {
+test('check on an item with no recorded outcome returns a null predicted/actual entry for that id, exit 0, no throw', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'unchecked-item');
   const result = run(cwd, ['check', 'unchecked-item']);
   assert.equal(result.status, 0);
-  assert.match(result.stdout, /chưa có dữ liệu/);
+  const data = envelopeData(result.stdout);
+  assert.deepEqual(data.outcomes, [{ id: 'unchecked-item', predicted: null, actual: null }]);
 });
 
-test('check on a directory with no log at all prints "chưa có dữ liệu", exit 0 (a read never initializes .fgos/)', () => {
+test('check on a directory with no log at all returns an empty outcomes list, exit 0 (a read never initializes .fgos/)', () => {
   const cwd = tmpCwd();
   const result = run(cwd, ['check']);
   assert.equal(result.status, 0);
-  assert.match(result.stdout, /chưa có dữ liệu/);
+  const data = envelopeData(result.stdout);
+  assert.deepEqual(data.outcomes, []);
+  assert.equal(data.friction, null);
+  assert.equal(data.entropy, null);
   assert.ok(!fs.existsSync(path.join(cwd, '.fgos')));
 });
 
-test('check prints BOTH predicted and actual values for an item with real outcome data, exit 0', () => {
+test('check returns BOTH predicted and actual values for an item with real outcome data, exit 0', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'checked-item');
   const dir = path.join(cwd, '.fgos');
@@ -801,12 +828,12 @@ test('check prints BOTH predicted and actual values for an item with real outcom
 
   const result = run(cwd, ['check', 'checked-item']);
   assert.equal(result.status, 0);
-  assert.match(result.stdout, /checked-item/);
-  assert.match(result.stdout, /predicted/);
-  assert.match(result.stdout, /"tier":"standard"/);
-  assert.match(result.stdout, /actual/);
-  assert.match(result.stdout, /"outcome":"proposed"/);
-  assert.match(result.stdout, /"passed":true/);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.outcomes.length, 1);
+  assert.equal(data.outcomes[0].id, 'checked-item');
+  assert.equal(data.outcomes[0].predicted.tier, 'standard');
+  assert.equal(data.outcomes[0].actual.outcome, 'proposed');
+  assert.equal(data.outcomes[0].actual.passed, true);
 });
 
 test('check with no id given reports every item that has outcome data, exit 0', () => {
@@ -819,8 +846,9 @@ test('check with no id given reports every item that has outcome data, exit 0', 
 
   const result = run(cwd, ['check']);
   assert.equal(result.status, 0);
-  assert.match(result.stdout, /item-a/);
-  assert.doesNotMatch(result.stdout, /item-b/, 'item-b has no outcome data yet, so it is not listed');
+  const data = envelopeData(result.stdout);
+  assert.equal(data.outcomes.length, 1);
+  assert.equal(data.outcomes[0].id, 'item-a', 'item-b has no outcome data yet, so it is not listed');
 });
 
 // --- rollup view theo bộ (P24) ----------------------------------------------
@@ -839,21 +867,29 @@ test('rollup on a root with n children, k done, prints k/n and lists every child
 
   const result = run(cwd, ['rollup', 'root-item']);
   assert.equal(result.status, 0);
-  assert.match(result.stdout, /root-item — Root Item \(todo\)/);
-  assert.match(result.stdout, /2\/3 done/);
-  assert.match(result.stdout, /child-a: Child A \(done\)/);
-  assert.match(result.stdout, /child-b: Child B \(todo\)/);
-  assert.match(result.stdout, /child-c: Child C \(done\)/);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.id, 'root-item');
+  assert.equal(data.title, 'Root Item');
+  assert.equal(data.status, 'todo');
+  assert.equal(data.doneCount, 2);
+  assert.equal(data.totalCount, 3);
+  assert.deepEqual(data.children, [
+    { id: 'child-a', title: 'Child A', status: 'done' },
+    { id: 'child-b', title: 'Child B', status: 'todo' },
+    { id: 'child-c', title: 'Child C', status: 'done' },
+  ]);
 });
 
-test('rollup on an item with no children prints 0/0 and a "no children" note, exit 0, no throw', () => {
+test('rollup on an item with no children returns 0/0 and an empty children list, exit 0, no throw', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'lonely-item');
 
   const result = run(cwd, ['rollup', 'lonely-item']);
   assert.equal(result.status, 0);
-  assert.match(result.stdout, /0\/0 done/);
-  assert.match(result.stdout, /không có con/);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.doneCount, 0);
+  assert.equal(data.totalCount, 0);
+  assert.deepEqual(data.children, []);
 });
 
 test('rollup on a nonexistent id is rejected as validation (not-found), exit 4', () => {
@@ -881,8 +917,10 @@ test('rollup never mutates state: no event is appended and no children of an unr
   const before = eventLines(cwd);
   const result = run(cwd, ['rollup', 'root-item']);
   assert.equal(result.status, 0);
-  assert.match(result.stdout, /1\/1 done/);
-  assert.doesNotMatch(result.stdout, /unrelated-item/);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.doneCount, 1);
+  assert.equal(data.totalCount, 1);
+  assert.ok(!data.children.some((c) => c.id === 'unrelated-item'));
   assert.deepEqual(eventLines(cwd), before);
 });
 
@@ -892,11 +930,11 @@ test('rollup never mutates state: no event is appended and no children of an unr
 // OPEN work by blocking fan-out (how many other still-open items depend on
 // it), highest first.
 
-test('triage on an empty backlog prints a "no open work" note, exit 0', () => {
+test('triage on an empty backlog returns an empty ranked list, exit 0', () => {
   const cwd = tmpCwd();
   const result = run(cwd, ['triage']);
   assert.equal(result.status, 0);
-  assert.match(result.stdout, /không có việc mở nào/);
+  assert.deepEqual(envelopeData(result.stdout), []);
 });
 
 test('triage ranks a base item above the items that depend on it', () => {
@@ -907,8 +945,14 @@ test('triage ranks a base item above the items that depend on it', () => {
 
   const result = run(cwd, ['triage']);
   assert.equal(result.status, 0);
-  assert.match(result.stdout, /base — Title base \(todo\) — blocks 2/);
-  assert.match(result.stdout, /dep1 — Dep1 \(todo\) — blocks 0/);
+  const data = envelopeData(result.stdout);
+  const base = data.find((r) => r.id === 'base');
+  const dep1 = data.find((r) => r.id === 'dep1');
+  assert.equal(base.title, 'Title base');
+  assert.equal(base.status, 'todo');
+  assert.equal(base.blocks, 2);
+  assert.equal(dep1.title, 'Dep1');
+  assert.equal(dep1.blocks, 0);
 });
 
 test('triage excludes a done item from ranking, and a done dependent never counts as blocked', () => {
@@ -920,8 +964,11 @@ test('triage excludes a done item from ranking, and a done dependent never count
 
   const result = run(cwd, ['triage']);
   assert.equal(result.status, 0);
-  assert.match(result.stdout, /base — Title base \(todo\) — blocks 0/);
-  assert.doesNotMatch(result.stdout, /done-item/);
+  const data = envelopeData(result.stdout);
+  const base = data.find((r) => r.id === 'base');
+  assert.equal(base.status, 'todo');
+  assert.equal(base.blocks, 0);
+  assert.ok(!data.some((r) => r.id === 'done-item'));
 });
 
 test('triage never mutates state: no event is appended', () => {
@@ -940,7 +987,7 @@ test('triage never mutates state: no event is appended', () => {
 // writes work.friction in production, so these seed through store.mjs's
 // addFriction and exercise the real `check` binary read-side.
 
-test('check prints the friction section — per-layer counts + recent records — when friction data exists', () => {
+test('check returns the friction data — per-layer counts + recent records — when friction data exists', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'fric-item');
   const dir = path.join(cwd, '.fgos');
@@ -949,11 +996,18 @@ test('check prints the friction section — per-layer counts + recent records �
 
   const result = run(cwd, ['check']);
   assert.equal(result.status, 0);
-  assert.match(result.stdout, /friction \(2\)/);
-  assert.match(result.stdout, /verification 1/);
-  assert.match(result.stdout, /environment 1/);
-  assert.match(result.stdout, /\[parked\] fric-item verify-miss\/verification \(attempts 2\)/);
-  assert.match(result.stdout, /\[halted\] fric-item worker-timeout\/environment/);
+  const { friction } = envelopeData(result.stdout);
+  assert.equal(friction.count, 2);
+  assert.deepEqual(friction.byLayer, { verification: 1, environment: 1 });
+  const parked = friction.recent.find((r) => r.disposition === 'parked');
+  const halted = friction.recent.find((r) => r.disposition === 'halted');
+  assert.equal(parked.id, 'fric-item');
+  assert.equal(parked.errorClass, 'verify-miss');
+  assert.equal(parked.layer, 'verification');
+  assert.equal(parked.attempts, 2);
+  assert.equal(halted.id, 'fric-item');
+  assert.equal(halted.errorClass, 'worker-timeout');
+  assert.equal(halted.layer, 'environment');
 });
 
 test('check nags items sitting in a final status without their actual half (porting-outcome-lifecycle: no silent record)', () => {
@@ -963,10 +1017,11 @@ test('check nags items sitting in a final status without their actual half (port
 
   const result = run(cwd, ['check']);
   assert.equal(result.status, 0);
-  assert.match(result.stdout, /nhắc: 1 item ở trạng thái cuối chưa có nửa actual: nag-item/);
+  const { missingOutcomeNag } = envelopeData(result.stdout);
+  assert.deepEqual(missingOutcomeNag, { count: 1, ids: ['nag-item'] });
 });
 
-test('check output on a log with no friction and no final-status gaps is unchanged — no friction section, no nag', () => {
+test('check output on a log with no friction and no final-status gaps is unchanged — no friction data, no nag', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'clean-item');
   const dir = path.join(cwd, '.fgos');
@@ -974,8 +1029,9 @@ test('check output on a log with no friction and no final-status gaps is unchang
 
   const result = run(cwd, ['check']);
   assert.equal(result.status, 0);
-  assert.doesNotMatch(result.stdout, /friction/);
-  assert.doesNotMatch(result.stdout, /nhắc/);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.friction, null);
+  assert.equal(data.missingOutcomeNag, null);
 });
 
 // --- `fgos ask`/`fgos answer` (async-human-gate-3): the human-gate round-trip ---
@@ -993,28 +1049,30 @@ test('ask/answer round-trip: park removes from ready and surfaces the ask via li
 
   const askResult = run(cwd, ['ask', 'gated-item', '--text', 'OAuth or password?']);
   assert.equal(askResult.status, 0);
+  assert.deepEqual(envelopeData(askResult.stdout), { id: 'gated-item', from: 'doing', to: 'awaiting-human', seq: 3 });
   assert.equal(stateView(cwd).work['gated-item'].status, 'awaiting-human');
 
   // D7: list surfaces the parked item's status and its question, no new
   // read command/formatter — the existing `view.gates` fold carries it.
-  const listedWhileAwaiting = JSON.parse(run(cwd, ['list']).stdout);
+  const listedWhileAwaiting = envelopeData(run(cwd, ['list']).stdout);
   assert.equal(listedWhileAwaiting.work['gated-item'].status, 'awaiting-human');
   assert.equal(listedWhileAwaiting.gates['gated-item'].ask, 'OAuth or password?');
   assert.equal(listedWhileAwaiting.gates['gated-item'].answer, undefined);
 
   // D6: a parked item is never in the ready set.
-  const readyWhileAwaiting = JSON.parse(run(cwd, ['ready']).stdout);
+  const readyWhileAwaiting = envelopeData(run(cwd, ['ready']).stdout);
   assert.ok(!readyWhileAwaiting.some((i) => i.id === 'gated-item'));
 
   const answerResult = run(cwd, ['answer', 'gated-item', '--text', 'OAuth']);
   assert.equal(answerResult.status, 0);
+  assert.deepEqual(envelopeData(answerResult.stdout), { id: 'gated-item', from: 'awaiting-human', to: 'todo', seq: 4 });
   assert.equal(stateView(cwd).work['gated-item'].status, 'todo');
 
-  const listedAfterAnswer = JSON.parse(run(cwd, ['list']).stdout);
+  const listedAfterAnswer = envelopeData(run(cwd, ['list']).stdout);
   assert.equal(listedAfterAnswer.gates['gated-item'].ask, 'OAuth or password?');
   assert.equal(listedAfterAnswer.gates['gated-item'].answer, 'OAuth');
 
-  const readyAfterAnswer = JSON.parse(run(cwd, ['ready']).stdout);
+  const readyAfterAnswer = envelopeData(run(cwd, ['ready']).stdout);
   assert.ok(readyAfterAnswer.some((i) => i.id === 'gated-item'));
 });
 
@@ -1098,7 +1156,7 @@ test('submit persists the full text as description, separate from the (possibly 
   const item = JSON.parse(result.stdout).data;
   assert.equal(item.description, text);
 
-  const view = JSON.parse(run(cwd, ['list']).stdout);
+  const view = envelopeData(run(cwd, ['list']).stdout);
   assert.equal(view.work[item.id].description, text);
 });
 
@@ -1115,7 +1173,7 @@ test('two submits of the same text get different ids, both persist, no duplicate
   const idB = JSON.parse(second.stdout).data.id;
   assert.notEqual(idA, idB, 'a second submit of the same text must not collide on id');
 
-  const view = JSON.parse(run(cwd, ['list']).stdout);
+  const view = envelopeData(run(cwd, ['list']).stdout);
   assert.ok(view.work[idA], 'first submitted item persisted');
   assert.ok(view.work[idB], 'second submitted item persisted');
 });
@@ -1131,7 +1189,7 @@ test('submit without a mode flag records mode:"sync"; --async records mode:"asyn
   assert.equal(asyncSubmit.status, 0);
   const asyncId = JSON.parse(asyncSubmit.stdout).data.id;
 
-  const view = JSON.parse(run(cwd, ['list']).stdout);
+  const view = envelopeData(run(cwd, ['list']).stdout);
   assert.equal(view.work[syncId].mode, 'sync');
   assert.equal(view.work[asyncId].mode, 'async');
 });
@@ -1141,7 +1199,7 @@ test('submit with --unattended is treated the same as --async: mode:"async" (D2)
   const result = run(cwd, ['submit', 'Draft the onboarding walkthrough', '--unattended']);
   assert.equal(result.status, 0);
   const id = JSON.parse(result.stdout).data.id;
-  assert.equal(JSON.parse(run(cwd, ['list']).stdout).work[id].mode, 'async');
+  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].mode, 'async');
 });
 
 test('submit of text matching no keyword falls back to tier:"standard" and persists, exit 0 (D1)', () => {
@@ -1150,7 +1208,7 @@ test('submit of text matching no keyword falls back to tier:"standard" and persi
   assert.equal(result.status, 0);
   const item = JSON.parse(result.stdout).data;
   assert.equal(item.tier, 'standard');
-  assert.equal(JSON.parse(run(cwd, ['list']).stdout).work[item.id].tier, 'standard');
+  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[item.id].tier, 'standard');
 });
 
 test('submit with no text at all is rejected as validation, exit 4, no event written', () => {
@@ -1181,13 +1239,13 @@ test("submit tags the new item with stage:'clarify' (D8), visible via list", () 
   const result = run(cwd, ['submit', 'Investigate the sluggish overview page']);
   assert.equal(result.status, 0);
   const id = JSON.parse(result.stdout).data.id;
-  assert.equal(JSON.parse(run(cwd, ['list']).stdout).work[id].stage, 'clarify');
+  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'clarify');
 });
 
 test('add leaves stage unset — the item reads as executing via the lazy default (D8)', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'plain-add');
-  const item = JSON.parse(run(cwd, ['list']).stdout).work['plain-add'];
+  const item = envelopeData(run(cwd, ['list']).stdout).work['plain-add'];
   assert.equal(item.stage, undefined);
 });
 
@@ -1198,7 +1256,7 @@ test('submit without --domain is byte-identical to before: domain unset, stage "
   const result = run(cwd, ['submit', 'Investigate the sluggish overview page']);
   assert.equal(result.status, 0);
   const id = JSON.parse(result.stdout).data.id;
-  const item = JSON.parse(run(cwd, ['list']).stdout).work[id];
+  const item = envelopeData(run(cwd, ['list']).stdout).work[id];
   assert.equal(item.domain, undefined);
   assert.equal(item.stage, 'clarify');
 });
@@ -1208,7 +1266,7 @@ test('submit --domain coding is explicit and still resolves stage to "clarify", 
   const result = run(cwd, ['submit', 'Investigate the sluggish overview page', '--domain', 'coding']);
   assert.equal(result.status, 0);
   const id = JSON.parse(result.stdout).data.id;
-  const item = JSON.parse(run(cwd, ['list']).stdout).work[id];
+  const item = envelopeData(run(cwd, ['list']).stdout).work[id];
   assert.equal(item.domain, 'coding');
   assert.equal(item.stage, 'clarify');
 });
@@ -1218,7 +1276,7 @@ test('submit --domain synthetic persists work.domain and resolves stage to its o
   const result = run(cwd, ['submit', 'Try the synthetic domain', '--domain', 'synthetic']);
   assert.equal(result.status, 0);
   const id = JSON.parse(result.stdout).data.id;
-  const item = JSON.parse(run(cwd, ['list']).stdout).work[id];
+  const item = envelopeData(run(cwd, ['list']).stdout).work[id];
   assert.equal(item.domain, 'synthetic');
   assert.equal(item.stage, 'assembling');
 });
@@ -1265,7 +1323,7 @@ test('discover on a clear verdict moves the submitted item to stage decompose wi
   assert.equal(envelope.contract, 'fgos.v1');
   assert.equal(envelope.data.outcome, 'clear');
 
-  const item = JSON.parse(run(cwd, ['list']).stdout).work[id];
+  const item = envelopeData(run(cwd, ['list']).stdout).work[id];
   assert.equal(item.stage, 'decompose');
   assert.equal(item.verify, 'npm test -- proven');
 });
@@ -1280,7 +1338,7 @@ test("discover called a second time, once the item sits at stage decompose, disp
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
 
   run(cwd, ['discover', id]);
-  assert.equal(JSON.parse(run(cwd, ['list']).stdout).work[id].stage, 'decompose');
+  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'decompose');
 
   // Same scripted executor's `{clear:true, verify:...}` reply is not a
   // valid chia-việc verdict shape (no `verdict` key) — judgeDecompose's
@@ -1289,7 +1347,7 @@ test("discover called a second time, once the item sits at stage decompose, disp
   const invalidAttempt = run(cwd, ['discover', id]);
   assert.equal(invalidAttempt.status, 0);
   assert.equal(JSON.parse(invalidAttempt.stdout).data.outcome, 'invalid');
-  assert.equal(JSON.parse(run(cwd, ['list']).stdout).work[id].stage, 'decompose', 'invalid verdict leaves the item untouched, not silently advanced');
+  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'decompose', 'invalid verdict leaves the item untouched, not silently advanced');
 
   // Rewrite the executor config with a real pass-through chia-việc verdict
   // and call `discover` a third time — now it dispatches to resolveDecompose
@@ -1298,7 +1356,7 @@ test("discover called a second time, once the item sits at stage decompose, disp
   const passThrough = run(cwd, ['discover', id]);
   assert.equal(passThrough.status, 0);
   assert.equal(JSON.parse(passThrough.stdout).data.outcome, 'pass-through');
-  assert.equal(JSON.parse(run(cwd, ['list']).stdout).work[id].stage, 'executing');
+  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'executing');
 });
 
 test('discover on an unclear verdict parks the submitted item in awaiting-human with the question, still stage clarify (D5/D7)', () => {
@@ -1310,7 +1368,7 @@ test('discover on an unclear verdict parks the submitted item in awaiting-human 
   assert.equal(result.status, 0);
   assert.equal(JSON.parse(result.stdout).data.outcome, 'unclear');
 
-  const view = JSON.parse(run(cwd, ['list']).stdout);
+  const view = envelopeData(run(cwd, ['list']).stdout);
   assert.equal(view.work[id].status, 'awaiting-human');
   assert.equal(view.work[id].stage, 'clarify');
   assert.equal(view.gates[id].ask, 'Which service?');
@@ -1382,25 +1440,28 @@ test('discover (sync verb) on a clear verdict stamps actor "session" on the work
   assert.equal(view.settlements[id][0].actor, 'session');
 });
 
-test('check prints the settlement section — per-kind/actor counts + recent records — when settlement data exists', () => {
+test('check returns the settlement data — per-kind/actor counts + recent records — when settlement data exists', () => {
   const cwd = tmpCwd();
   toProposed(cwd, 'settle-item');
   run(cwd, ['move', 'settle-item', '--to', 'done']);
 
   const result = run(cwd, ['check']);
   assert.equal(result.status, 0);
-  assert.match(result.stdout, /settlement \(1\)/);
-  assert.match(result.stdout, /close\/human 1/);
-  assert.match(result.stdout, /\[close\] settle-item actor=human/);
+  const { settlement } = envelopeData(result.stdout);
+  assert.equal(settlement.count, 1);
+  assert.deepEqual(settlement.byKindActor, { 'close/human': 1 });
+  assert.equal(settlement.recent[0].kind, 'close');
+  assert.equal(settlement.recent[0].id, 'settle-item');
+  assert.equal(settlement.recent[0].actor, 'human');
 });
 
-test('check output on a log with no settling transitions is unchanged — no settlement section', () => {
+test('check output on a log with no settling transitions is unchanged — no settlement data', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'no-settlement-item');
 
   const result = run(cwd, ['check']);
   assert.equal(result.status, 0);
-  assert.doesNotMatch(result.stdout, /settlement/);
+  assert.equal(envelopeData(result.stdout).settlement, null);
 });
 
 // --- entropy-trend + seal-digest in `check` (phase-3-compound-learning-6,
@@ -1417,15 +1478,15 @@ test('check reports a nonzero baseline entropy score with an explainable part fo
 
   const result = run(cwd, ['check']);
   assert.equal(result.status, 0);
-  assert.match(result.stdout, /entropy: \d+ \(baseline\)/);
-  assert.match(result.stdout, /stale-doing: 1 × 5 = 5/);
-
-  const scoreMatch = result.stdout.match(/entropy: (\d+) \(baseline\)/);
-  assert.ok(scoreMatch);
-  assert.notEqual(Number(scoreMatch[1]), 0, 'a doing item must contribute a nonzero baseline score');
+  const { entropy } = envelopeData(result.stdout);
+  assert.equal(entropy.trend.baseline, true);
+  assert.equal(entropy.trend.delta, null);
+  const stalePart = entropy.parts.find((p) => p.label === 'stale-doing');
+  assert.deepEqual(stalePart, { label: 'stale-doing', count: 1, weight: 5, points: 5 });
+  assert.notEqual(entropy.score, 0, 'a doing item must contribute a nonzero baseline score');
 });
 
-test('check prints a seal-digest clause only for channels with real compound data, format "compounded: +N outcome" (per this cell action (3)), and never mentions a channel with no data', () => {
+test('check reports a seal-digest delta only meaningfully for channels with real compound data, and every channel is always present (per this cell action (3))', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'seal-digest-item');
   const dir = path.join(cwd, '.fgos');
@@ -1437,17 +1498,17 @@ test('check prints a seal-digest clause only for channels with real compound dat
 
   const first = run(cwd, ['check']);
   assert.equal(first.status, 0);
-  assert.match(first.stdout, /compounded: \+1 outcome/);
-  assert.doesNotMatch(first.stdout, /friction/);
-  assert.doesNotMatch(first.stdout, /compounded:[^\n]*settlement/);
+  const firstEntropy = envelopeData(first.stdout).entropy;
+  assert.equal(firstEntropy.compounded.outcomes, 1);
+  assert.equal(firstEntropy.compounded.frictions, 0);
+  assert.equal(firstEntropy.compounded.settlements, 0);
 
   // Second run over the same (unchanged) store: the outcome channel already
-  // has data, so its clause still appears, now with a zero delta — the
-  // digest is a live snapshot against the last checkpoint, not a one-shot
-  // "something changed" flag.
+  // has data, so its delta is now zero against the last checkpoint — the
+  // digest is a live snapshot, not a one-shot "something changed" flag.
   const second = run(cwd, ['check']);
   assert.equal(second.status, 0);
-  assert.match(second.stdout, /compounded: \+0 outcome/);
+  assert.equal(envelopeData(second.stdout).entropy.compounded.outcomes, 0);
 });
 
 test('check on a second consecutive run over the same store prints a real trend delta against the first run (not baseline again)', () => {
@@ -1457,21 +1518,18 @@ test('check on a second consecutive run over the same store prints a real trend 
 
   const first = run(cwd, ['check']);
   assert.equal(first.status, 0);
-  assert.match(first.stdout, /\(baseline\)/);
+  assert.equal(envelopeData(first.stdout).entropy.trend.baseline, true);
 
   // Move the item out of "doing" (stale-suspect ×5) into "awaiting-human"
   // (×2) between the two checks — the score must genuinely shift, not just
-  // repeat, so the delta printed on run 2 is real evidence of trend.
+  // repeat, so the delta on run 2 is real evidence of trend.
   assert.equal(run(cwd, ['ask', 'entropy-trend-item', '--text', 'blocked on what?']).status, 0);
 
   const second = run(cwd, ['check']);
   assert.equal(second.status, 0);
-  assert.doesNotMatch(second.stdout, /\(baseline\)/);
-  assert.match(second.stdout, /entropy: \d+ \([+-]\d+ so lần trước\)/);
-
-  const deltaMatch = second.stdout.match(/entropy: \d+ \(([+-]\d+) so lần trước\)/);
-  assert.ok(deltaMatch);
-  assert.equal(Number(deltaMatch[1]), 2 - 5, 'doing(×5) -> awaiting-human(×2) must show a -3 delta');
+  const secondEntropy = envelopeData(second.stdout).entropy;
+  assert.equal(secondEntropy.trend.baseline, false);
+  assert.equal(secondEntropy.trend.delta, 2 - 5, 'doing(×5) -> awaiting-human(×2) must show a -3 delta');
 });
 
 test('entropy-history.jsonl is written in the SAME data dir as events.jsonl, not a hardcoded path, one line per check run', () => {
@@ -1495,12 +1553,13 @@ test('entropy-history.jsonl is written in the SAME data dir as events.jsonl, not
   }
 });
 
-test('check on a directory with no log at all still never initializes .fgos/ (entropy section stays absent, same as friction/settlement)', () => {
+test('check on a directory with no log at all still never initializes .fgos/ (entropy data stays absent, same as friction/settlement)', () => {
   const cwd = tmpCwd();
   const result = run(cwd, ['check']);
   assert.equal(result.status, 0);
-  assert.match(result.stdout, /chưa có dữ liệu/);
-  assert.doesNotMatch(result.stdout, /entropy/);
+  const data = envelopeData(result.stdout);
+  assert.deepEqual(data.outcomes, []);
+  assert.equal(data.entropy, null);
   assert.ok(!fs.existsSync(path.join(cwd, '.fgos')));
 });
 
@@ -1509,7 +1568,7 @@ test('check on a directory with no log at all still never initializes .fgos/ (en
 // (never here); these tests only exercise its surfacing through the real
 // `fgos check` binary. ------------------------------------------------------
 
-test('check prints the learning section — outcome/friction/settlement summary — for an item that reached done with real outcome+friction data', () => {
+test('check returns the learning data — outcome/friction/settlement summary — for an item that reached done with real outcome+friction data', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'learning-item');
   const dir = path.join(cwd, '.fgos');
@@ -1532,20 +1591,25 @@ test('check prints the learning section — outcome/friction/settlement summary 
 
   const check = run(cwd, ['check']);
   assert.equal(check.status, 0);
-  assert.match(check.stdout, /learning \(1\)/);
-  assert.match(check.stdout, /disposition=pass attempts=1 errorClass=n\/a/);
-  assert.match(check.stdout, /friction: verification 1/);
-  assert.match(check.stdout, /settlement: close\/human 1/);
+  const { learning } = envelopeData(check.stdout);
+  assert.equal(learning.count, 1);
+  const record = learning.recent[0];
+  assert.equal(record.id, 'learning-item');
+  assert.equal(record.outcome.disposition, 'pass');
+  assert.equal(record.outcome.attempts, 1);
+  assert.equal(record.outcome.errorClass, null);
+  assert.deepEqual(record.frictions, { verification: 1 });
+  assert.deepEqual(record.settlements, { 'close/human': 1 });
 });
 
-test('check on a log with no item ever reaching done is unchanged — no learning section', () => {
+test('check on a log with no item ever reaching done is unchanged — no learning data', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'no-learning-item');
   run(cwd, ['move', 'no-learning-item', '--to', 'doing']);
 
   const result = run(cwd, ['check']);
   assert.equal(result.status, 0);
-  assert.doesNotMatch(result.stdout, /learning/);
+  assert.equal(envelopeData(result.stdout).learning, null);
 });
 
 // --- take/return: cửa pull giao–nhận việc (stage-decompose S2-pull D1) -----
@@ -1558,8 +1622,9 @@ test('take with no --id claims the frontier head, defaults actor to human, recor
 
   const result = run(cwd, ['take']);
   assert.equal(result.status, 0, `take failed: ${result.stderr}`);
-  assert.match(result.stdout, /pull-a/);
-  assert.match(result.stdout, /actor=human/);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.id, 'pull-a');
+  assert.equal(data.actor, 'human');
 
   const view = stateView(cwd);
   assert.equal(view.work['pull-a'].status, 'doing');
@@ -1642,7 +1707,9 @@ test('return happy path: verify passes -> doing to proposed, actual outcome reco
   const headAtReturn = gitHead(cwd);
   const result = run(cwd, ['return', 'pull-return-ok']);
   assert.equal(result.status, 0, `return failed: ${result.stderr}`);
-  assert.match(result.stdout, /proposed/);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.to, 'proposed');
+  assert.equal(data.passed, true);
 
   const view = stateView(cwd);
   assert.equal(view.work['pull-return-ok'].status, 'proposed');
@@ -1734,7 +1801,7 @@ test('return verify-fail: doing -> blocked + friction (verification layer), exit
 
   const result = run(cwd, ['return', 'pull-return-red']);
   assert.equal(result.status, 0, `return should exit 0 for a defined blocked outcome: ${result.stderr}`);
-  assert.match(result.stdout, /blocked/);
+  assert.equal(envelopeData(result.stdout).to, 'blocked');
 
   const view = stateView(cwd);
   assert.equal(view.work['pull-return-red'].status, 'blocked');
@@ -1913,23 +1980,23 @@ function makeRunnerProposedLeafItem(cwd, rootId, leafId, extra = {}) {
 // same single write door the runner uses in production), same discipline as
 // the friction-section tests for `check` above.
 
-test('evolve with zero open friction prints a clear empty-state message and exits 0', () => {
+test('evolve with zero open friction returns an empty candidate list and exits 0', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'clean-item');
   const result = run(cwd, ['evolve']);
   assert.equal(result.status, 0);
-  assert.match(result.stdout, /không có candidate/);
+  assert.deepEqual(envelopeData(result.stdout), []);
 });
 
-test('evolve on a directory with no log at all prints the empty-state message, exit 0 (a read never initializes .fgos/)', () => {
+test('evolve on a directory with no log at all returns an empty candidate list, exit 0 (a read never initializes .fgos/)', () => {
   const cwd = tmpCwd();
   const result = run(cwd, ['evolve']);
   assert.equal(result.status, 0);
-  assert.match(result.stdout, /không có candidate/);
+  assert.deepEqual(envelopeData(result.stdout), []);
   assert.ok(!fs.existsSync(path.join(cwd, '.fgos')));
 });
 
-test('evolve with candidates prints the ranked list with every field id/disposition/errorClass/layer/detail/attempts/score', () => {
+test('evolve with candidates returns the ranked list with every field id/disposition/errorClass/layer/detail/attempts/score', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'rank-item');
   const dir = path.join(cwd, '.fgos');
@@ -1937,11 +2004,18 @@ test('evolve with candidates prints the ranked list with every field id/disposit
 
   const result = run(cwd, ['evolve']);
   assert.equal(result.status, 0);
-  assert.match(result.stdout, /candidates \(1\)/);
-  assert.match(result.stdout, /rank-item score=2 \[blocked\] verify-miss\/verification \(attempts 2\): goal-check failed \(exit 1\)/);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.length, 1);
+  assert.equal(data[0].id, 'rank-item');
+  assert.equal(data[0].score, 2);
+  assert.equal(data[0].disposition, 'blocked');
+  assert.equal(data[0].errorClass, 'verify-miss');
+  assert.equal(data[0].layer, 'verification');
+  assert.equal(data[0].attempts, 2);
+  assert.equal(data[0].detail, 'goal-check failed (exit 1)');
 });
 
-test('evolve with a candidate missing disposition/errorClass/layer/attempts never prints the literal "null"', () => {
+test('evolve with a candidate missing disposition/errorClass/layer/attempts carries those fields as null/undefined, never the literal string "null"', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'sparse-item');
   const dir = path.join(cwd, '.fgos');
@@ -1949,10 +2023,10 @@ test('evolve with a candidate missing disposition/errorClass/layer/attempts neve
 
   const result = run(cwd, ['evolve']);
   assert.equal(result.status, 0);
-  assert.doesNotMatch(result.stdout, /null/);
+  assert.doesNotMatch(result.stdout, /"disposition":"null"|"errorClass":"null"|"layer":"null"|"attempts":"null"/);
 });
 
-test('evolve --pick <valid-id> prints that candidate\'s full friction record via the existing check formatter, no state change', () => {
+test('evolve --pick <valid-id> returns that candidate\'s full friction record, no state change', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'pick-item');
   const dir = path.join(cwd, '.fgos');
@@ -1960,8 +2034,12 @@ test('evolve --pick <valid-id> prints that candidate\'s full friction record via
 
   const result = run(cwd, ['evolve', '--pick', 'pick-item']);
   assert.equal(result.status, 0);
-  assert.match(result.stdout, /friction \(1\)/);
-  assert.match(result.stdout, /\[blocked\] pick-item verify-miss\/verification \(attempts 1\): goal-check failed/);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.count, 1);
+  assert.equal(data.recent[0].id, 'pick-item');
+  assert.equal(data.recent[0].disposition, 'blocked');
+  assert.equal(data.recent[0].errorClass, 'verify-miss');
+  assert.equal(data.recent[0].layer, 'verification');
 });
 
 test('evolve --pick <invalid-id> prints a clean error and exits non-zero, with no state change', () => {
@@ -2039,7 +2117,7 @@ test('submit stays byte-identical after the submitWork extraction: a plain call 
   assert.equal(plainItem.status, 'todo');
   assert.equal(plainItem.mode, 'sync');
   assert.equal(plainItem.domain, undefined);
-  assert.equal(JSON.parse(run(cwd, ['list']).stdout).work[plainItem.id].stage, 'clarify');
+  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[plainItem.id].stage, 'clarify');
 
   const flagged = run(cwd, ['submit', 'Try the synthetic domain', '--async', '--domain', 'synthetic']);
   assert.equal(flagged.status, 0);
@@ -2083,7 +2161,7 @@ test("evolve --submit <id> with a matching candidate creates exactly one new wor
   assert.match(item.description, /goal-check failed \(exit 1\)/);
 
   assert.equal(eventLines(cwd).length, before + 1, 'evolve --submit appends exactly one new event');
-  const view = JSON.parse(run(cwd, ['list']).stdout);
+  const view = envelopeData(run(cwd, ['list']).stdout);
   assert.ok(view.work[item.id], 'the new work item persisted');
   assert.equal(view.work['submit-item'].status, 'todo', 'the candidate\'s own item is untouched');
 });
@@ -2133,11 +2211,14 @@ test('evolve (no flag) and evolve --pick remain unaffected by the new --submit p
   const before = eventLines(cwd).length;
   const list = run(cwd, ['evolve']);
   assert.equal(list.status, 0);
-  assert.match(list.stdout, /unaffected-item score=2 \[blocked\] verify-miss\/verification \(attempts 1\): goal-check failed/);
+  const listData = envelopeData(list.stdout);
+  assert.equal(listData[0].id, 'unaffected-item');
+  assert.equal(listData[0].score, 2);
+  assert.equal(listData[0].disposition, 'blocked');
 
   const pick = run(cwd, ['evolve', '--pick', 'unaffected-item']);
   assert.equal(pick.status, 0);
-  assert.match(pick.stdout, /friction \(1\)/);
+  assert.equal(envelopeData(pick.stdout).count, 1);
 
   assert.equal(eventLines(cwd).length, before, 'evolve and evolve --pick still append no events');
 });
@@ -2162,9 +2243,11 @@ test('review of a runner-source proposed item prints the branch diff and no warn
 
   const result = run(cwd, ['review', 'review-runner-item']);
   assert.equal(result.status, 0, result.stderr);
-  assert.match(result.stdout, /source: runner/);
-  assert.match(result.stdout, /review-runner-item-produced\.txt/);
-  assert.doesNotMatch(result.stdout, /warning:/);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.mode, 'local');
+  assert.equal(data.source, 'runner');
+  assert.match(data.diff, /review-runner-item-produced\.txt/);
+  assert.deepEqual(data.warnings, []);
 });
 
 test('review of a pull-door proposed item prints the headAtTake..headAtReturn diff, exit 0', () => {
@@ -2177,9 +2260,10 @@ test('review of a pull-door proposed item prints the headAtTake..headAtReturn di
 
   const result = run(cwd, ['review', 'review-pull-item']);
   assert.equal(result.status, 0, result.stderr);
-  assert.match(result.stdout, /source: pull/);
-  assert.match(result.stdout, /proof\.txt/);
-  assert.doesNotMatch(result.stdout, /warning:/);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.source, 'pull');
+  assert.match(data.diff, /proof\.txt/);
+  assert.deepEqual(data.warnings, []);
 });
 
 test('review of a legacy proposed item (no branch, no headAtTake/headAtReturn) degrades honestly — a warning, no throw, exit 0 (must_have: legacy degrade)', () => {
@@ -2190,8 +2274,9 @@ test('review of a legacy proposed item (no branch, no headAtTake/headAtReturn) d
 
   const result = run(cwd, ['review', 'review-legacy-item']);
   assert.equal(result.status, 0, result.stderr);
-  assert.match(result.stdout, /source: legacy/);
-  assert.match(result.stdout, /warning: no live diff source/);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.source, 'legacy');
+  assert.match(data.warnings.join('\n'), /no live diff source/);
 });
 
 test('review of a leaf proposed item diffs against its resolved root branch (fgw/<root>), not main (D3)', () => {
@@ -2201,9 +2286,10 @@ test('review of a leaf proposed item diffs against its resolved root branch (fgw
 
   const result = run(cwd, ['review', 'review-leaf-child']);
   assert.equal(result.status, 0, result.stderr);
-  assert.match(result.stdout, /source: runner/);
-  assert.match(result.stdout, /review-leaf-child-produced\.txt/);
-  assert.doesNotMatch(result.stdout, /root-only\.txt/, 'diff against fgw/<root> must not include the root branch\'s own divergence from main');
+  const data = envelopeData(result.stdout);
+  assert.equal(data.source, 'runner');
+  assert.match(data.diff, /review-leaf-child-produced\.txt/);
+  assert.doesNotMatch(data.diff, /root-only\.txt/, 'diff against fgw/<root> must not include the root branch\'s own divergence from main');
 });
 
 test('review of a root proposed item is unchanged — still diffs against main (regression, D3)', () => {
@@ -2213,8 +2299,9 @@ test('review of a root proposed item is unchanged — still diffs against main (
 
   const result = run(cwd, ['review', 'review-root-regression-item']);
   assert.equal(result.status, 0, result.stderr);
-  assert.match(result.stdout, /source: runner/);
-  assert.match(result.stdout, /review-root-regression-item-produced\.txt/);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.source, 'runner');
+  assert.match(data.diff, /review-root-regression-item-produced\.txt/);
 });
 
 test('approve on a nonexistent id is rejected as validation, exit 4', () => {
@@ -2237,7 +2324,7 @@ test('approve of a runner item (happy path): merges fgw/<id> into main, verifies
 
   const result = run(cwd, ['approve', 'approve-runner-item']);
   assert.equal(result.status, 0, result.stderr);
-  assert.match(result.stdout, /proposed -> done/);
+  assert.equal(envelopeData(result.stdout).to, 'done');
 
   const view = stateView(cwd);
   assert.equal(view.work['approve-runner-item'].status, 'done');
@@ -2292,8 +2379,10 @@ test('approve of a leaf item with a clean merge lands the work on fgw/<root> (no
   const headBefore = gitHead(cwd);
   const result = run(cwd, ['approve', 'approve-leaf-child']);
   assert.equal(result.status, 0, result.stderr);
-  assert.match(result.stdout, /merged fgw\/approve-leaf-child -> fgw\/approve-leaf-root/);
-  assert.match(result.stdout, /proposed -> done/);
+  const approveData = envelopeData(result.stdout);
+  assert.equal(approveData.branch, 'fgw/approve-leaf-child');
+  assert.equal(approveData.target, 'fgw/approve-leaf-root');
+  assert.equal(approveData.to, 'done');
 
   // main must never be touched by a leaf approve.
   assert.equal(gitHead(cwd), headBefore, 'main HEAD must be unchanged by a leaf approve');
@@ -2343,8 +2432,9 @@ test('approve of a runner item that conflicts: aborts the merge, proposed -> blo
   const headBefore = gitHead(cwd);
   const result = run(cwd, ['approve', 'approve-conflict-item']);
   assert.equal(result.status, 0, result.stderr);
-  assert.match(result.stdout, /blocked/);
-  assert.match(result.stdout, /merge-conflict/);
+  const conflictData = envelopeData(result.stdout);
+  assert.equal(conflictData.to, 'blocked');
+  assert.equal(conflictData.reason, 'merge-conflict');
 
   assert.equal(gitHead(cwd), headBefore, 'HEAD must be unchanged after an aborted merge');
   assert.equal(fs.readFileSync(path.join(cwd, 'shared.txt'), 'utf8'), 'main-change\n', 'main content must be unchanged');
@@ -2362,8 +2452,9 @@ test('approve of a runner item whose staged merge fails its own verify: aborts, 
   const headBefore = gitHead(cwd);
   const result = run(cwd, ['approve', 'approve-verify-fail-item']);
   assert.equal(result.status, 0, result.stderr);
-  assert.match(result.stdout, /blocked/);
-  assert.match(result.stdout, /verify-fail-post-merge/);
+  const verifyFailData = envelopeData(result.stdout);
+  assert.equal(verifyFailData.to, 'blocked');
+  assert.equal(verifyFailData.reason, 'verify-fail-post-merge');
 
   assert.equal(gitHead(cwd), headBefore, 'HEAD must be unchanged after an aborted merge');
   assert.equal(fs.existsSync(path.join(cwd, 'approve-verify-fail-item-produced.txt')), false, 'a staged-then-aborted merge must not leave its file behind');
@@ -2415,7 +2506,7 @@ test('approve of a root item that HAD children, whose merge into main conflicts,
   const headBefore = gitHead(cwd);
   const result = run(cwd, ['approve', 'drift-root-item']);
   assert.equal(result.status, 0, result.stderr);
-  assert.match(result.stdout, /integration-drift/);
+  assert.equal(envelopeData(result.stdout).reason, 'integration-drift');
 
   assert.equal(gitHead(cwd), headBefore, 'HEAD must be unchanged after an aborted merge');
   assert.equal(fs.readFileSync(path.join(cwd, 'shared.txt'), 'utf8'), 'main-change\n', 'main content must be unchanged');
@@ -2436,7 +2527,7 @@ test('approve of a pull-door item (no merge, code already on main): re-verifies 
 
   const result = run(cwd, ['approve', 'approve-pull-item']);
   assert.equal(result.status, 0, result.stderr);
-  assert.match(result.stdout, /proposed -> done/);
+  assert.equal(envelopeData(result.stdout).to, 'done');
 
   const view = stateView(cwd);
   assert.equal(view.work['approve-pull-item'].status, 'done');
@@ -2451,9 +2542,9 @@ test('approve of a legacy item with a failing verify: blocked (reason verify-fai
 
   const result = run(cwd, ['approve', 'approve-legacy-fail-item']);
   assert.equal(result.status, 0, result.stderr);
-  assert.match(result.stdout, /blocked/);
-  assert.match(result.stdout, /verify-fail\b/);
-  assert.doesNotMatch(result.stdout, /verify-fail-post-merge/);
+  const legacyFailData = envelopeData(result.stdout);
+  assert.equal(legacyFailData.to, 'blocked');
+  assert.equal(legacyFailData.reason, 'verify-fail');
 
   const view = stateView(cwd);
   assert.equal(view.work['approve-legacy-fail-item'].status, 'blocked');
@@ -2541,7 +2632,7 @@ test('approve of the same self-modifying diff PROCEEDS with --acknowledge-iron-l
 
   const result = run(cwd, ['approve', 'iron-ack-item', '--acknowledge-iron-law']);
   assert.equal(result.status, 0, `approve with acknowledgment must succeed: ${result.stderr}`);
-  assert.match(result.stdout, /proposed -> done/);
+  assert.equal(envelopeData(result.stdout).to, 'done');
 
   const view = stateView(cwd);
   assert.equal(view.work['iron-ack-item'].status, 'done');
@@ -2560,7 +2651,7 @@ test('approve of an ordinary runner item (diff touches no self-modifying module)
 
   const result = run(cwd, ['approve', 'iron-plain-item']);
   assert.equal(result.status, 0, `an ordinary diff must approve without any acknowledgment: ${result.stderr}`);
-  assert.match(result.stdout, /proposed -> done/);
+  assert.equal(envelopeData(result.stdout).to, 'done');
   assert.doesNotMatch(result.stdout, /Iron Law/);
   assert.equal(stateView(cwd).work['iron-plain-item'].status, 'done');
 });
@@ -2600,8 +2691,10 @@ test('reject moves proposed -> todo with the reason recorded, actor human, and r
   const headBefore = gitHead(cwd);
   const result = run(cwd, ['reject', 'reject-pull-item', '--reason', 'needs more test coverage']);
   assert.equal(result.status, 0, result.stderr);
-  assert.match(result.stdout, /proposed -> todo/);
-  assert.match(result.stdout, /no revert/);
+  const rejectData = envelopeData(result.stdout);
+  assert.equal(rejectData.from, 'proposed');
+  assert.equal(rejectData.to, 'todo');
+  assert.equal(rejectData.reason, 'needs more test coverage');
 
   assert.equal(gitHead(cwd), headBefore, 'reject must never touch git — HEAD unchanged');
   assert.ok(fs.existsSync(path.join(cwd, 'proof.txt')), 'reject never reverts the code already on main (D4)');
@@ -2747,8 +2840,11 @@ test('review --github on a runner item pushes the branch and opens a PR via a re
 
   const result = run(cwd, ['review', 'gh-review-ok', '--github'], { FGOS_GH_COMMAND: fake });
   assert.equal(result.status, 0, `${result.stdout}${result.stderr}`);
-  assert.match(result.stdout, /GitHub PR #314/);
-  assert.match(result.stdout, /fgw\/gh-review-ok -> main/);
+  const ghData = envelopeData(result.stdout);
+  assert.equal(ghData.outcome, 'created');
+  assert.equal(ghData.prNumber, 314);
+  assert.equal(ghData.head, 'fgw/gh-review-ok');
+  assert.equal(ghData.base, 'main');
 
   // Crossed the real process boundary: the fake logged its argv.
   assert.match(fs.readFileSync(ghLog, 'utf8'), /pr create .*-H fgw\/gh-review-ok -B main/);
@@ -2767,8 +2863,9 @@ test('review --github reports a gh failure as plain output with no state mutatio
 
   const result = run(cwd, ['review', 'gh-review-blocked', '--github'], { FGOS_GH_COMMAND: fake });
   assert.equal(result.status, 0, `${result.stdout}${result.stderr}`);
-  assert.match(result.stdout, /reason auth-failure/);
-  assert.match(result.stdout, /no state change/);
+  const ghData = envelopeData(result.stdout);
+  assert.equal(ghData.outcome, 'failed');
+  assert.equal(ghData.reason, 'auth-failure');
   assert.equal(stateView(cwd).work['gh-review-blocked'].status, 'proposed', 'review never transitions state, even on a gh failure');
   assert.equal(stateView(cwd).frictions?.['gh-review-blocked'], undefined, 'review never records friction');
 });
@@ -2799,7 +2896,7 @@ test('approve --github with a dirty main tree is NOT blocked by the local dirty-
   const result = run(cwd, ['approve', 'gh-approve-dirty', '--github', '--pr', '5'], { FGOS_GH_COMMAND: fake });
   assert.equal(result.status, 0, `${result.stdout}${result.stderr}`);
   assert.doesNotMatch(result.stdout, /not clean/);
-  assert.match(result.stdout, /proposed -> done/);
+  assert.equal(envelopeData(result.stdout).to, 'done');
   assert.equal(stateView(cwd).work['gh-approve-dirty'].status, 'done');
 });
 
@@ -2811,8 +2908,9 @@ test('approve --github --pr on a fake gh merge success transitions the item prop
 
   const result = run(cwd, ['approve', 'gh-approve-merged', '--github', '--pr', '42'], { FGOS_GH_COMMAND: fake });
   assert.equal(result.status, 0, `${result.stdout}${result.stderr}`);
-  assert.match(result.stdout, /merged GitHub PR #42/);
-  assert.match(result.stdout, /proposed -> done/);
+  const mergedData = envelopeData(result.stdout);
+  assert.equal(mergedData.prNumber, '42');
+  assert.equal(mergedData.to, 'done');
 
   const view = stateView(cwd);
   assert.equal(view.work['gh-approve-merged'].status, 'done');
@@ -2827,7 +2925,9 @@ test('approve --github --pr on a fake gh merge failure transitions proposed -> b
 
   const result = run(cwd, ['approve', 'gh-approve-blocked', '--github', '--pr', '99'], { FGOS_GH_COMMAND: fake });
   assert.equal(result.status, 0, `${result.stdout}${result.stderr}`);
-  assert.match(result.stdout, /proposed -> blocked \(reason auth-failure\)/);
+  const blockedData = envelopeData(result.stdout);
+  assert.equal(blockedData.to, 'blocked');
+  assert.equal(blockedData.reason, 'auth-failure');
 
   const view = stateView(cwd);
   assert.equal(view.work['gh-approve-blocked'].status, 'blocked');
@@ -2870,7 +2970,9 @@ test('review --github --pr on a still-open PR (closed:false) reports it is open 
 
   const result = run(cwd, ['review', 'gh-status-open', '--github', '--pr', '11'], { FGOS_GH_COMMAND: fake });
   assert.equal(result.status, 0, `${result.stdout}${result.stderr}`);
-  assert.match(result.stdout, /PR #11 is still open/);
+  const statusData = envelopeData(result.stdout);
+  assert.equal(statusData.prNumber, '11');
+  assert.equal(statusData.outcome, 'open');
   // Crossed the real process boundary as a status read, never a create/push.
   assert.match(fs.readFileSync(ghLog, 'utf8'), /pr view 11/);
   const view = stateView(cwd);
@@ -2888,7 +2990,10 @@ test('review --github --pr on a merged PR (closed:true, mergedAt set) reports it
 
   const result = run(cwd, ['review', 'gh-status-merged', '--github', '--pr', '42'], { FGOS_GH_COMMAND: fake });
   assert.equal(result.status, 0, `${result.stdout}${result.stderr}`);
-  assert.match(result.stdout, /PR #42 was merged/);
+  const mergedStatusData = envelopeData(result.stdout);
+  assert.equal(mergedStatusData.prNumber, '42');
+  assert.equal(mergedStatusData.outcome, 'merged');
+  assert.equal(mergedStatusData.mergedAt, '2026-07-17T10:00:00Z');
   const view = stateView(cwd);
   // This cell never reconciles a GitHub-side merge into FSM state (out of scope, D4/D6).
   assert.equal(view.work['gh-status-merged'].status, 'proposed');
@@ -2912,8 +3017,9 @@ test('review --github --pr on a closed-without-merge PR names the PR, points to 
   const elapsedMs = Date.now() - startedAt;
 
   assert.equal(result.status, 0, `${result.stdout}${result.stderr}`);
-  assert.match(result.stdout, /PR #77 was CLOSED WITHOUT MERGING/);
-  assert.match(result.stdout, /fgos reject gh-status-closed --reason/);
+  const closedData = envelopeData(result.stdout);
+  assert.equal(closedData.prNumber, '77');
+  assert.equal(closedData.outcome, 'closed-unmerged');
 
   const invocations = fs.readFileSync(ghLog, 'utf8').trim().split('\n').filter(Boolean);
   assert.equal(invocations.length, 1, `expected exactly one gh invocation under pollTimeoutMs:0, got ${invocations.length}`);
@@ -2932,8 +3038,9 @@ test('review --github --pr reports a gh status-check failure as plain output wit
 
   const result = run(cwd, ['review', 'gh-status-failed', '--github', '--pr', '5'], { FGOS_GH_COMMAND: fake });
   assert.equal(result.status, 0, `${result.stdout}${result.stderr}`);
-  assert.match(result.stdout, /status check failed \(reason auth-failure\)/);
-  assert.match(result.stdout, /no state change/);
+  const failedData = envelopeData(result.stdout);
+  assert.equal(failedData.outcome, 'check-failed');
+  assert.equal(failedData.reason, 'auth-failure');
   const view = stateView(cwd);
   assert.equal(view.work['gh-status-failed'].status, 'proposed');
   assert.equal(view.frictions?.['gh-status-failed'], undefined);
@@ -2975,7 +3082,9 @@ test('catchup on a root parked with reason integration-drift, after a non-overla
   const worktreesBefore = gitAtCwd(cwd, ['worktree', 'list', '--porcelain']);
   const result = run(cwd, ['catchup', 'catchup-root-drift']);
   assert.equal(result.status, 0, result.stderr);
-  assert.match(result.stdout, /blocked -> proposed/);
+  const catchupData = envelopeData(result.stdout);
+  assert.equal(catchupData.from, 'blocked');
+  assert.equal(catchupData.to, 'proposed');
 
   assert.equal(gitHead(cwd), mainHeadBefore, "catchup must never touch the human's own main checkout");
   assert.equal(gitAtCwd(cwd, ['worktree', 'list', '--porcelain']), worktreesBefore, 'the ephemeral catchup worktree is cleaned up — no leftover');
@@ -3006,8 +3115,10 @@ test('catchup on a leaf parked with reason merge-conflict targets its PARENT bra
   const worktreesBefore = gitAtCwd(cwd, ['worktree', 'list', '--porcelain']);
   const result = run(cwd, ['catchup', 'catchup-leaf-child']);
   assert.equal(result.status, 0, result.stderr);
-  assert.match(result.stdout, /blocked -> proposed/);
-  assert.match(result.stdout, /fgw\/catchup-leaf-root/, 'catchup must merge the PARENT branch, not main');
+  const leafCatchupData = envelopeData(result.stdout);
+  assert.equal(leafCatchupData.from, 'blocked');
+  assert.equal(leafCatchupData.to, 'proposed');
+  assert.equal(leafCatchupData.target, 'fgw/catchup-leaf-root', 'catchup must merge the PARENT branch, not main');
 
   assert.equal(gitHead(cwd), mainHeadBefore, 'a leaf catchup must never touch main');
   assert.equal(gitAtCwd(cwd, ['worktree', 'list', '--porcelain']), worktreesBefore, 'the ephemeral catchup worktree is cleaned up — no leftover');
@@ -3126,7 +3237,8 @@ test('init in a project with a .bee/ marker detects it, reports it in the output
 
   const result = run(cwd, ['init']);
   assert.equal(result.status, 0);
-  assert.match(result.stdout, /Detected other harness\(es\): bee/);
+  const initData = envelopeData(result.stdout);
+  assert.deepEqual(initData.detectedHarnesses, [{ name: 'bee', markers: ['.bee'] }]);
 
   const manifest = JSON.parse(fs.readFileSync(coexistPath(cwd), 'utf8'));
   assert.deepEqual(manifest.detected_harnesses, [{ name: 'bee', markers: ['.bee'] }]);
@@ -3198,8 +3310,10 @@ test('take --id on a blocked item with a live fgw/<id> branch claims via blocked
 
   const result = run(cwd, ['take', '--id', 'branch-take-a']);
   assert.equal(result.status, 0, `take failed: ${result.stderr}`);
-  assert.match(result.stdout, /blocked -> doing/);
-  assert.match(result.stdout, /fgw\/branch-take-a/);
+  const takeData = envelopeData(result.stdout);
+  assert.equal(takeData.from, 'blocked');
+  assert.equal(takeData.to, 'doing');
+  assert.equal(takeData.branch, 'fgw/branch-take-a');
 
   const view = stateView(cwd);
   assert.equal(view.work['branch-take-a'].status, 'doing');
@@ -3326,12 +3440,11 @@ test('return on a branch-source take: verify-fail -> doing -> blocked + friction
 // Parses `session start`'s output into { result, sessionId, worktreePath }.
 function startSession(cwd, extraArgs = []) {
   const result = run(cwd, ['session', 'start', ...extraArgs]);
-  const idMatch = result.stdout.match(/Started session (\S+)/);
-  const wtMatch = result.stdout.match(/worktree: (.+)/);
+  const data = result.status === 0 ? envelopeData(result.stdout) : null;
   return {
     result,
-    sessionId: idMatch ? idMatch[1] : null,
-    worktreePath: wtMatch ? wtMatch[1].trim() : null,
+    sessionId: data ? data.sessionId : null,
+    worktreePath: data ? data.worktreePath : null,
   };
 }
 
@@ -3346,14 +3459,13 @@ function commitInWorktree(worktreePath, filename, content = 'inside-session\n') 
   return execFileSync('git', ['rev-parse', 'HEAD'], { cwd: worktreePath, encoding: 'utf8' }).trim();
 }
 
-test('session start prints a session id and an existing worktree path, exit 0', () => {
+test('session start returns a session id and an existing worktree path, exit 0', () => {
   const cwd = initGitCwd();
   const { result, sessionId, worktreePath } = startSession(cwd);
   assert.equal(result.status, 0, `session start should succeed: ${result.stderr}`);
-  assert.ok(sessionId, 'stdout names a session id');
-  assert.ok(worktreePath, 'stdout names a worktree path to cd into');
+  assert.ok(sessionId, 'data names a session id');
+  assert.ok(worktreePath, 'data names a worktree path to cd into');
   assert.ok(fs.existsSync(worktreePath), 'the worktree directory actually exists on disk');
-  assert.match(result.stdout, /cd /, 'output tells the caller where to cd');
 
   run(cwd, ['session', 'end', sessionId]);
 });
@@ -3364,15 +3476,18 @@ test('session list shows a started session, then omits it after it ends', () => 
 
   const listed = run(cwd, ['session', 'list']);
   assert.equal(listed.status, 0);
-  assert.match(listed.stdout, new RegExp(sessionId), 'the started session id is listed');
-  assert.match(listed.stdout, /work-x/, 'the bound item id is listed');
-  assert.ok(listed.stdout.includes(worktreePath), 'the worktree path is listed');
+  const listedData = envelopeData(listed.stdout);
+  const entry = listedData.find((e) => e.sessionId === sessionId);
+  assert.ok(entry, 'the started session id is listed');
+  assert.equal(entry.itemId, 'work-x', 'the bound item id is listed');
+  assert.equal(entry.worktreePath, worktreePath, 'the worktree path is listed');
 
   assert.equal(run(cwd, ['session', 'end', sessionId]).status, 0);
   const listedAfter = run(cwd, ['session', 'list']);
   assert.equal(listedAfter.status, 0);
-  assert.doesNotMatch(listedAfter.stdout, new RegExp(sessionId), 'ended session no longer listed');
-  assert.match(listedAfter.stdout, /không có phiên nào/, 'empty registry prints the no-sessions note');
+  const listedAfterData = envelopeData(listedAfter.stdout);
+  assert.ok(!listedAfterData.some((e) => e.sessionId === sessionId), 'ended session no longer listed');
+  assert.deepEqual(listedAfterData, [], 'empty registry returns an empty list');
 });
 
 test('session end removes a non-diverged session cleanly — exit 0, worktree gone', () => {
@@ -3406,8 +3521,10 @@ test('session end --force removes a diverged session anyway, exit 0', () => {
 
   const forced = run(cwd, ['session', 'end', sessionId, '--force']);
   assert.equal(forced.status, 0, `--force should override the divergence refusal: ${forced.stderr}`);
+  assert.equal(envelopeData(forced.stdout).forced, true);
   assert.ok(!fs.existsSync(worktreePath), 'the worktree directory is removed under --force');
-  assert.doesNotMatch(run(cwd, ['session', 'list']).stdout, new RegExp(sessionId));
+  const remaining = envelopeData(run(cwd, ['session', 'list']).stdout);
+  assert.ok(!remaining.some((e) => e.sessionId === sessionId));
 });
 
 test('session end on an unknown session id is a clean validation error, exit 4, no crash', () => {

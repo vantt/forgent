@@ -62,6 +62,13 @@ function stateView(cwd) {
   return JSON.parse(fs.readFileSync(viewPath(cwd), 'utf8'));
 }
 
+// Every verb's success path prints a single fgos.v1 envelope
+// {contract, generated_at, data_hash, data} — this unwraps it to the verb's
+// own structured data.
+function envelopeData(stdout) {
+  return JSON.parse(stdout).data;
+}
+
 function eventsRaw(cwd) {
   return fs.readFileSync(logPath(cwd), 'utf8');
 }
@@ -198,19 +205,22 @@ test(
     // needs to judge it (D12).
     const list = fgos(repoRoot, ['evolve']);
     assert.equal(list.status, 0, `evolve list failed: ${list.stderr}`);
-    assert.match(list.stdout, /self-fix-source/);
-    assert.match(list.stdout, /score=2/);
-    assert.match(list.stdout, /\[blocked\]/);
-    assert.match(list.stdout, /verify-miss\/verification/);
-    assert.match(list.stdout, /attempts 2/);
-    assert.match(list.stdout, /schema migration/);
+    const listData = envelopeData(list.stdout);
+    const candidate = listData.find((c) => c.id === 'self-fix-source');
+    assert.ok(candidate, 'self-fix-source appears in the ranked list');
+    assert.equal(candidate.score, 2);
+    assert.equal(candidate.disposition, 'blocked');
+    assert.equal(candidate.errorClass, 'verify-miss');
+    assert.equal(candidate.layer, 'verification');
+    assert.equal(candidate.attempts, 2);
+    assert.match(candidate.detail, /schema migration/);
 
     // (3) `fgos evolve --pick <id>` is read-only (D6/D11) — byte-compare the
     // event log before/after, not just an assertion about the return value.
     const beforePick = eventsRaw(repoRoot);
     const pick = fgos(repoRoot, ['evolve', '--pick', 'self-fix-source']);
     assert.equal(pick.status, 0, `evolve --pick failed: ${pick.stderr}`);
-    assert.match(pick.stdout, /self-fix-source/);
+    assert.equal(envelopeData(pick.stdout).recent[0].id, 'self-fix-source');
     const afterPick = eventsRaw(repoRoot);
     assert.equal(afterPick, beforePick, 'evolve --pick must append zero events (read-only, D6/D11)');
 
@@ -220,7 +230,7 @@ test(
     // same heavy keyword).
     const submit = fgos(repoRoot, ['evolve', '--submit', 'self-fix-source']);
     assert.equal(submit.status, 0, `evolve --submit failed: ${submit.stderr}`);
-    const submitted = JSON.parse(submit.stdout).data;
+    const submitted = envelopeData(submit.stdout);
     assert.equal(submitted.status, 'todo');
     assert.equal(submitted.stage, 'clarify');
     assert.match(submitted.description, /Self-improve candidate self-fix-source/);
@@ -264,8 +274,9 @@ test(
     // (6) `fgos review <id>` — real diff shown.
     const review = fgos(repoRoot, ['review', submitted.id]);
     assert.equal(review.status, 0, `review failed: ${review.stderr}`);
-    assert.match(review.stdout, /source: runner/);
-    assert.match(review.stdout, /fixed\.txt/);
+    const reviewData = envelopeData(review.stdout);
+    assert.equal(reviewData.source, 'runner');
+    assert.match(reviewData.diff, /fixed\.txt/);
 
     // approve's runner path refuses a dirty main tree — fold the evolve/
     // dispatch log deltas into a real commit first (same convention every
@@ -292,8 +303,9 @@ test(
     // succeeds: merges, verifies, proposed -> done, branch cleaned up.
     const approved = fgos(repoRoot, ['approve', submitted.id, '--acknowledge-iron-law']);
     assert.equal(approved.status, 0, `approve with acknowledgment must succeed: ${approved.stderr}`);
-    assert.match(approved.stdout, /proposed -> done/);
-    assert.match(approved.stdout, /FIX_OK/);
+    const approvedData = envelopeData(approved.stdout);
+    assert.equal(approvedData.to, 'done');
+    assert.match(approvedData.output, /FIX_OK/);
 
     const finalView = stateView(repoRoot);
     assert.equal(finalView.work[submitted.id].status, 'done');

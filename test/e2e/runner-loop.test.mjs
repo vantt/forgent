@@ -84,6 +84,13 @@ function stateView(cwd) {
   return JSON.parse(fs.readFileSync(viewPath(cwd), 'utf8'));
 }
 
+// Every verb's success path prints a single fgos.v1 envelope
+// {contract, generated_at, data_hash, data} — this unwraps it to the verb's
+// own structured data.
+function envelopeData(stdout) {
+  return JSON.parse(stdout).data;
+}
+
 function events(cwd) {
   return fs
     .readFileSync(logPath(cwd), 'utf8')
@@ -333,7 +340,7 @@ test('e2e stage-clarify (a) clear verdict: submit -> --once takes the item stage
   assert.equal(discovery[0].clear, true);
 
   // `fgos list` (the public read surface) confirms the same facts.
-  const list = JSON.parse(fgos(repoRoot, ['list']).stdout);
+  const list = envelopeData(fgos(repoRoot, ['list']).stdout);
   assert.equal(list.work[submitted.id].stage, 'executing');
   assert.equal(list.work[submitted.id].verify, 'test -f output.txt && echo VERIFY_OK');
 });
@@ -593,7 +600,7 @@ test('e2e S2-pull: submit pass-throughs 2 stages via discover, a human takes the
   const headAtTake = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: repoRoot, encoding: 'utf8' }).trim();
   const taken = fgos(repoRoot, ['take']);
   assert.equal(taken.status, 0, `take failed: ${taken.stderr}`);
-  assert.match(taken.stdout, new RegExp(submitted.id));
+  assert.equal(envelopeData(taken.stdout).id, submitted.id);
 
   view = stateView(repoRoot);
   assert.equal(view.work[submitted.id].status, 'doing');
@@ -619,8 +626,9 @@ test('e2e S2-pull: submit pass-throughs 2 stages via discover, a human takes the
 
   const returned = fgos(repoRoot, ['return', submitted.id]);
   assert.equal(returned.status, 0, `return failed: ${returned.stderr}`);
-  assert.match(returned.stdout, /proposed/);
-  assert.match(returned.stdout, /PULL_OK/, 'the real goal-check ran and its output surfaced, not just a status word');
+  const returnedData = envelopeData(returned.stdout);
+  assert.equal(returnedData.to, 'proposed');
+  assert.match(returnedData.output, /PULL_OK/, 'the real goal-check ran and its output surfaced, not just a status word');
 
   view = stateView(repoRoot);
   assert.equal(view.work[submitted.id].status, 'proposed');
@@ -718,12 +726,11 @@ test('e2e full journey: item1 (no deps) -> proposed with a worker commit on fgw/
   // an "outcome exists" flag.
   const check = fgos(repoRoot, ['check', 'item1']);
   assert.equal(check.status, 0, `fgos check failed: ${check.stderr}`);
-  assert.match(check.stdout, /item1/);
-  assert.match(check.stdout, /predicted/);
-  assert.match(check.stdout, /"tier":"standard"/, 'predicted half carries the real claimed tier');
-  assert.match(check.stdout, /actual/);
-  assert.match(check.stdout, /"outcome":"proposed"/, 'actual half carries the real dispatch outcome');
-  assert.match(check.stdout, /"passed":true/);
+  const checkData = envelopeData(check.stdout);
+  assert.equal(checkData.outcomes[0].id, 'item1');
+  assert.equal(checkData.outcomes[0].predicted.tier, 'standard', 'predicted half carries the real claimed tier');
+  assert.equal(checkData.outcomes[0].actual.outcome, 'proposed', 'actual half carries the real dispatch outcome');
+  assert.equal(checkData.outcomes[0].actual.passed, true);
 });
 
 // --- case 2: verify-red -> blocked, never proposed --------------------------

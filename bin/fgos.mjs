@@ -174,203 +174,126 @@ function parseListFlag(value) {
     .filter(Boolean);
 }
 
-// One block per item, always naming both halves explicitly (`predicted:` /
-// `actual:`) even when a half is still missing — this is what makes the
-// output real CoS evidence (per plan Approach S1) rather than a bare
-// "has outcome" flag: a reader (human or e2e assertion) sees the actual
-// predicted/actual VALUES, not just the words.
-function formatOutcomeBlock(id, entry) {
-  const predictedLine = entry?.predicted
-    ? `  predicted: ${JSON.stringify(entry.predicted)}`
-    : '  predicted: chưa có dữ liệu';
-  const actualLine = entry?.actual
-    ? `  actual: ${JSON.stringify(entry.actual)}`
-    : '  actual: chưa có dữ liệu';
-  return `${id}\n${predictedLine}\n${actualLine}`;
-}
-
-// Read-only formatter (per D1 request-class): folds `view.outcomes` (lazy
-// key — absent on any log with no work.outcome events, per replay.mjs) into
-// a predicted-vs-actual report. Never throws on missing data — an item with
-// no outcome yet, or a log with no `outcomes` key at all, both print
-// "chưa có dữ liệu" and the caller still exits 0 (this is a read, not a
-// validation failure).
-function formatCheck(view, id, dir) {
-  const outcomes = view.outcomes ?? {};
-  const ids = id ? [id] : Object.keys(outcomes);
-  const sections = [];
-  if (ids.length > 0) {
-    sections.push(ids.map((itemId) => formatOutcomeBlock(itemId, outcomes[itemId])).join('\n\n'));
-  }
-  const friction = formatFrictionSection(view, id);
-  if (friction) {
-    sections.push(friction);
-  }
-  const settlement = formatSettlementSection(view, id);
-  if (settlement) {
-    sections.push(settlement);
-  }
-  const learning = formatLearningSection(view, id);
-  if (learning) {
-    sections.push(learning);
-  }
-  const nag = formatMissingOutcomeNag(view, id);
-  if (nag) {
-    sections.push(nag);
-  }
-  // Entropy-trend + seal-digest (per Phase 3 S3-closeout, plan Slice 3 (b)):
-  // a whole-work-state summary, not scoped to `id` like the sections above —
-  // it reports on the learning area as a whole even when `check <id>` was
-  // called for one item.
-  const entropy = formatEntropySection(view, dir);
-  if (entropy) {
-    sections.push(entropy);
-  }
-  if (sections.length === 0) {
-    return 'chưa có dữ liệu';
-  }
-  return sections.join('\n\n');
+// One structured entry per item, always naming both halves explicitly
+// (`predicted`/`actual`) even when a half is still missing (null) — this is
+// what makes the output real CoS evidence (per plan Approach S1) rather than
+// a bare "has outcome" flag: a reader (agent or e2e assertion) sees the
+// actual predicted/actual VALUES, not just their presence.
+function collectOutcomeEntry(id, entry) {
+  return { id, predicted: entry?.predicted ?? null, actual: entry?.actual ?? null };
 }
 
 // Friction report cap (per porting lesson predicted-actual-feedback-store:
 // "gợi ý luôn CAP, không xả vô hạn") — counts are always full, the record
-// list shown is only the newest few.
+// list returned is only the newest few.
 const FRICTION_DISPLAY_CAP = 5;
 
-// Friction channel section (kênh 2 của capture 2 kênh — Phase 3 Slice 2):
-// per-layer counts over ALL matching records, then the newest records capped
+// Friction channel data (kênh 2 của capture 2 kênh — Phase 3 Slice 2):
+// per-layer counts over ALL matching records, plus the newest records capped
 // at FRICTION_DISPLAY_CAP. `frictions` is a lazy view key (replay.mjs) — a
-// log with no work.friction events has no key and this section disappears,
-// keeping `check` output byte-identical to pre-friction logs.
-function formatFrictionSection(view, id) {
+// log with no work.friction events has no key and this returns null, keeping
+// `check`'s data shape byte-identical to pre-friction logs.
+function collectFrictionData(view, id) {
   const frictions = view.frictions ?? {};
   const records = (id ? [id] : Object.keys(frictions)).flatMap((itemId) =>
     (frictions[itemId] ?? []).map((r) => ({ ...r, id: r.id ?? itemId })),
   );
   if (records.length === 0) {
-    return '';
+    return null;
   }
   const byLayer = {};
   for (const r of records) {
     byLayer[r.layer] = (byLayer[r.layer] ?? 0) + 1;
   }
-  const layerLine = Object.entries(byLayer)
-    .map(([layer, n]) => `${layer} ${n}`)
-    .join(' · ');
   const recent = records
     .sort((a, b) => ((a.ts ?? '') < (b.ts ?? '') ? -1 : 1))
     .slice(-FRICTION_DISPLAY_CAP)
-    .reverse()
-    .map((r) =>
-      `  - [${r.disposition}] ${r.id} ${r.errorClass}/${r.layer} (attempts ${r.attempts}): ${r.detail ?? ''}`.trimEnd(),
-    );
-  return `friction (${records.length}):\n  theo lớp: ${layerLine}\n${recent.join('\n')}`;
+    .reverse();
+  return { count: records.length, byLayer, recent };
 }
 
 // `review`'s trace summary (pr-lifecycle-2 cell action: "kèm trace tóm tắt
-// (outcome/friction)"): reuses the SAME two sections `check` already prints
-// — no new formatter, no new data source — so a reviewer sees exactly the
-// outcome/friction history `fgos check <id>` would show, folded into the
-// review output instead of requiring a second command.
-function formatReviewTrace(view, id) {
-  const sections = [];
-  const outcomeEntry = view.outcomes?.[id];
-  if (outcomeEntry) {
-    sections.push(formatOutcomeBlock(id, outcomeEntry));
-  }
-  const friction = formatFrictionSection(view, id);
-  if (friction) {
-    sections.push(friction);
-  }
-  return sections.join('\n\n');
+// (outcome/friction)"): reuses the SAME two data sources `check` already
+// returns — no new collector, no new data source — so a reviewer gets
+// exactly the outcome/friction history `fgos check <id>` would show, folded
+// into the review payload instead of requiring a second command.
+function collectReviewTrace(view, id) {
+  const outcomeEntry = view.outcomes?.[id] ?? null;
+  return {
+    outcome: outcomeEntry ? collectOutcomeEntry(id, outcomeEntry) : null,
+    friction: collectFrictionData(view, id),
+  };
 }
 
 // Settlement report cap — same "always CAP, never unbounded" rule as
 // friction's cap above (porting lesson predicted-actual-feedback-store).
 const SETTLEMENT_DISPLAY_CAP = 5;
 
-// Settlement channel section (kênh 1 của capture 2 kênh — Phase 3
+// Settlement channel data (kênh 1 của capture 2 kênh — Phase 3
 // S3-closeout, vision §8): per-kind/actor counts over ALL matching records,
-// then the newest records capped at SETTLEMENT_DISPLAY_CAP. `settlements` is
+// plus the newest records capped at SETTLEMENT_DISPLAY_CAP. `settlements` is
 // a lazy view key (replay.mjs) — a log with no settling event has no key and
-// this section disappears, keeping `check` output byte-identical to
+// this returns null, keeping `check`'s data shape byte-identical to
 // pre-settlement logs.
-function formatSettlementSection(view, id) {
+function collectSettlementData(view, id) {
   const settlements = view.settlements ?? {};
   const records = (id ? [id] : Object.keys(settlements)).flatMap((itemId) =>
     (settlements[itemId] ?? []).map((r) => ({ ...r, id: itemId })),
   );
   if (records.length === 0) {
-    return '';
+    return null;
   }
   const byKindActor = {};
   for (const r of records) {
     const key = `${r.kind}/${r.actor ?? 'unknown'}`;
     byKindActor[key] = (byKindActor[key] ?? 0) + 1;
   }
-  const summaryLine = Object.entries(byKindActor)
-    .map(([key, n]) => `${key} ${n}`)
-    .join(' · ');
   const recent = records
     .sort((a, b) => ((a.ts ?? '') < (b.ts ?? '') ? -1 : 1))
     .slice(-SETTLEMENT_DISPLAY_CAP)
-    .reverse()
-    .map((r) => `  - [${r.kind}] ${r.id} actor=${r.actor ?? 'unknown'}: ${r.detail ?? ''}`.trimEnd());
-  return `settlement (${records.length}):\n  theo kind/actor: ${summaryLine}\n${recent.join('\n')}`;
+    .reverse();
+  return { count: records.length, byKindActor, recent };
 }
 
 // Learning report cap — same "always CAP, never unbounded" rule as
 // friction/settlement's caps above (porting lesson predicted-actual-feedback-store).
 const LEARNING_DISPLAY_CAP = 5;
 
-// Câu-6 tự động section (per Phase 3 S3-closeout (c), six-questions L5): one
+// Câu-6 tự động data (per Phase 3 S3-closeout (c), six-questions L5): one
 // record per item that has reached `done`, composed mechanically by
-// store.mjs at close time (never here — this only reads and formats).
+// store.mjs at close time (never here — this only reads and collects).
 // `learnings` is a lazy view key (replay.mjs) — a log with no item ever
-// closed has no key and this section disappears, keeping `check` output
-// byte-identical to pre-câu-6 logs, mirroring the friction/settlement
-// sections' own "absent data -> no section" rule.
-function formatLearningSection(view, id) {
+// closed has no key and this returns null, mirroring the friction/settlement
+// data's own "absent data -> null" rule.
+function collectLearningData(view, id) {
   const learnings = view.learnings ?? {};
   const records = (id ? [id] : Object.keys(learnings)).flatMap((itemId) =>
     (learnings[itemId] ?? []).map((r) => ({ ...r, id: itemId })),
   );
   if (records.length === 0) {
-    return '';
+    return null;
   }
   const recent = records
     .sort((a, b) => ((a.ts ?? '') < (b.ts ?? '') ? -1 : 1))
     .slice(-LEARNING_DISPLAY_CAP)
-    .reverse()
-    .map((r) => {
-      const outcomeStr = r.outcome
-        ? `disposition=${r.outcome.disposition ?? 'n/a'} attempts=${r.outcome.attempts ?? 'n/a'} errorClass=${r.outcome.errorClass ?? 'n/a'}`
-        : 'chưa có outcome';
-      const frictionEntries = Object.entries(r.frictions ?? {});
-      const frictionStr = frictionEntries.length ? frictionEntries.map(([k, n]) => `${k} ${n}`).join(' · ') : 'không';
-      const settlementEntries = Object.entries(r.settlements ?? {});
-      const settlementStr = settlementEntries.length
-        ? settlementEntries.map(([k, n]) => `${k} ${n}`).join(' · ')
-        : 'không';
-      return `  - ${r.id}: ${outcomeStr}; friction: ${frictionStr}; settlement: ${settlementStr}`;
-    });
-  return `learning (${records.length}):\n${recent.join('\n')}`;
+    .reverse();
+  return { count: records.length, recent };
 }
 
-// Outcome-lifecycle nag (per porting lesson porting-outcome-lifecycle: the
-// check surface reminds records that reached an end state without their
+// Outcome-lifecycle nag data (per porting lesson porting-outcome-lifecycle:
+// the check surface reminds records that reached an end state without their
 // outcome). An item sitting in a final status should carry its actual half;
 // listing the ones that don't keeps the predicted→actual loop honest.
-function formatMissingOutcomeNag(view, id) {
+function collectMissingOutcomeNag(view, id) {
   const outcomes = view.outcomes ?? {};
   const FINAL_STATUSES = new Set(['proposed', 'blocked', 'done']);
   const missing = Object.values(view.work ?? {})
     .filter((w) => (!id || w.id === id) && FINAL_STATUSES.has(w.status) && !outcomes[w.id]?.actual)
     .map((w) => w.id);
   if (missing.length === 0) {
-    return '';
+    return null;
   }
-  return `nhắc: ${missing.length} item ở trạng thái cuối chưa có nửa actual: ${missing.join(', ')}`;
+  return { count: missing.length, ids: missing };
 }
 
 // Entropy-trend history path (per this cell's action (2) / must_haves: MUST
@@ -402,7 +325,7 @@ function readLastHistoryEntry(dir) {
 // Appends exactly one history line per `check` run — same
 // append-then-nothing-else discipline as events.mjs's appendEvent, but this
 // file (unlike events.jsonl/state.json) is new per this cell and never
-// read by store.mjs/replay.mjs. Only ever called when formatEntropySection
+// read by store.mjs/replay.mjs. Only ever called when collectEntropyData
 // has already confirmed there is work-state data to report on (below) —
 // so a `check` against an uninitialized dir never creates it.
 function appendHistoryEntry(dir, entry) {
@@ -410,98 +333,54 @@ function appendHistoryEntry(dir, entry) {
   fs.appendFileSync(entropyHistoryPath(dir), `${JSON.stringify(entry)}\n`, 'utf8');
 }
 
-function signed(n) {
-  return n >= 0 ? `+${n}` : `${n}`;
-}
-
-// Builds one "<delta> <label>" seal-digest clause, but ONLY when that
-// channel actually has something to say — either a nonzero count right now
-// or a nonzero delta since the last checkpoint. This mirrors the
-// friction/settlement sections' own "absent data -> no section" rule one
-// level down (per clause instead of per section): `check`'s existing
-// contract on a clean log asserts the literal words "friction"/"settlement"
-// never appear when there is no such data at all (see the friction/
-// settlement section tests above), and a bare "+0 friction" clause would
-// violate that even though the NUMBER is accurate. Silence, not a zero, is
-// what "nothing happened on this channel" looks like here.
-function formatSealDigestClause(label, count, delta) {
-  if (count === 0 && delta === 0) {
-    return null;
-  }
-  return `${signed(delta)} ${label}`;
-}
-
-// Entropy-trend + seal-digest section (per this cell's action (2)/(3)):
+// Entropy-trend + seal-digest data (per this cell's action (2)/(3)):
 // reported only when at least one work item exists — an empty view (no log
-// at all) must keep `check`'s existing "chưa có dữ liệu" / never-initializes
-// contract byte-identical (the same "absent data -> no section" rule the
-// friction/settlement sections already follow), rather than writing a
-// zero-score checkpoint into a directory that was never initialized.
-function formatEntropySection(view, dir) {
+// at all) returns null, keeping `check`'s existing "no data at all" contract
+// byte-identical (the same "absent data -> null" rule the friction/
+// settlement data already follow), rather than writing a zero-score
+// checkpoint into a directory that was never initialized. `compounded` always
+// carries every channel's raw delta since the last checkpoint (never
+// suppressed for a zero value) — the caller decides what is worth surfacing.
+function collectEntropyData(view, dir) {
   if (Object.keys(view.work ?? {}).length === 0) {
-    return '';
+    return null;
   }
   const { score, parts } = computeEntropy(view);
   const counts = computeCounts(view);
   const prev = readLastHistoryEntry(dir);
   appendHistoryEntry(dir, { ts: new Date().toISOString(), score, counts });
 
-  const trendLine = prev
-    ? `entropy: ${score} (${signed(score - prev.score)} so lần trước)`
-    : `entropy: ${score} (baseline)`;
-  const partsLines = parts
-    .filter((p) => p.count > 0)
-    .map((p) => `  - ${p.label}: ${p.count} × ${p.weight} = ${p.points}`);
+  const trend = prev ? { baseline: false, delta: score - prev.score } : { baseline: true, delta: null };
   const prevCounts = prev?.counts ?? { outcomes: 0, frictions: 0, settlements: 0 };
-  const sealClauses = [
-    formatSealDigestClause('outcome', counts.outcomes, counts.outcomes - prevCounts.outcomes),
-    formatSealDigestClause('friction', counts.frictions, counts.frictions - prevCounts.frictions),
-    formatSealDigestClause('settlement', counts.settlements, counts.settlements - prevCounts.settlements),
-  ].filter(Boolean);
-  const sealLine = sealClauses.length > 0 ? `compounded: ${sealClauses.join(' /')}` : null;
-
-  return [trendLine, ...partsLines, sealLine].filter(Boolean).join('\n');
+  const compounded = {
+    outcomes: counts.outcomes - prevCounts.outcomes,
+    frictions: counts.frictions - prevCounts.frictions,
+    settlements: counts.settlements - prevCounts.settlements,
+  };
+  return { score, trend, parts: parts.filter((p) => p.count > 0), counts, compounded };
 }
 
-// Gate A candidate-list formatter (self-improve-loop P13 Slice 1, D6/D11):
-// one line per ranked candidate, every field a human needs to judge it
-// (id/score/disposition/errorClass/layer/attempts/detail — same discipline
-// as the friction/settlement sections' "every field, never a truncated
-// subset" rule). Never capped (unlike FRICTION_DISPLAY_CAP) — Gate A must
-// show every open candidate, since the human is choosing among ALL of them.
-function formatCandidateLine(c) {
-  return `  - ${c.id} score=${c.score} [${c.disposition ?? 'n/a'}] ${c.errorClass ?? 'n/a'}/${c.layer ?? 'n/a'} (attempts ${c.attempts ?? 'n/a'}): ${c.detail ?? ''}`.trimEnd();
-}
-
-function formatCandidateList(candidates) {
-  if (candidates.length === 0) {
-    return 'evolve: không có friction chưa ngã-ngũ nào — không có candidate nào để chọn.';
-  }
-  return `candidates (${candidates.length}):\n${candidates.map(formatCandidateLine).join('\n')}`;
-}
-
-// Backlog-triage impact ranking (P21): blocking-fan-out ranked list, one line
-// per open item — `blocks` is how many other still-open items depend on it.
-function formatTriage(ranked) {
-  if (ranked.length === 0) {
-    return 'triage: không có việc mở nào để xếp hạng.';
-  }
-  const lines = ranked.map((r) => `${r.id} — ${r.title} (${r.status}) — blocks ${r.blocks}`);
-  return `triage (${ranked.length}):\n${lines.join('\n')}`;
-}
-
-// Session registry list (fgos session list): the same "count header + one
-// line per record" plain-text shape triage/candidate lists use. Each line
-// carries the fields a human/agent needs to `cd` into a session's worktree
-// or end it — id, worktree path, bound item, start time.
-function formatSessions(entries) {
-  if (entries.length === 0) {
-    return 'session: không có phiên nào đang mở.';
-  }
-  const lines = entries.map(
-    (e) => `${e.sessionId} — ${e.worktreePath} — item ${e.itemId ?? '(none)'} — started ${e.startedAt}`,
-  );
-  return `sessions (${entries.length}):\n${lines.join('\n')}`;
+// Read-only data collector (per D1 request-class): folds `view.outcomes`
+// (lazy key — absent on any log with no work.outcome events, per replay.mjs)
+// plus the friction/settlement/learning/nag/entropy channels above into one
+// predicted-vs-actual report. Never throws on missing data — an item with no
+// outcome yet, or a log with no `outcomes` key at all, both return an empty
+// outcomes list and the caller still exits 0 (this is a read, not a
+// validation failure).
+function collectCheckData(view, id, dir) {
+  const outcomes = view.outcomes ?? {};
+  const ids = id ? [id] : Object.keys(outcomes);
+  return {
+    outcomes: ids.map((itemId) => collectOutcomeEntry(itemId, outcomes[itemId])),
+    friction: collectFrictionData(view, id),
+    settlement: collectSettlementData(view, id),
+    learning: collectLearningData(view, id),
+    missingOutcomeNag: collectMissingOutcomeNag(view, id),
+    // Entropy-trend + seal-digest: a whole-work-state summary, not scoped to
+    // `id` like the fields above — it reports on the learning area as a
+    // whole even when `check <id>` was called for one item.
+    entropy: collectEntropyData(view, dir),
+  };
 }
 
 // Rollup view (P24): direct children only (`w.parent === id`) — decompose
@@ -510,22 +389,21 @@ function formatSessions(entries) {
 // complexity with nothing real to show yet (YAGNI over frontier.mjs's
 // multi-level `hasOpenDescendant` walk, which exists for a different job —
 // gating the frontier, not reporting progress).
-function formatRollup(view, id) {
+function collectRollupData(view, id) {
   const item = view.work?.[id];
   if (!item) {
     throw new StoreError('validation', `rollup: work "${id}" not found.`);
   }
   const children = Object.values(view.work).filter((w) => w.parent === id);
   const done = children.filter((w) => w.status === 'done').length;
-  const lines = [`${id} — ${item.title} (${item.status})`, `${done}/${children.length} done`];
-  if (children.length === 0) {
-    lines.push('không có con');
-  } else {
-    for (const child of children) {
-      lines.push(`  - ${child.id}: ${child.title} (${child.status})`);
-    }
-  }
-  return lines.join('\n');
+  return {
+    id,
+    title: item.title,
+    status: item.status,
+    doneCount: done,
+    totalCount: children.length,
+    children: children.map((c) => ({ id: c.id, title: c.title, status: c.status })),
+  };
 }
 
 // Shared body of the `submit` verb (P14) — extracted per self-improve-loop
@@ -581,7 +459,7 @@ function submitWork(dir, text, opts = {}) {
       ?? getDomain(opts.domain, { onUnrecognized: () => {} }).stages[0],
   };
   const { event } = addWork(dir, work);
-  return JSON.stringify(wrapEnvelope(event.payload), null, 2);
+  return event.payload;
 }
 
 // Composes the human-readable description `evolve --submit` hands to
@@ -610,17 +488,14 @@ async function runVerb(verb, flags, positional, dir) {
       initStore(dir);
       // D4: detection/manifest writing must never fail init — a permissions
       // quirk or unexpected error here still leaves `.fgos/` initialized.
-      let coexistNote = '';
+      let detectedHarnesses = [];
       try {
         const manifest = writeCoexistenceManifest(path.dirname(dir), dir);
-        if (manifest.detected_harnesses.length > 0) {
-          const names = manifest.detected_harnesses.map((h) => h.name).join(', ');
-          coexistNote = `\nDetected other harness(es): ${names} — leaving them untouched.`;
-        }
+        detectedHarnesses = manifest.detected_harnesses;
       } catch {
         // Swallowed by design (D4 fail-safe) — see comment above.
       }
-      return `Initialized ${dir}${coexistNote}`;
+      return { dir, detectedHarnesses };
     }
 
     case 'add': {
@@ -655,7 +530,7 @@ async function runVerb(verb, flags, positional, dir) {
         domain: optionalField(flags.domain, 'add --domain requires a domain name (e.g. coding/synthetic); omit --domain entirely to use the default.'),
       };
       const { event } = addWork(dir, work);
-      return `Added ${event.payload.id} (event #${event.seq})`;
+      return { id: event.payload.id, seq: event.seq };
     }
 
     // Intake verb (P14, D1-D6): takes a single free-text blob, derives its
@@ -693,7 +568,7 @@ async function runVerb(verb, flags, positional, dir) {
       const result = stage === 'decompose'
         ? resolveDecompose(dir, id, cfg, 'session')
         : resolveDiscovery(dir, id, cfg, 'session');
-      return JSON.stringify(wrapEnvelope(result), null, 2);
+      return result;
     }
 
     case 'move': {
@@ -707,7 +582,7 @@ async function runVerb(verb, flags, positional, dir) {
       // supplied.
       const reason = optionalField(flags.reason, 'move --reason requires a non-empty reason value (omit --reason entirely when not rejecting a proposal)');
       const { event } = moveWork(dir, { id, to, expectedStatus, reason, actor: 'human' });
-      return `Moved ${id}: ${event.payload.from} -> ${event.payload.to} (event #${event.seq})`;
+      return { id, from: event.payload.from, to: event.payload.to, seq: event.seq };
     }
 
     // Patches fields on an existing item (P23, D2-D5) — the "always
@@ -737,7 +612,7 @@ async function runVerb(verb, flags, positional, dir) {
         );
       }
       const { event } = editWork(dir, { id, patch, actor: 'human' });
-      return `Edited ${id}: ${Object.keys(patch).join(', ')} (event #${event.seq})`;
+      return { id, fields: Object.keys(patch), seq: event.seq };
     }
 
     // Parks the item into `awaiting-human`, carrying the question it is
@@ -749,7 +624,7 @@ async function runVerb(verb, flags, positional, dir) {
       const text = requireField(flags.text, 'ask requires --text "..."');
       const expectedStatus = optionalField(flags.expect, 'ask --expect requires a status value (omit --expect entirely to skip the CAS check)');
       const { event } = putInAwaiting(dir, { id, ask: text, expectedStatus });
-      return `Parked ${id}: ${event.payload.from} -> ${event.payload.to} (event #${event.seq})`;
+      return { id, from: event.payload.from, to: event.payload.to, seq: event.seq };
     }
 
     // Records the answer and resumes the item to `todo` (per D2/D5). Same
@@ -761,17 +636,17 @@ async function runVerb(verb, flags, positional, dir) {
       const text = requireField(flags.text, 'answer requires --text "..."');
       const expectedStatus = optionalField(flags.expect, 'answer --expect requires a status value (omit --expect entirely to skip the CAS check)');
       const { event } = answerAwaiting(dir, { id, answer: text, expectedStatus, actor: 'human' });
-      return `Answered ${id}: ${event.payload.from} -> ${event.payload.to} (event #${event.seq})`;
+      return { id, from: event.payload.from, to: event.payload.to, seq: event.seq };
     }
 
     case 'decision': {
       const text = requireField(flags.text ?? (positional.length ? positional.join(' ') : undefined), 'decision requires --text "..."');
       const { event } = addDecision(dir, { text });
-      return `Logged decision (event #${event.seq})`;
+      return { seq: event.seq };
     }
 
     case 'list': {
-      return JSON.stringify(listWork(dir), null, 2);
+      return listWork(dir);
     }
 
     // Request-class per D1: a pure read — never appends an event, never
@@ -779,12 +654,12 @@ async function runVerb(verb, flags, positional, dir) {
     // through store.readyWork only; this file never imports frontier.mjs
     // directly (per this cell's key_links).
     case 'ready': {
-      return JSON.stringify(readyWork(dir), null, 2);
+      return readyWork(dir);
     }
 
     case 'rebuild': {
       const view = rebuild(dir);
-      return `Rebuilt view: ${Object.keys(view.work).length} work item(s), ${view.decisions.length} decision(s).`;
+      return { workCount: Object.keys(view.work).length, decisionCount: view.decisions.length };
     }
 
     // Operator-invoked repair (per readEvents' fail-closed 'corrupt-log'
@@ -795,7 +670,7 @@ async function runVerb(verb, flags, positional, dir) {
     case 'repair': {
       const logPath = path.join(dir, 'events.jsonl');
       const { backupPath, droppedLine, eventCount } = repairTruncatedLastLine(logPath);
-      return `Repaired ${logPath}: dropped truncated final line, backup at ${backupPath} (${eventCount} event(s) remain).\ndropped: ${droppedLine}`;
+      return { logPath, backupPath, eventCount, droppedLine };
     }
 
     // Request-class per D1 (same contract as `ready`/`list`): a pure read,
@@ -805,7 +680,7 @@ async function runVerb(verb, flags, positional, dir) {
     // export needed for reading, per this cell's action.
     case 'check': {
       const id = optionalField(positional[0] ?? flags.id, 'check --id requires a non-empty id value (omit --id entirely to check every item)');
-      return formatCheck(listWork(dir), id, dir);
+      return collectCheckData(listWork(dir), id, dir);
     }
 
     // Rollup view theo bộ (P24, request-class per D1: a pure read — never
@@ -816,7 +691,7 @@ async function runVerb(verb, flags, positional, dir) {
     // rồi" answer without a human filtering `list` by hand.
     case 'rollup': {
       const id = requireField(positional[0] ?? flags.id, 'rollup requires an id: fgos rollup <id>');
-      return formatRollup(listWork(dir), id);
+      return collectRollupData(listWork(dir), id);
     }
 
     // Cửa pull — take (stage-decompose S2-pull D1): a tác nhân ngoài runner
@@ -877,7 +752,7 @@ async function runVerb(verb, flags, positional, dir) {
           id,
           predicted: { tier: item.tier ?? DEFAULTS.tier, deps: item.deps.length, priorVisits, actor, branchHeadAtTake },
         });
-        return `Took ${id}: blocked -> doing (actor=${actor}, branch=${branch}, branchHeadAtTake=${branchHeadAtTake}) (event #${event.seq})`;
+        return { id, from: 'blocked', to: 'doing', actor, seq: event.seq, source: 'branch', branch, branchHeadAtTake };
       }
 
       const headAtTake = currentHead(process.cwd());
@@ -886,7 +761,7 @@ async function runVerb(verb, flags, positional, dir) {
         id,
         predicted: { tier: item.tier ?? DEFAULTS.tier, deps: item.deps.length, priorVisits, actor, headAtTake },
       });
-      return `Took ${id}: todo -> doing (actor=${actor}, headAtTake=${headAtTake}) (event #${event.seq})`;
+      return { id, from: 'todo', to: 'doing', actor, seq: event.seq, source: 'main', headAtTake };
     }
 
     // Cửa pull — return (stage-decompose S2-pull D1/R13): KHÔNG tin lời
@@ -974,7 +849,7 @@ async function runVerb(verb, flags, positional, dir) {
         if (check.passed) {
           const { event } = moveWork(dir, { id, to: 'proposed', expectedStatus: 'doing', branchHeadAtReturn: branchHead });
           addOutcome(dir, { id, actual: { outcome: 'proposed', passed: true, attempts: 1, errorClass: null, aheadCount: branchAheadCount } });
-          return `Returned ${id}: doing -> proposed (verify passed on branch "${branch}", ${branchAheadCount} commit(s)) (event #${event.seq})\n${check.output}`;
+          return { id, from: 'doing', to: 'proposed', source: 'branch', branch, aheadCount: branchAheadCount, passed: true, seq: event.seq, output: check.output };
         }
 
         moveWork(dir, { id, to: 'blocked', expectedStatus: 'doing', reason: 'verify-fail' });
@@ -987,7 +862,7 @@ async function runVerb(verb, flags, positional, dir) {
           attempts: 1,
           detail: `goal-check failed on branch "${branch}" (exit ${check.status})`,
         });
-        return `Returned ${id}: doing -> blocked (verify failed on branch "${branch}", exit ${check.status})\n${check.output}`;
+        return { id, from: 'doing', to: 'blocked', source: 'branch', branch, aheadCount: branchAheadCount, passed: false, exitStatus: check.status, output: check.output };
       }
 
       if (typeof item.headAtTake !== 'string' || !item.headAtTake) {
@@ -1011,7 +886,7 @@ async function runVerb(verb, flags, positional, dir) {
       if (check.passed) {
         const { event } = moveWork(dir, { id, to: 'proposed', expectedStatus: 'doing', headAtReturn: head });
         addOutcome(dir, { id, actual: { outcome: 'proposed', passed: true, attempts: 1, errorClass: null, aheadCount } });
-        return `Returned ${id}: doing -> proposed (verify passed, ${aheadCount} commit(s)) (event #${event.seq})\n${check.output}`;
+        return { id, from: 'doing', to: 'proposed', source: 'main', aheadCount, passed: true, seq: event.seq, output: check.output };
       }
 
       moveWork(dir, { id, to: 'blocked', expectedStatus: 'doing', reason: 'verify-fail' });
@@ -1024,7 +899,7 @@ async function runVerb(verb, flags, positional, dir) {
         attempts: 1,
         detail: `goal-check failed (exit ${check.status})`,
       });
-      return `Returned ${id}: doing -> blocked (verify failed, exit ${check.status})\n${check.output}`;
+      return { id, from: 'doing', to: 'blocked', source: 'main', aheadCount, passed: false, exitStatus: check.status, output: check.output };
     }
 
     // Cổng duyệt PR nội bộ (pr-lifecycle D1/D4): a proposed item's diff,
@@ -1071,15 +946,15 @@ async function runVerb(verb, flags, positional, dir) {
         if (prNumber !== undefined) {
           const result = await viewGitHubPRStatus(repoRoot, prNumber, { ...ghCommandOpts(), pollTimeoutMs: 0 });
           if (result.outcome === 'blocked') {
-            return `Review ${id}: GitHub PR #${prNumber} status check failed (reason ${result.reason}) — no state change.\n${result.detail}`;
+            return { id, mode: 'github-status', prNumber, outcome: 'check-failed', reason: result.reason, detail: result.detail };
           }
           if (!result.closed) {
-            return `Review ${id}: GitHub PR #${prNumber} is still open — nothing to reconcile. Approve it after a GitHub-side review with \`fgos approve ${id} --github --pr ${prNumber}\`.`;
+            return { id, mode: 'github-status', prNumber, outcome: 'open' };
           }
           if (result.mergedAt) {
-            return `Review ${id}: GitHub PR #${prNumber} was merged (${result.mergedAt}) — informational only, no local state change made here.`;
+            return { id, mode: 'github-status', prNumber, outcome: 'merged', mergedAt: result.mergedAt };
           }
-          return `Review ${id}: GitHub PR #${prNumber} was CLOSED WITHOUT MERGING — this is not itself a reject and changes nothing locally. Run \`fgos reject ${id} --reason "..."\` if you want the item back in the todo queue.`;
+          return { id, mode: 'github-status', prNumber, outcome: 'closed-unmerged' };
         }
 
         const head = branchNameFor(id);
@@ -1099,9 +974,9 @@ async function runVerb(verb, flags, positional, dir) {
           ghCommandOpts(),
         );
         if (result.outcome === 'created') {
-          return `Reviewed ${id}: opened GitHub PR #${result.prNumber} (${head} -> ${base}). Approve it after a GitHub-side review with \`fgos approve ${id} --github --pr ${result.prNumber}\`; inspect it with \`gh pr view ${result.prNumber} --web\` or your GitHub remote's PR list.`;
+          return { id, mode: 'github-create', outcome: 'created', prNumber: result.prNumber, head, base };
         }
-        return `Review ${id}: GitHub PR creation failed (reason ${result.reason}) — no state change.\n${result.detail}`;
+        return { id, mode: 'github-create', outcome: 'failed', reason: result.reason, detail: result.detail };
       }
 
       // D3 leaf-vs-root split: a leaf (its resolved root is a different
@@ -1112,18 +987,7 @@ async function runVerb(verb, flags, positional, dir) {
       const { source, diff, warnings } = rootId !== id
         ? reviewDiff(process.cwd(), item, { trunk: branchNameFor(rootId) })
         : reviewDiff(process.cwd(), item);
-      const lines = [`${id} — source: ${source}`];
-      for (const warning of warnings) {
-        lines.push(`warning: ${warning}`);
-      }
-      if (diff !== null) {
-        lines.push('', diff.trim() === '' ? '(no changes)' : diff);
-      }
-      const trace = formatReviewTrace(view, id);
-      if (trace) {
-        lines.push('', trace);
-      }
-      return lines.join('\n');
+      return { id, mode: 'local', source, warnings, diff, trace: collectReviewTrace(view, id) };
     }
 
     // Cổng duyệt — approve (pr-lifecycle D3/D4): merges a runner item's
@@ -1180,7 +1044,7 @@ async function runVerb(verb, flags, positional, dir) {
           // origin copy are both left in place after a server-side merge (no
           // local cleanup mechanism exists for a branch merged on GitHub).
           const { event } = moveWork(dir, { id, to: 'done', expectedStatus: 'proposed', actor: 'human' });
-          return `Approved ${id}: merged GitHub PR #${prNumber}, proposed -> done (event #${event.seq})`;
+          return { id, mode: 'github', to: 'done', prNumber, seq: event.seq };
         }
         // blocked — mirrors the local merge-conflict/verify-fail-post-merge
         // shape: park proposed -> blocked with the classifyGhFailure reason,
@@ -1196,7 +1060,7 @@ async function runVerb(verb, flags, positional, dir) {
           attempts: 1,
           detail: `gh pr merge #${prNumber} failed at step ${result.step}: ${result.detail}`,
         });
-        return `Approved ${id}: GitHub PR #${prNumber} merge failed — proposed -> blocked (reason ${reason})\n${result.detail}`;
+        return { id, mode: 'github', to: 'blocked', prNumber, reason, detail: result.detail };
       }
 
       // Multi-session guard (fgos-multi-session-checkout Epic 2): approve must
@@ -1284,7 +1148,7 @@ async function runVerb(verb, flags, positional, dir) {
                 attempts: 1,
                 detail: `git merge --no-commit --no-ff ${result.branch} into ${rootBranch} conflicted; merge aborted, ${rootBranch} unchanged`,
               });
-              return `Approved ${id}: merge into ${rootBranch} conflicted — proposed -> blocked (reason merge-conflict), ${rootBranch} left unchanged`;
+              return { id, mode: 'merge', to: 'blocked', reason: 'merge-conflict', target: rootBranch };
             }
 
             if (result.outcome === 'verify-fail') {
@@ -1297,7 +1161,7 @@ async function runVerb(verb, flags, positional, dir) {
                 attempts: 1,
                 detail: `goal-check failed on staged merge into ${rootBranch} (exit ${result.check.status}); merge aborted, ${rootBranch} unchanged`,
               });
-              return `Approved ${id}: verify failed on staged merge into ${rootBranch} (exit ${result.check.status}) — proposed -> blocked (reason verify-fail-post-merge), ${rootBranch} left unchanged\n${result.check.output}`;
+              return { id, mode: 'merge', to: 'blocked', reason: 'verify-fail-post-merge', target: rootBranch, exitStatus: result.check.status, output: result.check.output };
             }
 
             // Merged: land the leaf's work on its root's branch, THEN
@@ -1310,8 +1174,16 @@ async function runVerb(verb, flags, positional, dir) {
             // warning), leaking the leaf's branch forever.
             const { event } = moveWork(dir, { id, to: 'done', expectedStatus: 'proposed', actor: 'human' });
             const cleanup = cleanupMergedBranch(ephemeral.path, result.branch);
-            const cleanupNote = cleanup.warnings.length ? `\ncleanup warning(s): ${cleanup.warnings.join('; ')}` : '';
-            return `Approved ${id}: merged ${result.branch} -> ${rootBranch}, verified, proposed -> done (event #${event.seq})${cleanupNote}\n${result.check.output}`;
+            return {
+              id,
+              mode: 'merge',
+              to: 'done',
+              target: rootBranch,
+              branch: result.branch,
+              seq: event.seq,
+              output: result.check.output,
+              cleanupWarnings: cleanup.warnings,
+            };
           } finally {
             // Per D4/D17: only the branch is durable, the worktree is
             // always ephemeral — removeWorktree never deletes the branch,
@@ -1350,7 +1222,7 @@ async function runVerb(verb, flags, positional, dir) {
             attempts: 1,
             detail,
           });
-          return `Approved ${id}: merge conflicted — proposed -> blocked (reason ${reason}), main left unchanged`;
+          return { id, mode: 'merge', to: 'blocked', reason, target: 'main' };
         }
 
         if (result.outcome === 'verify-fail') {
@@ -1367,13 +1239,21 @@ async function runVerb(verb, flags, positional, dir) {
             attempts: 1,
             detail,
           });
-          return `Approved ${id}: verify failed on staged merge (exit ${result.check.status}) — proposed -> blocked (reason ${reason}), main left unchanged\n${result.check.output}`;
+          return { id, mode: 'merge', to: 'blocked', reason, target: 'main', exitStatus: result.check.status, output: result.check.output };
         }
 
         const { event } = moveWork(dir, { id, to: 'done', expectedStatus: 'proposed', actor: 'human' });
         const cleanup = cleanupMergedBranch(repoRoot, result.branch);
-        const cleanupNote = cleanup.warnings.length ? `\ncleanup warning(s): ${cleanup.warnings.join('; ')}` : '';
-        return `Approved ${id}: merged ${result.branch} -> main, verified, proposed -> done (event #${event.seq})${cleanupNote}\n${result.check.output}`;
+        return {
+          id,
+          mode: 'merge',
+          to: 'done',
+          target: 'main',
+          branch: result.branch,
+          seq: event.seq,
+          output: result.check.output,
+          cleanupWarnings: cleanup.warnings,
+        };
       }
 
       // pull-door or legacy proposal: code is already on main (D4) — no
@@ -1390,10 +1270,10 @@ async function runVerb(verb, flags, positional, dir) {
           attempts: 1,
           detail: `goal-check failed on main (exit ${check.status})`,
         });
-        return `Approved ${id}: verify failed on main (exit ${check.status}) — proposed -> blocked (reason verify-fail)\n${check.output}`;
+        return { id, mode: 'verify-only', to: 'blocked', reason: 'verify-fail', exitStatus: check.status, output: check.output };
       }
       const { event } = moveWork(dir, { id, to: 'done', expectedStatus: 'proposed', actor: 'human' });
-      return `Approved ${id}: verified on main, proposed -> done (event #${event.seq})\n${check.output}`;
+      return { id, mode: 'verify-only', to: 'done', seq: event.seq, output: check.output };
     }
 
     // Cổng duyệt — reject (pr-lifecycle D4): proposed -> todo, reason
@@ -1412,7 +1292,7 @@ async function runVerb(verb, flags, positional, dir) {
         throw new StoreError('precondition', `reject: work "${id}" is "${item.status}", not "proposed" — nothing to reject.`);
       }
       const { event } = moveWork(dir, { id, to: 'todo', expectedStatus: 'proposed', reason, actor: 'human' });
-      return `Rejected ${id}: proposed -> todo (reason: ${reason}) (event #${event.seq}) — no revert, main unchanged`;
+      return { id, from: 'proposed', to: 'todo', reason, seq: event.seq };
     }
 
     // Catch-up-by-merge (D6/D7/D11, fan-out-parallel): the unified mechanism
@@ -1517,7 +1397,13 @@ async function runVerb(verb, flags, positional, dir) {
           // only detection + clean reporting; the item stays blocked
           // (unchanged) for a human to resolve manually via the existing
           // take/return branch flow.
-          return `Catch-up ${id}: merge of "${target}" into "${ownBranch}" conflicted (${conflictedFiles || 'unknown file(s)'}) — merge aborted, "${ownBranch}" left unchanged; resolve manually (take + merge + return).`;
+          return {
+            id,
+            outcome: 'conflict',
+            target,
+            branch: ownBranch,
+            conflictedFiles: conflictedFiles ? conflictedFiles.split('\n').filter(Boolean) : [],
+          };
         }
 
         // Clean merge staged (not yet committed) — the item's OWN verify
@@ -1530,7 +1416,7 @@ async function runVerb(verb, flags, positional, dir) {
           } catch (abortErr) {
             throw abortErr;
           }
-          return `Catch-up ${id}: merge of "${target}" into "${ownBranch}" was clean but verify failed (exit ${check.status}) — merge aborted, "${ownBranch}" left unchanged; investigate manually.\n${check.output}`;
+          return { id, outcome: 'verify-fail', target, branch: ownBranch, exitStatus: check.status, output: check.output };
         }
 
         execFileSync('git', ['commit', '-m', `catch-up: merge ${target} into ${ownBranch}`], { cwd: ephemeral.path, encoding: 'utf8', shell: false });
@@ -1538,7 +1424,7 @@ async function runVerb(verb, flags, positional, dir) {
         // touches 'doing', so anti-loop's visitCount never sees it. No
         // reason/ask required on this edge (fsm.mjs).
         const { event } = moveWork(dir, { id, to: 'proposed', expectedStatus: 'blocked', actor: 'runner' });
-        return `Catch-up ${id}: merged "${target}" -> "${ownBranch}", verified, blocked -> proposed (event #${event.seq})\n${check.output}`;
+        return { id, outcome: 'merged', from: 'blocked', to: 'proposed', target, branch: ownBranch, seq: event.seq, output: check.output };
       } finally {
         removeWorktree(repoRoot, ephemeral.path, { force: true });
       }
@@ -1573,7 +1459,7 @@ async function runVerb(verb, flags, positional, dir) {
         return submitWork(dir, describeCandidate(picked));
       }
       if (pickId === undefined) {
-        return formatCandidateList(candidates);
+        return candidates;
       }
       const picked = candidates.find((c) => c.id === pickId);
       if (!picked) {
@@ -1582,17 +1468,17 @@ async function runVerb(verb, flags, positional, dir) {
           `evolve --pick: "${pickId}" is not an open candidate — run "fgos evolve" to see the current ranked list.`,
         );
       }
-      // Reuses the existing friction-record formatter (formatFrictionSection
+      // Reuses the existing friction-record collector (collectFrictionData
       // above) rather than a new one — the picked candidate's "full record"
-      // IS that id's friction section.
-      return formatFrictionSection(view, pickId);
+      // IS that id's friction data.
+      return collectFrictionData(view, pickId);
     }
 
     // Backlog-triage impact ranking (P21) — separate from P14's intake-time
     // risk/lane classification: this ranks open work by blocking fan-out
     // (how many other open items it unblocks), not by how risky it is.
     case 'triage': {
-      return formatTriage(rankImpact(listWork(dir)));
+      return rankImpact(listWork(dir));
     }
 
     // Opt-in per-session git worktree lifecycle (fgos-multi-session-checkout
@@ -1613,17 +1499,15 @@ async function runVerb(verb, flags, positional, dir) {
         if (sub === 'start') {
           const itemId = optionalField(flags.item, 'session start --item requires a non-empty id value (omit --item entirely to start a session with no item bound)');
           const entry = createSession(repoRoot, { itemId });
-          const itemNote = entry.itemId ? ` (item ${entry.itemId})` : '';
-          return `Started session ${entry.sessionId}${itemNote}\nworktree: ${entry.worktreePath}\ncd ${entry.worktreePath}`;
+          return { ...entry };
         }
         if (sub === 'end') {
           const sessionId = requireField(positional[1], 'session end requires a session id: fgos session end <session-id> [--force]');
           const entry = endSession(repoRoot, sessionId, { force: Boolean(flags.force) });
-          const forcedNote = flags.force ? ' (forced)' : '';
-          return `Ended session ${entry.sessionId}${forcedNote} — removed worktree ${entry.worktreePath}`;
+          return { ...entry, forced: Boolean(flags.force) };
         }
         if (sub === 'list') {
-          return formatSessions(listSessions(repoRoot));
+          return listSessions(repoRoot);
         }
         throw new StoreError('validation', `unknown session sub-verb "${sub}". Usage: fgos session <start|end|list> ...`);
       } catch (err) {
@@ -1644,8 +1528,8 @@ async function main() {
   const { flags, positional } = parseArgs(rest);
 
   try {
-    const output = await runVerb(verb, flags, positional, dataDir());
-    console.log(output);
+    const data = await runVerb(verb, flags, positional, dataDir());
+    process.stdout.write(`${JSON.stringify(wrapEnvelope(data), null, 2)}\n`);
     process.exitCode = 0;
   } catch (err) {
     process.stderr.write(`fgos: ${err.message}\n`);
