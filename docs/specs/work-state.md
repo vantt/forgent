@@ -1,8 +1,8 @@
 ---
 area: work-state
 updated: 2026-07-18
-sources: [phase-1-state-layer, phase-1-review-fixes, phase-2-routing-s1, phase-2-routing-s2, phase-3-compound-learning-s1, phase-3-compound-learning-s2, phase-3-compound-learning-s3-closeout, async-human-gate, stage-intake, stage-clarify, stage-decompose-s1, stage-decompose-s2, pr-lifecycle-s1, install-coexistence, discovery-context, worker-execution, fan-out-parallel, human-rounds, work-item-verb-surface, base-workflow-model-s1, base-workflow-model-s2, self-improve-loop, work-graph-intelligence-s1, work-graph-intelligence-s2a]
-decisions: [9ac6ca50, 0790031c, 451ca088, fd17309a, 55ad2f9f, feed7428, 1a80b4d3, 65c642a8, 9f6b52c8, 9a19eea5, 96a65365, a7c099af, 43f257ae, 44936500, e1218b22, 6f2cbc47, a30a3d3c, 1359ab5e, f1715488, 8788e9bb, cfae0120, 396d9d9e, 2e92b7a5, 5a6900b2, b28487af, 2ae492d8, 76b7a36b, 8d04bba3, 1cd895e1, 38160a70, a2146274, 896219a7, b5c0ba0c]
+sources: [phase-1-state-layer, phase-1-review-fixes, phase-2-routing-s1, phase-2-routing-s2, phase-3-compound-learning-s1, phase-3-compound-learning-s2, phase-3-compound-learning-s3-closeout, async-human-gate, stage-intake, stage-clarify, stage-decompose-s1, stage-decompose-s2, pr-lifecycle-s1, install-coexistence, discovery-context, worker-execution, fan-out-parallel, human-rounds, work-item-verb-surface, base-workflow-model-s1, base-workflow-model-s2, self-improve-loop, work-graph-intelligence-s1, work-graph-intelligence-s2a, entry-standardization]
+decisions: [9ac6ca50, 0790031c, 451ca088, fd17309a, 55ad2f9f, feed7428, 1a80b4d3, 65c642a8, 9f6b52c8, 9a19eea5, 96a65365, a7c099af, 43f257ae, 44936500, e1218b22, 6f2cbc47, a30a3d3c, 1359ab5e, f1715488, 8788e9bb, cfae0120, 396d9d9e, 2e92b7a5, 5a6900b2, b28487af, 2ae492d8, 76b7a36b, 8d04bba3, 1cd895e1, 38160a70, a2146274, 896219a7, b5c0ba0c, b2d18cc7, b0da87aa]
 coverage: full
 ---
 
@@ -430,14 +430,38 @@ chạm trần chống-lặp, xem spec Runner R29) cũng đi qua CÙNG hai verb `
   bình thường (nhánh `fgw/<id>` còn sống) — không cần thay đổi cách phân
   loại nguồn của cổng duyệt.
 
-### Phong bì output (envelope) — chuẩn máy-đọc của `submit`
+### Phong bì output (envelope) — chuẩn máy-đọc của MỌI verb (per D b2d18cc7, b0da87aa)
 
-`submit` in kết quả bọc trong một phong bì chuẩn thay vì in thẳng dữ liệu: bốn
-trường `contract` (tên+phiên bản chuẩn phong bì), `generated_at` (thời điểm in),
+**Mọi verb** đều in kết quả thành công bọc trong một phong bì chuẩn duy nhất
+thay vì in thẳng dữ liệu hay câu chữ cho người. Phong bì có bốn trường:
+`contract` (tên+phiên bản chuẩn phong bì), `generated_at` (thời điểm in),
 `data_hash` (dấu vân tay của dữ liệu — bên đọc biết dữ liệu đổi chưa mà không
-cần so từng trường), và `data` (dữ liệu thật, ở đây là work item vừa tạo). Đây
-là hợp đồng máy-đọc đầu tiên của CLI này có code thật; các verb khác (`add`,
-`list`...) chưa dùng phong bì này.
+cần so từng trường), và `data` (dữ liệu thật của verb đó). Dữ liệu trong `data`
+là **có cấu trúc** (các trường tên rõ nghĩa), không phải câu xác nhận cho người:
+verb đọc (`list`/`ready`/`check`/…) trả thẳng đối tượng kết quả; verb ghi trả
+đúng những trường nó vừa đổi (ví dụ chuyển trạng thái trả `{id, from, to, seq}`)
+— nhờ vậy một surface bất kỳ đọc kết quả bằng MỘT bộ đọc chung, không phải dò
+regex trên chữ. Phong bì được đóng tại **một cửa in duy nhất**, nên không verb
+nào lọt lưới và không có hai cách in khác nhau.
+
+**Đường lỗi không bọc phong bì.** Chỉ đường thành công in phong bì ra `stdout`;
+khi verb ném lỗi, chẩn đoán đi ra `stderr` kèm mã thoát theo bảng phân loại lỗi
+(stdout=dữ liệu, stderr=chẩn đoán) — bên gọi phân biệt thành/bại bằng mã thoát,
+không phải bằng việc dò nội dung phong bì.
+
+### Sổ verb máy-đọc (manifest) — `--help --json`
+
+CLI công bố **toàn bộ mặt verb** dưới dạng một sổ máy-đọc: gọi trợ giúp ở dạng
+máy-đọc trả `{schema_version, commands: […]}`, mỗi mục mô tả một verb —
+`name`, cách gọi, mô tả một dòng, lược đồ tham số (cờ/positional), ví dụ, cờ
+**`access` (`read` hay `mutation`)** cho biết verb chỉ đọc hay có đổi trạng thái,
+và ô `deprecated`. Sổ này để một listener/giao diện **sinh** khung lệnh và khung
+form từ manifest thay vì hard-code từng verb. Bản thân sổ verb là **siêu dữ liệu
+về CLI**, KHÔNG bọc trong phong bì `data` (nó mô tả CLI, không phải kết quả một
+verb). Cờ `access` mới chỉ là **khai báo** — chưa nối vào điều-phối hay xác danh;
+cổng "ai được nói verb nào" là việc riêng sau này (backlog P38), sổ verb chỉ cung
+cấp nguyên liệu cho nó. Dạng trợ giúp thường (không máy-đọc) in cùng thông tin ở
+dạng chữ cho người đọc.
 
 ## Behaviors & Operations
 

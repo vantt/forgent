@@ -1,7 +1,7 @@
 ---
 area: system-overview
 updated: 2026-07-17
-decisions: [ca7de3cf, ae461c8b, ed953e09, 14ebeea9, 1a80b4d3, 65c642a8, 43f257ae, 6f2cbc47, a30a3d3c, 1359ab5e]
+decisions: [ca7de3cf, ae461c8b, ed953e09, 14ebeea9, 1a80b4d3, 65c642a8, 43f257ae, 6f2cbc47, a30a3d3c, 1359ab5e, b2d18cc7]
 coverage: partial
 ---
 
@@ -45,6 +45,8 @@ coverage: partial
 **Cổng duyệt PR nội bộ (work-state ↔ runner):** một đề xuất `proposed` — dù đến từ runner (nhánh `fgw/<id>`) hay từ cửa pull `take`/`return` (dải commit) — đi qua CÙNG một cổng: `review` (xem diff), `approve` (merge nếu có nhánh, rồi verify; hoặc chỉ verify nếu code đã trên main), `reject` (từ chối, không revert). Duyệt sạch đóng cạnh `→done` mang actor NGƯỜI; gãy đóng cạnh MỚI `proposed→blocked` mang lý do. Xem docs/specs/runner.md "Cổng duyệt PR nội bộ" cho hợp đồng đầy đủ.
 
 **Cửa pull giao–nhận việc (work-state, thay thế runner cho MỘT item):** một tác nhân ngoài runner — người, một phiên đang sống, hay một runner thứ hai — `fgos take` đúng một item từ CÙNG tập frontier runner dùng, rồi tự `fgos return`; `return` không tin lời người gọi, tự đo working tree sạch + HEAD tiến + verify thật trước khi item thành `proposed` mang `headAtReturn` — mirror đúng contract `proposed` của runner. Gặt-lại lúc khởi động của runner không bao giờ giẫm lên claim này (xem docs/specs/work-state.md "Cửa pull giao–nhận việc", docs/specs/runner.md). Dải `headAtTake→headAtReturn` là nguồn diff của đề xuất này khi nó tới cổng duyệt PR nội bộ (trên).
+
+**Hướng mặt-người đa-surface (đã chốt, chưa xây — backlog P37/P38, per D b2d18cc7):** mọi mặt người — cửa lệnh hôm nay, web/chat/webhook mai sau — là DA; ruột chỉ có một, và chỗ da gặp ruột là hợp đồng cửa-lệnh (envelope kết quả + phân loại exit đóng). Một listener nhận transport ngoài (web/chat) sống ở đất host-adapter và DỊCH yêu cầu thành verb — gọi cửa lệnh như một người dùng, không bao giờ mở đường ghi riêng; kèm cổng xác danh "ai được nói verb nào" trước khi dịch (mô tả tự do đổ vào intake là vector tiêm lệnh vì proof của việc chạy như lệnh — nguồn chưa kiểm phải qua cổng). Chuẩn hóa đi trước **đã xong** (P37): envelope bọc kết quả trên MỌI verb qua một cửa in duy nhất + một manifest verb máy-đọc (`--help --json`, mỗi verb có cờ `access` read/mutation) để mọi surface sinh giao diện từ manifest thay vì hard-code. Còn lại của hướng này: listener host-adapter + cổng xác danh (backlog P38). Chiều hệ→người chủ động (kênh chú-ý) chưa xây — surface tạm poll danh sách việc + so hash thay đổi của envelope; poll bắt đầu khó chịu là tín hiệu kênh chú-ý đến lượt.
 
 [unknown — vòng học distillery → porting → platform law cần harvest xác nhận từng bước; xem Open Gaps]
 
