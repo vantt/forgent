@@ -3,6 +3,8 @@
 
 # forgent state layer — events.jsonl is truth (committed); state.json is a derived view
 .fgos/state.json
+# worker dispatch logs — local observability, never committed (worker-dispatch-log D4)
+.fgos/logs/
 node_modules/
 
 # BEE:START

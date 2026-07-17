@@ -18,6 +18,12 @@
 // category -> exit code, and the four error classes raised anywhere in the
 // state layer are re-exported from here so bin/fgos.mjs never needs to
 // import fsm.mjs/work.mjs/events.mjs directly.
+//
+// SIBLING FACADE (D3, worker-dispatch-log): `.fgos/logs/` is written by a
+// separate narrow facade, worker-log.mjs — NOT this door. This module's
+// single-write-door scope stays exactly `events.jsonl` + `state.json` (the
+// event-sourced FSM truth and its view); unstructured worker dispatch output
+// is a different concern and never flows through moveWork/appendEvent.
 
 import fs from 'node:fs';
 import path from 'node:path';

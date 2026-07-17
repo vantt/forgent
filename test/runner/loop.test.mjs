@@ -538,6 +538,11 @@ test('worker-spawn-fail: nonexistent executor -> retry per matrix, then park to 
   assert.equal(result.dispatched[0].attempts, 2);
   assert.equal(listWork(dir).work['item-nospawn'].status, 'blocked');
   assert.deepEqual(fs.readdirSync(worktreeDir), []);
+  // worker-dispatch-log (D1/D3/D4): the failing outcome is persisted to
+  // .fgos/logs/<id>.log — recoverable after the fact, not console-only.
+  const logFile = path.join(dir, 'logs', 'item-nospawn.log');
+  assert.ok(fs.existsSync(logFile), 'worker dispatch log persisted for the failed spawn');
+  assert.match(fs.readFileSync(logFile, 'utf8'), /worker-spawn-fail/);
 });
 
 // --- anti-loop: max-visits parks the item OFF the frontier ----------------

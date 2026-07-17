@@ -27,6 +27,13 @@
 // output are surfaced on the console only (a tail, via `log`) — never
 // persisted to any committed path. This module writes no files at all
 // outside the store facade's own `.fgos/` writes.
+// SUPERSEDED (D1, worker-dispatch-log) — narrowed, not repealed: worker
+// stdout/stderr is now ALSO persisted to `.fgos/logs/` (git-ignored, per D4)
+// via the sibling worker-log.mjs facade, so an orchestrator can recover what
+// a worker did after the console tail scrolls past. The guarantee that
+// actually mattered still holds exactly — worker output never lands in a
+// committed/git-tracked path. Verify/goal-check output stays console-only
+// (out of scope).
 //
 // REPO ROOT: always derived from the caller's cwd (`git rev-parse
 // --show-toplevel`), never from this file's own location — the runner
@@ -57,6 +64,7 @@ import {
   BREAKER_MISSES,
 } from './anti-loop.mjs';
 import { spawnWorker, modelForTier } from './dispatch.mjs';
+import { appendWorkerLog } from './worker-log.mjs';
 import { createWorktree, removeWorktree, listLeftovers, branchNameFor, createBranchRef } from './worktree.mjs';
 import { runGoalCheck } from './goal-check.mjs';
 import { createWriteQueue } from './write-queue.mjs';
@@ -526,6 +534,18 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
         },
       });
       log(`fgos-runner: worker for "${item.id}" exited ${worker.status ?? `signal ${worker.signal}`} (tier ${worker.tier} -> ${worker.model})`);
+      // Persist the worker's own output for after-the-fact recovery (D1/D3/D4):
+      // right after the spawn resolves, before goal-check — so success AND
+      // verify-miss are both captured (goal-check runs next).
+      appendWorkerLog(dir, item.id, {
+        attempt,
+        tier: worker.tier,
+        model: worker.model,
+        status: worker.status,
+        signal: worker.signal,
+        stdout: worker.stdout,
+        stderr: worker.stderr,
+      });
 
       const check = await runGoalCheck(item, wt.path, config.timeoutMs);
       const facts = branchFacts(repoRoot, wt.branch);
@@ -569,6 +589,21 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
         // (worktree-fail) — recovery-matrix vocabulary, routed below.
         failure = { errorClass: err.errorClass, message: err.message };
         log(`fgos-runner: ${err.errorClass} for "${item.id}" (attempt ${attempt}): ${err.message}`);
+        // Persist the failing outcome (D1/D3/D4). DispatchError carries the
+        // buffered stdout/stderr (cell worker-dispatch-log-1); WorktreeError
+        // has no tier/model/stdout/stderr — appendWorkerLog degrades to
+        // errorClass+message only, never throwing on the missing fields.
+        appendWorkerLog(dir, item.id, {
+          attempt,
+          errorClass: err.errorClass,
+          message: err.message,
+          tier: err.tier,
+          model: err.model,
+          status: err.status,
+          signal: err.signal,
+          stdout: err.stdout,
+          stderr: err.stderr,
+        });
       } else {
         // Store/CAS/config errors bubble to claimAndDispatch's classifier —
         // the finally below still removes the worktree on this path too.
