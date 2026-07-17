@@ -1,6 +1,6 @@
 ---
 area: system-overview
-updated: 2026-07-16
+updated: 2026-07-17
 decisions: [ca7de3cf, ae461c8b, ed953e09, 14ebeea9, 1a80b4d3, 65c642a8, 43f257ae, 6f2cbc47, a30a3d3c, 1359ab5e]
 coverage: partial
 ---
@@ -14,6 +14,7 @@ coverage: partial
 - platform-foundations — 8 luật thiết kế đã khóa đứng trên mọi code của compound stack; spec: platform-foundations.md
 - work-state — bộ nhớ công việc tự quản của forgent (cửa lệnh `fgos`, nhật ký sự kiện là truth, bản chiếu dựng lại được); spec: work-state.md
 - runner — vòng tự hành: lấy việc từ frontier, giao trợ lý nền trong nhánh cô lập, tự chấm, ghi đề xuất chờ duyệt; spec: runner.md
+- distribution — cài `fgos` từ ngoài source repo (npm install qua GitHub); spec: distribution.md
 - distillery — vùng học từ reference sources: index feature từng nguồn, so sánh chéo, porting log; spec: chưa có (harvest sẽ viết)
 - distill-skill — skill portable vận hành vòng học (init/add/delta/seal/check); spec: chưa có (harvest sẽ viết)
 
