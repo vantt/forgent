@@ -7,6 +7,8 @@
 //   risk       -> risk   | proof of done -> verify      | learning left    -> learn (optional)
 // plus id/title/status/deps to identify, name, place-in-FSM, and link work.
 
+import { DOMAINS, DEFAULT_DOMAIN } from './domains.mjs';
+
 /** Error raised by this module. `category` is the CLI exit-code contract (R4). */
 export class WorkValidationError extends Error {
   constructor(message) {
@@ -51,8 +53,23 @@ export const TIERS = Object.freeze(['light', 'standard', 'heavy']);
  * lazily wherever it is consumed (frontier.mjs, store.mjs), never injected
  * onto the record itself — this keeps every existing add/submit/legacy path
  * byte-for-byte unchanged.
+ *
+ * Sourced from the 'coding' domain's registry entry (base-workflow-model
+ * D2/D3, src/state/domains.mjs) rather than declared inline — this keeps
+ * exactly one definition of coding's stage list, but the exported value
+ * (and every existing consumer of it) is unchanged.
  */
-export const STAGES = Object.freeze(['clarify', 'decompose', 'executing']);
+export const STAGES = DOMAINS[DEFAULT_DOMAIN].stages;
+
+/**
+ * Domain field domain for `work.domain` (per base-workflow-model D1-D3) —
+ * which domain's stage semantics (list + step-mapping + transition edges,
+ * `src/state/domains.mjs`) govern this item's `stage` value. OPTIONAL and
+ * NOT in DEFAULTS — same D8 lazy-default shape as `stage` itself: a missing
+ * `domain` reads as `'coding'` lazily wherever it is consumed (frontier.mjs,
+ * loop.mjs, stage.mjs, and this module's own `validateWork`), never injected
+ * onto the record — every existing (100% coding) item needs zero migration.
+ */
 
 /**
  * Current schema/event version (per D7c): every event appended from Phase 2
@@ -125,10 +142,23 @@ export function validateWorkShape(work) {
       `work.tier must be one of ${JSON.stringify(TIERS)} when present, got: ${JSON.stringify(work.tier)}`,
     );
   }
-  if (work.stage !== undefined && !STAGES.includes(work.stage)) {
+  if (work.domain !== undefined && !Object.hasOwn(DOMAINS, work.domain)) {
     throw new WorkValidationError(
-      `work.stage must be one of ${JSON.stringify(STAGES)} when present, got: ${JSON.stringify(work.stage)}`,
+      `work.domain must be one of ${JSON.stringify(Object.keys(DOMAINS))} when present, got: ${JSON.stringify(work.domain)}`,
     );
+  }
+  if (work.stage !== undefined) {
+    // Domain-aware per base-workflow-model D2/D3: look up the item's own
+    // domain's stage list instead of the flat STAGES constant, so a future
+    // Slice-2 domain's own stage names validate too. work.domain was already
+    // confirmed to be a real DOMAINS key (or absent) just above, so this
+    // lookup can never miss.
+    const domain = DOMAINS[work.domain ?? DEFAULT_DOMAIN];
+    if (!domain.stages.includes(work.stage)) {
+      throw new WorkValidationError(
+        `work.stage must be one of ${JSON.stringify(domain.stages)} when present, got: ${JSON.stringify(work.stage)}`,
+      );
+    }
   }
   // Lineage (per stage-decompose D5, inherited verbatim from stage-clarify
   // D11): a child work item carries `parent` — the id of the item it was

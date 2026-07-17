@@ -54,6 +54,7 @@ import {
   EXIT_CODES,
 } from '../state/store.mjs';
 import { DEFAULTS } from '../state/work.mjs';
+import { getDomain, stageForStep } from '../state/domains.mjs';
 import { resolveAction, resolveStaleDoing } from './recovery.mjs';
 import {
   visitCount,
@@ -773,8 +774,21 @@ export async function runOnce(options = {}) {
     // `executing` — the DECOMPOSE SWEEP right below is what carries it the
     // rest of the way.
     if (!dryRun) {
+      // Domain-aware per base-workflow-model D2/D3: each item's own domain
+      // (lazily read, absent -> 'coding') decides which stage name means
+      // "at the Clarify step" / "at the Divide step" — 'clarify'/'decompose'
+      // for the 'coding' domain, byte-for-byte the literal checks this sweep
+      // used before the retrofit. An unrecognized item.domain never throws
+      // here (domains.mjs's fail-safe) — it folds to 'coding' with a
+      // diagnostic log line instead, so a corrupt/rolled-back domain value
+      // can never wedge the sweep.
       for (const item of Object.values(listWork(dir).work)) {
-        if (item.stage === 'clarify' && item.status === 'todo') {
+        const domain = getDomain(item.domain, {
+          onUnrecognized: (bad) =>
+            log(`fgos-runner: work "${item.id}" has unrecognized domain "${bad}" — folding to "coding".`),
+        });
+        const clarifyStage = stageForStep(domain, 'Clarify');
+        if (item.stage === clarifyStage && item.status === 'todo') {
           resolveDiscovery(dir, item.id, config, 'runner');
           log(`fgos-runner: context-discovery swept clarify item "${item.id}"`);
         }
@@ -789,7 +803,12 @@ export async function runOnce(options = {}) {
       // already parked in `awaiting-human` (D3's need-human/risk-heavy gate)
       // is never re-swept.
       for (const item of Object.values(listWork(dir).work)) {
-        if (item.stage === 'decompose' && item.status === 'todo') {
+        const domain = getDomain(item.domain, {
+          onUnrecognized: (bad) =>
+            log(`fgos-runner: work "${item.id}" has unrecognized domain "${bad}" — folding to "coding".`),
+        });
+        const decomposeStage = stageForStep(domain, 'Divide');
+        if (item.stage === decomposeStage && item.status === 'todo') {
           resolveDecompose(dir, item.id, config, 'runner');
           log(`fgos-runner: chia-việc swept decompose item "${item.id}"`);
         }

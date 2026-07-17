@@ -6,6 +6,7 @@ import path from 'node:path';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 import { initStore, addWork, moveWork, listWork, readRawEvents, readyWork } from '../../src/state/store.mjs';
+import { appendEvent } from '../../src/state/events.mjs';
 import { createWorktree, removeWorktree, createBranchRef, branchNameFor } from '../../src/runner/worktree.mjs';
 import { runOnce } from '../../src/runner/loop.mjs';
 
@@ -313,6 +314,46 @@ test('runOnce clarify sweep records a clarify-pass settlement stamped actor "run
   assert.equal(view.settlements['item-clarify'].length, 1);
   assert.equal(view.settlements['item-clarify'][0].kind, 'clarify-pass');
   assert.equal(view.settlements['item-clarify'][0].actor, 'runner');
+});
+
+// --- domain-aware sweeps (per base-workflow-model D2/D3): an unrecognized
+// item.domain must never throw inside the hot loop — it folds to 'coding'
+// (same clarify/decompose stage names as today) with a diagnostic log line.
+// validateWork (intake) rejects an unrecognized domain by design, so the
+// only realistic way this reaches the runner is data that never went
+// through addWork — e.g. a future domain later dropped from the registry
+// (approach.md's rollback plan). Exercised here via a raw appended event,
+// bypassing addWork's validation on purpose. ---
+
+test('runOnce clarify+decompose sweeps fold an unrecognized item.domain to "coding" (fail-safe), logging a warning instead of throwing', async () => {
+  const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
+  appendEvent(path.join(dir, 'events.jsonl'), {
+    type: 'work.add',
+    payload: {
+      id: 'item-clarify',
+      title: 'Produce the output file',
+      kind: 'behavior_change',
+      status: 'todo',
+      deps: [],
+      risk: 'low',
+      refs: [],
+      verify: 'test -f output.txt',
+      stage: 'clarify',
+      domain: 'bogus-domain',
+    },
+  });
+  const config = configFor(writeClearDiscoveryExecutor(scriptDir, counterFile, { verify: 'test -f output.txt' }));
+  const lines = [];
+  const capture = (msg) => lines.push(msg);
+
+  const result = await runOnce({ repoRoot, config, worktreeDir, log: capture });
+
+  assert.equal(result.outcome, 'drained', 'the sweeps still clear the item despite the unrecognized domain');
+  assert.equal(result.dispatched[0].id, 'item-clarify');
+  assert.ok(
+    lines.some((line) => /unrecognized domain "bogus-domain"/.test(line)),
+    'the fold must be logged, not silent',
+  );
 });
 
 // --- real parallelism: two independent items overlap in one runOnce -------

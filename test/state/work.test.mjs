@@ -159,6 +159,32 @@ test('validateWork rejects a stage outside the STAGES domain', () => {
   );
 });
 
+// --- `domain` field (per base-workflow-model D1-D3): optional, lazy default
+// 'coding', domain-aware stage-enum check ---
+
+test('validateWork accepts a work item missing domain (optional, defaulted lazily to "coding" wherever consumed)', () => {
+  const work = baseWork();
+  assert.equal(work.domain, undefined);
+  assert.doesNotThrow(() => validateWork(work));
+});
+
+test('validateWork accepts an explicit domain: "coding"', () => {
+  assert.doesNotThrow(() => validateWork(baseWork({ domain: 'coding' })));
+});
+
+test('validateWork rejects a domain outside the DOMAINS registry', () => {
+  assert.throws(
+    () => validateWork(baseWork({ domain: 'marketing' })),
+    (err) => err instanceof WorkValidationError && /domain/.test(err.message),
+  );
+});
+
+test('validateWork accepts every stage in STAGES when domain is explicitly "coding" (same stage-enum as the default)', () => {
+  for (const stage of STAGES) {
+    assert.doesNotThrow(() => validateWork(baseWork({ domain: 'coding', stage })));
+  }
+});
+
 // --- lineage field `parent` (per stage-decompose D5, inherited from stage-clarify D11) ---
 
 test('validateWork accepts a work item missing parent (optional, additive lineage field)', () => {

@@ -184,6 +184,33 @@ test('moveStage with a stale expectedStage -> conflict, no event appended (must_
   assert.equal(rawAfter.length, rawBefore.length);
 });
 
+// --- domain-aware (per base-workflow-model D2/D3): transitionStage looks up
+// its transition table via the item's own domain, defaulting to 'coding' ---
+
+test('transitionStage behaves identically with an explicit domain: "coding" as with no domain at all', () => {
+  const explicit = transitionStage({ work: work('clarify', { domain: 'coding' }), to: 'executing' });
+  const implicit = transitionStage({ work: work('clarify'), to: 'executing' });
+  assert.deepEqual(explicit, implicit);
+});
+
+test('transitionStage folds an unrecognized work.domain to "coding" and never throws for that reason alone', () => {
+  const event = transitionStage({ work: work('clarify', { domain: 'bogus-domain' }), to: 'executing' });
+  assert.deepEqual(event, { type: 'work.stage', payload: { id: 'w1', from: 'clarify', to: 'executing' } });
+});
+
+test('transitionStage with an unrecognized work.domain warns once via console.warn (fail-safe, not silent)', () => {
+  const original = console.warn;
+  const calls = [];
+  console.warn = (...args) => calls.push(args);
+  try {
+    transitionStage({ work: work('clarify', { domain: 'bogus-domain' }), to: 'executing' });
+    assert.equal(calls.length, 1);
+    assert.match(calls[0][0], /bogus-domain/);
+  } finally {
+    console.warn = original;
+  }
+});
+
 test('addDiscovery APPENDS a verdict record readable back through listWork', () => {
   const dir = tmpDir();
   addSampleWork(dir);

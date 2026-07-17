@@ -249,3 +249,24 @@ test('a dangling parent id (child points at a parent not present in the view) ne
   assert.doesNotThrow(() => frontier(view));
   assert.deepEqual(frontier(view).map((i) => i.id), ['child']);
 });
+
+// --- domain-aware (per base-workflow-model D2/D3): frontier looks up the
+// item's own domain to decide which stage counts as "ready", defaulting to
+// 'coding' — zero behavior change for every item, which has no domain field ---
+
+test('an item with an explicit domain "coding" and stage "executing" behaves identically to no domain at all', () => {
+  const view = { work: { a: { ...item('a', 'todo'), domain: 'coding', stage: 'executing' } } };
+  assert.deepEqual(frontier(view).map((i) => i.id), ['a']);
+});
+
+test('a todo item with an explicit domain "coding" and stage "clarify" is still excluded (matches the no-domain case)', () => {
+  const view = { work: { a: { ...item('a', 'todo'), domain: 'coding', stage: 'clarify' } } };
+  assert.deepEqual(frontier(view), []);
+});
+
+test('an item with an unrecognized domain never throws and folds to "coding" readiness rules', () => {
+  const view = { work: { a: { ...item('a', 'todo'), domain: 'bogus-domain' } } };
+  assert.doesNotThrow(() => frontier(view));
+  // No stage field either -> reads as coding's Execute stage ("executing") -> ready.
+  assert.deepEqual(frontier(view).map((i) => i.id), ['a']);
+});

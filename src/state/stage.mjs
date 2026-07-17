@@ -5,10 +5,15 @@
 //
 // PURE: no fs import, no disk writes. This module only decides whether a
 // stage transition is legal and, if so, RETURNS the validated event for the
-// store to append — disk writes belong to store.mjs, never here.
+// store to append — disk writes belong to store.mjs, never here. The one
+// side effect it can perform is a diagnostic `console.warn` (via
+// domains.mjs's fail-safe) on a genuinely unrecognized `work.domain` value —
+// never a throw (base-workflow-model D2/D3).
 //
-// Three edges exist today: `clarify -> executing` (D12), plus
-// `clarify -> decompose` and `decompose -> executing` (stage-decompose
+// Three edges exist today for the 'coding' domain (base-workflow-model D2
+// retrofit — byte-for-byte the same table this file used to own directly,
+// now sourced from domains.mjs's registry): `clarify -> executing` (D12),
+// plus `clarify -> decompose` and `decompose -> executing` (stage-decompose
 // D2/D4/D5) for the chia-việc stage that now sits between clarify and
 // executing. stage-decompose cell 3 retargeted the discovery engine
 // (discovery.mjs) onto `clarify -> decompose`, so no caller uses the first
@@ -19,36 +24,37 @@
 // follow-up for whichever cell next touches this file's test scope.
 
 import { FsmError } from './fsm.mjs';
+import { DEFAULT_DOMAIN, getDomain, stageForStep } from './domains.mjs';
 
 // Re-exported for consumers that want the stage error type under this
 // module's own name, mirroring fsm.mjs's re-export of STATUSES from work.mjs.
 export { FsmError };
-
-// The transition table: `clarify -> executing` (D12) stays until cell 3
-// retargets clarify-pass onto `decompose`; the other two edges (per
-// stage-decompose D2/D4/D5) carry an item through chia-việc.
-const STAGE_TRANSITIONS = Object.freeze([
-  Object.freeze({ from: 'clarify', to: 'executing' }),
-  Object.freeze({ from: 'clarify', to: 'decompose' }),
-  Object.freeze({ from: 'decompose', to: 'executing' }),
-]);
 
 /**
  * Decide whether `work` can move to stage `to`, and if so return the
  * validated event ready for the store to append — this function never
  * writes anything itself.
  *
- * `from` is read lazily (per D8): `work.stage ?? 'executing'`, since a work
- * item with no `stage` field at all is treated as already `executing`.
+ * `from` is read lazily (per D8): `work.stage ?? <the item's domain's Execute
+ * stage>` — 'executing' for the 'coding' domain, so a work item with no
+ * `stage` field at all is treated as already at that stage, exactly as
+ * before this retrofit.
+ *
+ * Domain-aware (base-workflow-model D2/D3): `work.domain` (lazily read,
+ * absent -> DEFAULT_DOMAIN, same shape as `stage` itself) selects which
+ * registry entry's transition edges apply. An unrecognized `work.domain`
+ * value never throws here — it folds to DEFAULT_DOMAIN with a diagnostic
+ * warning (domains.mjs's resolveDomainName); only `to` and `work` shape
+ * validation below can throw a precondition error.
  *
  * CAS: when `expectedStage` is supplied and does not match the item's
  * (lazily-read) current stage, refuse with category 'conflict' — checked
  * before the transition-table lookup, same order as fsm.mjs's
  * transitionWork.
  *
- * Precondition: the (from, to) pair must exist in STAGE_TRANSITIONS. Any
- * other pair (including the reverse edge, or a same-stage no-op) is refused
- * with category 'precondition' and no event is returned.
+ * Precondition: the (from, to) pair must exist in the domain's transition
+ * table. Any other pair (including the reverse edge, or a same-stage no-op)
+ * is refused with category 'precondition' and no event is returned.
  *
  * `verify` (per D10): when supplied, rides on the SAME event as the stage
  * move — the store's fold sets `item.verify` alongside `item.stage` from
@@ -68,7 +74,14 @@ export function transitionStage({ work, to, expectedStage, verify } = {}) {
     throw new FsmError('precondition', 'transitionStage: "to" is required and must be a non-empty string.');
   }
 
-  const from = work.stage ?? 'executing';
+  const domain = getDomain(work.domain, {
+    onUnrecognized: (bad) =>
+      console.warn(
+        `fgos: work "${work.id}" has unrecognized domain "${bad}" — folding to "${DEFAULT_DOMAIN}" for its stage transition.`,
+      ),
+  });
+  const executeStage = stageForStep(domain, 'Execute');
+  const from = work.stage ?? executeStage;
 
   if (expectedStage !== undefined && from !== expectedStage) {
     throw new FsmError(
@@ -77,7 +90,7 @@ export function transitionStage({ work, to, expectedStage, verify } = {}) {
     );
   }
 
-  const allowed = STAGE_TRANSITIONS.some((edge) => edge.from === from && edge.to === to);
+  const allowed = domain.transitions.some((edge) => edge.from === from && edge.to === to);
   if (!allowed) {
     throw new FsmError(
       'precondition',

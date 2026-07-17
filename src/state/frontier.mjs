@@ -2,20 +2,26 @@
 // Epic 2, A2 FIFO). PURE: no fs import, no side effects — this module only
 // reads the `view` object it is handed (built by replay.mjs's `foldEvents`
 // / `rebuildView`, or a literal view in tests) and returns a derived array.
-// It never mutates `view` and never writes an event.
+// It never mutates `view` and never writes an event (the one exception is a
+// diagnostic `console.warn` via domains.mjs on a genuinely unrecognized
+// `item.domain` value — never a throw, see base-workflow-model D2/D3).
+import { getDomain, stageForStep } from './domains.mjs';
 //
 // Ready = status 'todo' AND every dep's status is 'done' (per D5: done
 // means "accepted into the main tree" — a dep sitting at 'proposed',
-// 'doing', or 'blocked' does NOT unblock its dependents) AND stage
-// 'executing' (per stage-clarify D1: an item still at stage `clarify` is not
+// 'doing', or 'blocked' does NOT unblock its dependents) AND stage at the
+// item's own domain's Execute-mapped stage ('executing' for the 'coding'
+// domain — per stage-clarify D1: an item still at stage `clarify` is not
 // yet "ready to start" no matter its status — `fgos ready` would otherwise
-// lie about items that have not passed context-discovery) AND no open
-// descendant (per stage-decompose D4/D5: an item that was decomposed stays
+// lie about items that have not passed context-discovery; domain-aware per
+// base-workflow-model D2/D3, domains.mjs) AND no open descendant (per
+// stage-decompose D4/D5: an item that was decomposed stays
 // anchored — excluded from the frontier — for as long as any item reachable
 // through the `parent` chain below it is not yet 'done'; this is a lineage
 // filter DERIVED from `parent`, never `deps` — a child is never written into
-// its parent's `deps`). `stage` is read lazily — `item.stage ?? 'executing'`
-// (D8) — so an item predating this field behaves exactly as before, and an
+// its parent's `deps`). `stage` is read lazily — `item.stage ?? <the item's
+// domain's Execute stage>` (D8; domain-aware per base-workflow-model D2/D3)
+// — so an item predating this field behaves exactly as before, and an
 // item with no `parent` anywhere in the view is likewise never blocked by
 // this filter (backward-compat). Frontier is a derived read (R5 — "derive,
 // no danh sách tay"), never a stored list.
@@ -43,7 +49,13 @@ export function frontier(view) {
   for (const id of Object.keys(work)) {
     const item = work[id];
     if (item.status !== 'todo') continue;
-    if ((item.stage ?? 'executing') !== 'executing') continue;
+    // Domain-aware per base-workflow-model D2/D3: an unrecognized
+    // item.domain never throws here (domains.mjs's fail-safe) — it folds to
+    // 'coding' with a diagnostic warning, so a corrupt/rolled-back domain
+    // value can never wedge the frontier derive itself.
+    const domain = getDomain(item.domain);
+    const executeStage = stageForStep(domain, 'Execute');
+    if ((item.stage ?? executeStage) !== executeStage) continue;
     if (hasOpenDescendant(id, work, childrenByParent)) continue;
     const depsReady = item.deps.every((dep) => work[dep]?.status === 'done');
     if (depsReady) ready.push(item);
