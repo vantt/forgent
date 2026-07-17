@@ -17,8 +17,15 @@ function tmpCwd() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-cli-'));
 }
 
-function run(cwd, args) {
-  return spawnSync(process.execPath, [FGOS, ...args], { cwd, encoding: 'utf8' });
+function run(cwd, args, extraEnv = {}) {
+  const opts = { cwd, encoding: 'utf8' };
+  // Only override env when the caller actually injects one (e.g. the GitHub
+  // tests' FGOS_GH_COMMAND): omitting the `env` key entirely lets spawnSync
+  // inherit process.env, keeping every existing call site byte-identical.
+  if (Object.keys(extraEnv).length > 0) {
+    opts.env = { ...process.env, ...extraEnv };
+  }
+  return spawnSync(process.execPath, [FGOS, ...args], opts);
 }
 
 function logPath(cwd) {
@@ -2592,6 +2599,208 @@ test('the CLI usage message for an unknown verb lists review/approve/reject in t
   const result = run(cwd, ['bogus-verb']);
   assert.equal(result.status, 4);
   assert.match(result.stderr, /review\|approve\|reject/);
+});
+
+// --- `review`/`approve` --github (github-adapter D1/D3/D5) -------------------
+//
+// Every "gh" invoked here is a short-lived fake node script (shebang + chmod
+// 0o755) injected into the spawned fgos.mjs subprocess via FGOS_GH_COMMAND —
+// a JS-level opts object cannot cross the spawnSync process boundary that the
+// `run()` helper puts between the test and the CLI, so the environment
+// variable is the only viable injection channel. No real `gh` binary is ever
+// invoked and no network call is ever made.
+
+function writeFakeGh(dir, name, body) {
+  const scriptPath = path.join(dir, name);
+  fs.writeFileSync(scriptPath, `#!/usr/bin/env node\n${body}\n`);
+  fs.chmodSync(scriptPath, 0o755);
+  return scriptPath;
+}
+
+// Logs each invocation's argv to `logPath`, then for `pr create` prints the
+// real observed gh URL shape (S1 ANSWER1) and exits 0.
+function writeCreateFake(dir, logPath, prNumber) {
+  return writeFakeGh(dir, 'gh-create.cjs',
+    `const fs = require('fs');
+fs.appendFileSync(${JSON.stringify(logPath)}, process.argv.slice(2).join(' ') + '\\n');
+process.stdout.write('https://github.com/vantt/forgent/pull/${prNumber}\\n');
+process.exit(0);`);
+}
+
+// `pr view` prints a settled MERGEABLE view (no poll needed); `pr merge`
+// exits 0 — a clean two-step merge.
+function writeMergeSuccessFake(dir) {
+  return writeFakeGh(dir, 'gh-merge-ok.cjs',
+    `const args = process.argv.slice(2);
+if (args[1] === 'view') {
+  process.stdout.write(JSON.stringify({ state: 'OPEN', mergeable: 'MERGEABLE', mergeStateStatus: 'CLEAN', mergedAt: null, closed: false, closedAt: null }));
+  process.exit(0);
+}
+process.exit(0);`);
+}
+
+// Exits 1 with S1's real auth-failure stderr on ANY call.
+function writeAuthFailFake(dir) {
+  return writeFakeGh(dir, 'gh-auth-fail.cjs',
+    `process.stderr.write('HTTP 401: Bad credentials (https://api.github.com/graphql)\\n');
+process.exit(1);`);
+}
+
+// Writes a marker file on ANY invocation — a probe used to prove the gh path
+// was NEVER reached (assert the marker is absent) when a gate rejects first.
+function writeMarkerFake(dir, markerPath) {
+  return writeFakeGh(dir, 'gh-marker.cjs',
+    `const fs = require('fs');
+fs.writeFileSync(${JSON.stringify(markerPath)}, 'called');
+process.exit(0);`);
+}
+
+// Adds a plain filesystem bare repo as `origin` on the main checkout — no
+// network, no real GitHub. `git push` against it is a normal fast local op,
+// so `review --github`'s push step works against a real remote.
+function addBareOrigin(cwd) {
+  const bare = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-cli-origin-'));
+  execFileSync('git', ['init', '-q', '--bare', bare]);
+  execFileSync('git', ['remote', 'add', 'origin', bare], { cwd });
+  return bare;
+}
+
+// A legacy proposed item (no fgw/<id> branch, no headAtTake/headAtReturn) —
+// classifySource resolves it to 'legacy', the non-runner case the --github
+// source gate must reject.
+function makeLegacyProposedItem(cwd, id) {
+  addOk(cwd, id);
+  run(cwd, ['move', id, '--to', 'doing']);
+  run(cwd, ['move', id, '--to', 'proposed']);
+}
+
+test('review --github on a legacy (non-runner) item is a validation error, no state change, and no gh call is attempted', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeLegacyProposedItem(cwd, 'gh-review-legacy');
+  const marker = path.join(cwd, 'gh-was-called');
+  const fake = writeMarkerFake(cwd, marker);
+
+  const result = run(cwd, ['review', 'gh-review-legacy', '--github'], { FGOS_GH_COMMAND: fake });
+  assert.equal(result.status, 4, `${result.stdout}${result.stderr}`);
+  assert.match(result.stderr, /runner-sourced item/);
+  assert.equal(stateView(cwd).work['gh-review-legacy'].status, 'proposed');
+  assert.ok(!fs.existsSync(marker), 'the source gate must reject before any gh CLI call');
+});
+
+test('approve --github on a legacy (non-runner) item is a validation error, no state change, and no gh call is attempted', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeLegacyProposedItem(cwd, 'gh-approve-legacy');
+  const marker = path.join(cwd, 'gh-was-called');
+  const fake = writeMarkerFake(cwd, marker);
+
+  // --pr present too — the source gate must still win over the --pr check.
+  const result = run(cwd, ['approve', 'gh-approve-legacy', '--github', '--pr', '7'], { FGOS_GH_COMMAND: fake });
+  assert.equal(result.status, 4, `${result.stdout}${result.stderr}`);
+  assert.match(result.stderr, /runner-sourced item/);
+  assert.equal(stateView(cwd).work['gh-approve-legacy'].status, 'proposed');
+  assert.ok(!fs.existsSync(marker), 'the source gate must reject before any gh CLI call');
+});
+
+test('review --github on a runner item pushes the branch and opens a PR via a real subprocess-injected fake gh, reports the PR number, and never mutates FSM state', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeRunnerProposedItem(cwd, 'gh-review-ok');
+  addBareOrigin(cwd);
+  const ghLog = path.join(cwd, 'gh-invocations.log');
+  const fake = writeCreateFake(cwd, ghLog, 314);
+
+  const result = run(cwd, ['review', 'gh-review-ok', '--github'], { FGOS_GH_COMMAND: fake });
+  assert.equal(result.status, 0, `${result.stdout}${result.stderr}`);
+  assert.match(result.stdout, /GitHub PR #314/);
+  assert.match(result.stdout, /fgw\/gh-review-ok -> main/);
+
+  // Crossed the real process boundary: the fake logged its argv.
+  assert.match(fs.readFileSync(ghLog, 'utf8'), /pr create .*-H fgw\/gh-review-ok -B main/);
+  // The branch really got pushed to origin.
+  assert.match(execFileSync('git', ['ls-remote', '--heads', 'origin', 'fgw/gh-review-ok'], { cwd, encoding: 'utf8' }), /fgw\/gh-review-ok/);
+  // review stays read-only on FSM state.
+  assert.equal(stateView(cwd).work['gh-review-ok'].status, 'proposed');
+});
+
+test('review --github reports a gh failure as plain output with no state mutation (read-only contract holds on the blocked path)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeRunnerProposedItem(cwd, 'gh-review-blocked');
+  addBareOrigin(cwd);
+  const fake = writeAuthFailFake(cwd);
+
+  const result = run(cwd, ['review', 'gh-review-blocked', '--github'], { FGOS_GH_COMMAND: fake });
+  assert.equal(result.status, 0, `${result.stdout}${result.stderr}`);
+  assert.match(result.stdout, /reason auth-failure/);
+  assert.match(result.stdout, /no state change/);
+  assert.equal(stateView(cwd).work['gh-review-blocked'].status, 'proposed', 'review never transitions state, even on a gh failure');
+  assert.equal(stateView(cwd).frictions?.['gh-review-blocked'], undefined, 'review never records friction');
+});
+
+test('approve --github without --pr is a validation error, item stays proposed, and mergeGitHubPR is never called', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeRunnerProposedItem(cwd, 'gh-approve-nopr');
+  const marker = path.join(cwd, 'gh-was-called');
+  const fake = writeMarkerFake(cwd, marker);
+
+  const result = run(cwd, ['approve', 'gh-approve-nopr', '--github'], { FGOS_GH_COMMAND: fake });
+  assert.equal(result.status, 4, `${result.stdout}${result.stderr}`);
+  assert.match(result.stderr, /requires --pr/);
+  assert.equal(stateView(cwd).work['gh-approve-nopr'].status, 'proposed');
+  assert.ok(!fs.existsSync(marker), 'no gh call is made when --pr is missing');
+});
+
+test('approve --github with a dirty main tree is NOT blocked by the local dirty-tree gate and proceeds to the GitHub merge', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeRunnerProposedItem(cwd, 'gh-approve-dirty');
+  // An unrelated dirty file on main — a LOCAL approve would refuse this, but
+  // a GitHub-side merge never touches the local tree, so it must not gate.
+  fs.writeFileSync(path.join(cwd, 'unrelated-dirt.txt'), 'uncommitted\n');
+  const fake = writeMergeSuccessFake(cwd);
+
+  const result = run(cwd, ['approve', 'gh-approve-dirty', '--github', '--pr', '5'], { FGOS_GH_COMMAND: fake });
+  assert.equal(result.status, 0, `${result.stdout}${result.stderr}`);
+  assert.doesNotMatch(result.stdout, /not clean/);
+  assert.match(result.stdout, /proposed -> done/);
+  assert.equal(stateView(cwd).work['gh-approve-dirty'].status, 'done');
+});
+
+test('approve --github --pr on a fake gh merge success transitions the item proposed -> done with actor human', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeRunnerProposedItem(cwd, 'gh-approve-merged');
+  const fake = writeMergeSuccessFake(cwd);
+
+  const result = run(cwd, ['approve', 'gh-approve-merged', '--github', '--pr', '42'], { FGOS_GH_COMMAND: fake });
+  assert.equal(result.status, 0, `${result.stdout}${result.stderr}`);
+  assert.match(result.stdout, /merged GitHub PR #42/);
+  assert.match(result.stdout, /proposed -> done/);
+
+  const view = stateView(cwd);
+  assert.equal(view.work['gh-approve-merged'].status, 'done');
+  assert.equal(view.settlements['gh-approve-merged'][0].actor, 'human');
+});
+
+test('approve --github --pr on a fake gh merge failure transitions proposed -> blocked and records friction with the classified reason, layer, and gh detail', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeRunnerProposedItem(cwd, 'gh-approve-blocked');
+  const fake = writeAuthFailFake(cwd);
+
+  const result = run(cwd, ['approve', 'gh-approve-blocked', '--github', '--pr', '99'], { FGOS_GH_COMMAND: fake });
+  assert.equal(result.status, 0, `${result.stdout}${result.stderr}`);
+  assert.match(result.stdout, /proposed -> blocked \(reason auth-failure\)/);
+
+  const view = stateView(cwd);
+  assert.equal(view.work['gh-approve-blocked'].status, 'blocked');
+  const friction = view.frictions['gh-approve-blocked'][0];
+  assert.equal(friction.errorClass, 'auth-failure');
+  assert.equal(friction.layer, 'environment');
+  assert.match(friction.detail, /Bad credentials/);
 });
 
 // --- catchup (D6/D7/D11: unified catch-up-by-merge for a merge-related park) ---

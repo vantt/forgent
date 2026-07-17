@@ -30,7 +30,8 @@ import { computeEntropy, computeCounts } from '../src/report/entropy.mjs';
 import { rankCandidates } from '../src/evolve/candidates.mjs';
 import { rankImpact } from '../src/state/impact.mjs';
 import { runGoalCheck } from '../src/runner/goal-check.mjs';
-import { classifySource, reviewDiff, mergeRunnerItem, cleanupMergedBranch, changedFiles, isWorkingTreeClean as isMainTreeClean, isFgosOnlyStatusLine } from '../src/runner/merge.mjs';
+import { classifySource, reviewDiff, mergeRunnerItem, cleanupMergedBranch, changedFiles, isWorkingTreeClean as isMainTreeClean, isFgosOnlyStatusLine, detectTrunk } from '../src/runner/merge.mjs';
+import { createGitHubPR, mergeGitHubPR } from '../src/runner/github-adapter.mjs';
 import { classifyIronLaw } from '../src/evolve/iron-law.mjs';
 import { branchNameFor, branchExists, createWorktree, removeWorktree } from '../src/runner/worktree.mjs';
 import { createSession, endSession, listSessions, SessionError } from '../src/runner/session.mjs';
@@ -83,6 +84,28 @@ function isWorkingTreeClean(cwd) {
 
 function commitsSince(cwd, from, to) {
   return parseInt(gitAt(cwd, ['rev-list', '--count', `${from}..${to}`]).trim(), 10) || 0;
+}
+
+// The gh binary the GitHub transport shells out to (github-adapter D2). Tests
+// substitute a fake executable through FGOS_GH_COMMAND; production leaves it
+// unset and the real `gh` on PATH is used.
+function ghCommandOpts() {
+  return { ghCommand: process.env.FGOS_GH_COMMAND || 'gh' };
+}
+
+// Push a runner item's branch to origin unless it already tracks an upstream.
+// The upstream probe is a plain execFileSync + try/catch, NOT gitAt: gitAt
+// rethrows every git failure as StoreError('validation', ...), the wrong
+// semantic for an existence probe that is *expected* to fail on a
+// never-pushed branch. Only the push itself is a real operation.
+function ensureBranchPushed(repoRoot, branch) {
+  try {
+    execFileSync('git', ['rev-parse', '--abbrev-ref', `${branch}@{upstream}`], { cwd: repoRoot, encoding: 'utf8', shell: false });
+    return; // upstream already set — nothing to push
+  } catch {
+    // no upstream yet — the normal, expected first-review case; fall through
+  }
+  execFileSync('git', ['push', '-u', 'origin', branch], { cwd: repoRoot, encoding: 'utf8', shell: false });
 }
 
 // A bare `--flag` (no value) parses to boolean `true` (see parseArgs below);
@@ -994,6 +1017,39 @@ async function runVerb(verb, flags, positional, dir) {
         throw new StoreError('precondition', `review: work "${id}" is "${item.status}", not "proposed" — nothing to review.`);
       }
 
+      // GitHub transport (github-adapter D1/D5): `review <id> --github` opens a
+      // real GitHub PR for a runner-sourced item instead of printing the local
+      // diff. Opt-in and additive — the flag's absence leaves the path below
+      // byte-identical. Stays read-only on FSM state exactly like local review:
+      // a gh failure is reported as plain output, never a moveWork/addFriction.
+      if (flags.github) {
+        const repoRoot = process.cwd();
+        const source = classifySource(repoRoot, item);
+        if (source !== 'runner') {
+          throw new StoreError('validation', `review --github: "${id}" is a ${source}-sourced item — GitHub review requires a runner-sourced item with a live fgw/${id} branch (no branch exists to attach a PR to for pull/legacy items).`);
+        }
+        const head = branchNameFor(id);
+        const rootId = resolveRoot(view, id);
+        // Leaf-vs-root base split mirrors approve/review's local path: a root
+        // targets the repo trunk, a leaf targets its resolved root's branch.
+        // Known limitation (accepted this slice): only the leaf's own branch is
+        // pushed below — the root's branch is never pushed here, so a real
+        // `gh pr create` for a leaf would fail with base absent on origin. The
+        // fake-gh tests don't validate remote branch existence, so they pass;
+        // the leaf/root GitHub push semantics need their own follow-up slice.
+        const base = rootId !== id ? branchNameFor(rootId) : detectTrunk(repoRoot);
+        ensureBranchPushed(repoRoot, head);
+        const result = await createGitHubPR(
+          repoRoot,
+          { head, base, title: item.title, body: item.description || `Runner-proposed change (fgos work item ${id}).` },
+          ghCommandOpts(),
+        );
+        if (result.outcome === 'created') {
+          return `Reviewed ${id}: opened GitHub PR #${result.prNumber} (${head} -> ${base}). Approve it after a GitHub-side review with \`fgos approve ${id} --github --pr ${result.prNumber}\`; inspect it with \`gh pr view ${result.prNumber} --web\` or your GitHub remote's PR list.`;
+        }
+        return `Review ${id}: GitHub PR creation failed (reason ${result.reason}) — no state change.\n${result.detail}`;
+      }
+
       // D3 leaf-vs-root split: a leaf (its resolved root is a different
       // item) diffs against its parent's integration branch instead of
       // main; a root (resolved root is itself) keeps the default
@@ -1048,6 +1104,46 @@ async function runVerb(verb, flags, positional, dir) {
 
       const repoRoot = process.cwd();
       const source = classifySource(repoRoot, item);
+
+      // GitHub transport (github-adapter D1/D3/D5): `approve <id> --github --pr
+      // <n>` merges a prior `review --github` PR through GitHub instead of a
+      // local git merge. Dispatched BEFORE the runner block's Iron Law and
+      // dirty-main-tree gates: a GitHub-side merge never touches the local
+      // working tree, so `isMainTreeClean` (which exists only because a LOCAL
+      // merge mutates the tree) must not gate it. The source gate is checked
+      // BEFORE the --pr presence check so a pull/legacy item always gets the
+      // runner-sourced error, never a misleading "missing --pr" message for an
+      // item that could never have a PR.
+      if (flags.github) {
+        if (source !== 'runner') {
+          throw new StoreError('validation', `approve --github: "${id}" is a ${source}-sourced item — GitHub approval requires a runner-sourced item with a live fgw/${id} branch (no branch exists to attach a PR to for pull/legacy items).`);
+        }
+        const prNumber = requireField(flags.pr, 'approve --github requires --pr <n> (the GitHub PR number from a prior review --github)');
+        const result = await mergeGitHubPR(repoRoot, prNumber, ghCommandOpts());
+        if (result.outcome === 'merged') {
+          // Accepted rough edge (this slice): unlike the local merged path, no
+          // cleanupMergedBranch runs — the local fgw/<id> branch and its pushed
+          // origin copy are both left in place after a server-side merge (no
+          // local cleanup mechanism exists for a branch merged on GitHub).
+          const { event } = moveWork(dir, { id, to: 'done', expectedStatus: 'proposed', actor: 'human' });
+          return `Approved ${id}: merged GitHub PR #${prNumber}, proposed -> done (event #${event.seq})`;
+        }
+        // blocked — mirrors the local merge-conflict/verify-fail-post-merge
+        // shape: park proposed -> blocked with the classifyGhFailure reason,
+        // plus a friction record carrying the failure layer and gh's stderr.
+        const reason = result.reason;
+        const layer = { 'auth-failure': 'environment', 'rate-limited': 'environment', 'unreachable': 'environment', 'gh-invocation-failed': 'state' }[reason] || 'state';
+        moveWork(dir, { id, to: 'blocked', expectedStatus: 'proposed', reason });
+        addFriction(dir, {
+          id,
+          disposition: 'blocked',
+          errorClass: reason,
+          layer,
+          attempts: 1,
+          detail: `gh pr merge #${prNumber} failed at step ${result.step}: ${result.detail}`,
+        });
+        return `Approved ${id}: GitHub PR #${prNumber} merge failed — proposed -> blocked (reason ${reason})\n${result.detail}`;
+      }
 
       if (source === 'runner') {
         // Iron Law gate (D16/D17): a runner-sourced diff that touches a
