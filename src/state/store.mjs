@@ -158,7 +158,7 @@ function composeLearning(view, id, closingSettlement) {
  * delegates the precondition/CAS decision to fsm.mjs (pure — never writes),
  * and only then appends the event it returns.
  */
-export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, actor, headAtTake, headAtReturn } = {}) {
+export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, actor, headAtTake, headAtReturn, branchHeadAtTake, branchHeadAtReturn } = {}) {
   const { logPath } = paths(dir);
   const before = rebuildView(logPath);
   const work = before.work[id];
@@ -201,6 +201,19 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, act
   // same way.
   if (headAtReturn !== undefined) {
     rawEvent.payload.headAtReturn = headAtReturn;
+  }
+  // Branch-source take/return markers (human-rounds D2): the SAME
+  // post-transition stamp pattern as headAtTake/headAtReturn above, on the
+  // SAME edges (`to === 'doing'` for the claim, `to === 'proposed'` for the
+  // return) — a branch-source take/return never writes headAtTake/
+  // headAtReturn (those are the main-based discriminator; mixing the two
+  // would give the review gate a meaningless diff range), so this is a
+  // strict addition, never a rewrite of the main-based pull-door shape.
+  if (branchHeadAtTake !== undefined) {
+    rawEvent.payload.branchHeadAtTake = branchHeadAtTake;
+  }
+  if (branchHeadAtReturn !== undefined) {
+    rawEvent.payload.branchHeadAtReturn = branchHeadAtReturn;
   }
   // Câu-6 tự động (per Phase 3 S3-closeout (c), six-questions L5): BOTH doors
   // into `done` (doing->done and proposed->done) converge on this one

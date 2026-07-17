@@ -16,6 +16,7 @@
 // src/state/store.mjs, the sole write door.
 
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { initStore, addWork, moveWork, addDecision, addOutcome, addFriction, listWork, readyWork, readRawEvents, rebuild, putInAwaiting, answerAwaiting, StoreError, EXIT_CODES, categoryOf } from '../src/state/store.mjs';
@@ -27,6 +28,7 @@ import { resolveDecompose } from '../src/intake/decompose.mjs';
 import { computeEntropy, computeCounts } from '../src/report/entropy.mjs';
 import { runGoalCheck } from '../src/runner/goal-check.mjs';
 import { classifySource, reviewDiff, mergeRunnerItem, cleanupMergedBranch, isWorkingTreeClean as isMainTreeClean } from '../src/runner/merge.mjs';
+import { branchNameFor, branchExists } from '../src/runner/worktree.mjs';
 import { visitCount } from '../src/runner/anti-loop.mjs';
 import { DEFAULTS } from '../src/state/work.mjs';
 import { writeCoexistenceManifest } from '../src/install/coexist.mjs';
@@ -623,8 +625,26 @@ async function runVerb(verb, flags, positional, dir) {
       // runner's own claim (D1's "đối xứng claim runner") — priorVisits is
       // read BEFORE this claim's own work.move so it never counts itself.
       const priorVisits = visitCount(readRawEvents(dir), id);
-      const headAtTake = currentHead(process.cwd());
 
+      // Branch take (human-rounds D2): a `blocked` item with a live
+      // `fgw/<id>` branch (parked by the runner, or a rejected proposal) is
+      // claimed via the existing blocked -> doing edge (fsm.mjs:69), CAS'd
+      // against the item's real "blocked" status rather than the main-based
+      // "todo" below. `branchHeadAtTake` — the BRANCH's own HEAD, not the
+      // repo's — is the sole discriminator `return` uses later; it is never
+      // mixed with the main-based `headAtTake`.
+      const branch = branchNameFor(id);
+      if (item.status === 'blocked' && branchExists(process.cwd(), branch)) {
+        const branchHeadAtTake = gitAt(process.cwd(), ['rev-parse', branch]).trim();
+        const { event } = moveWork(dir, { id, to: 'doing', expectedStatus: 'blocked', actor, branchHeadAtTake });
+        addOutcome(dir, {
+          id,
+          predicted: { tier: item.tier ?? DEFAULTS.tier, deps: item.deps.length, priorVisits, actor, branchHeadAtTake },
+        });
+        return `Took ${id}: blocked -> doing (actor=${actor}, branch=${branch}, branchHeadAtTake=${branchHeadAtTake}) (event #${event.seq})`;
+      }
+
+      const headAtTake = currentHead(process.cwd());
       const { event } = moveWork(dir, { id, to: 'doing', expectedStatus: 'todo', actor, headAtTake });
       addOutcome(dir, {
         id,
@@ -666,11 +686,79 @@ async function runVerb(verb, flags, positional, dir) {
           `return: work "${id}" was not taken through the pull door (claimed by "${item.claimActor ?? 'runner'}") — return only completes a take.`,
         );
       }
+
+      // Branch-source discriminator (human-rounds D2/BINDING repair): checked
+      // BEFORE every main-based guard below (headAtTake presence, clean-tree)
+      // — a branch take never carries headAtTake, so testing that first
+      // would wrongly reject a branch-source return as "no recorded
+      // headAtTake". `branchHeadAtTake` is the ONLY signal that discriminates
+      // a branch-source item; classifySource is never used here (per D2, it
+      // is branch-existence-first and would misread a stale/sibling branch).
+      const repoRoot = process.cwd();
+      if (typeof item.branchHeadAtTake === 'string' && item.branchHeadAtTake) {
+        const branch = branchNameFor(id);
+        let branchHead;
+        try {
+          branchHead = gitAt(repoRoot, ['rev-parse', branch]).trim();
+        } catch (err) {
+          throw new StoreError('validation', `return: branch "${branch}" for "${id}" not found or unreadable: ${err.message}`);
+        }
+        const branchAheadCount = commitsSince(repoRoot, item.branchHeadAtTake, branchHead);
+        if (branchAheadCount <= 0) {
+          throw new StoreError(
+            'validation',
+            `return: branch "${branch}" has not advanced past branchHeadAtTake for "${id}" (${item.branchHeadAtTake} -> ${branchHead}) — commit the work on the branch before returning.`,
+          );
+        }
+
+        // No cwd-clean requirement here (D2: "tree người là việc của
+        // người") — the human's own working tree is never inspected or
+        // touched. Verify runs in a DISPOSABLE, DETACHED worktree checked out
+        // at the branch's own commit SHA — never `git worktree add <path>
+        // <branch>` (that fails outright, and would collide, if the human
+        // happens to be standing on `fgw/<id>` in their own tree right now)
+        // and never `reclaimOrphanedCheckout` (that would force-remove a
+        // checkout the human is actively using — the exact BLOCKER the
+        // validating gate caught).
+        const tmpWorktree = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-return-'));
+        let check;
+        try {
+          gitAt(repoRoot, ['worktree', 'add', '--detach', tmpWorktree, branchHead]);
+          check = await runGoalCheck(item, tmpWorktree, timeoutMs);
+        } finally {
+          try {
+            execFileSync('git', ['worktree', 'remove', tmpWorktree, '--force'], { cwd: repoRoot, encoding: 'utf8', shell: false });
+          } catch {
+            // best-effort — mirrors worktree.mjs's own removeWorktree/prune
+            // discipline; a cleanup failure must never mask the verify
+            // result already computed above.
+          }
+        }
+
+        if (check.passed) {
+          const { event } = moveWork(dir, { id, to: 'proposed', expectedStatus: 'doing', branchHeadAtReturn: branchHead });
+          addOutcome(dir, { id, actual: { outcome: 'proposed', passed: true, attempts: 1, errorClass: null, aheadCount: branchAheadCount } });
+          return `Returned ${id}: doing -> proposed (verify passed on branch "${branch}", ${branchAheadCount} commit(s)) (event #${event.seq})\n${check.output}`;
+        }
+
+        moveWork(dir, { id, to: 'blocked', expectedStatus: 'doing', reason: 'verify-fail' });
+        addOutcome(dir, { id, actual: { outcome: 'blocked', passed: false, attempts: 1, errorClass: 'verify-miss', aheadCount: branchAheadCount } });
+        addFriction(dir, {
+          id,
+          disposition: 'blocked',
+          errorClass: 'verify-miss',
+          layer: 'verification',
+          attempts: 1,
+          detail: `goal-check failed on branch "${branch}" (exit ${check.status})`,
+        });
+        return `Returned ${id}: doing -> blocked (verify failed on branch "${branch}", exit ${check.status})\n${check.output}`;
+      }
+
       if (typeof item.headAtTake !== 'string' || !item.headAtTake) {
         throw new StoreError('validation', `return: work "${id}" has no recorded headAtTake — cannot verify progress since take.`);
       }
 
-      const cwd = process.cwd();
+      const cwd = repoRoot;
       if (!isWorkingTreeClean(cwd)) {
         throw new StoreError('validation', `return: working tree at "${cwd}" is not clean — commit the work for "${id}" before returning.`);
       }

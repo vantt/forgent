@@ -345,3 +345,130 @@ test('e2e pr-gate (d) reject a pull-door item: proposed -> todo carries the reas
   assert.match(gitAt(repoRoot, ['log', '--oneline']), /human: pr-d-file\.txt/, "the item's commit remains in main's history");
   assert.equal(fs.readFileSync(path.join(repoRoot, 'pr-d-file.txt'), 'utf8'), 'important content, keep me\n', 'the file content is unchanged — no revert');
 });
+
+// --- (e)/(f) branch-source item (human-rounds D2): a second door for a
+// `blocked` item that already carries a live `fgw/<id>` branch (parked by
+// the runner after too many visits, or a rejected proposal whose branch
+// survives) — `take` claims it via the existing blocked -> doing edge
+// (branchHeadAtTake, the branch's own HEAD), `return` verifies on the branch
+// in a disposable DETACHED worktree without ever touching the human's own
+// checkout, and classifySource's branch-existence-first rule (unchanged,
+// per D2) means review/approve treat the resulting proposal exactly like a
+// normal runner-source item — no merge.mjs changes needed. -----------------
+
+/** Leaves behind exactly what a real parked runner branch looks like: item
+ * at `blocked`, a live `fgw/<id>` branch one commit ahead of main, main's
+ * own tree/HEAD untouched — mirrors makeRunnerProposedItem's own "simulate
+ * what the runner leaves behind" discipline above, but the item never
+ * reaches `proposed`; it stays `blocked`, the D2 starting point. */
+function parkBranchItem(repoRoot, id, extra = {}) {
+  add(repoRoot, id, extra);
+  commitPending(repoRoot, `state: add ${id}`);
+
+  gitAt(repoRoot, ['checkout', '-b', `fgw/${id}`]);
+  fs.writeFileSync(path.join(repoRoot, `${id}-attempt.txt`), 'worker attempt\n');
+  gitAt(repoRoot, ['add', '-A']);
+  gitAt(repoRoot, ['commit', '-q', '-m', `worker attempt for ${id}`]);
+  gitAt(repoRoot, ['checkout', 'main']);
+
+  const moved = fgos(repoRoot, ['move', id, '--to', 'blocked']);
+  assert.equal(moved.status, 0, `move to blocked failed: ${moved.stderr}`);
+  commitPending(repoRoot, `state: park ${id}`);
+}
+
+test('e2e pr-gate (e) branch-source item full loop: park (blocked + live branch) -> take -> human commits fix on the branch -> return verifies in a detached temp worktree -> proposed -> review shows source: runner (classifySource unchanged, no merge.mjs edit) -> approve merges + verifies -> done, branch cleaned up', () => {
+  const repoRoot = initTempRepo();
+
+  assert.equal(fgos(repoRoot, ['init']).status, 0);
+  parkBranchItem(repoRoot, 'pr-e-item', { verify: 'test -f pr-e-proof.txt && echo PR_E_OK' });
+
+  const taken = fgos(repoRoot, ['take', '--id', 'pr-e-item']);
+  assert.equal(taken.status, 0, `take failed: ${taken.stderr}`);
+  assert.match(taken.stdout, /blocked -> doing/);
+  commitPending(repoRoot, 'state: take pr-e-item');
+
+  // The human's own fix, committed directly ON THE BRANCH — never on main.
+  gitAt(repoRoot, ['checkout', 'fgw/pr-e-item']);
+  fs.writeFileSync(path.join(repoRoot, 'pr-e-proof.txt'), 'fixed by hand\n');
+  gitAt(repoRoot, ['add', '-A']);
+  gitAt(repoRoot, ['commit', '-q', '-m', 'human fix']);
+  gitAt(repoRoot, ['checkout', 'main']);
+  const mainHeadBeforeReturn = currentHead(repoRoot);
+
+  const returned = fgos(repoRoot, ['return', 'pr-e-item']);
+  assert.equal(returned.status, 0, `return failed: ${returned.stderr}`);
+  assert.match(returned.stdout, /proposed/);
+  assert.equal(currentHead(repoRoot), mainHeadBeforeReturn, "return never advances the human's own main checkout");
+  assert.equal(worktreeCount(repoRoot), 1, 'the disposable detached verify worktree is cleaned up — no leftover');
+
+  const view1 = stateView(repoRoot);
+  assert.equal(view1.work['pr-e-item'].status, 'proposed');
+  assert.ok(view1.work['pr-e-item'].branchHeadAtReturn, 'branchHeadAtReturn recorded');
+  assert.equal('headAtReturn' in view1.work['pr-e-item'], false, 'a branch return never records the main-based headAtReturn (D2 CẤM)');
+
+  const review = fgos(repoRoot, ['review', 'pr-e-item']);
+  assert.equal(review.status, 0, `review failed: ${review.stderr}`);
+  assert.match(review.stdout, /source: runner/, "D2: classifySource sees the live branch — review/approve treat this exactly like a normal runner-source item, no merge.mjs changes needed");
+
+  commitPending(repoRoot, 'state: propose pr-e-item');
+
+  const approve = fgos(repoRoot, ['approve', 'pr-e-item']);
+  assert.equal(approve.status, 0, `approve failed: ${approve.stderr}`);
+  assert.match(approve.stdout, /proposed -> done/);
+  assert.match(approve.stdout, /PR_E_OK/);
+
+  const view2 = stateView(repoRoot);
+  assert.equal(view2.work['pr-e-item'].status, 'done');
+  assert.equal(view2.settlements['pr-e-item'][0].actor, 'human');
+  assert.equal(branchExists(repoRoot, 'fgw/pr-e-item'), false, 'the fully-merged branch is cleaned up');
+  assert.equal(worktreeCount(repoRoot), 1, 'no leaked worktree after cleanup');
+  assert.ok(fs.existsSync(path.join(repoRoot, 'pr-e-proof.txt')), 'the merged file is present on main');
+});
+
+test('e2e pr-gate (f) branch-source return never disturbs a checkout the human is actively standing on: a second live worktree on fgw/<id> at return time survives untouched — no reclaimOrphanedCheckout, no checkout-by-name collision', () => {
+  const repoRoot = initTempRepo();
+
+  assert.equal(fgos(repoRoot, ['init']).status, 0);
+  parkBranchItem(repoRoot, 'pr-f-item', { verify: 'test -f pr-f-proof.txt && echo PR_F_OK' });
+
+  const taken = fgos(repoRoot, ['take', '--id', 'pr-f-item']);
+  assert.equal(taken.status, 0, `take failed: ${taken.stderr}`);
+  commitPending(repoRoot, 'state: take pr-f-item');
+
+  gitAt(repoRoot, ['checkout', 'fgw/pr-f-item']);
+  fs.writeFileSync(path.join(repoRoot, 'pr-f-proof.txt'), 'fixed by hand\n');
+  gitAt(repoRoot, ['add', '-A']);
+  gitAt(repoRoot, ['commit', '-q', '-m', 'human fix']);
+  gitAt(repoRoot, ['checkout', 'main']);
+
+  // The human then opens a SECOND worktree on the very same branch — e.g. a
+  // second terminal/editor window still open on the code while `return` runs
+  // from their main checkout. `git worktree add <path> <branch>` (checkout
+  // BY NAME — exactly what `return` must NEVER do here) would fail outright
+  // with git's own "already checked out" refusal the moment a second such
+  // add is attempted against a branch already checked out somewhere; a
+  // `--detach <sha>` add (what `return` actually does) coexists with it
+  // cleanly, which is the whole point of this scenario.
+  const humanWorktree = mkTempDir('fgos-pr-gate-e2e-f-human-worktree-');
+  gitAt(repoRoot, ['worktree', 'add', humanWorktree, 'fgw/pr-f-item']);
+  assert.equal(worktreeCount(repoRoot), 2, "sanity: the human really does have a second live checkout of the branch");
+
+  const returned = fgos(repoRoot, ['return', 'pr-f-item']);
+  assert.equal(returned.status, 0, `return failed (must never collide with the human's own live checkout): ${returned.stderr}`);
+  assert.match(returned.stdout, /proposed/);
+
+  // The human's own worktree survives, untouched, still checked out on the
+  // branch — this is the BLOCKER the validating gate caught: reclaiming or
+  // checking out by name here would rip out or corrupt exactly this.
+  assert.ok(fs.existsSync(humanWorktree), "the human's own worktree directory must survive — never reclaimed");
+  assert.equal(
+    gitAt(humanWorktree, ['rev-parse', '--abbrev-ref', 'HEAD']).trim(),
+    'fgw/pr-f-item',
+    "the human's own worktree must still be checked out on the branch — never reclaimed/detached out from under them",
+  );
+  assert.equal(worktreeCount(repoRoot), 2, "return's own disposable verify worktree is cleaned up, but the human's own worktree remains — net count back to 2");
+
+  assert.equal(stateView(repoRoot).work['pr-f-item'].status, 'proposed');
+
+  gitAt(repoRoot, ['worktree', 'remove', humanWorktree, '--force']);
+});
