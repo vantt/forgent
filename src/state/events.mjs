@@ -73,6 +73,72 @@ export function readEvents(logPath) {
   return events;
 }
 
+function parsesAsJson(line) {
+  try {
+    JSON.parse(line);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Operator-invoked repair, scoped ONLY to the common crash-mid-append shape:
+ * every line parses except the last. Any other corruption shape (mid-file,
+ * multiple bad lines) is refused with `EventLogError('corrupt-log')` — this
+ * function never widens the fail-closed guarantee `readEvents` enforces.
+ *
+ * The original log is always backed up (to `<logPath>.corrupt-<ts>`) before
+ * the malformed trailing line is dropped, and the repaired file is
+ * re-validated through `readEvents` before returning — a repair that somehow
+ * left the log still unreadable surfaces as a thrown error, never a silent
+ * "fixed" result.
+ */
+export function repairTruncatedLastLine(logPath) {
+  let raw;
+  try {
+    raw = fs.readFileSync(logPath, 'utf8');
+  } catch (err) {
+    if (err.code === 'ENOENT') {
+      throw new EventLogError('validation', `repair: no event log at ${logPath} — nothing to repair.`);
+    }
+    throw err;
+  }
+
+  const lines = raw.split('\n');
+  if (lines[lines.length - 1] === '') lines.pop();
+
+  if (lines.length === 0) {
+    throw new EventLogError('validation', `repair: event log at ${logPath} is empty — nothing to repair.`);
+  }
+
+  for (let i = 0; i < lines.length - 1; i++) {
+    if (!parsesAsJson(lines[i])) {
+      throw new EventLogError(
+        'corrupt-log',
+        `repair: line ${i + 1} of ${lines.length} in ${logPath} is corrupt (not just a truncated final line) — refusing to repair.`,
+      );
+    }
+  }
+
+  const lastLine = lines[lines.length - 1];
+  if (parsesAsJson(lastLine)) {
+    throw new EventLogError('validation', `repair: event log at ${logPath} already parses cleanly — nothing to repair.`);
+  }
+
+  const backupPath = `${logPath}.corrupt-${Date.now()}`;
+  fs.copyFileSync(logPath, backupPath);
+
+  const repaired = lines.slice(0, -1).map((line) => `${line}\n`).join('');
+  fs.writeFileSync(logPath, repaired, 'utf8');
+
+  // Re-validate: readEvents throws if the repaired file is somehow still
+  // unreadable, so this call never returns a falsely-reported "fixed" state.
+  const events = readEvents(logPath);
+
+  return { backupPath, droppedLine: lastLine, eventCount: events.length };
+}
+
 /**
  * Append exactly one event to `logPath` as a single JSON line: `{ seq, ts,
  * type, payload, v }`. `seq` is derived from the current last event (1 if

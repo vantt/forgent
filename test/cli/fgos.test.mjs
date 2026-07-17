@@ -264,6 +264,34 @@ test('rebuild reconstructs state.json from the log alone when the view file stil
   assert.deepEqual(stateView(cwd), freshFromLog);
 });
 
+test('repair fixes a truncated final line via the real CLI, log becomes readable and usable again', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'before-truncation');
+  const before = eventLines(cwd).length;
+  fs.appendFileSync(logPath(cwd), '{"seq":99,"partial', 'utf8');
+
+  const repaired = run(cwd, ['repair']);
+  assert.equal(repaired.status, 0);
+  assert.equal(eventLines(cwd).length, before);
+
+  const list = run(cwd, ['list']);
+  assert.equal(list.status, 0);
+  assert.ok(JSON.parse(list.stdout).work['before-truncation']);
+});
+
+test('repair refuses mid-file corruption via the real CLI (valid, corrupt, valid), exit 5, log left untouched', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'a');
+  addOk(cwd, 'b');
+  const [firstLine, secondLine] = eventLines(cwd);
+  fs.writeFileSync(logPath(cwd), `${firstLine}\nnot json either\n${secondLine}\n`, 'utf8');
+  const before = fs.readFileSync(logPath(cwd), 'utf8');
+
+  const result = run(cwd, ['repair']);
+  assert.equal(result.status, 5);
+  assert.equal(fs.readFileSync(logPath(cwd), 'utf8'), before);
+});
+
 test('done is terminal via the real CLI: moving out of done is refused as precondition, exit 2, no event written', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'terminal-item');

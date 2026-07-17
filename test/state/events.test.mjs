@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { appendEvent, readEvents, EventLogError } from '../../src/state/events.mjs';
+import { appendEvent, readEvents, repairTruncatedLastLine, EventLogError } from '../../src/state/events.mjs';
 import { SCHEMA_VERSION } from '../../src/state/work.mjs';
 
 // Every test gets its own mkdtemp dir — never touch the repo's .fgos/.
@@ -123,6 +123,78 @@ test('appendEvent stamps every new event with v: SCHEMA_VERSION, from the single
 
   const [line] = fs.readFileSync(logPath, 'utf8').split('\n').filter(Boolean);
   assert.equal(JSON.parse(line).v, SCHEMA_VERSION);
+});
+
+test('repairTruncatedLastLine repairs a log with only a truncated final line, and the log becomes readable again', () => {
+  const logPath = tmpLogPath();
+  appendEvent(logPath, { type: 'work.add', payload: { id: 'a' } });
+  fs.appendFileSync(logPath, '{"seq":2,"ts":"2026-07-14T00:00:00.000Z","type":"work.move","pay', 'utf8');
+
+  const result = repairTruncatedLastLine(logPath);
+  assert.equal(result.eventCount, 1);
+  assert.ok(fs.existsSync(result.backupPath));
+
+  const events = readEvents(logPath);
+  assert.equal(events.length, 1);
+  assert.equal(events[0].type, 'work.add');
+});
+
+test('repairTruncatedLastLine backs up the original (unrepaired) log before truncating', () => {
+  const logPath = tmpLogPath();
+  appendEvent(logPath, { type: 'work.add', payload: { id: 'a' } });
+  const originalRaw = fs.readFileSync(logPath, 'utf8');
+  fs.appendFileSync(logPath, '{"seq":2,"broken', 'utf8');
+  const beforeRepair = fs.readFileSync(logPath, 'utf8');
+
+  const { backupPath } = repairTruncatedLastLine(logPath);
+
+  assert.equal(fs.readFileSync(backupPath, 'utf8'), beforeRepair);
+  assert.notEqual(beforeRepair, originalRaw);
+});
+
+test('repairTruncatedLastLine refuses mid-file corruption (valid, corrupt, valid) — does not silently accept it', () => {
+  const logPath = tmpLogPath();
+  fs.writeFileSync(
+    logPath,
+    [
+      '{"seq":1,"ts":"2026-07-14T00:00:00.000Z","type":"work.add","payload":null}',
+      'not json either',
+      '{"seq":3,"ts":"2026-07-14T00:00:01.000Z","type":"work.move","payload":null}',
+      '',
+    ].join('\n'),
+    'utf8',
+  );
+
+  assert.throws(
+    () => repairTruncatedLastLine(logPath),
+    (err) => err instanceof EventLogError && err.category === 'corrupt-log',
+  );
+  // Refusing must never touch the file on disk.
+  assert.ok(fs.readFileSync(logPath, 'utf8').includes('not json either'));
+});
+
+test('repairTruncatedLastLine refuses multiple bad lines, including two truncated-looking lines', () => {
+  const logPath = tmpLogPath();
+  fs.writeFileSync(
+    logPath,
+    ['{"seq":1,"ts":"2026-07-14T00:00:00.000Z","type":"work.add","payload":null}', 'trunc-one', 'trunc-two'].join('\n'),
+    'utf8',
+  );
+
+  assert.throws(
+    () => repairTruncatedLastLine(logPath),
+    (err) => err instanceof EventLogError && err.category === 'corrupt-log',
+  );
+});
+
+test('repairTruncatedLastLine refuses a log that already parses cleanly — nothing to repair', () => {
+  const logPath = tmpLogPath();
+  appendEvent(logPath, { type: 'work.add', payload: { id: 'a' } });
+
+  assert.throws(
+    () => repairTruncatedLastLine(logPath),
+    (err) => err instanceof EventLogError && err.category === 'validation',
+  );
 });
 
 test('readEvents reads a pre-Phase-2 event with no v field at all, unmodified (per D7a: never rewritten)', () => {

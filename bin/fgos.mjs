@@ -20,6 +20,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { initStore, addWork, moveWork, addDecision, addOutcome, addFriction, listWork, readyWork, readRawEvents, rebuild, putInAwaiting, answerAwaiting, StoreError, EXIT_CODES, categoryOf } from '../src/state/store.mjs';
+import { repairTruncatedLastLine } from '../src/state/events.mjs';
 import { deriveTitle, classify, generateId } from '../src/intake/classify.mjs';
 import { wrapEnvelope } from '../src/state/envelope.mjs';
 import { loadRunnerConfig } from '../src/runner/dispatch.mjs';
@@ -604,6 +605,17 @@ async function runVerb(verb, flags, positional, dir) {
     case 'rebuild': {
       const view = rebuild(dir);
       return `Rebuilt view: ${Object.keys(view.work).length} work item(s), ${view.decisions.length} decision(s).`;
+    }
+
+    // Operator-invoked repair (per readEvents' fail-closed 'corrupt-log'
+    // halt, events.mjs): scoped ONLY to the common crash-mid-append shape —
+    // a truncated final line, every other line already parses. Any other
+    // corruption shape still refuses (events.mjs's own guarantee, unchanged
+    // here). Backs up the original log before truncating, then re-validates.
+    case 'repair': {
+      const logPath = path.join(dir, 'events.jsonl');
+      const { backupPath, droppedLine, eventCount } = repairTruncatedLastLine(logPath);
+      return `Repaired ${logPath}: dropped truncated final line, backup at ${backupPath} (${eventCount} event(s) remain).\ndropped: ${droppedLine}`;
     }
 
     // Request-class per D1 (same contract as `ready`/`list`): a pure read,
@@ -1203,7 +1215,7 @@ async function runVerb(verb, flags, positional, dir) {
     }
 
     default:
-      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <init|add|submit|discover|move|ask|answer|decision|list|ready|rebuild|check|rollup|take|return|review|approve|reject|catchup> ...`);
+      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <init|add|submit|discover|move|ask|answer|decision|list|ready|rebuild|repair|check|rollup|take|return|review|approve|reject|catchup> ...`);
   }
 }
 
