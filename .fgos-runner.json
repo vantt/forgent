@@ -1,14 +1,23 @@
 {
   "executor": {
     "command": "claude",
-    "args": ["-p", "{prompt}", "--model", "{model}", "--permission-mode", "acceptEdits", "--allowedTools", "Bash(git add:*),Bash(git commit:*)"]
+    "args": [
+      "-p",
+      "{prompt}",
+      "--model",
+      "{model}",
+      "--permission-mode",
+      "acceptEdits",
+      "--allowedTools",
+      "Bash(git add:*),Bash(git commit:*)"
+    ]
   },
   "models": {
     "light": "haiku",
     "standard": "sonnet",
     "heavy": "opus"
   },
-  "timeoutMs": 300000,
+  "timeoutMs": 900000,
   "parallel": {
     "maxRoots": 4,
     "maxLeavesPerRoot": 4
