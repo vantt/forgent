@@ -6,6 +6,7 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import {
   createWorktree,
+  createBranchRef,
   removeWorktree,
   listLeftovers,
   branchNameFor,
@@ -203,4 +204,112 @@ test('removeWorktree throws worktree-fail for a path that is not an actual workt
       return true;
     },
   );
+});
+
+// --- branch-tree topology (fan-out-parallel, D3/D4/D17) --------------------
+//
+// This harness's initTempRepo() runs plain `git init -q` with no `-b main`,
+// so its default branch is whatever this machine's `init.defaultBranch` is
+// (often not literally "main") — unlike merge.test.mjs's initRepo(), which
+// pins `-b main`. Every test below therefore reads the repo's real initial
+// branch name via currentBranch() and passes it explicitly as baseRef,
+// never relying on createBranchRef's bare 'main' default resolving here.
+
+function currentBranch(repoRoot) {
+  return execFileSync('git', ['rev-parse', '--abbrev-ref', 'HEAD'], { cwd: repoRoot, encoding: 'utf8' }).trim();
+}
+
+function branchTip(repoRoot, branch) {
+  return execFileSync('git', ['rev-parse', branch], { cwd: repoRoot, encoding: 'utf8' }).trim();
+}
+
+test('createBranchRef creates a real branch ref pointed at baseRef, with zero worktree checkouts registered for it', () => {
+  const repoRoot = initTempRepo();
+  const initialBranch = currentBranch(repoRoot);
+
+  const result = createBranchRef(repoRoot, 'root-a', { baseRef: initialBranch });
+
+  assert.equal(result.branch, 'fgw/root-a');
+  assert.equal(result.created, true);
+  assert.equal(branchTip(repoRoot, 'fgw/root-a'), branchTip(repoRoot, initialBranch));
+
+  const listing = execFileSync('git', ['worktree', 'list', '--porcelain'], { cwd: repoRoot, encoding: 'utf8' });
+  assert.doesNotMatch(listing, /branch refs\/heads\/fgw\/root-a/);
+});
+
+test('createBranchRef is idempotent: a second call on an existing branch is a no-op and does not move the branch', () => {
+  const repoRoot = initTempRepo();
+  const initialBranch = currentBranch(repoRoot);
+
+  const first = createBranchRef(repoRoot, 'root-b', { baseRef: initialBranch });
+  assert.equal(first.created, true);
+  const shaAfterFirst = branchTip(repoRoot, 'fgw/root-b');
+
+  // move the base ref forward — if createBranchRef were not idempotent, a
+  // second call would (wrongly) re-point fgw/root-b at this new tip.
+  fs.writeFileSync(path.join(repoRoot, 'advance.txt'), 'advanced\n');
+  execFileSync('git', ['add', 'advance.txt'], { cwd: repoRoot });
+  execFileSync('git', ['commit', '-q', '-m', 'advance base'], { cwd: repoRoot });
+
+  const second = createBranchRef(repoRoot, 'root-b', { baseRef: initialBranch });
+  assert.equal(second.created, false);
+  assert.equal(second.branch, 'fgw/root-b');
+  assert.equal(branchTip(repoRoot, 'fgw/root-b'), shaAfterFirst, 'branch must not move on idempotent no-op');
+});
+
+test('createWorktree with opts.baseRef forks a new branch from that ref\'s tip, not from repoRoot\'s current HEAD', () => {
+  const repoRoot = initTempRepo();
+  const worktreeDir = mkWorktreeDir();
+  const initialBranch = currentBranch(repoRoot);
+
+  // "side" diverges from initialBranch at the seed commit, then gets a
+  // commit of its own that initialBranch never sees.
+  execFileSync('git', ['branch', 'side'], { cwd: repoRoot });
+  execFileSync('git', ['checkout', '-q', 'side'], { cwd: repoRoot });
+  fs.writeFileSync(path.join(repoRoot, 'side-only.txt'), 'side content\n');
+  execFileSync('git', ['add', 'side-only.txt'], { cwd: repoRoot });
+  execFileSync('git', ['commit', '-q', '-m', 'side commit'], { cwd: repoRoot });
+  execFileSync('git', ['checkout', '-q', initialBranch], { cwd: repoRoot });
+
+  // initialBranch (current HEAD) then advances independently, so it now
+  // holds a file "side" never sees.
+  fs.writeFileSync(path.join(repoRoot, 'main-only.txt'), 'main only\n');
+  execFileSync('git', ['add', 'main-only.txt'], { cwd: repoRoot });
+  execFileSync('git', ['commit', '-q', '-m', 'main-only commit'], { cwd: repoRoot });
+
+  const wt = createWorktree(repoRoot, 'leaf-a', { worktreeDir, baseRef: 'side' });
+
+  assert.equal(wt.reused, false);
+  assert.ok(fs.existsSync(path.join(wt.path, 'side-only.txt')), 'forked worktree must see side branch content');
+  assert.equal(
+    fs.existsSync(path.join(wt.path, 'main-only.txt')),
+    false,
+    'forked worktree must NOT see current-HEAD-only content — proves it forked from baseRef tip, not HEAD',
+  );
+});
+
+test('createWorktree with opts.baseRef on an existing (reused) branch ignores baseRef and reuses as before', () => {
+  const repoRoot = initTempRepo();
+  const worktreeDir = mkWorktreeDir();
+
+  const first = createWorktree(repoRoot, 'item-reuse', { worktreeDir });
+  commitOnWorktree(first.path, 'attempt-1.txt', 'first attempt\n');
+  removeWorktree(repoRoot, first.path);
+
+  // an unrelated branch that does NOT contain attempt-1.txt — if baseRef
+  // were (wrongly) honored on the reuse path, the checkout would come from
+  // here instead of the existing fgw/item-reuse branch.
+  execFileSync('git', ['branch', 'unrelated'], { cwd: repoRoot });
+
+  const second = createWorktree(repoRoot, 'item-reuse', { worktreeDir, baseRef: 'unrelated' });
+
+  assert.equal(second.branch, 'fgw/item-reuse');
+  assert.equal(second.reused, true);
+  assert.notEqual(second.path, first.path);
+  assert.ok(
+    fs.existsSync(path.join(second.path, 'attempt-1.txt')),
+    'baseRef must be ignored on reuse — checkout must still come from the existing fgw/item-reuse branch',
+  );
+
+  removeWorktree(repoRoot, second.path);
 });

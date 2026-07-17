@@ -24,6 +24,17 @@
 // the same work item therefore never collides with its own previous attempt
 // — same branch, new empty directory slot.
 //
+// BRANCH-TREE TOPOLOGY (fan-out-parallel, D3/D4/D17): a root's integration
+// branch `fgw/<root>` is created EARLY as a ref only, via `createBranchRef`
+// — no worktree/checkout, just `git branch <branch> <baseRef>`. Leaves of
+// that root then fork their own `fgw/<leaf>` branch from the *tip of the
+// root's branch* (D3 "leaf fork-from-tip-of-parent") by passing that tip as
+// `opts.baseRef` to `createWorktree`, instead of forking from `main`/current
+// HEAD. D17 revises the original D4 design: no worktree is ever long-lived
+// here — only branches are durable; every checkout (leaf execution,
+// leaf-into-parent merge, root-into-main merge) is ephemeral and rebuilt
+// from its branch ref on demand.
+//
 // CRASH RECLAIM (phase-2-routing-10): a normal teardown always runs
 // `removeWorktree` before a branch is ever reused, so under ordinary
 // operation the branch is never checked out anywhere when `createWorktree`
@@ -150,12 +161,45 @@ export function reclaimOrphanedCheckout(repoRoot, branch) {
 }
 
 /**
+ * Create the integration branch `fgw/<id>` (D17: "nhánh tạo sớm, không cần
+ * worktree") as a REF ONLY — no worktree/checkout is registered for it.
+ * `opts.baseRef` (default `'main'`) is the ref the new branch forks from.
+ * Idempotent: if `fgw/<id>` already exists, this is a no-op — it does NOT
+ * move the branch to `baseRef`, mirroring the RETRY-WITHOUT-SELF-COLLISION
+ * discipline above (a retried root-dispatch must not disturb a branch that
+ * may already carry committed leaf work). Returns `{ branch, created }`,
+ * where `created` is `false` when the branch already existed.
+ */
+export function createBranchRef(repoRoot, id, opts = {}) {
+  const branch = branchNameFor(id);
+  const baseRef = opts.baseRef ?? 'main';
+
+  if (branchExists(repoRoot, branch)) {
+    return { branch, created: false };
+  }
+
+  try {
+    git(repoRoot, ['branch', branch, baseRef]);
+  } catch (err) {
+    throw new WorktreeError(`git branch failed creating ref "${branch}" from "${baseRef}": ${err.message}`, {
+      branch,
+      baseRef,
+    });
+  }
+
+  return { branch, created: true };
+}
+
+/**
  * Create (or reuse, see module doc) an isolated worktree for work item `id`
  * inside `repoRoot`. Always allocates a fresh temp directory for the
  * checkout via `mkdtemp` (default base: `os.tmpdir()/fgos-worktrees`,
  * overridable via `opts.worktreeDir` — tests use this to stay inside a
- * disposable temp git repo, never the main repo). Returns
- * `{ path, branch, reused }`.
+ * disposable temp git repo, never the main repo). When the branch does not
+ * already exist, `opts.baseRef` (D3 "leaf fork-from-tip-of-parent") forks
+ * the new branch from that ref instead of the implicit current HEAD; it is
+ * ignored on the reuse path (an existing branch is reused exactly as
+ * before, regardless of `opts.baseRef`). Returns `{ path, branch, reused }`.
  */
 export function createWorktree(repoRoot, id, opts = {}) {
   const branch = branchNameFor(id);
@@ -168,6 +212,8 @@ export function createWorktree(repoRoot, id, opts = {}) {
   try {
     if (reused) {
       git(repoRoot, ['worktree', 'add', worktreePath, branch]);
+    } else if (opts.baseRef) {
+      git(repoRoot, ['worktree', 'add', '-b', branch, worktreePath, opts.baseRef]);
     } else {
       git(repoRoot, ['worktree', 'add', '-b', branch, worktreePath]);
     }
