@@ -788,7 +788,7 @@ export async function runOnce(options = {}) {
             log(`fgos-runner: work "${item.id}" has unrecognized domain "${bad}" — folding to "coding".`),
         });
         const clarifyStage = stageForStep(domain, 'Clarify');
-        if (item.stage === clarifyStage && item.status === 'todo') {
+        if (clarifyStage !== undefined && item.stage === clarifyStage && item.status === 'todo') {
           resolveDiscovery(dir, item.id, config, 'runner');
           log(`fgos-runner: context-discovery swept clarify item "${item.id}"`);
         }
@@ -808,7 +808,7 @@ export async function runOnce(options = {}) {
             log(`fgos-runner: work "${item.id}" has unrecognized domain "${bad}" — folding to "coding".`),
         });
         const decomposeStage = stageForStep(domain, 'Divide');
-        if (item.stage === decomposeStage && item.status === 'todo') {
+        if (decomposeStage !== undefined && item.stage === decomposeStage && item.status === 'todo') {
           resolveDecompose(dir, item.id, config, 'runner');
           log(`fgos-runner: chia-việc swept decompose item "${item.id}"`);
         }

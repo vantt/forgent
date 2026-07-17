@@ -356,6 +356,50 @@ test('runOnce clarify+decompose sweeps fold an unrecognized item.domain to "codi
   );
 });
 
+// --- clarify/decompose sweeps never match on a domain with no Clarify/Divide
+// stage (base-workflow-model-4): stageForStep returns undefined for the
+// 'synthetic' domain's Clarify/Divide steps, and an item with no explicit
+// `stage` also reads as `item.stage === undefined` (D8 lazy default) — the
+// pre-fix comparison (`item.stage === clarifyStage`) wrongly matched
+// undefined === undefined and swept the item into resolveDiscovery, which
+// then threw a stage conflict (synthetic's lazily-resolved "from" stage is
+// its own Execute stage, 'assembling', never 'clarify') and halted the whole
+// drain-run. The fixed guard requires clarifyStage/decomposeStage to be a
+// real stage name before comparing, so a synthetic-domain item is left alone
+// by both sweeps and reaches the frontier (already ready, since its own
+// lazy-default stage IS its Execute stage) and dispatches normally.
+
+test('runOnce clarify+decompose sweeps never touch a synthetic-domain item with no Clarify/Divide-mapped stage — it dispatches straight through instead of being wrongly swept', async () => {
+  const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
+  seedItem(dir, { id: 'item-synthetic', domain: 'synthetic', verify: 'test -f output.txt' });
+  const config = configFor(writeCommittingExecutor(scriptDir, counterFile));
+
+  const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
+
+  assert.equal(result.outcome, 'drained', 'the synthetic item must dispatch, never halt on a bogus stage conflict');
+  assert.equal(result.dispatched.length, 1);
+  assert.equal(result.dispatched[0].outcome, 'proposed');
+  assert.equal(result.dispatched[0].id, 'item-synthetic');
+  assert.equal(listWork(dir).work['item-synthetic'].status, 'proposed');
+  // no work.discovery / work.stage event was ever written — the sweeps
+  // genuinely skipped it rather than happening to succeed
+  const events = readRawEvents(dir);
+  assert.ok(!events.some((e) => e.type === 'work.discovery' || e.type === 'work.stage'));
+});
+
+test('runOnce clarify+decompose sweeps still fire normally for a coding-domain item at stage "clarify" (no behavior change for coding)', async () => {
+  const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
+  seedItem(dir, { id: 'item-coding-clarify', stage: 'clarify', verify: 'test -f output.txt' });
+  const config = configFor(writeClearDiscoveryExecutor(scriptDir, counterFile, { verify: 'test -f output.txt' }));
+
+  const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
+
+  assert.equal(result.outcome, 'drained');
+  assert.equal(result.dispatched[0].outcome, 'proposed');
+  assert.equal(result.dispatched[0].id, 'item-coding-clarify');
+  assert.equal(listWork(dir).work['item-coding-clarify'].stage, 'executing');
+});
+
 // --- real parallelism: two independent items overlap in one runOnce -------
 // (fan-out-parallel D10/D16 — the whole point of the drain-run rewrite). The
 // overlap is proven CONCRETELY (interval intersection), not by a wall-clock-
