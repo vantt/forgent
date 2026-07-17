@@ -12,5 +12,9 @@
   "files": ["bin", "src", "README.md", "LICENSE"],
   "scripts": {
     "test": "node --test 'test/**/*.test.mjs'"
+  },
+  "exports": {
+    "./state/porting": "./src/state/porting.mjs",
+    "./state/porting-store": "./src/state/porting-store.mjs"
   }
 }
