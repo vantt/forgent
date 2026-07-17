@@ -6,6 +6,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { addOutcome, addFriction, moveWork, addWork, editWork, StoreError } from '../../src/state/store.mjs';
+import { createSession, endSession } from '../../src/runner/session.mjs';
 
 // The CLI under test, resolved by absolute path so it works regardless of
 // the spawned process's cwd (which every test below points at a fresh
@@ -3285,4 +3286,144 @@ test('session with no sub-verb, and an unknown sub-verb, are both rejected as va
   const cwd = initGitCwd();
   assert.equal(run(cwd, ['session']).status, 4);
   assert.equal(run(cwd, ['session', 'bogus']).status, 4);
+});
+
+// --- approve session-nesting guard (fgos-multi-session-checkout Epic 2) ------
+//
+// approve (NOT --github) refuses when cwd is inside a registered session
+// worktree, covering BOTH non-github source paths — runner (a merge there
+// lands on the session's own detached HEAD, never main) and pull/legacy (a
+// goal-check verifies whatever cwd has checked out while claiming "verified on
+// main"). Every session below is created via session.mjs's REAL createSession
+// (not a mock) so the guard sees a genuinely registered worktree, and torn
+// down with endSession(force) so no worktree leaks.
+
+// A git-backed cwd with a `main` default branch AND `.fgos/` ENTIRELY
+// gitignored (not just state.json). The full ignore is load-bearing here:
+// createSession runs `git worktree add --detach HEAD`, so if HEAD carried a
+// committed `.fgos/` (the repo's usual convention), the new worktree would
+// materialize it and collide (EEXIST) with the `.fgos` symlink createSession
+// then creates. Gitignoring `.fgos/` keeps it out of every commit; the shared
+// store still lives on disk and is symlinked into each session worktree, and
+// isMainTreeClean already excludes `.fgos/`, so approve is unaffected.
+function initSessionSafeCwd() {
+  const cwd = tmpCwd();
+  execFileSync('git', ['init', '-q', '-b', 'main'], { cwd });
+  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd });
+  execFileSync('git', ['config', 'user.name', 'Test'], { cwd });
+  fs.writeFileSync(path.join(cwd, '.gitignore'), '.fgos/\n');
+  fs.writeFileSync(path.join(cwd, 'seed.txt'), 'seed\n');
+  execFileSync('git', ['add', 'seed.txt', '.gitignore'], { cwd });
+  execFileSync('git', ['commit', '-q', '-m', 'seed'], { cwd });
+  return cwd;
+}
+
+// Builds a runner-classified proposed item (a live fgw/<id> branch with a real
+// commit, item moved doing->proposed) on an initSessionSafeCwd, WITHOUT ever
+// committing `.fgos/` into HEAD — the only difference from makeRunnerProposedItem,
+// whose `git add -A` commits would both fold `.fgos/` into HEAD (breaking the
+// session-worktree symlink) and, under a fully-ignored `.fgos/`, have nothing to
+// commit. main's HEAD stays at seed; only the fgw/<id> branch carries the produced
+// file, exactly what classifySource keys off.
+function makeSessionSafeRunnerItem(cwd, id, extra = {}) {
+  addOk(cwd, id, extra);
+  run(cwd, ['move', id, '--to', 'doing']);
+  gitAtCwd(cwd, ['checkout', '-b', `fgw/${id}`]);
+  fs.writeFileSync(path.join(cwd, `${id}-produced.txt`), 'ok\n');
+  gitAtCwd(cwd, ['add', `${id}-produced.txt`]);
+  gitAtCwd(cwd, ['commit', '-q', '-m', `worker output for ${id}`]);
+  gitAtCwd(cwd, ['checkout', 'main']);
+  run(cwd, ['move', id, '--to', 'proposed']);
+}
+
+test('approve refuses from inside a registered session worktree (runner source) — no merge, item stays proposed, main HEAD unchanged, exit 4', () => {
+  const cwd = initSessionSafeCwd();
+  run(cwd, ['init']);
+  makeSessionSafeRunnerItem(cwd, 'approve-nested-runner', { verify: 'test -f approve-nested-runner-produced.txt' });
+  const headBefore = gitHead(cwd);
+
+  const session = createSession(cwd, { sessionId: 'sess-runner' });
+  try {
+    const result = run(session.worktreePath, ['approve', 'approve-nested-runner']);
+    assert.equal(result.status, 4, `expected a clean validation refusal: ${result.stdout}${result.stderr}`);
+    assert.match(result.stderr, /sess-runner/, 'the refusal names the session id cwd is nested inside');
+    assert.match(result.stderr, /session end/, 'the refusal tells the caller how to proceed');
+    assert.equal(stateView(cwd).work['approve-nested-runner'].status, 'proposed', 'item is untouched — no merge, no state change');
+    assert.equal(gitHead(cwd), headBefore, 'main HEAD must be unchanged — no merge landed');
+  } finally {
+    endSession(cwd, session.sessionId, { force: true });
+  }
+});
+
+test('approve refuses from inside a registered session worktree (pull source) — refuses before any goal-check, item stays proposed, exit 4', () => {
+  const cwd = initSessionSafeCwd();
+  run(cwd, ['init']);
+  addOk(cwd, 'approve-nested-pull', { verify: 'test -f proof.txt' });
+  run(cwd, ['take', '--id', 'approve-nested-pull']);
+  commitFile(cwd, 'proof.txt');
+  run(cwd, ['return', 'approve-nested-pull']);
+
+  const session = createSession(cwd, { sessionId: 'sess-pull' });
+  try {
+    // proof.txt exists at HEAD, so an unguarded pull-source approve would run
+    // goal-check, pass, and mark the item done. The guard must refuse first.
+    const result = run(session.worktreePath, ['approve', 'approve-nested-pull']);
+    assert.equal(result.status, 4, `expected a clean validation refusal: ${result.stdout}${result.stderr}`);
+    assert.match(result.stderr, /sess-pull/, 'the refusal names the session id cwd is nested inside');
+    assert.equal(stateView(cwd).work['approve-nested-pull'].status, 'proposed', 'item stays proposed — goal-check never ran to close it');
+  } finally {
+    endSession(cwd, session.sessionId, { force: true });
+  }
+});
+
+test('approve from the main checkout is unaffected by the guard even while a session is registered — runner and pull both close to done, exit 0', () => {
+  // runner source: main-checkout approve still merges fgw/<id> and closes.
+  const cwdR = initSessionSafeCwd();
+  run(cwdR, ['init']);
+  makeSessionSafeRunnerItem(cwdR, 'approve-main-runner', { verify: 'test -f approve-main-runner-produced.txt' });
+  const sessionR = createSession(cwdR, { sessionId: 'sess-active-runner' });
+  try {
+    const resR = run(cwdR, ['approve', 'approve-main-runner']);
+    assert.equal(resR.status, 0, `runner approve from main must still succeed with a session active: ${resR.stderr}`);
+    assert.equal(stateView(cwdR).work['approve-main-runner'].status, 'done');
+  } finally {
+    endSession(cwdR, sessionR.sessionId, { force: true });
+  }
+
+  // pull source: main-checkout approve still re-verifies on main and closes.
+  const cwdP = initSessionSafeCwd();
+  run(cwdP, ['init']);
+  addOk(cwdP, 'approve-main-pull', { verify: 'test -f proof.txt' });
+  run(cwdP, ['take', '--id', 'approve-main-pull']);
+  commitFile(cwdP, 'proof.txt');
+  run(cwdP, ['return', 'approve-main-pull']);
+  const sessionP = createSession(cwdP, { sessionId: 'sess-active-pull' });
+  try {
+    const resP = run(cwdP, ['approve', 'approve-main-pull']);
+    assert.equal(resP.status, 0, `pull approve from main must still succeed with a session active: ${resP.stderr}`);
+    assert.equal(stateView(cwdP).work['approve-main-pull'].status, 'done');
+  } finally {
+    endSession(cwdP, sessionP.sessionId, { force: true });
+  }
+});
+
+test('return succeeds unchanged from inside a real session worktree (created via session.mjs createSession) — doing -> proposed, exit 0', () => {
+  const cwd = initSessionSafeCwd();
+  run(cwd, ['init']);
+  addOk(cwd, 'return-in-session', { verify: 'test -f proof.txt' });
+  run(cwd, ['take', '--id', 'return-in-session']); // headAtTake = current main HEAD
+
+  // Real detached-HEAD worktree at headAtTake, then advance it with a genuine
+  // commit made FROM INSIDE the session worktree (a real dangling commit).
+  const session = createSession(cwd, { sessionId: 'sess-return' });
+  commitInWorktree(session.worktreePath, 'proof.txt', 'work\n');
+
+  try {
+    const result = run(session.worktreePath, ['return', 'return-in-session']);
+    assert.equal(result.status, 0, `return from inside a session worktree should succeed unchanged: ${result.stdout}${result.stderr}`);
+    assert.match(result.stdout, /proposed/);
+    assert.equal(stateView(cwd).work['return-in-session'].status, 'proposed');
+  } finally {
+    endSession(cwd, session.sessionId, { force: true });
+  }
 });

@@ -86,6 +86,21 @@ function commitsSince(cwd, from, to) {
   return parseInt(gitAt(cwd, ['rev-list', '--count', `${from}..${to}`]).trim(), 10) || 0;
 }
 
+// LOCAL copy of session.mjs's private realpathOr (session.mjs is never edited,
+// nothing is exported from it for this). A bare fs.realpathSync would throw the
+// moment any ONE registered session's worktree directory is gone from disk (a
+// crashed session hand-cleaned instead of via `fgos session end`) — crashing
+// approve for EVERY caller, including from the main checkout. The try/catch
+// fallback to path.resolve keeps one stale registry entry from taking down the
+// approval gate.
+function realpathOr(p) {
+  try {
+    return fs.realpathSync(p);
+  } catch {
+    return path.resolve(p);
+  }
+}
+
 // The gh binary the GitHub transport shells out to (github-adapter D2). Tests
 // substitute a fake executable through FGOS_GH_COMMAND; production leaves it
 // unset and the real `gh` on PATH is used.
@@ -1143,6 +1158,33 @@ async function runVerb(verb, flags, positional, dir) {
           detail: `gh pr merge #${prNumber} failed at step ${result.step}: ${result.detail}`,
         });
         return `Approved ${id}: GitHub PR #${prNumber} merge failed — proposed -> blocked (reason ${reason})\n${result.detail}`;
+      }
+
+      // Multi-session guard (fgos-multi-session-checkout Epic 2): approve must
+      // never run with cwd inside a registered session worktree. One refusal,
+      // covering BOTH non-github source paths, each dangerous for its own reason:
+      //   - runner: the merge below lands on the session's own detached HEAD,
+      //     never main (spike-proven) — a silent "approved" item whose code
+      //     never reaches main.
+      //   - pull/legacy: runGoalCheck below verifies whatever cwd has checked
+      //     out; a session worktree sits at its startCommit, which may predate
+      //     later advances to main, so this would verify STALE code while the
+      //     "verified on main" message claims otherwise, marking the item done
+      //     regardless — a silent false verification.
+      // Refuses BEFORE any git command or verify run: the item stays proposed,
+      // main untouched. --github is exempt (handled above — it never touches the
+      // local tree). Registry-based: an ad-hoc `git worktree add` never created
+      // through `fgos session start` is invisible to this guard (CONTEXT.md
+      // Deferred Ideas — ad-hoc unregistered worktree residual risk).
+      const approveCwdReal = realpathOr(repoRoot);
+      for (const session of listSessions(repoRoot)) {
+        const wtReal = realpathOr(session.worktreePath);
+        if (approveCwdReal === wtReal || approveCwdReal.startsWith(`${wtReal}${path.sep}`)) {
+          throw new StoreError(
+            'validation',
+            `approve: refusing to run from inside session "${session.sessionId}" worktree at "${wtReal}" — approve must land on the main checkout, which a session worktree structurally is not. Run approve from the main checkout, or end the session first with "fgos session end ${session.sessionId}".`,
+          );
+        }
       }
 
       if (source === 'runner') {
