@@ -77,9 +77,9 @@ test('hasExceededMaxVisits honors a custom threshold override', () => {
   assert.equal(hasExceededMaxVisits(5, 5), true);
 });
 
-// -- createMissBreaker: in-memory per-run circuit breaker ------------------
+// -- createMissBreaker: in-memory, now per-item circuit breaker ------------
 
-test('a fresh breaker starts untripped with zero consecutive misses', () => {
+test('a fresh breaker starts untripped with zero consecutive misses (sentinel/no-id getter)', () => {
   const breaker = createMissBreaker();
   assert.equal(breaker.consecutiveMisses, 0);
   assert.equal(breaker.isTripped(), false);
@@ -88,29 +88,29 @@ test('a fresh breaker starts untripped with zero consecutive misses', () => {
 test('recordMiss increments the streak; isTripped flips at BREAKER_MISSES (boundary)', () => {
   const breaker = createMissBreaker();
   for (let i = 1; i < BREAKER_MISSES; i++) {
-    breaker.recordMiss();
-    assert.equal(breaker.isTripped(), false, `should not trip before ${BREAKER_MISSES} misses (at ${i})`);
+    breaker.recordMiss('a');
+    assert.equal(breaker.isTripped('a'), false, `should not trip before ${BREAKER_MISSES} misses (at ${i})`);
   }
-  breaker.recordMiss();
-  assert.equal(breaker.consecutiveMisses, BREAKER_MISSES);
-  assert.equal(breaker.isTripped(), true);
+  breaker.recordMiss('a');
+  assert.equal(breaker.consecutiveMissesFor('a'), BREAKER_MISSES);
+  assert.equal(breaker.isTripped('a'), true);
 });
 
 test('recordHit resets the streak to 0', () => {
   const breaker = createMissBreaker();
-  breaker.recordMiss();
-  breaker.recordMiss();
-  breaker.recordHit();
-  assert.equal(breaker.consecutiveMisses, 0);
-  assert.equal(breaker.isTripped(), false);
+  breaker.recordMiss('a');
+  breaker.recordMiss('a');
+  breaker.recordHit('a');
+  assert.equal(breaker.consecutiveMissesFor('a'), 0);
+  assert.equal(breaker.isTripped('a'), false);
 });
 
 test('a custom threshold trips earlier', () => {
   const breaker = createMissBreaker(2);
-  breaker.recordMiss();
-  assert.equal(breaker.isTripped(), false);
-  breaker.recordMiss();
-  assert.equal(breaker.isTripped(), true);
+  breaker.recordMiss('a');
+  assert.equal(breaker.isTripped('a'), false);
+  breaker.recordMiss('a');
+  assert.equal(breaker.isTripped('a'), true);
 });
 
 test('two misses with an unrelated (human) event in between still count as consecutive (in-memory, not event-derived)', () => {
@@ -120,14 +120,54 @@ test('two misses with an unrelated (human) event in between still count as conse
   // the caller never reports through this API leaves the streak untouched,
   // because there is nothing here that could have seen it.
   const breaker = createMissBreaker(3);
-  breaker.recordMiss();
+  breaker.recordMiss('a');
   const unrelatedHumanEvent = { seq: 7, ts: new Date().toISOString(), type: 'decision', payload: { text: 'note' }, v: 2 };
   void unrelatedHumanEvent; // never passed to the breaker — it has no read path to see it
+  breaker.recordMiss('a');
+  assert.equal(breaker.consecutiveMissesFor('a'), 2);
+  assert.equal(breaker.isTripped('a'), false);
+  breaker.recordMiss('a');
+  assert.equal(breaker.isTripped('a'), true);
+});
+
+test('zero-arg recordMiss/recordHit/isTripped (no id) keep working exactly as before, keyed to the same sentinel as the consecutiveMisses getter', () => {
+  const breaker = createMissBreaker();
+  breaker.recordMiss();
   breaker.recordMiss();
   assert.equal(breaker.consecutiveMisses, 2);
   assert.equal(breaker.isTripped(), false);
   breaker.recordMiss();
+  assert.equal(breaker.consecutiveMisses, BREAKER_MISSES);
   assert.equal(breaker.isTripped(), true);
+  breaker.recordHit();
+  assert.equal(breaker.consecutiveMisses, 0);
+  assert.equal(breaker.isTripped(), false);
+});
+
+test('two different item ids each independently reach their own trip threshold without affecting each other', () => {
+  const breaker = createMissBreaker();
+  for (let i = 1; i < BREAKER_MISSES; i++) {
+    breaker.recordMiss('item-a');
+  }
+  assert.equal(breaker.consecutiveMissesFor('item-a'), BREAKER_MISSES - 1);
+  assert.equal(breaker.isTripped('item-a'), false);
+
+  for (let i = 0; i < BREAKER_MISSES; i++) {
+    breaker.recordMiss('item-b');
+  }
+  assert.equal(breaker.consecutiveMissesFor('item-b'), BREAKER_MISSES);
+  assert.equal(breaker.isTripped('item-b'), true);
+
+  // item-a's streak is untouched by item-b's misses.
+  assert.equal(breaker.consecutiveMissesFor('item-a'), BREAKER_MISSES - 1);
+  assert.equal(breaker.isTripped('item-a'), false);
+});
+
+test('an id never explicitly initialized starts at 0/untripped (Map absence is fresh state, not a throw)', () => {
+  const breaker = createMissBreaker();
+  assert.doesNotThrow(() => breaker.consecutiveMissesFor('never-seen'));
+  assert.equal(breaker.consecutiveMissesFor('never-seen'), 0);
+  assert.equal(breaker.isTripped('never-seen'), false);
 });
 
 // -- purity guard: the lib must never import fs/child_process -------------
