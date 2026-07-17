@@ -419,6 +419,30 @@ function formatEntropySection(view, dir) {
   return [trendLine, ...partsLines, sealLine].filter(Boolean).join('\n');
 }
 
+// Rollup view (P24): direct children only (`w.parent === id`) — decompose
+// (P16) is a single-level split, a root's own children never carry further
+// `parent` chains of their own in current data, so walking deeper would add
+// complexity with nothing real to show yet (YAGNI over frontier.mjs's
+// multi-level `hasOpenDescendant` walk, which exists for a different job —
+// gating the frontier, not reporting progress).
+function formatRollup(view, id) {
+  const item = view.work?.[id];
+  if (!item) {
+    throw new StoreError('validation', `rollup: work "${id}" not found.`);
+  }
+  const children = Object.values(view.work).filter((w) => w.parent === id);
+  const done = children.filter((w) => w.status === 'done').length;
+  const lines = [`${id} — ${item.title} (${item.status})`, `${done}/${children.length} done`];
+  if (children.length === 0) {
+    lines.push('không có con');
+  } else {
+    for (const child of children) {
+      lines.push(`  - ${child.id}: ${child.title} (${child.status})`);
+    }
+  }
+  return lines.join('\n');
+}
+
 async function runVerb(verb, flags, positional, dir) {
   switch (verb) {
     case 'init': {
@@ -590,6 +614,17 @@ async function runVerb(verb, flags, positional, dir) {
     case 'check': {
       const id = optionalField(positional[0] ?? flags.id, 'check --id requires a non-empty id value (omit --id entirely to check every item)');
       return formatCheck(listWork(dir), id, dir);
+    }
+
+    // Rollup view theo bộ (P24, request-class per D1: a pure read — never
+    // appends an event, never mutates state.json, same contract as
+    // `check`/`ready`/`list`). Prints one root item (title/status) plus a
+    // done/total count over its direct children (via `parent`, dựng từ P16
+    // decompose) and each child's own status — the "việc tôi nộp tới đâu
+    // rồi" answer without a human filtering `list` by hand.
+    case 'rollup': {
+      const id = requireField(positional[0] ?? flags.id, 'rollup requires an id: fgos rollup <id>');
+      return formatRollup(listWork(dir), id);
     }
 
     // Cửa pull — take (stage-decompose S2-pull D1): a tác nhân ngoài runner
@@ -1168,7 +1203,7 @@ async function runVerb(verb, flags, positional, dir) {
     }
 
     default:
-      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <init|add|submit|discover|move|ask|answer|decision|list|ready|rebuild|check|take|return|review|approve|reject|catchup> ...`);
+      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <init|add|submit|discover|move|ask|answer|decision|list|ready|rebuild|check|rollup|take|return|review|approve|reject|catchup> ...`);
   }
 }
 
