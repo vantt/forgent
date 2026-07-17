@@ -153,16 +153,16 @@ test('reviewDiff for a legacy item (no branch, no head markers) returns a null d
 // --- mergeRunnerItem (spike-proven mechanics: --no-commit --no-ff, verify
 // on the staged tree BEFORE commit, --abort on any red path) --------------
 
-test('mergeRunnerItem merges cleanly, verify passes, and commits — outcome "merged"', () => {
+test('mergeRunnerItem merges cleanly, verify passes, and commits — outcome "merged"', async () => {
   const repoRoot = initRepo();
   makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
-  const result = mergeRunnerItem(repoRoot, makeItem({ verify: 'test -f produced.txt' }));
+  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'test -f produced.txt' }));
   assert.equal(result.outcome, 'merged');
   assert.ok(fs.existsSync(path.join(repoRoot, 'produced.txt')));
   assert.equal(isWorkingTreeClean(repoRoot), true);
 });
 
-test('mergeRunnerItem aborts cleanly on a real conflict — main left byte-for-byte unchanged, outcome "conflict"', () => {
+test('mergeRunnerItem aborts cleanly on a real conflict — main left byte-for-byte unchanged, outcome "conflict"', async () => {
   const repoRoot = initRepo();
   fs.writeFileSync(path.join(repoRoot, 'shared.txt'), 'base\n');
   git(repoRoot, ['add', 'shared.txt']);
@@ -178,19 +178,19 @@ test('mergeRunnerItem aborts cleanly on a real conflict — main left byte-for-b
   git(repoRoot, ['commit', '-q', '-m', 'main changes shared.txt']);
 
   const headBefore = headOf(repoRoot);
-  const result = mergeRunnerItem(repoRoot, makeItem());
+  const result = await mergeRunnerItem(repoRoot, makeItem());
   assert.equal(result.outcome, 'conflict');
   assert.equal(headOf(repoRoot), headBefore, 'HEAD must be unchanged after an aborted merge');
   assert.equal(isWorkingTreeClean(repoRoot), true, 'tree must be clean after merge --abort');
   assert.equal(fs.readFileSync(path.join(repoRoot, 'shared.txt'), 'utf8'), 'main-change\n');
 });
 
-test('mergeRunnerItem aborts cleanly when the staged merge fails its own verify — main left unchanged, outcome "verify-fail"', () => {
+test('mergeRunnerItem aborts cleanly when the staged merge fails its own verify — main left unchanged, outcome "verify-fail"', async () => {
   const repoRoot = initRepo();
   makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
 
   const headBefore = headOf(repoRoot);
-  const result = mergeRunnerItem(repoRoot, makeItem({ verify: 'test -f required-file-never-produced.txt' }));
+  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'test -f required-file-never-produced.txt' }));
   assert.equal(result.outcome, 'verify-fail');
   assert.equal(headOf(repoRoot), headBefore, 'HEAD must be unchanged after an aborted merge');
   assert.equal(isWorkingTreeClean(repoRoot), true, 'tree must be clean after merge --abort');
@@ -199,10 +199,10 @@ test('mergeRunnerItem aborts cleanly when the staged merge fails its own verify 
 
 // --- cleanupMergedBranch -------------------------------------------------
 
-test('cleanupMergedBranch deletes the now-fully-merged branch and never throws', () => {
+test('cleanupMergedBranch deletes the now-fully-merged branch and never throws', async () => {
   const repoRoot = initRepo();
   makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
-  mergeRunnerItem(repoRoot, makeItem({ verify: 'test -f produced.txt' }));
+  await mergeRunnerItem(repoRoot, makeItem({ verify: 'test -f produced.txt' }));
 
   const result = cleanupMergedBranch(repoRoot, 'fgw/demo-item');
   assert.deepEqual(result.warnings, []);

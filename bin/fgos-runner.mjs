@@ -47,7 +47,7 @@ function parseArgs(args) {
   return flags;
 }
 
-function main() {
+async function main() {
   try {
     const flags = parseArgs(process.argv.slice(2));
     const repoRoot = resolveRepoRoot(process.cwd());
@@ -56,7 +56,7 @@ function main() {
 
     // `--once` is the default (and only) Phase 2 mode — the flag is
     // accepted for explicitness; omitting it changes nothing.
-    const result = runOnce({ repoRoot, config, dryRun: flags.dryRun });
+    const result = await runOnce({ repoRoot, config, dryRun: flags.dryRun });
     console.log(`fgos-runner: ${result.outcome}${result.id ? ` (${result.id})` : ''}`);
     process.exitCode = result.exitCode;
   } catch (err) {

@@ -408,7 +408,7 @@ function formatEntropySection(view, dir) {
   return [trendLine, ...partsLines, sealLine].filter(Boolean).join('\n');
 }
 
-function runVerb(verb, flags, positional, dir) {
+async function runVerb(verb, flags, positional, dir) {
   switch (verb) {
     case 'init': {
       initStore(dir);
@@ -683,7 +683,7 @@ function runVerb(verb, flags, positional, dir) {
         );
       }
 
-      const check = runGoalCheck(item, cwd, timeoutMs);
+      const check = await runGoalCheck(item, cwd, timeoutMs);
       if (check.passed) {
         const { event } = moveWork(dir, { id, to: 'proposed', expectedStatus: 'doing', headAtReturn: head });
         addOutcome(dir, { id, actual: { outcome: 'proposed', passed: true, attempts: 1, errorClass: null, aheadCount } });
@@ -771,7 +771,7 @@ function runVerb(verb, flags, positional, dir) {
           throw new StoreError('validation', `approve: working tree at "${repoRoot}" is not clean — commit or stash pending changes before approving "${id}".`);
         }
 
-        const result = mergeRunnerItem(repoRoot, item, { timeoutMs });
+        const result = await mergeRunnerItem(repoRoot, item, { timeoutMs });
 
         if (result.outcome === 'conflict') {
           moveWork(dir, { id, to: 'blocked', expectedStatus: 'proposed', reason: 'merge-conflict' });
@@ -808,7 +808,7 @@ function runVerb(verb, flags, positional, dir) {
       // pull-door or legacy proposal: code is already on main (D4) — no
       // merge step, just re-run the item's own verify against the current
       // tree, exactly the goal-check contract `return` already uses.
-      const check = runGoalCheck(item, repoRoot, timeoutMs);
+      const check = await runGoalCheck(item, repoRoot, timeoutMs);
       if (!check.passed) {
         moveWork(dir, { id, to: 'blocked', expectedStatus: 'proposed', reason: 'verify-fail' });
         addFriction(dir, {
@@ -849,12 +849,12 @@ function runVerb(verb, flags, positional, dir) {
   }
 }
 
-function main() {
+async function main() {
   const [, , verb, ...rest] = process.argv;
   const { flags, positional } = parseArgs(rest);
 
   try {
-    const output = runVerb(verb, flags, positional, dataDir());
+    const output = await runVerb(verb, flags, positional, dataDir());
     console.log(output);
     process.exitCode = 0;
   } catch (err) {

@@ -268,7 +268,7 @@ function safeRemoveWorktree(repoRoot, worktreePath, log) {
  * With `dryRun` nothing is written, no worktree is created, no branch is
  * deleted — only the planned resolutions are reported.
  */
-export function startupReap({ repoRoot, dir, worktreeDir, verifyTimeoutMs, log = () => {}, dryRun = false } = {}) {
+export async function startupReap({ repoRoot, dir, worktreeDir, verifyTimeoutMs, log = () => {}, dryRun = false } = {}) {
   const view = listWork(dir);
   const resolutions = [];
 
@@ -300,7 +300,7 @@ export function startupReap({ repoRoot, dir, worktreeDir, verifyTimeoutMs, log =
       let wt = null;
       try {
         wt = createWorktree(repoRoot, id, { worktreeDir });
-        verifyPassed = runGoalCheck(item, wt.path, verifyTimeoutMs).passed;
+        verifyPassed = (await runGoalCheck(item, wt.path, verifyTimeoutMs)).passed;
       } catch (err) {
         // A worktree-fail here (e.g. this branch is irreconcilably checked
         // out somewhere even after the reclaim in worktree.mjs) must never
@@ -366,7 +366,7 @@ export function startupReap({ repoRoot, dir, worktreeDir, verifyTimeoutMs, log =
  * runner's own `runGoalCheck`/`branchFacts`, never the worker's own
  * status/signal (D3) — the worker's report is never trusted on its own.
  */
-function processItem({ repoRoot, dir, item, config, worktreeDir, breaker, log, priorVisits }) {
+async function processItem({ repoRoot, dir, item, config, worktreeDir, breaker, log, priorVisits }) {
   moveWork(dir, { id: item.id, to: 'doing', expectedStatus: 'todo', actor: 'runner' });
   log(`fgos-runner: claimed "${item.id}" (todo -> doing)`);
   addOutcome(dir, {
@@ -395,7 +395,7 @@ function processItem({ repoRoot, dir, item, config, worktreeDir, breaker, log, p
       // loop converges — without them the next round re-produces the same
       // rejected proposal. Read fresh: `item` predates this claim's moves.
       const feedbackView = listWork(dir);
-      const worker = spawnWorker(item, config, wt.path, {
+      const worker = await spawnWorker(item, config, wt.path, {
         feedback: {
           answer: feedbackView.gates?.[item.id]?.answer,
           reason: feedbackView.work?.[item.id]?.reason,
@@ -403,7 +403,7 @@ function processItem({ repoRoot, dir, item, config, worktreeDir, breaker, log, p
       });
       log(`fgos-runner: worker for "${item.id}" exited ${worker.status ?? `signal ${worker.signal}`} (tier ${worker.tier} -> ${worker.model})`);
 
-      const check = runGoalCheck(item, wt.path, config.timeoutMs);
+      const check = await runGoalCheck(item, wt.path, config.timeoutMs);
       const facts = branchFacts(repoRoot, wt.branch);
 
       if (check.passed && facts.aheadCount > 0) {
@@ -523,7 +523,7 @@ function processItem({ repoRoot, dir, item, config, worktreeDir, breaker, log, p
  * Returns a result object; never throws for a classified halt (the caller
  * maps `exitCode` straight to the process exit).
  */
-export function runOnce(options = {}) {
+export async function runOnce(options = {}) {
   const log = options.log ?? ((...args) => console.log(...args));
   const dryRun = options.dryRun ?? false;
   const repoRoot = options.repoRoot ?? resolveRepoRoot(options.cwd ?? process.cwd());
@@ -547,7 +547,7 @@ export function runOnce(options = {}) {
   }
 
   try {
-    const reap = startupReap({ repoRoot, dir, worktreeDir, verifyTimeoutMs: config?.timeoutMs, log, dryRun });
+    const reap = await startupReap({ repoRoot, dir, worktreeDir, verifyTimeoutMs: config?.timeoutMs, log, dryRun });
 
     // CLARIFY SWEEP (D13): the safety net for context-discovery. Before any
     // executing item is dispatched, resolve every clarify+todo item —
@@ -623,7 +623,7 @@ export function runOnce(options = {}) {
         return { outcome: 'dry-run', plan, reap, parked, exitCode: 0 };
       }
 
-      const result = processItem({ repoRoot, dir, item, config, worktreeDir, breaker, log, priorVisits: visits });
+      const result = await processItem({ repoRoot, dir, item, config, worktreeDir, breaker, log, priorVisits: visits });
       return { ...result, reap, parked };
     }
   } catch (err) {

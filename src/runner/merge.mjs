@@ -35,7 +35,7 @@
 // is now caller-parameterizable via `opts.trunk` — fan-out's per-root branch
 // tree (`fgw/<root>`) needs a leaf's diff computed against its parent branch
 // instead of `main`. Wiring an actual caller to pass a non-default trunk is
-// out of scope here (Epic 3's job); this only makes the primitive capable.
+// out of scope here (Epic 4's job); this only makes the primitive capable.
 
 import { execFileSync } from 'node:child_process';
 import { branchNameFor, branchExists, reclaimOrphanedCheckout } from './worktree.mjs';
@@ -144,7 +144,7 @@ export function reviewDiff(repoRoot, item, opts = {}) {
  * untouched. Only a failure to even run `git merge --abort` itself throws
  * (a real bug).
  */
-export function mergeRunnerItem(repoRoot, item, { timeoutMs } = {}) {
+export async function mergeRunnerItem(repoRoot, item, { timeoutMs } = {}) {
   const branch = branchNameFor(item.id);
 
   try {
@@ -158,7 +158,7 @@ export function mergeRunnerItem(repoRoot, item, { timeoutMs } = {}) {
     return { outcome: 'conflict', branch };
   }
 
-  const check = runGoalCheck(item, repoRoot, timeoutMs);
+  const check = await runGoalCheck(item, repoRoot, timeoutMs);
   if (!check.passed) {
     try {
       git(repoRoot, ['merge', '--abort']);

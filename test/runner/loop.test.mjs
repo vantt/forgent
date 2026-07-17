@@ -139,12 +139,12 @@ function setup() {
 
 // --- happy path: --once runs the full circle -----------------------------
 
-test('runOnce full circle: todo -> doing -> worker commit -> goal-check pass -> proposed, branch kept, worktree gone, runner is the only .fgos writer', () => {
+test('runOnce full circle: todo -> doing -> worker commit -> goal-check pass -> proposed, branch kept, worktree gone, runner is the only .fgos writer', async () => {
   const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
   seedItem(dir, { id: 'item-happy' });
   const config = configFor(writeCommittingExecutor(scriptDir, counterFile));
 
-  const result = runOnce({ repoRoot, config, worktreeDir, log: noLog });
+  const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
   assert.equal(result.outcome, 'proposed');
   assert.equal(result.id, 'item-happy');
@@ -180,12 +180,12 @@ test('runOnce full circle: todo -> doing -> worker commit -> goal-check pass -> 
 // actor:'runner' on the raw event payload (per vision §8 — the runner is
 // never a human/session). -------------------------------------------------
 
-test('runOnce stamps actor "runner" on every claim/propose work.move it writes', () => {
+test('runOnce stamps actor "runner" on every claim/propose work.move it writes', async () => {
   const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
   seedItem(dir, { id: 'item-actor' });
   const config = configFor(writeCommittingExecutor(scriptDir, counterFile));
 
-  runOnce({ repoRoot, config, worktreeDir, log: noLog });
+  await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
   const moves = readRawEvents(dir).filter((e) => e.type === 'work.move');
   assert.ok(moves.length >= 2, 'claim (todo->doing) and propose (doing->proposed) both wrote a move');
@@ -226,12 +226,12 @@ if (prompt.startsWith('# Context-discovery')) {
   return scriptPath;
 }
 
-test('runOnce clarify sweep records a clarify-pass settlement stamped actor "runner" (R19/D13 sweep); the decompose sweep right after it (stage-decompose D2) pass-throughs the item on to executing in the same pass', () => {
+test('runOnce clarify sweep records a clarify-pass settlement stamped actor "runner" (R19/D13 sweep); the decompose sweep right after it (stage-decompose D2) pass-throughs the item on to executing in the same pass', async () => {
   const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
   seedItem(dir, { id: 'item-clarify', stage: 'clarify', verify: 'test -f output.txt' });
   const config = configFor(writeClearDiscoveryExecutor(scriptDir, counterFile, { verify: 'test -f output.txt' }));
 
-  const result = runOnce({ repoRoot, config, worktreeDir, log: noLog });
+  const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
   assert.equal(result.outcome, 'proposed', 'the clarify+decompose sweeps clear the item before the frontier dispatches it in the same pass');
   const view = listWork(dir);
@@ -247,13 +247,13 @@ test('runOnce clarify sweep records a clarify-pass settlement stamped actor "run
 
 // --- verify-miss: retry then park ----------------------------------------
 
-test('verify-miss: worker commits the wrong thing -> retry once, then park to blocked (never proposed)', () => {
+test('verify-miss: worker commits the wrong thing -> retry once, then park to blocked (never proposed)', async () => {
   const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
   seedItem(dir, { id: 'item-miss' });
   // commits junk.txt, but verify demands output.txt -> goal-check miss
   const config = configFor(writeCommittingExecutor(scriptDir, counterFile, 'junk.txt'));
 
-  const result = runOnce({ repoRoot, config, worktreeDir, log: noLog });
+  const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
   assert.equal(result.outcome, 'parked');
   assert.equal(result.errorClass, 'verify-miss');
@@ -285,12 +285,12 @@ test('verify-miss: worker commits the wrong thing -> retry once, then park to bl
   assert.ok(frictionEvent.payload.detail, 'friction carries the failure message');
 });
 
-test('verify passes but the worker never committed -> classified verify-miss, parked after retries', () => {
+test('verify passes but the worker never committed -> classified verify-miss, parked after retries', async () => {
   const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
   seedItem(dir, { id: 'item-nocommit' });
   const config = configFor(writeNonCommittingExecutor(scriptDir, counterFile));
 
-  const result = runOnce({ repoRoot, config, worktreeDir, log: noLog });
+  const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
   assert.equal(result.outcome, 'parked');
   assert.equal(result.errorClass, 'verify-miss');
@@ -300,7 +300,7 @@ test('verify passes but the worker never committed -> classified verify-miss, pa
 
 // --- spawn-fail: routed by the recovery matrix ----------------------------
 
-test('worker-spawn-fail: nonexistent executor -> retry per matrix, then park to blocked', () => {
+test('worker-spawn-fail: nonexistent executor -> retry per matrix, then park to blocked', async () => {
   const { repoRoot, dir, worktreeDir } = setup();
   seedItem(dir, { id: 'item-nospawn' });
   const config = {
@@ -309,7 +309,7 @@ test('worker-spawn-fail: nonexistent executor -> retry per matrix, then park to 
     timeoutMs: 30000,
   };
 
-  const result = runOnce({ repoRoot, config, worktreeDir, log: noLog });
+  const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
   assert.equal(result.outcome, 'parked');
   assert.equal(result.errorClass, 'worker-spawn-fail');
@@ -320,7 +320,7 @@ test('worker-spawn-fail: nonexistent executor -> retry per matrix, then park to 
 
 // --- anti-loop: max-visits parks the item OFF the frontier ----------------
 
-test('anti-loop: an item at MAX_VISITS is parked todo -> blocked and truly leaves the frontier — the next item runs in the same pass', () => {
+test('anti-loop: an item at MAX_VISITS is parked todo -> blocked and truly leaves the frontier — the next item runs in the same pass', async () => {
   const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
   seedItem(dir, { id: 'item-loopy' });
   seedItem(dir, { id: 'item-fresh' });
@@ -330,7 +330,7 @@ test('anti-loop: an item at MAX_VISITS is parked todo -> blocked and truly leave
   moveWork(dir, { id: 'item-loopy', to: 'todo', expectedStatus: 'blocked' });
   const config = configFor(writeCommittingExecutor(scriptDir, counterFile));
 
-  const result = runOnce({ repoRoot, config, worktreeDir, maxVisits: 1, log: noLog });
+  const result = await runOnce({ repoRoot, config, worktreeDir, maxVisits: 1, log: noLog });
 
   // the FIFO head was parked, and the loop moved on instead of hovering
   assert.deepEqual(result.parked, [{ id: 'item-loopy', reason: 'anti-loop-max-visits', visits: 1 }]);
@@ -342,12 +342,12 @@ test('anti-loop: an item at MAX_VISITS is parked todo -> blocked and truly leave
 
 // --- circuit breaker: consecutive misses halt the whole run ---------------
 
-test('breaker trip: a goal-check miss at threshold parks the item and halts the run — worktree gone, branch kept (halt path teardown)', () => {
+test('breaker trip: a goal-check miss at threshold parks the item and halts the run — worktree gone, branch kept (halt path teardown)', async () => {
   const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
   seedItem(dir, { id: 'item-breaker' });
   const config = configFor(writeCommittingExecutor(scriptDir, counterFile, 'junk.txt'));
 
-  const result = runOnce({ repoRoot, config, worktreeDir, breakerThreshold: 1, log: noLog });
+  const result = await runOnce({ repoRoot, config, worktreeDir, breakerThreshold: 1, log: noLog });
 
   assert.equal(result.outcome, 'halted');
   assert.equal(result.reason, 'breaker-tripped');
@@ -370,7 +370,7 @@ test('breaker trip: a goal-check miss at threshold parks the item and halts the 
 
 // --- startup reap: stale doing + orphan branches --------------------------
 
-test('startup reap: a crashed run\'s doing item with a committed, verify-passing branch is completed to proposed before the frontier runs', () => {
+test('startup reap: a crashed run\'s doing item with a committed, verify-passing branch is completed to proposed before the frontier runs', async () => {
   const { repoRoot, dir, worktreeDir } = setup();
   const item = seedItem(dir, { id: 'item-crashed' });
   // simulate the crashed run: claim, do the work on the branch, crash
@@ -388,7 +388,7 @@ test('startup reap: a crashed run\'s doing item with a committed, verify-passing
     timeoutMs: 30000,
   };
 
-  const result = runOnce({ repoRoot, config, worktreeDir, log: noLog });
+  const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
   assert.deepEqual(result.reap.resolutions, [{ id: 'item-crashed', to: 'proposed', reason: null }]);
   assert.equal(listWork(dir).work['item-crashed'].status, 'proposed');
@@ -396,7 +396,7 @@ test('startup reap: a crashed run\'s doing item with a committed, verify-passing
   assert.deepEqual(fs.readdirSync(worktreeDir), []);
 });
 
-test('startup reap reclaims an orphaned checkout left behind by a genuine crash (worktree teardown never ran) instead of dying raw', () => {
+test('startup reap reclaims an orphaned checkout left behind by a genuine crash (worktree teardown never ran) instead of dying raw', async () => {
   const { repoRoot, dir, worktreeDir } = setup();
   const item = seedItem(dir, { id: 'item-orphaned-crash' });
   // simulate a genuine process kill: claim, commit on the branch, but never
@@ -414,7 +414,7 @@ test('startup reap reclaims an orphaned checkout left behind by a genuine crash 
     timeoutMs: 30000,
   };
 
-  const result = runOnce({ repoRoot, config, worktreeDir, log: noLog });
+  const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
   assert.deepEqual(result.reap.resolutions, [{ id: 'item-orphaned-crash', to: 'proposed', reason: null }]);
   assert.equal(listWork(dir).work['item-orphaned-crash'].status, 'proposed');
@@ -423,7 +423,7 @@ test('startup reap reclaims an orphaned checkout left behind by a genuine crash 
   assert.equal(fs.existsSync(wt.path), false);
 });
 
-test('startup reap: a doing item with nothing on its branch is reclaimed to blocked (runner-crash-reclaim)', () => {
+test('startup reap: a doing item with nothing on its branch is reclaimed to blocked (runner-crash-reclaim)', async () => {
   const { repoRoot, dir, worktreeDir } = setup();
   seedItem(dir, { id: 'item-vanished' });
   moveWork(dir, { id: 'item-vanished', to: 'doing', expectedStatus: 'todo' });
@@ -433,7 +433,7 @@ test('startup reap: a doing item with nothing on its branch is reclaimed to bloc
     timeoutMs: 30000,
   };
 
-  const result = runOnce({ repoRoot, config, worktreeDir, log: noLog });
+  const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
   assert.deepEqual(result.reap.resolutions, [
     { id: 'item-vanished', to: 'blocked', reason: 'runner-crash-reclaim' },
@@ -446,7 +446,7 @@ test('startup reap: a doing item with nothing on its branch is reclaimed to bloc
 // (stage-decompose S2-pull D1/cell action (4)): a person holds `doing`
 // indefinitely — only a runner's own crashed claim is ever reaped.
 
-test('startup reap SKIPS a doing item claimed by a human (claimActor) — never reclaimed, even with no branch/commit at all', () => {
+test('startup reap SKIPS a doing item claimed by a human (claimActor) — never reclaimed, even with no branch/commit at all', async () => {
   const { repoRoot, dir, worktreeDir } = setup();
   const item = seedItem(dir, { id: 'item-human-held' });
   moveWork(dir, { id: item.id, to: 'doing', expectedStatus: 'todo', actor: 'human', headAtTake: 'deadbeef' });
@@ -456,14 +456,14 @@ test('startup reap SKIPS a doing item claimed by a human (claimActor) — never 
     timeoutMs: 30000,
   };
 
-  const result = runOnce({ repoRoot, config, worktreeDir, log: noLog });
+  const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
   assert.deepEqual(result.reap.resolutions, [], 'the human-held item is never entered into the reap resolutions at all');
   assert.equal(listWork(dir).work['item-human-held'].status, 'doing', 'still held — a person is working it, no auto-reclaim');
   assert.equal(result.outcome, 'idle', 'the item stays out of the frontier too (status doing, not todo)');
 });
 
-test('startup reap SKIPS a doing item claimed by a session, but still reaps a plain runner claim in the SAME pass — selective, not a blanket disablement', () => {
+test('startup reap SKIPS a doing item claimed by a session, but still reaps a plain runner claim in the SAME pass — selective, not a blanket disablement', async () => {
   const { repoRoot, dir, worktreeDir } = setup();
   const held = seedItem(dir, { id: 'item-session-held' });
   moveWork(dir, { id: held.id, to: 'doing', expectedStatus: 'todo', actor: 'session', headAtTake: 'cafebabe' });
@@ -475,7 +475,7 @@ test('startup reap SKIPS a doing item claimed by a session, but still reaps a pl
     timeoutMs: 30000,
   };
 
-  const result = runOnce({ repoRoot, config, worktreeDir, log: noLog });
+  const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
   assert.deepEqual(result.reap.resolutions, [
     { id: 'item-runner-vanished', to: 'blocked', reason: 'runner-crash-reclaim' },
@@ -484,7 +484,7 @@ test('startup reap SKIPS a doing item claimed by a session, but still reaps a pl
   assert.equal(listWork(dir).work['item-runner-vanished'].status, 'blocked', 'runner claim still reclaimed');
 });
 
-test('startup reap: empty fgw/ orphan branches are pruned, branches carrying commits are kept', () => {
+test('startup reap: empty fgw/ orphan branches are pruned, branches carrying commits are kept', async () => {
   const { repoRoot, dir, worktreeDir } = setup();
   // orphan: worktree created and torn down without a single commit
   const orphan = createWorktree(repoRoot, 'orphan-x', { worktreeDir });
@@ -501,7 +501,7 @@ test('startup reap: empty fgw/ orphan branches are pruned, branches carrying com
     timeoutMs: 30000,
   };
 
-  const result = runOnce({ repoRoot, config, worktreeDir, log: noLog });
+  const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
   assert.deepEqual(result.reap.pruned, ['fgw/orphan-x']);
   assert.deepEqual(result.reap.kept, [{ branch: 'fgw/keeper-y', aheadCount: 1 }]);
@@ -511,12 +511,12 @@ test('startup reap: empty fgw/ orphan branches are pruned, branches carrying com
 
 // --- CAS conflict on the runner's own write -> clean halt, exit 3 ---------
 
-test('state-conflict: a racing write under the runner\'s claim makes its own CAS fail -> cleanup, clean halt, exit 3', () => {
+test('state-conflict: a racing write under the runner\'s claim makes its own CAS fail -> cleanup, clean halt, exit 3', async () => {
   const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
   seedItem(dir, { id: 'item-race' });
   const config = configFor(writeRacingExecutor(scriptDir, counterFile, dir, 'item-race'));
 
-  const result = runOnce({ repoRoot, config, worktreeDir, log: noLog });
+  const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
   assert.equal(result.outcome, 'halted');
   assert.equal(result.errorClass, 'state-conflict');
@@ -530,12 +530,12 @@ test('state-conflict: a racing write under the runner\'s claim makes its own CAS
 
 // --- dry-run: reads only, writes nothing ----------------------------------
 
-test('dry-run: prints the plan (tier -> model, branch) and writes no event, no branch, no worktree', () => {
+test('dry-run: prints the plan (tier -> model, branch) and writes no event, no branch, no worktree', async () => {
   const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
   seedItem(dir, { id: 'item-plan' });
   const config = configFor(writeCommittingExecutor(scriptDir, counterFile));
 
-  const result = runOnce({ repoRoot, config, worktreeDir, dryRun: true, log: noLog });
+  const result = await runOnce({ repoRoot, config, worktreeDir, dryRun: true, log: noLog });
 
   assert.equal(result.outcome, 'dry-run');
   assert.equal(result.plan.dispatch, 'item-plan');
