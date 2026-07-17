@@ -10,6 +10,7 @@ import {
   reviewDiff,
   mergeRunnerItem,
   cleanupMergedBranch,
+  changedFiles,
   isWorkingTreeClean,
 } from '../../src/runner/merge.mjs';
 import { branchNameFor } from '../../src/runner/worktree.mjs';
@@ -150,6 +151,51 @@ test('reviewDiff for a legacy item (no branch, no head markers) returns a null d
   assert.equal(result.diff, null);
   assert.equal(result.warnings.length, 1);
   assert.match(result.warnings[0], /no live diff source/);
+});
+
+// --- changedFiles (the Iron Law classifier's approve-side input, D16) ----
+
+test('changedFiles returns a runner branch\'s changed paths as an array (repo-relative, reusing the runner branch/trunk resolution)', () => {
+  const repoRoot = initRepo();
+  git(repoRoot, ['checkout', '-b', 'fgw/demo-item']);
+  fs.mkdirSync(path.join(repoRoot, 'src', 'runner'), { recursive: true });
+  fs.writeFileSync(path.join(repoRoot, 'src', 'runner', 'probe.mjs'), 'export const x = 1;\n');
+  git(repoRoot, ['add', '-A']);
+  git(repoRoot, ['commit', '-q', '-m', 'on fgw/demo-item']);
+  git(repoRoot, ['checkout', 'main']);
+  assert.deepEqual(changedFiles(repoRoot, makeItem()), ['src/runner/probe.mjs']);
+});
+
+test('changedFiles returns every changed path when a runner branch touches several files', () => {
+  const repoRoot = initRepo();
+  git(repoRoot, ['checkout', '-b', 'fgw/demo-item']);
+  fs.mkdirSync(path.join(repoRoot, 'src', 'runner'), { recursive: true });
+  fs.writeFileSync(path.join(repoRoot, 'src', 'runner', 'a.mjs'), 'a\n');
+  fs.writeFileSync(path.join(repoRoot, 'plain.txt'), 'plain\n');
+  git(repoRoot, ['add', '-A']);
+  git(repoRoot, ['commit', '-q', '-m', 'two files']);
+  git(repoRoot, ['checkout', 'main']);
+  assert.deepEqual(changedFiles(repoRoot, makeItem()).sort(), ['plain.txt', 'src/runner/a.mjs']);
+});
+
+test('changedFiles honors an explicit opts.trunk (leaf diffs against its parent root, not main — D3)', () => {
+  const repoRoot = initRepo();
+  makeBranchWithCommit(repoRoot, 'fgw/parent-root', 'root-only.txt', 'root\n');
+  git(repoRoot, ['checkout', 'fgw/parent-root']);
+  makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'leaf-only.txt', 'leaf\n');
+  git(repoRoot, ['checkout', 'main']);
+  assert.deepEqual(changedFiles(repoRoot, makeItem(), { trunk: 'fgw/parent-root' }), ['leaf-only.txt']);
+});
+
+test('changedFiles returns an empty array for a pull-source item (Iron Law approve-check is runner-only, D16)', () => {
+  const repoRoot = initRepo();
+  const head = headOf(repoRoot);
+  assert.deepEqual(changedFiles(repoRoot, makeItem({ headAtTake: head, headAtReturn: head })), []);
+});
+
+test('changedFiles returns an empty array for a legacy-source item (no branch, no head markers)', () => {
+  const repoRoot = initRepo();
+  assert.deepEqual(changedFiles(repoRoot, makeItem()), []);
 });
 
 // --- isWorkingTreeClean (.fgos/ exclusion) -------------------------------

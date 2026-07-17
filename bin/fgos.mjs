@@ -30,7 +30,8 @@ import { computeEntropy, computeCounts } from '../src/report/entropy.mjs';
 import { rankCandidates } from '../src/evolve/candidates.mjs';
 import { rankImpact } from '../src/state/impact.mjs';
 import { runGoalCheck } from '../src/runner/goal-check.mjs';
-import { classifySource, reviewDiff, mergeRunnerItem, cleanupMergedBranch, isWorkingTreeClean as isMainTreeClean, isFgosOnlyStatusLine } from '../src/runner/merge.mjs';
+import { classifySource, reviewDiff, mergeRunnerItem, cleanupMergedBranch, changedFiles, isWorkingTreeClean as isMainTreeClean, isFgosOnlyStatusLine } from '../src/runner/merge.mjs';
+import { classifyIronLaw } from '../src/evolve/iron-law.mjs';
 import { branchNameFor, branchExists, createWorktree, removeWorktree } from '../src/runner/worktree.mjs';
 import { resolveRoot } from '../src/runner/root-affinity.mjs';
 import { visitCount } from '../src/runner/anti-loop.mjs';
@@ -1034,6 +1035,28 @@ async function runVerb(verb, flags, positional, dir) {
       const source = classifySource(repoRoot, item);
 
       if (source === 'runner') {
+        // Iron Law gate (D16/D17): a runner-sourced diff that touches a
+        // self-modifying-capable module or trips a hard-gate keyword must not
+        // land without the approver consciously acknowledging that a failing
+        // test preceded the fix — fgOS cannot mechanically verify that
+        // history, so the honest mechanism is a deliberate override gesture,
+        // not a fabricated red/green check. One check point, inside the
+        // runner block but before the leaf-vs-root split below, so it guards
+        // both merge branches identically. changedFiles diffs the item's own
+        // branch against the default trunk, so a leaf over-reports its file
+        // set (superset of its real leaf-vs-root diff) — the fail-safe
+        // direction, accepted as-is. Refuses BEFORE the dirty-tree check and
+        // any git mutation: the item stays `proposed`, nothing is touched.
+        const ironLaw = classifyIronLaw({ filesChanged: changedFiles(repoRoot, item), description: item.description });
+        if (ironLaw.required && !flags['acknowledge-iron-law']) {
+          throw new StoreError(
+            'validation',
+            `approve: "${id}" trips the Iron Law — a failing test must precede this self-modifying diff before it can land. `
+              + `Matched flags: [${ironLaw.matchedFlags.join(', ') || 'none'}]; matched modules: [${ironLaw.matchedModules.join(', ') || 'none'}]. `
+              + `Re-run with --acknowledge-iron-law to confirm failing-test-first proof and proceed.`,
+          );
+        }
+
         if (!isMainTreeClean(repoRoot)) {
           throw new StoreError('validation', `approve: working tree at "${repoRoot}" is not clean — commit or stash pending changes before approving "${id}".`);
         }

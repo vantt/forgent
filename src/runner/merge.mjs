@@ -180,6 +180,36 @@ export function reviewDiff(repoRoot, item, opts = {}) {
 }
 
 /**
+ * The changed file paths of a runner item's branch, relative to the repo
+ * root — the input the Iron Law classifier (evolve/iron-law.mjs) checks its
+ * self-modifying-capable module rules against (D16). Reuses the exact same
+ * trunk/branch resolution `reviewDiff`'s runner path already uses
+ * (`detectTrunk` + `branchNameFor`, `opts.trunk` overridable per D3) but runs
+ * `git diff --name-only <trunk>...<branch>` instead of the full textual diff,
+ * returning the paths as an array of strings (empty entries dropped).
+ *
+ * Scoped to runner-sourced items only (per D16): a pull/legacy item returns
+ * an empty array — its code is already human-committed directly to main (the
+ * durability ladder D4), so the approve-side Iron Law check has nothing to
+ * gate. This is a confirmed, intentional boundary, not a coverage gap.
+ */
+export function changedFiles(repoRoot, item, opts = {}) {
+  const { trunk = detectTrunk(repoRoot) } = opts;
+  const source = classifySource(repoRoot, item);
+  if (source !== 'runner') {
+    return [];
+  }
+  const branch = branchNameFor(item.id);
+  let out;
+  try {
+    out = git(repoRoot, ['diff', '--name-only', `${trunk}...${branch}`]);
+  } catch (err) {
+    throw new MergeError(`computing changed files for branch "${branch}" failed: ${err.message}`, { branch });
+  }
+  return out.split('\n').filter((line) => line !== '');
+}
+
+/**
  * Attempt to merge a runner item's branch into `repoRoot`'s current checkout
  * (checked clean by the caller first). The git call itself is target-
  * agnostic — no trunk is hardcoded — so per D3 (fan-out-parallel) this

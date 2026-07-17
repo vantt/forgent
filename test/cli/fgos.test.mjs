@@ -2453,6 +2453,90 @@ test('approve twice: the second approve on an already-done item is rejected as p
   assert.equal(result.status, 2);
 });
 
+// --- approve Iron Law gate (self-improve-loop P13 Slice 3, D16/D17) --------
+//
+// A runner-sourced diff that touches a self-modifying-capable module
+// (iron-law.mjs's D10/D14 list) must not merge without the approver
+// consciously passing --acknowledge-iron-law. The check is generic to every
+// runner-sourced proposal (D16), scoped inside the runner-source block before
+// the leaf/root split, and refuses BEFORE any git mutation (D17). An ordinary
+// diff (no module/keyword match) is entirely unaffected — the backward-
+// compatibility guarantee proven by every pr-gate scenario above.
+
+// Like makeRunnerProposedItem, but the branch's real commit lands its file at
+// `relPath` (relative to cwd) — used to make the branch diff touch (or not
+// touch) a self-modifying-capable module path the Iron Law classifies.
+function makeRunnerProposedItemTouching(cwd, id, relPath, extra = {}) {
+  addOk(cwd, id, extra);
+  run(cwd, ['move', id, '--to', 'doing']);
+  commitPending(cwd, `state: claim ${id}`);
+
+  gitAtCwd(cwd, ['checkout', '-b', `fgw/${id}`]);
+  const abs = path.join(cwd, relPath);
+  fs.mkdirSync(path.dirname(abs), { recursive: true });
+  fs.writeFileSync(abs, 'export const produced = true;\n');
+  gitAtCwd(cwd, ['add', '-A']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', `worker output for ${id}`]);
+  gitAtCwd(cwd, ['checkout', 'main']);
+
+  run(cwd, ['move', id, '--to', 'proposed']);
+  commitPending(cwd, `state: propose ${id}`);
+}
+
+test('approve of a runner item whose diff touches a self-modifying-capable module (src/runner/**) REFUSES without --acknowledge-iron-law: validation exit 4, item stays proposed, no merge, message names the tripped module', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeRunnerProposedItemTouching(cwd, 'iron-refuse-item', 'src/runner/probe.mjs', {
+    verify: 'test -f src/runner/probe.mjs',
+  });
+
+  const headBefore = gitHead(cwd);
+  const result = run(cwd, ['approve', 'iron-refuse-item']);
+  assert.equal(result.status, 4, `expected a validation refusal: ${result.stdout}${result.stderr}`);
+  assert.match(result.stderr, /Iron Law/);
+  assert.match(result.stderr, /src\/runner\/probe\.mjs/, 'the refusal must name the exact module that tripped required:true');
+  assert.match(result.stderr, /--acknowledge-iron-law/);
+
+  const view = stateView(cwd);
+  assert.equal(view.work['iron-refuse-item'].status, 'proposed', 'a refused approve leaves the item proposed');
+  assert.equal(gitHead(cwd), headBefore, 'a refused approve attempts no merge — HEAD is unchanged');
+  const survivingBranches = gitAtCwd(cwd, ['for-each-ref', '--format=%(refname:short)', 'refs/heads/']);
+  assert.match(survivingBranches, /fgw\/iron-refuse-item/, 'the branch survives an Iron Law refusal — nothing was merged or cleaned up');
+});
+
+test('approve of the same self-modifying diff PROCEEDS with --acknowledge-iron-law: merges, verifies, proposed -> done, branch cleaned up', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeRunnerProposedItemTouching(cwd, 'iron-ack-item', 'src/runner/probe.mjs', {
+    verify: 'test -f src/runner/probe.mjs',
+  });
+
+  const result = run(cwd, ['approve', 'iron-ack-item', '--acknowledge-iron-law']);
+  assert.equal(result.status, 0, `approve with acknowledgment must succeed: ${result.stderr}`);
+  assert.match(result.stdout, /proposed -> done/);
+
+  const view = stateView(cwd);
+  assert.equal(view.work['iron-ack-item'].status, 'done');
+  assert.equal(view.settlements['iron-ack-item'][0].actor, 'human');
+  assert.ok(fs.existsSync(path.join(cwd, 'src/runner/probe.mjs')), 'the merged module file is present on main');
+  const branches = gitAtCwd(cwd, ['for-each-ref', '--format=%(refname:short)', 'refs/heads/']);
+  assert.doesNotMatch(branches, /fgw\/iron-ack-item/, 'the fully-merged branch is cleaned up');
+});
+
+test('approve of an ordinary runner item (diff touches no self-modifying module) is UNAFFECTED — proceeds to done with no --acknowledge-iron-law flag (backward compatibility, D17)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeRunnerProposedItemTouching(cwd, 'iron-plain-item', 'docs/notes.txt', {
+    verify: 'test -f docs/notes.txt',
+  });
+
+  const result = run(cwd, ['approve', 'iron-plain-item']);
+  assert.equal(result.status, 0, `an ordinary diff must approve without any acknowledgment: ${result.stderr}`);
+  assert.match(result.stdout, /proposed -> done/);
+  assert.doesNotMatch(result.stdout, /Iron Law/);
+  assert.equal(stateView(cwd).work['iron-plain-item'].status, 'done');
+});
+
 test('reject on a nonexistent id is rejected as validation, exit 4', () => {
   const cwd = tmpCwd();
   const result = run(cwd, ['reject', 'ghost', '--reason', 'nope']);
