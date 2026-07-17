@@ -3,7 +3,14 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { MAX_VISITS, BREAKER_MISSES, visitCount, hasExceededMaxVisits, createMissBreaker } from '../../src/runner/anti-loop.mjs';
+import {
+  MAX_VISITS,
+  BREAKER_MISSES,
+  visitCount,
+  visitsSinceLastHumanEvent,
+  hasExceededMaxVisits,
+  createMissBreaker,
+} from '../../src/runner/anti-loop.mjs';
 
 // Pure lib — every event array here is a literal built in-memory; no fs, no
 // mkdtemp, no `.fgos/` writes anywhere in this file.
@@ -56,6 +63,95 @@ test('visitCount defensive guards: non-array events / missing id never throw', (
   assert.doesNotThrow(() => visitCount(undefined, 'a'));
   assert.equal(visitCount(undefined, 'a'), 0);
   assert.equal(visitCount([move('a', 'doing', 1)], undefined), 0);
+});
+
+// -- visitsSinceLastHumanEvent: human-rounds D1 gate budget ----------------
+//
+// Distinct from visitCount above: this is the runner GATE's own budget
+// (loop.mjs's hasExceededMaxVisits call sites), not the shipped lifetime
+// metric. `humanMove` mints the two CLOSED trigger shapes (D1c): an `answer`
+// leaving awaiting-human, or a `reason`-carrying move — both require
+// `actor: 'human'`, matching fsm.mjs's transitionWork (answer only appears
+// on `awaiting-human -> todo`; reason only on `proposed -> todo`/`blocked`).
+
+function humanMove(id, to, seq, extra = {}) {
+  return { seq, ts: new Date(2026, 0, seq).toISOString(), type: 'work.move', payload: { id, from: 'x', to, actor: 'human', ...extra }, v: 2 };
+}
+
+test('visitsSinceLastHumanEvent is 0 on an empty log', () => {
+  assert.equal(visitsSinceLastHumanEvent([], 'a'), 0);
+});
+
+test('with no human trigger event ever, visitsSinceLastHumanEvent equals visitCount (a pure machine loop still dies at the cap)', () => {
+  const events = [move('a', 'doing', 1), move('a', 'blocked', 2), move('a', 'doing', 3)];
+  assert.equal(visitsSinceLastHumanEvent(events, 'a'), visitCount(events, 'a'));
+  assert.equal(visitsSinceLastHumanEvent(events, 'a'), 2);
+});
+
+test('a human answer (leaving awaiting-human) resets the budget — only doing-entries AFTER it count', () => {
+  const events = [
+    move('a', 'doing', 1),
+    move('a', 'blocked', 2),
+    move('a', 'doing', 3),
+    humanMove('a', 'todo', 4, { answer: 'go ahead' }),
+    move('a', 'doing', 5),
+  ];
+  assert.equal(visitCount(events, 'a'), 3); // lifetime metric unaffected
+  assert.equal(visitsSinceLastHumanEvent(events, 'a'), 1); // only the doing at seq 5
+});
+
+test('a human reject/park with reason resets the budget the same way', () => {
+  const events = [
+    move('a', 'doing', 1),
+    move('a', 'doing', 2),
+    humanMove('a', 'todo', 3, { reason: 'not quite right' }),
+    move('a', 'doing', 4),
+  ];
+  assert.equal(visitsSinceLastHumanEvent(events, 'a'), 1);
+});
+
+test('a bare resume (blocked -> todo, no reason, no actor) does NOT reset the budget', () => {
+  const events = [
+    move('a', 'doing', 1),
+    move('a', 'blocked', 2),
+    move('a', 'todo', 3),
+    move('a', 'doing', 4),
+  ];
+  assert.equal(visitsSinceLastHumanEvent(events, 'a'), 2);
+});
+
+test('a human take (blocked -> doing, actor human, no answer/reason) does NOT reset the budget — it counts as a visit like any other', () => {
+  const events = [
+    move('a', 'doing', 1),
+    move('a', 'blocked', 2),
+    humanMove('a', 'doing', 3),
+  ];
+  assert.equal(visitsSinceLastHumanEvent(events, 'a'), 2);
+});
+
+test('a machine park with reason (actor runner, e.g. anti-loop-max-visits) does NOT reset the budget — reason alone is not enough, actor must be human', () => {
+  const events = [
+    move('a', 'doing', 1),
+    { seq: 2, ts: new Date(2026, 0, 2).toISOString(), type: 'work.move', payload: { id: 'a', from: 'doing', to: 'blocked', reason: 'anti-loop-max-visits', actor: 'runner' }, v: 2 },
+    move('a', 'doing', 3),
+  ];
+  assert.equal(visitsSinceLastHumanEvent(events, 'a'), 2);
+});
+
+test('per-item: another id\'s human event never resets this id\'s budget', () => {
+  const events = [
+    move('a', 'doing', 1),
+    move('a', 'doing', 2),
+    humanMove('b', 'todo', 3, { answer: 'yes' }),
+    move('a', 'doing', 4),
+  ];
+  assert.equal(visitsSinceLastHumanEvent(events, 'a'), 3);
+});
+
+test('visitsSinceLastHumanEvent defensive guards: non-array events / missing id never throw', () => {
+  assert.doesNotThrow(() => visitsSinceLastHumanEvent(undefined, 'a'));
+  assert.equal(visitsSinceLastHumanEvent(undefined, 'a'), 0);
+  assert.equal(visitsSinceLastHumanEvent([move('a', 'doing', 1)], undefined), 0);
 });
 
 // -- hasExceededMaxVisits boundary -----------------------------------------

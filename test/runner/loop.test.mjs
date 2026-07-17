@@ -464,6 +464,47 @@ test('anti-loop: an item at MAX_VISITS is parked todo -> blocked and truly leave
   assert.deepEqual(readyWork(dir), []);
 });
 
+test('anti-loop: a human reject (with reason) resets the runner gate — visits BEFORE it no longer count toward the cap (human-rounds D1)', async () => {
+  const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
+  seedItem(dir, { id: 'item-reprieved' });
+  // one machine visit that would already be AT the cap (maxVisits: 1) on its
+  // own — then a human rejects with a reason, which per D1 resets the item's
+  // own budget. Reaching `proposed` first (not just doing -> blocked -> todo)
+  // exercises the real reject edge (proposed -> todo, reason required).
+  moveWork(dir, { id: 'item-reprieved', to: 'doing', expectedStatus: 'todo' });
+  moveWork(dir, { id: 'item-reprieved', to: 'proposed', expectedStatus: 'doing' });
+  moveWork(dir, { id: 'item-reprieved', to: 'todo', expectedStatus: 'proposed', reason: 'not quite right', actor: 'human' });
+  // lifetime visitCount is already 1 here — the OLD (pre-D1) gate would have
+  // parked this item immediately at maxVisits: 1, never dispatching it again.
+  const config = configFor(writeCommittingExecutor(scriptDir, counterFile));
+
+  const result = await runOnce({ repoRoot, config, worktreeDir, maxVisits: 1, log: noLog });
+
+  // the human reject reset the budget to 0 doing-entries-since — the item
+  // dispatches and proposes instead of being parked as over-limit.
+  assert.deepEqual(result.parked, []);
+  assert.equal(result.dispatched.length, 1);
+  assert.equal(result.dispatched[0].id, 'item-reprieved');
+  assert.equal(result.dispatched[0].outcome, 'proposed');
+});
+
+test('anti-loop: a BARE resume (no reason, no human actor) does NOT reset the gate — the machine-only loop still dies at the cap', async () => {
+  const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
+  seedItem(dir, { id: 'item-loopy-bare' });
+  // todo -> doing -> blocked -> todo, no reason, no actor: a bare resume,
+  // never a human trigger per D1c. The prior visit must still count.
+  moveWork(dir, { id: 'item-loopy-bare', to: 'doing', expectedStatus: 'todo' });
+  moveWork(dir, { id: 'item-loopy-bare', to: 'blocked', expectedStatus: 'doing' });
+  moveWork(dir, { id: 'item-loopy-bare', to: 'todo', expectedStatus: 'blocked' });
+  const config = configFor(writeCommittingExecutor(scriptDir, counterFile));
+
+  const result = await runOnce({ repoRoot, config, worktreeDir, maxVisits: 1, log: noLog });
+
+  assert.deepEqual(result.parked, [{ id: 'item-loopy-bare', reason: 'anti-loop-max-visits', visits: 1 }]);
+  assert.equal(listWork(dir).work['item-loopy-bare'].status, 'blocked');
+  assert.equal(result.dispatched.length, 0);
+});
+
 // --- circuit breaker: consecutive misses halt the whole run ---------------
 
 test('breaker trip: a goal-check miss at threshold parks the item and halts the run — worktree gone, branch kept (halt path teardown)', async () => {

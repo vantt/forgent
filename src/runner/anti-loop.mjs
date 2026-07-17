@@ -24,16 +24,75 @@ export const BREAKER_MISSES = 3;
  *
  * Derived from the log's existing `work.move` shape (per key_links: no new
  * event type) — a visit is any event with `type === 'work.move'` and
- * `payload.to === 'doing'` for this id. This is deliberately agent-agnostic:
- * the current event shape carries no "who wrote this" field, and the
- * semantic is explicit (per the cell's action text) that a human's manual
- * re-dispatch counts as a visit exactly the same as the runner's — there is
- * no privileged writer whose visits don't count.
+ * `payload.to === 'doing'` for this id. Lifetime, agent-agnostic count: a
+ * human's manual re-dispatch counts exactly like the runner's. This is the
+ * shipped metric (loop.mjs's `visits`/`priorVisits` payload fields, fgos.mjs's
+ * `priorVisits`) — untouched by human-rounds D1, which reset the runner's own
+ * anti-loop GATE only (see `visitsSinceLastHumanEvent` below), never this
+ * lifetime tally.
+ *
+ * SUPERSEDES the comment this replaced ("there is no privileged writer whose
+ * visits don't count"): that was true only because `actor` did not exist yet
+ * when it was written. `actor` is now stamped on every `work.move` event
+ * (store.mjs), and human-rounds D1 gives a human's actor-attributed events
+ * gate-resetting weight the runner's own never gets — this function still
+ * treats every writer identically because it is the lifetime metric, not the
+ * gate; the gate's asymmetry lives entirely in `visitsSinceLastHumanEvent`.
  */
 export function visitCount(events, id) {
   if (!Array.isArray(events) || typeof id !== 'string' || !id) return 0;
   let count = 0;
   for (const event of events) {
+    if (event && event.type === 'work.move' && event.payload && event.payload.to === 'doing' && event.payload.id === id) {
+      count += 1;
+    }
+  }
+  return count;
+}
+
+/**
+ * Count how many times work item `id` has re-entered `doing` SINCE its own
+ * last human-attributed event (human-rounds D1) — the anti-loop GATE's own
+ * budget, distinct from `visitCount`'s lifetime tally above.
+ *
+ * Per-item (D1b): only events carrying this exact `id` mark or count.
+ *
+ * Trigger-set is CLOSED (D1c) and keyed on `actor === 'human'` plus payload
+ * shape — never on a `from` field:
+ *   - `payload.answer !== undefined` — the item left `awaiting-human` via a
+ *     human's answer (`answerAwaiting`, fsm.mjs's `awaiting-human -> todo`
+ *     edge; the only edge `answer` appears on).
+ *   - `payload.reason !== undefined` — a human's reject/park-with-reason
+ *     (fsm.mjs's `proposed -> todo`/`proposed -> blocked` edges; the runner's
+ *     own reason-carrying parks, e.g. `anti-loop-max-visits`/`breaker-tripped`,
+ *     stamp `actor: 'runner'` and so never match here).
+ * A bare resume (`blocked -> todo` with no reason) and a human `take`
+ * (`blocked -> doing`, `actor: 'human'`, no answer/reason) are deliberately
+ * NOT triggers — per D1c only the two closed shapes above reset the budget.
+ *
+ * No qualifying event found for this id → the budget is the item's whole
+ * history, i.e. identical to `visitCount(events, id)` (a pure machine loop
+ * still dies at the cap — no human event has ever intervened).
+ */
+export function visitsSinceLastHumanEvent(events, id) {
+  if (!Array.isArray(events) || typeof id !== 'string' || !id) return 0;
+  let lastHumanIndex = -1;
+  for (let i = 0; i < events.length; i += 1) {
+    const event = events[i];
+    if (
+      event &&
+      event.type === 'work.move' &&
+      event.payload &&
+      event.payload.id === id &&
+      event.payload.actor === 'human' &&
+      (event.payload.answer !== undefined || event.payload.reason !== undefined)
+    ) {
+      lastHumanIndex = i;
+    }
+  }
+  let count = 0;
+  for (let i = lastHumanIndex + 1; i < events.length; i += 1) {
+    const event = events[i];
     if (event && event.type === 'work.move' && event.payload && event.payload.to === 'doing' && event.payload.id === id) {
       count += 1;
     }

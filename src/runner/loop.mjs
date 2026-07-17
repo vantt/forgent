@@ -50,6 +50,7 @@ import { DEFAULTS } from '../state/work.mjs';
 import { resolveAction, resolveStaleDoing } from './recovery.mjs';
 import {
   visitCount,
+  visitsSinceLastHumanEvent,
   hasExceededMaxVisits,
   createMissBreaker,
   MAX_VISITS,
@@ -748,7 +749,10 @@ export async function runOnce(options = {}) {
         return { outcome: 'idle', reap, parked, dispatched: [], exitCode: 0 };
       }
       const item = frontierItems[0];
-      const visits = visitCount(readRawEvents(dir), item.id);
+      // Gate on the human-rounds D1 budget (resets on the item's own last
+      // human answer/reject-with-reason), not the lifetime visitCount above
+      // — see anti-loop.mjs's visitsSinceLastHumanEvent.
+      const visits = visitsSinceLastHumanEvent(readRawEvents(dir), item.id);
       if (hasExceededMaxVisits(visits, maxVisits)) {
         return { outcome: 'dry-run', plan: { park: item.id, reason: 'anti-loop-max-visits', visits }, reap, parked, exitCode: 0 };
       }
@@ -782,13 +786,15 @@ export async function runOnce(options = {}) {
       // Anti-loop max-visits parks every over-limit item (they genuinely
       // leave the frontier via `todo -> blocked`, per D5), then re-polls —
       // exactly the sequential loop's per-head guard, applied to the whole
-      // ready set before steering.
+      // ready set before steering. Gated on the human-rounds D1 budget
+      // (visitsSinceLastHumanEvent), not the lifetime visitCount — a human's
+      // answer or reject-with-reason resets an item's own budget, per-item.
       const overLimit = frontierItems.filter(
-        (it) => hasExceededMaxVisits(visitCount(readRawEvents(dir), it.id), maxVisits),
+        (it) => hasExceededMaxVisits(visitsSinceLastHumanEvent(readRawEvents(dir), it.id), maxVisits),
       );
       if (overLimit.length > 0) {
         for (const it of overLimit) {
-          const visits = visitCount(readRawEvents(dir), it.id);
+          const visits = visitsSinceLastHumanEvent(readRawEvents(dir), it.id);
           await queue.enqueue(async () => {
             moveWork(dir, { id: it.id, to: 'blocked', expectedStatus: 'todo', reason: 'anti-loop-max-visits', actor: 'runner' });
           });
