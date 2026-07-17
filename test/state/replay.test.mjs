@@ -365,6 +365,29 @@ test('foldEvents folds claimActor + headAtTake onto the item from a doing claim 
   assert.equal(view.work.a.headAtTake, 'deadbeef');
 });
 
+test('foldEvents folds the latest move reason onto the item (reject loop feedback), lazily', () => {
+  const events = [
+    { seq: 1, ts: '2026-07-17T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo' }, v: 2 },
+    { seq: 2, ts: '2026-07-17T00:00:01.000Z', type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing', actor: 'runner' }, v: 2 },
+    { seq: 3, ts: '2026-07-17T00:00:02.000Z', type: 'work.move', payload: { id: 'a', from: 'doing', to: 'proposed' }, v: 2 },
+    { seq: 4, ts: '2026-07-17T00:00:03.000Z', type: 'work.move', payload: { id: 'a', from: 'proposed', to: 'todo', reason: 'first objection' }, v: 2 },
+    { seq: 5, ts: '2026-07-17T00:00:04.000Z', type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing', actor: 'runner' }, v: 2 },
+    { seq: 6, ts: '2026-07-17T00:00:05.000Z', type: 'work.move', payload: { id: 'a', from: 'doing', to: 'proposed' }, v: 2 },
+    { seq: 7, ts: '2026-07-17T00:00:06.000Z', type: 'work.move', payload: { id: 'a', from: 'proposed', to: 'todo', reason: 'second objection wins' }, v: 2 },
+  ];
+  const view = foldEvents(events);
+  assert.equal(view.work.a.reason, 'second objection wins');
+});
+
+test('foldEvents leaves no reason key on items whose moves never carried one', () => {
+  const events = [
+    { seq: 1, ts: '2026-07-17T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo' }, v: 2 },
+    { seq: 2, ts: '2026-07-17T00:00:01.000Z', type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing', actor: 'runner' }, v: 2 },
+  ];
+  const view = foldEvents(events);
+  assert.ok(!('reason' in view.work.a));
+});
+
 test('foldEvents folds claimActor "runner" with no headAtTake for a plain runner claim (runner claims never carry a headAtTake)', () => {
   const events = [
     { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo' }, v: 2 },

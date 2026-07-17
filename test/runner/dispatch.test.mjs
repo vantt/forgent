@@ -95,6 +95,30 @@ test('buildPrompt degrades to "(không có)" when the work item has no descripti
   assert.match(prompt, /# Description\n\(không có\)/);
 });
 
+test('buildPrompt with no feedback stays byte-identical to the pre-feedback shape (no Human feedback section)', () => {
+  assert.equal(buildPrompt(sampleWork()), buildPrompt(sampleWork(), undefined));
+  assert.doesNotMatch(buildPrompt(sampleWork(), {}), /# Human feedback/);
+});
+
+test('buildPrompt embeds the human answer and latest rejection reason verbatim under Human feedback', () => {
+  const feedback = {
+    answer: 'CHỐT (a): detectTrunk — origin/HEAD rồi HEAD, fallback main.',
+    reason: 'Thiếu test master-trunk; giữ code, chỉ bổ sung test.',
+  };
+  const prompt = buildPrompt(sampleWork(), feedback);
+  assert.match(prompt, /# Human feedback/);
+  assert.ok(prompt.includes(feedback.answer));
+  assert.ok(prompt.includes(feedback.reason));
+  assert.match(prompt, /fix THIS before anything else/);
+});
+
+test('buildPrompt renders a reason-only feedback without an answer block', () => {
+  const prompt = buildPrompt(sampleWork(), { reason: 'only the objection' });
+  assert.match(prompt, /# Human feedback/);
+  assert.ok(prompt.includes('only the objection'));
+  assert.doesNotMatch(prompt, /Human answer/);
+});
+
 test('buildPrompt embeds title, kind, refs, and verify from the work item', () => {
   const work = sampleWork();
   const prompt = buildPrompt(work);

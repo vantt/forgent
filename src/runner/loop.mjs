@@ -390,7 +390,17 @@ function processItem({ repoRoot, dir, item, config, worktreeDir, breaker, log, p
         execFileSync('git', ['clean', '-fdq'], { cwd: wt.path, encoding: 'utf8', shell: false });
       }
 
-      const worker = spawnWorker(item, config, wt.path);
+      // Human feedback rides into the worker prompt (worker-feedback): the
+      // clarify answer and the latest reject/park reason are how a reject
+      // loop converges — without them the next round re-produces the same
+      // rejected proposal. Read fresh: `item` predates this claim's moves.
+      const feedbackView = listWork(dir);
+      const worker = spawnWorker(item, config, wt.path, {
+        feedback: {
+          answer: feedbackView.gates?.[item.id]?.answer,
+          reason: feedbackView.work?.[item.id]?.reason,
+        },
+      });
       log(`fgos-runner: worker for "${item.id}" exited ${worker.status ?? `signal ${worker.signal}`} (tier ${worker.tier} -> ${worker.model})`);
 
       const check = runGoalCheck(item, wt.path, config.timeoutMs);

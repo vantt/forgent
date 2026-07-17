@@ -71,8 +71,23 @@ export class DispatchError extends Error {
  * reproduced verbatim — never truncated — with "(không có)" when absent.
  * Nothing here reads or writes `.fgos/` — this is pure string assembly.
  */
-export function buildPrompt(work) {
+export function buildPrompt(work, feedback) {
   const refs = Array.isArray(work.refs) && work.refs.length ? work.refs.join(', ') : '(none)';
+
+  // Human feedback (worker-feedback): when the item carries a human answer
+  // (clarify gate) or the latest reject/park reason, the worker must see it —
+  // a reject loop can only converge if the objection reaches the next round.
+  // With no feedback at all the section is omitted entirely, keeping the
+  // prompt byte-identical to the pre-feedback shape for every other item.
+  let feedbackSection = '';
+  const answer = feedback && typeof feedback.answer === 'string' && feedback.answer.trim() ? feedback.answer : null;
+  const reason = feedback && typeof feedback.reason === 'string' && feedback.reason.trim() ? feedback.reason : null;
+  if (answer || reason) {
+    const lines = [];
+    if (answer) lines.push(`Human answer (binding decision):\n${answer}`);
+    if (reason) lines.push(`Latest human rejection/park reason (fix THIS before anything else):\n${reason}`);
+    feedbackSection = `\n# Human feedback\n${lines.join('\n\n')}\n`;
+  }
   const description = work.description ?? '(không có)';
 
   return `# Goal
@@ -80,7 +95,7 @@ ${work.title} (kind: ${work.kind})
 
 # Description
 ${description}
-
+${feedbackSection}
 # Worktree boundary
 You are running on an isolated git worktree, checked out on its own branch for
 this work item only. Stay inside this checkout — never touch the main
@@ -203,7 +218,7 @@ export function resolveExecutorCommand(cfg, { prompt, model }) {
 export function spawnWorker(work, cfg, cwd, opts = {}) {
   const tier = work.tier ?? DEFAULTS.tier;
   const model = modelForTier(cfg, tier);
-  const prompt = buildPrompt(work);
+  const prompt = buildPrompt(work, opts.feedback);
   const { command, args } = resolveExecutorCommand(cfg, { prompt, model });
   const timeoutMs = opts.timeoutMs ?? cfg.timeoutMs;
 

@@ -44,7 +44,7 @@ function applyEvent(view, event) {
       break;
     }
     case 'work.move': {
-      const { id, to, ask, answer, actor, learning, headAtTake, headAtReturn } = event.payload ?? {};
+      const { id, to, ask, answer, actor, learning, headAtTake, headAtReturn, reason } = event.payload ?? {};
       const item = view.work[id];
       if (item) {
         item.status = to;
@@ -68,6 +68,14 @@ function applyEvent(view, event) {
         if (headAtTake !== undefined) {
           item.headAtTake = headAtTake;
         }
+      }
+      // Latest human rationale on the item (worker-feedback): a `reason`
+      // rides reject (`proposed -> todo`) and park moves; fold the newest
+      // one onto the item (latest wins) so the next dispatch can hand the
+      // worker the human's actual objection. Lazy: items whose moves never
+      // carried a reason keep no `reason` key at all.
+      if (item && reason !== undefined) {
+        item.reason = reason;
       }
       // Pull-door return marker (pr-lifecycle D3/D4): folds onto the item the
       // same way `headAtTake` above folds on claim — durable per-item field,
