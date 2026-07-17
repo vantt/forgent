@@ -27,6 +27,7 @@ import { loadRunnerConfig } from '../src/runner/dispatch.mjs';
 import { resolveDiscovery } from '../src/intake/discovery.mjs';
 import { resolveDecompose } from '../src/intake/decompose.mjs';
 import { computeEntropy, computeCounts } from '../src/report/entropy.mjs';
+import { rankCandidates } from '../src/evolve/candidates.mjs';
 import { runGoalCheck } from '../src/runner/goal-check.mjs';
 import { classifySource, reviewDiff, mergeRunnerItem, cleanupMergedBranch, isWorkingTreeClean as isMainTreeClean, isFgosOnlyStatusLine } from '../src/runner/merge.mjs';
 import { branchNameFor, branchExists, createWorktree, removeWorktree } from '../src/runner/worktree.mjs';
@@ -418,6 +419,23 @@ function formatEntropySection(view, dir) {
   const sealLine = sealClauses.length > 0 ? `compounded: ${sealClauses.join(' /')}` : null;
 
   return [trendLine, ...partsLines, sealLine].filter(Boolean).join('\n');
+}
+
+// Gate A candidate-list formatter (self-improve-loop P13 Slice 1, D6/D11):
+// one line per ranked candidate, every field a human needs to judge it
+// (id/score/disposition/errorClass/layer/attempts/detail — same discipline
+// as the friction/settlement sections' "every field, never a truncated
+// subset" rule). Never capped (unlike FRICTION_DISPLAY_CAP) — Gate A must
+// show every open candidate, since the human is choosing among ALL of them.
+function formatCandidateLine(c) {
+  return `  - ${c.id} score=${c.score} [${c.disposition}] ${c.errorClass}/${c.layer} (attempts ${c.attempts}): ${c.detail ?? ''}`.trimEnd();
+}
+
+function formatCandidateList(candidates) {
+  if (candidates.length === 0) {
+    return 'evolve: không có friction chưa ngã-ngũ nào — không có candidate nào để chọn.';
+  }
+  return `candidates (${candidates.length}):\n${candidates.map(formatCandidateLine).join('\n')}`;
 }
 
 // Rollup view (P24): direct children only (`w.parent === id`) — decompose
@@ -1214,8 +1232,38 @@ async function runVerb(verb, flags, positional, dir) {
       }
     }
 
+    // Gate A — candidate ranking (self-improve-loop P13 Slice 1, D1/D3/D6):
+    // two-shot, flag-driven, NEVER an interactive stdin loop (D11). `fgos
+    // evolve` (no --pick) ranks every id with unsettled friction and prints
+    // the full list; `fgos evolve --pick <id>` reprints that candidate's
+    // full friction record. Request-class per D1 (same contract as
+    // `ready`/`list`/`check`): reads the view via `listWork` ONLY — never
+    // `rebuild`/`rebuild`-adjacent writers — so a run never appends an
+    // event or touches state.json. Running with no `--pick` IS the "stop"
+    // outcome (D6); there is no separate cancel input and no re-prompt on a
+    // bad `--pick` id (D11) — an unmatched id is a clean validation error.
+    case 'evolve': {
+      const pickId = optionalField(flags.pick, 'evolve --pick requires a non-empty candidate id value (omit --pick entirely to list every candidate)');
+      const view = listWork(dir);
+      const candidates = rankCandidates(view);
+      if (pickId === undefined) {
+        return formatCandidateList(candidates);
+      }
+      const picked = candidates.find((c) => c.id === pickId);
+      if (!picked) {
+        throw new StoreError(
+          'validation',
+          `evolve --pick: "${pickId}" is not an open candidate — run "fgos evolve" to see the current ranked list.`,
+        );
+      }
+      // Reuses the existing friction-record formatter (formatFrictionSection
+      // above) rather than a new one — the picked candidate's "full record"
+      // IS that id's friction section.
+      return formatFrictionSection(view, pickId);
+    }
+
     default:
-      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <init|add|submit|discover|move|ask|answer|decision|list|ready|rebuild|repair|check|rollup|take|return|review|approve|reject|catchup> ...`);
+      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <init|add|submit|discover|move|ask|answer|decision|list|ready|rebuild|repair|check|rollup|take|return|review|approve|reject|catchup|evolve> ...`);
   }
 }
 

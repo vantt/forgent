@@ -1610,6 +1610,114 @@ function makeRunnerProposedLeafItem(cwd, rootId, leafId, extra = {}) {
   commitPending(cwd, `state: propose ${leafId}`);
 }
 
+// --- `fgos evolve` (self-improve-loop P13 Slice 1, Gate A) -----------------
+//
+// Request-class per D1 (same contract as `ready`/`list`/`check`): a pure
+// read over `listWork(dir)`, ranked by `src/evolve/candidates.mjs`. Two-shot
+// per D11 — `evolve` lists, `evolve --pick <id>` reprints one candidate's
+// friction record — never an interactive stdin loop, never a re-prompt on a
+// bad id. Friction is seeded directly through store.mjs's addFriction (the
+// same single write door the runner uses in production), same discipline as
+// the friction-section tests for `check` above.
+
+test('evolve with zero open friction prints a clear empty-state message and exits 0', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'clean-item');
+  const result = run(cwd, ['evolve']);
+  assert.equal(result.status, 0);
+  assert.match(result.stdout, /không có candidate/);
+});
+
+test('evolve on a directory with no log at all prints the empty-state message, exit 0 (a read never initializes .fgos/)', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['evolve']);
+  assert.equal(result.status, 0);
+  assert.match(result.stdout, /không có candidate/);
+  assert.ok(!fs.existsSync(path.join(cwd, '.fgos')));
+});
+
+test('evolve with candidates prints the ranked list with every field id/disposition/errorClass/layer/detail/attempts/score', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'rank-item');
+  const dir = path.join(cwd, '.fgos');
+  addFriction(dir, { id: 'rank-item', disposition: 'blocked', errorClass: 'verify-miss', layer: 'verification', attempts: 2, detail: 'goal-check failed (exit 1)' });
+
+  const result = run(cwd, ['evolve']);
+  assert.equal(result.status, 0);
+  assert.match(result.stdout, /candidates \(1\)/);
+  assert.match(result.stdout, /rank-item score=2 \[blocked\] verify-miss\/verification \(attempts 2\): goal-check failed \(exit 1\)/);
+});
+
+test('evolve --pick <valid-id> prints that candidate\'s full friction record via the existing check formatter, no state change', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'pick-item');
+  const dir = path.join(cwd, '.fgos');
+  addFriction(dir, { id: 'pick-item', disposition: 'blocked', errorClass: 'verify-miss', layer: 'verification', attempts: 1, detail: 'goal-check failed' });
+
+  const result = run(cwd, ['evolve', '--pick', 'pick-item']);
+  assert.equal(result.status, 0);
+  assert.match(result.stdout, /friction \(1\)/);
+  assert.match(result.stdout, /\[blocked\] pick-item verify-miss\/verification \(attempts 1\): goal-check failed/);
+});
+
+test('evolve --pick <invalid-id> prints a clean error and exits non-zero, with no state change', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'exists-item');
+  const dir = path.join(cwd, '.fgos');
+  addFriction(dir, { id: 'exists-item', disposition: 'blocked', errorClass: 'verify-miss', layer: 'verification', attempts: 1, detail: 'x' });
+
+  const logBefore = fs.readFileSync(logPath(cwd), 'utf8');
+  const viewBefore = fs.readFileSync(viewPath(cwd), 'utf8');
+
+  const result = run(cwd, ['evolve', '--pick', 'nonexistent-id']);
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /not an open candidate/);
+
+  assert.equal(fs.readFileSync(logPath(cwd), 'utf8'), logBefore, 'events.jsonl must be untouched by an invalid --pick');
+  assert.equal(fs.readFileSync(viewPath(cwd), 'utf8'), viewBefore, 'state.json must be untouched by an invalid --pick');
+});
+
+test('evolve --pick with a bare flag (no value) is refused as validation, not a re-prompt (D11)', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'bare-pick-item');
+  const result = run(cwd, ['evolve', '--pick']);
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /evolve --pick requires a non-empty candidate id/);
+});
+
+test('GOLDEN evolve is read-only: events.jsonl and state.json are byte-identical before/after both the list and --pick paths', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'ro-item');
+  const dir = path.join(cwd, '.fgos');
+  addFriction(dir, { id: 'ro-item', disposition: 'blocked', errorClass: 'verify-miss', layer: 'verification', attempts: 1, detail: 'goal-check failed' });
+
+  const logBefore = fs.readFileSync(logPath(cwd), 'utf8');
+  const viewBefore = fs.readFileSync(viewPath(cwd), 'utf8');
+
+  const list = run(cwd, ['evolve']);
+  assert.equal(list.status, 0);
+  assert.equal(fs.readFileSync(logPath(cwd), 'utf8'), logBefore, 'events.jsonl must be untouched by evolve (list)');
+  assert.equal(fs.readFileSync(viewPath(cwd), 'utf8'), viewBefore, 'state.json must be untouched by evolve (list)');
+
+  const pick = run(cwd, ['evolve', '--pick', 'ro-item']);
+  assert.equal(pick.status, 0);
+  assert.equal(fs.readFileSync(logPath(cwd), 'utf8'), logBefore, 'events.jsonl must be untouched by evolve (--pick)');
+  assert.equal(fs.readFileSync(viewPath(cwd), 'utf8'), viewBefore, 'state.json must be untouched by evolve (--pick)');
+});
+
+test('evolve never touches git (no branch/worktree operation) — succeeds on a directory that is not even a git repo', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'no-git-item');
+  const dir = path.join(cwd, '.fgos');
+  addFriction(dir, { id: 'no-git-item', disposition: 'blocked', errorClass: 'verify-miss', layer: 'verification', attempts: 1, detail: 'x' });
+  assert.equal(fs.existsSync(path.join(cwd, '.git')), false);
+
+  const result = run(cwd, ['evolve']);
+  assert.equal(result.status, 0);
+  const pickResult = run(cwd, ['evolve', '--pick', 'no-git-item']);
+  assert.equal(pickResult.status, 0);
+});
+
 test('review on a nonexistent id is rejected as validation, exit 4', () => {
   const cwd = tmpCwd();
   const result = run(cwd, ['review', 'ghost']);
