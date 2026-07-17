@@ -27,7 +27,7 @@ import { resolveDiscovery } from '../src/intake/discovery.mjs';
 import { resolveDecompose } from '../src/intake/decompose.mjs';
 import { computeEntropy, computeCounts } from '../src/report/entropy.mjs';
 import { runGoalCheck } from '../src/runner/goal-check.mjs';
-import { classifySource, reviewDiff, mergeRunnerItem, cleanupMergedBranch, isWorkingTreeClean as isMainTreeClean } from '../src/runner/merge.mjs';
+import { classifySource, reviewDiff, mergeRunnerItem, cleanupMergedBranch, isWorkingTreeClean as isMainTreeClean, isFgosOnlyStatusLine } from '../src/runner/merge.mjs';
 import { branchNameFor, branchExists, createWorktree, removeWorktree } from '../src/runner/worktree.mjs';
 import { resolveRoot } from '../src/runner/root-affinity.mjs';
 import { visitCount } from '../src/runner/anti-loop.mjs';
@@ -63,8 +63,16 @@ function currentHead(cwd) {
   return gitAt(cwd, ['rev-parse', 'HEAD']).trim();
 }
 
+// `.fgos/` is excluded from this check the same way merge.mjs's own
+// isWorkingTreeClean excludes it (isFgosOnlyStatusLine, shared rule): the
+// store is a live, self-mutating write door — return's own headAtReturn
+// event lands there as part of this very call — never a signal that the
+// code tree itself is dirty.
 function isWorkingTreeClean(cwd) {
-  return gitAt(cwd, ['status', '--porcelain']).trim() === '';
+  return gitAt(cwd, ['status', '--porcelain'])
+    .split('\n')
+    .filter((line) => line.trim() !== '')
+    .every(isFgosOnlyStatusLine);
 }
 
 function commitsSince(cwd, from, to) {

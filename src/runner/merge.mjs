@@ -88,11 +88,29 @@ export function detectTrunk(repoRoot) {
   return 'main';
 }
 
-/** Whether `repoRoot`'s working tree has no pending changes — checked before
- * a runner-item merge is attempted (a dirty main tree must never be mixed
- * into a merge attempt). */
+/** Whether every path on a `git status --porcelain` line sits inside
+ * `.fgos/` — exported so bin/fgos.mjs's own working-tree-clean check
+ * (`return`'s pull-door gate) can apply the identical exclusion instead of
+ * re-deriving the porcelain-parsing rule. */
+export function isFgosOnlyStatusLine(line) {
+  const pathPart = line.slice(3);
+  const paths = pathPart.includes(' -> ') ? pathPart.split(' -> ') : [pathPart];
+  return paths.every((p) => p === '.fgos' || p.startsWith('.fgos/'));
+}
+
+/** Whether `repoRoot`'s working tree has no pending changes outside of
+ * `.fgos/` — checked before a runner-item merge is attempted (a dirty main
+ * tree must never be mixed into a merge attempt). `.fgos/` itself is
+ * excluded: it's a live store with its own write door, mutated by the very
+ * take/return/approve lifecycle operations this gate guards (each appends an
+ * event as part of the same call), so it never signals an actually-dirty
+ * code tree — only a manual `.fgos/events.jsonl` commit made that true
+ * before this exclusion existed. */
 export function isWorkingTreeClean(repoRoot) {
-  return git(repoRoot, ['status', '--porcelain']).trim() === '';
+  return git(repoRoot, ['status', '--porcelain'])
+    .split('\n')
+    .filter((line) => line.trim() !== '')
+    .every(isFgosOnlyStatusLine);
 }
 
 /** Classify a proposed `item` into its diff/merge source (see module doc). */
