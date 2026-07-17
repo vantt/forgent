@@ -16,7 +16,11 @@ export const MAX_VISITS = 3;
 
 /** Default number of consecutive goal-check misses (across any items, in
  * one runner run) before the circuit breaker trips. Provisional, same
- * caveat as MAX_VISITS. */
+ * caveat as MAX_VISITS. Inert in `--once` mode: dispatchClaimedItem
+ * (loop.mjs) parks an item after at most 2 retries, so a single `--once`
+ * invocation never accumulates enough misses to trip this threshold — it
+ * only takes effect once a shared-breaker or lower-threshold multi-pass path
+ * exists. */
 export const BREAKER_MISSES = 3;
 
 /**
