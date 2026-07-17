@@ -20,10 +20,18 @@
 // throw, so every hot-path consumer (frontier.mjs, loop.mjs) can call it
 // unconditionally.
 //
-// Exactly ONE entry today (D2 retrofit, zero behavior change): 'coding'
-// reproduces work.mjs's pre-retrofit STAGES and stage.mjs's pre-retrofit
-// STAGE_TRANSITIONS byte-for-byte. A second (synthetic) domain is explicitly
-// out of scope for this slice (D1; Slice 1/Slice 2 split, approach.md).
+// 'coding' reproduces work.mjs's pre-retrofit STAGES and stage.mjs's
+// pre-retrofit STAGE_TRANSITIONS byte-for-byte (D2, zero behavior change).
+//
+// 'synthetic' (Slice 2, D1/D4) is an illustrative, disposable second domain
+// that exists only to prove a non-coding domain runs on the same base FSM —
+// it declares exactly one stage, mapped only to 'Execute'. It deliberately
+// maps no stage to 'Clarify'/'Divide': discovery.mjs/decompose.mjs are
+// hardcoded to coding's literal stage names and were never retrofitted
+// (approach.md's Boundary correction) — a domain reaching a Clarify/Divide-
+// mapped stage would get its stage silently overwritten with a coding
+// literal outside its own stages list. Keeping 'synthetic' single-stage/
+// Execute-only sidesteps that gap entirely rather than papering over it.
 
 /** The domain every item without an explicit `domain` field belongs to —
  * matches today's implicit, exclusively-coding behavior (D2). */
@@ -48,6 +56,13 @@ export const DOMAINS = Object.freeze({
       Object.freeze({ from: 'clarify', to: 'decompose' }),
       Object.freeze({ from: 'decompose', to: 'executing' }),
     ]),
+  }),
+  synthetic: Object.freeze({
+    stages: Object.freeze(['assembling']),
+    stepMap: Object.freeze({
+      assembling: 'Execute',
+    }),
+    transitions: Object.freeze([]),
   }),
 });
 

@@ -35,6 +35,7 @@ import { branchNameFor, branchExists, createWorktree, removeWorktree } from '../
 import { resolveRoot } from '../src/runner/root-affinity.mjs';
 import { visitCount } from '../src/runner/anti-loop.mjs';
 import { DEFAULTS } from '../src/state/work.mjs';
+import { getDomain, stageForStep } from '../src/state/domains.mjs';
 import { writeCoexistenceManifest } from '../src/install/coexist.mjs';
 
 // D5: `verify` is a required non-empty field on every work item, but a
@@ -512,6 +513,16 @@ async function runVerb(verb, flags, positional, dir) {
         // validateWorkShape is the single source for the TIERS domain and
         // rejects it as validation, so that rule is never duplicated here.
         tier: optionalField(flags.tier, 'add --tier requires a tier value (e.g. light/standard/heavy); omit --tier entirely to use the default.'),
+        // Per base-workflow-model D1-D4/S2: --domain is optional, same
+        // omitted-leaves-undefined shape as --tier just above; omitting it
+        // leaves work.domain undefined so store.mjs's addWork/validateWorkShape
+        // apply DEFAULT_DOMAIN's lazy default. An out-of-registry value passes
+        // through unrejected here — work.mjs's validateWorkShape is the single
+        // source for the DOMAINS registry and rejects it as validation, so
+        // that rule is never duplicated here (same discipline as --tier/TIERS).
+        // No --stage flag: omitting stage already resolves per-domain via the
+        // existing lazy default (item.stage ?? domain's Execute-mapped stage).
+        domain: optionalField(flags.domain, 'add --domain requires a domain name (e.g. coding/synthetic); omit --domain entirely to use the default.'),
       };
       const { event } = addWork(dir, work);
       return `Added ${event.payload.id} (event #${event.seq})`;
@@ -545,10 +556,21 @@ async function runVerb(verb, flags, positional, dir) {
         verify: SUBMIT_VERIFY_SENTINEL,
         tier,
         mode: flags.async || flags.unattended ? 'async' : 'sync',
-        // Per D8: every item entering through the public door starts in stage
-        // `clarify` — context-discovery must pass before it can be worked.
-        // `add` deliberately omits this (lazy default `executing`, D8).
-        stage: 'clarify',
+        // Per base-workflow-model D1-D4/S2: --domain is optional, same
+        // omitted-leaves-undefined shape as `add`'s --domain above; omitting
+        // it leaves work.domain undefined so store.mjs's addWork/
+        // validateWorkShape apply DEFAULT_DOMAIN's lazy default.
+        domain: optionalField(flags.domain, 'submit --domain requires a domain name (e.g. coding/synthetic); omit --domain entirely to use the default.'),
+        // Per D8: every item entering through the public door starts at its
+        // domain's Clarify-mapped stage — context-discovery must pass before
+        // it can be worked. Generalized from the hardcoded 'clarify' (D8) to
+        // stay domain-aware (base-workflow-model D1-D4/S2): byte-identical
+        // 'clarify' for the default/omitted (coding) case, since
+        // stageForStep(DOMAINS.coding, 'Clarify') === 'clarify'. A domain with
+        // no Clarify-mapped stage (e.g. 'synthetic') falls back to its own
+        // first declared stage. `add` deliberately omits this (lazy default,
+        // D8) — only `submit` needs an explicit entry stage.
+        stage: stageForStep(getDomain(flags.domain), 'Clarify') ?? getDomain(flags.domain).stages[0],
       };
       const { event } = addWork(dir, work);
       return JSON.stringify(wrapEnvelope(event.payload), null, 2);

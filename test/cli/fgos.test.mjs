@@ -524,6 +524,67 @@ test('add with a bare --tier (no value) is rejected as validation, exit 4, no ev
   assert.equal(eventLines(cwd).length, before);
 });
 
+// --- base-workflow-model S2: --domain on `add` (D1-D4) ---
+
+test('add without --domain leaves domain unset — the view still reads "coding" behavior unchanged, exit 0', () => {
+  const cwd = tmpCwd();
+  const result = addOk(cwd, 'default-domain-item');
+  assert.equal(result.status, 0);
+  assert.equal(stateView(cwd).work['default-domain-item'].domain, undefined);
+});
+
+test('add --domain synthetic persists work.domain and the item\'s default stage resolves to "assembling" (no --stage flag needed), exit 0', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, [
+    'add', 'synthetic-item',
+    '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x',
+    '--domain', 'synthetic',
+  ]);
+  assert.equal(result.status, 0);
+  const item = stateView(cwd).work['synthetic-item'];
+  assert.equal(item.domain, 'synthetic');
+  assert.equal(item.stage, undefined, 'add still omits stage explicitly — the lazy per-domain default resolves it, not new fgos.mjs code');
+  assert.deepEqual(JSON.parse(run(cwd, ['ready']).stdout).map((w) => w.id), ['synthetic-item'], 'the item resolves to its domain\'s one Execute-mapped stage ("assembling") through the existing lazy default, so it is already frontier-ready');
+});
+
+test('add --domain coding is explicit and behaves identically to omitting --domain, exit 0', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, [
+    'add', 'explicit-coding-item',
+    '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x',
+    '--domain', 'coding',
+  ]);
+  assert.equal(result.status, 0);
+  assert.equal(stateView(cwd).work['explicit-coding-item'].domain, 'coding');
+});
+
+test('add with an unrecognized --domain value is rejected as validation, exit 4, no event written', () => {
+  const cwd = tmpCwd();
+  const before = eventLines(cwd).length;
+  const result = run(cwd, [
+    'add', 'bad-domain-item',
+    '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x',
+    '--domain', 'bogus',
+  ]);
+  assert.equal(result.status, 4);
+  assert.equal(eventLines(cwd).length, before);
+});
+
+test('add with a bare --domain (no value) is rejected as validation, exit 4, no event written', () => {
+  const cwd = tmpCwd();
+  const before = eventLines(cwd).length;
+  const result = run(cwd, ['add', 'bare-domain-item', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--domain']);
+  assert.equal(result.status, 4);
+  assert.equal(eventLines(cwd).length, before);
+});
+
+test('add never gained a --stage flag: passing --stage is simply ignored (not a recognized flag on this verb)', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['add', 'stage-flag-ignored', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--stage', 'assembling']);
+  assert.equal(result.status, 0);
+  assert.equal(stateView(cwd).work['stage-flag-ignored'].stage, undefined);
+});
+
 // --- D5 proposed: new edges + --reason on `move` (phase-2-routing-3) ---
 
 function toProposed(cwd, id) {
@@ -1120,6 +1181,54 @@ test('add leaves stage unset — the item reads as executing via the lazy defaul
   addOk(cwd, 'plain-add');
   const item = JSON.parse(run(cwd, ['list']).stdout).work['plain-add'];
   assert.equal(item.stage, undefined);
+});
+
+// --- base-workflow-model S2: --domain on `submit` (D1-D4, E3) ---
+
+test('submit without --domain is byte-identical to before: domain unset, stage "clarify" (coding\'s Clarify-mapped stage), exit 0', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['submit', 'Investigate the sluggish overview page']);
+  assert.equal(result.status, 0);
+  const id = JSON.parse(result.stdout).data.id;
+  const item = JSON.parse(run(cwd, ['list']).stdout).work[id];
+  assert.equal(item.domain, undefined);
+  assert.equal(item.stage, 'clarify');
+});
+
+test('submit --domain coding is explicit and still resolves stage to "clarify", exit 0', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['submit', 'Investigate the sluggish overview page', '--domain', 'coding']);
+  assert.equal(result.status, 0);
+  const id = JSON.parse(result.stdout).data.id;
+  const item = JSON.parse(run(cwd, ['list']).stdout).work[id];
+  assert.equal(item.domain, 'coding');
+  assert.equal(item.stage, 'clarify');
+});
+
+test('submit --domain synthetic persists work.domain and resolves stage to its own first stage ("assembling", no Clarify-mapped stage), exit 0', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['submit', 'Try the synthetic domain', '--domain', 'synthetic']);
+  assert.equal(result.status, 0);
+  const id = JSON.parse(result.stdout).data.id;
+  const item = JSON.parse(run(cwd, ['list']).stdout).work[id];
+  assert.equal(item.domain, 'synthetic');
+  assert.equal(item.stage, 'assembling');
+});
+
+test('submit with an unrecognized --domain value is rejected as validation, exit 4, no event written', () => {
+  const cwd = tmpCwd();
+  const before = eventLines(cwd).length;
+  const result = run(cwd, ['submit', 'Try a bad domain', '--domain', 'bogus']);
+  assert.equal(result.status, 4);
+  assert.equal(eventLines(cwd).length, before);
+});
+
+test('submit with a bare --domain (no value) is rejected as validation, exit 4, no event written', () => {
+  const cwd = tmpCwd();
+  const before = eventLines(cwd).length;
+  const result = run(cwd, ['submit', 'Try a bare domain flag', '--domain']);
+  assert.equal(result.status, 4);
+  assert.equal(eventLines(cwd).length, before);
 });
 
 // RETARGET (stage-decompose D2, cell 3): `discover` on a stage-`clarify`

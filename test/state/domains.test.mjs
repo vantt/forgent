@@ -12,8 +12,8 @@ test('DEFAULT_DOMAIN is "coding"', () => {
   assert.equal(DEFAULT_DOMAIN, 'coding');
 });
 
-test('DOMAINS has exactly one entry ("coding") — no second (synthetic) domain in this slice (D1)', () => {
-  assert.deepEqual(Object.keys(DOMAINS), ['coding']);
+test('DOMAINS has exactly two entries: "coding" and "synthetic" (D1)', () => {
+  assert.deepEqual(Object.keys(DOMAINS), ['coding', 'synthetic']);
 });
 
 test('DOMAINS.coding.stages is byte-for-byte the pre-retrofit work.mjs STAGES value', () => {
@@ -43,6 +43,55 @@ test('DOMAINS is deeply frozen: the registry, each domain entry, and each nested
   assert.ok(Object.isFrozen(DOMAINS.coding.stepMap));
   assert.ok(Object.isFrozen(DOMAINS.coding.transitions));
   assert.ok(Object.isFrozen(DOMAINS.coding.transitions[0]));
+});
+
+// --- 'synthetic' domain (Slice 2, D1/D4): illustrative/disposable, exactly
+// one stage mapped only to 'Execute' — no Clarify/Divide mapping (approach.md
+// Boundary correction), zero effect on the existing 'coding' entry. ---
+
+test("DOMAINS.synthetic declares exactly one stage, 'assembling'", () => {
+  assert.deepEqual(DOMAINS.synthetic.stages, ['assembling']);
+});
+
+test("DOMAINS.synthetic.stepMap maps 'assembling' only to 'Execute' — never Clarify or Divide", () => {
+  assert.deepEqual(DOMAINS.synthetic.stepMap, { assembling: 'Execute' });
+});
+
+test('DOMAINS.synthetic.transitions is empty (a single-stage domain has no legal stage-move edges)', () => {
+  assert.deepEqual(DOMAINS.synthetic.transitions, []);
+});
+
+test('DOMAINS.synthetic is deeply frozen: the entry and its nested array/object reject mutation', () => {
+  assert.ok(Object.isFrozen(DOMAINS.synthetic));
+  assert.ok(Object.isFrozen(DOMAINS.synthetic.stages));
+  assert.ok(Object.isFrozen(DOMAINS.synthetic.stepMap));
+  assert.ok(Object.isFrozen(DOMAINS.synthetic.transitions));
+});
+
+test('adding "synthetic" leaves DOMAINS.coding byte-for-byte unchanged', () => {
+  assert.deepEqual(DOMAINS.coding.stages, ['clarify', 'decompose', 'executing']);
+  assert.deepEqual(DOMAINS.coding.stepMap, { clarify: 'Clarify', decompose: 'Divide', executing: 'Execute' });
+  assert.deepEqual(DOMAINS.coding.transitions, [
+    { from: 'clarify', to: 'executing' },
+    { from: 'clarify', to: 'decompose' },
+    { from: 'decompose', to: 'executing' },
+  ]);
+});
+
+test('resolveDomainName passes through "synthetic" unchanged', () => {
+  assert.equal(resolveDomainName('synthetic'), 'synthetic');
+});
+
+test('getDomain resolves "synthetic" to its own registry entry', () => {
+  assert.equal(getDomain('synthetic'), DOMAINS.synthetic);
+});
+
+test("stageForStep resolves synthetic's one step to 'assembling', and returns undefined for every other step", () => {
+  assert.equal(stageForStep(DOMAINS.synthetic, 'Execute'), 'assembling');
+  assert.equal(stageForStep(DOMAINS.synthetic, 'Clarify'), undefined);
+  assert.equal(stageForStep(DOMAINS.synthetic, 'Divide'), undefined);
+  assert.equal(stageForStep(DOMAINS.synthetic, 'Init'), undefined);
+  assert.equal(stageForStep(DOMAINS.synthetic, 'Compound-learn'), undefined);
 });
 
 // --- resolveDomainName / getDomain: the fail-safe (must_have) ---
