@@ -102,6 +102,36 @@ moveWork(${JSON.stringify(mainDir)}, { id: ${JSON.stringify(id)}, to: 'blocked',
   return scriptPath;
 }
 
+/** A worker that records a real execution INTERVAL: it writes a start marker,
+ * waits long enough that two concurrent dispatches must overlap in wall time,
+ * then writes+commits its proof file and an end marker. Each item writes to
+ * its OWN marker files (keyed by the produce target parsed out of the prompt's
+ * `test -f <file>` verify line, exactly as the real e2e decompose-aware
+ * executor does), so two concurrent executors never race on the same file —
+ * the overlap is proven by interval intersection, not a delay-only proxy. */
+function writeIntervalExecutor(scriptDir, markerDir, sleepMs = 300) {
+  const scriptPath = path.join(scriptDir, 'interval-executor.mjs');
+  fs.writeFileSync(
+    scriptPath,
+    `
+import fs from 'node:fs';
+import path from 'node:path';
+import { execFileSync } from 'node:child_process';
+const prompt = process.argv[2] ?? '';
+const match = prompt.match(/test -f (\\S+)/);
+const file = match ? match[1] : 'output.txt';
+const marker = path.join(${JSON.stringify(markerDir)}, file);
+fs.writeFileSync(marker + '.start', String(Date.now()));
+await new Promise((r) => setTimeout(r, ${sleepMs}));
+fs.writeFileSync(file, 'produced by worker\\n');
+execFileSync('git', ['add', file]);
+execFileSync('git', ['commit', '-q', '-m', 'worker: ' + file]);
+fs.writeFileSync(marker + '.end', String(Date.now()));
+`,
+  );
+  return scriptPath;
+}
+
 function configFor(scriptPath) {
   return {
     executor: { command: process.execPath, args: [scriptPath, '{prompt}', '--model', '{model}'] },
@@ -146,10 +176,12 @@ test('runOnce full circle: todo -> doing -> worker commit -> goal-check pass -> 
 
   const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
-  assert.equal(result.outcome, 'proposed');
-  assert.equal(result.id, 'item-happy');
-  assert.equal(result.branch, 'fgw/item-happy');
+  assert.equal(result.outcome, 'drained');
   assert.equal(result.exitCode, 0);
+  assert.equal(result.dispatched.length, 1);
+  assert.equal(result.dispatched[0].outcome, 'proposed');
+  assert.equal(result.dispatched[0].id, 'item-happy');
+  assert.equal(result.dispatched[0].branch, 'fgw/item-happy');
   assert.equal(listWork(dir).work['item-happy'].status, 'proposed');
   assert.equal(branchExists(repoRoot, 'fgw/item-happy'), true);
   const log = execFileSync('git', ['log', '--oneline', 'fgw/item-happy'], { cwd: repoRoot, encoding: 'utf8' });
@@ -233,7 +265,9 @@ test('runOnce clarify sweep records a clarify-pass settlement stamped actor "run
 
   const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
-  assert.equal(result.outcome, 'proposed', 'the clarify+decompose sweeps clear the item before the frontier dispatches it in the same pass');
+  assert.equal(result.outcome, 'drained', 'the clarify+decompose sweeps clear the item before the frontier dispatches it in the same pass');
+  assert.equal(result.dispatched[0].outcome, 'proposed');
+  assert.equal(result.dispatched[0].id, 'item-clarify');
   const view = listWork(dir);
   assert.equal(view.work['item-clarify'].stage, 'executing');
   // must_haves truth 4: the clarify-pass settlement (cell 1's re-guard on
@@ -243,6 +277,91 @@ test('runOnce clarify sweep records a clarify-pass settlement stamped actor "run
   assert.equal(view.settlements['item-clarify'].length, 1);
   assert.equal(view.settlements['item-clarify'][0].kind, 'clarify-pass');
   assert.equal(view.settlements['item-clarify'][0].actor, 'runner');
+});
+
+// --- real parallelism: two independent items overlap in one runOnce -------
+// (fan-out-parallel D10/D16 — the whole point of the drain-run rewrite). The
+// overlap is proven CONCRETELY (interval intersection), not by a wall-clock-
+// under-2x-delay proxy: two sequential delayed dispatches would pass a delay-
+// only check, so only genuinely intersecting [start,end] intervals prove it.
+
+test('real concurrency: two independent ready items dispatched in ONE runOnce overlap in wall time (interval intersection) and both reach proposed with a consistent event log', async () => {
+  const { repoRoot, dir, scriptDir, worktreeDir } = setup();
+  const markerDir = mkTempDir('fgos-loop-test-marker-');
+  seedItem(dir, { id: 'item-a', verify: 'test -f a.txt' });
+  seedItem(dir, { id: 'item-b', verify: 'test -f b.txt' });
+  const config = configFor(writeIntervalExecutor(scriptDir, markerDir, 300));
+
+  const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
+
+  // both items dispatched in the same drain-run, both proposed
+  assert.equal(result.outcome, 'drained');
+  const outcomes = new Map(result.dispatched.map((d) => [d.id, d.outcome]));
+  assert.equal(outcomes.get('item-a'), 'proposed');
+  assert.equal(outcomes.get('item-b'), 'proposed');
+
+  // event-log internal consistency: the log replays cleanly and both items
+  // land at proposed in the rebuilt view (the write-queue kept the concurrent
+  // workers' state writes from interleaving into corruption).
+  const view = listWork(dir);
+  assert.equal(view.work['item-a'].status, 'proposed');
+  assert.equal(view.work['item-b'].status, 'proposed');
+
+  // CONCRETE overlap proof: item-a's [start,end] and item-b's [start,end]
+  // genuinely intersect — impossible under sequential dispatch, where b would
+  // not start until a's worker had fully finished (b.start > a.end).
+  const readMarker = (f, suffix) => parseInt(fs.readFileSync(path.join(markerDir, `${f}.${suffix}`), 'utf8'), 10);
+  const aStart = readMarker('a.txt', 'start');
+  const aEnd = readMarker('a.txt', 'end');
+  const bStart = readMarker('b.txt', 'start');
+  const bEnd = readMarker('b.txt', 'end');
+  assert.ok(
+    Math.max(aStart, bStart) < Math.min(aEnd, bEnd),
+    `the two dispatches must overlap in wall time: a=[${aStart},${aEnd}] b=[${bStart},${bEnd}]`,
+  );
+});
+
+// --- bounded drain-run: cap + refill + terminate (D10/D15) ----------------
+
+test('bounded drain-run: three independent ready items under maxRoots=2 dispatch across two waves (refill) — all reach proposed, then the run terminates', async () => {
+  const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
+  seedItem(dir, { id: 'root-1' });
+  seedItem(dir, { id: 'root-2' });
+  seedItem(dir, { id: 'root-3' });
+  const config = { ...configFor(writeCommittingExecutor(scriptDir, counterFile)), parallel: { maxRoots: 2, maxLeavesPerRoot: 1 } };
+
+  const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
+
+  assert.equal(result.outcome, 'drained');
+  assert.equal(result.dispatched.length, 3, 'the cap dispatched 2 then refilled the 3rd — all three, none dropped');
+  for (const id of ['root-1', 'root-2', 'root-3']) {
+    assert.equal(listWork(dir).work[id].status, 'proposed');
+  }
+  assert.equal(countRuns(counterFile), 3); // three real worker dispatches
+  assert.deepEqual(readyWork(dir), [], 'the drain terminated with the frontier empty (D15), it did not spin');
+});
+
+// --- two-tier cap + root-affinity: leaves of one root share an owner ------
+
+test('two-tier cap: a root with three ready leaves dispatches maxLeavesPerRoot per wave, refills the rest, all leaves reach proposed under one shared root owner', async () => {
+  const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
+  seedItem(dir, { id: 'the-root', verify: 'test -f root.txt' });
+  seedItem(dir, { id: 'leaf-1', parent: 'the-root' });
+  seedItem(dir, { id: 'leaf-2', parent: 'the-root' });
+  seedItem(dir, { id: 'leaf-3', parent: 'the-root' });
+  const config = { ...configFor(writeCommittingExecutor(scriptDir, counterFile)), parallel: { maxRoots: 4, maxLeavesPerRoot: 2 } };
+
+  const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
+
+  assert.equal(result.outcome, 'drained');
+  assert.equal(result.dispatched.length, 3, 'all three leaves of the one root dispatched (2 in wave 1, 1 refilled)');
+  for (const id of ['leaf-1', 'leaf-2', 'leaf-3']) {
+    assert.equal(listWork(dir).work[id].status, 'proposed');
+  }
+  // the root itself never dispatched — its descendants are only proposed (not
+  // done), so the lineage filter keeps it off the frontier this whole run.
+  assert.equal(listWork(dir).work['the-root'].status, 'todo');
+  assert.equal(countRuns(counterFile), 3);
 });
 
 // --- verify-miss: retry then park ----------------------------------------
@@ -255,9 +374,10 @@ test('verify-miss: worker commits the wrong thing -> retry once, then park to bl
 
   const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
-  assert.equal(result.outcome, 'parked');
-  assert.equal(result.errorClass, 'verify-miss');
-  assert.equal(result.attempts, 2);
+  assert.equal(result.outcome, 'drained');
+  assert.equal(result.dispatched[0].outcome, 'parked');
+  assert.equal(result.dispatched[0].errorClass, 'verify-miss');
+  assert.equal(result.dispatched[0].attempts, 2);
   assert.equal(countRuns(counterFile), 2); // retry really re-dispatched
   assert.equal(listWork(dir).work['item-miss'].status, 'blocked');
   assert.deepEqual(fs.readdirSync(worktreeDir), []);
@@ -292,8 +412,9 @@ test('verify passes but the worker never committed -> classified verify-miss, pa
 
   const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
-  assert.equal(result.outcome, 'parked');
-  assert.equal(result.errorClass, 'verify-miss');
+  assert.equal(result.outcome, 'drained');
+  assert.equal(result.dispatched[0].outcome, 'parked');
+  assert.equal(result.dispatched[0].errorClass, 'verify-miss');
   assert.equal(listWork(dir).work['item-nocommit'].status, 'blocked');
   assert.deepEqual(fs.readdirSync(worktreeDir), []);
 });
@@ -311,9 +432,10 @@ test('worker-spawn-fail: nonexistent executor -> retry per matrix, then park to 
 
   const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
-  assert.equal(result.outcome, 'parked');
-  assert.equal(result.errorClass, 'worker-spawn-fail');
-  assert.equal(result.attempts, 2);
+  assert.equal(result.outcome, 'drained');
+  assert.equal(result.dispatched[0].outcome, 'parked');
+  assert.equal(result.dispatched[0].errorClass, 'worker-spawn-fail');
+  assert.equal(result.dispatched[0].attempts, 2);
   assert.equal(listWork(dir).work['item-nospawn'].status, 'blocked');
   assert.deepEqual(fs.readdirSync(worktreeDir), []);
 });
@@ -332,11 +454,13 @@ test('anti-loop: an item at MAX_VISITS is parked todo -> blocked and truly leave
 
   const result = await runOnce({ repoRoot, config, worktreeDir, maxVisits: 1, log: noLog });
 
-  // the FIFO head was parked, and the loop moved on instead of hovering
+  // the FIFO head was parked, and the drain moved on instead of hovering
   assert.deepEqual(result.parked, [{ id: 'item-loopy', reason: 'anti-loop-max-visits', visits: 1 }]);
   assert.equal(listWork(dir).work['item-loopy'].status, 'blocked');
-  assert.equal(result.outcome, 'proposed');
-  assert.equal(result.id, 'item-fresh');
+  assert.equal(result.outcome, 'drained');
+  assert.equal(result.dispatched.length, 1);
+  assert.equal(result.dispatched[0].id, 'item-fresh');
+  assert.equal(result.dispatched[0].outcome, 'proposed');
   assert.deepEqual(readyWork(dir), []);
 });
 
@@ -349,10 +473,11 @@ test('breaker trip: a goal-check miss at threshold parks the item and halts the 
 
   const result = await runOnce({ repoRoot, config, worktreeDir, breakerThreshold: 1, log: noLog });
 
-  assert.equal(result.outcome, 'halted');
-  assert.equal(result.reason, 'breaker-tripped');
-  assert.equal(result.attempts, 1); // the breaker vetoed the matrix's retry
+  assert.equal(result.outcome, 'drained');
   assert.equal(result.exitCode, 1);
+  assert.equal(result.dispatched[0].outcome, 'halted');
+  assert.equal(result.dispatched[0].reason, 'breaker-tripped');
+  assert.equal(result.dispatched[0].attempts, 1); // the breaker vetoed the matrix's retry
   assert.equal(countRuns(counterFile), 1);
   assert.equal(listWork(dir).work['item-breaker'].status, 'blocked'); // never dangles in doing
   // removeWorktree ran in the finally even on the halt path
@@ -518,9 +643,10 @@ test('state-conflict: a racing write under the runner\'s claim makes its own CAS
 
   const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
-  assert.equal(result.outcome, 'halted');
-  assert.equal(result.errorClass, 'state-conflict');
+  assert.equal(result.outcome, 'drained');
   assert.equal(result.exitCode, 3);
+  assert.equal(result.dispatched[0].outcome, 'halted');
+  assert.equal(result.dispatched[0].errorClass, 'state-conflict');
   // the racing writer's state stands — the runner never overwrote it blindly
   assert.equal(listWork(dir).work['item-race'].status, 'blocked');
   // cleanup still ran on this halt path: worktree gone, branch kept

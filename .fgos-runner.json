@@ -8,5 +8,9 @@
     "standard": "sonnet",
     "heavy": "opus"
   },
-  "timeoutMs": 300000
+  "timeoutMs": 300000,
+  "parallel": {
+    "maxRoots": 4,
+    "maxLeavesPerRoot": 4
+  }
 }

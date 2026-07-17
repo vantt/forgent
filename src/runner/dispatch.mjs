@@ -162,6 +162,22 @@ function validateRunnerConfigShape(cfg, sourceLabel) {
   if (typeof cfg.timeoutMs !== 'number' || !Number.isFinite(cfg.timeoutMs) || cfg.timeoutMs <= 0) {
     throw new RunnerConfigError(`runner config (${sourceLabel}) must declare a positive numeric "timeoutMs".`);
   }
+  // OPTIONAL `parallel` block (fan-out-parallel D10) — validated the same
+  // additive-optional way every field above is: absent entirely is fine (the
+  // runner falls back to in-code defaults), but when present it must be an
+  // object whose `maxRoots`/`maxLeavesPerRoot`, if given, are positive
+  // integers. This keeps every existing `.fgos-runner.json` valid untouched.
+  if (cfg.parallel !== undefined) {
+    if (!cfg.parallel || typeof cfg.parallel !== 'object' || Array.isArray(cfg.parallel)) {
+      throw new RunnerConfigError(`runner config (${sourceLabel}) "parallel" must be an object when present.`);
+    }
+    for (const key of ['maxRoots', 'maxLeavesPerRoot']) {
+      const value = cfg.parallel[key];
+      if (value !== undefined && (!Number.isInteger(value) || value <= 0)) {
+        throw new RunnerConfigError(`runner config (${sourceLabel}) "parallel.${key}" must be a positive integer when present.`);
+      }
+    }
+  }
 }
 
 /**
