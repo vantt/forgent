@@ -28,7 +28,8 @@ import { resolveDecompose } from '../src/intake/decompose.mjs';
 import { computeEntropy, computeCounts } from '../src/report/entropy.mjs';
 import { runGoalCheck } from '../src/runner/goal-check.mjs';
 import { classifySource, reviewDiff, mergeRunnerItem, cleanupMergedBranch, isWorkingTreeClean as isMainTreeClean } from '../src/runner/merge.mjs';
-import { branchNameFor, branchExists } from '../src/runner/worktree.mjs';
+import { branchNameFor, branchExists, createWorktree, removeWorktree } from '../src/runner/worktree.mjs';
+import { resolveRoot } from '../src/runner/root-affinity.mjs';
 import { visitCount } from '../src/runner/anti-loop.mjs';
 import { DEFAULTS } from '../src/state/work.mjs';
 import { writeCoexistenceManifest } from '../src/install/coexist.mjs';
@@ -807,7 +808,14 @@ async function runVerb(verb, flags, positional, dir) {
         throw new StoreError('precondition', `review: work "${id}" is "${item.status}", not "proposed" — nothing to review.`);
       }
 
-      const { source, diff, warnings } = reviewDiff(process.cwd(), item);
+      // D3 leaf-vs-root split: a leaf (its resolved root is a different
+      // item) diffs against its parent's integration branch instead of
+      // main; a root (resolved root is itself) keeps the default
+      // (main) trunk — byte-for-byte unchanged.
+      const rootId = resolveRoot(view, id);
+      const { source, diff, warnings } = rootId !== id
+        ? reviewDiff(process.cwd(), item, { trunk: branchNameFor(rootId) })
+        : reviewDiff(process.cwd(), item);
       const lines = [`${id} — source: ${source}`];
       for (const warning of warnings) {
         lines.push(`warning: ${warning}`);
@@ -843,7 +851,8 @@ async function runVerb(verb, flags, positional, dir) {
         }
       }
 
-      const item = listWork(dir).work[id];
+      const view = listWork(dir);
+      const item = view.work[id];
       if (!item) {
         throw new StoreError('validation', `approve: work "${id}" not found.`);
       }
@@ -859,32 +868,121 @@ async function runVerb(verb, flags, positional, dir) {
           throw new StoreError('validation', `approve: working tree at "${repoRoot}" is not clean — commit or stash pending changes before approving "${id}".`);
         }
 
+        // D3 leaf-vs-root split: a leaf's resolved root is a DIFFERENT item
+        // (resolveRoot walks item.parent up to the top); a root's resolved
+        // root is itself.
+        const rootId = resolveRoot(view, id);
+
+        if (rootId !== id) {
+          const rootBranch = branchNameFor(rootId);
+          // Ephemeral worktree checked out on fgw/<rootId> (guaranteed to
+          // exist by the time a leaf reaches "proposed" — dispatch-side
+          // wiring, cell fan-out-parallel-9) — never the human's own main
+          // checkout. ASSUMPTION (acknowledged, not fixed in this cell):
+          // this races a concurrent approval of a sibling leaf of the same
+          // root, or the runner's own dispatch of that root, since
+          // createWorktree's branch-reuse path force-reclaims any existing
+          // checkout of fgw/<rootId>; low-likelihood under single-operator
+          // P6, D16's per-root merge-mutex lives in the runner's
+          // write-queue, not this human-driven CLI verb.
+          const ephemeral = createWorktree(repoRoot, rootId, {});
+          try {
+            const result = await mergeRunnerItem(ephemeral.path, item, { timeoutMs });
+
+            if (result.outcome === 'conflict') {
+              moveWork(dir, { id, to: 'blocked', expectedStatus: 'proposed', reason: 'merge-conflict' });
+              addFriction(dir, {
+                id,
+                disposition: 'blocked',
+                errorClass: 'merge-conflict',
+                layer: 'state',
+                attempts: 1,
+                detail: `git merge --no-commit --no-ff ${result.branch} into ${rootBranch} conflicted; merge aborted, ${rootBranch} unchanged`,
+              });
+              return `Approved ${id}: merge into ${rootBranch} conflicted — proposed -> blocked (reason merge-conflict), ${rootBranch} left unchanged`;
+            }
+
+            if (result.outcome === 'verify-fail') {
+              moveWork(dir, { id, to: 'blocked', expectedStatus: 'proposed', reason: 'verify-fail-post-merge' });
+              addFriction(dir, {
+                id,
+                disposition: 'blocked',
+                errorClass: 'verify-miss',
+                layer: 'verification',
+                attempts: 1,
+                detail: `goal-check failed on staged merge into ${rootBranch} (exit ${result.check.status}); merge aborted, ${rootBranch} unchanged`,
+              });
+              return `Approved ${id}: verify failed on staged merge into ${rootBranch} (exit ${result.check.status}) — proposed -> blocked (reason verify-fail-post-merge), ${rootBranch} left unchanged\n${result.check.output}`;
+            }
+
+            // Merged: land the leaf's work on its root's branch, THEN
+            // delete the leaf's own branch — in that exact order.
+            // cleanupMergedBranch must run from the ephemeral worktree
+            // (checked out on rootBranch, where the leaf is actually
+            // merged) — `git branch -d` only succeeds against the checkout
+            // the branch is merged INTO; running it from repoRoot/main
+            // would have git silently refuse the delete (swallowed as a
+            // warning), leaking the leaf's branch forever.
+            const { event } = moveWork(dir, { id, to: 'done', expectedStatus: 'proposed', actor: 'human' });
+            const cleanup = cleanupMergedBranch(ephemeral.path, result.branch);
+            const cleanupNote = cleanup.warnings.length ? `\ncleanup warning(s): ${cleanup.warnings.join('; ')}` : '';
+            return `Approved ${id}: merged ${result.branch} -> ${rootBranch}, verified, proposed -> done (event #${event.seq})${cleanupNote}\n${result.check.output}`;
+          } finally {
+            // Per D4/D17: only the branch is durable, the worktree is
+            // always ephemeral — removeWorktree never deletes the branch,
+            // only the checkout. Runs on every exit path (conflict,
+            // verify-fail, merged) — mergeRunnerItem's own conflict/
+            // verify-fail outcomes already leave the ephemeral checkout
+            // clean via `git merge --abort`, so no cleanupMergedBranch call
+            // is needed on those paths.
+            removeWorktree(repoRoot, ephemeral.path, { force: true });
+          }
+        }
+
+        // Root merge into main — unchanged except for D8: a root that
+        // actually had children (was a decomposed root, per replay.mjs's
+        // fold which never clears `parent` on a child that reached `done`)
+        // gets the distinguishing reason `integration-drift` instead of the
+        // existing reason strings on a conflict/verify-fail, plus a
+        // `main@<sha>` ref in the friction detail. A standalone (no
+        // children) root keeps today's exact reason strings and message —
+        // zero behavior change for the common case.
+        const hadChildren = Object.values(view.work).some((w) => w.parent === id);
+
         const result = await mergeRunnerItem(repoRoot, item, { timeoutMs });
 
         if (result.outcome === 'conflict') {
-          moveWork(dir, { id, to: 'blocked', expectedStatus: 'proposed', reason: 'merge-conflict' });
+          const reason = hadChildren ? 'integration-drift' : 'merge-conflict';
+          const detail = hadChildren
+            ? `cross-root integration drift at main@${currentHead(repoRoot)}; git merge --no-commit --no-ff ${result.branch} conflicted; merge aborted, main unchanged`
+            : `git merge --no-commit --no-ff ${result.branch} conflicted; merge aborted, main unchanged`;
+          moveWork(dir, { id, to: 'blocked', expectedStatus: 'proposed', reason });
           addFriction(dir, {
             id,
             disposition: 'blocked',
             errorClass: 'merge-conflict',
             layer: 'state',
             attempts: 1,
-            detail: `git merge --no-commit --no-ff ${result.branch} conflicted; merge aborted, main unchanged`,
+            detail,
           });
-          return `Approved ${id}: merge conflicted — proposed -> blocked (reason merge-conflict), main left unchanged`;
+          return `Approved ${id}: merge conflicted — proposed -> blocked (reason ${reason}), main left unchanged`;
         }
 
         if (result.outcome === 'verify-fail') {
-          moveWork(dir, { id, to: 'blocked', expectedStatus: 'proposed', reason: 'verify-fail-post-merge' });
+          const reason = hadChildren ? 'integration-drift' : 'verify-fail-post-merge';
+          const detail = hadChildren
+            ? `cross-root integration drift at main@${currentHead(repoRoot)}; goal-check failed on staged merge (exit ${result.check.status}); merge aborted, main unchanged`
+            : `goal-check failed on staged merge (exit ${result.check.status}); merge aborted, main unchanged`;
+          moveWork(dir, { id, to: 'blocked', expectedStatus: 'proposed', reason });
           addFriction(dir, {
             id,
             disposition: 'blocked',
             errorClass: 'verify-miss',
             layer: 'verification',
             attempts: 1,
-            detail: `goal-check failed on staged merge (exit ${result.check.status}); merge aborted, main unchanged`,
+            detail,
           });
-          return `Approved ${id}: verify failed on staged merge (exit ${result.check.status}) — proposed -> blocked (reason verify-fail-post-merge), main left unchanged\n${result.check.output}`;
+          return `Approved ${id}: verify failed on staged merge (exit ${result.check.status}) — proposed -> blocked (reason ${reason}), main left unchanged\n${result.check.output}`;
         }
 
         const { event } = moveWork(dir, { id, to: 'done', expectedStatus: 'proposed', actor: 'human' });

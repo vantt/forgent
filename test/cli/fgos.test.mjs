@@ -5,7 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync, spawnSync } from 'node:child_process';
-import { addOutcome, addFriction, moveWork } from '../../src/state/store.mjs';
+import { addOutcome, addFriction, moveWork, addWork } from '../../src/state/store.mjs';
 
 // The CLI under test, resolved by absolute path so it works regardless of
 // the spawned process's cwd (which every test below points at a fresh
@@ -1425,6 +1425,66 @@ function makeRunnerProposedItem(cwd, id, extra = {}) {
   commitPending(cwd, `state: propose ${id}`);
 }
 
+// Simulates what a real fan-out-parallel dispatch (D3, cell
+// fan-out-parallel-9) leaves behind for a LEAF item under the per-root
+// branch tree: a durable `fgw/<rootId>` integration branch (created early,
+// ref only, per D17) and the leaf's own `fgw/<leafId>` branch forked from
+// that root branch's TIP, carrying a real commit — with the leaf item's own
+// status independently moved to `proposed` and `parent: rootId` set
+// directly through store.mjs's addWork (the CLI's `add` verb has no
+// --parent flag; only decompose.mjs writes it in production). The root
+// item itself is added but never dispatched through the CLI — only its
+// existence (for `resolveRoot` to resolve against) and its branch matter to
+// these tests.
+//
+// `opts.rootDivergesFromMain`: commits a file on `fgw/<rootId>` BEFORE the
+// leaf forks from it, so a test can prove a leaf's diff/merge target is
+// really the root branch (and not main) by asserting the root-only content
+// is absent/present as the trunk in play dictates.
+function makeRunnerProposedLeafItem(cwd, rootId, leafId, extra = {}) {
+  const dir = path.join(cwd, '.fgos');
+  addWork(dir, { id: rootId, title: `Title ${rootId}`, kind: 'task', status: 'todo', deps: [], risk: 'low', refs: [], verify: 'true' });
+  // Commit the root's own work.add event onto MAIN before any branch
+  // switching — `.fgos/events.jsonl` is git-tracked in this fixture (same
+  // convention every take/return/approve test here already relies on), so
+  // leaving it uncommitted-but-existing here would let a later `checkout`
+  // + `git add -A` on a different branch sweep it up and lose it from
+  // main's own log.
+  commitPending(cwd, `state: add ${rootId}`);
+  gitAtCwd(cwd, ['branch', `fgw/${rootId}`, 'main']);
+
+  if (extra.rootDivergesFromMain) {
+    gitAtCwd(cwd, ['checkout', `fgw/${rootId}`]);
+    fs.writeFileSync(path.join(cwd, 'root-only.txt'), 'root\n');
+    gitAtCwd(cwd, ['add', 'root-only.txt']);
+    gitAtCwd(cwd, ['commit', '-q', '-m', 'root diverges from main']);
+    gitAtCwd(cwd, ['checkout', 'main']);
+  }
+
+  addWork(dir, {
+    id: leafId,
+    title: extra.title ?? `Title ${leafId}`,
+    kind: 'task',
+    status: 'todo',
+    deps: [],
+    risk: 'low',
+    refs: [],
+    verify: extra.verify ?? 'npm test',
+    parent: rootId,
+  });
+  run(cwd, ['move', leafId, '--to', 'doing']);
+  commitPending(cwd, `state: claim ${leafId}`);
+
+  gitAtCwd(cwd, ['checkout', '-b', `fgw/${leafId}`, `fgw/${rootId}`]);
+  fs.writeFileSync(path.join(cwd, `${leafId}-produced.txt`), 'ok\n');
+  gitAtCwd(cwd, ['add', '-A']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', `worker output for ${leafId}`]);
+  gitAtCwd(cwd, ['checkout', 'main']);
+
+  run(cwd, ['move', leafId, '--to', 'proposed']);
+  commitPending(cwd, `state: propose ${leafId}`);
+}
+
 test('review on a nonexistent id is rejected as validation, exit 4', () => {
   const cwd = tmpCwd();
   const result = run(cwd, ['review', 'ghost']);
@@ -1477,6 +1537,29 @@ test('review of a legacy proposed item (no branch, no headAtTake/headAtReturn) d
   assert.match(result.stdout, /warning: no live diff source/);
 });
 
+test('review of a leaf proposed item diffs against its resolved root branch (fgw/<root>), not main (D3)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeRunnerProposedLeafItem(cwd, 'review-leaf-root', 'review-leaf-child', { rootDivergesFromMain: true });
+
+  const result = run(cwd, ['review', 'review-leaf-child']);
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /source: runner/);
+  assert.match(result.stdout, /review-leaf-child-produced\.txt/);
+  assert.doesNotMatch(result.stdout, /root-only\.txt/, 'diff against fgw/<root> must not include the root branch\'s own divergence from main');
+});
+
+test('review of a root proposed item is unchanged — still diffs against main (regression, D3)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeRunnerProposedItem(cwd, 'review-root-regression-item');
+
+  const result = run(cwd, ['review', 'review-root-regression-item']);
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /source: runner/);
+  assert.match(result.stdout, /review-root-regression-item-produced\.txt/);
+});
+
 test('approve on a nonexistent id is rejected as validation, exit 4', () => {
   const cwd = tmpCwd();
   const result = run(cwd, ['approve', 'ghost']);
@@ -1507,6 +1590,39 @@ test('approve of a runner item (happy path): merges fgw/<id> into main, verifies
 
   const branches = gitAtCwd(cwd, ['for-each-ref', '--format=%(refname:short)', 'refs/heads/fgw/']);
   assert.doesNotMatch(branches, /fgw\/approve-runner-item/, 'the fully-merged branch is cleaned up');
+});
+
+test('approve of a leaf item with a clean merge lands the work on fgw/<root> (not main) via an ephemeral worktree, leaf -> done, fgw/<leaf> is actually deleted, fgw/<root> survives (D3/D4/D17)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeRunnerProposedLeafItem(cwd, 'approve-leaf-root', 'approve-leaf-child', { verify: 'test -f approve-leaf-child-produced.txt' });
+
+  const headBefore = gitHead(cwd);
+  const result = run(cwd, ['approve', 'approve-leaf-child']);
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /merged fgw\/approve-leaf-child -> fgw\/approve-leaf-root/);
+  assert.match(result.stdout, /proposed -> done/);
+
+  // main must never be touched by a leaf approve.
+  assert.equal(gitHead(cwd), headBefore, 'main HEAD must be unchanged by a leaf approve');
+  assert.equal(
+    fs.existsSync(path.join(cwd, 'approve-leaf-child-produced.txt')),
+    false,
+    'the leaf\'s produced file must not land on the human\'s own main checkout',
+  );
+
+  const view = stateView(cwd);
+  assert.equal(view.work['approve-leaf-child'].status, 'done');
+
+  // fgw/<leaf> must be ACTUALLY deleted (git branch list), not just the
+  // ephemeral worktree directory gone — the exact gap validating found.
+  const branches = gitAtCwd(cwd, ['for-each-ref', '--format=%(refname:short)', 'refs/heads/fgw/']);
+  assert.doesNotMatch(branches, /fgw\/approve-leaf-child\b/, 'the leaf\'s own branch must be deleted after merging into its root');
+  assert.match(branches, /fgw\/approve-leaf-root\b/, 'the root\'s own integration branch must survive');
+
+  // the merged content must actually be present on fgw/<root>'s tip.
+  const rootTreeFile = gitAtCwd(cwd, ['show', 'fgw/approve-leaf-root:approve-leaf-child-produced.txt']);
+  assert.match(rootTreeFile, /ok/);
 });
 
 test('approve of a runner item that conflicts: aborts the merge, proposed -> blocked (reason merge-conflict), main left byte-for-byte unchanged (must_have: main never holds a broken merge commit)', () => {
@@ -1563,6 +1679,59 @@ test('approve of a runner item whose staged merge fails its own verify: aborts, 
   const view = stateView(cwd);
   assert.equal(view.work['approve-verify-fail-item'].status, 'blocked');
   assert.equal(view.frictions['approve-verify-fail-item'][0].errorClass, 'verify-miss');
+});
+
+test('approve of a root item that HAD children, whose merge into main conflicts, parks with the distinguishing reason integration-drift and a main@<sha> friction detail (D8)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  fs.writeFileSync(path.join(cwd, 'shared.txt'), 'base\n');
+  gitAtCwd(cwd, ['add', 'shared.txt']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', 'seed shared.txt']);
+
+  const dir = path.join(cwd, '.fgos');
+  addOk(cwd, 'drift-root-item');
+  // A child (any status) is enough to mark this root as "actually had
+  // children" (D8's check reads existence of `parent === id`, per
+  // replay.mjs's fold never clearing `parent` even once the child is done).
+  addWork(dir, {
+    id: 'drift-root-child',
+    title: 'drift child',
+    kind: 'task',
+    status: 'todo',
+    deps: [],
+    risk: 'low',
+    refs: [],
+    verify: 'true',
+    parent: 'drift-root-item',
+  });
+
+  run(cwd, ['move', 'drift-root-item', '--to', 'doing']);
+  commitPending(cwd, 'state: claim drift-root-item');
+
+  gitAtCwd(cwd, ['checkout', '-b', 'fgw/drift-root-item']);
+  fs.writeFileSync(path.join(cwd, 'shared.txt'), 'branch-change\n');
+  gitAtCwd(cwd, ['add', 'shared.txt']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', 'branch changes shared.txt']);
+  gitAtCwd(cwd, ['checkout', 'main']);
+  fs.writeFileSync(path.join(cwd, 'shared.txt'), 'main-change\n');
+  gitAtCwd(cwd, ['add', 'shared.txt']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', 'main changes shared.txt']);
+
+  run(cwd, ['move', 'drift-root-item', '--to', 'proposed']);
+  commitPending(cwd, 'state: propose drift-root-item');
+
+  const headBefore = gitHead(cwd);
+  const result = run(cwd, ['approve', 'drift-root-item']);
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /integration-drift/);
+
+  assert.equal(gitHead(cwd), headBefore, 'HEAD must be unchanged after an aborted merge');
+  assert.equal(fs.readFileSync(path.join(cwd, 'shared.txt'), 'utf8'), 'main-change\n', 'main content must be unchanged');
+
+  const view = stateView(cwd);
+  assert.equal(view.work['drift-root-item'].status, 'blocked');
+  assert.equal(view.frictions['drift-root-item'][0].errorClass, 'merge-conflict');
+  assert.match(view.frictions['drift-root-item'][0].detail, new RegExp(`main@${headBefore}`), 'friction detail must record the main@<sha> ref');
 });
 
 test('approve of a pull-door item (no merge, code already on main): re-verifies and closes proposed -> done with actor human', () => {
