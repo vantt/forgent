@@ -75,12 +75,24 @@ function baseConfig(executorArgs) {
 
 // --- buildPrompt: four framing sections + item fields -----------------
 
-test('buildPrompt includes all four framing sections', () => {
+test('buildPrompt includes all five framing sections', () => {
   const prompt = buildPrompt(sampleWork());
   assert.match(prompt, /# Goal/);
+  assert.match(prompt, /# Description/);
   assert.match(prompt, /# Worktree boundary/);
   assert.match(prompt, /# Expected proof/);
   assert.match(prompt, /# Constraints/);
+});
+
+test('buildPrompt embeds work.description verbatim under the Description section', () => {
+  const description = 'Line one.\nLine two with detail: do X, then Y — no truncation expected.';
+  const prompt = buildPrompt(sampleWork({ description }));
+  assert.match(prompt, /# Description\nLine one\.\nLine two with detail: do X, then Y — no truncation expected\./);
+});
+
+test('buildPrompt degrades to "(không có)" when the work item has no description', () => {
+  const prompt = buildPrompt(sampleWork());
+  assert.match(prompt, /# Description\n\(không có\)/);
 });
 
 test('buildPrompt embeds title, kind, refs, and verify from the work item', () => {
@@ -164,6 +176,17 @@ test('the committed .fgos-runner.json at repo root loads and is well-formed', ()
   const repoRoot = path.resolve(import.meta.dirname, '..', '..');
   const cfg = loadRunnerConfig(path.join(repoRoot, '.fgos-runner.json'));
   assert.deepEqual(Object.keys(cfg.models).sort(), ['heavy', 'light', 'standard']);
+});
+
+test('the committed .fgos-runner.json grants the worker exactly acceptEdits + git add/commit — no wider (per spike B)', () => {
+  const repoRoot = path.resolve(import.meta.dirname, '..', '..');
+  const cfg = loadRunnerConfig(path.join(repoRoot, '.fgos-runner.json'));
+  const { args } = cfg.executor;
+  assert.ok(args.includes('--permission-mode'));
+  assert.equal(args[args.indexOf('--permission-mode') + 1], 'acceptEdits');
+  assert.ok(args.includes('--allowedTools'));
+  assert.equal(args[args.indexOf('--allowedTools') + 1], 'Bash(git add:*),Bash(git commit:*)');
+  assert.ok(!args.includes('--dangerously-skip-permissions'));
 });
 
 // --- modelForTier: tier -> model, unknown tier is a validation error ----

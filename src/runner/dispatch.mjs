@@ -64,16 +64,22 @@ export class DispatchError extends Error {
 
 /**
  * Build the worker prompt from a work item's own fields (title/kind/refs/
- * verify, per D3) — the four framing sections below are a fixed contract
- * (tests pin their presence): Goal, Worktree boundary, Expected proof, and
- * Constraints (the D3 "never call fgos yourself" rule). Nothing here reads
- * or writes `.fgos/` — this is pure string assembly.
+ * verify, per D3) — the five framing sections below are a fixed contract
+ * (tests pin their presence): Goal, Description, Worktree boundary,
+ * Expected proof, and Constraints (the D3 "never call fgos yourself" rule).
+ * Description is the work item's full-text intake description (per P30),
+ * reproduced verbatim — never truncated — with "(không có)" when absent.
+ * Nothing here reads or writes `.fgos/` — this is pure string assembly.
  */
 export function buildPrompt(work) {
   const refs = Array.isArray(work.refs) && work.refs.length ? work.refs.join(', ') : '(none)';
+  const description = work.description ?? '(không có)';
 
   return `# Goal
 ${work.title} (kind: ${work.kind})
+
+# Description
+${description}
 
 # Worktree boundary
 You are running on an isolated git worktree, checked out on its own branch for
