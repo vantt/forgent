@@ -148,6 +148,18 @@ export function validateWorkShape(work) {
     }
   }
 
+  // Full-text intake description (per discovery-context P30): OPTIONAL
+  // additive field carrying the submitter's original free text, so the
+  // discovery engine's prompt does not lose it to title truncation/
+  // classification. `submit` sets it; `add` never does — this validator
+  // only enforces shape when the field is actually present, same
+  // optional-additive rule as `parent` above (null treated as absent).
+  if (work.description !== undefined && work.description !== null) {
+    if (typeof work.description !== 'string' || !work.description.trim()) {
+      throw new WorkValidationError('work.description must be a non-empty string when present.');
+    }
+  }
+
   if (work.deps.includes(work.id)) {
     throw new WorkValidationError(`work "${work.id}" cannot list itself as a dep.`);
   }

@@ -468,6 +468,10 @@ function runVerb(verb, flags, positional, dir) {
       const work = {
         id,
         title,
+        // Per P30 (discovery-context): the full submitted text, kept
+        // alongside the derived/truncated `title` so context-discovery can
+        // read the real ask instead of just the classified summary.
+        description: text,
         kind,
         status: 'todo',
         deps: [],

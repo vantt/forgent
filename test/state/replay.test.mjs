@@ -26,6 +26,27 @@ test('foldEvents applies work.add then work.move to build current status', () =>
   assert.equal(view.work.a.title, 'A');
 });
 
+// Regression pin (per discovery-context P30 / validation-s1.md's corrected
+// assumption): `work.add`'s fold is a SPREAD of the whole payload (see
+// applyEvent's `case 'work.add'` above), so an additive field like
+// `description` survives rebuild with no fold-logic change at all — unlike
+// `work.move`'s destructure-based fields, which need an explicit allowlist
+// entry (critical-patterns fold-allowlist) to survive. This test pins that
+// behavior so a future change from spread to destructure on work.add would
+// be caught here.
+test('foldEvents survives an additive work.add field (description) through rebuild via spread — no allowlist edit needed', () => {
+  const events = [
+    {
+      seq: 1,
+      ts: '2026-07-17T00:00:00.000Z',
+      type: 'work.add',
+      payload: { id: 'a', title: 'A', status: 'todo', description: 'The full text the submitter typed.' },
+    },
+  ];
+  const view = foldEvents(events);
+  assert.equal(view.work.a.description, 'The full text the submitter typed.');
+});
+
 test('foldEvents folds multiple work items independently', () => {
   const events = [
     { seq: 1, ts: '2026-07-14T00:00:00.000Z', type: 'work.add', payload: { id: 'a', status: 'todo' } },

@@ -763,6 +763,18 @@ test('submit prints a well-formed fgos.v1 envelope: contract + generated_at + da
   assert.equal(envelope.data.status, 'todo');
 });
 
+test('submit persists the full text as description, separate from the (possibly truncated) title (P30)', () => {
+  const cwd = tmpCwd();
+  const text = 'Investigate the sluggish overview page and figure out why it takes so long to render for large accounts';
+  const result = run(cwd, ['submit', text]);
+  assert.equal(result.status, 0);
+  const item = JSON.parse(result.stdout).data;
+  assert.equal(item.description, text);
+
+  const view = JSON.parse(run(cwd, ['list']).stdout);
+  assert.equal(view.work[item.id].description, text);
+});
+
 test('two submits of the same text get different ids, both persist, no duplicate-id error (D3 collision retry)', () => {
   const cwd = tmpCwd();
   const text = 'Fix the broken login button';

@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { judgeDiscovery, resolveDiscovery } from '../../src/intake/discovery.mjs';
-import { addWork, listWork, StoreError, categoryOf } from '../../src/state/store.mjs';
+import { addWork, listWork, StoreError, categoryOf, putInAwaiting, answerAwaiting } from '../../src/state/store.mjs';
 
 // Fake executors only — every "command" spawned here is a node script this
 // file writes to a mkdtemp directory at test time, mirroring dispatch.test.mjs's
@@ -181,6 +181,77 @@ test('judgeDiscovery fails safe when the work item\'s tier has no configured mod
   assert.equal(verdict.clear, false);
 });
 
+// --- discovery-context (P30): description + ask/answer + prior-verdict -----
+// context threaded into the prompt via the optional `view` param -----------
+
+function echoPromptExecutor(dir) {
+  const scriptPath = path.join(dir, 'echo-full-prompt.mjs');
+  fs.writeFileSync(
+    scriptPath,
+    `
+    const prompt = process.argv[2];
+    process.stdout.write(JSON.stringify({ clear: true, verify: prompt }));
+    process.exit(0);
+    `,
+  );
+  return scriptPath;
+}
+
+test('judgeDiscovery with a view embeds the item description verbatim and the latest gate answer in the prompt (P30)', () => {
+  const dir = mkTempDir();
+  const scriptPath = echoPromptExecutor(dir);
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+  const work = sampleWork({ description: 'Full submitted text: fix the sluggish overview page for real.' });
+  const view = {
+    work: { [work.id]: work },
+    gates: { [work.id]: { ask: 'Which page exactly?', answer: 'The account overview page, definitely final.' } },
+  };
+  const verdict = judgeDiscovery(work, cfg, view);
+  // `verify` here is the prompt itself (echo executor), per the `verdict.verify`
+  // convention used elsewhere in this file — asserting on it is asserting on
+  // the actual prompt text sent to the executor.
+  assert.match(verdict.verify, /Full submitted text: fix the sluggish overview page for real\./);
+  assert.match(verdict.verify, /Which page exactly\?/);
+  assert.match(verdict.verify, /The account overview page, definitely final\./);
+});
+
+test('judgeDiscovery with a view embeds prior discovery verdicts in the prompt (P30)', () => {
+  const dir = mkTempDir();
+  const scriptPath = echoPromptExecutor(dir);
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+  const work = sampleWork();
+  const view = {
+    work: { [work.id]: work },
+    discovery: { [work.id]: [{ clear: false, question: 'What is the target file?' }] },
+  };
+  const verdict = judgeDiscovery(work, cfg, view);
+  assert.match(verdict.verify, /What is the target file\?/);
+});
+
+test('judgeDiscovery degrades to placeholders (no throw) when the item has no description and no view is passed — old 2-arg call stays backward-compatible (P30)', () => {
+  const dir = mkTempDir();
+  const scriptPath = echoPromptExecutor(dir);
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+  const work = sampleWork();
+  assert.equal(work.description, undefined);
+  const verdict = judgeDiscovery(work, cfg); // 2-arg, no view — must not throw
+  assert.match(verdict.verify, /\(không có\)/);
+  assert.match(verdict.verify, /chưa có vòng hỏi-đáp nào với người/);
+  assert.match(verdict.verify, /chưa phán lần nào/);
+});
+
+test('judgeDiscovery degrades description/gates to placeholders when a view is passed but has no entries for this item (legacy item, P30)', () => {
+  const dir = mkTempDir();
+  const scriptPath = echoPromptExecutor(dir);
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+  const work = sampleWork();
+  const view = { work: { [work.id]: work } }; // no gates, no discovery for this id
+  const verdict = judgeDiscovery(work, cfg, view);
+  assert.match(verdict.verify, /\(không có\)/);
+  assert.match(verdict.verify, /chưa có vòng hỏi-đáp nào với người/);
+  assert.match(verdict.verify, /chưa phán lần nào/);
+});
+
 // --- resolveDiscovery: read-judge-write, both outcomes recorded ----------
 
 function tmpStoreDir() {
@@ -270,4 +341,31 @@ test('resolveDiscovery throws a validation StoreError for an unknown id', () => 
     () => resolveDiscovery(storeDir, 'nope', cfgFor(['{prompt}'])),
     (err) => err instanceof StoreError && categoryOf(err) === 'validation',
   );
+});
+
+// --- P30 CoS regression (dogfood run-1): the re-judge after a person answers
+// must see BOTH the full submitted description and the answer, not just the
+// (possibly truncated) title — this is the exact gap run-1 hit (the model
+// re-asked the same question because the prompt never carried either). ------
+
+test('resolveDiscovery threads the real store view so a re-judge after an answer sees the description and the latest answer (P30 / dogfood run-1 regression)', () => {
+  const echoDir = mkTempDir();
+  const echoScript = echoPromptExecutor(echoDir);
+  const cfg = cfgFor([echoScript, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  addWork(
+    storeDir,
+    sampleWork({
+      description: 'Bỏ hardcode tên trunk "main" trong merge engine.',
+    }),
+  );
+  putInAwaiting(storeDir, { id: 'item-x', ask: 'Nguồn tên trunk: auto-detect hay config?' });
+  answerAwaiting(storeDir, { id: 'item-x', answer: 'CHỐT: auto-detect, fallback "main". KHÔNG hỏi thêm.' });
+
+  const verdict = resolveDiscovery(storeDir, 'item-x', cfg);
+  // Echo executor returns the prompt itself as `verify` — asserting on it
+  // asserts on what the model actually saw.
+  assert.match(verdict.verdict.verify, /Bỏ hardcode tên trunk "main" trong merge engine\./);
+  assert.match(verdict.verdict.verify, /CHỐT: auto-detect, fallback "main"\. KHÔNG hỏi thêm\./);
 });

@@ -197,6 +197,37 @@ test('validateWork rejects a work item that lists itself as its own parent', () 
   );
 });
 
+// --- full-text intake `description` (per discovery-context P30) ---
+
+test('validateWork accepts a work item missing description (optional, additive intake field)', () => {
+  const work = baseWork();
+  assert.equal(work.description, undefined);
+  assert.doesNotThrow(() => validateWork(work));
+});
+
+test('validateWork accepts description as a non-empty string', () => {
+  assert.doesNotThrow(() => validateWork(baseWork({ description: 'Full text the submitter typed.' })));
+});
+
+test('validateWork treats description: null the same as absent', () => {
+  assert.doesNotThrow(() => validateWork(baseWork({ description: null })));
+});
+
+test('validateWork rejects a non-string, non-empty description', () => {
+  assert.throws(
+    () => validateWork(baseWork({ description: 42 })),
+    (err) => err instanceof WorkValidationError && /description/.test(err.message),
+  );
+  assert.throws(
+    () => validateWork(baseWork({ description: '' })),
+    (err) => err instanceof WorkValidationError && /description/.test(err.message),
+  );
+  assert.throws(
+    () => validateWork(baseWork({ description: '   ' })),
+    (err) => err instanceof WorkValidationError && /description/.test(err.message),
+  );
+});
+
 test('validateWork does not require parent to point at an existing id (lineage existence is not deps existence)', () => {
   assert.doesNotThrow(() => validateWork(baseWork({ id: 'b', parent: 'ghost-parent' }), new Set(['a', 'b'])));
 });
