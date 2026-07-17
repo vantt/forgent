@@ -1,8 +1,8 @@
 ---
 area: runner
 updated: 2026-07-17
-sources: [phase-2-routing, post-divorce-hardening, phase-3-compound-learning-s1, phase-3-compound-learning-s2, phase-3-compound-learning-s3-closeout, stage-clarify, stage-decompose-s1, stage-decompose-s2, pr-lifecycle-s1, discovery-context, worker-execution, fan-out-parallel, human-rounds, worker-dispatch-log]
-decisions: [feed7428, 14396a5c, 1a80b4d3, 9a19eea5, 96a65365, a7c099af, 43f257ae, 44936500, e1218b22, 6f2cbc47, a30a3d3c, 1359ab5e, cfae0120, 22699c61, 04a6cd05, 396d9d9e, 2e92b7a5, f0c40acc, 5a6900b2, 8575f1a3]
+sources: [phase-2-routing, post-divorce-hardening, phase-3-compound-learning-s1, phase-3-compound-learning-s2, phase-3-compound-learning-s3-closeout, stage-clarify, stage-decompose-s1, stage-decompose-s2, pr-lifecycle-s1, discovery-context, worker-execution, fan-out-parallel, human-rounds, worker-dispatch-log, self-improve-loop, base-workflow-model-s2]
+decisions: [feed7428, 14396a5c, 1a80b4d3, 9a19eea5, 96a65365, a7c099af, 43f257ae, 44936500, e1218b22, 6f2cbc47, a30a3d3c, 1359ab5e, cfae0120, 22699c61, 04a6cd05, 396d9d9e, 2e92b7a5, f0c40acc, 5a6900b2, 8575f1a3, c8df2479, cb09d6fd, b1aa1bdc, caecb9d1, 9b141173, a3176299, 140eb8a4, 76b7a36b, 8d04bba3, 1cd895e1, 38160a70]
 coverage: full
 ---
 
@@ -35,6 +35,8 @@ Vòng lặp tự hành của forgent: tự lấy việc sẵn-sàng từ work-st
 | 6 | Trần song song hai tầng | Giới hạn số việc chạy đồng thời trong một mẻ, đọc từ cấu hình committed | tầng 1 — số việc GỐC đồng thời; tầng 2 — số việc CON đồng thời trong MỖI gốc; mỗi lần nạp mẻ lấy `min(trần, số việc sẵn-sàng sau lọc quyền-sở-hữu-gốc)` | no (có mặc định) | 4 gốc × 4 con mỗi gốc |
 | 7 | Quyền sở-hữu gốc | Ai đang cầm mọi việc CON của một gốc trong MỘT lượt chạy — gắn lúc con đầu tiên của gốc được nhận, xả khi gốc xong; sống trong bộ nhớ của lượt chạy, KHÔNG bền qua lượt chạy khác/tiến trình khác | một định danh (per lượt chạy) | — | chưa-chủ |
 | 8 | Bản ghi output cục bộ (một file mỗi việc) | Lưu lại output của trợ lý cho MỌI lượt dispatch của một việc — đọc được sau khi console đã cuộn qua; không bao giờ vào cây committed | mỗi khối: dấu thời gian, số lần thử, loại kết cục (đề xuất/quá-giờ/hỏng-spawn/…), output (khi trợ lý kịp sinh ra) | no (chỉ tồn tại sau lượt dispatch đầu tiên của việc) | — |
+| 9 | Candidate (Gate A, self-improve loop P13 Slice 1) | Một việc mang ít nhất một bản ghi friction chưa ngã-ngũ, xếp hạng làm ứng viên tự cải thiện — dẫn xuất TỪ friction đã ghi, không phải một bản ghi độc lập, không bền qua lần `evolve` khác | id, disposition, errorClass, layer, detail, attempts (tất cả lấy từ bản ghi friction MỚI NHẤT theo dấu thời gian của id đó khi id có nhiều bản ghi chưa ngã-ngũ), score (cộng dồn TOÀN BỘ bản ghi chưa ngã-ngũ của id đó, không chỉ bản mới nhất) | — | dẫn xuất mỗi lần gọi `evolve` |
+| 10 | Phán quyết Iron Law (self-improve loop P13 Slice 2) | Kết quả của phép tính hai-cửa (module + từ khóa) trên MỘT candidate fix — dẫn xuất thuần từ đầu vào truyền vào, không bền, không có bề mặt gọi nào tồn tại tính tới slice này (xem Open Gaps) | required (có/không cần chứng minh test-đỏ-trước), matchedFlags (danh sách từ khóa rủi ro nặng khớp trong mô tả fix), matchedModules (danh sách file khớp danh sách module minh họa D10/D14) | — | required mặc định `false` khi cả hai phép thử đều không khớp |
 
 ## Behaviors & Operations
 
@@ -76,16 +78,25 @@ Vòng lặp tự hành của forgent: tự lấy việc sẵn-sàng từ work-st
 
 - **Runs when:** mỗi lượt chạy, ngay sau gặt-lại, TRƯỚC khi giao bất kỳ việc
   thi công (executing) nào.
-- **What changes:** mọi việc đang ở stage `clarify` VÀ status `todo` (xem
-  spec Work-State "Giai đoạn Làm-rõ") được chạy context-discovery — BẤT KỂ
-  giá trị `mode` của item mang gì (mode chỉ là quy ước ai NÊN gọi trước,
-  không phải điều kiện runner rẽ nhánh). Việc đang `awaiting-human` (đã hỏi,
-  chưa ai trả lời) KHÔNG BAO GIỜ bị quét lại — cùng luật loại-trừ với dispatch
-  thường (xem R6 Work-State/R15). Prompt phán mà runner gọi ở đây mang cùng
-  ngữ cảnh đầy đủ như lời gọi `fgos discover` tay — description gốc + cặp
-  hỏi-đáp mới nhất + các lần phán trước của item (per discovery-context P30
-  / cfae0120, xem spec Work-State "Giai đoạn Làm-rõ") — không phải một bản
-  rút gọn riêng cho vòng tự hành.
+- **What changes:** mọi việc đang ở **stage thỏa bước Làm-rõ của domain của
+  chính nó** (per spec Work-State "Mô hình domain"; với `coding` đây luôn là
+  `clarify`) VÀ status `todo` (xem spec Work-State "Giai đoạn Làm-rõ") được
+  chạy context-discovery — BẤT KỂ giá trị `mode` của item mang gì (mode chỉ
+  là quy ước ai NÊN gọi trước, không phải điều kiện runner rẽ nhánh). Một
+  domain KHÔNG có stage nào thỏa bước Làm-rõ (vd `synthetic`) không có item
+  nào từng bị quét ở đây — dù `stage` của item đó vắng mặt (per R-domain-1
+  spec Work-State / 1cd895e1, 38160a70): quét chỉ khớp khi domain đó THẬT SỰ
+  khai một stage cho bước Làm-rõ, không khớp nhầm hai giá trị vắng mặt với
+  nhau. Việc đang `awaiting-human` (đã hỏi, chưa ai trả lời) KHÔNG BAO GIỜ bị
+  quét lại — cùng luật loại-trừ với dispatch thường (xem R6 Work-State/R15).
+  Prompt phán mà runner gọi ở đây mang cùng ngữ cảnh đầy đủ như lời gọi
+  `fgos discover` tay — description gốc + cặp hỏi-đáp mới nhất + các lần phán
+  trước của item (per discovery-context P30 / cfae0120, xem spec Work-State
+  "Giai đoạn Làm-rõ") — không phải một bản rút gọn riêng cho vòng tự hành.
+  `resolveDiscovery` bản thân nó vẫn CHƯA domain-hóa — chỉ nhận diện đúng tên
+  stage của `coding` (xem spec Work-State "Mô hình domain") — quét ở đây chỉ
+  bảo đảm nó không BAO GIỜ bị gọi nhầm cho một domain khác, không bảo đảm nó
+  DÙNG được cho domain khác.
 - **Side effects:** một lời gọi model thật cho mỗi item quét được — không
   bao giờ throw ra ngoài dù model lỗi/timeout (fail-safe, xem spec
   Work-State).
@@ -105,10 +116,14 @@ Vòng lặp tự hành của forgent: tự lấy việc sẵn-sàng từ work-st
   Đọc lại view TƯƠI sau quét làm-rõ — một item vừa được quét làm-rõ đẩy sang
   stage `decompose` trong CÙNG lượt chạy này vẫn bị quét chia-việc ngay, không
   phải đợi lượt chạy sau.
-- **What changes:** mọi item đang ở stage `decompose` VÀ status `todo` (xem
-  spec Work-State "Giai đoạn Chia-việc") được chạy phán chia-việc — BẤT KỂ
-  giá trị `mode` của item. Việc đang `awaiting-human` KHÔNG BAO GIỜ bị quét
-  lại — cùng luật loại-trừ với mọi dispatch khác (R6/R15 Work-State).
+- **What changes:** mọi item đang ở **stage thỏa bước Chia-việc của domain
+  của chính nó** (per spec Work-State "Mô hình domain"; với `coding` đây luôn
+  là `decompose`) VÀ status `todo` (xem spec Work-State "Giai đoạn Chia-việc")
+  được chạy phán chia-việc — BẤT KỂ giá trị `mode` của item. Cùng luật domain
+  như quét làm-rõ trên: một domain không có stage nào thỏa bước Chia-việc
+  không bao giờ bị quét ở đây (per 1cd895e1, 38160a70). Việc đang
+  `awaiting-human` KHÔNG BAO GIỜ bị quét lại — cùng luật loại-trừ với mọi
+  dispatch khác (R6/R15 Work-State).
 - **Side effects:** một lời gọi model thật cho mỗi item quét được — không
   bao giờ throw ra ngoài dù model lỗi/timeout, hay verdict sinh con thiếu
   verify (fail-safe, xem spec Work-State).
@@ -283,6 +298,49 @@ vòng dispatch thường (D3).
   này); không candidate nào bị chọn tự động, không đề xuất nào được tạo ra
   chỉ vì `evolve` chạy.
 
+### Iron Law — phân loại rủi ro của một candidate fix (self-improve loop P13 Slice 2)
+
+Bước phán-rủi-ro của vòng tự cải thiện (CONTEXT.md D5/D10/D13/D14): trước khi
+một fix cho một candidate được phép BỎ QUA kỷ luật "chứng minh bằng test đỏ
+trước" (failing-test-first), hệ tự hỏi hai câu — fix này có chạm module có
+NĂNG LỰC làm yếu chính kỷ luật gate/verify của hệ không (D10), và mô tả của
+fix có mang từ khóa thuộc nhóm cờ rủi ro nặng không (D5)? Trả lời CÓ ở BẤT KỲ
+câu nào → Iron Law áp dụng, fix phải tự chứng minh bằng test đỏ trước khi
+được coi là xong.
+
+- **Runs when:** hiện CHƯA có bề mặt nào gọi bước phán này — đây là một khối
+  quyết-định thuần, chưa nối vào `evolve`, chưa nối vào bất kỳ verb CLI nào.
+  Nối nó vào luồng chọn-candidate→sửa→duyệt là việc của slice sau (Gate B
+  wiring, D2/D9, xem Open Gaps).
+- **Blocked when:** không áp dụng — đây là hàm thuần, không có trạng thái để
+  chặn.
+- **What changes:** không gì ở tầng trạng thái — đây là một phép TÍNH thuần
+  trên hai đầu vào (danh sách file candidate fix chạm tới, mô tả tùy chọn của
+  fix), trả lại một phán quyết CÓ/KHÔNG kèm bằng chứng (đúng cờ nào, đúng
+  module nào khớp) — không phải chỉ một boolean trơ.
+  - Phép thử module (D10, mở rộng D14): file chạm khớp LITERAL vào danh sách
+    minh họa — mọi file trong nhóm điều-phối-runner, module tính-điểm-entropy,
+    mọi file trong nhóm tự-cải-thiện (chính vòng evolve), toàn bộ file điểm-
+    vào CLI (thay đổi bất kỳ đâu trong đó bị coi là chạm — cố ý rộng hơn thực
+    tế, hướng AN TOÀN hơn là bỏ sót), module lưu-trữ sự-kiện lõi, module máy-
+    trạng-thái lõi. Danh sách này MINH HỌA, không đóng khung (D10) — module
+    năng-lực-liên-quan khác ngoài danh sách vẫn có thể cần Iron Law theo phép
+    thử năng lực gốc của D10, một giới hạn còn lại đã ghi nhận (xem Open
+    Gaps).
+  - Phép thử từ khóa (D5, mở rộng D14): mô tả fix (nếu có cung cấp) được so
+    khớp không phân biệt hoa/thường với một bộ từ khóa rủi-ro-nặng dùng
+    CHUNG với bước phân loại submission lúc `fgos submit` (cùng một nguồn dữ
+    liệu, không hai danh sách lệch nhau theo thời gian) — bộ này phủ cả sáu
+    nhóm cờ đã khóa (bảo mật/xác thực, phân quyền, mất dữ liệu, kiểm toán,
+    hệ thống ngoài, bỏ kiểm tra). Mô tả VẮNG MẶT không bao giờ được coi là
+    "an toàn" — phán quyết vẫn tính đủ từ phép thử module.
+- **Side effects:** không có — hàm thuần tuyệt đối, không đọc/ghi gì ngoài
+  hai tham số truyền vào.
+- **Afterwards:** người/bước gọi (chưa tồn tại — slice sau) nhận lại phán
+  quyết kèm bằng chứng (đúng cờ/module nào khớp) để quyết định fix có phải đi
+  qua kỷ luật test-đỏ-trước hay không, trước khi tới cổng duyệt PR nội bộ
+  (trên).
+
 ### Tín hiệu compounding qua check (entropy-trend + seal-digest)
 
 Ngoài mục outcome/friction/settlement/học đã có, `fgos check` (lệnh đọc-thuần
@@ -327,6 +385,7 @@ sức khỏe cho toàn bộ vòng compounding.
 | Commit trong worktree/nhánh riêng | — | — | ✓ |
 | Sửa cây làm việc chính | ✓ | — | — CẤM (bằng chỉ dẫn + kết quả chỉ là đề xuất) |
 | Đồng bộ lại một việc đỗ vì gãy nhập (`catchup`) | ✓ | — | — |
+| Xếp hạng/xem candidate tự cải thiện (Gate A, `evolve`) | ✓ | — | — |
 
 ## Business Rules
 
@@ -343,7 +402,7 @@ sức khỏe cho toàn bộ vòng compounding.
 - **R11 (thang kiểm chứng).** T0 suite executor-giả mọi commit · T1 dogfood việc thật hằng ngày · T1c canary khai-môi-trường (worker tự báo pwd/git-root/doctrine nó thấy, verify assert từng dòng) định kỳ và sau mỗi đổi harness · T2 máy-trắng (HOME giả + credential tối thiểu) trước release (per f3a16887). Bất biến nền: mỗi agent khởi đầu tại project-root CỦA NÓ — thợ ở xưởng, worker ở git-root của worktree nó đứng.
 - **R12 (khoá liên-tiến-trình).** Mỗi kho chỉ một runner sống tại một thời điểm: đầu MỌI lần chạy (trước cả bước gặt-lại — gặt cũng ghi trạng thái), runner chiếm khoá độc quyền trong vùng trạng thái, ghi định danh tiến trình của mình. Kho đang có runner sống → lần chạy mới thoát «bận» bằng mã thoát riêng (không trùng mã nào hiện hành): không ghi trạng thái, không đụng worktree, không đụng khoá của người giữ. Khoá của runner đã chết (crash để lại, hoặc nội dung không chứng minh được chủ sống) → **dọn-rồi-nhường**: kiểm nội dung sát trước khi xoá (đổi rồi thì không đụng), xoá xong lượt đó vẫn lui ra «bận» — không lượt chạy nào vừa xoá khoá vừa tự chiếm trong cùng một lần, nên hai lượt cùng gặp khoá chết không thể cướp khoá mới của nhau; lượt kế tiếp chiếm khoá sạch (sau crash, phục hồi trọn trong hai lượt). Khoá luôn được nhả trên mọi đường thoát.
 - **R13 (vòng dự đoán-thực tế, học từ cả thành công lẫn thất bại).** Mỗi lần dispatch, runner ghi bản ghi outcome ở CẢ hai đầu: nửa dự đoán lúc nhận việc, nửa thực tế ở MỌI kết cục cuối — thành đề xuất, bị đỗ, hay bị dừng — không bao giờ chỉ ghi khi thành công. Giá trị thực tế luôn lấy từ phép đo goal-check/kiểm nhánh của chính runner, không bao giờ từ báo cáo tự khai của trợ lý (per D2/D3 phase-3-compound-learning / 1a80b4d3; mở rộng nguyên tắc "không tin lời trợ lý" đã khóa ở R3). Bản ghi outcome đọc lại được qua lệnh đọc-thuần `fgos check` của tầng Work-State — runner không có verb ghi riêng cho việc này.
-- **R14 (quét làm-rõ chạy trước dispatch, bất kể mode).** Mỗi lượt chạy, ngay sau gặt-lại và trước khi tìm việc thi công, runner quét TOÀN BỘ item `stage: clarify` + `status: todo` và tự chạy context-discovery — không đọc/không rẽ nhánh theo field `mode` của item (per D5/D13 stage-clarify / 9a19eea5, xem spec Work-State R17-R19). Never chạm item `awaiting-human` — cùng luật loại-trừ R6/R15 của tầng Work-State áp cho cả bước quét này. Đây là lưới đỡ: phiên submit sống chết giữa chừng không để lại việc kẹt vô hình.
+- **R14 (quét làm-rõ chạy trước dispatch, bất kể mode).** Mỗi lượt chạy, ngay sau gặt-lại và trước khi tìm việc thi công, runner quét TOÀN BỘ item đang ở stage thỏa bước Làm-rõ của domain của chính nó (`clarify` cho `coding`) + `status: todo` và tự chạy context-discovery — không đọc/không rẽ nhánh theo field `mode` của item (per D5/D13 stage-clarify / 9a19eea5, xem spec Work-State R17-R19). Never chạm item `awaiting-human` — cùng luật loại-trừ R6/R15 của tầng Work-State áp cho cả bước quét này. Đây là lưới đỡ: phiên submit sống chết giữa chừng không để lại việc kẹt vô hình. Quét này khớp domain qua step-mapping thật, không khớp nhầm một domain KHÔNG có stage-Làm-rõ với `stage` vắng mặt của chính item đó — hai giá trị vắng mặt không được coi là bằng nhau (per base-workflow-model 1cd895e1/38160a70, xem spec Work-State "Mô hình domain").
 - **R15 (actor trên mọi ngã-ngũ tự động của runner).** Mọi ngã-ngũ mà runner TỰ ghi trong vòng dispatch (quét làm-rõ cho qua, quét chia-việc cho qua, nhận việc, đề xuất, đỗ) mang `actor` = `runner`; ngã-ngũ do phiên sống gọi tay context-discovery/phán chia-việc mang `actor` = `session`; ngã-ngũ do người gọi qua lệnh CLI mang `actor` = `human` — ba giá trị phủ hết mọi đường ngã-ngũ hiện có, không đường nào bị bỏ sót (per D2 phase-3-compound-learning S3-closeout / 96a65365; xem spec Work-State "Bản ghi settlement").
 - **R16 (điểm entropy luôn giải thích được + luôn kèm xu hướng).** Điểm entropy trên `check` không bao giờ là một con số đơn độc — luôn kèm các thành phần đã cộng nên nó, và luôn so với lần `check` gần nhất (lần đầu là baseline). Seal-digest chỉ im lặng một mệnh đề khi kênh đó thật sự không có gì để nói (số đếm hiện tại VÀ chênh lệch đều bằng 0) — một kênh có dữ liệu nhưng không đổi từ lần trước vẫn in ra "không đổi" (per D2 phase-3-compound-learning S3-closeout / 96a65365).
 - **R17 (quét chia-việc chạy ngay sau quét làm-rõ, trước dispatch, bất kể mode).** Mỗi lượt chạy, ngay sau quét làm-rõ và trước khi tìm việc thi công, runner đọc lại view tươi rồi quét TOÀN BỘ item `stage: decompose` + `status: todo` và tự chạy phán chia-việc — không đọc/không rẽ nhánh theo field `mode` của item. Never chạm item `awaiting-human` — cùng luật loại-trừ R6/R15 Work-State áp cho bước quét này. Đọc view tươi sau quét làm-rõ nghĩa là một item vừa rời clarify trong CÙNG lượt chạy vẫn được quét chia-việc ngay, không đợi lượt sau (per D2 stage-decompose / 43f257ae, xem spec Work-State "Giai đoạn Chia-việc").
@@ -361,6 +420,10 @@ sức khỏe cho toàn bộ vòng compounding.
 - **R29 (cổng chống-lặp reset theo can thiệp người CUỐI CÙNG của chính việc, per-item, trigger-set đóng).** Cổng chặn dispatch (khác `visitCount` lifetime metric ở R13 — xem Data Dictionary #4/#4b) đếm `visitsSinceLastHumanEvent`: số lần việc vào `doing` KỂ TỪ sự kiện người cuối cùng của CHÍNH việc đó. Trigger-set đóng — chỉ hai hình reset: việc rời `awaiting-human` bằng một câu trả lời của người (`answer`, actor `human`), hoặc một move mang `reason` VỚI actor `human` (reject/park do người quyết). Một lần resume trần (`blocked→todo` không `reason`), một lần người `take` việc (`blocked→doing`, actor `human`, không `answer`/`reason`), và mọi move của chính runner (kể cả park mang `reason` của chính nó) đều KHÔNG reset — chỉ tính là một visit như mọi lần khác. Không có sự kiện người nào của việc → ngân sách bằng đúng lifetime `visitCount` (một vòng lỗi máy thuần vẫn chết ở trần 3, không đổi). `MAX_VISITS=3` và mọi call site của `visitCount` (outcome/metric đã ship) giữ nguyên — chỉ điểm CHẶN DISPATCH đổi công thức đếm (per D1 human-rounds / 5a6900b2).
 - **R30 (cửa người-hoàn-tất một đề xuất nguồn-nhánh bị đỗ — mở rộng take/return, không verb mới).** Một việc `blocked` mang nhánh đề xuất còn sống (`fgw/<id>`) — kể cả bị đỗ do chạm trần chống-lặp — có cửa công khai để người hoàn tất: `take` claim qua cạnh `blocked→doing` sẵn có, ghi `branchHeadAtTake` (HEAD của NHÁNH lúc take — discriminator DUY NHẤT của nguồn-nhánh, không dùng `classifySource` để phân biệt vì nó ưu-tiên-nhánh); người commit thêm lên nhánh; `return` kiểm `branchHeadAtTake` TRƯỚC mọi guard main-based (cây làm việc chính của người không bao giờ bị đọc/đụng), verify chạy trong một worktree TẠM, DETACHED tại đúng SHA của nhánh (không bao giờ checkout theo tên, không `reclaimOrphanedCheckout` — an toàn cả khi người đang đứng trên chính nhánh đó ở một worktree khác) → sạch + xanh → `proposed` mang `branchHeadAtReturn`; **TUYỆT ĐỐI không ghi `headAtReturn`** cho nguồn-nhánh (trộn hai marker cho `reviewDiff` một dải vô nghĩa). Không commit mới trên nhánh, hoặc verify đỏ trong worktree tạm → từ chối rõ lý do, việc giữ nguyên `doing`. Một đề xuất hoàn tất theo đường này đọc nguồn là `runner` như bình thường (nhánh `fgw/<id>` còn sống — không cần đổi `classifySource`/`merge.mjs`) và đi qua CÙNG cổng duyệt PR nội bộ (per D2 human-rounds / 5a6900b2, xem spec Work-State "Cửa pull giao–nhận việc").
 
+- **R32 (vòng tự cải thiện chỉ nhắm vào chính repo sản phẩm, không phải tính năng mở cho host ngoài).** Toàn bộ vòng self-improve (Gate A đã xây; Iron Law + Gate B wiring các slice sau) tác động lên chính `repo/src` của fgOS — công cụ fgOS tự soi lại chính nó, không phải một khả năng fgOS cấp cho project khác mà nó đang điều phối (per D1 self-improve-loop / c8df2479).
+- **R33 (vòng tự cải thiện luôn on-demand, không bao giờ một nhánh tự động của vòng dispatch thường).** Không bước nào của `fgos-runner --once`/`--dry-run` tự khởi động Gate A hay bất kỳ bước nào sau nó — toàn vòng self-improve chỉ chạy khi người vận hành gọi tay qua verb riêng (`evolve`, và các verb Iron Law/Gate B của slice sau). Lý do: P9 (auto-merge đề xuất worker) vẫn `proposed`, chưa đủ tin cậy để mở thêm bề mặt tự động quanh việc tự sửa hệ thống (per D3 self-improve-loop / cb09d6fd).
+- **R34 (Iron Law áp dụng khi CHẠM cờ rủi ro HOẶC module năng-lực — không cần cả hai).** Phán quyết Iron Law là phép HOẶC của hai phép thử độc lập trên một candidate fix: phép thử module (danh sách minh họa D10, mở rộng D14) và phép thử từ khóa (bộ từ khóa rủi ro nặng dùng chung với `fgos submit`, D5, mở rộng D14). Mô tả fix vắng mặt KHÔNG BAO GIỜ được coi là bằng chứng an toàn — phán quyết vẫn tính đủ từ phép thử module một mình. Danh sách module là minh họa, không đóng khung (per D10 self-improve-loop; xem D10's phép thử năng lực gốc: một module đủ tư cách nếu sửa nó có thể làm YẾU hoặc BỎ QUA chính kỷ luật gate/verify của hệ) (per D5/D10/D13/D14 self-improve-loop).
+- **R35 (bộ từ khóa rủi ro nặng là MỘT nguồn duy nhất, dùng chung giữa intake và Iron Law).** Bộ từ khóa quyết định tier `heavy` lúc `fgos submit` (xem spec Work-State "Nộp vấn đề tự do (submit)", R16) và bộ từ khóa quyết định phép thử-từ-khóa của Iron Law là ĐÚNG MỘT bộ dữ liệu — không hai danh sách lệch nhau theo thời gian. Mở rộng bộ này (per D14, thêm nhóm hệ-thống-ngoài/bỏ-kiểm-tra/kiểm-toán) đồng thời làm `fgos submit` phân loại nặng hơn cho các mô tả trùng từ khóa mới — một hệ quả CHỦ Ý, không phải hồi quy (per D14 self-improve-loop).
 - **R31 (kỷ-luật-output NỚI RỘNG: console + bản ghi cục bộ riêng-từng-việc, KHÔNG BAO GIỜ vào cây committed — SUPERSEDE một phần quyết định trước).** Trước đây output của trợ lý chỉ in console, không ghi ra file nào. Nay MỌI kết cục của một lượt dispatch — thành đề xuất, chấm-trượt, quá-giờ, hỏng-spawn (kể cả tràn bộ đệm) — đều CÒN được ghi thêm vào một bản ghi cục bộ, một file riêng mỗi việc, gộp theo thời gian qua các lần thử. Nửa bảo đảm gốc vẫn giữ nguyên tuyệt đối: bản ghi này không bao giờ vào cây committed (không git-track được) — chỉ nửa "không ghi ra file nào cả" bị nới. Một lượt dispatch hỏng trước khi trợ lý sinh ra output (lỗi worktree, không phải lỗi trợ lý) vẫn ghi được một khối (chỉ mang loại lỗi + thông điệp), không throw vì thiếu trường (per D1/D2/D3/D4 worker-dispatch-log / 8575f1a3). **Bổ chú (20260717, review-20260717-daily-batch, review finding F-P1-1):** bản ghi cục bộ này KHÔNG BAO GIỜ throw ra ngoài, dù chính thao tác ghi thất bại (đĩa đầy, không có quyền ghi, thư mục chỉ-đọc) — bản ghi này là quan sát thuần, không bao giờ được phép làm hỏng hay che khuất kết cục dispatch thật; một lần ghi hỏng chỉ âm thầm bỏ qua (trả về rỗng), không bao giờ lan ra ngoài `dispatchClaimedItem`.
 
 ## Edge Cases Settled
@@ -414,6 +477,9 @@ sức khỏe cho toàn bộ vòng compounding.
 - Chưa dự đoán trước những việc con nào của cùng một gốc khả năng chạm cùng chỗ để xếp chúng chạy nối tiếp thay vì song song — hai con cùng gốc chạm cùng chỗ vẫn ĐÚNG (một con catch-up/làm-lại), chỉ không phải TỐI ƯU (giảm việc-song-song-phí là một cải tiến hiệu năng hoãn lại, không phải một lưới đúng-sai, deferred, backlog P16).
 - Một cây nhiều hơn hai tầng (gốc-của-gốc, cháu) hôm nay chưa từng được tạo ra bởi hệ thống (phán chia-việc chỉ sinh con ở đúng một tầng dưới gốc) — cơ chế cây nhánh tích hợp phân giải MỌI con về nhánh của ĐỈNH cây (không phải nhánh của cha trực tiếp), điều này chỉ tương đương với "con nhập vào nhánh cha" khi cây đúng hai tầng; một cây sâu hơn hai tầng, nếu tương lai sinh ra được, sẽ cần xác nhận lại điều này còn đúng hay không — chưa kiểm chứng vì chưa có dữ liệu thật để thử.
 - Cổng duyệt PR nội bộ do người gọi tay không có khóa chống hai lần gọi cùng lúc trên cùng một gốc (vd người duyệt hai việc con cùng gốc gần như đồng thời, hoặc người duyệt trong khi chính vòng tự hành đang dispatch gốc đó) — rủi ro thấp dưới một người vận hành, một cửa ghi tuần tự chỉ bảo vệ phần ghi trạng thái chứ không khóa riêng thao tác nhập của cổng duyệt tay; chưa xảy ra thật, ghi nhận như một giả định chưa kiểm.
+- Iron Law (self-improve loop P13 Slice 2) chưa có bề mặt gọi nào — hàm phán quyết tồn tại và test đầy đủ nhưng không verb CLI, không call site nào dùng nó; nối nó vào luồng chọn-candidate→sửa→duyệt là việc của slice sau (D2/D9, xem `docs/backlog.md` P13).
+- Danh sách module của phép thử Iron Law (Data Dictionary #10, D10/D14) vẫn là danh sách MINH HỌA, không đóng khung — có thể còn module năng-lực-liên-quan khác (vd các module domain/kernel khác trong `src/state/`, `src/runner/`) chưa được liệt kê mà lẽ ra đủ tư cách theo phép thử năng lực gốc của D10; mở lại khi slice sau (wiring live) cho thấy một trường hợp bỏ sót thật.
+- Phép thử module của Iron Law so khớp path LITERAL, không chuẩn hóa (`./x`, `repo/x`, hay một path chứa `..` không được rút gọn trước khi so khớp) — một đường dẫn không-chuẩn có thể bị bỏ sót (false `required:false`); chuẩn hóa path là hợp đồng của bên gọi tương lai, chưa xây trong slice này (D13, xem `docs/backlog.md` P13).
 
 ## Visuals
 
@@ -437,6 +503,8 @@ Not applicable — không có màn hình.
 - `bin/fgos.mjs` verb `catchup <id>` — đồng bộ lại một việc `blocked` (xem "Đồng bộ lại một việc đỗ (catch-up)" trên): tiền điều kiện chấp nhận lý do đỗ ∈ {`merge-conflict`, `verify-fail-post-merge`, `integration-drift`} và nhánh riêng của việc còn tồn tại (`branchExists`); đích = `branchNameFor(resolveRoot(view,id))` nếu là con, `'main'` nếu là gốc/độc lập; mở worktree ephemeral trên chính nhánh của việc, `git merge --no-commit --no-ff <đích>` → xung đột thật → `git merge --abort` + giữ nguyên `blocked`; sạch → `runGoalCheck` trên cây đã stage TRƯỚC khi commit → đỏ → `git merge --abort` + giữ nguyên `blocked`; xanh → commit rồi `moveWork(..., to:'proposed', expectedStatus:'blocked')` — cạnh D18, không `reason`, không qua `doing` (per D6/D7/D11, spike `.bee/spikes/fan-out-parallel/catchup-real-conflict-probe.sh` chứng minh trước khi build cell); một sự-kiện merge THỰC HIỆN TRỰC TIẾP trong verb này (không gọi `mergeRunnerItem` — hướng nhập của catch-up ngược với `mergeRunnerItem`, đích nhập VÀO nhánh của việc chứ không phải nhánh của việc nhập vào đích)
 - `src/evolve/candidates.mjs` — Gate A candidate ranking (self-improve loop P13 Slice 1, per D6/D11/D12): thuần (`rankCandidates(view)`), không fs/Date.now(), tái dùng `entropy.mjs`'s `listUnsettledFrictionsByWork`/`WEIGHTS.frictionUnsettled` (không tự định nghĩa "chưa ngã-ngũ" hay trọng số riêng); một candidate mỗi id còn friction chưa ngã-ngũ, trường hiển thị lấy từ bản ghi MỚI NHẤT theo `ts`, `score` cộng dồn TOÀN BỘ bản ghi chưa ngã-ngũ của id đó, sắp xếp score giảm dần rồi id tăng dần (tie-break). Manifest layer: domain.
 - `bin/fgos.mjs` verb `evolve` — bề mặt CLI của Gate A (xem "Gate A — xếp hạng candidate (evolve)" trên cho hợp đồng đầy đủ): hai bước, KHÔNG BAO GIỜ stdin tương tác (D11) — không `--pick` thì liệt kê, `--pick <id>` thì in bản ghi friction đầy đủ của đúng id đó, tái dùng formatter friction sẵn có của `check` (`formatFrictionSection`, không formatter mới). Đọc view qua `listWork(dir)` DUY NHẤT — không bao giờ `rebuild`/`refreshView`/`initStore` — nên không sự kiện nào vào nhật ký, không dòng nào vào `state.json`, không tiến trình con git nào.
+- `src/intake/risk-keywords.mjs` — nguồn duy nhất của `HEAVY_KEYWORDS` (self-improve loop P13 Slice 2, per D13/D14): 34 từ khóa (21 gốc chuyển từ `classify.mjs` + 13 thêm per D14, nhóm hệ thống ngoài/bỏ kiểm tra/kiểm toán). Manifest layer: kernel (tầng sâu nhất — `classify.mjs` tầng use-case và `iron-law.mjs` tầng domain đều import hợp lệ từ đây; `iron-law.mjs` KHÔNG BAO GIỜ import thẳng từ `classify.mjs` — chiều ngược, vi phạm luật một-chiều-xuống của `architecture.test.mjs`).
+- `src/evolve/iron-law.mjs` — phán quyết Iron Law (self-improve loop P13 Slice 2, xem "Iron Law — phân loại rủi ro của một candidate fix" trên cho hợp đồng đầy đủ): thuần (`classifyIronLaw({filesChanged, description})`), không fs/Date/network, import `HEAVY_KEYWORDS` từ `risk-keywords.mjs`. Manifest layer: domain. Chưa có call site nào (xem Open Gaps).
 - `src/runner/worker-log.mjs` — cửa ghi DUY NHẤT cho bản ghi output cục bộ (`.fgos/logs/<id>.log`, per D3 worker-dispatch-log) — tách khỏi `store.mjs` vì đây là văn bản tự do (output trợ lý), khác nhật ký sự kiện có cấu trúc của `store.mjs`; `appendWorkerLog(dir, workId, entry)` nối thêm một khối, không bao giờ đè; field vắng mặt (vd không tier/model/output khi lỗi không phải của trợ lý) render mà không throw. `loop.mjs`'s `dispatchClaimedItem` gọi nó ở hai điểm: ngay sau trợ lý chạy xong (trước goal-check — bắt cả đề xuất lẫn chấm-trượt), và trong nhánh bắt lỗi mang `errorClass` (quá-giờ/hỏng-spawn/hỏng-worktree). Thư mục `.fgos/logs/` được git-ignore (không bao giờ vào cây committed, per D4/D1) — khác `.fgos/events.jsonl` (committed, là truth) và giống `.fgos/state.json` (view cục bộ). `store.mjs`'s cửa ghi duy nhất (`events.jsonl`+`state.json`) không đổi phạm vi — bản ghi output là một cửa RIÊNG, không đi qua `moveWork`/`appendEvent` (per D3). Manifest layer (`docs/architecture-manifest.json`): infra.
 - `docs/routing-handoff-contract.md` — hợp đồng handoff + ranh giới tin cậy
 - Test: `test/runner/*` (gồm `test/runner/merge.test.mjs` — unit `classifySource`/`reviewDiff`/`mergeRunnerItem`/`cleanupMergedBranch`; `test/runner/write-queue.test.mjs` — chứng minh serialize thật qua marker enter/exit không xen kẽ; `test/runner/root-affinity.test.mjs` — resolveRoot/claimRoot/steerFrontier, khuôn race 2-tác-nhân đã spike-proven; `test/runner/goal-check.test.mjs` — mới, real-fake-executor) + `test/e2e/runner-loop.test.mjs` (executor giả, repo git tạm, bao gồm 3 kịch bản stage-clarify + 3 kịch bản stage-decompose: pass-through, chia-con-chặn-frontier, cần-người + 1 kịch bản S2-pull: `take` người + `fgos-runner --once` song song không giẫm + `return` xanh + kịch bản con fork từ tip nhánh gốc) + `test/e2e/pr-gate.test.mjs` (4 kịch bản thật qua binary + git: runner item full loop review→approve→merge→done, merge conflict thật với tree nguyên vẹn sau abort, pull-door item full loop, reject pull-door giữ commit làm lịch sử) + `test/cli/fgos.test.mjs` (unit CLI cho `take`/`return`/`review`/`approve`/`reject`/`catchup`: frontier-head claim, CAS conflict, dirty-tree/HEAD-chưa-tiến refusal, verify xanh/đỏ, main-never-holds-broken-merge cho cả conflict lẫn verify-fail, legacy degrade, leaf-vs-root branch targeting, integration-drift reason, catch-up sạch/xung-đột-thật/lý-do-không-áp-dụng-được) + `test/state/replay.test.mjs` (fold `claimActor`/`headAtTake`/`headAtReturn`) + `test/state/fsm.test.mjs` (cạnh `blocked→proposed`, D18) + `test/report/entropy.test.mjs` (entropy thuần) + kịch bản chồng-lấn-thật hai việc song song trong `test/runner/loop.test.mjs` (peak-concurrency counter, không phải suy luận thời gian tường) + `test/runner/worker-log.test.mjs` (mới — create/append, nối-không-đè qua nhiều lần thử, degrade không throw khi field vắng) + benchmark ngoài suite `docs/history/phase-3-compound-learning/reports/f4-benchmark.md` (F4, real binaries, expected-delta khai trước run); 637 test toàn suite (`cd repo && npm test`)
