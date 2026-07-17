@@ -86,6 +86,31 @@ test('reviewDiff for a runner item diffs main...fgw/<id> and carries no warnings
   assert.deepEqual(result.warnings, []);
 });
 
+test('reviewDiff for a runner item with an explicit opts.trunk diffs against that trunk instead of main (D3)', () => {
+  const repoRoot = initRepo();
+  // A non-main trunk, forked from main, with its own commit — then a leaf
+  // branch forked from THAT trunk's tip, per D3's fgw/<root> tree shape.
+  makeBranchWithCommit(repoRoot, 'fgw/parent-root', 'root-only.txt', 'root\n');
+  git(repoRoot, ['checkout', 'fgw/parent-root']);
+  makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
+  git(repoRoot, ['checkout', 'main']);
+
+  const result = reviewDiff(repoRoot, makeItem(), { trunk: 'fgw/parent-root' });
+  assert.equal(result.source, 'runner');
+  assert.match(result.diff, /produced\.txt/);
+  assert.doesNotMatch(result.diff, /root-only\.txt/, 'diff against the custom trunk must not include the trunk\'s own changes relative to main');
+  assert.deepEqual(result.warnings, []);
+});
+
+test('reviewDiff for a runner item with no opts.trunk still defaults to main (regression)', () => {
+  const repoRoot = initRepo();
+  makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
+  const result = reviewDiff(repoRoot, makeItem());
+  assert.equal(result.source, 'runner');
+  assert.match(result.diff, /produced\.txt/);
+  assert.deepEqual(result.warnings, []);
+});
+
 test('reviewDiff for a pull item diffs headAtTake..headAtReturn with no warning for a single-commit range', () => {
   const repoRoot = initRepo();
   const headAtTake = headOf(repoRoot);

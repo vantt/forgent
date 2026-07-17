@@ -29,6 +29,13 @@
 // -> done / -> blocked) stays in bin/fgos.mjs, the sole write door via
 // src/state/store.mjs, exactly like worktree.mjs/goal-check.mjs never touch
 // state.json either.
+//
+// TRUNK PARAMETERIZATION (per D3, fan-out-parallel): `reviewDiff`'s "runner"
+// source diff trunk defaults to `main` (unchanged pr-lifecycle behavior) but
+// is now caller-parameterizable via `opts.trunk` — fan-out's per-root branch
+// tree (`fgw/<root>`) needs a leaf's diff computed against its parent branch
+// instead of `main`. Wiring an actual caller to pass a non-default trunk is
+// out of scope here (Epic 3's job); this only makes the primitive capable.
 
 import { execFileSync } from 'node:child_process';
 import { branchNameFor, branchExists, reclaimOrphanedCheckout } from './worktree.mjs';
@@ -71,9 +78,13 @@ export function classifySource(repoRoot, item) {
 
 /**
  * Build the human-viewable diff for a proposed item's `review` (never
- * throws on a legacy item — it degrades to a warning, no diff). Per D4, the
- * trunk compared against is always `main` (this feature's local-first PR
- * model assumes a `main` trunk, same as worktree.mjs's `fgw/<id>` branches).
+ * throws on a legacy item — it degrades to a warning, no diff). For a
+ * "runner" item, the trunk compared against defaults to `main` (this
+ * feature's local-first PR model, same as worktree.mjs's `fgw/<id>`
+ * branches) but is caller-parameterizable via `opts.trunk` (per D3,
+ * fan-out-parallel) — a leaf's diff against its parent root branch instead
+ * of `main`, without changing the default behavior for every existing
+ * caller.
  *
  * Pull-door range (per plan's deferred-to-planning resolution): the range is
  * fixed at `headAtTake..headAtReturn`, so it never picks up commits landed
@@ -83,14 +94,15 @@ export function classifySource(repoRoot, item) {
  * honest warning (commit count in range) rather than silently attributing
  * every line in the diff to this one item.
  */
-export function reviewDiff(repoRoot, item) {
+export function reviewDiff(repoRoot, item, opts = {}) {
+  const { trunk = 'main' } = opts;
   const source = classifySource(repoRoot, item);
 
   if (source === 'runner') {
     const branch = branchNameFor(item.id);
     let diff;
     try {
-      diff = git(repoRoot, ['diff', `main...${branch}`]);
+      diff = git(repoRoot, ['diff', `${trunk}...${branch}`]);
     } catch (err) {
       throw new MergeError(`computing diff for branch "${branch}" failed: ${err.message}`, { branch });
     }
@@ -122,11 +134,15 @@ export function reviewDiff(repoRoot, item) {
 
 /**
  * Attempt to merge a runner item's branch into `repoRoot`'s current checkout
- * (assumed to be `main`, checked clean by the caller first). Every path is
+ * (checked clean by the caller first). The git call itself is target-
+ * agnostic — no trunk is hardcoded — so per D3 (fan-out-parallel) this
+ * generalizes to whichever branch the caller has checked out: `main` for a
+ * root->main merge, or `fgw/<root>` for a leaf->parent merge. Every path is
  * either "outcome: merged" (verify passed on the staged tree, merge
  * committed) or a defined non-throwing outcome — "conflict" or
- * "verify-fail" — with the merge already cleanly aborted, main untouched.
- * Only a failure to even run `git merge --abort` itself throws (a real bug).
+ * "verify-fail" — with the merge already cleanly aborted, the checkout
+ * untouched. Only a failure to even run `git merge --abort` itself throws
+ * (a real bug).
  */
 export function mergeRunnerItem(repoRoot, item, { timeoutMs } = {}) {
   const branch = branchNameFor(item.id);
