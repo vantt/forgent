@@ -5,6 +5,7 @@
 // CLI verb's job, not this module's.
 
 import { createHash } from 'node:crypto';
+import { HEAVY_KEYWORDS } from './risk-keywords.mjs';
 
 // D4: cut the title at the first sentence/line boundary; fall back to a
 // truncated prefix when the text has no natural boundary within reach. Both
@@ -37,13 +38,8 @@ export function deriveTitle(text) {
 // D1/D5 keyword tables — mechanical, deterministic, always overridable by the
 // caller. No match in any table is not an error: tier falls back to
 // 'standard' (work.mjs TIERS default) and kind falls back to 'task'.
-const HEAVY_KEYWORDS = [
-  'security', 'bảo mật', 'auth', 'authentication', 'payment', 'thanh toán',
-  'migration', 'schema', 'data loss', 'mất dữ liệu', 'breaking change',
-  'production incident', 'sự cố', 'irreversible', 'không thể hoàn tác',
-  'credentials', 'secret', 'encryption', 'mã hóa', 'delete', 'xóa dữ liệu',
-];
-
+// HEAVY_KEYWORDS lives in the kernel-layer risk-keywords.mjs (D13) so the
+// domain-layer iron-law.mjs can share the same list without an upward import.
 const LIGHT_KEYWORDS = [
   'typo', 'docs', 'documentation', 'tài liệu', 'readme', 'comment',
   'chú thích', 'rename', 'đổi tên', 'formatting', 'định dạng', 'log message',
