@@ -48,12 +48,23 @@ function formatEntry(workId, entry) {
  * Append one dispatch-outcome block to `.fgos/logs/<workId>.log`, creating the
  * logs directory on first write. Append-only: a retried item's later attempts
  * add fresh blocks to the same file rather than overwriting the first. Returns
- * the resolved log path.
+ * the resolved log path, or `null` if the write failed.
+ *
+ * NEVER THROWS (review finding F-P1-1, review-20260717-daily-batch): this is
+ * pure git-ignored observability, never load-bearing on the dispatch outcome
+ * (per D1/D3). A real I/O failure (disk full, EACCES, read-only `.fgos/`)
+ * must not abort an otherwise-successful dispatch, and must not mask the real
+ * `DispatchError`/`WorktreeError` a caller is already handling when this is
+ * called from a catch block. Failure degrades to a best-effort no-op.
  */
 export function appendWorkerLog(dir, workId, entry = {}) {
-  const logsDir = path.join(dir, 'logs');
-  fs.mkdirSync(logsDir, { recursive: true });
-  const logPath = path.join(logsDir, `${workId}.log`);
-  fs.appendFileSync(logPath, formatEntry(workId, entry), 'utf8');
-  return logPath;
+  try {
+    const logsDir = path.join(dir, 'logs');
+    fs.mkdirSync(logsDir, { recursive: true });
+    const logPath = path.join(logsDir, `${workId}.log`);
+    fs.appendFileSync(logPath, formatEntry(workId, entry), 'utf8');
+    return logPath;
+  } catch {
+    return null;
+  }
 }

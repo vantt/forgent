@@ -62,3 +62,17 @@ test('appendWorkerLog degrades gracefully: only errorClass + message present (Wo
   assert.match(content, /--- STDOUT ---\n\(empty\)/);
   assert.match(content, /--- STDERR ---\n\(empty\)/);
 });
+
+test('appendWorkerLog never throws when the write fails (review finding F-P1-1) -- pure observability must not crash dispatch', () => {
+  const dir = mkTempDir();
+  // Blocking 'logs' with a plain file makes mkdirSync throw (EEXIST/ENOTDIR)
+  // exactly the class of I/O failure (disk full, EACCES, read-only .fgos)
+  // this fix isolates.
+  fs.writeFileSync(path.join(dir, 'logs'), 'not a directory');
+
+  let result;
+  assert.doesNotThrow(() => {
+    result = appendWorkerLog(dir, 'item-d', { attempt: 1, stdout: 'would have logged' });
+  });
+  assert.equal(result, null, 'a failed write degrades to null, never throws');
+});
