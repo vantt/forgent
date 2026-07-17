@@ -11,6 +11,7 @@
     "src/runner/worktree.mjs": "infra",
     "src/runner/goal-check.mjs": "infra",
     "src/runner/merge.mjs": "infra",
+    "src/runner/github-adapter.mjs": "infra",
     "src/state/store.mjs": "infra",
     "src/install/coexist.mjs": "infra",
     "src/runner/recovery.mjs": "domain",
