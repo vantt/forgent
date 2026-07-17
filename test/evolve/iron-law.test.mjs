@@ -106,15 +106,52 @@ test('classifyIronLaw returns required:false when neither test matches', () => {
   assert.deepEqual(result, { required: false, matchedFlags: [], matchedModules: [] });
 });
 
-test('classifyIronLaw matches module paths LITERALLY — a non-normalized path does not match', () => {
-  // Known limitation: no normalization. './src/runner/x' and 'repo/src/runner/x'
-  // are NOT recognized; normalizing is the future caller's contract (Slice 3).
+test('classifyIronLaw normalizes paths — a "./"-prefixed path inside a protected dir matches', () => {
+  // Paths are normalized (path.posix.normalize) before matching, so './x' and
+  // 'x' match identically. matchedModules reports the ORIGINAL path the caller
+  // passed. ('repo/'-prefixed paths still do not match — normalize cannot strip
+  // an arbitrary prefix — but per D16 filesChanged is always repo-relative.)
   const result = classifyIronLaw({
-    filesChanged: ['./src/runner/loop.mjs', 'repo/src/state/store.mjs'],
+    filesChanged: ['./src/runner/loop.mjs'],
+    description: undefined,
+  });
+  assert.deepEqual(result.matchedModules, ['./src/runner/loop.mjs']);
+  assert.equal(result.required, true);
+});
+
+test('classifyIronLaw does not match a "..""-traversal that escapes every protected prefix', () => {
+  // Only over-matching (false positives) is removed; under-matching (false
+  // negatives) — the dangerous direction for a hard gate — is never introduced.
+  const result = classifyIronLaw({
+    filesChanged: ['src/runner/../evil.mjs'],
     description: undefined,
   });
   assert.deepEqual(result.matchedModules, []);
   assert.equal(result.required, false);
+});
+
+test('classifyIronLaw treats an empty-string filesChanged entry as no match, no throw', () => {
+  const result = classifyIronLaw({ filesChanged: [''], description: undefined });
+  assert.deepEqual(result.matchedModules, []);
+  assert.equal(result.required, false);
+});
+
+test('classifyIronLaw throws a clear error when a filesChanged entry is not a string', () => {
+  assert.throws(
+    () => classifyIronLaw({ filesChanged: ['src/runner/loop.mjs', 42] }),
+    /filesChanged\[1\] must be a string, got number/,
+  );
+  assert.throws(
+    () => classifyIronLaw({ filesChanged: [null] }),
+    /filesChanged\[0\] must be a string, got object/,
+  );
+});
+
+test('classifyIronLaw throws a clear error when description is present but not a string', () => {
+  assert.throws(
+    () => classifyIronLaw({ filesChanged: [], description: 42 }),
+    /description must be a string or omitted, got number/,
+  );
 });
 
 // --- iron-law: empty / invalid input ---

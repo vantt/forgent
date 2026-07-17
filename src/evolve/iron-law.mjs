@@ -6,12 +6,10 @@
 // KNOWN LIMITATION (flag for review before Slice 3 wires this to actually skip
 // failing-test-first proof): matchedModules tests filesChanged entries against
 // D10+D14's ILLUSTRATIVE path list, not every capability-relevant module in the
-// repo, and it matches paths LITERALLY — no normalization/canonicalization. A
-// caller passing './x', 'repo/x', or a '..'-traversal path gets a literal,
-// un-normalized match attempt. Normalizing paths to repo-relative form before
-// calling classifyIronLaw is the future caller's contract (Slice 3), not this
-// module's job. Both are recorded residual limitations, not silent bugs.
+// repo. The list is deliberately illustrative, not exhaustive (D10) — a
+// recorded residual limitation, not a silent bug.
 
+import path from 'node:path';
 import { HEAVY_KEYWORDS } from '../intake/risk-keywords.mjs';
 
 // D10+D14 self-modifying-capable module list. Each rule tests a filesChanged
@@ -45,11 +43,13 @@ function matchesModuleRule(filePath, rule) {
  *
  * @param {object} input
  * @param {string[]} input.filesChanged - required array of repo-relative path
- *   strings, matched LITERALLY (no normalization). Throws if not an array.
+ *   strings, normalized (path.posix.normalize) before matching so './x' and 'x'
+ *   match identically. Throws if not an array or any entry is not a string.
  * @param {string} [input.description] - optional free text; matched
  *   case-insensitively against every HEAVY_KEYWORDS entry when non-empty. An
  *   absent/empty description yields no flags but never counts as "safe" —
- *   required is still computed from matchedModules.
+ *   required is still computed from matchedModules. Throws if present but not a
+ *   string.
  * @returns {{required: boolean, matchedFlags: string[], matchedModules: string[]}}
  */
 export function classifyIronLaw({ filesChanged, description } = {}) {
@@ -58,9 +58,21 @@ export function classifyIronLaw({ filesChanged, description } = {}) {
       'classifyIronLaw: filesChanged must be an array of repo-relative path strings',
     );
   }
+  filesChanged.forEach((filePath, i) => {
+    if (typeof filePath !== 'string') {
+      throw new TypeError(
+        `classifyIronLaw: filesChanged[${i}] must be a string, got ${typeof filePath}`,
+      );
+    }
+  });
+  if (description !== undefined && typeof description !== 'string') {
+    throw new TypeError(
+      `classifyIronLaw: description must be a string or omitted, got ${typeof description}`,
+    );
+  }
 
   const matchedModules = filesChanged.filter((filePath) =>
-    MODULE_RULES.some((rule) => matchesModuleRule(filePath, rule)),
+    MODULE_RULES.some((rule) => matchesModuleRule(path.posix.normalize(filePath), rule)),
   );
 
   const matchedFlags = [];
