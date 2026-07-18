@@ -29,8 +29,13 @@ function dispatchedVerbs() {
   const source = fs.readFileSync(FGOS_SOURCE_PATH, 'utf8');
   const switchStart = source.indexOf('async function runVerb(');
   assert.ok(switchStart >= 0, 'runVerb() not found in bin/fgos.mjs — drift guard source moved.');
-  const body = source.slice(switchStart);
-  const verbs = [...body.matchAll(/^\s{4}case '([a-z-]+)':/gm)].map((m) => m[1]);
+  // Bounded to runVerb's own body (up to the next top-level function) so a
+  // `case '<verb>':` label elsewhere in the file can never register as a
+  // phantom dispatched verb.
+  const switchEnd = source.indexOf('\nfunction publicManifestEntries(', switchStart);
+  assert.ok(switchEnd > switchStart, 'publicManifestEntries() not found after runVerb() — drift guard bound moved.');
+  const body = source.slice(switchStart, switchEnd);
+  const verbs = [...body.matchAll(/^\s{4}case '([a-z0-9-]+)':/gm)].map((m) => m[1]);
   assert.ok(verbs.length > 0, 'no `case \'<verb>\':` lines found — drift guard regex needs updating.');
   return verbs;
 }
