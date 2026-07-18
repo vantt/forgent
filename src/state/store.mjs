@@ -29,7 +29,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { appendEvent, readEvents } from './events.mjs';
 import { rebuildView, viewRevision } from './replay.mjs';
-import { graphMetrics as computeGraphMetrics } from './graph-metrics.mjs';
+import { graphMetrics as computeGraphMetrics, whatIf as computeWhatIf } from './graph-metrics.mjs';
 import { transitionWork, FsmError } from './fsm.mjs';
 import { transitionStage } from './stage.mjs';
 import { validateWork, WorkValidationError, DEFAULTS } from './work.mjs';
@@ -497,6 +497,16 @@ export function readyWork(dir) {
 export function graphMetrics(dir) {
   const { logPath } = paths(dir);
   return computeGraphMetrics(rebuildView(logPath));
+}
+
+/**
+ * Read-only (work-graph-intelligence S7): the what-if answer for a single item
+ * — "if I complete `id`, what does it unblock?". Same read contract/facade
+ * shape as graphMetrics; the Domain compute core decides the answer.
+ */
+export function graphWhatIf(dir, id) {
+  const { logPath } = paths(dir);
+  return computeWhatIf(rebuildView(logPath), id);
 }
 
 /**

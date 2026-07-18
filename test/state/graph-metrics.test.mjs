@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { connectedComponents, criticalPath, staleBlocked, greedyTopUnblock, graphMetrics } from '../../src/state/graph-metrics.mjs';
+import { connectedComponents, criticalPath, staleBlocked, greedyTopUnblock, whatIf, metricsFrame, graphMetrics } from '../../src/state/graph-metrics.mjs';
 
 // Pure lib — every view here is a literal (foldEvents style), no fs, no
 // `.fgos/` writes. connectedComponents groups work items linked by ANY unified
@@ -181,8 +181,51 @@ test('graphMetrics umbrella completes P43: components + criticalPath + staleBloc
   const m1 = graphMetrics(view);
   const m2 = graphMetrics(view);
   assert.deepEqual(m1, m2); // deterministic -> stable data_hash
-  assert.deepEqual(Object.keys(m1), ['order_version', 'componentCount', 'components', 'criticalPath', 'staleBlocked', 'topUnblock']);
+  assert.deepEqual(Object.keys(m1), ['order_version', 'frame', 'componentCount', 'components', 'criticalPath', 'staleBlocked', 'topUnblock']);
   assert.deepEqual(m1.criticalPath, { depth: 2, path: ['b', 'a'] });
   assert.deepEqual(m1.staleBlocked, [{ id: 'b', status: 'todo', blockedBy: ['a'] }]);
   assert.deepEqual(m1.topUnblock[0], { id: 'a', unblocks: 1, newlyUnblocks: 2 });
+});
+
+// --- S7: what-if + architecture frame --------------------------------------
+
+test('whatIf: completing a chain root unblocks its transitive downstream; newlyReady = dependents whose other deps are already done', () => {
+  const view = {
+    work: {
+      a: item('a'),
+      b: item('b', { deps: ['a'] }), // only dep is a -> newly ready when a done
+      c: item('c', { deps: ['a', 'b'] }), // also waits on b -> NOT newly ready
+    },
+  };
+  assert.deepEqual(whatIf(view, 'a'), { id: 'a', exists: true, unblocksTransitive: 2, newlyReady: ['b'] });
+});
+
+test('whatIf: an unknown id is exists:false with zero impact', () => {
+  assert.deepEqual(whatIf({ work: { a: item('a') } }, 'nope'), { id: 'nope', exists: false, unblocksTransitive: 0, newlyReady: [] });
+});
+
+test('whatIf: a done dependent is never counted as newly-unblocked', () => {
+  const view = { work: { root: item('root'), done: item('done', { status: 'done', deps: ['root'] }) } };
+  assert.deepEqual(whatIf(view, 'root'), { id: 'root', exists: true, unblocksTransitive: 0, newlyReady: [] });
+});
+
+test('metricsFrame: carries the deterministic revision + node count, all cheap metrics computed', () => {
+  const view = { work: { a: item('a'), b: item('b', { deps: ['a'] }) } };
+  const frame = metricsFrame(view);
+  assert.match(frame.revision, /^[0-9a-f]{64}$/);
+  assert.equal(frame.nodeCount, 2);
+  assert.deepEqual(frame.computed, ['componentCount', 'components', 'criticalPath', 'staleBlocked', 'topUnblock']);
+  assert.deepEqual(frame.skipped, []);
+});
+
+test('metricsFrame: the greedy topUnblock is the only skippable metric — skipped above the node ceiling, and the umbrella returns [] for it', () => {
+  const view = { work: { a: item('a'), b: item('b', { deps: ['a'] }), c: item('c') } };
+  const frame = metricsFrame(view, { maxNodesForGreedy: 1 });
+  assert.deepEqual(frame.skipped, ['topUnblock']);
+  assert.ok(!frame.computed.includes('topUnblock'));
+  const metrics = graphMetrics(view, { maxNodesForGreedy: 1 });
+  assert.deepEqual(metrics.topUnblock, [], 'skipped greedy yields an empty topUnblock');
+  // cheap metrics still ran
+  assert.equal(metrics.componentCount, 2);
+  assert.deepEqual(metrics.frame.skipped, ['topUnblock']);
 });

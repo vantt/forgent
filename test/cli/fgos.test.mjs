@@ -3802,14 +3802,39 @@ test('graph verb: reports connected components (independent parallel tracks) in 
   assert.deepEqual(data.components.map((component) => component.items), [['a', 'b'], ['c']]);
 
   // S6: the umbrella completes P43's stated acceptance — critical path,
-  // stale-blocked, and greedy top-k-unblock ride the same envelope.
-  assert.deepEqual(Object.keys(data), ['order_version', 'componentCount', 'components', 'criticalPath', 'staleBlocked', 'topUnblock']);
+  // stale-blocked, and greedy top-k-unblock. S7 adds the architecture frame.
+  assert.deepEqual(Object.keys(data), ['order_version', 'frame', 'componentCount', 'components', 'criticalPath', 'staleBlocked', 'topUnblock']);
   assert.deepEqual(data.criticalPath, { depth: 2, path: ['b', 'a'] });
   assert.deepEqual(data.staleBlocked, [{ id: 'b', status: 'todo', blockedBy: ['a'] }]);
   assert.deepEqual(data.topUnblock[0], { id: 'a', unblocks: 1, newlyUnblocks: 2 });
+  assert.match(data.frame.revision, /^[0-9a-f]{64}$/);
+  assert.equal(data.frame.nodeCount, 3);
+  assert.deepEqual(data.frame.skipped, []);
 
   // Pure read: no event written by the verb.
   assert.equal(eventLines(cwd).length, before, 'graph must not append any event');
+});
+
+test('graph --what-if <id>: reports what completing that item unblocks, in a fgos.v1 envelope, pure read', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0);
+  assert.equal(addOk(cwd, 'a').status, 0);
+  assert.equal(run(cwd, ['add', 'b', '--title', 'B', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--deps', 'a']).status, 0);
+
+  const before = eventLines(cwd).length;
+  const result = run(cwd, ['graph', '--what-if', 'a']);
+  assert.equal(result.status, 0);
+  const data = envelopeData(result.stdout);
+  assert.deepEqual(data, { id: 'a', exists: true, unblocksTransitive: 1, newlyReady: ['b'] });
+  assert.equal(eventLines(cwd).length, before, 'what-if must not append any event');
+});
+
+test('graph --what-if on an unknown id: exists false, zero impact, still exit 0 + envelope', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0);
+  const result = run(cwd, ['graph', '--what-if', 'ghost']);
+  assert.equal(result.status, 0);
+  assert.deepEqual(envelopeData(result.stdout), { id: 'ghost', exists: false, unblocksTransitive: 0, newlyReady: [] });
 });
 
 test('graph verb on an empty store: zero components, still a valid envelope, exit 0', () => {

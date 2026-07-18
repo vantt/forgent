@@ -199,9 +199,15 @@ export const COMMAND_REGISTRY = [
   {
     name: 'graph',
     invoke: 'fgos graph',
-    description: 'Read-only mechanical work-graph metrics: connected components (independent parallel tracks) folded from the dependency + lineage graph.',
-    parameters: { type: 'object', properties: {}, required: [] },
-    examples: ['fgos graph'],
+    description: 'Read-only mechanical work-graph metrics: connected components, critical path, stale-blocked, greedy top-k-unblock, folded from the dependency + lineage graph. With --what-if <id>, reports only what completing that item unblocks.',
+    parameters: {
+      type: 'object',
+      properties: {
+        'what-if': { type: 'string', description: 'A work id: report what completing it unblocks (transitive count + newly dep-satisfied items) instead of the full metrics umbrella.' },
+      },
+      required: [],
+    },
+    examples: ['fgos graph', 'fgos graph --what-if auth-3'],
     access: 'read',
     deprecated: null,
   },

@@ -10,6 +10,7 @@
 
 import { buildUnifiedEdges } from './dep-graph.mjs';
 import { FRONTIER_ORDER_VERSION } from './frontier.mjs';
+import { viewRevision } from './replay.mjs';
 
 /**
  * Connected components of the UNDIRECTED unified graph (blocks + parent-child
@@ -95,6 +96,21 @@ function reverseDeps(depsMap) {
     for (const d of ds) rev.get(d).push(id);
   }
   return rev;
+}
+
+// The transitive set of NOT-done items that depend on `id` (reverse-deps
+// reachability, bounded to the `notDone` set). Shared by greedyTopUnblock and
+// whatIf so "what completing X unblocks" has one definition.
+function transitiveDownstream(id, rev, notDone) {
+  const out = new Set();
+  const stack = [...(rev.get(id) ?? [])];
+  while (stack.length > 0) {
+    const next = stack.pop();
+    if (out.has(next) || !notDone.has(next)) continue;
+    out.add(next);
+    for (const up of rev.get(next) ?? []) stack.push(up);
+  }
+  return out;
 }
 
 /**
@@ -188,22 +204,9 @@ export function greedyTopUnblock(view, k = 10) {
   const rev = reverseDeps(deps);
   const notDone = new Set(Object.keys(work).filter((id) => work[id].status !== 'done'));
 
-  // Transitive not-done dependents of `id` (reverse-deps reachability).
-  const downstreamOf = (id) => {
-    const out = new Set();
-    const stack = [...(rev.get(id) ?? [])];
-    while (stack.length > 0) {
-      const next = stack.pop();
-      if (out.has(next) || !notDone.has(next)) continue;
-      out.add(next);
-      for (const up of rev.get(next) ?? []) stack.push(up);
-    }
-    return out;
-  };
-
   const downstreamCache = new Map();
   const downstream = (id) => {
-    if (!downstreamCache.has(id)) downstreamCache.set(id, downstreamOf(id));
+    if (!downstreamCache.has(id)) downstreamCache.set(id, transitiveDownstream(id, rev, notDone));
     return downstreamCache.get(id);
   };
 
@@ -234,21 +237,76 @@ export function greedyTopUnblock(view, k = 10) {
 }
 
 /**
+ * WHAT-IF (S7): "if I complete `id`, what does it unblock?" — the cheap answer
+ * a human gate wants. `unblocksTransitive` is the size of `id`'s transitive
+ * not-done downstream (the same definition greedyTopUnblock ranks by).
+ * `newlyReady` is the direct dependents that become DEP-SATISFIED the moment
+ * `id` is done: status `todo` and every OTHER dep already `done`. That is a
+ * graph fact about dependencies only — NOT full frontier eligibility (it does
+ * not check stage/lineage), so a `newlyReady` item may still wait on
+ * context-discovery or an open descendant. An unknown id yields exists:false.
+ */
+export function whatIf(view, id) {
+  const work = view?.work ?? {};
+  if (!work[id]) {
+    return { id, exists: false, unblocksTransitive: 0, newlyReady: [] };
+  }
+  const deps = knownDeps(work);
+  const rev = reverseDeps(deps);
+  const notDone = new Set(Object.keys(work).filter((x) => work[x].status !== 'done'));
+  const downstream = transitiveDownstream(id, rev, notDone);
+  const newlyReady = (rev.get(id) ?? []).filter((depId) => {
+    const item = work[depId];
+    if (item.status !== 'todo') return false;
+    return (Array.isArray(item.deps) ? item.deps : []).every((d) => d === id || work[d]?.status === 'done');
+  });
+  return { id, exists: true, unblocksTransitive: downstream.size, newlyReady };
+}
+
+// Default node ceiling above which the expensive greedy (topUnblock) is
+// skipped. Cheap metrics (components/critical-path/stale-blocked are all
+// linear in V+E) always run; the greedy is the only super-linear one, so it is
+// the only metric the frame ever marks skipped.
+export const DEFAULT_MAX_NODES_FOR_GREEDY = 500;
+
+/**
+ * The ARCHITECTURE FRAME (S7): provenance for the metrics payload. `revision`
+ * is the deterministic view fingerprint (S3) — a consumer caches metrics by it
+ * and skips recompute when it is unchanged. `computed`/`skipped` name which
+ * metrics actually ran: the greedy `topUnblock` is skipped (kept bounded) once
+ * `nodeCount` exceeds `maxNodesForGreedy`. This is a computed/skipped + data-
+ * hash frame, not decoration — it tells a consumer exactly what it is reading.
+ */
+export function metricsFrame(view, { maxNodesForGreedy = DEFAULT_MAX_NODES_FOR_GREEDY } = {}) {
+  const nodeCount = Object.keys(view?.work ?? {}).length;
+  const greedyComputed = nodeCount <= maxNodesForGreedy;
+  return {
+    revision: viewRevision(view),
+    nodeCount,
+    computed: ['componentCount', 'components', 'criticalPath', 'staleBlocked', ...(greedyComputed ? ['topUnblock'] : [])],
+    skipped: greedyComputed ? [] : ['topUnblock'],
+  };
+}
+
+/**
  * The umbrella read-only metrics surface the `fgos graph` verb emits. It
  * carries the claim-order contract version alongside the graph facts so a
  * consumer reads how work is ordered (order_version), grouped (components, S5),
  * chained (criticalPath), stuck (staleBlocked), and best unblocked (topUnblock)
  * from ONE envelope — all folded mechanically from the same view, never
- * re-derived by the consumer. S6 completes P43's stated acceptance here.
+ * re-derived by the consumer. S6 completes P43's stated acceptance; S7 adds the
+ * `frame` (computed/skipped + revision), and skips the greedy on a large graph.
  */
-export function graphMetrics(view) {
+export function graphMetrics(view, opts = {}) {
   const { componentCount, components } = connectedComponents(view);
+  const frame = metricsFrame(view, opts);
   return {
     order_version: FRONTIER_ORDER_VERSION,
+    frame,
     componentCount,
     components,
     criticalPath: criticalPath(view),
     staleBlocked: staleBlocked(view),
-    topUnblock: greedyTopUnblock(view),
+    topUnblock: frame.skipped.includes('topUnblock') ? [] : greedyTopUnblock(view),
   };
 }
