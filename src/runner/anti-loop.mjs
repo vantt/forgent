@@ -14,13 +14,14 @@
  * deferred to real operation, per the cell's own note. */
 export const MAX_VISITS = 3;
 
-/** Default number of consecutive goal-check misses (across any items, in
- * one runner run) before the circuit breaker trips. Provisional, same
- * caveat as MAX_VISITS. Inert in `--once` mode: dispatchClaimedItem
- * (loop.mjs) parks an item after at most 2 retries, so a single `--once`
- * invocation never accumulates enough misses to trip this threshold — it
- * only takes effect once a shared-breaker or lower-threshold multi-pass path
- * exists. */
+/** Default number of consecutive goal-check misses (for one item) before
+ * the circuit breaker trips. Provisional, same caveat as MAX_VISITS. Inert
+ * under shipped defaults: dispatchClaimedItem (loop.mjs) parks an item
+ * after at most DEFAULT_MAX_RETRIES (2) retries, so a single item's own
+ * streak never reaches this threshold on its own. The breaker only trips
+ * when a caller passes an explicit lower `breakerThreshold` to
+ * `createMissBreaker` (see its doc comment below) — that path already
+ * exists today. */
 export const BREAKER_MISSES = 3;
 
 /**
@@ -153,6 +154,16 @@ const DEFAULT_ITEM_KEY = Symbol('anti-loop.default-item');
  * the event log never affects it — an unrelated event (e.g. a human writing
  * a `decision`, or another item's `work.move`) that the caller does not
  * report through `recordMiss()`/`recordHit()` leaves the streak untouched.
+ *
+ * **Inert under shipped defaults (phase2-p1-breaker-inert-fix):** with
+ * `threshold` at its default (`BREAKER_MISSES` = 3), the breaker can never
+ * trip from a single item's own retries — `dispatchClaimedItem` (loop.mjs)
+ * parks an item after at most `DEFAULT_MAX_RETRIES` (2) failed attempts,
+ * one short of tripping. The breaker only becomes reachable when a caller
+ * passes an explicit lower `threshold` (e.g. `breakerThreshold: 1`, already
+ * exercised by an existing test) — production callers do not do this today,
+ * so the halt branch this feeds (`loop.mjs`'s `if (tripped)`) is currently
+ * dead under default configuration, not broken.
  */
 export function createMissBreaker(threshold = BREAKER_MISSES) {
   const streaks = new Map();

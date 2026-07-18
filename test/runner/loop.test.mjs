@@ -898,6 +898,21 @@ test('breaker trip: a goal-check miss at threshold parks the item and halts the 
   assert.equal(frictionEvent.payload.layer, 'verification');
 });
 
+test('breaker inert under default config: same goal-check miss with no breakerThreshold override parks the item instead of tripping the breaker (phase2-p1-breaker-inert-fix)', async () => {
+  const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
+  seedItem(dir, { id: 'item-breaker-default' });
+  const config = configFor(writeCommittingExecutor(scriptDir, counterFile, 'junk.txt'));
+
+  const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
+
+  assert.equal(result.outcome, 'drained');
+  assert.equal(result.exitCode, 0);
+  assert.equal(result.dispatched[0].outcome, 'parked');
+  assert.equal(result.dispatched[0].errorClass, 'verify-miss');
+  assert.equal(result.dispatched[0].attempts, 2);
+  assert.equal(countRuns(counterFile), 2); // DEFAULT_MAX_RETRIES retried once, unvetoed by the breaker
+});
+
 // --- startup reap: stale doing + orphan branches --------------------------
 
 test('startup reap: a crashed run\'s doing item with a committed, verify-passing branch is completed to proposed before the frontier runs', async () => {

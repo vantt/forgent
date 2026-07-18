@@ -788,6 +788,10 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
       });
     });
 
+    // Reachable only when the caller passes an explicit lower
+    // `breakerThreshold` (see createMissBreaker's doc comment in
+    // anti-loop.mjs) — under shipped defaults this branch is dead because
+    // DEFAULT_MAX_RETRIES caps an item's own attempts below BREAKER_MISSES.
     if (tripped) {
       log(`fgos-runner: halting — consecutive-miss breaker tripped (${breaker.consecutiveMissesFor(item.id)} miss(es)); "${item.id}" parked`);
       return { outcome: 'halted', reason: 'breaker-tripped', id: item.id, errorClass: failure.errorClass, attempts: attempt, exitCode: 1 };
