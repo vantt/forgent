@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { appendEvent } from '../../src/state/events.mjs';
-import { foldEvents, rebuildView } from '../../src/state/replay.mjs';
+import { foldEvents, rebuildView, viewRevision } from '../../src/state/replay.mjs';
 
 // Every test gets its own mkdtemp dir — never touch the repo's .fgos/.
 function tmpLogPath() {
@@ -565,4 +565,42 @@ test('foldEvents ignores branchHeadAtReturn on a proposed move for an id that wa
   assert.doesNotThrow(() => foldEvents(events));
   const view = foldEvents(events);
   assert.equal('ghost' in view.work, false);
+});
+
+// --- work-graph-intelligence S3: view revision-hash -----------------------
+// A deterministic fingerprint of a folded view (C1 data_hash pattern), so a
+// consumer can tell "did the folded state change?" without re-folding — and
+// WITHOUT the hash leaking into the fold return shape (which whole-view
+// snapshot + backward-compat tests pin).
+
+test('viewRevision is deterministic: rebuilding the same log twice yields byte-identical revisions', () => {
+  const logPath = tmpLogPath();
+  appendEvent(logPath, { type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo' } });
+  appendEvent(logPath, { type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing' } });
+
+  const r1 = viewRevision(rebuildView(logPath));
+  const r2 = viewRevision(rebuildView(logPath));
+  assert.equal(r1, r2);
+  assert.match(r1, /^[0-9a-f]{64}$/, 'sha256 hex, same shape as the C1 data_hash');
+});
+
+test('viewRevision is sensitive: a new event changes the revision', () => {
+  const logPath = tmpLogPath();
+  appendEvent(logPath, { type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo' } });
+  const before = viewRevision(rebuildView(logPath));
+
+  appendEvent(logPath, { type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing' } });
+  const after = viewRevision(rebuildView(logPath));
+
+  assert.notEqual(before, after, 'a state mutation must move the fingerprint');
+});
+
+test('viewRevision does NOT leak into the fold return: rebuildView still returns the pure {work, decisions, ...} shape', () => {
+  const logPath = tmpLogPath();
+  appendEvent(logPath, { type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo' } });
+  const view = rebuildView(logPath);
+
+  viewRevision(view); // computing the hash must not mutate the view
+  assert.equal('revision' in view, false, 'the revision is a persisted sibling, never part of the fold return');
+  assert.deepEqual(rebuildView(logPath), view, 'rebuild return unchanged by the revision primitive');
 });

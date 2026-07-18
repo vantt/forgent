@@ -9,6 +9,7 @@
 // Deterministic: folding the same ordered event array (or rebuilding from
 // the same log) twice always yields deep-equal views.
 
+import { createHash } from 'node:crypto';
 import { readEvents } from './events.mjs';
 import { DEFAULTS } from './work.mjs';
 
@@ -316,4 +317,22 @@ function applyEvent(view, event) {
 export function rebuildView(logPath) {
   const events = readEvents(logPath);
   return foldEvents(events);
+}
+
+/**
+ * Deterministic fingerprint of a folded view (work-graph-intelligence S3).
+ * Reuses the C1 `data_hash` pattern (`envelope.mjs` wrapEnvelope) — the
+ * sha256 hex digest of `JSON.stringify(view)` — so a consumer can tell "did
+ * the folded state change?" without re-folding the log or diffing the view.
+ *
+ * PURE and deterministic by the same guarantee `rebuildView` gives: the view
+ * carries no `Date.now()`/wall-clock value (every timestamp comes from an
+ * event's own `ts`), so the same log always hashes to the same revision. The
+ * caller passes the folded view itself — this function never re-folds. It is
+ * computed over the view EXACTLY as `rebuildView` returns it, so it must be
+ * called on that pure shape (the on-disk `state.json` stamps this hash as a
+ * sibling field; it is never folded back into the view a rebuild returns).
+ */
+export function viewRevision(view) {
+  return createHash('sha256').update(JSON.stringify(view)).digest('hex');
 }

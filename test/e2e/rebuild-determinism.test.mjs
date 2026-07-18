@@ -117,6 +117,14 @@ test('rebuild-determinism: init, add work with deps + unicode title, move throug
 
   const after = stateView(cwd);
   assert.deepEqual(after, before);
+
+  // work-graph-intelligence S3: the persisted view carries a deterministic
+  // revision-hash (a sibling of work/decisions on the ON-DISK state.json, never
+  // folded back into the rebuild return). It survives the delete+rebuild
+  // byte-identically — which is exactly why the deepEqual(after, before) above
+  // still holds after the revision was added.
+  assert.match(before.revision, /^[0-9a-f]{64}$/, 'state.json carries a sha256 revision-hash');
+  assert.equal(after.revision, before.revision, 'revision is deterministic across delete+rebuild');
 });
 
 test('rebuild-determinism: CAS conflict — a stale --expect on the second of two moves is refused, exit 3, no event written', () => {

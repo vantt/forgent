@@ -109,7 +109,13 @@ test('init creates .fgos/ with an empty log and a rebuilt (empty) view, exit 0',
   const result = run(cwd, ['init']);
   assert.equal(result.status, 0);
   assert.ok(fs.existsSync(logPath(cwd)));
-  assert.deepEqual(stateView(cwd), { work: {}, decisions: [] });
+  const view = stateView(cwd);
+  assert.deepEqual(view.work, {});
+  assert.deepEqual(view.decisions, []);
+  // work-graph-intelligence S3: the persisted (on-disk) view now carries a
+  // deterministic revision-hash sibling — the fold return stays pure, but
+  // state.json fingerprints its own folded state.
+  assert.match(view.revision, /^[0-9a-f]{64}$/);
 });
 
 test('add creates exactly one work.add event and the view reflects the new item, exit 0', () => {

@@ -28,7 +28,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { appendEvent, readEvents } from './events.mjs';
-import { rebuildView } from './replay.mjs';
+import { rebuildView, viewRevision } from './replay.mjs';
 import { transitionWork, FsmError } from './fsm.mjs';
 import { transitionStage } from './stage.mjs';
 import { validateWork, WorkValidationError, DEFAULTS } from './work.mjs';
@@ -87,7 +87,14 @@ function paths(dir) {
 
 function writeView(viewPath, view) {
   fs.mkdirSync(path.dirname(viewPath), { recursive: true });
-  fs.writeFileSync(viewPath, `${JSON.stringify(view, null, 2)}\n`, 'utf8');
+  // work-graph-intelligence S3: stamp a deterministic revision-hash onto the
+  // ON-DISK derived view only. `view` (what refreshView returns to store
+  // callers) stays the pure fold shape rebuildView produces — the revision is
+  // a sibling field written to state.json, never folded back into the view a
+  // rebuild returns. Determinism (same log -> same revision) keeps the
+  // rebuild-determinism e2e's before/after deep-equal green.
+  const persisted = { ...view, revision: viewRevision(view) };
+  fs.writeFileSync(viewPath, `${JSON.stringify(persisted, null, 2)}\n`, 'utf8');
 }
 
 // Shared tail of every mutation: rebuild the view fresh from the (now
