@@ -1141,13 +1141,42 @@ async function runVerb(verb, flags, positional, dir) {
         );
       }
 
+      // Iron Law gate (D16/D17), hoisted ahead of the --github branch —
+      // review-20260718-self-improve-loop finding f01: this check previously
+      // lived only inside the local-merge branch further below, so `approve
+      // --github` could land the exact same self-modifying diff without ever
+      // consulting it — a complete, structural bypass of the loop's own hard
+      // gate, contradicting D16's "one common point for every runner-sourced
+      // proposal, not just the local path". One check point now guards BOTH
+      // merge transports identically, before either can run. changedFiles
+      // diffs the item's own branch against the default trunk, so a leaf
+      // over-reports its file set (superset of its real leaf-vs-root diff) —
+      // the fail-safe direction, accepted as-is (unchanged from before this
+      // hoist). Refuses BEFORE any git mutation or GitHub call: the item
+      // stays `proposed`, nothing is touched, neither transport is reached.
+      if (source === 'runner') {
+        const ironLaw = classifyIronLaw({ filesChanged: changedFiles(repoRoot, item), description: item.description });
+        // review-20260718-self-improve-loop finding f02: only the bare flag
+        // (parsed as boolean `true`, no following value) counts as
+        // acknowledgment; any value form (e.g. a stray "false") fails closed.
+        if (ironLaw.required && flags['acknowledge-iron-law'] !== true) {
+          throw new StoreError(
+            'validation',
+            `approve: "${id}" trips the Iron Law — a failing test must precede this self-modifying diff before it can land. `
+              + `Matched flags: [${ironLaw.matchedFlags.join(', ') || 'none'}]; matched modules: [${ironLaw.matchedModules.join(', ') || 'none'}]. `
+              + `Re-run with --acknowledge-iron-law to confirm failing-test-first proof and proceed.`,
+          );
+        }
+      }
+
       // GitHub transport (github-adapter D1/D3/D5): `approve <id> --github --pr
       // <n>` merges a prior `review --github` PR through GitHub instead of a
-      // local git merge. Dispatched BEFORE the runner block's Iron Law and
-      // dirty-main-tree gates: a GitHub-side merge never touches the local
-      // working tree, so `isMainTreeClean` (which exists only because a LOCAL
-      // merge mutates the tree) must not gate it. The source gate is checked
-      // BEFORE the --pr presence check so a pull/legacy item always gets the
+      // local git merge. Dispatched BEFORE the runner block's dirty-main-tree
+      // gate: a GitHub-side merge never touches the local working tree, so
+      // `isMainTreeClean` (which exists only because a LOCAL merge mutates
+      // the tree) must not gate it. The Iron Law gate above DOES gate this
+      // branch now (hoisted, f01). The source gate is checked BEFORE the
+      // --pr presence check so a pull/legacy item always gets the
       // runner-sourced error, never a misleading "missing --pr" message for an
       // item that could never have a PR. Runs AFTER the worktree-identity
       // guards above (approve-worktree-guard-github-fix D1/D3): environment
@@ -1189,36 +1218,10 @@ async function runVerb(verb, flags, positional, dir) {
       }
 
       if (source === 'runner') {
-        // Iron Law gate (D16/D17): a runner-sourced diff that touches a
-        // self-modifying-capable module or trips a hard-gate keyword must not
-        // land without the approver consciously acknowledging that a failing
-        // test preceded the fix — fgOS cannot mechanically verify that
-        // history, so the honest mechanism is a deliberate override gesture,
-        // not a fabricated red/green check. One check point, inside the
-        // runner block but before the leaf-vs-root split below, so it guards
-        // both merge branches identically. changedFiles diffs the item's own
-        // branch against the default trunk, so a leaf over-reports its file
-        // set (superset of its real leaf-vs-root diff) — the fail-safe
-        // direction, accepted as-is. Refuses BEFORE the dirty-tree check and
-        // any git mutation: the item stays `proposed`, nothing is touched.
-        const ironLaw = classifyIronLaw({ filesChanged: changedFiles(repoRoot, item), description: item.description });
-        // review-20260718-self-improve-loop finding f02: parseArgs consumes any
-        // non-'--'-prefixed following token as a flag's string value, so
-        // `--acknowledge-iron-law false` would set this to the truthy string
-        // 'false' under a plain falsiness check — silently granting the
-        // override an operator typed to decline. Only the bare flag (parsed as
-        // boolean `true`, no following value) counts; any value form fails
-        // closed, matching this flag's stated boolean-only design (runner.md
-        // R37 — same shape as submit's --async/--unattended).
-        if (ironLaw.required && flags['acknowledge-iron-law'] !== true) {
-          throw new StoreError(
-            'validation',
-            `approve: "${id}" trips the Iron Law — a failing test must precede this self-modifying diff before it can land. `
-              + `Matched flags: [${ironLaw.matchedFlags.join(', ') || 'none'}]; matched modules: [${ironLaw.matchedModules.join(', ') || 'none'}]. `
-              + `Re-run with --acknowledge-iron-law to confirm failing-test-first proof and proceed.`,
-          );
-        }
-
+        // Iron Law check now runs earlier (hoisted above the --github branch,
+        // f01) so it guards both merge transports identically — see that
+        // block for the full rationale. This local-merge branch continues
+        // directly with the dirty-tree check.
         if (!isMainTreeClean(repoRoot)) {
           throw new StoreError('validation', `approve: working tree at "${repoRoot}" is not clean — commit or stash pending changes before approving "${id}".`);
         }
