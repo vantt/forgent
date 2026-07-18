@@ -208,6 +208,66 @@ anchor assertions.
 
 **Ngưỡng xem lại.** Không có — failure-driven, hai lần trả giá ở upstream rồi.
 
+## L9 — Thang hoàn tất của MỘT việc: run ≠ merge ≠ durable
+
+**Luật.** Một work-item đi qua BA mức hoàn tất KHÁC NHAU; consumer không được gộp:
+
+| Mức | Trạng thái item | Ai tuyên | Nghĩa |
+|---|---|---|---|
+| run-complete | `proposed` | runner (D3, verify tự chạy lại) | worker chạy xong + verify xanh TRÊN NHÁNH — "đã làm" nhưng CHƯA vào main |
+| merge-complete | `done` | cổng duyệt/merge (C5) | đã duyệt + nhập vào cây chính — "đã nhận" |
+| durable | `done` + đã đẩy | github-adapter (P28) | đã đẩy lên remote, sống ngoài máy này — "đã bền" |
+
+**Phân biệt với L7 (bắt buộc — hai trục khác nhau).** L7 đo độ bền LƯU TRỮ của một
+*artifact* (nó SỐNG ở đâu: D1 nhánh … D5 local-only). L9 đo TRẠNG THÁI hoàn tất
+của một *việc* (nó ĐÃ ĐI tới đâu trong vòng đời). Một item `proposed` là
+run-complete ở L9 trong khi artifact nhánh của nó là L7-D1 — cùng một sự việc,
+hai câu hỏi khác nhau. Header của L7 mượn cụm "chạy xong ≠ đã merge ≠ đã bền" để
+nói tinh thần; L9 là chỗ ba mức đó thành khái niệm có tên cho vòng đời việc.
+
+**Nguồn.** Sống ngầm trong P17 (PR lifecycle) và P28 (github-adapter); trực tiếp
+liên quan hai nửa của `fgos check` (predicted/actual outcome) và cổng merge C5.
+D-ID sẽ gán khi một slice đầu tiên cần trích L9 làm ràng buộc thiết kế.
+
+**Hệ quả.** Đọc `proposed` là "xong" là lỗi phân tầng — mới run-complete. Một yêu
+cầu "ship/release" đòi merge-complete tối thiểu; "bền/đã lưu ngoài" đòi durable.
+`approve --github` không tự dọn nhánh remote (github-adapter S3) chính là ranh
+giới merge-complete vs durable chưa khép kín — biết-nhưng-chưa-sửa, không nhầm là
+đã bền.
+
+**Ngưỡng xem lại.** Khi có fleet-run / remote-push flow thật, mỗi mức cần quy tắc
+retention/đối-chiếu riêng — bổ sung, không đổi ba mức.
+
+## L10 — Add-through-not-alongside: mở rộng QUA cửa, không đắp CẠNH cửa
+
+**Luật.** Một hành vi ghi/đọc mới LUÔN mở rộng cửa hiện có, KHÔNG BAO GIỜ mở một
+đường song song bên cạnh nó:
+
+- Trạng thái mới → thêm nhánh transition qua CÙNG `moveWork` (một cửa ghi), không
+  một hàm ghi riêng.
+- Field mới → cưỡi CÙNG event, sống qua CÙNG fold (spread `work.add`), không một
+  event-type/log riêng.
+- Read mới → qua facade store hiện có, không import thẳng một tầng Domain vào
+  Entry.
+
+**Nguồn / bằng chứng (đã DONE, không phải mục tiêu).** `awaiting-human` là một
+`moveWork` wrapper (`store.mjs` `putInAwaiting`/`answerAwaiting`), không phải write
+path thứ hai. work-graph-intelligence (P43 + S7–S9) chạm mọi metric/advisory qua
+facade store (`readyWork`/`graphMetrics`/`graphWhatIf`/`staleDoingAdvisory`/
+`footprintConflicts`), và thêm field (`discoveredFrom`, `footprint`) cưỡi cùng
+`work.add` spread — không cửa mới nào. Đây là doctrine đứng SAU L3 rule 4 (mọi ghi
+qua MỘT cửa) và contract C2 (single-write-door).
+
+**Hệ quả.** "Cửa có lỗ hổng vẫn là luật không có lỗ hổng" — đắp một đường cạnh cửa
+làm MỌI bảo đảm của cửa (CAS, cycle-check phi-chu-trình, envelope C1, serialize
+write-queue) mất hiệu lực TRONG IM LẶNG, vì đường mới không đi qua chúng. Review/
+test bắt "một write path THỨ HAI" hay "Entry import thẳng Domain" là red flag ngang
+với bỏ CAS.
+
+**Ngưỡng xem lại.** Khi multi-writer thật (gãy tiền đề single-writer của L3): cửa
+có thể tiến hóa thành lease/daemon, nhưng bất biến "MỘT cửa, mở rộng qua nó" giữ
+nguyên — chính là điều L3 ngưỡng-xem-lại đã hẹn.
+
 ---
 
 ## Trình tự thi công phía trên các luật
