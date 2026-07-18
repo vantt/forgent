@@ -534,6 +534,14 @@ export function parseDiscoveredBlocks(output) {
   return blocks;
 }
 
+// Per-dispatch ceiling on how many fgos-discovered blocks a single worker
+// output can mint into items (review-fix S10, P2 finding): untrusted worker
+// stdout could otherwise emit an unbounded run of blocks, each becoming an
+// autonomously-dispatched item. The cap never throws and never touches the
+// dispatch outcome — it only bounds how many of the parsed blocks are acted
+// on; the surplus is logged and dropped.
+const DISCOVERY_CAP = 20;
+
 // Create a work item for each block the worker reported, RUNNER-side (D3),
 // stamping discoveredFrom = the dispatched item's id. Each item is submit-
 // shaped: classify()-derived tier/kind/risk (block overrides win), a shared
@@ -543,9 +551,16 @@ export function parseDiscoveredBlocks(output) {
 // provenance (excluded from the cycle-check by design). Every write goes
 // through queue.enqueue (the serialized write door) — never a raw addWork —
 // and generateId is computed INSIDE the serialized callback so back-to-back
-// discoveries never collide on an id. FAIL-SAFE: parsing and each create are
-// isolated so a bad block is logged and skipped, never altering the dispatch
-// outcome or control flow.
+// discoveries never collide on an id. The same callback also re-scans the
+// current view for a prior item with discoveredFrom === item.id and a
+// case/whitespace-insensitive matching title (review-fix S10, P2 finding):
+// the same worker output repeating a block, or a re-dispatched item
+// re-emitting a block it already captured, is recognized as already-captured
+// and skipped rather than minting a second item. The scan runs inside the
+// serialized callback so it stays race-free against a concurrent discovery
+// in the same dispatch. FAIL-SAFE: parsing and each create are isolated so a
+// bad block is logged and skipped, never altering the dispatch outcome or
+// control flow.
 async function captureDiscoveredWork({ output, item, queue, dir, log }) {
   let blocks;
   try {
@@ -554,10 +569,24 @@ async function captureDiscoveredWork({ output, item, queue, dir, log }) {
     log(`fgos-runner: discovery-report parse failed for "${item.id}" (ignored): ${err.message}`);
     return;
   }
-  for (const block of blocks) {
+  const capped = blocks.slice(0, DISCOVERY_CAP);
+  const surplus = blocks.length - capped.length;
+  if (surplus > 0) {
+    log(`fgos-runner: discovery-report for "${item.id}" had ${blocks.length} blocks, capped to ${DISCOVERY_CAP} (${surplus} skipped)`);
+  }
+  for (const block of capped) {
     try {
       await queue.enqueue(async () => {
-        const id = generateId(block.title, Object.keys(listWork(dir).work));
+        const view = listWork(dir).work;
+        const normalizedTitle = block.title.trim().toLowerCase();
+        const alreadyCaptured = Object.values(view).some(
+          (w) => w.discoveredFrom === item.id && w.title.trim().toLowerCase() === normalizedTitle,
+        );
+        if (alreadyCaptured) {
+          log(`fgos-runner: discovery-report for "${item.id}" ("${block.title}") already captured, skipped (idempotent)`);
+          return;
+        }
+        const id = generateId(block.title, Object.keys(view));
         const derived = classify(block.title);
         addWork(dir, {
           id,

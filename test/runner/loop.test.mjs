@@ -1204,6 +1204,82 @@ test('wgi-8: a malformed fgos-discovered block is skipped (fail-safe) — the di
   assert.deepEqual(Object.keys(listWork(dir).work), ['item-happy'], 'malformed block creates nothing');
 });
 
+// --- S10 review-fix: discovery-capture cap + idempotency (2 P2 findings) ---
+
+test('S10: a worker output with more than DISCOVERY_CAP (20) fgos-discovered blocks creates exactly 20 items, surplus skipped, dispatch outcome unaffected', async () => {
+  const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
+  seedItem(dir, { id: 'item-flood' });
+  const bodies = Array.from({ length: 25 }, (_, i) =>
+    JSON.stringify({ title: `Discovered item ${i + 1}` }),
+  );
+  const config = configFor(writeDiscoveringExecutor(scriptDir, counterFile, bodies));
+
+  const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
+
+  assert.equal(result.dispatched[0].outcome, 'proposed', 'the cap never affects the dispatch outcome');
+  const discovered = Object.values(listWork(dir).work).filter((w) => w.discoveredFrom === 'item-flood');
+  assert.equal(discovered.length, 20, 'exactly DISCOVERY_CAP items created, the surplus 5 blocks skipped');
+});
+
+test('S10: a worker output repeating the identical block twice (same output) creates exactly one item', async () => {
+  const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
+  seedItem(dir, { id: 'item-repeat' });
+  const body = JSON.stringify({ title: 'Wire retry metrics into the dashboard' });
+  const config = configFor(writeDiscoveringExecutor(scriptDir, counterFile, [body, body]));
+
+  const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
+
+  assert.equal(result.dispatched[0].outcome, 'proposed');
+  const discovered = Object.values(listWork(dir).work).filter((w) => w.discoveredFrom === 'item-repeat');
+  assert.equal(discovered.length, 1, 'the second, identical block is recognized as already-captured and skipped');
+});
+
+test('S10: a re-dispatched item re-emitting a block it already captured on a prior dispatch creates no additional item', async () => {
+  const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
+  seedItem(dir, { id: 'item-redispatch' });
+  // Simulate a prior dispatch's already-captured discovery: a work item
+  // already exists, discoveredFrom = item-redispatch, matching title
+  // (different case/whitespace to also prove the match is normalized).
+  addWork(dir, {
+    id: 'prior-discovery',
+    title: '  wire RETRY metrics into the dashboard  ',
+    kind: 'feature',
+    status: 'todo',
+    deps: [],
+    risk: 'standard',
+    refs: [],
+    verify: 'chưa xác định',
+    stage: 'clarify',
+    discoveredFrom: 'item-redispatch',
+  });
+  const body = JSON.stringify({ title: 'Wire retry metrics into the dashboard' });
+  const config = configFor(writeDiscoveringExecutor(scriptDir, counterFile, [body]));
+
+  const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
+
+  assert.equal(result.dispatched[0].outcome, 'proposed');
+  const discovered = Object.values(listWork(dir).work).filter((w) => w.discoveredFrom === 'item-redispatch');
+  assert.equal(discovered.length, 1, 'still only the pre-existing capture — the re-emitted block minted no second item');
+});
+
+test('S10: two genuinely distinct blocks in one output still both create items (idempotency check does not over-match)', async () => {
+  const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
+  seedItem(dir, { id: 'item-distinct' });
+  const bodies = [
+    JSON.stringify({ title: 'Wire retry metrics into the dashboard' }),
+    JSON.stringify({ title: 'Add a health-check endpoint' }),
+  ];
+  const config = configFor(writeDiscoveringExecutor(scriptDir, counterFile, bodies));
+
+  const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
+
+  assert.equal(result.dispatched[0].outcome, 'proposed');
+  const discovered = Object.values(listWork(dir).work).filter((w) => w.discoveredFrom === 'item-distinct');
+  assert.equal(discovered.length, 2, 'two distinct titles both create items');
+  const titles = discovered.map((d) => d.title).sort();
+  assert.deepEqual(titles, ['Add a health-check endpoint', 'Wire retry metrics into the dashboard']);
+});
+
 /** A worker that emits a discovery block, then hangs past the timeout — so its
  * output reaches the runner on the DispatchError(err.stdout) path, never
  * worker.stdout. Proves the terminal-outcome capture covers BOTH sources. */
