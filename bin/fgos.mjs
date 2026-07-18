@@ -30,7 +30,7 @@ import { computeEntropy, computeCounts } from '../src/report/entropy.mjs';
 import { rankCandidates } from '../src/evolve/candidates.mjs';
 import { rankImpact } from '../src/state/impact.mjs';
 import { runGoalCheck } from '../src/runner/goal-check.mjs';
-import { classifySource, reviewDiff, mergeRunnerItem, cleanupMergedBranch, changedFiles, isWorkingTreeClean as isMainTreeClean, isFgosOnlyStatusLine, detectTrunk } from '../src/runner/merge.mjs';
+import { classifySource, reviewDiff, mergeRunnerItem, cleanupMergedBranch, changedFiles, isWorkingTreeClean as isMainTreeClean, isFgosOnlyStatusLine, detectTrunk, isMainWorktree } from '../src/runner/merge.mjs';
 import { createGitHubPR, mergeGitHubPR, viewGitHubPRStatus } from '../src/runner/github-adapter.mjs';
 import { classifyIronLaw } from '../src/evolve/iron-law.mjs';
 import { branchNameFor, branchExists, createWorktree, removeWorktree } from '../src/runner/worktree.mjs';
@@ -1156,6 +1156,22 @@ async function runVerb(verb, flags, positional, dir) {
             `approve: refusing to run from inside session "${session.sessionId}" worktree at "${wtReal}" — approve must land on the main checkout, which a session worktree structurally is not. Run approve from the main checkout, or end the session first with "fgos session end ${session.sessionId}".`,
           );
         }
+      }
+
+      // Structural guard (P44): the registry loop above only catches a
+      // worktree registered via `fgos session start`. A plain `git worktree
+      // add` run by hand is invisible to sessions.json, so it slipped through
+      // untouched — same false-verification risk (merge lands on that
+      // worktree's own checkout, or goal-check verifies its own possibly-stale
+      // tree, while the item is reported "done"/"verified on main"), just
+      // unregistered instead of registered. isMainWorktree reads git's own
+      // common-dir structure, so it catches ANY linked worktree regardless of
+      // how it was created.
+      if (!isMainWorktree(repoRoot)) {
+        throw new StoreError(
+          'validation',
+          `approve: refusing to run from "${repoRoot}" — this is a git worktree, not the repository's main working tree, whether or not it was created through "fgos session start". Run approve from the main checkout.`,
+        );
       }
 
       if (source === 'runner') {

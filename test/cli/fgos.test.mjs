@@ -3783,6 +3783,98 @@ test('return succeeds unchanged from inside a real session worktree (created via
   }
 });
 
+// --- approve ad-hoc (unregistered) worktree guard (P44) --------------------
+//
+// The registry-based guard above only catches a worktree created through
+// `fgos session start` (session.mjs's createSession). A plain `git worktree
+// add` run by hand is invisible to sessions.json, so it slipped through the
+// same guard block untouched — approve would merge/verify against that
+// worktree's checkout while still reporting the item `done`, exactly the
+// silent false-verification the registry guard exists to prevent, just from
+// an unregistered path instead of a registered one. The fix must catch ANY
+// worktree structurally — main-vs-linked, not registered-vs-not.
+//
+// Uses initGitCwdMain (the REAL fgos convention: `.fgos/events.jsonl` tracked
+// and committed, only `.fgos/state.json` gitignored) rather than
+// initSessionSafeCwd's fully-ignored `.fgos/` — a plain `git worktree add`
+// only ever checks out tracked content, so the ad-hoc worktree must have a
+// genuinely committed events log to see the item at all (mirroring what a
+// real ad-hoc worktree of this repo would have on disk).
+
+function addAdHocWorktree(cwd, branch) {
+  const worktreePath = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-adhoc-wt-'));
+  fs.rmdirSync(worktreePath); // git worktree add requires the path not exist yet
+  execFileSync('git', ['worktree', 'add', '-b', branch, worktreePath, 'HEAD'], { cwd });
+  return worktreePath;
+}
+
+function removeAdHocWorktree(cwd, worktreePath) {
+  execFileSync('git', ['worktree', 'remove', '--force', worktreePath], { cwd });
+}
+
+test('approve refuses from an ad-hoc worktree never created through "fgos session start" (runner source) — no merge, item stays proposed, main HEAD unchanged, exit 4', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeRunnerProposedItem(cwd, 'approve-adhoc-runner', { verify: 'test -f approve-adhoc-runner-produced.txt' });
+  const headBefore = gitHead(cwd);
+
+  const worktreePath = addAdHocWorktree(cwd, 'adhoc-runner-branch');
+  try {
+    assert.equal(stateView(cwd).work['approve-adhoc-runner'].status, 'proposed', 'sanity: the ad-hoc worktree really does see the item (real committed events log)');
+    const result = run(worktreePath, ['approve', 'approve-adhoc-runner']);
+    assert.equal(result.status, 4, `expected a clean validation refusal, not a merge on an unregistered worktree: ${result.stdout}${result.stderr}`);
+    assert.equal(stateView(cwd).work['approve-adhoc-runner'].status, 'proposed', 'item is untouched — no merge, no false "done"');
+    assert.equal(gitHead(cwd), headBefore, 'main HEAD must be unchanged — nothing landed on main');
+  } finally {
+    removeAdHocWorktree(cwd, worktreePath);
+  }
+});
+
+test('approve refuses from an ad-hoc worktree never created through "fgos session start" (pull source) — refuses before any goal-check, item stays proposed, exit 4', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  commitPending(cwd, 'state: init');
+  addOk(cwd, 'approve-adhoc-pull', { verify: 'test -f proof.txt' });
+  commitPending(cwd, 'state: add');
+  run(cwd, ['take', '--id', 'approve-adhoc-pull']);
+  commitFile(cwd, 'proof.txt');
+  run(cwd, ['return', 'approve-adhoc-pull']);
+  commitPending(cwd, 'state: return');
+
+  // proof.txt exists at HEAD, so an unguarded ad-hoc-worktree approve would
+  // run goal-check, pass, and mark the item done without ever having proven
+  // anything about the actual main checkout — the exact silent
+  // false-verification this guard must close.
+  const worktreePath = addAdHocWorktree(cwd, 'adhoc-pull-branch');
+  try {
+    assert.equal(stateView(cwd).work['approve-adhoc-pull'].status, 'proposed', 'sanity: the ad-hoc worktree really does see the item');
+    const result = run(worktreePath, ['approve', 'approve-adhoc-pull']);
+    assert.equal(result.status, 4, `expected a clean validation refusal, not a false-verified goal-check: ${result.stdout}${result.stderr}`);
+    assert.equal(stateView(cwd).work['approve-adhoc-pull'].status, 'proposed', 'item stays proposed — goal-check never ran to close it');
+  } finally {
+    removeAdHocWorktree(cwd, worktreePath);
+  }
+});
+
+test('approve from the main checkout is unaffected by the ad-hoc-worktree guard — runner and pull both still close to done, exit 0', () => {
+  const cwdR = initGitCwdMain();
+  run(cwdR, ['init']);
+  makeRunnerProposedItem(cwdR, 'approve-adhoc-main-runner', { verify: 'test -f approve-adhoc-main-runner-produced.txt' });
+  const resR = run(cwdR, ['approve', 'approve-adhoc-main-runner']);
+  assert.equal(resR.status, 0, `runner approve from main must still succeed: ${resR.stderr}`);
+  assert.equal(stateView(cwdR).work['approve-adhoc-main-runner'].status, 'done');
+
+  const cwdP = initGitCwdMain();
+  run(cwdP, ['init']);
+  addOk(cwdP, 'approve-adhoc-main-pull', { verify: 'test -f proof.txt' });
+  run(cwdP, ['take', '--id', 'approve-adhoc-main-pull']);
+  commitFile(cwdP, 'proof.txt');
+  run(cwdP, ['return', 'approve-adhoc-main-pull']);
+  const resP = run(cwdP, ['approve', 'approve-adhoc-main-pull']);
+  assert.equal(resP.status, 0, `pull approve from main must still succeed: ${resP.stderr}`);
+  assert.equal(stateView(cwdP).work['approve-adhoc-main-pull'].status, 'done');
+});
+
 // --- work-graph-intelligence S5: `fgos graph` read verb -------------------
 
 test('graph verb: reports connected components (independent parallel tracks) in a fgos.v1 envelope, and is a pure read (no event appended, exit 0)', () => {

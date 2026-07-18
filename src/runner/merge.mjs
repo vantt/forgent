@@ -40,6 +40,8 @@
 // name anymore. Wiring an actual caller to pass a non-default trunk is out
 // of scope here (Epic 4's job); this only makes the primitive capable.
 
+import fs from 'node:fs';
+import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { branchNameFor, branchExists, reclaimOrphanedCheckout } from './worktree.mjs';
 import { runGoalCheck } from './goal-check.mjs';
@@ -111,6 +113,50 @@ export function isWorkingTreeClean(repoRoot) {
     .split('\n')
     .filter((line) => line.trim() !== '')
     .every(isFgosOnlyStatusLine);
+}
+
+function realpathOrSelf(p) {
+  try {
+    return fs.realpathSync(p);
+  } catch {
+    return path.resolve(p);
+  }
+}
+
+/**
+ * Whether `repoRoot` IS the repo's main working tree — never a linked
+ * worktree, registered through `fgos session start` (session.mjs) or ad-hoc
+ * (a plain `git worktree add` run by hand, invisible to `sessions.json`).
+ * `approve`'s registry-based guard only ever caught the registered case; an
+ * ad-hoc worktree slipped through the exact same risk untouched — a merge
+ * landing on that worktree's own checkout, or a goal-check verifying its own
+ * (possibly stale/divergent) tree, while the item is still reported "done" /
+ * "verified on main" (P44).
+ *
+ * The check is structural, not registry-based, so it catches both: a main
+ * worktree's git-common-dir sits directly inside its own toplevel (its
+ * parent IS the toplevel); a linked worktree's common-dir resolves to the
+ * MAIN repo's `.git`, whose parent is the main repo root — never the linked
+ * worktree's own toplevel.
+ *
+ * A `repoRoot` that is not a git repository at all (legacy-item tests, or a
+ * plain directory `approve` is otherwise happy to degrade against) has no
+ * worktree concept to violate — trivially "main", fail-open, matching how
+ * every other legacy-source path in `approve` already tolerates a non-git
+ * cwd.
+ */
+export function isMainWorktree(repoRoot) {
+  let toplevelRaw;
+  try {
+    toplevelRaw = git(repoRoot, ['rev-parse', '--show-toplevel']).trim();
+  } catch {
+    return true;
+  }
+  const toplevel = realpathOrSelf(toplevelRaw);
+  const commonDirRaw = git(repoRoot, ['rev-parse', '--git-common-dir']).trim();
+  const commonDirAbs = path.isAbsolute(commonDirRaw) ? commonDirRaw : path.resolve(repoRoot, commonDirRaw);
+  const commonDirParent = realpathOrSelf(path.dirname(commonDirAbs));
+  return toplevel === commonDirParent;
 }
 
 /** Classify a proposed `item` into its diff/merge source (see module doc). */
