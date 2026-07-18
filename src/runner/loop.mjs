@@ -541,6 +541,18 @@ export function parseDiscoveredBlocks(output) {
 // dispatch outcome — it only bounds how many of the parsed blocks are acted
 // on; the surplus is logged and dropped.
 const DISCOVERY_CAP = 20;
+const DISCOVERY_TITLE_LOG_MAX = 120;
+
+// Collapses whitespace/newlines and clamps length so a crafted discovery-block
+// title can never forge extra runner log lines (review-fix S11, P3 finding).
+// Only the logged copy is normalized — the title stored on the work item via
+// addWork is never touched by this.
+function sanitizeTitleForLog(title) {
+  const collapsed = title.replace(/\s+/g, ' ').trim();
+  return collapsed.length > DISCOVERY_TITLE_LOG_MAX
+    ? `${collapsed.slice(0, DISCOVERY_TITLE_LOG_MAX)}…`
+    : collapsed;
+}
 
 // Create a work item for each block the worker reported, RUNNER-side (D3),
 // stamping discoveredFrom = the dispatched item's id. Each item is submit-
@@ -583,7 +595,7 @@ async function captureDiscoveredWork({ output, item, queue, dir, log }) {
           (w) => w.discoveredFrom === item.id && w.title.trim().toLowerCase() === normalizedTitle,
         );
         if (alreadyCaptured) {
-          log(`fgos-runner: discovery-report for "${item.id}" ("${block.title}") already captured, skipped (idempotent)`);
+          log(`fgos-runner: discovery-report for "${item.id}" ("${sanitizeTitleForLog(block.title)}") already captured, skipped (idempotent)`);
           return;
         }
         const id = generateId(block.title, Object.keys(view));
@@ -605,7 +617,7 @@ async function captureDiscoveredWork({ output, item, queue, dir, log }) {
         log(`fgos-runner: discovered work "${id}" from "${item.id}" (runner-created, stage clarify)`);
       });
     } catch (err) {
-      log(`fgos-runner: discovery-report create skipped for "${item.id}" ("${block.title}"): ${err.message}`);
+      log(`fgos-runner: discovery-report create skipped for "${item.id}" ("${sanitizeTitleForLog(block.title)}"): ${err.message}`);
     }
   }
 }

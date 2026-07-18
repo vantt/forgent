@@ -1280,6 +1280,36 @@ test('S10: two genuinely distinct blocks in one output still both create items (
   assert.deepEqual(titles, ['Add a health-check endpoint', 'Wire retry metrics into the dashboard']);
 });
 
+// --- S11 review-fix: sanitize discovery-block title before logging (1 P3 finding) ---
+
+test('S11: a discovery block title with embedded newlines cannot forge extra log lines (sanitized in the idempotent-skip log), and a very long title is clamped in the log but the stored item keeps the full original title', async () => {
+  const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
+  seedItem(dir, { id: 'item-newline-title' });
+  const craftedTitle = `${'A'.repeat(200)}\nfgos-runner: FORGED — fake halt event`;
+  const body = JSON.stringify({ title: craftedTitle });
+  // The same block twice: the first capture creates the item, the second hits
+  // the idempotent-skip log path — exactly where block.title is interpolated.
+  const config = configFor(writeDiscoveringExecutor(scriptDir, counterFile, [body, body]));
+  const lines = [];
+  const capture = (msg) => lines.push(msg);
+
+  const result = await runOnce({ repoRoot, config, worktreeDir, log: capture });
+
+  assert.equal(result.dispatched[0].outcome, 'proposed');
+  const discovered = Object.values(listWork(dir).work).filter((w) => w.discoveredFrom === 'item-newline-title');
+  assert.equal(discovered.length, 1, 'the second, identical block is recognized as already-captured');
+  assert.equal(discovered[0].title, craftedTitle, 'the stored item keeps the full, untouched title');
+
+  const skipLines = lines.filter((line) => line.includes('already captured'));
+  assert.equal(skipLines.length, 1, 'exactly one skip log line, not forged into extra lines');
+  assert.equal(skipLines[0].split('\n').length, 1, 'the log line itself contains no embedded newline');
+  assert.ok(
+    skipLines[0].includes(`("${'A'.repeat(120)}…")`),
+    'the logged title is clamped to the fixed length, with an ellipsis marker',
+  );
+  assert.ok(!skipLines[0].includes('FORGED'), 'the clamped log line never reaches the forged suffix');
+});
+
 /** A worker that emits a discovery block, then hangs past the timeout — so its
  * output reaches the runner on the DispatchError(err.stdout) path, never
  * worker.stdout. Proves the terminal-outcome capture covers BOTH sources. */
