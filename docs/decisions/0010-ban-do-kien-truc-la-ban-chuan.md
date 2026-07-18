@@ -4,8 +4,8 @@
 
 ## Bối cảnh
 
-Hệ chuẩn bị nhận một loạt thành phần mới (S2 friction capture, P14–P17 lifecycle
-stages, P8 signal). Trước đó các khái niệm kiến trúc nằm rải trong tài liệu bàn
+Hệ chuẩn bị nhận một loạt thành phần mới (S2 friction capture, STR14–STR17 lifecycle
+stages, STR8 signal). Trước đó các khái niệm kiến trúc nằm rải trong tài liệu bàn
 luận (ba trục ngang hàng, người đọc tự hợp nhất, tên va chạm, contract không tên).
 `docs/architecture-map.md` được viết làm đề xuất hợp nhất, qua hai vòng phản biện
 có kiểm chứng trên code: vòng 1 soi tự-nhất-quán (chiều phụ thuộc, maturity nói
@@ -26,18 +26,18 @@ sai giữa Domain và Infra.
    có code. Không sửa văn bản luật L5 tại chỗ, không mở luật mới — khi L5 tới
    ngưỡng xem lại thì gộp chính thức lúc supersede.
 3. **Năm câu hỏi mở của bản đồ chốt theo đề xuất:** (a) nợ C2 một-cửa-ghi
-   per-process giải ở PBI riêng trước P6 fan-out, không chặn P15; (b) xử lý L5
-   như trên; (c) `dispatch.mjs` giữ một file ở Infra, chỉ tách khi P8/P16 đòi;
-   (d) C1 envelope đợi P14; (e) registry-manifest + 2 phép kiểm máy (chiều
-   import + đủ sổ) là **PBI P20, đứng trước S2-friction**.
+   per-process giải ở PBI riêng trước STR6 fan-out, không chặn STR15; (b) xử lý L5
+   như trên; (c) `dispatch.mjs` giữ một file ở Infra, chỉ tách khi STR8/STR16 đòi;
+   (d) C1 envelope đợi STR14; (e) registry-manifest + 2 phép kiểm máy (chiều
+   import + đủ sổ) là **PBI STR20, đứng trước S2-friction**.
 4. Bản đồ nối vào đường đọc chuẩn: `docs/specs/reading-map.md` + mục lục README.
    Tài liệu bàn luận gốc ở xưởng hạ thành thinking record.
 
 ## Hệ quả
 
 - Mọi feature mới đi qua nghi thức 3 bước của map §9 trong exploring/planning;
-  registry không drift vì P20 giao cho máy giữ (verify đỏ khi import ngược tầng
+  registry không drift vì STR20 giao cho máy giữ (verify đỏ khi import ngược tầng
   hoặc file thiếu row).
 - Đổi bản đồ = decision record mới supersede 0010 + nâng version, không sửa ngầm.
-- Nợ có tên còn mở: C2 cross-process lease (trước P6), C6 designed-chưa-code,
+- Nợ có tên còn mở: C2 cross-process lease (trước STR6), C6 designed-chưa-code,
   C3 partial (3 field RUN_CONTRACT vay khi fan-out).

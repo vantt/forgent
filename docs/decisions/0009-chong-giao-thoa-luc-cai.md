@@ -3,7 +3,7 @@ title: Chống giao thoa tiến trình lúc cài (harness coexistence)
 date: 2026-07-14
 status: accepted
 source_decisions: [99a8a7fc]
-relates_backlog: [P10]
+relates_backlog: [STR10]
 relates_specs: [platform-foundations]
 ---
 
@@ -38,7 +38,7 @@ với harness khác cùng máy. Bốn nguyên tắc:
 ## Hệ quả
 
 - **Đây là non-functional requirement mở, CHƯA thực thi** — ghi lại để install
-  design tương lai không bỏ sót. Việc thực thi nằm ở backlog **P10**.
+  design tương lai không bỏ sót. Việc thực thi nằm ở backlog **STR10**.
 - **Tiêu chí kiểm** khi làm: một canary chạy trong project cài **cả hai** harness —
   hai bên không chặn nhầm write của nhau, agent không nhận mệnh lệnh điều phối mâu
   thuẫn.

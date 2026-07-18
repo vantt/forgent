@@ -66,7 +66,7 @@ Chọn **mô hình (3)**, với các chốt sau — tất cả ở mức interfa
    chạm lib trực tiếp; mọi UI ngoài terminal đi qua cửa mạng của daemon → daemon là
    điều kiện cần cho bất kỳ UI ngoài terminal.
 
-6. **Kênh attention/push tách thành subsystem riêng** (backlog P48) với
+6. **Kênh attention/push tách thành subsystem riêng** (backlog STR48) với
    delivery-semantics tường minh (at-least-once, dedup, routing, ack, escalation),
    sống ở consumer — không để nó là phần phụ của review in/out.
 
@@ -81,10 +81,10 @@ Chọn **mô hình (3)**, với các chốt sau — tất cả ở mức interfa
   ghi single-door (C2) và lock giữ nguyên.
 - **Chưa quyết (ngoài phạm vi record này):** tầng OWNER — daemon là co-writer (đứng
   trên cùng lock, giữ CLI thật sự standalone; đổi lại nợ đồng-thời read-modify-write,
-  backlog P45) hay sole-writer-khi-bật — chưa chốt. Sub-choice chiều-ra: poll-qua-CLI
+  backlog STR45) hay sole-writer-khi-bật — chưa chốt. Sub-choice chiều-ra: poll-qua-CLI
   (đơn giản, nghiêng cái này trước) vs tail-event-log (push tức thì nhưng khoá
   log-format).
-- **Gate trước khi thực thi:** review in/out (backlog P46) và kênh push (P48) phải
+- **Gate trước khi thực thi:** review in/out (backlog STR46) và kênh push (STR48) phải
   được cân độ ưu tiên so với nợ content đang chặn dogfood (discovery-context,
   worker-execution, feedback-loop) — quyết định *kiến trúc* này không tự nó nâng
   *độ ưu tiên thực thi*.

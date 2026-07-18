@@ -11,7 +11,7 @@ extends: [0010]
 
 ## Bối cảnh
 
-`docs/id-systems-audit.md` (P47) rà soát toàn bộ hệ đặt tên/đánh mã đang chạy
+`docs/id-systems-audit.md` (STR47) rà soát toàn bộ hệ đặt tên/đánh mã đang chạy
 song song trong repo và phát hiện contract registry (`architecture-map.md`
 §7) là hệ duy nhất còn dùng định danh một-chữ-cái-trần (`C1`-`C9`) — khác mọi
 hệ đã có tiền tố 3-chữ tự khai type (`TSK`, `ADR`, `RUL`, `STR`). Một định
@@ -21,7 +21,7 @@ git diff, hay log — người đọc phải tra ngược ngữ cảnh. Audit #6
 (ví dụ `RUL042`) để số lượng contract có thể vượt quá 9 mà không đổi độ rộng
 định danh giữa chừng — ví dụ khoá trong audit: `CTR009`.
 
-Backlog `P54` submit hướng này thành việc thi công cụ thể: đổi mọi citation
+Backlog `STR54` submit hướng này thành việc thi công cụ thể: đổi mọi citation
 `C1`-`C9` genuine trong 7 file + `architecture-map.md` chính nó, không đổi ý
 nghĩa/ranh giới/maturity của bất kỳ contract nào.
 
