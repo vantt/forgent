@@ -2,7 +2,7 @@
 title: Coexistence — chạy cạnh một harness agent khác
 status: living
 relates_decisions: [ADR0009]
-relates_backlog: [P10]
+relates_backlog: [STR10]
 ---
 
 # Coexistence
@@ -118,7 +118,7 @@ hai. Cả hai đều thuộc về cây mã nguồn của harness kia, không thu
 không tự sửa một harness khác. Bash — tức là gọi `fgos <verb>` như một lệnh
 shell thường — không bị chặn bởi cả hai cơ chế trên.
 
-Phần fgOS của P10 (manifest, detection, nhường-nhịn, canary pin đúng thực
+Phần fgOS của STR10 (manifest, detection, nhường-nhịn, canary pin đúng thực
 trạng) đóng đủ ở đợt này. Gap ở trên là gap phía-ngoài, được pin làm known-gap
 có bằng chứng sống, không phải bị che giấu — flip khi phía kia sửa.
 
@@ -130,4 +130,4 @@ có bằng chứng sống, không phải bị che giấu — flip khi phía kia 
 - `bin/fgos.mjs` verb `init` — điểm gọi detection.
 - `test/e2e/coexistence-canary.test.mjs` — canary pin known-gap + footprint +
   nhường-nhịn.
-- `docs/backlog.md` (P10) — trạng thái backlog, trỏ tới hồ sơ xưởng.
+- `docs/backlog.md` (STR10) — trạng thái backlog, trỏ tới hồ sơ xưởng.

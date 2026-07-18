@@ -1,6 +1,6 @@
 # Operator runbook — herdr cockpit
 
-The official fgOS operator cockpit (P40 / decision D d3dbe7f5, supersedes the
+The official fgOS operator cockpit (STR40 / decision D d3dbe7f5, supersedes the
 earlier tmux-based D ef6ed305). herdr arranges panes; every pane runs the
 real fgOS CLI standalone — herdr is chrome, not a brain.
 
@@ -32,7 +32,7 @@ herdr tab focus <tab_id>
    shell loop (5s). No new runner flag: `--once` + `runner.lock` are already
    idempotent, so this is a plain wrapper, not new runner behavior.
 2. **fgos-tail-log** — `tail -F .fgos/logs/*.log`, live per-item worker
-   output as it's produced (P39).
+   output as it's produced (STR39).
 3. **human-door** — a plain interactive shell. This pane *is* where you type
    the next `fgos` verb (`submit`, `ask`/`answer`, `review`/`approve`/
    `reject`, `catchup`) — intentionally unscripted.
@@ -70,5 +70,5 @@ takes over; anyone else can still read.
 
 This cockpit adds no new code on the merge/approve path. `approve` already
 does not false-alarm when the runner merges in parallel — that guarantee was
-fixed by P35 (`fgos-multi-session-checkout`) and this cockpit only exposes it
+fixed by STR35 (`fgos-multi-session-checkout`) and this cockpit only exposes it
 through the dashboard pane, it does not re-implement it.

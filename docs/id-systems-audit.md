@@ -1,5 +1,5 @@
 ---
-title: Audit loại-hình công việc & hệ đặt tên/đánh mã (P47)
+title: Audit loại-hình công việc & hệ đặt tên/đánh mã (STR47)
 status: DRAFT — nhiều hệ đã chốt hướng, #7/#8/#9/#10 còn mở
 updated: 2026-07-18
 kind: audit-draft
@@ -7,14 +7,14 @@ kind: audit-draft
 
 # Audit: loại-hình công việc + hệ đặt tên/đánh mã
 
-**DRAFT.** Tài liệu này trả lời `docs/backlog.md` P47. Bảng inventory trích
+**DRAFT.** Tài liệu này trả lời `docs/backlog.md` STR47. Bảng inventory trích
 thẳng từ code/docs thật (file:line), không suy đoán. §4 ghi nhận trạng thái
 quyết định theo từng hệ — **ghi nhận trước, điều chỉnh sau**: các hướng đã
 chốt (✅) vẫn CHƯA áp dụng vào `runner.md`/`architecture-map.md`/
 `classify.mjs`/… — đây là bước ghi lại hướng, migration thật là 1 plan thi
 công riêng sau khi chốt hết.
 
-## Bối cảnh (P47)
+## Bối cảnh (STR47)
 
 > Audit thống nhất **loại-hình công việc** + **hệ đặt tên/đánh mã** đang chạy
 > song song trong hệ thống — chưa có review nào gộp chung: (a) `kind`
@@ -22,13 +22,13 @@ công riêng sau khi chốt hết.
 > giới ở một chỗ: P# tuần tự, D-hex, R#, C1-C9, cell-id `<feature>-N`; (c)
 > tên feature kebab-case tự đặt tay.
 
-`work.id` (#1) không nằm trong danh sách gốc của P47 — phát hiện thêm trong
+`work.id` (#1) không nằm trong danh sách gốc của STR47 — phát hiện thêm trong
 lúc thảo luận, gộp vào audit vì cùng loại vấn đề.
 
 **Khung xét trọng số (thảo luận 2026-07-18):** decision `0004`
 (`repo/docs/decisions/0004-pham-vi-va-non-goal.md`) đã khoá: fgOS chạy
 **song song, không thay thế** harness phát triển (bee) cho tới khi chạm
-"ngưỡng-có-tên". P50 (`docs/backlog.md`) là chính bước mở ngưỡng đó — induct
+"ngưỡng-có-tên". STR50 (`docs/backlog.md`) là chính bước mở ngưỡng đó — induct
 skill-workflow của bee vào fgOS. Hệ quả: **hệ id của bee (#7-#10) là giàn
 giáo TẠM THỜI** — dùng trong giai đoạn xây fgOS, không cần đầu tư sâu; **hệ
 id của fgOS (#1-#6) là SẢN PHẨM VĨNH VIỄN**, và về sau chính fgOS (không cần
@@ -111,7 +111,7 @@ trùng ký tự khi đọc cạnh nhau (đúng trường hợp #3 Story vs #11 s
 | 3 | Story `P<n>` → `STR<n>` | ✅ Đã chốt hướng |
 | 4 | ADR → `ADR<n>` khi rút gọn | ✅ Đã chốt |
 | 5 | `R#` → `RUL<n>` | ✅ Đã chốt hướng (chưa migrate) |
-| 6 | `C#` → `CTR<n>` | ✅ Đã migrate (P54, 2026-07-18) — `CTR001`-`CTR009`, decision `ADR0015` |
+| 6 | `C#` → `CTR<n>` | ✅ Đã migrate (STR54, 2026-07-18) — `CTR001`-`CTR009`, decision `ADR0015` |
 | 7 | D-hex global | 🟡 Còn mở — xem §5 |
 | 8 | `D<n>` local | 🟡 Còn mở — xem §5 |
 | 9 | cell-id | ⏸ Để sau |
@@ -166,7 +166,7 @@ cần đầu tư sâu — chỉ cần đủ rõ để không nhầm trong lúc b
 
 ---
 
-Nguồn: `repo/docs/backlog.md` P47 + thảo luận 2026-07-18. Bằng chứng đọc
+Nguồn: `repo/docs/backlog.md` STR47 + thảo luận 2026-07-18. Bằng chứng đọc
 trực tiếp: `src/intake/classify.mjs`, `src/intake/decompose.mjs`,
 `src/state/work.mjs`, `src/state/store.mjs`, `.bee/bin/lib/cells.mjs`,
 `.bee/bin/lib/decisions.mjs`, `docs/architecture-map.md`,

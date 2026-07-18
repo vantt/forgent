@@ -216,7 +216,7 @@ anchor assertions.
 |---|---|---|---|
 | run-complete | `proposed` | runner (D3, verify tự chạy lại) | worker chạy xong + verify xanh TRÊN NHÁNH — "đã làm" nhưng CHƯA vào main |
 | merge-complete | `done` | cổng duyệt/merge (CTR005) | đã duyệt + nhập vào cây chính — "đã nhận" |
-| durable | `done` + đã đẩy | github-adapter (P28) | đã đẩy lên remote, sống ngoài máy này — "đã bền" |
+| durable | `done` + đã đẩy | github-adapter (STR28) | đã đẩy lên remote, sống ngoài máy này — "đã bền" |
 
 **Phân biệt với L7 (bắt buộc — hai trục khác nhau).** L7 đo độ bền LƯU TRỮ của một
 *artifact* (nó SỐNG ở đâu: D1 nhánh … D5 local-only). L9 đo TRẠNG THÁI hoàn tất
@@ -225,7 +225,7 @@ run-complete ở L9 trong khi artifact nhánh của nó là L7-D1 — cùng mộ
 hai câu hỏi khác nhau. Header của L7 mượn cụm "chạy xong ≠ đã merge ≠ đã bền" để
 nói tinh thần; L9 là chỗ ba mức đó thành khái niệm có tên cho vòng đời việc.
 
-**Nguồn.** Sống ngầm trong P17 (PR lifecycle) và P28 (github-adapter); trực tiếp
+**Nguồn.** Sống ngầm trong STR17 (PR lifecycle) và STR28 (github-adapter); trực tiếp
 liên quan hai nửa của `fgos check` (predicted/actual outcome) và cổng merge CTR005.
 D-ID sẽ gán khi một slice đầu tiên cần trích L9 làm ràng buộc thiết kế.
 
@@ -252,7 +252,7 @@ retention/đối-chiếu riêng — bổ sung, không đổi ba mức.
 
 **Nguồn / bằng chứng (đã DONE, không phải mục tiêu).** `awaiting-human` là một
 `moveWork` wrapper (`store.mjs` `putInAwaiting`/`answerAwaiting`), không phải write
-path thứ hai. work-graph-intelligence (P43 + S7–S9) chạm mọi metric/advisory qua
+path thứ hai. work-graph-intelligence (STR43 + S7–S9) chạm mọi metric/advisory qua
 facade store (`readyWork`/`graphMetrics`/`graphWhatIf`/`staleDoingAdvisory`/
 `footprintConflicts`), và thêm field (`discoveredFrom`, `footprint`) cưỡi cùng
 `work.add` spread — không cửa mới nào. Đây là doctrine đứng SAU L3 rule 4 (mọi ghi
