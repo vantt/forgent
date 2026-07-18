@@ -59,7 +59,7 @@ và bảo đảm phi-chu-trình, trong khi hai trường lưu trữ vẫn tách 
   biến 896219a7 ("đồ thị phi chu trình") đúng cho **toàn bộ** đồ thị hợp
   nhất, không chỉ nhánh `deps`.
 - **Dẫn xuất, không vật lý (derived-not-physical) — ba căn cứ:**
-  1. **R11** (log bất khả xâm phạm, `work-state.md:703`): một trường
+  1. **RUL11 (work-state)** (log bất khả xâm phạm, `work-state.md:703`): một trường
      `edges[]` lưu trữ mới sẽ đòi migration cho mọi event cũ; một
      read-projection thuần Domain thì không.
   2. **Học thuyết DT2 "add-through-không-alongside"**: mở rộng cửa ghi hiện
@@ -68,7 +68,7 @@ và bảo đảm phi-chu-trình, trong khi hai trường lưu trữ vẫn tách 
   3. **~10 consumer đọc trực tiếp `.deps`/`.parent`** (frontier, impact,
      `validateDeps`, v.v.) — giữ nguyên, không cần migrate.
 - Vì thuần dẫn xuất: **không có trường lưu trữ mới, `SCHEMA_VERSION` giữ
-  nguyên 2**, mọi event cũ replay y hệt (R11).
+  nguyên 2**, mọi event cũ replay y hệt (RUL11 (work-state)).
 
 ## Hệ quả
 

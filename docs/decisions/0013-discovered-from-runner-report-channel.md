@@ -88,7 +88,7 @@ Kênh này là **cố-gắng-tối-đa, tối-đa-một-lần** (best-effort, at
 ít-nhất-một-lần. Một report hợp lệ được `runner` phân tích thành công đúng MỘT LẦN, tại
 kết cục cuối của lượt dispatch; nếu tiến trình runner chết giữa lúc phân tích và lúc
 `addWork` ghi xong, report đó mất — không có cơ chế đối-soát-lại nào đọc lại output đã
-lưu để phục hồi report đã mất. Xem spec Runner "Báo việc-phát-hiện từ trợ lý" / R45.
+lưu để phục hồi report đã mất. Xem spec Runner "Báo việc-phát-hiện từ trợ lý" / RUL45 (runner).
 
 ## Phương án đã cân nhắc và bỏ
 

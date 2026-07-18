@@ -158,7 +158,7 @@ cần đầu tư sâu — chỉ cần đủ rõ để không nhầm trong lúc b
 2. cell-id (#9) và feature slug (#10) — chưa bàn.
 3. Phụ lục boundary cuối cùng (sau khi chốt hết) đặt ở `architecture-map.md`
    hay `reading-map.md`, hay cả hai?
-4. `R#`→`RUL<n>` và `C#`→`CTR<n>` là migration có quy mô (R1-R43 trong 5
+4. `R#`→`RUL<n>` và `C#`→`CTR<n>` là migration có quy mô (R1-R45 trong 5
    spec file, C1-C9 rải khắp `architecture-map.md` + mermaid + docs khác) —
    cần liệt kê hết call site trước khi đổi.
 5. `work.id`/Story/ADR-ngắn/RUL/CTR đã đủ rõ để chuyển sang lập plan thi
