@@ -1,7 +1,7 @@
 ---
 title: Coexistence — chạy cạnh một harness agent khác
 status: living
-relates_decisions: [0009]
+relates_decisions: [ADR0009]
 relates_backlog: [P10]
 ---
 
@@ -93,7 +93,7 @@ thành một entry).
 
 ## Known Gaps (thành thật, chưa flip)
 
-Nguyên tắc 2 của record 0009 ("hook gate theo path của mình — không quơ lên
+Nguyên tắc 2 của record ADR0009 ("hook gate theo path của mình — không quơ lên
 path harness khác") hiện **chưa được thi hành ở phía harness ngoài fgOS**
 trong đợt cài này. Một canary thật (spawn hook chặn-ghi thật của một harness
 tham chiếu, chạy trong xưởng phát triển fgOS — xem

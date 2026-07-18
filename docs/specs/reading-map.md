@@ -2,11 +2,11 @@
 
 - `docs/platform-foundations.md` — văn bản gốc 8 luật nền platform (L1–L8); spec: docs/specs/platform-foundations.md
 - `docs/backlog.md` — product backlog (PBI rows, scribing-owned)
-- `docs/architecture-map.md` — bản chuẩn kiến trúc (v0.2, record 0010): 5 tầng + 2 lớp phủ, sổ component + sổ contract (CTR001–CTR009), nghi thức thẻ-căn-cước-trước-code
+- `docs/architecture-map.md` — bản chuẩn kiến trúc (v0.2, record ADR0010): 5 tầng + 2 lớp phủ, sổ component + sổ contract (CTR001–CTR009), nghi thức thẻ-căn-cước-trước-code
 - `docs/work-item-lifecycle-vision.md` — tầm nhìn nền tảng: chu trình sống của work-item (mixed-autonomy, base-workflow + domain-extension); khung cho các PBI P14-P18
 - `docs/specs/` — state layer: area spec + system-overview + bản đồ này
 - `docs/routing-handoff-contract.md` — hợp đồng handoff agent↔agent + ranh giới tin cậy
-- `docs/coexistence.md` — doctrine chạy cạnh một harness agent khác (record 0009): lãnh địa, một-nhạc-trưởng-mỗi-phiên, nhường-nhịn lúc `init`, manifest `.fgos/coexistence.json`, Known Gaps chưa flip; `src/install/coexist.mjs` — cài đặt detection + manifest (read-only, không đè)
+- `docs/coexistence.md` — doctrine chạy cạnh một harness agent khác (record ADR0009): lãnh địa, một-nhạc-trưởng-mỗi-phiên, nhường-nhịn lúc `init`, manifest `.fgos/coexistence.json`, Known Gaps chưa flip; `src/install/coexist.mjs` — cài đặt detection + manifest (read-only, không đè)
 - `package.json` (`version`, `files`, `bin.fgos`) + `README.md` (mục `## Install`) — cài `fgos` từ ngoài source repo qua GitHub install; `test/install-packaging.test.mjs` — proof e2e (pack → install → chạy từ project ngoài); spec: docs/specs/distribution.md
 - `docs/decisions/` — hồ sơ quyết định dài hạn cho người ngoài (decision records)
 - `docs/id-systems-audit.md` — audit + quyết định hình dạng mọi hệ id/mã đang sống trong hệ thống (work.id/kind/Story/ADR/Rule/Contract phía fgOS; D-hex/D-local/cell-id/feature-slug/severity phía bee) — nguồn cho `work.id`'s `tsk-<hash>` (P53) và các migration P54-P58 đang xếp hàng
