@@ -1633,6 +1633,29 @@ test('entropy-history.jsonl is written in the SAME data dir as events.jsonl, not
   }
 });
 
+test('check tolerates a torn final entropy-history line — folds trend against the last COMPLETE checkpoint instead of throwing', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'torn-history-item');
+  run(cwd, ['move', 'torn-history-item', '--to', 'doing']);
+
+  // First check writes one complete checkpoint line — the baseline.
+  const first = run(cwd, ['check']);
+  assert.equal(first.status, 0);
+  assert.equal(envelopeData(first.stdout).entropy.trend.baseline, true);
+
+  // Simulate a crash mid-append: a partial, unparseable JSON line at EOF.
+  const historyPath = path.join(cwd, '.fgos', 'entropy-history.jsonl');
+  fs.appendFileSync(historyPath, '{"ts":"2026-07-18T00:00:00.000Z","score":9,"cou', 'utf8');
+
+  // The torn last line must NOT crash check: readLastHistoryEntry walks back to
+  // the previous COMPLETE checkpoint, so trend still folds as a real delta.
+  const second = run(cwd, ['check']);
+  assert.equal(second.status, 0);
+  const trend = envelopeData(second.stdout).entropy.trend;
+  assert.equal(trend.baseline, false);
+  assert.equal(typeof trend.delta, 'number');
+});
+
 test('check on a directory with no log at all still never initializes .fgos/ (entropy data stays absent, same as friction/settlement)', () => {
   const cwd = tmpCwd();
   const result = run(cwd, ['check']);

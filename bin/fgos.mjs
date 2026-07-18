@@ -319,8 +319,19 @@ function readLastHistoryEntry(dir) {
     throw err;
   }
   const lines = raw.split('\n').filter(Boolean);
-  if (lines.length === 0) return null;
-  return JSON.parse(lines[lines.length - 1]);
+  // Walk backwards to the last COMPLETE (parseable) line. A crash or a partial
+  // append can leave a torn final line; the last valid checkpoint is whatever
+  // precedes it. One truncated line must never throw the whole `check` over —
+  // the same "absent/corrupt data reads as the baseline, never a crash"
+  // tolerance the missing-file branch above already gives.
+  for (let i = lines.length - 1; i >= 0; i--) {
+    try {
+      return JSON.parse(lines[i]);
+    } catch {
+      // torn/partial line — fall back to the previous one
+    }
+  }
+  return null;
 }
 
 // Appends exactly one history line per `check` run — same
