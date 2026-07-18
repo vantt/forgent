@@ -47,6 +47,31 @@ test('foldEvents survives an additive work.add field (description) through rebui
   assert.equal(view.work.a.description, 'The full text the submitter typed.');
 });
 
+// Same spread-fold guarantee as the `description` pin above, applied to the
+// new `discoveredFrom` provenance field (work-graph-intelligence S2b): no
+// dedicated fold code is added for it — work.add's existing spread carries
+// it through rebuild for free.
+test('foldEvents survives an additive work.add field (discoveredFrom) through rebuild via spread — no fold code added', () => {
+  const events = [
+    {
+      seq: 1,
+      ts: '2026-07-18T00:00:00.000Z',
+      type: 'work.add',
+      payload: { id: 'b', title: 'B', status: 'todo', discoveredFrom: 'a' },
+    },
+  ];
+  const view = foldEvents(events);
+  assert.equal(view.work.b.discoveredFrom, 'a');
+});
+
+test('foldEvents on a work.add with no discoveredFrom leaves the field absent (legacy/unrelated item, backward-compat)', () => {
+  const events = [
+    { seq: 1, ts: '2026-07-18T00:00:01.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo' } },
+  ];
+  const view = foldEvents(events);
+  assert.equal(view.work.a.discoveredFrom, undefined);
+});
+
 test('foldEvents folds multiple work items independently', () => {
   const events = [
     { seq: 1, ts: '2026-07-14T00:00:00.000Z', type: 'work.add', payload: { id: 'a', status: 'todo' } },

@@ -186,6 +186,28 @@ export function validateWorkShape(work) {
     }
   }
 
+  // Discovery provenance (per work-graph-intelligence S2b, decision
+  // b5c0ba0c/0012): an item a worker reported finding mid-task carries
+  // `discoveredFrom` — the id of the item that was being worked when it was
+  // discovered. Mirrors `parent` immediately above: its own stored field,
+  // OPTIONAL and NOT in DEFAULTS (same lazy-additive shape as parent/stage/
+  // domain), rides SCHEMA_VERSION 2 unchanged (no bump — precedent: every
+  // prior additive field stayed on v2). Existence of the referenced id is
+  // deliberately NOT enforced here, exactly like parent — a dangling
+  // provenance id degrades gracefully rather than blocking the add. It is
+  // non-blocking by design: dep-graph.mjs's buildUnifiedEdges reads only
+  // `deps`/`parent`, so `discoveredFrom` never enters the cycle-check.
+  if (work.discoveredFrom !== undefined && work.discoveredFrom !== null) {
+    if (typeof work.discoveredFrom !== 'string' || !work.discoveredFrom.trim()) {
+      throw new WorkValidationError(
+        `work.discoveredFrom must be a non-empty string when present, got: ${JSON.stringify(work.discoveredFrom)}`,
+      );
+    }
+    if (work.discoveredFrom === work.id) {
+      throw new WorkValidationError(`work "${work.id}" cannot list itself as its own discoveredFrom.`);
+    }
+  }
+
   // Full-text intake description (per discovery-context P30): OPTIONAL
   // additive field carrying the submitter's original free text, so the
   // discovery engine's prompt does not lose it to title truncation/

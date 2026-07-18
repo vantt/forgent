@@ -257,3 +257,51 @@ test('validateWork rejects a non-string, non-empty description', () => {
 test('validateWork does not require parent to point at an existing id (lineage existence is not deps existence)', () => {
   assert.doesNotThrow(() => validateWork(baseWork({ id: 'b', parent: 'ghost-parent' }), new Set(['a', 'b'])));
 });
+
+// --- provenance field `discoveredFrom` (per work-graph-intelligence S2b,
+// decision b5c0ba0c/0012 — mirrors the `parent` lineage block above) ---
+
+test('validateWork accepts a work item missing discoveredFrom (optional, additive provenance field)', () => {
+  const work = baseWork();
+  assert.equal(work.discoveredFrom, undefined);
+  assert.doesNotThrow(() => validateWork(work));
+});
+
+test('validateWork accepts discoveredFrom as a non-empty string', () => {
+  assert.doesNotThrow(() => validateWork(baseWork({ id: 'child-1', discoveredFrom: 'setup-repo' })));
+});
+
+test('validateWork treats discoveredFrom: null the same as absent', () => {
+  assert.doesNotThrow(() => validateWork(baseWork({ discoveredFrom: null })));
+});
+
+test('validateWork rejects a non-string, non-empty discoveredFrom', () => {
+  assert.throws(
+    () => validateWork(baseWork({ discoveredFrom: 42 })),
+    (err) => err instanceof WorkValidationError && /discoveredFrom/.test(err.message),
+  );
+  assert.throws(
+    () => validateWork(baseWork({ discoveredFrom: '' })),
+    (err) => err instanceof WorkValidationError && /discoveredFrom/.test(err.message),
+  );
+  assert.throws(
+    () => validateWork(baseWork({ discoveredFrom: '   ' })),
+    (err) => err instanceof WorkValidationError && /discoveredFrom/.test(err.message),
+  );
+});
+
+test('validateWork rejects a work item that lists itself as its own discoveredFrom', () => {
+  assert.throws(
+    () => validateWork(baseWork({ id: 'a', discoveredFrom: 'a' })),
+    (err) => err instanceof WorkValidationError && /own discoveredFrom|discoveredFrom/.test(err.message),
+  );
+});
+
+test('validateWork does not require discoveredFrom to point at an existing id (provenance existence is not deps existence, mirrors parent)', () => {
+  assert.doesNotThrow(() => validateWork(baseWork({ id: 'b', discoveredFrom: 'ghost-item' }), new Set(['a', 'b'])));
+});
+
+test('validateWork does not add discoveredFrom to SCHEMA_VERSION or DEFAULTS (optional lazy field, no schema bump)', () => {
+  assert.equal(SCHEMA_VERSION, 2);
+  assert.equal(Object.hasOwn(DEFAULTS, 'discoveredFrom'), false);
+});
