@@ -1,0 +1,54 @@
+{
+  "work": {
+    "tsk-4e5": {
+      "tier": "standard",
+      "id": "tsk-4e5",
+      "title": "Add a multiply(a, b) function to the calculator, returning",
+      "description": "Add a multiply(a, b) function to the calculator, returning a*b, with a matching test",
+      "kind": "feature",
+      "status": "doing",
+      "deps": [],
+      "risk": "standard",
+      "refs": [],
+      "verify": "node --test 'test/**/*.test.mjs' --test-name-pattern=multiply",
+      "mode": "sync",
+      "stage": "executing",
+      "claimActor": "human",
+      "headAtTake": "c52aeabb8c54ee4b3ce8d7a99ac69c073a54e1af"
+    }
+  },
+  "decisions": [],
+  "discovery": {
+    "tsk-4e5": [
+      {
+        "id": "tsk-4e5",
+        "clear": true,
+        "verify": "node --test 'test/**/*.test.mjs' --test-name-pattern=multiply",
+        "ts": "2026-07-18T15:54:16.801Z"
+      }
+    ]
+  },
+  "settlements": {
+    "tsk-4e5": [
+      {
+        "kind": "clarify-pass",
+        "actor": "session",
+        "ts": "2026-07-18T15:54:16.802Z",
+        "detail": "node --test 'test/**/*.test.mjs' --test-name-pattern=multiply"
+      }
+    ]
+  },
+  "outcomes": {
+    "tsk-4e5": {
+      "id": "tsk-4e5",
+      "predicted": {
+        "tier": "standard",
+        "deps": 0,
+        "priorVisits": 0,
+        "actor": "human",
+        "headAtTake": "c52aeabb8c54ee4b3ce8d7a99ac69c073a54e1af"
+      }
+    }
+  },
+  "revision": "9b3477cc72c404b804f3687d504fb4b98a8bb0ec3a023fa39dc1eb2f217b3c1b"
+}
