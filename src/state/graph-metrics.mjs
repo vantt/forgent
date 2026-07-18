@@ -1,5 +1,8 @@
-// graph-metrics.mjs — read-only MECHANICAL graph metrics over a work view
-// (work-graph-intelligence S5+, the "compute-brain"). PURE: no fs, no writes,
+// graph-metrics.mjs — read-only MECHANICAL graph metrics AND work-item
+// advisories over a work view (work-graph-intelligence S5+, the "compute-
+// brain"; S8 adds the stale-doing advisory, which is status/time based rather
+// than graph-topology based but shares the same read-only, suggest-never-act
+// stance). PURE: no fs, no writes,
 // no model/LLM call — every metric is folded mechanically from the view's
 // unified typed-edge graph (dep-graph.mjs `buildUnifiedEdges`). Stance R42:
 // this module NEVER writes and never decides; it computes graph FACTS that a
@@ -309,4 +312,41 @@ export function graphMetrics(view, opts = {}) {
     staleBlocked: staleBlocked(view),
     topUnblock: frame.skipped.includes('topUnblock') ? [] : greedyTopUnblock(view),
   };
+}
+
+// Advisory grace windows per owner type (S8). A person's claim gets a far
+// longer grace than an agent's — human >> agent — mirroring the runner reap,
+// which reclaims only its OWN crashed claims and never a human/session's. Both
+// are advisory defaults, fully overridable by the caller.
+export const STALE_DOING_DEFAULTS = Object.freeze({
+  agentMs: 15 * 60 * 1000, // 15 minutes
+  humanMs: 24 * 60 * 60 * 1000, // 24 hours
+});
+
+/**
+ * EVIDENCE-CLASSIFIER ADVISORY (S8): classify items stuck in `doing` as stale
+ * by OWNER TYPE and SUGGEST — never act. `entries` is
+ * `[{ id, claimActor, claimedAt }]` (claimedAt in epoch ms). PURE when `now`
+ * is passed. An item claimed by the `runner` is an `agent` claim (short grace);
+ * anything else (`human`/`session`/unknown) is treated as a `human` claim (the
+ * long grace — the conservative choice, and never auto-reclaimed anywhere).
+ * An entry with no locatable claim time is skipped (never a NaN age). Returns
+ * only the stale entries; every suggestion is advisory text and explicitly
+ * NEVER an automatic reclaim — this module classifies, the human decides.
+ */
+export function classifyStaleDoing(entries, { now = Date.now(), thresholds = STALE_DOING_DEFAULTS } = {}) {
+  const stale = [];
+  for (const entry of entries ?? []) {
+    const { id, claimActor, claimedAt } = entry ?? {};
+    if (typeof claimedAt !== 'number' || !Number.isFinite(claimedAt)) continue; // no claim time -> cannot age
+    const ownerClass = claimActor === 'runner' ? 'agent' : 'human';
+    const thresholdMs = ownerClass === 'agent' ? thresholds.agentMs : thresholds.humanMs;
+    const ageMs = now - claimedAt;
+    if (ageMs <= thresholdMs) continue; // fresh enough for this owner type
+    const suggestion = ownerClass === 'agent'
+      ? `runner-claimed ~${Math.round(ageMs / 60000)}m — likely a crashed or hung agent; investigate or let the startup reap reclaim it. This advisory never reclaims.`
+      : `held by ${claimActor ?? 'a person'} ~${Math.round(ageMs / 3600000)}h — check in with the holder; a person's claim is never auto-reclaimed.`;
+    stale.push({ id, claimActor, ownerClass, ageMs, thresholdMs, suggestion });
+  }
+  return { now, thresholds, stale };
 }

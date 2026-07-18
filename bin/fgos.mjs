@@ -19,7 +19,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { initStore, addWork, moveWork, editWork, addDecision, addOutcome, addFriction, listWork, readyWork, graphMetrics, graphWhatIf, readRawEvents, rebuild, putInAwaiting, answerAwaiting, StoreError, EXIT_CODES, categoryOf } from '../src/state/store.mjs';
+import { initStore, addWork, moveWork, editWork, addDecision, addOutcome, addFriction, listWork, readyWork, graphMetrics, graphWhatIf, staleDoingAdvisory, readRawEvents, rebuild, putInAwaiting, answerAwaiting, StoreError, EXIT_CODES, categoryOf } from '../src/state/store.mjs';
 import { repairTruncatedLastLine } from '../src/state/events.mjs';
 import { deriveTitle, classify, generateId } from '../src/intake/classify.mjs';
 import { wrapEnvelope } from '../src/state/envelope.mjs';
@@ -698,6 +698,15 @@ async function runVerb(verb, flags, positional, dir) {
         return graphWhatIf(dir, id);
       }
       return graphMetrics(dir);
+    }
+
+    // Request-class per D1 (same contract as `ready`/`list`/`graph`): a pure
+    // read. work-graph-intelligence S8: the evidence-classifier advisory over
+    // items stuck in `doing` — classifies stale-by-owner-type (human >> agent)
+    // and SUGGESTS; it never moves or reclaims anything (the runner reap is the
+    // only actor, and it never reclaims a person's claim).
+    case 'stale': {
+      return staleDoingAdvisory(dir);
     }
 
     case 'rebuild': {

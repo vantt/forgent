@@ -29,7 +29,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { appendEvent, readEvents } from './events.mjs';
 import { rebuildView, viewRevision } from './replay.mjs';
-import { graphMetrics as computeGraphMetrics, whatIf as computeWhatIf } from './graph-metrics.mjs';
+import { graphMetrics as computeGraphMetrics, whatIf as computeWhatIf, classifyStaleDoing } from './graph-metrics.mjs';
 import { transitionWork, FsmError } from './fsm.mjs';
 import { transitionStage } from './stage.mjs';
 import { validateWork, WorkValidationError, DEFAULTS } from './work.mjs';
@@ -507,6 +507,31 @@ export function graphMetrics(dir) {
 export function graphWhatIf(dir, id) {
   const { logPath } = paths(dir);
   return computeWhatIf(rebuildView(logPath), id);
+}
+
+/**
+ * Read-only (work-graph-intelligence S8): the stale-doing advisory. Extracts
+ * each `doing` item's latest claim timestamp from the raw log (the ts of its
+ * most recent `work.move` to `doing`) and its `claimActor` from the view, then
+ * hands them to the pure classifier. Advisory only — it reads, classifies, and
+ * suggests; it never moves or reclaims anything.
+ */
+export function staleDoingAdvisory(dir, opts = {}) {
+  const { logPath } = paths(dir);
+  const view = rebuildView(logPath);
+  const claimedAt = new Map();
+  for (const event of readEvents(logPath)) {
+    if (event.type === 'work.move' && event.payload?.to === 'doing' && typeof event.payload?.id === 'string') {
+      const ts = Date.parse(event.ts);
+      if (!Number.isNaN(ts)) claimedAt.set(event.payload.id, ts); // in-order iteration -> latest claim wins
+    }
+  }
+  const entries = [];
+  for (const id of Object.keys(view.work)) {
+    if (view.work[id].status !== 'doing') continue;
+    entries.push({ id, claimActor: view.work[id].claimActor, claimedAt: claimedAt.get(id) });
+  }
+  return classifyStaleDoing(entries, opts);
 }
 
 /**

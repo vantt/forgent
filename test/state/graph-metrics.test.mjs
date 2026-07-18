@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { connectedComponents, criticalPath, staleBlocked, greedyTopUnblock, whatIf, metricsFrame, graphMetrics } from '../../src/state/graph-metrics.mjs';
+import { connectedComponents, criticalPath, staleBlocked, greedyTopUnblock, whatIf, metricsFrame, graphMetrics, classifyStaleDoing, STALE_DOING_DEFAULTS } from '../../src/state/graph-metrics.mjs';
 
 // Pure lib — every view here is a literal (foldEvents style), no fs, no
 // `.fgos/` writes. connectedComponents groups work items linked by ANY unified
@@ -228,4 +228,55 @@ test('metricsFrame: the greedy topUnblock is the only skippable metric — skipp
   // cheap metrics still ran
   assert.equal(metrics.componentCount, 2);
   assert.deepEqual(metrics.frame.skipped, ['topUnblock']);
+});
+
+// --- S8: evidence-classifier advisory for stale doing items ----------------
+
+const NOW = 1_000_000_000_000;
+
+test('classifyStaleDoing: human >> agent — the same age is stale for an agent claim but fresh for a human claim', () => {
+  const twentyMin = 20 * 60 * 1000;
+  const entries = [
+    { id: 'by-agent', claimActor: 'runner', claimedAt: NOW - twentyMin },
+    { id: 'by-human', claimActor: 'human', claimedAt: NOW - twentyMin },
+  ];
+  const { stale } = classifyStaleDoing(entries, { now: NOW });
+  assert.deepEqual(stale.map((s) => s.id), ['by-agent']); // 20m > 15m agent grace, but 20m << 24h human grace
+  assert.equal(stale[0].ownerClass, 'agent');
+});
+
+test('classifyStaleDoing: a session claim gets the human (long) grace, never the agent one', () => {
+  const twentyMin = 20 * 60 * 1000;
+  const { stale } = classifyStaleDoing([{ id: 's', claimActor: 'session', claimedAt: NOW - twentyMin }], { now: NOW });
+  assert.deepEqual(stale, []); // session is person-held -> long grace -> not stale at 20m
+});
+
+test('classifyStaleDoing: an entry with no locatable claim time is skipped (never a NaN age)', () => {
+  const { stale } = classifyStaleDoing([{ id: 'x', claimActor: 'runner', claimedAt: undefined }], { now: NOW });
+  assert.deepEqual(stale, []);
+});
+
+test('classifyStaleDoing: suggestions are advisory and NEVER describe an automatic reclaim', () => {
+  const entries = [
+    { id: 'agent', claimActor: 'runner', claimedAt: NOW - 60 * 60 * 1000 }, // 1h > 15m
+    { id: 'human', claimActor: 'human', claimedAt: NOW - 30 * 60 * 60 * 1000 }, // 30h > 24h
+  ];
+  const { stale } = classifyStaleDoing(entries, { now: NOW });
+  assert.equal(stale.length, 2);
+  assert.match(stale.find((s) => s.id === 'agent').suggestion, /never reclaims/);
+  assert.match(stale.find((s) => s.id === 'human').suggestion, /never auto-reclaimed/);
+  // every entry carries the mechanical evidence, not just a verdict
+  for (const s of stale) {
+    assert.ok(Number.isFinite(s.ageMs) && Number.isFinite(s.thresholdMs));
+  }
+});
+
+test('classifyStaleDoing: defaults are agent 15m / human 24h and are overridable', () => {
+  assert.equal(STALE_DOING_DEFAULTS.agentMs, 15 * 60 * 1000);
+  assert.equal(STALE_DOING_DEFAULTS.humanMs, 24 * 60 * 60 * 1000);
+  const { stale } = classifyStaleDoing(
+    [{ id: 'x', claimActor: 'runner', claimedAt: NOW - 5000 }],
+    { now: NOW, thresholds: { agentMs: 1000, humanMs: 1000 } }, // 5s > 1s -> stale
+  );
+  assert.deepEqual(stale.map((s) => s.id), ['x']);
 });

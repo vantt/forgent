@@ -3837,6 +3837,32 @@ test('graph --what-if on an unknown id: exists false, zero impact, still exit 0 
   assert.deepEqual(envelopeData(result.stdout), { id: 'ghost', exists: false, unblocksTransitive: 0, newlyReady: [] });
 });
 
+// --- work-graph-intelligence S8: `fgos stale` advisory --------------------
+
+test('stale verb: a freshly-claimed doing item is NOT stale; a valid envelope + pure read (no event, exit 0)', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0);
+  assert.equal(addOk(cwd, 'a').status, 0);
+  assert.equal(run(cwd, ['move', 'a', '--to', 'doing', '--expect', 'todo']).status, 0);
+
+  const before = eventLines(cwd).length;
+  const result = run(cwd, ['stale']);
+  assert.equal(result.status, 0);
+  const data = envelopeData(result.stdout);
+  assert.deepEqual(data.stale, [], 'a just-claimed item is well within any grace window');
+  assert.equal(data.thresholds.agentMs, 15 * 60 * 1000);
+  assert.equal(data.thresholds.humanMs, 24 * 60 * 60 * 1000);
+  assert.equal(eventLines(cwd).length, before, 'stale must not append any event');
+});
+
+test('stale verb on a store with nothing in doing: empty advisory, exit 0', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0);
+  assert.equal(addOk(cwd, 'a').status, 0); // stays todo, never claimed
+  const data = envelopeData(run(cwd, ['stale']).stdout);
+  assert.deepEqual(data.stale, []);
+});
+
 test('graph verb on an empty store: zero components, still a valid envelope, exit 0', () => {
   const cwd = tmpCwd();
   assert.equal(run(cwd, ['init']).status, 0);

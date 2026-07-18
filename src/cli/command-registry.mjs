@@ -212,6 +212,15 @@ export const COMMAND_REGISTRY = [
     deprecated: null,
   },
   {
+    name: 'stale',
+    invoke: 'fgos stale',
+    description: 'Read-only advisory: items stuck in "doing" classified as stale by owner type (a person\'s claim gets far longer grace than an agent\'s). Classifies and suggests only — never reclaims.',
+    parameters: { type: 'object', properties: {}, required: [] },
+    examples: ['fgos stale'],
+    access: 'read',
+    deprecated: null,
+  },
+  {
     name: 'rebuild',
     invoke: 'fgos rebuild',
     description: 'Rebuild the derived view (.fgos/state.json) from the event log.',
