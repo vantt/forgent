@@ -711,8 +711,26 @@ Một verb đọc-thuần trả **metrics CƠ HỌC** của đồ thị công vi
 - **Critical path (đường tới hạn / độ sâu):** chuỗi phụ-thuộc DÀI NHẤT trong đồ thị `deps` (bảo đảm phi-chu-trình ở cửa ghi) — độ dài là số bước tuần tự tối thiểu trước khi item sâu nhất khởi động được.
 - **Stale-blocked (chuỗi kẹt):** các item `todo`/`blocked` còn ≥1 dep chưa `done` (kể cả một dep KHÔNG tồn tại — kẹt vĩnh viễn), kèm danh sách dep đang chặn. Item đã sẵn-sàng (mọi dep done) không liệt kê.
 - **Greedy top-k-unblock (nên làm gì tiếp):** xếp hạng tham-lam dưới-mô-đun các item chưa `done` theo lượng công việc hoàn thành nó sẽ MỞ KHÓA — mỗi lượt chọn item phủ được nhiều hậu-duệ-chưa-done MỚI nhất; báo cả tổng hậu duệ (`unblocks`) lẫn phần mở mới biên (`newlyUnblocks`).
+- **What-if (hoàn thành X → mở khóa gì):** `graph --what-if <id>` trả riêng tác động của một item: tổng hậu-duệ-chưa-done transitive + `newlyReady` (các item phụ thuộc trực-tiếp mà MỌI dep KHÁC đã `done` → hoàn thành X làm chúng thỏa-dep). Là sự thật phụ-thuộc, KHÔNG phải đủ-điều-kiện-frontier (không xét stage/lineage).
+- **Frame (computed/skipped + revision):** mỗi payload metrics kèm một `frame` — `revision` (dấu vân tay view deterministic, S3) để một bên đọc cache theo revision và bỏ qua tính lại khi không đổi; `computed[]`/`skipped[]` nêu metric nào đã chạy: greedy `topUnblock` (metric duy nhất siêu-tuyến-tính) bị BỎ QUA trên đồ thị lớn (quá `maxNodesForGreedy`), giữ đọc luôn có biên.
 - **Blocked when:** như mọi đọc — nhật ký hỏng → `corrupt-log` (mã 5); không bao giờ ghi một byte.
 - Chỉ các id thật (có trong view) được nhóm/tính — một cạnh trỏ tới id không tồn tại (dangling parent/dep) không bao giờ tạo nút ma.
+- **Đầu ra time-relative:** `graph`/`what-if`/components/critical-path là deterministic; chỉ advisory `stale` (dưới) mang thời-gian-thực nên `data_hash` của nó đổi theo thời gian đã trôi — đúng bản chất "kẹt bao lâu rồi".
+
+### Cố vấn item kẹt ở `doing` (stale) — đọc-thuần, KHÔNG tự thu hồi (S8)
+
+`stale` phân loại các item đang `doing` là kẹt-hay-không theo NGƯỠNG-THEO-CHỦ, gợi ý — không bao giờ hành động:
+
+- **Ngưỡng theo chủ (người ≫ agent):** claim của `runner` là claim AGENT (ân hạn ngắn, mặc định 15 phút); claim của `human`/`session`/khác là claim NGƯỜI (ân hạn dài, mặc định 24 giờ). Cùng một tuổi claim có thể kẹt với agent mà chưa kẹt với người. Ngưỡng ghi đè được.
+- Chỉ liệt kê item kẹt, kèm `ageMs`/`thresholdMs`/`suggestion`. **Gợi ý không bao giờ mô tả thu-hồi tự-động** — đúng luật đã khóa: reap của runner chỉ thu hồi claim của CHÍNH nó khi crash, không bao giờ thu hồi claim của một người. Đây là bên cố-vấn: phân loại + gợi ý, người quyết.
+- Item không tìm được thời-điểm-claim bị bỏ qua (không bao giờ tuổi NaN).
+
+### Cố vấn xung đột dấu chân file (conflicts) — chống đụng độ fan-out song song (S9)
+
+`conflicts` tìm rủi ro đụng-độ-file giữa các item CÓ THỂ giao SONG SONG. Tập ứng viên là frontier (`ready` = item giao được ngay bây giờ), nên mỗi xung đột là thật: một runner song song có thể nhặt cả hai cùng lúc.
+
+- Mỗi item có thể khai một **`footprint`** — danh sách đường-dẫn file nó dự kiến chạm (`add --footprint a,b`). Trường phụ TÙY CHỌN, cưỡi SCHEMA_VERSION 2, vắng-khi-không-khai; là nội dung cụ thể cho hai trường C3 có-tên-mà-rỗng (`forbidden_paths`/`required_outputs`). PHI-CHẶN: chỉ nuôi cố-vấn này, không vào cycle-check/frontier.
+- Mỗi cặp ready chia sẻ ≥1 đường-dẫn footprint được nêu kèm đường-dẫn chung + **lựa chọn giải quyết** `sequence`/`hoist`/`re-slice`. Bên cố-vấn CHỈ gợi ý — không bao giờ tự re-slice hay sửa deps. Item không khai footprint không bao giờ xung đột.
 
 ## Actors & Access
 
