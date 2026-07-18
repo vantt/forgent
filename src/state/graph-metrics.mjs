@@ -12,7 +12,7 @@
 // the log itself; the store facade hands it the view).
 
 import { buildUnifiedEdges } from './dep-graph.mjs';
-import { FRONTIER_ORDER_VERSION } from './frontier.mjs';
+import { FRONTIER_ORDER_VERSION, frontier } from './frontier.mjs';
 import { viewRevision } from './replay.mjs';
 
 /**
@@ -349,4 +349,38 @@ export function classifyStaleDoing(entries, { now = Date.now(), thresholds = STA
     stale.push({ id, claimActor, ownerClass, ageMs, thresholdMs, suggestion });
   }
   return { now, thresholds, stale };
+}
+
+// The options a footprint conflict can be resolved by — surfaced as data, never
+// applied. `sequence` = add a dependency so the two run in order not in
+// parallel; `hoist` = extract the shared file's work into a prerequisite both
+// depend on; `re-slice` = split so the footprints no longer overlap.
+const FOOTPRINT_CONFLICT_SUGGESTIONS = Object.freeze(['sequence', 'hoist', 're-slice']);
+
+/**
+ * FOOTPRINT-INTERSECTION advisory (S9 — the target): find file-collision risk
+ * between items that could dispatch IN PARALLEL. The candidate set is the
+ * frontier (`ready` = items independently dispatchable right now), so a
+ * conflict here is real: a parallel runner could pick both at once. Every pair
+ * whose declared `footprint`s share at least one path is flagged with the
+ * shared paths and the resolution OPTIONS (sequence / hoist / re-slice) — the
+ * detector suggests, it never re-slices. Deterministic: pairs follow the ready
+ * FIFO order (i < j), shared paths keep the first item's order. An item with no
+ * footprint never conflicts.
+ */
+export function footprintOverlap(view) {
+  const ready = frontier(view);
+  const conflicts = [];
+  for (let i = 0; i < ready.length; i += 1) {
+    const footprintA = Array.isArray(ready[i].footprint) ? ready[i].footprint : [];
+    if (footprintA.length === 0) continue;
+    for (let j = i + 1; j < ready.length; j += 1) {
+      const footprintB = new Set(Array.isArray(ready[j].footprint) ? ready[j].footprint : []);
+      const shared = footprintA.filter((path) => footprintB.has(path));
+      if (shared.length > 0) {
+        conflicts.push({ a: ready[i].id, b: ready[j].id, shared, suggestions: [...FOOTPRINT_CONFLICT_SUGGESTIONS] });
+      }
+    }
+  }
+  return conflicts;
 }

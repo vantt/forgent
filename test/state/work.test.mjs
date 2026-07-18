@@ -57,6 +57,20 @@ test('validateWork rejects refs that is not an array', () => {
   assert.throws(() => validateWork(baseWork({ refs: 'readme' })), WorkValidationError);
 });
 
+// work-graph-intelligence S9: footprint is an OPTIONAL additive list.
+test('validateWork accepts footprint absent, null, or an array of non-empty strings', () => {
+  assert.doesNotThrow(() => validateWork(baseWork())); // absent
+  assert.doesNotThrow(() => validateWork(baseWork({ footprint: null })));
+  assert.doesNotThrow(() => validateWork(baseWork({ footprint: [] })));
+  assert.doesNotThrow(() => validateWork(baseWork({ footprint: ['src/a.mjs', 'src/b.mjs'] })));
+});
+
+test('validateWork rejects a footprint that is not an array, or has an empty/non-string entry', () => {
+  assert.throws(() => validateWork(baseWork({ footprint: 'src/a.mjs' })), WorkValidationError);
+  assert.throws(() => validateWork(baseWork({ footprint: ['src/a.mjs', ''] })), WorkValidationError);
+  assert.throws(() => validateWork(baseWork({ footprint: ['src/a.mjs', 42] })), WorkValidationError);
+});
+
 test('validateWork rejects an unstable id format', () => {
   assert.throws(() => validateWork(baseWork({ id: 'Not Valid!' })), WorkValidationError);
   assert.throws(() => validateWork(baseWork({ id: '' })), WorkValidationError);

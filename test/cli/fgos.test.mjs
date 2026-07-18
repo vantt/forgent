@@ -3863,6 +3863,40 @@ test('stale verb on a store with nothing in doing: empty advisory, exit 0', () =
   assert.deepEqual(data.stale, []);
 });
 
+// --- work-graph-intelligence S9: footprint field + `fgos conflicts` -------
+
+test('add --footprint persists the list; omitting the flag leaves footprint absent', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0);
+  assert.equal(run(cwd, ['add', 'withfp', '--title', 'X', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--footprint', 'src/a.mjs,src/b.mjs']).status, 0);
+  assert.equal(addOk(cwd, 'nofp').status, 0);
+  const view = stateView(cwd);
+  assert.deepEqual(view.work.withfp.footprint, ['src/a.mjs', 'src/b.mjs']);
+  assert.equal('footprint' in view.work.nofp, false, 'an omitted --footprint leaves the field absent, not []');
+});
+
+test('conflicts verb: two ready items sharing a footprint path are flagged with shared + suggestions, pure read', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0);
+  assert.equal(run(cwd, ['add', 'a', '--title', 'A', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--footprint', 'src/x.mjs,src/y.mjs']).status, 0);
+  assert.equal(run(cwd, ['add', 'b', '--title', 'B', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--footprint', 'src/y.mjs,src/z.mjs']).status, 0);
+  assert.equal(run(cwd, ['add', 'c', '--title', 'C', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--footprint', 'src/w.mjs']).status, 0);
+
+  const before = eventLines(cwd).length;
+  const result = run(cwd, ['conflicts']);
+  assert.equal(result.status, 0);
+  const data = envelopeData(result.stdout);
+  assert.deepEqual(data, [{ a: 'a', b: 'b', shared: ['src/y.mjs'], suggestions: ['sequence', 'hoist', 're-slice'] }]);
+  assert.equal(eventLines(cwd).length, before, 'conflicts must not append any event');
+});
+
+test('conflicts verb on a store with no overlaps: empty list, exit 0', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0);
+  assert.equal(addOk(cwd, 'a').status, 0); // no footprint
+  assert.deepEqual(envelopeData(run(cwd, ['conflicts']).stdout), []);
+});
+
 test('graph verb on an empty store: zero components, still a valid envelope, exit 0', () => {
   const cwd = tmpCwd();
   assert.equal(run(cwd, ['init']).status, 0);

@@ -208,6 +208,27 @@ export function validateWorkShape(work) {
     }
   }
 
+  // File footprint (work-graph-intelligence S9): OPTIONAL additive list of the
+  // file paths/globs this item is expected to touch — the concrete content for
+  // C3's named-but-empty forbidden_paths/required_outputs. When present it must
+  // be an array of non-empty strings (same entry rule as `refs`); absent (or
+  // null) on every item that predates the field or never declared one. Rides
+  // SCHEMA_VERSION 2 (folds via the work.add spread) and is NON-BLOCKING: it
+  // feeds only the footprint-intersection advisory, never the cycle-check or
+  // the frontier.
+  if (work.footprint !== undefined && work.footprint !== null) {
+    if (!Array.isArray(work.footprint)) {
+      throw new WorkValidationError(
+        `work.footprint must be an array of non-empty strings when present, got: ${JSON.stringify(work.footprint)}`,
+      );
+    }
+    for (const path of work.footprint) {
+      if (typeof path !== 'string' || !path.trim()) {
+        throw new WorkValidationError(`work.footprint entries must be non-empty strings, got: ${JSON.stringify(path)}`);
+      }
+    }
+  }
+
   // Full-text intake description (per discovery-context P30): OPTIONAL
   // additive field carrying the submitter's original free text, so the
   // discovery engine's prompt does not lose it to title truncation/

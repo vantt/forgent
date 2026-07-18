@@ -29,7 +29,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { appendEvent, readEvents } from './events.mjs';
 import { rebuildView, viewRevision } from './replay.mjs';
-import { graphMetrics as computeGraphMetrics, whatIf as computeWhatIf, classifyStaleDoing } from './graph-metrics.mjs';
+import { graphMetrics as computeGraphMetrics, whatIf as computeWhatIf, classifyStaleDoing, footprintOverlap } from './graph-metrics.mjs';
 import { transitionWork, FsmError } from './fsm.mjs';
 import { transitionStage } from './stage.mjs';
 import { validateWork, WorkValidationError, DEFAULTS } from './work.mjs';
@@ -532,6 +532,17 @@ export function staleDoingAdvisory(dir, opts = {}) {
     entries.push({ id, claimActor: view.work[id].claimActor, claimedAt: claimedAt.get(id) });
   }
   return classifyStaleDoing(entries, opts);
+}
+
+/**
+ * Read-only (work-graph-intelligence S9): the footprint-intersection advisory —
+ * pairs of ready items whose declared file footprints overlap, so a parallel
+ * dispatch would risk a file conflict. Same read-facade shape as graphMetrics;
+ * the Domain core finds the overlaps and suggests resolutions.
+ */
+export function footprintConflicts(dir) {
+  const { logPath } = paths(dir);
+  return footprintOverlap(rebuildView(logPath));
 }
 
 /**

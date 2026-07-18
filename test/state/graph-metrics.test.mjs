@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { connectedComponents, criticalPath, staleBlocked, greedyTopUnblock, whatIf, metricsFrame, graphMetrics, classifyStaleDoing, STALE_DOING_DEFAULTS } from '../../src/state/graph-metrics.mjs';
+import { connectedComponents, criticalPath, staleBlocked, greedyTopUnblock, whatIf, metricsFrame, graphMetrics, classifyStaleDoing, STALE_DOING_DEFAULTS, footprintOverlap } from '../../src/state/graph-metrics.mjs';
 
 // Pure lib — every view here is a literal (foldEvents style), no fs, no
 // `.fgos/` writes. connectedComponents groups work items linked by ANY unified
@@ -279,4 +279,53 @@ test('classifyStaleDoing: defaults are agent 15m / human 24h and are overridable
     { now: NOW, thresholds: { agentMs: 1000, humanMs: 1000 } }, // 5s > 1s -> stale
   );
   assert.deepEqual(stale.map((s) => s.id), ['x']);
+});
+
+// --- S9: footprint-intersection advisory -----------------------------------
+
+test('footprintOverlap: two READY items sharing a file path are flagged with the shared paths + resolution options', () => {
+  const view = {
+    work: {
+      a: item('a', { footprint: ['src/x.mjs', 'src/y.mjs'] }),
+      b: item('b', { footprint: ['src/y.mjs', 'src/z.mjs'] }),
+    },
+  };
+  assert.deepEqual(footprintOverlap(view), [
+    { a: 'a', b: 'b', shared: ['src/y.mjs'], suggestions: ['sequence', 'hoist', 're-slice'] },
+  ]);
+});
+
+test('footprintOverlap: disjoint footprints (or no footprint) never conflict', () => {
+  const view = {
+    work: {
+      a: item('a', { footprint: ['src/x.mjs'] }),
+      b: item('b', { footprint: ['src/z.mjs'] }),
+      c: item('c'), // no footprint
+    },
+  };
+  assert.deepEqual(footprintOverlap(view), []);
+});
+
+test('footprintOverlap: a NON-ready item (unmet dep) is never in a conflict pair even if its footprint overlaps', () => {
+  const view = {
+    work: {
+      a: item('a', { footprint: ['src/x.mjs'] }), // ready (no deps)
+      b: item('b', { deps: ['a'], footprint: ['src/x.mjs'] }), // blocked on a -> not ready
+    },
+  };
+  // b is not dispatchable now, so there is no parallel-dispatch conflict yet.
+  assert.deepEqual(footprintOverlap(view), []);
+});
+
+test('footprintOverlap is deterministic across ready items: pairs follow FIFO order, shared keeps the first item order', () => {
+  const view = {
+    work: {
+      first: item('first', { footprint: ['b.mjs', 'a.mjs'] }),
+      second: item('second', { footprint: ['a.mjs', 'b.mjs'] }),
+      third: item('third', { footprint: ['a.mjs'] }),
+    },
+  };
+  const out = footprintOverlap(view);
+  assert.deepEqual(out.map((c) => [c.a, c.b]), [['first', 'second'], ['first', 'third'], ['second', 'third']]);
+  assert.deepEqual(out[0].shared, ['b.mjs', 'a.mjs']); // first item's footprint order
 });

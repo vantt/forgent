@@ -19,7 +19,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { initStore, addWork, moveWork, editWork, addDecision, addOutcome, addFriction, listWork, readyWork, graphMetrics, graphWhatIf, staleDoingAdvisory, readRawEvents, rebuild, putInAwaiting, answerAwaiting, StoreError, EXIT_CODES, categoryOf } from '../src/state/store.mjs';
+import { initStore, addWork, moveWork, editWork, addDecision, addOutcome, addFriction, listWork, readyWork, graphMetrics, graphWhatIf, staleDoingAdvisory, footprintConflicts, readRawEvents, rebuild, putInAwaiting, answerAwaiting, StoreError, EXIT_CODES, categoryOf } from '../src/state/store.mjs';
 import { repairTruncatedLastLine } from '../src/state/events.mjs';
 import { deriveTitle, classify, generateId } from '../src/intake/classify.mjs';
 import { wrapEnvelope } from '../src/state/envelope.mjs';
@@ -551,6 +551,13 @@ async function runVerb(verb, flags, positional, dir) {
         // the referenced id is deliberately never enforced here (work-graph-
         // intelligence-6, mirrors `parent`'s norm).
         discoveredFrom: optionalField(flags['discovered-from'], 'add --discovered-from requires a non-empty id; omit it to leave unset.'),
+        // Per work-graph-intelligence S9: --footprint is an optional list of
+        // the file paths this item is expected to touch (feeds the
+        // footprint-intersection advisory). Set ONLY when the flag is present
+        // so an omitted flag leaves footprint ABSENT (present-or-absent
+        // optional additive), unlike deps/refs which default to []. An empty
+        // `--footprint ''` parses to [] explicitly.
+        footprint: flags.footprint === undefined ? undefined : parseListFlag(flags.footprint),
       };
       const { event } = addWork(dir, work);
       return { id: event.payload.id, seq: event.seq };
@@ -707,6 +714,15 @@ async function runVerb(verb, flags, positional, dir) {
     // only actor, and it never reclaims a person's claim).
     case 'stale': {
       return staleDoingAdvisory(dir);
+    }
+
+    // Request-class per D1 (same contract as `ready`/`graph`/`stale`): a pure
+    // read. work-graph-intelligence S9: the footprint-intersection advisory —
+    // pairs of ready items whose declared file footprints overlap, so a
+    // parallel dispatch would risk a file conflict. Suggests sequence/hoist/
+    // re-slice; never mutates anything.
+    case 'conflicts': {
+      return footprintConflicts(dir);
     }
 
     case 'rebuild': {

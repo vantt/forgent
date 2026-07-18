@@ -221,6 +221,15 @@ export const COMMAND_REGISTRY = [
     deprecated: null,
   },
   {
+    name: 'conflicts',
+    invoke: 'fgos conflicts',
+    description: 'Read-only advisory: pairs of ready work items whose declared file footprints overlap (a parallel-dispatch conflict risk), with the shared paths and resolution options (sequence/hoist/re-slice). Suggests only — never re-slices.',
+    parameters: { type: 'object', properties: {}, required: [] },
+    examples: ['fgos conflicts'],
+    access: 'read',
+    deprecated: null,
+  },
+  {
     name: 'rebuild',
     invoke: 'fgos rebuild',
     description: 'Rebuild the derived view (.fgos/state.json) from the event log.',
