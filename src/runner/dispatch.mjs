@@ -111,6 +111,21 @@ Never call \`fgos\` yourself and never write to \`.fgos/\` directly — the
 runner is the sole writer through that door during this dispatch. Commit
 your changes on this branch and report; do not merge, push, or approve your
 own work.
+
+# Reporting discovered work (report, not write)
+If — while doing this item — you discover a NEW unit of work that deserves its
+own work item (a follow-up, a newly surfaced dependency, a separable concern),
+you MAY surface it as DATA ONLY by emitting one fenced block per discovery in
+your output:
+
+\`\`\`fgos-discovered
+{"title": "<one-line title>", "kind": "<optional>", "risk": "<optional>", "description": "<optional>"}
+\`\`\`
+
+\`title\` is required; \`kind\`/\`risk\`/\`description\` are optional. This is a
+report, not a write — you still MUST NOT call \`fgos\` or touch \`.fgos/\`. The
+runner reads these blocks after you finish and creates each item itself,
+stamping it as discovered-from this item.
 `;
 }
 

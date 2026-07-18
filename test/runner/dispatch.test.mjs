@@ -121,6 +121,16 @@ test('buildPrompt includes all five framing sections', () => {
   assert.match(prompt, /# Constraints/);
 });
 
+test('buildPrompt describes the fgos-discovered report-not-write channel while keeping the never-call-fgos constraint (wgi-8)', () => {
+  const prompt = buildPrompt(sampleWork());
+  assert.match(prompt, /# Reporting discovered work/);
+  assert.match(prompt, /```fgos-discovered/);
+  assert.match(prompt, /"title"/);
+  // the channel is a REPORT, never a write — the D3 write constraint stays intact
+  assert.match(prompt, /Never call `fgos` yourself/);
+  assert.match(prompt, /report, not a write/);
+});
+
 test('buildPrompt embeds work.description verbatim under the Description section', () => {
   const description = 'Line one.\nLine two with detail: do X, then Y — no truncation expected.';
   const prompt = buildPrompt(sampleWork({ description }));

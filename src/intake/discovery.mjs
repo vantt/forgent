@@ -35,7 +35,12 @@ const DEFAULT_UNCLEAR_QUESTION =
 // clarify with — a DIFFERENT string from the retired P14 sentinel
 // ("chưa xác định — P15 bổ sung"), so nothing from the old placeholder
 // survives past clarify (must_haves truth 3).
-const FALLBACK_VERIFY = 'chưa xác định — bổ sung thủ công';
+// EXPORTED (work-graph-intelligence S2b, wgi-8): the runner-automatic
+// discovered-from channel reuses this same clarify-entry placeholder for the
+// items it creates from a worker's report — a discovered item enters at stage
+// `clarify`, so context-discovery later replaces this sentinel with the real
+// verify, exactly as a submitted item does. Shared, never a duplicated literal.
+export const FALLBACK_VERIFY = 'chưa xác định — bổ sung thủ công';
 
 /**
  * `view` is OPTIONAL (per discovery-context P30's backward-compat seam):

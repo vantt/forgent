@@ -940,3 +940,111 @@ test('bin/fgos-runner.mjs rejects an unknown flag with the validation exit code'
   assert.equal(run.status, 4);
   assert.match(run.stderr, /unknown flag/);
 });
+
+// --- wgi-8: runner-automatic discovered-from (report-not-write channel) ----
+// The worker surfaces newly-discovered work as a fenced ```fgos-discovered
+// JSON block in its output; the RUNNER (never the worker, D3) creates each
+// item, stamping discoveredFrom = the dispatched item's id. Discovered items
+// enter at stage `clarify` with a placeholder verify, exactly like a submit.
+
+/** A committing worker that ALSO emits one fgos-discovered block per entry in
+ * `bodies` on stdout (bodies are raw strings, so a test can feed malformed
+ * JSON too). With `commit: false` the verify target is never produced. */
+function writeDiscoveringExecutor(scriptDir, counterFile, bodies, { commit = true } = {}) {
+  const scriptPath = path.join(scriptDir, 'discovering-executor.mjs');
+  const emit = bodies
+    .map((body) => `process.stdout.write(${JSON.stringify('```fgos-discovered\n' + body + '\n```\n')});`)
+    .join('\n');
+  const commitLines = commit
+    ? `fs.writeFileSync('output.txt', 'produced by worker\\n');
+execFileSync('git', ['add', 'output.txt']);
+execFileSync('git', ['commit', '-q', '-m', 'worker: output.txt']);`
+    : '';
+  fs.writeFileSync(
+    scriptPath,
+    `
+import fs from 'node:fs';
+import { execFileSync } from 'node:child_process';
+fs.appendFileSync(${JSON.stringify(counterFile)}, 'run\\n');
+${emit}
+${commitLines}
+`,
+  );
+  return scriptPath;
+}
+
+test('wgi-8: a worker fgos-discovered block makes the RUNNER create a new item stamped discoveredFrom = the dispatched item (D3: the worker never writes)', async () => {
+  const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
+  seedItem(dir, { id: 'item-happy' });
+  const body = JSON.stringify({
+    title: 'Wire retry metrics into the dashboard',
+    kind: 'feature',
+    risk: 'standard',
+    description: 'surfaced while doing item-happy',
+  });
+  const config = configFor(writeDiscoveringExecutor(scriptDir, counterFile, [body]));
+
+  const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
+
+  assert.equal(result.dispatched[0].outcome, 'proposed');
+  const view = listWork(dir);
+  const discovered = Object.values(view.work).filter((w) => w.discoveredFrom === 'item-happy');
+  assert.equal(discovered.length, 1, 'exactly one discovered item, created by the RUNNER');
+  const d = discovered[0];
+  assert.equal(d.title, 'Wire retry metrics into the dashboard');
+  assert.equal(d.description, 'surfaced while doing item-happy');
+  assert.equal(d.status, 'todo');
+  assert.equal(d.stage, 'clarify', 'enters at clarify so context-discovery attaches the real verify later');
+  assert.equal(d.kind, 'feature', 'block kind override wins over classify()');
+  assert.equal(d.risk, 'standard', 'block risk override wins over classify()');
+  assert.equal(d.deps.length, 0);
+  assert.match(d.verify, /chưa xác định/, 'reuses the shared clarify-entry verify placeholder, not a hardcoded duplicate');
+  // D3: the worker committed only its own file; the .fgos work.add for the
+  // discovered item was written by the runner, so item-happy still proposed.
+  assert.equal(view.work['item-happy'].status, 'proposed');
+});
+
+test('wgi-8: a malformed fgos-discovered block is skipped (fail-safe) — the dispatch still proposes and no item is created', async () => {
+  const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
+  seedItem(dir, { id: 'item-happy' });
+  const config = configFor(writeDiscoveringExecutor(scriptDir, counterFile, ['{ this is not valid json )']));
+
+  const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
+
+  assert.equal(result.dispatched[0].outcome, 'proposed', 'a garbled report never derails the dispatch');
+  assert.deepEqual(Object.keys(listWork(dir).work), ['item-happy'], 'malformed block creates nothing');
+});
+
+/** A worker that emits a discovery block, then hangs past the timeout — so its
+ * output reaches the runner on the DispatchError(err.stdout) path, never
+ * worker.stdout. Proves the terminal-outcome capture covers BOTH sources. */
+function writeHangingDiscoveringExecutor(scriptDir, body) {
+  const scriptPath = path.join(scriptDir, 'hanging-discovering-executor.mjs');
+  fs.writeFileSync(
+    scriptPath,
+    `
+process.stdout.write(${JSON.stringify('```fgos-discovered\n' + body + '\n```\n')});
+await new Promise(() => {}); // hang until SIGTERM (timeout)
+`,
+  );
+  return scriptPath;
+}
+
+test('wgi-8: even a TIMED-OUT worker (output on the err.stdout path) has its fgos-discovered report captured exactly once at the terminal outcome, no duplicate across the retry', async () => {
+  const { repoRoot, dir, scriptDir, worktreeDir } = setup();
+  seedItem(dir, { id: 'item-slow' });
+  const body = JSON.stringify({ title: 'Investigate the slow path' });
+  const scriptPath = writeHangingDiscoveringExecutor(scriptDir, body);
+  const config = {
+    executor: { command: process.execPath, args: [scriptPath, '{prompt}'] },
+    models: { light: 'haiku', standard: 'sonnet', heavy: 'opus' },
+    timeoutMs: 400,
+  };
+
+  const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
+
+  assert.notEqual(result.dispatched[0].outcome, 'proposed', 'the item itself times out — it never proposes');
+  const discovered = Object.values(listWork(dir).work).filter((w) => w.discoveredFrom === 'item-slow');
+  assert.equal(discovered.length, 1, 'the err.stdout (timeout) report is captured once, never duplicated across retries');
+  assert.equal(discovered[0].title, 'Investigate the slow path');
+});

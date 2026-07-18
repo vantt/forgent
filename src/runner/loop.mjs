@@ -46,6 +46,7 @@ import { execFileSync } from 'node:child_process';
 import {
   listWork,
   moveWork,
+  addWork,
   readyWork,
   readRawEvents,
   addOutcome,
@@ -70,8 +71,9 @@ import { createWorktree, removeWorktree, listLeftovers, branchNameFor, createBra
 import { runGoalCheck } from './goal-check.mjs';
 import { createWriteQueue } from './write-queue.mjs';
 import { createOwnershipStore, resolveRoot, claimRoot, steerFrontier } from './root-affinity.mjs';
-import { resolveDiscovery } from '../intake/discovery.mjs';
+import { resolveDiscovery, FALLBACK_VERIFY } from '../intake/discovery.mjs';
 import { resolveDecompose } from '../intake/decompose.mjs';
+import { classify, generateId } from '../intake/classify.mjs';
 
 // errorClass -> failure layer: 5-layer self-attribution (task-spec / context /
 // environment / verification / state) the runner stamps on every friction
@@ -490,6 +492,85 @@ async function claimItem({ dir, ownershipStore, queue, ownerIdentity, item }) {
  * earlier merged leaf), and forks fresh from `main`/current HEAD otherwise —
  * byte-for-byte the pre-fan-out-parallel-9 single-item behavior.
  */
+// work-graph-intelligence S2b (wgi-8): the worker->runner discovery-report
+// channel. The worker (dispatch.mjs prompt) MAY emit fenced ```fgos-discovered
+// JSON blocks to surface newly-discovered work — DATA ONLY; it still never
+// calls fgos or writes .fgos/ (D3: the runner is the sole writer). This parser
+// extracts every well-formed block from a captured worker output string. It is
+// FAIL-SAFE by construction: a malformed JSON body, a block missing a non-empty
+// `title`, a non-object payload, or absent fences all yield fewer/zero blocks —
+// it never throws, so a garbled worker report can never derail a dispatch.
+const FGOS_DISCOVERED_FENCE = /```fgos-discovered[^\n]*\n([\s\S]*?)```/g;
+
+export function parseDiscoveredBlocks(output) {
+  const blocks = [];
+  if (typeof output !== 'string' || !output) return blocks;
+  for (const match of output.matchAll(FGOS_DISCOVERED_FENCE)) {
+    let parsed;
+    try {
+      parsed = JSON.parse(match[1]);
+    } catch {
+      continue; // malformed body — skip this block, keep scanning
+    }
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) continue;
+    if (typeof parsed.title !== 'string' || !parsed.title.trim()) continue;
+    blocks.push({
+      title: parsed.title.trim(),
+      kind: typeof parsed.kind === 'string' && parsed.kind.trim() ? parsed.kind.trim() : undefined,
+      risk: typeof parsed.risk === 'string' && parsed.risk.trim() ? parsed.risk.trim() : undefined,
+      description: typeof parsed.description === 'string' ? parsed.description : undefined,
+    });
+  }
+  return blocks;
+}
+
+// Create a work item for each block the worker reported, RUNNER-side (D3),
+// stamping discoveredFrom = the dispatched item's id. Each item is submit-
+// shaped: classify()-derived tier/kind/risk (block overrides win), a shared
+// clarify-entry verify placeholder (FALLBACK_VERIFY — never a hardcoded
+// duplicate), status 'todo', stage 'clarify' (so context-discovery attaches
+// the real verify later), deps/refs empty. discoveredFrom is non-blocking
+// provenance (excluded from the cycle-check by design). Every write goes
+// through queue.enqueue (the serialized write door) — never a raw addWork —
+// and generateId is computed INSIDE the serialized callback so back-to-back
+// discoveries never collide on an id. FAIL-SAFE: parsing and each create are
+// isolated so a bad block is logged and skipped, never altering the dispatch
+// outcome or control flow.
+async function captureDiscoveredWork({ output, item, queue, dir, log }) {
+  let blocks;
+  try {
+    blocks = parseDiscoveredBlocks(output);
+  } catch (err) {
+    log(`fgos-runner: discovery-report parse failed for "${item.id}" (ignored): ${err.message}`);
+    return;
+  }
+  for (const block of blocks) {
+    try {
+      await queue.enqueue(async () => {
+        const id = generateId(block.title, Object.keys(listWork(dir).work));
+        const derived = classify(block.title);
+        addWork(dir, {
+          id,
+          title: block.title,
+          description: block.description,
+          kind: block.kind ?? derived.kind,
+          status: 'todo',
+          deps: [],
+          risk: block.risk ?? derived.risk,
+          refs: [],
+          verify: FALLBACK_VERIFY,
+          tier: derived.tier,
+          stage: 'clarify',
+          discoveredFrom: item.id,
+        });
+        log(`fgos-runner: discovered work "${id}" from "${item.id}" (runner-created, stage clarify)`);
+      });
+    } catch (err) {
+      log(`fgos-runner: discovery-report create skipped for "${item.id}" ("${block.title}"): ${err.message}`);
+    }
+  }
+}
+
 async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, breaker, queue, log, priorVisits, rootId }) {
   log(`fgos-runner: claimed "${item.id}" (todo -> doing)`);
   await queue.enqueue(async () => {
@@ -500,7 +581,13 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
   });
 
   let attempt = 0;
+  // wgi-8: the most recent attempt's captured worker output — set from
+  // worker.stdout on the success/verify-miss path and from err.stdout on the
+  // dispatch-failure path, so the terminal-outcome capture below parses the
+  // discovery report exactly once, whichever way this dispatch ends.
+  let lastWorkerOutput = '';
 
+  try {
   while (true) {
     attempt += 1;
     let wt = null;
@@ -534,6 +621,7 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
           reason: feedbackView.work?.[item.id]?.reason,
         },
       });
+      lastWorkerOutput = worker.stdout ?? ''; // wgi-8: terminal-outcome discovery source (success/verify-miss)
       log(`fgos-runner: worker for "${item.id}" exited ${worker.status ?? `signal ${worker.signal}`} (tier ${worker.tier} -> ${worker.model})`);
       // Persist the worker's own output for after-the-fact recovery (D1/D3/D4):
       // right after the spawn resolves, before goal-check — so success AND
@@ -589,6 +677,7 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
         // DispatchError (worker-spawn-fail / worker-timeout) or WorktreeError
         // (worktree-fail) — recovery-matrix vocabulary, routed below.
         failure = { errorClass: err.errorClass, message: err.message };
+        lastWorkerOutput = err.stdout ?? lastWorkerOutput; // wgi-8: a timed-out/failed worker can still have surfaced discoveries
         log(`fgos-runner: ${err.errorClass} for "${item.id}" (attempt ${attempt}): ${err.message}`);
         // Persist the failing outcome (D1/D3/D4). DispatchError carries the
         // buffered stdout/stderr (cell worker-dispatch-log-1); WorktreeError
@@ -683,6 +772,15 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
 
     log(`fgos-runner: parked "${item.id}" (${failure.errorClass}, ${attempt} attempt(s))`);
     return { outcome: 'parked', id: item.id, errorClass: failure.errorClass, attempts: attempt, exitCode: 0 };
+  }
+  } finally {
+    // wgi-8: ONE discovery capture per dispatch, at the terminal attempt's
+    // outcome. It runs before the proposed/parked/halted return (or a bubbled
+    // store error) — never on a retry `continue` (those never leave the loop),
+    // so a re-emitted block can never mint duplicate items across retries.
+    // captureDiscoveredWork is fail-safe and never throws, so it cannot mask a
+    // real error propagating out of the loop.
+    await captureDiscoveredWork({ output: lastWorkerOutput, item, queue, dir, log });
   }
 }
 
