@@ -23,7 +23,7 @@
       "title": "Add a divide(a, b) function to the calculator;",
       "description": "Add a divide(a, b) function to the calculator; zero-division behavior is unspecified",
       "kind": "feature",
-      "status": "doing",
+      "status": "done",
       "deps": [],
       "risk": "standard",
       "refs": [],
@@ -31,7 +31,8 @@
       "mode": "sync",
       "stage": "executing",
       "claimActor": "human",
-      "headAtTake": "02a41162f8f319881a14d7a3bbfc9345130fbdd0"
+      "headAtTake": "02a41162f8f319881a14d7a3bbfc9345130fbdd0",
+      "headAtReturn": "c73d39ee2a5f3eb64d3b5f43172828bc05e66bc3"
     }
   },
   "decisions": [],
@@ -74,6 +75,12 @@
         "actor": "session",
         "ts": "2026-07-18T16:04:48.960Z",
         "detail": "cd /home/vantt/projects/forgent/repo/dogfood-fixture && node --test test/calculator.test.mjs"
+      },
+      {
+        "kind": "close",
+        "actor": "human",
+        "ts": "2026-07-18T16:06:56.419Z",
+        "detail": null
       }
     ]
   },
@@ -103,6 +110,13 @@
         "priorVisits": 0,
         "actor": "human",
         "headAtTake": "02a41162f8f319881a14d7a3bbfc9345130fbdd0"
+      },
+      "actual": {
+        "outcome": "proposed",
+        "passed": true,
+        "attempts": 1,
+        "errorClass": null,
+        "aheadCount": 1
       }
     }
   },
@@ -121,7 +135,22 @@
         },
         "ts": "2026-07-18T15:57:17.824Z"
       }
+    ],
+    "tsk-2ie": [
+      {
+        "outcome": {
+          "disposition": "proposed",
+          "attempts": 1,
+          "errorClass": null
+        },
+        "frictions": {},
+        "settlements": {
+          "clarify-pass/session": 1,
+          "close/human": 1
+        },
+        "ts": "2026-07-18T16:06:56.419Z"
+      }
     ]
   },
-  "revision": "3256ff6d87e6158987c001322a7b820b8255340027744ac3530c2c33da975a03"
+  "revision": "5fb790c43ffcb89c7758949898cad4f883d5eed6dc5da28973bc0b91a57d54f1"
 }
