@@ -27,7 +27,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { appendEvent, readEvents } from './events.mjs';
+import { appendEvent, readEvents, withEventsLock, appendEventLocked } from './events.mjs';
 import { rebuildView, viewRevision } from './replay.mjs';
 import { graphMetrics as computeGraphMetrics, whatIf as computeWhatIf, classifyStaleDoing, footprintOverlap } from './graph-metrics.mjs';
 import { transitionWork, FsmError } from './fsm.mjs';
@@ -126,43 +126,52 @@ export function initStore(dir) {
  * Add a new work item. Validates shape + deps against the log's own current
  * ids (read fresh, never off the possibly-stale view) BEFORE writing
  * anything — an invalid item never reaches the log.
+ *
+ * The existence check through the append is one held `events.lock` critical
+ * section (via `withEventsLock`/`appendEventLocked`, not the bare
+ * `appendEvent`): two processes racing `addWork` on the same id can no
+ * longer both read "id not present yet" and both append a `work.add` — the
+ * second to acquire the lock re-reads with the first's event already in the
+ * log, so its own existence check now correctly fails.
  */
 export function addWork(dir, work) {
   const { logPath } = paths(dir);
-  const before = rebuildView(logPath);
+  const event = withEventsLock(logPath, () => {
+    const before = rebuildView(logPath);
 
-  if (before.work[work?.id]) {
-    throw new StoreError('validation', `work "${work.id}" already exists.`);
-  }
+    if (before.work[work?.id]) {
+      throw new StoreError('validation', `work "${work.id}" already exists.`);
+    }
 
-  // Per D6/D7b: every NEW work.add event carries `tier` explicitly — the
-  // caller's own value, or work.mjs's declared DEFAULTS.tier when omitted —
-  // so the event log itself (not only replay.mjs's fold) states what tier
-  // was in effect at write time. `??` only fills in when `tier` is missing
-  // or nullish; an explicit (even invalid) value passes through unchanged
-  // so validateWork below still rejects it as validation.
-  const item = { ...work, tier: work?.tier ?? DEFAULTS.tier };
-  validateWork(item, Object.keys(before.work));
-  // work-graph-intelligence S1 (D f176c18a): the acyclic invariant on `deps`
-  // is enforced at this SAME write door, right after shape/existence
-  // validation — never a second validation path. assertNoCycle throws
-  // WorkValidationError (category='validation'), already mapped to exit 4 by
-  // categoryOf below; it is never wrapped or re-classified here.
-  //
-  // S2a (record 0012) extends that guarantee from the deps-only graph to the
-  // UNIFIED blocking graph (`deps` as `blocks` edges + `parent` as
-  // `parent-child` edges). The deps-only check runs FIRST so a pure-deps cycle
-  // keeps its S1 "dependency cycle" message; assertNoUnifiedCycle then catches
-  // any cycle that a `parent` edge participates in (a MIXED or pure
-  // parent-child cycle the deps-only walk cannot see — a parent id is never
-  // existence-checked, so a dangling forward parent makes such a cycle
-  // reachable today) and reports it as a "graph cycle". Same
-  // WorkValidationError / category='validation' / exit-4 contract; no schema
-  // change, SCHEMA_VERSION unchanged, legacy events replay untouched (R11).
-  assertNoCycle(item, before.work);
-  assertNoUnifiedCycle(item, before.work);
+    // Per D6/D7b: every NEW work.add event carries `tier` explicitly — the
+    // caller's own value, or work.mjs's declared DEFAULTS.tier when omitted —
+    // so the event log itself (not only replay.mjs's fold) states what tier
+    // was in effect at write time. `??` only fills in when `tier` is missing
+    // or nullish; an explicit (even invalid) value passes through unchanged
+    // so validateWork below still rejects it as validation.
+    const item = { ...work, tier: work?.tier ?? DEFAULTS.tier };
+    validateWork(item, Object.keys(before.work));
+    // work-graph-intelligence S1 (D f176c18a): the acyclic invariant on `deps`
+    // is enforced at this SAME write door, right after shape/existence
+    // validation — never a second validation path. assertNoCycle throws
+    // WorkValidationError (category='validation'), already mapped to exit 4 by
+    // categoryOf below; it is never wrapped or re-classified here.
+    //
+    // S2a (record 0012) extends that guarantee from the deps-only graph to the
+    // UNIFIED blocking graph (`deps` as `blocks` edges + `parent` as
+    // `parent-child` edges). The deps-only check runs FIRST so a pure-deps cycle
+    // keeps its S1 "dependency cycle" message; assertNoUnifiedCycle then catches
+    // any cycle that a `parent` edge participates in (a MIXED or pure
+    // parent-child cycle the deps-only walk cannot see — a parent id is never
+    // existence-checked, so a dangling forward parent makes such a cycle
+    // reachable today) and reports it as a "graph cycle". Same
+    // WorkValidationError / category='validation' / exit-4 contract; no schema
+    // change, SCHEMA_VERSION unchanged, legacy events replay untouched (R11).
+    assertNoCycle(item, before.work);
+    assertNoUnifiedCycle(item, before.work);
 
-  const event = appendEvent(logPath, { type: 'work.add', payload: item });
+    return appendEventLocked(logPath, { type: 'work.add', payload: item });
+  });
   const view = refreshView(dir);
   return { event, view };
 }
@@ -186,45 +195,53 @@ const EDITABLE_FIELDS = new Set(['title', 'kind', 'risk', 'verify', 'tier', 'ref
  * only `{ id, patch }` (additive, per D3/R11) — never the full record — so
  * replay can fold exactly the changed keys onto the item.
  */
+// Same held-lock critical section as addWork above (existence + validation
+// check through the append, one withEventsLock/appendEventLocked scope): two
+// processes racing editWork on the same id, or racing editWork against
+// addWork/moveWork/moveStage on ids that would collide (e.g. a deps/parent
+// cycle only the second writer's patch creates), can no longer both read a
+// precondition that the other's not-yet-visible write is about to invalidate.
 export function editWork(dir, { id, patch, actor } = {}) {
   const { logPath } = paths(dir);
-  const before = rebuildView(logPath);
-  const work = before.work[id];
-  if (!work) {
-    throw new StoreError('validation', `work "${id}" not found.`);
-  }
-  if (!patch || typeof patch !== 'object' || Array.isArray(patch) || Object.keys(patch).length === 0) {
-    throw new StoreError('validation', 'edit requires at least one field to change.');
-  }
-  for (const key of Object.keys(patch)) {
-    if (!EDITABLE_FIELDS.has(key)) {
-      throw new StoreError(
-        'validation',
-        `edit cannot change "${key}" — allowed fields are: ${[...EDITABLE_FIELDS].join(', ')}.`,
-      );
+  const event = withEventsLock(logPath, () => {
+    const before = rebuildView(logPath);
+    const work = before.work[id];
+    if (!work) {
+      throw new StoreError('validation', `work "${id}" not found.`);
     }
-  }
+    if (!patch || typeof patch !== 'object' || Array.isArray(patch) || Object.keys(patch).length === 0) {
+      throw new StoreError('validation', 'edit requires at least one field to change.');
+    }
+    for (const key of Object.keys(patch)) {
+      if (!EDITABLE_FIELDS.has(key)) {
+        throw new StoreError(
+          'validation',
+          `edit cannot change "${key}" — allowed fields are: ${[...EDITABLE_FIELDS].join(', ')}.`,
+        );
+      }
+    }
 
-  const candidate = { ...work, ...patch };
-  validateWork(candidate, Object.keys(before.work));
-  // Same guard pair as addWork above. deps-only first (work-graph-intelligence
-  // S1) — this is the gap that used to close silently: a patch introducing an
-  // A<->B cycle through `deps` (an EDITABLE_FIELDS entry) went straight
-  // through, since validateDeps only checks existence, never acyclicity — and
-  // it keeps the S1 "dependency cycle" message for that pure-deps case. Then
-  // the UNIFIED check (S2a, record 0012) catches a cycle that a `parent` edge
-  // participates in: `parent` is NOT editable, so an edit closes such a cycle
-  // only by patching `deps` into a loop against a parent edge fixed at add
-  // time (a MIXED cycle the deps-only walk cannot see), reported as a "graph
-  // cycle". Same validation/exit-4 contract; no schema change (R11).
-  assertNoCycle(candidate, before.work);
-  assertNoUnifiedCycle(candidate, before.work);
+    const candidate = { ...work, ...patch };
+    validateWork(candidate, Object.keys(before.work));
+    // Same guard pair as addWork above. deps-only first (work-graph-intelligence
+    // S1) — this is the gap that used to close silently: a patch introducing an
+    // A<->B cycle through `deps` (an EDITABLE_FIELDS entry) went straight
+    // through, since validateDeps only checks existence, never acyclicity — and
+    // it keeps the S1 "dependency cycle" message for that pure-deps case. Then
+    // the UNIFIED check (S2a, record 0012) catches a cycle that a `parent` edge
+    // participates in: `parent` is NOT editable, so an edit closes such a cycle
+    // only by patching `deps` into a loop against a parent edge fixed at add
+    // time (a MIXED cycle the deps-only walk cannot see), reported as a "graph
+    // cycle". Same validation/exit-4 contract; no schema change (R11).
+    assertNoCycle(candidate, before.work);
+    assertNoUnifiedCycle(candidate, before.work);
 
-  const payload = { id, patch };
-  if (actor !== undefined) {
-    payload.actor = actor;
-  }
-  const event = appendEvent(logPath, { type: 'work.edit', payload });
+    const payload = { id, patch };
+    if (actor !== undefined) {
+      payload.actor = actor;
+    }
+    return appendEventLocked(logPath, { type: 'work.edit', payload });
+  });
   const view = refreshView(dir);
   return { event, view };
 }
@@ -266,9 +283,18 @@ function composeLearning(view, id, closingSettlement) {
  * Move a work item to a new status. Looks the item up fresh from the log,
  * delegates the precondition/CAS decision to fsm.mjs (pure — never writes),
  * and only then appends the event it returns.
+ *
+ * The lookup, the CAS decision, and the append are one held `events.lock`
+ * critical section (via `withEventsLock`/`appendEventLocked`): two processes
+ * racing `moveWork` on the same id with the same `expectedStatus` can no
+ * longer both pass the CAS check against a status that's about to change out
+ * from under one of them — the second to acquire the lock re-reads with the
+ * first's event already in the log, so its own `expectedStatus` compare
+ * correctly conflicts.
  */
 export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, actor, headAtTake, headAtReturn, branchHeadAtTake, branchHeadAtReturn } = {}) {
   const { logPath } = paths(dir);
+  const event = withEventsLock(logPath, () => {
   const before = rebuildView(logPath);
   const work = before.work[id];
   if (!work) {
@@ -351,7 +377,8 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, act
       // best-effort — see comment above.
     }
   }
-  const event = appendEvent(logPath, rawEvent); // captures the real seq; rawEvent itself has none
+  return appendEventLocked(logPath, rawEvent); // captures the real seq; rawEvent itself has none
+  });
   const view = refreshView(dir);
   return { event, view };
 }
@@ -381,22 +408,28 @@ export function answerAwaiting(dir, { id, answer, expectedStatus, actor } = {}) 
  * `moveWork` exactly, one dimension up: looks the item up fresh from the
  * log, delegates the precondition/CAS decision to stage.mjs (pure — never
  * writes), and only then appends the event it returns.
+ *
+ * Same held-lock critical section as moveWork above — the lookup, the
+ * `expectedStage` CAS decision, and the append all run inside one
+ * `withEventsLock`/`appendEventLocked` scope.
  */
 export function moveStage(dir, { id, to, expectedStage, verify, actor } = {}) {
   const { logPath } = paths(dir);
-  const before = rebuildView(logPath);
-  const work = before.work[id];
-  if (!work) {
-    throw new StoreError('validation', `work "${id}" not found.`);
-  }
+  const event = withEventsLock(logPath, () => {
+    const before = rebuildView(logPath);
+    const work = before.work[id];
+    if (!work) {
+      throw new StoreError('validation', `work "${id}" not found.`);
+    }
 
-  const rawEvent = transitionStage({ work, to, expectedStage, verify }); // FsmError: precondition | conflict
-  // Same post-transition actor stamp as moveWork above — stage.mjs is pure
-  // and only ever returns the fields it knows about.
-  if (actor !== undefined) {
-    rawEvent.payload.actor = actor;
-  }
-  const event = appendEvent(logPath, rawEvent);
+    const rawEvent = transitionStage({ work, to, expectedStage, verify }); // FsmError: precondition | conflict
+    // Same post-transition actor stamp as moveWork above — stage.mjs is pure
+    // and only ever returns the fields it knows about.
+    if (actor !== undefined) {
+      rawEvent.payload.actor = actor;
+    }
+    return appendEventLocked(logPath, rawEvent);
+  });
   const view = refreshView(dir);
   return { event, view };
 }

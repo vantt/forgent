@@ -292,6 +292,50 @@ function acquireEventsLock(logPath, { pid = process.pid, timeoutMs = EVENTS_LOCK
 }
 
 /**
+ * Run `fn` while holding the same cross-process `events.lock` `appendEvent`
+ * uses (derived from `path.dirname(logPath)`), releasing in a `finally` on
+ * every exit path. Exported so a caller with its own precondition check
+ * ahead of an append — store.mjs's addWork/editWork/moveWork/moveStage —
+ * can widen the exclusive window to cover that whole read-check-append
+ * sequence as ONE critical section, instead of only the append itself: the
+ * precondition read and the append share the lock's single scope, so a
+ * second process can no longer read a precondition that's about to go stale
+ * out from under a first process still deciding.
+ */
+export function withEventsLock(logPath, fn) {
+  const lock = acquireEventsLock(logPath);
+  try {
+    return fn();
+  } finally {
+    lock.release();
+  }
+}
+
+/**
+ * The unlocked core of `appendEvent` — same seq derivation and write, minus
+ * lock acquisition. For a caller that already holds the `events.lock` via
+ * `withEventsLock` and wants to append inside that same held lock, without
+ * `appendEvent`'s own (non-reentrant) acquire/release around it.
+ */
+function appendEventCore(logPath, { type, payload = null } = {}) {
+  if (typeof type !== 'string' || !type.trim()) {
+    throw new EventLogError('validation', 'appendEvent: "type" is required and must be a non-empty string.');
+  }
+
+  const existing = readEvents(logPath);
+  const last = existing[existing.length - 1];
+  const seq = last ? last.seq + 1 : 1;
+
+  const event = { seq, ts: new Date().toISOString(), type: type.trim(), payload, v: SCHEMA_VERSION };
+
+  fs.mkdirSync(path.dirname(logPath), { recursive: true });
+  fs.appendFileSync(logPath, `${JSON.stringify(event)}\n`, 'utf8');
+  return event;
+}
+
+export { appendEventCore as appendEventLocked };
+
+/**
  * Append exactly one event to `logPath` as a single JSON line: `{ seq, ts,
  * type, payload, v }`. `seq` is derived from the current last event (1 if
  * the log is empty/absent) — never supplied by the caller, so events cannot
@@ -304,35 +348,19 @@ function acquireEventsLock(logPath, { pid = process.pid, timeoutMs = EVENTS_LOCK
  * already-corrupt log fails loudly with the same 'corrupt-log' category
  * rather than silently continuing on top of unknown state.
  *
- * The read-seq/compute/append sequence runs under a cross-process
- * `events.lock` (released in a finally on every exit path), so two concurrent
- * processes never both read the same last seq and write a duplicate. SCOPE:
- * this closes ONLY the duplicate/out-of-order seq race at the append itself.
- * It does NOT make store.mjs's higher-level read-modify-write operations (e.g.
- * addWork's existing-id check, moveWork's expectedStatus compare-and-swap)
- * atomic across processes — those read state OUTSIDE this lock, so two
- * interactive verbs can each pass a stale precondition and append a
- * valid-but-logically-conflicting event. That residual is a separate, accepted,
- * deferred concern (see this feature's CONTEXT.md Deferred Ideas), NOT solved
- * here. The lock adds exclusivity; it does not alter the seq-numbering algorithm.
+ * The read-seq/compute/append sequence runs under `withEventsLock` (released
+ * in a finally on every exit path), so two concurrent processes never both
+ * read the same last seq and write a duplicate.
+ *
+ * SCOPE: called bare like this, it closes ONLY the duplicate/out-of-order seq
+ * race at the append itself — a caller with its own precondition read ahead
+ * of the append (store.mjs's addWork existing-id check, moveWork's
+ * expectedStatus compare-and-swap, editWork, moveStage) needs that read
+ * inside the SAME held lock to avoid acting on a precondition that's already
+ * gone stale; those callers use `withEventsLock` + `appendEventLocked`
+ * directly instead of this function, so their whole read-check-append
+ * sequence is one critical section.
  */
-export function appendEvent(logPath, { type, payload = null } = {}) {
-  if (typeof type !== 'string' || !type.trim()) {
-    throw new EventLogError('validation', 'appendEvent: "type" is required and must be a non-empty string.');
-  }
-
-  const lock = acquireEventsLock(logPath);
-  try {
-    const existing = readEvents(logPath);
-    const last = existing[existing.length - 1];
-    const seq = last ? last.seq + 1 : 1;
-
-    const event = { seq, ts: new Date().toISOString(), type: type.trim(), payload, v: SCHEMA_VERSION };
-
-    fs.mkdirSync(path.dirname(logPath), { recursive: true });
-    fs.appendFileSync(logPath, `${JSON.stringify(event)}\n`, 'utf8');
-    return event;
-  } finally {
-    lock.release();
-  }
+export function appendEvent(logPath, opts) {
+  return withEventsLock(logPath, () => appendEventCore(logPath, opts));
 }

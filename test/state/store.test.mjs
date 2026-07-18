@@ -15,11 +15,61 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { addWork, editWork, moveWork, addOutcome, addFriction, listWork } from '../../src/state/store.mjs';
+import { fork } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
+import { addWork, editWork, moveWork, addOutcome, addFriction, listWork, readRawEvents } from '../../src/state/store.mjs';
+
+const STORE_MJS = path.resolve(fileURLToPath(import.meta.url), '../../../src/state/store.mjs');
 
 // Every test gets its own mkdtemp dir — never touch the repo's .fgos/.
 function tmpDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-store-learning-'));
+}
+
+// Spawns N real child OS processes that all call `storeCall` (a snippet of
+// source referencing `dir`/`id`, run inside the child) at a synchronized
+// start instant, so their read-check-append windows genuinely overlap —
+// mirrors test/state/events.test.mjs's cross-process race technique
+// (in-process concurrency can never expose this: one event loop serializes
+// calls for free). Each child reports its outcome over the fork IPC channel
+// before exiting.
+async function raceAcrossProcesses(dir, storeCall, nProcesses) {
+  const workDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-store-race-'));
+  const childScript = `
+import { addWork, editWork, moveWork, moveStage, StoreError, FsmError } from ${JSON.stringify(STORE_MJS)};
+const dir = process.argv[2];
+const startAt = Number(process.argv[3]);
+const waitMs = startAt - Date.now();
+if (waitMs > 0) Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, waitMs);
+try {
+  ${storeCall}
+  process.send({ ok: true });
+} catch (err) {
+  process.send({ ok: false, category: err.category, message: err.message });
+}
+`;
+  const childPath = path.join(workDir, 'race-child.mjs');
+  fs.writeFileSync(childPath, childScript);
+
+  const startAt = Date.now() + 300;
+  const results = await Promise.all(
+    Array.from({ length: nProcesses }, () =>
+      new Promise((resolve, reject) => {
+        const child = fork(childPath, [dir, String(startAt)], { stdio: 'inherit' });
+        let message = null;
+        child.on('message', (msg) => {
+          message = msg;
+        });
+        child.on('exit', (code) => {
+          if (!message) return reject(new Error(`child exited (code ${code}) without reporting an outcome`));
+          resolve(message);
+        });
+      }),
+    ),
+  );
+
+  fs.rmSync(workDir, { recursive: true, force: true });
+  return results;
 }
 
 function addSampleWork(dir, id, overrides = {}) {
@@ -322,4 +372,66 @@ test('a valid parent chain (no cycle) is still accepted — the unified guard ha
   addWork(dir, { id: 'tree-child', title: 'Tree Child', kind: 'task', status: 'todo', parent: 'tree-root', deps: [], risk: 'low', refs: [], verify: 'npm test' });
   addWork(dir, { id: 'tree-grandchild', title: 'Tree Grandchild', kind: 'task', status: 'todo', parent: 'tree-child', deps: [], risk: 'low', refs: [], verify: 'npm test' });
   assert.ok(listWork(dir).work['tree-grandchild'], 'a plain parent chain is a DAG, not a cycle');
+});
+
+// Cross-process regression (store-atomic-rmw): before this fix, addWork's
+// "id already exists" precondition read `before` OUTSIDE any lock, so two
+// OS processes racing addWork on the SAME id could each pass the stale
+// check and each append a work.add event — two valid-but-conflicting events
+// for one id. withEventsLock now holds the SAME events.lock appendEvent
+// already used across the whole check-then-append, so the second process to
+// acquire the lock re-reads with the first's event already on disk.
+test('addWork under concurrent OS processes racing the SAME id: exactly one succeeds, the rest see "already exists", and the log has exactly one work.add for that id', async () => {
+  const dir = tmpDir();
+  const N = 6;
+
+  const results = await raceAcrossProcesses(
+    dir,
+    `addWork(dir, { id: 'race-add', title: 'Race Add', kind: 'task', status: 'todo', deps: [], risk: 'low', refs: [], verify: 'npm test' });`,
+    N,
+  );
+
+  const succeeded = results.filter((r) => r.ok);
+  const failed = results.filter((r) => !r.ok);
+  assert.equal(succeeded.length, 1, `exactly one of ${N} concurrent addWork calls must win the race`);
+  assert.equal(failed.length, N - 1, 'every other concurrent addWork call must fail its precondition');
+  for (const r of failed) {
+    assert.equal(r.category, 'validation', 'a losing addWork must fail as StoreError("validation"), not crash or hang');
+    assert.match(r.message, /already exists/);
+  }
+
+  const addEvents = readRawEvents(dir).filter((e) => e.type === 'work.add' && e.payload?.id === 'race-add');
+  assert.equal(addEvents.length, 1, 'the log must carry exactly one work.add event for the raced id, never two conflicting ones');
+});
+
+// Cross-process regression (store-atomic-rmw): before this fix, moveWork's
+// `expectedStatus` CAS read `before` OUTSIDE any lock, so two OS processes
+// racing the SAME status transition on the SAME id could each pass the
+// stale CAS check and each append a work.move event. Same fix as addWork
+// above: the lookup, the CAS decision, and the append now share one held
+// events.lock critical section.
+test('moveWork under concurrent OS processes racing the SAME expectedStatus CAS on the SAME id: exactly one succeeds, the rest conflict, and the log has exactly one matching work.move', async () => {
+  const dir = tmpDir();
+  addSampleWork(dir, 'race-move');
+  moveWork(dir, { id: 'race-move', to: 'doing', expectedStatus: 'todo' });
+  const N = 6;
+
+  const results = await raceAcrossProcesses(
+    dir,
+    `moveWork(dir, { id: 'race-move', to: 'done', expectedStatus: 'doing' });`,
+    N,
+  );
+
+  const succeeded = results.filter((r) => r.ok);
+  const failed = results.filter((r) => !r.ok);
+  assert.equal(succeeded.length, 1, `exactly one of ${N} concurrent moveWork CAS calls must win the race`);
+  assert.equal(failed.length, N - 1, 'every other concurrent moveWork CAS call must fail its precondition');
+  for (const r of failed) {
+    assert.equal(r.category, 'conflict', 'a losing moveWork must fail as FsmError("conflict"), not crash or hang');
+  }
+
+  const moveToDoneEvents = readRawEvents(dir).filter(
+    (e) => e.type === 'work.move' && e.payload?.id === 'race-move' && e.payload?.to === 'done',
+  );
+  assert.equal(moveToDoneEvents.length, 1, 'the log must carry exactly one doing->done work.move event for the raced id');
 });
