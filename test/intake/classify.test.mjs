@@ -88,6 +88,22 @@ test('generateId always returns an id matching ID_PATTERN', () => {
   assert.match(generateId('!!!', []), ID_PATTERN);
 });
 
+test('generateId returns a fixed tsk- prefixed id, independent of title content', () => {
+  for (const title of ['Fix login bug', '123 numeric start', '', '!!!', 'a'.repeat(200)]) {
+    const id = generateId(title, []);
+    assert.match(id, /^tsk-[a-z0-9]{3,8}$/);
+  }
+});
+
+test('generateId satisfies ID_PATTERN even when the hash digest starts with a digit', () => {
+  // "title-0" is a fixed, deterministic input whose sha256->base36 digest
+  // starts with a digit (verified directly) -- the exact case the bare-hash
+  // approach violated on ~89% of inputs (id-systems-audit.md #1).
+  const id = generateId('title-0', []);
+  assert.match(id, ID_PATTERN);
+  assert.match(id, /^tsk-/);
+});
+
 test('generateId retries with a longer suffix on collision, returning a different id', () => {
   const first = generateId('Duplicate title example', []);
   const second = generateId('Duplicate title example', new Set([first]));

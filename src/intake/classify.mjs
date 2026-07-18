@@ -91,17 +91,6 @@ export function classify(text) {
   return { tier, kind, risk };
 }
 
-function slugify(title) {
-  return title
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .slice(0, 40)
-    .replace(/-+$/g, '');
-}
-
 // D3: SHA256 -> base36, per porting-log `hash-id-adaptive-length` (3-8 chars
 // adaptive to a 25% collision threshold). The suffix grows by taking a
 // longer prefix of the same digest on each retry, so a longer suffix is
@@ -115,20 +104,20 @@ const MIN_SUFFIX_LENGTH = 3;
 const MAX_SUFFIX_LENGTH = 8;
 
 /**
- * Generate a stable, kebab-case id from a title (D3): slug + adaptive hash
- * suffix, retrying with a longer suffix when it collides with `existingIds`,
- * bounded to MAX_SUFFIX_LENGTH attempts. Always satisfies work.mjs's
- * ID_PATTERN (letter-start) — a slug that would start with a digit, or an
- * empty slug, is prefixed with a letter.
+ * Generate a stable, kebab-case id (id-systems-audit.md #1: `TSK<hash>`,
+ * stored lowercase as `tsk-<hash>` to satisfy work.mjs's ID_PATTERN — the
+ * title is never part of the id; it's already stored as its own field).
+ * The fixed `tsk-` prefix guarantees letter-start regardless of hash
+ * content (a bare hash digest starts with a digit ~89% of the time).
+ * Retries with a longer suffix when it collides with `existingIds`,
+ * bounded to MAX_SUFFIX_LENGTH attempts.
  */
 export function generateId(title, existingIds = []) {
   const known = existingIds instanceof Set ? existingIds : new Set(existingIds ?? []);
-  const rawSlug = slugify(typeof title === 'string' ? title : '') || 'work';
-  const baseSlug = /^[a-z]/.test(rawSlug) ? rawSlug : `w-${rawSlug}`;
   const suffixSource = hashSuffixSource(typeof title === 'string' ? title : '');
 
   for (let length = MIN_SUFFIX_LENGTH; length <= MAX_SUFFIX_LENGTH; length += 1) {
-    const candidate = `${baseSlug}-${suffixSource.slice(0, length)}`;
+    const candidate = `tsk-${suffixSource.slice(0, length)}`;
     if (!known.has(candidate)) return candidate;
   }
 
