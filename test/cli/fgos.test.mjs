@@ -2726,6 +2726,23 @@ test('approve of a runner item whose diff touches a self-modifying-capable modul
   assert.match(survivingBranches, /fgw\/iron-refuse-item/, 'the branch survives an Iron Law refusal — nothing was merged or cleaned up');
 });
 
+test('approve --acknowledge-iron-law false (a value form, not the bare flag) still REFUSES -- fail-closed, review-20260718-self-improve-loop f02', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeRunnerProposedItemTouching(cwd, 'iron-ack-false-item', 'src/runner/probe.mjs', {
+    verify: 'test -f src/runner/probe.mjs',
+  });
+
+  const headBefore = gitHead(cwd);
+  const result = run(cwd, ['approve', 'iron-ack-false-item', '--acknowledge-iron-law', 'false']);
+  assert.equal(result.status, 4, `a value form must refuse exactly like no flag at all: ${result.stdout}${result.stderr}`);
+  assert.match(result.stderr, /Iron Law/);
+
+  const view = stateView(cwd);
+  assert.equal(view.work['iron-ack-false-item'].status, 'proposed');
+  assert.equal(gitHead(cwd), headBefore);
+});
+
 test('approve of the same self-modifying diff PROCEEDS with --acknowledge-iron-law: merges, verifies, proposed -> done, branch cleaned up', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);

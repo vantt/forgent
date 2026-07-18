@@ -1188,7 +1188,15 @@ async function runVerb(verb, flags, positional, dir) {
         // direction, accepted as-is. Refuses BEFORE the dirty-tree check and
         // any git mutation: the item stays `proposed`, nothing is touched.
         const ironLaw = classifyIronLaw({ filesChanged: changedFiles(repoRoot, item), description: item.description });
-        if (ironLaw.required && !flags['acknowledge-iron-law']) {
+        // review-20260718-self-improve-loop finding f02: parseArgs consumes any
+        // non-'--'-prefixed following token as a flag's string value, so
+        // `--acknowledge-iron-law false` would set this to the truthy string
+        // 'false' under a plain falsiness check — silently granting the
+        // override an operator typed to decline. Only the bare flag (parsed as
+        // boolean `true`, no following value) counts; any value form fails
+        // closed, matching this flag's stated boolean-only design (runner.md
+        // R37 — same shape as submit's --async/--unattended).
+        if (ironLaw.required && flags['acknowledge-iron-law'] !== true) {
           throw new StoreError(
             'validation',
             `approve: "${id}" trips the Iron Law — a failing test must precede this self-modifying diff before it can land. `
