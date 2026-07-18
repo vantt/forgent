@@ -58,13 +58,13 @@ a developer who wants to run `fgos` in a project that is not this repo.
 
 ## Business Rules
 
-- **R1.** The distributed package never includes the source repository's own
+- **RUL1.** The distributed package never includes the source repository's own
   runtime data directory or its own dogfood runner configuration — install
   content is always limited to the distribution file allowlist (per D2).
-- **R2.** Distribution happens by installing directly from the GitHub
+- **RUL2.** Distribution happens by installing directly from the GitHub
   repository, not by publishing to the public npm registry — no package
   rename and no registry publish credentials are involved (per D1).
-- **R3.** Installing fgos does not change init/doctrine/marker-detection
+- **RUL3.** Installing fgos does not change init/doctrine/marker-detection
   behavior in any way — that behavior belongs entirely to the coexistence
   area and is unchanged by installation (per D3).
 
