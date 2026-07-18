@@ -15,6 +15,11 @@ Mỗi record theo dạng ADR (Architecture Decision Record): `NNNN-<slug>.md`, c
 quyết định của dự án — không phải log thô. Một quyết định đã chốt sau này (per
 `AGENTS.md` Definition of Done bước 6) được thêm vào đây.
 
+**Quy ước trích dẫn rút gọn:** trong văn xuôi, khi trích một record mà không kèm
+tên file đầy đủ, viết dạng `ADR<n>` (vd `ADR0013`) thay vì số trần trụi (`0013`).
+Tên file đầy đủ (`NNNN-slug.md`) hoặc một markdown link (href đã kèm sẵn tên
+file) không cần đổi.
+
 Đổi một quyết định = **supersede** record tương ứng bằng một record mới, không sửa
 tại chỗ (giữ đúng nguyên tắc bất-biến của platform-foundations).
 
