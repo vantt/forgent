@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { frontier } from '../../src/state/frontier.mjs';
+import { frontier, FRONTIER_ORDER_VERSION } from '../../src/state/frontier.mjs';
 
 // Pure lib — every view here is a literal or built via foldEvents in
 // replay.test.mjs's style; no fs, no mkdtemp, no `.fgos/` writes anywhere in
@@ -84,6 +84,32 @@ test('frontier follows FIFO seq/declaration order, not lexical id order (add-ord
     },
   };
   assert.deepEqual(frontier(view).map((i) => i.id), ['zeta', 'alpha']);
+});
+
+// --- work-graph-intelligence S4: claim-order tie-break contract -----------
+// The frontier's order is a NAMED, VERSIONED contract. v1's sole ordering key
+// is FIFO by declaration order; a future priority key (P7) is a deliberate
+// v1 -> v2 bump. These tests pin the version and re-assert the v1 order as the
+// contract, so an accidental reorder (or a P7 change that forgets to bump the
+// version) trips here.
+
+test('S4 tie-break contract: FRONTIER_ORDER_VERSION is 1 — a reorder of the claim-order must bump it deliberately', () => {
+  assert.equal(FRONTIER_ORDER_VERSION, 1);
+});
+
+test('S4 tie-break contract v1: a later-declared ready item orders AFTER an earlier-declared one (FIFO declaration order is the sole v1 key)', () => {
+  const view = {
+    work: {
+      'later-declared': item('later-declared', 'todo'),
+      'earlier-would-sort-first-by-id': item('earlier-would-sort-first-by-id', 'todo'),
+    },
+  };
+  // Declaration order, not id order: the first-declared key comes first even
+  // though its id sorts LAST lexically. This is the v1 contract P7 supersedes.
+  assert.deepEqual(
+    frontier(view).map((i) => i.id),
+    ['later-declared', 'earlier-would-sort-first-by-id'],
+  );
 });
 
 test('FIFO order survives status moves on unrelated items (moving does not reorder view.work keys)', () => {

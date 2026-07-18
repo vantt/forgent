@@ -42,6 +42,25 @@ import { getDomain, stageForStep } from './domains.mjs';
 //     FIFO). `Object.keys(view.work)` therefore always iterates in
 //     declaration (insertion) order, which is what `frontier` relies on for
 //     FIFO — it never sorts by id.
+// TIE-BREAK CONTRACT (work-graph-intelligence S4). `frontier(view)` is the
+// single, versioned surface that decides claim order: the order it returns IS
+// the order the runner claims and dispatches in (consumers `readyWork` in
+// store.mjs and `steerFrontier` in the runner take this order as given, never
+// re-sorting). `FRONTIER_ORDER_VERSION` names that order so a change to it is
+// deliberate and visible, never an accidental reorder of a cold-pickup-
+// critical invariant.
+//
+//   - v1 (current): the SOLE ordering key is FIFO by `work.add` declaration
+//     order — exactly the insertion-order iteration argued for in the header
+//     comment above. No priority, no re-sort.
+//
+// A future priority key (P7) is a v1 -> v2 supersession made HERE — priority
+// becomes the primary key, declaration order the tie-break — bumping this
+// constant in the same change. The version pin below turns any such reorder
+// into a deliberate, test-visible decision. (No comparator framework is built
+// ahead of that need — v1 has one key, and the frontier already yields it.)
+export const FRONTIER_ORDER_VERSION = 1;
+
 export function frontier(view) {
   const work = view?.work ?? {};
   const childrenByParent = indexChildrenByParent(work);
