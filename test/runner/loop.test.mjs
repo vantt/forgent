@@ -166,6 +166,37 @@ fs.writeFileSync(marker + '.end', String(Date.now()));
   return scriptPath;
 }
 
+/** A worker that fails verify on its first attempt (commits junk.txt, not
+ * the output the seeded item's verify demands) then succeeds on its retry
+ * (commits output.txt) — proves a retry's reset target: whichever attempt
+ * this is decided purely from how many runs the counter file already
+ * recorded, so it needs no state beyond what dispatchClaimedItem's own
+ * retry loop already drives. */
+function writeFlakyThenFixingExecutor(scriptDir, counterFile) {
+  const scriptPath = path.join(scriptDir, 'flaky-then-fixing-executor.mjs');
+  fs.writeFileSync(
+    scriptPath,
+    `
+import fs from 'node:fs';
+import { execFileSync } from 'node:child_process';
+const priorRuns = fs.existsSync(${JSON.stringify(counterFile)})
+  ? fs.readFileSync(${JSON.stringify(counterFile)}, 'utf8').split('\\n').filter(Boolean).length
+  : 0;
+fs.appendFileSync(${JSON.stringify(counterFile)}, 'run\\n');
+if (priorRuns === 0) {
+  fs.writeFileSync('junk.txt', 'wrong output from the failed first attempt\\n');
+  execFileSync('git', ['add', 'junk.txt']);
+  execFileSync('git', ['commit', '-q', '-m', 'worker: junk.txt (attempt 1, fails verify)']);
+} else {
+  fs.writeFileSync('output.txt', 'correct output from the retry\\n');
+  execFileSync('git', ['add', 'output.txt']);
+  execFileSync('git', ['commit', '-q', '-m', 'worker: output.txt (retry, passes verify)']);
+}
+`,
+  );
+  return scriptPath;
+}
+
 function configFor(scriptPath) {
   return {
     executor: { command: process.execPath, args: [scriptPath, '{prompt}', '--model', '{model}'] },
@@ -614,6 +645,36 @@ test('verify-miss: worker commits the wrong thing -> retry once, then park to bl
   assert.equal(frictionEvent.payload.layer, 'verification');
   assert.equal(frictionEvent.payload.attempts, 2);
   assert.ok(frictionEvent.payload.detail, 'friction carries the failure message');
+});
+
+test('P1 fix: retry resets to this item\'s own dispatch baseline, not HEAD — a differently-committing retry never carries the first (failed) attempt\'s commit forward', async () => {
+  const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
+  seedItem(dir, { id: 'item-retry-clean' }); // default verify: 'test -f output.txt'
+  const config = configFor(writeFlakyThenFixingExecutor(scriptDir, counterFile));
+
+  const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
+
+  assert.equal(result.outcome, 'drained');
+  assert.equal(result.dispatched[0].outcome, 'proposed');
+  assert.equal(result.dispatched[0].attempts, 2);
+  assert.equal(listWork(dir).work['item-retry-clean'].status, 'proposed');
+
+  const branch = branchNameFor('item-retry-clean');
+  assert.equal(fileAtRef(repoRoot, branch, 'output.txt'), true, "the retry's own commit landed");
+  assert.equal(
+    fileAtRef(repoRoot, branch, 'junk.txt'),
+    false,
+    "the first (failed) attempt's commit was discarded by the retry reset, not carried forward",
+  );
+
+  // Exactly one commit ahead of main — proof the retry reset to the dispatch
+  // baseline (main's tip), not HEAD, which would have kept the first
+  // attempt's commit and stacked the retry's commit on top of it (two ahead).
+  const aheadCount = parseInt(
+    execFileSync('git', ['rev-list', '--count', `main..${branch}`], { cwd: repoRoot, encoding: 'utf8' }).trim(),
+    10,
+  );
+  assert.equal(aheadCount, 1, 'exactly one commit ahead of main — the failed first attempt did not stack under the retry');
 });
 
 test('verify passes but the worker never committed -> classified verify-miss, parked after retries', async () => {

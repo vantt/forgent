@@ -20,8 +20,13 @@
 // path leaks a checkout. The branch (`fgw/<id>`) always survives teardown:
 // it is the durable D1-level proposal artifact (per D4). A retry never
 // builds on a previous attempt's debris: each attempt gets a FRESH worktree
-// directory checked out at the (reused) branch's head, plus an explicit
-// `reset --hard`/`clean -fd` belt-and-braces before re-spawn.
+// directory checked out at the (reused) branch's current tip, then reset
+// --hard to this item's own DISPATCH BASELINE (the branch tip captured on
+// this item's first attempt, before any worker of its own ran) — not HEAD,
+// which IS the prior attempt's own commit whenever that attempt committed
+// before failing verify. The baseline preserves anything legitimately on
+// the branch before this item's own dispatch (e.g. an earlier merged leaf,
+// D3) while discarding only this item's own failed work.
 //
 // OUTPUT DISCIPLINE (security panel): worker stdout/stderr and verify
 // output are surfaced on the console only (a tail, via `log`) — never
@@ -586,6 +591,10 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
   });
 
   let attempt = 0;
+  // Captured once, on this item's first attempt: the branch tip BEFORE this
+  // item's own worker ever ran (see WORKTREE LIFECYCLE above). Retries reset
+  // to this, not HEAD.
+  let dispatchBaseline = null;
   // wgi-8: the most recent attempt's captured worker output — set from
   // worker.stdout on the success/verify-miss path and from err.stdout on the
   // dispatch-failure path, so the terminal-outcome capture below parses the
@@ -608,10 +617,14 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
       } else {
         wt = createWorktree(repoRoot, item.id, { worktreeDir });
       }
-      if (attempt > 1) {
-        // Retry never builds on debris: the fresh checkout is already at the
-        // reused branch's head, and this reset/clean makes that explicit.
-        execFileSync('git', ['reset', '--hard', 'HEAD'], { cwd: wt.path, encoding: 'utf8', shell: false });
+      if (dispatchBaseline === null) {
+        dispatchBaseline = git(repoRoot, ['rev-parse', wt.branch]).trim();
+      } else {
+        // Retry never builds on debris: the reused branch's HEAD is the
+        // prior attempt's OWN commit whenever that attempt committed before
+        // failing verify, so `reset --hard HEAD` would be a no-op against
+        // it. Reset to this item's own dispatch baseline instead.
+        execFileSync('git', ['reset', '--hard', dispatchBaseline], { cwd: wt.path, encoding: 'utf8', shell: false });
         execFileSync('git', ['clean', '-fdq'], { cwd: wt.path, encoding: 'utf8', shell: false });
       }
 
