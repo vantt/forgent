@@ -6,7 +6,7 @@
       "title": "Add a multiply(a, b) function to the calculator, returning",
       "description": "Add a multiply(a, b) function to the calculator, returning a*b, with a matching test",
       "kind": "feature",
-      "status": "doing",
+      "status": "done",
       "deps": [],
       "risk": "standard",
       "refs": [],
@@ -14,7 +14,24 @@
       "mode": "sync",
       "stage": "executing",
       "claimActor": "human",
-      "headAtTake": "c52aeabb8c54ee4b3ce8d7a99ac69c073a54e1af"
+      "headAtTake": "c52aeabb8c54ee4b3ce8d7a99ac69c073a54e1af",
+      "headAtReturn": "02a41162f8f319881a14d7a3bbfc9345130fbdd0"
+    },
+    "tsk-2ie": {
+      "tier": "standard",
+      "id": "tsk-2ie",
+      "title": "Add a divide(a, b) function to the calculator;",
+      "description": "Add a divide(a, b) function to the calculator; zero-division behavior is unspecified",
+      "kind": "feature",
+      "status": "doing",
+      "deps": [],
+      "risk": "standard",
+      "refs": [],
+      "verify": "cd /home/vantt/projects/forgent/repo/dogfood-fixture && node --test test/calculator.test.mjs",
+      "mode": "sync",
+      "stage": "executing",
+      "claimActor": "human",
+      "headAtTake": "02a41162f8f319881a14d7a3bbfc9345130fbdd0"
     }
   },
   "decisions": [],
@@ -26,6 +43,14 @@
         "verify": "node --test 'test/**/*.test.mjs' --test-name-pattern=multiply",
         "ts": "2026-07-18T15:54:16.801Z"
       }
+    ],
+    "tsk-2ie": [
+      {
+        "id": "tsk-2ie",
+        "clear": true,
+        "verify": "cd /home/vantt/projects/forgent/repo/dogfood-fixture && node --test test/calculator.test.mjs",
+        "ts": "2026-07-18T16:04:48.959Z"
+      }
     ]
   },
   "settlements": {
@@ -35,6 +60,20 @@
         "actor": "session",
         "ts": "2026-07-18T15:54:16.802Z",
         "detail": "node --test 'test/**/*.test.mjs' --test-name-pattern=multiply"
+      },
+      {
+        "kind": "close",
+        "actor": "human",
+        "ts": "2026-07-18T15:57:17.824Z",
+        "detail": null
+      }
+    ],
+    "tsk-2ie": [
+      {
+        "kind": "clarify-pass",
+        "actor": "session",
+        "ts": "2026-07-18T16:04:48.960Z",
+        "detail": "cd /home/vantt/projects/forgent/repo/dogfood-fixture && node --test test/calculator.test.mjs"
       }
     ]
   },
@@ -47,8 +86,42 @@
         "priorVisits": 0,
         "actor": "human",
         "headAtTake": "c52aeabb8c54ee4b3ce8d7a99ac69c073a54e1af"
+      },
+      "actual": {
+        "outcome": "proposed",
+        "passed": true,
+        "attempts": 1,
+        "errorClass": null,
+        "aheadCount": 1
+      }
+    },
+    "tsk-2ie": {
+      "id": "tsk-2ie",
+      "predicted": {
+        "tier": "standard",
+        "deps": 0,
+        "priorVisits": 0,
+        "actor": "human",
+        "headAtTake": "02a41162f8f319881a14d7a3bbfc9345130fbdd0"
       }
     }
   },
-  "revision": "9b3477cc72c404b804f3687d504fb4b98a8bb0ec3a023fa39dc1eb2f217b3c1b"
+  "learnings": {
+    "tsk-4e5": [
+      {
+        "outcome": {
+          "disposition": "proposed",
+          "attempts": 1,
+          "errorClass": null
+        },
+        "frictions": {},
+        "settlements": {
+          "clarify-pass/session": 1,
+          "close/human": 1
+        },
+        "ts": "2026-07-18T15:57:17.824Z"
+      }
+    ]
+  },
+  "revision": "3256ff6d87e6158987c001322a7b820b8255340027744ac3530c2c33da975a03"
 }
