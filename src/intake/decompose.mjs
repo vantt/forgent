@@ -19,7 +19,6 @@
 
 import { spawnSync } from 'node:child_process';
 import { resolveExecutorCommand, modelForTier } from '../runner/dispatch.mjs';
-import { generateId } from './classify.mjs';
 import { DEFAULTS } from '../state/work.mjs';
 import { listWork, moveStage, addWork, putInAwaiting, StoreError } from '../state/store.mjs';
 
@@ -205,9 +204,10 @@ export function resolveDecompose(dir, id, cfg, actor) {
 
   // RE-ENTRANCY (validating feasibility matrix, REPAIRED): a crash between
   // writing children and moving the root to executing must not regenerate
-  // children on retry — generateId is deterministic, so a blind retry would
-  // hit addWork's "already exists" validation error. Detect prior children
-  // via the view instead, and only finish the root's own stage-move.
+  // children on retry — child ids are positional (`${work.id}-<n>`), so a
+  // blind retry would hit addWork's "already exists" validation error.
+  // Detect prior children via the view instead, and only finish the root's
+  // own stage-move.
   const hasChildren = Object.values(view.work).some((item) => item.parent === id);
   if (hasChildren) {
     moveStage(dir, { id, to: 'executing', expectedStage: 'decompose', actor });
@@ -235,17 +235,12 @@ export function resolveDecompose(dir, id, cfg, actor) {
     return { outcome: 'pass-through', id };
   }
 
-  // verdict.kind === 'decompose': generate every child id up front (so
-  // sibling `deps` resolve to real ids), then write each through the same
-  // single store door, in list order — a child's deps were already filtered
-  // to indices strictly before its own position, so every dep it names has
-  // already been written by the time its own addWork runs.
-  const existingIds = new Set(Object.keys(view.work));
-  const childIds = verdict.children.map((child) => {
-    const childId = generateId(child.title, existingIds);
-    existingIds.add(childId);
-    return childId;
-  });
+  // verdict.kind === 'decompose': child ids are positional — `${work.id}-<n>`,
+  // n = 1-based sibling index (id-systems-audit.md #1) — so recursion into a
+  // grandchild falls out for free: when a child is itself later decomposed,
+  // its own `work.id` (already `<root>-<m>`) becomes the base, producing
+  // `<root>-<m>-<n>` with no special-case code.
+  const childIds = verdict.children.map((child, index) => `${work.id}-${index + 1}`);
 
   verdict.children.forEach((child, index) => {
     addWork(dir, {

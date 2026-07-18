@@ -232,6 +232,8 @@ test('resolveDecompose on a decompose verdict writes every child with parent/dep
   assert.equal(view.work['item-x'].stage, 'executing');
 
   const [firstId, secondId] = result.childIds;
+  assert.equal(firstId, 'item-x-1');
+  assert.equal(secondId, 'item-x-2');
   assert.equal(view.work[firstId].parent, 'item-x');
   assert.equal(view.work[firstId].stage, 'executing');
   assert.equal(view.work[firstId].status, 'todo');
@@ -244,6 +246,59 @@ test('resolveDecompose on a decompose verdict writes every child with parent/dep
 
   // D4/D5: children are lineage only, never written into the root's own deps.
   assert.deepEqual(view.work['item-x'].deps, []);
+});
+
+test('resolveDecompose assigns positional child ids `${work.id}-<n>` for n=1..N across N siblings', () => {
+  const scriptDir = mkTempDir();
+  const scriptPath = writeVerdictExecutor(scriptDir, {
+    verdict: 'decompose',
+    children: [
+      { title: 'Build parser', verify: 'npm test -- parser' },
+      { title: 'Build renderer', verify: 'npm test -- renderer' },
+      { title: 'Build linker', verify: 'npm test -- linker' },
+    ],
+  });
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork());
+
+  const result = resolveDecompose(storeDir, 'item-x', cfg, 'runner');
+  assert.equal(result.outcome, 'decompose');
+  assert.deepEqual(result.childIds, ['item-x-1', 'item-x-2', 'item-x-3']);
+});
+
+test('resolveDecompose on a grandchild decompose produces `<root>-<m>-<n>` ids with no special-case code', () => {
+  const scriptDir = mkTempDir();
+  const scriptPath = writeVerdictExecutor(scriptDir, {
+    verdict: 'decompose',
+    children: [{ title: 'Build sub-parser', verify: 'npm test -- sub-parser' }],
+  });
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork());
+  // Simulate a child already produced by a prior decompose of the root
+  // (id `item-x-2`), itself now sitting at stage `decompose`.
+  addWork(storeDir, {
+    id: 'item-x-2',
+    title: 'Build renderer',
+    kind: 'feature',
+    status: 'todo',
+    deps: [],
+    risk: 'standard',
+    refs: [],
+    verify: 'npm test -- renderer',
+    stage: 'decompose',
+    parent: 'item-x',
+  });
+
+  const result = resolveDecompose(storeDir, 'item-x-2', cfg, 'runner');
+  assert.equal(result.outcome, 'decompose');
+  assert.deepEqual(result.childIds, ['item-x-2-1']);
+
+  const view = listWork(storeDir);
+  assert.equal(view.work['item-x-2-1'].parent, 'item-x-2');
 });
 
 test('resolveDecompose completes an interrupted decompose (children exist, root still at decompose stage) without regenerating children', () => {
