@@ -154,22 +154,50 @@ export function loadRunnerConfig(configPath) {
   return cfg;
 }
 
-function validateRunnerConfigShape(cfg, sourceLabel) {
-  if (!cfg || typeof cfg !== 'object' || Array.isArray(cfg)) {
-    throw new RunnerConfigError(`runner config (${sourceLabel}) must be an object.`);
-  }
-  const executor = cfg.executor;
+/**
+ * Shape-check one executor block ({command, args[], adapter?}) — shared by
+ * the required global `cfg.executor` and every optional `cfg.executors.<tier>`
+ * entry (P41/C9 v2). An `adapter` field, when present, must name a
+ * registered `EXECUTOR_ADAPTERS` key; absent defaults to `DEFAULT_ADAPTER`
+ * at resolve time, not validated here.
+ */
+function validateExecutorShape(executor, label) {
   if (
     !executor ||
     typeof executor !== 'object' ||
+    Array.isArray(executor) ||
     typeof executor.command !== 'string' ||
     !executor.command.trim() ||
     !Array.isArray(executor.args) ||
     !executor.args.every((arg) => typeof arg === 'string')
   ) {
     throw new RunnerConfigError(
-      `runner config (${sourceLabel}) must declare "executor.command" (non-empty string) and "executor.args" (array of strings).`,
+      `runner config (${label}) must declare "command" (non-empty string) and "args" (array of strings).`,
     );
+  }
+  if (executor.adapter !== undefined && (typeof executor.adapter !== 'string' || !(executor.adapter in EXECUTOR_ADAPTERS))) {
+    throw new RunnerConfigError(
+      `runner config (${label}) "adapter" must be one of: ${Object.keys(EXECUTOR_ADAPTERS).join(', ')}.`,
+    );
+  }
+}
+
+function validateRunnerConfigShape(cfg, sourceLabel) {
+  if (!cfg || typeof cfg !== 'object' || Array.isArray(cfg)) {
+    throw new RunnerConfigError(`runner config (${sourceLabel}) must be an object.`);
+  }
+  validateExecutorShape(cfg.executor, `${sourceLabel} executor`);
+  // OPTIONAL per-tier executor overrides (P41/D a4fe4c2b): a tier declared
+  // here dispatches through its own executor block; a tier absent from this
+  // map falls back to the global `executor` above — old configs with no
+  // `executors` block at all keep running unchanged (backward-compat).
+  if (cfg.executors !== undefined) {
+    if (!cfg.executors || typeof cfg.executors !== 'object' || Array.isArray(cfg.executors)) {
+      throw new RunnerConfigError(`runner config (${sourceLabel}) "executors" must be an object mapping tier -> executor when present.`);
+    }
+    for (const [tier, executor] of Object.entries(cfg.executors)) {
+      validateExecutorShape(executor, `${sourceLabel} executors.${tier}`);
+    }
   }
   if (!cfg.models || typeof cfg.models !== 'object' || Array.isArray(cfg.models)) {
     throw new RunnerConfigError(`runner config (${sourceLabel}) must declare a "models" object mapping tier -> model.`);
@@ -212,15 +240,37 @@ export function modelForTier(cfg, tier) {
 }
 
 /**
- * Substitute `{prompt}` and `{model}` into `cfg.executor.args` — PER ARRAY
- * ELEMENT (never joined into one shell string, per the security panel).
- * Returns `{ command, args }`, ready to hand to `spawn(command, args,
- * { shell: false })` unchanged.
+ * Resolve which executor block applies for `tier` (P41/D a4fe4c2b): a tier
+ * present in `cfg.executors` uses that block; otherwise (or with no `tier`
+ * given at all, keeping every pre-P41 call site working unchanged) falls
+ * back to the global `cfg.executor`.
  */
-export function resolveExecutorCommand(cfg, { prompt, model }) {
-  const executor = cfg && cfg.executor;
+function resolveExecutorConfig(cfg, tier) {
+  const perTier = cfg && cfg.executors && typeof cfg.executors === 'object' ? cfg.executors[tier] : undefined;
+  const executor = perTier ?? (cfg && cfg.executor);
   if (!executor || typeof executor.command !== 'string' || !Array.isArray(executor.args)) {
     throw new RunnerConfigError('runner config "executor" must have a string "command" and an "args" array.');
+  }
+  return executor;
+}
+
+/**
+ * Substitute `{prompt}` and `{model}` into the resolved executor's `args` —
+ * PER ARRAY ELEMENT (never joined into one shell string, per the security
+ * panel). `tier`, when given, selects a per-tier executor override (P41)
+ * ahead of the global `cfg.executor`; omitted keeps every pre-P41 caller's
+ * behavior identical. Returns `{ command, args, adapter }` — `adapter` names
+ * the C9 v2 executor interface's adapter (`EXECUTOR_ADAPTERS` key) this
+ * command should run through, defaulting to `DEFAULT_ADAPTER` when the
+ * executor block does not declare one.
+ */
+export function resolveExecutorCommand(cfg, { prompt, model, tier } = {}) {
+  const executor = resolveExecutorConfig(cfg, tier);
+  const adapter = executor.adapter ?? DEFAULT_ADAPTER;
+  if (!(adapter in EXECUTOR_ADAPTERS)) {
+    throw new RunnerConfigError(
+      `runner config declares unknown executor adapter "${adapter}" (known: ${Object.keys(EXECUTOR_ADAPTERS).join(', ')}).`,
+    );
   }
   const args = executor.args.map((arg) => {
     if (typeof arg !== 'string') {
@@ -228,7 +278,7 @@ export function resolveExecutorCommand(cfg, { prompt, model }) {
     }
     return arg.split('{prompt}').join(prompt).split('{model}').join(model);
   });
-  return { command: executor.command, args };
+  return { command: executor.command, args, adapter };
 }
 
 /**
@@ -266,19 +316,23 @@ function teeChunk(onChunk, stream, chunk) {
   }
 }
 
-export function spawnWorker(work, cfg, cwd, opts = {}) {
-  // Setup stays synchronous and OUTSIDE the Promise below on purpose: a
-  // malformed tier/config (RunnerConfigError, via modelForTier/
-  // resolveExecutorCommand) must still throw synchronously, before any
-  // process is spawned — exactly like the spawnSync-based version, and
-  // exactly what dispatch.test.mjs's "throws a RunnerConfigError ... before
-  // any spawn" test pins.
-  const tier = work.tier ?? DEFAULTS.tier;
-  const model = modelForTier(cfg, tier);
-  const prompt = buildPrompt(work, opts.feedback);
-  const { command, args } = resolveExecutorCommand(cfg, { prompt, model });
-  const timeoutMs = opts.timeoutMs ?? cfg.timeoutMs;
-  const maxBuffer = opts.maxBuffer ?? 10 * 1024 * 1024;
+/**
+ * C9 v2 (P41/D a4fe4c2b): the executor port is now a NAMED interface —
+ * `EXECUTOR_ADAPTERS` maps an adapter name to a function
+ * `(command, args, cwd, opts) => Promise<{status, signal, stdout, stderr,
+ * tier, model}>`. Today exactly one adapter is registered: `cli-spawn`,
+ * which is this exact process-spawning body, unchanged in every behavioral
+ * detail from before this cell (timeout-on-'exit', hand-tracked maxBuffer
+ * kill, onChunk teed before accounting, grandchild-SIGTERM caveat still
+ * applies). An `rpc`/`app-server` adapter (e.g. talking to a headless
+ * agent's app-server over RPC instead of CLI argv) is deferred — not
+ * registered here — until a real system needs to plug into this port; only
+ * the interface's name is bought now, not a second adapter.
+ */
+export const DEFAULT_ADAPTER = 'cli-spawn';
+
+function cliSpawnAdapter(command, args, cwd, opts) {
+  const { timeoutMs, maxBuffer, onChunk, workId, tier, model } = opts;
 
   return new Promise((resolve, reject) => {
     const child = spawn(command, args, { cwd, shell: false });
@@ -347,8 +401,8 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
       finish(() => {
         reject(new DispatchError(
           'worker-spawn-fail',
-          `executor failed to start for work "${work.id}": ${err.message}`,
-          { workId: work.id, tier, model, cause: err.message, stdout, stderr },
+          `executor failed to start for work "${workId}": ${err.message}`,
+          { workId, tier, model, cause: err.message, stdout, stderr },
         ));
       });
     });
@@ -366,21 +420,67 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
         if (timedOut) {
           reject(new DispatchError(
             'worker-timeout',
-            `executor timed out after ${timeoutMs}ms for work "${work.id}".`,
-            { workId: work.id, tier, model, stdout, stderr },
+            `executor timed out after ${timeoutMs}ms for work "${workId}".`,
+            { workId, tier, model, stdout, stderr },
           ));
           return;
         }
         if (maxBufferExceeded) {
           reject(new DispatchError(
             'worker-spawn-fail',
-            `executor for work "${work.id}" exceeded maxBuffer (${maxBuffer} bytes) and was killed.`,
-            { workId: work.id, tier, model, cause: 'maxBuffer exceeded', stdout, stderr },
+            `executor for work "${workId}" exceeded maxBuffer (${maxBuffer} bytes) and was killed.`,
+            { workId, tier, model, cause: 'maxBuffer exceeded', stdout, stderr },
           ));
           return;
         }
         resolve({ status: code, signal, stdout, stderr, tier, model });
       });
     });
+  });
+}
+
+/** C9 v2 executor-adapter registry — see `cliSpawnAdapter`'s doc comment. */
+export const EXECUTOR_ADAPTERS = { [DEFAULT_ADAPTER]: cliSpawnAdapter };
+
+/**
+ * Run the headless executor for `work` inside `cwd` (the worktree checkout
+ * — this function never touches the main working tree itself; the caller
+ * decides `cwd`). Builds the prompt, resolves tier -> model, resolves the
+ * (possibly per-tier, P41) executor + its C9 v2 adapter, substitutes the
+ * config template, and delegates the actual spawn to that adapter.
+ *
+ * Throws `DispatchError('worker-timeout', ...)` when the executor is killed
+ * for exceeding `cfg.timeoutMs` (or `opts.timeoutMs`, test-only override),
+ * and `DispatchError('worker-spawn-fail', ...)` when the process could not
+ * be started at all (e.g. the configured command does not exist). A
+ * non-zero exit status from a process that *did* run is NOT an error here —
+ * that is the runner's goal-check's concern (per D3: the worker's own exit
+ * status/report is never trusted on its own; only `verify` decides).
+ */
+export function spawnWorker(work, cfg, cwd, opts = {}) {
+  // Setup stays synchronous and OUTSIDE the adapter call on purpose: a
+  // malformed tier/config (RunnerConfigError, via modelForTier/
+  // resolveExecutorCommand) must still throw synchronously, before any
+  // process is spawned — exactly like the spawnSync-based version, and
+  // exactly what dispatch.test.mjs's "throws a RunnerConfigError ... before
+  // any spawn" test pins.
+  const tier = work.tier ?? DEFAULTS.tier;
+  const model = modelForTier(cfg, tier);
+  const prompt = buildPrompt(work, opts.feedback);
+  const { command, args, adapter } = resolveExecutorCommand(cfg, { prompt, model, tier });
+  const adapterFn = EXECUTOR_ADAPTERS[adapter];
+  if (!adapterFn) {
+    throw new RunnerConfigError(`no executor adapter registered for "${adapter}".`);
+  }
+  const timeoutMs = opts.timeoutMs ?? cfg.timeoutMs;
+  const maxBuffer = opts.maxBuffer ?? 10 * 1024 * 1024;
+
+  return adapterFn(command, args, cwd, {
+    timeoutMs,
+    maxBuffer,
+    onChunk: opts.onChunk,
+    workId: work.id,
+    tier,
+    model,
   });
 }

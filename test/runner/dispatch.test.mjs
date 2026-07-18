@@ -11,6 +11,8 @@ import {
   spawnWorker,
   RunnerConfigError,
   DispatchError,
+  EXECUTOR_ADAPTERS,
+  DEFAULT_ADAPTER,
 } from '../../src/runner/dispatch.mjs';
 
 // Fake executors only — every "command" spawned here is a node script this
@@ -260,6 +262,103 @@ test('loadRunnerConfig rejects a non-positive timeoutMs', () => {
   assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
 });
 
+// --- P41: per-tier `executors` override + C9 v2 named adapter -----------
+
+test('loadRunnerConfig accepts a config with no "executors" block at all — pre-P41 shape, unchanged', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'no-executors.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      models: { standard: 'sonnet' },
+      timeoutMs: 1000,
+    }),
+  );
+  const cfg = loadRunnerConfig(configPath);
+  assert.equal(cfg.executors, undefined);
+});
+
+test('loadRunnerConfig accepts a well-formed per-tier "executors" override', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'with-executors.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      executors: { light: { command: 'cheap-cli', args: ['{prompt}'] } },
+      models: { light: 'haiku', standard: 'sonnet' },
+      timeoutMs: 1000,
+    }),
+  );
+  const cfg = loadRunnerConfig(configPath);
+  assert.equal(cfg.executors.light.command, 'cheap-cli');
+});
+
+test('loadRunnerConfig rejects an "executors" block that is not an object', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'bad-executors-shape.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      executors: 'nope',
+      models: {},
+      timeoutMs: 1000,
+    }),
+  );
+  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
+});
+
+test('loadRunnerConfig rejects an "executors.<tier>" entry missing args', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'bad-executors-entry.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      executors: { light: { command: 'cheap-cli' } },
+      models: {},
+      timeoutMs: 1000,
+    }),
+  );
+  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
+});
+
+test('loadRunnerConfig rejects an unknown "adapter" value on the global executor', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'bad-adapter-global.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'], adapter: 'rpc' },
+      models: {},
+      timeoutMs: 1000,
+    }),
+  );
+  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
+});
+
+test('loadRunnerConfig rejects an unknown "adapter" value on a per-tier executor', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'bad-adapter-tier.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      executors: { light: { command: 'cheap-cli', args: ['{prompt}'], adapter: 'app-server' } },
+      models: {},
+      timeoutMs: 1000,
+    }),
+  );
+  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
+});
+
+test('EXECUTOR_ADAPTERS registers exactly one adapter today: cli-spawn (the RPC/app-server adapter is deferred per D a4fe4c2b)', () => {
+  assert.deepEqual(Object.keys(EXECUTOR_ADAPTERS), ['cli-spawn']);
+  assert.equal(DEFAULT_ADAPTER, 'cli-spawn');
+});
+
 test('the committed .fgos-runner.json at repo root loads and is well-formed', () => {
   const repoRoot = path.resolve(import.meta.dirname, '..', '..');
   const cfg = loadRunnerConfig(path.join(repoRoot, '.fgos-runner.json'));
@@ -317,6 +416,36 @@ test('resolveExecutorCommand substitutes both placeholders even inside the same 
   assert.deepEqual(args, ['m:p']);
 });
 
+test('resolveExecutorCommand defaults to the "cli-spawn" adapter when the executor block omits one', () => {
+  const cfg = baseConfig(['{prompt}']);
+  const { adapter } = resolveExecutorCommand(cfg, { prompt: 'p', model: 'm' });
+  assert.equal(adapter, 'cli-spawn');
+});
+
+test('resolveExecutorCommand falls back to the global executor when no tier is given — every pre-P41 call site keeps working', () => {
+  const cfg = baseConfig(['{prompt}']);
+  const { command } = resolveExecutorCommand(cfg, { prompt: 'p', model: 'm' });
+  assert.equal(command, process.execPath);
+});
+
+test('resolveExecutorCommand honors an executors.<tier> override ahead of the global executor for that tier', () => {
+  const cfg = {
+    executor: { command: '/global/executor', args: ['{prompt}'] },
+    executors: { heavy: { command: '/heavy/executor', args: ['{prompt}'] } },
+    models: { light: 'haiku', standard: 'sonnet', heavy: 'opus' },
+    timeoutMs: 5000,
+  };
+  const heavy = resolveExecutorCommand(cfg, { prompt: 'p', model: 'opus', tier: 'heavy' });
+  assert.equal(heavy.command, '/heavy/executor');
+  const standard = resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard' });
+  assert.equal(standard.command, '/global/executor');
+});
+
+test('resolveExecutorCommand throws for an unknown adapter even on a raw config object that skipped loadRunnerConfig validation', () => {
+  const cfg = { executor: { command: 'x', args: ['{prompt}'], adapter: 'not-a-real-adapter' }, models: {}, timeoutMs: 5000 };
+  assert.throws(() => resolveExecutorCommand(cfg, { prompt: 'p', model: 'm' }), RunnerConfigError);
+});
+
 // --- spawnWorker: fake executor, tier->model, cwd, timeout, spawn-fail --
 
 test('spawnWorker resolves tier -> model, runs in cwd, and passes the prompt via argv', async () => {
@@ -344,6 +473,42 @@ test('spawnWorker defaults to the standard tier when the work item omits tier', 
   const result = await spawnWorker(sampleWork(), cfg, mkTempDir());
   assert.equal(result.tier, 'standard');
   assert.equal(result.model, 'sonnet');
+});
+
+test('spawnWorker (P41): light and heavy each dispatch through their own per-tier executor, standard falls back to the global one — all three resolved from ONE cfg object, proving mixed-tier dispatch within a single drain batch', async () => {
+  const dir = mkTempDir();
+  const lightScript = writeEchoExecutor(dir);
+  const heavyDir = mkTempDir();
+  const heavyScript = path.join(heavyDir, 'heavy-echo-executor.mjs');
+  fs.writeFileSync(
+    heavyScript,
+    `
+    const args = process.argv.slice(2);
+    process.stdout.write(JSON.stringify({ args, cwd: process.cwd(), marker: 'heavy-executor' }));
+    process.exit(0);
+    `,
+  );
+  const globalScript = writeEchoExecutor(mkTempDir());
+
+  const cfg = {
+    executor: { command: process.execPath, args: [globalScript, '{prompt}', 'via-global'] },
+    executors: {
+      light: { command: process.execPath, args: [lightScript, '{prompt}', 'via-light'] },
+      heavy: { command: process.execPath, args: [heavyScript, '{prompt}', 'via-heavy'] },
+    },
+    models: { light: 'haiku', standard: 'sonnet', heavy: 'opus' },
+    timeoutMs: 5000,
+  };
+
+  const lightResult = await spawnWorker(sampleWork({ tier: 'light' }), cfg, mkTempDir());
+  const heavyResult = await spawnWorker(sampleWork({ tier: 'heavy' }), cfg, mkTempDir());
+  const standardResult = await spawnWorker(sampleWork({ tier: 'standard' }), cfg, mkTempDir());
+
+  assert.deepEqual(JSON.parse(lightResult.stdout).args.slice(-1), ['via-light']);
+  const heavyPayload = JSON.parse(heavyResult.stdout);
+  assert.deepEqual(heavyPayload.args.slice(-1), ['via-heavy']);
+  assert.equal(heavyPayload.marker, 'heavy-executor');
+  assert.deepEqual(JSON.parse(standardResult.stdout).args.slice(-1), ['via-global']);
 });
 
 test('spawnWorker throws worker-timeout and kills the process when it runs past the time budget', async () => {
