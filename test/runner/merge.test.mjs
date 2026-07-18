@@ -326,3 +326,29 @@ function makeBranchWithCommitOn(repoRoot, trunk, branch, filename, content) {
   git(repoRoot, ['commit', '-q', '-m', `on ${branch}`]);
   git(repoRoot, ['checkout', trunk]);
 }
+
+// --- detectTrunk via the origin/HEAD target (the FIRST resolution branch) ---
+// A cloned repo carries refs/remotes/origin/HEAD as a symbolic ref to the
+// remote's own default branch. detectTrunk prefers that over any local
+// main/master guess. The upstream default branch is deliberately named
+// neither `main` nor `master`, so a passing assertion can only come from the
+// origin/HEAD path firing — never from the fallback loop.
+
+function initClonedRepoWithOriginHead(defaultBranch) {
+  const upstream = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-merge-test-upstream-'));
+  execFileSync('git', ['init', '-q', '-b', defaultBranch], { cwd: upstream });
+  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: upstream });
+  execFileSync('git', ['config', 'user.name', 'Test'], { cwd: upstream });
+  fs.writeFileSync(path.join(upstream, 'seed.txt'), 'seed\n');
+  execFileSync('git', ['add', 'seed.txt'], { cwd: upstream });
+  execFileSync('git', ['commit', '-q', '-m', 'seed'], { cwd: upstream });
+
+  const clone = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-merge-test-clone-'));
+  execFileSync('git', ['clone', '-q', upstream, clone]);
+  return clone;
+}
+
+test('detectTrunk resolves the origin/HEAD target branch, not the local main/master fallback', () => {
+  const repoRoot = initClonedRepoWithOriginHead('release-line');
+  assert.equal(detectTrunk(repoRoot), 'release-line');
+});
