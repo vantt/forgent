@@ -1,6 +1,6 @@
 ---
 title: Sổ quyết định forgent (fgOS) — mục lục
-updated: 2026-07-14
+updated: 2026-07-18
 kind: decision-records-index
 ---
 
@@ -33,6 +33,9 @@ tại chỗ (giữ đúng nguyên tắc bất-biến của platform-foundations)
 | [0009](0009-chong-giao-thoa-luc-cai.md) | Chống giao thoa lúc cài | fgOS khi cài không được giao thoa tiến trình với harness khác (yêu cầu platform, chưa thực thi). |
 | [0010](0010-ban-do-kien-truc-la-ban-chuan.md) | Bản đồ kiến trúc là bản chuẩn | `docs/architecture-map.md` v0.2 (5 tầng E→U→I→D→K + 2 lớp phủ + 2 sổ) là chuẩn; thẻ-căn-cước-trước-code hiệu lực như phụ lục definition-of-done; 5 câu hỏi mở chốt kèm. |
 | [0011](0011-version-tuong-minh-cho-moi-contract.md) | Version tường minh cho mọi contract | Mở rộng 0007: không chỉ event mà cả schema và artifact đều khai version trong định danh (`<name>/v<N>`), theo mẫu `artifact_contract: bee-plan/v1` bee đã dùng sống. |
+| [0012](0012-typed-edge-model-supersedes-deps-parent-separation.md) | Đồ thị typed-edge derive | Một đồ thị typed-edge derive trên work item (deps→`blocks`, parent→`parent-child`); bảo đảm acyclic của cửa-ghi mở rộng từ đồ-thị-deps sang subset chặn hợp nhất. Supersede tách deps-và-parent. |
+| [0013](0013-discovered-from-runner-report-channel.md) | Kênh báo-cáo-không-ghi cho `discovered-from` | Worker phát khối rào `fgos-discovered` (dữ liệu thuần) trong output; runner đọc và tự ghi — thêm nhà sản xuất tự-động mà giữ nguyên runner-một-cửa-ghi (C2/D3). |
+| [0014](0014-kien-truc-giao-tiep-nguoi-fgos.md) | Kiến trúc giao tiếp người ↔ fgOS | Contract = schema event-log (không phải lib); lib là client tham chiếu; CLI = adapter local standalone; daemon NGOÀI core (consumer qua CLI, `b2d18cc7` giữ nguyên); UI là client của daemon; push tách subsystem. Mức interface. |
 
 ## Truy vết nguồn (đầy đủ)
 
