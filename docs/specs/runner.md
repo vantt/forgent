@@ -190,6 +190,15 @@ Vòng lặp tự hành của forgent: tự lấy việc sẵn-sàng từ work-st
   worker xong mới đọc được gì. Nền cho chiều-ra của P38/P40 (UI tail +
   tmux pane).
 
+**Phần (b) — stream-json qua executor args (backlog P39, KHÔNG CẦN CODE riêng):**
+`.fgos-runner.json`'s `executor.args` đã là một mẫu Host Adapter (Data
+Dictionary #1) — thêm một cờ như `--output-format stream-json` vào đó (nếu
+CLI trợ lý hỗ trợ) chỉ đổi NỘI DUNG stdout trợ lý phát ra, không đổi đường đi
+của nó: dispatch.mjs vẫn tee từng chunk y hệt bất kể định dạng (JSON-lines
+hay text thường), worker-log.mjs vẫn là cửa ghi duy nhất. Không có nhánh code
+nào phân biệt định dạng output — vì không cần: đây thuần là cấu hình, không
+phải một tính năng runner phải hiểu.
+
 ### Ai ngã-ngũ — actor trên settlement (Phase 3 S3-closeout)
 
 Mỗi ngã-ngũ (kênh 1 của capture 2 kênh — xem spec Work-State "Bản ghi
@@ -549,7 +558,13 @@ sức khỏe cho toàn bộ vòng compounding.
 - **What changes:** không có event nào vào nhật ký sự kiện (đây vẫn là một
   lệnh đọc) — riêng lần chạy này tự thêm đúng MỘT dòng vào một lịch sử xu
   hướng nằm CÙNG chỗ với dữ liệu của kho đang được đọc (không phải nhật ký sự
-  kiện, không đi qua cửa ghi work-state).
+  kiện, không đi qua cửa ghi work-state). Đọc baseline (dòng cuối của lịch sử
+  xu hướng) chịu được một dòng cuối bị TORN (crash/ghi dở giữa chừng, per
+  `readLastHistoryEntry` bin/fgos.mjs): lùi ngược từ dòng cuối, bỏ qua mọi
+  dòng không parse được, dùng checkpoint HOÀN CHỈNH gần nhất làm baseline —
+  một dòng cuối rách không bao giờ làm `check` throw, cùng độ khoan-dung
+  "thiếu/hỏng dữ liệu đọc như baseline, không bao giờ crash" mà nhánh
+  file-vắng-mặt đã có sẵn.
 - **Side effects:** một dòng mới trong lịch sử xu hướng; không có lời gọi
   model nào.
 - **Afterwards:**
@@ -722,7 +737,7 @@ này (xem CONTEXT.md Deferred Ideas).
 - **R37 (Iron Law áp vào `approve` một điểm CHUNG cho MỌI đề xuất nguồn runner — không riêng gì evolve — chặn CỨNG, không phải cảnh báo im lặng).** Ngay sau guard nguồn `runner` hiện có, TRƯỚC bước kiểm cây sạch và trước mọi thao tác git, `approve` chạy `classifyIronLaw({filesChanged, description})` trên chính đề xuất đang duyệt (`filesChanged` từ `changedFiles`, `description` từ `item.description`) — áp dụng bất kể đề xuất tới từ `evolve --submit`, `add`, hay `submit` thường, vì bài toán D10 hỏi diff này có NĂNG LỰC làm yếu kỷ luật gate/verify của hệ hay không, không phải nó tới từ đâu. `required: true` mà thiếu `--acknowledge-iron-law` (cờ boolean, cùng khuôn phân tích cờ với `--async`/`--unattended` của `submit` — không phải cờ mang giá trị như `--timeout`) → từ chối cứng (`StoreError('validation', …)`), nêu tên đúng matchedFlags/matchedModules, đề xuất giữ nguyên `proposed`, không git nào chạy — fgOS không bao giờ tự nhận đã "chứng minh được" một test đỏ chạy trước khi fix (không có hạ tầng theo-dõi lịch-sử đỏ/xanh nào tồn tại); `--acknowledge-iron-law` là cử chỉ CHỦ Ý của người duyệt xác nhận điều đó thay hệ thống, không phải một xác minh cơ học. **Ranh giới CHỦ Ý:** chỉ nguồn `runner` đi qua chặn này — nguồn `pull`/`legacy` (code đã do người tự tay commit thẳng lên main) không đi qua, vì code đó đã là lịch sử theo thang bền vững, không phải một diff đang chờ merge lần đầu (per D16/D17 self-improve-loop).
 - **R31 (kỷ-luật-output NỚI RỘNG: console + bản ghi cục bộ riêng-từng-việc, KHÔNG BAO GIỜ vào cây committed — SUPERSEDE một phần quyết định trước).** Trước đây output của trợ lý chỉ in console, không ghi ra file nào. Nay MỌI kết cục của một lượt dispatch — thành đề xuất, chấm-trượt, quá-giờ, hỏng-spawn (kể cả tràn bộ đệm) — đều CÒN được ghi thêm vào một bản ghi cục bộ, một file riêng mỗi việc, gộp theo thời gian qua các lần thử. Nửa bảo đảm gốc vẫn giữ nguyên tuyệt đối: bản ghi này không bao giờ vào cây committed (không git-track được) — chỉ nửa "không ghi ra file nào cả" bị nới. Một lượt dispatch hỏng trước khi trợ lý sinh ra output (lỗi worktree, không phải lỗi trợ lý) vẫn ghi được một khối (chỉ mang loại lỗi + thông điệp), không throw vì thiếu trường (per D1/D2/D3/D4 worker-dispatch-log / 8575f1a3). **Bổ chú (20260717, review-20260717-daily-batch, review finding F-P1-1):** bản ghi cục bộ này KHÔNG BAO GIỜ throw ra ngoài, dù chính thao tác ghi thất bại (đĩa đầy, không có quyền ghi, thư mục chỉ-đọc) — bản ghi này là quan sát thuần, không bao giờ được phép làm hỏng hay che khuất kết cục dispatch thật; một lần ghi hỏng chỉ âm thầm bỏ qua (trả về rỗng), không bao giờ lan ra ngoài `dispatchClaimedItem`.
 
-- **R39 (hướng đã chốt, chưa xây — xem backlog P39).** Bản ghi output cục bộ của một việc nhận output theo THỜI GIAN THỰC: từng mảnh output của trợ lý được nối vào bản ghi ngay khi đến, thay vì chỉ một khối sau khi lượt dispatch kết thúc — người vận hành theo dõi được một worker đang chạy bằng cách theo-đuôi bản ghi của việc đó, mỗi việc một bản ghi nên nhiều worker song song không giẫm dòng nhau. Khối kết-cục cuối (kể cả quá-giờ/hỏng-spawn) vẫn ghi đủ như R31, và bảo đảm không-vào-cây-committed giữ nguyên tuyệt đối (per D 644916a4).
+- **R39 (ĐÃ XÂY — backlog P39, cell live-worker-log-1).** Bản ghi output cục bộ của một việc nhận output theo THỜI GIAN THỰC: từng mảnh output của trợ lý được nối vào bản ghi ngay khi đến (`appendWorkerLogChunk`, worker-log.mjs — cùng cửa ghi DUY NHẤT với khối kết-cục cuối, không mở cửa thứ hai), thay vì chỉ một khối sau khi lượt dispatch kết thúc — người vận hành theo dõi được một worker đang chạy bằng `tail -f .fgos/logs/<id>.log`, mỗi việc một bản ghi nên nhiều worker song song không giẫm dòng nhau. `spawnWorker` (dispatch.mjs) gọi chunk này qua `opts.onChunk(stream, chunk)` ngay trên mỗi sự kiện `data` của stdout/stderr, bọc try/catch để một callback ghi hỏng không bao giờ làm gãy dispatch thật. Khối kết-cục cuối (kể cả quá-giờ/hỏng-spawn) vẫn ghi đủ như R31, không đổi vị trí gọi hay bảo đảm, và bảo đảm không-vào-cây-committed giữ nguyên tuyệt đối (per D 644916a4). Xem thêm "Xem live output worker khi đang chạy" ở trên.
 - **R40 (hướng đã chốt, chưa xây — xem backlog P40).** Vận hành qua bộ ghép màn hình terminal (tmux) là chế độ được hỗ trợ chính thức: một phiên chuẩn bốn cửa sổ — vòng runner lặp, theo dõi output live từng việc (đứng trên R39), cửa thao tác của người (nộp/trả lời/duyệt), bảng trạng thái — kèm một trang runbook trong docs sản phẩm; tín hiệu chờ-người dùng cơ chế đánh-dấu-cửa-sổ của chính bộ ghép màn hình cho tới khi hệ có kênh chú-ý riêng (per D ef6ed305; nhiều phiên trên cùng checkout đòi P35 đóng trước).
 - **R42 (STANCE trí-tuệ-giao-việc — picker cơ học VĨNH VIỄN, trí tuệ vào qua đúng hai cửa).** Vòng chọn-giao của runner không bao giờ gọi một model thông minh: mọi quyết định của nó (việc nào, model nào, tiếp hay dừng) phải tra-bảng hoặc dẫn xuất được từ dữ liệu đã nằm trên item. Trí tuệ vào hệ qua đúng hai cửa — (1) dòng chính: một bộ não thông minh (phiên trợ lý, stage làm-rõ/chia-việc, chấm-điểm tương lai) đọc frontier, chấm điểm, và GHI KẾT LUẬN XUỐNG FIELD của item qua cửa ghi chuẩn (khóa ưu tiên P7, intent P8, cờ tuần-tự-hóa); picker chỉ đổi khóa sort, không đổi bản chất; (2) ngoại lệ có cửa riêng: cửa pull take/return cho một phiên thông minh nhấc đúng một việc ra khỏi dòng máy — kết quả trả về vẫn bị đo lại cơ học như mọi đề xuất. Một trợ lý điều phối không bao giờ trở thành picker; nó là người viết điểm số mà picker đọc. P7 và P8 thiết kế dưới stance này (per D f69951df).
 - **R41 (hướng đã chốt, chưa xây — xem backlog P41).** Mỗi tier khai được một executor riêng trong cấu hình runner; tier không khai riêng rơi về executor chung — cấu hình cũ chạy nguyên, không đổi hành xử. Ranh giới executor trở thành một cổng có tên với adapter: adapter đầu tiên là spawn-tiến-trình-CLI (hành xử hiện tại giữ nguyên từng chi tiết); adapter giao-tiếp-RPC (hệ thực thi dạng app-server) chỉ xây khi có hệ thật cần cắm — hợp đồng executor nâng phiên bản có tên interface ngay từ lượt per-tier (per D a4fe4c2b).
