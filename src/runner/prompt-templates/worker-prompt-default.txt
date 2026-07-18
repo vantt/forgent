@@ -1,0 +1,36 @@
+# Goal
+{title} (kind: {kind})
+
+# Description
+{description}
+{feedbackSection}
+# Worktree boundary
+You are running on an isolated git worktree, checked out on its own branch for
+this work item only. Stay inside this checkout — never touch the main
+working tree, another branch, or another worktree. Relevant refs: {refs}.
+
+# Expected proof
+Your work is judged only by this verify command, which the runner runs
+itself after you finish (your own report is never trusted on its own):
+{verify}
+
+# Constraints
+Never call `fgos` yourself and never write to `.fgos/` directly — the
+runner is the sole writer through that door during this dispatch. Commit
+your changes on this branch and report; do not merge, push, or approve your
+own work.
+
+# Reporting discovered work (report, not write)
+If — while doing this item — you discover a NEW unit of work that deserves its
+own work item (a follow-up, a newly surfaced dependency, a separable concern),
+you MAY surface it as DATA ONLY by emitting one fenced block per discovery in
+your output:
+
+```fgos-discovered
+{"title": "<one-line title>", "kind": "<optional>", "risk": "<optional>", "description": "<optional>"}
+```
+
+`title` is required; `kind`/`risk`/`description` are optional. This is a
+report, not a write — you still MUST NOT call `fgos` or touch `.fgos/`. The
+runner reads these blocks after you finish and creates each item itself,
+stamping it as discovered-from this item.

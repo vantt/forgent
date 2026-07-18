@@ -63,6 +63,38 @@ test('appendWorkerLog degrades gracefully: only errorClass + message present (Wo
   assert.match(content, /--- STDERR ---\n\(empty\)/);
 });
 
+// --- appendWorkerLog: template name + hash header (P49) ------------------
+
+test('appendWorkerLog renders "template <name>@<hash8>" in the header when templateName/templateHash are present', () => {
+  const dir = mkTempDir();
+  const logPath = appendWorkerLog(dir, 'item-tpl', {
+    attempt: 1,
+    tier: 'standard',
+    model: 'sonnet',
+    templateName: 'worker-prompt-default.txt',
+    templateHash: 'abcdef0123456789abcdef0123456789abcdef0123456789abcdef01234567',
+    status: 0,
+    stdout: 'ok',
+    stderr: '',
+  });
+  const content = fs.readFileSync(logPath, 'utf8');
+  assert.match(content, /template worker-prompt-default\.txt@abcdef01\b/);
+});
+
+test('appendWorkerLog omits the template segment entirely when templateName is absent (optional-field degrade, unchanged from pre-P49 output)', () => {
+  const dir = mkTempDir();
+  const logPath = appendWorkerLog(dir, 'item-notpl', {
+    attempt: 1,
+    tier: 'standard',
+    model: 'sonnet',
+    status: 0,
+    stdout: 'ok',
+    stderr: '',
+  });
+  const content = fs.readFileSync(logPath, 'utf8');
+  assert.doesNotMatch(content, /template /);
+});
+
 test('appendWorkerLog never throws when the write fails (review finding F-P1-1) -- pure observability must not crash dispatch', () => {
   const dir = mkTempDir();
   // Blocking 'logs' with a plain file makes mkdirSync throw (EEXIST/ENOTDIR)

@@ -34,13 +34,16 @@ function section(label, text) {
  * status/stdout/stderr) and a bare WorktreeError (errorClass + message only)
  * both render without throwing on missing fields. */
 function formatEntry(workId, entry) {
-  const { attempt, errorClass, message, tier, model, status, signal, stdout, stderr } = entry;
+  const { attempt, errorClass, message, tier, model, templateName, templateHash, status, signal, stdout, stderr } = entry;
 
   const header = [`work ${workId}`];
   if (attempt != null) header.push(`attempt ${attempt}`);
   if (errorClass) header.push(errorClass);
   if (tier != null && model != null) header.push(`tier ${tier} -> ${model}`);
   else if (tier != null) header.push(`tier ${tier}`);
+  // P49: template name + content hash — traces a bad worker run back to
+  // exactly which prompt-template version produced it.
+  if (templateName != null) header.push(`template ${templateName}@${templateHash ? templateHash.slice(0, 8) : 'unknown'}`);
   if (status != null) header.push(`exit ${status}`);
   if (signal != null) header.push(`signal ${signal}`);
 

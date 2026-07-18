@@ -36,6 +36,7 @@
 import fs from 'node:fs';
 import { spawn } from 'node:child_process';
 import { DEFAULTS } from '../state/work.mjs';
+import { selectTemplate, renderTemplate, hashTemplate } from './prompt-templates.mjs';
 
 /** Raised for malformed runner config or an unresolvable tier -> model
  * lookup. `category` follows the same CLI-facing vocabulary as
@@ -64,12 +65,18 @@ export class DispatchError extends Error {
 
 /**
  * Build the worker prompt from a work item's own fields (title/kind/refs/
- * verify, per D3) — the five framing sections below are a fixed contract
- * (tests pin their presence): Goal, Description, Worktree boundary,
- * Expected proof, and Constraints (the D3 "never call fgos yourself" rule).
+ * verify, per D3) — the five framing sections are a fixed contract (tests
+ * pin their presence): Goal, Description, Worktree boundary, Expected
+ * proof, and Constraints (the D3 "never call fgos yourself" rule).
  * Description is the work item's full-text intake description (per P30),
  * reproduced verbatim — never truncated — with "(không có)" when absent.
- * Nothing here reads or writes `.fgos/` — this is pure string assembly.
+ *
+ * The literal prompt TEXT lives in `prompt-templates/*.txt` (P49) — this
+ * function only computes the varying pieces (refs/feedbackSection/
+ * description, each still pure JS conditional logic, never moved into a
+ * template) and selects+renders the template via `selectTemplate`/
+ * `renderTemplate`. Nothing here reads or writes `.fgos/` — this stays pure
+ * string assembly, still returning a plain string (unchanged signature).
  */
 export function buildPrompt(work, feedback) {
   const refs = Array.isArray(work.refs) && work.refs.length ? work.refs.join(', ') : '(none)';
@@ -90,43 +97,15 @@ export function buildPrompt(work, feedback) {
   }
   const description = work.description ?? '(không có)';
 
-  return `# Goal
-${work.title} (kind: ${work.kind})
-
-# Description
-${description}
-${feedbackSection}
-# Worktree boundary
-You are running on an isolated git worktree, checked out on its own branch for
-this work item only. Stay inside this checkout — never touch the main
-working tree, another branch, or another worktree. Relevant refs: ${refs}.
-
-# Expected proof
-Your work is judged only by this verify command, which the runner runs
-itself after you finish (your own report is never trusted on its own):
-${work.verify}
-
-# Constraints
-Never call \`fgos\` yourself and never write to \`.fgos/\` directly — the
-runner is the sole writer through that door during this dispatch. Commit
-your changes on this branch and report; do not merge, push, or approve your
-own work.
-
-# Reporting discovered work (report, not write)
-If — while doing this item — you discover a NEW unit of work that deserves its
-own work item (a follow-up, a newly surfaced dependency, a separable concern),
-you MAY surface it as DATA ONLY by emitting one fenced block per discovery in
-your output:
-
-\`\`\`fgos-discovered
-{"title": "<one-line title>", "kind": "<optional>", "risk": "<optional>", "description": "<optional>"}
-\`\`\`
-
-\`title\` is required; \`kind\`/\`risk\`/\`description\` are optional. This is a
-report, not a write — you still MUST NOT call \`fgos\` or touch \`.fgos/\`. The
-runner reads these blocks after you finish and creates each item itself,
-stamping it as discovered-from this item.
-`;
+  const templateName = selectTemplate({ kind: work.kind, tier: work.tier ?? DEFAULTS.tier, domain: work.domain });
+  return renderTemplate(templateName, {
+    title: work.title,
+    kind: work.kind,
+    description,
+    feedbackSection,
+    refs,
+    verify: work.verify,
+  });
 }
 
 /**
@@ -475,6 +454,12 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
   const timeoutMs = opts.timeoutMs ?? cfg.timeoutMs;
   const maxBuffer = opts.maxBuffer ?? 10 * 1024 * 1024;
 
+  // P49: same mechanical selection buildPrompt used internally, called again
+  // here (cheap, deterministic, no duplicated LOGIC) purely so the dispatch
+  // log can record which template + version produced this prompt.
+  const templateName = selectTemplate({ kind: work.kind, tier, domain: work.domain });
+  const templateHash = hashTemplate(templateName);
+
   return adapterFn(command, args, cwd, {
     timeoutMs,
     maxBuffer,
@@ -482,5 +467,14 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
     workId: work.id,
     tier,
     model,
-  });
+  }).then(
+    (result) => ({ ...result, templateName, templateHash }),
+    (err) => {
+      if (err instanceof DispatchError) {
+        err.templateName = templateName;
+        err.templateHash = templateHash;
+      }
+      throw err;
+    },
+  );
 }
