@@ -27,6 +27,7 @@
     "src/state/stage.mjs": "domain",
     "src/state/replay.mjs": "domain",
     "src/state/dep-graph.mjs": "domain",
+    "src/state/graph-metrics.mjs": "domain",
     "src/intake/discovery.mjs": "use-case",
     "src/intake/decompose.mjs": "use-case",
     "src/cli/command-registry.mjs": "kernel",

@@ -19,7 +19,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { initStore, addWork, moveWork, editWork, addDecision, addOutcome, addFriction, listWork, readyWork, readRawEvents, rebuild, putInAwaiting, answerAwaiting, StoreError, EXIT_CODES, categoryOf } from '../src/state/store.mjs';
+import { initStore, addWork, moveWork, editWork, addDecision, addOutcome, addFriction, listWork, readyWork, graphMetrics, readRawEvents, rebuild, putInAwaiting, answerAwaiting, StoreError, EXIT_CODES, categoryOf } from '../src/state/store.mjs';
 import { repairTruncatedLastLine } from '../src/state/events.mjs';
 import { deriveTitle, classify, generateId } from '../src/intake/classify.mjs';
 import { wrapEnvelope } from '../src/state/envelope.mjs';
@@ -670,6 +670,16 @@ async function runVerb(verb, flags, positional, dir) {
     // directly (per this cell's key_links).
     case 'ready': {
       return readyWork(dir);
+    }
+
+    // Request-class per D1 (same contract as `ready`/`list`): a pure read —
+    // never appends an event, never touches state.json. work-graph-intelligence
+    // S5: mechanical graph metrics (connected components = independent parallel
+    // tracks) folded from the view. Reaches the Domain compute core through the
+    // store facade only (graphMetrics), never importing it here — same rule the
+    // `ready` verb follows for `frontier`.
+    case 'graph': {
+      return graphMetrics(dir);
     }
 
     case 'rebuild': {

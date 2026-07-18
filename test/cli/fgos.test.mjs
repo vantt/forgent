@@ -3759,3 +3759,35 @@ test('return succeeds unchanged from inside a real session worktree (created via
     endSession(cwd, session.sessionId, { force: true });
   }
 });
+
+// --- work-graph-intelligence S5: `fgos graph` read verb -------------------
+
+test('graph verb: reports connected components (independent parallel tracks) in a fgos.v1 envelope, and is a pure read (no event appended, exit 0)', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0);
+  assert.equal(addOk(cwd, 'a').status, 0);
+  assert.equal(run(cwd, ['add', 'b', '--title', 'B', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--deps', 'a']).status, 0);
+  assert.equal(addOk(cwd, 'c').status, 0); // isolated -> its own track
+
+  const before = eventLines(cwd).length;
+  const result = run(cwd, ['graph']);
+  assert.equal(result.status, 0);
+
+  const data = envelopeData(result.stdout); // asserts the C1 envelope shape
+  assert.equal(data.order_version, 1);
+  assert.equal(data.componentCount, 2);
+  assert.deepEqual(data.components.map((component) => component.items), [['a', 'b'], ['c']]);
+
+  // Pure read: no event written by the verb.
+  assert.equal(eventLines(cwd).length, before, 'graph must not append any event');
+});
+
+test('graph verb on an empty store: zero components, still a valid envelope, exit 0', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0);
+  const result = run(cwd, ['graph']);
+  assert.equal(result.status, 0);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.componentCount, 0);
+  assert.deepEqual(data.components, []);
+});

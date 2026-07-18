@@ -29,6 +29,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { appendEvent, readEvents } from './events.mjs';
 import { rebuildView, viewRevision } from './replay.mjs';
+import { graphMetrics as computeGraphMetrics } from './graph-metrics.mjs';
 import { transitionWork, FsmError } from './fsm.mjs';
 import { transitionStage } from './stage.mjs';
 import { validateWork, WorkValidationError, DEFAULTS } from './work.mjs';
@@ -483,6 +484,19 @@ export function listWork(dir) {
 export function readyWork(dir) {
   const { logPath } = paths(dir);
   return frontier(rebuildView(logPath));
+}
+
+/**
+ * Read-only (work-graph-intelligence S5): the mechanical graph-metrics surface
+ * the `fgos graph` verb emits. Same read contract as `readyWork`/`listWork` —
+ * rebuild the view fresh from the log, then hand it to the Domain compute core
+ * (`graph-metrics.mjs`). Entry (`bin/fgos.mjs`) reads through this facade and
+ * never imports the Domain graph module directly, exactly as the `ready` verb
+ * reaches `frontier` only through `readyWork`.
+ */
+export function graphMetrics(dir) {
+  const { logPath } = paths(dir);
+  return computeGraphMetrics(rebuildView(logPath));
 }
 
 /**

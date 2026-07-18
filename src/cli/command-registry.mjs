@@ -197,6 +197,15 @@ export const COMMAND_REGISTRY = [
     deprecated: null,
   },
   {
+    name: 'graph',
+    invoke: 'fgos graph',
+    description: 'Read-only mechanical work-graph metrics: connected components (independent parallel tracks) folded from the dependency + lineage graph.',
+    parameters: { type: 'object', properties: {}, required: [] },
+    examples: ['fgos graph'],
+    access: 'read',
+    deprecated: null,
+  },
+  {
     name: 'rebuild',
     invoke: 'fgos rebuild',
     description: 'Rebuild the derived view (.fgos/state.json) from the event log.',
