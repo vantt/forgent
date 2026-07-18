@@ -36,6 +36,7 @@ tại chỗ (giữ đúng nguyên tắc bất-biến của platform-foundations)
 | [0012](0012-typed-edge-model-supersedes-deps-parent-separation.md) | Đồ thị typed-edge derive | Một đồ thị typed-edge derive trên work item (deps→`blocks`, parent→`parent-child`); bảo đảm acyclic của cửa-ghi mở rộng từ đồ-thị-deps sang subset chặn hợp nhất. Supersede tách deps-và-parent. |
 | [0013](0013-discovered-from-runner-report-channel.md) | Kênh báo-cáo-không-ghi cho `discovered-from` | Worker phát khối rào `fgos-discovered` (dữ liệu thuần) trong output; runner đọc và tự ghi — thêm nhà sản xuất tự-động mà giữ nguyên runner-một-cửa-ghi (C2/D3). |
 | [0014](0014-kien-truc-giao-tiep-nguoi-fgos.md) | Kiến trúc giao tiếp người ↔ fgOS | Contract = schema event-log (không phải lib); lib là client tham chiếu; CLI = adapter local standalone; daemon NGOÀI core (consumer qua CLI, `b2d18cc7` giữ nguyên); UI là client của daemon; push tách subsystem. Mức interface. |
+| [0015](0015-doi-ten-ctr-cho-contract.md) | Đổi tên định danh contract C1-C9 thành CTR001-CTR009 | Định danh contract registry (`architecture-map.md` §7) đổi từ `C<n>` trần sang `CTR<n>` 3-digit zero-padded (vd `CTR009`), theo `id-systems-audit.md` #6; đổi tên thuần, không đổi ý nghĩa/ranh giới/maturity của bất kỳ contract nào. |
 
 ## Truy vết nguồn (đầy đủ)
 

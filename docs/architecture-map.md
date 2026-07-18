@@ -1,10 +1,12 @@
 # Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký
 
-**Phiên bản:** v0.4. **Trạng thái:** CHUẨN — chấp nhận 2026-07-16, record
+**Phiên bản:** v0.5. **Trạng thái:** CHUẨN — chấp nhận 2026-07-16, record
 [0010](decisions/0010-ban-do-kien-truc-la-ban-chuan.md); nâng v0.3 theo record
 [0012](decisions/0012-typed-edge-model-supersedes-deps-parent-separation.md);
 nâng v0.4 theo record
-[0013](decisions/0013-discovered-from-runner-report-channel.md).
+[0013](decisions/0013-discovered-from-runner-report-channel.md); nâng v0.5
+theo record
+[0015](decisions/0015-doi-ten-ctr-cho-contract.md).
 
 Chưng từ tài liệu bàn luận ở xưởng và hai deep-dive distillery (`work-item-management`,
 `work-item-schema-and-io-contracts`); v0.2 sửa theo hai vòng tự phản biện có kiểm
@@ -19,8 +21,8 @@ record kèm nâng version — supersede, không sửa ngầm.
 2. Host Adapter không còn là tầng đầu chuỗi — là **ổ cắm** (port + config) bên hông.
 3. Sổ component xây lại bottom-up từ inventory file: đủ 13 module (v0.1 thiếu 5),
    tách hai loại row **component** (một nhà) và **slice** (lát dọc).
-4. Thêm contract **C9 · executor.v1** (biên model-gateway ↔ provider — đã live,
-   trước đây vô danh); C6 hạ maturity `live` → `designed` cho đúng sự thật.
+4. Thêm contract **CTR009 · executor.v1** (biên model-gateway ↔ provider — đã live,
+   trước đây vô danh); CTR006 hạ maturity `live` → `designed` cho đúng sự thật.
 5. Sequence §8 thêm **nhánh fail** (park/halt → friction, chỗ S2 cắm vào).
 6. Thêm §12: quan hệ với `system-overview.md`, `reading-map.md`, `backlog.md`.
 
@@ -29,7 +31,7 @@ record kèm nâng version — supersede, không sửa ngầm.
 1. `src/state/dep-graph.mjs` (§6) không còn chỉ kiểm chu trình trên `deps` —
    đổi thành đồ thị cạnh-định-kiểu HỢP NHẤT `blocks`+`parent-child` (`deps`
    chiếu `blocks`, `parent` chiếu `parent-child`), đã ship + verify xanh.
-2. Contract **C2** (§7) thêm mệnh đề bất biến phi-chu-trình: bảo đảm một-cửa-
+2. Contract **CTR002** (§7) thêm mệnh đề bất biến phi-chu-trình: bảo đảm một-cửa-
    ghi giờ phủ đồ thị hợp nhất `blocks`+`parent-child`, không chỉ `deps` —
    đóng một lỗ hổng chu trình cha-con sống (benign) mà bản đồ chưa từng khai.
 3. "deps và parent tách rời có chủ đích" (decision 0002) được supersede: tách
@@ -37,9 +39,9 @@ record kèm nâng version — supersede, không sửa ngầm.
    compute. Không đổi schema, `SCHEMA_VERSION` giữ 2, không có row §6/manifest
    mới (mở rộng module đã có, không tạo module mới).
 
-**Changelog v0.3 → v0.4** (record [0013](decisions/0013-discovered-from-runner-report-channel.md) — mở rộng C3, không supersede):
+**Changelog v0.3 → v0.4** (record [0013](decisions/0013-discovered-from-runner-report-channel.md) — mở rộng CTR003, không supersede):
 
-1. Contract **C3** (§7, orchestrator ↔ worker) thêm một mệnh đề **kênh
+1. Contract **CTR003** (§7, orchestrator ↔ worker) thêm một mệnh đề **kênh
    báo-cáo-không-ghi** (report-not-write): worker CÓ THỂ phát một khối
    `fgos-discovered` (dữ liệu thuần) trong output để nêu một việc mới phát
    hiện; worker vẫn KHÔNG BAO GIỜ gọi `fgos` hay ghi `.fgos/` — RUNNER đọc
@@ -48,6 +50,17 @@ record kèm nâng version — supersede, không sửa ngầm.
 2. Không đổi schema, không module mới, không row §6/manifest mới — `loop.mjs`
    và `dispatch.mjs` đã có (mở rộng tại chỗ). Trường `discoveredFrom` là lineage
    phi-chặn (loại khỏi cycle-check theo thiết kế), cưỡi `SCHEMA_VERSION` 2.
+
+**Changelog v0.4 → v0.5** (record [0015](decisions/0015-doi-ten-ctr-cho-contract.md) — đổi tên định danh, không supersede):
+
+1. Định danh contract một-chữ-số-trần cũ (§7, từ số 1 đến số 9) đổi tên
+   thành `CTR001`-`CTR009` (3-digit zero-padded, cùng quy ước padding với
+   `RUL<n>`), theo `docs/id-systems-audit.md` #6. Đổi tên thuần — không đổi
+   ý nghĩa, ranh giới, hay maturity của bất kỳ contract nào; mỗi contract
+   vẫn là cùng một contract, chỉ đổi cách viết định danh.
+2. Không đổi schema, không module mới, không row §6/manifest mới — chỉ đổi
+   nhãn ở mọi nơi contract ID xuất hiện trong file này (§6, §7, hai sơ đồ
+   mermaid, changelog, câu hỏi mở).
 
 ---
 
@@ -136,8 +149,8 @@ flowchart TB
     D["DOMAIN — functional core<br/>fsm · frontier · replay(fold) · recovery · anti-loop<br/><i>luật thuần</i>"]
     K["STATE KERNEL<br/>events.mjs + work.mjs (schema) + log JSONL + views<br/><i>chất liệu truth</i>"]
     E --> U --> I --> D --> K
-    CFG -. "cắm vào port executor — C9" .-> I
-    HK -. "gọi verb như một người dùng — C1" .-> E
+    CFG -. "cắm vào port executor — CTR009" .-> I
+    HK -. "gọi verb như một người dùng — CTR001" .-> E
 ```
 
 **Vì sao Infra đứng TRÊN Domain** (điểm v0.2 sửa lớn nhất): đo trên import thật,
@@ -191,7 +204,7 @@ Ghi chú ranh giới nghĩa (v0.2):
 - **"Một cửa ghi" nghĩa là một cửa GHI** — `appendEvent` chỉ được gọi qua store
   facade; *đọc* thì tự do (replay đọc thẳng log để fold — hợp lệ).
 - **Luật một-cửa hôm nay là per-process.** Nhiều tiến trình ghi đồng thời cần
-  lease/lock chưa tồn tại — chỗ yếu thật khi đi multi-process, ghi thẳng vào C2
+  lease/lock chưa tồn tại — chỗ yếu thật khi đi multi-process, ghi thẳng vào CTR002
   (§7) làm nợ có tên, không giấu.
 - **`docs/specs/` KHÔNG nằm trong Kernel.** Kernel là truth máy-vận-hành (schema +
   log + views, mỗi artifact một schema máy-đọc). Specs là tri thức người-viết cho
@@ -263,7 +276,7 @@ Chú ý cách mọi lời giải đều là **phép tách** — đó chính là 
 | R1 — gates thuộc control hay governance? | luật gate: tag **governance** · điểm đặt: nhà **Use-case**, tag control |
 | R2 — khóa file thuộc tool hay control? | chính sách: tag **control** · thực thi khóa: nhà **Infra**, tag tool |
 | R3 — working context thuộc memory hay execution? | sở hữu: tag **memory** · execution mượn-đọc |
-| R4 — handoff là luồng hay hợp đồng? | là **contract C6** (§7); phần quyết ở lại control |
+| R4 — handoff là luồng hay hợp đồng? | là **contract CTR006** (§7); phần quyết ở lại control |
 | R5 — specs/learnings tách tầng nào? | tri thức vai memory, tầng tài liệu — KHÔNG vào Kernel (§4) |
 | R6 — entry surface là plane riêng? | không — là **tầng Entry** của bản kết cấu, luật "mỏng" |
 
@@ -282,41 +295,41 @@ máy bắt được lỗi đếm tay này.)
 
 | Module | Nhà | Physics | Vai | Contracts |
 |---|---|---|---|---|
-| `bin/fgos.mjs` (add/list/ready/move/ask/answer/check + mọi verb) | Entry | — | — (cửa) | C1 *(live — envelope trên MỌI verb + exit-code taxonomy + sổ verb `--help --json`, P37)*, C2 |
-| `bin/fgos-runner.mjs` | Entry | — | — (cửa) | C1, C3 (surface), C9 (nạp config) |
-| `src/runner/loop.mjs` | Use-case | — | control + execution | C2, C3 |
-| `src/runner/dispatch.mjs` — port executor + validate config + spawn | Infra | — | model gateway + tool | **C9 (định nghĩa port)**, C3 |
-| `src/runner/worktree.mjs` — vòng đời nhánh `fgw/` | Infra | — | tool | C3 (nửa sandbox) |
-| `src/state/store.mjs` — facade một cửa ghi | Infra | store | tool | C2 |
+| `bin/fgos.mjs` (add/list/ready/move/ask/answer/check + mọi verb) | Entry | — | — (cửa) | CTR001 *(live — envelope trên MỌI verb + exit-code taxonomy + sổ verb `--help --json`, P37)*, CTR002 |
+| `bin/fgos-runner.mjs` | Entry | — | — (cửa) | CTR001, CTR003 (surface), CTR009 (nạp config) |
+| `src/runner/loop.mjs` | Use-case | — | control + execution | CTR002, CTR003 |
+| `src/runner/dispatch.mjs` — port executor + validate config + spawn | Infra | — | model gateway + tool | **CTR009 (định nghĩa port)**, CTR003 |
+| `src/runner/worktree.mjs` — vòng đời nhánh `fgw/` | Infra | — | tool | CTR003 (nửa sandbox) |
+| `src/state/store.mjs` — facade một cửa ghi | Infra | store | tool | CTR002 |
 | `src/runner/recovery.mjs` — ma trận crash-recovery | Domain | — | control | — (nội bộ) |
 | `src/runner/anti-loop.mjs` — chặn lặp vô hạn | Domain | — | governance | — (nội bộ) |
-| `src/state/fsm.mjs` — luật transition | Domain | — | memory | C2 |
+| `src/state/fsm.mjs` — luật transition | Domain | — | memory | CTR002 |
 | `src/state/frontier.mjs` — truy vấn ready | Domain | state (derived) | control | — (nội bộ) |
-| `src/state/replay.mjs` — fold/rebuild view | Domain | state | memory | C2 |
+| `src/state/replay.mjs` — fold/rebuild view | Domain | state | memory | CTR002 |
 | `src/state/dep-graph.mjs` — kiểm tra chu trình trên đồ thị hợp nhất blocks+parent-child (supersede record 0012; trước v0.3 chỉ xét `deps`) | Domain | — | governance | — (nội bộ) |
-| `src/state/events.mjs` — engine đọc/ghi log | Kernel | event | memory | C2 |
-| `src/state/work.mjs` — schema + DEFAULTS | Kernel | — (schema) | memory | C2 (schema v2) |
+| `src/state/events.mjs` — engine đọc/ghi log | Kernel | event | memory | CTR002 |
+| `src/state/work.mjs` — schema + DEFAULTS | Kernel | — (schema) | memory | CTR002 (schema v2) |
 | *(test/{state,runner,cli,e2e} — đi theo nhà module nó kiểm, không row riêng)* | | | | |
 
 ### Slice — live (tính năng xuyên tầng, trỏ về component)
 
 | Slice | Ghép từ | Physics | Contracts | Maturity |
 |---|---|---|---|---|
-| human-gate (`awaiting-human`) | verbs ask/answer (Entry) + FSM edge (Domain) + fold (Domain) | event | C4 | live (P19) |
-| outcome hai-nửa + `fgos check` | loop ghi 2 nửa (Use-case) + fold (Domain) + check (Entry) | event→state | C2 | live |
-| worker-run trên nhánh `fgw/` | dispatch spawn (Infra) + worktree sandbox (Infra) + loop giám sát (Use-case) | run | C3, C9 | live |
+| human-gate (`awaiting-human`) | verbs ask/answer (Entry) + FSM edge (Domain) + fold (Domain) | event | CTR004 | live (P19) |
+| outcome hai-nửa + `fgos check` | loop ghi 2 nửa (Use-case) + fold (Domain) + check (Entry) | event→state | CTR002 | live |
+| worker-run trên nhánh `fgw/` | dispatch spawn (Infra) + worktree sandbox (Infra) + loop giám sát (Use-case) | run | CTR003, CTR009 | live |
 
 ### Slice — sắp cắm (planned; mỗi cái PHẢI qua nghi thức §9 + trỏ PBI)
 
 | Slice | Component con dự kiến (nhà) | Contracts | PBI |
 |---|---|---|---|
-| friction capture | fold friction (Domain) + điểm ghi tại park/halt (Use-case) | C2 | P3-S2 |
-| `fgos submit` + auto-classify | verb (Entry) + use-case intake (Use-case) | **C1 port đầu tiên tại đây** (nay đủ mọi verb, P37), C2 | P14 |
-| runner sơ khởi clarify/discovery | use-case (Use-case) | C3, C4 | P15 |
-| planner/decomposer | use-case (Use-case) — tag **control**, decide-altitude, không bao giờ là worker | C2 | P16 |
-| PR adapter + merge policy | adapter (Infra) + policy (Use-case) | C5 | P17 |
-| signal fabric | emit (Kernel) + reactor wiring (Use-case) | C7 | P8 |
-| attention hub | ngoài process — bậc vật lý duy nhất của sổ | C8 | idea |
+| friction capture | fold friction (Domain) + điểm ghi tại park/halt (Use-case) | CTR002 | P3-S2 |
+| `fgos submit` + auto-classify | verb (Entry) + use-case intake (Use-case) | **CTR001 port đầu tiên tại đây** (nay đủ mọi verb, P37), CTR002 | P14 |
+| runner sơ khởi clarify/discovery | use-case (Use-case) | CTR003, CTR004 | P15 |
+| planner/decomposer | use-case (Use-case) — tag **control**, decide-altitude, không bao giờ là worker | CTR002 | P16 |
+| PR adapter + merge policy | adapter (Infra) + policy (Use-case) | CTR005 | P17 |
+| signal fabric | emit (Kernel) + reactor wiring (Use-case) | CTR007 | P8 |
+| attention hub | ngoài process — bậc vật lý duy nhất của sổ | CTR008 | idea |
 
 ---
 
@@ -324,20 +337,20 @@ máy bắt được lỗi đếm tay này.)
 
 **Luật phạm vi** (v0.2 — chốt cho hết bất nhất): ranh giới **phi tất định**
 (người↔hệ, agent↔agent, agent↔model) *bắt buộc* có contract row. Ranh giới
-in-process chỉ cần row khi nó public cho caller ngoài module (C2 là ví dụ);
+in-process chỉ cần row khi nó public cho caller ngoài module (CTR002 là ví dụ);
 mũi tên nội bộ (frontier, recovery) không cần — đó không phải lỗ hổng.
 
 | ID | Ranh giới | Hợp đồng | Trạng thái | Định nghĩa ở |
 |---|---|---|---|---|
-| **C1** | người/agent ↔ CLI | `fgos.v1` envelope `{contract, generated_at, data_hash, data}` trên MỌI verb + exit-code taxonomy đóng + stdout=data/stderr=chẩn-đoán + sổ verb máy-đọc `--help --json` (`{schema_version, commands[]}`, mỗi verb có `access` read/mutation) | **live** — envelope bọc ở một cửa in duy nhất trên mọi verb, exit codes + categoryOf ở cả 2 binary, sổ verb công bố toàn mặt verb (P37) | deep-dive schema §5; porting-log `agent-output-envelope-contract`; spec work-state §envelope |
-| **C2** | mọi caller ↔ store | bốn vế: (a) verbs một-cửa-GHI — đọc tự do; (b) event schema v2; (c) luật evolution (additive event, lazy view key, tolerate-unknown-field, hard-fail-unknown-version); (d) **bất biến phi-chu-trình** (record 0012): đồ thị cạnh-định-kiểu hợp nhất `blocks`+`parent-child` (chiếu từ `deps`+`parent`) được cửa ghi bảo đảm phi-chu-trình — `addWork`/`editWork` từ chối mọi ghi khép một chu trình trên đồ thị hợp nhất, không chỉ trên `deps`. **Nợ có tên:** một-cửa là per-process; multi-process cần lease (chưa có) | **live** | `store.mjs` · `dep-graph.mjs` · spec work-state · luật R3 |
-| **C3** | orchestrator ↔ worker | dispatch: việc + verify đòi hỏi + proof khi về; **trust boundary của worker**: sandbox = nhánh `fgw/` cô lập (worktree) + vay 3 field RUN_CONTRACT khi fan-out (`forbidden_paths`, `required_outputs`, `result_json_schema`); **kênh báo-cáo-không-ghi (record 0013):** worker CÓ THỂ phát khối `fgos-discovered` (dữ liệu thuần) để nêu việc mới phát hiện — vẫn không gọi `fgos`/ghi `.fgos/`; RUNNER đọc và tự tạo item `discoveredFrom` (runner vẫn một-cửa-ghi, D3) | partial | `loop.mjs` · `dispatch.mjs` · `worktree.mjs`; deep-dive schema §3 |
-| **C4** | người ↔ hệ (bất đồng bộ) | ask/answer + trạng thái `awaiting-human`; frontier loại việc đang chờ | **live** (P19) | spec work-state |
-| **C5** | hệ ↔ người (PR) | review gate + merge policy + integrated re-verify sau merge | planned (P17) | lifecycle vision §4 |
-| **C6** | agent ↔ agent | routing-handoff contract + trust boundary | **designed** — spec đầy đủ, chưa có code implement | `docs/routing-handoff-contract.md` |
-| **C7** | state ↔ reactor | signal: con trỏ tối thiểu, lossy/at-least-once, consumer bắt buộc idempotent | planned (P8) | §4 bảng event≠signal |
-| **C8** | hệ ↔ hub chú ý | attention envelope (`gate-opened`/`question-raised`/`blocked`), versioned | idea | deep-dive quản-lý §9 |
-| **C9** | model gateway ↔ provider | `executor.v1`: runner config `{command, args[]}` thay `{prompt}`/`{model}` per-element — không nối chuỗi; validate RunnerConfigError tại nạp | **live** (v0.1 để vô danh — chính là ranh giới doc cũ tự hỏi "còn thiếu contract nào") | `dispatch.mjs` |
+| **CTR001** | người/agent ↔ CLI | `fgos.v1` envelope `{contract, generated_at, data_hash, data}` trên MỌI verb + exit-code taxonomy đóng + stdout=data/stderr=chẩn-đoán + sổ verb máy-đọc `--help --json` (`{schema_version, commands[]}`, mỗi verb có `access` read/mutation) | **live** — envelope bọc ở một cửa in duy nhất trên mọi verb, exit codes + categoryOf ở cả 2 binary, sổ verb công bố toàn mặt verb (P37) | deep-dive schema §5; porting-log `agent-output-envelope-contract`; spec work-state §envelope |
+| **CTR002** | mọi caller ↔ store | bốn vế: (a) verbs một-cửa-GHI — đọc tự do; (b) event schema v2; (c) luật evolution (additive event, lazy view key, tolerate-unknown-field, hard-fail-unknown-version); (d) **bất biến phi-chu-trình** (record 0012): đồ thị cạnh-định-kiểu hợp nhất `blocks`+`parent-child` (chiếu từ `deps`+`parent`) được cửa ghi bảo đảm phi-chu-trình — `addWork`/`editWork` từ chối mọi ghi khép một chu trình trên đồ thị hợp nhất, không chỉ trên `deps`. **Nợ có tên:** một-cửa là per-process; multi-process cần lease (chưa có) | **live** | `store.mjs` · `dep-graph.mjs` · spec work-state · luật R3 |
+| **CTR003** | orchestrator ↔ worker | dispatch: việc + verify đòi hỏi + proof khi về; **trust boundary của worker**: sandbox = nhánh `fgw/` cô lập (worktree) + vay 3 field RUN_CONTRACT khi fan-out (`forbidden_paths`, `required_outputs`, `result_json_schema`); **kênh báo-cáo-không-ghi (record 0013):** worker CÓ THỂ phát khối `fgos-discovered` (dữ liệu thuần) để nêu việc mới phát hiện — vẫn không gọi `fgos`/ghi `.fgos/`; RUNNER đọc và tự tạo item `discoveredFrom` (runner vẫn một-cửa-ghi, D3) | partial | `loop.mjs` · `dispatch.mjs` · `worktree.mjs`; deep-dive schema §3 |
+| **CTR004** | người ↔ hệ (bất đồng bộ) | ask/answer + trạng thái `awaiting-human`; frontier loại việc đang chờ | **live** (P19) | spec work-state |
+| **CTR005** | hệ ↔ người (PR) | review gate + merge policy + integrated re-verify sau merge | planned (P17) | lifecycle vision §4 |
+| **CTR006** | agent ↔ agent | routing-handoff contract + trust boundary | **designed** — spec đầy đủ, chưa có code implement | `docs/routing-handoff-contract.md` |
+| **CTR007** | state ↔ reactor | signal: con trỏ tối thiểu, lossy/at-least-once, consumer bắt buộc idempotent | planned (P8) | §4 bảng event≠signal |
+| **CTR008** | hệ ↔ hub chú ý | attention envelope (`gate-opened`/`question-raised`/`blocked`), versioned | idea | deep-dive quản-lý §9 |
+| **CTR009** | model gateway ↔ provider | `executor.v1`: runner config `{command, args[]}` thay `{prompt}`/`{model}` per-element — không nối chuỗi; validate RunnerConfigError tại nạp | **live** (v0.1 để vô danh — chính là ranh giới doc cũ tự hỏi "còn thiếu contract nào") | `dispatch.mjs` |
 
 ```mermaid
 flowchart LR
@@ -350,23 +363,23 @@ flowchart LR
     WK["Worker<br/>(run, nhánh fgw/)"]
     PR["PR / nhánh đề xuất"]
 
-    HU -- "C1 · fgos.v1" --> CLI
-    HOST -. "C9 · executor.v1" .-> ST
+    HU -- "CTR001 · fgos.v1" --> CLI
+    HOST -. "CTR009 · executor.v1" .-> ST
     CLI --> UC
-    UC -- "C2 · một cửa ghi" --> ST
+    UC -- "CTR002 · một cửa ghi" --> ST
     ST --> K
-    UC -- "C3 · dispatch + sandbox" --> WK
+    UC -- "CTR003 · dispatch + sandbox" --> WK
     WK -- "commit + proof" --> PR
-    PR -- "C5 · review gate (P17)" --> HU
-    HU -- "C4 · ask/answer" --> CLI
-    K -. "C7 · signal (P8)" .-> UC
+    PR -- "CTR005 · review gate (P17)" --> HU
+    HU -- "CTR004 · ask/answer" --> CLI
+    K -. "CTR007 · signal (P8)" .-> UC
 ```
 
 **Luồng lỗi giữa các tầng** (v0.2 — trước đây bản đồ im): mỗi cửa Infra/Kernel ném
 lỗi có tên (`StoreError`, `EventLogError`, `FsmError`, `WorkValidationError`,
 `RunnerConfigError`, lỗi dispatch/worktree) — tầng nào xử được thì xử, không thì để
 nổi lên; chỉ **Entry** convert lỗi thành exit code qua taxonomy `EXIT_CODES` +
-`categoryOf` (vế sống của C1). Domain không nuốt lỗi, Entry không đoán lỗi.
+`categoryOf` (vế sống của CTR001). Domain không nuốt lỗi, Entry không đoán lỗi.
 
 ---
 
@@ -384,31 +397,31 @@ sequenceDiagram
     participant K as Kernel (event log → view)
     participant W as Worker (run)
 
-    H->>E: fgos submit "vấn đề X" — C1 (P14)
+    H->>E: fgos submit "vấn đề X" — CTR001 (P14)
     E->>U: use-case intake
-    U->>S: tạo work-item + phân loại — C2
+    U->>S: tạo work-item + phân loại — CTR002
     S->>K: event work.add (truth, bất biến)
     Note over K: view dựng lại → frontier thấy việc ready
-    U->>S: claim doing + ghi NỬA DỰ ĐOÁN outcome — C2
-    U->>W: giao việc — C3 (sandbox fgw/, executor C9)
+    U->>S: claim doing + ghi NỬA DỰ ĐOÁN outcome — CTR002
+    U->>W: giao việc — CTR003 (sandbox fgw/, executor CTR009)
     alt verify xanh
         W-->>U: commit + bằng chứng verify
-        U->>S: proposed + NỬA THỰC TẾ outcome — C2
-        H->>E: duyệt PR — C5 (P17)
-        U->>S: done → việc phụ thuộc mở khóa — C2
+        U->>S: proposed + NỬA THỰC TẾ outcome — CTR002
+        H->>E: duyệt PR — CTR005 (P17)
+        U->>S: done → việc phụ thuộc mở khóa — CTR002
     else worker fail / verify đỏ / lặp quá ngưỡng
         W-->>U: kết quả fail + log
         Note over U: anti-loop đếm ngưỡng — quá thì không thử nữa
-        U->>S: park/halt + NỬA THỰC TẾ outcome (fail cũng ghi) — C2
+        U->>S: park/halt + NỬA THỰC TẾ outcome (fail cũng ghi) — CTR002
         Note over S,K: event fail = nguyên liệu FRICTION (S2)<br/>ghi ở cùng một cửa với đường thành công
     end
-    Note over H,K: việc cần người giữa chừng? → awaiting-human, C4:<br/>hệ KHÔNG chặn, việc khác chạy tiếp
-    K-->>U: (tương lai) C7 signal đánh thức thay vì poll (P8)
+    Note over H,K: việc cần người giữa chừng? → awaiting-human, CTR004:<br/>hệ KHÔNG chặn, việc khác chạy tiếp
+    K-->>U: (tương lai) CTR007 signal đánh thức thay vì poll (P8)
 ```
 
-Bốn điều sơ đồ chứng minh: (1) **mọi ghi đi qua đúng một cửa** — C2 ở mọi mutation;
+Bốn điều sơ đồ chứng minh: (1) **mọi ghi đi qua đúng một cửa** — CTR002 ở mọi mutation;
 (2) **đường thất bại cũng một cửa ấy** — friction không cần kênh riêng, chỉ cần fold
-riêng; (3) **người là participant có hợp đồng riêng** (C1/C4/C5); (4) các PBI tương
+riêng; (3) **người là participant có hợp đồng riêng** (CTR001/CTR004/CTR005); (4) các PBI tương
 lai (S2, P14, P17, P8) **đã có chỗ ngồi vẽ sẵn**.
 
 ---
@@ -471,7 +484,7 @@ Kết quả trên bảng planned §6: **S2, P14, P15, P16, P17 đậu cả ba ti
 | `execution` hai nghĩa | foundation đổi tên `run` | giữ + vá chỗ v0.1 tự dùng sai tag run |
 | — | Host Adapter là tầng trên cùng | **ổ cắm** port+config — vì import thật cho thấy U/I gọi xuống port, host cắm từ ngoài |
 | — | thứ tự U→D→I→K | **E→U→I→D→K** — đo trên đồ thị import thật; shell bọc core |
-| contracts là nhãn mũi tên | Sổ C1–C8 | + **C9 executor.v1** (live, trước vô danh) · C6 hạ về designed · C1 live (envelope mọi verb + sổ verb, P37) · luật phạm vi contract |
+| contracts là nhãn mũi tên | Sổ CTR001–CTR008 | + **CTR009 executor.v1** (live, trước vô danh) · CTR006 hạ về designed · CTR001 live (envelope mọi verb + sổ verb, P37) · luật phạm vi contract |
 | — | registry 11 row, thiếu 5 module runner | **14/14 bottom-up** + tách component/slice + máy giữ đủ sổ (§9.3) |
 | — | luồng chỉ happy path | + nhánh fail (chỗ S2 sống) + luồng lỗi/exit-code |
 | thang 7 bậc đứng đầu doc | rút thành Phụ lục A | giữ |
@@ -491,8 +504,8 @@ Ba bản ghi, ba câu hỏi, không giẫm chân:
 | `docs/architecture-map.md` (file này) | code **Ở ĐÂU** + ranh giới **KÝ GÌ** | tầng, tag, hai sổ đăng ký |
 | `docs/backlog.md` | **SẮP LÀM GÌ** | PBI — mọi row `planned` §6 phải trỏ về một PBI ở đây |
 
-Entity xuất hiện ở cả hai bản đồ cross-link qua contract: work item ↔ C2 ·
-human-gate ↔ C4 · outcome ↔ C2 · handoff ↔ C6. Bản đồ nằm trong đường đọc
+Entity xuất hiện ở cả hai bản đồ cross-link qua contract: work item ↔ CTR002 ·
+human-gate ↔ CTR004 · outcome ↔ CTR002 · handoff ↔ CTR006. Bản đồ nằm trong đường đọc
 chuẩn: `docs/specs/reading-map.md` + mục lục README (nối tại record 0010).
 
 ---
@@ -513,14 +526,14 @@ deploy/team, agent cắt theo kinh tế context-window và tính phi tất đị
 
 ## Câu hỏi mở — đã chốt tại record 0010 (chấp nhận không phản biện, theo đề xuất)
 
-1. **Đa tiến trình:** điểm yếu thật là **C2 một-cửa-ghi per-process** (JSONL + fs,
-   chưa lease/lock). **Chốt:** ghi nợ có tên trong C2; giải ở PBI riêng, bắt buộc
+1. **Đa tiến trình:** điểm yếu thật là **CTR002 một-cửa-ghi per-process** (JSONL + fs,
+   chưa lease/lock). **Chốt:** ghi nợ có tên trong CTR002; giải ở PBI riêng, bắt buộc
    xong **trước P6 (fan-out)** — không chặn P15.
 2. **Nghi thức thẻ-trước-code chạm L5.** **Chốt:** hiệu lực như *phụ lục
    definition-of-done* qua record 0010 — không sửa văn bản L5 tại chỗ, không mở
    luật L9 mới; nếu L5 tới ngưỡng xem lại thì gộp chính thức khi supersede.
 3. **Nhà của `dispatch.mjs`.** **Chốt:** giữ một file ở Infra; chỉ tách port/spawn
    khi P8 hoặc P16 thật sự cần hai nhịp đổi khác nhau (YAGNI).
-4. **C1 live.** Envelope port đầu tại P14 (`submit`), nay đủ trên MỌI verb qua một cửa in duy nhất, kèm sổ verb máy-đọc `--help --json` (P37, per D b2d18cc7/b0da87aa).
+4. **CTR001 live.** Envelope port đầu tại P14 (`submit`), nay đủ trên MỌI verb qua một cửa in duy nhất, kèm sổ verb máy-đọc `--help --json` (P37, per D b2d18cc7/b0da87aa).
 5. **Registry-manifest + 2 phép kiểm máy (§9.3).** **Chốt:** đứng riêng **trước
    S2** — là PBI **P20** trong backlog; nó canh mọi feature sau.
