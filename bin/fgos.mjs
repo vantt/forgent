@@ -437,6 +437,9 @@ function submitWork(dir, text, opts = {}) {
     // it leaves work.domain undefined so store.mjs's addWork/
     // validateWorkShape apply DEFAULT_DOMAIN's lazy default.
     domain: opts.domain,
+    // Per work-graph-intelligence S2b (producer A): --discovered-from
+    // threaded from opts the same way --domain is, immediately above.
+    discoveredFrom: opts.discoveredFrom,
     // Per D8: every item entering through the public door starts at its
     // domain's Clarify-mapped stage — context-discovery must pass before
     // it can be worked. Generalized from the hardcoded 'clarify' (D8) to
@@ -529,6 +532,14 @@ async function runVerb(verb, flags, positional, dir) {
         // No --stage flag: omitting stage already resolves per-domain via the
         // existing lazy default (item.stage ?? domain's Execute-mapped stage).
         domain: optionalField(flags.domain, 'add --domain requires a domain name (e.g. coding/synthetic); omit --domain entirely to use the default.'),
+        // Per work-graph-intelligence S2b (producer A): --discovered-from is
+        // an explicit, optional scalar provenance flag — same omitted-leaves-
+        // undefined shape as --domain/--tier above. work.mjs's
+        // validateWorkShape (mirroring its `parent` block) is the single
+        // source for the non-empty/non-self-referencing rule; existence of
+        // the referenced id is deliberately never enforced here (work-graph-
+        // intelligence-6, mirrors `parent`'s norm).
+        discoveredFrom: optionalField(flags['discovered-from'], 'add --discovered-from requires a non-empty id; omit it to leave unset.'),
       };
       const { event } = addWork(dir, work);
       return { id: event.payload.id, seq: event.seq };
@@ -547,6 +558,9 @@ async function runVerb(verb, flags, positional, dir) {
       const opts = {
         async: Boolean(flags.async || flags.unattended),
         domain: optionalField(flags.domain, 'submit --domain requires a domain name (e.g. coding/synthetic); omit --domain entirely to use the default.'),
+        // Per work-graph-intelligence S2b (producer A): two-hop like domain —
+        // parsed here, threaded into submitWork's work object below.
+        discoveredFrom: optionalField(flags['discovered-from'], 'submit --discovered-from requires a non-empty id; omit it to leave unset.'),
       };
       return submitWork(dir, text, opts);
     }

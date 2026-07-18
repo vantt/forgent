@@ -613,6 +613,43 @@ test('add never gained a --stage flag: passing --stage is simply ignored (not a 
   assert.equal(stateView(cwd).work['stage-flag-ignored'].stage, undefined);
 });
 
+// --- work-graph-intelligence S2b: --discovered-from on `add` (producer A) ---
+
+test('add without --discovered-from leaves discoveredFrom unset, exit 0', () => {
+  const cwd = tmpCwd();
+  const result = addOk(cwd, 'no-discovered-item');
+  assert.equal(result.status, 0);
+  assert.equal(stateView(cwd).work['no-discovered-item'].discoveredFrom, undefined);
+});
+
+test('add --discovered-from persists discoveredFrom on the new item, exit 0', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'origin-item');
+  const result = run(cwd, [
+    'add', 'discovered-item',
+    '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x',
+    '--discovered-from', 'origin-item',
+  ]);
+  assert.equal(result.status, 0);
+  assert.equal(stateView(cwd).work['discovered-item'].discoveredFrom, 'origin-item');
+});
+
+test('add with an empty --discovered-from "" is rejected as validation, exit 4, no event written', () => {
+  const cwd = tmpCwd();
+  const before = eventLines(cwd).length;
+  const result = run(cwd, ['add', 'empty-discovered-item', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--discovered-from', '']);
+  assert.equal(result.status, 4);
+  assert.equal(eventLines(cwd).length, before);
+});
+
+test('add with a bare --discovered-from (no value) is rejected as validation, exit 4, no event written', () => {
+  const cwd = tmpCwd();
+  const before = eventLines(cwd).length;
+  const result = run(cwd, ['add', 'bare-discovered-item', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--discovered-from']);
+  assert.equal(result.status, 4);
+  assert.equal(eventLines(cwd).length, before);
+});
+
 // --- D5 proposed: new edges + --reason on `move` (phase-2-routing-3) ---
 
 function toProposed(cwd, id) {
@@ -1302,6 +1339,43 @@ test('submit with a bare --domain (no value) is rejected as validation, exit 4, 
   const cwd = tmpCwd();
   const before = eventLines(cwd).length;
   const result = run(cwd, ['submit', 'Try a bare domain flag', '--domain']);
+  assert.equal(result.status, 4);
+  assert.equal(eventLines(cwd).length, before);
+});
+
+// --- work-graph-intelligence S2b: --discovered-from on `submit` (producer A, two-hop) ---
+
+test('submit without --discovered-from leaves discoveredFrom unset, exit 0', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['submit', 'Investigate the sluggish overview page']);
+  assert.equal(result.status, 0);
+  const id = JSON.parse(result.stdout).data.id;
+  const item = envelopeData(run(cwd, ['list']).stdout).work[id];
+  assert.equal(item.discoveredFrom, undefined);
+});
+
+test('submit --discovered-from persists discoveredFrom (two-hop: opts -> submitWork work object), exit 0', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'origin-item');
+  const result = run(cwd, ['submit', 'Follow up on the origin item', '--discovered-from', 'origin-item']);
+  assert.equal(result.status, 0);
+  const id = JSON.parse(result.stdout).data.id;
+  const item = envelopeData(run(cwd, ['list']).stdout).work[id];
+  assert.equal(item.discoveredFrom, 'origin-item');
+});
+
+test('submit with an empty --discovered-from "" is rejected as validation, exit 4, no event written', () => {
+  const cwd = tmpCwd();
+  const before = eventLines(cwd).length;
+  const result = run(cwd, ['submit', 'Try an empty discovered-from', '--discovered-from', '']);
+  assert.equal(result.status, 4);
+  assert.equal(eventLines(cwd).length, before);
+});
+
+test('submit with a bare --discovered-from (no value) is rejected as validation, exit 4, no event written', () => {
+  const cwd = tmpCwd();
+  const before = eventLines(cwd).length;
+  const result = run(cwd, ['submit', 'Try a bare discovered-from flag', '--discovered-from']);
   assert.equal(result.status, 4);
   assert.equal(eventLines(cwd).length, before);
 });
