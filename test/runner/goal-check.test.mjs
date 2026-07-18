@@ -85,3 +85,29 @@ test('runGoalCheck output is captured even on a failing verify (exit nonzero)', 
   assert.equal(result.status, 3);
   assert.match(result.output, /failure-detail/);
 });
+
+// --- output cap ------------------------------------------------------------
+// runGoalCheck stops appending once captured output reaches the 10 MiB
+// maxBuffer — a runaway-chatty verify never grows `output` without bound. The
+// process still runs to completion and resolves with its real exit status;
+// only the retained text is bounded (the over-cap chunks are dropped, not the
+// exit code).
+
+test('runGoalCheck caps captured output at maxBuffer but still resolves the real exit status', async () => {
+  const cwd = mkTempDir();
+  const maxBuffer = 10 * 1024 * 1024;
+  const emitted = 11 * 1024 * 1024; // deliberately over the cap
+  // Emit `emitted` bytes to stdout, then exit 0, entirely inside a real child.
+  const script = `process.stdout.write('x'.repeat(${emitted}))`;
+  const result = await runGoalCheck(
+    makeItem(`${process.execPath} -e ${JSON.stringify(script)}`),
+    cwd,
+  );
+
+  assert.equal(result.passed, true, 'an over-chatty verify that exits 0 still passes');
+  assert.equal(result.status, 0);
+  // Truncation: what we kept is bounded by maxBuffer and strictly less than
+  // what the child actually wrote — proving the over-cap chunks were dropped.
+  assert.ok(result.output.length <= maxBuffer, `output ${result.output.length} must not exceed maxBuffer ${maxBuffer}`);
+  assert.ok(result.output.length < emitted, 'captured output must be smaller than the emitted stream');
+});
