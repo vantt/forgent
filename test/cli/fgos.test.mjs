@@ -509,6 +509,10 @@ test('an unknown verb is rejected as validation, exit 4', () => {
   const cwd = tmpCwd();
   const result = run(cwd, ['bogus-verb']);
   assert.equal(result.status, 4);
+  // O1: the error path never prints a fgos.v1 envelope on stdout — diagnostics
+  // go to stderr only, so a consumer can trust "stdout parses" as "success".
+  assert.equal(result.stdout, '', 'a failing verb prints no stdout envelope');
+  assert.throws(() => JSON.parse(result.stdout), 'stdout is not parseable JSON on the error path');
 });
 
 test('add with no id at all is rejected as validation, exit 4', () => {
