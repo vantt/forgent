@@ -677,6 +677,29 @@ test('P1 fix: retry resets to this item\'s own dispatch baseline, not HEAD — a
   assert.equal(aheadCount, 1, 'exactly one commit ahead of main — the failed first attempt did not stack under the retry');
 });
 
+test('P1 fix (defect-class sweep): a retry on a root item whose branch already carries a planted commit preserves that pre-existing content while still discarding only its own failed first-attempt commit', async () => {
+  const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
+  seedItem(dir, { id: 'the-root3' }); // default verify: 'test -f output.txt'
+
+  // Simulate "an earlier leaf already merged into fgw/the-root3" — plant a
+  // commit directly on the root's own branch BEFORE it is ever dispatched
+  // (mirrors cell fan-out-parallel-9's own planted-commit tests). A
+  // dispatch-baseline reset must preserve this; a merge-base(trunk, branch)
+  // reset — the explicitly-rejected alternative — would have discarded it.
+  plantCommit(repoRoot, worktreeDir, 'the-root3', 'root-marker.txt', 'from an earlier merged leaf\n');
+
+  const result = await runOnce({ repoRoot, config: configFor(writeFlakyThenFixingExecutor(scriptDir, counterFile)), worktreeDir, log: noLog });
+
+  assert.equal(result.outcome, 'drained');
+  assert.equal(result.dispatched[0].outcome, 'proposed');
+  assert.equal(result.dispatched[0].attempts, 2);
+
+  const branch = branchNameFor('the-root3');
+  assert.equal(fileAtRef(repoRoot, branch, 'root-marker.txt'), true, 'planted (pre-existing) content survived the retry reset');
+  assert.equal(fileAtRef(repoRoot, branch, 'output.txt'), true, "the retry's own commit landed");
+  assert.equal(fileAtRef(repoRoot, branch, 'junk.txt'), false, "the failed first attempt's own commit was discarded");
+});
+
 test('verify passes but the worker never committed -> classified verify-miss, parked after retries', async () => {
   const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
   seedItem(dir, { id: 'item-nocommit' });
