@@ -3778,6 +3778,13 @@ test('graph verb: reports connected components (independent parallel tracks) in 
   assert.equal(data.componentCount, 2);
   assert.deepEqual(data.components.map((component) => component.items), [['a', 'b'], ['c']]);
 
+  // S6: the umbrella completes P43's stated acceptance — critical path,
+  // stale-blocked, and greedy top-k-unblock ride the same envelope.
+  assert.deepEqual(Object.keys(data), ['order_version', 'componentCount', 'components', 'criticalPath', 'staleBlocked', 'topUnblock']);
+  assert.deepEqual(data.criticalPath, { depth: 2, path: ['b', 'a'] });
+  assert.deepEqual(data.staleBlocked, [{ id: 'b', status: 'todo', blockedBy: ['a'] }]);
+  assert.deepEqual(data.topUnblock[0], { id: 'a', unblocks: 1, newlyUnblocks: 2 });
+
   // Pure read: no event written by the verb.
   assert.equal(eventLines(cwd).length, before, 'graph must not append any event');
 });

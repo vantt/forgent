@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { connectedComponents, graphMetrics } from '../../src/state/graph-metrics.mjs';
+import { connectedComponents, criticalPath, staleBlocked, greedyTopUnblock, graphMetrics } from '../../src/state/graph-metrics.mjs';
 
 // Pure lib — every view here is a literal (foldEvents style), no fs, no
 // `.fgos/` writes. connectedComponents groups work items linked by ANY unified
@@ -90,4 +90,99 @@ test('graphMetrics umbrella carries order_version alongside the component facts'
   assert.equal(metrics.order_version, 1); // FRONTIER_ORDER_VERSION (S4)
   assert.equal(metrics.componentCount, 1);
   assert.deepEqual(metrics.components[0].items, ['a', 'b']);
+});
+
+// --- S6: critical path, stale-blocked, greedy top-k-unblock ----------------
+
+test('criticalPath: the longest deps chain, deepest item down through its deps', () => {
+  // c deps b deps a; d deps a (a shorter branch). Longest chain is c->b->a.
+  const view = {
+    work: {
+      a: item('a'),
+      b: item('b', { deps: ['a'] }),
+      c: item('c', { deps: ['b'] }),
+      d: item('d', { deps: ['a'] }),
+    },
+  };
+  assert.deepEqual(criticalPath(view), { depth: 3, path: ['c', 'b', 'a'] });
+});
+
+test('criticalPath: empty view is depth 0 with an empty path; a single item is depth 1', () => {
+  assert.deepEqual(criticalPath({ work: {} }), { depth: 0, path: [] });
+  assert.deepEqual(criticalPath({ work: { solo: item('solo') } }), { depth: 1, path: ['solo'] });
+});
+
+test('staleBlocked: lists todo/blocked items with an unmet dep (missing dep included); ready items are omitted', () => {
+  const view = {
+    work: {
+      a: item('a'), // no deps -> ready, not stale
+      b: item('b', { deps: ['a'] }), // a is todo (not done) -> stale
+      done: item('done', { status: 'done' }),
+      c: item('c', { deps: ['done'] }), // dep done -> ready, not stale
+      parked: item('parked', { status: 'blocked', deps: ['gone'] }), // missing dep -> stale
+    },
+  };
+  assert.deepEqual(staleBlocked(view), [
+    { id: 'b', status: 'todo', blockedBy: ['a'] },
+    { id: 'parked', status: 'blocked', blockedBy: ['gone'] },
+  ]);
+});
+
+test('greedyTopUnblock: ranks by marginal not-done coverage — the chain root wins, then leftovers', () => {
+  // a unblocks b,c,d (transitively); e/f a separate pair; g isolated.
+  const view = {
+    work: {
+      a: item('a'),
+      b: item('b', { deps: ['a'] }),
+      c: item('c', { deps: ['b'] }),
+      d: item('d', { deps: ['a'] }),
+      e: item('e'),
+      f: item('f', { deps: ['e'] }),
+      g: item('g'),
+    },
+  };
+  const picks = greedyTopUnblock(view);
+  // First pick a: downstream {b,c,d} (size 3), marginal 4 (a+b+c+d).
+  assert.deepEqual(picks[0], { id: 'a', unblocks: 3, newlyUnblocks: 4 });
+  // Next best marginal is e: downstream {f} (size 1), marginal 2 (e+f).
+  assert.deepEqual(picks[1], { id: 'e', unblocks: 1, newlyUnblocks: 2 });
+  // Then g alone: marginal 1.
+  assert.deepEqual(picks[2], { id: 'g', unblocks: 0, newlyUnblocks: 1 });
+  // Everything is covered after that — no further picks.
+  assert.equal(picks.length, 3);
+});
+
+test('greedyTopUnblock: a done item is never a candidate and never counts as downstream', () => {
+  const view = {
+    work: {
+      root: item('root'),
+      finished: item('finished', { status: 'done', deps: ['root'] }), // done -> not counted
+      pending: item('pending', { deps: ['root'] }),
+    },
+  };
+  const picks = greedyTopUnblock(view);
+  // root's downstream among NOT-done is just {pending}; finished is ignored.
+  assert.deepEqual(picks[0], { id: 'root', unblocks: 1, newlyUnblocks: 2 });
+  assert.ok(!picks.some((p) => p.id === 'finished'));
+});
+
+test('greedyTopUnblock respects k', () => {
+  const view = { work: { a: item('a'), b: item('b'), c: item('c') } };
+  assert.equal(greedyTopUnblock(view, 2).length, 2);
+});
+
+test('graphMetrics umbrella completes P43: components + criticalPath + staleBlocked + topUnblock, all deterministic', () => {
+  const view = {
+    work: {
+      a: item('a'),
+      b: item('b', { deps: ['a'] }),
+    },
+  };
+  const m1 = graphMetrics(view);
+  const m2 = graphMetrics(view);
+  assert.deepEqual(m1, m2); // deterministic -> stable data_hash
+  assert.deepEqual(Object.keys(m1), ['order_version', 'componentCount', 'components', 'criticalPath', 'staleBlocked', 'topUnblock']);
+  assert.deepEqual(m1.criticalPath, { depth: 2, path: ['b', 'a'] });
+  assert.deepEqual(m1.staleBlocked, [{ id: 'b', status: 'todo', blockedBy: ['a'] }]);
+  assert.deepEqual(m1.topUnblock[0], { id: 'a', unblocks: 1, newlyUnblocks: 2 });
 });
