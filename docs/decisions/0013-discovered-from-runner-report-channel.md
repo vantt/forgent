@@ -66,6 +66,30 @@ mở rộng hợp đồng C3 (orchestrator ↔ worker) — không supersede gì:
   thêm mệnh đề kênh khám-phá; §11 changelog ghi delta. Không module mới, không
   row §6/manifest mới — `loop.mjs`/`dispatch.mjs` mở rộng tại chỗ.
 
+## Ranh giới tin cậy (bổ chú 2026-07-18, review-fix S11)
+
+`title`/`description` trong một khối `fgos-discovered` là VĂN BẢN KHÔNG ĐÁNG TIN — do
+chính worker (một trợ lý đang chạy, có thể bị chèn lệnh từ nội dung không đáng tin nó
+đọc phải) tự soạn. Item runner tạo ra từ đó vào thẳng giai đoạn `clarify`, nơi
+`title`/`description` nạp vào prompt của MODEL làm-rõ — đây là mặt tiếp xúc thứ hai
+(sau chính worker) nơi văn bản không đáng tin chạm tới một model sẽ sinh ra lệnh chạy
+được. Chấp nhận CÓ CHỦ Ý, không phải bỏ sót: giảm nhẹ đã có từ thiết kế gốc giữ nguyên
+— `verify` KHÔNG BAO GIỜ do worker đặt (luôn `FALLBACK_VERIFY` rồi model/người ở bước
+làm-rõ gán lại), nên văn bản worker không đáng tin không thể trực tiếp trở thành một
+lệnh shell chạy được; item không mang niềm tin đặc biệt nào, đi qua đúng vòng xét-lại
+như một item người tự khai. **Phương án đã cân nhắc, CHƯA XÂY:** một cửa xét-duyệt-người
+bắt buộc trước khi một item runner-tự-tạo được dispatch tự động (thay vì vào thẳng
+`clarify` như hôm nay) — đổi thiết kế lớn hơn phạm vi một P3 review-fix, ghi lại đây để
+cân nhắc lại nếu bằng chứng chèn-lệnh thật xuất hiện.
+
+## Bảo đảm giao-nhận (bổ chú 2026-07-18, review-fix S11)
+
+Kênh này là **cố-gắng-tối-đa, tối-đa-một-lần** (best-effort, at-most-once) — KHÔNG PHẢI
+ít-nhất-một-lần. Một report hợp lệ được `runner` phân tích thành công đúng MỘT LẦN, tại
+kết cục cuối của lượt dispatch; nếu tiến trình runner chết giữa lúc phân tích và lúc
+`addWork` ghi xong, report đó mất — không có cơ chế đối-soát-lại nào đọc lại output đã
+lưu để phục hồi report đã mất. Xem spec Runner "Báo việc-phát-hiện từ trợ lý" / R45.
+
 ## Phương án đã cân nhắc và bỏ
 
 - **Worker tự gọi `fgos add`.** Bỏ — phá vỡ runner-một-cửa-ghi (D3) và làm report
