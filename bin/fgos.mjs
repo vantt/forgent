@@ -1591,12 +1591,30 @@ async function runVerb(verb, flags, positional, dir) {
         if (sub === 'start') {
           const itemId = optionalField(flags.item, 'session start --item requires a non-empty id value (omit --item entirely to start a session with no item bound)');
           const entry = createSession(repoRoot, { itemId });
-          return { ...entry };
+          // Explicit projection, not a spread: decouples the public envelope
+          // from session.mjs's internal registry-entry shape (mirrors every
+          // other converted verb, e.g. move's {id,from,to,seq}).
+          return {
+            sessionId: entry.sessionId,
+            worktreePath: entry.worktreePath,
+            itemId: entry.itemId,
+            startCommit: entry.startCommit,
+            pid: entry.pid,
+            startedAt: entry.startedAt,
+          };
         }
         if (sub === 'end') {
           const sessionId = requireField(positional[1], 'session end requires a session id: fgos session end <session-id> [--force]');
           const entry = endSession(repoRoot, sessionId, { force: Boolean(flags.force) });
-          return { ...entry, forced: Boolean(flags.force) };
+          return {
+            sessionId: entry.sessionId,
+            worktreePath: entry.worktreePath,
+            itemId: entry.itemId,
+            startCommit: entry.startCommit,
+            pid: entry.pid,
+            startedAt: entry.startedAt,
+            forced: Boolean(flags.force),
+          };
         }
         if (sub === 'list') {
           return listSessions(repoRoot);
