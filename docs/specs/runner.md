@@ -360,6 +360,16 @@ một lệnh sẽ luôn gãy ngay lần dùng đầu tiên:
   đi qua phép kiểm cây-làm-việc-chính-phải-sạch hay phán Iron Law của đường
   duyệt cục bộ — cả hai phép kiểm đó tồn tại chỉ vì một merge CỤC BỘ làm bẩn
   cây làm việc; một merge qua GitHub không đụng cây làm việc cục bộ chút nào.
+  **(Cập nhật, approve-worktree-guard-github-fix D1/D3):** hai chặn định-danh-
+  worktree của đường duyệt cục bộ (sổ đăng ký phiên + chặn cấu trúc
+  `isMainWorktree` — xem "Cổng duyệt PR nội bộ" trên) nay chạy TRƯỚC CẢ nhánh
+  `--github` này. Hệ quả đã ghi nhận, chấp nhận (D3): với một đề xuất nguồn
+  KHÔNG-runner gọi `approve --github` TỪ một worktree liên-kết (đã đăng ký
+  hay tay), người gọi nay thấy thông điệp từ-chối định-danh-worktree thay vì
+  thông điệp "không phải nguồn runner" ở trên — tính hợp lệ MÔI TRƯỜNG (đây
+  có phải cây chính không) được kiểm trước tính hợp lệ NGHIỆP VỤ (nguồn của
+  đề xuất có hợp với `--github` không), phòng-thủ-theo-chiều-sâu có chủ đích,
+  không phải một hồi quy.
 - **What changes:**
   - `review <id> --github` — đẩy nhánh của đề xuất lên remote gốc nếu nhánh
     đó chưa từng được đẩy (thăm dò tồn tại trước, chỉ đẩy khi thật sự cần —
@@ -676,7 +686,12 @@ hai vế qua một wrapper `try realpathSync / catch → path.resolve` — bản
 BỘ trong `bin/fgos.mjs`, KHÔNG import từ `session.mjs`: một mục sổ có worktree
 đã biến mất khỏi đĩa không được phép làm `fs.realpathSync` trần đánh sập approve
 cho MỌI người gọi, kể cả từ cây chính), khớp hoặc lồng dưới qua tiền tố nối
-`path.sep`. `approve --github` KHÔNG bị chặn (không đụng cây cục bộ).
+`path.sep`. **(Cập nhật, approve-worktree-guard-github-fix D1):**
+`approve --github` nay CŨNG chạy qua chặn này — cả chặn sổ đăng ký này lẫn
+chặn cấu trúc `isMainWorktree` dưới đều dời lên chạy TRƯỚC nhánh `--github`,
+vì một merge qua GitHub tuy không đụng cây cục bộ vẫn cần `cwd` đúng là cây
+chính để trạng thái `done` không lạc vào một worktree khác trong khi GitHub
+đã báo PR merged.
 
 **Bổ sung hành vi (ghi nhận, không phải byte-identical):** vì phép kiểm gọi
 `listSessions(repoRoot)`, một kho CHƯA từng dùng phiên (`sessions.json` vắng,

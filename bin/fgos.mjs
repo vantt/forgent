@@ -1091,6 +1091,56 @@ async function runVerb(verb, flags, positional, dir) {
       const repoRoot = process.cwd();
       const source = classifySource(repoRoot, item);
 
+      // Multi-session guard (fgos-multi-session-checkout Epic 2): approve must
+      // never run with cwd inside a registered session worktree. One refusal,
+      // covering BOTH non-github source paths, each dangerous for its own reason:
+      //   - runner: the merge below lands on the session's own detached HEAD,
+      //     never main (spike-proven) — a silent "approved" item whose code
+      //     never reaches main.
+      //   - pull/legacy: runGoalCheck below verifies whatever cwd has checked
+      //     out; a session worktree sits at its startCommit, which may predate
+      //     later advances to main, so this would verify STALE code while the
+      //     "verified on main" message claims otherwise, marking the item done
+      //     regardless — a silent false verification.
+      // Refuses BEFORE any git command or verify run: the item stays proposed,
+      // main untouched. Runs BEFORE the --github branch too (approve-worktree-
+      // guard-github-fix D1): a GitHub-side merge is server-side and never
+      // touches the local tree, but the local checkout's own IDENTITY — is
+      // this even the main worktree? — is a more fundamental precondition than
+      // which transport approve uses, so it is checked first for every source.
+      // Registry-based: an ad-hoc `git worktree add` never created through
+      // `fgos session start` is invisible to this guard (CONTEXT.md Deferred
+      // Ideas — ad-hoc unregistered worktree residual risk); the structural
+      // check right below catches that case.
+      const approveCwdReal = realpathOr(repoRoot);
+      for (const session of listSessions(repoRoot)) {
+        const wtReal = realpathOr(session.worktreePath);
+        if (approveCwdReal === wtReal || approveCwdReal.startsWith(`${wtReal}${path.sep}`)) {
+          throw new StoreError(
+            'validation',
+            `approve: refusing to run from inside session "${session.sessionId}" worktree at "${wtReal}" — approve must land on the main checkout, which a session worktree structurally is not. Run approve from the main checkout, or end the session first with "fgos session end ${session.sessionId}".`,
+          );
+        }
+      }
+
+      // Structural guard (P44): the registry loop above only catches a
+      // worktree registered via `fgos session start`. A plain `git worktree
+      // add` run by hand is invisible to sessions.json, so it slipped through
+      // untouched — same false-verification risk (merge lands on that
+      // worktree's own checkout, or goal-check verifies its own possibly-stale
+      // tree, while the item is reported "done"/"verified on main"), just
+      // unregistered instead of registered. isMainWorktree reads git's own
+      // common-dir structure, so it catches ANY linked worktree regardless of
+      // how it was created. Also runs BEFORE the --github branch, same
+      // rationale as the registry loop above (approve-worktree-guard-github-
+      // fix D1).
+      if (!isMainWorktree(repoRoot)) {
+        throw new StoreError(
+          'validation',
+          `approve: refusing to run from "${repoRoot}" — this is a git worktree, not the repository's main working tree, whether or not it was created through "fgos session start". Run approve from the main checkout.`,
+        );
+      }
+
       // GitHub transport (github-adapter D1/D3/D5): `approve <id> --github --pr
       // <n>` merges a prior `review --github` PR through GitHub instead of a
       // local git merge. Dispatched BEFORE the runner block's Iron Law and
@@ -1099,7 +1149,14 @@ async function runVerb(verb, flags, positional, dir) {
       // merge mutates the tree) must not gate it. The source gate is checked
       // BEFORE the --pr presence check so a pull/legacy item always gets the
       // runner-sourced error, never a misleading "missing --pr" message for an
-      // item that could never have a PR.
+      // item that could never have a PR. Runs AFTER the worktree-identity
+      // guards above (approve-worktree-guard-github-fix D1/D3): environment
+      // validity (is this even a valid worktree to approve from) is checked
+      // before business-logic validity (is this item's source compatible with
+      // --github) — an accepted, documented precedence change for the narrow
+      // combination of --github + a non-runner-sourced item + a linked
+      // worktree, which now sees the worktree-identity refusal instead of this
+      // block's own source-mismatch message.
       if (flags.github) {
         if (source !== 'runner') {
           throw new StoreError('validation', `approve --github: "${id}" is a ${source}-sourced item — GitHub approval requires a runner-sourced item with a live fgw/${id} branch (no branch exists to attach a PR to for pull/legacy items).`);
@@ -1129,49 +1186,6 @@ async function runVerb(verb, flags, positional, dir) {
           detail: `gh pr merge #${prNumber} failed at step ${result.step}: ${result.detail}`,
         });
         return { id, mode: 'github', to: 'blocked', prNumber, reason, detail: result.detail };
-      }
-
-      // Multi-session guard (fgos-multi-session-checkout Epic 2): approve must
-      // never run with cwd inside a registered session worktree. One refusal,
-      // covering BOTH non-github source paths, each dangerous for its own reason:
-      //   - runner: the merge below lands on the session's own detached HEAD,
-      //     never main (spike-proven) — a silent "approved" item whose code
-      //     never reaches main.
-      //   - pull/legacy: runGoalCheck below verifies whatever cwd has checked
-      //     out; a session worktree sits at its startCommit, which may predate
-      //     later advances to main, so this would verify STALE code while the
-      //     "verified on main" message claims otherwise, marking the item done
-      //     regardless — a silent false verification.
-      // Refuses BEFORE any git command or verify run: the item stays proposed,
-      // main untouched. --github is exempt (handled above — it never touches the
-      // local tree). Registry-based: an ad-hoc `git worktree add` never created
-      // through `fgos session start` is invisible to this guard (CONTEXT.md
-      // Deferred Ideas — ad-hoc unregistered worktree residual risk).
-      const approveCwdReal = realpathOr(repoRoot);
-      for (const session of listSessions(repoRoot)) {
-        const wtReal = realpathOr(session.worktreePath);
-        if (approveCwdReal === wtReal || approveCwdReal.startsWith(`${wtReal}${path.sep}`)) {
-          throw new StoreError(
-            'validation',
-            `approve: refusing to run from inside session "${session.sessionId}" worktree at "${wtReal}" — approve must land on the main checkout, which a session worktree structurally is not. Run approve from the main checkout, or end the session first with "fgos session end ${session.sessionId}".`,
-          );
-        }
-      }
-
-      // Structural guard (P44): the registry loop above only catches a
-      // worktree registered via `fgos session start`. A plain `git worktree
-      // add` run by hand is invisible to sessions.json, so it slipped through
-      // untouched — same false-verification risk (merge lands on that
-      // worktree's own checkout, or goal-check verifies its own possibly-stale
-      // tree, while the item is reported "done"/"verified on main"), just
-      // unregistered instead of registered. isMainWorktree reads git's own
-      // common-dir structure, so it catches ANY linked worktree regardless of
-      // how it was created.
-      if (!isMainWorktree(repoRoot)) {
-        throw new StoreError(
-          'validation',
-          `approve: refusing to run from "${repoRoot}" — this is a git worktree, not the repository's main working tree, whether or not it was created through "fgos session start". Run approve from the main checkout.`,
-        );
       }
 
       if (source === 'runner') {

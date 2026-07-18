@@ -3896,6 +3896,60 @@ test('approve from the main checkout is unaffected by the ad-hoc-worktree guard 
   assert.equal(stateView(cwdP).work['approve-adhoc-main-pull'].status, 'done');
 });
 
+// --- approve --github + worktree guard (approve-worktree-guard-github-fix) -
+//
+// P1 finding (review-260718-concurrency-hard-gate-cluster): the --github
+// branch (github-adapter) merged server-side and called moveWork/returned
+// BEFORE the registry guard loop or isMainWorktree ever ran, so it was never
+// covered by P44/approve-worktree-guard — a linked worktree (registered
+// session or ad-hoc) running `approve --github` reached `done` while GitHub
+// showed the PR merged, exactly the false-verification class the guard
+// exists to close. Red-before-green: run against the pre-fix code (guards
+// positioned after the `if (flags.github)` branch), each test below fails —
+// approve reaches the gh fake and/or moveWork; after relocating the guards
+// ahead of the --github branch, both refuse cleanly, proving the fix.
+
+test('approve --github --pr refuses from an ad-hoc worktree never created through "fgos session start" — no gh call, no moveWork, item stays proposed, exit 4', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeRunnerProposedItem(cwd, 'approve-adhoc-github', { verify: 'test -f approve-adhoc-github-produced.txt' });
+  const headBefore = gitHead(cwd);
+  const marker = path.join(cwd, 'gh-was-called');
+  const fake = writeMarkerFake(cwd, marker);
+
+  const worktreePath = addAdHocWorktree(cwd, 'adhoc-github-branch');
+  try {
+    const result = run(worktreePath, ['approve', 'approve-adhoc-github', '--github', '--pr', '9'], { FGOS_GH_COMMAND: fake });
+    assert.equal(result.status, 4, `expected a clean validation refusal, not a GitHub merge from an unregistered worktree: ${result.stdout}${result.stderr}`);
+    assert.match(result.stderr, /main working tree/, 'the structural worktree-identity message, not the --github source-mismatch message');
+    assert.ok(!fs.existsSync(marker), 'the worktree guard must reject before any gh CLI call');
+    assert.equal(stateView(cwd).work['approve-adhoc-github'].status, 'proposed', 'item is untouched — no moveWork, no false "done"');
+    assert.equal(gitHead(cwd), headBefore, 'main HEAD must be unchanged — nothing landed on main');
+  } finally {
+    removeAdHocWorktree(cwd, worktreePath);
+  }
+});
+
+test('approve --github --pr refuses from inside a registered session worktree, with the registry guard\'s friendlier session-naming message (same precedence as the local path) — no gh call, item stays proposed, exit 4', () => {
+  const cwd = initSessionSafeCwd();
+  run(cwd, ['init']);
+  makeSessionSafeRunnerItem(cwd, 'approve-session-github', { verify: 'test -f approve-session-github-produced.txt' });
+  const marker = path.join(cwd, 'gh-was-called');
+  const fake = writeMarkerFake(cwd, marker);
+
+  const session = createSession(cwd, { sessionId: 'sess-github' });
+  try {
+    const result = run(session.worktreePath, ['approve', 'approve-session-github', '--github', '--pr', '9'], { FGOS_GH_COMMAND: fake });
+    assert.equal(result.status, 4, `expected a clean validation refusal: ${result.stdout}${result.stderr}`);
+    assert.match(result.stderr, /sess-github/, "the registry guard's friendlier session-naming message wins, not the generic structural message");
+    assert.match(result.stderr, /session end/, 'the refusal tells the caller how to proceed');
+    assert.ok(!fs.existsSync(marker), 'the worktree guard must reject before any gh CLI call');
+    assert.equal(stateView(cwd).work['approve-session-github'].status, 'proposed', 'item is untouched — no moveWork, no false "done"');
+  } finally {
+    endSession(cwd, session.sessionId, { force: true });
+  }
+});
+
 // --- work-graph-intelligence S5: `fgos graph` read verb -------------------
 
 test('graph verb: reports connected components (independent parallel tracks) in a fgos.v1 envelope, and is a pure read (no event appended, exit 0)', () => {
