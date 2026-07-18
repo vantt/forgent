@@ -5,6 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync, spawnSync } from 'node:child_process';
+import { frontier } from '../../src/state/frontier.mjs';
 
 // e2e proof for base-workflow-model (D1-D4): a second, synthetic domain
 // dispatches through the exact same fgos-runner/dispatch code path as the
@@ -19,12 +20,17 @@ import { execFileSync, spawnSync } from 'node:child_process';
 // explicit `stage` field (it stays lazily-defaulted, per base-workflow-model
 // approach.md); a work.stage event is only ever written by the
 // discovery/decompose sweep, which `add`-created items never go through. So
-// there is no on-disk `stage` value to read directly for an added item —
-// the only observable proof that the lazy default resolved to the
-// synthetic domain's Execute-mapped stage ('assembling') is that the item
-// was actually picked up and dispatched by the real runner at all: if the
-// domain-aware lazy default were broken, the item would simply sit at
-// `todo` forever, never entering the frontier.
+// there is no on-disk `stage` value to read directly for an added item.
+// IMPORTANT: reaching `proposed` here does NOT, by itself, prove the lazy
+// default resolved to the synthetic domain's own Execute-mapped stage
+// ('assembling') — frontier.mjs's `(item.stage ?? executeStage) !==
+// executeStage` check is trivially satisfied whenever `item.stage` is
+// absent, for ANY domain's Execute-mapped stage, correct or not. The actual
+// domain-discriminating proof lives in the "frontier: domain-aware stage
+// resolution actually discriminates" test below, which pins two items to
+// the SAME explicit stage under different domains. This e2e test instead
+// proves the real runner/dispatch.mjs code path, git branch creation, and
+// zero cross-effect between the two domains — see the assertions below.
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FGOS = path.resolve(__dirname, '../../bin/fgos.mjs');
@@ -163,13 +169,15 @@ test('e2e synthetic domain: add --domain synthetic (no --stage) dispatches throu
   const synth = afterFirst.work['synth-item'];
   const coding = afterFirst.work['coding-item'];
 
-  // Truth: the synthetic item was recognized as ready and actually
-  // dispatched to `proposed` with no --stage flag ever passed — the only
-  // way this happens is if the lazy default resolved its stage to the
-  // synthetic domain's own Execute-mapped stage ('assembling'); a broken
-  // resolution would have left it sitting at `todo` forever (frontier.mjs).
+  // Both items reaching `proposed` proves the real runner picked them up
+  // and dispatched them through the live fgos-runner/dispatch.mjs code
+  // path — it does NOT by itself prove domain-aware stage resolution (see
+  // the header comment above and the discriminating frontier test below):
+  // an `add`-created item never carries an explicit `stage`, so this check
+  // passes for ANY domain's Execute-mapped stage, correct or not.
   assert.equal(synth.status, 'proposed', 'the synthetic item was dispatched by the real runner');
   assert.equal(coding.status, 'proposed', 'the plain coding item was dispatched in the same run');
+  assert.equal(synth.domain, 'synthetic', 'the persisted item retains its explicit domain');
 
   assert.equal(branchExists(repoRoot, 'fgw/synth-item'), true);
   assert.match(branchLog(repoRoot, 'fgw/synth-item'), /worker: synth-output\.txt/);
@@ -218,4 +226,41 @@ test('e2e synthetic domain: submit --domain synthetic is deliberately NOT the en
   const item = view.work[submitted.id];
   assert.equal(item.stage, 'clarify');
   assert.equal(item.domain, undefined);
+});
+
+test('frontier: domain-aware stage resolution actually discriminates — two items share the SAME explicit stage under different domains, only synthetic is ready', () => {
+  // Unlike the e2e test above (which never writes an explicit `stage`, so
+  // its "reached proposed" assertion is trivially true for any domain, per
+  // the header comment), this pins both items to the exact same explicit
+  // `stage: 'assembling'` value and varies only `domain`. `assembling` is
+  // synthetic's own Execute-mapped stage (domains.mjs); it is not one of
+  // coding's stages at all (coding's Execute stage is `executing`). A
+  // broken synthetic-to-stage mapping — or a frontier that ignored domain
+  // entirely — would make both items ready, or neither; this test fails
+  // either way, which the e2e proof above cannot.
+  const view = {
+    work: {
+      'synth-explicit': {
+        id: 'synth-explicit',
+        status: 'todo',
+        domain: 'synthetic',
+        stage: 'assembling',
+        deps: [],
+      },
+      'coding-explicit': {
+        id: 'coding-explicit',
+        status: 'todo',
+        domain: 'coding',
+        stage: 'assembling',
+        deps: [],
+      },
+    },
+  };
+
+  const readyIds = frontier(view).map((readyItem) => readyItem.id);
+  assert.deepEqual(
+    readyIds,
+    ['synth-explicit'],
+    'only the synthetic item at its own Execute stage is ready; the coding item pinned to the same literal stage name is excluded',
+  );
 });
