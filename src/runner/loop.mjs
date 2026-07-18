@@ -34,6 +34,11 @@
 // actually mattered still holds exactly — worker output never lands in a
 // committed/git-tracked path. Verify/goal-check output stays console-only
 // (out of scope).
+// LIVE TEE (P39): each chunk is ALSO persisted the instant it arrives, via
+// spawnWorker's onChunk hook -> appendWorkerLogChunk (same sole-writer
+// facade), so `tail -f` on a work item's log shows output in real time while
+// the worker is still running. The terminal block appended once dispatch
+// settles (below) is unchanged.
 //
 // REPO ROOT: always derived from the caller's cwd (`git rev-parse
 // --show-toplevel`), never from this file's own location — the runner
@@ -66,7 +71,7 @@ import {
   BREAKER_MISSES,
 } from './anti-loop.mjs';
 import { spawnWorker, modelForTier } from './dispatch.mjs';
-import { appendWorkerLog } from './worker-log.mjs';
+import { appendWorkerLog, appendWorkerLogChunk } from './worker-log.mjs';
 import { createWorktree, removeWorktree, listLeftovers, branchNameFor, createBranchRef } from './worktree.mjs';
 import { runGoalCheck } from './goal-check.mjs';
 import { createWriteQueue } from './write-queue.mjs';
@@ -620,6 +625,11 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
           answer: feedbackView.gates?.[item.id]?.answer,
           reason: feedbackView.work?.[item.id]?.reason,
         },
+        // P39: live tee, chunk by chunk, through worker-log.mjs's sole
+        // writer — so `tail -f .fgos/logs/<id>.log` shows this worker's
+        // output while it is still running. The terminal block below (after
+        // spawnWorker resolves) is unchanged.
+        onChunk: (stream, chunk) => appendWorkerLogChunk(dir, item.id, chunk),
       });
       lastWorkerOutput = worker.stdout ?? ''; // wgi-8: terminal-outcome discovery source (success/verify-miss)
       log(`fgos-runner: worker for "${item.id}" exited ${worker.status ?? `signal ${worker.signal}`} (tier ${worker.tier} -> ${worker.model})`);

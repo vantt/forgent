@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { appendWorkerLog } from '../../src/runner/worker-log.mjs';
+import { appendWorkerLog, appendWorkerLogChunk } from '../../src/runner/worker-log.mjs';
 
 function mkTempDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-worker-log-'));
@@ -73,6 +73,57 @@ test('appendWorkerLog never throws when the write fails (review finding F-P1-1) 
   let result;
   assert.doesNotThrow(() => {
     result = appendWorkerLog(dir, 'item-d', { attempt: 1, stdout: 'would have logged' });
+  });
+  assert.equal(result, null, 'a failed write degrades to null, never throws');
+});
+
+// --- appendWorkerLogChunk: live per-chunk tee (P39) -------------------
+
+test('appendWorkerLogChunk creates the logs dir on first write and writes the chunk unwrapped (no header)', () => {
+  const dir = mkTempDir();
+  const logPath = appendWorkerLogChunk(dir, 'item-e', 'partial output as it arrives');
+
+  assert.equal(logPath, path.join(dir, 'logs', 'item-e.log'));
+  const content = fs.readFileSync(logPath, 'utf8');
+  assert.equal(content, 'partial output as it arrives', 'raw chunk, no timestamp/header wrapping');
+});
+
+test('appendWorkerLogChunk appends successive chunks in order onto the same file, live-tee style', () => {
+  const dir = mkTempDir();
+  appendWorkerLogChunk(dir, 'item-f', 'first chunk\n');
+  appendWorkerLogChunk(dir, 'item-f', 'second chunk\n');
+  appendWorkerLogChunk(dir, 'item-f', 'third chunk\n');
+
+  const content = fs.readFileSync(path.join(dir, 'logs', 'item-f.log'), 'utf8');
+  assert.equal(content, 'first chunk\nsecond chunk\nthird chunk\n');
+});
+
+test('appendWorkerLogChunk followed by appendWorkerLog: live-teed chunks are still there, then the terminal block appends after (both through the same door)', () => {
+  const dir = mkTempDir();
+  appendWorkerLogChunk(dir, 'item-g', 'streamed while running\n');
+  appendWorkerLog(dir, 'item-g', { attempt: 1, status: 0, stdout: 'streamed while running\n' });
+
+  const content = fs.readFileSync(path.join(dir, 'logs', 'item-g.log'), 'utf8');
+  const liveIndex = content.indexOf('streamed while running');
+  const blockIndex = content.indexOf('=== ');
+  assert.ok(liveIndex >= 0 && blockIndex > liveIndex, 'live chunk appears before the terminal block');
+  assert.match(content, /exit 0/, 'terminal block still records the outcome as before');
+});
+
+test('appendWorkerLogChunk is a no-op for an empty/falsy chunk (never creates the dir for nothing)', () => {
+  const dir = mkTempDir();
+  assert.equal(appendWorkerLogChunk(dir, 'item-h', ''), null);
+  assert.equal(appendWorkerLogChunk(dir, 'item-h', undefined), null);
+  assert.ok(!fs.existsSync(path.join(dir, 'logs')));
+});
+
+test('appendWorkerLogChunk never throws when the write fails (same F-P1-1 discipline as appendWorkerLog)', () => {
+  const dir = mkTempDir();
+  fs.writeFileSync(path.join(dir, 'logs'), 'not a directory');
+
+  let result;
+  assert.doesNotThrow(() => {
+    result = appendWorkerLogChunk(dir, 'item-i', 'would have streamed');
   });
   assert.equal(result, null, 'a failed write degrades to null, never throws');
 });

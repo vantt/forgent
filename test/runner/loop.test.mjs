@@ -74,6 +74,32 @@ execFileSync('git', ['commit', '-q', '-m', ${JSON.stringify(`worker: ${produce}`
   return scriptPath;
 }
 
+/** A worker that writes several DISTINCT stdout chunks (separate write()
+ * calls, keyed by the item's own produce target so two concurrent items
+ * never share a marker) before producing and committing its file — for
+ * proving the live tee (P39) persists each chunk to `.fgos/logs/<id>.log`
+ * as it arrives, not just in the terminal recap block. */
+function writeChunkyCommittingExecutor(scriptDir, counterFile) {
+  const scriptPath = path.join(scriptDir, 'chunky-committing-executor.mjs');
+  fs.writeFileSync(
+    scriptPath,
+    `
+import fs from 'node:fs';
+import { execFileSync } from 'node:child_process';
+const prompt = process.argv[2] ?? '';
+const match = prompt.match(/test -f (\\S+)/);
+const file = match ? match[1] : 'output.txt';
+fs.appendFileSync(${JSON.stringify(counterFile)}, 'run\\n');
+process.stdout.write('chunk-1-for-' + file + '\\n');
+process.stdout.write('chunk-2-for-' + file + '\\n');
+fs.writeFileSync(file, 'produced by worker\\n');
+execFileSync('git', ['add', file]);
+execFileSync('git', ['commit', '-q', '-m', 'worker: ' + file]);
+`,
+  );
+  return scriptPath;
+}
+
 /** A worker that produces the verify target but never commits it. */
 function writeNonCommittingExecutor(scriptDir, counterFile) {
   const scriptPath = path.join(scriptDir, 'non-committing-executor.mjs');
@@ -628,6 +654,70 @@ test('worker-spawn-fail: nonexistent executor -> retry per matrix, then park to 
   const logFile = path.join(dir, 'logs', 'item-nospawn.log');
   assert.ok(fs.existsSync(logFile), 'worker dispatch log persisted for the failed spawn');
   assert.match(fs.readFileSync(logFile, 'utf8'), /worker-spawn-fail/);
+});
+
+// --- live tee: chunks land in .fgos/logs/<id>.log as they arrive (P39) ----
+
+test('live tee: each stdout chunk is persisted to .fgos/logs/<id>.log AS IT ARRIVES, and the terminal block still follows it intact', async () => {
+  const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
+  seedItem(dir, { id: 'item-live' });
+  const config = configFor(writeChunkyCommittingExecutor(scriptDir, counterFile));
+
+  const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
+
+  assert.equal(result.outcome, 'drained');
+  assert.equal(result.dispatched[0].outcome, 'proposed');
+  const logFile = path.join(dir, 'logs', 'item-live.log');
+  const content = fs.readFileSync(logFile, 'utf8');
+
+  // both chunks landed, raw and unwrapped, in arrival order
+  const rawChunk1 = content.indexOf('chunk-1-for-output.txt');
+  const rawChunk2 = content.indexOf('chunk-2-for-output.txt');
+  assert.ok(rawChunk1 >= 0 && rawChunk2 > rawChunk1, 'chunks are live-teed in order');
+  // the terminal block (D1/D3/D4 recap) still appends after, unchanged
+  const terminalBlock = content.indexOf('=== ');
+  assert.ok(terminalBlock > rawChunk2, 'terminal block appended after the live-teed chunks');
+  assert.match(content, /exit 0/);
+  assert.match(content.slice(terminalBlock), /chunk-1-for-output\.txt/, 'terminal block still carries the full stdout recap');
+});
+
+test('live tee: two items dispatched in the same parallel wave never interleave into each other\'s log file', async () => {
+  const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
+  seedItem(dir, { id: 'item-live-a', verify: 'test -f a.txt', refs: ['a.txt'] });
+  seedItem(dir, { id: 'item-live-b', verify: 'test -f b.txt', refs: ['b.txt'] });
+  const config = {
+    ...configFor(writeChunkyCommittingExecutor(scriptDir, counterFile)),
+    parallel: { maxRoots: 2, maxLeavesPerRoot: 1 },
+  };
+
+  const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
+
+  assert.equal(result.outcome, 'drained');
+  assert.equal(result.dispatched.length, 2);
+  assert.ok(result.dispatched.every((r) => r.outcome === 'proposed'));
+
+  const contentA = fs.readFileSync(path.join(dir, 'logs', 'item-live-a.log'), 'utf8');
+  const contentB = fs.readFileSync(path.join(dir, 'logs', 'item-live-b.log'), 'utf8');
+  assert.match(contentA, /chunk-1-for-a\.txt/);
+  assert.match(contentA, /chunk-2-for-a\.txt/);
+  assert.doesNotMatch(contentA, /for-b\.txt/, 'item-a\'s log carries no trace of item-b\'s chunks');
+  assert.match(contentB, /chunk-1-for-b\.txt/);
+  assert.match(contentB, /chunk-2-for-b\.txt/);
+  assert.doesNotMatch(contentB, /for-a\.txt/, 'item-b\'s log carries no trace of item-a\'s chunks');
+});
+
+test('live tee: .fgos/logs is never committed (per D4 — live tee did not change the committed surface)', async () => {
+  const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
+  seedItem(dir, { id: 'item-live-clean' });
+  const config = configFor(writeChunkyCommittingExecutor(scriptDir, counterFile));
+
+  await runOnce({ repoRoot, config, worktreeDir, log: noLog });
+
+  assert.ok(fs.existsSync(path.join(dir, 'logs', 'item-live-clean.log')));
+  // main only ever gains the worker's own commit (produced by the committing
+  // executor) — .fgos/logs never enters a git object at all, tracked or not.
+  const tracked = execFileSync('git', ['ls-files'], { cwd: repoRoot, encoding: 'utf8' });
+  assert.doesNotMatch(tracked, /\.fgos/, 'no .fgos path is ever committed');
 });
 
 // --- anti-loop: max-visits parks the item OFF the frontier ----------------

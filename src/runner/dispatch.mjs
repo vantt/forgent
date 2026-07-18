@@ -246,6 +246,26 @@ export function resolveExecutorCommand(cfg, { prompt, model }) {
  * that is the runner's goal-check's concern (per D3: the worker's own exit
  * status/report is never trusted on its own; only `verify` decides).
  */
+/**
+ * Live per-chunk teeing (P39): `opts.onChunk(stream, chunk)`, when provided,
+ * is called synchronously on every stdout/stderr 'data' event — BEFORE the
+ * maxBuffer accounting below, so a chunk is teed even on the event that
+ * crosses the cap and triggers the kill. Wrapped in try/catch: an event
+ * handler that throws is an uncaught exception in Node (not something a
+ * Promise reject can catch), and this module's job is spawning the worker,
+ * never crashing on a caller's logging callback. dispatch.mjs itself still
+ * touches no filesystem outside the child process's own cwd — the callback
+ * (loop.mjs, via worker-log.mjs's sole writer) owns `.fgos/logs/`.
+ */
+function teeChunk(onChunk, stream, chunk) {
+  if (!onChunk) return;
+  try {
+    onChunk(stream, chunk);
+  } catch {
+    // observability must never crash dispatch
+  }
+}
+
 export function spawnWorker(work, cfg, cwd, opts = {}) {
   // Setup stays synchronous and OUTSIDE the Promise below on purpose: a
   // malformed tier/config (RunnerConfigError, via modelForTier/
@@ -299,6 +319,7 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
     }
 
     child.stdout.on('data', (chunk) => {
+      teeChunk(opts.onChunk, 'stdout', chunk);
       stdoutLen += Buffer.byteLength(chunk);
       if (stdoutLen + stderrLen > maxBuffer) {
         if (!maxBufferExceeded) {
@@ -310,6 +331,7 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
       stdout += chunk;
     });
     child.stderr.on('data', (chunk) => {
+      teeChunk(opts.onChunk, 'stderr', chunk);
       stderrLen += Buffer.byteLength(chunk);
       if (stdoutLen + stderrLen > maxBuffer) {
         if (!maxBufferExceeded) {

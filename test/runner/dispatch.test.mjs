@@ -69,6 +69,23 @@ function writeHangingExecutorWithOutput(dir) {
   return scriptPath;
 }
 
+/** Write a fake executor that writes stdout and stderr as several SEPARATE
+ * writes (not one flush), so onChunk observes multiple 'data' events instead
+ * of collapsing to a single chunk. */
+function writeMultiChunkExecutor(dir) {
+  const scriptPath = path.join(dir, 'multi-chunk-executor.mjs');
+  fs.writeFileSync(
+    scriptPath,
+    `
+    process.stdout.write('out-chunk-1\\n');
+    process.stdout.write('out-chunk-2\\n');
+    process.stderr.write('err-chunk-1\\n');
+    process.exit(0);
+    `,
+  );
+  return scriptPath;
+}
+
 /** Write a fake executor that writes stdout well past a small maxBuffer,
  * so spawnWorker's manual maxBuffer-exceeded kill path is exercised. */
 function writeChattyExecutor(dir) {
@@ -409,6 +426,72 @@ test('spawnWorker throws a RunnerConfigError (not DispatchError) for an unconfig
   const scriptPath = writeEchoExecutor(dir);
   const cfg = { executor: { command: scriptPath, args: ['{prompt}'] }, models: {}, timeoutMs: 5000 };
   assert.throws(() => spawnWorker(sampleWork({ tier: 'standard' }), cfg, mkTempDir()), RunnerConfigError);
+});
+
+// --- spawnWorker: opts.onChunk live tee (P39) ---------------------------
+
+test('spawnWorker calls opts.onChunk for every stdout/stderr data event, tagged by stream, as they arrive', async () => {
+  const dir = mkTempDir();
+  const scriptPath = writeMultiChunkExecutor(dir);
+  const cfg = baseConfig([scriptPath]);
+  const seen = [];
+
+  const result = await spawnWorker(sampleWork(), cfg, mkTempDir(), {
+    onChunk: (stream, chunk) => seen.push([stream, chunk.toString()]),
+  });
+
+  assert.equal(result.status, 0);
+  // every observed chunk concatenates back to exactly the accumulated stdout/stderr
+  const stdoutSeen = seen.filter(([s]) => s === 'stdout').map(([, c]) => c).join('');
+  const stderrSeen = seen.filter(([s]) => s === 'stderr').map(([, c]) => c).join('');
+  assert.equal(stdoutSeen, result.stdout);
+  assert.equal(stderrSeen, result.stderr);
+  assert.ok(stdoutSeen.includes('out-chunk-1') && stdoutSeen.includes('out-chunk-2'));
+  assert.ok(stderrSeen.includes('err-chunk-1'));
+});
+
+test('spawnWorker never throws when opts.onChunk itself throws (observability must not crash dispatch)', async () => {
+  const dir = mkTempDir();
+  const scriptPath = writeMultiChunkExecutor(dir);
+  const cfg = baseConfig([scriptPath]);
+
+  const result = await spawnWorker(sampleWork(), cfg, mkTempDir(), {
+    onChunk: () => {
+      throw new Error('a broken logging callback');
+    },
+  });
+
+  assert.equal(result.status, 0);
+  assert.match(result.stdout, /out-chunk-1/);
+});
+
+test('spawnWorker still tees a chunk that crosses the maxBuffer threshold, before the kill', async () => {
+  const dir = mkTempDir();
+  const scriptPath = writeChattyExecutor(dir);
+  const cfg = baseConfig([scriptPath]);
+  const seen = [];
+
+  await assert.rejects(
+    () =>
+      spawnWorker(sampleWork(), cfg, mkTempDir(), {
+        maxBuffer: 2048,
+        onChunk: (stream, chunk) => seen.push(chunk),
+      }),
+    (err) => {
+      assert.equal(err.errorClass, 'worker-spawn-fail');
+      return true;
+    },
+  );
+  assert.ok(seen.length > 0, 'onChunk observed at least the chunks before the kill');
+});
+
+test('spawnWorker with no opts.onChunk behaves exactly as before (optional hook, default no-op)', async () => {
+  const dir = mkTempDir();
+  const scriptPath = writeMultiChunkExecutor(dir);
+  const cfg = baseConfig([scriptPath]);
+  const result = await spawnWorker(sampleWork(), cfg, mkTempDir());
+  assert.equal(result.status, 0);
+  assert.match(result.stdout, /out-chunk-1/);
 });
 
 test('spawnWorker surfaces a non-zero exit status without throwing (goal-check is the runner\'s job, not dispatch\'s)', async () => {

@@ -13,6 +13,13 @@
 // after the console tail scrolls past — but it never lands in a committed/
 // git-tracked path (the half of the security panel's OUTPUT DISCIPLINE that
 // still holds exactly, per D1).
+//
+// LIVE TEE (P39): appendWorkerLogChunk writes each stdout/stderr chunk to the
+// same file AS IT ARRIVES, so `tail -f` shows a worker's output in real time
+// while it is still running. appendWorkerLog's terminal block is unchanged —
+// still the one write after dispatch settles, still the recovery record for
+// every outcome including timeout/spawn-fail. Both go through this same sole
+// writer of `.fgos/logs/`.
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -63,6 +70,34 @@ export function appendWorkerLog(dir, workId, entry = {}) {
     fs.mkdirSync(logsDir, { recursive: true });
     const logPath = path.join(logsDir, `${workId}.log`);
     fs.appendFileSync(logPath, formatEntry(workId, entry), 'utf8');
+    return logPath;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Append one raw stdout/stderr chunk to `.fgos/logs/<workId>.log` AS IT
+ * ARRIVES — the live-tee counterpart to `appendWorkerLog`'s terminal block
+ * (per P39, worker-dispatch-log's one-door extended, not replaced). Written
+ * unwrapped (no timestamp/header, just the bytes) so `tail -f` reads exactly
+ * what the worker is producing right now; the terminal block appended later
+ * by `appendWorkerLog` is unchanged and still lands after every chunk. Each
+ * work item writes only its own file, so N items dispatched concurrently
+ * never interleave into each other's log.
+ *
+ * Synchronous (`fs.appendFileSync`), same discipline as `appendWorkerLog`:
+ * creates the logs dir on first write and NEVER throws (F-P1-1) — a chunk
+ * handler that threw would crash the whole dispatch, and this is pure
+ * git-ignored observability, never load-bearing on the outcome.
+ */
+export function appendWorkerLogChunk(dir, workId, chunk) {
+  if (!chunk) return null;
+  try {
+    const logsDir = path.join(dir, 'logs');
+    fs.mkdirSync(logsDir, { recursive: true });
+    const logPath = path.join(logsDir, `${workId}.log`);
+    fs.appendFileSync(logPath, chunk, 'utf8');
     return logPath;
   } catch {
     return null;
