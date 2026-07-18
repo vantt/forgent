@@ -215,7 +215,7 @@ anchor assertions.
 | Mức | Trạng thái item | Ai tuyên | Nghĩa |
 |---|---|---|---|
 | run-complete | `proposed` | runner (D3, verify tự chạy lại) | worker chạy xong + verify xanh TRÊN NHÁNH — "đã làm" nhưng CHƯA vào main |
-| merge-complete | `done` | cổng duyệt/merge (C5) | đã duyệt + nhập vào cây chính — "đã nhận" |
+| merge-complete | `done` | cổng duyệt/merge (CTR005) | đã duyệt + nhập vào cây chính — "đã nhận" |
 | durable | `done` + đã đẩy | github-adapter (P28) | đã đẩy lên remote, sống ngoài máy này — "đã bền" |
 
 **Phân biệt với L7 (bắt buộc — hai trục khác nhau).** L7 đo độ bền LƯU TRỮ của một
@@ -226,7 +226,7 @@ hai câu hỏi khác nhau. Header của L7 mượn cụm "chạy xong ≠ đã m
 nói tinh thần; L9 là chỗ ba mức đó thành khái niệm có tên cho vòng đời việc.
 
 **Nguồn.** Sống ngầm trong P17 (PR lifecycle) và P28 (github-adapter); trực tiếp
-liên quan hai nửa của `fgos check` (predicted/actual outcome) và cổng merge C5.
+liên quan hai nửa của `fgos check` (predicted/actual outcome) và cổng merge CTR005.
 D-ID sẽ gán khi một slice đầu tiên cần trích L9 làm ràng buộc thiết kế.
 
 **Hệ quả.** Đọc `proposed` là "xong" là lỗi phân tầng — mới run-complete. Một yêu
@@ -256,10 +256,10 @@ path thứ hai. work-graph-intelligence (P43 + S7–S9) chạm mọi metric/advi
 facade store (`readyWork`/`graphMetrics`/`graphWhatIf`/`staleDoingAdvisory`/
 `footprintConflicts`), và thêm field (`discoveredFrom`, `footprint`) cưỡi cùng
 `work.add` spread — không cửa mới nào. Đây là doctrine đứng SAU L3 rule 4 (mọi ghi
-qua MỘT cửa) và contract C2 (single-write-door).
+qua MỘT cửa) và contract CTR002 (single-write-door).
 
 **Hệ quả.** "Cửa có lỗ hổng vẫn là luật không có lỗ hổng" — đắp một đường cạnh cửa
-làm MỌI bảo đảm của cửa (CAS, cycle-check phi-chu-trình, envelope C1, serialize
+làm MỌI bảo đảm của cửa (CAS, cycle-check phi-chu-trình, envelope CTR001, serialize
 write-queue) mất hiệu lực TRONG IM LẶNG, vì đường mới không đi qua chúng. Review/
 test bắt "một write path THỨ HAI" hay "Entry import thẳng Domain" là red flag ngang
 với bỏ CAS.
