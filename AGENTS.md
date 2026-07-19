@@ -41,6 +41,14 @@ A stranger agent with no chat history should be able to answer, for any change:
 Laws in `docs/platform-foundations.md` are fixed until their named review
 threshold is hit. Changing one supersedes its decision ID — never edit it in place.
 
+## fgOS Workflow
+
+A session opening in this repo to work an item through its lifecycle loads
+`fgos-routing` first (`.claude/skills/fgos/fgos-routing/SKILL.md`): it orients
+on open work, claims one item through the pull door, then points to
+`fgos-exploring`, `fgos-planning`, or `fgos-validating` based on where that
+item's `stage` puts it.
+
 <!-- gitnexus:start -->
 # GitNexus — Code Intelligence
 
