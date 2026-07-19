@@ -241,6 +241,23 @@ export function validateWorkShape(work) {
     }
   }
 
+  // Ceremony decision-doc pointer (per p50-workflow-induct D7): OPTIONAL
+  // additive field naming the relative path to the feature's own
+  // docs/history/<feature>/ directory, where its CONTEXT.md/plan.md actually
+  // live. The item carries only the pointer -- decision content itself stays
+  // in that git-versioned markdown file (D7's "docs is content, field is a
+  // pointer" shape; C2 is unchanged, no new event kind). Same
+  // optional-additive validation as `description` immediately above:
+  // shape-checked only when present, null treated as absent. Deliberately NO
+  // existence-on-disk check at this write door -- a docsRef pointing at a
+  // not-yet-created or since-moved path degrades gracefully, the same norm
+  // `parent`/`discoveredFrom` already apply to a dangling id.
+  if (work.docsRef !== undefined && work.docsRef !== null) {
+    if (typeof work.docsRef !== 'string' || !work.docsRef.trim()) {
+      throw new WorkValidationError('work.docsRef must be a non-empty string when present.');
+    }
+  }
+
   if (work.deps.includes(work.id)) {
     throw new WorkValidationError(`work "${work.id}" cannot list itself as a dep.`);
   }

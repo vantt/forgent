@@ -319,3 +319,40 @@ test('validateWork does not add discoveredFrom to SCHEMA_VERSION or DEFAULTS (op
   assert.equal(SCHEMA_VERSION, 2);
   assert.equal(Object.hasOwn(DEFAULTS, 'discoveredFrom'), false);
 });
+
+// --- ceremony decision-doc pointer `docsRef` (per p50-workflow-induct D7 —
+// same optional-additive validation shape as `description` above) ---
+
+test('validateWork accepts a work item missing docsRef (optional, additive back-compat)', () => {
+  const work = baseWork();
+  assert.equal(work.docsRef, undefined);
+  assert.doesNotThrow(() => validateWork(work));
+});
+
+test('validateWork accepts docsRef as a non-empty string', () => {
+  assert.doesNotThrow(() => validateWork(baseWork({ docsRef: 'docs/history/p50-workflow-induct/' })));
+});
+
+test('validateWork treats docsRef: null the same as absent', () => {
+  assert.doesNotThrow(() => validateWork(baseWork({ docsRef: null })));
+});
+
+test('validateWork rejects a non-string, non-empty docsRef', () => {
+  assert.throws(
+    () => validateWork(baseWork({ docsRef: 42 })),
+    (err) => err instanceof WorkValidationError && /docsRef/.test(err.message),
+  );
+  assert.throws(
+    () => validateWork(baseWork({ docsRef: '' })),
+    (err) => err instanceof WorkValidationError && /docsRef/.test(err.message),
+  );
+  assert.throws(
+    () => validateWork(baseWork({ docsRef: '   ' })),
+    (err) => err instanceof WorkValidationError && /docsRef/.test(err.message),
+  );
+});
+
+test('validateWork does not add docsRef to SCHEMA_VERSION or DEFAULTS (optional lazy field, no schema bump)', () => {
+  assert.equal(SCHEMA_VERSION, 2);
+  assert.equal(Object.hasOwn(DEFAULTS, 'docsRef'), false);
+});

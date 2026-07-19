@@ -51,6 +51,7 @@ export const COMMAND_REGISTRY = [
         domain: { type: 'string', description: 'Optional domain; omit to use the store default.' },
         footprint: { type: 'string', description: 'Optional comma-separated list of file paths this item is expected to touch (advisory only).' },
         'discovered-from': { type: 'string', description: 'Optional id of the item this one was discovered from (provenance, not a dependency).' },
+        'docs-ref': { type: 'string', description: 'Optional relative path to this item\'s docs/history/<feature>/ directory (its own CONTEXT.md/plan.md).' },
       },
       required: ['id', 'title', 'kind', 'risk', 'verify'],
     },
