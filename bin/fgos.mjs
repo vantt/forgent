@@ -571,13 +571,6 @@ async function runVerb(verb, flags, positional, dir) {
         // optional additive), unlike deps/refs which default to []. An empty
         // `--footprint ''` parses to [] explicitly.
         footprint: flags.footprint === undefined ? undefined : parseListFlag(flags.footprint),
-        // Per p50-workflow-induct D7: --docs-ref is an optional pointer to the
-        // relative docs/history/<feature>/ path this item's own decision
-        // artifacts (CONTEXT.md/plan.md) live at. Same omitted-leaves-undefined
-        // shape as --discovered-from/--domain/--tier above; work.mjs's
-        // validateWorkShape is the single source for the non-empty-string
-        // shape check, mirroring `description`'s rule.
-        docsRef: optionalField(flags['docs-ref'], 'add --docs-ref requires a non-empty path; omit it to leave unset.'),
       };
       const { event } = addWork(dir, work);
       return { id: event.payload.id, seq: event.seq };
