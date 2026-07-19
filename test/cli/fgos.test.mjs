@@ -95,6 +95,28 @@ function gitHead(cwd) {
   return execFileSync('git', ['rev-parse', 'HEAD'], { cwd, encoding: 'utf8' }).trim();
 }
 
+// Same shape as initGitCwd, but `fgos` (and its `.fgos/`) lives one level
+// BELOW the real git top-level — mirrors the STR60 dogfood-fixture layout
+// (`repo/dogfood-fixture/.fgos/`, real top-level at `repo/`) that exposed
+// both the path-prefix bug (git reports `.fgos/` status lines relative to
+// the real top-level, e.g. "workspace/.fgos/...") and the scope bug
+// (return's cleanliness check must not scan the whole real repo). Returns
+// both the subdirectory `cwd` tests should run `fgos` from, and `topLevel`
+// so a test can plant a dirty file OUTSIDE cwd's own subtree.
+function initGitCwdInSubdir(subdirName = 'workspace') {
+  const topLevel = tmpCwd();
+  execFileSync('git', ['init', '-q'], { cwd: topLevel });
+  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: topLevel });
+  execFileSync('git', ['config', 'user.name', 'Test'], { cwd: topLevel });
+  fs.writeFileSync(path.join(topLevel, '.gitignore'), '.fgos/state.json\n');
+  fs.writeFileSync(path.join(topLevel, 'seed.txt'), 'seed\n');
+  execFileSync('git', ['add', 'seed.txt', '.gitignore'], { cwd: topLevel });
+  execFileSync('git', ['commit', '-q', '-m', 'seed'], { cwd: topLevel });
+  const cwd = path.join(topLevel, subdirName);
+  fs.mkdirSync(cwd, { recursive: true });
+  return { cwd, topLevel };
+}
+
 // Commits the produced file AND whatever `.fgos/events.jsonl` deltas are
 // pending (`git add -A`) — mirrors what a real "commit your work" step looks
 // like against a repo where the truth log rides alongside the code.
@@ -656,6 +678,44 @@ test('add with a bare --discovered-from (no value) is rejected as validation, ex
   const cwd = tmpCwd();
   const before = eventLines(cwd).length;
   const result = run(cwd, ['add', 'bare-discovered-item', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--discovered-from']);
+  assert.equal(result.status, 4);
+  assert.equal(eventLines(cwd).length, before);
+});
+
+// --- p50-workflow-induct D7: --docs-ref on `add` (ceremony decision-doc pointer) ---
+
+test('add without --docs-ref leaves docsRef unset, exit 0', () => {
+  const cwd = tmpCwd();
+  const result = addOk(cwd, 'no-docs-ref-item');
+  assert.equal(result.status, 0);
+  assert.equal(stateView(cwd).work['no-docs-ref-item'].docsRef, undefined);
+});
+
+test('add --docs-ref persists docsRef and round-trips unchanged through fgos list, exit 0', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, [
+    'add', 'docs-ref-item',
+    '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x',
+    '--docs-ref', 'docs/history/p50-workflow-induct/',
+  ]);
+  assert.equal(result.status, 0);
+  assert.equal(stateView(cwd).work['docs-ref-item'].docsRef, 'docs/history/p50-workflow-induct/');
+  const listed = envelopeData(run(cwd, ['list']).stdout);
+  assert.equal(listed.work['docs-ref-item'].docsRef, 'docs/history/p50-workflow-induct/');
+});
+
+test('add with an empty --docs-ref "" is rejected as validation, exit 4, no event written', () => {
+  const cwd = tmpCwd();
+  const before = eventLines(cwd).length;
+  const result = run(cwd, ['add', 'empty-docs-ref-item', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--docs-ref', '']);
+  assert.equal(result.status, 4);
+  assert.equal(eventLines(cwd).length, before);
+});
+
+test('add with a bare --docs-ref (no value) is rejected as validation, exit 4, no event written', () => {
+  const cwd = tmpCwd();
+  const before = eventLines(cwd).length;
+  const result = run(cwd, ['add', 'bare-docs-ref-item', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--docs-ref']);
   assert.equal(result.status, 4);
   assert.equal(eventLines(cwd).length, before);
 });
@@ -1871,6 +1931,55 @@ test('return succeeds when ONLY .fgos/ (the live event log) is dirty — its own
   const result = run(cwd, ['return', 'pull-return-fgos-only-dirty']);
   assert.equal(result.status, 0, `return should succeed with only .fgos/ dirty: ${result.stderr}`);
   assert.equal(stateView(cwd).work['pull-return-fgos-only-dirty'].status, 'proposed');
+});
+
+test('return succeeds when cwd is a subdirectory of the real git top-level and only .fgos/ (under that subtree) is dirty (STR60 path-prefix fix)', () => {
+  const { cwd } = initGitCwdInSubdir();
+  run(cwd, ['init']);
+  addOk(cwd, 'sub-return-fgos-only-dirty', { verify: 'test -f proof.txt' });
+  assert.equal(run(cwd, ['take', '--id', 'sub-return-fgos-only-dirty']).status, 0);
+
+  // Commit ONLY the produced file, same isolation as the top-level
+  // "ONLY .fgos/ dirty" test above — the take event's `.fgos/events.jsonl`
+  // delta (under the subdirectory) is deliberately left uncommitted.
+  fs.writeFileSync(path.join(cwd, 'proof.txt'), 'work\n');
+  execFileSync('git', ['add', 'proof.txt'], { cwd });
+  execFileSync('git', ['commit', '-q', '-m', 'work: proof.txt'], { cwd });
+
+  const result = run(cwd, ['return', 'sub-return-fgos-only-dirty']);
+  assert.equal(result.status, 0, `return should succeed with only the subdirectory's .fgos/ dirty: ${result.stderr}`);
+  assert.equal(stateView(cwd).work['sub-return-fgos-only-dirty'].status, 'proposed');
+});
+
+test('return succeeds when cwd is a subdirectory and an unrelated file is dirty ELSEWHERE in the repo, outside cwd\'s own subtree (STR60 scope fix)', () => {
+  const { cwd, topLevel } = initGitCwdInSubdir();
+  run(cwd, ['init']);
+  addOk(cwd, 'sub-return-scope-ok', { verify: 'test -f proof.txt' });
+  assert.equal(run(cwd, ['take', '--id', 'sub-return-scope-ok']).status, 0);
+
+  fs.writeFileSync(path.join(cwd, 'proof.txt'), 'work\n');
+  execFileSync('git', ['add', 'proof.txt'], { cwd });
+  execFileSync('git', ['commit', '-q', '-m', 'work: proof.txt'], { cwd });
+
+  // A different in-flight change elsewhere in the repo, unrelated to this
+  // item, never staged/committed — must never block returning THIS item.
+  fs.writeFileSync(path.join(topLevel, 'unrelated-elsewhere.txt'), 'unrelated\n');
+
+  const result = run(cwd, ['return', 'sub-return-scope-ok']);
+  assert.equal(result.status, 0, `an unrelated dirty file outside cwd's subtree must never block return: ${result.stderr}`);
+  assert.equal(stateView(cwd).work['sub-return-scope-ok'].status, 'proposed');
+});
+
+test('return still refuses when cwd is a subdirectory and a non-.fgos file is dirty INSIDE cwd\'s own subtree (real dirt still caught, STR60 does not overcorrect)', () => {
+  const { cwd } = initGitCwdInSubdir();
+  run(cwd, ['init']);
+  addOk(cwd, 'sub-return-dirty', { verify: 'test -f proof.txt' });
+  assert.equal(run(cwd, ['take', '--id', 'sub-return-dirty']).status, 0);
+  fs.writeFileSync(path.join(cwd, 'proof.txt'), 'uncommitted\n'); // never git add/commit
+
+  const result = run(cwd, ['return', 'sub-return-dirty']);
+  assert.equal(result.status, 4);
+  assert.equal(stateView(cwd).work['sub-return-dirty'].status, 'doing');
 });
 
 test('return refuses when HEAD has not advanced past headAtTake — a clean tree with zero real progress — as validation, exit 4, item stays doing', () => {

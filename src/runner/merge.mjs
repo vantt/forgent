@@ -93,11 +93,25 @@ export function detectTrunk(repoRoot) {
 /** Whether every path on a `git status --porcelain` line sits inside
  * `.fgos/` — exported so bin/fgos.mjs's own working-tree-clean check
  * (`return`'s pull-door gate) can apply the identical exclusion instead of
- * re-deriving the porcelain-parsing rule. */
-export function isFgosOnlyStatusLine(line) {
+ * re-deriving the porcelain-parsing rule.
+ *
+ * `git status --porcelain` always reports paths relative to the real git
+ * top-level, never relative to the cwd the command was actually run from
+ * (verified empirically: `git -C sub status --porcelain` still reports
+ * `sub/other.txt`, not `other.txt`). When the caller's own `.fgos/` lives
+ * under a subdirectory of that top-level (`fgos` invoked from a subdir of
+ * the real repo — the STR60 dogfood-fixture case), the literal `.fgos`/
+ * `.fgos/` comparison never matches. `prefix` is that subdirectory's path
+ * relative to the git top-level (with a trailing slash, or '' at the
+ * top-level itself — exactly `git rev-parse --show-prefix`'s own output),
+ * so callers already at the top-level (the default, '') see byte-identical
+ * behavior to before this parameter existed. */
+export function isFgosOnlyStatusLine(line, prefix = '') {
   const pathPart = line.slice(3);
   const paths = pathPart.includes(' -> ') ? pathPart.split(' -> ') : [pathPart];
-  return paths.every((p) => p === '.fgos' || p.startsWith('.fgos/'));
+  const fgosPath = `${prefix}.fgos`;
+  const fgosDirPrefix = `${prefix}.fgos/`;
+  return paths.every((p) => p === fgosPath || p.startsWith(fgosDirPrefix));
 }
 
 /** Whether `repoRoot`'s working tree has no pending changes outside of
@@ -107,12 +121,21 @@ export function isFgosOnlyStatusLine(line) {
  * take/return/approve lifecycle operations this gate guards (each appends an
  * event as part of the same call), so it never signals an actually-dirty
  * code tree — only a manual `.fgos/events.jsonl` commit made that true
- * before this exclusion existed. */
+ * before this exclusion existed.
+ *
+ * Scans the WHOLE repo (no pathspec) regardless of where `repoRoot` sits
+ * inside it — `approve` is expected to see the entire main tree's
+ * cleanliness, not just its own subtree. `repoRoot` itself is not
+ * guaranteed to be the git top-level though (`isMainWorktree` above
+ * tolerates a subdirectory of the main worktree), so the `.fgos/` exclusion
+ * still needs the same top-level-relative prefix `isFgosOnlyStatusLine`
+ * takes — computed here via `git rev-parse --show-prefix`. */
 export function isWorkingTreeClean(repoRoot) {
+  const prefix = git(repoRoot, ['rev-parse', '--show-prefix']).trim();
   return git(repoRoot, ['status', '--porcelain'])
     .split('\n')
     .filter((line) => line.trim() !== '')
-    .every(isFgosOnlyStatusLine);
+    .every((line) => isFgosOnlyStatusLine(line, prefix));
 }
 
 function realpathOrSelf(p) {

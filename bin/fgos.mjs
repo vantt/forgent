@@ -76,11 +76,24 @@ function currentHead(cwd) {
 // store is a live, self-mutating write door — return's own headAtReturn
 // event lands there as part of this very call — never a signal that the
 // code tree itself is dirty.
+//
+// Unlike merge.mjs's isWorkingTreeClean (approve's whole-repo gate), this is
+// `return`'s per-item gate — scoped to `cwd`'s OWN subtree, never the whole
+// real repo. `cwd` is the item's working directory, not necessarily the git
+// top-level (STR60 dogfood-fixture: `.fgos` under `repo/dogfood-fixture/`,
+// real top-level at `repo/`); an unrelated uncommitted file elsewhere in the
+// repo (outside `cwd`'s subtree) must never block a return for THIS item.
+// `git status --porcelain -- .`, run with `cwd` as the actual process cwd,
+// scopes git's own output to that subtree — but the reported paths are
+// STILL top-level-relative (verified empirically, same as the whole-repo
+// case), so the `.fgos/` exclusion still needs the same prefix fix
+// isWorkingTreeClean(repoRoot) above uses.
 function isWorkingTreeClean(cwd) {
-  return gitAt(cwd, ['status', '--porcelain'])
+  const prefix = gitAt(cwd, ['rev-parse', '--show-prefix']).trim();
+  return gitAt(cwd, ['status', '--porcelain', '--', '.'])
     .split('\n')
     .filter((line) => line.trim() !== '')
-    .every(isFgosOnlyStatusLine);
+    .every((line) => isFgosOnlyStatusLine(line, prefix));
 }
 
 function commitsSince(cwd, from, to) {

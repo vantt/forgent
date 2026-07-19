@@ -12,6 +12,7 @@ import {
   cleanupMergedBranch,
   changedFiles,
   isWorkingTreeClean,
+  isFgosOnlyStatusLine,
 } from '../../src/runner/merge.mjs';
 import { branchNameFor } from '../../src/runner/worktree.mjs';
 
@@ -221,6 +222,46 @@ test('isWorkingTreeClean is false when a non-.fgos path is dirty, even alongside
   fs.appendFileSync(path.join(repoRoot, '.fgos', 'events.jsonl'), '{"seq":2}\n');
   fs.writeFileSync(path.join(repoRoot, 'scratch.txt'), 'uncommitted\n');
   assert.equal(isWorkingTreeClean(repoRoot), false);
+});
+
+// isWorkingTreeClean's own `.fgos/` exclusion needs to stay correct when
+// `repoRoot` itself is a subdirectory of the real git top-level (STR60):
+// `isMainWorktree` tolerates approve running from such a subdirectory, so
+// `git status --porcelain` from there still reports paths relative to the
+// TRUE top-level (e.g. "sub/.fgos/events.jsonl", never bare ".fgos/...").
+test('isWorkingTreeClean(repoRoot) still recognizes its own .fgos/ as excluded when repoRoot is a subdirectory of the real git top-level', () => {
+  const topLevel = initRepo();
+  const sub = path.join(topLevel, 'sub');
+  fs.mkdirSync(path.join(sub, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(sub, '.fgos', 'events.jsonl'), '{"seq":1}\n');
+  git(topLevel, ['add', 'sub/.fgos/events.jsonl']);
+  git(topLevel, ['commit', '-q', '-m', 'seed sub/.fgos/events.jsonl']);
+
+  fs.appendFileSync(path.join(sub, '.fgos', 'events.jsonl'), '{"seq":2}\n');
+  assert.equal(isWorkingTreeClean(sub), true);
+});
+
+test('isWorkingTreeClean(repoRoot) still scans the WHOLE repo when repoRoot is a subdirectory — a dirty file elsewhere still counts (approve is a whole-tree gate, unlike return)', () => {
+  const topLevel = initRepo();
+  const sub = path.join(topLevel, 'sub');
+  fs.mkdirSync(sub, { recursive: true });
+  fs.writeFileSync(path.join(topLevel, 'elsewhere.txt'), 'uncommitted\n');
+  assert.equal(isWorkingTreeClean(sub), false);
+});
+
+// --- isFgosOnlyStatusLine's prefix parameter -----------------------------
+
+test('isFgosOnlyStatusLine with no prefix (default) matches only a bare top-level .fgos/ path — unchanged pre-STR60 behavior', () => {
+  assert.equal(isFgosOnlyStatusLine(' M .fgos/events.jsonl'), true);
+  assert.equal(isFgosOnlyStatusLine('?? .fgos'), true);
+  assert.equal(isFgosOnlyStatusLine(' M sub/.fgos/events.jsonl'), false, 'without a matching prefix, a nested .fgos/ path must not match');
+});
+
+test('isFgosOnlyStatusLine with a prefix matches that prefix\'s own .fgos/ path, not a bare top-level one', () => {
+  assert.equal(isFgosOnlyStatusLine(' M sub/.fgos/events.jsonl', 'sub/'), true);
+  assert.equal(isFgosOnlyStatusLine('?? sub/.fgos', 'sub/'), true);
+  assert.equal(isFgosOnlyStatusLine(' M .fgos/events.jsonl', 'sub/'), false, 'a top-level .fgos/ must not match a subdirectory prefix');
+  assert.equal(isFgosOnlyStatusLine(' M sub/other.txt', 'sub/'), false, 'a real non-.fgos path under the prefix must still be rejected');
 });
 
 // --- mergeRunnerItem (spike-proven mechanics: --no-commit --no-ff, verify
