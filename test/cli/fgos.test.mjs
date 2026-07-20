@@ -743,6 +743,50 @@ test('move proposed -> done (approval) applies via the real CLI, exit 0', () => 
   assert.equal(stateView(cwd).work['approved-item'].status, 'done');
 });
 
+// --- D2/D3 compound-learn: the deliberate `fgos compound` transition ---
+
+test('compound rejects a non-proposed item as validation, exit 4, no event written', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'not-proposed-yet');
+  const before = eventLines(cwd).length;
+  const result = run(cwd, ['compound', 'not-proposed-yet']);
+  assert.equal(result.status, 4);
+  assert.equal(eventLines(cwd).length, before);
+  assert.equal(stateView(cwd).work['not-proposed-yet'].stage, undefined);
+});
+
+test('compound accepts a proposed coding item and moves its stage to compound-learn, exit 0', () => {
+  const cwd = tmpCwd();
+  toProposed(cwd, 'compound-ready');
+  const before = eventLines(cwd).length;
+  const result = run(cwd, ['compound', 'compound-ready']);
+  assert.equal(result.status, 0);
+  assert.equal(eventLines(cwd).length, before + 1);
+  assert.equal(stateView(cwd).work['compound-ready'].stage, 'compound-learn');
+  assert.equal(stateView(cwd).work['compound-ready'].status, 'proposed');
+  const data = envelopeData(result.stdout);
+  assert.equal(data.id, 'compound-ready');
+  assert.equal(data.from, 'executing');
+  assert.equal(data.to, 'compound-learn');
+});
+
+test('compound on a nonexistent id is rejected as validation (not-found), exit 4', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['compound', 'never-added-for-compound']);
+  assert.equal(result.status, 4);
+});
+
+test('compound called twice on the same item rejects the second, illegal stage move as precondition, exit 2, no second event written', () => {
+  const cwd = tmpCwd();
+  toProposed(cwd, 'compound-twice');
+  assert.equal(run(cwd, ['compound', 'compound-twice']).status, 0);
+  const before = eventLines(cwd).length;
+  const result = run(cwd, ['compound', 'compound-twice']);
+  assert.equal(result.status, 2);
+  assert.equal(eventLines(cwd).length, before);
+  assert.equal(stateView(cwd).work['compound-twice'].stage, 'compound-learn');
+});
+
 test('move proposed -> todo (rejection) without --reason is refused as validation, exit 4, no event written', () => {
   const cwd = tmpCwd();
   toProposed(cwd, 'no-reason-item');

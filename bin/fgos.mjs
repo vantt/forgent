@@ -19,7 +19,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { initStore, addWork, moveWork, editWork, addDecision, addOutcome, addFriction, listWork, readyWork, graphMetrics, graphWhatIf, staleDoingAdvisory, footprintConflicts, readRawEvents, rebuild, putInAwaiting, answerAwaiting, StoreError, EXIT_CODES, categoryOf } from '../src/state/store.mjs';
+import { initStore, addWork, moveWork, moveStage, editWork, addDecision, addOutcome, addFriction, listWork, readyWork, graphMetrics, graphWhatIf, staleDoingAdvisory, footprintConflicts, readRawEvents, rebuild, putInAwaiting, answerAwaiting, StoreError, EXIT_CODES, categoryOf } from '../src/state/store.mjs';
 import { repairTruncatedLastLine } from '../src/state/events.mjs';
 import { deriveTitle, classify, generateId } from '../src/intake/classify.mjs';
 import { wrapEnvelope } from '../src/state/envelope.mjs';
@@ -636,6 +636,28 @@ async function runVerb(verb, flags, positional, dir) {
       // supplied.
       const reason = optionalField(flags.reason, 'move --reason requires a non-empty reason value (omit --reason entirely when not rejecting a proposal)');
       const { event } = moveWork(dir, { id, to, expectedStatus, reason, actor: 'human' });
+      return { id, from: event.payload.from, to: event.payload.to, seq: event.seq };
+    }
+
+    // The deliberate entry into Compound-learn (per compound-learn-enduser-docs
+    // D2/D3): unlike `move`, this is not a generic status/stage door — it is
+    // the one act that makes the synthesis stage non-vacuous (an auto-advance
+    // on return/approve would let the stage transit with nothing synthesised,
+    // exactly what D3 forbids). Requires `status === 'proposed'` (work
+    // returned, verify green) so the item is at a settled checkpoint before it
+    // moves into compound-learn; persists via store.mjs's moveStage (not the
+    // pure stage.mjs transitionStage) so the move is actually written to the
+    // log, mirroring moveWork's own persisting-wrapper shape above.
+    case 'compound': {
+      const id = requireField(positional[0] ?? flags.id, 'compound requires an id: fgos compound <id>');
+      const item = listWork(dir).work[id];
+      if (!item) {
+        throw new StoreError('validation', `compound: work "${id}" not found.`);
+      }
+      if (item.status !== 'proposed') {
+        throw new StoreError('validation', `compound: work "${id}" is "${item.status}", not "proposed" — cannot move into compound-learn.`);
+      }
+      const { event } = moveStage(dir, { id, to: 'compound-learn', actor: 'human' });
       return { id, from: event.payload.from, to: event.payload.to, seq: event.seq };
     }
 

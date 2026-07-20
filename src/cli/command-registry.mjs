@@ -112,6 +112,21 @@ export const COMMAND_REGISTRY = [
     deprecated: null,
   },
   {
+    name: 'compound',
+    invoke: 'fgos compound',
+    description: 'Move a proposed work item into the compound-learn stage — the deliberate transition (D2) through which captured signals get synthesised before the item can reach done.',
+    parameters: {
+      type: 'object',
+      properties: {
+        id: { type: 'string', description: 'Work item id (positional or --id).' },
+      },
+      required: ['id'],
+    },
+    examples: ['fgos compound build-cli'],
+    access: 'mutation',
+    deprecated: null,
+  },
+  {
     name: 'edit',
     invoke: 'fgos edit',
     description: 'Patch fields on an existing item (title/kind/risk/verify/tier/refs/deps). At least one field must be given.',
