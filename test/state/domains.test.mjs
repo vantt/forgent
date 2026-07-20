@@ -16,23 +16,25 @@ test('DOMAINS has exactly two entries: "coding" and "synthetic" (D1)', () => {
   assert.deepEqual(Object.keys(DOMAINS), ['coding', 'synthetic']);
 });
 
-test('DOMAINS.coding.stages is byte-for-byte the pre-retrofit work.mjs STAGES value', () => {
-  assert.deepEqual(DOMAINS.coding.stages, ['clarify', 'decompose', 'executing']);
+test('DOMAINS.coding.stages is the pre-retrofit work.mjs STAGES value plus compound-learn appended (compound-learn-enduser-docs D2)', () => {
+  assert.deepEqual(DOMAINS.coding.stages, ['clarify', 'decompose', 'executing', 'compound-learn']);
 });
 
-test('DOMAINS.coding.transitions is byte-for-byte the pre-retrofit stage.mjs STAGE_TRANSITIONS value', () => {
+test('DOMAINS.coding.transitions is the pre-retrofit stage.mjs STAGE_TRANSITIONS value plus the executing->compound-learn edge (compound-learn-enduser-docs D2)', () => {
   assert.deepEqual(DOMAINS.coding.transitions, [
     { from: 'clarify', to: 'executing' },
     { from: 'clarify', to: 'decompose' },
     { from: 'decompose', to: 'executing' },
+    { from: 'executing', to: 'compound-learn' },
   ]);
 });
 
-test('DOMAINS.coding.stepMap maps every stage to a base-workflow step (vision §2 vocabulary)', () => {
+test('DOMAINS.coding.stepMap maps every stage to a base-workflow step (vision §2 vocabulary), including compound-learn (compound-learn-enduser-docs D2)', () => {
   assert.deepEqual(DOMAINS.coding.stepMap, {
     clarify: 'Clarify',
     decompose: 'Divide',
     executing: 'Execute',
+    'compound-learn': 'Compound-learn',
   });
 });
 
@@ -68,13 +70,19 @@ test('DOMAINS.synthetic is deeply frozen: the entry and its nested array/object 
   assert.ok(Object.isFrozen(DOMAINS.synthetic.transitions));
 });
 
-test('adding "synthetic" leaves DOMAINS.coding byte-for-byte unchanged', () => {
-  assert.deepEqual(DOMAINS.coding.stages, ['clarify', 'decompose', 'executing']);
-  assert.deepEqual(DOMAINS.coding.stepMap, { clarify: 'Clarify', decompose: 'Divide', executing: 'Execute' });
+test('adding "synthetic" leaves DOMAINS.coding unchanged', () => {
+  assert.deepEqual(DOMAINS.coding.stages, ['clarify', 'decompose', 'executing', 'compound-learn']);
+  assert.deepEqual(DOMAINS.coding.stepMap, {
+    clarify: 'Clarify',
+    decompose: 'Divide',
+    executing: 'Execute',
+    'compound-learn': 'Compound-learn',
+  });
   assert.deepEqual(DOMAINS.coding.transitions, [
     { from: 'clarify', to: 'executing' },
     { from: 'clarify', to: 'decompose' },
     { from: 'decompose', to: 'executing' },
+    { from: 'executing', to: 'compound-learn' },
   ]);
 });
 
@@ -140,15 +148,15 @@ test('getDomain resolves straight to the registry entry, folding an unrecognized
 
 // --- stageForStep ---
 
-test('stageForStep resolves each of coding\'s three steps to its stage name', () => {
+test('stageForStep resolves each of coding\'s four steps to its stage name (compound-learn-enduser-docs D2 adds Compound-learn)', () => {
   assert.equal(stageForStep(DOMAINS.coding, 'Clarify'), 'clarify');
   assert.equal(stageForStep(DOMAINS.coding, 'Divide'), 'decompose');
   assert.equal(stageForStep(DOMAINS.coding, 'Execute'), 'executing');
+  assert.equal(stageForStep(DOMAINS.coding, 'Compound-learn'), 'compound-learn');
 });
 
-test('stageForStep returns undefined for a step the domain never declares (Init/Compound-learn are outside the stage dimension)', () => {
+test('stageForStep returns undefined for a step the domain never declares (Init stays outside the stage dimension, compound-learn-enduser-docs D2)', () => {
   assert.equal(stageForStep(DOMAINS.coding, 'Init'), undefined);
-  assert.equal(stageForStep(DOMAINS.coding, 'Compound-learn'), undefined);
 });
 
 // --- rebuild-determinism (must_have): replaying an event log with zero

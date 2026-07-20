@@ -21,7 +21,11 @@
 // unconditionally.
 //
 // 'coding' reproduces work.mjs's pre-retrofit STAGES and stage.mjs's
-// pre-retrofit STAGE_TRANSITIONS byte-for-byte (D2, zero behavior change).
+// pre-retrofit STAGE_TRANSITIONS byte-for-byte (base-workflow-model D2, zero
+// behavior change), plus one appended stage: 'compound-learn' now closes the
+// list, entered from 'executing' (compound-learn-enduser-docs D2 — Compound-
+// learn is a first-class, FSM-routable stage for coding; Init is the only
+// base-workflow step left outside the `stage` dimension).
 //
 // 'synthetic' (Slice 2, D1/D4) is an illustrative, disposable second domain
 // that exists only to prove a non-coding domain runs on the same base FSM —
@@ -39,22 +43,29 @@ export const DEFAULT_DOMAIN = 'coding';
 
 export const DOMAINS = Object.freeze({
   coding: Object.freeze({
-    // Byte-for-byte the pre-retrofit work.mjs STAGES value.
-    stages: Object.freeze(['clarify', 'decompose', 'executing']),
+    // Pre-retrofit work.mjs STAGES value, plus 'compound-learn' appended
+    // (compound-learn-enduser-docs D2): a first-class stage between
+    // execution and close, so the synthesis layer is FSM-routable and never
+    // silently skipped.
+    stages: Object.freeze(['clarify', 'decompose', 'executing', 'compound-learn']),
     // Maps each of coding's stages to the base-workflow step it satisfies.
-    // Coding's stage list never carries an Init or Compound-learn value —
-    // those two steps happen outside the `stage` dimension (intake, and
-    // post-done learning capture) — so only the middle three steps appear.
+    // Compound-learn now carries its own stage entry (compound-learn-
+    // enduser-docs D2, superseding the prior stance that it lived outside
+    // the `stage` dimension) — Init is the only base-workflow step that
+    // still happens outside `stage` (intake, before any stage exists).
     stepMap: Object.freeze({
       clarify: 'Clarify',
       decompose: 'Divide',
       executing: 'Execute',
+      'compound-learn': 'Compound-learn',
     }),
-    // Byte-for-byte the pre-retrofit stage.mjs STAGE_TRANSITIONS value.
+    // Pre-retrofit stage.mjs STAGE_TRANSITIONS value, plus the new
+    // executing -> compound-learn edge (compound-learn-enduser-docs D2).
     transitions: Object.freeze([
       Object.freeze({ from: 'clarify', to: 'executing' }),
       Object.freeze({ from: 'clarify', to: 'decompose' }),
       Object.freeze({ from: 'decompose', to: 'executing' }),
+      Object.freeze({ from: 'executing', to: 'compound-learn' }),
     ]),
   }),
   synthetic: Object.freeze({
