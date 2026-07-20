@@ -42,6 +42,7 @@ tại chỗ (giữ đúng nguyên tắc bất-biến của platform-foundations)
 | [0013](0013-discovered-from-runner-report-channel.md) | Kênh báo-cáo-không-ghi cho `discovered-from` | Worker phát khối rào `fgos-discovered` (dữ liệu thuần) trong output; runner đọc và tự ghi — thêm nhà sản xuất tự-động mà giữ nguyên runner-một-cửa-ghi (CTR002/D3). |
 | [0014](0014-kien-truc-giao-tiep-nguoi-fgos.md) | Kiến trúc giao tiếp người ↔ fgOS | Contract = schema event-log (không phải lib); lib là client tham chiếu; CLI = adapter local standalone; daemon NGOÀI core (consumer qua CLI, `b2d18cc7` giữ nguyên); UI là client của daemon; push tách subsystem. Mức interface. |
 | [0015](0015-doi-ten-ctr-cho-contract.md) | Đổi tên định danh contract C1-C9 thành CTR001-CTR009 | Định danh contract registry (`architecture-map.md` §7) đổi từ `C<n>` trần sang `CTR<n>` 3-digit zero-padded (vd `CTR009`), theo `id-systems-audit.md` #6; đổi tên thuần, không đổi ý nghĩa/ranh giới/maturity của bất kỳ contract nào. |
+| [0016](0016-moc-mvp-fgos.md) | Mốc MVP của fgOS | Người mới, chỉ dựa tài liệu đã ship, nộp một yêu cầu văn xuôi và nhận code sẵn-sàng-merge với tối thiểu ngồi canh; bổ sung cho L5/L6, không thay thế. |
 
 ## Truy vết nguồn (đầy đủ)
 
@@ -68,3 +69,5 @@ Sổ này chưng cất các quyết định **product-facing**. Bảng dưới l
 | `ddd9e431` | ngoài phạm vi | Nhật ký thi hành tách kho. |
 | `47950429` | ngoài phạm vi | Kết quả kiểm khói quy trình phát triển. |
 | `13916523` | record | 0011 |
+| `4faa122e` | record | 0016 |
+| `9401954d` | record | 0016 |
