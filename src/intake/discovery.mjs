@@ -22,8 +22,8 @@
 // verdict. The system is never allowed to treat an uncertain judgement as a
 // pass.
 
-import { spawnSync } from 'node:child_process';
-import { resolveExecutorCommand, modelForTier } from '../runner/dispatch.mjs';
+import { modelForTier } from '../runner/dispatch.mjs';
+import { runJudgeExecutor, JUDGE_STRICT_JSON_SUFFIX } from './judge-executor.mjs';
 import { DEFAULTS } from '../state/work.mjs';
 import { listWork, moveStage, addDiscovery, putInAwaiting, StoreError } from '../state/store.mjs';
 
@@ -131,20 +131,9 @@ export function judgeDiscovery(work, cfg, view) {
     const tier = work?.tier ?? DEFAULTS.tier;
     const model = modelForTier(cfg, tier);
     const prompt = buildDiscoveryPrompt(work, view);
-    const { command, args } = resolveExecutorCommand(cfg, { prompt, model });
+    const stricterPrompt = prompt + JUDGE_STRICT_JSON_SUFFIX;
 
-    const result = spawnSync(command, args, {
-      shell: false,
-      timeout: cfg?.timeoutMs,
-      encoding: 'utf8',
-      maxBuffer: 10 * 1024 * 1024,
-    });
-
-    if (result.error || result.status !== 0) {
-      return { clear: false, question: DEFAULT_UNCLEAR_QUESTION };
-    }
-
-    const verdict = JSON.parse(result.stdout);
+    const verdict = runJudgeExecutor(cfg, model, prompt, stricterPrompt);
     if (!verdict || typeof verdict.clear !== 'boolean') {
       return { clear: false, question: DEFAULT_UNCLEAR_QUESTION };
     }

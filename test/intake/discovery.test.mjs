@@ -32,6 +32,66 @@ function writeFailingExecutor(dir, exitCode = 1) {
   return scriptPath;
 }
 
+function readCount(counterPath) {
+  return fs.existsSync(counterPath) ? parseInt(fs.readFileSync(counterPath, 'utf8'), 10) : 0;
+}
+
+function writeCountingRawStdoutExecutor(dir, rawStdout) {
+  const scriptPath = path.join(dir, 'counting-raw-executor.mjs');
+  const counterPath = path.join(dir, 'counting-raw-count.txt');
+  fs.writeFileSync(counterPath, '0');
+  fs.writeFileSync(
+    scriptPath,
+    `
+    import fs from 'node:fs';
+    const counterPath = ${JSON.stringify(counterPath)};
+    fs.writeFileSync(counterPath, String(parseInt(fs.readFileSync(counterPath, 'utf8'), 10) + 1));
+    process.stdout.write(${JSON.stringify(rawStdout)});
+    process.exit(0);
+    `,
+  );
+  return { scriptPath, counterPath };
+}
+
+function writeCountingFailingExecutor(dir, exitCode = 1) {
+  const scriptPath = path.join(dir, 'counting-failing-executor.mjs');
+  const counterPath = path.join(dir, 'counting-failing-count.txt');
+  fs.writeFileSync(counterPath, '0');
+  fs.writeFileSync(
+    scriptPath,
+    `
+    import fs from 'node:fs';
+    const counterPath = ${JSON.stringify(counterPath)};
+    fs.writeFileSync(counterPath, String(parseInt(fs.readFileSync(counterPath, 'utf8'), 10) + 1));
+    process.exit(${exitCode});
+    `,
+  );
+  return { scriptPath, counterPath };
+}
+
+// Returns unparsable stdout on invocation 1, a valid verdict on invocation 2
+// — proves judgeDiscovery's retry (str68 D2) resolves to the retry verdict.
+function writeFlakyThenValidExecutor(dir, badStdout, validVerdict) {
+  const scriptPath = path.join(dir, 'flaky-then-valid-executor.mjs');
+  fs.writeFileSync(
+    scriptPath,
+    `
+    import fs from 'node:fs';
+    const counterPath = ${JSON.stringify(path.join(dir, 'flaky-count.txt'))};
+    let n = 1;
+    try { n = parseInt(fs.readFileSync(counterPath, 'utf8'), 10) + 1; } catch { n = 1; }
+    fs.writeFileSync(counterPath, String(n));
+    if (n === 1) {
+      process.stdout.write(${JSON.stringify(badStdout)});
+    } else {
+      process.stdout.write(${JSON.stringify(JSON.stringify(validVerdict))});
+    }
+    process.exit(0);
+    `,
+  );
+  return scriptPath;
+}
+
 function writeHangingExecutor(dir) {
   const scriptPath = path.join(dir, 'hanging-executor.mjs');
   fs.writeFileSync(
@@ -121,14 +181,28 @@ test('judgeDiscovery embeds the item title/kind/refs/deps in the prompt sent to 
   assert.deepEqual(verdict, { clear: true, verify: 'ok' });
 });
 
-test('judgeDiscovery fails safe (never throws, never clear) on unparsable stdout', () => {
+test('judgeDiscovery fails safe (never throws, never clear) on unparsable stdout, retrying exactly once before falling back (str68 D2/D3)', () => {
   const dir = mkTempDir();
-  const scriptPath = writeRawStdoutExecutor(dir, 'not json at all');
+  const { scriptPath, counterPath } = writeCountingRawStdoutExecutor(dir, 'not json at all');
   const cfg = cfgFor([scriptPath, '{prompt}']);
-  assert.doesNotThrow(() => judgeDiscovery(sampleWork(), cfg));
-  const verdict = judgeDiscovery(sampleWork(), cfg);
+  let verdict;
+  assert.doesNotThrow(() => {
+    verdict = judgeDiscovery(sampleWork(), cfg);
+  });
   assert.equal(verdict.clear, false);
   assert.equal(typeof verdict.question, 'string');
+  assert.equal(readCount(counterPath), 2);
+});
+
+test('judgeDiscovery retries once with a stricter prompt on a parse-shaped failure and resolves to the retry verdict (str68 D2)', () => {
+  const dir = mkTempDir();
+  const scriptPath = writeFlakyThenValidExecutor(dir, 'not json at all', {
+    clear: true,
+    verify: 'npm test -- retried',
+  });
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+  const verdict = judgeDiscovery(sampleWork(), cfg);
+  assert.deepEqual(verdict, { clear: true, verify: 'npm test -- retried' });
 });
 
 test('judgeDiscovery fails safe when the verdict JSON is missing the "clear" field', () => {
@@ -147,12 +221,13 @@ test('judgeDiscovery fails safe when "clear" is present but not a boolean', () =
   assert.equal(verdict.clear, false);
 });
 
-test('judgeDiscovery fails safe when the executor exits non-zero', () => {
+test('judgeDiscovery fails safe when the executor exits non-zero, attempting exactly once — no retry on a non-parse failure (str68 D2)', () => {
   const dir = mkTempDir();
-  const scriptPath = writeFailingExecutor(dir, 7);
+  const { scriptPath, counterPath } = writeCountingFailingExecutor(dir, 7);
   const cfg = cfgFor([scriptPath, '{prompt}']);
   const verdict = judgeDiscovery(sampleWork(), cfg);
   assert.equal(verdict.clear, false);
+  assert.equal(readCount(counterPath), 1);
 });
 
 test('judgeDiscovery fails safe when the configured command does not exist (spawn fail)', () => {

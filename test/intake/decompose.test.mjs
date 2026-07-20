@@ -32,6 +32,66 @@ function writeFailingExecutor(dir, exitCode = 1) {
   return scriptPath;
 }
 
+function readCount(counterPath) {
+  return fs.existsSync(counterPath) ? parseInt(fs.readFileSync(counterPath, 'utf8'), 10) : 0;
+}
+
+function writeCountingRawStdoutExecutor(dir, rawStdout) {
+  const scriptPath = path.join(dir, 'counting-raw-executor.mjs');
+  const counterPath = path.join(dir, 'counting-raw-count.txt');
+  fs.writeFileSync(counterPath, '0');
+  fs.writeFileSync(
+    scriptPath,
+    `
+    import fs from 'node:fs';
+    const counterPath = ${JSON.stringify(counterPath)};
+    fs.writeFileSync(counterPath, String(parseInt(fs.readFileSync(counterPath, 'utf8'), 10) + 1));
+    process.stdout.write(${JSON.stringify(rawStdout)});
+    process.exit(0);
+    `,
+  );
+  return { scriptPath, counterPath };
+}
+
+function writeCountingFailingExecutor(dir, exitCode = 1) {
+  const scriptPath = path.join(dir, 'counting-failing-executor.mjs');
+  const counterPath = path.join(dir, 'counting-failing-count.txt');
+  fs.writeFileSync(counterPath, '0');
+  fs.writeFileSync(
+    scriptPath,
+    `
+    import fs from 'node:fs';
+    const counterPath = ${JSON.stringify(counterPath)};
+    fs.writeFileSync(counterPath, String(parseInt(fs.readFileSync(counterPath, 'utf8'), 10) + 1));
+    process.exit(${exitCode});
+    `,
+  );
+  return { scriptPath, counterPath };
+}
+
+// Returns unparsable stdout on invocation 1, a valid verdict on invocation 2
+// — proves judgeDecompose's retry (str68 D2) resolves to the retry verdict.
+function writeFlakyThenValidExecutor(dir, badStdout, validVerdict) {
+  const scriptPath = path.join(dir, 'flaky-then-valid-executor.mjs');
+  fs.writeFileSync(
+    scriptPath,
+    `
+    import fs from 'node:fs';
+    const counterPath = ${JSON.stringify(path.join(dir, 'flaky-count.txt'))};
+    let n = 1;
+    try { n = parseInt(fs.readFileSync(counterPath, 'utf8'), 10) + 1; } catch { n = 1; }
+    fs.writeFileSync(counterPath, String(n));
+    if (n === 1) {
+      process.stdout.write(${JSON.stringify(badStdout)});
+    } else {
+      process.stdout.write(${JSON.stringify(JSON.stringify(validVerdict))});
+    }
+    process.exit(0);
+    `,
+  );
+  return scriptPath;
+}
+
 function cfgFor(executorArgs, overrides = {}) {
   return {
     executor: { command: process.execPath, args: executorArgs },
@@ -154,12 +214,24 @@ test('judgeDecompose falls back to a default reason when need-human supplies non
   assert.ok(verdict.reason.length > 0);
 });
 
-test('judgeDecompose fails safe (never throws, invalid) on unparsable stdout', () => {
+test('judgeDecompose fails safe (never throws, invalid) on unparsable stdout, retrying exactly once before falling back (str68 D2/D3)', () => {
   const dir = mkTempDir();
-  const scriptPath = writeRawStdoutExecutor(dir, 'not json at all');
+  const { scriptPath, counterPath } = writeCountingRawStdoutExecutor(dir, 'not json at all');
   const cfg = cfgFor([scriptPath, '{prompt}']);
-  assert.doesNotThrow(() => judgeDecompose(sampleWork(), cfg));
-  assert.deepEqual(judgeDecompose(sampleWork(), cfg), { kind: 'invalid' });
+  let verdict;
+  assert.doesNotThrow(() => {
+    verdict = judgeDecompose(sampleWork(), cfg);
+  });
+  assert.deepEqual(verdict, { kind: 'invalid' });
+  assert.equal(readCount(counterPath), 2);
+});
+
+test('judgeDecompose retries once with a stricter prompt on a parse-shaped failure and resolves to the retry verdict (str68 D2)', () => {
+  const dir = mkTempDir();
+  const scriptPath = writeFlakyThenValidExecutor(dir, 'not json at all', { verdict: 'pass-through' });
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+  const verdict = judgeDecompose(sampleWork(), cfg);
+  assert.deepEqual(verdict, { kind: 'pass-through' });
 });
 
 test('judgeDecompose fails safe when the verdict JSON is missing the "verdict" field', () => {
@@ -169,11 +241,12 @@ test('judgeDecompose fails safe when the verdict JSON is missing the "verdict" f
   assert.deepEqual(judgeDecompose(sampleWork(), cfg), { kind: 'invalid' });
 });
 
-test('judgeDecompose fails safe when the executor exits non-zero', () => {
+test('judgeDecompose fails safe when the executor exits non-zero, attempting exactly once — no retry on a non-parse failure (str68 D2)', () => {
   const dir = mkTempDir();
-  const scriptPath = writeFailingExecutor(dir, 7);
+  const { scriptPath, counterPath } = writeCountingFailingExecutor(dir, 7);
   const cfg = cfgFor([scriptPath, '{prompt}']);
   assert.deepEqual(judgeDecompose(sampleWork(), cfg), { kind: 'invalid' });
+  assert.equal(readCount(counterPath), 1);
 });
 
 test('judgeDecompose fails safe when the configured command does not exist (spawn fail)', () => {

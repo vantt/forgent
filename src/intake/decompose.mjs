@@ -17,8 +17,8 @@
 // produced (need-human) or a risk-heavy root (D3) — never for "the model
 // call itself broke".
 
-import { spawnSync } from 'node:child_process';
-import { resolveExecutorCommand, modelForTier } from '../runner/dispatch.mjs';
+import { modelForTier } from '../runner/dispatch.mjs';
+import { runJudgeExecutor, JUDGE_STRICT_JSON_SUFFIX } from './judge-executor.mjs';
 import { DEFAULTS } from '../state/work.mjs';
 import { listWork, moveStage, addWork, putInAwaiting, StoreError } from '../state/store.mjs';
 
@@ -104,20 +104,9 @@ export function judgeDecompose(work, cfg) {
     const tier = work?.tier ?? DEFAULTS.tier;
     const model = modelForTier(cfg, tier);
     const prompt = buildDecomposePrompt(work);
-    const { command, args } = resolveExecutorCommand(cfg, { prompt, model });
+    const stricterPrompt = prompt + JUDGE_STRICT_JSON_SUFFIX;
 
-    const result = spawnSync(command, args, {
-      shell: false,
-      timeout: cfg?.timeoutMs,
-      encoding: 'utf8',
-      maxBuffer: 10 * 1024 * 1024,
-    });
-
-    if (result.error || result.status !== 0) {
-      return { kind: 'invalid' };
-    }
-
-    const verdict = JSON.parse(result.stdout);
+    const verdict = runJudgeExecutor(cfg, model, prompt, stricterPrompt);
     if (!verdict || typeof verdict.verdict !== 'string') {
       return { kind: 'invalid' };
     }

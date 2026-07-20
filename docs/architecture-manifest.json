@@ -32,6 +32,7 @@
     "src/state/awaiting-context.mjs": "domain",
     "src/intake/discovery.mjs": "use-case",
     "src/intake/decompose.mjs": "use-case",
+    "src/intake/judge-executor.mjs": "infra",
     "src/cli/command-registry.mjs": "kernel",
     "src/report/entropy.mjs": "domain",
     "src/evolve/candidates.mjs": "domain",
