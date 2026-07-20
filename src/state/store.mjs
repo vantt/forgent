@@ -292,7 +292,7 @@ function composeLearning(view, id, closingSettlement) {
  * first's event already in the log, so its own `expectedStatus` compare
  * correctly conflicts.
  */
-export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, actor, headAtTake, headAtReturn, branchHeadAtTake, branchHeadAtReturn } = {}) {
+export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, actor, headAtTake, headAtReturn, branchHeadAtTake, branchHeadAtReturn, parentSnapshotAtAsk } = {}) {
   const { logPath } = paths(dir);
   const event = withEventsLock(logPath, () => {
   const before = rebuildView(logPath);
@@ -350,6 +350,17 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, act
   if (branchHeadAtReturn !== undefined) {
     rawEvent.payload.branchHeadAtReturn = branchHeadAtReturn;
   }
+  // Parent-anchor snapshot at ask-time (str61 D2/D3): the same post-transition
+  // additive stamp pattern as headAtTake/headAtReturn above — a snapshot of
+  // the item's parent `{id, title, status}` taken at the moment this
+  // `to === 'awaiting-human'` move parks it, so a later read can tell what
+  // changed on the parent since. Ignored by fsm.mjs (pure, only knows the
+  // fields it destructures itself) exactly like headAtTake/actor above, so
+  // this is stamped post-transition the same way. Never set on any other
+  // edge — putInAwaiting is the only caller that ever passes it.
+  if (parentSnapshotAtAsk !== undefined) {
+    rawEvent.payload.parentSnapshotAtAsk = parentSnapshotAtAsk;
+  }
   // Câu-6 tự động (per Phase 3 S3-closeout (c), six-questions L5): BOTH doors
   // into `done` (doing->done and proposed->done) converge on this one
   // `moveWork` call, so gating on `to === 'done'` here — rather than at each
@@ -389,8 +400,8 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, act
  * append-then-refresh tail, same CAS/validation errors — fsm.mjs requires a
  * non-empty `ask` on this edge.
  */
-export function putInAwaiting(dir, { id, ask, expectedStatus } = {}) {
-  return moveWork(dir, { id, to: 'awaiting-human', expectedStatus, ask });
+export function putInAwaiting(dir, { id, ask, expectedStatus, parentSnapshotAtAsk } = {}) {
+  return moveWork(dir, { id, to: 'awaiting-human', expectedStatus, ask, parentSnapshotAtAsk });
 }
 
 /**

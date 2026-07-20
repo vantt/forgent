@@ -45,7 +45,7 @@ function applyEvent(view, event) {
       break;
     }
     case 'work.move': {
-      const { id, to, ask, answer, actor, learning, headAtTake, headAtReturn, branchHeadAtTake, branchHeadAtReturn, reason } = event.payload ?? {};
+      const { id, to, ask, answer, actor, learning, headAtTake, headAtReturn, branchHeadAtTake, branchHeadAtReturn, reason, parentSnapshotAtAsk } = event.payload ?? {};
       const item = view.work[id];
       if (item) {
         item.status = to;
@@ -114,6 +114,15 @@ function applyEvent(view, event) {
       // being present — a gateless move never creates the key, and `gates`
       // stays absent from the view entirely on any log with no gate events
       // (mirrors the "no outcomes key" backward-compat guarantee).
+      //
+      // `parentSnapshotAtAsk` (str61 D2/D3) rides the SAME fold, guarded the
+      // same way (only stamped when present) — a snapshot of the item's
+      // parent taken at ask-time, so a later read can diff the parent's
+      // current state against it. It folds only on the `ask` branch (the
+      // only move that ever carries it, per putInAwaiting/store.mjs); a
+      // fresh `ask` after an `answer` overwrites the prior snapshot with the
+      // new one via this same spread-then-override merge, never accumulating
+      // both.
       if (ask || answer) {
         if (!view.gates) {
           view.gates = {};
@@ -122,6 +131,7 @@ function applyEvent(view, event) {
           ...view.gates[id],
           ...(ask ? { ask } : {}),
           ...(answer ? { answer } : {}),
+          ...(parentSnapshotAtAsk !== undefined ? { parentSnapshotAtAsk } : {}),
         };
       }
       // Settlement channel (kênh 1 của capture 2 kênh, per Phase 3
