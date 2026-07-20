@@ -501,19 +501,47 @@ export function addDecision(dir, payload) {
   return { event, view };
 }
 
+// Diataxis doc-type axis (per CONTEXT D5/D6): an OPTIONAL, additive tag on
+// the compound-learn capture payload, orthogonal to the engineer type-axis
+// (pattern/decision/failure). Exactly the four Diataxis quadrants — no
+// audience/type beyond these four is valid when the field is present at
+// all; absent/null stays untagged (never required). Defined once here and
+// shared by `addOutcome`/`addFriction` below.
+const DIATAXIS_DOC_TYPES = new Set(['tutorial', 'how-to', 'reference', 'explanation']);
+
+// Shared optional-shape check for `payload.docType` (mirrors the `docsRef`
+// idiom in work.mjs: validated only when present, `null` treated as
+// absent/untagged, per D6). Throws the same `StoreError('validation', …)`
+// shape every other capture-door check in this file uses.
+function assertValidDocType(payload) {
+  if (payload.docType === undefined || payload.docType === null) {
+    return;
+  }
+  if (typeof payload.docType !== 'string' || !DIATAXIS_DOC_TYPES.has(payload.docType)) {
+    throw new StoreError(
+      'validation',
+      `docType, when present, must be one of: ${[...DIATAXIS_DOC_TYPES].join(', ')}.`,
+    );
+  }
+}
+
 /**
  * Log a work-outcome event (predicted at claim, actual at close — per plan
  * Approach S1). No FSM/work validation beyond requiring the `id` the fold
  * merges on; unlike `addDecision`, payload shape (predicted-only vs
  * actual-only) is the caller's (runner's) concern, not this facade's — this
  * is still the single write door (D3), same append-then-refresh tail as
- * every other mutation here.
+ * every other mutation here. `payload.docType` is an OPTIONAL Diataxis tag
+ * (D5/D6): shape-checked only when present via `assertValidDocType` above;
+ * the payload is still appended RAW (no destructure/allowlist) so it rides
+ * replay's existing spread-fold with zero mechanism change.
  */
 export function addOutcome(dir, payload) {
   const { logPath } = paths(dir);
   if (!payload || typeof payload.id !== 'string' || !payload.id.trim()) {
     throw new StoreError('validation', 'outcome requires a non-empty "id".');
   }
+  assertValidDocType(payload);
   const event = appendEvent(logPath, { type: 'work.outcome', payload });
   const view = refreshView(dir);
   return { event, view };
@@ -526,12 +554,15 @@ export function addOutcome(dir, payload) {
  * `work.outcome` (two halves MERGED by id), frictions are occurrences — the
  * fold APPENDS per id, a later record never erases an earlier one. Same
  * single write door + append-then-refresh tail as every mutation here.
+ * `payload.docType` is the same OPTIONAL Diataxis tag as `addOutcome` above
+ * (D5/D6) — same shape check, same raw-append-for-fold-survival contract.
  */
 export function addFriction(dir, payload) {
   const { logPath } = paths(dir);
   if (!payload || typeof payload.id !== 'string' || !payload.id.trim()) {
     throw new StoreError('validation', 'friction requires a non-empty "id".');
   }
+  assertValidDocType(payload);
   const event = appendEvent(logPath, { type: 'work.friction', payload });
   const view = refreshView(dir);
   return { event, view };

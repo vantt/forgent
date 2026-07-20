@@ -961,7 +961,7 @@ test('check on an item with no recorded outcome returns a null predicted/actual 
   const result = run(cwd, ['check', 'unchecked-item']);
   assert.equal(result.status, 0);
   const data = envelopeData(result.stdout);
-  assert.deepEqual(data.outcomes, [{ id: 'unchecked-item', predicted: null, actual: null }]);
+  assert.deepEqual(data.outcomes, [{ id: 'unchecked-item', predicted: null, actual: null, docType: null }]);
 });
 
 test('check on a directory with no log at all returns an empty outcomes list, exit 0 (a read never initializes .fgos/)', () => {
@@ -1008,6 +1008,41 @@ test('check with no id given reports every item that has outcome data, exit 0', 
   const data = envelopeData(result.stdout);
   assert.equal(data.outcomes.length, 1);
   assert.equal(data.outcomes[0].id, 'item-a', 'item-b has no outcome data yet, so it is not listed');
+});
+
+// --- Diataxis docType surfacing in `check` (CONTEXT D5/D6) ------------------
+//
+// docType rides the SAME outcome/friction capture these tests above already
+// exercise — no new collector, no new write door. `check` surfaces a tagged
+// outcome via `collectOutcomeEntry`; a tagged friction rides through
+// `collectFrictionData`'s existing `recent` spread with no code change
+// beyond the store validation these tests prove separately.
+
+test('check surfaces docType for a tagged outcome; an untagged outcome nulls it, output shape otherwise unchanged', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'tagged-outcome-item');
+  addOk(cwd, 'untagged-outcome-item');
+  const dir = path.join(cwd, '.fgos');
+  addOutcome(dir, { id: 'tagged-outcome-item', docType: 'tutorial', predicted: { tier: 'standard', deps: 0, priorVisits: 0 } });
+  addOutcome(dir, { id: 'untagged-outcome-item', predicted: { tier: 'standard', deps: 0, priorVisits: 0 } });
+
+  const taggedResult = run(cwd, ['check', 'tagged-outcome-item']);
+  assert.equal(taggedResult.status, 0);
+  assert.deepEqual(envelopeData(taggedResult.stdout).outcomes[0], {
+    id: 'tagged-outcome-item',
+    predicted: { tier: 'standard', deps: 0, priorVisits: 0 },
+    actual: null,
+    docType: 'tutorial',
+  });
+
+  const untaggedResult = run(cwd, ['check', 'untagged-outcome-item']);
+  assert.equal(untaggedResult.status, 0);
+  assert.deepEqual(envelopeData(untaggedResult.stdout).outcomes[0], {
+    id: 'untagged-outcome-item',
+    predicted: { tier: 'standard', deps: 0, priorVisits: 0 },
+    actual: null,
+    docType: null,
+  });
 });
 
 // --- rollup view theo bộ (P24) ----------------------------------------------
@@ -1167,6 +1202,19 @@ test('check returns the friction data — per-layer counts + recent records — 
   assert.equal(halted.id, 'fric-item');
   assert.equal(halted.errorClass, 'worker-timeout');
   assert.equal(halted.layer, 'environment');
+});
+
+test('check surfaces docType for a tagged friction via the existing recent spread — no collectFrictionData change needed', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'fric-doctype-item');
+  const dir = path.join(cwd, '.fgos');
+  addFriction(dir, { id: 'fric-doctype-item', docType: 'explanation', disposition: 'parked', errorClass: 'verify-miss', layer: 'verification', attempts: 1, detail: 'x' });
+
+  const result = run(cwd, ['check']);
+  assert.equal(result.status, 0);
+  const { friction } = envelopeData(result.stdout);
+  const record = friction.recent.find((r) => r.id === 'fric-doctype-item');
+  assert.equal(record.docType, 'explanation');
 });
 
 test('check nags items sitting in a final status without their actual half (porting-outcome-lifecycle: no silent record)', () => {

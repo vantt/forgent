@@ -193,9 +193,12 @@ function parseListFlag(value) {
 // (`predicted`/`actual`) even when a half is still missing (null) — this is
 // what makes the output real CoS evidence (per plan Approach S1) rather than
 // a bare "has outcome" flag: a reader (agent or e2e assertion) sees the
-// actual predicted/actual VALUES, not just their presence.
+// actual predicted/actual VALUES, not just their presence. `docType` is the
+// optional Diataxis tag (CONTEXT D5/D6): surfaced the same way — present as
+// its real value when the capture was tagged, `null` when untagged — so an
+// untagged item's output shape stays byte-identical to pre-docType logs.
 function collectOutcomeEntry(id, entry) {
-  return { id, predicted: entry?.predicted ?? null, actual: entry?.actual ?? null };
+  return { id, predicted: entry?.predicted ?? null, actual: entry?.actual ?? null, docType: entry?.docType ?? null };
 }
 
 // Friction report cap (per porting lesson predicted-actual-feedback-store:

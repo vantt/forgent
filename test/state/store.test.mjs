@@ -225,6 +225,90 @@ test('moveWork omits branchHeadAtTake/branchHeadAtReturn entirely from the event
   assert.equal('branchHeadAtReturn' in event.payload, false);
 });
 
+// --- Diataxis docType tag on outcome/friction capture (CONTEXT D5/D6) -----
+//
+// docType is an OPTIONAL, additive axis on the compound-learn capture
+// payload — orthogonal to the engineer type-axis these events already
+// carry. Absent/null must always stay valid (untagged); present, it must be
+// one of exactly the four Diataxis quadrants. The load-bearing assertion is
+// replay survival: the field must ride the existing spread-fold with zero
+// change to replay.mjs, so a rebuild (a fresh `listWork`, not just the
+// call's own returned view) still carries it.
+
+const DIATAXIS_QUADRANTS = ['tutorial', 'how-to', 'reference', 'explanation'];
+
+test('addOutcome accepts a docType tag of any of the four Diataxis quadrants', () => {
+  const dir = tmpDir();
+  for (const docType of DIATAXIS_QUADRANTS) {
+    addSampleWork(dir, `outcome-doctype-${docType}`);
+    const { view } = addOutcome(dir, { id: `outcome-doctype-${docType}`, docType, predicted: { tier: 'standard', deps: 0, priorVisits: 0 } });
+    assert.equal(view.outcomes[`outcome-doctype-${docType}`].docType, docType);
+  }
+});
+
+test('addFriction accepts a docType tag of any of the four Diataxis quadrants', () => {
+  const dir = tmpDir();
+  for (const docType of DIATAXIS_QUADRANTS) {
+    addSampleWork(dir, `friction-doctype-${docType}`);
+    const { view } = addFriction(dir, { id: `friction-doctype-${docType}`, docType, disposition: 'parked', errorClass: 'verify-miss', layer: 'verification', attempts: 1, detail: 'x' });
+    const records = view.frictions[`friction-doctype-${docType}`];
+    assert.equal(records[records.length - 1].docType, docType);
+  }
+});
+
+test('addOutcome and addFriction stay valid when docType is absent or explicitly null (untagged, per D6)', () => {
+  const dir = tmpDir();
+  addSampleWork(dir, 'outcome-untagged');
+  addSampleWork(dir, 'friction-untagged');
+
+  const { view: v1 } = addOutcome(dir, { id: 'outcome-untagged', predicted: { tier: 'standard', deps: 0, priorVisits: 0 } });
+  assert.equal('docType' in v1.outcomes['outcome-untagged'], false, 'absent docType is never fabricated onto the folded record');
+
+  const { view: v2 } = addOutcome(dir, { id: 'outcome-untagged', docType: null, actual: { outcome: 'pass', passed: true, attempts: 1, errorClass: null, aheadCount: 0, visits: 1 } });
+  assert.equal(v2.outcomes['outcome-untagged'].docType, null, 'an explicit null is accepted and folds through as null');
+
+  const { view: v3 } = addFriction(dir, { id: 'friction-untagged', disposition: 'parked', errorClass: 'verify-miss', layer: 'verification', attempts: 1, detail: 'x' });
+  assert.equal('docType' in v3.frictions['friction-untagged'][0], false);
+
+  const { view: v4 } = addFriction(dir, { id: 'friction-untagged', docType: null, disposition: 'halted', errorClass: 'worker-timeout', layer: 'environment', attempts: 1, detail: 'y' });
+  assert.equal(v4.frictions['friction-untagged'][1].docType, null);
+});
+
+test('addOutcome and addFriction reject a docType outside the four Diataxis quadrants — non-quadrant string, empty/whitespace, and non-string', () => {
+  const dir = tmpDir();
+  addSampleWork(dir, 'outcome-bad-doctype');
+  addSampleWork(dir, 'friction-bad-doctype');
+
+  const badValues = ['pattern', '', '   ', 42, true, {}];
+  for (const docType of badValues) {
+    assert.throws(
+      () => addOutcome(dir, { id: 'outcome-bad-doctype', docType, predicted: { tier: 'standard', deps: 0, priorVisits: 0 } }),
+      /docType.*must be one of/,
+    );
+    assert.throws(
+      () => addFriction(dir, { id: 'friction-bad-doctype', docType, disposition: 'parked', errorClass: 'verify-miss', layer: 'verification', attempts: 1, detail: 'x' }),
+      /docType.*must be one of/,
+    );
+  }
+  // Neither rejected call left a partial event behind.
+  assert.equal(listWork(dir).outcomes?.['outcome-bad-doctype'], undefined);
+  assert.equal(listWork(dir).frictions?.['friction-bad-doctype'], undefined);
+});
+
+test('a docType-tagged outcome AND friction survive an independent rebuild of the view from the log (load-bearing D6 proof: zero replay.mjs mechanism change)', () => {
+  const dir = tmpDir();
+  addSampleWork(dir, 'replay-survival');
+
+  addOutcome(dir, { id: 'replay-survival', docType: 'how-to', predicted: { tier: 'standard', deps: 0, priorVisits: 0 } });
+  addFriction(dir, { id: 'replay-survival', docType: 'reference', disposition: 'parked', errorClass: 'verify-miss', layer: 'verification', attempts: 1, detail: 'x' });
+
+  // A fresh, independent rebuild from the on-disk log — not the write call's
+  // own returned view — is the actual replay-survival proof.
+  const rebuilt = listWork(dir);
+  assert.equal(rebuilt.outcomes['replay-survival'].docType, 'how-to', 'tagged outcome retains docType after rebuild');
+  assert.equal(rebuilt.frictions['replay-survival'][0].docType, 'reference', 'tagged friction retains docType after rebuild');
+});
+
 // --- cycle guard at the write door (work-graph-intelligence S1) -----------
 //
 // dep-graph.mjs's findDepCycle/assertNoCycle are unit-tested directly in
