@@ -41,6 +41,7 @@ import { DEFAULTS } from '../src/state/work.mjs';
 import { getDomain, stageForStep } from '../src/state/domains.mjs';
 import { writeCoexistenceManifest } from '../src/install/coexist.mjs';
 import { SCHEMA_VERSION, COMMAND_REGISTRY } from '../src/cli/command-registry.mjs';
+import { computeAwaitingContext } from '../src/state/awaiting-context.mjs';
 
 // D5: `verify` is a required non-empty field on every work item, but a
 // free-text submission has no verification plan yet — that is P15's job. The
@@ -676,7 +677,18 @@ async function runVerb(verb, flags, positional, dir) {
       const id = requireField(positional[0] ?? flags.id, 'ask requires an id: fgos ask <id> --text "..." [--expect <status>]');
       const text = requireField(flags.text, 'ask requires --text "..."');
       const expectedStatus = optionalField(flags.expect, 'ask --expect requires a status value (omit --expect entirely to skip the CAS check)');
-      const { event } = putInAwaiting(dir, { id, ask: text, expectedStatus });
+      // Parent-anchor snapshot (str61 D2/D3): looked up from the CURRENT
+      // view before the park below, so a later `list` read can diff the
+      // parent's state against what it was at ask-time. Only stamped when
+      // the item actually has a `parent` that resolves right now — a
+      // missing item, or a `parent` that doesn't resolve, leaves
+      // parentSnapshotAtAsk undefined, the same "no baseline" case
+      // computeAwaitingContext already tolerates.
+      const askView = listWork(dir);
+      const parentId = askView.work[id]?.parent;
+      const parent = parentId ? askView.work[parentId] : undefined;
+      const parentSnapshotAtAsk = parent ? { id: parent.id, title: parent.title, status: parent.status } : undefined;
+      const { event } = putInAwaiting(dir, { id, ask: text, expectedStatus, parentSnapshotAtAsk });
       return { id, from: event.payload.from, to: event.payload.to, seq: event.seq };
     }
 
@@ -699,7 +711,20 @@ async function runVerb(verb, flags, positional, dir) {
     }
 
     case 'list': {
-      return listWork(dir);
+      const view = listWork(dir);
+      // Parent-anchored context (str61 D1/D2/D3): additive-only key,
+      // computed fresh from `view` on every read (D1 — never a persisted
+      // "session"), never touching store.listWork itself. Only
+      // `awaiting-human` items ever produce an entry; a repo/scenario with
+      // none of them sees `view` returned byte-identical, no
+      // `awaitingContext` key at all.
+      const awaitingContext = {};
+      for (const item of Object.values(view.work)) {
+        if (item.status !== 'awaiting-human') continue;
+        const ctx = computeAwaitingContext(view, item.id);
+        if (ctx) awaitingContext[item.id] = ctx;
+      }
+      return Object.keys(awaitingContext).length > 0 ? { ...view, awaitingContext } : view;
     }
 
     // Request-class per D1: a pure read — never appends an event, never
