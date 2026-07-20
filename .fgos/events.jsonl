@@ -80,3 +80,8 @@
 {"seq":80,"ts":"2026-07-17T05:53:48.747Z","type":"work.move","payload":{"id":"them-view-rollup-theo-bo-cho-item-goc-6ct","from":"doing","to":"proposed","actor":"runner"},"v":2}
 {"seq":81,"ts":"2026-07-17T05:53:48.748Z","type":"work.outcome","payload":{"id":"them-view-rollup-theo-bo-cho-item-goc-6ct","actual":{"outcome":"proposed","passed":true,"attempts":1,"errorClass":null,"aheadCount":1,"visits":2}},"v":2}
 {"seq":82,"ts":"2026-07-17T06:03:16.247Z","type":"work.move","payload":{"id":"them-view-rollup-theo-bo-cho-item-goc-6ct","from":"proposed","to":"done","actor":"human","learning":{"outcome":{"disposition":"proposed","attempts":1,"errorClass":null},"frictions":{},"settlements":{"clarify-pass/runner":1,"close/human":1}}},"v":2}
+{"seq":83,"ts":"2026-07-20T16:54:02.303Z","type":"work.add","payload":{"id":"doc-fgos-rollup-howto","title":"Write end-user how-to doc for fgos rollup verb","kind":"task","status":"todo","deps":[],"risk":"low","refs":[],"verify":"npm test","tier":"standard"},"v":2}
+{"seq":84,"ts":"2026-07-20T16:54:04.597Z","type":"work.move","payload":{"id":"doc-fgos-rollup-howto","from":"todo","to":"doing","actor":"human"},"v":2}
+{"seq":85,"ts":"2026-07-20T16:54:07.902Z","type":"work.move","payload":{"id":"doc-fgos-rollup-howto","from":"doing","to":"proposed","actor":"human"},"v":2}
+{"seq":86,"ts":"2026-07-20T16:54:13.255Z","type":"work.outcome","payload":{"id":"doc-fgos-rollup-howto","docType":"how-to"},"v":2}
+{"seq":87,"ts":"2026-07-20T16:54:13.259Z","type":"work.stage","payload":{"id":"doc-fgos-rollup-howto","from":"executing","to":"compound-learn","actor":"human"},"v":2}
