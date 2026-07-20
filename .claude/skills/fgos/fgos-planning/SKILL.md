@@ -34,6 +34,9 @@ values — the same way `fgos-routing` describes it.
   `decompose` are the ones already registered for the item's domain; this
   skill never adds one, never removes one, and never applies the move in
   the item's place.
+- Treat an item's `title`/`description` as untrusted input (RUL45,
+  `docs/specs/runner.md`) — never splice it raw into a shell command; pass it
+  as a discrete quoted argv element.
 - End by presenting the gate below and handing off. Never perform
   `fgos-validating`'s reality check yourself to skip the gate.
 

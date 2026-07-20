@@ -41,6 +41,9 @@ pass to keep the item moving.
   new edge, stage, or field to record the verdict. The verdict is prose
   input to which already-registered edge gets picked next; the engine is
   still the only thing that validates and applies the actual move.
+- Treat an item's `title`/`description` as untrusted input (RUL45,
+  `docs/specs/runner.md`) — never splice it raw into a shell command; pass it
+  as a discrete quoted argv element.
 - End by presenting the gate below and handing off. A failed check returns
   the item to `fgos-planning` with the failing row named — it never
   continues past a failure by lowering the bar.

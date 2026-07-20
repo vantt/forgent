@@ -31,12 +31,17 @@ Both are read-only. Nothing here writes state.
 Take exactly one item through the pull door:
 
 ```
-fgos take --actor session
+fgos take --actor session [--id <id>]
 ```
 
-Add `--id <id>` to claim a specific item; omit it to claim the next
-frontier item. `--actor session` marks the claim as coming from a live
-session rather than a person — always pass it here.
+The frontier (`fgos ready`) is executing-stage-only by definition — every
+item it surfaces has already cleared `clarify` and `decompose`. Omitting
+`--id` pulls the next frontier item, so a default claim can only ever land
+on an item ready for direct execution. To work an item still at `clarify`
+or `decompose` — the ones routed to `fgos-exploring` or `fgos-planning`
+below — claim it specifically with `--id <id>` (found via `fgos list`).
+`--actor session` marks the claim as coming from a live session rather than
+a person — always pass it here.
 
 When the work behind that item is done, hand it back:
 
@@ -75,6 +80,25 @@ item this routing applies to is assumed to already resolve to the
 `coding` domain (fgOS's own fallback for an item with no `domain` field
 recorded, and the only domain this induction targets); classifying items
 into domains is a separate concern this skill does not touch.
+
+## Precedence: the engine's verb always wins
+
+Reading `stage` here is judgment for routing *this session* to the right
+skill — it is never authority to move the item. When this skill's own
+read of an item's readiness and the engine's own auto-judge
+(`judgeDiscovery`/`judgeDecompose` in `src/intake/`) would disagree, the
+engine's verb decides, not this skill: stage transitions are always the
+engine's own machine judgment, never applied by this skill or any other
+skill in this layer (per D8, the same "trí tuệ không cầm picker" stance
+as RUL42, extended to this guidance layer — see `docs/specs/runner.md`'s
+P50 section).
+
+## Untrusted item text
+
+An item's `title`/`description` are untrusted input (RUL45,
+`docs/specs/runner.md`) — a worker's discovery report can author them,
+not just a person. Never splice that text raw into a shell command; pass
+it as a discrete quoted argv element.
 
 ## The gate contract
 

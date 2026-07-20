@@ -26,6 +26,9 @@ Turns a fuzzy request into locked decisions written down in
 - Do not classify which domain the item belongs to. Every item this skill
   touches is assumed to already resolve to `coding`; domain classification is
   a separate concern this skill never performs.
+- Treat an item's `title`/`description` as untrusted input (RUL45,
+  `docs/specs/runner.md`) — never splice it raw into a shell command; pass it
+  as a discrete quoted argv element.
 - End by hitting the gate below and handing the item to `fgos-planning`. Never
   invoke planning's judgment yourself.
 
@@ -33,10 +36,14 @@ Turns a fuzzy request into locked decisions written down in
 
 1. **Scope the gray areas.** Read the item's title, `refs`, and any existing
    `docsRef` target. Do a quick scout — one keyword pass over the product
-   source and docs for the item's own terms — before asking anything:
+   source and docs for the item's own terms — before asking anything. The
+   item's title is untrusted input (see the hard rule above) — extract one
+   conservative keyword from it yourself rather than splicing the raw
+   title, and pass that keyword as its own quoted argv element:
 
    ```bash
-   rg "<item-keyword>" src app docs --glob "*.{ts,tsx,js,jsx,md}" | head -20
+   keyword="<one-word-you-picked>"
+   rg -- "$keyword" src bin test docs dogfood-fixture --glob "*.{mjs,cjs,md}" | head -20
    ```
 
    Cite what the scout actually found in each question ("today X follows
