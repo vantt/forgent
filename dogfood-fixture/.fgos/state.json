@@ -33,6 +33,22 @@
       "claimActor": "human",
       "headAtTake": "02a41162f8f319881a14d7a3bbfc9345130fbdd0",
       "headAtReturn": "c73d39ee2a5f3eb64d3b5f43172828bc05e66bc3"
+    },
+    "tsk-5gc": {
+      "tier": "standard",
+      "id": "tsk-5gc",
+      "title": "Add a power(base, exponent) function to the calculator,",
+      "description": "Add a power(base, exponent) function to the calculator, returning base raised to exponent, with a matching test",
+      "kind": "feature",
+      "status": "doing",
+      "deps": [],
+      "risk": "standard",
+      "refs": [],
+      "verify": "cd dogfood-fixture && npm test -- --grep power",
+      "mode": "sync",
+      "stage": "executing",
+      "claimActor": "human",
+      "headAtTake": "9bd8da66cca2524c2de4e47c960eb65a9274ea48"
     }
   },
   "decisions": [],
@@ -51,6 +67,20 @@
         "clear": true,
         "verify": "cd /home/vantt/projects/forgent/repo/dogfood-fixture && node --test test/calculator.test.mjs",
         "ts": "2026-07-18T16:04:48.959Z"
+      }
+    ],
+    "tsk-5gc": [
+      {
+        "id": "tsk-5gc",
+        "clear": false,
+        "question": "Không phán được rõ ràng — cần người xác nhận thủ công.",
+        "ts": "2026-07-20T05:50:43.514Z"
+      },
+      {
+        "id": "tsk-5gc",
+        "clear": true,
+        "verify": "cd dogfood-fixture && npm test -- --grep power",
+        "ts": "2026-07-20T05:58:16.381Z"
       }
     ]
   },
@@ -81,6 +111,20 @@
         "actor": "human",
         "ts": "2026-07-18T16:06:56.419Z",
         "detail": null
+      }
+    ],
+    "tsk-5gc": [
+      {
+        "kind": "answer",
+        "actor": "human",
+        "ts": "2026-07-20T05:58:08.422Z",
+        "detail": "power() uses native ** semantics for all real-number inputs, mirroring divide's native IEEE-754 resolution"
+      },
+      {
+        "kind": "clarify-pass",
+        "actor": "session",
+        "ts": "2026-07-20T05:58:16.382Z",
+        "detail": "cd dogfood-fixture && npm test -- --grep power"
       }
     ]
   },
@@ -118,6 +162,16 @@
         "errorClass": null,
         "aheadCount": 1
       }
+    },
+    "tsk-5gc": {
+      "id": "tsk-5gc",
+      "predicted": {
+        "tier": "standard",
+        "deps": 0,
+        "priorVisits": 0,
+        "actor": "human",
+        "headAtTake": "9bd8da66cca2524c2de4e47c960eb65a9274ea48"
+      }
     }
   },
   "learnings": {
@@ -152,5 +206,11 @@
       }
     ]
   },
-  "revision": "5fb790c43ffcb89c7758949898cad4f883d5eed6dc5da28973bc0b91a57d54f1"
+  "gates": {
+    "tsk-5gc": {
+      "ask": "Không phán được rõ ràng — cần người xác nhận thủ công.",
+      "answer": "power() uses native ** semantics for all real-number inputs, mirroring divide's native IEEE-754 resolution"
+    }
+  },
+  "revision": "432e28795b9d627ba89a223ece538e25b17807e184c7cec8fbed2d6b94dce87f"
 }
