@@ -40,15 +40,16 @@
       "title": "Add a power(base, exponent) function to the calculator,",
       "description": "Add a power(base, exponent) function to the calculator, returning base raised to exponent, with a matching test",
       "kind": "feature",
-      "status": "doing",
+      "status": "done",
       "deps": [],
       "risk": "standard",
       "refs": [],
-      "verify": "cd dogfood-fixture && npm test -- --grep power",
+      "verify": "node --test 'test/**/*.test.mjs' --test-name-pattern=power",
       "mode": "sync",
       "stage": "executing",
       "claimActor": "human",
-      "headAtTake": "9bd8da66cca2524c2de4e47c960eb65a9274ea48"
+      "headAtTake": "9bd8da66cca2524c2de4e47c960eb65a9274ea48",
+      "headAtReturn": "76aa4d713fbd7e1ea1307719e1c783c37e85bcbc"
     }
   },
   "decisions": [],
@@ -125,6 +126,12 @@
         "actor": "session",
         "ts": "2026-07-20T05:58:16.382Z",
         "detail": "cd dogfood-fixture && npm test -- --grep power"
+      },
+      {
+        "kind": "close",
+        "actor": "human",
+        "ts": "2026-07-20T06:02:05.170Z",
+        "detail": null
       }
     ]
   },
@@ -171,6 +178,13 @@
         "priorVisits": 0,
         "actor": "human",
         "headAtTake": "9bd8da66cca2524c2de4e47c960eb65a9274ea48"
+      },
+      "actual": {
+        "outcome": "proposed",
+        "passed": true,
+        "attempts": 1,
+        "errorClass": null,
+        "aheadCount": 1
       }
     }
   },
@@ -204,6 +218,24 @@
         },
         "ts": "2026-07-18T16:06:56.419Z"
       }
+    ],
+    "tsk-5gc": [
+      {
+        "outcome": {
+          "disposition": "proposed",
+          "attempts": 1,
+          "errorClass": null
+        },
+        "frictions": {
+          "verification": 1
+        },
+        "settlements": {
+          "answer/human": 1,
+          "clarify-pass/session": 1,
+          "close/human": 1
+        },
+        "ts": "2026-07-20T06:02:05.170Z"
+      }
     ]
   },
   "gates": {
@@ -212,5 +244,18 @@
       "answer": "power() uses native ** semantics for all real-number inputs, mirroring divide's native IEEE-754 resolution"
     }
   },
-  "revision": "432e28795b9d627ba89a223ece538e25b17807e184c7cec8fbed2d6b94dce87f"
+  "frictions": {
+    "tsk-5gc": [
+      {
+        "id": "tsk-5gc",
+        "disposition": "blocked",
+        "errorClass": "verify-miss",
+        "layer": "verification",
+        "attempts": 1,
+        "detail": "goal-check failed (exit 2)",
+        "ts": "2026-07-20T06:01:16.900Z"
+      }
+    ]
+  },
+  "revision": "d9d07b9bc03693c41ba01a4608fbf60cdb103c87b088d121aaa1b3634f1073bf"
 }
