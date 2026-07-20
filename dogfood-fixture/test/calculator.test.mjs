@@ -33,3 +33,8 @@ test('power follows native ** semantics for edge-case inputs', () => {
   assert.equal(power(4, 0.5), 2);
   assert.equal(power(0, 0), 1);
 });
+
+test('power follows native ** semantics for NaN and Infinity edge cases', () => {
+  assert.ok(Number.isNaN(power(-1, 0.5)));
+  assert.equal(power(2, Infinity), Infinity);
+});
