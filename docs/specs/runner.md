@@ -1,8 +1,8 @@
 ---
 area: runner
 updated: 2026-07-20
-sources: [phase-2-routing, post-divorce-hardening, phase-3-compound-learning-s1, phase-3-compound-learning-s2, phase-3-compound-learning-s3-closeout, stage-clarify, stage-decompose-s1, stage-decompose-s2, pr-lifecycle-s1, discovery-context, worker-execution, fan-out-parallel, human-rounds, worker-dispatch-log, self-improve-loop, base-workflow-model-s2, fgos-multi-session-checkout, github-adapter-s3, github-adapter-s4, work-graph-intelligence-s2b, work-graph-intelligence-s10, work-graph-intelligence-s11, fgos-sample-testbed, p50-workflow-induct]
-decisions: [feed7428, 14396a5c, 1a80b4d3, 9a19eea5, 96a65365, a7c099af, 43f257ae, 44936500, e1218b22, 6f2cbc47, a30a3d3c, 1359ab5e, cfae0120, 22699c61, 04a6cd05, 396d9d9e, 2e92b7a5, f0c40acc, 5a6900b2, 8575f1a3, c8df2479, cb09d6fd, b1aa1bdc, caecb9d1, 9b141173, a3176299, 140eb8a4, 76b7a36b, 8d04bba3, 1cd895e1, 38160a70, c11322cb, 2ac16176, f8a3a5d9, 3d4ea29c, 3c8e5926, 342102b9, d4c59ba2, 644916a4, ef6ed305, a4fe4c2b, f69951df, 5208dfe9, 8cf7effe, 7bbe6315, a7c93ec8, cfdd808f, 31b5f045]
+sources: [phase-2-routing, post-divorce-hardening, phase-3-compound-learning-s1, phase-3-compound-learning-s2, phase-3-compound-learning-s3-closeout, stage-clarify, stage-decompose-s1, stage-decompose-s2, pr-lifecycle-s1, discovery-context, worker-execution, fan-out-parallel, human-rounds, worker-dispatch-log, self-improve-loop, base-workflow-model-s2, fgos-multi-session-checkout, github-adapter-s3, github-adapter-s4, work-graph-intelligence-s2b, work-graph-intelligence-s10, work-graph-intelligence-s11, fgos-sample-testbed, p50-workflow-induct, str68-discovery-judge-robustness]
+decisions: [feed7428, 14396a5c, 1a80b4d3, 9a19eea5, 96a65365, a7c099af, 43f257ae, 44936500, e1218b22, 6f2cbc47, a30a3d3c, 1359ab5e, cfae0120, 22699c61, 04a6cd05, 396d9d9e, 2e92b7a5, f0c40acc, 5a6900b2, 8575f1a3, c8df2479, cb09d6fd, b1aa1bdc, caecb9d1, 9b141173, a3176299, 140eb8a4, 76b7a36b, 8d04bba3, 1cd895e1, 38160a70, c11322cb, 2ac16176, f8a3a5d9, 3d4ea29c, 3c8e5926, 342102b9, d4c59ba2, 644916a4, ef6ed305, a4fe4c2b, f69951df, 5208dfe9, 8cf7effe, 7bbe6315, a7c93ec8, cfdd808f, 31b5f045, 87536f3f]
 coverage: full
 ---
 
@@ -100,9 +100,16 @@ Vòng lặp tự hành của forgent: tự lấy việc sẵn-sàng từ work-st
   stage của `coding` (xem spec Work-State "Mô hình domain") — quét ở đây chỉ
   bảo đảm nó không BAO GIỜ bị gọi nhầm cho một domain khác, không bảo đảm nó
   DÙNG được cho domain khác.
-- **Side effects:** một lời gọi model thật cho mỗi item quét được — không
-  bao giờ throw ra ngoài dù model lỗi/timeout (fail-safe, xem spec
-  Work-State).
+- **Side effects:** một lời gọi model thật cho mỗi item quét được; khi lời
+  gọi đó trả về nhưng không đọc được thành phán quyết hợp lệ (dạng gãy-đọc —
+  JSON hỏng hoặc không phải object), hệ thống thử lại ĐÚNG MỘT LẦN với một
+  bản nhắc chặt hơn, cùng ngân sách thời gian mỗi lần gọi như lần đầu (không
+  cộng dồn); một lần gọi gãy vì lý do KHÁC gãy-đọc (model lỗi/timeout/tiến
+  trình hỏng) không bao giờ được thử lại — rơi thẳng về fail-safe hiện có;
+  lần thử lại tự nó gãy (dù gãy-đọc hay gãy-gọi) cũng rơi về đúng fail-safe
+  đó, không có trạng thái từ-chối mới nào phát sinh — không bao giờ throw ra
+  ngoài dù model lỗi/timeout (fail-safe, xem spec Work-State RUL48
+  (work-state); per D1-D5 discovery-judge-robustness / 87536f3f).
 - **Afterwards:** item đủ rõ chuyển sang stage `decompose` (mang verify thật,
   không thẳng `executing` — giai đoạn chia-việc chèn ở giữa) — CÙNG lượt chạy
   này, quét chia-việc bên dưới (xem "Quét chia-việc trước dispatch") có thể
@@ -127,9 +134,13 @@ Vòng lặp tự hành của forgent: tự lấy việc sẵn-sàng từ work-st
   không bao giờ bị quét ở đây (per 1cd895e1, 38160a70). Việc đang
   `awaiting-human` KHÔNG BAO GIỜ bị quét lại — cùng luật loại-trừ với mọi
   dispatch khác (RUL6 (work-state)/RUL15 (work-state)).
-- **Side effects:** một lời gọi model thật cho mỗi item quét được — không
-  bao giờ throw ra ngoài dù model lỗi/timeout, hay verdict sinh con thiếu
-  verify (fail-safe, xem spec Work-State).
+- **Side effects:** một lời gọi model thật cho mỗi item quét được; cùng luật
+  thử-lại-có-điều-kiện như quét làm-rõ trên (xem "Side effects" quét làm-rõ):
+  gãy-đọc thử lại đúng một lần với bản nhắc chặt hơn trong cùng ngân sách
+  thời gian, gãy-gọi không bao giờ thử lại, thử lại tự gãy cũng rơi về cùng
+  fail-safe — không bao giờ throw ra ngoài dù model lỗi/timeout, hay verdict
+  sinh con thiếu verify (fail-safe, xem spec Work-State RUL48 (work-state);
+  per D1-D5 discovery-judge-robustness / 87536f3f).
 - **Afterwards:** item pass-through hoặc vừa sinh đủ con (gốc chuyển
   `decompose → executing`) — CÙNG lượt chạy này, vòng dispatch bên dưới có
   thể nhặt được gốc ngay nếu deps/lineage cũng đã mở (gốc không có hậu duệ
@@ -870,6 +881,7 @@ Not applicable — không có màn hình.
 - `src/runner/goal-check.mjs` — hàm goal-check dùng chung DUY NHẤT (`runGoalCheck(item, cwd, timeoutMs)`): chạy `item.verify` qua shell tại `cwd`, phán chỉ bằng exit status — trích xuất từ `loop.mjs` (stage-decompose S2-pull) để cả vòng tự hành LẪN cửa pull `fgos return` (spec Work-State) gọi đúng một bản logic, không bao giờ hai bản song song
 - `src/intake/discovery.mjs` — xem Pointers spec Work-State (module dùng chung giữa runner và verb `discover`); verb `discover` (phiên sống) truyền `'session'`; verdict đủ rõ nay `moveStage` tới `decompose`, không còn thẳng `executing`; `judgeDiscovery` nhận thêm `view` tùy chọn (per discovery-context STR30) — cả sweep của runner LẪN verb `discover` truyền view đã đọc sẵn, không lời gọi nào cần đọc thêm
 - `src/intake/decompose.mjs` — xem Pointers spec Work-State (module dùng chung giữa runner và verb `discover` khi item ở stage `decompose`); verb `discover` (phiên sống) truyền `'session'`
+- `src/intake/judge-executor.mjs` (discovery-judge-robustness D1-D5 / 87536f3f) — helper thử-lại dùng chung giữa `judgeDiscovery` và `judgeDecompose`: một lần gọi model qua cùng `resolveExecutorCommand`/`modelForTier`/spawn options hai file trên đã dùng; gãy-đọc (JSON hỏng/không phải object) thử lại đúng một lần với bản nhắc chặt hơn, cùng `cfg.timeoutMs` mỗi lần gọi (hai ngân sách độc lập, không cộng dồn); gãy vì lý do khác (spawn lỗi/không-zero-exit/timeout) không bao giờ thử lại; thử lại tự gãy (dù kiểu gì) trả `null`, hai call site tự áp fail-safe hiện có của riêng mình lên `null` đó — helper không tự tạo verdict shape mới
 - `src/report/entropy.mjs` — thuần, không fs/Date.now(): `computeEntropy(view)` → `{score, parts}` (5 tín hiệu có trọng số, mỗi phần giải thích được); `computeCounts(view)` → tổng phẳng outcome/friction/settlement cho seal-digest; đọc/ghi lịch sử xu hướng (`entropy-history.jsonl`, cùng thư mục dữ liệu với `events.jsonl`) và định dạng seal-digest là việc của `bin/fgos.mjs`'s verb `check`, không phải module này
 - `.fgos-runner.json` — config committed (executor template + models light/haiku, standard/sonnet, heavy/opus + timeoutMs); `executor.args` mang `--permission-mode acceptEdits` + `--allowedTools "Bash(git add:*),Bash(git commit:*)"` (quyền TỐI THIỂU, xem RUL6); khối `parallel` TÙY CHỌN — `maxRoots`/`maxLeavesPerRoot` (Data Dictionary #6, mặc định trong-code 4/4 khi khối vắng mặt, mọi config cũ vẫn chạy không cần sửa)
 - `src/runner/write-queue.mjs` — cửa ghi tuần tự thuần (không import fs/store): `createWriteQueue()`'s `enqueue(fn)` chạy đúng MỘT giao dịch async trọn vẹn tại một thời điểm, theo thứ tự nộp FIFO, bất kể số điểm `await` bên trong; một giao dịch throw/reject không chặn hàng đợi cho giao dịch sau (D16); hiện thực in-process của "cửa ghi" D12
