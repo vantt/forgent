@@ -11,7 +11,7 @@ description: >-
 # fgos-routing
 
 Entry point for a session working an fgOS item through the core loop
-(`clarify` → `decompose` → `executing`). This skill never does the work
+(`clarify` → `decompose` → `executing` → `compound-learn`). This skill never does the work
 itself — it locates where an item stands right now and names the one
 other skill to load next. Load it first when a session opens in this
 repo.
@@ -65,6 +65,7 @@ Every item carries a `stage` field, independent of its `status`. Read
 | `decompose`, early | scope is settled; the work now needs shaping and, where it doesn't fit in one pass, splitting into child items | `fgos-planning` |
 | `decompose`, late | shape and children (if any) exist; what's left is proving the plan against reality before the item is allowed to move to `executing` | `fgos-validating` |
 | `executing` | the item has already cleared clarification and shaping (or never needed either), and is ready for direct implementation | no skill to load here — this is the item's already-mechanical build/verify/return path |
+| `compound-learn` | the item has completed execution; the synthesis layer composes learnings from outcomes and classi­fies them as end-user documentation | `fgos-compounding` |
 
 `decompose` is one stage in the data, not two — "early" and "late" above
 are a judgment call inside that single stage, never a value `stage`
