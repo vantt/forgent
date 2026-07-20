@@ -795,6 +795,71 @@ test('compound called twice on the same item rejects the second, illegal stage m
   assert.equal(stateView(cwd).work['compound-twice'].stage, 'compound-learn');
 });
 
+// --- compound-learn-enduser-docs slice 3: `--doc-type` CLI producer (CONTEXT
+// D4/D8) — the minimal producer surface the inducted `fgos-compounding`
+// skill uses to store its first real Diataxis classification. Additive-
+// optional (candidate design from plan.md's slice-3 "Open question for
+// validating"): reuses slice 2's `addOutcome`/`assertValidDocType`
+// validation wholesale, no duplicate enum check in the CLI layer.
+
+const DIATAXIS_QUADRANTS = ['tutorial', 'how-to', 'reference', 'explanation'];
+
+for (const docType of DIATAXIS_QUADRANTS) {
+  test(`compound --doc-type ${docType} stores the tag on the item's outcome and check surfaces it, exit 0`, () => {
+    const cwd = tmpCwd();
+    toProposed(cwd, `compound-doctype-${docType}`);
+    const result = run(cwd, ['compound', `compound-doctype-${docType}`, '--doc-type', docType]);
+    assert.equal(result.status, 0);
+    assert.equal(stateView(cwd).work[`compound-doctype-${docType}`].stage, 'compound-learn');
+
+    const checkResult = run(cwd, ['check', `compound-doctype-${docType}`]);
+    assert.equal(checkResult.status, 0);
+    const data = envelopeData(checkResult.stdout);
+    assert.equal(data.outcomes[0].id, `compound-doctype-${docType}`);
+    assert.equal(data.outcomes[0].docType, docType);
+  });
+}
+
+test('compound rejects a non-quadrant --doc-type as validation, exit 4, no event written at all (no dangling stage-move)', () => {
+  const cwd = tmpCwd();
+  toProposed(cwd, 'compound-bad-doctype');
+  const before = eventLines(cwd).length;
+  const result = run(cwd, ['compound', 'compound-bad-doctype', '--doc-type', 'banana']);
+  assert.equal(result.status, 4);
+  assert.equal(eventLines(cwd).length, before, 'a rejected --doc-type must not leave a moveStage event behind');
+  assert.equal(stateView(cwd).work['compound-bad-doctype'].stage, undefined);
+});
+
+test('compound with NO --doc-type is byte-identical to pre-slice-3: moveStage only, no outcome written, check output unchanged', () => {
+  const cwd = tmpCwd();
+  toProposed(cwd, 'compound-no-doctype');
+  const before = eventLines(cwd).length;
+  const result = run(cwd, ['compound', 'compound-no-doctype']);
+  assert.equal(result.status, 0);
+  assert.equal(eventLines(cwd).length, before + 1, 'only the moveStage event is written when --doc-type is absent');
+  assert.equal(stateView(cwd).work['compound-no-doctype'].stage, 'compound-learn');
+  assert.equal(stateView(cwd).outcomes?.['compound-no-doctype'], undefined, 'no outcome record exists when --doc-type is absent');
+
+  const checkResult = run(cwd, ['check', 'compound-no-doctype']);
+  assert.equal(checkResult.status, 0);
+  assert.deepEqual(envelopeData(checkResult.stdout).outcomes, [
+    { id: 'compound-no-doctype', predicted: null, actual: null, docType: null },
+  ]);
+});
+
+test('a compound --doc-type tag survives a rebuild of the view from the log alone', () => {
+  const cwd = tmpCwd();
+  toProposed(cwd, 'compound-doctype-rebuild');
+  assert.equal(run(cwd, ['compound', 'compound-doctype-rebuild', '--doc-type', 'reference']).status, 0);
+  const before = stateView(cwd);
+  assert.equal(before.outcomes['compound-doctype-rebuild'].docType, 'reference');
+
+  fs.rmSync(viewPath(cwd));
+  const result = run(cwd, ['rebuild']);
+  assert.equal(result.status, 0);
+  assert.deepEqual(stateView(cwd), before);
+});
+
 test('move proposed -> todo (rejection) without --reason is refused as validation, exit 4, no event written', () => {
   const cwd = tmpCwd();
   toProposed(cwd, 'no-reason-item');
@@ -950,10 +1015,12 @@ test('GOLDEN request-class: running ready twice never appends to events.jsonl, a
 // --- `fgos check` (phase-3-compound-learning-3): predicted-vs-actual report ---
 //
 // `check` is a pure read (per D1 request-class, same as `ready`/`list`) over
-// `listWork(dir).outcomes` — the CLI itself has no verb that WRITES a
-// work.outcome event (only the runner does, per plan Approach S1), so these
-// tests seed outcome data directly through store.mjs's addOutcome, the same
-// single write door the runner uses, then exercise the real `check` binary.
+// `listWork(dir).outcomes` — until compound-learn-enduser-docs slice 3, the
+// CLI had no verb that WRITES a work.outcome event (only the runner did, per
+// plan Approach S1; `compound --doc-type` is now the one CLI producer, see
+// its own tests above), so these tests seed outcome data directly through
+// store.mjs's addOutcome, the same single write door the runner uses, then
+// exercise the real `check` binary.
 
 test('check on an item with no recorded outcome returns a null predicted/actual entry for that id, exit 0, no throw', () => {
   const cwd = tmpCwd();

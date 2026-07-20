@@ -651,6 +651,17 @@ async function runVerb(verb, flags, positional, dir) {
     // moves into compound-learn; persists via store.mjs's moveStage (not the
     // pure stage.mjs transitionStage) so the move is actually written to the
     // log, mirroring moveWork's own persisting-wrapper shape above.
+    //
+    // `--doc-type <quadrant>` (slice 3, CONTEXT D4/D8) is the minimal producer
+    // surface the inducted `fgos-compounding` skill uses to store its Diataxis
+    // classification: when given, it stores a `docType`-tagged outcome via the
+    // already-shipped `addOutcome` (slice 2's `assertValidDocType` rejects a
+    // non-quadrant value — reused here, not re-implemented). It is validated
+    // and written BEFORE the `moveStage` call below so a rejected `--doc-type`
+    // never leaves a dangling stage-move event (same "reject clean, no partial
+    // write" shape the other guards in this case already have). Omitted
+    // entirely, `compound` stays byte-identical to pre-slice-3: `moveStage`
+    // only, no outcome written.
     case 'compound': {
       const id = requireField(positional[0] ?? flags.id, 'compound requires an id: fgos compound <id>');
       const item = listWork(dir).work[id];
@@ -659,6 +670,10 @@ async function runVerb(verb, flags, positional, dir) {
       }
       if (item.status !== 'proposed') {
         throw new StoreError('validation', `compound: work "${id}" is "${item.status}", not "proposed" — cannot move into compound-learn.`);
+      }
+      const docType = optionalField(flags['doc-type'], 'compound --doc-type requires a non-empty value: tutorial | how-to | reference | explanation.');
+      if (docType !== undefined) {
+        addOutcome(dir, { id, docType });
       }
       const { event } = moveStage(dir, { id, to: 'compound-learn', actor: 'human' });
       return { id, from: event.payload.from, to: event.payload.to, seq: event.seq };
