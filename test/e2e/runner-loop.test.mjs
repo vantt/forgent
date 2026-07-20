@@ -490,6 +490,8 @@ test('e2e stage-decompose (b) complex item: decompose sweep writes 2 children (r
   assert.equal(childB.status, 'todo', 'childB is blocked on childA, which is only proposed (not done) yet');
 
   // Accept childA into the tree (human close via the normal `done` door).
+  // A coding item must pass through the compound-learn stage before done (D3).
+  assert.equal(fgos(repoRoot, ['compound', childA.id]).status, 0);
   assert.equal(fgos(repoRoot, ['move', childA.id, '--to', 'done']).status, 0);
 
   // --once #2: childB's dep is now done — it becomes the frontier head.
@@ -499,6 +501,8 @@ test('e2e stage-decompose (b) complex item: decompose sweep writes 2 children (r
   assert.equal(view.work[childB.id].status, 'proposed');
   assert.equal(view.work[submitted.id].status, 'todo', 'the root is still blocked — childB is proposed, not done, yet');
 
+  // childB must also pass through compound-learn before done (D3).
+  assert.equal(fgos(repoRoot, ['compound', childB.id]).status, 0);
   assert.equal(fgos(repoRoot, ['move', childB.id, '--to', 'done']).status, 0);
 
   // --once #3: both children done -> the lineage filter drops -> the root is

@@ -17,7 +17,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fork } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { addWork, editWork, moveWork, addOutcome, addFriction, listWork, readRawEvents } from '../../src/state/store.mjs';
+import { addWork, editWork, moveWork, moveStage, addOutcome, addFriction, listWork, readRawEvents } from '../../src/state/store.mjs';
 
 const STORE_MJS = path.resolve(fileURLToPath(import.meta.url), '../../../src/state/store.mjs');
 
@@ -105,6 +105,10 @@ test('moveWork doing->done composes a learning record reflecting the item\'s act
     detail: 'first miss',
   });
 
+  // A coding item must pass through the compound-learn stage before it can
+  // close (D3) â€” advance the stage before the doing->done move the learning
+  // record is asserted on.
+  moveStage(dir, { id: 'learn-doing', to: 'compound-learn' });
   const { view } = moveWork(dir, { id: 'learn-doing', to: 'done', expectedStatus: 'doing', actor: 'human' });
 
   assert.ok(view.learnings, 'learnings key must exist once an item has closed');
@@ -123,6 +127,8 @@ test('moveWork proposed->done (the SECOND door into done) also composes a learni
   moveWork(dir, { id: 'learn-proposed', to: 'doing', expectedStatus: 'todo' });
   moveWork(dir, { id: 'learn-proposed', to: 'proposed', expectedStatus: 'doing' });
 
+  // Pass through compound-learn before the proposed->done close (D3).
+  moveStage(dir, { id: 'learn-proposed', to: 'compound-learn' });
   const { view } = moveWork(dir, { id: 'learn-proposed', to: 'done', expectedStatus: 'proposed', actor: 'human' });
 
   assert.ok(view.learnings?.['learn-proposed'], 'proposed->done must also produce a learning record');
@@ -135,6 +141,8 @@ test('moveWork to done for an item with no outcome and no friction still produce
   addSampleWork(dir, 'learn-empty');
   moveWork(dir, { id: 'learn-empty', to: 'doing', expectedStatus: 'todo' });
 
+  // Pass through compound-learn before the doing->done close (D3).
+  moveStage(dir, { id: 'learn-empty', to: 'compound-learn' });
   const { view } = moveWork(dir, { id: 'learn-empty', to: 'done', expectedStatus: 'doing', actor: 'human' });
 
   const record = view.learnings['learn-empty'][0];
@@ -150,6 +158,10 @@ test('the learning record rides the SAME work.move event that closes the item â€
   const dir = tmpDir();
   addSampleWork(dir, 'learn-rebuild');
   moveWork(dir, { id: 'learn-rebuild', to: 'doing', expectedStatus: 'todo' });
+  // Pass through compound-learn before the close (D3); snapshot the log AFTER
+  // this so the assertion below still proves the CLOSE itself appends exactly
+  // one event (the stage move is a separate, earlier lifecycle step).
+  moveStage(dir, { id: 'learn-rebuild', to: 'compound-learn' });
 
   const logPath = path.join(dir, 'events.jsonl');
   const filesBefore = fs.readdirSync(dir).sort();
@@ -163,7 +175,7 @@ test('the learning record rides the SAME work.move event that closes the item â€
   const lines = fs.readFileSync(logPath, 'utf8').split('\n').filter(Boolean);
   assert.equal(lines.length, eventsBefore + 1, 'exactly ONE event appended for the close â€” not two');
   const types = lines.map((l) => JSON.parse(l).type);
-  assert.deepEqual(types, ['work.add', 'work.move', 'work.move']);
+  assert.deepEqual(types, ['work.add', 'work.move', 'work.stage', 'work.move']);
   assert.equal(event.type, 'work.move');
   assert.ok(event.payload.learning, 'the returned move event itself carries the learning field');
 
@@ -414,6 +426,9 @@ test('moveWork under concurrent OS processes racing the SAME expectedStatus CAS 
   const dir = tmpDir();
   addSampleWork(dir, 'race-move');
   moveWork(dir, { id: 'race-move', to: 'doing', expectedStatus: 'todo' });
+  // Advance to compound-learn so the raced doing->done move is gated only by
+  // the status CAS (D3) â€” the race is about concurrent CAS, not the stage gate.
+  moveStage(dir, { id: 'race-move', to: 'compound-learn' });
   const N = 6;
 
   const results = await raceAcrossProcesses(

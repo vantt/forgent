@@ -5,7 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync, spawnSync } from 'node:child_process';
-import { addOutcome, addFriction, moveWork, addWork, editWork, StoreError } from '../../src/state/store.mjs';
+import { addOutcome, addFriction, moveWork, moveStage, addWork, editWork, StoreError } from '../../src/state/store.mjs';
 import { createSession, endSession } from '../../src/runner/session.mjs';
 
 // The CLI under test, resolved by absolute path so it works regardless of
@@ -469,8 +469,7 @@ test('repair refuses mid-file corruption via the real CLI (valid, corrupt, valid
 
 test('done is terminal via the real CLI: moving out of done is refused as precondition, exit 2, no event written', () => {
   const cwd = tmpCwd();
-  addOk(cwd, 'terminal-item');
-  run(cwd, ['move', 'terminal-item', '--to', 'doing']);
+  toCompoundLearn(cwd, 'terminal-item');
   run(cwd, ['move', 'terminal-item', '--to', 'done']);
   const before = eventLines(cwd).length;
 
@@ -728,6 +727,15 @@ function toProposed(cwd, id) {
   return run(cwd, ['move', id, '--to', 'proposed']);
 }
 
+// A coding item must pass through the compound-learn stage before it can
+// close (D3). Mirrors toProposed one step further: it leaves the item at
+// status `proposed`, stage `compound-learn` — ready for `move --to done` /
+// `approve` to pass the done-gate.
+function toCompoundLearn(cwd, id) {
+  toProposed(cwd, id);
+  return run(cwd, ['compound', id]);
+}
+
 test('move doing -> proposed applies via the real CLI, exit 0', () => {
   const cwd = tmpCwd();
   const result = toProposed(cwd, 'goal-checked');
@@ -737,7 +745,7 @@ test('move doing -> proposed applies via the real CLI, exit 0', () => {
 
 test('move proposed -> done (approval) applies via the real CLI, exit 0', () => {
   const cwd = tmpCwd();
-  toProposed(cwd, 'approved-item');
+  toCompoundLearn(cwd, 'approved-item');
   const result = run(cwd, ['move', 'approved-item', '--to', 'done']);
   assert.equal(result.status, 0);
   assert.equal(stateView(cwd).work['approved-item'].status, 'done');
@@ -885,7 +893,7 @@ test('ready excludes a todo item whose dep sits at proposed (proposed is not don
 
 test('ready opens a todo item once its dep reaches done (approved, not merely proposed)', () => {
   const cwd = tmpCwd();
-  toProposed(cwd, 'dep-approved');
+  toCompoundLearn(cwd, 'dep-approved');
   assert.equal(run(cwd, ['move', 'dep-approved', '--to', 'done']).status, 0);
   assert.equal(
     run(cwd, ['add', 'unblocked-item', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--deps', 'dep-approved']).status,
@@ -1595,7 +1603,7 @@ test('answer via the real CLI stamps actor "human" on the event payload and fold
 
 test('move to done via the real CLI stamps actor "human" on the event payload and folds into a "close" settlement', () => {
   const cwd = tmpCwd();
-  toProposed(cwd, 'close-actor-item');
+  toCompoundLearn(cwd, 'close-actor-item');
 
   const result = run(cwd, ['move', 'close-actor-item', '--to', 'done']);
   assert.equal(result.status, 0);
@@ -1630,7 +1638,7 @@ test('discover (sync verb) on a clear verdict stamps actor "session" on the work
 
 test('check returns the settlement data — per-kind/actor counts + recent records — when settlement data exists', () => {
   const cwd = tmpCwd();
-  toProposed(cwd, 'settle-item');
+  toCompoundLearn(cwd, 'settle-item');
   run(cwd, ['move', 'settle-item', '--to', 'done']);
 
   const result = run(cwd, ['check']);
@@ -1797,6 +1805,8 @@ test('check returns the learning data — outcome/friction/settlement summary �
     detail: 'miss',
   });
 
+  // Pass through compound-learn before the doing->done close (D3).
+  moveStage(dir, { id: 'learning-item', to: 'compound-learn' });
   const result = run(cwd, ['move', 'learning-item', '--to', 'done']);
   assert.equal(result.status, 0);
 
@@ -2148,6 +2158,17 @@ function gitAtCwd(cwd, args) {
 function commitPending(cwd, message) {
   execFileSync('git', ['add', '-A'], { cwd });
   execFileSync('git', ['commit', '-q', '-m', message], { cwd });
+}
+
+// Advance a proposed runner/pull item through the compound-learn stage (D3)
+// and fold the resulting stage event into main's commit, so the tree stays
+// clean and `approve` can close it to done. Mirrors the state a real
+// compound-learn transition leaves behind for a git-backed proposed item.
+function compoundAndCommit(cwd, id) {
+  const result = run(cwd, ['compound', id]);
+  assert.equal(result.status, 0, `compound ${id} should succeed: ${result.stderr}`);
+  commitPending(cwd, `state: compound ${id}`);
+  return result;
 }
 
 // Simulates what the real runner (loop.mjs/worktree.mjs) leaves behind for a
@@ -2581,6 +2602,7 @@ test('approve of a runner item (happy path): merges fgw/<id> into main, verifies
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   makeRunnerProposedItem(cwd, 'approve-runner-item', { verify: 'test -f approve-runner-item-produced.txt' });
+  compoundAndCommit(cwd, 'approve-runner-item');
 
   const result = run(cwd, ['approve', 'approve-runner-item']);
   assert.equal(result.status, 0, result.stderr);
@@ -2600,6 +2622,7 @@ test('approve of a runner item succeeds when ONLY .fgos/ (the live event log) is
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   makeRunnerProposedItem(cwd, 'approve-fgos-only-dirty', { verify: 'test -f approve-fgos-only-dirty-produced.txt' });
+  compoundAndCommit(cwd, 'approve-fgos-only-dirty');
 
   // Dirty ONLY `.fgos/events.jsonl` on main after the item is proposed —
   // an unrelated `add` appends an event and never touches any other file —
@@ -2635,6 +2658,7 @@ test('approve of a leaf item with a clean merge lands the work on fgw/<root> (no
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   makeRunnerProposedLeafItem(cwd, 'approve-leaf-root', 'approve-leaf-child', { verify: 'test -f approve-leaf-child-produced.txt' });
+  compoundAndCommit(cwd, 'approve-leaf-child');
 
   const headBefore = gitHead(cwd);
   const result = run(cwd, ['approve', 'approve-leaf-child']);
@@ -2784,6 +2808,7 @@ test('approve of a pull-door item (no merge, code already on main): re-verifies 
   run(cwd, ['take', '--id', 'approve-pull-item']);
   commitFile(cwd, 'proof.txt');
   run(cwd, ['return', 'approve-pull-item']);
+  compoundAndCommit(cwd, 'approve-pull-item');
 
   const result = run(cwd, ['approve', 'approve-pull-item']);
   assert.equal(result.status, 0, result.stderr);
@@ -2815,6 +2840,7 @@ test('approve of a legacy item with a passing verify closes it to done — legac
   addOk(cwd, 'approve-legacy-ok-item', { verify: 'true' });
   run(cwd, ['move', 'approve-legacy-ok-item', '--to', 'doing']);
   run(cwd, ['move', 'approve-legacy-ok-item', '--to', 'proposed']);
+  assert.equal(run(cwd, ['compound', 'approve-legacy-ok-item']).status, 0);
 
   const result = run(cwd, ['approve', 'approve-legacy-ok-item']);
   assert.equal(result.status, 0, result.stderr);
@@ -2826,6 +2852,7 @@ test('approve twice: the second approve on an already-done item is rejected as p
   addOk(cwd, 'approve-twice-item', { verify: 'true' });
   run(cwd, ['move', 'approve-twice-item', '--to', 'doing']);
   run(cwd, ['move', 'approve-twice-item', '--to', 'proposed']);
+  assert.equal(run(cwd, ['compound', 'approve-twice-item']).status, 0);
   assert.equal(run(cwd, ['approve', 'approve-twice-item']).status, 0);
 
   const result = run(cwd, ['approve', 'approve-twice-item']);
@@ -2906,6 +2933,7 @@ test('approve of the same self-modifying diff PROCEEDS with --acknowledge-iron-l
   makeRunnerProposedItemTouching(cwd, 'iron-ack-item', 'src/runner/probe.mjs', {
     verify: 'test -f src/runner/probe.mjs',
   });
+  compoundAndCommit(cwd, 'iron-ack-item');
 
   const result = run(cwd, ['approve', 'iron-ack-item', '--acknowledge-iron-law']);
   assert.equal(result.status, 0, `approve with acknowledgment must succeed: ${result.stderr}`);
@@ -2925,6 +2953,7 @@ test('approve of an ordinary runner item (diff touches no self-modifying module)
   makeRunnerProposedItemTouching(cwd, 'iron-plain-item', 'docs/notes.txt', {
     verify: 'test -f docs/notes.txt',
   });
+  compoundAndCommit(cwd, 'iron-plain-item');
 
   const result = run(cwd, ['approve', 'iron-plain-item']);
   assert.equal(result.status, 0, `an ordinary diff must approve without any acknowledgment: ${result.stderr}`);
@@ -3165,6 +3194,7 @@ test('approve --github with a dirty main tree is NOT blocked by the local dirty-
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   makeRunnerProposedItem(cwd, 'gh-approve-dirty');
+  compoundAndCommit(cwd, 'gh-approve-dirty');
   // An unrelated dirty file on main — a LOCAL approve would refuse this, but
   // a GitHub-side merge never touches the local tree, so it must not gate.
   fs.writeFileSync(path.join(cwd, 'unrelated-dirt.txt'), 'uncommitted\n');
@@ -3181,6 +3211,7 @@ test('approve --github --pr on a fake gh merge success transitions the item prop
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   makeRunnerProposedItem(cwd, 'gh-approve-merged');
+  compoundAndCommit(cwd, 'gh-approve-merged');
   const fake = writeMergeSuccessFake(cwd);
 
   const result = run(cwd, ['approve', 'gh-approve-merged', '--github', '--pr', '42'], { FGOS_GH_COMMAND: fake });
@@ -3910,6 +3941,9 @@ test('approve from the main checkout is unaffected by the guard even while a ses
   const cwdR = initSessionSafeCwd();
   run(cwdR, ['init']);
   makeSessionSafeRunnerItem(cwdR, 'approve-main-runner', { verify: 'test -f approve-main-runner-produced.txt' });
+  // .fgos/ is git-ignored in a session-safe cwd (never committed), so advance
+  // the stage without folding it into a commit — plain compound, no commitPending.
+  assert.equal(run(cwdR, ['compound', 'approve-main-runner']).status, 0);
   const sessionR = createSession(cwdR, { sessionId: 'sess-active-runner' });
   try {
     const resR = run(cwdR, ['approve', 'approve-main-runner']);
@@ -3926,6 +3960,8 @@ test('approve from the main checkout is unaffected by the guard even while a ses
   run(cwdP, ['take', '--id', 'approve-main-pull']);
   commitFile(cwdP, 'proof.txt');
   run(cwdP, ['return', 'approve-main-pull']);
+  // .fgos/ is git-ignored in a session-safe cwd — plain compound, no commit.
+  assert.equal(run(cwdP, ['compound', 'approve-main-pull']).status, 0);
   const sessionP = createSession(cwdP, { sessionId: 'sess-active-pull' });
   try {
     const resP = run(cwdP, ['approve', 'approve-main-pull']);
@@ -4034,6 +4070,7 @@ test('approve from the main checkout is unaffected by the ad-hoc-worktree guard 
   const cwdR = initGitCwdMain();
   run(cwdR, ['init']);
   makeRunnerProposedItem(cwdR, 'approve-adhoc-main-runner', { verify: 'test -f approve-adhoc-main-runner-produced.txt' });
+  compoundAndCommit(cwdR, 'approve-adhoc-main-runner');
   const resR = run(cwdR, ['approve', 'approve-adhoc-main-runner']);
   assert.equal(resR.status, 0, `runner approve from main must still succeed: ${resR.stderr}`);
   assert.equal(stateView(cwdR).work['approve-adhoc-main-runner'].status, 'done');
@@ -4044,6 +4081,7 @@ test('approve from the main checkout is unaffected by the ad-hoc-worktree guard 
   run(cwdP, ['take', '--id', 'approve-adhoc-main-pull']);
   commitFile(cwdP, 'proof.txt');
   run(cwdP, ['return', 'approve-adhoc-main-pull']);
+  compoundAndCommit(cwdP, 'approve-adhoc-main-pull');
   const resP = run(cwdP, ['approve', 'approve-adhoc-main-pull']);
   assert.equal(resP.status, 0, `pull approve from main must still succeed: ${resP.stderr}`);
   assert.equal(stateView(cwdP).work['approve-adhoc-main-pull'].status, 'done');
@@ -4130,6 +4168,7 @@ test('approve --github --pr on the same self-modifying diff PROCEEDS with --ackn
   makeRunnerProposedItemTouching(cwd, 'gh-iron-ack-item', 'src/runner/probe.mjs', {
     verify: 'test -f src/runner/probe.mjs',
   });
+  compoundAndCommit(cwd, 'gh-iron-ack-item');
   const fake = writeMergeSuccessFake(cwd);
 
   const result = run(cwd, ['approve', 'gh-iron-ack-item', '--github', '--acknowledge-iron-law', '--pr', '14'], { FGOS_GH_COMMAND: fake });

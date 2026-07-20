@@ -32,6 +32,7 @@ import { rebuildView, viewRevision } from './replay.mjs';
 import { graphMetrics as computeGraphMetrics, whatIf as computeWhatIf, classifyStaleDoing, footprintOverlap } from './graph-metrics.mjs';
 import { transitionWork, FsmError } from './fsm.mjs';
 import { transitionStage } from './stage.mjs';
+import { getDomain, stageForStep } from './domains.mjs';
 import { validateWork, WorkValidationError, DEFAULTS } from './work.mjs';
 import { EventLogError } from './events.mjs';
 import { frontier } from './frontier.mjs';
@@ -361,6 +362,33 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, act
   if (parentSnapshotAtAsk !== undefined) {
     rawEvent.payload.parentSnapshotAtAsk = parentSnapshotAtAsk;
   }
+  // Compound-learn done-gate: a work item whose domain declares a
+  // Compound-learn stage can never reach `done` without first passing through
+  // that stage — the synthesis layer is FSM-enforced, never left to a reflex
+  // that can be silently lost. Placed AFTER transitionWork's CAS + precondition
+  // checks (line above) so a stale caller still gets 'conflict' first, and
+  // BEFORE the append below so a refused close persists nothing (the whole
+  // block runs under the held events.lock). Both doors into `done` — the
+  // proposed->done approval and the doing->done hand-move — converge on this
+  // one call, so gating here covers both. Domains that declare no
+  // Compound-learn stage (e.g. synthetic) are exempt: coding-only enforcement.
+  // The current stage is read lazily, exactly as stage.mjs does — a missing
+  // `stage` reads as the domain's Execute stage — so a coding item that never
+  // moved past execution is correctly refused.
+  if (to === 'done') {
+    const domain = getDomain(work.domain);
+    const compoundLearnStage = stageForStep(domain, 'Compound-learn');
+    if (compoundLearnStage !== undefined) {
+      const currentStage = work.stage ?? stageForStep(domain, 'Execute');
+      if (currentStage !== compoundLearnStage) {
+        throw new StoreError(
+          'precondition',
+          `work "${id}" cannot move to "done" from stage "${currentStage}" — it must pass through the "${compoundLearnStage}" stage first so the compound-learn synthesis is never silently skipped.`,
+        );
+      }
+    }
+  }
+
   // Câu-6 tự động (per Phase 3 S3-closeout (c), six-questions L5): BOTH doors
   // into `done` (doing->done and proposed->done) converge on this one
   // `moveWork` call, so gating on `to === 'done'` here — rather than at each

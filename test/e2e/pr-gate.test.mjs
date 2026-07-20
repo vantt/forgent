@@ -200,8 +200,11 @@ test('e2e pr-gate (a) runner item full loop: add -> runner dispatch -> proposed,
   assert.equal(reviewData.source, 'runner');
   assert.match(reviewData.diff, /pr-a-produced\.txt/);
 
+  // A coding item must pass through the compound-learn stage before done (D3).
+  assert.equal(fgos(repoRoot, ['compound', 'pr-a-item']).status, 0);
+
   // approve's runner path refuses a dirty main tree — fold the init/add/
-  // dispatch log deltas into one real commit first.
+  // dispatch/compound log deltas into one real commit first.
   commitPending(repoRoot, 'state: propose pr-a-item');
 
   const approve = fgos(repoRoot, ['approve', 'pr-a-item']);
@@ -304,6 +307,9 @@ test('e2e pr-gate (c) pull-door item: take -> commit -> return -> proposed, revi
   assert.match(reviewData.diff, /pr-c-proof\.txt/);
   assert.deepEqual(reviewData.warnings, [], 'a single-commit pull range carries no interleaving warning');
 
+  // A coding item must pass through the compound-learn stage before done (D3);
+  // a pull-door approve re-verifies on main and tolerates the .fgos delta.
+  assert.equal(fgos(repoRoot, ['compound', 'pr-c-item']).status, 0);
   const approve = fgos(repoRoot, ['approve', 'pr-c-item']);
   assert.equal(approve.status, 0, `approve failed: ${approve.stderr}`);
   const approveData = envelopeData(approve.stdout);
@@ -426,6 +432,8 @@ test('e2e pr-gate (e) branch-source item full loop: park (blocked + live branch)
   assert.equal(review.status, 0, `review failed: ${review.stderr}`);
   assert.equal(envelopeData(review.stdout).source, 'runner', "D2: classifySource sees the live branch — review/approve treat this exactly like a normal runner-source item, no merge.mjs changes needed");
 
+  // A coding item must pass through the compound-learn stage before done (D3).
+  assert.equal(fgos(repoRoot, ['compound', 'pr-e-item']).status, 0);
   commitPending(repoRoot, 'state: propose pr-e-item');
 
   const approve = fgos(repoRoot, ['approve', 'pr-e-item']);

@@ -278,9 +278,13 @@ test(
     assert.equal(reviewData.source, 'runner');
     assert.match(reviewData.diff, /fixed\.txt/);
 
+    // A coding item must pass through the compound-learn stage before it can
+    // close (D3) — take the deliberate transition while the item is proposed.
+    assert.equal(fgos(repoRoot, ['compound', submitted.id]).status, 0);
+
     // approve's runner path refuses a dirty main tree — fold the evolve/
-    // dispatch log deltas into a real commit first (same convention every
-    // pr-gate.test.mjs runner scenario follows).
+    // dispatch/compound log deltas into a real commit first (same convention
+    // every pr-gate.test.mjs runner scenario follows).
     commitPending(repoRoot, `state: propose ${submitted.id}`);
 
     // (7) `approve <id>` WITHOUT --acknowledge-iron-law: a REAL refusal
