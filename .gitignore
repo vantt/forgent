@@ -7,6 +7,11 @@
 .fgos/logs/
 node_modules/
 
+# test-leak artifacts — belt against auto-commit clobber (backlog STR74/STR65)
+output.txt
+*-output.txt
+.fgos/sessions.json
+
 # BEE:START
 .bee/state.json
 .bee/reservations.json
