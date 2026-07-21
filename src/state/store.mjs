@@ -512,8 +512,13 @@ const DIATAXIS_DOC_TYPES = new Set(['tutorial', 'how-to', 'reference', 'explanat
 // Shared optional-shape check for `payload.docType` (mirrors the `docsRef`
 // idiom in work.mjs: validated only when present, `null` treated as
 // absent/untagged, per D6). Throws the same `StoreError('validation', …)`
-// shape every other capture-door check in this file uses.
-function assertValidDocType(payload) {
+// shape every other capture-door check in this file uses. Exported (slice-3
+// P1 fix) so a caller — `bin/fgos.mjs`'s `compound --doc-type` — can
+// pre-validate a quadrant BEFORE any write, reusing this single
+// `DIATAXIS_DOC_TYPES` set rather than duplicating the enum at the CLI
+// layer. `addOutcome`/`addFriction` below still call it too, so validation
+// stays identical whichever door the payload comes through.
+export function assertValidDocType(payload) {
   if (payload.docType === undefined || payload.docType === null) {
     return;
   }

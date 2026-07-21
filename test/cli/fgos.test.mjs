@@ -860,6 +860,42 @@ test('a compound --doc-type tag survives a rebuild of the view from the log alon
   assert.deepEqual(stateView(cwd), before);
 });
 
+// --- compound-learn-enduser-docs slice 3 P1 fix: stage-aware, atomic
+// `compound --doc-type` (routed-flow case + no-dangling-outcome guarantee).
+// `fgos-routing` loads `fgos-compounding` only once an item has already
+// arrived at stage `compound-learn`, and that skill's own producer call is
+// `fgos compound <id> --doc-type <quadrant>` — so the CLI must tag an
+// already-compound-learn item without attempting (and failing) a second
+// stage move, and a rejected --doc-type must never leave a dangling write
+// behind on ANY source stage, not just the from-executing one already
+// covered above.
+
+test('compound --doc-type on an item already at stage compound-learn (the routed case) tags the capture without moving stage again, exit 0', () => {
+  const cwd = tmpCwd();
+  toCompoundLearn(cwd, 'compound-doctype-retag');
+  const before = eventLines(cwd).length;
+  const result = run(cwd, ['compound', 'compound-doctype-retag', '--doc-type', 'how-to']);
+  assert.equal(result.status, 0);
+  assert.equal(eventLines(cwd).length, before + 1, 'only the outcome event is written — no second stage-move event');
+  assert.equal(stateView(cwd).work['compound-doctype-retag'].stage, 'compound-learn');
+
+  const checkResult = run(cwd, ['check', 'compound-doctype-retag']);
+  assert.equal(checkResult.status, 0);
+  const data = envelopeData(checkResult.stdout);
+  assert.equal(data.outcomes[0].id, 'compound-doctype-retag');
+  assert.equal(data.outcomes[0].docType, 'how-to');
+});
+
+test('compound rejects a non-quadrant --doc-type on an item already at stage compound-learn, exit 4, zero events (no dangling outcome from the illegal-move path)', () => {
+  const cwd = tmpCwd();
+  toCompoundLearn(cwd, 'compound-doctype-retag-bad');
+  const before = eventLines(cwd).length;
+  const result = run(cwd, ['compound', 'compound-doctype-retag-bad', '--doc-type', 'banana']);
+  assert.equal(result.status, 4);
+  assert.equal(eventLines(cwd).length, before, 'a rejected --doc-type on an already-compound-learn item must write nothing at all');
+  assert.equal(stateView(cwd).work['compound-doctype-retag-bad'].stage, 'compound-learn');
+});
+
 test('move proposed -> todo (rejection) without --reason is refused as validation, exit 4, no event written', () => {
   const cwd = tmpCwd();
   toProposed(cwd, 'no-reason-item');

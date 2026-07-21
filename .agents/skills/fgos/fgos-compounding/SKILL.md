@@ -32,8 +32,8 @@ evidence-quoted end-user document.
   hand. The stored tag is the machine-checkable half of this step; a
   document with no matching tag is unfinished synthesis, not a shortcut.
 - Do not write the end-user document anywhere outside
-  `repo/docs/<quadrant>/` matching the tag just stored —
-  `repo/docs/specs/` is the separate, technology-agnostic reference layer
+  `docs/<quadrant>/` matching the tag just stored —
+  `docs/specs/` is the separate, technology-agnostic reference layer
   this skill never touches.
 - Do not apply the item's own stage or status move yourself beyond the one
   producer command named below. The engine still validates and applies
@@ -64,11 +64,13 @@ evidence-quoted end-user document.
 
 3. **Store the tag.** Run `fgos compound <id> --doc-type <quadrant>` with
    the quadrant chosen above. This is the one producer surface this step is
-   allowed to use — it stores the Diataxis tag on the item's capture and
-   moves the item onto the `compound-learn` stage in the same call. Absent
-   this call, the item's capture stays untagged and synthesis is unfinished.
+   allowed to use — it stores the Diataxis tag on the item's capture. Since
+   this step only runs once the item is already at stage `compound-learn`,
+   the call tags the capture without moving stage again (there is no
+   compound-learn -> compound-learn move to make). Absent this call, the
+   item's capture stays untagged and synthesis is unfinished.
 
-4. **Write the document.** Create (if missing) `repo/docs/<quadrant>/` and
+4. **Write the document.** Create (if missing) `docs/<quadrant>/` and
    write at least one document there whose content is quoted from the real
    capture read in step 1 — never paraphrased into something the capture
    did not actually say. Match the quadrant's own shape: a tutorial reads

@@ -19,7 +19,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { initStore, addWork, moveWork, moveStage, editWork, addDecision, addOutcome, addFriction, listWork, readyWork, graphMetrics, graphWhatIf, staleDoingAdvisory, footprintConflicts, readRawEvents, rebuild, putInAwaiting, answerAwaiting, StoreError, EXIT_CODES, categoryOf } from '../src/state/store.mjs';
+import { initStore, addWork, moveWork, moveStage, editWork, addDecision, addOutcome, addFriction, listWork, readyWork, graphMetrics, graphWhatIf, staleDoingAdvisory, footprintConflicts, readRawEvents, rebuild, putInAwaiting, answerAwaiting, StoreError, EXIT_CODES, categoryOf, assertValidDocType } from '../src/state/store.mjs';
 import { repairTruncatedLastLine } from '../src/state/events.mjs';
 import { deriveTitle, classify, generateId } from '../src/intake/classify.mjs';
 import { wrapEnvelope } from '../src/state/envelope.mjs';
@@ -654,14 +654,23 @@ async function runVerb(verb, flags, positional, dir) {
     //
     // `--doc-type <quadrant>` (slice 3, CONTEXT D4/D8) is the minimal producer
     // surface the inducted `fgos-compounding` skill uses to store its Diataxis
-    // classification: when given, it stores a `docType`-tagged outcome via the
-    // already-shipped `addOutcome` (slice 2's `assertValidDocType` rejects a
-    // non-quadrant value — reused here, not re-implemented). It is validated
-    // and written BEFORE the `moveStage` call below so a rejected `--doc-type`
-    // never leaves a dangling stage-move event (same "reject clean, no partial
-    // write" shape the other guards in this case already have). Omitted
+    // classification: when given, it is PRE-VALIDATED via store.mjs's exported
+    // `assertValidDocType` (the single `DIATAXIS_DOC_TYPES` set, not
+    // re-implemented here) BEFORE any write — a non-quadrant value is
+    // rejected with zero events, on every stage. Real guarantee, not
+    // "reject clean, no partial write" in general: once validation passes,
+    // this case is STAGE-AWARE (P1 fix, slice-3 review). An item already at
+    // stage `compound-learn` is the routed case (`fgos-compounding` runs
+    // only once an item has already arrived there) — the docType is tagged
+    // via `addOutcome` WITHOUT a stage move, because `moveStage` has no
+    // compound-learn -> compound-learn edge and would throw; writing the
+    // outcome first and then hitting that throw is exactly the dangling-
+    // outcome bug this fix closes. Every other source stage keeps the
+    // original order — `moveStage` first, `addOutcome` second — so an
+    // illegal source stage throws before any outcome is written. Omitted
     // entirely, `compound` stays byte-identical to pre-slice-3: `moveStage`
-    // only, no outcome written.
+    // only, no outcome written, still rejecting an already-compound-learn
+    // re-compound.
     case 'compound': {
       const id = requireField(positional[0] ?? flags.id, 'compound requires an id: fgos compound <id>');
       const item = listWork(dir).work[id];
@@ -673,9 +682,16 @@ async function runVerb(verb, flags, positional, dir) {
       }
       const docType = optionalField(flags['doc-type'], 'compound --doc-type requires a non-empty value: tutorial | how-to | reference | explanation.');
       if (docType !== undefined) {
-        addOutcome(dir, { id, docType });
+        assertValidDocType({ docType });
+      }
+      if (docType !== undefined && item.stage === 'compound-learn') {
+        const { event } = addOutcome(dir, { id, docType });
+        return { id, docType, stage: item.stage, seq: event.seq };
       }
       const { event } = moveStage(dir, { id, to: 'compound-learn', actor: 'human' });
+      if (docType !== undefined) {
+        addOutcome(dir, { id, docType });
+      }
       return { id, from: event.payload.from, to: event.payload.to, seq: event.seq };
     }
 
