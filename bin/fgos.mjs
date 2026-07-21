@@ -27,7 +27,7 @@ import { loadRunnerConfig } from '../src/runner/dispatch.mjs';
 import { resolveDiscovery } from '../src/intake/discovery.mjs';
 import { resolveDecompose } from '../src/intake/decompose.mjs';
 import { computeEntropy, computeCounts } from '../src/report/entropy.mjs';
-import { buildEnduserIndex, QUADRANTS } from '../src/report/enduser-index.mjs';
+import { buildEnduserIndex, QUADRANTS, findSourceCaptureIds } from '../src/report/enduser-index.mjs';
 import { rankCandidates } from '../src/evolve/candidates.mjs';
 import { rankImpact } from '../src/state/impact.mjs';
 import { runGoalCheck } from '../src/runner/goal-check.mjs';
@@ -946,6 +946,38 @@ async function runVerb(verb, flags, positional, dir) {
         path: path.relative(repoRoot, manifestPath).split(path.sep).join('/'),
         count: entries.length,
         entries,
+      };
+    }
+
+    // Read-only doc↔capture linkage gather (Slice ① gộp-sống, CONTEXT.md
+    // D13/D17): given a docPath, gathers EVERY compound-learn capture linked
+    // to it — via the plural `findSourceCaptureIds` helper over the SAME
+    // outcomes view `docs-index` folds — each rendered as the same
+    // check-content shape `fgos check` already returns
+    // (id/predicted/actual/docType/docPath), so a future export skill can
+    // reconstruct a living doc from source with no loss of detail (D13).
+    //
+    // Uses `listWork(dir)` — NOT `rebuild(dir)` — for the exact same reason
+    // `docs-index` above does: both replay the same event log through the
+    // same fold, but `rebuild(dir)` additionally overwrites
+    // `.fgos/state.json`, which would contradict this verb's own
+    // `access: 'read'` declaration. Never calls `rebuild`/`writeView`.
+    //
+    // A docPath with zero linked captures is SUCCESS, not an error — an
+    // as-yet-unlinked doc (or one with no captures recorded) is a
+    // legitimate, common state; the caller still exits 0 with an empty list.
+    case 'doc-sources': {
+      const docPath = requireField(
+        positional[0] ?? flags['doc-path'],
+        'doc-sources requires a docPath: fgos doc-sources <docPath>',
+      );
+      const view = listWork(dir);
+      const outcomes = view.outcomes ?? {};
+      const ids = findSourceCaptureIds(outcomes, docPath);
+      return {
+        docPath,
+        count: ids.length,
+        captures: ids.map((id) => collectOutcomeEntry(id, outcomes[id])),
       };
     }
 

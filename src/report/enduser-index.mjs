@@ -64,6 +64,27 @@ export function findSourceCaptureId(outcomesView, docPath) {
 }
 
 /**
+ * Find EVERY outcome id whose `docPath` matches `docPath` exactly — the
+ * plural counterpart to `findSourceCaptureId` above, added for the Slice ①
+ * gộp-sống merge (CONTEXT.md D13/D17): the export skill must gather ALL
+ * captures linked to a docPath to reconstruct a living doc with no loss of
+ * detail, not just the first — the singular helper's first-match behavior
+ * above is unchanged and stays the index's own sourceCaptureId resolver.
+ * Returns ids in the outcomesView's own stable insertion (object-key) order;
+ * `[]` when no outcome carries this docPath — a docPath with zero linked
+ * captures is a legitimate, common state, never an error.
+ */
+export function findSourceCaptureIds(outcomesView, docPath) {
+  const ids = [];
+  for (const [id, outcome] of Object.entries(outcomesView ?? {})) {
+    if (outcome?.docPath === docPath) {
+      ids.push(id);
+    }
+  }
+  return ids;
+}
+
+/**
  * Build the manifest array from enumerated doc entries + the rebuilt
  * outcomes view. `docEntries` is `[{ quadrant, docPath, title }]` — exactly
  * what the entry-layer enumeration step produces per doc file found under a

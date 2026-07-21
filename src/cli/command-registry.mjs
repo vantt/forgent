@@ -432,6 +432,21 @@ export const COMMAND_REGISTRY = [
     deprecated: null,
   },
   {
+    name: 'doc-sources',
+    invoke: 'fgos doc-sources',
+    description: 'Read-only: gather every compound-learn capture linked to a docPath (ALL matches, not just the first) as check-content (id/predicted/actual/docType/docPath), so an export skill can reconstruct a doc from source with no loss (CONTEXT.md D13). A docPath with zero linked captures is success, reported as an empty list.',
+    parameters: {
+      type: 'object',
+      properties: {
+        'doc-path': { type: 'string', description: 'The end-user doc path to gather linked captures for (positional or --doc-path).' },
+      },
+      required: ['doc-path'],
+    },
+    examples: ['fgos doc-sources docs/how-to/check-rollup-progress.md'],
+    access: 'read',
+    deprecated: null,
+  },
+  {
     name: 'session',
     invoke: 'fgos session',
     description: 'Per-session git worktree lifecycle: "start" opens a detached-HEAD worktree, "end" removes it, "list" (read-only) prints the registry.',

@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
-import { buildEnduserIndex, findSourceCaptureId, QUADRANT_META, QUADRANTS } from '../../src/report/enduser-index.mjs';
+import { buildEnduserIndex, findSourceCaptureId, findSourceCaptureIds, QUADRANT_META, QUADRANTS } from '../../src/report/enduser-index.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '../..');
@@ -39,6 +39,31 @@ test('findSourceCaptureId returns the id whose outcome docPath matches, or null 
   assert.equal(findSourceCaptureId(outcomesView, 'docs/how-to/foo.md'), 'work-a');
   assert.equal(findSourceCaptureId(outcomesView, 'docs/how-to/bar.md'), null);
   assert.equal(findSourceCaptureId(undefined, 'docs/how-to/foo.md'), null);
+});
+
+test('findSourceCaptureIds returns ALL outcome ids whose docPath matches, in stable insertion order (D13 no-loss gather)', () => {
+  const outcomesView = {
+    'work-a': { docPath: 'docs/how-to/foo.md' },
+    'work-b': { docPath: 'docs/how-to/bar.md' },
+    'work-c': { docPath: 'docs/how-to/foo.md' },
+  };
+  assert.deepEqual(findSourceCaptureIds(outcomesView, 'docs/how-to/foo.md'), ['work-a', 'work-c']);
+});
+
+test('findSourceCaptureIds returns [] when no outcome matches the docPath, or the view is empty/absent', () => {
+  const outcomesView = { 'work-a': { docPath: 'docs/how-to/foo.md' } };
+  assert.deepEqual(findSourceCaptureIds(outcomesView, 'docs/how-to/nope.md'), []);
+  assert.deepEqual(findSourceCaptureIds({}, 'docs/how-to/foo.md'), []);
+  assert.deepEqual(findSourceCaptureIds(undefined, 'docs/how-to/foo.md'), []);
+});
+
+test('findSourceCaptureIds leaves the singular findSourceCaptureId behavior (first-match) unchanged', () => {
+  const outcomesView = {
+    'work-a': { docPath: 'docs/how-to/foo.md' },
+    'work-b': { docPath: 'docs/how-to/foo.md' },
+  };
+  assert.equal(findSourceCaptureId(outcomesView, 'docs/how-to/foo.md'), 'work-a');
+  assert.deepEqual(findSourceCaptureIds(outcomesView, 'docs/how-to/foo.md'), ['work-a', 'work-b']);
 });
 
 test('buildEnduserIndex seeds purpose/audience from the fixed quadrant mapping and resolves sourceCaptureId', () => {

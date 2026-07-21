@@ -1522,6 +1522,68 @@ test('check never mutates state: events.jsonl and state.json are byte-identical 
   assert.equal(fs.readFileSync(viewPath(cwd), 'utf8'), viewBefore, 'state.json must be untouched by check');
 });
 
+// --- `fgos doc-sources <docPath>` (Slice ① gộp-sống, CONTEXT.md D13/D17):
+// read-only gather of EVERY compound-learn capture linked to a docPath, not
+// just the first (findSourceCaptureIds's plural gather, closing the D13
+// no-loss gap `findSourceCaptureId`'s first-match leaves).
+
+test('doc-sources returns every capture linked to a docPath (multiplicity — the D13 gap closed)', () => {
+  const cwd = tmpCwd();
+  toProposed(cwd, 'doc-sources-a');
+  run(cwd, ['compound', 'doc-sources-a', '--doc-type', 'how-to', '--doc-path', 'docs/how-to/shared.md']);
+  toProposed(cwd, 'doc-sources-b');
+  run(cwd, ['compound', 'doc-sources-b', '--doc-type', 'how-to', '--doc-path', 'docs/how-to/shared.md']);
+  // A third item linked to a DIFFERENT docPath must never leak into the result.
+  toProposed(cwd, 'doc-sources-other');
+  run(cwd, ['compound', 'doc-sources-other', '--doc-type', 'how-to', '--doc-path', 'docs/how-to/other.md']);
+
+  const result = run(cwd, ['doc-sources', 'docs/how-to/shared.md']);
+  assert.equal(result.status, 0);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.docPath, 'docs/how-to/shared.md');
+  assert.equal(data.count, 2);
+  assert.deepEqual(
+    data.captures.map((c) => c.id).sort(),
+    ['doc-sources-a', 'doc-sources-b'],
+  );
+  for (const capture of data.captures) {
+    assert.equal(capture.docPath, 'docs/how-to/shared.md');
+    assert.equal(capture.docType, 'how-to');
+    assert.ok('predicted' in capture && 'actual' in capture, 'capture must carry the same check-content shape as `fgos check`');
+  }
+});
+
+test('doc-sources on a docPath with zero linked captures is SUCCESS (exit 0), reporting none — not an error', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['doc-sources', 'docs/how-to/never-linked.md']);
+  assert.equal(result.status, 0);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.docPath, 'docs/how-to/never-linked.md');
+  assert.equal(data.count, 0);
+  assert.deepEqual(data.captures, []);
+});
+
+test('doc-sources never mutates state: events.jsonl and state.json are byte-identical before/after', () => {
+  const cwd = tmpCwd();
+  toProposed(cwd, 'doc-sources-readonly');
+  run(cwd, ['compound', 'doc-sources-readonly', '--doc-type', 'how-to', '--doc-path', 'docs/how-to/readonly.md']);
+
+  const logBefore = fs.readFileSync(logPath(cwd), 'utf8');
+  const viewBefore = fs.readFileSync(viewPath(cwd), 'utf8');
+
+  const result = run(cwd, ['doc-sources', 'docs/how-to/readonly.md']);
+  assert.equal(result.status, 0);
+
+  assert.equal(fs.readFileSync(logPath(cwd), 'utf8'), logBefore, 'events.jsonl must be untouched by doc-sources');
+  assert.equal(fs.readFileSync(viewPath(cwd), 'utf8'), viewBefore, 'state.json must be untouched by doc-sources');
+});
+
+test('doc-sources requires a docPath argument (validation, exit 4)', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['doc-sources']);
+  assert.equal(result.status, 4);
+});
+
 // --- `fgos submit` (stage-intake-3): free-text intake verb (P14, D1-D6) ---
 //
 // e2e through the real binary (never a direct call to classify.mjs) per the
