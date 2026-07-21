@@ -27,6 +27,7 @@ import { loadRunnerConfig } from '../src/runner/dispatch.mjs';
 import { resolveDiscovery } from '../src/intake/discovery.mjs';
 import { resolveDecompose } from '../src/intake/decompose.mjs';
 import { computeEntropy, computeCounts } from '../src/report/entropy.mjs';
+import { buildEnduserIndex, QUADRANTS } from '../src/report/enduser-index.mjs';
 import { rankCandidates } from '../src/evolve/candidates.mjs';
 import { rankImpact } from '../src/state/impact.mjs';
 import { runGoalCheck } from '../src/runner/goal-check.mjs';
@@ -888,6 +889,64 @@ async function runVerb(verb, flags, positional, dir) {
     case 'rollup': {
       const id = requireField(positional[0] ?? flags.id, 'rollup requires an id: fgos rollup <id>');
       return collectRollupData(listWork(dir), id);
+    }
+
+    // Read-by-tag end-user doc index (bước-3, CONTEXT.md D12/D13/D14): a
+    // read-only doc-centric manifest generator, NOT a merged/consolidated
+    // living doc (D10 — that "gộp sống" slice is deferred). Enumerates the
+    // real end-user docs under docs/<quadrant>/ for each of the four
+    // Diataxis quadrants (enduser-index.mjs's QUADRANTS) — a missing
+    // quadrant dir (today, only docs/how-to/ exists) is skipped cleanly,
+    // never a crash. All I/O (readdir, first-H1 extraction, folding the
+    // event log, writing the manifest) lives here in the entry layer;
+    // `buildEnduserIndex` itself stays a PURE transform (zero imports,
+    // mirrors entropy.mjs) that only assembles the manifest rows and
+    // resolves each doc's `sourceCaptureId` by matching `docPath` against
+    // the rebuilt outcomes view (D13's fidelity/back-link guarantee).
+    //
+    // Uses `listWork(dir)` — NOT `rebuild(dir)` — to fold the outcomes view:
+    // both replay the SAME event log through the SAME fold logic
+    // (rebuildView), but `rebuild(dir)` additionally overwrites
+    // `.fgos/state.json` as a side effect, which would contradict this
+    // verb's own `access: 'read'` declaration and the generator's read-only
+    // prohibition (must_haves). `listWork` is store.mjs's dedicated
+    // read-only facade for exactly this "current view, rebuilt fresh from
+    // the log" need, with no write.
+    //
+    // Idempotent by construction: every run re-enumerates the doc tree from
+    // scratch and re-derives the manifest from the current event log, then
+    // OVERWRITES enduser-docs-index.json whole — there is no accumulating
+    // state for a re-run to duplicate (D12 validation constraint (d)).
+    case 'docs-index': {
+      const repoRoot = process.cwd();
+      const docEntries = [];
+      for (const quadrant of QUADRANTS) {
+        const quadrantDir = path.join(repoRoot, 'docs', quadrant);
+        let dirEntries;
+        try {
+          dirEntries = fs.readdirSync(quadrantDir, { withFileTypes: true });
+        } catch (err) {
+          if (err.code === 'ENOENT') continue; // quadrant dir absent — skip cleanly, never a crash
+          throw err;
+        }
+        for (const dirEntry of dirEntries) {
+          if (!dirEntry.isFile() || !dirEntry.name.endsWith('.md')) continue;
+          const absPath = path.join(quadrantDir, dirEntry.name);
+          const docPath = path.relative(repoRoot, absPath).split(path.sep).join('/');
+          const content = fs.readFileSync(absPath, 'utf8');
+          const h1 = content.match(/^#\s+(.+)$/m);
+          docEntries.push({ quadrant, docPath, title: h1 ? h1[1].trim() : null });
+        }
+      }
+      const view = listWork(dir);
+      const entries = buildEnduserIndex(docEntries, view.outcomes ?? {});
+      const manifestPath = path.join(repoRoot, 'docs', 'enduser-docs-index.json');
+      fs.writeFileSync(manifestPath, `${JSON.stringify(entries, null, 2)}\n`, 'utf8');
+      return {
+        path: path.relative(repoRoot, manifestPath).split(path.sep).join('/'),
+        count: entries.length,
+        entries,
+      };
     }
 
     // Cửa pull — take (stage-decompose S2-pull D1): a tác nhân ngoài runner

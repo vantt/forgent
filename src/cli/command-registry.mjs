@@ -423,6 +423,15 @@ export const COMMAND_REGISTRY = [
     deprecated: null,
   },
   {
+    name: 'docs-index',
+    invoke: 'fgos docs-index',
+    description: 'Read-only: (re)generate the end-user doc read-by-tag index, keyed by Diataxis quadrant (tutorial/how-to/reference/explanation). Enumerates docs/<quadrant>/, writes docs/enduser-docs-index.json with each entry\'s purpose/audience (fixed quadrant mapping), docPath, title, and sourceCaptureId (the compound-learn capture that produced the doc, or null when none is recorded).',
+    parameters: { type: 'object', properties: {}, required: [] },
+    examples: ['fgos docs-index'],
+    access: 'read',
+    deprecated: null,
+  },
+  {
     name: 'session',
     invoke: 'fgos session',
     description: 'Per-session git worktree lifecycle: "start" opens a detached-HEAD worktree, "end" removes it, "list" (read-only) prints the registry.',

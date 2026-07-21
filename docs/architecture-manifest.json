@@ -35,6 +35,7 @@
     "src/intake/judge-executor.mjs": "infra",
     "src/cli/command-registry.mjs": "kernel",
     "src/report/entropy.mjs": "domain",
+    "src/report/enduser-index.mjs": "domain",
     "src/evolve/candidates.mjs": "domain",
     "src/evolve/iron-law.mjs": "domain",
     "src/state/events.mjs": "kernel",
