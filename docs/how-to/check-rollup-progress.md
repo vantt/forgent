@@ -66,6 +66,26 @@ That `0/0` with an empty `children` array is exactly the "no children yet"
 case described in Step 4 — you can tell at a glance that this item was never
 decomposed, rather than wondering whether the command silently failed.
 
+## Scope: one level only
+
+`fgos rollup` only ever counts **direct** children — it does not walk
+further down into grandchildren. This is a deliberate scope, quoted here
+verbatim from the verb's own implementation comment so it stays exact:
+
+> "Rollup view (P24): direct children only (`w.parent === id`) — decompose
+> (P16) is a single-level split, a root's own children never carry further
+> `parent` chains of their own in current data, so walking deeper would add
+> complexity with nothing real to show yet (YAGNI over frontier.mjs's
+> multi-level `hasOpenDescendant` walk, which exists for a different job —
+> gating the frontier, not reporting progress)."
+> — real source comment, `bin/fgos.mjs` (`collectRollupData`)
+
+In practice: if a child item is itself later decomposed into its own
+children, `fgos rollup <root-id>` still reports that child as one entry in
+`children` — it does not recurse into that child's own children to fold
+them into the root's `doneCount`/`totalCount`. Use `fgos rollup <child-id>`
+directly on that child if you need its own sub-progress.
+
 ## Why this exists
 
 The verb exists because filing and progress-tracking a root item with several
@@ -98,3 +118,31 @@ runner, then a human `close`:
   including the entries quoted above.
 - `fgos list` — the full work list, if you need more than one root item's
   direct children.
+
+## Document history (compound-learn capture linkage)
+
+This doc's path (`docs/how-to/check-rollup-progress.md`) is itself linked
+to a real compound-learn capture, gathered via `fgos doc-sources
+docs/how-to/check-rollup-progress.md`:
+
+> ```json
+> {
+>   "id": "doc-fgos-rollup-howto",
+>   "predicted": null,
+>   "actual": null,
+>   "docType": "how-to",
+>   "docPath": "docs/how-to/check-rollup-progress.md"
+> }
+> ```
+> — real `work.outcome` capture, id `doc-fgos-rollup-howto`
+
+That capture's own work item is the task that asked for this very document:
+
+> "Write end-user how-to doc for fgos rollup verb"
+> — real work item title, id `doc-fgos-rollup-howto`
+
+This capture carries only a `docType`/`docPath` tag (no `predicted`/`actual`
+metrics of its own) — a light exercise of the grow-per-docPath mechanism
+rather than a rich merge. If a later capture links to this same docPath,
+the export skill accumulates it here too, additively, without losing this
+section or anything above it.

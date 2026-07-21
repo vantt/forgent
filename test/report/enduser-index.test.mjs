@@ -118,10 +118,11 @@ test('fgos docs-index writes repo/docs/enduser-docs-index.json with the real how
   assert.ok(demo.audience && demo.audience.length > 0);
   assert.equal(demo.docPath, 'docs/how-to/check-rollup-progress.md');
   assert.equal(demo.title, "How to check a root item's progress with `fgos rollup`");
-  // Today's real event log carries no `docPath`-tagged compound-learn
-  // capture for this legacy demo doc — null is the honest answer (cell
-  // action's own example), never a fabricated id.
-  assert.equal(demo.sourceCaptureId, null);
+  // Slice ① gộp-sống (CONTEXT.md D13/D16/D17) links this demo doc to its
+  // real compound-learn capture via `fgos compound doc-fgos-rollup-howto
+  // --doc-type how-to --doc-path docs/how-to/check-rollup-progress.md` —
+  // CoS-3 evidence, not a fabricated id (the real event log now carries it).
+  assert.equal(demo.sourceCaptureId, 'doc-fgos-rollup-howto');
 });
 
 test('fgos docs-index tolerates missing quadrant dirs (tutorials/reference/explanation absent today) with no crash and no entries from them', () => {

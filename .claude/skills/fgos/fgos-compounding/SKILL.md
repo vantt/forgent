@@ -72,13 +72,28 @@ evidence-quoted end-user document.
    compound-learn move to make). Absent this call, the item's capture stays
    untagged and unlinked, and synthesis is unfinished.
 
-4. **Write the document.** Create (if missing) `docs/<quadrant>/` and
-   write at least one document there, at the exact path just passed to
-   `--doc-path`, whose content is quoted from the real capture read in
-   step 1 — never paraphrased into something the capture did not actually
-   say. Match the quadrant's own shape: a tutorial reads as ordered steps,
-   a how-to as a recipe for one goal, a reference as a lookup table or
-   list, an explanation as prose discussion.
+4. **Gather every linked capture, then grow or create the document.**
+   Before writing, run `fgos doc-sources <docPath>` (the same path just
+   passed to `--doc-path` in step 3) to gather *every* capture already
+   linked to this doc's path — not just the one just tagged. This is the
+   no-loss gather: reconstructing or extending a doc from only the newest
+   capture would silently drop what earlier captures said.
+   - **Detect grow-vs-create by file existence on disk** — no extra flag,
+     no capture-record marker. If `docs/<quadrant>/<file>.md` (the exact
+     path just passed to `--doc-path`) does not yet exist, **create** it
+     fresh from the gathered capture(s), quoted, never paraphrased.
+   - If the file already exists, **grow** it: accumulate the newly
+     gathered capture(s) into the existing living prose as additive
+     sections — append what is new, and do not delete, shorten, or
+     restructure prose that is already there. The document keeps every
+     prior detail and structural section it already had (no loss) while
+     gaining whatever the new capture(s) add.
+   Match the quadrant's own shape either way: a tutorial reads as ordered
+   steps, a how-to as a recipe for one goal, a reference as a lookup table
+   or list, an explanation as prose discussion. The Diataxis quadrant
+   stays the only structural axis — grow the doc's prose, never add a
+   second organizing dimension (e.g. by audience or product area) inside
+   it.
 
 5. **Confirm the close.** Run `fgos check <id>` again and confirm the
    `docType` field now shows the quadrant just stored, and that the
@@ -102,6 +117,11 @@ this skill's own job ends at a tagged capture and a written document.
   without running the tagging command
 - a document filed under a quadrant directory that does not match the tag
   just stored
+- growing an existing document by deleting or shortening prose that was
+  already there, instead of accumulating the newly gathered capture(s)
+  additively
+- organizing a grown document by a second axis (audience, product area,
+  etc.) instead of keeping the Diataxis quadrant as the sole structure
 - applying the item's stage or status move directly instead of leaving it
   to the engine
 - splicing an item's raw `title`/`description` into a shell command

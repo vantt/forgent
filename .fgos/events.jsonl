@@ -86,3 +86,4 @@
 {"seq":86,"ts":"2026-07-20T16:54:13.255Z","type":"work.outcome","payload":{"id":"doc-fgos-rollup-howto","docType":"how-to"},"v":2}
 {"seq":87,"ts":"2026-07-20T16:54:13.259Z","type":"work.stage","payload":{"id":"doc-fgos-rollup-howto","from":"executing","to":"compound-learn","actor":"human"},"v":2}
 {"seq":88,"ts":"2026-07-21T02:27:29.812Z","type":"work.add","payload":{"id":"tsk-5ui","title":"edge test doc","description":"edge test doc","kind":"task","status":"todo","deps":[],"risk":"standard","refs":[],"verify":"chưa xác định — P15 bổ sung","tier":"standard","mode":"sync","stage":"clarify"},"v":2}
+{"seq":89,"ts":"2026-07-21T07:29:50.240Z","type":"work.outcome","payload":{"id":"doc-fgos-rollup-howto","docType":"how-to","docPath":"docs/how-to/check-rollup-progress.md"},"v":2}

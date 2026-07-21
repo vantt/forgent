@@ -5,6 +5,6 @@
     "audience": "A user who already knows the system and wants a concrete recipe.",
     "docPath": "docs/how-to/check-rollup-progress.md",
     "title": "How to check a root item's progress with `fgos rollup`",
-    "sourceCaptureId": null
+    "sourceCaptureId": "doc-fgos-rollup-howto"
   }
 ]
