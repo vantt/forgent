@@ -197,8 +197,18 @@ function parseListFlag(value) {
 // optional Diataxis tag (CONTEXT D5/D6): surfaced the same way — present as
 // its real value when the capture was tagged, `null` when untagged — so an
 // untagged item's output shape stays byte-identical to pre-docType logs.
+// `docPath` (CONTEXT D12/D15, bước-3) is the same additive idiom: the
+// end-user doc path the capture's `docType` was written for, surfaced as its
+// real value when supplied to `compound --doc-path` and `null` when omitted
+// — a capture with no doc-path stays byte-identical to pre-docPath logs.
 function collectOutcomeEntry(id, entry) {
-  return { id, predicted: entry?.predicted ?? null, actual: entry?.actual ?? null, docType: entry?.docType ?? null };
+  return {
+    id,
+    predicted: entry?.predicted ?? null,
+    actual: entry?.actual ?? null,
+    docType: entry?.docType ?? null,
+    docPath: entry?.docPath ?? null,
+  };
 }
 
 // Friction report cap (per porting lesson predicted-actual-feedback-store:
@@ -671,6 +681,13 @@ async function runVerb(verb, flags, positional, dir) {
     // entirely, `compound` stays byte-identical to pre-slice-3: `moveStage`
     // only, no outcome written, still rejecting an already-compound-learn
     // re-compound.
+    //
+    // `--doc-path <path>` (bước-3, CONTEXT D12/D15) is an additive linkage
+    // field alongside `--doc-type`: it records which real end-user doc the
+    // tagged capture belongs to, so a later read-side index can back-link a
+    // doc to its source capture with no loss of detail (D13). Omitted
+    // entirely, or omitted while `--doc-type` is given, `compound` is
+    // byte-identical to pre-docPath behavior.
     case 'compound': {
       const id = requireField(positional[0] ?? flags.id, 'compound requires an id: fgos compound <id>');
       const item = listWork(dir).work[id];
@@ -684,13 +701,23 @@ async function runVerb(verb, flags, positional, dir) {
       if (docType !== undefined) {
         assertValidDocType({ docType });
       }
+      // `--doc-path <path>` (bước-3, CONTEXT D12/D15) is the additive
+      // doc-capture linkage: the end-user doc path the `docType`-tagged
+      // outcome was written for, so the deferred index/manifest can back-
+      // link a real doc to the capture it came from. Same optional-shape
+      // idiom as `docType` above (only a bare/empty value is refused); rides
+      // the same addOutcome payload spread with zero store.mjs change (D6's
+      // additive pattern). Only meaningful alongside `--doc-type` — it never
+      // gates whether an outcome is written on its own, matching the
+      // pre-existing docType-gated write below.
+      const docPath = optionalField(flags['doc-path'], 'compound --doc-path requires a non-empty value.');
       if (docType !== undefined && item.stage === 'compound-learn') {
-        const { event } = addOutcome(dir, { id, docType });
-        return { id, docType, stage: item.stage, seq: event.seq };
+        const { event } = addOutcome(dir, { id, docType, ...(docPath !== undefined ? { docPath } : {}) });
+        return { id, docType, docPath: docPath ?? null, stage: item.stage, seq: event.seq };
       }
       const { event } = moveStage(dir, { id, to: 'compound-learn', actor: 'human' });
       if (docType !== undefined) {
-        addOutcome(dir, { id, docType });
+        addOutcome(dir, { id, docType, ...(docPath !== undefined ? { docPath } : {}) });
       }
       return { id, from: event.payload.from, to: event.payload.to, seq: event.seq };
     }

@@ -843,7 +843,7 @@ test('compound with NO --doc-type is byte-identical to pre-slice-3: moveStage on
   const checkResult = run(cwd, ['check', 'compound-no-doctype']);
   assert.equal(checkResult.status, 0);
   assert.deepEqual(envelopeData(checkResult.stdout).outcomes, [
-    { id: 'compound-no-doctype', predicted: null, actual: null, docType: null },
+    { id: 'compound-no-doctype', predicted: null, actual: null, docType: null, docPath: null },
   ]);
 });
 
@@ -894,6 +894,89 @@ test('compound rejects a non-quadrant --doc-type on an item already at stage com
   assert.equal(result.status, 4);
   assert.equal(eventLines(cwd).length, before, 'a rejected --doc-type on an already-compound-learn item must write nothing at all');
   assert.equal(stateView(cwd).work['compound-doctype-retag-bad'].stage, 'compound-learn');
+});
+
+// --- bước-3: `--doc-path` doc-capture linkage (CONTEXT D12/D15) -------------
+//
+// Additive alongside `--doc-type`: the end-user doc path the tagged capture
+// belongs to, so a later read-side index can back-link a real doc to its
+// source capture (D13, "no loss of detail"). Covers BOTH `addOutcome` write
+// sites in the `compound` case: the fresh moveStage path (this item starts at
+// `executing`, per the `toProposed` fixture) and the re-compound / tag-only
+// path (item already at stage `compound-learn`) — a doc-path given on the
+// re-compound path is silently dropped if only one site is wired.
+
+test('compound --doc-type <q> --doc-path <p> stores both and check surfaces the docPath round-trip (fresh moveStage path), exit 0', () => {
+  const cwd = tmpCwd();
+  toProposed(cwd, 'compound-docpath-roundtrip');
+  const result = run(cwd, [
+    'compound',
+    'compound-docpath-roundtrip',
+    '--doc-type',
+    'how-to',
+    '--doc-path',
+    'docs/how-to/example.md',
+  ]);
+  assert.equal(result.status, 0);
+  assert.equal(stateView(cwd).work['compound-docpath-roundtrip'].stage, 'compound-learn');
+
+  const checkResult = run(cwd, ['check', 'compound-docpath-roundtrip']);
+  assert.equal(checkResult.status, 0);
+  const data = envelopeData(checkResult.stdout);
+  assert.equal(data.outcomes[0].docType, 'how-to');
+  assert.equal(data.outcomes[0].docPath, 'docs/how-to/example.md');
+});
+
+test('compound --doc-type <q> with NO --doc-path leaves docPath null while docType still works, exit 0', () => {
+  const cwd = tmpCwd();
+  toProposed(cwd, 'compound-docpath-absent');
+  const result = run(cwd, ['compound', 'compound-docpath-absent', '--doc-type', 'reference']);
+  assert.equal(result.status, 0);
+
+  const checkResult = run(cwd, ['check', 'compound-docpath-absent']);
+  assert.equal(checkResult.status, 0);
+  const data = envelopeData(checkResult.stdout);
+  assert.equal(data.outcomes[0].docType, 'reference');
+  assert.equal(data.outcomes[0].docPath, null);
+});
+
+test('compound --doc-type <q> --doc-path <p> on an item already at stage compound-learn (the re-compound path) records docPath too, exit 0', () => {
+  const cwd = tmpCwd();
+  toCompoundLearn(cwd, 'compound-docpath-retag');
+  const before = eventLines(cwd).length;
+  const result = run(cwd, [
+    'compound',
+    'compound-docpath-retag',
+    '--doc-type',
+    'explanation',
+    '--doc-path',
+    'docs/explanation/example.md',
+  ]);
+  assert.equal(result.status, 0);
+  assert.equal(eventLines(cwd).length, before + 1, 'only the outcome event is written — no second stage-move event');
+  assert.equal(stateView(cwd).work['compound-docpath-retag'].stage, 'compound-learn');
+
+  const checkResult = run(cwd, ['check', 'compound-docpath-retag']);
+  assert.equal(checkResult.status, 0);
+  const data = envelopeData(checkResult.stdout);
+  assert.equal(data.outcomes[0].docType, 'explanation');
+  assert.equal(data.outcomes[0].docPath, 'docs/explanation/example.md');
+});
+
+test('a compound --doc-path tag survives a rebuild of the view from the log alone (rides the docType spread-fold, zero store.mjs change)', () => {
+  const cwd = tmpCwd();
+  toProposed(cwd, 'compound-docpath-rebuild');
+  assert.equal(
+    run(cwd, ['compound', 'compound-docpath-rebuild', '--doc-type', 'tutorial', '--doc-path', 'docs/tutorials/example.md']).status,
+    0,
+  );
+  const before = stateView(cwd);
+  assert.equal(before.outcomes['compound-docpath-rebuild'].docPath, 'docs/tutorials/example.md');
+
+  fs.rmSync(viewPath(cwd));
+  const result = run(cwd, ['rebuild']);
+  assert.equal(result.status, 0);
+  assert.deepEqual(stateView(cwd), before);
 });
 
 test('move proposed -> todo (rejection) without --reason is refused as validation, exit 4, no event written', () => {
@@ -1064,7 +1147,7 @@ test('check on an item with no recorded outcome returns a null predicted/actual 
   const result = run(cwd, ['check', 'unchecked-item']);
   assert.equal(result.status, 0);
   const data = envelopeData(result.stdout);
-  assert.deepEqual(data.outcomes, [{ id: 'unchecked-item', predicted: null, actual: null, docType: null }]);
+  assert.deepEqual(data.outcomes, [{ id: 'unchecked-item', predicted: null, actual: null, docType: null, docPath: null }]);
 });
 
 test('check on a directory with no log at all returns an empty outcomes list, exit 0 (a read never initializes .fgos/)', () => {
@@ -1136,6 +1219,7 @@ test('check surfaces docType for a tagged outcome; an untagged outcome nulls it,
     predicted: { tier: 'standard', deps: 0, priorVisits: 0 },
     actual: null,
     docType: 'tutorial',
+    docPath: null,
   });
 
   const untaggedResult = run(cwd, ['check', 'untagged-outcome-item']);
@@ -1145,6 +1229,7 @@ test('check surfaces docType for a tagged outcome; an untagged outcome nulls it,
     predicted: { tier: 'standard', deps: 0, priorVisits: 0 },
     actual: null,
     docType: null,
+    docPath: null,
   });
 });
 
