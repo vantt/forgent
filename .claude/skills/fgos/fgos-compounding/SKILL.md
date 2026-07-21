@@ -62,20 +62,23 @@ evidence-quoted end-user document.
    This is a judgment call grounded in the capture's real content, never a
    coin flip or a default choice.
 
-3. **Store the tag.** Run `fgos compound <id> --doc-type <quadrant>` with
-   the quadrant chosen above. This is the one producer surface this step is
-   allowed to use — it stores the Diataxis tag on the item's capture. Since
-   this step only runs once the item is already at stage `compound-learn`,
-   the call tags the capture without moving stage again (there is no
-   compound-learn -> compound-learn move to make). Absent this call, the
-   item's capture stays untagged and synthesis is unfinished.
+3. **Store the tag.** Run `fgos compound <id> --doc-type <quadrant>
+   --doc-path docs/<quadrant>/<file>.md` with the quadrant chosen above and
+   the same path the document lands at in step 4. This is the one producer
+   surface this step is allowed to use — it stores the Diataxis tag and the
+   doc-path linkage on the item's capture in one call. Since this step only
+   runs once the item is already at stage `compound-learn`, the call tags
+   the capture without moving stage again (there is no compound-learn ->
+   compound-learn move to make). Absent this call, the item's capture stays
+   untagged and unlinked, and synthesis is unfinished.
 
 4. **Write the document.** Create (if missing) `docs/<quadrant>/` and
-   write at least one document there whose content is quoted from the real
-   capture read in step 1 — never paraphrased into something the capture
-   did not actually say. Match the quadrant's own shape: a tutorial reads
-   as ordered steps, a how-to as a recipe for one goal, a reference as a
-   lookup table or list, an explanation as prose discussion.
+   write at least one document there, at the exact path just passed to
+   `--doc-path`, whose content is quoted from the real capture read in
+   step 1 — never paraphrased into something the capture did not actually
+   say. Match the quadrant's own shape: a tutorial reads as ordered steps,
+   a how-to as a recipe for one goal, a reference as a lookup table or
+   list, an explanation as prose discussion.
 
 5. **Confirm the close.** Run `fgos check <id>` again and confirm the
    `docType` field now shows the quadrant just stored, and that the
