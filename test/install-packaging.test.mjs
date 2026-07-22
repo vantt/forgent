@@ -98,6 +98,11 @@ test('e2e: npm pack -> npm install -g -> fgos init from a fresh external cwd', (
     const fgosBin = path.join(installPrefix, 'bin', 'fgos');
     assert.ok(fs.existsSync(fgosBin), `installed fgos binary not found at ${fgosBin}`);
 
+    const fgosRunnerBin = path.join(installPrefix, 'bin', 'fgos-runner');
+    assert.ok(fs.existsSync(fgosRunnerBin), `installed fgos-runner binary not found at ${fgosRunnerBin}`);
+    const fgosRunnerMode = fs.statSync(fgosRunnerBin).mode;
+    assert.ok(fgosRunnerMode & fs.constants.S_IXUSR, 'installed fgos-runner binary must be executable');
+
     const init = spawnSync(fgosBin, ['init'], { cwd: externalCwd, encoding: 'utf8' });
     assert.equal(init.status, 0, `fgos init failed: ${init.stderr}`);
 
