@@ -163,9 +163,9 @@ function writeClearDiscoveryExecutor(scriptDir, { verify, produce = 'output.txt'
 import fs from 'node:fs';
 import { execFileSync } from 'node:child_process';
 const prompt = process.argv[2] ?? '';
-if (prompt.startsWith('# Context-discovery')) {
+if (prompt.includes('# Context-discovery')) {
   process.stdout.write(JSON.stringify({ clear: true, verify: ${JSON.stringify(verify)} }));
-} else if (prompt.startsWith('# Chia-việc (decompose)')) {
+} else if (prompt.includes('# Chia-việc (decompose)')) {
   process.stdout.write(JSON.stringify({ verdict: 'pass-through' }));
 } else {
   fs.writeFileSync(${JSON.stringify(produce)}, 'produced by worker\\n');

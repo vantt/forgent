@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { runJudgeExecutor } from '../../src/intake/judge-executor.mjs';
+import { runJudgeExecutor, JUDGE_CALLER_CONTEXT_PREAMBLE } from '../../src/intake/judge-executor.mjs';
 
 // Fake executors only — every "command" spawned here is a node script this
 // file writes to a mkdtemp directory at test time, mirroring
@@ -158,6 +158,46 @@ function writeFlakyEchoExecutor(dir) {
   return scriptPath;
 }
 
+// Echoes back the prompt argument it received on every invocation as a
+// valid JSON verdict — proves the caller-context preamble is prepended to
+// whatever this fake executor actually receives on argv.
+function writeEchoExecutor(dir) {
+  const scriptPath = path.join(dir, 'echo-executor.mjs');
+  fs.writeFileSync(
+    scriptPath,
+    `
+    const prompt = process.argv[2];
+    process.stdout.write(JSON.stringify({ echoed: prompt }));
+    process.exit(0);
+    `,
+  );
+  return scriptPath;
+}
+
+// Returns unparsable stdout on invocations 1 and 2, a valid verdict on
+// invocation 3 — proves the 3rd (2nd retry) attempt can still succeed.
+function writeFlakyTwiceThenValidExecutor(dir, badStdout, validVerdict) {
+  const scriptPath = path.join(dir, 'flaky-twice-then-valid-executor.mjs');
+  const counterPath = path.join(dir, 'flaky-twice-count.txt');
+  fs.writeFileSync(counterPath, '0');
+  fs.writeFileSync(
+    scriptPath,
+    `
+    import fs from 'node:fs';
+    const counterPath = ${JSON.stringify(counterPath)};
+    const n = parseInt(fs.readFileSync(counterPath, 'utf8'), 10) + 1;
+    fs.writeFileSync(counterPath, String(n));
+    if (n < 3) {
+      process.stdout.write(${JSON.stringify(badStdout)});
+    } else {
+      process.stdout.write(${JSON.stringify(JSON.stringify(validVerdict))});
+    }
+    process.exit(0);
+    `,
+  );
+  return { scriptPath, counterPath };
+}
+
 function cfgFor(scriptPath, overrides = {}) {
   return {
     executor: { command: process.execPath, args: [scriptPath, '{prompt}'] },
@@ -189,16 +229,34 @@ test('runJudgeExecutor sends the stricter prompt (not the original) on the retry
   const scriptPath = writeFlakyEchoExecutor(dir);
   const cfg = cfgFor(scriptPath);
   const verdict = runJudgeExecutor(cfg, 'sonnet', 'original prompt', 'STRICTER SUFFIX prompt');
-  assert.equal(verdict.echoed, 'STRICTER SUFFIX prompt');
+  assert.equal(verdict.echoed, JUDGE_CALLER_CONTEXT_PREAMBLE + 'STRICTER SUFFIX prompt');
 });
 
-test('runJudgeExecutor returns null (fail-safe) when both attempts hit a parse-shaped failure (str68 D3)', () => {
+test('runJudgeExecutor prepends JUDGE_CALLER_CONTEXT_PREAMBLE to the prompt sent to the executor (str68 nested-judge-fix)', () => {
+  const dir = mkTempDir();
+  const scriptPath = writeEchoExecutor(dir);
+  const cfg = cfgFor(scriptPath);
+  const verdict = runJudgeExecutor(cfg, 'sonnet', 'original prompt', 'stricter prompt');
+  assert.equal(verdict.echoed, JUDGE_CALLER_CONTEXT_PREAMBLE + 'original prompt');
+  assert.ok(verdict.echoed.startsWith(JUDGE_CALLER_CONTEXT_PREAMBLE));
+});
+
+test('runJudgeExecutor returns null (fail-safe) when all three attempts hit a parse-shaped failure (str68 D3, nested-judge-fix)', () => {
   const dir = mkTempDir();
   const { scriptPath, counterPath } = writeRawStdoutExecutor(dir, 'not json at all');
   const cfg = cfgFor(scriptPath);
   const verdict = runJudgeExecutor(cfg, 'sonnet', 'prompt', 'stricter prompt');
   assert.equal(verdict, null);
-  assert.equal(readCount(counterPath), 2);
+  assert.equal(readCount(counterPath), 3);
+});
+
+test('runJudgeExecutor succeeds on the third attempt (second retry) after two parse-shaped failures (str68 nested-judge-fix)', () => {
+  const dir = mkTempDir();
+  const { scriptPath, counterPath } = writeFlakyTwiceThenValidExecutor(dir, 'not json at all', { clear: true, verify: 'ok' });
+  const cfg = cfgFor(scriptPath);
+  const verdict = runJudgeExecutor(cfg, 'sonnet', 'prompt', 'stricter prompt');
+  assert.deepEqual(verdict, { clear: true, verify: 'ok' });
+  assert.equal(readCount(counterPath), 3);
 });
 
 test('runJudgeExecutor treats a parsed non-object (array) as a parse-shaped failure and retries', () => {
