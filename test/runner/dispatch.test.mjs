@@ -6,6 +6,8 @@ import path from 'node:path';
 import {
   buildPrompt,
   loadRunnerConfig,
+  ensureRunnerConfig,
+  DEFAULT_RUNNER_CONFIG,
   modelForTier,
   resolveExecutorCommand,
   spawnWorker,
@@ -374,6 +376,100 @@ test('the committed .fgos-runner.json grants the worker exactly acceptEdits + gi
   assert.ok(args.includes('--allowedTools'));
   assert.equal(args[args.indexOf('--allowedTools') + 1], 'Bash(git add:*),Bash(git commit:*)');
   assert.ok(!args.includes('--dangerously-skip-permissions'));
+});
+
+// --- ensureRunnerConfig: D1/D3 default-write bootstrap wrapper ----------
+
+/** Capture what's written to process.stderr during `fn()`; restores the
+ * original `write` afterward even if `fn` throws. */
+function captureStderr(fn) {
+  const original = process.stderr.write.bind(process.stderr);
+  let captured = '';
+  process.stderr.write = (chunk) => {
+    captured += chunk;
+    return true;
+  };
+  try {
+    fn();
+  } finally {
+    process.stderr.write = original;
+  }
+  return captured;
+}
+
+test('ensureRunnerConfig on a missing path writes DEFAULT_RUNNER_CONFIG, announces it, and returns a loaded config', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, '.fgos-runner.json');
+  assert.equal(fs.existsSync(configPath), false);
+
+  let cfg;
+  const stderr = captureStderr(() => {
+    cfg = ensureRunnerConfig(configPath);
+  });
+
+  assert.equal(fs.existsSync(configPath), true);
+  assert.deepEqual(JSON.parse(fs.readFileSync(configPath, 'utf8')), DEFAULT_RUNNER_CONFIG);
+  assert.match(stderr, /wrote a default/);
+  assert.match(stderr, /executor: claude/);
+  assert.match(stderr, new RegExp(configPath.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
+  assert.deepEqual(cfg, DEFAULT_RUNNER_CONFIG);
+});
+
+test('ensureRunnerConfig on an already-existing path does not rewrite the file or re-announce', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, '.fgos-runner.json');
+  const existing = {
+    executor: { command: 'claude', args: ['{prompt}'] },
+    models: { standard: 'sonnet' },
+    timeoutMs: 1000,
+  };
+  fs.writeFileSync(configPath, JSON.stringify(existing));
+  const before = fs.statSync(configPath).mtimeMs;
+
+  let cfg;
+  const stderr = captureStderr(() => {
+    cfg = ensureRunnerConfig(configPath);
+  });
+
+  assert.equal(stderr, '');
+  assert.equal(fs.statSync(configPath).mtimeMs, before);
+  assert.deepEqual(cfg, existing);
+});
+
+test('ensureRunnerConfig is idempotent: a second call on the now-existing default path returns the same config without rewriting or re-announcing', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, '.fgos-runner.json');
+
+  captureStderr(() => ensureRunnerConfig(configPath));
+  const writtenAfterFirst = fs.readFileSync(configPath, 'utf8');
+
+  let cfg;
+  const stderr = captureStderr(() => {
+    cfg = ensureRunnerConfig(configPath);
+  });
+
+  assert.equal(stderr, '');
+  assert.equal(fs.readFileSync(configPath, 'utf8'), writtenAfterFirst);
+  assert.deepEqual(cfg, DEFAULT_RUNNER_CONFIG);
+});
+
+test('ensureRunnerConfig propagates a write failure as a thrown error instead of silently swallowing it', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'missing-subdir', '.fgos-runner.json');
+  // The parent directory does not exist, so fs.writeFileSync throws ENOENT —
+  // this must reach the caller, never be caught-and-ignored.
+  assert.throws(() => ensureRunnerConfig(configPath));
+  assert.equal(fs.existsSync(configPath), false);
+});
+
+test('ensureRunnerConfig delegates shape validation to loadRunnerConfig, never re-implementing it', () => {
+  // DEFAULT_RUNNER_CONFIG must itself satisfy loadRunnerConfig's own shape
+  // rules — proven by loading it back through the real (unmocked) function.
+  const dir = mkTempDir();
+  const configPath = path.join(dir, '.fgos-runner.json');
+  captureStderr(() => ensureRunnerConfig(configPath));
+  const cfg = loadRunnerConfig(configPath);
+  assert.deepEqual(cfg, DEFAULT_RUNNER_CONFIG);
 });
 
 // --- modelForTier: tier -> model, unknown tier is a validation error ----

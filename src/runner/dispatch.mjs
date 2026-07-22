@@ -134,6 +134,60 @@ export function loadRunnerConfig(configPath) {
 }
 
 /**
+ * D1's baked-in default `.fgos-runner.json` payload — mirrors this repo's own
+ * tracked `.fgos-runner.json` verbatim, so the auto-generated default is
+ * provably identical to what already works in this repo's own dogfood loop.
+ */
+export const DEFAULT_RUNNER_CONFIG = {
+  executor: {
+    command: 'claude',
+    args: [
+      '-p',
+      '{prompt}',
+      '--model',
+      '{model}',
+      '--permission-mode',
+      'acceptEdits',
+      '--allowedTools',
+      'Bash(git add:*),Bash(git commit:*)',
+    ],
+  },
+  models: {
+    light: 'haiku',
+    standard: 'sonnet',
+    heavy: 'opus',
+  },
+  timeoutMs: 900000,
+  parallel: {
+    maxRoots: 4,
+    maxLeavesPerRoot: 4,
+  },
+};
+
+/**
+ * Bootstrap wrapper (D1/D3) around `loadRunnerConfig`: when `configPath` does
+ * not exist, writes `DEFAULT_RUNNER_CONFIG` there and announces the write
+ * (executor + path) before loading. `loadRunnerConfig` itself is never
+ * modified — its "rejects a missing file" contract stays intact for any
+ * caller (e.g. an explicit `--config` path) that still wants a loud failure
+ * on ENOENT; this wrapper is the one place that instead treats a missing
+ * default path as "first run, bootstrap it."
+ *
+ * A write failure (permissions, read-only fs, disk full) is never caught —
+ * it propagates as a normal thrown error, since a failed bootstrap write IS
+ * the whole point of this call, not a side effect to shrug off.
+ */
+export function ensureRunnerConfig(configPath) {
+  if (!fs.existsSync(configPath)) {
+    fs.writeFileSync(configPath, `${JSON.stringify(DEFAULT_RUNNER_CONFIG, null, 2)}\n`);
+    process.stderr.write(
+      `fgos: no .fgos-runner.json found — wrote a default (executor: ${DEFAULT_RUNNER_CONFIG.executor.command}) at ${configPath}; edit it to change.\n`,
+    );
+  }
+  return loadRunnerConfig(configPath);
+}
+
+/**
  * Shape-check one executor block ({command, args[], adapter?}) — shared by
  * the required global `cfg.executor` and every optional `cfg.executors.<tier>`
  * entry (P41/C9 v2). An `adapter` field, when present, must name a
