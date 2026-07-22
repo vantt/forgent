@@ -1,8 +1,8 @@
 ---
 area: work-state
-updated: 2026-07-21
-sources: [phase-1-state-layer, phase-1-review-fixes, phase-2-routing-s1, phase-2-routing-s2, phase-3-compound-learning-s1, phase-3-compound-learning-s2, phase-3-compound-learning-s3-closeout, async-human-gate, stage-intake, stage-clarify, stage-decompose-s1, stage-decompose-s2, pr-lifecycle-s1, install-coexistence, discovery-context, worker-execution, fan-out-parallel, human-rounds, work-item-verb-surface, base-workflow-model-s1, base-workflow-model-s2, self-improve-loop, work-graph-intelligence-s1, work-graph-intelligence-s2a, work-graph-intelligence-s2b, entry-standardization, work-id-tsk-hash, p50-workflow-induct, str61-chat-context-continuity, str68-discovery-judge-robustness, compound-learn-enduser-docs]
-decisions: [9ac6ca50, 0790031c, 451ca088, fd17309a, 55ad2f9f, feed7428, 1a80b4d3, 65c642a8, 9f6b52c8, 9a19eea5, 96a65365, a7c099af, 43f257ae, 44936500, e1218b22, 6f2cbc47, a30a3d3c, 1359ab5e, f1715488, 8788e9bb, cfae0120, 396d9d9e, 2e92b7a5, 5a6900b2, b28487af, 2ae492d8, 76b7a36b, 8d04bba3, 1cd895e1, 38160a70, a2146274, 896219a7, b5c0ba0c, b2d18cc7, b0da87aa, 8cf7effe, 81322763, 28e6184b, 14091e58, 19330e09, bce79d8a, 87536f3f, 9c67c3d1, 6aa67ae4, 1c776c56, 1d336d8a]
+updated: 2026-07-22
+sources: [phase-1-state-layer, phase-1-review-fixes, phase-2-routing-s1, phase-2-routing-s2, phase-3-compound-learning-s1, phase-3-compound-learning-s2, phase-3-compound-learning-s3-closeout, async-human-gate, stage-intake, stage-clarify, stage-decompose-s1, stage-decompose-s2, pr-lifecycle-s1, install-coexistence, discovery-context, worker-execution, fan-out-parallel, human-rounds, work-item-verb-surface, base-workflow-model-s1, base-workflow-model-s2, self-improve-loop, work-graph-intelligence-s1, work-graph-intelligence-s2a, work-graph-intelligence-s2b, entry-standardization, work-id-tsk-hash, p50-workflow-induct, str61-chat-context-continuity, str68-discovery-judge-robustness, compound-learn-enduser-docs, str77-79-doc-gap-fixes]
+decisions: [9ac6ca50, 0790031c, 451ca088, fd17309a, 55ad2f9f, feed7428, 1a80b4d3, 65c642a8, 9f6b52c8, 9a19eea5, 96a65365, a7c099af, 43f257ae, 44936500, e1218b22, 6f2cbc47, a30a3d3c, 1359ab5e, f1715488, 8788e9bb, cfae0120, 396d9d9e, 2e92b7a5, 5a6900b2, b28487af, 2ae492d8, 76b7a36b, 8d04bba3, 1cd895e1, 38160a70, a2146274, 896219a7, b5c0ba0c, b2d18cc7, b0da87aa, 8cf7effe, 81322763, 28e6184b, 14091e58, 19330e09, bce79d8a, 87536f3f, 9c67c3d1, 6aa67ae4, 1c776c56, 1d336d8a, ea8b9a8d]
 coverage: full
 ---
 
@@ -493,7 +493,33 @@ về CLI**, KHÔNG bọc trong phong bì `data` (nó mô tả CLI, không phải
 verb). Cờ `access` mới chỉ là **khai báo** — chưa nối vào điều-phối hay xác danh;
 cổng "ai được nói verb nào" là việc riêng sau này (backlog STR38), sổ verb chỉ cung
 cấp nguyên liệu cho nó. Dạng trợ giúp thường (không máy-đọc) in cùng thông tin ở
-dạng chữ cho người đọc.
+dạng chữ cho người đọc. Với một tham số CHỈ nhận qua vị trí trên dòng lệnh
+(positional — vd `text` của `submit`, đọc từ đối số đầu, không bao giờ qua một
+cờ `--text`), sổ verb đánh dấu riêng tham số đó là positional; dạng trợ giúp
+chữ cho người đọc in dòng "positional: `<tên>`" cho tham số này, KHÔNG BAO GIỜ
+in nhầm thành "required: `--<tên>`" như một cờ thật — một tham số vừa nhận
+positional vừa nhận qua cờ (vd `id` của `discover`/`take`) in cả hai dạng phân
+biệt (per D3 str77-79-doc-gap-fixes / ea8b9a8d — RUL54).
+
+### Trợ giúp theo từng verb — `fgos <verb> --help`
+
+Gọi `--help` (không kèm `--json`) SAU tên một verb cụ thể (vd `fgos submit
+--help`) in đúng mục trợ giúp của RIÊNG verb đó (cách gọi, mô tả, tham số,
+ví dụ) — không phải toàn bộ sổ verb. Áp dụng ĐỒNG NHẤT cho mọi verb, kể cả
+`init`.
+
+- **Runs when:** người/agent gọi `fgos <verb> --help` cho bất kỳ verb nào
+  trong sổ verb.
+- **Blocked when:** không có điều kiện chặn — mọi verb đều có mục trợ giúp
+  riêng.
+- **What changes:** không gì — đây là thao tác chỉ-đọc, không ghi sự kiện,
+  không đổi bản chiếu, không có tác dụng phụ nào (kể cả với `init` — gọi `fgos
+  init --help` KHÔNG chạy `init` thật, không tạo `.fgos/`).
+- **Side effects:** không có, cho MỌI verb kể cả những verb thường có tác
+  dụng phụ khi gọi thật (vd `init`).
+- **Afterwards:** người gọi thấy đúng mục trợ giúp của verb đã nêu tên, thoát
+  mã 0 — không bao giờ thoát ở phạm trù lỗi (mã 4) vì thiếu tham số bắt buộc,
+  dù tham số đó có mặt hay không (per D3 str77-79-doc-gap-fixes / ea8b9a8d — RUL55).
 
 ## Behaviors & Operations
 
@@ -825,6 +851,8 @@ Một verb đọc-thuần trả **metrics CƠ HỌC** của đồ thị công vi
 - **RUL51 (verb `compound` — cửa duy nhất mở lối vào Compound-learn).** `fgos compound <id>` là hành động CHỦ Ý duy nhất chuyển stage `executing → compound-learn` — không có đường tự-động nào khác (`return`/`approve` không tự advance qua nó, đúng ý RUL50: một auto-advance sẽ làm stage đó trống rỗng, đúng điều D3 cấm). Đòi item đang `status: proposed` (đã `return`/verify xanh) — item ở status khác bị từ chối `validation` (mã 4), không sự kiện nào ghi thêm (per D2/D3 compound-learn-enduser-docs / 9c67c3d1). Verb nhận thêm một cờ TÙY CHỌN `--doc-type <quadrant>` (bên sản xuất đầu tiên của nhãn Diataxis): khi có mặt, giá trị được KIỂM TRƯỚC MỌI GHI (đúng một trong bốn quadrant, dùng chung bộ kiểm slice-2) — sai thì từ chối `validation` (mã 4), không sự kiện nào ghi, ở MỌI stage. Sau khi kiểm đạt, hành vi PHÂN THEO STAGE (atomic — một lệnh thất bại không bao giờ để lại `docType` đã ghi): item đang ở `executing` thì chuyển stage TRƯỚC rồi ghi outcome mang `docType` (một stage nguồn không hợp lệ khiến `moveStage` ném `precondition` TRƯỚC khi ghi outcome, không để lại outcome lơ lửng); item ĐÃ ở `compound-learn` — ca luồng định tuyến, vì `fgos-compounding` chỉ chạy SAU khi item đã tới đó — thì CHỈ ghi outcome mang `docType`, KHÔNG chuyển stage lại (không có cạnh `compound-learn → compound-learn`). VẮNG cờ: hành vi không đổi một byte (chỉ chuyển stage; item đã ở `compound-learn` vẫn bị từ chối re-compound) — xem RUL52. Cờ `--doc-path <path>` đi kèm ghi con trỏ linkage tại cùng hai site ghi outcome đó — xem RUL53 (per D2/D3 + producer & stage-aware fix slice 3 + linkage bước-3 compound-learn-enduser-docs).
 - **RUL52 (nhãn Diataxis `docType` — trường capture cộng-thêm, trực giao và tùy chọn).** Bản ghi capture của Compound-learn (outcome VÀ friction) mang thêm một trường TÙY CHỌN `docType` — nhãn phân loại tài liệu Diataxis theo chiều audience, đúng một trong bốn quadrant `tutorial`/`how-to`/`reference`/`explanation`. Chiều này TRỰC GIAO với type-axis kỹ sư (pattern/decision/failure): một chiều CỘNG THÊM, không thay thế (per D5). Kiểm hình dạng chỉ KHI có mặt — giá trị ngoài bốn quadrant bị từ chối `validation`; vắng mặt/`null` luôn hợp lệ (chưa gắn nhãn), không bao giờ bắt buộc — cùng khuôn optional-additive với `docsRef` (RUL nền của Data Dictionary #23). KHÔNG event type mới, KHÔNG đổi fold: trường đi ké payload thô của `work.outcome`/`work.friction` nên sống sót replay/rebuild qua chính spread-fold sẵn có, cơ chế không đổi một byte (per D6). `fgos check` hiển thị `docType` khi có mặt (trên khối outcome và trong record friction gần nhất); log chưa có nhãn nào giữ hình dạng đầu ra byte-for-byte như trước khi trường tồn tại. BÊN SẢN XUẤT nhãn nay đã tồn tại: cờ TÙY CHỌN `--doc-type <quadrant>` trên verb `compound` (RUL51) ghi một `docType` thật lên bản ghi outcome — nên `fgos check` hiển thị nhãn thật, không còn chỉ là khả năng. Cờ tái dùng đúng kiểm slice-2 (giá trị ngoài bốn quadrant bị từ chối `validation`); vắng cờ thì `compound` giữ hành vi cũ byte-for-byte. Lớp phán đoán tổng hợp cấp nhãn — kỹ năng `fgos-compounding` chạy ở stage `compound-learn` — nay cũng đã dựng: nó gom capture thật, phân loại quadrant, gọi `compound --doc-type`, rồi soạn tài liệu người-dùng-cuối đặt dưới `docs/<quadrant>/` có trích dẫn bằng chứng thật (per D5/D6 + producer/skill slice 3 compound-learn-enduser-docs / 6aa67ae4).
 - **RUL53 (con trỏ tài liệu `docPath` — trường linkage cộng-thêm trên outcome).** Verb `compound` nhận thêm cờ TÙY CHỌN `--doc-path <path>`: khi có mặt, ghi trường `docPath` lên CÙNG bản ghi outcome mang `docType`, tại CẢ HAI site ghi outcome của verb (đường re-compound khi item đã ở `compound-learn`, VÀ đường fresh `moveStage`) — bỏ sót một site thì linkage bị nuốt lặng lẽ ở đường re-compound. Trường này trực giao và tùy chọn hệt `docType` (RUL52): KHÔNG kiểm hình dạng (đường dẫn tự do), KHÔNG event type mới, KHÔNG đổi fold — đi ké payload thô của `work.outcome` nên sống sót replay/rebuild qua chính spread-fold sẵn có, tầng lưu không đổi một byte. Vắng cờ thì `compound` giữ hành vi cũ byte-for-byte (kể cả bare `compound` không cờ nào; chỉ có `--doc-type` mà không `--doc-path` vẫn ghi `docType` bình thường, `docPath` là `null`). `fgos check` hiển thị `docPath` khi có mặt. Con trỏ này là NỀN cho chỉ mục đọc-theo-tag (area `enduser-docs-index`): mỗi tài liệu người-dùng-cuối truy ngược được về capture đã sinh ra nó, nên khi dựng lại tài liệu (slice gộp-sống về sau) không mất chi tiết/cấu trúc (per D12/D13/D15 bước-3 compound-learn-enduser-docs).
+- **RUL54 (sổ verb máy-đọc không bao giờ in nhầm tham số positional thành cờ bắt buộc).** Một tham số CHỈ nhận qua vị trí trên dòng lệnh (positional — vd `text` của `submit`) được đánh dấu riêng trong sổ verb máy-đọc; dạng trợ giúp chữ cho người đọc in "positional: `<tên>`" cho tham số đó, KHÔNG BAO GIỜ "required: `--<tên>`" — trước fix này, sổ verb in nhầm mọi tham số bắt buộc thành dạng cờ dù tham số chỉ nhận positional, khiến người dùng thử một cờ chưa từng hoạt động. Tham số vừa nhận positional vừa nhận qua cờ (vd `id` của `discover`/`take`) in cả hai dạng phân biệt. Sổ verb máy-đọc (`--help --json`) không đổi hình dạng — chỉ dạng chữ cho người đọc đổi (per D3 str77-79-doc-gap-fixes / ea8b9a8d).
+- **RUL55 (trợ giúp theo từng verb luôn có thật, không tác dụng phụ).** `fgos <verb> --help` (không kèm `--json`) luôn in mục trợ giúp CỦA RIÊNG verb đó, thoát mã 0, không ghi sự kiện/đổi bản chiếu/tác dụng phụ nào — áp dụng ĐỒNG NHẤT cho mọi verb kể cả `init` (gọi `init --help` không chạy `init` thật, không tạo `.fgos/`). Trước fix này, verb không có xử lý `--help` riêng: hầu hết verb rơi vào nhánh lỗi thiếu-tham-số (thoát mã 4, một dòng chẩn đoán thay vì trợ giúp thật), còn `init --help` lặng lẽ bỏ qua cờ và chạy `init` thật (tác dụng phụ ngoài ý muốn). `fgos --help` (không kèm tên verb) và `fgos <verb> --help --json` không đổi (per D3 str77-79-doc-gap-fixes / ea8b9a8d).
 
 ## Edge Cases Settled
 
