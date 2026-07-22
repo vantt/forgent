@@ -5,7 +5,7 @@
 // It never mutates `view` and never writes an event (the one exception is a
 // diagnostic `console.warn` via domains.mjs on a genuinely unrecognized
 // `item.domain` value — never a throw, see base-workflow-model D2/D3).
-import { getDomain, stageForStep } from './domains.mjs';
+import { getDomain, stageForStep } from './workflow-stage-graphs.mjs';
 //
 // Ready = status 'todo' AND every dep's status is 'done' (per D5: done
 // means "accepted into the main tree" — a dep sitting at 'proposed',
