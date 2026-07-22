@@ -9,7 +9,15 @@
   "bin": {
     "fgos": "bin/fgos.mjs"
   },
-  "files": ["bin", "src", "README.md", "LICENSE"],
+  "files": [
+    "bin",
+    "src",
+    "README.md",
+    "LICENSE",
+    "docs/how-to",
+    "docs/explanation",
+    "docs/enduser-docs-index.json"
+  ],
   "scripts": {
     "test": "node --test 'test/**/*.test.mjs'"
   },
