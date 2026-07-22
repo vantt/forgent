@@ -101,3 +101,34 @@ test('fgos --help prints non-empty text listing every verb', () => {
     assert.ok(result.stdout.includes(entry.invoke), `--help text is missing "${entry.invoke}"`);
   }
 });
+
+// STR77: submit's `text` is read only from `positional[0]` (bin/fgos.mjs's
+// `case 'submit':`) — it never falls back to `flags.text` the way id-style
+// params do. The manifest previously rendered every name in
+// `parameters.required` as `--name`, so `fgos --help` printed the
+// impossible-to-use `required: --text` for submit. It must now render the
+// positional usage instead, and never the `--text` flag hint.
+test('fgos --help renders submit\'s positional text arg, not "required: --text"', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['--help']);
+  assert.equal(result.status, 0);
+  const submitBlock = result.stdout.split(/\n(?=fgos [a-z])/).find((block) => block.startsWith('fgos submit '));
+  assert.ok(submitBlock, '--help output is missing a "fgos submit" block');
+  assert.ok(!submitBlock.includes('required: --text'), `submit's --help block still prints "required: --text":\n${submitBlock}`);
+  assert.ok(submitBlock.includes('positional: text'), `submit's --help block is missing "positional: text":\n${submitBlock}`);
+});
+
+// Same root cause, mixed-mode case: move's `id` is read as
+// `positional[0] ?? flags.id` (both forms work) while `to` is read only from
+// `flags.to`. The two must render distinctly — `id` as positional, `to` as
+// a real `--to` flag — proving the fix generalizes past the positional-only
+// case above instead of special-casing submit alone.
+test('fgos --help renders move\'s mixed positional/flag args distinctly', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['--help']);
+  const moveBlock = result.stdout.split(/\n(?=fgos [a-z])/).find((block) => block.startsWith('fgos move '));
+  assert.ok(moveBlock, '--help output is missing a "fgos move" block');
+  assert.ok(moveBlock.includes('positional: id'), `move's --help block is missing "positional: id":\n${moveBlock}`);
+  assert.ok(moveBlock.includes('required: --to'), `move's --help block is missing "required: --to":\n${moveBlock}`);
+  assert.ok(!moveBlock.includes('--id'), `move's --help block should not render id as a --flag:\n${moveBlock}`);
+});

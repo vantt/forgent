@@ -1904,7 +1904,18 @@ function renderHelpText() {
     lines.push(`${entry.invoke} [${entry.access}]`);
     lines.push(`    ${entry.description}`);
     const required = entry.parameters?.required || [];
-    if (required.length) lines.push(`    required: ${required.map((r) => `--${r}`).join(', ')}`);
+    const positional = entry.parameters?.positional || [];
+    // A required param that can be supplied positionally (mixed) or ONLY
+    // positionally (e.g. submit's text, session's sub) is never a real
+    // `--flag` on the command line — printing it as `required: --name`
+    // would be actively wrong for the positional-only case (STR77) and
+    // misleading for the mixed case. Split required into the two shapes so
+    // each renders in its own idiom; only the flag-only remainder still
+    // gets the `--name` form.
+    const positionalRequired = required.filter((r) => positional.includes(r));
+    const flagRequired = required.filter((r) => !positional.includes(r));
+    if (positionalRequired.length) lines.push(`    positional: ${positionalRequired.join(', ')}`);
+    if (flagRequired.length) lines.push(`    required: ${flagRequired.map((r) => `--${r}`).join(', ')}`);
     if (entry.deprecated) {
       lines.push(`    DEPRECATED since ${entry.deprecated.since} — use "${entry.deprecated.use_instead}" instead.`);
     }
