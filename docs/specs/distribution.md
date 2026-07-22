@@ -1,8 +1,8 @@
 ---
 area: distribution
-updated: 2026-07-17
-sources: [distribution-packaging]
-decisions: [12aedbc8, 469f4c79, 5d669ff6]
+updated: 2026-07-22
+sources: [distribution-packaging, str76-runner-bootstrap]
+decisions: [12aedbc8, 469f4c79, 5d669ff6, 38f7e0b8]
 coverage: full
 ---
 
@@ -27,7 +27,7 @@ a developer who wants to run `fgos` in a project that is not this repo.
 | 1 | Package name | The npm package identity used for the git-based install command | `forgent` | yes | — |
 | 2 | Package version | A semantic version string tooling (e.g. packaging commands) needs to treat the package as valid | semver string | yes | `0.1.0` |
 | 3 | Distribution file allowlist | The exact set of paths shipped to anyone installing the package — everything else in the source repo is excluded | `bin`, `src`, `README.md`, `LICENSE` | yes | — |
-| 4 | CLI entry point | The command exposed once installed | `fgos` → runs `bin/fgos.mjs` | yes | — |
+| 4 | CLI entry points | The commands exposed once installed | `fgos` → runs `bin/fgos.mjs`; `fgos-runner` → runs `bin/fgos-runner.mjs` (the autonomous-loop runner, see spec Runner) | yes | — |
 
 ## Behaviors & Operations
 
@@ -36,11 +36,12 @@ a developer who wants to run `fgos` in a project that is not this repo.
 - **Blocked when:** the installer's machine cannot reach GitHub over the
   network, or does not have Node.js 18+ available.
 - **What changes:** npm resolves the forgent GitHub repository, packages it
-  according to the distribution file allowlist, and installs the `fgos`
-  command into the caller's chosen npm location (global or project-local,
-  per the installer's own `npm install` flags). The install always resolves
-  against the source repository's default branch — no tagged or pinned
-  release exists yet.
+  according to the distribution file allowlist, and installs both CLI entry
+  points — `fgos` and `fgos-runner` — into the caller's chosen npm location
+  (global or project-local, per the installer's own `npm install` flags),
+  both immediately executable. The install always resolves against the
+  source repository's default branch — no tagged or pinned release exists
+  yet.
 - **Side effects:** none beyond the local npm install; no registry account is
   created or touched, and nothing is published to the public npm registry.
 - **Afterwards:** the installer has a working `fgos` command. The content
@@ -73,6 +74,10 @@ a developer who wants to run `fgos` in a project that is not this repo.
 - A package marked as not intended for public registry publication can still
   be installed directly from its GitHub repository — that restriction only
   blocks publishing to a public registry, not this installation path.
+- Both CLI entry points (`fgos` and `fgos-runner`) are installed identically,
+  executable immediately after install — a fresh install does not require
+  the installer to separately locate or make executable the autonomous-loop
+  runner command.
 
 ## Open Gaps
 
@@ -84,8 +89,8 @@ Not applicable — no screen; this is a command-line install flow.
 
 ## Pointers (implementation)
 
-- `repo/package.json` — `version`, `files`, `bin.fgos` fields define the
-  installable surface.
+- `repo/package.json` — `version`, `files`, `bin.fgos`, `bin.fgos-runner`
+  fields define the installable surface.
 - `repo/README.md` — `## Install` section states the exact command for users.
 - `repo/test/install-packaging.test.mjs` — real end-to-end proof: packs the
   package, installs it into a scratch location, and verifies both the
