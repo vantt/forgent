@@ -181,7 +181,7 @@ test('judgeDiscovery embeds the item title/kind/refs/deps in the prompt sent to 
   assert.deepEqual(verdict, { clear: true, verify: 'ok' });
 });
 
-test('judgeDiscovery fails safe (never throws, never clear) on unparsable stdout, retrying exactly once before falling back (str68 D2/D3)', () => {
+test('judgeDiscovery fails safe (never throws, never clear) on unparsable stdout, retrying up to MAX_JUDGE_ATTEMPTS before falling back (str68 D2/D3, nested-judge-fix)', () => {
   const dir = mkTempDir();
   const { scriptPath, counterPath } = writeCountingRawStdoutExecutor(dir, 'not json at all');
   const cfg = cfgFor([scriptPath, '{prompt}']);
@@ -191,7 +191,7 @@ test('judgeDiscovery fails safe (never throws, never clear) on unparsable stdout
   });
   assert.equal(verdict.clear, false);
   assert.equal(typeof verdict.question, 'string');
-  assert.equal(readCount(counterPath), 2);
+  assert.equal(readCount(counterPath), 3);
 });
 
 test('judgeDiscovery retries once with a stricter prompt on a parse-shaped failure and resolves to the retry verdict (str68 D2)', () => {

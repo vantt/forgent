@@ -214,7 +214,7 @@ test('judgeDecompose falls back to a default reason when need-human supplies non
   assert.ok(verdict.reason.length > 0);
 });
 
-test('judgeDecompose fails safe (never throws, invalid) on unparsable stdout, retrying exactly once before falling back (str68 D2/D3)', () => {
+test('judgeDecompose fails safe (never throws, invalid) on unparsable stdout, retrying up to MAX_JUDGE_ATTEMPTS before falling back (str68 D2/D3, nested-judge-fix)', () => {
   const dir = mkTempDir();
   const { scriptPath, counterPath } = writeCountingRawStdoutExecutor(dir, 'not json at all');
   const cfg = cfgFor([scriptPath, '{prompt}']);
@@ -223,7 +223,7 @@ test('judgeDecompose fails safe (never throws, invalid) on unparsable stdout, re
     verdict = judgeDecompose(sampleWork(), cfg);
   });
   assert.deepEqual(verdict, { kind: 'invalid' });
-  assert.equal(readCount(counterPath), 2);
+  assert.equal(readCount(counterPath), 3);
 });
 
 test('judgeDecompose retries once with a stricter prompt on a parse-shaped failure and resolves to the retry verdict (str68 D2)', () => {

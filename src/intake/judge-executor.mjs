@@ -15,6 +15,12 @@ import { resolveExecutorCommand } from '../runner/dispatch.mjs';
 export const JUDGE_STRICT_JSON_SUFFIX =
   '\n\nTRẢ LỜI CHỈ BẰNG JSON THUẦN, KHÔNG PROSE, KHÔNG GIẢI THÍCH, KHÔNG HỎI LẠI.';
 
+// str68 nested-judge-fix: total attempts (1 normal + 2 stricter retries),
+// raised from 2 (1 normal + 1 retry) — the refusal is probabilistic
+// (original str68 report: "đôi khi" = sometimes), not deterministic, so a
+// single retry wasn't enough headroom.
+const MAX_JUDGE_ATTEMPTS = 3;
+
 function spawnAttempt(cfg, model, prompt) {
   const { command, args } = resolveExecutorCommand(cfg, { prompt, model });
   return spawnSync(command, args, {
@@ -42,32 +48,29 @@ function parseVerdict(stdout) {
 }
 
 /**
- * Run a single judge call attempt against `prompt`, retrying exactly once
- * with `stricterPrompt` on a parse-shaped failure only (str68 D2). A
- * non-parse failure — spawn error, non-zero exit, or timeout — on either
- * attempt returns `null` immediately, never retries (str68 D2/D3). Each
- * attempt is bounded by the same `cfg.timeoutMs` (str68 D4), not a
- * shared/extended budget. Returns the parsed-but-unvalidated verdict object
- * on success, or `null` once both attempts are exhausted — callers apply
- * their own existing field validation and fail-safe branching to whichever
- * of these two outcomes they get.
+ * Run a judge call attempt against `prompt`, retrying with `stricterPrompt`
+ * on a parse-shaped failure only, up to `MAX_JUDGE_ATTEMPTS` total attempts
+ * (str68 D2, raised to 3 by str68 nested-judge-fix). A non-parse failure —
+ * spawn error, non-zero exit, or timeout — on ANY attempt returns `null`
+ * immediately, never retries (str68 D2/D3, unchanged). Each attempt is
+ * bounded by the same `cfg.timeoutMs` (str68 D4), not a shared/extended
+ * budget. Returns the parsed-but-unvalidated verdict object on success, or
+ * `null` once all attempts are exhausted — callers apply their own existing
+ * field validation and fail-safe branching to whichever of these two
+ * outcomes they get.
  */
 export function runJudgeExecutor(cfg, model, prompt, stricterPrompt) {
-  const first = spawnAttempt(cfg, model, prompt);
-  if (first.error || first.status !== 0) {
-    return null;
+  for (let attempt = 1; attempt <= MAX_JUDGE_ATTEMPTS; attempt += 1) {
+    const result = spawnAttempt(cfg, model, attempt === 1 ? prompt : stricterPrompt);
+    if (result.error || result.status !== 0) {
+      return null;
+    }
+
+    const verdict = parseVerdict(result.stdout);
+    if (verdict.parsed) {
+      return verdict.verdict;
+    }
   }
 
-  const firstResult = parseVerdict(first.stdout);
-  if (firstResult.parsed) {
-    return firstResult.verdict;
-  }
-
-  const second = spawnAttempt(cfg, model, stricterPrompt);
-  if (second.error || second.status !== 0) {
-    return null;
-  }
-
-  const secondResult = parseVerdict(second.stdout);
-  return secondResult.parsed ? secondResult.verdict : null;
+  return null;
 }

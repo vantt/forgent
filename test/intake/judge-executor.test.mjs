@@ -158,6 +158,30 @@ function writeFlakyEchoExecutor(dir) {
   return scriptPath;
 }
 
+// Returns unparsable stdout on invocations 1 and 2, a valid verdict on
+// invocation 3 — proves the 3rd (2nd retry) attempt can still succeed.
+function writeFlakyTwiceThenValidExecutor(dir, badStdout, validVerdict) {
+  const scriptPath = path.join(dir, 'flaky-twice-then-valid-executor.mjs');
+  const counterPath = path.join(dir, 'flaky-twice-count.txt');
+  fs.writeFileSync(counterPath, '0');
+  fs.writeFileSync(
+    scriptPath,
+    `
+    import fs from 'node:fs';
+    const counterPath = ${JSON.stringify(counterPath)};
+    const n = parseInt(fs.readFileSync(counterPath, 'utf8'), 10) + 1;
+    fs.writeFileSync(counterPath, String(n));
+    if (n < 3) {
+      process.stdout.write(${JSON.stringify(badStdout)});
+    } else {
+      process.stdout.write(${JSON.stringify(JSON.stringify(validVerdict))});
+    }
+    process.exit(0);
+    `,
+  );
+  return { scriptPath, counterPath };
+}
+
 function cfgFor(scriptPath, overrides = {}) {
   return {
     executor: { command: process.execPath, args: [scriptPath, '{prompt}'] },
@@ -192,13 +216,22 @@ test('runJudgeExecutor sends the stricter prompt (not the original) on the retry
   assert.equal(verdict.echoed, 'STRICTER SUFFIX prompt');
 });
 
-test('runJudgeExecutor returns null (fail-safe) when both attempts hit a parse-shaped failure (str68 D3)', () => {
+test('runJudgeExecutor returns null (fail-safe) when all three attempts hit a parse-shaped failure (str68 D3, nested-judge-fix)', () => {
   const dir = mkTempDir();
   const { scriptPath, counterPath } = writeRawStdoutExecutor(dir, 'not json at all');
   const cfg = cfgFor(scriptPath);
   const verdict = runJudgeExecutor(cfg, 'sonnet', 'prompt', 'stricter prompt');
   assert.equal(verdict, null);
-  assert.equal(readCount(counterPath), 2);
+  assert.equal(readCount(counterPath), 3);
+});
+
+test('runJudgeExecutor succeeds on the third attempt (second retry) after two parse-shaped failures (str68 nested-judge-fix)', () => {
+  const dir = mkTempDir();
+  const { scriptPath, counterPath } = writeFlakyTwiceThenValidExecutor(dir, 'not json at all', { clear: true, verify: 'ok' });
+  const cfg = cfgFor(scriptPath);
+  const verdict = runJudgeExecutor(cfg, 'sonnet', 'prompt', 'stricter prompt');
+  assert.deepEqual(verdict, { clear: true, verify: 'ok' });
+  assert.equal(readCount(counterPath), 3);
 });
 
 test('runJudgeExecutor treats a parsed non-object (array) as a parse-shaped failure and retries', () => {
