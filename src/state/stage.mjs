@@ -24,7 +24,7 @@
 // follow-up for whichever cell next touches this file's test scope.
 
 import { FsmError } from './fsm.mjs';
-import { DEFAULT_DOMAIN, getDomain, stageForStep } from './domains.mjs';
+import { DEFAULT_DOMAIN, getDomain, stageForStep } from './workflow-stage-graphs.mjs';
 
 // Re-exported for consumers that want the stage error type under this
 // module's own name, mirroring fsm.mjs's re-export of STATUSES from work.mjs.

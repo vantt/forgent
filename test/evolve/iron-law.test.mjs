@@ -34,7 +34,7 @@ const MODULE_TRIP_CASES = [
   'src/state/fsm.mjs',         // equals (D14)
   'src/intake/risk-keywords.mjs', // equals (review-20260717-self-improve-base-workflow f1)
   'src/intake/classify.mjs',      // equals (review-20260717-self-improve-base-workflow f1)
-  'src/state/domains.mjs',        // equals (review-20260718-self-improve-loop f03)
+  'src/state/workflow-stage-graphs.mjs',        // equals (review-20260718-self-improve-loop f03)
 ];
 
 // --- iron-law: flag test (description) over every HEAVY_KEYWORDS entry ---

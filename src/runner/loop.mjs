@@ -65,7 +65,7 @@ import {
   EXIT_CODES,
 } from '../state/store.mjs';
 import { DEFAULTS } from '../state/work.mjs';
-import { getDomain, stageForStep } from '../state/domains.mjs';
+import { getDomain, stageForStep } from '../state/workflow-stage-graphs.mjs';
 import { resolveAction, resolveStaleDoing } from './recovery.mjs';
 import {
   visitCount,

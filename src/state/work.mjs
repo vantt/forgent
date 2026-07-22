@@ -7,7 +7,7 @@
 //   risk       -> risk   | proof of done -> verify      | learning left    -> learn (optional)
 // plus id/title/status/deps to identify, name, place-in-FSM, and link work.
 
-import { DOMAINS, DEFAULT_DOMAIN } from './domains.mjs';
+import { DOMAINS, DEFAULT_DOMAIN } from './workflow-stage-graphs.mjs';
 
 /** Error raised by this module. `category` is the CLI exit-code contract (R4). */
 export class WorkValidationError extends Error {
@@ -55,7 +55,7 @@ export const TIERS = Object.freeze(['light', 'standard', 'heavy']);
  * byte-for-byte unchanged.
  *
  * Sourced from the 'coding' domain's registry entry (base-workflow-model
- * D2/D3, src/state/domains.mjs) rather than declared inline — this keeps
+ * D2/D3, src/state/workflow-stage-graphs.mjs) rather than declared inline — this keeps
  * exactly one definition of coding's stage list, but the exported value
  * (and every existing consumer of it) is unchanged.
  */
@@ -64,7 +64,7 @@ export const STAGES = DOMAINS[DEFAULT_DOMAIN].stages;
 /**
  * Domain field domain for `work.domain` (per base-workflow-model D1-D3) —
  * which domain's stage semantics (list + step-mapping + transition edges,
- * `src/state/domains.mjs`) govern this item's `stage` value. OPTIONAL and
+ * `src/state/workflow-stage-graphs.mjs`) govern this item's `stage` value. OPTIONAL and
  * NOT in DEFAULTS — same D8 lazy-default shape as `stage` itself: a missing
  * `domain` reads as `'coding'` lazily wherever it is consumed (frontier.mjs,
  * loop.mjs, stage.mjs, and this module's own `validateWork`), never injected

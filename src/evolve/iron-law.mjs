@@ -34,7 +34,7 @@ const MODULE_RULES = [
   // domain's legal FSM stage-transition table, the same capability fsm.mjs
   // already covers above — missing it let a diff widen a domain's legal
   // transitions (e.g. skip a stage) with required:false.
-  { kind: 'equals', value: 'src/state/domains.mjs' },
+  { kind: 'equals', value: 'src/state/workflow-stage-graphs.mjs' },
 ];
 
 function matchesModuleRule(filePath, rule) {

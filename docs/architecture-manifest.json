@@ -41,7 +41,7 @@
     "src/state/events.mjs": "kernel",
     "src/state/work.mjs": "kernel",
     "src/state/envelope.mjs": "kernel",
-    "src/state/domains.mjs": "kernel",
+    "src/state/workflow-stage-graphs.mjs": "kernel",
     "src/intake/risk-keywords.mjs": "kernel",
     "src/intake/classify.mjs": "use-case"
   }
