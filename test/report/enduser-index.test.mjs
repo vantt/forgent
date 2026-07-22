@@ -126,12 +126,14 @@ test('fgos docs-index writes repo/docs/enduser-docs-index.json with the real how
   assert.equal(demo.sourceCaptureId, 'doc-fgos-rollup-howto');
 });
 
-test('fgos docs-index tolerates missing quadrant dirs (tutorials/reference/explanation primary dir absent today) with no crash and no entries from them', () => {
-  // docs/explanation (the PRIMARY dir for the explanation quadrant) stays
-  // absent — the alias (str64-backfill, CONTEXT.md D2) is `docs/decisions/`,
-  // a different on-disk dir, not this one. tutorials/reference have no alias
-  // at all and stay fully empty.
-  for (const quadrant of ['tutorials', 'reference', 'explanation']) {
+test('fgos docs-index tolerates missing quadrant dirs (tutorials/reference have no alias and stay empty) with no crash and no entries from them', () => {
+  // tutorials/reference have no on-disk dir and no alias (D2's alias is
+  // explanation-only) — they stay fully empty. docs/explanation (the
+  // PRIMARY dir for the explanation quadrant) is no longer expected absent:
+  // str64-backfill-3 populates it with real backfilled docs, alongside the
+  // docs/decisions/ alias (D2) — both are legitimate on-disk sources for
+  // the same quadrant.
+  for (const quadrant of ['tutorials', 'reference']) {
     assert.ok(
       !fs.existsSync(path.join(REPO_ROOT, 'docs', quadrant)),
       `expected docs/${quadrant} to be absent today — validation constraint (a) assumes this`,
@@ -146,24 +148,31 @@ test('fgos docs-index tolerates missing quadrant dirs (tutorials/reference/expla
   }
 });
 
-test('fgos docs-index reads the docs/decisions/ alias (D2) into the explanation quadrant, tagged by quadrant name not alias dir name', () => {
+test('fgos docs-index reads BOTH the docs/decisions/ alias (D2) and the primary docs/explanation/ dir into the explanation quadrant, tagged by quadrant name not source dir name', () => {
   const result = runDocsIndex();
   assert.equal(result.status, 0, result.stderr);
   const manifest = JSON.parse(fs.readFileSync(MANIFEST_PATH, 'utf8'));
 
   const explanationEntries = manifest.filter((e) => e.quadrant === 'explanation');
+  const decisionsCount = fs.readdirSync(path.join(REPO_ROOT, 'docs', 'decisions')).filter((f) => f.endsWith('.md')).length;
+  const primaryExplanationCount = fs.readdirSync(path.join(REPO_ROOT, 'docs', 'explanation')).filter((f) => f.endsWith('.md')).length;
   assert.equal(
     explanationEntries.length,
-    fs.readdirSync(path.join(REPO_ROOT, 'docs', 'decisions')).filter((f) => f.endsWith('.md')).length,
-    'every .md file under docs/decisions/ must appear as one explanation-quadrant entry',
+    decisionsCount + primaryExplanationCount,
+    'every .md file under docs/decisions/ (alias) plus every .md file under docs/explanation/ (primary dir) must appear as one explanation-quadrant entry each',
   );
   for (const entry of explanationEntries) {
-    assert.ok(entry.docPath.startsWith('docs/decisions/'), `docPath must stay under the real on-disk dir: ${entry.docPath}`);
+    assert.ok(
+      entry.docPath.startsWith('docs/decisions/') || entry.docPath.startsWith('docs/explanation/'),
+      `docPath must stay under a real on-disk dir for this quadrant: ${entry.docPath}`,
+    );
     assert.equal(entry.purpose, QUADRANT_META.explanation.purpose);
     assert.equal(entry.audience, QUADRANT_META.explanation.audience);
   }
   const adr0001 = explanationEntries.find((e) => e.docPath === 'docs/decisions/0001-event-log-la-su-that.md');
   assert.ok(adr0001, 'ADR0001 must appear in the manifest via the alias');
+  const primaryDoc = explanationEntries.find((e) => e.docPath.startsWith('docs/explanation/'));
+  assert.ok(primaryDoc, 'at least one backfilled docs/explanation/ doc must appear via the primary dir');
 });
 
 test('fgos docs-index is idempotent — re-running yields the same entries, no duplicate docPath/sourceCaptureId pairs', () => {
