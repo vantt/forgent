@@ -15,17 +15,6 @@ import { resolveExecutorCommand } from '../runner/dispatch.mjs';
 export const JUDGE_STRICT_JSON_SUFFIX =
   '\n\nTRẢ LỜI CHỈ BẰNG JSON THUẦN, KHÔNG PROSE, KHÔNG GIẢI THÍCH, KHÔNG HỎI LẠI.';
 
-// str68 nested-judge-fix: prepended to EVERY prompt sent to the spawned
-// executor. Confirmed by direct manual reproduction that a nested `claude
-// -p` call issued from within an already-running Claude Code session can
-// return a prose refusal (exit 0, no JSON) when the prompt reads as a bare,
-// unexplained instruction with no framing for why it's being asked — the
-// identical prompt succeeds once it's clear the call comes from an
-// automated process, not a chatting end user. Vietnamese to match this
-// module's existing prompt language.
-export const JUDGE_CALLER_CONTEXT_PREAMBLE =
-  'Bạn đang được gọi như một bộ phân loại JSON tự động bởi công cụ dev fgOS, thông qua một lệnh gọi API có cấu trúc từ một tiến trình tự động — không phải một người dùng đang trò chuyện. Hãy trả lời đúng một dòng JSON duy nhất.\n\n';
-
 // str68 nested-judge-fix: total attempts (1 normal + 2 stricter retries),
 // raised from 2 (1 normal + 1 retry) — the refusal is probabilistic
 // (original str68 report: "đôi khi" = sometimes), not deterministic, so a
@@ -33,7 +22,7 @@ export const JUDGE_CALLER_CONTEXT_PREAMBLE =
 const MAX_JUDGE_ATTEMPTS = 3;
 
 function spawnAttempt(cfg, model, prompt) {
-  const { command, args } = resolveExecutorCommand(cfg, { prompt: JUDGE_CALLER_CONTEXT_PREAMBLE + prompt, model });
+  const { command, args } = resolveExecutorCommand(cfg, { prompt, model });
   return spawnSync(command, args, {
     shell: false,
     timeout: cfg?.timeoutMs,

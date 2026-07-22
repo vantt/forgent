@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { runJudgeExecutor, JUDGE_CALLER_CONTEXT_PREAMBLE } from '../../src/intake/judge-executor.mjs';
+import { runJudgeExecutor } from '../../src/intake/judge-executor.mjs';
 
 // Fake executors only — every "command" spawned here is a node script this
 // file writes to a mkdtemp directory at test time, mirroring
@@ -158,22 +158,6 @@ function writeFlakyEchoExecutor(dir) {
   return scriptPath;
 }
 
-// Echoes back the prompt argument it received on every invocation as a
-// valid JSON verdict — proves the caller-context preamble is prepended to
-// whatever this fake executor actually receives on argv.
-function writeEchoExecutor(dir) {
-  const scriptPath = path.join(dir, 'echo-executor.mjs');
-  fs.writeFileSync(
-    scriptPath,
-    `
-    const prompt = process.argv[2];
-    process.stdout.write(JSON.stringify({ echoed: prompt }));
-    process.exit(0);
-    `,
-  );
-  return scriptPath;
-}
-
 // Returns unparsable stdout on invocations 1 and 2, a valid verdict on
 // invocation 3 — proves the 3rd (2nd retry) attempt can still succeed.
 function writeFlakyTwiceThenValidExecutor(dir, badStdout, validVerdict) {
@@ -229,16 +213,7 @@ test('runJudgeExecutor sends the stricter prompt (not the original) on the retry
   const scriptPath = writeFlakyEchoExecutor(dir);
   const cfg = cfgFor(scriptPath);
   const verdict = runJudgeExecutor(cfg, 'sonnet', 'original prompt', 'STRICTER SUFFIX prompt');
-  assert.equal(verdict.echoed, JUDGE_CALLER_CONTEXT_PREAMBLE + 'STRICTER SUFFIX prompt');
-});
-
-test('runJudgeExecutor prepends JUDGE_CALLER_CONTEXT_PREAMBLE to the prompt sent to the executor (str68 nested-judge-fix)', () => {
-  const dir = mkTempDir();
-  const scriptPath = writeEchoExecutor(dir);
-  const cfg = cfgFor(scriptPath);
-  const verdict = runJudgeExecutor(cfg, 'sonnet', 'original prompt', 'stricter prompt');
-  assert.equal(verdict.echoed, JUDGE_CALLER_CONTEXT_PREAMBLE + 'original prompt');
-  assert.ok(verdict.echoed.startsWith(JUDGE_CALLER_CONTEXT_PREAMBLE));
+  assert.equal(verdict.echoed, 'STRICTER SUFFIX prompt');
 });
 
 test('runJudgeExecutor returns null (fail-safe) when all three attempts hit a parse-shaped failure (str68 D3, nested-judge-fix)', () => {
