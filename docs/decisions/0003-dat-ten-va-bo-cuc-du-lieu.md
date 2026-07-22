@@ -1,5 +1,9 @@
 ---
-title: Đặt tên & bố cục dữ liệu — fgos / work / .fgos/
+type: explanation
+title: 0003 — Đặt tên & bố cục dữ liệu
+tags: []
+timestamp: 2026-07-22T00:00:00.000Z
+source_capture_ids: []
 date: 2026-07-14
 status: accepted
 source_decisions: [55ad2f9f]

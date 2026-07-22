@@ -1,5 +1,9 @@
 ---
-title: Tiến hoá schema & event — log bất khả xâm phạm, replay backward-compatible có test
+type: explanation
+title: 0007 — Tiến hoá schema & event
+tags: []
+timestamp: 2026-07-22T00:00:00.000Z
+source_capture_ids: []
 date: 2026-07-14
 status: accepted
 source_decisions: [feed7428]

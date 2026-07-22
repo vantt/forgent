@@ -1,5 +1,9 @@
 ---
-title: Mốc MVP của fgOS — người lạ nộp một yêu cầu, nhận code sẵn-sàng-merge, tối thiểu ngồi canh
+type: explanation
+title: 0016 — Mốc MVP của fgOS
+tags: []
+timestamp: 2026-07-22T00:00:00.000Z
+source_capture_ids: []
 date: 2026-07-20
 status: accepted
 source_decisions: [4faa122e, 9401954d]

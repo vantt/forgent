@@ -27,7 +27,7 @@ import { loadRunnerConfig } from '../src/runner/dispatch.mjs';
 import { resolveDiscovery } from '../src/intake/discovery.mjs';
 import { resolveDecompose } from '../src/intake/decompose.mjs';
 import { computeEntropy, computeCounts } from '../src/report/entropy.mjs';
-import { buildEnduserIndex, QUADRANTS, findSourceCaptureIds } from '../src/report/enduser-index.mjs';
+import { buildEnduserIndex, QUADRANTS, QUADRANT_DIR_ALIASES, findSourceCaptureIds } from '../src/report/enduser-index.mjs';
 import { rankCandidates } from '../src/evolve/candidates.mjs';
 import { rankImpact } from '../src/state/impact.mjs';
 import { runGoalCheck } from '../src/runner/goal-check.mjs';
@@ -920,13 +920,17 @@ async function runVerb(verb, flags, positional, dir) {
     case 'docs-index': {
       const repoRoot = process.cwd();
       const docEntries = [];
-      for (const quadrant of QUADRANTS) {
-        const quadrantDir = path.join(repoRoot, 'docs', quadrant);
+      // Scans one on-disk dir for `.md` files and pushes each as a docEntry
+      // tagged with `quadrant` — the quadrant this dir counts as, which for
+      // an alias dir (D2) differs from the dir's own on-disk name. A missing
+      // dir is skipped cleanly (ENOENT), never a crash: not every quadrant
+      // dir, nor every alias dir, is guaranteed to exist yet.
+      const scanDirAsQuadrant = (quadrantDir, quadrant) => {
         let dirEntries;
         try {
           dirEntries = fs.readdirSync(quadrantDir, { withFileTypes: true });
         } catch (err) {
-          if (err.code === 'ENOENT') continue; // quadrant dir absent — skip cleanly, never a crash
+          if (err.code === 'ENOENT') return; // dir absent — skip cleanly, never a crash
           throw err;
         }
         for (const dirEntry of dirEntries) {
@@ -936,6 +940,12 @@ async function runVerb(verb, flags, positional, dir) {
           const content = fs.readFileSync(absPath, 'utf8');
           const h1 = content.match(/^#\s+(.+)$/m);
           docEntries.push({ quadrant, docPath, title: h1 ? h1[1].trim() : null });
+        }
+      };
+      for (const quadrant of QUADRANTS) {
+        scanDirAsQuadrant(path.join(repoRoot, 'docs', quadrant), quadrant);
+        for (const alias of QUADRANT_DIR_ALIASES[quadrant] ?? []) {
+          scanDirAsQuadrant(path.join(repoRoot, 'docs', alias), quadrant);
         }
       }
       const view = listWork(dir);

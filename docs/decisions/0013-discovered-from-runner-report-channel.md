@@ -1,5 +1,9 @@
 ---
-title: Kênh báo-cáo-không-ghi worker→runner cho discovered-from
+type: explanation
+title: 0013 — Kênh báo-cáo-không-ghi (worker→runner) cho `discovered-from`
+tags: []
+timestamp: 2026-07-22T00:00:00.000Z
+source_capture_ids: []
 date: 2026-07-18
 status: accepted
 source_decisions: [f176c18a]

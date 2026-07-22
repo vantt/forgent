@@ -1,9 +1,13 @@
 ---
-title: Mô hình đồ thị cạnh-định-kiểu hợp nhất thay thế deps/parent tách rời
+type: explanation
+title: 0012 — Mô hình đồ thị cạnh-định-kiểu hợp nhất thay thế deps/parent tách rời
+tags: []
+timestamp: 2026-07-22T00:00:00.000Z
+source_capture_ids: []
 date: 2026-07-18
 status: accepted
 source_decisions: [b5c0ba0c, 896219a7]
-supersedes: ["0002"]
+supersedes: [0002]
 relates_specs: [work-state]
 ---
 

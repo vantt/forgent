@@ -5,6 +5,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 import { buildEnduserIndex, findSourceCaptureId, findSourceCaptureIds, QUADRANT_META, QUADRANTS } from '../../src/report/enduser-index.mjs';
+import { parseFrontmatter } from '../../src/report/frontmatter.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '../..');
@@ -125,7 +126,11 @@ test('fgos docs-index writes repo/docs/enduser-docs-index.json with the real how
   assert.equal(demo.sourceCaptureId, 'doc-fgos-rollup-howto');
 });
 
-test('fgos docs-index tolerates missing quadrant dirs (tutorials/reference/explanation absent today) with no crash and no entries from them', () => {
+test('fgos docs-index tolerates missing quadrant dirs (tutorials/reference/explanation primary dir absent today) with no crash and no entries from them', () => {
+  // docs/explanation (the PRIMARY dir for the explanation quadrant) stays
+  // absent — the alias (str64-backfill, CONTEXT.md D2) is `docs/decisions/`,
+  // a different on-disk dir, not this one. tutorials/reference have no alias
+  // at all and stay fully empty.
   for (const quadrant of ['tutorials', 'reference', 'explanation']) {
     assert.ok(
       !fs.existsSync(path.join(REPO_ROOT, 'docs', quadrant)),
@@ -138,8 +143,27 @@ test('fgos docs-index tolerates missing quadrant dirs (tutorials/reference/expla
   for (const entry of manifest) {
     assert.notEqual(entry.quadrant, 'tutorials');
     assert.notEqual(entry.quadrant, 'reference');
-    assert.notEqual(entry.quadrant, 'explanation');
   }
+});
+
+test('fgos docs-index reads the docs/decisions/ alias (D2) into the explanation quadrant, tagged by quadrant name not alias dir name', () => {
+  const result = runDocsIndex();
+  assert.equal(result.status, 0, result.stderr);
+  const manifest = JSON.parse(fs.readFileSync(MANIFEST_PATH, 'utf8'));
+
+  const explanationEntries = manifest.filter((e) => e.quadrant === 'explanation');
+  assert.equal(
+    explanationEntries.length,
+    fs.readdirSync(path.join(REPO_ROOT, 'docs', 'decisions')).filter((f) => f.endsWith('.md')).length,
+    'every .md file under docs/decisions/ must appear as one explanation-quadrant entry',
+  );
+  for (const entry of explanationEntries) {
+    assert.ok(entry.docPath.startsWith('docs/decisions/'), `docPath must stay under the real on-disk dir: ${entry.docPath}`);
+    assert.equal(entry.purpose, QUADRANT_META.explanation.purpose);
+    assert.equal(entry.audience, QUADRANT_META.explanation.audience);
+  }
+  const adr0001 = explanationEntries.find((e) => e.docPath === 'docs/decisions/0001-event-log-la-su-that.md');
+  assert.ok(adr0001, 'ADR0001 must appear in the manifest via the alias');
 });
 
 test('fgos docs-index is idempotent — re-running yields the same entries, no duplicate docPath/sourceCaptureId pairs', () => {
@@ -155,4 +179,28 @@ test('fgos docs-index is idempotent — re-running yields the same entries, no d
   const keys = manifestAfterSecond.map((e) => `${e.docPath}::${e.sourceCaptureId}`);
   assert.equal(new Set(keys).size, keys.length, 'no duplicate docPath/sourceCaptureId pairs after a re-run');
   assert.deepEqual(manifestAfterSecond, manifestAfterFirst);
+});
+
+// --- retrofitted OKF frontmatter on the backfilled ADRs + the existing
+// how-to demo doc (str64-backfill, CONTEXT.md D3) ---------------------------
+
+test('every repo/docs/decisions/*.md file parses with parseFrontmatter to a non-empty meta.type', () => {
+  const decisionsDir = path.join(REPO_ROOT, 'docs', 'decisions');
+  const files = fs.readdirSync(decisionsDir).filter((f) => f.endsWith('.md'));
+  assert.ok(files.length > 0, 'expected at least one ADR file under docs/decisions/');
+  for (const file of files) {
+    const content = fs.readFileSync(path.join(decisionsDir, file), 'utf8');
+    const { meta } = parseFrontmatter(content);
+    assert.ok(meta.type && meta.type.length > 0, `${file} must have a non-empty frontmatter type`);
+    assert.equal(meta.type, 'explanation', `${file}'s frontmatter type must be 'explanation'`);
+  }
+});
+
+test("docs/how-to/check-rollup-progress.md's frontmatter has a non-empty type and links source_capture_ids to doc-fgos-rollup-howto", () => {
+  const content = fs.readFileSync(path.join(REPO_ROOT, 'docs', 'how-to', 'check-rollup-progress.md'), 'utf8');
+  const { meta } = parseFrontmatter(content);
+  assert.ok(meta.type && meta.type.length > 0);
+  assert.equal(meta.type, 'how-to');
+  assert.ok(Array.isArray(meta.source_capture_ids));
+  assert.ok(meta.source_capture_ids.includes('doc-fgos-rollup-howto'));
 });

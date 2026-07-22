@@ -1,5 +1,9 @@
 ---
-title: Runner & cô lập worker — executor headless, người-ghi-duy-nhất, đề xuất trên nhánh
+type: explanation
+title: 0005 — Runner & cô lập worker
+tags: []
+timestamp: 2026-07-22T00:00:00.000Z
+source_capture_ids: []
 date: 2026-07-14
 status: accepted
 source_decisions: [feed7428, 14396a5c]

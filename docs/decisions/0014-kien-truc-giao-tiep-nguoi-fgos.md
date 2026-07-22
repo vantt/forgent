@@ -1,5 +1,9 @@
 ---
-title: Kiến trúc giao tiếp người ↔ fgOS — contract là schema log, adapter mỏng, daemon ngoài core
+type: explanation
+title: 0014 — Kiến trúc giao tiếp người ↔ fgOS
+tags: []
+timestamp: 2026-07-22T00:00:00.000Z
+source_capture_ids: []
 date: 2026-07-18
 status: accepted
 source_decisions: [b2d18cc7, ef6ed305]

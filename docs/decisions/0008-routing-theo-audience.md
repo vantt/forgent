@@ -1,5 +1,9 @@
 ---
-title: Routing theo audience của từng interface, không toàn cục
+type: explanation
+title: 0008 — Routing theo audience của từng interface
+tags: []
+timestamp: 2026-07-22T00:00:00.000Z
+source_capture_ids: []
 date: 2026-07-13
 status: accepted
 source_decisions: [14ebeea9]

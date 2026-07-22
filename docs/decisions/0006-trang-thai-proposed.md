@@ -1,9 +1,13 @@
 ---
-title: Trạng thái `proposed` & vòng đề-xuất → duyệt → merge
+type: explanation
+title: 0006 — Trạng thái `proposed`
+tags: []
+timestamp: 2026-07-22T00:00:00.000Z
+source_capture_ids: []
 date: 2026-07-14
 status: accepted
 source_decisions: [feed7428]
-supersedes: "Tập trạng thái FSM của Phase 1 (spec work-state cập nhật khi đóng feature)"
+supersedes: Tập trạng thái FSM của Phase 1 (spec work-state cập nhật khi đóng feature)
 relates_specs: [work-state, runner]
 ---
 

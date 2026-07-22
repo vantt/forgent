@@ -1,5 +1,9 @@
 ---
-title: Mô hình việc phẳng — một loại item, một FSM, deps, frontier toàn cục
+type: explanation
+title: 0002 — Mô hình việc phẳng
+tags: []
+timestamp: 2026-07-22T00:00:00.000Z
+source_capture_ids: []
 date: 2026-07-14
 status: accepted
 source_decisions: [fd17309a]

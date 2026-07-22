@@ -1,3 +1,10 @@
+---
+type: explanation
+title: 0010 — Bản đồ kiến trúc là bản chuẩn
+tags: []
+timestamp: 2026-07-22T00:00:00.000Z
+source_capture_ids: []
+---
 # 0010 — Bản đồ kiến trúc là bản chuẩn
 
 **Ngày:** 2026-07-16 · **Trạng thái:** chốt

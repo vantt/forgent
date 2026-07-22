@@ -22,6 +22,21 @@ export const QUADRANTS = ['tutorials', 'how-to', 'reference', 'explanation'];
 // explicit hedge against the Diataxis-sufficiency doubt recorded at D14: an
 // index entry is self-describing even if a reader questions whether the
 // quadrant label alone is enough.
+// One extra on-disk directory alias per quadrant (str64-backfill, CONTEXT.md
+// D2): `docs/decisions/` (17 pre-existing ADR records, already product-facing
+// distilled) enters the index as `explanation`-quadrant docs alongside the
+// primary `docs/explanation/` convention, without moving the files. This is
+// the ONE explicit, locked extension — not a general multi-location-per-
+// quadrant mechanism, so it deliberately stays a plain quadrant->[dirNames]
+// map rather than something more generic. A quadrant absent from this map has
+// no alias; the entry layer (bin/fgos.mjs) reads it to also scan
+// `docs/<alias>/` for any quadrant listed here, tagging entries found there
+// with the quadrant name, never the alias dir name (docPath still reflects
+// the real on-disk `docs/decisions/...` location).
+export const QUADRANT_DIR_ALIASES = Object.freeze({
+  explanation: Object.freeze(['decisions']),
+});
+
 export const QUADRANT_META = Object.freeze({
   tutorials: Object.freeze({
     purpose: 'Teach a newcomer to complete a first real task, learning by doing.',

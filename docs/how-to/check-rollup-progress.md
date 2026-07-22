@@ -1,3 +1,10 @@
+---
+type: how-to
+title: How to check a root item's progress with `fgos rollup`
+tags: []
+timestamp: 2026-07-22T00:00:00.000Z
+source_capture_ids: [doc-fgos-rollup-howto]
+---
 # How to check a root item's progress with `fgos rollup`
 
 Use this when you have submitted a work item that later got broken into child

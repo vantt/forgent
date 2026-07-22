@@ -1,5 +1,9 @@
 ---
-title: Phạm vi & non-goal — work-state trước, chạy song song harness phát triển
+type: explanation
+title: 0004 — Phạm vi & non-goal
+tags: []
+timestamp: 2026-07-22T00:00:00.000Z
+source_capture_ids: []
 date: 2026-07-14
 status: accepted
 source_decisions: [9ac6ca50, 0790031c]

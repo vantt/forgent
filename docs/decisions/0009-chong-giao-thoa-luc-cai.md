@@ -1,5 +1,9 @@
 ---
-title: Chống giao thoa tiến trình lúc cài (harness coexistence)
+type: explanation
+title: 0009 — Chống giao thoa tiến trình lúc cài
+tags: []
+timestamp: 2026-07-22T00:00:00.000Z
+source_capture_ids: []
 date: 2026-07-14
 status: accepted
 source_decisions: [99a8a7fc]

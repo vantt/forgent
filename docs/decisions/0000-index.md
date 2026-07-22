@@ -1,5 +1,9 @@
 ---
-title: Sổ quyết định forgent (fgOS) — mục lục
+type: explanation
+title: Quyết định thiết kế forgent (fgOS)
+tags: []
+timestamp: 2026-07-22T00:00:00.000Z
+source_capture_ids: []
 updated: 2026-07-18
 kind: decision-records-index
 ---

@@ -1,5 +1,9 @@
 ---
-title: Đổi tên định danh contract C1-C9 thành CTR001-CTR009
+type: explanation
+title: 0015 — Đổi tên định danh contract C1-C9 thành CTR001-CTR009
+tags: []
+timestamp: 2026-07-22T00:00:00.000Z
+source_capture_ids: []
 date: 2026-07-18
 status: accepted
 source_decisions: [9286e6f5]
