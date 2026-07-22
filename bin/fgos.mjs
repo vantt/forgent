@@ -23,7 +23,7 @@ import { initStore, addWork, moveWork, moveStage, editWork, addDecision, addOutc
 import { repairTruncatedLastLine } from '../src/state/events.mjs';
 import { deriveTitle, classify, generateId } from '../src/intake/classify.mjs';
 import { wrapEnvelope } from '../src/state/envelope.mjs';
-import { loadRunnerConfig } from '../src/runner/dispatch.mjs';
+import { loadRunnerConfig, ensureRunnerConfig } from '../src/runner/dispatch.mjs';
 import { resolveDiscovery } from '../src/intake/discovery.mjs';
 import { resolveDecompose } from '../src/intake/decompose.mjs';
 import { computeEntropy, computeCounts } from '../src/report/entropy.mjs';
@@ -630,8 +630,12 @@ async function runVerb(verb, flags, positional, dir) {
     // is loaded the same way bin/fgos-runner.mjs loads it.
     case 'discover': {
       const id = requireField(positional[0] ?? flags.id, 'discover requires an id: fgos discover <id> [--config <path>]');
-      const configPath = flags.config ?? path.join(process.cwd(), '.fgos-runner.json');
-      const cfg = loadRunnerConfig(configPath);
+      // An explicit --config path stays a loud, unmodified failure on ENOENT
+      // (loadRunnerConfig); only the default, unflagged path bootstraps a
+      // missing config (D1/D3, ensureRunnerConfig).
+      const cfg = flags.config
+        ? loadRunnerConfig(flags.config)
+        : ensureRunnerConfig(path.join(process.cwd(), '.fgos-runner.json'));
       const stage = listWork(dir).work[id]?.stage;
       const result = stage === 'decompose'
         ? resolveDecompose(dir, id, cfg, 'session')

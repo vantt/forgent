@@ -24,7 +24,7 @@
 
 import path from 'node:path';
 import { EXIT_CODES, categoryOf } from '../src/state/store.mjs';
-import { loadRunnerConfig } from '../src/runner/dispatch.mjs';
+import { loadRunnerConfig, ensureRunnerConfig } from '../src/runner/dispatch.mjs';
 import { resolveRepoRoot, runOnce } from '../src/runner/loop.mjs';
 
 function parseArgs(args) {
@@ -51,8 +51,12 @@ async function main() {
   try {
     const flags = parseArgs(process.argv.slice(2));
     const repoRoot = resolveRepoRoot(process.cwd());
-    const configPath = flags.config ?? path.join(repoRoot, '.fgos-runner.json');
-    const config = loadRunnerConfig(configPath);
+    // An explicit --config path stays a loud, unmodified failure on ENOENT
+    // (loadRunnerConfig); only the default, unflagged path bootstraps a
+    // missing config (D1/D3, ensureRunnerConfig).
+    const config = flags.config
+      ? loadRunnerConfig(flags.config)
+      : ensureRunnerConfig(path.join(repoRoot, '.fgos-runner.json'));
 
     // `--once` runs one bounded drain-run over the frontier (D10/D15): it may
     // now dispatch several items in parallel, so a `drained` result carries a

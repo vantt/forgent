@@ -1874,6 +1874,42 @@ test('discover with no id is rejected as validation, exit 4', () => {
   assert.equal(result.status, 4);
 });
 
+// str76-runner-bootstrap-e3: a fresh cwd with no .fgos-runner.json used to
+// crash `discover` with RunnerConfigError/ENOENT (the bug this feature
+// fixes) — it now bootstraps the D1 default config instead. PATH is
+// neutralized to exclude the real `claude` binary (baked-in default
+// executor, D1) so judge-executor's spawnSync fails fast (spawn-fail) on the
+// nested judge call, never invoking a live agent; judgeDiscovery's fail-safe
+// (discovery.mjs) then parks the item as unclear, not a bare "success".
+test('discover on a fresh cwd with no .fgos-runner.json bootstraps the default config instead of crashing on ENOENT (D1/D3)', () => {
+  const cwd = tmpCwd();
+  const configPath = path.join(cwd, '.fgos-runner.json');
+  assert.equal(fs.existsSync(configPath), false);
+
+  const id = JSON.parse(run(cwd, ['submit', 'Ship the thing with no config yet']).stdout).data.id;
+
+  const result = run(cwd, ['discover', id], { PATH: '/usr/bin:/bin' });
+  assert.equal(result.status, 0, `expected no RunnerConfigError/ENOENT crash, got stderr: ${result.stderr}`);
+  assert.equal(JSON.parse(result.stdout).data.outcome, 'unclear');
+
+  assert.equal(fs.existsSync(configPath), true, 'discover should have auto-written the default .fgos-runner.json');
+
+  const view = envelopeData(run(cwd, ['list']).stdout);
+  assert.equal(view.work[id].status, 'awaiting-human');
+  assert.equal(view.work[id].stage, 'clarify');
+});
+
+test('discover --config pointing at a missing path still throws RunnerConfigError unchanged, exit 4', () => {
+  const cwd = tmpCwd();
+  const id = JSON.parse(run(cwd, ['submit', 'Ship the thing with an explicit missing config']).stdout).data.id;
+  const missingConfigPath = path.join(cwd, 'no-such-runner-config.json');
+
+  const result = run(cwd, ['discover', id, '--config', missingConfigPath]);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /cannot read runner config/);
+  assert.equal(fs.existsSync(missingConfigPath), false, 'an explicit --config path must never be auto-written');
+});
+
 // --- settlement channel actor attribution (phase-3-compound-learning-5,
 // S3-closeout) — real CLI call sites stamp `actor` per vision §8: the
 // `move`/`answer` verbs are always a human at the keyboard; `discover` is
