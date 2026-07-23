@@ -1,9 +1,9 @@
 ---
 area: distribution
 updated: 2026-07-23
-sources: [distribution-packaging, str76-runner-bootstrap, str77-79-doc-gap-fixes, str87-fgos-install-ux, str88-fgos-pnpm-lifecycle]
-decisions: [12aedbc8, 469f4c79, 5d669ff6, 38f7e0b8, ea8b9a8d, cbb4736a, 862ac01f, b799cbaa, 563db0a9, e52cc667]
-coverage: partial
+sources: [distribution-packaging, str76-runner-bootstrap, str77-79-doc-gap-fixes, str87-fgos-install-ux, str88-fgos-pnpm-lifecycle, str87-fgos-setup-doctor]
+decisions: [12aedbc8, 469f4c79, 5d669ff6, 38f7e0b8, ea8b9a8d, cbb4736a, 862ac01f, b799cbaa, 563db0a9, e52cc667, e8852403, 4cb11e46, 589eb4b0, 175cfc08, 1005dae0, 4206a0a6, 7d982955, ef531b22]
+coverage: full
 ---
 
 # Spec: Distribution
@@ -27,6 +27,11 @@ of it).
   shell profile → makes `fgos` and `fgos-runner` available directly from any
   location inside a checkout of the forgent source repository itself
   (including a linked git worktree of it), with no separate install step.
+- `fgos setup` (run anywhere) → wires the shell helper's source line into
+  every shell profile the caller actually has, and brings the local config
+  file up to date with the current defaults.
+- `fgos doctor` (run anywhere) → reports whether the environment is set up
+  correctly (Node/git present, shell helper sourced, config up to date).
 
 ## Data Dictionary
 
@@ -37,6 +42,9 @@ of it).
 | 3 | Distribution file allowlist | The exact set of paths shipped to anyone installing the package — everything else in the source repo is excluded | `bin`, `src`, `README.md`, `LICENSE`, plus the end-user documentation subset: the how-to guides directory, the design-rationale (explanation) directory, and the read-by-tag documentation index file | yes | — |
 | 4 | CLI entry points | The commands exposed once installed | `fgos` → runs `bin/fgos.mjs`; `fgos-runner` → runs `bin/fgos-runner.mjs` (the autonomous-loop runner, see spec Runner) | yes | — |
 | 5 | Dev checkout shell helper | An opt-in file, sourced from a contributor's own shell profile, exposing the same two CLI entry points from inside a checkout of the source repository — no install, no package fetch | one file, both commands | no (contributor's own choice) | not sourced automatically anywhere |
+| 6 | Local config staleness | Whether the local config file already has every setting the current default schema defines | up to date / missing one or more default settings | yes (computed, not stored) | — |
+| 7 | Doctor check | One named diagnostic `fgos doctor` reports on | `node-and-git` (Node/git present), `shell-integration-sourced` (helper wired into every shell profile the caller has), `config-not-stale` (local config has every current default setting) | yes | — |
+| 8 | Output rendering mode | How `fgos setup`/`fgos doctor` present their result | enveloped JSON (every other verb's shape, unchanged) / colored plain text (`--pretty`) | yes | enveloped JSON |
 
 ## Behaviors & Operations
 
@@ -106,6 +114,43 @@ of it).
   one-time manual step for contributors, not a requirement for installing
   or running `fgos` itself.
 
+### Setup
+
+- **Blocked when:** never — running `fgos setup` always attempts its work;
+  a shell profile that does not exist is simply skipped rather than
+  refused.
+- **What changes:** for every shell profile the caller actually has (bash's
+  and/or zsh's, whichever exist), the shell helper's source line is added
+  if not already present — never duplicated on a repeat run. The local
+  config file is also brought up to date: any setting present in the
+  current default schema but missing from the caller's file is added,
+  without ever changing a setting the caller already customized; a config
+  file that already has every current default is left untouched.
+- **Side effects:** the caller's own shell profile file(s) and local config
+  file may be modified; nothing outside the caller's own environment is
+  touched, and no network access happens.
+- **Afterwards:** the caller sees exactly what changed — which profile
+  file(s) gained the source line (or already had it), and which config
+  settings were newly added (or that none were needed). Nothing is done
+  silently; running `fgos setup` again when everything is already current
+  reports that plainly, without repeating any change.
+
+### Doctor
+
+- **Blocked when:** never — `fgos doctor` always runs every check and
+  reports the result; it never fails the invocation itself, only reports
+  individual checks as passing or not.
+- **What changes:** nothing — this is a read-only diagnostic. It never
+  writes a config file, never modifies a shell profile, and never installs
+  anything, even when a check reports a problem (`config-not-stale`
+  failing on a missing config file reports that plainly rather than
+  creating one).
+- **Side effects:** none.
+- **Afterwards:** the caller sees each named check (Data Dictionary #7) and
+  whether it passed, including enough detail to know what to do next (e.g.
+  which config settings are missing, or that `fgos setup` has not been run
+  yet).
+
 ## Actors & Access
 
 | Capability | Developer installing fgos elsewhere | forgent maintainer / contributor |
@@ -114,6 +159,8 @@ of it).
 | Receive the distribution file allowlist content | ✓ | — (stays in the source repo) |
 | Receive the source repo's own internal data (event log, dogfood runner config, tests) | never | n/a — never leaves the source repo |
 | Source the dev checkout shell helper file | n/a (nothing to source outside a checkout) | ✓ (opt-in, from their own shell profile) |
+| Run `fgos setup` (writes shell profile + config) | ✓ | ✓ |
+| Run `fgos doctor` (read-only diagnostic) | ✓ | ✓ |
 
 ## Business Rules
 
@@ -144,6 +191,25 @@ of it).
   (per str88-fgos-pnpm-lifecycle D1). This is what lets every package
   manager's own build-script approval policy stay out of the way entirely,
   rather than needing to be satisfied.
+- **RUL7.** `fgos setup` and `fgos doctor` both cover bash and zsh — neither
+  shell is treated as a lesser case (per D4).
+- **RUL8.** `fgos setup`'s config update never overwrites a setting the
+  caller already customized, at any nesting depth; array-valued settings
+  are never partially merged, only added wholesale when entirely missing
+  (per D3).
+- **RUL9.** `fgos doctor`'s checks never write anything, under any
+  circumstance, including when a check would otherwise need to create a
+  file to check it — a missing config file is reported as missing, never
+  created as a side effect of checking (per D2).
+- **RUL10.** `fgos setup` never asks for confirmation before writing to a
+  shell profile or the config file — it acts and then reports exactly what
+  it changed (per D6). Every other verb, and both of these two without
+  `--pretty`, still produce the same enveloped-JSON result shape as before
+  this feature — `--pretty` only changes how that same result is displayed,
+  never what it contains (per D7).
+- **RUL11.** `fgos doctor --fix` (automatic repair) does not exist yet — v1
+  is report-only by design (per D8), not an oversight; this stays a
+  Deferred Idea, not an Open Gap, until a future round decides it.
 
 ## Edge Cases Settled
 
@@ -163,14 +229,17 @@ of it).
   installing this package, because this package's install never declares a
   lifecycle script in the first place (per str88-fgos-pnpm-lifecycle D1) —
   there is nothing for that policy to approve or refuse.
+- `fgos setup` run a second time with nothing new to do reports that
+  plainly rather than silently repeating (or silently no-oping without
+  saying so).
+- `fgos doctor`'s `config-not-stale` check on a machine where `fgos setup`
+  was never run reports "not configured yet", not an error and not a
+  silently-created file.
 
 ## Open Gaps
 
-- The dev checkout shell helper only covers bash today; zsh support, merging
-  new default settings into a contributor's existing settings, and a
-  `doctor` self-diagnostic command are open questions still to be decided
-  (tracked as STR87's remaining scope, `docs/backlog.md`) — not yet
-  reflected here.
+(none — coverage is full for the mechanisms this feature adds. `fgos doctor
+--fix` is a deliberate Deferred Idea (RUL11/D8), not a gap.)
 
 ## Visuals
 
@@ -205,3 +274,21 @@ Not applicable — no screen; this is a command-line install flow.
 - `repo/test/scripts/install-git-hooks.test.mjs` — includes the regression
   case asserting `package.json` has no `prepare` key and does have
   `setup:hooks`.
+- `repo/src/setup/ansi.mjs` — hand-rolled ANSI color helpers behind
+  `--pretty`, zero dependency.
+- `repo/src/setup/config-merge.mjs` — `mergeConfigDefaults`, the
+  general-purpose deep-merge-fill-missing-only utility (arrays treated as
+  leaves); `repo/src/runner/dispatch.mjs`'s `ensureRunnerConfig` calls it
+  when a config file already exists.
+- `repo/src/setup/shell-rc.mjs` — bash/zsh rc-file detection and idempotent
+  source-line insertion.
+- `repo/src/setup/checks.mjs` — `fgos doctor`'s check registry (Data
+  Dictionary #7).
+- `repo/bin/fgos.mjs` — `setup`/`doctor` verb dispatch, `--pretty` rendering
+  gated to only these two verbs (CTR001 unchanged for every other verb).
+- `repo/src/cli/command-registry.mjs` — `setup`/`doctor` verb manifest
+  entries.
+- `repo/docs/architecture-manifest.json` — layer registration for the four
+  `src/setup/*.mjs` files.
+- `repo/test/setup/*.test.mjs` — unit and real-CLI proof for all of the
+  above.
