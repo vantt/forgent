@@ -8,6 +8,16 @@ import { fileURLToPath } from 'node:url';
 import { installGitHooks } from '../../scripts/install-git-hooks.mjs';
 
 const scriptPath = fileURLToPath(new URL('../../scripts/install-git-hooks.mjs', import.meta.url));
+const packageJsonPath = fileURLToPath(new URL('../../package.json', import.meta.url));
+
+// --- package.json lifecycle wiring: no automatic `prepare`, manual `setup:hooks` ---
+
+test('package.json has no prepare script and exposes setup:hooks running install-git-hooks.mjs', () => {
+  const pkg = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+
+  assert.equal('prepare' in pkg.scripts, false);
+  assert.equal(pkg.scripts['setup:hooks'], 'node scripts/install-git-hooks.mjs');
+});
 
 function mkTempDir(prefix) {
   return fs.mkdtempSync(path.join(os.tmpdir(), prefix));

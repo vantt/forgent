@@ -21,7 +21,7 @@
   ],
   "scripts": {
     "test": "node --test 'test/**/*.test.mjs'",
-    "prepare": "node scripts/install-git-hooks.mjs"
+    "setup:hooks": "node scripts/install-git-hooks.mjs"
   },
   "exports": {
     "./state/porting": "./src/state/porting.mjs",

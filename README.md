@@ -1,7 +1,7 @@
 # Forgent
 
 <!-- BEE:BACKLOG-BADGES:START -->
-![backlog done](https://img.shields.io/badge/backlog%20done-60-brightgreen) ![backlog in-flight](https://img.shields.io/badge/backlog%20in--flight-1-blue) ![backlog proposed](https://img.shields.io/badge/backlog%20proposed-26-lightgrey)
+![backlog done](https://img.shields.io/badge/backlog%20done-60-brightgreen) ![backlog in-flight](https://img.shields.io/badge/backlog%20in--flight-2-blue) ![backlog proposed](https://img.shields.io/badge/backlog%20proposed-26-lightgrey)
 <!-- BEE:BACKLOG-BADGES:END -->
 
 **The Foundation for Generative Agents.**
@@ -30,6 +30,12 @@ resolve the right `bin/*.mjs` automatically from any cwd inside the repo:
 ```bash
 source /path/to/forgent/scripts/fgos-shell-integration.sh
 ```
+
+### Contributing
+
+After cloning, run `npm run setup:hooks` once to wire up the pre-commit
+hook (this is not automatic on install — it no-ops for pnpm 10+, which
+blocks lifecycle scripts for git-hosted dependencies).
 
 ## Documentation
 
