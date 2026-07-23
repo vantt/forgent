@@ -51,6 +51,39 @@ function initTempRepoWithHook() {
   return repoRoot;
 }
 
+function initTempRepoWithDetachedWorktree() {
+  const mainRoot = mkTempDir('fgos-main-checkout-hook-e2e-main-');
+  execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: mainRoot });
+  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: mainRoot });
+  execFileSync('git', ['config', 'user.name', 'Test'], { cwd: mainRoot });
+  fs.writeFileSync(path.join(mainRoot, 'seed.txt'), 'seed\n');
+  execFileSync('git', ['add', 'seed.txt'], { cwd: mainRoot });
+  execFileSync('git', ['commit', '-q', '-m', 'root commit'], { cwd: mainRoot });
+
+  // A detached worktree off mainRoot -- this is the real deployment shape
+  // (fgOS 'session start' and bee's --with-companion mount both use
+  // 'git worktree add'). Its own '.git' is a FILE pointing at metadata
+  // nested under mainRoot's '.git/worktrees/<name>', and git sets GIT_DIR
+  // to that absolute path for any process spawned with cwd inside it --
+  // exactly the environment shape that broke the old
+  // 'git rev-parse --show-toplevel'-based resolution.
+  const worktreeParent = mkTempDir('fgos-main-checkout-hook-e2e-worktree-parent-');
+  const worktreeRoot = path.join(worktreeParent, 'worktree');
+  execFileSync('git', ['worktree', 'add', '--detach', worktreeRoot], { cwd: mainRoot });
+
+  const hooksDir = path.join(worktreeRoot, '.githooks');
+  const runnerDir = path.join(worktreeRoot, 'src', 'runner');
+  fs.mkdirSync(hooksDir, { recursive: true });
+  fs.mkdirSync(runnerDir, { recursive: true });
+  fs.copyFileSync(REAL_HOOK, path.join(hooksDir, 'pre-commit'));
+  fs.copyFileSync(REAL_LOCK_MODULE, path.join(runnerDir, 'main-checkout-lock.mjs'));
+  fs.copyFileSync(REAL_IDENTITY_MODULE, path.join(runnerDir, 'session-identity.mjs'));
+  fs.chmodSync(path.join(hooksDir, 'pre-commit'), 0o755);
+  execFileSync('git', ['config', 'core.hooksPath', '.githooks'], { cwd: worktreeRoot });
+
+  return worktreeRoot;
+}
+
 let fileCounter = 0;
 
 /** Stages a new, always-unique file and runs `git commit` as a child
@@ -181,3 +214,26 @@ test('a git commit is refused when the lock file is corrupt, and the refusal nev
   assert.doesNotMatch(result.stderr, /session-observer/);
   assert.doesNotMatch(result.stderr, /\bpid\b/i);
 });
+
+// --- truth 6: real detached worktree resolves its OWN root, not __dirname -
+// Regression coverage for the GIT_DIR-inheritance bug (str65 cell -9): a
+// plain `git rev-parse --show-toplevel` run with cwd == the hooks dir
+// inherits the worktree's GIT_DIR and incorrectly returns the hooks dir
+// itself as "toplevel" instead of walking up to the real worktree root.
+
+test('a commit inside a real detached git worktree writes the lock at the worktree\'s own .fgos, not under its hooks directory', () => {
+  const worktreeRoot = initTempRepoWithDetachedWorktree();
+
+  const result = commitAsSession(worktreeRoot, { BEE_SESSION_ID: 'session-worktree' });
+
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(
+    fs.existsSync(path.join(worktreeRoot, '.fgos', 'main-checkout.lock')),
+    true,
+  );
+  assert.equal(
+    fs.existsSync(path.join(worktreeRoot, '.githooks', '.fgos')),
+    false,
+  );
+});
+

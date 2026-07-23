@@ -12,7 +12,6 @@
 // alongside copies of those same two dependency files into a disposable
 // temp repo, preserving the same relative nesting.
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { acquireMainCheckoutLock, HELD, AMBIGUOUS } from '../src/runner/main-checkout-lock.mjs';
 import { resolveWriterIdentity } from '../src/runner/session-identity.mjs';
@@ -41,7 +40,7 @@ function refuse(message) {
 }
 
 function main() {
-  const repoRoot = execFileSync('git', ['rev-parse', '--show-toplevel'], { cwd: __dirname, encoding: 'utf8' }).trim();
+  const repoRoot = path.resolve(__dirname, '..');
   const fgosDir = path.join(repoRoot, '.fgos');
   const { identity } = resolveWriterIdentity();
   const ttlMs = resolveTtlMs();
