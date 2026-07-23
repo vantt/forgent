@@ -1,0 +1,8 @@
+{
+  "name": "fgOS",
+  "description": "fgOS slash-command surface: submit and pick work items from inside Claude Code without hand-typing the fgos CLI.",
+  "version": "1.0.0",
+  "author": {
+    "name": "fgOS"
+  }
+}

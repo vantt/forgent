@@ -465,7 +465,12 @@ function submitWork(dir, text, opts = {}) {
     description: text,
     kind,
     status: 'todo',
-    deps: [],
+    // Per D4 (str83-fgos-slash-commands): --deps threaded from opts the
+    // same way --domain/--discovered-from already are, immediately below.
+    // opts.deps defaults to [] (parseListFlag's own undefined-input
+    // shape), so an omitted --deps flag stays byte-identical to the prior
+    // hardcoded deps: [].
+    deps: opts.deps ?? [],
     risk,
     refs: [],
     verify: SUBMIT_VERIFY_SENTINEL,
@@ -614,6 +619,12 @@ async function runVerb(verb, flags, positional, dir) {
         // Per work-graph-intelligence S2b (producer A): two-hop like domain —
         // parsed here, threaded into submitWork's work object below.
         discoveredFrom: optionalField(flags['discovered-from'], 'submit --discovered-from requires a non-empty id; omit it to leave unset.'),
+        // Per D4 (str83-fgos-slash-commands): same parseListFlag helper
+        // `add`'s --deps already uses (above) — an omitted flag parses to
+        // [], byte-identical to the prior hardcoded deps: []. Cycle/
+        // existence validation happens at the same addWork write-gate
+        // every other verb goes through; no new check here.
+        deps: parseListFlag(flags.deps),
       };
       return submitWork(dir, text, opts);
     }
@@ -1063,6 +1074,76 @@ async function runVerb(verb, flags, positional, dir) {
         predicted: { tier: item.tier ?? DEFAULTS.tier, deps: item.deps.length, priorVisits, actor, headAtTake },
       });
       return { id, from: 'todo', to: 'doing', actor, seq: event.seq, source: 'main', headAtTake };
+    }
+
+    // Cửa pull — pick (str83-fgos-slash-commands, D1/D3): combines take's
+    // claim logic with worktree.mjs's createWorktree in one call, so
+    // `/fgOS:pick` can claim AND stand up the item's isolated `fgw/<id>`
+    // worktree/branch in a single verb. Reuses take's exact frontier-head
+    // default, explicit-id frontier validation, and blocked-branch re-take
+    // rules VERBATIM — pick opens no new claim surface, only a new combined
+    // entry point onto the same one take already uses. `actor` is never a
+    // flag here (unlike take's `--actor`): per D3 the picking session IS the
+    // actor, always `'session'`, because it is the one that will drive and
+    // later complete the item end to end.
+    case 'pick': {
+      const explicitId = optionalField(positional[0] ?? flags.id, 'pick --id requires a non-empty id value (omit --id entirely to pick the frontier head)');
+      const actor = 'session';
+
+      let id = explicitId;
+      if (!id) {
+        const [head] = readyWork(dir);
+        if (!head) {
+          throw new StoreError('validation', 'pick: the frontier is empty — no item ready to pick.');
+        }
+        id = head.id;
+      } else {
+        const item = listWork(dir).work[id];
+        if (!item) {
+          throw new StoreError('validation', `pick: work "${id}" not found.`);
+        }
+        if (item.status === 'todo' && !readyWork(dir).some((w) => w.id === id)) {
+          throw new StoreError(
+            'validation',
+            `pick: "${id}" is todo but not in the frontier yet (stage/deps/lineage) — pick only opens the same set the runner would dispatch (D1, same rule as take).`,
+          );
+        }
+      }
+
+      const item = listWork(dir).work[id];
+      const priorVisits = visitCount(readRawEvents(dir), id);
+      const repoRoot = process.cwd();
+
+      const branch = branchNameFor(id);
+      let claim;
+      if (item.status === 'blocked' && branchExists(repoRoot, branch)) {
+        const branchHeadAtTake = gitAt(repoRoot, ['rev-parse', branch]).trim();
+        const { event } = moveWork(dir, { id, to: 'doing', expectedStatus: 'blocked', actor, branchHeadAtTake });
+        addOutcome(dir, {
+          id,
+          predicted: { tier: item.tier ?? DEFAULTS.tier, deps: item.deps.length, priorVisits, actor, branchHeadAtTake },
+        });
+        claim = { id, from: 'blocked', to: 'doing', actor, seq: event.seq, source: 'branch', branch, branchHeadAtTake };
+      } else {
+        const headAtTake = currentHead(repoRoot);
+        const { event } = moveWork(dir, { id, to: 'doing', expectedStatus: 'todo', actor, headAtTake });
+        addOutcome(dir, {
+          id,
+          predicted: { tier: item.tier ?? DEFAULTS.tier, deps: item.deps.length, priorVisits, actor, headAtTake },
+        });
+        claim = { id, from: 'todo', to: 'doing', actor, seq: event.seq, source: 'main', headAtTake };
+      }
+
+      // The claim above is already durable (moveWork's event is committed to
+      // the log) by the time createWorktree runs. If createWorktree throws
+      // (WorktreeError), that error is left to surface AS-IS to the caller —
+      // no catch/rollback here: the item stays "doing" with no worktree, and
+      // the caller sees the real failure rather than a swallowed one. Undoing
+      // the claim automatically would hide a genuine git-level failure behind
+      // a clean-looking retry surface, which is worse than a visible partial
+      // state the human/session can act on directly.
+      const worktree = createWorktree(repoRoot, id);
+      return { ...claim, worktree };
     }
 
     // Cửa pull — return (stage-decompose S2-pull D1/R13): KHÔNG tin lời
