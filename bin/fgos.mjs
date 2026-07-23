@@ -543,7 +543,17 @@ async function runVerb(verb, flags, positional, dir) {
       } catch {
         // Swallowed by design (D4 fail-safe) — see comment above.
       }
-      return { dir, detectedHarnesses };
+      // D4 fail-safe, same discipline as the coexistence manifest above: a
+      // missing git binary, a non-repo cwd, and a repo with zero commits all
+      // land in the same catch — this is a plain non-fatal notice, not a
+      // distinction worth making.
+      let gitHeadless = false;
+      try {
+        execFileSync('git', ['rev-parse', '--verify', '--quiet', 'HEAD'], { cwd: path.dirname(dir), encoding: 'utf8', shell: false });
+      } catch {
+        gitHeadless = true;
+      }
+      return { dir, detectedHarnesses, ...(gitHeadless ? { gitHeadless: true } : {}) };
     }
 
     case 'add': {

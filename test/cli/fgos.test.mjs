@@ -95,6 +95,14 @@ function gitHead(cwd) {
   return execFileSync('git', ['rev-parse', 'HEAD'], { cwd, encoding: 'utf8' }).trim();
 }
 
+// Same shape as initGitCwd, but stops before the commit step — a real git
+// repo with no resolvable HEAD, for the str86 gitHeadless notice tests.
+function initHeadlessGitCwd() {
+  const cwd = tmpCwd();
+  execFileSync('git', ['init', '-q'], { cwd });
+  return cwd;
+}
+
 // Same shape as initGitCwd, but `fgos` (and its `.fgos/`) lives one level
 // BELOW the real git top-level — mirrors the STR60 dogfood-fixture layout
 // (`repo/dogfood-fixture/.fgos/`, real top-level at `repo/`) that exposed
@@ -138,6 +146,22 @@ test('init creates .fgos/ with an empty log and a rebuilt (empty) view, exit 0',
   // deterministic revision-hash sibling — the fold return stays pure, but
   // state.json fingerprints its own folded state.
   assert.match(view.revision, /^[0-9a-f]{64}$/);
+});
+
+test('init in a git repo with zero commits reports gitHeadless: true', () => {
+  const cwd = initHeadlessGitCwd();
+  const result = run(cwd, ['init']);
+  assert.equal(result.status, 0);
+  const initData = envelopeData(result.stdout);
+  assert.equal(initData.gitHeadless, true);
+});
+
+test('init in a git repo with a commit does not report gitHeadless', () => {
+  const cwd = initGitCwd();
+  const result = run(cwd, ['init']);
+  assert.equal(result.status, 0);
+  const initData = envelopeData(result.stdout);
+  assert.equal(initData.gitHeadless, undefined);
 });
 
 test('add creates exactly one work.add event and the view reflects the new item, exit 0', () => {
