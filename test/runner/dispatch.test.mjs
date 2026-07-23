@@ -415,14 +415,10 @@ test('ensureRunnerConfig on a missing path writes DEFAULT_RUNNER_CONFIG, announc
   assert.deepEqual(cfg, DEFAULT_RUNNER_CONFIG);
 });
 
-test('ensureRunnerConfig on an already-existing path does not rewrite the file or re-announce', () => {
+test('ensureRunnerConfig on an already-existing, already-up-to-date path does not rewrite the file or announce anything', () => {
   const dir = mkTempDir();
   const configPath = path.join(dir, '.fgos-runner.json');
-  const existing = {
-    executor: { command: 'claude', args: ['{prompt}'] },
-    models: { standard: 'sonnet' },
-    timeoutMs: 1000,
-  };
+  const existing = JSON.parse(JSON.stringify(DEFAULT_RUNNER_CONFIG));
   fs.writeFileSync(configPath, JSON.stringify(existing));
   const before = fs.statSync(configPath).mtimeMs;
 
@@ -434,6 +430,61 @@ test('ensureRunnerConfig on an already-existing path does not rewrite the file o
   assert.equal(stderr, '');
   assert.equal(fs.statSync(configPath).mtimeMs, before);
   assert.deepEqual(cfg, existing);
+});
+
+// --- ensureRunnerConfig: D3 config-merge on an existing but stale file --
+
+test('ensureRunnerConfig on an existing file missing newly-added default keys adds them, announces which, and rewrites the file — without touching keys already set', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, '.fgos-runner.json');
+  // A pre-D3 config: has the older fields, but predates DEFAULT_RUNNER_CONFIG
+  // growing a "parallel" block and a fuller "models" map (str87 D3's exact
+  // motivating gap).
+  const existing = {
+    executor: { command: 'claude', args: ['{prompt}'] },
+    models: { standard: 'sonnet' },
+    timeoutMs: 1000,
+  };
+  fs.writeFileSync(configPath, JSON.stringify(existing));
+
+  let cfg;
+  const stderr = captureStderr(() => {
+    cfg = ensureRunnerConfig(configPath);
+  });
+
+  assert.match(stderr, /added missing default config keys/);
+  assert.match(stderr, /models\.light/);
+  assert.match(stderr, /models\.heavy/);
+  assert.match(stderr, /parallel/);
+  // Values the user already set are untouched.
+  assert.equal(cfg.executor.command, 'claude');
+  assert.deepEqual(cfg.executor.args, ['{prompt}']);
+  assert.equal(cfg.models.standard, 'sonnet');
+  assert.equal(cfg.timeoutMs, 1000);
+  // Missing default keys were filled in.
+  assert.equal(cfg.models.light, DEFAULT_RUNNER_CONFIG.models.light);
+  assert.equal(cfg.models.heavy, DEFAULT_RUNNER_CONFIG.models.heavy);
+  assert.deepEqual(cfg.parallel, DEFAULT_RUNNER_CONFIG.parallel);
+  // The file on disk reflects the merge, not just the in-memory return.
+  assert.deepEqual(JSON.parse(fs.readFileSync(configPath, 'utf8')), cfg);
+});
+
+test('ensureRunnerConfig never overwrites a value the user already customized, even when a sibling default key is missing', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, '.fgos-runner.json');
+  const existing = {
+    executor: { command: 'my-custom-cli', args: ['{prompt}'] },
+    models: { standard: 'opus' },
+    timeoutMs: 42,
+  };
+  fs.writeFileSync(configPath, JSON.stringify(existing));
+
+  const cfg = ensureRunnerConfig(configPath);
+
+  assert.equal(cfg.executor.command, 'my-custom-cli');
+  assert.deepEqual(cfg.executor.args, ['{prompt}']);
+  assert.equal(cfg.models.standard, 'opus');
+  assert.equal(cfg.timeoutMs, 42);
 });
 
 test('ensureRunnerConfig is idempotent: a second call on the now-existing default path returns the same config without rewriting or re-announcing', () => {

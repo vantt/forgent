@@ -37,6 +37,7 @@ import fs from 'node:fs';
 import { spawn } from 'node:child_process';
 import { DEFAULTS } from '../state/work.mjs';
 import { selectTemplate, renderTemplate, hashTemplate } from './prompt-templates.mjs';
+import { mergeConfigDefaults } from '../setup/config-merge.mjs';
 
 /** Raised for malformed runner config or an unresolvable tier -> model
  * lookup. `category` follows the same CLI-facing vocabulary as
@@ -173,6 +174,12 @@ export const DEFAULT_RUNNER_CONFIG = {
  * on ENOENT; this wrapper is the one place that instead treats a missing
  * default path as "first run, bootstrap it."
  *
+ * When `configPath` already exists (str87-fgos-setup-doctor D3), it is
+ * merged against `DEFAULT_RUNNER_CONFIG` via `mergeConfigDefaults` instead of
+ * left untouched: any default key the user's file is missing gets filled in
+ * and the file is rewritten + the added keys announced; a file that already
+ * has every default key is never rewritten.
+ *
  * A write failure (permissions, read-only fs, disk full) is never caught —
  * it propagates as a normal thrown error, since a failed bootstrap write IS
  * the whole point of this call, not a side effect to shrug off.
@@ -183,7 +190,19 @@ export function ensureRunnerConfig(configPath) {
     process.stderr.write(
       `fgos: no .fgos-runner.json found — wrote a default (executor: ${DEFAULT_RUNNER_CONFIG.executor.command}) at ${configPath}; edit it to change.\n`,
     );
+    return loadRunnerConfig(configPath);
   }
+
+  const existingConfig = loadRunnerConfig(configPath);
+  const { merged, addedKeys } = mergeConfigDefaults(existingConfig, DEFAULT_RUNNER_CONFIG);
+  if (addedKeys.length === 0) {
+    return existingConfig;
+  }
+
+  fs.writeFileSync(configPath, `${JSON.stringify(merged, null, 2)}\n`);
+  process.stderr.write(
+    `fgos: added missing default config keys to ${configPath}: ${addedKeys.join(', ')}\n`,
+  );
   return loadRunnerConfig(configPath);
 }
 
