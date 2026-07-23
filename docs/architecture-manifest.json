@@ -1,7 +1,13 @@
 {
   "contract": "architecture-manifest.v1",
   "map": "docs/architecture-map.md",
-  "layers": ["entry", "use-case", "infra", "domain", "kernel"],
+  "layers": [
+    "entry",
+    "use-case",
+    "infra",
+    "domain",
+    "kernel"
+  ],
   "files": {
     "bin/fgos.mjs": "entry",
     "bin/fgos-runner.mjs": "entry",
@@ -11,8 +17,10 @@
     "src/runner/worker-log.mjs": "infra",
     "src/runner/worktree.mjs": "infra",
     "src/runner/session.mjs": "infra",
+    "src/runner/session-identity.mjs": "infra",
     "src/runner/goal-check.mjs": "infra",
     "src/runner/merge.mjs": "infra",
+    "src/runner/main-checkout-lock.mjs": "infra",
     "src/runner/github-adapter.mjs": "infra",
     "src/state/store.mjs": "infra",
     "src/state/porting-store.mjs": "infra",

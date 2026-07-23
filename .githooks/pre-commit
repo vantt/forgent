@@ -1,0 +1,61 @@
+#!/usr/bin/env node
+// .githooks/pre-commit -- git-native hard block for the STR65 main-checkout
+// activity lock (D2/D3, str65-worktree-isolation-enforcement). Fires for
+// ANY `git commit` against this checkout, regardless of actor (human
+// terminal, agent session, or CI) -- not only writes made through fgOS's
+// own CLI verbs, per D2.
+//
+// Installed via `git config core.hooksPath .githooks` (wiring is cell -6's
+// job, out of scope here). Lives at <repoRoot>/.githooks/pre-commit and
+// imports its two dependencies with paths relative to ITS OWN location,
+// mirroring the production install layout -- the e2e test copies this file
+// alongside copies of those same two dependency files into a disposable
+// temp repo, preserving the same relative nesting.
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { acquireMainCheckoutLock, HELD, AMBIGUOUS } from '../src/runner/main-checkout-lock.mjs';
+import { resolveWriterIdentity } from '../src/runner/session-identity.mjs';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+// Historical STR65 incidents (3 SHA'd, docs/history/str65-worktree-isolation-
+// enforcement/reports/validation-phase1.md) showed real inter-commit gaps of
+// ~2-3.5 minutes within a single working session. 15 minutes is generous
+// enough to cover a realistic pause between a session's own commits while
+// staying bounded enough to self-heal once a session actually goes away.
+const DEFAULT_TTL_MS = 15 * 60 * 1000;
+
+const HOW_TO_DOC = 'docs/how-to-parallel-lanes.md (workshop root, one level up from repo/)';
+
+function resolveTtlMs() {
+  const raw = process.env.FGOS_MAIN_CHECKOUT_LOCK_TTL_MS;
+  if (raw === undefined) return DEFAULT_TTL_MS;
+  const parsed = Number(raw);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : DEFAULT_TTL_MS;
+}
+
+function refuse(message) {
+  process.stderr.write(`${message}\nSee ${HOW_TO_DOC} for how to work in an isolated worktree/session.\n`);
+  process.exit(1);
+}
+
+function main() {
+  const repoRoot = path.resolve(__dirname, '..');
+  const fgosDir = path.join(repoRoot, '.fgos');
+  const { identity } = resolveWriterIdentity();
+  const ttlMs = resolveTtlMs();
+
+  const result = acquireMainCheckoutLock(fgosDir, { identity, ttlMs });
+
+  if (result.status === HELD) {
+    refuse('commit refused: another session appears to be actively working in this checkout.');
+    return;
+  }
+  if (result.status === AMBIGUOUS) {
+    refuse('commit refused: the main-checkout lock file could not be read -- refusing to commit, per fail-closed policy.');
+    return;
+  }
+  process.exit(0);
+}
+
+main();
