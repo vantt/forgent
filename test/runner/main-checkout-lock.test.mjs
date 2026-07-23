@@ -13,7 +13,7 @@ import {
   AMBIGUOUS,
 } from '../../src/runner/main-checkout-lock.mjs';
 
-// Main-checkout activity lock (str65-worktree-isolation-enforcement, D4/D5).
+// Main-checkout activity lock (str65-worktree-isolation-enforcement, D4/D5/D6).
 // Every test builds its own disposable git repo (git init in mkdtemp) with
 // its own `.fgos/` inside it; nothing here touches THIS repo (forgent
 // itself).
@@ -51,7 +51,7 @@ function lockPathFor(dir) {
 
 test('acquires the lock when no lock file exists (missing lock file is NOT ambiguous)', () => {
   const { dir } = setup();
-  const res = acquireMainCheckoutLock(dir, { pid: process.pid });
+  const res = acquireMainCheckoutLock(dir, { identity: process.pid });
   assert.equal(res.status, ACQUIRED);
   assert.equal(fs.existsSync(lockPathFor(dir)), true);
   const record = JSON.parse(fs.readFileSync(lockPathFor(dir), 'utf8'));
@@ -69,7 +69,7 @@ test('refuses when held by a live other pid (two racing processes cannot both su
   fs.writeFileSync(lockPathFor(dir), JSON.stringify({ pid: process.pid, ts: Date.now() }));
 
   const otherPid = process.pid + 1; // never actually probed as the acquirer's own identity
-  const res = acquireMainCheckoutLock(dir, { pid: otherPid });
+  const res = acquireMainCheckoutLock(dir, { identity: otherPid });
 
   assert.equal(res.status, HELD);
   assert.equal(res.holderPid, process.pid);
@@ -86,7 +86,7 @@ test('reclaims a lock held by a dead pid', () => {
   const dead = deadPid();
   fs.writeFileSync(lockPathFor(dir), JSON.stringify({ pid: dead, ts: Date.now() }));
 
-  const res = acquireMainCheckoutLock(dir, { pid: process.pid });
+  const res = acquireMainCheckoutLock(dir, { identity: process.pid });
 
   assert.equal(res.status, ACQUIRED);
   const record = JSON.parse(fs.readFileSync(lockPathFor(dir), 'utf8'));
@@ -103,7 +103,7 @@ test('reclaims a lock held by a live pid whose last-touched timestamp exceeds tt
   // timestamp is old enough to exceed the ttlMs supplied below.
   fs.writeFileSync(lockPathFor(dir), JSON.stringify({ pid: process.pid, ts: staleTs }));
 
-  const res = acquireMainCheckoutLock(dir, { pid: process.pid + 1, ttlMs: 1000 });
+  const res = acquireMainCheckoutLock(dir, { identity: process.pid + 1, ttlMs: 1000 });
 
   assert.equal(res.status, ACQUIRED);
 });
@@ -114,7 +114,7 @@ test('does NOT reclaim a lock held by a live pid whose timestamp is within ttlMs
   const freshTs = Date.now() - 500;
   fs.writeFileSync(lockPathFor(dir), JSON.stringify({ pid: process.pid, ts: freshTs }));
 
-  const res = acquireMainCheckoutLock(dir, { pid: process.pid + 1, ttlMs: 60_000 });
+  const res = acquireMainCheckoutLock(dir, { identity: process.pid + 1, ttlMs: 60_000 });
 
   assert.equal(res.status, HELD);
   assert.equal(res.holderPid, process.pid);
@@ -126,7 +126,7 @@ test('falls back to pure PID-liveness when ttlMs is omitted (old timestamp, live
   const veryOldTs = Date.now() - 10_000_000;
   fs.writeFileSync(lockPathFor(dir), JSON.stringify({ pid: process.pid, ts: veryOldTs }));
 
-  const res = acquireMainCheckoutLock(dir, { pid: process.pid + 1 });
+  const res = acquireMainCheckoutLock(dir, { identity: process.pid + 1 });
 
   assert.equal(res.status, HELD);
   assert.equal(res.holderPid, process.pid);
@@ -139,7 +139,7 @@ test('reports AMBIGUOUS for an unparseable (non-JSON) lock file, never free or h
   fs.mkdirSync(dir, { recursive: true });
   fs.writeFileSync(lockPathFor(dir), 'not json at all {{{');
 
-  const res = acquireMainCheckoutLock(dir, { pid: process.pid });
+  const res = acquireMainCheckoutLock(dir, { identity: process.pid });
 
   assert.equal(res.status, AMBIGUOUS);
   assert.equal(res.holderPid, undefined);
@@ -152,7 +152,7 @@ test('reports AMBIGUOUS for a lock file whose pid field is not a usable number',
   fs.mkdirSync(dir, { recursive: true });
   fs.writeFileSync(lockPathFor(dir), JSON.stringify({ pid: 'not-a-pid', ts: Date.now() }));
 
-  const res = acquireMainCheckoutLock(dir, { pid: process.pid });
+  const res = acquireMainCheckoutLock(dir, { identity: process.pid });
 
   assert.equal(res.status, AMBIGUOUS);
 });
@@ -162,7 +162,7 @@ test('reports AMBIGUOUS for a lock file with a valid pid but no usable timestamp
   fs.mkdirSync(dir, { recursive: true });
   fs.writeFileSync(lockPathFor(dir), JSON.stringify({ pid: process.pid, ts: 'not-a-timestamp' }));
 
-  const res = acquireMainCheckoutLock(dir, { pid: process.pid + 1 });
+  const res = acquireMainCheckoutLock(dir, { identity: process.pid + 1 });
 
   assert.equal(res.status, AMBIGUOUS);
 });
@@ -171,13 +171,13 @@ test('reports AMBIGUOUS for a lock file with a valid pid but no usable timestamp
 
 test('release removes the lock so a subsequent acquire by another pid succeeds cleanly', () => {
   const { dir } = setup();
-  const first = acquireMainCheckoutLock(dir, { pid: process.pid });
+  const first = acquireMainCheckoutLock(dir, { identity: process.pid });
   assert.equal(first.status, ACQUIRED);
 
   first.release();
   assert.equal(fs.existsSync(lockPathFor(dir)), false);
 
-  const second = acquireMainCheckoutLock(dir, { pid: process.pid + 1 });
+  const second = acquireMainCheckoutLock(dir, { identity: process.pid + 1 });
   assert.equal(second.status, ACQUIRED);
   const record = JSON.parse(fs.readFileSync(lockPathFor(dir), 'utf8'));
   assert.equal(record.pid, process.pid + 1);
@@ -187,4 +187,94 @@ test('releaseMainCheckoutLock is idempotent when no lock file exists', () => {
   const { dir } = setup();
   fs.mkdirSync(dir, { recursive: true });
   assert.doesNotThrow(() => releaseMainCheckoutLock(dir));
+});
+
+// --- string identity (D6): opaque session ids, never liveness-checked -------
+
+test('acquires the lock when free using a string identity', () => {
+  const { dir } = setup();
+  const res = acquireMainCheckoutLock(dir, { identity: 'session-abc-123' });
+
+  assert.equal(res.status, ACQUIRED);
+  const record = JSON.parse(fs.readFileSync(lockPathFor(dir), 'utf8'));
+  assert.equal(record.pid, 'session-abc-123');
+});
+
+test('a different string identity is held within ttlMs of its last refresh', () => {
+  const { dir } = setup();
+  fs.mkdirSync(dir, { recursive: true });
+  const freshTs = Date.now() - 500;
+  fs.writeFileSync(lockPathFor(dir), JSON.stringify({ pid: 'session-holder', ts: freshTs }));
+
+  const res = acquireMainCheckoutLock(dir, { identity: 'session-other', ttlMs: 60_000 });
+
+  assert.equal(res.status, HELD);
+  assert.equal(res.holderPid, 'session-holder');
+});
+
+test('a different string identity is reclaimed once ttlMs has elapsed since its last refresh', () => {
+  const { dir } = setup();
+  fs.mkdirSync(dir, { recursive: true });
+  const staleTs = Date.now() - 10_000;
+  fs.writeFileSync(lockPathFor(dir), JSON.stringify({ pid: 'session-holder', ts: staleTs }));
+
+  const res = acquireMainCheckoutLock(dir, { identity: 'session-other', ttlMs: 1000 });
+
+  assert.equal(res.status, ACQUIRED);
+  const record = JSON.parse(fs.readFileSync(lockPathFor(dir), 'utf8'));
+  assert.equal(record.pid, 'session-other');
+});
+
+test('checking a different string identity lock with no ttlMs supplied is AMBIGUOUS, never silently free or held', () => {
+  const { dir } = setup();
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(lockPathFor(dir), JSON.stringify({ pid: 'session-holder', ts: Date.now() }));
+
+  const res = acquireMainCheckoutLock(dir, { identity: 'session-other' });
+
+  assert.equal(res.status, AMBIGUOUS);
+  // untouched -- neither reclaimed nor treated as held
+  const record = JSON.parse(fs.readFileSync(lockPathFor(dir), 'utf8'));
+  assert.equal(record.pid, 'session-holder');
+});
+
+// --- self-recognition (D6): same identity always refreshes ------------------
+
+test('self-recognition: the same numeric identity refreshes its own lock regardless of ttlMs or liveness', () => {
+  const { dir } = setup();
+  fs.mkdirSync(dir, { recursive: true });
+  const veryOldTs = Date.now() - 10_000_000;
+  fs.writeFileSync(lockPathFor(dir), JSON.stringify({ pid: process.pid, ts: veryOldTs }));
+
+  const res = acquireMainCheckoutLock(dir, { identity: process.pid, ttlMs: 1 });
+
+  assert.equal(res.status, ACQUIRED);
+  const record = JSON.parse(fs.readFileSync(lockPathFor(dir), 'utf8'));
+  assert.equal(record.pid, process.pid);
+  assert.ok(record.ts > veryOldTs);
+});
+
+test('self-recognition: the same string identity refreshes its own lock regardless of ttlMs', () => {
+  const { dir } = setup();
+  fs.mkdirSync(dir, { recursive: true });
+  const staleTs = Date.now() - 10_000;
+  fs.writeFileSync(lockPathFor(dir), JSON.stringify({ pid: 'session-abc-123', ts: staleTs }));
+
+  const res = acquireMainCheckoutLock(dir, { identity: 'session-abc-123', ttlMs: 1 });
+
+  assert.equal(res.status, ACQUIRED);
+  const record = JSON.parse(fs.readFileSync(lockPathFor(dir), 'utf8'));
+  assert.equal(record.pid, 'session-abc-123');
+  assert.ok(record.ts > staleTs);
+});
+
+test('self-recognition: the same string identity refreshes its own lock with no ttlMs supplied at all', () => {
+  const { dir } = setup();
+  fs.mkdirSync(dir, { recursive: true });
+  const staleTs = Date.now() - 10_000;
+  fs.writeFileSync(lockPathFor(dir), JSON.stringify({ pid: 'session-abc-123', ts: staleTs }));
+
+  const res = acquireMainCheckoutLock(dir, { identity: 'session-abc-123' });
+
+  assert.equal(res.status, ACQUIRED);
 });

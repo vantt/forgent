@@ -13,24 +13,35 @@
 // testable and zero-dep) and this module touches neither runner.lock,
 // sessions.lock, nor events.lock.
 //
-// TWO divergences from the mirrored lineage, both required by D5
+// THREE divergences from the mirrored lineage, all required by D5/D6
 // (docs/history/str65-worktree-isolation-enforcement/CONTEXT.md):
 //
 //   1. A corrupt/unparseable lock file, or one whose pid field isn't a
-//      usable positive integer, is its own AMBIGUOUS outcome — distinct from
-//      both ACQUIRED and HELD. The lineage instead treats that shape as
-//      stale-and-reclaimable; this primitive must not, because a future
-//      caller (the Phase 2 git hook) has to fail closed on an unreadable
-//      signal rather than silently treat it as free. A MISSING lock file is
-//      NOT ambiguous — that's the ordinary free/acquire-succeeds case, same
-//      as the lineage.
-//   2. An optional `ttlMs` supplements PID-liveness: a lock is only "fresh"
-//      (still held) when its holder pid is alive AND its last-touched
-//      timestamp is within `ttlMs`. The other three protect one short-lived
-//      operation; this one protects an overlapping session issuing several
-//      commits over minutes, so a live pid from ten minutes ago isn't a
-//      strong enough signal by itself. Omitting `ttlMs` falls back to pure
-//      PID-liveness, same as the lineage.
+//      usable identity (neither a positive integer nor a non-empty string),
+//      is its own AMBIGUOUS outcome — distinct from both ACQUIRED and HELD.
+//      The lineage instead treats that shape as stale-and-reclaimable; this
+//      primitive must not, because a future caller (the Phase 2 git hook)
+//      has to fail closed on an unreadable signal rather than silently
+//      treat it as free. A MISSING lock file is NOT ambiguous — that's the
+//      ordinary free/acquire-succeeds case, same as the lineage.
+//   2. An optional `ttlMs` supplements liveness: a lock recorded under a
+//      numeric identity is only "fresh" (still held) when its holder pid is
+//      alive AND its last-touched timestamp is within `ttlMs` (omitting
+//      `ttlMs` falls back to pure PID-liveness, same as the lineage). A
+//      lock recorded under a STRING identity has no process to probe, so
+//      its held-ness is judged purely by `ttlMs` freshness — and since a
+//      string identity's staleness is undecidable without a window,
+//      checking a different string-identity lock with no `ttlMs` supplied
+//      is AMBIGUOUS (D5: fail closed), never silently free or held.
+//   3. SELF-RECOGNITION (D6): when an existing lock's recorded identity
+//      strictly equals (===) the caller's OWN supplied identity, the acquire
+//      always succeeds as a refresh (fresh timestamp, same identity),
+//      regardless of ttlMs or liveness — this is the same writer continuing
+//      its own session, never a competing holder. This is what lets the
+//      Phase 2 hook distinguish its own next commit from a genuinely
+//      different concurrent session (see decision D6 and
+//      docs/history/str65-worktree-isolation-enforcement/reports/validation-phase1.md
+//      for the pid:1-sentinel design this replaces).
 //
 // This module does not pick a production ttlMs default (out of scope for
 // this cell) and does not wire into any git hook — both are Phase 2.
@@ -46,7 +57,8 @@ export const AMBIGUOUS = 'ambiguous';
 
 /** Signal-0 liveness probe (mirrors loop.mjs/session.mjs/events.mjs's
  * isPidAlive). EPERM means the pid exists under another user — still alive,
- * still a holder. */
+ * still a holder. Only ever called for a NUMERIC recorded identity — a
+ * string identity has no process to probe. */
 function isPidAlive(pid) {
   try {
     process.kill(pid, 0);
@@ -56,9 +68,20 @@ function isPidAlive(pid) {
   }
 }
 
-/** Parses lock file content written by this module: `{"pid": <int>, "ts":
- * <int>}`. Returns null when the content isn't a well-formed record — the
- * caller treats null as AMBIGUOUS, never as free or stale. */
+/** A usable identity is either a positive integer (a real pid) or a
+ * non-empty string (an opaque session id). Anything else (empty string,
+ * boolean, object, negative/non-integer number) is not usable. */
+function isUsableIdentity(value) {
+  if (typeof value === 'string') return value.length > 0;
+  return Number.isInteger(value) && value > 0;
+}
+
+/** Parses lock file content written by this module: `{"pid": <identity>,
+ * "ts": <int>}`, where `pid` may be a positive integer OR a non-empty
+ * string (the on-disk field name stays literally `pid` even though its
+ * value may now be an opaque string identity). Returns null when the
+ * content isn't a well-formed record — the caller treats null as
+ * AMBIGUOUS, never as free or stale. */
 function parseLockContent(raw) {
   let parsed;
   try {
@@ -68,7 +91,7 @@ function parseLockContent(raw) {
   }
   if (!parsed || typeof parsed !== 'object') return null;
   const { pid, ts } = parsed;
-  if (!Number.isInteger(pid) || pid <= 0) return null;
+  if (!isUsableIdentity(pid)) return null;
   if (!Number.isInteger(ts) || ts <= 0) return null;
   return { pid, ts };
 }
@@ -76,14 +99,16 @@ function parseLockContent(raw) {
 /**
  * One attempt at the wx-atomic-create lock, mirroring the three sibling
  * locks' single-attempt primitive for the create/EEXIST/liveness/reclaim
- * shape — diverging only where `parseLockContent` returns null (AMBIGUOUS)
- * and where `ttlMs` makes a live pid's lock stale anyway.
+ * shape — diverging only where `parseLockContent` returns null (AMBIGUOUS),
+ * where the recorded identity matches the caller's own (self-recognition,
+ * always ACQUIRED), and where a string-identity holder is judged by
+ * `ttlMs` freshness alone (never a liveness probe).
  */
-function tryAcquireOnce(lockPath, pid, now, ttlMs) {
+function tryAcquireOnce(lockPath, identity, now, ttlMs) {
   try {
     const fd = fs.openSync(lockPath, 'wx');
     try {
-      fs.writeSync(fd, JSON.stringify({ pid, ts: now }));
+      fs.writeSync(fd, JSON.stringify({ pid: identity, ts: now }));
     } finally {
       fs.closeSync(fd);
     }
@@ -105,17 +130,38 @@ function tryAcquireOnce(lockPath, pid, now, ttlMs) {
     return { status: AMBIGUOUS };
   }
 
-  const pidLive = isPidAlive(record.pid);
-  const withinTtl = typeof ttlMs !== 'number' || now - record.ts <= ttlMs;
+  // Self-recognition (D6): the caller's own identity always refreshes,
+  // regardless of ttlMs or liveness — this is the same writer continuing
+  // its own session, never a competing holder.
+  if (record.pid === identity) {
+    fs.writeFileSync(lockPath, JSON.stringify({ pid: identity, ts: now }));
+    return { status: ACQUIRED };
+  }
 
-  if (pidLive && withinTtl) {
+  let held;
+  if (typeof record.pid === 'number') {
+    // Different numeric identity: unchanged pidLive-AND-ttlMs logic.
+    const pidLive = isPidAlive(record.pid);
+    const withinTtl = typeof ttlMs !== 'number' || now - record.ts <= ttlMs;
+    held = pidLive && withinTtl;
+  } else {
+    // Different string identity: no process to probe, so held-ness is
+    // judged purely by ttlMs freshness. Undecidable without a window —
+    // fail closed (D5) rather than guess free or held.
+    if (typeof ttlMs !== 'number') {
+      return { status: AMBIGUOUS };
+    }
+    held = now - record.ts <= ttlMs;
+  }
+
+  if (held) {
     return { status: HELD, holderPid: record.pid };
   }
 
-  // Stale (dead pid, or ttl-expired while alive). Re-read right before the
-  // unlink: the liveness probe above is the slow window — a competitor may
-  // have cleaned this lock and a fresh holder created its own here since
-  // `raw` was read. Changed content is a live lock we must not touch.
+  // Stale (dead pid, or ttl-expired). Re-read right before the unlink: the
+  // liveness probe above is the slow window — a competitor may have
+  // cleaned this lock and a fresh holder created its own here since `raw`
+  // was read. Changed content is a live lock we must not touch.
   let current;
   try {
     current = fs.readFileSync(lockPath, 'utf8');
@@ -142,6 +188,12 @@ function tryAcquireOnce(lockPath, pid, now, ttlMs) {
  * out). A commit-time check should get an immediate answer, not block on a
  * timeout, so this never sleeps/retries beyond that single reclaim step.
  *
+ * `identity` is either a positive integer (a real process id,
+ * liveness-checked via isPidAlive) or a non-empty string (an opaque session
+ * identity, e.g. an env-derived session id — never liveness-checked, since
+ * there is no process to probe). Defaults to `process.pid`. The on-disk
+ * JSON field holding it is still named `pid`.
+ *
  * Returns `{ status, holderPid?, lockPath, release? }` where `status` is one
  * of ACQUIRED / HELD / AMBIGUOUS. Never throws for a stale/corrupt/missing
  * lock — only for unexpected fs errors.
@@ -149,14 +201,16 @@ function tryAcquireOnce(lockPath, pid, now, ttlMs) {
  * `ttlMs` is optional and caller-supplied only (no production default picked
  * here, per this cell's scope) — when present, a live-pid holder whose
  * last-touched timestamp exceeds `ttlMs` is treated as stale, same as a dead
- * pid.
+ * pid. For a different string-identity holder, `ttlMs` is the ONLY
+ * staleness signal (no liveness probe exists) — omitting it is AMBIGUOUS,
+ * not stale.
  */
-export function acquireMainCheckoutLock(dir, { pid = process.pid, ttlMs, now = Date.now() } = {}) {
+export function acquireMainCheckoutLock(dir, { identity = process.pid, ttlMs, now = Date.now() } = {}) {
   fs.mkdirSync(dir, { recursive: true });
   const lockPath = path.join(dir, LOCK_FILE);
 
   for (let attempt = 0; attempt < 2; attempt += 1) {
-    const res = tryAcquireOnce(lockPath, pid, now, ttlMs);
+    const res = tryAcquireOnce(lockPath, identity, now, ttlMs);
     if (res.status === ACQUIRED) {
       return {
         status: ACQUIRED,
