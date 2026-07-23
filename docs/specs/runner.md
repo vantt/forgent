@@ -712,13 +712,50 @@ phiên nay khiến MỌI lần `approve` chiếm `.fgos/sessions.lock` (một `s
 hỏng nay ném lỗi; một khóa cũ kẹt thêm tối đa ~10s trễ). Đây là một bổ sung
 hành vi được chấp nhận, không nói dối là "y hệt từng bit".
 
-**Rủi ro còn lại (deferred, không vá ở Epic 2):** phép kiểm dựa trên SỔ đăng
-ký nên KHÔNG bắt được một `git worktree add` thủ công chưa từng đăng ký qua
-`fgos session start` — `approve` chạy từ một worktree không-đăng-ký như vậy vẫn
-dính đúng mối nguy xác-minh-sai của nguồn `pull`/`legacy`, vô hình. Vá trọn cần
-xác nhận DƯƠNG rằng `repoRoot` ĐÚNG là worktree chính (vd `git rev-parse
---show-toplevel` so với cha của `--git-common-dir`) — một đổi thiết kế vượt lát
-này (xem CONTEXT.md Deferred Ideas).
+**Rủi ro còn lại (deferred, không vá ở Epic 2 — một phần đã vá khác lớp bởi STR65):**
+phép kiểm dựa trên SỔ đăng ký nên KHÔNG bắt được một `git worktree add` thủ công
+chưa từng đăng ký qua `fgos session start` — `approve` chạy từ một worktree
+không-đăng-ký như vậy vẫn dính đúng mối nguy xác-minh-sai của nguồn `pull`/`legacy`,
+vô hình MỘT MÌNH theo cơ chế NÀY (`isMainWorktree`, canh riêng verb `approve`). Vá
+trọn CHO VERB NÀY cần xác nhận DƯƠNG rằng `repoRoot` ĐÚNG là worktree chính (vd
+`git rev-parse --show-toplevel` so với cha của `--git-common-dir`) — một đổi thiết
+kế vượt lát này vẫn chưa xây (xem CONTEXT.md Deferred Ideas). Lớp bảo vệ riêng, rộng
+hơn — "Khóa hoạt động cây chính" dưới (STR65) — đã đóng phần lớn khoảng trống THỰC
+TẾ này từ một góc khác: nó canh MỌI commit trần vào cây chính (không riêng gì
+`approve`, không cần sổ đăng ký nào), nên một `git worktree add` thủ công không
+đăng ký vẫn bị khóa hoạt động phát hiện nếu nó thực sự commit đè lên phiên khác —
+gap còn lại thu hẹp về đúng một verb (`approve`) và đúng loại lỗi (xác-minh-sai âm
+thầm, không phải mất dữ liệu).
+
+### Khóa hoạt động cây chính — chặn commit trần khi phiên khác đang hoạt động (STR65)
+
+Khác với "Bảo vệ approve khỏi lồng phiên" trên (chỉ canh MỘT verb, `approve`, và chỉ
+canh phiên đã đăng ký qua sổ `session start`), cơ chế này canh MỌI `git commit` trần
+vào cây chính (dù qua verb fgOS nào, qua một trợ lý, hay tay gõ thẳng) và không phụ
+thuộc sổ đăng ký — vá đúng lỗ hổng "một `git worktree add` thủ công chưa từng đăng ký"
+mà rủi ro-còn-lại ở trên nêu tên.
+
+- **Runs when:** mọi lần `git commit` chạm cây chính — dù người gõ tay, một trợ lý,
+  hay CI — đi qua một hook cài sẵn ở tầng git (không phải một verb fgOS, không phải
+  một cấu hình riêng của công cụ trợ lý nào).
+- **Blocked when:** một khóa hoạt động ghi rằng một danh tính KHÁC đã chạm cây chính
+  này trong cửa sổ gần đây (mặc định 15 phút) — commit bị từ chối thẳng, không chạy;
+  hoặc khóa không đọc được (hỏng/không phân tích được) — commit CŨNG bị từ chối (thà
+  chặn nhầm còn hơn để lọt một race thật).
+- **What changes:** khi cây chính đang rảnh, hoặc khi CHÍNH danh tính đang commit là
+  danh tính đã ghi khóa gần nhất (cùng phiên tiếp tục làm việc), commit đi qua bình
+  thường, không thông báo gì. Danh tính ưu tiên biến môi trường phiên trợ lý khi có;
+  vắng mặt (terminal tay gõ) thì suy ra từ một tiến trình tổ tiên gần đó — suy đoán
+  tốt-nhất, không tuyệt đối (hai terminal tay gõ chia sẻ cùng tiến trình cha gần có
+  thể không phân biệt được nhau — xem Open Gaps).
+- **Side effects:** ghi lại khóa hoạt động (danh tính + thời điểm) ngay tại chính cây
+  chính, dùng đúng cơ chế tạo-nguyên-tử + đòi-lại-pid-chết đã có ba lần trong hệ (xem
+  "Phiên checkout đa-phiên" trên) — không đụng sổ đăng ký phiên, không đụng khóa
+  `sessions.lock`/`runner.lock`/`events.lock` nào đã có.
+- **Afterwards:** một commit bị từ chối in thông điệp giải thích bằng thời gian ("một
+  phiên khác dường như đang hoạt động ở đây gần đây") và trỏ người tới đúng cách mở
+  một cây làm việc cô lập — không bao giờ in ra một định danh thô (pid/session-id) như
+  thể đó là thứ người đọc cần tự hành động theo.
 
 ### Vòng làm việc có hướng dẫn qua tầng skill trích xuất (entry skill + phase skills, P50)
 
@@ -802,6 +839,9 @@ Một báo-cáo hỏng-hình (không phân tích được, thiếu tên việc) 
 - **RUL46 (lớp hướng dẫn không bao giờ tự áp cạnh chuyển-trạng-thái — chỉ engine mới được).** Skill hướng dẫn giai đoạn (làm-rõ/chia-việc/thẩm-định) chỉ SÀNG LỌC câu hỏi, GHI giả định, và PHÁN xong-hay-chưa trong phạm vi phán đoán của chính nó — cạnh chuyển stage thật sự luôn đi qua verb máy của engine, không bao giờ do chính skill tự gọi hay tự suy ra kết quả (per D8 p50-workflow-induct, cùng stance RUL42).
 - **RUL47 (cổng chờ-người của lớp hướng dẫn không bao giờ tự trả lời).** Khi engine tự phán một item chưa đủ rõ/chưa đủ khả thi (cổng chờ-người), lớp hướng dẫn luôn escalate ra ngoài phiên và chờ người quyết — không bao giờ tự đưa ra câu trả lời thay người, kể cả khi câu hỏi có vẻ hiển nhiên (per D11 p50-workflow-induct, mở rộng RUL3/RUL13 sang lớp hướng dẫn).
 - **RUL48 (cấu hình runner tự sinh tại đường mặc định khi vắng mặt — không bao giờ đòi người tạo tay trước).** `fgos discover` và `fgos-runner` đều giải đường cấu hình mặc định (không kèm `--config`) và, nếu đường đó chưa tồn tại, tự viết một bản mặc định (executor giả định `claude`, cùng hình dạng với cấu hình dogfood của chính repo — model light/standard/heavy, `timeoutMs`, khối `parallel`) trước khi nạp — không còn báo lỗi "không đọc được cấu hình" ngay từ bước đầu tiên của vòng làm-rõ. Việc tự sinh này LUÔN kèm một dòng thông báo (tên file + executor giả định) để người vận hành biết ngay cấu hình vừa được tạo, không âm thầm. Một `--config <path>` TƯỜNG MINH trỏ vào đường vắng mặt KHÔNG BAO GIỜ được tự sinh thay — vẫn báo lỗi ngay như trước, vì một đường dẫn người tự chỉ định là chủ đích, không phải "chưa từng cấu hình" (per D 38f7e0b8).
+- **RUL49 (khóa hoạt động cây chính chặn CỨNG, không phải cảnh báo — canh MỌI commit trần, không riêng gì verb fgOS).** Cơ chế mô tả ở "Khóa hoạt động cây chính" trên chặn ở tầng git, trước khi bất kỳ commit nào chạm cây chính — không phải một guard trong `bin/fgos.mjs`, nên không thể bị vòng qua bằng cách gọi git trực tiếp thay vì qua verb fgOS (đúng lỗ hổng đã biết của "Bảo vệ approve khỏi lồng phiên" trên, vốn chỉ canh MỘT verb và chỉ canh phiên đã đăng ký). Khóa dùng đúng một danh tính (biến môi trường phiên trợ lý khi có, tổ tiên tiến trình gần khi không) để phân biệt "chính phiên này tiếp tục" khỏi "một phiên khác đang hoạt động" — cùng danh tính luôn được coi là refresh, không bao giờ tự chặn chính mình (per STR65).
+- **RUL50 (khóa hoạt động cây chính fail-closed trên tín hiệu không đọc được).** Khi nội dung khóa không phân tích được hoặc thiếu trường cần thiết, commit bị từ chối — không bao giờ được coi là "cây đang rảnh". Đây là lựa chọn CHỦ Ý ưu tiên an toàn hơn sẵn sàng, khác với "Bảo vệ approve khỏi lồng phiên"'s `isMainWorktree` (fail-open trên trường hợp mơ hồ) — hai cơ chế bảo vệ hai rủi ro khác nhau (một canh thẩm quyền FSM, một canh mất-dữ-liệu-thật đang hoạt động) nên được phép chọn khác nhau (per STR65).
+
 
 ## Edge Cases Settled
 
@@ -871,6 +911,16 @@ Một báo-cáo hỏng-hình (không phân tích được, thiếu tên việc) 
 - Một đề xuất CON (có việc cha) gọi `review --github` chỉ đẩy nhánh của CHÍNH NÓ lên remote gốc, không đẩy nhánh của GỐC nó — nên `gh pr create` thật trên GitHub sẽ gãy vì nhánh đích (`base`) không tồn tại trên remote cho một đề xuất con; vận chuyển GitHub hôm nay chỉ dùng được thật cho đề xuất gốc/độc lập, ngữ nghĩa GitHub cho con cần một slice riêng (github-adapter S3, giới hạn đã biết trước khi build).
 - Lời gọi phán-đoán bên dưới engine (quyết đủ-rõ/chưa-đủ-rõ) có thể trả về văn bản không máy-đọc-được thay vì phán quyết đúng khuôn khi được gọi TỪ BÊN TRONG một phiên trợ lý khác đang chạy (lồng phiên) — engine fail-safe đúng thiết kế (đậu cổng chờ-người, không bao giờ coi không chắc là pass). **Nguyên nhân gốc xác nhận 2026-07-22 (`claude -p` thật, không đoán):** không phải lỗi định dạng — model con ĐÔI KHI từ chối một prompt-chỉ-đòi-JSON vì đọc như prompt-injection (exit code vẫn 0), tính chất XÁC SUẤT chứ không tất định. Thử thêm một câu mào đầu "hợp thức hoá" lời gọi — PHẢN TÁC DỤNG, model đọc chính khung đó như dấu hiệu injection rõ hơn (bằng chứng thật, gỡ bỏ). Giải pháp còn lại: tăng số lần thử lại từ 1 lên 2 (3 lượt tổng) — giảm xác suất gặp phải, KHÔNG loại trừ hoàn toàn (`docs/backlog.md` STR68, đóng lại 2026-07-22).
 
+- Khóa hoạt động cây chính (STR65) suy danh tính từ một tiến trình tổ tiên gần khi
+  không có biến môi trường phiên trợ lý — suy đoán tốt-nhất cho terminal người gõ
+  tay, KHÔNG tuyệt đối: hai terminal người khác nhau chia sẻ cùng một tiến trình cha
+  đủ gần (vd cùng phiên tmux/sshd) vẫn có thể đọc ra cùng một danh tính và không bị
+  chặn dù đang thực sự đồng thời hoạt động. Cả 3 sự cố STR65 có SHA cụ thể trước đây
+  đều là phiên trợ lý (có biến môi trường riêng, không rơi vào giới hạn này) — giới
+  hạn chỉ áp dụng cho trường hợp chưa quan sát được thật (terminal-đối-terminal).
+  Vá trọn cần một danh tính phiên bền hơn cho terminal tay gõ (deferred, backlog
+  STR84 nhắm khác lớp — enforcement phía bee-core — không trực tiếp vá gap này).
+
 ## Visuals
 
 Not applicable — không có màn hình.
@@ -908,4 +958,8 @@ Not applicable — không có màn hình.
 - `src/state/work.mjs` field `docsRef` (optional, xem spec Work-State Data Dictionary #23) — con trỏ tới `docs/history/<feature>/` của tính năng đã tạo ra item, dùng bởi lớp hướng dẫn để tìm CONTEXT.md/plan.md liên quan khi cần
 - `docs/history/p50-workflow-induct/reports/p50-workflow-induct-6.md` — bằng chứng vận hành thật đầy đủ của case-study (lịch sử verb từng lệnh, kèm phát hiện lồng-phiên ở Open Gaps)
 - `docs/routing-handoff-contract.md` — hợp đồng handoff + ranh giới tin cậy
+- `src/runner/main-checkout-lock.mjs` (STR65) — `acquireMainCheckoutLock(dir, {identity, ttlMs, now})`/`releaseMainCheckoutLock(dir)`: khóa tạo-nguyên-tử `wx` + đòi-lại-pid-chết, độc lập với ba khóa anh em (`runner.lock`/`sessions.lock`/`events.lock`, không import chung, xem lineage note ở `src/state/events.mjs`); `identity` nhận số nguyên (pid thật, kiểm sống qua tín hiệu 0) HOẶC chuỗi (danh tính phiên, không kiểm sống được); TỰ-NHẬN-DIỆN: danh tính khóa hiện có trùng đúng danh tính người gọi → luôn ACQUIRED (refresh), bất kể ttlMs/sống-chết — đây là "chính phiên này tiếp tục", không phải một chủ cạnh tranh; danh tính KHÁC: số nguyên giữ nguyên phép thử sống+ttl có sẵn, chuỗi chỉ xét độ mới theo `ttlMs` (không có gì để kiểm sống); nội dung khóa hỏng/không phân tích được → AMBIGUOUS (không bao giờ coi là rảnh hay đang giữ). Manifest layer: infra.
+- `src/runner/session-identity.mjs` (STR65) — `resolveWriterIdentity()`: ưu tiên `BEE_SESSION_ID`/`CLAUDE_CODE_SESSION_ID` (đúng thứ tự ưu tiên với `.bee/bin/lib/lock.mjs`'s `envSessionId`) làm danh tính chuỗi; vắng cả hai thì đi ngược 3 tầng tiến trình cha (shell ra `ps -o ppid=`, dừng sớm ở pid 1 hoặc lỗi ps) lấy một pid số làm danh tính — suy đoán tốt-nhất cho terminal tay gõ (xem Open Gaps); `ps` không gọi được ngay ở tầng đầu → lui về pid của chính người gọi thay vì treo/ném lỗi. Manifest layer: infra.
+- `.githooks/pre-commit` (STR65) — hook git-native (không phải verb fgOS, không phải cấu hình riêng công cụ trợ lý nào — xem "Khóa hoạt động cây chính" trên cho hợp đồng đầy đủ): giải thư mục gốc worktree bằng `path.resolve(__dirname, '..')` (KHÔNG gọi `git rev-parse --show-toplevel` — biến môi trường `GIT_DIR` mà git tự đặt khi hook chạy TRONG một git worktree làm lời gọi đó trả sai thư mục gốc, xác nhận thật bằng tái tạo có chủ đích trước khi vá); gọi `resolveWriterIdentity()` rồi `acquireMainCheckoutLock` với `ttlMs` mặc định 900000 (15 phút, đọc đè được qua biến môi trường `FGOS_MAIN_CHECKOUT_LOCK_TTL_MS`) — số này chọn từ bằng chứng thật (khoảng cách giữa các commit thật của 3 sự cố STR65 có SHA, ~2-3.5 phút); HELD/AMBIGUOUS → in thông điệp bằng thời gian + trỏ `docs/how-to-parallel-lanes.md`, thoát khác 0; ACQUIRED → thoát 0 im lặng.
+- `scripts/install-git-hooks.mjs` (STR65) — wire `core.hooksPath` về `.githooks` khi checkout có git thật (dev clone); vắng git (cài như dependency qua `npm install <github-url>`, không giữ lại git — xem `docs/specs/distribution.md`) thì thoát 0 im lặng, không throw; gọi qua `prepare` lifecycle script của `package.json` — chạy tự động sau `npm install` trên một clone mới, không cần bước cài tay riêng.
 - Test: `test/runner/*` (gồm `test/runner/merge.test.mjs` — unit `classifySource`/`reviewDiff`/`mergeRunnerItem`/`cleanupMergedBranch`; `test/runner/write-queue.test.mjs` — chứng minh serialize thật qua marker enter/exit không xen kẽ; `test/runner/root-affinity.test.mjs` — resolveRoot/claimRoot/steerFrontier, khuôn race 2-tác-nhân đã spike-proven; `test/runner/goal-check.test.mjs` — mới, real-fake-executor) + `test/e2e/runner-loop.test.mjs` (executor giả, repo git tạm, bao gồm 3 kịch bản stage-clarify + 3 kịch bản stage-decompose: pass-through, chia-con-chặn-frontier, cần-người + 1 kịch bản S2-pull: `take` người + `fgos-runner --once` song song không giẫm + `return` xanh + kịch bản con fork từ tip nhánh gốc) + `test/e2e/pr-gate.test.mjs` (4 kịch bản thật qua binary + git: runner item full loop review→approve→merge→done, merge conflict thật với tree nguyên vẹn sau abort, pull-door item full loop, reject pull-door giữ commit làm lịch sử) + `test/cli/fgos.test.mjs` (unit CLI cho `take`/`return`/`review`/`approve`/`reject`/`catchup`: frontier-head claim, CAS conflict, dirty-tree/HEAD-chưa-tiến refusal, verify xanh/đỏ, main-never-holds-broken-merge cho cả conflict lẫn verify-fail, legacy degrade, leaf-vs-root branch targeting, integration-drift reason, catch-up sạch/xung-đột-thật/lý-do-không-áp-dụng-được) + `test/state/replay.test.mjs` (fold `claimActor`/`headAtTake`/`headAtReturn`) + `test/state/fsm.test.mjs` (cạnh `blocked→proposed`, D18) + `test/report/entropy.test.mjs` (entropy thuần) + kịch bản chồng-lấn-thật hai việc song song trong `test/runner/loop.test.mjs` (peak-concurrency counter, không phải suy luận thời gian tường) + `test/runner/worker-log.test.mjs` (mới — create/append, nối-không-đè qua nhiều lần thử, degrade không throw khi field vắng) + benchmark ngoài suite `docs/history/phase-3-compound-learning/reports/f4-benchmark.md` (F4, real binaries, expected-delta khai trước run); 637 test toàn suite (`cd repo && npm test`)
