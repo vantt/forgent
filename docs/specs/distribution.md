@@ -1,8 +1,8 @@
 ---
 area: distribution
 updated: 2026-07-22
-sources: [distribution-packaging, str76-runner-bootstrap]
-decisions: [12aedbc8, 469f4c79, 5d669ff6, 38f7e0b8]
+sources: [distribution-packaging, str76-runner-bootstrap, str77-79-doc-gap-fixes]
+decisions: [12aedbc8, 469f4c79, 5d669ff6, 38f7e0b8, ea8b9a8d]
 coverage: full
 ---
 
@@ -26,7 +26,7 @@ a developer who wants to run `fgos` in a project that is not this repo.
 |---|-------|---------|--------|----------|---------|
 | 1 | Package name | The npm package identity used for the git-based install command | `forgent` | yes | — |
 | 2 | Package version | A semantic version string tooling (e.g. packaging commands) needs to treat the package as valid | semver string | yes | `0.1.0` |
-| 3 | Distribution file allowlist | The exact set of paths shipped to anyone installing the package — everything else in the source repo is excluded | `bin`, `src`, `README.md`, `LICENSE` | yes | — |
+| 3 | Distribution file allowlist | The exact set of paths shipped to anyone installing the package — everything else in the source repo is excluded | `bin`, `src`, `README.md`, `LICENSE`, plus the end-user documentation subset: the how-to guides directory, the design-rationale (explanation) directory, and the read-by-tag documentation index file | yes | — |
 | 4 | CLI entry points | The commands exposed once installed | `fgos` → runs `bin/fgos.mjs`; `fgos-runner` → runs `bin/fgos-runner.mjs` (the autonomous-loop runner, see spec Runner) | yes | — |
 
 ## Behaviors & Operations
@@ -48,6 +48,13 @@ a developer who wants to run `fgos` in a project that is not this repo.
   they received is limited to the distribution file allowlist — the source
   repository's own internal data (its live event log, its own dogfood
   runner configuration, its test suite) is never part of what they receive.
+  The installer also receives the end-user documentation subset (how-to
+  guides, design-rationale docs, and the read-by-tag index) — every link the
+  README's Documentation section points to resolves to a file that is
+  actually present in what they installed; contributor/maintainer-only docs
+  (decision records, area specs, the product backlog, platform foundations)
+  are not part of the install and are not linked from that section — a
+  reader who wants those clones the source repository instead.
 
 ## Actors & Access
 
@@ -68,6 +75,14 @@ a developer who wants to run `fgos` in a project that is not this repo.
 - **RUL3.** Installing fgos does not change init/doctrine/marker-detection
   behavior in any way — that behavior belongs entirely to the coexistence
   area and is unchanged by installation (per D3).
+- **RUL4.** Every link in the README's Documentation section resolves to a
+  file that is actually present in the distribution file allowlist — a link
+  to content that isn't shipped is a defect, not an acceptable pointer to
+  "clone the repo for more" (per D1/D2 str77-79-doc-gap-fixes / ea8b9a8d).
+  Contributor/maintainer-only documentation (decision records, area specs,
+  the product backlog, platform foundations) is intentionally excluded from
+  both the allowlist and that section — it is out of scope for an installed
+  end user, not an oversight.
 
 ## Edge Cases Settled
 

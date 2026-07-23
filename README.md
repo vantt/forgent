@@ -1,7 +1,7 @@
 # Forgent
 
 <!-- BEE:BACKLOG-BADGES:START -->
-![backlog done](https://img.shields.io/badge/backlog%20done-56-brightgreen) ![backlog in-flight](https://img.shields.io/badge/backlog%20in--flight-0-blue) ![backlog proposed](https://img.shields.io/badge/backlog%20proposed-27-lightgrey)
+![backlog done](https://img.shields.io/badge/backlog%20done-59-brightgreen) ![backlog in-flight](https://img.shields.io/badge/backlog%20in--flight-0-blue) ![backlog proposed](https://img.shields.io/badge/backlog%20proposed-24-lightgrey)
 <!-- BEE:BACKLOG-BADGES:END -->
 
 **The Foundation for Generative Agents.**
@@ -22,14 +22,12 @@ fgos init
 
 ## Documentation
 
-- [`docs/architecture-map.md`](docs/architecture-map.md) — bản chuẩn kiến trúc: 5 tầng + 2 lớp phủ + 2 sổ đăng ký (component, contract C1–C9)
-- [`docs/reference-learning-system.md`](docs/reference-learning-system.md) — thiết kế hệ thống học từ reference sources (lifecycle, schema, taxonomy)
-- [`docs/distillery/intake.md`](docs/distillery/intake.md) — hàng đợi nguồn học mới chờ triage
-- [`docs/distillery/sources/beegog.md`](docs/distillery/sources/beegog.md) — feature index: beegog (bee)
-- [`docs/distillery/sources/repository-harness.md`](docs/distillery/sources/repository-harness.md) — feature index: repository-harness
-- [`docs/distillery/comparison-matrix.md`](docs/distillery/comparison-matrix.md) — so sánh tính năng giữa các nguồn
-- [`docs/distillery/porting-log.md`](docs/distillery/porting-log.md) — trạng thái porting (nguồn sự thật duy nhất)
-- [`docs/naming.md`](docs/naming.md) — brainstorm định vị & đặt tên (Forgent/fgOS)
-- [`bin/fgos.mjs`](bin/fgos.mjs) + [`docs/history/phase-1-state-layer/`](docs/history/phase-1-state-layer/) — state layer: CLI `fgos`, event log + FSM + rebuild-view (Phase 1)
-- [`bin/fgos-runner.mjs`](bin/fgos-runner.mjs) + [`docs/routing-handoff-contract.md`](docs/routing-handoff-contract.md) — routing runner: frontier → dispatch → goal-check loop + agent↔agent handoff contract (Phase 2)
-- [`.agents/skills/distill/`](.agents/skills/distill/SKILL.md) — skill portable vận hành vòng học (init/add/delta/seal/check, Node zero-dep)
+End-user docs for the install → submit → merge flow, indexed in
+[`docs/enduser-docs-index.json`](docs/enduser-docs-index.json):
+
+- [`docs/how-to/`](docs/how-to/) — task-oriented guides, e.g. checking a root item's rollup progress
+- [`docs/explanation/`](docs/explanation/) — design rationale: event log evolution, ID generation, layered architecture, runner execution safety, session isolation and concurrency, work-item lifecycle
+
+Contributor and maintainer docs (architecture, decisions, specs) live in the
+repo's `docs/` tree but aren't part of the published package — clone the
+repo to read them.

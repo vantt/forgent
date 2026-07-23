@@ -1902,13 +1902,24 @@ function publicManifestEntries() {
   }));
 }
 
-function renderHelpText() {
+function renderHelpText(entries = publicManifestEntries()) {
   const lines = [`fgos — the fgOS work-item CLI (schema_version ${SCHEMA_VERSION})`, ''];
-  for (const entry of publicManifestEntries()) {
+  for (const entry of entries) {
     lines.push(`${entry.invoke} [${entry.access}]`);
     lines.push(`    ${entry.description}`);
     const required = entry.parameters?.required || [];
-    if (required.length) lines.push(`    required: ${required.map((r) => `--${r}`).join(', ')}`);
+    const positional = entry.parameters?.positional || [];
+    // A required param that can be supplied positionally (mixed) or ONLY
+    // positionally (e.g. submit's text, session's sub) is never a real
+    // `--flag` on the command line — printing it as `required: --name`
+    // would be actively wrong for the positional-only case (STR77) and
+    // misleading for the mixed case. Split required into the two shapes so
+    // each renders in its own idiom; only the flag-only remainder still
+    // gets the `--name` form.
+    const positionalRequired = required.filter((r) => positional.includes(r));
+    const flagRequired = required.filter((r) => !positional.includes(r));
+    if (positionalRequired.length) lines.push(`    positional: ${positionalRequired.join(', ')}`);
+    if (flagRequired.length) lines.push(`    required: ${flagRequired.map((r) => `--${r}`).join(', ')}`);
     if (entry.deprecated) {
       lines.push(`    DEPRECATED since ${entry.deprecated.since} — use "${entry.deprecated.use_instead}" instead.`);
     }
@@ -1926,6 +1937,21 @@ function handleHelp(json) {
   }
 }
 
+// Per-verb `fgos <verb> --help` (STR79/D3): same "one door" idiom as the
+// top-level `--help` special-case above, one level down — prints only that
+// verb's own manifest entry (not the full command list) and returns true so
+// the caller exits before runVerb ever dispatches (no side effects, e.g.
+// `init --help` must never call initStore). Unknown verb -> false, so the
+// normal dispatch path still produces its usual "unknown verb" error.
+// Text-mode only (D3/CONTEXT out-of-scope note): the caller gates this on
+// `!flags.json`, so `<verb> --help --json` is left to fall through unchanged.
+function handleVerbHelp(verb) {
+  const entry = publicManifestEntries().find((e) => e.name === verb);
+  if (!entry) return false;
+  process.stdout.write(renderHelpText([entry]));
+  return true;
+}
+
 async function main() {
   const [, , verb, ...rest] = process.argv;
 
@@ -1936,6 +1962,11 @@ async function main() {
   }
 
   const { flags, positional } = parseArgs(rest);
+
+  if (flags.help && !flags.json && handleVerbHelp(verb)) {
+    process.exitCode = 0;
+    return;
+  }
 
   try {
     const data = await runVerb(verb, flags, positional, dataDir());
