@@ -274,10 +274,12 @@ export function acquireRunnerLock(dir, { pid = process.pid } = {}) {
 
 /** Resolve the repo root from `cwd` via git itself (never from __dirname —
  * the runner binary may live in a different repo than the one it runs on).
- * Throws with category 'validation' when `cwd` is not inside a git repo. */
+ * Throws with category 'validation' when `cwd` is not inside a git repo, or
+ * when the repo has no resolvable HEAD (no commits yet). */
 export function resolveRepoRoot(cwd = process.cwd()) {
+  let repoRoot;
   try {
-    return execFileSync('git', ['rev-parse', '--show-toplevel'], {
+    repoRoot = execFileSync('git', ['rev-parse', '--show-toplevel'], {
       cwd,
       encoding: 'utf8',
       shell: false,
@@ -287,6 +289,20 @@ export function resolveRepoRoot(cwd = process.cwd()) {
     error.category = 'validation';
     throw error;
   }
+  try {
+    execFileSync('git', ['rev-parse', '--verify', '--quiet', 'HEAD'], {
+      cwd: repoRoot,
+      encoding: 'utf8',
+      shell: false,
+    });
+  } catch {
+    const error = new Error(
+      `fgos-runner requires at least one commit in ${repoRoot} (HEAD does not resolve) -- run "git commit" (e.g. an initial commit) before running fgos-runner`,
+    );
+    error.category = 'validation';
+    throw error;
+  }
+  return repoRoot;
 }
 
 function git(repoRoot, args) {

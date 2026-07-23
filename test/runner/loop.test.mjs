@@ -8,7 +8,7 @@ import { pathToFileURL } from 'node:url';
 import { initStore, addWork, moveWork, listWork, readRawEvents, readyWork } from '../../src/state/store.mjs';
 import { appendEvent } from '../../src/state/events.mjs';
 import { createWorktree, removeWorktree, createBranchRef, branchNameFor } from '../../src/runner/worktree.mjs';
-import { runOnce } from '../../src/runner/loop.mjs';
+import { runOnce, resolveRepoRoot } from '../../src/runner/loop.mjs';
 
 // Fake executors only — every "worker" spawned here is a node script this
 // file writes into a mkdtemp directory. Every test builds its own
@@ -1342,4 +1342,25 @@ test('wgi-8: even a TIMED-OUT worker (output on the err.stdout path) has its fgo
   const discovered = Object.values(listWork(dir).work).filter((w) => w.discoveredFrom === 'item-slow');
   assert.equal(discovered.length, 1, 'the err.stdout (timeout) report is captured once, never duplicated across retries');
   assert.equal(discovered[0].title, 'Investigate the slow path');
+});
+
+test('resolveRepoRoot: a git repo with zero commits throws category "validation" naming the cause and the fix', () => {
+  const repoRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-loop-test-headless-'));
+  execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: repoRoot });
+
+  assert.throws(
+    () => resolveRepoRoot(repoRoot),
+    (err) => {
+      assert.equal(err.category, 'validation');
+      assert.match(err.message, /HEAD does not resolve/);
+      assert.match(err.message, /git commit/);
+      return true;
+    },
+  );
+});
+
+test('resolveRepoRoot: a git repo with at least one commit still returns the repo root string unchanged', () => {
+  const repoRoot = initTempRepo();
+
+  assert.equal(resolveRepoRoot(repoRoot), fs.realpathSync(repoRoot));
 });
