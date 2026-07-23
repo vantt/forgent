@@ -71,6 +71,7 @@ export const COMMAND_REGISTRY = [
         async: { type: 'boolean', description: 'Mark as async/unattended (submitter does not stay to collaborate). Alias: --unattended.' },
         domain: { type: 'string', description: 'Optional domain; omit to use the store default.' },
         'discovered-from': { type: 'string', description: 'Optional id of the item this one was discovered from (provenance, not a dependency).' },
+        deps: { type: 'string', description: 'Comma-separated list of dependency ids.' },
       },
       positional: ['text'],
       required: ['text'],

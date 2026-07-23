@@ -465,7 +465,12 @@ function submitWork(dir, text, opts = {}) {
     description: text,
     kind,
     status: 'todo',
-    deps: [],
+    // Per D4 (str83-fgos-slash-commands): --deps threaded from opts the
+    // same way --domain/--discovered-from already are, immediately below.
+    // opts.deps defaults to [] (parseListFlag's own undefined-input
+    // shape), so an omitted --deps flag stays byte-identical to the prior
+    // hardcoded deps: [].
+    deps: opts.deps ?? [],
     risk,
     refs: [],
     verify: SUBMIT_VERIFY_SENTINEL,
@@ -614,6 +619,12 @@ async function runVerb(verb, flags, positional, dir) {
         // Per work-graph-intelligence S2b (producer A): two-hop like domain —
         // parsed here, threaded into submitWork's work object below.
         discoveredFrom: optionalField(flags['discovered-from'], 'submit --discovered-from requires a non-empty id; omit it to leave unset.'),
+        // Per D4 (str83-fgos-slash-commands): same parseListFlag helper
+        // `add`'s --deps already uses (above) — an omitted flag parses to
+        // [], byte-identical to the prior hardcoded deps: []. Cycle/
+        // existence validation happens at the same addWork write-gate
+        // every other verb goes through; no new check here.
+        deps: parseListFlag(flags.deps),
       };
       return submitWork(dir, text, opts);
     }

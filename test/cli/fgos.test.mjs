@@ -1800,6 +1800,39 @@ test('submit with a bare --discovered-from (no value) is rejected as validation,
   assert.equal(eventLines(cwd).length, before);
 });
 
+// --- str83-fgos-slash-commands D4: --deps on `submit` (mirrors add's ---
+// already-existing --deps handling, same parseListFlag helper, same
+// addWork write-gate, cycle-checked)
+
+test('submit without --deps stays byte-identical to today: deps: [], exit 0', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['submit', 'Investigate the sluggish overview page']);
+  assert.equal(result.status, 0);
+  const item = JSON.parse(result.stdout).data;
+  assert.deepEqual(item.deps, []);
+  const id = item.id;
+  assert.deepEqual(envelopeData(run(cwd, ['list']).stdout).work[id].deps, []);
+});
+
+test('submit --deps <id1,id2> persists those deps, validated through the same write-gate add uses, exit 0', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'dep-one');
+  addOk(cwd, 'dep-two');
+  const result = run(cwd, ['submit', 'Follow up on two prior items', '--deps', 'dep-one,dep-two']);
+  assert.equal(result.status, 0);
+  const id = JSON.parse(result.stdout).data.id;
+  const item = envelopeData(run(cwd, ['list']).stdout).work[id];
+  assert.deepEqual(item.deps, ['dep-one', 'dep-two']);
+});
+
+test('submit --deps <nonexistent-id> fails loudly through the existing write-gate validation, exit 4, no event written, same as add', () => {
+  const cwd = tmpCwd();
+  const before = eventLines(cwd).length;
+  const result = run(cwd, ['submit', 'Try a bad dep', '--deps', 'ghost-dep']);
+  assert.equal(result.status, 4);
+  assert.equal(eventLines(cwd).length, before);
+});
+
 // RETARGET (stage-decompose D2, cell 3): `discover` on a stage-`clarify`
 // item still only runs `resolveDiscovery` (one hop) — a clear verdict now
 // lands it on stage `decompose`, not `executing` directly, since chia-việc
