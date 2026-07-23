@@ -1,7 +1,7 @@
 # Forgent
 
 <!-- BEE:BACKLOG-BADGES:START -->
-![backlog done](https://img.shields.io/badge/backlog%20done-60-brightgreen) ![backlog in-flight](https://img.shields.io/badge/backlog%20in--flight-2-blue) ![backlog proposed](https://img.shields.io/badge/backlog%20proposed-26-lightgrey)
+![backlog done](https://img.shields.io/badge/backlog%20done-61-brightgreen) ![backlog in-flight](https://img.shields.io/badge/backlog%20in--flight-1-blue) ![backlog proposed](https://img.shields.io/badge/backlog%20proposed-26-lightgrey)
 <!-- BEE:BACKLOG-BADGES:END -->
 
 **The Foundation for Generative Agents.**

@@ -1,8 +1,8 @@
 ---
 area: distribution
 updated: 2026-07-23
-sources: [distribution-packaging, str76-runner-bootstrap, str77-79-doc-gap-fixes, str87-fgos-install-ux]
-decisions: [12aedbc8, 469f4c79, 5d669ff6, 38f7e0b8, ea8b9a8d, cbb4736a, 862ac01f, b799cbaa]
+sources: [distribution-packaging, str76-runner-bootstrap, str77-79-doc-gap-fixes, str87-fgos-install-ux, str88-fgos-pnpm-lifecycle]
+decisions: [12aedbc8, 469f4c79, 5d669ff6, 38f7e0b8, ea8b9a8d, cbb4736a, 862ac01f, b799cbaa, 563db0a9, e52cc667]
 coverage: partial
 ---
 
@@ -44,14 +44,18 @@ of it).
 
 - **Blocked when:** the installer's machine cannot reach GitHub over the
   network, or does not have Node.js 18+ available.
-- **What changes:** npm resolves the forgent GitHub repository, packages it
-  according to the distribution file allowlist, and installs both CLI entry
-  points — `fgos` and `fgos-runner` — into the caller's chosen npm location
-  (global or project-local, per the installer's own `npm install` flags),
-  both immediately executable. The install always resolves against the
-  source repository's default branch — no tagged or pinned release exists
-  yet.
-- **Side effects:** none beyond the local npm install; no registry account is
+- **What changes:** the installer's package manager (npm, pnpm, or yarn)
+  resolves the forgent GitHub repository, packages it according to the
+  distribution file allowlist, and installs both CLI entry points — `fgos`
+  and `fgos-runner` — into the caller's chosen install location (global or
+  project-local, per the installer's own install flags), both immediately
+  executable. The install always resolves against the source repository's
+  default branch — no tagged or pinned release exists yet. The install runs
+  no lifecycle script of its own — there is nothing for a package manager's
+  build-script policy (e.g. pnpm's `allowBuilds`) to approve or block, so the
+  install succeeds the same way regardless of which of the three package
+  managers runs it (per D1/D2 str88-fgos-pnpm-lifecycle).
+- **Side effects:** none beyond the local install; no registry account is
   created or touched, and nothing is published to the public npm registry.
 - **Afterwards:** the installer has a working `fgos` command. The content
   they received is limited to the distribution file allowlist — the source
@@ -86,6 +90,22 @@ of it).
   contributor's own explicit action; nothing in this repository sources it
   for them.
 
+### Contributor hooks setup
+
+- **Blocked when:** never — this is an explicit command a contributor runs
+  themselves; it always runs when invoked.
+- **What changes:** running the setup command wires up this repository's
+  pre-commit hook for the person who just cloned it. It is never triggered
+  automatically by any package manager's install step (per str88-fgos-pnpm-lifecycle
+  D1) — a contributor runs it once, by hand, after cloning.
+- **Side effects:** none beyond the local git config change; nothing is
+  installed and no network access happens.
+- **Afterwards:** the contributor's local clone has the pre-commit hook
+  wired up, identically to what used to happen automatically. Someone who
+  never runs this command simply does not get the local hook — this is a
+  one-time manual step for contributors, not a requirement for installing
+  or running `fgos` itself.
+
 ## Actors & Access
 
 | Capability | Developer installing fgos elsewhere | forgent maintainer / contributor |
@@ -118,6 +138,12 @@ of it).
   by any install step or other mechanism in this repository — a contributor
   adding it to their own shell profile is always their own explicit,
   separate action (per D3/D4).
+- **RUL6.** Installing (from any of npm, pnpm, or yarn) never runs a lifecycle
+  script of its own — the contributor hooks setup is always a separate,
+  manually-invoked command, never an automatic `prepare`/`postinstall` step
+  (per str88-fgos-pnpm-lifecycle D1). This is what lets every package
+  manager's own build-script approval policy stay out of the way entirely,
+  rather than needing to be satisfied.
 
 ## Edge Cases Settled
 
@@ -132,6 +158,11 @@ of it).
   inside a linked git worktree of this repository always runs the MAIN
   checkout's entry point, never that worktree's own local copy — accepted
   as-is for this mechanism (per D1/D2), not treated as a defect.
+- A package manager whose own policy blocks lifecycle scripts for
+  git-hosted dependencies (e.g. pnpm 10+'s `allowBuilds`) never blocks
+  installing this package, because this package's install never declares a
+  lifecycle script in the first place (per str88-fgos-pnpm-lifecycle D1) —
+  there is nothing for that policy to approve or refuse.
 
 ## Open Gaps
 
@@ -164,4 +195,13 @@ Not applicable — no screen; this is a command-line install flow.
   proof: repo-root resolution, linked-worktree resolution, and the
   no-git-repo error path, for both functions.
 - `repo/README.md` — "Dev shell helpers" note under `## Install` links the
-  helper file with one-line sourcing instructions.
+  helper file with one-line sourcing instructions; the "Contributing" note
+  documents the manual `npm run setup:hooks` command.
+- `repo/package.json` — `scripts["setup:hooks"]` runs the same command the
+  automatic `prepare` script used to run; `scripts.prepare` no longer
+  exists.
+- `repo/scripts/install-git-hooks.mjs` — the contributor hooks setup logic
+  itself, unchanged; only its trigger moved from automatic to manual.
+- `repo/test/scripts/install-git-hooks.test.mjs` — includes the regression
+  case asserting `package.json` has no `prepare` key and does have
+  `setup:hooks`.
