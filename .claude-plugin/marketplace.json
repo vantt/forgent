@@ -1,0 +1,13 @@
+{
+  "name": "fgos-plugins",
+  "owner": {
+    "name": "fgOS"
+  },
+  "plugins": [
+    {
+      "name": "fgOS",
+      "source": "./plugins/fgOS",
+      "description": "fgOS slash-command surface for Claude Code"
+    }
+  ]
+}
