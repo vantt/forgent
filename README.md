@@ -20,6 +20,17 @@ Then initialize your project:
 fgos init
 ```
 
+### Dev shell helpers
+
+Working from a checkout of this repo (main checkout or a linked git
+worktree) without a global install? Source `scripts/fgos-shell-integration.sh`
+from your own shell rc file to get `fgos` and `fgos-runner` functions that
+resolve the right `bin/*.mjs` automatically from any cwd inside the repo:
+
+```bash
+source /path/to/forgent/scripts/fgos-shell-integration.sh
+```
+
 ## Documentation
 
 End-user docs for the install → submit → merge flow, indexed in
