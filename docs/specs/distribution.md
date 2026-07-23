@@ -1,16 +1,20 @@
 ---
 area: distribution
-updated: 2026-07-22
-sources: [distribution-packaging, str76-runner-bootstrap, str77-79-doc-gap-fixes]
-decisions: [12aedbc8, 469f4c79, 5d669ff6, 38f7e0b8, ea8b9a8d]
-coverage: full
+updated: 2026-07-23
+sources: [distribution-packaging, str76-runner-bootstrap, str77-79-doc-gap-fixes, str87-fgos-install-ux]
+decisions: [12aedbc8, 469f4c79, 5d669ff6, 38f7e0b8, ea8b9a8d, cbb4736a, 862ac01f, b799cbaa]
+coverage: partial
 ---
 
 # Spec: Distribution
 
-How a developer gets the `fgos` command line tool onto their own machine and
-into their own project, from outside the forgent source repository. Used by:
-a developer who wants to run `fgos` in a project that is not this repo.
+How a developer gets the `fgos` and `fgos-runner` commands running — either
+onto their own machine and into their own project from outside the forgent
+source repository, or directly from inside a checkout of the source
+repository itself, without a separate install. Used by: a developer who
+wants to run `fgos` in a project that is not this repo, and a forgent
+contributor working inside this repo's own checkout (or a linked worktree
+of it).
 
 ## Entry Points & Triggers
 
@@ -19,6 +23,10 @@ a developer who wants to run `fgos` in a project that is not this repo.
 - After install, `fgos init` (run inside the target project) → the existing
   init/doctrine/marker-detection behavior, unchanged and owned by the
   coexistence area — see `docs/coexistence.md`.
+- Sourcing the dev checkout's shell helper file from a contributor's own
+  shell profile → makes `fgos` and `fgos-runner` available directly from any
+  location inside a checkout of the forgent source repository itself
+  (including a linked git worktree of it), with no separate install step.
 
 ## Data Dictionary
 
@@ -28,6 +36,7 @@ a developer who wants to run `fgos` in a project that is not this repo.
 | 2 | Package version | A semantic version string tooling (e.g. packaging commands) needs to treat the package as valid | semver string | yes | `0.1.0` |
 | 3 | Distribution file allowlist | The exact set of paths shipped to anyone installing the package — everything else in the source repo is excluded | `bin`, `src`, `README.md`, `LICENSE`, plus the end-user documentation subset: the how-to guides directory, the design-rationale (explanation) directory, and the read-by-tag documentation index file | yes | — |
 | 4 | CLI entry points | The commands exposed once installed | `fgos` → runs `bin/fgos.mjs`; `fgos-runner` → runs `bin/fgos-runner.mjs` (the autonomous-loop runner, see spec Runner) | yes | — |
+| 5 | Dev checkout shell helper | An opt-in file, sourced from a contributor's own shell profile, exposing the same two CLI entry points from inside a checkout of the source repository — no install, no package fetch | one file, both commands | no (contributor's own choice) | not sourced automatically anywhere |
 
 ## Behaviors & Operations
 
@@ -56,13 +65,35 @@ a developer who wants to run `fgos` in a project that is not this repo.
   are not part of the install and are not linked from that section — a
   reader who wants those clones the source repository instead.
 
+### Dev checkout shell helpers
+
+- **Blocked when:** the current location is not inside any git repository —
+  sourcing the helper file still succeeds (it only defines functions), but
+  calling `fgos` or `fgos-runner` then fails immediately with a clear error
+  and a non-zero exit, before anything is invoked.
+- **What changes:** once sourced, `fgos` and `fgos-runner` become available
+  as ordinary shell commands. Each resolves the checkout's own root the
+  moment it is called — using the current location, not where the file was
+  sourced from — then runs that checkout's `fgos`/`fgos-runner` entry point
+  with whatever arguments were passed.
+- **Side effects:** none — nothing is installed, no file outside the current
+  shell session is touched, and no other install mechanism (npm or
+  otherwise) is affected.
+- **Afterwards:** a contributor working anywhere inside a checkout of this
+  repository — the main checkout or a linked git worktree of it — has both
+  commands available without a separate install, and without needing to
+  remember or type the checkout's own path. Sourcing the file is always the
+  contributor's own explicit action; nothing in this repository sources it
+  for them.
+
 ## Actors & Access
 
-| Capability | Developer installing fgos elsewhere | forgent maintainer |
+| Capability | Developer installing fgos elsewhere | forgent maintainer / contributor |
 |---|---|---|
 | Run the install command | ✓ | ✓ |
 | Receive the distribution file allowlist content | ✓ | — (stays in the source repo) |
 | Receive the source repo's own internal data (event log, dogfood runner config, tests) | never | n/a — never leaves the source repo |
+| Source the dev checkout shell helper file | n/a (nothing to source outside a checkout) | ✓ (opt-in, from their own shell profile) |
 
 ## Business Rules
 
@@ -83,6 +114,10 @@ a developer who wants to run `fgos` in a project that is not this repo.
   the product backlog, platform foundations) is intentionally excluded from
   both the allowlist and that section — it is out of scope for an installed
   end user, not an oversight.
+- **RUL5.** The dev checkout shell helper file is never sourced automatically
+  by any install step or other mechanism in this repository — a contributor
+  adding it to their own shell profile is always their own explicit,
+  separate action (per D3/D4).
 
 ## Edge Cases Settled
 
@@ -93,10 +128,18 @@ a developer who wants to run `fgos` in a project that is not this repo.
   executable immediately after install — a fresh install does not require
   the installer to separately locate or make executable the autonomous-loop
   runner command.
+- Calling `fgos`/`fgos-runner` (via the dev checkout shell helper) from
+  inside a linked git worktree of this repository always runs the MAIN
+  checkout's entry point, never that worktree's own local copy — accepted
+  as-is for this mechanism (per D1/D2), not treated as a defect.
 
 ## Open Gaps
 
-(none — coverage is full for the current installation mechanism)
+- The dev checkout shell helper only covers bash today; zsh support, merging
+  new default settings into a contributor's existing settings, and a
+  `doctor` self-diagnostic command are open questions still to be decided
+  (tracked as STR87's remaining scope, `docs/backlog.md`) — not yet
+  reflected here.
 
 ## Visuals
 
@@ -113,3 +156,12 @@ Not applicable — no screen; this is a command-line install flow.
   external project creates its own data directory there, not in the source
   repo.
 - `docs/coexistence.md` — what happens after install, at `fgos init` time.
+- `repo/scripts/fgos-shell-integration.sh` — the dev checkout shell helper;
+  defines the `fgos`/`fgos-runner` shell functions, resolving the checkout
+  root via `git rev-parse --path-format=absolute --git-common-dir` (never
+  `--show-toplevel`, which resolves wrong inside a linked worktree).
+- `repo/test/scripts/fgos-shell-integration.test.mjs` — real-git-checkout
+  proof: repo-root resolution, linked-worktree resolution, and the
+  no-git-repo error path, for both functions.
+- `repo/README.md` — "Dev shell helpers" note under `## Install` links the
+  helper file with one-line sourcing instructions.
