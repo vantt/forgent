@@ -1,6 +1,5 @@
 #!/usr/bin/env node
-// install-git-hooks.mjs -- wires this repo's .githooks/pre-commit hook (D2,
-// str65-worktree-isolation-enforcement) into a fresh dev clone automatically,
+// install-git-hooks.mjs -- wires this repo's .githooks/pre-commit hook into a fresh dev clone automatically,
 // via package.json's `prepare` lifecycle script. When this checkout has no
 // `.git` entry (installed as a dependency, e.g. `npm install <github-url>`,
 // per docs/specs/distribution.md -- no .git is retained in that case), it
