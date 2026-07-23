@@ -327,6 +327,22 @@ export const COMMAND_REGISTRY = [
     deprecated: null,
   },
   {
+    name: 'pick',
+    invoke: 'fgos pick',
+    description: 'Claim one item through the pull door as the session actor (same rules as take, actor fixed to "session") and create/reuse its isolated fgw/<id> worktree in one step.',
+    parameters: {
+      type: 'object',
+      properties: {
+        id: { type: 'string', description: 'Optional work item id (positional or --id); omit to pick the frontier head.' },
+      },
+      positional: ['id'],
+      required: [],
+    },
+    examples: ['fgos pick', 'fgos pick build-cli'],
+    access: 'mutation',
+    deprecated: null,
+  },
+  {
     name: 'return',
     invoke: 'fgos return',
     description: "Complete a take: runs the item's own verify and moves it to proposed (verify green) or blocked (verify red), recording the actual outcome.",

@@ -2285,6 +2285,91 @@ test('take --id not found is rejected as validation, exit 4', () => {
   assert.equal(result.status, 4);
 });
 
+// --- pick: take + createWorktree combined (str83-fgos-slash-commands-4) ---
+
+test('pick with no --id claims the frontier head exactly like take does today, actor fixed to "session", and stands up a real (non-detached) git branch/worktree for the claim', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  addOk(cwd, 'pick-a', { verify: 'test -f done.txt' });
+  const headBefore = gitHead(cwd);
+
+  const result = run(cwd, ['pick']);
+  assert.equal(result.status, 0, `pick failed: ${result.stderr}`);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.id, 'pick-a');
+  assert.equal(data.actor, 'session');
+  assert.equal(data.from, 'todo');
+  assert.equal(data.to, 'doing');
+  assert.equal(data.headAtTake, headBefore);
+  assert.equal(data.worktree.branch, 'fgw/pick-a');
+  assert.equal(data.worktree.reused, false);
+  assert.ok(fs.existsSync(data.worktree.path), 'pick must leave a real worktree checkout on disk');
+
+  const view = stateView(cwd);
+  assert.equal(view.work['pick-a'].status, 'doing');
+  assert.equal(view.work['pick-a'].claimActor, 'session');
+  assert.equal(view.outcomes['pick-a'].predicted.actor, 'session');
+
+  // truth 3: the branch is real and non-detached — `symbolic-ref HEAD`
+  // succeeds inside the worktree (mirrors session.test.mjs's negative check
+  // for a genuinely detached session worktree, asserted the other way).
+  assert.doesNotThrow(() =>
+    execFileSync('git', ['symbolic-ref', '-q', 'HEAD'], { cwd: data.worktree.path, stdio: 'ignore' }),
+  );
+});
+
+test('pick --id claims that specific item, actor fixed to "session" — pick has no --actor flag at all, unlike take', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  addOk(cwd, 'pick-explicit-other');
+  addOk(cwd, 'pick-explicit-target');
+
+  const result = run(cwd, ['pick', '--id', 'pick-explicit-target']);
+  assert.equal(result.status, 0, `pick failed: ${result.stderr}`);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.id, 'pick-explicit-target');
+  assert.equal(data.actor, 'session');
+  assert.equal(data.worktree.branch, 'fgw/pick-explicit-target');
+
+  assert.equal(stateView(cwd).work['pick-explicit-other'].status, 'todo', 'pick --id must not touch a different frontier item');
+  assert.equal(stateView(cwd).work['pick-explicit-target'].status, 'doing');
+  assert.equal(stateView(cwd).work['pick-explicit-target'].claimActor, 'session');
+});
+
+test('pick --id on an item already claimed (doing) fails the same way take does today — conflict, exit 3, no double-claim', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  addOk(cwd, 'pick-double');
+  assert.equal(run(cwd, ['pick', '--id', 'pick-double']).status, 0);
+
+  const result = run(cwd, ['pick', '--id', 'pick-double']);
+  assert.equal(result.status, 3);
+  assert.equal(stateView(cwd).work['pick-double'].status, 'doing');
+});
+
+test('pick surfaces a real createWorktree failure as-is after the claim already succeeded — the claim is never silently rolled back or hidden', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  addOk(cwd, 'pick-wt-fail');
+  // Force `git worktree add -b fgw/pick-wt-fail ...` to fail deterministically
+  // and for real (no mock): git's ref namespace cannot hold both a leaf ref
+  // and a directory at the same path, so a pre-existing
+  // "fgw/pick-wt-fail/leftover" ref makes git itself refuse to create the
+  // leaf ref "fgw/pick-wt-fail" — exactly the kind of WorktreeError
+  // createWorktree raises after the claim above has already committed.
+  execFileSync('git', ['branch', 'fgw/pick-wt-fail/leftover'], { cwd });
+
+  const result = run(cwd, ['pick', '--id', 'pick-wt-fail']);
+  assert.notEqual(result.status, 0, 'pick must fail when createWorktree fails');
+  assert.match(result.stderr, /git worktree add failed/);
+
+  // The claim itself is NOT rolled back: the item is left "doing" with no
+  // worktree, exactly as the cell's must_haves truth 5 requires.
+  const view = stateView(cwd);
+  assert.equal(view.work['pick-wt-fail'].status, 'doing');
+  assert.equal(view.work['pick-wt-fail'].claimActor, 'session');
+});
+
 test('return happy path: verify passes -> doing to proposed, actual outcome recorded, no settlement (settlement belongs to the -> done edge, D4)', () => {
   const cwd = initGitCwd();
   run(cwd, ['init']);
@@ -4008,6 +4093,36 @@ test('take --id on a blocked item with NO live branch still falls through to the
   const result = run(cwd, ['take', '--id', 'blocked-no-branch']);
   assert.equal(result.status, 3);
   assert.equal(stateView(cwd).work['blocked-no-branch'].status, 'blocked');
+});
+
+test('pick --id on a blocked item with a live fgw/<id> branch claims via blocked -> doing (the same edge take uses), actor "session", and REUSES the existing branch/worktree instead of creating a duplicate', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeBlockedBranchItem(cwd, 'pick-branch-a');
+  const branchHead = gitAtCwd(cwd, ['rev-parse', 'fgw/pick-branch-a']).trim();
+  const mainHeadBefore = gitHead(cwd);
+
+  const result = run(cwd, ['pick', '--id', 'pick-branch-a']);
+  assert.equal(result.status, 0, `pick failed: ${result.stderr}`);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.actor, 'session');
+  assert.equal(data.from, 'blocked');
+  assert.equal(data.to, 'doing');
+  assert.equal(data.branch, 'fgw/pick-branch-a');
+  assert.equal(data.branchHeadAtTake, branchHead);
+  assert.equal(data.worktree.branch, 'fgw/pick-branch-a');
+  assert.equal(data.worktree.reused, true, 'an existing branch must be reused, never recreated');
+
+  const view = stateView(cwd);
+  assert.equal(view.work['pick-branch-a'].status, 'doing');
+  assert.equal(view.work['pick-branch-a'].claimActor, 'session');
+  assert.equal(view.work['pick-branch-a'].branchHeadAtTake, branchHead);
+  assert.equal(gitHead(cwd), mainHeadBefore, "pick never touches the human's own main checkout");
+
+  // truth 3: the reused branch is real and non-detached inside its worktree.
+  assert.doesNotThrow(() =>
+    execFileSync('git', ['symbolic-ref', '-q', 'HEAD'], { cwd: data.worktree.path, stdio: 'ignore' }),
+  );
 });
 
 test('return on a branch-source take: verify passes in a disposable detached worktree at the branch tip -> proposed, branchHeadAtReturn recorded (never headAtReturn), the human\'s own main checkout is untouched and no worktree is left behind', () => {
