@@ -500,4 +500,34 @@ export const COMMAND_REGISTRY = [
     access: 'mutation',
     deprecated: null,
   },
+  {
+    name: 'setup',
+    invoke: 'fgos setup',
+    description: 'Insert the fgos shell-integration source line into detected shell rc file(s) (bash/zsh) and ensure .fgos-runner.json exists and has every current default key — do-and-announce, never asks first.',
+    parameters: {
+      type: 'object',
+      properties: {
+        pretty: { type: 'boolean', description: 'Render colored human-readable text instead of the JSON envelope.' },
+      },
+      required: [],
+    },
+    examples: ['fgos setup', 'fgos setup --pretty'],
+    access: 'mutation',
+    deprecated: null,
+  },
+  {
+    name: 'doctor',
+    invoke: 'fgos doctor',
+    description: 'Read-only diagnostic: Node/git availability, whether the shell-integration source line is present in detected rc file(s), and whether .fgos-runner.json exists and is not stale relative to the current default schema.',
+    parameters: {
+      type: 'object',
+      properties: {
+        pretty: { type: 'boolean', description: 'Render colored human-readable text instead of the JSON envelope.' },
+      },
+      required: [],
+    },
+    examples: ['fgos doctor', 'fgos doctor --pretty'],
+    access: 'read',
+    deprecated: null,
+  },
 ];

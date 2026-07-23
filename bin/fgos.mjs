@@ -23,7 +23,7 @@ import { initStore, addWork, moveWork, moveStage, editWork, addDecision, addOutc
 import { repairTruncatedLastLine } from '../src/state/events.mjs';
 import { deriveTitle, classify, generateId } from '../src/intake/classify.mjs';
 import { wrapEnvelope } from '../src/state/envelope.mjs';
-import { loadRunnerConfig, ensureRunnerConfig } from '../src/runner/dispatch.mjs';
+import { loadRunnerConfig, ensureRunnerConfig, DEFAULT_RUNNER_CONFIG } from '../src/runner/dispatch.mjs';
 import { resolveDiscovery } from '../src/intake/discovery.mjs';
 import { resolveDecompose } from '../src/intake/decompose.mjs';
 import { computeEntropy, computeCounts } from '../src/report/entropy.mjs';
@@ -43,6 +43,10 @@ import { getDomain, stageForStep } from '../src/state/workflow-stage-graphs.mjs'
 import { writeCoexistenceManifest } from '../src/install/coexist.mjs';
 import { SCHEMA_VERSION, COMMAND_REGISTRY } from '../src/cli/command-registry.mjs';
 import { computeAwaitingContext } from '../src/state/awaiting-context.mjs';
+import { DOCTOR_CHECKS, integrationScriptPath } from '../src/setup/checks.mjs';
+import { detectRcFiles, insertSourceLine } from '../src/setup/shell-rc.mjs';
+import { mergeConfigDefaults } from '../src/setup/config-merge.mjs';
+import { formatCheck, bold } from '../src/setup/ansi.mjs';
 
 // D5: `verify` is a required non-empty field on every work item, but a
 // free-text submission has no verification plan yet — that is P15's job. The
@@ -1969,8 +1973,54 @@ async function runVerb(verb, flags, positional, dir) {
       }
     }
 
+    // Do-and-announce shell-integration + config bootstrap (str87-fgos-setup-doctor
+    // D6): inserts the shell-integration source line into every DETECTED rc
+    // file (bash/zsh, D4) — never creates a new rc file (shell-rc.mjs's own
+    // refusal) — then ensures `.fgos-runner.json` exists / has every current
+    // default key via dispatch.mjs's `ensureRunnerConfig` (the one write path
+    // allowed here; `doctor`, unlike `setup`, never calls it). The addedKeys
+    // report is computed read-only (mergeConfigDefaults) BEFORE the real
+    // write, purely so the returned data can describe what changed.
+    case 'setup': {
+      const repoRoot = process.cwd();
+      const scriptPath = integrationScriptPath();
+      const rcFiles = detectRcFiles(os.homedir());
+      const rcFilesInserted = [];
+      const rcFilesAlreadyConfigured = [];
+      for (const rcFile of rcFiles) {
+        if (insertSourceLine(rcFile, scriptPath)) {
+          rcFilesInserted.push(rcFile);
+        } else {
+          rcFilesAlreadyConfigured.push(rcFile);
+        }
+      }
+      const configPath = path.join(repoRoot, '.fgos-runner.json');
+      const configExisted = fs.existsSync(configPath);
+      const priorConfig = configExisted ? JSON.parse(fs.readFileSync(configPath, 'utf8')) : {};
+      const { addedKeys } = mergeConfigDefaults(priorConfig, DEFAULT_RUNNER_CONFIG);
+      ensureRunnerConfig(configPath);
+      return {
+        rcFilesInserted,
+        rcFilesAlreadyConfigured,
+        configPath,
+        configCreated: !configExisted,
+        configAddedKeys: configExisted ? addedKeys : [],
+      };
+    }
+
+    // Read-only diagnostic (D2): runs every DOCTOR_CHECKS entry against the
+    // current cwd. Never writes anything — no rc file insertion, no config
+    // write — matching this verb's `access: 'read'` declaration.
+    case 'doctor': {
+      const checks = DOCTOR_CHECKS.map(({ id, description, check }) => {
+        const { passed, message } = check(process.cwd());
+        return { id, description, passed, message };
+      });
+      return { checks };
+    }
+
     default:
-      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <init|add|submit|discover|move|edit|ask|answer|decision|list|ready|rebuild|repair|check|rollup|take|return|review|approve|reject|catchup|evolve|triage|session> ...`);
+      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <init|add|submit|discover|move|edit|ask|answer|decision|list|ready|rebuild|repair|check|rollup|take|return|review|approve|reject|catchup|evolve|triage|session|setup|doctor> ...`);
   }
 }
 
@@ -2043,6 +2093,39 @@ function handleVerbHelp(verb) {
   return true;
 }
 
+// `--pretty` rendering (D7): ONLY for `setup`/`doctor`, and only when the
+// flag is given — every other verb, and these two without `--pretty`, stay
+// byte-identical to the wrapEnvelope + JSON path (CTR001, no exception).
+function renderPretty(verb, data) {
+  const lines = [];
+  if (verb === 'doctor') {
+    lines.push(bold('fgos doctor'));
+    for (const c of data.checks) {
+      lines.push(formatCheck(c.passed, c.description, c.message));
+    }
+  } else if (verb === 'setup') {
+    lines.push(bold('fgos setup'));
+    for (const rc of data.rcFilesInserted) {
+      lines.push(formatCheck(true, `inserted shell-integration source line`, rc));
+    }
+    for (const rc of data.rcFilesAlreadyConfigured) {
+      lines.push(formatCheck(true, `already sourced`, rc));
+    }
+    lines.push(
+      formatCheck(
+        true,
+        data.configCreated
+          ? 'created .fgos-runner.json with current defaults'
+          : data.configAddedKeys.length > 0
+            ? `added missing config keys: ${data.configAddedKeys.join(', ')}`
+            : 'config already up to date',
+        data.configPath,
+      ),
+    );
+  }
+  return `${lines.join('\n')}\n`;
+}
+
 async function main() {
   const [, , verb, ...rest] = process.argv;
 
@@ -2061,7 +2144,11 @@ async function main() {
 
   try {
     const data = await runVerb(verb, flags, positional, dataDir());
-    process.stdout.write(`${JSON.stringify(wrapEnvelope(data), null, 2)}\n`);
+    if (flags.pretty && (verb === 'setup' || verb === 'doctor')) {
+      process.stdout.write(renderPretty(verb, data));
+    } else {
+      process.stdout.write(`${JSON.stringify(wrapEnvelope(data), null, 2)}\n`);
+    }
     process.exitCode = 0;
   } catch (err) {
     process.stderr.write(`fgos: ${err.message}\n`);

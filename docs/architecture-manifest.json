@@ -52,6 +52,10 @@
     "src/state/envelope.mjs": "kernel",
     "src/state/workflow-stage-graphs.mjs": "kernel",
     "src/intake/risk-keywords.mjs": "kernel",
-    "src/intake/classify.mjs": "use-case"
+    "src/intake/classify.mjs": "use-case",
+    "src/setup/ansi.mjs": "domain",
+    "src/setup/config-merge.mjs": "domain",
+    "src/setup/shell-rc.mjs": "infra",
+    "src/setup/checks.mjs": "use-case"
   }
 }
