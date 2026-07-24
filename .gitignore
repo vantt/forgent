@@ -12,6 +12,9 @@ output.txt
 *-output.txt
 .fgos/sessions.json
 
+# main-checkout activity lock + sibling lock files (STR65) — process state, never committed
+.fgos/*.lock
+
 # BEE:START
 .bee/state.json
 .bee/reservations.json
