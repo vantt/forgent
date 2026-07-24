@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { DOMAINS, DEFAULT_DOMAIN, resolveDomainName, getDomain, stageForStep } from '../../src/state/workflow-stage-graphs.mjs';
+import { DOMAINS, DEFAULT_DOMAIN, resolveDomainName, getDomain, stageForStep, skillForStage } from '../../src/state/workflow-stage-graphs.mjs';
 import { rebuildView } from '../../src/state/replay.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -45,6 +45,43 @@ test('DOMAINS is deeply frozen: the registry, each domain entry, and each nested
   assert.ok(Object.isFrozen(DOMAINS.coding.stepMap));
   assert.ok(Object.isFrozen(DOMAINS.coding.transitions));
   assert.ok(Object.isFrozen(DOMAINS.coding.transitions[0]));
+  assert.ok(Object.isFrozen(DOMAINS.coding.skillMap));
+});
+
+// --- skillMap / skillForStage (str89-fgos-domain-skills D3/D4) ---
+
+test('DOMAINS.coding.skillMap has an entry for every stage in DOMAINS.coding.stages', () => {
+  for (const stage of DOMAINS.coding.stages) {
+    assert.ok(Object.hasOwn(DOMAINS.coding.skillMap, stage), `missing skillMap entry for stage "${stage}"`);
+  }
+});
+
+test('DOMAINS.coding.skillMap maps every stage, including executing, to its skill (str89-fgos-domain-skills D4/D6)', () => {
+  assert.equal(DOMAINS.coding.skillMap.clarify, 'fgos-exploring');
+  assert.equal(DOMAINS.coding.skillMap.decompose, 'fgos-planning');
+  assert.equal(DOMAINS.coding.skillMap.executing, 'fgos-executing');
+  assert.equal(DOMAINS.coding.skillMap['compound-learn'], 'fgos-compounding');
+});
+
+test('DOMAINS.synthetic.skillMap.assembling is null (synthetic has never loaded a skill)', () => {
+  assert.equal(DOMAINS.synthetic.skillMap.assembling, null);
+  assert.ok(Object.isFrozen(DOMAINS.synthetic.skillMap));
+});
+
+test('skillForStage resolves each of coding\'s mapped stages to its skill name', () => {
+  assert.equal(skillForStage(DOMAINS.coding, 'clarify'), 'fgos-exploring');
+  assert.equal(skillForStage(DOMAINS.coding, 'decompose'), 'fgos-planning');
+  assert.equal(skillForStage(DOMAINS.coding, 'compound-learn'), 'fgos-compounding');
+});
+
+test('skillForStage(DOMAINS.coding, "executing") resolves to fgos-executing (str89-fgos-domain-skills D4/D6)', () => {
+  assert.equal(skillForStage(DOMAINS.coding, 'executing'), 'fgos-executing');
+});
+
+test('skillForStage never throws for a stage absent from a domain\'s skillMap, returning null', () => {
+  assert.doesNotThrow(() => skillForStage(DOMAINS.synthetic, 'nonexistent-stage'));
+  assert.equal(skillForStage(DOMAINS.synthetic, 'nonexistent-stage'), null);
+  assert.equal(skillForStage(DOMAINS.coding, 'nonexistent-stage'), null);
 });
 
 // --- 'synthetic' domain (Slice 2, D1/D4): illustrative/disposable, exactly

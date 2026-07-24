@@ -67,6 +67,23 @@ export const DOMAINS = Object.freeze({
       Object.freeze({ from: 'decompose', to: 'executing' }),
       Object.freeze({ from: 'executing', to: 'compound-learn' }),
     ]),
+    // Which fgOS skill a session should load for each stage (str89-fgos-
+    // domain-skills D3/D4) — `null` means "no skill, mechanical" (today's
+    // exact default for every stage). `decompose` maps to `fgos-planning`
+    // as the entry-point default only: fgos-routing's own early/late
+    // judgment (unaffected by this field) still decides to load
+    // `fgos-validating` instead once shape/children already exist — that
+    // judgment is session-side prose, not data, so it has no entry here.
+    // `executing` now resolves to `fgos-executing` (str89-fgos-domain-skills
+    // D4/D6) — hand-authored via `distill` from bee-executing's
+    // implement->verify->cap discipline, translated into fgOS's own
+    // item/verify/`fgos return` vocabulary.
+    skillMap: Object.freeze({
+      clarify: 'fgos-exploring',
+      decompose: 'fgos-planning',
+      executing: 'fgos-executing',
+      'compound-learn': 'fgos-compounding',
+    }),
   }),
   synthetic: Object.freeze({
     stages: Object.freeze(['assembling']),
@@ -74,6 +91,12 @@ export const DOMAINS = Object.freeze({
       assembling: 'Execute',
     }),
     transitions: Object.freeze([]),
+    // Synthetic is illustrative/throwaway (see file header) and has never
+    // loaded a skill — preserve that with an explicit null, not an absent
+    // key, so skillForStage's behavior is identical either way.
+    skillMap: Object.freeze({
+      assembling: null,
+    }),
   }),
 });
 
@@ -111,4 +134,12 @@ export function getDomain(name, opts) {
  * Returns `undefined` if the domain declares no stage for that step. */
 export function stageForStep(domain, step) {
   return Object.keys(domain.stepMap).find((stage) => domain.stepMap[stage] === step);
+}
+
+/** Which fgOS skill (if any) a session should load for `stage` within
+ * `domain` (str89-fgos-domain-skills D3/D4) — `null` both when the domain
+ * declares no skill for that stage (today's exact default) and when the
+ * stage is absent from the domain's `skillMap` entirely. Never throws. */
+export function skillForStage(domain, stage) {
+  return (domain.skillMap && domain.skillMap[stage]) ?? null;
 }
