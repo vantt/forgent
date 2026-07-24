@@ -25,9 +25,11 @@ values — the same way `fgos-routing` describes it.
   Cite its D-ID; never override it here.
 - Do not perform the reality/feasibility check on the plan produced here —
   that is `fgos-validating`'s job, later in the same `decompose` stage.
-- Do not classify which domain the item belongs to. Every item this skill
-  touches is assumed to already resolve to `coding`; that is a separate
-  concern this skill never performs.
+- Do not classify which domain the item belongs to. This skill reads
+  whatever `domain` field the item already carries — already resolved
+  upstream by `fgos-routing` via the registry in
+  `repo/src/state/workflow-stage-graphs.mjs` — rather than assuming
+  `coding`; that is a separate concern this skill never performs.
 - Do not invent a new stage, field, or event kind to record the mode
   decision. It lives in `plan.md` prose, nothing else.
 - Do not apply any stage move yourself. The only edges that exist from
