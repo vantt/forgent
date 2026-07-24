@@ -313,6 +313,7 @@ if (prompt.includes('# Context-discovery')) {
       executor: { command: process.execPath, args: [executorPath, '{prompt}', '--model', '{model}'] },
       models: { light: 'haiku', standard: 'sonnet', heavy: 'opus' },
       timeoutMs: 15000,
+      parallel: { maxRoots: 4, maxLeavesPerRoot: 4 },
     }),
   );
 
