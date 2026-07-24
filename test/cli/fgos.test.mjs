@@ -4797,6 +4797,186 @@ test('conflicts verb on a store with no overlaps: empty list, exit 0', () => {
   assert.deepEqual(envelopeData(run(cwd, ['conflicts']).stdout), []);
 });
 
+// --- str73-done-flip-cos-check cell 1: --acceptance on add/submit/edit ----
+
+test('add --acceptance persists work.acceptance as the given array, validated through validateWork', () => {
+  const cwd = tmpCwd();
+  const clauses = [{ text: 'CLI exits 0 on success' }, { text: 'field round-trips', evidence: 'test/x.mjs:1' }];
+  const result = run(cwd, ['add', 'with-acceptance', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--acceptance', JSON.stringify(clauses)]);
+  assert.equal(result.status, 0);
+  assert.deepEqual(stateView(cwd).work['with-acceptance'].acceptance, clauses);
+});
+
+test('submit --acceptance persists work.acceptance as the given array (opts -> submitWork work object)', () => {
+  const cwd = tmpCwd();
+  const clauses = [{ text: 'the intake item satisfies its ask' }];
+  const result = run(cwd, ['submit', 'Do the thing', '--acceptance', JSON.stringify(clauses)]);
+  assert.equal(result.status, 0);
+  const data = envelopeData(result.stdout);
+  assert.deepEqual(stateView(cwd).work[data.id].acceptance, clauses);
+});
+
+test('edit --acceptance persists work.acceptance as the given array', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'edit-acceptance');
+  const clauses = [{ text: 'newly added clause' }];
+  const result = run(cwd, ['edit', 'edit-acceptance', '--acceptance', JSON.stringify(clauses)]);
+  assert.equal(result.status, 0);
+  assert.deepEqual(stateView(cwd).work['edit-acceptance'].acceptance, clauses);
+});
+
+test('edit --acceptance replaces the whole array (latest-wins), same semantics as --refs/--deps', () => {
+  const cwd = tmpCwd();
+  const first = [{ text: 'first clause' }, { text: 'second clause' }];
+  const result = run(cwd, ['add', 'edit-acceptance-replace', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--acceptance', JSON.stringify(first)]);
+  assert.equal(result.status, 0);
+  assert.deepEqual(stateView(cwd).work['edit-acceptance-replace'].acceptance, first);
+
+  const second = [{ text: 'a completely different clause' }];
+  const replaced = run(cwd, ['edit', 'edit-acceptance-replace', '--acceptance', JSON.stringify(second)]);
+  assert.equal(replaced.status, 0);
+  assert.deepEqual(stateView(cwd).work['edit-acceptance-replace'].acceptance, second, 'edit --acceptance must replace, not merge, the array');
+});
+
+test('an item added with no --acceptance flag has work.acceptance absent (undefined), not an empty array', () => {
+  const cwd = tmpCwd();
+  const result = addOk(cwd, 'no-acceptance-item');
+  assert.equal(result.status, 0);
+  const view = stateView(cwd);
+  assert.equal('acceptance' in view.work['no-acceptance-item'], false, 'an omitted --acceptance leaves the field absent, not []');
+  const listed = envelopeData(run(cwd, ['list']).stdout);
+  assert.equal('acceptance' in listed.work['no-acceptance-item'], false);
+});
+
+test('add with a malformed --acceptance is rejected as validation, exit 4, no event written', () => {
+  const cwd = tmpCwd();
+  const before = eventLines(cwd).length;
+
+  const invalidJson = run(cwd, ['add', 'bad-json', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--acceptance', 'not json']);
+  assert.equal(invalidJson.status, 4);
+
+  const notArray = run(cwd, ['add', 'bad-shape', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--acceptance', JSON.stringify({ text: 'x' })]);
+  assert.equal(notArray.status, 4);
+
+  const missingText = run(cwd, ['add', 'bad-entry', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--acceptance', JSON.stringify([{ evidence: 'e' }])]);
+  assert.equal(missingText.status, 4);
+
+  const emptyText = run(cwd, ['add', 'bad-empty-text', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--acceptance', JSON.stringify([{ text: '' }])]);
+  assert.equal(emptyText.status, 4);
+
+  const bareFlag = run(cwd, ['add', 'bad-bare-flag', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--acceptance']);
+  assert.equal(bareFlag.status, 4);
+
+  assert.equal(eventLines(cwd).length, before, 'no malformed --acceptance attempt should append any event');
+});
+
+test('edit with a malformed --acceptance is rejected as validation, exit 4, no event written', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'edit-bad-acceptance');
+  const before = eventLines(cwd).length;
+
+  const invalidJson = run(cwd, ['edit', 'edit-bad-acceptance', '--acceptance', 'not json']);
+  assert.equal(invalidJson.status, 4);
+
+  const notArray = run(cwd, ['edit', 'edit-bad-acceptance', '--acceptance', JSON.stringify({ text: 'x' })]);
+  assert.equal(notArray.status, 4);
+
+  const missingText = run(cwd, ['edit', 'edit-bad-acceptance', '--acceptance', JSON.stringify([{ evidence: 'e' }])]);
+  assert.equal(missingText.status, 4);
+
+  const emptyText = run(cwd, ['edit', 'edit-bad-acceptance', '--acceptance', JSON.stringify([{ text: '' }])]);
+  assert.equal(emptyText.status, 4);
+
+  assert.equal(eventLines(cwd).length, before, 'no malformed --acceptance edit should append any event');
+  assert.equal('acceptance' in stateView(cwd).work['edit-bad-acceptance'], false);
+});
+
+test('submit with a malformed --acceptance is rejected as validation, exit 4, no event written', () => {
+  const cwd = tmpCwd();
+  const before = eventLines(cwd).length;
+  const result = run(cwd, ['submit', 'Try a bad acceptance value', '--acceptance', 'not json']);
+  assert.equal(result.status, 4);
+  assert.equal(eventLines(cwd).length, before);
+});
+
+// --- str73-done-flip-cos-check cell 2: per-clause CoS done-gate via the ----
+// --- real CLI (move / approve) ---------------------------------------------
+//
+// Mirrors the RUL50 compound-learn tests above (`toCompoundLearn`, "move
+// proposed -> done (approval) applies via the real CLI"): an item must clear
+// BOTH the stage gate and this cell's acceptance-evidence gate before it can
+// close. `approve` on a plain (non-git-backed) item resolves to the
+// "legacy" source (no `fgw/<id>` branch, no headAtTake/headAtReturn) and its
+// verify-only path re-runs `item.verify` against cwd before calling the same
+// `moveWork(..., to: 'done')` a direct `move` uses — `verify: 'true'` keeps
+// that check trivially green so the test isolates the acceptance gate.
+
+test('move --to done is refused when a populated acceptance clause has no evidence: precondition, exit 2, item stays proposed, no event written', () => {
+  const cwd = tmpCwd();
+  toCompoundLearn(cwd, 'cli-cos-missing');
+  run(cwd, ['edit', 'cli-cos-missing', '--acceptance', JSON.stringify([{ text: 'ship it' }])]);
+
+  const before = eventLines(cwd).length;
+  const result = run(cwd, ['move', 'cli-cos-missing', '--to', 'done']);
+  assert.equal(result.status, 2);
+  assert.match(result.stderr, /ship it/);
+  assert.equal(stateView(cwd).work['cli-cos-missing'].status, 'proposed');
+  assert.equal(eventLines(cwd).length, before);
+});
+
+test('move --to done succeeds when every acceptance clause has non-empty evidence, exactly as before this cell', () => {
+  const cwd = tmpCwd();
+  toCompoundLearn(cwd, 'cli-cos-evidenced');
+  run(cwd, ['edit', 'cli-cos-evidenced', '--acceptance', JSON.stringify([{ text: 'ship it', evidence: 'test/cli/fgos.test.mjs:1' }])]);
+
+  const result = run(cwd, ['move', 'cli-cos-evidenced', '--to', 'done']);
+  assert.equal(result.status, 0);
+  assert.equal(stateView(cwd).work['cli-cos-evidenced'].status, 'done');
+});
+
+test('an item with acceptance absent, or an empty array, closes via move --to done completely unaffected (D4 no-op)', () => {
+  const cwd = tmpCwd();
+  toCompoundLearn(cwd, 'cli-cos-absent'); // no --acceptance ever set
+  assert.equal(run(cwd, ['move', 'cli-cos-absent', '--to', 'done']).status, 0);
+  assert.equal(stateView(cwd).work['cli-cos-absent'].status, 'done');
+
+  const cwd2 = tmpCwd();
+  toCompoundLearn(cwd2, 'cli-cos-empty');
+  run(cwd2, ['edit', 'cli-cos-empty', '--acceptance', JSON.stringify([])]);
+  assert.equal(run(cwd2, ['move', 'cli-cos-empty', '--to', 'done']).status, 0);
+  assert.equal(stateView(cwd2).work['cli-cos-empty'].status, 'done');
+});
+
+test('editing in the missing evidence after a refusal, then retrying move --to done, succeeds — no cached verdict', () => {
+  const cwd = tmpCwd();
+  toCompoundLearn(cwd, 'cli-cos-retry');
+  run(cwd, ['edit', 'cli-cos-retry', '--acceptance', JSON.stringify([{ text: 'ship it' }])]);
+
+  assert.equal(run(cwd, ['move', 'cli-cos-retry', '--to', 'done']).status, 2);
+  assert.equal(stateView(cwd).work['cli-cos-retry'].status, 'proposed');
+
+  run(cwd, ['edit', 'cli-cos-retry', '--acceptance', JSON.stringify([{ text: 'ship it', evidence: 'test/cli/fgos.test.mjs:1' }])]);
+  const result = run(cwd, ['move', 'cli-cos-retry', '--to', 'done']);
+  assert.equal(result.status, 0, 'the retry must re-read the just-edited evidence, not a cached refusal');
+  assert.equal(stateView(cwd).work['cli-cos-retry'].status, 'done');
+});
+
+test('approve on a proposed item with a missing-evidence acceptance clause is refused the same way as move --to done: precondition, exit 2, item stays proposed, no event written', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'approve-cos-missing', { verify: 'true' });
+  run(cwd, ['edit', 'approve-cos-missing', '--acceptance', JSON.stringify([{ text: 'ship it' }])]);
+  run(cwd, ['move', 'approve-cos-missing', '--to', 'doing']);
+  run(cwd, ['move', 'approve-cos-missing', '--to', 'proposed']);
+  run(cwd, ['compound', 'approve-cos-missing']);
+
+  const before = eventLines(cwd).length;
+  const result = run(cwd, ['approve', 'approve-cos-missing']);
+  assert.equal(result.status, 2, result.stderr);
+  assert.match(result.stderr, /ship it/);
+  assert.equal(stateView(cwd).work['approve-cos-missing'].status, 'proposed');
+  assert.equal(eventLines(cwd).length, before);
+});
+
 test('graph verb on an empty store: zero components, still a valid envelope, exit 0', () => {
   const cwd = tmpCwd();
   assert.equal(run(cwd, ['init']).status, 0);

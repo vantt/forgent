@@ -17,7 +17,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fork } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { addWork, editWork, moveWork, moveStage, addOutcome, addFriction, listWork, readRawEvents } from '../../src/state/store.mjs';
+import { addWork, editWork, moveWork, moveStage, addOutcome, addFriction, listWork, readRawEvents, StoreError } from '../../src/state/store.mjs';
 
 const STORE_MJS = path.resolve(fileURLToPath(import.meta.url), '../../../src/state/store.mjs');
 
@@ -533,4 +533,79 @@ test('moveWork under concurrent OS processes racing the SAME expectedStatus CAS 
     (e) => e.type === 'work.move' && e.payload?.id === 'race-move' && e.payload?.to === 'done',
   );
   assert.equal(moveToDoneEvents.length, 1, 'the log must carry exactly one doing->done work.move event for the raced id');
+});
+
+// --- str73-done-flip-cos-check cell 2: per-clause CoS done-gate ------------
+//
+// Mirrors the RUL50 compound-learn done-gate tests above: same "advance to
+// compound-learn, then attempt the doing->done close" shape, since a coding
+// item must clear BOTH gates. These tests exercise the sibling `acceptance`
+// gate store.mjs's `moveWork` now enforces (D2/D3): a populated clause
+// missing evidence refuses the close as `precondition`, the same category/
+// error class RUL50's own stage check already uses.
+
+// Advance `id` to `doing`, then to `compound-learn` stage — the shared setup
+// every test below needs before it can attempt a doing->done close.
+function toDoingAtCompoundLearn(dir, id) {
+  moveWork(dir, { id, to: 'doing', expectedStatus: 'todo' });
+  moveStage(dir, { id, to: 'compound-learn' });
+}
+
+test('moveWork refuses a doing->done close when a populated acceptance clause has no evidence: precondition, item stays "doing", no event written', () => {
+  const dir = tmpDir();
+  addSampleWork(dir, 'cos-missing-evidence', { acceptance: [{ text: 'field round-trips' }] });
+  toDoingAtCompoundLearn(dir, 'cos-missing-evidence');
+
+  const before = readRawEvents(dir).length;
+  assert.throws(
+    () => moveWork(dir, { id: 'cos-missing-evidence', to: 'done', expectedStatus: 'doing' }),
+    (err) => err instanceof StoreError && err.category === 'precondition' && /field round-trips/.test(err.message),
+  );
+  assert.equal(listWork(dir).work['cos-missing-evidence'].status, 'doing', 'a refused close must leave the item at its prior status');
+  assert.equal(readRawEvents(dir).length, before, 'a refused close must append no event');
+});
+
+test('moveWork allows a doing->done close when every acceptance clause has non-empty evidence, exactly as before this cell', () => {
+  const dir = tmpDir();
+  addSampleWork(dir, 'cos-all-evidenced', {
+    acceptance: [
+      { text: 'field round-trips', evidence: 'test/state/work.test.mjs:1' },
+      { text: 'CLI exits 0', evidence: 'test/cli/fgos.test.mjs:1' },
+    ],
+  });
+  toDoingAtCompoundLearn(dir, 'cos-all-evidenced');
+
+  const { view } = moveWork(dir, { id: 'cos-all-evidenced', to: 'done', expectedStatus: 'doing', actor: 'human' });
+  assert.equal(view.work['cos-all-evidenced'].status, 'done');
+});
+
+test('moveWork leaves a doing->done close completely unaffected when acceptance is absent, or an empty array — D4 no-op', () => {
+  const dir = tmpDir();
+  addSampleWork(dir, 'cos-absent'); // no `acceptance` field at all
+  addSampleWork(dir, 'cos-empty', { acceptance: [] });
+  toDoingAtCompoundLearn(dir, 'cos-absent');
+  toDoingAtCompoundLearn(dir, 'cos-empty');
+
+  const { view: viewAbsent } = moveWork(dir, { id: 'cos-absent', to: 'done', expectedStatus: 'doing', actor: 'human' });
+  assert.equal(viewAbsent.work['cos-absent'].status, 'done');
+
+  const { view: viewEmpty } = moveWork(dir, { id: 'cos-empty', to: 'done', expectedStatus: 'doing', actor: 'human' });
+  assert.equal(viewEmpty.work['cos-empty'].status, 'done');
+});
+
+test('moveWork re-reads fresh state on retry: editing in the missing evidence after a refusal, then retrying, succeeds — no cached verdict', () => {
+  const dir = tmpDir();
+  addSampleWork(dir, 'cos-retry', { acceptance: [{ text: 'field round-trips' }] });
+  toDoingAtCompoundLearn(dir, 'cos-retry');
+
+  assert.throws(
+    () => moveWork(dir, { id: 'cos-retry', to: 'done', expectedStatus: 'doing' }),
+    (err) => err instanceof StoreError && err.category === 'precondition',
+  );
+  assert.equal(listWork(dir).work['cos-retry'].status, 'doing');
+
+  editWork(dir, { id: 'cos-retry', patch: { acceptance: [{ text: 'field round-trips', evidence: 'test/state/work.test.mjs:1' }] } });
+
+  const { view } = moveWork(dir, { id: 'cos-retry', to: 'done', expectedStatus: 'doing', actor: 'human' });
+  assert.equal(view.work['cos-retry'].status, 'done', 'the retry must re-read the just-edited evidence, not a cached refusal');
 });

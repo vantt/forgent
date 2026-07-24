@@ -71,6 +71,49 @@ test('validateWork rejects a footprint that is not an array, or has an empty/non
   assert.throws(() => validateWork(baseWork({ footprint: ['src/a.mjs', 42] })), WorkValidationError);
 });
 
+// str73-done-flip-cos-check cell 1: acceptance is an OPTIONAL additive array
+// of {text, evidence} Condition-of-Satisfaction clauses, alongside `verify`.
+test('validateWork accepts acceptance absent, null, or an array of {text, evidence} clauses', () => {
+  assert.equal(baseWork().acceptance, undefined);
+  assert.doesNotThrow(() => validateWork(baseWork())); // absent
+  assert.doesNotThrow(() => validateWork(baseWork({ acceptance: null })));
+  assert.doesNotThrow(() => validateWork(baseWork({ acceptance: [] })));
+  assert.doesNotThrow(() => validateWork(baseWork({
+    acceptance: [
+      { text: 'CLI returns exit 0 on success' },
+      { text: 'New field round-trips through fgos list', evidence: 'test/cli/fgos.test.mjs:123' },
+    ],
+  })));
+});
+
+test('validateWork accepts acceptance entries with evidence absent or null', () => {
+  assert.doesNotThrow(() => validateWork(baseWork({ acceptance: [{ text: 'done' }] })));
+  assert.doesNotThrow(() => validateWork(baseWork({ acceptance: [{ text: 'done', evidence: null }] })));
+});
+
+test('validateWork rejects acceptance that is not an array', () => {
+  assert.throws(() => validateWork(baseWork({ acceptance: 'not-an-array' })), WorkValidationError);
+  assert.throws(() => validateWork(baseWork({ acceptance: { text: 'x' } })), WorkValidationError);
+});
+
+test('validateWork rejects an acceptance entry that is not a plain object', () => {
+  assert.throws(() => validateWork(baseWork({ acceptance: ['just a string'] })), WorkValidationError);
+  assert.throws(() => validateWork(baseWork({ acceptance: [42] })), WorkValidationError);
+  assert.throws(() => validateWork(baseWork({ acceptance: [['nested', 'array']] })), WorkValidationError);
+});
+
+test('validateWork rejects an acceptance entry missing text, or with an empty/non-string text', () => {
+  assert.throws(() => validateWork(baseWork({ acceptance: [{ evidence: 'e' }] })), WorkValidationError);
+  assert.throws(() => validateWork(baseWork({ acceptance: [{ text: '' }] })), WorkValidationError);
+  assert.throws(() => validateWork(baseWork({ acceptance: [{ text: '   ' }] })), WorkValidationError);
+  assert.throws(() => validateWork(baseWork({ acceptance: [{ text: 42 }] })), WorkValidationError);
+});
+
+test('validateWork rejects an acceptance entry with a non-string or empty evidence', () => {
+  assert.throws(() => validateWork(baseWork({ acceptance: [{ text: 'done', evidence: '' }] })), WorkValidationError);
+  assert.throws(() => validateWork(baseWork({ acceptance: [{ text: 'done', evidence: 42 }] })), WorkValidationError);
+});
+
 test('validateWork rejects an unstable id format', () => {
   assert.throws(() => validateWork(baseWork({ id: 'Not Valid!' })), WorkValidationError);
   assert.throws(() => validateWork(baseWork({ id: '' })), WorkValidationError);

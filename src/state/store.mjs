@@ -182,7 +182,7 @@ export function addWork(dir, work) {
 // write path (identity is immutable; `status` is `move`'s; `stage` is
 // `moveStage`'s) and mixing them into `edit` would open a second door onto
 // the same field.
-const EDITABLE_FIELDS = new Set(['title', 'kind', 'risk', 'verify', 'tier', 'refs', 'deps']);
+const EDITABLE_FIELDS = new Set(['title', 'kind', 'risk', 'verify', 'tier', 'refs', 'deps', 'acceptance']);
 
 /**
  * Patch fields on an existing work item, through the SAME single write door
@@ -384,6 +384,30 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, act
         throw new StoreError(
           'precondition',
           `work "${id}" cannot move to "done" from stage "${currentStage}" — it must pass through the "${compoundLearnStage}" stage first so the compound-learn synthesis is never silently skipped.`,
+        );
+      }
+    }
+  }
+
+  // Per-clause CoS done-gate (str73-done-flip-cos-check D2/D3): a work item
+  // that has opted into `acceptance` clauses (per work.mjs's optional-additive
+  // shape) can never reach `done` while any populated clause still lacks
+  // evidence — mirrors bee's own per-clause CoS discipline (D1), mechanically
+  // checking only *presence* of evidence, never its truth. Sibling to RUL50's
+  // Compound-learn block immediately above: same `to === 'done'` guard, same
+  // held `events.lock`, same `precondition` category, placed BEFORE the
+  // append so a refused close persists nothing. `work.acceptance` absent,
+  // null, or an empty array is a complete no-op (D4) — an item that never
+  // opted in is unaffected. Both doors into `done` (doing->done, proposed->
+  // done) converge on this one `moveWork` call, so gating here covers both,
+  // exactly like RUL50's own comment describes for itself.
+  if (to === 'done' && Array.isArray(work.acceptance) && work.acceptance.length > 0) {
+    for (const clause of work.acceptance) {
+      if (typeof clause?.text !== 'string' || !clause.text.trim()) continue;
+      if (typeof clause.evidence !== 'string' || !clause.evidence.trim()) {
+        throw new StoreError(
+          'precondition',
+          `work "${id}" cannot move to "done" — acceptance clause "${clause.text}" has no evidence yet; edit --acceptance must supply it before "done".`,
         );
       }
     }
