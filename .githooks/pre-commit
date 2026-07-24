@@ -20,10 +20,10 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // Historical STR65 incidents (3 SHA'd, docs/history/str65-worktree-isolation-
 // enforcement/reports/validation-phase1.md) showed real inter-commit gaps of
-// ~2-3.5 minutes within a single working session. 15 minutes is generous
-// enough to cover a realistic pause between a session's own commits while
-// staying bounded enough to self-heal once a session actually goes away.
-const DEFAULT_TTL_MS = 15 * 60 * 1000;
+// ~2-3.5 minutes within a single working session. 5 minutes still clears
+// that observed gap, though with a thinner margin than the prior 10-minute
+// value -- accepted tradeoff for self-healing an abandoned lock sooner.
+const DEFAULT_TTL_MS = 5 * 60 * 1000;
 
 const HOW_TO_DOC = 'docs/how-to-parallel-lanes.md (workshop root, one level up from repo/)';
 
