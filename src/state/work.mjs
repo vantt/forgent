@@ -229,6 +229,34 @@ export function validateWorkShape(work) {
     }
   }
 
+  // Condition-of-Satisfaction clauses (per str73-done-flip-cos-check D1-D4):
+  // OPTIONAL additive array of `{text, evidence}` clauses standing alongside
+  // the single `verify` command — mirrors bee's own per-clause CoS check.
+  // Same optional-additive validation as `footprint` immediately above:
+  // shape-checked only when present, null treated as absent. Never defaults
+  // to an empty array — absence stays absence (per D4), matching
+  // `docsRef`/`footprint`'s own convention. This cell only adds the shape
+  // check; the done-gate enforcement of these clauses is a separate cell.
+  if (work.acceptance !== undefined && work.acceptance !== null) {
+    if (!Array.isArray(work.acceptance)) {
+      throw new WorkValidationError(
+        `work.acceptance must be an array of {text, evidence} clauses when present, got: ${JSON.stringify(work.acceptance)}`,
+      );
+    }
+    for (const clause of work.acceptance) {
+      if (!clause || typeof clause !== 'object' || Array.isArray(clause)) {
+        throw new WorkValidationError(`work.acceptance entries must be objects, got: ${JSON.stringify(clause)}`);
+      }
+      if (typeof clause.text !== 'string' || !clause.text.trim()) {
+        throw new WorkValidationError(`work.acceptance entries must have a non-empty "text", got: ${JSON.stringify(clause)}`);
+      }
+      if (clause.evidence !== undefined && clause.evidence !== null
+        && (typeof clause.evidence !== 'string' || !clause.evidence.trim())) {
+        throw new WorkValidationError(`work.acceptance entry "evidence" must be a non-empty string when present, got: ${JSON.stringify(clause)}`);
+      }
+    }
+  }
+
   // Full-text intake description (per discovery-context P30): OPTIONAL
   // additive field carrying the submitter's original free text, so the
   // discovery engine's prompt does not lose it to title truncation/

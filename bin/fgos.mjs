@@ -194,6 +194,26 @@ function parseListFlag(value) {
     .filter(Boolean);
 }
 
+// Per str73-done-flip-cos-check D2: --acceptance carries a JSON-encoded array
+// of {text, evidence} clauses (never parseListFlag's comma-separated shape —
+// clause text may itself contain commas), threaded identically through
+// add/submit/edit. Omitted entirely leaves the field undefined (present-or-
+// absent optional additive, same as --footprint); a malformed value (not a
+// string, or a string that fails JSON.parse) is refused here as a validation
+// error rather than an uncaught crash — work.mjs's validateWork stays the
+// single source for the {text, evidence} shape rule itself.
+function parseAcceptanceFlag(value, message) {
+  if (value === undefined) return undefined;
+  if (typeof value !== 'string') {
+    throw new StoreError('validation', message);
+  }
+  try {
+    return JSON.parse(value);
+  } catch (err) {
+    throw new StoreError('validation', `${message} (invalid JSON: ${err.message})`);
+  }
+}
+
 // One structured entry per item, always naming both halves explicitly
 // (`predicted`/`actual`) even when a half is still missing (null) — this is
 // what makes the output real CoS evidence (per plan Approach S1) rather than
@@ -488,6 +508,9 @@ function submitWork(dir, text, opts = {}) {
     // Per work-graph-intelligence S2b (producer A): --discovered-from
     // threaded from opts the same way --domain is, immediately above.
     discoveredFrom: opts.discoveredFrom,
+    // Per str73-done-flip-cos-check D2: --acceptance threaded from opts the
+    // same way --domain/--discovered-from are, immediately above.
+    acceptance: opts.acceptance,
     // Per D8: every item entering through the public door starts at its
     // domain's Clarify-mapped stage — context-discovery must pass before
     // it can be worked. Generalized from the hardcoded 'clarify' (D8) to
@@ -612,6 +635,12 @@ async function runVerb(verb, flags, positional, dir) {
         // validateWorkShape is the single source for the non-empty-string
         // shape check, mirroring `description`'s rule.
         docsRef: optionalField(flags['docs-ref'], 'add --docs-ref requires a non-empty path; omit it to leave unset.'),
+        // Per str73-done-flip-cos-check D2: --acceptance is an optional
+        // JSON-encoded array of {text, evidence} clauses — same omitted-
+        // leaves-undefined shape as --footprint/--docs-ref above. work.mjs's
+        // validateWorkShape is the single source for the {text, evidence}
+        // shape rule; a malformed JSON value is rejected here, before that.
+        acceptance: parseAcceptanceFlag(flags.acceptance, 'add --acceptance requires a JSON-encoded array of {text, evidence} clauses.'),
       };
       const { event } = addWork(dir, work);
       return { id: event.payload.id, seq: event.seq };
@@ -639,6 +668,10 @@ async function runVerb(verb, flags, positional, dir) {
         // existence validation happens at the same addWork write-gate
         // every other verb goes through; no new check here.
         deps: parseListFlag(flags.deps),
+        // Per str73-done-flip-cos-check D2: same optional JSON-encoded
+        // acceptance flag as `add`, threaded through submitWork's opts the
+        // same way domain/discoveredFrom already are, immediately above.
+        acceptance: parseAcceptanceFlag(flags.acceptance, 'submit --acceptance requires a JSON-encoded array of {text, evidence} clauses.'),
       };
       return submitWork(dir, text, opts);
     }
@@ -772,10 +805,18 @@ async function runVerb(verb, flags, positional, dir) {
           patch[field] = parseListFlag(flags[field]);
         }
       }
+      // Per str73-done-flip-cos-check D2/D3: --acceptance always replaces the
+      // whole array (latest-wins), same semantics as --refs/--deps above,
+      // but JSON-encoded rather than comma-separated (clause text may
+      // contain commas) — so it gets its own parse rather than reusing
+      // parseListFlag.
+      if (flags.acceptance !== undefined) {
+        patch.acceptance = parseAcceptanceFlag(flags.acceptance, 'edit --acceptance requires a JSON-encoded array of {text, evidence} clauses.');
+      }
       if (Object.keys(patch).length === 0) {
         throw new StoreError(
           'validation',
-          'edit requires at least one field to change: --title/--kind/--risk/--verify/--tier/--refs/--deps.',
+          'edit requires at least one field to change: --title/--kind/--risk/--verify/--tier/--refs/--deps/--acceptance.',
         );
       }
       const { event } = editWork(dir, { id, patch, actor: 'human' });

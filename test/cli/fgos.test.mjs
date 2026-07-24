@@ -4797,6 +4797,108 @@ test('conflicts verb on a store with no overlaps: empty list, exit 0', () => {
   assert.deepEqual(envelopeData(run(cwd, ['conflicts']).stdout), []);
 });
 
+// --- str73-done-flip-cos-check cell 1: --acceptance on add/submit/edit ----
+
+test('add --acceptance persists work.acceptance as the given array, validated through validateWork', () => {
+  const cwd = tmpCwd();
+  const clauses = [{ text: 'CLI exits 0 on success' }, { text: 'field round-trips', evidence: 'test/x.mjs:1' }];
+  const result = run(cwd, ['add', 'with-acceptance', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--acceptance', JSON.stringify(clauses)]);
+  assert.equal(result.status, 0);
+  assert.deepEqual(stateView(cwd).work['with-acceptance'].acceptance, clauses);
+});
+
+test('submit --acceptance persists work.acceptance as the given array (opts -> submitWork work object)', () => {
+  const cwd = tmpCwd();
+  const clauses = [{ text: 'the intake item satisfies its ask' }];
+  const result = run(cwd, ['submit', 'Do the thing', '--acceptance', JSON.stringify(clauses)]);
+  assert.equal(result.status, 0);
+  const data = envelopeData(result.stdout);
+  assert.deepEqual(stateView(cwd).work[data.id].acceptance, clauses);
+});
+
+test('edit --acceptance persists work.acceptance as the given array', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'edit-acceptance');
+  const clauses = [{ text: 'newly added clause' }];
+  const result = run(cwd, ['edit', 'edit-acceptance', '--acceptance', JSON.stringify(clauses)]);
+  assert.equal(result.status, 0);
+  assert.deepEqual(stateView(cwd).work['edit-acceptance'].acceptance, clauses);
+});
+
+test('edit --acceptance replaces the whole array (latest-wins), same semantics as --refs/--deps', () => {
+  const cwd = tmpCwd();
+  const first = [{ text: 'first clause' }, { text: 'second clause' }];
+  const result = run(cwd, ['add', 'edit-acceptance-replace', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--acceptance', JSON.stringify(first)]);
+  assert.equal(result.status, 0);
+  assert.deepEqual(stateView(cwd).work['edit-acceptance-replace'].acceptance, first);
+
+  const second = [{ text: 'a completely different clause' }];
+  const replaced = run(cwd, ['edit', 'edit-acceptance-replace', '--acceptance', JSON.stringify(second)]);
+  assert.equal(replaced.status, 0);
+  assert.deepEqual(stateView(cwd).work['edit-acceptance-replace'].acceptance, second, 'edit --acceptance must replace, not merge, the array');
+});
+
+test('an item added with no --acceptance flag has work.acceptance absent (undefined), not an empty array', () => {
+  const cwd = tmpCwd();
+  const result = addOk(cwd, 'no-acceptance-item');
+  assert.equal(result.status, 0);
+  const view = stateView(cwd);
+  assert.equal('acceptance' in view.work['no-acceptance-item'], false, 'an omitted --acceptance leaves the field absent, not []');
+  const listed = envelopeData(run(cwd, ['list']).stdout);
+  assert.equal('acceptance' in listed.work['no-acceptance-item'], false);
+});
+
+test('add with a malformed --acceptance is rejected as validation, exit 4, no event written', () => {
+  const cwd = tmpCwd();
+  const before = eventLines(cwd).length;
+
+  const invalidJson = run(cwd, ['add', 'bad-json', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--acceptance', 'not json']);
+  assert.equal(invalidJson.status, 4);
+
+  const notArray = run(cwd, ['add', 'bad-shape', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--acceptance', JSON.stringify({ text: 'x' })]);
+  assert.equal(notArray.status, 4);
+
+  const missingText = run(cwd, ['add', 'bad-entry', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--acceptance', JSON.stringify([{ evidence: 'e' }])]);
+  assert.equal(missingText.status, 4);
+
+  const emptyText = run(cwd, ['add', 'bad-empty-text', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--acceptance', JSON.stringify([{ text: '' }])]);
+  assert.equal(emptyText.status, 4);
+
+  const bareFlag = run(cwd, ['add', 'bad-bare-flag', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--acceptance']);
+  assert.equal(bareFlag.status, 4);
+
+  assert.equal(eventLines(cwd).length, before, 'no malformed --acceptance attempt should append any event');
+});
+
+test('edit with a malformed --acceptance is rejected as validation, exit 4, no event written', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'edit-bad-acceptance');
+  const before = eventLines(cwd).length;
+
+  const invalidJson = run(cwd, ['edit', 'edit-bad-acceptance', '--acceptance', 'not json']);
+  assert.equal(invalidJson.status, 4);
+
+  const notArray = run(cwd, ['edit', 'edit-bad-acceptance', '--acceptance', JSON.stringify({ text: 'x' })]);
+  assert.equal(notArray.status, 4);
+
+  const missingText = run(cwd, ['edit', 'edit-bad-acceptance', '--acceptance', JSON.stringify([{ evidence: 'e' }])]);
+  assert.equal(missingText.status, 4);
+
+  const emptyText = run(cwd, ['edit', 'edit-bad-acceptance', '--acceptance', JSON.stringify([{ text: '' }])]);
+  assert.equal(emptyText.status, 4);
+
+  assert.equal(eventLines(cwd).length, before, 'no malformed --acceptance edit should append any event');
+  assert.equal('acceptance' in stateView(cwd).work['edit-bad-acceptance'], false);
+});
+
+test('submit with a malformed --acceptance is rejected as validation, exit 4, no event written', () => {
+  const cwd = tmpCwd();
+  const before = eventLines(cwd).length;
+  const result = run(cwd, ['submit', 'Try a bad acceptance value', '--acceptance', 'not json']);
+  assert.equal(result.status, 4);
+  assert.equal(eventLines(cwd).length, before);
+});
+
 test('graph verb on an empty store: zero components, still a valid envelope, exit 0', () => {
   const cwd = tmpCwd();
   assert.equal(run(cwd, ['init']).status, 0);

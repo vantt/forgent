@@ -52,6 +52,7 @@ export const COMMAND_REGISTRY = [
         footprint: { type: 'string', description: 'Optional comma-separated list of file paths this item is expected to touch (advisory only).' },
         'discovered-from': { type: 'string', description: 'Optional id of the item this one was discovered from (provenance, not a dependency).' },
         'docs-ref': { type: 'string', description: 'Optional relative path to this item\'s docs/history/<feature>/ directory (its own CONTEXT.md/plan.md).' },
+        acceptance: { type: 'string', description: 'Optional JSON-encoded array of {text, evidence} Condition-of-Satisfaction clauses (NOT comma-separated — clause text may contain commas).' },
       },
       positional: ['id'],
       required: ['id', 'title', 'kind', 'risk', 'verify'],
@@ -72,6 +73,7 @@ export const COMMAND_REGISTRY = [
         domain: { type: 'string', description: 'Optional domain; omit to use the store default.' },
         'discovered-from': { type: 'string', description: 'Optional id of the item this one was discovered from (provenance, not a dependency).' },
         deps: { type: 'string', description: 'Comma-separated list of dependency ids.' },
+        acceptance: { type: 'string', description: 'Optional JSON-encoded array of {text, evidence} Condition-of-Satisfaction clauses (NOT comma-separated — clause text may contain commas).' },
       },
       positional: ['text'],
       required: ['text'],
@@ -136,7 +138,7 @@ export const COMMAND_REGISTRY = [
   {
     name: 'edit',
     invoke: 'fgos edit',
-    description: 'Patch fields on an existing item (title/kind/risk/verify/tier/refs/deps). At least one field must be given.',
+    description: 'Patch fields on an existing item (title/kind/risk/verify/tier/refs/deps/acceptance). At least one field must be given.',
     parameters: {
       type: 'object',
       properties: {
@@ -148,6 +150,7 @@ export const COMMAND_REGISTRY = [
         tier: { type: 'string', description: 'New tier.' },
         refs: { type: 'string', description: 'Comma-separated list of reference ids/links (empty string clears the field).' },
         deps: { type: 'string', description: 'Comma-separated list of dependency ids (empty string clears the field).' },
+        acceptance: { type: 'string', description: 'Optional JSON-encoded array of {text, evidence} Condition-of-Satisfaction clauses — replaces the whole array (empty array "[]" clears the field). NOT comma-separated — clause text may contain commas.' },
       },
       positional: ['id'],
       required: ['id'],
