@@ -761,6 +761,21 @@ mà rủi ro-còn-lại ở trên nêu tên.
 
 Khi một phiên trợ lý (người hoặc agent) mở repo để làm một item qua vòng đời của nó, phiên tự định vị bằng một entry skill đọc `stage` hiện tại của item rồi trỏ tới đúng skill giai đoạn kế tiếp — không có nghi thức khởi động nào khác ngoài đọc verb đọc-thuần (`list`/`ready`) rồi vào việc qua cửa pull `take` (per D10 p50-workflow-induct). Bản đồ giai đoạn: skill `làm-rõ` hoạt động ở stage `clarify` — nó sàng lọc câu hỏi thật qua ba phép thử (chất-liệu/có-căn-cứ/trả-lời-được) trước khi hỏi người; câu hỏi không đạt sàng lọc (vd một lựa chọn chỉ ảnh hưởng người-triển-khai, không ảnh hưởng phạm vi sản phẩm) được ghim thành một giả định thay vì tạo cổng chờ-người. Skill `chia-việc` hoạt động ở nửa đầu stage `decompose`; skill `thẩm-định` hoạt động ở nửa cuối, gác cạnh `decompose→executing` — một thẩm định thất bại quay lại `chia-việc`, không bao giờ tự nhận đã qua. Bước chuyển stage thật sự (đánh giá item đã đủ rõ/đủ khả thi hay chưa) luôn là verb máy của engine, không phải chính skill — skill không bao giờ tự áp cạnh chuyển-trạng-thái (per D8, cùng stance "trí tuệ không cầm picker" của RUL42 áp dụng tương tự ở lớp hướng dẫn này — chính `fgos-routing/SKILL.md` cũng nêu tường minh nguyên tắc này trong mục "Precedence: the engine's verb always wins" của nó). Một cổng chờ-người thật (engine tự phán không đủ rõ) không bao giờ được chính vòng skill tự trả lời — nó luôn escalate ra ngoài phiên, chờ người quyết (per D11, mở rộng nguyên tắc "không tin lời trợ lý"/"không tự quyết thay người" của RUL3 sang lớp hướng dẫn này). Toàn bộ vòng này chỉ dùng lại các verb/trạng thái đã có — không có event, stage, hay domain mới nào cho lớp hướng dẫn (per D2/D3/D6/D7 p50-workflow-induct).
 
+Từ str89-fgos-domain-skills, vòng này không còn giả định ngầm domain
+`coding`: entry skill (`fgos-routing`) đọc trường `domain` của item (mặc
+định `coding` khi vắng mặt) rồi tra sổ đăng ký domain (spec Work-State,
+mục "Mô hình domain") để biết skill nào ứng với từng stage — bảng
+skill/stage không còn hard-code trong entry skill, mà đọc động từ sổ đăng
+ký mỗi domain khai riêng (một domain khác `coding` có thể ánh xạ khác,
+hoặc không ánh xạ skill nào cho một stage). Stage `executing` — trước đây
+không skill nào ứng (thi công máy móc, không hướng dẫn) — nay CÓ một skill
+cho domain `coding`: nó chạy vòng cài-đặt→kiểm-chứng→trả-việc (đọc item đã
+claim, cài thật, chạy đúng `verify` đã ghi trên item, rồi `return`) — cùng
+kỷ luật RUL46/RUL47 (không tự áp cạnh chuyển-stage, không tự trả lời cổng
+chờ-người) áp dụng ở stage này y hệt ba stage trước. Domain `marketing`
+(nếu/khi được xây, xem backlog STR52) nằm ngoài phạm vi này — chưa có skill
+executing riêng, hoãn có chủ ý.
+
 Chứng minh vận hành thật (case-study, 2026-07-20): một item thật (thêm một hàm mới vào một dự án đồ chơi dogfood) đi trọn `submit → clarify (entry skill → skill làm-rõ, một câu hỏi bị lọc không đạt sàng lọc, không tạo cổng chờ-người) → engine tự phán "chưa đủ rõ" (cổng chờ-người THẬT, không phải kịch bản dàn dựng — nguyên nhân: một lời gọi phán-đoán lồng bên trong một phiên trợ lý đang chạy trả về văn xuôi thay vì phán quyết máy-đọc-được, xem Open Gaps) → escalate ra ngoài, không tự trả lời → người trả lời thật → engine tự phán "đủ rõ" → decompose (skill chia-việc → skill thẩm-định, thẩm-định gắn cờ "đạt kèm ràng buộc") → executing → cài đặt thật → trả việc (bắt được một lỗi thật khác: chuỗi lệnh xác nhận do skill chia-việc đề xuất giả định sai thư mục làm việc — sửa tại chỗ qua verb sửa-trường sẵn có, một sai lệch thật chứ không phải giả lập) → duyệt → xong, không chạm bất kỳ cơ chế riêng nào của công cụ điều phối bên ngoài dự án.
 
 ### Báo việc-phát-hiện từ trợ lý (worker→runner discovery report)
@@ -955,6 +970,8 @@ Not applicable — không có màn hình.
 - `.claude/skills/fgos/fgos-exploring/SKILL.md` + `.agents/` mirror — skill `làm-rõ` (stage `clarify`)
 - `.claude/skills/fgos/fgos-planning/SKILL.md` + `.agents/` mirror — skill `chia-việc` (nửa đầu stage `decompose`)
 - `.claude/skills/fgos/fgos-validating/SKILL.md` + `.agents/` mirror — skill `thẩm-định` (nửa cuối stage `decompose`, gác cạnh `decompose→executing`)
+- `.claude/skills/fgos/fgos-executing/SKILL.md` + `.agents/` mirror — skill `thi-công` (stage `executing`, domain `coding` — str89-fgos-domain-skills)
+- `src/state/workflow-stage-graphs.mjs` field `skillMap` mỗi domain + hàm `skillForStage(domain, stage)` (str89-fgos-domain-skills) — sổ đăng ký domain nay còn khai skill ứng với mỗi stage, xem spec Work-State "Mô hình domain"
 - `src/state/work.mjs` field `docsRef` (optional, xem spec Work-State Data Dictionary #23) — con trỏ tới `docs/history/<feature>/` của tính năng đã tạo ra item, dùng bởi lớp hướng dẫn để tìm CONTEXT.md/plan.md liên quan khi cần
 - `docs/history/p50-workflow-induct/reports/p50-workflow-induct-6.md` — bằng chứng vận hành thật đầy đủ của case-study (lịch sử verb từng lệnh, kèm phát hiện lồng-phiên ở Open Gaps)
 - `docs/routing-handoff-contract.md` — hợp đồng handoff + ranh giới tin cậy
