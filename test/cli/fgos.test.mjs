@@ -4899,6 +4899,84 @@ test('submit with a malformed --acceptance is rejected as validation, exit 4, no
   assert.equal(eventLines(cwd).length, before);
 });
 
+// --- str73-done-flip-cos-check cell 2: per-clause CoS done-gate via the ----
+// --- real CLI (move / approve) ---------------------------------------------
+//
+// Mirrors the RUL50 compound-learn tests above (`toCompoundLearn`, "move
+// proposed -> done (approval) applies via the real CLI"): an item must clear
+// BOTH the stage gate and this cell's acceptance-evidence gate before it can
+// close. `approve` on a plain (non-git-backed) item resolves to the
+// "legacy" source (no `fgw/<id>` branch, no headAtTake/headAtReturn) and its
+// verify-only path re-runs `item.verify` against cwd before calling the same
+// `moveWork(..., to: 'done')` a direct `move` uses — `verify: 'true'` keeps
+// that check trivially green so the test isolates the acceptance gate.
+
+test('move --to done is refused when a populated acceptance clause has no evidence: precondition, exit 2, item stays proposed, no event written', () => {
+  const cwd = tmpCwd();
+  toCompoundLearn(cwd, 'cli-cos-missing');
+  run(cwd, ['edit', 'cli-cos-missing', '--acceptance', JSON.stringify([{ text: 'ship it' }])]);
+
+  const before = eventLines(cwd).length;
+  const result = run(cwd, ['move', 'cli-cos-missing', '--to', 'done']);
+  assert.equal(result.status, 2);
+  assert.match(result.stderr, /ship it/);
+  assert.equal(stateView(cwd).work['cli-cos-missing'].status, 'proposed');
+  assert.equal(eventLines(cwd).length, before);
+});
+
+test('move --to done succeeds when every acceptance clause has non-empty evidence, exactly as before this cell', () => {
+  const cwd = tmpCwd();
+  toCompoundLearn(cwd, 'cli-cos-evidenced');
+  run(cwd, ['edit', 'cli-cos-evidenced', '--acceptance', JSON.stringify([{ text: 'ship it', evidence: 'test/cli/fgos.test.mjs:1' }])]);
+
+  const result = run(cwd, ['move', 'cli-cos-evidenced', '--to', 'done']);
+  assert.equal(result.status, 0);
+  assert.equal(stateView(cwd).work['cli-cos-evidenced'].status, 'done');
+});
+
+test('an item with acceptance absent, or an empty array, closes via move --to done completely unaffected (D4 no-op)', () => {
+  const cwd = tmpCwd();
+  toCompoundLearn(cwd, 'cli-cos-absent'); // no --acceptance ever set
+  assert.equal(run(cwd, ['move', 'cli-cos-absent', '--to', 'done']).status, 0);
+  assert.equal(stateView(cwd).work['cli-cos-absent'].status, 'done');
+
+  const cwd2 = tmpCwd();
+  toCompoundLearn(cwd2, 'cli-cos-empty');
+  run(cwd2, ['edit', 'cli-cos-empty', '--acceptance', JSON.stringify([])]);
+  assert.equal(run(cwd2, ['move', 'cli-cos-empty', '--to', 'done']).status, 0);
+  assert.equal(stateView(cwd2).work['cli-cos-empty'].status, 'done');
+});
+
+test('editing in the missing evidence after a refusal, then retrying move --to done, succeeds — no cached verdict', () => {
+  const cwd = tmpCwd();
+  toCompoundLearn(cwd, 'cli-cos-retry');
+  run(cwd, ['edit', 'cli-cos-retry', '--acceptance', JSON.stringify([{ text: 'ship it' }])]);
+
+  assert.equal(run(cwd, ['move', 'cli-cos-retry', '--to', 'done']).status, 2);
+  assert.equal(stateView(cwd).work['cli-cos-retry'].status, 'proposed');
+
+  run(cwd, ['edit', 'cli-cos-retry', '--acceptance', JSON.stringify([{ text: 'ship it', evidence: 'test/cli/fgos.test.mjs:1' }])]);
+  const result = run(cwd, ['move', 'cli-cos-retry', '--to', 'done']);
+  assert.equal(result.status, 0, 'the retry must re-read the just-edited evidence, not a cached refusal');
+  assert.equal(stateView(cwd).work['cli-cos-retry'].status, 'done');
+});
+
+test('approve on a proposed item with a missing-evidence acceptance clause is refused the same way as move --to done: precondition, exit 2, item stays proposed, no event written', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'approve-cos-missing', { verify: 'true' });
+  run(cwd, ['edit', 'approve-cos-missing', '--acceptance', JSON.stringify([{ text: 'ship it' }])]);
+  run(cwd, ['move', 'approve-cos-missing', '--to', 'doing']);
+  run(cwd, ['move', 'approve-cos-missing', '--to', 'proposed']);
+  run(cwd, ['compound', 'approve-cos-missing']);
+
+  const before = eventLines(cwd).length;
+  const result = run(cwd, ['approve', 'approve-cos-missing']);
+  assert.equal(result.status, 2, result.stderr);
+  assert.match(result.stderr, /ship it/);
+  assert.equal(stateView(cwd).work['approve-cos-missing'].status, 'proposed');
+  assert.equal(eventLines(cwd).length, before);
+});
+
 test('graph verb on an empty store: zero components, still a valid envelope, exit 0', () => {
   const cwd = tmpCwd();
   assert.equal(run(cwd, ['init']).status, 0);
