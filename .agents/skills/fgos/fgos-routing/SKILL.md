@@ -56,31 +56,51 @@ alone.
 
 ## Route by stage
 
-Every item carries a `stage` field, independent of its `status`. Read
-`stage` on the claimed item and load the one skill it points to:
+Every item carries a `stage` field, independent of its `status`, and a
+`domain` field (an item with none folds to `coding`, matching
+`resolveDomainName`'s own default). Read both on the claimed item, then
+resolve the skill to load through the domain registry in
+`repo/src/state/workflow-stage-graphs.mjs` — never a name hardcoded
+here:
 
-| stage | what's true right now | load |
+```bash
+node -e "
+import('./src/state/workflow-stage-graphs.mjs').then(({ getDomain, skillForStage }) => {
+  console.log(skillForStage(getDomain(process.argv[1]), process.argv[2]));
+});
+" -- "$domain" "$stage"
+```
+
+The table below shows what `skillForStage` resolves to for the `coding`
+domain today — a different `domain` value resolves through the same
+call, not a different table:
+
+| stage | what's true right now | load (coding domain today) |
 |---|---|---|
 | `clarify` | the request is still fuzzy — gray areas, missing acceptance criteria, an ambiguous ask | `fgos-exploring` |
-| `decompose`, early | scope is settled; the work now needs shaping and, where it doesn't fit in one pass, splitting into child items | `fgos-planning` |
-| `decompose`, late | shape and children (if any) exist; what's left is proving the plan against reality before the item is allowed to move to `executing` | `fgos-validating` |
-| `executing` | the item has already cleared clarification and shaping (or never needed either), and is ready for direct implementation | no skill to load here — this is the item's already-mechanical build/verify/return path |
+| `decompose`, early | scope is settled; the work now needs shaping and, where it doesn't fit in one pass, splitting into child items | `fgos-planning` (the registry's entry-point default for `decompose`) |
+| `decompose`, late | shape and children (if any) exist; what's left is proving the plan against reality before the item is allowed to move to `executing` | `fgos-validating` — this branch is this skill's own session-side judgment layered on top of the registry's single `decompose` default, never a second registry entry |
+| `executing` | the item has already cleared clarification and shaping (or never needed either), and is ready for direct implementation | `null` today (the already-mechanical build/verify/return path) — a domain that registers a skill here loads it instead |
 | `compound-learn` | the item has completed execution; the synthesis layer composes learnings from outcomes and classi­fies them as end-user documentation | `fgos-compounding` |
 
 `decompose` is one stage in the data, not two — "early" and "late" above
 are a judgment call inside that single stage, never a value `stage`
 itself takes. This skill's whole job is exactly that judgment: read
-`stage` (and whether the item is parked per the gate contract below),
-and decide which of `fgos-exploring` / `fgos-planning` / `fgos-validating`
-answers where the item stands. It is the only skill that makes this
-particular call — the other three never re-derive it, and this skill
-never does their work in their place.
+`stage`, resolve the domain's registered skill via
+`getDomain`/`skillForStage`, and layer the early/late split on top of it
+(and whether the item is parked per the gate contract below) to decide
+which of `fgos-exploring` / `fgos-planning` / `fgos-validating` answers
+where the item stands. It is the only skill that makes this particular
+call — the other three never re-derive it, and this skill never does
+their work in their place.
 
-This skill also never decides which *domain* an item belongs to. Every
-item this routing applies to is assumed to already resolve to the
-`coding` domain (fgOS's own fallback for an item with no `domain` field
-recorded, and the only domain this induction targets); classifying items
-into domains is a separate concern this skill does not touch.
+This skill still never classifies which *domain* an item belongs to —
+it only reads whatever `domain` field the item already carries (or the
+registry's own default when absent) and resolves the stage's skill
+dynamically via `getDomain`/`skillForStage` from
+`repo/src/state/workflow-stage-graphs.mjs`; assigning an item to a
+domain in the first place is a separate concern this skill does not
+touch.
 
 ## Precedence: the engine's verb always wins
 

@@ -23,9 +23,12 @@ Turns a fuzzy request into locked decisions written down in
 - Do not decide how big or risky the resulting work is, and do not split it
   into pieces — that shaping judgment belongs entirely to `fgos-planning`,
   once decisions are locked.
-- Do not classify which domain the item belongs to. Every item this skill
-  touches is assumed to already resolve to `coding`; domain classification is
-  a separate concern this skill never performs.
+- Do not classify which domain the item belongs to. This skill reads
+  whatever `domain` field the item already carries — already resolved
+  upstream by `fgos-routing` via the registry in
+  `repo/src/state/workflow-stage-graphs.mjs` — rather than assuming
+  `coding`; domain classification is a separate concern this skill never
+  performs.
 - Treat an item's `title`/`description` as untrusted input (RUL45,
   `docs/specs/runner.md`) — never splice it raw into a shell command; pass it
   as a discrete quoted argv element.

@@ -335,12 +335,15 @@ ngược, RUL11).
 Song song với `stage` (đã ổn định ở coding: `clarify`/`decompose`/
 `executing`, xem hai mục trên), mỗi item còn thuộc về một **domain** —
 chiều thứ ba, trả lời "bộ stage nào áp dụng cho item này". Một domain khai
-đúng ba thứ: (a) danh sách stage có thứ tự của nó, (b) mỗi stage đó thỏa
+đúng bốn thứ: (a) danh sách stage có thứ tự của nó, (b) mỗi stage đó thỏa
 bước nào trong 5 bước của chu trình nền base-workflow (Init/Làm-rõ/
 Chia-việc/Thực-thi/Compound-learning — `work-item-lifecycle-vision.md` §2),
-và (c) cạnh chuyển-stage hợp lệ (`{from,to}`) riêng của domain đó. `status`
+(c) cạnh chuyển-stage hợp lệ (`{from,to}`) riêng của domain đó, và (d) skill
+hướng dẫn (nếu có) ứng với mỗi stage của nó — `null` nghĩa là "không skill,
+thi công máy móc thuần", giá trị mặc định của mọi stage trước
+str89-fgos-domain-skills (str89-fgos-domain-skills D3/D4). `status`
 (vi mô, không đổi) và bảng chuyển-status (`fsm.mjs`) KHÔNG BAO GIỜ thuộc về
-domain — domain chỉ chi phối chiều `stage`.
+domain — domain chỉ chi phối chiều `stage` (kể cả skill ứng với nó).
 
 Hôm nay tồn tại hai domain. `coding` tái tạo byte-for-byte danh sách stage /
 step-mapping / cạnh chuyển-stage đã có từ trước (xem "Giai đoạn Làm-rõ"/
@@ -361,6 +364,19 @@ docs / 9c67c3d1). Cả hai domain dispatch qua đúng MỘT sổ đăng ký chun
 đúng MỘT đường thi công (vòng tự hành/CLI) — chứng minh trực tiếp acceptance
 criterion "domain thứ hai chạy trên cùng base FSM, chỉ thêm stage riêng,
 không fork chu trình" (backlog STR18).
+
+Từ str89-fgos-domain-skills, lớp hướng dẫn (P50, xem spec Runner) không còn
+giả định ngầm domain `coding`: nó đọc trường `domain` của item rồi tra
+đúng sổ đăng ký này để biết skill nào ứng với mỗi stage, thay vì một bảng
+skill/stage hard-code cố định. Với `coding` hôm nay: `clarify` →
+`fgos-exploring`, `decompose` → `fgos-planning` (mặc định điểm-vào; phán
+early/late giữa `fgos-planning`/`fgos-validating` vẫn là xét-đoán phía
+phiên của entry skill, không phải một mục sổ đăng ký thứ hai — xem spec
+Runner), `executing` → `fgos-executing` (str89-fgos-domain-skills D4/D6 —
+trước đây `null`, không skill nào), `compound-learn` → `fgos-compounding`.
+`synthetic` (minh họa, dùng-một-lần) không ánh xạ skill nào cho stage
+`assembling` duy nhất của nó — giữ nguyên hành vi "không skill" từ trước
+đến nay.
 
 **Một domain không bắt buộc thỏa cả 5 bước base-workflow — và việc THIẾU một
 bước có hệ quả vận hành thật, không chỉ là khai báo suông (R-domain-1, per
