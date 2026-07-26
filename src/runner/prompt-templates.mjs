@@ -11,19 +11,24 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
+import { resolveDomainName } from '../state/workflow-stage-graphs.mjs';
 
 export const TEMPLATE_DIR = path.join(import.meta.dirname, 'prompt-templates');
 
 /**
  * Ordered rule table: the first rule whose declared `match` fields all equal
  * the input wins. The final wildcard rule (`match: {}`) always matches, so
- * `selectTemplate` never fails to resolve. Today exactly one rule exists —
- * no differentiated template is invented speculatively (mirrors P41's
- * "buy the interface, not the second instance" discipline); add a more
- * specific rule ahead of the wildcard when a real kind/tier/domain needs its
- * own prompt.
+ * `selectTemplate` never fails to resolve. The `domain: 'coding'` rule
+ * (str91-runner-skill-convergence D3) sits ahead of that wildcard: `coding`
+ * is the only domain with a shipped `SKILL.md` chain today (STR89) and is
+ * also `DEFAULT_DOMAIN`, so this rule fires for effectively all of today's
+ * real dispatches. Add a further rule ahead of the wildcard when another
+ * domain grows its own skill chain.
  */
-const TEMPLATE_RULES = [{ match: {}, template: 'worker-prompt-default.txt' }];
+const TEMPLATE_RULES = [
+  { match: { domain: 'coding' }, template: 'worker-prompt-skill-pointer.txt' },
+  { match: {}, template: 'worker-prompt-default.txt' },
+];
 
 function ruleMatches(match, input) {
   return Object.keys(match).every((key) => match[key] === input[key]);
@@ -32,9 +37,14 @@ function ruleMatches(match, input) {
 /**
  * Mechanical kind/tier/domain -> template-file-name lookup. Pure and
  * synchronous — no model call, ever (R42).
+ *
+ * The incoming `domain` is folded via `resolveDomainName` (undefined or an
+ * unrecognized string both fold to `'coding'`, str91 D7) IN HERE — the ONLY
+ * fold point. Callers (`buildPrompt`, `spawnWorker`) always pass the item's
+ * raw `work.domain` unchanged, so the two call sites can never diverge.
  */
 export function selectTemplate({ kind, tier, domain } = {}) {
-  const input = { kind, tier, domain };
+  const input = { kind, tier, domain: resolveDomainName(domain) };
   const rule = TEMPLATE_RULES.find((r) => ruleMatches(r.match, input));
   return rule.template;
 }
