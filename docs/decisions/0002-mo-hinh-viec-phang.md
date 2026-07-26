@@ -6,9 +6,15 @@ timestamp: 2026-07-22T00:00:00.000Z
 source_capture_ids: []
 date: 2026-07-14
 status: accepted
+superseded_by: 0012
 source_decisions: [fd17309a]
 relates_specs: [work-state]
 ---
+
+> **Một phần đã supersede bởi [0012](0012-typed-edge-model-supersedes-deps-parent-separation.md):**
+> "deps và parent tách rời có chủ đích" nay đọc là "tách rời về lưu trữ và ngữ
+> nghĩa, nhưng hợp nhất thành một đồ thị typed-edge derive". Phần còn lại của
+> record này (mô hình việc phẳng, một FSM, "epic" là item thường) vẫn hiện hành.
 
 # 0002 — Mô hình việc phẳng
 

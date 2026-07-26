@@ -27,12 +27,20 @@ file) không cần đổi.
 Đổi một quyết định = **supersede** record tương ứng bằng một record mới, không sửa
 tại chỗ (giữ đúng nguyên tắc bất-biến của platform-foundations).
 
+**Supersede phải trỏ ngược (STR72).** Record mới ghi `supersedes: [<id cũ>]` trong
+frontmatter là chưa đủ — record CŨ (bị supersede) phải mang một dấu trỏ NGƯỢC
+trong CÙNG đơn vị công việc: thêm field `superseded_by: <id mới>` vào frontmatter
+của record cũ, và cập nhật dòng của nó trong bảng bên dưới để không còn đọc như
+đang hiện hành 100%. Thiếu bước này, một phiên đọc thẳng record cũ (không qua
+record mới) sẽ tái-suy framing đã lỗi thời. Đây là kỷ luật văn-xuôi (không có
+script tự-động kiểm), người viết record mới tự đối chiếu.
+
 ## Các record
 
 | # | Chủ đề | Tóm tắt một dòng |
 |---|--------|------------------|
 | [0001](0001-event-log-la-su-that.md) | Nhật ký sự kiện là sự thật | Dữ liệu bền khai là *log* (sự thật, git-committed) hoặc *view* (dựng lại được); DB chỉ là materialized view. |
-| [0002](0002-mo-hinh-viec-phang.md) | Mô hình việc phẳng | Một loại work item, một FSM, deps; "epic" là item thường; frontier sẵn-sàng derive toàn cục. |
+| [0002](0002-mo-hinh-viec-phang.md) | Mô hình việc phẳng | Một loại work item, một FSM, "epic" là item thường; frontier sẵn-sàng derive toàn cục. **Phần deps/parent một-phần đã supersede bởi [0012](0012-typed-edge-model-supersedes-deps-parent-separation.md).** |
 | [0003](0003-dat-ten-va-bo-cuc-du-lieu.md) | Đặt tên & bố cục dữ liệu | CLI `fgos`, entity `work`, data dir `.fgos/` (events.jsonl = truth, state.json = view gitignored). |
 | [0004](0004-pham-vi-va-non-goal.md) | Phạm vi & non-goal | Domain đầu là work-state của chính forgent; chạy song song harness phát triển, không interop tới ngưỡng-có-tên. |
 | [0005](0005-runner-va-co-lap-worker.md) | Runner & cô lập worker | Executor headless; runner là người ghi duy nhất; worker sinh ĐỀ XUẤT trên nhánh cô lập; tier→model. |
