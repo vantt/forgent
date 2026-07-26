@@ -23,6 +23,9 @@ Before touching anything, read the shape of the work:
 - `fgos list` — every item with its status, stage, and domain.
 - `fgos ready` — the frontier: items at stage `executing`, status `todo`,
   with all dependencies satisfied and no unfinished descendants.
+- For a deeper "what should I work on next" read, `fgos triage`, `fgos
+  stale`, and `fgos rollup` are further-reading, read-only verbs worth
+  knowing about alongside `list`/`ready`.
 
 Both are read-only. Nothing here writes state.
 
