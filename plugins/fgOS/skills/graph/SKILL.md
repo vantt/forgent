@@ -47,7 +47,17 @@ same contract as `ready`/`check`/`conflicts`.
 
 3. **Report the result.** Read the returned JSON envelope's `data` field
    and relay the relevant fields back to the user plainly — the full
-   metrics (connected components / independent parallel tracks) or the
-   single item's unblock impact, whichever was requested. Do not
-   reimplement or reinterpret the graph logic — it already lives in
-   `fgos graph`.
+   metrics or the single item's unblock impact, whichever was requested.
+   The full-metrics form (`graphMetrics()`, `src/state/graph-metrics.mjs`)
+   returns `componentCount`/`components` (connected components /
+   independent parallel tracks), `criticalPath` (the longest dependency
+   chain), `staleBlocked` (items blocked with no recent progress), and
+   `topUnblock` (the items whose completion would unblock the most other
+   work) — name all of these, not just components. Also read `frame`,
+   which records what was actually computed vs. skipped for this graph
+   size; when `frame.skipped` includes `topUnblock`, the field comes back
+   `[]` purely because of that large-graph ceiling, not because there is
+   nothing to unblock — say so rather than reporting an empty list as "no
+   unblock candidates." The what-if form still reports `unblocksTransitive`/
+   `newlyReady` as before. Do not reimplement or reinterpret the graph
+   logic — it already lives in `fgos graph`.
