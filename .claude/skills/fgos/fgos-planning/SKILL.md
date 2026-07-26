@@ -69,9 +69,12 @@ stage values — the same way `fgos-routing` describes it.
 
 3. **Approach.** Write the chosen path and the alternatives rejected along
    the way, a risk map (component / how risky / what would prove it), the
-   files likely touched, and the order they need to happen in. Cite the
-   `CONTEXT.md` decision each choice honors. A medium or high risk in the
-   map needs a proof point at `fgos-validating`, not a guess here.
+   files likely touched, and the order they need to happen in. Before fixing
+   that order, run `fgos graph --json` and read its `criticalPath` and
+   `topUnblock` fields — let those inform which piece goes first instead of
+   ordering by judgment alone. Cite the `CONTEXT.md` decision each choice
+   honors. A medium or high risk in the map needs a proof point at
+   `fgos-validating`, not a guess here.
 
 4. **Shape.** Write (or enrich) `plan.md` scaled to the mode: a direct note
    for `tiny`, one open question for `spike`, a short plan for `small`, a
@@ -82,14 +85,18 @@ stage values — the same way `fgos-routing` describes it.
    `high-risk` one does.
 
 5. **Decide the split, if any.** Some items are one honest piece of work;
-   others need to become several independently workable ones first. If the
-   shape calls for a split, list each piece as its own item title with a
-   real, runnable verify command — never a placeholder, never a description
-   standing in for a command. Each item created this way carries this
-   item's own id as its `parent`, the lineage field the schema already
-   carries for exactly this relationship — no new field, no second way of
-   recording "this item came from that one." If one piece is honestly
-   enough, there is no split, and the item proceeds as itself.
+   others need to become several independently workable ones first. When
+   more than one candidate piece could go first, run
+   `fgos graph --what-if <id> --json` per candidate and compare the
+   resulting `topUnblock`/`criticalPath` fields to see which pick actually
+   unblocks the most follow-on work, instead of guessing from judgment
+   alone. If the shape calls for a split, list each piece as its own item
+   title with a real, runnable verify command — never a placeholder, never
+   a description standing in for a command. Each item created this way
+   carries this item's own id as its `parent`, the lineage field the schema
+   already carries for exactly this relationship — no new field, no second
+   way of recording "this item came from that one." If one piece is
+   honestly enough, there is no split, and the item proceeds as itself.
 
 6. **Leave execution alone.** Per the locked decision that Execute and its
    verify already have a working mechanical path (the goal-check the engine
