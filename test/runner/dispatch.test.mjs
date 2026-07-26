@@ -142,6 +142,12 @@ test('buildPrompt includes all five framing sections', () => {
   assert.match(prompt, /# Constraints/);
 });
 
+test('buildPrompt for a coding-domain (or no-domain) work item also contains a new "# Agent skill" section naming the fgos-executing SKILL.md (str91-runner-skill-convergence D1/D6)', () => {
+  const prompt = buildPrompt(sampleWork());
+  assert.match(prompt, /# Agent skill/);
+  assert.ok(prompt.includes('.claude/skills/fgos/fgos-executing/SKILL.md'));
+});
+
 test('buildPrompt describes the fgos-discovered report-not-write channel while keeping the never-call-fgos constraint (wgi-8)', () => {
   const prompt = buildPrompt(sampleWork());
   assert.match(prompt, /# Reporting discovered work/);
@@ -611,6 +617,19 @@ test('spawnWorker resolves tier -> model, runs in cwd, and passes the prompt via
   assert.equal(payload.args[1], '--model');
   assert.equal(payload.args[2], 'opus');
   assert.equal(fs.realpathSync(payload.cwd), fs.realpathSync(runCwd));
+});
+
+test('spawnWorker logs the same templateName that buildPrompt actually rendered for the same item — never a diverging pick between the two call sites (str91-runner-skill-convergence D7)', async () => {
+  const dir = mkTempDir();
+  const scriptPath = writeEchoExecutor(dir);
+  const cfg = baseConfig([scriptPath, '{prompt}']);
+  const work = sampleWork();
+
+  const result = await spawnWorker(work, cfg, mkTempDir());
+
+  assert.equal(result.templateName, 'worker-prompt-skill-pointer.txt');
+  const payload = JSON.parse(result.stdout);
+  assert.equal(payload.args[0], buildPrompt(work));
 });
 
 test('spawnWorker defaults to the standard tier when the work item omits tier', async () => {

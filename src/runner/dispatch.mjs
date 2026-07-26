@@ -36,6 +36,7 @@
 import fs from 'node:fs';
 import { spawn } from 'node:child_process';
 import { DEFAULTS } from '../state/work.mjs';
+import { DOMAINS, resolveDomainName, skillForStage } from '../state/workflow-stage-graphs.mjs';
 import { selectTemplate, renderTemplate, hashTemplate } from './prompt-templates.mjs';
 import { mergeConfigDefaults } from '../setup/config-merge.mjs';
 
@@ -74,10 +75,22 @@ export class DispatchError extends Error {
  *
  * The literal prompt TEXT lives in `prompt-templates/*.txt` (P49) — this
  * function only computes the varying pieces (refs/feedbackSection/
- * description, each still pure JS conditional logic, never moved into a
- * template) and selects+renders the template via `selectTemplate`/
- * `renderTemplate`. Nothing here reads or writes `.fgos/` — this stays pure
- * string assembly, still returning a plain string (unchanged signature).
+ * description/domain/skillPath, each still pure JS conditional logic, never
+ * moved into a template) and selects+renders the template via
+ * `selectTemplate`/`renderTemplate`. Nothing here reads or writes `.fgos/` —
+ * this stays pure string assembly, still returning a plain string (unchanged
+ * signature).
+ *
+ * str91-runner-skill-convergence (D6/D7): `domain`/`skillPath` are two new
+ * `renderTemplate` vars, resolved via `workflow-stage-graphs.mjs`'s own
+ * domain->skill registry (never a hardcoded path) — they only render for
+ * templates that declare the `{domain}`/`{skillPath}` placeholders
+ * (currently `worker-prompt-skill-pointer.txt`); an extra unused var is
+ * harmless for every other template, per `renderTemplate`'s own per-key
+ * substitution loop. `selectTemplate`'s own call below keeps passing the
+ * item's raw `work.domain` unchanged — the domain fold lives ONLY inside
+ * `selectTemplate` itself (D7), so this function's call site can never
+ * diverge from `spawnWorker`'s identical call.
  */
 export function buildPrompt(work, feedback) {
   const refs = Array.isArray(work.refs) && work.refs.length ? work.refs.join(', ') : '(none)';
@@ -98,6 +111,17 @@ export function buildPrompt(work, feedback) {
   }
   const description = work.description ?? '(không có)';
 
+  // Skill-pointer vars (str91-runner-skill-convergence D6/D7): resolved once
+  // here via the SAME domain registry `fgos-routing`/STR89 already use, never
+  // a hardcoded literal — `resolveDomainName` folds an absent/unrecognized
+  // domain to `DEFAULT_DOMAIN` exactly like `selectTemplate`'s own internal
+  // fold does, so this call site's single console.warn (when the domain is
+  // genuinely unrecognized) is the only one buildPrompt triggers.
+  const domainName = resolveDomainName(work.domain);
+  const domainObj = DOMAINS[domainName];
+  const skillName = skillForStage(domainObj, 'executing');
+  const skillPath = `.claude/skills/fgos/${skillName}/SKILL.md`;
+
   const templateName = selectTemplate({ kind: work.kind, tier: work.tier ?? DEFAULTS.tier, domain: work.domain });
   return renderTemplate(templateName, {
     title: work.title,
@@ -106,6 +130,8 @@ export function buildPrompt(work, feedback) {
     feedbackSection,
     refs,
     verify: work.verify,
+    domain: domainName,
+    skillPath,
   });
 }
 
