@@ -105,3 +105,7 @@
 {"seq":105,"ts":"2026-07-26T16:29:08.453Z","type":"work.stage","payload":{"id":"tsk-1op","from":"decompose","to":"executing","actor":"session"},"v":2}
 {"seq":106,"ts":"2026-07-26T16:29:19.769Z","type":"work.move","payload":{"id":"tsk-1op","from":"todo","to":"doing","actor":"session","headAtTake":"add2f9d297067a9fb83b5a6a630e0f246c7911da"},"v":2}
 {"seq":107,"ts":"2026-07-26T16:29:19.771Z","type":"work.outcome","payload":{"id":"tsk-1op","predicted":{"tier":"standard","deps":0,"priorVisits":0,"actor":"session","headAtTake":"add2f9d297067a9fb83b5a6a630e0f246c7911da"}},"v":2}
+{"seq":108,"ts":"2026-07-26T16:40:30.805Z","type":"work.move","payload":{"id":"tsk-1op","from":"doing","to":"proposed","headAtReturn":"6965d5976481b2ec8b03791e6606d556cf0b0045"},"v":2}
+{"seq":109,"ts":"2026-07-26T16:40:30.807Z","type":"work.outcome","payload":{"id":"tsk-1op","actual":{"outcome":"proposed","passed":true,"attempts":1,"errorClass":null,"aheadCount":1}},"v":2}
+{"seq":110,"ts":"2026-07-26T16:40:55.420Z","type":"work.stage","payload":{"id":"tsk-1op","from":"executing","to":"compound-learn","actor":"human"},"v":2}
+{"seq":111,"ts":"2026-07-26T16:42:15.661Z","type":"work.move","payload":{"id":"tsk-1op","from":"proposed","to":"done","actor":"human","learning":{"outcome":{"disposition":"proposed","attempts":1,"errorClass":null},"frictions":{},"settlements":{"clarify-pass/session":1,"close/human":1}}},"v":2}
