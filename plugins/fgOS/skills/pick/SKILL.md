@@ -57,9 +57,24 @@ state or touches git worktrees directly — every write goes through the
    a new session there. This is the same fallback pattern `bee worktree
    new` already uses for the analogous case.
 
-4. **Report and stop.** After the switch (or the printed fallback), tell
-   the user which item id was claimed and, if EnterWorktree failed, the
-   worktree path they need to open. Do not reimplement or orchestrate the
-   item's lifecycle beyond this — the product's existing
-   `.claude/skills/fgos/` stage-routing layer (already keyed on the item's
-   stage) takes over from here.
+4. **Load `fgos-routing` — do not stop after the switch.** If step 3
+   actually switched the session into the worktree, immediately invoke the
+   `fgos-routing` skill before saying anything else to the user. That
+   skill reads the claimed item's `stage` and `domain` and hands off to
+   whichever skill actually does the work for this item today; follow
+   that hand-off through and let it decide when to stop. This is what
+   makes claiming through `/fgOS:pick` behave the same as an internal
+   fgOS dev session, instead of leaving the person staring at a claimed
+   item with no next step.
+
+   If step 3 fell back (no switch happened), skip this step — the
+   session the user opens at the printed worktree path loads
+   `fgos-routing` itself first, per that skill's own "load it first when a
+   session opens in this repo" convention.
+
+5. **Report and stop.** In the fallback case, report right after step 3:
+   tell the user which item id was claimed and the worktree path they
+   need to open. In the switched case, this is naturally where step 4's
+   hand-off ends up stopping — do not add a separate report step of your
+   own on top of it. Do not reimplement or orchestrate the item's
+   lifecycle beyond this.
