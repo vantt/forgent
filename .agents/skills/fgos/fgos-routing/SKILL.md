@@ -78,16 +78,16 @@ call, not a different table:
 | stage | what's true right now | load (coding domain today) |
 |---|---|---|
 | `clarify` | the request is still fuzzy — gray areas, missing acceptance criteria, an ambiguous ask | `fgos-exploring` |
-| `decompose`, early | scope is settled; the work now needs shaping and, where it doesn't fit in one pass, splitting into child items | `fgos-planning` (the registry's entry-point default for `decompose`) |
-| `decompose`, late | shape and children (if any) exist; what's left is proving the plan against reality before the item is allowed to move to `executing` | `fgos-validating` — this branch is this skill's own session-side judgment layered on top of the registry's single `decompose` default, never a second registry entry |
+| `decompose` — shaping | scope is settled; the work now needs shaping and, where it doesn't fit in one pass, splitting into child items | `fgos-planning` (the registry's entry-point default for `decompose`) |
+| `decompose` — proving | shape and children (if any) exist; what's left is proving the plan against reality before the item is allowed to move to `executing` | `fgos-validating` — this branch is this skill's own session-side judgment layered on top of the registry's single `decompose` default, never a second registry entry |
 | `executing` | the item has already cleared clarification and shaping (or never needed either), and is ready for direct implementation | `null` today (the already-mechanical build/verify/return path) — a domain that registers a skill here loads it instead |
 | `compound-learn` | the item has completed execution; the synthesis layer composes learnings from outcomes and classi­fies them as end-user documentation | `fgos-compounding` |
 
-`decompose` is one stage in the data, not two — "early" and "late" above
-are a judgment call inside that single stage, never a value `stage`
+`decompose` is one stage in the data, not two — "shaping" and "proving"
+above are a judgment call inside that single stage, never a value `stage`
 itself takes. This skill's whole job is exactly that judgment: read
 `stage`, resolve the domain's registered skill via
-`getDomain`/`skillForStage`, and layer the early/late split on top of it
+`getDomain`/`skillForStage`, and layer the shaping/proving split on top of it
 (and whether the item is parked per the gate contract below) to decide
 which of `fgos-exploring` / `fgos-planning` / `fgos-validating` answers
 where the item stands. It is the only skill that makes this particular

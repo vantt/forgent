@@ -15,9 +15,9 @@ Turns the decisions locked in `docs/history/<feature>/CONTEXT.md` into
 `docs/history/<feature>/plan.md` — the mode, the approach, and the shape a
 stranger could pick up cold. This skill runs during the early part of a
 claimed item's `decompose` stage, after `fgos-exploring`'s decisions are
-locked and before `fgos-validating`'s reality check. "Early" and "late" are a
-judgment split inside the one `decompose` stage, never two separate stage
-values — the same way `fgos-routing` describes it.
+locked and before `fgos-validating`'s reality check. "Shaping" and "proving"
+are a judgment split inside the one `decompose` stage, never two separate
+stage values — the same way `fgos-routing` describes it.
 
 ## Hard rules
 
