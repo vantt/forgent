@@ -78,7 +78,13 @@ Turns a fuzzy request into locked decisions written down in
    A question that fails any check is never asked — pin it as a labeled
    assumption instead, or hand it to `fgos-planning` if only the implementer
    cares. After each answer, confirm the decision back and assign it a
-   stable ID: `D1`, `D2`, `D3`… When an answer settles what a fuzzy term
+   stable ID: `D1`, `D2`, `D3`… Then run `fgos decision --text "<D-ID>:
+   <one-line summary>"` so the decision also lands in the item's
+   append-only decision log, surfaced through `view.decisions`/`fgos list`
+   for machine readers — this call is additive alongside writing
+   CONTEXT.md in step 3, never a replacement for it: CONTEXT.md stays the
+   source of truth for the full decision, this just makes its existence
+   visible outside the prose doc. When an answer settles what a fuzzy term
    means, pin the term the same way. If one answer contains several
    decisions, lock the one the question asked about and surface the rest as
    separate candidate decisions, one at a time. Scope creep — a new feature,
