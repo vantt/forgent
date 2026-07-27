@@ -55,6 +55,7 @@ script tự-động kiểm), người viết record mới tự đối chiếu.
 | [0014](0014-kien-truc-giao-tiep-nguoi-fgos.md) | Kiến trúc giao tiếp người ↔ fgOS | Contract = schema event-log (không phải lib); lib là client tham chiếu; CLI = adapter local standalone; daemon NGOÀI core (consumer qua CLI, `b2d18cc7` giữ nguyên); UI là client của daemon; push tách subsystem. Mức interface. |
 | [0015](0015-doi-ten-ctr-cho-contract.md) | Đổi tên định danh contract C1-C9 thành CTR001-CTR009 | Định danh contract registry (`architecture-map.md` §7) đổi từ `C<n>` trần sang `CTR<n>` 3-digit zero-padded (vd `CTR009`), theo `id-systems-audit.md` #6; đổi tên thuần, không đổi ý nghĩa/ranh giới/maturity của bất kỳ contract nào. |
 | [0016](0016-moc-mvp-fgos.md) | Mốc MVP của fgOS | Người mới, chỉ dựa tài liệu đã ship, nộp một yêu cầu văn xuôi và nhận code sẵn-sàng-merge với tối thiểu ngồi canh; bổ sung cho L5/L6, không thay thế. |
+| [0017](0017-mien-tru-viet-lai-nhat-ky.md) | Miễn trừ pre-release cho RUL11 | Trong lúc sản phẩm chưa phát hành, migration được phép viết lại tại chỗ cả ba kho `.fgos`; miễn trừ hết hiệu lực ở v1.0.0; không bao gồm `phase1-events.jsonl`. |
 
 ## Truy vết nguồn (đầy đủ)
 
@@ -83,3 +84,5 @@ Sổ này chưng cất các quyết định **product-facing**. Bảng dưới l
 | `13916523` | record | 0011 |
 | `4faa122e` | record | 0016 |
 | `9401954d` | record | 0016 |
+| `2accc216` | record | 0017 |
+| `80fe8e83` | record | 0017 |
