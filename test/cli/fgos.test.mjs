@@ -927,6 +927,37 @@ test('add with a bare --docs-ref (no value) is rejected as validation, exit 4, n
   assert.equal(eventLines(cwd).length, before);
 });
 
+// --- edit --docs-ref: docsRef can now be attached/changed after creation,
+// not only at `add` time -- closes the gap where an item created via
+// `submit` (no --docs-ref of its own before this) had no way to ever gain
+// this link. ---
+
+test('edit --docs-ref sets docsRef on an item that had none, exit 0', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'edit-docs-ref-new');
+  const result = run(cwd, ['edit', 'edit-docs-ref-new', '--docs-ref', 'docs/history/edit-docs-ref-new/']);
+  assert.equal(result.status, 0);
+  assert.equal(stateView(cwd).work['edit-docs-ref-new'].docsRef, 'docs/history/edit-docs-ref-new/');
+});
+
+test('edit --docs-ref replaces an existing docsRef (latest-wins), exit 0', () => {
+  const cwd = tmpCwd();
+  run(cwd, ['add', 'edit-docs-ref-replace', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--docs-ref', 'docs/history/old-feature/']);
+  const result = run(cwd, ['edit', 'edit-docs-ref-replace', '--docs-ref', 'docs/history/new-feature/']);
+  assert.equal(result.status, 0);
+  assert.equal(stateView(cwd).work['edit-docs-ref-replace'].docsRef, 'docs/history/new-feature/');
+});
+
+test('edit with an empty --docs-ref "" is rejected as validation, exit 4, item unchanged', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'edit-docs-ref-empty');
+  const before = eventLines(cwd).length;
+  const result = run(cwd, ['edit', 'edit-docs-ref-empty', '--docs-ref', '']);
+  assert.equal(result.status, 4);
+  assert.equal(eventLines(cwd).length, before);
+  assert.equal(stateView(cwd).work['edit-docs-ref-empty'].docsRef, undefined);
+});
+
 // --- D5 proposed: new edges + --reason on `move` (phase-2-routing-3) ---
 
 function toProposed(cwd, id) {
@@ -2092,6 +2123,30 @@ test('submit with a bare --tier (no value) is rejected as validation, exit 4, no
   const cwd = tmpCwd();
   const before = eventLines(cwd).length;
   const result = run(cwd, ['submit', 'Try a bare tier flag', '--tier']);
+  assert.equal(result.status, 4);
+  assert.equal(eventLines(cwd).length, before);
+});
+
+test('submit without --docs-ref leaves docsRef unset, exit 0', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['submit', 'A task with no docs link']);
+  assert.equal(result.status, 0);
+  const id = JSON.parse(result.stdout).data.id;
+  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].docsRef, undefined);
+});
+
+test('submit --docs-ref persists docsRef, exit 0 -- an item created through the public door can now carry this link from the start', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['submit', 'A task with a docs link', '--docs-ref', 'docs/history/some-feature/']);
+  assert.equal(result.status, 0);
+  const id = JSON.parse(result.stdout).data.id;
+  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].docsRef, 'docs/history/some-feature/');
+});
+
+test('submit with an empty --docs-ref "" is rejected as validation, exit 4, no event written', () => {
+  const cwd = tmpCwd();
+  const before = eventLines(cwd).length;
+  const result = run(cwd, ['submit', 'A task with a broken docs link', '--docs-ref', '']);
   assert.equal(result.status, 4);
   assert.equal(eventLines(cwd).length, before);
 });

@@ -530,6 +530,8 @@ function submitWork(dir, text, opts = {}) {
     // Per str73-done-flip-cos-check D2: --acceptance threaded from opts the
     // same way --domain/--discovered-from are, immediately above.
     acceptance: opts.acceptance,
+    // --docs-ref threaded from opts the same way, immediately above.
+    docsRef: opts.docsRef,
     // Per D8: every item entering through the public door starts at its
     // domain's Clarify-mapped stage — context-discovery must pass before
     // it can be worked. Generalized from the hardcoded 'clarify' (D8) to
@@ -715,6 +717,11 @@ async function runVerb(verb, flags, positional, dir) {
         tier: optionalField(flags.tier, 'submit --tier requires a tier value (e.g. light/standard/heavy); omit --tier entirely to use classify()\'s derived value.'),
         kind: optionalField(flags.kind, 'submit --kind requires a kind value; omit --kind entirely to use classify()\'s derived value.'),
         risk: optionalField(flags.risk, 'submit --risk requires a risk value; omit --risk entirely to use classify()\'s derived value.'),
+        // Same optional non-empty-path field `add` already exposes
+        // (bin/fgos.mjs's `add` case) — submit previously had no way to set
+        // this at all, so an item created through the public door could
+        // never gain a docsRef except via a later `edit --docs-ref`.
+        docsRef: optionalField(flags['docs-ref'], 'submit --docs-ref requires a non-empty path; omit --docs-ref entirely to leave unset.'),
       };
       return submitWork(dir, text, opts);
     }
@@ -856,6 +863,15 @@ async function runVerb(verb, flags, positional, dir) {
       if (flags.acceptance !== undefined) {
         patch.acceptance = parseAcceptanceFlag(flags.acceptance, 'edit --acceptance requires a JSON-encoded array of {text, evidence} clauses.');
       }
+      // --docs-ref: same optional non-empty-path field `add` already exposes
+      // (bin/fgos.mjs's `add` case), now also patchable after creation --
+      // an item created via `submit` without --docs-ref (or one whose
+      // feature doc gets written/moved after the fact) previously had no way
+      // to ever gain this link. Kebab-case flag name, camelCase field, so it
+      // cannot join the simple same-name loop above.
+      if (flags['docs-ref'] !== undefined) {
+        patch.docsRef = optionalField(flags['docs-ref'], 'edit --docs-ref requires a non-empty path.');
+      }
       // Priority/intent (per str7-str8-priority-intent D1/D3/D6): both are
       // numeric fields, unlike the string flags in the loop above, so each
       // gets its own coercion. parseArgs sets flags[field] = true (boolean)
@@ -893,7 +909,7 @@ async function runVerb(verb, flags, positional, dir) {
       if (Object.keys(patch).length === 0) {
         throw new StoreError(
           'validation',
-          'edit requires at least one field to change: --title/--kind/--risk/--verify/--tier/--refs/--deps/--acceptance/--priority/--intent.',
+          'edit requires at least one field to change: --title/--kind/--risk/--verify/--tier/--refs/--deps/--acceptance/--priority/--intent/--docs-ref.',
         );
       }
       const { event } = editWork(dir, { id, patch, actor: 'human' });
