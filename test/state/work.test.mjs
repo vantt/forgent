@@ -399,3 +399,50 @@ test('validateWork does not add docsRef to SCHEMA_VERSION or DEFAULTS (optional 
   assert.equal(SCHEMA_VERSION, 2);
   assert.equal(Object.hasOwn(DEFAULTS, 'docsRef'), false);
 });
+
+// --- `priority`/`intent` fields (per str7-str8-priority-intent D1/D6):
+// optional additive integers, absent-last, no schema bump. Same
+// optional-additive validation shape as tier/domain/docsRef above.
+
+test('validateWork accepts a work item missing priority or intent (optional, no default, stays absent)', () => {
+  const work = baseWork();
+  assert.equal(work.priority, undefined);
+  assert.equal(work.intent, undefined);
+  assert.doesNotThrow(() => validateWork(work));
+});
+
+test('validateWork accepts priority: 0 and any non-negative integer', () => {
+  for (const priority of [0, 1, 42, 1000]) {
+    assert.doesNotThrow(() => validateWork(baseWork({ priority })));
+  }
+});
+
+test('validateWork rejects a negative or non-integer priority', () => {
+  for (const priority of [-1, -100, 1.5, 'high', true, NaN]) {
+    assert.throws(
+      () => validateWork(baseWork({ priority })),
+      (err) => err instanceof WorkValidationError && /priority/.test(err.message),
+    );
+  }
+});
+
+test('validateWork accepts intent as any integer, including negative (no sign constraint per D6)', () => {
+  for (const intent of [-100, -1, 0, 1, 999]) {
+    assert.doesNotThrow(() => validateWork(baseWork({ intent })));
+  }
+});
+
+test('validateWork rejects a non-integer intent', () => {
+  for (const intent of [1.5, 'urgent', true, NaN]) {
+    assert.throws(
+      () => validateWork(baseWork({ intent })),
+      (err) => err instanceof WorkValidationError && /intent/.test(err.message),
+    );
+  }
+});
+
+test('validateWork does not add priority or intent to SCHEMA_VERSION or DEFAULTS (optional additive fields, no schema bump)', () => {
+  assert.equal(SCHEMA_VERSION, 2);
+  assert.equal(Object.hasOwn(DEFAULTS, 'priority'), false);
+  assert.equal(Object.hasOwn(DEFAULTS, 'intent'), false);
+});

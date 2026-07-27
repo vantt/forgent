@@ -609,3 +609,37 @@ test('moveWork re-reads fresh state on retry: editing in the missing evidence af
   const { view } = moveWork(dir, { id: 'cos-retry', to: 'done', expectedStatus: 'doing', actor: 'human' });
   assert.equal(view.work['cos-retry'].status, 'done', 'the retry must re-read the just-edited evidence, not a cached refusal');
 });
+
+// --- `priority`/`intent` in EDITABLE_FIELDS (per str7-str8-priority-intent
+// D3): both fields go through the SAME standard write door as every other
+// editable field — asserting editWork actually accepts and persists them,
+// and that the merged candidate still runs through validateWork (a bad
+// value is rejected the same way an invalid `tier` patch already is).
+
+test('editWork accepts a priority patch and persists it through a fresh rebuild', () => {
+  const dir = tmpDir();
+  addSampleWork(dir, 'prio-a');
+  assert.equal(listWork(dir).work['prio-a'].priority, undefined);
+
+  editWork(dir, { id: 'prio-a', patch: { priority: 3 } });
+  assert.equal(listWork(dir).work['prio-a'].priority, 3);
+});
+
+test('editWork accepts an intent patch, including a negative value (no sign constraint per D6)', () => {
+  const dir = tmpDir();
+  addSampleWork(dir, 'intent-a');
+  assert.equal(listWork(dir).work['intent-a'].intent, undefined);
+
+  editWork(dir, { id: 'intent-a', patch: { intent: -5 } });
+  assert.equal(listWork(dir).work['intent-a'].intent, -5);
+});
+
+test('editWork rejects a negative priority patch — validateWork still runs on the merged candidate', () => {
+  const dir = tmpDir();
+  addSampleWork(dir, 'prio-neg');
+  assert.throws(
+    () => editWork(dir, { id: 'prio-neg', patch: { priority: -1 } }),
+    /priority/,
+  );
+  assert.equal(listWork(dir).work['prio-neg'].priority, undefined, 'the rejected patch never lands');
+});

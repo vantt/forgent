@@ -394,6 +394,78 @@ test('edit reports the real event seq in its envelope data, not undefined', () =
   assert.deepEqual(data.fields, ['risk']);
 });
 
+// --- str7-str8-priority-intent D1/D3/D6: --priority/--intent on `edit` ---
+//
+// Both flags exist ONLY on `edit` (D3) — `add`/`submit` are untouched
+// (see the add-without-tier/domain coverage above for the established shape
+// of an omitted-optional-field add; there is no --priority/--intent
+// equivalent there by design, so no test asserts a negative for `add` —
+// the flags simply don't appear in its parser wiring at all).
+
+test('edit --priority sets the item priority field to the given integer, exit 0', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'edit-priority');
+  const result = run(cwd, ['edit', 'edit-priority', '--priority', '3']);
+  assert.equal(result.status, 0);
+  assert.equal(stateView(cwd).work['edit-priority'].priority, 3);
+});
+
+test('edit --priority with a negative value is rejected as validation, exit 4, no event written (D1: priority must be non-negative)', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'edit-priority-neg');
+  const before = eventLines(cwd).length;
+  const result = run(cwd, ['edit', 'edit-priority-neg', '--priority', '-1']);
+  assert.equal(result.status, 4);
+  assert.equal(eventLines(cwd).length, before);
+  assert.equal(stateView(cwd).work['edit-priority-neg'].priority, undefined);
+});
+
+test('edit --priority with a bare flag (no following value) is rejected as validation, exit 4, never silently written as 1', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'edit-priority-bare');
+  const before = eventLines(cwd).length;
+  const result = run(cwd, ['edit', 'edit-priority-bare', '--priority']);
+  assert.equal(result.status, 4);
+  assert.equal(eventLines(cwd).length, before);
+  assert.equal(stateView(cwd).work['edit-priority-bare'].priority, undefined);
+});
+
+test('edit --intent accepts a negative value (no sign constraint per D6), exit 0', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'edit-intent-neg');
+  const result = run(cwd, ['edit', 'edit-intent-neg', '--intent', '-1']);
+  assert.equal(result.status, 0);
+  assert.equal(stateView(cwd).work['edit-intent-neg'].intent, -1);
+});
+
+test('edit --intent with a non-numeric value is rejected as validation, exit 4, no event written', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'edit-intent-nan');
+  const before = eventLines(cwd).length;
+  const result = run(cwd, ['edit', 'edit-intent-nan', '--intent', 'notanumber']);
+  assert.equal(result.status, 4);
+  assert.equal(eventLines(cwd).length, before);
+  assert.equal(stateView(cwd).work['edit-intent-nan'].intent, undefined);
+});
+
+test('edit --intent with a bare flag (no following value) is rejected as validation, exit 4, never silently written as 1', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'edit-intent-bare');
+  const before = eventLines(cwd).length;
+  const result = run(cwd, ['edit', 'edit-intent-bare', '--intent']);
+  assert.equal(result.status, 4);
+  assert.equal(eventLines(cwd).length, before);
+  assert.equal(stateView(cwd).work['edit-intent-bare'].intent, undefined);
+});
+
+test('add with no --priority/--intent leaves both fields absent (undefined), not null and not zero', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'add-no-priority-intent');
+  const item = stateView(cwd).work['add-no-priority-intent'];
+  assert.equal(item.priority, undefined);
+  assert.equal(item.intent, undefined);
+});
+
 test('decision logs one event and appears in the view, exit 0', () => {
   const cwd = tmpCwd();
   run(cwd, ['init']);
