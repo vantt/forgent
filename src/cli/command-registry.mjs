@@ -489,11 +489,11 @@ export const COMMAND_REGISTRY = [
   {
     name: 'session',
     invoke: 'fgos session',
-    description: 'Per-session git worktree lifecycle: "start" opens a detached-HEAD worktree, "end" removes it, "list" (read-only) prints the registry.',
+    description: 'Per-session git worktree lifecycle: "start" opens a detached-HEAD worktree, "end" removes it, "list" (read-only) prints the registry, "gc" reclaims entries whose worktree is gone from git or whose start-CLI pid has since exited (sparing diverged or uncommitted-work sessions).',
     parameters: {
       type: 'object',
       properties: {
-        sub: { type: 'string', description: 'Sub-verb (positional).', enum: ['start', 'end', 'list'] },
+        sub: { type: 'string', description: 'Sub-verb (positional).', enum: ['start', 'end', 'list', 'gc'] },
         'session-id': { type: 'string', description: 'Session id (positional, required for "end").' },
         item: { type: 'string', description: '"start" only: optional work item id to bind the session to.' },
         force: { type: 'boolean', description: '"end" only: force-remove a diverged (dangling-commit) session.' },
@@ -501,7 +501,7 @@ export const COMMAND_REGISTRY = [
       positional: ['sub', 'session-id'],
       required: ['sub'],
     },
-    examples: ['fgos session start', 'fgos session end <session-id>', 'fgos session list'],
+    examples: ['fgos session start', 'fgos session end <session-id>', 'fgos session list', 'fgos session gc'],
     access: 'mutation',
     deprecated: null,
   },

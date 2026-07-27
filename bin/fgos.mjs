@@ -36,7 +36,7 @@ import { classifySource, reviewDiff, mergeRunnerItem, cleanupMergedBranch, chang
 import { createGitHubPR, mergeGitHubPR, viewGitHubPRStatus } from '../src/runner/github-adapter.mjs';
 import { classifyIronLaw } from '../src/evolve/iron-law.mjs';
 import { branchNameFor, branchExists, createWorktree, removeWorktree } from '../src/runner/worktree.mjs';
-import { createSession, endSession, listSessions, SessionError } from '../src/runner/session.mjs';
+import { createSession, endSession, listSessions, reclaimOrphanedSessions, SessionError } from '../src/runner/session.mjs';
 import { resolveRoot } from '../src/runner/root-affinity.mjs';
 import { visitCount } from '../src/runner/anti-loop.mjs';
 import { DEFAULTS } from '../src/state/work.mjs';
@@ -2011,17 +2011,20 @@ async function runVerb(verb, flags, positional, dir) {
 
     // Opt-in per-session git worktree lifecycle (fgos-multi-session-checkout
     // Epic 1, D6/D7): a first-class `session` verb family wiring session.mjs's
-    // createSession/endSession/listSessions. `start` opens a detached-HEAD
-    // worktree on the current HEAD (zero new branches) with a `.fgos` symlink
-    // back to the one shared store (D10) and prints where to `cd`; `end`
-    // removes it, refusing a diverged (dangling-commit) session without
-    // --force and naming the sha(s); `list` prints the registry. session.mjs
-    // raises SessionError for every lifecycle failure (unknown id, divergence
+    // createSession/endSession/listSessions/reclaimOrphanedSessions. `start`
+    // opens a detached-HEAD worktree on the current HEAD (zero new branches)
+    // with a `.fgos` symlink back to the one shared store (D10) and prints
+    // where to `cd`; `end` removes it, refusing a diverged (dangling-commit)
+    // session without --force and naming the sha(s); `list` prints the
+    // registry; `gc` (p-fgos-session-gc) sweeps entries whose worktree is gone
+    // from git or whose one-shot `start` CLI pid has since exited, sparing any
+    // that are diverged or have uncommitted work. session.mjs raises
+    // SessionError for every lifecycle failure (unknown id, divergence
     // refusal, git failure) — surfaced here as `validation` (exit 4) so a bad
     // input is a clean categorized exit, never an uncaught crash. repoRoot is
     // the caller's cwd, the same root every other git-backed verb uses.
     case 'session': {
-      const sub = requireField(positional[0], 'session requires a sub-verb: fgos session <start|end|list> ...');
+      const sub = requireField(positional[0], 'session requires a sub-verb: fgos session <start|end|list|gc> ...');
       const repoRoot = process.cwd();
       try {
         if (sub === 'start') {
@@ -2055,7 +2058,10 @@ async function runVerb(verb, flags, positional, dir) {
         if (sub === 'list') {
           return listSessions(repoRoot);
         }
-        throw new StoreError('validation', `unknown session sub-verb "${sub}". Usage: fgos session <start|end|list> ...`);
+        if (sub === 'gc') {
+          return reclaimOrphanedSessions(repoRoot);
+        }
+        throw new StoreError('validation', `unknown session sub-verb "${sub}". Usage: fgos session <start|end|list|gc> ...`);
       } catch (err) {
         if (err instanceof SessionError) {
           throw new StoreError('validation', err.message);

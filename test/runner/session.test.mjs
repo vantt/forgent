@@ -422,3 +422,35 @@ test('reclaimOrphanedSessions cleans a dead-pid orphan, keeps a live session, an
     cleanup(repoRoot, sessionsDir);
   }
 });
+
+test('reclaimOrphanedSessions spares a dead-pid orphan with uncommitted (never-committed) changes', () => {
+  const repoRoot = initTempRepo();
+  const sessionsDir = mkSessionsDir();
+  try {
+    const dirtyOrphan = createSession(repoRoot, { sessionId: 'dirty-orphan', sessionsDir });
+    // Uncommitted change, never committed — HEAD stays at startCommit, so this
+    // is invisible to the divergence check and would otherwise be silently
+    // destroyed by the `--force` remove.
+    fs.writeFileSync(path.join(dirtyOrphan.worktreePath, 'wip.txt'), 'not committed yet\n');
+
+    const dead = deadPid();
+    writeRegistry(
+      repoRoot,
+      readRegistry(repoRoot).map((e) => (e.sessionId === 'dirty-orphan' ? { ...e, pid: dead } : e)),
+    );
+
+    const result = reclaimOrphanedSessions(repoRoot);
+
+    assert.deepEqual(result.reclaimed, [], 'nothing reclaimed — the only orphan candidate is dirty');
+    assert.deepEqual(result.skipped, ['dirty-orphan'], 'dirty orphan is spared, not silently discarded');
+    assert.ok(fs.existsSync(dirtyOrphan.worktreePath), 'dirty orphan worktree preserved');
+    assert.ok(
+      fs.existsSync(path.join(dirtyOrphan.worktreePath, 'wip.txt')),
+      'the uncommitted file itself survives the reclaim pass',
+    );
+    const remaining = listSessions(repoRoot).map((e) => e.sessionId);
+    assert.deepEqual(remaining, ['dirty-orphan'], 'registry entry kept alongside the preserved worktree');
+  } finally {
+    cleanup(repoRoot, sessionsDir);
+  }
+});

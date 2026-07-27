@@ -4457,6 +4457,58 @@ test('session with no sub-verb, and an unknown sub-verb, are both rejected as va
   assert.equal(run(cwd, ['session', 'bogus']).status, 4);
 });
 
+// `session gc` (p-fgos-session-gc): reclaims registry entries whose worktree
+// is gone from git or whose one-shot `session start` CLI pid has since
+// exited — every started session qualifies for the pid half almost
+// immediately (the CLI process that started it already exited), so these
+// tests key on divergence/dirty-work to prove what gc does and does NOT
+// touch, matching test/runner/session.test.mjs's own reclaim coverage.
+
+test('session gc reclaims a clean, untouched session and reports it, exit 0', () => {
+  const cwd = initGitCwd();
+  const { sessionId, worktreePath } = startSession(cwd);
+
+  const gced = run(cwd, ['session', 'gc']);
+  assert.equal(gced.status, 0, `gc should succeed: ${gced.stderr}`);
+  const data = envelopeData(gced.stdout);
+  assert.deepEqual(data.reclaimed, [sessionId], 'the clean session is reclaimed');
+  assert.deepEqual(data.skipped, []);
+  assert.ok(!fs.existsSync(worktreePath), 'the reclaimed worktree is removed from disk');
+  assert.deepEqual(envelopeData(run(cwd, ['session', 'list']).stdout), [], 'registry entry dropped');
+});
+
+test('session gc spares a diverged session and reports it as skipped, exit 0', () => {
+  const cwd = initGitCwd();
+  const { sessionId, worktreePath } = startSession(cwd);
+  const danglingSha = commitInWorktree(worktreePath, 'change.txt');
+
+  const gced = run(cwd, ['session', 'gc']);
+  assert.equal(gced.status, 0);
+  const data = envelopeData(gced.stdout);
+  assert.deepEqual(data.reclaimed, []);
+  assert.deepEqual(data.skipped, [sessionId], 'the diverged session is skipped, not reclaimed');
+  assert.ok(fs.existsSync(worktreePath), 'the worktree with the dangling commit is preserved');
+
+  const ended = run(cwd, ['session', 'end', sessionId]);
+  assert.ok(ended.stderr.includes(danglingSha), 'end still names the preserved dangling commit');
+  run(cwd, ['session', 'end', sessionId, '--force']);
+});
+
+test('session gc spares a session with uncommitted (never-committed) changes, exit 0', () => {
+  const cwd = initGitCwd();
+  const { sessionId, worktreePath } = startSession(cwd);
+  fs.writeFileSync(path.join(worktreePath, 'wip.txt'), 'not committed yet\n');
+
+  const gced = run(cwd, ['session', 'gc']);
+  assert.equal(gced.status, 0);
+  const data = envelopeData(gced.stdout);
+  assert.deepEqual(data.reclaimed, [], 'nothing reclaimed — the only session is dirty');
+  assert.deepEqual(data.skipped, [sessionId], 'dirty session is skipped, not silently discarded');
+  assert.ok(fs.existsSync(path.join(worktreePath, 'wip.txt')), 'the uncommitted file survives gc');
+
+  run(cwd, ['session', 'end', sessionId, '--force']);
+});
+
 // --- approve session-nesting guard (fgos-multi-session-checkout Epic 2) ------
 //
 // approve (NOT --github) refuses when cwd is inside a registered session
