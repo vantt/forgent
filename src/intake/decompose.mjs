@@ -54,14 +54,15 @@ con độc lập, dependency rõ?
 - Đơn giản: trả "verdict": "pass-through".
 - Cần chia: liệt kê MỖI việc con với "title", "verify" (một lệnh chạy được
   THẬT để chứng minh việc con đã xong — không được bỏ trống, không được là
-  một câu mô tả suông), và tùy chọn "kind", "risk", "refs", "deps" ("deps" là
-  mảng chỉ số 0-based trỏ vào các việc con KHÁC đứng TRƯỚC nó trong danh
-  sách mà nó phụ thuộc).
+  một câu mô tả suông), và tùy chọn "kind", "risk", "refs", "footprint" (danh
+  sách đường dẫn file việc con này dự kiến đụng tới, nếu biết), "deps"
+  ("deps" là mảng chỉ số 0-based trỏ vào các việc con KHÁC đứng TRƯỚC nó
+  trong danh sách mà nó phụ thuộc).
 - Mơ hồ, không phán chắc được: trả "verdict": "need-human" kèm "reason".
 
 # Định dạng trả lời
 Trả lời DUY NHẤT bằng một dòng JSON, không kèm chữ nào khác:
-{"verdict": "pass-through" | "decompose" | "need-human", "reason": string (chỉ khi need-human), "children": [{"title": string, "verify": string, "kind": string, "risk": string, "refs": string[], "deps": number[]}] (chỉ khi decompose)}
+{"verdict": "pass-through" | "decompose" | "need-human", "reason": string (chỉ khi need-human), "children": [{"title": string, "verify": string, "kind": string, "risk": string, "refs": string[], "footprint": string[], "deps": number[]}] (chỉ khi decompose)}
 `;
 }
 
@@ -80,6 +81,13 @@ function normalizeChild(child) {
     kind: typeof child.kind === 'string' && child.kind.trim() ? child.kind : undefined,
     risk: typeof child.risk === 'string' && child.risk.trim() ? child.risk : undefined,
     refs: Array.isArray(child.refs) ? child.refs.filter((r) => typeof r === 'string') : [],
+    // work-graph-intelligence S9 footprint, same optional-additive shape as
+    // work.mjs's validateWorkShape: a malformed (non-array) value never
+    // invalidates the child, it just leaves footprint absent — same fail-soft
+    // rule bin/fgos.mjs's own --footprint flag follows.
+    footprint: Array.isArray(child.footprint)
+      ? child.footprint.filter((p) => typeof p === 'string' && p.trim())
+      : undefined,
     rawDeps: Array.isArray(child.deps) ? child.deps : [],
   };
 }
@@ -90,7 +98,7 @@ function normalizeChild(child) {
  * real model configured for its tier (per D2/D3, never a mechanical
  * classifier). Always returns one of:
  *   { kind: 'pass-through' }
- *   { kind: 'decompose', children: [{title, verify, kind?, risk?, refs, deps}] }
+ *   { kind: 'decompose', children: [{title, verify, kind?, risk?, refs, footprint?, deps}] }
  *   { kind: 'need-human', reason }
  *   { kind: 'invalid' }  // fail-safe: model/parse failure, or a child missing verify
  * and never throws. A "decompose" verdict with zero children normalizes to
@@ -240,6 +248,7 @@ export function resolveDecompose(dir, id, cfg, actor) {
       deps: child.deps.map((depIndex) => childIds[depIndex]),
       risk: child.risk ?? work.risk,
       refs: child.refs,
+      footprint: child.footprint,
       verify: child.verify,
       stage: 'executing',
       parent: id,

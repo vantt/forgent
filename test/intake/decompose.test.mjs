@@ -321,6 +321,47 @@ test('resolveDecompose on a decompose verdict writes every child with parent/dep
   assert.deepEqual(view.work['item-x'].deps, []);
 });
 
+test('resolveDecompose writes footprint on a child exactly when the verdict provided one, undefined otherwise', () => {
+  const scriptDir = mkTempDir();
+  const scriptPath = writeVerdictExecutor(scriptDir, {
+    verdict: 'decompose',
+    children: [
+      { title: 'Build parser', verify: 'npm test -- parser', footprint: ['src/parser.mjs', 'test/parser.test.mjs'] },
+      { title: 'Build renderer', verify: 'npm test -- renderer' },
+    ],
+  });
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork());
+
+  const result = resolveDecompose(storeDir, 'item-x', cfg, 'runner');
+  assert.equal(result.outcome, 'decompose');
+
+  const view = listWork(storeDir);
+  const [firstId, secondId] = result.childIds;
+  assert.deepEqual(view.work[firstId].footprint, ['src/parser.mjs', 'test/parser.test.mjs']);
+  assert.equal(view.work[secondId].footprint, undefined);
+});
+
+test('resolveDecompose leaves footprint undefined when a child provides a malformed (non-array) footprint, without invalidating the verdict', () => {
+  const scriptDir = mkTempDir();
+  const scriptPath = writeVerdictExecutor(scriptDir, {
+    verdict: 'decompose',
+    children: [{ title: 'Build parser', verify: 'npm test -- parser', footprint: 'not-an-array' }],
+  });
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork());
+
+  const result = resolveDecompose(storeDir, 'item-x', cfg, 'runner');
+  assert.equal(result.outcome, 'decompose');
+
+  const view = listWork(storeDir);
+  assert.equal(view.work[result.childIds[0]].footprint, undefined);
+});
+
 test('resolveDecompose assigns positional child ids `${work.id}-<n>` for n=1..N across N siblings', () => {
   const scriptDir = mkTempDir();
   const scriptPath = writeVerdictExecutor(scriptDir, {
