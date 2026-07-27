@@ -360,7 +360,7 @@ test('validateWork does not require discoveredFrom to point at an existing id (p
 });
 
 test('validateWork does not add discoveredFrom to SCHEMA_VERSION or DEFAULTS (optional lazy field, no schema bump)', () => {
-  assert.equal(SCHEMA_VERSION, 2);
+  assert.equal(SCHEMA_VERSION, 3);
   assert.equal(Object.hasOwn(DEFAULTS, 'discoveredFrom'), false);
 });
 
@@ -397,7 +397,7 @@ test('validateWork rejects a non-string, non-empty docsRef', () => {
 });
 
 test('validateWork does not add docsRef to SCHEMA_VERSION or DEFAULTS (optional lazy field, no schema bump)', () => {
-  assert.equal(SCHEMA_VERSION, 2);
+  assert.equal(SCHEMA_VERSION, 3);
   assert.equal(Object.hasOwn(DEFAULTS, 'docsRef'), false);
 });
 
@@ -443,7 +443,7 @@ test('validateWork rejects a non-integer intent', () => {
 });
 
 test('validateWork does not add priority or intent to SCHEMA_VERSION or DEFAULTS (optional additive fields, no schema bump)', () => {
-  assert.equal(SCHEMA_VERSION, 2);
+  assert.equal(SCHEMA_VERSION, 3);
   assert.equal(Object.hasOwn(DEFAULTS, 'priority'), false);
   assert.equal(Object.hasOwn(DEFAULTS, 'intent'), false);
 });
@@ -512,7 +512,7 @@ test('validateWork does not require targets to point at existing ids (targets ma
 });
 
 test('validateWork does not add goalTier or targets to SCHEMA_VERSION or DEFAULTS (optional additive fields, no schema bump)', () => {
-  assert.equal(SCHEMA_VERSION, 2);
+  assert.equal(SCHEMA_VERSION, 3);
   assert.equal(Object.hasOwn(DEFAULTS, 'goalTier'), false);
   assert.equal(Object.hasOwn(DEFAULTS, 'targets'), false);
 });

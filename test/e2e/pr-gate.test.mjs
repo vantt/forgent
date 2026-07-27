@@ -181,7 +181,7 @@ function worktreeCount(repoRoot) {
 // --- (a) runner item, full loop: proposed -> review -> approve -> merge ->
 // done, with all three of the must_have's "dấu vết" checked -------------
 
-test('e2e pr-gate (a) runner item full loop: add -> runner dispatch -> proposed, review shows the branch diff, approve merges + verifies -> done with settlement actor human, câu-6 learning present, and the branch/worktree are cleaned up', () => {
+test('e2e pr-gate (a) runner item full loop: add -> runner dispatch -> proposed, review shows the branch diff, approve merges + verifies -> done with settlement role human, câu-6 learning present, and the branch/worktree are cleaned up', () => {
   const repoRoot = initTempRepo();
   const scriptDir = mkTempDir('fgos-pr-gate-e2e-a-');
 
@@ -218,7 +218,7 @@ test('e2e pr-gate (a) runner item full loop: add -> runner dispatch -> proposed,
 
   // 3 marks (must_haves truth 2):
   assert.equal(view.settlements['pr-a-item'][0].kind, 'close');
-  assert.equal(view.settlements['pr-a-item'][0].actor, 'human', 'D3: the approver is the settlement actor, merge is only the mechanical consequence');
+  assert.equal(view.settlements['pr-a-item'][0].role, 'human', 'D3: the approver is the settlement role, merge is only the mechanical consequence');
   assert.ok(view.learnings['pr-a-item'][0], 'câu-6 learning record must be present on the close edge');
   assert.equal(branchExists(repoRoot, 'fgw/pr-a-item'), false, 'the fully-merged branch is cleaned up');
   assert.equal(worktreeCount(repoRoot), 1, 'no leaked worktree after cleanup');
@@ -320,7 +320,7 @@ test('e2e pr-gate (c) pull-door item: take -> commit -> return -> proposed, revi
   const view = stateView(repoRoot);
   assert.equal(view.work['pr-c-item'].status, 'done');
   assert.equal(view.settlements['pr-c-item'][0].kind, 'close');
-  assert.equal(view.settlements['pr-c-item'][0].actor, 'human');
+  assert.equal(view.settlements['pr-c-item'][0].role, 'human');
   assert.equal(branchExists(repoRoot, 'fgw/pr-c-item'), false, 'a pull-door item never creates a branch');
   assert.notEqual(headAtTake, currentHead(repoRoot), 'sanity: the human commit really did advance HEAD past headAtTake');
 });
@@ -444,7 +444,7 @@ test('e2e pr-gate (e) branch-source item full loop: park (blocked + live branch)
 
   const view2 = stateView(repoRoot);
   assert.equal(view2.work['pr-e-item'].status, 'done');
-  assert.equal(view2.settlements['pr-e-item'][0].actor, 'human');
+  assert.equal(view2.settlements['pr-e-item'][0].role, 'human');
   assert.equal(branchExists(repoRoot, 'fgw/pr-e-item'), false, 'the fully-merged branch is cleaned up');
   assert.equal(worktreeCount(repoRoot), 1, 'no leaked worktree after cleanup');
   assert.ok(fs.existsSync(path.join(repoRoot, 'pr-e-proof.txt')), 'the merged file is present on main');

@@ -157,7 +157,7 @@ theo `repository-harness:maturity-ladder-h0-h5` — "không tự phán".
 
 **Claimed.** F4 — 2026-07-16, trên bằng chứng benchmark ngoài thật (real
 `fgos`/`fgos-runner` binaries, bản sao pristine, không fixture): vòng
-predicted→actual đủ 2 nửa; capture 2 kênh (settlement actor-attributed
+predicted→actual đủ 2 nửa; capture 2 kênh (settlement role-attributed
 runner/human, friction 5-layer); entropy-trend + seal-digest qua hai lần
 `check`; câu-6 tự động lúc đóng. Chi tiết + toàn bộ output dán nguyên văn:
 `docs/history/phase-3-compound-learning/reports/f4-benchmark.md` (round 2,

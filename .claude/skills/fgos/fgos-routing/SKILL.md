@@ -34,7 +34,7 @@ Both are read-only. Nothing here writes state.
 Take exactly one item through the pull door:
 
 ```
-fgos take --actor session [--id <id>]
+fgos take --role session [--id <id>]
 ```
 
 The frontier (`fgos ready`) is executing-stage-only by definition — every
@@ -43,7 +43,7 @@ item it surfaces has already cleared `clarify` and `decompose`. Omitting
 on an item ready for direct execution. To work an item still at `clarify`
 or `decompose` — the ones routed to `fgos-exploring` or `fgos-planning`
 below — claim it specifically with `--id <id>` (found via `fgos list`).
-`--actor session` marks the claim as coming from a live session rather than
+`--role session` marks the claim as coming from a live session rather than
 a person — always pass it here.
 
 When the work behind that item is done, hand it back:
@@ -151,7 +151,7 @@ lying about what's actually happening.
 ## Summary
 
 1. `fgos list` / `fgos ready` to orient.
-2. `fgos take --actor session [--id <id>]` to claim one item.
+2. `fgos take --role session [--id <id>]` to claim one item.
 3. Read the claimed item's `stage` and load `fgos-exploring`,
    `fgos-planning`, or `fgos-validating` per the table above — or proceed
    directly if it's already at `executing`.

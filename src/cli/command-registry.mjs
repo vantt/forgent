@@ -327,19 +327,19 @@ export const COMMAND_REGISTRY = [
       type: 'object',
       properties: {
         id: { type: 'string', description: 'Optional work item id (positional or --id); omit to take the frontier head.' },
-        actor: { type: 'string', description: 'Claiming actor (default "human").', enum: ['human', 'session'] },
+        role: { type: 'string', description: 'Claiming role (default "human").', enum: ['human', 'session'] },
       },
       positional: ['id'],
       required: [],
     },
-    examples: ['fgos take', 'fgos take build-cli --actor session'],
+    examples: ['fgos take', 'fgos take build-cli --role session'],
     access: 'mutation',
     deprecated: null,
   },
   {
     name: 'pick',
     invoke: 'fgos pick',
-    description: 'Claim one item through the pull door as the session actor (same rules as take, actor fixed to "session") and create/reuse its isolated fgw/<id> worktree in one step.',
+    description: 'Claim one item through the pull door as the session role (same rules as take, role fixed to "session") and create/reuse its isolated fgw/<id> worktree in one step.',
     parameters: {
       type: 'object',
       properties: {

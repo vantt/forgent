@@ -222,13 +222,13 @@ export function judgeDiscovery(work, cfg, view) {
  * retired P14 placeholder). An unclear verdict parks the item in
  * `awaiting-human` with the verdict's question.
  *
- * `actor` (per Phase 3 S3-closeout settlement design) attributes WHO ran
+ * `role` (per Phase 3 S3-closeout settlement design) attributes WHO ran
  * this pass — the two call sites disagree, so it is the caller's job to say:
  * the runner's clarify sweep passes `'runner'`, the sync `discover` verb
  * passes `'session'`. Optional; a clear verdict's `moveStage` only stamps it
  * on the settlement record when a caller actually supplies it.
  */
-export function resolveDiscovery(dir, id, cfg, actor) {
+export function resolveDiscovery(dir, id, cfg, role) {
   const view = listWork(dir);
   const work = view.work[id];
   if (!work) {
@@ -248,7 +248,7 @@ export function resolveDiscovery(dir, id, cfg, actor) {
   // judgeDiscovery itself.
   if (Number.isInteger(verdict.intentScore)) {
     try {
-      editWork(dir, { id, patch: { intent: verdict.intentScore }, actor });
+      editWork(dir, { id, patch: { intent: verdict.intentScore }, role });
     } catch {
       // Swallowed intentionally — see comment above.
     }
@@ -260,7 +260,7 @@ export function resolveDiscovery(dir, id, cfg, actor) {
       to: 'decompose',
       expectedStage: 'clarify',
       verify: verdict.verify ?? FALLBACK_VERIFY,
-      actor,
+      role,
     });
     return { outcome: 'clear', id, verdict };
   }

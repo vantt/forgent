@@ -37,6 +37,7 @@ import { validateWork, WorkValidationError, DEFAULTS, GOAL_TIERS } from './work.
 import { EventLogError } from './events.mjs';
 import { frontier } from './frontier.mjs';
 import { assertNoCycle, assertNoUnifiedCycle } from './dep-graph.mjs';
+import { resolveWriterIdentity } from '../runner/session-identity.mjs';
 
 export { FsmError, WorkValidationError, EventLogError };
 
@@ -202,7 +203,7 @@ const EDITABLE_FIELDS = new Set(['title', 'kind', 'risk', 'verify', 'tier', 'ref
 // addWork/moveWork/moveStage on ids that would collide (e.g. a deps/parent
 // cycle only the second writer's patch creates), can no longer both read a
 // precondition that the other's not-yet-visible write is about to invalidate.
-export function editWork(dir, { id, patch, actor } = {}) {
+export function editWork(dir, { id, patch, role } = {}) {
   const { logPath } = paths(dir);
   const event = withEventsLock(logPath, () => {
     const before = rebuildView(logPath);
@@ -238,9 +239,15 @@ export function editWork(dir, { id, patch, actor } = {}) {
     assertNoUnifiedCycle(candidate, before.work);
 
     const payload = { id, patch };
-    if (actor !== undefined) {
-      payload.actor = actor;
+    if (role !== undefined) {
+      payload.role = role;
     }
+    // Writer provenance (D8/D15/D17/D18, str46-io-contract): stamped
+    // post-transition exactly like role above, but unconditional -- every
+    // event through this door records who wrote it. resolveWriterIdentity
+    // never throws and never blocks the mutation (D18); no validator sits on
+    // this path.
+    payload.writer = resolveWriterIdentity(dir);
     return appendEventLocked(logPath, { type: 'work.edit', payload });
   });
   const view = refreshView(dir);
@@ -273,7 +280,7 @@ function composeLearning(view, id, closingSettlement) {
   const settlementRecords = [...(view.settlements?.[id] ?? []), closingSettlement];
   const settlements = {};
   for (const record of settlementRecords) {
-    const key = `${record.kind}/${record.actor ?? 'unknown'}`;
+    const key = `${record.kind}/${record.role ?? 'unknown'}`;
     settlements[key] = (settlements[key] ?? 0) + 1;
   }
 
@@ -324,7 +331,7 @@ export function setFocus(dir, { id, actor } = {}) {
  * first's event already in the log, so its own `expectedStatus` compare
  * correctly conflicts.
  */
-export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, actor, headAtTake, headAtReturn, branchHeadAtTake, branchHeadAtReturn, parentSnapshotAtAsk } = {}) {
+export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, role, headAtTake, headAtReturn, branchHeadAtTake, branchHeadAtReturn, parentSnapshotAtAsk } = {}) {
   const { logPath } = paths(dir);
   const event = withEventsLock(logPath, () => {
   const before = rebuildView(logPath);
@@ -339,19 +346,24 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, act
   // doesn't apply to the edge being taken — this facade never branches on
   // `to` itself, it just forwards what the caller gave it.
   const rawEvent = transitionWork({ work, to, expectedStatus, reason, ask, answer }); // FsmError: precondition | conflict
-  // Settlement actor attribution (per Phase 3 S3-closeout, vision §8):
+  // Settlement role attribution (per Phase 3 S3-closeout, vision §8):
   // stamped onto the payload AFTER the pure transition already returned it —
-  // passing `actor` INTO transitionWork would be silently dropped, since
+  // passing `role` INTO transitionWork would be silently dropped, since
   // fsm.mjs rebuilds `payload` itself from only the fields it knows about.
-  // Additive + optional: a caller that never supplies `actor` gets the
+  // Additive + optional: a caller that never supplies `role` gets the
   // exact payload shape transitionWork already produced, byte-for-byte.
-  if (actor !== undefined) {
-    rawEvent.payload.actor = actor;
+  if (role !== undefined) {
+    rawEvent.payload.role = role;
   }
+  // Writer provenance (D8/D15/D17/D18, str46-io-contract) -- same
+  // post-transition stamp as role/headAtTake above, but unconditional:
+  // every moveWork call records who wrote it, never blocking on a
+  // malformed identity (D18).
+  rawEvent.payload.writer = resolveWriterIdentity(dir);
   // Pull-door claim marker (stage-decompose S2-pull D1): the host repo's HEAD
   // at claim time, additive on the SAME `to === 'doing'` move `take` writes —
   // never a separate event (single write door, D3). Ignored by fsm.mjs (pure,
-  // only knows the fields it destructures itself) exactly like `actor` above,
+  // only knows the fields it destructures itself) exactly like `role` above,
   // so this is stamped post-transition the same way.
   if (headAtTake !== undefined) {
     rawEvent.payload.headAtTake = headAtTake;
@@ -364,7 +376,7 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, act
   // headAtReturn` diff range for a pull-door proposal, without depending on
   // a live branch the way a runner proposal's `fgw/<id>` diff does. Ignored
   // by fsm.mjs (pure, only knows the fields it destructures itself) exactly
-  // like `headAtTake`/`actor` above, so this is stamped post-transition the
+  // like `headAtTake`/`role` above, so this is stamped post-transition the
   // same way.
   if (headAtReturn !== undefined) {
     rawEvent.payload.headAtReturn = headAtReturn;
@@ -387,7 +399,7 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, act
   // the item's parent `{id, title, status}` taken at the moment this
   // `to === 'awaiting-human'` move parks it, so a later read can tell what
   // changed on the parent since. Ignored by fsm.mjs (pure, only knows the
-  // fields it destructures itself) exactly like headAtTake/actor above, so
+  // fields it destructures itself) exactly like headAtTake/role above, so
   // this is stamped post-transition the same way. Never set on any other
   // edge — putInAwaiting is the only caller that ever passes it.
   if (parentSnapshotAtAsk !== undefined) {
@@ -455,7 +467,7 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, act
   // payload instead — composed from `before` (the pre-transition view,
   // already in hand) plus the close settlement this transition is about to
   // create. A second appendEvent here would become the new "last event"
-  // after every `move --to done`, which the settlement-actor-attribution
+  // after every `move --to done`, which the settlement-role-attribution
   // tests (phase-3-compound-learning-5) already assert IS the move event
   // itself — an existing, unmodifiable test. One event, one extra field,
   // is still exactly one write door (must_haves truth 3), just a tighter
@@ -466,7 +478,7 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, act
   // must NEVER block the transition below. Best-effort, silently swallowed.
   if (to === 'done') {
     try {
-      rawEvent.payload.learning = composeLearning(before, id, { kind: 'close', actor: actor ?? null });
+      rawEvent.payload.learning = composeLearning(before, id, { kind: 'close', role: role ?? null });
     } catch {
       // best-effort — see comment above.
     }
@@ -493,8 +505,8 @@ export function putInAwaiting(dir, { id, ask, expectedStatus, parentSnapshotAtAs
  * append-then-refresh tail, same CAS/validation errors — fsm.mjs requires a
  * non-empty `answer` on this edge.
  */
-export function answerAwaiting(dir, { id, answer, expectedStatus, actor } = {}) {
-  return moveWork(dir, { id, to: 'todo', expectedStatus, answer, actor });
+export function answerAwaiting(dir, { id, answer, expectedStatus, role } = {}) {
+  return moveWork(dir, { id, to: 'todo', expectedStatus, answer, role });
 }
 
 /**
@@ -507,7 +519,7 @@ export function answerAwaiting(dir, { id, answer, expectedStatus, actor } = {}) 
  * `expectedStage` CAS decision, and the append all run inside one
  * `withEventsLock`/`appendEventLocked` scope.
  */
-export function moveStage(dir, { id, to, expectedStage, verify, actor } = {}) {
+export function moveStage(dir, { id, to, expectedStage, verify, role } = {}) {
   const { logPath } = paths(dir);
   const event = withEventsLock(logPath, () => {
     const before = rebuildView(logPath);
@@ -517,11 +529,16 @@ export function moveStage(dir, { id, to, expectedStage, verify, actor } = {}) {
     }
 
     const rawEvent = transitionStage({ work, to, expectedStage, verify }); // FsmError: precondition | conflict
-    // Same post-transition actor stamp as moveWork above — stage.mjs is pure
+    // Same post-transition role stamp as moveWork above — stage.mjs is pure
     // and only ever returns the fields it knows about.
-    if (actor !== undefined) {
-      rawEvent.payload.actor = actor;
+    if (role !== undefined) {
+      rawEvent.payload.role = role;
     }
+    // Writer provenance (D8/D15/D17/D18, str46-io-contract) -- same
+    // post-transition stamp as role above, but unconditional: every
+    // moveStage call records who wrote it, never blocking on a malformed
+    // identity (D18).
+    rawEvent.payload.writer = resolveWriterIdentity(dir);
     return appendEventLocked(logPath, rawEvent);
   });
   const view = refreshView(dir);
@@ -697,7 +714,7 @@ export function goalFocusShow(dir) {
 /**
  * Read-only (work-graph-intelligence S8): the stale-doing advisory. Extracts
  * each `doing` item's latest claim timestamp from the raw log (the ts of its
- * most recent `work.move` to `doing`) and its `claimActor` from the view, then
+ * most recent `work.move` to `doing`) and its `claimRole` from the view, then
  * hands them to the pure classifier. Advisory only — it reads, classifies, and
  * suggests; it never moves or reclaims anything.
  */
@@ -714,7 +731,7 @@ export function staleDoingAdvisory(dir, opts = {}) {
   const entries = [];
   for (const id of Object.keys(view.work)) {
     if (view.work[id].status !== 'doing') continue;
-    entries.push({ id, claimActor: view.work[id].claimActor, claimedAt: claimedAt.get(id) });
+    entries.push({ id, claimRole: view.work[id].claimRole, claimedAt: claimedAt.get(id) });
   }
   return classifyStaleDoing(entries, opts);
 }

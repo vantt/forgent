@@ -88,7 +88,7 @@ export const STAGES = DOMAINS[DEFAULT_DOMAIN].stages;
  * replay for those events is cell phase-2-routing-2's concern, not this
  * module's.
  */
-export const SCHEMA_VERSION = 2;
+export const SCHEMA_VERSION = 3;
 
 /**
  * Declared defaults for optional fields (per D7b). This module only

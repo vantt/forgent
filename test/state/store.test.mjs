@@ -18,6 +18,9 @@ import path from 'node:path';
 import { fork } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { addWork, editWork, moveWork, moveStage, addOutcome, addFriction, listWork, readRawEvents, setFocus, StoreError } from '../../src/state/store.mjs';
+import { REGISTRY, ENV, PID, UNRESOLVED } from "../../src/runner/session-identity.mjs";
+
+const WRITER_SOURCES = new Set([REGISTRY, ENV, PID, UNRESOLVED]);
 
 const STORE_MJS = path.resolve(fileURLToPath(import.meta.url), '../../../src/state/store.mjs');
 
@@ -86,7 +89,7 @@ function addSampleWork(dir, id, overrides = {}) {
   });
 }
 
-test('moveWork doing->done composes a learning record reflecting the item\'s actual outcome, friction (by layer), and settlement (by kind/actor)', () => {
+test('moveWork doing->done composes a learning record reflecting the item\'s actual outcome, friction (by layer), and settlement (by kind/role)', () => {
   const dir = tmpDir();
   addSampleWork(dir, 'learn-doing');
   moveWork(dir, { id: 'learn-doing', to: 'doing', expectedStatus: 'todo' });
@@ -109,7 +112,7 @@ test('moveWork doing->done composes a learning record reflecting the item\'s act
   // close (D3) — advance the stage before the doing->done move the learning
   // record is asserted on.
   moveStage(dir, { id: 'learn-doing', to: 'compound-learn' });
-  const { view } = moveWork(dir, { id: 'learn-doing', to: 'done', expectedStatus: 'doing', actor: 'human' });
+  const { view } = moveWork(dir, { id: 'learn-doing', to: 'done', expectedStatus: 'doing', role: 'human' });
 
   assert.ok(view.learnings, 'learnings key must exist once an item has closed');
   const records = view.learnings['learn-doing'];
@@ -129,7 +132,7 @@ test('moveWork proposed->done (the SECOND door into done) also composes a learni
 
   // Pass through compound-learn before the proposed->done close (D3).
   moveStage(dir, { id: 'learn-proposed', to: 'compound-learn' });
-  const { view } = moveWork(dir, { id: 'learn-proposed', to: 'done', expectedStatus: 'proposed', actor: 'human' });
+  const { view } = moveWork(dir, { id: 'learn-proposed', to: 'done', expectedStatus: 'proposed', role: 'human' });
 
   assert.ok(view.learnings?.['learn-proposed'], 'proposed->done must also produce a learning record');
   assert.equal(view.learnings['learn-proposed'].length, 1);
@@ -143,7 +146,7 @@ test('moveWork to done for an item with no outcome and no friction still produce
 
   // Pass through compound-learn before the doing->done close (D3).
   moveStage(dir, { id: 'learn-empty', to: 'compound-learn' });
-  const { view } = moveWork(dir, { id: 'learn-empty', to: 'done', expectedStatus: 'doing', actor: 'human' });
+  const { view } = moveWork(dir, { id: 'learn-empty', to: 'done', expectedStatus: 'doing', role: 'human' });
 
   const record = view.learnings['learn-empty'][0];
   assert.equal(record.outcome, null, 'no outcome recorded -> null, never fabricated');
@@ -167,7 +170,7 @@ test('the learning record rides the SAME work.move event that closes the item �
   const filesBefore = fs.readdirSync(dir).sort();
   const eventsBefore = fs.readFileSync(logPath, 'utf8').split('\n').filter(Boolean).length;
 
-  const { event } = moveWork(dir, { id: 'learn-rebuild', to: 'done', expectedStatus: 'doing', actor: 'human' });
+  const { event } = moveWork(dir, { id: 'learn-rebuild', to: 'done', expectedStatus: 'doing', role: 'human' });
 
   const filesAfter = fs.readdirSync(dir).sort();
   assert.deepEqual(filesAfter, filesBefore, 'no new file appears — the learning record rides the events.jsonl append that already happens');
@@ -198,7 +201,7 @@ test('moveWork stamps branchHeadAtTake onto the appended event payload for a blo
   const dir = tmpDir();
   addSampleWork(dir, 'branch-take', { status: 'blocked' });
 
-  const { event } = moveWork(dir, { id: 'branch-take', to: 'doing', expectedStatus: 'blocked', actor: 'human', branchHeadAtTake: 'branch-deadbeef' });
+  const { event } = moveWork(dir, { id: 'branch-take', to: 'doing', expectedStatus: 'blocked', role: 'human', branchHeadAtTake: 'branch-deadbeef' });
 
   assert.equal(event.payload.branchHeadAtTake, 'branch-deadbeef');
   assert.equal('headAtTake' in event.payload, false, 'a branch take never also stamps the main-based headAtTake');
@@ -207,7 +210,7 @@ test('moveWork stamps branchHeadAtTake onto the appended event payload for a blo
 test('moveWork stamps branchHeadAtReturn onto the appended event payload for a doing -> proposed move that carries it, never headAtReturn', () => {
   const dir = tmpDir();
   addSampleWork(dir, 'branch-return', { status: 'blocked' });
-  moveWork(dir, { id: 'branch-return', to: 'doing', expectedStatus: 'blocked', actor: 'human', branchHeadAtTake: 'branch-deadbeef' });
+  moveWork(dir, { id: 'branch-return', to: 'doing', expectedStatus: 'blocked', role: 'human', branchHeadAtTake: 'branch-deadbeef' });
 
   const { event } = moveWork(dir, { id: 'branch-return', to: 'proposed', expectedStatus: 'doing', branchHeadAtReturn: 'branch-c0ffee' });
 
@@ -219,7 +222,7 @@ test('moveWork omits branchHeadAtTake/branchHeadAtReturn entirely from the event
   const dir = tmpDir();
   addSampleWork(dir, 'branch-absent');
 
-  const { event } = moveWork(dir, { id: 'branch-absent', to: 'doing', expectedStatus: 'todo', actor: 'human', headAtTake: 'main-deadbeef' });
+  const { event } = moveWork(dir, { id: 'branch-absent', to: 'doing', expectedStatus: 'todo', role: 'human', headAtTake: 'main-deadbeef' });
 
   assert.equal('branchHeadAtTake' in event.payload, false);
   assert.equal('branchHeadAtReturn' in event.payload, false);
@@ -575,7 +578,7 @@ test('moveWork allows a doing->done close when every acceptance clause has non-e
   });
   toDoingAtCompoundLearn(dir, 'cos-all-evidenced');
 
-  const { view } = moveWork(dir, { id: 'cos-all-evidenced', to: 'done', expectedStatus: 'doing', actor: 'human' });
+  const { view } = moveWork(dir, { id: 'cos-all-evidenced', to: 'done', expectedStatus: 'doing', role: 'human' });
   assert.equal(view.work['cos-all-evidenced'].status, 'done');
 });
 
@@ -586,10 +589,10 @@ test('moveWork leaves a doing->done close completely unaffected when acceptance 
   toDoingAtCompoundLearn(dir, 'cos-absent');
   toDoingAtCompoundLearn(dir, 'cos-empty');
 
-  const { view: viewAbsent } = moveWork(dir, { id: 'cos-absent', to: 'done', expectedStatus: 'doing', actor: 'human' });
+  const { view: viewAbsent } = moveWork(dir, { id: 'cos-absent', to: 'done', expectedStatus: 'doing', role: 'human' });
   assert.equal(viewAbsent.work['cos-absent'].status, 'done');
 
-  const { view: viewEmpty } = moveWork(dir, { id: 'cos-empty', to: 'done', expectedStatus: 'doing', actor: 'human' });
+  const { view: viewEmpty } = moveWork(dir, { id: 'cos-empty', to: 'done', expectedStatus: 'doing', role: 'human' });
   assert.equal(viewEmpty.work['cos-empty'].status, 'done');
 });
 
@@ -606,7 +609,7 @@ test('moveWork re-reads fresh state on retry: editing in the missing evidence af
 
   editWork(dir, { id: 'cos-retry', patch: { acceptance: [{ text: 'field round-trips', evidence: 'test/state/work.test.mjs:1' }] } });
 
-  const { view } = moveWork(dir, { id: 'cos-retry', to: 'done', expectedStatus: 'doing', actor: 'human' });
+  const { view } = moveWork(dir, { id: 'cos-retry', to: 'done', expectedStatus: 'doing', role: 'human' });
   assert.equal(view.work['cos-retry'].status, 'done', 'the retry must re-read the just-edited evidence, not a cached refusal');
 });
 
@@ -665,4 +668,26 @@ test('setFocus throws StoreError("validation") when the item exists but has no g
     () => setFocus(dir, { id: 'not-a-goal' }),
     (err) => err instanceof StoreError && err.category === 'validation' && /goal tier/.test(err.message),
   );
+});
+// --- writer provenance (D8/D15/D17/D18, str46-io-contract): every event
+// written through editWork, moveWork and moveStage carries a writer
+// object produced by resolveWriterIdentity -- table-driven since the three
+// doors exercise the exact same shape assertion, only the call differs.
+test("editWork, moveWork and moveStage each stamp the event payload with writer id/source, never a joined string, never routed through a validator", () => {
+  const dir = tmpDir();
+  addSampleWork(dir, "writer-a");
+
+  const doors = [
+    { name: "editWork", call: () => editWork(dir, { id: "writer-a", patch: { title: "Writer A edited" } }) },
+    { name: "moveWork", call: () => moveWork(dir, { id: "writer-a", to: "doing", expectedStatus: "todo" }) },
+    { name: "moveStage", call: () => moveStage(dir, { id: "writer-a", to: "compound-learn" }) },
+  ];
+
+  for (const { name, call } of doors) {
+    const { event } = call();
+    const writer = event.payload.writer;
+    assert.ok(writer && typeof writer === "object" && !Array.isArray(writer), name + ": writer must be a nested object, not a joined string");
+    assert.deepEqual(Object.keys(writer).sort(), ["id", "source"], name + ": writer has exactly two children, id and source");
+    assert.ok(WRITER_SOURCES.has(writer.source), name + ": source must be one of registry/env/pid/unresolved");
+  }
 });

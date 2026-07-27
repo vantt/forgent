@@ -1,21 +1,41 @@
 // session-identity.test.mjs -- tests for resolveWriterIdentity (D6,
-// str65-worktree-isolation-enforcement).
+// str65-worktree-isolation-enforcement; D9/D15/D16/D17/D18/D25/D28,
+// str46-io-contract).
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
-import { resolveWriterIdentity, SESSION, PID } from '../../src/runner/session-identity.mjs';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import {
+  resolveWriterIdentity,
+  REGISTRY,
+  ENV,
+  PID,
+  UNRESOLVED,
+} from '../../src/runner/session-identity.mjs';
+
+/** A disposable `.fgos`-shaped directory holding whatever raw sessions.json
+ * body a case needs -- including bodies that are not valid JSON at all. */
+function mkFgosDir(rawRegistryBody) {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-session-identity-'));
+  if (rawRegistryBody !== undefined) {
+    fs.writeFileSync(path.join(dir, 'sessions.json'), rawRegistryBody);
+  }
+  return dir;
+}
 
 test('BEE_SESSION_ID takes precedence over CLAUDE_CODE_SESSION_ID when both set', () => {
-  const result = resolveWriterIdentity({
+  const result = resolveWriterIdentity(undefined, {
     env: { BEE_SESSION_ID: 'bee-session-1', CLAUDE_CODE_SESSION_ID: 'claude-session-2' },
   });
-  assert.deepEqual(result, { identity: 'bee-session-1', kind: SESSION });
+  assert.deepEqual(result, { id: 'bee-session-1', source: ENV });
 });
 
 test('falls back to CLAUDE_CODE_SESSION_ID when BEE_SESSION_ID is unset', () => {
-  const result = resolveWriterIdentity({ env: { CLAUDE_CODE_SESSION_ID: 'claude-session-2' } });
-  assert.deepEqual(result, { identity: 'claude-session-2', kind: SESSION });
+  const result = resolveWriterIdentity(undefined, { env: { CLAUDE_CODE_SESSION_ID: 'claude-session-2' } });
+  assert.deepEqual(result, { id: 'claude-session-2', source: ENV });
 });
 
 test('neither env var set falls back to a 3-hop-capped ancestor pid walk', () => {
@@ -24,8 +44,8 @@ test('neither env var set falls back to a 3-hop-capped ancestor pid walk', () =>
     const pid = Number(args[args.length - 1]);
     return `${chain[pid]}\n`;
   };
-  const result = resolveWriterIdentity({ env: {}, pid: 100, execFile });
-  assert.deepEqual(result, { identity: 70, kind: PID });
+  const result = resolveWriterIdentity(undefined, { env: {}, pid: 100, execFile });
+  assert.deepEqual(result, { id: 70, source: PID });
 });
 
 test('empty-string env values are treated as unset, same ancestor walk fallback', () => {
@@ -34,12 +54,12 @@ test('empty-string env values are treated as unset, same ancestor walk fallback'
     const pid = Number(args[args.length - 1]);
     return `${chain[pid]}\n`;
   };
-  const result = resolveWriterIdentity({
+  const result = resolveWriterIdentity(undefined, {
     env: { BEE_SESSION_ID: '   ', CLAUDE_CODE_SESSION_ID: '' },
     pid: 100,
     execFile,
   });
-  assert.deepEqual(result, { identity: 70, kind: PID });
+  assert.deepEqual(result, { id: 70, source: PID });
 });
 
 test('walk stops early at pid 1 before exhausting 3 hops', () => {
@@ -48,16 +68,20 @@ test('walk stops early at pid 1 before exhausting 3 hops', () => {
     const pid = Number(args[args.length - 1]);
     return `${chain[pid] ?? '1'}\n`;
   };
-  const result = resolveWriterIdentity({ env: {}, pid: 50, execFile });
-  assert.deepEqual(result, { identity: 1, kind: PID });
+  const result = resolveWriterIdentity(undefined, { env: {}, pid: 50, execFile });
+  assert.deepEqual(result, { id: 1, source: PID });
 });
 
-test('ps failure on the very first hop falls back to the caller\'s own pid', () => {
+// D17: the fourth source is a LABEL, never an absent identity. No env value
+// was usable and `ps` was unavailable on the very first hop, so no ancestor
+// could be walked -- the caller's own pid is still handed back, byte-identical
+// to the pre-D9 behaviour, and only `source` records that nothing confirmed it.
+test('unresolved keeps the callers own pid when ps fails on the very first hop', () => {
   const execFile = () => {
     throw new Error('ps: command not found');
   };
-  const result = resolveWriterIdentity({ env: {}, pid: 4242, execFile });
-  assert.deepEqual(result, { identity: 4242, kind: PID });
+  const result = resolveWriterIdentity(undefined, { env: {}, pid: 4242, execFile });
+  assert.deepEqual(result, { id: 4242, source: UNRESOLVED });
 });
 
 test('ps failure after the first successful hop returns the last resolved pid', () => {
@@ -67,8 +91,98 @@ test('ps failure after the first successful hop returns the last resolved pid', 
     if (calls === 1) return '90\n';
     throw new Error('ps failed mid-walk');
   };
-  const result = resolveWriterIdentity({ env: {}, pid: 100, execFile });
-  assert.deepEqual(result, { identity: 90, kind: PID });
+  const result = resolveWriterIdentity(undefined, { env: {}, pid: 100, execFile });
+  assert.deepEqual(result, { id: 90, source: PID });
+});
+
+// --- D28: the registry CONFIRMS an env-supplied id, it never supplies one ---
+
+test('identity resolves from the session registry when the env id matches a row', () => {
+  const fgosDir = mkFgosDir(
+    JSON.stringify([
+      { sessionId: 'other-session', worktreePath: '/tmp/other', pid: 111 },
+      { sessionId: 'session-in-registry', worktreePath: '/tmp/mine', pid: 222 },
+    ]),
+  );
+  const result = resolveWriterIdentity(fgosDir, { env: { BEE_SESSION_ID: 'session-in-registry' } });
+  assert.deepEqual(result, { id: 'session-in-registry', source: REGISTRY });
+});
+
+test('an env id absent from the registry keeps the same value but reports env', () => {
+  const fgosDir = mkFgosDir(JSON.stringify([{ sessionId: 'someone-else', worktreePath: '/tmp/other', pid: 111 }]));
+  const result = resolveWriterIdentity(fgosDir, { env: { BEE_SESSION_ID: 'not-registered' } });
+  assert.deepEqual(result, { id: 'not-registered', source: ENV });
+});
+
+test('a registry row is never matched by directory or by row pid', () => {
+  const fgosDir = mkFgosDir(
+    JSON.stringify([{ sessionId: 'issued-by-fgos', worktreePath: process.cwd(), pid: process.pid }]),
+  );
+  // Same worktree, same live pid, DIFFERENT session id: two agent processes
+  // sharing one worktree must not collapse onto one identity.
+  const result = resolveWriterIdentity(fgosDir, { env: { BEE_SESSION_ID: 'a-different-session' } });
+  assert.deepEqual(result, { id: 'a-different-session', source: ENV });
+});
+
+// D25: this module reads sessions.json with its own fs and is TOLERANT of
+// every shape session.mjs's own reader would throw on -- writeRegistry is a
+// non-atomic writeFileSync, so a half-written file is reachable in practice.
+const CORRUPT_REGISTRIES = [
+  ['no sessions.json at all', undefined],
+  ['not valid JSON', 'not-json-at-all{{{'],
+  ['a half-written array', '[{"sessionId": "session-corrupt", "worktree'],
+  ['a JSON object rather than an array', '{"sessionId": "session-corrupt"}'],
+  ['an array of non-objects', '["session-corrupt", null, 7]'],
+];
+
+for (const [label, body] of CORRUPT_REGISTRIES) {
+  test(`a corrupt registry falls through to env without throwing -- ${label}`, () => {
+    const fgosDir = mkFgosDir(body);
+    const result = resolveWriterIdentity(fgosDir, { env: { BEE_SESSION_ID: 'session-corrupt' } });
+    assert.deepEqual(result, { id: 'session-corrupt', source: ENV });
+  });
+}
+
+test('a corrupt registry falls through to env without throwing -- an unreadable fgosDir path', () => {
+  const result = resolveWriterIdentity('/definitely/not/a/real/fgos/dir', {
+    env: { BEE_SESSION_ID: 'session-corrupt' },
+  });
+  assert.deepEqual(result, { id: 'session-corrupt', source: ENV });
+});
+
+// D18: an identity outside SESSION_ID_RE (session.mjs:48) plus a length cap
+// is DISCARDED at the resolution layer and the next source is tried. This is
+// the one input class whose resolved VALUE deliberately changes: today such a
+// string is returned verbatim and reaches acquireMainCheckoutLock.
+const MALFORMED_ENV_VALUES = [
+  ['a path traversal segment', '../../etc/passwd'],
+  ['a shell metacharacter', 'session;rm -rf /'],
+  ['whitespace inside the value', 'session id with spaces'],
+  ['a slash', 'sessions/abc'],
+  ['a value past the length ceiling', 'a'.repeat(201)],
+];
+
+for (const [label, value] of MALFORMED_ENV_VALUES) {
+  test(`a malformed env value falls through to the next source -- ${label}`, () => {
+    const chain = { 100: '90', 90: '80', 80: '70' };
+    const execFile = (_file, args) => {
+      const pid = Number(args[args.length - 1]);
+      return `${chain[pid]}\n`;
+    };
+    const result = resolveWriterIdentity(undefined, {
+      env: { BEE_SESSION_ID: value },
+      pid: 100,
+      execFile,
+    });
+    assert.deepEqual(result, { id: 70, source: PID });
+  });
+}
+
+test('a malformed env value falls through to the next source -- a valid fallback env var is still used', () => {
+  const result = resolveWriterIdentity(undefined, {
+    env: { BEE_SESSION_ID: 'bad value/with spaces', CLAUDE_CODE_SESSION_ID: 'claude-session-2' },
+  });
+  assert.deepEqual(result, { id: 'claude-session-2', source: ENV });
 });
 
 // Real-process test: proves the 3-hop walk reaches the expected ancestor
@@ -123,8 +237,8 @@ test('3-hop walk reaches the real ancestor across a spawned process chain', { ti
     const [topPid, midPid, leafPid] = chain;
     assert.equal(typeof leafPid, 'number');
 
-    const result = resolveWriterIdentity({ env: {}, pid: leafPid });
-    assert.deepEqual(result, { identity: process.pid, kind: PID });
+    const result = resolveWriterIdentity(undefined, { env: {}, pid: leafPid });
+    assert.deepEqual(result, { id: process.pid, source: PID });
 
     for (const pid of [topPid, midPid, leafPid]) {
       try {

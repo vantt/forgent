@@ -116,7 +116,7 @@ second pass, one attempt, no errors:
 and closed through the normal settlement path — a `clarify-pass` by the
 runner, then a human `close`:
 
-> `{"kind":"clarify-pass","actor":"runner", ...}`, `{"kind":"close","actor":"human", ...}`
+> `{"kind":"clarify-pass","role":"runner", ...}`, `{"kind":"close","role":"human", ...}`
 > — real settlement capture, id `them-view-rollup-theo-bo-cho-item-goc-6ct`
 
 ## Related
