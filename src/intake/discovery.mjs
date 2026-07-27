@@ -25,7 +25,9 @@
 import { modelForTier } from '../runner/dispatch.mjs';
 import { runJudgeExecutor, JUDGE_STRICT_JSON_SUFFIX } from './judge-executor.mjs';
 import { DEFAULTS } from '../state/work.mjs';
-import { listWork, moveStage, addDiscovery, putInAwaiting, StoreError } from '../state/store.mjs';
+import { listWork, moveStage, addDiscovery, putInAwaiting, editWork, StoreError } from '../state/store.mjs';
+import { graphMetrics } from '../state/graph-metrics.mjs';
+import { rankImpact } from '../state/impact.mjs';
 
 const DEFAULT_UNCLEAR_QUESTION =
   'Không phán được rõ ràng — cần người xác nhận thủ công.';
@@ -49,6 +51,29 @@ export const FALLBACK_VERIFY = 'chưa xác định — bổ sung thủ công';
  * with no view (old 2-arg unit-test callers) degrades every added section
  * to a "(không có)"/"(chưa ...)" placeholder instead of throwing.
  */
+// STR8 (D4): terse mechanical graph/impact context for this item, folded from
+// STR43's graphMetrics + STR21's rankImpact — both PURE read-only derives
+// over the same view the judge already has. Only called when `view` is
+// truthy (see the call site's guard) since graphMetrics(view) hashes the view
+// internally and throws on undefined.
+function buildGraphContextBlock(work, view) {
+  const metrics = graphMetrics(view);
+  const ranked = rankImpact(view);
+  const impactEntry = ranked.find((r) => r.id === work.id);
+  const blocks = impactEntry ? impactEntry.blocks : 0;
+  const isStaleBlocked = metrics.staleBlocked.some((entry) => entry.id === work.id);
+  const component = metrics.components.find((c) => c.items.includes(work.id));
+  const componentSize = component ? component.size : 1;
+
+  return [
+    `Item này đang chặn ${blocks} việc khác còn mở (impact/blocks, STR21).`,
+    isStaleBlocked
+      ? 'Item này đang nằm trong danh sách stale-blocked (chờ dep chưa xong).'
+      : 'Item này KHÔNG nằm trong danh sách stale-blocked.',
+    `Kích thước nhóm liên thông (component) chứa item này: ${componentSize} item.`,
+  ].join('\n');
+}
+
 function buildDiscoveryPrompt(work, view) {
   const refs = Array.isArray(work.refs) && work.refs.length ? work.refs.join(', ') : '(none)';
   const deps = Array.isArray(work.deps) && work.deps.length ? work.deps.join(', ') : '(none)';
@@ -77,6 +102,14 @@ function buildDiscoveryPrompt(work, view) {
         .join('\n')
     : '(chưa phán lần nào)';
 
+  // STR8 (D4): mechanical graph/impact context for the judge's intentScore —
+  // read-only, never re-derived by the model. `view` is documented-optional
+  // above (P30 backward-compat, old 2-arg callers pass none); graphMetrics
+  // throws on an undefined view (it hashes the view internally), so this
+  // follows the exact same guard-on-`view`-truthiness idiom `qa`/`history`
+  // already use above rather than calling it unconditionally.
+  const graphContext = view ? buildGraphContextBlock(work, view) : '(không có dữ liệu đồ thị — gọi không kèm view)';
+
   return `# Context-discovery
 
 Bạn đang phán một work item có đủ thông tin để bắt tay THI CÔNG hay chưa.
@@ -86,6 +119,9 @@ Kind: ${work.kind}
 Risk: ${work.risk ?? '(none)'}
 Refs: ${refs}
 Deps: ${deps}
+
+# Ngữ cảnh đồ thị (cơ học, chỉ để tham khảo, không tự suy lại)
+${graphContext}
 
 # Mô tả đầy đủ (nguyên văn lúc submit)
 ${description}
@@ -103,11 +139,14 @@ một \`verify\` chạy được thật.
 # Câu hỏi
 Item này đã đủ rõ để thi công chưa? Nếu đủ, đề xuất một lệnh \`verify\` chạy
 được thật để chứng minh việc đã xong. Nếu chưa đủ, nêu MỘT câu hỏi cụ thể cần
-người trả lời để làm rõ.
+người trả lời để làm rõ. Ngoài ra, dựa trên ngữ cảnh đồ thị ở trên, ước lượng
+mức độ khẩn cấp của item này bằng một số nguyên intentScore từ 0 đến 100
+(0 = không gấp, 100 = cực gấp/nên làm ngay) — trường này TÙY CHỌN, không ảnh
+hưởng đến quyết định clear/unclear.
 
 # Định dạng trả lời
 Trả lời DUY NHẤT bằng một dòng JSON, không kèm chữ nào khác:
-{"clear": boolean, "question": string (chỉ khi clear=false), "verify": string (chỉ khi clear=true)}
+{"clear": boolean, "question": string (chỉ khi clear=false), "verify": string (chỉ khi clear=true), "intentScore": number nguyên từ 0 đến 100 (tùy chọn)}
 `;
 }
 
@@ -138,17 +177,30 @@ export function judgeDiscovery(work, cfg, view) {
       return { clear: false, question: DEFAULT_UNCLEAR_QUESTION };
     }
 
+    // STR8 (D4): intentScore rides on EITHER outcome — it never gates or
+    // changes the clear/unclear decision. An invalid/missing value is
+    // silently omitted (fail-safe discipline, same as `verify`/`question`
+    // above), never thrown, on both return sites below.
+    const intentScore = Number.isInteger(verdict.intentScore) ? verdict.intentScore : undefined;
+
     if (!verdict.clear) {
       const question =
         typeof verdict.question === 'string' && verdict.question.trim()
           ? verdict.question
           : DEFAULT_UNCLEAR_QUESTION;
-      return { clear: false, question };
+      const out = { clear: false, question };
+      if (intentScore !== undefined) {
+        out.intentScore = intentScore;
+      }
+      return out;
     }
 
     const out = { clear: true };
     if (typeof verdict.verify === 'string' && verdict.verify.trim()) {
       out.verify = verdict.verify;
+    }
+    if (intentScore !== undefined) {
+      out.intentScore = intentScore;
     }
     return out;
   } catch {
@@ -185,6 +237,22 @@ export function resolveDiscovery(dir, id, cfg, actor) {
 
   const verdict = judgeDiscovery(work, cfg, view);
   addDiscovery(dir, { id, ...verdict });
+
+  // STR8 (D4): a SECOND standard-door write, never merged into moveStage's or
+  // putInAwaiting's payload below — intent is scored on EITHER outcome (an
+  // unclear verdict still gets scored if the judge produced one; the item
+  // just doesn't advance stage). Wrapped in its own try/catch so a write-door
+  // rejection (e.g. a legacy item shape editWork's validateWork rejects)
+  // never aborts the clarify/unclear resolution that follows — same
+  // file-level fail-safe discipline this module's header states for
+  // judgeDiscovery itself.
+  if (Number.isInteger(verdict.intentScore)) {
+    try {
+      editWork(dir, { id, patch: { intent: verdict.intentScore }, actor });
+    } catch {
+      // Swallowed intentionally — see comment above.
+    }
+  }
 
   if (verdict.clear) {
     moveStage(dir, {
