@@ -289,6 +289,21 @@ function applyEvent(view, event) {
       }
       break;
     }
+    case 'goal.focus': {
+      // Additive event type (per str67-goal-directed-planning D3/D4): the
+      // single persisted pointer to the currently active goal id — a
+      // scalar OVERWRITE (last-write-wins), never merged like work.outcome
+      // above (D4: exactly one active focus at a time). `focus` is a LAZY
+      // key exactly like `outcomes`/`frictions`/`gates`: absent from the
+      // view until the first goal.focus event folds, so replaying a
+      // pre-STR67 log produces a view shaped exactly as before this event
+      // type existed (backward-compat).
+      const { id } = event.payload ?? {};
+      if (typeof id === 'string') {
+        view.focus = id;
+      }
+      break;
+    }
     case 'work.friction': {
       // Additive event type (per D7 schema evolution, mirroring work.outcome
       // above) — but with the OPPOSITE fold rule: one friction record per
