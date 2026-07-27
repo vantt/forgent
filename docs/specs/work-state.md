@@ -279,11 +279,15 @@ tách thành các việc con độc lập hay không.
 - **Chia (decompose)** — phán sinh ra n ≥ 1 item con ĐỘC LẬP, mỗi con mang:
   field `parent` trỏ về item gốc (lineage — xem Data Dictionary #13), `deps`
   giữa các con nếu phán đề xuất (dùng nghĩa `deps` sẵn có, không phải trường
-  mới), và một `verify` THẬT — con bỏ qua clarify nên chính phán chia-việc là
-  nơi duy nhất sản xuất verify đó, không bao giờ để lại placeholder. Sinh đủ
-  con xong, gốc chuyển `decompose → executing` ngay — gốc KHÔNG tự động
-  `done`; nó chỉ dispatch-được khi mọi con đã `done` (xem bộ lọc frontier
-  lineage dưới).
+  mới), một `verify` THẬT — con bỏ qua clarify nên chính phán chia-việc là
+  nơi duy nhất sản xuất verify đó, không bao giờ để lại placeholder — và tùy
+  chọn một `footprint` (cùng nghĩa `footprint` sẵn có ở trên, feed cố-vấn
+  `fgos conflicts`) khi phán đề xuất đường-dẫn file con đó dự kiến chạm; phán
+  không nêu, hoặc nêu sai hình dạng (không phải mảng chuỗi) → con đó ghi
+  KHÔNG có `footprint` (vắng, không phải mảng rỗng), không bao giờ làm hỏng cả
+  verdict chia. Sinh đủ con xong, gốc chuyển `decompose → executing` ngay —
+  gốc KHÔNG tự động `done`; nó chỉ dispatch-được khi mọi con đã `done` (xem bộ
+  lọc frontier lineage dưới).
 - **Cần người quyết (need-human)** — rơi vào cổng có điều kiện khi (a) phán
   tự báo mơ hồ không tách được rành mạch, hoặc (b) item gốc mang risk `heavy`
   (ngưỡng risk cao ánh xạ thẳng vào giá trị risk sẵn có từ classify). Item đậu
