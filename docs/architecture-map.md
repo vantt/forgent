@@ -1,12 +1,14 @@
 # Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký
 
-**Phiên bản:** v0.5. **Trạng thái:** CHUẨN — chấp nhận 2026-07-16, record
+**Phiên bản:** v0.6. **Trạng thái:** CHUẨN — chấp nhận 2026-07-16, record
 [0010](decisions/0010-ban-do-kien-truc-la-ban-chuan.md); nâng v0.3 theo record
 [0012](decisions/0012-typed-edge-model-supersedes-deps-parent-separation.md);
 nâng v0.4 theo record
 [0013](decisions/0013-discovered-from-runner-report-channel.md); nâng v0.5
 theo record
-[0015](decisions/0015-doi-ten-ctr-cho-contract.md).
+[0015](decisions/0015-doi-ten-ctr-cho-contract.md); nâng v0.6 theo record
+[0017](decisions/0017-dong-audit-he-id-ten-goi.md) (§12 thêm dòng id-systems-audit,
+Phụ lục B mới — sổ đăng ký 13 hệ id/tên gọi).
 
 Chưng từ tài liệu bàn luận ở xưởng và hai deep-dive distillery (`work-item-management`,
 `work-item-schema-and-io-contracts`); v0.2 sửa theo hai vòng tự phản biện có kiểm
@@ -503,6 +505,7 @@ Ba bản ghi, ba câu hỏi, không giẫm chân:
 | `docs/specs/system-overview.md` + area specs | hệ **LÀM GÌ** (BA-grade, tech-agnostic) | entity nghiệp vụ, luồng nghiệp vụ |
 | `docs/architecture-map.md` (file này) | code **Ở ĐÂU** + ranh giới **KÝ GÌ** | tầng, tag, hai sổ đăng ký |
 | `docs/backlog.md` | **SẮP LÀM GÌ** | PBI — mọi row `planned` §6 phải trỏ về một PBI ở đây |
+| `docs/id-systems-audit.md` (nguồn) / Phụ lục B (file này, bản tóm tắt) | mọi id/tên gọi **KÝ HIỆU GÌ** (prefix, hình dạng, hệ nào sống ở đâu) | sổ đăng ký 13 hệ id/naming (STR47) |
 
 Entity xuất hiện ở cả hai bản đồ cross-link qua contract: work item ↔ CTR002 ·
 human-gate ↔ CTR004 · outcome ↔ CTR002 · handoff ↔ CTR006. Bản đồ nằm trong đường đọc
@@ -521,6 +524,30 @@ chuẩn: `docs/specs/reading-map.md` + mục lục README (nối tại record AD
 
 Tiêu chí cắt khác nhau ở mỗi bậc — class cắt theo actor, service cắt theo
 deploy/team, agent cắt theo kinh tế context-window và tính phi tất định.
+
+---
+
+## Phụ lục B · Sổ đăng ký hệ id/tên gọi (STR47, record ADR0017)
+
+Bản tóm tắt — nguồn đầy đủ + bằng chứng file:line: `docs/id-systems-audit.md`.
+
+| Prefix/hình dạng | Hệ | Tầng |
+|---|---|---|
+| `tsk-<hash>` (+ `-<n>` con) | Task (`work.id`) | fgOS — sản phẩm |
+| `STR<n>` | Story (backlog PBI) | fgOS — sản phẩm |
+| `ADR<n>` (trích rút gọn của `NNNN-slug.md`) | Decision record | fgOS — sản phẩm |
+| `RUL<n>` (không unique toàn cục, kèm tên area khi trích ngoài spec gốc) | Business rule | fgOS — sản phẩm |
+| `CTR<n>` (3-digit zero-pad) | Contract (sổ §7 file này) | fgOS — sản phẩm |
+| `D<hex>` (8-hex khi trích) | Quyết định toàn xưởng | bee — giàn giáo tạm |
+| `D<n>` (số nguyên nhỏ) | Quyết định cục bộ 1 feature — **không bao giờ trích ngoài `CONTEXT.md` gốc** | bee — giàn giáo tạm |
+| `<feature>-N` | cell-id | bee — giàn giáo tạm |
+| kebab tự do | feature slug | bee — giàn giáo tạm |
+| `P1`/`P2`/`P3` | Severity | bee — giàn giáo tạm |
+
+Ranh giới: cột fgOS là **sản phẩm vĩnh viễn** (fgOS tự sinh/tự đọc được, không
+phụ thuộc bee); cột bee là **giàn giáo tạm** cho giai đoạn xây fgOS — giữ
+nguyên định dạng hiện tại, không đầu tư đổi tên/migrate (khung quyết định:
+`docs/decisions/0004-pham-vi-va-non-goal.md`, chốt tại `docs/decisions/0017-...md`).
 
 ---
 
