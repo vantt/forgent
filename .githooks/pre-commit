@@ -42,10 +42,10 @@ function refuse(message) {
 function main() {
   const repoRoot = path.resolve(__dirname, '..');
   const fgosDir = path.join(repoRoot, '.fgos');
-  const { identity } = resolveWriterIdentity();
+  const { id } = resolveWriterIdentity(fgosDir);
   const ttlMs = resolveTtlMs();
 
-  const result = acquireMainCheckoutLock(fgosDir, { identity, ttlMs });
+  const result = acquireMainCheckoutLock(fgosDir, { identity: id, ttlMs });
 
   if (result.status === HELD) {
     refuse('commit refused: another session appears to be actively working in this checkout.');
