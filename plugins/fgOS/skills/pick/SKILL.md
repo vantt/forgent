@@ -4,7 +4,7 @@ description: >-
   Use when the user wants to claim the next fgOS work item (or a specific
   one) and start working on it from inside a Claude Code session, invoked
   as /fgOS:pick [id]. Claims the item through fgOS's own pick verb (session
-  actor, one-door-write), stands up its isolated worktree, and hands the
+  role, one-door-write), stands up its isolated worktree, and hands the
   current session into that worktree so work can begin immediately.
   Examples: "/fgOS:pick", "/fgOS:pick build-cli".
 ---

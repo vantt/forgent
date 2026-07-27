@@ -26,10 +26,10 @@ the fix is a new dimension, not a new value squeezed into the old one.
 ## Extending the domain still means auditing every consumer
 
 Even with the right shape, adding a new value to an *existing* dimension (a new
-stage, a new actor kind, a new status) is not free. The same failure shape has
+stage, a new role kind, a new status) is not free. The same failure shape has
 recurred across multiple features: a stage value gets added to the schema/enum,
 but some consumer — a settlement guard anchored to a literal `to === 'executing'`
-check, a claim-reclaim routine (`startupReap`) that is blind to which actor kind
+check, a claim-reclaim routine (`startupReap`) that is blind to which role kind
 now holds a claim, a counter in the reporting layer — never learns about it,
 because it matches on the literal string rather than reading the shared
 constant. One audit pass at the time a new value is introduced is not enough,

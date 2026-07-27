@@ -36,7 +36,8 @@ record kèm nâng version — supersede, không sửa ngầm.
    đóng một lỗ hổng chu trình cha-con sống (benign) mà bản đồ chưa từng khai.
 3. "deps và parent tách rời có chủ đích" (decision ADR0002) được supersede: tách
    rời về lưu trữ vẫn giữ, nhưng hợp nhất thành một đồ thị cho cycle-check +
-   compute. Không đổi schema, `SCHEMA_VERSION` giữ 2, không có row §6/manifest
+   compute. Không đổi schema tại thời điểm đó — `SCHEMA_VERSION` khi ấy vẫn là
+   2 (nay đã lên 3, per D19/D27 str46-io-contract), không có row §6/manifest
    mới (mở rộng module đã có, không tạo module mới).
 
 **Changelog v0.3 → v0.4** (record [0013](decisions/0013-discovered-from-runner-report-channel.md) — mở rộng CTR003, không supersede):
@@ -47,9 +48,10 @@ record kèm nâng version — supersede, không sửa ngầm.
    hiện; worker vẫn KHÔNG BAO GIỜ gọi `fgos` hay ghi `.fgos/` — RUNNER đọc
    khối đó và tự tạo item với `discoveredFrom` trỏ về việc đang chạy. Bảo đảm
    runner-một-cửa-ghi (D3) giữ nguyên tuyệt đối.
-2. Không đổi schema, không module mới, không row §6/manifest mới — `loop.mjs`
-   và `dispatch.mjs` đã có (mở rộng tại chỗ). Trường `discoveredFrom` là lineage
-   phi-chặn (loại khỏi cycle-check theo thiết kế), cưỡi `SCHEMA_VERSION` 2.
+2. Không đổi schema tại thời điểm đó, không module mới, không row §6/manifest
+   mới — `loop.mjs` và `dispatch.mjs` đã có (mở rộng tại chỗ). Trường `discoveredFrom`
+   là lineage phi-chặn (loại khỏi cycle-check theo thiết kế), cưỡi SCHEMA_VERSION
+   khi ấy vẫn là 2 (nay đã lên 3, per D19/D27 str46-io-contract).
 
 **Changelog v0.4 → v0.5** (record [0015](decisions/0015-doi-ten-ctr-cho-contract.md) — đổi tên định danh, không supersede):
 

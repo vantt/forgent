@@ -65,7 +65,8 @@ mở rộng hợp đồng C3 (orchestrator ↔ worker) — không supersede gì:
 - **Runner vẫn một-cửa-ghi (D3).** Worker phát dữ liệu; RUNNER ghi. Không có
   đường ghi song song mới nào mở ra.
 - **`discoveredFrom` là lineage phi-chặn** — loại khỏi cycle-check theo thiết kế
-  (nó không phải cạnh phụ-thuộc), cưỡi `SCHEMA_VERSION` 2 (trường lazy additive).
+  (nó không phải cạnh phụ-thuộc), cưỡi SCHEMA_VERSION lúc bằng 2 tại thời điểm
+  đó (nay đã lên 3, per D19/D27 str46-io-contract) — trường lazy additive.
 - **C3 mở rộng, có tên, không sửa ngầm.** architecture-map v0.3 → v0.4: hàng C3
   thêm mệnh đề kênh khám-phá; §11 changelog ghi delta. Không module mới, không
   row §6/manifest mới — `loop.mjs`/`dispatch.mjs` mở rộng tại chỗ.
