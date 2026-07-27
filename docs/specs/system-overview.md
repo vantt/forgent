@@ -18,6 +18,7 @@ coverage: partial
 - runner — vòng tự hành: lấy việc từ frontier, giao trợ lý nền trong nhánh cô lập, tự chấm, ghi đề xuất chờ duyệt; spec: runner.md
 - fgos-plugin — bề mặt slash-command `/fgOS:<verb>` cho Claude Code, 12 verb wrapper one-door-write bọc quanh CLI `fgos`; spec: fgos-plugin.md
 - distribution — cài `fgos` từ ngoài source repo (npm install qua GitHub); spec: distribution.md
+- decision-citation-drift — quét backlog/spec tìm dòng còn trích một quyết định đã bị supersede mà không nhắc quyết định thay thế (chỉ phát hiện, không tự sửa); spec: decision-citation-drift.md
 - distillery — vùng học từ reference sources: index feature từng nguồn, so sánh chéo, porting log; spec: chưa có (harvest sẽ viết)
 - distill-skill — skill portable vận hành vòng học (init/add/delta/seal/check); spec: chưa có (harvest sẽ viết)
 
