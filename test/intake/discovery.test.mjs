@@ -5,6 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { judgeDiscovery, resolveDiscovery } from '../../src/intake/discovery.mjs';
 import { addWork, listWork, StoreError, categoryOf, putInAwaiting, answerAwaiting } from '../../src/state/store.mjs';
+import { appendEvent, readEvents } from '../../src/state/events.mjs';
 
 // Fake executors only — every "command" spawned here is a node script this
 // file writes to a mkdtemp directory at test time, mirroring dispatch.test.mjs's
@@ -443,4 +444,168 @@ test('resolveDiscovery threads the real store view so a re-judge after an answer
   // asserts on what the model actually saw.
   assert.match(verdict.verdict.verify, /Bỏ hardcode tên trunk "main" trong merge engine\./);
   assert.match(verdict.verdict.verify, /CHỐT: auto-detect, fallback "main"\. KHÔNG hỏi thêm\./);
+});
+
+// --- STR8 (D4): judgeDiscovery gains an optional intentScore, computed from
+// STR43's graphMetrics + STR21's rankImpact context, never gating clear/unclear -
+
+test('judgeDiscovery includes a valid integer intentScore on a clear verdict', () => {
+  const dir = mkTempDir();
+  const scriptPath = writeVerdictExecutor(dir, { clear: true, verify: 'ok', intentScore: 72 });
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+  const verdict = judgeDiscovery(sampleWork(), cfg);
+  assert.deepEqual(verdict, { clear: true, verify: 'ok', intentScore: 72 });
+});
+
+test('judgeDiscovery includes a valid integer intentScore on an unclear verdict too (not gated on clear)', () => {
+  const dir = mkTempDir();
+  const scriptPath = writeVerdictExecutor(dir, { clear: false, question: 'Which file?', intentScore: 15 });
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+  const verdict = judgeDiscovery(sampleWork(), cfg);
+  assert.deepEqual(verdict, { clear: false, question: 'Which file?', intentScore: 15 });
+});
+
+test('judgeDiscovery omits intentScore (never throws) when the model supplies a missing or non-integer value', () => {
+  const cases = [
+    { label: 'missing', raw: { clear: true, verify: 'ok' } },
+    { label: 'string', raw: { clear: true, verify: 'ok', intentScore: '80' } },
+    { label: 'float', raw: { clear: true, verify: 'ok', intentScore: 12.5 } },
+    { label: 'null', raw: { clear: true, verify: 'ok', intentScore: null } },
+  ];
+  for (const { label, raw } of cases) {
+    const dir = mkTempDir();
+    const scriptPath = writeVerdictExecutor(dir, raw);
+    const cfg = cfgFor([scriptPath, '{prompt}']);
+    let verdict;
+    assert.doesNotThrow(() => {
+      verdict = judgeDiscovery(sampleWork(), cfg);
+    }, `case: ${label}`);
+    assert.equal('intentScore' in verdict, false, `case: ${label}`);
+  }
+});
+
+test('the judge prompt states the intentScore response-format range as 0 to 100', () => {
+  const dir = mkTempDir();
+  const scriptPath = echoPromptExecutor(dir);
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+  const verdict = judgeDiscovery(sampleWork(), cfg);
+  assert.match(verdict.verify, /intentScore[^\n]*0[^\n]*100/);
+});
+
+test('judgeDiscovery with a view embeds the exact graph-context heading and mechanical graph/impact numbers (STR8 D4)', () => {
+  const dir = mkTempDir();
+  const scriptPath = echoPromptExecutor(dir);
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+  const work = sampleWork();
+  // item-y depends on item-x -> item-x blocks 1 open item, and both land in
+  // the same connected component (size 2) via the undirected deps edge.
+  const blocked = sampleWork({ id: 'item-y', deps: ['item-x'] });
+  const view = { work: { [work.id]: work, [blocked.id]: blocked } };
+  const verdict = judgeDiscovery(work, cfg, view);
+  assert.match(verdict.verify, /# Ngữ cảnh đồ thị \(cơ học, chỉ để tham khảo, không tự suy lại\)/);
+  assert.match(verdict.verify, /chặn 1 việc khác còn mở/);
+  assert.match(verdict.verify, /nhóm liên thông.*2 item/);
+});
+
+test('judgeDiscovery with a view but no graph edges degrades the graph-context section without throwing', () => {
+  const dir = mkTempDir();
+  const scriptPath = echoPromptExecutor(dir);
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+  const work = sampleWork();
+  const view = { work: { [work.id]: work } };
+  const verdict = judgeDiscovery(work, cfg, view);
+  assert.match(verdict.verify, /# Ngữ cảnh đồ thị \(cơ học, chỉ để tham khảo, không tự suy lại\)/);
+  assert.match(verdict.verify, /chặn 0 việc khác còn mở/);
+});
+
+// --- STR8 (D4): resolveDiscovery writes `intent` via a second, try/catch-
+// wrapped editWork call, right after addDiscovery, before the clear/unclear
+// branch -----------------------------------------------------------------
+
+test('resolveDiscovery writes intent when a clear verdict carries a valid integer intentScore', () => {
+  const scriptDir = mkTempDir();
+  const scriptPath = writeVerdictExecutor(scriptDir, {
+    clear: true,
+    verify: 'npm test -- discovered',
+    intentScore: 88,
+  });
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork());
+
+  resolveDiscovery(storeDir, 'item-x', cfg);
+  const view = listWork(storeDir);
+  assert.equal(view.work['item-x'].intent, 88);
+});
+
+test('resolveDiscovery writes intent when an unclear verdict carries a valid integer intentScore too (not gated on clear)', () => {
+  const scriptDir = mkTempDir();
+  const scriptPath = writeVerdictExecutor(scriptDir, { clear: false, question: 'Which file?', intentScore: 40 });
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork());
+
+  resolveDiscovery(storeDir, 'item-x', cfg);
+  const view = listWork(storeDir);
+  assert.equal(view.work['item-x'].intent, 40);
+});
+
+test('resolveDiscovery leaves intent absent when the verdict carries no intentScore', () => {
+  const scriptDir = mkTempDir();
+  const scriptPath = writeVerdictExecutor(scriptDir, { clear: true, verify: 'npm test -- discovered' });
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork());
+
+  resolveDiscovery(storeDir, 'item-x', cfg);
+  const view = listWork(storeDir);
+  assert.equal(view.work['item-x'].intent, undefined);
+});
+
+test('resolveDiscovery writes EXACTLY ONE work.edit event carrying intent per call (no duplicate write)', () => {
+  const scriptDir = mkTempDir();
+  const scriptPath = writeVerdictExecutor(scriptDir, {
+    clear: true,
+    verify: 'npm test -- discovered',
+    intentScore: 55,
+  });
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork());
+
+  resolveDiscovery(storeDir, 'item-x', cfg);
+
+  const events = readEvents(path.join(storeDir, 'events.jsonl'));
+  const intentEdits = events.filter(
+    (e) => e.type === 'work.edit' && e.payload?.id === 'item-x' && e.payload?.patch?.intent !== undefined,
+  );
+  assert.equal(intentEdits.length, 1);
+});
+
+test('resolveDiscovery still completes clear/unclear resolution when editWork throws for a corrupted item shape (STR8 D4 fail-safe)', () => {
+  const scriptDir = mkTempDir();
+  const scriptPath = writeVerdictExecutor(scriptDir, {
+    clear: true,
+    verify: 'npm test -- discovered',
+    intentScore: 60,
+  });
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  const logPath = path.join(storeDir, 'events.jsonl');
+  // Bypass the normal addWork write door to plant a corrupted item shape
+  // (empty `risk`) — replay never validates on fold, so it reads back fine,
+  // but editWork's validateWork rejects it when merging the intent patch.
+  // This proves resolveDiscovery's try/catch around editWork never aborts
+  // the moveStage/putInAwaiting resolution that follows.
+  appendEvent(logPath, { type: 'work.add', payload: { ...sampleWork(), risk: '' } });
+
+  assert.doesNotThrow(() => resolveDiscovery(storeDir, 'item-x', cfg));
+  const view = listWork(storeDir);
+  assert.equal(view.work['item-x'].stage, 'decompose');
+  assert.equal(view.work['item-x'].intent, undefined);
 });

@@ -813,10 +813,44 @@ async function runVerb(verb, flags, positional, dir) {
       if (flags.acceptance !== undefined) {
         patch.acceptance = parseAcceptanceFlag(flags.acceptance, 'edit --acceptance requires a JSON-encoded array of {text, evidence} clauses.');
       }
+      // Priority/intent (per str7-str8-priority-intent D1/D3/D6): both are
+      // numeric fields, unlike the string flags in the loop above, so each
+      // gets its own coercion. parseArgs sets flags[field] = true (boolean)
+      // when the flag is given with no following value — Number(true) === 1,
+      // which would silently write priority:1/intent:1 for a bare
+      // `--priority`/`--intent` with nothing after it. Guard against that
+      // BEFORE coercing: a valueless flag is a validation error, never a
+      // silent 1.
+      if (flags.priority !== undefined) {
+        if (flags.priority === true) {
+          throw new StoreError('validation', '--priority requires a numeric value.');
+        }
+        const priority = Number(flags.priority);
+        if (!Number.isInteger(priority)) {
+          throw new StoreError(
+            'validation',
+            `--priority must be an integer, got: ${JSON.stringify(flags.priority)}`,
+          );
+        }
+        patch.priority = priority;
+      }
+      if (flags.intent !== undefined) {
+        if (flags.intent === true) {
+          throw new StoreError('validation', '--intent requires a numeric value.');
+        }
+        const intent = Number(flags.intent);
+        if (!Number.isInteger(intent)) {
+          throw new StoreError(
+            'validation',
+            `--intent must be an integer, got: ${JSON.stringify(flags.intent)}`,
+          );
+        }
+        patch.intent = intent;
+      }
       if (Object.keys(patch).length === 0) {
         throw new StoreError(
           'validation',
-          'edit requires at least one field to change: --title/--kind/--risk/--verify/--tier/--refs/--deps/--acceptance.',
+          'edit requires at least one field to change: --title/--kind/--risk/--verify/--tier/--refs/--deps/--acceptance/--priority/--intent.',
         );
       }
       const { event } = editWork(dir, { id, patch, actor: 'human' });

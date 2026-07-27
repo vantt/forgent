@@ -147,6 +147,28 @@ export function validateWorkShape(work) {
       `work.domain must be one of ${JSON.stringify(Object.keys(DOMAINS))} when present, got: ${JSON.stringify(work.domain)}`,
     );
   }
+  // Priority (per str7-str8-priority-intent D1): OPTIONAL additive integer —
+  // ascending sort, human/agent-set via `fgos edit --priority`. Validated
+  // only when present (same optional-additive shape as tier/domain above);
+  // must be a non-negative integer — negative priorities are rejected here
+  // so the frontier comparator never has to special-case a sign. NOT in
+  // DEFAULTS (D1): absent stays absent, sorts after every item that has an
+  // explicit priority.
+  if (work.priority !== undefined && !(Number.isInteger(work.priority) && work.priority >= 0)) {
+    throw new WorkValidationError(
+      `work.priority must be a non-negative integer when present, got: ${JSON.stringify(work.priority)}`,
+    );
+  }
+  // Intent (per str7-str8-priority-intent D4/D6): OPTIONAL additive integer
+  // score, computed by the clarify-stage LLM judge. Descending sort,
+  // absent-last (D6) — no sign/bound constraint is locked (the concrete
+  // scale is Slice 2's discretion), so only integer-ness is checked here.
+  // NOT in DEFAULTS: absent stays absent.
+  if (work.intent !== undefined && !Number.isInteger(work.intent)) {
+    throw new WorkValidationError(
+      `work.intent must be an integer when present, got: ${JSON.stringify(work.intent)}`,
+    );
+  }
   if (work.stage !== undefined) {
     // Domain-aware per base-workflow-model D2/D3: look up the item's own
     // domain's stage list instead of the flat STAGES constant, so a future

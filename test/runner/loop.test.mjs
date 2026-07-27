@@ -8,7 +8,8 @@ import { pathToFileURL } from 'node:url';
 import { initStore, addWork, moveWork, listWork, readRawEvents, readyWork } from '../../src/state/store.mjs';
 import { appendEvent } from '../../src/state/events.mjs';
 import { createWorktree, removeWorktree, createBranchRef, branchNameFor } from '../../src/runner/worktree.mjs';
-import { runOnce, resolveRepoRoot } from '../../src/runner/loop.mjs';
+import { runOnce, runWatch, resolveRepoRoot } from '../../src/runner/loop.mjs';
+import { createMissBreaker } from '../../src/runner/anti-loop.mjs';
 
 // Fake executors only — every "worker" spawned here is a node script this
 // file writes into a mkdtemp directory. Every test builds its own
@@ -1363,4 +1364,134 @@ test('resolveRepoRoot: a git repo with at least one commit still returns the rep
   const repoRoot = initTempRepo();
 
   assert.equal(resolveRepoRoot(repoRoot), fs.realpathSync(repoRoot));
+});
+
+
+// --- runWatch (D7/D8/D9): the persistent --watch loop mode -----------------
+// Level-triggered ("did the last cycle commit anything?") instead of an
+// EventEmitter listener -- see decision d3445024 (loop.mjs's own runWatch
+// doc comment) for why the listener shape was rejected in validation.
+
+test('runWatch: a cycle that committed is followed by an immediate next cycle; a cycle that committed nothing is followed by a next cycle only after roughly pollFallbackMs', async () => {
+  const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
+  seedItem(dir, { id: 'item-watch-timing' });
+  const config = configFor(writeCommittingExecutor(scriptDir, counterFile));
+  const pollFallbackMs = 300;
+  const timestamps = [];
+  const controller = new AbortController();
+
+  await runWatch({
+    repoRoot,
+    dir,
+    config,
+    worktreeDir,
+    pollFallbackMs,
+    signal: controller.signal,
+    log: noLog,
+    onCycle: () => {
+      timestamps.push(Date.now());
+      if (timestamps.length >= 3) controller.abort();
+    },
+  });
+
+  assert.equal(timestamps.length, 3, 'collected exactly 3 cycles before aborting');
+  // cycle 1 dispatches+proposes the seeded item (commits) -> cycle 2 starts
+  // immediately, with no artificial wait; cycle 2 itself is a cheap idle poll
+  // (the item is already proposed, nothing left to dispatch), so this gap is
+  // dominated by cycle 2's own tiny duration, not by pollFallbackMs.
+  const immediateGap = timestamps[1] - timestamps[0];
+  // cycle 2 committed nothing (idle) -> runWatch waits ~pollFallbackMs before
+  // cycle 3 starts.
+  const waitedGap = timestamps[2] - timestamps[1];
+  assert.ok(immediateGap < pollFallbackMs / 2, `expected the post-commit gap (${immediateGap}ms) to be well under pollFallbackMs (${pollFallbackMs}ms)`);
+  assert.ok(waitedGap >= pollFallbackMs - 20, `expected the post-idle gap (${waitedGap}ms) to be roughly pollFallbackMs (${pollFallbackMs}ms)`);
+  assert.ok(waitedGap > immediateGap, 'the waited (idle) gap is clearly larger than the immediate (committed) gap');
+});
+
+test('runWatch stops promptly when its AbortSignal aborts mid-wait, and resolves cleanly without throwing', async () => {
+  const { repoRoot, dir, worktreeDir } = setup(); // empty frontier -- idle every cycle
+  const pollFallbackMs = 2000;
+  const controller = new AbortController();
+  setTimeout(() => controller.abort(), 30);
+
+  const started = Date.now();
+  await runWatch({ repoRoot, dir, worktreeDir, pollFallbackMs, signal: controller.signal, log: noLog });
+  const elapsed = Date.now() - started;
+
+  assert.ok(elapsed < pollFallbackMs / 2, `expected runWatch to resolve promptly on abort (took ${elapsed}ms, pollFallbackMs was ${pollFallbackMs}ms)`);
+});
+
+test('runWatch threads the SAME breaker instance into every cycle: misses accumulate ACROSS cycles past what one dispatch alone could reach (D9 cross-cycle sharing)', async () => {
+  const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
+  seedItem(dir, { id: 'item-watch-breaker' });
+  // commits junk.txt, but verify demands output.txt -> every attempt misses.
+  const config = configFor(writeCommittingExecutor(scriptDir, counterFile, 'junk.txt'));
+  const breaker = createMissBreaker(); // default threshold, BREAKER_MISSES = 3
+  const results = [];
+  const controller = new AbortController();
+
+  await runWatch({
+    repoRoot,
+    dir,
+    config,
+    worktreeDir,
+    breaker,
+    pollFallbackMs: 5,
+    signal: controller.signal,
+    log: noLog,
+    onCycle: (result) => {
+      results.push(result);
+      if (results.length === 1) {
+        // cycle 1's own retry cap (2 attempts) cannot reach the default
+        // threshold (3) on its own -- resume the item so a SECOND cycle
+        // dispatches it again, against the SAME breaker instance.
+        assert.equal(breaker.consecutiveMissesFor('item-watch-breaker'), 2, "one dispatch alone never reaches the default threshold");
+        moveWork(dir, { id: 'item-watch-breaker', to: 'todo', expectedStatus: 'blocked', actor: 'human', reason: 'test-resume' });
+      } else {
+        controller.abort();
+      }
+    },
+  });
+
+  assert.equal(results.length, 2);
+  assert.equal(results[0].dispatched[0].outcome, 'parked');
+  assert.equal(results[0].dispatched[0].attempts, 2);
+  // cycle 2's FIRST attempt alone pushes the SAME breaker's streak from 2 to
+  // 3, tripping it immediately (attempts: 1, retry vetoed) -- reachable only
+  // because the breaker persisted across cycles.
+  assert.equal(results[1].dispatched[0].outcome, 'halted');
+  assert.equal(results[1].dispatched[0].reason, 'breaker-tripped');
+  assert.equal(results[1].dispatched[0].attempts, 1);
+  assert.equal(breaker.consecutiveMissesFor('item-watch-breaker'), 3);
+});
+
+test('runWatch catches a runOnce throw, reports it via onCycle with outcome "error", and keeps looping instead of terminating', async () => {
+  const { repoRoot, dir, worktreeDir } = setup(); // empty frontier -- reaches the idle log call every cycle
+  let logCalls = 0;
+  const flakyLog = () => {
+    logCalls += 1;
+    if (logCalls === 1) throw new Error('injected-log-throw'); // only the first cycle's log call throws
+  };
+  const results = [];
+  const controller = new AbortController();
+
+  await runWatch({
+    repoRoot,
+    dir,
+    worktreeDir,
+    pollFallbackMs: 5,
+    signal: controller.signal,
+    log: flakyLog,
+    onCycle: (result) => {
+      results.push(result);
+      if (results.length >= 3) controller.abort();
+    },
+  });
+
+  assert.equal(results.length, 3, 'the injected throw did not end the watch loop early');
+  assert.equal(results[0].outcome, 'error');
+  assert.match(results[0].error.message, /injected-log-throw/);
+  // the loop kept going and ran at least 2 more cycles successfully
+  assert.equal(results[1].outcome, 'idle');
+  assert.equal(results[2].outcome, 'idle');
 });

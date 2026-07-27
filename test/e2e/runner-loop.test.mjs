@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { execFileSync, spawnSync } from 'node:child_process';
+import { execFileSync, spawnSync, spawn } from 'node:child_process';
 
 // e2e — the runner's own binary (bin/fgos-runner.mjs), exercised as a real
 // child process against a real, disposable git repo, alongside the CLI
@@ -831,4 +831,101 @@ test('e2e crash-idempotency: runner killed mid-item (after doing, before propose
   // this repo — the killed first attempt's checkout and the second
   // attempt's own throwaway reap checkout must both be gone.
   assert.equal(worktreeCount(repoRoot), 1);
+});
+
+// --- --watch (str7-str8-priority-intent D8) ---------------------------------
+// Async spawn+kill pattern (not spawnSync, which blocks until exit and
+// cannot deliver a mid-run signal) mirrors test/runner/session-identity
+// .test.mjs's real spawned-process test (~lines 87-139): spawn, await a
+// stdout marker via a Promise, act on the live child, assert, SIGKILL in a
+// `finally` so a bug here fails loudly instead of hanging the suite.
+
+function runnerAsync(cwd, args) {
+  return spawn(process.execPath, [RUNNER, ...args], { cwd, encoding: 'utf8' });
+}
+
+/** Buffer a child's stdout and resolve the first time it contains `marker`,
+ * rejecting on early exit/error or after `timeoutMs` — polls the buffer
+ * rather than sleeping a fixed duration, so the wait is exactly as long as
+ * the real cycle takes and no longer. */
+function waitForStdout(child, marker, timeoutMs = 5000) {
+  let buf = '';
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error(`timed out waiting for "${marker}" in stdout; got: ${buf}`)), timeoutMs);
+    const onData = (chunk) => {
+      buf += chunk;
+      if (buf.includes(marker)) {
+        clearTimeout(timer);
+        child.stdout.off('data', onData);
+        resolve(buf);
+      }
+    };
+    child.stdout.on('data', onData);
+    child.once('exit', (code, signal) => {
+      if (!buf.includes(marker)) {
+        clearTimeout(timer);
+        reject(new Error(`process exited (code ${code}, signal ${signal}) before "${marker}" appeared; got: ${buf}`));
+      }
+    });
+    child.once('error', (err) => {
+      clearTimeout(timer);
+      reject(err);
+    });
+  });
+}
+
+test('e2e --watch: stays alive over an idle frontier, completes a cycle, and a single SIGINT stops it cleanly (exit 0) within 2000ms', { timeout: 10_000 }, async () => {
+  const repoRoot = initTempRepo();
+  assert.equal(fgos(repoRoot, ['init']).status, 0);
+
+  const child = runnerAsync(repoRoot, ['--watch', '--poll-ms', '200']);
+  let stdout = '';
+  child.stdout.on('data', (chunk) => { stdout += chunk; });
+  let stderr = '';
+  child.stderr.on('data', (chunk) => { stderr += chunk; });
+
+  try {
+    // Proof of at least one completed drain cycle over the idle frontier —
+    // never a fixed sleep.
+    await waitForStdout(child, 'fgos-runner: idle');
+
+    const sigintSentAt = Date.now();
+    child.kill('SIGINT');
+
+    const exit = await new Promise((resolve, reject) => {
+      const timer = setTimeout(() => reject(new Error(`did not exit within bound; stdout: ${stdout}; stderr: ${stderr}`)), 2000);
+      child.once('exit', (code, signal) => {
+        clearTimeout(timer);
+        resolve({ code, signal });
+      });
+    });
+
+    assert.ok(Date.now() - sigintSentAt < 2000, 'exited within the 2000ms bound');
+    assert.equal(exit.code, 0, `expected clean exit 0, got code=${exit.code} signal=${exit.signal}; stderr: ${stderr}`);
+    assert.match(stdout, /fgos-runner: watch mode stopped \(signal received\)/);
+  } finally {
+    if (child.exitCode === null && child.signalCode === null) child.kill('SIGKILL');
+  }
+});
+
+test('e2e --watch --dry-run is rejected as a validation error (exit 4)', () => {
+  const repoRoot = initTempRepo();
+  assert.equal(fgos(repoRoot, ['init']).status, 0);
+
+  const result = runner(repoRoot, ['--watch', '--dry-run']);
+  assert.equal(result.status, 4, `expected validation exit 4: ${result.stderr}`);
+  assert.match(result.stderr, /--watch cannot be combined with --dry-run/);
+});
+
+test('e2e --watch --poll-ms with a non-positive/invalid value is rejected as a validation error (exit 4), never silently becomes NaN', () => {
+  const repoRoot = initTempRepo();
+  assert.equal(fgos(repoRoot, ['init']).status, 0);
+
+  const nonNumeric = runner(repoRoot, ['--watch', '--poll-ms', 'abc']);
+  assert.equal(nonNumeric.status, 4, `expected validation exit 4: ${nonNumeric.stderr}`);
+  assert.match(nonNumeric.stderr, /--poll-ms requires a positive number/);
+
+  const negative = runner(repoRoot, ['--watch', '--poll-ms', '-1']);
+  assert.equal(negative.status, 4, `expected validation exit 4: ${negative.stderr}`);
+  assert.match(negative.stderr, /--poll-ms requires a positive number/);
 });

@@ -148,22 +148,37 @@ const DEFAULT_ITEM_KEY = Symbol('anti-loop.default-item');
  * deliberately NOT event-derived. It is in-memory state scoped to one
  * runner run (matches A1's sequential-once-per-run shape, e.g. a `--once`
  * invocation) — cross-run persistence of consecutive-miss state is out of
- * scope for Phase 2.
+ * scope for Phase 2. UPDATED (str7-str8-priority-intent D7/D8/D9): under
+ * `--watch`'s `runWatch` (loop.mjs), "one runner run" means the WHOLE watch
+ * session, not one cycle — `runWatch` creates a single breaker before its
+ * loop starts and threads the SAME object into every `runOnce` cycle via
+ * `options.breaker`, so this state deliberately persists and accumulates
+ * ACROSS cycles for as long as the watch process runs. This is intentional:
+ * a persistent daemon should accumulate failure history toward a trip,
+ * unlike a single bounded `--once` pass. Cross-PROCESS persistence (surviving
+ * a restart) is still out of scope.
  *
  * Because this state exists only in the closure below, replaying or reading
  * the event log never affects it — an unrelated event (e.g. a human writing
  * a `decision`, or another item's `work.move`) that the caller does not
  * report through `recordMiss()`/`recordHit()` leaves the streak untouched.
  *
- * **Inert under shipped defaults (phase2-p1-breaker-inert-fix):** with
- * `threshold` at its default (`BREAKER_MISSES` = 3), the breaker can never
- * trip from a single item's own retries — `dispatchClaimedItem` (loop.mjs)
- * parks an item after at most `DEFAULT_MAX_RETRIES` (2) failed attempts,
- * one short of tripping. The breaker only becomes reachable when a caller
- * passes an explicit lower `threshold` (e.g. `breakerThreshold: 1`, already
- * exercised by an existing test) — production callers do not do this today,
- * so the halt branch this feeds (`loop.mjs`'s `if (tripped)`) is currently
- * dead under default configuration, not broken.
+ * **Reachable under `--watch` (str7-str8-priority-intent D9), NOT inert
+ * (supersedes phase2-p1-breaker-inert-fix's "dead under shipped defaults"
+ * claim for that mode):** with `threshold` at its default (`BREAKER_MISSES`
+ * = 3), a single `--once` invocation still can never trip the breaker from
+ * one item's own retries alone — `dispatchClaimedItem` (loop.mjs) parks an
+ * item after at most `DEFAULT_MAX_RETRIES` (2) failed attempts, one short of
+ * tripping, so within ONE `--once` pass the halt branch this feeds
+ * (`loop.mjs`'s `if (tripped)`) stays dead under default configuration, not
+ * broken. But under `--watch`, the breaker is shared across every cycle of
+ * the whole watch session (see the UPDATED note above), so an item that gets
+ * re-dispatched and re-misses across multiple SEPARATE cycles (each cycle
+ * itself capped at `DEFAULT_MAX_RETRIES`, but the streak no longer resets
+ * between cycles) CAN reach the default threshold and trip — the "inert
+ * under shipped defaults" claim no longer holds once `--watch` is in use. A
+ * caller can still pass an explicit lower `threshold` (e.g.
+ * `breakerThreshold: 1`) to reach the branch sooner in either mode.
  */
 export function createMissBreaker(threshold = BREAKER_MISSES) {
   const streaks = new Map();

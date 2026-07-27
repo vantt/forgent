@@ -84,6 +84,7 @@ import { createOwnershipStore, resolveRoot, claimRoot, steerFrontier } from './r
 import { resolveDiscovery, FALLBACK_VERIFY } from '../intake/discovery.mjs';
 import { resolveDecompose } from '../intake/decompose.mjs';
 import { classify, generateId } from '../intake/classify.mjs';
+import { setTimeout as delay } from 'node:timers/promises';
 
 // errorClass -> failure layer: 5-layer self-attribution (task-spec / context /
 // environment / verification / state) the runner stamps on every friction
@@ -845,10 +846,16 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
       });
     });
 
-    // Reachable only when the caller passes an explicit lower
-    // `breakerThreshold` (see createMissBreaker's doc comment in
-    // anti-loop.mjs) — under shipped defaults this branch is dead because
-    // DEFAULT_MAX_RETRIES caps an item's own attempts below BREAKER_MISSES.
+    // Reachable either via an explicit lower `breakerThreshold` (any mode),
+    // OR under `--watch`'s `runWatch` (loop.mjs) even at the DEFAULT
+    // threshold: within a single `--once` pass this branch stays dead
+    // because DEFAULT_MAX_RETRIES caps an item's own attempts below
+    // BREAKER_MISSES, but `runWatch` shares one breaker across every cycle
+    // of the whole watch session, so an item re-missing across separate
+    // cycles CAN accumulate past the default threshold and trip (see
+    // createMissBreaker's doc comment in anti-loop.mjs, updated for
+    // str7-str8-priority-intent D9 — "under shipped defaults" no longer
+    // means "dead" once `--watch` is in use).
     if (tripped) {
       log(`fgos-runner: halting — consecutive-miss breaker tripped (${breaker.consecutiveMissesFor(item.id)} miss(es)); "${item.id}" parked`);
       return { outcome: 'halted', reason: 'breaker-tripped', id: item.id, errorClass: failure.errorClass, attempts: attempt, exitCode: 1 };
@@ -1102,5 +1109,76 @@ export async function runOnce(options = {}) {
     return { outcome: 'halted', errorClass, message: err.message, parked, exitCode };
   } finally {
     lock.release();
+  }
+}
+
+/**
+ * Persistent runner mode (D7/D8): re-derives `frontier()` (via `runOnce`,
+ * unchanged) on a level-triggered "did the last cycle commit anything?"
+ * check instead of `--once`'s poll-then-drain-then-exit. Supersedes an
+ * earlier EventEmitter-based draft rejected in validation (decision
+ * d3445024) — that design was structurally unobservable because every
+ * write-queue commit happens strictly inside `runOnce`'s own synchronous
+ * execution, before any listener attached after `runOnce` returns could ever
+ * fire. This version needs no listener: a closure boolean set by the
+ * write-queue's `onCommit` hook is checked AFTER `runOnce` returns, which is
+ * always after every commit that cycle could have made — correct by
+ * construction, not by timing.
+ *
+ * One write-queue and one breaker are created ONCE, before the loop starts,
+ * and shared across every cycle (same injection points `runOnce` already
+ * exposes via `options.queue`/`options.breaker`) — this is what lets D9's
+ * anti-loop breaker accumulate consecutive-miss state across the whole watch
+ * session instead of resetting every cycle (see anti-loop.mjs's updated
+ * `createMissBreaker` doc comment).
+ *
+ * Loop shape: each cycle resets `committed` to false, runs one `runOnce`
+ * cycle (catching any throw so a single bad cycle can never end the watch —
+ * D8's "persistent" only stops on an explicit signal abort), reports the
+ * cycle's outcome via `options.onCycle`, and then either loops again
+ * immediately (something committed — the frontier may have changed) or waits
+ * `options.pollFallbackMs` (default 5000ms, abortable via `options.signal`)
+ * before the next cycle. Resolves (returns undefined) only once
+ * `options.signal` aborts.
+ *
+ * @param {object} [options] Every `runOnce` option, forwarded unchanged into
+ *   each cycle, plus: `signal` (AbortSignal, required to ever stop the
+ *   loop), `pollFallbackMs` (number, default 5000), `onCycle` (optional
+ *   `(result) => void` hook invoked once per cycle with either `runOnce`'s
+ *   real result or `{outcome: 'error', error}` on a caught throw).
+ */
+export async function runWatch(options = {}) {
+  let committed = false;
+  const queue = options.queue ?? createWriteQueue({ onCommit: () => { committed = true; } });
+  const breaker = options.breaker ?? createMissBreaker(options.breakerThreshold ?? BREAKER_MISSES);
+
+  while (!options.signal?.aborted) {
+    committed = false;
+    let result;
+    try {
+      result = await runOnce({ ...options, queue, breaker });
+    } catch (err) {
+      // A cycle-level throw must never terminate the watch loop (D8) — report
+      // it via onCycle and keep going, same accepted-risk class as the
+      // hot-loop niche noted below.
+      options.onCycle?.({ outcome: 'error', error: err });
+      result = null;
+    }
+    if (result) options.onCycle?.(result);
+    if (options.signal?.aborted) break;
+    if (!committed) {
+      // Narrow accepted niche: a cycle that commits something and then
+      // throws still sets `committed = true`, so the NEXT cycle starts
+      // immediately with no backoff (a hot loop). This is bounded in
+      // practice by MAX_VISITS/parking moving state toward quiescence, same
+      // accepted-risk class as the doc's W10 note — no throttling added.
+      try {
+        await delay(options.pollFallbackMs ?? 5000, null, { signal: options.signal });
+      } catch {
+        // AbortError from the delay mid-wait — let the while condition exit
+        // the loop naturally on the next check rather than rethrowing.
+        break;
+      }
+    }
   }
 }

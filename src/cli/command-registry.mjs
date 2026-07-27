@@ -138,7 +138,7 @@ export const COMMAND_REGISTRY = [
   {
     name: 'edit',
     invoke: 'fgos edit',
-    description: 'Patch fields on an existing item (title/kind/risk/verify/tier/refs/deps/acceptance). At least one field must be given.',
+    description: 'Patch fields on an existing item (title/kind/risk/verify/tier/refs/deps/acceptance/priority/intent). At least one field must be given.',
     parameters: {
       type: 'object',
       properties: {
@@ -151,6 +151,8 @@ export const COMMAND_REGISTRY = [
         refs: { type: 'string', description: 'Comma-separated list of reference ids/links (empty string clears the field).' },
         deps: { type: 'string', description: 'Comma-separated list of dependency ids (empty string clears the field).' },
         acceptance: { type: 'string', description: 'Optional JSON-encoded array of {text, evidence} Condition-of-Satisfaction clauses — replaces the whole array (empty array "[]" clears the field). NOT comma-separated — clause text may contain commas.' },
+        priority: { type: 'integer', description: 'New priority: a non-negative integer, ascending sort (lower = higher priority). Absent stays absent — items without a priority sort after every item that has one.' },
+        intent: { type: 'integer', description: 'New intent score: any integer, descending sort (higher = more urgent). Absent stays absent — items without an intent sort after every item that has one.' },
       },
       positional: ['id'],
       required: ['id'],

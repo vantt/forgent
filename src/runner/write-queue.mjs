@@ -30,6 +30,14 @@
 /**
  * Create a fresh sequential write-queue.
  *
+ * @param {{onCommit?: () => void}} [options] `onCommit`, when supplied, is
+ *   invoked exactly once per `enqueue()` call that settles successfully
+ *   (never when `fn()` throws/rejects) — the D7 "signal" `runWatch` (loop.mjs)
+ *   listens on to know a transaction actually committed. Invoked synchronously
+ *   from inside its own `try/catch` so a throwing `onCommit` can never break
+ *   the queue's chain for transactions queued after it. Omitting it (the
+ *   zero-arg `createWriteQueue()` call every existing caller uses) leaves
+ *   behavior 100% unchanged.
  * @returns {{enqueue: (fn: () => Promise<any>) => Promise<any>, size: () => number}}
  *   `enqueue(fn)` submits an async transaction `fn` (a zero-arg function
  *   returning a promise, or any value) and returns a promise that resolves
@@ -39,7 +47,7 @@
  *   transactions currently queued or running (not yet settled) — a
  *   diagnostic accessor, not part of the ordering guarantee.
  */
-export function createWriteQueue() {
+export function createWriteQueue({ onCommit } = {}) {
   let tail = Promise.resolve();
   let pending = 0;
 
@@ -66,6 +74,13 @@ export function createWriteQueue() {
     settled.then(
       () => {
         pending -= 1;
+        // Signal only on the successful-settle path (D7) — never when fn()
+        // rejects/threw. A throwing onCommit must never break the queue.
+        try {
+          onCommit?.();
+        } catch {
+          /* subscriber failure never breaks the queue */
+        }
       },
       () => {
         pending -= 1;
