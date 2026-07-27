@@ -138,3 +138,33 @@ test('enqueue() resolves with a synchronous (non-promise-returning) transaction 
   const result = await queue.enqueue(() => 42);
   assert.equal(result, 42);
 });
+
+// --- onCommit signal (D7): the level-triggered flag runWatch (loop.mjs)
+// checks after every runOnce cycle instead of an EventEmitter listener. ----
+
+test('onCommit fires exactly once per successful enqueue() settle, never on a rejecting transaction, and a throwing onCommit never breaks the queue', async () => {
+  let commits = 0;
+  const queue = createWriteQueue({
+    onCommit: () => {
+      commits += 1;
+      if (commits === 2) throw new Error('subscriber-boom'); // must not break the queue
+    },
+  });
+
+  assert.equal(await queue.enqueue(() => 'ok1'), 'ok1');
+  assert.equal(commits, 1, 'onCommit fired once for the first successful settle');
+
+  await assert.rejects(
+    queue.enqueue(() => {
+      throw new Error('tx-boom');
+    }),
+    /tx-boom/,
+  );
+  assert.equal(commits, 1, 'onCommit does not fire when the transaction itself rejects');
+
+  assert.equal(await queue.enqueue(() => 'ok2'), 'ok2', "this settle's own onCommit throws, but the queue's own promise still resolves");
+  assert.equal(commits, 2);
+
+  assert.equal(await queue.enqueue(() => 'ok3'), 'ok3', 'queue stays usable for transactions submitted after a throwing onCommit');
+  assert.equal(commits, 3, 'onCommit still fires for transactions after a throwing onCommit');
+});
