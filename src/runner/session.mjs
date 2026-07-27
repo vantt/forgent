@@ -473,9 +473,16 @@ export function listSessions(repoRoot) {
  * Reclaim orphaned sessions: an entry whose worktree is gone from
  * `git worktree list` OR whose recorded pid is dead. Applies the SAME
  * divergence protection as endSession — a diverged orphan is left in place
- * (its dangling commit is never discarded silently). PID reuse masking a dead
- * session as live is an accepted, documented limitation (matching the fgw/<id>
- * reclaim's own). Returns `{ reclaimed, skipped }` session-id lists.
+ * (its dangling commit is never discarded silently) — PLUS an uncommitted-
+ * work protection endSession doesn't need: `entry.pid` is the pid of the
+ * one-shot `fgos session start` CLI invocation, which exits the moment it
+ * prints its result, so `pidDead` is true for essentially every session
+ * within moments of creation regardless of whether the worktree is still
+ * being actively edited. A dirty (uncommitted-changes) worktree is therefore
+ * left in place exactly like a diverged one, never silently discarded by the
+ * `--force` remove below. PID reuse masking a dead session as live is an
+ * accepted, documented limitation (matching the fgw/<id> reclaim's own).
+ * Returns `{ reclaimed, skipped }` session-id lists.
  */
 export function reclaimOrphanedSessions(repoRoot) {
   const fgosDir = fgosDirOf(repoRoot);
@@ -506,6 +513,24 @@ export function reclaimOrphanedSessions(repoRoot) {
         }
         if (headNow && headNow !== entry.startCommit) {
           skipped.push(entry.sessionId); // diverged — keep, do not discard a dangling commit
+          kept.push(entry);
+          continue;
+        }
+
+        // Fail closed on an unreadable status (never assume clean): mirrors
+        // this module's own corrupt-registry-fails-closed stance above.
+        // `.fgos` itself is excluded from the check — it is this module's own
+        // symlink-or-restored-tracked-content artifact (D10), never real user
+        // work, and would otherwise always read as dirty (untracked symlink,
+        // or a tracked dir replaced by one) regardless of the actual session.
+        let dirty = true;
+        try {
+          dirty = gitAt(entry.worktreePath, ['status', '--porcelain', '--', ':!.fgos']).trim().length > 0;
+        } catch {
+          dirty = true;
+        }
+        if (dirty) {
+          skipped.push(entry.sessionId); // uncommitted work — keep, do not discard it
           kept.push(entry);
           continue;
         }

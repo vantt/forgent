@@ -22,7 +22,7 @@ Vòng lặp tự hành của forgent: tự lấy việc sẵn-sàng từ work-st
 - `fgos review <id> --github [--pr <n>]` / `fgos approve <id> --github --pr <n>` (ngoài vòng runner, gọi bởi người vận hành, tuỳ chọn — github-adapter D5) — vận chuyển thay thế của CÙNG cổng duyệt trên, đưa việc duyệt sang GitHub thay vì diff/merge cục bộ, chỉ áp dụng cho đề xuất nguồn runner (D1); `review --github` kèm `--pr` là phép hỏi thăm trạng thái sống của một PR đã mở, không mở PR mới (github-adapter D6, phát hiện đóng-không-merge) — xem "Cổng duyệt qua GitHub" dưới
 - `fgos catchup <id>` (ngoài vòng runner, gọi bởi người vận hành) — đồng bộ lại một việc đang đỗ (`blocked`) vì gãy nhập (xung đột, verify đỏ sau nhập, hoặc trôi tích hợp): kéo trạng thái mới nhất của đích vào nhánh riêng của việc rồi thử lại — xem "Đồng bộ lại một việc đỗ (catch-up)" dưới
 - `fgos evolve` / `fgos evolve --pick <id>` / `fgos evolve --submit <id>` (ngoài vòng runner, gọi bởi người vận hành, on-demand — self-improve loop STR13 D1/D3/D15) — Gate A của vòng tự cải thiện: xếp hạng candidate từ friction chưa ngã-ngũ, người chọn một hoặc dừng (đọc-thuần tuyệt đối), hoặc bắc cầu candidate đã chọn sang một việc thật (`--submit`, hành động ghi duy nhất của bề mặt evolve) — xem "Gate A — xếp hạng candidate, bắc cầu sang việc thật (evolve)" dưới
-- `fgos session start [--item <id>]` / `fgos session end <session-id> [--force]` / `fgos session list` (ngoài vòng runner, gọi bởi người vận hành/một tác nhân) — vòng đời phiên checkout đa-phiên tùy chọn: một worktree detached-HEAD mỗi phiên cho cây nguồn, dùng chung MỘT kho `.fgos/` qua symlink (D10); `end` từ chối một phiên đã rời commit khởi tạo trừ khi `--force` — xem "Phiên checkout đa-phiên" dưới
+- `fgos session start [--item <id>]` / `fgos session end <session-id> [--force]` / `fgos session list` / `fgos session gc` (ngoài vòng runner, gọi bởi người vận hành/một tác nhân) — vòng đời phiên checkout đa-phiên tùy chọn: một worktree detached-HEAD mỗi phiên cho cây nguồn, dùng chung MỘT kho `.fgos/` qua symlink (D10); `end` từ chối một phiên đã rời commit khởi tạo trừ khi `--force`; `gc` dọn các mục sổ mồ côi (worktree đã mất khỏi git, hoặc pid của lệnh `start` một-lần đã chết), tha các phiên còn commit lửng hoặc còn thay đổi chưa commit — xem "Phiên checkout đa-phiên" dưới
 
 ## Data Dictionary
 
@@ -626,7 +626,7 @@ sức khỏe cho toàn bộ vòng compounding.
   - Kho chưa từng có việc nào → toàn bộ tín hiệu này vắng mặt, `check` không
     tự khởi tạo bất cứ gì — giữ nguyên hợp đồng đọc-thuần.
 
-### Phiên checkout đa-phiên — session start / end / list
+### Phiên checkout đa-phiên — session start / end / list / gc
 
 Một **phiên** (session) là chỗ làm việc cô lập, TÙY CHỌN, gắn với đúng một
 việc: mỗi phiên có một git worktree riêng cho cây nguồn git-tracked, trong khi
@@ -643,7 +643,7 @@ của nó (`aheadCount` + `verify`) vốn đã đúng khi chạy từ trong work
 
 - **Runs when:** người vận hành/một tác nhân gọi `fgos session start
   [--item <id>]` / `fgos session end <session-id> [--force]` / `fgos session
-  list`.
+  list` / `fgos session gc`.
 - **Blocked when:** thiếu sub-verb, hoặc sub-verb lạ — `validation`; `session
   end` thiếu session-id — `validation`; `session end <id>` với id không có
   trong sổ (hoặc đã kết thúc) — `validation`; `session end <id>` khi HEAD của
@@ -669,6 +669,16 @@ của nó (`aheadCount` + `verify`) vốn đã đúng khi chạy từ trong work
     theo.
   - `session list` — đọc thuần sổ đăng ký, in mỗi phiên một dòng (id / đường
     worktree / item / thời điểm mở).
+  - `session gc` (p-fgos-session-gc) — dọn mục sổ MỒ CÔI: worktree đã mất khỏi
+    `git worktree list`, HOẶC pid ghi trong mục đã chết. Lưu ý pid ghi lại là
+    pid của chính tiến trình CLI `session start` MỘT-LẦN, tự thoát ngay sau khi
+    in kết quả — nên gần như MỌI phiên có pid-chết trong vài khắc sau khi tạo,
+    bất kể worktree còn đang được dùng hay không; vì vậy `gc` áp CÙNG phép bảo
+    vệ phân kỳ như `end` (một commit lửng không bao giờ bị âm thầm bỏ), CỘNG
+    THÊM một phép bảo vệ cây-bẩn riêng: một worktree còn thay đổi CHƯA commit
+    (kể cả chưa từng commit — nằm ngoài phép kiểm phân kỳ dựa-commit) cũng được
+    tha, không bị `--force` xóa. Mục nào bị tha thì liệt vào `skipped`, mục nào
+    dọn được thì liệt vào `reclaimed`; trả `{ reclaimed, skipped }`.
 - **Side effects:** mọi đọc-sửa-ghi `sessions.json` được canh bởi một khóa
   RIÊNG `.fgos/sessions.lock` (tạo-nguyên-tử `wx` + đòi-lại-pid-chết, soi theo
   `acquireRunnerLock` của loop.mjs như một cơ chế MỚI, TÁCH BẠCH — không bao
