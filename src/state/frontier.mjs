@@ -42,24 +42,34 @@ import { getDomain, stageForStep } from './workflow-stage-graphs.mjs';
 //     FIFO). `Object.keys(view.work)` therefore always iterates in
 //     declaration (insertion) order, which is what `frontier` relies on for
 //     FIFO — it never sorts by id.
-// TIE-BREAK CONTRACT (work-graph-intelligence S4). `frontier(view)` is the
-// single, versioned surface that decides claim order: the order it returns IS
-// the order the runner claims and dispatches in (consumers `readyWork` in
-// store.mjs and `steerFrontier` in the runner take this order as given, never
-// re-sorting). `FRONTIER_ORDER_VERSION` names that order so a change to it is
-// deliberate and visible, never an accidental reorder of a cold-pickup-
-// critical invariant.
+// TIE-BREAK CONTRACT (work-graph-intelligence S4, bumped to v2 by
+// str7-str8-priority-intent D2). `frontier(view)` is the single, versioned
+// surface that decides claim order: the order it returns IS the order the
+// runner claims and dispatches in (consumers `readyWork` in store.mjs and
+// `steerFrontier` in the runner take this order as given, never re-sorting).
+// `FRONTIER_ORDER_VERSION` names that order so a change to it is deliberate
+// and visible, never an accidental reorder of a cold-pickup-critical
+// invariant.
 //
-//   - v1 (current): the SOLE ordering key is FIFO by `work.add` declaration
-//     order — exactly the insertion-order iteration argued for in the header
-//     comment above. No priority, no re-sort.
+//   - v1 (superseded): the SOLE ordering key was FIFO by `work.add`
+//     declaration order — exactly the insertion-order iteration argued for
+//     in the header comment above. No priority, no intent, no re-sort.
+//   - v2 (current, per D1/D2/D6): three ordering keys, applied in order —
+//     (1) `priority` ASCENDING, absent-last (an item with no `priority`
+//     sorts strictly after every item that has one, regardless of the
+//     latter's magnitude); (2) among ties on (1), `intent` DESCENDING, same
+//     absent-last bucketing; (3) among ties on (1) and (2), declaration
+//     order — the v1 tie-break, preserved for free by
+//     `Array.prototype.sort`'s spec-guaranteed stability on Node >=18 (this
+//     repo's engines requirement): a comparator that returns 0 once both
+//     keys tie never reorders those items relative to each other, so no
+//     third key is hand-written here.
 //
-// A future priority key (P7) is a v1 -> v2 supersession made HERE — priority
-// becomes the primary key, declaration order the tie-break — bumping this
-// constant in the same change. The version pin below turns any such reorder
-// into a deliberate, test-visible decision. (No comparator framework is built
-// ahead of that need — v1 has one key, and the frontier already yields it.)
-export const FRONTIER_ORDER_VERSION = 1;
+// A view where no item has `priority` or `intent` set produces the exact v1
+// order (every comparison short-circuits both absent-last branches to a tie,
+// i.e. "keep declaration order") — v2 is a strict backward-compatible
+// superset of v1, not a behavior change for existing data.
+export const FRONTIER_ORDER_VERSION = 2;
 
 export function frontier(view) {
   const work = view?.work ?? {};
@@ -79,7 +89,26 @@ export function frontier(view) {
     const depsReady = item.deps.every((dep) => work[dep]?.status === 'done');
     if (depsReady) ready.push(item);
   }
+  ready.sort(compareReadyOrder);
   return ready;
+}
+
+// v2 comparator (D2/D6): priority ASC absent-last, then intent DESC
+// absent-last, then declaration order — the last key falls out of
+// Array.prototype.sort's guaranteed stability (see header comment above),
+// so returning 0 on a full tie is the entire tie-break, not an omission.
+function compareReadyOrder(a, b) {
+  if (a.priority !== b.priority) {
+    if (a.priority === undefined) return 1;
+    if (b.priority === undefined) return -1;
+    return a.priority - b.priority;
+  }
+  if (a.intent !== b.intent) {
+    if (a.intent === undefined) return 1;
+    if (b.intent === undefined) return -1;
+    return b.intent - a.intent;
+  }
+  return 0;
 }
 
 // Reverse index of `parent` -> direct children ids. Items with no `parent`

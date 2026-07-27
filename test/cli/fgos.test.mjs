@@ -4769,7 +4769,7 @@ test('graph verb: reports connected components (independent parallel tracks) in 
   assert.equal(result.status, 0);
 
   const data = envelopeData(result.stdout); // asserts the C1 envelope shape
-  assert.equal(data.order_version, 1);
+  assert.equal(data.order_version, 2); // FRONTIER_ORDER_VERSION bumped to v2 by str7-str8-priority-intent D2
   assert.equal(data.componentCount, 2);
   assert.deepEqual(data.components.map((component) => component.items), [['a', 'b'], ['c']]);
 

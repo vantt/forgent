@@ -88,13 +88,13 @@ test('frontier follows FIFO seq/declaration order, not lexical id order (add-ord
 
 // --- work-graph-intelligence S4: claim-order tie-break contract -----------
 // The frontier's order is a NAMED, VERSIONED contract. v1's sole ordering key
-// is FIFO by declaration order; a future priority key (P7) is a deliberate
-// v1 -> v2 bump. These tests pin the version and re-assert the v1 order as the
-// contract, so an accidental reorder (or a P7 change that forgets to bump the
-// version) trips here.
+// was FIFO by declaration order; str7-str8-priority-intent D2 bumps it to v2
+// — priority ASC (absent-last), then intent DESC (absent-last), then
+// declaration order. These tests pin the version and re-assert both the v1
+// and v2 order as the contract, so an accidental reorder trips here.
 
-test('S4 tie-break contract: FRONTIER_ORDER_VERSION is 1 — a reorder of the claim-order must bump it deliberately', () => {
-  assert.equal(FRONTIER_ORDER_VERSION, 1);
+test('S4 tie-break contract: FRONTIER_ORDER_VERSION is 2 (str7-str8-priority-intent D2 bump) — a reorder of the claim-order must bump it deliberately', () => {
+  assert.equal(FRONTIER_ORDER_VERSION, 2);
 });
 
 test('S4 tie-break contract v1: a later-declared ready item orders AFTER an earlier-declared one (FIFO declaration order is the sole v1 key)', () => {
@@ -296,3 +296,53 @@ test('an item with an unrecognized domain never throws and folds to "coding" rea
   // No stage field either -> reads as coding's Execute stage ("executing") -> ready.
   assert.deepEqual(frontier(view).map((i) => i.id), ['a']);
 });
+
+// --- str7-str8-priority-intent D2/D6: v2 comparator (priority ASC, intent
+// DESC, both absent-last, declaration order as final tie-break) -----------
+
+test('v2: an item with priority=1 orders before one with priority=5 (priority ASCENDING — lower value = higher priority)', () => {
+  const view = {
+    work: {
+      low: { ...item('low', 'todo'), priority: 5 },
+      high: { ...item('high', 'todo'), priority: 1 },
+    },
+  };
+  assert.deepEqual(frontier(view).map((i) => i.id), ['high', 'low']);
+});
+
+test('v2: an item WITH a priority sorts before one with no priority at all, regardless of the set value (absent-last bucketing, D1)', () => {
+  const view = {
+    work: {
+      unset: item('unset', 'todo'),
+      // A high (numerically large, i.e. "low urgency") priority value still
+      // beats "no priority" — presence of the field always wins the bucket.
+      setHigh: { ...item('setHigh', 'todo'), priority: 99 },
+    },
+  };
+  assert.deepEqual(frontier(view).map((i) => i.id), ['setHigh', 'unset']);
+});
+
+test('v2: tied on priority (both absent), an item with a higher intent orders before one with a lower intent (intent DESCENDING, D6)', () => {
+  const view = {
+    work: {
+      lowIntent: { ...item('lowIntent', 'todo'), intent: 2 },
+      highIntent: { ...item('highIntent', 'todo'), intent: 8 },
+    },
+  };
+  assert.deepEqual(frontier(view).map((i) => i.id), ['highIntent', 'lowIntent']);
+});
+
+test('v2 REPLAY-COMPATIBILITY (per Phase 2 D7): a view where no item has priority or intent produces the EXACT SAME order as the pre-bump v1 contract (declaration order, not lexical id order)', () => {
+  // Same fixture shape as the v1 FIFO test above (zeta declared before
+  // alpha, whose id would sort first lexically) — neither item carries
+  // priority or intent, so the v2 comparator must fall straight through to
+  // declaration order exactly as v1 did, byte-identical.
+  const view = {
+    work: {
+      zeta: item('zeta', 'todo'),
+      alpha: item('alpha', 'todo'),
+    },
+  };
+  assert.deepEqual(frontier(view).map((i) => i.id), ['zeta', 'alpha']);
+});
+

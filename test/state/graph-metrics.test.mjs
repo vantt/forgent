@@ -87,7 +87,7 @@ test('connectedComponents is deterministic: items in declaration order, componen
 test('graphMetrics umbrella carries order_version alongside the component facts', () => {
   const view = { work: { a: item('a'), b: item('b', { deps: ['a'] }) } };
   const metrics = graphMetrics(view);
-  assert.equal(metrics.order_version, 1); // FRONTIER_ORDER_VERSION (S4)
+  assert.equal(metrics.order_version, 2); // FRONTIER_ORDER_VERSION (S4, bumped to v2 by str7-str8-priority-intent D2)
   assert.equal(metrics.componentCount, 1);
   assert.deepEqual(metrics.components[0].items, ['a', 'b']);
 });
