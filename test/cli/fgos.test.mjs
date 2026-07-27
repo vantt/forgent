@@ -822,6 +822,73 @@ test('add with a bare --targets (no value) also parses to [], exit 0', () => {
   assert.deepEqual(stateView(cwd).work['bare-targets-item'].targets, []);
 });
 
+// --- str67-goal-directed-planning D3/D4/D6/D7: `fgos goal set|show` CLI verb ---
+
+function addGoalItem(cwd, id, goalTier = 'mvp') {
+  return run(cwd, ['add', id, '--title', `Title ${id}`, '--kind', 'task', '--risk', 'low', '--verify', 'npm test', '--goal-tier', goalTier]);
+}
+
+test('goal set on a real goal item succeeds, exit 0, and a following goal show reflects it', () => {
+  const cwd = tmpCwd();
+  addGoalItem(cwd, 'goal-target-1');
+  const setResult = run(cwd, ['goal', 'set', 'goal-target-1']);
+  assert.equal(setResult.status, 0);
+  assert.equal(envelopeData(setResult.stdout).focus, 'goal-target-1');
+
+  const showResult = run(cwd, ['goal', 'show']);
+  assert.equal(showResult.status, 0);
+  assert.equal(envelopeData(showResult.stdout).focus, 'goal-target-1');
+});
+
+test('goal set on a non-existent id is rejected as validation, exit 4, no event written', () => {
+  const cwd = tmpCwd();
+  const before = eventLines(cwd).length;
+  const result = run(cwd, ['goal', 'set', 'does-not-exist']);
+  assert.equal(result.status, 4);
+  assert.equal(eventLines(cwd).length, before);
+});
+
+test('goal set on an existing item without goalTier is rejected as validation, exit 4, no event written (D7)', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'non-goal-item');
+  const before = eventLines(cwd).length;
+  const result = run(cwd, ['goal', 'set', 'non-goal-item']);
+  assert.equal(result.status, 4);
+  assert.equal(eventLines(cwd).length, before);
+});
+
+test('goal show with no focus ever set returns focus: null, exit 0, not an error', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['goal', 'show']);
+  assert.equal(result.status, 0);
+  assert.equal(envelopeData(result.stdout).focus, null);
+});
+
+test('goal show after a successful set returns the focus id plus goal-scoped ranking data', () => {
+  const cwd = tmpCwd();
+  addGoalItem(cwd, 'goal-target-2');
+  run(cwd, ['goal', 'set', 'goal-target-2']);
+  const data = envelopeData(run(cwd, ['goal', 'show']).stdout);
+  assert.equal(data.focus, 'goal-target-2');
+  assert.ok('criticalPath' in data);
+  assert.ok('topUnblock' in data);
+});
+
+test('goal focus is not auto-cleared when the focused item reaches status done (D7)', () => {
+  const cwd = tmpCwd();
+  addGoalItem(cwd, 'goal-target-done');
+  run(cwd, ['goal', 'set', 'goal-target-done']);
+  run(cwd, ['move', 'goal-target-done', '--to', 'doing']);
+  run(cwd, ['move', 'goal-target-done', '--to', 'proposed']);
+  run(cwd, ['compound', 'goal-target-done']);
+  const moveResult = run(cwd, ['move', 'goal-target-done', '--to', 'done']);
+  assert.equal(moveResult.status, 0);
+  assert.equal(stateView(cwd).work['goal-target-done'].status, 'done');
+
+  const data = envelopeData(run(cwd, ['goal', 'show']).stdout);
+  assert.equal(data.focus, 'goal-target-done');
+});
+
 // --- p50-workflow-induct D7: --docs-ref on `add` (ceremony decision-doc pointer) ---
 
 test('add without --docs-ref leaves docsRef unset, exit 0', () => {

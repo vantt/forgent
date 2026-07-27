@@ -19,7 +19,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { initStore, addWork, moveWork, moveStage, editWork, addDecision, addOutcome, addFriction, listWork, readyWork, graphMetrics, graphWhatIf, staleDoingAdvisory, footprintConflicts, readRawEvents, rebuild, putInAwaiting, answerAwaiting, StoreError, EXIT_CODES, categoryOf, assertValidDocType } from '../src/state/store.mjs';
+import { initStore, addWork, moveWork, moveStage, editWork, addDecision, addOutcome, addFriction, listWork, readyWork, graphMetrics, graphWhatIf, staleDoingAdvisory, footprintConflicts, readRawEvents, rebuild, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, StoreError, EXIT_CODES, categoryOf, assertValidDocType } from '../src/state/store.mjs';
 import { repairTruncatedLastLine } from '../src/state/events.mjs';
 import { deriveTitle, classify, generateId } from '../src/intake/classify.mjs';
 import { wrapEnvelope } from '../src/state/envelope.mjs';
@@ -2101,6 +2101,25 @@ async function runVerb(verb, flags, positional, dir) {
       }
     }
 
+    // Persisted-focus CLI surface (str67-goal-directed-planning D3/D4/D6/D7):
+    // reads/writes go through the setFocus/goalFocusShow facades only, never
+    // graph-metrics.mjs directly. Only `set`/`show` exist here — `clear`/
+    // `list` are explicitly deferred (CONTEXT.md Deferred Ideas).
+    case 'goal': {
+      const sub = requireField(positional[0], 'goal requires a sub-verb: fgos goal <set|show> ...');
+      if (sub === 'set') {
+        const id = requireField(positional[1], 'goal set requires an id: fgos goal set <id>');
+        const { view } = setFocus(dir, { id });
+        // Explicit projection, not a spread: decouples the public envelope
+        // from setFocus's internal {event, view} return shape.
+        return { focus: view.focus };
+      }
+      if (sub === 'show') {
+        return goalFocusShow(dir);
+      }
+      throw new StoreError('validation', `unknown goal sub-verb "${sub}". Usage: fgos goal <set|show> ...`);
+    }
+
     // Do-and-announce shell-integration + config bootstrap (str87-fgos-setup-doctor
     // D6): inserts the shell-integration source line into every DETECTED rc
     // file (bash/zsh, D4) — never creates a new rc file (shell-rc.mjs's own
@@ -2148,7 +2167,7 @@ async function runVerb(verb, flags, positional, dir) {
     }
 
     default:
-      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <init|add|submit|discover|move|edit|ask|answer|decision|list|ready|rebuild|repair|check|rollup|take|return|review|approve|reject|catchup|evolve|triage|session|setup|doctor> ...`);
+      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <init|add|submit|discover|move|edit|ask|answer|decision|list|ready|rebuild|repair|check|rollup|take|return|review|approve|reject|catchup|evolve|triage|session|goal|setup|doctor> ...`);
   }
 }
 

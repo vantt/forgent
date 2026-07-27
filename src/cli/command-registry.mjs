@@ -511,6 +511,23 @@ export const COMMAND_REGISTRY = [
     deprecated: null,
   },
   {
+    name: 'goal',
+    invoke: 'fgos goal',
+    description: 'Persisted-focus pointer (str67-goal-directed-planning D3/D4/D6/D7): "set" points focus at an existing goalTier item (rejects a non-goal id, required for "set"); "show" (read-only) returns the current focus plus its goal-scoped ranking, or {focus: null} when nothing is set.',
+    parameters: {
+      type: 'object',
+      properties: {
+        sub: { type: 'string', description: 'Sub-verb (positional).', enum: ['set', 'show'] },
+        id: { type: 'string', description: 'Goal item id (positional, required for "set"; not used by "show").' },
+      },
+      positional: ['sub', 'id'],
+      required: ['sub'],
+    },
+    examples: ['fgos goal set <id>', 'fgos goal show'],
+    access: 'mutation',
+    deprecated: null,
+  },
+  {
     name: 'setup',
     invoke: 'fgos setup',
     description: 'Insert the fgos shell-integration source line into detected shell rc file(s) (bash/zsh) and ensure .fgos-runner.json exists and has every current default key — do-and-announce, never asks first.',
