@@ -132,3 +132,22 @@ test('fgos --help renders move\'s mixed positional/flag args distinctly', () => 
   assert.ok(moveBlock.includes('required: --to'), `move's --help block is missing "required: --to":\n${moveBlock}`);
   assert.ok(!moveBlock.includes('--id'), `move's --help block should not render id as a --flag:\n${moveBlock}`);
 });
+
+// str51-llm-assist-classify D2: submit's --tier/--kind/--risk overrides must
+// be registered in the manifest as optional properties (not in `required`)
+// so they are discoverable via `fgos --help --json`, same shape as the
+// existing domain/discovered-from/deps/acceptance optional entries.
+test('submit\'s registry entry lists tier/kind/risk as optional properties, not required', () => {
+  const submitEntry = COMMAND_REGISTRY.find((entry) => entry.name === 'submit');
+  assert.ok(submitEntry, 'COMMAND_REGISTRY is missing a "submit" entry');
+  for (const field of ['tier', 'kind', 'risk']) {
+    assert.ok(
+      submitEntry.parameters.properties[field],
+      `submit's registry entry is missing a "${field}" property`,
+    );
+    assert.ok(
+      !submitEntry.parameters.required.includes(field),
+      `submit's "${field}" property should be optional, not in parameters.required`,
+    );
+  }
+});
