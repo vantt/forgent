@@ -1257,13 +1257,23 @@ async function runVerb(verb, flags, positional, dir) {
         });
         claim = { id, from: 'blocked', to: 'doing', actor, seq: event.seq, source: 'branch', branch, branchHeadAtTake };
       } else {
-        const headAtTake = currentHead(repoRoot);
-        const { event } = moveWork(dir, { id, to: 'doing', expectedStatus: 'todo', actor, headAtTake });
+        // pick ALWAYS creates a fgw/<id> worktree/branch below (createWorktree,
+        // unconditionally) — including on this first todo->doing claim, not
+        // only on the blocked->doing reclaim above. So this claim must record
+        // branchHeadAtTake, the same discriminator the reclaim branch uses,
+        // never the main-based headAtTake (return's own branch-source check
+        // is keyed on branchHeadAtTake alone — see its comment in the `return`
+        // case). The value is identical either way: createWorktree's `git
+        // worktree add -b <branch> <path>` with no explicit start-point forks
+        // the new branch from repoRoot's CURRENT HEAD, i.e. exactly this same
+        // commit.
+        const branchHeadAtTake = currentHead(repoRoot);
+        const { event } = moveWork(dir, { id, to: 'doing', expectedStatus: 'todo', actor, branchHeadAtTake });
         addOutcome(dir, {
           id,
-          predicted: { tier: item.tier ?? DEFAULTS.tier, deps: item.deps.length, priorVisits, actor, headAtTake },
+          predicted: { tier: item.tier ?? DEFAULTS.tier, deps: item.deps.length, priorVisits, actor, branchHeadAtTake },
         });
-        claim = { id, from: 'todo', to: 'doing', actor, seq: event.seq, source: 'main', headAtTake };
+        claim = { id, from: 'todo', to: 'doing', actor, seq: event.seq, source: 'branch', branch, branchHeadAtTake };
       }
 
       // The claim above is already durable (moveWork's event is committed to

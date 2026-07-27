@@ -2571,7 +2571,12 @@ test('pick with no --id claims the frontier head exactly like take does today, a
   assert.equal(data.actor, 'session');
   assert.equal(data.from, 'todo');
   assert.equal(data.to, 'doing');
-  assert.equal(data.headAtTake, headBefore);
+  // A first pick claim records branchHeadAtTake, not the main-based
+  // headAtTake — pick always creates a fgw/<id> worktree/branch below, on
+  // this first claim exactly as much as on a blocked reclaim, so `return`
+  // must take the SAME branch-source path either way.
+  assert.equal(data.branchHeadAtTake, headBefore);
+  assert.equal('headAtTake' in data, false, 'a pick claim never records the main-based headAtTake');
   assert.equal(data.worktree.branch, 'fgw/pick-a');
   assert.equal(data.worktree.reused, false);
   assert.ok(fs.existsSync(data.worktree.path), 'pick must leave a real worktree checkout on disk');
@@ -2579,6 +2584,7 @@ test('pick with no --id claims the frontier head exactly like take does today, a
   const view = stateView(cwd);
   assert.equal(view.work['pick-a'].status, 'doing');
   assert.equal(view.work['pick-a'].claimActor, 'session');
+  assert.equal(view.work['pick-a'].branchHeadAtTake, headBefore);
   assert.equal(view.outcomes['pick-a'].predicted.actor, 'session');
 
   // truth 3: the branch is real and non-detached — `symbolic-ref HEAD`
@@ -4425,6 +4431,37 @@ test('pick --id on a blocked item with a live fgw/<id> branch claims via blocked
   assert.doesNotThrow(() =>
     execFileSync('git', ['symbolic-ref', '-q', 'HEAD'], { cwd: data.worktree.path, stdio: 'ignore' }),
   );
+});
+
+test('return succeeds after a FIRST pick (todo -> doing, no prior blocked branch) once real work is committed on the fresh fgw/<id> worktree — a fresh pick claim records branchHeadAtTake exactly like a blocked reclaim does, so return recognizes the branch\'s own progress instead of checking the (unchanged) main checkout', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  addOk(cwd, 'pick-fresh-return-ok', { verify: 'test -f proof.txt' });
+  const mainHeadBefore = gitHead(cwd);
+
+  const pickResult = run(cwd, ['pick', '--id', 'pick-fresh-return-ok']);
+  assert.equal(pickResult.status, 0, `pick failed: ${pickResult.stderr}`);
+  const pickData = envelopeData(pickResult.stdout);
+  assert.equal(pickData.worktree.reused, false, 'sanity: this is a fresh claim, not a blocked reclaim');
+
+  // The real work happens on the fresh worktree pick just stood up — never
+  // on the human's own main checkout.
+  fs.writeFileSync(path.join(pickData.worktree.path, 'proof.txt'), 'built by the fresh pick\n');
+  execFileSync('git', ['add', '-A'], { cwd: pickData.worktree.path });
+  execFileSync('git', ['commit', '-q', '-m', 'work: proof.txt'], { cwd: pickData.worktree.path });
+  const branchHeadAtReturn = gitAtCwd(cwd, ['rev-parse', 'fgw/pick-fresh-return-ok']).trim();
+  const worktreesBefore = gitAtCwd(cwd, ['worktree', 'list', '--porcelain']);
+
+  const result = run(cwd, ['return', 'pick-fresh-return-ok']);
+  assert.equal(result.status, 0, `return failed: ${result.stderr}`);
+  assert.match(result.stdout, /proposed/);
+
+  const view = stateView(cwd);
+  assert.equal(view.work['pick-fresh-return-ok'].status, 'proposed');
+  assert.equal(view.work['pick-fresh-return-ok'].branchHeadAtReturn, branchHeadAtReturn);
+  assert.equal('headAtReturn' in view.work['pick-fresh-return-ok'], false, 'a branch-source return never records the main-based headAtReturn');
+  assert.equal(gitHead(cwd), mainHeadBefore, "return never advances or touches the human's own main checkout");
+  assert.equal(gitAtCwd(cwd, ['worktree', 'list', '--porcelain']), worktreesBefore, 'the disposable detached verify worktree is cleaned up — no leftover');
 });
 
 test('return on a branch-source take: verify passes in a disposable detached worktree at the branch tip -> proposed, branchHeadAtReturn recorded (never headAtReturn), the human\'s own main checkout is untouched and no worktree is left behind', () => {
