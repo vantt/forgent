@@ -53,6 +53,8 @@ export const COMMAND_REGISTRY = [
         'discovered-from': { type: 'string', description: 'Optional id of the item this one was discovered from (provenance, not a dependency).' },
         'docs-ref': { type: 'string', description: 'Optional relative path to this item\'s docs/history/<feature>/ directory (its own CONTEXT.md/plan.md).' },
         acceptance: { type: 'string', description: 'Optional JSON-encoded array of {text, evidence} Condition-of-Satisfaction clauses (NOT comma-separated — clause text may contain commas).' },
+        'goal-tier': { type: 'string', description: "Optional goal tier ('mvp' or 'milestone'); omit to leave unset (not a goal)." },
+        targets: { type: 'string', description: 'Optional comma-separated list of ids this goal item considers "part of" it (an MVP\'s targets are milestone ids; a milestone\'s targets are ordinary work ids).' },
       },
       positional: ['id'],
       required: ['id', 'title', 'kind', 'risk', 'verify'],

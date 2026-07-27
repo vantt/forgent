@@ -777,6 +777,51 @@ test('add with a bare --discovered-from (no value) is rejected as validation, ex
   assert.equal(eventLines(cwd).length, before);
 });
 
+// --- str67-goal-directed-planning D1/D2: --goal-tier and --targets on `add` ---
+
+test('add without --goal-tier/--targets leaves both fields unset, exit 0', () => {
+  const cwd = tmpCwd();
+  const result = addOk(cwd, 'no-goal-item');
+  assert.equal(result.status, 0);
+  assert.equal(stateView(cwd).work['no-goal-item'].goalTier, undefined);
+  assert.equal(stateView(cwd).work['no-goal-item'].targets, undefined);
+});
+
+test('add --goal-tier mvp --targets a,b persists both fields, exit 0', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, [
+    'add', 'goal-item',
+    '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x',
+    '--goal-tier', 'mvp', '--targets', 'a,b',
+  ]);
+  assert.equal(result.status, 0);
+  const item = stateView(cwd).work['goal-item'];
+  assert.equal(item.goalTier, 'mvp');
+  assert.deepEqual(item.targets, ['a', 'b']);
+});
+
+test('add --goal-tier <invalid value> is rejected as validation, exit 4, no event written', () => {
+  const cwd = tmpCwd();
+  const before = eventLines(cwd).length;
+  const result = run(cwd, ['add', 'bogus-goal-item', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--goal-tier', 'bogus']);
+  assert.equal(result.status, 4);
+  assert.equal(eventLines(cwd).length, before);
+});
+
+test('add --targets "" parses to [] explicitly, exit 0', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['add', 'empty-targets-item', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--targets', '']);
+  assert.equal(result.status, 0);
+  assert.deepEqual(stateView(cwd).work['empty-targets-item'].targets, []);
+});
+
+test('add with a bare --targets (no value) also parses to [], exit 0', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['add', 'bare-targets-item', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--targets']);
+  assert.equal(result.status, 0);
+  assert.deepEqual(stateView(cwd).work['bare-targets-item'].targets, []);
+});
+
 // --- p50-workflow-induct D7: --docs-ref on `add` (ceremony decision-doc pointer) ---
 
 test('add without --docs-ref leaves docsRef unset, exit 0', () => {

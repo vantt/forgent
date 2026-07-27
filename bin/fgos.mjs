@@ -660,6 +660,23 @@ async function runVerb(verb, flags, positional, dir) {
         // validateWorkShape is the single source for the {text, evidence}
         // shape rule; a malformed JSON value is rejected here, before that.
         acceptance: parseAcceptanceFlag(flags.acceptance, 'add --acceptance requires a JSON-encoded array of {text, evidence} clauses.'),
+        // Per str67-goal-directed-planning D1: --goal-tier is optional, same
+        // omitted-leaves-undefined shape as --tier/--domain/--discovered-from
+        // above. A goal item is always created fresh with goalTier set at
+        // add time (never retrofitted via edit). An out-of-domain value
+        // (not mvp/milestone) passes through unrejected here — work.mjs's
+        // validateWorkShape is the single source for the GOAL_TIERS domain
+        // and rejects it as validation, so that rule is never duplicated
+        // here (same discipline as --tier/TIERS and --domain/DOMAINS).
+        goalTier: optionalField(flags['goal-tier'], "add --goal-tier requires a value ('mvp' or 'milestone'); omit --goal-tier entirely to leave unset."),
+        // Per str67-goal-directed-planning D2: --targets is an optional list
+        // of ids (existing or not-yet-created) this goal item considers
+        // "part of" it. Same present-or-absent shape as --footprint above,
+        // NOT the default-to-[] shape --deps/--refs use: set ONLY when the
+        // flag is present so an omitted flag leaves targets ABSENT. An
+        // empty `--targets ''` (or a bare `--targets` with no value)
+        // parses to [] explicitly, same as --footprint.
+        targets: flags.targets === undefined ? undefined : parseListFlag(flags.targets),
       };
       const { event } = addWork(dir, work);
       return { id: event.payload.id, seq: event.seq };
