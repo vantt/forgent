@@ -604,3 +604,32 @@ test('viewRevision does NOT leak into the fold return: rebuildView still returns
   assert.equal('revision' in view, false, 'the revision is a persisted sibling, never part of the fold return');
   assert.deepEqual(rebuildView(logPath), view, 'rebuild return unchanged by the revision primitive');
 });
+
+test("foldEvents folds writer onto the item across work.move, work.edit and work.stage, latest write wins (D8/D15)", () => {
+  const base = { seq: 1, ts: "2026-07-27T00:00:00.000Z", type: "work.add", payload: { id: "a", title: "A", status: "todo" } };
+  const writerA = { id: "sess-1", source: "env" };
+  const writerB = { id: "sess-2", source: "registry" };
+  const writerC = { id: 4242, source: "pid" };
+  const moveEvent = { seq: 2, ts: "2026-07-27T00:00:01.000Z", type: "work.move", payload: { id: "a", to: "doing", writer: writerA } };
+  const editEvent = { seq: 3, ts: "2026-07-27T00:00:02.000Z", type: "work.edit", payload: { id: "a", patch: { title: "A2" }, writer: writerB } };
+  const stageEvent = { seq: 4, ts: "2026-07-27T00:00:03.000Z", type: "work.stage", payload: { id: "a", from: "executing", to: "decompose", writer: writerC } };
+
+  const steps = [
+    { events: [base, moveEvent], expected: writerA, label: "work.move" },
+    { events: [base, moveEvent, editEvent], expected: writerB, label: "work.edit" },
+    { events: [base, moveEvent, editEvent, stageEvent], expected: writerC, label: "work.stage" },
+  ];
+  for (const { events, expected, label } of steps) {
+    const view = foldEvents(events);
+    assert.deepEqual(view.work.a.writer, expected, label + ": writer must fold onto the item");
+  }
+});
+
+test("foldEvents on a work.move with no writer leaves item.writer absent (legacy events, backward-compat)", () => {
+  const events = [
+    { seq: 1, ts: "2026-07-27T00:00:04.000Z", type: "work.add", payload: { id: "a", title: "A", status: "todo" } },
+    { seq: 2, ts: "2026-07-27T00:00:05.000Z", type: "work.move", payload: { id: "a", to: "doing" } },
+  ];
+  const view = foldEvents(events);
+  assert.equal(view.work.a.writer, undefined);
+});

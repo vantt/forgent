@@ -18,6 +18,9 @@ import path from 'node:path';
 import { fork } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { addWork, editWork, moveWork, moveStage, addOutcome, addFriction, listWork, readRawEvents, StoreError } from '../../src/state/store.mjs';
+import { REGISTRY, ENV, PID, UNRESOLVED } from "../../src/runner/session-identity.mjs";
+
+const WRITER_SOURCES = new Set([REGISTRY, ENV, PID, UNRESOLVED]);
 
 const STORE_MJS = path.resolve(fileURLToPath(import.meta.url), '../../../src/state/store.mjs');
 
@@ -642,4 +645,28 @@ test('editWork rejects a negative priority patch — validateWork still runs on 
     /priority/,
   );
   assert.equal(listWork(dir).work['prio-neg'].priority, undefined, 'the rejected patch never lands');
+});
+
+
+// --- writer provenance (D8/D15/D17/D18, str46-io-contract): every event
+// written through editWork, moveWork and moveStage carries a writer
+// object produced by resolveWriterIdentity -- table-driven since the three
+// doors exercise the exact same shape assertion, only the call differs.
+test("editWork, moveWork and moveStage each stamp the event payload with writer id/source, never a joined string, never routed through a validator", () => {
+  const dir = tmpDir();
+  addSampleWork(dir, "writer-a");
+
+  const doors = [
+    { name: "editWork", call: () => editWork(dir, { id: "writer-a", patch: { title: "Writer A edited" } }) },
+    { name: "moveWork", call: () => moveWork(dir, { id: "writer-a", to: "doing", expectedStatus: "todo" }) },
+    { name: "moveStage", call: () => moveStage(dir, { id: "writer-a", to: "compound-learn" }) },
+  ];
+
+  for (const { name, call } of doors) {
+    const { event } = call();
+    const writer = event.payload.writer;
+    assert.ok(writer && typeof writer === "object" && !Array.isArray(writer), name + ": writer must be a nested object, not a joined string");
+    assert.deepEqual(Object.keys(writer).sort(), ["id", "source"], name + ": writer has exactly two children, id and source");
+    assert.ok(WRITER_SOURCES.has(writer.source), name + ": source must be one of registry/env/pid/unresolved");
+  }
 });

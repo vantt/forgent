@@ -37,6 +37,7 @@ import { validateWork, WorkValidationError, DEFAULTS } from './work.mjs';
 import { EventLogError } from './events.mjs';
 import { frontier } from './frontier.mjs';
 import { assertNoCycle, assertNoUnifiedCycle } from './dep-graph.mjs';
+import { resolveWriterIdentity } from '../runner/session-identity.mjs';
 
 export { FsmError, WorkValidationError, EventLogError };
 
@@ -241,6 +242,12 @@ export function editWork(dir, { id, patch, actor } = {}) {
     if (actor !== undefined) {
       payload.actor = actor;
     }
+    // Writer provenance (D8/D15/D17/D18, str46-io-contract): stamped
+    // post-transition exactly like actor above, but unconditional -- every
+    // event through this door records who wrote it. resolveWriterIdentity
+    // never throws and never blocks the mutation (D18); no validator sits on
+    // this path.
+    payload.writer = resolveWriterIdentity(dir);
     return appendEventLocked(logPath, { type: 'work.edit', payload });
   });
   const view = refreshView(dir);
@@ -317,6 +324,11 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, act
   if (actor !== undefined) {
     rawEvent.payload.actor = actor;
   }
+  // Writer provenance (D8/D15/D17/D18, str46-io-contract) -- same
+  // post-transition stamp as actor/headAtTake above, but unconditional:
+  // every moveWork call records who wrote it, never blocking on a
+  // malformed identity (D18).
+  rawEvent.payload.writer = resolveWriterIdentity(dir);
   // Pull-door claim marker (stage-decompose S2-pull D1): the host repo's HEAD
   // at claim time, additive on the SAME `to === 'doing'` move `take` writes —
   // never a separate event (single write door, D3). Ignored by fsm.mjs (pure,
@@ -491,6 +503,11 @@ export function moveStage(dir, { id, to, expectedStage, verify, actor } = {}) {
     if (actor !== undefined) {
       rawEvent.payload.actor = actor;
     }
+    // Writer provenance (D8/D15/D17/D18, str46-io-contract) -- same
+    // post-transition stamp as actor above, but unconditional: every
+    // moveStage call records who wrote it, never blocking on a malformed
+    // identity (D18).
+    rawEvent.payload.writer = resolveWriterIdentity(dir);
     return appendEventLocked(logPath, rawEvent);
   });
   const view = refreshView(dir);

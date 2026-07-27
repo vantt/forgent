@@ -45,10 +45,18 @@ function applyEvent(view, event) {
       break;
     }
     case 'work.move': {
-      const { id, to, ask, answer, actor, learning, headAtTake, headAtReturn, branchHeadAtTake, branchHeadAtReturn, reason, parentSnapshotAtAsk } = event.payload ?? {};
+      const { id, to, ask, answer, actor, learning, headAtTake, headAtReturn, branchHeadAtTake, branchHeadAtReturn, reason, parentSnapshotAtAsk, writer } = event.payload ?? {};
       const item = view.work[id];
       if (item) {
         item.status = to;
+      }
+      // Writer provenance (D8/D15, str46-io-contract): folds onto the item
+      // unconditionally, latest write wins -- a durable per-item field
+      // recording who last wrote it, unlike claimActor below which only
+      // folds on the doing-entry edge. Absent on a legacy event with no
+      // writer, mirroring reason/headAtTake above (backward-compat).
+      if (item && writer !== undefined) {
+        item.writer = writer;
       }
       // Claim attribution (stage-decompose S2-pull D1/cell action (4)):
       // fold the claiming `actor` onto the item itself as `claimActor` —
@@ -201,10 +209,16 @@ function applyEvent(view, event) {
       // (reason, headAtTake, ...) rather than replacing the whole record.
       // Guarded on `item` for the same ghost-id no-op reason as every other
       // case here — an edit for an id that was never added stays a no-op.
-      const { id, patch } = event.payload ?? {};
+      const { id, patch, writer } = event.payload ?? {};
       const item = view.work[id];
       if (item && patch && typeof patch === 'object') {
         Object.assign(item, patch);
+      }
+      // Writer provenance (D8/D15, str46-io-contract): same unconditional,
+      // latest-write-wins fold as work.move above -- writer is a sibling of
+      // patch on the payload, never itself part of the editable-field set.
+      if (item && writer !== undefined) {
+        item.writer = writer;
       }
       break;
     }
@@ -241,12 +255,17 @@ function applyEvent(view, event) {
       // (read lazily as `executing` by consumers, per D8); this case only
       // ever runs for an item that already has a real `work.stage` event in
       // its history, at which point setting the field explicitly is correct.
-      const { id, from, to, verify, actor } = event.payload ?? {};
+      const { id, from, to, verify, actor, writer } = event.payload ?? {};
       const item = view.work[id];
       if (item) {
         item.stage = to;
         if (verify !== undefined) {
           item.verify = verify;
+        }
+        // Writer provenance (D8/D15, str46-io-contract): same unconditional,
+        // latest-write-wins fold as work.move/work.edit above.
+        if (writer !== undefined) {
+          item.writer = writer;
         }
       }
       // Settlement channel, third kind (mirrors the work.move case above):
