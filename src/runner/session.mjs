@@ -490,11 +490,26 @@ export function reclaimOrphanedSessions(repoRoot) {
   try {
     const entries = readRegistry(fgosDir);
     const registered = listWorktreePaths(repoRoot);
+    const callerRealpath = realpathOr(path.resolve(repoRoot));
     const reclaimed = [];
     const skipped = [];
     const kept = [];
 
     for (const entry of entries) {
+      // Self-mount guard: the caller can never legitimately be reclaiming the
+      // exact worktree it is currently running from — the call itself proves
+      // that worktree is in use. This must run BEFORE the pidDead/
+      // missingFromGit checks below: the worktree's own registered pid (the
+      // one-shot `fgos session start` CLI) is expected to already be dead by
+      // design right after handoff, and `.fgos` inside every session
+      // worktree symlinks back to this SAME shared registry — so without
+      // this guard a session calling reclaimOrphanedSessions(process.cwd())
+      // from inside its own worktree would read itself as an orphan.
+      if (realpathOr(entry.worktreePath) === callerRealpath) {
+        kept.push(entry);
+        continue;
+      }
+
       const missingFromGit = !registered.has(realpathOr(entry.worktreePath));
       const pidDead = !(Number.isInteger(entry.pid) && entry.pid > 0 && isPidAlive(entry.pid));
       if (!missingFromGit && !pidDead) {

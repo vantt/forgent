@@ -1,8 +1,8 @@
 ---
 area: runner
 updated: 2026-07-27
-sources: [phase-2-routing, post-divorce-hardening, phase-3-compound-learning-s1, phase-3-compound-learning-s2, phase-3-compound-learning-s3-closeout, stage-clarify, stage-decompose-s1, stage-decompose-s2, pr-lifecycle-s1, discovery-context, worker-execution, fan-out-parallel, human-rounds, worker-dispatch-log, self-improve-loop, base-workflow-model-s2, fgos-multi-session-checkout, github-adapter-s3, github-adapter-s4, work-graph-intelligence-s2b, work-graph-intelligence-s10, work-graph-intelligence-s11, fgos-sample-testbed, p50-workflow-induct, str68-discovery-judge-robustness, str76-runner-bootstrap, str86-runner-headless-git, str7-str8-priority-intent]
-decisions: [feed7428, 14396a5c, 1a80b4d3, 9a19eea5, 96a65365, a7c099af, 43f257ae, 44936500, e1218b22, 6f2cbc47, a30a3d3c, 1359ab5e, cfae0120, 22699c61, 04a6cd05, 396d9d9e, 2e92b7a5, f0c40acc, 5a6900b2, 8575f1a3, c8df2479, cb09d6fd, b1aa1bdc, caecb9d1, 9b141173, a3176299, 140eb8a4, 76b7a36b, 8d04bba3, 1cd895e1, 38160a70, c11322cb, 2ac16176, f8a3a5d9, 3d4ea29c, 3c8e5926, 342102b9, d4c59ba2, 644916a4, ef6ed305, a4fe4c2b, f69951df, 5208dfe9, 8cf7effe, 7bbe6315, a7c93ec8, cfdd808f, 31b5f045, 87536f3f, 38f7e0b8, ecfd0d1a, f176c18a, d3445024]
+sources: [phase-2-routing, post-divorce-hardening, phase-3-compound-learning-s1, phase-3-compound-learning-s2, phase-3-compound-learning-s3-closeout, stage-clarify, stage-decompose-s1, stage-decompose-s2, pr-lifecycle-s1, discovery-context, worker-execution, fan-out-parallel, human-rounds, worker-dispatch-log, self-improve-loop, base-workflow-model-s2, fgos-multi-session-checkout, github-adapter-s3, github-adapter-s4, work-graph-intelligence-s2b, work-graph-intelligence-s10, work-graph-intelligence-s11, fgos-sample-testbed, p50-workflow-induct, str68-discovery-judge-robustness, str76-runner-bootstrap, str86-runner-headless-git, str7-str8-priority-intent, str51-2-reclaim-self-mount-fix]
+decisions: [feed7428, 14396a5c, 1a80b4d3, 9a19eea5, 96a65365, a7c099af, 43f257ae, 44936500, e1218b22, 6f2cbc47, a30a3d3c, 1359ab5e, cfae0120, 22699c61, 04a6cd05, 396d9d9e, 2e92b7a5, f0c40acc, 5a6900b2, 8575f1a3, c8df2479, cb09d6fd, b1aa1bdc, caecb9d1, 9b141173, a3176299, 140eb8a4, 76b7a36b, 8d04bba3, 1cd895e1, 38160a70, c11322cb, 2ac16176, f8a3a5d9, 3d4ea29c, 3c8e5926, 342102b9, d4c59ba2, 644916a4, ef6ed305, a4fe4c2b, f69951df, 5208dfe9, 8cf7effe, 7bbe6315, a7c93ec8, cfdd808f, 31b5f045, 87536f3f, 38f7e0b8, ecfd0d1a, f176c18a, d3445024, cf3ee399]
 coverage: full
 ---
 
@@ -686,7 +686,15 @@ của nó (`aheadCount` + `verify`) vốn đã đúng khi chạy từ trong work
     vệ phân kỳ như `end` (một commit lửng không bao giờ bị âm thầm bỏ), CỘNG
     THÊM một phép bảo vệ cây-bẩn riêng: một worktree còn thay đổi CHƯA commit
     (kể cả chưa từng commit — nằm ngoài phép kiểm phân kỳ dựa-commit) cũng được
-    tha, không bị `--force` xóa. Mục nào bị tha thì liệt vào `skipped`, mục nào
+    tha, không bị `--force` xóa. **CỘNG THÊM một phép bảo vệ tự-thân** (str51-2-reclaim-self-mount-fix):
+    mục nào có đường worktree TRÙNG với đường gọi `gc` (`repoRoot` truyền vào)
+    luôn được tha VÔ ĐIỀU KIỆN, kiểm TRƯỚC cả pid-chết lẫn phân kỳ/cây-bẩn — vì
+    chính lệnh gọi `gc` đang chạy TỪ worktree đó đã là bằng chứng nó còn đang
+    dùng, bất kể pid ghi sổ chết hay còn sống. Không có phép bảo vệ này, một
+    phiên tự gọi `gc` từ bên trong worktree của chính nó (ví dụ qua `.fgos`
+    symlink dùng chung sổ đăng ký) sẽ luôn đọc chính mình là mồ côi (pid-chết
+    do thiết kế) và tự xóa worktree đang dùng — đã xảy ra thật một lần trước
+    khi có phép bảo vệ này. Mục nào bị tha thì liệt vào `skipped`, mục nào
     dọn được thì liệt vào `reclaimed`; trả `{ reclaimed, skipped }`.
 - **Side effects:** mọi đọc-sửa-ghi `sessions.json` được canh bởi một khóa
   RIÊNG `.fgos/sessions.lock` (tạo-nguyên-tử `wx` + đòi-lại-pid-chết, soi theo
