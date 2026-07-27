@@ -490,7 +490,14 @@ function collectRollupData(view, id) {
 // with the defaults (D15: no flag surface of its own, YAGNI).
 function submitWork(dir, text, opts = {}) {
   const title = deriveTitle(text);
-  const { tier, kind, risk } = classify(text);
+  const classified = classify(text);
+  // Per str51-llm-assist-classify D2/D5: --tier/--kind/--risk are
+  // independently overridable per-field; an omitted flag falls through to
+  // classify(text)'s own mechanical default for exactly that field, so a
+  // flagless call stays byte-identical to the pre-feature behavior.
+  const tier = opts.tier ?? classified.tier;
+  const kind = opts.kind ?? classified.kind;
+  const risk = opts.risk ?? classified.risk;
   const id = generateId(title, Object.keys(listWork(dir).work));
   const work = {
     id,
@@ -684,6 +691,13 @@ async function runVerb(verb, flags, positional, dir) {
         // acceptance flag as `add`, threaded through submitWork's opts the
         // same way domain/discoveredFrom already are, immediately above.
         acceptance: parseAcceptanceFlag(flags.acceptance, 'submit --acceptance requires a JSON-encoded array of {text, evidence} clauses.'),
+        // Per str51-llm-assist-classify D2: three new optional overrides for
+        // classify(text)'s per-field output, same optionalField shape as
+        // add's --tier above; each is independent (D5) and omitted leaves
+        // this field undefined so submitWork falls through to classify().
+        tier: optionalField(flags.tier, 'submit --tier requires a tier value (e.g. light/standard/heavy); omit --tier entirely to use classify()\'s derived value.'),
+        kind: optionalField(flags.kind, 'submit --kind requires a kind value; omit --kind entirely to use classify()\'s derived value.'),
+        risk: optionalField(flags.risk, 'submit --risk requires a risk value; omit --risk entirely to use classify()\'s derived value.'),
       };
       return submitWork(dir, text, opts);
     }

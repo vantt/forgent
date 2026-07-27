@@ -1929,6 +1929,69 @@ test('submit --deps <nonexistent-id> fails loudly through the existing write-gat
   assert.equal(eventLines(cwd).length, before);
 });
 
+// --- str51-llm-assist-classify D2/D5: --tier/--kind/--risk overrides on ---
+// `submit` (each independently overrides classify(text)'s per-field output;
+// an omitted flag stays byte-identical to classify()'s own derived value)
+
+test('submit with no --tier/--kind/--risk flags is byte-identical to pre-feature behavior (D2 regression proof)', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['submit', 'Investigate the sluggish overview page']);
+  assert.equal(result.status, 0);
+  const id = JSON.parse(result.stdout).data.id;
+  const item = envelopeData(run(cwd, ['list']).stdout).work[id];
+  assert.equal(item.tier, 'standard');
+  assert.equal(item.kind, 'task');
+  assert.equal(item.risk, 'standard');
+});
+
+test('submit --tier heavy --kind bug --risk heavy overrides all three fields regardless of classify(text)', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['submit', 'Investigate the sluggish overview page', '--tier', 'heavy', '--kind', 'bug', '--risk', 'heavy']);
+  assert.equal(result.status, 0);
+  const id = JSON.parse(result.stdout).data.id;
+  const item = envelopeData(run(cwd, ['list']).stdout).work[id];
+  assert.equal(item.tier, 'heavy');
+  assert.equal(item.kind, 'bug');
+  assert.equal(item.risk, 'heavy');
+});
+
+test('submit with only --kind overrides just that field; tier and risk still come from classify(text)', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['submit', 'Investigate the sluggish overview page', '--kind', 'bug']);
+  assert.equal(result.status, 0);
+  const id = JSON.parse(result.stdout).data.id;
+  const item = envelopeData(run(cwd, ['list']).stdout).work[id];
+  assert.equal(item.kind, 'bug');
+  assert.equal(item.tier, 'standard');
+  assert.equal(item.risk, 'standard');
+});
+
+test('submit --tier override alone does not change risk -- risk still mirrors classify()\'s own tier, not the override', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['submit', 'Investigate the sluggish overview page', '--tier', 'heavy']);
+  assert.equal(result.status, 0);
+  const id = JSON.parse(result.stdout).data.id;
+  const item = envelopeData(run(cwd, ['list']).stdout).work[id];
+  assert.equal(item.tier, 'heavy');
+  assert.equal(item.risk, 'standard');
+});
+
+test('submit with a bare --tier (no value) is rejected as validation, exit 4, no event written', () => {
+  const cwd = tmpCwd();
+  const before = eventLines(cwd).length;
+  const result = run(cwd, ['submit', 'Try a bare tier flag', '--tier']);
+  assert.equal(result.status, 4);
+  assert.equal(eventLines(cwd).length, before);
+});
+
+test('submit with an empty --kind "" is rejected as validation, exit 4, no event written', () => {
+  const cwd = tmpCwd();
+  const before = eventLines(cwd).length;
+  const result = run(cwd, ['submit', 'Try an empty kind', '--kind', '']);
+  assert.equal(result.status, 4);
+  assert.equal(eventLines(cwd).length, before);
+});
+
 // RETARGET (stage-decompose D2, cell 3): `discover` on a stage-`clarify`
 // item still only runs `resolveDiscovery` (one hop) — a clear verdict now
 // lands it on stage `decompose`, not `executing` directly, since chia-việc
