@@ -454,3 +454,41 @@ test('reclaimOrphanedSessions spares a dead-pid orphan with uncommitted (never-c
     cleanup(repoRoot, sessionsDir);
   }
 });
+
+test('reclaimOrphanedSessions never reclaims the caller\'s own worktree, even with a dead recorded pid', () => {
+  const repoRoot = initTempRepo();
+  const sessionsDir = mkSessionsDir();
+  try {
+    const self = createSession(repoRoot, { sessionId: 'self', sessionsDir });
+    const otherOrphan = createSession(repoRoot, { sessionId: 'other-orphan', sessionsDir });
+
+    // Mark both dead-pid — by design, `self`'s own registered pid (the
+    // one-shot `fgos session start` CLI) is always dead by the time anyone
+    // could call reclaim from inside it, exactly the case the guard exists
+    // for.
+    const dead = deadPid();
+    const registry = readRegistry(repoRoot).map((e) =>
+      e.sessionId === 'self' || e.sessionId === 'other-orphan' ? { ...e, pid: dead } : e,
+    );
+    writeRegistry(repoRoot, registry);
+
+    // Call reclaimOrphanedSessions with repoRoot = `self`'s OWN worktree path
+    // — simulating the call happening from inside that very session, the
+    // same way `.fgos` inside every session worktree symlinks back to this
+    // same shared registry.
+    const result = reclaimOrphanedSessions(self.worktreePath);
+
+    assert.deepEqual(result.reclaimed, ['other-orphan'], 'only the genuinely other orphan is reclaimed');
+    assert.ok(!result.reclaimed.includes('self'), 'the caller never reclaims its own worktree entry');
+    assert.ok(!result.skipped.includes('self'), 'the caller\'s own entry is kept outright, not routed through skip');
+
+    const remaining = listSessions(self.worktreePath)
+      .map((e) => e.sessionId)
+      .sort();
+    assert.deepEqual(remaining, ['self'], 'self entry preserved in the registry; other-orphan dropped');
+    assert.ok(fs.existsSync(self.worktreePath), 'the caller\'s own worktree is never removed');
+    assert.ok(!fs.existsSync(otherOrphan.worktreePath), 'the genuinely orphaned worktree is removed');
+  } finally {
+    cleanup(repoRoot, sessionsDir);
+  }
+});
