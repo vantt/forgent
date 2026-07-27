@@ -13,7 +13,7 @@
       "verify": "node --test 'test/**/*.test.mjs' --test-name-pattern=multiply",
       "mode": "sync",
       "stage": "executing",
-      "claimActor": "human",
+      "claimRole": "human",
       "headAtTake": "c52aeabb8c54ee4b3ce8d7a99ac69c073a54e1af",
       "headAtReturn": "02a41162f8f319881a14d7a3bbfc9345130fbdd0"
     },
@@ -30,7 +30,7 @@
       "verify": "cd /home/vantt/projects/forgent/repo/dogfood-fixture && node --test test/calculator.test.mjs",
       "mode": "sync",
       "stage": "executing",
-      "claimActor": "human",
+      "claimRole": "human",
       "headAtTake": "02a41162f8f319881a14d7a3bbfc9345130fbdd0",
       "headAtReturn": "c73d39ee2a5f3eb64d3b5f43172828bc05e66bc3"
     },
@@ -47,7 +47,7 @@
       "verify": "node --test 'test/**/*.test.mjs' --test-name-pattern=power",
       "mode": "sync",
       "stage": "executing",
-      "claimActor": "human",
+      "claimRole": "human",
       "headAtTake": "9bd8da66cca2524c2de4e47c960eb65a9274ea48",
       "headAtReturn": "76aa4d713fbd7e1ea1307719e1c783c37e85bcbc"
     }
@@ -89,13 +89,13 @@
     "tsk-4e5": [
       {
         "kind": "clarify-pass",
-        "actor": "session",
+        "role": "session",
         "ts": "2026-07-18T15:54:16.802Z",
         "detail": "node --test 'test/**/*.test.mjs' --test-name-pattern=multiply"
       },
       {
         "kind": "close",
-        "actor": "human",
+        "role": "human",
         "ts": "2026-07-18T15:57:17.824Z",
         "detail": null
       }
@@ -103,13 +103,13 @@
     "tsk-2ie": [
       {
         "kind": "clarify-pass",
-        "actor": "session",
+        "role": "session",
         "ts": "2026-07-18T16:04:48.960Z",
         "detail": "cd /home/vantt/projects/forgent/repo/dogfood-fixture && node --test test/calculator.test.mjs"
       },
       {
         "kind": "close",
-        "actor": "human",
+        "role": "human",
         "ts": "2026-07-18T16:06:56.419Z",
         "detail": null
       }
@@ -117,19 +117,19 @@
     "tsk-5gc": [
       {
         "kind": "answer",
-        "actor": "human",
+        "role": "human",
         "ts": "2026-07-20T05:58:08.422Z",
         "detail": "power() uses native ** semantics for all real-number inputs, mirroring divide's native IEEE-754 resolution"
       },
       {
         "kind": "clarify-pass",
-        "actor": "session",
+        "role": "session",
         "ts": "2026-07-20T05:58:16.382Z",
         "detail": "cd dogfood-fixture && npm test -- --grep power"
       },
       {
         "kind": "close",
-        "actor": "human",
+        "role": "human",
         "ts": "2026-07-20T06:02:05.170Z",
         "detail": null
       }
@@ -142,8 +142,8 @@
         "tier": "standard",
         "deps": 0,
         "priorVisits": 0,
-        "actor": "human",
-        "headAtTake": "c52aeabb8c54ee4b3ce8d7a99ac69c073a54e1af"
+        "headAtTake": "c52aeabb8c54ee4b3ce8d7a99ac69c073a54e1af",
+        "role": "human"
       },
       "actual": {
         "outcome": "proposed",
@@ -159,8 +159,8 @@
         "tier": "standard",
         "deps": 0,
         "priorVisits": 0,
-        "actor": "human",
-        "headAtTake": "02a41162f8f319881a14d7a3bbfc9345130fbdd0"
+        "headAtTake": "02a41162f8f319881a14d7a3bbfc9345130fbdd0",
+        "role": "human"
       },
       "actual": {
         "outcome": "proposed",
@@ -176,8 +176,8 @@
         "tier": "standard",
         "deps": 0,
         "priorVisits": 0,
-        "actor": "human",
-        "headAtTake": "9bd8da66cca2524c2de4e47c960eb65a9274ea48"
+        "headAtTake": "9bd8da66cca2524c2de4e47c960eb65a9274ea48",
+        "role": "human"
       },
       "actual": {
         "outcome": "proposed",
@@ -257,5 +257,5 @@
       }
     ]
   },
-  "revision": "d9d07b9bc03693c41ba01a4608fbf60cdb103c87b088d121aaa1b3634f1073bf"
+  "revision": "c19b5f7daa3aec0d4615ab463871f0e26c74297bdbff446141b76b00f815f953"
 }
