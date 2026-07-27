@@ -45,6 +45,15 @@ export const STATUSES = Object.freeze(['todo', 'doing', 'blocked', 'proposed', '
 export const TIERS = Object.freeze(['light', 'standard', 'heavy']);
 
 /**
+ * Goal-tier domain for `work.goalTier` (per str67-goal-directed-planning D1)
+ * — marks a work item as a declared goal. A goal is not a new entity: it is
+ * an ordinary work item carrying this optional field, always set at `add`
+ * time (never retrofitted onto an existing item — see store.mjs's
+ * EDITABLE_FIELDS, which excludes it).
+ */
+export const GOAL_TIERS = Object.freeze(['mvp', 'milestone']);
+
+/**
  * Stage domain for `work.stage` (per stage-clarify D1/D2/D8, extended by
  * stage-decompose D2) — the macro-level lifecycle stage of a work item
  * (clarify -> decompose -> executing), orthogonal to the FSM's micro-level
@@ -305,6 +314,43 @@ export function validateWorkShape(work) {
   if (work.docsRef !== undefined && work.docsRef !== null) {
     if (typeof work.docsRef !== 'string' || !work.docsRef.trim()) {
       throw new WorkValidationError('work.docsRef must be a non-empty string when present.');
+    }
+  }
+
+  // Goal tier (per str67-goal-directed-planning D1): OPTIONAL additive field
+  // marking a work item as a declared goal -- 'mvp' or 'milestone'. Same
+  // lazy-additive shape as tier/domain above: absent means "not a goal", no
+  // DEFAULTS entry, no item migration. A goal item is always created fresh
+  // with goalTier set at add time (see store.mjs's EDITABLE_FIELDS, which
+  // excludes it) -- never retrofitted onto an existing item.
+  if (work.goalTier !== undefined && !GOAL_TIERS.includes(work.goalTier)) {
+    throw new WorkValidationError(
+      `work.goalTier must be one of ${JSON.stringify(GOAL_TIERS)} when present, got: ${JSON.stringify(work.goalTier)}`,
+    );
+  }
+
+  // Goal targets (per str67-goal-directed-planning D2): OPTIONAL additive
+  // list of ids -- existing or not-yet-created -- that this goal item
+  // considers "part of" it (an MVP's targets are milestone ids; a
+  // milestone's targets are ordinary work ids). Mirrors deps' array-of-
+  // non-empty-strings shape and parent/discoveredFrom's self-reference
+  // guard; unlike deps, target ids are NOT required to already exist (see
+  // validateDeps, which never checks targets -- targets may point at
+  // not-yet-created ids). null is treated the same as absent, same as
+  // parent/discoveredFrom.
+  if (work.targets !== undefined && work.targets !== null) {
+    if (!Array.isArray(work.targets)) {
+      throw new WorkValidationError(
+        `work.targets must be an array of non-empty strings when present, got: ${JSON.stringify(work.targets)}`,
+      );
+    }
+    for (const target of work.targets) {
+      if (typeof target !== 'string' || !target) {
+        throw new WorkValidationError(`work.targets entries must be non-empty strings, got: ${JSON.stringify(target)}`);
+      }
+      if (target === work.id) {
+        throw new WorkValidationError(`work "${work.id}" cannot list itself in its own targets.`);
+      }
     }
   }
 
