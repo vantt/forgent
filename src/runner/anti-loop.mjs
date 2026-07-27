@@ -70,7 +70,8 @@ export function visitCount(events, id) {
  *   - `payload.reason !== undefined` — a human's reject/park-with-reason
  *     (fsm.mjs's `proposed -> todo`/`proposed -> blocked` edges; the runner's
  *     own reason-carrying parks, e.g. `anti-loop-max-visits`/`breaker-tripped`,
- *     stamp `role: 'runner'` and so never match here).
+ *     stamp `role: 'runner'`, and `return`/`approve`'s own internal park edges
+ *     stamp `role: 'system'` (D30) — neither ever matches here).
  * A bare resume (`blocked -> todo` with no reason) and a human `take`
  * (`blocked -> doing`, `role: 'human'`, no answer/reason) are deliberately
  * NOT triggers — per D1c only the two closed shapes above reset the budget.

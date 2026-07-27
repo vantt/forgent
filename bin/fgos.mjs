@@ -1337,7 +1337,7 @@ async function runVerb(verb, flags, positional, dir) {
           return { id, from: 'doing', to: 'proposed', source: 'branch', branch, aheadCount: branchAheadCount, passed: true, seq: event.seq, output: check.output, frozenJudgeHits: frozenJudge };
         }
 
-        moveWork(dir, { id, to: 'blocked', expectedStatus: 'doing', reason: 'verify-fail' });
+        moveWork(dir, { id, to: 'blocked', expectedStatus: 'doing', reason: 'verify-fail', role: 'system' });
         addOutcome(dir, { id, actual: { outcome: 'blocked', passed: false, attempts: 1, errorClass: 'verify-miss', aheadCount: branchAheadCount } });
         addFriction(dir, {
           id,
@@ -1376,7 +1376,7 @@ async function runVerb(verb, flags, positional, dir) {
         return { id, from: 'doing', to: 'proposed', source: 'main', aheadCount, passed: true, seq: event.seq, output: check.output, frozenJudgeHits: frozenJudge };
       }
 
-      moveWork(dir, { id, to: 'blocked', expectedStatus: 'doing', reason: 'verify-fail' });
+      moveWork(dir, { id, to: 'blocked', expectedStatus: 'doing', reason: 'verify-fail', role: 'system' });
       addOutcome(dir, { id, actual: { outcome: 'blocked', passed: false, attempts: 1, errorClass: 'verify-miss', aheadCount } });
       addFriction(dir, {
         id,
@@ -1624,7 +1624,7 @@ async function runVerb(verb, flags, positional, dir) {
         // plus a friction record carrying the failure layer and gh's stderr.
         const reason = result.reason;
         const layer = { 'auth-failure': 'environment', 'rate-limited': 'environment', 'unreachable': 'environment', 'gh-invocation-failed': 'state' }[reason] || 'state';
-        moveWork(dir, { id, to: 'blocked', expectedStatus: 'proposed', reason });
+        moveWork(dir, { id, to: 'blocked', expectedStatus: 'proposed', reason, role: 'system' });
         addFriction(dir, {
           id,
           disposition: 'blocked',
@@ -1667,7 +1667,7 @@ async function runVerb(verb, flags, positional, dir) {
             const result = await mergeRunnerItem(ephemeral.path, item, { timeoutMs });
 
             if (result.outcome === 'conflict') {
-              moveWork(dir, { id, to: 'blocked', expectedStatus: 'proposed', reason: 'merge-conflict' });
+              moveWork(dir, { id, to: 'blocked', expectedStatus: 'proposed', reason: 'merge-conflict', role: 'system' });
               addFriction(dir, {
                 id,
                 disposition: 'blocked',
@@ -1680,7 +1680,7 @@ async function runVerb(verb, flags, positional, dir) {
             }
 
             if (result.outcome === 'verify-fail') {
-              moveWork(dir, { id, to: 'blocked', expectedStatus: 'proposed', reason: 'verify-fail-post-merge' });
+              moveWork(dir, { id, to: 'blocked', expectedStatus: 'proposed', reason: 'verify-fail-post-merge', role: 'system' });
               addFriction(dir, {
                 id,
                 disposition: 'blocked',
@@ -1741,7 +1741,7 @@ async function runVerb(verb, flags, positional, dir) {
           const detail = hadChildren
             ? `cross-root integration drift at main@${currentHead(repoRoot)}; git merge --no-commit --no-ff ${result.branch} conflicted; merge aborted, main unchanged`
             : `git merge --no-commit --no-ff ${result.branch} conflicted; merge aborted, main unchanged`;
-          moveWork(dir, { id, to: 'blocked', expectedStatus: 'proposed', reason });
+          moveWork(dir, { id, to: 'blocked', expectedStatus: 'proposed', reason, role: 'system' });
           addFriction(dir, {
             id,
             disposition: 'blocked',
@@ -1758,7 +1758,7 @@ async function runVerb(verb, flags, positional, dir) {
           const detail = hadChildren
             ? `cross-root integration drift at main@${currentHead(repoRoot)}; goal-check failed on staged merge (exit ${result.check.status}); merge aborted, main unchanged`
             : `goal-check failed on staged merge (exit ${result.check.status}); merge aborted, main unchanged`;
-          moveWork(dir, { id, to: 'blocked', expectedStatus: 'proposed', reason });
+          moveWork(dir, { id, to: 'blocked', expectedStatus: 'proposed', reason, role: 'system' });
           addFriction(dir, {
             id,
             disposition: 'blocked',
@@ -1789,7 +1789,7 @@ async function runVerb(verb, flags, positional, dir) {
       // tree, exactly the goal-check contract `return` already uses.
       const check = await runGoalCheck(item, repoRoot, timeoutMs);
       if (!check.passed) {
-        moveWork(dir, { id, to: 'blocked', expectedStatus: 'proposed', reason: 'verify-fail' });
+        moveWork(dir, { id, to: 'blocked', expectedStatus: 'proposed', reason: 'verify-fail', role: 'system' });
         addFriction(dir, {
           id,
           disposition: 'blocked',

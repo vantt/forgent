@@ -2660,6 +2660,23 @@ test('return verify-fail: doing -> blocked + friction (verification layer), exit
   assert.equal(view.frictions['pull-return-red'][0].errorClass, 'verify-miss');
 });
 
+test("return verify-fail: park edge stamps role 'system' (not human) on the doing -> blocked event", () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  addOk(cwd, 'pull-return-red-role', { verify: 'test -f proof.txt' });
+  assert.equal(run(cwd, ['take', '--id', 'pull-return-red-role']).status, 0);
+  commitFile(cwd, 'wrong-file.txt'); // advances HEAD, but never satisfies verify
+
+  const result = run(cwd, ['return', 'pull-return-red-role']);
+  assert.equal(result.status, 0, `return should exit 0 for a defined blocked outcome: ${result.stderr}`);
+  assert.equal(envelopeData(result.stdout).to, 'blocked');
+
+  const lines = eventLines(cwd);
+  const moveEvent = lines.map((l) => JSON.parse(l)).find((e) => e.type === 'work.move' && e.payload.to === 'blocked');
+  assert.ok(moveEvent, 'expected a work.move event to blocked');
+  assert.equal(moveEvent.payload.role, 'system');
+});
+
 test('return on an item that is not "doing" (still todo) is rejected as validation, exit 4', () => {
   const cwd = initGitCwd();
   run(cwd, ['init']);
@@ -3412,6 +3429,22 @@ test('approve of a legacy item with a failing verify: blocked (reason verify-fai
 
   const view = stateView(cwd);
   assert.equal(view.work['approve-legacy-fail-item'].status, 'blocked');
+});
+
+test("approve verify-fail (legacy item): park edge stamps role 'system' (not human) on the proposed -> blocked event", () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'approve-legacy-fail-role-item', { verify: 'false' });
+  run(cwd, ['move', 'approve-legacy-fail-role-item', '--to', 'doing']);
+  run(cwd, ['move', 'approve-legacy-fail-role-item', '--to', 'proposed']);
+
+  const result = run(cwd, ['approve', 'approve-legacy-fail-role-item']);
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(envelopeData(result.stdout).to, 'blocked');
+
+  const lines = eventLines(cwd);
+  const moveEvent = lines.map((l) => JSON.parse(l)).find((e) => e.type === 'work.move' && e.payload.to === 'blocked');
+  assert.ok(moveEvent, 'expected a work.move event to blocked');
+  assert.equal(moveEvent.payload.role, 'system');
 });
 
 test('approve of a legacy item with a passing verify closes it to done — legacy degrade never blocks approve/reject from working (must_have)', () => {

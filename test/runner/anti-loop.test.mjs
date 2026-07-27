@@ -138,6 +138,15 @@ test('a machine park with reason (role runner, e.g. anti-loop-max-visits) does N
   assert.equal(visitsSinceLastHumanEvent(events, 'a'), 2);
 });
 
+test('a system park edge does not reset the anti-loop budget — role must be human, not just reason (D30: return/approve internal park edges stamp role system)', () => {
+  const events = [
+    move('a', 'doing', 1),
+    { seq: 2, ts: new Date(2026, 0, 2).toISOString(), type: 'work.move', payload: { id: 'a', from: 'doing', to: 'blocked', reason: 'verify-fail', role: 'system' }, v: 2 },
+    move('a', 'doing', 3),
+  ];
+  assert.equal(visitsSinceLastHumanEvent(events, 'a'), 2);
+});
+
 test('per-item: another id\'s human event never resets this id\'s budget', () => {
   const events = [
     move('a', 'doing', 1),
