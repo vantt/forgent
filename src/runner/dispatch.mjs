@@ -34,6 +34,7 @@
 // until real operation shows it is needed.
 
 import fs from 'node:fs';
+import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { DEFAULTS } from '../state/work.mjs';
 import { DOMAINS, resolveDomainName, skillForStage } from '../state/workflow-stage-graphs.mjs';
@@ -161,6 +162,44 @@ export function loadRunnerConfig(configPath) {
 }
 
 /**
+ * CLI names this module knows how to recognize when auto-detecting an
+ * assistant CLI on PATH for a fresh `.fgos-runner.json` (str82). Order
+ * matters: earlier names win when more than one is present on PATH. `codex`
+ * is listed here for a clearer "found X, but no verified template" message
+ * only — it has no entry in `SUPPORTED_EXECUTOR_TEMPLATES` below (no
+ * verified working argv shape for this dispatch path).
+ */
+export const KNOWN_ASSISTANT_CLI_NAMES = ['claude', 'codex'];
+
+/**
+ * Pure, side-effect-free PATH scan (str82): does an executable file named
+ * one of `candidateNames` exist in one of `pathEnv`'s directories? Never
+ * spawns or execs the candidate — this is a filesystem check only
+ * (`fs.statSync` + POSIX exec-bit check via `mode & 0o111`). Returns the
+ * first matching candidate name (in `candidateNames` order, so an earlier
+ * name wins over a later one found elsewhere on PATH) or `null` when none is
+ * found. `candidateNames`/`pathEnv` are both injectable so callers (and
+ * tests) never have to mutate the real environment to control the result.
+ */
+export function detectAssistantCli(candidateNames = KNOWN_ASSISTANT_CLI_NAMES, pathEnv = process.env.PATH) {
+  const dirs = typeof pathEnv === 'string' && pathEnv ? pathEnv.split(path.delimiter).filter(Boolean) : [];
+  for (const name of candidateNames) {
+    for (const dir of dirs) {
+      let stat;
+      try {
+        stat = fs.statSync(path.join(dir, name));
+      } catch {
+        continue;
+      }
+      if (stat.isFile() && (stat.mode & 0o111) !== 0) {
+        return name;
+      }
+    }
+  }
+  return null;
+}
+
+/**
  * D1's baked-in default `.fgos-runner.json` payload — mirrors this repo's own
  * tracked `.fgos-runner.json` verbatim, so the auto-generated default is
  * provably identical to what already works in this repo's own dogfood loop.
@@ -192,19 +231,45 @@ export const DEFAULT_RUNNER_CONFIG = {
 };
 
 /**
+ * Executor templates this module has actually verified for the missing-path
+ * bootstrap in `ensureRunnerConfig` (str82). Only `claude` has one — it is
+ * literally `DEFAULT_RUNNER_CONFIG.executor`, so detecting `claude` on PATH
+ * writes a byte-identical config to today's unconditional default. There is
+ * deliberately no `codex` (or other) entry: no verified working argv shape
+ * exists for this dispatch path yet, and fabricating one would silently
+ * break a user's first run instead of loudly asking them to fill it in by
+ * hand.
+ */
+export const SUPPORTED_EXECUTOR_TEMPLATES = { claude: DEFAULT_RUNNER_CONFIG.executor };
+
+/**
  * Bootstrap wrapper (D1/D3) around `loadRunnerConfig`: when `configPath` does
- * not exist, writes `DEFAULT_RUNNER_CONFIG` there and announces the write
- * (executor + path) before loading. `loadRunnerConfig` itself is never
- * modified — its "rejects a missing file" contract stays intact for any
- * caller (e.g. an explicit `--config` path) that still wants a loud failure
- * on ENOENT; this wrapper is the one place that instead treats a missing
- * default path as "first run, bootstrap it."
+ * not exist, auto-detects a known assistant CLI on PATH (str82,
+ * `detectAssistantCli`) and writes a default `.fgos-runner.json` there,
+ * announcing what it detected (or didn't) and the executor it wrote, before
+ * loading it. `loadRunnerConfig` itself is never modified — its "rejects a
+ * missing file" contract stays intact for any caller (e.g. an explicit
+ * `--config` path) that still wants a loud failure on ENOENT; this wrapper
+ * is the one place that instead treats a missing default path as "first
+ * run, bootstrap it."
+ *
+ * The written executor depends on what `detectAssistantCli` finds: `claude`
+ * on PATH writes `SUPPORTED_EXECUTOR_TEMPLATES.claude` (byte-identical to
+ * `DEFAULT_RUNNER_CONFIG.executor`, since that IS the verified claude
+ * template — so this stays byte-identical to the pre-str82 unconditional
+ * default whenever claude is present). A detected CLI with no verified
+ * template (e.g. `codex`), or no known CLI at all, writes a
+ * self-documenting placeholder `executor.command` instead of a
+ * fabricated/guessed argv shape, naming what to fix by hand in
+ * `.fgos-runner.json`. Every other `DEFAULT_RUNNER_CONFIG` field
+ * (models/timeoutMs/parallel) is unaffected either way.
  *
  * When `configPath` already exists (str87-fgos-setup-doctor D3), it is
  * merged against `DEFAULT_RUNNER_CONFIG` via `mergeConfigDefaults` instead of
  * left untouched: any default key the user's file is missing gets filled in
  * and the file is rewritten + the added keys announced; a file that already
- * has every default key is never rewritten.
+ * has every default key is never rewritten. This branch is unaffected by
+ * str82 — it never runs `detectAssistantCli`.
  *
  * A write failure (permissions, read-only fs, disk full) is never caught —
  * it propagates as a normal thrown error, since a failed bootstrap write IS
@@ -212,9 +277,22 @@ export const DEFAULT_RUNNER_CONFIG = {
  */
 export function ensureRunnerConfig(configPath) {
   if (!fs.existsSync(configPath)) {
-    fs.writeFileSync(configPath, `${JSON.stringify(DEFAULT_RUNNER_CONFIG, null, 2)}\n`);
+    const detected = detectAssistantCli();
+    const executor =
+      detected && detected in SUPPORTED_EXECUTOR_TEMPLATES
+        ? SUPPORTED_EXECUTOR_TEMPLATES[detected]
+        : {
+            command: detected
+              ? `NO_VERIFIED_TEMPLATE_FOR_${detected.toUpperCase()}__edit_.fgos-runner.json`
+              : 'NO_ASSISTANT_CLI_FOUND__edit_.fgos-runner.json',
+            args: ['{prompt}'],
+          };
+    const config = { ...DEFAULT_RUNNER_CONFIG, executor };
+    fs.writeFileSync(configPath, `${JSON.stringify(config, null, 2)}\n`);
     process.stderr.write(
-      `fgos: no .fgos-runner.json found — wrote a default (executor: ${DEFAULT_RUNNER_CONFIG.executor.command}) at ${configPath}; edit it to change.\n`,
+      `fgos: no .fgos-runner.json found — ${
+        detected ? `detected "${detected}" on PATH` : 'no known assistant CLI found on PATH'
+      }; wrote a default (executor: ${executor.command}) at ${configPath}; edit .fgos-runner.json by hand to change.\n`,
     );
     return loadRunnerConfig(configPath);
   }

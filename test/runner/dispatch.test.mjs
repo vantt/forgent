@@ -8,6 +8,7 @@ import {
   loadRunnerConfig,
   ensureRunnerConfig,
   DEFAULT_RUNNER_CONFIG,
+  detectAssistantCli,
   modelForTier,
   resolveExecutorCommand,
   spawnWorker,
@@ -403,22 +404,73 @@ function captureStderr(fn) {
   return captured;
 }
 
+/** Create a temp PATH dir containing empty, executable (mode 0o755) files
+ * named `names`, prepend it to `process.env.PATH` for the duration of
+ * `fn()`, and always restore the original PATH afterward (even if `fn`
+ * throws) — same restore-in-finally pattern as `captureStderr`. Used so
+ * `ensureRunnerConfig`'s PATH-dependent `detectAssistantCli()` call inside
+ * these tests is deterministic regardless of what's actually installed on
+ * the host machine running the suite (str82). */
+function withKnownCliOnPath(names, fn) {
+  const dir = mkTempDir();
+  for (const name of names) {
+    fs.writeFileSync(path.join(dir, name), '#!/bin/sh\nexit 0\n', { mode: 0o755 });
+  }
+  const originalPath = process.env.PATH;
+  process.env.PATH = `${dir}${path.delimiter}${originalPath ?? ''}`;
+  try {
+    return fn();
+  } finally {
+    process.env.PATH = originalPath;
+  }
+}
+
 test('ensureRunnerConfig on a missing path writes DEFAULT_RUNNER_CONFIG, announces it, and returns a loaded config', () => {
+  withKnownCliOnPath(['claude'], () => {
+    const dir = mkTempDir();
+    const configPath = path.join(dir, '.fgos-runner.json');
+    assert.equal(fs.existsSync(configPath), false);
+
+    let cfg;
+    const stderr = captureStderr(() => {
+      cfg = ensureRunnerConfig(configPath);
+    });
+
+    assert.equal(fs.existsSync(configPath), true);
+    assert.deepEqual(JSON.parse(fs.readFileSync(configPath, 'utf8')), DEFAULT_RUNNER_CONFIG);
+    assert.match(stderr, /wrote a default/);
+    assert.match(stderr, /executor: claude/);
+    assert.match(stderr, new RegExp(configPath.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
+    assert.deepEqual(cfg, DEFAULT_RUNNER_CONFIG);
+  });
+});
+
+test('ensureRunnerConfig on a missing path with no known assistant CLI on PATH writes a self-documenting placeholder executor and names it in stderr', () => {
   const dir = mkTempDir();
   const configPath = path.join(dir, '.fgos-runner.json');
-  assert.equal(fs.existsSync(configPath), false);
+  const emptyPathDir = mkTempDir();
+  const originalPath = process.env.PATH;
+  process.env.PATH = emptyPathDir;
 
   let cfg;
-  const stderr = captureStderr(() => {
-    cfg = ensureRunnerConfig(configPath);
-  });
+  let stderr;
+  try {
+    stderr = captureStderr(() => {
+      cfg = ensureRunnerConfig(configPath);
+    });
+  } finally {
+    process.env.PATH = originalPath;
+  }
 
-  assert.equal(fs.existsSync(configPath), true);
-  assert.deepEqual(JSON.parse(fs.readFileSync(configPath, 'utf8')), DEFAULT_RUNNER_CONFIG);
-  assert.match(stderr, /wrote a default/);
-  assert.match(stderr, /executor: claude/);
-  assert.match(stderr, new RegExp(configPath.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
-  assert.deepEqual(cfg, DEFAULT_RUNNER_CONFIG);
+  assert.equal(cfg.executor.command, 'NO_ASSISTANT_CLI_FOUND__edit_.fgos-runner.json');
+  assert.deepEqual(cfg.executor.args, ['{prompt}']);
+  // Every other default field is unaffected by the missing-CLI placeholder.
+  assert.deepEqual(cfg.models, DEFAULT_RUNNER_CONFIG.models);
+  assert.equal(cfg.timeoutMs, DEFAULT_RUNNER_CONFIG.timeoutMs);
+  assert.deepEqual(cfg.parallel, DEFAULT_RUNNER_CONFIG.parallel);
+  assert.match(stderr, /no known assistant CLI found on PATH/);
+  assert.match(stderr, /NO_ASSISTANT_CLI_FOUND__edit_\.fgos-runner\.json/);
+  assert.deepEqual(JSON.parse(fs.readFileSync(configPath, 'utf8')), cfg);
 });
 
 test('ensureRunnerConfig on an already-existing, already-up-to-date path does not rewrite the file or announce anything', () => {
@@ -494,20 +546,22 @@ test('ensureRunnerConfig never overwrites a value the user already customized, e
 });
 
 test('ensureRunnerConfig is idempotent: a second call on the now-existing default path returns the same config without rewriting or re-announcing', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, '.fgos-runner.json');
+  withKnownCliOnPath(['claude'], () => {
+    const dir = mkTempDir();
+    const configPath = path.join(dir, '.fgos-runner.json');
 
-  captureStderr(() => ensureRunnerConfig(configPath));
-  const writtenAfterFirst = fs.readFileSync(configPath, 'utf8');
+    captureStderr(() => ensureRunnerConfig(configPath));
+    const writtenAfterFirst = fs.readFileSync(configPath, 'utf8');
 
-  let cfg;
-  const stderr = captureStderr(() => {
-    cfg = ensureRunnerConfig(configPath);
+    let cfg;
+    const stderr = captureStderr(() => {
+      cfg = ensureRunnerConfig(configPath);
+    });
+
+    assert.equal(stderr, '');
+    assert.equal(fs.readFileSync(configPath, 'utf8'), writtenAfterFirst);
+    assert.deepEqual(cfg, DEFAULT_RUNNER_CONFIG);
   });
-
-  assert.equal(stderr, '');
-  assert.equal(fs.readFileSync(configPath, 'utf8'), writtenAfterFirst);
-  assert.deepEqual(cfg, DEFAULT_RUNNER_CONFIG);
 });
 
 test('ensureRunnerConfig propagates a write failure as a thrown error instead of silently swallowing it', () => {
@@ -520,13 +574,34 @@ test('ensureRunnerConfig propagates a write failure as a thrown error instead of
 });
 
 test('ensureRunnerConfig delegates shape validation to loadRunnerConfig, never re-implementing it', () => {
-  // DEFAULT_RUNNER_CONFIG must itself satisfy loadRunnerConfig's own shape
-  // rules — proven by loading it back through the real (unmocked) function.
+  withKnownCliOnPath(['claude'], () => {
+    // DEFAULT_RUNNER_CONFIG must itself satisfy loadRunnerConfig's own shape
+    // rules — proven by loading it back through the real (unmocked) function.
+    const dir = mkTempDir();
+    const configPath = path.join(dir, '.fgos-runner.json');
+    captureStderr(() => ensureRunnerConfig(configPath));
+    const cfg = loadRunnerConfig(configPath);
+    assert.deepEqual(cfg, DEFAULT_RUNNER_CONFIG);
+  });
+});
+
+// --- detectAssistantCli: pure PATH scan, injected inputs (str82) --------
+
+test('detectAssistantCli finds a candidate on an injected PATH without touching the real environment', () => {
   const dir = mkTempDir();
-  const configPath = path.join(dir, '.fgos-runner.json');
-  captureStderr(() => ensureRunnerConfig(configPath));
-  const cfg = loadRunnerConfig(configPath);
-  assert.deepEqual(cfg, DEFAULT_RUNNER_CONFIG);
+  fs.writeFileSync(path.join(dir, 'claude'), '#!/bin/sh\nexit 0\n', { mode: 0o755 });
+  const realPathBefore = process.env.PATH;
+
+  const found = detectAssistantCli(['claude', 'codex'], dir);
+
+  assert.equal(found, 'claude');
+  assert.equal(process.env.PATH, realPathBefore);
+});
+
+test('detectAssistantCli returns null when none of the candidates are present on the injected PATH', () => {
+  const dir = mkTempDir();
+  const found = detectAssistantCli(['claude', 'codex'], dir);
+  assert.equal(found, null);
 });
 
 // --- modelForTier: tier -> model, unknown tier is a validation error ----
