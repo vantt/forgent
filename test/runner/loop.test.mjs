@@ -302,12 +302,12 @@ test('runOnce full circle: todo -> doing -> worker commit -> goal-check pass -> 
   assert.equal(actualEvent.payload.actual.aheadCount, 1);
 });
 
-// --- settlement actor attribution (phase-3-compound-learning-5,
+// --- settlement role attribution (phase-3-compound-learning-5,
 // S3-closeout): every moveWork call the runner itself makes stamps
-// actor:'runner' on the raw event payload (per vision §8 — the runner is
+// role:'runner' on the raw event payload (per vision §8 — the runner is
 // never a human/session). -------------------------------------------------
 
-test('runOnce stamps actor "runner" on every claim/propose work.move it writes', async () => {
+test('runOnce stamps role "runner" on every claim/propose work.move it writes', async () => {
   const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
   seedItem(dir, { id: 'item-actor' });
   const config = configFor(writeCommittingExecutor(scriptDir, counterFile));
@@ -317,7 +317,7 @@ test('runOnce stamps actor "runner" on every claim/propose work.move it writes',
   const moves = readRawEvents(dir).filter((e) => e.type === 'work.move');
   assert.ok(moves.length >= 2, 'claim (todo->doing) and propose (doing->proposed) both wrote a move');
   for (const move of moves) {
-    assert.equal(move.payload.actor, 'runner');
+    assert.equal(move.payload.role, 'runner');
   }
 });
 
@@ -353,7 +353,7 @@ if (prompt.includes('# Context-discovery')) {
   return scriptPath;
 }
 
-test('runOnce clarify sweep records a clarify-pass settlement stamped actor "runner" (R19/D13 sweep); the decompose sweep right after it (stage-decompose D2) pass-throughs the item on to executing in the same pass', async () => {
+test('runOnce clarify sweep records a clarify-pass settlement stamped role "runner" (R19/D13 sweep); the decompose sweep right after it (stage-decompose D2) pass-throughs the item on to executing in the same pass', async () => {
   const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
   seedItem(dir, { id: 'item-clarify', stage: 'clarify', verify: 'test -f output.txt' });
   const config = configFor(writeClearDiscoveryExecutor(scriptDir, counterFile, { verify: 'test -f output.txt' }));
@@ -371,7 +371,7 @@ test('runOnce clarify sweep records a clarify-pass settlement stamped actor "run
   // not the eventual (decompose-driven) stage the item lands on.
   assert.equal(view.settlements['item-clarify'].length, 1);
   assert.equal(view.settlements['item-clarify'][0].kind, 'clarify-pass');
-  assert.equal(view.settlements['item-clarify'][0].actor, 'runner');
+  assert.equal(view.settlements['item-clarify'][0].role, 'runner');
 });
 
 // --- domain-aware sweeps (per base-workflow-model D2/D3): an unrecognized
@@ -838,7 +838,7 @@ test('anti-loop: a human reject (with reason) resets the runner gate — visits 
   // exercises the real reject edge (proposed -> todo, reason required).
   moveWork(dir, { id: 'item-reprieved', to: 'doing', expectedStatus: 'todo' });
   moveWork(dir, { id: 'item-reprieved', to: 'proposed', expectedStatus: 'doing' });
-  moveWork(dir, { id: 'item-reprieved', to: 'todo', expectedStatus: 'proposed', reason: 'not quite right', actor: 'human' });
+  moveWork(dir, { id: 'item-reprieved', to: 'todo', expectedStatus: 'proposed', reason: 'not quite right', role: 'human' });
   // lifetime visitCount is already 1 here — the OLD (pre-D1) gate would have
   // parked this item immediately at maxVisits: 1, never dispatching it again.
   const config = configFor(writeCommittingExecutor(scriptDir, counterFile));
@@ -853,10 +853,10 @@ test('anti-loop: a human reject (with reason) resets the runner gate — visits 
   assert.equal(result.dispatched[0].outcome, 'proposed');
 });
 
-test('anti-loop: a BARE resume (no reason, no human actor) does NOT reset the gate — the machine-only loop still dies at the cap', async () => {
+test('anti-loop: a BARE resume (no reason, no human role) does NOT reset the gate — the machine-only loop still dies at the cap', async () => {
   const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
   seedItem(dir, { id: 'item-loopy-bare' });
-  // todo -> doing -> blocked -> todo, no reason, no actor: a bare resume,
+  // todo -> doing -> blocked -> todo, no reason, no role: a bare resume,
   // never a human trigger per D1c. The prior visit must still count.
   moveWork(dir, { id: 'item-loopy-bare', to: 'doing', expectedStatus: 'todo' });
   moveWork(dir, { id: 'item-loopy-bare', to: 'blocked', expectedStatus: 'doing' });
@@ -992,10 +992,10 @@ test('startup reap: a doing item with nothing on its branch is reclaimed to bloc
 // (stage-decompose S2-pull D1/cell action (4)): a person holds `doing`
 // indefinitely — only a runner's own crashed claim is ever reaped.
 
-test('startup reap SKIPS a doing item claimed by a human (claimActor) — never reclaimed, even with no branch/commit at all', async () => {
+test('startup reap SKIPS a doing item claimed by a human (claimRole) — never reclaimed, even with no branch/commit at all', async () => {
   const { repoRoot, dir, worktreeDir } = setup();
   const item = seedItem(dir, { id: 'item-human-held' });
-  moveWork(dir, { id: item.id, to: 'doing', expectedStatus: 'todo', actor: 'human', headAtTake: 'deadbeef' });
+  moveWork(dir, { id: item.id, to: 'doing', expectedStatus: 'todo', role: 'human', headAtTake: 'deadbeef' });
   const config = {
     executor: { command: '/no/such/executor-binary-xyz', args: ['{prompt}'] },
     models: { standard: 'sonnet' },
@@ -1012,9 +1012,9 @@ test('startup reap SKIPS a doing item claimed by a human (claimActor) — never 
 test('startup reap SKIPS a doing item claimed by a session, but still reaps a plain runner claim in the SAME pass — selective, not a blanket disablement', async () => {
   const { repoRoot, dir, worktreeDir } = setup();
   const held = seedItem(dir, { id: 'item-session-held' });
-  moveWork(dir, { id: held.id, to: 'doing', expectedStatus: 'todo', actor: 'session', headAtTake: 'cafebabe' });
+  moveWork(dir, { id: held.id, to: 'doing', expectedStatus: 'todo', role: 'session', headAtTake: 'cafebabe' });
   const vanished = seedItem(dir, { id: 'item-runner-vanished' });
-  moveWork(dir, { id: vanished.id, to: 'doing', expectedStatus: 'todo', actor: 'runner' });
+  moveWork(dir, { id: vanished.id, to: 'doing', expectedStatus: 'todo', role: 'runner' });
   const config = {
     executor: { command: '/no/such/executor-binary-xyz', args: ['{prompt}'] },
     models: { standard: 'sonnet' },
@@ -1446,7 +1446,7 @@ test('runWatch threads the SAME breaker instance into every cycle: misses accumu
         // threshold (3) on its own -- resume the item so a SECOND cycle
         // dispatches it again, against the SAME breaker instance.
         assert.equal(breaker.consecutiveMissesFor('item-watch-breaker'), 2, "one dispatch alone never reaches the default threshold");
-        moveWork(dir, { id: 'item-watch-breaker', to: 'todo', expectedStatus: 'blocked', actor: 'human', reason: 'test-resume' });
+        moveWork(dir, { id: 'item-watch-breaker', to: 'todo', expectedStatus: 'blocked', role: 'human', reason: 'test-resume' });
       } else {
         controller.abort();
       }

@@ -45,34 +45,34 @@ function applyEvent(view, event) {
       break;
     }
     case 'work.move': {
-      const { id, to, ask, answer, actor, learning, headAtTake, headAtReturn, branchHeadAtTake, branchHeadAtReturn, reason, parentSnapshotAtAsk, writer } = event.payload ?? {};
+      const { id, to, ask, answer, role, learning, headAtTake, headAtReturn, branchHeadAtTake, branchHeadAtReturn, reason, parentSnapshotAtAsk, writer } = event.payload ?? {};
       const item = view.work[id];
       if (item) {
         item.status = to;
       }
       // Writer provenance (D8/D15, str46-io-contract): folds onto the item
       // unconditionally, latest write wins -- a durable per-item field
-      // recording who last wrote it, unlike claimActor below which only
+      // recording who last wrote it, unlike claimRole below which only
       // folds on the doing-entry edge. Absent on a legacy event with no
       // writer, mirroring reason/headAtTake above (backward-compat).
       if (item && writer !== undefined) {
         item.writer = writer;
       }
       // Claim attribution (stage-decompose S2-pull D1/cell action (4)):
-      // fold the claiming `actor` onto the item itself as `claimActor` —
-      // separate from the settlement channel's per-transition `actor` below,
+      // fold the claiming `role` onto the item itself as `claimRole` —
+      // separate from the settlement channel's per-transition `role` below,
       // this is a durable per-item field the reap guard reads (`item.status
-      // === 'doing' && item.claimActor is human/session` means a person is
+      // === 'doing' && item.claimRole is human/session` means a person is
       // holding it, never auto-reclaimed). `headAtTake` (the host repo's HEAD
       // at claim time, per D1's take verb) rides the same event additively
       // so `fgos return` can later measure real progress against it. Both
       // only ever get set on THIS claim's `to === 'doing'` move — a runner
-      // claim carries `actor: 'runner'` and no `headAtTake`, so this is a
+      // claim carries `role: 'runner'` and no `headAtTake`, so this is a
       // strict addition for the pull door, never a rewrite of the runner's
       // own claim shape.
       if (item && to === 'doing') {
-        if (actor !== undefined) {
-          item.claimActor = actor;
+        if (role !== undefined) {
+          item.claimRole = role;
         }
         if (headAtTake !== undefined) {
           item.headAtTake = headAtTake;
@@ -176,7 +176,7 @@ function applyEvent(view, event) {
           }
           view.settlements[id] = [
             ...(view.settlements[id] ?? []),
-            { kind, actor: actor ?? null, ts: event.ts, detail },
+            { kind, role: role ?? null, ts: event.ts, detail },
           ];
         }
       }
@@ -255,7 +255,7 @@ function applyEvent(view, event) {
       // (read lazily as `executing` by consumers, per D8); this case only
       // ever runs for an item that already has a real `work.stage` event in
       // its history, at which point setting the field explicitly is correct.
-      const { id, from, to, verify, actor, writer } = event.payload ?? {};
+      const { id, from, to, verify, role, writer } = event.payload ?? {};
       const item = view.work[id];
       if (item) {
         item.stage = to;
@@ -285,7 +285,7 @@ function applyEvent(view, event) {
         }
         view.settlements[id] = [
           ...(view.settlements[id] ?? []),
-          { kind: 'clarify-pass', actor: actor ?? null, ts: event.ts, detail: verify ?? null },
+          { kind: 'clarify-pass', role: role ?? null, ts: event.ts, detail: verify ?? null },
         ];
       }
       break;

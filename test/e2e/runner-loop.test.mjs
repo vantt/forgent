@@ -436,7 +436,7 @@ test('e2e stage-decompose (a) simple item pass-through: submit -> --once chains 
   // now `decompose`, not `executing`.
   assert.equal(view.settlements[submitted.id].length, 1);
   assert.equal(view.settlements[submitted.id][0].kind, 'clarify-pass');
-  assert.equal(view.settlements[submitted.id][0].actor, 'runner');
+  assert.equal(view.settlements[submitted.id][0].role, 'runner');
 
   // a pass-through verdict writes no lineage at all.
   assert.equal(Object.values(view.work).some((w) => w.parent === submitted.id), false);
@@ -584,7 +584,7 @@ test('e2e S2-pull: submit pass-throughs 2 stages via discover, a human takes the
   const submitted = submit(repoRoot, 'Rename a single config key, take by hand');
   assert.equal(submitted.stage, 'clarify');
 
-  // Pass-through both stages via the SYNC session-actor `discover` verb
+  // Pass-through both stages via the SYNC session-role `discover` verb
   // (mirrors the existing "discover called a second time" CLI test) — this
   // never touches the runner's own dispatch loop, so once the item reaches
   // stage executing it is left sitting at status todo: the exact frontier
@@ -608,7 +608,7 @@ test('e2e S2-pull: submit pass-throughs 2 stages via discover, a human takes the
 
   view = stateView(repoRoot);
   assert.equal(view.work[submitted.id].status, 'doing');
-  assert.equal(view.work[submitted.id].claimActor, 'human');
+  assert.equal(view.work[submitted.id].claimRole, 'human');
   assert.equal(view.work[submitted.id].headAtTake, headAtTake);
 
   // A concurrent fgos-runner --once run right before return: the only item
@@ -620,7 +620,7 @@ test('e2e S2-pull: submit pass-throughs 2 stages via discover, a human takes the
   assert.match(concurrent.stdout, /idle/);
   view = stateView(repoRoot);
   assert.equal(view.work[submitted.id].status, 'doing', 'the concurrent runner never reaped or reclaimed the human-held claim');
-  assert.equal(view.work[submitted.id].claimActor, 'human', 'still human-claimed after the concurrent run');
+  assert.equal(view.work[submitted.id].claimRole, 'human', 'still human-claimed after the concurrent run');
 
   // The human does real work and commits it (the real file, plus whatever
   // events.jsonl deltas take/discover already appended).

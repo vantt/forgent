@@ -71,11 +71,11 @@ test('visitCount defensive guards: non-array events / missing id never throw', (
 // (loop.mjs's hasExceededMaxVisits call sites), not the shipped lifetime
 // metric. `humanMove` mints the two CLOSED trigger shapes (D1c): an `answer`
 // leaving awaiting-human, or a `reason`-carrying move — both require
-// `actor: 'human'`, matching fsm.mjs's transitionWork (answer only appears
+// `role: 'human'`, matching fsm.mjs's transitionWork (answer only appears
 // on `awaiting-human -> todo`; reason only on `proposed -> todo`/`blocked`).
 
 function humanMove(id, to, seq, extra = {}) {
-  return { seq, ts: new Date(2026, 0, seq).toISOString(), type: 'work.move', payload: { id, from: 'x', to, actor: 'human', ...extra }, v: 2 };
+  return { seq, ts: new Date(2026, 0, seq).toISOString(), type: 'work.move', payload: { id, from: 'x', to, role: 'human', ...extra }, v: 2 };
 }
 
 test('visitsSinceLastHumanEvent is 0 on an empty log', () => {
@@ -110,7 +110,7 @@ test('a human reject/park with reason resets the budget the same way', () => {
   assert.equal(visitsSinceLastHumanEvent(events, 'a'), 1);
 });
 
-test('a bare resume (blocked -> todo, no reason, no actor) does NOT reset the budget', () => {
+test('a bare resume (blocked -> todo, no reason, no role) does NOT reset the budget', () => {
   const events = [
     move('a', 'doing', 1),
     move('a', 'blocked', 2),
@@ -120,7 +120,7 @@ test('a bare resume (blocked -> todo, no reason, no actor) does NOT reset the bu
   assert.equal(visitsSinceLastHumanEvent(events, 'a'), 2);
 });
 
-test('a human take (blocked -> doing, actor human, no answer/reason) does NOT reset the budget — it counts as a visit like any other', () => {
+test('a human take (blocked -> doing, role human, no answer/reason) does NOT reset the budget — it counts as a visit like any other', () => {
   const events = [
     move('a', 'doing', 1),
     move('a', 'blocked', 2),
@@ -129,10 +129,10 @@ test('a human take (blocked -> doing, actor human, no answer/reason) does NOT re
   assert.equal(visitsSinceLastHumanEvent(events, 'a'), 2);
 });
 
-test('a machine park with reason (actor runner, e.g. anti-loop-max-visits) does NOT reset the budget — reason alone is not enough, actor must be human', () => {
+test('a machine park with reason (role runner, e.g. anti-loop-max-visits) does NOT reset the budget — reason alone is not enough, role must be human', () => {
   const events = [
     move('a', 'doing', 1),
-    { seq: 2, ts: new Date(2026, 0, 2).toISOString(), type: 'work.move', payload: { id: 'a', from: 'doing', to: 'blocked', reason: 'anti-loop-max-visits', actor: 'runner' }, v: 2 },
+    { seq: 2, ts: new Date(2026, 0, 2).toISOString(), type: 'work.move', payload: { id: 'a', from: 'doing', to: 'blocked', reason: 'anti-loop-max-visits', role: 'runner' }, v: 2 },
     move('a', 'doing', 3),
   ];
   assert.equal(visitsSinceLastHumanEvent(events, 'a'), 2);

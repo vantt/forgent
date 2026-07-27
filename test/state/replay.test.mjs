@@ -265,27 +265,27 @@ test('foldEvents on a log with no work.discovery events yields a view with no "d
 //
 // Three settling kinds derived from EXISTING event types (no new event type,
 // per D3/R3): 'clarify-pass' (work.stage -> executing), 'answer' (work.move
-// carrying an answer), 'close' (work.move -> done). `actor` rides on the
+// carrying an answer), 'close' (work.move -> done). `role` rides on the
 // SAME event's payload (additive, optional) rather than a separate write.
 
-test('foldEvents derives a clarify-pass settlement from work.stage -> executing, carrying actor + verify as detail', () => {
+test('foldEvents derives a clarify-pass settlement from work.stage -> executing, carrying role + verify as detail', () => {
   const events = [
     { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo', stage: 'clarify' }, v: 2 },
-    { seq: 2, ts: '2026-07-16T00:00:01.000Z', type: 'work.stage', payload: { id: 'a', from: 'clarify', to: 'executing', verify: 'npm test -- a', actor: 'runner' }, v: 2 },
+    { seq: 2, ts: '2026-07-16T00:00:01.000Z', type: 'work.stage', payload: { id: 'a', from: 'clarify', to: 'executing', verify: 'npm test -- a', role: 'runner' }, v: 2 },
   ];
   const view = foldEvents(events);
   assert.equal(view.settlements.a.length, 1);
-  assert.deepEqual(view.settlements.a[0], { kind: 'clarify-pass', actor: 'runner', ts: '2026-07-16T00:00:01.000Z', detail: 'npm test -- a' });
+  assert.deepEqual(view.settlements.a[0], { kind: 'clarify-pass', role: 'runner', ts: '2026-07-16T00:00:01.000Z', detail: 'npm test -- a' });
 });
 
 test('foldEvents derives a clarify-pass settlement from work.stage clarify -> decompose too (re-guard per stage-decompose D2: settlement keys off leaving clarify, not landing on executing)', () => {
   const events = [
     { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo', stage: 'clarify' }, v: 2 },
-    { seq: 2, ts: '2026-07-16T00:00:01.000Z', type: 'work.stage', payload: { id: 'a', from: 'clarify', to: 'decompose', verify: 'npm test -- a', actor: 'runner' }, v: 2 },
+    { seq: 2, ts: '2026-07-16T00:00:01.000Z', type: 'work.stage', payload: { id: 'a', from: 'clarify', to: 'decompose', verify: 'npm test -- a', role: 'runner' }, v: 2 },
   ];
   const view = foldEvents(events);
   assert.equal(view.settlements.a.length, 1);
-  assert.deepEqual(view.settlements.a[0], { kind: 'clarify-pass', actor: 'runner', ts: '2026-07-16T00:00:01.000Z', detail: 'npm test -- a' });
+  assert.deepEqual(view.settlements.a[0], { kind: 'clarify-pass', role: 'runner', ts: '2026-07-16T00:00:01.000Z', detail: 'npm test -- a' });
 });
 
 test('foldEvents does NOT derive a settlement from work.stage decompose -> executing (it never leaves clarify)', () => {
@@ -301,43 +301,43 @@ test('foldEvents derives an answer settlement from a work.move carrying answer, 
   const events = [
     { seq: 1, ts: '2026-07-15T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo' }, v: 2 },
     { seq: 2, ts: '2026-07-15T00:00:01.000Z', type: 'work.move', payload: { id: 'a', from: 'todo', to: 'awaiting-human', ask: 'OAuth or password?' }, v: 2 },
-    { seq: 3, ts: '2026-07-15T00:00:02.000Z', type: 'work.move', payload: { id: 'a', from: 'awaiting-human', to: 'todo', answer: 'OAuth', actor: 'human' }, v: 2 },
+    { seq: 3, ts: '2026-07-15T00:00:02.000Z', type: 'work.move', payload: { id: 'a', from: 'awaiting-human', to: 'todo', answer: 'OAuth', role: 'human' }, v: 2 },
   ];
   const view = foldEvents(events);
   assert.equal(view.settlements.a.length, 1);
-  assert.deepEqual(view.settlements.a[0], { kind: 'answer', actor: 'human', ts: '2026-07-15T00:00:02.000Z', detail: 'OAuth' });
+  assert.deepEqual(view.settlements.a[0], { kind: 'answer', role: 'human', ts: '2026-07-15T00:00:02.000Z', detail: 'OAuth' });
 });
 
-test('foldEvents derives a close settlement from a work.move -> done, with a null detail and actor', () => {
+test('foldEvents derives a close settlement from a work.move -> done, with a null detail and role', () => {
   const events = [
     { seq: 1, ts: '2026-07-15T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo' }, v: 2 },
-    { seq: 2, ts: '2026-07-15T00:00:01.000Z', type: 'work.move', payload: { id: 'a', from: 'doing', to: 'done', actor: 'human' }, v: 2 },
+    { seq: 2, ts: '2026-07-15T00:00:01.000Z', type: 'work.move', payload: { id: 'a', from: 'doing', to: 'done', role: 'human' }, v: 2 },
   ];
   const view = foldEvents(events);
   assert.equal(view.settlements.a.length, 1);
-  assert.deepEqual(view.settlements.a[0], { kind: 'close', actor: 'human', ts: '2026-07-15T00:00:01.000Z', detail: null });
+  assert.deepEqual(view.settlements.a[0], { kind: 'close', role: 'human', ts: '2026-07-15T00:00:01.000Z', detail: null });
 });
 
 test('foldEvents settlement APPENDS across multiple settling transitions on the same id — none erase a prior one', () => {
   const events = [
     { seq: 1, ts: '2026-07-15T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo', stage: 'clarify' }, v: 2 },
-    { seq: 2, ts: '2026-07-15T00:00:01.000Z', type: 'work.stage', payload: { id: 'a', from: 'clarify', to: 'executing', verify: 'npm test', actor: 'runner' }, v: 2 },
+    { seq: 2, ts: '2026-07-15T00:00:01.000Z', type: 'work.stage', payload: { id: 'a', from: 'clarify', to: 'executing', verify: 'npm test', role: 'runner' }, v: 2 },
     { seq: 3, ts: '2026-07-15T00:00:02.000Z', type: 'work.move', payload: { id: 'a', from: 'todo', to: 'awaiting-human', ask: 'sure?' }, v: 2 },
-    { seq: 4, ts: '2026-07-15T00:00:03.000Z', type: 'work.move', payload: { id: 'a', from: 'awaiting-human', to: 'todo', answer: 'yes', actor: 'human' }, v: 2 },
-    { seq: 5, ts: '2026-07-15T00:00:04.000Z', type: 'work.move', payload: { id: 'a', from: 'doing', to: 'done', actor: 'human' }, v: 2 },
+    { seq: 4, ts: '2026-07-15T00:00:03.000Z', type: 'work.move', payload: { id: 'a', from: 'awaiting-human', to: 'todo', answer: 'yes', role: 'human' }, v: 2 },
+    { seq: 5, ts: '2026-07-15T00:00:04.000Z', type: 'work.move', payload: { id: 'a', from: 'doing', to: 'done', role: 'human' }, v: 2 },
   ];
   const view = foldEvents(events);
   assert.equal(view.settlements.a.length, 3);
   assert.deepEqual(view.settlements.a.map((r) => r.kind), ['clarify-pass', 'answer', 'close']);
 });
 
-test('foldEvents settlement records fold with actor null when the event carries none (additive, actor optional)', () => {
+test('foldEvents settlement records fold with role null when the event carries none (additive, role optional)', () => {
   const events = [
     { seq: 1, ts: '2026-07-15T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo' }, v: 2 },
     { seq: 2, ts: '2026-07-15T00:00:01.000Z', type: 'work.move', payload: { id: 'a', from: 'doing', to: 'done' }, v: 2 },
   ];
   const view = foldEvents(events);
-  assert.equal(view.settlements.a[0].actor, null);
+  assert.equal(view.settlements.a[0].role, null);
 });
 
 test('foldEvents on a log with no settling transitions yields a view with no "settlements" key (lazy key, backward-compat)', () => {
@@ -374,29 +374,29 @@ test('rebuildView preserves the historical ts from each event, never the current
 
 // --- claim attribution (stage-decompose S2-pull D1/cell action (4)) --------
 //
-// `claimActor` + `headAtTake` fold onto the item itself (not a settlement)
+// `claimRole` + `headAtTake` fold onto the item itself (not a settlement)
 // from a `work.move` claim (`to: 'doing'`) that carries them — this is what
 // lets startupReap tell a pull-door claim (human/session, never auto-reaped)
 // apart from a runner claim, and lets `fgos return` measure real progress
 // against the HEAD recorded at take time.
 
-test('foldEvents folds claimActor + headAtTake onto the item from a doing claim that carries them (pull-door take)', () => {
+test('foldEvents folds claimRole + headAtTake onto the item from a doing claim that carries them (pull-door take)', () => {
   const events = [
     { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo' }, v: 2 },
-    { seq: 2, ts: '2026-07-16T00:00:01.000Z', type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing', actor: 'human', headAtTake: 'deadbeef' }, v: 2 },
+    { seq: 2, ts: '2026-07-16T00:00:01.000Z', type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing', role: 'human', headAtTake: 'deadbeef' }, v: 2 },
   ];
   const view = foldEvents(events);
-  assert.equal(view.work.a.claimActor, 'human');
+  assert.equal(view.work.a.claimRole, 'human');
   assert.equal(view.work.a.headAtTake, 'deadbeef');
 });
 
 test('foldEvents folds the latest move reason onto the item (reject loop feedback), lazily', () => {
   const events = [
     { seq: 1, ts: '2026-07-17T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo' }, v: 2 },
-    { seq: 2, ts: '2026-07-17T00:00:01.000Z', type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing', actor: 'runner' }, v: 2 },
+    { seq: 2, ts: '2026-07-17T00:00:01.000Z', type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing', role: 'runner' }, v: 2 },
     { seq: 3, ts: '2026-07-17T00:00:02.000Z', type: 'work.move', payload: { id: 'a', from: 'doing', to: 'proposed' }, v: 2 },
     { seq: 4, ts: '2026-07-17T00:00:03.000Z', type: 'work.move', payload: { id: 'a', from: 'proposed', to: 'todo', reason: 'first objection' }, v: 2 },
-    { seq: 5, ts: '2026-07-17T00:00:04.000Z', type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing', actor: 'runner' }, v: 2 },
+    { seq: 5, ts: '2026-07-17T00:00:04.000Z', type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing', role: 'runner' }, v: 2 },
     { seq: 6, ts: '2026-07-17T00:00:05.000Z', type: 'work.move', payload: { id: 'a', from: 'doing', to: 'proposed' }, v: 2 },
     { seq: 7, ts: '2026-07-17T00:00:06.000Z', type: 'work.move', payload: { id: 'a', from: 'proposed', to: 'todo', reason: 'second objection wins' }, v: 2 },
   ];
@@ -407,49 +407,49 @@ test('foldEvents folds the latest move reason onto the item (reject loop feedbac
 test('foldEvents leaves no reason key on items whose moves never carried one', () => {
   const events = [
     { seq: 1, ts: '2026-07-17T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo' }, v: 2 },
-    { seq: 2, ts: '2026-07-17T00:00:01.000Z', type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing', actor: 'runner' }, v: 2 },
+    { seq: 2, ts: '2026-07-17T00:00:01.000Z', type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing', role: 'runner' }, v: 2 },
   ];
   const view = foldEvents(events);
   assert.ok(!('reason' in view.work.a));
 });
 
-test('foldEvents folds claimActor "runner" with no headAtTake for a plain runner claim (runner claims never carry a headAtTake)', () => {
+test('foldEvents folds claimRole "runner" with no headAtTake for a plain runner claim (runner claims never carry a headAtTake)', () => {
   const events = [
     { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo' }, v: 2 },
-    { seq: 2, ts: '2026-07-16T00:00:01.000Z', type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing', actor: 'runner' }, v: 2 },
+    { seq: 2, ts: '2026-07-16T00:00:01.000Z', type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing', role: 'runner' }, v: 2 },
   ];
   const view = foldEvents(events);
-  assert.equal(view.work.a.claimActor, 'runner');
+  assert.equal(view.work.a.claimRole, 'runner');
   assert.equal('headAtTake' in view.work.a, false);
 });
 
-test('foldEvents leaves claimActor/headAtTake absent from the item for a legacy doing claim with no actor at all (backward-compat)', () => {
+test('foldEvents leaves claimRole/headAtTake absent from the item for a legacy doing claim with no role at all (backward-compat)', () => {
   const events = [
     { seq: 1, ts: '2026-07-14T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo' } },
     { seq: 2, ts: '2026-07-14T00:00:01.000Z', type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing' } },
   ];
   const view = foldEvents(events);
-  assert.equal('claimActor' in view.work.a, false);
+  assert.equal('claimRole' in view.work.a, false);
   assert.equal('headAtTake' in view.work.a, false);
 });
 
-test('foldEvents ignores claimActor/headAtTake on a doing move for an id that was never added — ghost id stays a true no-op', () => {
+test('foldEvents ignores claimRole/headAtTake on a doing move for an id that was never added — ghost id stays a true no-op', () => {
   const events = [
-    { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.move', payload: { id: 'ghost', from: 'todo', to: 'doing', actor: 'human', headAtTake: 'deadbeef' }, v: 2 },
+    { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.move', payload: { id: 'ghost', from: 'todo', to: 'doing', role: 'human', headAtTake: 'deadbeef' }, v: 2 },
   ];
   assert.doesNotThrow(() => foldEvents(events));
   const view = foldEvents(events);
   assert.equal('ghost' in view.work, false);
 });
 
-test('foldEvents does not fold claimActor/headAtTake on a non-doing move even when the payload carries them (only the doing edge sets them)', () => {
+test('foldEvents does not fold claimRole/headAtTake on a non-doing move even when the payload carries them (only the doing edge sets them)', () => {
   const events = [
     { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo' }, v: 2 },
-    { seq: 2, ts: '2026-07-16T00:00:01.000Z', type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing', actor: 'human', headAtTake: 'aaa' }, v: 2 },
-    { seq: 3, ts: '2026-07-16T00:00:02.000Z', type: 'work.move', payload: { id: 'a', from: 'doing', to: 'proposed', actor: 'human', headAtTake: 'ignored-on-this-edge' }, v: 2 },
+    { seq: 2, ts: '2026-07-16T00:00:01.000Z', type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing', role: 'human', headAtTake: 'aaa' }, v: 2 },
+    { seq: 3, ts: '2026-07-16T00:00:02.000Z', type: 'work.move', payload: { id: 'a', from: 'doing', to: 'proposed', role: 'human', headAtTake: 'ignored-on-this-edge' }, v: 2 },
   ];
   const view = foldEvents(events);
-  assert.equal(view.work.a.claimActor, 'human', 'the doing edge already set claimActor — a later non-doing move never touches it');
+  assert.equal(view.work.a.claimRole, 'human', 'the doing edge already set claimRole — a later non-doing move never touches it');
   assert.equal(view.work.a.headAtTake, 'aaa', 'the proposed move carries headAtTake in its payload but it is not the doing edge, so it is never read');
 });
 
@@ -462,7 +462,7 @@ test('foldEvents does not fold claimActor/headAtTake on a non-doing move even wh
 test('foldEvents folds headAtReturn onto the item from a proposed move that carries it (pull-door return)', () => {
   const events = [
     { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo' }, v: 2 },
-    { seq: 2, ts: '2026-07-16T00:00:01.000Z', type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing', actor: 'human', headAtTake: 'deadbeef' }, v: 2 },
+    { seq: 2, ts: '2026-07-16T00:00:01.000Z', type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing', role: 'human', headAtTake: 'deadbeef' }, v: 2 },
     { seq: 3, ts: '2026-07-16T00:00:02.000Z', type: 'work.move', payload: { id: 'a', from: 'doing', to: 'proposed', headAtReturn: 'c0ffee' }, v: 2 },
   ];
   const view = foldEvents(events);
@@ -473,7 +473,7 @@ test('foldEvents folds headAtReturn onto the item from a proposed move that carr
 test('foldEvents leaves headAtReturn absent for a runner proposal (doing -> proposed with no headAtReturn)', () => {
   const events = [
     { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo' }, v: 2 },
-    { seq: 2, ts: '2026-07-16T00:00:01.000Z', type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing', actor: 'runner' }, v: 2 },
+    { seq: 2, ts: '2026-07-16T00:00:01.000Z', type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing', role: 'runner' }, v: 2 },
     { seq: 3, ts: '2026-07-16T00:00:02.000Z', type: 'work.move', payload: { id: 'a', from: 'doing', to: 'proposed' }, v: 2 },
   ];
   const view = foldEvents(events);
@@ -483,7 +483,7 @@ test('foldEvents leaves headAtReturn absent for a runner proposal (doing -> prop
 test('foldEvents ignores headAtReturn on a non-proposed move even when the payload carries it (only the proposed edge sets it)', () => {
   const events = [
     { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo' }, v: 2 },
-    { seq: 2, ts: '2026-07-16T00:00:01.000Z', type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing', actor: 'human', headAtReturn: 'ignored-on-this-edge' }, v: 2 },
+    { seq: 2, ts: '2026-07-16T00:00:01.000Z', type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing', role: 'human', headAtReturn: 'ignored-on-this-edge' }, v: 2 },
   ];
   const view = foldEvents(events);
   assert.equal('headAtReturn' in view.work.a, false);
@@ -510,10 +510,10 @@ test('foldEvents ignores headAtReturn on a proposed move for an id that was neve
 test('foldEvents folds branchHeadAtTake onto the item from a blocked -> doing claim that carries it (branch take)', () => {
   const events = [
     { seq: 1, ts: '2026-07-17T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'blocked' }, v: 2 },
-    { seq: 2, ts: '2026-07-17T00:00:01.000Z', type: 'work.move', payload: { id: 'a', from: 'blocked', to: 'doing', actor: 'human', branchHeadAtTake: 'branch-deadbeef' }, v: 2 },
+    { seq: 2, ts: '2026-07-17T00:00:01.000Z', type: 'work.move', payload: { id: 'a', from: 'blocked', to: 'doing', role: 'human', branchHeadAtTake: 'branch-deadbeef' }, v: 2 },
   ];
   const view = foldEvents(events);
-  assert.equal(view.work.a.claimActor, 'human');
+  assert.equal(view.work.a.claimRole, 'human');
   assert.equal(view.work.a.branchHeadAtTake, 'branch-deadbeef');
   assert.equal('headAtTake' in view.work.a, false, 'a branch take never carries the main-based headAtTake');
 });
@@ -521,7 +521,7 @@ test('foldEvents folds branchHeadAtTake onto the item from a blocked -> doing cl
 test('foldEvents ignores branchHeadAtTake on a non-doing move even when the payload carries it (only the doing edge sets it)', () => {
   const events = [
     { seq: 1, ts: '2026-07-17T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo' }, v: 2 },
-    { seq: 2, ts: '2026-07-17T00:00:01.000Z', type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing', actor: 'human', branchHeadAtTake: 'aaa' }, v: 2 },
+    { seq: 2, ts: '2026-07-17T00:00:01.000Z', type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing', role: 'human', branchHeadAtTake: 'aaa' }, v: 2 },
     { seq: 3, ts: '2026-07-17T00:00:02.000Z', type: 'work.move', payload: { id: 'a', from: 'doing', to: 'proposed', branchHeadAtTake: 'ignored-on-this-edge' }, v: 2 },
   ];
   const view = foldEvents(events);
@@ -530,7 +530,7 @@ test('foldEvents ignores branchHeadAtTake on a non-doing move even when the payl
 
 test('foldEvents ignores branchHeadAtTake on a doing move for an id that was never added — ghost id stays a true no-op', () => {
   const events = [
-    { seq: 1, ts: '2026-07-17T00:00:00.000Z', type: 'work.move', payload: { id: 'ghost', from: 'blocked', to: 'doing', actor: 'human', branchHeadAtTake: 'deadbeef' }, v: 2 },
+    { seq: 1, ts: '2026-07-17T00:00:00.000Z', type: 'work.move', payload: { id: 'ghost', from: 'blocked', to: 'doing', role: 'human', branchHeadAtTake: 'deadbeef' }, v: 2 },
   ];
   assert.doesNotThrow(() => foldEvents(events));
   const view = foldEvents(events);
@@ -540,7 +540,7 @@ test('foldEvents ignores branchHeadAtTake on a doing move for an id that was nev
 test('foldEvents folds branchHeadAtReturn onto the item from a proposed move that carries it (branch return), never headAtReturn', () => {
   const events = [
     { seq: 1, ts: '2026-07-17T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'blocked' }, v: 2 },
-    { seq: 2, ts: '2026-07-17T00:00:01.000Z', type: 'work.move', payload: { id: 'a', from: 'blocked', to: 'doing', actor: 'human', branchHeadAtTake: 'branch-deadbeef' }, v: 2 },
+    { seq: 2, ts: '2026-07-17T00:00:01.000Z', type: 'work.move', payload: { id: 'a', from: 'blocked', to: 'doing', role: 'human', branchHeadAtTake: 'branch-deadbeef' }, v: 2 },
     { seq: 3, ts: '2026-07-17T00:00:02.000Z', type: 'work.move', payload: { id: 'a', from: 'doing', to: 'proposed', branchHeadAtReturn: 'branch-c0ffee' }, v: 2 },
   ];
   const view = foldEvents(events);
@@ -552,7 +552,7 @@ test('foldEvents folds branchHeadAtReturn onto the item from a proposed move tha
 test('foldEvents ignores branchHeadAtReturn on a non-proposed move even when the payload carries it (only the proposed edge sets it)', () => {
   const events = [
     { seq: 1, ts: '2026-07-17T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'blocked' }, v: 2 },
-    { seq: 2, ts: '2026-07-17T00:00:01.000Z', type: 'work.move', payload: { id: 'a', from: 'blocked', to: 'doing', actor: 'human', branchHeadAtReturn: 'ignored-on-this-edge' }, v: 2 },
+    { seq: 2, ts: '2026-07-17T00:00:01.000Z', type: 'work.move', payload: { id: 'a', from: 'blocked', to: 'doing', role: 'human', branchHeadAtReturn: 'ignored-on-this-edge' }, v: 2 },
   ];
   const view = foldEvents(events);
   assert.equal('branchHeadAtReturn' in view.work.a, false);

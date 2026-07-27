@@ -168,11 +168,11 @@ function formatProposalAsk(verdict, reason) {
  * Read `id` from the store at `dir`, judge it via `judgeDecompose`, and
  * resolve the verdict — the ONE function both the sync decompose-equivalent
  * verb and the async runner sweep call (D3's sync/async parity, mirroring
- * resolveDiscovery). `actor` is positional, exactly like resolveDiscovery
+ * resolveDiscovery). `role` is positional, exactly like resolveDiscovery
  * (Phase 3 S3-closeout settlement design): the runner's sweep passes
  * `'runner'`; a sync caller passes its own attribution. Only stamped on the
  * root's own stage-move (children are `work.add` events, which carry no
- * actor field at all).
+ * role field at all).
  *
  * Returns `{ outcome, id, verdict?, childIds? }` where `outcome` is one of
  * `'noop'` (already past decompose — CAS-backed idempotency), `'already-
@@ -182,7 +182,7 @@ function formatProposalAsk(verdict, reason) {
  * with the proposal, nothing written to the queue yet), `'pass-through'`, or
  * `'decompose'` (children written, root moved to executing).
  */
-export function resolveDecompose(dir, id, cfg, actor) {
+export function resolveDecompose(dir, id, cfg, role) {
   const view = listWork(dir);
   const work = view.work[id];
   if (!work) {
@@ -207,7 +207,7 @@ export function resolveDecompose(dir, id, cfg, actor) {
   // own stage-move.
   const hasChildren = Object.values(view.work).some((item) => item.parent === id);
   if (hasChildren) {
-    moveStage(dir, { id, to: 'executing', expectedStage: 'decompose', actor });
+    moveStage(dir, { id, to: 'executing', expectedStage: 'decompose', role });
     return { outcome: 'already-decomposed', id };
   }
 
@@ -228,7 +228,7 @@ export function resolveDecompose(dir, id, cfg, actor) {
   }
 
   if (verdict.kind === 'pass-through') {
-    moveStage(dir, { id, to: 'executing', expectedStage: 'decompose', actor });
+    moveStage(dir, { id, to: 'executing', expectedStage: 'decompose', role });
     return { outcome: 'pass-through', id };
   }
 
@@ -256,6 +256,6 @@ export function resolveDecompose(dir, id, cfg, actor) {
     });
   });
 
-  moveStage(dir, { id, to: 'executing', expectedStage: 'decompose', actor });
+  moveStage(dir, { id, to: 'executing', expectedStage: 'decompose', role });
   return { outcome: 'decompose', id, childIds };
 }

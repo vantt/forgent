@@ -373,12 +373,12 @@ export async function startupReap({ repoRoot, dir, worktreeDir, verifyTimeoutMs,
     // Pull-door claims never expire on their own (stage-decompose S2-pull
     // D1/cell action (4)): a human/session claimant holds `doing`
     // indefinitely — reap only reclaims a claim the RUNNER itself made and
-    // then crashed on. `claimActor` is folded onto the item by replay.mjs
-    // from the claiming `work.move`'s own `actor` field; a legacy log with
-    // no actor at all (or a runner claim, `actor: 'runner'`) is untouched —
+    // then crashed on. `claimRole` is folded onto the item by replay.mjs
+    // from the claiming `work.move`'s own `role` field; a legacy log with
+    // no role at all (or a runner claim, `role: 'runner'`) is untouched —
     // this is a strict narrowing of what already gets reaped, never a
     // widening.
-    if (item.claimActor === 'human' || item.claimActor === 'session') continue;
+    if (item.claimRole === 'human' || item.claimRole === 'session') continue;
 
     const branch = branchNameFor(id);
     const facts = branchFacts(repoRoot, branch);
@@ -416,7 +416,7 @@ export async function startupReap({ repoRoot, dir, worktreeDir, verifyTimeoutMs,
     const resolution = worktreeFailed
       ? { to: 'blocked', reason: 'runner-crash-reclaim' }
       : resolveStaleDoing({ hasCommit, verifyPassed });
-    moveWork(dir, { id, to: resolution.to, expectedStatus: 'doing', reason: resolution.reason, actor: 'runner' });
+    moveWork(dir, { id, to: resolution.to, expectedStatus: 'doing', reason: resolution.reason, role: 'runner' });
     log(`fgos-runner: reaped stale doing "${id}" -> ${resolution.to}${resolution.reason ? ` (${resolution.reason})` : ''}`);
     resolutions.push({ id, to: resolution.to, reason: resolution.reason ?? null });
   }
@@ -482,7 +482,7 @@ async function claimItem({ dir, ownershipStore, queue, ownerIdentity, item }) {
     const decision = claimRoot(ownershipStore, freshView, item.id, ownerIdentity);
     if (decision.action === 'claim') ownershipStore.setOwner(decision.root, ownerIdentity);
     if (decision.accepted) {
-      moveWork(dir, { id: item.id, to: 'doing', expectedStatus: 'todo', actor: 'runner' });
+      moveWork(dir, { id: item.id, to: 'doing', expectedStatus: 'todo', role: 'runner' });
     }
     return decision;
   });
@@ -725,7 +725,7 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
       if (check.passed && facts.aheadCount > 0) {
         breaker.recordHit(item.id);
         await queue.enqueue(async () => {
-          moveWork(dir, { id: item.id, to: 'proposed', expectedStatus: 'doing', actor: 'runner' });
+          moveWork(dir, { id: item.id, to: 'proposed', expectedStatus: 'doing', role: 'runner' });
         });
         log(`fgos-runner: "${item.id}" proposed on branch ${wt.branch} (${facts.aheadCount} commit(s))`);
         log(`fgos-runner: verify tail:\n${tailLines(check.output)}`);
@@ -805,7 +805,7 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
         to: 'blocked',
         expectedStatus: 'doing',
         reason: tripped ? 'breaker-tripped' : failure.errorClass,
-        actor: 'runner',
+        role: 'runner',
       });
     });
 
@@ -1065,7 +1065,7 @@ export async function runOnce(options = {}) {
         for (const it of overLimit) {
           const visits = visitsSinceLastHumanEvent(readRawEvents(dir), it.id);
           await queue.enqueue(async () => {
-            moveWork(dir, { id: it.id, to: 'blocked', expectedStatus: 'todo', reason: 'anti-loop-max-visits', actor: 'runner' });
+            moveWork(dir, { id: it.id, to: 'blocked', expectedStatus: 'todo', reason: 'anti-loop-max-visits', role: 'runner' });
           });
           log(`fgos-runner: parked "${it.id}" — anti-loop max-visits (${visits}/${maxVisits})`);
           parked.push({ id: it.id, reason: 'anti-loop-max-visits', visits });

@@ -326,7 +326,7 @@ export const STALE_DOING_DEFAULTS = Object.freeze({
 /**
  * EVIDENCE-CLASSIFIER ADVISORY (S8): classify items stuck in `doing` as stale
  * by OWNER TYPE and SUGGEST — never act. `entries` is
- * `[{ id, claimActor, claimedAt }]` (claimedAt in epoch ms). PURE when `now`
+ * `[{ id, claimRole, claimedAt }]` (claimedAt in epoch ms). PURE when `now`
  * is passed. An item claimed by the `runner` is an `agent` claim (short grace);
  * anything else (`human`/`session`/unknown) is treated as a `human` claim (the
  * long grace — the conservative choice, and never auto-reclaimed anywhere).
@@ -337,16 +337,16 @@ export const STALE_DOING_DEFAULTS = Object.freeze({
 export function classifyStaleDoing(entries, { now = Date.now(), thresholds = STALE_DOING_DEFAULTS } = {}) {
   const stale = [];
   for (const entry of entries ?? []) {
-    const { id, claimActor, claimedAt } = entry ?? {};
+    const { id, claimRole, claimedAt } = entry ?? {};
     if (typeof claimedAt !== 'number' || !Number.isFinite(claimedAt)) continue; // no claim time -> cannot age
-    const ownerClass = claimActor === 'runner' ? 'agent' : 'human';
+    const ownerClass = claimRole === 'runner' ? 'agent' : 'human';
     const thresholdMs = ownerClass === 'agent' ? thresholds.agentMs : thresholds.humanMs;
     const ageMs = now - claimedAt;
     if (ageMs <= thresholdMs) continue; // fresh enough for this owner type
     const suggestion = ownerClass === 'agent'
       ? `runner-claimed ~${Math.round(ageMs / 60000)}m — likely a crashed or hung agent; investigate or let the startup reap reclaim it. This advisory never reclaims.`
-      : `held by ${claimActor ?? 'a person'} ~${Math.round(ageMs / 3600000)}h — check in with the holder; a person's claim is never auto-reclaimed.`;
-    stale.push({ id, claimActor, ownerClass, ageMs, thresholdMs, suggestion });
+      : `held by ${claimRole ?? 'a person'} ~${Math.round(ageMs / 3600000)}h — check in with the holder; a person's claim is never auto-reclaimed.`;
+    stale.push({ id, claimRole, ownerClass, ageMs, thresholdMs, suggestion });
   }
   return { now, thresholds, stale };
 }

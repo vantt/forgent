@@ -78,7 +78,7 @@ test('a coding item at stage compound-learn is allowed to reach done, and the cl
   moveWork(dir, { id: 'gate-allowed', to: 'proposed', expectedStatus: 'doing' });
   moveStage(dir, { id: 'gate-allowed', to: 'compound-learn' });
 
-  const { event, view } = moveWork(dir, { id: 'gate-allowed', to: 'done', expectedStatus: 'proposed', actor: 'human' });
+  const { event, view } = moveWork(dir, { id: 'gate-allowed', to: 'done', expectedStatus: 'proposed', role: 'human' });
   assert.equal(view.work['gate-allowed'].status, 'done');
   // composeLearning preserved: the close event still carries the learning field.
   assert.ok(event.payload.learning, 'the close event carries the composed learning record');
@@ -90,7 +90,7 @@ test('a synthetic-domain item (no Compound-learn stage) reaches done unchanged â
   addSynthetic(dir, 'exempt-item');
   moveWork(dir, { id: 'exempt-item', to: 'doing', expectedStatus: 'todo' });
 
-  const { view } = moveWork(dir, { id: 'exempt-item', to: 'done', expectedStatus: 'doing', actor: 'human' });
+  const { view } = moveWork(dir, { id: 'exempt-item', to: 'done', expectedStatus: 'doing', role: 'human' });
   assert.equal(view.work['exempt-item'].status, 'done');
 });
 

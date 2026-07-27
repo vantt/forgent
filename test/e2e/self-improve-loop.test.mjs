@@ -313,14 +313,14 @@ test(
 
     const finalView = stateView(repoRoot);
     assert.equal(finalView.work[submitted.id].status, 'done');
-    // The item already carries an earlier settlement (clarify-pass, actor
+    // The item already carries an earlier settlement (clarify-pass, role
     // runner) from the clarify/decompose sweep during dispatch — the close
-    // edge's settlement (actor human, D3: the approver is the settlement,
+    // edge's settlement (role human, D3: the approver is the settlement,
     // merge is only the mechanical consequence) is the LAST one, not the
     // first.
     const closeSettlement = finalView.settlements[submitted.id].at(-1);
     assert.equal(closeSettlement.kind, 'close');
-    assert.equal(closeSettlement.actor, 'human');
+    assert.equal(closeSettlement.role, 'human');
     assert.equal(branchExists(repoRoot, `fgw/${submitted.id}`), false, 'the fully-merged branch is cleaned up');
     assert.equal(worktreeCount(repoRoot), 1, 'no leaked worktree after cleanup');
     assert.ok(fs.existsSync(path.join(repoRoot, 'fixed.txt')), 'the merged file is present on main');

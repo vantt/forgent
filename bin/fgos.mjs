@@ -295,7 +295,7 @@ function collectReviewTrace(view, id) {
 const SETTLEMENT_DISPLAY_CAP = 5;
 
 // Settlement channel data (kênh 1 của capture 2 kênh — Phase 3
-// S3-closeout, vision §8): per-kind/actor counts over ALL matching records,
+// S3-closeout, vision §8): per-kind/role counts over ALL matching records,
 // plus the newest records capped at SETTLEMENT_DISPLAY_CAP. `settlements` is
 // a lazy view key (replay.mjs) — a log with no settling event has no key and
 // this returns null, keeping `check`'s data shape byte-identical to
@@ -308,16 +308,16 @@ function collectSettlementData(view, id) {
   if (records.length === 0) {
     return null;
   }
-  const byKindActor = {};
+  const byKindRole = {};
   for (const r of records) {
-    const key = `${r.kind}/${r.actor ?? 'unknown'}`;
-    byKindActor[key] = (byKindActor[key] ?? 0) + 1;
+    const key = `${r.kind}/${r.role ?? 'unknown'}`;
+    byKindRole[key] = (byKindRole[key] ?? 0) + 1;
   }
   const recent = records
     .sort((a, b) => ((a.ts ?? '') < (b.ts ?? '') ? -1 : 1))
     .slice(-SETTLEMENT_DISPLAY_CAP)
     .reverse();
-  return { count: records.length, byKindActor, recent };
+  return { count: records.length, byKindRole, recent };
 }
 
 // Learning report cap — same "always CAP, never unbounded" rule as
@@ -693,7 +693,7 @@ async function runVerb(verb, flags, positional, dir) {
     // runner sweep calls for whichever stage the item is currently sitting
     // at — `resolveDiscovery` for `clarify`, `resolveDecompose` for
     // `decompose` (D3's sync/async parity: identical trace either way, only
-    // the actor differs). A clear discovery verdict moves the item to
+    // the role differs). A clear discovery verdict moves the item to
     // `decompose` (carrying a real verify, D10); chia-việc then either
     // passes it through to `executing`, splits it into children, or parks it
     // in `awaiting-human` (D3). The runner config (executor + tier models)
@@ -723,7 +723,7 @@ async function runVerb(verb, flags, positional, dir) {
       // everywhere else" — this verb just forwards whatever the caller
       // supplied.
       const reason = optionalField(flags.reason, 'move --reason requires a non-empty reason value (omit --reason entirely when not rejecting a proposal)');
-      const { event } = moveWork(dir, { id, to, expectedStatus, reason, actor: 'human' });
+      const { event } = moveWork(dir, { id, to, expectedStatus, reason, role: 'human' });
       return { id, from: event.payload.from, to: event.payload.to, seq: event.seq };
     }
 
@@ -790,7 +790,7 @@ async function runVerb(verb, flags, positional, dir) {
         const { event } = addOutcome(dir, { id, docType, ...(docPath !== undefined ? { docPath } : {}) });
         return { id, docType, docPath: docPath ?? null, stage: item.stage, seq: event.seq };
       }
-      const { event } = moveStage(dir, { id, to: 'compound-learn', actor: 'human' });
+      const { event } = moveStage(dir, { id, to: 'compound-learn', role: 'human' });
       if (docType !== undefined) {
         addOutcome(dir, { id, docType, ...(docPath !== undefined ? { docPath } : {}) });
       }
@@ -865,7 +865,7 @@ async function runVerb(verb, flags, positional, dir) {
           'edit requires at least one field to change: --title/--kind/--risk/--verify/--tier/--refs/--deps/--acceptance/--priority/--intent.',
         );
       }
-      const { event } = editWork(dir, { id, patch, actor: 'human' });
+      const { event } = editWork(dir, { id, patch, role: 'human' });
       return { id, fields: Object.keys(patch), seq: event.seq };
     }
 
@@ -900,7 +900,7 @@ async function runVerb(verb, flags, positional, dir) {
       const id = requireField(positional[0] ?? flags.id, 'answer requires an id: fgos answer <id> --text "..." [--expect <status>]');
       const text = requireField(flags.text, 'answer requires --text "..."');
       const expectedStatus = optionalField(flags.expect, 'answer --expect requires a status value (omit --expect entirely to skip the CAS check)');
-      const { event } = answerAwaiting(dir, { id, answer: text, expectedStatus, actor: 'human' });
+      const { event } = answerAwaiting(dir, { id, answer: text, expectedStatus, role: 'human' });
       return { id, from: event.payload.from, to: event.payload.to, seq: event.seq };
     }
 
@@ -956,7 +956,7 @@ async function runVerb(verb, flags, positional, dir) {
     // read. work-graph-intelligence S8: the evidence-classifier advisory over
     // items stuck in `doing` — classifies stale-by-owner-type (human >> agent)
     // and SUGGESTS; it never moves or reclaims anything (the runner reap is the
-    // only actor, and it never reclaims a person's claim).
+    // only role, and it never reclaims a person's claim).
     case 'stale': {
       return staleDoingAdvisory(dir);
     }
@@ -1119,9 +1119,9 @@ async function runVerb(verb, flags, positional, dir) {
     // can later measure real progress against it.
     case 'take': {
       const explicitId = optionalField(positional[0] ?? flags.id, 'take --id requires a non-empty id value (omit --id entirely to take the frontier head)');
-      const actor = optionalField(flags.actor, 'take --actor requires "human" or "session" (omit --actor entirely to default to human)') ?? 'human';
-      if (actor !== 'human' && actor !== 'session') {
-        throw new StoreError('validation', `take --actor must be "human" or "session" (got "${actor}").`);
+      const role = optionalField(flags.role, 'take --role requires "human" or "session" (omit --role entirely to default to human)') ?? 'human';
+      if (role !== 'human' && role !== 'session') {
+        throw new StoreError('validation', `take --role must be "human" or "session" (got "${role}").`);
       }
 
       let id = explicitId;
@@ -1160,21 +1160,21 @@ async function runVerb(verb, flags, positional, dir) {
       const branch = branchNameFor(id);
       if (item.status === 'blocked' && branchExists(process.cwd(), branch)) {
         const branchHeadAtTake = gitAt(process.cwd(), ['rev-parse', branch]).trim();
-        const { event } = moveWork(dir, { id, to: 'doing', expectedStatus: 'blocked', actor, branchHeadAtTake });
+        const { event } = moveWork(dir, { id, to: 'doing', expectedStatus: 'blocked', role, branchHeadAtTake });
         addOutcome(dir, {
           id,
-          predicted: { tier: item.tier ?? DEFAULTS.tier, deps: item.deps.length, priorVisits, actor, branchHeadAtTake },
+          predicted: { tier: item.tier ?? DEFAULTS.tier, deps: item.deps.length, priorVisits, role, branchHeadAtTake },
         });
-        return { id, from: 'blocked', to: 'doing', actor, seq: event.seq, source: 'branch', branch, branchHeadAtTake };
+        return { id, from: 'blocked', to: 'doing', role, seq: event.seq, source: 'branch', branch, branchHeadAtTake };
       }
 
       const headAtTake = currentHead(process.cwd());
-      const { event } = moveWork(dir, { id, to: 'doing', expectedStatus: 'todo', actor, headAtTake });
+      const { event } = moveWork(dir, { id, to: 'doing', expectedStatus: 'todo', role, headAtTake });
       addOutcome(dir, {
         id,
-        predicted: { tier: item.tier ?? DEFAULTS.tier, deps: item.deps.length, priorVisits, actor, headAtTake },
+        predicted: { tier: item.tier ?? DEFAULTS.tier, deps: item.deps.length, priorVisits, role, headAtTake },
       });
-      return { id, from: 'todo', to: 'doing', actor, seq: event.seq, source: 'main', headAtTake };
+      return { id, from: 'todo', to: 'doing', role, seq: event.seq, source: 'main', headAtTake };
     }
 
     // Cửa pull — pick (str83-fgos-slash-commands, D1/D3): combines take's
@@ -1183,13 +1183,13 @@ async function runVerb(verb, flags, positional, dir) {
     // worktree/branch in a single verb. Reuses take's exact frontier-head
     // default, explicit-id frontier validation, and blocked-branch re-take
     // rules VERBATIM — pick opens no new claim surface, only a new combined
-    // entry point onto the same one take already uses. `actor` is never a
-    // flag here (unlike take's `--actor`): per D3 the picking session IS the
-    // actor, always `'session'`, because it is the one that will drive and
+    // entry point onto the same one take already uses. `role` is never a
+    // flag here (unlike take's `--role`): per D3 the picking session IS the
+    // role, always `'session'`, because it is the one that will drive and
     // later complete the item end to end.
     case 'pick': {
       const explicitId = optionalField(positional[0] ?? flags.id, 'pick --id requires a non-empty id value (omit --id entirely to pick the frontier head)');
-      const actor = 'session';
+      const role = 'session';
 
       let id = explicitId;
       if (!id) {
@@ -1219,20 +1219,20 @@ async function runVerb(verb, flags, positional, dir) {
       let claim;
       if (item.status === 'blocked' && branchExists(repoRoot, branch)) {
         const branchHeadAtTake = gitAt(repoRoot, ['rev-parse', branch]).trim();
-        const { event } = moveWork(dir, { id, to: 'doing', expectedStatus: 'blocked', actor, branchHeadAtTake });
+        const { event } = moveWork(dir, { id, to: 'doing', expectedStatus: 'blocked', role, branchHeadAtTake });
         addOutcome(dir, {
           id,
-          predicted: { tier: item.tier ?? DEFAULTS.tier, deps: item.deps.length, priorVisits, actor, branchHeadAtTake },
+          predicted: { tier: item.tier ?? DEFAULTS.tier, deps: item.deps.length, priorVisits, role, branchHeadAtTake },
         });
-        claim = { id, from: 'blocked', to: 'doing', actor, seq: event.seq, source: 'branch', branch, branchHeadAtTake };
+        claim = { id, from: 'blocked', to: 'doing', role, seq: event.seq, source: 'branch', branch, branchHeadAtTake };
       } else {
         const headAtTake = currentHead(repoRoot);
-        const { event } = moveWork(dir, { id, to: 'doing', expectedStatus: 'todo', actor, headAtTake });
+        const { event } = moveWork(dir, { id, to: 'doing', expectedStatus: 'todo', role, headAtTake });
         addOutcome(dir, {
           id,
-          predicted: { tier: item.tier ?? DEFAULTS.tier, deps: item.deps.length, priorVisits, actor, headAtTake },
+          predicted: { tier: item.tier ?? DEFAULTS.tier, deps: item.deps.length, priorVisits, role, headAtTake },
         });
-        claim = { id, from: 'todo', to: 'doing', actor, seq: event.seq, source: 'main', headAtTake };
+        claim = { id, from: 'todo', to: 'doing', role, seq: event.seq, source: 'main', headAtTake };
       }
 
       // The claim above is already durable (moveWork's event is committed to
@@ -1274,10 +1274,10 @@ async function runVerb(verb, flags, positional, dir) {
       if (item.status !== 'doing') {
         throw new StoreError('validation', `return: work "${id}" is "${item.status}", not "doing" — nothing to return.`);
       }
-      if (item.claimActor !== 'human' && item.claimActor !== 'session') {
+      if (item.claimRole !== 'human' && item.claimRole !== 'session') {
         throw new StoreError(
           'validation',
-          `return: work "${id}" was not taken through the pull door (claimed by "${item.claimActor ?? 'runner'}") — return only completes a take.`,
+          `return: work "${id}" was not taken through the pull door (claimed by "${item.claimRole ?? 'runner'}") — return only completes a take.`,
         );
       }
 
@@ -1485,7 +1485,7 @@ async function runVerb(verb, flags, positional, dir) {
     // path (conflict, red verify) parks the item at `blocked` with a reason
     // instead of leaving main mid-merge or the item silently in `proposed`
     // (D3's "merge sạch → done tự động; conflict/đỏ → hủy sạch + blocked").
-    // `done`'s actor is always "human" (D3: the person who ran approve is
+    // `done`'s role is always "human" (D3: the person who ran approve is
     // the settlement, the merge itself is only the mechanical consequence).
     case 'approve': {
       const id = requireField(positional[0] ?? flags.id, 'approve requires an id: fgos approve <id> [--timeout <ms>]');
@@ -1616,7 +1616,7 @@ async function runVerb(verb, flags, positional, dir) {
           // cleanupMergedBranch runs — the local fgw/<id> branch and its pushed
           // origin copy are both left in place after a server-side merge (no
           // local cleanup mechanism exists for a branch merged on GitHub).
-          const { event } = moveWork(dir, { id, to: 'done', expectedStatus: 'proposed', actor: 'human' });
+          const { event } = moveWork(dir, { id, to: 'done', expectedStatus: 'proposed', role: 'human' });
           return { id, mode: 'github', to: 'done', prNumber, seq: event.seq };
         }
         // blocked — mirrors the local merge-conflict/verify-fail-post-merge
@@ -1700,7 +1700,7 @@ async function runVerb(verb, flags, positional, dir) {
             // the branch is merged INTO; running it from repoRoot/main
             // would have git silently refuse the delete (swallowed as a
             // warning), leaking the leaf's branch forever.
-            const { event } = moveWork(dir, { id, to: 'done', expectedStatus: 'proposed', actor: 'human' });
+            const { event } = moveWork(dir, { id, to: 'done', expectedStatus: 'proposed', role: 'human' });
             const cleanup = cleanupMergedBranch(ephemeral.path, result.branch);
             return {
               id,
@@ -1770,7 +1770,7 @@ async function runVerb(verb, flags, positional, dir) {
           return { id, mode: 'merge', to: 'blocked', reason, target: 'main', exitStatus: result.check.status, output: result.check.output };
         }
 
-        const { event } = moveWork(dir, { id, to: 'done', expectedStatus: 'proposed', actor: 'human' });
+        const { event } = moveWork(dir, { id, to: 'done', expectedStatus: 'proposed', role: 'human' });
         const cleanup = cleanupMergedBranch(repoRoot, result.branch);
         return {
           id,
@@ -1800,7 +1800,7 @@ async function runVerb(verb, flags, positional, dir) {
         });
         return { id, mode: 'verify-only', to: 'blocked', reason: 'verify-fail', exitStatus: check.status, output: check.output };
       }
-      const { event } = moveWork(dir, { id, to: 'done', expectedStatus: 'proposed', actor: 'human' });
+      const { event } = moveWork(dir, { id, to: 'done', expectedStatus: 'proposed', role: 'human' });
       return { id, mode: 'verify-only', to: 'done', seq: event.seq, output: check.output };
     }
 
@@ -1819,7 +1819,7 @@ async function runVerb(verb, flags, positional, dir) {
       if (item.status !== 'proposed') {
         throw new StoreError('precondition', `reject: work "${id}" is "${item.status}", not "proposed" — nothing to reject.`);
       }
-      const { event } = moveWork(dir, { id, to: 'todo', expectedStatus: 'proposed', reason, actor: 'human' });
+      const { event } = moveWork(dir, { id, to: 'todo', expectedStatus: 'proposed', reason, role: 'human' });
       return { id, from: 'proposed', to: 'todo', reason, seq: event.seq };
     }
 
@@ -1951,7 +1951,7 @@ async function runVerb(verb, flags, positional, dir) {
         // D18's edge: mechanical, uncounted reconcile-success — never
         // touches 'doing', so anti-loop's visitCount never sees it. No
         // reason/ask required on this edge (fsm.mjs).
-        const { event } = moveWork(dir, { id, to: 'proposed', expectedStatus: 'blocked', actor: 'runner' });
+        const { event } = moveWork(dir, { id, to: 'proposed', expectedStatus: 'blocked', role: 'runner' });
         return { id, outcome: 'merged', from: 'blocked', to: 'proposed', target, branch: ownBranch, seq: event.seq, output: check.output };
       } finally {
         removeWorktree(repoRoot, ephemeral.path, { force: true });

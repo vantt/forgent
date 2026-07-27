@@ -37,9 +37,9 @@ export const BREAKER_MISSES = 3;
  * lifetime tally.
  *
  * SUPERSEDES the comment this replaced ("there is no privileged writer whose
- * visits don't count"): that was true only because `actor` did not exist yet
- * when it was written. `actor` is now stamped on every `work.move` event
- * (store.mjs), and human-rounds D1 gives a human's actor-attributed events
+ * visits don't count"): that was true only because `role` did not exist yet
+ * when it was written. `role` is now stamped on every `work.move` event
+ * (store.mjs), and human-rounds D1 gives a human's role-attributed events
  * gate-resetting weight the runner's own never gets — this function still
  * treats every writer identically because it is the lifetime metric, not the
  * gate; the gate's asymmetry lives entirely in `visitsSinceLastHumanEvent`.
@@ -62,7 +62,7 @@ export function visitCount(events, id) {
  *
  * Per-item (D1b): only events carrying this exact `id` mark or count.
  *
- * Trigger-set is CLOSED (D1c) and keyed on `actor === 'human'` plus payload
+ * Trigger-set is CLOSED (D1c) and keyed on `role === 'human'` plus payload
  * shape — never on a `from` field:
  *   - `payload.answer !== undefined` — the item left `awaiting-human` via a
  *     human's answer (`answerAwaiting`, fsm.mjs's `awaiting-human -> todo`
@@ -70,9 +70,9 @@ export function visitCount(events, id) {
  *   - `payload.reason !== undefined` — a human's reject/park-with-reason
  *     (fsm.mjs's `proposed -> todo`/`proposed -> blocked` edges; the runner's
  *     own reason-carrying parks, e.g. `anti-loop-max-visits`/`breaker-tripped`,
- *     stamp `actor: 'runner'` and so never match here).
+ *     stamp `role: 'runner'` and so never match here).
  * A bare resume (`blocked -> todo` with no reason) and a human `take`
- * (`blocked -> doing`, `actor: 'human'`, no answer/reason) are deliberately
+ * (`blocked -> doing`, `role: 'human'`, no answer/reason) are deliberately
  * NOT triggers — per D1c only the two closed shapes above reset the budget.
  *
  * No qualifying event found for this id → the budget is the item's whole
@@ -89,7 +89,7 @@ export function visitsSinceLastHumanEvent(events, id) {
       event.type === 'work.move' &&
       event.payload &&
       event.payload.id === id &&
-      event.payload.actor === 'human' &&
+      event.payload.role === 'human' &&
       (event.payload.answer !== undefined || event.payload.reason !== undefined)
     ) {
       lastHumanIndex = i;
