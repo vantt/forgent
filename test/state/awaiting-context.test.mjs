@@ -133,3 +133,25 @@ test('multiple awaiting-human items with parents -> each computes independently 
     parent: { id: 'goal-y', title: 'Cut the release', status: 'todo' },
   });
 });
+
+test('ask recorded on the gate -> ctx.ask mirrors it verbatim', () => {
+  const view = baseView({
+    gates: { 'item-x': { ask: 'What tone should the copy use?' } },
+  });
+  const ctx = computeAwaitingContext(view, 'item-x');
+  assert.equal(ctx.ask, 'What tone should the copy use?');
+});
+
+test('no gates entry at all -> no ask key', () => {
+  const view = baseView();
+  const ctx = computeAwaitingContext(view, 'item-x');
+  assert.ok(!('ask' in ctx));
+});
+
+test('gate present but no ask recorded -> no ask key', () => {
+  const view = baseView({
+    gates: { 'item-x': { parentSnapshotAtAsk: { id: 'goal-x', title: 'Ship the launch', status: 'doing' } } },
+  });
+  const ctx = computeAwaitingContext(view, 'item-x');
+  assert.ok(!('ask' in ctx));
+});

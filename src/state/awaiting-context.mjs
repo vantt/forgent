@@ -44,7 +44,7 @@ const MATERIAL_FIELDS = ['title', 'status'];
  *
  * @param {object} view - a folded view (replay.mjs's rebuildView/foldEvents shape)
  * @param {string} id - the work item id to compute context for
- * @returns {{ parent: { id: string, title: string, status: string }, changedSinceAsk?: Array<{ field: string, from: unknown, to: unknown }> } | null}
+ * @returns {{ parent: { id: string, title: string, status: string }, changedSinceAsk?: Array<{ field: string, from: unknown, to: unknown }>, ask?: string } | null}
  */
 export function computeAwaitingContext(view, id) {
   const item = view?.work?.[id];
@@ -59,7 +59,9 @@ export function computeAwaitingContext(view, id) {
     parent: { id: parent.id, title: parent.title, status: parent.status },
   };
 
-  const snapshot = view?.gates?.[id]?.parentSnapshotAtAsk;
+  const gate = view?.gates?.[id];
+
+  const snapshot = gate?.parentSnapshotAtAsk;
   if (snapshot) {
     const changedSinceAsk = MATERIAL_FIELDS
       .filter((field) => snapshot[field] !== parent[field])
@@ -67,6 +69,10 @@ export function computeAwaitingContext(view, id) {
     if (changedSinceAsk.length > 0) {
       result.changedSinceAsk = changedSinceAsk;
     }
+  }
+
+  if (gate?.ask !== undefined) {
+    result.ask = gate.ask;
   }
 
   return result;
