@@ -2489,6 +2489,37 @@ test('return happy path: verify passes -> doing to proposed, actual outcome reco
   assert.equal('settlements' in view, false, 'doing -> proposed never settles (D4: settlement belongs to the -> done edge)');
 });
 
+test('return (STR63): a changed sensitive file outside the item\'s footprint surfaces a frozenJudgeHits advisory, and never blocks the return', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  addOk(cwd, 'pull-return-judge', { verify: 'test -f proof.txt' });
+  assert.equal(run(cwd, ['take', '--id', 'pull-return-judge']).status, 0);
+  commitFile(cwd, 'proof.txt');
+  commitFile(cwd, 'package.json', '{}\n');
+
+  const result = run(cwd, ['return', 'pull-return-judge']);
+  assert.equal(result.status, 0, `return failed: ${result.stderr}`);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.to, 'proposed');
+  assert.equal(data.passed, true, 'the frozen-judge advisory never fails the return itself');
+  assert.deepEqual(data.frozenJudgeHits, [{ file: 'package.json', rule: 'package manifest' }]);
+});
+
+test('return (STR63): a changed sensitive file DECLARED in the item\'s footprint is not a hit', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  assert.equal(run(cwd, ['add', 'pull-return-judge-declared', '--title', 'X', '--kind', 'task', '--risk', 'low', '--verify', 'test -f proof.txt', '--footprint', 'package.json']).status, 0);
+  assert.equal(run(cwd, ['take', '--id', 'pull-return-judge-declared']).status, 0);
+  commitFile(cwd, 'proof.txt');
+  commitFile(cwd, 'package.json', '{}\n');
+
+  const result = run(cwd, ['return', 'pull-return-judge-declared']);
+  assert.equal(result.status, 0, `return failed: ${result.stderr}`);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.passed, true);
+  assert.deepEqual(data.frozenJudgeHits, []);
+});
+
 test('return refuses a dirty working tree (uncommitted changes) as validation, exit 4, item stays doing', () => {
   const cwd = initGitCwd();
   run(cwd, ['init']);

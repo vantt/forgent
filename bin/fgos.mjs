@@ -31,6 +31,7 @@ import { buildEnduserIndex, QUADRANTS, QUADRANT_DIR_ALIASES, findSourceCaptureId
 import { rankCandidates } from '../src/evolve/candidates.mjs';
 import { rankImpact } from '../src/state/impact.mjs';
 import { runGoalCheck } from '../src/runner/goal-check.mjs';
+import { frozenJudgeHits } from '../src/runner/frozen-judge.mjs';
 import { classifySource, reviewDiff, mergeRunnerItem, cleanupMergedBranch, changedFiles, isWorkingTreeClean as isMainTreeClean, isFgosOnlyStatusLine, detectTrunk, isMainWorktree } from '../src/runner/merge.mjs';
 import { createGitHubPR, mergeGitHubPR, viewGitHubPRStatus } from '../src/runner/github-adapter.mjs';
 import { classifyIronLaw } from '../src/evolve/iron-law.mjs';
@@ -104,6 +105,17 @@ function isWorkingTreeClean(cwd) {
 
 function commitsSince(cwd, from, to) {
   return parseInt(gitAt(cwd, ['rev-list', '--count', `${from}..${to}`]).trim(), 10) || 0;
+}
+
+// STR63: the file paths `return` actually changed between `from` and `to` —
+// the input frozenJudgeHits checks against the item's declared `footprint`.
+// A literal tree diff (not a merge-base range): `commitsSince` above walks
+// `from..to` because it's counting commits, but a two-ref `git diff` already
+// compares the two trees directly, so no `..`/`...` range syntax is needed.
+function changedFilesSince(cwd, from, to) {
+  return gitAt(cwd, ['diff', '--name-only', from, to])
+    .split('\n')
+    .filter((line) => line.trim() !== '');
 }
 
 // LOCAL copy of session.mjs's private realpathOr (session.mjs is never edited,
@@ -1318,9 +1330,11 @@ async function runVerb(verb, flags, positional, dir) {
         }
 
         if (check.passed) {
+          // STR63: advisory only (per cos) — a hit never blocks this return.
+          const frozenJudge = frozenJudgeHits(changedFilesSince(repoRoot, item.branchHeadAtTake, branchHead), item.footprint);
           const { event } = moveWork(dir, { id, to: 'proposed', expectedStatus: 'doing', branchHeadAtReturn: branchHead });
           addOutcome(dir, { id, actual: { outcome: 'proposed', passed: true, attempts: 1, errorClass: null, aheadCount: branchAheadCount } });
-          return { id, from: 'doing', to: 'proposed', source: 'branch', branch, aheadCount: branchAheadCount, passed: true, seq: event.seq, output: check.output };
+          return { id, from: 'doing', to: 'proposed', source: 'branch', branch, aheadCount: branchAheadCount, passed: true, seq: event.seq, output: check.output, frozenJudgeHits: frozenJudge };
         }
 
         moveWork(dir, { id, to: 'blocked', expectedStatus: 'doing', reason: 'verify-fail' });
@@ -1355,9 +1369,11 @@ async function runVerb(verb, flags, positional, dir) {
 
       const check = await runGoalCheck(item, cwd, timeoutMs);
       if (check.passed) {
+        // STR63: advisory only (per cos) — a hit never blocks this return.
+        const frozenJudge = frozenJudgeHits(changedFilesSince(cwd, item.headAtTake, head), item.footprint);
         const { event } = moveWork(dir, { id, to: 'proposed', expectedStatus: 'doing', headAtReturn: head });
         addOutcome(dir, { id, actual: { outcome: 'proposed', passed: true, attempts: 1, errorClass: null, aheadCount } });
-        return { id, from: 'doing', to: 'proposed', source: 'main', aheadCount, passed: true, seq: event.seq, output: check.output };
+        return { id, from: 'doing', to: 'proposed', source: 'main', aheadCount, passed: true, seq: event.seq, output: check.output, frozenJudgeHits: frozenJudge };
       }
 
       moveWork(dir, { id, to: 'blocked', expectedStatus: 'doing', reason: 'verify-fail' });
