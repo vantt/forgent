@@ -50,6 +50,102 @@
       "claimActor": "human",
       "headAtTake": "9bd8da66cca2524c2de4e47c960eb65a9274ea48",
       "headAtReturn": "76aa4d713fbd7e1ea1307719e1c783c37e85bcbc"
+    },
+    "tsk-calc-reliability-audit": {
+      "tier": "standard",
+      "id": "tsk-calc-reliability-audit",
+      "title": "Audit the calculator's own reliability before dogfood-fixture is considered dogfood-solid",
+      "kind": "task",
+      "status": "todo",
+      "deps": [],
+      "risk": "low",
+      "refs": [],
+      "verify": "none"
+    },
+    "tsk-doc-newcomer-review": {
+      "tier": "standard",
+      "id": "tsk-doc-newcomer-review",
+      "title": "Review whether fgOS's shipped docs are sufficient for a newcomer with zero prior context",
+      "kind": "task",
+      "status": "todo",
+      "deps": [],
+      "risk": "low",
+      "refs": [],
+      "verify": "none"
+    },
+    "tsk-human-gate-audit": {
+      "tier": "standard",
+      "id": "tsk-human-gate-audit",
+      "title": "Audit the human-gate UX for the moments where the loop genuinely needs a person",
+      "kind": "task",
+      "status": "todo",
+      "deps": [],
+      "risk": "low",
+      "refs": [],
+      "verify": "none"
+    },
+    "milestone-loop-reliability": {
+      "tier": "standard",
+      "id": "milestone-loop-reliability",
+      "title": "Milestone: self-run loop reliability -- no manual unstick needed (decision 0016 axis a)",
+      "kind": "milestone",
+      "status": "todo",
+      "deps": [
+        "tsk-calc-reliability-audit",
+        "tsk-2ie",
+        "tsk-5gc"
+      ],
+      "risk": "low",
+      "refs": [],
+      "verify": "none",
+      "goalTier": "milestone"
+    },
+    "milestone-shipped-docs": {
+      "tier": "standard",
+      "id": "milestone-shipped-docs",
+      "title": "Milestone: shipped docs sufficient for a newcomer with zero prior context (decision 0016 axis b)",
+      "kind": "milestone",
+      "status": "todo",
+      "deps": [],
+      "risk": "low",
+      "refs": [],
+      "verify": "none",
+      "goalTier": "milestone",
+      "targets": [
+        "tsk-doc-newcomer-review"
+      ]
+    },
+    "milestone-human-gate-ux": {
+      "tier": "standard",
+      "id": "milestone-human-gate-ux",
+      "title": "Milestone: human-gate UX for the moments where the loop genuinely needs a person (decision 0016 axis c)",
+      "kind": "milestone",
+      "status": "todo",
+      "deps": [],
+      "risk": "low",
+      "refs": [],
+      "verify": "none",
+      "goalTier": "milestone",
+      "targets": [
+        "tsk-human-gate-audit"
+      ]
+    },
+    "mvp-fgos-newcomer-loop": {
+      "tier": "standard",
+      "id": "mvp-fgos-newcomer-loop",
+      "title": "Một người mới — không có ngữ cảnh trước, chỉ dựa vào tài liệu ĐÃ SHIP — cài fgOS, nộp MỘT yêu cầu thật bằng văn xuôi tự do, và nhận lại một thay đổi code thật: chạy được, có test, sẵn sàng merge — với tối thiểu sự canh chừng của con người.",
+      "kind": "mvp",
+      "status": "todo",
+      "deps": [],
+      "risk": "low",
+      "refs": [],
+      "verify": "none",
+      "goalTier": "mvp",
+      "targets": [
+        "milestone-loop-reliability",
+        "milestone-shipped-docs",
+        "milestone-human-gate-ux"
+      ]
     }
   },
   "decisions": [],
@@ -257,5 +353,6 @@
       }
     ]
   },
-  "revision": "d9d07b9bc03693c41ba01a4608fbf60cdb103c87b088d121aaa1b3634f1073bf"
+  "focus": "mvp-fgos-newcomer-loop",
+  "revision": "9258eacc18e30b138b7c48a1646e1b60509583393664ac1d07dd55a0ae6a5285"
 }

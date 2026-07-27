@@ -29,11 +29,11 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { appendEvent, readEvents, withEventsLock, appendEventLocked } from './events.mjs';
 import { rebuildView, viewRevision } from './replay.mjs';
-import { graphMetrics as computeGraphMetrics, whatIf as computeWhatIf, classifyStaleDoing, footprintOverlap } from './graph-metrics.mjs';
+import { graphMetrics as computeGraphMetrics, whatIf as computeWhatIf, classifyStaleDoing, footprintOverlap, goalScopedCriticalPath, goalScopedGreedyTopUnblock } from './graph-metrics.mjs';
 import { transitionWork, FsmError } from './fsm.mjs';
 import { transitionStage } from './stage.mjs';
 import { getDomain, stageForStep } from './workflow-stage-graphs.mjs';
-import { validateWork, WorkValidationError, DEFAULTS } from './work.mjs';
+import { validateWork, WorkValidationError, DEFAULTS, GOAL_TIERS } from './work.mjs';
 import { EventLogError } from './events.mjs';
 import { frontier } from './frontier.mjs';
 import { assertNoCycle, assertNoUnifiedCycle } from './dep-graph.mjs';
@@ -278,6 +278,37 @@ function composeLearning(view, id, closingSettlement) {
   }
 
   return { outcome, frictions, settlements };
+}
+
+/**
+ * Set the persisted "focus" pointer (per str67-goal-directed-planning
+ * D3/D4/D7) to `id` — the SINGLE write door for focus, mirroring
+ * addWork/editWork's exact shape: resolve paths, rebuild the view fresh
+ * inside the held lock, validate, append, refresh. Rejects an id that does
+ * not exist, or whose item has no declared `goalTier` (D7: "must target an
+ * actual goal item"). No CAS/precondition beyond those two checks — setting
+ * focus to an id that is already the current focus is a harmless no-op
+ * re-write (idempotent, per plan.md's edge-dimension note).
+ */
+export function setFocus(dir, { id, actor } = {}) {
+  const { logPath } = paths(dir);
+  const event = withEventsLock(logPath, () => {
+    const before = rebuildView(logPath);
+    const work = before.work[id];
+    if (!work) {
+      throw new StoreError('validation', `work "${id}" not found.`);
+    }
+    if (!GOAL_TIERS.includes(work.goalTier)) {
+      throw new StoreError(
+        'validation',
+        `work "${id}" has no declared goal tier — "goal set" requires goalTier to be one of ${GOAL_TIERS.join(', ')}.`,
+      );
+    }
+    const payload = actor !== undefined ? { id, actor } : { id };
+    return appendEventLocked(logPath, { type: 'goal.focus', payload });
+  });
+  const view = refreshView(dir);
+  return { event, view };
 }
 
 /**
@@ -639,6 +670,28 @@ export function graphMetrics(dir) {
 export function graphWhatIf(dir, id) {
   const { logPath } = paths(dir);
   return computeWhatIf(rebuildView(logPath), id);
+}
+
+/**
+ * Read-only (str67-goal-directed-planning D3): the goal-focus facade the
+ * new `fgos goal show` verb reads. Same read contract/facade shape as
+ * graphMetrics/graphWhatIf — Entry never imports graph-metrics.mjs directly,
+ * it always reads through this door. Does NOT validate that `view.focus`
+ * still names a real goal item (D7: a focus is never auto-cleared) — it just
+ * reads whatever is persisted and computes over it; the goal-scoped metrics
+ * functions already degrade gracefully (empty scope) on an unknown/stale id.
+ */
+export function goalFocusShow(dir) {
+  const { logPath } = paths(dir);
+  const view = rebuildView(logPath);
+  if (view.focus === undefined) {
+    return { focus: null };
+  }
+  return {
+    focus: view.focus,
+    criticalPath: goalScopedCriticalPath(view, view.focus),
+    topUnblock: goalScopedGreedyTopUnblock(view, view.focus),
+  };
 }
 
 /**

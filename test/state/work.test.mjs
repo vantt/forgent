@@ -8,6 +8,7 @@ import {
   STATUSES,
   TIERS,
   STAGES,
+  GOAL_TIERS,
   DEFAULTS,
   SCHEMA_VERSION,
 } from '../../src/state/work.mjs';
@@ -445,4 +446,73 @@ test('validateWork does not add priority or intent to SCHEMA_VERSION or DEFAULTS
   assert.equal(SCHEMA_VERSION, 2);
   assert.equal(Object.hasOwn(DEFAULTS, 'priority'), false);
   assert.equal(Object.hasOwn(DEFAULTS, 'intent'), false);
+});
+
+// --- `goalTier`/`targets` fields (per str67-goal-directed-planning D1/D2):
+// goalTier is an optional additive allowlist field (mirrors tier/domain);
+// targets is an optional additive array field (mirrors deps' shape check
+// and parent/discoveredFrom's self-reference guard, null treated as absent) ---
+
+test('validateWork accepts a work item missing goalTier or targets (optional, no default, stays absent)', () => {
+  const work = baseWork();
+  assert.equal(work.goalTier, undefined);
+  assert.equal(work.targets, undefined);
+  assert.doesNotThrow(() => validateWork(work));
+});
+
+test('validateWork accepts every goalTier in GOAL_TIERS', () => {
+  for (const goalTier of GOAL_TIERS) {
+    assert.doesNotThrow(() => validateWork(baseWork({ goalTier })));
+  }
+});
+
+test('validateWork rejects a goalTier outside GOAL_TIERS', () => {
+  assert.throws(
+    () => validateWork(baseWork({ goalTier: 'epic' })),
+    (err) => err instanceof WorkValidationError && /goalTier/.test(err.message),
+  );
+});
+
+test('validateWork accepts targets as an array of non-empty strings that exclude the item\'s own id', () => {
+  assert.doesNotThrow(() => validateWork(baseWork({ id: 'mvp-1', targets: ['milestone-1', 'milestone-2'] })));
+  assert.doesNotThrow(() => validateWork(baseWork({ targets: [] })));
+});
+
+test('validateWork treats targets: null the same as absent', () => {
+  assert.doesNotThrow(() => validateWork(baseWork({ targets: null })));
+});
+
+test('validateWork rejects a targets that is not an array', () => {
+  assert.throws(
+    () => validateWork(baseWork({ targets: 'milestone-1' })),
+    (err) => err instanceof WorkValidationError && /targets/.test(err.message),
+  );
+});
+
+test('validateWork rejects a targets entry that is a non-string or empty string', () => {
+  assert.throws(
+    () => validateWork(baseWork({ targets: ['milestone-1', 42] })),
+    (err) => err instanceof WorkValidationError && /targets/.test(err.message),
+  );
+  assert.throws(
+    () => validateWork(baseWork({ targets: ['milestone-1', ''] })),
+    (err) => err instanceof WorkValidationError && /targets/.test(err.message),
+  );
+});
+
+test('validateWork rejects a work item that lists itself in its own targets', () => {
+  assert.throws(
+    () => validateWork(baseWork({ id: 'mvp-1', targets: ['mvp-1'] })),
+    (err) => err instanceof WorkValidationError && /own targets|targets/.test(err.message),
+  );
+});
+
+test('validateWork does not require targets to point at existing ids (targets may name not-yet-created items, per D2)', () => {
+  assert.doesNotThrow(() => validateWork(baseWork({ id: 'mvp-1', targets: ['not-yet-created'] }), new Set(['mvp-1'])));
+});
+
+test('validateWork does not add goalTier or targets to SCHEMA_VERSION or DEFAULTS (optional additive fields, no schema bump)', () => {
+  assert.equal(SCHEMA_VERSION, 2);
+  assert.equal(Object.hasOwn(DEFAULTS, 'goalTier'), false);
+  assert.equal(Object.hasOwn(DEFAULTS, 'targets'), false);
 });

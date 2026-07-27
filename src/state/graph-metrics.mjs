@@ -116,20 +116,16 @@ function transitiveDownstream(id, rev, notDone) {
   return out;
 }
 
-/**
- * The CRITICAL PATH through the `deps` (blocks) DAG — the longest dependency
- * chain, whose length is the minimum number of sequential steps before the
- * deepest item can start. The graph is acyclic (guaranteed at the write door
- * by S1/S2a), so the memoized longest-path recursion always terminates; a
- * `guard` set is a pure defensive backstop, never a cycle report.
- *
- * Returns `{ depth, path }` — `path` traced from the deepest item DOWN through
- * the max-depth dependency it sits on, ties broken by declaration order. An
- * empty view yields `{ depth: 0, path: [] }`.
- */
-export function criticalPath(view) {
-  const work = view?.work ?? {};
-  const deps = knownDeps(work);
+// Shared longest-`deps`-chain search underlying both criticalPath (over the
+// whole graph) and goalScopedCriticalPath (over a D5 scope). `candidateIds`
+// is the declaration-order list of ids eligible to be the deepest item; the
+// depthOf recursion itself is never separately scoped — every dep of a
+// scoped candidate is already inside the scope by construction (D5's own
+// deps-ancestor closure), so recursion naturally never leaves it. The graph
+// is acyclic (guaranteed at the write door by S1/S2a), so the memoized
+// recursion always terminates; a `guard` set is a pure defensive backstop,
+// never a cycle report.
+function longestChain(deps, candidateIds) {
   const depthMemo = new Map();
   const deepestDep = new Map();
 
@@ -154,7 +150,7 @@ export function criticalPath(view) {
 
   let top = null;
   let topDepth = 0;
-  for (const id of Object.keys(work)) {
+  for (const id of candidateIds) {
     const d = depthOf(id);
     if (d > topDepth) {
       topDepth = d;
@@ -167,6 +163,109 @@ export function criticalPath(view) {
     path.push(cursor);
   }
   return { depth: topDepth, path };
+}
+
+/**
+ * The CRITICAL PATH through the `deps` (blocks) DAG — the longest dependency
+ * chain, whose length is the minimum number of sequential steps before the
+ * deepest item can start. The graph is acyclic (guaranteed at the write door
+ * by S1/S2a), so the memoized longest-path recursion always terminates; a
+ * `guard` set is a pure defensive backstop, never a cycle report.
+ *
+ * Returns `{ depth, path }` — `path` traced from the deepest item DOWN through
+ * the max-depth dependency it sits on, ties broken by declaration order. An
+ * empty view yields `{ depth: 0, path: [] }`.
+ */
+export function criticalPath(view) {
+  const work = view?.work ?? {};
+  const deps = knownDeps(work);
+  return longestChain(deps, Object.keys(work));
+}
+
+// Ids reachable from `startId` via the transitive closure of `targets` (D5's
+// scope-union starting point — covers nested MVP > milestone > work). Cycle-
+// safe: `result` doubles as the seen-guard, so a `targets` cycle (A targets
+// B targets A) terminates without duplicating members, the same defensive
+// stance as criticalPath's `guard` set. Only known ids (present in
+// `view.work`) are ever added — mirrors knownDeps's dangling-edge filtering,
+// so an entry naming an unknown id is simply not traversed further. An
+// unknown `startId` yields an empty set.
+function targetsClosure(work, startId) {
+  const known = new Set(Object.keys(work));
+  const result = new Set();
+  if (!known.has(startId)) return result;
+  result.add(startId);
+  const stack = [startId];
+  while (stack.length > 0) {
+    const id = stack.pop();
+    const targets = Array.isArray(work[id]?.targets) ? work[id].targets : [];
+    for (const t of targets) {
+      if (!known.has(t) || result.has(t)) continue;
+      result.add(t);
+      stack.push(t);
+    }
+  }
+  return result;
+}
+
+// The transitive deps-ancestor set of every id in `startIds` — every id
+// reachable by walking `deps` outward, the same "blocker" relation
+// criticalPath's depthOf recursion walks, collected as a SET instead of a
+// depth. `startIds` themselves are never re-walked (they are already in the
+// caller's scope) and never included in the returned set.
+function depsAncestors(startIds, deps) {
+  const visited = new Set(startIds);
+  const result = new Set();
+  const stack = [];
+  for (const id of startIds) stack.push(...(deps.get(id) ?? []));
+  while (stack.length > 0) {
+    const dep = stack.pop();
+    if (visited.has(dep)) continue;
+    visited.add(dep);
+    result.add(dep);
+    stack.push(...(deps.get(dep) ?? []));
+  }
+  return result;
+}
+
+/**
+ * GOAL-SCOPED SET (D5): for a focus id, the ranking scope = the focus item
+ * itself PLUS the transitive `targets` closure from it (covers nested
+ * MVP > milestone > work), UNION every member's transitive `deps`-ancestors
+ * (the same blocker relation `criticalPath` already walks). This feeds
+ * `goalScopedCriticalPath`/`goalScopedGreedyTopUnblock` RANKING only — item
+ * readiness (`frontier.mjs`) stays a whole-graph computation, a documented
+ * boundary, not a gap (D5).
+ *
+ * An unknown `focusId` (not present in `view.work`) yields an empty Set.
+ * Deterministic and pure, matching the module's stance throughout.
+ */
+export function goalScopedSet(view, focusId) {
+  const work = view?.work ?? {};
+  const scope = targetsClosure(work, focusId);
+  if (scope.size === 0) return scope;
+  const deps = knownDeps(work);
+  for (const ancestor of depsAncestors(scope, deps)) scope.add(ancestor);
+  return scope;
+}
+
+/**
+ * GOAL-SCOPED CRITICAL PATH (D5): the same longest-`deps`-chain search as
+ * `criticalPath`, but restricted to the D5 goal-scoped set for `focusId` —
+ * an item outside the scope never appears in the returned path, even if it
+ * would otherwise be the whole graph's deepest chain. The candidate search
+ * iterates `Object.keys(view.work)` in declaration order filtered by the
+ * scope (never the scope Set directly), preserving the same declaration-
+ * order tie-break every other metric in this module relies on. An unknown
+ * `focusId` yields `{ depth: 0, path: [] }`, matching `criticalPath`'s own
+ * empty-view behavior.
+ */
+export function goalScopedCriticalPath(view, focusId) {
+  const work = view?.work ?? {};
+  const scope = goalScopedSet(view, focusId);
+  if (scope.size === 0) return { depth: 0, path: [] };
+  const deps = knownDeps(work);
+  return longestChain(deps, Object.keys(work).filter((id) => scope.has(id)));
 }
 
 /**
@@ -191,22 +290,14 @@ export function staleBlocked(view) {
   return result;
 }
 
-/**
- * GREEDY TOP-K-UNBLOCK: a submodular greedy ranking of the not-`done` items by
- * how much completing each would unblock. `unblocks` is the size of an item's
- * transitive downstream (the not-done items that depend on it, directly or
- * through a chain); `newlyUnblocks` is the MARGINAL coverage a pick adds over
- * everything the earlier picks already cover — the greedy always takes the
- * largest marginal gain next (declaration order breaking ties), which is the
- * classic submodular-cover heuristic. Stops at `k` picks or when no remaining
- * candidate adds new coverage.
- */
-export function greedyTopUnblock(view, k = 10) {
-  const work = view?.work ?? {};
-  const deps = knownDeps(work);
+// Shared submodular-greedy unblock ranking underlying both greedyTopUnblock
+// (over the whole graph) and goalScopedGreedyTopUnblock (over a D5 scope).
+// `candidates` is the declaration-order eligible set; `notDone` bounds the
+// downstream-coverage counting (transitiveDownstream stops the moment it
+// leaves `notDone`, so a scoped `notDone` already keeps out-of-scope items
+// out of every pick's newlyUnblocks count without any extra filtering here).
+function computeGreedyTopUnblock(candidates, notDone, deps, k) {
   const rev = reverseDeps(deps);
-  const notDone = new Set(Object.keys(work).filter((id) => work[id].status !== 'done'));
-
   const downstreamCache = new Map();
   const downstream = (id) => {
     if (!downstreamCache.has(id)) downstreamCache.set(id, transitiveDownstream(id, rev, notDone));
@@ -215,7 +306,6 @@ export function greedyTopUnblock(view, k = 10) {
 
   const covered = new Set();
   const picks = [];
-  const candidates = [...notDone]; // declaration order
 
   for (let round = 0; round < k; round += 1) {
     let best = null;
@@ -237,6 +327,43 @@ export function greedyTopUnblock(view, k = 10) {
     for (const d of ds) covered.add(d);
   }
   return picks;
+}
+
+/**
+ * GREEDY TOP-K-UNBLOCK: a submodular greedy ranking of the not-`done` items by
+ * how much completing each would unblock. `unblocks` is the size of an item's
+ * transitive downstream (the not-done items that depend on it, directly or
+ * through a chain); `newlyUnblocks` is the MARGINAL coverage a pick adds over
+ * everything the earlier picks already cover — the greedy always takes the
+ * largest marginal gain next (declaration order breaking ties), which is the
+ * classic submodular-cover heuristic. Stops at `k` picks or when no remaining
+ * candidate adds new coverage.
+ */
+export function greedyTopUnblock(view, k = 10) {
+  const work = view?.work ?? {};
+  const deps = knownDeps(work);
+  const notDone = new Set(Object.keys(work).filter((id) => work[id].status !== 'done'));
+  return computeGreedyTopUnblock([...notDone], notDone, deps, k); // declaration order
+}
+
+/**
+ * GOAL-SCOPED GREEDY TOP-K-UNBLOCK (D5): the same submodular-greedy ranking
+ * as `greedyTopUnblock`, but both the candidate set and the `notDone` set
+ * used for downstream-coverage counting are intersected with the D5 goal-
+ * scoped set for `focusId` first — so ranking and marginal-coverage counting
+ * only consider work relevant to this goal, never whole-graph noise. This
+ * also truncates `transitiveDownstream` at out-of-scope hops, which is
+ * correct under D5 (coverage counting should only count scoped work), not a
+ * bug to avoid. An unknown `focusId` yields `[]`, matching `greedyTopUnblock`
+ * on an empty candidate set.
+ */
+export function goalScopedGreedyTopUnblock(view, focusId, k = 10) {
+  const work = view?.work ?? {};
+  const scope = goalScopedSet(view, focusId);
+  if (scope.size === 0) return [];
+  const deps = knownDeps(work);
+  const notDone = new Set(Object.keys(work).filter((id) => scope.has(id) && work[id].status !== 'done'));
+  return computeGreedyTopUnblock([...notDone], notDone, deps, k); // declaration order, scope-filtered
 }
 
 /**

@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { connectedComponents, criticalPath, staleBlocked, greedyTopUnblock, whatIf, metricsFrame, graphMetrics, classifyStaleDoing, STALE_DOING_DEFAULTS, footprintOverlap } from '../../src/state/graph-metrics.mjs';
+import { connectedComponents, criticalPath, staleBlocked, greedyTopUnblock, goalScopedSet, goalScopedCriticalPath, goalScopedGreedyTopUnblock, whatIf, metricsFrame, graphMetrics, classifyStaleDoing, STALE_DOING_DEFAULTS, footprintOverlap } from '../../src/state/graph-metrics.mjs';
 
 // Pure lib — every view here is a literal (foldEvents style), no fs, no
 // `.fgos/` writes. connectedComponents groups work items linked by ANY unified
@@ -169,6 +169,110 @@ test('greedyTopUnblock: a done item is never a candidate and never counts as dow
 test('greedyTopUnblock respects k', () => {
   const view = { work: { a: item('a'), b: item('b'), c: item('c') } };
   assert.equal(greedyTopUnblock(view, 2).length, 2);
+});
+
+// --- STR67 D5: goal-scoped ranking (goalScopedSet/criticalPath/greedyTopUnblock) ---
+
+// Nested MVP > milestone > work fixture, plus a deeper whole-graph chain
+// (outside*) that would win an UNSCOPED criticalPath — proving the scoped
+// variants exclude it even though it is deeper than anything in scope.
+function nestedGoalView() {
+  return {
+    work: {
+      outside: item('outside'),
+      outsideMid: item('outsideMid', { deps: ['outside'] }),
+      outsideDeep: item('outsideDeep', { deps: ['outsideMid'] }), // whole-graph depth 3
+      mvp: item('mvp', { goalTier: 'mvp', targets: ['ms1', 'ms2'] }),
+      ms1: item('ms1', { goalTier: 'milestone', targets: ['w1'] }),
+      ms2: item('ms2', { goalTier: 'milestone', targets: ['w2'] }),
+      w1: item('w1'),
+      w2: item('w2', { deps: ['w1'] }), // scoped depth 2 (w2 -> w1)
+    },
+  };
+}
+
+test('goalScopedSet: focus + transitive targets closure (nested MVP > milestone > work), excludes unrelated whole-graph items', () => {
+  const scope = goalScopedSet(nestedGoalView(), 'mvp');
+  assert.deepEqual([...scope].sort(), ['ms1', 'ms2', 'mvp', 'w1', 'w2']);
+  assert.ok(!scope.has('outside') && !scope.has('outsideMid') && !scope.has('outsideDeep'));
+});
+
+test('goalScopedCriticalPath: restricted to the goal-scoped set even when a deeper chain exists outside it', () => {
+  const result = goalScopedCriticalPath(nestedGoalView(), 'mvp');
+  assert.deepEqual(result, { depth: 2, path: ['w2', 'w1'] });
+  // the unscoped chain is strictly deeper (3) — proves this is a real restriction, not a coincidence
+  assert.equal(criticalPath(nestedGoalView()).depth, 3);
+});
+
+test('goalScopedGreedyTopUnblock: candidates and downstream coverage both restricted to the goal-scoped set', () => {
+  const picks = goalScopedGreedyTopUnblock(nestedGoalView(), 'mvp');
+  assert.deepEqual(picks, [
+    { id: 'w1', unblocks: 1, newlyUnblocks: 2 },
+    { id: 'mvp', unblocks: 0, newlyUnblocks: 1 },
+    { id: 'ms1', unblocks: 0, newlyUnblocks: 1 },
+    { id: 'ms2', unblocks: 0, newlyUnblocks: 1 },
+  ]);
+  assert.ok(!picks.some((p) => ['outside', 'outsideMid', 'outsideDeep'].includes(p.id)));
+});
+
+// A milestone's own `deps` entry points OUTSIDE its immediate `targets` list —
+// the exact gap D5 was revised to fix: the deps-ancestor closure must still
+// catch it.
+function depsAncestorOutsideTargetsView() {
+  return {
+    work: {
+      mvp: item('mvp', { goalTier: 'mvp', targets: ['ms'] }),
+      ms: item('ms', { goalTier: 'milestone', targets: ['w1'], deps: ['blocker'] }),
+      blocker: item('blocker'),
+      w1: item('w1'),
+      unrelated: item('unrelated'),
+    },
+  };
+}
+
+test('goalScopedSet: catches a scoped item deps-ancestor outside its immediate targets list', () => {
+  const scope = goalScopedSet(depsAncestorOutsideTargetsView(), 'mvp');
+  assert.deepEqual([...scope].sort(), ['blocker', 'mvp', 'ms', 'w1'].sort());
+  assert.ok(!scope.has('unrelated'));
+});
+
+test('goalScopedCriticalPath: a milestone real blocker (outside targets) shows up in the scoped path/depth', () => {
+  const result = goalScopedCriticalPath(depsAncestorOutsideTargetsView(), 'mvp');
+  assert.deepEqual(result, { depth: 2, path: ['ms', 'blocker'] });
+});
+
+test('goalScopedGreedyTopUnblock: a milestone real blocker (outside targets) is ranked and contributes to the milestone pick', () => {
+  const picks = goalScopedGreedyTopUnblock(depsAncestorOutsideTargetsView(), 'mvp');
+  assert.deepEqual(picks, [
+    { id: 'blocker', unblocks: 1, newlyUnblocks: 2 },
+    { id: 'mvp', unblocks: 0, newlyUnblocks: 1 },
+    { id: 'w1', unblocks: 0, newlyUnblocks: 1 },
+  ]);
+  assert.ok(!picks.some((p) => p.id === 'unrelated'));
+});
+
+test('goalScopedSet: a targets CYCLE (A targets B targets A) terminates without duplicating members', () => {
+  const view = {
+    work: {
+      a: item('a', { goalTier: 'mvp', targets: ['b'] }),
+      b: item('b', { goalTier: 'milestone', targets: ['a'] }),
+    },
+  };
+  const scope = goalScopedSet(view, 'a');
+  assert.deepEqual([...scope].sort(), ['a', 'b']);
+});
+
+test('goalScopedSet/goalScopedCriticalPath/goalScopedGreedyTopUnblock: an unknown focusId yields the empty-input shape', () => {
+  const view = { work: { a: item('a') } };
+  assert.deepEqual(goalScopedSet(view, 'nope'), new Set());
+  assert.deepEqual(goalScopedCriticalPath(view, 'nope'), { depth: 0, path: [] });
+  assert.deepEqual(goalScopedGreedyTopUnblock(view, 'nope'), []);
+});
+
+test('goalScopedCriticalPath/goalScopedGreedyTopUnblock are deterministic (same declaration-order tie-breaks as the whole-graph functions)', () => {
+  const view = nestedGoalView();
+  assert.deepEqual(goalScopedCriticalPath(view, 'mvp'), goalScopedCriticalPath(view, 'mvp'));
+  assert.deepEqual(goalScopedGreedyTopUnblock(view, 'mvp'), goalScopedGreedyTopUnblock(view, 'mvp'));
 });
 
 test('graphMetrics umbrella completes P43: components + criticalPath + staleBlocked + topUnblock, all deterministic', () => {

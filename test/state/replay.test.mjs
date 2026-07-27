@@ -604,3 +604,36 @@ test('viewRevision does NOT leak into the fold return: rebuildView still returns
   assert.equal('revision' in view, false, 'the revision is a persisted sibling, never part of the fold return');
   assert.deepEqual(rebuildView(logPath), view, 'rebuild return unchanged by the revision primitive');
 });
+
+test('foldEvents folds a goal.focus event to view.focus === id', () => {
+  const events = [
+    { seq: 1, ts: '2026-07-27T00:00:00.000Z', type: 'goal.focus', payload: { id: 'goal-a' } },
+  ];
+  const view = foldEvents(events);
+  assert.equal(view.focus, 'goal-a');
+});
+
+test('foldEvents on a log with no goal.focus events yields a view with no "focus" key (lazy key, backward-compat)', () => {
+  const events = [
+    { seq: 1, ts: '2026-07-27T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo' } },
+  ];
+  const view = foldEvents(events);
+  assert.equal('focus' in view, false);
+});
+
+test('foldEvents folds two goal.focus events to the LAST one\'s id — overwrite, never merged', () => {
+  const events = [
+    { seq: 1, ts: '2026-07-27T00:00:00.000Z', type: 'goal.focus', payload: { id: 'goal-a' } },
+    { seq: 2, ts: '2026-07-27T00:00:01.000Z', type: 'goal.focus', payload: { id: 'goal-b' } },
+  ];
+  const view = foldEvents(events);
+  assert.equal(view.focus, 'goal-b');
+});
+
+test('foldEvents silently skips a malformed goal.focus payload (missing/non-string id)', () => {
+  const events = [
+    { seq: 1, ts: '2026-07-27T00:00:00.000Z', type: 'goal.focus', payload: { actor: 'human' } },
+  ];
+  assert.doesNotThrow(() => foldEvents(events));
+  assert.equal('focus' in foldEvents(events), false);
+});

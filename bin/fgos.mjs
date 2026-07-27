@@ -19,7 +19,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { initStore, addWork, moveWork, moveStage, editWork, addDecision, addOutcome, addFriction, listWork, readyWork, graphMetrics, graphWhatIf, staleDoingAdvisory, footprintConflicts, readRawEvents, rebuild, putInAwaiting, answerAwaiting, StoreError, EXIT_CODES, categoryOf, assertValidDocType } from '../src/state/store.mjs';
+import { initStore, addWork, moveWork, moveStage, editWork, addDecision, addOutcome, addFriction, listWork, readyWork, graphMetrics, graphWhatIf, staleDoingAdvisory, footprintConflicts, readRawEvents, rebuild, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, StoreError, EXIT_CODES, categoryOf, assertValidDocType } from '../src/state/store.mjs';
 import { repairTruncatedLastLine } from '../src/state/events.mjs';
 import { deriveTitle, classify, generateId } from '../src/intake/classify.mjs';
 import { wrapEnvelope } from '../src/state/envelope.mjs';
@@ -660,6 +660,23 @@ async function runVerb(verb, flags, positional, dir) {
         // validateWorkShape is the single source for the {text, evidence}
         // shape rule; a malformed JSON value is rejected here, before that.
         acceptance: parseAcceptanceFlag(flags.acceptance, 'add --acceptance requires a JSON-encoded array of {text, evidence} clauses.'),
+        // Per str67-goal-directed-planning D1: --goal-tier is optional, same
+        // omitted-leaves-undefined shape as --tier/--domain/--discovered-from
+        // above. A goal item is always created fresh with goalTier set at
+        // add time (never retrofitted via edit). An out-of-domain value
+        // (not mvp/milestone) passes through unrejected here — work.mjs's
+        // validateWorkShape is the single source for the GOAL_TIERS domain
+        // and rejects it as validation, so that rule is never duplicated
+        // here (same discipline as --tier/TIERS and --domain/DOMAINS).
+        goalTier: optionalField(flags['goal-tier'], "add --goal-tier requires a value ('mvp' or 'milestone'); omit --goal-tier entirely to leave unset."),
+        // Per str67-goal-directed-planning D2: --targets is an optional list
+        // of ids (existing or not-yet-created) this goal item considers
+        // "part of" it. Same present-or-absent shape as --footprint above,
+        // NOT the default-to-[] shape --deps/--refs use: set ONLY when the
+        // flag is present so an omitted flag leaves targets ABSENT. An
+        // empty `--targets ''` (or a bare `--targets` with no value)
+        // parses to [] explicitly, same as --footprint.
+        targets: flags.targets === undefined ? undefined : parseListFlag(flags.targets),
       };
       const { event } = addWork(dir, work);
       return { id: event.payload.id, seq: event.seq };
@@ -2084,6 +2101,25 @@ async function runVerb(verb, flags, positional, dir) {
       }
     }
 
+    // Persisted-focus CLI surface (str67-goal-directed-planning D3/D4/D6/D7):
+    // reads/writes go through the setFocus/goalFocusShow facades only, never
+    // graph-metrics.mjs directly. Only `set`/`show` exist here — `clear`/
+    // `list` are explicitly deferred (CONTEXT.md Deferred Ideas).
+    case 'goal': {
+      const sub = requireField(positional[0], 'goal requires a sub-verb: fgos goal <set|show> ...');
+      if (sub === 'set') {
+        const id = requireField(positional[1], 'goal set requires an id: fgos goal set <id>');
+        const { view } = setFocus(dir, { id });
+        // Explicit projection, not a spread: decouples the public envelope
+        // from setFocus's internal {event, view} return shape.
+        return { focus: view.focus };
+      }
+      if (sub === 'show') {
+        return goalFocusShow(dir);
+      }
+      throw new StoreError('validation', `unknown goal sub-verb "${sub}". Usage: fgos goal <set|show> ...`);
+    }
+
     // Do-and-announce shell-integration + config bootstrap (str87-fgos-setup-doctor
     // D6): inserts the shell-integration source line into every DETECTED rc
     // file (bash/zsh, D4) — never creates a new rc file (shell-rc.mjs's own
@@ -2131,7 +2167,7 @@ async function runVerb(verb, flags, positional, dir) {
     }
 
     default:
-      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <init|add|submit|discover|move|edit|ask|answer|decision|list|ready|rebuild|repair|check|rollup|take|return|review|approve|reject|catchup|evolve|triage|session|setup|doctor> ...`);
+      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <init|add|submit|discover|move|edit|ask|answer|decision|list|ready|rebuild|repair|check|rollup|take|return|review|approve|reject|catchup|evolve|triage|session|goal|setup|doctor> ...`);
   }
 }
 

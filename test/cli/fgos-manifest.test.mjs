@@ -151,3 +151,22 @@ test('submit\'s registry entry lists tier/kind/risk as optional properties, not 
     );
   }
 });
+
+// str67-goal-directed-planning D1/D2: --goal-tier/--targets must be
+// registered on `add` so a future drift between the registry and the real
+// CLI parser (bin/fgos.mjs) is caught here, not discovered by a caller
+// reading --help --json and finding the flags missing.
+test('add\'s registry entry lists goal-tier and targets as optional properties, not required', () => {
+  const addEntry = COMMAND_REGISTRY.find((entry) => entry.name === 'add');
+  assert.ok(addEntry, 'COMMAND_REGISTRY is missing an "add" entry');
+  for (const field of ['goal-tier', 'targets']) {
+    assert.ok(
+      addEntry.parameters.properties[field],
+      `add's registry entry is missing a "${field}" property`,
+    );
+    assert.ok(
+      !addEntry.parameters.required.includes(field),
+      `add's "${field}" property should be optional, not in parameters.required`,
+    );
+  }
+});

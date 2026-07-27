@@ -17,7 +17,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fork } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { addWork, editWork, moveWork, moveStage, addOutcome, addFriction, listWork, readRawEvents, StoreError } from '../../src/state/store.mjs';
+import { addWork, editWork, moveWork, moveStage, addOutcome, addFriction, listWork, readRawEvents, setFocus, StoreError } from '../../src/state/store.mjs';
 
 const STORE_MJS = path.resolve(fileURLToPath(import.meta.url), '../../../src/state/store.mjs');
 
@@ -642,4 +642,27 @@ test('editWork rejects a negative priority patch — validateWork still runs on 
     /priority/,
   );
   assert.equal(listWork(dir).work['prio-neg'].priority, undefined, 'the rejected patch never lands');
+});
+
+// setFocus (str67-goal-directed-planning D7): the write door's two
+// validation-throw cases, asserted directly against the returned view —
+// cheaper than round-tripping through the CLI (this file's own top-of-file
+// rationale). Mirrors the `assert.throws(... StoreError ... category ===
+// 'validation')` shape moveWork's precondition tests above already use.
+
+test('setFocus throws StoreError("validation") when id does not exist in view.work', () => {
+  const dir = tmpDir();
+  assert.throws(
+    () => setFocus(dir, { id: 'no-such-id' }),
+    (err) => err instanceof StoreError && err.category === 'validation' && /not found/.test(err.message),
+  );
+});
+
+test('setFocus throws StoreError("validation") when the item exists but has no goalTier', () => {
+  const dir = tmpDir();
+  addSampleWork(dir, 'not-a-goal');
+  assert.throws(
+    () => setFocus(dir, { id: 'not-a-goal' }),
+    (err) => err instanceof StoreError && err.category === 'validation' && /goal tier/.test(err.message),
+  );
 });
