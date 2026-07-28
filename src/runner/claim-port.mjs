@@ -48,7 +48,7 @@ export class ClaimError extends Error {
  * @param {string} [opts.worktreeDir] - custom worktree directory (for runner)
  * @returns {Object} claim result with worktree info if isolated
  */
-export function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoot = process.cwd(), worktreeDir } = {}) {
+export function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoot = process.cwd(), worktreeDir, skipOutcome = false } = {}) {
   const view = listWork(dir);
   const item = view.work[id];
 
@@ -75,11 +75,17 @@ export function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoot = pr
     const isLeaf = rootId !== id;
     const baseRef = isLeaf ? branchNameFor(rootId) : undefined;
 
-    // Branch reuse: if branch exists, get its HEAD; otherwise use current HEAD
-    // For leaves, this still applies but with root branch consideration
-    const branchHeadAtTake = branchAlreadyExists
-      ? gitAt(repoRoot, ['rev-parse', branch]).trim()
-      : (isLeaf && baseRef ? gitAt(repoRoot, ['rev-parse', baseRef]).trim() : currentHead(repoRoot));
+    // Branch reuse: if branch exists, get its HEAD; otherwise use current HEAD.
+    // For leaves, try root branch if it exists; fall back to current HEAD if not
+    // (runner creates root branch later, in runItem, so it may not exist yet).
+    let branchHeadAtTake;
+    if (branchAlreadyExists) {
+      branchHeadAtTake = gitAt(repoRoot, ['rev-parse', branch]).trim();
+    } else if (isLeaf && baseRef && branchExists(repoRoot, baseRef)) {
+      branchHeadAtTake = gitAt(repoRoot, ['rev-parse', baseRef]).trim();
+    } else {
+      branchHeadAtTake = currentHead(repoRoot);
+    }
 
     // Branch take (human-rounds D2): a blocked item with existing branch uses
     // blocked→doing edge; blocked WITHOUT branch falls through to todo edge
@@ -99,18 +105,20 @@ export function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoot = pr
       claimTrigger,
     });
 
-    // Record predicted outcome
-    addOutcome(dir, {
-      id,
-      predicted: {
-        tier: item.tier ?? DEFAULTS.tier,
-        deps: item.deps?.length ?? 0,
-        priorVisits,
-        actor,
-        branchHeadAtTake: useBranchSource ? branchHeadAtTake : undefined,
-        headAtTake: useBranchSource ? undefined : currentHead(repoRoot),
-      },
-    });
+    // Record predicted outcome (skipped when caller handles it separately, e.g. runner)
+    if (!skipOutcome) {
+      addOutcome(dir, {
+        id,
+        predicted: {
+          tier: item.tier ?? DEFAULTS.tier,
+          deps: item.deps?.length ?? 0,
+          priorVisits,
+          actor,
+          branchHeadAtTake: useBranchSource ? branchHeadAtTake : undefined,
+          headAtTake: useBranchSource ? undefined : currentHead(repoRoot),
+        },
+      });
+    }
 
     const claim = {
       id,
