@@ -1,0 +1,1723 @@
+commit aabafe5e8410a42defd8c52a29ef66c9d26cb463
+Author: Van Tran <940988+vantt@users.noreply.github.com>
+Date:   Fri Jul 17 10:34:25 2026 +0700
+
+    feat(human-rounds-1): anti-loop gate resets on the item's own last human intervention
+    
+    The runner's anti-loop gate previously counted an item's lifetime visits
+    (machine and human re-dispatches alike), so a human's reject-with-reason
+    or answer had no effect on the budget: an item could stay stuck at the
+    cap forever even after a person intervened.
+    
+    visitsSinceLastHumanEvent(events, id) counts doing-entries only since the
+    item's own last human-attributed answer or reason-carrying move (actor
+    'human') — the runner's own reason-carrying parks never qualify. The
+    shipped lifetime visitCount metric and its call sites are unchanged.
+
+diff --git a/src/runner/anti-loop.mjs b/src/runner/anti-loop.mjs
+index 899168e..95c881b 100644
+--- a/src/runner/anti-loop.mjs
++++ b/src/runner/anti-loop.mjs
+@@ -24,11 +24,20 @@ export const BREAKER_MISSES = 3;
+  *
+  * Derived from the log's existing `work.move` shape (per key_links: no new
+  * event type) — a visit is any event with `type === 'work.move'` and
+- * `payload.to === 'doing'` for this id. This is deliberately agent-agnostic:
+- * the current event shape carries no "who wrote this" field, and the
+- * semantic is explicit (per the cell's action text) that a human's manual
+- * re-dispatch counts as a visit exactly the same as the runner's — there is
+- * no privileged writer whose visits don't count.
++ * `payload.to === 'doing'` for this id. Lifetime, agent-agnostic count: a
++ * human's manual re-dispatch counts exactly like the runner's. This is the
++ * shipped metric (loop.mjs's `visits`/`priorVisits` payload fields, fgos.mjs's
++ * `priorVisits`) — untouched by human-rounds D1, which reset the runner's own
++ * anti-loop GATE only (see `visitsSinceLastHumanEvent` below), never this
++ * lifetime tally.
++ *
++ * SUPERSEDES the comment this replaced ("there is no privileged writer whose
++ * visits don't count"): that was true only because `actor` did not exist yet
++ * when it was written. `actor` is now stamped on every `work.move` event
++ * (store.mjs), and human-rounds D1 gives a human's actor-attributed events
++ * gate-resetting weight the runner's own never gets — this function still
++ * treats every writer identically because it is the lifetime metric, not the
++ * gate; the gate's asymmetry lives entirely in `visitsSinceLastHumanEvent`.
+  */
+ export function visitCount(events, id) {
+   if (!Array.isArray(events) || typeof id !== 'string' || !id) return 0;
+@@ -41,6 +50,56 @@ export function visitCount(events, id) {
+   return count;
+ }
+ 
++/**
++ * Count how many times work item `id` has re-entered `doing` SINCE its own
++ * last human-attributed event (human-rounds D1) — the anti-loop GATE's own
++ * budget, distinct from `visitCount`'s lifetime tally above.
++ *
++ * Per-item (D1b): only events carrying this exact `id` mark or count.
++ *
++ * Trigger-set is CLOSED (D1c) and keyed on `actor === 'human'` plus payload
++ * shape — never on a `from` field:
++ *   - `payload.answer !== undefined` — the item left `awaiting-human` via a
++ *     human's answer (`answerAwaiting`, fsm.mjs's `awaiting-human -> todo`
++ *     edge; the only edge `answer` appears on).
++ *   - `payload.reason !== undefined` — a human's reject/park-with-reason
++ *     (fsm.mjs's `proposed -> todo`/`proposed -> blocked` edges; the runner's
++ *     own reason-carrying parks, e.g. `anti-loop-max-visits`/`breaker-tripped`,
++ *     stamp `actor: 'runner'` and so never match here).
++ * A bare resume (`blocked -> todo` with no reason) and a human `take`
++ * (`blocked -> doing`, `actor: 'human'`, no answer/reason) are deliberately
++ * NOT triggers — per D1c only the two closed shapes above reset the budget.
++ *
++ * No qualifying event found for this id → the budget is the item's whole
++ * history, i.e. identical to `visitCount(events, id)` (a pure machine loop
++ * still dies at the cap — no human event has ever intervened).
++ */
++export function visitsSinceLastHumanEvent(events, id) {
++  if (!Array.isArray(events) || typeof id !== 'string' || !id) return 0;
++  let lastHumanIndex = -1;
++  for (let i = 0; i < events.length; i += 1) {
++    const event = events[i];
++    if (
++      event &&
++      event.type === 'work.move' &&
++      event.payload &&
++      event.payload.id === id &&
++      event.payload.actor === 'human' &&
++      (event.payload.answer !== undefined || event.payload.reason !== undefined)
++    ) {
++      lastHumanIndex = i;
++    }
++  }
++  let count = 0;
++  for (let i = lastHumanIndex + 1; i < events.length; i += 1) {
++    const event = events[i];
++    if (event && event.type === 'work.move' && event.payload && event.payload.to === 'doing' && event.payload.id === id) {
++      count += 1;
++    }
++  }
++  return count;
++}
++
+ /**
+  * Has `count` (as returned by `visitCount`) reached or passed the max-visits
+  * threshold? At-threshold and past-threshold both block re-dispatch — only
+diff --git a/src/runner/loop.mjs b/src/runner/loop.mjs
+index eba3cee..f91ab87 100644
+--- a/src/runner/loop.mjs
++++ b/src/runner/loop.mjs
+@@ -50,6 +50,7 @@ import { DEFAULTS } from '../state/work.mjs';
+ import { resolveAction, resolveStaleDoing } from './recovery.mjs';
+ import {
+   visitCount,
++  visitsSinceLastHumanEvent,
+   hasExceededMaxVisits,
+   createMissBreaker,
+   MAX_VISITS,
+@@ -748,7 +749,10 @@ export async function runOnce(options = {}) {
+         return { outcome: 'idle', reap, parked, dispatched: [], exitCode: 0 };
+       }
+       const item = frontierItems[0];
+-      const visits = visitCount(readRawEvents(dir), item.id);
++      // Gate on the human-rounds D1 budget (resets on the item's own last
++      // human answer/reject-with-reason), not the lifetime visitCount above
++      // — see anti-loop.mjs's visitsSinceLastHumanEvent.
++      const visits = visitsSinceLastHumanEvent(readRawEvents(dir), item.id);
+       if (hasExceededMaxVisits(visits, maxVisits)) {
+         return { outcome: 'dry-run', plan: { park: item.id, reason: 'anti-loop-max-visits', visits }, reap, parked, exitCode: 0 };
+       }
+@@ -782,13 +786,15 @@ export async function runOnce(options = {}) {
+       // Anti-loop max-visits parks every over-limit item (they genuinely
+       // leave the frontier via `todo -> blocked`, per D5), then re-polls —
+       // exactly the sequential loop's per-head guard, applied to the whole
+-      // ready set before steering.
++      // ready set before steering. Gated on the human-rounds D1 budget
++      // (visitsSinceLastHumanEvent), not the lifetime visitCount — a human's
++      // answer or reject-with-reason resets an item's own budget, per-item.
+       const overLimit = frontierItems.filter(
+-        (it) => hasExceededMaxVisits(visitCount(readRawEvents(dir), it.id), maxVisits),
++        (it) => hasExceededMaxVisits(visitsSinceLastHumanEvent(readRawEvents(dir), it.id), maxVisits),
+       );
+       if (overLimit.length > 0) {
+         for (const it of overLimit) {
+-          const visits = visitCount(readRawEvents(dir), it.id);
++          const visits = visitsSinceLastHumanEvent(readRawEvents(dir), it.id);
+           await queue.enqueue(async () => {
+             moveWork(dir, { id: it.id, to: 'blocked', expectedStatus: 'todo', reason: 'anti-loop-max-visits', actor: 'runner' });
+           });
+diff --git a/test/runner/anti-loop.test.mjs b/test/runner/anti-loop.test.mjs
+index 81dc330..0d725ff 100644
+--- a/test/runner/anti-loop.test.mjs
++++ b/test/runner/anti-loop.test.mjs
+@@ -3,7 +3,14 @@ import assert from 'node:assert/strict';
+ import fs from 'node:fs';
+ import path from 'node:path';
+ import { fileURLToPath } from 'node:url';
+-import { MAX_VISITS, BREAKER_MISSES, visitCount, hasExceededMaxVisits, createMissBreaker } from '../../src/runner/anti-loop.mjs';
++import {
++  MAX_VISITS,
++  BREAKER_MISSES,
++  visitCount,
++  visitsSinceLastHumanEvent,
++  hasExceededMaxVisits,
++  createMissBreaker,
++} from '../../src/runner/anti-loop.mjs';
+ 
+ // Pure lib — every event array here is a literal built in-memory; no fs, no
+ // mkdtemp, no `.fgos/` writes anywhere in this file.
+@@ -58,6 +65,95 @@ test('visitCount defensive guards: non-array events / missing id never throw', (
+   assert.equal(visitCount([move('a', 'doing', 1)], undefined), 0);
+ });
+ 
++// -- visitsSinceLastHumanEvent: human-rounds D1 gate budget ----------------
++//
++// Distinct from visitCount above: this is the runner GATE's own budget
++// (loop.mjs's hasExceededMaxVisits call sites), not the shipped lifetime
++// metric. `humanMove` mints the two CLOSED trigger shapes (D1c): an `answer`
++// leaving awaiting-human, or a `reason`-carrying move — both require
++// `actor: 'human'`, matching fsm.mjs's transitionWork (answer only appears
++// on `awaiting-human -> todo`; reason only on `proposed -> todo`/`blocked`).
++
++function humanMove(id, to, seq, extra = {}) {
++  return { seq, ts: new Date(2026, 0, seq).toISOString(), type: 'work.move', payload: { id, from: 'x', to, actor: 'human', ...extra }, v: 2 };
++}
++
++test('visitsSinceLastHumanEvent is 0 on an empty log', () => {
++  assert.equal(visitsSinceLastHumanEvent([], 'a'), 0);
++});
++
++test('with no human trigger event ever, visitsSinceLastHumanEvent equals visitCount (a pure machine loop still dies at the cap)', () => {
++  const events = [move('a', 'doing', 1), move('a', 'blocked', 2), move('a', 'doing', 3)];
++  assert.equal(visitsSinceLastHumanEvent(events, 'a'), visitCount(events, 'a'));
++  assert.equal(visitsSinceLastHumanEvent(events, 'a'), 2);
++});
++
++test('a human answer (leaving awaiting-human) resets the budget — only doing-entries AFTER it count', () => {
++  const events = [
++    move('a', 'doing', 1),
++    move('a', 'blocked', 2),
++    move('a', 'doing', 3),
++    humanMove('a', 'todo', 4, { answer: 'go ahead' }),
++    move('a', 'doing', 5),
++  ];
++  assert.equal(visitCount(events, 'a'), 3); // lifetime metric unaffected
++  assert.equal(visitsSinceLastHumanEvent(events, 'a'), 1); // only the doing at seq 5
++});
++
++test('a human reject/park with reason resets the budget the same way', () => {
++  const events = [
++    move('a', 'doing', 1),
++    move('a', 'doing', 2),
++    humanMove('a', 'todo', 3, { reason: 'not quite right' }),
++    move('a', 'doing', 4),
++  ];
++  assert.equal(visitsSinceLastHumanEvent(events, 'a'), 1);
++});
++
++test('a bare resume (blocked -> todo, no reason, no actor) does NOT reset the budget', () => {
++  const events = [
++    move('a', 'doing', 1),
++    move('a', 'blocked', 2),
++    move('a', 'todo', 3),
++    move('a', 'doing', 4),
++  ];
++  assert.equal(visitsSinceLastHumanEvent(events, 'a'), 2);
++});
++
++test('a human take (blocked -> doing, actor human, no answer/reason) does NOT reset the budget — it counts as a visit like any other', () => {
++  const events = [
++    move('a', 'doing', 1),
++    move('a', 'blocked', 2),
++    humanMove('a', 'doing', 3),
++  ];
++  assert.equal(visitsSinceLastHumanEvent(events, 'a'), 2);
++});
++
++test('a machine park with reason (actor runner, e.g. anti-loop-max-visits) does NOT reset the budget — reason alone is not enough, actor must be human', () => {
++  const events = [
++    move('a', 'doing', 1),
++    { seq: 2, ts: new Date(2026, 0, 2).toISOString(), type: 'work.move', payload: { id: 'a', from: 'doing', to: 'blocked', reason: 'anti-loop-max-visits', actor: 'runner' }, v: 2 },
++    move('a', 'doing', 3),
++  ];
++  assert.equal(visitsSinceLastHumanEvent(events, 'a'), 2);
++});
++
++test('per-item: another id\'s human event never resets this id\'s budget', () => {
++  const events = [
++    move('a', 'doing', 1),
++    move('a', 'doing', 2),
++    humanMove('b', 'todo', 3, { answer: 'yes' }),
++    move('a', 'doing', 4),
++  ];
++  assert.equal(visitsSinceLastHumanEvent(events, 'a'), 3);
++});
++
++test('visitsSinceLastHumanEvent defensive guards: non-array events / missing id never throw', () => {
++  assert.doesNotThrow(() => visitsSinceLastHumanEvent(undefined, 'a'));
++  assert.equal(visitsSinceLastHumanEvent(undefined, 'a'), 0);
++  assert.equal(visitsSinceLastHumanEvent([move('a', 'doing', 1)], undefined), 0);
++});
++
+ // -- hasExceededMaxVisits boundary -----------------------------------------
+ 
+ test('hasExceededMaxVisits: strictly below MAX_VISITS is not exceeded', () => {
+diff --git a/test/runner/loop.test.mjs b/test/runner/loop.test.mjs
+index b640566..1eb7be4 100644
+--- a/test/runner/loop.test.mjs
++++ b/test/runner/loop.test.mjs
+@@ -464,6 +464,47 @@ test('anti-loop: an item at MAX_VISITS is parked todo -> blocked and truly leave
+   assert.deepEqual(readyWork(dir), []);
+ });
+ 
++test('anti-loop: a human reject (with reason) resets the runner gate — visits BEFORE it no longer count toward the cap (human-rounds D1)', async () => {
++  const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
++  seedItem(dir, { id: 'item-reprieved' });
++  // one machine visit that would already be AT the cap (maxVisits: 1) on its
++  // own — then a human rejects with a reason, which per D1 resets the item's
++  // own budget. Reaching `proposed` first (not just doing -> blocked -> todo)
++  // exercises the real reject edge (proposed -> todo, reason required).
++  moveWork(dir, { id: 'item-reprieved', to: 'doing', expectedStatus: 'todo' });
++  moveWork(dir, { id: 'item-reprieved', to: 'proposed', expectedStatus: 'doing' });
++  moveWork(dir, { id: 'item-reprieved', to: 'todo', expectedStatus: 'proposed', reason: 'not quite right', actor: 'human' });
++  // lifetime visitCount is already 1 here — the OLD (pre-D1) gate would have
++  // parked this item immediately at maxVisits: 1, never dispatching it again.
++  const config = configFor(writeCommittingExecutor(scriptDir, counterFile));
++
++  const result = await runOnce({ repoRoot, config, worktreeDir, maxVisits: 1, log: noLog });
++
++  // the human reject reset the budget to 0 doing-entries-since — the item
++  // dispatches and proposes instead of being parked as over-limit.
++  assert.deepEqual(result.parked, []);
++  assert.equal(result.dispatched.length, 1);
++  assert.equal(result.dispatched[0].id, 'item-reprieved');
++  assert.equal(result.dispatched[0].outcome, 'proposed');
++});
++
++test('anti-loop: a BARE resume (no reason, no human actor) does NOT reset the gate — the machine-only loop still dies at the cap', async () => {
++  const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
++  seedItem(dir, { id: 'item-loopy-bare' });
++  // todo -> doing -> blocked -> todo, no reason, no actor: a bare resume,
++  // never a human trigger per D1c. The prior visit must still count.
++  moveWork(dir, { id: 'item-loopy-bare', to: 'doing', expectedStatus: 'todo' });
++  moveWork(dir, { id: 'item-loopy-bare', to: 'blocked', expectedStatus: 'doing' });
++  moveWork(dir, { id: 'item-loopy-bare', to: 'todo', expectedStatus: 'blocked' });
++  const config = configFor(writeCommittingExecutor(scriptDir, counterFile));
++
++  const result = await runOnce({ repoRoot, config, worktreeDir, maxVisits: 1, log: noLog });
++
++  assert.deepEqual(result.parked, [{ id: 'item-loopy-bare', reason: 'anti-loop-max-visits', visits: 1 }]);
++  assert.equal(listWork(dir).work['item-loopy-bare'].status, 'blocked');
++  assert.equal(result.dispatched.length, 0);
++});
++
+ // --- circuit breaker: consecutive misses halt the whole run ---------------
+ 
+ test('breaker trip: a goal-check miss at threshold parks the item and halts the run — worktree gone, branch kept (halt path teardown)', async () => {
+commit 1e3da5a5763279f3702756b73324dd218897137c
+Author: Van Tran <940988+vantt@users.noreply.github.com>
+Date:   Fri Jul 17 10:24:42 2026 +0700
+
+    feat(human-rounds-2): take/return nguồn nhánh cho item blocked có fgw/<id>
+    
+    Mở cửa thứ hai cho pull-door: take claim item blocked có nhánh sống qua
+    cạnh blocked->doing (branchHeadAtTake là discriminator, CAS sửa từ
+    expectedStatus 'todo' hardcode sang nhánh rẽ theo status thật); return
+    kiểm branchHeadAtTake TRƯỚC mọi guard main-based, verify trong worktree
+    tạm DETACHED tại tip nhánh (không bao giờ checkout theo tên, không
+    reclaimOrphanedCheckout — an toàn cả khi người đang đứng trên chính
+    nhánh đó ở một worktree khác), ghi branchHeadAtReturn (không headAtReturn).
+    store.mjs (vế ghi) + replay.mjs (vế đọc) đều mở allowlist cho 2 marker mới.
+    classifySource/merge.mjs giữ nguyên — nguồn nhánh tự đọc là "runner".
+
+diff --git a/bin/fgos.mjs b/bin/fgos.mjs
+index 1cd2476..c517a82 100755
+--- a/bin/fgos.mjs
++++ b/bin/fgos.mjs
+@@ -16,6 +16,7 @@
+ // src/state/store.mjs, the sole write door.
+ 
+ import fs from 'node:fs';
++import os from 'node:os';
+ import path from 'node:path';
+ import { execFileSync } from 'node:child_process';
+ import { initStore, addWork, moveWork, addDecision, addOutcome, addFriction, listWork, readyWork, readRawEvents, rebuild, putInAwaiting, answerAwaiting, StoreError, EXIT_CODES, categoryOf } from '../src/state/store.mjs';
+@@ -27,6 +28,7 @@ import { resolveDecompose } from '../src/intake/decompose.mjs';
+ import { computeEntropy, computeCounts } from '../src/report/entropy.mjs';
+ import { runGoalCheck } from '../src/runner/goal-check.mjs';
+ import { classifySource, reviewDiff, mergeRunnerItem, cleanupMergedBranch, isWorkingTreeClean as isMainTreeClean } from '../src/runner/merge.mjs';
++import { branchNameFor, branchExists } from '../src/runner/worktree.mjs';
+ import { visitCount } from '../src/runner/anti-loop.mjs';
+ import { DEFAULTS } from '../src/state/work.mjs';
+ import { writeCoexistenceManifest } from '../src/install/coexist.mjs';
+@@ -623,8 +625,26 @@ async function runVerb(verb, flags, positional, dir) {
+       // runner's own claim (D1's "đối xứng claim runner") — priorVisits is
+       // read BEFORE this claim's own work.move so it never counts itself.
+       const priorVisits = visitCount(readRawEvents(dir), id);
+-      const headAtTake = currentHead(process.cwd());
+ 
++      // Branch take (human-rounds D2): a `blocked` item with a live
++      // `fgw/<id>` branch (parked by the runner, or a rejected proposal) is
++      // claimed via the existing blocked -> doing edge (fsm.mjs:69), CAS'd
++      // against the item's real "blocked" status rather than the main-based
++      // "todo" below. `branchHeadAtTake` — the BRANCH's own HEAD, not the
++      // repo's — is the sole discriminator `return` uses later; it is never
++      // mixed with the main-based `headAtTake`.
++      const branch = branchNameFor(id);
++      if (item.status === 'blocked' && branchExists(process.cwd(), branch)) {
++        const branchHeadAtTake = gitAt(process.cwd(), ['rev-parse', branch]).trim();
++        const { event } = moveWork(dir, { id, to: 'doing', expectedStatus: 'blocked', actor, branchHeadAtTake });
++        addOutcome(dir, {
++          id,
++          predicted: { tier: item.tier ?? DEFAULTS.tier, deps: item.deps.length, priorVisits, actor, branchHeadAtTake },
++        });
++        return `Took ${id}: blocked -> doing (actor=${actor}, branch=${branch}, branchHeadAtTake=${branchHeadAtTake}) (event #${event.seq})`;
++      }
++
++      const headAtTake = currentHead(process.cwd());
+       const { event } = moveWork(dir, { id, to: 'doing', expectedStatus: 'todo', actor, headAtTake });
+       addOutcome(dir, {
+         id,
+@@ -666,11 +686,79 @@ async function runVerb(verb, flags, positional, dir) {
+           `return: work "${id}" was not taken through the pull door (claimed by "${item.claimActor ?? 'runner'}") — return only completes a take.`,
+         );
+       }
++
++      // Branch-source discriminator (human-rounds D2/BINDING repair): checked
++      // BEFORE every main-based guard below (headAtTake presence, clean-tree)
++      // — a branch take never carries headAtTake, so testing that first
++      // would wrongly reject a branch-source return as "no recorded
++      // headAtTake". `branchHeadAtTake` is the ONLY signal that discriminates
++      // a branch-source item; classifySource is never used here (per D2, it
++      // is branch-existence-first and would misread a stale/sibling branch).
++      const repoRoot = process.cwd();
++      if (typeof item.branchHeadAtTake === 'string' && item.branchHeadAtTake) {
++        const branch = branchNameFor(id);
++        let branchHead;
++        try {
++          branchHead = gitAt(repoRoot, ['rev-parse', branch]).trim();
++        } catch (err) {
++          throw new StoreError('validation', `return: branch "${branch}" for "${id}" not found or unreadable: ${err.message}`);
++        }
++        const branchAheadCount = commitsSince(repoRoot, item.branchHeadAtTake, branchHead);
++        if (branchAheadCount <= 0) {
++          throw new StoreError(
++            'validation',
++            `return: branch "${branch}" has not advanced past branchHeadAtTake for "${id}" (${item.branchHeadAtTake} -> ${branchHead}) — commit the work on the branch before returning.`,
++          );
++        }
++
++        // No cwd-clean requirement here (D2: "tree người là việc của
++        // người") — the human's own working tree is never inspected or
++        // touched. Verify runs in a DISPOSABLE, DETACHED worktree checked out
++        // at the branch's own commit SHA — never `git worktree add <path>
++        // <branch>` (that fails outright, and would collide, if the human
++        // happens to be standing on `fgw/<id>` in their own tree right now)
++        // and never `reclaimOrphanedCheckout` (that would force-remove a
++        // checkout the human is actively using — the exact BLOCKER the
++        // validating gate caught).
++        const tmpWorktree = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-return-'));
++        let check;
++        try {
++          gitAt(repoRoot, ['worktree', 'add', '--detach', tmpWorktree, branchHead]);
++          check = await runGoalCheck(item, tmpWorktree, timeoutMs);
++        } finally {
++          try {
++            execFileSync('git', ['worktree', 'remove', tmpWorktree, '--force'], { cwd: repoRoot, encoding: 'utf8', shell: false });
++          } catch {
++            // best-effort — mirrors worktree.mjs's own removeWorktree/prune
++            // discipline; a cleanup failure must never mask the verify
++            // result already computed above.
++          }
++        }
++
++        if (check.passed) {
++          const { event } = moveWork(dir, { id, to: 'proposed', expectedStatus: 'doing', branchHeadAtReturn: branchHead });
++          addOutcome(dir, { id, actual: { outcome: 'proposed', passed: true, attempts: 1, errorClass: null, aheadCount: branchAheadCount } });
++          return `Returned ${id}: doing -> proposed (verify passed on branch "${branch}", ${branchAheadCount} commit(s)) (event #${event.seq})\n${check.output}`;
++        }
++
++        moveWork(dir, { id, to: 'blocked', expectedStatus: 'doing', reason: 'verify-fail' });
++        addOutcome(dir, { id, actual: { outcome: 'blocked', passed: false, attempts: 1, errorClass: 'verify-miss', aheadCount: branchAheadCount } });
++        addFriction(dir, {
++          id,
++          disposition: 'blocked',
++          errorClass: 'verify-miss',
++          layer: 'verification',
++          attempts: 1,
++          detail: `goal-check failed on branch "${branch}" (exit ${check.status})`,
++        });
++        return `Returned ${id}: doing -> blocked (verify failed on branch "${branch}", exit ${check.status})\n${check.output}`;
++      }
++
+       if (typeof item.headAtTake !== 'string' || !item.headAtTake) {
+         throw new StoreError('validation', `return: work "${id}" has no recorded headAtTake — cannot verify progress since take.`);
+       }
+ 
+-      const cwd = process.cwd();
++      const cwd = repoRoot;
+       if (!isWorkingTreeClean(cwd)) {
+         throw new StoreError('validation', `return: working tree at "${cwd}" is not clean — commit the work for "${id}" before returning.`);
+       }
+diff --git a/src/state/replay.mjs b/src/state/replay.mjs
+index 1e163e4..f47dc58 100644
+--- a/src/state/replay.mjs
++++ b/src/state/replay.mjs
+@@ -44,7 +44,7 @@ function applyEvent(view, event) {
+       break;
+     }
+     case 'work.move': {
+-      const { id, to, ask, answer, actor, learning, headAtTake, headAtReturn, reason } = event.payload ?? {};
++      const { id, to, ask, answer, actor, learning, headAtTake, headAtReturn, branchHeadAtTake, branchHeadAtReturn, reason } = event.payload ?? {};
+       const item = view.work[id];
+       if (item) {
+         item.status = to;
+@@ -68,6 +68,14 @@ function applyEvent(view, event) {
+         if (headAtTake !== undefined) {
+           item.headAtTake = headAtTake;
+         }
++        // Branch-source claim marker (human-rounds D2): the branch's OWN
++        // HEAD at take time, discriminator for a blocked-item-with-branch
++        // take — set only on THIS claim's `to === 'doing'` move, mirroring
++        // headAtTake exactly, never on a main-based take (which carries
++        // headAtTake instead).
++        if (branchHeadAtTake !== undefined) {
++          item.branchHeadAtTake = branchHeadAtTake;
++        }
+       }
+       // Latest human rationale on the item (worker-feedback): a `reason`
+       // rides reject (`proposed -> todo`) and park moves; fold the newest
+@@ -86,6 +94,16 @@ function applyEvent(view, event) {
+       if (item && to === 'proposed' && headAtReturn !== undefined) {
+         item.headAtReturn = headAtReturn;
+       }
++      // Branch-source return marker (human-rounds D2, mirrors headAtReturn
++      // above): folds onto the item from THIS return's `to === 'proposed'`
++      // move alone. A branch-source return never carries headAtReturn (CẤM
++      // per D2 — mixing the two markers would give reviewDiff a meaningless
++      // range), so the two fields are always mutually exclusive on a given
++      // item, but the fold itself imposes no such check — it just reads
++      // whichever field the move actually carried.
++      if (item && to === 'proposed' && branchHeadAtReturn !== undefined) {
++        item.branchHeadAtReturn = branchHeadAtReturn;
++      }
+       // Human-gate ask/answer (per async-human-gate D2/D5), mirroring the
+       // work.outcome lazy-key/merge-by-id precedent above: the ask (entry
+       // move into awaiting-human) and answer (exit move back to todo) ride
+diff --git a/src/state/store.mjs b/src/state/store.mjs
+index e21512b..91e5369 100644
+--- a/src/state/store.mjs
++++ b/src/state/store.mjs
+@@ -158,7 +158,7 @@ function composeLearning(view, id, closingSettlement) {
+  * delegates the precondition/CAS decision to fsm.mjs (pure — never writes),
+  * and only then appends the event it returns.
+  */
+-export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, actor, headAtTake, headAtReturn } = {}) {
++export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, actor, headAtTake, headAtReturn, branchHeadAtTake, branchHeadAtReturn } = {}) {
+   const { logPath } = paths(dir);
+   const before = rebuildView(logPath);
+   const work = before.work[id];
+@@ -202,6 +202,19 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, act
+   if (headAtReturn !== undefined) {
+     rawEvent.payload.headAtReturn = headAtReturn;
+   }
++  // Branch-source take/return markers (human-rounds D2): the SAME
++  // post-transition stamp pattern as headAtTake/headAtReturn above, on the
++  // SAME edges (`to === 'doing'` for the claim, `to === 'proposed'` for the
++  // return) — a branch-source take/return never writes headAtTake/
++  // headAtReturn (those are the main-based discriminator; mixing the two
++  // would give the review gate a meaningless diff range), so this is a
++  // strict addition, never a rewrite of the main-based pull-door shape.
++  if (branchHeadAtTake !== undefined) {
++    rawEvent.payload.branchHeadAtTake = branchHeadAtTake;
++  }
++  if (branchHeadAtReturn !== undefined) {
++    rawEvent.payload.branchHeadAtReturn = branchHeadAtReturn;
++  }
+   // Câu-6 tự động (per Phase 3 S3-closeout (c), six-questions L5): BOTH doors
+   // into `done` (doing->done and proposed->done) converge on this one
+   // `moveWork` call, so gating on `to === 'done'` here — rather than at each
+diff --git a/test/cli/fgos.test.mjs b/test/cli/fgos.test.mjs
+index cd4e16d..a80f07f 100644
+--- a/test/cli/fgos.test.mjs
++++ b/test/cli/fgos.test.mjs
+@@ -1735,3 +1735,159 @@ test('init runs a second time (idempotent) and rewrites coexistence.json with th
+ 
+   assert.deepEqual(second, first);
+ });
++
++// --- take/return: nguồn nhánh (human-rounds D2) — a second door for a
++// `blocked` item that already carries a live `fgw/<id>` branch (parked by
++// the runner after too many visits, or a rejected proposal whose branch
++// survives): `take` claims it via the existing blocked -> doing edge
++// (fsm.mjs:69), discriminated by `branchHeadAtTake` — the BRANCH's own HEAD,
++// never the main-based `headAtTake`; `return` verifies on the branch itself,
++// in a disposable DETACHED worktree, and never inspects or touches the
++// human's own main checkout (D2: "tree người là việc của người"). ----------
++
++// Leaves behind exactly what a real parked runner branch looks like: item at
++// `blocked`, a live `fgw/<id>` branch one commit ahead of main, the human's
++// own main tree/HEAD completely undisturbed — mirrors
++// `makeRunnerProposedItem`'s "simulate what the runner leaves behind"
++// discipline, but the item never reaches `proposed`; it stays `blocked`,
++// the D2 starting point.
++function makeBlockedBranchItem(cwd, id, extra = {}) {
++  addOk(cwd, id, extra);
++  // Commit the add BEFORE branching off (mirrors makeRunnerProposedItem's
++  // own ordering above) — otherwise the pending events.jsonl delta rides
++  // along into the branch's own commit and is lost from main the moment
++  // `checkout main` restores main's own (add-less) tracked state.
++  commitPending(cwd, `state: add ${id}`);
++
++  gitAtCwd(cwd, ['checkout', '-b', `fgw/${id}`]);
++  fs.writeFileSync(path.join(cwd, `${id}-attempt.txt`), 'worker attempt\n');
++  gitAtCwd(cwd, ['add', '-A']);
++  gitAtCwd(cwd, ['commit', '-q', '-m', `worker attempt for ${id}`]);
++  gitAtCwd(cwd, ['checkout', 'main']);
++  run(cwd, ['move', id, '--to', 'blocked']);
++  commitPending(cwd, `state: park ${id}`);
++}
++
++test('take --id on a blocked item with a live fgw/<id> branch claims via blocked -> doing, recording branchHeadAtTake (the branch\'s own HEAD, never the main-based headAtTake)', () => {
++  const cwd = initGitCwdMain();
++  run(cwd, ['init']);
++  makeBlockedBranchItem(cwd, 'branch-take-a');
++  const branchHead = gitAtCwd(cwd, ['rev-parse', 'fgw/branch-take-a']).trim();
++  const mainHeadBefore = gitHead(cwd);
++  assert.notEqual(branchHead, mainHeadBefore, 'sanity: the branch really is ahead of main');
++
++  const result = run(cwd, ['take', '--id', 'branch-take-a']);
++  assert.equal(result.status, 0, `take failed: ${result.stderr}`);
++  assert.match(result.stdout, /blocked -> doing/);
++  assert.match(result.stdout, /fgw\/branch-take-a/);
++
++  const view = stateView(cwd);
++  assert.equal(view.work['branch-take-a'].status, 'doing');
++  assert.equal(view.work['branch-take-a'].claimActor, 'human');
++  assert.equal(view.work['branch-take-a'].branchHeadAtTake, branchHead);
++  assert.equal('headAtTake' in view.work['branch-take-a'], false, 'a branch take never records the main-based headAtTake');
++  assert.equal(view.outcomes['branch-take-a'].predicted.branchHeadAtTake, branchHead);
++  assert.equal(gitHead(cwd), mainHeadBefore, "take never touches the human's own main checkout");
++});
++
++test('take --id on a blocked item with NO live branch still falls through to the old todo-only CAS — conflict, exit 3, item stays blocked', () => {
++  const cwd = initGitCwdMain();
++  run(cwd, ['init']);
++  addOk(cwd, 'blocked-no-branch');
++  run(cwd, ['move', 'blocked-no-branch', '--to', 'blocked']);
++
++  const result = run(cwd, ['take', '--id', 'blocked-no-branch']);
++  assert.equal(result.status, 3);
++  assert.equal(stateView(cwd).work['blocked-no-branch'].status, 'blocked');
++});
++
++test('return on a branch-source take: verify passes in a disposable detached worktree at the branch tip -> proposed, branchHeadAtReturn recorded (never headAtReturn), the human\'s own main checkout is untouched and no worktree is left behind', () => {
++  const cwd = initGitCwdMain();
++  run(cwd, ['init']);
++  makeBlockedBranchItem(cwd, 'branch-return-ok', { verify: 'test -f proof.txt' });
++  assert.equal(run(cwd, ['take', '--id', 'branch-return-ok']).status, 0);
++  // take's own event lands on events.jsonl in the SAME main tree (take never
++  // uses a worktree) — commit that bookkeeping to main before switching
++  // branches, exactly like commitFile's own doc comment describes.
++  commitPending(cwd, 'state: take branch-return-ok');
++
++  // The human commits their fix ON THE BRANCH — never on main.
++  gitAtCwd(cwd, ['checkout', 'fgw/branch-return-ok']);
++  fs.writeFileSync(path.join(cwd, 'proof.txt'), 'fixed by hand\n');
++  gitAtCwd(cwd, ['add', '-A']);
++  gitAtCwd(cwd, ['commit', '-q', '-m', 'human fix']);
++  const branchHeadAtReturn = gitAtCwd(cwd, ['rev-parse', 'fgw/branch-return-ok']).trim();
++  gitAtCwd(cwd, ['checkout', 'main']);
++  const mainHeadBefore = gitHead(cwd);
++  const worktreesBefore = gitAtCwd(cwd, ['worktree', 'list', '--porcelain']);
++
++  const result = run(cwd, ['return', 'branch-return-ok']);
++  assert.equal(result.status, 0, `return failed: ${result.stderr}`);
++  assert.match(result.stdout, /proposed/);
++
++  const view = stateView(cwd);
++  assert.equal(view.work['branch-return-ok'].status, 'proposed');
++  assert.equal(view.work['branch-return-ok'].branchHeadAtReturn, branchHeadAtReturn);
++  assert.equal('headAtReturn' in view.work['branch-return-ok'], false, 'a branch return never records the main-based headAtReturn (D2 CẤM)');
++  assert.equal(gitHead(cwd), mainHeadBefore, "return never advances or touches the human's own main checkout");
++  assert.equal(gitAtCwd(cwd, ['worktree', 'list', '--porcelain']), worktreesBefore, 'the disposable detached verify worktree is cleaned up — no leftover');
++});
++
++test('return on a branch-source take refuses when the branch has NOT advanced past branchHeadAtTake (no new commit) — validation, exit 4, item stays doing', () => {
++  const cwd = initGitCwdMain();
++  run(cwd, ['init']);
++  makeBlockedBranchItem(cwd, 'branch-return-stale', { verify: 'test -f proof.txt' });
++  assert.equal(run(cwd, ['take', '--id', 'branch-return-stale']).status, 0);
++
++  const result = run(cwd, ['return', 'branch-return-stale']);
++  assert.equal(result.status, 4);
++  assert.match(result.stderr, /has not advanced past branchHeadAtTake/);
++  assert.equal(stateView(cwd).work['branch-return-stale'].status, 'doing');
++});
++
++test('return on a branch-source take never requires the human\'s own main tree to be clean (D2: "tree người là việc của người") — a dirty main tree never blocks it and is left untouched', () => {
++  const cwd = initGitCwdMain();
++  run(cwd, ['init']);
++  makeBlockedBranchItem(cwd, 'branch-return-dirty-main', { verify: 'test -f proof.txt' });
++  assert.equal(run(cwd, ['take', '--id', 'branch-return-dirty-main']).status, 0);
++  commitPending(cwd, 'state: take branch-return-dirty-main');
++
++  gitAtCwd(cwd, ['checkout', 'fgw/branch-return-dirty-main']);
++  fs.writeFileSync(path.join(cwd, 'proof.txt'), 'fixed by hand\n');
++  gitAtCwd(cwd, ['add', '-A']);
++  gitAtCwd(cwd, ['commit', '-q', '-m', 'human fix']);
++  gitAtCwd(cwd, ['checkout', 'main']);
++
++  // Dirty the human's own main working tree — untracked, uncommitted, and
++  // unrelated to this item entirely.
++  fs.writeFileSync(path.join(cwd, 'scratch.txt'), 'unrelated in-progress work\n');
++
++  const result = run(cwd, ['return', 'branch-return-dirty-main']);
++  assert.equal(result.status, 0, `return must never inspect the main tree for a branch-source item: ${result.stderr}`);
++  assert.equal(stateView(cwd).work['branch-return-dirty-main'].status, 'proposed');
++  assert.equal(fs.readFileSync(path.join(cwd, 'scratch.txt'), 'utf8'), 'unrelated in-progress work\n', "the human's own dirty scratch file is untouched");
++});
++
++test('return on a branch-source take: verify-fail -> doing -> blocked + friction (verification layer), exit 0 (a defined outcome, not a CLI error)', () => {
++  const cwd = initGitCwdMain();
++  run(cwd, ['init']);
++  makeBlockedBranchItem(cwd, 'branch-return-red', { verify: 'test -f proof.txt' });
++  assert.equal(run(cwd, ['take', '--id', 'branch-return-red']).status, 0);
++  commitPending(cwd, 'state: take branch-return-red');
++
++  gitAtCwd(cwd, ['checkout', 'fgw/branch-return-red']);
++  fs.writeFileSync(path.join(cwd, 'wrong-file.txt'), 'nope\n'); // advances the branch, never satisfies verify
++  gitAtCwd(cwd, ['add', '-A']);
++  gitAtCwd(cwd, ['commit', '-q', '-m', 'wrong fix']);
++  gitAtCwd(cwd, ['checkout', 'main']);
++
++  const result = run(cwd, ['return', 'branch-return-red']);
++  assert.equal(result.status, 0, `return should exit 0 for a defined blocked outcome: ${result.stderr}`);
++  assert.match(result.stdout, /blocked/);
++
++  const view = stateView(cwd);
++  assert.equal(view.work['branch-return-red'].status, 'blocked');
++  assert.equal(view.outcomes['branch-return-red'].actual.outcome, 'blocked');
++  assert.equal(view.frictions['branch-return-red'][0].layer, 'verification');
++  assert.equal(view.frictions['branch-return-red'][0].errorClass, 'verify-miss');
++});
+diff --git a/test/e2e/pr-gate.test.mjs b/test/e2e/pr-gate.test.mjs
+index 67162ef..153fe48 100644
+--- a/test/e2e/pr-gate.test.mjs
++++ b/test/e2e/pr-gate.test.mjs
+@@ -345,3 +345,130 @@ test('e2e pr-gate (d) reject a pull-door item: proposed -> todo carries the reas
+   assert.match(gitAt(repoRoot, ['log', '--oneline']), /human: pr-d-file\.txt/, "the item's commit remains in main's history");
+   assert.equal(fs.readFileSync(path.join(repoRoot, 'pr-d-file.txt'), 'utf8'), 'important content, keep me\n', 'the file content is unchanged — no revert');
+ });
++
++// --- (e)/(f) branch-source item (human-rounds D2): a second door for a
++// `blocked` item that already carries a live `fgw/<id>` branch (parked by
++// the runner after too many visits, or a rejected proposal whose branch
++// survives) — `take` claims it via the existing blocked -> doing edge
++// (branchHeadAtTake, the branch's own HEAD), `return` verifies on the branch
++// in a disposable DETACHED worktree without ever touching the human's own
++// checkout, and classifySource's branch-existence-first rule (unchanged,
++// per D2) means review/approve treat the resulting proposal exactly like a
++// normal runner-source item — no merge.mjs changes needed. -----------------
++
++/** Leaves behind exactly what a real parked runner branch looks like: item
++ * at `blocked`, a live `fgw/<id>` branch one commit ahead of main, main's
++ * own tree/HEAD untouched — mirrors makeRunnerProposedItem's own "simulate
++ * what the runner leaves behind" discipline above, but the item never
++ * reaches `proposed`; it stays `blocked`, the D2 starting point. */
++function parkBranchItem(repoRoot, id, extra = {}) {
++  add(repoRoot, id, extra);
++  commitPending(repoRoot, `state: add ${id}`);
++
++  gitAt(repoRoot, ['checkout', '-b', `fgw/${id}`]);
++  fs.writeFileSync(path.join(repoRoot, `${id}-attempt.txt`), 'worker attempt\n');
++  gitAt(repoRoot, ['add', '-A']);
++  gitAt(repoRoot, ['commit', '-q', '-m', `worker attempt for ${id}`]);
++  gitAt(repoRoot, ['checkout', 'main']);
++
++  const moved = fgos(repoRoot, ['move', id, '--to', 'blocked']);
++  assert.equal(moved.status, 0, `move to blocked failed: ${moved.stderr}`);
++  commitPending(repoRoot, `state: park ${id}`);
++}
++
++test('e2e pr-gate (e) branch-source item full loop: park (blocked + live branch) -> take -> human commits fix on the branch -> return verifies in a detached temp worktree -> proposed -> review shows source: runner (classifySource unchanged, no merge.mjs edit) -> approve merges + verifies -> done, branch cleaned up', () => {
++  const repoRoot = initTempRepo();
++
++  assert.equal(fgos(repoRoot, ['init']).status, 0);
++  parkBranchItem(repoRoot, 'pr-e-item', { verify: 'test -f pr-e-proof.txt && echo PR_E_OK' });
++
++  const taken = fgos(repoRoot, ['take', '--id', 'pr-e-item']);
++  assert.equal(taken.status, 0, `take failed: ${taken.stderr}`);
++  assert.match(taken.stdout, /blocked -> doing/);
++  commitPending(repoRoot, 'state: take pr-e-item');
++
++  // The human's own fix, committed directly ON THE BRANCH — never on main.
++  gitAt(repoRoot, ['checkout', 'fgw/pr-e-item']);
++  fs.writeFileSync(path.join(repoRoot, 'pr-e-proof.txt'), 'fixed by hand\n');
++  gitAt(repoRoot, ['add', '-A']);
++  gitAt(repoRoot, ['commit', '-q', '-m', 'human fix']);
++  gitAt(repoRoot, ['checkout', 'main']);
++  const mainHeadBeforeReturn = currentHead(repoRoot);
++
++  const returned = fgos(repoRoot, ['return', 'pr-e-item']);
++  assert.equal(returned.status, 0, `return failed: ${returned.stderr}`);
++  assert.match(returned.stdout, /proposed/);
++  assert.equal(currentHead(repoRoot), mainHeadBeforeReturn, "return never advances the human's own main checkout");
++  assert.equal(worktreeCount(repoRoot), 1, 'the disposable detached verify worktree is cleaned up — no leftover');
++
++  const view1 = stateView(repoRoot);
++  assert.equal(view1.work['pr-e-item'].status, 'proposed');
++  assert.ok(view1.work['pr-e-item'].branchHeadAtReturn, 'branchHeadAtReturn recorded');
++  assert.equal('headAtReturn' in view1.work['pr-e-item'], false, 'a branch return never records the main-based headAtReturn (D2 CẤM)');
++
++  const review = fgos(repoRoot, ['review', 'pr-e-item']);
++  assert.equal(review.status, 0, `review failed: ${review.stderr}`);
++  assert.match(review.stdout, /source: runner/, "D2: classifySource sees the live branch — review/approve treat this exactly like a normal runner-source item, no merge.mjs changes needed");
++
++  commitPending(repoRoot, 'state: propose pr-e-item');
++
++  const approve = fgos(repoRoot, ['approve', 'pr-e-item']);
++  assert.equal(approve.status, 0, `approve failed: ${approve.stderr}`);
++  assert.match(approve.stdout, /proposed -> done/);
++  assert.match(approve.stdout, /PR_E_OK/);
++
++  const view2 = stateView(repoRoot);
++  assert.equal(view2.work['pr-e-item'].status, 'done');
++  assert.equal(view2.settlements['pr-e-item'][0].actor, 'human');
++  assert.equal(branchExists(repoRoot, 'fgw/pr-e-item'), false, 'the fully-merged branch is cleaned up');
++  assert.equal(worktreeCount(repoRoot), 1, 'no leaked worktree after cleanup');
++  assert.ok(fs.existsSync(path.join(repoRoot, 'pr-e-proof.txt')), 'the merged file is present on main');
++});
++
++test('e2e pr-gate (f) branch-source return never disturbs a checkout the human is actively standing on: a second live worktree on fgw/<id> at return time survives untouched — no reclaimOrphanedCheckout, no checkout-by-name collision', () => {
++  const repoRoot = initTempRepo();
++
++  assert.equal(fgos(repoRoot, ['init']).status, 0);
++  parkBranchItem(repoRoot, 'pr-f-item', { verify: 'test -f pr-f-proof.txt && echo PR_F_OK' });
++
++  const taken = fgos(repoRoot, ['take', '--id', 'pr-f-item']);
++  assert.equal(taken.status, 0, `take failed: ${taken.stderr}`);
++  commitPending(repoRoot, 'state: take pr-f-item');
++
++  gitAt(repoRoot, ['checkout', 'fgw/pr-f-item']);
++  fs.writeFileSync(path.join(repoRoot, 'pr-f-proof.txt'), 'fixed by hand\n');
++  gitAt(repoRoot, ['add', '-A']);
++  gitAt(repoRoot, ['commit', '-q', '-m', 'human fix']);
++  gitAt(repoRoot, ['checkout', 'main']);
++
++  // The human then opens a SECOND worktree on the very same branch — e.g. a
++  // second terminal/editor window still open on the code while `return` runs
++  // from their main checkout. `git worktree add <path> <branch>` (checkout
++  // BY NAME — exactly what `return` must NEVER do here) would fail outright
++  // with git's own "already checked out" refusal the moment a second such
++  // add is attempted against a branch already checked out somewhere; a
++  // `--detach <sha>` add (what `return` actually does) coexists with it
++  // cleanly, which is the whole point of this scenario.
++  const humanWorktree = mkTempDir('fgos-pr-gate-e2e-f-human-worktree-');
++  gitAt(repoRoot, ['worktree', 'add', humanWorktree, 'fgw/pr-f-item']);
++  assert.equal(worktreeCount(repoRoot), 2, "sanity: the human really does have a second live checkout of the branch");
++
++  const returned = fgos(repoRoot, ['return', 'pr-f-item']);
++  assert.equal(returned.status, 0, `return failed (must never collide with the human's own live checkout): ${returned.stderr}`);
++  assert.match(returned.stdout, /proposed/);
++
++  // The human's own worktree survives, untouched, still checked out on the
++  // branch — this is the BLOCKER the validating gate caught: reclaiming or
++  // checking out by name here would rip out or corrupt exactly this.
++  assert.ok(fs.existsSync(humanWorktree), "the human's own worktree directory must survive — never reclaimed");
++  assert.equal(
++    gitAt(humanWorktree, ['rev-parse', '--abbrev-ref', 'HEAD']).trim(),
++    'fgw/pr-f-item',
++    "the human's own worktree must still be checked out on the branch — never reclaimed/detached out from under them",
++  );
++  assert.equal(worktreeCount(repoRoot), 2, "return's own disposable verify worktree is cleaned up, but the human's own worktree remains — net count back to 2");
++
++  assert.equal(stateView(repoRoot).work['pr-f-item'].status, 'proposed');
++
++  gitAt(repoRoot, ['worktree', 'remove', humanWorktree, '--force']);
++});
+diff --git a/test/state/replay.test.mjs b/test/state/replay.test.mjs
+index a79b94d..9ea87dc 100644
+--- a/test/state/replay.test.mjs
++++ b/test/state/replay.test.mjs
+@@ -472,3 +472,72 @@ test('foldEvents ignores headAtReturn on a proposed move for an id that was neve
+   const view = foldEvents(events);
+   assert.equal('ghost' in view.work, false);
+ });
++
++// --- branch-source take/return markers (human-rounds D2) -------------------
++//
++// `branchHeadAtTake`/`branchHeadAtReturn` fold onto the item on the SAME
++// `to: 'doing'`/`to: 'proposed'` edges as headAtTake/headAtReturn above, but
++// are a strict addition — never a rewrite — of the main-based pair: a
++// branch-source take/return never carries headAtTake/headAtReturn at all
++// (CẤM per D2), so the two marker pairs are always mutually exclusive on a
++// real item, though the fold itself imposes no such check.
++
++test('foldEvents folds branchHeadAtTake onto the item from a blocked -> doing claim that carries it (branch take)', () => {
++  const events = [
++    { seq: 1, ts: '2026-07-17T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'blocked' }, v: 2 },
++    { seq: 2, ts: '2026-07-17T00:00:01.000Z', type: 'work.move', payload: { id: 'a', from: 'blocked', to: 'doing', actor: 'human', branchHeadAtTake: 'branch-deadbeef' }, v: 2 },
++  ];
++  const view = foldEvents(events);
++  assert.equal(view.work.a.claimActor, 'human');
++  assert.equal(view.work.a.branchHeadAtTake, 'branch-deadbeef');
++  assert.equal('headAtTake' in view.work.a, false, 'a branch take never carries the main-based headAtTake');
++});
++
++test('foldEvents ignores branchHeadAtTake on a non-doing move even when the payload carries it (only the doing edge sets it)', () => {
++  const events = [
++    { seq: 1, ts: '2026-07-17T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo' }, v: 2 },
++    { seq: 2, ts: '2026-07-17T00:00:01.000Z', type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing', actor: 'human', branchHeadAtTake: 'aaa' }, v: 2 },
++    { seq: 3, ts: '2026-07-17T00:00:02.000Z', type: 'work.move', payload: { id: 'a', from: 'doing', to: 'proposed', branchHeadAtTake: 'ignored-on-this-edge' }, v: 2 },
++  ];
++  const view = foldEvents(events);
++  assert.equal(view.work.a.branchHeadAtTake, 'aaa', 'the proposed move carries branchHeadAtTake in its payload but it is not the doing edge, so it is never read');
++});
++
++test('foldEvents ignores branchHeadAtTake on a doing move for an id that was never added — ghost id stays a true no-op', () => {
++  const events = [
++    { seq: 1, ts: '2026-07-17T00:00:00.000Z', type: 'work.move', payload: { id: 'ghost', from: 'blocked', to: 'doing', actor: 'human', branchHeadAtTake: 'deadbeef' }, v: 2 },
++  ];
++  assert.doesNotThrow(() => foldEvents(events));
++  const view = foldEvents(events);
++  assert.equal('ghost' in view.work, false);
++});
++
++test('foldEvents folds branchHeadAtReturn onto the item from a proposed move that carries it (branch return), never headAtReturn', () => {
++  const events = [
++    { seq: 1, ts: '2026-07-17T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'blocked' }, v: 2 },
++    { seq: 2, ts: '2026-07-17T00:00:01.000Z', type: 'work.move', payload: { id: 'a', from: 'blocked', to: 'doing', actor: 'human', branchHeadAtTake: 'branch-deadbeef' }, v: 2 },
++    { seq: 3, ts: '2026-07-17T00:00:02.000Z', type: 'work.move', payload: { id: 'a', from: 'doing', to: 'proposed', branchHeadAtReturn: 'branch-c0ffee' }, v: 2 },
++  ];
++  const view = foldEvents(events);
++  assert.equal(view.work.a.branchHeadAtTake, 'branch-deadbeef');
++  assert.equal(view.work.a.branchHeadAtReturn, 'branch-c0ffee');
++  assert.equal('headAtReturn' in view.work.a, false, 'a branch return never carries the main-based headAtReturn (D2 CẤM)');
++});
++
++test('foldEvents ignores branchHeadAtReturn on a non-proposed move even when the payload carries it (only the proposed edge sets it)', () => {
++  const events = [
++    { seq: 1, ts: '2026-07-17T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'blocked' }, v: 2 },
++    { seq: 2, ts: '2026-07-17T00:00:01.000Z', type: 'work.move', payload: { id: 'a', from: 'blocked', to: 'doing', actor: 'human', branchHeadAtReturn: 'ignored-on-this-edge' }, v: 2 },
++  ];
++  const view = foldEvents(events);
++  assert.equal('branchHeadAtReturn' in view.work.a, false);
++});
++
++test('foldEvents ignores branchHeadAtReturn on a proposed move for an id that was never added — ghost id stays a true no-op', () => {
++  const events = [
++    { seq: 1, ts: '2026-07-17T00:00:00.000Z', type: 'work.move', payload: { id: 'ghost', from: 'doing', to: 'proposed', branchHeadAtReturn: 'branch-c0ffee' }, v: 2 },
++  ];
++  assert.doesNotThrow(() => foldEvents(events));
++  const view = foldEvents(events);
++  assert.equal('ghost' in view.work, false);
++});
+diff --git a/test/state/store.test.mjs b/test/state/store.test.mjs
+index f473f37..33bdd1e 100644
+--- a/test/state/store.test.mjs
++++ b/test/state/store.test.mjs
+@@ -121,3 +121,44 @@ test('the learning record rides the SAME work.move event that closes the item 
+   const rebuiltTwice = listWork(dir);
+   assert.deepEqual(rebuiltTwice, rebuiltOnce, 'rebuilding the same log twice must be deep-equal (determinism)');
+ });
++
++// --- branch-source take/return write-side stamp (human-rounds D2) ---------
++//
++// moveWork's destructure is a FIXED field list (never a `...rest` spread,
++// per the fold-allowlist critical pattern) — a caller passing a new field
++// that this facade does not also destructure gets it silently dropped
++// before the event is ever appended. This asserts the write side directly
++// (the exact gap a reviewer caught during validating): branchHeadAtTake/
++// branchHeadAtReturn must land on the appended event's own payload, not
++// only on replay.mjs's later fold.
++
++test('moveWork stamps branchHeadAtTake onto the appended event payload for a blocked -> doing move that carries it', () => {
++  const dir = tmpDir();
++  addSampleWork(dir, 'branch-take', { status: 'blocked' });
++
++  const { event } = moveWork(dir, { id: 'branch-take', to: 'doing', expectedStatus: 'blocked', actor: 'human', branchHeadAtTake: 'branch-deadbeef' });
++
++  assert.equal(event.payload.branchHeadAtTake, 'branch-deadbeef');
++  assert.equal('headAtTake' in event.payload, false, 'a branch take never also stamps the main-based headAtTake');
++});
++
++test('moveWork stamps branchHeadAtReturn onto the appended event payload for a doing -> proposed move that carries it, never headAtReturn', () => {
++  const dir = tmpDir();
++  addSampleWork(dir, 'branch-return', { status: 'blocked' });
++  moveWork(dir, { id: 'branch-return', to: 'doing', expectedStatus: 'blocked', actor: 'human', branchHeadAtTake: 'branch-deadbeef' });
++
++  const { event } = moveWork(dir, { id: 'branch-return', to: 'proposed', expectedStatus: 'doing', branchHeadAtReturn: 'branch-c0ffee' });
++
++  assert.equal(event.payload.branchHeadAtReturn, 'branch-c0ffee');
++  assert.equal('headAtReturn' in event.payload, false, 'a branch return never also stamps the main-based headAtReturn (D2 CẤM)');
++});
++
++test('moveWork omits branchHeadAtTake/branchHeadAtReturn entirely from the event payload when the caller never supplies them (byte-identical to the pre-D2 shape)', () => {
++  const dir = tmpDir();
++  addSampleWork(dir, 'branch-absent');
++
++  const { event } = moveWork(dir, { id: 'branch-absent', to: 'doing', expectedStatus: 'todo', actor: 'human', headAtTake: 'main-deadbeef' });
++
++  assert.equal('branchHeadAtTake' in event.payload, false);
++  assert.equal('branchHeadAtReturn' in event.payload, false);
++});
+commit af2535b8bd70561b9efbe1bc697664c512edb460
+Author: Van Tran <940988+vantt@users.noreply.github.com>
+Date:   Fri Jul 17 09:42:08 2026 +0700
+
+    docs(backlog): P31+P33 done, add P34 anti-loop-vs-human-rounds
+
+diff --git a/docs/backlog.md b/docs/backlog.md
+index ea9fae8..3cc5c58 100644
+--- a/docs/backlog.md
++++ b/docs/backlog.md
+@@ -30,7 +30,10 @@
+ | P28 | GitHub adapter cho PR lifecycle: transport remote (tạo PR thật, duyệt trên web, auto-merge qua API) đứng trên CÙNG cổng duyệt nội bộ của P17 (pr-lifecycle D1 — local-first, adapter chỉ đổi transport) | Một item proposed tạo được PR GitHub thật, duyệt web → hệ merge remote + item done; cổng duyệt nội bộ không fork luật | proposed | — |
+ | P29 | Packaging/install thật của fgOS (npm/global/copy-bin): câu chuyện phân phối đứng trên nền coexistence P10 (install-coexistence D1 — đợt P10 chỉ chạy-tại-chỗ) | Cài fgos vào một project ngoài bằng một lệnh, init + doctrine + marker detection chạy đúng như canary P10 | proposed | — |
+ | P30 | Discovery prompt đủ ngữ cảnh: buildDiscoveryPrompt (src/intake/discovery.mjs) hiện chỉ đưa title-cắt/kind/risk/refs/deps — THIẾU description đầy đủ + toàn bộ ask/answer history (gates) + discovery history → vòng làm-rõ không hội tụ, hỏi lặp rồi fail-safe park (dogfood P25 run-1 phát hiện, 2026-07-16) | Item có answer của người không bị hỏi lại cùng chủ đề; item dogfood bo-hardcode-ten-trunk pass clarify sau 1 answer; description đầy đủ nằm trong prompt phán | done | [discovery-context](history/discovery-context/) |
+-| P31 | Worker execution thật cho dogfood: run-2 (2026-07-17) worker được dispatch nhưng nhánh fgw rỗng (aheadCount 0, verify-miss ×2 → parked đúng luật) — điều tra executor config/worker prompt của dispatch cho task implementation thật (model nào, prompt đủ chưa, timeout, làm sao thấy log worker) | Item dogfood bo-hardcode-ten-trunk được worker thật implement: nhánh fgw có commit, goal-check xanh, item proposed | proposed | — |
++| P31 | Worker execution thật cho dogfood: run-2 (2026-07-17) worker được dispatch nhưng nhánh fgw rỗng (aheadCount 0, verify-miss ×2 → parked đúng luật) — điều tra executor config/worker prompt của dispatch cho task implementation thật (model nào, prompt đủ chưa, timeout, làm sao thấy log worker) | Item dogfood bo-hardcode-ten-trunk được worker thật implement: nhánh fgw có commit, goal-check xanh, item proposed | done | [worker-execution](history/worker-execution/) |
++| P32 | Persist log worker dispatch (observability): hiện output worker chỉ console-tail per luật security-panel (loop.mjs output-discipline — KHÔNG persist vào path committed); muốn log file .fgos/logs cần SUPERSEDE quyết định đó tường minh + gitignore + một cửa ghi (single-door .fgos) + đính stdout vào DispatchError cho timeout/spawn-fail (plan-checker P31 B1/W1/W2 đã map đủ ràng buộc) | Quyết supersede-hay-không có decision record; nếu làm: log đọc được cho MỌI kết cục kể cả timeout, không phá single-door, không vào git | proposed | — |
++| P33 | Feedback người tới worker: prompt worker (buildPrompt) thiếu answer từ gates + lý do reject mới nhất → vòng reject không hội tụ (run-3: reject kèm yêu cầu test, worker round-2 no-op vì không thấy lý do); kiểm fold `reason` trên work.move (đường destructure — critical pattern fold-allowlist) | Reject kèm lý do → worker round sau NHÌN THẤY lý do trong prompt và làm đúng; item dogfood có test master-trunk sau một vòng reject — GHI CHÚ: code + unit-proof đã ship (worker-execution-2); live-proof CoS bị anti-loop chặn trước dispatch → gộp vào CoS P34 | done | [worker-execution](history/worker-execution/) |
++| P34 | Anti-loop vs vòng người: (a) reject/answer của NGƯỜI hiện ăn cùng ngân sách visit với vòng lỗi → item bị park 3/3 TRƯỚC khi worker kịp thấy lý do reject (run-4); (b) item nhánh-runner bị anti-loop park xong thì KHÔNG còn cửa công khai nào cho người hoàn tất đề xuất (pull-door đo main, không hợp việc trên nhánh; classifier cũng chặn đẩy tay — đúng tinh thần). Thiết kế: can thiệp người (answer/reject) làm mới/mở rộng ngân sách visit? verb người-tiếp-quản-nhánh? | Một vòng reject do người chủ động không bị anti-loop nuốt; item park 3/3 có đường người-hoàn-tất chính danh; live-proof P33 (worker thấy lý do và làm đúng) chạy được | proposed | — |
+ | P20 | Registry-manifest máy-đọc cho architecture-map + script 2 phép kiểm trong verify: (a) chiều import một-chiều-xuống theo nhà đã khai, (b) đủ sổ — mọi file src/** bin/** có row (architecture-map §9.3, record 0010; đứng trước S2-friction) | Script đỏ khi có import ngược tầng hoặc file thiếu row; verify chain chạy nó; sổ §6 không drift được nữa | done | [0010](decisions/0010-ban-do-kien-truc-la-ban-chuan.md) + map §9.3 |
+ | P2 | Routing trên state (Phase 2): frontier sẵn-sàng thành lệnh, chain handoff, recovery matrix + anti-loop, runner tuần tự | Agent lạ tự tìm việc kế tiếp bằng truy vấn derive, không danh sách tay (tiêu chí F3, luật L6) | done | [phase-2-routing](history/phase-2-routing/) |
+ | P1 | forgent tự quản work-state của chính nó qua tầng state/FSM (Phase 1: store zero-dep, transition có precondition, single-door, CAS, decisions event-sourced) | Một agent lạ, không chat history, trả lời "đang ở đâu / việc gì đang mở" từ state chứ không từ trí nhớ (tiêu chí F2, luật L6) | done | [phase-1-state-layer](history/phase-1-state-layer/) |
+commit 05dfb67fef5357e63a8990bce177a179d66fe83b
+Author: Van Tran <940988+vantt@users.noreply.github.com>
+Date:   Fri Jul 17 10:43:25 2026 +0700
+
+    docs(backlog): P34 in-flight (human-rounds)
+
+diff --git a/docs/backlog.md b/docs/backlog.md
+index 3cc5c58..ab97031 100644
+--- a/docs/backlog.md
++++ b/docs/backlog.md
+@@ -33,7 +33,7 @@
+ | P31 | Worker execution thật cho dogfood: run-2 (2026-07-17) worker được dispatch nhưng nhánh fgw rỗng (aheadCount 0, verify-miss ×2 → parked đúng luật) — điều tra executor config/worker prompt của dispatch cho task implementation thật (model nào, prompt đủ chưa, timeout, làm sao thấy log worker) | Item dogfood bo-hardcode-ten-trunk được worker thật implement: nhánh fgw có commit, goal-check xanh, item proposed | done | [worker-execution](history/worker-execution/) |
+ | P32 | Persist log worker dispatch (observability): hiện output worker chỉ console-tail per luật security-panel (loop.mjs output-discipline — KHÔNG persist vào path committed); muốn log file .fgos/logs cần SUPERSEDE quyết định đó tường minh + gitignore + một cửa ghi (single-door .fgos) + đính stdout vào DispatchError cho timeout/spawn-fail (plan-checker P31 B1/W1/W2 đã map đủ ràng buộc) | Quyết supersede-hay-không có decision record; nếu làm: log đọc được cho MỌI kết cục kể cả timeout, không phá single-door, không vào git | proposed | — |
+ | P33 | Feedback người tới worker: prompt worker (buildPrompt) thiếu answer từ gates + lý do reject mới nhất → vòng reject không hội tụ (run-3: reject kèm yêu cầu test, worker round-2 no-op vì không thấy lý do); kiểm fold `reason` trên work.move (đường destructure — critical pattern fold-allowlist) | Reject kèm lý do → worker round sau NHÌN THẤY lý do trong prompt và làm đúng; item dogfood có test master-trunk sau một vòng reject — GHI CHÚ: code + unit-proof đã ship (worker-execution-2); live-proof CoS bị anti-loop chặn trước dispatch → gộp vào CoS P34 | done | [worker-execution](history/worker-execution/) |
+-| P34 | Anti-loop vs vòng người: (a) reject/answer của NGƯỜI hiện ăn cùng ngân sách visit với vòng lỗi → item bị park 3/3 TRƯỚC khi worker kịp thấy lý do reject (run-4); (b) item nhánh-runner bị anti-loop park xong thì KHÔNG còn cửa công khai nào cho người hoàn tất đề xuất (pull-door đo main, không hợp việc trên nhánh; classifier cũng chặn đẩy tay — đúng tinh thần). Thiết kế: can thiệp người (answer/reject) làm mới/mở rộng ngân sách visit? verb người-tiếp-quản-nhánh? | Một vòng reject do người chủ động không bị anti-loop nuốt; item park 3/3 có đường người-hoàn-tất chính danh; live-proof P33 (worker thấy lý do và làm đúng) chạy được | proposed | — |
++| P34 | Anti-loop vs vòng người: (a) reject/answer của NGƯỜI hiện ăn cùng ngân sách visit với vòng lỗi → item bị park 3/3 TRƯỚC khi worker kịp thấy lý do reject (run-4); (b) item nhánh-runner bị anti-loop park xong thì KHÔNG còn cửa công khai nào cho người hoàn tất đề xuất (pull-door đo main, không hợp việc trên nhánh; classifier cũng chặn đẩy tay — đúng tinh thần). Thiết kế: can thiệp người (answer/reject) làm mới/mở rộng ngân sách visit? verb người-tiếp-quản-nhánh? | Một vòng reject do người chủ động không bị anti-loop nuốt; item park 3/3 có đường người-hoàn-tất chính danh; live-proof P33 (worker thấy lý do và làm đúng) chạy được | in-flight | [human-rounds](history/human-rounds/) |
+ | P20 | Registry-manifest máy-đọc cho architecture-map + script 2 phép kiểm trong verify: (a) chiều import một-chiều-xuống theo nhà đã khai, (b) đủ sổ — mọi file src/** bin/** có row (architecture-map §9.3, record 0010; đứng trước S2-friction) | Script đỏ khi có import ngược tầng hoặc file thiếu row; verify chain chạy nó; sổ §6 không drift được nữa | done | [0010](decisions/0010-ban-do-kien-truc-la-ban-chuan.md) + map §9.3 |
+ | P2 | Routing trên state (Phase 2): frontier sẵn-sàng thành lệnh, chain handoff, recovery matrix + anti-loop, runner tuần tự | Agent lạ tự tìm việc kế tiếp bằng truy vấn derive, không danh sách tay (tiêu chí F3, luật L6) | done | [phase-2-routing](history/phase-2-routing/) |
+ | P1 | forgent tự quản work-state của chính nó qua tầng state/FSM (Phase 1: store zero-dep, transition có precondition, single-door, CAS, decisions event-sourced) | Một agent lạ, không chat history, trả lời "đang ở đâu / việc gì đang mở" từ state chứ không từ trí nhớ (tiêu chí F2, luật L6) | done | [phase-1-state-layer](history/phase-1-state-layer/) |
+commit c326ea3c1464764e636f94aa87832a6f131c80d7
+Author: Van Tran <940988+vantt@users.noreply.github.com>
+Date:   Fri Jul 17 11:34:54 2026 +0700
+
+    docs(specs): sync runner + work-state specs for human-rounds (D1/D2), backlog P6 done
+    
+    Anti-loop gate now resets on the item's own last human intervention
+    (visitsSinceLastHumanEvent, R29) instead of counting lifetime visits;
+    take/return extends to blocked items with a live proposal branch
+    (branchHeadAtTake/branchHeadAtReturn, R30/R34), giving humans a public
+    door to complete a parked runner-branch proposal. Also picks up the
+    already-capped fan-out-parallel backlog flip and reading-map refresh.
+
+diff --git a/docs/backlog.md b/docs/backlog.md
+index ab97031..239d339 100644
+--- a/docs/backlog.md
++++ b/docs/backlog.md
+@@ -5,7 +5,7 @@
+ | P3 | Compound-learning trên routing (Phase 3): vòng predicted→actual, capture 2 kênh, entropy-trend, evolving human-gated | Vòng predicted→actual chạy thật với bằng chứng output (tiêu chí F4, luật L6) | done | [phase-3-compound-learning](history/phase-3-compound-learning/) |
+ | P4 | Distillery lên state layer làm consumer thứ hai (porting lifecycle thành FSM) | Trạng thái porting đọc/ghi qua cùng một cửa state layer, dựng lại được từ event log | proposed | — |
+ | P5 | Xem xét thay bee bằng state layer của forgent — chỉ mở khi forgent đạt F3 (ngưỡng tên, per D2 phase-1-state-layer) | Quyết định có/không kèm case study vận hành song song | proposed | — |
+-| P6 | Fan-out song song N worker trên frontier | Anti-loop đã chứng minh trong vòng chạy thật (ngưỡng A1 phase-2-routing); N worker không phá single-writer | proposed | — |
++| P6 | Fan-out song song N worker trên frontier | Anti-loop đã chứng minh trong vòng chạy thật (ngưỡng A1 phase-2-routing); N worker không phá single-writer | done | [fan-out-parallel](history/fan-out-parallel/) |
+ | P7 | Trường priority cho frontier ordering | FIFO-theo-seq lộ giới hạn thật được ghi nhận | proposed | — |
+ | P8 | Intent-scoring + signal-driven chaining (hướng đã chốt từ consult) | Phase 2 đóng; có case cần reactive dispatch | proposed | — |
+ | P9 | Merge tự động đề xuất của worker khi review sạch | Vòng đề-xuất-duyệt chạy tay đủ tin cậy, có số liệu | proposed | — |
+diff --git a/docs/specs/reading-map.md b/docs/specs/reading-map.md
+index a956de1..6c106de 100644
+--- a/docs/specs/reading-map.md
++++ b/docs/specs/reading-map.md
+@@ -8,14 +8,14 @@
+ - `docs/routing-handoff-contract.md` — hợp đồng handoff agent↔agent + ranh giới tin cậy
+ - `docs/coexistence.md` — doctrine chạy cạnh một harness agent khác (record 0009): lãnh địa, một-nhạc-trưởng-mỗi-phiên, nhường-nhịn lúc `init`, manifest `.fgos/coexistence.json`, Known Gaps chưa flip; `src/install/coexist.mjs` — cài đặt detection + manifest (read-only, không đè)
+ - `docs/decisions/` — hồ sơ quyết định dài hạn cho người ngoài (decision records)
+-- `bin/fgos.mjs` — CLI một cửa của work-state; chạy `node bin/fgos.mjs <verb>`; gồm verb `take`/`return` — cửa pull giao–nhận việc cho tác nhân ngoài runner; gồm verb `review`/`approve`/`reject` — cổng duyệt PR nội bộ, một cổng cho mọi đề xuất `proposed` (spec: docs/specs/runner.md); spec: docs/specs/work-state.md
++- `bin/fgos.mjs` — CLI một cửa của work-state; chạy `node bin/fgos.mjs <verb>`; gồm verb `take`/`return` — cửa pull giao–nhận việc cho tác nhân ngoài runner; gồm verb `review`/`approve`/`reject` — cổng duyệt PR nội bộ, một cổng cho mọi đề xuất `proposed`, nay leaf-vs-root-aware (con nhập vào nhánh của gốc, gốc nhập vào cây chính); gồm verb `catchup` — đồng bộ lại một việc đỗ vì gãy nhập/trôi tích hợp (spec: docs/specs/runner.md); spec: docs/specs/work-state.md
+ - `src/state/` — lõi work-state: events (nhật ký), work (schema — STATUSES + STAGES + field `parent` lineage), fsm (bảng chuyển status + CAS), stage (bảng chuyển stage + CAS, chiều vĩ mô song song fsm; cạnh `clarify→decompose→executing`), replay (fold), frontier (truy vấn sẵn-sàng — lọc theo status, stage, VÀ lineage qua `parent`), store (chủ ghi duy nhất + readRawEvents), envelope (phong bì output C1, `wrapEnvelope`)
+ - `src/intake/classify.mjs` — logic thuần của `fgos submit`: deriveTitle, classify (tier/kind/risk cơ học), generateId (slug+hash chống trùng)
+ - `src/intake/discovery.mjs` — context-discovery của stage clarify: `judgeDiscovery` (gọi model, fail-safe) + `resolveDiscovery` (đọc-phán-ghi, dùng chung bởi verb `discover` và vòng tự hành); verdict đủ rõ chuyển item sang stage `decompose`
+ - `src/intake/decompose.mjs` — phán chia-việc của stage decompose: `judgeDecompose` (gọi model, fail-safe) + `resolveDecompose` (đọc-phán-ghi, dùng chung bởi verb `discover` và vòng tự hành khi item ở stage `decompose`); sinh con qua lineage `parent`, không qua `deps`
+-- `src/runner/` + `bin/fgos-runner.mjs` — vòng tự hành (loop/dispatch/worktree/recovery/anti-loop); loop chạy quét làm-rõ rồi quét chia-việc trước mọi dispatch thi công; gặt-lại bỏ qua claim của cửa pull (`claimActor` human/session); `goal-check.mjs` — hàm goal-check dùng chung giữa vòng tự hành và verb `return`; config: `.fgos-runner.json`; spec: docs/specs/runner.md
+-- `src/runner/merge.mjs` — cơ chế cổng duyệt PR nội bộ (`classifySource`/`reviewDiff`/`mergeRunnerItem`/`cleanupMergedBranch`), dùng bởi `bin/fgos.mjs` verb `review`/`approve`/`reject`; spec: docs/specs/runner.md
++- `src/runner/` + `bin/fgos-runner.mjs` — vòng tự hành (loop/dispatch/worktree/recovery/anti-loop/write-queue/root-affinity); loop giao việc theo mẻ song song có giới hạn hai tầng (cấu hình `parallel` trong `.fgos-runner.json`), giữ quyền-sở-hữu-gốc trong một lượt chạy, quét làm-rõ rồi quét chia-việc trước mọi dispatch thi công; gặt-lại bỏ qua claim của cửa pull (`claimActor` human/session); `goal-check.mjs` — hàm goal-check dùng chung giữa vòng tự hành và verb `return`; `write-queue.mjs` — cửa ghi tuần tự giữ một-người-ghi dưới song song; `root-affinity.mjs` — quyền-sở-hữu-gốc, giữ mọi con của một gốc chung một chủ trong một lượt chạy; config: `.fgos-runner.json`; spec: docs/specs/runner.md
++- `src/runner/merge.mjs` — cơ chế cổng duyệt PR nội bộ (`classifySource`/`reviewDiff`/`mergeRunnerItem`/`cleanupMergedBranch`), dùng bởi `bin/fgos.mjs` verb `review`/`approve`/`reject`, nay tham số hóa được nhánh đích (cây chính hoặc nhánh của gốc — cây nhánh tích hợp); `catchup` (bin/fgos.mjs) dùng lại cùng cơ chế git cho cả tầng con→gốc lẫn gốc→cây chính; spec: docs/specs/runner.md
+ - `src/report/entropy.mjs` — tín hiệu entropy-trend + đếm compounding (thuần, đọc trên view work-state), surfaced qua `fgos check`; spec: docs/specs/runner.md
+-- `test/` — node:test suite (`npm test`, 508 test): smoke + state + cli + runner + report + e2e (rebuild-determinism, runner-loop — gồm kịch bản cửa pull S2-pull, pr-gate — 4 kịch bản trọn vòng review/approve/reject); benchmark ngoài suite (F4) tại `docs/history/phase-3-compound-learning/reports/f4-benchmark.md`
++- `test/` — node:test suite (`npm test`, 625 test): smoke + state + cli + runner + report + e2e (rebuild-determinism, runner-loop — gồm kịch bản cửa pull S2-pull + con fork từ tip nhánh gốc, pr-gate — 4 kịch bản trọn vòng review/approve/reject, dispatch song song thật với cửa sổ chồng-lấn đo được); benchmark ngoài suite (F4) tại `docs/history/phase-3-compound-learning/reports/f4-benchmark.md`
+ - `.fgos/events.jsonl` — nhật ký sự kiện work-state (truth, committed); `.fgos/state.json` là view gitignored
+ - `AGENTS.md`, `CLAUDE.md` — doctrine layer nạp mọi phiên agent (bản sản phẩm — thuần forgent)
+diff --git a/docs/specs/runner.md b/docs/specs/runner.md
+index 3e280f7..53de67e 100644
+--- a/docs/specs/runner.md
++++ b/docs/specs/runner.md
+@@ -1,8 +1,8 @@
+ ---
+ area: runner
+ updated: 2026-07-17
+-sources: [phase-2-routing, post-divorce-hardening, phase-3-compound-learning-s1, phase-3-compound-learning-s2, phase-3-compound-learning-s3-closeout, stage-clarify, stage-decompose-s1, stage-decompose-s2, pr-lifecycle-s1, discovery-context, worker-execution]
+-decisions: [feed7428, 14396a5c, 1a80b4d3, 9a19eea5, 96a65365, a7c099af, 43f257ae, 44936500, e1218b22, 6f2cbc47, a30a3d3c, 1359ab5e, cfae0120, 22699c61, 04a6cd05, 396d9d9e]
++sources: [phase-2-routing, post-divorce-hardening, phase-3-compound-learning-s1, phase-3-compound-learning-s2, phase-3-compound-learning-s3-closeout, stage-clarify, stage-decompose-s1, stage-decompose-s2, pr-lifecycle-s1, discovery-context, worker-execution, fan-out-parallel, human-rounds]
++decisions: [feed7428, 14396a5c, 1a80b4d3, 9a19eea5, 96a65365, a7c099af, 43f257ae, 44936500, e1218b22, 6f2cbc47, a30a3d3c, 1359ab5e, cfae0120, 22699c61, 04a6cd05, 396d9d9e, 2e92b7a5, f0c40acc, 5a6900b2]
+ coverage: full
+ ---
+ 
+@@ -12,13 +12,14 @@ Vòng lặp tự hành của forgent: tự lấy việc sẵn-sàng từ work-st
+ 
+ ## Entry Points & Triggers
+ 
+-- `fgos-runner --once` → chạy đúng một vòng: gặt-lại → tìm việc → giao việc → chấm → ghi (mặc định Phase 2, tuần tự một việc)
++- `fgos-runner --once` → chạy đúng một vòng: gặt-lại → tìm việc → giao việc theo MẺ (nhiều việc cùng lúc, giới hạn hai tầng) → chấm từng việc → ghi, rồi nạp lại mẻ kế tiếp — lặp tới khi không còn việc đang chạy VÀ không còn việc sẵn-sàng (xem "Giao việc theo mẻ, song song có giới hạn" dưới)
+ - `fgos-runner --dry-run` → in kế hoạch (việc nào sẽ chạy, model nào) mà không làm gì
+ - Khởi động MỌI vòng đều bắt đầu bằng bước **gặt-lại** (reap): việc kẹt ở `doing` từ lần chạy đổ trước được giải quyết trước khi tìm việc mới
+ - Ngay sau gặt-lại, TRƯỚC khi tìm việc thi công: **quét làm-rõ** (clarify sweep) — xem "Quét làm-rõ trước dispatch" dưới
+ - Ngay sau quét làm-rõ, CÙNG TRƯỚC khi tìm việc thi công: **quét chia-việc** (decompose sweep) — xem "Quét chia-việc trước dispatch" dưới
+ - `fgos take`/`fgos return` (cửa pull, ngoài vòng runner — xem spec Work-State "Cửa pull giao–nhận việc") claim/trả việc qua đúng CAS + goal-check runner tự dùng; gặt-lại lúc khởi động BỎ QUA claim đến từ cửa pull — xem "Gặt-lại lúc khởi động" dưới
+ - `fgos review <id>` / `fgos approve <id> [--timeout <ms>]` / `fgos reject <id> --reason "..."` (ngoài vòng runner, gọi bởi người vận hành) — cổng duyệt PR nội bộ cho một đề xuất `proposed` đã sẵn, MỘT cổng cho cả nguồn runner lẫn pull-door — xem "Cổng duyệt PR nội bộ" dưới
++- `fgos catchup <id>` (ngoài vòng runner, gọi bởi người vận hành) — đồng bộ lại một việc đang đỗ (`blocked`) vì gãy nhập (xung đột, verify đỏ sau nhập, hoặc trôi tích hợp): kéo trạng thái mới nhất của đích vào nhánh riêng của việc rồi thử lại — xem "Đồng bộ lại một việc đỗ (catch-up)" dưới
+ 
+ ## Data Dictionary
+ 
+@@ -27,18 +28,48 @@ Vòng lặp tự hành của forgent: tự lấy việc sẵn-sàng từ work-st
+ | 1 | Cấu hình runner (file committed ở gốc repo) | Chính sách thực thi — LÀ CONFIG THỰC THI ĐƯỢC: ai sửa nó điều khiển tiến trình được spawn (đầu vào tin cậy) | `executor` — mẫu lệnh gọi trợ lý (thay thế {prompt}/{model} theo từng phần tử, không bao giờ qua shell) · `models` — bảng tier→model (light/standard/heavy) · `timeoutMs` — trần thời gian một worker | yes | có sẵn bản mặc định |
+ | 2 | Nhánh đề xuất | Không gian kết quả của một worker, tên mang tiền tố nhận diện `fgw/<id>` | — | — | — |
+ | 3 | Bảng phục hồi | Lớp-lỗi → hành-động, máy đọc được | 8 lớp: hỏng-spawn, quá-giờ, chấm-trượt, hỏng-worktree, nhật-ký-hỏng, đề-xuất-bị-trả, việc-kẹt-do-crash, tranh-chấp-ghi → hành động ∈ thử-lại (có trần) / đỗ-lại / dừng; lớp LẠ → dừng (an toàn trước) | — | — |
+-| 4 | Bộ đếm chống-lặp | visitCount: số lần một việc vào `doing` — dẫn xuất từ nhật ký sự kiện, không trường mới; trần mặc định 3 (provisional) | — | — | — |
+-| 5 | Cầu dao (breaker) | Số lần chấm-trượt liên tiếp trong MỘT lần chạy (bộ nhớ trong phiên, không dẫn xuất từ nhật ký — chủ đích, vì nhật ký không phân biệt người/máy ghi); trần mặc định 3 | — | — | — |
++| 4 | Bộ đếm chống-lặp (lifetime) | visitCount: số lần một việc vào `doing` TÍNH TỪ ĐẦU đời việc — dẫn xuất từ nhật ký sự kiện, không trường mới; dùng cho các bản ghi outcome/metric đã ship (KHÔNG dùng để chặn dispatch nữa — xem #4b) | — | — | — |
++| 4b | Ngân sách cổng chống-lặp (kể từ can thiệp người) | visitsSinceLastHumanEvent: số lần việc vào `doing` TÍNH TỪ sự kiện người CUỐI CÙNG của chính việc đó — đây là con số CỔNG dùng để chặn/park dispatch (thay `visitCount` ở vai trò này); một can thiệp người (xem trigger-set) đưa ngân sách về lại đủ 3 cho vòng kế tiếp | — | — | trần mặc định 3, dùng chung `MAX_VISITS` |
++| 5 | Cầu dao (breaker) | Số lần chấm-trượt liên tiếp trong MỘT lần chạy (bộ nhớ trong phiên, không dẫn xuất từ nhật ký — chủ đích, vì nhật ký không phân biệt người/máy ghi); trần mặc định 3, đếm RIÊNG cho từng việc dưới dispatch song song (một việc chấm-trượt không kéo cầu dao của việc khác) | — | — | — |
++| 6 | Trần song song hai tầng | Giới hạn số việc chạy đồng thời trong một mẻ, đọc từ cấu hình committed | tầng 1 — số việc GỐC đồng thời; tầng 2 — số việc CON đồng thời trong MỖI gốc; mỗi lần nạp mẻ lấy `min(trần, số việc sẵn-sàng sau lọc quyền-sở-hữu-gốc)` | no (có mặc định) | 4 gốc × 4 con mỗi gốc |
++| 7 | Quyền sở-hữu gốc | Ai đang cầm mọi việc CON của một gốc trong MỘT lượt chạy — gắn lúc con đầu tiên của gốc được nhận, xả khi gốc xong; sống trong bộ nhớ của lượt chạy, KHÔNG bền qua lượt chạy khác/tiến trình khác | một định danh (per lượt chạy) | — | chưa-chủ |
+ 
+ ## Behaviors & Operations
+ 
+ ### Một vòng --once (hạnh phúc)
+ 
+-- **Runs when:** người vận hành gọi; tuần tự đúng một việc.
++- **Runs when:** người vận hành gọi; MỘT hoặc NHIỀU việc cùng lúc trong một mẻ (xem "Giao việc theo mẻ, song song có giới hạn" dưới) — mỗi việc đi đúng vòng đời dưới đây, độc lập với việc khác trong cùng mẻ.
+ - **What changes:** việc đầu frontier được claim (`todo→doing` có kỳ vọng); **ngay sau khi claim, runner ghi nửa DỰ ĐOÁN của một bản ghi kết quả (outcome) cho việc đó** — tier dự kiến, số dep, số lần nhận trước đó (xem spec Work-State); worktree + nhánh `fgw/<id>` mở ra từ đỉnh cây chính; trợ lý chạy nền với prompt dựng từ chính việc đó (mục tiêu / mô tả gốc nguyên văn / ranh giới worktree / proof kỳ vọng / cấm tự ghi trạng thái — cộng thêm một mục Human feedback khi item mang câu trả lời làm-rõ mới nhất và/hoặc lý do từ-chối/đỗ mới nhất, xem R23), dưới quyền TỐI THIỂU khai trong `.fgos-runner.json` (xem R6), model chọn theo tier của việc; trợ lý tự commit trong worktree; **runner tự chạy lệnh proof của việc trong worktree** — không tin lời trợ lý; đạt → `doing→proposed`, và **CÙNG LÚC runner ghi nửa THỰC TẾ tương ứng** (kết cục `proposed`, goal-check đạt, số lần thử, số commit, số lần nhận) — đo từ chính goal-check/kiểm nhánh của runner, không bao giờ từ lời tự báo của trợ lý; worktree dọn đi, **nhánh ở lại** làm đề xuất.
+ - **Side effects:** đúng các sự kiện chuyển trạng thái trong nhật ký; output chạy chỉ in console, không bao giờ ghi vào cây committed.
+ - **Afterwards:** người vận hành thấy việc ở `proposed` + nhánh để review; việc phụ thuộc CHƯA mở (chờ duyệt/merge → `done`); vòng --once thứ hai không giao lại việc nào (frontier trống).
+ 
++### Giao việc theo mẻ, song song có giới hạn, giữ quyền-sở-hữu-gốc
++
++- **Runs when:** ngay sau quét làm-rõ + quét chia-việc, và lặp lại mỗi khi một mẻ vừa dispatch xong (một hoặc nhiều việc trong mẻ tới kết cục cuối).
++- **What changes:** đọc lại TOÀN BỘ tập việc sẵn-sàng tươi; lọc theo quyền sở-hữu gốc — một việc chỉ lọt vào mẻ nếu gốc của nó CHƯA có chủ, hoặc đã thuộc về CHÍNH lượt chạy này (một chủ khác giành nhận cùng gốc bị từ chối, cùng khuôn kỳ-vọng-lệch của mọi cửa nhận việc khác — trên một máy chỉ một chủ tồn tại nên đường từ-chối này hiếm khi thật sự xảy ra, nhưng vẫn được kiểm mỗi lần); nhóm phần còn lại theo gốc, lấy tối đa N gốc, mỗi gốc lấy tối đa M con (trần hai tầng, Data Dictionary #6); mỗi việc trong mẻ được nhận (`todo→doing`) qua đúng MỘT cửa ghi tuần tự (xem R24) — dù nhiều việc thi công song song, quyết-nhận và ghi-nhận của từng việc vẫn nối tiếp nhau, không bao giờ hai lượt nhận chen lẫn; việc bị từ chối nhận ở lại chờ mẻ sau, không mất.
++- **Side effects:** mỗi việc trong mẻ chạy vòng đời "Một vòng --once" ở trên, đồng thời với việc khác trong CÙNG mẻ, cho tới kết cục cuối của từng việc (đề xuất, đỗ, hoặc dừng).
++- **Afterwards:** mẻ xong (mọi việc trong mẻ đã tới kết cục) → đọc lại tập sẵn-sàng TƯƠI (việc vừa xong có thể mở khóa việc phụ thuộc, hoặc mở khóa chính gốc của nó nếu đó là con cuối cùng) rồi nạp mẻ kế tiếp — lặp tới khi KHÔNG còn việc đang chạy VÀ KHÔNG còn việc sẵn-sàng, vòng --once mới kết thúc thật sự.
++
++### Cây nhánh tích hợp — con nhập vào nhánh của gốc, chỉ gốc nhập vào cây chính
++
++- **Runs when:** mỗi lần một việc CON (có việc cha, xem spec Work-State "Giai đoạn Chia-việc") được dispatch hoặc đề xuất của nó được duyệt.
++- **What changes:** một việc GỐC (không việc cha, hoặc chính là đỉnh một cây) mở nhánh đề xuất riêng như mọi việc khác (Data Dictionary #2) — nhánh đó nay CŨNG đóng vai nhánh tích hợp của cả cây hậu duệ nó. Một việc CON mở worktree từ ĐỈNH nhánh của gốc nó (không phải từ cây chính) — kế thừa mọi việc anh em cùng gốc đã nhập trước nó. Đề xuất của một việc CON, khi qua cổng duyệt PR nội bộ, nhập vào NHÁNH CỦA GỐC — không bao giờ nhập thẳng vào cây chính. Một việc ĐỘC LẬP (không con, không cha) đi đúng đường cũ không đổi: đề xuất của nó nhập thẳng vào cây chính như trước.
++- **Afterwards:** chỉ khi TOÀN BỘ con của một gốc đã `done`, gốc mới tới lượt sẵn-sàng dispatch (cơ chế lineage sẵn có, xem spec Work-State) — verify của chính gốc lúc đó chạy trên nhánh của gốc (đã chứa mọi con đã nhập) như phép kiểm tích hợp cho cả cây; gốc đi tiếp đúng vòng đời và cổng duyệt như mọi việc khác, và CHỈ đề xuất của gốc mới nhập vào cây chính, đúng một lần cho cả tính năng. Bảo đảm nghiệp vụ: cây chính không bao giờ nhận một mảnh dở của một tính năng nhiều-việc — chỉ nhận nguyên vẹn khi toàn bộ cây đã xong (xem R25).
++
++### Trôi tích hợp & đồng bộ lại tại gốc→cây chính (integration drift)
++
++- **Runs when:** cổng duyệt PR nội bộ (`approve`) xử lý đề xuất của một GỐC từng có con (đã đi qua cây nhánh tích hợp ở trên).
++- **What changes:** trước khi nhập vào cây chính, hệ thống kiểm CẢ HAI điều kiện: (a) nhập có xung đột văn bản không; (b) SAU khi nhập (nhưng CHƯA chốt), verify của chính gốc chạy lại trên cây đã nhập — đại diện cho "cả tính năng cộng với mọi thứ khác đã vào cây chính từ lúc gốc bắt đầu vẫn đúng cùng nhau", không chỉ "nhập được không xung đột". Xung đột văn bản HOẶC verify đỏ ở bước (b) đều bị coi ngang nhau — cả hai là TRÔI tích hợp: hủy sạch việc nhập (cây chính giữ nguyên, không bao giờ giữ một nhập xanh-mà-gãy), gốc đỗ lại mang lý do trôi-tích-hợp RIÊNG (phân biệt với lý do gãy-nhập thường của một việc không-con) cùng dấu vết chỗ cây chính đang đứng lúc đó.
++- **Afterwards:** gốc đỗ vì trôi tích hợp chờ người gọi đồng bộ lại (xem "Đồng bộ lại một việc đỗ (catch-up)" dưới); nhập sạch + verify xanh ở bước (b) → gốc `done`, tính năng hoàn tất trên cây chính.
++
++### Đồng bộ lại một việc đỗ (catch-up)
++
++- **Runs when:** người vận hành gọi `fgos catchup <id>` trên một việc đang `blocked` vì gãy nhập (xung đột, verify đỏ sau nhập, hoặc trôi tích hợp).
++- **Blocked when:** việc không tồn tại — `validation`; việc không ở `blocked` — `precondition`; lý do đỗ hiện tại không thuộc nhóm gãy-nhập (vd đỗ vì chạm trần chống-lặp, hoặc gặt-do-crash) — `validation`, đồng bộ-lại không giúp được những lý do đó, người phải cầm việc qua cửa pull để tự sửa tay; nhánh riêng của việc không còn tồn tại — `validation`.
++- **What changes:** hệ thống xác định ĐÍCH cần đồng bộ — nhánh của gốc nếu việc là con, cây chính nếu việc là gốc/độc lập — rồi kéo trạng thái MỚI NHẤT của đích vào nhánh riêng của việc (nhập, chưa chốt), chạy verify của chính việc trên kết quả TRƯỚC KHI chốt: nhập sạch + verify xanh → chốt, việc chuyển thẳng `blocked → sẵn sàng nộp lại` — KHÔNG đi qua `đang làm`, một bước CƠ HỌC không tính vào ngân sách chống-lặp của việc; còn xung đột → hủy sạch việc nhập vừa thử, việc giữ nguyên `blocked`, thông báo tên các tệp xung đột cho người tự xử lý; verify đỏ sau khi nhập sạch → cũng hủy sạch, việc giữ nguyên `blocked`, người phải tự điều tra vì sao đồng bộ xong mà verify vẫn gãy — cả hai đường thất bại này KHÔNG có cơ chế agent tự giải xung đột (đó là mở rộng sau, xem Open Gaps).
++- **Side effects:** không gì ngoài dấu vết trên nhánh riêng của chính việc đó (khi thành công) — cây chính/nhánh của gốc không bao giờ bị đụng bởi lệnh này.
++- **Afterwards:** đồng bộ thành công → việc actionable lại qua đúng cổng duyệt PR nội bộ như một đề xuất bình thường, không cần nộp lại từ đầu; đồng bộ thất bại → việc vẫn đỗ, người chọn giữa gọi lại `catchup` sau khi đích đổi tiếp, hoặc cầm việc qua cửa pull để tự làm-lại tay — đường làm-lại tay CÓ tính vào ngân sách chống-lặp (đi qua `đang làm` bình thường), phân biệt với đường cơ học ở trên (xem R28).
++
+ ### Quét làm-rõ trước dispatch (clarify sweep)
+ 
+ - **Runs when:** mỗi lượt chạy, ngay sau gặt-lại, TRƯỚC khi giao bất kỳ việc
+@@ -127,6 +158,14 @@ trong ba nguồn: **runner** (nhánh `fgw/<id>` tồn tại — `git rev-parse
+ `headAtReturn`), hoặc **legacy** (không cả hai — đề xuất từ trước feature này,
+ hoặc nhánh/dấu vết đã mất).
+ 
++Song song với phân loại NGUỒN ở trên, một đề xuất nguồn **runner** còn được phân
++biệt theo TẦNG trong cây nhánh tích hợp (xem "Cây nhánh tích hợp" trên): một đề
++xuất **con** (có việc cha) so sánh/nhập với NHÁNH CỦA GỐC nó thay vì cây chính;
++một đề xuất **gốc/độc lập** so sánh/nhập với cây chính như trước, không đổi. Một
++việc con gãy nhập mang đúng lý do gãy-nhập sẵn có (`merge-conflict`/`verify-fail-
++post-merge`) như mọi nhập gãy khác; lý do trôi-tích-hợp riêng chỉ dành cho một
++GỐC từng có con gãy nhập vào CÂY CHÍNH (xem "Trôi tích hợp & đồng bộ lại" trên).
++
+ - **Runs when:** người vận hành gọi `fgos review <id>` / `fgos approve <id>
+   [--timeout <ms>]` / `fgos reject <id> --reason "..."` trên một item đang
+   `proposed`.
+@@ -218,13 +257,14 @@ sức khỏe cho toàn bộ vòng compounding.
+ | Ghi trạng thái trong vòng dispatch | — (ngoài vòng vẫn ghi tay được) | ✓ duy nhất, qua một cửa | — CẤM (bằng chỉ dẫn) |
+ | Commit trong worktree/nhánh riêng | — | — | ✓ |
+ | Sửa cây làm việc chính | ✓ | — | — CẤM (bằng chỉ dẫn + kết quả chỉ là đề xuất) |
++| Đồng bộ lại một việc đỗ vì gãy nhập (`catchup`) | ✓ | — | — |
+ 
+ ## Business Rules
+ 
+ - **R1.** Trong vòng dispatch, runner là người ghi duy nhất qua một cửa; worker không bao giờ tự ghi trạng thái (per D3 phase-2-routing / feed7428).
+ - **R2.** Kết quả worker là ĐỀ XUẤT mức bền D1: commit trên nhánh `fgw/`, phải qua người duyệt mới thành `done`; không bao giờ tự merge (per D4; auto-merge là backlog P9).
+ - **R3.** Runner tự chạy proof của việc làm goal-check — lời trợ lý không bao giờ là bằng chứng (per D3).
+-- **R4.** Tuần tự một việc một lúc; nâng song song chỉ sau khi chống-lặp chứng minh trong vận hành thật (A1 — ngưỡng tên, backlog P6).
++- **R4 (giao việc theo mẻ, giới hạn hai tầng, quyền-sở-hữu-gốc giữ nguyên trong lượt chạy).** Một lượt chạy giao TỐI ĐA N việc cùng lúc, giới hạn qua cấu hình hai tầng — số gốc đồng thời × số con đồng thời mỗi gốc (Data Dictionary #6); mọi con của MỘT gốc luôn về tay cùng một chủ trong suốt một lượt chạy (Data Dictionary #7, xem R26); dispatch nạp lại mẻ tới khi không còn việc đang chạy VÀ không còn việc sẵn-sàng. Chống-lặp qua vận hành thật (A1) là điều kiện đã chứng minh TRƯỚC khi song song được dựng — không còn là một ngưỡng-tên treo chờ (per D5/D10/D13/D14/D15 fan-out-parallel / 2e92b7a5).
+ - **R5.** Model chọn theo tier của việc qua bảng cấu hình (per D6); tập tier reconcile một nguồn tại đây.
+ - **R6.** Chống đỡ bằng CHỈ DẪN + nhánh-vứt-được, KHÔNG phải sandbox OS/container. Worker headless chạy dưới tập quyền TỐI THIỂU khai tường minh trong `.fgos-runner.json` `executor.args`: `--permission-mode acceptEdits` (tự nhận sửa file) cộng đúng `--allowedTools "Bash(git add:*),Bash(git commit:*)"` — không rộng hơn; `--dangerously-skip-permissions` bị BÁC có chủ đích (worker chỉ cần sửa-file + commit trong worktree, prompt đã cấm merge/push/tự gọi fgos, và goal-check không tin lời trợ lý — R13 — nên quyền rộng hơn là rủi ro không cần) (per worker-execution / 22699c61, 04a6cd05). Root cause spike-proven (2 biến thể, claude CLI thật): thiếu allowlist này, headless `claude -p` sửa file được nhưng `git commit` treo vô thời hạn chờ duyệt tương tác → nhánh đề xuất luôn rỗng, dispatch luôn đỗ. Bất biến phải giữ: work item (nhất là trường proof — được chạy như lệnh shell) do chính người dùng tạo; không bao giờ nạp việc từ nguồn ngoài khi chưa có vòng kiểm (security panel, ghi trong hợp đồng handoff).
+ - **R7.** Lớp lỗi lạ → dừng, không bao giờ mặc định thử-lại (fail-safe).
+@@ -244,6 +284,13 @@ sức khỏe cho toàn bộ vòng compounding.
+ - **R21 (merge sạch → done tự động; gãy → hủy sạch merge dở + blocked có lý do).** `approve` trên nguồn runner không bao giờ để main ở trạng thái merge dở trên bất kỳ đường thoát nào: conflict hoặc verify đỏ sau merge đều `git merge --abort` (main nguyên vẹn byte-for-byte, chứng minh bằng spike + test thật) rồi đậu item ở `blocked` mang lý do cụ thể (`merge-conflict`/`verify-fail-post-merge`) — KHÔNG tự rebase, KHÔNG halt cả vòng runner. `done` qua approve luôn mang actor `human` (per D3 pr-lifecycle / 1359ab5e — người chạy approve là ngã-ngũ, merge chỉ là hệ quả cơ học, per vision §8 "người ở cổng").
+ - **R22 (reject không bao giờ đảo lịch sử).** `reject` là một move FSM thuần `proposed→todo` mang `reason`; không bao giờ gọi một lệnh git nào, kể cả cho một đề xuất pull-door đã có code thật trên main — code đó ở lại như lịch sử, `reject` chỉ từ-chối coi-là-xong, không revert/rewrite (per D4 pr-lifecycle / 1359ab5e).
+ - **R23 (phản hồi người threading vào prompt worker).** Prompt dựng cho worker (`buildPrompt`) mang thêm một mục `# Human feedback` TÙY CHỌN khi item mang câu trả lời làm-rõ mới nhất (fold từ cổng chờ-người, xem spec Work-State "Bản ghi cổng-người") và/hoặc lý do từ-chối/đỗ mới nhất (`item.reason`, xem spec Work-State Data Dictionary #18): câu trả lời in NGUYÊN VĂN dưới nhãn quyết-định-cuối-cùng-ràng-buộc, lý do mới nhất in NGUYÊN VĂN dưới nhãn ưu-tiên-sửa-trước-tiên. Vắng cả hai → mục này KHÔNG xuất hiện, prompt giữ nguyên byte-identical hình cũ (cộng thêm thuần, không phá vỡ hợp đồng 4 section pin sẵn có). Runner đọc lại view TƯƠI ngay trước khi spawn worker (item truyền vào dispatch có thể cũ hơn move gần nhất của chính lượt gặt-lại/quét) rồi truyền `feedback: {answer, reason}` xuống `spawnWorker`. Đây là cách một vòng reject hội tụ: dogfood-thật cho thấy không có mục này, worker vòng sau lặp lại đúng đề xuất vừa bị từ chối vì không thấy lý do (per worker-execution P33 / 396d9d9e).
++- **R24 (một-người-ghi vẫn giữ nguyên dưới song song, qua một cửa ghi tuần tự).** Dù nhiều việc thi công đồng thời trong một mẻ, MỌI thay đổi trạng thái (nhận việc, đề xuất, đỗ, nhập) đi qua ĐÚNG một cửa ghi tuần tự — một giao dịch ghi trọn vẹn rồi mới tới giao dịch kế tiếp, không bao giờ hai thay đổi chen lẫn nhau giữa chừng. Đây là hệ quả trực tiếp của R1 dưới điều kiện mới: song song ở việc THỰC THI (nhiều worker chạy đồng thời), không phải ở việc GHI (per D16 fan-out-parallel).
++- **R25 (cây chính chỉ nhận nguyên một tính năng đã xong, không mảnh dở — SUPERSEDE quyết định trước đó).** Một việc CON không bao giờ nhập thẳng vào cây chính — nó nhập vào nhánh của GỐC nó; chỉ đề xuất của chính GỐC (sau khi mọi con đã xong) mới nhập vào cây chính, đúng một lần cho cả tính năng. Điều này THAY quyết định trước đây ("mỗi việc một đề xuất, thẳng vào cây chính") trong bối cảnh một việc có con — quyết định cũ vẫn đúng nguyên vẹn cho một việc ĐỘC LẬP (không con), đi thẳng đường cũ không đổi (per D2/D3 fan-out-parallel / 2e92b7a5, supersede-in-context quyết định D2 pr-lifecycle).
++- **R26 (quyền-sở-hữu-gốc — mọi con của một gốc về tay cùng một chủ trong một lượt chạy).** Lúc con ĐẦU TIÊN của một gốc được nhận trong một lượt chạy, gốc đó gắn chủ; con tiếp theo của CÙNG gốc chỉ được nhận bởi ĐÚNG chủ đó — một chủ khác giành nhận bị từ chối (cùng khuôn kỳ-vọng-lệch của mọi cửa nhận việc khác), việc đó ở lại chờ mẻ sau. Chủ xả khi gốc xong. Bảo vệ nguyên tắc "mọi con của một gốc chung một không gian làm việc" (per D5/D13 fan-out-parallel).
++- **R27 (nhập gốc→cây chính bắt CẢ xung đột văn bản LẪN trôi ngữ nghĩa im lặng).** Một GỐC từng có con, lúc nhập vào cây chính, được kiểm CẢ hai: nhập có xung đột văn bản không, VÀ sau khi nhập (chưa chốt) verify của chính gốc còn xanh không trên cây đã nhập — verify đỏ ở bước này là TRÔI ngữ nghĩa (nhập sạch nhưng kết hợp gãy), bị coi ngang xung đột văn bản: hủy sạch, cây chính không bao giờ giữ một nhập xanh-mà-gãy (per D6/D9 fan-out-parallel / f0c40acc). Vì đây là phép kiểm DUY NHẤT cho cả cây hậu duệ, verify của gốc phải đủ mạnh lúc soạn — verify mỏng bỏ lọt trôi ngữ nghĩa.
++- **R28 (đồng bộ-lại sạch = cơ học không đếm; làm-lại tay = có đếm).** Một việc đỗ vì gãy nhập được đồng bộ-lại: nếu sau khi kéo đích mới nhất vào, nhập sạch VÀ verify xanh, việc trở lại sẵn sàng nộp lại theo đường cơ học (không qua "đang làm", không tính vào ngân sách chống-lặp của việc) — phân biệt với người CHỌN cầm việc qua cửa pull để tự làm-lại tay, đường đó QUA "đang làm" như bình thường và ĐƯỢC đếm (per D11/D18 fan-out-parallel).
++- **R29 (cổng chống-lặp reset theo can thiệp người CUỐI CÙNG của chính việc, per-item, trigger-set đóng).** Cổng chặn dispatch (khác `visitCount` lifetime metric ở R13 — xem Data Dictionary #4/#4b) đếm `visitsSinceLastHumanEvent`: số lần việc vào `doing` KỂ TỪ sự kiện người cuối cùng của CHÍNH việc đó. Trigger-set đóng — chỉ hai hình reset: việc rời `awaiting-human` bằng một câu trả lời của người (`answer`, actor `human`), hoặc một move mang `reason` VỚI actor `human` (reject/park do người quyết). Một lần resume trần (`blocked→todo` không `reason`), một lần người `take` việc (`blocked→doing`, actor `human`, không `answer`/`reason`), và mọi move của chính runner (kể cả park mang `reason` của chính nó) đều KHÔNG reset — chỉ tính là một visit như mọi lần khác. Không có sự kiện người nào của việc → ngân sách bằng đúng lifetime `visitCount` (một vòng lỗi máy thuần vẫn chết ở trần 3, không đổi). `MAX_VISITS=3` và mọi call site của `visitCount` (outcome/metric đã ship) giữ nguyên — chỉ điểm CHẶN DISPATCH đổi công thức đếm (per D1 human-rounds / 5a6900b2).
++- **R30 (cửa người-hoàn-tất một đề xuất nguồn-nhánh bị đỗ — mở rộng take/return, không verb mới).** Một việc `blocked` mang nhánh đề xuất còn sống (`fgw/<id>`) — kể cả bị đỗ do chạm trần chống-lặp — có cửa công khai để người hoàn tất: `take` claim qua cạnh `blocked→doing` sẵn có, ghi `branchHeadAtTake` (HEAD của NHÁNH lúc take — discriminator DUY NHẤT của nguồn-nhánh, không dùng `classifySource` để phân biệt vì nó ưu-tiên-nhánh); người commit thêm lên nhánh; `return` kiểm `branchHeadAtTake` TRƯỚC mọi guard main-based (cây làm việc chính của người không bao giờ bị đọc/đụng), verify chạy trong một worktree TẠM, DETACHED tại đúng SHA của nhánh (không bao giờ checkout theo tên, không `reclaimOrphanedCheckout` — an toàn cả khi người đang đứng trên chính nhánh đó ở một worktree khác) → sạch + xanh → `proposed` mang `branchHeadAtReturn`; **TUYỆT ĐỐI không ghi `headAtReturn`** cho nguồn-nhánh (trộn hai marker cho `reviewDiff` một dải vô nghĩa). Không commit mới trên nhánh, hoặc verify đỏ trong worktree tạm → từ chối rõ lý do, việc giữ nguyên `doing`. Một đề xuất hoàn tất theo đường này đọc nguồn là `runner` như bình thường (nhánh `fgw/<id>` còn sống — không cần đổi `classifySource`/`merge.mjs`) và đi qua CÙNG cổng duyệt PR nội bộ (per D2 human-rounds / 5a6900b2, xem spec Work-State "Cửa pull giao–nhận việc").
+ 
+ ## Edge Cases Settled
+ 
+@@ -269,12 +316,29 @@ sức khỏe cho toàn bộ vòng compounding.
+ - Merge conflict thật trên một main đã rẽ nhánh: sau `approve` bị hủy, cây làm việc NGUYÊN VẸN byte-for-byte (HEAD không đổi, tracked tree sạch, nội dung file không đổi) — chứng minh bằng e2e thật, không chỉ spike.
+ - Vòng đủ của một item pull-door qua cổng duyệt: `take` → commit → `return` → `review` → `approve` (không bước merge, per D4) → `done` — chứng minh bằng e2e qua binary thật.
+ - `reject` một item pull-door: commit của nó vẫn là lịch sử THẬT trên main sau reject (D4 no-auto-revert) — chứng minh bằng e2e thật.
++- Hai việc độc lập (không chung gốc, không phụ thuộc nhau) dispatch trong CÙNG một mẻ đều tới đề xuất, và nhật ký sự kiện sau đó dựng lại đúng nguyên vẹn — chứng minh bằng một cửa sổ chồng-lấn THẬT giữa hai việc (không phải suy luận từ thời gian tường trình, vốn cũng đúng cho hai lần chạy tuần tự trông giống song song).
++- Quyền-sở-hữu-gốc dưới hai chủ tranh cùng một gốc: chủ thứ hai luôn bị từ chối nhận, không có cửa sổ nào cả hai cùng nhận được cùng lúc — chứng minh bằng kịch bản đối đầu 2 tác nhân trước khi cell dựng thật, giữ nguyên khi dựng thật.
++- Nhập xung đột thật ở tầng con→nhánh-của-gốc VÀ ở tầng gốc→cây chính: cả hai hủy sạch bằng đúng một cơ chế đã chứng minh cho việc-độc-lập trước đây — nhánh/cây nguyên vẹn sau khi hủy, không có tầng nào cần cơ chế riêng.
++- Đồng bộ-lại thành công thật (đích đổi không đụng cùng chỗ với việc): việc chuyển thẳng từ đỗ về sẵn sàng nộp lại mà không đi qua "đang làm" — chứng minh bằng kịch bản thật, không rút gọn.
++- Đồng bộ-lại gặp xung đột thật (đích đổi đụng đúng chỗ với việc): hủy sạch, việc giữ nguyên đỗ, nhánh của việc không đổi tip — chứng minh bằng kịch bản xung đột thật (không phải một xung đột dựng tắt), cùng cơ chế chứng minh cho cả tầng con→gốc lẫn tầng gốc→cây chính.
++- Một câu trả lời làm-rõ của người (`answer`) hoặc một reject/park mang `reason` của người reset ngân sách cổng chống-lặp của chính việc đó — việc dispatch lại thay vì bị đỗ dù đã chạm trần trước đó; một resume trần (không `reason`), một `take` của người (không `answer`/`reason`), và mọi park của chính runner (kể cả mang `reason`) KHÔNG reset — chứng minh bằng test thật per-item cho từng hình, cộng một kịch bản tích hợp `runOnce` thật (R29).
++- Một vòng chỉ-máy-lỗi (không sự kiện người nào) vẫn chết đúng ở trần 3 — reset chỉ xảy ra khi CÓ can thiệp người, không phải mặc định (regression giữ nguyên cùng lúc R29 được thêm).
++- Vòng đủ của một đề xuất nguồn-nhánh từng bị đỗ (chạm trần chống-lặp): người `take` (ghi `branchHeadAtTake`) → commit thêm lên nhánh → `return` đo sạch trên worktree tạm detached tại tip nhánh → `proposed` mang `branchHeadAtReturn` (không `headAtReturn`) → `review`/`approve` (nguồn đọc là `runner`) → `done` — chứng minh bằng e2e qua binary + git thật (R30).
++- `return` nguồn-nhánh với nhánh KHÔNG có commit mới kể từ `branchHeadAtTake`: từ chối rõ lý do, việc giữ nguyên `doing`, không đổi tip nhánh — chứng minh bằng test thật.
++- `return` nguồn-nhánh trong khi người đang đứng trên chính nhánh `fgw/<id>` đó ở một worktree khác: worktree tạm detached không đụng worktree của người (snapshot trước/sau byte-identical) — chứng minh bằng kịch bản hai-worktree thật, không phải suy luận.
+ 
+ ## Open Gaps
+ 
+ - Nhiều lượt `check` chạy đồng thời trên cùng một kho chưa có cơ chế khóa/chống-tranh-chấp cho dòng lịch sử xu hướng (khác với nhật ký sự kiện chính, vốn đã có CAS) — cùng tinh thần ngưỡng-chưa-tới của R10 Work-State, mở lại khi ghi đồng thời thành tải chính.
+ - Tên nhánh trục (trunk) của cổng duyệt hiện là literal `"main"` (`merge.mjs`) — một host project dùng tên nhánh trục khác (vd `master`) sẽ gãy `approve`/`review`; đề xuất là tự phát hiện trunk lúc init/config thay vì literal (friction filed khi viết e2e cell pr-lifecycle-3, layer task-spec, severity P3 — xem `.bee/backlog.jsonl`).
+-- Một vòng reject do người kích hoạt tiêu CÙNG ngân sách chống-lặp (visitCount, R23 spec Work-State) với vòng thất bại kỹ thuật — không có ngân sách riêng cho "hội tụ bằng phản hồi": một item có thể chạm trần chống-lặp (`todo→blocked`) trước khi worker kịp thấy lý do từ-chối mới nhất trong prompt (R23 trên). Thêm nữa, một đề xuất nguồn runner bị đỗ đúng lúc chạm trần chống-lặp không còn cửa công khai nào để người hoàn tất đề xuất đó — nhánh `fgw/<id>` vẫn còn sống nhưng không luồng nào dẫn người trở lại nó (worker-execution / P34, xem `docs/backlog.md`).
++- Chưa có escalation tự động khi một việc trải qua NHIỀU vòng người liên tiếp mà vẫn chưa hội tụ (vd item nổi lên "cần bàn sâu" sau N vòng người) — R29 chỉ mở lại ngân sách theo can thiệp người, không giới hạn tổng số vòng người; escalation dạng đó cần intent-scoring và deferred có chủ đích (human-rounds D1, xem `docs/backlog.md` P8).
++- Nhiều tiến trình/máy ghi trạng thái thật cùng lúc (đa-writer, đa-máy) chưa được dựng — quyền-sở-hữu-gốc hôm nay chỉ sống trong bộ nhớ của MỘT lượt chạy, không bền qua tiến trình/máy khác; một lượt chạy thứ hai trên máy khác không biết gì về chủ của lượt thứ nhất (deferred, backlog P27).
++- Nạp mẻ mới hôm nay là chờ-mẻ-trước-xong-rồi-đọc-lại (poll khi một việc trong mẻ hoàn tất), không phải phản ứng tức thời theo tín hiệu bên ngoài; và vòng chạy vẫn kết thúc khi hết việc (không sống liên tục chờ việc mới) — cả hai là ranh giới có chủ đích với một cơ chế phản ứng-theo-tín-hiệu-liên-tục rộng hơn (deferred, backlog P8).
++- Chưa có ưu tiên nhập khi nhiều gốc cùng cạnh tranh cây chính — một gốc thua một lần đồng bộ-lại rồi thua lại lần sau (do gốc khác vào trước liên tục) không có cơ chế được ưu tiên hơn ở lần thử kế tiếp (deferred, backlog P7).
++- Khi đồng bộ-lại gặp xung đột thật, không có agent nào tự giải xung đột rồi đưa người duyệt lại — người luôn phải tự đọc và sửa tay (deferred lên một tầng cao hơn, backlog P19).
++- Chưa dự đoán trước những việc con nào của cùng một gốc khả năng chạm cùng chỗ để xếp chúng chạy nối tiếp thay vì song song — hai con cùng gốc chạm cùng chỗ vẫn ĐÚNG (một con catch-up/làm-lại), chỉ không phải TỐI ƯU (giảm việc-song-song-phí là một cải tiến hiệu năng hoãn lại, không phải một lưới đúng-sai, deferred, backlog P16).
++- Một cây nhiều hơn hai tầng (gốc-của-gốc, cháu) hôm nay chưa từng được tạo ra bởi hệ thống (phán chia-việc chỉ sinh con ở đúng một tầng dưới gốc) — cơ chế cây nhánh tích hợp phân giải MỌI con về nhánh của ĐỈNH cây (không phải nhánh của cha trực tiếp), điều này chỉ tương đương với "con nhập vào nhánh cha" khi cây đúng hai tầng; một cây sâu hơn hai tầng, nếu tương lai sinh ra được, sẽ cần xác nhận lại điều này còn đúng hay không — chưa kiểm chứng vì chưa có dữ liệu thật để thử.
++- Cổng duyệt PR nội bộ do người gọi tay không có khóa chống hai lần gọi cùng lúc trên cùng một gốc (vd người duyệt hai việc con cùng gốc gần như đồng thời, hoặc người duyệt trong khi chính vòng tự hành đang dispatch gốc đó) — rủi ro thấp dưới một người vận hành, một cửa ghi tuần tự chỉ bảo vệ phần ghi trạng thái chứ không khóa riêng thao tác nhập của cổng duyệt tay; chưa xảy ra thật, ghi nhận như một giả định chưa kiểm.
+ 
+ ## Visuals
+ 
+@@ -283,15 +347,18 @@ Not applicable — không có màn hình.
+ ## Pointers (implementation)
+ 
+ - `bin/fgos-runner.mjs` — CLI (--once/--dry-run/--config), exit theo phạm trù
+-- `src/runner/loop.mjs` — vòng + startup reap (SKIP claim `human`/`session` — xem "Gặt-lại lúc khởi động") + khoá liên-tiến-trình `.fgos/runner.lock` (busy exit 6); NGAY SAU reap, TRƯỚC vòng dispatch: (1) quét mọi item `stage==='clarify' && status==='todo'` (không đọc `item.mode`) và gọi `resolveDiscovery` (`src/intake/discovery.mjs`) cho từng item, truyền `'runner'`; (2) đọc lại view tươi rồi quét mọi item `stage==='decompose' && status==='todo'` và gọi `resolveDecompose` (`src/intake/decompose.mjs`) cho từng item, cùng truyền `'runner'` — cùng lượt chạy có thể chaining cả hai sweep trên một item vừa rời clarify; ghi bản outcome dự đoán tại claim + thực tế ở cả hai lối ra cuối (thành đề xuất, hoặc đỗ/dừng) qua `addOutcome` của store; mọi `moveWork` runner tự gọi (claim/propose/park) truyền `actor:'runner'`; gọi `runGoalCheck` (từ `goal-check.mjs`, không còn tự triển khai) cho cả proof lúc dispatch lẫn proof lúc gặt-lại; ngay trước khi spawn worker, đọc lại view TƯƠI qua `listWork(dir)` rồi truyền `feedback: {answer: view.gates?.[item.id]?.answer, reason: view.work?.[item.id]?.reason}` vào `spawnWorker` (per worker-execution P33 / 396d9d9e, xem R23); `dispatch.mjs` — prompt/config/spawn (argv-only, spawnSync timeout; caveat grandchild SIGTERM ghi trong doc comment) + `resolveExecutorCommand`/`modelForTier` (tái dùng bởi discovery.mjs VÀ decompose.mjs cho lời gọi model phán); `buildPrompt(work, feedback?)` dựng 5 section cố định (Goal, Description, Worktree boundary, Expected proof, Constraints — hợp đồng test pin presence) cộng mục `# Human feedback` TÙY CHỌN khi `feedback.answer`/`feedback.reason` có mặt (nguyên văn, xem R23); `description` là `work.description` nguyên văn, degrade "(không có)" khi vắng (per discovery-context P30); `spawnWorker(work, cfg, cwd, opts)` nhận `opts.feedback` truyền xuống `buildPrompt`; `worktree.mjs` — lifecycle + reclaimOrphanedCheckout; `recovery.mjs` — 8 lớp; `anti-loop.mjs` — visitCount/breaker
++- `src/runner/loop.mjs` — vòng + startup reap (SKIP claim `human`/`session` — xem "Gặt-lại lúc khởi động") + khoá liên-tiến-trình `.fgos/runner.lock` (busy exit 6); NGAY SAU reap, TRƯỚC vòng dispatch: (1) quét mọi item `stage==='clarify' && status==='todo'` (không đọc `item.mode`) và gọi `resolveDiscovery` (`src/intake/discovery.mjs`) cho từng item, truyền `'runner'`; (2) đọc lại view tươi rồi quét mọi item `stage==='decompose' && status==='todo'` và gọi `resolveDecompose` (`src/intake/decompose.mjs`) cho từng item, cùng truyền `'runner'` — cùng lượt chạy có thể chaining cả hai sweep trên một item vừa rời clarify; ghi bản outcome dự đoán tại claim + thực tế ở cả hai lối ra cuối (thành đề xuất, hoặc đỗ/dừng) qua `addOutcome` của store; mọi `moveWork` runner tự gọi (claim/propose/park) truyền `actor:'runner'`; gọi `runGoalCheck` (từ `goal-check.mjs`, không còn tự triển khai) cho cả proof lúc dispatch lẫn proof lúc gặt-lại; ngay trước khi spawn worker, đọc lại view TƯƠI qua `listWork(dir)` rồi truyền `feedback: {answer: view.gates?.[item.id]?.answer, reason: view.work?.[item.id]?.reason}` vào `spawnWorker` (per worker-execution P33 / 396d9d9e, xem R23); `dispatch.mjs` — prompt/config/spawn (argv-only, spawnSync timeout; caveat grandchild SIGTERM ghi trong doc comment) + `resolveExecutorCommand`/`modelForTier` (tái dùng bởi discovery.mjs VÀ decompose.mjs cho lời gọi model phán); `buildPrompt(work, feedback?)` dựng 5 section cố định (Goal, Description, Worktree boundary, Expected proof, Constraints — hợp đồng test pin presence) cộng mục `# Human feedback` TÙY CHỌN khi `feedback.answer`/`feedback.reason` có mặt (nguyên văn, xem R23); `description` là `work.description` nguyên văn, degrade "(không có)" khi vắng (per discovery-context P30); `spawnWorker(work, cfg, cwd, opts)` nhận `opts.feedback` truyền xuống `buildPrompt`; `worktree.mjs` — lifecycle + reclaimOrphanedCheckout + `createBranchRef(repoRoot, id, opts)` (tạo `fgw/<id>` chỉ-là-ref, không worktree, idempotent) + `createWorktree`'s `opts.baseRef` (fork worktree mới từ một ref chỉ định thay vì HEAD hiện tại — dùng cho con fork từ tip nhánh gốc, per D3/D4/D17); `recovery.mjs` — 8 lớp; `anti-loop.mjs` — `visitCount` (lifetime, dùng cho outcome/metric) + `visitsSinceLastHumanEvent(events, id)` (ngân sách CỔNG, per-item, reset trên `actor==='human'` mang `answer` hoặc `reason`, xem R29) + breaker; `loop.mjs`'s gate (cả nhánh dry-run đơn lẻ lẫn nhánh lọc `overLimit` của batch dispatch dưới) gọi `visitsSinceLastHumanEvent`, không còn `visitCount`, để quyết park; `createMissBreaker` nay PER-ITEM (Map theo id, `consecutiveMissesFor(itemId)`; `consecutiveMisses` getter cũ giữ nguyên qua một khóa sentinel tương thích ngược, per fan-out-parallel-5). `runOnce`'s vòng dispatch nay là pool-loop batch (D10/D13/D14/D15, cell fan-out-parallel-8): đọc TOÀN BỘ `readyWork(dir)`, lọc qua `root-affinity.mjs`'s `steerFrontier`, nhóm theo gốc và cắt còn tối đa `parallel.maxRoots × parallel.maxLeavesPerRoot` (đọc từ `.fgos-runner.json`, mặc định 4×4 khi vắng khối `parallel`), claim từng việc bên trong callback của `write-queue.mjs`'s `enqueue()` (bắt buộc — giải-và-ghi phải cùng một giao dịch hàng đợi để giữ đúng chứng minh chống-tranh-giành của D13), rồi dispatch cả mẻ đồng thời qua `Promise.allSettled`; mỗi việc claim xong xác định LEAF hay ROOT qua `root-affinity.mjs`'s `resolveRoot(view, id)` — leaf: `createBranchRef(repoRoot, rootId, {baseRef:'main'})` rồi `createWorktree(repoRoot, item.id, {worktreeDir, baseRef: branchNameFor(rootId)})`; root: `createWorktree` không đổi, tự nhiên tái dùng nhánh đã có nếu tồn tại. Mẻ xong → đọc lại `readyWork` tươi, lặp tới khi không còn việc đang chạy VÀ không còn việc sẵn-sàng (D15); `runOnce` trả `{outcome, dispatched, parked, reap, exitCode}` thay vì kết quả một item
+ - `src/runner/goal-check.mjs` — hàm goal-check dùng chung DUY NHẤT (`runGoalCheck(item, cwd, timeoutMs)`): chạy `item.verify` qua shell tại `cwd`, phán chỉ bằng exit status — trích xuất từ `loop.mjs` (stage-decompose S2-pull) để cả vòng tự hành LẪN cửa pull `fgos return` (spec Work-State) gọi đúng một bản logic, không bao giờ hai bản song song
+ - `src/intake/discovery.mjs` — xem Pointers spec Work-State (module dùng chung giữa runner và verb `discover`); verb `discover` (phiên sống) truyền `'session'`; verdict đủ rõ nay `moveStage` tới `decompose`, không còn thẳng `executing`; `judgeDiscovery` nhận thêm `view` tùy chọn (per discovery-context P30) — cả sweep của runner LẪN verb `discover` truyền view đã đọc sẵn, không lời gọi nào cần đọc thêm
+ - `src/intake/decompose.mjs` — xem Pointers spec Work-State (module dùng chung giữa runner và verb `discover` khi item ở stage `decompose`); verb `discover` (phiên sống) truyền `'session'`
+ - `src/report/entropy.mjs` — thuần, không fs/Date.now(): `computeEntropy(view)` → `{score, parts}` (5 tín hiệu có trọng số, mỗi phần giải thích được); `computeCounts(view)` → tổng phẳng outcome/friction/settlement cho seal-digest; đọc/ghi lịch sử xu hướng (`entropy-history.jsonl`, cùng thư mục dữ liệu với `events.jsonl`) và định dạng seal-digest là việc của `bin/fgos.mjs`'s verb `check`, không phải module này
+-- `.fgos-runner.json` — config committed (executor template + models light/haiku, standard/sonnet, heavy/opus + timeoutMs); `executor.args` mang `--permission-mode acceptEdits` + `--allowedTools "Bash(git add:*),Bash(git commit:*)"` (quyền TỐI THIỂU, xem R6)
++- `.fgos-runner.json` — config committed (executor template + models light/haiku, standard/sonnet, heavy/opus + timeoutMs); `executor.args` mang `--permission-mode acceptEdits` + `--allowedTools "Bash(git add:*),Bash(git commit:*)"` (quyền TỐI THIỂU, xem R6); khối `parallel` TÙY CHỌN — `maxRoots`/`maxLeavesPerRoot` (Data Dictionary #6, mặc định trong-code 4/4 khi khối vắng mặt, mọi config cũ vẫn chạy không cần sửa)
++- `src/runner/write-queue.mjs` — cửa ghi tuần tự thuần (không import fs/store): `createWriteQueue()`'s `enqueue(fn)` chạy đúng MỘT giao dịch async trọn vẹn tại một thời điểm, theo thứ tự nộp FIFO, bất kể số điểm `await` bên trong; một giao dịch throw/reject không chặn hàng đợi cho giao dịch sau (D16); hiện thực in-process của "cửa ghi" D12
++- `src/runner/root-affinity.mjs` — quyền-sở-hữu-gốc thuần (không fs/child_process, per D13): `createOwnershipStore()` (Map rootId→identity, sống trong bộ nhớ một `runOnce`, không bao giờ ghi bền); `resolveRoot(view, id)` (đi ngược `parent` tới đỉnh, có bảo vệ chu trình); `claimRoot(store, view, id, ownerIdentity)` — quyết định THUẦN (không tự ghi), người gọi áp dụng bên trong `write-queue`; `steerFrontier(readyItems, view, store, ownerIdentity)` — lọc tập sẵn-sàng còn lại việc mà gốc chưa-chủ hoặc thuộc về chính danh tính này
+ - `src/state/store.mjs` `readRawEvents` — accessor chỉ-đọc cho anti-loop (decision 14396a5c); `addOutcome` — cửa ghi outcome (mẫu `addDecision`); `moveStage`/`addDiscovery` — cửa ghi đổi-stage/bản-ghi-discovery (xem spec Work-State); `moveWork` gắn `actor` post-transition + compose bài học câu-6 khi `to==='done'` (xem Pointers spec Work-State); `moveWork` cũng nhận `headAtTake` cộng-thêm tùy chọn — chỉ cửa pull `take` truyền, runner không bao giờ truyền nên không đổi hành vi claim của chính nó; cùng khuôn, nhận `headAtReturn` — chỉ `return` truyền (per pr-lifecycle D1)
+-- `bin/fgos.mjs` verb `take`/`return` — cửa pull giao–nhận việc ngoài vòng runner, `return` gọi thẳng `runGoalCheck` ở trên (xem spec Work-State "Cửa pull giao–nhận việc" cho hợp đồng đầy đủ)
+-- `src/runner/merge.mjs` — cỗ máy cơ chế của cổng duyệt (per D1-D5 pr-lifecycle / 1359ab5e), tách khỏi CLI cùng khuôn `worktree.mjs`/`goal-check.mjs`: `classifySource` (runner/pull/legacy — nhánh sống qua `worktree.mjs`'s `branchExists`, hay cặp `headAtTake`+`headAtReturn`, hay không cả hai); `reviewDiff` (diff theo nguồn + cảnh báo degrade trung thực); `mergeRunnerItem` (`git merge --no-commit --no-ff` → verify trên staged tree qua `runGoalCheck` → commit-hoặc-abort, spike-proven); `cleanupMergedBranch` (dọn nhánh/worktree sau merge sạch, best-effort). KHÔNG BAO GIỜ ghi `.fgos/` trực tiếp — mọi chuyển trạng thái (`proposed→done`/`proposed→blocked`) vẫn ở `bin/fgos.mjs` qua `store.mjs`. Manifest layer (`docs/architecture-manifest.json`): infra
+-- `bin/fgos.mjs` verb `review`/`approve`/`reject` — cổng duyệt PR nội bộ, bề mặt CLI của cổng duyệt một-cửa (xem "Cổng duyệt PR nội bộ" trên cho hợp đồng đầy đủ)
++- `bin/fgos.mjs` verb `take`/`return` — cửa pull giao–nhận việc ngoài vòng runner, `return` gọi thẳng `runGoalCheck` ở trên (xem spec Work-State "Cửa pull giao–nhận việc" cho hợp đồng đầy đủ); `take` nay CŨNG chấp nhận một item `blocked` mang nhánh `fgw/<id>` sống (`branchExists`, `worktree.mjs`) qua cạnh `blocked→doing`, ghi `branchHeadAtTake` thay vì `headAtTake`; `return` kiểm `item.branchHeadAtTake` TRƯỚC MỌI guard main-based — nguồn-nhánh verify trong worktree tạm detached tại SHA nhánh (`git worktree add --detach`, dọn trong `finally`), ghi `branchHeadAtReturn`, không bao giờ `headAtReturn` (R30, xem spec Work-State "Cửa pull giao–nhận việc")
++- `src/runner/merge.mjs` — cỗ máy cơ chế của cổng duyệt (per D1-D5 pr-lifecycle / 1359ab5e), tách khỏi CLI cùng khuôn `worktree.mjs`/`goal-check.mjs`: `classifySource` (runner/pull/legacy — nhánh sống qua `worktree.mjs`'s `branchExists`, hay cặp `headAtTake`+`headAtReturn`, hay không cả hai); `reviewDiff(repoRoot, item, opts)` (diff theo nguồn + cảnh báo degrade trung thực; `opts.trunk` TÙY CHỌN mặc định `'main'`, per D3 fan-out-parallel — cây nhánh tích hợp truyền nhánh của gốc cho một đề xuất con); `mergeRunnerItem` (`git merge --no-commit --no-ff` → verify trên staged tree qua `runGoalCheck` → commit-hoặc-abort, spike-proven; target-agnostic — người gọi checkout đúng nhánh đích trước, cây chính cho gốc hoặc nhánh của gốc cho con); `cleanupMergedBranch` (dọn nhánh/worktree sau merge sạch, best-effort). KHÔNG BAO GIỜ ghi `.fgos/` trực tiếp — mọi chuyển trạng thái (`proposed→done`/`proposed→blocked`) vẫn ở `bin/fgos.mjs` qua `store.mjs`. Manifest layer (`docs/architecture-manifest.json`): infra
++- `bin/fgos.mjs` verb `review`/`approve`/`reject` — cổng duyệt PR nội bộ, bề mặt CLI của cổng duyệt một-cửa (xem "Cổng duyệt PR nội bộ" trên cho hợp đồng đầy đủ); `review`/`approve` nay leaf-vs-root-aware qua `root-affinity.mjs`'s `resolveRoot(view, id)`: một đề xuất con gọi `reviewDiff(..., {trunk: branchNameFor(rootId)})` và `approve` nhập vào một worktree ephemeral checkout trên `fgw/<rootId>` (không phải cây chính của người vận hành) rồi dọn nhánh con đó TỪ CHÍNH worktree ephemeral đó (`git branch -d` chỉ thành công từ checkout đã thật sự chứa merge); một đề xuất gốc từng có con (`view.work` có item nào `parent===id`) mà nhập-vào-cây-chính gãy mang lý do `integration-drift` riêng cộng dấu vết `main@<sha hiện tại>` trong chi tiết friction, thay vì lý do gãy-nhập thường (D8); gốc không con giữ nguyên hành vi/lý do cũ, không đổi
++- `bin/fgos.mjs` verb `catchup <id>` — đồng bộ lại một việc `blocked` (xem "Đồng bộ lại một việc đỗ (catch-up)" trên): tiền điều kiện chấp nhận lý do đỗ ∈ {`merge-conflict`, `verify-fail-post-merge`, `integration-drift`} và nhánh riêng của việc còn tồn tại (`branchExists`); đích = `branchNameFor(resolveRoot(view,id))` nếu là con, `'main'` nếu là gốc/độc lập; mở worktree ephemeral trên chính nhánh của việc, `git merge --no-commit --no-ff <đích>` → xung đột thật → `git merge --abort` + giữ nguyên `blocked`; sạch → `runGoalCheck` trên cây đã stage TRƯỚC khi commit → đỏ → `git merge --abort` + giữ nguyên `blocked`; xanh → commit rồi `moveWork(..., to:'proposed', expectedStatus:'blocked')` — cạnh D18, không `reason`, không qua `doing` (per D6/D7/D11, spike `.bee/spikes/fan-out-parallel/catchup-real-conflict-probe.sh` chứng minh trước khi build cell); một sự-kiện merge THỰC HIỆN TRỰC TIẾP trong verb này (không gọi `mergeRunnerItem` — hướng nhập của catch-up ngược với `mergeRunnerItem`, đích nhập VÀO nhánh của việc chứ không phải nhánh của việc nhập vào đích)
+ - `docs/routing-handoff-contract.md` — hợp đồng handoff + ranh giới tin cậy
+-- Test: `test/runner/*` (gồm `test/runner/merge.test.mjs` — unit `classifySource`/`reviewDiff`/`mergeRunnerItem`/`cleanupMergedBranch`) + `test/e2e/runner-loop.test.mjs` (executor giả, repo git tạm, bao gồm 3 kịch bản stage-clarify + 3 kịch bản stage-decompose: pass-through, chia-con-chặn-frontier, cần-người + 1 kịch bản S2-pull: `take` người + `fgos-runner --once` song song không giẫm + `return` xanh) + `test/e2e/pr-gate.test.mjs` (4 kịch bản thật qua binary + git: runner item full loop review→approve→merge→done, merge conflict thật với tree nguyên vẹn sau abort, pull-door item full loop, reject pull-door giữ commit làm lịch sử) + `test/cli/fgos.test.mjs` (unit CLI cho `take`/`return`/`review`/`approve`/`reject`: frontier-head claim, CAS conflict, dirty-tree/HEAD-chưa-tiến refusal, verify xanh/đỏ, main-never-holds-broken-merge cho cả conflict lẫn verify-fail, legacy degrade) + `test/state/replay.test.mjs` (fold `claimActor`/`headAtTake`/`headAtReturn`) + `test/report/entropy.test.mjs` (entropy thuần) + benchmark ngoài suite `docs/history/phase-3-compound-learning/reports/f4-benchmark.md` (F4, real binaries, expected-delta khai trước run); 508 test toàn suite
++- Test: `test/runner/*` (gồm `test/runner/merge.test.mjs` — unit `classifySource`/`reviewDiff`/`mergeRunnerItem`/`cleanupMergedBranch`; `test/runner/write-queue.test.mjs` — chứng minh serialize thật qua marker enter/exit không xen kẽ; `test/runner/root-affinity.test.mjs` — resolveRoot/claimRoot/steerFrontier, khuôn race 2-tác-nhân đã spike-proven; `test/runner/goal-check.test.mjs` — mới, real-fake-executor) + `test/e2e/runner-loop.test.mjs` (executor giả, repo git tạm, bao gồm 3 kịch bản stage-clarify + 3 kịch bản stage-decompose: pass-through, chia-con-chặn-frontier, cần-người + 1 kịch bản S2-pull: `take` người + `fgos-runner --once` song song không giẫm + `return` xanh + kịch bản con fork từ tip nhánh gốc) + `test/e2e/pr-gate.test.mjs` (4 kịch bản thật qua binary + git: runner item full loop review→approve→merge→done, merge conflict thật với tree nguyên vẹn sau abort, pull-door item full loop, reject pull-door giữ commit làm lịch sử) + `test/cli/fgos.test.mjs` (unit CLI cho `take`/`return`/`review`/`approve`/`reject`/`catchup`: frontier-head claim, CAS conflict, dirty-tree/HEAD-chưa-tiến refusal, verify xanh/đỏ, main-never-holds-broken-merge cho cả conflict lẫn verify-fail, legacy degrade, leaf-vs-root branch targeting, integration-drift reason, catch-up sạch/xung-đột-thật/lý-do-không-áp-dụng-được) + `test/state/replay.test.mjs` (fold `claimActor`/`headAtTake`/`headAtReturn`) + `test/state/fsm.test.mjs` (cạnh `blocked→proposed`, D18) + `test/report/entropy.test.mjs` (entropy thuần) + kịch bản chồng-lấn-thật hai việc song song trong `test/runner/loop.test.mjs` (peak-concurrency counter, không phải suy luận thời gian tường) + benchmark ngoài suite `docs/history/phase-3-compound-learning/reports/f4-benchmark.md` (F4, real binaries, expected-delta khai trước run); 625 test toàn suite (`cd repo && npm test`)
+diff --git a/docs/specs/work-state.md b/docs/specs/work-state.md
+index 3d7caaf..396f93b 100644
+--- a/docs/specs/work-state.md
++++ b/docs/specs/work-state.md
+@@ -1,8 +1,8 @@
+ ---
+ area: work-state
+ updated: 2026-07-17
+-sources: [phase-1-state-layer, phase-1-review-fixes, phase-2-routing-s1, phase-2-routing-s2, phase-3-compound-learning-s1, phase-3-compound-learning-s2, phase-3-compound-learning-s3-closeout, async-human-gate, stage-intake, stage-clarify, stage-decompose-s1, stage-decompose-s2, pr-lifecycle-s1, install-coexistence, discovery-context, worker-execution]
+-decisions: [9ac6ca50, 0790031c, 451ca088, fd17309a, 55ad2f9f, feed7428, 1a80b4d3, 65c642a8, 9f6b52c8, 9a19eea5, 96a65365, a7c099af, 43f257ae, 44936500, e1218b22, 6f2cbc47, a30a3d3c, 1359ab5e, f1715488, 8788e9bb, cfae0120, 396d9d9e]
++sources: [phase-1-state-layer, phase-1-review-fixes, phase-2-routing-s1, phase-2-routing-s2, phase-3-compound-learning-s1, phase-3-compound-learning-s2, phase-3-compound-learning-s3-closeout, async-human-gate, stage-intake, stage-clarify, stage-decompose-s1, stage-decompose-s2, pr-lifecycle-s1, install-coexistence, discovery-context, worker-execution, fan-out-parallel, human-rounds]
++decisions: [9ac6ca50, 0790031c, 451ca088, fd17309a, 55ad2f9f, feed7428, 1a80b4d3, 65c642a8, 9f6b52c8, 9a19eea5, 96a65365, a7c099af, 43f257ae, 44936500, e1218b22, 6f2cbc47, a30a3d3c, 1359ab5e, f1715488, 8788e9bb, cfae0120, 396d9d9e, 2e92b7a5, 5a6900b2]
+ coverage: full
+ ---
+ 
+@@ -35,7 +35,7 @@ Bộ nhớ công việc tự quản của forgent: nơi duy nhất ghi nhận "
+ | 1 | id | Định danh bền của work item, dạng kebab-case chữ thường, mở đầu bằng chữ cái; không trùng | ví dụ `add-login-form` | yes | — |
+ | 2 | title | Tên việc người đọc hiểu; nhận mọi ký tự unicode | free text | yes | — |
+ | 3 | kind | Loại việc (trả lời "việc này thuộc loại gì" — câu 2 của sáu câu) | free text | yes | — |
+-| 4 | status | Trạng thái vòng đời; schema từ chối giá trị ngoài sáu trạng thái này (phạm trù `validation`) kể cả qua tầng thư viện | `todo` — chưa bắt đầu · `doing` — đang làm · `blocked` — kẹt vì lỗi/runner-park, hai chiều với todo/doing; nhận thêm một cạnh vào từ `proposed` (per pr-lifecycle D3 / 1359ab5e) khi cổng duyệt gãy — merge conflict hoặc verify đỏ sau merge — mang `reason` bắt buộc, cùng khuôn enforce với `proposed→todo`; xem spec Runner "Cổng duyệt PR nội bộ" · `awaiting-human` — đậu chờ người quyết, mang một câu hỏi; runner/frontier KHÔNG BAO GIỜ pick; rời khi người trả lời (một lối vào từ `todo` hoặc `doing`, một lối ra về `todo`); đậu vô thời hạn, không timeout · `proposed` — goal-check đạt, đề xuất nằm trên nhánh chờ duyệt · `done` — đã nhận vào cây chính, TERMINAL: hai lối vào (`doing→done` thao tác tay, `proposed→done` duyệt đề xuất), không bao giờ ra | yes | `todo` |
++| 4 | status | Trạng thái vòng đời; schema từ chối giá trị ngoài sáu trạng thái này (phạm trù `validation`) kể cả qua tầng thư viện | `todo` — chưa bắt đầu · `doing` — đang làm · `blocked` — kẹt vì lỗi/runner-park, hai chiều với todo/doing; nhận thêm một cạnh vào từ `proposed` (per pr-lifecycle D3 / 1359ab5e) khi cổng duyệt gãy — merge conflict hoặc verify đỏ sau merge — mang `reason` bắt buộc, cùng khuôn enforce với `proposed→todo`; xem spec Runner "Cổng duyệt PR nội bộ"; và một cạnh RA thẳng tới `proposed` (per D18 fan-out-parallel) khi một lần đồng bộ-lại (catch-up) sạch — cạnh này KHÔNG mang `reason` (mirror khuôn cơ học của `blocked→todo`/`blocked→doing`, khác khuôn bắt-buộc-lý-do của `proposed→todo`/`proposed→blocked`) và KHÔNG BAO GIỜ đi qua `doing`; xem spec Runner "Đồng bộ lại một việc đỗ (catch-up)" · `awaiting-human` — đậu chờ người quyết, mang một câu hỏi; runner/frontier KHÔNG BAO GIỜ pick; rời khi người trả lời (một lối vào từ `todo` hoặc `doing`, một lối ra về `todo`); đậu vô thời hạn, không timeout · `proposed` — goal-check đạt, đề xuất nằm trên nhánh chờ duyệt · `done` — đã nhận vào cây chính, TERMINAL: hai lối vào (`doing→done` thao tác tay, `proposed→done` duyệt đề xuất), không bao giờ ra | yes | `todo` |
+ | 5 | deps | Các id item phải xong trước; mọi id phải tồn tại, cấm tự trỏ; "epic" chỉ là một item thường được deps trỏ vào | danh sách id | yes (rỗng được) | `[]` |
+ | 6 | risk | Mức rủi ro của việc (câu 4) | free text | yes | — |
+ | 7 | refs | Đọc gì trước / chạm contract nào (câu 1 + 3) | danh sách tham chiếu | yes (rỗng được) | — |
+@@ -50,7 +50,9 @@ Bộ nhớ công việc tự quản của forgent: nơi duy nhất ghi nhận "
+ | 16 | headAtReturn | Vị trí commit (HEAD) của host repo tại đúng thời điểm `return` đo verify XANH — cộng-thêm trên CÙNG sự kiện `work.move` đưa item `doing→proposed`; đối xứng `headAtTake` nhưng ghi ở đầu RA thay vì đầu VÀO (per pr-lifecycle D1 / 1359ab5e); nguồn diff trung thực cho cổng duyệt tính dải `headAtTake→headAtReturn` của một đề xuất pull-door (xem spec Runner "Cổng duyệt PR nội bộ") | mã commit (string), hoặc vắng mặt | no | vắng mặt (đề xuất của runner không qua `return`, hoặc mọi đề xuất tạo trước pr-lifecycle) |
+ | 17 | description | Toàn văn mô tả gốc người submit gõ — nguồn ngữ cảnh đầy đủ để context-discovery đọc lại (xem "Giai đoạn Làm-rõ" dưới), không bị cắt gọn/phân loại như `title` (per discovery-context P30 / cfae0120) | free text (không rỗng khi có mặt) | no | vắng mặt (item tạo qua `add`, hoặc mọi item tạo trước tính năng này) |
+ | 18 | reason | Lý do từ-chối/đỗ MỚI NHẤT của item — fold từ trường `reason` trên sự kiện `work.move` gần nhất mang nó (reject `proposed→todo`, hoặc gate-gãy `proposed→blocked`), KHÔNG phải trường người tự điền. GHI ĐÈ mỗi lần fold (latest-wins) — khác khuôn "cộng thêm không đè" của outcome/friction/settlement/discovery, vì đây là ngữ cảnh SỐNG cho lần dispatch kế tiếp (worker prompt, xem spec Runner R23), không phải một chuỗi lịch sử cần giữ mọi lần | free text | no | vắng mặt (item chưa từng bị đỗ/từ chối lần nào) |
+-| — | Sự kiện (không hiển thị) | Đơn vị ghi của nhật ký; mỗi thao tác ghi đúng MỘT sự kiện, số thứ tự tăng dần + thời điểm + phiên bản schema `v` (hiện hành: 2; sự kiện di sản không có `v` vẫn đọc được) | `work.add` — khai item (luôn mang tier tường minh từ v2) · `work.move` — chuyển trạng thái (from/to; cạnh từ-chối `proposed→todo` VÀ cạnh gate-gãy `proposed→blocked` (per pr-lifecycle D3) đều mang `reason` bắt buộc; cạnh vào chờ mang `ask`, cạnh rời chờ mang `answer`; mọi ngã-ngũ có thể mang thêm `actor` tùy chọn — xem "Bản ghi settlement" dưới; ngã-ngũ vào `done` cũng tự mang thêm một bản ghi học — xem "Bài học lúc đóng" dưới; cạnh claim `todo→doing` qua cửa pull `take` mang thêm `headAtTake`, xem Data Dictionary #15; cạnh `doing→proposed` qua cửa pull `return` (verify xanh) mang thêm `headAtReturn`, xem Data Dictionary #16) · `decision` — quyết định kèm chữ · `work.outcome` — dự đoán HOẶC thực tế cho một item (mỗi nửa là một sự kiện riêng, cùng id; xem "Bản ghi kết quả" dưới) · `work.friction` — một lần thất bại tự-quy-tội tại park/halt (xem "Bản ghi friction" dưới) · `work.stage` — chuyển stage (from/to; có thể kèm `verify` khi rời clarify — xem "Giai đoạn Làm-rõ" dưới; ngã-ngũ rời clarify cũng có thể mang `actor` tùy chọn) · `work.discovery` — một lần context-discovery phán (xem "Bản ghi cổng discovery" dưới) | — | — |
++| 19 | branchHeadAtTake | Vị trí commit (HEAD) của CHÍNH NHÁNH đề xuất (`fgw/<id>`) tại đúng thời điểm `take` cầm một item `blocked` mang nhánh sống — cộng-thêm trên CÙNG sự kiện `work.move` đưa item `blocked→doing`; KHÔNG BAO GIỜ cùng mặt với `headAtTake` trên một item (R34) | mã commit (string), hoặc vắng mặt | no | vắng mặt (claim main-based, hoặc claim của runner) |
++| 20 | branchHeadAtReturn | Vị trí commit (HEAD) của CHÍNH NHÁNH tại đúng thời điểm `return` đo verify XANH trên một item nguồn-nhánh — cộng-thêm trên CÙNG sự kiện `work.move` đưa item `doing→proposed`; KHÔNG BAO GIỜ cùng mặt với `headAtReturn` trên một item (R34) | mã commit (string), hoặc vắng mặt | no | vắng mặt (return main-based, hoặc đề xuất của runner) |
++| — | Sự kiện (không hiển thị) | Đơn vị ghi của nhật ký; mỗi thao tác ghi đúng MỘT sự kiện, số thứ tự tăng dần + thời điểm + phiên bản schema `v` (hiện hành: 2; sự kiện di sản không có `v` vẫn đọc được) | `work.add` — khai item (luôn mang tier tường minh từ v2) · `work.move` — chuyển trạng thái (from/to; cạnh từ-chối `proposed→todo` VÀ cạnh gate-gãy `proposed→blocked` (per pr-lifecycle D3) đều mang `reason` bắt buộc; cạnh vào chờ mang `ask`, cạnh rời chờ mang `answer`; mọi ngã-ngũ có thể mang thêm `actor` tùy chọn — xem "Bản ghi settlement" dưới; ngã-ngũ vào `done` cũng tự mang thêm một bản ghi học — xem "Bài học lúc đóng" dưới; cạnh claim `todo→doing` qua cửa pull `take` mang thêm `headAtTake`, xem Data Dictionary #15 (hoặc `branchHeadAtTake` thay vào đó khi claim là nguồn-nhánh, cạnh `blocked→doing`, Data Dictionary #19); cạnh `doing→proposed` qua cửa pull `return` (verify xanh) mang thêm `headAtReturn`, xem Data Dictionary #16 (hoặc `branchHeadAtReturn` cho nguồn-nhánh, Data Dictionary #20, xem R34)) · `decision` — quyết định kèm chữ · `work.outcome` — dự đoán HOẶC thực tế cho một item (mỗi nửa là một sự kiện riêng, cùng id; xem "Bản ghi kết quả" dưới) · `work.friction` — một lần thất bại tự-quy-tội tại park/halt (xem "Bản ghi friction" dưới) · `work.stage` — chuyển stage (from/to; có thể kèm `verify` khi rời clarify — xem "Giai đoạn Làm-rõ" dưới; ngã-ngũ rời clarify cũng có thể mang `actor` tùy chọn) · `work.discovery` — một lần context-discovery phán (xem "Bản ghi cổng discovery" dưới) | — | — |
+ | — | Phạm trù lỗi (không hiển thị) | Hợp đồng cho consumer: rẽ nhánh theo mã thoát, không theo thông điệp | `precondition` → mã 2 · `conflict` (kỳ vọng lệch) → mã 3 · `validation` → mã 4 · `corrupt-log` → mã 5 · bất ngờ → mã 1 · thành công → 0 | — | — |
+ 
+ ### Bản ghi kết quả (outcome) — dự đoán / thực tế
+@@ -338,6 +340,40 @@ dispatch (`fgos ready`) — cửa pull không mở một tập riêng.
+ claim di sản không actor) bị `return` từ chối `validation` — cửa pull không
+ bao giờ đụng vào claim của runner.
+ 
++#### Cửa pull mở rộng: hoàn tất một đề xuất nguồn-nhánh bị đỗ
++
++Một item `blocked` mang một nhánh đề xuất còn sống (`fgw/<id>` — vd bị đỗ do
++chạm trần chống-lặp, xem spec Runner R29) cũng đi qua CÙNG hai verb `take`/
++`return` ở trên, không phải verb riêng — chỉ khác Ở NGUỒN được ghi lại:
++
++- **`take`** trên một item `blocked` mang nhánh `fgw/<id>` sống: claim qua
++  cạnh `blocked → doing` (thay vì `todo → doing`), ghi **`branchHeadAtTake`**
++  — HEAD của CHÍNH NHÁNH lúc take, KHÔNG phải HEAD của host repo — thay vì
++  `headAtTake`. `branchHeadAtTake` là discriminator DUY NHẤT phân biệt một
++  claim nguồn-nhánh với một claim main-based ở bước `return`; nguồn không
++  được suy ra từ việc nhánh có tồn tại hay không tại thời điểm return (nhánh
++  có thể tồn tại vì lý do khác, xem spec Runner "Cổng duyệt PR nội bộ" —
++  phân loại nguồn `runner`/`pull`/`legacy` của cổng duyệt).
++- Người commit thêm việc lên NHÁNH (không đụng cây làm việc chính của host
++  repo).
++- **`return`** kiểm `item.branchHeadAtTake` TRƯỚC ba điều kiện main-based ở
++  trên — một claim nguồn-nhánh không mang `headAtTake` nên kiểm main trước
++  sẽ từ chối oan. Đo: nhánh phải có commit MỚI kể từ `branchHeadAtTake`, và
++  verify của item phải chạy XANH — nhưng chạy trong một **worktree tạm,
++  DETACHED tại đúng SHA của nhánh** (không bao giờ checkout theo tên nhánh,
++  không dùng cơ chế đòi-lại-worktree-mồ-côi của runner) — cây làm việc chính
++  của người đứng KHÔNG BAO GIỜ bị đọc hay đụng tới, kể cả khi người đang
++  đứng trên chính nhánh đó ở một worktree khác. Worktree tạm luôn được dọn
++  sau khi đo xong, thành công hay thất bại như nhau. Sạch + xanh →
++  `doing → proposed` mang **`branchHeadAtReturn`** (HEAD nhánh tại lúc đo) —
++  **TUYỆT ĐỐI không ghi `headAtReturn`** (trộn hai marker cho `reviewDiff`
++  của cổng duyệt một dải vô nghĩa). Không có commit mới, hoặc verify đỏ →
++  từ chối rõ lý do (nguồn-nhánh: `verify-fail` + friction lớp
++  `verification`), item giữ nguyên `doing`, nhánh không đổi tip.
++- Một đề xuất hoàn tất theo đường này đọc nguồn là `runner` ở cổng duyệt như
++  bình thường (nhánh `fgw/<id>` còn sống) — không cần thay đổi cách phân
++  loại nguồn của cổng duyệt.
++
+ ### Phong bì output (envelope) — chuẩn máy-đọc của `submit`
+ 
+ `submit` in kết quả bọc trong một phong bì chuẩn thay vì in thẳng dữ liệu: bốn
+@@ -452,10 +488,10 @@ của `submit`. Số phận cuối cùng (giữ/xóa) chưa quyết — xem back
+ 
+ ### Chuyển trạng thái (move)
+ 
+-- **Blocked when:** (a) cạnh chuyển không có trong bảng — `todo→doing`, `doing→done`, `doing→proposed`, `proposed→done`, `proposed→todo` (bắt buộc lý do), `proposed→blocked` (bắt buộc lý do — per pr-lifecycle D3 / 1359ab5e, cạnh gate duyệt gãy: merge conflict hoặc verify đỏ sau merge, xem spec Runner "Cổng duyệt PR nội bộ"), `todo/doing→blocked`, `blocked→todo/doing`, `todo/doing→awaiting-human` (bắt buộc câu hỏi), `awaiting-human→todo` (bắt buộc câu trả lời) là toàn bộ cạnh hợp lệ — trả `precondition` (mã 2); (a2) cạnh từ-chối `proposed→todo` hoặc cạnh gate-gãy `proposed→blocked` thiếu/rỗng lý do, hoặc cạnh vào chờ thiếu/rỗng câu hỏi, hoặc cạnh rời chờ thiếu/rỗng câu trả lời — trả `validation` (mã 4); (b) trạng thái thực khác `--expect` — trả `conflict` (mã 3); (c) cờ thiếu giá trị hoặc rỗng (`--to` trống, `--expect ""`) — trả `validation` (mã 4), không bao giờ lọt sang phạm trù 2/3. Cả ba trường hợp KHÔNG ghi sự kiện nào.
++- **Blocked when:** (a) cạnh chuyển không có trong bảng — `todo→doing`, `doing→done`, `doing→proposed`, `proposed→done`, `proposed→todo` (bắt buộc lý do), `proposed→blocked` (bắt buộc lý do — per pr-lifecycle D3 / 1359ab5e, cạnh gate duyệt gãy: merge conflict hoặc verify đỏ sau merge, xem spec Runner "Cổng duyệt PR nội bộ"), `todo/doing→blocked`, `blocked→todo/doing`, `blocked→proposed` (per D18 fan-out-parallel — cạnh cơ học, KHÔNG bắt buộc lý do, dành riêng cho một lần đồng bộ-lại/catch-up sạch, xem spec Runner "Đồng bộ lại một việc đỗ (catch-up)"), `todo/doing→awaiting-human` (bắt buộc câu hỏi), `awaiting-human→todo` (bắt buộc câu trả lời) là toàn bộ cạnh hợp lệ — trả `precondition` (mã 2); (a2) cạnh từ-chối `proposed→todo` hoặc cạnh gate-gãy `proposed→blocked` thiếu/rỗng lý do, hoặc cạnh vào chờ thiếu/rỗng câu hỏi, hoặc cạnh rời chờ thiếu/rỗng câu trả lời — trả `validation` (mã 4); (b) trạng thái thực khác `--expect` — trả `conflict` (mã 3); (c) cờ thiếu giá trị hoặc rỗng (`--to` trống, `--expect ""`) — trả `validation` (mã 4), không bao giờ lọt sang phạm trù 2/3. Cả ba trường hợp KHÔNG ghi sự kiện nào.
+ - **What changes:** một sự kiện chuyển-trạng-thái (kèm from/to) vào nhật ký, rồi bản chiếu cập nhật — luôn theo thứ tự nhật-ký-trước, bản-chiếu-sau.
+ - **Side effects:** không.
+-- **Afterwards:** `done` là cửa một chiều ra: item đã done thì mọi lần move tiếp theo đều bị `precondition`. Item bị từ chối về `todo` mang lý do trong nhật ký, vào lại hàng chờ làm tiếp. Cạnh `proposed→todo` (reject) hoặc `proposed→blocked` (gate gãy) mang `reason`: giá trị MỚI NHẤT còn được fold thêm lên chính item (`item.reason`, Data Dictionary #18, latest-wins) — không chỉ nằm trong nhật ký sự kiện, để consumer sau (prompt worker, người đọc `list`) thấy lý do mới nhất mà không cần lục nhật ký (per worker-execution P33 / 396d9d9e, xem spec Runner R23).
++- **Afterwards:** `done` là cửa một chiều ra: item đã done thì mọi lần move tiếp theo đều bị `precondition`. Item bị từ chối về `todo` mang lý do trong nhật ký, vào lại hàng chờ làm tiếp. Cạnh `proposed→todo` (reject) hoặc `proposed→blocked` (gate gãy) mang `reason`: giá trị MỚI NHẤT còn được fold thêm lên chính item (`item.reason`, Data Dictionary #18, latest-wins) — không chỉ nằm trong nhật ký sự kiện, để consumer sau (prompt worker, người đọc `list`) thấy lý do mới nhất mà không cần lục nhật ký (per worker-execution P33 / 396d9d9e, xem spec Runner R23). Cạnh `blocked→proposed` (per D18 fan-out-parallel) là cạnh DUY NHẤT rời `blocked` không mang `reason` và không đi qua `doing` — dành riêng cho một lần đồng bộ-lại (catch-up) sạch, phân biệt với người chọn cầm việc qua cửa pull để tự làm-lại tay (`blocked→doing`, đi qua chống-lặp bình thường như mọi lần nhận việc khác); xem spec Runner "Đồng bộ lại một việc đỗ (catch-up)".
+ 
+ ### Ghi quyết định (decision)
+ 
+@@ -563,6 +599,8 @@ của `submit`. Số phận cuối cùng (giữ/xóa) chưa quyết — xem back
+ - **R30 (`headAtReturn` — đối xứng `headAtTake`, nguồn diff của một đề xuất pull-door).** `return` verify xanh ghi thêm `headAtReturn` (HEAD host repo tại đúng thời điểm đó) lên CÙNG sự kiện `doing→proposed` (per pr-lifecycle D1 / 1359ab5e) — cổng duyệt dùng dải `headAtTake→headAtReturn` làm nguồn diff trung thực của một đề xuất pull-door. Vắng mặt cho đề xuất runner (không qua `return`) và cho mọi đề xuất tạo trước feature này (tương thích ngược, R11).
+ - **R31 (lãnh địa fgos tường minh, `init` chỉ đọc-và-ghi-nhận).** Lãnh địa ghi/khóa của fgos là CHÍNH XÁC `.fgos/` (data dir theo cwd) + worktree tmpdir + nhánh `fgw/*`, cộng đúng hai cửa có chủ (merge-sau-duyệt cổng review, và source repo khi một runner worker được giao việc) — mọi thứ fgos làm với file của một harness khác là READ-ONLY, không bao giờ ghi/sửa/xóa. `init` quét marker harness khác (thư mục dấu ấn + khối managed AGENTS.md) chỉ để GHI NHẬN vào manifest `.fgos/coexistence.json`, không bao giờ tạo/sửa `AGENTS.md` của host; lỗi phát hiện không chặn `init` (fail-safe), re-init idempotent (per install-coexistence D2/D4/D6 / f1715488; doctrine đầy đủ: `docs/coexistence.md`).
+ - **R32 (`reason` mới nhất fold lên item, latest-wins — khác khuôn cộng-thêm-không-đè).** Trường `reason` trên một sự kiện `work.move` (reject `proposed→todo`, hoặc gate-gãy `proposed→blocked`) được fold thêm lên `item.reason` (Data Dictionary #18) — GHI ĐÈ giá trị cũ mỗi lần (latest-wins), khác hẳn khuôn "cộng thêm, không đè" của outcome/friction/settlement/discovery: đây là ngữ cảnh SỐNG cho lần dispatch kế tiếp (worker cần lý do MỚI NHẤT, không phải toàn bộ lịch sử), không phải một chuỗi ghi nhận lịch sử. Item chưa từng bị đỗ/từ chối không mang trường này — vắng mặt hoàn toàn (tương thích ngược, R11) (per worker-execution P33 / 396d9d9e).
++- **R33 (cạnh `blocked→proposed` — đồng bộ-lại cơ học, cạnh MỚI DUY NHẤT mà fan-out-parallel thêm vào bảng FSM).** Khi một việc đỗ vì gãy nhập (xung đột/verify-đỏ-sau-nhập/trôi-tích-hợp) được đồng bộ-lại (catch-up) sạch, nó chuyển thẳng `blocked → proposed` — cạnh này KHÔNG mang `reason` bắt buộc (khác khuôn của `proposed→todo`/`proposed→blocked`, cùng khuôn cơ học của `blocked→todo`/`blocked→doing`) và KHÔNG BAO GIỜ đi qua `doing`, nên không tính vào ngân sách chống-lặp (`visitCount`) của việc — phân biệt rõ với người chọn cầm việc qua cửa pull để tự làm-lại tay (`blocked→doing`, có tính) (per D18 fan-out-parallel / 2e92b7a5, xem spec Runner "Đồng bộ lại một việc đỗ (catch-up)").
++- **R34 (`branchHeadAtTake`/`branchHeadAtReturn` — cặp marker nguồn-nhánh, luôn tách bạch với `headAtTake`/`headAtReturn`).** Cửa pull `take`/`return` trên một item `blocked` mang nhánh sống ghi CẶP marker riêng — `branchHeadAtTake` (HEAD của NHÁNH lúc `take`, Data Dictionary #19) trên cạnh `blocked→doing`, `branchHeadAtReturn` (HEAD của NHÁNH lúc `return` đo xanh, Data Dictionary #20) trên cạnh `doing→proposed` — mirror đúng cặp `headAtTake`/`headAtReturn` main-based nhưng KHÔNG BAO GIỜ cùng xuất hiện với cặp đó trên MỘT item: một claim nguồn-nhánh ghi `branchHeadAtTake` thay vì `headAtTake`, một return nguồn-nhánh ghi `branchHeadAtReturn` thay vì `headAtReturn` — trộn hai cặp cho cùng một đề xuất khiến `reviewDiff` của cổng duyệt dựng một dải vô nghĩa (cấm tuyệt đối, kiểm bằng test). `branchHeadAtTake` là discriminator DUY NHẤT `return` dùng để rẽ nhánh nguồn-nhánh — không dùng `classifySource` (nó ưu-tiên-nhánh và nhập nhằng với một pull-take main-based mà nhánh vẫn còn sót lại) (per D2 human-rounds / 5a6900b2, xem spec Runner R30).
+ 
+ ## Edge Cases Settled
+ 
+@@ -603,6 +641,10 @@ của `submit`. Số phận cuối cùng (giữ/xóa) chưa quyết — xem back
+ - Cạnh `proposed→blocked` thiếu `reason` bị từ chối `validation`, cùng khuôn `proposed→todo` — test khóa (per pr-lifecycle D3).
+ - `return` verify xanh ghi `headAtReturn` lên đúng sự kiện `doing→proposed`; fold đọc lại được qua rebuild (mẫu `headAtTake`), vắng mặt cho một đề xuất của runner (không qua `return`) — test khóa (per pr-lifecycle D1).
+ - Reject/park mang `reason`: giá trị fold lên `item.reason`, đọc lại được qua rebuild (mẫu `claimActor`/`headAtTake`); một lần fold sau GHI ĐÈ lần trước (latest-wins, không cộng thêm) — test khóa cả hai chiều (per worker-execution P33 / 396d9d9e).
++- `take` trên một item `blocked` mang nhánh `fgw/<id>` sống: claim qua `blocked→doing`, ghi `branchHeadAtTake` (không `headAtTake`) — chứng minh qua CLI thật; `take` trên một item `blocked` KHÔNG mang nhánh sống vẫn xung đột như trước (không đường mới nào mở toang `blocked→doing`).
++- `return` nguồn-nhánh (item mang `branchHeadAtTake`): đo trên nhánh KHÔNG đụng working tree host repo — verify chạy trong worktree tạm detached tại SHA nhánh, dọn trong `finally` dù thành công hay thất bại; verify xanh + có commit mới → `proposed` mang `branchHeadAtReturn`, KHÔNG BAO GIỜ mang `headAtReturn` — test khóa cả hai chiều (mutual exclusion) (per D2 human-rounds / 5a6900b2, xem spec Runner R30).
++- `return` nguồn-nhánh khi nhánh KHÔNG có commit mới kể từ `branchHeadAtTake`: từ chối rõ lý do, item giữ `doing`, không sự kiện nào ghi thêm, tip nhánh không đổi — chứng minh bằng test thật.
++- `fold` của `branchHeadAtTake`/`branchHeadAtReturn` qua rebuild: chỉ fold trên đúng cạnh của nó (`blocked→doing`/`doing→proposed`), không bao giờ lẫn với `headAtTake`/`headAtReturn` của cùng item hay của item khác — test khóa (write-side allowlist trong `store.mjs` + read-side fold trong `replay.mjs` đều được kiểm, đây là lỗ CRITICAL mà bee-validating từng gắn cờ trước khi cell dựng thật).
+ 
+ ## Open Gaps
+ 
+@@ -622,16 +664,16 @@ Not applicable — không có màn hình.
+ ## Pointers (implementation)
+ 
+ - `bin/fgos.mjs` — CLI một cửa, bảng EXIT_CODES, resolve `.fgos/` từ cwd
+-- `src/state/store.mjs` — chủ ghi duy nhất (append event → update view); facade lỗi: EXIT_CODES + categoryOf + re-export 4 error class; STATUSES sống ở work.mjs (fsm re-export); `addOutcome` — cửa ghi outcome (mẫu `addDecision`), gọi trực tiếp từ runner (không qua verb CLI); `addFriction` — cửa ghi friction (mẫu giống `addOutcome`), cũng gọi trực tiếp từ runner; `moveWork` chuyển tiếp `ask`/`answer` cho `transitionWork`, GẮN `actor` vào payload SAU khi transition thuần trả về (không truyền vào transitionWork — payload bị rebuild sẽ nuốt mất), và khi `to==='done'` compose bài học câu-6 (`composeLearning`, thuần, try/catch best-effort) từ view TRƯỚC transition + settlement đóng sắp sinh, gắn additive vào CÙNG event `work.move`; `putInAwaiting`/`answerAwaiting` — hai verb mỏng đưa-vào-chờ / trả-lời (append event chuyển-trạng-thái mang câu hỏi/câu trả lời rồi refresh view); `moveStage` — cửa ghi đổi-stage (mẫu `moveWork`, một tầng phía trên), chuyển tiếp `transitionStage`, cùng cách gắn `actor` post-transition; `addDiscovery` — cửa ghi bản ghi discovery (mẫu `addFriction`); `moveWork` nhận thêm một tham số cộng-thêm tùy chọn `headAtTake` (gắn post-transition, cùng cách gắn `actor` — không đưa vào `transitionWork`), để cửa pull `take` cõng HEAD của host repo lên sự kiện claim; mọi lời gọi khác (runner, `add`/`move`/`ask`/`answer`) không bao giờ truyền tham số này nên nó luôn `undefined`, no-op, tương thích ngược tuyệt đối; cùng khuôn, `moveWork` nhận thêm `headAtReturn` (per pr-lifecycle D1 / 1359ab5e) — CHỈ cửa pull `return` truyền, gắn post-transition trên cạnh `doing→proposed`
++- `src/state/store.mjs` — chủ ghi duy nhất (append event → update view); facade lỗi: EXIT_CODES + categoryOf + re-export 4 error class; STATUSES sống ở work.mjs (fsm re-export); `addOutcome` — cửa ghi outcome (mẫu `addDecision`), gọi trực tiếp từ runner (không qua verb CLI); `addFriction` — cửa ghi friction (mẫu giống `addOutcome`), cũng gọi trực tiếp từ runner; `moveWork` chuyển tiếp `ask`/`answer` cho `transitionWork`, GẮN `actor` vào payload SAU khi transition thuần trả về (không truyền vào transitionWork — payload bị rebuild sẽ nuốt mất), và khi `to==='done'` compose bài học câu-6 (`composeLearning`, thuần, try/catch best-effort) từ view TRƯỚC transition + settlement đóng sắp sinh, gắn additive vào CÙNG event `work.move`; `putInAwaiting`/`answerAwaiting` — hai verb mỏng đưa-vào-chờ / trả-lời (append event chuyển-trạng-thái mang câu hỏi/câu trả lời rồi refresh view); `moveStage` — cửa ghi đổi-stage (mẫu `moveWork`, một tầng phía trên), chuyển tiếp `transitionStage`, cùng cách gắn `actor` post-transition; `addDiscovery` — cửa ghi bản ghi discovery (mẫu `addFriction`); `moveWork` nhận thêm một tham số cộng-thêm tùy chọn `headAtTake` (gắn post-transition, cùng cách gắn `actor` — không đưa vào `transitionWork`), để cửa pull `take` cõng HEAD của host repo lên sự kiện claim; mọi lời gọi khác (runner, `add`/`move`/`ask`/`answer`) không bao giờ truyền tham số này nên nó luôn `undefined`, no-op, tương thích ngược tuyệt đối; cùng khuôn, `moveWork` nhận thêm `headAtReturn` (per pr-lifecycle D1 / 1359ab5e) — CHỈ cửa pull `return` truyền, gắn post-transition trên cạnh `doing→proposed`; cùng khuôn thêm lần nữa, `moveWork` nhận `branchHeadAtTake`/`branchHeadAtReturn` (per D2 human-rounds / 5a6900b2) — CHỈ cửa pull `take`/`return` nguồn-nhánh truyền, gắn post-transition trên đúng cạnh `blocked→doing`/`doing→proposed` tương ứng; đây là fix write-side allowlist mà bee-validating gắn cờ CRITICAL trước khi cell dựng thật — thiếu nó, hai field mới bị `moveWork` âm thầm nuốt mất trước khi sự kiện tới `appendEvent`
+ - `src/state/events.mjs` — append/read JSONL `.fgos/events.jsonl` (seq + ts ISO, path tường minh), phát hiện corrupt tail
+-- `src/state/fsm.mjs` — bảng TRANSITIONS + precondition + CAS, thuần (chiều `status`, KHÔNG đổi bởi stage-clarify); cạnh `todo/doing→awaiting-human` bắt buộc `ask`, cạnh `awaiting-human→todo` bắt buộc `answer` (cùng cơ chế `reason`-trên-`proposed→todo`), giá trị trim vào `payload.ask`/`payload.answer`; cạnh `proposed→blocked` (per pr-lifecycle D3 / 1359ab5e) bắt buộc `reason`, cùng cơ chế enforce với `proposed→todo`
++- `src/state/fsm.mjs` — bảng TRANSITIONS + precondition + CAS, thuần (chiều `status`, KHÔNG đổi bởi stage-clarify); cạnh `todo/doing→awaiting-human` bắt buộc `ask`, cạnh `awaiting-human→todo` bắt buộc `answer` (cùng cơ chế `reason`-trên-`proposed→todo`), giá trị trim vào `payload.ask`/`payload.answer`; cạnh `proposed→blocked` (per pr-lifecycle D3 / 1359ab5e) bắt buộc `reason`, cùng cơ chế enforce với `proposed→todo`; cạnh `blocked→proposed` (per D18 fan-out-parallel / 2e92b7a5) KHÔNG bắt buộc `reason` — mirror khuôn cơ học của `blocked→todo`/`blocked→doing`, không phải khuôn bắt-buộc-lý-do
+ - `src/state/stage.mjs` — bảng chuyển-stage + precondition + CAS, thuần, mẫu hệt `fsm.mjs` một tầng phía trên (chiều `stage`); cạnh hợp lệ hôm nay: `clarify → decompose`, `decompose → executing`; cạnh `clarify → executing` cũ vẫn còn trong bảng (hợp lệ, log di sản đọc lại đúng) nhưng không caller nào nhắm tới nữa — dormant, chưa gỡ (quyết theo bằng chứng grep, xem `docs/history/stage-decompose/`); `expectedStage` CAS chống đua giữa phiên sống và vòng tự hành cùng phán một item
+ - `src/state/work.mjs` — schema + validate (ID_PATTERN kebab-case); STATUSES gồm `awaiting-human`; STAGES = `clarify`/`decompose`/`executing`, field `stage` optional (đọc lazy `?? 'executing'` khi vắng mặt, không có trong DEFAULTS); field `parent` optional (lineage, validate string non-self-referencing, không đòi tồn tại — additive, không có trong DEFAULTS)
+-- `src/state/replay.mjs` — fold events → view, thuần; case `work.outcome` gộp theo id vào `view.outcomes` (key lazy, cộng thêm không đè); case `work.friction` APPEND theo id vào `view.frictions` (key lazy, mảng — mỗi record một lần xảy ra, không gộp/không đè); case `work.move` mang `ask`/`answer` gộp theo id vào `view.gates` (key lazy có bảo vệ, cộng thêm không đè); case `work.move` mang `answer` hoặc `to==='done'` (VÀ sự kiện mang phiên bản schema — bảo vệ nhật ký di sản thật) APPEND một bản ghi settlement theo id vào `view.settlements` (key lazy, mảng, kind answer/close); case `work.move` với `to==='done'` mang thêm `learning` APPEND theo id vào `view.learnings` (key lazy, mảng); case `work.add` fold thêm `item.parent` khi payload mang (additive, key lazy); case `work.stage` set `item.stage` (và `item.verify` khi payload mang verify — một sự kiện làm cả hai) và, khi RỜI clarify (guard `from === 'clarify'`, không phải đích cụ thể — chốt tại validating để retarget đích không làm câm settlement), APPEND một bản ghi settlement kind clarify-pass vào `view.settlements`; case `work.discovery` APPEND theo id vào `view.discovery` (key lazy, mảng, cùng khuôn `view.frictions`); case `work.move` đích `doing` fold thêm `actor` payload thành `item.claimActor` và `headAtTake` payload thành `item.headAtTake` khi sự kiện mang chúng (additive, lazy — đây là cách `return`/gặt-lại của runner phân biệt claim của cửa pull với claim của runner, xem "Cửa pull giao–nhận việc" trên và spec Runner); case `work.move` mang `reason` (bất kỳ đích nào, không chỉ `proposed→todo`/`proposed→blocked`) fold thành `item.reason` — GHI ĐÈ mỗi lần (latest-wins, khác khuôn cộng-thêm-không-đè của outcome/friction/settlement/discovery ở trên, per worker-execution P33 / 396d9d9e, xem R32 và spec Runner R23)
++- `src/state/replay.mjs` — fold events → view, thuần; case `work.outcome` gộp theo id vào `view.outcomes` (key lazy, cộng thêm không đè); case `work.friction` APPEND theo id vào `view.frictions` (key lazy, mảng — mỗi record một lần xảy ra, không gộp/không đè); case `work.move` mang `ask`/`answer` gộp theo id vào `view.gates` (key lazy có bảo vệ, cộng thêm không đè); case `work.move` mang `answer` hoặc `to==='done'` (VÀ sự kiện mang phiên bản schema — bảo vệ nhật ký di sản thật) APPEND một bản ghi settlement theo id vào `view.settlements` (key lazy, mảng, kind answer/close); case `work.move` với `to==='done'` mang thêm `learning` APPEND theo id vào `view.learnings` (key lazy, mảng); case `work.add` fold thêm `item.parent` khi payload mang (additive, key lazy); case `work.stage` set `item.stage` (và `item.verify` khi payload mang verify — một sự kiện làm cả hai) và, khi RỜI clarify (guard `from === 'clarify'`, không phải đích cụ thể — chốt tại validating để retarget đích không làm câm settlement), APPEND một bản ghi settlement kind clarify-pass vào `view.settlements`; case `work.discovery` APPEND theo id vào `view.discovery` (key lazy, mảng, cùng khuôn `view.frictions`); case `work.move` đích `doing` fold thêm `actor` payload thành `item.claimActor` và `headAtTake` payload thành `item.headAtTake` khi sự kiện mang chúng (additive, lazy — đây là cách `return`/gặt-lại của runner phân biệt claim của cửa pull với claim của runner, xem "Cửa pull giao–nhận việc" trên và spec Runner), cộng thêm `branchHeadAtTake` payload thành `item.branchHeadAtTake` trên CÙNG cạnh khi sự kiện mang nó (nguồn-nhánh, R34); case `work.move` đích `proposed` fold thêm `branchHeadAtReturn` payload thành `item.branchHeadAtReturn` khi sự kiện mang nó (mirror `headAtReturn` ở trên nhưng field riêng, không bao giờ cùng mặt trên một item, R34); case `work.move` mang `reason` (bất kỳ đích nào, không chỉ `proposed→todo`/`proposed→blocked`) fold thành `item.reason` — GHI ĐÈ mỗi lần (latest-wins, khác khuôn cộng-thêm-không-đè của outcome/friction/settlement/discovery ở trên, per worker-execution P33 / 396d9d9e, xem R32 và spec Runner R23)
+ - `src/state/frontier.mjs` — bộ lọc `status === 'todo'` (đã loại `awaiting-human`) VÀ `(stage ?? 'executing') === 'executing'` (đã loại item clarify/decompose) VÀ, dẫn xuất thuần từ `parent` (đệ quy qua chuỗi hậu duệ, KHÔNG đụng `deps`), loại một gốc khi bất kỳ hậu duệ nào của nó chưa `done` khỏi ready set
+ - `src/intake/discovery.mjs` — Use-case: `judgeDiscovery(work, cfg, view)` (gọi model thật qua `resolveExecutorCommand`/`modelForTier` của `dispatch.mjs`, fail-safe try/catch bao trọn mọi lỗi spawn/timeout/parse về `{clear:false, question:...}` mặc định, không bao giờ throw); `view` là tham số TÙY CHỌN (per discovery-context P30 / cfae0120) — `resolveDiscovery` truyền view nó đã đọc sẵn (không đọc thêm lần nào); `buildDiscoveryPrompt(work, view)` dùng `work.description`, `view.gates[id]` (cặp hỏi-đáp MỚI NHẤT) và `view.discovery[id]` (mọi verdict trước) để dựng phần ngữ cảnh bổ sung của prompt — thiếu `view` (lời gọi 2-tham-số cũ, vd unit test) degrade từng phần về placeholder "(không có)", không throw; `resolveDiscovery` — hàm chung DUY NHẤT cho cả verb `discover` và vòng tự hành: đọc item, gọi judgeDiscovery, ghi bản ghi discovery LUÔN, rồi `moveStage`(đủ rõ → **`decompose`**, kèm verify thật)hoặc `putInAwaiting`(chưa đủ rõ, kèm câu hỏi)
+ - `src/intake/decompose.mjs` — Use-case tầng sau discovery: `judgeDecompose` (gọi model thật, cùng executor/fail-safe pattern với `judgeDiscovery`, mọi lỗi spawn/timeout/parse → verdict không hợp lệ mặc định, không bao giờ throw); `resolveDecompose` — hàm chung cho cả verb `discover` (khi item ở stage `decompose`) và vòng tự hành: đọc item, gọi judgeDecompose, rồi một trong bốn nhánh — pass-through (`moveStage` decompose→executing, giữ verify cũ), chia (ghi n con qua `addWork` — `parent`/`deps`/verify thật từng con — rồi `moveStage` gốc; re-entrancy: view đã có con mang `parent` trỏ về gốc thì không sinh thêm, chỉ hoàn tất chuyển stage gốc), cần-người (`putInAwaiting` mang đề xuất chia làm câu hỏi, gate risk `heavy` đọc từ `item.risk`), hoặc không hợp lệ (không ghi gì, item ở nguyên cho lượt quét sau)
+-- `bin/fgos.mjs` — verb `check`: đọc `listWork(dir).outcomes`, in predicted-vs-actual; cộng thêm mục friction (đọc `view.frictions`, đếm theo lớp + cap 5 record gần nhất), mục settlement (đọc `view.settlements`, đếm theo kind+actor + cap 5), mục học (đọc `view.learnings`, cap 5), và nhắc item trạng thái cuối thiếu outcome — tất cả read-only, không sự kiện mới; tín hiệu entropy-trend + seal-digest trên cùng `check` — xem spec Runner; verb `ask`/`answer` gọi `putInAwaiting`/`answerAwaiting`; `list` mang `view.gates` (câu hỏi hiện ra không cần formatter mới) và trường `parent` khi item mang (đã đi qua `listWork`'s full-object dump, không cần formatter mới); verb `submit` — gọi `classify.mjs` (deriveTitle/classify/generateId) + `envelope.mjs` (wrapEnvelope) rồi `addWork` sẵn có, KHÔNG cửa ghi mới, gắn `stage:'clarify'`; verb `discover` — dispatch theo `item.stage` hiện tại: gọi `resolveDiscovery` (stage clarify) hoặc `resolveDecompose` (stage decompose), cùng `actor:'session'`; verb `take` — cầm đầu frontier (`readyWork`) hoặc một `--id` cùng tập, CAS `todo→doing` qua `moveWork` mang `actor`+`headAtTake` (`currentHead` của host repo), ghi outcome dự đoán qua `addOutcome`; verb `return` — TỰ CHẠY `verify` của item qua `runGoalCheck` (`src/runner/goal-check.mjs`, module dùng chung với runner — xem spec Runner) sau khi tự kiểm `isWorkingTreeClean`/`commitsSince` (helper git nhỏ trong `bin/fgos.mjs`) so `headAtTake`; xanh → `moveWork` `doing→proposed` mang thêm `headAtReturn` (`currentHead`, per pr-lifecycle D1) + `addOutcome` thực tế; đỏ → `moveWork` `doing→blocked` (`reason:'verify-fail'`) + `addOutcome` thực tế + `addFriction` lớp `verification`; verb `review`/`approve`/`reject` — cổng duyệt PR nội bộ, bề mặt CLI của một cửa duyệt cho mọi đề xuất `proposed`; cơ chế merge/verify đầy đủ sống ở `src/runner/merge.mjs` (xem spec Runner "Cổng duyệt PR nội bộ" cho hợp đồng đầy đủ)
++- `bin/fgos.mjs` — verb `check`: đọc `listWork(dir).outcomes`, in predicted-vs-actual; cộng thêm mục friction (đọc `view.frictions`, đếm theo lớp + cap 5 record gần nhất), mục settlement (đọc `view.settlements`, đếm theo kind+actor + cap 5), mục học (đọc `view.learnings`, cap 5), và nhắc item trạng thái cuối thiếu outcome — tất cả read-only, không sự kiện mới; tín hiệu entropy-trend + seal-digest trên cùng `check` — xem spec Runner; verb `ask`/`answer` gọi `putInAwaiting`/`answerAwaiting`; `list` mang `view.gates` (câu hỏi hiện ra không cần formatter mới) và trường `parent` khi item mang (đã đi qua `listWork`'s full-object dump, không cần formatter mới); verb `submit` — gọi `classify.mjs` (deriveTitle/classify/generateId) + `envelope.mjs` (wrapEnvelope) rồi `addWork` sẵn có, KHÔNG cửa ghi mới, gắn `stage:'clarify'`; verb `discover` — dispatch theo `item.stage` hiện tại: gọi `resolveDiscovery` (stage clarify) hoặc `resolveDecompose` (stage decompose), cùng `actor:'session'`; verb `take` — cầm đầu frontier (`readyWork`) hoặc một `--id` cùng tập, CAS `todo→doing` qua `moveWork` mang `actor`+`headAtTake` (`currentHead` của host repo), ghi outcome dự đoán qua `addOutcome`; item `blocked` mang nhánh `fgw/<id>` sống (`branchExists`, `worktree.mjs`) rẽ nhánh RIÊNG trước nhánh main-based: CAS `blocked→doing` qua `moveWork` mang `branchHeadAtTake` (`git rev-parse` trên chính nhánh, không phải host repo) thay vì `headAtTake`; verb `return` — kiểm `item.branchHeadAtTake` TRƯỚC mọi guard main-based (nguồn-nhánh không mang `headAtTake` nên kiểm main trước sẽ từ chối oan) — nếu có: đo số commit mới trên nhánh qua `commitsSince`, verify chạy qua `runGoalCheck` trong một worktree tạm DETACHED tại SHA nhánh (`git worktree add --detach`, dọn bằng `git worktree remove --force` trong `finally`, best-effort) — không đụng working tree host repo; xanh + có commit mới → `moveWork` `doing→proposed` mang `branchHeadAtReturn` (KHÔNG BAO GIỜ `headAtReturn`); không đủ điều kiện → từ chối rõ lý do hoặc `moveWork` `doing→blocked` (`reason:'verify-fail'`) + `addFriction`. Đường main-based cũ (không `branchHeadAtTake`) không đổi: TỰ CHẠY `verify` của item qua `runGoalCheck` (`src/runner/goal-check.mjs`, module dùng chung với runner — xem spec Runner) sau khi tự kiểm `isWorkingTreeClean`/`commitsSince` so `headAtTake`; xanh → `moveWork` `doing→proposed` mang thêm `headAtReturn` (`currentHead`, per pr-lifecycle D1) + `addOutcome` thực tế; đỏ → `moveWork` `doing→blocked` (`reason:'verify-fail'`) + `addOutcome` thực tế + `addFriction` lớp `verification`; verb `review`/`approve`/`reject` — cổng duyệt PR nội bộ, bề mặt CLI của một cửa duyệt cho mọi đề xuất `proposed`; cơ chế merge/verify đầy đủ sống ở `src/runner/merge.mjs` (xem spec Runner "Cổng duyệt PR nội bộ" cho hợp đồng đầy đủ)
+ - `src/runner/loop.mjs` — `runOnce`: NGAY SAU startupReap, TRƯỚC vòng dispatch executing: (1) quét mọi item `stage==='clarify' && status==='todo'` và gọi `resolveDiscovery` — lưới đỡ R19; (2) NGAY SAU đó, đọc lại view TƯƠI rồi quét mọi item `stage==='decompose' && status==='todo'` và gọi `resolveDecompose` — cùng lưới đỡ, cùng lượt chạy có thể chaining cả hai sweep trên một item vừa rời clarify; không đọc `item.mode` ở cả hai sweep; mọi `moveWork` runner tự ghi (claim/propose/park) gọi kèm `actor:'runner'`; cả hai sweep gọi `resolveDiscovery`/`resolveDecompose(..., 'runner')`
+ - `src/intake/classify.mjs` — thuần, không import store.mjs: `deriveTitle` (cắt câu/dòng đầu hoặc N ký tự), `classify` (bảng từ khóa → tier/kind/risk, mặc định standard/task khi không khớp), `generateId` (slug + hậu tố hash base36 adaptive 3-8 ký tự, thử lại khi trùng)
+ - `src/state/envelope.mjs` — thuần: `wrapEnvelope(data)` → `{contract:'fgos.v1', generated_at, data_hash (sha256 hex của data), data}`
+commit 42415be9fc21018d48eda189a65103ad4c6fb484
+Author: Van Tran <940988+vantt@users.noreply.github.com>
+Date:   Fri Jul 17 11:59:31 2026 +0700
+
+    fix(runner): exclude .fgos/ from approve/return's working-tree-clean gate
+    
+    .fgos is a live store with its own write door, mutated by the very
+    take/return/approve lifecycle calls this gate guards (each appends an
+    event as part of the same call) — it never signals an actually-dirty
+    code tree, so approve/return no longer require committing
+    events.jsonl by hand before every call.
+
+diff --git a/bin/fgos.mjs b/bin/fgos.mjs
+index b6350c6..0dab6d1 100755
+--- a/bin/fgos.mjs
++++ b/bin/fgos.mjs
+@@ -27,7 +27,7 @@ import { resolveDiscovery } from '../src/intake/discovery.mjs';
+ import { resolveDecompose } from '../src/intake/decompose.mjs';
+ import { computeEntropy, computeCounts } from '../src/report/entropy.mjs';
+ import { runGoalCheck } from '../src/runner/goal-check.mjs';
+-import { classifySource, reviewDiff, mergeRunnerItem, cleanupMergedBranch, isWorkingTreeClean as isMainTreeClean } from '../src/runner/merge.mjs';
++import { classifySource, reviewDiff, mergeRunnerItem, cleanupMergedBranch, isWorkingTreeClean as isMainTreeClean, isFgosOnlyStatusLine } from '../src/runner/merge.mjs';
+ import { branchNameFor, branchExists, createWorktree, removeWorktree } from '../src/runner/worktree.mjs';
+ import { resolveRoot } from '../src/runner/root-affinity.mjs';
+ import { visitCount } from '../src/runner/anti-loop.mjs';
+@@ -63,8 +63,16 @@ function currentHead(cwd) {
+   return gitAt(cwd, ['rev-parse', 'HEAD']).trim();
+ }
+ 
++// `.fgos/` is excluded from this check the same way merge.mjs's own
++// isWorkingTreeClean excludes it (isFgosOnlyStatusLine, shared rule): the
++// store is a live, self-mutating write door — return's own headAtReturn
++// event lands there as part of this very call — never a signal that the
++// code tree itself is dirty.
+ function isWorkingTreeClean(cwd) {
+-  return gitAt(cwd, ['status', '--porcelain']).trim() === '';
++  return gitAt(cwd, ['status', '--porcelain'])
++    .split('\n')
++    .filter((line) => line.trim() !== '')
++    .every(isFgosOnlyStatusLine);
+ }
+ 
+ function commitsSince(cwd, from, to) {
+diff --git a/docs/specs/runner.md b/docs/specs/runner.md
+index 53de67e..8b0c777 100644
+--- a/docs/specs/runner.md
++++ b/docs/specs/runner.md
+@@ -173,8 +173,10 @@ GỐC từng có con gãy nhập vào CÂY CHÍNH (xem "Trôi tích hợp & đ
+   `proposed` — `precondition` ("nothing to review/approve/reject"); `reject`
+   thiếu `--reason` — `validation` (bắt buộc, cùng khuôn `proposed→todo`);
+   `approve --timeout` không phải số dương — `validation`; `approve` trên
+-  nguồn `runner` khi working tree của main KHÔNG sạch — `validation`. Không
+-  nhánh chặn nào ghi sự kiện.
++  nguồn `runner` khi working tree của main KHÔNG sạch — `validation` (phép
++  kiểm này loại trừ `.fgos/`: store sống mang cửa ghi riêng, tự mutate bởi
++  chính take/return/approve nên không bao giờ tính là bẩn — `isFgosOnlyStatusLine`,
++  `src/runner/merge.mjs`). Không nhánh chặn nào ghi sự kiện.
+ - **What changes:**
+   - `review <id>` — thuần đọc (không sự kiện nào): in diff theo nguồn —
+     `runner` → `git diff main...fgw/<id>`; `pull` → `git diff
+diff --git a/docs/specs/work-state.md b/docs/specs/work-state.md
+index 396f93b..36de452 100644
+--- a/docs/specs/work-state.md
++++ b/docs/specs/work-state.md
+@@ -324,7 +324,8 @@ dispatch (`fgos ready`) — cửa pull không mở một tập riêng.
+ - **`fgos return <id> [--timeout <ms>]`** — trả kết quả, KHÔNG BAO GIỜ tin
+   lời người gọi: verb tự đo đủ ba điều kiện, mirror TRUNG THỰC contract
+   `proposed` của chính runner — (a) working tree của host repo phải SẠCH
+-  (mọi việc đã commit), (b) HEAD phải tiến so `headAtTake` (tiến bộ THẬT,
++  (mọi việc đã commit, loại trừ `.fgos/` — store sống tự mutate bởi chính
++  take/return/approve nên không bao giờ tính là bẩn), (b) HEAD phải tiến so `headAtTake` (tiến bộ THẬT,
+   không phải commit rỗng hay chưa commit gì), (c) verb TỰ CHẠY `verify`
+   thật của item (goal-check — cùng một hàm runner dùng, xem spec Runner)
+   tại HEAD đó, ngay trong thư mục làm việc hiện hành. Thiếu (a) hoặc (b) →
+@@ -540,7 +541,7 @@ của `submit`. Số phận cuối cùng (giữ/xóa) chưa quyết — xem back
+ ### Trả việc qua cửa pull (return)
+ 
+ - **Runs when:** người/phiên đang cầm một item qua `take` gọi `fgos return <id> [--timeout <ms>]`.
+-- **Blocked when:** item không tồn tại — `validation`; item không ở `doing` — `validation`; item đang `doing` nhưng `claimActor` không phải `human`/`session` (claim của runner) — `validation`, `return` chỉ hoàn tất một `take`; item thiếu `headAtTake` (claim di sản/không qua `take`) — `validation`; working tree host repo KHÔNG sạch — `validation`; HEAD chưa tiến so `headAtTake` — `validation`; `--timeout` không phải số dương — `validation`. KHÔNG có nhánh chặn nào ghi sự kiện.
++- **Blocked when:** item không tồn tại — `validation`; item không ở `doing` — `validation`; item đang `doing` nhưng `claimActor` không phải `human`/`session` (claim của runner) — `validation`, `return` chỉ hoàn tất một `take`; item thiếu `headAtTake` (claim di sản/không qua `take`) — `validation`; working tree host repo KHÔNG sạch (loại trừ `.fgos/` — store sống tự mutate bởi chính `return`, không bao giờ tính là bẩn) — `validation`; HEAD chưa tiến so `headAtTake` — `validation`; `--timeout` không phải số dương — `validation`. KHÔNG có nhánh chặn nào ghi sự kiện.
+ - **What changes:** verb TỰ CHẠY `verify` thật của item (goal-check) tại HEAD hiện hành, trong thư mục làm việc hiện hành — không bao giờ tin lời người gọi. Verify xanh: một sự kiện chuyển-trạng-thái `doing → proposed` mang thêm `headAtReturn` (HEAD tại đúng thời điểm này, Data Dictionary #16, per pr-lifecycle D1 / 1359ab5e), cộng một sự kiện outcome nửa THỰC TẾ (kết cục `proposed`, đạt goal-check, số commit kể từ `headAtTake`). Verify đỏ: một sự kiện chuyển-trạng-thái `doing → blocked` (lý do `verify-fail`), cộng nửa thực tế (kết cục `blocked`, không đạt), cộng một bản ghi friction lớp `verification`.
+ - **Side effects:** một tiến trình con chạy `verify` của item (shell, trong `cwd` hiện hành).
+ - **Afterwards:** verify xanh → item ở `proposed` mang `headAtReturn`, chờ người duyệt qua cổng `review`/`approve`/`reject` như mọi đề xuất khác (xem spec Runner "Cổng duyệt PR nội bộ" — dải `headAtTake→headAtReturn` là nguồn diff của một đề xuất pull-door) — KHÔNG sinh settlement ở bước này (settlement thuộc cạnh `→done`); verify đỏ → item ở `blocked`, mang một bản ghi friction verification, đi lại đường `blocked → todo` thường như mọi item đỗ khác.
+diff --git a/src/runner/merge.mjs b/src/runner/merge.mjs
+index fcad5ea..c94b305 100644
+--- a/src/runner/merge.mjs
++++ b/src/runner/merge.mjs
+@@ -88,11 +88,29 @@ export function detectTrunk(repoRoot) {
+   return 'main';
+ }
+ 
+-/** Whether `repoRoot`'s working tree has no pending changes — checked before
+- * a runner-item merge is attempted (a dirty main tree must never be mixed
+- * into a merge attempt). */
++/** Whether every path on a `git status --porcelain` line sits inside
++ * `.fgos/` — exported so bin/fgos.mjs's own working-tree-clean check
++ * (`return`'s pull-door gate) can apply the identical exclusion instead of
++ * re-deriving the porcelain-parsing rule. */
++export function isFgosOnlyStatusLine(line) {
++  const pathPart = line.slice(3);
++  const paths = pathPart.includes(' -> ') ? pathPart.split(' -> ') : [pathPart];
++  return paths.every((p) => p === '.fgos' || p.startsWith('.fgos/'));
++}
++
++/** Whether `repoRoot`'s working tree has no pending changes outside of
++ * `.fgos/` — checked before a runner-item merge is attempted (a dirty main
++ * tree must never be mixed into a merge attempt). `.fgos/` itself is
++ * excluded: it's a live store with its own write door, mutated by the very
++ * take/return/approve lifecycle operations this gate guards (each appends an
++ * event as part of the same call), so it never signals an actually-dirty
++ * code tree — only a manual `.fgos/events.jsonl` commit made that true
++ * before this exclusion existed. */
+ export function isWorkingTreeClean(repoRoot) {
+-  return git(repoRoot, ['status', '--porcelain']).trim() === '';
++  return git(repoRoot, ['status', '--porcelain'])
++    .split('\n')
++    .filter((line) => line.trim() !== '')
++    .every(isFgosOnlyStatusLine);
+ }
+ 
+ /** Classify a proposed `item` into its diff/merge source (see module doc). */
+diff --git a/test/cli/fgos.test.mjs b/test/cli/fgos.test.mjs
+index 744eeee..bea5ad9 100644
+--- a/test/cli/fgos.test.mjs
++++ b/test/cli/fgos.test.mjs
+@@ -1276,11 +1276,45 @@ test('return refuses a dirty working tree (uncommitted changes) as validation, e
+   assert.equal(run(cwd, ['take', '--id', 'pull-return-dirty']).status, 0);
+   fs.writeFileSync(path.join(cwd, 'proof.txt'), 'uncommitted\n'); // never git add/commit
+ 
++  // Sanity: `.fgos/` is ALSO dirty here (take's own event, never committed —
++  // reported collapsed as "?? .fgos/" since nothing inside it has ever been
++  // tracked yet) — proving the .fgos/ exclusion below does not accidentally
++  // mask this rejection; it's proof.txt, a real non-.fgos path, that trips it.
++  assert.match(execFileSync('git', ['status', '--porcelain'], { cwd, encoding: 'utf8' }), /\.fgos/);
++
+   const result = run(cwd, ['return', 'pull-return-dirty']);
+   assert.equal(result.status, 4);
+   assert.equal(stateView(cwd).work['pull-return-dirty'].status, 'doing');
+ });
+ 
++test('return succeeds when ONLY .fgos/ (the live event log) is dirty — its own take/return writes are excluded from the clean-tree gate (no more manual events.jsonl commit before every return)', () => {
++  const cwd = initGitCwd();
++  run(cwd, ['init']);
++  addOk(cwd, 'pull-return-fgos-only-dirty', { verify: 'test -f proof.txt' });
++  assert.equal(run(cwd, ['take', '--id', 'pull-return-fgos-only-dirty']).status, 0);
++
++  // Commit ONLY the produced file — deliberately leave the take event's
++  // `.fgos/events.jsonl` delta uncommitted, unlike commitFile's `git add -A`
++  // which would fold both together and never isolate the exclusion.
++  fs.writeFileSync(path.join(cwd, 'proof.txt'), 'work\n');
++  execFileSync('git', ['add', 'proof.txt'], { cwd });
++  execFileSync('git', ['commit', '-q', '-m', 'work: proof.txt'], { cwd });
++
++  // `.fgos/` has never had a tracked file inside it in this fixture, so git
++  // reports it collapsed as a single untracked directory ("?? .fgos/")
++  // rather than listing events.jsonl individually — either shape must still
++  // count as "only .fgos/ dirty" for the exclusion below.
++  const statusLines = execFileSync('git', ['status', '--porcelain'], { cwd, encoding: 'utf8' })
++    .split('\n')
++    .filter(Boolean);
++  assert.equal(statusLines.length, 1, 'sanity: .fgos/ must be the ONLY dirty path at this point');
++  assert.match(statusLines[0], /\.fgos\/?$/);
++
++  const result = run(cwd, ['return', 'pull-return-fgos-only-dirty']);
++  assert.equal(result.status, 0, `return should succeed with only .fgos/ dirty: ${result.stderr}`);
++  assert.equal(stateView(cwd).work['pull-return-fgos-only-dirty'].status, 'proposed');
++});
++
+ test('return refuses when HEAD has not advanced past headAtTake — a clean tree with zero real progress — as validation, exit 4, item stays doing', () => {
+   // `.fgos/` entirely gitignored here (unlike initGitCwd's `.fgos/state.json`
+   // only) so the tree is genuinely clean right after `take` with no commit
+@@ -1592,6 +1626,41 @@ test('approve of a runner item (happy path): merges fgw/<id> into main, verifies
+   assert.doesNotMatch(branches, /fgw\/approve-runner-item/, 'the fully-merged branch is cleaned up');
+ });
+ 
++test('approve of a runner item succeeds when ONLY .fgos/ (the live event log) is dirty on main — no more manual events.jsonl commit before every approve', () => {
++  const cwd = initGitCwdMain();
++  run(cwd, ['init']);
++  makeRunnerProposedItem(cwd, 'approve-fgos-only-dirty', { verify: 'test -f approve-fgos-only-dirty-produced.txt' });
++
++  // Dirty ONLY `.fgos/events.jsonl` on main after the item is proposed —
++  // an unrelated `add` appends an event and never touches any other file —
++  // deliberately left uncommitted (unlike makeRunnerProposedItem's own
++  // commitPending calls, which fold everything together).
++  assert.equal(addOk(cwd, 'approve-fgos-only-dirty-noise').status, 0);
++
++  const statusLines = execFileSync('git', ['status', '--porcelain'], { cwd, encoding: 'utf8' })
++    .split('\n')
++    .filter(Boolean);
++  assert.equal(statusLines.length, 1, 'sanity: .fgos/events.jsonl must be the ONLY dirty path at this point');
++  assert.match(statusLines[0], /\.fgos\/events\.jsonl$/);
++
++  const result = run(cwd, ['approve', 'approve-fgos-only-dirty']);
++  assert.equal(result.status, 0, `approve should succeed with only .fgos/ dirty: ${result.stderr}`);
++  assert.equal(stateView(cwd).work['approve-fgos-only-dirty'].status, 'done');
++});
++
++test('approve of a runner item still refuses when a non-.fgos file on main is dirty, as validation, exit 4, item stays proposed', () => {
++  const cwd = initGitCwdMain();
++  run(cwd, ['init']);
++  makeRunnerProposedItem(cwd, 'approve-real-dirty', { verify: 'test -f approve-real-dirty-produced.txt' });
++
++  fs.writeFileSync(path.join(cwd, 'scratch.txt'), 'unrelated uncommitted work\n'); // never git add/commit
++
++  const result = run(cwd, ['approve', 'approve-real-dirty']);
++  assert.equal(result.status, 4);
++  assert.match(result.stderr, /not clean/);
++  assert.equal(stateView(cwd).work['approve-real-dirty'].status, 'proposed');
++});
++
+ test('approve of a leaf item with a clean merge lands the work on fgw/<root> (not main) via an ephemeral worktree, leaf -> done, fgw/<leaf> is actually deleted, fgw/<root> survives (D3/D4/D17)', () => {
+   const cwd = initGitCwdMain();
+   run(cwd, ['init']);
+diff --git a/test/runner/merge.test.mjs b/test/runner/merge.test.mjs
+index c948eb1..46084d2 100644
+--- a/test/runner/merge.test.mjs
++++ b/test/runner/merge.test.mjs
+@@ -152,6 +152,31 @@ test('reviewDiff for a legacy item (no branch, no head markers) returns a null d
+   assert.match(result.warnings[0], /no live diff source/);
+ });
+ 
++// --- isWorkingTreeClean (.fgos/ exclusion) -------------------------------
++
++test('isWorkingTreeClean is true when the only pending change is inside .fgos/', () => {
++  const repoRoot = initRepo();
++  fs.mkdirSync(path.join(repoRoot, '.fgos'));
++  fs.writeFileSync(path.join(repoRoot, '.fgos', 'events.jsonl'), '{"seq":1}\n');
++  git(repoRoot, ['add', '.fgos/events.jsonl']);
++  git(repoRoot, ['commit', '-q', '-m', 'seed .fgos/events.jsonl']);
++
++  fs.appendFileSync(path.join(repoRoot, '.fgos', 'events.jsonl'), '{"seq":2}\n');
++  assert.equal(isWorkingTreeClean(repoRoot), true);
++});
++
++test('isWorkingTreeClean is false when a non-.fgos path is dirty, even alongside a dirty .fgos/', () => {
++  const repoRoot = initRepo();
++  fs.mkdirSync(path.join(repoRoot, '.fgos'));
++  fs.writeFileSync(path.join(repoRoot, '.fgos', 'events.jsonl'), '{"seq":1}\n');
++  git(repoRoot, ['add', '.fgos/events.jsonl']);
++  git(repoRoot, ['commit', '-q', '-m', 'seed .fgos/events.jsonl']);
++
++  fs.appendFileSync(path.join(repoRoot, '.fgos', 'events.jsonl'), '{"seq":2}\n');
++  fs.writeFileSync(path.join(repoRoot, 'scratch.txt'), 'uncommitted\n');
++  assert.equal(isWorkingTreeClean(repoRoot), false);
++});
++
+ // --- mergeRunnerItem (spike-proven mechanics: --no-commit --no-ff, verify
+ // on the staged tree BEFORE commit, --abort on any red path) --------------
+ 
+commit 3262bdfff7d00de0bed59a999dbdda33424062a1
+Author: Van Tran <940988+vantt@users.noreply.github.com>
+Date:   Fri Jul 17 11:49:11 2026 +0700
+
+    chore(runner): raise executor timeout 300s -> 900s — real implementation tasks need suite runs (run-5b friction)
+
+diff --git a/.fgos-runner.json b/.fgos-runner.json
+index d805a73..845415c 100644
+--- a/.fgos-runner.json
++++ b/.fgos-runner.json
+@@ -1,14 +1,23 @@
+ {
+   "executor": {
+     "command": "claude",
+-    "args": ["-p", "{prompt}", "--model", "{model}", "--permission-mode", "acceptEdits", "--allowedTools", "Bash(git add:*),Bash(git commit:*)"]
++    "args": [
++      "-p",
++      "{prompt}",
++      "--model",
++      "{model}",
++      "--permission-mode",
++      "acceptEdits",
++      "--allowedTools",
++      "Bash(git add:*),Bash(git commit:*)"
++    ]
+   },
+   "models": {
+     "light": "haiku",
+     "standard": "sonnet",
+     "heavy": "opus"
+   },
+-  "timeoutMs": 300000,
++  "timeoutMs": 900000,
+   "parallel": {
+     "maxRoots": 4,
+     "maxLeavesPerRoot": 4
+diff --git a/.fgos/entropy-history.jsonl b/.fgos/entropy-history.jsonl
+index 316e77a..66a105d 100644
+--- a/.fgos/entropy-history.jsonl
++++ b/.fgos/entropy-history.jsonl
+@@ -1 +1,2 @@
+ {"ts":"2026-07-17T01:25:19.159Z","score":2,"counts":{"outcomes":1,"frictions":1,"settlements":4}}
++{"ts":"2026-07-17T04:36:17.052Z","score":0,"counts":{"outcomes":1,"frictions":2,"settlements":5}}
+diff --git a/.fgos/events.jsonl b/.fgos/events.jsonl
+index 77131ae..e3ad3d5 100644
+--- a/.fgos/events.jsonl
++++ b/.fgos/events.jsonl
+@@ -39,3 +39,13 @@
+ {"seq":39,"ts":"2026-07-17T03:43:51.154Z","type":"work.outcome","payload":{"id":"bo-hardcode-ten-trunk-main-trong-merge-e-5i0","predicted":{"tier":"standard","deps":0,"priorVisits":4,"actor":"human","branchHeadAtTake":"9ed87960c793292e0731c2beb07b15bebee32842"}},"v":2}
+ {"seq":40,"ts":"2026-07-17T03:44:57.524Z","type":"work.move","payload":{"id":"bo-hardcode-ten-trunk-main-trong-merge-e-5i0","from":"doing","to":"proposed","branchHeadAtReturn":"0e6ce242b90cb37978dea6de40bc0da006e805dc"},"v":2}
+ {"seq":41,"ts":"2026-07-17T03:44:57.525Z","type":"work.outcome","payload":{"id":"bo-hardcode-ten-trunk-main-trong-merge-e-5i0","actual":{"outcome":"proposed","passed":true,"attempts":1,"errorClass":null,"aheadCount":13}},"v":2}
++{"seq":42,"ts":"2026-07-17T04:36:03.846Z","type":"work.move","payload":{"id":"bo-hardcode-ten-trunk-main-trong-merge-e-5i0","from":"proposed","to":"done","actor":"human","learning":{"outcome":{"disposition":"proposed","attempts":1,"errorClass":null},"frictions":{"verification":1,"state":1},"settlements":{"answer/human":3,"clarify-pass/runner":1,"close/human":1}}},"v":2}
++{"seq":43,"ts":"2026-07-17T04:37:05.502Z","type":"work.add","payload":{"id":"loai-tru-data-dir-39c","title":"Loại trừ data dir","description":"Loại trừ data dir .fgos khỏi phép kiểm cây-sạch của approve và return (bin/fgos.mjs): .fgos là store sống có cửa ghi riêng, mutate bởi chính thao tác vòng đời (take/return/approve ghi event) nên không bao giờ dính vào merge — hiện mỗi lần approve phải commit events.jsonl thủ công trước (friction đã ghi 2026-07-17). Yêu cầu: isWorkingTreeClean (hoặc điểm gọi của nó trong approve/return) bỏ qua đường dẫn .fgos/; test chứng minh approve chạy được khi CHỈ .fgos bẩn nhưng vẫn từ chối khi file khác bẩn; suite xanh. Verify: npm test","kind":"task","status":"todo","deps":[],"risk":"standard","refs":[],"verify":"chưa xác định — P15 bổ sung","tier":"standard","mode":"async","stage":"clarify"},"v":2}
++{"seq":44,"ts":"2026-07-17T04:38:04.713Z","type":"work.discovery","payload":{"id":"loai-tru-data-dir-39c","clear":true,"verify":"npm test"},"v":2}
++{"seq":45,"ts":"2026-07-17T04:38:04.715Z","type":"work.stage","payload":{"id":"loai-tru-data-dir-39c","from":"clarify","to":"decompose","verify":"npm test","actor":"runner"},"v":2}
++{"seq":46,"ts":"2026-07-17T04:38:34.751Z","type":"work.stage","payload":{"id":"loai-tru-data-dir-39c","from":"decompose","to":"executing","actor":"runner"},"v":2}
++{"seq":47,"ts":"2026-07-17T04:38:34.753Z","type":"work.move","payload":{"id":"loai-tru-data-dir-39c","from":"todo","to":"doing","actor":"runner"},"v":2}
++{"seq":48,"ts":"2026-07-17T04:38:34.755Z","type":"work.outcome","payload":{"id":"loai-tru-data-dir-39c","predicted":{"tier":"standard","deps":0,"priorVisits":0}},"v":2}
++{"seq":49,"ts":"2026-07-17T04:48:35.947Z","type":"work.move","payload":{"id":"loai-tru-data-dir-39c","from":"doing","to":"blocked","actor":"runner"},"v":2}
++{"seq":50,"ts":"2026-07-17T04:48:35.953Z","type":"work.outcome","payload":{"id":"loai-tru-data-dir-39c","actual":{"outcome":"parked","passed":false,"attempts":2,"errorClass":"worker-timeout","aheadCount":0,"visits":1}},"v":2}
++{"seq":51,"ts":"2026-07-17T04:48:35.954Z","type":"work.friction","payload":{"id":"loai-tru-data-dir-39c","disposition":"parked","errorClass":"worker-timeout","layer":"environment","attempts":2,"detail":"executor timed out after 300000ms for work \"loai-tru-data-dir-39c\"."},"v":2}
+commit c3b7a12dc82020f04da96df518af24f26c3f6932
+Author: Van Tran <940988+vantt@users.noreply.github.com>
+Date:   Fri Jul 17 12:11:12 2026 +0700
+
+    docs(backlog): P34 done, P25 ACHIEVED — first full self-orchestrated lifecycle (2 real items)
+
+diff --git a/.fgos/events.jsonl b/.fgos/events.jsonl
+index dd30cfd..77e2d5c 100644
+--- a/.fgos/events.jsonl
++++ b/.fgos/events.jsonl
+@@ -65,3 +65,4 @@
+ {"seq":65,"ts":"2026-07-17T05:07:46.623Z","type":"work.outcome","payload":{"id":"loai-tru-data-dir-39c","predicted":{"tier":"standard","deps":0,"priorVisits":3,"actor":"human","branchHeadAtTake":"42415be9fc21018d48eda189a65103ad4c6fb484"}},"v":2}
+ {"seq":66,"ts":"2026-07-17T05:08:36.175Z","type":"work.move","payload":{"id":"loai-tru-data-dir-39c","from":"doing","to":"proposed","branchHeadAtReturn":"66c73e389d9431e9b3cbf71c62c1c1451f9f7e19"},"v":2}
+ {"seq":67,"ts":"2026-07-17T05:08:36.175Z","type":"work.outcome","payload":{"id":"loai-tru-data-dir-39c","actual":{"outcome":"proposed","passed":true,"attempts":1,"errorClass":null,"aheadCount":2}},"v":2}
++{"seq":68,"ts":"2026-07-17T05:10:09.795Z","type":"work.move","payload":{"id":"loai-tru-data-dir-39c","from":"proposed","to":"done","actor":"human","learning":{"outcome":{"disposition":"proposed","attempts":1,"errorClass":null},"frictions":{"environment":1,"verification":2},"settlements":{"clarify-pass/runner":1,"close/human":1}}},"v":2}
+diff --git a/docs/backlog.md b/docs/backlog.md
+index 2792190..d9fdf87 100644
+--- a/docs/backlog.md
++++ b/docs/backlog.md
+@@ -24,7 +24,7 @@
+ | P22 | Số phận verb `add`: đã hạ cấp khỏi câu chuyện public (stage-clarify D9 — submit là cửa công khai duy nhất; id tự đặt phá nhất quán id tự sinh); quyết xóa hẳn hay giữ làm bề mặt nội bộ cho test/tooling | Spec/docs không kể `add` là cửa vào; quyết định xóa/giữ có decision record; test suite không phụ thuộc đường public nào đã bỏ | proposed | — |
+ | P23 | Verb update/edit field công khai cho work-item (ghi đè kind/risk do classify gợi ý, sửa verify tay...) — "luôn ghi đè được" (stage-intake D1) hiện chưa có bề mặt CLI nào thực hiện được | Người/agent đổi được field của item đã tồn tại qua một verb, đi qua cửa ghi C2, event additive | proposed | — |
+ | P24 | Rollup view theo "bộ" (stage-clarify D11): human hỏi "việc tôi nộp tới đâu rồi" — xem item gốc + tiến độ hậu duệ (n/m xong), dựa trên field parent (P16 dựng) | Một lệnh đọc cho thấy mọi item gốc kèm tiến độ con; item nội bộ không làm nhiễu tầm nhìn cấp gốc | proposed | — |
+-| P25 | Mốc dogfood tự-phát-triển: dùng fgos tại xưởng điều phối phát triển chính fgos sản phẩm (thay vai bee hiện tại — xưởng điều phối, `./repo` là đối tượng). Điều kiện tối thiểu: P16 + P17 khép kín vòng giao việc→nghiệm thu; P10 coexistence trước khi chạy thật trong xưởng đang có bee. Bee chủ động báo người dùng khi đủ điều kiện (standing request 2026-07-16, kiểm tại mỗi feature close) | Một work-item thật của chính fgos đi trọn vòng submit→clarify→chia việc→execute→PR→merge do fgos-runner điều phối trong xưởng, không cần bee đỡ — run-1 2026-07-16: FAIL tại clarify-loop (→P30), bằng chứng docs/history/dogfood-p25-run1/ xưởng; run-2 2026-07-17 SAU P30: clarify HỘI TỤ với answer sẵn có (P30 CoS đạt), đi tiếp decompose→dispatch→goal-check→park verify-miss — biên giới mới: worker execution rỗng (→P31) | proposed | — |
++| P25 | Mốc dogfood tự-phát-triển: dùng fgos tại xưởng điều phối phát triển chính fgos sản phẩm (thay vai bee hiện tại — xưởng điều phối, `./repo` là đối tượng). Điều kiện tối thiểu: P16 + P17 khép kín vòng giao việc→nghiệm thu; P10 coexistence trước khi chạy thật trong xưởng đang có bee. Bee chủ động báo người dùng khi đủ điều kiện (standing request 2026-07-16, kiểm tại mỗi feature close) | Một work-item thật của chính fgos đi trọn vòng submit→clarify→chia việc→execute→PR→merge do fgos-runner điều phối trong xưởng, không cần bee đỡ — run-1 2026-07-16: FAIL tại clarify-loop (→P30), bằng chứng docs/history/dogfood-p25-run1/ xưởng; run-2 2026-07-17 SAU P30: clarify HỘI TỤ với answer sẵn có (P30 CoS đạt), đi tiếp decompose→dispatch→goal-check→park verify-miss — biên giới mới: worker execution rỗng (→P31) — **ĐẠT 2026-07-17**: 2 item thật trọn vòng (bo-hardcode 763497d, loai-tru-data-dir 6bb3e01) — submit→clarify→(decompose pass-through)→worker code thật→proposed→reject/park→người hoàn tất qua cửa D2→approve→merge→done; settlement/learning/friction/entropy đủ; bee không đỡ bước nào của vòng fgos | done | [human-rounds](history/human-rounds/) + [dogfood-p25-run1](history/dogfood-p25-run1/) |
+ | P26 | Cửa pull giao–nhận việc (take/return): tác nhân ngoài runner (người/phiên/runner khác) nhận đúng một item từ queue qua claim CAS, trả kết quả qua cửa event; runner vẫn tự dispatch khi không ai cầm — mô hình hóa attend/unattend (stage-decompose D1) | Một người/phiên take một item, runner không giẫm; return trả kết quả thành event; goal-check giữ luật không-tin-lời-worker | done | [stage-decompose](history/stage-decompose/) |
+ | P27 | Orchestrator service tầng fleet: registry worker + heartbeat + push assignment + lease/liveness + capacity + giao thức/auth cho worker từ xa — đắp TRÊN cùng event log (stage-decompose D1: pull là móng, không đập lại) | Chỉ mở khi có nhu cầu fleet thật (worker từ xa/luôn-bật); thiết kế đứng trên log + claim sẵn có | proposed | — |
+ | P28 | GitHub adapter cho PR lifecycle: transport remote (tạo PR thật, duyệt trên web, auto-merge qua API) đứng trên CÙNG cổng duyệt nội bộ của P17 (pr-lifecycle D1 — local-first, adapter chỉ đổi transport) | Một item proposed tạo được PR GitHub thật, duyệt web → hệ merge remote + item done; cổng duyệt nội bộ không fork luật | proposed | — |
+commit c7184f888f0597f3874886db8f3dcafb7f011c3e
+Author: Van Tran <940988+vantt@users.noreply.github.com>
+Date:   Fri Jul 17 12:09:53 2026 +0700
+
+    docs(backlog): sync row states
+
+diff --git a/docs/backlog.md b/docs/backlog.md
+index 239d339..2792190 100644
+--- a/docs/backlog.md
++++ b/docs/backlog.md
+@@ -33,7 +33,7 @@
+ | P31 | Worker execution thật cho dogfood: run-2 (2026-07-17) worker được dispatch nhưng nhánh fgw rỗng (aheadCount 0, verify-miss ×2 → parked đúng luật) — điều tra executor config/worker prompt của dispatch cho task implementation thật (model nào, prompt đủ chưa, timeout, làm sao thấy log worker) | Item dogfood bo-hardcode-ten-trunk được worker thật implement: nhánh fgw có commit, goal-check xanh, item proposed | done | [worker-execution](history/worker-execution/) |
+ | P32 | Persist log worker dispatch (observability): hiện output worker chỉ console-tail per luật security-panel (loop.mjs output-discipline — KHÔNG persist vào path committed); muốn log file .fgos/logs cần SUPERSEDE quyết định đó tường minh + gitignore + một cửa ghi (single-door .fgos) + đính stdout vào DispatchError cho timeout/spawn-fail (plan-checker P31 B1/W1/W2 đã map đủ ràng buộc) | Quyết supersede-hay-không có decision record; nếu làm: log đọc được cho MỌI kết cục kể cả timeout, không phá single-door, không vào git | proposed | — |
+ | P33 | Feedback người tới worker: prompt worker (buildPrompt) thiếu answer từ gates + lý do reject mới nhất → vòng reject không hội tụ (run-3: reject kèm yêu cầu test, worker round-2 no-op vì không thấy lý do); kiểm fold `reason` trên work.move (đường destructure — critical pattern fold-allowlist) | Reject kèm lý do → worker round sau NHÌN THẤY lý do trong prompt và làm đúng; item dogfood có test master-trunk sau một vòng reject — GHI CHÚ: code + unit-proof đã ship (worker-execution-2); live-proof CoS bị anti-loop chặn trước dispatch → gộp vào CoS P34 | done | [worker-execution](history/worker-execution/) |
+-| P34 | Anti-loop vs vòng người: (a) reject/answer của NGƯỜI hiện ăn cùng ngân sách visit với vòng lỗi → item bị park 3/3 TRƯỚC khi worker kịp thấy lý do reject (run-4); (b) item nhánh-runner bị anti-loop park xong thì KHÔNG còn cửa công khai nào cho người hoàn tất đề xuất (pull-door đo main, không hợp việc trên nhánh; classifier cũng chặn đẩy tay — đúng tinh thần). Thiết kế: can thiệp người (answer/reject) làm mới/mở rộng ngân sách visit? verb người-tiếp-quản-nhánh? | Một vòng reject do người chủ động không bị anti-loop nuốt; item park 3/3 có đường người-hoàn-tất chính danh; live-proof P33 (worker thấy lý do và làm đúng) chạy được | in-flight | [human-rounds](history/human-rounds/) |
++| P34 | Anti-loop vs vòng người: (a) reject/answer của NGƯỜI hiện ăn cùng ngân sách visit với vòng lỗi → item bị park 3/3 TRƯỚC khi worker kịp thấy lý do reject (run-4); (b) item nhánh-runner bị anti-loop park xong thì KHÔNG còn cửa công khai nào cho người hoàn tất đề xuất (pull-door đo main, không hợp việc trên nhánh; classifier cũng chặn đẩy tay — đúng tinh thần). Thiết kế: can thiệp người (answer/reject) làm mới/mở rộng ngân sách visit? verb người-tiếp-quản-nhánh? | Một vòng reject do người chủ động không bị anti-loop nuốt; item park 3/3 có đường người-hoàn-tất chính danh; live-proof P33 (worker thấy lý do và làm đúng) chạy được | done | [human-rounds](history/human-rounds/) |
+ | P20 | Registry-manifest máy-đọc cho architecture-map + script 2 phép kiểm trong verify: (a) chiều import một-chiều-xuống theo nhà đã khai, (b) đủ sổ — mọi file src/** bin/** có row (architecture-map §9.3, record 0010; đứng trước S2-friction) | Script đỏ khi có import ngược tầng hoặc file thiếu row; verify chain chạy nó; sổ §6 không drift được nữa | done | [0010](decisions/0010-ban-do-kien-truc-la-ban-chuan.md) + map §9.3 |
+ | P2 | Routing trên state (Phase 2): frontier sẵn-sàng thành lệnh, chain handoff, recovery matrix + anti-loop, runner tuần tự | Agent lạ tự tìm việc kế tiếp bằng truy vấn derive, không danh sách tay (tiêu chí F3, luật L6) | done | [phase-2-routing](history/phase-2-routing/) |
+ | P1 | forgent tự quản work-state của chính nó qua tầng state/FSM (Phase 1: store zero-dep, transition có precondition, single-door, CAS, decisions event-sourced) | Một agent lạ, không chat history, trả lời "đang ở đâu / việc gì đang mở" từ state chứ không từ trí nhớ (tiêu chí F2, luật L6) | done | [phase-1-state-layer](history/phase-1-state-layer/) |

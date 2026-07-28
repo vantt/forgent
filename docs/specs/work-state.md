@@ -1,8 +1,8 @@
 ---
 area: work-state
-updated: 2026-07-27
-sources: [phase-1-state-layer, phase-1-review-fixes, phase-2-routing-s1, phase-2-routing-s2, phase-3-compound-learning-s1, phase-3-compound-learning-s2, phase-3-compound-learning-s3-closeout, async-human-gate, stage-intake, stage-clarify, stage-decompose-s1, stage-decompose-s2, pr-lifecycle-s1, install-coexistence, discovery-context, worker-execution, fan-out-parallel, human-rounds, work-item-verb-surface, base-workflow-model-s1, base-workflow-model-s2, self-improve-loop, work-graph-intelligence-s1, work-graph-intelligence-s2a, work-graph-intelligence-s2b, entry-standardization, work-id-tsk-hash, p50-workflow-induct, str61-chat-context-continuity, str68-discovery-judge-robustness, compound-learn-enduser-docs, str77-79-doc-gap-fixes, str83-fgos-slash-commands, str86-runner-headless-git, str73-done-flip-cos-check, str93-discovery-precedence-labels, str7-str8-priority-intent, str51-llm-assist-classify]
-decisions: [9ac6ca50, 0790031c, 451ca088, fd17309a, 55ad2f9f, feed7428, 1a80b4d3, 65c642a8, 9f6b52c8, 9a19eea5, 96a65365, a7c099af, 43f257ae, 44936500, e1218b22, 6f2cbc47, a30a3d3c, 1359ab5e, f1715488, 8788e9bb, cfae0120, 396d9d9e, 2e92b7a5, 5a6900b2, b28487af, 2ae492d8, 76b7a36b, 8d04bba3, 1cd895e1, 38160a70, a2146274, 896219a7, b5c0ba0c, b2d18cc7, b0da87aa, 8cf7effe, 81322763, 28e6184b, 14091e58, 19330e09, bce79d8a, 87536f3f, 9c67c3d1, 6aa67ae4, 1c776c56, 1d336d8a, ea8b9a8d, 757e5dd7, ecfd0d1a, 0f3b6eb0, 0e575f83, ee0f95c3, f69951df, f176c18a, d3445024, a5825b8b]
+updated: 2026-07-28
+sources: [phase-1-state-layer, phase-1-review-fixes, phase-2-routing-s1, phase-2-routing-s2, phase-3-compound-learning-s1, phase-3-compound-learning-s2, phase-3-compound-learning-s3-closeout, async-human-gate, stage-intake, stage-clarify, stage-decompose-s1, stage-decompose-s2, pr-lifecycle-s1, install-coexistence, discovery-context, worker-execution, fan-out-parallel, human-rounds, work-item-verb-surface, base-workflow-model-s1, base-workflow-model-s2, self-improve-loop, work-graph-intelligence-s1, work-graph-intelligence-s2a, work-graph-intelligence-s2b, entry-standardization, work-id-tsk-hash, p50-workflow-induct, str61-chat-context-continuity, str68-discovery-judge-robustness, compound-learn-enduser-docs, str77-79-doc-gap-fixes, str83-fgos-slash-commands, str86-runner-headless-git, str73-done-flip-cos-check, str93-discovery-precedence-labels, str7-str8-priority-intent, str51-llm-assist-classify, str46-io-contract-lat2, str46-io-contract-lat3]
+decisions: [9ac6ca50, 0790031c, 451ca088, fd17309a, 55ad2f9f, feed7428, 1a80b4d3, 65c642a8, 9f6b52c8, 9a19eea5, 96a65365, a7c099af, 43f257ae, 44936500, e1218b22, 6f2cbc47, a30a3d3c, 1359ab5e, f1715488, 8788e9bb, cfae0120, 396d9d9e, 2e92b7a5, 5a6900b2, b28487af, 2ae492d8, 76b7a36b, 8d04bba3, 1cd895e1, 38160a70, a2146274, 896219a7, b5c0ba0c, b2d18cc7, b0da87aa, 8cf7effe, 81322763, 28e6184b, 14091e58, 19330e09, bce79d8a, 87536f3f, 9c67c3d1, 6aa67ae4, 1c776c56, 1d336d8a, ea8b9a8d, 757e5dd7, ecfd0d1a, 0f3b6eb0, 0e575f83, ee0f95c3, f69951df, f176c18a, d3445024, a5825b8b, a58a7563, 11d5ebc4, 10a740da, 8fc155eb]
 coverage: full
 ---
 
@@ -154,7 +154,7 @@ mang thêm một trường **writer** — object lồng đúng hai trường con
 gọi thuộc LOẠI nào" (`human`/`runner`/`session`/`system`), còn `writer`
 trả lời "người gọi là CÁ THỂ nào" — phân biệt được hai phiên agent cùng chạy
 song song, cùng mang `role: session` nhưng là hai tiến trình khác nhau
-(per D7/D8 str46-io-contract).
+(per D7/D8 str46-io-contract). The gates[id] projection derived from `work.move` events carries CTR004/v1 version token through the `SCHEMA_VERSION` field of the source event, per D37 str46-io-contract.
 
 `writer.id` là chuỗi hoặc số định danh tiến trình ghi. `writer.source` nói
 độ tin của giá trị đó — KHÔNG phải một trường độc lập, mà đi kèm bắt buộc với
@@ -552,25 +552,68 @@ khi verb ném lỗi, chẩn đoán đi ra `stderr` kèm mã thoát theo bảng p
 (stdout=dữ liệu, stderr=chẩn đoán) — bên gọi phân biệt thành/bại bằng mã thoát,
 không phải bằng việc dò nội dung phong bì.
 
+**Vòng tự hành (`fgos-runner`) cũng dùng CÙNG phong bì này cho kết cục cuối của
+mỗi lượt/chu kỳ** (per D2 str46-io-contract) — in liền một dòng thay vì nhiều
+dòng như trên, vì một tiến trình `--watch` phát nhiều phong bì nối tiếp theo
+thời gian; chi tiết đầy đủ + các luồng output khác nằm ngoài phong bì: xem spec
+Runner RUL61.
+
 ### Sổ verb máy-đọc (manifest) — `--help --json`
 
 CLI công bố **toàn bộ mặt verb** dưới dạng một sổ máy-đọc: gọi trợ giúp ở dạng
-máy-đọc trả `{schema_version, commands: […]}`, mỗi mục mô tả một verb —
-`name`, cách gọi, mô tả một dòng, lược đồ tham số (cờ/positional), ví dụ, cờ
-**`access` (`read` hay `mutation`)** cho biết verb chỉ đọc hay có đổi trạng thái,
-và ô `deprecated`. Sổ này để một listener/giao diện **sinh** khung lệnh và khung
-form từ manifest thay vì hard-code từng verb. Bản thân sổ verb là **siêu dữ liệu
-về CLI**, KHÔNG bọc trong phong bì `data` (nó mô tả CLI, không phải kết quả một
-verb). Cờ `access` mới chỉ là **khai báo** — chưa nối vào điều-phối hay xác danh;
-cổng "ai được nói verb nào" là việc riêng sau này (backlog STR38), sổ verb chỉ cung
-cấp nguyên liệu cho nó. Dạng trợ giúp thường (không máy-đọc) in cùng thông tin ở
-dạng chữ cho người đọc. Với một tham số CHỈ nhận qua vị trí trên dòng lệnh
-(positional — vd `text` của `submit`, đọc từ đối số đầu, không bao giờ qua một
-cờ `--text`), sổ verb đánh dấu riêng tham số đó là positional; dạng trợ giúp
-chữ cho người đọc in dòng "positional: `<tên>`" cho tham số này, KHÔNG BAO GIỜ
-in nhầm thành "required: `--<tên>`" như một cờ thật — một tham số vừa nhận
-positional vừa nhận qua cờ (vd `id` của `discover`/`take`) in cả hai dạng phân
-biệt (per D3 str77-79-doc-gap-fixes / ea8b9a8d — RUL54).
+máy-đọc trả `{schema_version, commands: […]}` (`schema_version` hiện hành
+`'2.0'`, per D34 str46-io-contract — tăng từ `'1.0'` vì một trường bị xoá,
+xem ngay dưới), mỗi mục mô tả một verb — `name`, cách gọi, mô tả một dòng,
+lược đồ tham số (cờ/positional), ví dụ, và ô `deprecated`. Sổ này để một
+listener/giao diện **sinh** khung lệnh và khung form từ manifest thay vì
+hard-code từng verb. Bản thân sổ verb là **siêu dữ liệu về CLI**, KHÔNG bọc
+trong phong bì `data` (nó mô tả CLI, không phải kết quả một verb). Dạng trợ
+giúp thường (không máy-đọc) in cùng thông tin ở dạng chữ cho người đọc. Với
+một tham số CHỈ nhận qua vị trí trên dòng lệnh (positional — vd `text` của
+`submit`, đọc từ đối số đầu, không bao giờ qua một cờ `--text`), sổ verb
+đánh dấu riêng tham số đó là positional; dạng trợ giúp chữ cho người đọc in
+dòng "positional: `<tên>`" cho tham số này, KHÔNG BAO GIỜ in nhầm thành
+"required: `--<tên>`" như một cờ thật — một tham số vừa nhận positional vừa
+nhận qua cờ (vd `id` của `discover`/`take`) in cả hai dạng phân biệt (per D3
+str77-79-doc-gap-fixes / ea8b9a8d — RUL54).
+
+**Hai trục thay cho `access` (per D4/D34 str46-io-contract).** Cờ `access`
+đơn (`read` hay `mutation`) từng gộp hai câu hỏi khác nhau vào một giá trị —
+lộ rõ khi `review` khai `mutation` chỉ vì chế độ `--github` của nó tạo một
+PR thật, dù bản thân `review` (không `--github`) không hề đổi trạng thái
+fgOS. Sổ verb nay tách thành **hai trường độc lập**: `touchesState`
+(verb có bao giờ ghi trạng thái fgOS hay không) và `externalEffect` (verb
+có bao giờ gọi một dịch vụ ngoài fgOS hay không — hôm nay chỉ `review` và
+`approve` mang `externalEffect: true`, đúng chế độ `--github` của chúng;
+`review` mang `touchesState: false` vì nó không bao giờ ghi trạng thái, kể
+cả qua `--github`). Cả hai cờ vẫn thuần **khai báo** — chưa nối vào điều
+phối hay xác danh; cổng "ai được nói verb nào" vẫn là việc riêng sau này
+(backlog STR38).
+
+**Phân trang cho verb trả tập lớn (per D5/D35 str46-io-contract).** Sổ verb
+khai thêm cờ `paginated` (đúng/sai) cho MỌI verb — chỉ bốn verb mang
+`paginated: true`: `ready`, `triage`, `evolve` (lượt liệt-kê không cờ của
+nó), và khoá `work` của `list`. Bốn verb này nhận thêm hai tham số tuỳ chọn
+`--cursor`/`--limit`: không truyền cờ nào → kết quả y hệt hôm nay (mảng/map
+đầy đủ, không đổi hình dạng); truyền một trong hai → kết quả đổi hình dạng
+thành `{items, nextCursor}` (với `list`, chỉ khoá `work` đổi, các khoá khác
+của kết quả `list` giữ nguyên). Con trỏ (`cursor`) là **đục hoàn toàn** —
+người gọi chỉ nhận lại nguyên văn từ `nextCursor` của lượt trước rồi truyền
+tiếp, không bao giờ tự phân tích hay tự chế. `nextCursor` là `null` khi đã
+tới cuối tập. Một con trỏ trỏ tới một mục đã rời tập (vd việc đã `done` từ
+lượt trước) là lỗi phạm trù `validation` — thông điệp lỗi tự nêu cách sửa
+(bắt đầu lại không kèm `--cursor`). `conflicts` CỐ Ý không phân trang
+(`paginated: false`, lý do ghi ngay trong mô tả verb) — mỗi dòng của nó là
+một cặp `(a,b)`, không có khoá riêng cho một dòng để làm mốc con trỏ.
+
+**Quy ước cờ nhiều-giá-trị (per D36 str46-io-contract).** Sổ verb khai thêm
+trường `multiValueFormat` (`'csv'` hay `'json-array'`) trên đúng những tham
+số nào mang nhiều giá trị — trước đây khác biệt này chỉ nằm trong văn xuôi
+mô tả, không đọc được bằng máy. `deps`, `refs`, `footprint`, `targets` mang
+`multiValueFormat: 'csv'` (phân tách bằng dấu phẩy). `acceptance` mang
+`multiValueFormat: 'json-array'` (chuỗi JSON-hoá, CỐ Ý không phẩy vì văn
+bản một clause có thể tự chứa dấu phẩy). Tham số không mang nhiều giá trị
+không có trường này.
 
 ### Trợ giúp theo từng verb — `fgos <verb> --help`
 

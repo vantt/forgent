@@ -737,6 +737,35 @@ test('e2e full journey: item1 (no deps) -> proposed with a worker commit on fgw/
   assert.equal(checkData.outcomes[0].actual.passed, true);
 });
 
+// CoS evidence (D2/l2-3): the "full journey" test above already asserts
+// `first.stdout` against /proposed/ and /item1/ substring regexes, but those
+// match loop.mjs's own untouched progress-trace lines (loop.mjs:730-731), not
+// printResult()'s envelope line — it never parses stdout as structured data.
+// This test covers that new case: the runner's own trailing line is a real,
+// parseable fgos.v1 envelope, not just a string containing the right words.
+test('e2e runner --once prints a trailing fgos.v1 envelope: the last stdout line parses as fgos.v1 with the real dispatched outcome', () => {
+  const repoRoot = initTempRepo();
+  const scriptDir = mkTempDir('fgos-runner-e2e-exec-');
+
+  assert.equal(fgos(repoRoot, ['init']).status, 0);
+  add(repoRoot, 'item1', { verify: 'test -f output.txt && echo VERIFY_OK' });
+  writeRunnerConfig(repoRoot, writeCommittingExecutor(scriptDir));
+
+  const result = runner(repoRoot, ['--once']);
+  assert.equal(result.status, 0, `--once failed: ${result.stderr}`);
+
+  // loop.mjs's own progress-trace lines (untouched, D2) and printResult()'s
+  // one compact single-line envelope are two independent, interleaved stdout
+  // writers — the envelope is reliably the LAST non-empty line because it is
+  // the only thing printResult() writes, and it writes after runOnce settles.
+  const lines = result.stdout.split('\n').filter(Boolean);
+  const envelope = JSON.parse(lines[lines.length - 1]);
+  assert.equal(envelope.contract, 'fgos.v1');
+  assert.equal(typeof envelope.data_hash, 'string');
+  assert.ok(envelope.data_hash.length > 0, 'data_hash is a non-empty string');
+  assert.equal(envelope.data.dispatched[0].outcome, 'proposed');
+});
+
 // --- case 2: verify-red -> blocked, never proposed --------------------------
 
 test('e2e verify-red: a worker that commits the wrong thing fails goal-check on every attempt -> retried per the matrix, then parked blocked, never proposed', () => {
@@ -886,8 +915,11 @@ test('e2e --watch: stays alive over an idle frontier, completes a cycle, and a s
 
   try {
     // Proof of at least one completed drain cycle over the idle frontier —
-    // never a fixed sleep.
-    await waitForStdout(child, 'fgos-runner: idle');
+    // never a fixed sleep. Marker is loop.mjs's own untouched progress-trace
+    // line (D2: this cell only reshapes printResult()'s trailing line into
+    // an fgos.v1 envelope, not loop.mjs's log() stream, so this text is the
+    // same before and after).
+    await waitForStdout(child, 'fgos-runner: frontier empty — nothing to do.');
 
     const sigintSentAt = Date.now();
     child.kill('SIGINT');
