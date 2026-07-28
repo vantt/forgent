@@ -76,22 +76,30 @@ export function connectedComponents(view) {
   return { componentCount: components.length, components };
 }
 
-// Build an id -> deps[] map over KNOWN ids only (the `blocks` sub-graph: a
-// dependent points at what it depends on). A dep to an id not present in
-// `work` is dropped — the same known-only rule connectedComponents uses, so a
-// dangling dep never phantoms a node. Insertion (declaration) order is kept
-// throughout so every derived list below is deterministic.
-function knownDeps(work) {
+// Build an id -> [things it waits on] map over the UNIFIED typed-edge graph
+// (dep-graph.mjs `buildUnifiedEdges` — `deps` PLUS `parent`), known ids only.
+// A `deps` entry contributes "id waits on dep", matching the graph's own
+// `blocks` edge `{from: id, to: dep}` directly. A `parent` edge is
+// `{from: parent, to: child}` ("parent waits on child" — dep-graph.mjs's own
+// documented direction, since a parent stays gated until every child is
+// done, frontier.mjs's `hasOpenDescendant`) — folded into this same map, so
+// every function below that walks "what does id wait on" sees an open child
+// exactly like it would see a `deps` entry, with no separate code path. An
+// edge to/from an id not present in `work` is dropped — the same known-only
+// rule connectedComponents uses, so a dangling reference never phantoms a
+// node. Insertion (declaration) order is kept throughout so every derived
+// list below is deterministic.
+function knownUnifiedDeps(work) {
   const known = new Set(Object.keys(work));
-  const deps = new Map();
-  for (const id of Object.keys(work)) {
-    const list = Array.isArray(work[id]?.deps) ? work[id].deps : [];
-    deps.set(id, list.filter((d) => known.has(d)));
+  const deps = new Map(Object.keys(work).map((id) => [id, []]));
+  for (const { from, to } of buildUnifiedEdges(work)) {
+    if (!known.has(from) || !known.has(to)) continue;
+    deps.get(from).push(to);
   }
   return deps;
 }
 
-// Reverse of knownDeps: id -> [ids that depend on it], each list in declaration
+// Reverse of knownUnifiedDeps: id -> [ids that depend on it], each list in declaration
 // order of the dependents (deterministic).
 function reverseDeps(depsMap) {
   const rev = new Map([...depsMap.keys()].map((id) => [id, []]));
@@ -166,11 +174,14 @@ function longestChain(deps, candidateIds) {
 }
 
 /**
- * The CRITICAL PATH through the `deps` (blocks) DAG — the longest dependency
- * chain, whose length is the minimum number of sequential steps before the
- * deepest item can start. The graph is acyclic (guaranteed at the write door
- * by S1/S2a), so the memoized longest-path recursion always terminates; a
- * `guard` set is a pure defensive backstop, never a cycle report.
+ * The CRITICAL PATH through the UNIFIED (`deps` + `parent`) DAG — the longest
+ * chain of things one item waits on, whose length is the minimum number of
+ * sequential steps before the deepest item can start. A root's own open
+ * child counts here exactly like a `deps` entry would (the root cannot
+ * finish until the child does, frontier.mjs's `hasOpenDescendant`). The
+ * graph is acyclic (guaranteed at the write door by S1/S2a), so the
+ * memoized longest-path recursion always terminates; a `guard` set is a
+ * pure defensive backstop, never a cycle report.
  *
  * Returns `{ depth, path }` — `path` traced from the deepest item DOWN through
  * the max-depth dependency it sits on, ties broken by declaration order. An
@@ -178,7 +189,7 @@ function longestChain(deps, candidateIds) {
  */
 export function criticalPath(view) {
   const work = view?.work ?? {};
-  const deps = knownDeps(work);
+  const deps = knownUnifiedDeps(work);
   return longestChain(deps, Object.keys(work));
 }
 
@@ -187,7 +198,7 @@ export function criticalPath(view) {
 // safe: `result` doubles as the seen-guard, so a `targets` cycle (A targets
 // B targets A) terminates without duplicating members, the same defensive
 // stance as criticalPath's `guard` set. Only known ids (present in
-// `view.work`) are ever added — mirrors knownDeps's dangling-edge filtering,
+// `view.work`) are ever added — mirrors knownUnifiedDeps's dangling-edge filtering,
 // so an entry naming an unknown id is simply not traversed further. An
 // unknown `startId` yields an empty set.
 function targetsClosure(work, startId) {
@@ -244,7 +255,7 @@ export function goalScopedSet(view, focusId) {
   const work = view?.work ?? {};
   const scope = targetsClosure(work, focusId);
   if (scope.size === 0) return scope;
-  const deps = knownDeps(work);
+  const deps = knownUnifiedDeps(work);
   for (const ancestor of depsAncestors(scope, deps)) scope.add(ancestor);
   return scope;
 }
@@ -264,7 +275,7 @@ export function goalScopedCriticalPath(view, focusId) {
   const work = view?.work ?? {};
   const scope = goalScopedSet(view, focusId);
   if (scope.size === 0) return { depth: 0, path: [] };
-  const deps = knownDeps(work);
+  const deps = knownUnifiedDeps(work);
   return longestChain(deps, Object.keys(work).filter((id) => scope.has(id)));
 }
 
@@ -341,7 +352,7 @@ function computeGreedyTopUnblock(candidates, notDone, deps, k) {
  */
 export function greedyTopUnblock(view, k = 10) {
   const work = view?.work ?? {};
-  const deps = knownDeps(work);
+  const deps = knownUnifiedDeps(work);
   const notDone = new Set(Object.keys(work).filter((id) => work[id].status !== 'done'));
   return computeGreedyTopUnblock([...notDone], notDone, deps, k); // declaration order
 }
@@ -361,7 +372,7 @@ export function goalScopedGreedyTopUnblock(view, focusId, k = 10) {
   const work = view?.work ?? {};
   const scope = goalScopedSet(view, focusId);
   if (scope.size === 0) return [];
-  const deps = knownDeps(work);
+  const deps = knownUnifiedDeps(work);
   const notDone = new Set(Object.keys(work).filter((id) => scope.has(id) && work[id].status !== 'done'));
   return computeGreedyTopUnblock([...notDone], notDone, deps, k); // declaration order, scope-filtered
 }
@@ -381,7 +392,7 @@ export function whatIf(view, id) {
   if (!work[id]) {
     return { id, exists: false, unblocksTransitive: 0, newlyReady: [] };
   }
-  const deps = knownDeps(work);
+  const deps = knownUnifiedDeps(work);
   const rev = reverseDeps(deps);
   const notDone = new Set(Object.keys(work).filter((x) => work[x].status !== 'done'));
   const downstream = transitiveDownstream(id, rev, notDone);
