@@ -222,5 +222,13 @@
     "docPath": "docs/decisions/0020-chan-fgos-khoi-worktree-worker.md",
     "title": "0020 — Chặn `.fgos/` khỏi worktree worker (không khóa, không cô lập)",
     "sourceCaptureId": null
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/decisions/0021-wire-main-checkout-hook-qua-doctor-setup.md",
+    "title": "0021 — Wire main-checkout lock hook qua fgos doctor/setup, không epoch-fence",
+    "sourceCaptureId": null
   }
 ]

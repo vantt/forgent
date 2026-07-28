@@ -1,0 +1,66 @@
+// git-hooks.mjs — infra layer: real git-config I/O for wiring this repo's
+// `.githooks/pre-commit` (str65-worktree-isolation-enforcement's main-
+// checkout lock) into a checkout. Two entry points, one each for the two
+// activation paths this repo has (str88: `prepare`-lifecycle auto-wiring was
+// removed because pnpm 10+ blocks it for a git-hosted dependency, leaving
+// `npm run setup:hooks` / `fgos setup` as the only paths left):
+//   - installGitHooks: the writer, used by scripts/install-git-hooks.mjs
+//     (npm run setup:hooks) and by `fgos setup` (bin/fgos.mjs).
+//   - mainCheckoutHookWired: the read-only check, used by `fgos doctor`
+//     (src/setup/checks.mjs) and by `fgos setup`'s own report of what it did.
+
+import { existsSync } from 'node:fs';
+import path from 'node:path';
+import { execFileSync } from 'node:child_process';
+
+function readHooksPath(repoRoot) {
+  try {
+    return execFileSync('git', ['config', '--get', 'core.hooksPath'], { cwd: repoRoot, encoding: 'utf8' }).trim();
+  } catch {
+    return '';
+  }
+}
+
+/**
+ * Sets core.hooksPath to .githooks for the given repo root, if (and only
+ * if) a `.git` entry exists there (a directory for a plain clone, a file
+ * for a linked worktree -- existsSync is true for both). Idempotent: safe
+ * to run repeatedly (e.g. every `npm install`/`npm pack`, or every `fgos
+ * setup`). No-ops silently when installed as a dependency (no `.git`
+ * retained, per docs/specs/distribution.md) -- never throws.
+ *
+ * FILL-ONLY, never overwrite (matches this verb's other two side effects --
+ * shell-rc.mjs's insertSourceLine only ever appends, config-merge.mjs's
+ * mergeConfigDefaults never touches a value the user already has): a
+ * pre-existing `core.hooksPath` pointing anywhere OTHER than `.githooks`
+ * (husky, lefthook, a hand-rolled hooks dir) is left untouched -- silently
+ * repointing it would stop the user's own hooks firing with zero warning.
+ * Returns `{ wired, skippedExisting }`: `wired` is the FINAL state (true
+ * whether freshly set or already correct); `skippedExisting` carries the
+ * untouched custom value when one was found (`null` otherwise), for the
+ * caller to surface.
+ */
+export function installGitHooks(repoRoot) {
+  if (!existsSync(path.join(repoRoot, '.git'))) return { wired: false, skippedExisting: null };
+  const current = readHooksPath(repoRoot);
+  if (current === '.githooks') return { wired: true, skippedExisting: null };
+  if (current !== '') return { wired: false, skippedExisting: current };
+  execFileSync('git', ['config', 'core.hooksPath', '.githooks'], { cwd: repoRoot });
+  return { wired: true, skippedExisting: null };
+}
+
+/**
+ * Whether `cwd`'s git config points `core.hooksPath` at this repo's own
+ * `.githooks/` -- the str65 main-checkout lock only actually guards commits
+ * when this is wired. Any other value (unset, or a different hooks dir)
+ * means commits on this checkout are NOT running the lock check. Never
+ * throws: a cwd with no `.git` at all (or git itself unavailable) reads the
+ * same as "not wired".
+ */
+export function mainCheckoutHookWired(cwd) {
+  try {
+    return execFileSync('git', ['config', '--get', 'core.hooksPath'], { cwd, encoding: 'utf8' }).trim() === '.githooks';
+  } catch {
+    return false;
+  }
+}

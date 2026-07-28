@@ -58,14 +58,47 @@ test('installGitHooks is idempotent -- running it twice does not throw and leave
   fs.rmSync(repoRoot, { recursive: true, force: true });
 });
 
+test('installGitHooks returns { wired: true, skippedExisting: null } on a fresh repo, { wired: false, skippedExisting: null } with no .git', () => {
+  const repoRoot = mkTempDir('install-git-hooks-return-');
+  execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: repoRoot });
+  assert.deepEqual(installGitHooks(repoRoot), { wired: true, skippedExisting: null });
+  fs.rmSync(repoRoot, { recursive: true, force: true });
+
+  const noGitDir = mkTempDir('install-git-hooks-return-no-git-');
+  assert.deepEqual(installGitHooks(noGitDir), { wired: false, skippedExisting: null });
+  fs.rmSync(noGitDir, { recursive: true, force: true });
+});
+
+test('installGitHooks never overwrites a pre-existing custom core.hooksPath -- fill-only, matches this verb\'s other side effects', () => {
+  const repoRoot = mkTempDir('install-git-hooks-custom-');
+  execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: repoRoot });
+  execFileSync('git', ['config', 'core.hooksPath', 'husky-hooks'], { cwd: repoRoot });
+
+  assert.deepEqual(installGitHooks(repoRoot), { wired: false, skippedExisting: 'husky-hooks' });
+
+  const hooksPath = execFileSync('git', ['config', '--get', 'core.hooksPath'], { cwd: repoRoot, encoding: 'utf8' }).trim();
+  assert.equal(hooksPath, 'husky-hooks', 'a pre-existing custom hooksPath must survive untouched');
+
+  fs.rmSync(repoRoot, { recursive: true, force: true });
+});
+
 // --- CLI: real end-to-end run, mirroring the production <repoRoot>/scripts/ layout ---
 
+const gitHooksModulePath = fileURLToPath(new URL('../../src/setup/git-hooks.mjs', import.meta.url));
+
+// The real script is a thin shim over src/setup/git-hooks.mjs (that layer
+// ships with the npm package; scripts/ does not — see the script's own
+// header comment) — a fixture exercising it as a real CLI must mirror BOTH
+// files at their real relative nesting, not just the shim alone.
 function setupCliFixture() {
   const fixtureRoot = mkTempDir('install-git-hooks-cli-');
   const scriptsDir = path.join(fixtureRoot, 'scripts');
   fs.mkdirSync(scriptsDir, { recursive: true });
   const scriptCopyPath = path.join(scriptsDir, 'install-git-hooks.mjs');
   fs.copyFileSync(scriptPath, scriptCopyPath);
+  const setupDir = path.join(fixtureRoot, 'src', 'setup');
+  fs.mkdirSync(setupDir, { recursive: true });
+  fs.copyFileSync(gitHooksModulePath, path.join(setupDir, 'git-hooks.mjs'));
   return { fixtureRoot, scriptCopyPath };
 }
 

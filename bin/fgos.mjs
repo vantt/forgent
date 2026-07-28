@@ -46,6 +46,7 @@ import { writeCoexistenceManifest } from '../src/install/coexist.mjs';
 import { SCHEMA_VERSION, COMMAND_REGISTRY } from '../src/cli/command-registry.mjs';
 import { computeAwaitingContext } from '../src/state/awaiting-context.mjs';
 import { DOCTOR_CHECKS, integrationScriptPath } from '../src/setup/checks.mjs';
+import { installGitHooks } from '../src/setup/git-hooks.mjs';
 import { detectRcFiles, insertSourceLine } from '../src/setup/shell-rc.mjs';
 import { mergeConfigDefaults } from '../src/setup/config-merge.mjs';
 import { formatCheck, bold } from '../src/setup/ansi.mjs';
@@ -2164,12 +2165,22 @@ async function runVerb(verb, flags, positional, dir) {
       const priorConfig = configExisted ? JSON.parse(fs.readFileSync(configPath, 'utf8')) : {};
       const { addedKeys } = mergeConfigDefaults(priorConfig, DEFAULT_RUNNER_CONFIG);
       ensureRunnerConfig(configPath);
+      // str65-6/str88: wires core.hooksPath the same way `npm run setup:hooks`
+      // does — a second, non-npm-lifecycle-dependent activation path for the
+      // main-checkout lock hook, since pnpm 10+ blocks `prepare` for a
+      // git-hosted dependency (str88) and nothing re-automated it since.
+      // Idempotent, no-ops silently when repoRoot has no `.git` at all.
+      // Fill-only like the two side effects above: a pre-existing custom
+      // core.hooksPath is left untouched, never silently repointed.
+      const { wired: hooksWired, skippedExisting: hooksSkippedExisting } = installGitHooks(repoRoot);
       return {
         rcFilesInserted,
         rcFilesAlreadyConfigured,
         configPath,
         configCreated: !configExisted,
         configAddedKeys: configExisted ? addedKeys : [],
+        hooksWired,
+        hooksSkippedExisting,
       };
     }
 
@@ -2285,6 +2296,17 @@ function renderPretty(verb, data) {
             ? `added missing config keys: ${data.configAddedKeys.join(', ')}`
             : 'config already up to date',
         data.configPath,
+      ),
+    );
+    lines.push(
+      formatCheck(
+        data.hooksWired,
+        data.hooksWired
+          ? 'core.hooksPath wired to .githooks'
+          : data.hooksSkippedExisting
+            ? `core.hooksPath already set to "${data.hooksSkippedExisting}" — left untouched, main-checkout lock is NOT active`
+            : 'core.hooksPath not wired (no .git checkout here)',
+        'main-checkout lock hook',
       ),
     );
   }
