@@ -1,8 +1,8 @@
 ---
 area: work-state
-updated: 2026-07-27
-sources: [phase-1-state-layer, phase-1-review-fixes, phase-2-routing-s1, phase-2-routing-s2, phase-3-compound-learning-s1, phase-3-compound-learning-s2, phase-3-compound-learning-s3-closeout, async-human-gate, stage-intake, stage-clarify, stage-decompose-s1, stage-decompose-s2, pr-lifecycle-s1, install-coexistence, discovery-context, worker-execution, fan-out-parallel, human-rounds, work-item-verb-surface, base-workflow-model-s1, base-workflow-model-s2, self-improve-loop, work-graph-intelligence-s1, work-graph-intelligence-s2a, work-graph-intelligence-s2b, entry-standardization, work-id-tsk-hash, p50-workflow-induct, str61-chat-context-continuity, str68-discovery-judge-robustness, compound-learn-enduser-docs, str77-79-doc-gap-fixes, str83-fgos-slash-commands, str86-runner-headless-git, str73-done-flip-cos-check, str93-discovery-precedence-labels, str7-str8-priority-intent, str51-llm-assist-classify]
-decisions: [9ac6ca50, 0790031c, 451ca088, fd17309a, 55ad2f9f, feed7428, 1a80b4d3, 65c642a8, 9f6b52c8, 9a19eea5, 96a65365, a7c099af, 43f257ae, 44936500, e1218b22, 6f2cbc47, a30a3d3c, 1359ab5e, f1715488, 8788e9bb, cfae0120, 396d9d9e, 2e92b7a5, 5a6900b2, b28487af, 2ae492d8, 76b7a36b, 8d04bba3, 1cd895e1, 38160a70, a2146274, 896219a7, b5c0ba0c, b2d18cc7, b0da87aa, 8cf7effe, 81322763, 28e6184b, 14091e58, 19330e09, bce79d8a, 87536f3f, 9c67c3d1, 6aa67ae4, 1c776c56, 1d336d8a, ea8b9a8d, 757e5dd7, ecfd0d1a, 0f3b6eb0, 0e575f83, ee0f95c3, f69951df, f176c18a, d3445024, a5825b8b]
+updated: 2026-07-28
+sources: [phase-1-state-layer, phase-1-review-fixes, phase-2-routing-s1, phase-2-routing-s2, phase-3-compound-learning-s1, phase-3-compound-learning-s2, phase-3-compound-learning-s3-closeout, async-human-gate, stage-intake, stage-clarify, stage-decompose-s1, stage-decompose-s2, pr-lifecycle-s1, install-coexistence, discovery-context, worker-execution, fan-out-parallel, human-rounds, work-item-verb-surface, base-workflow-model-s1, base-workflow-model-s2, self-improve-loop, work-graph-intelligence-s1, work-graph-intelligence-s2a, work-graph-intelligence-s2b, entry-standardization, work-id-tsk-hash, p50-workflow-induct, str61-chat-context-continuity, str68-discovery-judge-robustness, compound-learn-enduser-docs, str77-79-doc-gap-fixes, str83-fgos-slash-commands, str86-runner-headless-git, str73-done-flip-cos-check, str93-discovery-precedence-labels, str7-str8-priority-intent, str51-llm-assist-classify, str46-io-contract-lat2]
+decisions: [9ac6ca50, 0790031c, 451ca088, fd17309a, 55ad2f9f, feed7428, 1a80b4d3, 65c642a8, 9f6b52c8, 9a19eea5, 96a65365, a7c099af, 43f257ae, 44936500, e1218b22, 6f2cbc47, a30a3d3c, 1359ab5e, f1715488, 8788e9bb, cfae0120, 396d9d9e, 2e92b7a5, 5a6900b2, b28487af, 2ae492d8, 76b7a36b, 8d04bba3, 1cd895e1, 38160a70, a2146274, 896219a7, b5c0ba0c, b2d18cc7, b0da87aa, 8cf7effe, 81322763, 28e6184b, 14091e58, 19330e09, bce79d8a, 87536f3f, 9c67c3d1, 6aa67ae4, 1c776c56, 1d336d8a, ea8b9a8d, 757e5dd7, ecfd0d1a, 0f3b6eb0, 0e575f83, ee0f95c3, f69951df, f176c18a, d3445024, a5825b8b, a58a7563]
 coverage: full
 ---
 
@@ -551,6 +551,12 @@ nào lọt lưới và không có hai cách in khác nhau.
 khi verb ném lỗi, chẩn đoán đi ra `stderr` kèm mã thoát theo bảng phân loại lỗi
 (stdout=dữ liệu, stderr=chẩn đoán) — bên gọi phân biệt thành/bại bằng mã thoát,
 không phải bằng việc dò nội dung phong bì.
+
+**Vòng tự hành (`fgos-runner`) cũng dùng CÙNG phong bì này cho kết cục cuối của
+mỗi lượt/chu kỳ** (per D2 str46-io-contract) — in liền một dòng thay vì nhiều
+dòng như trên, vì một tiến trình `--watch` phát nhiều phong bì nối tiếp theo
+thời gian; chi tiết đầy đủ + các luồng output khác nằm ngoài phong bì: xem spec
+Runner RUL61.
 
 ### Sổ verb máy-đọc (manifest) — `--help --json`
 
