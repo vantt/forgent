@@ -161,3 +161,5 @@
 {"seq":161,"ts":"2026-07-28T07:13:12.194Z","type":"work.move","payload":{"id":"tsk-3fb","from":"doing","to":"todo"},"v":2}
 {"seq":162,"ts":"2026-07-28T07:15:13.916Z","type":"work.move","payload":{"id":"tsk-3fb","from":"todo","to":"doing","actor":"session","headAtTake":"c7f2ed8f042b11ef1335d7938d5c85f3fe7f3e52"},"v":2}
 {"seq":163,"ts":"2026-07-28T07:15:13.918Z","type":"work.outcome","payload":{"id":"tsk-3fb","predicted":{"tier":"light","deps":0,"priorVisits":0,"actor":"session","headAtTake":"c7f2ed8f042b11ef1335d7938d5c85f3fe7f3e52"}},"v":2}
+{"seq":164,"ts":"2026-07-28T07:15:18.327Z","type":"work.move","payload":{"id":"tsk-3fb","from":"doing","to":"proposed","branchHeadAtReturn":"68e2594902fc7e0121e2c5572cd4d11e9fcd99e5"},"v":2}
+{"seq":165,"ts":"2026-07-28T07:15:18.329Z","type":"work.outcome","payload":{"id":"tsk-3fb","actual":{"outcome":"proposed","passed":true,"attempts":1,"errorClass":null,"aheadCount":8}},"v":2}
