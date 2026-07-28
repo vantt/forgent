@@ -311,7 +311,7 @@ test('mergeRunnerItem aborts cleanly when the staged merge fails its own verify 
   assert.equal(fs.existsSync(path.join(repoRoot, 'produced.txt')), false, 'a staged-then-aborted merge must not leave its file behind');
 });
 
-// --- mergeRunnerItem rejects a .fgos/ write on the branch (ADR0019) -------
+// --- mergeRunnerItem rejects a .fgos/ write on the branch (ADR0020) -------
 //
 // worktree.mjs's createWorktree no longer checks .fgos/ out into a worker's
 // worktree at all, so this should never trigger from an ordinary dispatch —

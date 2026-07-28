@@ -417,7 +417,7 @@ test('resolveDiscovery on an unclear verdict stamps statusAtAsk "doing" when a p
 
   const storeDir = tmpStoreDir();
   addWork(storeDir, sampleWork());
-  moveWork(storeDir, { id: 'item-x', to: 'doing', expectedStatus: 'todo', actor: 'session' });
+  moveWork(storeDir, { id: 'item-x', to: 'doing', expectedStatus: 'todo', role: 'session' });
 
   resolveDiscovery(storeDir, 'item-x', cfg);
   const view = listWork(storeDir);

@@ -100,7 +100,7 @@ convenience layer on top of that.
 - **Runs when:** invoked with no argument.
 - **What changes:** nothing — read-only, never reclaims a stuck item itself.
 - **Side effects:** none.
-- **Afterwards:** the person sees which items look stuck, classified by how long is "too long" for the kind of actor holding each one.
+- **Afterwards:** the person sees which items look stuck, classified by how long is "too long" for the kind of role holding each one.
 
 ### rollup
 
@@ -137,8 +137,8 @@ convenience layer on top of that.
 | Submit / pick / move / return / ask / answer (mutating verbs) | ✓ |
 | Read frontier / staleness / rollup / check / graph / conflicts | ✓ |
 
-Every command runs as whatever actor the underlying tool itself assigns (a
-human actor for the mutating verbs) — the plugin layer introduces no separate
+Every command runs as whatever role the underlying tool itself assigns (a
+human role for the mutating verbs) — the plugin layer introduces no separate
 role model of its own.
 
 ## Business Rules

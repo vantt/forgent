@@ -94,12 +94,14 @@ export function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoot = pr
     const expectedStatus = isBranchTake ? 'blocked' : 'todo';
     const useBranchSource = isolate || isBranchTake;
 
-    // Claim via moveWork
+    // Claim via moveWork. moveWork's own field is `role` (store.mjs's
+    // long-settled settlement-role-attribution contract, S3-closeout) — this
+    // module's own opt is named `actor` (its public contract), mapped here.
     const { event } = moveWork(dir, {
       id,
       to: 'doing',
       expectedStatus,
-      actor,
+      role: actor,
       branchHeadAtTake: useBranchSource ? branchHeadAtTake : undefined,
       headAtTake: useBranchSource ? undefined : currentHead(repoRoot),
       claimTrigger,
@@ -113,7 +115,7 @@ export function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoot = pr
           tier: item.tier ?? DEFAULTS.tier,
           deps: item.deps?.length ?? 0,
           priorVisits,
-          actor,
+          role: actor,
           branchHeadAtTake: useBranchSource ? branchHeadAtTake : undefined,
           headAtTake: useBranchSource ? undefined : currentHead(repoRoot),
         },
@@ -124,7 +126,7 @@ export function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoot = pr
       id,
       from: expectedStatus,
       to: 'doing',
-      actor,
+      role: actor,
       seq: event.seq,
       source: useBranchSource ? 'branch' : 'main',
       branch: useBranchSource ? branch : undefined,

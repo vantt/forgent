@@ -2228,7 +2228,7 @@ test('discover on a clear verdict moves the submitted item to stage decompose wi
 
 // The sync path's second hop (stage-decompose D3 parity): calling `discover`
 // again on the same item, now sitting at stage `decompose`, dispatches to
-// `resolveDecompose` instead of `resolveDiscovery` — same verb, same actor
+// `resolveDecompose` instead of `resolveDiscovery` — same verb, same role
 // attribution, the engine picked by the item's CURRENT stage.
 test("discover called a second time, once the item sits at stage decompose, dispatches to resolveDecompose and pass-throughs it on to executing (D3 sync/async parity)", () => {
   const cwd = tmpCwd();
@@ -2314,13 +2314,13 @@ test('discover --config pointing at a missing path still throws RunnerConfigErro
   assert.equal(fs.existsSync(missingConfigPath), false, 'an explicit --config path must never be auto-written');
 });
 
-// --- settlement channel actor attribution (phase-3-compound-learning-5,
-// S3-closeout) — real CLI call sites stamp `actor` per vision §8: the
+// --- settlement channel role attribution (phase-3-compound-learning-5,
+// S3-closeout) — real CLI call sites stamp `role` per vision §8: the
 // `move`/`answer` verbs are always a human at the keyboard; `discover` is
 // the sync, session-driven call site (the async runner sweep is 'runner',
 // covered at the runner unit-test layer). ---------------------------------
 
-test('answer via the real CLI stamps actor "human" on the event payload and folds into an "answer" settlement', () => {
+test('answer via the real CLI stamps role "human" on the event payload and folds into an "answer" settlement', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'answer-actor-item');
   run(cwd, ['move', 'answer-actor-item', '--to', 'doing']);
@@ -2331,15 +2331,15 @@ test('answer via the real CLI stamps actor "human" on the event payload and fold
 
   const lines = eventLines(cwd);
   const lastEvent = JSON.parse(lines[lines.length - 1]);
-  assert.equal(lastEvent.payload.actor, 'human');
+  assert.equal(lastEvent.payload.role, 'human');
 
   const view = stateView(cwd);
   assert.equal(view.settlements['answer-actor-item'].length, 1);
   assert.equal(view.settlements['answer-actor-item'][0].kind, 'answer');
-  assert.equal(view.settlements['answer-actor-item'][0].actor, 'human');
+  assert.equal(view.settlements['answer-actor-item'][0].role, 'human');
 });
 
-test('move to done via the real CLI stamps actor "human" on the event payload and folds into a "close" settlement', () => {
+test('move to done via the real CLI stamps role "human" on the event payload and folds into a "close" settlement', () => {
   const cwd = tmpCwd();
   toCompoundLearn(cwd, 'close-actor-item');
 
@@ -2348,15 +2348,15 @@ test('move to done via the real CLI stamps actor "human" on the event payload an
 
   const lines = eventLines(cwd);
   const lastEvent = JSON.parse(lines[lines.length - 1]);
-  assert.equal(lastEvent.payload.actor, 'human');
+  assert.equal(lastEvent.payload.role, 'human');
 
   const view = stateView(cwd);
   assert.equal(view.settlements['close-actor-item'].length, 1);
   assert.equal(view.settlements['close-actor-item'][0].kind, 'close');
-  assert.equal(view.settlements['close-actor-item'][0].actor, 'human');
+  assert.equal(view.settlements['close-actor-item'][0].role, 'human');
 });
 
-test('discover (sync verb) on a clear verdict stamps actor "session" on the work.stage event and folds into a clarify-pass settlement', () => {
+test('discover (sync verb) on a clear verdict stamps role "session" on the work.stage event and folds into a clarify-pass settlement', () => {
   const cwd = tmpCwd();
   writeRunnerConfig(cwd, { clear: true, verify: 'npm test -- proven' });
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
@@ -2366,15 +2366,15 @@ test('discover (sync verb) on a clear verdict stamps actor "session" on the work
 
   const lines = eventLines(cwd);
   const stageEvent = lines.map((l) => JSON.parse(l)).find((e) => e.type === 'work.stage');
-  assert.equal(stageEvent.payload.actor, 'session');
+  assert.equal(stageEvent.payload.role, 'session');
 
   const view = stateView(cwd);
   assert.equal(view.settlements[id].length, 1);
   assert.equal(view.settlements[id][0].kind, 'clarify-pass');
-  assert.equal(view.settlements[id][0].actor, 'session');
+  assert.equal(view.settlements[id][0].role, 'session');
 });
 
-test('check returns the settlement data — per-kind/actor counts + recent records — when settlement data exists', () => {
+test('check returns the settlement data — per-kind/role counts + recent records — when settlement data exists', () => {
   const cwd = tmpCwd();
   toCompoundLearn(cwd, 'settle-item');
   run(cwd, ['move', 'settle-item', '--to', 'done']);
@@ -2383,10 +2383,10 @@ test('check returns the settlement data — per-kind/actor counts + recent recor
   assert.equal(result.status, 0);
   const { settlement } = envelopeData(result.stdout);
   assert.equal(settlement.count, 1);
-  assert.deepEqual(settlement.byKindActor, { 'close/human': 1 });
+  assert.deepEqual(settlement.byKindRole, { 'close/human': 1 });
   assert.equal(settlement.recent[0].kind, 'close');
   assert.equal(settlement.recent[0].id, 'settle-item');
-  assert.equal(settlement.recent[0].actor, 'human');
+  assert.equal(settlement.recent[0].role, 'human');
 });
 
 test('check output on a log with no settling transitions is unchanged — no settlement data', () => {
@@ -2573,7 +2573,7 @@ test('check on a log with no item ever reaching done is unchanged — no learnin
 
 // --- take/return: cửa pull giao–nhận việc (stage-decompose S2-pull D1) -----
 
-test('take with no --id claims the frontier head, defaults actor to human, records headAtTake, and writes a predicted outcome', () => {
+test('take with no --id claims the frontier head, defaults role to human, records headAtTake, and writes a predicted outcome', () => {
   const cwd = initGitCwd();
   run(cwd, ['init']);
   addOk(cwd, 'pull-a', { verify: 'test -f done.txt' });
@@ -2583,34 +2583,34 @@ test('take with no --id claims the frontier head, defaults actor to human, recor
   assert.equal(result.status, 0, `take failed: ${result.stderr}`);
   const data = envelopeData(result.stdout);
   assert.equal(data.id, 'pull-a');
-  assert.equal(data.actor, 'human');
+  assert.equal(data.role, 'human');
 
   const view = stateView(cwd);
   assert.equal(view.work['pull-a'].status, 'doing');
-  assert.equal(view.work['pull-a'].claimActor, 'human');
+  assert.equal(view.work['pull-a'].claimRole, 'human');
   assert.equal(view.work['pull-a'].headAtTake, headBefore);
-  assert.equal(view.outcomes['pull-a'].predicted.actor, 'human');
+  assert.equal(view.outcomes['pull-a'].predicted.role, 'human');
   assert.equal(view.outcomes['pull-a'].predicted.headAtTake, headBefore);
   assert.equal(view.outcomes['pull-a'].predicted.tier, 'standard');
 });
 
-test('take --actor session records claimActor "session" instead of the default human', () => {
+test('take --role session records claimRole "session" instead of the default human', () => {
   const cwd = initGitCwd();
   run(cwd, ['init']);
   addOk(cwd, 'pull-session');
 
-  const result = run(cwd, ['take', '--actor', 'session']);
+  const result = run(cwd, ['take', '--role', 'session']);
   assert.equal(result.status, 0, `take failed: ${result.stderr}`);
-  assert.equal(stateView(cwd).work['pull-session'].claimActor, 'session');
+  assert.equal(stateView(cwd).work['pull-session'].claimRole, 'session');
 });
 
-test('take --actor with an invalid value is rejected as validation, exit 4, no event written', () => {
+test('take --role with an invalid value is rejected as validation, exit 4, no event written', () => {
   const cwd = initGitCwd();
   run(cwd, ['init']);
   addOk(cwd, 'pull-bad-actor');
   const before = eventLines(cwd).length;
 
-  const result = run(cwd, ['take', '--actor', 'robot']);
+  const result = run(cwd, ['take', '--role', 'robot']);
   assert.equal(result.status, 4);
   assert.equal(eventLines(cwd).length, before);
 });
@@ -2658,7 +2658,7 @@ test('take --id not found is rejected as validation, exit 4', () => {
 
 // --- pick: take + createWorktree combined (str83-fgos-slash-commands-4) ---
 
-test('pick with no --id claims the frontier head exactly like take does today, actor fixed to "session", and stands up a real (non-detached) git branch/worktree for the claim', () => {
+test('pick with no --id claims the frontier head exactly like take does today, role fixed to "session", and stands up a real (non-detached) git branch/worktree for the claim', () => {
   const cwd = initGitCwd();
   run(cwd, ['init']);
   addOk(cwd, 'pick-a', { verify: 'test -f done.txt' });
@@ -2668,7 +2668,7 @@ test('pick with no --id claims the frontier head exactly like take does today, a
   assert.equal(result.status, 0, `pick failed: ${result.stderr}`);
   const data = envelopeData(result.stdout);
   assert.equal(data.id, 'pick-a');
-  assert.equal(data.actor, 'session');
+  assert.equal(data.role, 'session');
   assert.equal(data.from, 'todo');
   assert.equal(data.to, 'doing');
   // A first pick claim records branchHeadAtTake, not the main-based
@@ -2683,9 +2683,9 @@ test('pick with no --id claims the frontier head exactly like take does today, a
 
   const view = stateView(cwd);
   assert.equal(view.work['pick-a'].status, 'doing');
-  assert.equal(view.work['pick-a'].claimActor, 'session');
+  assert.equal(view.work['pick-a'].claimRole, 'session');
   assert.equal(view.work['pick-a'].branchHeadAtTake, headBefore);
-  assert.equal(view.outcomes['pick-a'].predicted.actor, 'session');
+  assert.equal(view.outcomes['pick-a'].predicted.role, 'session');
 
   // truth 3: the branch is real and non-detached — `symbolic-ref HEAD`
   // succeeds inside the worktree (mirrors session.test.mjs's negative check
@@ -2695,7 +2695,7 @@ test('pick with no --id claims the frontier head exactly like take does today, a
   );
 });
 
-test('pick --id claims that specific item, actor fixed to "session" — pick has no --actor flag at all, unlike take', () => {
+test('pick --id claims that specific item, role fixed to "session" — pick has no --role flag at all, unlike take', () => {
   const cwd = initGitCwd();
   run(cwd, ['init']);
   addOk(cwd, 'pick-explicit-other');
@@ -2705,12 +2705,12 @@ test('pick --id claims that specific item, actor fixed to "session" — pick has
   assert.equal(result.status, 0, `pick failed: ${result.stderr}`);
   const data = envelopeData(result.stdout);
   assert.equal(data.id, 'pick-explicit-target');
-  assert.equal(data.actor, 'session');
+  assert.equal(data.role, 'session');
   assert.equal(data.worktree.branch, 'fgw/pick-explicit-target');
 
   assert.equal(stateView(cwd).work['pick-explicit-other'].status, 'todo', 'pick --id must not touch a different frontier item');
   assert.equal(stateView(cwd).work['pick-explicit-target'].status, 'doing');
-  assert.equal(stateView(cwd).work['pick-explicit-target'].claimActor, 'session');
+  assert.equal(stateView(cwd).work['pick-explicit-target'].claimRole, 'session');
 });
 
 test('pick --id on an item already claimed (doing) fails the same way take does today — conflict, exit 3, no double-claim', () => {
@@ -2744,7 +2744,7 @@ test('pick surfaces a real createWorktree failure as-is after the claim already 
   // worktree, exactly as the cell's must_haves truth 5 requires.
   const view = stateView(cwd);
   assert.equal(view.work['pick-wt-fail'].status, 'doing');
-  assert.equal(view.work['pick-wt-fail'].claimActor, 'session');
+  assert.equal(view.work['pick-wt-fail'].claimRole, 'session');
 });
 
 // --- pick: claim-lock §3a/§3c/§7 (guard loosen, branch-reuse generalize, claimTrigger) ---
@@ -3019,6 +3019,23 @@ test('return verify-fail: doing -> blocked + friction (verification layer), exit
   assert.equal(view.frictions['pull-return-red'][0].errorClass, 'verify-miss');
 });
 
+test("return verify-fail: park edge stamps role 'system' (not human) on the doing -> blocked event", () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  addOk(cwd, 'pull-return-red-role', { verify: 'test -f proof.txt' });
+  assert.equal(run(cwd, ['take', '--id', 'pull-return-red-role']).status, 0);
+  commitFile(cwd, 'wrong-file.txt'); // advances HEAD, but never satisfies verify
+
+  const result = run(cwd, ['return', 'pull-return-red-role']);
+  assert.equal(result.status, 0, `return should exit 0 for a defined blocked outcome: ${result.stderr}`);
+  assert.equal(envelopeData(result.stdout).to, 'blocked');
+
+  const lines = eventLines(cwd);
+  const moveEvent = lines.map((l) => JSON.parse(l)).find((e) => e.type === 'work.move' && e.payload.to === 'blocked');
+  assert.ok(moveEvent, 'expected a work.move event to blocked');
+  assert.equal(moveEvent.payload.role, 'system');
+});
+
 test('return on an item that is not "doing" (still todo) is rejected as validation, exit 4', () => {
   const cwd = initGitCwd();
   run(cwd, ['init']);
@@ -3027,12 +3044,12 @@ test('return on an item that is not "doing" (still todo) is rejected as validati
   assert.equal(result.status, 4);
 });
 
-test('return on an item claimed by the runner (claimActor "runner", no headAtTake) is rejected as validation — return only completes a take', () => {
+test('return on an item claimed by the runner (claimRole "runner", no headAtTake) is rejected as validation — return only completes a take', () => {
   const cwd = initGitCwd();
   run(cwd, ['init']);
   addOk(cwd, 'pull-return-runner-claim');
   const dir = path.join(cwd, '.fgos');
-  moveWork(dir, { id: 'pull-return-runner-claim', to: 'doing', expectedStatus: 'todo', actor: 'runner' });
+  moveWork(dir, { id: 'pull-return-runner-claim', to: 'doing', expectedStatus: 'todo', role: 'runner' });
 
   const result = run(cwd, ['return', 'pull-return-runner-claim']);
   assert.equal(result.status, 4);
@@ -3536,7 +3553,7 @@ test('approve on a non-proposed item is rejected as precondition, exit 2', () =>
   assert.equal(result.status, 2);
 });
 
-test('approve of a runner item (happy path): merges fgw/<id> into main, verifies, proposed -> done with actor human, and cleans up the branch', () => {
+test('approve of a runner item (happy path): merges fgw/<id> into main, verifies, proposed -> done with role human, and cleans up the branch', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   makeRunnerProposedItem(cwd, 'approve-runner-item', { verify: 'test -f approve-runner-item-produced.txt' });
@@ -3549,7 +3566,7 @@ test('approve of a runner item (happy path): merges fgw/<id> into main, verifies
   const view = stateView(cwd);
   assert.equal(view.work['approve-runner-item'].status, 'done');
   assert.equal(view.settlements['approve-runner-item'][0].kind, 'close');
-  assert.equal(view.settlements['approve-runner-item'][0].actor, 'human');
+  assert.equal(view.settlements['approve-runner-item'][0].role, 'human');
   assert.ok(fs.existsSync(path.join(cwd, 'approve-runner-item-produced.txt')), 'the merged file must be present on main');
 
   const branches = gitAtCwd(cwd, ['for-each-ref', '--format=%(refname:short)', 'refs/heads/fgw/']);
@@ -3739,7 +3756,7 @@ test('approve of a root item that HAD children, whose merge into main conflicts,
   assert.match(view.frictions['drift-root-item'][0].detail, new RegExp(`main@${headBefore}`), 'friction detail must record the main@<sha> ref');
 });
 
-test('approve of a pull-door item (no merge, code already on main): re-verifies and closes proposed -> done with actor human', () => {
+test('approve of a pull-door item (no merge, code already on main): re-verifies and closes proposed -> done with role human', () => {
   const cwd = initGitCwd();
   run(cwd, ['init']);
   addOk(cwd, 'approve-pull-item', { verify: 'test -f proof.txt' });
@@ -3754,7 +3771,7 @@ test('approve of a pull-door item (no merge, code already on main): re-verifies 
 
   const view = stateView(cwd);
   assert.equal(view.work['approve-pull-item'].status, 'done');
-  assert.equal(view.settlements['approve-pull-item'][0].actor, 'human');
+  assert.equal(view.settlements['approve-pull-item'][0].role, 'human');
 });
 
 test('approve of a legacy item with a failing verify: blocked (reason verify-fail), not merge-related, exit 0', () => {
@@ -3771,6 +3788,22 @@ test('approve of a legacy item with a failing verify: blocked (reason verify-fai
 
   const view = stateView(cwd);
   assert.equal(view.work['approve-legacy-fail-item'].status, 'blocked');
+});
+
+test("approve verify-fail (legacy item): park edge stamps role 'system' (not human) on the proposed -> blocked event", () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'approve-legacy-fail-role-item', { verify: 'false' });
+  run(cwd, ['move', 'approve-legacy-fail-role-item', '--to', 'doing']);
+  run(cwd, ['move', 'approve-legacy-fail-role-item', '--to', 'proposed']);
+
+  const result = run(cwd, ['approve', 'approve-legacy-fail-role-item']);
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(envelopeData(result.stdout).to, 'blocked');
+
+  const lines = eventLines(cwd);
+  const moveEvent = lines.map((l) => JSON.parse(l)).find((e) => e.type === 'work.move' && e.payload.to === 'blocked');
+  assert.ok(moveEvent, 'expected a work.move event to blocked');
+  assert.equal(moveEvent.payload.role, 'system');
 });
 
 test('approve of a legacy item with a passing verify closes it to done — legacy degrade never blocks approve/reject from working (must_have)', () => {
@@ -3879,7 +3912,7 @@ test('approve of the same self-modifying diff PROCEEDS with --acknowledge-iron-l
 
   const view = stateView(cwd);
   assert.equal(view.work['iron-ack-item'].status, 'done');
-  assert.equal(view.settlements['iron-ack-item'][0].actor, 'human');
+  assert.equal(view.settlements['iron-ack-item'][0].role, 'human');
   assert.ok(fs.existsSync(path.join(cwd, 'src/runner/probe.mjs')), 'the merged module file is present on main');
   const branches = gitAtCwd(cwd, ['for-each-ref', '--format=%(refname:short)', 'refs/heads/']);
   assert.doesNotMatch(branches, /fgw\/iron-ack-item/, 'the fully-merged branch is cleaned up');
@@ -3924,7 +3957,7 @@ test('reject on a non-proposed item is rejected as precondition, exit 2', () => 
   assert.equal(result.status, 2);
 });
 
-test('reject moves proposed -> todo with the reason recorded, actor human, and runs no git command at all — never a revert (D4)', () => {
+test('reject moves proposed -> todo with the reason recorded, role human, and runs no git command at all — never a revert (D4)', () => {
   const cwd = initGitCwd();
   run(cwd, ['init']);
   addOk(cwd, 'reject-pull-item', { verify: 'test -f proof.txt' });
@@ -3949,7 +3982,7 @@ test('reject moves proposed -> todo with the reason recorded, actor human, and r
   const lines = eventLines(cwd);
   const lastEvent = JSON.parse(lines[lines.length - 1]);
   assert.equal(lastEvent.payload.reason, 'needs more test coverage');
-  assert.equal(lastEvent.payload.actor, 'human');
+  assert.equal(lastEvent.payload.role, 'human');
 });
 
 test('the CLI usage message for an unknown verb lists review/approve/reject in the surface', () => {
@@ -4145,7 +4178,7 @@ test('approve --github with a dirty main tree is NOT blocked by the local dirty-
   assert.equal(stateView(cwd).work['gh-approve-dirty'].status, 'done');
 });
 
-test('approve --github --pr on a fake gh merge success transitions the item proposed -> done with actor human', () => {
+test('approve --github --pr on a fake gh merge success transitions the item proposed -> done with role human', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   makeRunnerProposedItem(cwd, 'gh-approve-merged');
@@ -4160,7 +4193,7 @@ test('approve --github --pr on a fake gh merge success transitions the item prop
 
   const view = stateView(cwd);
   assert.equal(view.work['gh-approve-merged'].status, 'done');
-  assert.equal(view.settlements['gh-approve-merged'][0].actor, 'human');
+  assert.equal(view.settlements['gh-approve-merged'][0].role, 'human');
 });
 
 test('approve --github --pr on a fake gh merge failure transitions proposed -> blocked and records friction with the classified reason, layer, and gh detail', () => {
@@ -4563,7 +4596,7 @@ test('take --id on a blocked item with a live fgw/<id> branch claims via blocked
 
   const view = stateView(cwd);
   assert.equal(view.work['branch-take-a'].status, 'doing');
-  assert.equal(view.work['branch-take-a'].claimActor, 'human');
+  assert.equal(view.work['branch-take-a'].claimRole, 'human');
   assert.equal(view.work['branch-take-a'].branchHeadAtTake, branchHead);
   assert.equal('headAtTake' in view.work['branch-take-a'], false, 'a branch take never records the main-based headAtTake');
   assert.equal(view.outcomes['branch-take-a'].predicted.branchHeadAtTake, branchHead);
@@ -4581,7 +4614,7 @@ test('take --id on a blocked item with NO live branch still falls through to the
   assert.equal(stateView(cwd).work['blocked-no-branch'].status, 'blocked');
 });
 
-test('pick --id on a blocked item with a live fgw/<id> branch claims via blocked -> doing (the same edge take uses), actor "session", and REUSES the existing branch/worktree instead of creating a duplicate', () => {
+test('pick --id on a blocked item with a live fgw/<id> branch claims via blocked -> doing (the same edge take uses), role "session", and REUSES the existing branch/worktree instead of creating a duplicate', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   makeBlockedBranchItem(cwd, 'pick-branch-a');
@@ -4591,7 +4624,7 @@ test('pick --id on a blocked item with a live fgw/<id> branch claims via blocked
   const result = run(cwd, ['pick', '--id', 'pick-branch-a']);
   assert.equal(result.status, 0, `pick failed: ${result.stderr}`);
   const data = envelopeData(result.stdout);
-  assert.equal(data.actor, 'session');
+  assert.equal(data.role, 'session');
   assert.equal(data.from, 'blocked');
   assert.equal(data.to, 'doing');
   assert.equal(data.branch, 'fgw/pick-branch-a');
@@ -4601,7 +4634,7 @@ test('pick --id on a blocked item with a live fgw/<id> branch claims via blocked
 
   const view = stateView(cwd);
   assert.equal(view.work['pick-branch-a'].status, 'doing');
-  assert.equal(view.work['pick-branch-a'].claimActor, 'session');
+  assert.equal(view.work['pick-branch-a'].claimRole, 'session');
   assert.equal(view.work['pick-branch-a'].branchHeadAtTake, branchHead);
   assert.equal(gitHead(cwd), mainHeadBefore, "pick never touches the human's own main checkout");
 

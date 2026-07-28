@@ -237,3 +237,29 @@ test('a commit inside a real detached git worktree writes the lock at the worktr
   );
 });
 
+// --- truth 7: the { id, source } identity shape still yields a usable token -
+// resolveWriterIdentity now returns { id, source }; a hook that kept
+// destructuring the old key would silently pass `undefined` into the lock,
+// write a token-less record, read it back as AMBIGUOUS, and refuse every
+// later commit. Asserting on the recorded token, not just the exit status,
+// is what makes that failure mode visible here.
+
+test('a commit still succeeds after the identity shape change, and the lock records a usable token', () => {
+  const repoRoot = initTempRepoWithHook();
+  const before = commitCount(repoRoot);
+
+  const first = commitAsSession(repoRoot, { BEE_SESSION_ID: 'session-shape' });
+  assert.equal(first.status, 0, first.stderr);
+  assert.equal(commitCount(repoRoot), before + 1);
+
+  const lock = JSON.parse(
+    fs.readFileSync(path.join(repoRoot, '.fgos', 'main-checkout.lock'), 'utf8'),
+  );
+  assert.equal(lock.pid, 'session-shape');
+
+  // Same session again: self-recognition still refreshes its own lock, which
+  // only works because the token above is the real identity, not undefined.
+  const second = commitAsSession(repoRoot, { BEE_SESSION_ID: 'session-shape' });
+  assert.equal(second.status, 0, second.stderr);
+  assert.equal(commitCount(repoRoot), before + 2);
+});

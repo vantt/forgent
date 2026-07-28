@@ -185,14 +185,14 @@ test('putInAwaiting with no statusAtAsk -> no such key on gates[id] at all', () 
 test('answerAwaiting resumes to statusAtAsk ("doing") instead of hardcoded "todo" — a claim held through the ask survives the answer', () => {
   const dir = tmpDir();
   addSampleWork(dir);
-  moveWork(dir, { id: 'item-x', to: 'doing', expectedStatus: 'todo', actor: 'session', headAtTake: 'deadbeef' });
+  moveWork(dir, { id: 'item-x', to: 'doing', expectedStatus: 'todo', role: 'session', headAtTake: 'deadbeef' });
   putInAwaiting(dir, { id: 'item-x', ask: 'OAuth or password?', expectedStatus: 'doing', statusAtAsk: 'doing' });
 
-  const { view } = answerAwaiting(dir, { id: 'item-x', answer: 'OAuth', expectedStatus: 'awaiting-human', actor: 'human' });
+  const { view } = answerAwaiting(dir, { id: 'item-x', answer: 'OAuth', expectedStatus: 'awaiting-human', role: 'human' });
   assert.equal(view.work['item-x'].status, 'doing');
   // The resume is not a fresh claim — the original claimant/head survive
   // untouched (replay.mjs's from !== 'awaiting-human' guard).
-  assert.equal(view.work['item-x'].claimActor, 'session');
+  assert.equal(view.work['item-x'].claimRole, 'session');
   assert.equal(view.work['item-x'].headAtTake, 'deadbeef');
 
   const rebuilt = listWork(dir);

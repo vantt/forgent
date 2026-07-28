@@ -290,7 +290,7 @@ export function changedFiles(repoRoot, item, opts = {}) {
  * checkout untouched. Only a failure to even run `git merge --abort` itself
  * throws (a real bug).
  *
- * FGOS-WRITE-REJECTED (ADR0019): a worker's `fgw/<id>` branch must never
+ * FGOS-WRITE-REJECTED (ADR0020): a worker's `fgw/<id>` branch must never
  * carry a change under `.fgos/` — the store's single write door stays the
  * `fgos` CLI verbs run against `repoRoot`, never a worker's own commit
  * (`0005`). `worktree.mjs`'s `createWorktree` no longer checks out `.fgos/`

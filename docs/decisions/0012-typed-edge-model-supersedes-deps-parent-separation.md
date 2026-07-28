@@ -71,8 +71,9 @@ và bảo đảm phi-chu-trình, trong khi hai trường lưu trữ vẫn tách 
      thay vì mở một đường ghi song song.
   3. **~10 consumer đọc trực tiếp `.deps`/`.parent`** (frontier, impact,
      `validateDeps`, v.v.) — giữ nguyên, không cần migrate.
-- Vì thuần dẫn xuất: **không có trường lưu trữ mới, `SCHEMA_VERSION` giữ
-  nguyên 2**, mọi event cũ replay y hệt (RUL11 (work-state)).
+- Vì thuần dẫn xuất: **không có trường lưu trữ mới; tại thời điểm quyết định
+  này, SCHEMA_VERSION vẫn ở 2** (nay đã lên 3, per D19/D27 str46-io-contract),
+  mọi event cũ replay y hệt (RUL11 (work-state)).
 
 ## Hệ quả
 
@@ -80,8 +81,9 @@ và bảo đảm phi-chu-trình, trong khi hai trường lưu trữ vẫn tách 
   hàng component §6 (`dep-graph.mjs`) và hàng contract **C2** đều cập nhật để
   phản ánh bảo đảm phi-chu-trình đã mở rộng sang đồ thị hợp nhất.
 - `waits-for`/`discovered-from` vẫn chỉ là từ vựng khai báo — không producer,
-  không dạng lưu trữ — cho tới S2b (dạng lưu trữ thật, `SCHEMA_VERSION`→3,
-  có producer, và quyết định riêng cho tính chất load-bearing/chặn hay
-  không của `waits-for`).
+  không dạng lưu trữ — cho tới S2b (dạng lưu trữ thật; chỗ dành SCHEMA_VERSION
+  cho S2b dời sang 4 vì STR46 đã lấy 3 trước, per D27 str46-io-contract — có
+  producer, và quyết định riêng cho tính chất load-bearing/chặn hay không của
+  `waits-for`).
 
 Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.

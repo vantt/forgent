@@ -293,7 +293,7 @@ test('resolveDecompose on a pass-through verdict releases a held claim (doing ->
 
   const storeDir = tmpStoreDir();
   addWork(storeDir, sampleWork());
-  moveWork(storeDir, { id: 'item-x', to: 'doing', expectedStatus: 'todo', actor: 'session' });
+  moveWork(storeDir, { id: 'item-x', to: 'doing', expectedStatus: 'todo', role: 'session' });
 
   const result = resolveDecompose(storeDir, 'item-x', cfg, 'session');
   assert.equal(result.outcome, 'pass-through');
@@ -367,7 +367,7 @@ test('resolveDecompose on a decompose verdict releases a held claim (doing -> to
 
   const storeDir = tmpStoreDir();
   addWork(storeDir, sampleWork());
-  moveWork(storeDir, { id: 'item-x', to: 'doing', expectedStatus: 'todo', actor: 'session' });
+  moveWork(storeDir, { id: 'item-x', to: 'doing', expectedStatus: 'todo', role: 'session' });
 
   const result = resolveDecompose(storeDir, 'item-x', cfg, 'session');
   assert.equal(result.outcome, 'decompose');
@@ -508,7 +508,7 @@ test('resolveDecompose on the already-decomposed re-entrant path also releases a
 
   const storeDir = tmpStoreDir();
   addWork(storeDir, sampleWork());
-  moveWork(storeDir, { id: 'item-x', to: 'doing', expectedStatus: 'todo', actor: 'session' });
+  moveWork(storeDir, { id: 'item-x', to: 'doing', expectedStatus: 'todo', role: 'session' });
   addWork(storeDir, {
     id: 'orphan-child-def',
     title: 'Build parser',
@@ -553,7 +553,7 @@ test('resolveDecompose on a need-human verdict stamps statusAtAsk "doing" when a
 
   const storeDir = tmpStoreDir();
   addWork(storeDir, sampleWork());
-  moveWork(storeDir, { id: 'item-x', to: 'doing', expectedStatus: 'todo', actor: 'session' });
+  moveWork(storeDir, { id: 'item-x', to: 'doing', expectedStatus: 'todo', role: 'session' });
 
   const result = resolveDecompose(storeDir, 'item-x', cfg, 'session');
   assert.equal(result.outcome, 'need-human');

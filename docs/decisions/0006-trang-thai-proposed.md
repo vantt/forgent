@@ -7,7 +7,7 @@ source_capture_ids: []
 date: 2026-07-14
 status: accepted
 source_decisions: [feed7428]
-supersedes: Tập trạng thái FSM của Phase 1 (spec work-state cập nhật khi đóng feature)
+supersedes: []
 relates_specs: [work-state, runner]
 ---
 
@@ -49,4 +49,5 @@ Ngữ nghĩa:
 - Record này **supersede** tập trạng thái FSM của Phase 1; spec work-state phản ánh
   tập trạng thái mới.
 
+- Record này supersede **Tập trạng thái FSM của Phase 1 (spec work-state cập nhật khi đóng feature)**.
 Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.
