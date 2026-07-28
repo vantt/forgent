@@ -2745,6 +2745,14 @@ test('pick with no --id claims the frontier head exactly like take does today, r
   assert.equal(data.worktree.branch, 'fgw/pick-a');
   assert.equal(data.worktree.reused, false);
   assert.ok(fs.existsSync(data.worktree.path), 'pick must leave a real worktree checkout on disk');
+  // tsk-424 D1/D2: pick's worktree must live under .claude/worktrees/ so the
+  // harness's EnterWorktree tool can chain a second in-session switch into
+  // it (e.g. a root item decomposing into a child mid-session) — a location
+  // outside .claude/worktrees/ is refused by the harness past the first switch.
+  assert.ok(
+    data.worktree.path.startsWith(path.join(cwd, '.claude', 'worktrees') + path.sep),
+    `pick worktree path "${data.worktree.path}" must live under .claude/worktrees/`,
+  );
 
   const view = stateView(cwd);
   assert.equal(view.work['pick-a'].status, 'doing');
