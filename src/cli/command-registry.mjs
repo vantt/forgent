@@ -462,7 +462,7 @@ export const COMMAND_REGISTRY = [
   {
     name: 'triage',
     invoke: 'fgos triage',
-    description: 'Rank open work by blocking fan-out (how many other open items it unblocks).',
+    description: 'Rank open work by blocking fan-out over the unified deps+parent graph (how many other open items it unblocks), one flat row per item with stage, goalTier, and its dependency/lineage component (componentId, componentSize, isIsolated) — declared goals (mvp, then milestone) sort first.',
     parameters: { type: 'object', properties: {}, required: [] },
     examples: ['fgos triage'],
     access: 'read',
