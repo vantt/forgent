@@ -1,0 +1,219 @@
+# Feature Comparison Matrix
+
+So sánh tính năng giữa các learning sources. Ô có ✓ link về entry chi tiết trong `sources/<name>.md`. Ký hiệu: ✓ có | ~ có một phần/dạng khác | ✗ không | ? chưa khảo sát.
+
+Bối cảnh quan trọng: **bee chưng cất từ repository-harness** (cùng 6 upstream khác — xem `sources/beegog.md#numbered-docs-progression`), nên nhiều tính năng harness xuất hiện trong bee ở dạng tinh gọn hơn. Cột Best đánh dấu bản triển khai đáng học nhất hiện tại.
+
+> **Delta @9cc306d (2026-07-13):** Symphony (worktree runner, auto mode, PR, web board) và các skill impeccable/intake-griller đã **tách khỏi repository-harness** sang repo `hoangnb24/symphony`. Harness thêm loạt tính năng mới: request-authority, orchestration protocol v1, proposal lifecycle, proof-before-tag.
+>
+> **Symphony đã scan @2f0b257 (2026-07-13):** giờ là source thứ ba (`sources/symphony.md`, 18 entry). Là CONSUMER thực chứng của orchestration protocol v1 — standalone product nói chuyện với harness chỉ qua typed boundary. Ô `→sym` cũ nay trỏ về entry symphony thật. Matrix giữ 2 cột nguồn chính (beegog | repository-harness); nơi symphony là bản triển khai đáng học nhất, cột Best trỏ thẳng `sources/symphony.md`.
+>
+> **compound-engineering-plugin đã scan @32fae6c (2026-07-17):** source đúng-chủ-đề nhất — LÀ triết lý "compounding" mà bee hiện thân. 30 entry (`sources/compound-engineering-plugin.md`). Hai đóng góp best-in-class mới: **multi-target-converter-engine** (parse→convert→write một plugin ra 7+ platform — bản built-out nhất của dual-runtime) và **learning-refresh-as-gardening** (learning được Keep/Update/Consolidate/Replace/Delete, thứ không nguồn nào khác có). Cùng cách xử symphony: Best trỏ thẳng `sources/compound-engineering-plugin.md` (viết `→ce`) nơi CE dẫn đầu; ba hội tụ độc lập mới được ghi vào Ghi chú (verify-evidence, fan-out-keep-decide, disk-as-truth).
+
+> **beegog scan lại @05a131f (2026-07-21, bee 1.4.0→1.7.10-rc):** đợt hardening đa-phiên. Chủ đề: **thứ trước đây đúng-nhờ-quy-ước nay đúng-nhờ-khoá**. 5 ô mới (`retry-budget-anti-loop`, `dispatch-payload-as-authority`, `semantic-judge-rework-teeth`, `gate-precondition-vs-human-checkpoint`, `verify-suite-integrity`) — cả 5 đều là beegog-độc-quyền, không nguồn nào khác chạm tới, nên chưa có hội tụ để nâng Evidence. Hai ô cũ lật trọng số: `worktree-isolation` (bee dẫn đầu ở đường VỀ nhờ merge gate bằng verify) và `write-conflict-control` (móng khoá + ledger chéo-worktree).
+
+## harness
+
+| Feature | beegog | repository-harness | Best | Ghi chú |
+|---|---|---|---|---|
+| risk-lane-classification | ✓ [→](sources/beegog.md#risk-lanes-mechanical) 6 lanes | ✓ 3 lanes (gốc, [→](sources/repository-harness.md#feature-intake-mandatory)) | beegog | bee thêm spike/docs lane + "ceremony scales, memory never" |
+| human-gates | ✓ [→](sources/beegog.md#four-gates-code-enforced) 4 gates code-enforced | ~ confirmation cho high-risk | beegog | bee enforce bằng write-guard + claim refusal; harness chỉ quy ước |
+| task-unit-with-proof | ✓ cell [→](sources/beegog.md#cell-task-unit) | ✓ story [→](sources/repository-harness.md#story-packets) | beegog (enforce) / harness (query) | cell = JSON zero-dep, cap từ chối cơ học; story = SQLite row, query SQL được |
+| durable-state-store | ✓ JSON/JSONL zero-dep | ✓ SQLite + Rust CLI [→](sources/repository-harness.md#durable-sqlite-layer) | trade-off | zero-dep dễ vendor; SQLite mạnh query/aggregate. Harness giải bài toán git-diff bằng changesets |
+| maturity-model | ✗ | ✓ H0–H5 [→](sources/repository-harness.md#maturity-ladder-h0-h5) | harness | thang đo kiểm chứng được + benchmark ngoài |
+| dual-runtime | ✓ [→](sources/beegog.md#dual-runtime-contract) | ~ (có .codex + .agents nhưng không có projection machinery) | beegog | "one brain, two belts" + parity tests |
+| autopilot-with-floor | ✓ gate-bypass [→](sources/beegog.md#gate-bypass-safety-floor) | ~ auto polling caps [→](sources/repository-harness.md#auto-polling-bounded) | beegog (floor) / harness (budget) | hai cách bound autonomy: safety floor vs run caps — bổ sung nhau |
+
+## skills
+
+| Feature | beegog | repository-harness | Best | Ghi chú |
+|---|---|---|---|---|
+| tdd-for-skills | ✓ Iron Law [→](sources/beegog.md#tdd-for-skills-iron-law) | ✗ | beegog | RED/GREEN/REFACTOR + rationalization table |
+| trigger-only-description | ✓ doctrine [→](sources/beegog.md#trigger-only-descriptions) | ~ có "Use when" nhưng không thành luật | beegog | kèm lý do sắc bén (step-summary làm agent bỏ body) |
+| skill-conventions | ✓ <200 dòng, headless, red flags, handoff [→](sources/beegog.md#skill-budgets-conventions) | ~ SKILL.md tự do | beegog | headless contract cho composition |
+| executable-skill-tooling | ~ vendored helpers | →sym (removed @9cc306d, [→](sources/repository-harness.md#impeccable-design-skill)) | symphony | skill = hệ công cụ chạy được (detector, live-edit); nay thuộc repo symphony |
+
+## hooks
+
+| Feature | beegog | repository-harness | Best | Ghi chú |
+|---|---|---|---|---|
+| lifecycle-coverage | ✓ 7 hooks / 7 events | ~ 1 PostToolUse [→](sources/repository-harness.md#post-tool-design-hook) | beegog (thực thi) / ce (bề mặt) | bee phủ session-init → close với 7 hook CHẠY. CE [→](sources/compound-engineering-plugin.md#hook-lifecycle-14-events) khai schema 14 EVENT rộng hơn (thêm PostToolUseFailure, PermissionRequest, SubagentStart/Stop) + action type `agent` (hook dispatch subagent) mà bee chưa có — nhưng CE không ship hook mặc định, chỉ framework+convert. Bề mặt event đầy đủ để chống drift khi forgent map hook đa-runtime |
+| fail-open-discipline | ✓ [→](sources/beegog.md#fail-open-crash-wrappers) | ✗ | beegog | crash không bao giờ lật allow/deny + log gap |
+| catalog-projection | ✓ [→](sources/beegog.md#hook-catalog-projection) | ✗ | beegog | one truth, N projections, byte-drift test |
+| write-guard | ✓ 4 checks [→](sources/beegog.md#write-guard-four-checks) | ✗ | beegog | gate + reservation + privacy + CLI-shape |
+| dispatch-guard | ✓ model-guard [→](sources/beegog.md#model-guard-tier-transport) | ✗ | beegog | enforce model-tier tại dispatch + audit log |
+
+## workflow
+
+| Feature | beegog | repository-harness | Best | Ghi chú |
+|---|---|---|---|---|
+| mandatory-intake | ✓ mode gate | ✓ gốc [→](sources/repository-harness.md#feature-intake-mandatory) | harness (durable record) / beegog (enforce) | harness ghi intake row durable trước mọi việc — bee đang adopt |
+| staged-phase-chain | ✓ [→](sources/beegog.md#staged-chain-with-gates) | ~ task loop 9 bước [→](sources/repository-harness.md#task-loop-nine-steps) | beegog | bee có phase state machine; harness có harness-delta checklist đáng học |
+| validate-before-execute | ✓ [→](sources/beegog.md#validate-before-execute) | ~ proof matrix ở planning | beegog | reality gate + spikes + adversarial checker |
+| requirement-locking | ✓ socratic + D-ID [→](sources/beegog.md#socratic-exploring) | ✓ intake-griller [→](sources/repository-harness.md#intake-griller-interview) | beegog | cùng gene phỏng vấn; bee thêm materiality test + domain probes + D-ID |
+| human-readable-brief | ✓ [→](sources/beegog.md#briefing-projection-artifact) | ~ high-risk execplan folder | beegog | projection-not-planner là giải pháp sạch cho dual-audience |
+| spec-decomposition | ~ (CONTEXT.md per feature) | ✓ [→](sources/repository-harness.md#spec-decomposition-lifecycle) | harness | "spec là input, không phải truth" + demo walkthrough |
+| read-only-exemption | ~ docs lane (không gate, không cell) | ✓ request-authority [→](sources/repository-harness.md#request-authority-model) | harness | câu hỏi/review/status không sinh nghi thức; bee mới chỉ miễn cho docs |
+
+## orchestration
+
+| Feature | beegog | repository-harness | Best | Ghi chú |
+|---|---|---|---|---|
+| worktree-isolation | ✓ [→](sources/beegog.md#independent-feature-worktrees) (@94b4a31) | ~ (gốc, [→](sources/repository-harness.md#symphony-isolated-runner)) | ✓ symphony [→](sources/symphony.md#isolated-run-contract) | symphony sở hữu: worktree + WAL-safe snapshot + RUN_CONTRACT.json v1 + result validation. **@94b4a31 beegog TRIỂN KHAI (bỏ deferred)**: opt-in per-wave, typed 3-valued resolution + validate 2 chiều git, grant read MAIN-store-only (worktree không tự-cấp), merge-back giao dịch verify-xanh, log union-merge. bee giờ có CẢ HAI trục điều phối: khóa-trong-cây (claims/lanes) VÀ cô-lập-cây (worktrees). **@05a131f bee vượt lên dẫn đầu ở đường VỀ**: `worktree merge` là giao dịch dàn trận — stage `--no-ff --no-commit`, chạy verify trên cây chưa commit, chỉ commit khi xanh; đỏ thì abort + bằng chứng 3 phần main byte-untouched, KHÔNG merge commit nào được tạo (thay hợp đồng cũ vốn để lại merge commit không ai rollback) [→](sources/beegog.md#worktree-merge-staged-verify-gate). Cổng ở đây là **xung đột NGỮ NGHĨA**: git merge sạch không chứng minh hệ thống còn chạy |
+| parallel-worker-swarm | ✓ [→](sources/beegog.md#orchestrator-assigns-workers) | ~ single-run lock | beegog | wave analysis + goal-check frozen judge. **@94b4a31 thêm lịch MÁY-TÍNH** [→](sources/beegog.md#computed-parallel-schedule): `computeSchedule` (Kahn) + `detectCycles` (Tarjan) + cycle refusal tại cửa ghi, derived-never-stored — hội tụ với bvr impact-first-fanout + harness runnable-predicate về "wave/việc kế = truy vấn dẫn xuất" |
+| write-conflict-control | ✓ reservations + cross-session claims/holds/lanes [→](sources/beegog.md#cross-session-atomic-claims) | ~ (worktree thay thế) | tùy kiến trúc | lock cùng cây vs cô lập cây — hai trường phái. **@55cf3a4 beegog nâng từ same-session lên đa-phiên cùng-checkout**: atomic claim (O_EXCL+TTL/heartbeat) + lane per-feature + hold deny độc-lập-phase [→](sources/beegog.md#lane-scoped-pipelines) — coordination cơ học không cần cô lập cây. **Beads là trường phái thứ ba**: multi-writer DB (Dolt all-on-main) + atomic claim + merge-slot + namespace-isolation [→](sources/beads.md#multiagent-routing-and-slots) — điều phối tại tầng store thay vì tại filesystem. **bvr là trường phái thứ tư**: message-passing giữa agent qua MCP Agent Mail + `.agent-mail.yaml` [→](sources/beads-viewer-rust.md#mcp-agent-mail-coordination) — điều phối bằng thư-tín thay vì lock/store/tree. **@05a131f bee khoá lại phần móng**: mọi read-check-write của claims/reservations/state/cells nay chạy trong một named store-lock O_EXCL với staleness HAI TẦNG — quá 30s mới là ứng viên, cướp quyền còn đòi pid chủ cũ chứng minh đã chết (hoặc quá trần cứng 1h) [→](sources/beegog.md#store-lock-named-mutex); và hold được mirror sang ledger CHÉO-WORKTREE ở main store để hai checkout không cùng thắng một path [→](sources/beegog.md#cross-worktree-holds-ledger). Chốt đáng học: KHÔNG dùng heartbeat để chứng khoá còn tươi — chủ khoá hợp lệ có thể chặn event loop nhiều phút vì `spawnSync`, nên tươi đến từ việc LÀM XONG rồi nhả |
+| model-tier-economy | ✓ [→](sources/beegog.md#model-tiers-cost-discipline) | ✗ (deferred) | beegog | ceiling/generation/extraction + advisor + presets. **CE hội tụ** [→](sources/compound-engineering-plugin.md#extraction-tier-grounding-scouts): grounding-before-judgment gom fact bằng subagent extraction-tier vào dossier-on-disk (không inline), scale scout theo consequence tier — bằng chứng thứ ba (bee + distill + CE) về "gather down-tier, decide at ceiling". **@94b4a31 bee ép boundary trong CODE**: `resolveTier(...,{for:'gather'|'cell'})` — external cli tier CHỈ resolve cho gather, resolve cho cell = typed refusal `cli_tier_gather_only`; config-validate từ chối cli-tier unsafe; digest chỉ nhận giữa framing markers |
+| judge-central-fanout | ✓ critical-rule-13 fan-out-keep-decide [→](sources/beegog.md#orchestrator-assigns-workers) | ✗ | hòa (hội tụ độc lập) | CE [→](sources/compound-engineering-plugin.md#orchestrator-judges-fans-out-fixes): ce-resolve-pr-feedback giữ mọi thread ở orchestrator, judge trung tâm, CHỈ fan-out subagent cho fix đã duyệt (subagent không phán). Tới cùng luật bee rule-13 từ hướng PR-review; "judge centrally" bắt reviewer sai-hệ-thống mà fan-out-judge bỏ lỡ. "Being invoked is NOT authorization" = authority-không-tự-nới |
+| retry-budget-anti-loop | ✓ [→](sources/beegog.md#cell-lifetime-budgets-anti-loop) (@05a131f) | ✗ | beegog | Ba ngân sách độc lập kiểm tại CỬA CLAIM (max_claims / max_failed_attempts / max_same_signature) trên nền sổ `trace.attempts` append-only + chữ ký lỗi chuẩn hoá — chặn được cả "cạn quota" lẫn "chạy lại y hệt bản vá vừa hỏng". Chốt thiết kế: cửa này CỐ Ý không đọc `gate_bypass` — an-toàn-cấu-trúc khác hẳn checkpoint-của-người, kể cả autopilot `total` cũng không mở. Không nguồn nào khác có anti-loop ở tầng task-unit; đây là mảnh forgent đã ghi là **tiền-điều-kiện của fan-out** |
+| dispatch-payload-as-authority | ✓ [→](sources/beegog.md#dispatch-prepare-payload-builder) (@05a131f) | ✗ | beegog | Payload dispatch được SINH bằng code từ một nơi duy nhất, tự kiểm qua chính hàm guard, ghi audit, và **từ chối cấp cho ai chưa cầm claim** ("payload LÀ thẩm quyền hành động trên cell"). Bước tiến từ "hook chặn dispatch sai" lên "code sinh dispatch đúng" — guard là lưới, prepare là khuôn. Kèm `pinned-tier-agent-types`: khai tier trong prompt chưa đủ, phải có hiện thân agent gắn model, `general-purpose` bị deny |
+| stuck-worker-rescue | ✓ advisor consult [→](sources/beegog.md#advisor-consult-protocol) | ✗ | beegog | budget ≤2, advice-only |
+| pr-integration | ✗ | ~ (gốc [→](sources/repository-harness.md#pr-automation)) | ✓ symphony | run → PR create/retry với forbidden-files guard; nay ở symphony (pr.rs, xem [→](sources/symphony.md#web-board-recovery-actions)) |
+
+## routing
+
+| Feature | beegog | repository-harness | Best | Ghi chú |
+|---|---|---|---|---|
+| next-work-derived-from-state | ✓ readyCells [→](sources/beegog.md#cell-status-lifecycle) | ✓ runnable predicate [→](sources/repository-harness.md#runnable-derived-dispatch) | hòa (hội tụ ×5) | NĂM nguồn độc lập cùng đến "việc kế tiếp = truy vấn dẫn xuất": readyCells ↔ runnable ↔ symphony board-precedence ↔ fgOS signal-consume ↔ beads `bd ready` [→](sources/beads.md#ready-work-ten-dep-types); beads thêm taxonomy 10 dep types (4 blocking / 6 non-blocking) giàu nhất. **bvr thêm TẦNG TRÊN ready nhị phân**: xếp hạng giải-thích-được [→](sources/beads-viewer-rust.md#transparent-triage-scoring) — ready cho biết "được làm chưa", triage-score cho biết "nên làm cái nào TRƯỚC + vì sao" (8 thành phần minh bạch) |
+| state-transition-enforcement | ✓ phase/cell CLI-owned + tail-guard [→](sources/beegog.md#phase-machine-cli-owned) | ✓ single-door + CAS [→](sources/repository-harness.md#story-status-single-door) | beegog (gates) / harness (concurrency) | bee chặn agent tự tiện (precondition + write-guard); harness chặn race đa-orchestrator (expected-status trong cùng transaction). **@55cf3a4 bee thêm chain-integrity tail-guard** [→](sources/beegog.md#chain-integrity-guard-tail): phase `compounding` không set-được-tay, chỉ producer thật (`scribing-run`) sinh — sau post-mortem một phiên giả 7 lần close bằng hand-edit phase |
+| skill-chain-router | ✓ hive router + handoff + chain-nudge [→](sources/beegog.md#hive-first-skill-router) | ~ request-class chọn loop một lần ở cửa [→](sources/repository-harness.md#request-class-loop-dispatch) | beegog | bee route liên tục qua chain nhiều skill; harness là single-skill system nên chỉ cần route request class |
+
+## integration-contract
+
+| Feature | beegog | repository-harness | Best | Ghi chú |
+|---|---|---|---|---|
+| cross-system-protocol | ✗ (monolith, không producer/consumer split) | ✓ protocol v1 producer [→](sources/repository-harness.md#orchestration-protocol-v1) | hòa (producer+consumer) | harness ĐỊNH NGHĨA protocol v1; symphony là CONSUMER thực chứng [→](sources/symphony.md#typed-runtime-boundary) — hai nửa cùng contract, chứng minh boundary chạy qua ranh giới product. bee:dual-runtime-contract là portability một-codebase, KHÁC loại. **@94b4a31 bee hardened Codex parity** [→](sources/beegog.md#codex-runtime-parity): native-subagent audit (audit-only, bounded fields), `state set --owner` chống review-session ghi đè, exactly-one-hook-source, Worker sandbox transport giữ test dưới EPERM — parity kiểm-được, không phải producer/consumer split |
+| agent-surface-regression | ~ (bee test contract hook nội bộ [→](sources/beegog.md#hook-contract-parity-tests)) | ✗ | ✓ beads-rust [→](sources/beads-rust.md#agent-baseline-golden-snapshots) | br ghim CHÍNH bề mặt agent-facing (help/schema/JSON+TOON ví dụ/fresh-agent journey) và diff với binary live — output-drift là API-break, fail CI. bee test byte-drift contract NỘI BỘ; br test contract mà agent NGOÀI dựa vào (+ snapshot-review-log-gate cho output). Hợp fgOS platform-cho-agent |
+| self-describing-contract | ~ (command registry schema+examples test thật [→](sources/beegog.md#unified-dispatcher-command-registry)) | ~ clap --help | ✓ beads-rust [→](sources/beads-rust.md#agent-first-cli-contract-hardened) | br 3 tầng tự-mô-tả (capabilities metadata / schema JSON / robot-docs sổ-tay-cap-80-dòng) + output versioned (`br.*.v1`) + exit-code taxonomy branch-được-trước-JSON. bee có registry test-chạy nhưng chưa tách 3 tầng + chưa version hóa contract |
+| agent-output-envelope | ✗ | ~ RESULT.json/RUN_CONTRACT | hòa (hội tụ agent-first CLI) | **bvr [→](sources/beads-viewer-rust.md#robot-mode-envelope) hội tụ với beads [→](sources/beads.md#agent-first-cli-contract)**: output cho agent bọc envelope máy-đọc, agent KHÔNG chạm UI người. bvr thêm `data_hash` (đổi-hay-chưa không cần diff) + envelope schema-validated bằng test [→](sources/beads-viewer-rust.md#schema-validated-output-contract); beads thêm `--json` bắt buộc + cấm interactive. Cả hai = "CLI có đường máy-đọc hạng nhất" |
+| product-boundary-ownership | ✗ | ~ (spec-decomposition ngầm) | ✓ symphony [→](sources/symphony.md#product-boundary-non-goals) | symphony khai báo tường minh "owns X / KHÔNG owns Y" + 11 non-goals; kỷ luật product biết ranh giới mình |
+| multi-runtime-projection | ~ dual-runtime 2 belt [→](sources/beegog.md#dual-runtime-contract) | ✗ | ✓ ce (build-out) / fgOS (spec) | BỐN flavor của "một brain, N runtime": bee project 2 belt qua catalog; fgOS [→](sources/marketing-cockpit.md#agent-agnostic-adapter-spec) spec adapter capability "4 required + 6 optional-with-fallback"; **CE [→](sources/compound-engineering-plugin.md#multi-target-converter-engine) là bản CHẠY ĐƯỢC đầy đủ nhất** — converter/writer engine dịch plugin ra 7+ platform với tool/hook/model map tường minh + explicit-tool-and-hook-mapping [→](sources/compound-engineering-plugin.md#explicit-tool-and-hook-mapping) + per-platform spec [→](sources/compound-engineering-plugin.md#platform-spec-per-target). fgOS mạnh spec/capability-degradation, CE mạnh engine thực chứng đa-platform |
+## context-memory
+
+| Feature | beegog | repository-harness | Best | Ghi chú |
+|---|---|---|---|---|
+| context-rules-budget | ~ reading lists + depths | ✓ matrix + token budgets [→](sources/repository-harness.md#context-rules-matrix) | harness | phase × lane × must/should/skip + score-context đo compliance |
+| area-state-specs | ✓ BA-grade + rebuild bar [→](sources/beegog.md#ba-grade-specs-rebuild-bar) | ~ product docs | beegog | rebuild bar là acceptance test cho memory |
+| log-vs-state-model | ✓ [→](sources/beegog.md#state-vs-log-two-physics) | ~ (ngầm: changesets vs docs) | beegog | phát biểu tường minh thành nguyên lý. **CE hội tụ** [→](sources/compound-engineering-plugin.md#disk-as-source-of-truth): "results table in conversation without writing to disk first = a bug" — mọi skill dài (optimize/dogfood/sweep/handoff) write-then-read-back verify, checkpoint resume-được. Bản áp-dụng-rộng của cùng luật disk-là-truth |
+| event-sourcing | ✓ decisions.jsonl [→](sources/beegog.md#event-sourced-decisions) | ✓ changesets [→](sources/repository-harness.md#changeset-event-sourcing) | cả hai | mục đích khác: quyết định thiết kế vs thao tác dữ liệu; changesets giải git-diff cho SQLite. **Beads @303e263 rẽ hướng thứ ba**: Dolt-as-truth (VC trong store, bỏ JSONL-truth) khi multi-agent write thành tải chính [→](sources/beads.md#dolt-as-versioned-truth). **beads-rust là ĐỐI TRỌNG**: sibling độc lập fork tại classic SQLite+JSONL rồi CỐ Ý đứng lại đó (tôi-luyện, không đổi engine) [→](sources/beads-rust.md#sqlite-jsonl-classic-truth) — bằng chứng "con đường không đi" của Dolt-pivot, củng cố luật changeset forgent ở single-writer; điểm phải-xem-lại (multi-writer thành tải chính) đúng chỗ bd rẽ |
+| pause-resume | ✓ HANDOFF 65% [→](sources/beegog.md#handoff-at-65-percent) | ✗ | beegog | never auto-resume |
+| settlement-capture | ✓ [→](sources/beegog.md#settlement-capture-unprompted) | ✗ | beegog | agent tự phát hiện "chốt" mỗi turn |
+| intervention-log | ~ (adopt-now, chưa build) | ✓ [→](sources/repository-harness.md#intervention-log) | harness | correction/override/escalation/approval là dữ liệu học |
+| memory-typing | ~ log-vs-state 2 loại | ✗ | ✓ fgOS 4 loại [→](sources/marketing-cockpit.md#four-memory-types) | fgOS phân working/episodic/semantic/procedural + consolidation + importance-forgetting; bee mới 2 physics. Beads: memory-là-bead trong đồ thị việc [→](sources/beads.md#remember-prime-memory-loop) + quên bằng LLM-compaction giữ snapshot [→](sources/beads.md#llm-tier-compaction) — hai cách quên khác nhau (TTL-vứt vs nén-giữ-gốc) |
+## planning
+
+| Feature | beegog | repository-harness | Best | Ghi chú |
+|---|---|---|---|---|
+| plan-artifact | ✓ unified 2-pass [→](sources/beegog.md#unified-plan-two-pass) | ✓ story packet + PHASE docs | beegog (đơn feature) / harness (roadmap) | PHASE docs có expected benchmark deltas — falsifiable. **CE hội tụ** [→](sources/compound-engineering-plugin.md#unified-plan-artifact): một artifact tiến hóa theo readiness (brainstorm→requirements-only, plan→implementation-ready, enrich in-place) — cùng "unified plan" như bee nhưng giải dual-audience bằng readiness-ladder thay vì projection. CE cũng có strategy-anchor-doc [→](sources/compound-engineering-plugin.md#strategy-anchor-doc) seed cả fleet skill |
+| research-protocol | ✓ evidence labels + ladder [→](sources/beegog.md#research-levels-evidence-labels) | ✗ | beegog | Local/Upstream/Docs/Inference |
+| edge-case-checklist | ✓ 12 dimensions [→](sources/beegog.md#edge-dimensions-checklist) | ~ validation ladder | beegog | |
+| dependency-tracking | ✓ cell deps | ✓ story deps trong schema [→](sources/repository-harness.md#epic-story-hierarchy) | harness | deps query được bằng SQL, board tự tính runnable |
+| explainable-work-ranking | ✗ | ✗ | ✓ bvr [→](sources/beads-viewer-rust.md#transparent-triage-scoring) | Không nguồn harness-family nào xếp-hạng-giải-thích-được việc; bvr chấm 8 thành phần (graph 42% + vận-hành 58%) trọng-số-tổng-1.0 + 5 preset. Kèm forecast/economics/what-if [→](sources/beads-viewer-rust.md#greedy-topk-unblock-and-whatif) = "sau khi có đồ thị-việc thì QUYẾT ĐỊNH gì" — mảnh còn thiếu của lifecycle bán-tự-động fgOS |
+| impact-first-selection | ✗ | ✗ | ✓ bvr [→](sources/beads-viewer-rust.md#greedy-topk-unblock-and-whatif) | Greedy submodular chọn k việc mở-khóa-nhiều-nhất downstream + what-if simulation + tách connected-component thành track song song — đúng hình fan-out reactive của fgOS |
+
+## quality-gates
+
+| Feature | beegog | repository-harness | Best | Ghi chú |
+|---|---|---|---|---|
+| verify-enforced-close | ✓ cap refuses [→](sources/beegog.md#cell-task-unit) | ✓ story complete atomic [→](sources/repository-harness.md#story-complete-atomic) | hòa (hội tụ ×3) | bee: refusal + before-state evidence; harness: fresh proof + closure 1 transaction. **CE hội tụ độc lập thứ ba** [→](sources/compound-engineering-plugin.md#verification-evidence-gate): ce-work đòi `verification_evidence` khi `behavior_change:true`, lfg retry-once nếu thiếu — ba nguồn cùng luật "không đóng khi chưa có proof". CE thêm: behavior_change là CỜ quyết định cần evidence không (docs-only skip), giống lane scaling |
+| signal-scaled-review-roster | ~ panel cố định [→](sources/beegog.md#multi-agent-review-severity) | ✗ | ✓ ce [→](sources/compound-engineering-plugin.md#reviewer-persona-selection) | CE bật reviewer persona theo SIGNAL trong diff (always-on + conditional: security khi auth/data, perf khi hot-path…) + small-diff-fast-path fail-closed [→](sources/compound-engineering-plugin.md#small-diff-fast-path). bee-reviewing dùng panel cố định; CE scale roster theo bề mặt rủi ro thực. Personas-as-prompt-assets (Skill seed subagent, không expose Agent) |
+| semantic-judge-rework-teeth | ✓ [→](sources/beegog.md#semantic-judge-verdict-loop) (@05a131f) | ✗ | beegog | Verdict theo schema đóng (`PASS`/`NEEDS_REVISION`, mỗi check BẮT BUỘC có evidence, cross-check loại verdict tự mâu thuẫn) + răng thật: cap bị từ chối khi verdict mới nhất là NEEDS_REVISION, và verdict đó **mở lại cell về `open` đồng thời xoá bằng chứng verify cũ**. Bài học vá lỗ đáng giá nhất đợt này: bản trước mở lại về `claimed` nhưng GIỮ verify cũ → một PASS sau đó cap lại được mà không hề chạy verify mới. So với `signal-scaled-review-roster` của CE: CE chọn AI nào review, bee chọn verdict có hiệu lực gì lên vòng đời task |
+| gate-precondition-vs-human-checkpoint | ✓ [→](sources/beegog.md#advisor-consult-gate-precondition) (@05a131f) | ✗ | beegog | Phân biệt hai loại chặn mà autopilot hay gộp: **checkpoint của người** (bypass gỡ được) vs **tiền-điều-kiện cơ học** (không ai gỡ). Với slice high-risk, `state gate --name execution` THROW nếu thiếu `advisor_ref` chưa cũ, ở mọi mức bypass. Staleness định nghĩa bằng SỰ KIỆN kiểm được (lệch feature / có decision mới hơn / sha256 plan đổi / có trước một lần thu-hồi-gate), không bao giờ bằng TTL — "AO13 đã một lần bỏng vì một con số bịa". Mẫu tái dùng cho mọi cache tri thức |
+| trace-quality-tiers | ~ trace depth theo lane (adopt từ harness) | ✓ + auto-score [→](sources/repository-harness.md#trace-quality-tiers) | harness | score-trace chấm điểm tự động |
+| multi-agent-review | ✓ [→](sources/beegog.md#multi-agent-review-severity) | ✗ | beegog | frozen scope + review-stale + EXISTS/SUBSTANTIVE/WIRED |
+| adversarial-plan-check | ✓ [→](sources/beegog.md#adversarial-plan-checker) | ✗ | beegog | |
+| session-baseline-gate | ✓ [→](sources/beegog.md#baseline-gate) | ✗ | beegog | never build on red |
+| proof-matrix | ~ must_haves per cell | ✓ [→](sources/repository-harness.md#proof-matrix) | harness | ma trận coverage tra được toàn dự án |
+
+## docs-style
+
+| Feature | beegog | repository-harness | Best | Ghi chú |
+|---|---|---|---|---|
+| glossary | ✗ | ✓ [→](sources/repository-harness.md#glossary-driven-vocab) | harness (tĩnh) / ce (sống) | harness glossary chống drift ngữ nghĩa. **CE nâng thành GLOSSARY SỐNG** [→](sources/compound-engineering-plugin.md#concepts-living-glossary): CONCEPTS.md accretes tự động khi ce-compound/refresh xử learning — term mới seed vào để không "dangle against undefined siblings", có scope discipline. Cầu nối naming↔learning, không phải doc biên tay |
+| entry-point-shim | ✓ AGENTS.md BEE block + CLAUDE.md 1 dòng | ✓ CLAUDE.md @import shim [→](sources/repository-harness.md#claude-md-import-shim) | harness | shim + progressive disclosure theo phase |
+| always-loaded-doctrine | ✓ doctrine layer + anchor-suite [→](sources/beegog.md#doctrine-layer-always-loaded) | ~ AGENTS.md prose, không test | beegog | placement rule ("hold khi không stage nào chạy?") + anchors suite-tested + "transport rides with the order"; fgOS có họ hàng conventions-coverage (enforce-ability manifest) nhưng không anchor-test standing sheet |
+| navigation-map | ✓ reading-map [→](sources/beegog.md#spec-reading-map) | ✓ component taxonomy [→](sources/repository-harness.md#component-taxonomy-coverage) | harness (taxonomy) / beegog (map) | 11-responsibility framework đáng đối chiếu với taxonomy forgent |
+| decision-records | ✓ Status/Confidence/Alternatives | ✓ Context/Decision/Reasoning/Alternatives/Implications | beegog | bee thêm Confidence + event-sourced supersede |
+| communication-doctrine | ✓ gate presentation + silent bookkeeping [→](sources/beegog.md#gate-presentation-contract) | ~ lane output format | beegog | litmus "user restate được" |
+| refusal-format | ✓ ERROR/WHY/FIX [→](sources/beegog.md#error-why-fix-refusals) | ✗ | beegog | có test assert |
+| learning-from-references | ✓ distillation + adoption audits [→](sources/beegog.md#numbered-docs-progression) | ~ research grounding trong PHASE5 | beegog | tiền lệ trực tiếp cho hệ thống này của forgent |
+
+## tooling
+
+| Feature | beegog | repository-harness | Best | Ghi chú |
+|---|---|---|---|---|
+| support-cli | ✓ zero-dep Node [→](sources/beegog.md#zero-dep-vendored-helpers) | ✓ Rust + SQLite [→](sources/repository-harness.md#rust-cli-ddd-layering) | trade-off | vendorability vs query power |
+| machine-readable-cli-catalog | ✓ [→](sources/beegog.md#unified-dispatcher-command-registry) | ~ clap --help | beegog | schema + examples được test chạy thật |
+| tool-registry | ✗ | ✓ [→](sources/repository-harness.md#tool-registry-capability) | harness | "absent capability = clean skip" |
+| env-doctor | ~ onboard recheck | ~ (gốc [→](sources/repository-harness.md#doctor-preflight)) | ✓ symphony 10 checks [→](sources/symphony.md#doctor-preflight-10-checks) | symphony tiến hóa: 10 check Pass/Warn/Fail + next-action, thêm changeset-sync + optional-provider |
+| observer-ui | ✗ | ~ (gốc [→](sources/repository-harness.md#symphony-web-board)) | ✓ symphony [→](sources/symphony.md#web-board-recovery-actions) | recovery-action tính từ run state, không phải nút tĩnh |
+| cost-visibility | ✓ statusline + perf-log [→](sources/beegog.md#performance-log-cross-project-matrix) | ✗ | beegog | statusline: token subagent theo model per-session. **@94b4a31 thêm performance-log CHÉO-DỰ-ÁN**: `performance.jsonl` toàn-máy, active-time (không wall-clock), token new/cached/total per-model, subagent attributed riêng, matrix gom theo folder + cache% — vòng đo cost-tier economy trên nhiều dự án |
+
+## config-packaging
+
+| Feature | beegog | repository-harness | Best | Ghi chú |
+|---|---|---|---|---|
+| installer | ✓ 2-layer [→](sources/beegog.md#one-line-installer-two-layers) | ✓ merge modes [→](sources/repository-harness.md#installer-merge-modes) | hòa | bee: dual-runtime; harness: conflict modes + shared payload manifest |
+| drift-detection | ✓ SHA256 manifest [→](sources/beegog.md#onboarding-manifest-drift) | ~ checksum binary | beegog | heal drift + downgrade guard |
+| host-file-coexistence | ✓ markers [→](sources/beegog.md#managed-block-markers) | ~ AGENTS shim refresh | beegog | byte-preservation có spec + edge cases |
+| release-automation | ✓ [→](sources/beegog.md#release-tuple-manifest-integrity) (@94b4a31) | ✓ post-merge tự động [→](sources/repository-harness.md#post-merge-maintenance-automation) | hòa | harness: bump+changelog post-merge, tag→proof gate. **@94b4a31 beegog**: `bump_version.mjs` một-lệnh bump cả tuple (2 state.mjs + 2 plugin.json qua registry `COMPONENTS`) + preflight desync refusal + tự regen manifest |
+| proof-before-release | ~ [→](sources/beegog.md#release-tuple-manifest-integrity) (@94b4a31 manifest) | ✓ [→](sources/repository-harness.md#proof-before-tag-promotion) | harness | harness: frozen baseline + full contract, tag sau matrix pass, failed tag bất biến. **@94b4a31 beegog** thêm nửa integrity: release manifest sha256+mode+role/file, self-test tự mutate để chứng so-sánh cắn, wired vào verify — chưa có frozen-baseline/immutable-tag như harness |
+| binary-distribution | ✗ (không cần, Node) | ✓ prebuilt + sha256 [→](sources/repository-harness.md#prebuilt-binary-release) | harness | |
+| multi-target-conversion | ~ dual-runtime 2 belt (projection) [→](sources/beegog.md#dual-runtime-contract) | ✗ | ✓ ce [→](sources/compound-engineering-plugin.md#multi-target-converter-engine) | bee project 1 codebase ra 2 belt (.codex/.agents) qua catalog-projection; CE dịch runtime ra 7+ platform qua converter/writer registry + tool/permission/hook/model map tường minh mỗi target. Bản built-out nhất của "one brain, N belts"; converter offline, không dep Claude runtime |
+| install-ownership-tracking | ✓ markers giữ byte ngoài [→](sources/beegog.md#managed-block-markers) | ~ merge modes | ✓ ce [→](sources/compound-engineering-plugin.md#install-manifest-ownership) | CE track file plugin-owned vs user bằng `install-manifest.json` per-plugin + cleanup xóa stale nhưng GIỮ symlink/file user + archive legacy không xóa. bee ở cấp text-block marker; CE ở cấp file-tracking |
+| release-metadata-parity | ~ plugin version tay | ✓ post-merge auto [→](sources/repository-harness.md#post-merge-maintenance-automation) | hòa (khác trục) | CE [→](sources/compound-engineering-plugin.md#release-metadata-parity): parity check version/description/count qua ~5 manifest surface (one-truth-N-projection cho đa-platform manifest); harness: bump+changelog tự động. Bổ sung nhau |
+
+## repo-layout
+
+| Feature | beegog | repository-harness | Best | Ghi chú |
+|---|---|---|---|---|
+| policy-vs-ops-split | ✓ [→](sources/beegog.md#policy-vs-ops-split) | ✓ [→](sources/repository-harness.md#policy-vs-durable-separation) | hòa | cùng nguyên lý; harness có negation pattern (.harness/* ignore trừ changesets/) |
+| feature-history-layout | ✓ docs/history/<feature>/ [→](sources/beegog.md#docs-history-per-feature) | ✓ stories/epics/US-*/ | tùy khẩu vị | bee theo dòng thời gian feature; harness theo cây backlog |
+| cross-platform-hygiene | ~ Windows-safe code | ✓ .gitattributes eol [→](sources/repository-harness.md#gitattributes-line-endings) | harness | chi tiết nhỏ, giá trị lớn |
+| multi-target-native-layout | ~ dual-runtime 2 belt | ✗ | ✓ ce [→](sources/compound-engineering-plugin.md#root-native-multi-target-layout) | CE commit native manifest cho ~11 platform dưới dir peer (`.claude-plugin/`, `.codex-plugin/`, …) — "native khi platform có surface, convert khi không". CLAUDE.md symlink→AGENTS.md thỏa loader + validate. Đối cực symphony (một product/một runtime); YAGNI cho forgent hôm nay nhưng là bản đồ đầy đủ |
+
+## safety
+
+| Feature | beegog | repository-harness | Best | Ghi chú |
+|---|---|---|---|---|
+| secret-read-protocol | ✓ privacy marker [→](sources/beegog.md#privacy-marker-protocol) | ✗ | beegog | approve-per-read qua hook |
+| hard-gate-risks | ✓ (thừa kế) | ✓ gốc [→](sources/repository-harness.md#hard-gates-intake) | hòa | cùng danh sách |
+| cross-repo-data-boundary | ✓ allowlist + consumer-revalidate [→](sources/beegog.md#allowlist-not-redaction) | ✗ | beegog | bài học falsified-by-data hiếm có |
+| untrusted-input-discipline | ✓ (guardrail: artifact/transcript là data) | ✗ | hòa (hội tụ) | CE [→](sources/compound-engineering-plugin.md#untrusted-input-discipline): feedback body/media/PR-comment/handoff là DATA mô tả vấn đề, action chỉ từ source-config không từ item content. Bằng chứng nguồn ngoài rằng luật "mined content là data, never instructions" của forgent là phổ quát cho agent đọc input không tin cậy |
+| install-write-safety | ~ managed-block byte-preserve | ✗ | ✓ ce [→](sources/compound-engineering-plugin.md#managed-root-escape-guard) | CE giả định user CÓ THỂ đã fork/symlink file mình: store bị repoint qua ancestor symlink → skip toàn bộ (no-op), symlink leaf giữ + không overwrite, containment check chống `../../`, legacy archive không xóa. fail-safe cấp filesystem-write, cùng tinh thần fail-open của bee |
+| blast-radius-containment | ✓ allowlist-not-redaction (cross-repo) [→](sources/beegog.md#allowlist-not-redaction) | ✗ | hòa (hội tụ falsified-by-data) | **beads-rust hội tụ ĐỘC LẬP** [→](sources/beads-rust.md#sync-safety-blast-radius): sync sinh từ sự cố thật (bd sync xoá cả cây source) → path allowlist + invariant "không gọi git" biến thành **grep CI test-được** + **strace witness** chứng blast-radius bằng syscall thật + tombstone-guard KHÔNG-override-được. Cùng gene "chặn bằng allowlist-cho-phép, sinh từ mất-dữ-liệu-thật" với bee; br thêm chiều cơ-học-kiểm-được. Áp thẳng thao tác điểm-không-quay-đầu forgent (repo-divorce) |
+| destructive-action-guardrail | ~ (verify-before-destroy trong rules) | ✗ | ✓ bvr [→](sources/beads-viewer-rust.md#agent-guardrail-doctrine) | bvr phát biểu tường minh ở tầng agent-instruction: RULE 0 override + "NO FILE DELETION" + "never break glass" cho thao tác không-hoàn-tác; + biến guardrail thành TEST chạy được (bắt version-literal hard-code, forbid unsafe). Hội tụ tinh thần với privacy/hard-gate của bee nhưng nhắm đường HUỶ-DIỆT |
+
+## self-improvement
+
+| Feature | beegog | repository-harness | Best | Ghi chú |
+|---|---|---|---|---|
+| friction-outcome-loop | ✓ (thừa kế + layer attribution) [→](sources/beegog.md#friction-backlog-outcome-loop) | ✓ gốc [→](sources/repository-harness.md#growth-rule-friction) | beegog | thêm 5-layer failure attribution |
+| entropy-score | ✓ + trend [→](sources/beegog.md#entropy-score-trend) | ✓ audit | beegog (trend) | cùng gene công thức |
+| self-modification-loop | ✓ evolving 2 human gates [→](sources/beegog.md#evolving-loop-two-gates) | ✓ explicit lifecycle @9cc306d [→](sources/repository-harness.md#proposal-lifecycle-explicit) | hòa (hội tụ) | hai bên hội tụ độc lập về "explicit accept per item"; bee mạnh về gate discipline, harness mạnh về đo outcome (confirmed/ineffective/reverted, regression/reconsideration) |
+| debt-grooming | ✓ project-first [→](sources/beegog.md#grooming-project-first) | ~ audit harness-only | beegog | tách nhà mình / nhà chủ |
+| proof-gated-refactor | ~ grooming + review severity [→](sources/beegog.md#grooming-project-first) | ✗ | ✓ beads-rust [→](sources/beads-rust.md#isomorphism-refactor-ledger) | Refactor agent-driven gated bằng proof-đẳng-cấu: score `(LOC×Conf)/Risk` + **equivalence-contract 10 trục** per candidate + **red-baseline-repair-first** (sửa baseline đỏ trước, ghi Order 0) + honor cross-agent reservation (reject ghi lý do). Cùng luật never-build-on-red của bee nhưng áp cho SELF-MODIFICATION; 10-trục contract chống "refactor đổi hành vi ngầm" |
+| design-before-code-proof-gate | ~ validate-before-execute [→](sources/beegog.md#validate-before-execute) | ✗ | ✓ beads-rust [→](sources/beads-rust.md#rollout-ladder-design-before-code) | Ship pure types cho tới khi proof gate qua: write-combining là "design artifact only" (`src/write_combining.rs` zero wiring) + rollout ladder 5 nấc (shadow→advisory→opt-in→default-on chỉ sau perf-bundle+parity) + fallback-đường-thẳng bắt buộc. Bản trưởng thành validate-before-execute cho tối-ưu; khung chống "bật tối ưu chưa chứng minh" cho fan-out forgent |
+| learning-capture-loop | ✓ bee-compounding → critical-patterns.md (append) [→](sources/beegog.md#numbered-docs-progression) | ~ research grounding | hòa (cách khác nhau) | CE [→](sources/compound-engineering-plugin.md#compound-capture-grounded): capture vào docs/solutions/ có frontmatter track + probe session-history (cheap-probe-escalate) + seed vocabulary vào glossary sống + grounding-validate claim trước khi tin. bee append vào critical-patterns; CE là doc-per-learning grounding-validated |
+| learning-refresh-gardening | ✗ (chỉ "keep it short and current" tay) | ✗ | ✓ ce [→](sources/compound-engineering-plugin.md#learning-refresh-as-gardening) | THỨ KHÔNG NGUỒN NÀO KHÁC CÓ: audit learning-set định kỳ Keep/Update/Consolidate/Replace/Delete với retrieval-value test — chống drift/trùng/lỗi-thời của mọi memory layer. bee-compounding chỉ tích lũy; đây là garden. Củng cố bằng grounding-validation-claims [→](sources/compound-engineering-plugin.md#grounding-validation-claims) (path/SHA/link check trước khi doc thành trusted) |
+
+## ux
+
+| Feature | beegog | repository-harness | Best | Ghi chú |
+|---|---|---|---|---|
+| jargon-discipline | ✓ silent bookkeeping [→](sources/beegog.md#silent-bookkeeping) | ~ | beegog | |
+| machine-protocol | ✓ status tokens [→](sources/beegog.md#status-token-protocol) | ✓ RESULT.json/SUMMARY.md | hòa | |
+| fleet-visibility | ~ statusline | →sym [→](sources/repository-harness.md#symphony-web-board) | symphony | |
+
+## testing-evals
+
+| Feature | beegog | repository-harness | Best | Ghi chú |
+|---|---|---|---|---|
+| behavior-pressure-tests | ✓ [→](sources/beegog.md#pressure-test-scenarios) | ✗ | beegog | 7 loại áp lực |
+| external-benchmark | ✗ | ✓ [→](sources/repository-harness.md#external-benchmark-repo) | harness | delta kỳ vọng khai báo trước |
+| infra-contract-tests | ✓ parity + byte-drift [→](sources/beegog.md#hook-contract-parity-tests) | ✓ CI release [→](sources/repository-harness.md#release-ci-verification) | beegog (depth) / harness (breadth) | |
+| verify-suite-integrity | ✓ [→](sources/beegog.md#verify-manifest-floor-guard) (@05a131f) | ~ CI release contract | beegog | Chống "verify âm thầm rụng suite": sàn số suite đông cứng + danh sách bắt buộc kiểm cả tồn-tại-trên-đĩa lẫn có-mặt-trong-runner, và bản thân checker có self-test chứng nó cắn. Kèm `hermetic-verify-env-sealing` (xoá session id khỏi env con — trị xanh-giả do dev chạy verify từ trong một phiên harness sống) và `honest-windows-ci-subset` (job CI tự khai chính xác nó KHÔNG chứng cái gì, exclusion có nguyên nhân + số CI run + backlog row). Đây là `evidence-before-claims` áp cho chính bộ đo |
+| llm-judge-eval | ✗ | ~ external benchmark (số) | ✓ fgOS cross-family [→](sources/marketing-cockpit.md#crossfamily-llm-judge) | fgOS: Claude chấm Gemini và ngược lại (chống self-bias) + rubric weighted + baseline regression; harness dùng benchmark số ngoài, khác cách |
+| reference-oracle-conformance | ✗ | ~ CI release contract | ✓ bvr [→](sources/beads-viewer-rust.md#conformance-against-reference) | Port chứng-minh-tương-đương: Go reference CLI commit vào repo làm oracle, so **JSON bất-biến-thứ-tự + typed schema** (không diff dòng). Kèm evidence-gated parity ledger [→](sources/beads-viewer-rust.md#evidence-gated-parity-ledger) — "complete chỉ khi conformance chống lưng". Mẫu cho fgOS khi domain-extension kế thừa base-workflow cần chứng minh parity |
+| output-quality-gate | ~ review severity | ✗ | ✓ fgOS default-FAIL [→](sources/marketing-cockpit.md#rigor-scaled-evaluation) | fgOS 3-tier (free→LLM→human) theo rigor + reviewer giả định FAIL; cùng tinh thần adversarial của bee-validating nhưng ở review output |
+| metric-optimize-loop | ✗ | ✗ | ✓ ce [→](sources/compound-engineering-plugin.md#metric-driven-optimize-loop) | Không nguồn nào khác có vòng tối-ưu experiment: hard-metric HOẶC LLM-as-judge mode + hypothesis backlog + degenerate gate + disk checkpoint CP-0..5 write-then-read-back. LLM-judge mode hợp khi forgent cần chấm chất lượng output agent không có metric cứng |
+| cross-model-review | ~ (llm-judge cross-family [→](sources/marketing-cockpit.md#crossfamily-llm-judge)) | ✗ | ✓ ce [→](sources/compound-engineering-plugin.md#cross-model-peer-pass) | CE chạy peer review bằng model KHÁC cho finding Tier 2/3 (consent + recipient validation) — adversarial thật vì model không tự bắt lỗi mình. Cùng gene chống self-bias với fgOS cross-family judge nhưng áp cho code/doc/POV review, không chỉ eval |
