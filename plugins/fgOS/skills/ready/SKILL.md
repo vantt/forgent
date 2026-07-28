@@ -23,7 +23,7 @@ read never appends an event).
 2. **Read the frontier.** Run:
 
    ```
-   node ${CLAUDE_PROJECT_DIR}/repo/bin/fgos.mjs ready --json
+   node ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs ready --json
    ```
 
    Always use the literal `${CLAUDE_PROJECT_DIR}` substitution shown above,

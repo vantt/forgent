@@ -42,8 +42,4 @@ output.txt
 !/.agents/skills/fgos/
 !/.agents/skills/distill/
 /.codex/
-/plans/
 /upstreams/
-/docs/history/
-/docs/reference-learning-system.md/
-/docs/naming.md/
