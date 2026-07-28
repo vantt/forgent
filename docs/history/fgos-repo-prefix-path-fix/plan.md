@@ -55,17 +55,28 @@ that consumes it.
 | 2 spec doc lines (`fgos-plugin.md:167-168`, `distribution.md`) | Low — documentation only | Same grep, scoped to the 2 files |
 | Standalone default behavior | Medium — this is the behavior every unset-env-var session hits today, so a wrong default breaks every plugin verb call again | Manual check: run one wrapped verb (`node ${CLAUDE_PROJECT_DIR}/bin/fgos.mjs list --json`, no `FGOS_NESTED_PREFIX` set) from this repo's own root and confirm it succeeds |
 
-**Files touched** (16 skill files + 2 specs, 22 lines total per the
-`grep -rn` count below — `docs/backlog.md` explicitly excluded per D2):
+**Files touched** (16 skill files + 1 spec line, 23 lines total —
+`docs/backlog.md` explicitly excluded per D2):
 
 ```
 plugins/fgOS/skills/{answer,ask,check,conflicts,cook,discover,goal,graph,
-list,move,pick,ready,return,rollup,stale,submit}/SKILL.md
-docs/specs/fgos-plugin.md:167-168
-docs/specs/distribution.md
+list,move,pick,ready,return,rollup,stale,submit}/SKILL.md  (22 lines)
+docs/specs/fgos-plugin.md:167  (1 line — the runnable invocation snippet)
 ```
 
-Verified current scope: `grep -rn "repo/bin/fgos.mjs" plugins/fgOS/skills/*/SKILL.md | wc -l` → 22.
+**D3 (validating correction, narrows D2):** `fgos-plugin.md:168` and
+`distribution.md:287` do NOT contain the `${CLAUDE_PROJECT_DIR}/repo/...`
+runnable pattern — both are bare file-listing bullets (`repo/bin/fgos.mjs —
+<description>`) sharing each doc's page-wide "prefix every path with
+`repo/`" listing convention (verified: `distribution.md` alone has dozens of
+sibling bullets — `repo/scripts/...`, `repo/src/...` — using the identical
+notation for unrelated files). Editing only these two would single them out
+inconsistently from every sibling bullet in the same doc, and edits nothing
+a shell would ever actually run. Excluded from execution scope; D2's
+underlying concern (the runnable template shouldn't perpetuate the wrong
+path) is fully addressed by fixing line 167 alone.
+
+Verified current scope: `grep -rn "repo/bin/fgos.mjs" plugins/fgOS/skills/*/SKILL.md | wc -l` → 22; `docs/specs/fgos-plugin.md:167` → 1 (the only in-scope spec line).
 
 ## Shape
 
@@ -93,10 +104,14 @@ Single-pass edit, scaled to `small`:
 
 Execute's own mechanical build/verify/return path already covers this
 (per the locked "leave execution alone" convention) — this plan names one
-verify command, already attached to the item:
+verify command, already attached to the item. It checks the exact
+`${CLAUDE_PROJECT_DIR}/repo/bin/fgos.mjs` runnable pattern only (fixed-string
+match), not a bare `repo/` substring — a plain-substring check would
+false-FAIL on `fgos-plugin.md:168`'s legitimate, untouched listing bullet
+(D3):
 
 ```
-grep -rL "repo/bin/fgos.mjs" plugins/fgOS/skills/*/SKILL.md | wc -l | grep -q "^0$" && ! grep -q "repo/bin/fgos.mjs" docs/specs/fgos-plugin.md docs/specs/distribution.md && echo "PASS: repo/ prefix removed from 20 skill files + 2 specs (docs/backlog.md intentionally untouched per D2)"
+grep -rlF "${CLAUDE_PROJECT_DIR}/repo/bin/fgos.mjs" plugins/fgOS/skills/*/SKILL.md docs/specs/fgos-plugin.md | wc -l | grep -q "^0$" && echo "PASS: exact runnable repo/ pattern removed from 16 skill files + fgos-plugin.md:167 (line 168 bare listing bullet + distribution.md intentionally untouched per D3)"
 ```
 
 ## Split decision
