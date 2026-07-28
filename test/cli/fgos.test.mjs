@@ -1602,6 +1602,24 @@ test('triage never mutates state: no event is appended', () => {
   assert.deepEqual(eventLines(cwd), before);
 });
 
+test('triage rows carry stage, goalTier, and component membership; declared goals sort ahead of ungrouped work', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'plain');
+  run(cwd, ['add', 'goal-item', '--title', 'Goal Item', '--kind', 'task', '--risk', 'low', '--verify', 'npm test', '--goal-tier', 'mvp']);
+
+  const result = run(cwd, ['triage']);
+  assert.equal(result.status, 0);
+  const data = envelopeData(result.stdout);
+  const plain = data.find((r) => r.id === 'plain');
+  const goal = data.find((r) => r.id === 'goal-item');
+  assert.equal(plain.stage, 'executing');
+  assert.equal(plain.goalTier, null);
+  assert.equal(plain.isIsolated, true);
+  assert.equal(plain.componentSize, 1);
+  assert.equal(goal.goalTier, 'mvp');
+  assert.deepEqual(data.map((r) => r.id), ['goal-item', 'plain']);
+});
+
 // --- friction channel in `check` (phase-3-compound-learning-4, S2) ---------
 //
 // Same write-door discipline as the outcome tests above: only the runner

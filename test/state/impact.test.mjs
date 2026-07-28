@@ -82,7 +82,107 @@ test('rankImpact is deterministic: same view always yields the same ordered outp
   assert.deepEqual(rankImpact(view), rankImpact(view));
 });
 
-test('rankImpact emits every human-facing field: id, title, status, blocks', () => {
+test('rankImpact emits every human-facing field: id, title, status, blocks, stage, goalTier, componentId, componentSize, isIsolated', () => {
   const view = { work: { a: item('a', 'blocked', []) } };
-  assert.deepEqual(rankImpact(view), [{ id: 'a', title: 'title-a', status: 'blocked', blocks: 0 }]);
+  assert.deepEqual(rankImpact(view), [{
+    id: 'a', title: 'title-a', status: 'blocked', blocks: 0,
+    stage: 'executing', goalTier: null, componentId: 0, componentSize: 1, isIsolated: true,
+  }]);
+});
+
+test('rankImpact reads stage as-is when the item carries one, defaulting to executing when absent', () => {
+  const view = { work: { a: item('a', 'todo', [], { stage: 'clarify' }), b: item('b', 'todo') } };
+  const [aRow, bRow] = rankImpact(view).sort((x, y) => (x.id < y.id ? -1 : 1));
+  assert.equal(aRow.stage, 'clarify');
+  assert.equal(bRow.stage, 'executing');
+});
+
+test('rankImpact reads goalTier as-is when the item carries one, null when absent', () => {
+  const view = { work: { a: item('a', 'todo', [], { goalTier: 'mvp' }), b: item('b', 'todo') } };
+  const [aRow, bRow] = rankImpact(view).sort((x, y) => (x.id < y.id ? -1 : 1));
+  assert.equal(aRow.goalTier, 'mvp');
+  assert.equal(bRow.goalTier, null);
+});
+
+test('rankImpact sorts declared goals ahead of ungrouped work: mvp, then milestone, then no tier', () => {
+  const view = {
+    work: {
+      plain: item('plain', 'todo'),
+      goal: item('goal', 'todo', [], { goalTier: 'milestone' }),
+      top: item('top', 'todo', [], { goalTier: 'mvp' }),
+    },
+  };
+  assert.deepEqual(rankImpact(view).map((r) => r.id), ['top', 'goal', 'plain']);
+});
+
+test('rankImpact groups items sharing a deps or parent edge into the same component, size counted correctly', () => {
+  const view = {
+    work: {
+      base: item('base', 'todo'),
+      dep1: item('dep1', 'todo', ['base']),
+      lonely: item('lonely', 'todo'),
+    },
+  };
+  const [baseRow, dep1Row, lonelyRow] = rankImpact(view).sort((x, y) => (x.id < y.id ? -1 : x.id > y.id ? 1 : 0));
+  assert.equal(baseRow.componentId, dep1Row.componentId);
+  assert.equal(baseRow.componentSize, 2);
+  assert.equal(baseRow.isIsolated, false);
+  assert.equal(lonelyRow.componentSize, 1);
+  assert.equal(lonelyRow.isIsolated, true);
+});
+
+test('rankImpact credits a child with unblocking its open parent, the same way a deps target is credited by its dependent', () => {
+  // A parent stays gated on an open child (frontier.mjs's hasOpenDescendant) —
+  // so finishing the CHILD is what moves the parent closer to unblocked, and
+  // the child is the one that earns the blocks credit, not the parent.
+  const view = {
+    work: {
+      root: item('root', 'todo'),
+      child: item('child', 'todo', [], { parent: 'root' }),
+    },
+  };
+  const [childRow] = rankImpact(view).filter((r) => r.id === 'child');
+  assert.equal(childRow.blocks, 1);
+});
+
+test('rankImpact combines deps-credit and parent-credit on the same item rather than only counting one relation', () => {
+  const view = {
+    work: {
+      hub: item('hub', 'todo'),
+      dependent: item('dependent', 'todo', ['hub']),
+      child: item('child', 'todo', [], { parent: 'hub' }),
+    },
+  };
+  const hubRow = rankImpact(view).find((r) => r.id === 'hub');
+  const childRow = rankImpact(view).find((r) => r.id === 'child');
+  assert.equal(hubRow.blocks, 1); // credited by `dependent`'s deps entry
+  assert.equal(childRow.blocks, 1); // credited for unblocking `hub` once done
+});
+
+test('rankImpact breaks an equal-blocks tie by component size before falling back to id', () => {
+  // `inCluster` and `alone` both sit at blocks:0, so id order alone (the
+  // pre-existing tiebreak) would put `alone` first — component size now
+  // takes priority over id, so the item with a real (still-open) cluster
+  // around it sorts first instead.
+  const view = {
+    work: {
+      alone: item('alone', 'todo'),
+      inCluster: item('inCluster', 'todo'),
+      clusterMate: item('clusterMate', 'todo', ['inCluster']),
+    },
+  };
+  const ids = rankImpact(view).map((r) => r.id);
+  assert.ok(ids.indexOf('inCluster') < ids.indexOf('alone'));
+});
+
+test('rankImpact excludes a done member from componentSize/isIsolated: a finished dependency leaves the item isolated', () => {
+  const view = {
+    work: {
+      openItem: item('openItem', 'todo', ['finishedDep']),
+      finishedDep: item('finishedDep', 'done'),
+    },
+  };
+  const [openRow] = rankImpact(view);
+  assert.equal(openRow.componentSize, 1);
+  assert.equal(openRow.isIsolated, true);
 });
