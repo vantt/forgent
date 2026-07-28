@@ -164,6 +164,54 @@ test('reclaimOrphanedCheckout reports reclaimed:true and force-removes the still
   assert.equal(fs.existsSync(wt.path), false);
 });
 
+test('reclaimOrphanedCheckout refuses (throws, does not remove) a checkout with real uncommitted changes (tsk-1os data-loss guard)', () => {
+  const repoRoot = initTempRepo();
+  const worktreeDir = mkWorktreeDir();
+  const wt = createWorktree(repoRoot, 'item-h', { worktreeDir });
+  commitOnWorktree(wt.path, 'attempt.txt', 'real work\n');
+  // simulate a live checkout still being worked in: uncommitted edit, never
+  // torn down via removeWorktree.
+  fs.writeFileSync(path.join(wt.path, 'in-progress.txt'), 'not yet committed\n');
+
+  assert.throws(() => reclaimOrphanedCheckout(repoRoot, 'fgw/item-h'), WorktreeError);
+  assert.equal(fs.existsSync(wt.path), true);
+  assert.equal(fs.existsSync(path.join(wt.path, 'in-progress.txt')), true);
+
+  removeWorktree(repoRoot, wt.path, { force: true });
+});
+
+test('createWorktree does not leak its freshly-allocated directory when the reuse path is refused for a dirty checkout', () => {
+  const repoRoot = initTempRepo();
+  const worktreeDir = mkWorktreeDir();
+  const wt = createWorktree(repoRoot, 'item-h2', { worktreeDir });
+  commitOnWorktree(wt.path, 'attempt.txt', 'real work\n');
+  fs.writeFileSync(path.join(wt.path, 'in-progress.txt'), 'not yet committed\n');
+
+  const before = fs.readdirSync(worktreeDir);
+  assert.throws(() => createWorktree(repoRoot, 'item-h2', { worktreeDir }), WorktreeError);
+  const after = fs.readdirSync(worktreeDir);
+
+  assert.deepEqual(after, before);
+
+  removeWorktree(repoRoot, wt.path, { force: true });
+});
+
+test('reclaimOrphanedCheckout still reclaims normally when the only "change" is the .fgos removal createWorktree itself performs', () => {
+  const repoRoot = initTempRepo();
+  fs.mkdirSync(path.join(repoRoot, '.fgos'));
+  fs.writeFileSync(path.join(repoRoot, '.fgos', 'events.jsonl'), '');
+  execFileSync('git', ['add', '.fgos/events.jsonl'], { cwd: repoRoot });
+  execFileSync('git', ['commit', '-q', '-m', 'track .fgos'], { cwd: repoRoot });
+  const worktreeDir = mkWorktreeDir();
+  const wt = createWorktree(repoRoot, 'item-i', { worktreeDir });
+  commitOnWorktree(wt.path, 'attempt.txt', 'real work\n');
+
+  const result = reclaimOrphanedCheckout(repoRoot, 'fgw/item-i');
+
+  assert.equal(result.reclaimed, true);
+  assert.equal(fs.existsSync(wt.path), false);
+});
+
 test('listLeftovers reports aheadCount 0 for a branch with no commits beyond base (orphan)', () => {
   const repoRoot = initTempRepo();
   const worktreeDir = mkWorktreeDir();
