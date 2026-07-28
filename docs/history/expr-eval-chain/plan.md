@@ -78,9 +78,11 @@ intended decompose shape:
    `dogfood-fixture/test/expr/index.test.mjs`. Depends on: evaluate.
    Verify: `node --test dogfood-fixture/test/expr/index.test.mjs`
 
-Root (`tsk-1wd`) keeps its own attached verify
-(`node --test test/expr/*.test.mjs`) as the final integration check once
-all three are `done`, per the scenario's expected shape.
+Root (`tsk-1wd`) keeps its own attached verify — corrected to
+`node --test 'dogfood-fixture/test/expr/*.test.mjs'` (the original
+`fgos discover` verdict omitted the `dogfood-fixture/` prefix; see backlog
+`p-af05e742`) — as the final integration check once all three are `done`,
+per the scenario's expected shape.
 
 ## Execution
 
