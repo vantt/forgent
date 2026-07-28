@@ -154,7 +154,7 @@ mang thêm một trường **writer** — object lồng đúng hai trường con
 gọi thuộc LOẠI nào" (`human`/`runner`/`session`/`system`), còn `writer`
 trả lời "người gọi là CÁ THỂ nào" — phân biệt được hai phiên agent cùng chạy
 song song, cùng mang `role: session` nhưng là hai tiến trình khác nhau
-(per D7/D8 str46-io-contract).
+(per D7/D8 str46-io-contract). The gates[id] projection derived from `work.move` events carries CTR004/v1 version token through the `SCHEMA_VERSION` field of the source event, per D37 str46-io-contract.
 
 `writer.id` là chuỗi hoặc số định danh tiến trình ghi. `writer.source` nói
 độ tin của giá trị đó — KHÔNG phải một trường độc lập, mà đi kèm bắt buộc với
