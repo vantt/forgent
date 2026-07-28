@@ -1,5 +1,6 @@
 {
   "enabledPlugins": {
-    "fgOS@fgos-plugins": true
+    "fgOS@fgos-plugins": true,
+    "dogfood-fixture@fgos-plugins": true
   }
 }

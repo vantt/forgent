@@ -198,5 +198,13 @@
     "docPath": "docs/decisions/0017-dong-audit-he-id-ten-goi.md",
     "title": "0017 — Đóng audit hệ id/tên gọi (STR47)",
     "sourceCaptureId": null
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/decisions/0018-moc-mvp2-fgos.md",
+    "title": "0018 — Mốc MVP2 của fgOS",
+    "sourceCaptureId": null
   }
 ]

@@ -1,0 +1,8 @@
+{
+  "name": "dogfood-fixture",
+  "description": "dogfood-fixture replay scenario surface: list/show/submit/cleanup repeatable fgOS test scenarios under dogfood-fixture/scenarios/, without touching .fgos/ state or the fgos CLI directly.",
+  "version": "1.0.0",
+  "author": {
+    "name": "fgOS"
+  }
+}

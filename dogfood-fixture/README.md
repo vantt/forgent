@@ -18,3 +18,18 @@ forgent's own `npm test` glob.
 cd repo/dogfood-fixture
 npm test
 ```
+
+## Replay scenarios
+
+`scenarios/` holds reusable, repeatable task descriptions for exercising
+fgOS's own workflow against this fixture (submit → clarify → decompose →
+executing → return → review), sized to reliably hit specific lifecycle
+shapes without ballooning runtime. See `scenarios/expr-eval-chain.md` for
+the current one (multi-child decompose with a `deps` chain, used for MVP2
+interactive-vs-headless parity testing).
+
+Each scenario documents its own reset step. Generic pattern:
+
+```sh
+npm run reset:<scenario-name>
+```
