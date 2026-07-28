@@ -182,3 +182,12 @@
 {"seq":182,"ts":"2026-07-28T06:58:30.563Z","type":"work.edit","payload":{"id":"tsk-37v","patch":{"verify":"node --test test/intake/judge-executor.test.mjs"},"actor":"human"},"v":2}
 {"seq":183,"ts":"2026-07-28T06:58:41.955Z","type":"work.move","payload":{"id":"tsk-37v","from":"doing","to":"proposed","branchHeadAtReturn":"fadb0149bb63888eff9192868fea4edfb358c621"},"v":2}
 {"seq":184,"ts":"2026-07-28T06:58:41.959Z","type":"work.outcome","payload":{"id":"tsk-37v","actual":{"outcome":"proposed","passed":true,"attempts":1,"errorClass":null,"aheadCount":1}},"v":2}
+{"seq":185,"ts":"2026-07-28T07:37:38.046Z","type":"work.stage","payload":{"id":"tsk-3fb","from":"executing","to":"compound-learn","actor":"human"},"v":2}
+{"seq":186,"ts":"2026-07-28T07:38:08.814Z","type":"work.discovery","payload":{"id":"tsk-37v","clear":true,"verify":"npm test -- judge-executor && node .fgos/run.cjs discover tsk-3fb","intentScore":70},"v":2}
+{"seq":187,"ts":"2026-07-28T07:38:08.819Z","type":"work.edit","payload":{"id":"tsk-37v","patch":{"intent":70},"actor":"session"},"v":2}
+{"seq":188,"ts":"2026-07-28T07:38:08.821Z","type":"work.stage","payload":{"id":"tsk-37v","from":"clarify","to":"decompose","verify":"npm test -- judge-executor && node .fgos/run.cjs discover tsk-3fb","actor":"session"},"v":2}
+{"seq":189,"ts":"2026-07-28T07:38:16.830Z","type":"work.edit","payload":{"id":"tsk-37v","patch":{"verify":"node --test test/intake/judge-executor.test.mjs"},"actor":"human"},"v":2}
+{"seq":190,"ts":"2026-07-28T07:38:41.170Z","type":"work.stage","payload":{"id":"tsk-37v","from":"decompose","to":"executing","actor":"session"},"v":2}
+{"seq":191,"ts":"2026-07-28T07:38:48.966Z","type":"work.stage","payload":{"id":"tsk-37v","from":"executing","to":"compound-learn","actor":"human"},"v":2}
+{"seq":192,"ts":"2026-07-28T07:38:57.024Z","type":"work.move","payload":{"id":"tsk-3fb","from":"proposed","to":"done","actor":"human","learning":{"outcome":{"disposition":"proposed","attempts":1,"errorClass":null},"frictions":{},"settlements":{"answer/human":2,"clarify-pass/session":1,"close/human":1}}},"v":2}
+{"seq":193,"ts":"2026-07-28T07:38:57.070Z","type":"work.move","payload":{"id":"tsk-37v","from":"proposed","to":"done","actor":"human","learning":{"outcome":{"disposition":"proposed","attempts":1,"errorClass":null},"frictions":{},"settlements":{"clarify-pass/session":1,"close/human":1}}},"v":2}
