@@ -89,3 +89,10 @@ per the scenario's expected shape.
 Per the locked decision that Execute's build/verify/return path is already
 mechanical, no re-design here — each piece above names the one command
 that proves it done; that is Execute's whole contract.
+
+## Result
+
+All 3 children (`tsk-1wd-1`/`tsk-1wd-2`/`tsk-1wd-3`) reached `done`,
+merged into this branch in dependency order. Root's own integration verify
+(`node --test 'dogfood-fixture/test/expr/*.test.mjs'`) run for real on the
+merged tree: 25/25 pass (2026-07-28).
