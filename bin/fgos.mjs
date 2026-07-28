@@ -5,12 +5,9 @@
 // assumed to be an agent — so every outcome is a categorized exit code
 // (R4), and callers should branch on the code, never on the message text.
 //
-//   0 ok            — mutation applied / read succeeded
-//   1 unexpected     — anything not covered below (a real bug)
-//   2 precondition   — illegal FSM transition (fsm.mjs)
-//   3 conflict       — CAS expected-status mismatch (fsm.mjs)
-//   4 validation     — bad input / not-found (work.mjs, store.mjs)
-//   5 corrupt-log    — the event log itself failed to parse (events.mjs)
+// Exit codes (R4): The canonical exit-code table lives in src/state/store.mjs's
+// EXIT_CODES export (codes 2-5, 7-9; 0=ok, 1=unexpected) plus src/runner/loop.mjs's
+// EXIT_BUSY (code 6, runner-only state).
 //
 // This file never writes to `.fgos/` itself — every mutation goes through
 // src/state/store.mjs, the sole write door.
