@@ -24,12 +24,15 @@ domains_covered: [harness, skills, hooks, workflow, orchestration, routing, inte
 > mechanical inventory (much deeper than this curated index): 3 group
 > reports at `docs/distillery/reports/distill-bee-inventory-2026-07-28-group-{a,b,c}.md`,
 > plus the original `docs/distillery/reports/distill-bee-inventory-2026-07-18.md`.
-> **Domain-taxonomy proposal (unresolved, human decision per extract-rules.md):**
-> `bee-herding` (autonomous multi-pane/worktree dispatch+merge loop) is filed
-> under `orchestration` below for now, but is arguably its own domain
-> (candidate name: `fleet-automation` or `unattended-ops`) — it's a different
-> shape of concern (cross-session/cross-process automation) than in-session
-> fan-out tiering. Flagging, not deciding.
+> **Domain-taxonomy proposal — resolved 2026-07-28 (user):** `bee-herding`
+> (autonomous multi-pane/worktree dispatch+merge loop) genuinely spans
+> several facets at once — orchestration, TUI/pane automation, fleet
+> automation, unattended-ops — user confirmed all of these read as correct
+> simultaneously, none wins as *the* single domain. Left filed under
+> `orchestration` below (no `taxonomy.txt` edit); a one-kebab-case-domain-
+> per-line taxonomy doesn't fit a concern this multi-faceted anyway. It's a
+> different shape of concern (cross-session/cross-process automation) than in-session
+> fan-out tiering.
 
 ## harness
 
