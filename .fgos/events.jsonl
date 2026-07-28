@@ -298,3 +298,10 @@
 {"seq":284,"ts":"2026-07-28T10:38:01.000Z","type":"work.stage","payload":{"id":"tsk-3oa","from":"decompose","to":"executing","actor":"human"}}
 {"seq":285,"ts":"2026-07-28T10:38:02.000Z","type":"work.stage","payload":{"id":"tsk-3oa","from":"executing","to":"compound-learn","actor":"human"}}
 {"seq":286,"ts":"2026-07-28T10:38:45.422Z","type":"work.move","payload":{"id":"tsk-3oa","from":"proposed","to":"done","actor":"human","learning":{"outcome":{"disposition":"blocked","attempts":1,"errorClass":"verify-miss"},"frictions":{"verification":1},"settlements":{"clarify-pass/human":1,"close/human":1}}},"v":2}
+{"seq":287,"ts":"2026-07-28T10:39:09.940Z","type":"work.move","payload":{"id":"tsk-4mo","from":"todo","to":"doing","actor":"session","branchHeadAtTake":"c3c6594d3f6982d0b4eaf0c91c38c8ffb664bcf5"},"v":2}
+{"seq":288,"ts":"2026-07-28T10:39:09.945Z","type":"work.outcome","payload":{"id":"tsk-4mo","predicted":{"tier":"standard","deps":1,"priorVisits":0,"actor":"session","branchHeadAtTake":"c3c6594d3f6982d0b4eaf0c91c38c8ffb664bcf5"}},"v":2}
+{"seq":289,"ts":"2026-07-28T10:41:16.200Z","type":"work.edit","payload":{"id":"tsk-4mo","patch":{"verify":"grep -q 'claimWork.*isolate.*true' bin/fgos.mjs && echo 'PASS: pick uses claimWork with isolate:true'"},"actor":"human"},"v":2}
+{"seq":290,"ts":"2026-07-28T10:41:16.325Z","type":"work.move","payload":{"id":"tsk-4mo","from":"doing","to":"blocked"},"v":2}
+{"seq":291,"ts":"2026-07-28T10:41:16.329Z","type":"work.outcome","payload":{"id":"tsk-4mo","actual":{"outcome":"blocked","passed":false,"attempts":1,"errorClass":"verify-miss","aheadCount":2}},"v":2}
+{"seq":292,"ts":"2026-07-28T10:41:16.332Z","type":"work.friction","payload":{"id":"tsk-4mo","disposition":"blocked","errorClass":"verify-miss","layer":"verification","attempts":1,"detail":"goal-check failed on branch \"fgw/tsk-4mo\" (exit 1)"},"v":2}
+{"seq":293,"ts":"2026-07-28T10:41:36.515Z","type":"work.edit","payload":{"id":"tsk-4mo","patch":{"verify":"grep 'isolate: true' bin/fgos.mjs && echo 'PASS: pick uses claimWork with isolate:true'"},"actor":"human"},"v":2}
