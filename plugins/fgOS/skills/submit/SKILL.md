@@ -27,7 +27,7 @@ work item without leaving the session or hand-typing the CLI. Never writes
 2. **Scan the current fgOS view for a dependency candidate.** Run:
 
    ```
-   node ${CLAUDE_PROJECT_DIR}/repo/bin/fgos.mjs list --json
+   node ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs list --json
    ```
 
    Always use the literal `${CLAUDE_PROJECT_DIR}` substitution shown above,
@@ -59,7 +59,7 @@ work item without leaving the session or hand-typing the CLI. Never writes
    - If the user confirmed (or edited to) one or more dependency ids, run:
 
      ```
-     node ${CLAUDE_PROJECT_DIR}/repo/bin/fgos.mjs submit "<text>" --deps <confirmed-ids>
+     node ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs submit "<text>" --deps <confirmed-ids>
      ```
 
      where `<confirmed-ids>` is a comma-separated list of the confirmed
@@ -68,7 +68,7 @@ work item without leaving the session or hand-typing the CLI. Never writes
      step 2, run the same command with **no `--deps` flag at all**:
 
      ```
-     node ${CLAUDE_PROJECT_DIR}/repo/bin/fgos.mjs submit "<text>"
+     node ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs submit "<text>"
      ```
 
    `<text>` is the original free-text description from step 1 (or the

@@ -216,6 +216,24 @@ test('runJudgeExecutor sends the stricter prompt (not the original) on the retry
   assert.equal(verdict.echoed, 'STRICTER SUFFIX prompt');
 });
 
+test('runJudgeExecutor strips a ```json ... ``` code fence and parses the wrapped verdict on the first attempt, with no retry (tsk-37v)', () => {
+  const dir = mkTempDir();
+  const { scriptPath, counterPath } = writeRawStdoutExecutor(dir, '```json\n{"clear": true, "verify": "ok"}\n```');
+  const cfg = cfgFor(scriptPath);
+  const verdict = runJudgeExecutor(cfg, 'sonnet', 'prompt', 'stricter prompt');
+  assert.deepEqual(verdict, { clear: true, verify: 'ok' });
+  assert.equal(readCount(counterPath), 1);
+});
+
+test('runJudgeExecutor strips a bare ``` ... ``` fence (no language tag) and parses the wrapped verdict (tsk-37v)', () => {
+  const dir = mkTempDir();
+  const { scriptPath, counterPath } = writeRawStdoutExecutor(dir, '```\n{"clear": false, "question": "why?"}\n```');
+  const cfg = cfgFor(scriptPath);
+  const verdict = runJudgeExecutor(cfg, 'sonnet', 'prompt', 'stricter prompt');
+  assert.deepEqual(verdict, { clear: false, question: 'why?' });
+  assert.equal(readCount(counterPath), 1);
+});
+
 test('runJudgeExecutor returns null (fail-safe) when all three attempts hit a parse-shaped failure (str68 D3, nested-judge-fix)', () => {
   const dir = mkTempDir();
   const { scriptPath, counterPath } = writeRawStdoutExecutor(dir, 'not json at all');

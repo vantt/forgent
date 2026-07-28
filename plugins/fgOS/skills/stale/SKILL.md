@@ -23,7 +23,7 @@ CTR001; a pure read never appends an event and never reclaims anything).
 2. **Read the stale-doing advisory.** Run:
 
    ```
-   node ${CLAUDE_PROJECT_DIR}/repo/bin/fgos.mjs stale --json
+   node ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs stale --json
    ```
 
    Always use the literal `${CLAUDE_PROJECT_DIR}` substitution shown above,
