@@ -2213,21 +2213,31 @@ async function runVerb(verb, flags, positional, dir) {
 // `--help --json`.
 
 function publicManifestEntries() {
-  return COMMAND_REGISTRY.map(({ name, invoke, description, parameters, examples, access, deprecated }) => ({
+  return COMMAND_REGISTRY.map(({ name, invoke, description, parameters, examples, touchesState, externalEffect, deprecated }) => ({
     name,
     invoke,
     description,
     parameters,
     examples,
-    access,
+    touchesState,
+    externalEffect,
     deprecated,
   }));
 }
 
 function renderHelpText(entries = publicManifestEntries()) {
+  // Label for touchesState+externalEffect: 'read' (both false), 'write'
+  // (touches only), 'external' (effect only), or 'write+external' (both true).
+  const labelFor = (touchesState, externalEffect) => {
+    if (touchesState && externalEffect) return 'write+external';
+    if (touchesState) return 'write';
+    if (externalEffect) return 'external';
+    return 'read';
+  };
   const lines = [`fgos — the fgOS work-item CLI (schema_version ${MANIFEST_SCHEMA_VERSION})`, ''];
   for (const entry of entries) {
-    lines.push(`${entry.invoke} [${entry.access}]`);
+    const label = labelFor(entry.touchesState, entry.externalEffect);
+    lines.push(`${entry.invoke} [${label}]`);
     lines.push(`    ${entry.description}`);
     const required = entry.parameters?.required || [];
     const positional = entry.parameters?.positional || [];

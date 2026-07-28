@@ -20,7 +20,7 @@
 // the whole verb is declared 'mutation'. This flag is a declaration only: P37
 // does not wire it into dispatch/authz (that is P38's job).
 
-export const MANIFEST_SCHEMA_VERSION = '1.0';
+export const MANIFEST_SCHEMA_VERSION = '2.0';
 
 export const COMMAND_REGISTRY = [
   {
@@ -29,7 +29,8 @@ export const COMMAND_REGISTRY = [
     description: 'Initialize the .fgos/ store in the current directory (event log, empty view, coexistence manifest).',
     parameters: { type: 'object', properties: {}, required: [] },
     examples: ['fgos init'],
-    access: 'mutation',
+    touchesState: true,
+    externalEffect: false,
     deprecated: null,
   },
   {
@@ -60,7 +61,8 @@ export const COMMAND_REGISTRY = [
       required: ['id', 'title', 'kind', 'risk', 'verify'],
     },
     examples: ['fgos add build-cli --title "Build CLI" --kind feature --risk medium --verify "npm test"'],
-    access: 'mutation',
+    touchesState: true,
+    externalEffect: false,
     deprecated: null,
   },
   {
@@ -85,7 +87,8 @@ export const COMMAND_REGISTRY = [
       required: ['text'],
     },
     examples: ['fgos submit "Fix the flaky retry test" --async'],
-    access: 'mutation',
+    touchesState: true,
+    externalEffect: false,
     deprecated: null,
   },
   {
@@ -102,7 +105,8 @@ export const COMMAND_REGISTRY = [
       required: ['id'],
     },
     examples: ['fgos discover build-cli'],
-    access: 'mutation',
+    touchesState: true,
+    externalEffect: false,
     deprecated: null,
   },
   {
@@ -121,7 +125,8 @@ export const COMMAND_REGISTRY = [
       required: ['id', 'to'],
     },
     examples: ['fgos move build-cli --to doing'],
-    access: 'mutation',
+    touchesState: true,
+    externalEffect: false,
     deprecated: null,
   },
   {
@@ -138,7 +143,8 @@ export const COMMAND_REGISTRY = [
       required: ['id'],
     },
     examples: ['fgos compound build-cli', 'fgos compound build-cli --doc-type how-to'],
-    access: 'mutation',
+    touchesState: true,
+    externalEffect: false,
     deprecated: null,
   },
   {
@@ -165,7 +171,8 @@ export const COMMAND_REGISTRY = [
       required: ['id'],
     },
     examples: ['fgos edit build-cli --verify "npm test -- --grep cli"'],
-    access: 'mutation',
+    touchesState: true,
+    externalEffect: false,
     deprecated: null,
   },
   {
@@ -183,7 +190,8 @@ export const COMMAND_REGISTRY = [
       required: ['id', 'text'],
     },
     examples: ['fgos ask build-cli --text "Which module owns this?"'],
-    access: 'mutation',
+    touchesState: true,
+    externalEffect: false,
     deprecated: null,
   },
   {
@@ -201,7 +209,8 @@ export const COMMAND_REGISTRY = [
       required: ['id', 'text'],
     },
     examples: ['fgos answer build-cli --text "src/cli owns it."'],
-    access: 'mutation',
+    touchesState: true,
+    externalEffect: false,
     deprecated: null,
   },
   {
@@ -217,7 +226,8 @@ export const COMMAND_REGISTRY = [
       required: ['text'],
     },
     examples: ['fgos decision --text "Use envelope wrapping at the dispatcher choke-point"'],
-    access: 'mutation',
+    touchesState: true,
+    externalEffect: false,
     deprecated: null,
   },
   {
@@ -226,7 +236,8 @@ export const COMMAND_REGISTRY = [
     description: 'List the full work/decisions view.',
     parameters: { type: 'object', properties: {}, required: [] },
     examples: ['fgos list'],
-    access: 'read',
+    touchesState: false,
+    externalEffect: false,
     deprecated: null,
   },
   {
@@ -235,7 +246,8 @@ export const COMMAND_REGISTRY = [
     description: 'List the frontier: open work items ready to be taken/dispatched right now.',
     parameters: { type: 'object', properties: {}, required: [] },
     examples: ['fgos ready'],
-    access: 'read',
+    touchesState: false,
+    externalEffect: false,
     deprecated: null,
   },
   {
@@ -250,7 +262,8 @@ export const COMMAND_REGISTRY = [
       required: [],
     },
     examples: ['fgos graph', 'fgos graph --what-if auth-3'],
-    access: 'read',
+    touchesState: false,
+    externalEffect: false,
     deprecated: null,
   },
   {
@@ -259,7 +272,8 @@ export const COMMAND_REGISTRY = [
     description: 'Read-only advisory: items stuck in "doing" classified as stale by owner type (a person\'s claim gets far longer grace than an agent\'s). Classifies and suggests only — never reclaims.',
     parameters: { type: 'object', properties: {}, required: [] },
     examples: ['fgos stale'],
-    access: 'read',
+    touchesState: false,
+    externalEffect: false,
     deprecated: null,
   },
   {
@@ -268,7 +282,8 @@ export const COMMAND_REGISTRY = [
     description: 'Read-only advisory: pairs of ready work items whose declared file footprints overlap (a parallel-dispatch conflict risk), with the shared paths and resolution options (sequence/hoist/re-slice). Suggests only — never re-slices.',
     parameters: { type: 'object', properties: {}, required: [] },
     examples: ['fgos conflicts'],
-    access: 'read',
+    touchesState: false,
+    externalEffect: false,
     deprecated: null,
   },
   {
@@ -277,7 +292,8 @@ export const COMMAND_REGISTRY = [
     description: 'Rebuild the derived view (.fgos/state.json) from the event log.',
     parameters: { type: 'object', properties: {}, required: [] },
     examples: ['fgos rebuild'],
-    access: 'mutation',
+    touchesState: true,
+    externalEffect: false,
     deprecated: null,
   },
   {
@@ -286,7 +302,8 @@ export const COMMAND_REGISTRY = [
     description: 'Repair a truncated final line in .fgos/events.jsonl (the common crash-mid-append shape); backs up the original log first.',
     parameters: { type: 'object', properties: {}, required: [] },
     examples: ['fgos repair'],
-    access: 'mutation',
+    touchesState: true,
+    externalEffect: false,
     deprecated: null,
   },
   {
@@ -302,7 +319,8 @@ export const COMMAND_REGISTRY = [
       required: [],
     },
     examples: ['fgos check', 'fgos check build-cli'],
-    access: 'read',
+    touchesState: false,
+    externalEffect: false,
     deprecated: null,
   },
   {
@@ -318,7 +336,8 @@ export const COMMAND_REGISTRY = [
       required: ['id'],
     },
     examples: ['fgos rollup build-cli'],
-    access: 'read',
+    touchesState: false,
+    externalEffect: false,
     deprecated: null,
   },
   {
@@ -335,7 +354,8 @@ export const COMMAND_REGISTRY = [
       required: [],
     },
     examples: ['fgos take', 'fgos take build-cli --role session'],
-    access: 'mutation',
+    touchesState: true,
+    externalEffect: false,
     deprecated: null,
   },
   {
@@ -351,7 +371,8 @@ export const COMMAND_REGISTRY = [
       required: [],
     },
     examples: ['fgos pick', 'fgos pick build-cli'],
-    access: 'mutation',
+    touchesState: true,
+    externalEffect: false,
     deprecated: null,
   },
   {
@@ -368,7 +389,8 @@ export const COMMAND_REGISTRY = [
       required: ['id'],
     },
     examples: ['fgos return build-cli'],
-    access: 'mutation',
+    touchesState: true,
+    externalEffect: false,
     deprecated: null,
   },
   {
@@ -386,7 +408,8 @@ export const COMMAND_REGISTRY = [
       required: ['id'],
     },
     examples: ['fgos review build-cli', 'fgos review build-cli --github'],
-    access: 'mutation',
+    touchesState: false,
+    externalEffect: true,
     deprecated: null,
   },
   {
@@ -406,7 +429,8 @@ export const COMMAND_REGISTRY = [
       required: ['id'],
     },
     examples: ['fgos approve build-cli'],
-    access: 'mutation',
+    touchesState: true,
+    externalEffect: true,
     deprecated: null,
   },
   {
@@ -423,7 +447,8 @@ export const COMMAND_REGISTRY = [
       required: ['id', 'reason'],
     },
     examples: ['fgos reject build-cli --reason "needs more work"'],
-    access: 'mutation',
+    touchesState: true,
+    externalEffect: false,
     deprecated: null,
   },
   {
@@ -440,7 +465,8 @@ export const COMMAND_REGISTRY = [
       required: ['id'],
     },
     examples: ['fgos catchup build-cli'],
-    access: 'mutation',
+    touchesState: true,
+    externalEffect: false,
     deprecated: null,
   },
   {
@@ -456,7 +482,8 @@ export const COMMAND_REGISTRY = [
       required: [],
     },
     examples: ['fgos evolve', 'fgos evolve --pick cand-1', 'fgos evolve --submit cand-1'],
-    access: 'mutation',
+    touchesState: true,
+    externalEffect: false,
     deprecated: null,
   },
   {
@@ -465,7 +492,8 @@ export const COMMAND_REGISTRY = [
     description: 'Rank open work by blocking fan-out (how many other open items it unblocks).',
     parameters: { type: 'object', properties: {}, required: [] },
     examples: ['fgos triage'],
-    access: 'read',
+    touchesState: false,
+    externalEffect: false,
     deprecated: null,
   },
   {
@@ -474,7 +502,8 @@ export const COMMAND_REGISTRY = [
     description: 'Read-only: (re)generate the end-user doc read-by-tag index, keyed by Diataxis quadrant (tutorial/how-to/reference/explanation). Enumerates docs/<quadrant>/, writes docs/enduser-docs-index.json with each entry\'s purpose/audience (fixed quadrant mapping), docPath, title, and sourceCaptureId (the compound-learn capture that produced the doc, or null when none is recorded).',
     parameters: { type: 'object', properties: {}, required: [] },
     examples: ['fgos docs-index'],
-    access: 'read',
+    touchesState: false,
+    externalEffect: false,
     deprecated: null,
   },
   {
@@ -490,7 +519,8 @@ export const COMMAND_REGISTRY = [
       required: ['doc-path'],
     },
     examples: ['fgos doc-sources docs/how-to/check-rollup-progress.md'],
-    access: 'read',
+    touchesState: false,
+    externalEffect: false,
     deprecated: null,
   },
   {
@@ -509,7 +539,8 @@ export const COMMAND_REGISTRY = [
       required: ['sub'],
     },
     examples: ['fgos session start', 'fgos session end <session-id>', 'fgos session list', 'fgos session gc'],
-    access: 'mutation',
+    touchesState: true,
+    externalEffect: false,
     deprecated: null,
   },
   {
@@ -526,7 +557,8 @@ export const COMMAND_REGISTRY = [
       required: ['sub'],
     },
     examples: ['fgos goal set <id>', 'fgos goal show'],
-    access: 'mutation',
+    touchesState: true,
+    externalEffect: false,
     deprecated: null,
   },
   {
@@ -541,7 +573,8 @@ export const COMMAND_REGISTRY = [
       required: [],
     },
     examples: ['fgos setup', 'fgos setup --pretty'],
-    access: 'mutation',
+    touchesState: true,
+    externalEffect: false,
     deprecated: null,
   },
   {
@@ -556,7 +589,8 @@ export const COMMAND_REGISTRY = [
       required: [],
     },
     examples: ['fgos doctor', 'fgos doctor --pretty'],
-    access: 'read',
+    touchesState: false,
+    externalEffect: false,
     deprecated: null,
   },
 ];
