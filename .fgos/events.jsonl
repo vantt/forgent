@@ -267,3 +267,5 @@
 {"seq":267,"ts":"2026-07-28T10:20:03.849Z","type":"work.edit","payload":{"id":"tsk-4mo","patch":{"deps":["tsk-3oa"]},"actor":"human"},"v":2}
 {"seq":268,"ts":"2026-07-28T10:20:03.896Z","type":"work.edit","payload":{"id":"tsk-1nu","patch":{"deps":["tsk-3oa"]},"actor":"human"},"v":2}
 {"seq":269,"ts":"2026-07-28T10:20:03.942Z","type":"work.edit","payload":{"id":"tsk-2r4","patch":{"deps":["tsk-3oa"]},"actor":"human"},"v":2}
+{"seq":272,"ts":"2026-07-28T10:17:04.586Z","type":"work.move","payload":{"id":"tsk-53f","from":"todo","to":"doing","actor":"session","branchHeadAtTake":"6ba60ce7bea3c61b6ba8ac441622dcc6069e5794"},"v":2}
+{"seq":273,"ts":"2026-07-28T10:17:04.590Z","type":"work.outcome","payload":{"id":"tsk-53f","predicted":{"tier":"light","deps":0,"priorVisits":0,"actor":"session","branchHeadAtTake":"6ba60ce7bea3c61b6ba8ac441622dcc6069e5794"}},"v":2}
