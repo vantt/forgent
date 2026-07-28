@@ -1256,12 +1256,20 @@ async function runVerb(verb, flags, positional, dir) {
       // executing boundary, claim-lock §3b) reattaches to that same branch
       // tip via createWorktree's reuse path instead of forking a new one.
       try {
+        // worktreeDir under .claude/worktrees/ (tsk-424 D1/D2): the harness's
+        // own EnterWorktree tool only allows a second-or-later in-session
+        // switch when the target sits there, e.g. a root item decomposing
+        // into a child mid-session. os.tmpdir()/fgos-worktrees (createWorktree's
+        // own default) fails that check past the first switch — pick is the
+        // only caller that needs the harness-chainable location; runner/
+        // merge-ephemeral callers are untouched.
         return claimWork(dir, {
           id,
           actor: 'session',
           isolate: true,
           claimTrigger,
           repoRoot: process.cwd(),
+          worktreeDir: path.join(process.cwd(), '.claude', 'worktrees'),
         });
       } catch (err) {
         if (err instanceof ClaimError) {
