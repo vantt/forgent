@@ -60,7 +60,7 @@ one for Windows would only add a fifth).
 | Resolver core + CLI wiring | medium — regression risk if the unified root diverges from any of the 4 existing getters under worktree/nested-repo layouts | `session.test.mjs`/`loop.test.mjs`/`worker-log.test.mjs` must be confirmed to actually exercise the replaced code paths post-migration, not just avoid touching them |
 | Windows profile-path detection | low-medium — new code path, additive only, no existing platform regression risk | `shell-rc.test.mjs` gets a Windows-profile fixture/mock case exercising the new detection, mirroring the existing bash/zsh cases |
 | Claude Code SessionStart hook wiring | medium-high — new integration surface outside this repo's own `npm test` harness; a broken hook could affect every session opening in this repo | confirm the hook degrades gracefully (session still starts if resolver injection fails) and has its own smoke-test/manual verification path, since no automated harness covers Claude Code hook execution today |
-| Skill-template migration (17 files) | low — mechanical, `tsk-3fb` already proved the underlying env-var mechanism safe | grep-confirm all 17 templates consistently updated, no template left on the old standalone convention |
+| ~~Skill-template migration~~ | dropped per D4-revised — no code/template touches this piece anymore | n/a |
 
 ## Shape — split into 4 pieces
 
@@ -86,12 +86,13 @@ carrying `tsk-63j` as `parent`:
    precomputed paths as session context/env. Depends on piece 1.
    verify: `npm test`
 
-4. **Migrate `plugins/fgOS/skills/*/SKILL.md` templates** — move the 17
-   templates (and the 1 spec documenting the convention,
-   `docs/specs/fgos-plugin.md:167-168`) off the standalone
-   `FGOS_NESTED_PREFIX` substitution pattern onto whatever the resolver
-   now provides, completing D4's subsumption. Depends on piece 1.
-   verify: `npm test`
+4. **Dropped per D4-revised.** The 17 `plugins/fgOS/skills/*/SKILL.md`
+   templates (and `docs/specs/fgos-plugin.md:167-168`) keep their existing
+   `FGOS_NESTED_PREFIX` shell-substitution pattern unchanged — empirically
+   confirmed unreadable from an in-process JS resolver (zero JS hits for
+   the variable; it resolves before Node starts). No migration needed;
+   the resolver built in piece 1 just also parses the same variable name
+   independently for its own JS-side needs.
 
 Order: piece 1 first (unblocks 2, 3, 4); pieces 2–4 are independent of
 each other once piece 1 lands and can proceed in any order.
