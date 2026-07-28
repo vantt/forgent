@@ -40,9 +40,4 @@ output.txt
 /.agents/skills/*
 !/.agents/skills/fgos/
 /.codex/
-/plans/
 /upstreams/
-/docs/history/
-/docs/distillery/
-/docs/reference-learning-system.md/
-/docs/naming.md/
