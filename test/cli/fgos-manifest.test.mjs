@@ -7,7 +7,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
-import { COMMAND_REGISTRY, SCHEMA_VERSION } from '../../src/cli/command-registry.mjs';
+import { COMMAND_REGISTRY, MANIFEST_SCHEMA_VERSION } from '../../src/cli/command-registry.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FGOS = path.resolve(__dirname, '../../bin/fgos.mjs');
@@ -76,7 +76,7 @@ test('fgos --help --json parses to {schema_version, commands:[...]} matching the
   assert.equal(result.status, 0);
   const manifest = JSON.parse(result.stdout);
   assert.deepEqual(Object.keys(manifest).sort(), ['commands', 'schema_version']);
-  assert.equal(manifest.schema_version, SCHEMA_VERSION);
+  assert.equal(manifest.schema_version, MANIFEST_SCHEMA_VERSION);
   assert.equal(manifest.commands.length, COMMAND_REGISTRY.length);
   assert.deepEqual(
     manifest.commands.map((c) => c.name).sort(),

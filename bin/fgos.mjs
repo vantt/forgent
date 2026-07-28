@@ -39,7 +39,7 @@ import { visitCount } from '../src/runner/anti-loop.mjs';
 import { DEFAULTS } from '../src/state/work.mjs';
 import { getDomain, stageForStep } from '../src/state/workflow-stage-graphs.mjs';
 import { writeCoexistenceManifest } from '../src/install/coexist.mjs';
-import { SCHEMA_VERSION, COMMAND_REGISTRY } from '../src/cli/command-registry.mjs';
+import { MANIFEST_SCHEMA_VERSION, COMMAND_REGISTRY } from '../src/cli/command-registry.mjs';
 import { computeAwaitingContext } from '../src/state/awaiting-context.mjs';
 import { DOCTOR_CHECKS, integrationScriptPath } from '../src/setup/checks.mjs';
 import { detectRcFiles, insertSourceLine } from '../src/setup/shell-rc.mjs';
@@ -2224,7 +2224,7 @@ function publicManifestEntries() {
 }
 
 function renderHelpText(entries = publicManifestEntries()) {
-  const lines = [`fgos — the fgOS work-item CLI (schema_version ${SCHEMA_VERSION})`, ''];
+  const lines = [`fgos — the fgOS work-item CLI (schema_version ${MANIFEST_SCHEMA_VERSION})`, ''];
   for (const entry of entries) {
     lines.push(`${entry.invoke} [${entry.access}]`);
     lines.push(`    ${entry.description}`);
@@ -2251,7 +2251,7 @@ function renderHelpText(entries = publicManifestEntries()) {
 
 function handleHelp(json) {
   if (json) {
-    const manifest = { schema_version: SCHEMA_VERSION, commands: publicManifestEntries() };
+    const manifest = { schema_version: MANIFEST_SCHEMA_VERSION, commands: publicManifestEntries() };
     process.stdout.write(`${JSON.stringify(manifest, null, 2)}\n`);
   } else {
     process.stdout.write(renderHelpText());

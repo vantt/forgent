@@ -20,7 +20,7 @@
 // the whole verb is declared 'mutation'. This flag is a declaration only: P37
 // does not wire it into dispatch/authz (that is P38's job).
 
-export const SCHEMA_VERSION = '1.0';
+export const MANIFEST_SCHEMA_VERSION = '1.0';
 
 export const COMMAND_REGISTRY = [
   {
