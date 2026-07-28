@@ -27,13 +27,13 @@ same contract as `ready`/`check`/`conflicts`.
    - If `$ARGUMENTS` is non-empty, run:
 
      ```
-     node ${CLAUDE_PROJECT_DIR}/repo/bin/fgos.mjs graph --what-if $ARGUMENTS --json
+     node ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs graph --what-if $ARGUMENTS --json
      ```
 
    - If `$ARGUMENTS` is empty, run the plain full-metrics form:
 
      ```
-     node ${CLAUDE_PROJECT_DIR}/repo/bin/fgos.mjs graph --json
+     node ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs graph --json
      ```
 
    Always use the literal `${CLAUDE_PROJECT_DIR}` substitution shown above,

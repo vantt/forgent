@@ -183,7 +183,7 @@ export function addWork(dir, work) {
 // write path (identity is immutable; `status` is `move`'s; `stage` is
 // `moveStage`'s) and mixing them into `edit` would open a second door onto
 // the same field.
-const EDITABLE_FIELDS = new Set(['title', 'kind', 'risk', 'verify', 'tier', 'refs', 'deps', 'acceptance', 'priority', 'intent']);
+const EDITABLE_FIELDS = new Set(['title', 'kind', 'risk', 'verify', 'tier', 'refs', 'deps', 'acceptance', 'priority', 'intent', 'docsRef']);
 
 /**
  * Patch fields on an existing work item, through the SAME single write door
@@ -297,7 +297,7 @@ function composeLearning(view, id, closingSettlement) {
  * focus to an id that is already the current focus is a harmless no-op
  * re-write (idempotent, per plan.md's edge-dimension note).
  */
-export function setFocus(dir, { id, actor } = {}) {
+export function setFocus(dir, { id, role } = {}) {
   const { logPath } = paths(dir);
   const event = withEventsLock(logPath, () => {
     const before = rebuildView(logPath);
@@ -311,7 +311,7 @@ export function setFocus(dir, { id, actor } = {}) {
         `work "${id}" has no declared goal tier — "goal set" requires goalTier to be one of ${GOAL_TIERS.join(', ')}.`,
       );
     }
-    const payload = actor !== undefined ? { id, actor } : { id };
+    const payload = role !== undefined ? { id, role } : { id };
     return appendEventLocked(logPath, { type: 'goal.focus', payload });
   });
   const view = refreshView(dir);
@@ -331,7 +331,7 @@ export function setFocus(dir, { id, actor } = {}) {
  * first's event already in the log, so its own `expectedStatus` compare
  * correctly conflicts.
  */
-export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, role, headAtTake, headAtReturn, branchHeadAtTake, branchHeadAtReturn, parentSnapshotAtAsk } = {}) {
+export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, role, headAtTake, headAtReturn, branchHeadAtTake, branchHeadAtReturn, parentSnapshotAtAsk, claimTrigger, statusAtAsk } = {}) {
   const { logPath } = paths(dir);
   const event = withEventsLock(logPath, () => {
   const before = rebuildView(logPath);
@@ -394,6 +394,14 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, rol
   if (branchHeadAtReturn !== undefined) {
     rawEvent.payload.branchHeadAtReturn = branchHeadAtReturn;
   }
+  // Claim-trigger marker (claim-lock §7, additive, NOT `claimRole`): who/what
+  // dispatched this claim (e.g. `'herdr'`) — audit-only, never a safety
+  // mechanism (claimRole/loop.mjs's reclaim-guard are unaffected). Stamped
+  // post-transition on the SAME `to === 'doing'` move `pick` writes, exactly
+  // like headAtTake above; ignored by fsm.mjs, which never destructures it.
+  if (claimTrigger !== undefined) {
+    rawEvent.payload.claimTrigger = claimTrigger;
+  }
   // Parent-anchor snapshot at ask-time (str61 D2/D3): the same post-transition
   // additive stamp pattern as headAtTake/headAtReturn above — a snapshot of
   // the item's parent `{id, title, status}` taken at the moment this
@@ -404,6 +412,16 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, rol
   // edge — putInAwaiting is the only caller that ever passes it.
   if (parentSnapshotAtAsk !== undefined) {
     rawEvent.payload.parentSnapshotAtAsk = parentSnapshotAtAsk;
+  }
+  // Status-at-ask snapshot (claim-lock §5.1): the item's OWN status right
+  // before this same `to === 'awaiting-human'` move parks it — `doing` when a
+  // pick claim is held mid-clarify/decompose, `todo` otherwise. answerAwaiting
+  // reads this back (via view.gates) to resume to the SAME status instead of
+  // hardcoding `todo`, so answering a gate never silently drops a live claim.
+  // Same additive, fsm-ignored stamp pattern as parentSnapshotAtAsk — never
+  // set on any edge but the awaiting-human entry.
+  if (statusAtAsk !== undefined) {
+    rawEvent.payload.statusAtAsk = statusAtAsk;
   }
   // Compound-learn done-gate: a work item whose domain declares a
   // Compound-learn stage can never reach `done` without first passing through
@@ -495,18 +513,26 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, rol
  * append-then-refresh tail, same CAS/validation errors — fsm.mjs requires a
  * non-empty `ask` on this edge.
  */
-export function putInAwaiting(dir, { id, ask, expectedStatus, parentSnapshotAtAsk } = {}) {
-  return moveWork(dir, { id, to: 'awaiting-human', expectedStatus, ask, parentSnapshotAtAsk });
+export function putInAwaiting(dir, { id, ask, expectedStatus, parentSnapshotAtAsk, statusAtAsk } = {}) {
+  return moveWork(dir, { id, to: 'awaiting-human', expectedStatus, ask, parentSnapshotAtAsk, statusAtAsk });
 }
 
 /**
- * Resume a work item out of `awaiting-human` back to `todo`, carrying the
- * answer it was waiting on (per D2/D5). Thin wrapper over `moveWork` — same
+ * Resume a work item out of `awaiting-human`, carrying the answer it was
+ * waiting on (per D2/D5). Thin wrapper over `moveWork` — same
  * append-then-refresh tail, same CAS/validation errors — fsm.mjs requires a
  * non-empty `answer` on this edge.
+ *
+ * Resume target (claim-lock §5.1): reads the gate's own `statusAtAsk`
+ * snapshot (stamped by the `ask` that parked this item) and resumes there —
+ * `doing` when a pick claim was held at ask-time, `todo` otherwise (also the
+ * default for pre-existing logs/gates with no `statusAtAsk`, preserving the
+ * historical hardcoded-`todo` behavior byte for byte).
  */
 export function answerAwaiting(dir, { id, answer, expectedStatus, role } = {}) {
-  return moveWork(dir, { id, to: 'todo', expectedStatus, answer, role });
+  const view = listWork(dir);
+  const to = view.gates?.[id]?.statusAtAsk ?? 'todo';
+  return moveWork(dir, { id, to, expectedStatus, answer, role });
 }
 
 /**

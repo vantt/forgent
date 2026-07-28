@@ -65,6 +65,75 @@ test('visitCount defensive guards: non-array events / missing id never throw', (
   assert.equal(visitCount([move('a', 'doing', 1)], undefined), 0);
 });
 
+// -- executing-phase scoping (claim-lock, code review finding) -------------
+//
+// Before claim-lock, `doing` was unreachable before stage `executing` (pick/
+// take were frontier-only), so every `to: 'doing'` move already WAS an
+// executing-phase dispatch — the tests above (no work.add at all) exercise
+// exactly that historical shape and must keep passing unchanged (asserted
+// below). Claim-lock lets `pick` claim an item at clarify/decompose too; a
+// claim-then-release cycle there must not consume the SAME budget real
+// executing retries draw from.
+
+function add(id, seq, overrides = {}) {
+  return { seq, ts: new Date(2026, 0, seq).toISOString(), type: 'work.add', payload: { id, title: id, status: 'todo', ...overrides }, v: 2 };
+}
+
+function stageMove(id, to, seq) {
+  return { seq, ts: new Date(2026, 0, seq).toISOString(), type: 'work.stage', payload: { id, from: 'x', to }, v: 2 };
+}
+
+test('a log with no work.add for the id counts every doing-move exactly as before (backward-compat: no domain/stage info defaults to counting)', () => {
+  const events = [move('a', 'doing', 1), move('a', 'blocked', 2), move('a', 'doing', 3)];
+  assert.equal(visitCount(events, 'a'), 2);
+});
+
+test('visitCount does not count a doing-move made while the item is still at stage clarify (claim-lock pick-at-clarify)', () => {
+  const events = [
+    add('a', 1, { stage: 'clarify' }),
+    move('a', 'doing', 2), // pick --id a (clarify) — not a dispatch attempt
+    move('a', 'todo', 3), // decompose.mjs's release, doing -> todo
+  ];
+  assert.equal(visitCount(events, 'a'), 0);
+});
+
+test('visitCount counts the doing-move once the item has actually reached stage executing, ignoring the earlier clarify-stage claim', () => {
+  const events = [
+    add('a', 1, { stage: 'clarify' }),
+    move('a', 'doing', 2), // pick at clarify — excluded
+    move('a', 'todo', 3), // release
+    stageMove('a', 'decompose', 4),
+    stageMove('a', 'executing', 5), // resolveDecompose's own moveStage
+    move('a', 'doing', 6), // pick at executing — the real first dispatch
+  ];
+  assert.equal(visitCount(events, 'a'), 1);
+});
+
+test('visitCount counts every executing-stage doing-move for an item added with no explicit stage (D8 lazy default reads as executing)', () => {
+  const events = [add('a', 1), move('a', 'doing', 2), move('a', 'blocked', 3), move('a', 'doing', 4)];
+  assert.equal(visitCount(events, 'a'), 2);
+});
+
+test('visitCount is domain-aware: a synthetic-domain item (single stage "assembling", mapped to Execute) counts from its first doing-move, never excluded', () => {
+  const events = [add('a', 1, { domain: 'synthetic', stage: 'assembling' }), move('a', 'doing', 2)];
+  assert.equal(visitCount(events, 'a'), 1);
+});
+
+test('visitsSinceLastHumanEvent also excludes clarify/decompose-phase claims from the budget', () => {
+  const events = [
+    add('a', 1, { stage: 'clarify' }),
+    move('a', 'doing', 2), // clarify claim — excluded from both metrics
+    move('a', 'todo', 3),
+    stageMove('a', 'decompose', 4),
+    stageMove('a', 'executing', 5),
+    move('a', 'doing', 6), // first real dispatch
+    move('a', 'blocked', 7),
+    move('a', 'doing', 8), // retry 2
+  ];
+  assert.equal(visitCount(events, 'a'), 2);
+  assert.equal(visitsSinceLastHumanEvent(events, 'a'), 2);
+});
+
 // -- visitsSinceLastHumanEvent: human-rounds D1 gate budget ----------------
 //
 // Distinct from visitCount above: this is the runner GATE's own budget

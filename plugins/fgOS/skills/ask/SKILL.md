@@ -28,7 +28,7 @@ verb (one-door-write, CTR001).
 2. **Ask the item.** Run:
 
    ```
-   node ${CLAUDE_PROJECT_DIR}/repo/bin/fgos.mjs ask <id> --text "<text>"
+   node ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs ask <id> --text "<text>"
    ```
 
    substituting the id and text parsed in step 1, with `<text>`

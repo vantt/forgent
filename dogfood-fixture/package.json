@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node --test 'test/**/*.test.mjs'"
+    "test": "node --test 'test/**/*.test.mjs'",
+    "reset:expr-eval-chain": "bash scripts/reset-expr-eval-chain.sh"
   }
 }

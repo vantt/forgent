@@ -8,6 +8,11 @@
       "name": "fgOS",
       "source": "./plugins/fgOS",
       "description": "fgOS slash-command surface for Claude Code"
+    },
+    {
+      "name": "dogfood-fixture",
+      "source": "./plugins/dogfood-fixture",
+      "description": "dogfood-fixture replay scenario surface for Claude Code"
     }
   ]
 }

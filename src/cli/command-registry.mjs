@@ -79,6 +79,7 @@ export const COMMAND_REGISTRY = [
         tier: { type: 'string', description: 'Optional tier override (e.g. light/standard/heavy); omit to use classify()\'s derived value.' },
         kind: { type: 'string', description: 'Optional kind override; omit to use classify()\'s derived value.' },
         risk: { type: 'string', description: 'Optional risk override; omit to use classify()\'s derived value.' },
+        'docs-ref': { type: 'string', description: 'Optional relative path to this item\'s docs/history/<feature>/ directory (its own CONTEXT.md/plan.md); omit to leave unset (can still be added later via edit --docs-ref).' },
       },
       positional: ['text'],
       required: ['text'],
@@ -143,7 +144,7 @@ export const COMMAND_REGISTRY = [
   {
     name: 'edit',
     invoke: 'fgos edit',
-    description: 'Patch fields on an existing item (title/kind/risk/verify/tier/refs/deps/acceptance/priority/intent). At least one field must be given.',
+    description: 'Patch fields on an existing item (title/kind/risk/verify/tier/refs/deps/acceptance/priority/intent/docs-ref). At least one field must be given.',
     parameters: {
       type: 'object',
       properties: {
@@ -158,6 +159,7 @@ export const COMMAND_REGISTRY = [
         acceptance: { type: 'string', description: 'Optional JSON-encoded array of {text, evidence} Condition-of-Satisfaction clauses — replaces the whole array (empty array "[]" clears the field). NOT comma-separated — clause text may contain commas.' },
         priority: { type: 'integer', description: 'New priority: a non-negative integer, ascending sort (lower = higher priority). Absent stays absent — items without a priority sort after every item that has one.' },
         intent: { type: 'integer', description: 'New intent score: any integer, descending sort (higher = more urgent). Absent stays absent — items without an intent sort after every item that has one.' },
+        'docs-ref': { type: 'string', description: 'New relative path to this item\'s docs/history/<feature>/ directory (its own CONTEXT.md/plan.md) — lets an item gain or change this link after creation, e.g. one created via submit (which had no --docs-ref of its own before this field was added here).' },
       },
       positional: ['id'],
       required: ['id'],

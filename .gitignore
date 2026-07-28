@@ -35,14 +35,11 @@ output.txt
 !/.claude/settings.json
 /.claude/skills/*
 !/.claude/skills/fgos/
+!/.claude/skills/distill/
 /.agents/*
 !/.agents/skills/
 /.agents/skills/*
 !/.agents/skills/fgos/
+!/.agents/skills/distill/
 /.codex/
-/plans/
 /upstreams/
-/docs/history/
-/docs/distillery/
-/docs/reference-learning-system.md/
-/docs/naming.md/

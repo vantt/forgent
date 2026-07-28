@@ -55,7 +55,7 @@ never re-implements a dev-skill's substance inline; it invokes them.
 
 2. **Drain the queue.** While the queue is non-empty, take the id at its
    front and re-read its live `stage`/`status`/`deps` via
-   `node ${CLAUDE_PROJECT_DIR}/repo/bin/fgos.mjs list --json` — always fresh,
+   `node ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs list --json` — always fresh,
    never assumed, since every branch below can change it:
 
    - **`status: awaiting-human`** — read the question (either
@@ -72,7 +72,7 @@ never re-implements a dev-skill's substance inline; it invokes them.
      it yourself. Once the user approves, call the mechanical engine:
 
      ```
-     node ${CLAUDE_PROJECT_DIR}/repo/bin/fgos.mjs discover <id> --json
+     node ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs discover <id> --json
      ```
 
      (Same call the `discover` skill wraps — see

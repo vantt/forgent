@@ -530,6 +530,8 @@ function submitWork(dir, text, opts = {}) {
     // Per str73-done-flip-cos-check D2: --acceptance threaded from opts the
     // same way --domain/--discovered-from are, immediately above.
     acceptance: opts.acceptance,
+    // --docs-ref threaded from opts the same way, immediately above.
+    docsRef: opts.docsRef,
     // Per D8: every item entering through the public door starts at its
     // domain's Clarify-mapped stage — context-discovery must pass before
     // it can be worked. Generalized from the hardcoded 'clarify' (D8) to
@@ -715,6 +717,11 @@ async function runVerb(verb, flags, positional, dir) {
         tier: optionalField(flags.tier, 'submit --tier requires a tier value (e.g. light/standard/heavy); omit --tier entirely to use classify()\'s derived value.'),
         kind: optionalField(flags.kind, 'submit --kind requires a kind value; omit --kind entirely to use classify()\'s derived value.'),
         risk: optionalField(flags.risk, 'submit --risk requires a risk value; omit --risk entirely to use classify()\'s derived value.'),
+        // Same optional non-empty-path field `add` already exposes
+        // (bin/fgos.mjs's `add` case) — submit previously had no way to set
+        // this at all, so an item created through the public door could
+        // never gain a docsRef except via a later `edit --docs-ref`.
+        docsRef: optionalField(flags['docs-ref'], 'submit --docs-ref requires a non-empty path; omit --docs-ref entirely to leave unset.'),
       };
       return submitWork(dir, text, opts);
     }
@@ -856,6 +863,15 @@ async function runVerb(verb, flags, positional, dir) {
       if (flags.acceptance !== undefined) {
         patch.acceptance = parseAcceptanceFlag(flags.acceptance, 'edit --acceptance requires a JSON-encoded array of {text, evidence} clauses.');
       }
+      // --docs-ref: same optional non-empty-path field `add` already exposes
+      // (bin/fgos.mjs's `add` case), now also patchable after creation --
+      // an item created via `submit` without --docs-ref (or one whose
+      // feature doc gets written/moved after the fact) previously had no way
+      // to ever gain this link. Kebab-case flag name, camelCase field, so it
+      // cannot join the simple same-name loop above.
+      if (flags['docs-ref'] !== undefined) {
+        patch.docsRef = optionalField(flags['docs-ref'], 'edit --docs-ref requires a non-empty path.');
+      }
       // Priority/intent (per str7-str8-priority-intent D1/D3/D6): both are
       // numeric fields, unlike the string flags in the loop above, so each
       // gets its own coercion. parseArgs sets flags[field] = true (boolean)
@@ -893,7 +909,7 @@ async function runVerb(verb, flags, positional, dir) {
       if (Object.keys(patch).length === 0) {
         throw new StoreError(
           'validation',
-          'edit requires at least one field to change: --title/--kind/--risk/--verify/--tier/--refs/--deps/--acceptance/--priority/--intent.',
+          'edit requires at least one field to change: --title/--kind/--risk/--verify/--tier/--refs/--deps/--acceptance/--priority/--intent/--docs-ref.',
         );
       }
       const { event } = editWork(dir, { id, patch, role: 'human' });
@@ -919,14 +935,21 @@ async function runVerb(verb, flags, positional, dir) {
       const parentId = askView.work[id]?.parent;
       const parent = parentId ? askView.work[parentId] : undefined;
       const parentSnapshotAtAsk = parent ? { id: parent.id, title: parent.title, status: parent.status } : undefined;
-      const { event } = putInAwaiting(dir, { id, ask: text, expectedStatus, parentSnapshotAtAsk });
+      // statusAtAsk (claim-lock §5.1): the item's OWN status right now, before
+      // the park below — `doing` when a pick claim is held, `todo` otherwise.
+      // answerAwaiting reads this back later to resume to the same status
+      // instead of always falling to `todo`.
+      const statusAtAsk = askView.work[id]?.status;
+      const { event } = putInAwaiting(dir, { id, ask: text, expectedStatus, parentSnapshotAtAsk, statusAtAsk });
       return { id, from: event.payload.from, to: event.payload.to, seq: event.seq };
     }
 
-    // Records the answer and resumes the item to `todo` (per D2/D5). Same
+    // Records the answer and resumes the item (per D2/D5) — to `todo`, or to
+    // `doing` when a pick claim was held at ask-time (claim-lock §5.1,
+    // answerAwaiting's own `statusAtAsk` lookup decides which). Same
     // CAS/precondition contract as `move` — the FSM enforces both the
-    // `awaiting-human -> todo` edge and that `--text` is non-empty (per D2's
-    // `answer` requirement on the exit edge).
+    // `awaiting-human -> *` exit edge and that `--text` is non-empty (per
+    // D2's `answer` requirement on the exit edge).
     case 'answer': {
       const id = requireField(positional[0] ?? flags.id, 'answer requires an id: fgos answer <id> --text "..." [--expect <status>]');
       const text = requireField(flags.text, 'answer requires --text "..."');
@@ -1208,18 +1231,23 @@ async function runVerb(verb, flags, positional, dir) {
       return { id, from: 'todo', to: 'doing', role, seq: event.seq, source: 'main', headAtTake };
     }
 
-    // Cửa pull — pick (str83-fgos-slash-commands, D1/D3): combines take's
-    // claim logic with worktree.mjs's createWorktree in one call, so
-    // `/fgOS:pick` can claim AND stand up the item's isolated `fgw/<id>`
-    // worktree/branch in a single verb. Reuses take's exact frontier-head
-    // default, explicit-id frontier validation, and blocked-branch re-take
-    // rules VERBATIM — pick opens no new claim surface, only a new combined
-    // entry point onto the same one take already uses. `role` is never a
-    // flag here (unlike take's `--role`): per D3 the picking session IS the
-    // role, always `'session'`, because it is the one that will drive and
-    // later complete the item end to end.
+// Cửa pull — pick (str83-fgos-slash-commands, D1/D3; guard loosened +
+    // branch-reuse generalized + claimTrigger per claim-lock §3a/§3c/§7):
+    // combines take's claim logic with worktree.mjs's createWorktree in one
+    // call, so `/fgOS:pick` can claim AND stand up the item's isolated
+    // `fgw/<id>` worktree/branch in a single verb. No-id still opens exactly
+    // take's frontier head (D1 same-set rule, unchanged). An EXPLICIT `--id`,
+    // though, needs only `status: 'todo'` — no frontier/stage membership
+    // check — because clarify/decompose work now claims through this same
+    // door too (status and stage are independent axes, fsm.mjs; the
+    // frontier-membership guard removed below was a hard check at THIS verb
+    // layer, never an FSM law). `role` is never a flag here (unlike take's
+    // `--role`): per D3 the picking session IS the role, always
+    // `'session'`, because it is the one that will drive and later complete
+    // the item end to end.
     case 'pick': {
       const explicitId = optionalField(positional[0] ?? flags.id, 'pick --id requires a non-empty id value (omit --id entirely to pick the frontier head)');
+      const claimTrigger = optionalField(flags.via, 'pick --via requires a non-empty value (omit --via entirely to skip stamping claimTrigger)');
       const role = 'session';
 
       let id = explicitId;
@@ -1229,52 +1257,50 @@ async function runVerb(verb, flags, positional, dir) {
           throw new StoreError('validation', 'pick: the frontier is empty — no item ready to pick.');
         }
         id = head.id;
-      } else {
-        const item = listWork(dir).work[id];
-        if (!item) {
-          throw new StoreError('validation', `pick: work "${id}" not found.`);
-        }
-        if (item.status === 'todo' && !readyWork(dir).some((w) => w.id === id)) {
-          throw new StoreError(
-            'validation',
-            `pick: "${id}" is todo but not in the frontier yet (stage/deps/lineage) — pick only opens the same set the runner would dispatch (D1, same rule as take).`,
-          );
-        }
+      } else if (!listWork(dir).work[id]) {
+        throw new StoreError('validation', `pick: work "${id}" not found.`);
       }
 
       const item = listWork(dir).work[id];
       const priorVisits = visitCount(readRawEvents(dir), id);
       const repoRoot = process.cwd();
 
+      // Branch-reuse generalized to "does fgw/<id> already exist" alone
+      // (claim-lock §3c) — no longer gated on `status === 'blocked'`. Covers
+      // three cases in one path: no branch -> fresh claim, branchHeadAtTake
+      // from repoRoot's CURRENT HEAD (unchanged shape — createWorktree's `git
+      // worktree add -b <branch> <path>` with no start-point forks from
+      // exactly this same commit); branch exists + `blocked` -> retake after
+      // reject (unchanged); branch exists + `todo` (NEW, claim-lock §3b) ->
+      // the item was released back to `todo` at the clarify/decompose ->
+      // executing boundary with its worktree already standing — pick
+      // reattaches to that SAME branch tip instead of forking a new one.
+      // `expectedStatus` mirrors whichever of the two legal pre-claim
+      // statuses `item` is actually in — the CAS in moveWork below is the
+      // real guard against anything else.
       const branch = branchNameFor(id);
-      let claim;
-      if (item.status === 'blocked' && branchExists(repoRoot, branch)) {
-        const branchHeadAtTake = gitAt(repoRoot, ['rev-parse', branch]).trim();
-        const { event } = moveWork(dir, { id, to: 'doing', expectedStatus: 'blocked', role, branchHeadAtTake });
-        addOutcome(dir, {
-          id,
-          predicted: { tier: item.tier ?? DEFAULTS.tier, deps: item.deps.length, priorVisits, role, branchHeadAtTake },
-        });
-        claim = { id, from: 'blocked', to: 'doing', role, seq: event.seq, source: 'branch', branch, branchHeadAtTake };
-      } else {
 // pick ALWAYS creates a fgw/<id> worktree/branch below (createWorktree,
-        // unconditionally) — including on this first todo->doing claim, not
-        // only on the blocked->doing reclaim above. So this claim must record
-        // branchHeadAtTake, the same discriminator the reclaim branch uses,
-        // never the main-based headAtTake (return's own branch-source check
-        // is keyed on branchHeadAtTake alone — see its comment in the `return`
-        // case). The value is identical either way: createWorktree's `git
-        // worktree add -b <branch> <path>` with no explicit start-point forks
-        // the new branch from repoRoot's CURRENT HEAD, i.e. exactly this same
-        // commit.
-        const branchHeadAtTake = currentHead(repoRoot);
-        const { event } = moveWork(dir, { id, to: 'doing', expectedStatus: 'todo', role, branchHeadAtTake });
-        addOutcome(dir, {
-          id,
-          predicted: { tier: item.tier ?? DEFAULTS.tier, deps: item.deps.length, priorVisits, role, branchHeadAtTake },
-        });
-        claim = { id, from: 'todo', to: 'doing', role, seq: event.seq, source: 'branch', branch, branchHeadAtTake };
-      }
+      // unconditionally) — so this claim must record branchHeadAtTake, the
+      // same discriminator a reclaim would use, never the main-based
+      // headAtTake (return's own branch-source check is keyed on
+      // branchHeadAtTake alone — see its comment in the `return` case).
+      // When the branch already exists (blocked->doing reclaim, or a
+      // todo->doing reattach after a clarify/decompose release), the value
+      // is that branch's current tip; otherwise createWorktree's
+      // `git worktree add -b <branch> <path>` with no explicit start-point
+      // forks the new branch from repoRoot's CURRENT HEAD, i.e. exactly this
+      // same commit.
+      const branchAlreadyExists = branchExists(repoRoot, branch);
+      const branchHeadAtTake = branchAlreadyExists
+        ? gitAt(repoRoot, ['rev-parse', branch]).trim()
+        : currentHead(repoRoot);
+      const expectedStatus = item.status === 'blocked' ? 'blocked' : 'todo';
+      const { event } = moveWork(dir, { id, to: 'doing', expectedStatus, role, branchHeadAtTake, claimTrigger });
+      addOutcome(dir, {
+        id,
+        predicted: { tier: item.tier ?? DEFAULTS.tier, deps: item.deps.length, priorVisits, role, branchHeadAtTake },
+      });
+      const claim = { id, from: expectedStatus, to: 'doing', role, seq: event.seq, source: 'branch', branch, branchHeadAtTake };
 
       // The claim above is already durable (moveWork's event is committed to
       // the log) by the time createWorktree runs. If createWorktree throws

@@ -221,13 +221,15 @@ lúc item vào chờ; câu trả lời ghi lúc người trả lời; nửa đ�
 | G1 | hỏi | câu hỏi (ask) | Điều người phải quyết trước khi việc đi tiếp (vd "OAuth hay mật khẩu?") — nhãn trạng thái đơn thuần không nói được "chờ gì" | free text (không rỗng) | lúc item vào `awaiting-human` |
 | G2 | trả lời | câu trả lời (answer) | Quyết định của người; ghi xong thì item rời `awaiting-human` | free text (không rỗng) | lúc người trả lời |
 | G3 | ảnh chụp gốc | `parentSnapshotAtAsk` | Ảnh `{id, title, status}` của gốc (`parent`) tại đúng lúc item vào chờ — mốc so sánh cho RUL45's "đổi-từ-lúc-hỏi"; KHÔNG BAO GIỜ tự sửa lại sau khi ghi (per D2/D3 str61-chat-context-continuity) | `{id, title, status}` | lúc item vào `awaiting-human`, CHỈ KHI item có `parent` giải được lúc đó |
+| G4 | status trước hỏi | `statusAtAsk` | Status CHÍNH item ngay trước khi vào chờ (`todo` hay `doing`) — mốc `answer` đọc lại để biết resume về đâu (claim-lock §5.1: một claim `doing` đang giữ lúc hỏi phải resume về `doing`, không rớt xuống `todo` trần); KHÔNG BAO GIỜ tự sửa lại sau khi ghi, cùng khuôn G3 | `'todo'` \| `'doing'` | lúc item vào `awaiting-human`, LUÔN CÓ (không điều kiện như G3) |
 
 Item chưa từng vào cổng chờ-người không mang bản ghi cổng nào — vắng mặt hoàn toàn, không phải
 bản ghi rỗng. Item đang chờ có G1 mà G2 chưa tới (đang chờ trả lời). Item không có `parent`
-(hoặc `parent` không giải được lúc `ask`) không mang G3 — vắng mặt, không phải `null`. Một
-lần `ask` mới trên item vừa được `answer` xong ghi lại G3 mới, GHI ĐÈ ảnh cũ (không gộp hai
-ảnh). Nhật ký không có sự kiện cổng nào replay lại không sinh bản ghi cổng nào (tương thích
-ngược, cùng khuôn RUL11/RUL13).
+(hoặc `parent` không giải được lúc `ask`) không mang G3 — vắng mặt, không phải `null`. Log cũ
+ghi trước claim-lock cũng không mang G4 — `answer` đọc vắng mặt là `todo` (tương thích ngược
+byte-for-byte với hành vi trước §5.1). Một lần `ask` mới trên item vừa được `answer` xong ghi
+lại G3/G4 mới, GHI ĐÈ ảnh cũ (không gộp hai ảnh). Nhật ký không có sự kiện cổng nào replay lại
+không sinh bản ghi cổng nào (tương thích ngược, cùng khuôn RUL11/RUL13).
 
 ### Giai đoạn Làm-rõ (stage clarify)
 
@@ -466,14 +468,17 @@ dispatch (`fgos ready`) — cửa pull không mở một tập riêng.
 
 - **`fgos take [--id <id>] [--role human|session]`** (mặc định `human`) —
   cầm đúng một item: không truyền `--id` thì cầm đầu frontier; truyền
-  `--id` thì item đó phải thật sự nằm trong frontier (cùng luật
-  stage/deps/lineage như dispatch thường) nếu còn `todo` — một id đã bị
+  `--id` thì item đó phải ở `status: 'todo'` nếu còn là status đó (một id đã bị
   cầm/đỗ/kẹt rơi thẳng xuống kỳ vọng (CAS) của chính cạnh chuyển trạng
   thái, báo `conflict` thật (mã 3), không phải một thông điệp tùy biến
-  trùng lặp. Chuyển `todo → doing` qua đúng CAS sẵn có, gắn thêm `role`
+  trùng lặp). Chuyển `todo → doing` qua đúng CAS sẵn có, gắn thêm `role`
   (người cầm) và `headAtTake` (HEAD hiện tại của host repo) vào CÙNG sự
   kiện đó; ghi nửa DỰ ĐOÁN của một bản ghi outcome, đối xứng claim của
-  runner (xem spec Runner).
+  runner (xem spec Runner). **Lưu ý (claim-lock):** `take` kiểm frontier nếu
+  item còn `todo` (frontier = executing-stage items), nhưng `pick --id` không
+  — `pick` mở cửa claim cho clarify/decompose items cũng được (status chỉ là
+  một trục độc lập từ stage, fsm.mjs; frontier-guard là một hard-check tại
+  tầng verb, không phải luật FSM).
 - **`fgos return <id> [--timeout <ms>]`** — trả kết quả, KHÔNG BAO GIỜ tin
   lời người gọi: verb tự đo đủ ba điều kiện, mirror TRUNG THỰC contract
   `proposed` của chính runner — (a) working tree của host repo phải SẠCH
@@ -801,9 +806,9 @@ ghi thứ hai cho cùng một trường.
 
 - **Runs when:** người gọi `fgos answer <id> --text "..."` để trả lời câu hỏi của một việc đang chờ.
 - **Blocked when:** item không ở `awaiting-human` (không có cạnh rời chờ từ trạng thái khác) — `precondition`; câu trả lời thiếu/rỗng — `validation`; trạng thái thực khác `--expect` — `conflict`. Không ghi sự kiện nào.
-- **What changes:** một sự kiện chuyển-trạng-thái mang câu trả lời vào nhật ký; item về `todo`, bản chiếu gộp câu trả lời vào bản ghi cổng (cạnh câu hỏi đã có vẫn còn — cộng thêm, không đè).
+- **What changes:** một sự kiện chuyển-trạng-thái mang câu trả lời vào nhật ký; item về status trước lúc `ask` đậu nó (`statusAtAsk`, ghi lúc `ask`, mặc định `todo` khi vắng — log cũ/gate không mang field này) — **`todo`** nếu item chưa bị cầm claim lúc hỏi, hoặc **`doing`** nếu một claim `pick`/`take` đang sống lúc hỏi (claim-lock §5.1: trước đây LUÔN về `todo` trần, làm rớt claim đang giữ nếu `ask` xảy ra giữa lúc item `doing` — đã sửa). Bản chiếu gộp câu trả lời vào bản ghi cổng (cạnh câu hỏi đã có vẫn còn — cộng thêm, không đè).
 - **Side effects:** không.
-- **Afterwards:** item lại actionable — xuất hiện trong `ready` khi deps đủ điều kiện; bản ghi cổng giữ cả câu hỏi lẫn câu trả lời để tra sau.
+- **Afterwards:** item lại actionable — về `todo` thì xuất hiện trong `ready` khi deps đủ điều kiện; về `doing` thì KHÔNG xuất hiện trong `ready` (claim vẫn đang giữ, chờ `fgos return` như bình thường). Bản ghi cổng giữ cả câu hỏi lẫn câu trả lời để tra sau.
 
 ### Ghi kết quả dự đoán/thực tế (outcome)
 
@@ -852,7 +857,7 @@ ghi thứ hai cho cùng một trường.
 ### Cầm việc + dựng workspace (pick)
 
 - **Runs when:** một tác nhân ngoài runner gọi `fgos pick [id]` — cùng cửa pull với `take`/`return`, nhưng gộp thêm bước dựng workspace trong MỘT lệnh.
-- **Blocked when:** không truyền `id` và frontier rỗng — `validation`; `id` truyền một id không tồn tại — `validation`; `id` truyền một item đã bị cầm/đỗ/kẹt — rơi thẳng xuống CAS của cạnh chuyển trạng thái, báo `conflict` thật (mã 3) — HỆT `take`, không có cờ `--role` (role LUÔN `session`, không đọc/chấp nhận cờ đó).
+- **Blocked when:** không truyền `id` và frontier rỗng — `validation` (no-id mở frontier-head như `take`); `id` truyền một id không tồn tại — `validation`; `id` truyền một item đã bị cầm/đỗ/kẹt — rơi thẳng xuống CAS của cạnh chuyển trạng thái, báo `conflict` thật (mã 3) — HỆT `take`, không có cờ `--role` (role LUÔN `session`, không đọc/chấp nhận cờ đó). **Khác `take`: explicit `--id` không kiểm frontier** (claim-lock §3a) — `pick` nên cầm item ở BẤT KỲ stage nào nếu còn `status: 'todo'` (clarify/decompose-phase items được), miễn status chưa thay (CAS trong `moveWork` là guard thật).
 - **What changes:** một sự kiện chuyển-trạng-thái `todo → doing` (hoặc `blocked → doing` cho đường tái claim nguồn-nhánh, HỆT `take`) vào nhật ký, mang `role: 'session'` + `headAtTake` (hoặc `branchHeadAtTake` cho đường nguồn-nhánh); một sự kiện outcome nửa DỰ ĐOÁN, HỆT `take`. NGAY SAU claim thành công, một worktree + nhánh `fgw/<id>` được dựng (hoặc tái dùng nếu đã sống) qua CHÍNH `createWorktree` vòng tự hành dùng — không đường dựng workspace riêng.
 - **Side effects:** nếu dựng workspace thất bại SAU KHI claim đã thành công, lỗi đó lộ ra nguyên vẹn cho người gọi — claim KHÔNG bao giờ bị âm thầm hoàn tác (không rollback tự động); item ở lại `doing`, không worktree.
 - **Afterwards:** người/phiên thấy item vừa claim VÀ đường dẫn worktree + tên nhánh của nó; item biến mất khỏi frontier như mọi claim khác; item chờ một `fgos return` để tới kết cục — HỆT vòng đời của một claim qua `take` (per D1/D3 str83-fgos-slash-commands / 757e5dd7).

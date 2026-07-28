@@ -265,6 +265,9 @@ export function resolveDiscovery(dir, id, cfg, role) {
     return { outcome: 'clear', id, verdict };
   }
 
-  putInAwaiting(dir, { id, ask: verdict.question });
+  // statusAtAsk (claim-lock §5.1): `work.status` read at function entry,
+  // before this park — `doing` when a pick claim is held through clarify,
+  // `todo` otherwise. answerAwaiting resumes to this same status later.
+  putInAwaiting(dir, { id, ask: verdict.question, statusAtAsk: work.status });
   return { outcome: 'unclear', id, verdict };
 }

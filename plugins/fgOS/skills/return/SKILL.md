@@ -26,7 +26,7 @@ CTR001).
 2. **Return the item.** Run:
 
    ```
-   node ${CLAUDE_PROJECT_DIR}/repo/bin/fgos.mjs return <id>
+   node ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs return <id>
    ```
 
    substituting the id from step 1. Always use the literal

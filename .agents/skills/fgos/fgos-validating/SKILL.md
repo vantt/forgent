@@ -47,6 +47,14 @@ pass to keep the item moving.
 - End by presenting the gate below and handing off. A failed check returns
   the item to `fgos-planning` with the failing row named — it never
   continues past a failure by lowering the bar.
+- Before this session (or a later one) calls `fgos discover` — the call that
+  actually fires the `decompose`→`executing` edge and releases the claim
+  back to `todo` (claim-lock §3b) — confirm `CONTEXT.md`/`plan.md` are
+  already committed to the item's `fgw/<id>` branch. A `READY` verdict on an
+  uncommitted plan hands off to an edge whose own artifacts are invisible to
+  whichever session re-claims the item next. Same one-artifact-per-stop
+  discipline `fgos-executing`'s "one commit per item" rule already gives
+  Execute.
 
 ## Flow
 

@@ -41,6 +41,13 @@ stage values — the same way `fgos-routing` describes it.
   as a discrete quoted argv element.
 - End by presenting the gate below and handing off. Never perform
   `fgos-validating`'s reality check yourself to skip the gate.
+- Commit `plan.md` (and `CONTEXT.md` if not already committed) to the item's
+  `fgw/<id>` branch before this session (or a later one) calls `fgos
+  discover` — that call is what releases the claim back to `todo` once the
+  item reaches `executing` (claim-lock §3b); an uncommitted `plan.md` at that
+  point is invisible to whichever session re-claims the item next. Same
+  one-artifact-per-stop discipline `fgos-executing`'s "one commit per item"
+  rule already gives Execute.
 
 ## Flow
 

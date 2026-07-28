@@ -927,6 +927,37 @@ test('add with a bare --docs-ref (no value) is rejected as validation, exit 4, n
   assert.equal(eventLines(cwd).length, before);
 });
 
+// --- edit --docs-ref: docsRef can now be attached/changed after creation,
+// not only at `add` time -- closes the gap where an item created via
+// `submit` (no --docs-ref of its own before this) had no way to ever gain
+// this link. ---
+
+test('edit --docs-ref sets docsRef on an item that had none, exit 0', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'edit-docs-ref-new');
+  const result = run(cwd, ['edit', 'edit-docs-ref-new', '--docs-ref', 'docs/history/edit-docs-ref-new/']);
+  assert.equal(result.status, 0);
+  assert.equal(stateView(cwd).work['edit-docs-ref-new'].docsRef, 'docs/history/edit-docs-ref-new/');
+});
+
+test('edit --docs-ref replaces an existing docsRef (latest-wins), exit 0', () => {
+  const cwd = tmpCwd();
+  run(cwd, ['add', 'edit-docs-ref-replace', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--docs-ref', 'docs/history/old-feature/']);
+  const result = run(cwd, ['edit', 'edit-docs-ref-replace', '--docs-ref', 'docs/history/new-feature/']);
+  assert.equal(result.status, 0);
+  assert.equal(stateView(cwd).work['edit-docs-ref-replace'].docsRef, 'docs/history/new-feature/');
+});
+
+test('edit with an empty --docs-ref "" is rejected as validation, exit 4, item unchanged', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'edit-docs-ref-empty');
+  const before = eventLines(cwd).length;
+  const result = run(cwd, ['edit', 'edit-docs-ref-empty', '--docs-ref', '']);
+  assert.equal(result.status, 4);
+  assert.equal(eventLines(cwd).length, before);
+  assert.equal(stateView(cwd).work['edit-docs-ref-empty'].docsRef, undefined);
+});
+
 // --- D5 proposed: new edges + --reason on `move` (phase-2-routing-3) ---
 
 function toProposed(cwd, id) {
@@ -1645,14 +1676,13 @@ test('check output on a log with no friction and no final-status gaps is unchang
 // new formatter (D7); `answer` records the answer and resumes the item to
 // `todo`, at which point it is actionable again (back in `ready`).
 
-test('ask/answer round-trip: park removes from ready and surfaces the ask via list, answer resumes to todo and reopens ready (per D5/D6/D7)', () => {
+test('ask/answer round-trip on a todo item: park removes from ready and surfaces the ask via list, answer resumes to todo and reopens ready (per D5/D6/D7)', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'gated-item');
-  assert.equal(run(cwd, ['move', 'gated-item', '--to', 'doing']).status, 0);
 
   const askResult = run(cwd, ['ask', 'gated-item', '--text', 'OAuth or password?']);
   assert.equal(askResult.status, 0);
-  assert.deepEqual(envelopeData(askResult.stdout), { id: 'gated-item', from: 'doing', to: 'awaiting-human', seq: 3 });
+  assert.deepEqual(envelopeData(askResult.stdout), { id: 'gated-item', from: 'todo', to: 'awaiting-human', seq: 2 });
   assert.equal(stateView(cwd).work['gated-item'].status, 'awaiting-human');
 
   // D7: list surfaces the parked item's status and its question, no new
@@ -1668,7 +1698,7 @@ test('ask/answer round-trip: park removes from ready and surfaces the ask via li
 
   const answerResult = run(cwd, ['answer', 'gated-item', '--text', 'OAuth']);
   assert.equal(answerResult.status, 0);
-  assert.deepEqual(envelopeData(answerResult.stdout), { id: 'gated-item', from: 'awaiting-human', to: 'todo', seq: 4 });
+  assert.deepEqual(envelopeData(answerResult.stdout), { id: 'gated-item', from: 'awaiting-human', to: 'todo', seq: 3 });
   assert.equal(stateView(cwd).work['gated-item'].status, 'todo');
 
   const listedAfterAnswer = envelopeData(run(cwd, ['list']).stdout);
@@ -1677,6 +1707,34 @@ test('ask/answer round-trip: park removes from ready and surfaces the ask via li
 
   const readyAfterAnswer = envelopeData(run(cwd, ['ready']).stdout);
   assert.ok(readyAfterAnswer.some((i) => i.id === 'gated-item'));
+});
+
+// claim-lock §5.1 (intentional contract change from the test above): asking
+// a "doing" item now resumes it to "doing", not a claimless "todo" — the
+// exact bug the design fixes ("fgos ask/answer mid-claim silently dropped
+// the claim"). The item never re-enters the ready set (still `doing`, not
+// `todo`), unlike the todo-item round-trip above.
+test('ask/answer round-trip on a doing item: answer resumes to doing, preserving the held claim (claim-lock §5.1)', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'gated-doing-item');
+  assert.equal(run(cwd, ['move', 'gated-doing-item', '--to', 'doing']).status, 0);
+
+  const askResult = run(cwd, ['ask', 'gated-doing-item', '--text', 'OAuth or password?']);
+  assert.equal(askResult.status, 0);
+  assert.deepEqual(envelopeData(askResult.stdout), { id: 'gated-doing-item', from: 'doing', to: 'awaiting-human', seq: 3 });
+  assert.equal(stateView(cwd).work['gated-doing-item'].status, 'awaiting-human');
+
+  const readyWhileAwaiting = envelopeData(run(cwd, ['ready']).stdout);
+  assert.ok(!readyWhileAwaiting.some((i) => i.id === 'gated-doing-item'));
+
+  const answerResult = run(cwd, ['answer', 'gated-doing-item', '--text', 'OAuth']);
+  assert.equal(answerResult.status, 0);
+  assert.deepEqual(envelopeData(answerResult.stdout), { id: 'gated-doing-item', from: 'awaiting-human', to: 'doing', seq: 4 });
+  assert.equal(stateView(cwd).work['gated-doing-item'].status, 'doing');
+
+  // Never resurfaces as ready — it resumed to "doing", not "todo".
+  const readyAfterAnswer = envelopeData(run(cwd, ['ready']).stdout);
+  assert.ok(!readyAfterAnswer.some((i) => i.id === 'gated-doing-item'));
 });
 
 test('ask without --text is rejected as validation, exit 4, no event written, item stays in its prior status', () => {
@@ -2092,6 +2150,30 @@ test('submit with a bare --tier (no value) is rejected as validation, exit 4, no
   const cwd = tmpCwd();
   const before = eventLines(cwd).length;
   const result = run(cwd, ['submit', 'Try a bare tier flag', '--tier']);
+  assert.equal(result.status, 4);
+  assert.equal(eventLines(cwd).length, before);
+});
+
+test('submit without --docs-ref leaves docsRef unset, exit 0', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['submit', 'A task with no docs link']);
+  assert.equal(result.status, 0);
+  const id = JSON.parse(result.stdout).data.id;
+  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].docsRef, undefined);
+});
+
+test('submit --docs-ref persists docsRef, exit 0 -- an item created through the public door can now carry this link from the start', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['submit', 'A task with a docs link', '--docs-ref', 'docs/history/some-feature/']);
+  assert.equal(result.status, 0);
+  const id = JSON.parse(result.stdout).data.id;
+  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].docsRef, 'docs/history/some-feature/');
+});
+
+test('submit with an empty --docs-ref "" is rejected as validation, exit 4, no event written', () => {
+  const cwd = tmpCwd();
+  const before = eventLines(cwd).length;
+  const result = run(cwd, ['submit', 'A task with a broken docs link', '--docs-ref', '']);
   assert.equal(result.status, 4);
   assert.equal(eventLines(cwd).length, before);
 });
@@ -2645,6 +2727,84 @@ test('pick surfaces a real createWorktree failure as-is after the claim already 
   const view = stateView(cwd);
   assert.equal(view.work['pick-wt-fail'].status, 'doing');
   assert.equal(view.work['pick-wt-fail'].claimRole, 'session');
+});
+
+// --- pick: claim-lock §3a/§3c/§7 (guard loosen, branch-reuse generalize, claimTrigger) ---
+
+test('pick --id claims a status:todo item at stage clarify (not the frontier at all) — the frontier/stage guard is gone (claim-lock §3a)', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  const id = JSON.parse(run(cwd, ['submit', 'Fuzzy request needing discovery']).stdout).data.id;
+  assert.equal(stateView(cwd).work[id].stage, 'clarify');
+  assert.ok(!envelopeData(run(cwd, ['ready']).stdout).some((i) => i.id === id), 'a clarify-stage item is never in the frontier');
+
+  const result = run(cwd, ['pick', '--id', id]);
+  assert.equal(result.status, 0, `pick failed: ${result.stderr}`);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.from, 'todo');
+  assert.equal(data.to, 'doing');
+  assert.equal(stateView(cwd).work[id].status, 'doing');
+  assert.equal(stateView(cwd).work[id].stage, 'clarify', 'pick claims the item without touching its stage');
+});
+
+test('pick with no --id still only opens the frontier head — the loosened guard applies to the explicit --id branch alone', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  run(cwd, ['submit', 'Fuzzy request never picked by id']); // stage clarify, never in the frontier
+  const result = run(cwd, ['pick']);
+  assert.notEqual(result.status, 0, 'the frontier is empty — a clarify-stage item must not be silently auto-picked');
+});
+
+test('pick --via stamps claimTrigger on the item; omitting --via leaves it entirely absent (claim-lock §7)', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  addOk(cwd, 'pick-via-herdr');
+  addOk(cwd, 'pick-via-none');
+
+  assert.equal(run(cwd, ['pick', '--id', 'pick-via-herdr', '--via', 'herdr']).status, 0);
+  assert.equal(stateView(cwd).work['pick-via-herdr'].claimTrigger, 'herdr');
+
+  assert.equal(run(cwd, ['pick', '--id', 'pick-via-none']).status, 0);
+  assert.equal('claimTrigger' in stateView(cwd).work['pick-via-none'], false);
+});
+
+test('pick --via requires a non-empty value, rejected as validation, exit 4', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  addOk(cwd, 'pick-via-empty');
+  const result = run(cwd, ['pick', '--id', 'pick-via-empty', '--via']);
+  assert.equal(result.status, 4);
+  assert.equal(stateView(cwd).work['pick-via-empty'].status, 'todo', 'a rejected --via must not leave a partial claim');
+});
+
+test('pick reclaims a released todo item onto its OWN existing branch tip, not a fresh HEAD (claim-lock §3c: branch-reuse keyed on branchExists alone, not status)', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  addOk(cwd, 'reuse-branch-item');
+
+  const firstPick = envelopeData(run(cwd, ['pick', '--id', 'reuse-branch-item']).stdout);
+  const worktreePath = firstPick.worktree.path;
+  assert.equal(firstPick.worktree.reused, false);
+
+  // Advance the branch's own tip past repoRoot's HEAD — simulates the
+  // fgos-exploring/planning hard rule (commit CONTEXT.md/plan.md before the
+  // release-triggering `fgos discover` call).
+  fs.writeFileSync(path.join(worktreePath, 'CONTEXT.md'), '# decisions\n');
+  execFileSync('git', ['add', 'CONTEXT.md'], { cwd: worktreePath });
+  execFileSync('git', ['commit', '-m', 'lock decisions'], { cwd: worktreePath });
+  const branchTip = execFileSync('git', ['rev-parse', 'fgw/reuse-branch-item'], { cwd, encoding: 'utf8' }).trim();
+  assert.notEqual(branchTip, gitHead(cwd), 'the branch must have genuinely advanced past main');
+
+  // Release (claim-lock §3b's own edge, doing -> todo) without settling the
+  // item — the branch and its commit survive (worktree.mjs never deletes it).
+  assert.equal(run(cwd, ['move', 'reuse-branch-item', '--to', 'todo', '--expect', 'doing']).status, 0);
+  assert.equal(stateView(cwd).work['reuse-branch-item'].status, 'todo');
+
+  const secondPick = envelopeData(run(cwd, ['pick', '--id', 'reuse-branch-item']).stdout);
+  assert.equal(secondPick.from, 'todo');
+  assert.equal(secondPick.branchHeadAtTake, branchTip, 'reclaims the SAME branch tip, not repoRoot\'s current HEAD');
+  assert.equal(secondPick.worktree.branch, 'fgw/reuse-branch-item');
+  assert.equal(secondPick.worktree.reused, true, 'createWorktree reuses the existing fgw/<id> branch');
 });
 
 test('return happy path: verify passes -> doing to proposed, actual outcome recorded, no settlement (settlement belongs to the -> done edge, D4)', () => {

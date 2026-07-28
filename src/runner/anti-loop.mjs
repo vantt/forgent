@@ -8,11 +8,63 @@
 // — it never opens `.fgos/events.jsonl` itself. `createMissBreaker`'s state
 // lives only in the closure returned to the caller; nothing here touches
 // disk or a process.
+//
+// EXECUTING-PHASE ONLY (claim-lock, code review finding): before claim-lock,
+// an item could never reach `doing` before stage `executing` (pick/take were
+// frontier-only), so counting every `to: 'doing'` move was equivalent to
+// counting only real dispatch attempts. Claim-lock lets `pick` claim an item
+// at `clarify`/`decompose` too — a claim-then-release cycle there (pick ->
+// decompose.mjs's release `doing -> todo` -> re-pick at `executing`) is not a
+// dispatch attempt and must not silently eat into the SAME budget real
+// executing retries draw from. `countableDoingMoveIndexes` below replays just
+// enough of the log (domain + stage per id, mirroring frontier.mjs's own
+// `(item.stage ?? executeStage) !== executeStage` check) to count only a
+// `to: 'doing'` move that lands while the item's stage already IS its
+// domain's Execute-mapped stage.
+
+import { getDomain, stageForStep } from '../state/workflow-stage-graphs.mjs';
 
 /** Default max times a single item may be re-dispatched (re-enter `doing`)
  * before the runner refuses to pick it up again. Provisional — tuning is
  * deferred to real operation, per the cell's own note. */
 export const MAX_VISITS = 3;
+
+/**
+ * Replay just enough of `events` to know, for each `work.move` event with
+ * `payload.to === 'doing'` and `payload.id === id`, whether the item's stage
+ * at that exact point in the log already equalled its domain's Execute-mapped
+ * stage — i.e. whether it was a real executing-phase dispatch, not a
+ * clarify/decompose-phase claim (claim-lock). Returns the Set of matching
+ * event indexes (positions in `events`), so both `visitCount` and
+ * `visitsSinceLastHumanEvent` below can share one scan.
+ *
+ * Tracks only `domain` (from this id's one `work.add`) and `stage` (from its
+ * `work.add` and any later `work.stage` moves) — the two fields
+ * frontier.mjs's own eligibility check reads, nothing else. A missing stage
+ * reads as the domain's Execute stage (D8 lazy default), same as
+ * frontier.mjs and stage.mjs.
+ */
+function countableDoingMoveIndexes(events, id) {
+  const indexes = new Set();
+  let domain;
+  let stage;
+  for (let i = 0; i < events.length; i += 1) {
+    const event = events[i];
+    if (!event || !event.payload) continue;
+    if (event.type === 'work.add' && event.payload.id === id) {
+      domain = event.payload.domain;
+      stage = event.payload.stage;
+    } else if (event.type === 'work.stage' && event.payload.id === id) {
+      stage = event.payload.to;
+    } else if (event.type === 'work.move' && event.payload.id === id && event.payload.to === 'doing') {
+      const executeStage = stageForStep(getDomain(domain), 'Execute');
+      if ((stage ?? executeStage) === executeStage) {
+        indexes.add(i);
+      }
+    }
+  }
+  return indexes;
+}
 
 /** Default number of consecutive goal-check misses (for one item) before
  * the circuit breaker trips. Provisional, same caveat as MAX_VISITS. Inert
@@ -25,11 +77,14 @@ export const MAX_VISITS = 3;
 export const BREAKER_MISSES = 3;
 
 /**
- * Count how many times work item `id` has entered `doing` across `events`.
+ * Count how many times work item `id` has entered `doing` at its executing
+ * stage across `events` (claim-lock: a clarify/decompose-phase claim is not
+ * a dispatch attempt — see `countableDoingMoveIndexes` above).
  *
  * Derived from the log's existing `work.move` shape (per key_links: no new
  * event type) — a visit is any event with `type === 'work.move'` and
- * `payload.to === 'doing'` for this id. Lifetime, agent-agnostic count: a
+ * `payload.to === 'doing'` for this id, at that point already at the
+ * domain's Execute-mapped stage. Lifetime, agent-agnostic count: a
  * human's manual re-dispatch counts exactly like the runner's. This is the
  * shipped metric (loop.mjs's `visits`/`priorVisits` payload fields, fgos.mjs's
  * `priorVisits`) — untouched by human-rounds D1, which reset the runner's own
@@ -46,13 +101,7 @@ export const BREAKER_MISSES = 3;
  */
 export function visitCount(events, id) {
   if (!Array.isArray(events) || typeof id !== 'string' || !id) return 0;
-  let count = 0;
-  for (const event of events) {
-    if (event && event.type === 'work.move' && event.payload && event.payload.to === 'doing' && event.payload.id === id) {
-      count += 1;
-    }
-  }
-  return count;
+  return countableDoingMoveIndexes(events, id).size;
 }
 
 /**
@@ -96,12 +145,10 @@ export function visitsSinceLastHumanEvent(events, id) {
       lastHumanIndex = i;
     }
   }
+  const countable = countableDoingMoveIndexes(events, id);
   let count = 0;
-  for (let i = lastHumanIndex + 1; i < events.length; i += 1) {
-    const event = events[i];
-    if (event && event.type === 'work.move' && event.payload && event.payload.to === 'doing' && event.payload.id === id) {
-      count += 1;
-    }
+  for (const index of countable) {
+    if (index > lastHumanIndex) count += 1;
   }
   return count;
 }

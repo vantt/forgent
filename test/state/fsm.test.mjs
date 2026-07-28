@@ -113,12 +113,14 @@ test('every legal edge is exactly the declared table; every other status pair is
     'blocked->doing',
     'blocked->proposed',
     'doing->proposed',
+    'doing->todo',
     'proposed->done',
     'proposed->todo',
     'proposed->blocked',
     'todo->awaiting-human',
     'doing->awaiting-human',
     'awaiting-human->todo',
+    'awaiting-human->doing',
   ]);
   for (const from of STATUSES) {
     for (const to of STATUSES) {
@@ -127,7 +129,7 @@ test('every legal edge is exactly the declared table; every other status pair is
         const args = { work: work(from), to };
         if (key === 'proposed->todo' || key === 'proposed->blocked') args.reason = 'sweep-test reason';
         if (to === 'awaiting-human') args.ask = 'sweep-test ask';
-        if (key === 'awaiting-human->todo') args.answer = 'sweep-test answer';
+        if (from === 'awaiting-human') args.answer = 'sweep-test answer';
         assert.doesNotThrow(() => transitionWork(args), `expected ${key} to be legal`);
       } else {
         assert.throws(
@@ -182,26 +184,50 @@ test('transitionWork rejects resuming from awaiting-human without a non-empty an
   );
 });
 
+// claim-lock §5.1: a claim held at ask-time (status 'doing') must be able to
+// resume to 'doing', not just 'todo' — otherwise answering a gate mid-claim
+// silently drops it. Mirrors the awaiting-human -> todo test above exactly,
+// one target over.
+test('transitionWork allows awaiting-human -> doing (resume held claim, per claim-lock §5.1) and carries the answer in the payload', () => {
+  const event = transitionWork({ work: work('awaiting-human'), to: 'doing', answer: 'use OAuth' });
+  assert.deepEqual(event, {
+    type: 'work.move',
+    payload: { id: 'w1', from: 'awaiting-human', to: 'doing', answer: 'use OAuth' },
+  });
+});
+
+test('transitionWork rejects resuming from awaiting-human to doing without a non-empty answer as validation, not precondition', () => {
+  assert.throws(
+    () => transitionWork({ work: work('awaiting-human'), to: 'doing' }),
+    (err) => err instanceof FsmError && err.category === 'validation',
+  );
+  assert.throws(
+    () => transitionWork({ work: work('awaiting-human'), to: 'doing', answer: '   ' }),
+    (err) => err instanceof FsmError && err.category === 'validation',
+  );
+});
+
+// claim-lock §3b: the direct release door a held claim leaves `doing`
+// through without settling the item — no `reason` required (mirrors
+// `blocked -> todo`'s own no-reason shape).
+test('transitionWork allows doing -> todo (claim release, per claim-lock §3b) with no extra payload keys', () => {
+  const event = transitionWork({ work: work('doing'), to: 'todo' });
+  assert.deepEqual(event, { type: 'work.move', payload: { id: 'w1', from: 'doing', to: 'todo' } });
+});
+
 test('ask/answer are ignored (never appear in payload) for every edge other than the awaiting-human entry/exit edges', () => {
   const event = transitionWork({ work: work('todo'), to: 'doing', ask: 'dropped ask', answer: 'dropped answer' });
   assert.deepEqual(event, { type: 'work.move', payload: { id: 'w1', from: 'todo', to: 'doing' } });
 });
 
-test('there is no awaiting-human -> doing edge (single exit only, per D-edge)', () => {
-  assert.throws(
-    () => transitionWork({ work: work('awaiting-human'), to: 'doing' }),
-    (err) => err instanceof FsmError && err.category === 'precondition',
-  );
-});
-
-test('awaiting-human is not reachable from blocked, proposed, or done, and does not accept doing/blocked/proposed/done as a resume target', () => {
+test('awaiting-human is not reachable from blocked, proposed, or done, and does not accept blocked/proposed/done as a resume target (todo/doing are the only two, per claim-lock §5.1)', () => {
   for (const from of ['blocked', 'proposed', 'done']) {
     assert.throws(
       () => transitionWork({ work: work(from), to: 'awaiting-human', ask: 'irrelevant' }),
       (err) => err instanceof FsmError && err.category === 'precondition',
     );
   }
-  for (const to of ['doing', 'blocked', 'proposed', 'done']) {
+  for (const to of ['blocked', 'proposed', 'done']) {
     assert.throws(
       () => transitionWork({ work: work('awaiting-human'), to, answer: 'irrelevant' }),
       (err) => err instanceof FsmError && err.category === 'precondition',
