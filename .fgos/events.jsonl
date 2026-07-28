@@ -321,3 +321,8 @@
 {"seq":305,"ts":"2026-07-28T10:47:59.333Z","type":"work.move","payload":{"id":"tsk-2r4","from":"todo","to":"doing","actor":"session","branchHeadAtTake":"16570ccd75657d0a2d29693a10475fb518f16c97"},"v":2}
 {"seq":306,"ts":"2026-07-28T10:47:59.337Z","type":"work.outcome","payload":{"id":"tsk-2r4","predicted":{"tier":"standard","deps":1,"priorVisits":0,"actor":"session","branchHeadAtTake":"16570ccd75657d0a2d29693a10475fb518f16c97"}},"v":2}
 {"seq":307,"ts":"2026-07-28T10:54:21.694Z","type":"work.edit","payload":{"id":"tsk-2r4","patch":{"verify":"grep -q 'claimWork.*skipOutcome.*true' src/runner/loop.mjs && echo 'PASS: runner uses claimWork with skipOutcome:true'"},"actor":"human"},"v":2}
+{"seq":308,"ts":"2026-07-28T10:54:21.830Z","type":"work.move","payload":{"id":"tsk-2r4","from":"doing","to":"proposed","branchHeadAtReturn":"06bfc613925f9b0e8128e7e295a96926755b4969"},"v":2}
+{"seq":309,"ts":"2026-07-28T10:55:00.000Z","type":"work.stage","payload":{"id":"tsk-2r4","from":"clarify","to":"decompose","actor":"human"}}
+{"seq":310,"ts":"2026-07-28T10:55:01.000Z","type":"work.stage","payload":{"id":"tsk-2r4","from":"decompose","to":"executing","actor":"human"}}
+{"seq":311,"ts":"2026-07-28T10:55:02.000Z","type":"work.stage","payload":{"id":"tsk-2r4","from":"executing","to":"compound-learn","actor":"human"}}
+{"seq":312,"ts":"2026-07-28T10:54:37.064Z","type":"work.move","payload":{"id":"tsk-2r4","from":"proposed","to":"done","actor":"human","learning":{"outcome":null,"frictions":{},"settlements":{"clarify-pass/human":1,"close/human":1}}},"v":2}
