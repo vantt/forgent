@@ -353,7 +353,7 @@ if (prompt.includes('# Context-discovery')) {
   return scriptPath;
 }
 
-test('runOnce clarify sweep records a clarify-pass settlement stamped role "runner" (R19/D13 sweep); the decompose sweep right after it (stage-decompose D2) pass-throughs the item on to executing in the same pass', async () => {
+test('runOnce clarify sweep records a clarify-pass settlement stamped role "runner"; the decompose sweep right after it pass-throughs the item on to executing in the same pass', async () => {
   const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
   seedItem(dir, { id: 'item-clarify', stage: 'clarify', verify: 'test -f output.txt' });
   const config = configFor(writeClearDiscoveryExecutor(scriptDir, counterFile, { verify: 'test -f output.txt' }));
@@ -791,7 +791,7 @@ test('live tee: two items dispatched in the same parallel wave never interleave 
   assert.doesNotMatch(contentB, /for-a\.txt/, 'item-b\'s log carries no trace of item-a\'s chunks');
 });
 
-test('live tee: .fgos/logs is never committed (per D4 — live tee did not change the committed surface)', async () => {
+test('live tee: .fgos/logs is never committed (live tee did not change the committed surface)', async () => {
   const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
   seedItem(dir, { id: 'item-live-clean' });
   const config = configFor(writeChunkyCommittingExecutor(scriptDir, counterFile));
@@ -829,7 +829,7 @@ test('anti-loop: an item at MAX_VISITS is parked todo -> blocked and truly leave
   assert.deepEqual(readyWork(dir), []);
 });
 
-test('anti-loop: a human reject (with reason) resets the runner gate — visits BEFORE it no longer count toward the cap (human-rounds D1)', async () => {
+test('anti-loop: a human reject (with reason) resets the runner gate — visits BEFORE it no longer count toward the cap', async () => {
   const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
   seedItem(dir, { id: 'item-reprieved' });
   // one machine visit that would already be AT the cap (maxVisits: 1) on its
@@ -1163,7 +1163,7 @@ ${commitLines}
   return scriptPath;
 }
 
-test('wgi-8: a worker fgos-discovered block makes the RUNNER create a new item stamped discoveredFrom = the dispatched item (D3: the worker never writes)', async () => {
+test('wgi-8: a worker fgos-discovered block makes the RUNNER create a new item stamped discoveredFrom = the dispatched item (the worker never writes)', async () => {
   const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
   seedItem(dir, { id: 'item-happy' });
   const body = JSON.stringify({
@@ -1421,7 +1421,7 @@ test('runWatch stops promptly when its AbortSignal aborts mid-wait, and resolves
   assert.ok(elapsed < pollFallbackMs / 2, `expected runWatch to resolve promptly on abort (took ${elapsed}ms, pollFallbackMs was ${pollFallbackMs}ms)`);
 });
 
-test('runWatch threads the SAME breaker instance into every cycle: misses accumulate ACROSS cycles past what one dispatch alone could reach (D9 cross-cycle sharing)', async () => {
+test('runWatch threads the SAME breaker instance into every cycle: misses accumulate ACROSS cycles past what one dispatch alone could reach (cross-cycle sharing)', async () => {
   const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
   seedItem(dir, { id: 'item-watch-breaker' });
   // commits junk.txt, but verify demands output.txt -> every attempt misses.

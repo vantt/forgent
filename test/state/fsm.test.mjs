@@ -33,7 +33,7 @@ for (const [from, to] of [
 // `'doing'` — so this edge's event (`payload.to === 'proposed'`) is
 // provably never counted as an anti-loop visit, no matter how many times a
 // root cycles through it.
-test('transitionWork allows blocked -> proposed (per fan-out-parallel D18) and its event is never counted by anti-loop.mjs (payload.to is "proposed", not "doing")', () => {
+test('transitionWork allows blocked -> proposed, and its event is never counted by anti-loop.mjs (payload.to is "proposed", not "doing")', () => {
   const event = transitionWork({ work: work('blocked'), to: 'proposed' });
   assert.deepEqual(event, { type: 'work.move', payload: { id: 'w1', from: 'blocked', to: 'proposed' } });
   assert.equal(event.payload.to, 'proposed');
@@ -50,7 +50,7 @@ for (const [from, to] of [
   });
 }
 
-test('transitionWork allows proposed -> todo (rejection, per D5) and carries the reason in the payload', () => {
+test('transitionWork allows proposed -> todo (rejection) and carries the reason in the payload', () => {
   const event = transitionWork({ work: work('proposed'), to: 'todo', reason: 'goal-check failed twice' });
   assert.deepEqual(event, {
     type: 'work.move',
@@ -71,7 +71,7 @@ test('transitionWork rejects proposed -> todo without a reason as validation, no
 
 // pr-lifecycle D3: proposed -> blocked (an approved proposal whose merge or
 // post-merge verify failed) requires a reason exactly like proposed -> todo.
-test('transitionWork allows proposed -> blocked (per pr-lifecycle D3) and carries the reason in the payload', () => {
+test('transitionWork allows proposed -> blocked and carries the reason in the payload', () => {
   const event = transitionWork({ work: work('proposed'), to: 'blocked', reason: 'merge conflict' });
   assert.deepEqual(event, {
     type: 'work.move',
@@ -165,7 +165,7 @@ test('transitionWork rejects entry into awaiting-human without a non-empty ask a
   }
 });
 
-test('transitionWork allows awaiting-human -> todo (resume, per D5) and carries the answer in the payload', () => {
+test('transitionWork allows awaiting-human -> todo (resume) and carries the answer in the payload', () => {
   const event = transitionWork({ work: work('awaiting-human'), to: 'todo', answer: 'use OAuth' });
   assert.deepEqual(event, {
     type: 'work.move',

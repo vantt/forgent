@@ -66,7 +66,7 @@ test('claimRoot on a root already owned by the SAME identity returns noop/accept
   assert.deepEqual(decision, { accepted: true, root: 'root', action: 'noop' });
 });
 
-test('claimRoot on a root owned by a DIFFERENT identity rejects with the real owner (D13 core claim)', () => {
+test('claimRoot on a root owned by a DIFFERENT identity rejects with the real owner', () => {
   const v = view([{ id: 'root' }]);
   const store = createOwnershipStore();
   store.setOwner('root', 'actor-A');

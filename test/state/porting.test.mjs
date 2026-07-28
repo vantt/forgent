@@ -68,7 +68,7 @@ for (const terminal of ['ported', 'adapted', 'rejected']) {
   });
 }
 
-test('there is no reopen/un-reject edge from any terminal state (out of scope per D3)', () => {
+test('there is no reopen/un-reject edge from any terminal state (out of scope)', () => {
   for (const terminal of ['ported', 'adapted', 'rejected']) {
     assert.throws(
       () => transitionPorting({ porting: porting(terminal), to: 'candidate' }),

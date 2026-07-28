@@ -182,7 +182,7 @@ test('judgeDiscovery embeds the item title/kind/refs/deps in the prompt sent to 
   assert.deepEqual(verdict, { clear: true, verify: 'ok' });
 });
 
-test('judgeDiscovery fails safe (never throws, never clear) on unparsable stdout, retrying up to MAX_JUDGE_ATTEMPTS before falling back (str68 D2/D3, nested-judge-fix)', () => {
+test('judgeDiscovery fails safe (never throws, never clear) on unparsable stdout, retrying up to MAX_JUDGE_ATTEMPTS before falling back (nested-judge-fix)', () => {
   const dir = mkTempDir();
   const { scriptPath, counterPath } = writeCountingRawStdoutExecutor(dir, 'not json at all');
   const cfg = cfgFor([scriptPath, '{prompt}']);
@@ -195,7 +195,7 @@ test('judgeDiscovery fails safe (never throws, never clear) on unparsable stdout
   assert.equal(readCount(counterPath), 3);
 });
 
-test('judgeDiscovery retries once with a stricter prompt on a parse-shaped failure and resolves to the retry verdict (str68 D2)', () => {
+test('judgeDiscovery retries once with a stricter prompt on a parse-shaped failure and resolves to the retry verdict', () => {
   const dir = mkTempDir();
   const scriptPath = writeFlakyThenValidExecutor(dir, 'not json at all', {
     clear: true,
@@ -222,7 +222,7 @@ test('judgeDiscovery fails safe when "clear" is present but not a boolean', () =
   assert.equal(verdict.clear, false);
 });
 
-test('judgeDiscovery fails safe when the executor exits non-zero, attempting exactly once — no retry on a non-parse failure (str68 D2)', () => {
+test('judgeDiscovery fails safe when the executor exits non-zero, attempting exactly once — no retry on a non-parse failure', () => {
   const dir = mkTempDir();
   const { scriptPath, counterPath } = writeCountingFailingExecutor(dir, 7);
   const cfg = cfgFor([scriptPath, '{prompt}']);
@@ -340,7 +340,7 @@ function tmpStoreDir() {
 // `executing` to `decompose` for exactly this reason (per D2, an intentional
 // contract change, not a test nerf).
 
-test('resolveDiscovery on a clear verdict writes the discovery record and moves stage to decompose with the proposed verify (stage-decompose D2 retarget)', () => {
+test('resolveDiscovery on a clear verdict writes the discovery record and moves stage to decompose with the proposed verify', () => {
   const scriptDir = mkTempDir();
   const scriptPath = writeVerdictExecutor(scriptDir, { clear: true, verify: 'npm test -- discovered' });
   const cfg = cfgFor([scriptPath, '{prompt}']);
@@ -358,7 +358,7 @@ test('resolveDiscovery on a clear verdict writes the discovery record and moves 
   assert.equal(view.discovery['item-x'][0].clear, true);
 });
 
-test('resolveDiscovery on a clear verdict with no model-proposed verify falls back to a placeholder distinct from the retired P14 sentinel (stage-decompose D2 retarget)', () => {
+test('resolveDiscovery on a clear verdict with no model-proposed verify falls back to a placeholder distinct from the retired P14 sentinel', () => {
   const scriptDir = mkTempDir();
   const scriptPath = writeVerdictExecutor(scriptDir, { clear: true });
   const cfg = cfgFor([scriptPath, '{prompt}']);
@@ -522,7 +522,7 @@ test('the judge prompt states the intentScore response-format range as 0 to 100'
   assert.match(verdict.verify, /intentScore[^\n]*0[^\n]*100/);
 });
 
-test('judgeDiscovery with a view embeds the exact graph-context heading and mechanical graph/impact numbers (STR8 D4)', () => {
+test('judgeDiscovery with a view embeds the exact graph-context heading and mechanical graph/impact numbers', () => {
   const dir = mkTempDir();
   const scriptPath = echoPromptExecutor(dir);
   const cfg = cfgFor([scriptPath, '{prompt}']);
@@ -616,7 +616,7 @@ test('resolveDiscovery writes EXACTLY ONE work.edit event carrying intent per ca
   assert.equal(intentEdits.length, 1);
 });
 
-test('resolveDiscovery still completes clear/unclear resolution when editWork throws for a corrupted item shape (STR8 D4 fail-safe)', () => {
+test('resolveDiscovery still completes clear/unclear resolution when editWork throws for a corrupted item shape (fail-safe)', () => {
   const scriptDir = mkTempDir();
   const scriptPath = writeVerdictExecutor(scriptDir, {
     clear: true,

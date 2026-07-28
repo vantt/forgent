@@ -39,24 +39,24 @@ test('transitionStage allows clarify -> executing and returns a validated event'
   assert.deepEqual(event, { type: 'work.stage', payload: { id: 'w1', from: 'clarify', to: 'executing' } });
 });
 
-test('transitionStage allows clarify -> decompose (per stage-decompose D2)', () => {
+test('transitionStage allows clarify -> decompose', () => {
   const event = transitionStage({ work: work('clarify'), to: 'decompose' });
   assert.deepEqual(event, { type: 'work.stage', payload: { id: 'w1', from: 'clarify', to: 'decompose' } });
 });
 
-test('transitionStage allows decompose -> executing (per stage-decompose D4)', () => {
+test('transitionStage allows decompose -> executing', () => {
   const event = transitionStage({ work: work('decompose'), to: 'executing' });
   assert.deepEqual(event, { type: 'work.stage', payload: { id: 'w1', from: 'decompose', to: 'executing' } });
 });
 
-test('transitionStage reads a missing stage as "executing" (per D8 lazy default)', () => {
+test('transitionStage reads a missing stage as "executing" (lazy default)', () => {
   assert.throws(
     () => transitionStage({ work: work(undefined), to: 'executing' }),
     (err) => err instanceof FsmError && err.category === 'precondition',
   );
 });
 
-test('transitionStage carries verify in the payload when supplied (per D10), and omits it when not', () => {
+test('transitionStage carries verify in the payload when supplied, and omits it when not', () => {
   const withVerify = transitionStage({ work: work('clarify'), to: 'executing', verify: 'npm test -- discovered' });
   assert.deepEqual(withVerify, {
     type: 'work.stage',
@@ -106,7 +106,7 @@ test('transitionStage CAS mismatch takes priority over table lookup (conflict, n
   );
 });
 
-test('transitionStage CAS treats a missing stage as "executing" against expectedStage (per D8)', () => {
+test('transitionStage CAS treats a missing stage as "executing" against expectedStage', () => {
   // expectedStage: 'executing' matches a stage-less item's lazy default, so
   // CAS passes — the failure that follows is precondition (no such edge),
   // proving the lazy default is what fed the CAS check, not a conflict.
@@ -140,7 +140,7 @@ test('transitionStage requires a non-empty "to"', () => {
   );
 });
 
-test('moveStage then rebuild -> stage executing + verify replaced (per D10, one event does both)', () => {
+test('moveStage then rebuild -> stage executing + verify replaced (one event does both)', () => {
   const dir = tmpDir();
   addSampleWork(dir);
 
@@ -153,7 +153,7 @@ test('moveStage then rebuild -> stage executing + verify replaced (per D10, one 
   assert.equal(rebuilt.work['item-x'].verify, 'npm test -- item-x');
 });
 
-test('moveStage carries an item clarify -> decompose -> executing (per stage-decompose D2/D4)', () => {
+test('moveStage carries an item clarify -> decompose -> executing', () => {
   const dir = tmpDir();
   addSampleWork(dir);
 

@@ -74,7 +74,7 @@ test('classify infers kind "feature" from a feature keyword', () => {
   assert.equal(classify('add a new feature for exporting reports').kind, 'feature');
 });
 
-test('classify sets risk to mirror the tier signal (D5)', () => {
+test('classify sets risk to mirror the tier signal', () => {
   const heavy = classify('run a production migration');
   assert.equal(heavy.risk, heavy.tier);
   const standard = classify('an ordinary request');

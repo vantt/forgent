@@ -42,7 +42,7 @@ test('findSourceCaptureId returns the id whose outcome docPath matches, or null 
   assert.equal(findSourceCaptureId(undefined, 'docs/how-to/foo.md'), null);
 });
 
-test('findSourceCaptureIds returns ALL outcome ids whose docPath matches, in stable insertion order (D13 no-loss gather)', () => {
+test('findSourceCaptureIds returns ALL outcome ids whose docPath matches, in stable insertion order (no-loss gather)', () => {
   const outcomesView = {
     'work-a': { docPath: 'docs/how-to/foo.md' },
     'work-b': { docPath: 'docs/how-to/bar.md' },
@@ -148,7 +148,7 @@ test('fgos docs-index tolerates missing quadrant dirs (tutorials/reference have 
   }
 });
 
-test('fgos docs-index reads BOTH the docs/decisions/ alias (D2) and the primary docs/explanation/ dir into the explanation quadrant, tagged by quadrant name not source dir name', () => {
+test('fgos docs-index reads BOTH the docs/decisions/ alias and the primary docs/explanation/ dir into the explanation quadrant, tagged by quadrant name not source dir name', () => {
   const result = runDocsIndex();
   assert.equal(result.status, 0, result.stderr);
   const manifest = JSON.parse(fs.readFileSync(MANIFEST_PATH, 'utf8'));
