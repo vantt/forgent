@@ -36,6 +36,7 @@ import { classifySource, reviewDiff, mergeRunnerItem, cleanupMergedBranch, chang
 import { createGitHubPR, mergeGitHubPR, viewGitHubPRStatus } from '../src/runner/github-adapter.mjs';
 import { classifyIronLaw } from '../src/evolve/iron-law.mjs';
 import { branchNameFor, branchExists, createWorktree, removeWorktree } from '../src/runner/worktree.mjs';
+import { claimWork, ClaimError } from '../src/runner/claim-port.mjs';
 import { createSession, endSession, listSessions, reclaimOrphanedSessions, SessionError } from '../src/runner/session.mjs';
 import { resolveRoot } from '../src/runner/root-affinity.mjs';
 import { visitCount } from '../src/runner/anti-loop.mjs';
@@ -1248,7 +1249,6 @@ async function runVerb(verb, flags, positional, dir) {
     case 'pick': {
       const explicitId = optionalField(positional[0] ?? flags.id, 'pick --id requires a non-empty id value (omit --id entirely to pick the frontier head)');
       const claimTrigger = optionalField(flags.via, 'pick --via requires a non-empty value (omit --via entirely to skip stamping claimTrigger)');
-      const actor = 'session';
 
       let id = explicitId;
       if (!id) {
@@ -1261,46 +1261,23 @@ async function runVerb(verb, flags, positional, dir) {
         throw new StoreError('validation', `pick: work "${id}" not found.`);
       }
 
-      const item = listWork(dir).work[id];
-      const priorVisits = visitCount(readRawEvents(dir), id);
-      const repoRoot = process.cwd();
-
-      // Branch-reuse generalized to "does fgw/<id> already exist" alone
-      // (claim-lock §3c) — no longer gated on `status === 'blocked'`. Covers
-      // three cases in one path: no branch -> fresh claim, branchHeadAtTake
-      // from repoRoot's CURRENT HEAD (unchanged shape — createWorktree's `git
-      // worktree add -b <branch> <path>` with no start-point forks from
-      // exactly this same commit); branch exists + `blocked` -> retake after
-      // reject (unchanged); branch exists + `todo` (NEW, claim-lock §3b) ->
-      // the item was released back to `todo` at the clarify/decompose ->
-      // executing boundary with its worktree already standing — pick
-      // reattaches to that SAME branch tip instead of forking a new one.
-      // `expectedStatus` mirrors whichever of the two legal pre-claim
-      // statuses `item` is actually in — the CAS in moveWork below is the
-      // real guard against anything else.
-      const branch = branchNameFor(id);
-      const branchAlreadyExists = branchExists(repoRoot, branch);
-      const branchHeadAtTake = branchAlreadyExists
-        ? gitAt(repoRoot, ['rev-parse', branch]).trim()
-        : currentHead(repoRoot);
-      const expectedStatus = item.status === 'blocked' ? 'blocked' : 'todo';
-      const { event } = moveWork(dir, { id, to: 'doing', expectedStatus, actor, branchHeadAtTake, claimTrigger });
-      addOutcome(dir, {
-        id,
-        predicted: { tier: item.tier ?? DEFAULTS.tier, deps: item.deps.length, priorVisits, actor, branchHeadAtTake },
-      });
-      const claim = { id, from: expectedStatus, to: 'doing', actor, seq: event.seq, source: 'branch', branch, branchHeadAtTake };
-
-      // The claim above is already durable (moveWork's event is committed to
-      // the log) by the time createWorktree runs. If createWorktree throws
-      // (WorktreeError), that error is left to surface AS-IS to the caller —
-      // no catch/rollback here: the item stays "doing" with no worktree, and
-      // the caller sees the real failure rather than a swallowed one. Undoing
-      // the claim automatically would hide a genuine git-level failure behind
-      // a clean-looking retry surface, which is worse than a visible partial
-      // state the human/session can act on directly.
-      const worktree = createWorktree(repoRoot, id);
-      return { ...claim, worktree };
+      // Delegate to claim-port.mjs — single choke-point for all claim flows
+      // (tsk-53f D1). Handles: main-checkout-lock, moveWork, addOutcome,
+      // worktree creation with correct baseRef for leaf items.
+      try {
+        return claimWork(dir, {
+          id,
+          actor: 'session',
+          isolate: true,
+          claimTrigger,
+          repoRoot: process.cwd(),
+        });
+      } catch (err) {
+        if (err instanceof ClaimError) {
+          throw new StoreError('validation', `pick: ${err.message}`);
+        }
+        throw err;
+      }
     }
 
     // Cửa pull — return (stage-decompose S2-pull D1/R13): KHÔNG tin lời
