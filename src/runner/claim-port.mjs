@@ -81,7 +81,12 @@ export function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoot = pr
       ? gitAt(repoRoot, ['rev-parse', branch]).trim()
       : (isLeaf && baseRef ? gitAt(repoRoot, ['rev-parse', baseRef]).trim() : currentHead(repoRoot));
 
-    const expectedStatus = item.status === 'blocked' ? 'blocked' : 'todo';
+    // Branch take (human-rounds D2): a blocked item with existing branch uses
+    // blocked→doing edge; blocked WITHOUT branch falls through to todo edge
+    // (will fail CAS, preserving old take behavior).
+    const isBranchTake = item.status === 'blocked' && branchAlreadyExists;
+    const expectedStatus = isBranchTake ? 'blocked' : 'todo';
+    const useBranchSource = isolate || isBranchTake;
 
     // Claim via moveWork
     const { event } = moveWork(dir, {
@@ -89,8 +94,8 @@ export function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoot = pr
       to: 'doing',
       expectedStatus,
       actor,
-      branchHeadAtTake: isolate ? branchHeadAtTake : undefined,
-      headAtTake: isolate ? undefined : currentHead(repoRoot),
+      branchHeadAtTake: useBranchSource ? branchHeadAtTake : undefined,
+      headAtTake: useBranchSource ? undefined : currentHead(repoRoot),
       claimTrigger,
     });
 
@@ -102,8 +107,8 @@ export function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoot = pr
         deps: item.deps?.length ?? 0,
         priorVisits,
         actor,
-        branchHeadAtTake: isolate ? branchHeadAtTake : undefined,
-        headAtTake: isolate ? undefined : currentHead(repoRoot),
+        branchHeadAtTake: useBranchSource ? branchHeadAtTake : undefined,
+        headAtTake: useBranchSource ? undefined : currentHead(repoRoot),
       },
     });
 
@@ -113,10 +118,10 @@ export function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoot = pr
       to: 'doing',
       actor,
       seq: event.seq,
-      source: isolate ? 'branch' : 'main',
-      branch: isolate ? branch : undefined,
-      branchHeadAtTake: isolate ? branchHeadAtTake : undefined,
-      headAtTake: isolate ? undefined : currentHead(repoRoot),
+      source: useBranchSource ? 'branch' : 'main',
+      branch: useBranchSource ? branch : undefined,
+      branchHeadAtTake: useBranchSource ? branchHeadAtTake : undefined,
+      headAtTake: useBranchSource ? undefined : currentHead(repoRoot),
     };
 
     // Create worktree if isolating

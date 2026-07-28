@@ -1199,37 +1199,21 @@ async function runVerb(verb, flags, positional, dir) {
         }
       }
 
-      const item = listWork(dir).work[id];
-      // Predicted half written right after the claim, mirroring the
-      // runner's own claim (D1's "đối xứng claim runner") — priorVisits is
-      // read BEFORE this claim's own work.move so it never counts itself.
-      const priorVisits = visitCount(readRawEvents(dir), id);
-
-      // Branch take (human-rounds D2): a `blocked` item with a live
-      // `fgw/<id>` branch (parked by the runner, or a rejected proposal) is
-      // claimed via the existing blocked -> doing edge (fsm.mjs:69), CAS'd
-      // against the item's real "blocked" status rather than the main-based
-      // "todo" below. `branchHeadAtTake` — the BRANCH's own HEAD, not the
-      // repo's — is the sole discriminator `return` uses later; it is never
-      // mixed with the main-based `headAtTake`.
-      const branch = branchNameFor(id);
-      if (item.status === 'blocked' && branchExists(process.cwd(), branch)) {
-        const branchHeadAtTake = gitAt(process.cwd(), ['rev-parse', branch]).trim();
-        const { event } = moveWork(dir, { id, to: 'doing', expectedStatus: 'blocked', actor, branchHeadAtTake });
-        addOutcome(dir, {
+      // Delegate to claim-port.mjs — single choke-point for all claim flows
+      // (tsk-53f D1). take uses isolate:false (no worktree creation).
+      try {
+        return claimWork(dir, {
           id,
-          predicted: { tier: item.tier ?? DEFAULTS.tier, deps: item.deps.length, priorVisits, actor, branchHeadAtTake },
+          actor,
+          isolate: false,
+          repoRoot: process.cwd(),
         });
-        return { id, from: 'blocked', to: 'doing', actor, seq: event.seq, source: 'branch', branch, branchHeadAtTake };
+      } catch (err) {
+        if (err instanceof ClaimError) {
+          throw new StoreError('validation', `take: ${err.message}`);
+        }
+        throw err;
       }
-
-      const headAtTake = currentHead(process.cwd());
-      const { event } = moveWork(dir, { id, to: 'doing', expectedStatus: 'todo', actor, headAtTake });
-      addOutcome(dir, {
-        id,
-        predicted: { tier: item.tier ?? DEFAULTS.tier, deps: item.deps.length, priorVisits, actor, headAtTake },
-      });
-      return { id, from: 'todo', to: 'doing', actor, seq: event.seq, source: 'main', headAtTake };
     }
 
     // Cửa pull — pick (str83-fgos-slash-commands, D1/D3; guard loosened +
