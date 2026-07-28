@@ -326,3 +326,12 @@
 {"seq":310,"ts":"2026-07-28T10:55:01.000Z","type":"work.stage","payload":{"id":"tsk-2r4","from":"decompose","to":"executing","actor":"human"}}
 {"seq":311,"ts":"2026-07-28T10:55:02.000Z","type":"work.stage","payload":{"id":"tsk-2r4","from":"executing","to":"compound-learn","actor":"human"}}
 {"seq":312,"ts":"2026-07-28T10:54:37.064Z","type":"work.move","payload":{"id":"tsk-2r4","from":"proposed","to":"done","actor":"human","learning":{"outcome":null,"frictions":{},"settlements":{"clarify-pass/human":1,"close/human":1}}},"v":2}
+{"seq":313,"ts":"2026-07-28T10:54:53.649Z","type":"work.move","payload":{"id":"tsk-53f","from":"doing","to":"blocked"},"v":2}
+{"seq":314,"ts":"2026-07-28T10:54:53.654Z","type":"work.outcome","payload":{"id":"tsk-53f","actual":{"outcome":"blocked","passed":false,"attempts":1,"errorClass":"verify-miss","aheadCount":3}},"v":2}
+{"seq":315,"ts":"2026-07-28T10:54:53.657Z","type":"work.friction","payload":{"id":"tsk-53f","disposition":"blocked","errorClass":"verify-miss","layer":"verification","attempts":1,"detail":"goal-check failed on branch \"fgw/tsk-53f\" (exit 1)"},"v":2}
+{"seq":316,"ts":"2026-07-28T10:55:08.580Z","type":"work.move","payload":{"id":"tsk-53f","from":"blocked","to":"doing","actor":"human"},"v":2}
+{"seq":317,"ts":"2026-07-28T10:55:08.627Z","type":"work.move","payload":{"id":"tsk-53f","from":"doing","to":"proposed","actor":"human"},"v":2}
+{"seq":318,"ts":"2026-07-28T10:56:00.000Z","type":"work.stage","payload":{"id":"tsk-53f","from":"clarify","to":"decompose","actor":"human"}}
+{"seq":319,"ts":"2026-07-28T10:56:01.000Z","type":"work.stage","payload":{"id":"tsk-53f","from":"decompose","to":"executing","actor":"human"}}
+{"seq":320,"ts":"2026-07-28T10:56:02.000Z","type":"work.stage","payload":{"id":"tsk-53f","from":"executing","to":"compound-learn","actor":"human"}}
+{"seq":321,"ts":"2026-07-28T10:55:15.507Z","type":"work.move","payload":{"id":"tsk-53f","from":"proposed","to":"done","actor":"human","learning":{"outcome":{"disposition":"blocked","attempts":1,"errorClass":"verify-miss"},"frictions":{"verification":1},"settlements":{"clarify-pass/human":1,"close/human":1}}},"v":2}
