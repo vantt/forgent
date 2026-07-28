@@ -1210,13 +1210,13 @@ async function runVerb(verb, flags, positional, dir) {
         });
       } catch (err) {
         if (err instanceof ClaimError) {
-          throw new StoreError('validation', `take: ${err.message}`);
+          throw new StoreError(err.category, `take: ${err.message}`);
         }
         throw err;
       }
     }
 
-// Cửa pull — pick (str83-fgos-slash-commands, D1/D3; guard loosened +
+    // Cửa pull — pick (str83-fgos-slash-commands, D1/D3; guard loosened +
     // branch-reuse generalized + claimTrigger per claim-lock §3a/§3c/§7):
     // combines take's claim logic with worktree.mjs's createWorktree in one
     // call, so `/fgOS:pick` can claim AND stand up the item's isolated
@@ -1264,7 +1264,7 @@ async function runVerb(verb, flags, positional, dir) {
         });
       } catch (err) {
         if (err instanceof ClaimError) {
-          throw new StoreError('validation', `pick: ${err.message}`);
+          throw new StoreError(err.category, `pick: ${err.message}`);
         }
         throw err;
       }
@@ -1703,14 +1703,14 @@ async function runVerb(verb, flags, positional, dir) {
             }
 
             if (result.outcome === 'fgos-write-rejected') {
-              moveWork(dir, { id, to: 'blocked', expectedStatus: 'proposed', reason: 'fgos-write-rejected' });
+              moveWork(dir, { id, to: 'blocked', expectedStatus: 'proposed', reason: 'fgos-write-rejected', role: 'system' });
               addFriction(dir, {
                 id,
                 disposition: 'blocked',
                 errorClass: 'fgos-write-blocked',
                 layer: 'state',
                 attempts: 1,
-                detail: `${result.branch} staged a change under .fgos/ (${result.paths.join(', ')}); merge aborted, ${rootBranch} unchanged — ADR0019`,
+                detail: `${result.branch} staged a change under .fgos/ (${result.paths.join(', ')}); merge aborted, ${rootBranch} unchanged — ADR0020`,
               });
               return { id, mode: 'merge', to: 'blocked', reason: 'fgos-write-rejected', target: rootBranch, paths: result.paths };
             }
@@ -1790,14 +1790,14 @@ async function runVerb(verb, flags, positional, dir) {
         }
 
         if (result.outcome === 'fgos-write-rejected') {
-          moveWork(dir, { id, to: 'blocked', expectedStatus: 'proposed', reason: 'fgos-write-rejected' });
+          moveWork(dir, { id, to: 'blocked', expectedStatus: 'proposed', reason: 'fgos-write-rejected', role: 'system' });
           addFriction(dir, {
             id,
             disposition: 'blocked',
             errorClass: 'fgos-write-blocked',
             layer: 'state',
             attempts: 1,
-            detail: `${result.branch} staged a change under .fgos/ (${result.paths.join(', ')}); merge aborted, main unchanged — ADR0019`,
+            detail: `${result.branch} staged a change under .fgos/ (${result.paths.join(', ')}); merge aborted, main unchanged — ADR0020`,
           });
           return { id, mode: 'merge', to: 'blocked', reason: 'fgos-write-rejected', target: 'main', paths: result.paths };
         }

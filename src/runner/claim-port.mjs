@@ -27,11 +27,25 @@ function gitAt(repoRoot, args) {
 }
 import { DEFAULTS } from '../state/work.mjs';
 
+// category (R4, store.mjs's categoryOf contract): 'not-found' mirrors
+// StoreError's own not-found convention ('validation'); 'lock-held'/
+// 'lock-ambiguous' reuse 'lock-timeout' (events.mjs's own category for the
+// same "couldn't get exclusive access" class) — without this, an uncategorized
+// ClaimError falls through categoryOf to 'unexpected' and crashes the whole
+// runOnce drain-run instead of a graceful per-item halt (same failure mode
+// store.mjs's own EXIT_CODES comment documents for WorktreeError/MergeError).
+const CLAIM_ERROR_CATEGORY = Object.freeze({
+  'not-found': 'validation',
+  'lock-held': 'lock-timeout',
+  'lock-ambiguous': 'lock-timeout',
+});
+
 export class ClaimError extends Error {
   constructor(code, message) {
     super(message);
     this.name = 'ClaimError';
     this.code = code;
+    this.category = CLAIM_ERROR_CATEGORY[code] ?? 'unexpected';
   }
 }
 
@@ -70,10 +84,21 @@ export function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoot = pr
     const branch = branchNameFor(id);
     const branchAlreadyExists = branchExists(repoRoot, branch);
 
-    // Determine baseRef for leaf items (fork from root branch, not main)
+    // Determine baseRef for leaf items (fork from root branch, not main) —
+    // only when the root branch actually exists (rootBranchExists guards
+    // BOTH baseRef and branchHeadAtTake below). A leaf claimed before the
+    // runner ever created its root branch (e.g. a human `pick` on a
+    // just-decomposed child, no dispatch involved yet) must fall through to
+    // repoRoot's current HEAD like a non-leaf claim — passing a baseRef that
+    // names a branch git doesn't have yet made createWorktree throw AFTER
+    // moveWork had already durably committed the doing-claim, orphaning the
+    // item in `doing` with no branch/worktree and no automatic recovery
+    // (startupReap skips human/session claims by design).
     const rootId = resolveRoot(view, id);
     const isLeaf = rootId !== id;
-    const baseRef = isLeaf ? branchNameFor(rootId) : undefined;
+    const rootBranch = isLeaf ? branchNameFor(rootId) : undefined;
+    const rootBranchExists = isLeaf && branchExists(repoRoot, rootBranch);
+    const baseRef = rootBranchExists ? rootBranch : undefined;
 
     // Branch reuse: if branch exists, get its HEAD; otherwise use current HEAD.
     // For leaves, try root branch if it exists; fall back to current HEAD if not
@@ -81,8 +106,8 @@ export function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoot = pr
     let branchHeadAtTake;
     if (branchAlreadyExists) {
       branchHeadAtTake = gitAt(repoRoot, ['rev-parse', branch]).trim();
-    } else if (isLeaf && baseRef && branchExists(repoRoot, baseRef)) {
-      branchHeadAtTake = gitAt(repoRoot, ['rev-parse', baseRef]).trim();
+    } else if (rootBranchExists) {
+      branchHeadAtTake = gitAt(repoRoot, ['rev-parse', rootBranch]).trim();
     } else {
       branchHeadAtTake = currentHead(repoRoot);
     }

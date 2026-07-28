@@ -2825,6 +2825,31 @@ test('pick reclaims a released todo item onto its OWN existing branch tip, not a
   assert.equal(secondPick.worktree.reused, true, 'createWorktree reuses the existing fgw/<id> branch');
 });
 
+test('pick on a leaf item whose root has no fgw/<rootId> branch yet forks from repoRoot HEAD instead of orphaning the claim (claim-port.mjs baseRef guard)', () => {
+  // A leaf claimed before the runner ever dispatched its root (e.g. a human
+  // `pick` right after decompose, no runner involved yet) has no root branch
+  // to fork from — claim-port.mjs must fall back to repoRoot's current HEAD,
+  // the same as a non-leaf claim, rather than passing createWorktree a
+  // baseRef naming a branch git doesn't have. Passing that nonexistent
+  // baseRef used to throw AFTER moveWork had already committed the
+  // doing-claim, leaving the item stuck in doing with no branch/worktree and
+  // no automatic recovery (startupReap skips human/session claims by design).
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  addOk(cwd, 'orphan-root-item', { title: 'Root Item' });
+  const dir = path.join(cwd, '.fgos');
+  addWork(dir, { id: 'orphan-leaf-item', title: 'Leaf Item', kind: 'task', status: 'todo', deps: [], risk: 'low', refs: [], verify: 'true', parent: 'orphan-root-item' });
+
+  const result = run(cwd, ['pick', '--id', 'orphan-leaf-item']);
+  assert.equal(result.status, 0, `pick failed: ${result.stderr}`);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.id, 'orphan-leaf-item');
+  assert.equal(data.branchHeadAtTake, gitHead(cwd), 'no root branch exists yet — must fork from repoRoot HEAD, not a nonexistent baseRef');
+  assert.equal(data.worktree.branch, 'fgw/orphan-leaf-item');
+  assert.equal(data.worktree.reused, false);
+  assert.equal(stateView(cwd).work['orphan-leaf-item'].status, 'doing');
+});
+
 test('return happy path: verify passes -> doing to proposed, actual outcome recorded, no settlement (settlement belongs to the -> done edge, D4)', () => {
   const cwd = initGitCwd();
   run(cwd, ['init']);
