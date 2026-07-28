@@ -13,20 +13,17 @@
 // temp repo, preserving the same relative nesting.
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { acquireMainCheckoutLock, HELD, AMBIGUOUS } from '../src/runner/main-checkout-lock.mjs';
+import { acquireMainCheckoutLock, HELD, AMBIGUOUS, DEFAULT_TTL_MS } from '../src/runner/main-checkout-lock.mjs';
 import { resolveWriterIdentity } from '../src/runner/session-identity.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-// Historical STR65 incidents (3 SHA'd, docs/history/str65-worktree-isolation-
-// enforcement/reports/validation-phase1.md) showed real inter-commit gaps of
-// ~2-3.5 minutes within a single working session. 5 minutes still clears
-// that observed gap, though with a thinner margin than the prior 10-minute
-// value -- accepted tradeoff for self-healing an abandoned lock sooner.
-const DEFAULT_TTL_MS = 5 * 60 * 1000;
-
 const HOW_TO_DOC = 'docs/how-to-parallel-lanes.md (workshop root, one level up from repo/)';
 
+// DEFAULT_TTL_MS now lives in main-checkout-lock.mjs itself (tsk-3w8
+// follow-up) -- claim-port.mjs's claimWork acquires this SAME lock too and
+// needs the same staleness window, not a second local copy of this repo's
+// own historical-gap-derived constant.
 function resolveTtlMs() {
   const raw = process.env.FGOS_MAIN_CHECKOUT_LOCK_TTL_MS;
   if (raw === undefined) return DEFAULT_TTL_MS;

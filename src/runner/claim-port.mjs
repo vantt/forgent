@@ -9,7 +9,7 @@
 
 import { moveWork, addOutcome, listWork, readRawEvents } from '../state/store.mjs';
 import { visitCount } from './anti-loop.mjs';
-import { acquireMainCheckoutLock, releaseMainCheckoutLock, HELD, AMBIGUOUS } from './main-checkout-lock.mjs';
+import { acquireMainCheckoutLock, releaseMainCheckoutLock, HELD, AMBIGUOUS, DEFAULT_TTL_MS } from './main-checkout-lock.mjs';
 import { createWorktree, branchNameFor, branchExists } from './worktree.mjs';
 import { resolveRoot } from './root-affinity.mjs';
 import { execFileSync } from 'node:child_process';
@@ -70,8 +70,14 @@ export function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoot = pr
     throw new ClaimError('not-found', `claimWork: work "${id}" not found.`);
   }
 
-  // Acquire main-checkout-lock before any state mutation
-  const lockResult = acquireMainCheckoutLock(dir, { identity: process.pid });
+  // Acquire main-checkout-lock before any state mutation. ttlMs is required
+  // here (tsk-3w8 follow-up): the pre-commit hook (.githooks/pre-commit,
+  // now wired via fgos setup/doctor) writes a STRING-identity record per
+  // commit and never releases it -- relying entirely on ttlMs-based
+  // staleness. Omitting ttlMs here (the original tsk-53f wiring did) makes
+  // that record read as AMBIGUOUS forever once the hook is active,
+  // permanently deadlocking every take/pick after the very first commit.
+  const lockResult = acquireMainCheckoutLock(dir, { identity: process.pid, ttlMs: DEFAULT_TTL_MS });
   if (lockResult.status === HELD) {
     throw new ClaimError('lock-held', `claimWork: main checkout locked by pid ${lockResult.holderPid}`);
   }
