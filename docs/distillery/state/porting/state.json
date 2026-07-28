@@ -1,0 +1,316 @@
+{
+  "porting": {
+    "policy-vs-ops-split": {
+      "id": "policy-vs-ops-split",
+      "status": "adapted"
+    },
+    "trigger-only-descriptions": {
+      "id": "trigger-only-descriptions",
+      "status": "adapted"
+    },
+    "skill-conventions": {
+      "id": "skill-conventions",
+      "status": "adapted"
+    },
+    "error-why-fix-refusals": {
+      "id": "error-why-fix-refusals",
+      "status": "adapted"
+    },
+    "managed-block-markers": {
+      "id": "managed-block-markers",
+      "status": "adapted"
+    },
+    "maturity-ladder": {
+      "id": "maturity-ladder",
+      "status": "candidate"
+    },
+    "request-authority-model": {
+      "id": "request-authority-model",
+      "status": "candidate"
+    },
+    "fail-open-crash-wrappers": {
+      "id": "fail-open-crash-wrappers",
+      "status": "candidate"
+    },
+    "six-questions-acceptance": {
+      "id": "six-questions-acceptance",
+      "status": "candidate"
+    },
+    "state-vs-log-two-physics": {
+      "id": "state-vs-log-two-physics",
+      "status": "candidate"
+    },
+    "context-rules-matrix": {
+      "id": "context-rules-matrix",
+      "status": "candidate"
+    },
+    "verify-enforced-close": {
+      "id": "verify-enforced-close",
+      "status": "candidate"
+    },
+    "orchestration-protocol-v1": {
+      "id": "orchestration-protocol-v1",
+      "status": "candidate"
+    },
+    "tdd-for-skills-iron-law": {
+      "id": "tdd-for-skills-iron-law",
+      "status": "candidate"
+    },
+    "tool-registry-capability": {
+      "id": "tool-registry-capability",
+      "status": "candidate"
+    },
+    "changeset-event-sourcing": {
+      "id": "changeset-event-sourcing",
+      "status": "planned"
+    },
+    "silent-bookkeeping": {
+      "id": "silent-bookkeeping",
+      "status": "candidate"
+    },
+    "hook-catalog-projection": {
+      "id": "hook-catalog-projection",
+      "status": "candidate"
+    },
+    "proof-before-tag-promotion": {
+      "id": "proof-before-tag-promotion",
+      "status": "candidate"
+    },
+    "repo-separation-playbook": {
+      "id": "repo-separation-playbook",
+      "status": "candidate"
+    },
+    "next-work-derived-from-state": {
+      "id": "next-work-derived-from-state",
+      "status": "candidate"
+    },
+    "cas-expected-status-transitions": {
+      "id": "cas-expected-status-transitions",
+      "status": "candidate"
+    },
+    "routing-model-per-interface": {
+      "id": "routing-model-per-interface",
+      "status": "candidate"
+    },
+    "typed-memory-consolidation": {
+      "id": "typed-memory-consolidation",
+      "status": "candidate"
+    },
+    "durability-tier-ladder": {
+      "id": "durability-tier-ladder",
+      "status": "candidate"
+    },
+    "anti-loop-recovery-matrix": {
+      "id": "anti-loop-recovery-matrix",
+      "status": "candidate"
+    },
+    "cognitive-tier-model-decoupling": {
+      "id": "cognitive-tier-model-decoupling",
+      "status": "candidate"
+    },
+    "intent-scoring-agent-dispatch": {
+      "id": "intent-scoring-agent-dispatch",
+      "status": "candidate"
+    },
+    "signal-driven-chaining": {
+      "id": "signal-driven-chaining",
+      "status": "candidate"
+    },
+    "run-artifact-durability-split": {
+      "id": "run-artifact-durability-split",
+      "status": "candidate"
+    },
+    "standalone-product-boundary": {
+      "id": "standalone-product-boundary",
+      "status": "candidate"
+    },
+    "agent-agnostic-adapter-projection": {
+      "id": "agent-agnostic-adapter-projection",
+      "status": "candidate"
+    },
+    "four-memory-types": {
+      "id": "four-memory-types",
+      "status": "candidate"
+    },
+    "crossfamily-llm-judge": {
+      "id": "crossfamily-llm-judge",
+      "status": "candidate"
+    },
+    "default-fail-review-protocol": {
+      "id": "default-fail-review-protocol",
+      "status": "candidate"
+    },
+    "porting-outcome-lifecycle": {
+      "id": "porting-outcome-lifecycle",
+      "status": "candidate"
+    },
+    "distillery-entropy-trend": {
+      "id": "distillery-entropy-trend",
+      "status": "candidate"
+    },
+    "seal-digest-zero-effort": {
+      "id": "seal-digest-zero-effort",
+      "status": "candidate"
+    },
+    "doctrine-placement-rule": {
+      "id": "doctrine-placement-rule",
+      "status": "candidate"
+    },
+    "gate-beads-event-driven": {
+      "id": "gate-beads-event-driven",
+      "status": "candidate"
+    },
+    "discovered-from-lineage": {
+      "id": "discovered-from-lineage",
+      "status": "candidate"
+    },
+    "llm-tier-compaction": {
+      "id": "llm-tier-compaction",
+      "status": "candidate"
+    },
+    "hash-id-adaptive-length": {
+      "id": "hash-id-adaptive-length",
+      "status": "candidate"
+    },
+    "same-checkout-multi-session-coordination": {
+      "id": "same-checkout-multi-session-coordination",
+      "status": "candidate"
+    },
+    "chain-integrity-tail-guard": {
+      "id": "chain-integrity-tail-guard",
+      "status": "candidate"
+    },
+    "explainable-work-ranking": {
+      "id": "explainable-work-ranking",
+      "status": "candidate"
+    },
+    "impact-first-fanout-selection": {
+      "id": "impact-first-fanout-selection",
+      "status": "candidate"
+    },
+    "agent-output-envelope-contract": {
+      "id": "agent-output-envelope-contract",
+      "status": "candidate"
+    },
+    "agent-mail-coordination": {
+      "id": "agent-mail-coordination",
+      "status": "candidate"
+    },
+    "reference-oracle-conformance": {
+      "id": "reference-oracle-conformance",
+      "status": "candidate"
+    },
+    "work-graph-drift-gate": {
+      "id": "work-graph-drift-gate",
+      "status": "candidate"
+    },
+    "predicted-actual-feedback-store": {
+      "id": "predicted-actual-feedback-store",
+      "status": "candidate"
+    },
+    "destructive-action-guardrail-as-test": {
+      "id": "destructive-action-guardrail-as-test",
+      "status": "candidate"
+    },
+    "bvr-viewer-frontend-stack": {
+      "id": "bvr-viewer-frontend-stack",
+      "status": "rejected"
+    },
+    "sync-safety-blast-radius": {
+      "id": "sync-safety-blast-radius",
+      "status": "candidate"
+    },
+    "rollout-ladder-design-before-code": {
+      "id": "rollout-ladder-design-before-code",
+      "status": "candidate"
+    },
+    "agent-surface-golden-snapshots": {
+      "id": "agent-surface-golden-snapshots",
+      "status": "candidate"
+    },
+    "coordination-evidence-classifier": {
+      "id": "coordination-evidence-classifier",
+      "status": "candidate"
+    },
+    "workspace-health-contract": {
+      "id": "workspace-health-contract",
+      "status": "candidate"
+    },
+    "isomorphism-refactor-ledger": {
+      "id": "isomorphism-refactor-ledger",
+      "status": "candidate"
+    },
+    "reliability-gate-suite": {
+      "id": "reliability-gate-suite",
+      "status": "candidate"
+    },
+    "default-off-one-time-skill": {
+      "id": "default-off-one-time-skill",
+      "status": "candidate"
+    },
+    "agent-context-inherited-governance": {
+      "id": "agent-context-inherited-governance",
+      "status": "candidate"
+    },
+    "two-layer-edge-taxonomy": {
+      "id": "two-layer-edge-taxonomy",
+      "status": "candidate"
+    },
+    "schema-per-artifact-boundary": {
+      "id": "schema-per-artifact-boundary",
+      "status": "candidate"
+    },
+    "doctor-invariant-in-verify": {
+      "id": "doctor-invariant-in-verify",
+      "status": "candidate"
+    },
+    "add-through-not-alongside": {
+      "id": "add-through-not-alongside",
+      "status": "candidate"
+    },
+    "fsm-single-status-writer": {
+      "id": "fsm-single-status-writer",
+      "status": "candidate"
+    },
+    "multi-target-converter-engine": {
+      "id": "multi-target-converter-engine",
+      "status": "candidate"
+    },
+    "learning-refresh-gardening": {
+      "id": "learning-refresh-gardening",
+      "status": "candidate"
+    },
+    "grounding-validation-claims": {
+      "id": "grounding-validation-claims",
+      "status": "candidate"
+    },
+    "mode-dispatch-triad": {
+      "id": "mode-dispatch-triad",
+      "status": "candidate"
+    },
+    "signal-scaled-review-roster": {
+      "id": "signal-scaled-review-roster",
+      "status": "candidate"
+    },
+    "install-manifest-ownership": {
+      "id": "install-manifest-ownership",
+      "status": "candidate"
+    },
+    "metric-driven-optimize-loop": {
+      "id": "metric-driven-optimize-loop",
+      "status": "candidate"
+    },
+    "concept-teaching-explainer": {
+      "id": "concept-teaching-explainer",
+      "status": "candidate"
+    },
+    "cross-model-peer-review": {
+      "id": "cross-model-peer-review",
+      "status": "candidate"
+    },
+    "feedback-source-sweep": {
+      "id": "feedback-source-sweep",
+      "status": "candidate"
+    }
+  }
+}

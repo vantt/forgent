@@ -19,7 +19,7 @@ coverage: partial
 - fgos-plugin — bề mặt slash-command `/fgOS:<verb>` cho Claude Code, 12 verb wrapper one-door-write bọc quanh CLI `fgos`; spec: fgos-plugin.md
 - distribution — cài `fgos` từ ngoài source repo (npm install qua GitHub); spec: distribution.md
 - decision-citation-drift — quét backlog/spec tìm dòng còn trích một quyết định đã bị supersede mà không nhắc quyết định thay thế (chỉ phát hiện, không tự sửa); spec: decision-citation-drift.md
-- distillery — vùng học từ reference sources: index feature từng nguồn, so sánh chéo, porting log; spec: chưa có (harvest sẽ viết)
+- distillery — vùng học từ reference sources: index feature từng nguồn, so sánh chéo, porting log; spec: distillery.md (partial — chỉ phủ porting lifecycle, xem Open Gaps trong spec đó)
 - distill-skill — skill portable vận hành vòng học (init/add/delta/seal/check); spec: chưa có (harvest sẽ viết)
 
 ## Shared Entities
@@ -58,7 +58,7 @@ coverage: partial
 
 ## Open Gaps
 
-- distillery: chưa có area spec — harvest từ `docs/reference-learning-system.md` + hành vi distill skill thực chạy.
+- distillery: spec chỉ phủ porting lifecycle (docs/specs/distillery.md) — các khả năng khác (tìm nguồn mới, so sánh chéo, xếp hạng candidate) chưa có spec.
 - distill-skill: chưa có area spec — harvest từ SKILL.md + lệnh thực chạy (`init/add/delta/seal/check`).
 - Shared entities ngoài 2 dòng đã liệt kê: cần harvest interview.
 - Cross-area flow học→port→luật: các bước và actor quan sát gì ở mỗi bước — cần harvest.
