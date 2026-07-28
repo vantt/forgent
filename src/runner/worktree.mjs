@@ -200,6 +200,16 @@ export function createBranchRef(repoRoot, id, opts = {}) {
  * the new branch from that ref instead of the implicit current HEAD; it is
  * ignored on the reuse path (an existing branch is reused exactly as
  * before, regardless of `opts.baseRef`). Returns `{ path, branch, reused }`.
+ *
+ * `.fgos/` (ADR0019): since `.fgos/` is git-tracked in this repo, a bare
+ * `git worktree add` would check out a snapshot frozen at fork time —
+ * stale the moment main gets another uncommitted event, and a live escape
+ * hatch into the shared store if it were symlinked instead (rejected,
+ * ADR0019). The worker running in this worktree has no legitimate reason to
+ * read or write `.fgos/` at all (`0005`: the runner is the sole writer,
+ * always against `repoRoot`), so any checked-out copy is removed outright —
+ * not shared, not synced. `mergeRunnerItem` (merge.mjs) is the trusted-side
+ * backstop if a worker commits a fresh `.fgos/` of its own anyway.
  */
 export function createWorktree(repoRoot, id, opts = {}) {
   const branch = branchNameFor(id);
@@ -225,6 +235,15 @@ export function createWorktree(repoRoot, id, opts = {}) {
       // failure below is what the caller needs to see.
     }
     throw new WorktreeError(`git worktree add failed for branch "${branch}": ${err.message}`, {
+      branch,
+      worktreePath,
+    });
+  }
+
+  try {
+    fs.rmSync(path.join(worktreePath, '.fgos'), { recursive: true, force: true });
+  } catch (err) {
+    throw new WorktreeError(`removing checked-out .fgos in worktree "${worktreePath}" failed: ${err.message}`, {
       branch,
       worktreePath,
     });

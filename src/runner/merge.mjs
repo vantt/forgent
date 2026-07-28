@@ -285,10 +285,22 @@ export function changedFiles(repoRoot, item, opts = {}) {
  * generalizes to whichever branch the caller has checked out: `main` for a
  * root->main merge, or `fgw/<root>` for a leaf->parent merge. Every path is
  * either "outcome: merged" (verify passed on the staged tree, merge
- * committed) or a defined non-throwing outcome — "conflict" or
- * "verify-fail" — with the merge already cleanly aborted, the checkout
- * untouched. Only a failure to even run `git merge --abort` itself throws
- * (a real bug).
+ * committed) or a defined non-throwing outcome — "conflict", "verify-fail",
+ * or "fgos-write-rejected" — with the merge already cleanly aborted, the
+ * checkout untouched. Only a failure to even run `git merge --abort` itself
+ * throws (a real bug).
+ *
+ * FGOS-WRITE-REJECTED (ADR0019): a worker's `fgw/<id>` branch must never
+ * carry a change under `.fgos/` — the store's single write door stays the
+ * `fgos` CLI verbs run against `repoRoot`, never a worker's own commit
+ * (`0005`). `worktree.mjs`'s `createWorktree` no longer checks out `.fgos/`
+ * into a worker's worktree at all (same ADR), so this should never trigger
+ * in practice — this check is the mechanical, trusted-side wall for the
+ * residual case (a worker `mkdir`s a fresh `.fgos/` itself and commits it)
+ * that a missing checkout alone can't prevent. Checked on the STAGED diff
+ * after `--no-commit --no-ff` lands cleanly — the exact paths *this* merge
+ * introduces relative to current HEAD, correct for both a root->main merge
+ * and a leaf->parent merge without needing to know either branch's trunk.
  */
 export async function mergeRunnerItem(repoRoot, item, { timeoutMs } = {}) {
   const branch = branchNameFor(item.id);
@@ -302,6 +314,22 @@ export async function mergeRunnerItem(repoRoot, item, { timeoutMs } = {}) {
       throw new MergeError(`merge of "${branch}" conflicted and "git merge --abort" itself failed: ${abortErr.message}`, { branch });
     }
     return { outcome: 'conflict', branch };
+  }
+
+  const stagedPaths = git(repoRoot, ['diff', '--name-only', '--cached'])
+    .split('\n')
+    .filter((p) => p !== '');
+  const fgosPaths = stagedPaths.filter((p) => p === '.fgos' || p.startsWith('.fgos/'));
+  if (fgosPaths.length > 0) {
+    try {
+      git(repoRoot, ['merge', '--abort']);
+    } catch (abortErr) {
+      throw new MergeError(
+        `merge of "${branch}" staged a change under ".fgos/" and "git merge --abort" itself failed: ${abortErr.message}`,
+        { branch, fgosPaths },
+      );
+    }
+    return { outcome: 'fgos-write-rejected', branch, paths: fgosPaths };
   }
 
   const check = await runGoalCheck(item, repoRoot, timeoutMs);

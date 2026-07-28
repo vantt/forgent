@@ -288,6 +288,39 @@ test('createWorktree with opts.baseRef forks a new branch from that ref\'s tip, 
   );
 });
 
+// --- .fgos/ exclusion (ADR0019, tsk-1an) -----------------------------------
+//
+// This repo's own convention is `.fgos/` git-tracked (D10/`0003`). A bare
+// `git worktree add` would therefore check a frozen snapshot of it into
+// every fresh worker worktree — stale the instant main gets another
+// uncommitted event, and (if ever symlinked instead, per the rejected
+// khóa-trong-cây option) a live write path into the shared store from an
+// execution context with no real capability wall. ADR0019 settles on
+// neither: `createWorktree` removes any checked-out `.fgos/` outright, so a
+// worker's checkout has none at all — nothing stale to misread, nothing
+// live to write into by accident.
+
+test('createWorktree removes a git-tracked .fgos/ from the fresh worktree entirely — no stale copy, no symlink (ADR0019)', () => {
+  const repoRoot = initTempRepo();
+  fs.mkdirSync(path.join(repoRoot, '.fgos'));
+  fs.writeFileSync(path.join(repoRoot, '.fgos', 'events.jsonl'), '{"seq":1}\n');
+  execFileSync('git', ['add', '.fgos/events.jsonl'], { cwd: repoRoot });
+  execFileSync('git', ['commit', '-q', '-m', 'seed .fgos/events.jsonl'], { cwd: repoRoot });
+
+  const worktreeDir = mkWorktreeDir();
+  const wt = createWorktree(repoRoot, 'item-h', { worktreeDir });
+
+  assert.equal(fs.existsSync(path.join(wt.path, '.fgos')), false);
+  assert.ok(fs.existsSync(path.join(wt.path, 'seed.txt')), 'unrelated tracked content must still be checked out normally');
+});
+
+test('createWorktree stays a no-op on .fgos/ removal when the repo never tracked .fgos/ at all', () => {
+  const repoRoot = initTempRepo();
+  const worktreeDir = mkWorktreeDir();
+  const wt = createWorktree(repoRoot, 'item-i', { worktreeDir });
+  assert.equal(fs.existsSync(path.join(wt.path, '.fgos')), false);
+});
+
 test('createWorktree with opts.baseRef on an existing (reused) branch ignores baseRef and reuses as before', () => {
   const repoRoot = initTempRepo();
   const worktreeDir = mkWorktreeDir();

@@ -311,6 +311,45 @@ test('mergeRunnerItem aborts cleanly when the staged merge fails its own verify 
   assert.equal(fs.existsSync(path.join(repoRoot, 'produced.txt')), false, 'a staged-then-aborted merge must not leave its file behind');
 });
 
+// --- mergeRunnerItem rejects a .fgos/ write on the branch (ADR0019) -------
+//
+// worktree.mjs's createWorktree no longer checks .fgos/ out into a worker's
+// worktree at all, so this should never trigger from an ordinary dispatch —
+// it is the trusted-side backstop for the residual case: a worker `mkdir`s
+// a fresh `.fgos/` itself and commits it despite having no checked-out copy
+// to begin with. `git add`/`git commit` do not care whether a path was
+// pre-existing; approve must still refuse it.
+
+test('mergeRunnerItem refuses a branch that stages a change under .fgos/ — main left byte-for-byte unchanged, outcome "fgos-write-rejected"', async () => {
+  const repoRoot = initRepo();
+  git(repoRoot, ['checkout', '-b', 'fgw/demo-item']);
+  fs.mkdirSync(path.join(repoRoot, '.fgos'));
+  fs.writeFileSync(path.join(repoRoot, '.fgos', 'events.jsonl'), '{"seq":1}\n');
+  git(repoRoot, ['add', '.fgos/events.jsonl']);
+  git(repoRoot, ['commit', '-q', '-m', 'worker wrote .fgos/events.jsonl']);
+  git(repoRoot, ['checkout', 'main']);
+
+  const headBefore = headOf(repoRoot);
+  const result = await mergeRunnerItem(repoRoot, makeItem());
+  assert.equal(result.outcome, 'fgos-write-rejected');
+  assert.deepEqual(result.paths, ['.fgos/events.jsonl']);
+  assert.equal(headOf(repoRoot), headBefore, 'HEAD must be unchanged after an aborted merge');
+  assert.equal(isWorkingTreeClean(repoRoot), true, 'tree must be clean after merge --abort');
+});
+
+test('mergeRunnerItem merges normally when the branch touches ordinary files alongside an untouched .fgos/', async () => {
+  const repoRoot = initRepo();
+  fs.mkdirSync(path.join(repoRoot, '.fgos'));
+  fs.writeFileSync(path.join(repoRoot, '.fgos', 'events.jsonl'), '{"seq":1}\n');
+  git(repoRoot, ['add', '.fgos/events.jsonl']);
+  git(repoRoot, ['commit', '-q', '-m', 'seed .fgos/events.jsonl on main']);
+
+  makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
+  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'test -f produced.txt' }));
+  assert.equal(result.outcome, 'merged');
+  assert.ok(fs.existsSync(path.join(repoRoot, 'produced.txt')));
+});
+
 // --- cleanupMergedBranch -------------------------------------------------
 
 test('cleanupMergedBranch deletes the now-fully-merged branch and never throws', async () => {

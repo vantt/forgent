@@ -1696,6 +1696,19 @@ async function runVerb(verb, flags, positional, dir) {
               return { id, mode: 'merge', to: 'blocked', reason: 'merge-conflict', target: rootBranch };
             }
 
+            if (result.outcome === 'fgos-write-rejected') {
+              moveWork(dir, { id, to: 'blocked', expectedStatus: 'proposed', reason: 'fgos-write-rejected' });
+              addFriction(dir, {
+                id,
+                disposition: 'blocked',
+                errorClass: 'fgos-write-blocked',
+                layer: 'state',
+                attempts: 1,
+                detail: `${result.branch} staged a change under .fgos/ (${result.paths.join(', ')}); merge aborted, ${rootBranch} unchanged — ADR0019`,
+              });
+              return { id, mode: 'merge', to: 'blocked', reason: 'fgos-write-rejected', target: rootBranch, paths: result.paths };
+            }
+
             if (result.outcome === 'verify-fail') {
               moveWork(dir, { id, to: 'blocked', expectedStatus: 'proposed', reason: 'verify-fail-post-merge' });
               addFriction(dir, {
@@ -1768,6 +1781,19 @@ async function runVerb(verb, flags, positional, dir) {
             detail,
           });
           return { id, mode: 'merge', to: 'blocked', reason, target: 'main' };
+        }
+
+        if (result.outcome === 'fgos-write-rejected') {
+          moveWork(dir, { id, to: 'blocked', expectedStatus: 'proposed', reason: 'fgos-write-rejected' });
+          addFriction(dir, {
+            id,
+            disposition: 'blocked',
+            errorClass: 'fgos-write-blocked',
+            layer: 'state',
+            attempts: 1,
+            detail: `${result.branch} staged a change under .fgos/ (${result.paths.join(', ')}); merge aborted, main unchanged — ADR0019`,
+          });
+          return { id, mode: 'merge', to: 'blocked', reason: 'fgos-write-rejected', target: 'main', paths: result.paths };
         }
 
         if (result.outcome === 'verify-fail') {
