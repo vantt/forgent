@@ -318,3 +318,6 @@
 {"seq":302,"ts":"2026-07-28T10:48:01.000Z","type":"work.stage","payload":{"id":"tsk-1nu","from":"decompose","to":"executing","actor":"human"}}
 {"seq":303,"ts":"2026-07-28T10:48:02.000Z","type":"work.stage","payload":{"id":"tsk-1nu","from":"executing","to":"compound-learn","actor":"human"}}
 {"seq":304,"ts":"2026-07-28T10:47:52.353Z","type":"work.move","payload":{"id":"tsk-1nu","from":"proposed","to":"done","actor":"human","learning":{"outcome":null,"frictions":{},"settlements":{"clarify-pass/human":1,"close/human":1}}},"v":2}
+{"seq":305,"ts":"2026-07-28T10:47:59.333Z","type":"work.move","payload":{"id":"tsk-2r4","from":"todo","to":"doing","actor":"session","branchHeadAtTake":"16570ccd75657d0a2d29693a10475fb518f16c97"},"v":2}
+{"seq":306,"ts":"2026-07-28T10:47:59.337Z","type":"work.outcome","payload":{"id":"tsk-2r4","predicted":{"tier":"standard","deps":1,"priorVisits":0,"actor":"session","branchHeadAtTake":"16570ccd75657d0a2d29693a10475fb518f16c97"}},"v":2}
+{"seq":307,"ts":"2026-07-28T10:54:21.694Z","type":"work.edit","payload":{"id":"tsk-2r4","patch":{"verify":"grep -q 'claimWork.*skipOutcome.*true' src/runner/loop.mjs && echo 'PASS: runner uses claimWork with skipOutcome:true'"},"actor":"human"},"v":2}
