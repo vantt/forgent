@@ -1,0 +1,94 @@
+# Canonical path resolver — CONTEXT
+
+## Feature boundary
+
+`tsk-63j`. Today, every place that needs the root path of fgOS storage
+(`.fgos/`), its logs (`.fgos/logs/`), its database-of-record (`state.json`
++ `events.jsonl`, both under `.fgos/`), or a skill's own on-disk location
+resolves that path independently — `process.cwd()`-based lookups scattered
+across `bin/fgos.mjs`, `src/runner/session.mjs`, `src/runner/loop.mjs`, and
+a separate env-var convention (`FGOS_NESTED_PREFIX`, from `tsk-3fb`) baked
+into 20 `plugins/fgOS/skills/*/SKILL.md` templates for skill paths.
+
+This item locks the decisions for replacing all of that with one canonical
+resolver function: parses the environment variables it needs, precomputes
+every path it is responsible for (including shell profile paths on
+bash/zsh/Windows), and is called at the start of both a fgOS CLI process
+and a Claude Code session (via a SessionStart hook), so every consumer
+reads precomputed paths instead of re-deriving them.
+
+## Locked decisions
+
+| D-ID | Decision |
+|------|----------|
+| D1 | One resolver function, called from two entry points: (a) fgOS CLI process start (`bin/fgos.mjs`, `bin/fgos-runner.mjs`), and (b) a Claude Code SessionStart hook that injects the precomputed paths as session context/env — matching the SessionStart-hook pattern this repo already uses for other startup context. |
+| D2 | Scope is everything named in the title, in full: the `.fgos` storage root (today scattered via `process.cwd()` in `bin/fgos.mjs:61`, `src/runner/session.mjs:84`, `src/runner/loop.mjs:281`/`941`), the logs directory (`.fgos/logs/`, written by `src/runner/worker-log.mjs`), the database-of-record (`state.json` + `events.jsonl`, both already living under the `.fgos` root — "database" is this event-sourced state, not a separate DB engine; none exists in this repo), and skill-path resolution (the `plugins/fgOS/skills/*/SKILL.md` path templates). |
+| D3 | Shell profile-path detection is in scope for bash, zsh, **and Windows** now. Today `src/setup/shell-rc.mjs` only detects `.bashrc`/`.zshrc` (`RC_FILE_NAMES`) — there is no Windows equivalent (e.g. PowerShell `$PROFILE`) anywhere in this repo. This item adds it, not just documents it as future intent. |
+| D4 | The new resolver subsumes `tsk-3fb`'s `FGOS_NESTED_PREFIX` env var — it becomes the single place that variable is read and applied, folding the skill-path mechanism `tsk-3fb` shipped into this resolver rather than leaving it as a second, separate path mechanism. |
+
+## Pinned terms
+
+- **Canonical resolver** — the single function this item locks the shape
+  of; not a class, not a config file, one function other code calls.
+- **"Session"** (per D1) — ambiguous on its face; locked to mean *both*
+  a fgOS CLI process invocation and a Claude Code agent session, not
+  either one alone.
+- **"Database"** (per D2) — this repo's event-sourced work-item state
+  (`state.json` derived view + `events.jsonl` append-only log), not a
+  SQL/NoSQL engine. Confirmed by scout: no `sqlite`/`.db`/`better-sqlite`
+  hit anywhere in `src`, `bin`, or `package.json`.
+
+## Scout evidence
+
+- `bin/fgos.mjs:61` — `path.join(process.cwd(), '.fgos')`, the primary
+  `.fgos` root getter, cwd-based.
+- `src/runner/session.mjs:84` — `path.join(path.resolve(repoRoot), '.fgos')`,
+  a second independent `.fgos` root getter.
+- `src/runner/loop.mjs:281` (`resolveRepoRoot(cwd = process.cwd())`) and
+  `:941` (`path.join(repoRoot, '.fgos')`) — a third.
+- `src/runner/worker-log.mjs:72,100` — `path.join(dir, 'logs')`, logs
+  directory derived from a caller-supplied `.fgos` dir; folds naturally
+  under the root resolver once that root is unified.
+- `scripts/herdr-cockpit.sh:41` — `'${REPO_ROOT}/.fgos/logs/'*.log`,
+  confirms logs live under the `.fgos` root in practice today.
+- `src/setup/shell-rc.mjs:13` — `RC_FILE_NAMES = ['.bashrc', '.zshrc']`,
+  no Windows entry; confirms D3's "not previously supported" claim.
+- `docs/history/fgos-repo-prefix-path-fix/CONTEXT.md` (`tsk-3fb`) — prior
+  item that introduced `FGOS_NESTED_PREFIX` for skill-path resolution
+  across workshop/standalone layouts; scoped to 20
+  `plugins/fgOS/skills/*/SKILL.md` files plus 2 specs. D4 folds this
+  mechanism into the new resolver rather than leaving it standalone.
+- `grep -rln -iE "sqlite|\.db['\"]|better-sqlite" src bin package.json` —
+  no hits, confirming D2/pinned-terms' "no separate DB engine" claim.
+
+## Canonical references
+
+- `bin/fgos.mjs`, `bin/fgos-runner.mjs` — CLI entry points needing the
+  resolver at process start (D1).
+- `src/runner/session.mjs`, `src/runner/loop.mjs`, `src/runner/worker-log.mjs`
+  — current independent path getters this resolver replaces (D2).
+- `src/setup/shell-rc.mjs` — current bash/zsh-only profile detection,
+  extended for Windows under D3.
+- `plugins/fgOS/skills/*/SKILL.md` (20 files) and
+  `docs/history/fgos-repo-prefix-path-fix/CONTEXT.md` — `tsk-3fb`'s
+  `FGOS_NESTED_PREFIX` mechanism, subsumed per D4.
+
+## Outstanding questions deferred to planning
+
+- Exact resolver module location and export shape (new file under
+  `src/state/` or `src/runner/`? single function vs. a small object of
+  path getters?) — implementation choice, not a product decision.
+- Exact env var names the resolver parses beyond `FGOS_NESTED_PREFIX`
+  (the description says "parses the environment variables it needs" but
+  names none new) — planning should confirm no new env var is actually
+  required beyond what D2's scope already implies, or name the ones that
+  are.
+- SessionStart hook wiring mechanics (hook script path, how injected
+  context reaches consuming skills/commands) — implementation choice.
+- Windows PowerShell `$PROFILE` detection mechanics (single default path
+  vs. querying the actual `$PROFILE` variable) — implementation choice,
+  deferred to planning/implementation.
+- Migration path for the 20 `plugins/fgOS/skills/*/SKILL.md` templates
+  once `FGOS_NESTED_PREFIX` is subsumed (D4) — whether those templates
+  change at all, or only the resolver's internal reading of the env var
+  changes — implementation choice for planning to size.
