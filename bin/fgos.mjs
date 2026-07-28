@@ -27,6 +27,7 @@ import { computeEntropy, computeCounts } from '../src/report/entropy.mjs';
 import { buildEnduserIndex, QUADRANTS, QUADRANT_DIR_ALIASES, findSourceCaptureIds } from '../src/report/enduser-index.mjs';
 import { rankCandidates } from '../src/evolve/candidates.mjs';
 import { rankImpact } from '../src/state/impact.mjs';
+import { paginate } from '../src/state/cursor.mjs';
 import { runGoalCheck } from '../src/runner/goal-check.mjs';
 import { frozenJudgeHits } from '../src/runner/frozen-judge.mjs';
 import { classifySource, reviewDiff, mergeRunnerItem, cleanupMergedBranch, changedFiles, isWorkingTreeClean as isMainTreeClean, isFgosOnlyStatusLine, detectTrunk, isMainWorktree } from '../src/runner/merge.mjs';
@@ -221,6 +222,33 @@ function parseAcceptanceFlag(value, message) {
   } catch (err) {
     throw new StoreError('validation', `${message} (invalid JSON: ${err.message})`);
   }
+}
+
+// Pagination opt-in (str46-io-contract D5/D35): `ready`/`triage`/`evolve`
+// (bare)/`list` each accept --cursor/--limit. Reads both flags and validates
+// --limit shape; the caller decides whether to actually paginate (see
+// paginateVerbResult below) — this only parses.
+function readPaginationFlags(flags, verbLabel) {
+  const cursor = optionalField(flags.cursor, `${verbLabel} --cursor requires a non-empty cursor value`);
+  const rawLimit = optionalField(flags.limit, `${verbLabel} --limit requires a positive integer value`);
+  if (rawLimit === undefined) return { cursor, limit: undefined };
+  const limit = Number(rawLimit);
+  if (!Number.isInteger(limit) || limit <= 0) {
+    throw new StoreError('validation', `${verbLabel} --limit requires a positive integer value`);
+  }
+  return { cursor, limit };
+}
+
+// Wraps `items` (an array of {id, ...} objects already in the verb's own
+// order) through cursor.mjs's paginate() ONLY when the caller actually passed
+// --cursor or --limit — omitting both returns `items` completely unchanged
+// (per D35: the four paginated verbs' default output stays byte-identical to
+// before this cell). `order` is this verb's own literal order tag (e.g.
+// 'ready-v1'), named once at the call site.
+function paginateVerbResult(items, flags, order, verbLabel) {
+  const { cursor, limit } = readPaginationFlags(flags, verbLabel);
+  if (cursor === undefined && limit === undefined) return items;
+  return paginate(items, { cursor, limit, order });
 }
 
 // One structured entry per item, always naming both halves explicitly
@@ -975,7 +1003,20 @@ async function runVerb(verb, flags, positional, dir) {
         const ctx = computeAwaitingContext(view, item.id);
         if (ctx) awaitingContext[item.id] = ctx;
       }
-      return Object.keys(awaitingContext).length > 0 ? { ...view, awaitingContext } : view;
+      const base = Object.keys(awaitingContext).length > 0 ? { ...view, awaitingContext } : view;
+      // Pagination (D5/D35): only `work` (the biggest payload, per plan.md's
+      // Discovery) ever changes shape, and only when --cursor/--limit was
+      // actually passed — every other view key (decisions/gates/settlements/
+      // etc.) is untouched. `view.work` is a map keyed by id, so it is
+      // wrapped into `{id, item}` pairs before going through the same
+      // generic `paginate()` every array-returning verb uses, then unwrapped
+      // back into a plain id->item map for the page itself.
+      const { cursor, limit } = readPaginationFlags(flags, 'list');
+      if (cursor === undefined && limit === undefined) return base;
+      const entries = Object.entries(view.work).map(([id, item]) => ({ id, item }));
+      const { items: pagedEntries, nextCursor } = paginate(entries, { cursor, limit, order: 'list-work-v1' });
+      const workPage = Object.fromEntries(pagedEntries.map(({ id, item }) => [id, item]));
+      return { ...base, work: { items: workPage, nextCursor } };
     }
 
     // Request-class per D1: a pure read — never appends an event, never
@@ -983,7 +1024,7 @@ async function runVerb(verb, flags, positional, dir) {
     // through store.readyWork only; this file never imports frontier.mjs
     // directly (per this cell's key_links).
     case 'ready': {
-      return readyWork(dir);
+      return paginateVerbResult(readyWork(dir), flags, 'ready-v1', 'ready');
     }
 
     // Request-class per D1 (same contract as `ready`/`list`): a pure read —
@@ -2051,7 +2092,7 @@ async function runVerb(verb, flags, positional, dir) {
         return submitWork(dir, describeCandidate(picked));
       }
       if (pickId === undefined) {
-        return candidates;
+        return paginateVerbResult(candidates, flags, 'evolve-v1', 'evolve');
       }
       const picked = candidates.find((c) => c.id === pickId);
       if (!picked) {
@@ -2070,7 +2111,7 @@ async function runVerb(verb, flags, positional, dir) {
     // risk/lane classification: this ranks open work by blocking fan-out
     // (how many other open items it unblocks), not by how risky it is.
     case 'triage': {
-      return rankImpact(listWork(dir));
+      return paginateVerbResult(rankImpact(listWork(dir)), flags, 'triage-v1', 'triage');
     }
 
     // Opt-in per-session git worktree lifecycle (fgos-multi-session-checkout
@@ -2213,7 +2254,7 @@ async function runVerb(verb, flags, positional, dir) {
 // `--help --json`.
 
 function publicManifestEntries() {
-  return COMMAND_REGISTRY.map(({ name, invoke, description, parameters, examples, touchesState, externalEffect, deprecated }) => ({
+  return COMMAND_REGISTRY.map(({ name, invoke, description, parameters, examples, touchesState, externalEffect, paginated, deprecated }) => ({
     name,
     invoke,
     description,
@@ -2221,6 +2262,7 @@ function publicManifestEntries() {
     examples,
     touchesState,
     externalEffect,
+    paginated,
     deprecated,
   }));
 }

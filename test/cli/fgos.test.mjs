@@ -1370,6 +1370,71 @@ test('GOLDEN request-class: running ready twice never appends to events.jsonl, a
   assert.equal(viewAfter, viewBefore, 'state.json must be untouched by ready (read never writes the view)');
 });
 
+// --- pagination (str46-io-contract D5/D35): `ready`/`triage`/`evolve`/`list`
+// opt in to --cursor/--limit; omitting both keeps every one of these verbs'
+// default output byte-identical to before this cell (asserted throughout
+// this file's existing `ready`/`triage`/`evolve`/`list` tests above, none of
+// which pass --cursor/--limit) — this section only exercises the opt-in
+// paginated shape through the real CLI binary.
+
+test('ready --limit paginates through the real CLI binary: envelope data carries items+nextCursor, and the cursor round-trips into the remaining items', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'page-a');
+  addOk(cwd, 'page-b');
+  addOk(cwd, 'page-c');
+
+  const first = run(cwd, ['ready', '--limit', '1']);
+  assert.equal(first.status, 0);
+  const firstData = envelopeData(first.stdout);
+  assert.deepEqual(Object.keys(firstData).sort(), ['items', 'nextCursor']);
+  assert.equal(firstData.items.length, 1);
+  assert.ok(typeof firstData.nextCursor === 'string' && firstData.nextCursor.length > 0);
+
+  const second = run(cwd, ['ready', '--limit', '1', '--cursor', firstData.nextCursor]);
+  assert.equal(second.status, 0);
+  const secondData = envelopeData(second.stdout);
+  assert.equal(secondData.items.length, 1);
+  assert.notEqual(secondData.items[0].id, firstData.items[0].id);
+
+  const third = run(cwd, ['ready', '--limit', '1', '--cursor', secondData.nextCursor]);
+  const thirdData = envelopeData(third.stdout);
+  assert.equal(thirdData.items.length, 1);
+  assert.equal(thirdData.nextCursor, null);
+
+  const allIds = [firstData.items[0].id, secondData.items[0].id, thirdData.items[0].id].sort();
+  assert.deepEqual(allIds, ['page-a', 'page-b', 'page-c']);
+});
+
+test('ready with no --cursor/--limit still returns the bare frontier array, not the paginated shape (byte-identical default)', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'unpaginated-item');
+  const result = run(cwd, ['ready']);
+  assert.equal(result.status, 0);
+  const data = envelopeData(result.stdout);
+  assert.ok(Array.isArray(data));
+});
+
+test('ready --cursor rejects a stale cursor (id no longer in the current frontier) as validation, exit 4, message states the restart remedy', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'only-item');
+  const staleCursor = Buffer.from(JSON.stringify({ order: 'ready-v1', lastId: 'never-existed' }), 'utf8').toString('base64');
+  const result = run(cwd, ['ready', '--cursor', staleCursor]);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /re-issue the call without --cursor/);
+});
+
+test('list --limit paginates only the work map: view.work becomes {items, nextCursor} while other view keys are untouched', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'list-page-a');
+  addOk(cwd, 'list-page-b');
+  const result = run(cwd, ['list', '--limit', '1']);
+  assert.equal(result.status, 0);
+  const data = envelopeData(result.stdout);
+  assert.deepEqual(Object.keys(data.work).sort(), ['items', 'nextCursor']);
+  assert.equal(Object.keys(data.work.items).length, 1);
+  assert.ok(Array.isArray(data.decisions));
+});
+
 // --- `fgos check` (phase-3-compound-learning-3): predicted-vs-actual report ---
 //
 // `check` is a pure read (per D1 request-class, same as `ready`/`list`) over

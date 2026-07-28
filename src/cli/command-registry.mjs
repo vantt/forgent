@@ -12,13 +12,24 @@
 // {type:"object", properties, required} shape bee's registry uses — the
 // manifest is zero-translation for any tool-schema-based agent.
 //
-// `access` is a NEW per-verb declaration (no prior source of truth): 'read'
-// for a verb that never appends an event or mutates `.fgos/state.json`,
-// 'mutation' for one that does. A verb with more than one sub-mode (review,
-// evolve, session) is classified by its most-privileged effect — e.g. `evolve`
-// with no flags is a pure read, but `evolve --submit` appends a work item, so
-// the whole verb is declared 'mutation'. This flag is a declaration only: P37
-// does not wire it into dispatch/authz (that is P38's job).
+// `touchesState`/`externalEffect` (str46-io-contract D4, superseding the
+// prior single `access` field) are two independent per-verb declarations: the
+// former is true for any verb that ever appends an event or overwrites
+// `.fgos/state.json`; the latter is true only for a verb with a real effect
+// OUTSIDE `.fgos/` (today: `review --github`/`approve --github`, which touch
+// a real GitHub PR). A verb with more than one sub-mode (review, evolve,
+// session) is classified by its most-privileged effect on each axis — e.g.
+// `evolve` with no flags is a pure read but `evolve --submit` appends a work
+// item, so the whole verb declares `touchesState: true`. Both flags are
+// declarations only: P37/this cell do not wire them into dispatch/authz
+// (that is P38's job).
+//
+// `paginated` (str46-io-contract D5/D35) declares whether the verb's result
+// accepts --cursor/--limit (opaque cursor, per cursor.mjs) — true only for
+// `ready`/`triage`/`evolve`/`list`, the four verbs whose result can grow
+// unboundedly with data. Every entry carries this field (even the 30 that
+// are `false`) so a transport can read pagination support machine-readably
+// instead of guessing per verb.
 
 export const MANIFEST_SCHEMA_VERSION = '2.0';
 
@@ -31,6 +42,7 @@ export const COMMAND_REGISTRY = [
     examples: ['fgos init'],
     touchesState: true,
     externalEffect: false,
+    paginated: false,
     deprecated: null,
   },
   {
@@ -63,6 +75,7 @@ export const COMMAND_REGISTRY = [
     examples: ['fgos add build-cli --title "Build CLI" --kind feature --risk medium --verify "npm test"'],
     touchesState: true,
     externalEffect: false,
+    paginated: false,
     deprecated: null,
   },
   {
@@ -89,6 +102,7 @@ export const COMMAND_REGISTRY = [
     examples: ['fgos submit "Fix the flaky retry test" --async'],
     touchesState: true,
     externalEffect: false,
+    paginated: false,
     deprecated: null,
   },
   {
@@ -107,6 +121,7 @@ export const COMMAND_REGISTRY = [
     examples: ['fgos discover build-cli'],
     touchesState: true,
     externalEffect: false,
+    paginated: false,
     deprecated: null,
   },
   {
@@ -127,6 +142,7 @@ export const COMMAND_REGISTRY = [
     examples: ['fgos move build-cli --to doing'],
     touchesState: true,
     externalEffect: false,
+    paginated: false,
     deprecated: null,
   },
   {
@@ -145,6 +161,7 @@ export const COMMAND_REGISTRY = [
     examples: ['fgos compound build-cli', 'fgos compound build-cli --doc-type how-to'],
     touchesState: true,
     externalEffect: false,
+    paginated: false,
     deprecated: null,
   },
   {
@@ -173,6 +190,7 @@ export const COMMAND_REGISTRY = [
     examples: ['fgos edit build-cli --verify "npm test -- --grep cli"'],
     touchesState: true,
     externalEffect: false,
+    paginated: false,
     deprecated: null,
   },
   {
@@ -192,6 +210,7 @@ export const COMMAND_REGISTRY = [
     examples: ['fgos ask build-cli --text "Which module owns this?"'],
     touchesState: true,
     externalEffect: false,
+    paginated: false,
     deprecated: null,
   },
   {
@@ -211,6 +230,7 @@ export const COMMAND_REGISTRY = [
     examples: ['fgos answer build-cli --text "src/cli owns it."'],
     touchesState: true,
     externalEffect: false,
+    paginated: false,
     deprecated: null,
   },
   {
@@ -228,26 +248,43 @@ export const COMMAND_REGISTRY = [
     examples: ['fgos decision --text "Use envelope wrapping at the dispatcher choke-point"'],
     touchesState: true,
     externalEffect: false,
+    paginated: false,
     deprecated: null,
   },
   {
     name: 'list',
     invoke: 'fgos list',
-    description: 'List the full work/decisions view.',
-    parameters: { type: 'object', properties: {}, required: [] },
-    examples: ['fgos list'],
+    description: 'List the full work/decisions view. --cursor/--limit paginate the "work" map (opaque cursor, per D5/D35): omit both to get the flat id->item map unchanged; pass either to get {items, nextCursor} instead.',
+    parameters: {
+      type: 'object',
+      properties: {
+        cursor: { type: 'string', description: 'Opaque pagination cursor from a prior call\'s nextCursor; omit to start from the beginning.' },
+        limit: { type: 'integer', description: 'Max items per page (default 50 when cursor/limit is used); omit both flags to get the unpaginated full map.' },
+      },
+      required: [],
+    },
+    examples: ['fgos list', 'fgos list --limit 20', 'fgos list --limit 20 --cursor <token>'],
     touchesState: false,
     externalEffect: false,
+    paginated: true,
     deprecated: null,
   },
   {
     name: 'ready',
     invoke: 'fgos ready',
-    description: 'List the frontier: open work items ready to be taken/dispatched right now.',
-    parameters: { type: 'object', properties: {}, required: [] },
-    examples: ['fgos ready'],
+    description: 'List the frontier: open work items ready to be taken/dispatched right now. --cursor/--limit paginate the result (opaque cursor, per D5/D35): omit both to get the full array unchanged; pass either to get {items, nextCursor} instead.',
+    parameters: {
+      type: 'object',
+      properties: {
+        cursor: { type: 'string', description: 'Opaque pagination cursor from a prior call\'s nextCursor; omit to start from the beginning.' },
+        limit: { type: 'integer', description: 'Max items per page (default 50 when cursor/limit is used); omit both flags to get the unpaginated full array.' },
+      },
+      required: [],
+    },
+    examples: ['fgos ready', 'fgos ready --limit 20', 'fgos ready --limit 20 --cursor <token>'],
     touchesState: false,
     externalEffect: false,
+    paginated: true,
     deprecated: null,
   },
   {
@@ -264,6 +301,7 @@ export const COMMAND_REGISTRY = [
     examples: ['fgos graph', 'fgos graph --what-if auth-3'],
     touchesState: false,
     externalEffect: false,
+    paginated: false,
     deprecated: null,
   },
   {
@@ -274,16 +312,18 @@ export const COMMAND_REGISTRY = [
     examples: ['fgos stale'],
     touchesState: false,
     externalEffect: false,
+    paginated: false,
     deprecated: null,
   },
   {
     name: 'conflicts',
     invoke: 'fgos conflicts',
-    description: 'Read-only advisory: pairs of ready work items whose declared file footprints overlap (a parallel-dispatch conflict risk), with the shared paths and resolution options (sequence/hoist/re-slice). Suggests only — never re-slices.',
+    description: 'Read-only advisory: pairs of ready work items whose declared file footprints overlap (a parallel-dispatch conflict risk), with the shared paths and resolution options (sequence/hoist/re-slice). Suggests only — never re-slices. Not paginated (per D5/D35): each row is a (a,b) pair with no single per-row id to build a cursor from, so it is excluded from the paginated-verb set rather than growing a synthetic per-pair key.',
     parameters: { type: 'object', properties: {}, required: [] },
     examples: ['fgos conflicts'],
     touchesState: false,
     externalEffect: false,
+    paginated: false,
     deprecated: null,
   },
   {
@@ -294,6 +334,7 @@ export const COMMAND_REGISTRY = [
     examples: ['fgos rebuild'],
     touchesState: true,
     externalEffect: false,
+    paginated: false,
     deprecated: null,
   },
   {
@@ -304,6 +345,7 @@ export const COMMAND_REGISTRY = [
     examples: ['fgos repair'],
     touchesState: true,
     externalEffect: false,
+    paginated: false,
     deprecated: null,
   },
   {
@@ -321,6 +363,7 @@ export const COMMAND_REGISTRY = [
     examples: ['fgos check', 'fgos check build-cli'],
     touchesState: false,
     externalEffect: false,
+    paginated: false,
     deprecated: null,
   },
   {
@@ -338,6 +381,7 @@ export const COMMAND_REGISTRY = [
     examples: ['fgos rollup build-cli'],
     touchesState: false,
     externalEffect: false,
+    paginated: false,
     deprecated: null,
   },
   {
@@ -356,6 +400,7 @@ export const COMMAND_REGISTRY = [
     examples: ['fgos take', 'fgos take build-cli --role session'],
     touchesState: true,
     externalEffect: false,
+    paginated: false,
     deprecated: null,
   },
   {
@@ -373,6 +418,7 @@ export const COMMAND_REGISTRY = [
     examples: ['fgos pick', 'fgos pick build-cli'],
     touchesState: true,
     externalEffect: false,
+    paginated: false,
     deprecated: null,
   },
   {
@@ -391,6 +437,7 @@ export const COMMAND_REGISTRY = [
     examples: ['fgos return build-cli'],
     touchesState: true,
     externalEffect: false,
+    paginated: false,
     deprecated: null,
   },
   {
@@ -410,6 +457,7 @@ export const COMMAND_REGISTRY = [
     examples: ['fgos review build-cli', 'fgos review build-cli --github'],
     touchesState: false,
     externalEffect: true,
+    paginated: false,
     deprecated: null,
   },
   {
@@ -431,6 +479,7 @@ export const COMMAND_REGISTRY = [
     examples: ['fgos approve build-cli'],
     touchesState: true,
     externalEffect: true,
+    paginated: false,
     deprecated: null,
   },
   {
@@ -449,6 +498,7 @@ export const COMMAND_REGISTRY = [
     examples: ['fgos reject build-cli --reason "needs more work"'],
     touchesState: true,
     externalEffect: false,
+    paginated: false,
     deprecated: null,
   },
   {
@@ -467,33 +517,45 @@ export const COMMAND_REGISTRY = [
     examples: ['fgos catchup build-cli'],
     touchesState: true,
     externalEffect: false,
+    paginated: false,
     deprecated: null,
   },
   {
     name: 'evolve',
     invoke: 'fgos evolve',
-    description: 'Rank open self-improve candidates (no flags), reprint one candidate\'s full friction record (--pick), or submit a candidate as a new work item (--submit — the only mutating path).',
+    description: 'Rank open self-improve candidates (no flags — --cursor/--limit paginate this list, opaque cursor per D5/D35), reprint one candidate\'s full friction record (--pick), or submit a candidate as a new work item (--submit — the only mutating path).',
     parameters: {
       type: 'object',
       properties: {
         pick: { type: 'string', description: "Reprint one ranked candidate's full friction record by id." },
         submit: { type: 'string', description: 'Submit the named candidate as a new work item.' },
+        cursor: { type: 'string', description: 'Bare-call only: opaque pagination cursor from a prior call\'s nextCursor; omit to start from the beginning.' },
+        limit: { type: 'integer', description: 'Bare-call only: max items per page (default 50 when cursor/limit is used); omit both flags to get the unpaginated full array.' },
       },
       required: [],
     },
-    examples: ['fgos evolve', 'fgos evolve --pick cand-1', 'fgos evolve --submit cand-1'],
+    examples: ['fgos evolve', 'fgos evolve --limit 20', 'fgos evolve --pick cand-1', 'fgos evolve --submit cand-1'],
     touchesState: true,
     externalEffect: false,
+    paginated: true,
     deprecated: null,
   },
   {
     name: 'triage',
     invoke: 'fgos triage',
-    description: 'Rank open work by blocking fan-out (how many other open items it unblocks).',
-    parameters: { type: 'object', properties: {}, required: [] },
-    examples: ['fgos triage'],
+    description: 'Rank open work by blocking fan-out (how many other open items it unblocks). --cursor/--limit paginate the result (opaque cursor, per D5/D35): omit both to get the full array unchanged; pass either to get {items, nextCursor} instead.',
+    parameters: {
+      type: 'object',
+      properties: {
+        cursor: { type: 'string', description: 'Opaque pagination cursor from a prior call\'s nextCursor; omit to start from the beginning.' },
+        limit: { type: 'integer', description: 'Max items per page (default 50 when cursor/limit is used); omit both flags to get the unpaginated full array.' },
+      },
+      required: [],
+    },
+    examples: ['fgos triage', 'fgos triage --limit 20', 'fgos triage --limit 20 --cursor <token>'],
     touchesState: false,
     externalEffect: false,
+    paginated: true,
     deprecated: null,
   },
   {
@@ -504,6 +566,7 @@ export const COMMAND_REGISTRY = [
     examples: ['fgos docs-index'],
     touchesState: false,
     externalEffect: false,
+    paginated: false,
     deprecated: null,
   },
   {
@@ -521,6 +584,7 @@ export const COMMAND_REGISTRY = [
     examples: ['fgos doc-sources docs/how-to/check-rollup-progress.md'],
     touchesState: false,
     externalEffect: false,
+    paginated: false,
     deprecated: null,
   },
   {
@@ -541,6 +605,7 @@ export const COMMAND_REGISTRY = [
     examples: ['fgos session start', 'fgos session end <session-id>', 'fgos session list', 'fgos session gc'],
     touchesState: true,
     externalEffect: false,
+    paginated: false,
     deprecated: null,
   },
   {
@@ -559,6 +624,7 @@ export const COMMAND_REGISTRY = [
     examples: ['fgos goal set <id>', 'fgos goal show'],
     touchesState: true,
     externalEffect: false,
+    paginated: false,
     deprecated: null,
   },
   {
@@ -575,6 +641,7 @@ export const COMMAND_REGISTRY = [
     examples: ['fgos setup', 'fgos setup --pretty'],
     touchesState: true,
     externalEffect: false,
+    paginated: false,
     deprecated: null,
   },
   {
@@ -591,6 +658,7 @@ export const COMMAND_REGISTRY = [
     examples: ['fgos doctor', 'fgos doctor --pretty'],
     touchesState: false,
     externalEffect: false,
+    paginated: false,
     deprecated: null,
   },
 ];
