@@ -81,6 +81,7 @@ import { createWorktree, removeWorktree, listLeftovers, branchNameFor, createBra
 import { runGoalCheck } from './goal-check.mjs';
 import { createWriteQueue } from './write-queue.mjs';
 import { createOwnershipStore, resolveRoot, claimRoot, steerFrontier } from './root-affinity.mjs';
+import { claimWork, ClaimError } from './claim-port.mjs';
 import { resolveDiscovery, FALLBACK_VERIFY } from '../intake/discovery.mjs';
 import { resolveDecompose } from '../intake/decompose.mjs';
 import { classify, generateId } from '../intake/classify.mjs';
@@ -476,13 +477,17 @@ export async function startupReap({ repoRoot, dir, worktreeDir, verifyTimeoutMs,
  * owner already holds the root) but never fires in-process; a rejected item is
  * simply left in the frontier for a later poll rather than dispatched.
  */
-async function claimItem({ dir, ownershipStore, queue, ownerIdentity, item }) {
+async function claimItem({ dir, ownershipStore, queue, ownerIdentity, item, repoRoot }) {
   return queue.enqueue(async () => {
     const freshView = listWork(dir);
     const decision = claimRoot(ownershipStore, freshView, item.id, ownerIdentity);
     if (decision.action === 'claim') ownershipStore.setOwner(decision.root, ownerIdentity);
     if (decision.accepted) {
-      moveWork(dir, { id: item.id, to: 'doing', expectedStatus: 'todo', role: 'runner' });
+      // Delegate to claim-port.mjs for main-checkout-lock + moveWork (tsk-53f D1).
+      // Runner uses isolate:false here — worktree creation happens later in runItem.
+      // skipOutcome:true because runner writes its own predicted outcome in runItem
+      // with proper timing (after worktree creation, with branch head info).
+      claimWork(dir, { id: item.id, actor: 'runner', isolate: false, repoRoot, skipOutcome: true });
     }
     return decision;
   });

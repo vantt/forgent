@@ -112,6 +112,19 @@ test('criticalPath: empty view is depth 0 with an empty path; a single item is d
   assert.deepEqual(criticalPath({ work: { solo: item('solo') } }), { depth: 1, path: ['solo'] });
 });
 
+test('criticalPath counts an open child the same as a deps entry: a root only blocked by an unfinished child still shows the real chain depth', () => {
+  // root has no `deps` at all — its only relation is `child.parent === 'root'`.
+  // A root stays gated until every child is done (frontier.mjs's
+  // hasOpenDescendant), so this chain is exactly as real as a deps chain.
+  const view = {
+    work: {
+      root: item('root'),
+      child: item('child', { parent: 'root' }),
+    },
+  };
+  assert.deepEqual(criticalPath(view), { depth: 2, path: ['root', 'child'] });
+});
+
 test('staleBlocked: lists todo/blocked items with an unmet dep (missing dep included); ready items are omitted', () => {
   const view = {
     work: {
@@ -164,6 +177,20 @@ test('greedyTopUnblock: a done item is never a candidate and never counts as dow
   // root's downstream among NOT-done is just {pending}; finished is ignored.
   assert.deepEqual(picks[0], { id: 'root', unblocks: 1, newlyUnblocks: 2 });
   assert.ok(!picks.some((p) => p.id === 'finished'));
+});
+
+test('greedyTopUnblock: completing an open child counts toward unblocking its parent, the same way a deps entry would', () => {
+  // `root` has no `deps` naming it — it is only reachable via `child.parent`.
+  // Before the unified-graph fix, root's downstream (and therefore its rank)
+  // was invisible to this metric entirely.
+  const view = {
+    work: {
+      root: item('root'),
+      child: item('child', { parent: 'root' }),
+    },
+  };
+  const picks = greedyTopUnblock(view);
+  assert.deepEqual(picks[0], { id: 'child', unblocks: 1, newlyUnblocks: 2 });
 });
 
 test('greedyTopUnblock respects k', () => {
@@ -302,6 +329,22 @@ test('whatIf: completing a chain root unblocks its transitive downstream; newlyR
     },
   };
   assert.deepEqual(whatIf(view, 'a'), { id: 'a', exists: true, unblocksTransitive: 2, newlyReady: ['b'] });
+});
+
+test('whatIf: completing a child unblocks its open parent, the same way completing a deps target would', () => {
+  const view = {
+    work: {
+      root: item('root'),
+      child: item('child', { parent: 'root' }),
+    },
+  };
+  // unblocksTransitive now sees root through the unified graph. newlyReady
+  // stays deps-only by design (per this function's own docstring — a "graph
+  // fact about dependencies only", not full frontier eligibility): root's
+  // `deps` array is empty, so it reads as vacuously deps-satisfied — the same
+  // pre-existing, unrelated-to-this-fix behavior any item with no `deps`
+  // would show for any `id` queried, not something this change introduces.
+  assert.deepEqual(whatIf(view, 'child'), { id: 'child', exists: true, unblocksTransitive: 1, newlyReady: ['root'] });
 });
 
 test('whatIf: an unknown id is exists:false with zero impact', () => {

@@ -57,6 +57,8 @@ script tự-động kiểm), người viết record mới tự đối chiếu.
 | [0016](0016-moc-mvp-fgos.md) | Mốc MVP của fgOS | Người mới, chỉ dựa tài liệu đã ship, nộp một yêu cầu văn xuôi và nhận code sẵn-sàng-merge với tối thiểu ngồi canh; bổ sung cho L5/L6, không thay thế. |
 | [0017](0017-dong-audit-he-id-ten-goi.md) | Đóng audit hệ id/tên gọi (STR47) | Giữ đa hệ id/tên gọi có chủ đích (6 hệ fgOS vĩnh viễn + 7 hệ bee giàn giáo tạm), không hợp nhất; khoá luật D-local không bao giờ trích ngoài `CONTEXT.md` gốc; cell-id/feature-slug giữ nguyên; boundary appendix tại `architecture-map.md` Phụ lục B. Đóng vòng STR53-STR58 (tất cả đã migrate). |
 | [0019](0019-mien-tru-viet-lai-nhat-ky.md) | Miễn trừ pre-release cho RUL11 | Trong lúc sản phẩm chưa phát hành, migration được phép viết lại tại chỗ cả ba kho `.fgos`; miễn trừ hết hiệu lực ở v1.0.0; không bao gồm `phase1-events.jsonl`. |
+| [0020](0020-chan-fgos-khoi-worktree-worker.md) | Chặn `.fgos/` khỏi worktree worker | `fgw/<id>` worktree worker không được symlink (khóa-trong-cây) lẫn bootstrap-copy (cô-lập-cây) `.fgos/` — xóa hẳn khỏi checkout + `merge.mjs` từ chối cứng diff chạm `.fgos/`; `session.mjs` (actor trusted) giữ nguyên symlink D10. Mở rộng `0005`. |
+| [0021](0021-wire-main-checkout-hook-qua-doctor-setup.md) | Wire main-checkout lock hook qua doctor/setup | Str65's `.githooks/pre-commit` (đã viết, đã test) chỉ active khi `core.hooksPath` = `.githooks` — wire vào `fgos doctor` (đọc) + `fgos setup` (ghi, fill-only, không đè custom path); không app-level lock-wrap, không epoch-fence mới. Fix khả-tiếp-cận, không phải enforcement bắt buộc. |
 
 ## Truy vết nguồn (đầy đủ)
 

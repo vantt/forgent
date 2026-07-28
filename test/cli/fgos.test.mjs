@@ -1667,6 +1667,24 @@ test('triage never mutates state: no event is appended', () => {
   assert.deepEqual(eventLines(cwd), before);
 });
 
+test('triage rows carry stage, goalTier, and component membership; declared goals sort ahead of ungrouped work', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'plain');
+  run(cwd, ['add', 'goal-item', '--title', 'Goal Item', '--kind', 'task', '--risk', 'low', '--verify', 'npm test', '--goal-tier', 'mvp']);
+
+  const result = run(cwd, ['triage']);
+  assert.equal(result.status, 0);
+  const data = envelopeData(result.stdout);
+  const plain = data.find((r) => r.id === 'plain');
+  const goal = data.find((r) => r.id === 'goal-item');
+  assert.equal(plain.stage, 'executing');
+  assert.equal(plain.goalTier, null);
+  assert.equal(plain.isIsolated, true);
+  assert.equal(plain.componentSize, 1);
+  assert.equal(goal.goalTier, 'mvp');
+  assert.deepEqual(data.map((r) => r.id), ['goal-item', 'plain']);
+});
+
 // --- friction channel in `check` (phase-3-compound-learning-4, S2) ---------
 //
 // Same write-door discipline as the outcome tests above: only the runner
@@ -2870,6 +2888,31 @@ test('pick reclaims a released todo item onto its OWN existing branch tip, not a
   assert.equal(secondPick.branchHeadAtTake, branchTip, 'reclaims the SAME branch tip, not repoRoot\'s current HEAD');
   assert.equal(secondPick.worktree.branch, 'fgw/reuse-branch-item');
   assert.equal(secondPick.worktree.reused, true, 'createWorktree reuses the existing fgw/<id> branch');
+});
+
+test('pick on a leaf item whose root has no fgw/<rootId> branch yet forks from repoRoot HEAD instead of orphaning the claim (claim-port.mjs baseRef guard)', () => {
+  // A leaf claimed before the runner ever dispatched its root (e.g. a human
+  // `pick` right after decompose, no runner involved yet) has no root branch
+  // to fork from — claim-port.mjs must fall back to repoRoot's current HEAD,
+  // the same as a non-leaf claim, rather than passing createWorktree a
+  // baseRef naming a branch git doesn't have. Passing that nonexistent
+  // baseRef used to throw AFTER moveWork had already committed the
+  // doing-claim, leaving the item stuck in doing with no branch/worktree and
+  // no automatic recovery (startupReap skips human/session claims by design).
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  addOk(cwd, 'orphan-root-item', { title: 'Root Item' });
+  const dir = path.join(cwd, '.fgos');
+  addWork(dir, { id: 'orphan-leaf-item', title: 'Leaf Item', kind: 'task', status: 'todo', deps: [], risk: 'low', refs: [], verify: 'true', parent: 'orphan-root-item' });
+
+  const result = run(cwd, ['pick', '--id', 'orphan-leaf-item']);
+  assert.equal(result.status, 0, `pick failed: ${result.stderr}`);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.id, 'orphan-leaf-item');
+  assert.equal(data.branchHeadAtTake, gitHead(cwd), 'no root branch exists yet — must fork from repoRoot HEAD, not a nonexistent baseRef');
+  assert.equal(data.worktree.branch, 'fgw/orphan-leaf-item');
+  assert.equal(data.worktree.reused, false);
+  assert.equal(stateView(cwd).work['orphan-leaf-item'].status, 'doing');
 });
 
 test('return happy path: verify passes -> doing to proposed, actual outcome recorded, no settlement (settlement belongs to the -> done edge, D4)', () => {

@@ -43,13 +43,25 @@
 //      docs/history/str65-worktree-isolation-enforcement/reports/validation-phase1.md
 //      for the pid:1-sentinel design this replaces).
 //
-// This module does not pick a production ttlMs default (out of scope for
-// this cell) and does not wire into any git hook — both are Phase 2.
-
 import fs from 'node:fs';
 import path from 'node:path';
 
 export const LOCK_FILE = 'main-checkout.lock';
+
+// DEFAULT_TTL_MS (tsk-3w8 follow-up): Phase 2 (the git hook, wired) and the
+// claim flow (claim-port.mjs's claimWork) now BOTH acquire this same lock,
+// and needed one shared staleness window instead of each picking its own —
+// the hook's own local copy of this value used to be the only one, and
+// claim-port.mjs's call passed no ttlMs at all. Without a ttlMs, a
+// string-identity lock (the hook writes one per commit, and never releases
+// it — TTL-based auto-expiry is the design, not a bug) reads as AMBIGUOUS
+// forever (D5 fail-closed), permanently deadlocking every take/pick after
+// the very first commit once the hook is active. Historical STR65 incidents
+// (docs/history/str65-worktree-isolation-enforcement/reports/
+// validation-phase1.md) showed real inter-commit gaps of ~2-3.5 minutes; 5
+// minutes clears that with a thinner margin than an earlier 10-minute value,
+// accepted for self-healing an abandoned lock sooner.
+export const DEFAULT_TTL_MS = 5 * 60 * 1000;
 
 export const ACQUIRED = 'acquired';
 export const HELD = 'held-by-live-other-pid';

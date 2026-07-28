@@ -9,9 +9,9 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { spawnSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 
-import { DOCTOR_CHECKS, integrationScriptPath } from '../../src/setup/checks.mjs';
+import { DOCTOR_CHECKS, integrationScriptPath, mainCheckoutHookWired } from '../../src/setup/checks.mjs';
 import { DEFAULT_RUNNER_CONFIG } from '../../src/runner/dispatch.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -29,10 +29,10 @@ function checkById(id) {
 
 // ─── Unit tests: DOCTOR_CHECKS ─────────────────────────────────────────────
 
-test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md D2', () => {
+test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md D2 plus main-checkout-hook-wired (tsk-3w8)', () => {
   assert.deepEqual(
     DOCTOR_CHECKS.map((c) => c.id).sort(),
-    ['config-not-stale', 'node-version-and-git', 'shell-integration-sourced'].sort(),
+    ['config-not-stale', 'main-checkout-hook-wired', 'node-version-and-git', 'shell-integration-sourced'].sort(),
   );
 });
 
@@ -111,6 +111,54 @@ test('config-not-stale fails when the existing config is missing a default key',
   fs.rmSync(cwd, { recursive: true, force: true });
 });
 
+// ─── main-checkout-hook-wired (tsk-3w8): str65's main-checkout lock only ───
+// guards commits when core.hooksPath actually points at .githooks — str88
+// removed the automatic `prepare`-lifecycle wiring (pnpm 10+ blocks it for a
+// git-hosted dependency), so this doctor check + fgos setup's own wiring
+// (below) are the only paths left that keep it honest.
+
+test('mainCheckoutHookWired is false in a cwd with no .git at all, and never throws', () => {
+  const cwd = mkTemp('doctor-hook-no-git-');
+  assert.equal(mainCheckoutHookWired(cwd), false);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+test('mainCheckoutHookWired is false in a real git repo whose core.hooksPath is unset', () => {
+  const cwd = mkTemp('doctor-hook-unset-');
+  execFileSync('git', ['init', '-q'], { cwd });
+  assert.equal(mainCheckoutHookWired(cwd), false);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+test('mainCheckoutHookWired is false when core.hooksPath points somewhere other than .githooks', () => {
+  const cwd = mkTemp('doctor-hook-other-');
+  execFileSync('git', ['init', '-q'], { cwd });
+  execFileSync('git', ['config', 'core.hooksPath', 'some-other-dir'], { cwd });
+  assert.equal(mainCheckoutHookWired(cwd), false);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+test('mainCheckoutHookWired is true once core.hooksPath is set to .githooks', () => {
+  const cwd = mkTemp('doctor-hook-wired-');
+  execFileSync('git', ['init', '-q'], { cwd });
+  execFileSync('git', ['config', 'core.hooksPath', '.githooks'], { cwd });
+  assert.equal(mainCheckoutHookWired(cwd), true);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+test('main-checkout-hook-wired doctor check reports passed/failed matching mainCheckoutHookWired, with an actionable message', () => {
+  const cwd = mkTemp('doctor-hook-check-');
+  execFileSync('git', ['init', '-q'], { cwd });
+  const before = checkById('main-checkout-hook-wired').check(cwd);
+  assert.equal(before.passed, false);
+  assert.match(before.message, /run fgos setup/);
+
+  execFileSync('git', ['config', 'core.hooksPath', '.githooks'], { cwd });
+  const after = checkById('main-checkout-hook-wired').check(cwd);
+  assert.equal(after.passed, true);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
 // ─── CLI-level tests: real spawned `fgos setup` / `fgos doctor` ───────────
 
 test('fgos setup (no flags) produces valid wrapEnvelope-shaped JSON on stdout', () => {
@@ -121,6 +169,47 @@ test('fgos setup (no flags) produces valid wrapEnvelope-shaped JSON on stdout', 
   const envelope = JSON.parse(result.stdout);
   assert.equal(typeof envelope.contract, 'string');
   assert.ok('data' in envelope);
+  fs.rmSync(cwd, { recursive: true, force: true });
+  fs.rmSync(homeDir, { recursive: true, force: true });
+});
+
+test('fgos setup wires core.hooksPath to .githooks in a real git checkout, and reports hooksWired: true', () => {
+  const cwd = mkTemp('setup-cli-hooks-');
+  const homeDir = mkTemp('setup-cli-hooks-home-');
+  execFileSync('git', ['init', '-q'], { cwd });
+  const result = spawnSync(process.execPath, [FGOS, 'setup'], { cwd, encoding: 'utf8', env: { ...process.env, HOME: homeDir } });
+  assert.equal(result.status, 0, result.stderr);
+  const envelope = JSON.parse(result.stdout);
+  assert.equal(envelope.data.hooksWired, true);
+  const hooksPath = execFileSync('git', ['config', '--get', 'core.hooksPath'], { cwd, encoding: 'utf8' }).trim();
+  assert.equal(hooksPath, '.githooks');
+  fs.rmSync(cwd, { recursive: true, force: true });
+  fs.rmSync(homeDir, { recursive: true, force: true });
+});
+
+test('fgos setup in a cwd with no .git reports hooksWired: false and does not throw', () => {
+  const cwd = mkTemp('setup-cli-no-git-');
+  const homeDir = mkTemp('setup-cli-no-git-home-');
+  const result = spawnSync(process.execPath, [FGOS, 'setup'], { cwd, encoding: 'utf8', env: { ...process.env, HOME: homeDir } });
+  assert.equal(result.status, 0, result.stderr);
+  const envelope = JSON.parse(result.stdout);
+  assert.equal(envelope.data.hooksWired, false);
+  fs.rmSync(cwd, { recursive: true, force: true });
+  fs.rmSync(homeDir, { recursive: true, force: true });
+});
+
+test('fgos setup leaves a pre-existing custom core.hooksPath untouched — fill-only, never silently repoint someone else\'s hooks', () => {
+  const cwd = mkTemp('setup-cli-custom-hooks-');
+  const homeDir = mkTemp('setup-cli-custom-hooks-home-');
+  execFileSync('git', ['init', '-q'], { cwd });
+  execFileSync('git', ['config', 'core.hooksPath', 'my-own-hooks'], { cwd });
+  const result = spawnSync(process.execPath, [FGOS, 'setup'], { cwd, encoding: 'utf8', env: { ...process.env, HOME: homeDir } });
+  assert.equal(result.status, 0, result.stderr);
+  const envelope = JSON.parse(result.stdout);
+  assert.equal(envelope.data.hooksWired, false);
+  assert.equal(envelope.data.hooksSkippedExisting, 'my-own-hooks');
+  const hooksPath = execFileSync('git', ['config', '--get', 'core.hooksPath'], { cwd, encoding: 'utf8' }).trim();
+  assert.equal(hooksPath, 'my-own-hooks', 'must not be silently repointed to .githooks');
   fs.rmSync(cwd, { recursive: true, force: true });
   fs.rmSync(homeDir, { recursive: true, force: true });
 });

@@ -34,6 +34,7 @@ import { classifySource, reviewDiff, mergeRunnerItem, cleanupMergedBranch, chang
 import { createGitHubPR, mergeGitHubPR, viewGitHubPRStatus } from '../src/runner/github-adapter.mjs';
 import { classifyIronLaw } from '../src/evolve/iron-law.mjs';
 import { branchNameFor, branchExists, createWorktree, removeWorktree } from '../src/runner/worktree.mjs';
+import { claimWork, ClaimError } from '../src/runner/claim-port.mjs';
 import { createSession, endSession, listSessions, reclaimOrphanedSessions, SessionError } from '../src/runner/session.mjs';
 import { resolveRoot } from '../src/runner/root-affinity.mjs';
 import { visitCount } from '../src/runner/anti-loop.mjs';
@@ -43,6 +44,7 @@ import { writeCoexistenceManifest } from '../src/install/coexist.mjs';
 import { MANIFEST_SCHEMA_VERSION, COMMAND_REGISTRY } from '../src/cli/command-registry.mjs';
 import { computeAwaitingContext } from '../src/state/awaiting-context.mjs';
 import { DOCTOR_CHECKS, integrationScriptPath } from '../src/setup/checks.mjs';
+import { installGitHooks } from '../src/setup/git-hooks.mjs';
 import { detectRcFiles, insertSourceLine } from '../src/setup/shell-rc.mjs';
 import { mergeConfigDefaults } from '../src/setup/config-merge.mjs';
 import { formatCheck, bold } from '../src/setup/ansi.mjs';
@@ -1236,40 +1238,24 @@ async function runVerb(verb, flags, positional, dir) {
         }
       }
 
-      const item = listWork(dir).work[id];
-      // Predicted half written right after the claim, mirroring the
-      // runner's own claim (D1's "đối xứng claim runner") — priorVisits is
-      // read BEFORE this claim's own work.move so it never counts itself.
-      const priorVisits = visitCount(readRawEvents(dir), id);
-
-      // Branch take (human-rounds D2): a `blocked` item with a live
-      // `fgw/<id>` branch (parked by the runner, or a rejected proposal) is
-      // claimed via the existing blocked -> doing edge (fsm.mjs:69), CAS'd
-      // against the item's real "blocked" status rather than the main-based
-      // "todo" below. `branchHeadAtTake` — the BRANCH's own HEAD, not the
-      // repo's — is the sole discriminator `return` uses later; it is never
-      // mixed with the main-based `headAtTake`.
-      const branch = branchNameFor(id);
-      if (item.status === 'blocked' && branchExists(process.cwd(), branch)) {
-        const branchHeadAtTake = gitAt(process.cwd(), ['rev-parse', branch]).trim();
-        const { event } = moveWork(dir, { id, to: 'doing', expectedStatus: 'blocked', role, branchHeadAtTake });
-        addOutcome(dir, {
+      // Delegate to claim-port.mjs — single choke-point for all claim flows
+      // (tsk-53f D1). take uses isolate:false (no worktree creation).
+      try {
+        return claimWork(dir, {
           id,
-          predicted: { tier: item.tier ?? DEFAULTS.tier, deps: item.deps.length, priorVisits, role, branchHeadAtTake },
+          actor: role,
+          isolate: false,
+          repoRoot: process.cwd(),
         });
-        return { id, from: 'blocked', to: 'doing', role, seq: event.seq, source: 'branch', branch, branchHeadAtTake };
+      } catch (err) {
+        if (err instanceof ClaimError) {
+          throw new StoreError(err.category, `take: ${err.message}`);
+        }
+        throw err;
       }
-
-      const headAtTake = currentHead(process.cwd());
-      const { event } = moveWork(dir, { id, to: 'doing', expectedStatus: 'todo', role, headAtTake });
-      addOutcome(dir, {
-        id,
-        predicted: { tier: item.tier ?? DEFAULTS.tier, deps: item.deps.length, priorVisits, role, headAtTake },
-      });
-      return { id, from: 'todo', to: 'doing', role, seq: event.seq, source: 'main', headAtTake };
     }
 
-// Cửa pull — pick (str83-fgos-slash-commands, D1/D3; guard loosened +
+    // Cửa pull — pick (str83-fgos-slash-commands, D1/D3; guard loosened +
     // branch-reuse generalized + claimTrigger per claim-lock §3a/§3c/§7):
     // combines take's claim logic with worktree.mjs's createWorktree in one
     // call, so `/fgOS:pick` can claim AND stand up the item's isolated
@@ -1286,7 +1272,6 @@ async function runVerb(verb, flags, positional, dir) {
     case 'pick': {
       const explicitId = optionalField(positional[0] ?? flags.id, 'pick --id requires a non-empty id value (omit --id entirely to pick the frontier head)');
       const claimTrigger = optionalField(flags.via, 'pick --via requires a non-empty value (omit --via entirely to skip stamping claimTrigger)');
-      const role = 'session';
 
       let id = explicitId;
       if (!id) {
@@ -1299,57 +1284,29 @@ async function runVerb(verb, flags, positional, dir) {
         throw new StoreError('validation', `pick: work "${id}" not found.`);
       }
 
-      const item = listWork(dir).work[id];
-      const priorVisits = visitCount(readRawEvents(dir), id);
-      const repoRoot = process.cwd();
-
-      // Branch-reuse generalized to "does fgw/<id> already exist" alone
-      // (claim-lock §3c) — no longer gated on `status === 'blocked'`. Covers
-      // three cases in one path: no branch -> fresh claim, branchHeadAtTake
-      // from repoRoot's CURRENT HEAD (unchanged shape — createWorktree's `git
-      // worktree add -b <branch> <path>` with no start-point forks from
-      // exactly this same commit); branch exists + `blocked` -> retake after
-      // reject (unchanged); branch exists + `todo` (NEW, claim-lock §3b) ->
-      // the item was released back to `todo` at the clarify/decompose ->
-      // executing boundary with its worktree already standing — pick
-      // reattaches to that SAME branch tip instead of forking a new one.
-      // `expectedStatus` mirrors whichever of the two legal pre-claim
-      // statuses `item` is actually in — the CAS in moveWork below is the
-      // real guard against anything else.
-      const branch = branchNameFor(id);
-// pick ALWAYS creates a fgw/<id> worktree/branch below (createWorktree,
-      // unconditionally) — so this claim must record branchHeadAtTake, the
-      // same discriminator a reclaim would use, never the main-based
-      // headAtTake (return's own branch-source check is keyed on
-      // branchHeadAtTake alone — see its comment in the `return` case).
-      // When the branch already exists (blocked->doing reclaim, or a
-      // todo->doing reattach after a clarify/decompose release), the value
-      // is that branch's current tip; otherwise createWorktree's
-      // `git worktree add -b <branch> <path>` with no explicit start-point
-      // forks the new branch from repoRoot's CURRENT HEAD, i.e. exactly this
-      // same commit.
-      const branchAlreadyExists = branchExists(repoRoot, branch);
-      const branchHeadAtTake = branchAlreadyExists
-        ? gitAt(repoRoot, ['rev-parse', branch]).trim()
-        : currentHead(repoRoot);
-      const expectedStatus = item.status === 'blocked' ? 'blocked' : 'todo';
-      const { event } = moveWork(dir, { id, to: 'doing', expectedStatus, role, branchHeadAtTake, claimTrigger });
-      addOutcome(dir, {
-        id,
-        predicted: { tier: item.tier ?? DEFAULTS.tier, deps: item.deps.length, priorVisits, role, branchHeadAtTake },
-      });
-      const claim = { id, from: expectedStatus, to: 'doing', role, seq: event.seq, source: 'branch', branch, branchHeadAtTake };
-
-      // The claim above is already durable (moveWork's event is committed to
-      // the log) by the time createWorktree runs. If createWorktree throws
-      // (WorktreeError), that error is left to surface AS-IS to the caller —
-      // no catch/rollback here: the item stays "doing" with no worktree, and
-      // the caller sees the real failure rather than a swallowed one. Undoing
-      // the claim automatically would hide a genuine git-level failure behind
-      // a clean-looking retry surface, which is worse than a visible partial
-      // state the human/session can act on directly.
-      const worktree = createWorktree(repoRoot, id);
-      return { ...claim, worktree };
+      // Delegate to claim-port.mjs — single choke-point for all claim flows
+      // (tsk-53f D1). Handles: main-checkout-lock, moveWork, addOutcome,
+      // worktree creation with correct baseRef for leaf items. Branch-reuse
+      // generalized to "does fgw/<id> already exist" alone (claim-lock §3c)
+      // — claimWork computes branchAlreadyExists unconditionally (not gated
+      // on status === 'blocked'), so a `todo` item whose branch already
+      // stands (released back to `todo` at the clarify/decompose ->
+      // executing boundary, claim-lock §3b) reattaches to that same branch
+      // tip via createWorktree's reuse path instead of forking a new one.
+      try {
+        return claimWork(dir, {
+          id,
+          actor: 'session',
+          isolate: true,
+          claimTrigger,
+          repoRoot: process.cwd(),
+        });
+      } catch (err) {
+        if (err instanceof ClaimError) {
+          throw new StoreError(err.category, `pick: ${err.message}`);
+        }
+        throw err;
+      }
     }
 
     // Cửa pull — return (stage-decompose S2-pull D1/R13): KHÔNG tin lời
@@ -1784,6 +1741,19 @@ async function runVerb(verb, flags, positional, dir) {
               return { id, mode: 'merge', to: 'blocked', reason: 'merge-conflict', target: rootBranch };
             }
 
+            if (result.outcome === 'fgos-write-rejected') {
+              moveWork(dir, { id, to: 'blocked', expectedStatus: 'proposed', reason: 'fgos-write-rejected', role: 'system' });
+              addFriction(dir, {
+                id,
+                disposition: 'blocked',
+                errorClass: 'fgos-write-blocked',
+                layer: 'state',
+                attempts: 1,
+                detail: `${result.branch} staged a change under .fgos/ (${result.paths.join(', ')}); merge aborted, ${rootBranch} unchanged — ADR0020`,
+              });
+              return { id, mode: 'merge', to: 'blocked', reason: 'fgos-write-rejected', target: rootBranch, paths: result.paths };
+            }
+
             if (result.outcome === 'verify-fail') {
               moveWork(dir, { id, to: 'blocked', expectedStatus: 'proposed', reason: 'verify-fail-post-merge', role: 'system' });
               addFriction(dir, {
@@ -1856,6 +1826,19 @@ async function runVerb(verb, flags, positional, dir) {
             detail,
           });
           return { id, mode: 'merge', to: 'blocked', reason, target: 'main' };
+        }
+
+        if (result.outcome === 'fgos-write-rejected') {
+          moveWork(dir, { id, to: 'blocked', expectedStatus: 'proposed', reason: 'fgos-write-rejected', role: 'system' });
+          addFriction(dir, {
+            id,
+            disposition: 'blocked',
+            errorClass: 'fgos-write-blocked',
+            layer: 'state',
+            attempts: 1,
+            detail: `${result.branch} staged a change under .fgos/ (${result.paths.join(', ')}); merge aborted, main unchanged — ADR0020`,
+          });
+          return { id, mode: 'merge', to: 'blocked', reason: 'fgos-write-rejected', target: 'main', paths: result.paths };
         }
 
         if (result.outcome === 'verify-fail') {
@@ -2220,12 +2203,22 @@ async function runVerb(verb, flags, positional, dir) {
       const priorConfig = configExisted ? JSON.parse(fs.readFileSync(configPath, 'utf8')) : {};
       const { addedKeys } = mergeConfigDefaults(priorConfig, DEFAULT_RUNNER_CONFIG);
       ensureRunnerConfig(configPath);
+      // str65-6/str88: wires core.hooksPath the same way `npm run setup:hooks`
+      // does — a second, non-npm-lifecycle-dependent activation path for the
+      // main-checkout lock hook, since pnpm 10+ blocks `prepare` for a
+      // git-hosted dependency (str88) and nothing re-automated it since.
+      // Idempotent, no-ops silently when repoRoot has no `.git` at all.
+      // Fill-only like the two side effects above: a pre-existing custom
+      // core.hooksPath is left untouched, never silently repointed.
+      const { wired: hooksWired, skippedExisting: hooksSkippedExisting } = installGitHooks(repoRoot);
       return {
         rcFilesInserted,
         rcFilesAlreadyConfigured,
         configPath,
         configCreated: !configExisted,
         configAddedKeys: configExisted ? addedKeys : [],
+        hooksWired,
+        hooksSkippedExisting,
       };
     }
 
@@ -2359,6 +2352,17 @@ function renderPretty(verb, data) {
             ? `added missing config keys: ${data.configAddedKeys.join(', ')}`
             : 'config already up to date',
         data.configPath,
+      ),
+    );
+    lines.push(
+      formatCheck(
+        data.hooksWired,
+        data.hooksWired
+          ? 'core.hooksPath wired to .githooks'
+          : data.hooksSkippedExisting
+            ? `core.hooksPath already set to "${data.hooksSkippedExisting}" — left untouched, main-checkout lock is NOT active`
+            : 'core.hooksPath not wired (no .git checkout here)',
+        'main-checkout lock hook',
       ),
     );
   }

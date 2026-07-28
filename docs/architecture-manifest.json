@@ -29,6 +29,7 @@
     "src/install/coexist.mjs": "infra",
     "src/runner/recovery.mjs": "domain",
     "src/runner/anti-loop.mjs": "domain",
+    "src/runner/claim-port.mjs": "infra",
     "src/runner/write-queue.mjs": "domain",
     "src/runner/root-affinity.mjs": "domain",
     "src/state/fsm.mjs": "domain",
@@ -58,6 +59,7 @@
     "src/setup/ansi.mjs": "domain",
     "src/setup/config-merge.mjs": "domain",
     "src/setup/shell-rc.mjs": "infra",
+    "src/setup/git-hooks.mjs": "infra",
     "src/setup/checks.mjs": "use-case"
   }
 }

@@ -16,7 +16,10 @@ import { fileURLToPath } from 'node:url';
 
 import { detectRcFiles, hasSourceLine } from './shell-rc.mjs';
 import { mergeConfigDefaults } from './config-merge.mjs';
+import { mainCheckoutHookWired } from './git-hooks.mjs';
 import { DEFAULT_RUNNER_CONFIG } from '../runner/dispatch.mjs';
+
+export { mainCheckoutHookWired } from './git-hooks.mjs';
 
 const MIN_NODE_MAJOR = 18;
 
@@ -70,6 +73,13 @@ function checkConfigNotStale(cwd) {
   return { passed: true, message: `config up to date at ${configPath}` };
 }
 
+function checkMainCheckoutHookWired(cwd) {
+  if (mainCheckoutHookWired(cwd)) {
+    return { passed: true, message: 'core.hooksPath = .githooks — main-checkout lock guards every commit here' };
+  }
+  return { passed: false, message: 'core.hooksPath not wired to .githooks — commits here are NOT guarded against concurrent-writer clobbering (str65) — run fgos setup' };
+}
+
 export const DOCTOR_CHECKS = [
   {
     id: 'node-version-and-git',
@@ -85,5 +95,10 @@ export const DOCTOR_CHECKS = [
     id: 'config-not-stale',
     description: '.fgos-runner.json exists and has every current default key',
     check: (cwd) => checkConfigNotStale(cwd),
+  },
+  {
+    id: 'main-checkout-hook-wired',
+    description: 'core.hooksPath wired to .githooks (str65 main-checkout lock guards every commit)',
+    check: (cwd) => checkMainCheckoutHookWired(cwd),
   },
 ];

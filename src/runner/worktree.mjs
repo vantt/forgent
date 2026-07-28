@@ -123,9 +123,37 @@ function findCheckoutPath(porcelainOutput, branch) {
 }
 
 /**
+ * True when `worktreePath` has any uncommitted change other than the
+ * `.fgos` removal `createWorktree` itself always performs right after
+ * checkout (ADR0020) — that path is this module's own known artifact,
+ * never real user/worker content, and would otherwise make every checkout
+ * look dirty regardless of real activity. Mirrors session.mjs's
+ * `reclaimOrphanedSessions` (same `:!.fgos` pathspec exclusion). Fails
+ * closed (dirty) on an unreadable status — never assume clean.
+ */
+function isCheckoutDirty(repoRoot, worktreePath) {
+  let status;
+  try {
+    status = git(repoRoot, ['-C', worktreePath, 'status', '--porcelain', '--', ':!.fgos']);
+  } catch {
+    return true;
+  }
+  return status.trim().length > 0;
+}
+
+/**
  * Reclaim `branch` from any existing checkout before it is reused (per
  * CRASH RECLAIM in the module doc). Idempotent: a branch not checked out
  * anywhere is a no-op. Returns `{ reclaimed, path }`.
+ *
+ * DATA-LOSS GUARD (tsk-1os): a genuine crash-orphan is clean — the
+ * worker's commit lands before the process dies, per CRASH RECLAIM above.
+ * A checkout with real uncommitted changes is therefore NOT a crash-orphan
+ * — it may be a live checkout (an ad-hoc `git worktree add` on this
+ * branch, invisible to any registry) still in active use, so this refuses
+ * to force-remove it instead of silently discarding the work. The caller
+ * (createWorktree's reuse path) does not catch this — it propagates as a
+ * hard failure rather than destroying the checkout.
  */
 export function reclaimOrphanedCheckout(repoRoot, branch) {
   let listing;
@@ -139,6 +167,12 @@ export function reclaimOrphanedCheckout(repoRoot, branch) {
   if (!orphanPath) return { reclaimed: false, path: null };
 
   if (fs.existsSync(orphanPath)) {
+    if (isCheckoutDirty(repoRoot, orphanPath)) {
+      throw new WorktreeError(
+        `refusing to reclaim checkout of "${branch}" at "${orphanPath}" — it has uncommitted changes, so it is not a genuine crash-orphan (a real one is clean, its commit already landed) and may be a live checkout still in use. Commit or discard the work there, or remove the worktree yourself, before retrying.`,
+        { branch, orphanPath },
+      );
+    }
     try {
       git(repoRoot, ['worktree', 'remove', '--force', orphanPath]);
     } catch (err) {
@@ -200,6 +234,16 @@ export function createBranchRef(repoRoot, id, opts = {}) {
  * the new branch from that ref instead of the implicit current HEAD; it is
  * ignored on the reuse path (an existing branch is reused exactly as
  * before, regardless of `opts.baseRef`). Returns `{ path, branch, reused }`.
+ *
+ * `.fgos/` (ADR0020): since `.fgos/` is git-tracked in this repo, a bare
+ * `git worktree add` would check out a snapshot frozen at fork time —
+ * stale the moment main gets another uncommitted event, and a live escape
+ * hatch into the shared store if it were symlinked instead (rejected,
+ * ADR0020). The worker running in this worktree has no legitimate reason to
+ * read or write `.fgos/` at all (`0005`: the runner is the sole writer,
+ * always against `repoRoot`), so any checked-out copy is removed outright —
+ * not shared, not synced. `mergeRunnerItem` (merge.mjs) is the trusted-side
+ * backstop if a worker commits a fresh `.fgos/` of its own anyway.
  */
 export function createWorktree(repoRoot, id, opts = {}) {
   const branch = branchNameFor(id);
@@ -208,7 +252,19 @@ export function createWorktree(repoRoot, id, opts = {}) {
   const worktreePath = fs.mkdtempSync(path.join(baseDir, `${id}-`));
 
   const reused = branchExists(repoRoot, branch);
-  if (reused) reclaimOrphanedCheckout(repoRoot, branch);
+  if (reused) {
+    try {
+      reclaimOrphanedCheckout(repoRoot, branch);
+    } catch (err) {
+      try {
+        fs.rmSync(worktreePath, { recursive: true, force: true });
+      } catch {
+        // best-effort cleanup of the empty dir mkdtemp created; the real
+        // failure below is what the caller needs to see.
+      }
+      throw err;
+    }
+  }
   try {
     if (reused) {
       git(repoRoot, ['worktree', 'add', worktreePath, branch]);
@@ -225,6 +281,15 @@ export function createWorktree(repoRoot, id, opts = {}) {
       // failure below is what the caller needs to see.
     }
     throw new WorktreeError(`git worktree add failed for branch "${branch}": ${err.message}`, {
+      branch,
+      worktreePath,
+    });
+  }
+
+  try {
+    fs.rmSync(path.join(worktreePath, '.fgos'), { recursive: true, force: true });
+  } catch (err) {
+    throw new WorktreeError(`removing checked-out .fgos in worktree "${worktreePath}" failed: ${err.message}`, {
       branch,
       worktreePath,
     });

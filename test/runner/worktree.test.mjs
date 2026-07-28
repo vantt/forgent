@@ -164,6 +164,54 @@ test('reclaimOrphanedCheckout reports reclaimed:true and force-removes the still
   assert.equal(fs.existsSync(wt.path), false);
 });
 
+test('reclaimOrphanedCheckout refuses (throws, does not remove) a checkout with real uncommitted changes (tsk-1os data-loss guard)', () => {
+  const repoRoot = initTempRepo();
+  const worktreeDir = mkWorktreeDir();
+  const wt = createWorktree(repoRoot, 'item-h', { worktreeDir });
+  commitOnWorktree(wt.path, 'attempt.txt', 'real work\n');
+  // simulate a live checkout still being worked in: uncommitted edit, never
+  // torn down via removeWorktree.
+  fs.writeFileSync(path.join(wt.path, 'in-progress.txt'), 'not yet committed\n');
+
+  assert.throws(() => reclaimOrphanedCheckout(repoRoot, 'fgw/item-h'), WorktreeError);
+  assert.equal(fs.existsSync(wt.path), true);
+  assert.equal(fs.existsSync(path.join(wt.path, 'in-progress.txt')), true);
+
+  removeWorktree(repoRoot, wt.path, { force: true });
+});
+
+test('createWorktree does not leak its freshly-allocated directory when the reuse path is refused for a dirty checkout', () => {
+  const repoRoot = initTempRepo();
+  const worktreeDir = mkWorktreeDir();
+  const wt = createWorktree(repoRoot, 'item-h2', { worktreeDir });
+  commitOnWorktree(wt.path, 'attempt.txt', 'real work\n');
+  fs.writeFileSync(path.join(wt.path, 'in-progress.txt'), 'not yet committed\n');
+
+  const before = fs.readdirSync(worktreeDir);
+  assert.throws(() => createWorktree(repoRoot, 'item-h2', { worktreeDir }), WorktreeError);
+  const after = fs.readdirSync(worktreeDir);
+
+  assert.deepEqual(after, before);
+
+  removeWorktree(repoRoot, wt.path, { force: true });
+});
+
+test('reclaimOrphanedCheckout still reclaims normally when the only "change" is the .fgos removal createWorktree itself performs', () => {
+  const repoRoot = initTempRepo();
+  fs.mkdirSync(path.join(repoRoot, '.fgos'));
+  fs.writeFileSync(path.join(repoRoot, '.fgos', 'events.jsonl'), '');
+  execFileSync('git', ['add', '.fgos/events.jsonl'], { cwd: repoRoot });
+  execFileSync('git', ['commit', '-q', '-m', 'track .fgos'], { cwd: repoRoot });
+  const worktreeDir = mkWorktreeDir();
+  const wt = createWorktree(repoRoot, 'item-i', { worktreeDir });
+  commitOnWorktree(wt.path, 'attempt.txt', 'real work\n');
+
+  const result = reclaimOrphanedCheckout(repoRoot, 'fgw/item-i');
+
+  assert.equal(result.reclaimed, true);
+  assert.equal(fs.existsSync(wt.path), false);
+});
+
 test('listLeftovers reports aheadCount 0 for a branch with no commits beyond base (orphan)', () => {
   const repoRoot = initTempRepo();
   const worktreeDir = mkWorktreeDir();
@@ -286,6 +334,39 @@ test('createWorktree with opts.baseRef forks a new branch from that ref\'s tip, 
     false,
     'forked worktree must NOT see current-HEAD-only content — proves it forked from baseRef tip, not HEAD',
   );
+});
+
+// --- .fgos/ exclusion (ADR0020, tsk-1an) -----------------------------------
+//
+// This repo's own convention is `.fgos/` git-tracked (D10/`0003`). A bare
+// `git worktree add` would therefore check a frozen snapshot of it into
+// every fresh worker worktree — stale the instant main gets another
+// uncommitted event, and (if ever symlinked instead, per the rejected
+// khóa-trong-cây option) a live write path into the shared store from an
+// execution context with no real capability wall. ADR0020 settles on
+// neither: `createWorktree` removes any checked-out `.fgos/` outright, so a
+// worker's checkout has none at all — nothing stale to misread, nothing
+// live to write into by accident.
+
+test('createWorktree removes a git-tracked .fgos/ from the fresh worktree entirely — no stale copy, no symlink (ADR0020)', () => {
+  const repoRoot = initTempRepo();
+  fs.mkdirSync(path.join(repoRoot, '.fgos'));
+  fs.writeFileSync(path.join(repoRoot, '.fgos', 'events.jsonl'), '{"seq":1}\n');
+  execFileSync('git', ['add', '.fgos/events.jsonl'], { cwd: repoRoot });
+  execFileSync('git', ['commit', '-q', '-m', 'seed .fgos/events.jsonl'], { cwd: repoRoot });
+
+  const worktreeDir = mkWorktreeDir();
+  const wt = createWorktree(repoRoot, 'item-h', { worktreeDir });
+
+  assert.equal(fs.existsSync(path.join(wt.path, '.fgos')), false);
+  assert.ok(fs.existsSync(path.join(wt.path, 'seed.txt')), 'unrelated tracked content must still be checked out normally');
+});
+
+test('createWorktree stays a no-op on .fgos/ removal when the repo never tracked .fgos/ at all', () => {
+  const repoRoot = initTempRepo();
+  const worktreeDir = mkWorktreeDir();
+  const wt = createWorktree(repoRoot, 'item-i', { worktreeDir });
+  assert.equal(fs.existsSync(path.join(wt.path, '.fgos')), false);
 });
 
 test('createWorktree with opts.baseRef on an existing (reused) branch ignores baseRef and reuses as before', () => {
