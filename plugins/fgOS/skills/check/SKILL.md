@@ -26,13 +26,13 @@ same contract as `ready`/`list`.
    - If `$ARGUMENTS` is non-empty, run:
 
      ```
-     node ${CLAUDE_PROJECT_DIR}/repo/bin/fgos.mjs check $ARGUMENTS --json
+     node ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs check $ARGUMENTS --json
      ```
 
    - If `$ARGUMENTS` is empty, omit the id entirely and run:
 
      ```
-     node ${CLAUDE_PROJECT_DIR}/repo/bin/fgos.mjs check --json
+     node ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs check --json
      ```
 
    Always use the literal `${CLAUDE_PROJECT_DIR}` substitution shown above,

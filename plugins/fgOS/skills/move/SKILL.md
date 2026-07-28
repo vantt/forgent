@@ -33,7 +33,7 @@ CTR001).
 2. **Move the item.** Run:
 
    ```
-   node ${CLAUDE_PROJECT_DIR}/repo/bin/fgos.mjs move <id> --to <status>
+   node ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs move <id> --to <status>
    ```
 
    substituting the id and status parsed in step 1. Always use the literal

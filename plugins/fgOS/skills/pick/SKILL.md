@@ -27,7 +27,7 @@ state or touches git worktrees directly — every write goes through the
 2. **Claim the item and stand up its worktree.** Run:
 
    ```
-   node ${CLAUDE_PROJECT_DIR}/repo/bin/fgos.mjs pick $ARGUMENTS
+   node ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs pick $ARGUMENTS
    ```
 
    Always use the literal `${CLAUDE_PROJECT_DIR}` substitution shown above,

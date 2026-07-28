@@ -33,13 +33,13 @@ never appends an event.
    - For `set`:
 
      ```
-     node ${CLAUDE_PROJECT_DIR}/repo/bin/fgos.mjs goal set <id> --json
+     node ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs goal set <id> --json
      ```
 
    - For `show`:
 
      ```
-     node ${CLAUDE_PROJECT_DIR}/repo/bin/fgos.mjs goal show --json
+     node ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs goal show --json
      ```
 
    substituting the id parsed in step 1 for `set`. Always use the literal

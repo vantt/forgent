@@ -36,7 +36,7 @@ write, CTR001 — never writes `.fgos/` state directly.
 2. **Run context-discovery / split-work judgment.** Run:
 
    ```
-   node ${CLAUDE_PROJECT_DIR}/repo/bin/fgos.mjs discover $ARGUMENTS --json
+   node ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs discover $ARGUMENTS --json
    ```
 
    Always use the literal `${CLAUDE_PROJECT_DIR}` substitution shown above,
