@@ -8,7 +8,7 @@
 resolves that path independently — `process.cwd()`-based lookups scattered
 across `bin/fgos.mjs`, `src/runner/session.mjs`, `src/runner/loop.mjs`, and
 a separate env-var convention (`FGOS_NESTED_PREFIX`, from `tsk-3fb`) baked
-into 20 `plugins/fgOS/skills/*/SKILL.md` templates for skill paths.
+into 17 `plugins/fgOS/skills/*/SKILL.md` templates for skill paths.
 
 This item locks the decisions for replacing all of that with one canonical
 resolver function: parses the environment variables it needs, precomputes
@@ -55,9 +55,15 @@ reads precomputed paths instead of re-deriving them.
   no Windows entry; confirms D3's "not previously supported" claim.
 - `docs/history/fgos-repo-prefix-path-fix/CONTEXT.md` (`tsk-3fb`) — prior
   item that introduced `FGOS_NESTED_PREFIX` for skill-path resolution
-  across workshop/standalone layouts; scoped to 20
-  `plugins/fgOS/skills/*/SKILL.md` files plus 2 specs. D4 folds this
-  mechanism into the new resolver rather than leaving it standalone.
+  across workshop/standalone layouts, scoped at the time to 20 templates
+  plus 2 specs. Re-verified against today's repo: `grep -rl
+  FGOS_NESTED_PREFIX plugins/fgOS/skills/*/SKILL.md | wc -l` → 17 (matches
+  `ls plugins/fgOS/skills/ | wc -l`, every current skill dir uses it), and
+  only `docs/specs/fgos-plugin.md:167-168` documents the pattern —
+  `docs/specs/distribution.md:287`'s `repo/bin/fgos.mjs` line is unrelated
+  (setup/doctor verb dispatch). Counts below use the re-verified numbers,
+  not `tsk-3fb`'s original ones. D4 folds this mechanism into the new
+  resolver rather than leaving it standalone.
 - `grep -rln -iE "sqlite|\.db['\"]|better-sqlite" src bin package.json` —
   no hits, confirming D2/pinned-terms' "no separate DB engine" claim.
 
@@ -69,7 +75,8 @@ reads precomputed paths instead of re-deriving them.
   — current independent path getters this resolver replaces (D2).
 - `src/setup/shell-rc.mjs` — current bash/zsh-only profile detection,
   extended for Windows under D3.
-- `plugins/fgOS/skills/*/SKILL.md` (20 files) and
+- `plugins/fgOS/skills/*/SKILL.md` (17 files) and
+  `docs/specs/fgos-plugin.md:167-168` (1 spec) and
   `docs/history/fgos-repo-prefix-path-fix/CONTEXT.md` — `tsk-3fb`'s
   `FGOS_NESTED_PREFIX` mechanism, subsumed per D4.
 
@@ -88,7 +95,7 @@ reads precomputed paths instead of re-deriving them.
 - Windows PowerShell `$PROFILE` detection mechanics (single default path
   vs. querying the actual `$PROFILE` variable) — implementation choice,
   deferred to planning/implementation.
-- Migration path for the 20 `plugins/fgOS/skills/*/SKILL.md` templates
+- Migration path for the 17 `plugins/fgOS/skills/*/SKILL.md` templates
   once `FGOS_NESTED_PREFIX` is subsumed (D4) — whether those templates
   change at all, or only the resolver's internal reading of the env var
   changes — implementation choice for planning to size.

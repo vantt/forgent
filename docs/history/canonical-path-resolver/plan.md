@@ -5,11 +5,13 @@
 **high-risk.** Flags counted against `docs/history/canonical-path-resolver/CONTEXT.md`'s
 locked decisions:
 
-- **public contracts** — `FGOS_NESTED_PREFIX` (D4) is read by 20
-  `plugins/fgOS/skills/*/SKILL.md` templates and 2 specs
-  (`docs/specs/fgos-plugin.md`, `docs/specs/distribution.md`); the shell
-  integration script is sourced from users' own `.bashrc`/`.zshrc`.
-  Changing how any of these resolve is a contract change.
+- **public contracts** — `FGOS_NESTED_PREFIX` (D4) is read by 17
+  `plugins/fgOS/skills/*/SKILL.md` templates and 1 spec
+  (`docs/specs/fgos-plugin.md:167-168`; `docs/specs/distribution.md:287`'s
+  `repo/bin/fgos.mjs` line is unrelated — setup/doctor dispatch, not this
+  convention); the shell integration script is sourced from users' own
+  `.bashrc`/`.zshrc`. Changing how any of these resolve is a contract
+  change.
 - **cross-platform** — D3 adds real Windows profile-path detection where
   none exists today.
 - **existing covered behavior** — D2's scope replaces path-resolution code
@@ -58,7 +60,7 @@ one for Windows would only add a fifth).
 | Resolver core + CLI wiring | medium — regression risk if the unified root diverges from any of the 4 existing getters under worktree/nested-repo layouts | `session.test.mjs`/`loop.test.mjs`/`worker-log.test.mjs` must be confirmed to actually exercise the replaced code paths post-migration, not just avoid touching them |
 | Windows profile-path detection | low-medium — new code path, additive only, no existing platform regression risk | `shell-rc.test.mjs` gets a Windows-profile fixture/mock case exercising the new detection, mirroring the existing bash/zsh cases |
 | Claude Code SessionStart hook wiring | medium-high — new integration surface outside this repo's own `npm test` harness; a broken hook could affect every session opening in this repo | confirm the hook degrades gracefully (session still starts if resolver injection fails) and has its own smoke-test/manual verification path, since no automated harness covers Claude Code hook execution today |
-| Skill-template migration (20 files) | low — mechanical, `tsk-3fb` already proved the underlying env-var mechanism safe | grep-confirm all 20 templates consistently updated, no template left on the old standalone convention |
+| Skill-template migration (17 files) | low — mechanical, `tsk-3fb` already proved the underlying env-var mechanism safe | grep-confirm all 17 templates consistently updated, no template left on the old standalone convention |
 
 ## Shape — split into 4 pieces
 
@@ -84,10 +86,11 @@ carrying `tsk-63j` as `parent`:
    precomputed paths as session context/env. Depends on piece 1.
    verify: `npm test`
 
-4. **Migrate `plugins/fgOS/skills/*/SKILL.md` templates** — move the 20
-   templates (and the 2 specs documenting the convention) off the
-   standalone `FGOS_NESTED_PREFIX` substitution pattern onto whatever the
-   resolver now provides, completing D4's subsumption. Depends on piece 1.
+4. **Migrate `plugins/fgOS/skills/*/SKILL.md` templates** — move the 17
+   templates (and the 1 spec documenting the convention,
+   `docs/specs/fgos-plugin.md:167-168`) off the standalone
+   `FGOS_NESTED_PREFIX` substitution pattern onto whatever the resolver
+   now provides, completing D4's subsumption. Depends on piece 1.
    verify: `npm test`
 
 Order: piece 1 first (unblocks 2, 3, 4); pieces 2–4 are independent of
