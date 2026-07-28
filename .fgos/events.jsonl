@@ -179,3 +179,6 @@
 {"seq":179,"ts":"2026-07-28T07:15:13.918Z","type":"work.outcome","payload":{"id":"tsk-3fb","predicted":{"tier":"light","deps":0,"priorVisits":0,"actor":"session","headAtTake":"c7f2ed8f042b11ef1335d7938d5c85f3fe7f3e52"}},"v":2}
 {"seq":180,"ts":"2026-07-28T07:15:18.327Z","type":"work.move","payload":{"id":"tsk-3fb","from":"doing","to":"proposed","branchHeadAtReturn":"68e2594902fc7e0121e2c5572cd4d11e9fcd99e5"},"v":2}
 {"seq":181,"ts":"2026-07-28T07:15:18.329Z","type":"work.outcome","payload":{"id":"tsk-3fb","actual":{"outcome":"proposed","passed":true,"attempts":1,"errorClass":null,"aheadCount":8}},"v":2}
+{"seq":182,"ts":"2026-07-28T06:58:30.563Z","type":"work.edit","payload":{"id":"tsk-37v","patch":{"verify":"node --test test/intake/judge-executor.test.mjs"},"actor":"human"},"v":2}
+{"seq":183,"ts":"2026-07-28T06:58:41.955Z","type":"work.move","payload":{"id":"tsk-37v","from":"doing","to":"proposed","branchHeadAtReturn":"fadb0149bb63888eff9192868fea4edfb358c621"},"v":2}
+{"seq":184,"ts":"2026-07-28T06:58:41.959Z","type":"work.outcome","payload":{"id":"tsk-37v","actual":{"outcome":"proposed","passed":true,"attempts":1,"errorClass":null,"aheadCount":1}},"v":2}
