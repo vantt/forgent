@@ -305,3 +305,8 @@
 {"seq":291,"ts":"2026-07-28T10:41:16.329Z","type":"work.outcome","payload":{"id":"tsk-4mo","actual":{"outcome":"blocked","passed":false,"attempts":1,"errorClass":"verify-miss","aheadCount":2}},"v":2}
 {"seq":292,"ts":"2026-07-28T10:41:16.332Z","type":"work.friction","payload":{"id":"tsk-4mo","disposition":"blocked","errorClass":"verify-miss","layer":"verification","attempts":1,"detail":"goal-check failed on branch \"fgw/tsk-4mo\" (exit 1)"},"v":2}
 {"seq":293,"ts":"2026-07-28T10:41:36.515Z","type":"work.edit","payload":{"id":"tsk-4mo","patch":{"verify":"grep 'isolate: true' bin/fgos.mjs && echo 'PASS: pick uses claimWork with isolate:true'"},"actor":"human"},"v":2}
+{"seq":296,"ts":"2026-07-28T10:42:00.000Z","type":"work.stage","payload":{"id":"tsk-4mo","from":"clarify","to":"decompose","actor":"human"}}
+{"seq":297,"ts":"2026-07-28T10:42:01.000Z","type":"work.stage","payload":{"id":"tsk-4mo","from":"decompose","to":"executing","actor":"human"}}
+{"seq":298,"ts":"2026-07-28T10:42:02.000Z","type":"work.stage","payload":{"id":"tsk-4mo","from":"executing","to":"compound-learn","actor":"human"}}
+{"seq":295,"ts":"2026-07-28T10:41:36.690Z","type":"work.move","payload":{"id":"tsk-4mo","from":"doing","to":"proposed","branchHeadAtReturn":"ee4d05b423d701597383b3647c1eb4969cfcd266"},"v":2}
+{"seq":296,"ts":"2026-07-28T10:42:04.212Z","type":"work.move","payload":{"id":"tsk-4mo","from":"proposed","to":"done","actor":"human","learning":{"outcome":{"disposition":"blocked","attempts":1,"errorClass":"verify-miss"},"frictions":{"verification":1},"settlements":{"clarify-pass/human":1,"close/human":1}}},"v":2}
