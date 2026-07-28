@@ -91,3 +91,16 @@ in the same call via a `finally` block, never targeted by `EnterWorktree`.
 - Whether `plugins/fgOS/skills/pick/SKILL.md` step 3's fallback prose should
   be trimmed/updated now that this scenario is fixed at the infra level
   rather than documented as a standing limitation.
+
+## Execution finding (filed separately as tsk-2zv)
+
+Executing this item surfaced a claim-lock gap unrelated to worktree
+relocation itself: `fgos discover` firing a stage edge releases the
+claim, and reclaiming afterward resets `branchHeadAtTake` to whatever
+the branch tip already is. Every real commit for this item (CONTEXT.md,
+plan.md, the code fix) landed before the `decompose` → `executing`
+`discover` call fired, so the post-reclaim `branchHeadAtTake` matched
+the tip exactly — `fgos return` refused with "branch has not advanced,"
+even though the work was genuinely done. Filed as `tsk-2zv` rather than
+worked around silently; this note is the real, new commit that gives
+`return` actual progress to see past the reclaim.
