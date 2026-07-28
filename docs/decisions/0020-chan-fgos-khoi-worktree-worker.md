@@ -1,6 +1,6 @@
 ---
 type: explanation
-title: 0019 — Chặn `.fgos/` khỏi worktree worker (không khóa, không cô lập)
+title: 0020 — Chặn `.fgos/` khỏi worktree worker (không khóa, không cô lập)
 tags: []
 timestamp: 2026-07-28T00:00:00.000Z
 source_capture_ids: []
@@ -10,7 +10,7 @@ extends: [0005]
 relates_specs: [runner, work-state]
 ---
 
-# 0019 — Chặn `.fgos/` khỏi worktree worker (không khóa, không cô lập)
+# 0020 — Chặn `.fgos/` khỏi worktree worker (không khóa, không cô lập)
 
 ## Bối cảnh
 
