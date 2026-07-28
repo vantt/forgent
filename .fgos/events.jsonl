@@ -310,3 +310,6 @@
 {"seq":298,"ts":"2026-07-28T10:42:02.000Z","type":"work.stage","payload":{"id":"tsk-4mo","from":"executing","to":"compound-learn","actor":"human"}}
 {"seq":295,"ts":"2026-07-28T10:41:36.690Z","type":"work.move","payload":{"id":"tsk-4mo","from":"doing","to":"proposed","branchHeadAtReturn":"ee4d05b423d701597383b3647c1eb4969cfcd266"},"v":2}
 {"seq":296,"ts":"2026-07-28T10:42:04.212Z","type":"work.move","payload":{"id":"tsk-4mo","from":"proposed","to":"done","actor":"human","learning":{"outcome":{"disposition":"blocked","attempts":1,"errorClass":"verify-miss"},"frictions":{"verification":1},"settlements":{"clarify-pass/human":1,"close/human":1}}},"v":2}
+{"seq":297,"ts":"2026-07-28T10:42:15.694Z","type":"work.move","payload":{"id":"tsk-1nu","from":"todo","to":"doing","actor":"session","branchHeadAtTake":"7e455f143f92c840b5fb5c794382716367f7c515"},"v":2}
+{"seq":298,"ts":"2026-07-28T10:42:15.698Z","type":"work.outcome","payload":{"id":"tsk-1nu","predicted":{"tier":"standard","deps":1,"priorVisits":0,"actor":"session","branchHeadAtTake":"7e455f143f92c840b5fb5c794382716367f7c515"}},"v":2}
+{"seq":299,"ts":"2026-07-28T10:47:37.515Z","type":"work.edit","payload":{"id":"tsk-1nu","patch":{"verify":"grep 'isolate: false' bin/fgos.mjs && echo 'PASS: take uses claimWork with isolate:false'"},"actor":"human"},"v":2}
