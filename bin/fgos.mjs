@@ -2207,8 +2207,9 @@ async function runVerb(verb, flags, positional, dir) {
 // ─── --help / --help --json: machine-readable verb manifest (P37 deliverable
 // b) — mirrors `.bee/bin/bee.mjs`'s publicManifestEntries/renderHelpText/
 // handleHelp exactly. The manifest itself is NEVER wrapped in the fgos.v1
-// envelope (wrapEnvelope) — it is metadata about the CLI's own verb surface,
-// not a verb's data payload, the same distinction bee.mjs draws for its own
+// envelope (wrapEnvelope) — this is CTR001's documented exception for the
+// verb manifest: metadata about the CLI's own verb surface, not a verb's
+// data payload, the same distinction bee.mjs draws for its own
 // `--help --json`.
 
 function publicManifestEntries() {
@@ -2266,6 +2267,10 @@ function handleHelp(json) {
 // normal dispatch path still produces its usual "unknown verb" error.
 // Text-mode only (D3/CONTEXT out-of-scope note): the caller gates this on
 // `!flags.json`, so `<verb> --help --json` is left to fall through unchanged.
+// Same documented exception as the full manifest above, not a separate one —
+// this reuses renderHelpText/publicManifestEntries scoped to one verb, so it
+// is never wrapped in the fgos.v1 envelope for the same reason: metadata
+// about the CLI's own verb surface, not a verb's data payload.
 function handleVerbHelp(verb) {
   const entry = publicManifestEntries().find((e) => e.name === verb);
   if (!entry) return false;
@@ -2275,7 +2280,9 @@ function handleVerbHelp(verb) {
 
 // `--pretty` rendering (D7): ONLY for `setup`/`doctor`, and only when the
 // flag is given — every other verb, and these two without `--pretty`, stay
-// byte-identical to the wrapEnvelope + JSON path (CTR001, no exception).
+// byte-identical to the wrapEnvelope + JSON path. `--pretty` itself IS
+// CTR001's documented exception here: an explicit human-readable rendering
+// opt-out via an explicit flag, not a verb's default payload.
 function renderPretty(verb, data) {
   const lines = [];
   if (verb === 'doctor') {
