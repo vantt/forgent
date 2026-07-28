@@ -20,7 +20,7 @@
 import { modelForTier } from '../runner/dispatch.mjs';
 import { runJudgeExecutor, JUDGE_STRICT_JSON_SUFFIX } from './judge-executor.mjs';
 import { DEFAULTS } from '../state/work.mjs';
-import { listWork, moveStage, addWork, putInAwaiting, StoreError } from '../state/store.mjs';
+import { listWork, moveStage, moveWork, addWork, putInAwaiting, StoreError } from '../state/store.mjs';
 
 const DEFAULT_NEED_HUMAN_REASON =
   'Không phán được rõ ràng — cần người xác nhận cách chia.';
@@ -189,6 +189,22 @@ export function resolveDecompose(dir, id, cfg, actor) {
     throw new StoreError('validation', `resolveDecompose: work "${id}" not found.`);
   }
 
+  // Claim release on the decompose->executing boundary (claim-lock §3b): a
+  // pick claim held through clarify/decompose (`status: 'doing'`) is released
+  // back to `todo` the moment the root actually reaches `executing`, so
+  // `pick <id>` can re-claim it for the executing phase (§3a/§3c reattach the
+  // SAME `fgw/<id>` worktree via branchExists, since it already exists).
+  // `work.status` is read once, from the same snapshot as `work` above — the
+  // status axis is untouched by anything else in this function, so it stays
+  // valid across all three moveStage(...,'executing',...) call sites below. A
+  // runner-sweep call (item never claimed, `status: 'todo'` already) is a
+  // no-op here, matching R15 (sweep only touches todo items).
+  const releaseClaimOnExecuting = () => {
+    if (work.status === 'doing') {
+      moveWork(dir, { id, to: 'todo', expectedStatus: 'doing' });
+    }
+  };
+
   // Idempotent no-op (must_haves truth 3): a re-entrant call once the root
   // is already past `decompose` does nothing — the CAS on the moveStage
   // calls below would otherwise throw a conflict for the exact same case,
@@ -208,6 +224,7 @@ export function resolveDecompose(dir, id, cfg, actor) {
   const hasChildren = Object.values(view.work).some((item) => item.parent === id);
   if (hasChildren) {
     moveStage(dir, { id, to: 'executing', expectedStage: 'decompose', actor });
+    releaseClaimOnExecuting();
     return { outcome: 'already-decomposed', id };
   }
 
@@ -223,12 +240,13 @@ export function resolveDecompose(dir, id, cfg, actor) {
   // "Đề xuất chia" is the proposal BEFORE it is committed).
   if (verdict.kind === 'need-human' || work.risk === HEAVY_RISK) {
     const reason = verdict.kind === 'need-human' ? verdict.reason : DEFAULT_RISK_GATE_REASON;
-    putInAwaiting(dir, { id, ask: formatProposalAsk(verdict, reason) });
+    putInAwaiting(dir, { id, ask: formatProposalAsk(verdict, reason), statusAtAsk: work.status });
     return { outcome: 'need-human', id, verdict };
   }
 
   if (verdict.kind === 'pass-through') {
     moveStage(dir, { id, to: 'executing', expectedStage: 'decompose', actor });
+    releaseClaimOnExecuting();
     return { outcome: 'pass-through', id };
   }
 
@@ -257,5 +275,6 @@ export function resolveDecompose(dir, id, cfg, actor) {
   });
 
   moveStage(dir, { id, to: 'executing', expectedStage: 'decompose', actor });
+  releaseClaimOnExecuting();
   return { outcome: 'decompose', id, childIds };
 }

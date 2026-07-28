@@ -148,3 +148,75 @@ test('a second ask after an answer overwrites the prior parentSnapshotAtAsk, nev
   assert.equal(rebuilt.gates['item-x'].ask, 'Second question?');
   assert.deepEqual(rebuilt.gates['item-x'].parentSnapshotAtAsk, secondSnapshot);
 });
+
+// claim-lock §5.1 — statusAtAsk snapshot + answerAwaiting's dynamic resume
+// target. Mirrors the parentSnapshotAtAsk block above exactly, one field
+// over: the item's OWN status at ask-time, folded into the same gates[id]
+// map, read back by answerAwaiting instead of always falling to 'todo'.
+
+test('putInAwaiting with a statusAtAsk -> gates[id].statusAtAsk on rebuild', () => {
+  const dir = tmpDir();
+  addSampleWork(dir);
+  moveWork(dir, { id: 'item-x', to: 'doing', expectedStatus: 'todo' });
+
+  const { view } = putInAwaiting(dir, {
+    id: 'item-x',
+    ask: 'OAuth or password?',
+    expectedStatus: 'doing',
+    statusAtAsk: 'doing',
+  });
+  assert.deepEqual(view.gates['item-x'], { ask: 'OAuth or password?', statusAtAsk: 'doing' });
+
+  const rebuilt = listWork(dir);
+  assert.deepEqual(rebuilt.gates['item-x'], { ask: 'OAuth or password?', statusAtAsk: 'doing' });
+});
+
+test('putInAwaiting with no statusAtAsk -> no such key on gates[id] at all', () => {
+  const dir = tmpDir();
+  addSampleWork(dir);
+
+  const { view } = putInAwaiting(dir, { id: 'item-x', ask: 'OAuth or password?', expectedStatus: 'todo' });
+  assert.ok(!('statusAtAsk' in view.gates['item-x']));
+
+  const rebuilt = listWork(dir);
+  assert.ok(!('statusAtAsk' in rebuilt.gates['item-x']));
+});
+
+test('answerAwaiting resumes to statusAtAsk ("doing") instead of hardcoded "todo" — a claim held through the ask survives the answer', () => {
+  const dir = tmpDir();
+  addSampleWork(dir);
+  moveWork(dir, { id: 'item-x', to: 'doing', expectedStatus: 'todo', actor: 'session', headAtTake: 'deadbeef' });
+  putInAwaiting(dir, { id: 'item-x', ask: 'OAuth or password?', expectedStatus: 'doing', statusAtAsk: 'doing' });
+
+  const { view } = answerAwaiting(dir, { id: 'item-x', answer: 'OAuth', expectedStatus: 'awaiting-human', actor: 'human' });
+  assert.equal(view.work['item-x'].status, 'doing');
+  // The resume is not a fresh claim — the original claimant/head survive
+  // untouched (replay.mjs's from !== 'awaiting-human' guard).
+  assert.equal(view.work['item-x'].claimActor, 'session');
+  assert.equal(view.work['item-x'].headAtTake, 'deadbeef');
+
+  const rebuilt = listWork(dir);
+  assert.equal(rebuilt.work['item-x'].status, 'doing');
+});
+
+test('answerAwaiting with no statusAtAsk on the gate falls back to "todo" (backward-compat, byte-identical to the pre-§5.1 behavior)', () => {
+  const dir = tmpDir();
+  addSampleWork(dir);
+  putInAwaiting(dir, { id: 'item-x', ask: 'OAuth or password?', expectedStatus: 'todo' });
+
+  const { view } = answerAwaiting(dir, { id: 'item-x', answer: 'OAuth', expectedStatus: 'awaiting-human' });
+  assert.equal(view.work['item-x'].status, 'todo');
+});
+
+test('a second ask after an answer overwrites the prior statusAtAsk, never merges', () => {
+  const dir = tmpDir();
+  addSampleWork(dir);
+  moveWork(dir, { id: 'item-x', to: 'doing', expectedStatus: 'todo' });
+  putInAwaiting(dir, { id: 'item-x', ask: 'First?', expectedStatus: 'doing', statusAtAsk: 'doing' });
+  answerAwaiting(dir, { id: 'item-x', answer: 'first answer', expectedStatus: 'awaiting-human' });
+
+  putInAwaiting(dir, { id: 'item-x', ask: 'Second?', expectedStatus: 'doing', statusAtAsk: 'doing' });
+  const { view } = answerAwaiting(dir, { id: 'item-x', answer: 'second answer', expectedStatus: 'awaiting-human' });
+  assert.equal(view.gates['item-x'].ask, 'Second?');
+  assert.equal(view.work['item-x'].status, 'doing');
+});

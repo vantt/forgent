@@ -69,12 +69,29 @@ const TRANSITIONS = Object.freeze([
   Object.freeze({ from: 'blocked', to: 'doing' }),
   Object.freeze({ from: 'blocked', to: 'proposed' }),
   Object.freeze({ from: 'doing', to: 'proposed' }),
+  // Claim release (claim-lock §3b): the clarify/decompose -> executing
+  // boundary hands a held pick claim back to `todo` the moment the item is
+  // actually ready for its executing phase (resolveDecompose, after its own
+  // moveStage(...,'executing',...)) — silent, no `reason` required, mirroring
+  // `blocked -> todo`'s own no-reason shape immediately above. This is the
+  // one new status edge the design needs beyond the awaiting-human ones: a
+  // held claim was previously only ever reclaimed via `blocked` (return's
+  // reject path) or resumed via `awaiting-human`; this is the third, direct
+  // door a claim can leave `doing` through without settling the item.
+  Object.freeze({ from: 'doing', to: 'todo' }),
   Object.freeze({ from: 'proposed', to: 'done' }),
   Object.freeze({ from: 'proposed', to: 'todo' }),
   Object.freeze({ from: 'proposed', to: 'blocked' }),
   Object.freeze({ from: 'todo', to: 'awaiting-human' }),
   Object.freeze({ from: 'doing', to: 'awaiting-human' }),
   Object.freeze({ from: 'awaiting-human', to: 'todo' }),
+  // Claim-lock resume (str-clarify-decompose-claim-lock §5.1): a claim held
+  // at ask-time (`doing`) must resume to `doing`, not fall to a claimless
+  // `todo` — otherwise answering a gate mid-clarify/decompose silently drops
+  // the pick claim. store.mjs's answerAwaiting picks the resume target from
+  // the ask-time snapshot (`statusAtAsk`); this edge is what makes `doing`
+  // a legal one, alongside the existing `todo` resume above.
+  Object.freeze({ from: 'awaiting-human', to: 'doing' }),
 ]);
 
 /**
@@ -105,11 +122,12 @@ const TRANSITIONS = Object.freeze([
  * Human-gate ask/answer (per async-human-gate D2/D5), mirroring the `reason`
  * mechanism above: entering `awaiting-human` (`todo -> awaiting-human` or
  * `doing -> awaiting-human`) requires a non-empty `ask` explaining what the
- * gate is waiting for; leaving it (`awaiting-human -> todo`) requires a
- * non-empty `answer`. Both are refused with category 'validation' when
- * missing or blank (checked only after the edge itself is confirmed legal).
- * `ask`/`answer` are ignored and never appear in the payload for any other
- * edge, exactly like `reason`.
+ * gate is waiting for; leaving it (`awaiting-human -> *`, either back to
+ * `todo` or, per claim-lock §5.1, resuming to `doing`) requires a non-empty
+ * `answer`. Both are refused with category 'validation' when missing or
+ * blank (checked only after the edge itself is confirmed legal). `ask`/
+ * `answer` are ignored and never appear in the payload for any other edge,
+ * exactly like `reason`.
  */
 export function transitionWork({ work, to, expectedStatus, reason, ask, answer } = {}) {
   if (!work || typeof work !== 'object' || Array.isArray(work)) {
@@ -159,7 +177,7 @@ export function transitionWork({ work, to, expectedStatus, reason, ask, answer }
     payload.ask = ask.trim();
   }
 
-  if (from === 'awaiting-human' && to === 'todo') {
+  if (from === 'awaiting-human') {
     if (typeof answer !== 'string' || !answer.trim()) {
       throw new FsmError(
         'validation',

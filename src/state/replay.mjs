@@ -45,7 +45,7 @@ function applyEvent(view, event) {
       break;
     }
     case 'work.move': {
-      const { id, to, ask, answer, actor, learning, headAtTake, headAtReturn, branchHeadAtTake, branchHeadAtReturn, reason, parentSnapshotAtAsk } = event.payload ?? {};
+      const { id, from, to, ask, answer, actor, learning, headAtTake, headAtReturn, branchHeadAtTake, branchHeadAtReturn, reason, parentSnapshotAtAsk, claimTrigger, statusAtAsk } = event.payload ?? {};
       const item = view.work[id];
       if (item) {
         item.status = to;
@@ -62,7 +62,22 @@ function applyEvent(view, event) {
       // claim carries `actor: 'runner'` and no `headAtTake`, so this is a
       // strict addition for the pull door, never a rewrite of the runner's
       // own claim shape.
-      if (item && to === 'doing') {
+      // Guarded on `from !== 'awaiting-human'` (claim-lock §5.1): a resume out
+      // of the human gate can now legally land on `doing` (the new
+      // awaiting-human -> doing edge, fsm.mjs), but that is a RESUME of an
+      // existing claim, never a fresh one. In practice only `claimActor` is
+      // at real risk (answerAwaiting's caller, bin/fgos.mjs's `answer` verb,
+      // forwards `actor: 'human'` but never headAtTake/branchHeadAtTake/
+      // claimTrigger, so those three would no-op via moveWork's own
+      // `!== undefined` guards regardless) — this guard is what stops that
+      // `actor` from silently overwriting the ORIGINAL pick/take's
+      // claimActor. Written to cover all four fields uniformly anyway, since
+      // that is the same shape the sibling fold below already has, and it
+      // costs nothing extra to also protect the other three from a future
+      // caller that DOES start passing them. The two genuine claim edges
+      // (`todo -> doing`, `blocked -> doing`) never have `from ===
+      // 'awaiting-human'`, so this guard changes nothing for them.
+      if (item && to === 'doing' && from !== 'awaiting-human') {
         if (actor !== undefined) {
           item.claimActor = actor;
         }
@@ -76,6 +91,13 @@ function applyEvent(view, event) {
         // headAtTake instead).
         if (branchHeadAtTake !== undefined) {
           item.branchHeadAtTake = branchHeadAtTake;
+        }
+        // Claim-trigger marker (claim-lock §7): audit-only record of what
+        // dispatched this claim (e.g. `'herdr'`), folded the same way as
+        // claimActor above — durable per-item field, set only on a genuine
+        // new claim.
+        if (claimTrigger !== undefined) {
+          item.claimTrigger = claimTrigger;
         }
       }
       // Latest human rationale on the item (worker-feedback): a `reason`
@@ -123,6 +145,12 @@ function applyEvent(view, event) {
       // fresh `ask` after an `answer` overwrites the prior snapshot with the
       // new one via this same spread-then-override merge, never accumulating
       // both.
+      //
+      // `statusAtAsk` (claim-lock §5.1) rides the SAME fold, same guard: the
+      // item's own status at the moment this ask parked it, read back by
+      // answerAwaiting (store.mjs) to pick the resume target. Only the `ask`
+      // branch ever carries it; a fresh `ask` overwrites the prior value the
+      // same way parentSnapshotAtAsk does.
       if (ask || answer) {
         if (!view.gates) {
           view.gates = {};
@@ -132,6 +160,7 @@ function applyEvent(view, event) {
           ...(ask ? { ask } : {}),
           ...(answer ? { answer } : {}),
           ...(parentSnapshotAtAsk !== undefined ? { parentSnapshotAtAsk } : {}),
+          ...(statusAtAsk !== undefined ? { statusAtAsk } : {}),
         };
       }
       // Settlement channel (kênh 1 của capture 2 kênh, per Phase 3

@@ -453,6 +453,44 @@ test('foldEvents does not fold claimActor/headAtTake on a non-doing move even wh
   assert.equal(view.work.a.headAtTake, 'aaa', 'the proposed move carries headAtTake in its payload but it is not the doing edge, so it is never read');
 });
 
+// claim-lock §5.1/§7: a resume out of awaiting-human onto `doing` (the new
+// fsm.mjs edge) is NOT a fresh claim — it must never clobber the
+// claimActor/headAtTake/branchHeadAtTake/claimTrigger the ORIGINAL pick/take
+// already folded, no matter what `actor` the answer itself carries.
+test('foldEvents does not re-fold claimActor/headAtTake/claimTrigger on an awaiting-human -> doing resume (answer never overwrites the original claim)', () => {
+  const events = [
+    { seq: 1, ts: '2026-07-28T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo' }, v: 2 },
+    { seq: 2, ts: '2026-07-28T00:00:01.000Z', type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing', actor: 'session', headAtTake: 'deadbeef', claimTrigger: 'herdr' }, v: 2 },
+    { seq: 3, ts: '2026-07-28T00:00:02.000Z', type: 'work.move', payload: { id: 'a', from: 'doing', to: 'awaiting-human', ask: 'which auth?', statusAtAsk: 'doing' }, v: 2 },
+    { seq: 4, ts: '2026-07-28T00:00:03.000Z', type: 'work.move', payload: { id: 'a', from: 'awaiting-human', to: 'doing', actor: 'human', answer: 'OAuth' }, v: 2 },
+  ];
+  const view = foldEvents(events);
+  assert.equal(view.work.a.status, 'doing');
+  assert.equal(view.work.a.claimActor, 'session', 'the answer carried actor:"human" — must never overwrite the pick claim\'s "session"');
+  assert.equal(view.work.a.headAtTake, 'deadbeef');
+  assert.equal(view.work.a.claimTrigger, 'herdr');
+});
+
+// claim-lock §7: claimTrigger folds onto the item exactly like claimActor,
+// on a genuine `to: 'doing'` claim (not a resume).
+test('foldEvents folds claimTrigger onto the item from a doing claim that carries it', () => {
+  const events = [
+    { seq: 1, ts: '2026-07-28T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo' }, v: 2 },
+    { seq: 2, ts: '2026-07-28T00:00:01.000Z', type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing', actor: 'session', claimTrigger: 'herdr' }, v: 2 },
+  ];
+  const view = foldEvents(events);
+  assert.equal(view.work.a.claimTrigger, 'herdr');
+});
+
+test('foldEvents leaves claimTrigger absent when the claim never carried one', () => {
+  const events = [
+    { seq: 1, ts: '2026-07-28T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo' }, v: 2 },
+    { seq: 2, ts: '2026-07-28T00:00:01.000Z', type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing', actor: 'session' }, v: 2 },
+  ];
+  const view = foldEvents(events);
+  assert.equal('claimTrigger' in view.work.a, false);
+});
+
 // --- return marker (pr-lifecycle D3/D4, mirrors headAtTake above) ---------
 //
 // `headAtReturn` folds onto the item from a `work.move` return (`to:

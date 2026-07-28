@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { judgeDecompose, resolveDecompose } from '../../src/intake/decompose.mjs';
-import { addWork, listWork, StoreError, categoryOf } from '../../src/state/store.mjs';
+import { addWork, listWork, StoreError, categoryOf, moveWork } from '../../src/state/store.mjs';
 
 // Fake executors only — every "command" spawned here is a node script this
 // file writes to a mkdtemp directory at test time, mirroring
@@ -283,6 +283,42 @@ test('resolveDecompose on a pass-through verdict moves the item straight to exec
   assert.equal(view.work['item-x'].verify, 'npm test -- reporting');
 });
 
+// claim-lock §3b: a pick claim held through clarify/decompose (status
+// 'doing') is released back to 'todo' the moment the root actually reaches
+// stage executing, so `pick <id>` can re-claim it for the executing phase.
+test('resolveDecompose on a pass-through verdict releases a held claim (doing -> todo) once the root reaches executing (claim-lock §3b)', () => {
+  const scriptDir = mkTempDir();
+  const scriptPath = writeVerdictExecutor(scriptDir, { verdict: 'pass-through' });
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork());
+  moveWork(storeDir, { id: 'item-x', to: 'doing', expectedStatus: 'todo', actor: 'session' });
+
+  const result = resolveDecompose(storeDir, 'item-x', cfg, 'session');
+  assert.equal(result.outcome, 'pass-through');
+
+  const view = listWork(storeDir);
+  assert.equal(view.work['item-x'].stage, 'executing');
+  assert.equal(view.work['item-x'].status, 'todo');
+});
+
+// R15 (runner sweep only touches status 'todo' items, never claims): an
+// unclaimed item passing through the same edge is an explicit no-op for the
+// release call — status stays 'todo' throughout, no spurious moveWork error.
+test('resolveDecompose on a pass-through verdict is a no-op release for an item that was never claimed (status stays todo)', () => {
+  const scriptDir = mkTempDir();
+  const scriptPath = writeVerdictExecutor(scriptDir, { verdict: 'pass-through' });
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork());
+
+  const result = resolveDecompose(storeDir, 'item-x', cfg, 'runner');
+  assert.equal(result.outcome, 'pass-through');
+  assert.equal(listWork(storeDir).work['item-x'].status, 'todo');
+});
+
 test('resolveDecompose on a decompose verdict writes every child with parent/deps/verify and moves the root to executing', () => {
   const scriptDir = mkTempDir();
   const scriptPath = writeVerdictExecutor(scriptDir, {
@@ -319,6 +355,23 @@ test('resolveDecompose on a decompose verdict writes every child with parent/dep
 
   // D4/D5: children are lineage only, never written into the root's own deps.
   assert.deepEqual(view.work['item-x'].deps, []);
+});
+
+test('resolveDecompose on a decompose verdict releases a held claim (doing -> todo) once the root reaches executing (claim-lock §3b)', () => {
+  const scriptDir = mkTempDir();
+  const scriptPath = writeVerdictExecutor(scriptDir, {
+    verdict: 'decompose',
+    children: [{ title: 'Build parser', verify: 'npm test -- parser' }],
+  });
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork());
+  moveWork(storeDir, { id: 'item-x', to: 'doing', expectedStatus: 'todo', actor: 'session' });
+
+  const result = resolveDecompose(storeDir, 'item-x', cfg, 'session');
+  assert.equal(result.outcome, 'decompose');
+  assert.equal(listWork(storeDir).work['item-x'].status, 'todo');
 });
 
 test('resolveDecompose writes footprint on a child exactly when the verdict provided one, undefined otherwise', () => {
@@ -448,6 +501,32 @@ test('resolveDecompose completes an interrupted decompose (children exist, root 
   assert.equal(children.length, 1);
 });
 
+test('resolveDecompose on the already-decomposed re-entrant path also releases a held claim (claim-lock §3b)', () => {
+  const scriptDir = mkTempDir();
+  const scriptPath = writeVerdictExecutor(scriptDir, { verdict: 'pass-through' }); // never consulted on this path
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork());
+  moveWork(storeDir, { id: 'item-x', to: 'doing', expectedStatus: 'todo', actor: 'session' });
+  addWork(storeDir, {
+    id: 'orphan-child-def',
+    title: 'Build parser',
+    kind: 'feature',
+    status: 'todo',
+    deps: [],
+    risk: 'standard',
+    refs: [],
+    verify: 'npm test -- parser',
+    stage: 'executing',
+    parent: 'item-x',
+  });
+
+  const result = resolveDecompose(storeDir, 'item-x', cfg, 'session');
+  assert.equal(result.outcome, 'already-decomposed');
+  assert.equal(listWork(storeDir).work['item-x'].status, 'todo');
+});
+
 test('resolveDecompose on a need-human verdict parks the item in awaiting-human carrying the proposal, writing no children', () => {
   const scriptDir = mkTempDir();
   const scriptPath = writeVerdictExecutor(scriptDir, { verdict: 'need-human', reason: 'Ambiguous scope' });
@@ -465,6 +544,20 @@ test('resolveDecompose on a need-human verdict parks the item in awaiting-human 
   assert.match(view.gates['item-x'].ask, /Ambiguous scope/);
   const children = Object.values(view.work).filter((item) => item.parent === 'item-x');
   assert.equal(children.length, 0);
+});
+
+test('resolveDecompose on a need-human verdict stamps statusAtAsk "doing" when a pick claim is held (claim-lock §5.1)', () => {
+  const scriptDir = mkTempDir();
+  const scriptPath = writeVerdictExecutor(scriptDir, { verdict: 'need-human', reason: 'Ambiguous scope' });
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork());
+  moveWork(storeDir, { id: 'item-x', to: 'doing', expectedStatus: 'todo', actor: 'session' });
+
+  const result = resolveDecompose(storeDir, 'item-x', cfg, 'session');
+  assert.equal(result.outcome, 'need-human');
+  assert.equal(listWork(storeDir).gates['item-x'].statusAtAsk, 'doing');
 });
 
 test('resolveDecompose routes a risk-heavy root through the human gate even on a clean decompose verdict, writing no children yet', () => {

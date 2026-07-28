@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { judgeDiscovery, resolveDiscovery } from '../../src/intake/discovery.mjs';
-import { addWork, listWork, StoreError, categoryOf, putInAwaiting, answerAwaiting } from '../../src/state/store.mjs';
+import { addWork, listWork, StoreError, categoryOf, putInAwaiting, answerAwaiting, moveWork } from '../../src/state/store.mjs';
 import { appendEvent, readEvents } from '../../src/state/events.mjs';
 
 // Fake executors only — every "command" spawned here is a node script this
@@ -392,6 +392,36 @@ test('resolveDiscovery on an unclear verdict writes the discovery record and par
   assert.equal(view.gates['item-x'].ask, 'Which endpoint?');
   assert.equal(view.discovery['item-x'].length, 1);
   assert.equal(view.discovery['item-x'][0].clear, false);
+});
+
+// claim-lock §5.1: the item's OWN status at the moment of park (not the
+// parent's) rides the same putInAwaiting call as statusAtAsk, so
+// answerAwaiting can resume to it later instead of always falling to 'todo'.
+test('resolveDiscovery on an unclear verdict stamps statusAtAsk from the item\'s status at call time — "todo" when never claimed', () => {
+  const scriptDir = mkTempDir();
+  const scriptPath = writeVerdictExecutor(scriptDir, { clear: false, question: 'Which endpoint?' });
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork());
+
+  resolveDiscovery(storeDir, 'item-x', cfg);
+  const view = listWork(storeDir);
+  assert.equal(view.gates['item-x'].statusAtAsk, 'todo');
+});
+
+test('resolveDiscovery on an unclear verdict stamps statusAtAsk "doing" when a pick claim is held through clarify (claim-lock §1/§5.1)', () => {
+  const scriptDir = mkTempDir();
+  const scriptPath = writeVerdictExecutor(scriptDir, { clear: false, question: 'Which endpoint?' });
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork());
+  moveWork(storeDir, { id: 'item-x', to: 'doing', expectedStatus: 'todo', actor: 'session' });
+
+  resolveDiscovery(storeDir, 'item-x', cfg);
+  const view = listWork(storeDir);
+  assert.equal(view.gates['item-x'].statusAtAsk, 'doing');
 });
 
 test('resolveDiscovery records the discovery event on the fail-safe path too (a spawn failure still gets an unclear record)', () => {
