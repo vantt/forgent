@@ -17,10 +17,37 @@
 // produced (need-human) or a risk-heavy root (D3) — never for "the model
 // call itself broke".
 
+import fs from 'node:fs';
+import path from 'node:path';
 import { modelForTier } from '../runner/dispatch.mjs';
 import { runJudgeExecutor, JUDGE_STRICT_JSON_SUFFIX } from './judge-executor.mjs';
 import { DEFAULTS } from '../state/work.mjs';
 import { listWork, moveStage, moveWork, addWork, putInAwaiting, StoreError } from '../state/store.mjs';
+
+// Best-effort read of the locked-decisions artifacts fgos-exploring/
+// fgos-planning write under `work.docsRef` (docs/history/<feature>/). A
+// missing docsRef, or a missing/unreadable file under it, is never fatal —
+// judgeDecompose still runs on title/description alone, same as an item
+// that never went through those skills. Real bug this backstops (p-<TBD>,
+// tsk-1wd dogfood 2026-07-28): buildDecomposePrompt used to see NEITHER
+// work.description NOR CONTEXT.md/plan.md, only a possibly-truncated
+// title — the split-work judgment silently reinvented an architecture the
+// item's own locked decisions had already ruled out.
+function readLockedContext(repoRoot, docsRef) {
+  if (typeof docsRef !== 'string' || !docsRef.trim()) return '';
+  const featureDir = path.join(repoRoot, docsRef);
+  const sections = [];
+  for (const file of ['CONTEXT.md', 'plan.md']) {
+    try {
+      const content = fs.readFileSync(path.join(featureDir, file), 'utf8');
+      if (content.trim()) sections.push(`## ${file}\n${content.trim()}`);
+    } catch {
+      // optional artifact; absence is not an error (item may still be
+      // mid-clarify with no plan.md yet, or predate fgos-exploring)
+    }
+  }
+  return sections.join('\n\n');
+}
 
 const DEFAULT_NEED_HUMAN_REASON =
   'Không phán được rõ ràng — cần người xác nhận cách chia.';
@@ -32,9 +59,15 @@ const DEFAULT_NEED_HUMAN_REASON =
 const HEAVY_RISK = 'heavy';
 const DEFAULT_RISK_GATE_REASON = 'Item gốc có risk cao (heavy) — cần xác nhận trước khi chia.';
 
-function buildDecomposePrompt(work) {
+function buildDecomposePrompt(work, lockedContext) {
   const refs = Array.isArray(work.refs) && work.refs.length ? work.refs.join(', ') : '(none)';
   const deps = Array.isArray(work.deps) && work.deps.length ? work.deps.join(', ') : '(none)';
+  const description =
+    typeof work.description === 'string' && work.description.trim() ? work.description : '(không có)';
+  const locked =
+    typeof lockedContext === 'string' && lockedContext.trim()
+      ? lockedContext
+      : '(không có CONTEXT.md/plan.md — item chưa qua fgos-exploring/fgos-planning, hoặc docsRef trống)';
 
   return `# Chia-việc (decompose)
 
@@ -47,6 +80,13 @@ Risk: ${work.risk ?? '(none)'}
 Verify (hiện có): ${work.verify ?? '(none)'}
 Refs: ${refs}
 Deps: ${deps}
+
+# Mô tả đầy đủ (nguyên văn lúc submit)
+${description}
+
+# Quyết định đã khoá (CONTEXT.md / plan.md, nếu có — đây là nguồn thẩm quyền,
+KHÔNG được đề xuất kiến trúc/hàm/file khác với những gì đã khoá ở đây)
+${locked}
 
 # Câu hỏi
 Item này đơn giản, thi công thẳng được không, hay cần chia thành nhiều việc
@@ -107,11 +147,11 @@ function normalizeChild(child) {
  * position — the only shape resolveDecompose can resolve to real ids while
  * writing children in a single forward pass through one store door.
  */
-export function judgeDecompose(work, cfg) {
+export function judgeDecompose(work, cfg, lockedContext) {
   try {
     const tier = work?.tier ?? DEFAULTS.tier;
     const model = modelForTier(cfg, tier);
-    const prompt = buildDecomposePrompt(work);
+    const prompt = buildDecomposePrompt(work, lockedContext);
     const stricterPrompt = prompt + JUDGE_STRICT_JSON_SUFFIX;
 
     const verdict = runJudgeExecutor(cfg, model, prompt, stricterPrompt);
@@ -228,7 +268,9 @@ export function resolveDecompose(dir, id, cfg, actor) {
     return { outcome: 'already-decomposed', id };
   }
 
-  const verdict = judgeDecompose(work, cfg);
+  const repoRoot = path.dirname(dir);
+  const lockedContext = readLockedContext(repoRoot, work.docsRef);
+  const verdict = judgeDecompose(work, cfg, lockedContext);
 
   if (verdict.kind === 'invalid') {
     return { outcome: 'invalid', id };
