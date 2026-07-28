@@ -31,13 +31,24 @@ function spawnAttempt(cfg, model, prompt) {
   });
 }
 
+// tsk-37v: the nested `claude -p` executor routinely wraps an otherwise-valid
+// verdict in a markdown code fence (```json ... ``` or ``` ... ```) despite
+// JUDGE_STRICT_JSON_SUFFIX asking for none — a habit of the underlying model,
+// not a refusal. Stripping it here (before JSON.parse) is a no-op on stdout
+// that was never fenced, so this never changes behavior for a clean response.
+function stripCodeFence(stdout) {
+  const trimmed = stdout.trim();
+  const match = trimmed.match(/^```[a-zA-Z]*\r?\n([\s\S]*?)\r?\n?```$/);
+  return match ? match[1] : trimmed;
+}
+
 // A parse-shaped failure (str68 Terms): exit 0, but stdout does not parse to
 // a plain object (JSON.parse throws, or parses to null/an array/a
 // primitive). Field-level validation (e.g. "clear" must be boolean) stays
 // the caller's job — this only decides whether the attempt is retry-worthy.
 function parseVerdict(stdout) {
   try {
-    const parsed = JSON.parse(stdout);
+    const parsed = JSON.parse(stripCodeFence(stdout));
     if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
       return { parsed: true, verdict: parsed };
     }
