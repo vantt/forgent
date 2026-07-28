@@ -24,6 +24,7 @@
     "src/runner/main-checkout-lock.mjs": "infra",
     "src/runner/github-adapter.mjs": "infra",
     "src/state/store.mjs": "infra",
+    "src/state/cursor.mjs": "use-case",
     "src/state/porting-store.mjs": "infra",
     "src/install/coexist.mjs": "infra",
     "src/runner/recovery.mjs": "domain",
