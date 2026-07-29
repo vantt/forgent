@@ -125,3 +125,43 @@ Two child items, both `parent: tsk-n4i`:
 Plan shaped. Next: `fgos-validating` reality-checks this plan (both pieces'
 risk maps and verify commands) before the `decompose` → `executing` edge is
 picked, per D3/D4 scope locked in CONTEXT.md.
+
+## Validation (fgos-validating, READY WITH CONSTRAINTS)
+
+Reality gate: mode fit PASS, repo fit PASS (all cited files/lines/flags
+confirmed by direct read), smaller path PASS (D4 already locked by explicit
+user confirmation). Baseline evidence gathered for real: both migrate
+scripts' `--dry-run` against the live `.fgos/events.jsonl` currently throw
+`seq gap at line 273 -- expected 273, got 272`; full `npm test` baseline is
+green (1706 pass / 0 fail / 5 skipped, 92.5s).
+
+Two constraints attached before executing either piece:
+
+1. **Piece A must update/annotate every stale seq citation, not only
+   `replay.mjs:263`.** A repo-wide grep (`seq [0-9]{3,}`-style patterns
+   across `src`, `bin`, `scripts`, `docs`) found 6 more hits beyond the one
+   named in this plan's Approach section: `src/state/store.mjs:628`;
+   `docs/history/decision-schema-rationale-alternatives-source/CONTEXT.md:29,72`
+   and `plan.md:48,49,54` (all citing "seq 1190" for the decision at
+   `.fgos/events.jsonl:1206` -- after the renumber that line's seq becomes
+   1206, matching its line number, so the "(seq 1190)" parenthetical goes
+   stale); `docs/decisions/0022-fgos-choke-point-survey.md:59` ("seq 502");
+   `docs/how-to/clear-a-stuck-main-checkout-lock.md:98` ("seq 647"); and
+   `docs/history/status-proposed-rename/plan.md:94`, which already
+   documents this exact bug ("272 VÀ 273 cùng mang `seq: 272`") from a
+   prior investigation. Also write a backup copy of `.fgos/events.jsonl`
+   before the in-place overwrite, mirroring the existing migrate scripts'
+   own `--backup` convention, even though ADR-0019 does not require a
+   compensating event.
+2. **Piece B's verify command is under-specified as bare `npm test`** --
+   that command already passes today with no contiguity check present, so
+   it would pass trivially even if piece B built nothing. Read piece B's
+   verify as: a new test file (picked up automatically by the
+   `test/**/*.test.mjs` glob) that asserts the new check FAILs on a
+   deliberately-corrupted fixture and PASSes on a clean one; `npm test`
+   green is necessary but not sufficient proof on its own.
+
+User approved proceeding with these constraints attached (not folded back
+through a second `fgos-planning` pass, since neither changes the chosen
+mode, approach, or split -- both only sharpen proof-surface detail within
+what was already approved).
