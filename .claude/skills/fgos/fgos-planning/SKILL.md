@@ -113,11 +113,40 @@ stage values — the same way `fgos-routing` describes it.
 
 ## Gate
 
-Before handing off, present the mode, the approach, and the shape in plain
-language — what gets built, why this size and not a bigger or smaller one,
-what it costs if the shape turns out wrong — with `plan.md` linked, then ask
-exactly: "Work shape is ready. Approve before execution?" `plan.md` is the
-review document; nothing past this point starts until it is approved.
+Before asking, check whether this gate can auto-approve instead
+(`docs/history/gate-bypass/CONTEXT.md` D1-D5 — never the `awaiting-human`
+park, only this skill-embedded question):
+
+```bash
+root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
+node -e "
+Promise.all([import('./src/state/store.mjs'), import('./src/state/gate-bypass.mjs'), import('node:fs')]).then(([{ listWork }, { canAutoApprove, readGateBypassLevel }, fs]) => {
+  const fgosDir = process.argv[1] + '/.fgos';
+  const item = listWork(fgosDir).work[process.argv[2]];
+  const artifact = fs.readFileSync(process.argv[3], 'utf8');
+  const level = readGateBypassLevel(fgosDir);
+  console.log(canAutoApprove(item, artifact, level) ? 'true' : 'false');
+});
+" -- "$root" "<item-id>" "docs/history/<feature>/plan.md"
+```
+
+The code (`gate-bypass.mjs`/`store.mjs`) imports cwd-relative — this worktree's own branch already carries whatever version it needs. Only the state lookup (`.fgos/`, gitignored and per-worktree-local) resolves to the main checkout's `.fgos/` via `git rev-parse --git-common-dir`, the same resolution `scripts/fgos-shell-integration.sh`'s `fgos` shell function already uses — a worktree's own local `.fgos/` never carries the real item record.
+
+Treat anything other than exactly `true` on stdout — `false`, empty output,
+a thrown error — as `false`: fail closed, never skip the question on a
+check that couldn't run cleanly.
+
+- **`true`** — skip the question. Post the non-question line
+  `auto-approved: plan.md (gate-bypass level <level>)`, log it
+  (`fgos decision --text "auto-approved plan.md gate for <item-id> at
+  level <level>"`, D3's audit trail), then continue straight to
+  `fgos-validating`.
+- **`false`** — present the mode, the approach, and the shape in plain
+  language — what gets built, why this size and not a bigger or smaller
+  one, what it costs if the shape turns out wrong — with `plan.md` linked,
+  then ask exactly: "Work shape is ready. Approve before execution?"
+  `plan.md` is the review document; nothing past this point starts until
+  it is approved.
 
 The mode decision reached in step 2 does not, by itself, move the item
 anywhere. It only informs which of the item's own already-registered edges
