@@ -41,6 +41,7 @@
     "src/state/stage.mjs": "domain",
     "src/state/replay.mjs": "domain",
     "src/state/dep-graph.mjs": "domain",
+    "src/state/graph-harness.mjs": "domain",
     "src/state/graph-metrics.mjs": "domain",
     "src/state/awaiting-context.mjs": "domain",
     "src/intake/discovery.mjs": "use-case",
