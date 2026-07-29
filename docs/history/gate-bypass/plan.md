@@ -72,7 +72,7 @@ read/status verb, mirroring `fgos-runner.json`'s pattern of a plain JSON
 file with no CLI verb required to edit it by hand — a `status`-only verb is
 enough, matching `TIERS`' own no-CLI-setter precedent).
 
-Verify: `npm test -- test/state/gate-bypass.test.mjs`
+Verify: `node --test test/state/gate-bypass.test.mjs`
 
 Depends on: nothing (first piece).
 
@@ -90,7 +90,7 @@ Files likely touched: `.claude/skills/fgos/fgos-exploring/SKILL.md`,
 `.claude/skills/fgos/fgos-planning/SKILL.md`, and their byte-identical
 `.agents/skills/fgos/` counterparts.
 
-Verify: `npm test -- test/skills/fgos-mirror.test.mjs`
+Verify: `node --test test/skills/fgos-mirror.test.mjs`
 
 Depends on: Piece 1 (`canAutoApprove` must exist to call).
 
@@ -116,8 +116,9 @@ Two pieces as shaped above. Per the schema's own `parent` field semantics
 (`add`/`edit`) accepts a `--parent` value today — `add`'s field list is
 `id/title/kind/risk/verify/deps/refs/learn/tier/domain/footprint/
 discovered-from/docs-ref/acceptance/goal-tier/targets`, no `parent`. Setting
-`parent` appears to be the decompose auto-judge's own machine action
-(`src/intake/decompose.mjs`), consistent with `fgos-routing`'s "the
+`parent` is the decompose auto-judge's own machine action — confirmed at
+`src/intake/decompose.mjs:349` (`parent: id` written when a split is
+judged) — consistent with `fgos-routing`'s "the
 engine's verb always wins" precedence rule. This plan documents the two
 child titles and their verify commands as the shape for that later
 machine step to act on; this session does not fabricate a `--parent` flag
@@ -125,10 +126,10 @@ that does not exist, and does not create the children by hand.
 
 - **Child 1**: "gate-bypass config + tier-coverage + completeness check
   (state/CLI layer)" — kind: feature, risk: standard, verify:
-  `npm test -- test/state/gate-bypass.test.mjs`.
+  `node --test test/state/gate-bypass.test.mjs`.
 - **Child 2**: "wire fgos-exploring/fgos-planning Gate steps to
   gate-bypass check, mirror to .agents" — kind: feature, risk: standard,
-  verify: `npm test -- test/skills/fgos-mirror.test.mjs`. Depends on Child 1.
+  verify: `node --test test/skills/fgos-mirror.test.mjs`. Depends on Child 1.
 
 ## Execution
 
