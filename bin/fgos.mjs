@@ -21,6 +21,7 @@ import { repairTruncatedLastLine } from '../src/state/events.mjs';
 import { deriveTitle, classify, generateId } from '../src/intake/classify.mjs';
 import { wrapEnvelope } from '../src/state/envelope.mjs';
 import { loadRunnerConfig, ensureRunnerConfig, DEFAULT_RUNNER_CONFIG } from '../src/runner/dispatch.mjs';
+import { readGateBypassLevel } from '../src/state/gate-bypass.mjs';
 import { resolveFgosDir } from '../src/runner/paths.mjs';
 import { resolveDiscovery } from '../src/intake/discovery.mjs';
 import { resolveDecompose } from '../src/intake/decompose.mjs';
@@ -1067,6 +1068,14 @@ async function runVerb(verb, flags, positional, dir) {
     // items stuck in `doing` — classifies stale-by-owner-type (human >> agent)
     // and SUGGESTS; it never moves or reclaims anything (the runner reap is the
     // only role, and it never reclaims a person's claim).
+    // Request-class per D1: a pure read, never touches state.json. Reports
+    // the configured gate-bypass level (docs/history/gate-bypass/CONTEXT.md
+    // D1-D5) — no CLI setter, mirroring .fgos-runner.json's own
+    // edit-the-file-by-hand pattern.
+    case 'gate-bypass': {
+      return { level: readGateBypassLevel(dir) };
+    }
+
     case 'stale': {
       return staleDoingAdvisory(dir);
     }

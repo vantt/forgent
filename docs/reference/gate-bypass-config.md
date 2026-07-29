@@ -1,16 +1,14 @@
 ---
 type: reference
-source_capture_ids: [tsk-6bx-1]
+source_capture_ids: [tsk-6bx-1, tsk-6bx-2]
 ---
 
 # Gate-bypass config
 
-Reference for `.fgos/gate-bypass.json` and the `fgos gate-bypass` verb —
-the config/state layer that lets a skill-embedded confirmation gate
-auto-approve instead of asking (`docs/history/gate-bypass/CONTEXT.md`
-D1-D5). This layer only computes the yes/no; wiring it into
-`fgos-exploring`/`fgos-planning`'s actual Gate steps is a separate piece
-not covered by this capture.
+Reference for `.fgos/gate-bypass.json`, the `fgos gate-bypass` verb, and
+the `fgos-exploring`/`fgos-planning` Gate steps that consult them — the
+full mechanism that lets a skill-embedded confirmation gate auto-approve
+instead of asking (`docs/history/gate-bypass/CONTEXT.md` D1-D5).
 
 ## `.fgos/gate-bypass.json`
 
@@ -81,3 +79,37 @@ Fails closed (returns "has open items") on any of:
 An artifact that never adopts the `## Outstanding questions` convention
 is always treated as incomplete — this is a fail-closed default, not a
 detection gap to fix later.
+
+## Gate-step wiring (`fgos-exploring`, `fgos-planning`)
+
+Both skills' Gate sections run a check before presenting their approval
+question — `fgos-exploring` against `CONTEXT.md`, `fgos-planning` against
+`plan.md`:
+
+```bash
+root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
+node -e "
+Promise.all([import('./src/state/store.mjs'), import('./src/state/gate-bypass.mjs'), import('node:fs')]).then(([{ listWork }, { canAutoApprove, readGateBypassLevel }, fs]) => {
+  const fgosDir = process.argv[1] + '/.fgos';
+  const item = listWork(fgosDir).work[process.argv[2]];
+  const artifact = fs.readFileSync(process.argv[3], 'utf8');
+  const level = readGateBypassLevel(fgosDir);
+  console.log(canAutoApprove(item, artifact, level) ? 'true' : 'false');
+});
+" -- "$root" "<item-id>" "docs/history/<feature>/CONTEXT.md"
+```
+
+The `.fgos/` state lookup resolves to the main checkout via `git
+rev-parse --git-common-dir`, not the cwd — a worktree's own local
+`.fgos/` is gitignored and per-worktree-local, so it never carries the
+real item record (confirmed empirically: `listWork('.fgos')` from inside
+a freshly claimed worktree returns `undefined` for the claimed item
+itself). The `gate-bypass.mjs`/`store.mjs` code imports stay cwd-relative
+— the worktree's own branch already carries whatever version it needs.
+
+Anything other than exactly `true` on stdout is treated as `false` and
+fails closed to presenting the gate normally. On `true`, the skill posts
+a non-question line (`auto-approved: CONTEXT.md (gate-bypass level
+<level>)` / `auto-approved: plan.md (gate-bypass level <level>)`) and
+logs a matching `fgos decision` entry (D3's audit trail) instead of
+asking.
