@@ -1,0 +1,12 @@
+id = "fgos.dashboard"
+name = "fgOS Dashboard"
+version = "0.1.0"
+min_herdr_version = "0.7.0"
+description = "fgOS work-item and in-process task cockpit inside a herdr pane"
+platforms = ["linux", "macos"]
+
+[[panes]]
+id = "dashboard"
+title = "fgOS Dashboard"
+placement = "overlay"
+command = ["sh", "-c", "exec \"$HERDR_PLUGIN_ROOT/target/release/herdr-fgos\""]
