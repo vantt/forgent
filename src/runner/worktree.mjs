@@ -298,6 +298,69 @@ export function createWorktree(repoRoot, id, opts = {}) {
   return { path: worktreePath, branch, reused };
 }
 
+// OPERATION-TYPE WRAPPERS (docs/decisions/0022 candidate #3, ranked-priority
+// row "createWorktree 6 call site tự quyết baseRef/cleanup"): every
+// createWorktree call site falls into exactly one of these 3 recurring
+// shapes, but before this each site re-decided its own cleanup policy
+// (force-remove now vs best-effort-remove-and-log vs no cleanup at all)
+// separately. `createWorktree`/`removeWorktree` above stay the only two
+// low-level primitives; these wrappers only name which shape a call site is
+// and centralize that shape's cleanup, never a second worktree/branch
+// implementation.
+
+/**
+ * claim-isolate: the worktree returned here IS the work — it outlives this
+ * call, and its owning claim (`claim-port.mjs`'s `claimWork`) tears it down
+ * later at return/reject time, never inline here. Thin passthrough, kept so
+ * a claim call site names its shape instead of calling the low-level
+ * primitive directly (and so a future claim-isolate call site has one
+ * documented place to land instead of a fourth ad hoc `createWorktree` call).
+ */
+export function createClaimWorktree(repoRoot, id, opts = {}) {
+  return createWorktree(repoRoot, id, opts);
+}
+
+/**
+ * merge-ephemeral: a worktree created ONLY to stage one merge (approve's
+ * leaf-into-root merge, catchup's target-into-item merge) against a branch
+ * that already exists — `opts.baseRef` is never needed here (createWorktree's
+ * branch-reuse path ignores it) — and force-removed unconditionally once
+ * `fn` settles, whether it returns or throws. Replaces the identical
+ * try/finally both call sites used to write out by hand.
+ */
+export async function withMergeEphemeralWorktree(repoRoot, id, fn) {
+  const worktree = createWorktree(repoRoot, id, {});
+  try {
+    return await fn(worktree);
+  } finally {
+    removeWorktree(repoRoot, worktree.path, { force: true });
+  }
+}
+
+/**
+ * runner-dispatch: a worktree created for one dispatch attempt (startup
+ * reap's throwaway goal-check checkout, or a claimed item's worker run).
+ * `opts` carries whatever baseRef/worktreeDir the caller's own leaf/root
+ * logic already resolved (D3 "leaf fork-from-tip-of-parent" stays call-site
+ * business logic, not a choke-point — only the cleanup policy was
+ * duplicated). Pair with `removeDispatchWorktree` below: a cleanup failure
+ * there is logged, never thrown, so it can never mask the attempt's real
+ * outcome — the same policy `loop.mjs` used to define as its own private
+ * `safeRemoveWorktree` at every call site.
+ */
+export function createDispatchWorktree(repoRoot, id, opts = {}) {
+  return createWorktree(repoRoot, id, opts);
+}
+
+/** Cleanup half of the runner-dispatch pair — see `createDispatchWorktree`. */
+export function removeDispatchWorktree(repoRoot, worktreePath, log) {
+  try {
+    removeWorktree(repoRoot, worktreePath, { force: true });
+  } catch (err) {
+    log(`fgos-runner: worktree cleanup failed for "${worktreePath}": ${err.message}`);
+  }
+}
+
 /**
  * Remove the worktree checkout at `worktreePath` (per CWD DISCIPLINE above:
  * always run from `repoRoot`, never from inside `worktreePath`). Does NOT

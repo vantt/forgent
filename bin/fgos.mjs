@@ -36,7 +36,7 @@ import { frozenJudgeHits } from '../src/runner/frozen-judge.mjs';
 import { classifySource, reviewDiff, mergeRunnerItem, cleanupMergedBranch, changedFiles, isWorkingTreeClean as isMainTreeClean, isFgosOnlyStatusLine, buildOwnFileSet, detectTrunk, isMainWorktree } from '../src/runner/merge.mjs';
 import { createGitHubPR, mergeGitHubPR, viewGitHubPRStatus } from '../src/runner/github-adapter.mjs';
 import { classifyIronLaw } from '../src/evolve/iron-law.mjs';
-import { branchNameFor, branchExists, createWorktree, removeWorktree } from '../src/runner/worktree.mjs';
+import { branchNameFor, branchExists, withMergeEphemeralWorktree } from '../src/runner/worktree.mjs';
 import { claimWork, ClaimError } from '../src/runner/claim-port.mjs';
 import {
   acquireMainCheckoutLock,
@@ -1873,8 +1873,14 @@ async function runVerb(verb, flags, positional, dir) {
           // checkout of fgw/<rootId>; low-likelihood under single-operator
           // P6, D16's per-root merge-mutex lives in the runner's
           // write-queue, not this human-driven CLI verb.
-          const ephemeral = createWorktree(repoRoot, rootId, {});
-          try {
+          //
+          // withMergeEphemeralWorktree's own finally (worktree.mjs) removes
+          // the checkout on every exit path below (conflict, verify-fail,
+          // merged) — per D4/D17 that never deletes the branch itself.
+          // mergeRunnerItem's own conflict/verify-fail outcomes already
+          // leave the ephemeral checkout clean via `git merge --abort`, so
+          // no cleanupMergedBranch call is needed on those paths.
+          return await withMergeEphemeralWorktree(repoRoot, rootId, async (ephemeral) => {
             const result = await mergeRunnerItem(ephemeral.path, item, { timeoutMs });
 
             if (result.outcome === 'conflict') {
@@ -1936,16 +1942,7 @@ async function runVerb(verb, flags, positional, dir) {
               output: result.check.output,
               cleanupWarnings: cleanup.warnings,
             };
-          } finally {
-            // Per D4/D17: only the branch is durable, the worktree is
-            // always ephemeral — removeWorktree never deletes the branch,
-            // only the checkout. Runs on every exit path (conflict,
-            // verify-fail, merged) — mergeRunnerItem's own conflict/
-            // verify-fail outcomes already leave the ephemeral checkout
-            // clean via `git merge --abort`, so no cleanupMergedBranch call
-            // is needed on those paths.
-            removeWorktree(repoRoot, ephemeral.path, { force: true });
-          }
+          });
         }
 
         // Root merge into main — unchanged except for D8: a root that
@@ -2131,9 +2128,9 @@ async function runVerb(verb, flags, positional, dir) {
       // Ephemeral worktree checked out on the item's OWN branch (confirmed
       // to exist above, so this always takes the branch-reuse path — no
       // baseRef needed, D17: only the branch is durable, every checkout is
-      // ephemeral). Removed on every exit path via the finally block below.
-      const ephemeral = createWorktree(repoRoot, id, {});
-      try {
+      // ephemeral). Removed on every exit path via withMergeEphemeralWorktree's
+      // own finally (worktree.mjs).
+      return await withMergeEphemeralWorktree(repoRoot, id, async (ephemeral) => {
         let conflicted = false;
         try {
           execFileSync('git', ['merge', '--no-commit', '--no-ff', target], { cwd: ephemeral.path, encoding: 'utf8', shell: false });
@@ -2190,9 +2187,7 @@ async function runVerb(verb, flags, positional, dir) {
         // reason/ask required on this edge (fsm.mjs).
         const { event } = moveWork(dir, { id, to: 'awaiting-approval', expectedStatus: 'blocked', role: 'runner' });
         return { id, outcome: 'merged', from: 'blocked', to: 'awaiting-approval', target, branch: ownBranch, seq: event.seq, output: check.output };
-      } finally {
-        removeWorktree(repoRoot, ephemeral.path, { force: true });
-      }
+      });
     }
 
     // Gate A — candidate ranking (self-improve-loop P13 Slice 1, D1/D3/D6):
