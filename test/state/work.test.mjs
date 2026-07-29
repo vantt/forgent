@@ -142,6 +142,10 @@ test('STATUSES includes awaiting-human', () => {
   assert.ok(STATUSES.includes('awaiting-human'));
 });
 
+test('STATUSES includes wontfix', () => {
+  assert.ok(STATUSES.includes('wontfix'));
+});
+
 test('validateWork rejects a work item that lists itself as a dep', () => {
   assert.throws(
     () => validateWork(baseWork({ id: 'a', deps: ['a'] })),

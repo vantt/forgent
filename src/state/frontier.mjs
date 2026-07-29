@@ -128,9 +128,15 @@ function indexChildrenByParent(work) {
 
 // True when `id` has any descendant (direct child, or a descendant reachable
 // through further `parent` chains below a child) whose status is not yet
-// 'done'. `seen` guards against a malformed/cyclic parent chain turning this
-// into an infinite walk — it never occurs on data produced by the decompose
-// engine, only a defensive backstop.
+// resolved — 'done', or, per fsm-wontfix-terminal-status D1, 'wontfix' (a
+// second terminal state for an item deliberately closed without being
+// built; without this, a permanently-`wontfix` child would anchor its
+// parent out of the frontier forever, the same structural bug `wontfix`
+// exists to fix for `blocked`). `seen` guards against a malformed/cyclic
+// parent chain turning this into an infinite walk — it never occurs on
+// data produced by the decompose engine, only a defensive backstop.
+const RESOLVED_STATUSES = new Set(['done', 'wontfix']);
+
 function hasOpenDescendant(id, work, childrenByParent, seen = new Set()) {
   const children = childrenByParent[id];
   if (!children) return false;
@@ -139,7 +145,7 @@ function hasOpenDescendant(id, work, childrenByParent, seen = new Set()) {
     seen.add(childId);
     const child = work[childId];
     if (!child) continue;
-    if (child.status !== 'done') return true;
+    if (!RESOLVED_STATUSES.has(child.status)) return true;
     if (hasOpenDescendant(childId, work, childrenByParent, seen)) return true;
   }
   return false;

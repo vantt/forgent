@@ -385,6 +385,20 @@ test('move applies a legal transition, appends one event, and updates the view, 
   assert.equal(stateView(cwd).work.movable.status, 'doing');
 });
 
+// fsm-wontfix-terminal-status D1/D3: move --to wontfix is legal from each
+// of its 3 entry statuses (blocked/todo/doing) through the existing
+// generic move verb — no dedicated CLI verb needed.
+for (const from of ['blocked', 'todo', 'doing']) {
+  test(`move applies ${from} -> wontfix through the generic verb, exit 0`, () => {
+    const cwd = tmpCwd();
+    addOk(cwd, `wontfix-from-${from}`);
+    if (from !== 'todo') run(cwd, ['move', `wontfix-from-${from}`, '--to', from]);
+    const result = run(cwd, ['move', `wontfix-from-${from}`, '--to', 'wontfix', '--reason', 'superseded']);
+    assert.equal(result.status, 0);
+    assert.equal(stateView(cwd).work[`wontfix-from-${from}`].status, 'wontfix');
+  });
+}
+
 test('move rejects an illegal transition as precondition, exit 2, no event written', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'stuck-todo');
