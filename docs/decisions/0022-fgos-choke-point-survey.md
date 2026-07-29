@@ -141,3 +141,24 @@ commit) — xem `docs/decisions/0021-wire-main-checkout-hook-qua-doctor-setup.md
 Không liệt lại thành candidate riêng của tsk-1ab vì đã có quyết định +
 theo dõi sẵn — trích dẫn ở đây để không đọc nhầm 2 cơ chế cùng tên
 "main-checkout-lock" là một.
+
+## Ranked priority
+
+1 bảng phẳng duy nhất (D4) — sort theo rủi ro lệch hành vi trước, tần suất
+gọi làm tie-break. Chỉ xếp hạng 3 candidate đã XÁC NHẬN THẬT ở trên (mục
+"Đã kiểm tra, KHÔNG phải choke-point" không vào bảng này vì không phải
+việc cần hợp nhất).
+
+| Hạng | Choke-point | Rủi ro lệch hành vi | Tần suất | Vì sao |
+|---|---|---|---|---|
+| 1 | `take` vs `pick` claim-eligibility (#1) | **Cao** — không chỉ khác hành vi ngầm, mà khiến lệnh do chính `fgos-routing` hướng dẫn literal bị CLI reject cứng, giữa chừng 1 session | Rất cao — `fgos-routing` được nạp "at the start of every fgOS work session" (chính mô tả skill), nên bất kỳ session nào theo đúng ví dụ prose sẽ dính | Sửa 1 lần (đồng bộ guard giữa `take`/`pick`, hoặc sửa lại prose `fgos-routing` theo hành vi thật của `pick`) chặn đứng lỗi lặp lại ở mọi session tương lai |
+| 2 | `isWorkingTreeClean` trùng lặp (`return` vs `approve`, #2) | Trung bình — 2 phạm vi khác nhau thật (subtree vs whole-repo) có thể khiến `return` coi là sạch trong khi `approve` sau đó lại thấy bẩn (hoặc ngược lại), lệch kỳ vọng giữa 2 verb lõi | Cao — mọi lần `return` và mọi lần `approve` đều chạy qua 1 trong 2 hàm này | Hợp nhất về 1 hàm nhận tham số phạm vi (subtree/whole-repo) thay vì 2 định nghĩa riêng, để đảm bảo cùng logic loại trừ + cùng cách tính prefix |
+| 3 | `createWorktree` 6 call site tự quyết baseRef/cleanup (#3) | Trung bình-thấp — mỗi nơi đã tự đúng theo ngữ cảnh riêng (baseRef hợp lý theo leaf/root, hầu hết đã có cleanup), rủi ro chủ yếu là worktree mồ côi khi cleanup thiếu (site `pick`), không phải state sai | Cao — 6 call site trải khắp `pick`/`approve`/`review`/runner dispatch, chạy thường xuyên | Thêm 1 wrapper theo "loại thao tác" (claim-isolate / merge-ephemeral / runner-dispatch) bọc `createWorktree` + cleanup thống nhất, thay vì sửa lẻ từng site |
+
+## No fixes applied
+
+Đúng yêu cầu (4) của item: khảo sát này KHÔNG tự sửa bất kỳ choke-point
+nào ở trên. Mỗi dòng trong bảng xếp hạng, nếu được chọn để sửa, trở thành
+1 item riêng sau này (như cách finding của `tsk-53f` đã tách thành item
+độc lập) — không nằm trong phạm vi thi công của `tsk-1ab`/`tsk-1ab-1`/
+`tsk-1ab-2`.
