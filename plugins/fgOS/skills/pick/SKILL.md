@@ -44,12 +44,15 @@ state or touches git worktrees directly — every write goes through the
    - the claimed item's **id** (`data.id`),
    - the worktree's **path** (`data.worktree.path`).
 
-3. **Rename the pane, then show the task description — before the
-   worktree switch.** This has to run after step 2 (never before): the
-   claimed **id** is only known once the claim call returns, including
-   the frontier-default case (`/fgOS:pick` with no id argument).
+3. **Rename the pane via `/fgOS:terminal`, then show the task
+   description — before the worktree switch.** This has to run after
+   step 2 (never before): the claimed **id** is only known once the
+   claim call returns, including the frontier-default case (`/fgOS:pick`
+   with no id argument).
 
-   Rename first:
+   Rename first — this is `/fgOS:terminal`'s own `rename` behavior,
+   invoked directly here rather than through a second slash-command
+   round trip:
 
    ```
    bash ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/plugins/fgOS/skills/terminal/rename.sh "<id>" "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
