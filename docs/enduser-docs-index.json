@@ -59,6 +59,14 @@
     "quadrant": "how-to",
     "purpose": "Show the steps to accomplish one specific, already-understood goal.",
     "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/diagnose-a-verify-fail-post-merge-block-on-approve.md",
+    "title": "How to diagnose an `fgos approve` blocked by `verify-fail-post-merge`",
+    "sourceCaptureId": "tsk-2z3"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
     "docPath": "docs/how-to/fgos-terminal-pane-rename.md",
     "title": "How to: label a herdr pane with the claimed task from a chrome-only fgOS skill",
     "sourceCaptureId": "tsk-62x-1"
@@ -67,9 +75,17 @@
     "quadrant": "how-to",
     "purpose": "Show the steps to accomplish one specific, already-understood goal.",
     "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/find-every-caller-before-requiring-a-cli-flag.md",
+    "title": "How to find every caller before making a CLI flag required",
+    "sourceCaptureId": "tsk-63c"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
     "docPath": "docs/how-to/fix-a-verify-command-broken-by-mixed-in-prose.md",
     "title": "How to fix a verify command that mixes prose with a real command",
-    "sourceCaptureId": null
+    "sourceCaptureId": "tsk-34y"
   },
   {
     "quadrant": "how-to",
@@ -102,6 +118,14 @@
     "docPath": "docs/how-to/see-done-items-in-list-and-triage.md",
     "title": "How to see done items in `fgos list` / `fgos triage`",
     "sourceCaptureId": "tsk-5oa"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/smoke-test-fgos-executing-with-a-trivial-item.md",
+    "title": "How to smoke-test fgos-executing with a trivial verify=true item",
+    "sourceCaptureId": "str89-case-study-executing"
   },
   {
     "quadrant": "reference",
@@ -142,6 +166,14 @@
     "docPath": "docs/explanation/event-log-evolution-discipline.md",
     "title": "How fgOS's event log is allowed to evolve without breaking replay",
     "sourceCaptureId": null
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/fgos-capture-points-and-the-why-gap.md",
+    "title": "Why fgOS's automatic capture records the what, but not the why",
+    "sourceCaptureId": "tsk-ma4"
   },
   {
     "quadrant": "explanation",
@@ -278,6 +310,14 @@
     "docPath": "docs/explanation/work-item-lifecycle-and-domain-model.md",
     "title": "Why the work-item lifecycle keeps status and stage separate, and what extending it costs",
     "sourceCaptureId": "tsk-2zv"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/worktree-isolation-axis-decision.md",
+    "title": "Why fgOS worktrees block `.fgos/` instead of locking or copying it",
+    "sourceCaptureId": "worktree-in-out"
   },
   {
     "quadrant": "explanation",
@@ -461,6 +501,14 @@
     "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/decisions/0022-fgos-choke-point-survey.md",
     "title": "0022 — Khảo sát choke-point fgOS (quyết định lặp/lệch xuyên CLI/runner/skill)",
+    "sourceCaptureId": null
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/decisions/0023-uu-tien-san-pham-ship-dod-hoan-thien.md",
+    "title": "0023 — Thứ tự ưu tiên sản phẩm: ship faster > DoD (result + docs) > hoàn thiện sau ngưỡng",
     "sourceCaptureId": null
   }
 ]

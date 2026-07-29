@@ -93,9 +93,11 @@ Turns a fuzzy request into locked decisions written down in
    assumption instead, or hand it to `fgos-planning` if only the implementer
    cares. After each answer, confirm the decision back and assign it a
    stable ID: `D1`, `D2`, `D3`… Then run `fgos decision --text "<D-ID>:
-   <one-line summary>"` so the decision also lands in the item's
+   <one-line summary>" --rationale "see CONTEXT.md for the full scout
+   evidence and reasoning"` so the decision also lands in the item's
    append-only decision log, surfaced through `view.decisions`/`fgos list`
-   for machine readers — this call is additive alongside writing
+   for machine readers — `--rationale` is required (tsk-63c) — this call
+   is additive alongside writing
    CONTEXT.md in step 3, never a replacement for it: CONTEXT.md stays the
    source of truth for the full decision, this just makes its existence
    visible outside the prose doc. When an answer settles what a fuzzy term
@@ -172,8 +174,9 @@ check that couldn't run cleanly.
 - **`true`** — skip the question. Post the non-question line
   `auto-approved: CONTEXT.md (gate-bypass level <level>)`, log it
   (`fgos decision --text "auto-approved CONTEXT.md gate for <item-id> at
-  level <level>"`, D3's audit trail), then continue straight to
-  `fgos-planning`.
+  level <level>" --rationale "gate-bypass level <level> permits
+  auto-approval per docs/history/gate-bypass/CONTEXT.md D1-D5"`, D3's
+  audit trail), then continue straight to `fgos-planning`.
 - **`false`** — surface the locked decisions in plain language — what was
   decided, why it can be trusted, what it costs if wrong — with CONTEXT.md
   linked, then ask exactly: "Decisions locked. Approve CONTEXT.md before

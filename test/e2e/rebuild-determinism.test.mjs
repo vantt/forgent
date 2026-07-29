@@ -91,7 +91,7 @@ test('rebuild-determinism: init, add work with deps + unicode title, move throug
   assert.equal(move(cwd, 'c', 'blocked', 'todo').status, 0);
   assert.equal(move(cwd, 'c', 'todo', 'blocked').status, 0);
 
-  assert.equal(run(cwd, ['decision', '--text', 'locked D3: event log is truth, view is rebuilt']).status, 0);
+  assert.equal(run(cwd, ['decision', '--text', 'locked D3: event log is truth, view is rebuilt', '--rationale', 'keeps the log the single source of truth']).status, 0);
 
   // `ready` (per phase-2-routing-5): a pure read, exercised mid-journey —
   // it must reflect the frontier at this exact point (only `a` is `done`;

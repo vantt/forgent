@@ -147,8 +147,9 @@ check that couldn't run cleanly.
 - **`true`** — skip the question. Post the non-question line
   `auto-approved: plan.md (gate-bypass level <level>)`, log it
   (`fgos decision --text "auto-approved plan.md gate for <item-id> at
-  level <level>"`, D3's audit trail), then continue straight to
-  `fgos-validating`.
+  level <level>" --rationale "gate-bypass level <level> permits
+  auto-approval per docs/history/gate-bypass/CONTEXT.md D1-D5"`, D3's
+  audit trail), then continue straight to `fgos-validating`.
 - **`false`** — present the mode, the approach, and the shape in plain
   language — what gets built, why this size and not a bigger or smaller
   one, what it costs if the shape turns out wrong — with `plan.md` linked,
