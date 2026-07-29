@@ -59,6 +59,7 @@ script tự-động kiểm), người viết record mới tự đối chiếu.
 | [0019](0019-mien-tru-viet-lai-nhat-ky.md) | Miễn trừ pre-release cho RUL11 | Trong lúc sản phẩm chưa phát hành, migration được phép viết lại tại chỗ cả ba kho `.fgos`; miễn trừ hết hiệu lực ở v1.0.0; không bao gồm `phase1-events.jsonl`. |
 | [0020](0020-chan-fgos-khoi-worktree-worker.md) | Chặn `.fgos/` khỏi worktree worker | `fgw/<id>` worktree worker không được symlink (khóa-trong-cây) lẫn bootstrap-copy (cô-lập-cây) `.fgos/` — xóa hẳn khỏi checkout + `merge.mjs` từ chối cứng diff chạm `.fgos/`; `session.mjs` (actor trusted) giữ nguyên symlink D10. Mở rộng `0005`. |
 | [0021](0021-wire-main-checkout-hook-qua-doctor-setup.md) | Wire main-checkout lock hook qua doctor/setup | Str65's `.githooks/pre-commit` (đã viết, đã test) chỉ active khi `core.hooksPath` = `.githooks` — wire vào `fgos doctor` (đọc) + `fgos setup` (ghi, fill-only, không đè custom path); không app-level lock-wrap, không epoch-fence mới. Fix khả-tiếp-cận, không phải enforcement bắt buộc. |
+| [0023](0023-uu-tien-san-pham-ship-dod-hoan-thien.md) | Thứ tự ưu tiên sản phẩm | 3 bậc: ship faster > DoD (result verify + docs evidence-linked, cùng 1 gate) > hoàn thiện sau ngưỡng (polish, không mở rộng scope). |
 
 ## Truy vết nguồn (đầy đủ)
 
