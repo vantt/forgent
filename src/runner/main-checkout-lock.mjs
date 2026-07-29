@@ -48,6 +48,18 @@ import path from 'node:path';
 
 export const LOCK_FILE = 'main-checkout.lock';
 
+/** Formats a millisecond duration (lockAgeMs/remainingTtlMs) as a short
+ * human-readable string ("2m15s", "45s") for CLI messages. Non-numeric or
+ * negative input (no known duration) formats as "unknown" rather than
+ * fabricating a number. */
+export function formatLockDurationMs(ms) {
+  if (typeof ms !== 'number' || Number.isNaN(ms) || ms < 0) return 'unknown';
+  const totalSeconds = Math.floor(ms / 1000);
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return minutes > 0 ? `${minutes}m${seconds}s` : `${seconds}s`;
+}
+
 // DEFAULT_TTL_MS (tsk-3w8 follow-up): Phase 2 (the git hook, wired) and the
 // claim flow (claim-port.mjs's claimWork) now BOTH acquire this same lock,
 // and needed one shared staleness window instead of each picking its own —
@@ -165,13 +177,22 @@ function tryAcquireOnce(lockPath, identity, now, ttlMs) {
     // judged purely by ttlMs freshness. Undecidable without a window —
     // fail closed (D5) rather than guess free or held.
     if (typeof ttlMs !== 'number') {
-      return { status: AMBIGUOUS };
+      // Record parsed fine, so age is real even though held-ness itself is
+      // undecidable (D5 fail-closed) — surface what's actually known,
+      // never a fabricated remaining-TTL with no ttlMs to compute it from.
+      return { status: AMBIGUOUS, lockAgeMs: now - record.ts };
     }
     held = now - record.ts <= ttlMs;
   }
 
   if (held) {
-    return { status: HELD, holderPid: record.pid };
+    const lockAgeMs = now - record.ts;
+    return {
+      status: HELD,
+      holderPid: record.pid,
+      lockAgeMs,
+      remainingTtlMs: typeof ttlMs === 'number' ? Math.max(0, ttlMs - lockAgeMs) : null,
+    };
   }
 
   // Stale (dead pid, or ttl-expired). Re-read right before the unlink: the
@@ -210,9 +231,16 @@ function tryAcquireOnce(lockPath, identity, now, ttlMs) {
  * there is no process to probe). Defaults to `process.pid`. The on-disk
  * JSON field holding it is still named `pid`.
  *
- * Returns `{ status, holderPid?, lockPath, release? }` where `status` is one
- * of ACQUIRED / HELD / AMBIGUOUS. Never throws for a stale/corrupt/missing
- * lock — only for unexpected fs errors.
+ * Returns `{ status, holderPid?, lockAgeMs?, remainingTtlMs?, lockPath,
+ * release? }` where `status` is one of ACQUIRED / HELD / AMBIGUOUS. `HELD`
+ * always carries `lockAgeMs` (time since the recorded holder last touched
+ * the lock); `remainingTtlMs` is `null` when no `ttlMs` was supplied (no
+ * staleness window to compute it from — never fabricated). An `AMBIGUOUS`
+ * from a parsed-but-undecidable string-identity record (no `ttlMs`
+ * supplied) also carries `lockAgeMs`; an `AMBIGUOUS` from genuinely
+ * unparseable content carries neither (no record to read a timestamp from).
+ * Never throws for a stale/corrupt/missing lock — only for unexpected fs
+ * errors.
  *
  * `ttlMs` is optional and caller-supplied only (no production default picked
  * here, per this cell's scope) — when present, a live-pid holder whose
@@ -237,18 +265,25 @@ export function acquireMainCheckoutLock(dir, { identity = process.pid, ttlMs, no
       };
     }
     if (res.status === HELD) {
-      return { status: HELD, holderPid: res.holderPid, lockPath };
+      return {
+        status: HELD,
+        holderPid: res.holderPid,
+        lockAgeMs: res.lockAgeMs,
+        remainingTtlMs: res.remainingTtlMs,
+        lockPath,
+      };
     }
     if (res.status === AMBIGUOUS) {
-      return { status: AMBIGUOUS, lockPath };
+      return { status: AMBIGUOUS, lockAgeMs: res.lockAgeMs, lockPath };
     }
     // status === 'retry': a stale lock was cleaned (by us or a racing
     // reclaimer); loop reattempts the bare create on the next iteration.
   }
   // Bound matches the mirrored lineage (loop.mjs): a reclaim-then-retry can
   // race at most once before either succeeding or meeting a fresh holder
-  // that a subsequent caller must re-evaluate.
-  return { status: HELD, holderPid: null, lockPath };
+  // that a subsequent caller must re-evaluate. No record was actually read
+  // here (both attempts raced a fresh holder), so no age/TTL to report.
+  return { status: HELD, holderPid: null, lockAgeMs: null, remainingTtlMs: null, lockPath };
 }
 
 /** Removes `.fgos/main-checkout.lock` under `dir` if present. Idempotent — a
