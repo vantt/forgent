@@ -363,7 +363,14 @@ export async function mergeRunnerItem(repoRoot, item, { timeoutMs } = {}) {
   // regression in kind, just a second call site inheriting a known gap.
   const fgosDir = path.join(repoRoot, '.fgos');
   const identity = resolveWriterIdentity(fgosDir).id;
-  const lock = acquireMainCheckoutLock(fgosDir, { identity, ttlMs: DEFAULT_TTL_MS });
+  // releaseOnExit (tsk-45z point 2): approve's own job is over once this
+  // process exits, so a crash/interrupt mid-merge should release the lock
+  // immediately rather than leaving the next writer to wait out the TTL —
+  // unlike `.githooks/pre-commit`'s intentional lingering acquire, this
+  // caller's `finally` below already always calls `lock.release()` itself
+  // on the happy path; releaseOnExit only adds the crash/SIGINT/SIGTERM net
+  // on top of that.
+  const lock = acquireMainCheckoutLock(fgosDir, { identity, ttlMs: DEFAULT_TTL_MS, releaseOnExit: true });
   if (lock.status === HELD) {
     throw new MergeError(`cannot merge "${branch}": main checkout is locked by another live session (${lock.holderPid}).`, { branch });
   }
