@@ -305,6 +305,17 @@ export const COMMAND_REGISTRY = [
     deprecated: null,
   },
   {
+    name: 'gate-bypass',
+    invoke: 'fgos gate-bypass',
+    description: 'Read-only status: the configured gate-bypass level (off/light/standard/heavy) from .fgos/gate-bypass.json, defaulting to "off" when the file is missing or malformed. Determines whether skill-embedded confirmation gates may auto-approve instead of asking (docs/history/gate-bypass/CONTEXT.md D1-D5) — never the awaiting-human park. No CLI setter: edit the file by hand, mirroring .fgos-runner.json\'s own no-CLI-setter pattern.',
+    parameters: { type: 'object', properties: {}, required: [] },
+    examples: ['fgos gate-bypass'],
+    touchesState: false,
+    externalEffect: false,
+    paginated: false,
+    deprecated: null,
+  },
+  {
     name: 'stale',
     invoke: 'fgos stale',
     description: 'Read-only advisory: items stuck in "doing" classified as stale by owner type (a person\'s claim gets far longer grace than an agent\'s). Classifies and suggests only — never reclaims.',
