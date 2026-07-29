@@ -58,10 +58,14 @@ export const LOCK_FILE = 'main-checkout.lock';
 // forever (D5 fail-closed), permanently deadlocking every take/pick after
 // the very first commit once the hook is active. Historical STR65 incidents
 // (docs/history/str65-worktree-isolation-enforcement/reports/
-// validation-phase1.md) showed real inter-commit gaps of ~2-3.5 minutes; 5
-// minutes clears that with a thinner margin than an earlier 10-minute value,
-// accepted for self-healing an abandoned lock sooner.
-export const DEFAULT_TTL_MS = 5 * 60 * 1000;
+// validation-phase1.md) showed real inter-commit gaps of ~2-3.5 minutes.
+// Lowered from 5 to 3 minutes (accepted trade-off, 2026-07-29): margin is
+// now thinner than that observed 3.5-minute worst case, so a genuinely slow
+// commit can self-expire and race a second writer — accepted for faster
+// self-healing of an abandoned lock. Use FGOS_MAIN_CHECKOUT_LOCK_TTL_MS to
+// widen the window for a specific session/CI run instead of raising this
+// default back up.
+export const DEFAULT_TTL_MS = 3 * 60 * 1000;
 
 export const ACQUIRED = 'acquired';
 export const HELD = 'held-by-live-other-pid';
