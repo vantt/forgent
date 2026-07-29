@@ -8,9 +8,9 @@ use herdr_fgos::ui::draw;
 fn dashboard_renders_without_panicking() {
     let backend = TestBackend::new(80, 24);
     let mut terminal = Terminal::new(backend).expect("terminal init");
-    let app = App::mock();
+    let mut app = App::mock();
 
     terminal
-        .draw(|frame| draw(frame, &app))
+        .draw(|frame| draw(frame, &mut app))
         .expect("draw should not panic");
 }

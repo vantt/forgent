@@ -6,7 +6,7 @@ use ratatui::Frame;
 
 use crate::app::App;
 
-pub fn draw(frame: &mut Frame, app: &App) {
+pub fn draw(frame: &mut Frame, app: &mut App) {
     let rows = Layout::default()
         .direction(Direction::Vertical)
         .constraints([Constraint::Min(0), Constraint::Length(1)])
@@ -27,16 +27,19 @@ pub fn draw(frame: &mut Frame, app: &App) {
             ))
         })
         .collect();
-    frame.render_widget(
-        List::new(work_items).block(
-            Block::default()
-                .borders(Borders::ALL)
-                .title(Span::styled(
-                    "Work items (by impact)",
-                    Style::default().add_modifier(Modifier::BOLD),
-                )),
-        ),
+    frame.render_stateful_widget(
+        List::new(work_items)
+            .block(
+                Block::default()
+                    .borders(Borders::ALL)
+                    .title(Span::styled(
+                        "Work items (by impact) — ↑/↓ select, Enter to pick",
+                        Style::default().add_modifier(Modifier::BOLD),
+                    )),
+            )
+            .highlight_style(Style::default().add_modifier(Modifier::REVERSED)),
         columns[0],
+        &mut app.selected,
     );
 
     let in_process: Vec<ListItem> = app
@@ -59,10 +62,12 @@ pub fn draw(frame: &mut Frame, app: &App) {
         columns[1],
     );
 
-    let status = match &app.last_error {
-        Some(err) => Paragraph::new(format!("fgos poll error: {err}"))
-            .style(Style::default().fg(Color::Red)),
-        None => Paragraph::new("q/Esc to quit"),
+    let status = if let Some(err) = &app.last_error {
+        Paragraph::new(format!("fgos poll error: {err}")).style(Style::default().fg(Color::Red))
+    } else if let Some(status) = &app.pick_status {
+        Paragraph::new(status.as_str()).style(Style::default().fg(Color::Green))
+    } else {
+        Paragraph::new("↑/↓ select · Enter: pick · q/Esc: quit")
     };
     frame.render_widget(status, rows[1]);
 }

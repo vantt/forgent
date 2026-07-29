@@ -1,5 +1,7 @@
 use std::path::Path;
 
+use ratatui::widgets::ListState;
+
 use crate::fgos;
 
 pub struct WorkItem {
@@ -19,6 +21,10 @@ pub struct App {
     pub work_items: Vec<WorkItem>,
     pub in_process: Vec<InProcessTask>,
     pub last_error: Option<String>,
+    pub selected: ListState,
+    /// Set right after a pick pane is opened, cleared on the next
+    /// keypress — a one-line status confirmation, never a blocking modal.
+    pub pick_status: Option<String>,
 }
 
 impl App {
@@ -27,6 +33,51 @@ impl App {
             work_items: Vec::new(),
             in_process: Vec::new(),
             last_error: None,
+            selected: ListState::default(),
+            pick_status: None,
+        }
+    }
+
+    pub fn select_next(&mut self) {
+        if self.work_items.is_empty() {
+            return;
+        }
+        let next = match self.selected.selected() {
+            Some(i) => (i + 1) % self.work_items.len(),
+            None => 0,
+        };
+        self.selected.select(Some(next));
+    }
+
+    pub fn select_previous(&mut self) {
+        if self.work_items.is_empty() {
+            return;
+        }
+        let prev = match self.selected.selected() {
+            Some(0) | None => self.work_items.len() - 1,
+            Some(i) => i - 1,
+        };
+        self.selected.select(Some(prev));
+    }
+
+    pub fn selected_id(&self) -> Option<&str> {
+        self.selected
+            .selected()
+            .and_then(|i| self.work_items.get(i))
+            .map(|item| item.id.as_str())
+    }
+
+    /// A live poll can shrink or grow `work_items`; keep the cursor inside
+    /// bounds rather than pointing at a row that no longer exists.
+    fn clamp_selection(&mut self) {
+        if self.work_items.is_empty() {
+            self.selected.select(None);
+        } else if let Some(i) = self.selected.selected() {
+            if i >= self.work_items.len() {
+                self.selected.select(Some(self.work_items.len() - 1));
+            }
+        } else {
+            self.selected.select(Some(0));
         }
     }
 
@@ -57,6 +108,8 @@ impl App {
                 title: "Wire real fgOS data into the dashboard".into(),
             }],
             last_error: None,
+            selected: ListState::default(),
+            pick_status: None,
         }
     }
 
@@ -76,6 +129,7 @@ impl App {
                     })
                     .collect();
                 self.last_error = None;
+                self.clamp_selection();
             }
             Err(err) => self.last_error = Some(err.to_string()),
         }
