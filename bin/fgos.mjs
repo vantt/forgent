@@ -42,9 +42,11 @@ import {
   releaseMainCheckoutLock,
   releaseMainCheckoutLockIfOwn,
   forceReclaimAmbiguousLock,
+  inspectMainCheckoutLock,
   ACQUIRED,
   HELD,
   DEFAULT_TTL_MS,
+  formatLockDurationMs,
 } from '../src/runner/main-checkout-lock.mjs';
 import { resolveWriterIdentity } from '../src/runner/session-identity.mjs';
 import { createSession, endSession, listSessions, reclaimOrphanedSessions, SessionError } from '../src/runner/session.mjs';
@@ -2307,9 +2309,12 @@ async function runVerb(verb, flags, positional, dir) {
     case 'unlock': {
       const lockResult = acquireMainCheckoutLock(dir, { identity: process.pid, ttlMs: DEFAULT_TTL_MS });
       if (lockResult.status === HELD) {
+        const ttlPart = lockResult.remainingTtlMs != null
+          ? `, expires in ${formatLockDurationMs(lockResult.remainingTtlMs)}`
+          : ', no TTL window known';
         throw new StoreError(
           'lock-timeout',
-          `unlock: main checkout lock is held by a live session (${lockResult.holderPid}) -- refusing to clear it.`,
+          `unlock: main checkout lock is held by a live session (${lockResult.holderPid}, held ${formatLockDurationMs(lockResult.lockAgeMs)}${ttlPart}) -- refusing to clear it.`,
         );
       }
       if (lockResult.status === ACQUIRED) {
@@ -2321,8 +2326,20 @@ async function runVerb(verb, flags, positional, dir) {
       return { cleared: reclaim.status === 'reclaimed', reason: reclaim.status };
     }
 
+    case 'lock-status': {
+      const status = inspectMainCheckoutLock(dir, { ttlMs: DEFAULT_TTL_MS });
+      return {
+        outcome: status.outcome,
+        holderPid: status.holderPid ?? null,
+        lockAgeMs: status.lockAgeMs ?? null,
+        remainingTtlMs: status.remainingTtlMs ?? null,
+        lockAge: status.lockAgeMs != null ? formatLockDurationMs(status.lockAgeMs) : null,
+        remainingTtl: status.remainingTtlMs != null ? formatLockDurationMs(status.remainingTtlMs) : null,
+      };
+    }
+
     default:
-      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <init|add|submit|discover|move|edit|ask|answer|decision|list|ready|rebuild|repair|check|rollup|take|return|review|approve|reject|catchup|evolve|triage|session|goal|setup|doctor|unlock> ...`);
+      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <init|add|submit|discover|move|edit|ask|answer|decision|list|ready|rebuild|repair|check|rollup|take|return|review|approve|reject|catchup|evolve|triage|session|goal|setup|doctor|unlock|lock-status> ...`);
   }
 }
 

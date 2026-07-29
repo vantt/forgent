@@ -9,7 +9,7 @@
 
 import { moveWork, addOutcome, listWork, readRawEvents } from '../state/store.mjs';
 import { visitCount } from './anti-loop.mjs';
-import { acquireMainCheckoutLock, HELD, AMBIGUOUS, DEFAULT_TTL_MS } from './main-checkout-lock.mjs';
+import { acquireMainCheckoutLock, HELD, AMBIGUOUS, DEFAULT_TTL_MS, formatLockDurationMs } from './main-checkout-lock.mjs';
 import { createWorktree, branchNameFor, branchExists } from './worktree.mjs';
 import { resolveRoot } from './root-affinity.mjs';
 import { execFileSync } from 'node:child_process';
@@ -79,10 +79,17 @@ export function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoot = pr
   // permanently deadlocking every take/pick after the very first commit.
   const lockResult = acquireMainCheckoutLock(dir, { identity: process.pid, ttlMs: DEFAULT_TTL_MS, releaseOnExit: true });
   if (lockResult.status === HELD) {
-    throw new ClaimError('lock-held', `claimWork: main checkout locked by pid ${lockResult.holderPid}`);
+    const ttlPart = lockResult.remainingTtlMs != null
+      ? `, expires in ${formatLockDurationMs(lockResult.remainingTtlMs)}`
+      : ', no TTL window known';
+    throw new ClaimError(
+      'lock-held',
+      `claimWork: main checkout locked by pid ${lockResult.holderPid} (held ${formatLockDurationMs(lockResult.lockAgeMs)}${ttlPart})`,
+    );
   }
   if (lockResult.status === AMBIGUOUS) {
-    throw new ClaimError('lock-ambiguous', 'claimWork: main checkout lock state ambiguous');
+    const agePart = lockResult.lockAgeMs != null ? ` (lock age ${formatLockDurationMs(lockResult.lockAgeMs)})` : '';
+    throw new ClaimError('lock-ambiguous', `claimWork: main checkout lock state ambiguous${agePart}`);
   }
 
   try {

@@ -5968,7 +5968,8 @@ test('unlock: lock genuinely held by a live session -- refuses, reports the hold
   const result = run(cwd, ['unlock']);
 
   assert.equal(result.status, 7, result.stderr);
-  assert.match(result.stderr, new RegExp(`held by a live session \\(${process.pid}\\)`));
+  assert.match(result.stderr, new RegExp(`held by a live session \\(${process.pid}, `));
+  assert.match(result.stderr, /held \d+[ms].*expires in \d+[ms]/);
   assert.equal(fs.existsSync(mainCheckoutLockPath(cwd)), true);
 });
 
@@ -5995,5 +5996,76 @@ test('unlock: registered in the --help --json manifest with write-only touchesSt
   const entry = manifest.commands.find((c) => c.name === 'unlock');
   assert.ok(entry, 'unlock entry missing from --help --json manifest');
   assert.equal(entry.touchesState, true);
+  assert.equal(entry.externalEffect, false);
+});
+
+// --- `fgos lock-status` (tsk-5z2, D1): read-only main-checkout.lock report -
+
+test('lock-status: no lock file present -- reports "free"', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0);
+  const result = run(cwd, ['lock-status']);
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.outcome, 'free');
+  assert.equal(data.holderPid, null);
+});
+
+test('lock-status: held by a live session -- reports "live" with holder identity, age, and remaining TTL, exit 0 (never refuses)', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0);
+  fs.mkdirSync(path.dirname(mainCheckoutLockPath(cwd)), { recursive: true });
+  fs.writeFileSync(mainCheckoutLockPath(cwd), JSON.stringify({ pid: process.pid, ts: Date.now() }));
+
+  const result = run(cwd, ['lock-status']);
+
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.outcome, 'live');
+  assert.equal(data.holderPid, process.pid);
+  assert.ok(typeof data.lockAgeMs === 'number');
+  assert.ok(typeof data.remainingTtlMs === 'number');
+  assert.match(data.lockAge, /^\d+[ms]/);
+  assert.match(data.remainingTtl, /^\d+[ms]/);
+});
+
+test('lock-status: held by a dead pid -- reports "stale" and never reclaims the file', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0);
+  fs.mkdirSync(path.dirname(mainCheckoutLockPath(cwd)), { recursive: true });
+  fs.writeFileSync(mainCheckoutLockPath(cwd), JSON.stringify({ pid: 999999999, ts: Date.now() }));
+
+  const result = run(cwd, ['lock-status']);
+
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.outcome, 'stale');
+  assert.equal(data.holderPid, 999999999);
+  assert.equal(fs.existsSync(mainCheckoutLockPath(cwd)), true);
+});
+
+test('lock-status: corrupt lock content -- reports "ambiguous" and never removes the file', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0);
+  fs.mkdirSync(path.dirname(mainCheckoutLockPath(cwd)), { recursive: true });
+  fs.writeFileSync(mainCheckoutLockPath(cwd), 'not json at all {{{');
+
+  const result = run(cwd, ['lock-status']);
+
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.outcome, 'ambiguous');
+  assert.equal(fs.existsSync(mainCheckoutLockPath(cwd)), true);
+  assert.equal(fs.readFileSync(mainCheckoutLockPath(cwd), 'utf8'), 'not json at all {{{');
+});
+
+test('lock-status: registered in the --help --json manifest as read-only (touchesState/externalEffect both false)', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['--help', '--json']);
+  assert.equal(result.status, 0, result.stderr);
+  const manifest = JSON.parse(result.stdout);
+  const entry = manifest.commands.find((c) => c.name === 'lock-status');
+  assert.ok(entry, 'lock-status entry missing from --help --json manifest');
+  assert.equal(entry.touchesState, false);
   assert.equal(entry.externalEffect, false);
 });
