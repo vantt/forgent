@@ -153,29 +153,37 @@ export function buildOwnFileSet(committedDiffPaths, footprint) {
   return new Set(paths.map(normalizePath));
 }
 
-/** Whether `repoRoot`'s working tree has no pending changes outside of
- * `.fgos/` — checked before a runner-item merge is attempted (a dirty main
- * tree must never be mixed into a merge attempt). `.fgos/` itself is
+/** Whether a working tree has no pending changes outside of `.fgos/` — the
+ * single shared gate both `return` (subtree scope) and `approve` (whole-repo
+ * scope) check before either lets an item advance. `.fgos/` itself is
  * excluded: it's a live store with its own write door, mutated by the very
  * take/return/approve lifecycle operations this gate guards (each appends an
  * event as part of the same call), so it never signals an actually-dirty
  * code tree — only a manual `.fgos/events.jsonl` commit made that true
  * before this exclusion existed.
  *
- * Scans the WHOLE repo (no pathspec) regardless of where `repoRoot` sits
- * inside it — `approve` is expected to see the entire main tree's
- * cleanliness, not just its own subtree. `repoRoot` itself is not
- * guaranteed to be the git top-level though (`isMainWorktree` above
- * tolerates a subdirectory of the main worktree), so the `.fgos/` exclusion
- * still needs the same top-level-relative prefix `isFgosOnlyStatusLine`
- * takes — computed here via `git rev-parse --show-prefix`.
+ * `scope` picks git's own pathspec: `'whole-repo'` (the default) runs `git
+ * status --porcelain` with no pathspec — `approve` is expected to see the
+ * entire main tree's cleanliness, not just its own subtree. `'subtree'` runs
+ * `git status --porcelain -- .` instead, scoping the scan to `repoRoot`'s
+ * own subtree — `return`'s per-item gate, where an unrelated uncommitted
+ * file elsewhere in the repo must never block returning THIS item.
+ *
+ * Either way `repoRoot` is not guaranteed to be the git top-level
+ * (`isMainWorktree` above tolerates a subdirectory of the main worktree;
+ * `return`'s cwd is the item's own working directory, same reasoning), and
+ * either way git still reports paths top-level-relative — verified
+ * empirically for both pathspec forms — so the `.fgos/` exclusion needs the
+ * same top-level-relative prefix `isFgosOnlyStatusLine` takes, computed here
+ * via `git rev-parse --show-prefix` regardless of scope.
  *
  * `ownFileSet` (tsk-598, D2/D3) is threaded straight through to
  * `isFgosOnlyStatusLine` — omitted (`null`, the default), every existing
  * caller keeps today's exact whole-tree-blocks-on-anything behavior. */
-export function isWorkingTreeClean(repoRoot, ownFileSet = null) {
+export function isWorkingTreeClean(repoRoot, ownFileSet = null, { scope = 'whole-repo' } = {}) {
   const prefix = git(repoRoot, ['rev-parse', '--show-prefix']).trim();
-  return git(repoRoot, ['status', '--porcelain'])
+  const statusArgs = scope === 'subtree' ? ['status', '--porcelain', '--', '.'] : ['status', '--porcelain'];
+  return git(repoRoot, statusArgs)
     .split('\n')
     .filter((line) => line.trim() !== '')
     .every((line) => isFgosOnlyStatusLine(line, prefix, ownFileSet));

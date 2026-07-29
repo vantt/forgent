@@ -109,33 +109,17 @@ function currentHead(cwd) {
   return gitAt(cwd, ['rev-parse', 'HEAD']).trim();
 }
 
-// `.fgos/` is excluded from this check the same way merge.mjs's own
-// isWorkingTreeClean excludes it (isFgosOnlyStatusLine, shared rule): the
-// store is a live, self-mutating write door — return's own headAtReturn
-// event lands there as part of this very call — never a signal that the
-// code tree itself is dirty.
-//
-// Unlike merge.mjs's isWorkingTreeClean (approve's whole-repo gate), this is
 // `return`'s per-item gate — scoped to `cwd`'s OWN subtree, never the whole
-// real repo. `cwd` is the item's working directory, not necessarily the git
-// top-level (STR60 dogfood-fixture: `.fgos` under `repo/dogfood-fixture/`,
-// real top-level at `repo/`); an unrelated uncommitted file elsewhere in the
-// repo (outside `cwd`'s subtree) must never block a return for THIS item.
-// `git status --porcelain -- .`, run with `cwd` as the actual process cwd,
-// scopes git's own output to that subtree — but the reported paths are
-// STILL top-level-relative (verified empirically, same as the whole-repo
-// case), so the `.fgos/` exclusion still needs the same prefix fix
-// isWorkingTreeClean(repoRoot) above uses.
-//
-// `ownFileSet` (tsk-598, D2/D3): threaded straight through to
-// isFgosOnlyStatusLine, same fail-safe `null` default as merge.mjs's own
-// isWorkingTreeClean.
+// real repo (`cwd` is the item's working directory, not necessarily the git
+// top-level: STR60 dogfood-fixture has `.fgos` under `repo/dogfood-fixture/`,
+// real top-level at `repo/`; an unrelated uncommitted file elsewhere in the
+// repo must never block a return for THIS item). Delegates to merge.mjs's
+// isWorkingTreeClean (imported above as isMainTreeClean) with `scope:
+// 'subtree'` — the single shared implementation `approve`'s whole-repo gate
+// also uses, so both gates share one prefix computation and one `.fgos/`
+// exclusion rule instead of two.
 function isWorkingTreeClean(cwd, ownFileSet = null) {
-  const prefix = gitAt(cwd, ['rev-parse', '--show-prefix']).trim();
-  return gitAt(cwd, ['status', '--porcelain', '--', '.'])
-    .split('\n')
-    .filter((line) => line.trim() !== '')
-    .every((line) => isFgosOnlyStatusLine(line, prefix, ownFileSet));
+  return isMainTreeClean(cwd, ownFileSet, { scope: 'subtree' });
 }
 
 function commitsSince(cwd, from, to) {
