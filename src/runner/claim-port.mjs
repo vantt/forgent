@@ -27,6 +27,26 @@ function gitAt(repoRoot, args) {
 }
 import { DEFAULTS } from '../state/work.mjs';
 
+/**
+ * Read `releaseTrigger` off the MOST RECENT `work.move` event that landed
+ * `id` on `to: 'todo'` — never off a durable item field, so a later
+ * reject/verify-fail-park (which never carries this marker) always wins
+ * over an earlier claim-lock §3b release's marker instead of the stale
+ * value silently surviving (tsk-2zv). Returns `undefined` when the item
+ * has never moved to `todo`, or when its latest such move didn't carry
+ * the marker (reject, verify-fail park, or a genuinely fresh take).
+ */
+function latestTodoReleaseTrigger(events, id) {
+  let marker;
+  for (const event of events) {
+    if (!event || !event.payload) continue;
+    if (event.type === 'work.move' && event.payload.id === id && event.payload.to === 'todo') {
+      marker = event.payload.releaseTrigger;
+    }
+  }
+  return marker;
+}
+
 // category (R4, store.mjs's categoryOf contract): 'not-found' mirrors
 // StoreError's own not-found convention ('validation'); 'lock-held'/
 // 'lock-ambiguous' reuse 'lock-timeout' (events.mjs's own category for the
@@ -93,7 +113,8 @@ export function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoot = pr
   }
 
   try {
-    const priorVisits = visitCount(readRawEvents(dir), id);
+    const rawEvents = readRawEvents(dir);
+    const priorVisits = visitCount(rawEvents, id);
     const branch = branchNameFor(id);
     const branchAlreadyExists = branchExists(repoRoot, branch);
 
@@ -116,8 +137,29 @@ export function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoot = pr
     // Branch reuse: if branch exists, get its HEAD; otherwise use current HEAD.
     // For leaves, try root branch if it exists; fall back to current HEAD if not
     // (runner creates root branch later, in runItem, so it may not exist yet).
+    //
+    // Reclaim-safe exception (tsk-2zv): a claim-lock §3b release (an item's
+    // `pick` claim held through clarify/decompose, released back to `todo`
+    // the instant the item reaches `executing`, `decompose.mjs`'s
+    // `releaseClaimOnExecuting`) is the SAME execution round split by a
+    // mechanical stage edge, not a new attempt — recomputing here would
+    // silently swallow every commit made before the release (CONTEXT.md,
+    // plan.md, or code already committed). Only THIS specific release is
+    // exempted, via `latestTodoReleaseTrigger`'s positive marker check —
+    // never inferred from status/branch-existence alone, since a reject
+    // (`proposed -> todo`) or a verify-fail park lands an item in the exact
+    // same shape without deleting the branch, and MUST still recompute
+    // fresh (that recompute is the deliberate anti-cheat gate forcing new
+    // work before a retaken item can `return` again).
+    const isClaimLockReclaim = branchAlreadyExists
+      && typeof item.branchHeadAtTake === 'string'
+      && item.branchHeadAtTake
+      && latestTodoReleaseTrigger(rawEvents, id) === 'claim-lock-3b';
+
     let branchHeadAtTake;
-    if (branchAlreadyExists) {
+    if (isClaimLockReclaim) {
+      branchHeadAtTake = item.branchHeadAtTake;
+    } else if (branchAlreadyExists) {
       branchHeadAtTake = gitAt(repoRoot, ['rev-parse', branch]).trim();
     } else if (rootBranchExists) {
       branchHeadAtTake = gitAt(repoRoot, ['rev-parse', rootBranch]).trim();

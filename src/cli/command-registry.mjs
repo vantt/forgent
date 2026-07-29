@@ -278,16 +278,17 @@ export const COMMAND_REGISTRY = [
   {
     name: 'list',
     invoke: 'fgos list',
-    description: 'List the full work/decisions view. --cursor/--limit paginate the "work" map (opaque cursor, per D5/D35): omit both to get the flat id->item map unchanged; pass either to get {items, nextCursor} instead.',
+    description: 'List the work/decisions view. Defaults to open-only (status !== "done"); pass --all to include done items too. --cursor/--limit paginate the "work" map (opaque cursor, per D5/D35): omit both to get the flat id->item map unchanged; pass either to get {items, nextCursor} instead.',
     parameters: {
       type: 'object',
       properties: {
+        all: { type: 'boolean', description: 'Include done items too (default: open-only, status !== "done").' },
         cursor: { type: 'string', description: 'Opaque pagination cursor from a prior call\'s nextCursor; omit to start from the beginning.' },
         limit: { type: 'integer', description: 'Max items per page (default 50 when cursor/limit is used); omit both flags to get the unpaginated full map.' },
       },
       required: [],
     },
-    examples: ['fgos list', 'fgos list --limit 20', 'fgos list --limit 20 --cursor <token>'],
+    examples: ['fgos list', 'fgos list --all', 'fgos list --limit 20', 'fgos list --limit 20 --cursor <token>'],
     touchesState: false,
     requiresExistingStore: false,
     externalEffect: false,
@@ -607,16 +608,17 @@ export const COMMAND_REGISTRY = [
   {
     name: 'triage',
     invoke: 'fgos triage',
-    description: 'Rank open work by blocking fan-out over the unified deps+parent graph (how many other open items it unblocks), one flat row per item with stage, goalTier, and its dependency/lineage component (componentId, componentSize, isIsolated) — declared goals (mvp, then milestone) sort first. --cursor/--limit paginate the result (opaque cursor, per D5/D35): omit both to get the full array unchanged; pass either to get {items, nextCursor} instead.',
+    description: 'Rank open work by blocking fan-out over the unified deps+parent graph (how many other open items it unblocks), one flat row per item with stage, goalTier, and its dependency/lineage component (componentId, componentSize, isIsolated) — declared goals (mvp, then milestone) sort first. Done items are excluded by default; pass --all to append them after the ranked rows (each with blocks: 0, componentSize: 0 — a done item can never block anything). --cursor/--limit paginate the result (opaque cursor, per D5/D35): omit both to get the full array unchanged; pass either to get {items, nextCursor} instead.',
     parameters: {
       type: 'object',
       properties: {
+        all: { type: 'boolean', description: 'Also include done items, appended after the ranked open rows (default: excluded).' },
         cursor: { type: 'string', description: 'Opaque pagination cursor from a prior call\'s nextCursor; omit to start from the beginning.' },
         limit: { type: 'integer', description: 'Max items per page (default 50 when cursor/limit is used); omit both flags to get the unpaginated full array.' },
       },
       required: [],
     },
-    examples: ['fgos triage', 'fgos triage --limit 20', 'fgos triage --limit 20 --cursor <token>'],
+    examples: ['fgos triage', 'fgos triage --all', 'fgos triage --limit 20', 'fgos triage --limit 20 --cursor <token>'],
     touchesState: false,
     requiresExistingStore: false,
     externalEffect: false,

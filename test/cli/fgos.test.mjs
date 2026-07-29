@@ -260,6 +260,49 @@ test('list on a fresh non-worktree dir with no store at all: exit 0, empty view,
   assert.equal(result.stderr, '');
 });
 
+// --- list open-only default + --all (tsk-5oa D1/D2) -----------------------
+
+test('list by default excludes a done item, but keeps a todo item', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'open-item', { title: 'Open Item' });
+  const dir = path.join(cwd, '.fgos');
+  addWork(dir, { id: 'finished-item', title: 'Finished Item', kind: 'task', status: 'done', deps: [], risk: 'low', refs: [], verify: 'npm test' });
+
+  const work = envelopeData(run(cwd, ['list']).stdout).work;
+  assert.ok(work['open-item']);
+  assert.equal(work['finished-item'], undefined);
+});
+
+test('list --all restores the done item alongside the open one', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'open-item', { title: 'Open Item' });
+  const dir = path.join(cwd, '.fgos');
+  addWork(dir, { id: 'finished-item', title: 'Finished Item', kind: 'task', status: 'done', deps: [], risk: 'low', refs: [], verify: 'npm test' });
+
+  const work = envelopeData(run(cwd, ['list', '--all']).stdout).work;
+  assert.ok(work['open-item']);
+  assert.ok(work['finished-item']);
+});
+
+test('list default keeps an awaiting-human item visible (D2: "not done" is exactly status !== done, not a broader closed/terminal set)', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'parked-item', { title: 'Parked Item' });
+  run(cwd, ['ask', 'parked-item', '--text', 'need a decision']);
+
+  const work = envelopeData(run(cwd, ['list']).stdout).work;
+  assert.equal(work['parked-item'].status, 'awaiting-human');
+});
+
+test('list default on a store with only done items returns an empty work map, not an error', () => {
+  const cwd = tmpCwd();
+  const dir = path.join(cwd, '.fgos');
+  addWork(dir, { id: 'finished-item', title: 'Finished Item', kind: 'task', status: 'done', deps: [], risk: 'low', refs: [], verify: 'npm test' });
+
+  const result = run(cwd, ['list']);
+  assert.equal(result.status, 0);
+  assert.deepEqual(envelopeData(result.stdout).work, {});
+});
+
 test('init creates .fgos/ with an empty log and a rebuilt (empty) view, exit 0', () => {
   const cwd = tmpCwd();
   const result = run(cwd, ['init']);
@@ -1775,6 +1818,23 @@ test('triage excludes a done item from ranking, and a done dependent never count
   assert.equal(base.status, 'todo');
   assert.equal(base.blocks, 0);
   assert.ok(!data.some((r) => r.id === 'done-item'));
+});
+
+test('triage --all appends done items after the ranked open rows, each with blocks:0 (tsk-5oa D1)', () => {
+  const cwd = tmpCwd();
+  const dir = path.join(cwd, '.fgos');
+  addOk(cwd, 'base');
+  addWork(dir, { id: 'done-item', title: 'Done Item', kind: 'task', status: 'done', deps: ['base'], risk: 'low', refs: [], verify: 'npm test' });
+
+  const withoutAll = envelopeData(run(cwd, ['triage']).stdout);
+  const withAll = envelopeData(run(cwd, ['triage', '--all']).stdout);
+  assert.ok(!withoutAll.some((r) => r.id === 'done-item'));
+  assert.deepEqual(withAll.slice(0, withoutAll.length), withoutAll);
+  const doneRow = withAll.find((r) => r.id === 'done-item');
+  assert.ok(doneRow);
+  assert.equal(doneRow.blocks, 0);
+  assert.equal(doneRow.componentSize, 0);
+  assert.equal(doneRow.isIsolated, true);
 });
 
 test('triage never mutates state: no event is appended', () => {
