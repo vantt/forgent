@@ -153,29 +153,37 @@ export function buildOwnFileSet(committedDiffPaths, footprint) {
   return new Set(paths.map(normalizePath));
 }
 
-/** Whether `repoRoot`'s working tree has no pending changes outside of
- * `.fgos/` — checked before a runner-item merge is attempted (a dirty main
- * tree must never be mixed into a merge attempt). `.fgos/` itself is
+/** Whether a working tree has no pending changes outside of `.fgos/` — the
+ * single shared gate both `return` (subtree scope) and `approve` (whole-repo
+ * scope) check before either lets an item advance. `.fgos/` itself is
  * excluded: it's a live store with its own write door, mutated by the very
  * take/return/approve lifecycle operations this gate guards (each appends an
  * event as part of the same call), so it never signals an actually-dirty
  * code tree — only a manual `.fgos/events.jsonl` commit made that true
  * before this exclusion existed.
  *
- * Scans the WHOLE repo (no pathspec) regardless of where `repoRoot` sits
- * inside it — `approve` is expected to see the entire main tree's
- * cleanliness, not just its own subtree. `repoRoot` itself is not
- * guaranteed to be the git top-level though (`isMainWorktree` above
- * tolerates a subdirectory of the main worktree), so the `.fgos/` exclusion
- * still needs the same top-level-relative prefix `isFgosOnlyStatusLine`
- * takes — computed here via `git rev-parse --show-prefix`.
+ * `scope` picks git's own pathspec: `'whole-repo'` (the default) runs `git
+ * status --porcelain` with no pathspec — `approve` is expected to see the
+ * entire main tree's cleanliness, not just its own subtree. `'subtree'` runs
+ * `git status --porcelain -- .` instead, scoping the scan to `repoRoot`'s
+ * own subtree — `return`'s per-item gate, where an unrelated uncommitted
+ * file elsewhere in the repo must never block returning THIS item.
+ *
+ * Either way `repoRoot` is not guaranteed to be the git top-level
+ * (`isMainWorktree` above tolerates a subdirectory of the main worktree;
+ * `return`'s cwd is the item's own working directory, same reasoning), and
+ * either way git still reports paths top-level-relative — verified
+ * empirically for both pathspec forms — so the `.fgos/` exclusion needs the
+ * same top-level-relative prefix `isFgosOnlyStatusLine` takes, computed here
+ * via `git rev-parse --show-prefix` regardless of scope.
  *
  * `ownFileSet` (tsk-598, D2/D3) is threaded straight through to
  * `isFgosOnlyStatusLine` — omitted (`null`, the default), every existing
  * caller keeps today's exact whole-tree-blocks-on-anything behavior. */
-export function isWorkingTreeClean(repoRoot, ownFileSet = null) {
+export function isWorkingTreeClean(repoRoot, ownFileSet = null, { scope = 'whole-repo' } = {}) {
   const prefix = git(repoRoot, ['rev-parse', '--show-prefix']).trim();
-  return git(repoRoot, ['status', '--porcelain'])
+  const statusArgs = scope === 'subtree' ? ['status', '--porcelain', '--', '.'] : ['status', '--porcelain'];
+  return git(repoRoot, statusArgs)
     .split('\n')
     .filter((line) => line.trim() !== '')
     .every((line) => isFgosOnlyStatusLine(line, prefix, ownFileSet));
@@ -321,6 +329,269 @@ export function changedFiles(repoRoot, item, opts = {}) {
   return out.split('\n').filter((line) => line !== '');
 }
 
+// DECISION-ID COLLISION AUTO-RESOLVE (tsk-3mv-1, CONTEXT.md D1a): a
+// content-agnostic conflict shape, proven real on `tsk-66l`
+// (docs/how-to/resolve-a-decision-id-collision-merge-conflict-on-approve.md)
+// -- two branches independently pick the same "next free" decision-record
+// id and both insert a row for it into `docs/decisions/0000-index.md` at
+// the same position. `classifyDecisionIndexCollision` below only ever
+// RECOGNIZES this shape (never resolves anything); the caller decides
+// whether to attempt a resolve, and the resolve itself renumbers ONLY
+// `branch`'s own colliding decision file(s) -- `HEAD`'s (main's) numbering
+// is always treated as already-authoritative, matching the how-to's own
+// "find the real next-free ID from main" step. Any conflict shape this
+// classifier does not recognize returns null, and the caller falls
+// through to the exact same abort-and-report `conflict` outcome as before
+// this feature existed -- self-resolve is additive, never a new way to
+// silently keep the wrong content (CONTEXT.md's pinned "self-resolvable
+// merge-conflict" boundary is a hard line, not a suggestion).
+
+const DECISION_INDEX_PATH = 'docs/decisions/0000-index.md';
+const DECISION_FILE_RE = /^docs\/decisions\/(\d{4})-([^/]+)\.md$/;
+const DECISION_ROW_RE = /^\|\s*\[(\d{4})\]\(([^)]+)\)\s*\|/;
+
+/** Split a conflicted file's raw text (as `git merge --no-commit --no-ff`
+ * leaves it on disk) into an ordered list of segments -- plain `{type:
+ * 'text', lines}` runs and `{type: 'conflict', oursLines, theirsLines}`
+ * hunks -- so a caller can reconstruct the file with only the conflict
+ * hunks replaced. Tolerates zero conflict markers (an all-text list),
+ * though a caller in this module never calls it on an unconflicted file. */
+export function splitConflictSegments(text) {
+  const lines = text.split('\n');
+  const segments = [];
+  let textLines = [];
+  let i = 0;
+  while (i < lines.length) {
+    if (lines[i].startsWith('<<<<<<<')) {
+      if (textLines.length > 0) {
+        segments.push({ type: 'text', lines: textLines });
+        textLines = [];
+      }
+      i++;
+      const oursLines = [];
+      while (i < lines.length && !lines[i].startsWith('=======')) {
+        oursLines.push(lines[i]);
+        i++;
+      }
+      i++; // skip the "=======" separator itself
+      const theirsLines = [];
+      while (i < lines.length && !lines[i].startsWith('>>>>>>>')) {
+        theirsLines.push(lines[i]);
+        i++;
+      }
+      i++; // skip the ">>>>>>> branch" marker itself
+      segments.push({ type: 'conflict', oursLines, theirsLines });
+    } else {
+      textLines.push(lines[i]);
+      i++;
+    }
+  }
+  if (textLines.length > 0) {
+    segments.push({ type: 'text', lines: textLines });
+  }
+  return segments;
+}
+
+/**
+ * Classify whether `repoRoot`'s currently-conflicted merge (mid `git merge
+ * --no-commit --no-ff`, called only from the conflict branch below) is a
+ * self-resolvable decision-ID collision. Requires: the ONLY conflicted path
+ * is `docs/decisions/0000-index.md` (any other conflicted path, or more
+ * than one, is never this shape), and every conflict hunk in it is a pure
+ * two-sided row INSERTION -- both `oursLines` and `theirsLines` are
+ * non-empty, share no identical line (a same-row edit reads as one side
+ * repeating what the other kept, which this never treats as a safe
+ * insertion), and every line on both sides matches the index's own `|
+ * [NNNN](file.md) | ... |` row shape. Returns `null` for anything else --
+ * a real content dispute, a non-index conflict, or a hunk this classifier
+ * cannot confidently read as "two independent new rows" -- so the caller's
+ * only choice on `null` is the pre-existing abort-and-report path.
+ */
+export function classifyDecisionIndexCollision(repoRoot) {
+  const paths = git(repoRoot, ['diff', '--name-only', '--diff-filter=U'])
+    .split('\n').filter(Boolean);
+  if (paths.length !== 1 || paths[0] !== DECISION_INDEX_PATH) {
+    return null;
+  }
+  const raw = fs.readFileSync(path.join(repoRoot, DECISION_INDEX_PATH), 'utf8');
+  const segments = splitConflictSegments(raw);
+  const conflicts = segments.filter((s) => s.type === 'conflict');
+  if (conflicts.length === 0) {
+    return null;
+  }
+  const oursIds = new Set();
+  const theirsIds = new Set();
+  const oursLinks = new Set();
+  const theirsLinks = new Set();
+  for (const hunk of conflicts) {
+    if (hunk.oursLines.length === 0 || hunk.theirsLines.length === 0) {
+      return null; // a pure delete/keep on either side is not two insertions
+    }
+    const oursSet = new Set(hunk.oursLines);
+    if (hunk.theirsLines.some((line) => oursSet.has(line))) {
+      return null; // an identical line on both sides doesn't read as two independent inserts
+    }
+    for (const line of hunk.oursLines) {
+      const m = line.match(DECISION_ROW_RE);
+      if (!m) return null;
+      oursIds.add(m[1]);
+      oursLinks.add(m[2]);
+    }
+    for (const line of hunk.theirsLines) {
+      const m = line.match(DECISION_ROW_RE);
+      if (!m) return null;
+      theirsIds.add(m[1]);
+      theirsLinks.add(m[2]);
+    }
+  }
+  // The decisive signal a same-id COLLISION (two independent new rows that
+  // happen to claim the same next-free number) is not the same thing as a
+  // same-ROW EDIT (both sides changing an existing row's text differently):
+  // a genuine insertion collision always links to two DIFFERENT files (each
+  // side wrote its own new decision doc); an edit dispute always links to
+  // the SAME already-existing file on both sides. Any shared link target
+  // between ours/theirs means at least one hunk is really an edit dispute,
+  // not two independent inserts -- bail to the safe abort-and-report path.
+  if ([...oursLinks].some((link) => theirsLinks.has(link))) {
+    return null;
+  }
+  const collidingIds = [...theirsIds].filter((id) => oursIds.has(id)).sort();
+  return { segments, oursIds, theirsIds, collidingIds };
+}
+
+/** The next free 4-digit decision id after every id already present on
+ * `ref`'s `docs/decisions/` (the index file itself, id "0000", excluded --
+ * it is the index, never a decision record). Mirrors the how-to's own "read
+ * the highest existing number on disk and add one" rule, just against
+ * `ref` (always `HEAD`/main here, per this function's only caller) instead
+ * of a person reading it by hand. */
+export function nextFreeDecisionId(repoRoot, ref) {
+  const files = git(repoRoot, ['ls-tree', '-r', '--name-only', ref, '--', 'docs/decisions/'])
+    .split('\n').filter(Boolean);
+  let max = 0;
+  for (const f of files) {
+    const m = f.match(DECISION_FILE_RE);
+    if (m && m[1] !== '0000') {
+      max = Math.max(max, parseInt(m[1], 10));
+    }
+  }
+  return String(max + 1).padStart(4, '0');
+}
+
+/** Rename `branch`'s colliding decision file from `oldId` to `newId` on
+ * disk (`git mv`, so the rename lands staged in the in-progress merge) and
+ * rewrite its own frontmatter `title:` line and its `# NNNN — ...` heading
+ * line to cite `newId` instead -- the two mechanical, always-present
+ * self-references every decision doc carries (confirmed against this
+ * repo's own decision docs' template). A `supersedes`/`superseded_by`
+ * cross-reference to a DIFFERENT decision's id is deliberately left
+ * untouched (it names another doc, not this one) -- and free-text prose
+ * that happens to cite the doc's own old number by hand is a documented,
+ * illustrative-not-exhaustive residual limitation here, the same honest
+ * "MINH HỌA, không đóng khung" stance `iron-law.mjs`'s own module list
+ * already takes, not a silent gap. */
+export function renumberDecisionFile(repoRoot, oldPath, newId) {
+  const m = oldPath.match(DECISION_FILE_RE);
+  if (!m) {
+    throw new MergeError(`renumberDecisionFile: "${oldPath}" is not a docs/decisions/NNNN-slug.md path`, { oldPath });
+  }
+  const [, oldId, slug] = m;
+  const newPath = `docs/decisions/${newId}-${slug}.md`;
+  git(repoRoot, ['mv', oldPath, newPath]);
+  const abs = path.join(repoRoot, newPath);
+  const oldIdRe = new RegExp(`\\b${oldId}\\b`);
+  const lines = fs.readFileSync(abs, 'utf8').split('\n');
+  let titleFixed = false;
+  let headingFixed = false;
+  for (let i = 0; i < lines.length; i++) {
+    if (!titleFixed && lines[i].startsWith('title:') && oldIdRe.test(lines[i])) {
+      lines[i] = lines[i].replace(oldIdRe, newId);
+      titleFixed = true;
+      continue;
+    }
+    if (!headingFixed && lines[i].startsWith('# ') && oldIdRe.test(lines[i])) {
+      lines[i] = lines[i].replace(oldIdRe, newId);
+      headingFixed = true;
+    }
+  }
+  fs.writeFileSync(abs, lines.join('\n'));
+  git(repoRoot, ['add', newPath]);
+  return { oldId, newId, oldPath, newPath };
+}
+
+/** Rebuild `docs/decisions/0000-index.md`'s conflicted text with every
+ * conflict hunk replaced by the union of both sides' rows, sorted
+ * numerically by decision id -- `idRenames` (a `Map<oldId, {newId,
+ * newPath}>`, only ever populated for `theirs`-side ids that collided with
+ * an `ours` id) rewrites a renamed row's `[oldId](oldPath)` link to
+ * `[newId](newPath)` before sorting. Writes the file and stages it; never
+ * touches any other path. */
+export function resolveDecisionIndexConflict(repoRoot, classification, idRenames) {
+  const rewriteRow = (line) => {
+    const m = line.match(DECISION_ROW_RE);
+    const rename = idRenames.get(m[1]);
+    if (!rename) return line;
+    return line
+      .replace(`[${m[1]}]`, `[${rename.newId}]`)
+      .replace(`(${m[2]})`, `(${path.basename(rename.newPath)})`);
+  };
+  const rowSortKey = (line) => line.match(DECISION_ROW_RE)[1];
+
+  const rebuilt = classification.segments.map((segment) => {
+    if (segment.type === 'text') {
+      return segment.lines.join('\n');
+    }
+    const rows = [...segment.oursLines, ...segment.theirsLines.map(rewriteRow)];
+    rows.sort((a, b) => (rowSortKey(a) < rowSortKey(b) ? -1 : 1));
+    return rows.join('\n');
+  }).join('\n');
+
+  fs.writeFileSync(path.join(repoRoot, DECISION_INDEX_PATH), rebuilt);
+  git(repoRoot, ['add', DECISION_INDEX_PATH]);
+}
+
+/**
+ * Attempt to auto-resolve a decision-ID-collision conflict already
+ * classified by `classifyDecisionIndexCollision` (the caller passes its
+ * non-null result). Renumbers every `branch`-side colliding decision file
+ * to the next free id after `HEAD`'s own (never touching `HEAD`'s already-
+ * landed numbering), then rewrites the index conflict with both sides'
+ * rows unioned. Never throws on an ordinary "couldn't find the branch-side
+ * file" mismatch -- returns `false` so the caller falls back to the
+ * pre-existing abort-and-report path exactly like a `null` classification
+ * would; only a real git-command failure inside the helpers above
+ * propagates, the same "only a genuine bug throws" contract every other
+ * git call in this module already keeps.
+ */
+export function autoResolveDecisionIndexCollision(repoRoot, branch, classification) {
+  if (classification.collidingIds.length === 0) {
+    resolveDecisionIndexConflict(repoRoot, classification, new Map());
+    return true;
+  }
+  const headFiles = new Set(
+    git(repoRoot, ['ls-tree', '-r', '--name-only', 'HEAD', '--', 'docs/decisions/']).split('\n').filter(Boolean),
+  );
+  const branchFiles = git(repoRoot, ['ls-tree', '-r', '--name-only', branch, '--', 'docs/decisions/'])
+    .split('\n').filter(Boolean);
+
+  const idRenames = new Map();
+  let nextId = nextFreeDecisionId(repoRoot, 'HEAD');
+  for (const oldId of classification.collidingIds) {
+    const theirsFile = branchFiles.find((f) => {
+      const m = f.match(DECISION_FILE_RE);
+      return m && m[1] === oldId && !headFiles.has(f);
+    });
+    if (!theirsFile) {
+      return false; // doesn't match the expected shape -- fall back safe
+    }
+    const renamed = renumberDecisionFile(repoRoot, theirsFile, nextId);
+    idRenames.set(oldId, renamed);
+    nextId = String(parseInt(nextId, 10) + 1).padStart(4, '0');
+  }
+  resolveDecisionIndexConflict(repoRoot, classification, idRenames);
+  return true;
+}
+
 /**
  * Attempt to merge a runner item's branch into `repoRoot`'s current checkout
  * (checked clean by the caller first). The git call itself is target-
@@ -435,15 +706,27 @@ async function mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs }) {
     return { outcome: 'merged', branch, check };
   }
 
+  let selfResolved = false;
   try {
     git(repoRoot, ['merge', '--no-commit', '--no-ff', branch]);
   } catch (err) {
-    try {
-      git(repoRoot, ['merge', '--abort']);
-    } catch (abortErr) {
-      throw new MergeError(`merge of "${branch}" conflicted and "git merge --abort" itself failed: ${abortErr.message}`, { branch });
+    // tsk-3mv-1 D1a: before giving up, check whether this is the one
+    // content-agnostic conflict shape proven self-resolvable (a
+    // decision-ID collision on docs/decisions/0000-index.md) -- never
+    // attempted for any other conflict shape, and never left half-resolved
+    // on any failure along this path (falls through to the exact same
+    // abort below).
+    const classification = classifyDecisionIndexCollision(repoRoot);
+    if (classification && autoResolveDecisionIndexCollision(repoRoot, branch, classification)) {
+      selfResolved = true;
+    } else {
+      try {
+        git(repoRoot, ['merge', '--abort']);
+      } catch (abortErr) {
+        throw new MergeError(`merge of "${branch}" conflicted and "git merge --abort" itself failed: ${abortErr.message}`, { branch });
+      }
+      return { outcome: 'conflict', branch };
     }
-    return { outcome: 'conflict', branch };
   }
 
   const stagedPaths = git(repoRoot, ['diff', '--name-only', '--cached'])
@@ -459,7 +742,7 @@ async function mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs }) {
         { branch, fgosPaths },
       );
     }
-    return { outcome: 'fgos-write-rejected', branch, paths: fgosPaths };
+    return { outcome: 'fgos-write-rejected', branch, paths: fgosPaths, ...(selfResolved && { selfResolved }) };
   }
 
   const check = await runGoalCheck(item, repoRoot, timeoutMs);
@@ -469,7 +752,7 @@ async function mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs }) {
     } catch (abortErr) {
       throw new MergeError(`post-merge verify failed for "${branch}" and "git merge --abort" itself failed: ${abortErr.message}`, { branch });
     }
-    return { outcome: 'verify-fail', branch, check };
+    return { outcome: 'verify-fail', branch, check, ...(selfResolved && { selfResolved }) };
   }
 
   try {
@@ -485,7 +768,7 @@ async function mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs }) {
     }
     throw new MergeError(`verify passed for "${branch}" but "git commit" failed: ${err.message}`, { branch });
   }
-  return { outcome: 'merged', branch, check };
+  return { outcome: 'merged', branch, check, ...(selfResolved && { selfResolved }) };
 }
 
 /**
