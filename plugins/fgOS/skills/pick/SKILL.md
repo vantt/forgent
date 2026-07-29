@@ -50,12 +50,18 @@ state or touches git worktrees directly — every write goes through the
    worktree.
 
    If `EnterWorktree` is unavailable, refuses, or errors for any reason
-   (for example, this session is already nested inside another worktree,
-   which imposes a `.claude/worktrees/` location constraint that fgOS's own
-   tmpdir-based worktree path won't satisfy) — do NOT fail or retry. Fall
-   back instead: print the worktree path plainly and tell the user to open
-   a new session there. This is the same fallback pattern `bee worktree
-   new` already uses for the analogous case.
+   (for example, this session was already nested inside another worktree
+   *before* this claim, a still-real limit — `EnterWorktree` flatly refuses
+   to stand up a brand-new worktree from inside an existing one) — do NOT
+   fail or retry. Fall back instead: print the worktree path plainly and
+   tell the user to open a new session there. This is the same fallback
+   pattern `bee worktree new` already uses for the analogous case.
+
+   tsk-424: pick's own worktree lives under `.claude/worktrees/` precisely
+   so a session already switched into a root item's worktree CAN chain a
+   second, in-session `EnterWorktree` call into a child item's worktree
+   (e.g. the root decomposing into children mid-session) — that specific
+   case no longer needs this fallback at all.
 
 4. **Load `fgos-routing` — do not stop after the switch.** If step 3
    actually switched the session into the worktree, immediately invoke the

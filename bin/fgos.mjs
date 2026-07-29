@@ -22,6 +22,7 @@ import { deriveTitle, classify, generateId } from '../src/intake/classify.mjs';
 import { wrapEnvelope } from '../src/state/envelope.mjs';
 import { loadRunnerConfig, ensureRunnerConfig, DEFAULT_RUNNER_CONFIG } from '../src/runner/dispatch.mjs';
 import { readGateBypassLevel } from '../src/state/gate-bypass.mjs';
+import { resolveFgosDir } from '../src/runner/paths.mjs';
 import { resolveDiscovery } from '../src/intake/discovery.mjs';
 import { resolveDecompose } from '../src/intake/decompose.mjs';
 import { computeEntropy, computeCounts } from '../src/report/entropy.mjs';
@@ -36,6 +37,14 @@ import { createGitHubPR, mergeGitHubPR, viewGitHubPRStatus } from '../src/runner
 import { classifyIronLaw } from '../src/evolve/iron-law.mjs';
 import { branchNameFor, branchExists, createWorktree, removeWorktree } from '../src/runner/worktree.mjs';
 import { claimWork, ClaimError } from '../src/runner/claim-port.mjs';
+import {
+  acquireMainCheckoutLock,
+  releaseMainCheckoutLock,
+  forceReclaimAmbiguousLock,
+  ACQUIRED,
+  HELD,
+  DEFAULT_TTL_MS,
+} from '../src/runner/main-checkout-lock.mjs';
 import { createSession, endSession, listSessions, reclaimOrphanedSessions, SessionError } from '../src/runner/session.mjs';
 import { resolveRoot } from '../src/runner/root-affinity.mjs';
 import { visitCount } from '../src/runner/anti-loop.mjs';
@@ -57,7 +66,10 @@ import { formatCheck, bold } from '../src/setup/ansi.mjs';
 const SUBMIT_VERIFY_SENTINEL = 'chưa xác định — P15 bổ sung';
 
 function dataDir() {
-  return path.join(process.cwd(), '.fgos');
+  // strict: true — this CLI's `.fgos/` always lives under the caller's own
+  // cwd, never git-resolved upward (D5, matches the pull-door assumption
+  // in gitAt's own comment below).
+  return resolveFgosDir(process.cwd(), { strict: true });
 }
 
 // Host-repo git helpers for the pull door (`take`/`return`, stage-decompose
@@ -1303,12 +1315,20 @@ async function runVerb(verb, flags, positional, dir) {
       // executing boundary, claim-lock §3b) reattaches to that same branch
       // tip via createWorktree's reuse path instead of forking a new one.
       try {
+        // worktreeDir under .claude/worktrees/ (tsk-424 D1/D2): the harness's
+        // own EnterWorktree tool only allows a second-or-later in-session
+        // switch when the target sits there, e.g. a root item decomposing
+        // into a child mid-session. os.tmpdir()/fgos-worktrees (createWorktree's
+        // own default) fails that check past the first switch — pick is the
+        // only caller that needs the harness-chainable location; runner/
+        // merge-ephemeral callers are untouched.
         return claimWork(dir, {
           id,
           actor: 'session',
           isolate: true,
           claimTrigger,
           repoRoot: process.cwd(),
+          worktreeDir: path.join(process.cwd(), '.claude', 'worktrees'),
         });
       } catch (err) {
         if (err instanceof ClaimError) {
@@ -2242,8 +2262,33 @@ async function runVerb(verb, flags, positional, dir) {
       return { checks };
     }
 
+    // Safely clears .fgos/main-checkout.lock (tsk-3h4). Never force-deletes:
+    // reuses acquireMainCheckoutLock as-is for the ACQUIRED (free/stale,
+    // reclaimed as a side effect of the acquire attempt then immediately
+    // released -- this verb never wants to hold the lock, only clear it) and
+    // HELD (genuinely live elsewhere, refuse) outcomes, and only reaches for
+    // the new forceReclaimAmbiguousLock for the one status that primitive
+    // deliberately never unlinks itself (AMBIGUOUS -- unparseable content,
+    // D5 fail-closed).
+    case 'unlock': {
+      const lockResult = acquireMainCheckoutLock(dir, { identity: process.pid, ttlMs: DEFAULT_TTL_MS });
+      if (lockResult.status === HELD) {
+        throw new StoreError(
+          'lock-timeout',
+          `unlock: main checkout lock is held by a live session (${lockResult.holderPid}) -- refusing to clear it.`,
+        );
+      }
+      if (lockResult.status === ACQUIRED) {
+        releaseMainCheckoutLock(dir);
+        return { cleared: true, reason: 'stale-or-free' };
+      }
+      // AMBIGUOUS
+      const reclaim = forceReclaimAmbiguousLock(dir);
+      return { cleared: reclaim.status === 'reclaimed', reason: reclaim.status };
+    }
+
     default:
-      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <init|add|submit|discover|move|edit|ask|answer|decision|list|ready|rebuild|repair|check|rollup|take|return|review|approve|reject|catchup|evolve|triage|session|goal|setup|doctor> ...`);
+      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <init|add|submit|discover|move|edit|ask|answer|decision|list|ready|rebuild|repair|check|rollup|take|return|review|approve|reject|catchup|evolve|triage|session|goal|setup|doctor|unlock> ...`);
   }
 }
 

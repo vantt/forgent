@@ -24,6 +24,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REAL_HOOK = path.resolve(__dirname, '../../.githooks/pre-commit');
 const REAL_LOCK_MODULE = path.resolve(__dirname, '../../src/runner/main-checkout-lock.mjs');
 const REAL_IDENTITY_MODULE = path.resolve(__dirname, '../../src/runner/session-identity.mjs');
+const FGOS = path.resolve(__dirname, '../../bin/fgos.mjs');
 
 function mkTempDir(prefix) {
   return fs.mkdtempSync(path.join(os.tmpdir(), prefix));
@@ -134,7 +135,7 @@ test('a solo git commit in a checkout with no existing lock succeeds', () => {
 // self-recognition must let the caller's own identity always refresh,
 // regardless of how much time passed since its last commit.
 
-test("the same session's second commit a few minutes later still succeeds (self-recognition, D6)", () => {
+test("the same session's second commit a few minutes later still succeeds (self-recognition)", () => {
   const repoRoot = initTempRepoWithHook();
   const env = { BEE_SESSION_ID: 'session-self', FGOS_MAIN_CHECKOUT_LOCK_TTL_MS: '100' };
 
@@ -213,6 +214,31 @@ test('a git commit is refused when the lock file is corrupt, and the refusal nev
   // session-id as if a human should recognize/act on it directly.
   assert.doesNotMatch(result.stderr, /session-observer/);
   assert.doesNotMatch(result.stderr, /\bpid\b/i);
+});
+
+// --- truth 5b: `fgos unlock` recovers exactly the corrupt-lock deadlock ----
+// above (tsk-3h4) -- the one case truth 5 shows has zero automatic recovery
+// otherwise, since the hook's own fail-closed refusal never touches the file.
+
+test('fgos unlock clears a corrupt lock left behind by a refused commit, and the next commit then succeeds', () => {
+  const repoRoot = initTempRepoWithHook();
+  const fgosDir = path.join(repoRoot, '.fgos');
+  fs.mkdirSync(fgosDir, { recursive: true });
+  fs.writeFileSync(path.join(fgosDir, 'main-checkout.lock'), 'not-json-at-all{{{');
+  const before = commitCount(repoRoot);
+
+  const refused = commitAsSession(repoRoot, { BEE_SESSION_ID: 'session-observer' });
+  assert.notEqual(refused.status, 0);
+  assert.equal(commitCount(repoRoot), before);
+
+  const unlock = spawnSync(process.execPath, [FGOS, 'unlock'], { cwd: repoRoot, encoding: 'utf8' });
+  assert.equal(unlock.status, 0, unlock.stderr);
+  assert.equal(JSON.parse(unlock.stdout).data.reason, 'reclaimed');
+  assert.equal(fs.existsSync(path.join(fgosDir, 'main-checkout.lock')), false);
+
+  const retried = commitAsSession(repoRoot, { BEE_SESSION_ID: 'session-observer' });
+  assert.equal(retried.status, 0, retried.stderr);
+  assert.equal(commitCount(repoRoot), before + 1);
 });
 
 // --- truth 6: real detached worktree resolves its OWN root, not __dirname -

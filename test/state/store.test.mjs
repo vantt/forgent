@@ -218,7 +218,7 @@ test('moveWork stamps branchHeadAtReturn onto the appended event payload for a d
   assert.equal('headAtReturn' in event.payload, false, 'a branch return never also stamps the main-based headAtReturn (D2 CẤM)');
 });
 
-test('moveWork omits branchHeadAtTake/branchHeadAtReturn entirely from the event payload when the caller never supplies them (byte-identical to the pre-D2 shape)', () => {
+test('moveWork omits branchHeadAtTake/branchHeadAtReturn entirely from the event payload when the caller never supplies them (byte-identical to the prior shape)', () => {
   const dir = tmpDir();
   addSampleWork(dir, 'branch-absent');
 
@@ -259,7 +259,7 @@ test('addFriction accepts a docType tag of any of the four Diataxis quadrants', 
   }
 });
 
-test('addOutcome and addFriction stay valid when docType is absent or explicitly null (untagged, per D6)', () => {
+test('addOutcome and addFriction stay valid when docType is absent or explicitly null (untagged)', () => {
   const dir = tmpDir();
   addSampleWork(dir, 'outcome-untagged');
   addSampleWork(dir, 'friction-untagged');
@@ -298,7 +298,7 @@ test('addOutcome and addFriction reject a docType outside the four Diataxis quad
   assert.equal(listWork(dir).frictions?.['friction-bad-doctype'], undefined);
 });
 
-test('a docType-tagged outcome AND friction survive an independent rebuild of the view from the log (load-bearing D6 proof: zero replay.mjs mechanism change)', () => {
+test('a docType-tagged outcome AND friction survive an independent rebuild of the view from the log (zero replay.mjs mechanism change)', () => {
   const dir = tmpDir();
   addSampleWork(dir, 'replay-survival');
 
@@ -582,7 +582,7 @@ test('moveWork allows a doing->done close when every acceptance clause has non-e
   assert.equal(view.work['cos-all-evidenced'].status, 'done');
 });
 
-test('moveWork leaves a doing->done close completely unaffected when acceptance is absent, or an empty array — D4 no-op', () => {
+test('moveWork leaves a doing->done close completely unaffected when acceptance is absent, or an empty array — a no-op', () => {
   const dir = tmpDir();
   addSampleWork(dir, 'cos-absent'); // no `acceptance` field at all
   addSampleWork(dir, 'cos-empty', { acceptance: [] });
@@ -628,7 +628,7 @@ test('editWork accepts a priority patch and persists it through a fresh rebuild'
   assert.equal(listWork(dir).work['prio-a'].priority, 3);
 });
 
-test('editWork accepts an intent patch, including a negative value (no sign constraint per D6)', () => {
+test('editWork accepts an intent patch, including a negative value (no sign constraint)', () => {
   const dir = tmpDir();
   addSampleWork(dir, 'intent-a');
   assert.equal(listWork(dir).work['intent-a'].intent, undefined);

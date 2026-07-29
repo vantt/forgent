@@ -138,7 +138,7 @@ test('validateWork accepts every status in STATUSES', () => {
   }
 });
 
-test('STATUSES includes awaiting-human (per async-human-gate D1/D3)', () => {
+test('STATUSES includes awaiting-human', () => {
   assert.ok(STATUSES.includes('awaiting-human'));
 });
 
@@ -200,7 +200,7 @@ test('DEFAULTS.tier is itself a member of TIERS, and SCHEMA_VERSION is a positiv
   assert.ok(Number.isInteger(SCHEMA_VERSION) && SCHEMA_VERSION > 0);
 });
 
-test('STAGES includes "decompose" between clarify and executing (per stage-decompose D2), and now "compound-learn" appended after executing (compound-learn-enduser-docs D2)', () => {
+test('STAGES includes "decompose" between clarify and executing, and "compound-learn" appended after executing', () => {
   assert.deepEqual(STAGES, ['clarify', 'decompose', 'executing', 'compound-learn']);
 });
 
@@ -427,7 +427,7 @@ test('validateWork rejects a negative or non-integer priority', () => {
   }
 });
 
-test('validateWork accepts intent as any integer, including negative (no sign constraint per D6)', () => {
+test('validateWork accepts intent as any integer, including negative (no sign constraint)', () => {
   for (const intent of [-100, -1, 0, 1, 999]) {
     assert.doesNotThrow(() => validateWork(baseWork({ intent })));
   }
@@ -507,7 +507,7 @@ test('validateWork rejects a work item that lists itself in its own targets', ()
   );
 });
 
-test('validateWork does not require targets to point at existing ids (targets may name not-yet-created items, per D2)', () => {
+test('validateWork does not require targets to point at existing ids (targets may name not-yet-created items)', () => {
   assert.doesNotThrow(() => validateWork(baseWork({ id: 'mvp-1', targets: ['not-yet-created'] }), new Set(['mvp-1'])));
 });
 

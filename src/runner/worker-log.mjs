@@ -23,6 +23,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { resolveLogsDir } from './paths.mjs';
 
 function section(label, text) {
   const body = typeof text === 'string' && text.trimEnd() !== '' ? text.trimEnd() : '(empty)';
@@ -69,7 +70,7 @@ function formatEntry(workId, entry) {
  */
 export function appendWorkerLog(dir, workId, entry = {}) {
   try {
-    const logsDir = path.join(dir, 'logs');
+    const logsDir = resolveLogsDir(dir);
     fs.mkdirSync(logsDir, { recursive: true });
     const logPath = path.join(logsDir, `${workId}.log`);
     fs.appendFileSync(logPath, formatEntry(workId, entry), 'utf8');
@@ -97,7 +98,7 @@ export function appendWorkerLog(dir, workId, entry = {}) {
 export function appendWorkerLogChunk(dir, workId, chunk) {
   if (!chunk) return null;
   try {
-    const logsDir = path.join(dir, 'logs');
+    const logsDir = resolveLogsDir(dir);
     fs.mkdirSync(logsDir, { recursive: true });
     const logPath = path.join(logsDir, `${workId}.log`);
     fs.appendFileSync(logPath, chunk, 'utf8');

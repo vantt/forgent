@@ -345,7 +345,7 @@ test('e2e stage-clarify (a) clear verdict: submit -> --once takes the item stage
   assert.equal(list.work[submitted.id].verify, 'test -f output.txt && echo VERIFY_OK');
 });
 
-test('e2e stage-clarify (b) unclear verdict: submit -> --once parks the item in awaiting-human with the exact question (still stage clarify); answering it and running --once again resweeps discovery (D7 loop)', () => {
+test('e2e stage-clarify (b) unclear verdict: submit -> --once parks the item in awaiting-human with the exact question (still stage clarify); answering it and running --once again resweeps discovery', () => {
   const repoRoot = initTempRepo();
   const scriptDir = mkTempDir('fgos-runner-e2e-discovery-');
   const question = 'Bạn muốn ưu tiên hiệu năng hay độ chính xác?';
@@ -380,7 +380,7 @@ test('e2e stage-clarify (b) unclear verdict: submit -> --once parks the item in 
   assert.equal(view.gates[submitted.id].ask, question);
 });
 
-test('e2e stage-clarify (c) garbage verdict: an executor that prints non-JSON stdout on the discovery call never crashes --once — the runner still exits 0 and the item lands in awaiting-human with the fixed fail-safe question (D4)', () => {
+test('e2e stage-clarify (c) garbage verdict: an executor that prints non-JSON stdout on the discovery call never crashes --once — the runner still exits 0 and the item lands in awaiting-human with the fixed fail-safe question', () => {
   const repoRoot = initTempRepo();
   const scriptDir = mkTempDir('fgos-runner-e2e-discovery-');
 
@@ -442,7 +442,7 @@ test('e2e stage-decompose (a) simple item pass-through: submit -> --once chains 
   assert.equal(Object.values(view.work).some((w) => w.parent === submitted.id), false);
 });
 
-test('e2e stage-decompose (b) complex item: decompose sweep writes 2 children (real parent+deps+verify, D2/D5), the root is frontier-blocked until both children reach done, then it lots frontier and runs its OWN verify -> proposed (D4)', () => {
+test('e2e stage-decompose (b) complex item: decompose sweep writes 2 children (real parent+deps+verify), the root is frontier-blocked until both children reach done, then it lots frontier and runs its OWN verify -> proposed', () => {
   const repoRoot = initTempRepo();
   const scriptDir = mkTempDir('fgos-runner-e2e-decompose-');
 
@@ -517,7 +517,7 @@ test('e2e stage-decompose (b) complex item: decompose sweep writes 2 children (r
   assert.equal(view.work[childB.id].status, 'done');
 });
 
-test('e2e stage-decompose (c) ambiguous verdict: decompose sweep parks the item in awaiting-human carrying the chia-việc proposal (still stage decompose, no children written); answering resumes it to todo and a resweep re-parks under the still-ambiguous verdict (D3/D7 parity)', () => {
+test('e2e stage-decompose (c) ambiguous verdict: decompose sweep parks the item in awaiting-human carrying the chia-việc proposal (still stage decompose, no children written); answering resumes it to todo and a resweep re-parks under the still-ambiguous verdict', () => {
   const repoRoot = initTempRepo();
   const scriptDir = mkTempDir('fgos-runner-e2e-decompose-');
   const reason = 'Không rõ nên tách theo domain hay theo tầng kỹ thuật.';
