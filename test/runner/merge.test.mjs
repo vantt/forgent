@@ -15,6 +15,7 @@ import {
   isFgosOnlyStatusLine,
 } from '../../src/runner/merge.mjs';
 import { branchNameFor } from '../../src/runner/worktree.mjs';
+import { acquireMainCheckoutLock, ACQUIRED } from '../../src/runner/main-checkout-lock.mjs';
 
 // Every test here creates its own disposable git repo (mirrors
 // worktree.test.mjs's own initTempRepo) — never this repo's own checkout.
@@ -300,6 +301,66 @@ test('mergeRunnerItem aborts cleanly when the staged merge fails its own verify 
   assert.equal(headOf(repoRoot), headBefore, 'HEAD must be unchanged after an aborted merge');
   assert.equal(isWorkingTreeClean(repoRoot), true, 'tree must be clean after merge --abort');
   assert.equal(fs.existsSync(path.join(repoRoot, 'produced.txt')), false, 'a staged-then-aborted merge must not leave its file behind');
+});
+
+// A real pre-commit hook (e.g. this repo's own .githooks/pre-commit main-
+// checkout-lock guard) refusing the commit is a distinct failure mode from
+// a merge conflict or a failed verify: the merge --no-commit already landed
+// cleanly and verify already passed — only the final `git commit` itself
+// fails. Every other failure branch in mergeRunnerItem aborts the merge
+// before returning/throwing; this one must too, or a commit-hook refusal
+// leaves a half-applied `--no-commit` merge sitting in the checkout.
+test('mergeRunnerItem aborts the merge when "git commit" itself fails (e.g. a refusing pre-commit hook) — main left unchanged', async () => {
+  const repoRoot = initRepo();
+  makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
+
+  const hookPath = path.join(repoRoot, '.git', 'hooks', 'pre-commit');
+  fs.writeFileSync(hookPath, '#!/bin/sh\necho "refused by test hook" >&2\nexit 1\n');
+  fs.chmodSync(hookPath, 0o755);
+
+  const headBefore = headOf(repoRoot);
+  await assert.rejects(
+    () => mergeRunnerItem(repoRoot, makeItem({ verify: 'true' })),
+    /verify passed for "fgw\/demo-item" but "git commit" failed/,
+  );
+  assert.equal(headOf(repoRoot), headBefore, 'HEAD must be unchanged after the aborted merge');
+  assert.equal(isWorkingTreeClean(repoRoot), true, 'tree must be clean after merge --abort, not left mid-merge');
+  assert.equal(fs.existsSync(path.join(repoRoot, 'produced.txt')), false, 'a staged-then-aborted merge must not leave its file behind');
+});
+
+// The pre-commit hook only ever locked the final `git commit` — the merge
+// --no-commit/verify steps before it ran unprotected, letting a concurrent
+// session's own merge/commit land in that window and pull MERGE_HEAD out
+// from under this one. mergeRunnerItem now acquires the same lock up front.
+test('mergeRunnerItem refuses to even attempt the merge when another identity already holds the main-checkout lock', async () => {
+  const repoRoot = initRepo();
+  makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
+
+  const fgosDir = path.join(repoRoot, '.fgos');
+  const otherLock = acquireMainCheckoutLock(fgosDir, { identity: 'a-different-live-session' });
+  assert.equal(otherLock.status, ACQUIRED);
+
+  const headBefore = headOf(repoRoot);
+  await assert.rejects(
+    () => mergeRunnerItem(repoRoot, makeItem({ verify: 'true' })),
+    /cannot merge "fgw\/demo-item": main checkout is locked by another live session/,
+  );
+  assert.equal(headOf(repoRoot), headBefore, 'HEAD must be unchanged — the merge must never even start while locked');
+  assert.equal(isWorkingTreeClean(repoRoot), true, 'tree must stay clean — refusing before the merge means nothing was ever staged');
+});
+
+test('mergeRunnerItem merges normally when the lock is free, and releases it afterward', async () => {
+  const repoRoot = initRepo();
+  makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
+
+  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'test -f produced.txt' }));
+  assert.equal(result.outcome, 'merged');
+
+  // Lock released (not left held past this call) — a second, differently-
+  // identified caller must be able to acquire it immediately afterward.
+  const fgosDir = path.join(repoRoot, '.fgos');
+  const afterLock = acquireMainCheckoutLock(fgosDir, { identity: 'someone-else' });
+  assert.equal(afterLock.status, ACQUIRED, 'lock must be released after a successful merge, not left held');
 });
 
 // --- mergeRunnerItem rejects a .fgos/ write on the branch (ADR0020) -------
