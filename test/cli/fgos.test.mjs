@@ -5796,6 +5796,69 @@ test('merge list: two dep-clear proposed items sharing a footprint are excluded 
   assert.deepEqual(data.conflicts, [{ a: 'a', b: 'b', shared: ['src/x.mjs'], suggestions: ['sequence', 'hoist', 're-slice'] }]);
 });
 
+// --- tsk-4j9-4: `fgos merge next` (merge-readiness automation) -----------
+
+test('merge next on an empty store: reports nothing ready, exit 0, no merge attempted', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0);
+  const result = run(cwd, ['merge', 'next']);
+  assert.equal(result.status, 0);
+  assert.deepEqual(envelopeData(result.stdout), { picked: null, reason: 'nothing ready to merge' });
+});
+
+test('merge next merges the single ready item by recursing into approve, item reaches done', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0);
+  // Explicit --verify true (not addOk's 'npm test' default) -- same
+  // sandbox pitfall documented in docs/how-to/add-a-read-only-fgos-verb-
+  // and-plugin-skill.md.
+  assert.equal(run(cwd, ['add', 'solo', '--title', 'Solo', '--kind', 'task', '--risk', 'low', '--verify', 'true']).status, 0);
+  assert.equal(run(cwd, ['move', 'solo', '--to', 'doing']).status, 0);
+  assert.equal(run(cwd, ['move', 'solo', '--to', 'proposed']).status, 0);
+  assert.equal(run(cwd, ['compound', 'solo']).status, 0);
+
+  const result = run(cwd, ['merge', 'next']);
+  assert.equal(result.status, 0, `${result.stdout}${result.stderr}`);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.picked, 'solo');
+  assert.equal(data.approve.to, 'done', `expected the picked item to reach done: ${JSON.stringify(data)}`);
+  assert.equal(stateView(cwd).work.solo.status, 'done');
+});
+
+test('merge next picks the higher-ranked (mvp goalTier) item first when two are ready', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0);
+  for (const id of ['plain', 'important']) {
+    assert.equal(run(cwd, ['add', id, '--title', id, '--kind', 'task', '--risk', 'low', '--verify', 'true', ...(id === 'important' ? ['--goal-tier', 'mvp'] : [])]).status, 0);
+    assert.equal(run(cwd, ['move', id, '--to', 'doing']).status, 0);
+    assert.equal(run(cwd, ['move', id, '--to', 'proposed']).status, 0);
+    assert.equal(run(cwd, ['compound', id]).status, 0);
+  }
+  const data = envelopeData(run(cwd, ['merge', 'next']).stdout);
+  assert.equal(data.picked, 'important', 'the mvp-goalTier item outranks the plain one per rankImpact');
+});
+
+test('merge next on a runner-sourced pick that trips the Iron Law: reports blocked, merges nothing, never auto-acknowledges', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeRunnerProposedItemTouching(cwd, 'iron-next-item', 'src/runner/probe.mjs', {
+    verify: 'test -f src/runner/probe.mjs',
+  });
+
+  const headBefore = gitHead(cwd);
+  const result = run(cwd, ['merge', 'next']);
+  assert.equal(result.status, 0, `merge next itself must not exit non-zero on a blocked pick: ${result.stdout}${result.stderr}`);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.picked, 'iron-next-item');
+  assert.equal(data.blocked, 'iron-law');
+  assert.match(data.message, /Iron Law/);
+
+  assert.equal(stateView(cwd).work['iron-next-item'].status, 'proposed', 'a blocked pick leaves the item proposed');
+  assert.equal(gitHead(cwd), headBefore, 'a blocked pick attempts no merge -- HEAD is unchanged');
+  const survivingBranches = gitAtCwd(cwd, ['for-each-ref', '--format=%(refname:short)', 'refs/heads/']);
+  assert.match(survivingBranches, /fgw\/iron-next-item/, 'the branch survives -- nothing was merged or cleaned up');
+});
+
 // --- str73-done-flip-cos-check cell 1: --acceptance on add/submit/edit ----
 
 test('add --acceptance persists work.acceptance as the given array, validated through validateWork', () => {

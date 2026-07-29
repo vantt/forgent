@@ -1103,11 +1103,41 @@ async function runVerb(verb, flags, positional, dir) {
     // Wraps `mergeReadiness` (`src/state/graph-harness.mjs`) — never
     // reimplements the ranking here.
     case 'merge': {
-      const sub = requireField(positional[0], 'merge requires a sub-verb: fgos merge <list>');
+      const sub = requireField(positional[0], 'merge requires a sub-verb: fgos merge <list|next>');
       if (sub === 'list') {
         return mergeReadiness(listWork(dir));
       }
-      throw new StoreError('validation', `merge: unknown sub-verb "${sub}" (known: list).`);
+      if (sub === 'next') {
+        // Picks the single top-ranked ready item and merges it by recursing
+        // into the SAME `approve` case below (never a parallel merge path,
+        // D6, docs/history/merge-standardization/CONTEXT.md) — `runVerb` is
+        // a pure dispatcher (no printing/exit-code side effects), so
+        // calling it recursively is exactly as safe as any other verb call.
+        // `flags` is forwarded as-is: this never injects
+        // `acknowledge-iron-law` itself (D7) — the Iron Law gate (D16/D17)
+        // exists specifically to require a human-verified failing-test-
+        // first proof before a self-modifying diff lands, so an unattended
+        // `merge next` run must never be able to silently satisfy that
+        // proof on its own authority. If the top pick trips it, this
+        // reports which item and why, merges nothing, and stops — it does
+        // NOT fall through to the next-ranked item (that would silently
+        // change merge order semantics `merge list` already promised).
+        const { ready } = mergeReadiness(listWork(dir));
+        if (ready.length === 0) {
+          return { picked: null, reason: 'nothing ready to merge' };
+        }
+        const id = ready[0];
+        try {
+          const approveResult = await runVerb('approve', flags, [id], dir);
+          return { picked: id, approve: approveResult };
+        } catch (err) {
+          if (err instanceof StoreError && err.message.includes('Iron Law')) {
+            return { picked: id, blocked: 'iron-law', message: err.message };
+          }
+          throw err;
+        }
+      }
+      throw new StoreError('validation', `merge: unknown sub-verb "${sub}" (known: list, next).`);
     }
 
     case 'rebuild': {
