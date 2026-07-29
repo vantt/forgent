@@ -21,6 +21,7 @@ import { repairTruncatedLastLine } from '../src/state/events.mjs';
 import { deriveTitle, classify, generateId } from '../src/intake/classify.mjs';
 import { wrapEnvelope } from '../src/state/envelope.mjs';
 import { loadRunnerConfig, ensureRunnerConfig, DEFAULT_RUNNER_CONFIG } from '../src/runner/dispatch.mjs';
+import { readGateBypassLevel } from '../src/state/gate-bypass.mjs';
 import { resolveFgosDir } from '../src/runner/paths.mjs';
 import { resolveDiscovery } from '../src/intake/discovery.mjs';
 import { resolveDecompose } from '../src/intake/decompose.mjs';
@@ -31,7 +32,7 @@ import { rankImpact } from '../src/state/impact.mjs';
 import { paginate } from '../src/state/cursor.mjs';
 import { runGoalCheck } from '../src/runner/goal-check.mjs';
 import { frozenJudgeHits } from '../src/runner/frozen-judge.mjs';
-import { classifySource, reviewDiff, mergeRunnerItem, cleanupMergedBranch, changedFiles, isWorkingTreeClean as isMainTreeClean, isFgosOnlyStatusLine, detectTrunk, isMainWorktree } from '../src/runner/merge.mjs';
+import { classifySource, reviewDiff, mergeRunnerItem, cleanupMergedBranch, changedFiles, isWorkingTreeClean as isMainTreeClean, isFgosOnlyStatusLine, buildOwnFileSet, detectTrunk, isMainWorktree } from '../src/runner/merge.mjs';
 import { createGitHubPR, mergeGitHubPR, viewGitHubPRStatus } from '../src/runner/github-adapter.mjs';
 import { classifyIronLaw } from '../src/evolve/iron-law.mjs';
 import { branchNameFor, branchExists, createWorktree, removeWorktree } from '../src/runner/worktree.mjs';
@@ -109,12 +110,16 @@ function currentHead(cwd) {
 // STILL top-level-relative (verified empirically, same as the whole-repo
 // case), so the `.fgos/` exclusion still needs the same prefix fix
 // isWorkingTreeClean(repoRoot) above uses.
-function isWorkingTreeClean(cwd) {
+//
+// `ownFileSet` (tsk-598, D2/D3): threaded straight through to
+// isFgosOnlyStatusLine, same fail-safe `null` default as merge.mjs's own
+// isWorkingTreeClean.
+function isWorkingTreeClean(cwd, ownFileSet = null) {
   const prefix = gitAt(cwd, ['rev-parse', '--show-prefix']).trim();
   return gitAt(cwd, ['status', '--porcelain', '--', '.'])
     .split('\n')
     .filter((line) => line.trim() !== '')
-    .every((line) => isFgosOnlyStatusLine(line, prefix));
+    .every((line) => isFgosOnlyStatusLine(line, prefix, ownFileSet));
 }
 
 function commitsSince(cwd, from, to) {
@@ -1065,6 +1070,14 @@ async function runVerb(verb, flags, positional, dir) {
     // items stuck in `doing` — classifies stale-by-owner-type (human >> agent)
     // and SUGGESTS; it never moves or reclaims anything (the runner reap is the
     // only role, and it never reclaims a person's claim).
+    // Request-class per D1: a pure read, never touches state.json. Reports
+    // the configured gate-bypass level (docs/history/gate-bypass/CONTEXT.md
+    // D1-D5) — no CLI setter, mirroring .fgos-runner.json's own
+    // edit-the-file-by-hand pattern.
+    case 'gate-bypass': {
+      return { level: readGateBypassLevel(dir) };
+    }
+
     case 'stale': {
       return staleDoingAdvisory(dir);
     }
@@ -1439,10 +1452,16 @@ async function runVerb(verb, flags, positional, dir) {
       }
 
       const cwd = repoRoot;
-      if (!isWorkingTreeClean(cwd)) {
+      // head is computed BEFORE the clean-tree check (tsk-598 D1/D2): the
+      // check itself now needs the item's own committed-diff paths
+      // (headAtTake..head) to build ownFileSet — a pure read, reordering it
+      // earlier changes nothing else about this branch.
+      const head = currentHead(cwd);
+      const ownDiff = changedFilesSince(cwd, item.headAtTake, head);
+      const ownFileSet = buildOwnFileSet(ownDiff, item.footprint);
+      if (!isWorkingTreeClean(cwd, ownFileSet)) {
         throw new StoreError('validation', `return: working tree at "${cwd}" is not clean — commit the work for "${id}" before returning.`);
       }
-      const head = currentHead(cwd);
       const aheadCount = commitsSince(cwd, item.headAtTake, head);
       if (aheadCount <= 0) {
         throw new StoreError(
@@ -1454,7 +1473,7 @@ async function runVerb(verb, flags, positional, dir) {
       const check = await runGoalCheck(item, cwd, timeoutMs);
       if (check.passed) {
         // STR63: advisory only (per cos) — a hit never blocks this return.
-        const frozenJudge = frozenJudgeHits(changedFilesSince(cwd, item.headAtTake, head), item.footprint);
+        const frozenJudge = frozenJudgeHits(ownDiff, item.footprint);
         const { event } = moveWork(dir, { id, to: 'proposed', expectedStatus: 'doing', headAtReturn: head });
         addOutcome(dir, { id, actual: { outcome: 'proposed', passed: true, attempts: 1, errorClass: null, aheadCount } });
         // tsk-45z D1/D2: this session's own commits (landed straight on the
@@ -1672,8 +1691,14 @@ async function runVerb(verb, flags, positional, dir) {
       // the fail-safe direction, accepted as-is (unchanged from before this
       // hoist). Refuses BEFORE any git mutation or GitHub call: the item
       // stays `proposed`, nothing is touched, neither transport is reached.
+      // Hoisted alongside the Iron Law gate (tsk-598 D1/D2): the local-merge
+      // branch's own clean-tree check, further below, reuses this exact
+      // array as its ownFileSet source instead of recomputing the same
+      // branch-vs-trunk diff a second time.
+      let runnerOwnDiff;
       if (source === 'runner') {
-        const ironLaw = classifyIronLaw({ filesChanged: changedFiles(repoRoot, item), description: item.description });
+        runnerOwnDiff = changedFiles(repoRoot, item);
+        const ironLaw = classifyIronLaw({ filesChanged: runnerOwnDiff, description: item.description });
         // review-20260718-self-improve-loop finding f02: only the bare flag
         // (parsed as boolean `true`, no following value) counts as
         // acknowledgment; any value form (e.g. a stray "false") fails closed.
@@ -1740,7 +1765,8 @@ async function runVerb(verb, flags, positional, dir) {
         // f01) so it guards both merge transports identically — see that
         // block for the full rationale. This local-merge branch continues
         // directly with the dirty-tree check.
-        if (!isMainTreeClean(repoRoot)) {
+        const ownFileSet = buildOwnFileSet(runnerOwnDiff, item.footprint);
+        if (!isMainTreeClean(repoRoot, ownFileSet)) {
           throw new StoreError('validation', `approve: working tree at "${repoRoot}" is not clean — commit or stash pending changes before approving "${id}".`);
         }
 
@@ -2448,7 +2474,30 @@ async function main() {
   }
 
   try {
-    const data = await runVerb(verb, flags, positional, dataDir());
+    const dir = dataDir();
+    // tsk-4fu-2: a verb registered `requiresExistingStore: true`
+    // (command-registry.mjs) reads/writes through this `dir` — refuse
+    // before ever reaching its handler when `.fgos/` isn't there yet,
+    // instead of letting `appendEventCore`'s own `mkdirSync` silently
+    // create a fresh, empty one (the worktree phantom-store hazard this
+    // item closes). `init` is deliberately never in that set — it is the
+    // one legitimate door that creates `.fgos/` — but gets the opposite
+    // check: refuse when `cwd` is a linked worktree, the one remaining
+    // path that could recreate a live `.fgos/` there and defeat ADR0020.
+    const entry = COMMAND_REGISTRY.find((e) => e.name === verb);
+    if (entry?.requiresExistingStore && !fs.existsSync(dir)) {
+      throw new StoreError(
+        'validation',
+        `.fgos/ not found at "${dir}" -- run "fgos init" here first, or check you are not inside a linked worktree (worktrees never carry .fgos/, per ADR0020: docs/decisions/0020-chan-fgos-khoi-worktree-worker.md).`,
+      );
+    }
+    if (verb === 'init' && !isMainWorktree(process.cwd())) {
+      throw new StoreError(
+        'validation',
+        `"fgos init" refused inside a linked worktree ("${process.cwd()}") -- worktrees never carry .fgos/ by design (ADR0020); run "fgos init" from the main checkout instead.`,
+      );
+    }
+    const data = await runVerb(verb, flags, positional, dir);
     if (flags.pretty && (verb === 'setup' || verb === 'doctor')) {
       process.stdout.write(renderPretty(verb, data));
     } else {

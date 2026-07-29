@@ -13,8 +13,10 @@ import {
   changedFiles,
   isWorkingTreeClean,
   isFgosOnlyStatusLine,
+  buildOwnFileSet,
 } from '../../src/runner/merge.mjs';
 import { branchNameFor } from '../../src/runner/worktree.mjs';
+import { acquireMainCheckoutLock, ACQUIRED } from '../../src/runner/main-checkout-lock.mjs';
 
 // Every test here creates its own disposable git repo (mirrors
 // worktree.test.mjs's own initTempRepo) — never this repo's own checkout.
@@ -240,6 +242,26 @@ test('isWorkingTreeClean(repoRoot) still scans the WHOLE repo when repoRoot is a
   assert.equal(isWorkingTreeClean(sub), false);
 });
 
+// --- isWorkingTreeClean's ownFileSet parameter (tsk-598 D1-D3) -----------
+
+test('isWorkingTreeClean(repoRoot, ownFileSet) is true when the only dirty path is outside ownFileSet', () => {
+  const repoRoot = initRepo();
+  fs.writeFileSync(path.join(repoRoot, 'unrelated.txt'), 'uncommitted\n');
+  assert.equal(isWorkingTreeClean(repoRoot, new Set(['src/a.mjs'])), true);
+});
+
+test('isWorkingTreeClean(repoRoot, ownFileSet) is false when the dirty path IS in ownFileSet', () => {
+  const repoRoot = initRepo();
+  fs.writeFileSync(path.join(repoRoot, 'src.mjs'), 'uncommitted\n');
+  assert.equal(isWorkingTreeClean(repoRoot, new Set(['src.mjs'])), false);
+});
+
+test('isWorkingTreeClean(repoRoot) with no ownFileSet argument reproduces the strict pre-tsk-598 default', () => {
+  const repoRoot = initRepo();
+  fs.writeFileSync(path.join(repoRoot, 'unrelated.txt'), 'uncommitted\n');
+  assert.equal(isWorkingTreeClean(repoRoot), false);
+});
+
 // --- isFgosOnlyStatusLine's prefix parameter -----------------------------
 
 test('isFgosOnlyStatusLine with no prefix (default) matches only a bare top-level .fgos/ path — unchanged prior behavior', () => {
@@ -253,6 +275,46 @@ test('isFgosOnlyStatusLine with a prefix matches that prefix\'s own .fgos/ path,
   assert.equal(isFgosOnlyStatusLine('?? sub/.fgos', 'sub/'), true);
   assert.equal(isFgosOnlyStatusLine(' M .fgos/events.jsonl', 'sub/'), false, 'a top-level .fgos/ must not match a subdirectory prefix');
   assert.equal(isFgosOnlyStatusLine(' M sub/other.txt', 'sub/'), false, 'a real non-.fgos path under the prefix must still be rejected');
+});
+
+// --- isFgosOnlyStatusLine's ownFileSet parameter (tsk-598 D1-D3) ---------
+
+test('isFgosOnlyStatusLine: omitted ownFileSet (default null) still blocks any non-.fgos path — fail-safe, unchanged from before tsk-598', () => {
+  assert.equal(isFgosOnlyStatusLine(' M other.txt'), false);
+  assert.equal(isFgosOnlyStatusLine(' M other.txt', '', null), false);
+});
+
+test('isFgosOnlyStatusLine: a non-.fgos path OUTSIDE ownFileSet is ignorable (does not block)', () => {
+  const ownFileSet = new Set(['src/a.mjs']);
+  assert.equal(isFgosOnlyStatusLine(' M unrelated.txt', '', ownFileSet), true);
+  assert.equal(isFgosOnlyStatusLine('?? unrelated.txt', '', ownFileSet), true);
+});
+
+test('isFgosOnlyStatusLine: a non-.fgos path INSIDE ownFileSet still blocks — a real conflict', () => {
+  const ownFileSet = new Set(['src/a.mjs']);
+  assert.equal(isFgosOnlyStatusLine(' M src/a.mjs', '', ownFileSet), false);
+});
+
+test('isFgosOnlyStatusLine: a .fgos/ path is always ignorable regardless of ownFileSet', () => {
+  const ownFileSet = new Set(['.fgos/events.jsonl']);
+  assert.equal(isFgosOnlyStatusLine(' M .fgos/events.jsonl', '', ownFileSet), true);
+  assert.equal(isFgosOnlyStatusLine(' M .fgos/events.jsonl', '', new Set()), true);
+});
+
+test('isFgosOnlyStatusLine: a rename line ("a -> b") blocks if EITHER side is in ownFileSet', () => {
+  const ownFileSet = new Set(['new-name.txt']);
+  assert.equal(isFgosOnlyStatusLine('R  old-name.txt -> new-name.txt', '', ownFileSet), false);
+  assert.equal(isFgosOnlyStatusLine('R  old-name.txt -> other-new-name.txt', '', ownFileSet), true);
+});
+
+test('buildOwnFileSet: unions committed-diff paths and footprint, normalized the same way frozenJudgeHits normalizes footprint', () => {
+  const set = buildOwnFileSet(['src/a.mjs', './src/b.mjs'], ['package.json']);
+  assert.deepEqual([...set].sort(), ['package.json', 'src/a.mjs', 'src/b.mjs']);
+});
+
+test('buildOwnFileSet: tolerates an absent footprint (item.footprint undefined) and an empty diff', () => {
+  assert.deepEqual([...buildOwnFileSet([], undefined)], []);
+  assert.deepEqual([...buildOwnFileSet(['src/a.mjs'], undefined)], ['src/a.mjs']);
 });
 
 // --- mergeRunnerItem (spike-proven mechanics: --no-commit --no-ff, verify
@@ -325,6 +387,41 @@ test('mergeRunnerItem aborts the merge when "git commit" itself fails (e.g. a re
   assert.equal(headOf(repoRoot), headBefore, 'HEAD must be unchanged after the aborted merge');
   assert.equal(isWorkingTreeClean(repoRoot), true, 'tree must be clean after merge --abort, not left mid-merge');
   assert.equal(fs.existsSync(path.join(repoRoot, 'produced.txt')), false, 'a staged-then-aborted merge must not leave its file behind');
+});
+
+// The pre-commit hook only ever locked the final `git commit` — the merge
+// --no-commit/verify steps before it ran unprotected, letting a concurrent
+// session's own merge/commit land in that window and pull MERGE_HEAD out
+// from under this one. mergeRunnerItem now acquires the same lock up front.
+test('mergeRunnerItem refuses to even attempt the merge when another identity already holds the main-checkout lock', async () => {
+  const repoRoot = initRepo();
+  makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
+
+  const fgosDir = path.join(repoRoot, '.fgos');
+  const otherLock = acquireMainCheckoutLock(fgosDir, { identity: 'a-different-live-session' });
+  assert.equal(otherLock.status, ACQUIRED);
+
+  const headBefore = headOf(repoRoot);
+  await assert.rejects(
+    () => mergeRunnerItem(repoRoot, makeItem({ verify: 'true' })),
+    /cannot merge "fgw\/demo-item": main checkout is locked by another live session/,
+  );
+  assert.equal(headOf(repoRoot), headBefore, 'HEAD must be unchanged — the merge must never even start while locked');
+  assert.equal(isWorkingTreeClean(repoRoot), true, 'tree must stay clean — refusing before the merge means nothing was ever staged');
+});
+
+test('mergeRunnerItem merges normally when the lock is free, and releases it afterward', async () => {
+  const repoRoot = initRepo();
+  makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
+
+  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'test -f produced.txt' }));
+  assert.equal(result.outcome, 'merged');
+
+  // Lock released (not left held past this call) — a second, differently-
+  // identified caller must be able to acquire it immediately afterward.
+  const fgosDir = path.join(repoRoot, '.fgos');
+  const afterLock = acquireMainCheckoutLock(fgosDir, { identity: 'someone-else' });
+  assert.equal(afterLock.status, ACQUIRED, 'lock must be released after a successful merge, not left held');
 });
 
 // --- mergeRunnerItem rejects a .fgos/ write on the branch (ADR0020) -------
