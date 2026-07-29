@@ -14,8 +14,27 @@ import { createSession, endSession } from '../../src/runner/session.mjs';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FGOS = path.resolve(__dirname, '../../bin/fgos.mjs');
 
-function tmpCwd() {
+// A fresh scratch dir with no `.fgos/` at all — never auto-inited. Only
+// the handful of tests that specifically exercise pre-init/first-init
+// behavior (the `init` verb's own tests, and tsk-4fu-2's new
+// `requiresExistingStore` guard tests) should use this directly; every
+// other test wants `tmpCwd()` below.
+function rawTmpCwd() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-cli-'));
+}
+
+// tsk-4fu-2: `fgos init` is no longer implicit — every `requiresExistingStore`
+// verb (command-registry.mjs) now refuses when `.fgos/` doesn't exist yet,
+// instead of silently auto-vivifying it. This suite's ~340 call sites all
+// want a ready-to-use store, not a test of that guard itself, so `tmpCwd()`
+// bootstraps it once here rather than needing an explicit `run(cwd,
+// ['init'])` at every site. `fgos init` is idempotent (store.mjs's own
+// `initStore` docstring), so the handful of tests that still call `init`
+// explicitly afterward are unaffected — a harmless no-op second call.
+function tmpCwd() {
+  const cwd = rawTmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0, 'tmpCwd(): "fgos init" failed to bootstrap .fgos/');
+  return cwd;
 }
 
 function run(cwd, args, extraEnv = {}) {
@@ -66,6 +85,12 @@ function stateView(cwd) {
 
 function addOk(cwd, id, extra = {}) {
   const flags = ['--title', extra.title ?? `Title ${id}`, '--kind', extra.kind ?? 'task', '--risk', extra.risk ?? 'low', '--verify', extra.verify ?? 'npm test'];
+  // --footprint stays omitted unless a caller actually passes one (tsk-598
+  // own-file-set tests): matches the CLI's own present-or-absent optional
+  // shape, so every existing call site (no extra.footprint) is unaffected.
+  if (extra.footprint !== undefined) {
+    flags.push('--footprint', extra.footprint);
+  }
   return run(cwd, ['add', id, ...flags]);
 }
 
@@ -1328,7 +1353,7 @@ test('ready opens a todo item once its dep reaches done (approved, not merely pr
 });
 
 test('ready on a directory with no log at all returns an empty result, exit 0 (a read never initializes .fgos/)', () => {
-  const cwd = tmpCwd();
+  const cwd = rawTmpCwd();
   const result = run(cwd, ['ready']);
   assert.equal(result.status, 0);
   assert.deepEqual(envelopeData(result.stdout), []);
@@ -1455,7 +1480,7 @@ test('check on an item with no recorded outcome returns a null predicted/actual 
 });
 
 test('check on a directory with no log at all returns an empty outcomes list, exit 0 (a read never initializes .fgos/)', () => {
-  const cwd = tmpCwd();
+  const cwd = rawTmpCwd();
   const result = run(cwd, ['check']);
   assert.equal(result.status, 0);
   const data = envelopeData(result.stdout);
@@ -2576,7 +2601,7 @@ test('check tolerates a torn final entropy-history line — folds trend against 
 });
 
 test('check on a directory with no log at all still never initializes .fgos/ (entropy data stays absent, same as friction/settlement)', () => {
-  const cwd = tmpCwd();
+  const cwd = rawTmpCwd();
   const result = run(cwd, ['check']);
   assert.equal(result.status, 0);
   const data = envelopeData(result.stdout);
@@ -2995,6 +3020,59 @@ test('return refuses a dirty working tree (uncommitted changes) as validation, e
   assert.equal(stateView(cwd).work['pull-return-dirty'].status, 'doing');
 });
 
+test('return succeeds when a dirty file on cwd is UNRELATED to the item\'s own committed progress (tsk-598 D1/D2) — own-file-set scoping, not a whole-tree gate', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  addOk(cwd, 'pull-return-unrelated-dirty', { verify: 'test -f proof.txt' });
+  assert.equal(run(cwd, ['take', '--id', 'pull-return-unrelated-dirty']).status, 0);
+  commitFile(cwd, 'proof.txt'); // real committed progress since headAtTake
+
+  // A path this item's headAtTake..HEAD diff never touches — another
+  // session's uncommitted work sitting in the same main checkout (the
+  // tsk-352 repro shape).
+  fs.writeFileSync(path.join(cwd, 'scratch.txt'), 'unrelated uncommitted work\n'); // never git add/commit
+
+  const result = run(cwd, ['return', 'pull-return-unrelated-dirty']);
+  assert.equal(result.status, 0, `return should succeed past an unrelated dirty file: ${result.stderr}`);
+  assert.equal(stateView(cwd).work['pull-return-unrelated-dirty'].status, 'proposed');
+  assert.equal(fs.readFileSync(path.join(cwd, 'scratch.txt'), 'utf8'), 'unrelated uncommitted work\n', 'the unrelated dirty file must be left untouched, still uncommitted');
+});
+
+test('return still refuses when the SAME path the item committed is dirty again — a real conflict, tsk-598 D2, exit 4, item stays doing', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  addOk(cwd, 'pull-return-real-conflict', { verify: 'test -f proof.txt' });
+  assert.equal(run(cwd, ['take', '--id', 'pull-return-real-conflict']).status, 0);
+  commitFile(cwd, 'proof.txt'); // proof.txt is now IN this item's own committed diff
+
+  // Re-dirty the SAME path after committing it — own-file-set membership
+  // still blocks this, unchanged from before tsk-598.
+  fs.writeFileSync(path.join(cwd, 'proof.txt'), 'clobbered by another writer\n'); // never git add/commit
+
+  const result = run(cwd, ['return', 'pull-return-real-conflict']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /not clean/);
+  assert.equal(stateView(cwd).work['pull-return-real-conflict'].status, 'doing');
+});
+
+test('return with a declared footprint still refuses on an uncommitted footprint path (tsk-598 D3) even though it was never committed', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  addOk(cwd, 'pull-return-footprint-dirty', { verify: 'test -f proof.txt', footprint: 'footprint-guarded.txt' });
+  assert.equal(run(cwd, ['take', '--id', 'pull-return-footprint-dirty']).status, 0);
+  commitFile(cwd, 'proof.txt'); // real committed progress since headAtTake
+
+  // footprint-guarded.txt is declared in item.footprint but was never
+  // committed — absent from headAtTake..HEAD. Per D3, a footprint path
+  // still blocks even uncommitted.
+  fs.writeFileSync(path.join(cwd, 'footprint-guarded.txt'), 'forgot to commit this\n'); // never git add/commit
+
+  const result = run(cwd, ['return', 'pull-return-footprint-dirty']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /not clean/);
+  assert.equal(stateView(cwd).work['pull-return-footprint-dirty'].status, 'doing');
+});
+
 test('return succeeds when ONLY .fgos/ (the live event log) is dirty — its own take/return writes are excluded from the clean-tree gate (no more manual events.jsonl commit before every return)', () => {
   const cwd = initGitCwd();
   run(cwd, ['init']);
@@ -3323,7 +3401,7 @@ test('evolve with zero open friction returns an empty candidate list and exits 0
 });
 
 test('evolve on a directory with no log at all returns an empty candidate list, exit 0 (a read never initializes .fgos/)', () => {
-  const cwd = tmpCwd();
+  const cwd = rawTmpCwd();
   const result = run(cwd, ['evolve']);
   assert.equal(result.status, 0);
   assert.deepEqual(envelopeData(result.stdout), []);
@@ -3694,17 +3772,62 @@ test('approve of a runner item succeeds when ONLY .fgos/ (the live event log) is
   assert.equal(stateView(cwd).work['approve-fgos-only-dirty'].status, 'done');
 });
 
-test('approve of a runner item still refuses when a non-.fgos file on main is dirty, as validation, exit 4, item stays proposed', () => {
+test('approve of a runner item succeeds when a dirty file on main is UNRELATED to the item (tsk-598 D1/D2) — own-file-set scoping, not a whole-tree gate', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
-  makeRunnerProposedItem(cwd, 'approve-real-dirty', { verify: 'test -f approve-real-dirty-produced.txt' });
+  makeRunnerProposedItem(cwd, 'approve-unrelated-dirty', { verify: 'test -f approve-unrelated-dirty-produced.txt' });
+  compoundAndCommit(cwd, 'approve-unrelated-dirty');
 
+  // A path the item's own branch-vs-trunk diff never touches — another
+  // session's uncommitted work sitting on main, the exact repro shape
+  // tsk-598 was filed for (tsk-veg's approve blocked by unrelated docs/
+  // plans/ files from a different session).
   fs.writeFileSync(path.join(cwd, 'scratch.txt'), 'unrelated uncommitted work\n'); // never git add/commit
 
-  const result = run(cwd, ['approve', 'approve-real-dirty']);
+  const result = run(cwd, ['approve', 'approve-unrelated-dirty']);
+  assert.equal(result.status, 0, `approve should succeed past an unrelated dirty file: ${result.stderr}`);
+  assert.equal(stateView(cwd).work['approve-unrelated-dirty'].status, 'done');
+  assert.equal(fs.readFileSync(path.join(cwd, 'scratch.txt'), 'utf8'), 'unrelated uncommitted work\n', 'the unrelated dirty file must be left untouched, still uncommitted');
+});
+
+test('approve of a runner item still refuses when the SAME path the item touched is dirty again on main — a real conflict, tsk-598 D2, exit 4, item stays proposed', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeRunnerProposedItem(cwd, 'approve-real-conflict', { verify: 'test -f approve-real-conflict-produced.txt' });
+  compoundAndCommit(cwd, 'approve-real-conflict');
+
+  // approve-real-conflict-produced.txt IS in this item's own branch-vs-trunk
+  // diff (makeRunnerProposedItem committed it on fgw/approve-real-conflict);
+  // re-dirtying that SAME path on main after propose is a real conflict —
+  // own-file-set membership still blocks it, unchanged from before tsk-598.
+  fs.writeFileSync(path.join(cwd, 'approve-real-conflict-produced.txt'), 'clobbered by another writer\n'); // never git add/commit
+
+  const result = run(cwd, ['approve', 'approve-real-conflict']);
   assert.equal(result.status, 4);
   assert.match(result.stderr, /not clean/);
-  assert.equal(stateView(cwd).work['approve-real-dirty'].status, 'proposed');
+  assert.equal(stateView(cwd).work['approve-real-conflict'].status, 'proposed');
+});
+
+test('approve of a runner item with a declared footprint still refuses on an uncommitted footprint path (tsk-598 D3) even though it was never committed to the branch', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeRunnerProposedItem(cwd, 'approve-footprint-dirty', {
+    verify: 'test -f approve-footprint-dirty-produced.txt',
+    footprint: 'footprint-guarded.txt',
+  });
+  compoundAndCommit(cwd, 'approve-footprint-dirty');
+
+  // footprint-guarded.txt was never committed to fgw/approve-footprint-dirty
+  // (so it is absent from the item's own committed diff) — only DECLARED in
+  // item.footprint. Per D3, a footprint path still blocks even uncommitted,
+  // protecting against exactly the "forgot to add it" gap a committed-diff-
+  // only own-file-set would silently let through.
+  fs.writeFileSync(path.join(cwd, 'footprint-guarded.txt'), 'forgot to commit this\n'); // never git add/commit
+
+  const result = run(cwd, ['approve', 'approve-footprint-dirty']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /not clean/);
+  assert.equal(stateView(cwd).work['approve-footprint-dirty'].status, 'proposed');
 });
 
 test('approve of a leaf item with a clean merge lands the work on fgw/<root> (not main) via an ephemeral worktree, leaf -> done, fgw/<leaf> is actually deleted, fgw/<root> survives', () => {

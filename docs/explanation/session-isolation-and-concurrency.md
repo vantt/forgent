@@ -63,6 +63,40 @@ kill-mid-operation rehearsal was run — the gap between "logic looks right on a
 constructed fixture" and "survives a real interruption" is exactly the kind a
 synthetic fixture can't close.
 
+## A two-syscall lock create (open, then write the identity) has an empty-file window an atomic-looking primitive doesn't close
+
+`events.lock`'s create step looked atomic — `fs.openSync(lockPath, 'wx')`
+uses the same O_CREAT|O_EXCL exclusivity as its sibling locks
+(`runner.lock`, `sessions.lock`, `main-checkout.lock`) — but it wrote the
+holder's identity in a *separate* `fs.writeSync` call right after. Between
+those two syscalls, the lock file exists but is still empty. A competitor
+that loses the create race and reads the file in that exact window sees
+unparseable (NaN) content, which the stale-holder-reclaim logic — correctly
+designed to treat a dead/garbage holder as reclaimable — can't tell apart
+from an actually-stale lock. It unlinks a lock a live process still holds,
+and both processes go on to believe they hold it: the identical
+duplicate-seq corruption the lock exists to prevent in the first place,
+just reopened through a different door.
+
+This reproduced empirically at the same scale that made it worth building
+this lineage of locks safe in the first place: 0/5 failures at 6 concurrent
+processes, 3/5 failures at 20. Low natural concurrency can make a real,
+reproducible race window look like it isn't there — proving a lock correct
+against today's typical concurrency is not the same claim as proving it
+correct at the concurrency the system is actually meant to support.
+
+The fix generalizes past this one call site: write the holder's identity to
+a per-attempt temp file first, then `fs.linkSync` it onto the lock path
+instead of `open('wx')` + a separate write. `link()` only ever exposes the
+destination fully-written or not-yet-existing — there is no intermediate
+state for a competitor to observe, so the empty-file misread is closed
+structurally rather than patched with a retry or a wider timeout. Any
+future lock in this same create-then-write-identity shape should default
+to the write-then-link pattern rather than the separate open-then-write one,
+even though the older shape reads as "atomic" at a glance — the atomicity
+of the *create* was never the missing piece; the gap was between create and
+content being fully present.
+
 ---
 
 **Source:** `docs/history/learnings/critical-patterns.md` —
@@ -72,4 +106,6 @@ fgos-multi-session-checkout);
 [20260717] "'Mirror X' reuses the mechanism, never the policy" (feature
 fgos-multi-session-checkout);
 condensed entry "Đường crash-recovery phải có test giết-thật" (feature
-phase-2-routing, 2026-07-14).
+phase-2-routing, 2026-07-14);
+`docs/history/events-lock-concurrency-race/plan.md` — real race confirmed
+and fixed at `962eb6b` (feature tsk-3ld, 2026-07-29).
