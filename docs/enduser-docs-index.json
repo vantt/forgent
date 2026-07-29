@@ -8,6 +8,14 @@
     "sourceCaptureId": "doc-fgos-rollup-howto"
   },
   {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/continue-after-root-decomposes-mid-session.md",
+    "title": "How to continue when a root item decomposes into children mid-session",
+    "sourceCaptureId": "tsk-424"
+  },
+  {
     "quadrant": "explanation",
     "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
     "audience": "A user seeking understanding of the design, not a task to complete.",
