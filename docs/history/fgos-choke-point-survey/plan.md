@@ -88,22 +88,19 @@ worktree fresh, consistent with treating every candidate the same way.
    (`scripts/` already holds `check-decision-citation-drift.mjs` /
    `next-doc-id.mjs` for the doc-tooling pattern, but this item's own
    check is small enough to stay inline, same precedent as tsk-64s's D3
-   grep-based verify):
+   grep-based verify). This is the item's live `verify` field (set via
+   `fgos edit tsk-1ab --verify`, overriding `fgos discover`'s
+   auto-judged guess which pointed at `plans/reports/` — stale against
+   locked **D1**):
 
    ```bash
-   node -e "
-   const fs = require('node:fs');
-   const t = fs.readFileSync(process.argv[1], 'utf8');
-   const required = ['## Candidates', '## Ranked priority', '## No fixes applied'];
-   const missing = required.filter((h) => !t.includes(h));
-   if (missing.length) { console.error('missing sections:', missing); process.exit(1); }
-   console.log('ok');
-   " -- docs/decisions/00NN-fgos-choke-point-survey.md
+   f=$(ls docs/decisions/*-fgos-choke-point-survey.md) && grep -q "## Candidates" "$f" && grep -q "## Ranked priority" "$f" && grep -q "## No fixes applied" "$f" && echo ok
    ```
 
-   Proves the artifact's shape (required sections present) without
-   claiming to prove each duplication judgment call, which per the risk
-   map stays a human-read check.
+   Proves the artifact's shape (required sections present, filename
+   pattern matches D1's `docs/decisions/` location) without claiming to
+   prove each duplication judgment call, which per the risk map stays a
+   human-read check.
 
 ## Split decision
 
@@ -118,7 +115,6 @@ work, proceeds as itself.
 ## Execution
 
 Per the locked convention, Execute and `return`'s own re-verify already
-have a working mechanical path — this plan only names the one verify
-command for `executing` to run: the inline `node -e` section check from
-step 5 above, pointed at the actual decision-doc path once its number is
-resolved via `ls docs/decisions | sort | tail -1` at write time.
+have a working mechanical path — this plan names the one verify command
+for `executing` to run: step 5's inline check above, already live as the
+item's `verify` field.
