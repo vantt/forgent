@@ -759,6 +759,7 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos lock-status'],
     touchesState: false,
+    requiresExistingStore: false,
     externalEffect: false,
     paginated: false,
     deprecated: null,
