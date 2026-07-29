@@ -43,3 +43,6 @@ output.txt
 !/.agents/skills/distill/
 /.codex/
 /upstreams/
+
+# Rust build output
+/herdr-plugin/target/
