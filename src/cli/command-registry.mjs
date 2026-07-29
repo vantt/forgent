@@ -748,4 +748,20 @@ export const COMMAND_REGISTRY = [
     paginated: false,
     deprecated: null,
   },
+  {
+    name: 'lock-status',
+    invoke: 'fgos lock-status',
+    description: 'Read-only report on .fgos/main-checkout.lock: whether it is free, live (genuinely held), stale (reclaimable), or ambiguous (corrupt/undecidable), plus holder identity, lock age, and remaining TTL. Never creates, refreshes, or deletes the lock file.',
+    parameters: {
+      type: 'object',
+      properties: {},
+      required: [],
+    },
+    examples: ['fgos lock-status'],
+    touchesState: false,
+    requiresExistingStore: false,
+    externalEffect: false,
+    paginated: false,
+    deprecated: null,
+  },
 ];
