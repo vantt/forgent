@@ -163,6 +163,14 @@
     "quadrant": "explanation",
     "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
     "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/orphaned-worktree-reclaim-must-check-for-live-uncommitted-work.md",
+    "title": "Why reclaiming an orphaned worktree checkout must check for live uncommitted work first",
+    "sourceCaptureId": "tsk-1os"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/explanation/runner-execution-safety.md",
     "title": "Design safeguards in fgOS's runner — anti-loop breakers, model-judgment fail-safes, and guard ordering",
     "sourceCaptureId": null
