@@ -411,23 +411,23 @@ test('move on a nonexistent id is rejected as validation (not-found), exit 4', (
   assert.equal(result.status, 4);
 });
 
-test('move with a bare --to (no value) is rejected as validation, exit 4, no event written', () => {
-  const cwd = tmpCwd();
-  addOk(cwd, 'bare-to');
-  const before = eventLines(cwd).length;
-  const result = run(cwd, ['move', 'bare-to', '--to']);
-  assert.equal(result.status, 4);
-  assert.equal(eventLines(cwd).length, before);
-});
+// tsk-34y: same invariant as ADD_BAD_FLAG_CASES/SUBMIT_BAD_FLAG_CASES above,
+// applied to `move` (D1, docs/history/test-suite-dry-consolidation/CONTEXT.md).
+const MOVE_BAD_FLAG_CASES = [
+  ['a bare --to (no value)', ['--to']],
+  ['a valid --to plus an empty --expect ""', ['--to', 'doing', '--expect', '']],
+];
 
-test('move with an empty --expect "" is rejected as validation, exit 4, no event written', () => {
-  const cwd = tmpCwd();
-  addOk(cwd, 'empty-expect');
-  const before = eventLines(cwd).length;
-  const result = run(cwd, ['move', 'empty-expect', '--to', 'doing', '--expect', '']);
-  assert.equal(result.status, 4);
-  assert.equal(eventLines(cwd).length, before);
-});
+for (const [label, badFlagArgs] of MOVE_BAD_FLAG_CASES) {
+  test(`move with ${label} is rejected as validation, exit 4, no event written`, () => {
+    const cwd = tmpCwd();
+    addOk(cwd, 'move-bad-flag-item');
+    const before = eventLines(cwd).length;
+    const result = run(cwd, ['move', 'move-bad-flag-item', ...badFlagArgs]);
+    assert.equal(result.status, 4);
+    assert.equal(eventLines(cwd).length, before);
+  });
+}
 
 test('move reports the real event seq in its envelope data, not undefined', () => {
   const cwd = tmpCwd();
@@ -831,21 +831,33 @@ test('add explicitly writes the tier into the work.add event payload itself, not
   assert.equal(addEvent.payload.tier, 'standard');
 });
 
-test('add with a --tier outside the TIERS domain is rejected as validation, exit 4, no event written', () => {
-  const cwd = tmpCwd();
-  const before = eventLines(cwd).length;
-  const result = run(cwd, ['add', 'bad-tier-item', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--tier', 'extreme']);
-  assert.equal(result.status, 4);
-  assert.equal(eventLines(cwd).length, before);
-});
+// tsk-34y: these `add` flag-value rejections shared one invariant -- an
+// otherwise-valid `add` invocation with one flag given a bad or bare value
+// is rejected as validation (exit 4) and appends no event. Each row below
+// used to be its own hand-written test (see D1, docs/history/
+// test-suite-dry-consolidation/CONTEXT.md); merging keeps every edge case
+// while dropping the repeated shape.
+const ADD_BAD_FLAG_CASES = [
+  ['a --tier outside the TIERS domain', ['--tier', 'extreme']],
+  ['a bare --tier (no value)', ['--tier']],
+  ['an unrecognized --domain value', ['--domain', 'bogus']],
+  ['a bare --domain (no value)', ['--domain']],
+  ['an empty --discovered-from ""', ['--discovered-from', '']],
+  ['a bare --discovered-from (no value)', ['--discovered-from']],
+  ['a --goal-tier outside its own domain', ['--goal-tier', 'bogus']],
+  ['an empty --docs-ref ""', ['--docs-ref', '']],
+  ['a bare --docs-ref (no value)', ['--docs-ref']],
+];
 
-test('add with a bare --tier (no value) is rejected as validation, exit 4, no event written', () => {
-  const cwd = tmpCwd();
-  const before = eventLines(cwd).length;
-  const result = run(cwd, ['add', 'bare-tier-item', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--tier']);
-  assert.equal(result.status, 4);
-  assert.equal(eventLines(cwd).length, before);
-});
+for (const [label, badFlagArgs] of ADD_BAD_FLAG_CASES) {
+  test(`add with ${label} is rejected as validation, exit 4, no event written`, () => {
+    const cwd = tmpCwd();
+    const before = eventLines(cwd).length;
+    const result = run(cwd, ['add', 'bad-flag-item', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', ...badFlagArgs]);
+    assert.equal(result.status, 4);
+    assert.equal(eventLines(cwd).length, before);
+  });
+}
 
 // --- base-workflow-model S2: --domain on `add` (D1-D4) ---
 
@@ -881,26 +893,6 @@ test('add --domain coding is explicit and behaves identically to omitting --doma
   assert.equal(stateView(cwd).work['explicit-coding-item'].domain, 'coding');
 });
 
-test('add with an unrecognized --domain value is rejected as validation, exit 4, no event written', () => {
-  const cwd = tmpCwd();
-  const before = eventLines(cwd).length;
-  const result = run(cwd, [
-    'add', 'bad-domain-item',
-    '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x',
-    '--domain', 'bogus',
-  ]);
-  assert.equal(result.status, 4);
-  assert.equal(eventLines(cwd).length, before);
-});
-
-test('add with a bare --domain (no value) is rejected as validation, exit 4, no event written', () => {
-  const cwd = tmpCwd();
-  const before = eventLines(cwd).length;
-  const result = run(cwd, ['add', 'bare-domain-item', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--domain']);
-  assert.equal(result.status, 4);
-  assert.equal(eventLines(cwd).length, before);
-});
-
 test('add never gained a --stage flag: passing --stage is simply ignored (not a recognized flag on this verb)', () => {
   const cwd = tmpCwd();
   const result = run(cwd, ['add', 'stage-flag-ignored', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--stage', 'assembling']);
@@ -929,22 +921,6 @@ test('add --discovered-from persists discoveredFrom on the new item, exit 0', ()
   assert.equal(stateView(cwd).work['discovered-item'].discoveredFrom, 'origin-item');
 });
 
-test('add with an empty --discovered-from "" is rejected as validation, exit 4, no event written', () => {
-  const cwd = tmpCwd();
-  const before = eventLines(cwd).length;
-  const result = run(cwd, ['add', 'empty-discovered-item', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--discovered-from', '']);
-  assert.equal(result.status, 4);
-  assert.equal(eventLines(cwd).length, before);
-});
-
-test('add with a bare --discovered-from (no value) is rejected as validation, exit 4, no event written', () => {
-  const cwd = tmpCwd();
-  const before = eventLines(cwd).length;
-  const result = run(cwd, ['add', 'bare-discovered-item', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--discovered-from']);
-  assert.equal(result.status, 4);
-  assert.equal(eventLines(cwd).length, before);
-});
-
 // --- str67-goal-directed-planning D1/D2: --goal-tier and --targets on `add` ---
 
 test('add without --goal-tier/--targets leaves both fields unset, exit 0', () => {
@@ -966,14 +942,6 @@ test('add --goal-tier mvp --targets a,b persists both fields, exit 0', () => {
   const item = stateView(cwd).work['goal-item'];
   assert.equal(item.goalTier, 'mvp');
   assert.deepEqual(item.targets, ['a', 'b']);
-});
-
-test('add --goal-tier <invalid value> is rejected as validation, exit 4, no event written', () => {
-  const cwd = tmpCwd();
-  const before = eventLines(cwd).length;
-  const result = run(cwd, ['add', 'bogus-goal-item', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--goal-tier', 'bogus']);
-  assert.equal(result.status, 4);
-  assert.equal(eventLines(cwd).length, before);
 });
 
 test('add --targets "" parses to [] explicitly, exit 0', () => {
@@ -1077,22 +1045,6 @@ test('add --docs-ref persists docsRef and round-trips unchanged through fgos lis
   assert.equal(stateView(cwd).work['docs-ref-item'].docsRef, 'docs/history/p50-workflow-induct/');
   const listed = envelopeData(run(cwd, ['list']).stdout);
   assert.equal(listed.work['docs-ref-item'].docsRef, 'docs/history/p50-workflow-induct/');
-});
-
-test('add with an empty --docs-ref "" is rejected as validation, exit 4, no event written', () => {
-  const cwd = tmpCwd();
-  const before = eventLines(cwd).length;
-  const result = run(cwd, ['add', 'empty-docs-ref-item', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--docs-ref', '']);
-  assert.equal(result.status, 4);
-  assert.equal(eventLines(cwd).length, before);
-});
-
-test('add with a bare --docs-ref (no value) is rejected as validation, exit 4, no event written', () => {
-  const cwd = tmpCwd();
-  const before = eventLines(cwd).length;
-  const result = run(cwd, ['add', 'bare-docs-ref-item', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--docs-ref']);
-  assert.equal(result.status, 4);
-  assert.equal(eventLines(cwd).length, before);
 });
 
 // --- edit --docs-ref: docsRef can now be attached/changed after creation,
@@ -2255,13 +2207,32 @@ test('submit --domain synthetic persists work.domain and resolves stage to its o
   assert.equal(item.stage, 'assembling');
 });
 
-test('submit with an unrecognized --domain value is rejected as validation, exit 4, no event written', () => {
-  const cwd = tmpCwd();
-  const before = eventLines(cwd).length;
-  const result = run(cwd, ['submit', 'Try a bad domain', '--domain', 'bogus']);
-  assert.equal(result.status, 4);
-  assert.equal(eventLines(cwd).length, before);
-});
+// tsk-34y: these `submit` flag-value rejections shared one invariant -- an
+// otherwise-valid `submit` invocation with one flag given a bad, bare, or
+// empty value is rejected as validation (exit 4) and appends no event.
+// Each row below used to be its own hand-written test (see D1, docs/
+// history/test-suite-dry-consolidation/CONTEXT.md); merging keeps every
+// edge case while dropping the repeated shape.
+const SUBMIT_BAD_FLAG_CASES = [
+  ['an unrecognized --domain value', ['--domain', 'bogus']],
+  ['a bare --domain (no value)', ['--domain']],
+  ['an empty --discovered-from ""', ['--discovered-from', '']],
+  ['a bare --discovered-from (no value)', ['--discovered-from']],
+  ['a nonexistent --deps id', ['--deps', 'ghost-dep']],
+  ['a bare --tier (no value)', ['--tier']],
+  ['an empty --docs-ref ""', ['--docs-ref', '']],
+  ['an empty --kind ""', ['--kind', '']],
+];
+
+for (const [label, badFlagArgs] of SUBMIT_BAD_FLAG_CASES) {
+  test(`submit with ${label} is rejected as validation, exit 4, no event written`, () => {
+    const cwd = tmpCwd();
+    const before = eventLines(cwd).length;
+    const result = run(cwd, ['submit', 'Try a bad flag value', ...badFlagArgs]);
+    assert.equal(result.status, 4);
+    assert.equal(eventLines(cwd).length, before);
+  });
+}
 
 test('submit --domain <bad> produces exactly one stderr line (the validation error), no stray "folding to coding" warning — parity with add (review-20260717-self-improve-base-workflow f3)', () => {
   const cwd = tmpCwd();
@@ -2270,14 +2241,6 @@ test('submit --domain <bad> produces exactly one stderr line (the validation err
   assert.doesNotMatch(result.stderr, /folding to "coding"/);
   const stderrLines = result.stderr.split('\n').filter(Boolean);
   assert.equal(stderrLines.length, 1, `expected exactly one stderr line, got: ${JSON.stringify(stderrLines)}`);
-});
-
-test('submit with a bare --domain (no value) is rejected as validation, exit 4, no event written', () => {
-  const cwd = tmpCwd();
-  const before = eventLines(cwd).length;
-  const result = run(cwd, ['submit', 'Try a bare domain flag', '--domain']);
-  assert.equal(result.status, 4);
-  assert.equal(eventLines(cwd).length, before);
 });
 
 // --- work-graph-intelligence S2b: --discovered-from on `submit` (producer A, two-hop) ---
@@ -2299,22 +2262,6 @@ test('submit --discovered-from persists discoveredFrom (two-hop: opts -> submitW
   const id = JSON.parse(result.stdout).data.id;
   const item = envelopeData(run(cwd, ['list']).stdout).work[id];
   assert.equal(item.discoveredFrom, 'origin-item');
-});
-
-test('submit with an empty --discovered-from "" is rejected as validation, exit 4, no event written', () => {
-  const cwd = tmpCwd();
-  const before = eventLines(cwd).length;
-  const result = run(cwd, ['submit', 'Try an empty discovered-from', '--discovered-from', '']);
-  assert.equal(result.status, 4);
-  assert.equal(eventLines(cwd).length, before);
-});
-
-test('submit with a bare --discovered-from (no value) is rejected as validation, exit 4, no event written', () => {
-  const cwd = tmpCwd();
-  const before = eventLines(cwd).length;
-  const result = run(cwd, ['submit', 'Try a bare discovered-from flag', '--discovered-from']);
-  assert.equal(result.status, 4);
-  assert.equal(eventLines(cwd).length, before);
 });
 
 // --- str83-fgos-slash-commands D4: --deps on `submit` (mirrors add's ---
@@ -2340,14 +2287,6 @@ test('submit --deps <id1,id2> persists those deps, validated through the same wr
   const id = JSON.parse(result.stdout).data.id;
   const item = envelopeData(run(cwd, ['list']).stdout).work[id];
   assert.deepEqual(item.deps, ['dep-one', 'dep-two']);
-});
-
-test('submit --deps <nonexistent-id> fails loudly through the existing write-gate validation, exit 4, no event written, same as add', () => {
-  const cwd = tmpCwd();
-  const before = eventLines(cwd).length;
-  const result = run(cwd, ['submit', 'Try a bad dep', '--deps', 'ghost-dep']);
-  assert.equal(result.status, 4);
-  assert.equal(eventLines(cwd).length, before);
 });
 
 // --- str51-llm-assist-classify D2/D5: --tier/--kind/--risk overrides on ---
@@ -2397,14 +2336,6 @@ test('submit --tier override alone does not change risk -- risk still mirrors cl
   assert.equal(item.risk, 'standard');
 });
 
-test('submit with a bare --tier (no value) is rejected as validation, exit 4, no event written', () => {
-  const cwd = tmpCwd();
-  const before = eventLines(cwd).length;
-  const result = run(cwd, ['submit', 'Try a bare tier flag', '--tier']);
-  assert.equal(result.status, 4);
-  assert.equal(eventLines(cwd).length, before);
-});
-
 test('submit without --docs-ref leaves docsRef unset, exit 0', () => {
   const cwd = tmpCwd();
   const result = run(cwd, ['submit', 'A task with no docs link']);
@@ -2419,22 +2350,6 @@ test('submit --docs-ref persists docsRef, exit 0 -- an item created through the 
   assert.equal(result.status, 0);
   const id = JSON.parse(result.stdout).data.id;
   assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].docsRef, 'docs/history/some-feature/');
-});
-
-test('submit with an empty --docs-ref "" is rejected as validation, exit 4, no event written', () => {
-  const cwd = tmpCwd();
-  const before = eventLines(cwd).length;
-  const result = run(cwd, ['submit', 'A task with a broken docs link', '--docs-ref', '']);
-  assert.equal(result.status, 4);
-  assert.equal(eventLines(cwd).length, before);
-});
-
-test('submit with an empty --kind "" is rejected as validation, exit 4, no event written', () => {
-  const cwd = tmpCwd();
-  const before = eventLines(cwd).length;
-  const result = run(cwd, ['submit', 'Try an empty kind', '--kind', '']);
-  assert.equal(result.status, 4);
-  assert.equal(eventLines(cwd).length, before);
 });
 
 // RETARGET (stage-decompose D2, cell 3): `discover` on a stage-`clarify`
