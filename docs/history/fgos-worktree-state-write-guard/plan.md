@@ -9,10 +9,17 @@ reopened here.
 Flags counted: **3** — standard.
 
 - public contracts (2) — every `SKILL.md` template a session reads mid-flow
-  (`pick`, `fgos-routing`, `fgos-exploring`, `fgos-planning`,
-  `fgos-validating`, `ask`/`answer`/`decision`/`discover`/`return`/`move`
-  under `plugins/fgOS/skills/`) is an agent-facing contract this item
-  changes the invocation shape of.
+  is an agent-facing contract this item changes the invocation shape of.
+  Verified by grep across every `SKILL.md` for a bare state-verb
+  invocation: `plugins/fgOS/skills/{ask,answer,return,discover,move,cook}`
+  and `.claude/skills/fgos/{fgos-routing,fgos-exploring,fgos-planning,
+  fgos-validating,fgos-executing,fgos-submit-assist}` — 12 files, not the
+  5-6 first assumed. There is no standalone `decision`/`edit` plugin skill
+  under `plugins/fgOS/skills/` (confirmed: `ls` lists only `answer, ask,
+  check, conflicts, cook, discover, goal, graph, list, move, pick, ready,
+  return, rollup, stale, submit, triage, unlock`) — those two verbs are
+  only ever invoked inline from `fgos-exploring`/`fgos-planning`'s own flow
+  text, which the file list above already covers.
 - existing covered behavior (1) — `test/cli/fgos.test.mjs` already has
   uncommitted WIP hardening the exact linked-worktree
   `requiresExistingStore` refusal this plan must not regress.
@@ -55,6 +62,17 @@ escape hatch a caller must opt into, never a silent change to what a bare
   directly (the same style `pick`'s own `SKILL.md` uses), never the shell
   function — fixing only the function would leave every real caller
   unfixed.
+- *Skip the `--dir` flag entirely; wrap each of the 12 snippets' node call
+  in a `(cd "$root" && node bin/fgos.mjs <verb> ...)` subshell instead* —
+  a genuinely smaller, zero-code-change alternative (empirically exercised
+  this whole session). Rejected anyway: it depends on every caller
+  remembering the subshell parens — a bare `cd "$root" && node ...`
+  (parens dropped) permanently moves the session's cwd off the worktree.
+  This session's own harness happens to reset cwd after every shell call,
+  masking that failure mode here, but `fgos-shell-integration.sh` (this
+  same mechanism, sourced into a real persistent shell per its own header)
+  gets no such reset. `--dir` removes the operator-error class outright
+  instead of relying on every snippet author remembering parens.
 
 ## Risk map
 
@@ -63,7 +81,7 @@ escape hatch a caller must opt into, never a silent change to what a bare
 | `bin/fgos.mjs` `--dir` flag parsing / `dataDir()` | low — additive, default path unchanged | `fgos list --dir <mainRoot>` run with cwd inside a `.fgos/`-less linked worktree returns the real view; `fgos list` with no `--dir` from the same cwd is unchanged (still silent-empty, until phase 2) |
 | requiresExistingStore refusal path | low — must not regress tsk-4fu-2 | existing + WIP tests in `test/cli/fgos.test.mjs` still pass unmodified; a state verb given a garbage `--dir` still refuses with the same `.fgos/ not found` message, just naming the given dir instead of cwd |
 | read-verb (`list`/`ready`/...) missing-store signal | low — additive field/stderr, no shape break | new test: the field is present and true only when `!fs.existsSync(dir) && !isMainWorktree(cwd)`; absent for a normal fresh non-worktree dir with no store (that case stays "not evaluated", not "warning") |
-| `SKILL.md` snippet rewrites (7+ files) | low-medium — most-touched surface, easy to miss one | manual dry run: pick a real throwaway item, walk pick → exploring (`ask`/`decision`) → planning (`decision`) → validating → return entirely from the worktree, confirm main's `.fgos/events.jsonl` gets every event and `approve` sees `proposed` with no manual `cd`/subshell |
+| `SKILL.md` snippet rewrites (12 files, grep-verified) | low-medium — most-touched surface, easy to miss one | manual dry run: pick a real throwaway item, walk pick → exploring (`ask`/`decision`) → planning (`decision`) → validating → return entirely from the worktree, confirm main's `.fgos/events.jsonl` gets every event and `approve` sees `proposed` with no manual `cd`/subshell |
 
 ## Shape (phased)
 
@@ -83,9 +101,12 @@ escape hatch a caller must opt into, never a silent change to what a bare
    JSON envelope — instead of a bare empty view. Test: the field appears
    for a linked-worktree cwd, is absent for a normal non-worktree cwd with
    no store.
-3. **Skill contract rewrite.** Update every `SKILL.md` snippet that
-   currently invokes a state-writing verb assuming cwd = main (audit list
-   above) to resolve `root` via the git-common-dir one-liner and pass
+3. **Skill contract rewrite.** Update the state-verb bash snippet in each
+   of the 12 files named in the mode-count evidence above
+   (`plugins/fgOS/skills/{ask,answer,return,discover,move,cook}/SKILL.md`,
+   `.claude/skills/fgos/{fgos-routing,fgos-exploring,fgos-planning,
+   fgos-validating,fgos-executing,fgos-submit-assist}/SKILL.md`) to
+   resolve `root` via the git-common-dir one-liner and pass
    `--dir "$root"`. Same untrusted-input rule already in force (item
    `title`/`description` stays a discrete quoted argv element — `--dir`
    doesn't change that).
