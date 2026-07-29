@@ -331,7 +331,7 @@ export function setFocus(dir, { id, role } = {}) {
  * first's event already in the log, so its own `expectedStatus` compare
  * correctly conflicts.
  */
-export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, role, headAtTake, headAtReturn, branchHeadAtTake, branchHeadAtReturn, parentSnapshotAtAsk, claimTrigger, statusAtAsk, releaseTrigger } = {}) {
+export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, role, headAtTake, headAtReturn, branchHeadAtTake, branchHeadAtReturn, parentSnapshotAtAsk, claimTrigger, statusAtAsk, releaseTrigger, rationale, alternatives, source } = {}) {
   const { logPath } = paths(dir);
   const event = withEventsLock(logPath, () => {
   const before = rebuildView(logPath);
@@ -422,6 +422,23 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, rol
   // set on any edge but the awaiting-human entry.
   if (statusAtAsk !== undefined) {
     rawEvent.payload.statusAtAsk = statusAtAsk;
+  }
+  // rationale/alternatives/source (tsk-63c D1, decision-schema-rationale-
+  // alternatives-source): the same additive, fsm-ignored post-transition
+  // stamp pattern as parentSnapshotAtAsk/statusAtAsk above, carried on the
+  // `ask`/`answer` gate edges via putInAwaiting/answerAwaiting — ported
+  // from bee's decisions.jsonl shape (docs/distillery/deep-dives/
+  // fgos-capture-gaps-vs-bee.md) so `gates[id]` gains the same
+  // who/why/what-was-rejected fields `addDecision` gets below, one schema
+  // for both surfaces.
+  if (rationale !== undefined) {
+    rawEvent.payload.rationale = rationale;
+  }
+  if (alternatives !== undefined) {
+    rawEvent.payload.alternatives = alternatives;
+  }
+  if (source !== undefined) {
+    rawEvent.payload.source = source;
   }
   // Release-trigger marker (claim-lock §3b, tsk-2zv): what released this
   // specific `doing -> todo` move — additive, fsm-ignored, same
@@ -524,8 +541,8 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, rol
  * append-then-refresh tail, same CAS/validation errors — fsm.mjs requires a
  * non-empty `ask` on this edge.
  */
-export function putInAwaiting(dir, { id, ask, expectedStatus, parentSnapshotAtAsk, statusAtAsk } = {}) {
-  return moveWork(dir, { id, to: 'awaiting-human', expectedStatus, ask, parentSnapshotAtAsk, statusAtAsk });
+export function putInAwaiting(dir, { id, ask, expectedStatus, parentSnapshotAtAsk, statusAtAsk, rationale, alternatives, source } = {}) {
+  return moveWork(dir, { id, to: 'awaiting-human', expectedStatus, ask, parentSnapshotAtAsk, statusAtAsk, rationale, alternatives, source });
 }
 
 /**
@@ -540,10 +557,10 @@ export function putInAwaiting(dir, { id, ask, expectedStatus, parentSnapshotAtAs
  * default for pre-existing logs/gates with no `statusAtAsk`, preserving the
  * historical hardcoded-`todo` behavior byte for byte).
  */
-export function answerAwaiting(dir, { id, answer, expectedStatus, role } = {}) {
+export function answerAwaiting(dir, { id, answer, expectedStatus, role, rationale, alternatives, source } = {}) {
   const view = listWork(dir);
   const to = view.gates?.[id]?.statusAtAsk ?? 'todo';
-  return moveWork(dir, { id, to, expectedStatus, answer, role });
+  return moveWork(dir, { id, to, expectedStatus, answer, role, rationale, alternatives, source });
 }
 
 /**
@@ -599,13 +616,28 @@ export function addDiscovery(dir, payload) {
   return { event, view };
 }
 
-/** Log a decision event (no FSM/work validation — decisions are freeform). */
+/**
+ * Log a decision event (no FSM/work validation — decisions are freeform).
+ *
+ * Schema per tsk-63c D1-D3 (decision-schema-rationale-alternatives-source,
+ * ported from bee's live `.bee/decisions.jsonl` shape): `rationale` is
+ * required (mirrors bee's own throw-if-blank rule); `alternatives` is
+ * optional free text; `source` is optional free text (no enum, per D3),
+ * defaulting to `'session'` when omitted since fgOS calls are
+ * agent-initiated unless a human types the CLI directly; `id` is optional
+ * (seq 1190) and, when present, additionally folds this decision into a
+ * per-item view alongside the existing global log (replay.mjs).
+ */
 export function addDecision(dir, payload) {
   const { logPath } = paths(dir);
   if (!payload || typeof payload.text !== 'string' || !payload.text.trim()) {
     throw new StoreError('validation', 'decision requires a non-empty "text".');
   }
-  const event = appendEvent(logPath, { type: 'decision', payload });
+  if (typeof payload.rationale !== 'string' || !payload.rationale.trim()) {
+    throw new StoreError('validation', 'decision requires a non-empty "rationale".');
+  }
+  const eventPayload = { ...payload, source: payload.source ?? 'session' };
+  const event = appendEvent(logPath, { type: 'decision', payload: eventPayload });
   const view = refreshView(dir);
   return { event, view };
 }

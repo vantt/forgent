@@ -45,7 +45,7 @@ function applyEvent(view, event) {
       break;
     }
     case 'work.move': {
-      const { id, from, to, ask, answer, role, learning, headAtTake, headAtReturn, branchHeadAtTake, branchHeadAtReturn, reason, parentSnapshotAtAsk, claimTrigger, statusAtAsk, writer } = event.payload ?? {};
+      const { id, from, to, ask, answer, role, learning, headAtTake, headAtReturn, branchHeadAtTake, branchHeadAtReturn, reason, parentSnapshotAtAsk, claimTrigger, statusAtAsk, writer, rationale, alternatives, source } = event.payload ?? {};
       const item = view.work[id];
       if (item) {
         item.status = to;
@@ -169,6 +169,13 @@ function applyEvent(view, event) {
           ...(answer ? { answer } : {}),
           ...(parentSnapshotAtAsk !== undefined ? { parentSnapshotAtAsk } : {}),
           ...(statusAtAsk !== undefined ? { statusAtAsk } : {}),
+          // rationale/alternatives/source (tsk-63c D1, decision-schema-
+          // rationale-alternatives-source): same guarded fold as
+          // parentSnapshotAtAsk/statusAtAsk above — only stamped when
+          // present, overwritten by a fresh ask/answer the same way.
+          ...(rationale !== undefined ? { rationale } : {}),
+          ...(alternatives !== undefined ? { alternatives } : {}),
+          ...(source !== undefined ? { source } : {}),
         };
       }
       // Settlement channel (kênh 1 của capture 2 kênh, per Phase 3
@@ -253,6 +260,22 @@ function applyEvent(view, event) {
     }
     case 'decision': {
       view.decisions.push({ ...event.payload, ts: event.ts });
+      // Per-item fold (tsk-63c D1/seq 1190, decision-schema-rationale-
+      // alternatives-source): `id` is optional on a decision (per
+      // addDecision) — when present, ALSO fold into a lazy `decisionsById`
+      // key, same append-per-id pattern as `discovery`/`frictions` above
+      // (decisions accumulate over time, never merge/replace). The global
+      // push above stays unconditional either way, so id-less decisions and
+      // every existing reader of the flat `decisions` array are unaffected.
+      if (typeof event.payload?.id === 'string') {
+        if (!view.decisionsById) {
+          view.decisionsById = {};
+        }
+        view.decisionsById[event.payload.id] = [
+          ...(view.decisionsById[event.payload.id] ?? []),
+          { ...event.payload, ts: event.ts },
+        ];
+      }
       break;
     }
     case 'work.outcome': {

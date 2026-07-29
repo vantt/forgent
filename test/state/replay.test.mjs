@@ -91,6 +91,35 @@ test('foldEvents collects decision events into view.decisions, preserving the ev
   assert.deepEqual(view.decisions, [{ text: 'chose fgos as CLI name', ts: '2020-01-01T00:00:00.000Z' }]);
 });
 
+// tsk-63c D1/seq 1190: an id-less decision keeps the exact pre-existing
+// shape -- no decisionsById key appears at all (lazy key, same as
+// discovery/frictions).
+test('foldEvents leaves view.decisionsById absent for a decision with no id', () => {
+  const events = [
+    { seq: 1, ts: '2020-01-01T00:00:00.000Z', type: 'decision', payload: { text: 'chose fgos as CLI name', rationale: 'short and typeable' } },
+  ];
+  const view = foldEvents(events);
+  assert.equal(view.decisionsById, undefined);
+  assert.equal(view.decisions.length, 1);
+});
+
+// tsk-63c D1/seq 1190: an id-bearing decision folds into a per-id
+// accumulating array (view.decisionsById), mirroring view.discovery/
+// view.frictions -- WITHOUT removing it from the existing flat
+// view.decisions array.
+test('foldEvents folds an id-bearing decision into view.decisionsById as an accumulating array', () => {
+  const events = [
+    { seq: 1, ts: '2020-01-01T00:00:00.000Z', type: 'decision', payload: { text: 'D1: broad scope', rationale: 'r1', id: 'tsk-63c' } },
+    { seq: 2, ts: '2020-01-01T00:00:01.000Z', type: 'decision', payload: { text: 'D2: rationale required', rationale: 'r2', id: 'tsk-63c' } },
+    { seq: 3, ts: '2020-01-01T00:00:02.000Z', type: 'decision', payload: { text: 'unrelated global decision', rationale: 'r3' } },
+  ];
+  const view = foldEvents(events);
+  assert.equal(view.decisions.length, 3);
+  assert.equal(view.decisionsById['tsk-63c'].length, 2);
+  assert.equal(view.decisionsById['tsk-63c'][0].text, 'D1: broad scope');
+  assert.equal(view.decisionsById['tsk-63c'][1].text, 'D2: rationale required');
+});
+
 test('foldEvents ignores unknown event types instead of throwing', () => {
   const events = [{ seq: 1, ts: '2026-07-14T00:00:00.000Z', type: 'something.future', payload: { whatever: true } }];
   assert.doesNotThrow(() => foldEvents(events));

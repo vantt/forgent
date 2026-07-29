@@ -681,11 +681,14 @@ test('decision logs one event and appears in the view, exit 0', () => {
   const cwd = tmpCwd();
   run(cwd, ['init']);
   const before = eventLines(cwd).length;
-  const result = run(cwd, ['decision', '--text', 'locked D5 naming']);
+  const result = run(cwd, ['decision', '--text', 'locked D5 naming', '--rationale', 'avoids a naming collision with an existing verb']);
   assert.equal(result.status, 0);
   assert.equal(eventLines(cwd).length, before + 1);
   assert.equal(stateView(cwd).decisions.length, 1);
   assert.equal(stateView(cwd).decisions[0].text, 'locked D5 naming');
+  assert.equal(stateView(cwd).decisions[0].rationale, 'avoids a naming collision with an existing verb');
+  // source defaults to 'session' when omitted (tsk-63c D3)
+  assert.equal(stateView(cwd).decisions[0].source, 'session');
 });
 
 test('decision without --text is rejected as validation, exit 4, no event written', () => {
@@ -695,6 +698,42 @@ test('decision without --text is rejected as validation, exit 4, no event writte
   const result = run(cwd, ['decision']);
   assert.equal(result.status, 4);
   assert.equal(eventLines(cwd).length, before);
+});
+
+// tsk-63c D2: rationale is required on `decision`, mirroring bee's own
+// throw-if-blank rule -- --text alone is no longer sufficient.
+test('decision without --rationale is rejected as validation, exit 4, no event written', () => {
+  const cwd = tmpCwd();
+  run(cwd, ['init']);
+  const before = eventLines(cwd).length;
+  const result = run(cwd, ['decision', '--text', 'locked D5 naming']);
+  assert.equal(result.status, 4);
+  assert.equal(eventLines(cwd).length, before);
+});
+
+// tsk-63c D1/D3: alternatives/source are optional free text, and an explicit
+// --source overrides the 'session' default.
+test('decision with --alternatives, --source, and --id folds all fields, exit 0', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'item-a');
+  const before = eventLines(cwd).length;
+  const result = run(cwd, [
+    'decision',
+    '--text', 'chose option B',
+    '--rationale', 'option B has no external dependency',
+    '--alternatives', 'option A was rejected -- needs a new package',
+    '--source', 'human',
+    '--id', 'item-a',
+  ]);
+  assert.equal(result.status, 0);
+  assert.equal(eventLines(cwd).length, before + 1);
+  const view = stateView(cwd);
+  const logged = view.decisions.at(-1);
+  assert.equal(logged.alternatives, 'option A was rejected -- needs a new package');
+  assert.equal(logged.source, 'human');
+  assert.equal(logged.id, 'item-a');
+  assert.equal(view.decisionsById['item-a'].length, 1);
+  assert.equal(view.decisionsById['item-a'][0].text, 'chose option B');
 });
 
 test('list prints the current view as parseable envelope data, exit 0', () => {
