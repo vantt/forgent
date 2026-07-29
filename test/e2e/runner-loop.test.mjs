@@ -453,6 +453,7 @@ test('e2e stage-decompose (b) complex item: decompose sweep writes 2 children (r
       discoveryVerify: 'test -f root-done.txt && echo ROOT_OK',
       decomposeVerdict: {
         verdict: 'decompose',
+        reason: 'Two independent surfaces, no shared state',
         children: [
           { title: 'Build the base module', verify: 'test -f child-a.txt', kind: 'task', risk: 'low', refs: [], deps: [] },
           { title: 'Wire the base module in', verify: 'test -f child-b.txt', kind: 'task', risk: 'low', refs: [], deps: [0] },
