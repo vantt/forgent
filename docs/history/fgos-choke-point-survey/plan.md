@@ -46,10 +46,10 @@ worktree fresh, consistent with treating every candidate the same way.
 |---|---|---|
 | Claim + worktree isolation | `take`/`pick` (CLI) vs runner `claimItem`/dispatch | `bin/fgos.mjs` (`take`, `pick`), `src/runner/claim-port.mjs`, `src/runner/loop.mjs` |
 | `createWorktree` invocation | baseRef selection, ephemeral vs persistent, cleanup-on-error | `src/runner/claim-port.mjs:170`, `src/runner/loop.mjs:398,679,681`, `bin/fgos.mjs` (pick/approve/review) |
-| Lock acquisition per verb | which verbs take `main-checkout-lock.mjs`, which don't | `src/runner/main-checkout-lock.mjs` (defined), grep its two exports across `bin/fgos.mjs` + `src/runner/*.mjs` |
+| Lock acquisition per verb | `main-checkout-lock.mjs` is **no longer dead code** — `src/runner/claim-port.mjs:12,73` imports and calls `acquireMainCheckoutLock`/`releaseMainCheckoutLock` (wired post tsk-53f D1, per `docs/decisions/0021-wire-main-checkout-hook-qua-doctor-setup.md`). The live question is narrower: which *other* state-mutating verbs (`return`, `approve`, `edit`, `compound`, …) acquire it vs which don't | `src/runner/main-checkout-lock.mjs` (defined, two exports), grep both exports across `bin/fgos.mjs` + `src/runner/*.mjs` to build the verb-by-verb table fresh — do not assume tsk-53f's original "imported by nothing" finding still holds |
 | Verify run + timeout | how each caller shells out to the item's `verify` command and enforces a timeout | `bin/fgos.mjs` (`return`, `approve`), `src/runner/loop.mjs` (auto-verify path) |
 | `docType`/`docsRef` validation | whether format/existence checks are duplicated per caller (`edit`, `discover`, `compound`) | `bin/fgos.mjs` (`edit`, `add`, `compound`), `src/intake/*.mjs` |
-| Working-tree cleanliness check | tsk-63j D1 already found 2 independent implementations (`return`'s `isWorkingTreeClean` vs `approve`'s `isMainTreeClean`) — confirm as a 6th candidate, cite tsk-63j rather than re-deriving | `bin/fgos.mjs:1382`, `bin/fgos.mjs:1668`/`src/runner/merge.mjs` |
+| Working-tree cleanliness check | tsk-63j D1 already found 2 independent implementations — confirmed fresh: `bin/fgos.mjs:98` defines its own subtree-scoped `isWorkingTreeClean(cwd)` (`git status --porcelain -- .`) for `return` (called `bin/fgos.mjs:1428`); `src/runner/merge.mjs:133` defines a separately-written whole-repo `isWorkingTreeClean(repoRoot)` (`git status --porcelain`, no pathspec) imported into `bin/fgos.mjs:33` aliased `isMainTreeClean` for `approve` (called `bin/fgos.mjs:1714`). Both share the same `isFgosOnlyStatusLine` exclusion helper but the gate function itself is duplicated with a real scope difference (subtree vs whole-repo) | `bin/fgos.mjs:98,1428,1714`, `src/runner/merge.mjs:133` |
 | *(open)* | anything else surfaced by the active search this item's D3 requires | grep sweep over `src/runner/*.mjs`, `src/intake/*.mjs`, `bin/fgos.mjs` for repeated shapes: multiple functions doing the same shell-out, the same field-presence check, or the same error-classification switch |
 
 ### Risk map
@@ -75,16 +75,35 @@ worktree fresh, consistent with treating every candidate the same way.
    DESC, call-frequency DESC tiebreak. Risk = does divergence produce
    silently wrong state (e.g. two sessions claiming the same item) vs.
    cosmetic; frequency = how many call sites/how often each path runs.
-4. **Write the artifact.** `docs/decisions/NNNN-fgos-choke-point-survey.md`
-   (next free decision number) — the candidates table, per-candidate
-   confirmation evidence, the ranked table, and an explicit "no fixes
-   applied here" statement per the item's own description (4).
-5. **Verify.** A mechanical check (node script or grep) asserting the
-   decision doc exists and contains the required sections: a candidates
-   table, per-candidate call-site citations, and the single ranked table
-   — proving the artifact's shape without claiming to prove each
-   duplication judgment call, which per the risk map stays a human-read
-   check.
+4. **Write the artifact.** `docs/decisions/00NN-fgos-choke-point-survey.md`
+   — number = one past the highest existing `docs/decisions/*.md` prefix
+   at write time (`0021` today per `ls docs/decisions/`, so `0022` unless
+   another decision lands first — confirmed mechanically with
+   `ls docs/decisions | sort | tail -1`, not hardcoded in this plan).
+   Content: the candidates table, per-candidate confirmation evidence
+   (file:line citations, not paraphrase), the single ranked table, and an
+   explicit "no fixes applied here" statement per the item's own
+   description (4).
+5. **Verify.** An inline mechanical check — no new script file needed
+   (`scripts/` already holds `check-decision-citation-drift.mjs` /
+   `next-doc-id.mjs` for the doc-tooling pattern, but this item's own
+   check is small enough to stay inline, same precedent as tsk-64s's D3
+   grep-based verify):
+
+   ```bash
+   node -e "
+   const fs = require('node:fs');
+   const t = fs.readFileSync(process.argv[1], 'utf8');
+   const required = ['## Candidates', '## Ranked priority', '## No fixes applied'];
+   const missing = required.filter((h) => !t.includes(h));
+   if (missing.length) { console.error('missing sections:', missing); process.exit(1); }
+   console.log('ok');
+   " -- docs/decisions/00NN-fgos-choke-point-survey.md
+   ```
+
+   Proves the artifact's shape (required sections present) without
+   claiming to prove each duplication judgment call, which per the risk
+   map stays a human-read check.
 
 ## Split decision
 
@@ -100,13 +119,6 @@ work, proceeds as itself.
 
 Per the locked convention, Execute and `return`'s own re-verify already
 have a working mechanical path — this plan only names the one verify
-command for `executing` to run:
-
-```
-node scripts/verify-decision-doc.mjs docs/decisions/NNNN-fgos-choke-point-survey.md
-```
-
-(exact decision-doc number and verify script path finalized at
-`executing` time, once the doc is written and the next free decision
-number is known — named here as the shape, not a placeholder for the
-plan's own gate).
+command for `executing` to run: the inline `node -e` section check from
+step 5 above, pointed at the actual decision-doc path once its number is
+resolved via `ls docs/decisions | sort | tail -1` at write time.
