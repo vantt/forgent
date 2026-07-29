@@ -45,6 +45,9 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { branchNameFor, branchExists, reclaimOrphanedCheckout } from './worktree.mjs';
 import { runGoalCheck } from './goal-check.mjs';
+import { normalizePath } from './frozen-judge.mjs';
+import { acquireMainCheckoutLock, HELD, AMBIGUOUS, DEFAULT_TTL_MS, formatLockDurationMs } from './main-checkout-lock.mjs';
+import { resolveWriterIdentity } from './session-identity.mjs';
 
 /** Raised only for a genuinely unexpected git failure (e.g. `git merge
  * --abort` itself failing) — never for a conflict or a red verify, which are
@@ -59,8 +62,15 @@ export class MergeError extends Error {
   }
 }
 
+// stdio: pipe (tsk-56t): explicit, not execFileSync's own default — without
+// it, a failing git call (e.g. "not a git repository" from a non-git cwd)
+// prints straight through to this process's real stderr in addition to
+// landing on the thrown error's own `.stderr`/`.message`, which every caller
+// here already reads instead. Found via isMainWorktree(process.cwd()) newly
+// reachable from a plain non-git dir (tsk-56t D2's read-verb warning) —
+// no caller's behavior changes, since none relied on the live leak.
 function git(repoRoot, args) {
-  return execFileSync('git', args, { cwd: repoRoot, encoding: 'utf8', shell: false });
+  return execFileSync('git', args, { cwd: repoRoot, encoding: 'utf8', shell: false, stdio: ['ignore', 'pipe', 'pipe'] });
 }
 
 /** Resolve `repoRoot`'s trunk branch name without assuming `'main'`: prefers
@@ -105,13 +115,42 @@ export function detectTrunk(repoRoot) {
  * relative to the git top-level (with a trailing slash, or '' at the
  * top-level itself — exactly `git rev-parse --show-prefix`'s own output),
  * so callers already at the top-level (the default, '') see byte-identical
- * behavior to before this parameter existed. */
-export function isFgosOnlyStatusLine(line, prefix = '') {
+ * behavior to before this parameter existed.
+ *
+ * `ownFileSet` (tsk-598, D2/D3) narrows which NON-`.fgos/` paths still count
+ * as blocking: `null` (the default, every existing caller) keeps this line
+ * blocking exactly like before — the fail-safe direction. When a `Set` is
+ * given, a non-`.fgos/` path also counts as ignorable when it is outside
+ * that set — an unrelated dirty/untracked file (a different session's work,
+ * or anything not in the item's own committed-diff-plus-footprint scope)
+ * never blocks `return`/`approve` again; a path that IS in the set still
+ * blocks, whether that is a real re-dirtied conflict (D2) or the item's own
+ * not-yet-committed work inside a declared `footprint` (D3). */
+export function isFgosOnlyStatusLine(line, prefix = '', ownFileSet = null) {
   const pathPart = line.slice(3);
   const paths = pathPart.includes(' -> ') ? pathPart.split(' -> ') : [pathPart];
   const fgosPath = `${prefix}.fgos`;
   const fgosDirPrefix = `${prefix}.fgos/`;
-  return paths.every((p) => p === fgosPath || p.startsWith(fgosDirPrefix));
+  const isFgosPath = (p) => p === fgosPath || p.startsWith(fgosDirPrefix);
+  if (paths.every(isFgosPath)) {
+    return true;
+  }
+  return ownFileSet !== null && paths.every((p) => isFgosPath(p) || !ownFileSet.has(p));
+}
+
+/** Build the `ownFileSet` `isFgosOnlyStatusLine`/`isWorkingTreeClean` take
+ * (D2/D3): the union of the item's own committed-diff paths (`return`'s
+ * `headAtTake..HEAD`, or `approve`'s branch-vs-trunk `changedFiles` — the
+ * caller already has whichever applies) and its declared `footprint`, if
+ * any — same exact-path Set membership `frozenJudgeHits` already uses for
+ * `footprint`, `normalizePath`'d the same way so a path reported by git
+ * status matches regardless of a stray `./` or `\`. */
+export function buildOwnFileSet(committedDiffPaths, footprint) {
+  const paths = [
+    ...(Array.isArray(committedDiffPaths) ? committedDiffPaths : []),
+    ...(Array.isArray(footprint) ? footprint : []),
+  ];
+  return new Set(paths.map(normalizePath));
 }
 
 /** Whether `repoRoot`'s working tree has no pending changes outside of
@@ -129,13 +168,17 @@ export function isFgosOnlyStatusLine(line, prefix = '') {
  * guaranteed to be the git top-level though (`isMainWorktree` above
  * tolerates a subdirectory of the main worktree), so the `.fgos/` exclusion
  * still needs the same top-level-relative prefix `isFgosOnlyStatusLine`
- * takes — computed here via `git rev-parse --show-prefix`. */
-export function isWorkingTreeClean(repoRoot) {
+ * takes — computed here via `git rev-parse --show-prefix`.
+ *
+ * `ownFileSet` (tsk-598, D2/D3) is threaded straight through to
+ * `isFgosOnlyStatusLine` — omitted (`null`, the default), every existing
+ * caller keeps today's exact whole-tree-blocks-on-anything behavior. */
+export function isWorkingTreeClean(repoRoot, ownFileSet = null) {
   const prefix = git(repoRoot, ['rev-parse', '--show-prefix']).trim();
   return git(repoRoot, ['status', '--porcelain'])
     .split('\n')
     .filter((line) => line.trim() !== '')
-    .every((line) => isFgosOnlyStatusLine(line, prefix));
+    .every((line) => isFgosOnlyStatusLine(line, prefix, ownFileSet));
 }
 
 function realpathOrSelf(p) {
@@ -305,6 +348,57 @@ export function changedFiles(repoRoot, item, opts = {}) {
 export async function mergeRunnerItem(repoRoot, item, { timeoutMs } = {}) {
   const branch = branchNameFor(item.id);
 
+  // The pre-commit hook only locks the final `git commit` — everything
+  // before it (`git merge --no-commit`, the .fgos-write check, verify) ran
+  // unprotected, so a concurrent session's own merge/commit could land in
+  // that window and resolve MERGE_HEAD out from under this one (observed:
+  // "no merge to abort" on the *abort* call itself, not just the commit).
+  // Acquiring here, before the first git call, closes that gap by holding
+  // the same lock the hook already enforces for the commit alone — same
+  // identity (`resolveWriterIdentity`) as the hook resolves inside the
+  // child `git commit` process it spawns, so D6 self-recognition lets that
+  // later, in-process-tree acquisition succeed as a refresh, never a
+  // self-deadlock — true whenever an env session id resolves the identity
+  // (the primary path; every session actually contending on this checkout
+  // observed during this fix carried one). The bare-terminal ancestor-walk
+  // fallback (session-identity.mjs) resolves relative to each process's OWN
+  // pid, so this call (from the approve process) and the hook's later call
+  // (from its own child pid, several hops deeper) are not guaranteed to
+  // land on the same ancestor and could in principle self-refuse. This is
+  // the same "best-effort only" limitation session-identity.mjs already
+  // documents for that fallback, now newly reachable from here too — not a
+  // regression in kind, just a second call site inheriting a known gap.
+  const fgosDir = path.join(repoRoot, '.fgos');
+  const identity = resolveWriterIdentity(fgosDir).id;
+  // releaseOnExit (tsk-45z point 2): approve's own job is over once this
+  // process exits, so a crash/interrupt mid-merge should release the lock
+  // immediately rather than leaving the next writer to wait out the TTL —
+  // unlike `.githooks/pre-commit`'s intentional lingering acquire, this
+  // caller's `finally` below already always calls `lock.release()` itself
+  // on the happy path; releaseOnExit only adds the crash/SIGINT/SIGTERM net
+  // on top of that.
+  const lock = acquireMainCheckoutLock(fgosDir, { identity, ttlMs: DEFAULT_TTL_MS, releaseOnExit: true });
+  if (lock.status === HELD) {
+    const ttlPart = lock.remainingTtlMs != null
+      ? `, expires in ${formatLockDurationMs(lock.remainingTtlMs)}`
+      : ', no TTL window known';
+    throw new MergeError(
+      `cannot merge "${branch}": main checkout is locked by another live session (${lock.holderPid}, held ${formatLockDurationMs(lock.lockAgeMs)}${ttlPart}).`,
+      { branch },
+    );
+  }
+  if (lock.status === AMBIGUOUS) {
+    throw new MergeError(`cannot merge "${branch}": main checkout lock is ambiguous (unparseable lock file) — refusing per fail-closed policy.`, { branch });
+  }
+
+  try {
+    return await mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs });
+  } finally {
+    lock.release();
+  }
+}
+
+async function mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs }) {
   try {
     git(repoRoot, ['merge', '--no-commit', '--no-ff', branch]);
   } catch (err) {
@@ -345,6 +439,14 @@ export async function mergeRunnerItem(repoRoot, item, { timeoutMs } = {}) {
   try {
     git(repoRoot, ['commit', '--no-edit']);
   } catch (err) {
+    try {
+      git(repoRoot, ['merge', '--abort']);
+    } catch (abortErr) {
+      throw new MergeError(
+        `verify passed for "${branch}" but "git commit" failed, and "git merge --abort" itself failed: ${abortErr.message} (commit error: ${err.message})`,
+        { branch },
+      );
+    }
     throw new MergeError(`verify passed for "${branch}" but "git commit" failed: ${err.message}`, { branch });
   }
   return { outcome: 'merged', branch, check };

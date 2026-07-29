@@ -10,18 +10,18 @@ import {
 
 // --- selectTemplate: mechanical table lookup, no LLM ---------------------
 
-test('selectTemplate resolves a coding-domain input to the skill-pointer template, for any kind/tier (mechanical table lookup, keyed on domain per D3)', () => {
+test('selectTemplate resolves a coding-domain input to the skill-pointer template, for any kind/tier (mechanical table lookup, keyed on domain)', () => {
   assert.equal(selectTemplate({ kind: 'behavior_change', tier: 'light', domain: 'coding' }), 'worker-prompt-skill-pointer.txt');
   assert.equal(selectTemplate({ kind: 'bug', tier: 'heavy', domain: 'coding' }), 'worker-prompt-skill-pointer.txt');
   assert.equal(selectTemplate({ kind: 'chore', tier: 'standard', domain: undefined }), 'worker-prompt-skill-pointer.txt');
 });
 
-test('selectTemplate resolves even with no arguments at all — an absent domain folds to "coding" (str91 D7), which resolves to the skill-pointer template', () => {
+test('selectTemplate resolves even with no arguments at all — an absent domain folds to "coding", which resolves to the skill-pointer template', () => {
   assert.equal(selectTemplate(), 'worker-prompt-skill-pointer.txt');
   assert.equal(selectTemplate({}), 'worker-prompt-skill-pointer.txt');
 });
 
-test('selectTemplate folds an unrecognized domain string to "coding" too (str91 D7 — same fold as undefined, not a fall-back to the old default)', () => {
+test('selectTemplate folds an unrecognized domain string to "coding" too (same fold as undefined, not a fall-back to the old default)', () => {
   assert.equal(selectTemplate({ domain: 'made-up-domain' }), 'worker-prompt-skill-pointer.txt');
 });
 
@@ -107,7 +107,7 @@ test('renderTemplate golden output — with-feedback shape includes the Human fe
   assert.match(rendered, /\(không có\)\n\n# Human feedback[\s\S]*\n\n# Worktree boundary/);
 });
 
-test('renderTemplate(worker-prompt-skill-pointer.txt, ...) golden output — no-feedback shape, byte-for-byte (str91-runner-skill-convergence D1)', () => {
+test('renderTemplate(worker-prompt-skill-pointer.txt, ...) golden output — no-feedback shape, byte-for-byte', () => {
   const rendered = renderTemplate('worker-prompt-skill-pointer.txt', {
     title: 'Add the widget',
     kind: 'behavior_change',
@@ -116,7 +116,7 @@ test('renderTemplate(worker-prompt-skill-pointer.txt, ...) golden output — no-
     refs: 'src/widget.mjs, docs/specs/widget.md',
     verify: 'npm test',
     domain: 'coding',
-    skillPath: '.claude/skills/fgos/fgos-executing/SKILL.md',
+    skillPath: '.claude/skills/fgos-executing/SKILL.md',
   });
 
   const golden = `# Goal
@@ -124,7 +124,7 @@ Add the widget (kind: behavior_change)
 
 # Agent skill
 You are a fgOS agent for domain coding at the executing stage. Before doing
-anything else, read .claude/skills/fgos/fgos-executing/SKILL.md in your own checkout — it is the same skill
+anything else, read .claude/skills/fgos-executing/SKILL.md in your own checkout — it is the same skill
 an interactive fgOS session loads for this exact domain and stage, and it
 governs how this work item must be done.
 

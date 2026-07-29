@@ -2,5 +2,18 @@
   "enabledPlugins": {
     "fgOS@fgos-plugins": true,
     "dogfood-fixture@fgos-plugins": true
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume|clear|compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR}/scripts/fgos-session-start-hook.mjs\""
+          }
+        ]
+      }
+    ]
   }
 }

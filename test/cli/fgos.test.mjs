@@ -14,8 +14,27 @@ import { createSession, endSession } from '../../src/runner/session.mjs';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FGOS = path.resolve(__dirname, '../../bin/fgos.mjs');
 
-function tmpCwd() {
+// A fresh scratch dir with no `.fgos/` at all — never auto-inited. Only
+// the handful of tests that specifically exercise pre-init/first-init
+// behavior (the `init` verb's own tests, and tsk-4fu-2's new
+// `requiresExistingStore` guard tests) should use this directly; every
+// other test wants `tmpCwd()` below.
+function rawTmpCwd() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-cli-'));
+}
+
+// tsk-4fu-2: `fgos init` is no longer implicit — every `requiresExistingStore`
+// verb (command-registry.mjs) now refuses when `.fgos/` doesn't exist yet,
+// instead of silently auto-vivifying it. This suite's ~340 call sites all
+// want a ready-to-use store, not a test of that guard itself, so `tmpCwd()`
+// bootstraps it once here rather than needing an explicit `run(cwd,
+// ['init'])` at every site. `fgos init` is idempotent (store.mjs's own
+// `initStore` docstring), so the handful of tests that still call `init`
+// explicitly afterward are unaffected — a harmless no-op second call.
+function tmpCwd() {
+  const cwd = rawTmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0, 'tmpCwd(): "fgos init" failed to bootstrap .fgos/');
+  return cwd;
 }
 
 function run(cwd, args, extraEnv = {}) {
@@ -66,6 +85,12 @@ function stateView(cwd) {
 
 function addOk(cwd, id, extra = {}) {
   const flags = ['--title', extra.title ?? `Title ${id}`, '--kind', extra.kind ?? 'task', '--risk', extra.risk ?? 'low', '--verify', extra.verify ?? 'npm test'];
+  // --footprint stays omitted unless a caller actually passes one (tsk-598
+  // own-file-set tests): matches the CLI's own present-or-absent optional
+  // shape, so every existing call site (no extra.footprint) is unaffected.
+  if (extra.footprint !== undefined) {
+    flags.push('--footprint', extra.footprint);
+  }
   return run(cwd, ['add', id, ...flags]);
 }
 
@@ -134,6 +159,107 @@ function commitFile(cwd, filename, content = 'work\n') {
   execFileSync('git', ['commit', '-q', '-m', `work: ${filename}`], { cwd });
 }
 
+// tsk-56t: a real `.fgos`-inited main checkout plus a linked worktree of it
+// with no `.fgos/` at all — mirrors what `createWorktree` (worktree.mjs,
+// ADR0020) actually produces. Returns both roots: `main` is where the real
+// store lives, `wt` is the `.fgos/`-less cwd a worktree-resident session
+// would actually run commands from.
+function tmpLinkedWorktree() {
+  const main = tmpCwd();
+  execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: main });
+  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: main });
+  execFileSync('git', ['config', 'user.name', 'Test'], { cwd: main });
+  commitFile(main, 'seed.txt');
+  const wt = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-cli-wt-'));
+  fs.rmdirSync(wt);
+  execFileSync('git', ['worktree', 'add', '-b', 'tsk-56t-dir-flag-test', wt], { cwd: main });
+  fs.rmSync(path.join(wt, '.fgos'), { recursive: true, force: true });
+  return { main, wt };
+}
+
+test('a state verb given --dir succeeds from a .fgos/-less worktree cwd, against the real store at --dir', () => {
+  const { main, wt } = tmpLinkedWorktree();
+  assert.ok(!fs.existsSync(path.join(wt, '.fgos')));
+  const before = eventLines(main).length;
+  const result = run(wt, ['submit', 'reached via --dir', '--dir', main]);
+  assert.equal(result.status, 0, `submit --dir unexpectedly failed: ${result.stderr}`);
+  assert.equal(eventLines(main).length, before + 1, '--dir must write into the given root, not the worktree cwd');
+  assert.ok(!fs.existsSync(path.join(wt, '.fgos')), '--dir must never create a .fgos/ at the worktree cwd itself');
+});
+
+test('the same state verb with no --dir, from the same .fgos/-less worktree cwd, still refuses exactly as before (tsk-4fu-2 regression guard)', () => {
+  const { wt } = tmpLinkedWorktree();
+  const result = run(wt, ['submit', 'should never land']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /\.fgos\/ not found/);
+  assert.ok(!fs.existsSync(path.join(wt, '.fgos')));
+});
+
+test('--dir with no value (a bare trailing flag) is a clean validation error, exit 4, not a crash', () => {
+  const { wt } = tmpLinkedWorktree();
+  const result = run(wt, ['submit', 'title', '--dir']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /--dir requires a non-empty path value/);
+});
+
+test('--dir pointed at a path with no .fgos/ at all gives the same clean refusal as omitting it, not a crash', () => {
+  const { wt } = tmpLinkedWorktree();
+  const garbage = rawTmpCwd();
+  const result = run(wt, ['submit', 'title', '--dir', garbage]);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /\.fgos\/ not found/);
+});
+
+test('--dir pointed at the main checkout itself (from main\'s own cwd) is a no-op, identical to omitting it', () => {
+  const main = tmpCwd();
+  const before = eventLines(main).length;
+  const result = run(main, ['submit', 'reached with redundant --dir', '--dir', main]);
+  assert.equal(result.status, 0);
+  assert.equal(eventLines(main).length, before + 1);
+});
+
+// tsk-56t D2: `list`/`ready`/etc. stay `requiresExistingStore: false` (a
+// fresh non-worktree dir with no store is legitimately "not evaluated",
+// not an error) — but a worktree-resident session that forgets `--dir`
+// should not read that as "no open work" with zero signal. One
+// object-shaped verb (`list`) and one array-shaped verb (`ready`, which
+// returns a bare array via paginateVerbResult when unpaginated — the
+// reason this is a stderr line, never a JSON field: JSON.stringify drops
+// a named property set on an array).
+test('list from a .fgos/-less linked worktree cwd, no --dir: exit 0, empty view, but a stderr warning names the real store elsewhere', () => {
+  const { wt } = tmpLinkedWorktree();
+  const result = run(wt, ['list']);
+  assert.equal(result.status, 0);
+  assert.deepEqual(envelopeData(result.stdout).work, {});
+  assert.match(result.stderr, /warning: \.fgos\/ not found/);
+  assert.match(result.stderr, /--dir <mainRoot>/);
+});
+
+test('ready (array-shaped, unpaginated) from the same linked worktree cwd: exit 0, empty array, same stderr warning', () => {
+  const { wt } = tmpLinkedWorktree();
+  const result = run(wt, ['ready']);
+  assert.equal(result.status, 0);
+  assert.deepEqual(envelopeData(result.stdout), []);
+  assert.match(result.stderr, /warning: \.fgos\/ not found/);
+});
+
+test('list with --dir pointed at the real store from the same worktree cwd: no warning, real data', () => {
+  const { main, wt } = tmpLinkedWorktree();
+  run(main, ['add', 'seen-via-dir', '--title', 'Seen via --dir', '--kind', 'task', '--risk', 'low', '--verify', 'npm test']);
+  const result = run(wt, ['list', '--dir', main]);
+  assert.equal(result.status, 0);
+  assert.ok(envelopeData(result.stdout).work['seen-via-dir']);
+  assert.equal(result.stderr, '');
+});
+
+test('list on a fresh non-worktree dir with no store at all: exit 0, empty view, no warning (legitimately "not evaluated", not a worktree footgun)', () => {
+  const cwd = rawTmpCwd();
+  const result = run(cwd, ['list']);
+  assert.equal(result.status, 0);
+  assert.deepEqual(envelopeData(result.stdout).work, {});
+  assert.equal(result.stderr, '');
+});
+
 test('init creates .fgos/ with an empty log and a rebuilt (empty) view, exit 0', () => {
   const cwd = tmpCwd();
   const result = run(cwd, ['init']);
@@ -162,6 +288,48 @@ test('init in a git repo with a commit does not report gitHeadless', () => {
   assert.equal(result.status, 0);
   const initData = envelopeData(result.stdout);
   assert.equal(initData.gitHeadless, undefined);
+});
+
+// tsk-4fu-2: requiresExistingStore guard (command-registry.mjs) — a
+// state-write verb no longer silently auto-vivifies `.fgos/` via
+// appendEventCore's own mkdirSync when it's missing; it refuses instead.
+test('submit on a directory with no .fgos/ at all is refused, exit 4, writes nothing (no auto-vivify)', () => {
+  const cwd = rawTmpCwd();
+  assert.ok(!fs.existsSync(path.join(cwd, '.fgos')));
+  const result = run(cwd, ['submit', 'should never land']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /\.fgos\/ not found/);
+  assert.ok(!fs.existsSync(path.join(cwd, '.fgos')), 'the refused verb must not create .fgos/ as a side effect');
+});
+
+test('init inside a linked worktree is refused, exit 4 (ADR0020: worktrees never carry .fgos/)', () => {
+  const { wt } = tmpLinkedWorktree();
+  assert.ok(!fs.existsSync(path.join(wt, '.fgos')));
+  const result = run(wt, ['init']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /linked worktree/);
+  assert.ok(!fs.existsSync(path.join(wt, '.fgos')), 'the refused init must not create .fgos/ in the worktree');
+});
+
+test('init on a fresh directory that is not a linked worktree still succeeds, exit 0', () => {
+  const cwd = rawTmpCwd();
+  const result = run(cwd, ['init']);
+  assert.equal(result.status, 0);
+  assert.ok(fs.existsSync(path.join(cwd, '.fgos')));
+});
+
+test('session start inside a .fgos/-less linked worktree still succeeds (D10 symlink actor exempt from the requiresExistingStore guard)', () => {
+  const { wt } = tmpLinkedWorktree();
+  assert.ok(!fs.existsSync(path.join(wt, '.fgos')));
+  const result = run(wt, ['session', 'start']);
+  assert.equal(result.status, 0, `session start unexpectedly refused: ${result.stderr}`);
+});
+
+test('setup inside a .fgos/-less linked worktree still succeeds (setup never touches .fgos/, exempt from the guard)', () => {
+  const { wt } = tmpLinkedWorktree();
+  assert.ok(!fs.existsSync(path.join(wt, '.fgos')));
+  const result = run(wt, ['setup']);
+  assert.equal(result.status, 0, `setup unexpectedly refused: ${result.stderr}`);
 });
 
 test('add creates exactly one work.add event and the view reflects the new item, exit 0', () => {
@@ -410,7 +578,7 @@ test('edit --priority sets the item priority field to the given integer, exit 0'
   assert.equal(stateView(cwd).work['edit-priority'].priority, 3);
 });
 
-test('edit --priority with a negative value is rejected as validation, exit 4, no event written (D1: priority must be non-negative)', () => {
+test('edit --priority with a negative value is rejected as validation, exit 4, no event written (priority must be non-negative)', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'edit-priority-neg');
   const before = eventLines(cwd).length;
@@ -430,7 +598,7 @@ test('edit --priority with a bare flag (no following value) is rejected as valid
   assert.equal(stateView(cwd).work['edit-priority-bare'].priority, undefined);
 });
 
-test('edit --intent accepts a negative value (no sign constraint per D6), exit 0', () => {
+test('edit --intent accepts a negative value (no sign constraint), exit 0', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'edit-intent-neg');
   const result = run(cwd, ['edit', 'edit-intent-neg', '--intent', '-1']);
@@ -848,7 +1016,7 @@ test('goal set on a non-existent id is rejected as validation, exit 4, no event 
   assert.equal(eventLines(cwd).length, before);
 });
 
-test('goal set on an existing item without goalTier is rejected as validation, exit 4, no event written (D7)', () => {
+test('goal set on an existing item without goalTier is rejected as validation, exit 4, no event written', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'non-goal-item');
   const before = eventLines(cwd).length;
@@ -874,7 +1042,7 @@ test('goal show after a successful set returns the focus id plus goal-scoped ran
   assert.ok('topUnblock' in data);
 });
 
-test('goal focus is not auto-cleared when the focused item reaches status done (D7)', () => {
+test('goal focus is not auto-cleared when the focused item reaches status done', () => {
   const cwd = tmpCwd();
   addGoalItem(cwd, 'goal-target-done');
   run(cwd, ['goal', 'set', 'goal-target-done']);
@@ -1328,7 +1496,7 @@ test('ready opens a todo item once its dep reaches done (approved, not merely pr
 });
 
 test('ready on a directory with no log at all returns an empty result, exit 0 (a read never initializes .fgos/)', () => {
-  const cwd = tmpCwd();
+  const cwd = rawTmpCwd();
   const result = run(cwd, ['ready']);
   assert.equal(result.status, 0);
   assert.deepEqual(envelopeData(result.stdout), []);
@@ -1370,6 +1538,71 @@ test('GOLDEN request-class: running ready twice never appends to events.jsonl, a
   assert.equal(viewAfter, viewBefore, 'state.json must be untouched by ready (read never writes the view)');
 });
 
+// --- pagination (str46-io-contract D5/D35): `ready`/`triage`/`evolve`/`list`
+// opt in to --cursor/--limit; omitting both keeps every one of these verbs'
+// default output byte-identical to before this cell (asserted throughout
+// this file's existing `ready`/`triage`/`evolve`/`list` tests above, none of
+// which pass --cursor/--limit) — this section only exercises the opt-in
+// paginated shape through the real CLI binary.
+
+test('ready --limit paginates through the real CLI binary: envelope data carries items+nextCursor, and the cursor round-trips into the remaining items', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'page-a');
+  addOk(cwd, 'page-b');
+  addOk(cwd, 'page-c');
+
+  const first = run(cwd, ['ready', '--limit', '1']);
+  assert.equal(first.status, 0);
+  const firstData = envelopeData(first.stdout);
+  assert.deepEqual(Object.keys(firstData).sort(), ['items', 'nextCursor']);
+  assert.equal(firstData.items.length, 1);
+  assert.ok(typeof firstData.nextCursor === 'string' && firstData.nextCursor.length > 0);
+
+  const second = run(cwd, ['ready', '--limit', '1', '--cursor', firstData.nextCursor]);
+  assert.equal(second.status, 0);
+  const secondData = envelopeData(second.stdout);
+  assert.equal(secondData.items.length, 1);
+  assert.notEqual(secondData.items[0].id, firstData.items[0].id);
+
+  const third = run(cwd, ['ready', '--limit', '1', '--cursor', secondData.nextCursor]);
+  const thirdData = envelopeData(third.stdout);
+  assert.equal(thirdData.items.length, 1);
+  assert.equal(thirdData.nextCursor, null);
+
+  const allIds = [firstData.items[0].id, secondData.items[0].id, thirdData.items[0].id].sort();
+  assert.deepEqual(allIds, ['page-a', 'page-b', 'page-c']);
+});
+
+test('ready with no --cursor/--limit still returns the bare frontier array, not the paginated shape (byte-identical default)', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'unpaginated-item');
+  const result = run(cwd, ['ready']);
+  assert.equal(result.status, 0);
+  const data = envelopeData(result.stdout);
+  assert.ok(Array.isArray(data));
+});
+
+test('ready --cursor rejects a stale cursor (id no longer in the current frontier) as validation, exit 4, message states the restart remedy', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'only-item');
+  const staleCursor = Buffer.from(JSON.stringify({ order: 'ready-v1', lastId: 'never-existed' }), 'utf8').toString('base64');
+  const result = run(cwd, ['ready', '--cursor', staleCursor]);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /re-issue the call without --cursor/);
+});
+
+test('list --limit paginates only the work map: view.work becomes {items, nextCursor} while other view keys are untouched', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'list-page-a');
+  addOk(cwd, 'list-page-b');
+  const result = run(cwd, ['list', '--limit', '1']);
+  assert.equal(result.status, 0);
+  const data = envelopeData(result.stdout);
+  assert.deepEqual(Object.keys(data.work).sort(), ['items', 'nextCursor']);
+  assert.equal(Object.keys(data.work.items).length, 1);
+  assert.ok(Array.isArray(data.decisions));
+});
+
 // --- `fgos check` (phase-3-compound-learning-3): predicted-vs-actual report ---
 //
 // `check` is a pure read (per D1 request-class, same as `ready`/`list`) over
@@ -1390,7 +1623,7 @@ test('check on an item with no recorded outcome returns a null predicted/actual 
 });
 
 test('check on a directory with no log at all returns an empty outcomes list, exit 0 (a read never initializes .fgos/)', () => {
-  const cwd = tmpCwd();
+  const cwd = rawTmpCwd();
   const result = run(cwd, ['check']);
   assert.equal(result.status, 0);
   const data = envelopeData(result.stdout);
@@ -1694,7 +1927,7 @@ test('check output on a log with no friction and no final-status gaps is unchang
 // new formatter (D7); `answer` records the answer and resumes the item to
 // `todo`, at which point it is actionable again (back in `ready`).
 
-test('ask/answer round-trip on a todo item: park removes from ready and surfaces the ask via list, answer resumes to todo and reopens ready (per D5/D6/D7)', () => {
+test('ask/answer round-trip on a todo item: park removes from ready and surfaces the ask via list, answer resumes to todo and reopens ready', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'gated-item');
 
@@ -1811,7 +2044,7 @@ test('check never mutates state: events.jsonl and state.json are byte-identical 
 // just the first (findSourceCaptureIds's plural gather, closing the D13
 // no-loss gap `findSourceCaptureId`'s first-match leaves).
 
-test('doc-sources returns every capture linked to a docPath (multiplicity — the D13 gap closed)', () => {
+test('doc-sources returns every capture linked to a docPath (multiplicity)', () => {
   const cwd = tmpCwd();
   toProposed(cwd, 'doc-sources-a');
   run(cwd, ['compound', 'doc-sources-a', '--doc-type', 'how-to', '--doc-path', 'docs/how-to/shared.md']);
@@ -1901,7 +2134,7 @@ test('submit persists the full text as description, separate from the (possibly 
   assert.equal(view.work[item.id].description, text);
 });
 
-test('two submits of the same text get different ids, both persist, no duplicate-id error (D3 collision retry)', () => {
+test('two submits of the same text get different ids, both persist, no duplicate-id error (collision retry)', () => {
   const cwd = tmpCwd();
   const text = 'Fix the broken login button';
 
@@ -1919,7 +2152,7 @@ test('two submits of the same text get different ids, both persist, no duplicate
   assert.ok(view.work[idB], 'second submitted item persisted');
 });
 
-test('submit without a mode flag records mode:"sync"; --async records mode:"async" — both visible via list (D6)', () => {
+test('submit without a mode flag records mode:"sync"; --async records mode:"async" — both visible via list', () => {
   const cwd = tmpCwd();
 
   const syncSubmit = run(cwd, ['submit', 'Investigate the sluggish overview page']);
@@ -1935,7 +2168,7 @@ test('submit without a mode flag records mode:"sync"; --async records mode:"asyn
   assert.equal(view.work[asyncId].mode, 'async');
 });
 
-test('submit with --unattended is treated the same as --async: mode:"async" (D2)', () => {
+test('submit with --unattended is treated the same as --async: mode:"async"', () => {
   const cwd = tmpCwd();
   const result = run(cwd, ['submit', 'Draft the onboarding walkthrough', '--unattended']);
   assert.equal(result.status, 0);
@@ -1943,7 +2176,7 @@ test('submit with --unattended is treated the same as --async: mode:"async" (D2)
   assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].mode, 'async');
 });
 
-test('submit of text matching no keyword falls back to tier:"standard" and persists, exit 0 (D1)', () => {
+test('submit of text matching no keyword falls back to tier:"standard" and persists, exit 0', () => {
   const cwd = tmpCwd();
   const result = run(cwd, ['submit', 'Investigate the sluggish overview page']);
   assert.equal(result.status, 0);
@@ -1975,7 +2208,7 @@ function writeRunnerConfig(cwd, verdict) {
   fs.writeFileSync(path.join(cwd, '.fgos-runner.json'), JSON.stringify(cfg));
 }
 
-test("submit tags the new item with stage:'clarify' (D8), visible via list", () => {
+test("submit tags the new item with stage:'clarify', visible via list", () => {
   const cwd = tmpCwd();
   const result = run(cwd, ['submit', 'Investigate the sluggish overview page']);
   assert.equal(result.status, 0);
@@ -1983,7 +2216,7 @@ test("submit tags the new item with stage:'clarify' (D8), visible via list", () 
   assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'clarify');
 });
 
-test('add leaves stage unset — the item reads as executing via the lazy default (D8)', () => {
+test('add leaves stage unset — the item reads as executing via the lazy default', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'plain-add');
   const item = envelopeData(run(cwd, ['list']).stdout).work['plain-add'];
@@ -2121,7 +2354,7 @@ test('submit --deps <nonexistent-id> fails loudly through the existing write-gat
 // `submit` (each independently overrides classify(text)'s per-field output;
 // an omitted flag stays byte-identical to classify()'s own derived value)
 
-test('submit with no --tier/--kind/--risk flags is byte-identical to pre-feature behavior (D2 regression proof)', () => {
+test('submit with no --tier/--kind/--risk flags is byte-identical to pre-feature behavior (regression proof)', () => {
   const cwd = tmpCwd();
   const result = run(cwd, ['submit', 'Investigate the sluggish overview page']);
   assert.equal(result.status, 0);
@@ -2210,7 +2443,7 @@ test('submit with an empty --kind "" is rejected as validation, exit 4, no event
 // is the next stop before executing. This assertion changed its expected
 // destination from `executing` to `decompose` for exactly that reason (per
 // D2, an intentional contract change, not a test nerf).
-test('discover on a clear verdict moves the submitted item to stage decompose with the model-proposed verify (D5/D10, stage-decompose D2 retarget)', () => {
+test('discover on a clear verdict moves the submitted item to stage decompose with the model-proposed verify', () => {
   const cwd = tmpCwd();
   writeRunnerConfig(cwd, { clear: true, verify: 'npm test -- proven' });
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
@@ -2230,7 +2463,7 @@ test('discover on a clear verdict moves the submitted item to stage decompose wi
 // again on the same item, now sitting at stage `decompose`, dispatches to
 // `resolveDecompose` instead of `resolveDiscovery` — same verb, same role
 // attribution, the engine picked by the item's CURRENT stage.
-test("discover called a second time, once the item sits at stage decompose, dispatches to resolveDecompose and pass-throughs it on to executing (D3 sync/async parity)", () => {
+test("discover called a second time, once the item sits at stage decompose, dispatches to resolveDecompose and pass-throughs it on to executing (sync/async parity)", () => {
   const cwd = tmpCwd();
   writeRunnerConfig(cwd, { clear: true, verify: 'npm test -- proven' });
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
@@ -2257,7 +2490,7 @@ test("discover called a second time, once the item sits at stage decompose, disp
   assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'executing');
 });
 
-test('discover on an unclear verdict parks the submitted item in awaiting-human with the question, still stage clarify (D5/D7)', () => {
+test('discover on an unclear verdict parks the submitted item in awaiting-human with the question, still stage clarify', () => {
   const cwd = tmpCwd();
   writeRunnerConfig(cwd, { clear: false, question: 'Which service?' });
   const id = JSON.parse(run(cwd, ['submit', 'Do the ambiguous work']).stdout).data.id;
@@ -2285,7 +2518,7 @@ test('discover with no id is rejected as validation, exit 4', () => {
 // executor, D1) so judge-executor's spawnSync fails fast (spawn-fail) on the
 // nested judge call, never invoking a live agent; judgeDiscovery's fail-safe
 // (discovery.mjs) then parks the item as unclear, not a bare "success".
-test('discover on a fresh cwd with no .fgos-runner.json bootstraps the default config instead of crashing on ENOENT (D1/D3)', () => {
+test('discover on a fresh cwd with no .fgos-runner.json bootstraps the default config instead of crashing on ENOENT', () => {
   const cwd = tmpCwd();
   const configPath = path.join(cwd, '.fgos-runner.json');
   assert.equal(fs.existsSync(configPath), false);
@@ -2511,7 +2744,7 @@ test('check tolerates a torn final entropy-history line — folds trend against 
 });
 
 test('check on a directory with no log at all still never initializes .fgos/ (entropy data stays absent, same as friction/settlement)', () => {
-  const cwd = tmpCwd();
+  const cwd = rawTmpCwd();
   const result = run(cwd, ['check']);
   assert.equal(result.status, 0);
   const data = envelopeData(result.stdout);
@@ -2625,7 +2858,7 @@ test('take on an empty frontier is rejected as validation, exit 4, no event writ
   assert.equal(eventLines(cwd).length, before);
 });
 
-test('take --id on a todo item outside the frontier (dep not done) is rejected as validation — take opens only the same set the runner would dispatch (D1)', () => {
+test('take --id on a todo item outside the frontier (dep not done) is rejected as validation — take opens only the same set the runner would dispatch', () => {
   const cwd = initGitCwd();
   run(cwd, ['init']);
   addOk(cwd, 'pull-dep-source');
@@ -2680,6 +2913,14 @@ test('pick with no --id claims the frontier head exactly like take does today, r
   assert.equal(data.worktree.branch, 'fgw/pick-a');
   assert.equal(data.worktree.reused, false);
   assert.ok(fs.existsSync(data.worktree.path), 'pick must leave a real worktree checkout on disk');
+  // tsk-424 D1/D2: pick's worktree must live under .claude/worktrees/ so the
+  // harness's EnterWorktree tool can chain a second in-session switch into
+  // it (e.g. a root item decomposing into a child mid-session) — a location
+  // outside .claude/worktrees/ is refused by the harness past the first switch.
+  assert.ok(
+    data.worktree.path.startsWith(path.join(cwd, '.claude', 'worktrees') + path.sep),
+    `pick worktree path "${data.worktree.path}" must live under .claude/worktrees/`,
+  );
 
   const view = stateView(cwd);
   assert.equal(view.work['pick-a'].status, 'doing');
@@ -2850,7 +3091,7 @@ test('pick on a leaf item whose root has no fgw/<rootId> branch yet forks from r
   assert.equal(stateView(cwd).work['orphan-leaf-item'].status, 'doing');
 });
 
-test('return happy path: verify passes -> doing to proposed, actual outcome recorded, no settlement (settlement belongs to the -> done edge, D4)', () => {
+test('return happy path: verify passes -> doing to proposed, actual outcome recorded, no settlement (settlement belongs to the -> done edge)', () => {
   const cwd = initGitCwd();
   run(cwd, ['init']);
   addOk(cwd, 'pull-return-ok', { verify: 'test -f proof.txt' });
@@ -2873,7 +3114,58 @@ test('return happy path: verify passes -> doing to proposed, actual outcome reco
   assert.equal('settlements' in view, false, 'doing -> proposed never settles (D4: settlement belongs to the -> done edge)');
 });
 
-test('return (STR63): a changed sensitive file outside the item\'s footprint surfaces a frozenJudgeHits advisory, and never blocks the return', () => {
+test('return (verify passes, main-source): a live main-checkout.lock recorded under THIS session\'s own identity is released early, instead of waiting out the TTL (tsk-45z D1/D2)', () => {
+  const cwd = initGitCwd();
+  const sessionId = 'tsk-45z-test-session-ok';
+  run(cwd, ['init']);
+  addOk(cwd, 'pull-return-releases-own-lock', { verify: 'test -f proof.txt' });
+  assert.equal(run(cwd, ['take', '--id', 'pull-return-releases-own-lock'], { BEE_SESSION_ID: sessionId }).status, 0);
+  commitFile(cwd, 'proof.txt');
+
+  const lockPath = path.join(cwd, '.fgos', 'main-checkout.lock');
+  fs.writeFileSync(lockPath, JSON.stringify({ pid: sessionId, ts: Date.now() }));
+
+  const result = run(cwd, ['return', 'pull-return-releases-own-lock'], { BEE_SESSION_ID: sessionId });
+  assert.equal(result.status, 0, `return failed: ${result.stderr}`);
+  assert.equal(envelopeData(result.stdout).to, 'proposed');
+  assert.equal(fs.existsSync(lockPath), false, 'return must release its own live lock once verify passes and the item settles to proposed');
+});
+
+test('return (verify FAILS, main-source): a live own-identity lock is released too — settling to blocked is just as much "done with the checkout" as proposed (tsk-45z D1/D2)', () => {
+  const cwd = initGitCwd();
+  const sessionId = 'tsk-45z-test-session-blocked';
+  run(cwd, ['init']);
+  addOk(cwd, 'pull-return-releases-own-lock-blocked', { verify: 'test -f proof.txt' });
+  assert.equal(run(cwd, ['take', '--id', 'pull-return-releases-own-lock-blocked'], { BEE_SESSION_ID: sessionId }).status, 0);
+  commitFile(cwd, 'wrong-file.txt'); // advances HEAD, never satisfies verify
+
+  const lockPath = path.join(cwd, '.fgos', 'main-checkout.lock');
+  fs.writeFileSync(lockPath, JSON.stringify({ pid: sessionId, ts: Date.now() }));
+
+  const result = run(cwd, ['return', 'pull-return-releases-own-lock-blocked'], { BEE_SESSION_ID: sessionId });
+  assert.equal(result.status, 0, `return should exit 0 for a defined blocked outcome: ${result.stderr}`);
+  assert.equal(envelopeData(result.stdout).to, 'blocked');
+  assert.equal(fs.existsSync(lockPath), false, 'return must release its own live lock even when verify fails and the item settles to blocked');
+});
+
+test('return (main-source) never touches a DIFFERENT session\'s live lock — never a blind unlink (tsk-45z D2)', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  addOk(cwd, 'pull-return-other-lock-untouched', { verify: 'test -f proof.txt' });
+  assert.equal(run(cwd, ['take', '--id', 'pull-return-other-lock-untouched'], { BEE_SESSION_ID: 'tsk-45z-this-session' }).status, 0);
+  commitFile(cwd, 'proof.txt');
+
+  const lockPath = path.join(cwd, '.fgos', 'main-checkout.lock');
+  fs.writeFileSync(lockPath, JSON.stringify({ pid: 'tsk-45z-a-different-live-session', ts: Date.now() }));
+
+  const result = run(cwd, ['return', 'pull-return-other-lock-untouched'], { BEE_SESSION_ID: 'tsk-45z-this-session' });
+  assert.equal(result.status, 0, `return failed: ${result.stderr}`);
+  assert.equal(envelopeData(result.stdout).to, 'proposed');
+  assert.equal(fs.existsSync(lockPath), true, 'a different session\'s live lock must survive this return untouched');
+  assert.equal(JSON.parse(fs.readFileSync(lockPath, 'utf8')).pid, 'tsk-45z-a-different-live-session');
+});
+
+test('return: a changed sensitive file outside the item\'s footprint surfaces a frozenJudgeHits advisory, and never blocks the return', () => {
   const cwd = initGitCwd();
   run(cwd, ['init']);
   addOk(cwd, 'pull-return-judge', { verify: 'test -f proof.txt' });
@@ -2889,7 +3181,7 @@ test('return (STR63): a changed sensitive file outside the item\'s footprint sur
   assert.deepEqual(data.frozenJudgeHits, [{ file: 'package.json', rule: 'package manifest' }]);
 });
 
-test('return (STR63): a changed sensitive file DECLARED in the item\'s footprint is not a hit', () => {
+test('return: a changed sensitive file DECLARED in the item\'s footprint is not a hit', () => {
   const cwd = initGitCwd();
   run(cwd, ['init']);
   assert.equal(run(cwd, ['add', 'pull-return-judge-declared', '--title', 'X', '--kind', 'task', '--risk', 'low', '--verify', 'test -f proof.txt', '--footprint', 'package.json']).status, 0);
@@ -2922,6 +3214,59 @@ test('return refuses a dirty working tree (uncommitted changes) as validation, e
   assert.equal(stateView(cwd).work['pull-return-dirty'].status, 'doing');
 });
 
+test('return succeeds when a dirty file on cwd is UNRELATED to the item\'s own committed progress (tsk-598 D1/D2) — own-file-set scoping, not a whole-tree gate', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  addOk(cwd, 'pull-return-unrelated-dirty', { verify: 'test -f proof.txt' });
+  assert.equal(run(cwd, ['take', '--id', 'pull-return-unrelated-dirty']).status, 0);
+  commitFile(cwd, 'proof.txt'); // real committed progress since headAtTake
+
+  // A path this item's headAtTake..HEAD diff never touches — another
+  // session's uncommitted work sitting in the same main checkout (the
+  // tsk-352 repro shape).
+  fs.writeFileSync(path.join(cwd, 'scratch.txt'), 'unrelated uncommitted work\n'); // never git add/commit
+
+  const result = run(cwd, ['return', 'pull-return-unrelated-dirty']);
+  assert.equal(result.status, 0, `return should succeed past an unrelated dirty file: ${result.stderr}`);
+  assert.equal(stateView(cwd).work['pull-return-unrelated-dirty'].status, 'proposed');
+  assert.equal(fs.readFileSync(path.join(cwd, 'scratch.txt'), 'utf8'), 'unrelated uncommitted work\n', 'the unrelated dirty file must be left untouched, still uncommitted');
+});
+
+test('return still refuses when the SAME path the item committed is dirty again — a real conflict, tsk-598 D2, exit 4, item stays doing', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  addOk(cwd, 'pull-return-real-conflict', { verify: 'test -f proof.txt' });
+  assert.equal(run(cwd, ['take', '--id', 'pull-return-real-conflict']).status, 0);
+  commitFile(cwd, 'proof.txt'); // proof.txt is now IN this item's own committed diff
+
+  // Re-dirty the SAME path after committing it — own-file-set membership
+  // still blocks this, unchanged from before tsk-598.
+  fs.writeFileSync(path.join(cwd, 'proof.txt'), 'clobbered by another writer\n'); // never git add/commit
+
+  const result = run(cwd, ['return', 'pull-return-real-conflict']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /not clean/);
+  assert.equal(stateView(cwd).work['pull-return-real-conflict'].status, 'doing');
+});
+
+test('return with a declared footprint still refuses on an uncommitted footprint path (tsk-598 D3) even though it was never committed', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  addOk(cwd, 'pull-return-footprint-dirty', { verify: 'test -f proof.txt', footprint: 'footprint-guarded.txt' });
+  assert.equal(run(cwd, ['take', '--id', 'pull-return-footprint-dirty']).status, 0);
+  commitFile(cwd, 'proof.txt'); // real committed progress since headAtTake
+
+  // footprint-guarded.txt is declared in item.footprint but was never
+  // committed — absent from headAtTake..HEAD. Per D3, a footprint path
+  // still blocks even uncommitted.
+  fs.writeFileSync(path.join(cwd, 'footprint-guarded.txt'), 'forgot to commit this\n'); // never git add/commit
+
+  const result = run(cwd, ['return', 'pull-return-footprint-dirty']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /not clean/);
+  assert.equal(stateView(cwd).work['pull-return-footprint-dirty'].status, 'doing');
+});
+
 test('return succeeds when ONLY .fgos/ (the live event log) is dirty — its own take/return writes are excluded from the clean-tree gate (no more manual events.jsonl commit before every return)', () => {
   const cwd = initGitCwd();
   run(cwd, ['init']);
@@ -2950,7 +3295,7 @@ test('return succeeds when ONLY .fgos/ (the live event log) is dirty — its own
   assert.equal(stateView(cwd).work['pull-return-fgos-only-dirty'].status, 'proposed');
 });
 
-test('return succeeds when cwd is a subdirectory of the real git top-level and only .fgos/ (under that subtree) is dirty (STR60 path-prefix fix)', () => {
+test('return succeeds when cwd is a subdirectory of the real git top-level and only .fgos/ (under that subtree) is dirty', () => {
   const { cwd } = initGitCwdInSubdir();
   run(cwd, ['init']);
   addOk(cwd, 'sub-return-fgos-only-dirty', { verify: 'test -f proof.txt' });
@@ -2968,7 +3313,7 @@ test('return succeeds when cwd is a subdirectory of the real git top-level and o
   assert.equal(stateView(cwd).work['sub-return-fgos-only-dirty'].status, 'proposed');
 });
 
-test('return succeeds when cwd is a subdirectory and an unrelated file is dirty ELSEWHERE in the repo, outside cwd\'s own subtree (STR60 scope fix)', () => {
+test('return succeeds when cwd is a subdirectory and an unrelated file is dirty ELSEWHERE in the repo, outside cwd\'s own subtree', () => {
   const { cwd, topLevel } = initGitCwdInSubdir();
   run(cwd, ['init']);
   addOk(cwd, 'sub-return-scope-ok', { verify: 'test -f proof.txt' });
@@ -2987,7 +3332,7 @@ test('return succeeds when cwd is a subdirectory and an unrelated file is dirty 
   assert.equal(stateView(cwd).work['sub-return-scope-ok'].status, 'proposed');
 });
 
-test('return still refuses when cwd is a subdirectory and a non-.fgos file is dirty INSIDE cwd\'s own subtree (real dirt still caught, STR60 does not overcorrect)', () => {
+test('return still refuses when cwd is a subdirectory and a non-.fgos file is dirty INSIDE cwd\'s own subtree (real dirt still caught, does not overcorrect)', () => {
   const { cwd } = initGitCwdInSubdir();
   run(cwd, ['init']);
   addOk(cwd, 'sub-return-dirty', { verify: 'test -f proof.txt' });
@@ -3250,7 +3595,7 @@ test('evolve with zero open friction returns an empty candidate list and exits 0
 });
 
 test('evolve on a directory with no log at all returns an empty candidate list, exit 0 (a read never initializes .fgos/)', () => {
-  const cwd = tmpCwd();
+  const cwd = rawTmpCwd();
   const result = run(cwd, ['evolve']);
   assert.equal(result.status, 0);
   assert.deepEqual(envelopeData(result.stdout), []);
@@ -3320,7 +3665,7 @@ test('evolve --pick <invalid-id> prints a clean error and exits non-zero, with n
   assert.equal(fs.readFileSync(viewPath(cwd), 'utf8'), viewBefore, 'state.json must be untouched by an invalid --pick');
 });
 
-test('evolve --pick with a bare flag (no value) is refused as validation, not a re-prompt (D11)', () => {
+test('evolve --pick with a bare flag (no value) is refused as validation, not a re-prompt', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'bare-pick-item');
   const result = run(cwd, ['evolve', '--pick']);
@@ -3540,7 +3885,7 @@ test('review of a legacy proposed item (no branch, no headAtTake/headAtReturn) d
   assert.match(data.warnings.join('\n'), /no live diff source/);
 });
 
-test('review of a leaf proposed item diffs against its resolved root branch (fgw/<root>), not main (D3)', () => {
+test('review of a leaf proposed item diffs against its resolved root branch (fgw/<root>), not main', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   makeRunnerProposedLeafItem(cwd, 'review-leaf-root', 'review-leaf-child', { rootDivergesFromMain: true });
@@ -3553,7 +3898,7 @@ test('review of a leaf proposed item diffs against its resolved root branch (fgw
   assert.doesNotMatch(data.diff, /root-only\.txt/, 'diff against fgw/<root> must not include the root branch\'s own divergence from main');
 });
 
-test('review of a root proposed item is unchanged — still diffs against main (regression, D3)', () => {
+test('review of a root proposed item is unchanged — still diffs against main (regression)', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   makeRunnerProposedItem(cwd, 'review-root-regression-item');
@@ -3621,20 +3966,65 @@ test('approve of a runner item succeeds when ONLY .fgos/ (the live event log) is
   assert.equal(stateView(cwd).work['approve-fgos-only-dirty'].status, 'done');
 });
 
-test('approve of a runner item still refuses when a non-.fgos file on main is dirty, as validation, exit 4, item stays proposed', () => {
+test('approve of a runner item succeeds when a dirty file on main is UNRELATED to the item (tsk-598 D1/D2) — own-file-set scoping, not a whole-tree gate', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
-  makeRunnerProposedItem(cwd, 'approve-real-dirty', { verify: 'test -f approve-real-dirty-produced.txt' });
+  makeRunnerProposedItem(cwd, 'approve-unrelated-dirty', { verify: 'test -f approve-unrelated-dirty-produced.txt' });
+  compoundAndCommit(cwd, 'approve-unrelated-dirty');
 
+  // A path the item's own branch-vs-trunk diff never touches — another
+  // session's uncommitted work sitting on main, the exact repro shape
+  // tsk-598 was filed for (tsk-veg's approve blocked by unrelated docs/
+  // plans/ files from a different session).
   fs.writeFileSync(path.join(cwd, 'scratch.txt'), 'unrelated uncommitted work\n'); // never git add/commit
 
-  const result = run(cwd, ['approve', 'approve-real-dirty']);
-  assert.equal(result.status, 4);
-  assert.match(result.stderr, /not clean/);
-  assert.equal(stateView(cwd).work['approve-real-dirty'].status, 'proposed');
+  const result = run(cwd, ['approve', 'approve-unrelated-dirty']);
+  assert.equal(result.status, 0, `approve should succeed past an unrelated dirty file: ${result.stderr}`);
+  assert.equal(stateView(cwd).work['approve-unrelated-dirty'].status, 'done');
+  assert.equal(fs.readFileSync(path.join(cwd, 'scratch.txt'), 'utf8'), 'unrelated uncommitted work\n', 'the unrelated dirty file must be left untouched, still uncommitted');
 });
 
-test('approve of a leaf item with a clean merge lands the work on fgw/<root> (not main) via an ephemeral worktree, leaf -> done, fgw/<leaf> is actually deleted, fgw/<root> survives (D3/D4/D17)', () => {
+test('approve of a runner item still refuses when the SAME path the item touched is dirty again on main — a real conflict, tsk-598 D2, exit 4, item stays proposed', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeRunnerProposedItem(cwd, 'approve-real-conflict', { verify: 'test -f approve-real-conflict-produced.txt' });
+  compoundAndCommit(cwd, 'approve-real-conflict');
+
+  // approve-real-conflict-produced.txt IS in this item's own branch-vs-trunk
+  // diff (makeRunnerProposedItem committed it on fgw/approve-real-conflict);
+  // re-dirtying that SAME path on main after propose is a real conflict —
+  // own-file-set membership still blocks it, unchanged from before tsk-598.
+  fs.writeFileSync(path.join(cwd, 'approve-real-conflict-produced.txt'), 'clobbered by another writer\n'); // never git add/commit
+
+  const result = run(cwd, ['approve', 'approve-real-conflict']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /not clean/);
+  assert.equal(stateView(cwd).work['approve-real-conflict'].status, 'proposed');
+});
+
+test('approve of a runner item with a declared footprint still refuses on an uncommitted footprint path (tsk-598 D3) even though it was never committed to the branch', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeRunnerProposedItem(cwd, 'approve-footprint-dirty', {
+    verify: 'test -f approve-footprint-dirty-produced.txt',
+    footprint: 'footprint-guarded.txt',
+  });
+  compoundAndCommit(cwd, 'approve-footprint-dirty');
+
+  // footprint-guarded.txt was never committed to fgw/approve-footprint-dirty
+  // (so it is absent from the item's own committed diff) — only DECLARED in
+  // item.footprint. Per D3, a footprint path still blocks even uncommitted,
+  // protecting against exactly the "forgot to add it" gap a committed-diff-
+  // only own-file-set would silently let through.
+  fs.writeFileSync(path.join(cwd, 'footprint-guarded.txt'), 'forgot to commit this\n'); // never git add/commit
+
+  const result = run(cwd, ['approve', 'approve-footprint-dirty']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /not clean/);
+  assert.equal(stateView(cwd).work['approve-footprint-dirty'].status, 'proposed');
+});
+
+test('approve of a leaf item with a clean merge lands the work on fgw/<root> (not main) via an ephemeral worktree, leaf -> done, fgw/<leaf> is actually deleted, fgw/<root> survives', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   makeRunnerProposedLeafItem(cwd, 'approve-leaf-root', 'approve-leaf-child', { verify: 'test -f approve-leaf-child-produced.txt' });
@@ -3728,7 +4118,7 @@ test('approve of a runner item whose staged merge fails its own verify: aborts, 
   assert.equal(view.frictions['approve-verify-fail-item'][0].errorClass, 'verify-miss');
 });
 
-test('approve of a root item that HAD children, whose merge into main conflicts, parks with the distinguishing reason integration-drift and a main@<sha> friction detail (D8)', () => {
+test('approve of a root item that HAD children, whose merge into main conflicts, parks with the distinguishing reason integration-drift and a main@<sha> friction detail', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   fs.writeFileSync(path.join(cwd, 'shared.txt'), 'base\n');
@@ -3943,7 +4333,7 @@ test('approve of the same self-modifying diff PROCEEDS with --acknowledge-iron-l
   assert.doesNotMatch(branches, /fgw\/iron-ack-item/, 'the fully-merged branch is cleaned up');
 });
 
-test('approve of an ordinary runner item (diff touches no self-modifying module) is UNAFFECTED — proceeds to done with no --acknowledge-iron-law flag (backward compatibility, D17)', () => {
+test('approve of an ordinary runner item (diff touches no self-modifying module) is UNAFFECTED — proceeds to done with no --acknowledge-iron-law flag (backward compatibility)', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   makeRunnerProposedItemTouching(cwd, 'iron-plain-item', 'docs/notes.txt', {
@@ -3982,7 +4372,7 @@ test('reject on a non-proposed item is rejected as precondition, exit 2', () => 
   assert.equal(result.status, 2);
 });
 
-test('reject moves proposed -> todo with the reason recorded, role human, and runs no git command at all — never a revert (D4)', () => {
+test('reject moves proposed -> todo with the reason recorded, role human, and runs no git command at all — never a revert', () => {
   const cwd = initGitCwd();
   run(cwd, ['init']);
   addOk(cwd, 'reject-pull-item', { verify: 'test -f proof.txt' });
@@ -4371,7 +4761,7 @@ function makeBlockedLeafItem(cwd, rootId, leafId, reason, extra = {}) {
   commitPending(cwd, `state: park ${leafId} (${reason})`);
 }
 
-test('catchup on a root parked with reason integration-drift, after a non-overlapping main-side change, merges main into fgw/<id> and bounces blocked -> proposed (D7)', () => {
+test('catchup on a root parked with reason integration-drift, after a non-overlapping main-side change, merges main into fgw/<id> and bounces blocked -> proposed', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   makeBlockedRunnerItem(cwd, 'catchup-root-drift', 'integration-drift', { verify: 'test -f catchup-root-drift-produced.txt' });
@@ -4402,7 +4792,7 @@ test('catchup on a root parked with reason integration-drift, after a non-overla
   assert.match(mainSideFile, /landed while parked/);
 });
 
-test('catchup on a leaf parked with reason merge-conflict targets its PARENT branch (fgw/<root>), not main, and succeeds the same way (D11)', () => {
+test('catchup on a leaf parked with reason merge-conflict targets its PARENT branch (fgw/<root>), not main, and succeeds the same way', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   makeBlockedLeafItem(cwd, 'catchup-leaf-root', 'catchup-leaf-child', 'merge-conflict', { verify: 'test -f catchup-leaf-child-produced.txt' });
@@ -4530,7 +4920,7 @@ test('init with no other harness present still writes .fgos/coexistence.json wit
   assert.deepEqual(manifest.detected_harnesses, []);
 });
 
-test('init in a project with a .bee/ marker detects it, reports it in the output, and leaves .bee/ byte/mtime unchanged (D4 read-only)', () => {
+test('init in a project with a .bee/ marker detects it, reports it in the output, and leaves .bee/ byte/mtime unchanged (read-only)', () => {
   const cwd = tmpCwd();
   const beeDir = path.join(cwd, '.bee');
   fs.mkdirSync(beeDir);
@@ -4552,7 +4942,7 @@ test('init in a project with a .bee/ marker detects it, reports it in the output
   assert.deepEqual(fs.readFileSync(beeMarkerFile), beforeContent);
 });
 
-test('init never creates a host AGENTS.md that did not already exist (D6)', () => {
+test('init never creates a host AGENTS.md that did not already exist', () => {
   const cwd = tmpCwd();
   const result = run(cwd, ['init']);
   assert.equal(result.status, 0);
@@ -4732,6 +5122,30 @@ test('return on a branch-source take: verify passes in a disposable detached wor
   assert.equal(gitAtCwd(cwd, ['worktree', 'list', '--porcelain']), worktreesBefore, 'the disposable detached verify worktree is cleaned up — no leftover');
 });
 
+test('return on a branch-source take never touches a live main-checkout.lock (tsk-45z D1 scope: only the main-source path releases early — worktree commits never contend for this shared lock)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeBlockedBranchItem(cwd, 'branch-return-lock-untouched', { verify: 'test -f proof.txt' });
+  assert.equal(run(cwd, ['take', '--id', 'branch-return-lock-untouched']).status, 0);
+  commitPending(cwd, 'state: take branch-return-lock-untouched');
+
+  gitAtCwd(cwd, ['checkout', 'fgw/branch-return-lock-untouched']);
+  fs.writeFileSync(path.join(cwd, 'proof.txt'), 'fixed by hand\n');
+  gitAtCwd(cwd, ['add', '-A']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', 'human fix']);
+  gitAtCwd(cwd, ['checkout', 'main']);
+
+  // A lock recorded under this session's OWN identity — if return's release
+  // wiring wrongly fired on the branch-source path too, this would vanish.
+  const lockPath = path.join(cwd, '.fgos', 'main-checkout.lock');
+  fs.writeFileSync(lockPath, JSON.stringify({ pid: 'tsk-45z-branch-session', ts: Date.now() }));
+
+  const result = run(cwd, ['return', 'branch-return-lock-untouched'], { BEE_SESSION_ID: 'tsk-45z-branch-session' });
+  assert.equal(result.status, 0, `return failed: ${result.stderr}`);
+  assert.match(result.stdout, /proposed/);
+  assert.equal(fs.existsSync(lockPath), true, 'a branch-source return must never touch main-checkout.lock, even one it could self-recognize');
+});
+
 test('return on a branch-source take refuses when the branch has NOT advanced past branchHeadAtTake (no new commit) — validation, exit 4, item stays doing', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
@@ -4744,7 +5158,7 @@ test('return on a branch-source take refuses when the branch has NOT advanced pa
   assert.equal(stateView(cwd).work['branch-return-stale'].status, 'doing');
 });
 
-test('return on a branch-source take never requires the human\'s own main tree to be clean (D2: "tree người là việc của người") — a dirty main tree never blocks it and is left untouched', () => {
+test('return on a branch-source take never requires the human\'s own main tree to be clean ("tree người là việc của người") — a dirty main tree never blocks it and is left untouched', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   makeBlockedBranchItem(cwd, 'branch-return-dirty-main', { verify: 'test -f proof.txt' });
@@ -5537,7 +5951,7 @@ test('move --to done succeeds when every acceptance clause has non-empty evidenc
   assert.equal(stateView(cwd).work['cli-cos-evidenced'].status, 'done');
 });
 
-test('an item with acceptance absent, or an empty array, closes via move --to done completely unaffected (D4 no-op)', () => {
+test('an item with acceptance absent, or an empty array, closes via move --to done completely unaffected (no-op)', () => {
   const cwd = tmpCwd();
   toCompoundLearn(cwd, 'cli-cos-absent'); // no --acceptance ever set
   assert.equal(run(cwd, ['move', 'cli-cos-absent', '--to', 'done']).status, 0);
@@ -5588,4 +6002,148 @@ test('graph verb on an empty store: zero components, still a valid envelope, exi
   const data = envelopeData(result.stdout);
   assert.equal(data.componentCount, 0);
   assert.deepEqual(data.components, []);
+});
+
+// --- `fgos unlock` (tsk-3h4): safely clears .fgos/main-checkout.lock -------
+
+function mainCheckoutLockPath(cwd) {
+  return path.join(cwd, '.fgos', 'main-checkout.lock');
+}
+
+test('unlock: no lock file present -- reports cleared, exit 0', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0);
+  const result = run(cwd, ['unlock']);
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.cleared, true);
+  assert.equal(data.reason, 'stale-or-free');
+});
+
+test('unlock: lock held by a dead pid -- self-heals via the existing reclaim path, reports cleared', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0);
+  fs.mkdirSync(path.dirname(mainCheckoutLockPath(cwd)), { recursive: true });
+  // A pid essentially guaranteed dead: an implausibly high, never-assigned value.
+  fs.writeFileSync(mainCheckoutLockPath(cwd), JSON.stringify({ pid: 999999999, ts: Date.now() }));
+
+  const result = run(cwd, ['unlock']);
+
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.cleared, true);
+  assert.equal(data.reason, 'stale-or-free');
+});
+
+test('unlock: lock genuinely held by a live session -- refuses, reports the holder identity, never deletes the file', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0);
+  fs.mkdirSync(path.dirname(mainCheckoutLockPath(cwd)), { recursive: true });
+  // The test process's own pid is genuinely alive and distinct from the
+  // spawned CLI child's pid -- a real live-other-holder case.
+  fs.writeFileSync(mainCheckoutLockPath(cwd), JSON.stringify({ pid: process.pid, ts: Date.now() }));
+
+  const result = run(cwd, ['unlock']);
+
+  assert.equal(result.status, 7, result.stderr);
+  assert.match(result.stderr, new RegExp(`held by a live session \\(${process.pid}, `));
+  assert.match(result.stderr, /held \d+[ms].*expires in \d+[ms]/);
+  assert.equal(fs.existsSync(mainCheckoutLockPath(cwd)), true);
+});
+
+test('unlock: corrupt (unparseable) lock content -- force-reclaims via forceReclaimAmbiguousLock, removes the file', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0);
+  fs.mkdirSync(path.dirname(mainCheckoutLockPath(cwd)), { recursive: true });
+  fs.writeFileSync(mainCheckoutLockPath(cwd), 'not json at all {{{');
+
+  const result = run(cwd, ['unlock']);
+
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.cleared, true);
+  assert.equal(data.reason, 'reclaimed');
+  assert.equal(fs.existsSync(mainCheckoutLockPath(cwd)), false);
+});
+
+test('unlock: registered in the --help --json manifest with write-only touchesState/externalEffect labels', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['--help', '--json']);
+  assert.equal(result.status, 0, result.stderr);
+  const manifest = JSON.parse(result.stdout);
+  const entry = manifest.commands.find((c) => c.name === 'unlock');
+  assert.ok(entry, 'unlock entry missing from --help --json manifest');
+  assert.equal(entry.touchesState, true);
+  assert.equal(entry.externalEffect, false);
+});
+
+// --- `fgos lock-status` (tsk-5z2, D1): read-only main-checkout.lock report -
+
+test('lock-status: no lock file present -- reports "free"', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0);
+  const result = run(cwd, ['lock-status']);
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.outcome, 'free');
+  assert.equal(data.holderPid, null);
+});
+
+test('lock-status: held by a live session -- reports "live" with holder identity, age, and remaining TTL, exit 0 (never refuses)', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0);
+  fs.mkdirSync(path.dirname(mainCheckoutLockPath(cwd)), { recursive: true });
+  fs.writeFileSync(mainCheckoutLockPath(cwd), JSON.stringify({ pid: process.pid, ts: Date.now() }));
+
+  const result = run(cwd, ['lock-status']);
+
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.outcome, 'live');
+  assert.equal(data.holderPid, process.pid);
+  assert.ok(typeof data.lockAgeMs === 'number');
+  assert.ok(typeof data.remainingTtlMs === 'number');
+  assert.match(data.lockAge, /^\d+[ms]/);
+  assert.match(data.remainingTtl, /^\d+[ms]/);
+});
+
+test('lock-status: held by a dead pid -- reports "stale" and never reclaims the file', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0);
+  fs.mkdirSync(path.dirname(mainCheckoutLockPath(cwd)), { recursive: true });
+  fs.writeFileSync(mainCheckoutLockPath(cwd), JSON.stringify({ pid: 999999999, ts: Date.now() }));
+
+  const result = run(cwd, ['lock-status']);
+
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.outcome, 'stale');
+  assert.equal(data.holderPid, 999999999);
+  assert.equal(fs.existsSync(mainCheckoutLockPath(cwd)), true);
+});
+
+test('lock-status: corrupt lock content -- reports "ambiguous" and never removes the file', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0);
+  fs.mkdirSync(path.dirname(mainCheckoutLockPath(cwd)), { recursive: true });
+  fs.writeFileSync(mainCheckoutLockPath(cwd), 'not json at all {{{');
+
+  const result = run(cwd, ['lock-status']);
+
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.outcome, 'ambiguous');
+  assert.equal(fs.existsSync(mainCheckoutLockPath(cwd)), true);
+  assert.equal(fs.readFileSync(mainCheckoutLockPath(cwd), 'utf8'), 'not json at all {{{');
+});
+
+test('lock-status: registered in the --help --json manifest as read-only (touchesState/externalEffect both false)', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['--help', '--json']);
+  assert.equal(result.status, 0, result.stderr);
+  const manifest = JSON.parse(result.stdout);
+  const entry = manifest.commands.find((c) => c.name === 'lock-status');
+  assert.ok(entry, 'lock-status entry missing from --help --json manifest');
+  assert.equal(entry.touchesState, false);
+  assert.equal(entry.externalEffect, false);
 });

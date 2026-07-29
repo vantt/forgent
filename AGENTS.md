@@ -44,7 +44,7 @@ threshold is hit. Changing one supersedes its decision ID — never edit it in p
 ## fgOS Workflow
 
 A session opening in this repo to work an item through its lifecycle loads
-`fgos-routing` first (`.claude/skills/fgos/fgos-routing/SKILL.md`): it orients
+`fgos-routing` first (`.claude/skills/fgos-routing/SKILL.md`): it orients
 on open work, claims one item through the pull door, then points to
 `fgos-exploring`, `fgos-planning`, or `fgos-validating` based on where that
 item's `stage` puts it.
@@ -52,7 +52,7 @@ item's `stage` puts it.
 <!-- gitnexus:start -->
 # GitNexus — Code Intelligence
 
-This project is indexed by GitNexus as **forgent** (3419 symbols, 6150 relationships, 243 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
+This project is indexed by GitNexus as **forgent** (3522 symbols, 6314 relationships, 248 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
 
 > Index stale? Run `node .gitnexus/run.cjs analyze` from the project root — it auto-selects an available runner. No `.gitnexus/run.cjs` yet? `npx gitnexus analyze` (npm 11 crash → `npm i -g gitnexus`; #1939).
 

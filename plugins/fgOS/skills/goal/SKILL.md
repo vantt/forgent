@@ -33,13 +33,13 @@ never appends an event.
    - For `set`:
 
      ```
-     node ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs goal set <id> --json
+     node ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs goal set <id> --json --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
      ```
 
    - For `show`:
 
      ```
-     node ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs goal show --json
+     node ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs goal show --json --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
      ```
 
    substituting the id parsed in step 1 for `set`. Always use the literal
@@ -47,6 +47,14 @@ never appends an event.
    an installed plugin's files run from a copied cache location, not from
    this repo checkout, so a relative path would resolve to the wrong place
    or fail outright.
+
+   `--dir` (tsk-56t): `goal` is `requiresExistingStore: true` for both
+   sub-verbs, and this session may already be inside a linked worktree
+   from an earlier `/fgOS:pick`, which never carries its own `.fgos/` by
+   design (ADR0020) — `${CLAUDE_PROJECT_DIR}` still resolves to the main
+   checkout even from inside that worktree (it survives an `EnterWorktree`
+   switch), so passing it as `--dir` here points this call at the one real
+   store explicitly.
 
    If the command fails (e.g. the id doesn't exist, or for `set` the item
    has no declared `goalTier`), show the real error to the user and stop —

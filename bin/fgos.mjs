@@ -5,12 +5,9 @@
 // assumed to be an agent — so every outcome is a categorized exit code
 // (R4), and callers should branch on the code, never on the message text.
 //
-//   0 ok            — mutation applied / read succeeded
-//   1 unexpected     — anything not covered below (a real bug)
-//   2 precondition   — illegal FSM transition (fsm.mjs)
-//   3 conflict       — CAS expected-status mismatch (fsm.mjs)
-//   4 validation     — bad input / not-found (work.mjs, store.mjs)
-//   5 corrupt-log    — the event log itself failed to parse (events.mjs)
+// Exit codes (R4): The canonical exit-code table lives in src/state/store.mjs's
+// EXIT_CODES export (codes 2-5, 7-9; 0=ok, 1=unexpected) plus src/runner/loop.mjs's
+// EXIT_BUSY (code 6, runner-only state).
 //
 // This file never writes to `.fgos/` itself — every mutation goes through
 // src/state/store.mjs, the sole write door.
@@ -24,26 +21,41 @@ import { repairTruncatedLastLine } from '../src/state/events.mjs';
 import { deriveTitle, classify, generateId } from '../src/intake/classify.mjs';
 import { wrapEnvelope } from '../src/state/envelope.mjs';
 import { loadRunnerConfig, ensureRunnerConfig, DEFAULT_RUNNER_CONFIG } from '../src/runner/dispatch.mjs';
+import { readGateBypassLevel } from '../src/state/gate-bypass.mjs';
+import { resolveFgosDir, fgosDirFromRoot } from '../src/runner/paths.mjs';
 import { resolveDiscovery } from '../src/intake/discovery.mjs';
 import { resolveDecompose } from '../src/intake/decompose.mjs';
 import { computeEntropy, computeCounts } from '../src/report/entropy.mjs';
 import { buildEnduserIndex, QUADRANTS, QUADRANT_DIR_ALIASES, findSourceCaptureIds } from '../src/report/enduser-index.mjs';
 import { rankCandidates } from '../src/evolve/candidates.mjs';
 import { rankImpact } from '../src/state/impact.mjs';
+import { paginate } from '../src/state/cursor.mjs';
 import { runGoalCheck } from '../src/runner/goal-check.mjs';
 import { frozenJudgeHits } from '../src/runner/frozen-judge.mjs';
-import { classifySource, reviewDiff, mergeRunnerItem, cleanupMergedBranch, changedFiles, isWorkingTreeClean as isMainTreeClean, isFgosOnlyStatusLine, detectTrunk, isMainWorktree } from '../src/runner/merge.mjs';
+import { classifySource, reviewDiff, mergeRunnerItem, cleanupMergedBranch, changedFiles, isWorkingTreeClean as isMainTreeClean, isFgosOnlyStatusLine, buildOwnFileSet, detectTrunk, isMainWorktree } from '../src/runner/merge.mjs';
 import { createGitHubPR, mergeGitHubPR, viewGitHubPRStatus } from '../src/runner/github-adapter.mjs';
 import { classifyIronLaw } from '../src/evolve/iron-law.mjs';
 import { branchNameFor, branchExists, createWorktree, removeWorktree } from '../src/runner/worktree.mjs';
 import { claimWork, ClaimError } from '../src/runner/claim-port.mjs';
+import {
+  acquireMainCheckoutLock,
+  releaseMainCheckoutLock,
+  releaseMainCheckoutLockIfOwn,
+  forceReclaimAmbiguousLock,
+  inspectMainCheckoutLock,
+  ACQUIRED,
+  HELD,
+  DEFAULT_TTL_MS,
+  formatLockDurationMs,
+} from '../src/runner/main-checkout-lock.mjs';
+import { resolveWriterIdentity } from '../src/runner/session-identity.mjs';
 import { createSession, endSession, listSessions, reclaimOrphanedSessions, SessionError } from '../src/runner/session.mjs';
 import { resolveRoot } from '../src/runner/root-affinity.mjs';
 import { visitCount } from '../src/runner/anti-loop.mjs';
 import { DEFAULTS } from '../src/state/work.mjs';
 import { getDomain, stageForStep } from '../src/state/workflow-stage-graphs.mjs';
 import { writeCoexistenceManifest } from '../src/install/coexist.mjs';
-import { SCHEMA_VERSION, COMMAND_REGISTRY } from '../src/cli/command-registry.mjs';
+import { MANIFEST_SCHEMA_VERSION, COMMAND_REGISTRY } from '../src/cli/command-registry.mjs';
 import { computeAwaitingContext } from '../src/state/awaiting-context.mjs';
 import { DOCTOR_CHECKS, integrationScriptPath } from '../src/setup/checks.mjs';
 import { installGitHooks } from '../src/setup/git-hooks.mjs';
@@ -57,8 +69,24 @@ import { formatCheck, bold } from '../src/setup/ansi.mjs';
 // overridable by a later edit.
 const SUBMIT_VERIFY_SENTINEL = 'chưa xác định — P15 bổ sung';
 
-function dataDir() {
-  return path.join(process.cwd(), '.fgos');
+// `overrideDir` (tsk-56t D1): an explicit, opt-in escape hatch alongside D5's
+// strict cwd resolution, never a replacement for it — omitting `--dir`
+// leaves every existing caller byte-identical to before this cell. A
+// worktree-resident session (no `.fgos/` at its own cwd, per ADR0020) passes
+// `--dir <mainRoot>` to reach the one real store explicitly, instead of the
+// CLI silently git-resolving upward (which would reopen D5 for every caller,
+// not just this one).
+function dataDir(overrideDir) {
+  if (overrideDir !== undefined) {
+    if (typeof overrideDir !== 'string' || !overrideDir.trim()) {
+      throw new StoreError('validation', '--dir requires a non-empty path value');
+    }
+    return fgosDirFromRoot(overrideDir);
+  }
+  // strict: true — this CLI's `.fgos/` always lives under the caller's own
+  // cwd, never git-resolved upward (D5, matches the pull-door assumption
+  // in gitAt's own comment below).
+  return resolveFgosDir(process.cwd(), { strict: true });
 }
 
 // Host-repo git helpers for the pull door (`take`/`return`, stage-decompose
@@ -97,12 +125,16 @@ function currentHead(cwd) {
 // STILL top-level-relative (verified empirically, same as the whole-repo
 // case), so the `.fgos/` exclusion still needs the same prefix fix
 // isWorkingTreeClean(repoRoot) above uses.
-function isWorkingTreeClean(cwd) {
+//
+// `ownFileSet` (tsk-598, D2/D3): threaded straight through to
+// isFgosOnlyStatusLine, same fail-safe `null` default as merge.mjs's own
+// isWorkingTreeClean.
+function isWorkingTreeClean(cwd, ownFileSet = null) {
   const prefix = gitAt(cwd, ['rev-parse', '--show-prefix']).trim();
   return gitAt(cwd, ['status', '--porcelain', '--', '.'])
     .split('\n')
     .filter((line) => line.trim() !== '')
-    .every((line) => isFgosOnlyStatusLine(line, prefix));
+    .every((line) => isFgosOnlyStatusLine(line, prefix, ownFileSet));
 }
 
 function commitsSince(cwd, from, to) {
@@ -226,6 +258,33 @@ function parseAcceptanceFlag(value, message) {
   } catch (err) {
     throw new StoreError('validation', `${message} (invalid JSON: ${err.message})`);
   }
+}
+
+// Pagination opt-in (str46-io-contract D5/D35): `ready`/`triage`/`evolve`
+// (bare)/`list` each accept --cursor/--limit. Reads both flags and validates
+// --limit shape; the caller decides whether to actually paginate (see
+// paginateVerbResult below) — this only parses.
+function readPaginationFlags(flags, verbLabel) {
+  const cursor = optionalField(flags.cursor, `${verbLabel} --cursor requires a non-empty cursor value`);
+  const rawLimit = optionalField(flags.limit, `${verbLabel} --limit requires a positive integer value`);
+  if (rawLimit === undefined) return { cursor, limit: undefined };
+  const limit = Number(rawLimit);
+  if (!Number.isInteger(limit) || limit <= 0) {
+    throw new StoreError('validation', `${verbLabel} --limit requires a positive integer value`);
+  }
+  return { cursor, limit };
+}
+
+// Wraps `items` (an array of {id, ...} objects already in the verb's own
+// order) through cursor.mjs's paginate() ONLY when the caller actually passed
+// --cursor or --limit — omitting both returns `items` completely unchanged
+// (per D35: the four paginated verbs' default output stays byte-identical to
+// before this cell). `order` is this verb's own literal order tag (e.g.
+// 'ready-v1'), named once at the call site.
+function paginateVerbResult(items, flags, order, verbLabel) {
+  const { cursor, limit } = readPaginationFlags(flags, verbLabel);
+  if (cursor === undefined && limit === undefined) return items;
+  return paginate(items, { cursor, limit, order });
 }
 
 // One structured entry per item, always naming both halves explicitly
@@ -980,7 +1039,20 @@ async function runVerb(verb, flags, positional, dir) {
         const ctx = computeAwaitingContext(view, item.id);
         if (ctx) awaitingContext[item.id] = ctx;
       }
-      return Object.keys(awaitingContext).length > 0 ? { ...view, awaitingContext } : view;
+      const base = Object.keys(awaitingContext).length > 0 ? { ...view, awaitingContext } : view;
+      // Pagination (D5/D35): only `work` (the biggest payload, per plan.md's
+      // Discovery) ever changes shape, and only when --cursor/--limit was
+      // actually passed — every other view key (decisions/gates/settlements/
+      // etc.) is untouched. `view.work` is a map keyed by id, so it is
+      // wrapped into `{id, item}` pairs before going through the same
+      // generic `paginate()` every array-returning verb uses, then unwrapped
+      // back into a plain id->item map for the page itself.
+      const { cursor, limit } = readPaginationFlags(flags, 'list');
+      if (cursor === undefined && limit === undefined) return base;
+      const entries = Object.entries(view.work).map(([id, item]) => ({ id, item }));
+      const { items: pagedEntries, nextCursor } = paginate(entries, { cursor, limit, order: 'list-work-v1' });
+      const workPage = Object.fromEntries(pagedEntries.map(({ id, item }) => [id, item]));
+      return { ...base, work: { items: workPage, nextCursor } };
     }
 
     // Request-class per D1: a pure read — never appends an event, never
@@ -988,7 +1060,7 @@ async function runVerb(verb, flags, positional, dir) {
     // through store.readyWork only; this file never imports frontier.mjs
     // directly (per this cell's key_links).
     case 'ready': {
-      return readyWork(dir);
+      return paginateVerbResult(readyWork(dir), flags, 'ready-v1', 'ready');
     }
 
     // Request-class per D1 (same contract as `ready`/`list`): a pure read —
@@ -1013,6 +1085,14 @@ async function runVerb(verb, flags, positional, dir) {
     // items stuck in `doing` — classifies stale-by-owner-type (human >> agent)
     // and SUGGESTS; it never moves or reclaims anything (the runner reap is the
     // only role, and it never reclaims a person's claim).
+    // Request-class per D1: a pure read, never touches state.json. Reports
+    // the configured gate-bypass level (docs/history/gate-bypass/CONTEXT.md
+    // D1-D5) — no CLI setter, mirroring .fgos-runner.json's own
+    // edit-the-file-by-hand pattern.
+    case 'gate-bypass': {
+      return { level: readGateBypassLevel(dir) };
+    }
+
     case 'stale': {
       return staleDoingAdvisory(dir);
     }
@@ -1256,12 +1336,20 @@ async function runVerb(verb, flags, positional, dir) {
       // executing boundary, claim-lock §3b) reattaches to that same branch
       // tip via createWorktree's reuse path instead of forking a new one.
       try {
+        // worktreeDir under .claude/worktrees/ (tsk-424 D1/D2): the harness's
+        // own EnterWorktree tool only allows a second-or-later in-session
+        // switch when the target sits there, e.g. a root item decomposing
+        // into a child mid-session. os.tmpdir()/fgos-worktrees (createWorktree's
+        // own default) fails that check past the first switch — pick is the
+        // only caller that needs the harness-chainable location; runner/
+        // merge-ephemeral callers are untouched.
         return claimWork(dir, {
           id,
           actor: 'session',
           isolate: true,
           claimTrigger,
           repoRoot: process.cwd(),
+          worktreeDir: path.join(process.cwd(), '.claude', 'worktrees'),
         });
       } catch (err) {
         if (err instanceof ClaimError) {
@@ -1379,10 +1467,16 @@ async function runVerb(verb, flags, positional, dir) {
       }
 
       const cwd = repoRoot;
-      if (!isWorkingTreeClean(cwd)) {
+      // head is computed BEFORE the clean-tree check (tsk-598 D1/D2): the
+      // check itself now needs the item's own committed-diff paths
+      // (headAtTake..head) to build ownFileSet — a pure read, reordering it
+      // earlier changes nothing else about this branch.
+      const head = currentHead(cwd);
+      const ownDiff = changedFilesSince(cwd, item.headAtTake, head);
+      const ownFileSet = buildOwnFileSet(ownDiff, item.footprint);
+      if (!isWorkingTreeClean(cwd, ownFileSet)) {
         throw new StoreError('validation', `return: working tree at "${cwd}" is not clean — commit the work for "${id}" before returning.`);
       }
-      const head = currentHead(cwd);
       const aheadCount = commitsSince(cwd, item.headAtTake, head);
       if (aheadCount <= 0) {
         throw new StoreError(
@@ -1394,9 +1488,19 @@ async function runVerb(verb, flags, positional, dir) {
       const check = await runGoalCheck(item, cwd, timeoutMs);
       if (check.passed) {
         // STR63: advisory only (per cos) — a hit never blocks this return.
-        const frozenJudge = frozenJudgeHits(changedFilesSince(cwd, item.headAtTake, head), item.footprint);
+        const frozenJudge = frozenJudgeHits(ownDiff, item.footprint);
         const { event } = moveWork(dir, { id, to: 'proposed', expectedStatus: 'doing', headAtReturn: head });
         addOutcome(dir, { id, actual: { outcome: 'proposed', passed: true, attempts: 1, errorClass: null, aheadCount } });
+        // tsk-45z D1/D2: this session's own commits (landed straight on the
+        // main checkout, not a branch/worktree) may still hold
+        // main-checkout.lock, refreshed by .githooks/pre-commit on each one
+        // and never released until TTL expiry. This point — verify green,
+        // item settling to `proposed` — is the state-machine's own signal
+        // that this session is done with the checkout, so release early
+        // instead of leaving the next writer to wait out the TTL.
+        // Identity-checked (never a blind unlink, D2): only removes the
+        // lock if it is still recorded under this session's own identity.
+        releaseMainCheckoutLockIfOwn(dir, resolveWriterIdentity(dir).id);
         return { id, from: 'doing', to: 'proposed', source: 'main', aheadCount, passed: true, seq: event.seq, output: check.output, frozenJudgeHits: frozenJudge };
       }
 
@@ -1410,6 +1514,11 @@ async function runVerb(verb, flags, positional, dir) {
         attempts: 1,
         detail: `goal-check failed (exit ${check.status})`,
       });
+      // Same early-release as the passing branch above (tsk-45z D1/D2) — a
+      // failed verify still means this session is done touching the main
+      // checkout; the item settling to `blocked` is just as much "done with
+      // the checkout" as settling to `proposed`.
+      releaseMainCheckoutLockIfOwn(dir, resolveWriterIdentity(dir).id);
       return { id, from: 'doing', to: 'blocked', source: 'main', aheadCount, passed: false, exitStatus: check.status, output: check.output };
     }
 
@@ -1597,8 +1706,14 @@ async function runVerb(verb, flags, positional, dir) {
       // the fail-safe direction, accepted as-is (unchanged from before this
       // hoist). Refuses BEFORE any git mutation or GitHub call: the item
       // stays `proposed`, nothing is touched, neither transport is reached.
+      // Hoisted alongside the Iron Law gate (tsk-598 D1/D2): the local-merge
+      // branch's own clean-tree check, further below, reuses this exact
+      // array as its ownFileSet source instead of recomputing the same
+      // branch-vs-trunk diff a second time.
+      let runnerOwnDiff;
       if (source === 'runner') {
-        const ironLaw = classifyIronLaw({ filesChanged: changedFiles(repoRoot, item), description: item.description });
+        runnerOwnDiff = changedFiles(repoRoot, item);
+        const ironLaw = classifyIronLaw({ filesChanged: runnerOwnDiff, description: item.description });
         // review-20260718-self-improve-loop finding f02: only the bare flag
         // (parsed as boolean `true`, no following value) counts as
         // acknowledgment; any value form (e.g. a stray "false") fails closed.
@@ -1665,7 +1780,8 @@ async function runVerb(verb, flags, positional, dir) {
         // f01) so it guards both merge transports identically — see that
         // block for the full rationale. This local-merge branch continues
         // directly with the dirty-tree check.
-        if (!isMainTreeClean(repoRoot)) {
+        const ownFileSet = buildOwnFileSet(runnerOwnDiff, item.footprint);
+        if (!isMainTreeClean(repoRoot, ownFileSet)) {
           throw new StoreError('validation', `approve: working tree at "${repoRoot}" is not clean — commit or stash pending changes before approving "${id}".`);
         }
 
@@ -2037,7 +2153,7 @@ async function runVerb(verb, flags, positional, dir) {
         return submitWork(dir, describeCandidate(picked));
       }
       if (pickId === undefined) {
-        return candidates;
+        return paginateVerbResult(candidates, flags, 'evolve-v1', 'evolve');
       }
       const picked = candidates.find((c) => c.id === pickId);
       if (!picked) {
@@ -2056,7 +2172,7 @@ async function runVerb(verb, flags, positional, dir) {
     // risk/lane classification: this ranks open work by blocking fan-out
     // (how many other open items it unblocks), not by how risky it is.
     case 'triage': {
-      return rankImpact(listWork(dir));
+      return paginateVerbResult(rankImpact(listWork(dir)), flags, 'triage-v1', 'triage');
     }
 
     // Opt-in per-session git worktree lifecycle (fgos-multi-session-checkout
@@ -2195,34 +2311,86 @@ async function runVerb(verb, flags, positional, dir) {
       return { checks };
     }
 
+    // Safely clears .fgos/main-checkout.lock (tsk-3h4). Never force-deletes:
+    // reuses acquireMainCheckoutLock as-is for the ACQUIRED (free/stale,
+    // reclaimed as a side effect of the acquire attempt then immediately
+    // released -- this verb never wants to hold the lock, only clear it) and
+    // HELD (genuinely live elsewhere, refuse) outcomes, and only reaches for
+    // the new forceReclaimAmbiguousLock for the one status that primitive
+    // deliberately never unlinks itself (AMBIGUOUS -- unparseable content,
+    // D5 fail-closed).
+    case 'unlock': {
+      const lockResult = acquireMainCheckoutLock(dir, { identity: process.pid, ttlMs: DEFAULT_TTL_MS });
+      if (lockResult.status === HELD) {
+        const ttlPart = lockResult.remainingTtlMs != null
+          ? `, expires in ${formatLockDurationMs(lockResult.remainingTtlMs)}`
+          : ', no TTL window known';
+        throw new StoreError(
+          'lock-timeout',
+          `unlock: main checkout lock is held by a live session (${lockResult.holderPid}, held ${formatLockDurationMs(lockResult.lockAgeMs)}${ttlPart}) -- refusing to clear it.`,
+        );
+      }
+      if (lockResult.status === ACQUIRED) {
+        releaseMainCheckoutLock(dir);
+        return { cleared: true, reason: 'stale-or-free' };
+      }
+      // AMBIGUOUS
+      const reclaim = forceReclaimAmbiguousLock(dir);
+      return { cleared: reclaim.status === 'reclaimed', reason: reclaim.status };
+    }
+
+    case 'lock-status': {
+      const status = inspectMainCheckoutLock(dir, { ttlMs: DEFAULT_TTL_MS });
+      return {
+        outcome: status.outcome,
+        holderPid: status.holderPid ?? null,
+        lockAgeMs: status.lockAgeMs ?? null,
+        remainingTtlMs: status.remainingTtlMs ?? null,
+        lockAge: status.lockAgeMs != null ? formatLockDurationMs(status.lockAgeMs) : null,
+        remainingTtl: status.remainingTtlMs != null ? formatLockDurationMs(status.remainingTtlMs) : null,
+      };
+    }
+
     default:
-      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <init|add|submit|discover|move|edit|ask|answer|decision|list|ready|rebuild|repair|check|rollup|take|return|review|approve|reject|catchup|evolve|triage|session|goal|setup|doctor> ...`);
+      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <init|add|submit|discover|move|edit|ask|answer|decision|list|ready|rebuild|repair|check|rollup|take|return|review|approve|reject|catchup|evolve|triage|session|goal|setup|doctor|unlock|lock-status> ...`);
   }
 }
 
 // ─── --help / --help --json: machine-readable verb manifest (P37 deliverable
 // b) — mirrors `.bee/bin/bee.mjs`'s publicManifestEntries/renderHelpText/
 // handleHelp exactly. The manifest itself is NEVER wrapped in the fgos.v1
-// envelope (wrapEnvelope) — it is metadata about the CLI's own verb surface,
-// not a verb's data payload, the same distinction bee.mjs draws for its own
+// envelope (wrapEnvelope) — this is CTR001's documented exception for the
+// verb manifest: metadata about the CLI's own verb surface, not a verb's
+// data payload, the same distinction bee.mjs draws for its own
 // `--help --json`.
 
 function publicManifestEntries() {
-  return COMMAND_REGISTRY.map(({ name, invoke, description, parameters, examples, access, deprecated }) => ({
+  return COMMAND_REGISTRY.map(({ name, invoke, description, parameters, examples, touchesState, externalEffect, paginated, deprecated }) => ({
     name,
     invoke,
     description,
     parameters,
     examples,
-    access,
+    touchesState,
+    externalEffect,
+    paginated,
     deprecated,
   }));
 }
 
 function renderHelpText(entries = publicManifestEntries()) {
-  const lines = [`fgos — the fgOS work-item CLI (schema_version ${SCHEMA_VERSION})`, ''];
+  // Label for touchesState+externalEffect: 'read' (both false), 'write'
+  // (touches only), 'external' (effect only), or 'write+external' (both true).
+  const labelFor = (touchesState, externalEffect) => {
+    if (touchesState && externalEffect) return 'write+external';
+    if (touchesState) return 'write';
+    if (externalEffect) return 'external';
+    return 'read';
+  };
+  const lines = [`fgos — the fgOS work-item CLI (schema_version ${MANIFEST_SCHEMA_VERSION})`, ''];
   for (const entry of entries) {
-    lines.push(`${entry.invoke} [${entry.access}]`);
+    const label = labelFor(entry.touchesState, entry.externalEffect);
+    lines.push(`${entry.invoke} [${label}]`);
     lines.push(`    ${entry.description}`);
     const required = entry.parameters?.required || [];
     const positional = entry.parameters?.positional || [];
@@ -2247,7 +2415,7 @@ function renderHelpText(entries = publicManifestEntries()) {
 
 function handleHelp(json) {
   if (json) {
-    const manifest = { schema_version: SCHEMA_VERSION, commands: publicManifestEntries() };
+    const manifest = { schema_version: MANIFEST_SCHEMA_VERSION, commands: publicManifestEntries() };
     process.stdout.write(`${JSON.stringify(manifest, null, 2)}\n`);
   } else {
     process.stdout.write(renderHelpText());
@@ -2262,6 +2430,10 @@ function handleHelp(json) {
 // normal dispatch path still produces its usual "unknown verb" error.
 // Text-mode only (D3/CONTEXT out-of-scope note): the caller gates this on
 // `!flags.json`, so `<verb> --help --json` is left to fall through unchanged.
+// Same documented exception as the full manifest above, not a separate one —
+// this reuses renderHelpText/publicManifestEntries scoped to one verb, so it
+// is never wrapped in the fgos.v1 envelope for the same reason: metadata
+// about the CLI's own verb surface, not a verb's data payload.
 function handleVerbHelp(verb) {
   const entry = publicManifestEntries().find((e) => e.name === verb);
   if (!entry) return false;
@@ -2271,7 +2443,9 @@ function handleVerbHelp(verb) {
 
 // `--pretty` rendering (D7): ONLY for `setup`/`doctor`, and only when the
 // flag is given — every other verb, and these two without `--pretty`, stay
-// byte-identical to the wrapEnvelope + JSON path (CTR001, no exception).
+// byte-identical to the wrapEnvelope + JSON path. `--pretty` itself IS
+// CTR001's documented exception here: an explicit human-readable rendering
+// opt-out via an explicit flag, not a verb's default payload.
 function renderPretty(verb, data) {
   const lines = [];
   if (verb === 'doctor') {
@@ -2313,6 +2487,12 @@ function renderPretty(verb, data) {
   return `${lines.join('\n')}\n`;
 }
 
+// tsk-56t D2: the exact 8 read verbs the decision names — not every
+// `requiresExistingStore: false` verb (that set also includes `session`/
+// `setup`/`doctor`, which never touch `.fgos/` at all, and `init`, which
+// gets its own opposite linked-worktree refusal above).
+const STORE_MISSING_WARNING_VERBS = new Set(['list', 'ready', 'graph', 'stale', 'check', 'rollup', 'conflicts', 'triage']);
+
 async function main() {
   const [, , verb, ...rest] = process.argv;
 
@@ -2330,7 +2510,45 @@ async function main() {
   }
 
   try {
-    const data = await runVerb(verb, flags, positional, dataDir());
+    const dir = dataDir(flags.dir);
+    // tsk-4fu-2: a verb registered `requiresExistingStore: true`
+    // (command-registry.mjs) reads/writes through this `dir` — refuse
+    // before ever reaching its handler when `.fgos/` isn't there yet,
+    // instead of letting `appendEventCore`'s own `mkdirSync` silently
+    // create a fresh, empty one (the worktree phantom-store hazard this
+    // item closes). `init` is deliberately never in that set — it is the
+    // one legitimate door that creates `.fgos/` — but gets the opposite
+    // check: refuse when `cwd` is a linked worktree, the one remaining
+    // path that could recreate a live `.fgos/` there and defeat ADR0020.
+    const entry = COMMAND_REGISTRY.find((e) => e.name === verb);
+    if (entry?.requiresExistingStore && !fs.existsSync(dir)) {
+      throw new StoreError(
+        'validation',
+        `.fgos/ not found at "${dir}" -- run "fgos init" here first, or check you are not inside a linked worktree (worktrees never carry .fgos/, per ADR0020: docs/decisions/0020-chan-fgos-khoi-worktree-worker.md).`,
+      );
+    }
+    if (verb === 'init' && !isMainWorktree(process.cwd())) {
+      throw new StoreError(
+        'validation',
+        `"fgos init" refused inside a linked worktree ("${process.cwd()}") -- worktrees never carry .fgos/ by design (ADR0020); run "fgos init" from the main checkout instead.`,
+      );
+    }
+    // tsk-56t D2: these 8 read verbs are `requiresExistingStore: false` by
+    // design (a fresh non-worktree dir with no store yet is a legitimate
+    // "not evaluated" case, not an error) — but that same tolerance means a
+    // worktree-resident session that forgets `--dir` sees a silent, real-
+    // looking empty view instead of a signal that the actual store lives
+    // elsewhere. `ready`/`triage` can return a bare array when unpaginated
+    // (paginateVerbResult), so this can never be a JSON `data` field without
+    // changing that shape only in this one runtime case — a stderr line
+    // keeps stdout's `data` shape byte-identical in every case, mirroring
+    // this file's existing stdout=data/stderr=diagnostics split above.
+    if (STORE_MISSING_WARNING_VERBS.has(verb) && !fs.existsSync(dir) && !isMainWorktree(process.cwd())) {
+      process.stderr.write(
+        `fgos: warning: .fgos/ not found at "${dir}" -- this view may be empty because the real store lives elsewhere (worktrees never carry .fgos/, per ADR0020); pass --dir <mainRoot> to read it.\n`,
+      );
+    }
+    const data = await runVerb(verb, flags, positional, dir);
     if (flags.pretty && (verb === 'setup' || verb === 'doctor')) {
       process.stdout.write(renderPretty(verb, data));
     } else {

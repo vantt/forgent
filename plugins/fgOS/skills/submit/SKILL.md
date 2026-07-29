@@ -59,7 +59,7 @@ work item without leaving the session or hand-typing the CLI. Never writes
    - If the user confirmed (or edited to) one or more dependency ids, run:
 
      ```
-     node ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs submit "<text>" --deps <confirmed-ids>
+     node ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs submit "<text>" --deps <confirmed-ids> --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
      ```
 
      where `<confirmed-ids>` is a comma-separated list of the confirmed
@@ -68,12 +68,19 @@ work item without leaving the session or hand-typing the CLI. Never writes
      step 2, run the same command with **no `--deps` flag at all**:
 
      ```
-     node ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs submit "<text>"
+     node ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs submit "<text>" --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
      ```
 
    `<text>` is the original free-text description from step 1 (or the
    text the user supplied if they were asked for it in step 1),
    double-quoted so it survives shell parsing as a single argument.
+
+   `--dir` (tsk-56t): this session may already be inside a linked
+   worktree from an earlier `/fgOS:pick`, which never carries its own
+   `.fgos/` by design (ADR0020) — `${CLAUDE_PROJECT_DIR}` still resolves
+   to the main checkout even from inside that worktree (it survives an
+   `EnterWorktree` switch), so passing it as `--dir` here points this
+   write at the one real store explicitly.
 
 5. **Report the result.** Relay `submit`'s own output (the new item's id
    and derived fields) back to the user. If the command fails (e.g. an

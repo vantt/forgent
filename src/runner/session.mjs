@@ -37,6 +37,7 @@ import os from 'node:os';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { execFileSync } from 'node:child_process';
+import { fgosDirFromRoot } from './paths.mjs';
 
 const SESSIONS_FILE = 'sessions.json';
 const SESSIONS_LOCK = 'sessions.lock';
@@ -81,7 +82,7 @@ function sleepSync(ms) {
 }
 
 function fgosDirOf(repoRoot) {
-  return path.join(path.resolve(repoRoot), '.fgos');
+  return fgosDirFromRoot(repoRoot);
 }
 
 /** Remove the `.fgos` symlink we created inside a session worktree. It is our

@@ -36,13 +36,21 @@ write, CTR001 — never writes `.fgos/` state directly.
 2. **Run context-discovery / split-work judgment.** Run:
 
    ```
-   node ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs discover $ARGUMENTS --json
+   node ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs discover $ARGUMENTS --json --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
    ```
 
    Always use the literal `${CLAUDE_PROJECT_DIR}` substitution shown above,
    never a relative path — an installed plugin's files run from a copied
    cache location, not from this repo checkout, so a relative path would
    resolve to the wrong place or fail outright.
+
+   `--dir` (tsk-56t): the session may already be inside the claimed item's
+   worktree (`/fgOS:pick` switches into it), which never carries its own
+   `.fgos/` by design (ADR0020) — `${CLAUDE_PROJECT_DIR}` still resolves
+   to the main checkout even from inside that worktree (it survives an
+   `EnterWorktree` switch), so passing it as `--dir` here points this
+   write at the one real store explicitly, instead of the CLI resolving
+   `.fgos/` under the worktree's own (missing) cwd.
 
    The CLI itself picks which judgment runs based on the item's current
    `stage` — `clarify` gets context-discovery, `decompose` gets split-work
