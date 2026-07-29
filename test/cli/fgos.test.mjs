@@ -5705,7 +5705,8 @@ test('unlock: lock genuinely held by a live session -- refuses, reports the hold
   const result = run(cwd, ['unlock']);
 
   assert.equal(result.status, 7, result.stderr);
-  assert.match(result.stderr, new RegExp(`held by a live session \\(${process.pid}\\)`));
+  assert.match(result.stderr, new RegExp(`held by a live session \\(${process.pid}, `));
+  assert.match(result.stderr, /held \d+[ms].*expires in \d+[ms]/);
   assert.equal(fs.existsSync(mainCheckoutLockPath(cwd)), true);
 });
 

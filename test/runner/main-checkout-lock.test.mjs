@@ -8,6 +8,7 @@ import {
   acquireMainCheckoutLock,
   releaseMainCheckoutLock,
   forceReclaimAmbiguousLock,
+  formatLockDurationMs,
   LOCK_FILE,
   ACQUIRED,
   HELD,
@@ -47,6 +48,25 @@ function deadPid() {
 function lockPathFor(dir) {
   return path.join(dir, LOCK_FILE);
 }
+
+// --- formatLockDurationMs (tsk-5z2) -----------------------------------------
+
+test('formatLockDurationMs renders seconds-only under a minute', () => {
+  assert.equal(formatLockDurationMs(45_000), '45s');
+  assert.equal(formatLockDurationMs(0), '0s');
+});
+
+test('formatLockDurationMs renders minutes and seconds at or above a minute', () => {
+  assert.equal(formatLockDurationMs(135_000), '2m15s');
+  assert.equal(formatLockDurationMs(60_000), '1m0s');
+});
+
+test('formatLockDurationMs never fabricates a duration for non-numeric or negative input', () => {
+  assert.equal(formatLockDurationMs(null), 'unknown');
+  assert.equal(formatLockDurationMs(undefined), 'unknown');
+  assert.equal(formatLockDurationMs(-1), 'unknown');
+  assert.equal(formatLockDurationMs(NaN), 'unknown');
+});
 
 // --- acquire when free ------------------------------------------------------
 
@@ -119,6 +139,10 @@ test('does NOT reclaim a lock held by a live pid whose timestamp is within ttlMs
 
   assert.equal(res.status, HELD);
   assert.equal(res.holderPid, process.pid);
+  // tsk-5z2: age/remaining-TTL now ride along on HELD so a caller doesn't
+  // have to hand-compute them from the raw file.
+  assert.ok(res.lockAgeMs >= 500 && res.lockAgeMs < 60_000, `lockAgeMs ${res.lockAgeMs} should be ~500ms`);
+  assert.ok(res.remainingTtlMs > 0 && res.remainingTtlMs <= 60_000, `remainingTtlMs ${res.remainingTtlMs} should be close to but under 60000`);
 });
 
 test('falls back to pure PID-liveness when ttlMs is omitted (old timestamp, live pid, still held)', () => {
@@ -131,6 +155,10 @@ test('falls back to pure PID-liveness when ttlMs is omitted (old timestamp, live
 
   assert.equal(res.status, HELD);
   assert.equal(res.holderPid, process.pid);
+  // tsk-5z2: age is still knowable without a ttlMs; remaining-TTL is not --
+  // no staleness window was supplied, so it must be null, never fabricated.
+  assert.ok(res.lockAgeMs >= 10_000_000, `lockAgeMs ${res.lockAgeMs} should reflect the ~10,000,000ms-old timestamp`);
+  assert.equal(res.remainingTtlMs, null);
 });
 
 // --- ambiguous: corrupt/unparseable content ----------------------------------
@@ -144,6 +172,9 @@ test('reports AMBIGUOUS for an unparseable (non-JSON) lock file, never free or h
 
   assert.equal(res.status, AMBIGUOUS);
   assert.equal(res.holderPid, undefined);
+  // tsk-5z2: unparseable content means no record to read a timestamp from --
+  // lockAgeMs must be absent, never a fabricated number.
+  assert.equal(res.lockAgeMs, undefined);
   // the ambiguous file is left untouched -- never deleted, never treated as free
   assert.equal(fs.readFileSync(lockPathFor(dir), 'utf8'), 'not json at all {{{');
 });
@@ -234,6 +265,9 @@ test('checking a different string identity lock with no ttlMs supplied is AMBIGU
   const res = acquireMainCheckoutLock(dir, { identity: 'session-other' });
 
   assert.equal(res.status, AMBIGUOUS);
+  // tsk-5z2: the record itself parsed fine (only held-ness is undecidable
+  // without a ttlMs), so age is real and known even though this is AMBIGUOUS.
+  assert.ok(res.lockAgeMs >= 0 && res.lockAgeMs < 5000, `lockAgeMs ${res.lockAgeMs} should be small (record.ts was just now)`);
   // untouched -- neither reclaimed nor treated as held
   const record = JSON.parse(fs.readFileSync(lockPathFor(dir), 'utf8'));
   assert.equal(record.pid, 'session-holder');

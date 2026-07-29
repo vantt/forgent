@@ -43,6 +43,7 @@ import {
   ACQUIRED,
   HELD,
   DEFAULT_TTL_MS,
+  formatLockDurationMs,
 } from '../src/runner/main-checkout-lock.mjs';
 import { createSession, endSession, listSessions, reclaimOrphanedSessions, SessionError } from '../src/runner/session.mjs';
 import { resolveRoot } from '../src/runner/root-affinity.mjs';
@@ -2264,9 +2265,12 @@ async function runVerb(verb, flags, positional, dir) {
     case 'unlock': {
       const lockResult = acquireMainCheckoutLock(dir, { identity: process.pid, ttlMs: DEFAULT_TTL_MS });
       if (lockResult.status === HELD) {
+        const ttlPart = lockResult.remainingTtlMs != null
+          ? `, expires in ${formatLockDurationMs(lockResult.remainingTtlMs)}`
+          : ', no TTL window known';
         throw new StoreError(
           'lock-timeout',
-          `unlock: main checkout lock is held by a live session (${lockResult.holderPid}) -- refusing to clear it.`,
+          `unlock: main checkout lock is held by a live session (${lockResult.holderPid}, held ${formatLockDurationMs(lockResult.lockAgeMs)}${ttlPart}) -- refusing to clear it.`,
         );
       }
       if (lockResult.status === ACQUIRED) {

@@ -45,7 +45,7 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { branchNameFor, branchExists, reclaimOrphanedCheckout } from './worktree.mjs';
 import { runGoalCheck } from './goal-check.mjs';
-import { acquireMainCheckoutLock, HELD, AMBIGUOUS, DEFAULT_TTL_MS } from './main-checkout-lock.mjs';
+import { acquireMainCheckoutLock, HELD, AMBIGUOUS, DEFAULT_TTL_MS, formatLockDurationMs } from './main-checkout-lock.mjs';
 import { resolveWriterIdentity } from './session-identity.mjs';
 
 /** Raised only for a genuinely unexpected git failure (e.g. `git merge
@@ -331,7 +331,13 @@ export async function mergeRunnerItem(repoRoot, item, { timeoutMs } = {}) {
   const identity = resolveWriterIdentity(fgosDir).id;
   const lock = acquireMainCheckoutLock(fgosDir, { identity, ttlMs: DEFAULT_TTL_MS });
   if (lock.status === HELD) {
-    throw new MergeError(`cannot merge "${branch}": main checkout is locked by another live session (${lock.holderPid}).`, { branch });
+    const ttlPart = lock.remainingTtlMs != null
+      ? `, expires in ${formatLockDurationMs(lock.remainingTtlMs)}`
+      : ', no TTL window known';
+    throw new MergeError(
+      `cannot merge "${branch}": main checkout is locked by another live session (${lock.holderPid}, held ${formatLockDurationMs(lock.lockAgeMs)}${ttlPart}).`,
+      { branch },
+    );
   }
   if (lock.status === AMBIGUOUS) {
     throw new MergeError(`cannot merge "${branch}": main checkout lock is ambiguous (unparseable lock file) — refusing per fail-closed policy.`, { branch });
