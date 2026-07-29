@@ -368,6 +368,25 @@ export const COMMAND_REGISTRY = [
     deprecated: null,
   },
   {
+    name: 'merge',
+    invoke: 'fgos merge',
+    description: 'Merge-readiness ranking over proposed work items: "list" (read-only) returns which proposed items are ready to merge now (every dep already done, no footprint conflict) ordered by rankImpact, which are still waiting on an unmerged dep, and which are footprint-conflicted pairs (same shape as fgos conflicts).',
+    parameters: {
+      type: 'object',
+      properties: {
+        sub: { type: 'string', description: 'Sub-verb (positional).', enum: ['list'] },
+      },
+      positional: ['sub'],
+      required: ['sub'],
+    },
+    examples: ['fgos merge list'],
+    touchesState: false,
+    requiresExistingStore: false,
+    externalEffect: false,
+    paginated: false,
+    deprecated: null,
+  },
+  {
     name: 'rebuild',
     invoke: 'fgos rebuild',
     description: 'Rebuild the derived view (.fgos/state.json) from the event log.',

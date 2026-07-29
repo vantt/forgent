@@ -29,6 +29,7 @@ import { computeEntropy, computeCounts } from '../src/report/entropy.mjs';
 import { buildEnduserIndex, QUADRANTS, QUADRANT_DIR_ALIASES, findSourceCaptureIds } from '../src/report/enduser-index.mjs';
 import { rankCandidates } from '../src/evolve/candidates.mjs';
 import { rankImpact } from '../src/state/impact.mjs';
+import { mergeReadiness } from '../src/state/graph-harness.mjs';
 import { paginate } from '../src/state/cursor.mjs';
 import { runGoalCheck } from '../src/runner/goal-check.mjs';
 import { frozenJudgeHits } from '../src/runner/frozen-judge.mjs';
@@ -1091,6 +1092,22 @@ async function runVerb(verb, flags, positional, dir) {
     // re-slice; never mutates anything.
     case 'conflicts': {
       return footprintConflicts(dir);
+    }
+
+    // Request-class per D1 (same contract as `ready`/`triage`/`conflicts`): a
+    // pure read. Merge-readiness ranking (docs/history/merge-standardization/
+    // CONTEXT.md/plan.md): "list" surfaces which `proposed` items are
+    // actually ready to merge right now (dependency-wait gate clear, no
+    // footprint conflict), ordered by `rankImpact`, alongside which ones are
+    // still waiting on an unmerged dep and which are footprint-conflicted.
+    // Wraps `mergeReadiness` (`src/state/graph-harness.mjs`) — never
+    // reimplements the ranking here.
+    case 'merge': {
+      const sub = requireField(positional[0], 'merge requires a sub-verb: fgos merge <list>');
+      if (sub === 'list') {
+        return mergeReadiness(listWork(dir));
+      }
+      throw new StoreError('validation', `merge: unknown sub-verb "${sub}" (known: list).`);
     }
 
     case 'rebuild': {
