@@ -510,5 +510,13 @@
     "docPath": "docs/decisions/0023-uu-tien-san-pham-ship-dod-hoan-thien.md",
     "title": "0023 — Thứ tự ưu tiên sản phẩm: ship faster > DoD (result + docs) > hoàn thiện sau ngưỡng",
     "sourceCaptureId": null
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/decisions/0024-doi-ten-status-proposed-thanh-awaiting-approval.md",
+    "title": "0024 — Đổi tên status `proposed` thành `awaiting-approval`",
+    "sourceCaptureId": null
   }
 ]
