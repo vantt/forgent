@@ -159,6 +159,29 @@ function commitFile(cwd, filename, content = 'work\n') {
   execFileSync('git', ['commit', '-q', '-m', `work: ${filename}`], { cwd });
 }
 
+// tsk-4fu-2: a linked worktree of a real `.fgos`-inited, `.fgos`-committed
+// main checkout — mirrors what `createWorktree` (worktree.mjs, ADR0020)
+// actually produces: `git worktree add` checks out a snapshot of the
+// committed `.fgos/`, then that snapshot is deleted outright (never
+// symlinked, never kept), so the returned worktree cwd has no `.fgos/` at
+// all. Only the `requiresExistingStore`/`isMainWorktree` guard tests below
+// need this — every other worktree concern in this repo lives in
+// test/runner/worktree.test.mjs, not here.
+function tmpLinkedWorktreeCwd() {
+  const main = rawTmpCwd();
+  execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: main });
+  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: main });
+  execFileSync('git', ['config', 'user.name', 'Test'], { cwd: main });
+  assert.equal(run(main, ['init']).status, 0);
+  fs.writeFileSync(path.join(main, 'seed.txt'), 'seed\n');
+  execFileSync('git', ['add', '-A'], { cwd: main });
+  execFileSync('git', ['commit', '-q', '-m', 'seed'], { cwd: main });
+  const wt = `${main}-wt`;
+  execFileSync('git', ['worktree', 'add', '-b', 'tsk-4fu-2-guard-test', wt], { cwd: main });
+  fs.rmSync(path.join(wt, '.fgos'), { recursive: true, force: true });
+  return wt;
+}
+
 test('init creates .fgos/ with an empty log and a rebuilt (empty) view, exit 0', () => {
   const cwd = tmpCwd();
   const result = run(cwd, ['init']);
@@ -187,6 +210,48 @@ test('init in a git repo with a commit does not report gitHeadless', () => {
   assert.equal(result.status, 0);
   const initData = envelopeData(result.stdout);
   assert.equal(initData.gitHeadless, undefined);
+});
+
+// tsk-4fu-2: requiresExistingStore guard (command-registry.mjs) — a
+// state-write verb no longer silently auto-vivifies `.fgos/` via
+// appendEventCore's own mkdirSync when it's missing; it refuses instead.
+test('submit on a directory with no .fgos/ at all is refused, exit 4, writes nothing (no auto-vivify)', () => {
+  const cwd = rawTmpCwd();
+  assert.ok(!fs.existsSync(path.join(cwd, '.fgos')));
+  const result = run(cwd, ['submit', 'should never land']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /\.fgos\/ not found/);
+  assert.ok(!fs.existsSync(path.join(cwd, '.fgos')), 'the refused verb must not create .fgos/ as a side effect');
+});
+
+test('init inside a linked worktree is refused, exit 4 (ADR0020: worktrees never carry .fgos/)', () => {
+  const wt = tmpLinkedWorktreeCwd();
+  assert.ok(!fs.existsSync(path.join(wt, '.fgos')));
+  const result = run(wt, ['init']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /linked worktree/);
+  assert.ok(!fs.existsSync(path.join(wt, '.fgos')), 'the refused init must not create .fgos/ in the worktree');
+});
+
+test('init on a fresh directory that is not a linked worktree still succeeds, exit 0', () => {
+  const cwd = rawTmpCwd();
+  const result = run(cwd, ['init']);
+  assert.equal(result.status, 0);
+  assert.ok(fs.existsSync(path.join(cwd, '.fgos')));
+});
+
+test('session start inside a .fgos/-less linked worktree still succeeds (D10 symlink actor exempt from the requiresExistingStore guard)', () => {
+  const wt = tmpLinkedWorktreeCwd();
+  assert.ok(!fs.existsSync(path.join(wt, '.fgos')));
+  const result = run(wt, ['session', 'start']);
+  assert.equal(result.status, 0, `session start unexpectedly refused: ${result.stderr}`);
+});
+
+test('setup inside a .fgos/-less linked worktree still succeeds (setup never touches .fgos/, exempt from the guard)', () => {
+  const wt = tmpLinkedWorktreeCwd();
+  assert.ok(!fs.existsSync(path.join(wt, '.fgos')));
+  const result = run(wt, ['setup']);
+  assert.equal(result.status, 0, `setup unexpectedly refused: ${result.stderr}`);
 });
 
 test('add creates exactly one work.add event and the view reflects the new item, exit 0', () => {

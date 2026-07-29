@@ -338,6 +338,7 @@ export const COMMAND_REGISTRY = [
     parameters: { type: 'object', properties: {}, required: [] },
     examples: ['fgos gate-bypass'],
     touchesState: false,
+    requiresExistingStore: false,
     externalEffect: false,
     paginated: false,
     deprecated: null,
