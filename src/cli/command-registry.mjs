@@ -369,6 +369,26 @@ export const COMMAND_REGISTRY = [
     deprecated: null,
   },
   {
+    name: 'merge',
+    invoke: 'fgos merge',
+    description: '"list" (read-only) returns which proposed items are ready to merge now (every dep already done, no footprint conflict) ordered by rankImpact, which are still waiting on an unmerged dep, and which are footprint-conflicted pairs (same shape as fgos conflicts). "next" merges the single top-ranked ready item by recursing into the same approve logic (never a parallel merge path) -- if that item trips the Iron Law gate it reports which item and why and merges nothing, it never auto-acknowledges or falls through to the next-ranked item.',
+    parameters: {
+      type: 'object',
+      properties: {
+        sub: { type: 'string', description: 'Sub-verb (positional).', enum: ['list', 'next'] },
+        timeout: { type: 'integer', description: '"next" only: forwarded to the underlying approve call, same as approve --timeout.' },
+      },
+      positional: ['sub'],
+      required: ['sub'],
+    },
+    examples: ['fgos merge list', 'fgos merge next'],
+    touchesState: true,
+    requiresExistingStore: false,
+    externalEffect: false,
+    paginated: false,
+    deprecated: null,
+  },
+  {
     name: 'rebuild',
     invoke: 'fgos rebuild',
     description: 'Rebuild the derived view (.fgos/state.json) from the event log.',

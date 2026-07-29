@@ -3066,6 +3066,81 @@ test('pick on a leaf item whose root has no fgw/<rootId> branch yet forks from r
   assert.equal(stateView(cwd).work['orphan-leaf-item'].status, 'doing');
 });
 
+test('pick on a leaf item whose root DOES have a live fgw/<rootId> branch forks the leaf worktree from that branch tip, not from repoRoot HEAD (claim-port.mjs D3 leaf-vs-root split, positive path)', () => {
+  // The counterpart to the fallback test above: once fgw/<rootId> actually
+  // exists (e.g. an earlier sibling already merged into it), a leaf pick
+  // must fork FROM that tip — mirroring approve/review's own leaf-vs-root
+  // split (bin/fgos.mjs's D3 comment) — never from main/repoRoot HEAD,
+  // which would silently drop whatever the root branch already carries
+  // (the tsk-1wd-3 dogfood incident this item exists to close).
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  addOk(cwd, 'baseref-root-item', { title: 'Root Item' });
+  const dir = path.join(cwd, '.fgos');
+  addWork(dir, { id: 'baseref-leaf-item', title: 'Leaf Item', kind: 'task', status: 'todo', deps: [], risk: 'low', refs: [], verify: 'true', parent: 'baseref-root-item' });
+
+  // Give fgw/baseref-root-item a tip that genuinely differs from repoRoot's
+  // current HEAD (same tree, a distinct commit) so the assertion below can
+  // tell "forked from root branch" apart from "forked from HEAD" for real.
+  const tree = execFileSync('git', ['rev-parse', 'HEAD^{tree}'], { cwd, encoding: 'utf8' }).trim();
+  const rootTip = execFileSync('git', ['commit-tree', tree, '-p', 'HEAD', '-m', 'root progress'], { cwd, encoding: 'utf8' }).trim();
+  execFileSync('git', ['branch', 'fgw/baseref-root-item', rootTip], { cwd });
+  assert.notEqual(rootTip, gitHead(cwd), 'the root branch tip must genuinely differ from repoRoot HEAD for this test to prove anything');
+
+  const result = run(cwd, ['pick', '--id', 'baseref-leaf-item']);
+  assert.equal(result.status, 0, `pick failed: ${result.stderr}`);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.branchHeadAtTake, rootTip, 'a live root branch exists — the leaf must fork from ITS tip, not repoRoot HEAD');
+  assert.equal(data.worktree.branch, 'fgw/baseref-leaf-item');
+  assert.equal(
+    execFileSync('git', ['rev-parse', 'HEAD'], { cwd: data.worktree.path, encoding: 'utf8' }).trim(),
+    rootTip,
+    'the new worktree checkout itself must sit on the root branch tip, not main',
+  );
+});
+
+test('pick on a leaf item refuses the claim when a dep is not yet status:done, instead of forking a worktree that could be missing that dep\'s content (claim-port.mjs D2 sibling-merge-ordering guard, tsk-3t4)', () => {
+  // The tsk-1wd-3 dogfood scenario: a leaf picked directly by id (frontier
+  // bypass, claim-lock §3a) whose dep hasn't been approved/merged into
+  // fgw/<rootId> yet. Approve is the ONLY path a leaf dep reaches
+  // status:'done' through, and it never lands 'done' without first merging
+  // into the root branch (bin/fgos.mjs's leaf approve case) — so a dep
+  // that isn't 'done' yet is exactly the case that must be refused, not
+  // silently forked from a root branch missing that dep's content.
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  addOk(cwd, 'guard-root-item', { title: 'Root Item' });
+  addOk(cwd, 'guard-dep-item', { title: 'Dep Item' }); // left status: todo — never approved
+  const dir = path.join(cwd, '.fgos');
+  addWork(dir, {
+    id: 'guard-leaf-item',
+    title: 'Leaf Item',
+    kind: 'task',
+    status: 'todo',
+    deps: ['guard-dep-item'],
+    risk: 'low',
+    refs: [],
+    verify: 'true',
+    parent: 'guard-root-item',
+  });
+  const before = eventLines(cwd).length;
+
+  const result = run(cwd, ['pick', '--id', 'guard-leaf-item']);
+  assert.notEqual(result.status, 0, 'pick must refuse a leaf claim while a dep is not yet status:done');
+  assert.match(result.stderr, /guard-dep-item/, 'the refusal must name the unmerged dep');
+
+  // The refusal must be a clean no-op — never the "claimed to doing but no
+  // branch/worktree" orphan the 268b172 baseRef fix already closed once for
+  // a different cause: no event written, status untouched, no branch made.
+  assert.equal(eventLines(cwd).length, before, 'a refused claim must never write a claim event');
+  assert.equal(stateView(cwd).work['guard-leaf-item'].status, 'todo');
+  assert.equal(
+    execFileSync('git', ['branch', '--list', 'fgw/guard-leaf-item'], { cwd, encoding: 'utf8' }).trim(),
+    '',
+    'a refused claim must never create the leaf\'s own branch',
+  );
+});
+
 test('return happy path: verify passes -> doing to proposed, actual outcome recorded, no settlement (settlement belongs to the -> done edge)', () => {
   const cwd = initGitCwd();
   run(cwd, ['init']);
@@ -5787,6 +5862,129 @@ test('conflicts verb on a store with no overlaps: empty list, exit 0', () => {
   assert.equal(run(cwd, ['init']).status, 0);
   assert.equal(addOk(cwd, 'a').status, 0); // no footprint
   assert.deepEqual(envelopeData(run(cwd, ['conflicts']).stdout), []);
+});
+
+// --- tsk-4j9-3: `fgos merge list` (merge-readiness ranking) ---------------
+
+test('merge list: unknown sub-verb is rejected as validation, exit 4', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0);
+  const result = run(cwd, ['merge', 'bogus']);
+  assert.equal(result.status, 4);
+});
+
+test('merge list on an empty store: empty ready/waiting/conflicts, exit 0, no event appended', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0);
+  const before = eventLines(cwd).length;
+  const result = run(cwd, ['merge', 'list']);
+  assert.equal(result.status, 0);
+  assert.deepEqual(envelopeData(result.stdout), { ready: [], waiting: [], conflicts: [] });
+  assert.equal(eventLines(cwd).length, before, 'merge list must not append any event');
+});
+
+test('merge list: a proposed item whose dep is already done is ready', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0);
+  // Built explicitly (not via toCompoundLearn/addOk) so --verify is a
+  // trivially-passing command: addOk's default ('npm test') has no
+  // package.json to run against in this bare sandbox, so approve would
+  // park it 'blocked' instead of 'done' — a false negative for this test.
+  assert.equal(run(cwd, ['add', 'dep', '--title', 'Dep', '--kind', 'task', '--risk', 'low', '--verify', 'true']).status, 0);
+  assert.equal(run(cwd, ['move', 'dep', '--to', 'doing']).status, 0);
+  assert.equal(run(cwd, ['move', 'dep', '--to', 'proposed']).status, 0);
+  assert.equal(run(cwd, ['compound', 'dep']).status, 0);
+  const approveResult = envelopeData(run(cwd, ['approve', 'dep']).stdout);
+  assert.equal(approveResult.to, 'done', `expected dep to reach done, got: ${JSON.stringify(approveResult)}`);
+  assert.equal(run(cwd, ['add', 'leaf', '--title', 'Leaf', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--deps', 'dep']).status, 0);
+  toProposed(cwd, 'leaf');
+  const data = envelopeData(run(cwd, ['merge', 'list']).stdout);
+  assert.deepEqual(data, { ready: ['leaf'], waiting: [], conflicts: [] });
+});
+
+test('merge list: a proposed item whose dep is NOT done waits, never ready', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0);
+  assert.equal(addOk(cwd, 'dep').status, 0); // stays todo
+  assert.equal(run(cwd, ['add', 'leaf', '--title', 'Leaf', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--deps', 'dep']).status, 0);
+  toProposed(cwd, 'leaf');
+  const data = envelopeData(run(cwd, ['merge', 'list']).stdout);
+  assert.deepEqual(data, { ready: [], waiting: ['leaf'], conflicts: [] });
+});
+
+test('merge list: two dep-clear proposed items sharing a footprint are excluded from ready and listed as conflicts', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0);
+  assert.equal(run(cwd, ['add', 'a', '--title', 'A', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--footprint', 'src/x.mjs']).status, 0);
+  assert.equal(run(cwd, ['add', 'b', '--title', 'B', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--footprint', 'src/x.mjs']).status, 0);
+  toProposed(cwd, 'a');
+  toProposed(cwd, 'b');
+  const data = envelopeData(run(cwd, ['merge', 'list']).stdout);
+  assert.deepEqual(data.ready, []);
+  assert.deepEqual(data.conflicts, [{ a: 'a', b: 'b', shared: ['src/x.mjs'], suggestions: ['sequence', 'hoist', 're-slice'] }]);
+});
+
+// --- tsk-4j9-4: `fgos merge next` (merge-readiness automation) -----------
+
+test('merge next on an empty store: reports nothing ready, exit 0, no merge attempted', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0);
+  const result = run(cwd, ['merge', 'next']);
+  assert.equal(result.status, 0);
+  assert.deepEqual(envelopeData(result.stdout), { picked: null, reason: 'nothing ready to merge' });
+});
+
+test('merge next merges the single ready item by recursing into approve, item reaches done', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0);
+  // Explicit --verify true (not addOk's 'npm test' default) -- same
+  // sandbox pitfall documented in docs/how-to/add-a-read-only-fgos-verb-
+  // and-plugin-skill.md.
+  assert.equal(run(cwd, ['add', 'solo', '--title', 'Solo', '--kind', 'task', '--risk', 'low', '--verify', 'true']).status, 0);
+  assert.equal(run(cwd, ['move', 'solo', '--to', 'doing']).status, 0);
+  assert.equal(run(cwd, ['move', 'solo', '--to', 'proposed']).status, 0);
+  assert.equal(run(cwd, ['compound', 'solo']).status, 0);
+
+  const result = run(cwd, ['merge', 'next']);
+  assert.equal(result.status, 0, `${result.stdout}${result.stderr}`);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.picked, 'solo');
+  assert.equal(data.approve.to, 'done', `expected the picked item to reach done: ${JSON.stringify(data)}`);
+  assert.equal(stateView(cwd).work.solo.status, 'done');
+});
+
+test('merge next picks the higher-ranked (mvp goalTier) item first when two are ready', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0);
+  for (const id of ['plain', 'important']) {
+    assert.equal(run(cwd, ['add', id, '--title', id, '--kind', 'task', '--risk', 'low', '--verify', 'true', ...(id === 'important' ? ['--goal-tier', 'mvp'] : [])]).status, 0);
+    assert.equal(run(cwd, ['move', id, '--to', 'doing']).status, 0);
+    assert.equal(run(cwd, ['move', id, '--to', 'proposed']).status, 0);
+    assert.equal(run(cwd, ['compound', id]).status, 0);
+  }
+  const data = envelopeData(run(cwd, ['merge', 'next']).stdout);
+  assert.equal(data.picked, 'important', 'the mvp-goalTier item outranks the plain one per rankImpact');
+});
+
+test('merge next on a runner-sourced pick that trips the Iron Law: reports blocked, merges nothing, never auto-acknowledges', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeRunnerProposedItemTouching(cwd, 'iron-next-item', 'src/runner/probe.mjs', {
+    verify: 'test -f src/runner/probe.mjs',
+  });
+
+  const headBefore = gitHead(cwd);
+  const result = run(cwd, ['merge', 'next']);
+  assert.equal(result.status, 0, `merge next itself must not exit non-zero on a blocked pick: ${result.stdout}${result.stderr}`);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.picked, 'iron-next-item');
+  assert.equal(data.blocked, 'iron-law');
+  assert.match(data.message, /Iron Law/);
+
+  assert.equal(stateView(cwd).work['iron-next-item'].status, 'proposed', 'a blocked pick leaves the item proposed');
+  assert.equal(gitHead(cwd), headBefore, 'a blocked pick attempts no merge -- HEAD is unchanged');
+  const survivingBranches = gitAtCwd(cwd, ['for-each-ref', '--format=%(refname:short)', 'refs/heads/']);
+  assert.match(survivingBranches, /fgw\/iron-next-item/, 'the branch survives -- nothing was merged or cleaned up');
 });
 
 // --- str73-done-flip-cos-check cell 1: --acceptance on add/submit/edit ----
