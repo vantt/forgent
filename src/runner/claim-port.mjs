@@ -58,6 +58,7 @@ const CLAIM_ERROR_CATEGORY = Object.freeze({
   'not-found': 'validation',
   'lock-held': 'lock-timeout',
   'lock-ambiguous': 'lock-timeout',
+  'deps-not-merged': 'validation',
 });
 
 export class ClaimError extends Error {
@@ -133,6 +134,29 @@ export function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoot = pr
     const rootBranch = isLeaf ? branchNameFor(rootId) : undefined;
     const rootBranchExists = isLeaf && branchExists(repoRoot, rootBranch);
     const baseRef = rootBranchExists ? rootBranch : undefined;
+
+    // Sibling-merge-ordering guard (D2, tsk-3t4): isolating a leaf forks a
+    // NEW branch/worktree from baseRef right now (below) — unlike `take`
+    // (isolate: false), which never forks anything and so can't hit this.
+    // A leaf's own dep reaching `status: 'done'` is only possible through
+    // `approve`'s leaf path, which never lands `done` without first
+    // merging that dep's branch into `rootBranch` (bin/fgos.mjs's leaf
+    // `approve` case) — so `done` on every dep already guarantees their
+    // content is on `rootBranch` by the time this leaf forks from it.
+    // Checked and refused BEFORE moveWork below, on purpose: passing a
+    // baseRef/expectation that later fails AFTER moveWork has committed is
+    // exactly the orphaning bug `268b172` already fixed once for a
+    // nonexistent baseRef — refusing here keeps this a clean no-op claim
+    // instead of repeating that failure mode for a different cause.
+    if (isolate && isLeaf) {
+      const unmergedDeps = (item.deps ?? []).filter((dep) => view.work[dep]?.status !== 'done');
+      if (unmergedDeps.length > 0) {
+        throw new ClaimError(
+          'deps-not-merged',
+          `claimWork: leaf "${id}" has dep(s) not yet status:done — ${unmergedDeps.join(', ')} — forking from "${rootBranch}" now risks missing their content; approve/merge them into "${rootBranch}" first.`,
+        );
+      }
+    }
 
     // Branch reuse: if branch exists, get its HEAD; otherwise use current HEAD.
     // For leaves, try root branch if it exists; fall back to current HEAD if not

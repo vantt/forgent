@@ -3066,6 +3066,81 @@ test('pick on a leaf item whose root has no fgw/<rootId> branch yet forks from r
   assert.equal(stateView(cwd).work['orphan-leaf-item'].status, 'doing');
 });
 
+test('pick on a leaf item whose root DOES have a live fgw/<rootId> branch forks the leaf worktree from that branch tip, not from repoRoot HEAD (claim-port.mjs D3 leaf-vs-root split, positive path)', () => {
+  // The counterpart to the fallback test above: once fgw/<rootId> actually
+  // exists (e.g. an earlier sibling already merged into it), a leaf pick
+  // must fork FROM that tip — mirroring approve/review's own leaf-vs-root
+  // split (bin/fgos.mjs's D3 comment) — never from main/repoRoot HEAD,
+  // which would silently drop whatever the root branch already carries
+  // (the tsk-1wd-3 dogfood incident this item exists to close).
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  addOk(cwd, 'baseref-root-item', { title: 'Root Item' });
+  const dir = path.join(cwd, '.fgos');
+  addWork(dir, { id: 'baseref-leaf-item', title: 'Leaf Item', kind: 'task', status: 'todo', deps: [], risk: 'low', refs: [], verify: 'true', parent: 'baseref-root-item' });
+
+  // Give fgw/baseref-root-item a tip that genuinely differs from repoRoot's
+  // current HEAD (same tree, a distinct commit) so the assertion below can
+  // tell "forked from root branch" apart from "forked from HEAD" for real.
+  const tree = execFileSync('git', ['rev-parse', 'HEAD^{tree}'], { cwd, encoding: 'utf8' }).trim();
+  const rootTip = execFileSync('git', ['commit-tree', tree, '-p', 'HEAD', '-m', 'root progress'], { cwd, encoding: 'utf8' }).trim();
+  execFileSync('git', ['branch', 'fgw/baseref-root-item', rootTip], { cwd });
+  assert.notEqual(rootTip, gitHead(cwd), 'the root branch tip must genuinely differ from repoRoot HEAD for this test to prove anything');
+
+  const result = run(cwd, ['pick', '--id', 'baseref-leaf-item']);
+  assert.equal(result.status, 0, `pick failed: ${result.stderr}`);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.branchHeadAtTake, rootTip, 'a live root branch exists — the leaf must fork from ITS tip, not repoRoot HEAD');
+  assert.equal(data.worktree.branch, 'fgw/baseref-leaf-item');
+  assert.equal(
+    execFileSync('git', ['rev-parse', 'HEAD'], { cwd: data.worktree.path, encoding: 'utf8' }).trim(),
+    rootTip,
+    'the new worktree checkout itself must sit on the root branch tip, not main',
+  );
+});
+
+test('pick on a leaf item refuses the claim when a dep is not yet status:done, instead of forking a worktree that could be missing that dep\'s content (claim-port.mjs D2 sibling-merge-ordering guard, tsk-3t4)', () => {
+  // The tsk-1wd-3 dogfood scenario: a leaf picked directly by id (frontier
+  // bypass, claim-lock §3a) whose dep hasn't been approved/merged into
+  // fgw/<rootId> yet. Approve is the ONLY path a leaf dep reaches
+  // status:'done' through, and it never lands 'done' without first merging
+  // into the root branch (bin/fgos.mjs's leaf approve case) — so a dep
+  // that isn't 'done' yet is exactly the case that must be refused, not
+  // silently forked from a root branch missing that dep's content.
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  addOk(cwd, 'guard-root-item', { title: 'Root Item' });
+  addOk(cwd, 'guard-dep-item', { title: 'Dep Item' }); // left status: todo — never approved
+  const dir = path.join(cwd, '.fgos');
+  addWork(dir, {
+    id: 'guard-leaf-item',
+    title: 'Leaf Item',
+    kind: 'task',
+    status: 'todo',
+    deps: ['guard-dep-item'],
+    risk: 'low',
+    refs: [],
+    verify: 'true',
+    parent: 'guard-root-item',
+  });
+  const before = eventLines(cwd).length;
+
+  const result = run(cwd, ['pick', '--id', 'guard-leaf-item']);
+  assert.notEqual(result.status, 0, 'pick must refuse a leaf claim while a dep is not yet status:done');
+  assert.match(result.stderr, /guard-dep-item/, 'the refusal must name the unmerged dep');
+
+  // The refusal must be a clean no-op — never the "claimed to doing but no
+  // branch/worktree" orphan the 268b172 baseRef fix already closed once for
+  // a different cause: no event written, status untouched, no branch made.
+  assert.equal(eventLines(cwd).length, before, 'a refused claim must never write a claim event');
+  assert.equal(stateView(cwd).work['guard-leaf-item'].status, 'todo');
+  assert.equal(
+    execFileSync('git', ['branch', '--list', 'fgw/guard-leaf-item'], { cwd, encoding: 'utf8' }).trim(),
+    '',
+    'a refused claim must never create the leaf\'s own branch',
+  );
+});
+
 test('return happy path: verify passes -> doing to proposed, actual outcome recorded, no settlement (settlement belongs to the -> done edge)', () => {
   const cwd = initGitCwd();
   run(cwd, ['init']);

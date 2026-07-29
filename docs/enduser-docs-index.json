@@ -195,6 +195,14 @@
     "quadrant": "explanation",
     "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
     "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/pick-leaf-fork-and-sibling-merge-guard.md",
+    "title": "Why a leaf claim can now be refused, and why status:done already proves the merge happened",
+    "sourceCaptureId": "tsk-3t4"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/explanation/runner-execution-safety.md",
     "title": "Design safeguards in fgOS's runner — anti-loop breakers, model-judgment fail-safes, and guard ordering",
     "sourceCaptureId": null
