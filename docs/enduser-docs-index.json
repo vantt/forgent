@@ -1,5 +1,13 @@
 [
   {
+    "quadrant": "tutorials",
+    "purpose": "Teach a newcomer to complete a first real task, learning by doing.",
+    "audience": "A first-time user with no prior context on this system.",
+    "docPath": "docs/tutorials/walking-a-heavy-item-through-a-3-child-split.md",
+    "title": "Walking a heavy fgOS item through clarify, a 3-child split, and done",
+    "sourceCaptureId": "tsk-3wr"
+  },
+  {
     "quadrant": "how-to",
     "purpose": "Show the steps to accomplish one specific, already-understood goal.",
     "audience": "A user who already knows the system and wants a concrete recipe.",
@@ -22,6 +30,14 @@
     "docPath": "docs/how-to/diagnose-a-blocked-return-from-an-unrelated-verify-failure.md",
     "title": "How to diagnose a `fgos return` blocked by a verify failure unrelated to your change",
     "sourceCaptureId": "tsk-3wr-1"
+  },
+  {
+    "quadrant": "reference",
+    "purpose": "Describe the machinery accurately and completely for lookup.",
+    "audience": "A user who needs precise facts about a specific field/command/API.",
+    "docPath": "docs/reference/gate-bypass-config.md",
+    "title": "Gate-bypass config",
+    "sourceCaptureId": "tsk-6bx-1"
   },
   {
     "quadrant": "reference",
