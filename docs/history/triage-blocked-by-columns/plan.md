@@ -88,9 +88,13 @@ working mechanical verify path, this plan does not redesign that — it only
 names the command that proves this item done:
 
 ```
-npm test -- --test-name-pattern="rankImpact"
+node --test --test-name-pattern="rankImpact" test/state/impact.test.mjs
 ```
 
-for the data-layer change, broadened to a full `npm test` run before
+for the data-layer change (verified during fgos-validating: 22/22 pass on
+the pre-change suite — `npm test -- --test-name-pattern=...` does NOT
+scope as expected, it silently runs the full suite instead; use the
+`node --test` form directly), broadened to a full `npm test` run before
 `return` (existing-covered-behavior flag means the whole suite, not just
-the new cases, must stay green).
+the new cases, must stay green — confirmed clean pre-change: 1706 pass, 0
+fail, 5 skipped).
