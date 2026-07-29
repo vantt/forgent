@@ -2,14 +2,16 @@
 
 ## Feature boundary
 
-`tsk-5z2`: today, every failure path that reports a held/ambiguous lock in
-the wx-atomic-create + stale-pid-reclaim lock lineage prints the holder's
-identity only (`pid <id>`). The caller cannot tell a legitimately-live
-hold apart from a stale one without manually reading the raw lock file and
-hand-computing `now - ts` against the relevant `DEFAULT_TTL_MS`. This item
-gives the caller that answer directly: lock age and remaining TTL,
+`tsk-5z2`: today, `.fgos/main-checkout.lock`'s failure paths print the
+holder's identity only (`pid <id>`). The caller cannot tell a
+legitimately-live hold apart from a stale one without manually reading the
+raw lock file and hand-computing `now - ts` against `DEFAULT_TTL_MS`. This
+item gives the caller that answer directly: lock age and remaining TTL,
 surfaced both inline in the existing failure messages and through a new
-read-only status verb, across all four locks in the lineage.
+read-only status verb. Scoped to `main-checkout.lock` only (D5) — the
+other three locks sharing this lock lineage (`runner.lock`,
+`sessions.lock`, `events.lock`) have no `ttlMs`/staleness-window concept
+at all, so this item does not touch them.
 
 Depends on `tsk-3h4` (the `fgos unlock` verb) — landed (`stage:
 compound-learn`, `docsRef: docs/history/fgos-unlock-main-checkout-lock/`).
@@ -24,7 +26,8 @@ this.
 | D1 | Ships both an inline error-text augmentation (age/remaining-TTL folded into the existing HELD/AMBIGUOUS failure messages) **and** a new read-only status verb for on-demand inspection outside a failed call — not one or the other. |
 | D2 | Both currently-identity-only failure surfaces get the fix: `claim-port.mjs`'s `ClaimError` (`lock-held`/`lock-ambiguous`, the take/pick path named in the item title) and `unlock`'s own refusal message (`bin/fgos.mjs:2269`) — same underlying lock-check result, same gap, both get it. |
 | D3 | Surfaced content is both lock age (time since the record's `ts`) and remaining TTL (time until the lock is eligible for reclaim) — not just one of the two. |
-| D4 | Scope generalizes to all four locks sharing this lineage — `.fgos/main-checkout.lock` (`src/runner/main-checkout-lock.mjs`), `runner.lock` (`src/runner/loop.mjs`), `sessions.lock` (`src/runner/session.mjs`), `events.lock` (`src/state/events.mjs`) — not `main-checkout.lock` alone. This reverses tsk-3h4's own D3 (which scoped narrow and deferred generalization to "a future item if that need shows up") — this item is that future item, confirmed against user, not assumed. |
+| D4 | ~~Scope generalizes to all four locks sharing this lineage~~ — **superseded by D5**. |
+| D5 (supersedes D4) | Scope narrows back to `.fgos/main-checkout.lock` only, matching the item's original title. Validating's reality gate found `runner.lock` (`loop.mjs:204-276`), `sessions.lock` (`session.mjs:191-219`, `141`), and `events.lock` (`events.mjs:211-227`, `215`) all write a bare pid string to disk — no `ts` field, and none of their acquire functions accept a `ttlMs`/staleness-window parameter. `ttlMs` is a documented divergence unique to `main-checkout-lock.mjs` (its own header comment: "THREE divergences from the mirrored lineage"). Lock *age* would still be recoverable for the siblings via file mtime with no format change, but remaining-*TTL* has no existing value to compute against for them — inventing one is a new staleness-policy decision for those three locks (which would also change their stale-reclaim behavior, not just reporting), out of scope for this item. Confirmed against user rather than worked around silently. |
 
 ## Pinned terms
 
@@ -34,14 +37,15 @@ this.
   `main-checkout-lock.mjs`, currently 3 minutes — the item's own
   description cites 5 minutes, which is stale; confirmed against
   `main-checkout-lock.mjs:68` and its own changelog comment, lowered
-  2026-07-29 by an unrelated fix). For locks without a caller-supplied
-  `ttlMs` (verified below — some sibling call sites omit it, pure
-  PID-liveness only), remaining-TTL is not computable; only age is shown
-  for those.
+  2026-07-29 by an unrelated fix). Out of scope per D5: `runner.lock`,
+  `sessions.lock`, `events.lock` have no `ttlMs` concept at all (pure
+  PID-liveness), so remaining-TTL is not computable there.
 - **"the lineage"** = the wx-atomic-create + stale-pid-reclaim lock
   pattern shared by all four locks (documented at
   `main-checkout-lock.mjs:1-14`'s own header, calling itself "a FOURTH,
   wholly independent instance" of the pattern already proven three times).
+  Sharing the lineage does not mean sharing every field: only
+  `main-checkout-lock.mjs` stores `ts` and accepts `ttlMs` (D5).
 
 ## Scout evidence
 
@@ -61,52 +65,36 @@ this.
   (`{ status: HELD, holderPid, lockPath }`) drops it; only `holderPid`
   survives to the caller. Age/remaining-TTL are computable today without
   new file-read plumbing, purely by widening this return shape.
-- `src/runner/loop.mjs:230-275,930-931` — sibling lock, same
-  `holderPid`-only shape returned from its own acquire attempt
-  (`acquireRunnerLock`), same identity-only message at line 930.
-- `src/runner/session.mjs:150-184,213-214` — same pattern
-  (`acquireSessionsLock`), identity-only message at line 213.
-- `src/state/events.mjs:220-230+` — same lineage (`acquireEventsLock`,
-  per this file's own lineage-note comment at lines 23-36 cited by
-  `main-checkout-lock.mjs`'s header).
+- `src/runner/loop.mjs:204-276` (`acquireRunnerLock`) — writes only
+  `String(pid)` to `runner.lock` (line 212); no `ts` field, no `ttlMs`
+  parameter. Confirms D5.
+- `src/runner/session.mjs:191-219`, `141` (`acquireSessionsLock`) — same:
+  bare pid string, `timeoutMs`/`retryMs` are the *caller's own* blocking
+  retry budget, not a staleness window on the lock itself. Confirms D5.
+- `src/state/events.mjs:211-227`, `215` (`tryAcquireEventsLockOnce`) —
+  same bare-pid shape; guards `appendEvent`'s cross-process writes to
+  `.fgos/events.jsonl`, held only for the duration of a single append
+  (`EVENTS_LOCK_TIMEOUT_MS = 2000`). Confirms D5.
 - `docs/history/fgos-unlock-main-checkout-lock/CONTEXT.md` — tsk-3h4's own
   decision doc; D3 explicitly scoped generalization to the other three
   locks out, calling it "a bigger surface than the item's title asked
-  for" and leaving it for "a future item" — this item is that future
-  item (D4 above), not an assumption.
+  for" and leaving it for "a future item" — this item tried to be that
+  future item (original D4) but reverted (D5) once the siblings' actual
+  lock-file shape ruled out an honest, symmetric fix.
 
 ## Canonical references
 
 - `src/runner/main-checkout-lock.mjs`
 - `src/runner/claim-port.mjs`
-- `src/runner/loop.mjs`
-- `src/runner/session.mjs`
-- `src/state/events.mjs`
 - `bin/fgos.mjs` (`case 'unlock'`, `COMMAND_REGISTRY` — where a new status
   verb would register)
 - `docs/history/fgos-unlock-main-checkout-lock/CONTEXT.md` (tsk-3h4,
-  D3 precedent this item reverses)
+  D3 precedent this item originally tried to extend, per D5 above)
 
 ## Outstanding questions deferred to planning
 
-- Exact status-verb name/flags (e.g. `fgos lock-status [--lock
-  main-checkout|runner|sessions|events]` vs one verb per lock vs a single
-  verb reporting all four at once) — implementation shape, not a product
-  decision.
+- Exact status-verb name/flags (e.g. `fgos lock-status`) — implementation
+  shape, not a product decision.
 - Exact wording/units for the augmented error messages and the new verb's
   output (raw milliseconds vs a human-readable duration like `2m15s`) —
   implementation detail.
-- Whether each lock's own acquire function needs its return shape widened
-  (e.g. `HELD` gaining `lockAgeMs`/`remainingTtlMs` fields) individually,
-  or a small shared helper is introduced — given each of the four lock
-  modules is deliberately independent/zero-dep by design (per
-  `main-checkout-lock.mjs`'s own header comment), whether that
-  independence extends to this new reporting logic or a shared
-  formatting-only helper is acceptable is a shaping call for planning.
-- Confirmed during scouting, not deferred: not every sibling call site
-  supplies `ttlMs` to its lock acquire call — planning should verify which
-  of the four call sites (`claim-port.mjs`, `loop.mjs`'s runner-lock
-  caller, `session.mjs`'s caller, `events.mjs`'s caller) actually pass a
-  TTL window today, since remaining-TTL is only computable where one is
-  supplied (pinned term above); a call site with no `ttlMs` shows age
-  only, not a gap in this item's scope.
