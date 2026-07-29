@@ -58,10 +58,14 @@ export const LOCK_FILE = 'main-checkout.lock';
 // forever (D5 fail-closed), permanently deadlocking every take/pick after
 // the very first commit once the hook is active. Historical STR65 incidents
 // (docs/history/str65-worktree-isolation-enforcement/reports/
-// validation-phase1.md) showed real inter-commit gaps of ~2-3.5 minutes; 5
-// minutes clears that with a thinner margin than an earlier 10-minute value,
-// accepted for self-healing an abandoned lock sooner.
-export const DEFAULT_TTL_MS = 5 * 60 * 1000;
+// validation-phase1.md) showed real inter-commit gaps of ~2-3.5 minutes.
+// Lowered from 5 to 3 minutes (accepted trade-off, 2026-07-29): margin is
+// now thinner than that observed 3.5-minute worst case, so a genuinely slow
+// commit can self-expire and race a second writer — accepted for faster
+// self-healing of an abandoned lock. Use FGOS_MAIN_CHECKOUT_LOCK_TTL_MS to
+// widen the window for a specific session/CI run instead of raising this
+// default back up.
+export const DEFAULT_TTL_MS = 3 * 60 * 1000;
 
 export const ACQUIRED = 'acquired';
 export const HELD = 'held-by-live-other-pid';
@@ -257,4 +261,49 @@ export function releaseMainCheckoutLock(dir) {
   } catch (err) {
     if (err.code !== 'ENOENT') throw err;
   }
+}
+
+/**
+ * Clears an AMBIGUOUS `.fgos/main-checkout.lock` (unparseable content) --
+ * the one status `acquireMainCheckoutLock` deliberately never unlinks
+ * itself (D5 fail-closed). Unlike a stale numeric-pid lock, an ambiguous
+ * one has no liveness signal to probe, so this never runs on a caller's
+ * own judgment alone -- only on content still unparseable at the moment of
+ * a second read, mirroring `tryAcquireOnce`'s own re-read-before-unlink
+ * discipline for the stale-pid branch (this file, lines 173-192): the
+ * first read may be racing a legitimate holder who is mid-write of a
+ * fresh, valid record.
+ *
+ * Never touches a lock that parses (that is HELD or ACQUIRED territory,
+ * already handled by acquireMainCheckoutLock -- this function's only job
+ * is the gap that primitive leaves open).
+ *
+ * Returns `{ status }` where status is one of:
+ *   - 'already-clear'    -- no lock file present
+ *   - 'no-longer-ambiguous' -- content now parses; a live holder wrote a
+ *     valid record between the caller's own read and this call; untouched
+ *   - 'reclaimed'         -- content still unparseable on the second read;
+ *     removed
+ */
+export function forceReclaimAmbiguousLock(dir) {
+  const lockPath = path.join(dir, LOCK_FILE);
+
+  let raw;
+  try {
+    raw = fs.readFileSync(lockPath, 'utf8');
+  } catch (err) {
+    if (err.code === 'ENOENT') return { status: 'already-clear' };
+    throw err;
+  }
+
+  if (parseLockContent(raw) !== null) {
+    return { status: 'no-longer-ambiguous' };
+  }
+
+  try {
+    fs.unlinkSync(lockPath);
+  } catch (err) {
+    if (err.code !== 'ENOENT') throw err;
+  }
+  return { status: 'reclaimed' };
 }

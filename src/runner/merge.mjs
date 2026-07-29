@@ -46,6 +46,8 @@ import { execFileSync } from 'node:child_process';
 import { branchNameFor, branchExists, reclaimOrphanedCheckout } from './worktree.mjs';
 import { runGoalCheck } from './goal-check.mjs';
 import { normalizePath } from './frozen-judge.mjs';
+import { acquireMainCheckoutLock, HELD, AMBIGUOUS, DEFAULT_TTL_MS } from './main-checkout-lock.mjs';
+import { resolveWriterIdentity } from './session-identity.mjs';
 
 /** Raised only for a genuinely unexpected git failure (e.g. `git merge
  * --abort` itself failing) — never for a conflict or a red verify, which are
@@ -339,6 +341,44 @@ export function changedFiles(repoRoot, item, opts = {}) {
 export async function mergeRunnerItem(repoRoot, item, { timeoutMs } = {}) {
   const branch = branchNameFor(item.id);
 
+  // The pre-commit hook only locks the final `git commit` — everything
+  // before it (`git merge --no-commit`, the .fgos-write check, verify) ran
+  // unprotected, so a concurrent session's own merge/commit could land in
+  // that window and resolve MERGE_HEAD out from under this one (observed:
+  // "no merge to abort" on the *abort* call itself, not just the commit).
+  // Acquiring here, before the first git call, closes that gap by holding
+  // the same lock the hook already enforces for the commit alone — same
+  // identity (`resolveWriterIdentity`) as the hook resolves inside the
+  // child `git commit` process it spawns, so D6 self-recognition lets that
+  // later, in-process-tree acquisition succeed as a refresh, never a
+  // self-deadlock — true whenever an env session id resolves the identity
+  // (the primary path; every session actually contending on this checkout
+  // observed during this fix carried one). The bare-terminal ancestor-walk
+  // fallback (session-identity.mjs) resolves relative to each process's OWN
+  // pid, so this call (from the approve process) and the hook's later call
+  // (from its own child pid, several hops deeper) are not guaranteed to
+  // land on the same ancestor and could in principle self-refuse. This is
+  // the same "best-effort only" limitation session-identity.mjs already
+  // documents for that fallback, now newly reachable from here too — not a
+  // regression in kind, just a second call site inheriting a known gap.
+  const fgosDir = path.join(repoRoot, '.fgos');
+  const identity = resolveWriterIdentity(fgosDir).id;
+  const lock = acquireMainCheckoutLock(fgosDir, { identity, ttlMs: DEFAULT_TTL_MS });
+  if (lock.status === HELD) {
+    throw new MergeError(`cannot merge "${branch}": main checkout is locked by another live session (${lock.holderPid}).`, { branch });
+  }
+  if (lock.status === AMBIGUOUS) {
+    throw new MergeError(`cannot merge "${branch}": main checkout lock is ambiguous (unparseable lock file) — refusing per fail-closed policy.`, { branch });
+  }
+
+  try {
+    return await mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs });
+  } finally {
+    lock.release();
+  }
+}
+
+async function mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs }) {
   try {
     git(repoRoot, ['merge', '--no-commit', '--no-ff', branch]);
   } catch (err) {
@@ -379,6 +419,14 @@ export async function mergeRunnerItem(repoRoot, item, { timeoutMs } = {}) {
   try {
     git(repoRoot, ['commit', '--no-edit']);
   } catch (err) {
+    try {
+      git(repoRoot, ['merge', '--abort']);
+    } catch (abortErr) {
+      throw new MergeError(
+        `verify passed for "${branch}" but "git commit" failed, and "git merge --abort" itself failed: ${abortErr.message} (commit error: ${err.message})`,
+        { branch },
+      );
+    }
     throw new MergeError(`verify passed for "${branch}" but "git commit" failed: ${err.message}`, { branch });
   }
   return { outcome: 'merged', branch, check };

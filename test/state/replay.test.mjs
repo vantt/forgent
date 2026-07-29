@@ -111,7 +111,7 @@ test('rebuildView reads through events.mjs readEvents and returns [] work for an
   assert.deepEqual(view, { work: {}, decisions: [] });
 });
 
-test('rebuildView twice from the same log produces deep-equal views (D3 determinism)', () => {
+test('rebuildView twice from the same log produces deep-equal views (determinism)', () => {
   const logPath = tmpLogPath();
   appendEvent(logPath, { type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo' } });
   appendEvent(logPath, { type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing' } });
@@ -196,7 +196,7 @@ test('foldEvents on a log with no gate (ask/answer) events yields a view with no
   assert.equal('gates' in view, false);
 });
 
-test('foldEvents applies work.stage to set item.stage (per stage-clarify D1)', () => {
+test('foldEvents applies work.stage to set item.stage', () => {
   const events = [
     { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo', stage: 'clarify' } },
     { seq: 2, ts: '2026-07-16T00:00:01.000Z', type: 'work.stage', payload: { id: 'a', from: 'clarify', to: 'executing' } },
@@ -205,7 +205,7 @@ test('foldEvents applies work.stage to set item.stage (per stage-clarify D1)', (
   assert.equal(view.work.a.stage, 'executing');
 });
 
-test('foldEvents work.stage also sets item.verify when the event carries one (per D10 — one event does both)', () => {
+test('foldEvents work.stage also sets item.verify when the event carries one (one event does both)', () => {
   const events = [
     { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo', stage: 'clarify', verify: 'P15 will fill this in' } },
     { seq: 2, ts: '2026-07-16T00:00:01.000Z', type: 'work.stage', payload: { id: 'a', from: 'clarify', to: 'executing', verify: 'npm test -- a' } },
@@ -224,7 +224,7 @@ test('foldEvents work.stage without a verify leaves item.verify untouched', () =
   assert.equal(view.work.a.verify, 'original verify');
 });
 
-test('foldEvents applies work.stage to set item.stage to "decompose" (per stage-decompose D2)', () => {
+test('foldEvents applies work.stage to set item.stage to "decompose"', () => {
   const events = [
     { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo', stage: 'clarify' } },
     { seq: 2, ts: '2026-07-16T00:00:01.000Z', type: 'work.stage', payload: { id: 'a', from: 'clarify', to: 'decompose' } },
@@ -278,7 +278,7 @@ test('foldEvents derives a clarify-pass settlement from work.stage -> executing,
   assert.deepEqual(view.settlements.a[0], { kind: 'clarify-pass', role: 'runner', ts: '2026-07-16T00:00:01.000Z', detail: 'npm test -- a' });
 });
 
-test('foldEvents derives a clarify-pass settlement from work.stage clarify -> decompose too (re-guard per stage-decompose D2: settlement keys off leaving clarify, not landing on executing)', () => {
+test('foldEvents derives a clarify-pass settlement from work.stage clarify -> decompose too (settlement keys off leaving clarify, not landing on executing)', () => {
   const events = [
     { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo', stage: 'clarify' }, v: 2 },
     { seq: 2, ts: '2026-07-16T00:00:01.000Z', type: 'work.stage', payload: { id: 'a', from: 'clarify', to: 'decompose', verify: 'npm test -- a', role: 'runner' }, v: 2 },
@@ -676,7 +676,7 @@ test('foldEvents silently skips a malformed goal.focus payload (missing/non-stri
   assert.equal('focus' in foldEvents(events), false);
 });
 
-test("foldEvents folds writer onto the item across work.move, work.edit and work.stage, latest write wins (D8/D15)", () => {
+test("foldEvents folds writer onto the item across work.move, work.edit and work.stage, latest write wins", () => {
   const base = { seq: 1, ts: "2026-07-27T00:00:00.000Z", type: "work.add", payload: { id: "a", title: "A", status: "todo" } };
   const writerA = { id: "sess-1", source: "env" };
   const writerB = { id: "sess-2", source: "registry" };

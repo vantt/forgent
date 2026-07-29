@@ -59,7 +59,7 @@ const DEFAULT_NEED_HUMAN_REASON =
 const HEAVY_RISK = 'heavy';
 const DEFAULT_RISK_GATE_REASON = 'Item gốc có risk cao (heavy) — cần xác nhận trước khi chia.';
 
-function buildDecomposePrompt(work, lockedContext) {
+function buildDecomposePrompt(work, lockedContext, view) {
   const refs = Array.isArray(work.refs) && work.refs.length ? work.refs.join(', ') : '(none)';
   const deps = Array.isArray(work.deps) && work.deps.length ? work.deps.join(', ') : '(none)';
   const description =
@@ -68,6 +68,17 @@ function buildDecomposePrompt(work, lockedContext) {
     typeof lockedContext === 'string' && lockedContext.trim()
       ? lockedContext
       : '(không có CONTEXT.md/plan.md — item chưa qua fgos-exploring/fgos-planning, hoặc docsRef trống)';
+
+  // Gate ask/answer (mirrors discovery.mjs's buildDiscoveryPrompt exactly —
+  // tsk-3w8 follow-up, str87-decompose-gate-consult): a "need-human" verdict
+  // from THIS function parks the item via the SAME putInAwaiting/view.gates
+  // door discovery.mjs's "unclear" verdict uses, but until now nothing here
+  // ever read it back — a human's `fgos answer` never changed the next
+  // judgment, so a re-run just asked the identical question again forever.
+  const gate = view?.gates?.[work.id];
+  const qa = gate
+    ? `Câu hỏi gần nhất: ${gate.ask ?? '(không có)'}\nCâu trả lời của người (MỚI NHẤT): ${gate.answer ?? '(chưa trả lời)'}`
+    : '(chưa có vòng hỏi-đáp nào với người)';
 
   return `# Chia-việc (decompose)
 
@@ -87,6 +98,10 @@ ${description}
 # Quyết định đã khoá (CONTEXT.md / plan.md, nếu có — đây là nguồn thẩm quyền,
 KHÔNG được đề xuất kiến trúc/hàm/file khác với những gì đã khoá ở đây)
 ${locked}
+
+# Vòng hỏi-đáp với người (nếu người đã xác nhận cách chia ở đây, dùng CHÍNH
+câu trả lời đó để phán — không hỏi lại cùng một câu)
+${qa}
 
 # Câu hỏi
 Item này đơn giản, thi công thẳng được không, hay cần chia thành nhiều việc
@@ -146,12 +161,16 @@ function normalizeChild(child) {
  * child's `deps` is filtered down to indices strictly before its own
  * position — the only shape resolveDecompose can resolve to real ids while
  * writing children in a single forward pass through one store door.
+ *
+ * `view` is optional (documented backward-compat, mirrors discovery.mjs's
+ * own optional-view idiom) — an old 3-arg caller still works exactly as
+ * before, just without the gate ask/answer consulted in the prompt.
  */
-export function judgeDecompose(work, cfg, lockedContext) {
+export function judgeDecompose(work, cfg, lockedContext, view) {
   try {
     const tier = work?.tier ?? DEFAULTS.tier;
     const model = modelForTier(cfg, tier);
-    const prompt = buildDecomposePrompt(work, lockedContext);
+    const prompt = buildDecomposePrompt(work, lockedContext, view);
     const stricterPrompt = prompt + JUDGE_STRICT_JSON_SUFFIX;
 
     const verdict = runJudgeExecutor(cfg, model, prompt, stricterPrompt);
@@ -270,7 +289,7 @@ export function resolveDecompose(dir, id, cfg, role) {
 
   const repoRoot = path.dirname(dir);
   const lockedContext = readLockedContext(repoRoot, work.docsRef);
-  const verdict = judgeDecompose(work, cfg, lockedContext);
+  const verdict = judgeDecompose(work, cfg, lockedContext, view);
 
   if (verdict.kind === 'invalid') {
     return { outcome: 'invalid', id };
@@ -280,7 +299,23 @@ export function resolveDecompose(dir, id, cfg, role) {
   // signal) routes through the human gate — carrying whatever the verdict
   // proposed as context, but writing nothing into the queue yet (Terms:
   // "Đề xuất chia" is the proposal BEFORE it is committed).
-  if (verdict.kind === 'need-human' || work.risk === HEAVY_RISK) {
+  //
+  // Heavy-risk gate release (tsk-3w8 follow-up): unlike a model "need-human"
+  // verdict (which the prompt above now consults via view.gates, so a real
+  // answer changes the NEXT verdict), this hard risk gate used to re-fire
+  // unconditionally on every call — a human answering `fgos answer` never
+  // released it, re-parking the exact same question forever (dogfood,
+  // 2026-07-28). Bypassed only when the MOST RECENT gate ask/answer on
+  // record is genuinely THIS gate's own prior ask (matched by
+  // DEFAULT_RISK_GATE_REASON's own text, the one string formatProposalAsk
+  // always embeds for it) — never a stale answer left over from an
+  // unrelated clarify-stage or model need-human question.
+  const gate = view?.gates?.[id];
+  const heavyRiskAlreadyConfirmed =
+    typeof gate?.answer === 'string' && gate.answer.trim() && typeof gate?.ask === 'string' && gate.ask.includes(DEFAULT_RISK_GATE_REASON);
+  const risksGate = work.risk === HEAVY_RISK && !heavyRiskAlreadyConfirmed;
+
+  if (verdict.kind === 'need-human' || risksGate) {
     const reason = verdict.kind === 'need-human' ? verdict.reason : DEFAULT_RISK_GATE_REASON;
     putInAwaiting(dir, { id, ask: formatProposalAsk(verdict, reason), statusAtAsk: work.status });
     return { outcome: 'need-human', id, verdict };

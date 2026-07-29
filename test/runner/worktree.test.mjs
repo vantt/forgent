@@ -164,7 +164,7 @@ test('reclaimOrphanedCheckout reports reclaimed:true and force-removes the still
   assert.equal(fs.existsSync(wt.path), false);
 });
 
-test('reclaimOrphanedCheckout refuses (throws, does not remove) a checkout with real uncommitted changes (tsk-1os data-loss guard)', () => {
+test('reclaimOrphanedCheckout refuses (throws, does not remove) a checkout with real uncommitted changes (data-loss guard)', () => {
   const repoRoot = initTempRepo();
   const worktreeDir = mkWorktreeDir();
   const wt = createWorktree(repoRoot, 'item-h', { worktreeDir });

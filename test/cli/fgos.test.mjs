@@ -416,7 +416,7 @@ test('edit --priority sets the item priority field to the given integer, exit 0'
   assert.equal(stateView(cwd).work['edit-priority'].priority, 3);
 });
 
-test('edit --priority with a negative value is rejected as validation, exit 4, no event written (D1: priority must be non-negative)', () => {
+test('edit --priority with a negative value is rejected as validation, exit 4, no event written (priority must be non-negative)', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'edit-priority-neg');
   const before = eventLines(cwd).length;
@@ -436,7 +436,7 @@ test('edit --priority with a bare flag (no following value) is rejected as valid
   assert.equal(stateView(cwd).work['edit-priority-bare'].priority, undefined);
 });
 
-test('edit --intent accepts a negative value (no sign constraint per D6), exit 0', () => {
+test('edit --intent accepts a negative value (no sign constraint), exit 0', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'edit-intent-neg');
   const result = run(cwd, ['edit', 'edit-intent-neg', '--intent', '-1']);
@@ -854,7 +854,7 @@ test('goal set on a non-existent id is rejected as validation, exit 4, no event 
   assert.equal(eventLines(cwd).length, before);
 });
 
-test('goal set on an existing item without goalTier is rejected as validation, exit 4, no event written (D7)', () => {
+test('goal set on an existing item without goalTier is rejected as validation, exit 4, no event written', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'non-goal-item');
   const before = eventLines(cwd).length;
@@ -880,7 +880,7 @@ test('goal show after a successful set returns the focus id plus goal-scoped ran
   assert.ok('topUnblock' in data);
 });
 
-test('goal focus is not auto-cleared when the focused item reaches status done (D7)', () => {
+test('goal focus is not auto-cleared when the focused item reaches status done', () => {
   const cwd = tmpCwd();
   addGoalItem(cwd, 'goal-target-done');
   run(cwd, ['goal', 'set', 'goal-target-done']);
@@ -1376,6 +1376,71 @@ test('GOLDEN request-class: running ready twice never appends to events.jsonl, a
   assert.equal(viewAfter, viewBefore, 'state.json must be untouched by ready (read never writes the view)');
 });
 
+// --- pagination (str46-io-contract D5/D35): `ready`/`triage`/`evolve`/`list`
+// opt in to --cursor/--limit; omitting both keeps every one of these verbs'
+// default output byte-identical to before this cell (asserted throughout
+// this file's existing `ready`/`triage`/`evolve`/`list` tests above, none of
+// which pass --cursor/--limit) — this section only exercises the opt-in
+// paginated shape through the real CLI binary.
+
+test('ready --limit paginates through the real CLI binary: envelope data carries items+nextCursor, and the cursor round-trips into the remaining items', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'page-a');
+  addOk(cwd, 'page-b');
+  addOk(cwd, 'page-c');
+
+  const first = run(cwd, ['ready', '--limit', '1']);
+  assert.equal(first.status, 0);
+  const firstData = envelopeData(first.stdout);
+  assert.deepEqual(Object.keys(firstData).sort(), ['items', 'nextCursor']);
+  assert.equal(firstData.items.length, 1);
+  assert.ok(typeof firstData.nextCursor === 'string' && firstData.nextCursor.length > 0);
+
+  const second = run(cwd, ['ready', '--limit', '1', '--cursor', firstData.nextCursor]);
+  assert.equal(second.status, 0);
+  const secondData = envelopeData(second.stdout);
+  assert.equal(secondData.items.length, 1);
+  assert.notEqual(secondData.items[0].id, firstData.items[0].id);
+
+  const third = run(cwd, ['ready', '--limit', '1', '--cursor', secondData.nextCursor]);
+  const thirdData = envelopeData(third.stdout);
+  assert.equal(thirdData.items.length, 1);
+  assert.equal(thirdData.nextCursor, null);
+
+  const allIds = [firstData.items[0].id, secondData.items[0].id, thirdData.items[0].id].sort();
+  assert.deepEqual(allIds, ['page-a', 'page-b', 'page-c']);
+});
+
+test('ready with no --cursor/--limit still returns the bare frontier array, not the paginated shape (byte-identical default)', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'unpaginated-item');
+  const result = run(cwd, ['ready']);
+  assert.equal(result.status, 0);
+  const data = envelopeData(result.stdout);
+  assert.ok(Array.isArray(data));
+});
+
+test('ready --cursor rejects a stale cursor (id no longer in the current frontier) as validation, exit 4, message states the restart remedy', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'only-item');
+  const staleCursor = Buffer.from(JSON.stringify({ order: 'ready-v1', lastId: 'never-existed' }), 'utf8').toString('base64');
+  const result = run(cwd, ['ready', '--cursor', staleCursor]);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /re-issue the call without --cursor/);
+});
+
+test('list --limit paginates only the work map: view.work becomes {items, nextCursor} while other view keys are untouched', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'list-page-a');
+  addOk(cwd, 'list-page-b');
+  const result = run(cwd, ['list', '--limit', '1']);
+  assert.equal(result.status, 0);
+  const data = envelopeData(result.stdout);
+  assert.deepEqual(Object.keys(data.work).sort(), ['items', 'nextCursor']);
+  assert.equal(Object.keys(data.work.items).length, 1);
+  assert.ok(Array.isArray(data.decisions));
+});
+
 // --- `fgos check` (phase-3-compound-learning-3): predicted-vs-actual report ---
 //
 // `check` is a pure read (per D1 request-class, same as `ready`/`list`) over
@@ -1700,7 +1765,7 @@ test('check output on a log with no friction and no final-status gaps is unchang
 // new formatter (D7); `answer` records the answer and resumes the item to
 // `todo`, at which point it is actionable again (back in `ready`).
 
-test('ask/answer round-trip on a todo item: park removes from ready and surfaces the ask via list, answer resumes to todo and reopens ready (per D5/D6/D7)', () => {
+test('ask/answer round-trip on a todo item: park removes from ready and surfaces the ask via list, answer resumes to todo and reopens ready', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'gated-item');
 
@@ -1817,7 +1882,7 @@ test('check never mutates state: events.jsonl and state.json are byte-identical 
 // just the first (findSourceCaptureIds's plural gather, closing the D13
 // no-loss gap `findSourceCaptureId`'s first-match leaves).
 
-test('doc-sources returns every capture linked to a docPath (multiplicity — the D13 gap closed)', () => {
+test('doc-sources returns every capture linked to a docPath (multiplicity)', () => {
   const cwd = tmpCwd();
   toProposed(cwd, 'doc-sources-a');
   run(cwd, ['compound', 'doc-sources-a', '--doc-type', 'how-to', '--doc-path', 'docs/how-to/shared.md']);
@@ -1907,7 +1972,7 @@ test('submit persists the full text as description, separate from the (possibly 
   assert.equal(view.work[item.id].description, text);
 });
 
-test('two submits of the same text get different ids, both persist, no duplicate-id error (D3 collision retry)', () => {
+test('two submits of the same text get different ids, both persist, no duplicate-id error (collision retry)', () => {
   const cwd = tmpCwd();
   const text = 'Fix the broken login button';
 
@@ -1925,7 +1990,7 @@ test('two submits of the same text get different ids, both persist, no duplicate
   assert.ok(view.work[idB], 'second submitted item persisted');
 });
 
-test('submit without a mode flag records mode:"sync"; --async records mode:"async" — both visible via list (D6)', () => {
+test('submit without a mode flag records mode:"sync"; --async records mode:"async" — both visible via list', () => {
   const cwd = tmpCwd();
 
   const syncSubmit = run(cwd, ['submit', 'Investigate the sluggish overview page']);
@@ -1941,7 +2006,7 @@ test('submit without a mode flag records mode:"sync"; --async records mode:"asyn
   assert.equal(view.work[asyncId].mode, 'async');
 });
 
-test('submit with --unattended is treated the same as --async: mode:"async" (D2)', () => {
+test('submit with --unattended is treated the same as --async: mode:"async"', () => {
   const cwd = tmpCwd();
   const result = run(cwd, ['submit', 'Draft the onboarding walkthrough', '--unattended']);
   assert.equal(result.status, 0);
@@ -1949,7 +2014,7 @@ test('submit with --unattended is treated the same as --async: mode:"async" (D2)
   assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].mode, 'async');
 });
 
-test('submit of text matching no keyword falls back to tier:"standard" and persists, exit 0 (D1)', () => {
+test('submit of text matching no keyword falls back to tier:"standard" and persists, exit 0', () => {
   const cwd = tmpCwd();
   const result = run(cwd, ['submit', 'Investigate the sluggish overview page']);
   assert.equal(result.status, 0);
@@ -1981,7 +2046,7 @@ function writeRunnerConfig(cwd, verdict) {
   fs.writeFileSync(path.join(cwd, '.fgos-runner.json'), JSON.stringify(cfg));
 }
 
-test("submit tags the new item with stage:'clarify' (D8), visible via list", () => {
+test("submit tags the new item with stage:'clarify', visible via list", () => {
   const cwd = tmpCwd();
   const result = run(cwd, ['submit', 'Investigate the sluggish overview page']);
   assert.equal(result.status, 0);
@@ -1989,7 +2054,7 @@ test("submit tags the new item with stage:'clarify' (D8), visible via list", () 
   assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'clarify');
 });
 
-test('add leaves stage unset — the item reads as executing via the lazy default (D8)', () => {
+test('add leaves stage unset — the item reads as executing via the lazy default', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'plain-add');
   const item = envelopeData(run(cwd, ['list']).stdout).work['plain-add'];
@@ -2127,7 +2192,7 @@ test('submit --deps <nonexistent-id> fails loudly through the existing write-gat
 // `submit` (each independently overrides classify(text)'s per-field output;
 // an omitted flag stays byte-identical to classify()'s own derived value)
 
-test('submit with no --tier/--kind/--risk flags is byte-identical to pre-feature behavior (D2 regression proof)', () => {
+test('submit with no --tier/--kind/--risk flags is byte-identical to pre-feature behavior (regression proof)', () => {
   const cwd = tmpCwd();
   const result = run(cwd, ['submit', 'Investigate the sluggish overview page']);
   assert.equal(result.status, 0);
@@ -2216,7 +2281,7 @@ test('submit with an empty --kind "" is rejected as validation, exit 4, no event
 // is the next stop before executing. This assertion changed its expected
 // destination from `executing` to `decompose` for exactly that reason (per
 // D2, an intentional contract change, not a test nerf).
-test('discover on a clear verdict moves the submitted item to stage decompose with the model-proposed verify (D5/D10, stage-decompose D2 retarget)', () => {
+test('discover on a clear verdict moves the submitted item to stage decompose with the model-proposed verify', () => {
   const cwd = tmpCwd();
   writeRunnerConfig(cwd, { clear: true, verify: 'npm test -- proven' });
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
@@ -2236,7 +2301,7 @@ test('discover on a clear verdict moves the submitted item to stage decompose wi
 // again on the same item, now sitting at stage `decompose`, dispatches to
 // `resolveDecompose` instead of `resolveDiscovery` — same verb, same role
 // attribution, the engine picked by the item's CURRENT stage.
-test("discover called a second time, once the item sits at stage decompose, dispatches to resolveDecompose and pass-throughs it on to executing (D3 sync/async parity)", () => {
+test("discover called a second time, once the item sits at stage decompose, dispatches to resolveDecompose and pass-throughs it on to executing (sync/async parity)", () => {
   const cwd = tmpCwd();
   writeRunnerConfig(cwd, { clear: true, verify: 'npm test -- proven' });
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
@@ -2263,7 +2328,7 @@ test("discover called a second time, once the item sits at stage decompose, disp
   assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'executing');
 });
 
-test('discover on an unclear verdict parks the submitted item in awaiting-human with the question, still stage clarify (D5/D7)', () => {
+test('discover on an unclear verdict parks the submitted item in awaiting-human with the question, still stage clarify', () => {
   const cwd = tmpCwd();
   writeRunnerConfig(cwd, { clear: false, question: 'Which service?' });
   const id = JSON.parse(run(cwd, ['submit', 'Do the ambiguous work']).stdout).data.id;
@@ -2291,7 +2356,7 @@ test('discover with no id is rejected as validation, exit 4', () => {
 // executor, D1) so judge-executor's spawnSync fails fast (spawn-fail) on the
 // nested judge call, never invoking a live agent; judgeDiscovery's fail-safe
 // (discovery.mjs) then parks the item as unclear, not a bare "success".
-test('discover on a fresh cwd with no .fgos-runner.json bootstraps the default config instead of crashing on ENOENT (D1/D3)', () => {
+test('discover on a fresh cwd with no .fgos-runner.json bootstraps the default config instead of crashing on ENOENT', () => {
   const cwd = tmpCwd();
   const configPath = path.join(cwd, '.fgos-runner.json');
   assert.equal(fs.existsSync(configPath), false);
@@ -2631,7 +2696,7 @@ test('take on an empty frontier is rejected as validation, exit 4, no event writ
   assert.equal(eventLines(cwd).length, before);
 });
 
-test('take --id on a todo item outside the frontier (dep not done) is rejected as validation — take opens only the same set the runner would dispatch (D1)', () => {
+test('take --id on a todo item outside the frontier (dep not done) is rejected as validation — take opens only the same set the runner would dispatch', () => {
   const cwd = initGitCwd();
   run(cwd, ['init']);
   addOk(cwd, 'pull-dep-source');
@@ -2686,6 +2751,14 @@ test('pick with no --id claims the frontier head exactly like take does today, r
   assert.equal(data.worktree.branch, 'fgw/pick-a');
   assert.equal(data.worktree.reused, false);
   assert.ok(fs.existsSync(data.worktree.path), 'pick must leave a real worktree checkout on disk');
+  // tsk-424 D1/D2: pick's worktree must live under .claude/worktrees/ so the
+  // harness's EnterWorktree tool can chain a second in-session switch into
+  // it (e.g. a root item decomposing into a child mid-session) — a location
+  // outside .claude/worktrees/ is refused by the harness past the first switch.
+  assert.ok(
+    data.worktree.path.startsWith(path.join(cwd, '.claude', 'worktrees') + path.sep),
+    `pick worktree path "${data.worktree.path}" must live under .claude/worktrees/`,
+  );
 
   const view = stateView(cwd);
   assert.equal(view.work['pick-a'].status, 'doing');
@@ -2856,7 +2929,7 @@ test('pick on a leaf item whose root has no fgw/<rootId> branch yet forks from r
   assert.equal(stateView(cwd).work['orphan-leaf-item'].status, 'doing');
 });
 
-test('return happy path: verify passes -> doing to proposed, actual outcome recorded, no settlement (settlement belongs to the -> done edge, D4)', () => {
+test('return happy path: verify passes -> doing to proposed, actual outcome recorded, no settlement (settlement belongs to the -> done edge)', () => {
   const cwd = initGitCwd();
   run(cwd, ['init']);
   addOk(cwd, 'pull-return-ok', { verify: 'test -f proof.txt' });
@@ -2879,7 +2952,7 @@ test('return happy path: verify passes -> doing to proposed, actual outcome reco
   assert.equal('settlements' in view, false, 'doing -> proposed never settles (D4: settlement belongs to the -> done edge)');
 });
 
-test('return (STR63): a changed sensitive file outside the item\'s footprint surfaces a frozenJudgeHits advisory, and never blocks the return', () => {
+test('return: a changed sensitive file outside the item\'s footprint surfaces a frozenJudgeHits advisory, and never blocks the return', () => {
   const cwd = initGitCwd();
   run(cwd, ['init']);
   addOk(cwd, 'pull-return-judge', { verify: 'test -f proof.txt' });
@@ -2895,7 +2968,7 @@ test('return (STR63): a changed sensitive file outside the item\'s footprint sur
   assert.deepEqual(data.frozenJudgeHits, [{ file: 'package.json', rule: 'package manifest' }]);
 });
 
-test('return (STR63): a changed sensitive file DECLARED in the item\'s footprint is not a hit', () => {
+test('return: a changed sensitive file DECLARED in the item\'s footprint is not a hit', () => {
   const cwd = initGitCwd();
   run(cwd, ['init']);
   assert.equal(run(cwd, ['add', 'pull-return-judge-declared', '--title', 'X', '--kind', 'task', '--risk', 'low', '--verify', 'test -f proof.txt', '--footprint', 'package.json']).status, 0);
@@ -3009,7 +3082,7 @@ test('return succeeds when ONLY .fgos/ (the live event log) is dirty — its own
   assert.equal(stateView(cwd).work['pull-return-fgos-only-dirty'].status, 'proposed');
 });
 
-test('return succeeds when cwd is a subdirectory of the real git top-level and only .fgos/ (under that subtree) is dirty (STR60 path-prefix fix)', () => {
+test('return succeeds when cwd is a subdirectory of the real git top-level and only .fgos/ (under that subtree) is dirty', () => {
   const { cwd } = initGitCwdInSubdir();
   run(cwd, ['init']);
   addOk(cwd, 'sub-return-fgos-only-dirty', { verify: 'test -f proof.txt' });
@@ -3027,7 +3100,7 @@ test('return succeeds when cwd is a subdirectory of the real git top-level and o
   assert.equal(stateView(cwd).work['sub-return-fgos-only-dirty'].status, 'proposed');
 });
 
-test('return succeeds when cwd is a subdirectory and an unrelated file is dirty ELSEWHERE in the repo, outside cwd\'s own subtree (STR60 scope fix)', () => {
+test('return succeeds when cwd is a subdirectory and an unrelated file is dirty ELSEWHERE in the repo, outside cwd\'s own subtree', () => {
   const { cwd, topLevel } = initGitCwdInSubdir();
   run(cwd, ['init']);
   addOk(cwd, 'sub-return-scope-ok', { verify: 'test -f proof.txt' });
@@ -3046,7 +3119,7 @@ test('return succeeds when cwd is a subdirectory and an unrelated file is dirty 
   assert.equal(stateView(cwd).work['sub-return-scope-ok'].status, 'proposed');
 });
 
-test('return still refuses when cwd is a subdirectory and a non-.fgos file is dirty INSIDE cwd\'s own subtree (real dirt still caught, STR60 does not overcorrect)', () => {
+test('return still refuses when cwd is a subdirectory and a non-.fgos file is dirty INSIDE cwd\'s own subtree (real dirt still caught, does not overcorrect)', () => {
   const { cwd } = initGitCwdInSubdir();
   run(cwd, ['init']);
   addOk(cwd, 'sub-return-dirty', { verify: 'test -f proof.txt' });
@@ -3379,7 +3452,7 @@ test('evolve --pick <invalid-id> prints a clean error and exits non-zero, with n
   assert.equal(fs.readFileSync(viewPath(cwd), 'utf8'), viewBefore, 'state.json must be untouched by an invalid --pick');
 });
 
-test('evolve --pick with a bare flag (no value) is refused as validation, not a re-prompt (D11)', () => {
+test('evolve --pick with a bare flag (no value) is refused as validation, not a re-prompt', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'bare-pick-item');
   const result = run(cwd, ['evolve', '--pick']);
@@ -3599,7 +3672,7 @@ test('review of a legacy proposed item (no branch, no headAtTake/headAtReturn) d
   assert.match(data.warnings.join('\n'), /no live diff source/);
 });
 
-test('review of a leaf proposed item diffs against its resolved root branch (fgw/<root>), not main (D3)', () => {
+test('review of a leaf proposed item diffs against its resolved root branch (fgw/<root>), not main', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   makeRunnerProposedLeafItem(cwd, 'review-leaf-root', 'review-leaf-child', { rootDivergesFromMain: true });
@@ -3612,7 +3685,7 @@ test('review of a leaf proposed item diffs against its resolved root branch (fgw
   assert.doesNotMatch(data.diff, /root-only\.txt/, 'diff against fgw/<root> must not include the root branch\'s own divergence from main');
 });
 
-test('review of a root proposed item is unchanged — still diffs against main (regression, D3)', () => {
+test('review of a root proposed item is unchanged — still diffs against main (regression)', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   makeRunnerProposedItem(cwd, 'review-root-regression-item');
@@ -3738,7 +3811,7 @@ test('approve of a runner item with a declared footprint still refuses on an unc
   assert.equal(stateView(cwd).work['approve-footprint-dirty'].status, 'proposed');
 });
 
-test('approve of a leaf item with a clean merge lands the work on fgw/<root> (not main) via an ephemeral worktree, leaf -> done, fgw/<leaf> is actually deleted, fgw/<root> survives (D3/D4/D17)', () => {
+test('approve of a leaf item with a clean merge lands the work on fgw/<root> (not main) via an ephemeral worktree, leaf -> done, fgw/<leaf> is actually deleted, fgw/<root> survives', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   makeRunnerProposedLeafItem(cwd, 'approve-leaf-root', 'approve-leaf-child', { verify: 'test -f approve-leaf-child-produced.txt' });
@@ -3832,7 +3905,7 @@ test('approve of a runner item whose staged merge fails its own verify: aborts, 
   assert.equal(view.frictions['approve-verify-fail-item'][0].errorClass, 'verify-miss');
 });
 
-test('approve of a root item that HAD children, whose merge into main conflicts, parks with the distinguishing reason integration-drift and a main@<sha> friction detail (D8)', () => {
+test('approve of a root item that HAD children, whose merge into main conflicts, parks with the distinguishing reason integration-drift and a main@<sha> friction detail', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   fs.writeFileSync(path.join(cwd, 'shared.txt'), 'base\n');
@@ -4047,7 +4120,7 @@ test('approve of the same self-modifying diff PROCEEDS with --acknowledge-iron-l
   assert.doesNotMatch(branches, /fgw\/iron-ack-item/, 'the fully-merged branch is cleaned up');
 });
 
-test('approve of an ordinary runner item (diff touches no self-modifying module) is UNAFFECTED — proceeds to done with no --acknowledge-iron-law flag (backward compatibility, D17)', () => {
+test('approve of an ordinary runner item (diff touches no self-modifying module) is UNAFFECTED — proceeds to done with no --acknowledge-iron-law flag (backward compatibility)', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   makeRunnerProposedItemTouching(cwd, 'iron-plain-item', 'docs/notes.txt', {
@@ -4086,7 +4159,7 @@ test('reject on a non-proposed item is rejected as precondition, exit 2', () => 
   assert.equal(result.status, 2);
 });
 
-test('reject moves proposed -> todo with the reason recorded, role human, and runs no git command at all — never a revert (D4)', () => {
+test('reject moves proposed -> todo with the reason recorded, role human, and runs no git command at all — never a revert', () => {
   const cwd = initGitCwd();
   run(cwd, ['init']);
   addOk(cwd, 'reject-pull-item', { verify: 'test -f proof.txt' });
@@ -4475,7 +4548,7 @@ function makeBlockedLeafItem(cwd, rootId, leafId, reason, extra = {}) {
   commitPending(cwd, `state: park ${leafId} (${reason})`);
 }
 
-test('catchup on a root parked with reason integration-drift, after a non-overlapping main-side change, merges main into fgw/<id> and bounces blocked -> proposed (D7)', () => {
+test('catchup on a root parked with reason integration-drift, after a non-overlapping main-side change, merges main into fgw/<id> and bounces blocked -> proposed', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   makeBlockedRunnerItem(cwd, 'catchup-root-drift', 'integration-drift', { verify: 'test -f catchup-root-drift-produced.txt' });
@@ -4506,7 +4579,7 @@ test('catchup on a root parked with reason integration-drift, after a non-overla
   assert.match(mainSideFile, /landed while parked/);
 });
 
-test('catchup on a leaf parked with reason merge-conflict targets its PARENT branch (fgw/<root>), not main, and succeeds the same way (D11)', () => {
+test('catchup on a leaf parked with reason merge-conflict targets its PARENT branch (fgw/<root>), not main, and succeeds the same way', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   makeBlockedLeafItem(cwd, 'catchup-leaf-root', 'catchup-leaf-child', 'merge-conflict', { verify: 'test -f catchup-leaf-child-produced.txt' });
@@ -4634,7 +4707,7 @@ test('init with no other harness present still writes .fgos/coexistence.json wit
   assert.deepEqual(manifest.detected_harnesses, []);
 });
 
-test('init in a project with a .bee/ marker detects it, reports it in the output, and leaves .bee/ byte/mtime unchanged (D4 read-only)', () => {
+test('init in a project with a .bee/ marker detects it, reports it in the output, and leaves .bee/ byte/mtime unchanged (read-only)', () => {
   const cwd = tmpCwd();
   const beeDir = path.join(cwd, '.bee');
   fs.mkdirSync(beeDir);
@@ -4656,7 +4729,7 @@ test('init in a project with a .bee/ marker detects it, reports it in the output
   assert.deepEqual(fs.readFileSync(beeMarkerFile), beforeContent);
 });
 
-test('init never creates a host AGENTS.md that did not already exist (D6)', () => {
+test('init never creates a host AGENTS.md that did not already exist', () => {
   const cwd = tmpCwd();
   const result = run(cwd, ['init']);
   assert.equal(result.status, 0);
@@ -4848,7 +4921,7 @@ test('return on a branch-source take refuses when the branch has NOT advanced pa
   assert.equal(stateView(cwd).work['branch-return-stale'].status, 'doing');
 });
 
-test('return on a branch-source take never requires the human\'s own main tree to be clean (D2: "tree người là việc của người") — a dirty main tree never blocks it and is left untouched', () => {
+test('return on a branch-source take never requires the human\'s own main tree to be clean ("tree người là việc của người") — a dirty main tree never blocks it and is left untouched', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   makeBlockedBranchItem(cwd, 'branch-return-dirty-main', { verify: 'test -f proof.txt' });
@@ -5641,7 +5714,7 @@ test('move --to done succeeds when every acceptance clause has non-empty evidenc
   assert.equal(stateView(cwd).work['cli-cos-evidenced'].status, 'done');
 });
 
-test('an item with acceptance absent, or an empty array, closes via move --to done completely unaffected (D4 no-op)', () => {
+test('an item with acceptance absent, or an empty array, closes via move --to done completely unaffected (no-op)', () => {
   const cwd = tmpCwd();
   toCompoundLearn(cwd, 'cli-cos-absent'); // no --acceptance ever set
   assert.equal(run(cwd, ['move', 'cli-cos-absent', '--to', 'done']).status, 0);
@@ -5692,4 +5765,76 @@ test('graph verb on an empty store: zero components, still a valid envelope, exi
   const data = envelopeData(result.stdout);
   assert.equal(data.componentCount, 0);
   assert.deepEqual(data.components, []);
+});
+
+// --- `fgos unlock` (tsk-3h4): safely clears .fgos/main-checkout.lock -------
+
+function mainCheckoutLockPath(cwd) {
+  return path.join(cwd, '.fgos', 'main-checkout.lock');
+}
+
+test('unlock: no lock file present -- reports cleared, exit 0', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0);
+  const result = run(cwd, ['unlock']);
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.cleared, true);
+  assert.equal(data.reason, 'stale-or-free');
+});
+
+test('unlock: lock held by a dead pid -- self-heals via the existing reclaim path, reports cleared', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0);
+  fs.mkdirSync(path.dirname(mainCheckoutLockPath(cwd)), { recursive: true });
+  // A pid essentially guaranteed dead: an implausibly high, never-assigned value.
+  fs.writeFileSync(mainCheckoutLockPath(cwd), JSON.stringify({ pid: 999999999, ts: Date.now() }));
+
+  const result = run(cwd, ['unlock']);
+
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.cleared, true);
+  assert.equal(data.reason, 'stale-or-free');
+});
+
+test('unlock: lock genuinely held by a live session -- refuses, reports the holder identity, never deletes the file', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0);
+  fs.mkdirSync(path.dirname(mainCheckoutLockPath(cwd)), { recursive: true });
+  // The test process's own pid is genuinely alive and distinct from the
+  // spawned CLI child's pid -- a real live-other-holder case.
+  fs.writeFileSync(mainCheckoutLockPath(cwd), JSON.stringify({ pid: process.pid, ts: Date.now() }));
+
+  const result = run(cwd, ['unlock']);
+
+  assert.equal(result.status, 7, result.stderr);
+  assert.match(result.stderr, new RegExp(`held by a live session \\(${process.pid}\\)`));
+  assert.equal(fs.existsSync(mainCheckoutLockPath(cwd)), true);
+});
+
+test('unlock: corrupt (unparseable) lock content -- force-reclaims via forceReclaimAmbiguousLock, removes the file', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0);
+  fs.mkdirSync(path.dirname(mainCheckoutLockPath(cwd)), { recursive: true });
+  fs.writeFileSync(mainCheckoutLockPath(cwd), 'not json at all {{{');
+
+  const result = run(cwd, ['unlock']);
+
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.cleared, true);
+  assert.equal(data.reason, 'reclaimed');
+  assert.equal(fs.existsSync(mainCheckoutLockPath(cwd)), false);
+});
+
+test('unlock: registered in the --help --json manifest with write-only touchesState/externalEffect labels', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['--help', '--json']);
+  assert.equal(result.status, 0, result.stderr);
+  const manifest = JSON.parse(result.stdout);
+  const entry = manifest.commands.find((c) => c.name === 'unlock');
+  assert.ok(entry, 'unlock entry missing from --help --json manifest');
+  assert.equal(entry.touchesState, true);
+  assert.equal(entry.externalEffect, false);
 });

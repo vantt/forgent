@@ -6,14 +6,29 @@
 // Never creates a new rc file: detectRcFiles only reports rc files that
 // already exist on disk, and insertSourceLine only ever appends to one of
 // those — it refuses rather than creating a missing file.
+//
+// WINDOWS (tsk-63j D3): detectRcFiles also detects PowerShell profile
+// paths on win32 — detection only, scoped narrowly to what D3 locked.
+// insertSourceLine/hasSourceLine stay bash/zsh-only: `source "..."` is not
+// valid PowerShell syntax, and profile auto-sourcing was never part of
+// D3's locked scope.
 
 import fs from 'node:fs';
 import path from 'node:path';
 
 const RC_FILE_NAMES = ['.bashrc', '.zshrc'];
 
-export function detectRcFiles(homeDir) {
-  return RC_FILE_NAMES.map((name) => path.join(homeDir, name)).filter((candidate) =>
+// Well-known default profile locations (Microsoft docs): Windows
+// PowerShell 5.1 and PowerShell 7+ (pwsh) keep separate profile files
+// under the user's Documents folder.
+const WINDOWS_PROFILE_RELATIVE_PATHS = [
+  path.join('Documents', 'PowerShell', 'Microsoft.PowerShell_profile.ps1'),
+  path.join('Documents', 'WindowsPowerShell', 'Microsoft.PowerShell_profile.ps1'),
+];
+
+export function detectRcFiles(homeDir, platform = process.platform) {
+  const relativeNames = platform === 'win32' ? WINDOWS_PROFILE_RELATIVE_PATHS : RC_FILE_NAMES;
+  return relativeNames.map((name) => path.join(homeDir, name)).filter((candidate) =>
     fs.existsSync(candidate),
   );
 }

@@ -29,7 +29,7 @@ function checkById(id) {
 
 // ─── Unit tests: DOCTOR_CHECKS ─────────────────────────────────────────────
 
-test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md D2 plus main-checkout-hook-wired (tsk-3w8)', () => {
+test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-checkout-hook-wired', () => {
   assert.deepEqual(
     DOCTOR_CHECKS.map((c) => c.id).sort(),
     ['config-not-stale', 'main-checkout-hook-wired', 'node-version-and-git', 'shell-integration-sourced'].sort(),

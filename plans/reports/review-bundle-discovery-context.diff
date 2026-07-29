@@ -1,0 +1,481 @@
+commit c43f3038ef63094d5583068dddfd85162404b211
+Author: Van Tran <940988+vantt@users.noreply.github.com>
+Date:   Fri Jul 17 08:07:26 2026 +0700
+
+    feat(discovery-context-1): thread description + gate/discovery history into clarify prompt
+    
+    submit now persists the full submitted text as work.description (optional
+    additive field). judgeDiscovery/buildDiscoveryPrompt take an optional `view`
+    param so the clarify-loop prompt carries the description, the latest
+    ask/answer pair, and prior verdicts instead of only title/kind/refs/deps —
+    fixing the run-1 dogfood gap where a person's answer was never seen by the
+    next judge pass. Old 2-arg calls keep working; work.add's fold already
+    spreads the payload so description survives rebuild with no replay.mjs edit.
+
+diff --git a/bin/fgos.mjs b/bin/fgos.mjs
+index 1245570..dd861e9 100755
+--- a/bin/fgos.mjs
++++ b/bin/fgos.mjs
+@@ -468,6 +468,10 @@ function runVerb(verb, flags, positional, dir) {
+       const work = {
+         id,
+         title,
++        // Per P30 (discovery-context): the full submitted text, kept
++        // alongside the derived/truncated `title` so context-discovery can
++        // read the real ask instead of just the classified summary.
++        description: text,
+         kind,
+         status: 'todo',
+         deps: [],
+diff --git a/src/intake/discovery.mjs b/src/intake/discovery.mjs
+index d8ce20e..d2f4dbb 100644
+--- a/src/intake/discovery.mjs
++++ b/src/intake/discovery.mjs
+@@ -37,9 +37,40 @@ const DEFAULT_UNCLEAR_QUESTION =
+ // survives past clarify (must_haves truth 3).
+ const FALLBACK_VERIFY = 'chưa xác định — bổ sung thủ công';
+ 
+-function buildDiscoveryPrompt(work) {
++/**
++ * `view` is OPTIONAL (per discovery-context P30's backward-compat seam):
++ * every call site that has one loaded (resolveDiscovery) passes it so the
++ * prompt carries description/ask-answer/prior-verdict context; a caller
++ * with no view (old 2-arg unit-test callers) degrades every added section
++ * to a "(không có)"/"(chưa ...)" placeholder instead of throwing.
++ */
++function buildDiscoveryPrompt(work, view) {
+   const refs = Array.isArray(work.refs) && work.refs.length ? work.refs.join(', ') : '(none)';
+   const deps = Array.isArray(work.deps) && work.deps.length ? work.deps.join(', ') : '(none)';
++  const description =
++    typeof work.description === 'string' && work.description.trim() ? work.description : '(không có)';
++
++  // Ask/answer (per replay.mjs:90-98): `view.gates[id]` folds to ONE merged
++  // {ask, answer} pair — the LATEST round only, never a history of every
++  // round asked. Known limitation (validation-s1.md): a multi-round clarify
++  // loop only ever sees the most recent answer here; the full sequence of
++  // past verdicts (including earlier questions) is `view.discovery` below.
++  const gate = view?.gates?.[work.id];
++  const qa = gate
++    ? `Câu hỏi gần nhất: ${gate.ask ?? '(không có)'}\nCâu trả lời của người (MỚI NHẤT): ${gate.answer ?? '(chưa trả lời)'}`
++    : '(chưa có vòng hỏi-đáp nào với người)';
++
++  const priorVerdicts = Array.isArray(view?.discovery?.[work.id]) ? view.discovery[work.id] : [];
++  const history = priorVerdicts.length
++    ? priorVerdicts
++        .map((v, i) => {
++          const bits = [`clear=${v.clear}`];
++          if (v.question) bits.push(`hỏi: ${v.question}`);
++          if (v.verify) bits.push(`verify: ${v.verify}`);
++          return `${i + 1}. ${bits.join(' — ')}`;
++        })
++        .join('\n')
++    : '(chưa phán lần nào)';
+ 
+   return `# Context-discovery
+ 
+@@ -51,6 +82,19 @@ Risk: ${work.risk ?? '(none)'}
+ Refs: ${refs}
+ Deps: ${deps}
+ 
++# Mô tả đầy đủ (nguyên văn lúc submit)
++${description}
++
++# Hỏi-đáp với người
++${qa}
++
++# Các lần phán trước
++${history}
++
++Câu trả lời của người ở trên là QUYẾT ĐỊNH CUỐI CÙNG — KHÔNG hỏi lại một chủ đề
++đã được trả lời. Nếu câu trả lời đã đủ để thi công, verdict phải clear=true kèm
++một \`verify\` chạy được thật.
++
+ # Câu hỏi
+ Item này đã đủ rõ để thi công chưa? Nếu đủ, đề xuất một lệnh \`verify\` chạy
+ được thật để chứng minh việc đã xong. Nếu chưa đủ, nêu MỘT câu hỏi cụ thể cần
+@@ -70,12 +114,18 @@ Trả lời DUY NHẤT bằng một dòng JSON, không kèm chữ nào khác:
+  * question: DEFAULT_UNCLEAR_QUESTION}` (fail-safe, D4). `question` is always
+  * present when `clear` is false (even when the model omits one) — the
+  * downstream `putInAwaiting` edge requires a non-empty `ask`.
++ *
++ * `view` (per discovery-context P30) is OPTIONAL — it is the same state view
++ * `resolveDiscovery` already has loaded (listWork), threaded through so the
++ * prompt can carry description/ask-answer/prior-verdict context. Omitting it
++ * (old 2-arg calls) still works: `buildDiscoveryPrompt` degrades every added
++ * section to a placeholder instead of throwing.
+  */
+-export function judgeDiscovery(work, cfg) {
++export function judgeDiscovery(work, cfg, view) {
+   try {
+     const tier = work?.tier ?? DEFAULTS.tier;
+     const model = modelForTier(cfg, tier);
+-    const prompt = buildDiscoveryPrompt(work);
++    const prompt = buildDiscoveryPrompt(work, view);
+     const { command, args } = resolveExecutorCommand(cfg, { prompt, model });
+ 
+     const result = spawnSync(command, args, {
+@@ -139,7 +189,7 @@ export function resolveDiscovery(dir, id, cfg, actor) {
+     throw new StoreError('validation', `resolveDiscovery: work "${id}" not found.`);
+   }
+ 
+-  const verdict = judgeDiscovery(work, cfg);
++  const verdict = judgeDiscovery(work, cfg, view);
+   addDiscovery(dir, { id, ...verdict });
+ 
+   if (verdict.clear) {
+diff --git a/src/state/work.mjs b/src/state/work.mjs
+index 6e30094..77108f2 100644
+--- a/src/state/work.mjs
++++ b/src/state/work.mjs
+@@ -148,6 +148,18 @@ export function validateWorkShape(work) {
+     }
+   }
+ 
++  // Full-text intake description (per discovery-context P30): OPTIONAL
++  // additive field carrying the submitter's original free text, so the
++  // discovery engine's prompt does not lose it to title truncation/
++  // classification. `submit` sets it; `add` never does — this validator
++  // only enforces shape when the field is actually present, same
++  // optional-additive rule as `parent` above (null treated as absent).
++  if (work.description !== undefined && work.description !== null) {
++    if (typeof work.description !== 'string' || !work.description.trim()) {
++      throw new WorkValidationError('work.description must be a non-empty string when present.');
++    }
++  }
++
+   if (work.deps.includes(work.id)) {
+     throw new WorkValidationError(`work "${work.id}" cannot list itself as a dep.`);
+   }
+diff --git a/test/cli/fgos.test.mjs b/test/cli/fgos.test.mjs
+index bbd46e3..cd4e16d 100644
+--- a/test/cli/fgos.test.mjs
++++ b/test/cli/fgos.test.mjs
+@@ -763,6 +763,18 @@ test('submit prints a well-formed fgos.v1 envelope: contract + generated_at + da
+   assert.equal(envelope.data.status, 'todo');
+ });
+ 
++test('submit persists the full text as description, separate from the (possibly truncated) title (P30)', () => {
++  const cwd = tmpCwd();
++  const text = 'Investigate the sluggish overview page and figure out why it takes so long to render for large accounts';
++  const result = run(cwd, ['submit', text]);
++  assert.equal(result.status, 0);
++  const item = JSON.parse(result.stdout).data;
++  assert.equal(item.description, text);
++
++  const view = JSON.parse(run(cwd, ['list']).stdout);
++  assert.equal(view.work[item.id].description, text);
++});
++
+ test('two submits of the same text get different ids, both persist, no duplicate-id error (D3 collision retry)', () => {
+   const cwd = tmpCwd();
+   const text = 'Fix the broken login button';
+diff --git a/test/intake/discovery.test.mjs b/test/intake/discovery.test.mjs
+index a2555bd..fe8f5d0 100644
+--- a/test/intake/discovery.test.mjs
++++ b/test/intake/discovery.test.mjs
+@@ -4,7 +4,7 @@ import fs from 'node:fs';
+ import os from 'node:os';
+ import path from 'node:path';
+ import { judgeDiscovery, resolveDiscovery } from '../../src/intake/discovery.mjs';
+-import { addWork, listWork, StoreError, categoryOf } from '../../src/state/store.mjs';
++import { addWork, listWork, StoreError, categoryOf, putInAwaiting, answerAwaiting } from '../../src/state/store.mjs';
+ 
+ // Fake executors only — every "command" spawned here is a node script this
+ // file writes to a mkdtemp directory at test time, mirroring dispatch.test.mjs's
+@@ -181,6 +181,77 @@ test('judgeDiscovery fails safe when the work item\'s tier has no configured mod
+   assert.equal(verdict.clear, false);
+ });
+ 
++// --- discovery-context (P30): description + ask/answer + prior-verdict -----
++// context threaded into the prompt via the optional `view` param -----------
++
++function echoPromptExecutor(dir) {
++  const scriptPath = path.join(dir, 'echo-full-prompt.mjs');
++  fs.writeFileSync(
++    scriptPath,
++    `
++    const prompt = process.argv[2];
++    process.stdout.write(JSON.stringify({ clear: true, verify: prompt }));
++    process.exit(0);
++    `,
++  );
++  return scriptPath;
++}
++
++test('judgeDiscovery with a view embeds the item description verbatim and the latest gate answer in the prompt (P30)', () => {
++  const dir = mkTempDir();
++  const scriptPath = echoPromptExecutor(dir);
++  const cfg = cfgFor([scriptPath, '{prompt}']);
++  const work = sampleWork({ description: 'Full submitted text: fix the sluggish overview page for real.' });
++  const view = {
++    work: { [work.id]: work },
++    gates: { [work.id]: { ask: 'Which page exactly?', answer: 'The account overview page, definitely final.' } },
++  };
++  const verdict = judgeDiscovery(work, cfg, view);
++  // `verify` here is the prompt itself (echo executor), per the `verdict.verify`
++  // convention used elsewhere in this file — asserting on it is asserting on
++  // the actual prompt text sent to the executor.
++  assert.match(verdict.verify, /Full submitted text: fix the sluggish overview page for real\./);
++  assert.match(verdict.verify, /Which page exactly\?/);
++  assert.match(verdict.verify, /The account overview page, definitely final\./);
++});
++
++test('judgeDiscovery with a view embeds prior discovery verdicts in the prompt (P30)', () => {
++  const dir = mkTempDir();
++  const scriptPath = echoPromptExecutor(dir);
++  const cfg = cfgFor([scriptPath, '{prompt}']);
++  const work = sampleWork();
++  const view = {
++    work: { [work.id]: work },
++    discovery: { [work.id]: [{ clear: false, question: 'What is the target file?' }] },
++  };
++  const verdict = judgeDiscovery(work, cfg, view);
++  assert.match(verdict.verify, /What is the target file\?/);
++});
++
++test('judgeDiscovery degrades to placeholders (no throw) when the item has no description and no view is passed — old 2-arg call stays backward-compatible (P30)', () => {
++  const dir = mkTempDir();
++  const scriptPath = echoPromptExecutor(dir);
++  const cfg = cfgFor([scriptPath, '{prompt}']);
++  const work = sampleWork();
++  assert.equal(work.description, undefined);
++  const verdict = judgeDiscovery(work, cfg); // 2-arg, no view — must not throw
++  assert.match(verdict.verify, /\(không có\)/);
++  assert.match(verdict.verify, /chưa có vòng hỏi-đáp nào với người/);
++  assert.match(verdict.verify, /chưa phán lần nào/);
++});
++
++test('judgeDiscovery degrades description/gates to placeholders when a view is passed but has no entries for this item (legacy item, P30)', () => {
++  const dir = mkTempDir();
++  const scriptPath = echoPromptExecutor(dir);
++  const cfg = cfgFor([scriptPath, '{prompt}']);
++  const work = sampleWork();
++  const view = { work: { [work.id]: work } }; // no gates, no discovery for this id
++  const verdict = judgeDiscovery(work, cfg, view);
++  assert.match(verdict.verify, /\(không có\)/);
++  assert.match(verdict.verify, /chưa có vòng hỏi-đáp nào với người/);
++  assert.match(verdict.verify, /chưa phán lần nào/);
++});
++
+ // --- resolveDiscovery: read-judge-write, both outcomes recorded ----------
+ 
+ function tmpStoreDir() {
+@@ -271,3 +342,30 @@ test('resolveDiscovery throws a validation StoreError for an unknown id', () =>
+     (err) => err instanceof StoreError && categoryOf(err) === 'validation',
+   );
+ });
++
++// --- P30 CoS regression (dogfood run-1): the re-judge after a person answers
++// must see BOTH the full submitted description and the answer, not just the
++// (possibly truncated) title — this is the exact gap run-1 hit (the model
++// re-asked the same question because the prompt never carried either). ------
++
++test('resolveDiscovery threads the real store view so a re-judge after an answer sees the description and the latest answer (P30 / dogfood run-1 regression)', () => {
++  const echoDir = mkTempDir();
++  const echoScript = echoPromptExecutor(echoDir);
++  const cfg = cfgFor([echoScript, '{prompt}']);
++
++  const storeDir = tmpStoreDir();
++  addWork(
++    storeDir,
++    sampleWork({
++      description: 'Bỏ hardcode tên trunk "main" trong merge engine.',
++    }),
++  );
++  putInAwaiting(storeDir, { id: 'item-x', ask: 'Nguồn tên trunk: auto-detect hay config?' });
++  answerAwaiting(storeDir, { id: 'item-x', answer: 'CHỐT: auto-detect, fallback "main". KHÔNG hỏi thêm.' });
++
++  const verdict = resolveDiscovery(storeDir, 'item-x', cfg);
++  // Echo executor returns the prompt itself as `verify` — asserting on it
++  // asserts on what the model actually saw.
++  assert.match(verdict.verdict.verify, /Bỏ hardcode tên trunk "main" trong merge engine\./);
++  assert.match(verdict.verdict.verify, /CHỐT: auto-detect, fallback "main"\. KHÔNG hỏi thêm\./);
++});
+diff --git a/test/state/replay.test.mjs b/test/state/replay.test.mjs
+index 1363698..446d295 100644
+--- a/test/state/replay.test.mjs
++++ b/test/state/replay.test.mjs
+@@ -26,6 +26,27 @@ test('foldEvents applies work.add then work.move to build current status', () =>
+   assert.equal(view.work.a.title, 'A');
+ });
+ 
++// Regression pin (per discovery-context P30 / validation-s1.md's corrected
++// assumption): `work.add`'s fold is a SPREAD of the whole payload (see
++// applyEvent's `case 'work.add'` above), so an additive field like
++// `description` survives rebuild with no fold-logic change at all — unlike
++// `work.move`'s destructure-based fields, which need an explicit allowlist
++// entry (critical-patterns fold-allowlist) to survive. This test pins that
++// behavior so a future change from spread to destructure on work.add would
++// be caught here.
++test('foldEvents survives an additive work.add field (description) through rebuild via spread — no allowlist edit needed', () => {
++  const events = [
++    {
++      seq: 1,
++      ts: '2026-07-17T00:00:00.000Z',
++      type: 'work.add',
++      payload: { id: 'a', title: 'A', status: 'todo', description: 'The full text the submitter typed.' },
++    },
++  ];
++  const view = foldEvents(events);
++  assert.equal(view.work.a.description, 'The full text the submitter typed.');
++});
++
+ test('foldEvents folds multiple work items independently', () => {
+   const events = [
+     { seq: 1, ts: '2026-07-14T00:00:00.000Z', type: 'work.add', payload: { id: 'a', status: 'todo' } },
+diff --git a/test/state/work.test.mjs b/test/state/work.test.mjs
+index 8f00537..a3f6778 100644
+--- a/test/state/work.test.mjs
++++ b/test/state/work.test.mjs
+@@ -197,6 +197,37 @@ test('validateWork rejects a work item that lists itself as its own parent', ()
+   );
+ });
+ 
++// --- full-text intake `description` (per discovery-context P30) ---
++
++test('validateWork accepts a work item missing description (optional, additive intake field)', () => {
++  const work = baseWork();
++  assert.equal(work.description, undefined);
++  assert.doesNotThrow(() => validateWork(work));
++});
++
++test('validateWork accepts description as a non-empty string', () => {
++  assert.doesNotThrow(() => validateWork(baseWork({ description: 'Full text the submitter typed.' })));
++});
++
++test('validateWork treats description: null the same as absent', () => {
++  assert.doesNotThrow(() => validateWork(baseWork({ description: null })));
++});
++
++test('validateWork rejects a non-string, non-empty description', () => {
++  assert.throws(
++    () => validateWork(baseWork({ description: 42 })),
++    (err) => err instanceof WorkValidationError && /description/.test(err.message),
++  );
++  assert.throws(
++    () => validateWork(baseWork({ description: '' })),
++    (err) => err instanceof WorkValidationError && /description/.test(err.message),
++  );
++  assert.throws(
++    () => validateWork(baseWork({ description: '   ' })),
++    (err) => err instanceof WorkValidationError && /description/.test(err.message),
++  );
++});
++
+ test('validateWork does not require parent to point at an existing id (lineage existence is not deps existence)', () => {
+   assert.doesNotThrow(() => validateWork(baseWork({ id: 'b', parent: 'ghost-parent' }), new Set(['a', 'b'])));
+ });
+commit aa1aad8cb8be87b254719c1657b8d88ea165a9c7
+Author: Van Tran <940988+vantt@users.noreply.github.com>
+Date:   Fri Jul 17 08:30:02 2026 +0700
+
+    docs(specs): sync submit description + clarify prompt context (discovery-context scribing)
+
+diff --git a/docs/specs/runner.md b/docs/specs/runner.md
+index 4910294..f16cb67 100644
+--- a/docs/specs/runner.md
++++ b/docs/specs/runner.md
+@@ -1,8 +1,8 @@
+ ---
+ area: runner
+-updated: 2026-07-16
+-sources: [phase-2-routing, post-divorce-hardening, phase-3-compound-learning-s1, phase-3-compound-learning-s2, phase-3-compound-learning-s3-closeout, stage-clarify, stage-decompose-s1, stage-decompose-s2, pr-lifecycle-s1]
+-decisions: [feed7428, 14396a5c, 1a80b4d3, 9a19eea5, 96a65365, a7c099af, 43f257ae, 44936500, e1218b22, 6f2cbc47, a30a3d3c, 1359ab5e]
++updated: 2026-07-17
++sources: [phase-2-routing, post-divorce-hardening, phase-3-compound-learning-s1, phase-3-compound-learning-s2, phase-3-compound-learning-s3-closeout, stage-clarify, stage-decompose-s1, stage-decompose-s2, pr-lifecycle-s1, discovery-context]
++decisions: [feed7428, 14396a5c, 1a80b4d3, 9a19eea5, 96a65365, a7c099af, 43f257ae, 44936500, e1218b22, 6f2cbc47, a30a3d3c, 1359ab5e, cfae0120]
+ coverage: full
+ ---
+ 
+@@ -48,7 +48,11 @@ Vòng lặp tự hành của forgent: tự lấy việc sẵn-sàng từ work-st
+   giá trị `mode` của item mang gì (mode chỉ là quy ước ai NÊN gọi trước,
+   không phải điều kiện runner rẽ nhánh). Việc đang `awaiting-human` (đã hỏi,
+   chưa ai trả lời) KHÔNG BAO GIỜ bị quét lại — cùng luật loại-trừ với dispatch
+-  thường (xem R6 Work-State/R15).
++  thường (xem R6 Work-State/R15). Prompt phán mà runner gọi ở đây mang cùng
++  ngữ cảnh đầy đủ như lời gọi `fgos discover` tay — description gốc + cặp
++  hỏi-đáp mới nhất + các lần phán trước của item (per discovery-context P30
++  / cfae0120, xem spec Work-State "Giai đoạn Làm-rõ") — không phải một bản
++  rút gọn riêng cho vòng tự hành.
+ - **Side effects:** một lời gọi model thật cho mỗi item quét được — không
+   bao giờ throw ra ngoài dù model lỗi/timeout (fail-safe, xem spec
+   Work-State).
+@@ -279,7 +283,7 @@ Not applicable — không có màn hình.
+ - `bin/fgos-runner.mjs` — CLI (--once/--dry-run/--config), exit theo phạm trù
+ - `src/runner/loop.mjs` — vòng + startup reap (SKIP claim `human`/`session` — xem "Gặt-lại lúc khởi động") + khoá liên-tiến-trình `.fgos/runner.lock` (busy exit 6); NGAY SAU reap, TRƯỚC vòng dispatch: (1) quét mọi item `stage==='clarify' && status==='todo'` (không đọc `item.mode`) và gọi `resolveDiscovery` (`src/intake/discovery.mjs`) cho từng item, truyền `'runner'`; (2) đọc lại view tươi rồi quét mọi item `stage==='decompose' && status==='todo'` và gọi `resolveDecompose` (`src/intake/decompose.mjs`) cho từng item, cùng truyền `'runner'` — cùng lượt chạy có thể chaining cả hai sweep trên một item vừa rời clarify; ghi bản outcome dự đoán tại claim + thực tế ở cả hai lối ra cuối (thành đề xuất, hoặc đỗ/dừng) qua `addOutcome` của store; mọi `moveWork` runner tự gọi (claim/propose/park) truyền `actor:'runner'`; gọi `runGoalCheck` (từ `goal-check.mjs`, không còn tự triển khai) cho cả proof lúc dispatch lẫn proof lúc gặt-lại; `dispatch.mjs` — prompt/config/spawn (argv-only, spawnSync timeout; caveat grandchild SIGTERM ghi trong doc comment) + `resolveExecutorCommand`/`modelForTier` (tái dùng bởi discovery.mjs VÀ decompose.mjs cho lời gọi model phán); `worktree.mjs` — lifecycle + reclaimOrphanedCheckout; `recovery.mjs` — 8 lớp; `anti-loop.mjs` — visitCount/breaker
+ - `src/runner/goal-check.mjs` — hàm goal-check dùng chung DUY NHẤT (`runGoalCheck(item, cwd, timeoutMs)`): chạy `item.verify` qua shell tại `cwd`, phán chỉ bằng exit status — trích xuất từ `loop.mjs` (stage-decompose S2-pull) để cả vòng tự hành LẪN cửa pull `fgos return` (spec Work-State) gọi đúng một bản logic, không bao giờ hai bản song song
+-- `src/intake/discovery.mjs` — xem Pointers spec Work-State (module dùng chung giữa runner và verb `discover`); verb `discover` (phiên sống) truyền `'session'`; verdict đủ rõ nay `moveStage` tới `decompose`, không còn thẳng `executing`
++- `src/intake/discovery.mjs` — xem Pointers spec Work-State (module dùng chung giữa runner và verb `discover`); verb `discover` (phiên sống) truyền `'session'`; verdict đủ rõ nay `moveStage` tới `decompose`, không còn thẳng `executing`; `judgeDiscovery` nhận thêm `view` tùy chọn (per discovery-context P30) — cả sweep của runner LẪN verb `discover` truyền view đã đọc sẵn, không lời gọi nào cần đọc thêm
+ - `src/intake/decompose.mjs` — xem Pointers spec Work-State (module dùng chung giữa runner và verb `discover` khi item ở stage `decompose`); verb `discover` (phiên sống) truyền `'session'`
+ - `src/report/entropy.mjs` — thuần, không fs/Date.now(): `computeEntropy(view)` → `{score, parts}` (5 tín hiệu có trọng số, mỗi phần giải thích được); `computeCounts(view)` → tổng phẳng outcome/friction/settlement cho seal-digest; đọc/ghi lịch sử xu hướng (`entropy-history.jsonl`, cùng thư mục dữ liệu với `events.jsonl`) và định dạng seal-digest là việc của `bin/fgos.mjs`'s verb `check`, không phải module này
+ - `.fgos-runner.json` — config committed (executor template + models light/haiku, standard/sonnet, heavy/opus + timeoutMs)
+diff --git a/docs/specs/work-state.md b/docs/specs/work-state.md
+index f4f196a..bad4d36 100644
+--- a/docs/specs/work-state.md
++++ b/docs/specs/work-state.md
+@@ -1,8 +1,8 @@
+ ---
+ area: work-state
+-updated: 2026-07-16
+-sources: [phase-1-state-layer, phase-1-review-fixes, phase-2-routing-s1, phase-2-routing-s2, phase-3-compound-learning-s1, phase-3-compound-learning-s2, phase-3-compound-learning-s3-closeout, async-human-gate, stage-intake, stage-clarify, stage-decompose-s1, stage-decompose-s2, pr-lifecycle-s1, install-coexistence]
+-decisions: [9ac6ca50, 0790031c, 451ca088, fd17309a, 55ad2f9f, feed7428, 1a80b4d3, 65c642a8, 9f6b52c8, 9a19eea5, 96a65365, a7c099af, 43f257ae, 44936500, e1218b22, 6f2cbc47, a30a3d3c, 1359ab5e, f1715488, 8788e9bb]
++updated: 2026-07-17
++sources: [phase-1-state-layer, phase-1-review-fixes, phase-2-routing-s1, phase-2-routing-s2, phase-3-compound-learning-s1, phase-3-compound-learning-s2, phase-3-compound-learning-s3-closeout, async-human-gate, stage-intake, stage-clarify, stage-decompose-s1, stage-decompose-s2, pr-lifecycle-s1, install-coexistence, discovery-context]
++decisions: [9ac6ca50, 0790031c, 451ca088, fd17309a, 55ad2f9f, feed7428, 1a80b4d3, 65c642a8, 9f6b52c8, 9a19eea5, 96a65365, a7c099af, 43f257ae, 44936500, e1218b22, 6f2cbc47, a30a3d3c, 1359ab5e, f1715488, 8788e9bb, cfae0120]
+ coverage: full
+ ---
+ 
+@@ -13,7 +13,7 @@ Bộ nhớ công việc tự quản của forgent: nơi duy nhất ghi nhận "
+ ## Entry Points & Triggers
+ 
+ - `fgos init` → khởi tạo kho work-state rỗng tại thư mục làm việc hiện hành (nhật ký rỗng + bản chiếu rỗng); đồng thời quét READ-ONLY project tìm marker của harness agent khác đã có mặt (thư mục dấu ấn như `.bee/`, `.claude/`, `.codex/`, `.cursor/`, và khối managed trong `AGENTS.md` khi file đó tồn tại — `init` không bao giờ tạo/sửa `AGENTS.md`), ghi kết quả phát hiện ra output + vào manifest `.fgos/coexistence.json`; lỗi phát hiện không bao giờ chặn `init` (fail-safe), re-init lặp lại ghi manifest nhất quán (idempotent) — doctrine đầy đủ: `docs/coexistence.md`
+-- `fgos submit "<mô tả tự do>" [--async|--unattended]` → **cửa vào công khai duy nhất** cho việc mới: khai một work item từ một câu mô tả văn xuôi duy nhất — id, title, kind, risk, tier đều TỰ SUY (không cần người submit tự đặt); `verify` nhận placeholder cố định chờ bổ sung sau; kết quả in ra bọc trong một phong bì máy-đọc chuẩn (xem "Phong bì output" dưới)
++- `fgos submit "<mô tả tự do>" [--async|--unattended]` → **cửa vào công khai duy nhất** cho việc mới: khai một work item từ một câu mô tả văn xuôi duy nhất — id, title, kind, risk, tier đều TỰ SUY (không cần người submit tự đặt); toàn văn mô tả gốc được giữ nguyên trên trường `description` (Data Dictionary #17, per discovery-context P30) — nguồn ngữ cảnh đầy đủ cho context-discovery đọc lại sau, không bị cắt gọn như `title`; `verify` nhận placeholder cố định chờ bổ sung sau; kết quả in ra bọc trong một phong bì máy-đọc chuẩn (xem "Phong bì output" dưới)
+ - `fgos move` → chuyển trạng thái một item, kèm `--expect` (kỳ vọng, chống ghi đè mù); cạnh từ-chối-đề-xuất bắt buộc `--reason`
+ - `fgos decision --text "..."` → ghi một quyết định vào nhật ký
+ - `fgos ask <id> --text "..."` → đưa một item vào chờ người (`awaiting-human`), kèm **câu hỏi** người phải quyết; item rời tập việc-sẵn-sàng cho tới khi được trả lời
+@@ -48,6 +48,7 @@ Bộ nhớ công việc tự quản của forgent: nơi duy nhất ghi nhận "
+ | 14 | claimActor | Ai đang cầm claim `doing` hiện tại của item — cộng-thêm (fold) từ `actor` trên chính sự kiện `work.move` đưa item vào `doing`, KHÔNG phải trường người tự điền; phân biệt claim của cửa pull với claim của runner (xem "Cửa pull giao–nhận việc" dưới) | `runner` · `human` · `session` | no | vắng mặt (nhật ký di sản không mang `actor` trên cạnh claim) |
+ | 15 | headAtTake | Vị trí commit (HEAD) của host repo tại đúng thời điểm cửa pull `take` cầm item — cộng-thêm trên CÙNG sự kiện `work.move` đưa item vào `doing`; CHỈ `take` ghi trường này, claim của runner không bao giờ mang nó | mã commit (string), hoặc vắng mặt | no | vắng mặt (claim của runner, hoặc item chưa từng qua cửa pull) |
+ | 16 | headAtReturn | Vị trí commit (HEAD) của host repo tại đúng thời điểm `return` đo verify XANH — cộng-thêm trên CÙNG sự kiện `work.move` đưa item `doing→proposed`; đối xứng `headAtTake` nhưng ghi ở đầu RA thay vì đầu VÀO (per pr-lifecycle D1 / 1359ab5e); nguồn diff trung thực cho cổng duyệt tính dải `headAtTake→headAtReturn` của một đề xuất pull-door (xem spec Runner "Cổng duyệt PR nội bộ") | mã commit (string), hoặc vắng mặt | no | vắng mặt (đề xuất của runner không qua `return`, hoặc mọi đề xuất tạo trước pr-lifecycle) |
++| 17 | description | Toàn văn mô tả gốc người submit gõ — nguồn ngữ cảnh đầy đủ để context-discovery đọc lại (xem "Giai đoạn Làm-rõ" dưới), không bị cắt gọn/phân loại như `title` (per discovery-context P30 / cfae0120) | free text (không rỗng khi có mặt) | no | vắng mặt (item tạo qua `add`, hoặc mọi item tạo trước tính năng này) |
+ | — | Sự kiện (không hiển thị) | Đơn vị ghi của nhật ký; mỗi thao tác ghi đúng MỘT sự kiện, số thứ tự tăng dần + thời điểm + phiên bản schema `v` (hiện hành: 2; sự kiện di sản không có `v` vẫn đọc được) | `work.add` — khai item (luôn mang tier tường minh từ v2) · `work.move` — chuyển trạng thái (from/to; cạnh từ-chối `proposed→todo` VÀ cạnh gate-gãy `proposed→blocked` (per pr-lifecycle D3) đều mang `reason` bắt buộc; cạnh vào chờ mang `ask`, cạnh rời chờ mang `answer`; mọi ngã-ngũ có thể mang thêm `actor` tùy chọn — xem "Bản ghi settlement" dưới; ngã-ngũ vào `done` cũng tự mang thêm một bản ghi học — xem "Bài học lúc đóng" dưới; cạnh claim `todo→doing` qua cửa pull `take` mang thêm `headAtTake`, xem Data Dictionary #15; cạnh `doing→proposed` qua cửa pull `return` (verify xanh) mang thêm `headAtReturn`, xem Data Dictionary #16) · `decision` — quyết định kèm chữ · `work.outcome` — dự đoán HOẶC thực tế cho một item (mỗi nửa là một sự kiện riêng, cùng id; xem "Bản ghi kết quả" dưới) · `work.friction` — một lần thất bại tự-quy-tội tại park/halt (xem "Bản ghi friction" dưới) · `work.stage` — chuyển stage (from/to; có thể kèm `verify` khi rời clarify — xem "Giai đoạn Làm-rõ" dưới; ngã-ngũ rời clarify cũng có thể mang `actor` tùy chọn) · `work.discovery` — một lần context-discovery phán (xem "Bản ghi cổng discovery" dưới) | — | — |
+ | — | Phạm trù lỗi (không hiển thị) | Hợp đồng cho consumer: rẽ nhánh theo mã thoát, không theo thông điệp | `precondition` → mã 2 · `conflict` (kỳ vọng lệch) → mã 3 · `validation` → mã 4 · `corrupt-log` → mã 5 · bất ngờ → mã 1 · thành công → 0 | — | — |
+ 
+@@ -178,6 +179,19 @@ Item vào stage `clarify` phải đi qua **context-discovery**: một phép phá
+ (gọi model thật, đọc toàn bộ item, không phải quy tắc cơ học) xem thông tin
+ đã đủ để bắt tay thi công chưa.
+ 
++**Ngữ cảnh phán (per discovery-context P30 / cfae0120):** phép phán không chỉ
++đọc title/kind/refs/deps — prompt còn mang toàn văn `description` (Data
++Dictionary #17; item không có description, vd tạo qua `add`, đọc ra
++"(không có)" — degrade, không nổ), cặp hỏi-đáp MỚI NHẤT của cổng chờ-người
++nếu item từng qua đó ("Bản ghi cổng-người" trên), và toàn bộ các lần phán
++discovery trước đó của chính item ("Bản ghi cổng discovery" dưới). **Câu trả
++lời của người ở đây là quyết định CUỐI CÙNG — phán không bao giờ hỏi lại một
++chủ đề đã được trả lời**; một câu trả lời đủ để thi công phải ra verdict đủ
++rõ kèm một `verify` chạy được thật. Known limitation: bản ghi cổng chỉ giữ
++cặp hỏi-đáp MỚI NHẤT (gộp-mới-nhất theo id, không phải một mảng lịch sử) —
++nếu một vòng làm-rõ cần nhìn lại nhiều vòng hỏi-đáp trước đó, đó là mở rộng
++sau (xem Open Gaps).
++
+ - **Đủ rõ** — item chuyển `clarify → decompose` (không thẳng `executing` —
+   giai đoạn chia-việc chèn ở giữa, xem "Giai đoạn Chia-việc" dưới); MỘT sự
+   kiện `work.stage` vừa đổi stage vừa gắn lại `verify` bằng một lệnh chạy
+@@ -596,6 +610,7 @@ của `submit`. Số phận cuối cùng (giữ/xóa) chưa quyết — xem back
+ - Orchestrator service tầng fleet (registry/heartbeat/push assignment/lease, giao thức+auth cho worker từ xa) — không thuộc cửa pull take/return đã dựng, đắp sau trên cùng nhật ký sự kiện chỉ khi cần fleet worker (deferred, per D1 stage-decompose).
+ - Rollup view theo bộ (tổng hợp trạng thái mọi hậu duệ của một gốc trong một màn hình) — P24, chưa làm (deferred).
+ - Trong một project mà bee đang nghỉ (phase terminal), guard hiện tại của bee chặn ghi trực tiếp vào `.fgos/` (cổng idle-intake theo-phase, allowlist tĩnh không biết territory manifest) VÀ vào worktree tmpdir (containment phi-phase, không quan tâm phase) — hai cơ chế độc lập, không nhắm riêng fgos; luồng qua verb CLI `fgos <verb>` (Bash) không bị chặn bởi cả hai. Gap thuộc cây bee, không sửa trong feature này; friction đã file (`.bee/backlog.jsonl`, severity P2) làm địa chỉ flip khi bee sửa (per install-coexistence D7 / 8788e9bb; canary pin sự thật này — `docs/coexistence.md` Known Gaps, `docs/history/install-coexistence/reports/canary-run.md`).
++- Ngữ cảnh phán context-discovery (xem "Giai đoạn Làm-rõ" trên) chỉ mang cặp hỏi-đáp MỚI NHẤT của một item — bản ghi cổng gộp-mới-nhất, không giữ một lịch sử đầy đủ mọi vòng hỏi-đáp trước đó; nếu một vòng làm-rõ nhiều bước cần nhìn lại toàn bộ chuỗi hỏi-đáp, đó là mở rộng sau (per discovery-context P30 / cfae0120, chấp nhận cho CoS hiện tại — accepted trade-off, không phải bug).
+ 
+ ## Visuals
+ 
+@@ -611,7 +626,7 @@ Not applicable — không có màn hình.
+ - `src/state/work.mjs` — schema + validate (ID_PATTERN kebab-case); STATUSES gồm `awaiting-human`; STAGES = `clarify`/`decompose`/`executing`, field `stage` optional (đọc lazy `?? 'executing'` khi vắng mặt, không có trong DEFAULTS); field `parent` optional (lineage, validate string non-self-referencing, không đòi tồn tại — additive, không có trong DEFAULTS)
+ - `src/state/replay.mjs` — fold events → view, thuần; case `work.outcome` gộp theo id vào `view.outcomes` (key lazy, cộng thêm không đè); case `work.friction` APPEND theo id vào `view.frictions` (key lazy, mảng — mỗi record một lần xảy ra, không gộp/không đè); case `work.move` mang `ask`/`answer` gộp theo id vào `view.gates` (key lazy có bảo vệ, cộng thêm không đè); case `work.move` mang `answer` hoặc `to==='done'` (VÀ sự kiện mang phiên bản schema — bảo vệ nhật ký di sản thật) APPEND một bản ghi settlement theo id vào `view.settlements` (key lazy, mảng, kind answer/close); case `work.move` với `to==='done'` mang thêm `learning` APPEND theo id vào `view.learnings` (key lazy, mảng); case `work.add` fold thêm `item.parent` khi payload mang (additive, key lazy); case `work.stage` set `item.stage` (và `item.verify` khi payload mang verify — một sự kiện làm cả hai) và, khi RỜI clarify (guard `from === 'clarify'`, không phải đích cụ thể — chốt tại validating để retarget đích không làm câm settlement), APPEND một bản ghi settlement kind clarify-pass vào `view.settlements`; case `work.discovery` APPEND theo id vào `view.discovery` (key lazy, mảng, cùng khuôn `view.frictions`); case `work.move` đích `doing` fold thêm `actor` payload thành `item.claimActor` và `headAtTake` payload thành `item.headAtTake` khi sự kiện mang chúng (additive, lazy — đây là cách `return`/gặt-lại của runner phân biệt claim của cửa pull với claim của runner, xem "Cửa pull giao–nhận việc" trên và spec Runner)
+ - `src/state/frontier.mjs` — bộ lọc `status === 'todo'` (đã loại `awaiting-human`) VÀ `(stage ?? 'executing') === 'executing'` (đã loại item clarify/decompose) VÀ, dẫn xuất thuần từ `parent` (đệ quy qua chuỗi hậu duệ, KHÔNG đụng `deps`), loại một gốc khi bất kỳ hậu duệ nào của nó chưa `done` khỏi ready set
+-- `src/intake/discovery.mjs` — Use-case: `judgeDiscovery` (gọi model thật qua `resolveExecutorCommand`/`modelForTier` của `dispatch.mjs`, fail-safe try/catch bao trọn mọi lỗi spawn/timeout/parse về `{clear:false, question:...}` mặc định, không bao giờ throw); `resolveDiscovery` — hàm chung DUY NHẤT cho cả verb `discover` và vòng tự hành: đọc item, gọi judgeDiscovery, ghi bản ghi discovery LUÔN, rồi `moveStage`(đủ rõ → **`decompose`**, kèm verify thật)hoặc `putInAwaiting`(chưa đủ rõ, kèm câu hỏi)
++- `src/intake/discovery.mjs` — Use-case: `judgeDiscovery(work, cfg, view)` (gọi model thật qua `resolveExecutorCommand`/`modelForTier` của `dispatch.mjs`, fail-safe try/catch bao trọn mọi lỗi spawn/timeout/parse về `{clear:false, question:...}` mặc định, không bao giờ throw); `view` là tham số TÙY CHỌN (per discovery-context P30 / cfae0120) — `resolveDiscovery` truyền view nó đã đọc sẵn (không đọc thêm lần nào); `buildDiscoveryPrompt(work, view)` dùng `work.description`, `view.gates[id]` (cặp hỏi-đáp MỚI NHẤT) và `view.discovery[id]` (mọi verdict trước) để dựng phần ngữ cảnh bổ sung của prompt — thiếu `view` (lời gọi 2-tham-số cũ, vd unit test) degrade từng phần về placeholder "(không có)", không throw; `resolveDiscovery` — hàm chung DUY NHẤT cho cả verb `discover` và vòng tự hành: đọc item, gọi judgeDiscovery, ghi bản ghi discovery LUÔN, rồi `moveStage`(đủ rõ → **`decompose`**, kèm verify thật)hoặc `putInAwaiting`(chưa đủ rõ, kèm câu hỏi)
+ - `src/intake/decompose.mjs` — Use-case tầng sau discovery: `judgeDecompose` (gọi model thật, cùng executor/fail-safe pattern với `judgeDiscovery`, mọi lỗi spawn/timeout/parse → verdict không hợp lệ mặc định, không bao giờ throw); `resolveDecompose` — hàm chung cho cả verb `discover` (khi item ở stage `decompose`) và vòng tự hành: đọc item, gọi judgeDecompose, rồi một trong bốn nhánh — pass-through (`moveStage` decompose→executing, giữ verify cũ), chia (ghi n con qua `addWork` — `parent`/`deps`/verify thật từng con — rồi `moveStage` gốc; re-entrancy: view đã có con mang `parent` trỏ về gốc thì không sinh thêm, chỉ hoàn tất chuyển stage gốc), cần-người (`putInAwaiting` mang đề xuất chia làm câu hỏi, gate risk `heavy` đọc từ `item.risk`), hoặc không hợp lệ (không ghi gì, item ở nguyên cho lượt quét sau)
+ - `bin/fgos.mjs` — verb `check`: đọc `listWork(dir).outcomes`, in predicted-vs-actual; cộng thêm mục friction (đọc `view.frictions`, đếm theo lớp + cap 5 record gần nhất), mục settlement (đọc `view.settlements`, đếm theo kind+actor + cap 5), mục học (đọc `view.learnings`, cap 5), và nhắc item trạng thái cuối thiếu outcome — tất cả read-only, không sự kiện mới; tín hiệu entropy-trend + seal-digest trên cùng `check` — xem spec Runner; verb `ask`/`answer` gọi `putInAwaiting`/`answerAwaiting`; `list` mang `view.gates` (câu hỏi hiện ra không cần formatter mới) và trường `parent` khi item mang (đã đi qua `listWork`'s full-object dump, không cần formatter mới); verb `submit` — gọi `classify.mjs` (deriveTitle/classify/generateId) + `envelope.mjs` (wrapEnvelope) rồi `addWork` sẵn có, KHÔNG cửa ghi mới, gắn `stage:'clarify'`; verb `discover` — dispatch theo `item.stage` hiện tại: gọi `resolveDiscovery` (stage clarify) hoặc `resolveDecompose` (stage decompose), cùng `actor:'session'`; verb `take` — cầm đầu frontier (`readyWork`) hoặc một `--id` cùng tập, CAS `todo→doing` qua `moveWork` mang `actor`+`headAtTake` (`currentHead` của host repo), ghi outcome dự đoán qua `addOutcome`; verb `return` — TỰ CHẠY `verify` của item qua `runGoalCheck` (`src/runner/goal-check.mjs`, module dùng chung với runner — xem spec Runner) sau khi tự kiểm `isWorkingTreeClean`/`commitsSince` (helper git nhỏ trong `bin/fgos.mjs`) so `headAtTake`; xanh → `moveWork` `doing→proposed` mang thêm `headAtReturn` (`currentHead`, per pr-lifecycle D1) + `addOutcome` thực tế; đỏ → `moveWork` `doing→blocked` (`reason:'verify-fail'`) + `addOutcome` thực tế + `addFriction` lớp `verification`; verb `review`/`approve`/`reject` — cổng duyệt PR nội bộ, bề mặt CLI của một cửa duyệt cho mọi đề xuất `proposed`; cơ chế merge/verify đầy đủ sống ở `src/runner/merge.mjs` (xem spec Runner "Cổng duyệt PR nội bộ" cho hợp đồng đầy đủ)
+ - `src/runner/loop.mjs` — `runOnce`: NGAY SAU startupReap, TRƯỚC vòng dispatch executing: (1) quét mọi item `stage==='clarify' && status==='todo'` và gọi `resolveDiscovery` — lưới đỡ R19; (2) NGAY SAU đó, đọc lại view TƯƠI rồi quét mọi item `stage==='decompose' && status==='todo'` và gọi `resolveDecompose` — cùng lưới đỡ, cùng lượt chạy có thể chaining cả hai sweep trên một item vừa rời clarify; không đọc `item.mode` ở cả hai sweep; mọi `moveWork` runner tự ghi (claim/propose/park) gọi kèm `actor:'runner'`; cả hai sweep gọi `resolveDiscovery`/`resolveDecompose(..., 'runner')`

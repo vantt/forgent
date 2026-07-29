@@ -12,15 +12,26 @@
 // {type:"object", properties, required} shape bee's registry uses — the
 // manifest is zero-translation for any tool-schema-based agent.
 //
-// `access` is a NEW per-verb declaration (no prior source of truth): 'read'
-// for a verb that never appends an event or mutates `.fgos/state.json`,
-// 'mutation' for one that does. A verb with more than one sub-mode (review,
-// evolve, session) is classified by its most-privileged effect — e.g. `evolve`
-// with no flags is a pure read, but `evolve --submit` appends a work item, so
-// the whole verb is declared 'mutation'. This flag is a declaration only: P37
-// does not wire it into dispatch/authz (that is P38's job).
+// `touchesState`/`externalEffect` (str46-io-contract D4, superseding the
+// prior single `access` field) are two independent per-verb declarations: the
+// former is true for any verb that ever appends an event or overwrites
+// `.fgos/state.json`; the latter is true only for a verb with a real effect
+// OUTSIDE `.fgos/` (today: `review --github`/`approve --github`, which touch
+// a real GitHub PR). A verb with more than one sub-mode (review, evolve,
+// session) is classified by its most-privileged effect on each axis — e.g.
+// `evolve` with no flags is a pure read but `evolve --submit` appends a work
+// item, so the whole verb declares `touchesState: true`. Both flags are
+// declarations only: P37/this cell do not wire them into dispatch/authz
+// (that is P38's job).
+//
+// `paginated` (str46-io-contract D5/D35) declares whether the verb's result
+// accepts --cursor/--limit (opaque cursor, per cursor.mjs) — true only for
+// `ready`/`triage`/`evolve`/`list`, the four verbs whose result can grow
+// unboundedly with data. Every entry carries this field (even the 30 that
+// are `false`) so a transport can read pagination support machine-readably
+// instead of guessing per verb.
 
-export const SCHEMA_VERSION = '1.0';
+export const MANIFEST_SCHEMA_VERSION = '2.0';
 
 export const COMMAND_REGISTRY = [
   {
@@ -29,7 +40,9 @@ export const COMMAND_REGISTRY = [
     description: 'Initialize the .fgos/ store in the current directory (event log, empty view, coexistence manifest).',
     parameters: { type: 'object', properties: {}, required: [] },
     examples: ['fgos init'],
-    access: 'mutation',
+    touchesState: true,
+    externalEffect: false,
+    paginated: false,
     deprecated: null,
   },
   {
@@ -44,23 +57,25 @@ export const COMMAND_REGISTRY = [
         kind: { type: 'string', description: 'Work item kind.' },
         risk: { type: 'string', description: 'Work item risk level.' },
         verify: { type: 'string', description: 'Verification command or plan for this item.' },
-        deps: { type: 'string', description: 'Comma-separated list of dependency ids.' },
-        refs: { type: 'string', description: 'Comma-separated list of reference ids/links.' },
+        deps: { type: 'string', description: 'Comma-separated list of dependency ids.', multiValueFormat: 'csv' },
+        refs: { type: 'string', description: 'Comma-separated list of reference ids/links.', multiValueFormat: 'csv' },
         learn: { type: 'string', description: 'Optional learning note.' },
         tier: { type: 'string', description: 'Optional tier; omit to use the store default.' },
         domain: { type: 'string', description: 'Optional domain; omit to use the store default.' },
-        footprint: { type: 'string', description: 'Optional comma-separated list of file paths this item is expected to touch (advisory only).' },
+        footprint: { type: 'string', description: 'Optional comma-separated list of file paths this item is expected to touch (advisory only).', multiValueFormat: 'csv' },
         'discovered-from': { type: 'string', description: 'Optional id of the item this one was discovered from (provenance, not a dependency).' },
         'docs-ref': { type: 'string', description: 'Optional relative path to this item\'s docs/history/<feature>/ directory (its own CONTEXT.md/plan.md).' },
-        acceptance: { type: 'string', description: 'Optional JSON-encoded array of {text, evidence} Condition-of-Satisfaction clauses (NOT comma-separated — clause text may contain commas).' },
+        acceptance: { type: 'string', description: 'Optional JSON-encoded array of {text, evidence} Condition-of-Satisfaction clauses (NOT comma-separated — clause text may contain commas).', multiValueFormat: 'json-array' },
         'goal-tier': { type: 'string', description: "Optional goal tier ('mvp' or 'milestone'); omit to leave unset (not a goal)." },
-        targets: { type: 'string', description: 'Optional comma-separated list of ids this goal item considers "part of" it (an MVP\'s targets are milestone ids; a milestone\'s targets are ordinary work ids).' },
+        targets: { type: 'string', description: 'Optional comma-separated list of ids this goal item considers "part of" it (an MVP\'s targets are milestone ids; a milestone\'s targets are ordinary work ids).', multiValueFormat: 'csv' },
       },
       positional: ['id'],
       required: ['id', 'title', 'kind', 'risk', 'verify'],
     },
     examples: ['fgos add build-cli --title "Build CLI" --kind feature --risk medium --verify "npm test"'],
-    access: 'mutation',
+    touchesState: true,
+    externalEffect: false,
+    paginated: false,
     deprecated: null,
   },
   {
@@ -74,8 +89,8 @@ export const COMMAND_REGISTRY = [
         async: { type: 'boolean', description: 'Mark as async/unattended (submitter does not stay to collaborate). Alias: --unattended.' },
         domain: { type: 'string', description: 'Optional domain; omit to use the store default.' },
         'discovered-from': { type: 'string', description: 'Optional id of the item this one was discovered from (provenance, not a dependency).' },
-        deps: { type: 'string', description: 'Comma-separated list of dependency ids.' },
-        acceptance: { type: 'string', description: 'Optional JSON-encoded array of {text, evidence} Condition-of-Satisfaction clauses (NOT comma-separated — clause text may contain commas).' },
+        deps: { type: 'string', description: 'Comma-separated list of dependency ids.', multiValueFormat: 'csv' },
+        acceptance: { type: 'string', description: 'Optional JSON-encoded array of {text, evidence} Condition-of-Satisfaction clauses (NOT comma-separated — clause text may contain commas).', multiValueFormat: 'json-array' },
         tier: { type: 'string', description: 'Optional tier override (e.g. light/standard/heavy); omit to use classify()\'s derived value.' },
         kind: { type: 'string', description: 'Optional kind override; omit to use classify()\'s derived value.' },
         risk: { type: 'string', description: 'Optional risk override; omit to use classify()\'s derived value.' },
@@ -85,7 +100,9 @@ export const COMMAND_REGISTRY = [
       required: ['text'],
     },
     examples: ['fgos submit "Fix the flaky retry test" --async'],
-    access: 'mutation',
+    touchesState: true,
+    externalEffect: false,
+    paginated: false,
     deprecated: null,
   },
   {
@@ -102,7 +119,9 @@ export const COMMAND_REGISTRY = [
       required: ['id'],
     },
     examples: ['fgos discover build-cli'],
-    access: 'mutation',
+    touchesState: true,
+    externalEffect: false,
+    paginated: false,
     deprecated: null,
   },
   {
@@ -121,7 +140,9 @@ export const COMMAND_REGISTRY = [
       required: ['id', 'to'],
     },
     examples: ['fgos move build-cli --to doing'],
-    access: 'mutation',
+    touchesState: true,
+    externalEffect: false,
+    paginated: false,
     deprecated: null,
   },
   {
@@ -138,7 +159,9 @@ export const COMMAND_REGISTRY = [
       required: ['id'],
     },
     examples: ['fgos compound build-cli', 'fgos compound build-cli --doc-type how-to'],
-    access: 'mutation',
+    touchesState: true,
+    externalEffect: false,
+    paginated: false,
     deprecated: null,
   },
   {
@@ -154,9 +177,9 @@ export const COMMAND_REGISTRY = [
         risk: { type: 'string', description: 'New risk level.' },
         verify: { type: 'string', description: 'New verification command/plan.' },
         tier: { type: 'string', description: 'New tier.' },
-        refs: { type: 'string', description: 'Comma-separated list of reference ids/links (empty string clears the field).' },
-        deps: { type: 'string', description: 'Comma-separated list of dependency ids (empty string clears the field).' },
-        acceptance: { type: 'string', description: 'Optional JSON-encoded array of {text, evidence} Condition-of-Satisfaction clauses — replaces the whole array (empty array "[]" clears the field). NOT comma-separated — clause text may contain commas.' },
+        refs: { type: 'string', description: 'Comma-separated list of reference ids/links (empty string clears the field).', multiValueFormat: 'csv' },
+        deps: { type: 'string', description: 'Comma-separated list of dependency ids (empty string clears the field).', multiValueFormat: 'csv' },
+        acceptance: { type: 'string', description: 'Optional JSON-encoded array of {text, evidence} Condition-of-Satisfaction clauses — replaces the whole array (empty array "[]" clears the field). NOT comma-separated — clause text may contain commas.', multiValueFormat: 'json-array' },
         priority: { type: 'integer', description: 'New priority: a non-negative integer, ascending sort (lower = higher priority). Absent stays absent — items without a priority sort after every item that has one.' },
         intent: { type: 'integer', description: 'New intent score: any integer, descending sort (higher = more urgent). Absent stays absent — items without an intent sort after every item that has one.' },
         'docs-ref': { type: 'string', description: 'New relative path to this item\'s docs/history/<feature>/ directory (its own CONTEXT.md/plan.md) — lets an item gain or change this link after creation, e.g. one created via submit (which had no --docs-ref of its own before this field was added here).' },
@@ -165,7 +188,9 @@ export const COMMAND_REGISTRY = [
       required: ['id'],
     },
     examples: ['fgos edit build-cli --verify "npm test -- --grep cli"'],
-    access: 'mutation',
+    touchesState: true,
+    externalEffect: false,
+    paginated: false,
     deprecated: null,
   },
   {
@@ -183,7 +208,9 @@ export const COMMAND_REGISTRY = [
       required: ['id', 'text'],
     },
     examples: ['fgos ask build-cli --text "Which module owns this?"'],
-    access: 'mutation',
+    touchesState: true,
+    externalEffect: false,
+    paginated: false,
     deprecated: null,
   },
   {
@@ -201,7 +228,9 @@ export const COMMAND_REGISTRY = [
       required: ['id', 'text'],
     },
     examples: ['fgos answer build-cli --text "src/cli owns it."'],
-    access: 'mutation',
+    touchesState: true,
+    externalEffect: false,
+    paginated: false,
     deprecated: null,
   },
   {
@@ -217,25 +246,45 @@ export const COMMAND_REGISTRY = [
       required: ['text'],
     },
     examples: ['fgos decision --text "Use envelope wrapping at the dispatcher choke-point"'],
-    access: 'mutation',
+    touchesState: true,
+    externalEffect: false,
+    paginated: false,
     deprecated: null,
   },
   {
     name: 'list',
     invoke: 'fgos list',
-    description: 'List the full work/decisions view.',
-    parameters: { type: 'object', properties: {}, required: [] },
-    examples: ['fgos list'],
-    access: 'read',
+    description: 'List the full work/decisions view. --cursor/--limit paginate the "work" map (opaque cursor, per D5/D35): omit both to get the flat id->item map unchanged; pass either to get {items, nextCursor} instead.',
+    parameters: {
+      type: 'object',
+      properties: {
+        cursor: { type: 'string', description: 'Opaque pagination cursor from a prior call\'s nextCursor; omit to start from the beginning.' },
+        limit: { type: 'integer', description: 'Max items per page (default 50 when cursor/limit is used); omit both flags to get the unpaginated full map.' },
+      },
+      required: [],
+    },
+    examples: ['fgos list', 'fgos list --limit 20', 'fgos list --limit 20 --cursor <token>'],
+    touchesState: false,
+    externalEffect: false,
+    paginated: true,
     deprecated: null,
   },
   {
     name: 'ready',
     invoke: 'fgos ready',
-    description: 'List the frontier: open work items ready to be taken/dispatched right now.',
-    parameters: { type: 'object', properties: {}, required: [] },
-    examples: ['fgos ready'],
-    access: 'read',
+    description: 'List the frontier: open work items ready to be taken/dispatched right now. --cursor/--limit paginate the result (opaque cursor, per D5/D35): omit both to get the full array unchanged; pass either to get {items, nextCursor} instead.',
+    parameters: {
+      type: 'object',
+      properties: {
+        cursor: { type: 'string', description: 'Opaque pagination cursor from a prior call\'s nextCursor; omit to start from the beginning.' },
+        limit: { type: 'integer', description: 'Max items per page (default 50 when cursor/limit is used); omit both flags to get the unpaginated full array.' },
+      },
+      required: [],
+    },
+    examples: ['fgos ready', 'fgos ready --limit 20', 'fgos ready --limit 20 --cursor <token>'],
+    touchesState: false,
+    externalEffect: false,
+    paginated: true,
     deprecated: null,
   },
   {
@@ -250,7 +299,9 @@ export const COMMAND_REGISTRY = [
       required: [],
     },
     examples: ['fgos graph', 'fgos graph --what-if auth-3'],
-    access: 'read',
+    touchesState: false,
+    externalEffect: false,
+    paginated: false,
     deprecated: null,
   },
   {
@@ -259,16 +310,20 @@ export const COMMAND_REGISTRY = [
     description: 'Read-only advisory: items stuck in "doing" classified as stale by owner type (a person\'s claim gets far longer grace than an agent\'s). Classifies and suggests only — never reclaims.',
     parameters: { type: 'object', properties: {}, required: [] },
     examples: ['fgos stale'],
-    access: 'read',
+    touchesState: false,
+    externalEffect: false,
+    paginated: false,
     deprecated: null,
   },
   {
     name: 'conflicts',
     invoke: 'fgos conflicts',
-    description: 'Read-only advisory: pairs of ready work items whose declared file footprints overlap (a parallel-dispatch conflict risk), with the shared paths and resolution options (sequence/hoist/re-slice). Suggests only — never re-slices.',
+    description: 'Read-only advisory: pairs of ready work items whose declared file footprints overlap (a parallel-dispatch conflict risk), with the shared paths and resolution options (sequence/hoist/re-slice). Suggests only — never re-slices. Not paginated (per D5/D35): each row is a (a,b) pair with no single per-row id to build a cursor from, so it is excluded from the paginated-verb set rather than growing a synthetic per-pair key.',
     parameters: { type: 'object', properties: {}, required: [] },
     examples: ['fgos conflicts'],
-    access: 'read',
+    touchesState: false,
+    externalEffect: false,
+    paginated: false,
     deprecated: null,
   },
   {
@@ -277,7 +332,9 @@ export const COMMAND_REGISTRY = [
     description: 'Rebuild the derived view (.fgos/state.json) from the event log.',
     parameters: { type: 'object', properties: {}, required: [] },
     examples: ['fgos rebuild'],
-    access: 'mutation',
+    touchesState: true,
+    externalEffect: false,
+    paginated: false,
     deprecated: null,
   },
   {
@@ -286,7 +343,9 @@ export const COMMAND_REGISTRY = [
     description: 'Repair a truncated final line in .fgos/events.jsonl (the common crash-mid-append shape); backs up the original log first.',
     parameters: { type: 'object', properties: {}, required: [] },
     examples: ['fgos repair'],
-    access: 'mutation',
+    touchesState: true,
+    externalEffect: false,
+    paginated: false,
     deprecated: null,
   },
   {
@@ -302,7 +361,9 @@ export const COMMAND_REGISTRY = [
       required: [],
     },
     examples: ['fgos check', 'fgos check build-cli'],
-    access: 'read',
+    touchesState: false,
+    externalEffect: false,
+    paginated: false,
     deprecated: null,
   },
   {
@@ -318,7 +379,9 @@ export const COMMAND_REGISTRY = [
       required: ['id'],
     },
     examples: ['fgos rollup build-cli'],
-    access: 'read',
+    touchesState: false,
+    externalEffect: false,
+    paginated: false,
     deprecated: null,
   },
   {
@@ -335,7 +398,9 @@ export const COMMAND_REGISTRY = [
       required: [],
     },
     examples: ['fgos take', 'fgos take build-cli --role session'],
-    access: 'mutation',
+    touchesState: true,
+    externalEffect: false,
+    paginated: false,
     deprecated: null,
   },
   {
@@ -351,7 +416,9 @@ export const COMMAND_REGISTRY = [
       required: [],
     },
     examples: ['fgos pick', 'fgos pick build-cli'],
-    access: 'mutation',
+    touchesState: true,
+    externalEffect: false,
+    paginated: false,
     deprecated: null,
   },
   {
@@ -368,7 +435,9 @@ export const COMMAND_REGISTRY = [
       required: ['id'],
     },
     examples: ['fgos return build-cli'],
-    access: 'mutation',
+    touchesState: true,
+    externalEffect: false,
+    paginated: false,
     deprecated: null,
   },
   {
@@ -386,7 +455,9 @@ export const COMMAND_REGISTRY = [
       required: ['id'],
     },
     examples: ['fgos review build-cli', 'fgos review build-cli --github'],
-    access: 'mutation',
+    touchesState: false,
+    externalEffect: true,
+    paginated: false,
     deprecated: null,
   },
   {
@@ -406,7 +477,9 @@ export const COMMAND_REGISTRY = [
       required: ['id'],
     },
     examples: ['fgos approve build-cli'],
-    access: 'mutation',
+    touchesState: true,
+    externalEffect: true,
+    paginated: false,
     deprecated: null,
   },
   {
@@ -423,7 +496,9 @@ export const COMMAND_REGISTRY = [
       required: ['id', 'reason'],
     },
     examples: ['fgos reject build-cli --reason "needs more work"'],
-    access: 'mutation',
+    touchesState: true,
+    externalEffect: false,
+    paginated: false,
     deprecated: null,
   },
   {
@@ -440,32 +515,47 @@ export const COMMAND_REGISTRY = [
       required: ['id'],
     },
     examples: ['fgos catchup build-cli'],
-    access: 'mutation',
+    touchesState: true,
+    externalEffect: false,
+    paginated: false,
     deprecated: null,
   },
   {
     name: 'evolve',
     invoke: 'fgos evolve',
-    description: 'Rank open self-improve candidates (no flags), reprint one candidate\'s full friction record (--pick), or submit a candidate as a new work item (--submit — the only mutating path).',
+    description: 'Rank open self-improve candidates (no flags — --cursor/--limit paginate this list, opaque cursor per D5/D35), reprint one candidate\'s full friction record (--pick), or submit a candidate as a new work item (--submit — the only mutating path).',
     parameters: {
       type: 'object',
       properties: {
         pick: { type: 'string', description: "Reprint one ranked candidate's full friction record by id." },
         submit: { type: 'string', description: 'Submit the named candidate as a new work item.' },
+        cursor: { type: 'string', description: 'Bare-call only: opaque pagination cursor from a prior call\'s nextCursor; omit to start from the beginning.' },
+        limit: { type: 'integer', description: 'Bare-call only: max items per page (default 50 when cursor/limit is used); omit both flags to get the unpaginated full array.' },
       },
       required: [],
     },
-    examples: ['fgos evolve', 'fgos evolve --pick cand-1', 'fgos evolve --submit cand-1'],
-    access: 'mutation',
+    examples: ['fgos evolve', 'fgos evolve --limit 20', 'fgos evolve --pick cand-1', 'fgos evolve --submit cand-1'],
+    touchesState: true,
+    externalEffect: false,
+    paginated: true,
     deprecated: null,
   },
   {
     name: 'triage',
     invoke: 'fgos triage',
-    description: 'Rank open work by blocking fan-out over the unified deps+parent graph (how many other open items it unblocks), one flat row per item with stage, goalTier, and its dependency/lineage component (componentId, componentSize, isIsolated) — declared goals (mvp, then milestone) sort first.',
-    parameters: { type: 'object', properties: {}, required: [] },
-    examples: ['fgos triage'],
-    access: 'read',
+    description: 'Rank open work by blocking fan-out over the unified deps+parent graph (how many other open items it unblocks), one flat row per item with stage, goalTier, and its dependency/lineage component (componentId, componentSize, isIsolated) — declared goals (mvp, then milestone) sort first. --cursor/--limit paginate the result (opaque cursor, per D5/D35): omit both to get the full array unchanged; pass either to get {items, nextCursor} instead.',
+    parameters: {
+      type: 'object',
+      properties: {
+        cursor: { type: 'string', description: 'Opaque pagination cursor from a prior call\'s nextCursor; omit to start from the beginning.' },
+        limit: { type: 'integer', description: 'Max items per page (default 50 when cursor/limit is used); omit both flags to get the unpaginated full array.' },
+      },
+      required: [],
+    },
+    examples: ['fgos triage', 'fgos triage --limit 20', 'fgos triage --limit 20 --cursor <token>'],
+    touchesState: false,
+    externalEffect: false,
+    paginated: true,
     deprecated: null,
   },
   {
@@ -474,7 +564,9 @@ export const COMMAND_REGISTRY = [
     description: 'Read-only: (re)generate the end-user doc read-by-tag index, keyed by Diataxis quadrant (tutorial/how-to/reference/explanation). Enumerates docs/<quadrant>/, writes docs/enduser-docs-index.json with each entry\'s purpose/audience (fixed quadrant mapping), docPath, title, and sourceCaptureId (the compound-learn capture that produced the doc, or null when none is recorded).',
     parameters: { type: 'object', properties: {}, required: [] },
     examples: ['fgos docs-index'],
-    access: 'read',
+    touchesState: false,
+    externalEffect: false,
+    paginated: false,
     deprecated: null,
   },
   {
@@ -490,7 +582,9 @@ export const COMMAND_REGISTRY = [
       required: ['doc-path'],
     },
     examples: ['fgos doc-sources docs/how-to/check-rollup-progress.md'],
-    access: 'read',
+    touchesState: false,
+    externalEffect: false,
+    paginated: false,
     deprecated: null,
   },
   {
@@ -509,7 +603,9 @@ export const COMMAND_REGISTRY = [
       required: ['sub'],
     },
     examples: ['fgos session start', 'fgos session end <session-id>', 'fgos session list', 'fgos session gc'],
-    access: 'mutation',
+    touchesState: true,
+    externalEffect: false,
+    paginated: false,
     deprecated: null,
   },
   {
@@ -526,7 +622,9 @@ export const COMMAND_REGISTRY = [
       required: ['sub'],
     },
     examples: ['fgos goal set <id>', 'fgos goal show'],
-    access: 'mutation',
+    touchesState: true,
+    externalEffect: false,
+    paginated: false,
     deprecated: null,
   },
   {
@@ -541,7 +639,9 @@ export const COMMAND_REGISTRY = [
       required: [],
     },
     examples: ['fgos setup', 'fgos setup --pretty'],
-    access: 'mutation',
+    touchesState: true,
+    externalEffect: false,
+    paginated: false,
     deprecated: null,
   },
   {
@@ -556,7 +656,24 @@ export const COMMAND_REGISTRY = [
       required: [],
     },
     examples: ['fgos doctor', 'fgos doctor --pretty'],
-    access: 'read',
+    touchesState: false,
+    externalEffect: false,
+    paginated: false,
+    deprecated: null,
+  },
+  {
+    name: 'unlock',
+    invoke: 'fgos unlock',
+    description: 'Safely clears .fgos/main-checkout.lock (the STR65 concurrent-writer guard) when it is stale or corrupt. Never force-deletes: refuses and reports the holder identity when a different session genuinely still holds it live.',
+    parameters: {
+      type: 'object',
+      properties: {},
+      required: [],
+    },
+    examples: ['fgos unlock'],
+    touchesState: true,
+    externalEffect: false,
+    paginated: false,
     deprecated: null,
   },
 ];

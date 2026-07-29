@@ -22,7 +22,7 @@ test('an item with no deps is always in the frontier when todo', () => {
   assert.deepEqual(frontier(view).map((i) => i.id), ['a']);
 });
 
-test('an item is excluded from the frontier when its dep is only "proposed" (per D5)', () => {
+test('an item is excluded from the frontier when its dep is only "proposed"', () => {
   const view = {
     work: {
       base: item('base', 'proposed'),
@@ -93,7 +93,7 @@ test('frontier follows FIFO seq/declaration order, not lexical id order (add-ord
 // declaration order. These tests pin the version and re-assert both the v1
 // and v2 order as the contract, so an accidental reorder trips here.
 
-test('S4 tie-break contract: FRONTIER_ORDER_VERSION is 2 (str7-str8-priority-intent D2 bump) — a reorder of the claim-order must bump it deliberately', () => {
+test('S4 tie-break contract: FRONTIER_ORDER_VERSION is pinned at 2 — a reorder of the claim-order must bump it deliberately', () => {
   assert.equal(FRONTIER_ORDER_VERSION, 2);
 });
 
@@ -147,12 +147,12 @@ test('frontier does not mutate the view it is given', () => {
 
 // --- D6 lock: `awaiting-human` never opens into the ready set (async-human-gate-3) ---
 
-test('LOCK (per D6): an item at status "awaiting-human" is never in the frontier', () => {
+test('LOCK: an item at status "awaiting-human" is never in the frontier', () => {
   const view = { work: { a: item('a', 'awaiting-human') } };
   assert.deepEqual(frontier(view), []);
 });
 
-test('LOCK (per D6): a todo item whose dep is "awaiting-human" is NOT ready (an awaiting dep does not unblock, mirrors the proposed-dep case)', () => {
+test('LOCK: a todo item whose dep is "awaiting-human" is NOT ready (an awaiting dep does not unblock, mirrors the proposed-dep case)', () => {
   const view = {
     work: {
       base: item('base', 'awaiting-human'),
@@ -164,7 +164,7 @@ test('LOCK (per D6): a todo item whose dep is "awaiting-human" is NOT ready (an 
 
 // --- stage-clarify D1: an item at stage "clarify" is never in the frontier ---
 
-test('LOCK (per stage-clarify D1): a todo item with no dep-blockers but stage "clarify" is excluded from the frontier', () => {
+test('LOCK: a todo item with no dep-blockers but stage "clarify" is excluded from the frontier', () => {
   const view = { work: { a: { ...item('a', 'todo'), stage: 'clarify' } } };
   assert.deepEqual(frontier(view), []);
 });
@@ -174,7 +174,7 @@ test('an item with stage "executing" (explicit) and status todo is ready, same a
   assert.deepEqual(frontier(view).map((i) => i.id), ['a']);
 });
 
-test('an item with no stage field at all defaults to "executing" (per D8 lazy default) and is ready', () => {
+test('an item with no stage field at all defaults to "executing" (lazy default) and is ready', () => {
   const view = { work: { a: item('a', 'todo') } };
   assert.equal('stage' in view.work.a, false);
   assert.deepEqual(frontier(view).map((i) => i.id), ['a']);
@@ -193,7 +193,7 @@ test('a todo item at stage "clarify" whose deps are all done is still excluded (
 // --- stage-decompose D4/D5: lineage-derived frontier filter (root blocked
 // by open descendants, never by `deps`) ---
 
-test('LOCK (per stage-decompose D4): a root item with an open (not-done) child is excluded from the frontier even though it has no deps of its own — the child itself is still dispatchable', () => {
+test('LOCK: a root item with an open (not-done) child is excluded from the frontier even though it has no deps of its own — the child itself is still dispatchable', () => {
   const view = {
     work: {
       root: item('root', 'todo'),
@@ -203,7 +203,7 @@ test('LOCK (per stage-decompose D4): a root item with an open (not-done) child i
   assert.deepEqual(frontier(view).map((i) => i.id), ['child']);
 });
 
-test('a root item is included once every child reaches "done" (per stage-decompose D4)', () => {
+test('a root item is included once every child reaches "done"', () => {
   const view = {
     work: {
       root: item('root', 'todo'),
@@ -310,7 +310,7 @@ test('v2: an item with priority=1 orders before one with priority=5 (priority AS
   assert.deepEqual(frontier(view).map((i) => i.id), ['high', 'low']);
 });
 
-test('v2: an item WITH a priority sorts before one with no priority at all, regardless of the set value (absent-last bucketing, D1)', () => {
+test('v2: an item WITH a priority sorts before one with no priority at all, regardless of the set value (absent-last bucketing)', () => {
   const view = {
     work: {
       unset: item('unset', 'todo'),
@@ -322,7 +322,7 @@ test('v2: an item WITH a priority sorts before one with no priority at all, rega
   assert.deepEqual(frontier(view).map((i) => i.id), ['setHigh', 'unset']);
 });
 
-test('v2: tied on priority (both absent), an item with a higher intent orders before one with a lower intent (intent DESCENDING, D6)', () => {
+test('v2: tied on priority (both absent), an item with a higher intent orders before one with a lower intent (intent DESCENDING)', () => {
   const view = {
     work: {
       lowIntent: { ...item('lowIntent', 'todo'), intent: 2 },
@@ -332,7 +332,7 @@ test('v2: tied on priority (both absent), an item with a higher intent orders be
   assert.deepEqual(frontier(view).map((i) => i.id), ['highIntent', 'lowIntent']);
 });
 
-test('v2 REPLAY-COMPATIBILITY (per Phase 2 D7): a view where no item has priority or intent produces the EXACT SAME order as the pre-bump v1 contract (declaration order, not lexical id order)', () => {
+test('v2 REPLAY-COMPATIBILITY: a view where no item has priority or intent produces the EXACT SAME order as the pre-bump v1 contract (declaration order, not lexical id order)', () => {
   // Same fixture shape as the v1 FIFO test above (zeta declared before
   // alpha, whose id would sort first lexically) — neither item carries
   // priority or intent, so the v2 comparator must fall straight through to

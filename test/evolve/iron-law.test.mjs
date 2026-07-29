@@ -74,7 +74,7 @@ test('classifyIronLaw lists every distinct keyword that matched, not just a bool
 
 // --- iron-law: module test (filesChanged) over every D10+D14 example ---
 
-test('classifyIronLaw trips required for every D10+D14 module path via filesChanged', () => {
+test('classifyIronLaw trips required for every self-modifying module path via filesChanged', () => {
   for (const filePath of MODULE_TRIP_CASES) {
     const result = classifyIronLaw({ filesChanged: [filePath], description: undefined });
     assert.equal(result.required, true, `path "${filePath}" should trip required`);
@@ -194,7 +194,7 @@ test('classify still tiers every ORIGINAL 21 keyword as heavy (byte-identical re
   }
 });
 
-test('classify newly tiers every D14 keyword as heavy (intended behavior change)', () => {
+test('classify newly tiers every keyword in the newly-added set as heavy (intended behavior change)', () => {
   for (const keyword of NEW_13) {
     const result = classify(`a request mentioning ${keyword} directly`);
     assert.equal(result.tier, 'heavy', `"${keyword}" should tier heavy`);
