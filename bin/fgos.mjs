@@ -2448,7 +2448,30 @@ async function main() {
   }
 
   try {
-    const data = await runVerb(verb, flags, positional, dataDir());
+    const dir = dataDir();
+    // tsk-4fu-2: a verb registered `requiresExistingStore: true`
+    // (command-registry.mjs) reads/writes through this `dir` — refuse
+    // before ever reaching its handler when `.fgos/` isn't there yet,
+    // instead of letting `appendEventCore`'s own `mkdirSync` silently
+    // create a fresh, empty one (the worktree phantom-store hazard this
+    // item closes). `init` is deliberately never in that set — it is the
+    // one legitimate door that creates `.fgos/` — but gets the opposite
+    // check: refuse when `cwd` is a linked worktree, the one remaining
+    // path that could recreate a live `.fgos/` there and defeat ADR0020.
+    const entry = COMMAND_REGISTRY.find((e) => e.name === verb);
+    if (entry?.requiresExistingStore && !fs.existsSync(dir)) {
+      throw new StoreError(
+        'validation',
+        `.fgos/ not found at "${dir}" -- run "fgos init" here first, or check you are not inside a linked worktree (worktrees never carry .fgos/, per ADR0020: docs/decisions/0020-chan-fgos-khoi-worktree-worker.md).`,
+      );
+    }
+    if (verb === 'init' && !isMainWorktree(process.cwd())) {
+      throw new StoreError(
+        'validation',
+        `"fgos init" refused inside a linked worktree ("${process.cwd()}") -- worktrees never carry .fgos/ by design (ADR0020); run "fgos init" from the main checkout instead.`,
+      );
+    }
+    const data = await runVerb(verb, flags, positional, dir);
     if (flags.pretty && (verb === 'setup' || verb === 'doctor')) {
       process.stdout.write(renderPretty(verb, data));
     } else {

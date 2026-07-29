@@ -14,8 +14,27 @@ import { createSession, endSession } from '../../src/runner/session.mjs';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FGOS = path.resolve(__dirname, '../../bin/fgos.mjs');
 
-function tmpCwd() {
+// A fresh scratch dir with no `.fgos/` at all — never auto-inited. Only
+// the handful of tests that specifically exercise pre-init/first-init
+// behavior (the `init` verb's own tests, and tsk-4fu-2's new
+// `requiresExistingStore` guard tests) should use this directly; every
+// other test wants `tmpCwd()` below.
+function rawTmpCwd() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-cli-'));
+}
+
+// tsk-4fu-2: `fgos init` is no longer implicit — every `requiresExistingStore`
+// verb (command-registry.mjs) now refuses when `.fgos/` doesn't exist yet,
+// instead of silently auto-vivifying it. This suite's ~340 call sites all
+// want a ready-to-use store, not a test of that guard itself, so `tmpCwd()`
+// bootstraps it once here rather than needing an explicit `run(cwd,
+// ['init'])` at every site. `fgos init` is idempotent (store.mjs's own
+// `initStore` docstring), so the handful of tests that still call `init`
+// explicitly afterward are unaffected — a harmless no-op second call.
+function tmpCwd() {
+  const cwd = rawTmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0, 'tmpCwd(): "fgos init" failed to bootstrap .fgos/');
+  return cwd;
 }
 
 function run(cwd, args, extraEnv = {}) {
@@ -1334,7 +1353,7 @@ test('ready opens a todo item once its dep reaches done (approved, not merely pr
 });
 
 test('ready on a directory with no log at all returns an empty result, exit 0 (a read never initializes .fgos/)', () => {
-  const cwd = tmpCwd();
+  const cwd = rawTmpCwd();
   const result = run(cwd, ['ready']);
   assert.equal(result.status, 0);
   assert.deepEqual(envelopeData(result.stdout), []);
@@ -1461,7 +1480,7 @@ test('check on an item with no recorded outcome returns a null predicted/actual 
 });
 
 test('check on a directory with no log at all returns an empty outcomes list, exit 0 (a read never initializes .fgos/)', () => {
-  const cwd = tmpCwd();
+  const cwd = rawTmpCwd();
   const result = run(cwd, ['check']);
   assert.equal(result.status, 0);
   const data = envelopeData(result.stdout);
@@ -2582,7 +2601,7 @@ test('check tolerates a torn final entropy-history line — folds trend against 
 });
 
 test('check on a directory with no log at all still never initializes .fgos/ (entropy data stays absent, same as friction/settlement)', () => {
-  const cwd = tmpCwd();
+  const cwd = rawTmpCwd();
   const result = run(cwd, ['check']);
   assert.equal(result.status, 0);
   const data = envelopeData(result.stdout);
@@ -3382,7 +3401,7 @@ test('evolve with zero open friction returns an empty candidate list and exits 0
 });
 
 test('evolve on a directory with no log at all returns an empty candidate list, exit 0 (a read never initializes .fgos/)', () => {
-  const cwd = tmpCwd();
+  const cwd = rawTmpCwd();
   const result = run(cwd, ['evolve']);
   assert.equal(result.status, 0);
   assert.deepEqual(envelopeData(result.stdout), []);
