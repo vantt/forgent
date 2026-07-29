@@ -5,8 +5,11 @@
 `tsk-d3c`. Any session that claims an fgOS item and calls `Skill()` to
 route through `fgos-routing`, `fgos-exploring`, `fgos-planning`,
 `fgos-validating`, `fgos-executing`, `fgos-compounding`,
-`fgos-indexing`, or `fgos-submit-assist` — the 8 dotdir skills at
-`.claude/skills/fgos/<name>/SKILL.md` — gets `Unknown skill`, for both
+`fgos-indexing`, `fgos-submit-assist`, or `fgos-unlock` — the 9 dotdir
+skills at `.claude/skills/fgos/<name>/SKILL.md` (`fgos-unlock` is
+missing from this item's own original acceptance text, which counted
+only 8 — corrected here against the real directory listing) — gets
+`Unknown skill`, for both
 the scoped form (`fgOS:fgos-routing`) and the unscoped form
 (`fgos-routing`). This item locks what's actually true about the gap
 before any fix is chosen, and hands the fix itself to `fgos-planning`.
@@ -22,7 +25,7 @@ and `Skill(fgOS:fgos-routing)` calls failed identically, then
 
 | D-ID | Decision |
 |------|----------|
-| D1 | Do not duplicate the 8 `fgos/*` skills into `plugins/fgOS/skills/*` as a first move, and do not blindly rename the `fgos/` subdirectory as an unverified workaround. Hand the item to `fgos-planning` to root-cause *why* the discovery gap exists before picking a fix — the original hypothesis this item shipped with ("dotdir skills need plugin registration") is contradicted by scout evidence below, so the fix shape is still open. |
+| D1 | Do not duplicate the 9 `fgos/*` skills into `plugins/fgOS/skills/*` as a first move, and do not blindly rename the `fgos/` subdirectory as an unverified workaround. Hand the item to `fgos-planning` to root-cause *why* the discovery gap exists before picking a fix — the original hypothesis this item shipped with ("dotdir skills need plugin registration") is contradicted by scout evidence below, so the fix shape is still open. |
 
 ## Pinned terms
 
@@ -60,7 +63,7 @@ and `Skill(fgOS:fgos-routing)` calls failed identically, then
   `goal`, `graph`, `conflicts`, `rollup`, `stale`, `triage`, `check`,
   `cook`) is a *separate*, working set — these are the CLI-wrapper
   skills that show up as `fgOS:pick` etc. They are not duplicates of the
-  8 `fgos/*` skills; they wrap individual CLI verbs, while the 8 `fgos/*`
+  9 `fgos/*` skills; they wrap individual CLI verbs, while the 9 `fgos/*`
   skills are the *workflow-routing* layer (`fgos-routing` and friends)
   that decides which of the CLI-wrapper (or dev-workflow) skills to load
   next. Losing the routing layer does not remove the CLI wrappers, but

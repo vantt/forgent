@@ -6,8 +6,10 @@
 (below, kept for the record) classified this as a `spike` because a
 single yes/no question decides whether any fix is real — that framing
 still holds for the *hypothesis*, but executing found the actual blast
-radius of applying the fix is far wider than "8 markdown files +
-`AGENTS.md`". Flags against `CONTEXT.md`'s D1 (root-cause before
+radius of applying the fix is far wider than "9 markdown files +
+`AGENTS.md`" (also corrected at this reshape: the first pass, following
+this item's own original acceptance text, undercounted at 8 — the real
+directory holds 9, `fgos-unlock` included). Flags against `CONTEXT.md`'s D1 (root-cause before
 fixing), recounted with the real scope now known:
 
 - **existing covered behavior** — `src/runner/dispatch.mjs:124` hardcodes
@@ -37,11 +39,11 @@ not reopened):**
 case-folded (`"fgOS".toLowerCase() === "fgos"`). Neither `gitnexus` nor
 `distill` — both discoverable today — has a same-named plugin under
 `plugins/` (`dogfood-fixture/`, `fgOS/` are the only two). This is
-still the strongest available lead for *why* the 8 `fgos-*` skills are
+still the strongest available lead for *why* the 9 `fgos-*` skills are
 invisible to `Skill()`, scoped and unscoped alike.
 
 **Rejected alternative (unchanged from the first pass, now reinforced):**
-duplicating the 8 skills into `plugins/fgOS/skills/*` was rejected
+duplicating the 9 skills into `plugins/fgOS/skills/*` was rejected
 because it doubles maintenance of routing-critical text and never
 tests the collision hypothesis. That reasoning holds even more now that
 the rename is known to be bigger — a bigger rename is still evidence,
@@ -51,8 +53,8 @@ where a bigger duplication is just more permanent workaround.
 
 | Area | Files | Change |
 |---|---|---|
-| Skill content | `.claude/skills/fgos/<8 names>/SKILL.md` | `git mv` to `.claude/skills/fgos-workflow/<name>/SKILL.md`; update each file's own self-references to sibling `.claude/skills/fgos/...` paths |
-| Mirror | `.agents/skills/fgos/<8 names>/SKILL.md` | Same `git mv` to `.agents/skills/fgos-workflow/`, kept byte-identical per D4 — `fgos-mirror.test.mjs` is the proof this stayed true |
+| Skill content | `.claude/skills/fgos/<9 names>/SKILL.md` | `git mv` to `.claude/skills/fgos-workflow/<name>/SKILL.md`; update each file's own self-references to sibling `.claude/skills/fgos/...` paths |
+| Mirror | `.agents/skills/fgos/<9 names>/SKILL.md` | Same `git mv` to `.agents/skills/fgos-workflow/`, kept byte-identical per D4 — `fgos-mirror.test.mjs` is the proof this stayed true |
 | Runtime | `src/runner/dispatch.mjs:124` | Update the hardcoded `'fgos'` path segment to `'fgos-workflow'` |
 | Tests | `test/runner/dispatch.test.mjs:149`, `test/runner/prompt-templates.test.mjs:119,127` | Update literal-string assertions to the new path |
 | Specs | `docs/specs/runner.md` (7 refs, incl. the D4 passage itself), `docs/specs/reading-map.md` (1), `docs/specs/enduser-docs-authoring.md` (2), `docs/backlog.md` (3) | Mechanical path-string update, no meaning change |
@@ -81,7 +83,7 @@ work.
 2. **Update the hardcoded runtime path.** `src/runner/dispatch.mjs:124`'s
    `'fgos'` segment → `'fgos-workflow'`.
 3. **Update the 3 test files' literal strings** to match.
-4. **Update the 8 skill files' self-references**, `AGENTS.md:47`, and
+4. **Update the 9 skill files' self-references**, `AGENTS.md:47`, and
    the 13 spec/doc references (`runner.md` ×7, `reading-map.md` ×1,
    `enduser-docs-authoring.md` ×2, `backlog.md` ×3) — mechanical
    find/replace of the path string, no prose rewrite beyond that.
