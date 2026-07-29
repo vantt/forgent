@@ -297,3 +297,48 @@ export function releaseMainCheckoutLock(dir) {
     if (err.code !== 'ENOENT') throw err;
   }
 }
+
+/**
+ * Clears an AMBIGUOUS `.fgos/main-checkout.lock` (unparseable content) --
+ * the one status `acquireMainCheckoutLock` deliberately never unlinks
+ * itself (D5 fail-closed). Unlike a stale numeric-pid lock, an ambiguous
+ * one has no liveness signal to probe, so this never runs on a caller's
+ * own judgment alone -- only on content still unparseable at the moment of
+ * a second read, mirroring `tryAcquireOnce`'s own re-read-before-unlink
+ * discipline for the stale-pid branch (this file, lines 173-192): the
+ * first read may be racing a legitimate holder who is mid-write of a
+ * fresh, valid record.
+ *
+ * Never touches a lock that parses (that is HELD or ACQUIRED territory,
+ * already handled by acquireMainCheckoutLock -- this function's only job
+ * is the gap that primitive leaves open).
+ *
+ * Returns `{ status }` where status is one of:
+ *   - 'already-clear'    -- no lock file present
+ *   - 'no-longer-ambiguous' -- content now parses; a live holder wrote a
+ *     valid record between the caller's own read and this call; untouched
+ *   - 'reclaimed'         -- content still unparseable on the second read;
+ *     removed
+ */
+export function forceReclaimAmbiguousLock(dir) {
+  const lockPath = path.join(dir, LOCK_FILE);
+
+  let raw;
+  try {
+    raw = fs.readFileSync(lockPath, 'utf8');
+  } catch (err) {
+    if (err.code === 'ENOENT') return { status: 'already-clear' };
+    throw err;
+  }
+
+  if (parseLockContent(raw) !== null) {
+    return { status: 'no-longer-ambiguous' };
+  }
+
+  try {
+    fs.unlinkSync(lockPath);
+  } catch (err) {
+    if (err.code !== 'ENOENT') throw err;
+  }
+  return { status: 'reclaimed' };
+}
