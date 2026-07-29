@@ -12,6 +12,7 @@
     "bin/fgos.mjs": "entry",
     "bin/fgos-runner.mjs": "entry",
     "src/runner/loop.mjs": "use-case",
+    "src/runner/paths.mjs": "infra",
     "src/runner/dispatch.mjs": "infra",
     "src/runner/prompt-templates.mjs": "infra",
     "src/runner/worker-log.mjs": "infra",
