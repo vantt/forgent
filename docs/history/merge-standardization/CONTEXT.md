@@ -64,6 +64,18 @@ after this item's merge functionality ships (user's own sequencing call).
   259 total references, including `test/state/backward-compat.test.mjs` —
   concrete blast-radius evidence behind deferring the rename (D2).
 
+## Child item resolutions
+
+- **`tsk-4j9-1`** ("worktree return path: auto-commit + register merge-list
+  entry, idempotent") — the engine's own decompose judgment spun this out
+  as a buildable child, but it restates D1 exactly: `fgos return <id>`
+  already commits, moves the item to `proposed`, and is already idempotent
+  by construction (`return` requires `status === 'doing'`; calling it
+  again on an already-`proposed` item errors "nothing to return" rather
+  than double-registering, `bin/fgos.mjs:1373-1375`). Confirmed with the
+  user at `fgos-executing` time: closed as a no-op, no new code. This note
+  is the item's own artifact/evidence for its `return`.
+
 ## Outstanding questions deferred to planning / the follow-up rename item
 
 - Exact new literal name for `proposed` (the deferred rename item, D2) —
