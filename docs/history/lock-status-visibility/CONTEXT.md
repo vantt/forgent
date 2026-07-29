@@ -25,6 +25,7 @@ this.
 |----|----------|
 | D1 | Ships both an inline error-text augmentation (age/remaining-TTL folded into the existing HELD/AMBIGUOUS failure messages) **and** a new read-only status verb for on-demand inspection outside a failed call — not one or the other. |
 | D2 | Both currently-identity-only failure surfaces get the fix: `claim-port.mjs`'s `ClaimError` (`lock-held`/`lock-ambiguous`, the take/pick path named in the item title) and `unlock`'s own refusal message (`bin/fgos.mjs:2269`) — same underlying lock-check result, same gap, both get it. |
+| D6 (extends D2) | A third caller, `src/runner/merge.mjs:332-337` (the `merge` verb), was not known when D2 was locked — grep for every `acquireMainCheckoutLock` caller during validating surfaced it. Its `HELD` branch (`MergeError`, line 334) has the identical identity-only gap. Included in scope, confirmed against user rather than silently left out or silently added. `test/runner/merge.test.mjs` already covers this call site. |
 | D3 | Surfaced content is both lock age (time since the record's `ts`) and remaining TTL (time until the lock is eligible for reclaim) — not just one of the two. |
 | D4 | ~~Scope generalizes to all four locks sharing this lineage~~ — **superseded by D5**. |
 | D5 (supersedes D4) | Scope narrows back to `.fgos/main-checkout.lock` only, matching the item's original title. Validating's reality gate found `runner.lock` (`loop.mjs:204-276`), `sessions.lock` (`session.mjs:191-219`, `141`), and `events.lock` (`events.mjs:211-227`, `215`) all write a bare pid string to disk — no `ts` field, and none of their acquire functions accept a `ttlMs`/staleness-window parameter. `ttlMs` is a documented divergence unique to `main-checkout-lock.mjs` (its own header comment: "THREE divergences from the mirrored lineage"). Lock *age* would still be recoverable for the siblings via file mtime with no format change, but remaining-*TTL* has no existing value to compute against for them — inventing one is a new staleness-policy decision for those three locks (which would also change their stale-reclaim behavior, not just reporting), out of scope for this item. Confirmed against user rather than worked around silently. |
@@ -65,6 +66,12 @@ this.
   (`{ status: HELD, holderPid, lockPath }`) drops it; only `holderPid`
   survives to the caller. Age/remaining-TTL are computable today without
   new file-read plumbing, purely by widening this return shape.
+- `src/runner/merge.mjs:332-337` — third `acquireMainCheckoutLock` caller
+  (`merge` verb). `HELD` branch (`MergeError`, line 334): `` `cannot merge
+  "${branch}": main checkout is locked by another live session
+  (${lock.holderPid}).` `` — identity only, same gap (D6). Found via
+  `grep -rn "acquireMainCheckoutLock" src bin` during validating; not
+  known when D2 was first locked.
 - `src/runner/loop.mjs:204-276` (`acquireRunnerLock`) — writes only
   `String(pid)` to `runner.lock` (line 212); no `ts` field, no `ttlMs`
   parameter. Confirms D5.

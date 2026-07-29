@@ -24,10 +24,11 @@ verb — small enough to stay a single piece of work.
 Widen `acquireMainCheckoutLock`'s `HELD`/`AMBIGUOUS` return with
 `lockAgeMs`/`remainingTtlMs`, computed from the `record.ts`/`now`/`ttlMs`
 already in scope inside `tryAcquireOnce` (`main-checkout-lock.mjs:157-175`)
-— no new file read needed. Fold both fields into `claim-port.mjs`'s
-`ClaimError` message (line 82) and `bin/fgos.mjs`'s unlock refusal message
-(line 2269) — the two surfaces D2 names. Then add a read-only status verb
-(D1) reporting the same for on-demand inspection outside a failed call.
+— no new file read needed. Fold both fields into all three call sites'
+failure messages: `claim-port.mjs`'s `ClaimError` (line 82),
+`bin/fgos.mjs`'s unlock refusal (line 2269), and `merge.mjs`'s
+`MergeError` (line 334, D6). Then add a read-only status verb (D1)
+reporting the same for on-demand inspection outside a failed call.
 
 ### Risk map
 
@@ -36,6 +37,7 @@ already in scope inside `tryAcquireOnce` (`main-checkout-lock.mjs:157-175`)
 | Widening `HELD`/`AMBIGUOUS` return shape | medium — existing callers/tests may pattern-match the exact return object | `test/runner/main-checkout-lock.test.mjs` green after the change, plus new assertions for the added fields |
 | `claim-port.mjs` `ClaimError` message text change | low — confirmed message is user-facing only, not machine-parsed (`categoryOf` maps by `err.name`/category string, `claim-port.mjs:31-40`, not message text) | `test/cli/fgos.test.mjs`, `test/e2e/main-checkout-lock-hook.test.mjs` still assert category/exit code, not exact wording — grep both for the old message substring before editing to confirm no snapshot breaks |
 | `bin/fgos.mjs` unlock refusal message change | low | same test files above |
+| `merge.mjs` `MergeError` message text change (D6) | low, same reasoning as the other two | `test/runner/merge.test.mjs` — grep it for the old message substring before editing |
 | New `fgos lock-status` verb | low, additive `COMMAND_REGISTRY` entry, same pattern as `unlock`'s own registration | `test/cli/fgos.test.mjs`, `test/cli/fgos-help.test.mjs` (registry-driven help/usage) |
 
 ### Files touched
@@ -45,20 +47,23 @@ already in scope inside `tryAcquireOnce` (`main-checkout-lock.mjs:157-175`)
 - `src/runner/claim-port.mjs` — `ClaimError` message (line 82)
 - `bin/fgos.mjs` — unlock refusal message (line 2269), new `lock-status`
   verb case
+- `src/runner/merge.mjs` — `MergeError` message (line 334, D6)
 - `src/cli/command-registry.mjs` — new verb registry entry
 - `test/runner/main-checkout-lock.test.mjs`
 - `test/cli/fgos.test.mjs`
 - `test/cli/fgos-help.test.mjs`
 - `test/e2e/main-checkout-lock-hook.test.mjs`
+- `test/runner/merge.test.mjs`
 
 ## Shape
 
-1. **Phase 1 — widen the primitive + both messages.** Widen
+1. **Phase 1 — widen the primitive + all three messages.** Widen
    `acquireMainCheckoutLock`'s `HELD`/`AMBIGUOUS` return. Update
-   `claim-port.mjs`'s `ClaimError` message and `bin/fgos.mjs`'s unlock
-   refusal message to include age and remaining-TTL.
+   `claim-port.mjs`'s `ClaimError`, `bin/fgos.mjs`'s unlock refusal, and
+   `merge.mjs`'s `MergeError` (D6) to include age and remaining-TTL.
    Verify: `node --test test/runner/main-checkout-lock.test.mjs
-   test/cli/fgos.test.mjs test/e2e/main-checkout-lock-hook.test.mjs`.
+   test/cli/fgos.test.mjs test/e2e/main-checkout-lock-hook.test.mjs
+   test/runner/merge.test.mjs`.
 2. **Phase 2 — status verb.** Add the read-only status verb reporting
    holder identity, age, and remaining-TTL for `main-checkout.lock`,
    registered in `src/cli/command-registry.mjs` and implemented in
