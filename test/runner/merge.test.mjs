@@ -302,6 +302,31 @@ test('mergeRunnerItem aborts cleanly when the staged merge fails its own verify 
   assert.equal(fs.existsSync(path.join(repoRoot, 'produced.txt')), false, 'a staged-then-aborted merge must not leave its file behind');
 });
 
+// A real pre-commit hook (e.g. this repo's own .githooks/pre-commit main-
+// checkout-lock guard) refusing the commit is a distinct failure mode from
+// a merge conflict or a failed verify: the merge --no-commit already landed
+// cleanly and verify already passed — only the final `git commit` itself
+// fails. Every other failure branch in mergeRunnerItem aborts the merge
+// before returning/throwing; this one must too, or a commit-hook refusal
+// leaves a half-applied `--no-commit` merge sitting in the checkout.
+test('mergeRunnerItem aborts the merge when "git commit" itself fails (e.g. a refusing pre-commit hook) — main left unchanged', async () => {
+  const repoRoot = initRepo();
+  makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
+
+  const hookPath = path.join(repoRoot, '.git', 'hooks', 'pre-commit');
+  fs.writeFileSync(hookPath, '#!/bin/sh\necho "refused by test hook" >&2\nexit 1\n');
+  fs.chmodSync(hookPath, 0o755);
+
+  const headBefore = headOf(repoRoot);
+  await assert.rejects(
+    () => mergeRunnerItem(repoRoot, makeItem({ verify: 'true' })),
+    /verify passed for "fgw\/demo-item" but "git commit" failed/,
+  );
+  assert.equal(headOf(repoRoot), headBefore, 'HEAD must be unchanged after the aborted merge');
+  assert.equal(isWorkingTreeClean(repoRoot), true, 'tree must be clean after merge --abort, not left mid-merge');
+  assert.equal(fs.existsSync(path.join(repoRoot, 'produced.txt')), false, 'a staged-then-aborted merge must not leave its file behind');
+});
+
 // --- mergeRunnerItem rejects a .fgos/ write on the branch (ADR0020) -------
 //
 // worktree.mjs's createWorktree no longer checks .fgos/ out into a worker's

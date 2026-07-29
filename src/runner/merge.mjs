@@ -345,6 +345,14 @@ export async function mergeRunnerItem(repoRoot, item, { timeoutMs } = {}) {
   try {
     git(repoRoot, ['commit', '--no-edit']);
   } catch (err) {
+    try {
+      git(repoRoot, ['merge', '--abort']);
+    } catch (abortErr) {
+      throw new MergeError(
+        `verify passed for "${branch}" but "git commit" failed, and "git merge --abort" itself failed: ${abortErr.message} (commit error: ${err.message})`,
+        { branch },
+      );
+    }
     throw new MergeError(`verify passed for "${branch}" but "git commit" failed: ${err.message}`, { branch });
   }
   return { outcome: 'merged', branch, check };
