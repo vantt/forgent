@@ -107,6 +107,14 @@
     "quadrant": "how-to",
     "purpose": "Show the steps to accomplish one specific, already-understood goal.",
     "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/poll-fgos-cli-data-from-a-rust-plugin.md",
+    "title": "Poll fgOS CLI data from a Rust plugin",
+    "sourceCaptureId": "tsk-19y-2"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
     "docPath": "docs/how-to/run-a-state-verb-from-inside-a-worktree.md",
     "title": "How to run a state-writing `fgos` verb from inside a picked worktree",
     "sourceCaptureId": "tsk-56t"
