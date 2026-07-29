@@ -36,8 +36,14 @@ ambiguity to resolve here):
    - filter to `status === 'proposed'` items whose every `deps` entry is
      itself `done` (dependency-wait gate — genuinely new, `approve` has no
      such check today);
-   - among those, split into conflict-free vs. `footprintConflicts`-paired
-     (reused as-is);
+   - among those, split into conflict-free vs. conflicting, via the pairwise
+     shared-path comparison extracted out of `footprintOverlap`
+     (`src/state/graph-metrics.mjs:509-524`, D4-revised) into its own
+     candidate-list function; `footprintOverlap(view)` stays a thin wrapper
+     over it calling `frontier(view)` — the 4 existing tests
+     (`test/state/graph-metrics.test.mjs:433-478`) and `footprintConflicts`/
+     `fgos conflicts` are untouched. This piece calls the extracted
+     comparison with the proposed-ready set instead;
    - order conflict-free items by `rankImpact` (reused as-is, blocking
      fan-out then goalTier).
    Exposed read-only, same shape as `fgos triage`/`fgos conflicts` today.
@@ -55,7 +61,7 @@ ambiguity to resolve here):
 
 | Component | Risk | Proof point (for `fgos-validating`) |
 |---|---|---|
-| Readiness/ordering function (new composition of dep-wait + footprintConflicts + rankImpact) | Medium — new combination, each part separately tested today, never together | Unit tests: an item with an unmerged dep is excluded; a conflicting pair has the lower-impact one deprioritized/excluded; goalTier tie-break matches `rankImpact`'s existing behavior byte-for-byte |
+| Readiness/ordering function (new composition of dep-wait + an extracted candidate-list overlap comparison + rankImpact) | Medium — new combination + extracting shared logic out of `footprintOverlap` | Unit tests: an item with an unmerged dep is excluded; a conflicting pair has the lower-impact one deprioritized/excluded; goalTier tie-break matches `rankImpact`'s existing behavior byte-for-byte; all 4 existing `test/state/graph-metrics.test.mjs` footprint-overlap tests (lines 433-478) and `fgos conflicts` output stay byte-for-byte unchanged after the extraction |
 | Merge-next calling `approve` unattended, agent-driven | High — touches CTR005, the worktree/main-checkout structural guards, the Iron Law gate (runner-sourced items), and local-vs-github transport branching | Confirm merge-next refuses identically to `approve` when run from a worktree; confirm a real conflict still ends in `blocked`/`merge-conflict` with main byte-for-byte untouched (existing `merge-abort-probe` guarantee); confirm `role: 'human'` attribution is unchanged |
 | Regression risk on existing `approve`/`review` behavior | Medium — full existing suite must stay green | `test/cli/fgos.test.mjs` + `test/runner/loop.test.mjs` unchanged and green after this item lands |
 | New CLI verb / skill manifest surface | Low — mechanical registration | `test/cli/fgos-manifest.test.mjs` (`dispatchedVerbs`) covers the new verb the same way it covers every other one |
