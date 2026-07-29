@@ -59,6 +59,14 @@
     "quadrant": "how-to",
     "purpose": "Show the steps to accomplish one specific, already-understood goal.",
     "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/diagnose-a-verify-fail-post-merge-block-on-approve.md",
+    "title": "How to diagnose an `fgos approve` blocked by `verify-fail-post-merge`",
+    "sourceCaptureId": "tsk-2z3"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
     "docPath": "docs/how-to/fgos-terminal-pane-rename.md",
     "title": "How to: label a herdr pane with the claimed task from a chrome-only fgOS skill",
     "sourceCaptureId": "tsk-62x-1"
