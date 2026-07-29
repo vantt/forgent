@@ -118,7 +118,7 @@ test('foldEvents on the fixture parsed by hand matches rebuildView (same fold, t
   assert.deepEqual(foldEvents(events), EXPECTED_OLD_VIEW);
 });
 
-test('rebuilding the fixture twice is deterministic (D3)', () => {
+test('rebuilding the fixture twice is deterministic', () => {
   const first = rebuildView(FIXTURE_PATH);
   const second = rebuildView(FIXTURE_PATH);
   assert.deepEqual(first, second);

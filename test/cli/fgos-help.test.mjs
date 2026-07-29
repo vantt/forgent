@@ -31,32 +31,20 @@ function entry(name) {
   return found;
 }
 
-test('fgos submit --help exits 0 and prints submit\'s own help, not a one-line error', () => {
-  const cwd = tmpCwd();
-  const result = run(cwd, ['submit', '--help']);
-  assert.equal(result.status, 0);
-  assert.equal(result.stderr, '');
-  assert.ok(result.stdout.includes(entry('submit').invoke), 'stdout missing "fgos submit"');
-  assert.ok(result.stdout.includes(entry('submit').description), 'stdout missing submit\'s description');
-});
-
-test('fgos discover --help exits 0 and prints discover\'s own help', () => {
-  const cwd = tmpCwd();
-  const result = run(cwd, ['discover', '--help']);
-  assert.equal(result.status, 0);
-  assert.equal(result.stderr, '');
-  assert.ok(result.stdout.includes(entry('discover').invoke), 'stdout missing "fgos discover"');
-  assert.ok(result.stdout.includes(entry('discover').description), 'stdout missing discover\'s description');
-});
-
-test('fgos take --help exits 0 and prints take\'s own help', () => {
-  const cwd = tmpCwd();
-  const result = run(cwd, ['take', '--help']);
-  assert.equal(result.status, 0);
-  assert.equal(result.stderr, '');
-  assert.ok(result.stdout.includes(entry('take').invoke), 'stdout missing "fgos take"');
-  assert.ok(result.stdout.includes(entry('take').description), 'stdout missing take\'s description');
-});
+// submit/discover/take are arbitrary sample verbs: the centralized
+// flags.help check in main() runs before verb dispatch, uniformly, so any
+// verb proves the same mechanism — no verb-specific wiring to distinguish
+// (unlike `init --help` below, which has its own real side-effect concern).
+for (const verb of ['submit', 'discover', 'take']) {
+  test(`fgos ${verb} --help exits 0 and prints ${verb}'s own help, not a one-line error`, () => {
+    const cwd = tmpCwd();
+    const result = run(cwd, [verb, '--help']);
+    assert.equal(result.status, 0);
+    assert.equal(result.stderr, '');
+    assert.ok(result.stdout.includes(entry(verb).invoke), `stdout missing "fgos ${verb}"`);
+    assert.ok(result.stdout.includes(entry(verb).description), `stdout missing ${verb}'s description`);
+  });
+}
 
 test('fgos init --help exits 0, prints help, and does not call initStore or write any file', () => {
   const cwd = tmpCwd();

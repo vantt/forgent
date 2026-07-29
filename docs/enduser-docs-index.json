@@ -1,11 +1,51 @@
 [
   {
+    "quadrant": "tutorials",
+    "purpose": "Teach a newcomer to complete a first real task, learning by doing.",
+    "audience": "A first-time user with no prior context on this system.",
+    "docPath": "docs/tutorials/walking-a-heavy-item-through-a-3-child-split.md",
+    "title": "Walking a heavy fgOS item through clarify, a 3-child split, and done",
+    "sourceCaptureId": "tsk-3wr"
+  },
+  {
     "quadrant": "how-to",
     "purpose": "Show the steps to accomplish one specific, already-understood goal.",
     "audience": "A user who already knows the system and wants a concrete recipe.",
     "docPath": "docs/how-to/check-rollup-progress.md",
     "title": "How to check a root item's progress with `fgos rollup`",
     "sourceCaptureId": "doc-fgos-rollup-howto"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/continue-after-root-decomposes-mid-session.md",
+    "title": "How to continue when a root item decomposes into children mid-session",
+    "sourceCaptureId": "tsk-424"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/diagnose-a-blocked-return-from-an-unrelated-verify-failure.md",
+    "title": "How to diagnose a `fgos return` blocked by a verify failure unrelated to your change",
+    "sourceCaptureId": "tsk-3wr-1"
+  },
+  {
+    "quadrant": "reference",
+    "purpose": "Describe the machinery accurately and completely for lookup.",
+    "audience": "A user who needs precise facts about a specific field/command/API.",
+    "docPath": "docs/reference/gate-bypass-config.md",
+    "title": "Gate-bypass config",
+    "sourceCaptureId": "tsk-6bx-1"
+  },
+  {
+    "quadrant": "reference",
+    "purpose": "Describe the machinery accurately and completely for lookup.",
+    "audience": "A user who needs precise facts about a specific field/command/API.",
+    "docPath": "docs/reference/test-suite-legibility-cleanup-numbers.md",
+    "title": "Test suite legibility/dedup cleanup — before/after numbers",
+    "sourceCaptureId": "tsk-3wr-3"
   },
   {
     "quadrant": "explanation",
@@ -22,6 +62,14 @@
     "docPath": "docs/explanation/id-generation-design.md",
     "title": "Why a work item's id is TSK<hash>, not a bare hash",
     "sourceCaptureId": null
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/judging-real-test-duplication.md",
+    "title": "Judging real test duplication vs. superficially-similar tests",
+    "sourceCaptureId": "tsk-3wr-2"
   },
   {
     "quadrant": "explanation",

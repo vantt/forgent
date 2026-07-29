@@ -160,7 +160,7 @@ function diffSnapshots(before, after) {
 
 // --- (i) bee->fgos: guard bee THẬT, 3 loại event, thực trạng D7 -------------
 
-test('canary (i) bee->fgos: real bee guard against 3 fgos-territory writes — D7 verdict-map (2 KNOWN-GAP deny, 1 allow)', { skip: BEE_SKIP }, () => {
+test('canary (i) bee->fgos: real bee guard against 3 fgos-territory writes — verdict-map (2 KNOWN-GAP deny, 1 allow)', { skip: BEE_SKIP }, () => {
   const fx = makeFixture();
 
   // Bash `fgos <verb>` — ALLOWED (D7: "Bash fgos verbs qua").
@@ -258,7 +258,7 @@ test('canary self-check control: the SAME git-less fixture WITH onboarding.json 
 
 // --- (iii) init: detect + nhường --------------------------------------------
 
-test('canary (iii) fgos init detects bee and leaves it untouched (nhường-nhịn, D4/D6)', { skip: BEE_SKIP }, () => {
+test('canary (iii) fgos init detects bee and leaves it untouched (nhường-nhịn)', { skip: BEE_SKIP }, () => {
   const fx = makeFixture();
   const stateBefore = fs.readFileSync(path.join(fx, '.bee/state.json'));
   const agentsBefore = fs.readFileSync(path.join(fx, 'AGENTS.md'));
@@ -279,7 +279,7 @@ test('canary (iii) fgos init detects bee and leaves it untouched (nhường-nh�
 
 // --- (ii) footprint: real fgos round, snapshot diff -------------------------
 
-test('canary (ii) footprint: a real fgos round (init->submit->runner --once->proposed) writes no byte outside .fgos/ and the owned .git/ door (D2); bee-fixture files stay byte-identical; fgos->bee stays vacuous-by-absence', { skip: BEE_SKIP }, () => {
+test('canary (ii) footprint: a real fgos round (init->submit->runner --once->proposed) writes no byte outside .fgos/ and the owned .git/ door; bee-fixture files stay byte-identical; fgos->bee stays vacuous-by-absence', { skip: BEE_SKIP }, () => {
   const fx = makeFixture();
   assert.equal(spawnSync(process.execPath, [FGOS, 'init'], { cwd: fx, encoding: 'utf8' }).status, 0);
 

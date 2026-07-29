@@ -328,7 +328,7 @@ test('e2e pr-gate (c) pull-door item: take -> commit -> return -> proposed, revi
 // --- (d) reject a pull-door item: D4's no-auto-revert has real teeth here,
 // because the item's code is already sitting on main ---------------------
 
-test('e2e pr-gate (d) reject a pull-door item: proposed -> todo carries the reason, and the item\'s own commit REMAINS on main untouched (D4 no-revert is meaningful only when the code is already on main)', () => {
+test('e2e pr-gate (d) reject a pull-door item: proposed -> todo carries the reason, and the item\'s own commit REMAINS on main untouched (no-revert is meaningful only when the code is already on main)', () => {
   const repoRoot = initTempRepo();
 
   assert.equal(fgos(repoRoot, ['init']).status, 0);

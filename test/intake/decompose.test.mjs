@@ -227,7 +227,7 @@ test('judgeDecompose falls back to a default reason when need-human supplies non
   assert.ok(verdict.reason.length > 0);
 });
 
-test('judgeDecompose fails safe (never throws, invalid) on unparsable stdout, retrying up to MAX_JUDGE_ATTEMPTS before falling back (str68 D2/D3, nested-judge-fix)', () => {
+test('judgeDecompose fails safe (never throws, invalid) on unparsable stdout, retrying up to MAX_JUDGE_ATTEMPTS before falling back (nested-judge-fix)', () => {
   const dir = mkTempDir();
   const { scriptPath, counterPath } = writeCountingRawStdoutExecutor(dir, 'not json at all');
   const cfg = cfgFor([scriptPath, '{prompt}']);
@@ -239,7 +239,7 @@ test('judgeDecompose fails safe (never throws, invalid) on unparsable stdout, re
   assert.equal(readCount(counterPath), 3);
 });
 
-test('judgeDecompose retries once with a stricter prompt on a parse-shaped failure and resolves to the retry verdict (str68 D2)', () => {
+test('judgeDecompose retries once with a stricter prompt on a parse-shaped failure and resolves to the retry verdict', () => {
   const dir = mkTempDir();
   const scriptPath = writeFlakyThenValidExecutor(dir, 'not json at all', { verdict: 'pass-through' });
   const cfg = cfgFor([scriptPath, '{prompt}']);
@@ -254,7 +254,7 @@ test('judgeDecompose fails safe when the verdict JSON is missing the "verdict" f
   assert.deepEqual(judgeDecompose(sampleWork(), cfg), { kind: 'invalid' });
 });
 
-test('judgeDecompose fails safe when the executor exits non-zero, attempting exactly once — no retry on a non-parse failure (str68 D2)', () => {
+test('judgeDecompose fails safe when the executor exits non-zero, attempting exactly once — no retry on a non-parse failure', () => {
   const dir = mkTempDir();
   const { scriptPath, counterPath } = writeCountingFailingExecutor(dir, 7);
   const cfg = cfgFor([scriptPath, '{prompt}']);
@@ -285,7 +285,7 @@ test('judgeDecompose fails safe when the work item\'s tier has no configured mod
 // human's `fgos answer` never changes anything and the same question repeats
 // forever. ---------------------------------------------------------------
 
-test('judgeDecompose with a view embeds the latest gate answer in the prompt (tsk-3w8)', () => {
+test('judgeDecompose with a view embeds the latest gate answer in the prompt', () => {
   const dir = mkTempDir();
   const scriptPath = echoPromptExecutor(dir);
   const cfg = cfgFor([scriptPath, '{prompt}']);
@@ -301,7 +301,7 @@ test('judgeDecompose with a view embeds the latest gate answer in the prompt (ts
   assert.match(verdict.reason, /Pass-through — không cần tách con\./);
 });
 
-test('judgeDecompose degrades to a placeholder (no throw) when no view is passed — old 3-arg call stays backward-compatible (tsk-3w8)', () => {
+test('judgeDecompose degrades to a placeholder (no throw) when no view is passed — old 3-arg call stays backward-compatible', () => {
   const dir = mkTempDir();
   const scriptPath = echoPromptExecutor(dir);
   const cfg = cfgFor([scriptPath, '{prompt}']);
@@ -309,7 +309,7 @@ test('judgeDecompose degrades to a placeholder (no throw) when no view is passed
   assert.match(verdict.reason, /chưa có vòng hỏi-đáp nào với người/);
 });
 
-test('resolveDecompose: a need-human verdict parks via putInAwaiting, and the NEXT resolveDecompose call sees that answer in the prompt (tsk-3w8 end-to-end)', () => {
+test('resolveDecompose: a need-human verdict parks via putInAwaiting, and the NEXT resolveDecompose call sees that answer in the prompt (end-to-end)', () => {
   const scriptDir = mkTempDir();
   const echoScript = echoPromptExecutor(scriptDir);
   const cfg = cfgFor([echoScript, '{prompt}']);
@@ -679,7 +679,7 @@ test('resolveDecompose routes a risk-heavy root through the human gate on a pass
 // time). The gate must release once a human has genuinely answered ITS OWN
 // prior ask — never a stale answer from an unrelated question.
 
-test('resolveDecompose releases a risk-heavy root once the human has answered THIS gate\'s own prior ask, proceeding with the model verdict (tsk-3w8)', () => {
+test('resolveDecompose releases a risk-heavy root once the human has answered THIS gate\'s own prior ask, proceeding with the model verdict', () => {
   const scriptDir = mkTempDir();
   const scriptPath = writeVerdictExecutor(scriptDir, { verdict: 'pass-through' });
   const cfg = cfgFor([scriptPath, '{prompt}']);
