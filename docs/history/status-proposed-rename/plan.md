@@ -16,7 +16,7 @@
 
 ## Approach
 
-**Hướng chọn:** một item fgOS duy nhất (không tách con), thực thi qua 2 pha không đối xứng — Pha A git-tracked (đổi enum trong source `src/`, `bin/fgos.mjs` + toàn bộ test suite + docs + viết migration script, verify bằng `npm test`, merge bình thường) và Pha B runbook thủ công ngoài git (chạy migration script thật lên 3 kho `.fgos` trong phạm vi 0019, nối tiếp NGAY trong cửa sổ `main-checkout-lock` mà Pha A's merge đã giữ — chi tiết ở dưới). Cộng một decision record MỚI supersede thuật ngữ của 0006 (không sửa 0006 tại chỗ — theo quy ước "Changing a locked law supersedes its decision ID" của `AGENTS.md`).
+**Hướng chọn:** một item fgOS duy nhất (không tách con), thực thi qua 2 pha không đối xứng — Pha A git-tracked (đổi enum trong source `src/`, `bin/fgos.mjs` + toàn bộ test suite + docs + viết migration script, verify bằng `npm test`, merge bình thường) và Pha B runbook thủ công ngoài git (chạy migration script thật lên 3 kho `.fgos` trong phạm vi 0019, ngay trong cùng phiên thao tác sau khi Pha A merge, best-effort tuần tự — chi tiết rủi ro/lý do không cần cơ chế khoá ở dưới). Cộng một decision record MỚI supersede thuật ngữ của 0006 (không sửa 0006 tại chỗ — theo quy ước "Changing a locked law supersedes its decision ID" của `AGENTS.md`).
 
 **Vì sao 1 item, không tách item con (dù có 2 pha):**
 - 2 pha không phải 2 "việc" độc lập trong backlog — Pha B không tự đứng được (không có gì để claim/verify/return qua vòng đời fgOS item, chỉ là thao tác vận hành một lần ngay sau merge của chính Pha A).
@@ -42,20 +42,30 @@ chính item này. Tách rõ 2 pha, KHÔNG phải 2 item fgOS riêng (migration k
   migration script lên 3 kho thật. KHÔNG phải việc của Execute/verify — không có
   gì để commit.
 
-**Rủi ro mới phát hiện: khe hở giữa merge (Pha A) và migrate (Pha B).**
-`src/state/work.mjs:37` khoá cứng `STATUSES = Object.freeze([..., 'proposed', ...])`,
-và dòng 135-137 throw nếu `status` không nằm trong danh sách. Khi Pha A merge xong,
-enum đổi sang `awaiting-approval` — TỪ THỜI ĐIỂM ĐÓ, mọi lệnh `fgos` nào chạm kho
-sống (246 event còn mang `"proposed"`, đo được ở `.fgos/events.jsonl`) sẽ throw
-validation ngay, phá `fgos list`/`ready`/mọi worktree khác đang dùng chung kho sống
-— cho tới khi Pha B chạy xong. Đây KHÔNG PHẢI lý do mở lại D4 (đã khoá: không
-permanent shim) — khe hở đóng được bằng hạ tầng CÓ SẴN: `merge.mjs:380` đã tự
-`acquireMainCheckoutLock` (`releaseOnExit: true`) quanh chính thao tác merge.
-Pha B phải chạy trong CÙNG một lần giữ lock đó (nối tiếp ngay sau merge, trước khi
-lock release) — không phải 2 thao tác tách rời theo "kỷ luật thao tác viên", mà là
-merge + migrate chạy trong 1 lần giữ lock cơ học, chặn mọi lệnh `fgos` khác xen vào
-giữa. Chi tiết nối `acquireMainCheckoutLock` cho Pha B là việc của Execute — plan
-này chỉ khoá YÊU CẦU: Pha B không được rời khỏi cửa sổ lock của Pha A.
+**Rủi ro thật giữa merge (Pha A) và migrate (Pha B) — đo lại chính xác, hẹp hơn
+đánh giá ban đầu:**
+`validateWorkShape`/`validateWork` (`src/state/work.mjs:122,387`) CHỈ chạy ở write
+path (`store.mjs:155` trong `addWork`, `:227` trong `editWork`) — KHÔNG chạy khi
+replay/đọc. Vậy `fgos list`/`ready`/`check` đọc event cũ mang `"proposed"` KHÔNG
+crash, chỉ fold nguyên chuỗi cũ vào view — an toàn tuyệt đối bất kể thời điểm.
+
+Rủi ro thật hẹp hơn nhiều: `fsm.mjs:162-176`'s `transitionWork` so `work.status`
+(fold từ log) với bảng `TRANSITIONS` bằng string literal (`from: 'proposed'`,
+dòng 84,96-98). Sau rename, bảng đổi key sang `'awaiting-approval'` — CHỈ item nào
+CHƯA migrate (còn `status: 'proposed'` thật trong log) mới bị `FsmError`
+(`'no transition from "proposed" to ...'`) khi ai đó gọi `approve`/`reject`/
+`return` trên ĐÚNG item đó — lỗi rõ ràng, tự hết khi migrate xong, không phải
+crash toàn hệ thống. Đếm thật tại thời điểm viết plan: đúng 3 item đang
+`status: proposed` (`tsk-5oa`, `tsk-63c`, `tsk-2z3`) — đây là TOÀN BỘ blast
+radius, không phải "mọi worktree khác".
+
+Vì rủi ro tự-chữa-lành và khoanh vùng rõ (chỉ 3 id cụ thể, chỉ hành động
+approve/reject/return, không phải đọc), KHÔNG cần nối Pha B vào cửa sổ
+`main-checkout-lock` của Pha A (over-engineer cho rủi ro nhỏ này — vi phạm YAGNI).
+Chỉ cần: chạy Pha B trong cùng phiên thao tác ngay sau khi Pha A merge (best-effort
+tuần tự, không cần cơ chế khoá cơ học); nếu ai đó lỡ gọi `approve` một trong 3 id
+trên đúng lúc giữa 2 pha, họ nhận lỗi `FsmError` rõ ràng và thử lại sau khi Pha B
+xong — không mất dữ liệu, không hỏng trạng thái nào khác.
 
 **Thứ tự thực hiện (Pha A, 1 commit trên `fgw/tsk-66l`):**
 1. Migration script (đọc/ghi 3 kho `.fgos` theo field path cụ thể — KHÔNG blind
@@ -66,14 +76,15 @@ này chỉ khoá YÊU CẦU: Pha B không được rời khỏi cửa sổ lock 
    edges), `docs/specs/work-state.md` Data Dictionary #4/O4.
 5. `npm test` xanh toàn bộ, commit, merge bình thường (diff không chạm `.fgos/`).
 
-**Thứ tự thực hiện (Pha B, runbook thủ công, trong cùng cửa sổ main-checkout-lock
-của Pha A, ngay sau merge — KHÔNG phải verify/Execute của item):**
+**Thứ tự thực hiện (Pha B, runbook thủ công, ngay sau merge — KHÔNG phải
+verify/Execute của item):**
 1. Chạy migration script thật lên 3 kho phạm vi (kho sống, `dogfood-fixture`,
    `fgos-test-drive` tại `/home/vantt/projects/fgos-test-drive/.fgos`) — xác nhận
    `test/fixtures/phase1-events.jsonl` KHÔNG đổi 1 byte (đã đo: fixture này có 0
    chỗ chứa `"proposed"`, loại trừ vô hại).
-2. `fgos rebuild` trên kho sống + xác nhận `fgos list` chạy được bình thường trước
-   khi nhả main-checkout-lock.
+2. `fgos rebuild` trên kho sống + xác nhận `fgos list` chạy được bình thường, và
+   3 item đang `proposed` (`tsk-5oa`, `tsk-63c`, `tsk-2z3`) đã fold đúng thành
+   `awaiting-approval`.
 
 ## Risk map
 
@@ -81,7 +92,7 @@ của Pha A, ngay sau merge — KHÔNG phải verify/Execute của item):**
 |---|---|---|
 | Migration script đúng field-path, không blind replace | CAO | Dry-run diff trên bản sao kho thật trước khi ghi kho thật; xác nhận CHỈ field `status`/`work.move.to`/`work.move.from`/`outcome.actual.outcome` đổi — text tự do (title/description) chứa chữ "proposed" không bị đụng |
 | Migration đủ cả 3 kho, đúng phạm vi 0019 | CAO | Checklist tường minh: kho sống dùng chung, `dogfood-fixture/.fgos` (đã xác nhận tồn tại), `fgos-test-drive` tại `/home/vantt/projects/fgos-test-drive/.fgos` (đã xác nhận tồn tại, có `events.jsonl`); `test/fixtures/phase1-events.jsonl` byte-diff = rỗng (đã đo: 0 chỗ chứa `"proposed"`) |
-| Khe hở merge→migrate (Pha A xong, Pha B chưa chạy) làm kho sống throw validation cho MỌI worktree khác | CAO | `src/state/work.mjs:37,135-137` xác nhận enum hard-validate, throw ngay nếu gặp giá trị lạ; `src/runner/merge.mjs:380` xác nhận `acquireMainCheckoutLock({releaseOnExit:true})` đã tồn tại quanh merge — Pha B phải nối vào CÙNG cửa sổ lock đó (Execute triển khai cụ thể, plan chỉ khoá yêu cầu) |
+| Khe hở merge→migrate (Pha A xong, Pha B chưa chạy) | THẤP (đã hạ từ CAO sau khi đo lại) | `store.mjs:155,227` xác nhận `validateWork` chỉ chạy write path, đọc/replay an toàn tuyệt đối; `fsm.mjs:162-176,84,96-98` xác nhận rủi ro thật CHỈ là `FsmError` precondition khi approve/reject/return đúng 1 trong 3 item hiện đang `proposed` (`tsk-5oa`, `tsk-63c`, `tsk-2z3`, đếm thật lúc viết plan) trong lúc chưa migrate — tự hết khi Pha B chạy xong, không mất dữ liệu |
 | Source + test rename đủ 239 chỗ / 30+ file | TRUNG BÌNH | `rg -n "'proposed'" src bin test` đếm trước/sau — kỳ vọng 0 chỗ còn lại ngoài text mô tả lịch sử (comment/docs nhắc tên cũ có chủ đích); `npm test` toàn bộ xanh |
 | Hash/revision ổn định sau rewrite | TRUNG BÌNH | `fgos rebuild` xong, so `data_hash`/view trước-sau trên cùng 1 trạng thái logic — theo đúng tinh thần `test/e2e/rebuild-determinism.test.mjs` đã có |
 | Decision record mới supersede đúng 0006 | THẤP | Đọc lại `docs/decisions/0006-*.md` sau khi thêm record mới — xác nhận 0006 không bị sửa tại chỗ, chỉ được trích dẫn ngược (đúng khuôn 0019 đã làm với RUL11) |
@@ -96,10 +107,10 @@ npm test && npm run cli -- list | head -10
 
 ## Split
 
-**Không tách.** Một mảnh việc trung thực duy nhất — Pha B (runbook migrate 3 kho) không phải một item fgOS độc lập được, vì không tự có vòng đời claim/verify/return riêng; nó là phần đuôi vận hành bắt buộc của chính Pha A, chạy trong cùng cửa sổ lock. Lý do đầy đủ ở mục Approach trên.
+**Không tách.** Một mảnh việc trung thực duy nhất — Pha B (runbook migrate 3 kho) không phải một item fgOS độc lập được, vì không tự có vòng đời claim/verify/return riêng; nó là phần đuôi vận hành bắt buộc của chính Pha A, chạy ngay sau (best-effort, rủi ro khe hở đã đo là THẤP/tự-chữa-lành). Lý do đầy đủ ở mục Approach trên.
 
 ## Câu hỏi còn mở (kế thừa từ CONTEXT.md, chưa cần chặn kế hoạch)
 
 - ~~Đường dẫn thật của kho `fgos-test-drive`~~ — đã xác nhận: `/home/vantt/projects/fgos-test-drive/.fgos` (giải quyết tại `fgos-validating`).
-- Có cần 1 test migration riêng (giống `test/state/backward-compat.test.mjs`) khoá hành vi replay sau rewrite hay không — quyết định cụ thể để `fgos-validating` cân nhắc khi chứng minh tính khả thi.
-- Cách cụ thể nối Pha B vào cửa sổ `acquireMainCheckoutLock` của Pha A (sửa `merge.mjs` để tự chạy migration script sau merge trước khi release lock, hay một lệnh `fgos` mới gọi cả hai tuần tự) — quyết định thiết kế cụ thể thuộc `fgos-executing`, plan này chỉ khoá yêu cầu không được rời khỏi cửa sổ lock.
+- Có cần 1 test migration riêng (giống `test/state/backward-compat.test.mjs`) khoá hành vi replay sau rewrite hay không — quyết định cụ thể để `fgos-executing` cân nhắc.
+- ~~Cách nối Pha B vào main-checkout-lock của Pha A~~ — không cần nữa: đo lại (`fgos-validating`, vòng 2) xác nhận rủi ro khe hở THẤP và tự-chữa-lành, không cần cơ chế khoá.
