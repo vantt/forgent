@@ -48,6 +48,14 @@
     "sourceCaptureId": "tsk-3wr-1"
   },
   {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/run-a-state-verb-from-inside-a-worktree.md",
+    "title": "How to run a state-writing `fgos` verb from inside a picked worktree",
+    "sourceCaptureId": "tsk-56t"
+  },
+  {
     "quadrant": "reference",
     "purpose": "Describe the machinery accurately and completely for lookup.",
     "audience": "A user who needs precise facts about a specific field/command/API.",
@@ -118,6 +126,14 @@
     "docPath": "docs/explanation/layered-architecture-invariant.md",
     "title": "fgOS's layered architecture is a live, tested invariant — not a diagram",
     "sourceCaptureId": null
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/main-checkout-lock-release-on-exit-opt-in.md",
+    "title": "Why `acquireMainCheckoutLock`'s release-on-exit is opt-in, never the default",
+    "sourceCaptureId": "tsk-45z"
   },
   {
     "quadrant": "explanation",
