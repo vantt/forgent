@@ -27,13 +27,23 @@ state or touches git worktrees directly — every write goes through the
 2. **Claim the item and stand up its worktree.** Run:
 
    ```
-   node ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs pick $ARGUMENTS
+   node ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs pick $ARGUMENTS --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
    ```
 
    Always use the literal `${CLAUDE_PROJECT_DIR}` substitution shown above,
    never a relative path — an installed plugin's files run from a copied
    cache location, not from this repo checkout, so a relative path would
    resolve to the wrong place or fail outright.
+
+   `--dir` (tsk-56t): most picks run from the main checkout, where this is
+   a no-op — but tsk-424's chaining case (a session already inside a root
+   item's worktree calling `/fgOS:pick` again on a child item, via a
+   second in-session `EnterWorktree`) means this cwd can already BE a
+   linked worktree, which never carries its own `.fgos/` (ADR0020).
+   `${CLAUDE_PROJECT_DIR}` still resolves to the main checkout even from
+   inside that worktree (it survives an `EnterWorktree` switch), so
+   passing it as `--dir` here keeps the chained claim writing to the one
+   real store instead of refusing.
 
    If the command fails (e.g. the frontier is empty, the id doesn't exist,
    or the item isn't claimable), show the real error to the user and stop —

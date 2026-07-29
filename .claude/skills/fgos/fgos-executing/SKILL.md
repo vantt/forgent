@@ -19,6 +19,20 @@ re-shapes the work; that already happened at `clarify`/`decompose`.
 
 ## Hard rules
 
+- This skill runs precisely while the session is inside the claimed
+  item's worktree (the case tsk-56t exists for) — which never carries its
+  own `.fgos/` by design (ADR0020). Every `fgos <verb>` this skill calls
+  (`ask`, `answer`, `return`) is `requiresExistingStore: true` and refuses
+  (exit 4) rather than silently diverge if run bare from here. Resolve
+  the main checkout root and pass it explicitly on every one of them:
+
+  ```bash
+  root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
+  node "$root/bin/fgos.mjs" <verb> ... --dir "$root"
+  ```
+
+  (tsk-56t D1 — the same `root` resolution `fgos-exploring`'s and
+  `fgos-planning`'s own gate-bypass checks already rely on).
 - Implement real behavior. No stubs, TODO-only placeholders, dead code, or
   pseudo-implementations offered as if they were done.
 - Match existing patterns in the touched files and the decisions already

@@ -29,13 +29,20 @@ liveness judgment `acquireMainCheckoutLock`
 2. **Clear the lock.** Run:
 
    ```
-   node ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs unlock
+   node ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs unlock --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
    ```
 
    Always use the literal `${CLAUDE_PROJECT_DIR}` substitution shown above,
    never a relative path — an installed plugin's files run from a copied
    cache location, not from this repo checkout, so a relative path would
    resolve to the wrong place or fail outright.
+
+   `--dir` (tsk-56t): the `take`/`pick` that just failed may have been a
+   tsk-424 chained pick from inside an existing linked worktree, which
+   never carries its own `.fgos/` by design (ADR0020) —
+   `${CLAUDE_PROJECT_DIR}` still resolves to the main checkout even from
+   inside that worktree (it survives an `EnterWorktree` switch), so
+   passing it as `--dir` here targets the one real lock/store explicitly.
 
 3. **Read the result.**
    - Success (`{ cleared: true, reason: "stale-or-free" | "reclaimed" }`) —

@@ -10,16 +10,22 @@ Flags counted: **3** — standard.
 
 - public contracts (2) — every `SKILL.md` template a session reads mid-flow
   is an agent-facing contract this item changes the invocation shape of.
-  Verified by grep across every `SKILL.md` for a bare state-verb
-  invocation: `plugins/fgOS/skills/{ask,answer,return,discover,move,cook}`
-  and `.claude/skills/fgos/{fgos-routing,fgos-exploring,fgos-planning,
-  fgos-validating,fgos-executing,fgos-submit-assist}` — 12 files, not the
-  5-6 first assumed. There is no standalone `decision`/`edit` plugin skill
-  under `plugins/fgOS/skills/` (confirmed: `ls` lists only `answer, ask,
-  check, conflicts, cook, discover, goal, graph, list, move, pick, ready,
-  return, rollup, stale, submit, triage, unlock`) — those two verbs are
-  only ever invoked inline from `fgos-exploring`/`fgos-planning`'s own flow
-  text, which the file list above already covers.
+  First verified by a narrow grep (12 files: `plugins/fgOS/skills/
+  {ask,answer,return,discover,move,cook}` and `.claude/skills/fgos/
+  {fgos-routing,fgos-exploring,fgos-planning,fgos-validating,
+  fgos-executing,fgos-submit-assist}`), then widened during Phase 3's own
+  implementation to a full sweep against every `requiresExistingStore:
+  true` verb name, not just the 7 originally searched for — found 5 more:
+  `plugins/fgOS/skills/{submit,pick,goal,unlock}` and `.claude/skills/fgos/
+  {fgos-unlock,fgos-compounding}` (`fgos-validating` dropped — it only
+  mentions `discover` descriptively, never calls a state verb itself).
+  **17 files total**, grep-verified clean (no remaining bare invocation of
+  a `requiresExistingStore: true` verb across either skill tree). There is
+  no standalone `decision`/`edit` plugin skill under `plugins/fgOS/skills/`
+  (confirmed: `ls` lists only `answer, ask, check, conflicts, cook,
+  discover, goal, graph, list, move, pick, ready, return, rollup, stale,
+  submit, triage, unlock`) — those two verbs are only ever invoked inline
+  from `fgos-exploring`/`fgos-planning`'s own flow text, already covered.
 - existing covered behavior (1) — `test/cli/fgos.test.mjs` already has
   uncommitted WIP hardening the exact linked-worktree
   `requiresExistingStore` refusal this plan must not regress.
@@ -81,7 +87,7 @@ escape hatch a caller must opt into, never a silent change to what a bare
 | `bin/fgos.mjs` `--dir` flag parsing / `dataDir()` | low — additive, default path unchanged | `fgos list --dir <mainRoot>` run with cwd inside a `.fgos/`-less linked worktree returns the real view; `fgos list` with no `--dir` from the same cwd is unchanged (still silent-empty, until phase 2) |
 | requiresExistingStore refusal path | low — must not regress tsk-4fu-2 | existing + WIP tests in `test/cli/fgos.test.mjs` still pass unmodified; a state verb given a garbage `--dir` still refuses with the same `.fgos/ not found` message, just naming the given dir instead of cwd |
 | read-verb (`list`/`ready`/...) missing-store signal | low — additive field/stderr, no shape break | new test: the field is present and true only when `!fs.existsSync(dir) && !isMainWorktree(cwd)`; absent for a normal fresh non-worktree dir with no store (that case stays "not evaluated", not "warning") |
-| `SKILL.md` snippet rewrites (12 files, grep-verified) | low-medium — most-touched surface, easy to miss one | manual dry run: pick a real throwaway item, walk pick → exploring (`ask`/`decision`) → planning (`decision`) → validating → return entirely from the worktree, confirm main's `.fgos/events.jsonl` gets every event and `approve` sees `proposed` with no manual `cd`/subshell |
+| `SKILL.md` snippet rewrites (17 files, grep-verified) | low-medium — most-touched surface, easy to miss one | manual dry run: pick a real throwaway item, walk pick → exploring (`ask`/`decision`) → planning (`decision`) → validating → return entirely from the worktree, confirm main's `.fgos/events.jsonl` gets every event and `approve` sees `proposed` with no manual `cd`/subshell |
 
 ## Shape (phased)
 
@@ -109,13 +115,32 @@ escape hatch a caller must opt into, never a silent change to what a bare
    one array-shaped verb (`ready`) and one object-shaped verb (`list`), is
    absent for a normal non-worktree cwd with no store (that stays "not
    evaluated", not "warning").
-3. **Skill contract rewrite.** Update the state-verb bash snippet in each
-   of the 12 files named in the mode-count evidence above
-   (`plugins/fgOS/skills/{ask,answer,return,discover,move,cook}/SKILL.md`,
-   `.claude/skills/fgos/{fgos-routing,fgos-exploring,fgos-planning,
-   fgos-validating,fgos-executing,fgos-submit-assist}/SKILL.md`) to
-   resolve `root` via the git-common-dir one-liner and pass
-   `--dir "$root"`. Same untrusted-input rule already in force (item
+3. **Skill contract rewrite — two idioms, matched to what each file
+   already does** (refined during this phase's own implementation, found
+   by empirically checking whether `${CLAUDE_PROJECT_DIR}` survives an
+   `EnterWorktree` switch — it does: this very session's own `/fgOS:pick`
+   render resolved it to the main checkout even though the session's cwd
+   was already a worktree at that point):
+   - `plugins/fgOS/skills/{ask,answer,return,discover,move,submit,pick,
+     goal,unlock,cook}/SKILL.md` (10 files — 6 identified going in, 4 more
+     found during this phase's own full-verb-name sweep: `submit`, `pick`,
+     `goal`, `unlock`) already compute
+     `${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}` as
+     the prefix for `/bin/fgos.mjs` — that same value, by construction, IS
+     the repo root. Reuse it verbatim as `--dir`'s value; no new
+     subprocess, no new mechanism.
+   - `.claude/skills/fgos/{fgos-routing,fgos-exploring,fgos-planning,
+     fgos-executing,fgos-submit-assist,fgos-unlock,fgos-compounding}/
+     SKILL.md` (7 files — `fgos-validating` dropped, it never calls a
+     state verb itself; `fgos-unlock`/`fgos-compounding` found during the
+     same sweep) never use `${CLAUDE_PROJECT_DIR}` today (some are loaded
+     mid-session via the Skill tool, not a slash command, so that
+     substitution isn't verified available there) — they keep the
+     git-common-dir one-liner they already use successfully in their own
+     embedded gate-check snippet (or gain one instruction bullet where
+     they had none, rather than rewriting every individual inline
+     mention), resolving `root` once and passing `--dir "$root"` on every
+     state-verb call. Same untrusted-input rule already in force (item
    `title`/`description` stays a discrete quoted argv element — `--dir`
    doesn't change that).
 4. **End-to-end proof.** The dry run described in the risk map's last row,

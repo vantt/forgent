@@ -72,7 +72,7 @@ never re-implements a dev-skill's substance inline; it invokes them.
      it yourself. Once the user approves, call the mechanical engine:
 
      ```
-     node ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs discover <id> --json
+     node ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs discover <id> --json --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
      ```
 
      (Same call the `discover` skill wraps — see
@@ -112,10 +112,13 @@ never re-implements a dev-skill's substance inline; it invokes them.
         description / linked `CONTEXT.md` / `plan.md`, implement the real
         change, and run its attached `verify` command until it actually
         passes. Commit.
-     3. `fgos return <id>` — it measures real progress itself (clean tree,
-        advanced HEAD, verify actually green); it does not take your word
-        for it. If it rejects the return, fix the real gap and retry — never
-        argue with it or fabricate progress.
+     3. `fgos return <id>` (same call, same `--dir` treatment, as
+        `plugins/fgOS/skills/return/SKILL.md` — the session is now inside
+        the worktree entered in step 2, which never carries its own
+        `.fgos/` per ADR0020) — it measures real progress itself (clean
+        tree, advanced HEAD, verify actually green); it does not take your
+        word for it. If it rejects the return, fix the real gap and
+        retry — never argue with it or fabricate progress.
      4. Once `return` succeeds the id is `proposed` — pop it off the queue.
 
 3. **Report.** Once the queue is empty, summarize every id touched and its

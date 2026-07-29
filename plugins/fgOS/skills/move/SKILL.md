@@ -33,7 +33,7 @@ CTR001).
 2. **Move the item.** Run:
 
    ```
-   node ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs move <id> --to <status>
+   node ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs move <id> --to <status> --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
    ```
 
    substituting the id and status parsed in step 1. Always use the literal
@@ -41,6 +41,14 @@ CTR001).
    an installed plugin's files run from a copied cache location, not from
    this repo checkout, so a relative path would resolve to the wrong place
    or fail outright.
+
+   `--dir` (tsk-56t): the session may already be inside the claimed item's
+   worktree (`/fgOS:pick` switches into it), which never carries its own
+   `.fgos/` by design (ADR0020) — `${CLAUDE_PROJECT_DIR}` still resolves
+   to the main checkout even from inside that worktree (it survives an
+   `EnterWorktree` switch), so passing it as `--dir` here points this
+   write at the one real store explicitly, instead of the CLI resolving
+   `.fgos/` under the worktree's own (missing) cwd.
 
    If the command fails (e.g. the id doesn't exist, the status is invalid,
    or a CAS precondition doesn't hold), show the real error to the user and
