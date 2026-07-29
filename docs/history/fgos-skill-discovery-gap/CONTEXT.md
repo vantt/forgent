@@ -84,6 +84,41 @@ and `Skill(fgOS:fgos-routing)` calls failed identically, then
   repo cannot control on its own is left open — `fgos-planning` should
   surface that distinction explicitly if it turns out to be the latter.
 
+## D2 — collision hypothesis disproven (post-executing)
+
+The `fgos-planning`-shaped rename (`.claude/skills/fgos/` →
+`.claude/skills/fgos-workflow/`, plus the `.agents/` mirror,
+`dispatch.mjs`, 3 tests, and doc references — committed `3e683aa` on
+`fgw/tsk-d3c`) shipped, `npm test` green, item returned to `proposed`.
+A fresh session opened directly in that worktree (real new session,
+not a continuation) then called `Skill({skill: "fgos-routing"})` —
+the skill's own name, unchanged by the rename — and it still failed
+with the identical `Unknown skill: fgos-routing`, and the skill still
+did not appear in that session's own available-skills list.
+
+**This disproves the case-fold collision hypothesis.** The rename was
+reverted (`dfe189e`, clean revert, `npm test` still green on the 3
+targeted files afterward). D1's "root-cause before fixing" stance is
+vindicated by this outcome, not contradicted by it — the
+strongest-available lead turned out wrong, and the item is better off
+having spent one cheap, reversible rename to learn that than having
+silently shipped a fix that never addressed the real cause.
+
+**What remains ruled out or open now:**
+- Ruled out: "needs plugin registration" (original hypothesis, D1).
+- Ruled out: case-fold name collision with `plugins/fgOS/` (D2, this
+  section).
+- Ruled out: git-tracking status (`gitnexus` is untracked yet
+  discoverable; `fgos` was tracked yet not — tracking is not the
+  variable).
+- Still open: the actual mechanism. Nothing else testable from inside
+  this repo was identified during this pass. The remaining option with
+  actual proof behind it (rather than a theory) is duplicating the 9
+  skills into `plugins/fgOS/skills/*`, matching the pattern the 17
+  already-working CLI-wrapper skills use — a person needs to decide
+  whether to take that fallback now or invest further in root-causing
+  a harness-level behavior this repo may not control.
+
 ## Canonical references
 
 - `.claude/skills/fgos/fgos-routing/SKILL.md`
