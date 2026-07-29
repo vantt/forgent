@@ -79,6 +79,13 @@ Cả hai dùng chung 1 helper loại trừ (`isFgosOnlyStatusLine`) nhưng hàm 
 chính thì viết riêng 2 lần, với khác biệt phạm vi thật (subtree vs
 whole-repo) — không phải trùng tên ngẫu nhiên, là 2 implementation thật.
 
+**Đã sửa** (item `choke-point-workingtree-clean-duplication`, commit
+`3dad0c2`): hợp nhất về 1 hàm `isWorkingTreeClean(repoRoot, ownFileSet,
+{ scope })` trong `src/runner/merge.mjs`, `scope` nhận `'subtree'` (return)
+hoặc `'whole-repo'` (approve, mặc định) — cùng 1 lần tính `prefix`, cùng 1
+lần loại trừ `.fgos/`. `bin/fgos.mjs`'s own `isWorkingTreeClean(cwd,
+ownFileSet)` giờ chỉ delegate sang hàm trên với `scope: 'subtree'`.
+
 #### 3. `createWorktree` — 6 call site, mỗi nơi tự xử lý baseRef/cleanup riêng
 
 Re-verify tsk-53f's finding từ đầu theo D2 (không tái dùng report cũ) —
