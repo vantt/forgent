@@ -1002,7 +1002,13 @@ async function runVerb(verb, flags, positional, dir) {
       // answerAwaiting reads this back later to resume to the same status
       // instead of always falling to `todo`.
       const statusAtAsk = askView.work[id]?.status;
-      const { event } = putInAwaiting(dir, { id, ask: text, expectedStatus, parentSnapshotAtAsk, statusAtAsk });
+      // rationale/alternatives/source (tsk-63c D1/D3): optional, same
+      // guarded-passthrough shape as the rest of ask's fields — fold into
+      // gates[id] alongside ask/parentSnapshotAtAsk/statusAtAsk.
+      const rationale = optionalField(flags.rationale, 'ask --rationale requires a non-empty value (omit --rationale entirely to skip it)');
+      const alternatives = optionalField(flags.alternatives, 'ask --alternatives requires a non-empty value (omit --alternatives entirely to skip it)');
+      const source = optionalField(flags.source, 'ask --source requires a non-empty value (omit --source entirely to skip it)');
+      const { event } = putInAwaiting(dir, { id, ask: text, expectedStatus, parentSnapshotAtAsk, statusAtAsk, rationale, alternatives, source });
       return { id, from: event.payload.from, to: event.payload.to, seq: event.seq };
     }
 
@@ -1016,13 +1022,22 @@ async function runVerb(verb, flags, positional, dir) {
       const id = requireField(positional[0] ?? flags.id, 'answer requires an id: fgos answer <id> --text "..." [--expect <status>]');
       const text = requireField(flags.text, 'answer requires --text "..."');
       const expectedStatus = optionalField(flags.expect, 'answer --expect requires a status value (omit --expect entirely to skip the CAS check)');
-      const { event } = answerAwaiting(dir, { id, answer: text, expectedStatus, role: 'human' });
+      // rationale/alternatives/source (tsk-63c D1/D3): same optional
+      // guarded-passthrough shape as `ask` above.
+      const rationale = optionalField(flags.rationale, 'answer --rationale requires a non-empty value (omit --rationale entirely to skip it)');
+      const alternatives = optionalField(flags.alternatives, 'answer --alternatives requires a non-empty value (omit --alternatives entirely to skip it)');
+      const source = optionalField(flags.source, 'answer --source requires a non-empty value (omit --source entirely to skip it)');
+      const { event } = answerAwaiting(dir, { id, answer: text, expectedStatus, role: 'human', rationale, alternatives, source });
       return { id, from: event.payload.from, to: event.payload.to, seq: event.seq };
     }
 
     case 'decision': {
       const text = requireField(flags.text ?? (positional.length ? positional.join(' ') : undefined), 'decision requires --text "..."');
-      const { event } = addDecision(dir, { text });
+      const rationale = requireField(flags.rationale, 'decision requires --rationale "..."');
+      const alternatives = optionalField(flags.alternatives, 'decision --alternatives requires a non-empty value (omit --alternatives entirely to skip it)');
+      const source = optionalField(flags.source, 'decision --source requires a non-empty value (omit --source entirely to skip it)');
+      const id = optionalField(flags.id, 'decision --id requires a non-empty value (omit --id entirely to skip per-item scoping)');
+      const { event } = addDecision(dir, { text, rationale, alternatives, source, id });
       return { seq: event.seq };
     }
 
