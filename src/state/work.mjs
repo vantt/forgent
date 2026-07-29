@@ -27,11 +27,14 @@ const ID_PATTERN = /^[a-z][a-z0-9]*(-[a-z0-9]+)*$/;
  * approval/merge before it becomes `done`; extended by async-human-gate D1/D3
  * with `awaiting-human`: a single generic human-gate state, separate from
  * `blocked`, that a work item parks in while waiting for a person to answer
- * a question — see fsm.mjs for its transition edges). Owned here (schema
+ * a question; extended by fsm-wontfix-terminal-status D1/D2 with `wontfix`:
+ * a second terminal state alongside `done`, for an item deliberately closed
+ * without being built (superseded, duplicate, admin decision) rather than
+ * completed — see fsm.mjs for its transition edges). Owned here (schema
  * owns domain) — fsm.mjs imports and re-exports this rather than defining
  * its own copy, so there is exactly one list of legal statuses.
  */
-export const STATUSES = Object.freeze(['todo', 'doing', 'blocked', 'proposed', 'done', 'awaiting-human']);
+export const STATUSES = Object.freeze(['todo', 'doing', 'blocked', 'proposed', 'done', 'awaiting-human', 'wontfix']);
 
 /**
  * Tier domain for `work.tier` (per D6) — the cost/cognitive weight a work

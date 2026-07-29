@@ -65,7 +65,7 @@ test('multi-tier deps: a mid-chain dep stuck at doing blocks the whole chain', (
   assert.deepEqual(frontier(view), []);
 });
 
-for (const status of ['blocked', 'doing', 'proposed', 'done']) {
+for (const status of ['blocked', 'doing', 'proposed', 'done', 'wontfix']) {
   test(`an item itself at status "${status}" (not todo) is excluded from the frontier`, () => {
     const view = { work: { a: item('a', status) } };
     assert.deepEqual(frontier(view), []);
@@ -224,6 +224,32 @@ test('a root with two children is blocked while either one is still open, then r
   assert.deepEqual(frontier(view), []);
   view.work.childB.status = 'done';
   assert.deepEqual(frontier(view).map((i) => i.id), ['root']);
+});
+
+// fsm-wontfix-terminal-status D1: wontfix is a second resolved status
+// alongside done for lineage purposes — a permanently-wontfix child must
+// not anchor its parent out of the frontier forever, the same structural
+// bug wontfix exists to fix for blocked (per the item's own trigger case).
+test('a root with two children is released once the open one reaches "wontfix" (not just "done") — wontfix counts as resolved for lineage', () => {
+  const view = {
+    work: {
+      root: item('root', 'todo'),
+      childA: { ...item('childA', 'done'), parent: 'root' },
+      childB: { ...item('childB', 'wontfix'), parent: 'root' },
+    },
+  };
+  assert.deepEqual(frontier(view).map((i) => i.id), ['root']);
+});
+
+test('a root with a genuinely blocked (not wontfix) child is still excluded — the lineage filter is not over-broadened by the wontfix fix', () => {
+  const view = {
+    work: {
+      root: item('root', 'todo'),
+      childA: { ...item('childA', 'done'), parent: 'root' },
+      childB: { ...item('childB', 'blocked'), parent: 'root' },
+    },
+  };
+  assert.deepEqual(frontier(view), []);
 });
 
 test('the lineage filter walks multiple generations: an open grandchild still blocks the root even though the direct child is already done', () => {

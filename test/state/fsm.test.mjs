@@ -7,7 +7,7 @@ function work(status, overrides = {}) {
 }
 
 test('STATUSES exposes the full flat status domain', () => {
-  assert.deepEqual(STATUSES, ['todo', 'doing', 'blocked', 'proposed', 'done', 'awaiting-human']);
+  assert.deepEqual(STATUSES, ['todo', 'doing', 'blocked', 'proposed', 'done', 'awaiting-human', 'wontfix']);
 });
 
 for (const [from, to] of [
@@ -20,6 +20,9 @@ for (const [from, to] of [
   ['blocked', 'proposed'],
   ['doing', 'proposed'],
   ['proposed', 'done'],
+  ['blocked', 'wontfix'],
+  ['todo', 'wontfix'],
+  ['doing', 'wontfix'],
 ]) {
   test(`transitionWork allows ${from} -> ${to} and returns a validated event with no extra payload keys`, () => {
     const event = transitionWork({ work: work(from), to });
@@ -113,6 +116,9 @@ test('every legal edge is exactly the declared table; every other status pair is
     'doing->awaiting-human',
     'awaiting-human->todo',
     'awaiting-human->doing',
+    'blocked->wontfix',
+    'todo->wontfix',
+    'doing->wontfix',
   ]);
   for (const from of STATUSES) {
     for (const to of STATUSES) {
@@ -247,6 +253,29 @@ test('done is reachable only through the doing -> done edge, never directly from
   for (const from of ['todo', 'blocked']) {
     assert.throws(
       () => transitionWork({ work: work(from), to: 'done' }),
+      (err) => err instanceof FsmError && err.category === 'precondition',
+    );
+  }
+});
+
+// fsm-wontfix-terminal-status D1/D4: wontfix is a SECOND terminal state
+// alongside done — same no-exit shape, mirrors the 'done is terminal'
+// test above one status over.
+test('wontfix is terminal single-door: no transition out of wontfix, no matter the target', () => {
+  for (const to of ['todo', 'doing', 'blocked', 'proposed', 'done', 'awaiting-human']) {
+    assert.throws(
+      () => transitionWork({ work: work('wontfix'), to }),
+      (err) => err instanceof FsmError && err.category === 'precondition',
+    );
+  }
+});
+
+// D3: wontfix is reachable from exactly blocked/todo/doing — never from
+// proposed, done, or awaiting-human.
+test('wontfix is not reachable from proposed, done, or awaiting-human', () => {
+  for (const from of ['proposed', 'done', 'awaiting-human']) {
+    assert.throws(
+      () => transitionWork({ work: work(from), to: 'wontfix' }),
       (err) => err instanceof FsmError && err.category === 'precondition',
     );
   }

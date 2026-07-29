@@ -12,6 +12,20 @@
 // and `proposed -> done` (approval/merge of a worker's proposal). Neither
 // is more canonical than the other — both are asserted by test.
 //
+// fsm-wontfix-terminal-status D1/D2/D3/D4: `wontfix` is a SECOND terminal
+// state alongside `done` — for an item deliberately closed without being
+// built (superseded, duplicate, admin decision), as opposed to `done`'s
+// "actually completed". Three doors in — `blocked -> wontfix`,
+// `todo -> wontfix`, `doing -> wontfix` (D3, mirroring how `awaiting-human`
+// already enters from both `todo` and `doing`, plus `blocked`) — and zero
+// doors out (D4, symmetric with `done`; a wrongly-closed item is revived by
+// filing a new item that references the old one via `refs`, not by
+// reopening this edge). No `reason` is mechanically required to enter
+// `wontfix`, the same shape as plain `todo -> blocked`/`doing -> blocked`
+// (as opposed to `proposed -> todo`/`proposed -> blocked`, which do
+// require one) — the closure reason is expected in the item's decision
+// log (D2), not enforced here.
+//
 // async-human-gate D1/D3/D5: `awaiting-human` is a single generic park
 // state, entered from either `todo` or `doing` (the two states an item can
 // hold before parking) and left through exactly one exit, back to `todo`
@@ -92,6 +106,11 @@ const TRANSITIONS = Object.freeze([
   // the ask-time snapshot (`statusAtAsk`); this edge is what makes `doing`
   // a legal one, alongside the existing `todo` resume above.
   Object.freeze({ from: 'awaiting-human', to: 'doing' }),
+  // fsm-wontfix-terminal-status D1/D3: three doors into the second
+  // terminal state, zero doors out (see header comment above).
+  Object.freeze({ from: 'blocked', to: 'wontfix' }),
+  Object.freeze({ from: 'todo', to: 'wontfix' }),
+  Object.freeze({ from: 'doing', to: 'wontfix' }),
 ]);
 
 /**
