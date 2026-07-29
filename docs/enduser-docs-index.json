@@ -51,6 +51,22 @@
     "quadrant": "how-to",
     "purpose": "Show the steps to accomplish one specific, already-understood goal.",
     "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/fgos-terminal-pane-rename.md",
+    "title": "How to: label a herdr pane with the claimed task from a chrome-only fgOS skill",
+    "sourceCaptureId": "tsk-62x-1"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/fix-invisible-nested-project-skills.md",
+    "title": "Fix a project skill that `Skill()` reports as \"Unknown skill\"",
+    "sourceCaptureId": "tsk-d3c"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
     "docPath": "docs/how-to/run-a-state-verb-from-inside-a-worktree.md",
     "title": "How to run a state-writing `fgos` verb from inside a picked worktree",
     "sourceCaptureId": "tsk-56t"
@@ -94,6 +110,14 @@
     "docPath": "docs/explanation/fgos-choke-point-pattern.md",
     "title": "Why fgOS keeps growing the same decision logic in more than one place",
     "sourceCaptureId": "tsk-1ab"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/fgos-discover-verify-path-drift.md",
+    "title": "Explanation: when the engine's own auto-generated verify is wrong",
+    "sourceCaptureId": "tsk-62x"
   },
   {
     "quadrant": "explanation",
@@ -157,7 +181,7 @@
     "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/explanation/work-item-lifecycle-and-domain-model.md",
     "title": "Why the work-item lifecycle keeps status and stage separate, and what extending it costs",
-    "sourceCaptureId": null
+    "sourceCaptureId": "tsk-2zv"
   },
   {
     "quadrant": "explanation",
