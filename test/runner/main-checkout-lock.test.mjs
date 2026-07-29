@@ -3,10 +3,12 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { pathToFileURL } from 'node:url';
 import { execFileSync, spawnSync } from 'node:child_process';
 import {
   acquireMainCheckoutLock,
   releaseMainCheckoutLock,
+  releaseMainCheckoutLockIfOwn,
   forceReclaimAmbiguousLock,
   LOCK_FILE,
   ACQUIRED,
@@ -188,6 +190,153 @@ test('releaseMainCheckoutLock is idempotent when no lock file exists', () => {
   const { dir } = setup();
   fs.mkdirSync(dir, { recursive: true });
   assert.doesNotThrow(() => releaseMainCheckoutLock(dir));
+});
+
+// --- releaseMainCheckoutLockIfOwn (tsk-45z D2): identity-checked release ----
+
+test('releaseMainCheckoutLockIfOwn releases a lock recorded under the caller\'s own identity', () => {
+  const { dir } = setup();
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(lockPathFor(dir), JSON.stringify({ pid: 'session-abc-123', ts: Date.now() }));
+
+  const res = releaseMainCheckoutLockIfOwn(dir, 'session-abc-123');
+
+  assert.equal(res.status, 'released');
+  assert.equal(fs.existsSync(lockPathFor(dir)), false);
+});
+
+test('releaseMainCheckoutLockIfOwn leaves a DIFFERENT identity\'s live lock untouched (never a blind unlink)', () => {
+  const { dir } = setup();
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(lockPathFor(dir), JSON.stringify({ pid: 'session-other-live', ts: Date.now() }));
+
+  const res = releaseMainCheckoutLockIfOwn(dir, 'session-abc-123');
+
+  assert.equal(res.status, 'not-owner');
+  assert.equal(res.holderPid, 'session-other-live');
+  assert.equal(fs.existsSync(lockPathFor(dir)), true);
+  const record = JSON.parse(fs.readFileSync(lockPathFor(dir), 'utf8'));
+  assert.equal(record.pid, 'session-other-live');
+});
+
+test('releaseMainCheckoutLockIfOwn is a no-op when no lock file exists', () => {
+  const { dir } = setup();
+  fs.mkdirSync(dir, { recursive: true });
+
+  const res = releaseMainCheckoutLockIfOwn(dir, 'session-abc-123');
+
+  assert.equal(res.status, 'no-lock');
+});
+
+test('releaseMainCheckoutLockIfOwn leaves an unparseable (AMBIGUOUS) lock file untouched', () => {
+  const { dir } = setup();
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(lockPathFor(dir), 'not json at all {{{');
+
+  const res = releaseMainCheckoutLockIfOwn(dir, 'session-abc-123');
+
+  assert.equal(res.status, 'ambiguous');
+  assert.equal(fs.readFileSync(lockPathFor(dir), 'utf8'), 'not json at all {{{');
+});
+
+test('releaseMainCheckoutLockIfOwn works for a numeric (pid) identity too, not just strings', () => {
+  const { dir } = setup();
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(lockPathFor(dir), JSON.stringify({ pid: process.pid, ts: Date.now() }));
+
+  const res = releaseMainCheckoutLockIfOwn(dir, process.pid);
+
+  assert.equal(res.status, 'released');
+  assert.equal(fs.existsSync(lockPathFor(dir)), false);
+});
+
+// --- crash-safety: exit/SIGINT/SIGTERM release the lock automatically ------
+
+test('acquire does NOT register exit/SIGINT/SIGTERM listeners by default (releaseOnExit omitted) — required for .githooks/pre-commit\'s intentional lingering-lock design', () => {
+  // .githooks/pre-commit acquires/refreshes this lock on every commit and
+  // NEVER releases it itself (TTL is the only intended clearing mechanism —
+  // a session may commit several times in a row, and the lock must survive
+  // each hook process's own normal exit(0) in between). If acquire attached
+  // exit listeners by default, the hook's own process.exit(0) would fire
+  // them and delete the lock it just successfully wrote, reopening the
+  // exact STR65 race this lock exists to prevent — this is the regression
+  // this test guards against.
+  const { dir } = setup();
+  const before = {
+    exit: process.listenerCount('exit'),
+    SIGINT: process.listenerCount('SIGINT'),
+    SIGTERM: process.listenerCount('SIGTERM'),
+  };
+
+  const res = acquireMainCheckoutLock(dir, { identity: process.pid });
+  assert.equal(res.status, ACQUIRED);
+  assert.equal(process.listenerCount('exit'), before.exit);
+  assert.equal(process.listenerCount('SIGINT'), before.SIGINT);
+  assert.equal(process.listenerCount('SIGTERM'), before.SIGTERM);
+
+  res.release();
+});
+
+test('acquire with releaseOnExit:true registers exit/SIGINT/SIGTERM listeners, and release() removes them again (no leak across cycles)', () => {
+  const { dir } = setup();
+  const before = {
+    exit: process.listenerCount('exit'),
+    SIGINT: process.listenerCount('SIGINT'),
+    SIGTERM: process.listenerCount('SIGTERM'),
+  };
+
+  const first = acquireMainCheckoutLock(dir, { identity: process.pid, releaseOnExit: true });
+  assert.equal(first.status, ACQUIRED);
+  assert.equal(process.listenerCount('exit'), before.exit + 1);
+  assert.equal(process.listenerCount('SIGINT'), before.SIGINT + 1);
+  assert.equal(process.listenerCount('SIGTERM'), before.SIGTERM + 1);
+
+  first.release();
+  assert.equal(process.listenerCount('exit'), before.exit);
+  assert.equal(process.listenerCount('SIGINT'), before.SIGINT);
+  assert.equal(process.listenerCount('SIGTERM'), before.SIGTERM);
+
+  // A second acquire/release cycle must not accumulate listeners either.
+  const second = acquireMainCheckoutLock(dir, { identity: process.pid + 1, releaseOnExit: true });
+  assert.equal(second.status, ACQUIRED);
+  second.release();
+  assert.equal(process.listenerCount('exit'), before.exit);
+  assert.equal(process.listenerCount('SIGINT'), before.SIGINT);
+  assert.equal(process.listenerCount('SIGTERM'), before.SIGTERM);
+});
+
+test('a held lock acquired with releaseOnExit:true is released automatically when the holding process is killed with SIGINT (crash-safety net)', () => {
+  const { dir } = setup();
+  const moduleUrl = pathToFileURL(path.resolve('src/runner/main-checkout-lock.mjs')).href;
+  const script = [
+    `import('${moduleUrl}').then(({ acquireMainCheckoutLock }) => {`,
+    `  const res = acquireMainCheckoutLock(${JSON.stringify(dir)}, { identity: process.pid, releaseOnExit: true });`,
+    `  if (res.status !== 'acquired') { process.exit(2); }`,
+    `  process.kill(process.pid, 'SIGINT');`,
+    `  setTimeout(() => process.exit(3), 2000);`, // never reached if the SIGINT handler's process.exit(1) fires as expected
+    `});`,
+  ].join('\n');
+
+  const child = spawnSync(process.execPath, ['-e', script], { encoding: 'utf8' });
+
+  assert.equal(child.status, 1, `child should exit(1) from the SIGINT handler after releasing the lock; stderr: ${child.stderr}`);
+  assert.equal(fs.existsSync(lockPathFor(dir)), false, 'the lock file must be gone once the SIGINT handler released it');
+});
+
+test('a held lock acquired WITHOUT releaseOnExit survives the holding process exiting normally (the .githooks/pre-commit contract)', () => {
+  const { dir } = setup();
+  const moduleUrl = pathToFileURL(path.resolve('src/runner/main-checkout-lock.mjs')).href;
+  const script = [
+    `import('${moduleUrl}').then(({ acquireMainCheckoutLock }) => {`,
+    `  const res = acquireMainCheckoutLock(${JSON.stringify(dir)}, { identity: process.pid });`,
+    `  process.exit(res.status === 'acquired' ? 0 : 2);`,
+    `});`,
+  ].join('\n');
+
+  const child = spawnSync(process.execPath, ['-e', script], { encoding: 'utf8' });
+
+  assert.equal(child.status, 0, `child should exit(0) after a plain acquire; stderr: ${child.stderr}`);
+  assert.equal(fs.existsSync(lockPathFor(dir)), true, 'the lock must survive the acquiring process exiting normally when releaseOnExit was not requested');
 });
 
 // --- string identity (D6): opaque session ids, never liveness-checked -------
