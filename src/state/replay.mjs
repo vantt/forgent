@@ -260,7 +260,8 @@ function applyEvent(view, event) {
     }
     case 'decision': {
       view.decisions.push({ ...event.payload, ts: event.ts });
-      // Per-item fold (tsk-63c D1/seq 1190, decision-schema-rationale-
+      // Per-item fold (tsk-63c D1/seq 1206 (renumbered by tsk-n4i-1; was
+      // 1190 before the live-log seq repair), decision-schema-rationale-
       // alternatives-source): `id` is optional on a decision (per
       // addDecision) — when present, ALSO fold into a lazy `decisionsById`
       // key, same append-per-id pattern as `discovery`/`frictions` above

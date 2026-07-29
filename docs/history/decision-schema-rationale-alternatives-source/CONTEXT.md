@@ -26,7 +26,7 @@ in-memory/view shape of `view.decisions[id]` vs the existing global
 
 | ID | Decision |
 |---|---|
-| D1 | Scope is BROAD: extend `addDecision` with `rationale` (required)/`alternatives` (optional)/`source` (optional, subsumes STR70a's `role`/`actor` ask)/`id` (optional, already locked per decision seq 1190), fold the same 3 fields (`rationale`/`alternatives`/`source`) into `gates[id]`'s ask+answer payload (`replay.mjs:166-172`). Supersedes the item description's narrower role-only STR70a plan. |
+| D1 | Scope is BROAD: extend `addDecision` with `rationale` (required)/`alternatives` (optional)/`source` (optional, subsumes STR70a's `role`/`actor` ask)/`id` (optional, already locked per decision seq 1206, renumbered by tsk-n4i-1; was 1190), fold the same 3 fields (`rationale`/`alternatives`/`source`) into `gates[id]`'s ask+answer payload (`replay.mjs:166-172`). Supersedes the item description's narrower role-only STR70a plan. |
 | D2 | `rationale` is REQUIRED on `addDecision` (mirrors bee's throw-if-blank rule). `fgos decision` CLI gets a new required `--rationale` flag alongside `--text`. Breaking change accepted — grep confirmed `bin/fgos.mjs:1025` is the only existing caller; no other call sites to migrate. |
 | D3 | `source` is FREE TEXT, no enum validation — matches bee's live convention (15 distinct real values in production) and fgOS's existing free-text `role`/`actor` string fields elsewhere. Defaults to `'session'` when omitted (per deep-dive), since fgOS calls are agent-initiated unless a human types the CLI directly. |
 
@@ -69,7 +69,7 @@ Prior decision cited, not re-locked here:
 - `docs/distillery/porting-log.md:119` — cross-reference confirming
   `tsk-63c`/`tsk-6b6` as the touch points for this exact schema
   extension.
-- `.fgos/events.jsonl:1206` (seq 1190) — the prior locked decision on
+- `.fgos/events.jsonl:1206` (seq 1206, renumbered by tsk-n4i-1; was 1190) — the prior locked decision on
   `id`-optional scoping, explicitly applying to `tsk-63c`.
 - Direct code read: `src/state/store.mjs:527` (`putInAwaiting`, no
   `role` param today), `src/state/store.mjs:543` (`answerAwaiting`,

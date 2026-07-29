@@ -625,7 +625,8 @@ export function addDiscovery(dir, payload) {
  * optional free text; `source` is optional free text (no enum, per D3),
  * defaulting to `'session'` when omitted since fgOS calls are
  * agent-initiated unless a human types the CLI directly; `id` is optional
- * (seq 1190) and, when present, additionally folds this decision into a
+ * (seq 1206, renumbered by tsk-n4i-1; was 1190) and, when present,
+ * additionally folds this decision into a
  * per-item view alongside the existing global log (replay.mjs).
  */
 export function addDecision(dir, payload) {
