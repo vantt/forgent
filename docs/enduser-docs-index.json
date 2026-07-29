@@ -91,6 +91,14 @@
     "quadrant": "explanation",
     "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
     "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/gate-bypass-design.md",
+    "title": "Why gate-bypass is shaped the way it is",
+    "sourceCaptureId": "tsk-6bx"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/explanation/id-generation-design.md",
     "title": "Why a work item's id is TSK<hash>, not a bare hash",
     "sourceCaptureId": null

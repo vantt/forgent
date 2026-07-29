@@ -290,6 +290,48 @@ test('init in a git repo with a commit does not report gitHeadless', () => {
   assert.equal(initData.gitHeadless, undefined);
 });
 
+// tsk-4fu-2: requiresExistingStore guard (command-registry.mjs) — a
+// state-write verb no longer silently auto-vivifies `.fgos/` via
+// appendEventCore's own mkdirSync when it's missing; it refuses instead.
+test('submit on a directory with no .fgos/ at all is refused, exit 4, writes nothing (no auto-vivify)', () => {
+  const cwd = rawTmpCwd();
+  assert.ok(!fs.existsSync(path.join(cwd, '.fgos')));
+  const result = run(cwd, ['submit', 'should never land']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /\.fgos\/ not found/);
+  assert.ok(!fs.existsSync(path.join(cwd, '.fgos')), 'the refused verb must not create .fgos/ as a side effect');
+});
+
+test('init inside a linked worktree is refused, exit 4 (ADR0020: worktrees never carry .fgos/)', () => {
+  const { wt } = tmpLinkedWorktree();
+  assert.ok(!fs.existsSync(path.join(wt, '.fgos')));
+  const result = run(wt, ['init']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /linked worktree/);
+  assert.ok(!fs.existsSync(path.join(wt, '.fgos')), 'the refused init must not create .fgos/ in the worktree');
+});
+
+test('init on a fresh directory that is not a linked worktree still succeeds, exit 0', () => {
+  const cwd = rawTmpCwd();
+  const result = run(cwd, ['init']);
+  assert.equal(result.status, 0);
+  assert.ok(fs.existsSync(path.join(cwd, '.fgos')));
+});
+
+test('session start inside a .fgos/-less linked worktree still succeeds (D10 symlink actor exempt from the requiresExistingStore guard)', () => {
+  const { wt } = tmpLinkedWorktree();
+  assert.ok(!fs.existsSync(path.join(wt, '.fgos')));
+  const result = run(wt, ['session', 'start']);
+  assert.equal(result.status, 0, `session start unexpectedly refused: ${result.stderr}`);
+});
+
+test('setup inside a .fgos/-less linked worktree still succeeds (setup never touches .fgos/, exempt from the guard)', () => {
+  const { wt } = tmpLinkedWorktree();
+  assert.ok(!fs.existsSync(path.join(wt, '.fgos')));
+  const result = run(wt, ['setup']);
+  assert.equal(result.status, 0, `setup unexpectedly refused: ${result.stderr}`);
+});
+
 test('add creates exactly one work.add event and the view reflects the new item, exit 0', () => {
   const cwd = tmpCwd();
   const before = eventLines(cwd).length;
@@ -3072,6 +3114,57 @@ test('return happy path: verify passes -> doing to proposed, actual outcome reco
   assert.equal('settlements' in view, false, 'doing -> proposed never settles (D4: settlement belongs to the -> done edge)');
 });
 
+test('return (verify passes, main-source): a live main-checkout.lock recorded under THIS session\'s own identity is released early, instead of waiting out the TTL (tsk-45z D1/D2)', () => {
+  const cwd = initGitCwd();
+  const sessionId = 'tsk-45z-test-session-ok';
+  run(cwd, ['init']);
+  addOk(cwd, 'pull-return-releases-own-lock', { verify: 'test -f proof.txt' });
+  assert.equal(run(cwd, ['take', '--id', 'pull-return-releases-own-lock'], { BEE_SESSION_ID: sessionId }).status, 0);
+  commitFile(cwd, 'proof.txt');
+
+  const lockPath = path.join(cwd, '.fgos', 'main-checkout.lock');
+  fs.writeFileSync(lockPath, JSON.stringify({ pid: sessionId, ts: Date.now() }));
+
+  const result = run(cwd, ['return', 'pull-return-releases-own-lock'], { BEE_SESSION_ID: sessionId });
+  assert.equal(result.status, 0, `return failed: ${result.stderr}`);
+  assert.equal(envelopeData(result.stdout).to, 'proposed');
+  assert.equal(fs.existsSync(lockPath), false, 'return must release its own live lock once verify passes and the item settles to proposed');
+});
+
+test('return (verify FAILS, main-source): a live own-identity lock is released too — settling to blocked is just as much "done with the checkout" as proposed (tsk-45z D1/D2)', () => {
+  const cwd = initGitCwd();
+  const sessionId = 'tsk-45z-test-session-blocked';
+  run(cwd, ['init']);
+  addOk(cwd, 'pull-return-releases-own-lock-blocked', { verify: 'test -f proof.txt' });
+  assert.equal(run(cwd, ['take', '--id', 'pull-return-releases-own-lock-blocked'], { BEE_SESSION_ID: sessionId }).status, 0);
+  commitFile(cwd, 'wrong-file.txt'); // advances HEAD, never satisfies verify
+
+  const lockPath = path.join(cwd, '.fgos', 'main-checkout.lock');
+  fs.writeFileSync(lockPath, JSON.stringify({ pid: sessionId, ts: Date.now() }));
+
+  const result = run(cwd, ['return', 'pull-return-releases-own-lock-blocked'], { BEE_SESSION_ID: sessionId });
+  assert.equal(result.status, 0, `return should exit 0 for a defined blocked outcome: ${result.stderr}`);
+  assert.equal(envelopeData(result.stdout).to, 'blocked');
+  assert.equal(fs.existsSync(lockPath), false, 'return must release its own live lock even when verify fails and the item settles to blocked');
+});
+
+test('return (main-source) never touches a DIFFERENT session\'s live lock — never a blind unlink (tsk-45z D2)', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  addOk(cwd, 'pull-return-other-lock-untouched', { verify: 'test -f proof.txt' });
+  assert.equal(run(cwd, ['take', '--id', 'pull-return-other-lock-untouched'], { BEE_SESSION_ID: 'tsk-45z-this-session' }).status, 0);
+  commitFile(cwd, 'proof.txt');
+
+  const lockPath = path.join(cwd, '.fgos', 'main-checkout.lock');
+  fs.writeFileSync(lockPath, JSON.stringify({ pid: 'tsk-45z-a-different-live-session', ts: Date.now() }));
+
+  const result = run(cwd, ['return', 'pull-return-other-lock-untouched'], { BEE_SESSION_ID: 'tsk-45z-this-session' });
+  assert.equal(result.status, 0, `return failed: ${result.stderr}`);
+  assert.equal(envelopeData(result.stdout).to, 'proposed');
+  assert.equal(fs.existsSync(lockPath), true, 'a different session\'s live lock must survive this return untouched');
+  assert.equal(JSON.parse(fs.readFileSync(lockPath, 'utf8')).pid, 'tsk-45z-a-different-live-session');
+});
+
 test('return: a changed sensitive file outside the item\'s footprint surfaces a frozenJudgeHits advisory, and never blocks the return', () => {
   const cwd = initGitCwd();
   run(cwd, ['init']);
@@ -5029,6 +5122,30 @@ test('return on a branch-source take: verify passes in a disposable detached wor
   assert.equal(gitAtCwd(cwd, ['worktree', 'list', '--porcelain']), worktreesBefore, 'the disposable detached verify worktree is cleaned up — no leftover');
 });
 
+test('return on a branch-source take never touches a live main-checkout.lock (tsk-45z D1 scope: only the main-source path releases early — worktree commits never contend for this shared lock)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeBlockedBranchItem(cwd, 'branch-return-lock-untouched', { verify: 'test -f proof.txt' });
+  assert.equal(run(cwd, ['take', '--id', 'branch-return-lock-untouched']).status, 0);
+  commitPending(cwd, 'state: take branch-return-lock-untouched');
+
+  gitAtCwd(cwd, ['checkout', 'fgw/branch-return-lock-untouched']);
+  fs.writeFileSync(path.join(cwd, 'proof.txt'), 'fixed by hand\n');
+  gitAtCwd(cwd, ['add', '-A']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', 'human fix']);
+  gitAtCwd(cwd, ['checkout', 'main']);
+
+  // A lock recorded under this session's OWN identity — if return's release
+  // wiring wrongly fired on the branch-source path too, this would vanish.
+  const lockPath = path.join(cwd, '.fgos', 'main-checkout.lock');
+  fs.writeFileSync(lockPath, JSON.stringify({ pid: 'tsk-45z-branch-session', ts: Date.now() }));
+
+  const result = run(cwd, ['return', 'branch-return-lock-untouched'], { BEE_SESSION_ID: 'tsk-45z-branch-session' });
+  assert.equal(result.status, 0, `return failed: ${result.stderr}`);
+  assert.match(result.stdout, /proposed/);
+  assert.equal(fs.existsSync(lockPath), true, 'a branch-source return must never touch main-checkout.lock, even one it could self-recognize');
+});
+
 test('return on a branch-source take refuses when the branch has NOT advanced past branchHeadAtTake (no new commit) — validation, exit 4, item stays doing', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
@@ -5929,7 +6046,8 @@ test('unlock: lock genuinely held by a live session -- refuses, reports the hold
   const result = run(cwd, ['unlock']);
 
   assert.equal(result.status, 7, result.stderr);
-  assert.match(result.stderr, new RegExp(`held by a live session \\(${process.pid}\\)`));
+  assert.match(result.stderr, new RegExp(`held by a live session \\(${process.pid}, `));
+  assert.match(result.stderr, /held \d+[ms].*expires in \d+[ms]/);
   assert.equal(fs.existsSync(mainCheckoutLockPath(cwd)), true);
 });
 
@@ -5956,5 +6074,76 @@ test('unlock: registered in the --help --json manifest with write-only touchesSt
   const entry = manifest.commands.find((c) => c.name === 'unlock');
   assert.ok(entry, 'unlock entry missing from --help --json manifest');
   assert.equal(entry.touchesState, true);
+  assert.equal(entry.externalEffect, false);
+});
+
+// --- `fgos lock-status` (tsk-5z2, D1): read-only main-checkout.lock report -
+
+test('lock-status: no lock file present -- reports "free"', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0);
+  const result = run(cwd, ['lock-status']);
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.outcome, 'free');
+  assert.equal(data.holderPid, null);
+});
+
+test('lock-status: held by a live session -- reports "live" with holder identity, age, and remaining TTL, exit 0 (never refuses)', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0);
+  fs.mkdirSync(path.dirname(mainCheckoutLockPath(cwd)), { recursive: true });
+  fs.writeFileSync(mainCheckoutLockPath(cwd), JSON.stringify({ pid: process.pid, ts: Date.now() }));
+
+  const result = run(cwd, ['lock-status']);
+
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.outcome, 'live');
+  assert.equal(data.holderPid, process.pid);
+  assert.ok(typeof data.lockAgeMs === 'number');
+  assert.ok(typeof data.remainingTtlMs === 'number');
+  assert.match(data.lockAge, /^\d+[ms]/);
+  assert.match(data.remainingTtl, /^\d+[ms]/);
+});
+
+test('lock-status: held by a dead pid -- reports "stale" and never reclaims the file', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0);
+  fs.mkdirSync(path.dirname(mainCheckoutLockPath(cwd)), { recursive: true });
+  fs.writeFileSync(mainCheckoutLockPath(cwd), JSON.stringify({ pid: 999999999, ts: Date.now() }));
+
+  const result = run(cwd, ['lock-status']);
+
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.outcome, 'stale');
+  assert.equal(data.holderPid, 999999999);
+  assert.equal(fs.existsSync(mainCheckoutLockPath(cwd)), true);
+});
+
+test('lock-status: corrupt lock content -- reports "ambiguous" and never removes the file', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0);
+  fs.mkdirSync(path.dirname(mainCheckoutLockPath(cwd)), { recursive: true });
+  fs.writeFileSync(mainCheckoutLockPath(cwd), 'not json at all {{{');
+
+  const result = run(cwd, ['lock-status']);
+
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.outcome, 'ambiguous');
+  assert.equal(fs.existsSync(mainCheckoutLockPath(cwd)), true);
+  assert.equal(fs.readFileSync(mainCheckoutLockPath(cwd), 'utf8'), 'not json at all {{{');
+});
+
+test('lock-status: registered in the --help --json manifest as read-only (touchesState/externalEffect both false)', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['--help', '--json']);
+  assert.equal(result.status, 0, result.stderr);
+  const manifest = JSON.parse(result.stdout);
+  const entry = manifest.commands.find((c) => c.name === 'lock-status');
+  assert.ok(entry, 'lock-status entry missing from --help --json manifest');
+  assert.equal(entry.touchesState, false);
   assert.equal(entry.externalEffect, false);
 });

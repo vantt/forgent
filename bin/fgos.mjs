@@ -40,11 +40,15 @@ import { claimWork, ClaimError } from '../src/runner/claim-port.mjs';
 import {
   acquireMainCheckoutLock,
   releaseMainCheckoutLock,
+  releaseMainCheckoutLockIfOwn,
   forceReclaimAmbiguousLock,
+  inspectMainCheckoutLock,
   ACQUIRED,
   HELD,
   DEFAULT_TTL_MS,
+  formatLockDurationMs,
 } from '../src/runner/main-checkout-lock.mjs';
+import { resolveWriterIdentity } from '../src/runner/session-identity.mjs';
 import { createSession, endSession, listSessions, reclaimOrphanedSessions, SessionError } from '../src/runner/session.mjs';
 import { resolveRoot } from '../src/runner/root-affinity.mjs';
 import { visitCount } from '../src/runner/anti-loop.mjs';
@@ -1487,6 +1491,16 @@ async function runVerb(verb, flags, positional, dir) {
         const frozenJudge = frozenJudgeHits(ownDiff, item.footprint);
         const { event } = moveWork(dir, { id, to: 'proposed', expectedStatus: 'doing', headAtReturn: head });
         addOutcome(dir, { id, actual: { outcome: 'proposed', passed: true, attempts: 1, errorClass: null, aheadCount } });
+        // tsk-45z D1/D2: this session's own commits (landed straight on the
+        // main checkout, not a branch/worktree) may still hold
+        // main-checkout.lock, refreshed by .githooks/pre-commit on each one
+        // and never released until TTL expiry. This point — verify green,
+        // item settling to `proposed` — is the state-machine's own signal
+        // that this session is done with the checkout, so release early
+        // instead of leaving the next writer to wait out the TTL.
+        // Identity-checked (never a blind unlink, D2): only removes the
+        // lock if it is still recorded under this session's own identity.
+        releaseMainCheckoutLockIfOwn(dir, resolveWriterIdentity(dir).id);
         return { id, from: 'doing', to: 'proposed', source: 'main', aheadCount, passed: true, seq: event.seq, output: check.output, frozenJudgeHits: frozenJudge };
       }
 
@@ -1500,6 +1514,11 @@ async function runVerb(verb, flags, positional, dir) {
         attempts: 1,
         detail: `goal-check failed (exit ${check.status})`,
       });
+      // Same early-release as the passing branch above (tsk-45z D1/D2) — a
+      // failed verify still means this session is done touching the main
+      // checkout; the item settling to `blocked` is just as much "done with
+      // the checkout" as settling to `proposed`.
+      releaseMainCheckoutLockIfOwn(dir, resolveWriterIdentity(dir).id);
       return { id, from: 'doing', to: 'blocked', source: 'main', aheadCount, passed: false, exitStatus: check.status, output: check.output };
     }
 
@@ -2303,9 +2322,12 @@ async function runVerb(verb, flags, positional, dir) {
     case 'unlock': {
       const lockResult = acquireMainCheckoutLock(dir, { identity: process.pid, ttlMs: DEFAULT_TTL_MS });
       if (lockResult.status === HELD) {
+        const ttlPart = lockResult.remainingTtlMs != null
+          ? `, expires in ${formatLockDurationMs(lockResult.remainingTtlMs)}`
+          : ', no TTL window known';
         throw new StoreError(
           'lock-timeout',
-          `unlock: main checkout lock is held by a live session (${lockResult.holderPid}) -- refusing to clear it.`,
+          `unlock: main checkout lock is held by a live session (${lockResult.holderPid}, held ${formatLockDurationMs(lockResult.lockAgeMs)}${ttlPart}) -- refusing to clear it.`,
         );
       }
       if (lockResult.status === ACQUIRED) {
@@ -2317,8 +2339,20 @@ async function runVerb(verb, flags, positional, dir) {
       return { cleared: reclaim.status === 'reclaimed', reason: reclaim.status };
     }
 
+    case 'lock-status': {
+      const status = inspectMainCheckoutLock(dir, { ttlMs: DEFAULT_TTL_MS });
+      return {
+        outcome: status.outcome,
+        holderPid: status.holderPid ?? null,
+        lockAgeMs: status.lockAgeMs ?? null,
+        remainingTtlMs: status.remainingTtlMs ?? null,
+        lockAge: status.lockAgeMs != null ? formatLockDurationMs(status.lockAgeMs) : null,
+        remainingTtl: status.remainingTtlMs != null ? formatLockDurationMs(status.remainingTtlMs) : null,
+      };
+    }
+
     default:
-      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <init|add|submit|discover|move|edit|ask|answer|decision|list|ready|rebuild|repair|check|rollup|take|return|review|approve|reject|catchup|evolve|triage|session|goal|setup|doctor|unlock> ...`);
+      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <init|add|submit|discover|move|edit|ask|answer|decision|list|ready|rebuild|repair|check|rollup|take|return|review|approve|reject|catchup|evolve|triage|session|goal|setup|doctor|unlock|lock-status> ...`);
   }
 }
 

@@ -48,6 +48,18 @@ import path from 'node:path';
 
 export const LOCK_FILE = 'main-checkout.lock';
 
+/** Formats a millisecond duration (lockAgeMs/remainingTtlMs) as a short
+ * human-readable string ("2m15s", "45s") for CLI messages. Non-numeric or
+ * negative input (no known duration) formats as "unknown" rather than
+ * fabricating a number. */
+export function formatLockDurationMs(ms) {
+  if (typeof ms !== 'number' || Number.isNaN(ms) || ms < 0) return 'unknown';
+  const totalSeconds = Math.floor(ms / 1000);
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return minutes > 0 ? `${minutes}m${seconds}s` : `${seconds}s`;
+}
+
 // DEFAULT_TTL_MS (tsk-3w8 follow-up): Phase 2 (the git hook, wired) and the
 // claim flow (claim-port.mjs's claimWork) now BOTH acquire this same lock,
 // and needed one shared staleness window instead of each picking its own —
@@ -165,13 +177,22 @@ function tryAcquireOnce(lockPath, identity, now, ttlMs) {
     // judged purely by ttlMs freshness. Undecidable without a window —
     // fail closed (D5) rather than guess free or held.
     if (typeof ttlMs !== 'number') {
-      return { status: AMBIGUOUS };
+      // Record parsed fine, so age is real even though held-ness itself is
+      // undecidable (D5 fail-closed) — surface what's actually known,
+      // never a fabricated remaining-TTL with no ttlMs to compute it from.
+      return { status: AMBIGUOUS, lockAgeMs: now - record.ts };
     }
     held = now - record.ts <= ttlMs;
   }
 
   if (held) {
-    return { status: HELD, holderPid: record.pid };
+    const lockAgeMs = now - record.ts;
+    return {
+      status: HELD,
+      holderPid: record.pid,
+      lockAgeMs,
+      remainingTtlMs: typeof ttlMs === 'number' ? Math.max(0, ttlMs - lockAgeMs) : null,
+    };
   }
 
   // Stale (dead pid, or ttl-expired). Re-read right before the unlink: the
@@ -210,9 +231,16 @@ function tryAcquireOnce(lockPath, identity, now, ttlMs) {
  * there is no process to probe). Defaults to `process.pid`. The on-disk
  * JSON field holding it is still named `pid`.
  *
- * Returns `{ status, holderPid?, lockPath, release? }` where `status` is one
- * of ACQUIRED / HELD / AMBIGUOUS. Never throws for a stale/corrupt/missing
- * lock — only for unexpected fs errors.
+ * Returns `{ status, holderPid?, lockAgeMs?, remainingTtlMs?, lockPath,
+ * release? }` where `status` is one of ACQUIRED / HELD / AMBIGUOUS. `HELD`
+ * always carries `lockAgeMs` (time since the recorded holder last touched
+ * the lock); `remainingTtlMs` is `null` when no `ttlMs` was supplied (no
+ * staleness window to compute it from — never fabricated). An `AMBIGUOUS`
+ * from a parsed-but-undecidable string-identity record (no `ttlMs`
+ * supplied) also carries `lockAgeMs`; an `AMBIGUOUS` from genuinely
+ * unparseable content carries neither (no record to read a timestamp from).
+ * Never throws for a stale/corrupt/missing lock — only for unexpected fs
+ * errors.
  *
  * `ttlMs` is optional and caller-supplied only (no production default picked
  * here, per this cell's scope) — when present, a live-pid holder whose
@@ -220,35 +248,80 @@ function tryAcquireOnce(lockPath, identity, now, ttlMs) {
  * pid. For a different string-identity holder, `ttlMs` is the ONLY
  * staleness signal (no liveness probe exists) — omitting it is AMBIGUOUS,
  * not stale.
+ *
+ * `releaseOnExit` (tsk-45z point 2, opt-in, default false): when true,
+ * registers `exit`/`SIGINT`/`SIGTERM` listeners that release the lock the
+ * moment THIS process ends, instead of leaving it for `ttlMs` to expire.
+ * This must stay OPT-IN, never the unconditional default: `.githooks/
+ * pre-commit` acquires/refreshes this lock on every commit and, BY DESIGN,
+ * never releases it itself — the lock is meant to linger past that short
+ * hook process's own `process.exit(0)`, with TTL as the only intended
+ * clearing mechanism (a session may commit several times in a row; an
+ * unconditional release-on-exit there would clear the lock between two
+ * commits of the SAME session, reopening the exact STR65 race this lock
+ * exists to prevent — the one thing this item's own scope explicitly rules
+ * out). Only a caller whose own job is genuinely OVER once its process
+ * exits — `claimWork`, `mergeRunnerItem` — should pass `releaseOnExit:
+ * true`. `once` + explicit removal on `release()` keeps this from
+ * accumulating listeners across repeated acquire/release cycles in the
+ * same process.
  */
-export function acquireMainCheckoutLock(dir, { identity = process.pid, ttlMs, now = Date.now() } = {}) {
+export function acquireMainCheckoutLock(dir, { identity = process.pid, ttlMs, now = Date.now(), releaseOnExit = false } = {}) {
   fs.mkdirSync(dir, { recursive: true });
   const lockPath = path.join(dir, LOCK_FILE);
 
   for (let attempt = 0; attempt < 2; attempt += 1) {
     const res = tryAcquireOnce(lockPath, identity, now, ttlMs);
     if (res.status === ACQUIRED) {
+      let released = false;
+      const release = () => {
+        if (released) return;
+        released = true;
+        if (releaseOnExit) {
+          process.removeListener('exit', onExit);
+          process.removeListener('SIGINT', onSignal);
+          process.removeListener('SIGTERM', onSignal);
+        }
+        releaseMainCheckoutLock(dir);
+      };
+      let onExit;
+      let onSignal;
+      if (releaseOnExit) {
+        onExit = () => release();
+        onSignal = () => {
+          release();
+          process.exit(1);
+        };
+        process.once('exit', onExit);
+        process.once('SIGINT', onSignal);
+        process.once('SIGTERM', onSignal);
+      }
       return {
         status: ACQUIRED,
         lockPath,
-        release() {
-          releaseMainCheckoutLock(dir);
-        },
+        release,
       };
     }
     if (res.status === HELD) {
-      return { status: HELD, holderPid: res.holderPid, lockPath };
+      return {
+        status: HELD,
+        holderPid: res.holderPid,
+        lockAgeMs: res.lockAgeMs,
+        remainingTtlMs: res.remainingTtlMs,
+        lockPath,
+      };
     }
     if (res.status === AMBIGUOUS) {
-      return { status: AMBIGUOUS, lockPath };
+      return { status: AMBIGUOUS, lockAgeMs: res.lockAgeMs, lockPath };
     }
     // status === 'retry': a stale lock was cleaned (by us or a racing
     // reclaimer); loop reattempts the bare create on the next iteration.
   }
   // Bound matches the mirrored lineage (loop.mjs): a reclaim-then-retry can
   // race at most once before either succeeding or meeting a fresh holder
-  // that a subsequent caller must re-evaluate.
-  return { status: HELD, holderPid: null, lockPath };
+  // that a subsequent caller must re-evaluate. No record was actually read
+  // here (both attempts raced a fresh holder), so no age/TTL to report.
+  return { status: HELD, holderPid: null, lockAgeMs: null, remainingTtlMs: null, lockPath };
 }
 
 /** Removes `.fgos/main-checkout.lock` under `dir` if present. Idempotent — a
@@ -261,6 +334,126 @@ export function releaseMainCheckoutLock(dir) {
   } catch (err) {
     if (err.code !== 'ENOENT') throw err;
   }
+}
+
+/**
+ * Releases `.fgos/main-checkout.lock` ONLY when its recorded holder
+ * identity strictly equals (===) `identity` (tsk-45z D2, mirroring
+ * `tryAcquireOnce`'s own self-recognition/D6 equality check). Unlike
+ * `releaseMainCheckoutLock` above -- an unconditional unlink meant for a
+ * caller that just acquired the lock itself and knows it is the sole
+ * holder -- this is for a caller (e.g. `fgos return`) that never acquired
+ * the lock in this same call and cannot assume the lock it sees is still
+ * its own: this session's earlier commits may have refreshed the lock
+ * under its own identity, but that identity's TTL could have lapsed and a
+ * different session could hold it live by the time this runs. Blindly
+ * unlinking in that case would delete a genuinely live different session's
+ * lock -- reopening the exact STR65 concurrent-writer race this lock
+ * exists to prevent.
+ *
+ * Returns `{ status }`:
+ *   - 'released'   -- the lock was held under `identity`; now removed.
+ *   - 'no-lock'    -- no lock file was present (nothing to release).
+ *   - 'not-owner'  -- a lock is present but recorded under a DIFFERENT
+ *     identity (or changed underneath this call, see below) -- left
+ *     untouched.
+ *   - 'ambiguous'  -- the lock file content is unparseable -- left
+ *     untouched, same fail-closed stance `acquireMainCheckoutLock` and
+ *     `forceReclaimAmbiguousLock` already take for this shape.
+ *
+ * Re-reads the lock file immediately before unlinking (same TOCTOU
+ * discipline `tryAcquireOnce`'s own stale-branch already uses, lines
+ * ~173-192 above): a competitor could reclaim or refresh the lock between
+ * the first read and this call's unlink, and changed content must never be
+ * touched on a stale judgment.
+ */
+export function releaseMainCheckoutLockIfOwn(dir, identity) {
+  const lockPath = path.join(dir, LOCK_FILE);
+
+  const readRecord = () => {
+    let raw;
+    try {
+      raw = fs.readFileSync(lockPath, 'utf8');
+    } catch (err) {
+      if (err.code === 'ENOENT') return undefined;
+      throw err;
+    }
+    return parseLockContent(raw);
+  };
+
+  const record = readRecord();
+  if (record === undefined) return { status: 'no-lock' };
+  if (record === null) return { status: 'ambiguous' };
+  if (record.pid !== identity) return { status: 'not-owner', holderPid: record.pid };
+
+  const recheck = readRecord();
+  if (recheck === undefined) return { status: 'no-lock' };
+  if (recheck === null || recheck.pid !== identity) return { status: 'not-owner' };
+
+  try {
+    fs.unlinkSync(lockPath);
+  } catch (err) {
+    if (err.code !== 'ENOENT') throw err;
+  }
+  return { status: 'released' };
+}
+
+/**
+ * Read-only inspection of `.fgos/main-checkout.lock` (tsk-5z2, D1) --
+ * unlike `acquireMainCheckoutLock`, this NEVER creates, refreshes, or
+ * deletes the lock file; it only reports what's there right now. Exists
+ * for the `fgos lock-status` verb, so a caller can check before a failed
+ * `take`/`pick`/`merge`/`unlock` without side effects.
+ *
+ * Returns `{ outcome, holderPid?, lockAgeMs?, remainingTtlMs? }` where
+ * `outcome` is one of:
+ *   - 'free'      -- no lock file present
+ *   - 'live'      -- held by a holder that would currently be judged HELD
+ *     by `acquireMainCheckoutLock` (live pid within ttlMs, or a
+ *     string identity within ttlMs)
+ *   - 'stale'     -- a parseable record exists but its holder is
+ *     reclaimable (dead pid, or ttlMs-expired) -- `acquireMainCheckoutLock`
+ *     would succeed against it
+ *   - 'ambiguous' -- unparseable content, or a string-identity record with
+ *     no `ttlMs` supplied (D5 fail-closed, same as the acquire path)
+ * `lockAgeMs`/`remainingTtlMs` follow the same never-fabricate rule as
+ * `acquireMainCheckoutLock`'s own HELD/AMBIGUOUS shape.
+ */
+export function inspectMainCheckoutLock(dir, { ttlMs, now = Date.now() } = {}) {
+  const lockPath = path.join(dir, LOCK_FILE);
+
+  let raw;
+  try {
+    raw = fs.readFileSync(lockPath, 'utf8');
+  } catch (err) {
+    if (err.code === 'ENOENT') return { outcome: 'free' };
+    throw err;
+  }
+
+  const record = parseLockContent(raw);
+  if (record === null) {
+    return { outcome: 'ambiguous' };
+  }
+
+  const lockAgeMs = now - record.ts;
+  let live;
+  if (typeof record.pid === 'number') {
+    const pidLive = isPidAlive(record.pid);
+    const withinTtl = typeof ttlMs !== 'number' || lockAgeMs <= ttlMs;
+    live = pidLive && withinTtl;
+  } else {
+    if (typeof ttlMs !== 'number') {
+      return { outcome: 'ambiguous', lockAgeMs };
+    }
+    live = lockAgeMs <= ttlMs;
+  }
+
+  return {
+    outcome: live ? 'live' : 'stale',
+    holderPid: record.pid,
+    lockAgeMs,
+    remainingTtlMs: typeof ttlMs === 'number' ? Math.max(0, ttlMs - lockAgeMs) : null,
+  };
 }
 
 /**
