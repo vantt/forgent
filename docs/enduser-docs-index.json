@@ -107,6 +107,14 @@
     "quadrant": "how-to",
     "purpose": "Show the steps to accomplish one specific, already-understood goal.",
     "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/launch-claude-in-a-new-herdr-pane-from-a-plugin.md",
+    "title": "Launch claude in a new herdr pane from a plugin",
+    "sourceCaptureId": "tsk-19y-3"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
     "docPath": "docs/how-to/poll-fgos-cli-data-from-a-rust-plugin.md",
     "title": "Poll fgOS CLI data from a Rust plugin",
     "sourceCaptureId": "tsk-19y-2"
