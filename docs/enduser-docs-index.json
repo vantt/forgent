@@ -181,7 +181,7 @@
     "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/explanation/work-item-lifecycle-and-domain-model.md",
     "title": "Why the work-item lifecycle keeps status and stage separate, and what extending it costs",
-    "sourceCaptureId": null
+    "sourceCaptureId": "tsk-2zv"
   },
   {
     "quadrant": "explanation",

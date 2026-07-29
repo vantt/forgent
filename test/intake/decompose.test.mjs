@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { judgeDecompose, resolveDecompose } from '../../src/intake/decompose.mjs';
-import { addWork, listWork, StoreError, categoryOf, moveWork } from '../../src/state/store.mjs';
+import { addWork, listWork, StoreError, categoryOf, moveWork, readRawEvents } from '../../src/state/store.mjs';
 
 // Fake executors only — every "command" spawned here is a node script this
 // file writes to a mkdtemp directory at test time, mirroring
@@ -376,6 +376,14 @@ test('resolveDecompose on a pass-through verdict releases a held claim (doing ->
   const view = listWork(storeDir);
   assert.equal(view.work['item-x'].stage, 'executing');
   assert.equal(view.work['item-x'].status, 'todo');
+
+  // tsk-2zv: the release carries a positive marker so claimWork can tell
+  // this todo-entry apart from a reject/verify-fail park, which land the
+  // same status without deleting the branch.
+  const releaseEvent = readRawEvents(storeDir)
+    .filter((e) => e.type === 'work.move' && e.payload.id === 'item-x' && e.payload.to === 'todo')
+    .at(-1);
+  assert.equal(releaseEvent.payload.releaseTrigger, 'claim-lock-3b');
 });
 
 // R15 (runner sweep only touches status 'todo' items, never claims): an

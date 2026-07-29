@@ -260,7 +260,11 @@ export function resolveDecompose(dir, id, cfg, role) {
   // no-op here, matching R15 (sweep only touches todo items).
   const releaseClaimOnExecuting = () => {
     if (work.status === 'doing') {
-      moveWork(dir, { id, to: 'todo', expectedStatus: 'doing' });
+      // releaseTrigger (tsk-2zv): tags this specific todo-entry as a
+      // claim-lock §3b release so claimWork can tell it apart from a
+      // reject or verify-fail park, which land an item at the exact same
+      // status/branch-existence shape without deleting the branch.
+      moveWork(dir, { id, to: 'todo', expectedStatus: 'doing', releaseTrigger: 'claim-lock-3b' });
     }
   };
 
