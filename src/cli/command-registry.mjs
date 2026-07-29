@@ -661,4 +661,19 @@ export const COMMAND_REGISTRY = [
     paginated: false,
     deprecated: null,
   },
+  {
+    name: 'unlock',
+    invoke: 'fgos unlock',
+    description: 'Safely clears .fgos/main-checkout.lock (the STR65 concurrent-writer guard) when it is stale or corrupt. Never force-deletes: refuses and reports the holder identity when a different session genuinely still holds it live.',
+    parameters: {
+      type: 'object',
+      properties: {},
+      required: [],
+    },
+    examples: ['fgos unlock'],
+    touchesState: true,
+    externalEffect: false,
+    paginated: false,
+    deprecated: null,
+  },
 ];

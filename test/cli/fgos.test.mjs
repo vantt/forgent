@@ -5662,3 +5662,75 @@ test('graph verb on an empty store: zero components, still a valid envelope, exi
   assert.equal(data.componentCount, 0);
   assert.deepEqual(data.components, []);
 });
+
+// --- `fgos unlock` (tsk-3h4): safely clears .fgos/main-checkout.lock -------
+
+function mainCheckoutLockPath(cwd) {
+  return path.join(cwd, '.fgos', 'main-checkout.lock');
+}
+
+test('unlock: no lock file present -- reports cleared, exit 0', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0);
+  const result = run(cwd, ['unlock']);
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.cleared, true);
+  assert.equal(data.reason, 'stale-or-free');
+});
+
+test('unlock: lock held by a dead pid -- self-heals via the existing reclaim path, reports cleared', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0);
+  fs.mkdirSync(path.dirname(mainCheckoutLockPath(cwd)), { recursive: true });
+  // A pid essentially guaranteed dead: an implausibly high, never-assigned value.
+  fs.writeFileSync(mainCheckoutLockPath(cwd), JSON.stringify({ pid: 999999999, ts: Date.now() }));
+
+  const result = run(cwd, ['unlock']);
+
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.cleared, true);
+  assert.equal(data.reason, 'stale-or-free');
+});
+
+test('unlock: lock genuinely held by a live session -- refuses, reports the holder identity, never deletes the file', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0);
+  fs.mkdirSync(path.dirname(mainCheckoutLockPath(cwd)), { recursive: true });
+  // The test process's own pid is genuinely alive and distinct from the
+  // spawned CLI child's pid -- a real live-other-holder case.
+  fs.writeFileSync(mainCheckoutLockPath(cwd), JSON.stringify({ pid: process.pid, ts: Date.now() }));
+
+  const result = run(cwd, ['unlock']);
+
+  assert.equal(result.status, 7, result.stderr);
+  assert.match(result.stderr, new RegExp(`held by a live session \\(${process.pid}\\)`));
+  assert.equal(fs.existsSync(mainCheckoutLockPath(cwd)), true);
+});
+
+test('unlock: corrupt (unparseable) lock content -- force-reclaims via forceReclaimAmbiguousLock, removes the file', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0);
+  fs.mkdirSync(path.dirname(mainCheckoutLockPath(cwd)), { recursive: true });
+  fs.writeFileSync(mainCheckoutLockPath(cwd), 'not json at all {{{');
+
+  const result = run(cwd, ['unlock']);
+
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.cleared, true);
+  assert.equal(data.reason, 'reclaimed');
+  assert.equal(fs.existsSync(mainCheckoutLockPath(cwd)), false);
+});
+
+test('unlock: registered in the --help --json manifest with write-only touchesState/externalEffect labels', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['--help', '--json']);
+  assert.equal(result.status, 0, result.stderr);
+  const manifest = JSON.parse(result.stdout);
+  const entry = manifest.commands.find((c) => c.name === 'unlock');
+  assert.ok(entry, 'unlock entry missing from --help --json manifest');
+  assert.equal(entry.touchesState, true);
+  assert.equal(entry.externalEffect, false);
+});
