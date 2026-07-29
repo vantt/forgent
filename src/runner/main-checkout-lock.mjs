@@ -299,6 +299,64 @@ export function releaseMainCheckoutLock(dir) {
 }
 
 /**
+ * Read-only inspection of `.fgos/main-checkout.lock` (tsk-5z2, D1) --
+ * unlike `acquireMainCheckoutLock`, this NEVER creates, refreshes, or
+ * deletes the lock file; it only reports what's there right now. Exists
+ * for the `fgos lock-status` verb, so a caller can check before a failed
+ * `take`/`pick`/`merge`/`unlock` without side effects.
+ *
+ * Returns `{ outcome, holderPid?, lockAgeMs?, remainingTtlMs? }` where
+ * `outcome` is one of:
+ *   - 'free'      -- no lock file present
+ *   - 'live'      -- held by a holder that would currently be judged HELD
+ *     by `acquireMainCheckoutLock` (live pid within ttlMs, or a
+ *     string identity within ttlMs)
+ *   - 'stale'     -- a parseable record exists but its holder is
+ *     reclaimable (dead pid, or ttlMs-expired) -- `acquireMainCheckoutLock`
+ *     would succeed against it
+ *   - 'ambiguous' -- unparseable content, or a string-identity record with
+ *     no `ttlMs` supplied (D5 fail-closed, same as the acquire path)
+ * `lockAgeMs`/`remainingTtlMs` follow the same never-fabricate rule as
+ * `acquireMainCheckoutLock`'s own HELD/AMBIGUOUS shape.
+ */
+export function inspectMainCheckoutLock(dir, { ttlMs, now = Date.now() } = {}) {
+  const lockPath = path.join(dir, LOCK_FILE);
+
+  let raw;
+  try {
+    raw = fs.readFileSync(lockPath, 'utf8');
+  } catch (err) {
+    if (err.code === 'ENOENT') return { outcome: 'free' };
+    throw err;
+  }
+
+  const record = parseLockContent(raw);
+  if (record === null) {
+    return { outcome: 'ambiguous' };
+  }
+
+  const lockAgeMs = now - record.ts;
+  let live;
+  if (typeof record.pid === 'number') {
+    const pidLive = isPidAlive(record.pid);
+    const withinTtl = typeof ttlMs !== 'number' || lockAgeMs <= ttlMs;
+    live = pidLive && withinTtl;
+  } else {
+    if (typeof ttlMs !== 'number') {
+      return { outcome: 'ambiguous', lockAgeMs };
+    }
+    live = lockAgeMs <= ttlMs;
+  }
+
+  return {
+    outcome: live ? 'live' : 'stale',
+    holderPid: record.pid,
+    lockAgeMs,
+    remainingTtlMs: typeof ttlMs === 'number' ? Math.max(0, ttlMs - lockAgeMs) : null,
+  };
+}
+
+/**
  * Clears an AMBIGUOUS `.fgos/main-checkout.lock` (unparseable content) --
  * the one status `acquireMainCheckoutLock` deliberately never unlinks
  * itself (D5 fail-closed). Unlike a stale numeric-pid lock, an ambiguous

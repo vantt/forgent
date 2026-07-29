@@ -8,6 +8,7 @@ import {
   acquireMainCheckoutLock,
   releaseMainCheckoutLock,
   forceReclaimAmbiguousLock,
+  inspectMainCheckoutLock,
   formatLockDurationMs,
   LOCK_FILE,
   ACQUIRED,
@@ -66,6 +67,68 @@ test('formatLockDurationMs never fabricates a duration for non-numeric or negati
   assert.equal(formatLockDurationMs(undefined), 'unknown');
   assert.equal(formatLockDurationMs(-1), 'unknown');
   assert.equal(formatLockDurationMs(NaN), 'unknown');
+});
+
+// --- inspectMainCheckoutLock: read-only status (tsk-5z2, D1) ---------------
+
+test('inspectMainCheckoutLock reports "free" for a missing lock file, and never creates one', () => {
+  const { dir } = setup();
+  const res = inspectMainCheckoutLock(dir);
+  assert.equal(res.outcome, 'free');
+  assert.equal(fs.existsSync(lockPathFor(dir)), false);
+});
+
+test('inspectMainCheckoutLock reports "live" for a live holder within ttlMs, without mutating the file', () => {
+  const { dir } = setup();
+  fs.mkdirSync(dir, { recursive: true });
+  const freshTs = Date.now() - 500;
+  fs.writeFileSync(lockPathFor(dir), JSON.stringify({ pid: process.pid, ts: freshTs }));
+
+  const res = inspectMainCheckoutLock(dir, { ttlMs: 60_000 });
+
+  assert.equal(res.outcome, 'live');
+  assert.equal(res.holderPid, process.pid);
+  assert.ok(res.lockAgeMs >= 500);
+  assert.ok(res.remainingTtlMs > 0 && res.remainingTtlMs <= 60_000);
+  // read-only: the file is untouched
+  const record = JSON.parse(fs.readFileSync(lockPathFor(dir), 'utf8'));
+  assert.equal(record.ts, freshTs);
+});
+
+test('inspectMainCheckoutLock reports "stale" for a dead-pid holder, without reclaiming it', () => {
+  const { dir } = setup();
+  fs.mkdirSync(dir, { recursive: true });
+  const dead = deadPid();
+  fs.writeFileSync(lockPathFor(dir), JSON.stringify({ pid: dead, ts: Date.now() }));
+
+  const res = inspectMainCheckoutLock(dir, { ttlMs: 60_000 });
+
+  assert.equal(res.outcome, 'stale');
+  assert.equal(res.holderPid, dead);
+  // read-only: the "stale" lock file is left in place, unlike acquire's reclaim
+  assert.equal(fs.existsSync(lockPathFor(dir)), true);
+});
+
+test('inspectMainCheckoutLock reports "ambiguous" for unparseable content, with no age fabricated', () => {
+  const { dir } = setup();
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(lockPathFor(dir), 'not json at all {{{');
+
+  const res = inspectMainCheckoutLock(dir);
+
+  assert.equal(res.outcome, 'ambiguous');
+  assert.equal(res.lockAgeMs, undefined);
+});
+
+test('inspectMainCheckoutLock reports "ambiguous" with a known age for a string identity with no ttlMs supplied', () => {
+  const { dir } = setup();
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(lockPathFor(dir), JSON.stringify({ pid: 'session-holder', ts: Date.now() }));
+
+  const res = inspectMainCheckoutLock(dir);
+
+  assert.equal(res.outcome, 'ambiguous');
+  assert.ok(res.lockAgeMs >= 0 && res.lockAgeMs < 5000);
 });
 
 // --- acquire when free ------------------------------------------------------

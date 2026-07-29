@@ -40,6 +40,7 @@ import {
   acquireMainCheckoutLock,
   releaseMainCheckoutLock,
   forceReclaimAmbiguousLock,
+  inspectMainCheckoutLock,
   ACQUIRED,
   HELD,
   DEFAULT_TTL_MS,
@@ -2282,8 +2283,20 @@ async function runVerb(verb, flags, positional, dir) {
       return { cleared: reclaim.status === 'reclaimed', reason: reclaim.status };
     }
 
+    case 'lock-status': {
+      const status = inspectMainCheckoutLock(dir, { ttlMs: DEFAULT_TTL_MS });
+      return {
+        outcome: status.outcome,
+        holderPid: status.holderPid ?? null,
+        lockAgeMs: status.lockAgeMs ?? null,
+        remainingTtlMs: status.remainingTtlMs ?? null,
+        lockAge: status.lockAgeMs != null ? formatLockDurationMs(status.lockAgeMs) : null,
+        remainingTtl: status.remainingTtlMs != null ? formatLockDurationMs(status.remainingTtlMs) : null,
+      };
+    }
+
     default:
-      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <init|add|submit|discover|move|edit|ask|answer|decision|list|ready|rebuild|repair|check|rollup|take|return|review|approve|reject|catchup|evolve|triage|session|goal|setup|doctor|unlock> ...`);
+      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <init|add|submit|discover|move|edit|ask|answer|decision|list|ready|rebuild|repair|check|rollup|take|return|review|approve|reject|catchup|evolve|triage|session|goal|setup|doctor|unlock|lock-status> ...`);
   }
 }
 

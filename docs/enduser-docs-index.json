@@ -19,6 +19,14 @@
     "quadrant": "how-to",
     "purpose": "Show the steps to accomplish one specific, already-understood goal.",
     "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/clear-a-stuck-main-checkout-lock.md",
+    "title": "How to clear a stuck `.fgos/main-checkout.lock`",
+    "sourceCaptureId": "tsk-3h4"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
     "docPath": "docs/how-to/continue-after-root-decomposes-mid-session.md",
     "title": "How to continue when a root item decomposes into children mid-session",
     "sourceCaptureId": "tsk-424"
