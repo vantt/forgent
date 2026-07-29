@@ -21,6 +21,25 @@ lineage, same problem class, not requested here — see D3).
 
 ## Pinned terms
 
+- **"git main checkout lock"** (item title) resolves to `.fgos/main-checkout.lock`
+  (`src/runner/main-checkout-lock.mjs`) — the fgOS-internal STR65
+  concurrent-writer activity lock — never git's own native
+  `.git/index.lock`, and never `git worktree lock`/`git worktree unlock`.
+  Ruled out, not just assumed:
+  - Neither `.git/index.lock` nor `git worktree lock` appears anywhere in
+    this repo's source, docs, or decision records (`grep -rIn` over
+    `src`/`bin`/`docs` turns up zero hits for either) — there is no
+    existing repo artifact either alternate reading would attach to.
+  - `.fgos/main-checkout.lock` does exist, is actively used
+    (`claim-port.mjs:80`, `.githooks/pre-commit`), and already has a
+    decision record naming it specifically (0021) — a real, in-repo
+    referent the title's wording matches directly ("main checkout lock").
+  - The item asks for a **skill** — a concept meaningful only inside this
+    repo's own fgOS/Claude-Code workflow (`.claude/skills/fgos/*`). A stuck
+    native `.git/index.lock` is universal git knowledge with a one-line
+    fix (`rm .git/index.lock`) that needs no bespoke skill or work item;
+    only the fgOS-internal lock's safety semantics (D2) justify building
+    one.
 - **"convenient skill"** (item title) resolves to: a `fgos` CLI verb (the
   actual capability) plus a skill doc that calls it — not a skill doc that
   contains the unlock logic itself (see D1).
