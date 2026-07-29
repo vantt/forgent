@@ -76,9 +76,51 @@ Source item: `tsk-62x-1`, `docs/history/fgos-terminal-pane-rename/CONTEXT.md`
    bash ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/plugins/fgOS/skills/terminal/rename.sh "<task-id>" "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
    ```
 
-## Real captured outcome (tsk-62x-1)
+5. **Sequence a caller-skill hook by `fgos`'s cwd-strict design, not just
+   by "when the id becomes known."** `/fgOS:pick` needed its new
+   rename+show-description step placed after claiming (step 2) but before
+   `EnterWorktree` (originally step 3, now step 4) — the obvious reason is
+   that the claimed id isn't known until the claim call returns. There is
+   a second, easy-to-miss reason: `bin/fgos.mjs`'s `dataDir()` resolves
+   `.fgos/` strictly from `process.cwd()`, deliberately never
+   git-resolved upward (`src/runner/paths.mjs`, D5: "`.fgos/` always
+   lives under the caller's own cwd, never resolved upward, never
+   treating a worktree as equivalent to its main checkout"). Any
+   `fgos <verb>`-backed step placed *after* `EnterWorktree` already
+   switched the session's cwd into the item's own worktree will silently
+   see empty state or hard-refuse (ADR0020: worktrees never carry
+   `.fgos/` at all) — confirmed directly while building this feature:
+   ```text
+   $ node bin/fgos.mjs list   # cwd = a worktree, no cd
+   { "data": { "work": {}, "decisions": [] } }   # silently empty, no error
 
-Predicted tier `light`, 0 deps, role `session`. Actual: `proposed`,
-`passed: true`, `attempts: 1`, `aheadCount: 1` — matched the prediction;
-the only real friction was the session-id collision above, caught by
-testing rather than by review.
+   $ node bin/fgos.mjs decision --text "..."   # cwd = a worktree, no cd
+   fgos: .fgos/ not found at ".../.fgos" -- run "fgos init" here first, or
+   check you are not inside a linked worktree (worktrees never carry
+   .fgos/, per ADR0020: docs/decisions/0020-chan-fgos-khoi-worktree-worker.md).
+   ```
+   The one place this doesn't apply is the `fgos` *shell function*
+   (`scripts/fgos-shell-integration.sh`), which resolves root via
+   `git rev-parse --path-format=absolute --git-common-dir` instead of raw
+   cwd — that's why `fgos-exploring`/`fgos-planning`/`fgos-validating`'s
+   own `fgos ask`/`fgos decision` calls (which run *after* the session is
+   already inside the claimed item's worktree) use that shell function,
+   while `/fgOS:pick`'s own `node ${CLAUDE_PROJECT_DIR}.../bin/fgos.mjs`
+   invocations are only ever safe *before* `EnterWorktree` runs. Any new
+   step wrapping a real `fgos` state-mutating verb into a
+   `/fgOS:<verb>`-style skill needs to be placed on the correct side of
+   that line, not just wherever the data it needs first becomes
+   available.
+
+## Real captured outcome
+
+- **tsk-62x-1**: predicted tier `light`, 0 deps, role `session`. Actual:
+  `proposed`, `passed: true`, `attempts: 1`, `aheadCount: 1` — matched the
+  prediction; the only real friction was the session-id collision above,
+  caught by testing rather than by review.
+- **tsk-62x-2**: predicted tier `light`, 1 dep (`tsk-62x-1`), role
+  `session`. Actual: `proposed`, `passed: true`, `attempts: 1`,
+  `aheadCount: 1` — matched the prediction; the real friction was the
+  cwd-strict ordering constraint above, which only surfaced by actually
+  running the documented invocation pattern from the wrong cwd, not by
+  reading the skill files alone.
