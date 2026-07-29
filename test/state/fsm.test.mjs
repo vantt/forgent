@@ -18,8 +18,10 @@ for (const [from, to] of [
   ['blocked', 'todo'],
   ['blocked', 'doing'],
   ['blocked', 'proposed'],
+  ['doing', 'proposed'],
+  ['proposed', 'done'],
 ]) {
-  test(`transitionWork allows ${from} -> ${to} and returns a validated event`, () => {
+  test(`transitionWork allows ${from} -> ${to} and returns a validated event with no extra payload keys`, () => {
     const event = transitionWork({ work: work(from), to });
     assert.deepEqual(event, { type: 'work.move', payload: { id: 'w1', from, to } });
   });
@@ -39,16 +41,6 @@ test('transitionWork allows blocked -> proposed, and its event is never counted 
   assert.equal(event.payload.to, 'proposed');
   assert.notEqual(event.payload.to, 'doing');
 });
-
-for (const [from, to] of [
-  ['doing', 'proposed'],
-  ['proposed', 'done'],
-]) {
-  test(`transitionWork allows ${from} -> ${to} (per D5) and returns a validated event with no extra payload keys`, () => {
-    const event = transitionWork({ work: work(from), to });
-    assert.deepEqual(event, { type: 'work.move', payload: { id: 'w1', from, to } });
-  });
-}
 
 test('transitionWork allows proposed -> todo (rejection) and carries the reason in the payload', () => {
   const event = transitionWork({ work: work('proposed'), to: 'todo', reason: 'goal-check failed twice' });

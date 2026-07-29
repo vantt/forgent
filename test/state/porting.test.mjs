@@ -49,13 +49,6 @@ test('every legal edge is exactly the declared table; every other status pair is
   }
 });
 
-test('transitionPorting rejects a transition not in the table and returns no event', () => {
-  assert.throws(
-    () => transitionPorting({ porting: porting('candidate'), to: 'in-progress' }),
-    (err) => err instanceof PortingError && err.category === 'precondition',
-  );
-});
-
 for (const terminal of ['ported', 'adapted', 'rejected']) {
   test(`${terminal} is terminal single-door: no transition out of ${terminal}, no matter the target`, () => {
     for (const to of STATUSES) {

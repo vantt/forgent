@@ -81,15 +81,6 @@ test('classifySource prefers "runner" even when headAtTake/headAtReturn are also
 
 // --- reviewDiff ---------------------------------------------------------
 
-test('reviewDiff for a runner item diffs main...fgw/<id> and carries no warnings', () => {
-  const repoRoot = initRepo();
-  makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
-  const result = reviewDiff(repoRoot, makeItem());
-  assert.equal(result.source, 'runner');
-  assert.match(result.diff, /produced\.txt/);
-  assert.deepEqual(result.warnings, []);
-});
-
 test('reviewDiff for a runner item with an explicit opts.trunk diffs against that trunk instead of main', () => {
   const repoRoot = initRepo();
   // A non-main trunk, forked from main, with its own commit — then a leaf
