@@ -138,11 +138,39 @@ Turns a fuzzy request into locked decisions written down in
 
 ## Gate
 
-Before handing off, surface the locked decisions in plain language — what
-was decided, why it can be trusted, what it costs if wrong — with
-CONTEXT.md linked, then ask exactly: "Decisions locked. Approve CONTEXT.md
-before planning?" CONTEXT.md is the source of truth for every downstream
-step; its decision IDs are stable and cited, never silently reinterpreted.
+Before asking, check whether this gate can auto-approve instead
+(`docs/history/gate-bypass/CONTEXT.md` D1-D5 — never the `awaiting-human`
+park, only this skill-embedded question):
+
+```bash
+root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
+node -e "
+Promise.all([import('./src/state/store.mjs'), import('./src/state/gate-bypass.mjs'), import('node:fs')]).then(([{ listWork }, { canAutoApprove, readGateBypassLevel }, fs]) => {
+  const fgosDir = process.argv[1] + '/.fgos';
+  const item = listWork(fgosDir).work[process.argv[2]];
+  const artifact = fs.readFileSync(process.argv[3], 'utf8');
+  const level = readGateBypassLevel(fgosDir);
+  console.log(canAutoApprove(item, artifact, level) ? 'true' : 'false');
+});
+" -- "$root" "<item-id>" "docs/history/<feature>/CONTEXT.md"
+```
+
+The code (`gate-bypass.mjs`/`store.mjs`) imports cwd-relative — this worktree's own branch already carries whatever version it needs. Only the state lookup (`.fgos/`, gitignored and per-worktree-local) resolves to the main checkout's `.fgos/` via `git rev-parse --git-common-dir`, the same resolution `scripts/fgos-shell-integration.sh`'s `fgos` shell function already uses — a worktree's own local `.fgos/` never carries the real item record.
+
+Treat anything other than exactly `true` on stdout — `false`, empty output,
+a thrown error — as `false`: fail closed, never skip the question on a
+check that couldn't run cleanly.
+
+- **`true`** — skip the question. Post the non-question line
+  `auto-approved: CONTEXT.md (gate-bypass level <level>)`, log it
+  (`fgos decision --text "auto-approved CONTEXT.md gate for <item-id> at
+  level <level>"`, D3's audit trail), then continue straight to
+  `fgos-planning`.
+- **`false`** — surface the locked decisions in plain language — what was
+  decided, why it can be trusted, what it costs if wrong — with CONTEXT.md
+  linked, then ask exactly: "Decisions locked. Approve CONTEXT.md before
+  planning?" CONTEXT.md is the source of truth for every downstream step;
+  its decision IDs are stable and cited, never silently reinterpreted.
 
 ## Red flags
 

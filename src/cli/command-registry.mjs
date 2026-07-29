@@ -30,6 +30,20 @@
 // unboundedly with data. Every entry carries this field (even the 30 that
 // are `false`) so a transport can read pagination support machine-readably
 // instead of guessing per verb.
+//
+// `requiresExistingStore` (tsk-4fu-2) is narrower than `touchesState`: true
+// only for a verb whose handler actually reads/writes through the CLI's own
+// `dataDir()` (the strict, cwd-resolved `.fgos/` — bin/fgos.mjs's `dir`
+// param). A verb can be `touchesState: true` without this — `session`
+// writes `.fgos/sessions.json` through its own independent, git-resolved
+// path (session.mjs, D10 symlink actor), never through `dir`, and `setup`
+// touches `.fgos-runner.json`/shell rc files/git hooks, never `.fgos/` at
+// all — so gating either of those on `dir`'s existence would refuse for a
+// reason that has nothing to do with what they actually do. `init` is also
+// `false` here despite being the one verb that legitimately creates
+// `.fgos/`: it gets the opposite check (refuse inside a linked worktree,
+// via `isMainWorktree`), not this one. Every entry carries this field, same
+// discipline as `paginated` above.
 
 export const MANIFEST_SCHEMA_VERSION = '2.0';
 
@@ -41,6 +55,7 @@ export const COMMAND_REGISTRY = [
     parameters: { type: 'object', properties: {}, required: [] },
     examples: ['fgos init'],
     touchesState: true,
+    requiresExistingStore: false,
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -74,6 +89,7 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos add build-cli --title "Build CLI" --kind feature --risk medium --verify "npm test"'],
     touchesState: true,
+    requiresExistingStore: true,
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -101,6 +117,7 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos submit "Fix the flaky retry test" --async'],
     touchesState: true,
+    requiresExistingStore: true,
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -120,6 +137,7 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos discover build-cli'],
     touchesState: true,
+    requiresExistingStore: true,
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -141,6 +159,7 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos move build-cli --to doing'],
     touchesState: true,
+    requiresExistingStore: true,
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -160,6 +179,7 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos compound build-cli', 'fgos compound build-cli --doc-type how-to'],
     touchesState: true,
+    requiresExistingStore: true,
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -189,6 +209,7 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos edit build-cli --verify "npm test -- --grep cli"'],
     touchesState: true,
+    requiresExistingStore: true,
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -209,6 +230,7 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos ask build-cli --text "Which module owns this?"'],
     touchesState: true,
+    requiresExistingStore: true,
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -229,6 +251,7 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos answer build-cli --text "src/cli owns it."'],
     touchesState: true,
+    requiresExistingStore: true,
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -247,6 +270,7 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos decision --text "Use envelope wrapping at the dispatcher choke-point"'],
     touchesState: true,
+    requiresExistingStore: true,
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -265,6 +289,7 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos list', 'fgos list --limit 20', 'fgos list --limit 20 --cursor <token>'],
     touchesState: false,
+    requiresExistingStore: false,
     externalEffect: false,
     paginated: true,
     deprecated: null,
@@ -283,6 +308,7 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos ready', 'fgos ready --limit 20', 'fgos ready --limit 20 --cursor <token>'],
     touchesState: false,
+    requiresExistingStore: false,
     externalEffect: false,
     paginated: true,
     deprecated: null,
@@ -300,6 +326,19 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos graph', 'fgos graph --what-if auth-3'],
     touchesState: false,
+    requiresExistingStore: false,
+    externalEffect: false,
+    paginated: false,
+    deprecated: null,
+  },
+  {
+    name: 'gate-bypass',
+    invoke: 'fgos gate-bypass',
+    description: 'Read-only status: the configured gate-bypass level (off/light/standard/heavy) from .fgos/gate-bypass.json, defaulting to "off" when the file is missing or malformed. Determines whether skill-embedded confirmation gates may auto-approve instead of asking (docs/history/gate-bypass/CONTEXT.md D1-D5) — never the awaiting-human park. No CLI setter: edit the file by hand, mirroring .fgos-runner.json\'s own no-CLI-setter pattern.',
+    parameters: { type: 'object', properties: {}, required: [] },
+    examples: ['fgos gate-bypass'],
+    touchesState: false,
+    requiresExistingStore: false,
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -311,6 +350,7 @@ export const COMMAND_REGISTRY = [
     parameters: { type: 'object', properties: {}, required: [] },
     examples: ['fgos stale'],
     touchesState: false,
+    requiresExistingStore: false,
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -322,6 +362,7 @@ export const COMMAND_REGISTRY = [
     parameters: { type: 'object', properties: {}, required: [] },
     examples: ['fgos conflicts'],
     touchesState: false,
+    requiresExistingStore: false,
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -333,6 +374,7 @@ export const COMMAND_REGISTRY = [
     parameters: { type: 'object', properties: {}, required: [] },
     examples: ['fgos rebuild'],
     touchesState: true,
+    requiresExistingStore: true,
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -344,6 +386,7 @@ export const COMMAND_REGISTRY = [
     parameters: { type: 'object', properties: {}, required: [] },
     examples: ['fgos repair'],
     touchesState: true,
+    requiresExistingStore: true,
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -362,6 +405,7 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos check', 'fgos check build-cli'],
     touchesState: false,
+    requiresExistingStore: false,
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -380,6 +424,7 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos rollup build-cli'],
     touchesState: false,
+    requiresExistingStore: false,
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -399,6 +444,7 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos take', 'fgos take build-cli --role session'],
     touchesState: true,
+    requiresExistingStore: true,
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -417,6 +463,7 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos pick', 'fgos pick build-cli'],
     touchesState: true,
+    requiresExistingStore: true,
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -436,6 +483,7 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos return build-cli'],
     touchesState: true,
+    requiresExistingStore: true,
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -456,6 +504,7 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos review build-cli', 'fgos review build-cli --github'],
     touchesState: false,
+    requiresExistingStore: false,
     externalEffect: true,
     paginated: false,
     deprecated: null,
@@ -478,6 +527,7 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos approve build-cli'],
     touchesState: true,
+    requiresExistingStore: true,
     externalEffect: true,
     paginated: false,
     deprecated: null,
@@ -497,6 +547,7 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos reject build-cli --reason "needs more work"'],
     touchesState: true,
+    requiresExistingStore: true,
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -516,6 +567,7 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos catchup build-cli'],
     touchesState: true,
+    requiresExistingStore: true,
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -536,6 +588,18 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos evolve', 'fgos evolve --limit 20', 'fgos evolve --pick cand-1', 'fgos evolve --submit cand-1'],
     touchesState: true,
+    // false, not true (tsk-4fu-2): unlike the other 20 requiresExistingStore
+    // verbs, evolve is dual-mode — bare/--pick is a pure read (must return an
+    // empty list on a missing store, same as ready/check/list, confirmed by
+    // this suite's own "on a directory with no log at all" tests) and only
+    // --submit actually mutates. The registry's per-verb flags describe the
+    // verb at its most-privileged effect (see file header), but this guard
+    // needs a call-time answer, not a verb-level one — gating the common read
+    // path on `.fgos/` existing would refuse a legitimate no-op read. A
+    // truly fresh `evolve --submit` retains the narrower pre-existing
+    // auto-vivify gap this item does not close (out of scope: not part of
+    // the worktree-write hazard this item targets).
+    requiresExistingStore: false,
     externalEffect: false,
     paginated: true,
     deprecated: null,
@@ -554,6 +618,7 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos triage', 'fgos triage --limit 20', 'fgos triage --limit 20 --cursor <token>'],
     touchesState: false,
+    requiresExistingStore: false,
     externalEffect: false,
     paginated: true,
     deprecated: null,
@@ -565,6 +630,7 @@ export const COMMAND_REGISTRY = [
     parameters: { type: 'object', properties: {}, required: [] },
     examples: ['fgos docs-index'],
     touchesState: false,
+    requiresExistingStore: false,
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -583,6 +649,7 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos doc-sources docs/how-to/check-rollup-progress.md'],
     touchesState: false,
+    requiresExistingStore: false,
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -604,6 +671,7 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos session start', 'fgos session end <session-id>', 'fgos session list', 'fgos session gc'],
     touchesState: true,
+    requiresExistingStore: false,
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -623,6 +691,7 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos goal set <id>', 'fgos goal show'],
     touchesState: true,
+    requiresExistingStore: true,
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -640,6 +709,7 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos setup', 'fgos setup --pretty'],
     touchesState: true,
+    requiresExistingStore: false,
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -657,6 +727,7 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos doctor', 'fgos doctor --pretty'],
     touchesState: false,
+    requiresExistingStore: false,
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -672,6 +743,7 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos unlock'],
     touchesState: true,
+    requiresExistingStore: true,
     externalEffect: false,
     paginated: false,
     deprecated: null,

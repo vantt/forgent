@@ -19,6 +19,14 @@
     "quadrant": "how-to",
     "purpose": "Show the steps to accomplish one specific, already-understood goal.",
     "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/claim-a-clarify-or-decompose-stage-item.md",
+    "title": "How to claim an item that is still at stage `clarify` or `decompose`",
+    "sourceCaptureId": "tsk-1ab-1"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
     "docPath": "docs/how-to/clear-a-stuck-main-checkout-lock.md",
     "title": "How to clear a stuck `.fgos/main-checkout.lock`",
     "sourceCaptureId": "tsk-3h4"
@@ -43,6 +51,14 @@
     "quadrant": "reference",
     "purpose": "Describe the machinery accurately and completely for lookup.",
     "audience": "A user who needs precise facts about a specific field/command/API.",
+    "docPath": "docs/reference/fgos-choke-point-ranked-priority.md",
+    "title": "fgOS choke-point survey — ranked priority table",
+    "sourceCaptureId": "tsk-1ab-2"
+  },
+  {
+    "quadrant": "reference",
+    "purpose": "Describe the machinery accurately and completely for lookup.",
+    "audience": "A user who needs precise facts about a specific field/command/API.",
     "docPath": "docs/reference/gate-bypass-config.md",
     "title": "Gate-bypass config",
     "sourceCaptureId": "tsk-6bx-1"
@@ -62,6 +78,22 @@
     "docPath": "docs/explanation/event-log-evolution-discipline.md",
     "title": "How fgOS's event log is allowed to evolve without breaking replay",
     "sourceCaptureId": null
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/fgos-choke-point-pattern.md",
+    "title": "Why fgOS keeps growing the same decision logic in more than one place",
+    "sourceCaptureId": "tsk-1ab"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/gate-bypass-design.md",
+    "title": "Why gate-bypass is shaped the way it is",
+    "sourceCaptureId": "tsk-6bx"
   },
   {
     "quadrant": "explanation",
@@ -101,7 +133,7 @@
     "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/explanation/session-isolation-and-concurrency.md",
     "title": "How fgOS isolates concurrent sessions, and why the event log's write door blocks instead of backing off",
-    "sourceCaptureId": null
+    "sourceCaptureId": "tsk-3ld"
   },
   {
     "quadrant": "explanation",
@@ -285,6 +317,14 @@
     "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/decisions/0021-wire-main-checkout-hook-qua-doctor-setup.md",
     "title": "0021 — Wire main-checkout lock hook qua fgos doctor/setup, không epoch-fence",
+    "sourceCaptureId": null
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/decisions/0022-fgos-choke-point-survey.md",
+    "title": "0022 — Khảo sát choke-point fgOS (quyết định lặp/lệch xuyên CLI/runner/skill)",
     "sourceCaptureId": null
   }
 ]
