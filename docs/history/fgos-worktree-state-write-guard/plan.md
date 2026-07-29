@@ -1,0 +1,106 @@
+# plan: fgos worktree state-write guard (tsk-56t)
+
+Decisions this plan honors: D1 and D2 in
+`docs/history/fgos-worktree-state-write-guard/CONTEXT.md`. Neither is
+reopened here.
+
+## Mode
+
+Flags counted: **3** — standard.
+
+- public contracts (2) — every `SKILL.md` template a session reads mid-flow
+  (`pick`, `fgos-routing`, `fgos-exploring`, `fgos-planning`,
+  `fgos-validating`, `ask`/`answer`/`decision`/`discover`/`return`/`move`
+  under `plugins/fgOS/skills/`) is an agent-facing contract this item
+  changes the invocation shape of.
+- existing covered behavior (1) — `test/cli/fgos.test.mjs` already has
+  uncommitted WIP hardening the exact linked-worktree
+  `requiresExistingStore` refusal this plan must not regress.
+- weak proof around the area (1, folded into the count above rather than
+  double-counted) — the original tsk-3fb/tsk-37v incident happened
+  precisely because no test or doc exercised "state verb called from a
+  worktree session."
+
+No hard-gate flag applies (no auth, no data loss, no external provider, no
+validation removed) — this stays standard, not high-risk.
+
+## Approach
+
+**Chosen:** add one additive, opt-in `--dir <path>` global CLI option to
+`bin/fgos.mjs` that overrides `process.cwd()` as `dataDir()`'s base when
+given; every skill that calls a state-writing verb from inside a
+worktree-resident session resolves the main root the same way the
+gate-bypass snippet already does (`git rev-parse --path-format=absolute
+--git-common-dir | xargs dirname`) and passes it via `--dir`. Default
+behavior (no flag) is byte-identical to today — D5's "cwd-strict, never
+git-resolved upward" contract stays the default; `--dir` is an explicit
+escape hatch a caller must opt into, never a silent change to what a bare
+`fgos <verb>` does.
+
+**Rejected alternatives:**
+- *Bake a git-common-dir fallback straight into `dataDir()`* (no flag,
+  auto-resolve upward when the strict path is missing) — rejected: this
+  silently reopens D5 for every caller, not just worktree sessions, and
+  removes the one signal (loud refusal) that made tsk-4fu-2's guard safe.
+  Reopening a stated CLI contract needs its own explicit decision, not a
+  side effect of this item.
+- *Read state via `git show fgw/<id>:.fgos/events.jsonl`* (option a) —
+  rejected per D1: superseded by the already-merged
+  `requiresExistingStore` guard; no code path in this repo does branch-ref
+  reads of `.fgos/` today, and adding one duplicates the escape hatch
+  above for no extra benefit.
+- *Fix only `scripts/fgos-shell-integration.sh`'s `fgos()` function* —
+  rejected: it is opt-in (never auto-sourced, per the script's own header)
+  and every skill snippet audited below invokes `node .../bin/fgos.mjs`
+  directly (the same style `pick`'s own `SKILL.md` uses), never the shell
+  function — fixing only the function would leave every real caller
+  unfixed.
+
+## Risk map
+
+| component | risk | proof point (→ fgos-validating) |
+|---|---|---|
+| `bin/fgos.mjs` `--dir` flag parsing / `dataDir()` | low — additive, default path unchanged | `fgos list --dir <mainRoot>` run with cwd inside a `.fgos/`-less linked worktree returns the real view; `fgos list` with no `--dir` from the same cwd is unchanged (still silent-empty, until phase 2) |
+| requiresExistingStore refusal path | low — must not regress tsk-4fu-2 | existing + WIP tests in `test/cli/fgos.test.mjs` still pass unmodified; a state verb given a garbage `--dir` still refuses with the same `.fgos/ not found` message, just naming the given dir instead of cwd |
+| read-verb (`list`/`ready`/...) missing-store signal | low — additive field/stderr, no shape break | new test: the field is present and true only when `!fs.existsSync(dir) && !isMainWorktree(cwd)`; absent for a normal fresh non-worktree dir with no store (that case stays "not evaluated", not "warning") |
+| `SKILL.md` snippet rewrites (7+ files) | low-medium — most-touched surface, easy to miss one | manual dry run: pick a real throwaway item, walk pick → exploring (`ask`/`decision`) → planning (`decision`) → validating → return entirely from the worktree, confirm main's `.fgos/events.jsonl` gets every event and `approve` sees `proposed` with no manual `cd`/subshell |
+
+## Shape (phased)
+
+1. **CLI escape hatch.** `bin/fgos.mjs`: add `--dir <path>` (global flag,
+   every verb) — when present, `dataDir()` uses `path.resolve(flags.dir)`
+   instead of `process.cwd()`; absent, behavior is exactly today's. Add
+   cases to `test/cli/fgos.test.mjs` (alongside the existing `tsk-4fu-2`
+   linked-worktree fixtures already there): a state verb succeeds against
+   a real store via `--dir` from a `.fgos/`-less worktree cwd; the same
+   verb with no `--dir` still refuses exactly as before (regression guard
+   for tsk-4fu-2).
+2. **Read-verb signal (D2).** For the `requiresExistingStore: false` verbs
+   (`list`/`ready`/`graph`/`stale`/`check`/`rollup`/`conflicts`/`triage`),
+   when the resolved dir has no `.fgos/` and `cwd` is a linked worktree
+   (`isMainWorktree` from `src/runner/merge.mjs` already does this check
+   for `init`), surface it — e.g. a `storeMissing: true` field on the
+   JSON envelope — instead of a bare empty view. Test: the field appears
+   for a linked-worktree cwd, is absent for a normal non-worktree cwd with
+   no store.
+3. **Skill contract rewrite.** Update every `SKILL.md` snippet that
+   currently invokes a state-writing verb assuming cwd = main (audit list
+   above) to resolve `root` via the git-common-dir one-liner and pass
+   `--dir "$root"`. Same untrusted-input rule already in force (item
+   `title`/`description` stays a discrete quoted argv element — `--dir`
+   doesn't change that).
+4. **End-to-end proof.** The dry run described in the risk map's last row,
+   carried to `fgos-validating` as this plan's concrete proof case,
+   alongside the boundary cases: garbage `--dir` value (clean validation
+   error, not a crash), and running from the actual main checkout with
+   `--dir` pointed at itself (no-op, identical result to omitting it).
+
+No split: one cohesive item, four phases, no independently-workable piece
+that benefits from becoming its own child work item.
+
+## Ordering signal
+
+`fgos graph --json`: `tsk-56t` sits on the critical path right after
+`tsk-4fu` (already merged) and is the top `topUnblock` entry
+(`unblocks: 2, newlyUnblocks: 3`) — worth finishing before its dependents,
+not deferring.
