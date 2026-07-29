@@ -159,28 +159,106 @@ function commitFile(cwd, filename, content = 'work\n') {
   execFileSync('git', ['commit', '-q', '-m', `work: ${filename}`], { cwd });
 }
 
-// tsk-4fu-2: a linked worktree of a real `.fgos`-inited, `.fgos`-committed
-// main checkout — mirrors what `createWorktree` (worktree.mjs, ADR0020)
-// actually produces: `git worktree add` checks out a snapshot of the
-// committed `.fgos/`, then that snapshot is deleted outright (never
-// symlinked, never kept), so the returned worktree cwd has no `.fgos/` at
-// all. Only the `requiresExistingStore`/`isMainWorktree` guard tests below
-// need this — every other worktree concern in this repo lives in
-// test/runner/worktree.test.mjs, not here.
-function tmpLinkedWorktreeCwd() {
-  const main = rawTmpCwd();
+// tsk-56t: a real `.fgos`-inited main checkout plus a linked worktree of it
+// with no `.fgos/` at all — mirrors what `createWorktree` (worktree.mjs,
+// ADR0020) actually produces. Returns both roots: `main` is where the real
+// store lives, `wt` is the `.fgos/`-less cwd a worktree-resident session
+// would actually run commands from.
+function tmpLinkedWorktree() {
+  const main = tmpCwd();
   execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: main });
   execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: main });
   execFileSync('git', ['config', 'user.name', 'Test'], { cwd: main });
-  assert.equal(run(main, ['init']).status, 0);
-  fs.writeFileSync(path.join(main, 'seed.txt'), 'seed\n');
-  execFileSync('git', ['add', '-A'], { cwd: main });
-  execFileSync('git', ['commit', '-q', '-m', 'seed'], { cwd: main });
-  const wt = `${main}-wt`;
-  execFileSync('git', ['worktree', 'add', '-b', 'tsk-4fu-2-guard-test', wt], { cwd: main });
+  commitFile(main, 'seed.txt');
+  const wt = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-cli-wt-'));
+  fs.rmdirSync(wt);
+  execFileSync('git', ['worktree', 'add', '-b', 'tsk-56t-dir-flag-test', wt], { cwd: main });
   fs.rmSync(path.join(wt, '.fgos'), { recursive: true, force: true });
-  return wt;
+  return { main, wt };
 }
+
+test('a state verb given --dir succeeds from a .fgos/-less worktree cwd, against the real store at --dir', () => {
+  const { main, wt } = tmpLinkedWorktree();
+  assert.ok(!fs.existsSync(path.join(wt, '.fgos')));
+  const before = eventLines(main).length;
+  const result = run(wt, ['submit', 'reached via --dir', '--dir', main]);
+  assert.equal(result.status, 0, `submit --dir unexpectedly failed: ${result.stderr}`);
+  assert.equal(eventLines(main).length, before + 1, '--dir must write into the given root, not the worktree cwd');
+  assert.ok(!fs.existsSync(path.join(wt, '.fgos')), '--dir must never create a .fgos/ at the worktree cwd itself');
+});
+
+test('the same state verb with no --dir, from the same .fgos/-less worktree cwd, still refuses exactly as before (tsk-4fu-2 regression guard)', () => {
+  const { wt } = tmpLinkedWorktree();
+  const result = run(wt, ['submit', 'should never land']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /\.fgos\/ not found/);
+  assert.ok(!fs.existsSync(path.join(wt, '.fgos')));
+});
+
+test('--dir with no value (a bare trailing flag) is a clean validation error, exit 4, not a crash', () => {
+  const { wt } = tmpLinkedWorktree();
+  const result = run(wt, ['submit', 'title', '--dir']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /--dir requires a non-empty path value/);
+});
+
+test('--dir pointed at a path with no .fgos/ at all gives the same clean refusal as omitting it, not a crash', () => {
+  const { wt } = tmpLinkedWorktree();
+  const garbage = rawTmpCwd();
+  const result = run(wt, ['submit', 'title', '--dir', garbage]);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /\.fgos\/ not found/);
+});
+
+test('--dir pointed at the main checkout itself (from main\'s own cwd) is a no-op, identical to omitting it', () => {
+  const main = tmpCwd();
+  const before = eventLines(main).length;
+  const result = run(main, ['submit', 'reached with redundant --dir', '--dir', main]);
+  assert.equal(result.status, 0);
+  assert.equal(eventLines(main).length, before + 1);
+});
+
+// tsk-56t D2: `list`/`ready`/etc. stay `requiresExistingStore: false` (a
+// fresh non-worktree dir with no store is legitimately "not evaluated",
+// not an error) — but a worktree-resident session that forgets `--dir`
+// should not read that as "no open work" with zero signal. One
+// object-shaped verb (`list`) and one array-shaped verb (`ready`, which
+// returns a bare array via paginateVerbResult when unpaginated — the
+// reason this is a stderr line, never a JSON field: JSON.stringify drops
+// a named property set on an array).
+test('list from a .fgos/-less linked worktree cwd, no --dir: exit 0, empty view, but a stderr warning names the real store elsewhere', () => {
+  const { wt } = tmpLinkedWorktree();
+  const result = run(wt, ['list']);
+  assert.equal(result.status, 0);
+  assert.deepEqual(envelopeData(result.stdout).work, {});
+  assert.match(result.stderr, /warning: \.fgos\/ not found/);
+  assert.match(result.stderr, /--dir <mainRoot>/);
+});
+
+test('ready (array-shaped, unpaginated) from the same linked worktree cwd: exit 0, empty array, same stderr warning', () => {
+  const { wt } = tmpLinkedWorktree();
+  const result = run(wt, ['ready']);
+  assert.equal(result.status, 0);
+  assert.deepEqual(envelopeData(result.stdout), []);
+  assert.match(result.stderr, /warning: \.fgos\/ not found/);
+});
+
+test('list with --dir pointed at the real store from the same worktree cwd: no warning, real data', () => {
+  const { main, wt } = tmpLinkedWorktree();
+  run(main, ['add', 'seen-via-dir', '--title', 'Seen via --dir', '--kind', 'task', '--risk', 'low', '--verify', 'npm test']);
+  const result = run(wt, ['list', '--dir', main]);
+  assert.equal(result.status, 0);
+  assert.ok(envelopeData(result.stdout).work['seen-via-dir']);
+  assert.equal(result.stderr, '');
+});
+
+test('list on a fresh non-worktree dir with no store at all: exit 0, empty view, no warning (legitimately "not evaluated", not a worktree footgun)', () => {
+  const cwd = rawTmpCwd();
+  const result = run(cwd, ['list']);
+  assert.equal(result.status, 0);
+  assert.deepEqual(envelopeData(result.stdout).work, {});
+  assert.equal(result.stderr, '');
+});
 
 test('init creates .fgos/ with an empty log and a rebuilt (empty) view, exit 0', () => {
   const cwd = tmpCwd();
@@ -225,7 +303,7 @@ test('submit on a directory with no .fgos/ at all is refused, exit 4, writes not
 });
 
 test('init inside a linked worktree is refused, exit 4 (ADR0020: worktrees never carry .fgos/)', () => {
-  const wt = tmpLinkedWorktreeCwd();
+  const { wt } = tmpLinkedWorktree();
   assert.ok(!fs.existsSync(path.join(wt, '.fgos')));
   const result = run(wt, ['init']);
   assert.equal(result.status, 4);
@@ -241,14 +319,14 @@ test('init on a fresh directory that is not a linked worktree still succeeds, ex
 });
 
 test('session start inside a .fgos/-less linked worktree still succeeds (D10 symlink actor exempt from the requiresExistingStore guard)', () => {
-  const wt = tmpLinkedWorktreeCwd();
+  const { wt } = tmpLinkedWorktree();
   assert.ok(!fs.existsSync(path.join(wt, '.fgos')));
   const result = run(wt, ['session', 'start']);
   assert.equal(result.status, 0, `session start unexpectedly refused: ${result.stderr}`);
 });
 
 test('setup inside a .fgos/-less linked worktree still succeeds (setup never touches .fgos/, exempt from the guard)', () => {
-  const wt = tmpLinkedWorktreeCwd();
+  const { wt } = tmpLinkedWorktree();
   assert.ok(!fs.existsSync(path.join(wt, '.fgos')));
   const result = run(wt, ['setup']);
   assert.equal(result.status, 0, `setup unexpectedly refused: ${result.stderr}`);

@@ -22,7 +22,7 @@ import { deriveTitle, classify, generateId } from '../src/intake/classify.mjs';
 import { wrapEnvelope } from '../src/state/envelope.mjs';
 import { loadRunnerConfig, ensureRunnerConfig, DEFAULT_RUNNER_CONFIG } from '../src/runner/dispatch.mjs';
 import { readGateBypassLevel } from '../src/state/gate-bypass.mjs';
-import { resolveFgosDir } from '../src/runner/paths.mjs';
+import { resolveFgosDir, fgosDirFromRoot } from '../src/runner/paths.mjs';
 import { resolveDiscovery } from '../src/intake/discovery.mjs';
 import { resolveDecompose } from '../src/intake/decompose.mjs';
 import { computeEntropy, computeCounts } from '../src/report/entropy.mjs';
@@ -69,7 +69,20 @@ import { formatCheck, bold } from '../src/setup/ansi.mjs';
 // overridable by a later edit.
 const SUBMIT_VERIFY_SENTINEL = 'chưa xác định — P15 bổ sung';
 
-function dataDir() {
+// `overrideDir` (tsk-56t D1): an explicit, opt-in escape hatch alongside D5's
+// strict cwd resolution, never a replacement for it — omitting `--dir`
+// leaves every existing caller byte-identical to before this cell. A
+// worktree-resident session (no `.fgos/` at its own cwd, per ADR0020) passes
+// `--dir <mainRoot>` to reach the one real store explicitly, instead of the
+// CLI silently git-resolving upward (which would reopen D5 for every caller,
+// not just this one).
+function dataDir(overrideDir) {
+  if (overrideDir !== undefined) {
+    if (typeof overrideDir !== 'string' || !overrideDir.trim()) {
+      throw new StoreError('validation', '--dir requires a non-empty path value');
+    }
+    return fgosDirFromRoot(overrideDir);
+  }
   // strict: true — this CLI's `.fgos/` always lives under the caller's own
   // cwd, never git-resolved upward (D5, matches the pull-door assumption
   // in gitAt's own comment below).
@@ -2474,6 +2487,12 @@ function renderPretty(verb, data) {
   return `${lines.join('\n')}\n`;
 }
 
+// tsk-56t D2: the exact 8 read verbs the decision names — not every
+// `requiresExistingStore: false` verb (that set also includes `session`/
+// `setup`/`doctor`, which never touch `.fgos/` at all, and `init`, which
+// gets its own opposite linked-worktree refusal above).
+const STORE_MISSING_WARNING_VERBS = new Set(['list', 'ready', 'graph', 'stale', 'check', 'rollup', 'conflicts', 'triage']);
+
 async function main() {
   const [, , verb, ...rest] = process.argv;
 
@@ -2491,7 +2510,7 @@ async function main() {
   }
 
   try {
-    const dir = dataDir();
+    const dir = dataDir(flags.dir);
     // tsk-4fu-2: a verb registered `requiresExistingStore: true`
     // (command-registry.mjs) reads/writes through this `dir` — refuse
     // before ever reaching its handler when `.fgos/` isn't there yet,
@@ -2512,6 +2531,21 @@ async function main() {
       throw new StoreError(
         'validation',
         `"fgos init" refused inside a linked worktree ("${process.cwd()}") -- worktrees never carry .fgos/ by design (ADR0020); run "fgos init" from the main checkout instead.`,
+      );
+    }
+    // tsk-56t D2: these 8 read verbs are `requiresExistingStore: false` by
+    // design (a fresh non-worktree dir with no store yet is a legitimate
+    // "not evaluated" case, not an error) — but that same tolerance means a
+    // worktree-resident session that forgets `--dir` sees a silent, real-
+    // looking empty view instead of a signal that the actual store lives
+    // elsewhere. `ready`/`triage` can return a bare array when unpaginated
+    // (paginateVerbResult), so this can never be a JSON `data` field without
+    // changing that shape only in this one runtime case — a stderr line
+    // keeps stdout's `data` shape byte-identical in every case, mirroring
+    // this file's existing stdout=data/stderr=diagnostics split above.
+    if (STORE_MISSING_WARNING_VERBS.has(verb) && !fs.existsSync(dir) && !isMainWorktree(process.cwd())) {
+      process.stderr.write(
+        `fgos: warning: .fgos/ not found at "${dir}" -- this view may be empty because the real store lives elsewhere (worktrees never carry .fgos/, per ADR0020); pass --dir <mainRoot> to read it.\n`,
       );
     }
     const data = await runVerb(verb, flags, positional, dir);

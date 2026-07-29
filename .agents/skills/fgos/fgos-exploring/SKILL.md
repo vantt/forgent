@@ -16,6 +16,14 @@ Turns a fuzzy request into locked decisions written down in
 
 ## Hard rules
 
+- Every bare `fgos <verb>` this skill calls (`add`, `ask`, `answer`,
+  `decision`, `discover`) is `requiresExistingStore: true` — resolve the
+  main checkout root the same way the gate check below already does
+  (`git rev-parse --path-format=absolute --git-common-dir | xargs
+  dirname`) and pass `--dir "$root"` on every one of them. This session's
+  cwd may already be a linked worktree, which never carries its own
+  `.fgos/` by design (ADR0020) — the verb refuses (exit 4) rather than
+  silently diverge if `--dir` is omitted there (tsk-56t D1).
 - Do not research implementation, propose architecture, or write code. If a
   candidate question only matters to whoever builds the thing, it belongs to
   `fgos-planning`, not here.

@@ -114,3 +114,16 @@ Include only the flags you're confident about; drop any flag you decided to
 leave to the default in step 2. All three fields stay correctable after
 filing via `fgos edit <id>` — a wrong guess here is a cheap, later-fixable
 mistake, not a reason to hesitate before submitting.
+
+`submit` and `edit` are both `requiresExistingStore: true` — this session
+may already be inside a linked worktree from an earlier `/fgOS:pick`,
+which never carries its own `.fgos/` by design (ADR0020), and the verb
+refuses (exit 4) rather than silently diverge if run bare from there.
+Resolve the main checkout root and pass it explicitly on both calls:
+
+```bash
+root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
+node "$root/bin/fgos.mjs" submit "..." --dir "$root"
+```
+
+(tsk-56t D1).

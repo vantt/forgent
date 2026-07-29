@@ -29,6 +29,26 @@ Before touching anything, read the shape of the work:
 
 Both are read-only. Nothing here writes state.
 
+## Running a state-writing verb from this session
+
+Every bare `fgos <verb>` below (`take`, `return`, and the `ask`/`answer`
+gate contract further down) is a `requiresExistingStore: true` verb — it
+refuses (exit 4, `.fgos/ not found`) rather than silently diverge if this
+session's cwd is a linked worktree, which never carries its own `.fgos/`
+by design (ADR0020: `docs/decisions/0020-chan-fgos-khoi-worktree-worker.md`).
+Resolve the main checkout root once and pass it explicitly on every such
+call — never a bare `fgos <verb>` when this session might already be
+inside a worktree (e.g. mid-`fgos-executing`, or a `pick`'d session
+running `fgos-routing` again):
+
+```bash
+root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
+node "$root/bin/fgos.mjs" <verb> ... --dir "$root"
+```
+
+(the same `root` resolution `fgos-exploring`'s and `fgos-planning`'s own
+gate-bypass checks already rely on — tsk-56t D1).
+
 ## Claim
 
 Take exactly one item through the pull door:

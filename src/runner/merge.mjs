@@ -62,8 +62,15 @@ export class MergeError extends Error {
   }
 }
 
+// stdio: pipe (tsk-56t): explicit, not execFileSync's own default — without
+// it, a failing git call (e.g. "not a git repository" from a non-git cwd)
+// prints straight through to this process's real stderr in addition to
+// landing on the thrown error's own `.stderr`/`.message`, which every caller
+// here already reads instead. Found via isMainWorktree(process.cwd()) newly
+// reachable from a plain non-git dir (tsk-56t D2's read-verb warning) —
+// no caller's behavior changes, since none relied on the live leak.
 function git(repoRoot, args) {
-  return execFileSync('git', args, { cwd: repoRoot, encoding: 'utf8', shell: false });
+  return execFileSync('git', args, { cwd: repoRoot, encoding: 'utf8', shell: false, stdio: ['ignore', 'pipe', 'pipe'] });
 }
 
 /** Resolve `repoRoot`'s trunk branch name without assuming `'main'`: prefers

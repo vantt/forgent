@@ -21,6 +21,14 @@ stage values — the same way `fgos-routing` describes it.
 
 ## Hard rules
 
+- The `fgos decision` call in the gate's auto-approve branch below is
+  `requiresExistingStore: true` — resolve the main checkout root the same
+  way the gate check itself already does (`git rev-parse
+  --path-format=absolute --git-common-dir | xargs dirname`) and pass
+  `--dir "$root"`. This session's cwd may already be a linked worktree,
+  which never carries its own `.fgos/` by design (ADR0020) — the verb
+  refuses (exit 4) rather than silently diverge if `--dir` is omitted
+  there (tsk-56t D1).
 - Do not reopen or reinterpret a decision already locked in `CONTEXT.md`.
   Cite its D-ID; never override it here.
 - Do not perform the reality/feasibility check on the plan produced here —
