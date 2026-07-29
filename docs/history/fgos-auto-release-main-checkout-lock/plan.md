@@ -63,7 +63,7 @@ Two independent-but-related changes, both grounded in `CONTEXT.md`'s D1/D2:
    `release()` once it actually runs. This is a single change point that
    automatically covers every current holder of this lock's `release()`
    closure — `claimWork` (`claim-port.mjs:80-177`) and `mergeRunnerItem`
-   (`merge.mjs:332-338`) — without duplicating signal-handling boilerplate
+   (`merge.mjs:332,343`) — without duplicating signal-handling boilerplate
    at each call site (DRY; also matches "the item's own description already
    asks for this at whichever verb holds `release()`", CONTEXT.md's
    deferred-to-planning note). A `SIGINT`/`SIGTERM` handler must call
