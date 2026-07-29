@@ -72,6 +72,17 @@ evidence-quoted end-user document.
    compound-learn move to make). Absent this call, the item's capture stays
    untagged and unlinked, and synthesis is unfinished.
 
+   `compound` is `requiresExistingStore: true` — this session is often
+   still inside the item's worktree right after its own `return`, which
+   never carries its own `.fgos/` by design (ADR0020). Resolve the main
+   checkout root and pass it explicitly rather than running bare
+   (tsk-56t D1):
+
+   ```bash
+   root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
+   node "$root/bin/fgos.mjs" compound <id> --doc-type <quadrant> --doc-path docs/<quadrant>/<file>.md --dir "$root"
+   ```
+
 4. **Gather every linked capture, then grow or create the document.**
    Before writing, run `fgos doc-sources <docPath>` (the same path just
    passed to `--doc-path` in step 3) to gather *every* capture already

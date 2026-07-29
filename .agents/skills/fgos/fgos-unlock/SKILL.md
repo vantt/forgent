@@ -33,9 +33,14 @@ encodes the same staleness/liveness judgment `acquireMainCheckoutLock`
    the two cases applies (`lock-held: main checkout locked by pid <id>` vs
    `lock-ambiguous: main checkout lock state ambiguous`). Do not guess or
    second-guess it.
-2. Run:
-   ```
-   fgos unlock
+2. Run — `unlock` is `requiresExistingStore: true`, and the `take`/`pick`
+   that just failed may have been a tsk-424 chained pick from inside an
+   existing linked worktree (which never carries its own `.fgos/` by
+   design, ADR0020), so resolve the main checkout root and pass it
+   explicitly rather than running bare (tsk-56t D1):
+   ```bash
+   root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
+   node "$root/bin/fgos.mjs" unlock --dir "$root"
    ```
 3. Read the result:
    - `{ cleared: true, reason: "stale-or-free" }` — the lock was free or

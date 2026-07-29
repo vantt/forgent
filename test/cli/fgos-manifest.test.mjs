@@ -50,7 +50,7 @@ test('every registry entry has touchesState, externalEffect, paginated booleans 
   for (const entry of COMMAND_REGISTRY) {
     assert.deepEqual(
       Object.keys(entry).sort(),
-      ['deprecated', 'description', 'examples', 'externalEffect', 'invoke', 'name', 'paginated', 'parameters', 'touchesState'].sort(),
+      ['deprecated', 'description', 'examples', 'externalEffect', 'invoke', 'name', 'paginated', 'parameters', 'requiresExistingStore', 'touchesState'].sort(),
       `entry "${entry.name}" has an unexpected key set`,
     );
     assert.equal(typeof entry.touchesState, 'boolean', `entry "${entry.name}" has invalid touchesState "${entry.touchesState}"`);
