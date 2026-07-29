@@ -24,6 +24,27 @@ test('deriveTitle truncates long text with no natural boundary at a word edge', 
   assert.equal(longText.startsWith(title), true);
 });
 
+test('deriveTitle does not cut early on a dotted filename opening the text', () => {
+  assert.equal(
+    deriveTitle('CONTEXT.md is the only place this lives. See the doc for detail.'),
+    'CONTEXT.md is the only place this lives',
+  );
+});
+
+test('deriveTitle does not cut early on a dotted source-file name opening the text', () => {
+  assert.equal(
+    deriveTitle('index.js exports the entry point. Nothing else does.'),
+    'index.js exports the entry point',
+  );
+});
+
+test('deriveTitle does not treat a mid-sentence abbreviation dot as a boundary', () => {
+  assert.equal(
+    deriveTitle('Update the docs, config, v.v, before shipping. Then review.'),
+    'Update the docs, config, v.v, before shipping',
+  );
+});
+
 test('deriveTitle falls back to a placeholder for blank or non-string input', () => {
   assert.equal(deriveTitle(''), 'Untitled submission');
   assert.equal(deriveTitle('   '), 'Untitled submission');

@@ -21,7 +21,7 @@ export function deriveTitle(text) {
   const safeText = typeof text === 'string' ? text.trim() : '';
   if (!safeText) return 'Untitled submission';
 
-  const boundary = safeText.match(/[.!?\n]/);
+  const boundary = safeText.match(/[.!?](?:\s|$)|\n/);
   if (boundary && boundary.index > 0) {
     const candidate = safeText.slice(0, boundary.index).trim();
     if (candidate) return candidate;

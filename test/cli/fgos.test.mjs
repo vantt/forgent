@@ -635,26 +635,6 @@ test('edit --priority sets the item priority field to the given integer, exit 0'
   assert.equal(stateView(cwd).work['edit-priority'].priority, 3);
 });
 
-test('edit --priority with a negative value is rejected as validation, exit 4, no event written (priority must be non-negative)', () => {
-  const cwd = tmpCwd();
-  addOk(cwd, 'edit-priority-neg');
-  const before = eventLines(cwd).length;
-  const result = run(cwd, ['edit', 'edit-priority-neg', '--priority', '-1']);
-  assert.equal(result.status, 4);
-  assert.equal(eventLines(cwd).length, before);
-  assert.equal(stateView(cwd).work['edit-priority-neg'].priority, undefined);
-});
-
-test('edit --priority with a bare flag (no following value) is rejected as validation, exit 4, never silently written as 1', () => {
-  const cwd = tmpCwd();
-  addOk(cwd, 'edit-priority-bare');
-  const before = eventLines(cwd).length;
-  const result = run(cwd, ['edit', 'edit-priority-bare', '--priority']);
-  assert.equal(result.status, 4);
-  assert.equal(eventLines(cwd).length, before);
-  assert.equal(stateView(cwd).work['edit-priority-bare'].priority, undefined);
-});
-
 test('edit --intent accepts a negative value (no sign constraint), exit 0', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'edit-intent-neg');
@@ -663,25 +643,31 @@ test('edit --intent accepts a negative value (no sign constraint), exit 0', () =
   assert.equal(stateView(cwd).work['edit-intent-neg'].intent, -1);
 });
 
-test('edit --intent with a non-numeric value is rejected as validation, exit 4, no event written', () => {
-  const cwd = tmpCwd();
-  addOk(cwd, 'edit-intent-nan');
-  const before = eventLines(cwd).length;
-  const result = run(cwd, ['edit', 'edit-intent-nan', '--intent', 'notanumber']);
-  assert.equal(result.status, 4);
-  assert.equal(eventLines(cwd).length, before);
-  assert.equal(stateView(cwd).work['edit-intent-nan'].intent, undefined);
-});
+// tsk-34y: same invariant as ADD_BAD_FLAG_CASES/SUBMIT_BAD_FLAG_CASES/
+// MOVE_BAD_FLAG_CASES above -- a bad, bare, or empty value on one `edit`
+// flag is rejected as validation (exit 4), appends no event, and leaves the
+// target field unset (never silently coerced). Includes the --docs-ref
+// empty-string case that used to sit far below near the other --docs-ref
+// tests (D1, docs/history/test-suite-dry-consolidation/CONTEXT.md).
+const EDIT_BAD_FLAG_CASES = [
+  ['a negative --priority (priority must be non-negative)', ['--priority', '-1'], 'priority'],
+  ['a bare --priority (no following value)', ['--priority'], 'priority'],
+  ['a non-numeric --intent', ['--intent', 'notanumber'], 'intent'],
+  ['a bare --intent (no following value)', ['--intent'], 'intent'],
+  ['an empty --docs-ref ""', ['--docs-ref', ''], 'docsRef'],
+];
 
-test('edit --intent with a bare flag (no following value) is rejected as validation, exit 4, never silently written as 1', () => {
-  const cwd = tmpCwd();
-  addOk(cwd, 'edit-intent-bare');
-  const before = eventLines(cwd).length;
-  const result = run(cwd, ['edit', 'edit-intent-bare', '--intent']);
-  assert.equal(result.status, 4);
-  assert.equal(eventLines(cwd).length, before);
-  assert.equal(stateView(cwd).work['edit-intent-bare'].intent, undefined);
-});
+for (const [label, badFlagArgs, fieldName] of EDIT_BAD_FLAG_CASES) {
+  test(`edit with ${label} is rejected as validation, exit 4, no event written, field left unset`, () => {
+    const cwd = tmpCwd();
+    addOk(cwd, 'edit-bad-flag-item');
+    const before = eventLines(cwd).length;
+    const result = run(cwd, ['edit', 'edit-bad-flag-item', ...badFlagArgs]);
+    assert.equal(result.status, 4);
+    assert.equal(eventLines(cwd).length, before);
+    assert.equal(stateView(cwd).work['edit-bad-flag-item'][fieldName], undefined);
+  });
+}
 
 test('add with no --priority/--intent leaves both fields absent (undefined), not null and not zero', () => {
   const cwd = tmpCwd();
@@ -695,11 +681,14 @@ test('decision logs one event and appears in the view, exit 0', () => {
   const cwd = tmpCwd();
   run(cwd, ['init']);
   const before = eventLines(cwd).length;
-  const result = run(cwd, ['decision', '--text', 'locked D5 naming']);
+  const result = run(cwd, ['decision', '--text', 'locked D5 naming', '--rationale', 'avoids a naming collision with an existing verb']);
   assert.equal(result.status, 0);
   assert.equal(eventLines(cwd).length, before + 1);
   assert.equal(stateView(cwd).decisions.length, 1);
   assert.equal(stateView(cwd).decisions[0].text, 'locked D5 naming');
+  assert.equal(stateView(cwd).decisions[0].rationale, 'avoids a naming collision with an existing verb');
+  // source defaults to 'session' when omitted (tsk-63c D3)
+  assert.equal(stateView(cwd).decisions[0].source, 'session');
 });
 
 test('decision without --text is rejected as validation, exit 4, no event written', () => {
@@ -709,6 +698,42 @@ test('decision without --text is rejected as validation, exit 4, no event writte
   const result = run(cwd, ['decision']);
   assert.equal(result.status, 4);
   assert.equal(eventLines(cwd).length, before);
+});
+
+// tsk-63c D2: rationale is required on `decision`, mirroring bee's own
+// throw-if-blank rule -- --text alone is no longer sufficient.
+test('decision without --rationale is rejected as validation, exit 4, no event written', () => {
+  const cwd = tmpCwd();
+  run(cwd, ['init']);
+  const before = eventLines(cwd).length;
+  const result = run(cwd, ['decision', '--text', 'locked D5 naming']);
+  assert.equal(result.status, 4);
+  assert.equal(eventLines(cwd).length, before);
+});
+
+// tsk-63c D1/D3: alternatives/source are optional free text, and an explicit
+// --source overrides the 'session' default.
+test('decision with --alternatives, --source, and --id folds all fields, exit 0', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'item-a');
+  const before = eventLines(cwd).length;
+  const result = run(cwd, [
+    'decision',
+    '--text', 'chose option B',
+    '--rationale', 'option B has no external dependency',
+    '--alternatives', 'option A was rejected -- needs a new package',
+    '--source', 'human',
+    '--id', 'item-a',
+  ]);
+  assert.equal(result.status, 0);
+  assert.equal(eventLines(cwd).length, before + 1);
+  const view = stateView(cwd);
+  const logged = view.decisions.at(-1);
+  assert.equal(logged.alternatives, 'option A was rejected -- needs a new package');
+  assert.equal(logged.source, 'human');
+  assert.equal(logged.id, 'item-a');
+  assert.equal(view.decisionsById['item-a'].length, 1);
+  assert.equal(view.decisionsById['item-a'][0].text, 'chose option B');
 });
 
 test('list prints the current view as parseable envelope data, exit 0', () => {
@@ -1123,16 +1148,6 @@ test('edit --docs-ref replaces an existing docsRef (latest-wins), exit 0', () =>
   const result = run(cwd, ['edit', 'edit-docs-ref-replace', '--docs-ref', 'docs/history/new-feature/']);
   assert.equal(result.status, 0);
   assert.equal(stateView(cwd).work['edit-docs-ref-replace'].docsRef, 'docs/history/new-feature/');
-});
-
-test('edit with an empty --docs-ref "" is rejected as validation, exit 4, item unchanged', () => {
-  const cwd = tmpCwd();
-  addOk(cwd, 'edit-docs-ref-empty');
-  const before = eventLines(cwd).length;
-  const result = run(cwd, ['edit', 'edit-docs-ref-empty', '--docs-ref', '']);
-  assert.equal(result.status, 4);
-  assert.equal(eventLines(cwd).length, before);
-  assert.equal(stateView(cwd).work['edit-docs-ref-empty'].docsRef, undefined);
 });
 
 // --- D5 proposed: new edges + --reason on `move` (phase-2-routing-3) ---

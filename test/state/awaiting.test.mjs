@@ -220,3 +220,56 @@ test('a second ask after an answer overwrites the prior statusAtAsk, never merge
   assert.equal(view.gates['item-x'].ask, 'Second?');
   assert.equal(view.work['item-x'].status, 'doing');
 });
+
+// tsk-63c D1/D3 (decision-schema-rationale-alternatives-source): rationale/
+// alternatives/source fold into gates[id] on BOTH the ask and the answer
+// edge, same guarded-spread pattern as parentSnapshotAtAsk/statusAtAsk
+// above.
+test('putInAwaiting with rationale/alternatives/source -> all three land on gates[id]', () => {
+  const dir = tmpDir();
+  addSampleWork(dir);
+
+  const { view } = putInAwaiting(dir, {
+    id: 'item-x',
+    ask: 'OAuth or password?',
+    expectedStatus: 'todo',
+    rationale: 'OAuth avoids storing a password hash at all',
+    alternatives: 'password auth was considered, rejected for storage risk',
+    source: 'session',
+  });
+  assert.equal(view.gates['item-x'].rationale, 'OAuth avoids storing a password hash at all');
+  assert.equal(view.gates['item-x'].alternatives, 'password auth was considered, rejected for storage risk');
+  assert.equal(view.gates['item-x'].source, 'session');
+
+  const rebuilt = listWork(dir);
+  assert.equal(rebuilt.gates['item-x'].rationale, 'OAuth avoids storing a password hash at all');
+});
+
+test('putInAwaiting with no rationale/alternatives/source -> none of the three keys appear on gates[id]', () => {
+  const dir = tmpDir();
+  addSampleWork(dir);
+
+  const { view } = putInAwaiting(dir, { id: 'item-x', ask: 'OAuth or password?', expectedStatus: 'todo' });
+  assert.ok(!('rationale' in view.gates['item-x']));
+  assert.ok(!('alternatives' in view.gates['item-x']));
+  assert.ok(!('source' in view.gates['item-x']));
+});
+
+test('answerAwaiting with rationale/source -> both land on gates[id] alongside the answer', () => {
+  const dir = tmpDir();
+  addSampleWork(dir);
+  putInAwaiting(dir, { id: 'item-x', ask: 'OAuth or password?', expectedStatus: 'todo' });
+
+  const { view } = answerAwaiting(dir, {
+    id: 'item-x',
+    answer: 'OAuth',
+    expectedStatus: 'awaiting-human',
+    role: 'human',
+    rationale: 'the team already has an OIDC provider available',
+    source: 'human',
+  });
+  assert.equal(view.gates['item-x'].ask, 'OAuth or password?');
+  assert.equal(view.gates['item-x'].answer, 'OAuth');
+  assert.equal(view.gates['item-x'].rationale, 'the team already has an OIDC provider available');
+  assert.equal(view.gates['item-x'].source, 'human');
+});
