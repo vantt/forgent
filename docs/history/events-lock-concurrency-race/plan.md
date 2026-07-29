@@ -1,5 +1,28 @@
 # events-lock-concurrency-race — plan
 
+## Outcome
+
+**(a) confirmed** — a real race, not test-oversensitivity. Running D1's
+ablation at `N_PROC = 20`: unpatched went reliably red (as expected); the
+*patched* lock also failed 3/5 repeated runs at that scale (0/5 failures at
+the test's original `N_PROC = 6`). Root cause: `tryAcquireEventsLockOnce`
+created the lock file via a separate `fs.openSync(lockPath, 'wx')` +
+`fs.writeSync(fd, pid)` — a window where the file existed but was still
+empty. A competing process reading it mid-write saw unparseable (NaN)
+content, treated it as a dead/garbage holder per the stale-pid-reclaim
+branch, and unlinked a lock a live process still legitimately held,
+letting two processes both believe they held it. Fixed in `962eb6b`
+(`src/state/events.mjs`): write the pid to a per-attempt temp file first,
+then `fs.linkSync` it onto the lock path — `link()` only ever exposes the
+destination fully-written or not-yet-existing, closing the window
+structurally rather than adding a retry. Re-ran the ablation 10 times at
+`N_PROC = 20` with the fix: 10/10 green. `N_PROC` bumped to 20 permanently
+in `test/state/events.test.mjs` as regression coverage at the scale that
+actually caught this. Full `npm test` regression pass: 1548/1554, the one
+failure being the pre-existing, unrelated `test/report/enduser-index.test.mjs`
+flake (tracked separately as `tsk-1wn`; confirmed via `git stash` to fail
+identically with or without this fix).
+
 ## Mode
 
 **Spike.** Flag count: 2 (existing covered behavior — this touches an
