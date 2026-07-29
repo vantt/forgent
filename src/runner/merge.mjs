@@ -398,7 +398,43 @@ export async function mergeRunnerItem(repoRoot, item, { timeoutMs } = {}) {
   }
 }
 
+// tsk-3yl D1: a prior `approve` run can already have landed this branch's
+// merge commit and died at a LATER step (any failure after merge-commit
+// but before the status-move to `done` — not just the compound-learn gap
+// that first surfaced this, docs/backlog.md p-b91d487a). Retrying then
+// finds `git merge --no-commit --no-ff` a no-op (nothing to stage), so
+// `git commit --no-edit` fails with "nothing to commit" and this function
+// used to throw an opaque MergeError instead of recognizing the merge
+// already happened. Checked BEFORE attempting the merge, not inferred
+// after the fact from an empty staged diff (fragile: commit-failure
+// wording is locale/git-version dependent, `is-ancestor` is not).
+function isAlreadyMerged(repoRoot, branch, ref) {
+  try {
+    git(repoRoot, ['merge-base', '--is-ancestor', branch, ref]);
+    return true;
+  } catch (err) {
+    if (err.status === 1) {
+      return false;
+    }
+    throw new MergeError(`checking whether "${branch}" is already merged into ${ref} failed: ${err.message}`, { branch });
+  }
+}
+
 async function mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs }) {
+  // tsk-3yl D1: still run the real goal-check here, even though nothing
+  // will be staged/committed — every 'merged' outcome must carry a real,
+  // freshly-executed verify result (both callers in bin/fgos.mjs read
+  // `result.check.output` unconditionally on this path), and a HEAD that
+  // drifted since the original merge landed still deserves a real check
+  // before this is declared done again.
+  if (isAlreadyMerged(repoRoot, branch, 'HEAD')) {
+    const check = await runGoalCheck(item, repoRoot, timeoutMs);
+    if (!check.passed) {
+      return { outcome: 'verify-fail', branch, check };
+    }
+    return { outcome: 'merged', branch, check };
+  }
+
   try {
     git(repoRoot, ['merge', '--no-commit', '--no-ff', branch]);
   } catch (err) {

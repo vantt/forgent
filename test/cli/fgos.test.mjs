@@ -260,6 +260,49 @@ test('list on a fresh non-worktree dir with no store at all: exit 0, empty view,
   assert.equal(result.stderr, '');
 });
 
+// --- list open-only default + --all (tsk-5oa D1/D2) -----------------------
+
+test('list by default excludes a done item, but keeps a todo item', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'open-item', { title: 'Open Item' });
+  const dir = path.join(cwd, '.fgos');
+  addWork(dir, { id: 'finished-item', title: 'Finished Item', kind: 'task', status: 'done', deps: [], risk: 'low', refs: [], verify: 'npm test' });
+
+  const work = envelopeData(run(cwd, ['list']).stdout).work;
+  assert.ok(work['open-item']);
+  assert.equal(work['finished-item'], undefined);
+});
+
+test('list --all restores the done item alongside the open one', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'open-item', { title: 'Open Item' });
+  const dir = path.join(cwd, '.fgos');
+  addWork(dir, { id: 'finished-item', title: 'Finished Item', kind: 'task', status: 'done', deps: [], risk: 'low', refs: [], verify: 'npm test' });
+
+  const work = envelopeData(run(cwd, ['list', '--all']).stdout).work;
+  assert.ok(work['open-item']);
+  assert.ok(work['finished-item']);
+});
+
+test('list default keeps an awaiting-human item visible (D2: "not done" is exactly status !== done, not a broader closed/terminal set)', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'parked-item', { title: 'Parked Item' });
+  run(cwd, ['ask', 'parked-item', '--text', 'need a decision']);
+
+  const work = envelopeData(run(cwd, ['list']).stdout).work;
+  assert.equal(work['parked-item'].status, 'awaiting-human');
+});
+
+test('list default on a store with only done items returns an empty work map, not an error', () => {
+  const cwd = tmpCwd();
+  const dir = path.join(cwd, '.fgos');
+  addWork(dir, { id: 'finished-item', title: 'Finished Item', kind: 'task', status: 'done', deps: [], risk: 'low', refs: [], verify: 'npm test' });
+
+  const result = run(cwd, ['list']);
+  assert.equal(result.status, 0);
+  assert.deepEqual(envelopeData(result.stdout).work, {});
+});
+
 test('init creates .fgos/ with an empty log and a rebuilt (empty) view, exit 0', () => {
   const cwd = tmpCwd();
   const result = run(cwd, ['init']);
@@ -425,23 +468,23 @@ test('move on a nonexistent id is rejected as validation (not-found), exit 4', (
   assert.equal(result.status, 4);
 });
 
-test('move with a bare --to (no value) is rejected as validation, exit 4, no event written', () => {
-  const cwd = tmpCwd();
-  addOk(cwd, 'bare-to');
-  const before = eventLines(cwd).length;
-  const result = run(cwd, ['move', 'bare-to', '--to']);
-  assert.equal(result.status, 4);
-  assert.equal(eventLines(cwd).length, before);
-});
+// tsk-34y: same invariant as ADD_BAD_FLAG_CASES/SUBMIT_BAD_FLAG_CASES above,
+// applied to `move` (D1, docs/history/test-suite-dry-consolidation/CONTEXT.md).
+const MOVE_BAD_FLAG_CASES = [
+  ['a bare --to (no value)', ['--to']],
+  ['a valid --to plus an empty --expect ""', ['--to', 'doing', '--expect', '']],
+];
 
-test('move with an empty --expect "" is rejected as validation, exit 4, no event written', () => {
-  const cwd = tmpCwd();
-  addOk(cwd, 'empty-expect');
-  const before = eventLines(cwd).length;
-  const result = run(cwd, ['move', 'empty-expect', '--to', 'doing', '--expect', '']);
-  assert.equal(result.status, 4);
-  assert.equal(eventLines(cwd).length, before);
-});
+for (const [label, badFlagArgs] of MOVE_BAD_FLAG_CASES) {
+  test(`move with ${label} is rejected as validation, exit 4, no event written`, () => {
+    const cwd = tmpCwd();
+    addOk(cwd, 'move-bad-flag-item');
+    const before = eventLines(cwd).length;
+    const result = run(cwd, ['move', 'move-bad-flag-item', ...badFlagArgs]);
+    assert.equal(result.status, 4);
+    assert.equal(eventLines(cwd).length, before);
+  });
+}
 
 test('move reports the real event seq in its envelope data, not undefined', () => {
   const cwd = tmpCwd();
@@ -845,21 +888,33 @@ test('add explicitly writes the tier into the work.add event payload itself, not
   assert.equal(addEvent.payload.tier, 'standard');
 });
 
-test('add with a --tier outside the TIERS domain is rejected as validation, exit 4, no event written', () => {
-  const cwd = tmpCwd();
-  const before = eventLines(cwd).length;
-  const result = run(cwd, ['add', 'bad-tier-item', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--tier', 'extreme']);
-  assert.equal(result.status, 4);
-  assert.equal(eventLines(cwd).length, before);
-});
+// tsk-34y: these `add` flag-value rejections shared one invariant -- an
+// otherwise-valid `add` invocation with one flag given a bad or bare value
+// is rejected as validation (exit 4) and appends no event. Each row below
+// used to be its own hand-written test (see D1, docs/history/
+// test-suite-dry-consolidation/CONTEXT.md); merging keeps every edge case
+// while dropping the repeated shape.
+const ADD_BAD_FLAG_CASES = [
+  ['a --tier outside the TIERS domain', ['--tier', 'extreme']],
+  ['a bare --tier (no value)', ['--tier']],
+  ['an unrecognized --domain value', ['--domain', 'bogus']],
+  ['a bare --domain (no value)', ['--domain']],
+  ['an empty --discovered-from ""', ['--discovered-from', '']],
+  ['a bare --discovered-from (no value)', ['--discovered-from']],
+  ['a --goal-tier outside its own domain', ['--goal-tier', 'bogus']],
+  ['an empty --docs-ref ""', ['--docs-ref', '']],
+  ['a bare --docs-ref (no value)', ['--docs-ref']],
+];
 
-test('add with a bare --tier (no value) is rejected as validation, exit 4, no event written', () => {
-  const cwd = tmpCwd();
-  const before = eventLines(cwd).length;
-  const result = run(cwd, ['add', 'bare-tier-item', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--tier']);
-  assert.equal(result.status, 4);
-  assert.equal(eventLines(cwd).length, before);
-});
+for (const [label, badFlagArgs] of ADD_BAD_FLAG_CASES) {
+  test(`add with ${label} is rejected as validation, exit 4, no event written`, () => {
+    const cwd = tmpCwd();
+    const before = eventLines(cwd).length;
+    const result = run(cwd, ['add', 'bad-flag-item', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', ...badFlagArgs]);
+    assert.equal(result.status, 4);
+    assert.equal(eventLines(cwd).length, before);
+  });
+}
 
 // --- base-workflow-model S2: --domain on `add` (D1-D4) ---
 
@@ -895,26 +950,6 @@ test('add --domain coding is explicit and behaves identically to omitting --doma
   assert.equal(stateView(cwd).work['explicit-coding-item'].domain, 'coding');
 });
 
-test('add with an unrecognized --domain value is rejected as validation, exit 4, no event written', () => {
-  const cwd = tmpCwd();
-  const before = eventLines(cwd).length;
-  const result = run(cwd, [
-    'add', 'bad-domain-item',
-    '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x',
-    '--domain', 'bogus',
-  ]);
-  assert.equal(result.status, 4);
-  assert.equal(eventLines(cwd).length, before);
-});
-
-test('add with a bare --domain (no value) is rejected as validation, exit 4, no event written', () => {
-  const cwd = tmpCwd();
-  const before = eventLines(cwd).length;
-  const result = run(cwd, ['add', 'bare-domain-item', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--domain']);
-  assert.equal(result.status, 4);
-  assert.equal(eventLines(cwd).length, before);
-});
-
 test('add never gained a --stage flag: passing --stage is simply ignored (not a recognized flag on this verb)', () => {
   const cwd = tmpCwd();
   const result = run(cwd, ['add', 'stage-flag-ignored', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--stage', 'assembling']);
@@ -943,22 +978,6 @@ test('add --discovered-from persists discoveredFrom on the new item, exit 0', ()
   assert.equal(stateView(cwd).work['discovered-item'].discoveredFrom, 'origin-item');
 });
 
-test('add with an empty --discovered-from "" is rejected as validation, exit 4, no event written', () => {
-  const cwd = tmpCwd();
-  const before = eventLines(cwd).length;
-  const result = run(cwd, ['add', 'empty-discovered-item', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--discovered-from', '']);
-  assert.equal(result.status, 4);
-  assert.equal(eventLines(cwd).length, before);
-});
-
-test('add with a bare --discovered-from (no value) is rejected as validation, exit 4, no event written', () => {
-  const cwd = tmpCwd();
-  const before = eventLines(cwd).length;
-  const result = run(cwd, ['add', 'bare-discovered-item', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--discovered-from']);
-  assert.equal(result.status, 4);
-  assert.equal(eventLines(cwd).length, before);
-});
-
 // --- str67-goal-directed-planning D1/D2: --goal-tier and --targets on `add` ---
 
 test('add without --goal-tier/--targets leaves both fields unset, exit 0', () => {
@@ -980,14 +999,6 @@ test('add --goal-tier mvp --targets a,b persists both fields, exit 0', () => {
   const item = stateView(cwd).work['goal-item'];
   assert.equal(item.goalTier, 'mvp');
   assert.deepEqual(item.targets, ['a', 'b']);
-});
-
-test('add --goal-tier <invalid value> is rejected as validation, exit 4, no event written', () => {
-  const cwd = tmpCwd();
-  const before = eventLines(cwd).length;
-  const result = run(cwd, ['add', 'bogus-goal-item', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--goal-tier', 'bogus']);
-  assert.equal(result.status, 4);
-  assert.equal(eventLines(cwd).length, before);
 });
 
 test('add --targets "" parses to [] explicitly, exit 0', () => {
@@ -1091,22 +1102,6 @@ test('add --docs-ref persists docsRef and round-trips unchanged through fgos lis
   assert.equal(stateView(cwd).work['docs-ref-item'].docsRef, 'docs/history/p50-workflow-induct/');
   const listed = envelopeData(run(cwd, ['list']).stdout);
   assert.equal(listed.work['docs-ref-item'].docsRef, 'docs/history/p50-workflow-induct/');
-});
-
-test('add with an empty --docs-ref "" is rejected as validation, exit 4, no event written', () => {
-  const cwd = tmpCwd();
-  const before = eventLines(cwd).length;
-  const result = run(cwd, ['add', 'empty-docs-ref-item', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--docs-ref', '']);
-  assert.equal(result.status, 4);
-  assert.equal(eventLines(cwd).length, before);
-});
-
-test('add with a bare --docs-ref (no value) is rejected as validation, exit 4, no event written', () => {
-  const cwd = tmpCwd();
-  const before = eventLines(cwd).length;
-  const result = run(cwd, ['add', 'bare-docs-ref-item', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--docs-ref']);
-  assert.equal(result.status, 4);
-  assert.equal(eventLines(cwd).length, before);
 });
 
 // --- edit --docs-ref: docsRef can now be attached/changed after creation,
@@ -1839,6 +1834,23 @@ test('triage excludes a done item from ranking, and a done dependent never count
   assert.ok(!data.some((r) => r.id === 'done-item'));
 });
 
+test('triage --all appends done items after the ranked open rows, each with blocks:0 (tsk-5oa D1)', () => {
+  const cwd = tmpCwd();
+  const dir = path.join(cwd, '.fgos');
+  addOk(cwd, 'base');
+  addWork(dir, { id: 'done-item', title: 'Done Item', kind: 'task', status: 'done', deps: ['base'], risk: 'low', refs: [], verify: 'npm test' });
+
+  const withoutAll = envelopeData(run(cwd, ['triage']).stdout);
+  const withAll = envelopeData(run(cwd, ['triage', '--all']).stdout);
+  assert.ok(!withoutAll.some((r) => r.id === 'done-item'));
+  assert.deepEqual(withAll.slice(0, withoutAll.length), withoutAll);
+  const doneRow = withAll.find((r) => r.id === 'done-item');
+  assert.ok(doneRow);
+  assert.equal(doneRow.blocks, 0);
+  assert.equal(doneRow.componentSize, 0);
+  assert.equal(doneRow.isIsolated, true);
+});
+
 test('triage never mutates state: no event is appended', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'base');
@@ -2269,13 +2281,32 @@ test('submit --domain synthetic persists work.domain and resolves stage to its o
   assert.equal(item.stage, 'assembling');
 });
 
-test('submit with an unrecognized --domain value is rejected as validation, exit 4, no event written', () => {
-  const cwd = tmpCwd();
-  const before = eventLines(cwd).length;
-  const result = run(cwd, ['submit', 'Try a bad domain', '--domain', 'bogus']);
-  assert.equal(result.status, 4);
-  assert.equal(eventLines(cwd).length, before);
-});
+// tsk-34y: these `submit` flag-value rejections shared one invariant -- an
+// otherwise-valid `submit` invocation with one flag given a bad, bare, or
+// empty value is rejected as validation (exit 4) and appends no event.
+// Each row below used to be its own hand-written test (see D1, docs/
+// history/test-suite-dry-consolidation/CONTEXT.md); merging keeps every
+// edge case while dropping the repeated shape.
+const SUBMIT_BAD_FLAG_CASES = [
+  ['an unrecognized --domain value', ['--domain', 'bogus']],
+  ['a bare --domain (no value)', ['--domain']],
+  ['an empty --discovered-from ""', ['--discovered-from', '']],
+  ['a bare --discovered-from (no value)', ['--discovered-from']],
+  ['a nonexistent --deps id', ['--deps', 'ghost-dep']],
+  ['a bare --tier (no value)', ['--tier']],
+  ['an empty --docs-ref ""', ['--docs-ref', '']],
+  ['an empty --kind ""', ['--kind', '']],
+];
+
+for (const [label, badFlagArgs] of SUBMIT_BAD_FLAG_CASES) {
+  test(`submit with ${label} is rejected as validation, exit 4, no event written`, () => {
+    const cwd = tmpCwd();
+    const before = eventLines(cwd).length;
+    const result = run(cwd, ['submit', 'Try a bad flag value', ...badFlagArgs]);
+    assert.equal(result.status, 4);
+    assert.equal(eventLines(cwd).length, before);
+  });
+}
 
 test('submit --domain <bad> produces exactly one stderr line (the validation error), no stray "folding to coding" warning — parity with add (review-20260717-self-improve-base-workflow f3)', () => {
   const cwd = tmpCwd();
@@ -2284,14 +2315,6 @@ test('submit --domain <bad> produces exactly one stderr line (the validation err
   assert.doesNotMatch(result.stderr, /folding to "coding"/);
   const stderrLines = result.stderr.split('\n').filter(Boolean);
   assert.equal(stderrLines.length, 1, `expected exactly one stderr line, got: ${JSON.stringify(stderrLines)}`);
-});
-
-test('submit with a bare --domain (no value) is rejected as validation, exit 4, no event written', () => {
-  const cwd = tmpCwd();
-  const before = eventLines(cwd).length;
-  const result = run(cwd, ['submit', 'Try a bare domain flag', '--domain']);
-  assert.equal(result.status, 4);
-  assert.equal(eventLines(cwd).length, before);
 });
 
 // --- work-graph-intelligence S2b: --discovered-from on `submit` (producer A, two-hop) ---
@@ -2313,22 +2336,6 @@ test('submit --discovered-from persists discoveredFrom (two-hop: opts -> submitW
   const id = JSON.parse(result.stdout).data.id;
   const item = envelopeData(run(cwd, ['list']).stdout).work[id];
   assert.equal(item.discoveredFrom, 'origin-item');
-});
-
-test('submit with an empty --discovered-from "" is rejected as validation, exit 4, no event written', () => {
-  const cwd = tmpCwd();
-  const before = eventLines(cwd).length;
-  const result = run(cwd, ['submit', 'Try an empty discovered-from', '--discovered-from', '']);
-  assert.equal(result.status, 4);
-  assert.equal(eventLines(cwd).length, before);
-});
-
-test('submit with a bare --discovered-from (no value) is rejected as validation, exit 4, no event written', () => {
-  const cwd = tmpCwd();
-  const before = eventLines(cwd).length;
-  const result = run(cwd, ['submit', 'Try a bare discovered-from flag', '--discovered-from']);
-  assert.equal(result.status, 4);
-  assert.equal(eventLines(cwd).length, before);
 });
 
 // --- str83-fgos-slash-commands D4: --deps on `submit` (mirrors add's ---
@@ -2354,14 +2361,6 @@ test('submit --deps <id1,id2> persists those deps, validated through the same wr
   const id = JSON.parse(result.stdout).data.id;
   const item = envelopeData(run(cwd, ['list']).stdout).work[id];
   assert.deepEqual(item.deps, ['dep-one', 'dep-two']);
-});
-
-test('submit --deps <nonexistent-id> fails loudly through the existing write-gate validation, exit 4, no event written, same as add', () => {
-  const cwd = tmpCwd();
-  const before = eventLines(cwd).length;
-  const result = run(cwd, ['submit', 'Try a bad dep', '--deps', 'ghost-dep']);
-  assert.equal(result.status, 4);
-  assert.equal(eventLines(cwd).length, before);
 });
 
 // --- str51-llm-assist-classify D2/D5: --tier/--kind/--risk overrides on ---
@@ -2411,14 +2410,6 @@ test('submit --tier override alone does not change risk -- risk still mirrors cl
   assert.equal(item.risk, 'standard');
 });
 
-test('submit with a bare --tier (no value) is rejected as validation, exit 4, no event written', () => {
-  const cwd = tmpCwd();
-  const before = eventLines(cwd).length;
-  const result = run(cwd, ['submit', 'Try a bare tier flag', '--tier']);
-  assert.equal(result.status, 4);
-  assert.equal(eventLines(cwd).length, before);
-});
-
 test('submit without --docs-ref leaves docsRef unset, exit 0', () => {
   const cwd = tmpCwd();
   const result = run(cwd, ['submit', 'A task with no docs link']);
@@ -2433,22 +2424,6 @@ test('submit --docs-ref persists docsRef, exit 0 -- an item created through the 
   assert.equal(result.status, 0);
   const id = JSON.parse(result.stdout).data.id;
   assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].docsRef, 'docs/history/some-feature/');
-});
-
-test('submit with an empty --docs-ref "" is rejected as validation, exit 4, no event written', () => {
-  const cwd = tmpCwd();
-  const before = eventLines(cwd).length;
-  const result = run(cwd, ['submit', 'A task with a broken docs link', '--docs-ref', '']);
-  assert.equal(result.status, 4);
-  assert.equal(eventLines(cwd).length, before);
-});
-
-test('submit with an empty --kind "" is rejected as validation, exit 4, no event written', () => {
-  const cwd = tmpCwd();
-  const before = eventLines(cwd).length;
-  const result = run(cwd, ['submit', 'Try an empty kind', '--kind', '']);
-  assert.equal(result.status, 4);
-  assert.equal(eventLines(cwd).length, before);
 });
 
 // RETARGET (stage-decompose D2, cell 3): `discover` on a stage-`clarify`
@@ -3103,6 +3078,81 @@ test('pick on a leaf item whose root has no fgw/<rootId> branch yet forks from r
   assert.equal(data.worktree.branch, 'fgw/orphan-leaf-item');
   assert.equal(data.worktree.reused, false);
   assert.equal(stateView(cwd).work['orphan-leaf-item'].status, 'doing');
+});
+
+test('pick on a leaf item whose root DOES have a live fgw/<rootId> branch forks the leaf worktree from that branch tip, not from repoRoot HEAD (claim-port.mjs D3 leaf-vs-root split, positive path)', () => {
+  // The counterpart to the fallback test above: once fgw/<rootId> actually
+  // exists (e.g. an earlier sibling already merged into it), a leaf pick
+  // must fork FROM that tip — mirroring approve/review's own leaf-vs-root
+  // split (bin/fgos.mjs's D3 comment) — never from main/repoRoot HEAD,
+  // which would silently drop whatever the root branch already carries
+  // (the tsk-1wd-3 dogfood incident this item exists to close).
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  addOk(cwd, 'baseref-root-item', { title: 'Root Item' });
+  const dir = path.join(cwd, '.fgos');
+  addWork(dir, { id: 'baseref-leaf-item', title: 'Leaf Item', kind: 'task', status: 'todo', deps: [], risk: 'low', refs: [], verify: 'true', parent: 'baseref-root-item' });
+
+  // Give fgw/baseref-root-item a tip that genuinely differs from repoRoot's
+  // current HEAD (same tree, a distinct commit) so the assertion below can
+  // tell "forked from root branch" apart from "forked from HEAD" for real.
+  const tree = execFileSync('git', ['rev-parse', 'HEAD^{tree}'], { cwd, encoding: 'utf8' }).trim();
+  const rootTip = execFileSync('git', ['commit-tree', tree, '-p', 'HEAD', '-m', 'root progress'], { cwd, encoding: 'utf8' }).trim();
+  execFileSync('git', ['branch', 'fgw/baseref-root-item', rootTip], { cwd });
+  assert.notEqual(rootTip, gitHead(cwd), 'the root branch tip must genuinely differ from repoRoot HEAD for this test to prove anything');
+
+  const result = run(cwd, ['pick', '--id', 'baseref-leaf-item']);
+  assert.equal(result.status, 0, `pick failed: ${result.stderr}`);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.branchHeadAtTake, rootTip, 'a live root branch exists — the leaf must fork from ITS tip, not repoRoot HEAD');
+  assert.equal(data.worktree.branch, 'fgw/baseref-leaf-item');
+  assert.equal(
+    execFileSync('git', ['rev-parse', 'HEAD'], { cwd: data.worktree.path, encoding: 'utf8' }).trim(),
+    rootTip,
+    'the new worktree checkout itself must sit on the root branch tip, not main',
+  );
+});
+
+test('pick on a leaf item refuses the claim when a dep is not yet status:done, instead of forking a worktree that could be missing that dep\'s content (claim-port.mjs D2 sibling-merge-ordering guard, tsk-3t4)', () => {
+  // The tsk-1wd-3 dogfood scenario: a leaf picked directly by id (frontier
+  // bypass, claim-lock §3a) whose dep hasn't been approved/merged into
+  // fgw/<rootId> yet. Approve is the ONLY path a leaf dep reaches
+  // status:'done' through, and it never lands 'done' without first merging
+  // into the root branch (bin/fgos.mjs's leaf approve case) — so a dep
+  // that isn't 'done' yet is exactly the case that must be refused, not
+  // silently forked from a root branch missing that dep's content.
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  addOk(cwd, 'guard-root-item', { title: 'Root Item' });
+  addOk(cwd, 'guard-dep-item', { title: 'Dep Item' }); // left status: todo — never approved
+  const dir = path.join(cwd, '.fgos');
+  addWork(dir, {
+    id: 'guard-leaf-item',
+    title: 'Leaf Item',
+    kind: 'task',
+    status: 'todo',
+    deps: ['guard-dep-item'],
+    risk: 'low',
+    refs: [],
+    verify: 'true',
+    parent: 'guard-root-item',
+  });
+  const before = eventLines(cwd).length;
+
+  const result = run(cwd, ['pick', '--id', 'guard-leaf-item']);
+  assert.notEqual(result.status, 0, 'pick must refuse a leaf claim while a dep is not yet status:done');
+  assert.match(result.stderr, /guard-dep-item/, 'the refusal must name the unmerged dep');
+
+  // The refusal must be a clean no-op — never the "claimed to doing but no
+  // branch/worktree" orphan the 268b172 baseRef fix already closed once for
+  // a different cause: no event written, status untouched, no branch made.
+  assert.equal(eventLines(cwd).length, before, 'a refused claim must never write a claim event');
+  assert.equal(stateView(cwd).work['guard-leaf-item'].status, 'todo');
+  assert.equal(
+    execFileSync('git', ['branch', '--list', 'fgw/guard-leaf-item'], { cwd, encoding: 'utf8' }).trim(),
+    '',
+    'a refused claim must never create the leaf\'s own branch',
+  );
 });
 
 test('return happy path: verify passes -> doing to proposed, actual outcome recorded, no settlement (settlement belongs to the -> done edge)', () => {
@@ -5826,6 +5876,129 @@ test('conflicts verb on a store with no overlaps: empty list, exit 0', () => {
   assert.equal(run(cwd, ['init']).status, 0);
   assert.equal(addOk(cwd, 'a').status, 0); // no footprint
   assert.deepEqual(envelopeData(run(cwd, ['conflicts']).stdout), []);
+});
+
+// --- tsk-4j9-3: `fgos merge list` (merge-readiness ranking) ---------------
+
+test('merge list: unknown sub-verb is rejected as validation, exit 4', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0);
+  const result = run(cwd, ['merge', 'bogus']);
+  assert.equal(result.status, 4);
+});
+
+test('merge list on an empty store: empty ready/waiting/conflicts, exit 0, no event appended', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0);
+  const before = eventLines(cwd).length;
+  const result = run(cwd, ['merge', 'list']);
+  assert.equal(result.status, 0);
+  assert.deepEqual(envelopeData(result.stdout), { ready: [], waiting: [], conflicts: [] });
+  assert.equal(eventLines(cwd).length, before, 'merge list must not append any event');
+});
+
+test('merge list: a proposed item whose dep is already done is ready', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0);
+  // Built explicitly (not via toCompoundLearn/addOk) so --verify is a
+  // trivially-passing command: addOk's default ('npm test') has no
+  // package.json to run against in this bare sandbox, so approve would
+  // park it 'blocked' instead of 'done' — a false negative for this test.
+  assert.equal(run(cwd, ['add', 'dep', '--title', 'Dep', '--kind', 'task', '--risk', 'low', '--verify', 'true']).status, 0);
+  assert.equal(run(cwd, ['move', 'dep', '--to', 'doing']).status, 0);
+  assert.equal(run(cwd, ['move', 'dep', '--to', 'proposed']).status, 0);
+  assert.equal(run(cwd, ['compound', 'dep']).status, 0);
+  const approveResult = envelopeData(run(cwd, ['approve', 'dep']).stdout);
+  assert.equal(approveResult.to, 'done', `expected dep to reach done, got: ${JSON.stringify(approveResult)}`);
+  assert.equal(run(cwd, ['add', 'leaf', '--title', 'Leaf', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--deps', 'dep']).status, 0);
+  toProposed(cwd, 'leaf');
+  const data = envelopeData(run(cwd, ['merge', 'list']).stdout);
+  assert.deepEqual(data, { ready: ['leaf'], waiting: [], conflicts: [] });
+});
+
+test('merge list: a proposed item whose dep is NOT done waits, never ready', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0);
+  assert.equal(addOk(cwd, 'dep').status, 0); // stays todo
+  assert.equal(run(cwd, ['add', 'leaf', '--title', 'Leaf', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--deps', 'dep']).status, 0);
+  toProposed(cwd, 'leaf');
+  const data = envelopeData(run(cwd, ['merge', 'list']).stdout);
+  assert.deepEqual(data, { ready: [], waiting: ['leaf'], conflicts: [] });
+});
+
+test('merge list: two dep-clear proposed items sharing a footprint are excluded from ready and listed as conflicts', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0);
+  assert.equal(run(cwd, ['add', 'a', '--title', 'A', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--footprint', 'src/x.mjs']).status, 0);
+  assert.equal(run(cwd, ['add', 'b', '--title', 'B', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--footprint', 'src/x.mjs']).status, 0);
+  toProposed(cwd, 'a');
+  toProposed(cwd, 'b');
+  const data = envelopeData(run(cwd, ['merge', 'list']).stdout);
+  assert.deepEqual(data.ready, []);
+  assert.deepEqual(data.conflicts, [{ a: 'a', b: 'b', shared: ['src/x.mjs'], suggestions: ['sequence', 'hoist', 're-slice'] }]);
+});
+
+// --- tsk-4j9-4: `fgos merge next` (merge-readiness automation) -----------
+
+test('merge next on an empty store: reports nothing ready, exit 0, no merge attempted', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0);
+  const result = run(cwd, ['merge', 'next']);
+  assert.equal(result.status, 0);
+  assert.deepEqual(envelopeData(result.stdout), { picked: null, reason: 'nothing ready to merge' });
+});
+
+test('merge next merges the single ready item by recursing into approve, item reaches done', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0);
+  // Explicit --verify true (not addOk's 'npm test' default) -- same
+  // sandbox pitfall documented in docs/how-to/add-a-read-only-fgos-verb-
+  // and-plugin-skill.md.
+  assert.equal(run(cwd, ['add', 'solo', '--title', 'Solo', '--kind', 'task', '--risk', 'low', '--verify', 'true']).status, 0);
+  assert.equal(run(cwd, ['move', 'solo', '--to', 'doing']).status, 0);
+  assert.equal(run(cwd, ['move', 'solo', '--to', 'proposed']).status, 0);
+  assert.equal(run(cwd, ['compound', 'solo']).status, 0);
+
+  const result = run(cwd, ['merge', 'next']);
+  assert.equal(result.status, 0, `${result.stdout}${result.stderr}`);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.picked, 'solo');
+  assert.equal(data.approve.to, 'done', `expected the picked item to reach done: ${JSON.stringify(data)}`);
+  assert.equal(stateView(cwd).work.solo.status, 'done');
+});
+
+test('merge next picks the higher-ranked (mvp goalTier) item first when two are ready', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0);
+  for (const id of ['plain', 'important']) {
+    assert.equal(run(cwd, ['add', id, '--title', id, '--kind', 'task', '--risk', 'low', '--verify', 'true', ...(id === 'important' ? ['--goal-tier', 'mvp'] : [])]).status, 0);
+    assert.equal(run(cwd, ['move', id, '--to', 'doing']).status, 0);
+    assert.equal(run(cwd, ['move', id, '--to', 'proposed']).status, 0);
+    assert.equal(run(cwd, ['compound', id]).status, 0);
+  }
+  const data = envelopeData(run(cwd, ['merge', 'next']).stdout);
+  assert.equal(data.picked, 'important', 'the mvp-goalTier item outranks the plain one per rankImpact');
+});
+
+test('merge next on a runner-sourced pick that trips the Iron Law: reports blocked, merges nothing, never auto-acknowledges', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeRunnerProposedItemTouching(cwd, 'iron-next-item', 'src/runner/probe.mjs', {
+    verify: 'test -f src/runner/probe.mjs',
+  });
+
+  const headBefore = gitHead(cwd);
+  const result = run(cwd, ['merge', 'next']);
+  assert.equal(result.status, 0, `merge next itself must not exit non-zero on a blocked pick: ${result.stdout}${result.stderr}`);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.picked, 'iron-next-item');
+  assert.equal(data.blocked, 'iron-law');
+  assert.match(data.message, /Iron Law/);
+
+  assert.equal(stateView(cwd).work['iron-next-item'].status, 'proposed', 'a blocked pick leaves the item proposed');
+  assert.equal(gitHead(cwd), headBefore, 'a blocked pick attempts no merge -- HEAD is unchanged');
+  const survivingBranches = gitAtCwd(cwd, ['for-each-ref', '--format=%(refname:short)', 'refs/heads/']);
+  assert.match(survivingBranches, /fgw\/iron-next-item/, 'the branch survives -- nothing was merged or cleaned up');
 });
 
 // --- str73-done-flip-cos-check cell 1: --acceptance on add/submit/edit ----

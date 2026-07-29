@@ -11,6 +11,14 @@
     "quadrant": "how-to",
     "purpose": "Show the steps to accomplish one specific, already-understood goal.",
     "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/add-a-read-only-fgos-verb-and-plugin-skill.md",
+    "title": "Add a read-only fgOS verb and its plugin skill",
+    "sourceCaptureId": "tsk-4j9-3"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
     "docPath": "docs/how-to/check-rollup-progress.md",
     "title": "How to check a root item's progress with `fgos rollup`",
     "sourceCaptureId": "doc-fgos-rollup-howto"
@@ -59,6 +67,14 @@
     "quadrant": "how-to",
     "purpose": "Show the steps to accomplish one specific, already-understood goal.",
     "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/fix-a-verify-command-broken-by-mixed-in-prose.md",
+    "title": "How to fix a verify command that mixes prose with a real command",
+    "sourceCaptureId": null
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
     "docPath": "docs/how-to/fix-invisible-nested-project-skills.md",
     "title": "Fix a project skill that `Skill()` reports as \"Unknown skill\"",
     "sourceCaptureId": "tsk-d3c"
@@ -80,6 +96,14 @@
     "sourceCaptureId": "tsk-56t"
   },
   {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/see-done-items-in-list-and-triage.md",
+    "title": "How to see done items in `fgos list` / `fgos triage`",
+    "sourceCaptureId": "tsk-5oa"
+  },
+  {
     "quadrant": "reference",
     "purpose": "Describe the machinery accurately and completely for lookup.",
     "audience": "A user who needs precise facts about a specific field/command/API.",
@@ -94,6 +118,14 @@
     "docPath": "docs/reference/gate-bypass-config.md",
     "title": "Gate-bypass config",
     "sourceCaptureId": "tsk-6bx-1"
+  },
+  {
+    "quadrant": "reference",
+    "purpose": "Describe the machinery accurately and completely for lookup.",
+    "audience": "A user who needs precise facts about a specific field/command/API.",
+    "docPath": "docs/reference/rankimpact-sort-key-order.md",
+    "title": "`rankImpact`'s real sort-key order",
+    "sourceCaptureId": "tsk-4j9-2"
   },
   {
     "quadrant": "reference",
@@ -171,9 +203,33 @@
     "quadrant": "explanation",
     "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
     "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/merge-idempotent-on-already-merged-branch.md",
+    "title": "Why `mergeRunnerItem` now checks ancestry before attempting a merge",
+    "sourceCaptureId": "tsk-3yl"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/merge-ready-registration-is-already-idempotent.md",
+    "title": "Why \"register a finished item into the merge list\" needs no new code",
+    "sourceCaptureId": "tsk-4j9-1"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/explanation/orphaned-worktree-reclaim-must-check-for-live-uncommitted-work.md",
     "title": "Why reclaiming an orphaned worktree checkout must check for live uncommitted work first",
     "sourceCaptureId": "tsk-1os"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/pick-leaf-fork-and-sibling-merge-guard.md",
+    "title": "Why a leaf claim can now be refused, and why status:done already proves the merge happened",
+    "sourceCaptureId": "tsk-3t4"
   },
   {
     "quadrant": "explanation",
@@ -190,6 +246,22 @@
     "docPath": "docs/explanation/session-isolation-and-concurrency.md",
     "title": "How fgOS isolates concurrent sessions, and why the event log's write door blocks instead of backing off",
     "sourceCaptureId": "tsk-3ld"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/why-a-verify-command-cannot-mutate-live-work-state.md",
+    "title": "Why a `verify` command cannot itself mutate live work state",
+    "sourceCaptureId": "tsk-4j9-4"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/why-merge-standardization-reuses-existing-mechanisms.md",
+    "title": "Why merge-standardization (`tsk-4j9`) reuses existing mechanisms instead of building new ones",
+    "sourceCaptureId": "tsk-4j9"
   },
   {
     "quadrant": "explanation",

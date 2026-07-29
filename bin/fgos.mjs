@@ -29,6 +29,7 @@ import { computeEntropy, computeCounts } from '../src/report/entropy.mjs';
 import { buildEnduserIndex, QUADRANTS, QUADRANT_DIR_ALIASES, findSourceCaptureIds } from '../src/report/enduser-index.mjs';
 import { rankCandidates } from '../src/evolve/candidates.mjs';
 import { rankImpact } from '../src/state/impact.mjs';
+import { mergeReadiness } from '../src/state/graph-harness.mjs';
 import { paginate } from '../src/state/cursor.mjs';
 import { runGoalCheck } from '../src/runner/goal-check.mjs';
 import { frozenJudgeHits } from '../src/runner/frozen-judge.mjs';
@@ -1026,7 +1027,16 @@ async function runVerb(verb, flags, positional, dir) {
     }
 
     case 'list': {
-      const view = listWork(dir);
+      const rawView = listWork(dir);
+      // Open-only default (tsk-5oa D1/D2): `list` shows only
+      // status !== 'done' items unless `--all` is passed, matching
+      // `triage`'s pre-existing open-only default. Only the `work` map
+      // changes shape here — every other view key (decisions/gates/
+      // settlements/etc.) is untouched either way.
+      const showAll = Boolean(flags.all);
+      const view = showAll
+        ? rawView
+        : { ...rawView, work: Object.fromEntries(Object.entries(rawView.work).filter(([, item]) => item.status !== 'done')) };
       // Parent-anchored context (str61 D1/D2/D3): additive-only key,
       // computed fresh from `view` on every read (D1 — never a persisted
       // "session"), never touching store.listWork itself. Only
@@ -1104,6 +1114,52 @@ async function runVerb(verb, flags, positional, dir) {
     // re-slice; never mutates anything.
     case 'conflicts': {
       return footprintConflicts(dir);
+    }
+
+    // Request-class per D1 (same contract as `ready`/`triage`/`conflicts`): a
+    // pure read. Merge-readiness ranking (docs/history/merge-standardization/
+    // CONTEXT.md/plan.md): "list" surfaces which `proposed` items are
+    // actually ready to merge right now (dependency-wait gate clear, no
+    // footprint conflict), ordered by `rankImpact`, alongside which ones are
+    // still waiting on an unmerged dep and which are footprint-conflicted.
+    // Wraps `mergeReadiness` (`src/state/graph-harness.mjs`) — never
+    // reimplements the ranking here.
+    case 'merge': {
+      const sub = requireField(positional[0], 'merge requires a sub-verb: fgos merge <list|next>');
+      if (sub === 'list') {
+        return mergeReadiness(listWork(dir));
+      }
+      if (sub === 'next') {
+        // Picks the single top-ranked ready item and merges it by recursing
+        // into the SAME `approve` case below (never a parallel merge path,
+        // D6, docs/history/merge-standardization/CONTEXT.md) — `runVerb` is
+        // a pure dispatcher (no printing/exit-code side effects), so
+        // calling it recursively is exactly as safe as any other verb call.
+        // `flags` is forwarded as-is: this never injects
+        // `acknowledge-iron-law` itself (D7) — the Iron Law gate (D16/D17)
+        // exists specifically to require a human-verified failing-test-
+        // first proof before a self-modifying diff lands, so an unattended
+        // `merge next` run must never be able to silently satisfy that
+        // proof on its own authority. If the top pick trips it, this
+        // reports which item and why, merges nothing, and stops — it does
+        // NOT fall through to the next-ranked item (that would silently
+        // change merge order semantics `merge list` already promised).
+        const { ready } = mergeReadiness(listWork(dir));
+        if (ready.length === 0) {
+          return { picked: null, reason: 'nothing ready to merge' };
+        }
+        const id = ready[0];
+        try {
+          const approveResult = await runVerb('approve', flags, [id], dir);
+          return { picked: id, approve: approveResult };
+        } catch (err) {
+          if (err instanceof StoreError && err.message.includes('Iron Law')) {
+            return { picked: id, blocked: 'iron-law', message: err.message };
+          }
+          throw err;
+        }
+      }
+      throw new StoreError('validation', `merge: unknown sub-verb "${sub}" (known: list, next).`);
     }
 
     case 'rebuild': {
@@ -2172,7 +2228,7 @@ async function runVerb(verb, flags, positional, dir) {
     // risk/lane classification: this ranks open work by blocking fan-out
     // (how many other open items it unblocks), not by how risky it is.
     case 'triage': {
-      return paginateVerbResult(rankImpact(listWork(dir)), flags, 'triage-v1', 'triage');
+      return paginateVerbResult(rankImpact(listWork(dir), { includeDone: Boolean(flags.all) }), flags, 'triage-v1', 'triage');
     }
 
     // Opt-in per-session git worktree lifecycle (fgos-multi-session-checkout
