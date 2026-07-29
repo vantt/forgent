@@ -36,7 +36,10 @@ export const FROZEN_JUDGE_PATTERNS = [
   },
 ];
 
-function normalizePath(p) {
+/** Backslash-to-slash, strip a leading `./` — the one path shape every
+ * caller comparing git-reported paths against a declared file set needs
+ * (footprint matching here, own-file-set matching in merge.mjs). */
+export function normalizePath(p) {
   return String(p).replace(/\\/g, '/').replace(/^\.\//, '').trim();
 }
 
