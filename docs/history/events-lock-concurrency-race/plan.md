@@ -23,6 +23,15 @@ failure being the pre-existing, unrelated `test/report/enduser-index.test.mjs`
 flake (tracked separately as `tsk-1wn`; confirmed via `git stash` to fail
 identically with or without this fix).
 
+**Merge note:** the first `fgos approve tsk-3ld` attempt merged cleanly but
+failed its post-merge verify on an unrelated, pre-existing main-branch gap —
+`.claude/skills/fgos/fgos-unlock/SKILL.md` had never been mirrored into
+`.agents/skills/fgos/`, breaking `test/skills/fgos-mirror.test.mjs` for
+every item, not just this one. `approve` correctly rolled the merge back
+(main was left clean). Fixed directly on `main` (commit `a258d29`,
+unrelated to tsk-3ld's own diff) by copying the missing file across; tsk-3ld
+was then re-claimed and re-returned to retry the merge.
+
 ## Mode
 
 **Spike.** Flag count: 2 (existing covered behavior — this touches an
