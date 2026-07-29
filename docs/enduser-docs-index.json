@@ -24,6 +24,14 @@
     "sourceCaptureId": "tsk-3wr-1"
   },
   {
+    "quadrant": "reference",
+    "purpose": "Describe the machinery accurately and completely for lookup.",
+    "audience": "A user who needs precise facts about a specific field/command/API.",
+    "docPath": "docs/reference/test-suite-legibility-cleanup-numbers.md",
+    "title": "Test suite legibility/dedup cleanup — before/after numbers",
+    "sourceCaptureId": "tsk-3wr-3"
+  },
+  {
     "quadrant": "explanation",
     "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
     "audience": "A user seeking understanding of the design, not a task to complete.",
