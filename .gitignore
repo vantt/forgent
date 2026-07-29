@@ -34,12 +34,12 @@ output.txt
 !/.claude/skills/
 !/.claude/settings.json
 /.claude/skills/*
-!/.claude/skills/fgos-workflow/
+!/.claude/skills/fgos/
 !/.claude/skills/distill/
 /.agents/*
 !/.agents/skills/
 /.agents/skills/*
-!/.agents/skills/fgos-workflow/
+!/.agents/skills/fgos/
 !/.agents/skills/distill/
 /.codex/
 /upstreams/
