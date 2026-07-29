@@ -62,10 +62,14 @@ route around an unconfirmed cause.
 
 Files likely touched if the rename proceeds: the 8
 `.claude/skills/fgos/<name>/SKILL.md` files (move only, no content
-change), `AGENTS.md` and `CLAUDE.md` (the "fgos-routing" references
-under "fgOS Workflow"), and this item's own routing skill's
+change), and `AGENTS.md`'s "fgOS Workflow" section (`AGENTS.md:47`, the
+only real hit for `.claude/skills/fgos/`). **Corrected at
+`fgos-validating`**: `CLAUDE.md` does not need touching — it carries no
+direct reference of its own, only `@AGENTS.md`, which pulls the real
+reference in at context-load time. This item's own routing skill's
 self-references (`fgos-routing`, `fgos-exploring`, `fgos-planning` all
-cite `.claude/skills/fgos/...` paths in their own prose).
+cite `.claude/skills/fgos/...` paths in their own prose) also need the
+update.
 
 `fgos graph --what-if tsk-d3c --json` reports `unblocksTransitive: 0` —
 nothing else in the backlog is waiting on this item, so there is no
