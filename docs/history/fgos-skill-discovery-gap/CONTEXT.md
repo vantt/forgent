@@ -108,21 +108,54 @@ silently shipped a fix that never addressed the real cause.
 - Ruled out: "needs plugin registration" (original hypothesis, D1).
 - Ruled out: case-fold name collision with `plugins/fgOS/` (D2, this
   section).
-- Ruled out: git-tracking status (`gitnexus` is untracked yet
-  discoverable; `fgos` was tracked yet not — tracking is not the
-  variable).
-- Still open: the actual mechanism. Nothing else testable from inside
-  this repo was identified during this pass. The remaining option with
-  actual proof behind it (rather than a theory) is duplicating the 9
-  skills into `plugins/fgOS/skills/*`, matching the pattern the 17
-  already-working CLI-wrapper skills use — a person needs to decide
-  whether to take that fallback now or invest further in root-causing
-  a harness-level behavior this repo may not control.
+- **Invalidated, not just ruled out**: the original `gitnexus`
+  counterexample. `.claude/skills/gitnexus/` was never a stable,
+  git-tracked comparator — `.gitignore` never allowlisted it (only
+  `fgos`/`distill` were), and the directory vanished from disk entirely
+  partway through this investigation, confirming it is materialized by
+  GitNexus's own MCP-server integration, not by the generic project-skill
+  scan this item is actually about. Every earlier claim resting on "gitnexus
+  is nested and discoverable, therefore nesting works" no longer holds —
+  see D3.
+
+## D3 — real root cause confirmed: the scan is flat-only, no recursion
+
+Controlled A/B test, same fresh session, same worktree: two disposable
+probe skills, `.claude/skills/zzz-flat-test/SKILL.md` (flat, one level,
+matching `distill`'s real shape) and
+`.claude/skills/zzz-nest-test/inner/SKILL.md` (nested, two levels,
+matching `fgos`'s shape). `Skill({skill: "zzz-flat-test"})` loaded
+successfully; `Skill({skill: "zzz-nest-test"})` reported "not in skill
+list" — confirmed with the file's real presence verified by `pwd` +
+`cat` in that same session first, ruling out a wrong-directory or
+stale-cache explanation.
+
+**Root cause: the generic `.claude/skills/` project-skill scan enumerates
+exactly one level deep (`.claude/skills/<name>/SKILL.md`) — it does not
+recurse into subdirectories.** `distill` works because it is flat.
+`fgos`'s 9 skills sit two levels deep (`.claude/skills/fgos/<name>/SKILL.md`)
+and are invisible for exactly that reason — independent of the parent
+folder's name, which is why D2's rename never helped: renaming
+`fgos/` to `fgos-workflow/` kept the nesting, so the real blocker was
+untouched.
+
+**The fix implied by D3**, superseding D2's rejected/rewound rename:
+flatten each of the 9 skills to live directly under
+`.claude/skills/<skill-name>/SKILL.md` (e.g.
+`.claude/skills/fgos-routing/SKILL.md`), with no shared parent folder —
+matching `distill`'s proven-working shape exactly. The `.agents/`
+mirror, `dispatch.mjs`'s hardcoded path, the 3 test files, the doc/spec
+references, and the `.gitignore` allowlist all need the equivalent
+flattening (same blast radius already mapped in `plan.md`'s standard-mode
+pass, just flattening instead of renaming the parent).
+
+The probe files (`zzz-flat-test`, `zzz-nest-test`) were deleted after
+the test — disposable, never meant to persist.
 
 ## Canonical references
 
 - `.claude/skills/fgos/fgos-routing/SKILL.md`
 - `.claude/skills/fgos/fgos-exploring/SKILL.md`
-- `.claude/skills/gitnexus/gitnexus-exploring/SKILL.md` (counterexample)
+- `.claude/skills/distill/SKILL.md` (real working comparator — flat)
 - `plugins/fgOS/.claude-plugin/plugin.json`
 - `.claude/settings.json` (`enabledPlugins`)
