@@ -69,7 +69,7 @@
     "audience": "A user who already knows the system and wants a concrete recipe.",
     "docPath": "docs/how-to/fix-a-verify-command-broken-by-mixed-in-prose.md",
     "title": "How to fix a verify command that mixes prose with a real command",
-    "sourceCaptureId": null
+    "sourceCaptureId": "tsk-34y"
   },
   {
     "quadrant": "how-to",
@@ -94,6 +94,14 @@
     "docPath": "docs/how-to/run-a-state-verb-from-inside-a-worktree.md",
     "title": "How to run a state-writing `fgos` verb from inside a picked worktree",
     "sourceCaptureId": "tsk-56t"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/scaffold-and-link-a-herdr-plugin.md",
+    "title": "Scaffold and link a herdr plugin",
+    "sourceCaptureId": "tsk-19y-1"
   },
   {
     "quadrant": "how-to",
