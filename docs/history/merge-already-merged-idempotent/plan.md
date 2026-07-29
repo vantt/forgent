@@ -100,6 +100,19 @@ handle any non-blocked outcome generically.
 
 ## Verify
 
-`npm test -- --testNamePattern="mergeRunnerItem" && npm test --
---testNamePattern="merge.*idempotent"` (the engine's own `discover`
-verdict already recorded this as the item's `verify` field).
+`node --test --test-name-pattern="mergeRunnerItem|merge.*idempotent"
+test/runner/merge.test.mjs` — corrected at `fgos-validating` from the
+`discover` verdict's original `npm test -- --testNamePattern=...` form.
+Confirmed by real execution: `npm test -- --testNamePattern=...` silently
+runs the *entire* 1276-test suite unfiltered — `--testNamePattern` isn't a
+flag Node's test runner recognizes (the real flag is
+`--test-name-pattern`), and even that flag has no effect when appended to
+`npm test`'s own globbed script command (`node --test
+'test/**/*.test.mjs'`); it only filters when passed to `node --test`
+targeting the file directly. Both confirmed by running the corrected
+command against the 8 existing `mergeRunnerItem` tests (`test/runner/
+merge.test.mjs:320-409`) and observing the exact expected count.
+
+New tests added during execution must contain "idempotent" in their test
+name for this pattern to pick them up (per the `merge.*idempotent` half
+of the alternation).
