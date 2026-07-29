@@ -68,7 +68,7 @@ function toProposedPull(repoRoot, id, proofFile) {
   gitAt(repoRoot, ['add', '-A']);
   gitAt(repoRoot, ['commit', '-q', '-m', `human: ${proofFile}`]);
   assert.equal(fgos(repoRoot, ['return', id]).status, 0);
-  assert.equal(stateView(repoRoot).work[id].status, 'proposed');
+  assert.equal(stateView(repoRoot).work[id].status, 'awaiting-approval');
 }
 
 test('e2e compound-learn happy path: take -> return -> compound -> approve -> done, closes green with the item at stage compound-learn', () => {
@@ -104,5 +104,5 @@ test('e2e compound-learn gate: approve is blocked when the compound-learn stage 
   const approve = fgos(repoRoot, ['approve', 'lifecycle-skip']);
   assert.equal(approve.status, 2, `expected a precondition refusal, got: ${approve.stdout}${approve.stderr}`);
   assert.match(approve.stderr, /compound-learn/);
-  assert.equal(stateView(repoRoot).work['lifecycle-skip'].status, 'proposed', 'a blocked close leaves the item proposed');
+  assert.equal(stateView(repoRoot).work['lifecycle-skip'].status, 'awaiting-approval', 'a blocked close leaves the item proposed');
 });

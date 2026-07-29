@@ -9,7 +9,7 @@
 // so once a work item is done, every further transitionWork() call for it
 // throws 'precondition'. Per D5, `done` now has TWO entries (two doors in,
 // still zero doors out): `doing -> done` (an operator's direct hand-move)
-// and `proposed -> done` (approval/merge of a worker's proposal). Neither
+// and `awaiting-approval -> done` (approval/merge of a worker's proposal). Neither
 // is more canonical than the other — both are asserted by test.
 //
 // fsm-wontfix-terminal-status D1/D2/D3/D4: `wontfix` is a SECOND terminal
@@ -22,7 +22,7 @@
 // filing a new item that references the old one via `refs`, not by
 // reopening this edge). No `reason` is mechanically required to enter
 // `wontfix`, the same shape as plain `todo -> blocked`/`doing -> blocked`
-// (as opposed to `proposed -> todo`/`proposed -> blocked`, which do
+// (as opposed to `awaiting-approval -> todo`/`awaiting-approval -> blocked`, which do
 // require one) — the closure reason is expected in the item's decision
 // log (D2), not enforced here.
 //
@@ -32,10 +32,10 @@
 // (resume makes the item actionable again; no `awaiting-human -> doing`
 // edge — YAGNI, add only if a real consumer needs it).
 //
-// fan-out-parallel D18: `blocked -> proposed` is a third door out of
+// fan-out-parallel D18: `blocked -> awaiting-approval` is a third door out of
 // `blocked`, alongside the existing `blocked -> todo`/`blocked -> doing`
 // pair. It exists for fan-out-parallel's drift reconcile (CONTEXT.md
-// D7/D8/D11): a root parked via `proposed -> blocked` (reason
+// D7/D8/D11): a root parked via `awaiting-approval -> blocked` (reason
 // `integration-drift`) after a clean catch-up + re-verify needs to return to
 // `proposed` directly, without re-entering `doing`. Re-entering `doing`
 // would wrongly count as an anti-loop visit — `visitCount` in
@@ -43,7 +43,7 @@
 // `'doing'`, and a mechanical reconcile retry is not the kind of rework that
 // counter is meant to bound. Like the other plain `blocked` edges, this one
 // carries no `reason`/`ask`/`answer` — it is not a rejection (that's
-// `proposed -> todo`/`proposed -> blocked`, which do require `reason`).
+// `awaiting-approval -> todo`/`awaiting-approval -> blocked`, which do require `reason`).
 
 import { STATUSES } from './work.mjs';
 
@@ -72,7 +72,7 @@ export { STATUSES };
 // or whose verify came back red on main after merge — the item parks with a
 // reason rather than being silently returned to the queue or auto-rebased; a
 // human resolves it, same as any other `blocked` item, via the existing
-// `blocked -> todo`/`blocked -> doing`/`blocked -> proposed` doors below).
+// `blocked -> todo`/`blocked -> doing`/`blocked -> awaiting-approval` doors below).
 // It is never a re-entry point for `doing` directly.
 const TRANSITIONS = Object.freeze([
   Object.freeze({ from: 'todo', to: 'doing' }),
@@ -81,8 +81,8 @@ const TRANSITIONS = Object.freeze([
   Object.freeze({ from: 'doing', to: 'blocked' }),
   Object.freeze({ from: 'blocked', to: 'todo' }),
   Object.freeze({ from: 'blocked', to: 'doing' }),
-  Object.freeze({ from: 'blocked', to: 'proposed' }),
-  Object.freeze({ from: 'doing', to: 'proposed' }),
+  Object.freeze({ from: 'blocked', to: 'awaiting-approval' }),
+  Object.freeze({ from: 'doing', to: 'awaiting-approval' }),
   // Claim release (claim-lock §3b): the clarify/decompose -> executing
   // boundary hands a held pick claim back to `todo` the moment the item is
   // actually ready for its executing phase (resolveDecompose, after its own
@@ -93,9 +93,9 @@ const TRANSITIONS = Object.freeze([
   // reject path) or resumed via `awaiting-human`; this is the third, direct
   // door a claim can leave `doing` through without settling the item.
   Object.freeze({ from: 'doing', to: 'todo' }),
-  Object.freeze({ from: 'proposed', to: 'done' }),
-  Object.freeze({ from: 'proposed', to: 'todo' }),
-  Object.freeze({ from: 'proposed', to: 'blocked' }),
+  Object.freeze({ from: 'awaiting-approval', to: 'done' }),
+  Object.freeze({ from: 'awaiting-approval', to: 'todo' }),
+  Object.freeze({ from: 'awaiting-approval', to: 'blocked' }),
   Object.freeze({ from: 'todo', to: 'awaiting-human' }),
   Object.freeze({ from: 'doing', to: 'awaiting-human' }),
   Object.freeze({ from: 'awaiting-human', to: 'todo' }),
@@ -128,8 +128,8 @@ const TRANSITIONS = Object.freeze([
  * the table — including any edge out of `done`, or into an unknown status —
  * is refused with category 'precondition' and no event is returned.
  *
- * Rejection reason (per D5): the `proposed -> todo` edge is a rejection, and
- * carries a `reason` explaining why. Per pr-lifecycle D3, `proposed -> blocked`
+ * Rejection reason (per D5): the `awaiting-approval -> todo` edge is a rejection, and
+ * carries a `reason` explaining why. Per pr-lifecycle D3, `awaiting-approval -> blocked`
  * (an approved proposal whose merge or post-merge verify failed) carries the
  * same `reason` requirement — the concrete failure, so a human resolving the
  * park knows what broke. `reason` is required for exactly these two edges —
@@ -176,7 +176,7 @@ export function transitionWork({ work, to, expectedStatus, reason, ask, answer }
   }
 
   const payload = { id: work.id, from, to };
-  if ((from === 'proposed' && to === 'todo') || (from === 'proposed' && to === 'blocked')) {
+  if ((from === 'awaiting-approval' && to === 'todo') || (from === 'awaiting-approval' && to === 'blocked')) {
     if (typeof reason !== 'string' || !reason.trim()) {
       throw new FsmError(
         'validation',

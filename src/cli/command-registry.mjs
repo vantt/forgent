@@ -152,7 +152,7 @@ export const COMMAND_REGISTRY = [
         id: { type: 'string', description: 'Work item id (positional or --id).' },
         to: { type: 'string', description: 'Target status to move to.' },
         expect: { type: 'string', description: 'Optional CAS guard: the expected current status.' },
-        reason: { type: 'string', description: 'Optional reason; required by the FSM on specific edges (e.g. proposed -> blocked/todo).' },
+        reason: { type: 'string', description: 'Optional reason; required by the FSM on specific edges (e.g. awaiting-approval -> blocked/todo).' },
       },
       positional: ['id'],
       required: ['id', 'to'],
@@ -167,7 +167,7 @@ export const COMMAND_REGISTRY = [
   {
     name: 'compound',
     invoke: 'fgos compound',
-    description: 'Move a proposed work item into the compound-learn stage — the deliberate transition (D2) through which captured signals get synthesised before the item can reach done. Optional --doc-type stores a Diataxis-tagged outcome (tutorial | how-to | reference | explanation) surfaced by `fgos check`.',
+    description: 'Move an awaiting-approval work item into the compound-learn stage — the deliberate transition (D2) through which captured signals get synthesised before the item can reach done. Optional --doc-type stores a Diataxis-tagged outcome (tutorial | how-to | reference | explanation) surfaced by `fgos check`.',
     parameters: {
       type: 'object',
       properties: {
@@ -375,7 +375,7 @@ export const COMMAND_REGISTRY = [
   {
     name: 'merge',
     invoke: 'fgos merge',
-    description: '"list" (read-only) returns which proposed items are ready to merge now (every dep already done, no footprint conflict) ordered by rankImpact, which are still waiting on an unmerged dep, and which are footprint-conflicted pairs (same shape as fgos conflicts). "next" merges the single top-ranked ready item by recursing into the same approve logic (never a parallel merge path) -- if that item trips the Iron Law gate it reports which item and why and merges nothing, it never auto-acknowledges or falls through to the next-ranked item.',
+    description: '"list" (read-only) returns which awaiting-approval items are ready to merge now (every dep already done, no footprint conflict) ordered by rankImpact, which are still waiting on an unmerged dep, and which are footprint-conflicted pairs (same shape as fgos conflicts). "next" merges the single top-ranked ready item by recursing into the same approve logic (never a parallel merge path) -- if that item trips the Iron Law gate it reports which item and why and merges nothing, it never auto-acknowledges or falls through to the next-ranked item.',
     parameters: {
       type: 'object',
       properties: {
@@ -496,7 +496,7 @@ export const COMMAND_REGISTRY = [
   {
     name: 'return',
     invoke: 'fgos return',
-    description: "Complete a take: runs the item's own verify and moves it to proposed (verify green) or blocked (verify red), recording the actual outcome.",
+    description: "Complete a take: runs the item's own verify and moves it to awaiting-approval (verify green) or blocked (verify red), recording the actual outcome.",
     parameters: {
       type: 'object',
       properties: {
@@ -516,7 +516,7 @@ export const COMMAND_REGISTRY = [
   {
     name: 'review',
     invoke: 'fgos review',
-    description: "Show a proposed item's diff and trace (local, read-only) or, with --github, open/inspect a real GitHub PR for a runner-sourced item.",
+    description: "Show an awaiting-approval item's diff and trace (local, read-only) or, with --github, open/inspect a real GitHub PR for a runner-sourced item.",
     parameters: {
       type: 'object',
       properties: {
@@ -560,7 +560,7 @@ export const COMMAND_REGISTRY = [
   {
     name: 'reject',
     invoke: 'fgos reject',
-    description: 'Reject a proposed item back to todo with a mandatory reason.',
+    description: 'Reject an awaiting-approval item back to todo with a mandatory reason.',
     parameters: {
       type: 'object',
       properties: {
@@ -580,7 +580,7 @@ export const COMMAND_REGISTRY = [
   {
     name: 'catchup',
     invoke: 'fgos catchup',
-    description: 'Catch up a merge-related blocked item by merging its target into its own branch, re-verifying, and landing (blocked -> proposed) or reporting the conflict/verify-fail.',
+    description: 'Catch up a merge-related blocked item by merging its target into its own branch, re-verifying, and landing (blocked -> awaiting-approval) or reporting the conflict/verify-fail.',
     parameters: {
       type: 'object',
       properties: {

@@ -2,7 +2,7 @@
 name: return
 description: >-
   Use when the user wants to return a claimed fgOS work item — running its
-  verify and advancing it to proposed (or blocked, on a red verify) — from
+  verify and advancing it to awaiting-approval (or blocked, on a red verify) — from
   inside a Claude Code session, invoked as /fgOS:return <id>. Returns the
   item through fgOS's own return verb (one-door-write), never writing
   .fgos/ state directly. Examples: "/fgOS:return build-cli",
@@ -53,5 +53,5 @@ CTR001).
 
 3. **Report the result.** On success, relay the command's JSON output back
    to the user — whether the item's own verify passed (advancing it to
-   `proposed`) or failed (parking it at `blocked` with friction), and the
+   `awaiting-approval`) or failed (parking it at `blocked` with friction), and the
    relevant fields the command returned.

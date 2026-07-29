@@ -175,8 +175,8 @@ test('e2e synthetic domain: add --domain synthetic (no --stage) dispatches throu
   // the header comment above and the discriminating frontier test below):
   // an `add`-created item never carries an explicit `stage`, so this check
   // passes for ANY domain's Execute-mapped stage, correct or not.
-  assert.equal(synth.status, 'proposed', 'the synthetic item was dispatched by the real runner');
-  assert.equal(coding.status, 'proposed', 'the plain coding item was dispatched in the same run');
+  assert.equal(synth.status, 'awaiting-approval', 'the synthetic item was dispatched by the real runner');
+  assert.equal(coding.status, 'awaiting-approval', 'the plain coding item was dispatched in the same run');
   assert.equal(synth.domain, 'synthetic', 'the persisted item retains its explicit domain');
 
   assert.equal(branchExists(repoRoot, 'fgw/synth-item'), true);
@@ -193,8 +193,8 @@ test('e2e synthetic domain: add --domain synthetic (no --stage) dispatches throu
 
   // `fgos list` (the public read surface) confirms the same facts.
   const list = JSON.parse(fgos(repoRoot, ['list']).stdout).data;
-  assert.equal(list.work['synth-item'].status, 'proposed');
-  assert.equal(list.work['coding-item'].status, 'proposed');
+  assert.equal(list.work['synth-item'].status, 'awaiting-approval');
+  assert.equal(list.work['coding-item'].status, 'awaiting-approval');
 
   // Both reach `done` via the same normal human-close door — proving the
   // synthetic domain rides the identical status FSM all the way to the end,

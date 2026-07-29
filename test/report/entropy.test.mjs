@@ -30,7 +30,7 @@ test('computeEntropy weighs a final-status item missing its actual half at ×5',
 test('computeEntropy does not flag a final-status item that already has its actual half recorded', () => {
   const view = {
     work: { a: { id: 'a', status: 'done' } },
-    outcomes: { a: { actual: { outcome: 'proposed', passed: true } } },
+    outcomes: { a: { actual: { outcome: 'awaiting-approval', passed: true } } },
   };
   assert.equal(computeEntropy(view).score, 0);
 });
@@ -122,7 +122,7 @@ test('computeCounts counts only outcomes with an actual half recorded, not predi
   const view = {
     outcomes: {
       a: { predicted: { tier: 'standard' } },
-      b: { predicted: { tier: 'light' }, actual: { outcome: 'proposed', passed: true } },
+      b: { predicted: { tier: 'light' }, actual: { outcome: 'awaiting-approval', passed: true } },
     },
   };
   assert.equal(computeCounts(view).outcomes, 1);

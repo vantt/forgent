@@ -96,7 +96,7 @@ re-shapes the work; that already happened at `clarify`/`decompose`.
 
    This is the fgOS equivalent of a bee cell's cap: `return` re-runs the
    item's `verify` itself, checks for a clean working tree and an advanced
-   commit history, and only then moves the item to `proposed` (verify red
+   commit history, and only then moves the item to `awaiting-approval` (verify red
    moves it to `blocked` instead) — it never takes the caller's word for
    it, the same "proof, not assertion" discipline bee's cap-with-evidence
    rule enforces, just applied by the engine instead of a recorded trace
@@ -116,7 +116,7 @@ for the whole chain, applied here at the implementation step specifically.
 
 ## Next
 
-Once `fgos return <id>` reports the item moved to `proposed`, load
+Once `fgos return <id>` reports the item moved to `awaiting-approval`, load
 `fgos-routing` to re-read its stage and continue — routing decides whether
 `compound-learn` (and `fgos-compounding`) comes next; this skill's own job
 ends at a returned, verified item.

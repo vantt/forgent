@@ -1097,7 +1097,7 @@ test('goal focus is not auto-cleared when the focused item reaches status done',
   addGoalItem(cwd, 'goal-target-done');
   run(cwd, ['goal', 'set', 'goal-target-done']);
   run(cwd, ['move', 'goal-target-done', '--to', 'doing']);
-  run(cwd, ['move', 'goal-target-done', '--to', 'proposed']);
+  run(cwd, ['move', 'goal-target-done', '--to', 'awaiting-approval']);
   run(cwd, ['compound', 'goal-target-done']);
   const moveResult = run(cwd, ['move', 'goal-target-done', '--to', 'done']);
   assert.equal(moveResult.status, 0);
@@ -1155,7 +1155,7 @@ test('edit --docs-ref replaces an existing docsRef (latest-wins), exit 0', () =>
 function toProposed(cwd, id) {
   addOk(cwd, id);
   run(cwd, ['move', id, '--to', 'doing']);
-  return run(cwd, ['move', id, '--to', 'proposed']);
+  return run(cwd, ['move', id, '--to', 'awaiting-approval']);
 }
 
 // A coding item must pass through the compound-learn stage before it can
@@ -1167,14 +1167,14 @@ function toCompoundLearn(cwd, id) {
   return run(cwd, ['compound', id]);
 }
 
-test('move doing -> proposed applies via the real CLI, exit 0', () => {
+test('move doing -> awaiting-approval applies via the real CLI, exit 0', () => {
   const cwd = tmpCwd();
   const result = toProposed(cwd, 'goal-checked');
   assert.equal(result.status, 0);
-  assert.equal(stateView(cwd).work['goal-checked'].status, 'proposed');
+  assert.equal(stateView(cwd).work['goal-checked'].status, 'awaiting-approval');
 });
 
-test('move proposed -> done (approval) applies via the real CLI, exit 0', () => {
+test('move awaiting-approval -> done (approval) applies via the real CLI, exit 0', () => {
   const cwd = tmpCwd();
   toCompoundLearn(cwd, 'approved-item');
   const result = run(cwd, ['move', 'approved-item', '--to', 'done']);
@@ -1202,7 +1202,7 @@ test('compound accepts a proposed coding item and moves its stage to compound-le
   assert.equal(result.status, 0);
   assert.equal(eventLines(cwd).length, before + 1);
   assert.equal(stateView(cwd).work['compound-ready'].stage, 'compound-learn');
-  assert.equal(stateView(cwd).work['compound-ready'].status, 'proposed');
+  assert.equal(stateView(cwd).work['compound-ready'].status, 'awaiting-approval');
   const data = envelopeData(result.stdout);
   assert.equal(data.id, 'compound-ready');
   assert.equal(data.from, 'executing');
@@ -1410,17 +1410,17 @@ test('a compound --doc-path tag survives a rebuild of the view from the log alon
   assert.deepEqual(stateView(cwd), before);
 });
 
-test('move proposed -> todo (rejection) without --reason is refused as validation, exit 4, no event written', () => {
+test('move awaiting-approval -> todo (rejection) without --reason is refused as validation, exit 4, no event written', () => {
   const cwd = tmpCwd();
   toProposed(cwd, 'no-reason-item');
   const before = eventLines(cwd).length;
   const result = run(cwd, ['move', 'no-reason-item', '--to', 'todo']);
   assert.equal(result.status, 4);
   assert.equal(eventLines(cwd).length, before);
-  assert.equal(stateView(cwd).work['no-reason-item'].status, 'proposed');
+  assert.equal(stateView(cwd).work['no-reason-item'].status, 'awaiting-approval');
 });
 
-test('move proposed -> todo with an empty --reason "" is rejected as validation, exit 4, no event written', () => {
+test('move awaiting-approval -> todo with an empty --reason "" is rejected as validation, exit 4, no event written', () => {
   const cwd = tmpCwd();
   toProposed(cwd, 'empty-reason-item');
   const before = eventLines(cwd).length;
@@ -1429,7 +1429,7 @@ test('move proposed -> todo with an empty --reason "" is rejected as validation,
   assert.equal(eventLines(cwd).length, before);
 });
 
-test('move proposed -> todo (rejection) with --reason carries the reason into the event payload, exit 0', () => {
+test('move awaiting-approval -> todo (rejection) with --reason carries the reason into the event payload, exit 0', () => {
   const cwd = tmpCwd();
   toProposed(cwd, 'rejected-item');
   const result = run(cwd, ['move', 'rejected-item', '--to', 'todo', '--reason', 'flaky test coverage']);
@@ -1442,7 +1442,7 @@ test('move proposed -> todo (rejection) with --reason carries the reason into th
   assert.equal(lastEvent.payload.reason, 'flaky test coverage');
 });
 
-test('move proposed -> doing is a forbidden edge (proposed is never a re-entry point for doing), exit 2, no event written', () => {
+test('move awaiting-approval -> doing is a forbidden edge (proposed is never a re-entry point for doing), exit 2, no event written', () => {
   const cwd = tmpCwd();
   toProposed(cwd, 'no-reentry-item');
   const before = eventLines(cwd).length;
@@ -1451,14 +1451,14 @@ test('move proposed -> doing is a forbidden edge (proposed is never a re-entry p
   assert.equal(eventLines(cwd).length, before);
 });
 
-test('move proposed -> done rejects a CAS expected-status mismatch as conflict, exit 3, no event written', () => {
+test('move awaiting-approval -> done rejects a CAS expected-status mismatch as conflict, exit 3, no event written', () => {
   const cwd = tmpCwd();
   toProposed(cwd, 'cas-proposed-item');
   const before = eventLines(cwd).length;
   const result = run(cwd, ['move', 'cas-proposed-item', '--to', 'done', '--expect', 'todo']);
   assert.equal(result.status, 3);
   assert.equal(eventLines(cwd).length, before);
-  assert.equal(stateView(cwd).work['cas-proposed-item'].status, 'proposed');
+  assert.equal(stateView(cwd).work['cas-proposed-item'].status, 'awaiting-approval');
 });
 
 test('move --reason on a non-rejection edge is accepted but ignored, not embedded in the payload', () => {
@@ -1478,7 +1478,7 @@ test('list shows tier and the proposed status for the real CLI view, exit 0', ()
   const result = run(cwd, ['list']);
   assert.equal(result.status, 0);
   const data = envelopeData(result.stdout);
-  assert.equal(data.work['listed-proposed'].status, 'proposed');
+  assert.equal(data.work['listed-proposed'].status, 'awaiting-approval');
   assert.equal(data.work['listed-proposed'].tier, 'standard');
 });
 
@@ -1664,7 +1664,7 @@ test('check returns BOTH predicted and actual values for an item with real outco
   addOutcome(dir, { id: 'checked-item', predicted: { tier: 'standard', deps: 0, priorVisits: 0 } });
   addOutcome(dir, {
     id: 'checked-item',
-    actual: { outcome: 'proposed', passed: true, attempts: 1, errorClass: null, aheadCount: 1, visits: 1 },
+    actual: { outcome: 'awaiting-approval', passed: true, attempts: 1, errorClass: null, aheadCount: 1, visits: 1 },
   });
 
   const result = run(cwd, ['check', 'checked-item']);
@@ -1673,7 +1673,7 @@ test('check returns BOTH predicted and actual values for an item with real outco
   assert.equal(data.outcomes.length, 1);
   assert.equal(data.outcomes[0].id, 'checked-item');
   assert.equal(data.outcomes[0].predicted.tier, 'standard');
-  assert.equal(data.outcomes[0].actual.outcome, 'proposed');
+  assert.equal(data.outcomes[0].actual.outcome, 'awaiting-approval');
   assert.equal(data.outcomes[0].actual.passed, true);
 });
 
@@ -1683,7 +1683,7 @@ test('check with no id given reports every item that has outcome data, exit 0', 
   addOk(cwd, 'item-b');
   const dir = path.join(cwd, '.fgos');
   addOutcome(dir, { id: 'item-a', predicted: { tier: 'light', deps: 0, priorVisits: 0 } });
-  addOutcome(dir, { id: 'item-a', actual: { outcome: 'proposed', passed: true, attempts: 1, errorClass: null, aheadCount: 1, visits: 1 } });
+  addOutcome(dir, { id: 'item-a', actual: { outcome: 'awaiting-approval', passed: true, attempts: 1, errorClass: null, aheadCount: 1, visits: 1 } });
 
   const result = run(cwd, ['check']);
   assert.equal(result.status, 0);
@@ -2664,7 +2664,7 @@ test('check reports a seal-digest delta only meaningfully for channels with real
   addOutcome(dir, { id: 'seal-digest-item', predicted: { tier: 'standard', deps: 0, priorVisits: 0 } });
   addOutcome(dir, {
     id: 'seal-digest-item',
-    actual: { outcome: 'proposed', passed: true, attempts: 1, errorClass: null, aheadCount: 1, visits: 1 },
+    actual: { outcome: 'awaiting-approval', passed: true, attempts: 1, errorClass: null, aheadCount: 1, visits: 1 },
   });
 
   const first = run(cwd, ['check']);
@@ -3181,16 +3181,16 @@ test('return happy path: verify passes -> doing to proposed, actual outcome reco
   const result = run(cwd, ['return', 'pull-return-ok']);
   assert.equal(result.status, 0, `return failed: ${result.stderr}`);
   const data = envelopeData(result.stdout);
-  assert.equal(data.to, 'proposed');
+  assert.equal(data.to, 'awaiting-approval');
   assert.equal(data.passed, true);
 
   const view = stateView(cwd);
-  assert.equal(view.work['pull-return-ok'].status, 'proposed');
-  assert.equal(view.outcomes['pull-return-ok'].actual.outcome, 'proposed');
+  assert.equal(view.work['pull-return-ok'].status, 'awaiting-approval');
+  assert.equal(view.outcomes['pull-return-ok'].actual.outcome, 'awaiting-approval');
   assert.equal(view.outcomes['pull-return-ok'].actual.passed, true);
   assert.equal(view.outcomes['pull-return-ok'].actual.aheadCount, 1);
   assert.equal(view.work['pull-return-ok'].headAtReturn, headAtReturn, 'pr-lifecycle D3/D4: return records HEAD at green-return time, mirroring headAtTake at claim time');
-  assert.equal('settlements' in view, false, 'doing -> proposed never settles (D4: settlement belongs to the -> done edge)');
+  assert.equal('settlements' in view, false, 'doing -> awaiting-approval never settles (D4: settlement belongs to the -> done edge)');
 });
 
 test('return (verify passes, main-source): a live main-checkout.lock recorded under THIS session\'s own identity is released early, instead of waiting out the TTL (tsk-45z D1/D2)', () => {
@@ -3206,7 +3206,7 @@ test('return (verify passes, main-source): a live main-checkout.lock recorded un
 
   const result = run(cwd, ['return', 'pull-return-releases-own-lock'], { BEE_SESSION_ID: sessionId });
   assert.equal(result.status, 0, `return failed: ${result.stderr}`);
-  assert.equal(envelopeData(result.stdout).to, 'proposed');
+  assert.equal(envelopeData(result.stdout).to, 'awaiting-approval');
   assert.equal(fs.existsSync(lockPath), false, 'return must release its own live lock once verify passes and the item settles to proposed');
 });
 
@@ -3239,7 +3239,7 @@ test('return (main-source) never touches a DIFFERENT session\'s live lock — ne
 
   const result = run(cwd, ['return', 'pull-return-other-lock-untouched'], { BEE_SESSION_ID: 'tsk-45z-this-session' });
   assert.equal(result.status, 0, `return failed: ${result.stderr}`);
-  assert.equal(envelopeData(result.stdout).to, 'proposed');
+  assert.equal(envelopeData(result.stdout).to, 'awaiting-approval');
   assert.equal(fs.existsSync(lockPath), true, 'a different session\'s live lock must survive this return untouched');
   assert.equal(JSON.parse(fs.readFileSync(lockPath, 'utf8')).pid, 'tsk-45z-a-different-live-session');
 });
@@ -3255,7 +3255,7 @@ test('return: a changed sensitive file outside the item\'s footprint surfaces a 
   const result = run(cwd, ['return', 'pull-return-judge']);
   assert.equal(result.status, 0, `return failed: ${result.stderr}`);
   const data = envelopeData(result.stdout);
-  assert.equal(data.to, 'proposed');
+  assert.equal(data.to, 'awaiting-approval');
   assert.equal(data.passed, true, 'the frozen-judge advisory never fails the return itself');
   assert.deepEqual(data.frozenJudgeHits, [{ file: 'package.json', rule: 'package manifest' }]);
 });
@@ -3307,7 +3307,7 @@ test('return succeeds when a dirty file on cwd is UNRELATED to the item\'s own c
 
   const result = run(cwd, ['return', 'pull-return-unrelated-dirty']);
   assert.equal(result.status, 0, `return should succeed past an unrelated dirty file: ${result.stderr}`);
-  assert.equal(stateView(cwd).work['pull-return-unrelated-dirty'].status, 'proposed');
+  assert.equal(stateView(cwd).work['pull-return-unrelated-dirty'].status, 'awaiting-approval');
   assert.equal(fs.readFileSync(path.join(cwd, 'scratch.txt'), 'utf8'), 'unrelated uncommitted work\n', 'the unrelated dirty file must be left untouched, still uncommitted');
 });
 
@@ -3371,7 +3371,7 @@ test('return succeeds when ONLY .fgos/ (the live event log) is dirty — its own
 
   const result = run(cwd, ['return', 'pull-return-fgos-only-dirty']);
   assert.equal(result.status, 0, `return should succeed with only .fgos/ dirty: ${result.stderr}`);
-  assert.equal(stateView(cwd).work['pull-return-fgos-only-dirty'].status, 'proposed');
+  assert.equal(stateView(cwd).work['pull-return-fgos-only-dirty'].status, 'awaiting-approval');
 });
 
 test('return succeeds when cwd is a subdirectory of the real git top-level and only .fgos/ (under that subtree) is dirty', () => {
@@ -3389,7 +3389,7 @@ test('return succeeds when cwd is a subdirectory of the real git top-level and o
 
   const result = run(cwd, ['return', 'sub-return-fgos-only-dirty']);
   assert.equal(result.status, 0, `return should succeed with only the subdirectory's .fgos/ dirty: ${result.stderr}`);
-  assert.equal(stateView(cwd).work['sub-return-fgos-only-dirty'].status, 'proposed');
+  assert.equal(stateView(cwd).work['sub-return-fgos-only-dirty'].status, 'awaiting-approval');
 });
 
 test('return succeeds when cwd is a subdirectory and an unrelated file is dirty ELSEWHERE in the repo, outside cwd\'s own subtree', () => {
@@ -3408,7 +3408,7 @@ test('return succeeds when cwd is a subdirectory and an unrelated file is dirty 
 
   const result = run(cwd, ['return', 'sub-return-scope-ok']);
   assert.equal(result.status, 0, `an unrelated dirty file outside cwd's subtree must never block return: ${result.stderr}`);
-  assert.equal(stateView(cwd).work['sub-return-scope-ok'].status, 'proposed');
+  assert.equal(stateView(cwd).work['sub-return-scope-ok'].status, 'awaiting-approval');
 });
 
 test('return still refuses when cwd is a subdirectory and a non-.fgos file is dirty INSIDE cwd\'s own subtree (real dirt still caught, does not overcorrect)', () => {
@@ -3578,7 +3578,7 @@ function compoundAndCommit(cwd, id) {
 // Simulates what the real runner (loop.mjs/worktree.mjs) leaves behind for a
 // runner-source proposed item: a live `fgw/<id>` branch carrying a real
 // commit, with the item's own status independently moved to `proposed`
-// through the normal doing -> proposed edge — these CLI tests never invoke
+// through the normal doing -> awaiting-approval edge — these CLI tests never invoke
 // the real runner, only the git/state shape it produces.
 function makeRunnerProposedItem(cwd, id, extra = {}) {
   addOk(cwd, id, extra);
@@ -3591,7 +3591,7 @@ function makeRunnerProposedItem(cwd, id, extra = {}) {
   gitAtCwd(cwd, ['commit', '-q', '-m', `worker output for ${id}`]);
   gitAtCwd(cwd, ['checkout', 'main']);
 
-  run(cwd, ['move', id, '--to', 'proposed']);
+  run(cwd, ['move', id, '--to', 'awaiting-approval']);
   commitPending(cwd, `state: propose ${id}`);
 }
 
@@ -3651,7 +3651,7 @@ function makeRunnerProposedLeafItem(cwd, rootId, leafId, extra = {}) {
   gitAtCwd(cwd, ['commit', '-q', '-m', `worker output for ${leafId}`]);
   gitAtCwd(cwd, ['checkout', 'main']);
 
-  run(cwd, ['move', leafId, '--to', 'proposed']);
+  run(cwd, ['move', leafId, '--to', 'awaiting-approval']);
   commitPending(cwd, `state: propose ${leafId}`);
 }
 
@@ -3955,7 +3955,7 @@ test('review of a legacy proposed item (no branch, no headAtTake/headAtReturn) d
   const cwd = tmpCwd();
   addOk(cwd, 'review-legacy-item');
   run(cwd, ['move', 'review-legacy-item', '--to', 'doing']);
-  run(cwd, ['move', 'review-legacy-item', '--to', 'proposed']);
+  run(cwd, ['move', 'review-legacy-item', '--to', 'awaiting-approval']);
 
   const result = run(cwd, ['review', 'review-legacy-item']);
   assert.equal(result.status, 0, result.stderr);
@@ -4002,7 +4002,7 @@ test('approve on a non-proposed item is rejected as precondition, exit 2', () =>
   assert.equal(result.status, 2);
 });
 
-test('approve of a runner item (happy path): merges fgw/<id> into main, verifies, proposed -> done with role human, and cleans up the branch', () => {
+test('approve of a runner item (happy path): merges fgw/<id> into main, verifies, awaiting-approval -> done with role human, and cleans up the branch', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   makeRunnerProposedItem(cwd, 'approve-runner-item', { verify: 'test -f approve-runner-item-produced.txt' });
@@ -4078,7 +4078,7 @@ test('approve of a runner item still refuses when the SAME path the item touched
   const result = run(cwd, ['approve', 'approve-real-conflict']);
   assert.equal(result.status, 4);
   assert.match(result.stderr, /not clean/);
-  assert.equal(stateView(cwd).work['approve-real-conflict'].status, 'proposed');
+  assert.equal(stateView(cwd).work['approve-real-conflict'].status, 'awaiting-approval');
 });
 
 test('approve of a runner item with a declared footprint still refuses on an uncommitted footprint path (tsk-598 D3) even though it was never committed to the branch', () => {
@@ -4100,7 +4100,7 @@ test('approve of a runner item with a declared footprint still refuses on an unc
   const result = run(cwd, ['approve', 'approve-footprint-dirty']);
   assert.equal(result.status, 4);
   assert.match(result.stderr, /not clean/);
-  assert.equal(stateView(cwd).work['approve-footprint-dirty'].status, 'proposed');
+  assert.equal(stateView(cwd).work['approve-footprint-dirty'].status, 'awaiting-approval');
 });
 
 test('approve of a leaf item with a clean merge lands the work on fgw/<root> (not main) via an ephemeral worktree, leaf -> done, fgw/<leaf> is actually deleted, fgw/<root> survives', () => {
@@ -4139,7 +4139,7 @@ test('approve of a leaf item with a clean merge lands the work on fgw/<root> (no
   assert.match(rootTreeFile, /ok/);
 });
 
-test('approve of a runner item that conflicts: aborts the merge, proposed -> blocked (reason merge-conflict), main left byte-for-byte unchanged (must_have: main never holds a broken merge commit)', () => {
+test('approve of a runner item that conflicts: aborts the merge, awaiting-approval -> blocked (reason merge-conflict), main left byte-for-byte unchanged (must_have: main never holds a broken merge commit)', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   fs.writeFileSync(path.join(cwd, 'shared.txt'), 'base\n');
@@ -4159,7 +4159,7 @@ test('approve of a runner item that conflicts: aborts the merge, proposed -> blo
   gitAtCwd(cwd, ['add', 'shared.txt']);
   gitAtCwd(cwd, ['commit', '-q', '-m', 'main changes shared.txt']);
 
-  run(cwd, ['move', 'approve-conflict-item', '--to', 'proposed']);
+  run(cwd, ['move', 'approve-conflict-item', '--to', 'awaiting-approval']);
   commitPending(cwd, 'state: propose approve-conflict-item');
 
   const headBefore = gitHead(cwd);
@@ -4177,7 +4177,7 @@ test('approve of a runner item that conflicts: aborts the merge, proposed -> blo
   assert.equal(view.frictions['approve-conflict-item'][0].errorClass, 'merge-conflict');
 });
 
-test('approve of a runner item whose staged merge fails its own verify: aborts, proposed -> blocked (reason verify-fail-post-merge), main left unchanged', () => {
+test('approve of a runner item whose staged merge fails its own verify: aborts, awaiting-approval -> blocked (reason verify-fail-post-merge), main left unchanged', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   makeRunnerProposedItem(cwd, 'approve-verify-fail-item', { verify: 'test -f file-never-produced.txt' });
@@ -4233,7 +4233,7 @@ test('approve of a root item that HAD children, whose merge into main conflicts,
   gitAtCwd(cwd, ['add', 'shared.txt']);
   gitAtCwd(cwd, ['commit', '-q', '-m', 'main changes shared.txt']);
 
-  run(cwd, ['move', 'drift-root-item', '--to', 'proposed']);
+  run(cwd, ['move', 'drift-root-item', '--to', 'awaiting-approval']);
   commitPending(cwd, 'state: propose drift-root-item');
 
   const headBefore = gitHead(cwd);
@@ -4250,7 +4250,7 @@ test('approve of a root item that HAD children, whose merge into main conflicts,
   assert.match(view.frictions['drift-root-item'][0].detail, new RegExp(`main@${headBefore}`), 'friction detail must record the main@<sha> ref');
 });
 
-test('approve of a pull-door item (no merge, code already on main): re-verifies and closes proposed -> done with role human', () => {
+test('approve of a pull-door item (no merge, code already on main): re-verifies and closes awaiting-approval -> done with role human', () => {
   const cwd = initGitCwd();
   run(cwd, ['init']);
   addOk(cwd, 'approve-pull-item', { verify: 'test -f proof.txt' });
@@ -4272,7 +4272,7 @@ test('approve of a legacy item with a failing verify: blocked (reason verify-fai
   const cwd = tmpCwd();
   addOk(cwd, 'approve-legacy-fail-item', { verify: 'false' });
   run(cwd, ['move', 'approve-legacy-fail-item', '--to', 'doing']);
-  run(cwd, ['move', 'approve-legacy-fail-item', '--to', 'proposed']);
+  run(cwd, ['move', 'approve-legacy-fail-item', '--to', 'awaiting-approval']);
 
   const result = run(cwd, ['approve', 'approve-legacy-fail-item']);
   assert.equal(result.status, 0, result.stderr);
@@ -4284,11 +4284,11 @@ test('approve of a legacy item with a failing verify: blocked (reason verify-fai
   assert.equal(view.work['approve-legacy-fail-item'].status, 'blocked');
 });
 
-test("approve verify-fail (legacy item): park edge stamps role 'system' (not human) on the proposed -> blocked event", () => {
+test("approve verify-fail (legacy item): park edge stamps role 'system' (not human) on the awaiting-approval -> blocked event", () => {
   const cwd = tmpCwd();
   addOk(cwd, 'approve-legacy-fail-role-item', { verify: 'false' });
   run(cwd, ['move', 'approve-legacy-fail-role-item', '--to', 'doing']);
-  run(cwd, ['move', 'approve-legacy-fail-role-item', '--to', 'proposed']);
+  run(cwd, ['move', 'approve-legacy-fail-role-item', '--to', 'awaiting-approval']);
 
   const result = run(cwd, ['approve', 'approve-legacy-fail-role-item']);
   assert.equal(result.status, 0, result.stderr);
@@ -4304,7 +4304,7 @@ test('approve of a legacy item with a passing verify closes it to done — legac
   const cwd = tmpCwd();
   addOk(cwd, 'approve-legacy-ok-item', { verify: 'true' });
   run(cwd, ['move', 'approve-legacy-ok-item', '--to', 'doing']);
-  run(cwd, ['move', 'approve-legacy-ok-item', '--to', 'proposed']);
+  run(cwd, ['move', 'approve-legacy-ok-item', '--to', 'awaiting-approval']);
   assert.equal(run(cwd, ['compound', 'approve-legacy-ok-item']).status, 0);
 
   const result = run(cwd, ['approve', 'approve-legacy-ok-item']);
@@ -4316,7 +4316,7 @@ test('approve twice: the second approve on an already-done item is rejected as p
   const cwd = tmpCwd();
   addOk(cwd, 'approve-twice-item', { verify: 'true' });
   run(cwd, ['move', 'approve-twice-item', '--to', 'doing']);
-  run(cwd, ['move', 'approve-twice-item', '--to', 'proposed']);
+  run(cwd, ['move', 'approve-twice-item', '--to', 'awaiting-approval']);
   assert.equal(run(cwd, ['compound', 'approve-twice-item']).status, 0);
   assert.equal(run(cwd, ['approve', 'approve-twice-item']).status, 0);
 
@@ -4350,7 +4350,7 @@ function makeRunnerProposedItemTouching(cwd, id, relPath, extra = {}) {
   gitAtCwd(cwd, ['commit', '-q', '-m', `worker output for ${id}`]);
   gitAtCwd(cwd, ['checkout', 'main']);
 
-  run(cwd, ['move', id, '--to', 'proposed']);
+  run(cwd, ['move', id, '--to', 'awaiting-approval']);
   commitPending(cwd, `state: propose ${id}`);
 }
 
@@ -4369,7 +4369,7 @@ test('approve of a runner item whose diff touches a self-modifying-capable modul
   assert.match(result.stderr, /--acknowledge-iron-law/);
 
   const view = stateView(cwd);
-  assert.equal(view.work['iron-refuse-item'].status, 'proposed', 'a refused approve leaves the item proposed');
+  assert.equal(view.work['iron-refuse-item'].status, 'awaiting-approval', 'a refused approve leaves the item proposed');
   assert.equal(gitHead(cwd), headBefore, 'a refused approve attempts no merge — HEAD is unchanged');
   const survivingBranches = gitAtCwd(cwd, ['for-each-ref', '--format=%(refname:short)', 'refs/heads/']);
   assert.match(survivingBranches, /fgw\/iron-refuse-item/, 'the branch survives an Iron Law refusal — nothing was merged or cleaned up');
@@ -4388,11 +4388,11 @@ test('approve --acknowledge-iron-law false (a value form, not the bare flag) sti
   assert.match(result.stderr, /Iron Law/);
 
   const view = stateView(cwd);
-  assert.equal(view.work['iron-ack-false-item'].status, 'proposed');
+  assert.equal(view.work['iron-ack-false-item'].status, 'awaiting-approval');
   assert.equal(gitHead(cwd), headBefore);
 });
 
-test('approve of the same self-modifying diff PROCEEDS with --acknowledge-iron-law: merges, verifies, proposed -> done, branch cleaned up', () => {
+test('approve of the same self-modifying diff PROCEEDS with --acknowledge-iron-law: merges, verifies, awaiting-approval -> done, branch cleaned up', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   makeRunnerProposedItemTouching(cwd, 'iron-ack-item', 'src/runner/probe.mjs', {
@@ -4437,11 +4437,11 @@ test('reject without --reason is rejected as validation, exit 4, item stays prop
   const cwd = tmpCwd();
   addOk(cwd, 'reject-no-reason-item');
   run(cwd, ['move', 'reject-no-reason-item', '--to', 'doing']);
-  run(cwd, ['move', 'reject-no-reason-item', '--to', 'proposed']);
+  run(cwd, ['move', 'reject-no-reason-item', '--to', 'awaiting-approval']);
 
   const result = run(cwd, ['reject', 'reject-no-reason-item']);
   assert.equal(result.status, 4);
-  assert.equal(stateView(cwd).work['reject-no-reason-item'].status, 'proposed');
+  assert.equal(stateView(cwd).work['reject-no-reason-item'].status, 'awaiting-approval');
 });
 
 test('reject on a non-proposed item is rejected as precondition, exit 2', () => {
@@ -4451,7 +4451,7 @@ test('reject on a non-proposed item is rejected as precondition, exit 2', () => 
   assert.equal(result.status, 2);
 });
 
-test('reject moves proposed -> todo with the reason recorded, role human, and runs no git command at all — never a revert', () => {
+test('reject moves awaiting-approval -> todo with the reason recorded, role human, and runs no git command at all — never a revert', () => {
   const cwd = initGitCwd();
   run(cwd, ['init']);
   addOk(cwd, 'reject-pull-item', { verify: 'test -f proof.txt' });
@@ -4463,7 +4463,7 @@ test('reject moves proposed -> todo with the reason recorded, role human, and ru
   const result = run(cwd, ['reject', 'reject-pull-item', '--reason', 'needs more test coverage']);
   assert.equal(result.status, 0, result.stderr);
   const rejectData = envelopeData(result.stdout);
-  assert.equal(rejectData.from, 'proposed');
+  assert.equal(rejectData.from, 'awaiting-approval');
   assert.equal(rejectData.to, 'todo');
   assert.equal(rejectData.reason, 'needs more test coverage');
 
@@ -4569,7 +4569,7 @@ function addBareOrigin(cwd) {
 function makeLegacyProposedItem(cwd, id) {
   addOk(cwd, id);
   run(cwd, ['move', id, '--to', 'doing']);
-  run(cwd, ['move', id, '--to', 'proposed']);
+  run(cwd, ['move', id, '--to', 'awaiting-approval']);
 }
 
 test('review --github on a legacy (non-runner) item is a validation error, no state change, and no gh call is attempted', () => {
@@ -4582,7 +4582,7 @@ test('review --github on a legacy (non-runner) item is a validation error, no st
   const result = run(cwd, ['review', 'gh-review-legacy', '--github'], { FGOS_GH_COMMAND: fake });
   assert.equal(result.status, 4, `${result.stdout}${result.stderr}`);
   assert.match(result.stderr, /runner-sourced item/);
-  assert.equal(stateView(cwd).work['gh-review-legacy'].status, 'proposed');
+  assert.equal(stateView(cwd).work['gh-review-legacy'].status, 'awaiting-approval');
   assert.ok(!fs.existsSync(marker), 'the source gate must reject before any gh CLI call');
 });
 
@@ -4597,7 +4597,7 @@ test('approve --github on a legacy (non-runner) item is a validation error, no s
   const result = run(cwd, ['approve', 'gh-approve-legacy', '--github', '--pr', '7'], { FGOS_GH_COMMAND: fake });
   assert.equal(result.status, 4, `${result.stdout}${result.stderr}`);
   assert.match(result.stderr, /runner-sourced item/);
-  assert.equal(stateView(cwd).work['gh-approve-legacy'].status, 'proposed');
+  assert.equal(stateView(cwd).work['gh-approve-legacy'].status, 'awaiting-approval');
   assert.ok(!fs.existsSync(marker), 'the source gate must reject before any gh CLI call');
 });
 
@@ -4622,7 +4622,7 @@ test('review --github on a runner item pushes the branch and opens a PR via a re
   // The branch really got pushed to origin.
   assert.match(execFileSync('git', ['ls-remote', '--heads', 'origin', 'fgw/gh-review-ok'], { cwd, encoding: 'utf8' }), /fgw\/gh-review-ok/);
   // review stays read-only on FSM state.
-  assert.equal(stateView(cwd).work['gh-review-ok'].status, 'proposed');
+  assert.equal(stateView(cwd).work['gh-review-ok'].status, 'awaiting-approval');
 });
 
 test('review --github reports a gh failure as plain output with no state mutation (read-only contract holds on the blocked path)', () => {
@@ -4637,7 +4637,7 @@ test('review --github reports a gh failure as plain output with no state mutatio
   const ghData = envelopeData(result.stdout);
   assert.equal(ghData.outcome, 'failed');
   assert.equal(ghData.reason, 'auth-failure');
-  assert.equal(stateView(cwd).work['gh-review-blocked'].status, 'proposed', 'review never transitions state, even on a gh failure');
+  assert.equal(stateView(cwd).work['gh-review-blocked'].status, 'awaiting-approval', 'review never transitions state, even on a gh failure');
   assert.equal(stateView(cwd).frictions?.['gh-review-blocked'], undefined, 'review never records friction');
 });
 
@@ -4651,7 +4651,7 @@ test('approve --github without --pr is a validation error, item stays proposed, 
   const result = run(cwd, ['approve', 'gh-approve-nopr', '--github'], { FGOS_GH_COMMAND: fake });
   assert.equal(result.status, 4, `${result.stdout}${result.stderr}`);
   assert.match(result.stderr, /requires --pr/);
-  assert.equal(stateView(cwd).work['gh-approve-nopr'].status, 'proposed');
+  assert.equal(stateView(cwd).work['gh-approve-nopr'].status, 'awaiting-approval');
   assert.ok(!fs.existsSync(marker), 'no gh call is made when --pr is missing');
 });
 
@@ -4672,7 +4672,7 @@ test('approve --github with a dirty main tree is NOT blocked by the local dirty-
   assert.equal(stateView(cwd).work['gh-approve-dirty'].status, 'done');
 });
 
-test('approve --github --pr on a fake gh merge success transitions the item proposed -> done with role human', () => {
+test('approve --github --pr on a fake gh merge success transitions the item awaiting-approval -> done with role human', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   makeRunnerProposedItem(cwd, 'gh-approve-merged');
@@ -4690,7 +4690,7 @@ test('approve --github --pr on a fake gh merge success transitions the item prop
   assert.equal(view.settlements['gh-approve-merged'][0].role, 'human');
 });
 
-test('approve --github --pr on a fake gh merge failure transitions proposed -> blocked and records friction with the classified reason, layer, and gh detail', () => {
+test('approve --github --pr on a fake gh merge failure transitions awaiting-approval -> blocked and records friction with the classified reason, layer, and gh detail', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   makeRunnerProposedItem(cwd, 'gh-approve-blocked');
@@ -4729,7 +4729,7 @@ test('review --github --pr on a legacy (non-runner) item is the same runner-sour
   const result = run(cwd, ['review', 'gh-status-legacy', '--github', '--pr', '9'], { FGOS_GH_COMMAND: fake });
   assert.equal(result.status, 4, `${result.stdout}${result.stderr}`);
   assert.match(result.stderr, /runner-sourced item/);
-  assert.equal(stateView(cwd).work['gh-status-legacy'].status, 'proposed');
+  assert.equal(stateView(cwd).work['gh-status-legacy'].status, 'awaiting-approval');
   assert.ok(!fs.existsSync(marker), 'the source gate must reject before any gh CLI call, --pr present or not');
 });
 
@@ -4749,7 +4749,7 @@ test('review --github --pr on a still-open PR (closed:false) reports it is open 
   // Crossed the real process boundary as a status read, never a create/push.
   assert.match(fs.readFileSync(ghLog, 'utf8'), /pr view 11/);
   const view = stateView(cwd);
-  assert.equal(view.work['gh-status-open'].status, 'proposed');
+  assert.equal(view.work['gh-status-open'].status, 'awaiting-approval');
   assert.equal(view.frictions?.['gh-status-open'], undefined, 'the status check never records friction');
 });
 
@@ -4769,7 +4769,7 @@ test('review --github --pr on a merged PR (closed:true, mergedAt set) reports it
   assert.equal(mergedStatusData.mergedAt, '2026-07-17T10:00:00Z');
   const view = stateView(cwd);
   // This cell never reconciles a GitHub-side merge into FSM state (out of scope, D4/D6).
-  assert.equal(view.work['gh-status-merged'].status, 'proposed');
+  assert.equal(view.work['gh-status-merged'].status, 'awaiting-approval');
   assert.equal(view.frictions?.['gh-status-merged'], undefined);
 });
 
@@ -4799,7 +4799,7 @@ test('review --github --pr on a closed-without-merge PR names the PR, points to 
   assert.ok(elapsedMs < 5000, `status check must resolve well under the default 10s poll timeout, took ${elapsedMs}ms`);
 
   const view = stateView(cwd);
-  assert.equal(view.work['gh-status-closed'].status, 'proposed', 'a GitHub-side close is not a reject — no FSM mutation');
+  assert.equal(view.work['gh-status-closed'].status, 'awaiting-approval', 'a GitHub-side close is not a reject — no FSM mutation');
   assert.equal(view.frictions?.['gh-status-closed'], undefined, 'the status check never records friction');
 });
 
@@ -4815,14 +4815,14 @@ test('review --github --pr reports a gh status-check failure as plain output wit
   assert.equal(failedData.outcome, 'check-failed');
   assert.equal(failedData.reason, 'auth-failure');
   const view = stateView(cwd);
-  assert.equal(view.work['gh-status-failed'].status, 'proposed');
+  assert.equal(view.work['gh-status-failed'].status, 'awaiting-approval');
   assert.equal(view.frictions?.['gh-status-failed'], undefined);
 });
 
 // --- catchup (D6/D7/D11: unified catch-up-by-merge for a merge-related park) ---
 
 // Builds on makeRunnerProposedItem: proposes a ROOT/standalone runner item,
-// then parks it blocked with `reason` via the real proposed -> blocked edge
+// then parks it blocked with `reason` via the real awaiting-approval -> blocked edge
 // (fsm.mjs's own reason requirement on that edge, same as the existing
 // 'approve of a runner item that conflicts' test above) so item.reason is
 // genuine, not synthesized.
@@ -4840,7 +4840,7 @@ function makeBlockedLeafItem(cwd, rootId, leafId, reason, extra = {}) {
   commitPending(cwd, `state: park ${leafId} (${reason})`);
 }
 
-test('catchup on a root parked with reason integration-drift, after a non-overlapping main-side change, merges main into fgw/<id> and bounces blocked -> proposed', () => {
+test('catchup on a root parked with reason integration-drift, after a non-overlapping main-side change, merges main into fgw/<id> and bounces blocked -> awaiting-approval', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   makeBlockedRunnerItem(cwd, 'catchup-root-drift', 'integration-drift', { verify: 'test -f catchup-root-drift-produced.txt' });
@@ -4857,11 +4857,11 @@ test('catchup on a root parked with reason integration-drift, after a non-overla
   assert.equal(result.status, 0, result.stderr);
   const catchupData = envelopeData(result.stdout);
   assert.equal(catchupData.from, 'blocked');
-  assert.equal(catchupData.to, 'proposed');
+  assert.equal(catchupData.to, 'awaiting-approval');
 
   assert.equal(gitHead(cwd), mainHeadBefore, "catchup must never touch the human's own main checkout");
   assert.equal(gitAtCwd(cwd, ['worktree', 'list', '--porcelain']), worktreesBefore, 'the ephemeral catchup worktree is cleaned up — no leftover');
-  assert.equal(stateView(cwd).work['catchup-root-drift'].status, 'proposed');
+  assert.equal(stateView(cwd).work['catchup-root-drift'].status, 'awaiting-approval');
 
   const branchLog = gitAtCwd(cwd, ['log', '--oneline', 'fgw/catchup-root-drift']);
   assert.match(branchLog, /catch-up: merge main into fgw\/catchup-root-drift/);
@@ -4890,12 +4890,12 @@ test('catchup on a leaf parked with reason merge-conflict targets its PARENT bra
   assert.equal(result.status, 0, result.stderr);
   const leafCatchupData = envelopeData(result.stdout);
   assert.equal(leafCatchupData.from, 'blocked');
-  assert.equal(leafCatchupData.to, 'proposed');
+  assert.equal(leafCatchupData.to, 'awaiting-approval');
   assert.equal(leafCatchupData.target, 'fgw/catchup-leaf-root', 'catchup must merge the PARENT branch, not main');
 
   assert.equal(gitHead(cwd), mainHeadBefore, 'a leaf catchup must never touch main');
   assert.equal(gitAtCwd(cwd, ['worktree', 'list', '--porcelain']), worktreesBefore, 'the ephemeral catchup worktree is cleaned up — no leftover');
-  assert.equal(stateView(cwd).work['catchup-leaf-child'].status, 'proposed');
+  assert.equal(stateView(cwd).work['catchup-leaf-child'].status, 'awaiting-approval');
 
   const branchLog = gitAtCwd(cwd, ['log', '--oneline', 'fgw/catchup-leaf-child']);
   assert.match(branchLog, /catch-up: merge fgw\/catchup-leaf-root into fgw\/catchup-leaf-child/);
@@ -4922,7 +4922,7 @@ test('catchup on an item whose target has a REAL same-line conflict leaves it bl
   gitAtCwd(cwd, ['commit', '-q', '-m', 'branch changes shared.txt']);
   gitAtCwd(cwd, ['checkout', 'main']);
 
-  run(cwd, ['move', 'catchup-conflict-item', '--to', 'proposed']);
+  run(cwd, ['move', 'catchup-conflict-item', '--to', 'awaiting-approval']);
   commitPending(cwd, 'state: propose catchup-conflict-item');
   run(cwd, ['move', 'catchup-conflict-item', '--to', 'blocked', '--reason', 'merge-conflict']);
   commitPending(cwd, 'state: park catchup-conflict-item');
@@ -4952,7 +4952,7 @@ test('catchup on an item blocked for an unrelated reason (e.g. anti-loop-max-vis
   const cwd = tmpCwd();
   addOk(cwd, 'catchup-unrelated-reason');
   run(cwd, ['move', 'catchup-unrelated-reason', '--to', 'doing']);
-  run(cwd, ['move', 'catchup-unrelated-reason', '--to', 'proposed']);
+  run(cwd, ['move', 'catchup-unrelated-reason', '--to', 'awaiting-approval']);
   run(cwd, ['move', 'catchup-unrelated-reason', '--to', 'blocked', '--reason', 'anti-loop-max-visits']);
 
   const result = run(cwd, ['catchup', 'catchup-unrelated-reason']);
@@ -5159,17 +5159,17 @@ test('return succeeds after a FIRST pick (todo -> doing, no prior blocked branch
 
   const result = run(cwd, ['return', 'pick-fresh-return-ok']);
   assert.equal(result.status, 0, `return failed: ${result.stderr}`);
-  assert.match(result.stdout, /proposed/);
+  assert.match(result.stdout, /awaiting-approval/);
 
   const view = stateView(cwd);
-  assert.equal(view.work['pick-fresh-return-ok'].status, 'proposed');
+  assert.equal(view.work['pick-fresh-return-ok'].status, 'awaiting-approval');
   assert.equal(view.work['pick-fresh-return-ok'].branchHeadAtReturn, branchHeadAtReturn);
   assert.equal('headAtReturn' in view.work['pick-fresh-return-ok'], false, 'a branch-source return never records the main-based headAtReturn');
   assert.equal(gitHead(cwd), mainHeadBefore, "return never advances or touches the human's own main checkout");
   assert.equal(gitAtCwd(cwd, ['worktree', 'list', '--porcelain']), worktreesBefore, 'the disposable detached verify worktree is cleaned up — no leftover');
 });
 
-test('return on a branch-source take: verify passes in a disposable detached worktree at the branch tip -> proposed, branchHeadAtReturn recorded (never headAtReturn), the human\'s own main checkout is untouched and no worktree is left behind', () => {
+test('return on a branch-source take: verify passes in a disposable detached worktree at the branch tip -> awaiting-approval, branchHeadAtReturn recorded (never headAtReturn), the human\'s own main checkout is untouched and no worktree is left behind', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   makeBlockedBranchItem(cwd, 'branch-return-ok', { verify: 'test -f proof.txt' });
@@ -5191,10 +5191,10 @@ test('return on a branch-source take: verify passes in a disposable detached wor
 
   const result = run(cwd, ['return', 'branch-return-ok']);
   assert.equal(result.status, 0, `return failed: ${result.stderr}`);
-  assert.match(result.stdout, /proposed/);
+  assert.match(result.stdout, /awaiting-approval/);
 
   const view = stateView(cwd);
-  assert.equal(view.work['branch-return-ok'].status, 'proposed');
+  assert.equal(view.work['branch-return-ok'].status, 'awaiting-approval');
   assert.equal(view.work['branch-return-ok'].branchHeadAtReturn, branchHeadAtReturn);
   assert.equal('headAtReturn' in view.work['branch-return-ok'], false, 'a branch return never records the main-based headAtReturn (D2 CẤM)');
   assert.equal(gitHead(cwd), mainHeadBefore, "return never advances or touches the human's own main checkout");
@@ -5221,7 +5221,7 @@ test('return on a branch-source take never touches a live main-checkout.lock (ts
 
   const result = run(cwd, ['return', 'branch-return-lock-untouched'], { BEE_SESSION_ID: 'tsk-45z-branch-session' });
   assert.equal(result.status, 0, `return failed: ${result.stderr}`);
-  assert.match(result.stdout, /proposed/);
+  assert.match(result.stdout, /awaiting-approval/);
   assert.equal(fs.existsSync(lockPath), true, 'a branch-source return must never touch main-checkout.lock, even one it could self-recognize');
 });
 
@@ -5256,7 +5256,7 @@ test('return on a branch-source take never requires the human\'s own main tree t
 
   const result = run(cwd, ['return', 'branch-return-dirty-main']);
   assert.equal(result.status, 0, `return must never inspect the main tree for a branch-source item: ${result.stderr}`);
-  assert.equal(stateView(cwd).work['branch-return-dirty-main'].status, 'proposed');
+  assert.equal(stateView(cwd).work['branch-return-dirty-main'].status, 'awaiting-approval');
   assert.equal(fs.readFileSync(path.join(cwd, 'scratch.txt'), 'utf8'), 'unrelated in-progress work\n', "the human's own dirty scratch file is untouched");
 });
 
@@ -5481,7 +5481,7 @@ function initSessionSafeCwd() {
 }
 
 // Builds a runner-classified proposed item (a live fgw/<id> branch with a real
-// commit, item moved doing->proposed) on an initSessionSafeCwd, WITHOUT ever
+// commit, item moved doing->awaiting-approval) on an initSessionSafeCwd, WITHOUT ever
 // committing `.fgos/` into HEAD — the only difference from makeRunnerProposedItem,
 // whose `git add -A` commits would both fold `.fgos/` into HEAD (breaking the
 // session-worktree symlink) and, under a fully-ignored `.fgos/`, have nothing to
@@ -5495,7 +5495,7 @@ function makeSessionSafeRunnerItem(cwd, id, extra = {}) {
   gitAtCwd(cwd, ['add', `${id}-produced.txt`]);
   gitAtCwd(cwd, ['commit', '-q', '-m', `worker output for ${id}`]);
   gitAtCwd(cwd, ['checkout', 'main']);
-  run(cwd, ['move', id, '--to', 'proposed']);
+  run(cwd, ['move', id, '--to', 'awaiting-approval']);
 }
 
 test('approve refuses from inside a registered session worktree (runner source) — no merge, item stays proposed, main HEAD unchanged, exit 4', () => {
@@ -5510,7 +5510,7 @@ test('approve refuses from inside a registered session worktree (runner source) 
     assert.equal(result.status, 4, `expected a clean validation refusal: ${result.stdout}${result.stderr}`);
     assert.match(result.stderr, /sess-runner/, 'the refusal names the session id cwd is nested inside');
     assert.match(result.stderr, /session end/, 'the refusal tells the caller how to proceed');
-    assert.equal(stateView(cwd).work['approve-nested-runner'].status, 'proposed', 'item is untouched — no merge, no state change');
+    assert.equal(stateView(cwd).work['approve-nested-runner'].status, 'awaiting-approval', 'item is untouched — no merge, no state change');
     assert.equal(gitHead(cwd), headBefore, 'main HEAD must be unchanged — no merge landed');
   } finally {
     endSession(cwd, session.sessionId, { force: true });
@@ -5532,7 +5532,7 @@ test('approve refuses from inside a registered session worktree (pull source) �
     const result = run(session.worktreePath, ['approve', 'approve-nested-pull']);
     assert.equal(result.status, 4, `expected a clean validation refusal: ${result.stdout}${result.stderr}`);
     assert.match(result.stderr, /sess-pull/, 'the refusal names the session id cwd is nested inside');
-    assert.equal(stateView(cwd).work['approve-nested-pull'].status, 'proposed', 'item stays proposed — goal-check never ran to close it');
+    assert.equal(stateView(cwd).work['approve-nested-pull'].status, 'awaiting-approval', 'item stays proposed — goal-check never ran to close it');
   } finally {
     endSession(cwd, session.sessionId, { force: true });
   }
@@ -5574,7 +5574,7 @@ test('approve from the main checkout is unaffected by the guard even while a ses
   }
 });
 
-test('return succeeds unchanged from inside a real session worktree (created via session.mjs createSession) — doing -> proposed, exit 0', () => {
+test('return succeeds unchanged from inside a real session worktree (created via session.mjs createSession) — doing -> awaiting-approval, exit 0', () => {
   const cwd = initSessionSafeCwd();
   run(cwd, ['init']);
   addOk(cwd, 'return-in-session', { verify: 'test -f proof.txt' });
@@ -5588,8 +5588,8 @@ test('return succeeds unchanged from inside a real session worktree (created via
   try {
     const result = run(session.worktreePath, ['return', 'return-in-session']);
     assert.equal(result.status, 0, `return from inside a session worktree should succeed unchanged: ${result.stdout}${result.stderr}`);
-    assert.match(result.stdout, /proposed/);
-    assert.equal(stateView(cwd).work['return-in-session'].status, 'proposed');
+    assert.match(result.stdout, /awaiting-approval/);
+    assert.equal(stateView(cwd).work['return-in-session'].status, 'awaiting-approval');
   } finally {
     endSession(cwd, session.sessionId, { force: true });
   }
@@ -5632,10 +5632,10 @@ test('approve refuses from an ad-hoc worktree never created through "fgos sessio
 
   const worktreePath = addAdHocWorktree(cwd, 'adhoc-runner-branch');
   try {
-    assert.equal(stateView(cwd).work['approve-adhoc-runner'].status, 'proposed', 'sanity: the ad-hoc worktree really does see the item (real committed events log)');
+    assert.equal(stateView(cwd).work['approve-adhoc-runner'].status, 'awaiting-approval', 'sanity: the ad-hoc worktree really does see the item (real committed events log)');
     const result = run(worktreePath, ['approve', 'approve-adhoc-runner']);
     assert.equal(result.status, 4, `expected a clean validation refusal, not a merge on an unregistered worktree: ${result.stdout}${result.stderr}`);
-    assert.equal(stateView(cwd).work['approve-adhoc-runner'].status, 'proposed', 'item is untouched — no merge, no false "done"');
+    assert.equal(stateView(cwd).work['approve-adhoc-runner'].status, 'awaiting-approval', 'item is untouched — no merge, no false "done"');
     assert.equal(gitHead(cwd), headBefore, 'main HEAD must be unchanged — nothing landed on main');
   } finally {
     removeAdHocWorktree(cwd, worktreePath);
@@ -5659,10 +5659,10 @@ test('approve refuses from an ad-hoc worktree never created through "fgos sessio
   // false-verification this guard must close.
   const worktreePath = addAdHocWorktree(cwd, 'adhoc-pull-branch');
   try {
-    assert.equal(stateView(cwd).work['approve-adhoc-pull'].status, 'proposed', 'sanity: the ad-hoc worktree really does see the item');
+    assert.equal(stateView(cwd).work['approve-adhoc-pull'].status, 'awaiting-approval', 'sanity: the ad-hoc worktree really does see the item');
     const result = run(worktreePath, ['approve', 'approve-adhoc-pull']);
     assert.equal(result.status, 4, `expected a clean validation refusal, not a false-verified goal-check: ${result.stdout}${result.stderr}`);
-    assert.equal(stateView(cwd).work['approve-adhoc-pull'].status, 'proposed', 'item stays proposed — goal-check never ran to close it');
+    assert.equal(stateView(cwd).work['approve-adhoc-pull'].status, 'awaiting-approval', 'item stays proposed — goal-check never ran to close it');
   } finally {
     removeAdHocWorktree(cwd, worktreePath);
   }
@@ -5716,7 +5716,7 @@ test('approve --github --pr refuses from an ad-hoc worktree never created throug
     assert.equal(result.status, 4, `expected a clean validation refusal, not a GitHub merge from an unregistered worktree: ${result.stdout}${result.stderr}`);
     assert.match(result.stderr, /main working tree/, 'the structural worktree-identity message, not the --github source-mismatch message');
     assert.ok(!fs.existsSync(marker), 'the worktree guard must reject before any gh CLI call');
-    assert.equal(stateView(cwd).work['approve-adhoc-github'].status, 'proposed', 'item is untouched — no moveWork, no false "done"');
+    assert.equal(stateView(cwd).work['approve-adhoc-github'].status, 'awaiting-approval', 'item is untouched — no moveWork, no false "done"');
     assert.equal(gitHead(cwd), headBefore, 'main HEAD must be unchanged — nothing landed on main');
   } finally {
     removeAdHocWorktree(cwd, worktreePath);
@@ -5737,7 +5737,7 @@ test('approve --github --pr refuses from inside a registered session worktree, w
     assert.match(result.stderr, /sess-github/, "the registry guard's friendlier session-naming message wins, not the generic structural message");
     assert.match(result.stderr, /session end/, 'the refusal tells the caller how to proceed');
     assert.ok(!fs.existsSync(marker), 'the worktree guard must reject before any gh CLI call');
-    assert.equal(stateView(cwd).work['approve-session-github'].status, 'proposed', 'item is untouched — no moveWork, no false "done"');
+    assert.equal(stateView(cwd).work['approve-session-github'].status, 'awaiting-approval', 'item is untouched — no moveWork, no false "done"');
   } finally {
     endSession(cwd, session.sessionId, { force: true });
   }
@@ -5761,10 +5761,10 @@ test('approve --github --pr on a runner item touching a self-modifying-capable m
   assert.match(result.stderr, /Iron Law/);
   assert.match(result.stderr, /src\/runner\/probe\.mjs/, 'the refusal must name the exact module that tripped required:true');
   assert.ok(!fs.existsSync(marker), 'the Iron Law gate must refuse before any gh CLI call');
-  assert.equal(stateView(cwd).work['gh-iron-refuse-item'].status, 'proposed', 'item is untouched — no moveWork, no false "done"');
+  assert.equal(stateView(cwd).work['gh-iron-refuse-item'].status, 'awaiting-approval', 'item is untouched — no moveWork, no false "done"');
 });
 
-test('approve --github --pr on the same self-modifying diff PROCEEDS with --acknowledge-iron-law: merges via the fake gh, proposed -> done (f01)', () => {
+test('approve --github --pr on the same self-modifying diff PROCEEDS with --acknowledge-iron-law: merges via the fake gh, awaiting-approval -> done (f01)', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   makeRunnerProposedItemTouching(cwd, 'gh-iron-ack-item', 'src/runner/probe.mjs', {
@@ -5921,7 +5921,7 @@ test('merge list: a proposed item whose dep is already done is ready', () => {
   // park it 'blocked' instead of 'done' — a false negative for this test.
   assert.equal(run(cwd, ['add', 'dep', '--title', 'Dep', '--kind', 'task', '--risk', 'low', '--verify', 'true']).status, 0);
   assert.equal(run(cwd, ['move', 'dep', '--to', 'doing']).status, 0);
-  assert.equal(run(cwd, ['move', 'dep', '--to', 'proposed']).status, 0);
+  assert.equal(run(cwd, ['move', 'dep', '--to', 'awaiting-approval']).status, 0);
   assert.equal(run(cwd, ['compound', 'dep']).status, 0);
   const approveResult = envelopeData(run(cwd, ['approve', 'dep']).stdout);
   assert.equal(approveResult.to, 'done', `expected dep to reach done, got: ${JSON.stringify(approveResult)}`);
@@ -5971,7 +5971,7 @@ test('merge next merges the single ready item by recursing into approve, item re
   // and-plugin-skill.md.
   assert.equal(run(cwd, ['add', 'solo', '--title', 'Solo', '--kind', 'task', '--risk', 'low', '--verify', 'true']).status, 0);
   assert.equal(run(cwd, ['move', 'solo', '--to', 'doing']).status, 0);
-  assert.equal(run(cwd, ['move', 'solo', '--to', 'proposed']).status, 0);
+  assert.equal(run(cwd, ['move', 'solo', '--to', 'awaiting-approval']).status, 0);
   assert.equal(run(cwd, ['compound', 'solo']).status, 0);
 
   const result = run(cwd, ['merge', 'next']);
@@ -5988,7 +5988,7 @@ test('merge next picks the higher-ranked (mvp goalTier) item first when two are 
   for (const id of ['plain', 'important']) {
     assert.equal(run(cwd, ['add', id, '--title', id, '--kind', 'task', '--risk', 'low', '--verify', 'true', ...(id === 'important' ? ['--goal-tier', 'mvp'] : [])]).status, 0);
     assert.equal(run(cwd, ['move', id, '--to', 'doing']).status, 0);
-    assert.equal(run(cwd, ['move', id, '--to', 'proposed']).status, 0);
+    assert.equal(run(cwd, ['move', id, '--to', 'awaiting-approval']).status, 0);
     assert.equal(run(cwd, ['compound', id]).status, 0);
   }
   const data = envelopeData(run(cwd, ['merge', 'next']).stdout);
@@ -6010,7 +6010,7 @@ test('merge next on a runner-sourced pick that trips the Iron Law: reports block
   assert.equal(data.blocked, 'iron-law');
   assert.match(data.message, /Iron Law/);
 
-  assert.equal(stateView(cwd).work['iron-next-item'].status, 'proposed', 'a blocked pick leaves the item proposed');
+  assert.equal(stateView(cwd).work['iron-next-item'].status, 'awaiting-approval', 'a blocked pick leaves the item proposed');
   assert.equal(gitHead(cwd), headBefore, 'a blocked pick attempts no merge -- HEAD is unchanged');
   const survivingBranches = gitAtCwd(cwd, ['for-each-ref', '--format=%(refname:short)', 'refs/heads/']);
   assert.match(survivingBranches, /fgw\/iron-next-item/, 'the branch survives -- nothing was merged or cleaned up');
@@ -6122,7 +6122,7 @@ test('submit with a malformed --acceptance is rejected as validation, exit 4, no
 // --- real CLI (move / approve) ---------------------------------------------
 //
 // Mirrors the RUL50 compound-learn tests above (`toCompoundLearn`, "move
-// proposed -> done (approval) applies via the real CLI"): an item must clear
+// awaiting-approval -> done (approval) applies via the real CLI"): an item must clear
 // BOTH the stage gate and this cell's acceptance-evidence gate before it can
 // close. `approve` on a plain (non-git-backed) item resolves to the
 // "legacy" source (no `fgw/<id>` branch, no headAtTake/headAtReturn) and its
@@ -6139,7 +6139,7 @@ test('move --to done is refused when a populated acceptance clause has no eviden
   const result = run(cwd, ['move', 'cli-cos-missing', '--to', 'done']);
   assert.equal(result.status, 2);
   assert.match(result.stderr, /ship it/);
-  assert.equal(stateView(cwd).work['cli-cos-missing'].status, 'proposed');
+  assert.equal(stateView(cwd).work['cli-cos-missing'].status, 'awaiting-approval');
   assert.equal(eventLines(cwd).length, before);
 });
 
@@ -6172,7 +6172,7 @@ test('editing in the missing evidence after a refusal, then retrying move --to d
   run(cwd, ['edit', 'cli-cos-retry', '--acceptance', JSON.stringify([{ text: 'ship it' }])]);
 
   assert.equal(run(cwd, ['move', 'cli-cos-retry', '--to', 'done']).status, 2);
-  assert.equal(stateView(cwd).work['cli-cos-retry'].status, 'proposed');
+  assert.equal(stateView(cwd).work['cli-cos-retry'].status, 'awaiting-approval');
 
   run(cwd, ['edit', 'cli-cos-retry', '--acceptance', JSON.stringify([{ text: 'ship it', evidence: 'test/cli/fgos.test.mjs:1' }])]);
   const result = run(cwd, ['move', 'cli-cos-retry', '--to', 'done']);
@@ -6185,14 +6185,14 @@ test('approve on a proposed item with a missing-evidence acceptance clause is re
   addOk(cwd, 'approve-cos-missing', { verify: 'true' });
   run(cwd, ['edit', 'approve-cos-missing', '--acceptance', JSON.stringify([{ text: 'ship it' }])]);
   run(cwd, ['move', 'approve-cos-missing', '--to', 'doing']);
-  run(cwd, ['move', 'approve-cos-missing', '--to', 'proposed']);
+  run(cwd, ['move', 'approve-cos-missing', '--to', 'awaiting-approval']);
   run(cwd, ['compound', 'approve-cos-missing']);
 
   const before = eventLines(cwd).length;
   const result = run(cwd, ['approve', 'approve-cos-missing']);
   assert.equal(result.status, 2, result.stderr);
   assert.match(result.stderr, /ship it/);
-  assert.equal(stateView(cwd).work['approve-cos-missing'].status, 'proposed');
+  assert.equal(stateView(cwd).work['approve-cos-missing'].status, 'awaiting-approval');
   assert.equal(eventLines(cwd).length, before);
 });
 

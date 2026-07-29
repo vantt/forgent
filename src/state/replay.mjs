@@ -109,7 +109,7 @@ function applyEvent(view, event) {
         }
       }
       // Latest human rationale on the item (worker-feedback): a `reason`
-      // rides reject (`proposed -> todo`) and park moves; fold the newest
+      // rides reject (`awaiting-approval -> todo`) and park moves; fold the newest
       // one onto the item (latest wins) so the next dispatch can hand the
       // worker the human's actual objection. Lazy: items whose moves never
       // carried a reason keep no `reason` key at all.
@@ -118,21 +118,21 @@ function applyEvent(view, event) {
       }
       // Pull-door return marker (pr-lifecycle D3/D4): folds onto the item the
       // same way `headAtTake` above folds on claim — durable per-item field,
-      // set only on THIS return's `to === 'proposed'` move (a runner's own
-      // `doing -> proposed` goal-check pass never carries `headAtReturn`, so
+      // set only on THIS return's `to === 'awaiting-approval'` move (a runner's own
+      // `doing -> awaiting-approval` goal-check pass never carries `headAtReturn`, so
       // this is a strict addition for the pull door, never a rewrite of the
       // runner's own proposal shape).
-      if (item && to === 'proposed' && headAtReturn !== undefined) {
+      if (item && to === 'awaiting-approval' && headAtReturn !== undefined) {
         item.headAtReturn = headAtReturn;
       }
       // Branch-source return marker (human-rounds D2, mirrors headAtReturn
-      // above): folds onto the item from THIS return's `to === 'proposed'`
+      // above): folds onto the item from THIS return's `to === 'awaiting-approval'`
       // move alone. A branch-source return never carries headAtReturn (CẤM
       // per D2 — mixing the two markers would give reviewDiff a meaningless
       // range), so the two fields are always mutually exclusive on a given
       // item, but the fold itself imposes no such check — it just reads
       // whichever field the move actually carried.
-      if (item && to === 'proposed' && branchHeadAtReturn !== undefined) {
+      if (item && to === 'awaiting-approval' && branchHeadAtReturn !== undefined) {
         item.branchHeadAtReturn = branchHeadAtReturn;
       }
       // Human-gate ask/answer (per async-human-gate D2/D5), mirroring the

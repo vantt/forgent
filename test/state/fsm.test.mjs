@@ -7,7 +7,7 @@ function work(status, overrides = {}) {
 }
 
 test('STATUSES exposes the full flat status domain', () => {
-  assert.deepEqual(STATUSES, ['todo', 'doing', 'blocked', 'proposed', 'done', 'awaiting-human', 'wontfix']);
+  assert.deepEqual(STATUSES, ['todo', 'doing', 'blocked', 'awaiting-approval', 'done', 'awaiting-human', 'wontfix']);
 });
 
 for (const [from, to] of [
@@ -17,9 +17,9 @@ for (const [from, to] of [
   ['doing', 'blocked'],
   ['blocked', 'todo'],
   ['blocked', 'doing'],
-  ['blocked', 'proposed'],
-  ['doing', 'proposed'],
-  ['proposed', 'done'],
+  ['blocked', 'awaiting-approval'],
+  ['doing', 'awaiting-approval'],
+  ['awaiting-approval', 'done'],
   ['blocked', 'wontfix'],
   ['todo', 'wontfix'],
   ['doing', 'wontfix'],
@@ -30,72 +30,72 @@ for (const [from, to] of [
   });
 }
 
-// fan-out-parallel D18: blocked -> proposed is the mechanical reconcile
+// fan-out-parallel D18: blocked -> awaiting-approval is the mechanical reconcile
 // door (drift catch-up + re-verify, CONTEXT.md D7/D8/D11) that returns a
 // parked root to `proposed` WITHOUT re-entering `doing`. This matters
 // because `runner/anti-loop.mjs`'s `visitCount` counts a work item's visits
 // by scanning for `work.move` events whose `payload.to` is strictly
-// `'doing'` — so this edge's event (`payload.to === 'proposed'`) is
+// `'doing'` — so this edge's event (`payload.to === 'awaiting-approval'`) is
 // provably never counted as an anti-loop visit, no matter how many times a
 // root cycles through it.
-test('transitionWork allows blocked -> proposed, and its event is never counted by anti-loop.mjs (payload.to is "proposed", not "doing")', () => {
-  const event = transitionWork({ work: work('blocked'), to: 'proposed' });
-  assert.deepEqual(event, { type: 'work.move', payload: { id: 'w1', from: 'blocked', to: 'proposed' } });
-  assert.equal(event.payload.to, 'proposed');
+test('transitionWork allows blocked -> awaiting-approval, and its event is never counted by anti-loop.mjs (payload.to is "awaiting-approval", not "doing")', () => {
+  const event = transitionWork({ work: work('blocked'), to: 'awaiting-approval' });
+  assert.deepEqual(event, { type: 'work.move', payload: { id: 'w1', from: 'blocked', to: 'awaiting-approval' } });
+  assert.equal(event.payload.to, 'awaiting-approval');
   assert.notEqual(event.payload.to, 'doing');
 });
 
-test('transitionWork allows proposed -> todo (rejection) and carries the reason in the payload', () => {
-  const event = transitionWork({ work: work('proposed'), to: 'todo', reason: 'goal-check failed twice' });
+test('transitionWork allows awaiting-approval -> todo (rejection) and carries the reason in the payload', () => {
+  const event = transitionWork({ work: work('awaiting-approval'), to: 'todo', reason: 'goal-check failed twice' });
   assert.deepEqual(event, {
     type: 'work.move',
-    payload: { id: 'w1', from: 'proposed', to: 'todo', reason: 'goal-check failed twice' },
+    payload: { id: 'w1', from: 'awaiting-approval', to: 'todo', reason: 'goal-check failed twice' },
   });
 });
 
-test('transitionWork rejects proposed -> todo without a reason as validation, not precondition', () => {
+test('transitionWork rejects awaiting-approval -> todo without a reason as validation, not precondition', () => {
   assert.throws(
-    () => transitionWork({ work: work('proposed'), to: 'todo' }),
+    () => transitionWork({ work: work('awaiting-approval'), to: 'todo' }),
     (err) => err instanceof FsmError && err.category === 'validation',
   );
   assert.throws(
-    () => transitionWork({ work: work('proposed'), to: 'todo', reason: '   ' }),
+    () => transitionWork({ work: work('awaiting-approval'), to: 'todo', reason: '   ' }),
     (err) => err instanceof FsmError && err.category === 'validation',
   );
 });
 
-// pr-lifecycle D3: proposed -> blocked (an approved proposal whose merge or
-// post-merge verify failed) requires a reason exactly like proposed -> todo.
-test('transitionWork allows proposed -> blocked and carries the reason in the payload', () => {
-  const event = transitionWork({ work: work('proposed'), to: 'blocked', reason: 'merge conflict' });
+// pr-lifecycle D3: awaiting-approval -> blocked (an approved proposal whose merge or
+// post-merge verify failed) requires a reason exactly like awaiting-approval -> todo.
+test('transitionWork allows awaiting-approval -> blocked and carries the reason in the payload', () => {
+  const event = transitionWork({ work: work('awaiting-approval'), to: 'blocked', reason: 'merge conflict' });
   assert.deepEqual(event, {
     type: 'work.move',
-    payload: { id: 'w1', from: 'proposed', to: 'blocked', reason: 'merge conflict' },
+    payload: { id: 'w1', from: 'awaiting-approval', to: 'blocked', reason: 'merge conflict' },
   });
 });
 
-test('transitionWork rejects proposed -> blocked without a reason as validation, not precondition', () => {
+test('transitionWork rejects awaiting-approval -> blocked without a reason as validation, not precondition', () => {
   assert.throws(
-    () => transitionWork({ work: work('proposed'), to: 'blocked' }),
+    () => transitionWork({ work: work('awaiting-approval'), to: 'blocked' }),
     (err) => err instanceof FsmError && err.category === 'validation',
   );
   assert.throws(
-    () => transitionWork({ work: work('proposed'), to: 'blocked', reason: '   ' }),
+    () => transitionWork({ work: work('awaiting-approval'), to: 'blocked', reason: '   ' }),
     (err) => err instanceof FsmError && err.category === 'validation',
   );
 });
 
-// Changed (pr-lifecycle-1): was "... other than proposed -> todo" — now two
-// edges require reason (proposed -> todo, proposed -> blocked, per D3), so
+// Changed (pr-lifecycle-1): was "... other than awaiting-approval -> todo" — now two
+// edges require reason (awaiting-approval -> todo, awaiting-approval -> blocked, per D3), so
 // the description and the edge exercised below are updated to name both.
-test('reason is ignored (never appears in payload) for every edge other than proposed -> todo/blocked', () => {
+test('reason is ignored (never appears in payload) for every edge other than awaiting-approval -> todo/blocked', () => {
   const event = transitionWork({ work: work('todo'), to: 'doing', reason: 'should be dropped' });
   assert.deepEqual(event, { type: 'work.move', payload: { id: 'w1', from: 'todo', to: 'doing' } });
 });
 
-// Changed (pr-lifecycle-1): added 'proposed->blocked' to legalEdges (per D3's
+// Changed (pr-lifecycle-1): added 'awaiting-approval->blocked' to legalEdges (per D3's
 // new table entry) and to the reason-required branch below, alongside the
-// existing 'proposed->todo' — this sweep asserts the FULL table, so a new
+// existing 'awaiting-approval->todo' — this sweep asserts the FULL table, so a new
 // edge left out here would silently pass as "still precondition" and hide
 // the addition.
 test('every legal edge is exactly the declared table; every other status pair is precondition', () => {
@@ -106,12 +106,12 @@ test('every legal edge is exactly the declared table; every other status pair is
     'doing->blocked',
     'blocked->todo',
     'blocked->doing',
-    'blocked->proposed',
-    'doing->proposed',
+    'blocked->awaiting-approval',
+    'doing->awaiting-approval',
     'doing->todo',
-    'proposed->done',
-    'proposed->todo',
-    'proposed->blocked',
+    'awaiting-approval->done',
+    'awaiting-approval->todo',
+    'awaiting-approval->blocked',
     'todo->awaiting-human',
     'doing->awaiting-human',
     'awaiting-human->todo',
@@ -125,7 +125,7 @@ test('every legal edge is exactly the declared table; every other status pair is
       const key = `${from}->${to}`;
       if (legalEdges.has(key)) {
         const args = { work: work(from), to };
-        if (key === 'proposed->todo' || key === 'proposed->blocked') args.reason = 'sweep-test reason';
+        if (key === 'awaiting-approval->todo' || key === 'awaiting-approval->blocked') args.reason = 'sweep-test reason';
         if (to === 'awaiting-human') args.ask = 'sweep-test ask';
         if (from === 'awaiting-human') args.answer = 'sweep-test answer';
         assert.doesNotThrow(() => transitionWork(args), `expected ${key} to be legal`);
@@ -218,14 +218,14 @@ test('ask/answer are ignored (never appear in payload) for every edge other than
   assert.deepEqual(event, { type: 'work.move', payload: { id: 'w1', from: 'todo', to: 'doing' } });
 });
 
-test('awaiting-human is not reachable from blocked, proposed, or done, and does not accept blocked/proposed/done as a resume target (todo/doing are the only two, per claim-lock §5.1)', () => {
-  for (const from of ['blocked', 'proposed', 'done']) {
+test('awaiting-human is not reachable from blocked, proposed, or done, and does not accept blocked/awaiting-approval/done as a resume target (todo/doing are the only two, per claim-lock §5.1)', () => {
+  for (const from of ['blocked', 'awaiting-approval', 'done']) {
     assert.throws(
       () => transitionWork({ work: work(from), to: 'awaiting-human', ask: 'irrelevant' }),
       (err) => err instanceof FsmError && err.category === 'precondition',
     );
   }
-  for (const to of ['blocked', 'proposed', 'done']) {
+  for (const to of ['blocked', 'awaiting-approval', 'done']) {
     assert.throws(
       () => transitionWork({ work: work('awaiting-human'), to, answer: 'irrelevant' }),
       (err) => err instanceof FsmError && err.category === 'precondition',
@@ -262,7 +262,7 @@ test('done is reachable only through the doing -> done edge, never directly from
 // alongside done — same no-exit shape, mirrors the 'done is terminal'
 // test above one status over.
 test('wontfix is terminal single-door: no transition out of wontfix, no matter the target', () => {
-  for (const to of ['todo', 'doing', 'blocked', 'proposed', 'done', 'awaiting-human']) {
+  for (const to of ['todo', 'doing', 'blocked', 'awaiting-approval', 'done', 'awaiting-human']) {
     assert.throws(
       () => transitionWork({ work: work('wontfix'), to }),
       (err) => err instanceof FsmError && err.category === 'precondition',
@@ -273,7 +273,7 @@ test('wontfix is terminal single-door: no transition out of wontfix, no matter t
 // D3: wontfix is reachable from exactly blocked/todo/doing — never from
 // proposed, done, or awaiting-human.
 test('wontfix is not reachable from proposed, done, or awaiting-human', () => {
-  for (const from of ['proposed', 'done', 'awaiting-human']) {
+  for (const from of ['awaiting-approval', 'done', 'awaiting-human']) {
     assert.throws(
       () => transitionWork({ work: work(from), to: 'wontfix' }),
       (err) => err instanceof FsmError && err.category === 'precondition',

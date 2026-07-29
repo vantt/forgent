@@ -171,7 +171,7 @@ test('a log mixing old (fixture) events followed by new (v-carrying) events fold
     },
   });
   appendEvent(logPath, { type: 'work.move', payload: { id: 'build-feature', from: 'todo', to: 'doing' } });
-  appendEvent(logPath, { type: 'work.move', payload: { id: 'build-feature', from: 'doing', to: 'proposed' } });
+  appendEvent(logPath, { type: 'work.move', payload: { id: 'build-feature', from: 'doing', to: 'awaiting-approval' } });
 
   const first = rebuildView(logPath);
   const second = rebuildView(logPath);
@@ -179,7 +179,7 @@ test('a log mixing old (fixture) events followed by new (v-carrying) events fold
 
   // Old items retain their defaulted tier alongside their updated status.
   assert.equal(first.work['setup-repo'].tier, 'standard');
-  assert.equal(first.work['build-feature'].status, 'proposed');
+  assert.equal(first.work['build-feature'].status, 'awaiting-approval');
   assert.equal(first.work['build-feature'].tier, 'standard');
 
   // New items: an explicit tier survives untouched; an omitted one still defaults.
@@ -220,8 +220,8 @@ test('a pure new log (every event carries v) replays correctly, not just old-alo
     },
   });
   appendEvent(logPath, { type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing' } });
-  appendEvent(logPath, { type: 'work.move', payload: { id: 'a', from: 'doing', to: 'proposed' } });
-  appendEvent(logPath, { type: 'work.move', payload: { id: 'a', from: 'proposed', to: 'done' } });
+  appendEvent(logPath, { type: 'work.move', payload: { id: 'a', from: 'doing', to: 'awaiting-approval' } });
+  appendEvent(logPath, { type: 'work.move', payload: { id: 'a', from: 'awaiting-approval', to: 'done' } });
   appendEvent(logPath, { type: 'decision', payload: { text: 'all-new log' } });
 
   const view = rebuildView(logPath);

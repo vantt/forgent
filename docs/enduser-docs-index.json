@@ -11,6 +11,14 @@
     "quadrant": "how-to",
     "purpose": "Show the steps to accomplish one specific, already-understood goal.",
     "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/add-a-new-createworktree-call-site.md",
+    "title": "How to add a new `createWorktree` call site without hand-writing cleanup",
+    "sourceCaptureId": "choke-point-createworktree-callsite-wrapper"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
     "docPath": "docs/how-to/add-a-read-only-fgos-verb-and-plugin-skill.md",
     "title": "Add a read-only fgOS verb and its plugin skill",
     "sourceCaptureId": "tsk-4j9-3"
@@ -123,6 +131,14 @@
     "quadrant": "how-to",
     "purpose": "Show the steps to accomplish one specific, already-understood goal.",
     "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/resolve-a-decision-id-collision-merge-conflict-on-approve.md",
+    "title": "How to resolve an `fgos approve` merge-conflict caused by two branches claiming the same decision ID",
+    "sourceCaptureId": "tsk-66l"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
     "docPath": "docs/how-to/run-a-state-verb-from-inside-a-worktree.md",
     "title": "How to run a state-writing `fgos` verb from inside a picked worktree",
     "sourceCaptureId": "tsk-56t"
@@ -150,6 +166,14 @@
     "docPath": "docs/how-to/smoke-test-fgos-executing-with-a-trivial-item.md",
     "title": "How to smoke-test fgos-executing with a trivial verify=true item",
     "sourceCaptureId": "str89-case-study-executing"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/unify-a-duplicated-clean-tree-check-across-return-and-approve.md",
+    "title": "How to unify two independently-written working-tree-clean checks into one scope-parameterized function",
+    "sourceCaptureId": "choke-point-workingtree-clean-duplication"
   },
   {
     "quadrant": "reference",
@@ -541,6 +565,14 @@
     "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/decisions/0023-uu-tien-san-pham-ship-dod-hoan-thien.md",
     "title": "0023 — Thứ tự ưu tiên sản phẩm: ship faster > DoD (result + docs) > hoàn thiện sau ngưỡng",
+    "sourceCaptureId": null
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/decisions/0024-doi-ten-status-proposed-thanh-awaiting-approval.md",
+    "title": "0024 — Đổi tên status `proposed` thành `awaiting-approval`",
     "sourceCaptureId": null
   }
 ]

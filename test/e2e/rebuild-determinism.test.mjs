@@ -80,9 +80,9 @@ test('rebuild-determinism: init, add work with deps + unicode title, move throug
   // A coding item must pass through the compound-learn stage before it can
   // close (D3): return for goal-check, take the deliberate compound-learn
   // transition, then close from there.
-  assert.equal(move(cwd, 'a', 'proposed', 'doing').status, 0);
+  assert.equal(move(cwd, 'a', 'awaiting-approval', 'doing').status, 0);
   assert.equal(run(cwd, ['compound', 'a']).status, 0);
-  assert.equal(move(cwd, 'a', 'done', 'proposed').status, 0);
+  assert.equal(move(cwd, 'a', 'done', 'awaiting-approval').status, 0);
 
   assert.equal(move(cwd, 'b', 'doing', 'todo').status, 0);
   assert.equal(move(cwd, 'b', 'blocked', 'doing').status, 0);

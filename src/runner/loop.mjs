@@ -77,7 +77,7 @@ import {
 } from './anti-loop.mjs';
 import { spawnWorker, modelForTier } from './dispatch.mjs';
 import { appendWorkerLog, appendWorkerLogChunk } from './worker-log.mjs';
-import { createWorktree, removeWorktree, listLeftovers, branchNameFor, createBranchRef } from './worktree.mjs';
+import { createDispatchWorktree, removeDispatchWorktree, listLeftovers, branchNameFor, createBranchRef } from './worktree.mjs';
 import { runGoalCheck } from './goal-check.mjs';
 import { createWriteQueue } from './write-queue.mjs';
 import { createOwnershipStore, resolveRoot, claimRoot, steerFrontier } from './root-affinity.mjs';
@@ -307,17 +307,6 @@ function tailLines(text, n = 10) {
   return lines.slice(-n).join('\n');
 }
 
-/** Teardown that never masks the real outcome: a failed removal is logged
- * and swallowed (the item's propose/park/halt result must still surface).
- * `force` because a failed worker may leave the checkout dirty. */
-function safeRemoveWorktree(repoRoot, worktreePath, log) {
-  try {
-    removeWorktree(repoRoot, worktreePath, { force: true });
-  } catch (err) {
-    log(`fgos-runner: worktree cleanup failed for "${worktreePath}": ${err.message}`);
-  }
-}
-
 /**
  * STARTUP REAP (reliability panel a/e/f): run BEFORE the frontier is even
  * computed, so `--once` is idempotent after a crash.
@@ -325,7 +314,7 @@ function safeRemoveWorktree(repoRoot, worktreePath, log) {
  * 1. Stale-doing resolution: any item sitting in `doing` (at most one under
  *    A1, but all are handled) has no live worker — the runner that claimed
  *    it is gone. Resolve per `resolveStaleDoing`: a branch carrying a commit
- *    whose verify passes completes the work (`doing -> proposed`); anything
+ *    whose verify passes completes the work (`doing -> awaiting-approval`); anything
  *    less reclaims it (`doing -> blocked`, reason runner-crash-reclaim).
  *    The verify for the completed case runs in a throwaway worktree of the
  *    item's own branch, torn down in a finally.
@@ -368,7 +357,7 @@ export async function startupReap({ repoRoot, dir, worktreeDir, verifyTimeoutMs,
     if (hasCommit) {
       let wt = null;
       try {
-        wt = createWorktree(repoRoot, id, { worktreeDir });
+        wt = createDispatchWorktree(repoRoot, id, { worktreeDir });
         verifyPassed = (await runGoalCheck(item, wt.path, verifyTimeoutMs)).passed;
       } catch (err) {
         // A worktree-fail here (e.g. this branch is irreconcilably checked
@@ -383,7 +372,7 @@ export async function startupReap({ repoRoot, dir, worktreeDir, verifyTimeoutMs,
           throw err;
         }
       } finally {
-        if (wt) safeRemoveWorktree(repoRoot, wt.path, log);
+        if (wt) removeDispatchWorktree(repoRoot, wt.path, log);
       }
     }
 
@@ -649,9 +638,9 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
         // already exists (an earlier sibling leaf, or the root's own prior
         // dispatch, already created it).
         createBranchRef(repoRoot, rootId, { baseRef: 'main' });
-        wt = createWorktree(repoRoot, item.id, { worktreeDir, baseRef: branchNameFor(rootId) });
+        wt = createDispatchWorktree(repoRoot, item.id, { worktreeDir, baseRef: branchNameFor(rootId) });
       } else {
-        wt = createWorktree(repoRoot, item.id, { worktreeDir });
+        wt = createDispatchWorktree(repoRoot, item.id, { worktreeDir });
       }
       if (dispatchBaseline === null) {
         dispatchBaseline = git(repoRoot, ['rev-parse', wt.branch]).trim();
@@ -703,7 +692,7 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
       if (check.passed && facts.aheadCount > 0) {
         breaker.recordHit(item.id);
         await queue.enqueue(async () => {
-          moveWork(dir, { id: item.id, to: 'proposed', expectedStatus: 'doing', role: 'runner' });
+          moveWork(dir, { id: item.id, to: 'awaiting-approval', expectedStatus: 'doing', role: 'runner' });
         });
         log(`fgos-runner: "${item.id}" proposed on branch ${wt.branch} (${facts.aheadCount} commit(s))`);
         log(`fgos-runner: verify tail:\n${tailLines(check.output)}`);
@@ -712,7 +701,7 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
           addOutcome(dir, {
             id: item.id,
             actual: {
-              outcome: 'proposed',
+              outcome: 'awaiting-approval',
               passed: true,
               attempts: attempt,
               errorClass: null,
@@ -721,7 +710,7 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
             },
           });
         });
-        return { outcome: 'proposed', id: item.id, branch: wt.branch, attempts: attempt, exitCode: 0 };
+        return { outcome: 'awaiting-approval', id: item.id, branch: wt.branch, attempts: attempt, exitCode: 0 };
       }
 
       failure = {
@@ -763,7 +752,7 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
         throw err;
       }
     } finally {
-      if (wt) safeRemoveWorktree(repoRoot, wt.path, log);
+      if (wt) removeDispatchWorktree(repoRoot, wt.path, log);
     }
 
     const decision = resolveAction(failure.errorClass, attempt);

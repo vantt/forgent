@@ -10,7 +10,7 @@
 import { moveWork, addOutcome, listWork, readRawEvents } from '../state/store.mjs';
 import { visitCount } from './anti-loop.mjs';
 import { acquireMainCheckoutLock, HELD, AMBIGUOUS, DEFAULT_TTL_MS, formatLockDurationMs } from './main-checkout-lock.mjs';
-import { createWorktree, branchNameFor, branchExists } from './worktree.mjs';
+import { createClaimWorktree, branchNameFor, branchExists } from './worktree.mjs';
 import { resolveRoot } from './root-affinity.mjs';
 import { execFileSync } from 'node:child_process';
 
@@ -171,7 +171,7 @@ export function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoot = pr
     // plan.md, or code already committed). Only THIS specific release is
     // exempted, via `latestTodoReleaseTrigger`'s positive marker check —
     // never inferred from status/branch-existence alone, since a reject
-    // (`proposed -> todo`) or a verify-fail park lands an item in the exact
+    // (`awaiting-approval -> todo`) or a verify-fail park lands an item in the exact
     // same shape without deleting the branch, and MUST still recompute
     // fresh (that recompute is the deliberate anti-cheat gate forcing new
     // work before a retaken item can `return` again).
@@ -240,7 +240,7 @@ export function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoot = pr
 
     // Create worktree if isolating
     if (isolate) {
-      const worktree = createWorktree(repoRoot, id, { worktreeDir, baseRef });
+      const worktree = createClaimWorktree(repoRoot, id, { worktreeDir, baseRef });
       return { ...claim, worktree };
     }
 

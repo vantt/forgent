@@ -370,7 +370,7 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, rol
   }
   // Pull-door return marker (pr-lifecycle D3/D4, mirrors headAtTake above):
   // the host repo's HEAD at return time, additive on the SAME `to ===
-  // 'proposed'` move `return` writes when it goes green — never a separate
+  // 'awaiting-approval'` move `return` writes when it goes green — never a separate
   // event (single write door, D3). Together with the claim's own
   // `headAtTake`, this gives the review gate an honest `headAtTake ->
   // headAtReturn` diff range for a pull-door proposal, without depending on
@@ -383,7 +383,7 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, rol
   }
   // Branch-source take/return markers (human-rounds D2): the SAME
   // post-transition stamp pattern as headAtTake/headAtReturn above, on the
-  // SAME edges (`to === 'doing'` for the claim, `to === 'proposed'` for the
+  // SAME edges (`to === 'doing'` for the claim, `to === 'awaiting-approval'` for the
   // return) — a branch-source take/return never writes headAtTake/
   // headAtReturn (those are the main-based discriminator; mixing the two
   // would give the review gate a meaningless diff range), so this is a
@@ -446,7 +446,7 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, rol
   // `releaseClaimOnExecuting` (decompose.mjs) ever passes this, so a
   // reader can positively identify "this todo-entry came from a claim-lock
   // §3b release" instead of inferring it from status/branch-existence
-  // alone, which reject (`proposed -> todo`) and a verify-fail park also
+  // alone, which reject (`awaiting-approval -> todo`) and a verify-fail park also
   // produce without deleting the branch.
   if (releaseTrigger !== undefined) {
     rawEvent.payload.releaseTrigger = releaseTrigger;
@@ -458,7 +458,7 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, rol
   // checks (line above) so a stale caller still gets 'conflict' first, and
   // BEFORE the append below so a refused close persists nothing (the whole
   // block runs under the held events.lock). Both doors into `done` — the
-  // proposed->done approval and the doing->done hand-move — converge on this
+  // awaiting-approval->done approval and the doing->done hand-move — converge on this
   // one call, so gating here covers both. Domains that declare no
   // Compound-learn stage (e.g. synthetic) are exempt: coding-only enforcement.
   // The current stage is read lazily, exactly as stage.mjs does — a missing
@@ -487,7 +487,7 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, rol
   // held `events.lock`, same `precondition` category, placed BEFORE the
   // append so a refused close persists nothing. `work.acceptance` absent,
   // null, or an empty array is a complete no-op (D4) — an item that never
-  // opted in is unaffected. Both doors into `done` (doing->done, proposed->
+  // opted in is unaffected. Both doors into `done` (doing->done, awaiting-approval->
   // done) converge on this one `moveWork` call, so gating here covers both,
   // exactly like RUL50's own comment describes for itself.
   if (to === 'done' && Array.isArray(work.acceptance) && work.acceptance.length > 0) {
@@ -503,7 +503,7 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, rol
   }
 
   // Câu-6 tự động (per Phase 3 S3-closeout (c), six-questions L5): BOTH doors
-  // into `done` (doing->done and proposed->done) converge on this one
+  // into `done` (doing->done and awaiting-approval->done) converge on this one
   // `moveWork` call, so gating on `to === 'done'` here — rather than at each
   // caller — covers both without duplication (must_haves truth 1).
   //

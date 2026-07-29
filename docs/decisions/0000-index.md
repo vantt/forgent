@@ -44,7 +44,7 @@ script tự-động kiểm), người viết record mới tự đối chiếu.
 | [0003](0003-dat-ten-va-bo-cuc-du-lieu.md) | Đặt tên & bố cục dữ liệu | CLI `fgos`, entity `work`, data dir `.fgos/` (events.jsonl = truth, state.json = view gitignored). |
 | [0004](0004-pham-vi-va-non-goal.md) | Phạm vi & non-goal | Domain đầu là work-state của chính forgent; chạy song song harness phát triển, không interop tới ngưỡng-có-tên. |
 | [0005](0005-runner-va-co-lap-worker.md) | Runner & cô lập worker | Executor headless; runner là người ghi duy nhất; worker sinh ĐỀ XUẤT trên nhánh cô lập; tier→model. |
-| [0006](0006-trang-thai-proposed.md) | Trạng thái `proposed` | Vòng đề-xuất → duyệt → merge; `done` nghĩa là "đã nhận vào cây chính". |
+| [0006](0006-trang-thai-proposed.md) | Trạng thái `proposed` | Vòng đề-xuất → duyệt → merge; `done` nghĩa là "đã nhận vào cây chính". **Tên `proposed` đã supersede bởi [0024](0024-doi-ten-status-proposed-thanh-awaiting-approval.md) → `awaiting-approval`; thiết kế FSM/edges không đổi.** |
 | [0007](0007-tien-hoa-schema-va-event.md) | Tiến hoá schema & event | Log đã commit bất khả xâm phạm; replay backward-compatible có test; event mang version. |
 | [0008](0008-routing-theo-audience.md) | Routing theo audience | Chọn kiểu giao tiếp theo audience của TỪNG interface, không áp một khuôn toàn cục. |
 | [0009](0009-chong-giao-thoa-luc-cai.md) | Chống giao thoa lúc cài | fgOS khi cài không được giao thoa tiến trình với harness khác (yêu cầu platform, chưa thực thi). |
@@ -60,6 +60,7 @@ script tự-động kiểm), người viết record mới tự đối chiếu.
 | [0020](0020-chan-fgos-khoi-worktree-worker.md) | Chặn `.fgos/` khỏi worktree worker | `fgw/<id>` worktree worker không được symlink (khóa-trong-cây) lẫn bootstrap-copy (cô-lập-cây) `.fgos/` — xóa hẳn khỏi checkout + `merge.mjs` từ chối cứng diff chạm `.fgos/`; `session.mjs` (actor trusted) giữ nguyên symlink D10. Mở rộng `0005`. |
 | [0021](0021-wire-main-checkout-hook-qua-doctor-setup.md) | Wire main-checkout lock hook qua doctor/setup | Str65's `.githooks/pre-commit` (đã viết, đã test) chỉ active khi `core.hooksPath` = `.githooks` — wire vào `fgos doctor` (đọc) + `fgos setup` (ghi, fill-only, không đè custom path); không app-level lock-wrap, không epoch-fence mới. Fix khả-tiếp-cận, không phải enforcement bắt buộc. |
 | [0023](0023-uu-tien-san-pham-ship-dod-hoan-thien.md) | Thứ tự ưu tiên sản phẩm | 3 bậc: ship faster > DoD (result verify + docs evidence-linked, cùng 1 gate) > hoàn thiện sau ngưỡng (polish, không mở rộng scope). |
+| [0024](0024-doi-ten-status-proposed-thanh-awaiting-approval.md) | Đổi tên status `proposed` thành `awaiting-approval` | `proposed` là ngoại lệ duy nhất trong 7 status không tự-giải-nghĩa; domain-agnostic (chứng minh qua `synthetic` domain) nên tên không được gắn nghĩa "merge". Đổi đồng nhất `work.status` + `outcome.actual.outcome`; migration ghi-đè-tại-chỗ dưới miễn trừ `0019`. Supersede một phần thuật ngữ của `0006`, giữ nguyên FSM edges. |
 
 ## Truy vết nguồn (đầy đủ)
 

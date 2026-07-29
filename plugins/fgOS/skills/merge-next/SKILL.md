@@ -52,7 +52,7 @@ CONTEXT.md` D6).
    - `{picked: <id>, blocked: "iron-law", message: "..."}` — the top pick
      trips the Iron Law gate (a self-modifying diff needing human-verified
      failing-test-first proof). Nothing was merged, the item stays
-     `proposed`. This never auto-resolves — tell the user which item
+     `awaiting-approval`. This never auto-resolves — tell the user which item
      tripped it and that a person needs to `/fgOS:approve <id>
      --acknowledge-iron-law` themselves after actually confirming
      failing-test-first proof; do not run that yourself on this skill's
