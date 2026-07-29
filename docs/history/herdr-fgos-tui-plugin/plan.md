@@ -101,24 +101,46 @@ rejected per D2 (this item ships an independent, actually-installable
 
 ## Shape / split
 
-Two child items, each carrying `parent: tsk-19y`:
+Reshaped per D6 (user steer: first slice is mock-UI-only, no real data)
+into **three** child items, each carrying `parent: tsk-19y` — piece 1 is
+now smaller/isolated than the original two-piece split had it:
 
-1. **"Herdr plugin scaffold + read-only impact/in-process dashboard TUI"**
-   Verify: `cargo test` in the new crate (fixture-based ordering/parse
-   tests from the risk map) passing, plus `herdr plugin link <path> &&
-   herdr plugin list --json` showing it registered. No dependency on
-   piece 2 — a read-only dashboard is a complete, shippable, reviewable
-   slice on its own.
+1. **"Herdr plugin scaffold + mock/static dashboard TUI (no real data)"**
+   Proves only the plumbing: `herdr-plugin.toml` manifest, `herdr plugin
+   link`, a `[[panes]]` entry that launches the ratatui binary, and the
+   binary rendering a dashboard with fake/hardcoded rows (no `fgos`
+   subprocess call at all yet). This is the whole first deliverable per
+   D6 — deliberately smaller than a full dashboard.
+   Mode for this piece alone: only 1 flag applies (external systems) —
+   **tiny/small**, not standard; no fgOS-CLI consumption or ranking logic
+   exists yet to make it multi-domain.
+   Verify: `cargo build --release --manifest-path plugins/herdr-fgos/
+   Cargo.toml` succeeds, a rendering smoke test against ratatui's own
+   `TestBackend` doesn't panic, and `herdr plugin link <path> && herdr
+   plugin list --json` shows it registered and enabled. No dependency on
+   pieces 2 or 3.
 
-2. **"Pick orchestration action (dashboard row → new pane → claude →
+2. **"Wire real fgOS data into the dashboard (impact sort + in-process
+   list)"**
+   Replaces piece 1's mock rows with real polling: `fgos triage --json`
+   for the impact-sorted list (D5) and `fgos list --all --json` filtered
+   to `status: doing` for the in-process list (D4). Depends on piece 1
+   (the rendering/manifest/link plumbing must already work before wiring
+   real data into it).
+   Verify: `cargo test` in the crate — the fixture-based ordering/parse
+   tests from the risk map (byte-for-byte match against D5's `rankImpact`
+   order, correct `doing`-only filtering for the in-process list).
+
+3. **"Pick orchestration action (dashboard row → new pane → claude →
    `/fgOS:pick <id>`)"**
-   Depends on child 1 (needs a working dashboard with selectable rows to
-   trigger the action from — there is nothing to "pick" without it).
+   Depends on piece 2 (needs a working dashboard with real, selectable
+   item ids to trigger the action from — there is nothing meaningful to
+   "pick" against mock rows).
    Verify: the stubbed argv-shape test from the risk map passing, plus one
    manual smoke run in a real herdr session confirmed by whoever executes
    this child.
 
-Not split out as a third item, per D1: merge/dispatch orchestration —
+Not split out as a fourth item, per D1: merge/dispatch orchestration —
 explicitly deferred to a future item, not sketched here at all.
 
 `fgos discover tsk-19y` (the engine's own decompose judgment, not this

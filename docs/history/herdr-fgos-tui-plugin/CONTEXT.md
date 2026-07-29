@@ -29,6 +29,7 @@ the dashboard + pick flow prove out.
 | D3 | Distribution is internal-only: a `herdr plugin link` target living in this repo, for this project's own operator use. No marketplace publish, no external README/semver discipline. |
 | D4 | "In-process task" list = fgOS items with `status: doing`, read via the fgOS CLI (`fgos list --json` / `fgos triage --json`) — **never** herdr's own `agent_status`. This is not a new call: it is the same hard rule STR40 already locked (decision `d3dbe7f5`) after a real production bug where herdr's own agent-detection became a second, competing source of truth ("idle killed an agent"). This plugin inherits that rule, does not re-decide it. |
 | D5 | "Impact" sort = the fgOS backlog's existing `rankImpact` order (`src/state/impact.mjs`, exposed today by `fgos triage`): declared `goalTier` first (`mvp` then `milestone` then ungrouped), then blocking fan-out (`blocks`) descending, ties broken by ascending id. No new ranking scheme — this is pure consumption of a verb that already exists. |
+| D6 | First deliverable is a **mock/static UI** — a rendered dashboard with fake/placeholder rows, proving only that the herdr-plugin plumbing works end to end (manifest, `herdr plugin link`, pane launch, rendering). Wiring real fgOS data (D4/D5's impact sort + in-process list) is explicitly a separate, later piece — not bundled into the first slice. (User steer, given mid-planning after the split was already shaped around real data from the start.) |
 
 ## Pinned terms
 
