@@ -6,7 +6,7 @@ timestamp: 2026-07-22T00:00:00.000Z
 source_capture_ids: []
 date: 2026-07-14
 status: accepted
-superseded_by: 0023
+superseded_by: 0024
 source_decisions: [feed7428]
 supersedes: []
 relates_specs: [work-state, runner]

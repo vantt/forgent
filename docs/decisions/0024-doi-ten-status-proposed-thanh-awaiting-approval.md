@@ -1,6 +1,6 @@
 ---
 type: explanation
-title: 0023 — Đổi tên status `proposed` thành `awaiting-approval`
+title: 0024 — Đổi tên status `proposed` thành `awaiting-approval`
 tags: []
 timestamp: 2026-07-29T00:00:00.000Z
 source_capture_ids: []
@@ -10,7 +10,7 @@ supersedes: [0006]
 relates_specs: [work-state]
 ---
 
-# 0023 — Đổi tên status `proposed` thành `awaiting-approval`
+# 0024 — Đổi tên status `proposed` thành `awaiting-approval`
 
 ## Bối cảnh
 
@@ -61,7 +61,7 @@ dry-run, seq-contiguity check) để ghi đè tại chỗ 3 kho `.fgos` trong ph
   này, chặn Pha B trên riêng kho sống cho tới khi ai đó xử lý riêng; không
   chặn `dogfood-fixture`/`fgos-test-drive` (dry-run sạch trên cả hai).
 - `0006` không sửa tại chỗ — vẫn đúng nguyên văn lịch sử của nó (chỉ nhận thêm
-  `superseded_by: 0023` trong frontmatter, đúng khuôn STR72 trỏ-ngược-bắt-buộc);
+  `superseded_by: 0024` trong frontmatter, đúng khuôn STR72 trỏ-ngược-bắt-buộc);
   record này khai `supersedes: [0006]` — supersede MỘT PHẦN (thuật ngữ), không
   phải toàn bộ thiết kế FSM của `0006`.
 
