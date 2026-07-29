@@ -101,6 +101,24 @@ doing` and `fgos return tsk-34y` again produced a clean pass with no code
 change in between, confirming the first block was a verify-field defect,
 not a regression in the work.
 
+## Recurrence: the same item hit this a second time
+
+`tsk-34y` tripped this exact defect twice, on two separate execution
+rounds of the same work item — not a one-off. The item's real capture
+(`fgos check tsk-34y`, second round) shows the identical friction shape:
+
+> `"friction":{"count":1,"byLayer":{"verification":1},"recent":[{"id":"tsk-34y","disposition":"blocked","errorClass":"verify-miss","layer":"verification","attempts":1,"detail":"goal-check failed on branch \"fgw/tsk-34y\" (exit 2)","ts":"2026-07-29T13:14:17.383Z"}]}`
+> — real `fgos check` output, second round
+
+Between the two rounds, the item cycled back through `clarify`/`decompose`
+(a fresh `fgos discover` run), which re-generated the same
+prose-mixed `verify` string from scratch — the fix from the first round
+(`fgos edit <id> --verify "npm test"`) does not persist across a
+re-discover, because `judgeDecompose` derives the field again each time
+rather than reading back what a human already corrected. The same
+steps 3-4 above fixed it again, with no code change in between, confirming
+this is purely a recurring verify-field defect, not a regression.
+
 ## Related
 
 - `fgos check <id>` — full outcome/friction history for an item, including
