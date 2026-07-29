@@ -152,6 +152,19 @@ pass, just flattening instead of renaming the parent).
 The probe files (`zzz-flat-test`, `zzz-nest-test`) were deleted after
 the test — disposable, never meant to persist.
 
+## D4 — fix confirmed working (final proof)
+
+The D3 flatten shipped (commit `1e14290` on `fgw/tsk-d3c`), `npm test`
+green (1641 pass), item returned to `proposed`. A fresh session opened
+directly in the same worktree then called
+`Skill({skill: "fgos-routing"})` — the exact call that failed with
+`Unknown skill` at the start of this item — and it loaded successfully,
+immediately orienting via `fgos list`/`fgos ready` per its own flow.
+
+**tsk-d3c's core bug is fixed and confirmed, end to end**: claim →
+root-cause (twice, once wrong then corrected) → shape → validate →
+implement → verify → real-session confirmation.
+
 ## Canonical references
 
 - `.claude/skills/fgos/fgos-routing/SKILL.md`
