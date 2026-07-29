@@ -2,93 +2,58 @@
 item: tsk-6b6
 stage: decompose (shaping)
 date: 2026-07-29
+revised: 2026-07-29 (tsk-63c landed with a different schema shape than originally assumed — see CONTEXT.md D1/D5 revision)
 ---
 
 # plan.md: decompose verdict capture
 
 ## Mode
 
-Flags counted against the mechanical gate:
+Flags counted against the mechanical gate, **recounted after tsk-63c
+landed** (originally 5 flags/high-risk; the schema/CLI/replay work this
+item used to own is now already shipped elsewhere):
 
 | Flag | Applies? | Why |
 |---|---|---|
 | auth | no | |
 | authorization | no | |
-| data model | **yes** | `addDecision`'s payload shape changes (`store.mjs:603`), and `decision` events' fold shape changes (`replay.mjs:254-255`) |
-| audit/security | **yes** | this feature IS the audit/decision-trail mechanism for an automated judge — the exact surface tsk-ma4's audit was about |
-| external systems | no | no new external call; the model/judge-executor path already exists |
-| public contracts | **yes** | `addDecision`/CLI `decision` verb is an existing public surface; see the compatibility risk below — the naive reading of CONTEXT.md D1 ("rationale required") would break it |
+| data model | no | `addDecision`/`view.decisionsById` already shipped by tsk-63c (`store.mjs:631-643`, `replay.mjs:261-280`) — this item does not touch that schema |
+| audit/security | **yes** | this feature is still the audit/decision-trail wiring for an automated judge — the surface tsk-ma4's audit was about |
+| external systems | no | no new external call |
+| public contracts | no | CLI `decision` verb already carries `--id`/`--rationale`/`--alternatives`/`--source` (`bin/fgos.mjs:1034-1042`, shipped) — this item does not touch the CLI |
 | cross-platform | no | |
-| existing covered behavior | **yes** | `bin/fgos.mjs:1025` is the ONLY production caller of `addDecision`, passing `{text}` only; `test/cli/fgos.test.mjs:694,705` and every `fgos decision --text` call inside `fgos-exploring`/`fgos-planning`/`cook` skills (including the 6 decision calls already logged for this very item) depend on that shape staying callable |
+| existing covered behavior | **yes** | `test/intake/decompose.test.mjs` has 38 passing tests, 13 fixtures constructing `verdict: 'decompose'` — see the recount below |
 | weak proof around the area | **yes** | item's own `verify` field reads "chưa xác định — P15 bổ sung" (not yet determined) |
-| multi-domain | no | single domain (coding), `src/intake` + `src/state` + `bin` |
+| multi-domain | no | single domain (coding), `src/intake/decompose.mjs` only |
 
-**5 flags → high-risk mode**, per the mechanical rule (4+ flags). Confirmed
-by direct grep evidence, not vibes — see Risk map below for the one flag
-(existing covered behavior) that actually threatens a live regression if
-handled naively.
+**3 flags → standard mode** (down from the original 5-flag/high-risk
+count). The scope shrunk for real reasons, not by relaxing rigor: the
+schema/CLI/replay risk this item used to carry is now someone else's
+already-landed, already-tested code.
 
 ## Approach
 
-### The one real risk: "rationale required" as CONTEXT.md D1 literally reads would break production today
+### What changed since the original plan
 
-CONTEXT.md's D1 says `addDecision` gains `rationale (required, throws if
-blank — mirrors bee's decisions.mjs:307-308)`. Taken unconditionally, this
-breaks the **only** existing production caller
-(`bin/fgos.mjs:1025`: `addDecision(dir, { text })`, no rationale) and fails
-two live tests (`test/cli/fgos.test.mjs:694` "decision logs one event...
-exit 0", and implicitly every bare `fgos decision --text "..."` call this
-session already made while locking tsk-6b6's own D1-D5, and every call
-`fgos-exploring`/`fgos-planning`/`cook` skills make the same way).
+The original plan (this same file, pre-revision) had this item build the
+`addDecision` extension itself (files 1-3 below). `tsk-63c` shipped that
+extension while this item sat blocked on it — with a **different** shape
+than CONTEXT.md D1 originally locked:
+- `rationale` is required **unconditionally** (not scoped to `id`-present).
+- The fold is **dual**: `view.decisions` (flat) always gets the push;
+  `view.decisionsById[id]` (not `view.decisions[id]`) is an *additional*
+  fold when `id` is present — never either/or.
+- CLI flags (`--id`/`--rationale`/`--alternatives`/`--source`) already
+  exist.
 
-**Resolution (implementation detail, not a reopening of D1):** `rationale`
-is required **only when `payload.id` is present** — i.e., only for the new
-id-scoped shape `judgeDecompose` actually uses. A bare, unscoped
-`addDecision(dir, { text })` call (today's only production shape) is
-completely untouched: no `id`, so no rationale requirement, identical
-behavior to today. This is the only reading that honors D1's "required"
-language for the feature it was written for (judgeDecompose's own calls
-always carry `id` + `source: 'judgeDecompose'`) without regressing the
-pre-existing global decision log every skill in this repo already depends
-on. Flagged as this plan's #1 proof point for `fgos-validating`.
-
-### Fold shape for `view.decisions[id]`
-
-Checked `replay.mjs:322-338` (`work.discovery`) and the sibling
-`work.friction`/`work.outcome` cases: each of those is a **separate, already
-id-namespaced event type** (`work.discovery`, not `decision`), so they only
-ever fold into their own `view.<key>[id]`, never also into a flat array.
-`decision` is different — it is ONE event type serving both the pre-existing
-global log and (after this change) the new id-scoped shape. Resolution:
-`case 'decision'` in `replay.mjs` branches on `payload.id` —
-- **`id` present** → append to `view.decisions[id]` (lazy key, array,
-  append-only — same append rule `work.discovery` already uses), and
-  **not** also pushed into the flat `view.decisions` array.
-- **`id` absent** → exactly today's behavior: push into the flat
-  `view.decisions` array.
-
-This keeps `test/state/replay.mjs:86` ("foldEvents collects decision events
-into view.decisions... `{text, ts}`") passing unmodified for every
-id-less event — old and new — while giving `judgeDecompose`'s calls a
-dedicated per-item view exactly like `view.discovery[id]`.
+This item's remaining scope is therefore **only `src/intake/decompose.mjs`**
+— consuming the shipped `addDecision`, plus the model-prompt change
+(D2/D3) that was always this item's own to build regardless of who owns
+the schema.
 
 ### Files touched, in dependency order
 
-1. **`src/state/store.mjs`** — extend `addDecision(dir, payload)`: accept
-   optional `id`, optional `rationale`/`alternatives`/`source`; throw
-   `StoreError('validation', ...)` when `id` is present and `rationale` is
-   blank/missing (mirrors the existing blank-`text` check already there).
-   `text` stays required exactly as today, unconditionally (D1 does not
-   touch it — bee's `decision` field and fgOS's existing `text` field serve
-   the same "what was decided" role; nothing here renames or drops it).
-2. **`src/state/replay.mjs`** — `case 'decision'`: add the `id`-branch fold
-   described above.
-3. **`bin/fgos.mjs`** — `case 'decision'`: add optional `--id`,
-   `--rationale`, `--alternatives`, `--source` flags, threaded straight
-   into `addDecision`'s payload (same `optionalField` idiom every other
-   optional flag in this file already uses). Additive only — no existing
-   flag changes shape.
-4. **`src/intake/decompose.mjs`** —
+1. **`src/intake/decompose.mjs`** —
    a. `buildDecomposePrompt`: extend the JSON schema description (currently
       line 120) so `pass-through` gains an optional top-level `"reason"`
       and `decompose` gains a **required** top-level `"reason"` (separate
@@ -100,58 +65,51 @@ dedicated per-item view exactly like `view.discovery[id]`.
       mirroring `normalizeChild`'s existing missing-`verify` rule at
       `decompose.mjs:127-131`).
    c. `resolveDecompose`: each of the four outcome branches
-      (`invalid`/`need-human`/`pass-through`/`decompose`) calls
-      `addDecision(dir, { id, source: 'judgeDecompose', rationale, alternatives? })`
-      alongside its existing `moveStage`/`putInAwaiting` call — `rationale`
-      sourced per CONTEXT.md's pinned term (`verdict.reason` →
-      `rationale`), with `invalid`'s rationale always the fixed string
-      from CONTEXT.md D3 (no model text exists to draw from on that path).
+      (`invalid`/`need-human`/`pass-through`/`decompose`) calls the
+      **already-shipped** `addDecision(dir, { id, text, source:
+      'judgeDecompose', rationale, alternatives? })` alongside its existing
+      `moveStage`/`putInAwaiting` call. `text` is required by the shipped
+      schema (unconditionally, unrelated to this feature) — a short fixed
+      label per branch (e.g. `"decompose verdict: pass-through"`,
+      `"decompose verdict: decompose (N children)"`), distinct from
+      `rationale` (the why, per CONTEXT.md's pinned term: `verdict.reason`
+      → `rationale`). `invalid`'s `rationale`/`text` are always the fixed
+      strings from CONTEXT.md D3 (no model text exists to draw from on
+      that path).
 
-No `fgos graph`-driven reordering needed — this item has no children today
-and nothing else in the graph depends on it landing in a particular
-sub-order; the four files above have a strict internal dependency chain
-(schema before wiring, prompt before wiring) which already fixes the order.
+No other files are in scope. No `fgos graph`-driven reordering needed —
+one file, one internal dependency chain (prompt/parsing before wiring).
 
 ## Risk map
 
 | Component | Risk | Proof point (→ fgos-validating) |
 |---|---|---|
-| `addDecision` required-rationale scoping | **high** — naive reading breaks the only production caller + 2 live tests + every skill's bare decision logging | Confirm `test/cli/fgos.test.mjs:694,705` still pass unmodified; confirm a bare `fgos decision --text "..."` (no `--id`) still exits 0 after the change |
-| `replay.mjs` decision fold branch | medium — must not touch the flat-array path for id-less events | Confirm `test/state/replay.mjs:86-97` (the two existing decision-fold tests) still pass byte-for-byte |
-| `decompose.mjs` reason parsing (D2/D3) | medium — a required top-level `reason` on the `decompose` branch changes what a previously-valid model response now normalizes to | Confirm existing `test/intake/decompose.test.mjs` cases for `decompose`-with-children still pass once fixtures gain a `reason` field; add one new case for "decompose verdict missing top-level reason → invalid" |
-| `resolveDecompose` calling `addDecision` on every branch | low — additive call, no existing return-shape change (per `resolveDecompose`'s own doc comment, `outcome` values are unchanged) | Confirm `view.decisions['<item-id>']` gains one entry per `discover` call, for all 4 branches (invalid/need-human/pass-through/decompose) — this is the item's own stated verify criterion |
-| CLI `decision` verb new flags | low | Confirm `--id`/`--rationale`/`--alternatives`/`--source` are all optional and omitting all four reproduces today's exact behavior |
+| `decompose.mjs` reason parsing (D2/D3) | medium — a required top-level `reason` on the `decompose` branch changes what a previously-valid model response now normalizes to | Confirm `test/intake/decompose.test.mjs`'s 13 `verdict: 'decompose'` fixtures (2 unaffected — 0-children and missing-verify negative paths); the other ~11 need a `reason` field added or they flip to `kind: 'invalid'`; add one new case for "decompose verdict missing top-level reason → invalid" |
+| `resolveDecompose` calling the shipped `addDecision` on every branch | low — additive call, no existing return-shape change (per `resolveDecompose`'s own doc comment, `outcome` values are unchanged); `text`/`rationale`/`id`/`source` are all fields the shipped `addDecision` already accepts | Confirm `view.decisionsById['<item-id>']` gains one entry per `discover` call, for all 4 branches (invalid/need-human/pass-through/decompose) — this is the item's own stated verify criterion |
 
 ## Concrete cases to prove against
 
-- Bare `fgos decision --text "..."` (no id) — must still work exactly as
-  today (regression guard for the #1 risk above).
 - `judgeDecompose` returns `pass-through` with no `reason` — must fall back
   to the fixed rationale (D2), not throw.
 - `judgeDecompose` returns `decompose` with children but no top-level
   `reason` — must normalize to `invalid` (D3), matching the existing
   missing-child-`verify` precedent.
-- `judgeDecompose` returns `invalid` (model/parse failure) — `rationale`
-  logged is always the fixed string, never sourced from `verdict`.
+- `judgeDecompose` returns `invalid` (model/parse failure) — `rationale`/
+  `text` logged are always the fixed strings, never sourced from `verdict`.
 - Two consecutive `discover` calls on the same item, different branches
-  each time (e.g. `need-human` then `decompose`) — `view.decisions[id]`
+  each time (e.g. `need-human` then `decompose`) — `view.decisionsById[id]`
   must accumulate both, never overwrite (append-only, matches
-  `view.discovery[id]`'s existing rule).
-- Re-entrant `already-decomposed` path (`decompose.mjs:287-292`) — decide
-  whether it also logs a decision record or stays silent (it currently
-  calls `moveStage` only, same as `pass-through`, but is a *different*
-  outcome kind not explicitly named in CONTEXT.md's four branches); leaning
+  `view.discovery[id]`'s existing rule and tsk-63c's own fold comment).
+- Re-entrant `already-decomposed` path (`decompose.mjs:287-292`) — leaning
   toward: no new record here, since children already carry their own trace
   and this path is purely a crash-recovery no-op, not a fresh judgment —
-  flagged for `fgos-validating` to confirm against the item's own verify
+  flagged for `fgos-executing` to confirm against the item's own verify
   wording ("cả 4 nhánh").
 
 ## No split
 
-This is one coherent piece: the schema extension (files 1-3) has no
-standalone value without `decompose.mjs` actually calling it (the item's
-own verify criterion needs all three), and the prompt change (4a/4b) has no
-standalone value without the wiring (4c) actually using the new field.
-Splitting into "schema" / "prompt" / "wiring" child items would produce
-three items with no independently runnable verify command — exactly what
-step 5's own rule rules out. Proceeds as one item.
+One file, one coherent change: the prompt/parsing change (1a/1b) has no
+standalone value without the wiring (1c) actually using the new field, and
+neither has an independently runnable verify command apart from the
+item's own stated verify (all 4 branches recording a decision). Proceeds
+as one item.
