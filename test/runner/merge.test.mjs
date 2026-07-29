@@ -424,6 +424,42 @@ test('mergeRunnerItem merges normally when the lock is free, and releases it aft
   assert.equal(afterLock.status, ACQUIRED, 'lock must be released after a successful merge, not left held');
 });
 
+// tsk-3yl: idempotent already-merged branch (docs/backlog.md p-b91d487a) —
+// a prior approve run already landed the merge commit but died at a LATER
+// step, so a retry finds the branch already an ancestor of HEAD. Reproduced
+// here by fast-forwarding the merge in directly (bypassing mergeRunnerItem
+// entirely), simulating "a prior successful run already committed it".
+
+test('mergeRunnerItem is idempotent: a branch already merged into HEAD returns outcome "merged" without attempting a redundant commit', async () => {
+  const repoRoot = initRepo();
+  makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
+
+  // Simulate an earlier, already-successful merge that landed the commit.
+  git(repoRoot, ['merge', '--no-ff', '-q', '-m', 'earlier successful merge', 'fgw/demo-item']);
+  const headAfterFirstMerge = headOf(repoRoot);
+
+  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'test -f produced.txt' }));
+  assert.equal(result.outcome, 'merged');
+  assert.equal(result.check.passed, true);
+  assert.equal(headOf(repoRoot), headAfterFirstMerge, 'no new commit should be created for an already-merged branch');
+  assert.equal(isWorkingTreeClean(repoRoot), true);
+});
+
+test('mergeRunnerItem on an already-merged branch still re-runs verify and returns "verify-fail" if HEAD has since regressed', async () => {
+  const repoRoot = initRepo();
+  makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
+  git(repoRoot, ['merge', '--no-ff', '-q', '-m', 'earlier successful merge', 'fgw/demo-item']);
+
+  // Something else broke on HEAD since that earlier merge landed.
+  fs.unlinkSync(path.join(repoRoot, 'produced.txt'));
+  git(repoRoot, ['add', '-A']);
+  git(repoRoot, ['commit', '-q', '-m', 'unrelated regression removes produced.txt']);
+
+  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'test -f produced.txt' }));
+  assert.equal(result.outcome, 'verify-fail');
+  assert.equal(result.check.passed, false);
+});
+
 // --- mergeRunnerItem rejects a .fgos/ write on the branch (ADR0020) -------
 //
 // worktree.mjs's createWorktree no longer checks .fgos/ out into a worker's

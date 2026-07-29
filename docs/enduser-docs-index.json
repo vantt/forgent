@@ -59,6 +59,14 @@
     "quadrant": "how-to",
     "purpose": "Show the steps to accomplish one specific, already-understood goal.",
     "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/fix-a-verify-command-broken-by-mixed-in-prose.md",
+    "title": "How to fix a verify command that mixes prose with a real command",
+    "sourceCaptureId": null
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
     "docPath": "docs/how-to/fix-invisible-nested-project-skills.md",
     "title": "Fix a project skill that `Skill()` reports as \"Unknown skill\"",
     "sourceCaptureId": "tsk-d3c"
@@ -70,6 +78,14 @@
     "docPath": "docs/how-to/run-a-state-verb-from-inside-a-worktree.md",
     "title": "How to run a state-writing `fgos` verb from inside a picked worktree",
     "sourceCaptureId": "tsk-56t"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/see-done-items-in-list-and-triage.md",
+    "title": "How to see done items in `fgos list` / `fgos triage`",
+    "sourceCaptureId": "tsk-5oa"
   },
   {
     "quadrant": "reference",
@@ -158,6 +174,14 @@
     "docPath": "docs/explanation/main-checkout-lock-release-on-exit-opt-in.md",
     "title": "Why `acquireMainCheckoutLock`'s release-on-exit is opt-in, never the default",
     "sourceCaptureId": "tsk-45z"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/merge-idempotent-on-already-merged-branch.md",
+    "title": "Why `mergeRunnerItem` now checks ancestry before attempting a merge",
+    "sourceCaptureId": "tsk-3yl"
   },
   {
     "quadrant": "explanation",

@@ -6,7 +6,7 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { claimWork, ClaimError } from '../../src/runner/claim-port.mjs';
 import { LOCK_FILE, DEFAULT_TTL_MS } from '../../src/runner/main-checkout-lock.mjs';
-import { initStore, addWork } from '../../src/state/store.mjs';
+import { initStore, addWork, moveWork } from '../../src/state/store.mjs';
 
 // claim-port.mjs's claimWork shares main-checkout.lock with .githooks/
 // pre-commit (tsk-3w8) — the hook writes a STRING-identity record per commit
@@ -79,4 +79,63 @@ test('claimWork throws a categorized ClaimError (unreadable/corrupt lock content
       return true;
     },
   );
+});
+
+// tsk-2zv: a claim-lock §3b release (decompose.mjs's releaseClaimOnExecuting)
+// is the SAME execution round split by a mechanical stage edge — commits
+// made before the release (CONTEXT.md, plan.md, or code) must still count
+// as real progress once the item is reclaimed for `executing`.
+test('claimWork on a claim-lock §3b-marked release preserves the ORIGINAL branchHeadAtTake on reclaim, instead of recomputing to the tip that already includes the pre-release commit (tsk-2zv)', () => {
+  const { repoRoot, dir } = setup();
+
+  const firstClaim = claimWork(dir, { id: 'item-a', actor: 'session', isolate: true, repoRoot });
+  assert.equal(firstClaim.source, 'branch');
+  const originalBranchHeadAtTake = firstClaim.branchHeadAtTake;
+
+  // Real work committed ON THE CLAIMED WORKTREE before the release fires —
+  // mirrors tsk-424's own repro (CONTEXT.md/plan.md committed during
+  // clarify/decompose). The branch is already checked out there by
+  // createWorktree, so commit inside it rather than in repoRoot's own
+  // checkout (which never touches this branch).
+  const worktreePath = firstClaim.worktree.path;
+  fs.writeFileSync(path.join(worktreePath, 'context.txt'), 'decisions locked\n');
+  execFileSync('git', ['add', '-A'], { cwd: worktreePath });
+  execFileSync('git', ['commit', '-q', '-m', 'docs: lock decisions'], { cwd: worktreePath });
+
+  moveWork(dir, { id: 'item-a', to: 'todo', expectedStatus: 'doing', releaseTrigger: 'claim-lock-3b' });
+
+  const reclaim = claimWork(dir, { id: 'item-a', actor: 'session', isolate: true, repoRoot });
+
+  assert.equal(
+    reclaim.branchHeadAtTake,
+    originalBranchHeadAtTake,
+    'reclaim must preserve the ORIGINAL branchHeadAtTake so return still sees the pre-release commit as real progress',
+  );
+});
+
+// tsk-2zv D2/D3: a reject (`proposed -> todo`) lands an item in the exact
+// same status+branch-existence shape as a §3b release, but never carries
+// the marker — it MUST still recompute fresh, the deliberate anti-cheat
+// gate that forces new work before a retaken item can `return` again.
+test('claimWork on an UNMARKED todo-with-branch reclaim (e.g. reject) still recomputes branchHeadAtTake fresh, never preserving a stale value (tsk-2zv D3)', () => {
+  const { repoRoot, dir } = setup();
+
+  const firstClaim = claimWork(dir, { id: 'item-a', actor: 'session', isolate: true, repoRoot });
+  const originalBranchHeadAtTake = firstClaim.branchHeadAtTake;
+
+  const worktreePath = firstClaim.worktree.path;
+  fs.writeFileSync(path.join(worktreePath, 'attempt.txt'), 'rejected attempt\n');
+  execFileSync('git', ['add', '-A'], { cwd: worktreePath });
+  execFileSync('git', ['commit', '-q', '-m', 'attempt later rejected'], { cwd: worktreePath });
+  const tipAfterAttempt = execFileSync('git', ['rev-parse', 'fgw/item-a'], { cwd: repoRoot, encoding: 'utf8' }).trim();
+
+  // No releaseTrigger here — an unmarked doing -> todo move, standing in
+  // for reject's own proposed -> todo (same shape: status todo, branch
+  // alive, no marker).
+  moveWork(dir, { id: 'item-a', to: 'todo', expectedStatus: 'doing' });
+
+  const reclaim = claimWork(dir, { id: 'item-a', actor: 'session', isolate: true, repoRoot });
+
+  assert.notEqual(reclaim.branchHeadAtTake, originalBranchHeadAtTake, 'must NOT preserve the stale pre-attempt marker');
+  assert.equal(reclaim.branchHeadAtTake, tipAfterAttempt, 'must recompute fresh to the live tip, demanding new work before a future return');
 });

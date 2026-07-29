@@ -67,6 +67,46 @@ existing optimistic-concurrency (CAS) check in the same transition, not before
 it — otherwise a caller with a stale expected-state can get misdiagnosed by the
 new gate instead of failing with the pre-existing, correct "conflict" outcome.
 
+## Two edges landing on the same status can still mean different things — a fix needs a positive marker, not an inference from the shared value
+
+`status` answers "where in this attempt" on purpose (see above) — but that
+also means two structurally different transitions can legally land an item
+on the exact same status value, and code reacting to that value later has
+no way to tell them apart unless something explicit says so.
+
+A claim held through `clarify`/`decompose` (`status: doing`) is released
+back to `todo` the instant the item reaches `executing`
+(`releaseClaimOnExecuting`, the claim-lock §3b lifecycle: "a pick claim
+held through clarify/decompose... is released back to todo the moment the
+root actually reaches executing... so pick <id> can re-claim it for the
+executing phase"). A rejected item (`proposed -> todo`) and a verify-fail
+park also land an item at `todo` with its branch still alive — reject
+"never touches/deletes the branch... the item's own commit REMAINS on
+main untouched." All three are, from the outside, "status todo, branch
+already exists" — indistinguishable by shape alone.
+
+A fix that needed to treat the first case specially (preserve a
+claim-time marker across the release so a later reclaim doesn't lose
+credit for work already committed) was first drafted to key off "does the
+item already carry that marker" — which is exactly the same shape as the
+undefined-vs-undefined collision above: inferring "why is this todo" from
+data that multiple different edges populate identically. Validated
+against the actual retake code path, this would have silently defeated a
+DIFFERENT edge's deliberate safety property — the reject/verify-fail
+retake path recomputes that same marker specifically to force new,
+provable work before the item can complete again; preserving it whenever
+present would have let an already-rejected attempt's own old commits
+satisfy that check with nothing new done.
+
+The fix that actually holds: tag the ONE edge that needs the special
+behavior with an explicit marker on its own transition event, and have
+the reader check for that literal marker — never infer intent from the
+status value (or from "does a related field happen to be set already")
+that other, semantically different edges also produce. The same
+"orthogonal dimension, not an inferred value" instinct that justified
+`stage` as its own field over a new status applies one level down, at the
+level of a single transition's payload.
+
 ---
 
 **Source:** `docs/history/learnings/critical-patterns.md` —
@@ -80,4 +120,10 @@ normalized BEFORE `===`-comparing it to a lazy-default field that can also be
 [20260716] "Extending an existing domain → audit EVERY consumer before code"
 (feature stage-decompose, with a 4th-occurrence addendum on base-workflow-model);
 [20260716] "Lifecycle concept answering a DIFFERENT question → orthogonal
-dimension, not a new status value" (feature stage-clarify).
+dimension, not a new status value" (feature stage-clarify);
+[20260729] "Two edges landing on the same status value still need a
+positive marker to tell apart, never an inference from the shared status
+— a naive fix based on 'is this field already set' would have defeated a
+DIFFERENT edge's deliberate anti-cheat gate" (feature
+claim-reclaim-branchhead-reset, `docs/history/claim-reclaim-branchhead-reset/CONTEXT.md`
+D2/D3, item tsk-2zv).

@@ -42,7 +42,7 @@ export function formatStatusLine(items) {
 }
 
 function pollOnce(repoRoot) {
-  const result = spawnSync(process.execPath, [path.join(repoRoot, 'bin', 'fgos.mjs'), 'list', '--json'], {
+  const result = spawnSync(process.execPath, [path.join(repoRoot, 'bin', 'fgos.mjs'), 'list', '--all', '--json'], {
     cwd: repoRoot,
     encoding: 'utf8',
   });
