@@ -97,10 +97,18 @@ escape hatch a caller must opt into, never a silent change to what a bare
    (`list`/`ready`/`graph`/`stale`/`check`/`rollup`/`conflicts`/`triage`),
    when the resolved dir has no `.fgos/` and `cwd` is a linked worktree
    (`isMainWorktree` from `src/runner/merge.mjs` already does this check
-   for `init`), surface it — e.g. a `storeMissing: true` field on the
-   JSON envelope — instead of a bare empty view. Test: the field appears
-   for a linked-worktree cwd, is absent for a normal non-worktree cwd with
-   no store.
+   for `init`), surface it as a **stderr warning line**, never a JSON
+   `data` field — `ready`/`triage` can return a bare array when called
+   unpaginated (`paginateVerbResult`), and `JSON.stringify` silently drops
+   a named property set on an array, so a `storeMissing` field would only
+   ever reach the other 6 verbs, not all 8 (found during Phase 2's own
+   implementation — the plan's original approach). A stderr line keeps
+   stdout's `data` shape byte-identical in every case, the same
+   stdout=data/stderr=diagnostics split `main()`'s own error path already
+   uses. Test: the line appears for a linked-worktree cwd across at least
+   one array-shaped verb (`ready`) and one object-shaped verb (`list`), is
+   absent for a normal non-worktree cwd with no store (that stays "not
+   evaluated", not "warning").
 3. **Skill contract rewrite.** Update the state-verb bash snippet in each
    of the 12 files named in the mode-count evidence above
    (`plugins/fgOS/skills/{ask,answer,return,discover,move,cook}/SKILL.md`,

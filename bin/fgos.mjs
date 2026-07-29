@@ -2453,6 +2453,12 @@ function renderPretty(verb, data) {
   return `${lines.join('\n')}\n`;
 }
 
+// tsk-56t D2: the exact 8 read verbs the decision names — not every
+// `requiresExistingStore: false` verb (that set also includes `session`/
+// `setup`/`doctor`, which never touch `.fgos/` at all, and `init`, which
+// gets its own opposite linked-worktree refusal above).
+const STORE_MISSING_WARNING_VERBS = new Set(['list', 'ready', 'graph', 'stale', 'check', 'rollup', 'conflicts', 'triage']);
+
 async function main() {
   const [, , verb, ...rest] = process.argv;
 
@@ -2491,6 +2497,21 @@ async function main() {
       throw new StoreError(
         'validation',
         `"fgos init" refused inside a linked worktree ("${process.cwd()}") -- worktrees never carry .fgos/ by design (ADR0020); run "fgos init" from the main checkout instead.`,
+      );
+    }
+    // tsk-56t D2: these 8 read verbs are `requiresExistingStore: false` by
+    // design (a fresh non-worktree dir with no store yet is a legitimate
+    // "not evaluated" case, not an error) — but that same tolerance means a
+    // worktree-resident session that forgets `--dir` sees a silent, real-
+    // looking empty view instead of a signal that the actual store lives
+    // elsewhere. `ready`/`triage` can return a bare array when unpaginated
+    // (paginateVerbResult), so this can never be a JSON `data` field without
+    // changing that shape only in this one runtime case — a stderr line
+    // keeps stdout's `data` shape byte-identical in every case, mirroring
+    // this file's existing stdout=data/stderr=diagnostics split above.
+    if (STORE_MISSING_WARNING_VERBS.has(verb) && !fs.existsSync(dir) && !isMainWorktree(process.cwd())) {
+      process.stderr.write(
+        `fgos: warning: .fgos/ not found at "${dir}" -- this view may be empty because the real store lives elsewhere (worktrees never carry .fgos/, per ADR0020); pass --dir <mainRoot> to read it.\n`,
       );
     }
     const data = await runVerb(verb, flags, positional, dir);

@@ -218,6 +218,48 @@ test('--dir pointed at the main checkout itself (from main\'s own cwd) is a no-o
   assert.equal(eventLines(main).length, before + 1);
 });
 
+// tsk-56t D2: `list`/`ready`/etc. stay `requiresExistingStore: false` (a
+// fresh non-worktree dir with no store is legitimately "not evaluated",
+// not an error) — but a worktree-resident session that forgets `--dir`
+// should not read that as "no open work" with zero signal. One
+// object-shaped verb (`list`) and one array-shaped verb (`ready`, which
+// returns a bare array via paginateVerbResult when unpaginated — the
+// reason this is a stderr line, never a JSON field: JSON.stringify drops
+// a named property set on an array).
+test('list from a .fgos/-less linked worktree cwd, no --dir: exit 0, empty view, but a stderr warning names the real store elsewhere', () => {
+  const { wt } = tmpLinkedWorktree();
+  const result = run(wt, ['list']);
+  assert.equal(result.status, 0);
+  assert.deepEqual(envelopeData(result.stdout).work, {});
+  assert.match(result.stderr, /warning: \.fgos\/ not found/);
+  assert.match(result.stderr, /--dir <mainRoot>/);
+});
+
+test('ready (array-shaped, unpaginated) from the same linked worktree cwd: exit 0, empty array, same stderr warning', () => {
+  const { wt } = tmpLinkedWorktree();
+  const result = run(wt, ['ready']);
+  assert.equal(result.status, 0);
+  assert.deepEqual(envelopeData(result.stdout), []);
+  assert.match(result.stderr, /warning: \.fgos\/ not found/);
+});
+
+test('list with --dir pointed at the real store from the same worktree cwd: no warning, real data', () => {
+  const { main, wt } = tmpLinkedWorktree();
+  run(main, ['add', 'seen-via-dir', '--title', 'Seen via --dir', '--kind', 'task', '--risk', 'low', '--verify', 'npm test']);
+  const result = run(wt, ['list', '--dir', main]);
+  assert.equal(result.status, 0);
+  assert.ok(envelopeData(result.stdout).work['seen-via-dir']);
+  assert.equal(result.stderr, '');
+});
+
+test('list on a fresh non-worktree dir with no store at all: exit 0, empty view, no warning (legitimately "not evaluated", not a worktree footgun)', () => {
+  const cwd = rawTmpCwd();
+  const result = run(cwd, ['list']);
+  assert.equal(result.status, 0);
+  assert.deepEqual(envelopeData(result.stdout).work, {});
+  assert.equal(result.stderr, '');
+});
+
 test('init creates .fgos/ with an empty log and a rebuilt (empty) view, exit 0', () => {
   const cwd = tmpCwd();
   const result = run(cwd, ['init']);
