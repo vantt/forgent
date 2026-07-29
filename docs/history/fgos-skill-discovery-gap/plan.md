@@ -105,7 +105,7 @@ subdivided further; a `high-risk` phased plan with proof points per
 component would overstate work that has exactly one genuinely unproven
 element (the hypothesis itself).
 
-## Verify
+## Verify (superseded — see D3 shape below)
 
 `npm test` green (specifically `test/skills/fgos-mirror.test.mjs`,
 `test/runner/dispatch.test.mjs`, `test/runner/prompt-templates.test.mjs`),
@@ -115,3 +115,66 @@ returns zero hits (excluding this item's own history docs, which
 intentionally keep the historical path name), **and** a fresh session's
 available-skills list includes the renamed `fgos-workflow` skills where
 today the `fgos` ones are silently absent.
+
+## D3 shape — flatten, not rename (supersedes this plan's rename shape)
+
+`CONTEXT.md` D3: a controlled A/B test confirmed the real cause —
+the generic `.claude/skills/` scan is flat-only, one level, no
+recursion. The rename tested above kept the nesting (`fgos-workflow/<name>/`
+is still two levels deep) so it could never have worked; this shape
+replaces "rename the parent" with **flatten each skill to its own
+top-level directory**, matching `distill`'s proven shape exactly.
+
+**Target layout:** `.claude/skills/fgos/<name>/SKILL.md` →
+`.claude/skills/<name>/SKILL.md` for all 9 names (`fgos-routing`,
+`fgos-exploring`, `fgos-planning`, `fgos-validating`, `fgos-executing`,
+`fgos-compounding`, `fgos-indexing`, `fgos-submit-assist`,
+`fgos-unlock`) — no shared parent folder at all. Same flatten for
+`.agents/skills/fgos/<name>/` → `.agents/skills/<name>/`.
+
+**Files touched (re-verified against the current, reverted tree — same
+count as the rename pass, confirming nothing else changed underneath):**
+
+| Area | Files | Change |
+|---|---|---|
+| Skill content | `.claude/skills/fgos/<name>/SKILL.md` (9) | `git mv` each to `.claude/skills/<name>/SKILL.md` — 9 separate moves, no parent dir survives |
+| Mirror | `.agents/skills/fgos/<name>/SKILL.md` (9) | Same flatten to `.agents/skills/<name>/SKILL.md` |
+| Runtime | `src/runner/dispatch.mjs:124` | `` `.claude/skills/fgos/${skillName}/SKILL.md` `` → `` `.claude/skills/${skillName}/SKILL.md` `` (`skillName` already resolves to e.g. `fgos-executing`, confirmed by `skillForStage`'s own test) |
+| Tests (string) | `test/runner/dispatch.test.mjs:149`, `test/runner/prompt-templates.test.mjs:119,127` | Literal path strings updated to the flat form |
+| **Test (structural — new, not just a string swap)** | `test/skills/fgos-mirror.test.mjs` | `CLAUDE_SKILLS_DIR`/`AGENTS_SKILLS_DIR` currently point at one parent (`.claude/skills/fgos`) and recursively diff its contents. After flattening there is no single parent — the test must instead: (a) list top-level dirs under `.claude/skills/` matching `fgos-*`, (b) do the same under `.agents/skills/`, (c) assert the two name-sets are equal, then (d) byte-compare each matched pair's files, same as today just per-skill instead of per-parent |
+| Specs | `docs/specs/runner.md` (7), `docs/specs/reading-map.md` (1), `docs/specs/enduser-docs-authoring.md` (2), `docs/backlog.md` (3) | Path-string update: `.claude/skills/fgos/<name>/` → `.claude/skills/<name>/` |
+| Entry doc | `AGENTS.md:47` | Same flat-path update |
+| `.gitignore` | lines allowlisting `!/.claude/skills/fgos/` and `!/.agents/skills/fgos/` | Replace each with a single-segment glob, `!/.claude/skills/fgos-*/` and `!/.agents/skills/fgos-*/` — covers all 9 flattened dirs (and any future `fgos-*` skill) without 9 separate lines |
+| This item's own history | `docs/history/fgos-skill-discovery-gap/{CONTEXT,plan}.md` | Left as-is, same reasoning as before |
+
+**Risk map:**
+
+| Component | Risk | Proof |
+|---|---|---|
+| 18 individual `git mv` operations (9 + 9 mirror) landing in one commit | Low, purely mechanical, but easy to miss one — `fgos-mirror.test.mjs` (once itself updated) catches any name-set mismatch | `npm test` green |
+| `fgos-mirror.test.mjs`'s own restructuring | Low-medium — this is real logic change, not a string replace; must not silently pass by comparing empty sets | New test still asserts `claudeFiles.length > 0` per matched skill dir (already in the current test, kept) |
+| `dispatch.mjs` + 2 test files | Low, one string each | `test/runner/dispatch.test.mjs`, `test/runner/prompt-templates.test.mjs` green |
+| `.gitignore` glob correctness | Low — single-segment `*` glob is standard, already proven pattern-wise by the existing `!/.claude/skills/distill/`-style exact-match entries | `git status` shows the 9 new flat dirs as tracked (not falling back to "ignored" warnings) after `git add` |
+| The hypothesis itself | **None remaining** — already confirmed by the A/B test (D3), not still open the way D2's was | N/A — this is no longer an unproven assumption |
+
+**Shape (standard, phased):**
+
+1. Flatten both trees, 18 `git mv` calls (9 skill + 9 mirror), one commit boundary only after everything below also lands (avoid an intermediate half-flattened commit).
+2. Update `dispatch.mjs`'s hardcoded segment.
+3. Update the 2 literal-string test files.
+4. **Rewrite `fgos-mirror.test.mjs`'s directory-comparison logic** (structural, per the table above) — this is the one piece that is not a pure find/replace.
+5. Update `AGENTS.md`, the 13 spec/doc references, and `.gitignore`'s two allowlist lines (switch to the glob form).
+6. `npm test` full suite green.
+7. Commit, `fgos edit --verify` stays `npm test` (already correct, no change needed), `fgos return`.
+8. No further fresh-session check needed for the hypothesis itself (already confirmed by the A/B probe) — but a fresh session naturally re-validates end-to-end once this lands, since that's exactly how the original bug was noticed in the first place.
+
+No child-item split — same reasoning as the rename pass: everything is mechanical except item 4, which is a small, self-contained test rewrite, not an open-ended design question.
+
+## Verify (D3 shape, current)
+
+`npm test` green (all suites, specifically the rewritten
+`test/skills/fgos-mirror.test.mjs`, `test/runner/dispatch.test.mjs`,
+`test/runner/prompt-templates.test.mjs`), **and**
+`grep -rn '\.claude/skills/fgos/\|\.agents/skills/fgos/' AGENTS.md docs src test .gitignore`
+returns zero hits (excluding this item's own history docs), **and**
+`git status` shows all 9+9 flattened files as tracked, not ignored.
