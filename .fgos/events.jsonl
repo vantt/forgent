@@ -631,3 +631,5 @@
 {"seq":615,"ts":"2026-07-29T03:44:10.011Z","type":"work.outcome","payload":{"id":"tsk-3ld","predicted":{"tier":"light","deps":0,"priorVisits":0,"role":"session","headAtTake":"a112f87d6d28915b6d9feeb1fa833d68c0c4c445"}},"v":3}
 {"seq":616,"ts":"2026-07-29T03:44:15.954Z","type":"work.stage","payload":{"id":"tsk-3wr","from":"executing","to":"compound-learn","role":"human","writer":{"id":"ae6b4da8-81d3-47b6-a75c-19c1a7f07e4d","source":"env"}},"v":3}
 {"seq":617,"ts":"2026-07-29T03:44:15.961Z","type":"work.outcome","payload":{"id":"tsk-3wr","docType":"tutorial","docPath":"docs/tutorials/walking-a-heavy-item-through-a-3-child-split.md"},"v":3}
+{"seq":618,"ts":"2026-07-29T03:46:17.390Z","type":"work.stage","payload":{"id":"tsk-6bx-1","from":"executing","to":"compound-learn","role":"human","writer":{"id":"cdfc46ae-ae48-44ed-b5c3-41059c726e97","source":"env"}},"v":3}
+{"seq":619,"ts":"2026-07-29T03:46:17.395Z","type":"work.outcome","payload":{"id":"tsk-6bx-1","docType":"reference","docPath":"docs/reference/gate-bypass-config.md"},"v":3}
