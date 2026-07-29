@@ -9,4 +9,4 @@ platforms = ["linux", "macos"]
 id = "dashboard"
 title = "fgOS Dashboard"
 placement = "overlay"
-command = ["target/release/herdr-fgos"]
+command = ["sh", "-c", "exec \"$HERDR_PLUGIN_ROOT/target/release/herdr-fgos\""]

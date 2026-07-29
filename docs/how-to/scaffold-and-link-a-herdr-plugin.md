@@ -104,12 +104,31 @@ fn dashboard_renders_without_panicking() {
 }
 ```
 
-## 7. Write the manifest with a `[[panes]]` entry only
+## 7. Write the manifest's `[[panes]]` command as `sh -c "$HERDR_PLUGIN_ROOT/..."`, never a bare relative path
 
-For a dashboard-only first slice (no orchestration action yet), the
-manifest needs exactly one `[[panes]]` entry pointing at the release
-binary, relative to the plugin directory (herdr runs plugin commands with
-the plugin directory as cwd):
+`herdr plugin list --json` accepting the manifest is not proof the pane
+command actually spawns. `herdr plugin link` + `list --json` only proves
+the *manifest parses*; `herdr plugin pane open` is the only real proof the
+command spawns. A bare relative `argv[0]` fails there even though link/list
+looked fine:
+
+```
+$ herdr plugin pane open --plugin fgos.dashboard --entrypoint dashboard
+{"error":{"code":"plugin_pane_open_failed","message":"Unable to spawn
+target/release/herdr-fgos because:\nNo viable candidates found in PATH
+\"...\""}}
+```
+
+Cause: herdr's pane spawner (`portable_pty`'s `CommandBuilder`) resolves
+`argv[0]` against `PATH` before the child's `cwd` is applied — a bare
+relative path like `target/release/herdr-fgos` isn't a `PATH` entry and
+isn't resolved relative to the plugin directory the way later `argv`
+elements or an interpreter's own relative-path handling would be.
+
+The working pattern, confirmed against a real already-linked plugin on
+this machine (`persiyanov.reviewr`'s pane entry) — wrap in `sh -c` and use
+the `HERDR_PLUGIN_ROOT` env var herdr injects into every plugin command
+(absolute, no relative-path ambiguity at all):
 
 ```toml
 id = "fgos.dashboard"
@@ -123,23 +142,29 @@ platforms = ["linux", "macos"]
 id = "dashboard"
 title = "fgOS Dashboard"
 placement = "overlay"
-command = ["target/release/herdr-fgos"]
+command = ["sh", "-c", "exec \"$HERDR_PLUGIN_ROOT/target/release/herdr-fgos\""]
 ```
 
-## 8. Build, test, then prove the real link
+`sh` itself resolves via `PATH` (always found), and `$HERDR_PLUGIN_ROOT`
+is an absolute path, so there is no cwd-relative resolution left to get
+wrong.
+
+## 8. Build, test, link, then actually open the pane
 
 ```bash
 cargo build --release --manifest-path herdr-plugin/Cargo.toml
 cargo test --manifest-path herdr-plugin/Cargo.toml
 herdr plugin link "$(pwd)/herdr-plugin"
 herdr plugin list --json   # confirm the plugin_id shows up, "enabled": true
+herdr plugin pane open --plugin fgos.dashboard --entrypoint dashboard
 ```
 
 `herdr plugin link` (not `install`) is the right verb for a plugin that
 lives in this repo's own working tree — `install` is for remote/GitHub
-sources. `herdr plugin list --json` is the actual proof the manifest
-parsed and the plugin registered; a successful `cargo build` alone doesn't
-prove that.
+sources. `herdr plugin list --json` only proves the manifest parsed and
+registered; it does not prove the pane's command actually spawns (see
+step 7) — `pane open` is the step that does, and it must be run inside a
+live herdr session (workspace/tab context), not a bare shell.
 
 If the link was only a one-time smoke check (not something the running
 session needs to keep registered), `herdr plugin unlink <id>` cleans it
