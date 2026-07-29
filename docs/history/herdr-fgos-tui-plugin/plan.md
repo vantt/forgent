@@ -114,7 +114,7 @@ now smaller/isolated than the original two-piece split had it:
    Mode for this piece alone: only 1 flag applies (external systems) —
    **tiny/small**, not standard; no fgOS-CLI consumption or ranking logic
    exists yet to make it multi-domain.
-   Verify: `cargo build --release --manifest-path plugins/herdr-fgos/
+   Verify: `cargo build --release --manifest-path herdr-plugin/
    Cargo.toml` succeeds, a rendering smoke test against ratatui's own
    `TestBackend` doesn't panic, and `herdr plugin link <path> && herdr
    plugin list --json` shows it registered and enabled. No dependency on
