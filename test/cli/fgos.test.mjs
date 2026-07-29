@@ -5864,6 +5864,129 @@ test('conflicts verb on a store with no overlaps: empty list, exit 0', () => {
   assert.deepEqual(envelopeData(run(cwd, ['conflicts']).stdout), []);
 });
 
+// --- tsk-4j9-3: `fgos merge list` (merge-readiness ranking) ---------------
+
+test('merge list: unknown sub-verb is rejected as validation, exit 4', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0);
+  const result = run(cwd, ['merge', 'bogus']);
+  assert.equal(result.status, 4);
+});
+
+test('merge list on an empty store: empty ready/waiting/conflicts, exit 0, no event appended', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0);
+  const before = eventLines(cwd).length;
+  const result = run(cwd, ['merge', 'list']);
+  assert.equal(result.status, 0);
+  assert.deepEqual(envelopeData(result.stdout), { ready: [], waiting: [], conflicts: [] });
+  assert.equal(eventLines(cwd).length, before, 'merge list must not append any event');
+});
+
+test('merge list: a proposed item whose dep is already done is ready', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0);
+  // Built explicitly (not via toCompoundLearn/addOk) so --verify is a
+  // trivially-passing command: addOk's default ('npm test') has no
+  // package.json to run against in this bare sandbox, so approve would
+  // park it 'blocked' instead of 'done' — a false negative for this test.
+  assert.equal(run(cwd, ['add', 'dep', '--title', 'Dep', '--kind', 'task', '--risk', 'low', '--verify', 'true']).status, 0);
+  assert.equal(run(cwd, ['move', 'dep', '--to', 'doing']).status, 0);
+  assert.equal(run(cwd, ['move', 'dep', '--to', 'proposed']).status, 0);
+  assert.equal(run(cwd, ['compound', 'dep']).status, 0);
+  const approveResult = envelopeData(run(cwd, ['approve', 'dep']).stdout);
+  assert.equal(approveResult.to, 'done', `expected dep to reach done, got: ${JSON.stringify(approveResult)}`);
+  assert.equal(run(cwd, ['add', 'leaf', '--title', 'Leaf', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--deps', 'dep']).status, 0);
+  toProposed(cwd, 'leaf');
+  const data = envelopeData(run(cwd, ['merge', 'list']).stdout);
+  assert.deepEqual(data, { ready: ['leaf'], waiting: [], conflicts: [] });
+});
+
+test('merge list: a proposed item whose dep is NOT done waits, never ready', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0);
+  assert.equal(addOk(cwd, 'dep').status, 0); // stays todo
+  assert.equal(run(cwd, ['add', 'leaf', '--title', 'Leaf', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--deps', 'dep']).status, 0);
+  toProposed(cwd, 'leaf');
+  const data = envelopeData(run(cwd, ['merge', 'list']).stdout);
+  assert.deepEqual(data, { ready: [], waiting: ['leaf'], conflicts: [] });
+});
+
+test('merge list: two dep-clear proposed items sharing a footprint are excluded from ready and listed as conflicts', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0);
+  assert.equal(run(cwd, ['add', 'a', '--title', 'A', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--footprint', 'src/x.mjs']).status, 0);
+  assert.equal(run(cwd, ['add', 'b', '--title', 'B', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--footprint', 'src/x.mjs']).status, 0);
+  toProposed(cwd, 'a');
+  toProposed(cwd, 'b');
+  const data = envelopeData(run(cwd, ['merge', 'list']).stdout);
+  assert.deepEqual(data.ready, []);
+  assert.deepEqual(data.conflicts, [{ a: 'a', b: 'b', shared: ['src/x.mjs'], suggestions: ['sequence', 'hoist', 're-slice'] }]);
+});
+
+// --- tsk-4j9-4: `fgos merge next` (merge-readiness automation) -----------
+
+test('merge next on an empty store: reports nothing ready, exit 0, no merge attempted', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0);
+  const result = run(cwd, ['merge', 'next']);
+  assert.equal(result.status, 0);
+  assert.deepEqual(envelopeData(result.stdout), { picked: null, reason: 'nothing ready to merge' });
+});
+
+test('merge next merges the single ready item by recursing into approve, item reaches done', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0);
+  // Explicit --verify true (not addOk's 'npm test' default) -- same
+  // sandbox pitfall documented in docs/how-to/add-a-read-only-fgos-verb-
+  // and-plugin-skill.md.
+  assert.equal(run(cwd, ['add', 'solo', '--title', 'Solo', '--kind', 'task', '--risk', 'low', '--verify', 'true']).status, 0);
+  assert.equal(run(cwd, ['move', 'solo', '--to', 'doing']).status, 0);
+  assert.equal(run(cwd, ['move', 'solo', '--to', 'proposed']).status, 0);
+  assert.equal(run(cwd, ['compound', 'solo']).status, 0);
+
+  const result = run(cwd, ['merge', 'next']);
+  assert.equal(result.status, 0, `${result.stdout}${result.stderr}`);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.picked, 'solo');
+  assert.equal(data.approve.to, 'done', `expected the picked item to reach done: ${JSON.stringify(data)}`);
+  assert.equal(stateView(cwd).work.solo.status, 'done');
+});
+
+test('merge next picks the higher-ranked (mvp goalTier) item first when two are ready', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0);
+  for (const id of ['plain', 'important']) {
+    assert.equal(run(cwd, ['add', id, '--title', id, '--kind', 'task', '--risk', 'low', '--verify', 'true', ...(id === 'important' ? ['--goal-tier', 'mvp'] : [])]).status, 0);
+    assert.equal(run(cwd, ['move', id, '--to', 'doing']).status, 0);
+    assert.equal(run(cwd, ['move', id, '--to', 'proposed']).status, 0);
+    assert.equal(run(cwd, ['compound', id]).status, 0);
+  }
+  const data = envelopeData(run(cwd, ['merge', 'next']).stdout);
+  assert.equal(data.picked, 'important', 'the mvp-goalTier item outranks the plain one per rankImpact');
+});
+
+test('merge next on a runner-sourced pick that trips the Iron Law: reports blocked, merges nothing, never auto-acknowledges', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeRunnerProposedItemTouching(cwd, 'iron-next-item', 'src/runner/probe.mjs', {
+    verify: 'test -f src/runner/probe.mjs',
+  });
+
+  const headBefore = gitHead(cwd);
+  const result = run(cwd, ['merge', 'next']);
+  assert.equal(result.status, 0, `merge next itself must not exit non-zero on a blocked pick: ${result.stdout}${result.stderr}`);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.picked, 'iron-next-item');
+  assert.equal(data.blocked, 'iron-law');
+  assert.match(data.message, /Iron Law/);
+
+  assert.equal(stateView(cwd).work['iron-next-item'].status, 'proposed', 'a blocked pick leaves the item proposed');
+  assert.equal(gitHead(cwd), headBefore, 'a blocked pick attempts no merge -- HEAD is unchanged');
+  const survivingBranches = gitAtCwd(cwd, ['for-each-ref', '--format=%(refname:short)', 'refs/heads/']);
+  assert.match(survivingBranches, /fgw\/iron-next-item/, 'the branch survives -- nothing was merged or cleaned up');
+});
+
 // --- str73-done-flip-cos-check cell 1: --acceptance on add/submit/edit ----
 
 test('add --acceptance persists work.acceptance as the given array, validated through validateWork', () => {

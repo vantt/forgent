@@ -496,29 +496,42 @@ export function classifyStaleDoing(entries, { now = Date.now(), thresholds = STA
 const FOOTPRINT_CONFLICT_SUGGESTIONS = Object.freeze(['sequence', 'hoist', 're-slice']);
 
 /**
- * FOOTPRINT-INTERSECTION advisory (S9 — the target): find file-collision risk
- * between items that could dispatch IN PARALLEL. The candidate set is the
- * frontier (`ready` = items independently dispatchable right now), so a
- * conflict here is real: a parallel runner could pick both at once. Every pair
- * whose declared `footprint`s share at least one path is flagged with the
- * shared paths and the resolution OPTIONS (sequence / hoist / re-slice) — the
- * detector suggests, it never re-slices. Deterministic: pairs follow the ready
- * FIFO order (i < j), shared paths keep the first item's order. An item with no
- * footprint never conflicts.
+ * Pairwise declared-footprint overlap over an explicit candidate list (D4-
+ * revised, docs/history/merge-standardization/CONTEXT.md): the comparison
+ * itself, with no opinion on WHICH items are candidates — `footprintOverlap`
+ * below supplies the frontier for the parallel-dispatch case; merge-
+ * readiness ranking (`src/state/graph-harness.mjs`) supplies the
+ * proposed-and-dep-clear set for the merge-ordering case. Every pair whose
+ * declared `footprint`s share at least one path is flagged with the shared
+ * paths and the resolution OPTIONS (sequence / hoist / re-slice) — the
+ * detector suggests, it never re-slices. Deterministic: pairs follow the
+ * candidate list's own order (i < j), shared paths keep the first item's
+ * order. An item with no footprint never conflicts.
  */
-export function footprintOverlap(view) {
-  const ready = frontier(view);
+export function footprintOverlapAmong(candidates) {
   const conflicts = [];
-  for (let i = 0; i < ready.length; i += 1) {
-    const footprintA = Array.isArray(ready[i].footprint) ? ready[i].footprint : [];
+  for (let i = 0; i < candidates.length; i += 1) {
+    const footprintA = Array.isArray(candidates[i].footprint) ? candidates[i].footprint : [];
     if (footprintA.length === 0) continue;
-    for (let j = i + 1; j < ready.length; j += 1) {
-      const footprintB = new Set(Array.isArray(ready[j].footprint) ? ready[j].footprint : []);
+    for (let j = i + 1; j < candidates.length; j += 1) {
+      const footprintB = new Set(Array.isArray(candidates[j].footprint) ? candidates[j].footprint : []);
       const shared = footprintA.filter((path) => footprintB.has(path));
       if (shared.length > 0) {
-        conflicts.push({ a: ready[i].id, b: ready[j].id, shared, suggestions: [...FOOTPRINT_CONFLICT_SUGGESTIONS] });
+        conflicts.push({ a: candidates[i].id, b: candidates[j].id, shared, suggestions: [...FOOTPRINT_CONFLICT_SUGGESTIONS] });
       }
     }
   }
   return conflicts;
+}
+
+/**
+ * FOOTPRINT-INTERSECTION advisory (S9 — the target): find file-collision risk
+ * between items that could dispatch IN PARALLEL. The candidate set is the
+ * frontier (`ready` = items independently dispatchable right now), so a
+ * conflict here is real: a parallel runner could pick both at once. Thin
+ * wrapper over `footprintOverlapAmong` (D4-revised) — byte-for-byte
+ * unchanged behavior, existing callers/tests untouched.
+ */
+export function footprintOverlap(view) {
+  return footprintOverlapAmong(frontier(view));
 }
