@@ -227,6 +227,14 @@
     "quadrant": "explanation",
     "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
     "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/herdr-fgos-dashboard-three-piece-build.md",
+    "title": "Why the herdr fgOS dashboard shipped as three sequential children, and what surfaced along the way",
+    "sourceCaptureId": "tsk-19y"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/explanation/id-generation-design.md",
     "title": "Why a work item's id is TSK<hash>, not a bare hash",
     "sourceCaptureId": null
