@@ -134,7 +134,7 @@ test('a solo git commit in a checkout with no existing lock succeeds', () => {
 // self-recognition must let the caller's own identity always refresh,
 // regardless of how much time passed since its last commit.
 
-test("the same session's second commit a few minutes later still succeeds (self-recognition, D6)", () => {
+test("the same session's second commit a few minutes later still succeeds (self-recognition)", () => {
   const repoRoot = initTempRepoWithHook();
   const env = { BEE_SESSION_ID: 'session-self', FGOS_MAIN_CHECKOUT_LOCK_TTL_MS: '100' };
 

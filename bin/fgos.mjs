@@ -5,12 +5,9 @@
 // assumed to be an agent — so every outcome is a categorized exit code
 // (R4), and callers should branch on the code, never on the message text.
 //
-//   0 ok            — mutation applied / read succeeded
-//   1 unexpected     — anything not covered below (a real bug)
-//   2 precondition   — illegal FSM transition (fsm.mjs)
-//   3 conflict       — CAS expected-status mismatch (fsm.mjs)
-//   4 validation     — bad input / not-found (work.mjs, store.mjs)
-//   5 corrupt-log    — the event log itself failed to parse (events.mjs)
+// Exit codes (R4): The canonical exit-code table lives in src/state/store.mjs's
+// EXIT_CODES export (codes 2-5, 7-9; 0=ok, 1=unexpected) plus src/runner/loop.mjs's
+// EXIT_BUSY (code 6, runner-only state).
 //
 // This file never writes to `.fgos/` itself — every mutation goes through
 // src/state/store.mjs, the sole write door.
@@ -30,6 +27,7 @@ import { computeEntropy, computeCounts } from '../src/report/entropy.mjs';
 import { buildEnduserIndex, QUADRANTS, QUADRANT_DIR_ALIASES, findSourceCaptureIds } from '../src/report/enduser-index.mjs';
 import { rankCandidates } from '../src/evolve/candidates.mjs';
 import { rankImpact } from '../src/state/impact.mjs';
+import { paginate } from '../src/state/cursor.mjs';
 import { runGoalCheck } from '../src/runner/goal-check.mjs';
 import { frozenJudgeHits } from '../src/runner/frozen-judge.mjs';
 import { classifySource, reviewDiff, mergeRunnerItem, cleanupMergedBranch, changedFiles, isWorkingTreeClean as isMainTreeClean, isFgosOnlyStatusLine, detectTrunk, isMainWorktree } from '../src/runner/merge.mjs';
@@ -43,7 +41,7 @@ import { visitCount } from '../src/runner/anti-loop.mjs';
 import { DEFAULTS } from '../src/state/work.mjs';
 import { getDomain, stageForStep } from '../src/state/workflow-stage-graphs.mjs';
 import { writeCoexistenceManifest } from '../src/install/coexist.mjs';
-import { SCHEMA_VERSION, COMMAND_REGISTRY } from '../src/cli/command-registry.mjs';
+import { MANIFEST_SCHEMA_VERSION, COMMAND_REGISTRY } from '../src/cli/command-registry.mjs';
 import { computeAwaitingContext } from '../src/state/awaiting-context.mjs';
 import { DOCTOR_CHECKS, integrationScriptPath } from '../src/setup/checks.mjs';
 import { installGitHooks } from '../src/setup/git-hooks.mjs';
@@ -226,6 +224,33 @@ function parseAcceptanceFlag(value, message) {
   } catch (err) {
     throw new StoreError('validation', `${message} (invalid JSON: ${err.message})`);
   }
+}
+
+// Pagination opt-in (str46-io-contract D5/D35): `ready`/`triage`/`evolve`
+// (bare)/`list` each accept --cursor/--limit. Reads both flags and validates
+// --limit shape; the caller decides whether to actually paginate (see
+// paginateVerbResult below) — this only parses.
+function readPaginationFlags(flags, verbLabel) {
+  const cursor = optionalField(flags.cursor, `${verbLabel} --cursor requires a non-empty cursor value`);
+  const rawLimit = optionalField(flags.limit, `${verbLabel} --limit requires a positive integer value`);
+  if (rawLimit === undefined) return { cursor, limit: undefined };
+  const limit = Number(rawLimit);
+  if (!Number.isInteger(limit) || limit <= 0) {
+    throw new StoreError('validation', `${verbLabel} --limit requires a positive integer value`);
+  }
+  return { cursor, limit };
+}
+
+// Wraps `items` (an array of {id, ...} objects already in the verb's own
+// order) through cursor.mjs's paginate() ONLY when the caller actually passed
+// --cursor or --limit — omitting both returns `items` completely unchanged
+// (per D35: the four paginated verbs' default output stays byte-identical to
+// before this cell). `order` is this verb's own literal order tag (e.g.
+// 'ready-v1'), named once at the call site.
+function paginateVerbResult(items, flags, order, verbLabel) {
+  const { cursor, limit } = readPaginationFlags(flags, verbLabel);
+  if (cursor === undefined && limit === undefined) return items;
+  return paginate(items, { cursor, limit, order });
 }
 
 // One structured entry per item, always naming both halves explicitly
@@ -980,7 +1005,20 @@ async function runVerb(verb, flags, positional, dir) {
         const ctx = computeAwaitingContext(view, item.id);
         if (ctx) awaitingContext[item.id] = ctx;
       }
-      return Object.keys(awaitingContext).length > 0 ? { ...view, awaitingContext } : view;
+      const base = Object.keys(awaitingContext).length > 0 ? { ...view, awaitingContext } : view;
+      // Pagination (D5/D35): only `work` (the biggest payload, per plan.md's
+      // Discovery) ever changes shape, and only when --cursor/--limit was
+      // actually passed — every other view key (decisions/gates/settlements/
+      // etc.) is untouched. `view.work` is a map keyed by id, so it is
+      // wrapped into `{id, item}` pairs before going through the same
+      // generic `paginate()` every array-returning verb uses, then unwrapped
+      // back into a plain id->item map for the page itself.
+      const { cursor, limit } = readPaginationFlags(flags, 'list');
+      if (cursor === undefined && limit === undefined) return base;
+      const entries = Object.entries(view.work).map(([id, item]) => ({ id, item }));
+      const { items: pagedEntries, nextCursor } = paginate(entries, { cursor, limit, order: 'list-work-v1' });
+      const workPage = Object.fromEntries(pagedEntries.map(({ id, item }) => [id, item]));
+      return { ...base, work: { items: workPage, nextCursor } };
     }
 
     // Request-class per D1: a pure read — never appends an event, never
@@ -988,7 +1026,7 @@ async function runVerb(verb, flags, positional, dir) {
     // through store.readyWork only; this file never imports frontier.mjs
     // directly (per this cell's key_links).
     case 'ready': {
-      return readyWork(dir);
+      return paginateVerbResult(readyWork(dir), flags, 'ready-v1', 'ready');
     }
 
     // Request-class per D1 (same contract as `ready`/`list`): a pure read —
@@ -1256,12 +1294,20 @@ async function runVerb(verb, flags, positional, dir) {
       // executing boundary, claim-lock §3b) reattaches to that same branch
       // tip via createWorktree's reuse path instead of forking a new one.
       try {
+        // worktreeDir under .claude/worktrees/ (tsk-424 D1/D2): the harness's
+        // own EnterWorktree tool only allows a second-or-later in-session
+        // switch when the target sits there, e.g. a root item decomposing
+        // into a child mid-session. os.tmpdir()/fgos-worktrees (createWorktree's
+        // own default) fails that check past the first switch — pick is the
+        // only caller that needs the harness-chainable location; runner/
+        // merge-ephemeral callers are untouched.
         return claimWork(dir, {
           id,
           actor: 'session',
           isolate: true,
           claimTrigger,
           repoRoot: process.cwd(),
+          worktreeDir: path.join(process.cwd(), '.claude', 'worktrees'),
         });
       } catch (err) {
         if (err instanceof ClaimError) {
@@ -2037,7 +2083,7 @@ async function runVerb(verb, flags, positional, dir) {
         return submitWork(dir, describeCandidate(picked));
       }
       if (pickId === undefined) {
-        return candidates;
+        return paginateVerbResult(candidates, flags, 'evolve-v1', 'evolve');
       }
       const picked = candidates.find((c) => c.id === pickId);
       if (!picked) {
@@ -2056,7 +2102,7 @@ async function runVerb(verb, flags, positional, dir) {
     // risk/lane classification: this ranks open work by blocking fan-out
     // (how many other open items it unblocks), not by how risky it is.
     case 'triage': {
-      return rankImpact(listWork(dir));
+      return paginateVerbResult(rankImpact(listWork(dir)), flags, 'triage-v1', 'triage');
     }
 
     // Opt-in per-session git worktree lifecycle (fgos-multi-session-checkout
@@ -2203,26 +2249,38 @@ async function runVerb(verb, flags, positional, dir) {
 // ─── --help / --help --json: machine-readable verb manifest (P37 deliverable
 // b) — mirrors `.bee/bin/bee.mjs`'s publicManifestEntries/renderHelpText/
 // handleHelp exactly. The manifest itself is NEVER wrapped in the fgos.v1
-// envelope (wrapEnvelope) — it is metadata about the CLI's own verb surface,
-// not a verb's data payload, the same distinction bee.mjs draws for its own
+// envelope (wrapEnvelope) — this is CTR001's documented exception for the
+// verb manifest: metadata about the CLI's own verb surface, not a verb's
+// data payload, the same distinction bee.mjs draws for its own
 // `--help --json`.
 
 function publicManifestEntries() {
-  return COMMAND_REGISTRY.map(({ name, invoke, description, parameters, examples, access, deprecated }) => ({
+  return COMMAND_REGISTRY.map(({ name, invoke, description, parameters, examples, touchesState, externalEffect, paginated, deprecated }) => ({
     name,
     invoke,
     description,
     parameters,
     examples,
-    access,
+    touchesState,
+    externalEffect,
+    paginated,
     deprecated,
   }));
 }
 
 function renderHelpText(entries = publicManifestEntries()) {
-  const lines = [`fgos — the fgOS work-item CLI (schema_version ${SCHEMA_VERSION})`, ''];
+  // Label for touchesState+externalEffect: 'read' (both false), 'write'
+  // (touches only), 'external' (effect only), or 'write+external' (both true).
+  const labelFor = (touchesState, externalEffect) => {
+    if (touchesState && externalEffect) return 'write+external';
+    if (touchesState) return 'write';
+    if (externalEffect) return 'external';
+    return 'read';
+  };
+  const lines = [`fgos — the fgOS work-item CLI (schema_version ${MANIFEST_SCHEMA_VERSION})`, ''];
   for (const entry of entries) {
-    lines.push(`${entry.invoke} [${entry.access}]`);
+    const label = labelFor(entry.touchesState, entry.externalEffect);
+    lines.push(`${entry.invoke} [${label}]`);
     lines.push(`    ${entry.description}`);
     const required = entry.parameters?.required || [];
     const positional = entry.parameters?.positional || [];
@@ -2247,7 +2305,7 @@ function renderHelpText(entries = publicManifestEntries()) {
 
 function handleHelp(json) {
   if (json) {
-    const manifest = { schema_version: SCHEMA_VERSION, commands: publicManifestEntries() };
+    const manifest = { schema_version: MANIFEST_SCHEMA_VERSION, commands: publicManifestEntries() };
     process.stdout.write(`${JSON.stringify(manifest, null, 2)}\n`);
   } else {
     process.stdout.write(renderHelpText());
@@ -2262,6 +2320,10 @@ function handleHelp(json) {
 // normal dispatch path still produces its usual "unknown verb" error.
 // Text-mode only (D3/CONTEXT out-of-scope note): the caller gates this on
 // `!flags.json`, so `<verb> --help --json` is left to fall through unchanged.
+// Same documented exception as the full manifest above, not a separate one —
+// this reuses renderHelpText/publicManifestEntries scoped to one verb, so it
+// is never wrapped in the fgos.v1 envelope for the same reason: metadata
+// about the CLI's own verb surface, not a verb's data payload.
 function handleVerbHelp(verb) {
   const entry = publicManifestEntries().find((e) => e.name === verb);
   if (!entry) return false;
@@ -2271,7 +2333,9 @@ function handleVerbHelp(verb) {
 
 // `--pretty` rendering (D7): ONLY for `setup`/`doctor`, and only when the
 // flag is given — every other verb, and these two without `--pretty`, stay
-// byte-identical to the wrapEnvelope + JSON path (CTR001, no exception).
+// byte-identical to the wrapEnvelope + JSON path. `--pretty` itself IS
+// CTR001's documented exception here: an explicit human-readable rendering
+// opt-out via an explicit flag, not a verb's default payload.
 function renderPretty(verb, data) {
   const lines = [];
   if (verb === 'doctor') {

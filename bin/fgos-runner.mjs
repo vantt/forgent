@@ -10,14 +10,9 @@
 //
 //   fgos-runner [--once] [--watch] [--poll-ms <ms>] [--dry-run] [--config <path>]
 //
-// Exit codes follow the same categorized contract as bin/fgos.mjs (R4):
-//   0 ok            — proposed / parked / idle / dry-run / watch stopped cleanly
-//   1 unexpected     — a real bug, or a tripped circuit breaker
-//   2 precondition   — illegal FSM transition surfaced by the runner's write
-//   3 conflict       — CAS conflict on the runner's own write (state-conflict)
-//   4 validation     — bad runner config, unknown tier, not a git repo
-//   5 corrupt-log    — the event log failed to parse
-//   6 busy           — another live runner holds .fgos/runner.lock
+// Exit codes (R4): The canonical exit-code table lives in src/state/store.mjs's
+// EXIT_CODES export (codes 2-5, 7-9; 0=ok, 1=unexpected) plus src/runner/loop.mjs's
+// EXIT_BUSY (code 6, runner-only state).
 //
 // The repo root is derived from the CURRENT WORKING DIRECTORY via git
 // (never from this file's own location), so the runner operates on the
@@ -29,6 +24,7 @@ import path from 'node:path';
 import { EXIT_CODES, categoryOf } from '../src/state/store.mjs';
 import { loadRunnerConfig, ensureRunnerConfig } from '../src/runner/dispatch.mjs';
 import { resolveRepoRoot, runOnce, runWatch } from '../src/runner/loop.mjs';
+import { wrapEnvelope } from '../src/state/envelope.mjs';
 
 function parseArgs(args) {
   const flags = { once: false, watch: false, pollMs: undefined, dryRun: false, config: undefined };
@@ -70,17 +66,31 @@ function parseArgs(args) {
 }
 
 // Shared by --once and every --watch cycle (via onCycle) so the printed
-// shape stays byte-for-byte identical between both modes — a `drained`
-// result prints one line per dispatched item, every other outcome prints a
-// single summary line.
+// shape stays byte-for-byte identical between both modes (D2): builds ONE
+// fgos.v1 envelope per call via wrapEnvelope() (the SAME function
+// bin/fgos.mjs uses at its own envelope call site, fgos.mjs:2333) and writes
+// it to stdout as COMPACT single-line JSON — no pretty-print indentation,
+// deliberately DIFFERENT from fgos.mjs's own pretty-printed convention.
+// Reason: fgos.mjs is a one-shot call producing exactly one envelope per
+// invocation, so multi-line pretty-print is fine there; fgos-runner can
+// emit MANY envelopes over a --watch session's lifetime (one per cycle),
+// and a consumer tailing/streaming that output needs one-JSON-object-per-
+// line to parse incrementally — the same operational reason the worker log
+// file (RUL39) is append-friendly. Compact single-line output also makes
+// "the envelope is the last line of stdout" literally true for a --once
+// run, instead of requiring a caller to reconstruct a multi-line trailing
+// JSON value. NOTE for any consumer: loop.mjs's own progress-trace lines
+// (verify-tail etc.) can themselves start with "{" — discriminate the real
+// envelope by parsing a line as JSON and checking contract === 'fgos.v1',
+// never by a textual "starts with {" heuristic.
+//
+// The enveloped data is the result object with `exitCode` stripped out:
+// exitCode continues to ONLY set process.exitCode via the existing call
+// sites (--once below, and --watch's onCycle never reads it at all) — it
+// never leaks into `data`, the same convention bin/fgos.mjs's verbs follow.
 function printResult(result) {
-  if (result.outcome === 'drained') {
-    for (const d of result.dispatched) {
-      console.log(`fgos-runner: ${d.outcome}${d.id ? ` (${d.id})` : ''}`);
-    }
-  } else {
-    console.log(`fgos-runner: ${result.outcome}${result.id ? ` (${result.id})` : ''}`);
-  }
+  const { exitCode, ...data } = result;
+  console.log(JSON.stringify(wrapEnvelope(data)));
 }
 
 async function main() {
@@ -126,6 +136,10 @@ async function main() {
           }
         },
       });
+      // documented exception (D2): this lifecycle line stays plain text,
+      // not an fgos.v1 envelope — it is metadata about the runner's own
+      // stop event, not a verb's data payload, same vocabulary D2/D32 use
+      // for the other non-enveloped stdout lines in this contract.
       console.log('fgos-runner: watch mode stopped (signal received)');
       // A deliberate stop is always a clean exit regardless of the last
       // cycle's own outcome (D8) — --watch never surfaces a per-cycle
@@ -136,9 +150,9 @@ async function main() {
 
     // `--once` runs one bounded drain-run over the frontier (D10/D15): it may
     // now dispatch several items in parallel, so a `drained` result carries a
-    // per-item `dispatched` list — print one line per item so a single
-    // dispatch still prints e.g. "proposed (item1)". `busy`/`idle`/`dry-run`
-    // are pre-dispatch short-circuits and keep the single-line form.
+    // per-item `dispatched` list inside the one envelope printResult() emits
+    // (D2) — `busy`/`idle`/`dry-run` are pre-dispatch short-circuits and get
+    // the same single-envelope treatment.
     const result = await runOnce({ repoRoot, config, dryRun: flags.dryRun });
     printResult(result);
     process.exitCode = result.exitCode;

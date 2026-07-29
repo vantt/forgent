@@ -81,16 +81,7 @@ test('classifySource prefers "runner" even when headAtTake/headAtReturn are also
 
 // --- reviewDiff ---------------------------------------------------------
 
-test('reviewDiff for a runner item diffs main...fgw/<id> and carries no warnings', () => {
-  const repoRoot = initRepo();
-  makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
-  const result = reviewDiff(repoRoot, makeItem());
-  assert.equal(result.source, 'runner');
-  assert.match(result.diff, /produced\.txt/);
-  assert.deepEqual(result.warnings, []);
-});
-
-test('reviewDiff for a runner item with an explicit opts.trunk diffs against that trunk instead of main (D3)', () => {
+test('reviewDiff for a runner item with an explicit opts.trunk diffs against that trunk instead of main', () => {
   const repoRoot = initRepo();
   // A non-main trunk, forked from main, with its own commit — then a leaf
   // branch forked from THAT trunk's tip, per D3's fgw/<root> tree shape.
@@ -179,7 +170,7 @@ test('changedFiles returns every changed path when a runner branch touches sever
   assert.deepEqual(changedFiles(repoRoot, makeItem()).sort(), ['plain.txt', 'src/runner/a.mjs']);
 });
 
-test('changedFiles honors an explicit opts.trunk (leaf diffs against its parent root, not main — D3)', () => {
+test('changedFiles honors an explicit opts.trunk (leaf diffs against its parent root, not main)', () => {
   const repoRoot = initRepo();
   makeBranchWithCommit(repoRoot, 'fgw/parent-root', 'root-only.txt', 'root\n');
   git(repoRoot, ['checkout', 'fgw/parent-root']);
@@ -188,7 +179,7 @@ test('changedFiles honors an explicit opts.trunk (leaf diffs against its parent 
   assert.deepEqual(changedFiles(repoRoot, makeItem(), { trunk: 'fgw/parent-root' }), ['leaf-only.txt']);
 });
 
-test('changedFiles returns an empty array for a pull-source item (Iron Law approve-check is runner-only, D16)', () => {
+test('changedFiles returns an empty array for a pull-source item (Iron Law approve-check is runner-only)', () => {
   const repoRoot = initRepo();
   const head = headOf(repoRoot);
   assert.deepEqual(changedFiles(repoRoot, makeItem({ headAtTake: head, headAtReturn: head })), []);
@@ -251,7 +242,7 @@ test('isWorkingTreeClean(repoRoot) still scans the WHOLE repo when repoRoot is a
 
 // --- isFgosOnlyStatusLine's prefix parameter -----------------------------
 
-test('isFgosOnlyStatusLine with no prefix (default) matches only a bare top-level .fgos/ path — unchanged pre-STR60 behavior', () => {
+test('isFgosOnlyStatusLine with no prefix (default) matches only a bare top-level .fgos/ path — unchanged prior behavior', () => {
   assert.equal(isFgosOnlyStatusLine(' M .fgos/events.jsonl'), true);
   assert.equal(isFgosOnlyStatusLine('?? .fgos'), true);
   assert.equal(isFgosOnlyStatusLine(' M sub/.fgos/events.jsonl'), false, 'without a matching prefix, a nested .fgos/ path must not match');

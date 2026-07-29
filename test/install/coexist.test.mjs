@@ -70,7 +70,7 @@ test('AGENTS.md present but without the managed block: not detected as a harness
   assert.deepEqual(statSnapshot(agentsPath), before);
 });
 
-test('AGENTS.md absent is skipped per D6 — no error recorded, init-side caller unaffected', () => {
+test('AGENTS.md absent is skipped — no error recorded, init-side caller unaffected', () => {
   const root = tmpRoot();
   assert.equal(fs.existsSync(path.join(root, 'AGENTS.md')), false);
 

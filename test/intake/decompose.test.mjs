@@ -92,6 +92,19 @@ function writeFlakyThenValidExecutor(dir, badStdout, validVerdict) {
   return scriptPath;
 }
 
+function echoPromptExecutor(dir) {
+  const scriptPath = path.join(dir, 'echo-full-prompt.mjs');
+  fs.writeFileSync(
+    scriptPath,
+    `
+    const prompt = process.argv[2];
+    process.stdout.write(JSON.stringify({ verdict: 'need-human', reason: prompt }));
+    process.exit(0);
+    `,
+  );
+  return scriptPath;
+}
+
 function cfgFor(executorArgs, overrides = {}) {
   return {
     executor: { command: process.execPath, args: executorArgs },
@@ -214,7 +227,7 @@ test('judgeDecompose falls back to a default reason when need-human supplies non
   assert.ok(verdict.reason.length > 0);
 });
 
-test('judgeDecompose fails safe (never throws, invalid) on unparsable stdout, retrying up to MAX_JUDGE_ATTEMPTS before falling back (str68 D2/D3, nested-judge-fix)', () => {
+test('judgeDecompose fails safe (never throws, invalid) on unparsable stdout, retrying up to MAX_JUDGE_ATTEMPTS before falling back (nested-judge-fix)', () => {
   const dir = mkTempDir();
   const { scriptPath, counterPath } = writeCountingRawStdoutExecutor(dir, 'not json at all');
   const cfg = cfgFor([scriptPath, '{prompt}']);
@@ -226,7 +239,7 @@ test('judgeDecompose fails safe (never throws, invalid) on unparsable stdout, re
   assert.equal(readCount(counterPath), 3);
 });
 
-test('judgeDecompose retries once with a stricter prompt on a parse-shaped failure and resolves to the retry verdict (str68 D2)', () => {
+test('judgeDecompose retries once with a stricter prompt on a parse-shaped failure and resolves to the retry verdict', () => {
   const dir = mkTempDir();
   const scriptPath = writeFlakyThenValidExecutor(dir, 'not json at all', { verdict: 'pass-through' });
   const cfg = cfgFor([scriptPath, '{prompt}']);
@@ -241,7 +254,7 @@ test('judgeDecompose fails safe when the verdict JSON is missing the "verdict" f
   assert.deepEqual(judgeDecompose(sampleWork(), cfg), { kind: 'invalid' });
 });
 
-test('judgeDecompose fails safe when the executor exits non-zero, attempting exactly once — no retry on a non-parse failure (str68 D2)', () => {
+test('judgeDecompose fails safe when the executor exits non-zero, attempting exactly once — no retry on a non-parse failure', () => {
   const dir = mkTempDir();
   const { scriptPath, counterPath } = writeCountingFailingExecutor(dir, 7);
   const cfg = cfgFor([scriptPath, '{prompt}']);
@@ -263,6 +276,68 @@ test('judgeDecompose fails safe when the work item\'s tier has no configured mod
   const scriptPath = writeVerdictExecutor(dir, { verdict: 'pass-through' });
   const cfg = { executor: { command: process.execPath, args: [scriptPath, '{prompt}'] }, models: {}, timeoutMs: 5000 };
   assert.deepEqual(judgeDecompose(sampleWork({ tier: 'standard' }), cfg), { kind: 'invalid' });
+});
+
+// --- judgeDecompose gate consultation (tsk-3w8 follow-up, mirrors --------
+// discovery.test.mjs's own P30 tests): a "need-human" verdict parks the item
+// via the SAME putInAwaiting/view.gates door discovery.mjs's "unclear" does
+// — the prompt must actually consult that answer on the next call, or a
+// human's `fgos answer` never changes anything and the same question repeats
+// forever. ---------------------------------------------------------------
+
+test('judgeDecompose with a view embeds the latest gate answer in the prompt', () => {
+  const dir = mkTempDir();
+  const scriptPath = echoPromptExecutor(dir);
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+  const work = sampleWork();
+  const view = {
+    work: { [work.id]: work },
+    gates: { [work.id]: { ask: 'Chia hay pass-through?', answer: 'Pass-through — không cần tách con.' } },
+  };
+  const verdict = judgeDecompose(work, cfg, '', view);
+  // need-human's `reason` here is the prompt itself (echo executor) — asserting
+  // on it is asserting on the actual prompt text sent to the executor.
+  assert.match(verdict.reason, /Chia hay pass-through\?/);
+  assert.match(verdict.reason, /Pass-through — không cần tách con\./);
+});
+
+test('judgeDecompose degrades to a placeholder (no throw) when no view is passed — old 3-arg call stays backward-compatible', () => {
+  const dir = mkTempDir();
+  const scriptPath = echoPromptExecutor(dir);
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+  const verdict = judgeDecompose(sampleWork(), cfg, ''); // 3-arg, no view — must not throw
+  assert.match(verdict.reason, /chưa có vòng hỏi-đáp nào với người/);
+});
+
+test('resolveDecompose: a need-human verdict parks via putInAwaiting, and the NEXT resolveDecompose call sees that answer in the prompt (end-to-end)', () => {
+  const scriptDir = mkTempDir();
+  const echoScript = echoPromptExecutor(scriptDir);
+  const cfg = cfgFor([echoScript, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork());
+
+  const first = resolveDecompose(storeDir, 'item-x', cfg, 'human');
+  assert.equal(first.outcome, 'need-human');
+  const view1 = listWork(storeDir);
+  assert.equal(view1.work['item-x'].status, 'awaiting-human');
+  assert.ok(view1.gates['item-x'].ask);
+
+  // Resolve the gate via the same store door `fgos answer` uses (moveWork's
+  // answer edge), never a hand-written state change.
+  moveWork(storeDir, {
+    id: 'item-x',
+    to: 'todo',
+    expectedStatus: 'awaiting-human',
+    answer: 'Pass-through — đã xác nhận, không cần tách con.',
+  });
+
+  const second = resolveDecompose(storeDir, 'item-x', cfg, 'human');
+  assert.equal(second.outcome, 'need-human');
+  // The SECOND call's prompt (echoed back as verdict.reason via the fake
+  // executor) must contain the answer just recorded — proving it was
+  // actually consulted, not just stored and ignored.
+  assert.match(second.verdict.reason, /đã xác nhận, không cần tách con/);
 });
 
 // --- resolveDecompose: read-judge-write over the real store ---------------
@@ -591,6 +666,57 @@ test('resolveDecompose routes a risk-heavy root through the human gate on a pass
 
   const result = resolveDecompose(storeDir, 'item-x', cfg, 'runner');
   assert.equal(result.outcome, 'need-human');
+  const view = listWork(storeDir);
+  assert.equal(view.work['item-x'].stage, 'decompose');
+});
+
+// --- heavy-risk gate release on confirmation (tsk-3w8 follow-up) ----------
+// Without this, a risk-heavy root re-fires the SAME "confirm before
+// splitting" ask forever, regardless of any answer a human gives — `fgos
+// answer` resumes status to `todo` but stage stays `decompose`, so the very
+// next resolveDecompose call hit the exact same unconditional gate again
+// (real dogfood, tsk-3w8, 2026-07-28: 3 discover calls, identical ask each
+// time). The gate must release once a human has genuinely answered ITS OWN
+// prior ask — never a stale answer from an unrelated question.
+
+test('resolveDecompose releases a risk-heavy root once the human has answered THIS gate\'s own prior ask, proceeding with the model verdict', () => {
+  const scriptDir = mkTempDir();
+  const scriptPath = writeVerdictExecutor(scriptDir, { verdict: 'pass-through' });
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork({ risk: 'heavy' }));
+
+  const first = resolveDecompose(storeDir, 'item-x', cfg, 'human');
+  assert.equal(first.outcome, 'need-human');
+  const askedView = listWork(storeDir);
+  assert.match(askedView.gates['item-x'].ask, /risk cao \(heavy\)/);
+
+  // Answer through the same door `fgos answer` uses — resumes status to
+  // todo, stage stays decompose (unchanged by this edge).
+  moveWork(storeDir, { id: 'item-x', to: 'todo', expectedStatus: 'awaiting-human', answer: 'Đã xác nhận, cứ pass-through.' });
+
+  const second = resolveDecompose(storeDir, 'item-x', cfg, 'human');
+  assert.equal(second.outcome, 'pass-through', 'the gate must release once its own prior ask has a real answer on record');
+  const finalView = listWork(storeDir);
+  assert.equal(finalView.work['item-x'].stage, 'executing');
+});
+
+test('resolveDecompose does NOT release the risk-heavy gate on a stale/unrelated gate answer (never a false bypass)', () => {
+  const scriptDir = mkTempDir();
+  const scriptPath = writeVerdictExecutor(scriptDir, { verdict: 'pass-through' });
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork({ risk: 'heavy' }));
+  // A gate answer already on record, but from an unrelated question (e.g.
+  // the clarify-stage's own ask) — must never be read as confirming this
+  // gate's own distinct ask.
+  moveWork(storeDir, { id: 'item-x', to: 'awaiting-human', ask: 'Which file exactly?', statusAtAsk: 'todo' });
+  moveWork(storeDir, { id: 'item-x', to: 'todo', expectedStatus: 'awaiting-human', answer: 'The parser module.' });
+
+  const result = resolveDecompose(storeDir, 'item-x', cfg, 'human');
+  assert.equal(result.outcome, 'need-human', 'an unrelated prior answer must not bypass the heavy-risk gate');
   const view = listWork(storeDir);
   assert.equal(view.work['item-x'].stage, 'decompose');
 });

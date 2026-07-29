@@ -199,7 +199,7 @@ test('runJudgeExecutor returns the parsed verdict on a clean first attempt, with
   assert.equal(readCount(counterPath), 1);
 });
 
-test('runJudgeExecutor retries once with the stricter prompt on a parse-shaped failure and returns the retry verdict (str68 D2)', () => {
+test('runJudgeExecutor retries once with the stricter prompt on a parse-shaped failure and returns the retry verdict', () => {
   const dir = mkTempDir();
   const { scriptPath, counterPath } = writeFlakyThenValidExecutor(dir, 'not json at all', { clear: true, verify: 'ok' });
   const cfg = cfgFor(scriptPath);
@@ -208,7 +208,7 @@ test('runJudgeExecutor retries once with the stricter prompt on a parse-shaped f
   assert.equal(readCount(counterPath), 2);
 });
 
-test('runJudgeExecutor sends the stricter prompt (not the original) on the retry attempt (str68 D2)', () => {
+test('runJudgeExecutor sends the stricter prompt (not the original) on the retry attempt', () => {
   const dir = mkTempDir();
   const scriptPath = writeFlakyEchoExecutor(dir);
   const cfg = cfgFor(scriptPath);
@@ -216,7 +216,7 @@ test('runJudgeExecutor sends the stricter prompt (not the original) on the retry
   assert.equal(verdict.echoed, 'STRICTER SUFFIX prompt');
 });
 
-test('runJudgeExecutor strips a ```json ... ``` code fence and parses the wrapped verdict on the first attempt, with no retry (tsk-37v)', () => {
+test('runJudgeExecutor strips a ```json ... ``` code fence and parses the wrapped verdict on the first attempt, with no retry', () => {
   const dir = mkTempDir();
   const { scriptPath, counterPath } = writeRawStdoutExecutor(dir, '```json\n{"clear": true, "verify": "ok"}\n```');
   const cfg = cfgFor(scriptPath);
@@ -225,7 +225,7 @@ test('runJudgeExecutor strips a ```json ... ``` code fence and parses the wrappe
   assert.equal(readCount(counterPath), 1);
 });
 
-test('runJudgeExecutor strips a bare ``` ... ``` fence (no language tag) and parses the wrapped verdict (tsk-37v)', () => {
+test('runJudgeExecutor strips a bare ``` ... ``` fence (no language tag) and parses the wrapped verdict', () => {
   const dir = mkTempDir();
   const { scriptPath, counterPath } = writeRawStdoutExecutor(dir, '```\n{"clear": false, "question": "why?"}\n```');
   const cfg = cfgFor(scriptPath);
@@ -234,7 +234,7 @@ test('runJudgeExecutor strips a bare ``` ... ``` fence (no language tag) and par
   assert.equal(readCount(counterPath), 1);
 });
 
-test('runJudgeExecutor returns null (fail-safe) when all three attempts hit a parse-shaped failure (str68 D3, nested-judge-fix)', () => {
+test('runJudgeExecutor returns null (fail-safe) when all three attempts hit a parse-shaped failure (nested-judge-fix)', () => {
   const dir = mkTempDir();
   const { scriptPath, counterPath } = writeRawStdoutExecutor(dir, 'not json at all');
   const cfg = cfgFor(scriptPath);
@@ -243,7 +243,7 @@ test('runJudgeExecutor returns null (fail-safe) when all three attempts hit a pa
   assert.equal(readCount(counterPath), 3);
 });
 
-test('runJudgeExecutor succeeds on the third attempt (second retry) after two parse-shaped failures (str68 nested-judge-fix)', () => {
+test('runJudgeExecutor succeeds on the third attempt (second retry) after two parse-shaped failures (nested-judge-fix)', () => {
   const dir = mkTempDir();
   const { scriptPath, counterPath } = writeFlakyTwiceThenValidExecutor(dir, 'not json at all', { clear: true, verify: 'ok' });
   const cfg = cfgFor(scriptPath);
@@ -261,7 +261,7 @@ test('runJudgeExecutor treats a parsed non-object (array) as a parse-shaped fail
   assert.equal(readCount(counterPath), 2);
 });
 
-test('runJudgeExecutor returns null immediately (no retry) on a non-parse failure — non-zero exit (str68 D2)', () => {
+test('runJudgeExecutor returns null immediately (no retry) on a non-parse failure — non-zero exit', () => {
   const dir = mkTempDir();
   const { scriptPath, counterPath } = writeFailingExecutor(dir, 7);
   const cfg = cfgFor(scriptPath);
@@ -270,7 +270,7 @@ test('runJudgeExecutor returns null immediately (no retry) on a non-parse failur
   assert.equal(readCount(counterPath), 1);
 });
 
-test('runJudgeExecutor returns null immediately when the configured command does not exist (spawn fail, str68 D2)', () => {
+test('runJudgeExecutor returns null immediately when the configured command does not exist (spawn fail)', () => {
   const cfg = {
     executor: { command: '/no/such/executor-binary-xyz', args: ['{prompt}'] },
     timeoutMs: 5000,
@@ -279,7 +279,7 @@ test('runJudgeExecutor returns null immediately when the configured command does
   assert.equal(verdict, null);
 });
 
-test('runJudgeExecutor returns null when a parse-shaped failure on attempt 1 is followed by a non-parse failure on the retry (str68 D3)', () => {
+test('runJudgeExecutor returns null when a parse-shaped failure on attempt 1 is followed by a non-parse failure on the retry', () => {
   const dir = mkTempDir();
   const { scriptPath, counterPath } = writeParseThenNonParseExecutor(dir);
   const cfg = cfgFor(scriptPath);
@@ -288,7 +288,7 @@ test('runJudgeExecutor returns null when a parse-shaped failure on attempt 1 is 
   assert.equal(readCount(counterPath), 2);
 });
 
-test('runJudgeExecutor fails safe (no retry) when the first attempt hangs past cfg.timeoutMs (str68 D4)', () => {
+test('runJudgeExecutor fails safe (no retry) when the first attempt hangs past cfg.timeoutMs', () => {
   const dir = mkTempDir();
   const scriptPath = writeHangingExecutor(dir);
   const cfg = cfgFor(scriptPath, { timeoutMs: 200 });

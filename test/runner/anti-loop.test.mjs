@@ -109,7 +109,7 @@ test('visitCount counts the doing-move once the item has actually reached stage 
   assert.equal(visitCount(events, 'a'), 1);
 });
 
-test('visitCount counts every executing-stage doing-move for an item added with no explicit stage (D8 lazy default reads as executing)', () => {
+test('visitCount counts every executing-stage doing-move for an item added with no explicit stage (lazy default reads as executing)', () => {
   const events = [add('a', 1), move('a', 'doing', 2), move('a', 'blocked', 3), move('a', 'doing', 4)];
   assert.equal(visitCount(events, 'a'), 2);
 });
@@ -207,7 +207,7 @@ test('a machine park with reason (role runner, e.g. anti-loop-max-visits) does N
   assert.equal(visitsSinceLastHumanEvent(events, 'a'), 2);
 });
 
-test('a system park edge does not reset the anti-loop budget — role must be human, not just reason (D30: return/approve internal park edges stamp role system)', () => {
+test('a system park edge does not reset the anti-loop budget — role must be human, not just reason (return/approve internal park edges stamp role system)', () => {
   const events = [
     move('a', 'doing', 1),
     { seq: 2, ts: new Date(2026, 0, 2).toISOString(), type: 'work.move', payload: { id: 'a', from: 'doing', to: 'blocked', reason: 'verify-fail', role: 'system' }, v: 2 },

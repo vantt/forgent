@@ -45,7 +45,7 @@ function addSynthetic(dir, id) {
   });
 }
 
-test('a coding item at stage executing is refused proposed->done — it must pass through compound-learn first (D3)', () => {
+test('a coding item at stage executing is refused proposed->done — it must pass through compound-learn first', () => {
   const dir = tmpDir();
   addCoding(dir, 'gate-proposed');
   moveWork(dir, { id: 'gate-proposed', to: 'doing', expectedStatus: 'todo' });
@@ -60,7 +60,7 @@ test('a coding item at stage executing is refused proposed->done — it must pas
   assert.equal(view.work['gate-proposed'].status, 'todo');
 });
 
-test('a coding item at stage executing is refused the doing->done shortcut too (both doors are gated, D3)', () => {
+test('a coding item at stage executing is refused the doing->done shortcut too (both doors are gated)', () => {
   const dir = tmpDir();
   addCoding(dir, 'gate-doing');
   moveWork(dir, { id: 'gate-doing', to: 'doing', expectedStatus: 'todo' });

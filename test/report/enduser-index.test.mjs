@@ -42,7 +42,7 @@ test('findSourceCaptureId returns the id whose outcome docPath matches, or null 
   assert.equal(findSourceCaptureId(undefined, 'docs/how-to/foo.md'), null);
 });
 
-test('findSourceCaptureIds returns ALL outcome ids whose docPath matches, in stable insertion order (D13 no-loss gather)', () => {
+test('findSourceCaptureIds returns ALL outcome ids whose docPath matches, in stable insertion order (no-loss gather)', () => {
   const outcomesView = {
     'work-a': { docPath: 'docs/how-to/foo.md' },
     'work-b': { docPath: 'docs/how-to/bar.md' },
@@ -126,29 +126,36 @@ test('fgos docs-index writes repo/docs/enduser-docs-index.json with the real how
   assert.equal(demo.sourceCaptureId, 'doc-fgos-rollup-howto');
 });
 
-test('fgos docs-index tolerates missing quadrant dirs (tutorials/reference have no alias and stay empty) with no crash and no entries from them', () => {
-  // tutorials/reference have no on-disk dir and no alias (D2's alias is
-  // explanation-only) — they stay fully empty. docs/explanation (the
-  // PRIMARY dir for the explanation quadrant) is no longer expected absent:
-  // str64-backfill-3 populates it with real backfilled docs, alongside the
-  // docs/decisions/ alias (D2) — both are legitimate on-disk sources for
-  // the same quadrant.
-  for (const quadrant of ['tutorials', 'reference']) {
-    assert.ok(
-      !fs.existsSync(path.join(REPO_ROOT, 'docs', quadrant)),
-      `expected docs/${quadrant} to be absent today — validation constraint (a) assumes this`,
-    );
-  }
-  const result = runDocsIndex();
-  assert.equal(result.status, 0, result.stderr);
-  const manifest = JSON.parse(fs.readFileSync(MANIFEST_PATH, 'utf8'));
-  for (const entry of manifest) {
-    assert.notEqual(entry.quadrant, 'tutorials');
-    assert.notEqual(entry.quadrant, 'reference');
+test('fgos docs-index tolerates a missing quadrant dir (tutorials has no alias) with no crash and no entries from it', () => {
+  // Every real Diataxis quadrant dir is now populated with real content
+  // (explanation: str64-backfill-3; reference/tutorials: tsk-3wr-3/tsk-3wr's
+  // own compound-learn captures) — this repo will likely never again have a
+  // quadrant dir that is naturally absent on disk. Per this file's own rule
+  // (no fake/temp-copy fixture), this test still exercises the REAL
+  // docs/tutorials dir and the real generator — it just constructs the
+  // missing-dir condition itself, renaming the real dir aside for the
+  // test's duration and unconditionally restoring it afterward, rather than
+  // depending on ambient repo state to happen to have an empty quadrant.
+  // tutorials is picked because it has no alias (D2's alias is
+  // explanation-only), so hiding its one real dir fully empties the
+  // quadrant with no second source left to populate it.
+  const tutorialsDir = path.join(REPO_ROOT, 'docs', 'tutorials');
+  const hiddenDir = path.join(REPO_ROOT, 'docs', '.tutorials-hidden-for-test');
+  assert.ok(fs.existsSync(tutorialsDir), 'expected docs/tutorials to exist today so this test can hide it');
+  fs.renameSync(tutorialsDir, hiddenDir);
+  try {
+    const result = runDocsIndex();
+    assert.equal(result.status, 0, result.stderr);
+    const manifest = JSON.parse(fs.readFileSync(MANIFEST_PATH, 'utf8'));
+    for (const entry of manifest) {
+      assert.notEqual(entry.quadrant, 'tutorials');
+    }
+  } finally {
+    fs.renameSync(hiddenDir, tutorialsDir);
   }
 });
 
-test('fgos docs-index reads BOTH the docs/decisions/ alias (D2) and the primary docs/explanation/ dir into the explanation quadrant, tagged by quadrant name not source dir name', () => {
+test('fgos docs-index reads BOTH the docs/decisions/ alias and the primary docs/explanation/ dir into the explanation quadrant, tagged by quadrant name not source dir name', () => {
   const result = runDocsIndex();
   assert.equal(result.status, 0, result.stderr);
   const manifest = JSON.parse(fs.readFileSync(MANIFEST_PATH, 'utf8'));
