@@ -20,7 +20,7 @@ either.
 | ID | Decision |
 |----|----------|
 | D1 | Proof bar for closing (a) vs (b): reuse the same ablation technique already validated in `docs/specs/work-state.md` RUL10 at implementation time — stash the `events.lock` patch, run the fork-based race test (`test/state/events.test.mjs:225`) at the load level that reproduces today's flake, confirm it reliably goes RED (proves the race exists without the lock at that load); restore the patch, run again at the same load. If the patched version reliably goes GREEN at that load across repeated runs, that closes the item as (b) — test-oversensitivity, not a lock bug. If the patched version also goes red (even occasionally) under that load, that's (a) — a real race, and the lock needs a fix. |
-| D2 | The "normal operation" baseline this item must protect against is explicitly **≥20 concurrent `fgos` worktrees/processes** capable of calling `appendEvent` — raised from the ~10 worktrees observed live in this repo at claim time (`git worktree list`). Any close-out (either "confirmed safe, test is oversensitive" or "fixed the lock") must be validated safe at that concurrency level, not just today's observed ~10. |
+| D2 | The race-test's session-count parameter should be scaled to **≥20 concurrent `fgos` processes** — the user's real minimum concurrent-window count (8 windows observed live, ~15-20 typical) — as headroom for the ablation proof (D1), not because real write-contention has been observed at that level (measured: it has not, see scout evidence below). Any close-out must run the D1 ablation at ≥20 concurrent processes, not just the test's current 6. |
 
 ## Pinned terms
 
@@ -31,8 +31,10 @@ either.
   processes × 40 back-to-back appends, no delay, on a machine already
   saturated by two parallel full-suite runs) exceeds any load the lock needs
   to survive in real operation, making the test itself the fragile part.
-- **"Normal operation"**: per D2, ≥20 concurrent `fgos` worktrees/processes,
-  not just the ~10 seen live today.
+- **"Normal operation"**: per D2, the D1 ablation proof must be run at ≥20
+  concurrent `fgos` processes (session-count headroom), not the L3
+  write-contention threshold — measured real write pattern (below) does not
+  show that threshold crossed.
 
 ## Scout evidence cited
 
@@ -58,9 +60,25 @@ either.
   multiple agents writing concurrently becomes the main load" — a threshold
   the doc frames as not yet reached.
 - `git worktree list` at claim time — showed ~10 active `fgw/*` worktrees
-  right now, i.e. real concurrent multi-session `fgos` usage already exists
-  in this repo today, in tension with RUL10's "not yet reached" framing.
-  Per D2, the user wants the bar set higher still: ≥20 concurrent.
+  right now; user reports 8 windows minimum, ~15-20 typical in real usage.
+- `.fgos/events.jsonl` measured directly (557 events, 2026-07-16 to
+  2026-07-29): 42% of consecutive-event gaps are under 1s, but inspecting
+  the 195 pairs under 50ms shows 170 (87%) share the SAME item id (one verb
+  call writing several related events back to back — e.g. `work.add` of N
+  children, or `work.move`+`work.outcome` in one transition — single
+  process, not contention) and the remaining 25 cross-id pairs match a
+  single script/loop editing several sibling items sequentially (e.g.
+  `work.edit tsk-3oa → tsk-4mo → tsk-1nu → tsk-2r4`, ~46ms apart each,
+  2026-07-28T10:20:03). **No pair in 557 events shows two independent
+  processes writing at genuinely the same instant.** L3's reopen threshold
+  ("nhiều agent ghi đồng thời như tải chính", `docs/platform-foundations.md`
+  line 92-95) requires real concurrent WRITE contention, distinct from
+  concurrent SESSION count — measured data shows session count is high
+  (D2) but write bursts remain effectively single-writer-at-a-time. L3 is
+  NOT triggered by this item; user also confirms no felt write-side
+  bottleneck, only test-side flakiness. This also further supports D1
+  leaning toward (b): the test's synchronized-to-the-millisecond 6×40 burst
+  doesn't resemble any real write pattern observed in 13 days of usage.
 
 ## Canonical references
 
