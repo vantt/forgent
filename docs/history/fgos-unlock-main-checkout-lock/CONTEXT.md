@@ -52,7 +52,8 @@ lineage, same problem class, not requested here — see D3).
 
 - `src/runner/main-checkout-lock.mjs` — the lock primitive itself:
   `acquireMainCheckoutLock`/`releaseMainCheckoutLock`, `ACQUIRED`/`HELD`/`AMBIGUOUS`
-  statuses, `DEFAULT_TTL_MS` (5 min), self-recognition (D6), string-identity
+  statuses, `DEFAULT_TTL_MS` (3 min as of a concurrent tsk-3h4-unrelated fix,
+  1dabb6b — was 5 min when this doc was first written), self-recognition (D6), string-identity
   vs numeric-pid staleness judgment.
 - `src/runner/claim-port.mjs:73-86` — the only current caller. On `HELD` or
   `AMBIGUOUS` it throws `ClaimError('lock-held'|'lock-ambiguous', ...)` with

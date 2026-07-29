@@ -7,6 +7,7 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import {
   acquireMainCheckoutLock,
   releaseMainCheckoutLock,
+  forceReclaimAmbiguousLock,
   LOCK_FILE,
   ACQUIRED,
   HELD,
@@ -277,4 +278,49 @@ test('self-recognition: the same string identity refreshes its own lock with no 
   const res = acquireMainCheckoutLock(dir, { identity: 'session-abc-123' });
 
   assert.equal(res.status, ACQUIRED);
+});
+
+// --- forceReclaimAmbiguousLock (tsk-3h4) -------------------------------------
+
+test('forceReclaimAmbiguousLock: already-clear when no lock file exists', () => {
+  const { dir } = setup();
+  const res = forceReclaimAmbiguousLock(dir);
+  assert.equal(res.status, 'already-clear');
+});
+
+test('forceReclaimAmbiguousLock: reclaims a lock file that is still unparseable on the second read', () => {
+  const { dir } = setup();
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(lockPathFor(dir), 'not json at all {{{');
+
+  const res = forceReclaimAmbiguousLock(dir);
+
+  assert.equal(res.status, 'reclaimed');
+  assert.equal(fs.existsSync(lockPathFor(dir)), false);
+});
+
+test('forceReclaimAmbiguousLock: never unlinks a lock that now parses (a legitimate holder wrote a fresh valid record since the caller\'s own read)', () => {
+  const { dir } = setup();
+  fs.mkdirSync(dir, { recursive: true });
+  // A live holder race-wins between the caller's own AMBIGUOUS read and this
+  // call: by the time forceReclaimAmbiguousLock reads the file itself, it is
+  // already a valid record again.
+  fs.writeFileSync(lockPathFor(dir), JSON.stringify({ pid: process.pid, ts: Date.now() }));
+
+  const res = forceReclaimAmbiguousLock(dir);
+
+  assert.equal(res.status, 'no-longer-ambiguous');
+  assert.equal(fs.existsSync(lockPathFor(dir)), true);
+});
+
+test('forceReclaimAmbiguousLock: reclaims a lock file with a valid pid but an unusable timestamp (AMBIGUOUS per acquireMainCheckoutLock)', () => {
+  const { dir } = setup();
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(lockPathFor(dir), JSON.stringify({ pid: process.pid, ts: 'not-a-timestamp' }));
+  assert.equal(acquireMainCheckoutLock(dir, { identity: process.pid + 1 }).status, AMBIGUOUS);
+
+  const res = forceReclaimAmbiguousLock(dir);
+
+  assert.equal(res.status, 'reclaimed');
+  assert.equal(fs.existsSync(lockPathFor(dir)), false);
 });
