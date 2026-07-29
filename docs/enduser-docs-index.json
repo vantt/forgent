@@ -251,6 +251,14 @@
     "quadrant": "explanation",
     "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
     "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/why-merge-loop-recurses-into-loop-not-ck-loop.md",
+    "title": "Why `/fgOS:merge-loop` (`tsk-1sm`) recurses into `loop`, not `ck-loop`",
+    "sourceCaptureId": "tsk-1sm"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/explanation/why-merge-standardization-reuses-existing-mechanisms.md",
     "title": "Why merge-standardization (`tsk-4j9`) reuses existing mechanisms instead of building new ones",
     "sourceCaptureId": "tsk-4j9"
