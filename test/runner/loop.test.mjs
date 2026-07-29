@@ -117,7 +117,7 @@ fs.writeFileSync('output.txt', 'uncommitted\\n');
 
 /** A rogue writer that races the runner: does the work, commits it, then
  * moves the item doing -> blocked in the MAIN repo's .fgos behind the
- * runner's back — so the runner's own doing -> proposed CAS must conflict. */
+ * runner's back — so the runner's own doing -> awaiting-approval CAS must conflict. */
 function writeRacingExecutor(scriptDir, counterFile, mainDir, id) {
   const storeUrl = pathToFileURL(path.resolve(import.meta.dirname, '../../src/state/store.mjs')).href;
   const scriptPath = path.join(scriptDir, 'racing-executor.mjs');
@@ -264,7 +264,7 @@ function setup() {
 
 // --- happy path: --once runs the full circle -----------------------------
 
-test('runOnce full circle: todo -> doing -> worker commit -> goal-check pass -> proposed, branch kept, worktree gone, runner is the only .fgos writer', async () => {
+test('runOnce full circle: todo -> doing -> worker commit -> goal-check pass -> awaiting-approval, branch kept, worktree gone, runner is the only .fgos writer', async () => {
   const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
   seedItem(dir, { id: 'item-happy' });
   const config = configFor(writeCommittingExecutor(scriptDir, counterFile));
@@ -274,10 +274,10 @@ test('runOnce full circle: todo -> doing -> worker commit -> goal-check pass -> 
   assert.equal(result.outcome, 'drained');
   assert.equal(result.exitCode, 0);
   assert.equal(result.dispatched.length, 1);
-  assert.equal(result.dispatched[0].outcome, 'proposed');
+  assert.equal(result.dispatched[0].outcome, 'awaiting-approval');
   assert.equal(result.dispatched[0].id, 'item-happy');
   assert.equal(result.dispatched[0].branch, 'fgw/item-happy');
-  assert.equal(listWork(dir).work['item-happy'].status, 'proposed');
+  assert.equal(listWork(dir).work['item-happy'].status, 'awaiting-approval');
   assert.equal(branchExists(repoRoot, 'fgw/item-happy'), true);
   const log = execFileSync('git', ['log', '--oneline', 'fgw/item-happy'], { cwd: repoRoot, encoding: 'utf8' });
   assert.match(log, /worker: output\.txt/);
@@ -289,7 +289,7 @@ test('runOnce full circle: todo -> doing -> worker commit -> goal-check pass -> 
   const events = readRawEvents(dir);
   assert.deepEqual(
     events.map((e) => (e.type === 'work.outcome' ? `work.outcome:${e.payload.predicted ? 'predicted' : 'actual'}` : `${e.type}:${e.payload.to ?? 'add'}`)),
-    ['work.add:add', 'work.move:doing', 'work.outcome:predicted', 'work.move:proposed', 'work.outcome:actual'],
+    ['work.add:add', 'work.move:doing', 'work.outcome:predicted', 'work.move:awaiting-approval', 'work.outcome:actual'],
   );
   // predicted is written right at claim time, before dispatch ever runs
   const predictedEvent = events.find((e) => e.type === 'work.outcome' && e.payload.predicted);
@@ -297,7 +297,7 @@ test('runOnce full circle: todo -> doing -> worker commit -> goal-check pass -> 
   // actual is written on the pass terminal, sourced from the runner's own
   // goal-check/branchFacts — never the worker's status/signal
   const actualEvent = events.find((e) => e.type === 'work.outcome' && e.payload.actual);
-  assert.equal(actualEvent.payload.actual.outcome, 'proposed');
+  assert.equal(actualEvent.payload.actual.outcome, 'awaiting-approval');
   assert.equal(actualEvent.payload.actual.passed, true);
   assert.equal(actualEvent.payload.actual.aheadCount, 1);
 });
@@ -315,7 +315,7 @@ test('runOnce stamps role "runner" on every claim/propose work.move it writes', 
   await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
   const moves = readRawEvents(dir).filter((e) => e.type === 'work.move');
-  assert.ok(moves.length >= 2, 'claim (todo->doing) and propose (doing->proposed) both wrote a move');
+  assert.ok(moves.length >= 2, 'claim (todo->doing) and propose (doing->awaiting-approval) both wrote a move');
   for (const move of moves) {
     assert.equal(move.payload.role, 'runner');
   }
@@ -361,7 +361,7 @@ test('runOnce clarify sweep records a clarify-pass settlement stamped role "runn
   const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
   assert.equal(result.outcome, 'drained', 'the clarify+decompose sweeps clear the item before the frontier dispatches it in the same pass');
-  assert.equal(result.dispatched[0].outcome, 'proposed');
+  assert.equal(result.dispatched[0].outcome, 'awaiting-approval');
   assert.equal(result.dispatched[0].id, 'item-clarify');
   const view = listWork(dir);
   assert.equal(view.work['item-clarify'].stage, 'executing');
@@ -436,9 +436,9 @@ test('runOnce clarify+decompose sweeps never touch a synthetic-domain item with 
 
   assert.equal(result.outcome, 'drained', 'the synthetic item must dispatch, never halt on a bogus stage conflict');
   assert.equal(result.dispatched.length, 1);
-  assert.equal(result.dispatched[0].outcome, 'proposed');
+  assert.equal(result.dispatched[0].outcome, 'awaiting-approval');
   assert.equal(result.dispatched[0].id, 'item-synthetic');
-  assert.equal(listWork(dir).work['item-synthetic'].status, 'proposed');
+  assert.equal(listWork(dir).work['item-synthetic'].status, 'awaiting-approval');
   // no work.discovery / work.stage event was ever written — the sweeps
   // genuinely skipped it rather than happening to succeed
   const events = readRawEvents(dir);
@@ -453,7 +453,7 @@ test('runOnce clarify+decompose sweeps still fire normally for a coding-domain i
   const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
   assert.equal(result.outcome, 'drained');
-  assert.equal(result.dispatched[0].outcome, 'proposed');
+  assert.equal(result.dispatched[0].outcome, 'awaiting-approval');
   assert.equal(result.dispatched[0].id, 'item-coding-clarify');
   assert.equal(listWork(dir).work['item-coding-clarify'].stage, 'executing');
 });
@@ -476,15 +476,15 @@ test('real concurrency: two independent ready items dispatched in ONE runOnce ov
   // both items dispatched in the same drain-run, both proposed
   assert.equal(result.outcome, 'drained');
   const outcomes = new Map(result.dispatched.map((d) => [d.id, d.outcome]));
-  assert.equal(outcomes.get('item-a'), 'proposed');
-  assert.equal(outcomes.get('item-b'), 'proposed');
+  assert.equal(outcomes.get('item-a'), 'awaiting-approval');
+  assert.equal(outcomes.get('item-b'), 'awaiting-approval');
 
   // event-log internal consistency: the log replays cleanly and both items
   // land at proposed in the rebuilt view (the write-queue kept the concurrent
   // workers' state writes from interleaving into corruption).
   const view = listWork(dir);
-  assert.equal(view.work['item-a'].status, 'proposed');
-  assert.equal(view.work['item-b'].status, 'proposed');
+  assert.equal(view.work['item-a'].status, 'awaiting-approval');
+  assert.equal(view.work['item-b'].status, 'awaiting-approval');
 
   // CONCRETE overlap proof: item-a's [start,end] and item-b's [start,end]
   // genuinely intersect — impossible under sequential dispatch, where b would
@@ -514,7 +514,7 @@ test('bounded drain-run: three independent ready items under maxRoots=2 dispatch
   assert.equal(result.outcome, 'drained');
   assert.equal(result.dispatched.length, 3, 'the cap dispatched 2 then refilled the 3rd — all three, none dropped');
   for (const id of ['root-1', 'root-2', 'root-3']) {
-    assert.equal(listWork(dir).work[id].status, 'proposed');
+    assert.equal(listWork(dir).work[id].status, 'awaiting-approval');
   }
   assert.equal(countRuns(counterFile), 3); // three real worker dispatches
   assert.deepEqual(readyWork(dir), [], 'the drain terminated with the frontier empty (D15), it did not spin');
@@ -535,7 +535,7 @@ test('two-tier cap: a root with three ready leaves dispatches maxLeavesPerRoot p
   assert.equal(result.outcome, 'drained');
   assert.equal(result.dispatched.length, 3, 'all three leaves of the one root dispatched (2 in wave 1, 1 refilled)');
   for (const id of ['leaf-1', 'leaf-2', 'leaf-3']) {
-    assert.equal(listWork(dir).work[id].status, 'proposed');
+    assert.equal(listWork(dir).work[id].status, 'awaiting-approval');
   }
   // the root itself never dispatched — its descendants are only proposed (not
   // done), so the lineage filter keeps it off the frontier this whole run.
@@ -561,8 +561,8 @@ test('cell fan-out-parallel-9: a leaf whose root branch already carries a plante
   const result = await runOnce({ repoRoot, config: configFor(writeCommittingExecutor(scriptDir, counterFile, 'leaf.txt')), worktreeDir, log: noLog });
 
   assert.equal(result.outcome, 'drained');
-  assert.equal(result.dispatched[0].outcome, 'proposed');
-  assert.equal(listWork(dir).work['leaf-1'].status, 'proposed');
+  assert.equal(result.dispatched[0].outcome, 'awaiting-approval');
+  assert.equal(listWork(dir).work['leaf-1'].status, 'awaiting-approval');
 
   // The leaf's OWN branch carries the root's planted content — proof it
   // forked from fgw/the-root's tip (D3 "leaf fork-from-tip-of-parent"), not
@@ -578,7 +578,7 @@ test('cell fan-out-parallel-9: a root-less item is unaffected (byte-for-byte reg
   const result = await runOnce({ repoRoot, config: configFor(writeCommittingExecutor(scriptDir, counterFile)), worktreeDir, log: noLog });
 
   assert.equal(result.outcome, 'drained');
-  assert.equal(listWork(dir).work.standalone.status, 'proposed');
+  assert.equal(listWork(dir).work.standalone.status, 'awaiting-approval');
   assert.equal(branchExists(repoRoot, 'fgw/standalone'), true);
   const mergeBase = execFileSync('git', ['merge-base', 'main', 'fgw/standalone'], { cwd: repoRoot, encoding: 'utf8' }).trim();
   const mainTip = execFileSync('git', ['rev-parse', 'main'], { cwd: repoRoot, encoding: 'utf8' }).trim();
@@ -596,8 +596,8 @@ test('cell fan-out-parallel-9: a root whose own branch already carries a planted
   const result = await runOnce({ repoRoot, config: configFor(writeCommittingExecutor(scriptDir, counterFile, 'root2.txt')), worktreeDir, log: noLog });
 
   assert.equal(result.outcome, 'drained');
-  assert.equal(result.dispatched[0].outcome, 'proposed');
-  assert.equal(listWork(dir).work['the-root2'].status, 'proposed');
+  assert.equal(result.dispatched[0].outcome, 'awaiting-approval');
+  assert.equal(listWork(dir).work['the-root2'].status, 'awaiting-approval');
 
   // Both the planted (pre-existing) content and the fresh worker commit are
   // on the SAME branch — createWorktree's branch-reuse path (opts.baseRef
@@ -656,9 +656,9 @@ test('P1 fix: retry resets to this item\'s own dispatch baseline, not HEAD — a
   const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
   assert.equal(result.outcome, 'drained');
-  assert.equal(result.dispatched[0].outcome, 'proposed');
+  assert.equal(result.dispatched[0].outcome, 'awaiting-approval');
   assert.equal(result.dispatched[0].attempts, 2);
-  assert.equal(listWork(dir).work['item-retry-clean'].status, 'proposed');
+  assert.equal(listWork(dir).work['item-retry-clean'].status, 'awaiting-approval');
 
   const branch = branchNameFor('item-retry-clean');
   assert.equal(fileAtRef(repoRoot, branch, 'output.txt'), true, "the retry's own commit landed");
@@ -692,7 +692,7 @@ test('P1 fix (defect-class sweep): a retry on a root item whose branch already c
   const result = await runOnce({ repoRoot, config: configFor(writeFlakyThenFixingExecutor(scriptDir, counterFile)), worktreeDir, log: noLog });
 
   assert.equal(result.outcome, 'drained');
-  assert.equal(result.dispatched[0].outcome, 'proposed');
+  assert.equal(result.dispatched[0].outcome, 'awaiting-approval');
   assert.equal(result.dispatched[0].attempts, 2);
 
   const branch = branchNameFor('the-root3');
@@ -751,7 +751,7 @@ test('live tee: each stdout chunk is persisted to .fgos/logs/<id>.log AS IT ARRI
   const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
   assert.equal(result.outcome, 'drained');
-  assert.equal(result.dispatched[0].outcome, 'proposed');
+  assert.equal(result.dispatched[0].outcome, 'awaiting-approval');
   const logFile = path.join(dir, 'logs', 'item-live.log');
   const content = fs.readFileSync(logFile, 'utf8');
 
@@ -779,7 +779,7 @@ test('live tee: two items dispatched in the same parallel wave never interleave 
 
   assert.equal(result.outcome, 'drained');
   assert.equal(result.dispatched.length, 2);
-  assert.ok(result.dispatched.every((r) => r.outcome === 'proposed'));
+  assert.ok(result.dispatched.every((r) => r.outcome === 'awaiting-approval'));
 
   const contentA = fs.readFileSync(path.join(dir, 'logs', 'item-live-a.log'), 'utf8');
   const contentB = fs.readFileSync(path.join(dir, 'logs', 'item-live-b.log'), 'utf8');
@@ -825,7 +825,7 @@ test('anti-loop: an item at MAX_VISITS is parked todo -> blocked and truly leave
   assert.equal(result.outcome, 'drained');
   assert.equal(result.dispatched.length, 1);
   assert.equal(result.dispatched[0].id, 'item-fresh');
-  assert.equal(result.dispatched[0].outcome, 'proposed');
+  assert.equal(result.dispatched[0].outcome, 'awaiting-approval');
   assert.deepEqual(readyWork(dir), []);
 });
 
@@ -835,10 +835,10 @@ test('anti-loop: a human reject (with reason) resets the runner gate — visits 
   // one machine visit that would already be AT the cap (maxVisits: 1) on its
   // own — then a human rejects with a reason, which per D1 resets the item's
   // own budget. Reaching `proposed` first (not just doing -> blocked -> todo)
-  // exercises the real reject edge (proposed -> todo, reason required).
+  // exercises the real reject edge (awaiting-approval -> todo, reason required).
   moveWork(dir, { id: 'item-reprieved', to: 'doing', expectedStatus: 'todo' });
-  moveWork(dir, { id: 'item-reprieved', to: 'proposed', expectedStatus: 'doing' });
-  moveWork(dir, { id: 'item-reprieved', to: 'todo', expectedStatus: 'proposed', reason: 'not quite right', role: 'human' });
+  moveWork(dir, { id: 'item-reprieved', to: 'awaiting-approval', expectedStatus: 'doing' });
+  moveWork(dir, { id: 'item-reprieved', to: 'todo', expectedStatus: 'awaiting-approval', reason: 'not quite right', role: 'human' });
   // lifetime visitCount is already 1 here — the OLD (pre-D1) gate would have
   // parked this item immediately at maxVisits: 1, never dispatching it again.
   const config = configFor(writeCommittingExecutor(scriptDir, counterFile));
@@ -850,7 +850,7 @@ test('anti-loop: a human reject (with reason) resets the runner gate — visits 
   assert.deepEqual(result.parked, []);
   assert.equal(result.dispatched.length, 1);
   assert.equal(result.dispatched[0].id, 'item-reprieved');
-  assert.equal(result.dispatched[0].outcome, 'proposed');
+  assert.equal(result.dispatched[0].outcome, 'awaiting-approval');
 });
 
 test('anti-loop: a BARE resume (no reason, no human role) does NOT reset the gate — the machine-only loop still dies at the cap', async () => {
@@ -936,8 +936,8 @@ test('startup reap: a crashed run\'s doing item with a committed, verify-passing
 
   const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
-  assert.deepEqual(result.reap.resolutions, [{ id: 'item-crashed', to: 'proposed', reason: null }]);
-  assert.equal(listWork(dir).work['item-crashed'].status, 'proposed');
+  assert.deepEqual(result.reap.resolutions, [{ id: 'item-crashed', to: 'awaiting-approval', reason: null }]);
+  assert.equal(listWork(dir).work['item-crashed'].status, 'awaiting-approval');
   assert.equal(result.outcome, 'idle'); // frontier was empty after the reap
   assert.deepEqual(fs.readdirSync(worktreeDir), []);
 });
@@ -962,8 +962,8 @@ test('startup reap reclaims an orphaned checkout left behind by a genuine crash 
 
   const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
-  assert.deepEqual(result.reap.resolutions, [{ id: 'item-orphaned-crash', to: 'proposed', reason: null }]);
-  assert.equal(listWork(dir).work['item-orphaned-crash'].status, 'proposed');
+  assert.deepEqual(result.reap.resolutions, [{ id: 'item-orphaned-crash', to: 'awaiting-approval', reason: null }]);
+  assert.equal(listWork(dir).work['item-orphaned-crash'].status, 'awaiting-approval');
   assert.equal(result.outcome, 'idle');
   // the orphaned checkout is reclaimed, not leaked
   assert.equal(fs.existsSync(wt.path), false);
@@ -1118,8 +1118,8 @@ test('bin/fgos-runner.mjs run from a SUBDIRECTORY of another repo operates on th
   const run = spawnSync(process.execPath, [runnerBin, '--once'], { cwd: nested, encoding: 'utf8' });
 
   assert.equal(run.status, 0, `stderr: ${run.stderr}`);
-  assert.match(run.stdout, /proposed/);
-  assert.equal(listWork(dir).work['item-cli'].status, 'proposed');
+  assert.match(run.stdout, /awaiting-approval/);
+  assert.equal(listWork(dir).work['item-cli'].status, 'awaiting-approval');
   assert.equal(branchExists(repoRoot, 'fgw/item-cli'), true);
 });
 
@@ -1176,7 +1176,7 @@ test('wgi-8: a worker fgos-discovered block makes the RUNNER create a new item s
 
   const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
-  assert.equal(result.dispatched[0].outcome, 'proposed');
+  assert.equal(result.dispatched[0].outcome, 'awaiting-approval');
   const view = listWork(dir);
   const discovered = Object.values(view.work).filter((w) => w.discoveredFrom === 'item-happy');
   assert.equal(discovered.length, 1, 'exactly one discovered item, created by the RUNNER');
@@ -1191,7 +1191,7 @@ test('wgi-8: a worker fgos-discovered block makes the RUNNER create a new item s
   assert.match(d.verify, /chưa xác định/, 'reuses the shared clarify-entry verify placeholder, not a hardcoded duplicate');
   // D3: the worker committed only its own file; the .fgos work.add for the
   // discovered item was written by the runner, so item-happy still proposed.
-  assert.equal(view.work['item-happy'].status, 'proposed');
+  assert.equal(view.work['item-happy'].status, 'awaiting-approval');
 });
 
 test('wgi-8: a malformed fgos-discovered block is skipped (fail-safe) — the dispatch still proposes and no item is created', async () => {
@@ -1201,7 +1201,7 @@ test('wgi-8: a malformed fgos-discovered block is skipped (fail-safe) — the di
 
   const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
-  assert.equal(result.dispatched[0].outcome, 'proposed', 'a garbled report never derails the dispatch');
+  assert.equal(result.dispatched[0].outcome, 'awaiting-approval', 'a garbled report never derails the dispatch');
   assert.deepEqual(Object.keys(listWork(dir).work), ['item-happy'], 'malformed block creates nothing');
 });
 
@@ -1217,7 +1217,7 @@ test('S10: a worker output with more than DISCOVERY_CAP (20) fgos-discovered blo
 
   const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
-  assert.equal(result.dispatched[0].outcome, 'proposed', 'the cap never affects the dispatch outcome');
+  assert.equal(result.dispatched[0].outcome, 'awaiting-approval', 'the cap never affects the dispatch outcome');
   const discovered = Object.values(listWork(dir).work).filter((w) => w.discoveredFrom === 'item-flood');
   assert.equal(discovered.length, 20, 'exactly DISCOVERY_CAP items created, the surplus 5 blocks skipped');
 });
@@ -1230,7 +1230,7 @@ test('S10: a worker output repeating the identical block twice (same output) cre
 
   const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
-  assert.equal(result.dispatched[0].outcome, 'proposed');
+  assert.equal(result.dispatched[0].outcome, 'awaiting-approval');
   const discovered = Object.values(listWork(dir).work).filter((w) => w.discoveredFrom === 'item-repeat');
   assert.equal(discovered.length, 1, 'the second, identical block is recognized as already-captured and skipped');
 });
@@ -1258,7 +1258,7 @@ test('S10: a re-dispatched item re-emitting a block it already captured on a pri
 
   const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
-  assert.equal(result.dispatched[0].outcome, 'proposed');
+  assert.equal(result.dispatched[0].outcome, 'awaiting-approval');
   const discovered = Object.values(listWork(dir).work).filter((w) => w.discoveredFrom === 'item-redispatch');
   assert.equal(discovered.length, 1, 'still only the pre-existing capture — the re-emitted block minted no second item');
 });
@@ -1274,7 +1274,7 @@ test('S10: two genuinely distinct blocks in one output still both create items (
 
   const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
-  assert.equal(result.dispatched[0].outcome, 'proposed');
+  assert.equal(result.dispatched[0].outcome, 'awaiting-approval');
   const discovered = Object.values(listWork(dir).work).filter((w) => w.discoveredFrom === 'item-distinct');
   assert.equal(discovered.length, 2, 'two distinct titles both create items');
   const titles = discovered.map((d) => d.title).sort();
@@ -1296,7 +1296,7 @@ test('S11: a discovery block title with embedded newlines cannot forge extra log
 
   const result = await runOnce({ repoRoot, config, worktreeDir, log: capture });
 
-  assert.equal(result.dispatched[0].outcome, 'proposed');
+  assert.equal(result.dispatched[0].outcome, 'awaiting-approval');
   const discovered = Object.values(listWork(dir).work).filter((w) => w.discoveredFrom === 'item-newline-title');
   assert.equal(discovered.length, 1, 'the second, identical block is recognized as already-captured');
   assert.equal(discovered[0].title, craftedTitle, 'the stored item keeps the full, untouched title');
@@ -1339,7 +1339,7 @@ test('wgi-8: even a TIMED-OUT worker (output on the err.stdout path) has its fgo
 
   const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
-  assert.notEqual(result.dispatched[0].outcome, 'proposed', 'the item itself times out — it never proposes');
+  assert.notEqual(result.dispatched[0].outcome, 'awaiting-approval', 'the item itself times out — it never proposes');
   const discovered = Object.values(listWork(dir).work).filter((w) => w.discoveredFrom === 'item-slow');
   assert.equal(discovered.length, 1, 'the err.stdout (timeout) report is captured once, never duplicated across retries');
   assert.equal(discovered[0].title, 'Investigate the slow path');

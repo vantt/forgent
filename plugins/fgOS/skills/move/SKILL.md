@@ -5,7 +5,7 @@ description: >-
   from inside a Claude Code session, invoked as /fgOS:move <id> <status>.
   Moves the item through fgOS's own move verb (one-door-write), never
   writing .fgos/ state directly. Examples: "/fgOS:move build-cli doing",
-  "/fgOS:move str88-e1 proposed".
+  "/fgOS:move str88-e1 awaiting-approval".
 ---
 
 # fgOS move

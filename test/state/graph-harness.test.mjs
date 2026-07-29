@@ -14,15 +14,15 @@ test('mergeReadiness on an empty view returns empty ready/waiting/conflicts', ()
 });
 
 test('mergeReadiness: a proposed item with no deps is ready', () => {
-  const view = { work: { a: item('a', 'proposed') } };
+  const view = { work: { a: item('a', 'awaiting-approval') } };
   assert.deepEqual(mergeReadiness(view), { ready: ['a'], waiting: [], conflicts: [] });
 });
 
 test('mergeReadiness: a proposed item whose dep is NOT done waits, never ready', () => {
   const view = {
     work: {
-      dep: item('dep', 'proposed'),
-      leaf: item('leaf', 'proposed', ['dep']),
+      dep: item('dep', 'awaiting-approval'),
+      leaf: item('leaf', 'awaiting-approval', ['dep']),
     },
   };
   const result = mergeReadiness(view);
@@ -34,7 +34,7 @@ test('mergeReadiness: a proposed item whose dep IS done is ready, not waiting', 
   const view = {
     work: {
       dep: item('dep', 'done'),
-      leaf: item('leaf', 'proposed', ['dep']),
+      leaf: item('leaf', 'awaiting-approval', ['dep']),
     },
   };
   assert.deepEqual(mergeReadiness(view), { ready: ['leaf'], waiting: [], conflicts: [] });
@@ -47,7 +47,7 @@ test('mergeReadiness: only proposed items are considered — todo/doing/done/blo
       b: item('b', 'doing'),
       c: item('c', 'done'),
       d: item('d', 'blocked'),
-      e: item('e', 'proposed'),
+      e: item('e', 'awaiting-approval'),
     },
   };
   assert.deepEqual(mergeReadiness(view), { ready: ['e'], waiting: [], conflicts: [] });
@@ -56,8 +56,8 @@ test('mergeReadiness: only proposed items are considered — todo/doing/done/blo
 test('mergeReadiness: two dep-clear proposed items sharing a footprint conflict are excluded from ready, not counted as waiting', () => {
   const view = {
     work: {
-      a: item('a', 'proposed', [], { footprint: ['src/x.mjs'] }),
-      b: item('b', 'proposed', [], { footprint: ['src/x.mjs'] }),
+      a: item('a', 'awaiting-approval', [], { footprint: ['src/x.mjs'] }),
+      b: item('b', 'awaiting-approval', [], { footprint: ['src/x.mjs'] }),
     },
   };
   const result = mergeReadiness(view);
@@ -71,9 +71,9 @@ test('mergeReadiness: two dep-clear proposed items sharing a footprint conflict 
 test('mergeReadiness: a dep-clear item conflicting with a dep-WAITING item is still flagged — conflict detection runs over all dep-clear candidates regardless of the other side', () => {
   const view = {
     work: {
-      dep: item('dep', 'proposed'),
-      waiting: item('waiting', 'proposed', ['dep'], { footprint: ['src/x.mjs'] }),
-      free: item('free', 'proposed', [], { footprint: ['src/x.mjs'] }),
+      dep: item('dep', 'awaiting-approval'),
+      waiting: item('waiting', 'awaiting-approval', ['dep'], { footprint: ['src/x.mjs'] }),
+      free: item('free', 'awaiting-approval', [], { footprint: ['src/x.mjs'] }),
     },
   };
   const result = mergeReadiness(view);
@@ -89,7 +89,7 @@ test('mergeReadiness: a dep-clear item conflicting with a dep-WAITING item is st
 test('mergeReadiness: ready ordering comes from rankImpact itself (blocks field flows through), not a re-derived order', () => {
   const view = {
     work: {
-      base: item('base', 'proposed', []),
+      base: item('base', 'awaiting-approval', []),
       dependent: item('dependent', 'todo', ['base']),
     },
   };
@@ -103,9 +103,9 @@ test('mergeReadiness: ready ordering comes from rankImpact itself (blocks field 
 test('mergeReadiness: goalTier tie-break matches rankImpact exactly (mvp before milestone before ungrouped)', () => {
   const view = {
     work: {
-      plain: item('plain', 'proposed'),
-      ms: item('ms', 'proposed', [], { goalTier: 'milestone' }),
-      mvp: item('mvp', 'proposed', [], { goalTier: 'mvp' }),
+      plain: item('plain', 'awaiting-approval'),
+      ms: item('ms', 'awaiting-approval', [], { goalTier: 'milestone' }),
+      mvp: item('mvp', 'awaiting-approval', [], { goalTier: 'mvp' }),
     },
   };
   const result = mergeReadiness(view);

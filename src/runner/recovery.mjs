@@ -21,7 +21,7 @@
  *   - worktree-fail      — isolated branch/worktree setup or teardown failed.
  *   - corrupt-log        — the event log failed to parse (readEvents threw
  *                          EventLogError('corrupt-log')); never auto-repaired.
- *   - reject-returned    — the item bounced proposed -> todo with a reason
+ *   - reject-returned    — the item bounced awaiting-approval -> todo with a reason
  *                          (D5 rejection edge); re-entering the frontier is
  *                          bounded by anti-loop's MAX_VISITS, not by this
  *                          module's retry count alone.
@@ -114,7 +114,7 @@ export function resolveAction(errorClass, attempt = 1) {
  * Resolve a `stale-doing` item (found sitting in `doing` at loop start with
  * no live worker attached) into the concrete FSM transition the runner
  * should make, per the reliability-panel revision: a branch with a commit
- * whose verify passed completes the work (`doing -> proposed`, same as an
+ * whose verify passed completes the work (`doing -> awaiting-approval`, same as an
  * ordinary goal-check pass); anything short of that reclaims the item
  * (`doing -> blocked`, reason `runner-crash-reclaim`) rather than silently
  * leaving it stuck or guessing that it is still safe to re-dispatch.
@@ -128,7 +128,7 @@ export function resolveAction(errorClass, attempt = 1) {
  */
 export function resolveStaleDoing({ hasCommit = false, verifyPassed = false } = {}) {
   if (hasCommit && verifyPassed) {
-    return { to: 'proposed' };
+    return { to: 'awaiting-approval' };
   }
   return { to: 'blocked', reason: 'runner-crash-reclaim' };
 }

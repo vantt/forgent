@@ -178,10 +178,10 @@ function worktreeCount(repoRoot) {
   return out.split('\n').filter((line) => line.startsWith('worktree ')).length;
 }
 
-// --- (a) runner item, full loop: proposed -> review -> approve -> merge ->
+// --- (a) runner item, full loop: awaiting-approval -> review -> approve -> merge ->
 // done, with all three of the must_have's "dấu vết" checked -------------
 
-test('e2e pr-gate (a) runner item full loop: add -> runner dispatch -> proposed, review shows the branch diff, approve merges + verifies -> done with settlement role human, câu-6 learning present, and the branch/worktree are cleaned up', () => {
+test('e2e pr-gate (a) runner item full loop: add -> runner dispatch -> awaiting-approval, review shows the branch diff, approve merges + verifies -> done with settlement role human, câu-6 learning present, and the branch/worktree are cleaned up', () => {
   const repoRoot = initTempRepo();
   const scriptDir = mkTempDir('fgos-pr-gate-e2e-a-');
 
@@ -191,7 +191,7 @@ test('e2e pr-gate (a) runner item full loop: add -> runner dispatch -> proposed,
 
   const dispatch = runner(repoRoot, ['--once']);
   assert.equal(dispatch.status, 0, `--once failed: ${dispatch.stderr}`);
-  assert.equal(stateView(repoRoot).work['pr-a-item'].status, 'proposed');
+  assert.equal(stateView(repoRoot).work['pr-a-item'].status, 'awaiting-approval');
   assert.equal(branchExists(repoRoot, 'fgw/pr-a-item'), true);
 
   const review = fgos(repoRoot, ['review', 'pr-a-item']);
@@ -241,7 +241,7 @@ test('e2e pr-gate (b) conflict: approving a runner item whose branch conflicts w
 
   const dispatch = runner(repoRoot, ['--once']);
   assert.equal(dispatch.status, 0, `--once failed: ${dispatch.stderr}`);
-  assert.equal(stateView(repoRoot).work['pr-b-item'].status, 'proposed');
+  assert.equal(stateView(repoRoot).work['pr-b-item'].status, 'awaiting-approval');
 
   commitPending(repoRoot, 'state: propose pr-b-item');
 
@@ -278,7 +278,7 @@ test('e2e pr-gate (b) conflict: approving a runner item whose branch conflicts w
 // --- (c) pull-door item: take/return, review the head-range diff, approve
 // re-verifies on main (no merge step, D4) ---------------------------------
 
-test('e2e pr-gate (c) pull-door item: take -> commit -> return -> proposed, review shows the exact headAtTake..headAtReturn diff, approve re-verifies on main (no merge) -> done', () => {
+test('e2e pr-gate (c) pull-door item: take -> commit -> return -> awaiting-approval, review shows the exact headAtTake..headAtReturn diff, approve re-verifies on main (no merge) -> done', () => {
   const repoRoot = initTempRepo();
 
   assert.equal(fgos(repoRoot, ['init']).status, 0);
@@ -298,7 +298,7 @@ test('e2e pr-gate (c) pull-door item: take -> commit -> return -> proposed, revi
 
   const returned = fgos(repoRoot, ['return', 'pr-c-item']);
   assert.equal(returned.status, 0, `return failed: ${returned.stderr}`);
-  assert.equal(stateView(repoRoot).work['pr-c-item'].status, 'proposed');
+  assert.equal(stateView(repoRoot).work['pr-c-item'].status, 'awaiting-approval');
 
   const review = fgos(repoRoot, ['review', 'pr-c-item']);
   assert.equal(review.status, 0, `review failed: ${review.stderr}`);
@@ -328,7 +328,7 @@ test('e2e pr-gate (c) pull-door item: take -> commit -> return -> proposed, revi
 // --- (d) reject a pull-door item: D4's no-auto-revert has real teeth here,
 // because the item's code is already sitting on main ---------------------
 
-test('e2e pr-gate (d) reject a pull-door item: proposed -> todo carries the reason, and the item\'s own commit REMAINS on main untouched (no-revert is meaningful only when the code is already on main)', () => {
+test('e2e pr-gate (d) reject a pull-door item: awaiting-approval -> todo carries the reason, and the item\'s own commit REMAINS on main untouched (no-revert is meaningful only when the code is already on main)', () => {
   const repoRoot = initTempRepo();
 
   assert.equal(fgos(repoRoot, ['init']).status, 0);
@@ -344,13 +344,13 @@ test('e2e pr-gate (d) reject a pull-door item: proposed -> todo carries the reas
 
   const returned = fgos(repoRoot, ['return', 'pr-d-item']);
   assert.equal(returned.status, 0, `return failed: ${returned.stderr}`);
-  assert.equal(stateView(repoRoot).work['pr-d-item'].status, 'proposed');
+  assert.equal(stateView(repoRoot).work['pr-d-item'].status, 'awaiting-approval');
   assert.equal(currentHead(repoRoot), itemCommit, 'return never commits anything itself');
 
   const reject = fgos(repoRoot, ['reject', 'pr-d-item', '--reason', 'not needed right now']);
   assert.equal(reject.status, 0, `reject failed: ${reject.stderr}`);
   const rejectData = envelopeData(reject.stdout);
-  assert.equal(rejectData.from, 'proposed');
+  assert.equal(rejectData.from, 'awaiting-approval');
   assert.equal(rejectData.to, 'todo');
   assert.equal(rejectData.reason, 'not needed right now');
 
@@ -396,7 +396,7 @@ function parkBranchItem(repoRoot, id, extra = {}) {
   commitPending(repoRoot, `state: park ${id}`);
 }
 
-test('e2e pr-gate (e) branch-source item full loop: park (blocked + live branch) -> take -> human commits fix on the branch -> return verifies in a detached temp worktree -> proposed -> review shows source: runner (classifySource unchanged, no merge.mjs edit) -> approve merges + verifies -> done, branch cleaned up', () => {
+test('e2e pr-gate (e) branch-source item full loop: park (blocked + live branch) -> take -> human commits fix on the branch -> return verifies in a detached temp worktree -> awaiting-approval -> review shows source: runner (classifySource unchanged, no merge.mjs edit) -> approve merges + verifies -> done, branch cleaned up', () => {
   const repoRoot = initTempRepo();
 
   assert.equal(fgos(repoRoot, ['init']).status, 0);
@@ -419,12 +419,12 @@ test('e2e pr-gate (e) branch-source item full loop: park (blocked + live branch)
 
   const returned = fgos(repoRoot, ['return', 'pr-e-item']);
   assert.equal(returned.status, 0, `return failed: ${returned.stderr}`);
-  assert.equal(envelopeData(returned.stdout).to, 'proposed');
+  assert.equal(envelopeData(returned.stdout).to, 'awaiting-approval');
   assert.equal(currentHead(repoRoot), mainHeadBeforeReturn, "return never advances the human's own main checkout");
   assert.equal(worktreeCount(repoRoot), 1, 'the disposable detached verify worktree is cleaned up — no leftover');
 
   const view1 = stateView(repoRoot);
-  assert.equal(view1.work['pr-e-item'].status, 'proposed');
+  assert.equal(view1.work['pr-e-item'].status, 'awaiting-approval');
   assert.ok(view1.work['pr-e-item'].branchHeadAtReturn, 'branchHeadAtReturn recorded');
   assert.equal('headAtReturn' in view1.work['pr-e-item'], false, 'a branch return never records the main-based headAtReturn (D2 CẤM)');
 
@@ -480,7 +480,7 @@ test('e2e pr-gate (f) branch-source return never disturbs a checkout the human i
 
   const returned = fgos(repoRoot, ['return', 'pr-f-item']);
   assert.equal(returned.status, 0, `return failed (must never collide with the human's own live checkout): ${returned.stderr}`);
-  assert.equal(envelopeData(returned.stdout).to, 'proposed');
+  assert.equal(envelopeData(returned.stdout).to, 'awaiting-approval');
 
   // The human's own worktree survives, untouched, still checked out on the
   // branch — this is the BLOCKER the validating gate caught: reclaiming or
@@ -493,7 +493,7 @@ test('e2e pr-gate (f) branch-source return never disturbs a checkout the human i
   );
   assert.equal(worktreeCount(repoRoot), 2, "return's own disposable verify worktree is cleaned up, but the human's own worktree remains — net count back to 2");
 
-  assert.equal(stateView(repoRoot).work['pr-f-item'].status, 'proposed');
+  assert.equal(stateView(repoRoot).work['pr-f-item'].status, 'awaiting-approval');
 
   gitAt(repoRoot, ['worktree', 'remove', humanWorktree, '--force']);
 });

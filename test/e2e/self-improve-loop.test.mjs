@@ -256,7 +256,7 @@ test(
     // (5) real runner dispatch: the discovery-aware executor answers all 3
     // call sites (context-discovery, chia-việc, worker) within one --once,
     // per runner-loop.test.mjs's stage-clarify (a) / stage-decompose (a)
-    // precedent — the item chains clarify->decompose->executing->proposed in
+    // precedent — the item chains clarify->decompose->executing->awaiting-approval in
     // one call.
     writeRunnerConfig(
       repoRoot,
@@ -267,7 +267,7 @@ test(
 
     const afterDispatch = stateView(repoRoot);
     const item = afterDispatch.work[submitted.id];
-    assert.equal(item.status, 'proposed', 'the discovery-aware executor chains the item all the way to proposed in one --once');
+    assert.equal(item.status, 'awaiting-approval', 'the discovery-aware executor chains the item all the way to proposed in one --once');
     assert.equal(item.stage, 'executing');
     assert.equal(branchExists(repoRoot, `fgw/${submitted.id}`), true);
 
@@ -299,12 +299,12 @@ test(
     assert.match(refused.stderr, /--acknowledge-iron-law/);
 
     const afterRefusal = stateView(repoRoot);
-    assert.equal(afterRefusal.work[submitted.id].status, 'proposed', 'a refused approve leaves the item proposed');
+    assert.equal(afterRefusal.work[submitted.id].status, 'awaiting-approval', 'a refused approve leaves the item proposed');
     assert.equal(currentHead(repoRoot), headBeforeRefusal, 'a refused approve attempts no merge — HEAD unchanged');
     assert.equal(branchExists(repoRoot, `fgw/${submitted.id}`), true, 'the branch survives an Iron Law refusal');
 
     // (8) `approve <id> --acknowledge-iron-law` — the deliberate override
-    // succeeds: merges, verifies, proposed -> done, branch cleaned up.
+    // succeeds: merges, verifies, awaiting-approval -> done, branch cleaned up.
     const approved = fgos(repoRoot, ['approve', submitted.id, '--acknowledge-iron-law']);
     assert.equal(approved.status, 0, `approve with acknowledgment must succeed: ${approved.stderr}`);
     const approvedData = envelopeData(approved.stdout);

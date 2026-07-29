@@ -117,7 +117,7 @@ export function visitCount(events, id) {
  *     human's answer (`answerAwaiting`, fsm.mjs's `awaiting-human -> todo`
  *     edge; the only edge `answer` appears on).
  *   - `payload.reason !== undefined` — a human's reject/park-with-reason
- *     (fsm.mjs's `proposed -> todo`/`proposed -> blocked` edges; the runner's
+ *     (fsm.mjs's `awaiting-approval -> todo`/`awaiting-approval -> blocked` edges; the runner's
  *     own reason-carrying parks, e.g. `anti-loop-max-visits`/`breaker-tripped`,
  *     stamp `role: 'runner'`, and `return`/`approve`'s own internal park edges
  *     stamp `role: 'system'` (D30) — neither ever matches here).
