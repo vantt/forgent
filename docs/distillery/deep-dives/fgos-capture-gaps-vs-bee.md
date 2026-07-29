@@ -188,12 +188,18 @@ modification, since bee's `decisions.jsonl` is itself append-only):
 
 ## Open questions
 
-- fgOS's `decision` verb is confirmed global/unscoped (tsk-ma4 audit) —
-  bee's is effectively per-repo too, but bee's `supersede`/`redact` types
-  assume enough scoping to target a specific prior decision by id. Should
-  fgOS's `decision` verb become id-scoped before or alongside adding
-  `rationale`/`alternatives`/`source`? Not settled here — a candidate for
-  whoever plans tsk-63c/tsk-6b6 next, since it changes those items' shape.
+- ~~fgOS's `decision` verb is confirmed global/unscoped (tsk-ma4 audit) —
+  should it become id-scoped before or alongside adding
+  `rationale`/`alternatives`/`source`?~~ **Resolved 2026-07-29 (user):**
+  add `id` as an OPTIONAL parameter to `addDecision`, matching the
+  existing `addOutcome`/`addFriction`/`addDiscovery` pattern — fold into
+  `view.decisions[id]` when present, fall through to the existing global
+  bucket when absent (zero migration, RUL11-safe). Explicitly rejected
+  copying bee's `scope`/`tags` + `decisions search` model here: bee uses
+  that because it has no per-work-item lifecycle as tight as fgOS's own —
+  fgOS already has the per-id fold pattern for three sibling verbs, so
+  extending the fourth to match is the consistent choice, not a borrow
+  from bee. Applies to tsk-63c/tsk-6b6's shape.
 - Bee's `source` free-text convention (`"bee-planning (bypass-total
   auto-approval, not user)"`) trades structure for expressiveness — no
   enum, no validation beyond non-empty. Should fgOS's `source` field be
