@@ -200,25 +200,45 @@ function sleepSync(ms) {
   Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
 }
 
-/** One attempt at the wx-atomic-create lock, mirroring acquireRunnerLock /
- * acquireSessionsLock exactly. On EEXIST: a live-pid holder backs off; a
- * dead/garbage-pid leftover is re-read right before the unlink (the liveness
- * probe is the slow window — changed content is a fresh holder we must not
- * touch) then cleaned. It NEVER creates the lock in the same attempt that
- * deleted a stale one (that delete-then-create was the TOCTOU the sibling
- * locks' doc comments call out); a reclaim yields and the next attempt does
- * the bare create. */
+let lockTmpCounter = 0;
+
+/** One attempt at the link-atomic-create lock, mirroring acquireRunnerLock /
+ * acquireSessionsLock's stale-pid-reclaim shape. On EEXIST: a live-pid holder
+ * backs off; a dead/garbage-pid leftover is re-read right before the unlink
+ * (the liveness probe is the slow window — changed content is a fresh holder
+ * we must not touch) then cleaned. It NEVER creates the lock in the same
+ * attempt that deleted a stale one (that delete-then-create was the TOCTOU
+ * the sibling locks' doc comments call out); a reclaim yields and the next
+ * attempt does the bare create.
+ *
+ * Creation itself writes the pid to a per-attempt temp file THEN
+ * `fs.linkSync`s it onto `lockPath` (spike-confirmed fix, tsk-3ld): the
+ * earlier `fs.openSync(lockPath, 'wx')` + separate `fs.writeSync` created a
+ * window where the lock file existed but was still empty, so a competing
+ * process reading it mid-write saw unparseable (NaN) content, fell through
+ * to the "dead/garbage holder" branch, and unlinked a lock a live process
+ * legitimately held — letting two processes both believe they held it
+ * (reproduced directly: ~30% of runs at 20 concurrent processes, see
+ * `docs/history/events-lock-concurrency-race/CONTEXT.md`). `link()` only
+ * ever exposes `lockPath` fully-written or not-yet-existing — never
+ * partially written — so that window is closed structurally, not papered
+ * over with a retry. */
 function tryAcquireEventsLockOnce(lockPath, pid) {
+  const dir = path.dirname(lockPath);
+  lockTmpCounter += 1;
+  const tmpPath = path.join(dir, `.events.lock.tmp-${pid}-${Date.now()}-${lockTmpCounter}`);
+  fs.writeFileSync(tmpPath, String(pid), 'utf8');
   try {
-    const fd = fs.openSync(lockPath, 'wx');
-    try {
-      fs.writeSync(fd, String(pid));
-    } finally {
-      fs.closeSync(fd);
-    }
+    fs.linkSync(tmpPath, lockPath);
     return { acquired: true };
   } catch (err) {
     if (err.code !== 'EEXIST') throw err;
+  } finally {
+    try {
+      fs.unlinkSync(tmpPath);
+    } catch (err) {
+      if (err.code !== 'ENOENT') throw err;
+    }
   }
 
   let raw;
@@ -232,6 +252,12 @@ function tryAcquireEventsLockOnce(lockPath, pid) {
 
   if (Number.isInteger(holderPid) && holderPid > 0 && isPidAlive(holderPid)) {
     return { acquired: false, holderPid };
+  }
+  if (!Number.isInteger(holderPid) || holderPid <= 0) {
+    // Unparseable content should not happen now that creation is link-atomic
+    // (a visible lockPath is always fully written) — but stay defensive: an
+    // ambiguous holder is never positively dead, so never reclaim it here.
+    return { acquired: false, holderPid: null };
   }
 
   let current;
