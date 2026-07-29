@@ -53,8 +53,17 @@ function tierRank(goalTier) {
  * then ungrouped work), then blocks descending, then component size
  * descending (a bigger cluster is a higher-leverage pick at an equal blocks
  * count), ties broken by ascending id.
+ *
+ * `opts.includeDone` (tsk-5oa D1, default falsy — byte-identical to the
+ * pre-existing single-arg call): when true, appends one row per
+ * `status === 'done'` item after every open row. A done item can never
+ * block anything (its dependents are already unblocked) or add real
+ * leverage to a cluster, so each done row always carries `blocks: 0`,
+ * `componentId: null`, `componentSize: 0`, `isIsolated: true` — done rows
+ * are sorted only by tier then id among themselves, never interleaved with
+ * open rows.
  */
-export function rankImpact(view) {
+export function rankImpact(view, opts = {}) {
   const work = view?.work ?? {};
   const openIds = Object.keys(work).filter((id) => work[id].status !== 'done');
   const openSet = new Set(openIds);
@@ -101,5 +110,29 @@ export function rankImpact(view) {
     || b.componentSize - a.componentSize
     || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0)
   ));
-  return ranked;
+
+  if (!opts.includeDone) return ranked;
+
+  const doneRows = Object.keys(work)
+    .filter((id) => work[id].status === 'done')
+    .map((id) => {
+      const item = work[id];
+      return {
+        id,
+        title: item.title,
+        status: item.status,
+        blocks: 0,
+        stage: item.stage ?? 'executing',
+        goalTier: item.goalTier ?? null,
+        componentId: null,
+        componentSize: 0,
+        isIsolated: true,
+      };
+    })
+    .sort((a, b) => (
+      tierRank(a.goalTier) - tierRank(b.goalTier)
+      || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0)
+    ));
+
+  return [...ranked, ...doneRows];
 }
