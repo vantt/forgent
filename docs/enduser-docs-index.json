@@ -67,6 +67,14 @@
     "quadrant": "how-to",
     "purpose": "Show the steps to accomplish one specific, already-understood goal.",
     "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/find-every-caller-before-requiring-a-cli-flag.md",
+    "title": "How to find every caller before making a CLI flag required",
+    "sourceCaptureId": "tsk-63c"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
     "docPath": "docs/how-to/fix-a-verify-command-broken-by-mixed-in-prose.md",
     "title": "How to fix a verify command that mixes prose with a real command",
     "sourceCaptureId": "tsk-34y"
