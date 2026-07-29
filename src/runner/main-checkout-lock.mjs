@@ -248,20 +248,58 @@ function tryAcquireOnce(lockPath, identity, now, ttlMs) {
  * pid. For a different string-identity holder, `ttlMs` is the ONLY
  * staleness signal (no liveness probe exists) — omitting it is AMBIGUOUS,
  * not stale.
+ *
+ * `releaseOnExit` (tsk-45z point 2, opt-in, default false): when true,
+ * registers `exit`/`SIGINT`/`SIGTERM` listeners that release the lock the
+ * moment THIS process ends, instead of leaving it for `ttlMs` to expire.
+ * This must stay OPT-IN, never the unconditional default: `.githooks/
+ * pre-commit` acquires/refreshes this lock on every commit and, BY DESIGN,
+ * never releases it itself — the lock is meant to linger past that short
+ * hook process's own `process.exit(0)`, with TTL as the only intended
+ * clearing mechanism (a session may commit several times in a row; an
+ * unconditional release-on-exit there would clear the lock between two
+ * commits of the SAME session, reopening the exact STR65 race this lock
+ * exists to prevent — the one thing this item's own scope explicitly rules
+ * out). Only a caller whose own job is genuinely OVER once its process
+ * exits — `claimWork`, `mergeRunnerItem` — should pass `releaseOnExit:
+ * true`. `once` + explicit removal on `release()` keeps this from
+ * accumulating listeners across repeated acquire/release cycles in the
+ * same process.
  */
-export function acquireMainCheckoutLock(dir, { identity = process.pid, ttlMs, now = Date.now() } = {}) {
+export function acquireMainCheckoutLock(dir, { identity = process.pid, ttlMs, now = Date.now(), releaseOnExit = false } = {}) {
   fs.mkdirSync(dir, { recursive: true });
   const lockPath = path.join(dir, LOCK_FILE);
 
   for (let attempt = 0; attempt < 2; attempt += 1) {
     const res = tryAcquireOnce(lockPath, identity, now, ttlMs);
     if (res.status === ACQUIRED) {
+      let released = false;
+      const release = () => {
+        if (released) return;
+        released = true;
+        if (releaseOnExit) {
+          process.removeListener('exit', onExit);
+          process.removeListener('SIGINT', onSignal);
+          process.removeListener('SIGTERM', onSignal);
+        }
+        releaseMainCheckoutLock(dir);
+      };
+      let onExit;
+      let onSignal;
+      if (releaseOnExit) {
+        onExit = () => release();
+        onSignal = () => {
+          release();
+          process.exit(1);
+        };
+        process.once('exit', onExit);
+        process.once('SIGINT', onSignal);
+        process.once('SIGTERM', onSignal);
+      }
       return {
         status: ACQUIRED,
         lockPath,
-        release() {
-          releaseMainCheckoutLock(dir);
-        },
+        release,
       };
     }
     if (res.status === HELD) {
@@ -296,6 +334,68 @@ export function releaseMainCheckoutLock(dir) {
   } catch (err) {
     if (err.code !== 'ENOENT') throw err;
   }
+}
+
+/**
+ * Releases `.fgos/main-checkout.lock` ONLY when its recorded holder
+ * identity strictly equals (===) `identity` (tsk-45z D2, mirroring
+ * `tryAcquireOnce`'s own self-recognition/D6 equality check). Unlike
+ * `releaseMainCheckoutLock` above -- an unconditional unlink meant for a
+ * caller that just acquired the lock itself and knows it is the sole
+ * holder -- this is for a caller (e.g. `fgos return`) that never acquired
+ * the lock in this same call and cannot assume the lock it sees is still
+ * its own: this session's earlier commits may have refreshed the lock
+ * under its own identity, but that identity's TTL could have lapsed and a
+ * different session could hold it live by the time this runs. Blindly
+ * unlinking in that case would delete a genuinely live different session's
+ * lock -- reopening the exact STR65 concurrent-writer race this lock
+ * exists to prevent.
+ *
+ * Returns `{ status }`:
+ *   - 'released'   -- the lock was held under `identity`; now removed.
+ *   - 'no-lock'    -- no lock file was present (nothing to release).
+ *   - 'not-owner'  -- a lock is present but recorded under a DIFFERENT
+ *     identity (or changed underneath this call, see below) -- left
+ *     untouched.
+ *   - 'ambiguous'  -- the lock file content is unparseable -- left
+ *     untouched, same fail-closed stance `acquireMainCheckoutLock` and
+ *     `forceReclaimAmbiguousLock` already take for this shape.
+ *
+ * Re-reads the lock file immediately before unlinking (same TOCTOU
+ * discipline `tryAcquireOnce`'s own stale-branch already uses, lines
+ * ~173-192 above): a competitor could reclaim or refresh the lock between
+ * the first read and this call's unlink, and changed content must never be
+ * touched on a stale judgment.
+ */
+export function releaseMainCheckoutLockIfOwn(dir, identity) {
+  const lockPath = path.join(dir, LOCK_FILE);
+
+  const readRecord = () => {
+    let raw;
+    try {
+      raw = fs.readFileSync(lockPath, 'utf8');
+    } catch (err) {
+      if (err.code === 'ENOENT') return undefined;
+      throw err;
+    }
+    return parseLockContent(raw);
+  };
+
+  const record = readRecord();
+  if (record === undefined) return { status: 'no-lock' };
+  if (record === null) return { status: 'ambiguous' };
+  if (record.pid !== identity) return { status: 'not-owner', holderPid: record.pid };
+
+  const recheck = readRecord();
+  if (recheck === undefined) return { status: 'no-lock' };
+  if (recheck === null || recheck.pid !== identity) return { status: 'not-owner' };
+
+  try {
+    fs.unlinkSync(lockPath);
+  } catch (err) {
+    if (err.code !== 'ENOENT') throw err;
+  }
+  return { status: 'released' };
 }
 
 /**

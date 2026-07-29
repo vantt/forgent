@@ -40,6 +40,7 @@ import { claimWork, ClaimError } from '../src/runner/claim-port.mjs';
 import {
   acquireMainCheckoutLock,
   releaseMainCheckoutLock,
+  releaseMainCheckoutLockIfOwn,
   forceReclaimAmbiguousLock,
   inspectMainCheckoutLock,
   ACQUIRED,
@@ -47,6 +48,7 @@ import {
   DEFAULT_TTL_MS,
   formatLockDurationMs,
 } from '../src/runner/main-checkout-lock.mjs';
+import { resolveWriterIdentity } from '../src/runner/session-identity.mjs';
 import { createSession, endSession, listSessions, reclaimOrphanedSessions, SessionError } from '../src/runner/session.mjs';
 import { resolveRoot } from '../src/runner/root-affinity.mjs';
 import { visitCount } from '../src/runner/anti-loop.mjs';
@@ -1476,6 +1478,16 @@ async function runVerb(verb, flags, positional, dir) {
         const frozenJudge = frozenJudgeHits(ownDiff, item.footprint);
         const { event } = moveWork(dir, { id, to: 'proposed', expectedStatus: 'doing', headAtReturn: head });
         addOutcome(dir, { id, actual: { outcome: 'proposed', passed: true, attempts: 1, errorClass: null, aheadCount } });
+        // tsk-45z D1/D2: this session's own commits (landed straight on the
+        // main checkout, not a branch/worktree) may still hold
+        // main-checkout.lock, refreshed by .githooks/pre-commit on each one
+        // and never released until TTL expiry. This point — verify green,
+        // item settling to `proposed` — is the state-machine's own signal
+        // that this session is done with the checkout, so release early
+        // instead of leaving the next writer to wait out the TTL.
+        // Identity-checked (never a blind unlink, D2): only removes the
+        // lock if it is still recorded under this session's own identity.
+        releaseMainCheckoutLockIfOwn(dir, resolveWriterIdentity(dir).id);
         return { id, from: 'doing', to: 'proposed', source: 'main', aheadCount, passed: true, seq: event.seq, output: check.output, frozenJudgeHits: frozenJudge };
       }
 
@@ -1489,6 +1501,11 @@ async function runVerb(verb, flags, positional, dir) {
         attempts: 1,
         detail: `goal-check failed (exit ${check.status})`,
       });
+      // Same early-release as the passing branch above (tsk-45z D1/D2) — a
+      // failed verify still means this session is done touching the main
+      // checkout; the item settling to `blocked` is just as much "done with
+      // the checkout" as settling to `proposed`.
+      releaseMainCheckoutLockIfOwn(dir, resolveWriterIdentity(dir).id);
       return { id, from: 'doing', to: 'blocked', source: 'main', aheadCount, passed: false, exitStatus: check.status, output: check.output };
     }
 

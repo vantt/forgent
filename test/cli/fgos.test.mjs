@@ -3036,6 +3036,57 @@ test('return happy path: verify passes -> doing to proposed, actual outcome reco
   assert.equal('settlements' in view, false, 'doing -> proposed never settles (D4: settlement belongs to the -> done edge)');
 });
 
+test('return (verify passes, main-source): a live main-checkout.lock recorded under THIS session\'s own identity is released early, instead of waiting out the TTL (tsk-45z D1/D2)', () => {
+  const cwd = initGitCwd();
+  const sessionId = 'tsk-45z-test-session-ok';
+  run(cwd, ['init']);
+  addOk(cwd, 'pull-return-releases-own-lock', { verify: 'test -f proof.txt' });
+  assert.equal(run(cwd, ['take', '--id', 'pull-return-releases-own-lock'], { BEE_SESSION_ID: sessionId }).status, 0);
+  commitFile(cwd, 'proof.txt');
+
+  const lockPath = path.join(cwd, '.fgos', 'main-checkout.lock');
+  fs.writeFileSync(lockPath, JSON.stringify({ pid: sessionId, ts: Date.now() }));
+
+  const result = run(cwd, ['return', 'pull-return-releases-own-lock'], { BEE_SESSION_ID: sessionId });
+  assert.equal(result.status, 0, `return failed: ${result.stderr}`);
+  assert.equal(envelopeData(result.stdout).to, 'proposed');
+  assert.equal(fs.existsSync(lockPath), false, 'return must release its own live lock once verify passes and the item settles to proposed');
+});
+
+test('return (verify FAILS, main-source): a live own-identity lock is released too — settling to blocked is just as much "done with the checkout" as proposed (tsk-45z D1/D2)', () => {
+  const cwd = initGitCwd();
+  const sessionId = 'tsk-45z-test-session-blocked';
+  run(cwd, ['init']);
+  addOk(cwd, 'pull-return-releases-own-lock-blocked', { verify: 'test -f proof.txt' });
+  assert.equal(run(cwd, ['take', '--id', 'pull-return-releases-own-lock-blocked'], { BEE_SESSION_ID: sessionId }).status, 0);
+  commitFile(cwd, 'wrong-file.txt'); // advances HEAD, never satisfies verify
+
+  const lockPath = path.join(cwd, '.fgos', 'main-checkout.lock');
+  fs.writeFileSync(lockPath, JSON.stringify({ pid: sessionId, ts: Date.now() }));
+
+  const result = run(cwd, ['return', 'pull-return-releases-own-lock-blocked'], { BEE_SESSION_ID: sessionId });
+  assert.equal(result.status, 0, `return should exit 0 for a defined blocked outcome: ${result.stderr}`);
+  assert.equal(envelopeData(result.stdout).to, 'blocked');
+  assert.equal(fs.existsSync(lockPath), false, 'return must release its own live lock even when verify fails and the item settles to blocked');
+});
+
+test('return (main-source) never touches a DIFFERENT session\'s live lock — never a blind unlink (tsk-45z D2)', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  addOk(cwd, 'pull-return-other-lock-untouched', { verify: 'test -f proof.txt' });
+  assert.equal(run(cwd, ['take', '--id', 'pull-return-other-lock-untouched'], { BEE_SESSION_ID: 'tsk-45z-this-session' }).status, 0);
+  commitFile(cwd, 'proof.txt');
+
+  const lockPath = path.join(cwd, '.fgos', 'main-checkout.lock');
+  fs.writeFileSync(lockPath, JSON.stringify({ pid: 'tsk-45z-a-different-live-session', ts: Date.now() }));
+
+  const result = run(cwd, ['return', 'pull-return-other-lock-untouched'], { BEE_SESSION_ID: 'tsk-45z-this-session' });
+  assert.equal(result.status, 0, `return failed: ${result.stderr}`);
+  assert.equal(envelopeData(result.stdout).to, 'proposed');
+  assert.equal(fs.existsSync(lockPath), true, 'a different session\'s live lock must survive this return untouched');
+  assert.equal(JSON.parse(fs.readFileSync(lockPath, 'utf8')).pid, 'tsk-45z-a-different-live-session');
+});
+
 test('return: a changed sensitive file outside the item\'s footprint surfaces a frozenJudgeHits advisory, and never blocks the return', () => {
   const cwd = initGitCwd();
   run(cwd, ['init']);
@@ -4991,6 +5042,30 @@ test('return on a branch-source take: verify passes in a disposable detached wor
   assert.equal('headAtReturn' in view.work['branch-return-ok'], false, 'a branch return never records the main-based headAtReturn (D2 CẤM)');
   assert.equal(gitHead(cwd), mainHeadBefore, "return never advances or touches the human's own main checkout");
   assert.equal(gitAtCwd(cwd, ['worktree', 'list', '--porcelain']), worktreesBefore, 'the disposable detached verify worktree is cleaned up — no leftover');
+});
+
+test('return on a branch-source take never touches a live main-checkout.lock (tsk-45z D1 scope: only the main-source path releases early — worktree commits never contend for this shared lock)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeBlockedBranchItem(cwd, 'branch-return-lock-untouched', { verify: 'test -f proof.txt' });
+  assert.equal(run(cwd, ['take', '--id', 'branch-return-lock-untouched']).status, 0);
+  commitPending(cwd, 'state: take branch-return-lock-untouched');
+
+  gitAtCwd(cwd, ['checkout', 'fgw/branch-return-lock-untouched']);
+  fs.writeFileSync(path.join(cwd, 'proof.txt'), 'fixed by hand\n');
+  gitAtCwd(cwd, ['add', '-A']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', 'human fix']);
+  gitAtCwd(cwd, ['checkout', 'main']);
+
+  // A lock recorded under this session's OWN identity — if return's release
+  // wiring wrongly fired on the branch-source path too, this would vanish.
+  const lockPath = path.join(cwd, '.fgos', 'main-checkout.lock');
+  fs.writeFileSync(lockPath, JSON.stringify({ pid: 'tsk-45z-branch-session', ts: Date.now() }));
+
+  const result = run(cwd, ['return', 'branch-return-lock-untouched'], { BEE_SESSION_ID: 'tsk-45z-branch-session' });
+  assert.equal(result.status, 0, `return failed: ${result.stderr}`);
+  assert.match(result.stdout, /proposed/);
+  assert.equal(fs.existsSync(lockPath), true, 'a branch-source return must never touch main-checkout.lock, even one it could self-recognize');
 });
 
 test('return on a branch-source take refuses when the branch has NOT advanced past branchHeadAtTake (no new commit) — validation, exit 4, item stays doing', () => {
