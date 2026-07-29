@@ -331,7 +331,7 @@ export function setFocus(dir, { id, role } = {}) {
  * first's event already in the log, so its own `expectedStatus` compare
  * correctly conflicts.
  */
-export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, role, headAtTake, headAtReturn, branchHeadAtTake, branchHeadAtReturn, parentSnapshotAtAsk, claimTrigger, statusAtAsk } = {}) {
+export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, role, headAtTake, headAtReturn, branchHeadAtTake, branchHeadAtReturn, parentSnapshotAtAsk, claimTrigger, statusAtAsk, releaseTrigger } = {}) {
   const { logPath } = paths(dir);
   const event = withEventsLock(logPath, () => {
   const before = rebuildView(logPath);
@@ -422,6 +422,17 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, rol
   // set on any edge but the awaiting-human entry.
   if (statusAtAsk !== undefined) {
     rawEvent.payload.statusAtAsk = statusAtAsk;
+  }
+  // Release-trigger marker (claim-lock §3b, tsk-2zv): what released this
+  // specific `doing -> todo` move — additive, fsm-ignored, same
+  // post-transition stamp pattern as claimTrigger above. Only
+  // `releaseClaimOnExecuting` (decompose.mjs) ever passes this, so a
+  // reader can positively identify "this todo-entry came from a claim-lock
+  // §3b release" instead of inferring it from status/branch-existence
+  // alone, which reject (`proposed -> todo`) and a verify-fail park also
+  // produce without deleting the branch.
+  if (releaseTrigger !== undefined) {
+    rawEvent.payload.releaseTrigger = releaseTrigger;
   }
   // Compound-learn done-gate: a work item whose domain declares a
   // Compound-learn stage can never reach `done` without first passing through
