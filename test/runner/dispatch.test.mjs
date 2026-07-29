@@ -146,7 +146,7 @@ test('buildPrompt includes all five framing sections', () => {
 test('buildPrompt for a coding-domain (or no-domain) work item also contains a new "# Agent skill" section naming the fgos-executing SKILL.md', () => {
   const prompt = buildPrompt(sampleWork());
   assert.match(prompt, /# Agent skill/);
-  assert.ok(prompt.includes('.claude/skills/fgos/fgos-executing/SKILL.md'));
+  assert.ok(prompt.includes('.claude/skills/fgos-workflow/fgos-executing/SKILL.md'));
 });
 
 test('buildPrompt describes the fgos-discovered report-not-write channel while keeping the never-call-fgos constraint (wgi-8)', () => {

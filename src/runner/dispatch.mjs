@@ -121,7 +121,7 @@ export function buildPrompt(work, feedback) {
   const domainName = resolveDomainName(work.domain);
   const domainObj = DOMAINS[domainName];
   const skillName = skillForStage(domainObj, 'executing');
-  const skillPath = `.claude/skills/fgos/${skillName}/SKILL.md`;
+  const skillPath = `.claude/skills/fgos-workflow/${skillName}/SKILL.md`;
 
   const templateName = selectTemplate({ kind: work.kind, tier: work.tier ?? DEFAULTS.tier, domain: work.domain });
   return renderTemplate(templateName, {

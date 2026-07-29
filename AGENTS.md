@@ -44,7 +44,7 @@ threshold is hit. Changing one supersedes its decision ID — never edit it in p
 ## fgOS Workflow
 
 A session opening in this repo to work an item through its lifecycle loads
-`fgos-routing` first (`.claude/skills/fgos/fgos-routing/SKILL.md`): it orients
+`fgos-routing` first (`.claude/skills/fgos-workflow/fgos-routing/SKILL.md`): it orients
 on open work, claims one item through the pull door, then points to
 `fgos-exploring`, `fgos-planning`, or `fgos-validating` based on where that
 item's `stage` puts it.
