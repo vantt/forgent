@@ -24,6 +24,7 @@ import { repairTruncatedLastLine } from '../src/state/events.mjs';
 import { deriveTitle, classify, generateId } from '../src/intake/classify.mjs';
 import { wrapEnvelope } from '../src/state/envelope.mjs';
 import { loadRunnerConfig, ensureRunnerConfig, DEFAULT_RUNNER_CONFIG } from '../src/runner/dispatch.mjs';
+import { resolveFgosDir } from '../src/runner/paths.mjs';
 import { resolveDiscovery } from '../src/intake/discovery.mjs';
 import { resolveDecompose } from '../src/intake/decompose.mjs';
 import { computeEntropy, computeCounts } from '../src/report/entropy.mjs';
@@ -58,7 +59,10 @@ import { formatCheck, bold } from '../src/setup/ansi.mjs';
 const SUBMIT_VERIFY_SENTINEL = 'chưa xác định — P15 bổ sung';
 
 function dataDir() {
-  return path.join(process.cwd(), '.fgos');
+  // strict: true — this CLI's `.fgos/` always lives under the caller's own
+  // cwd, never git-resolved upward (D5, matches the pull-door assumption
+  // in gitAt's own comment below).
+  return resolveFgosDir(process.cwd(), { strict: true });
 }
 
 // Host-repo git helpers for the pull door (`take`/`return`, stage-decompose
