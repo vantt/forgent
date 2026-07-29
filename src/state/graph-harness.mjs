@@ -37,7 +37,7 @@ import { footprintOverlapAmong } from './graph-metrics.mjs';
  */
 export function mergeReadiness(view) {
   const work = view?.work ?? {};
-  const proposed = Object.values(work).filter((item) => item.status === 'proposed');
+  const proposed = Object.values(work).filter((item) => item.status === 'awaiting-approval');
 
   const waiting = [];
   const candidates = [];

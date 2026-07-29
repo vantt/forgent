@@ -12,7 +12,7 @@
 // CLI-layer concern (bin/fgos.mjs's `check` verb) — this module never
 // resolves a data dir and never writes.
 
-const FINAL_STATUSES = new Set(['proposed', 'blocked', 'done']);
+const FINAL_STATUSES = new Set(['awaiting-approval', 'blocked', 'done']);
 
 // Weights modeled on the consult report's sample scheme (L107 — cited, not
 // reused verbatim: that scheme scored distillery's unsealed/backfill/broken

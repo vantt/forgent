@@ -1,7 +1,7 @@
 ---
 name: fgos-compounding
 description: >-
-  Turn a proposed item's real captured signal into a Diataxis-classified,
+  Turn an awaiting-approval item's real captured signal into a Diataxis-classified,
   evidence-quoted end-user document before the item is allowed toward `done`.
   Use once a claimed item's stage reads `compound-learn` — the synthesis step
   between `executing` and `done`. Examples: "synthesize what this item
@@ -11,7 +11,7 @@ description: >-
 
 # fgos-compounding
 
-Runs while a proposed work item sits at stage `compound-learn` — the
+Runs while an awaiting-approval work item sits at stage `compound-learn` — the
 deliberate synthesis step that gates the item's path onward: no item takes
 the edge toward `done` without first passing through this step's synthesis
 of its real captured signal into an audience-facing document. This skill

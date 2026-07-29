@@ -1,6 +1,6 @@
 // test/state/store.test.mjs — câu-6 tự động (Phase 3 S3-closeout (c)):
 // moveWork composes a learning record MECHANICALLY the moment an item
-// reaches `done` via EITHER entry door (doing->done, proposed->done — both
+// reaches `done` via EITHER entry door (doing->done, awaiting-approval->done — both
 // converge on this one moveWork call), from data the view already folded
 // for the item (outcome/friction/settlement channels). No model call, no
 // second write door (per this cell's must_haves).
@@ -124,17 +124,17 @@ test('moveWork doing->done composes a learning record reflecting the item\'s act
   assert.equal(typeof record.ts, 'string');
 });
 
-test('moveWork proposed->done (the SECOND door into done) also composes a learning record — not only doing->done', () => {
+test('moveWork awaiting-approval->done (the SECOND door into done) also composes a learning record — not only doing->done', () => {
   const dir = tmpDir();
   addSampleWork(dir, 'learn-proposed');
   moveWork(dir, { id: 'learn-proposed', to: 'doing', expectedStatus: 'todo' });
-  moveWork(dir, { id: 'learn-proposed', to: 'proposed', expectedStatus: 'doing' });
+  moveWork(dir, { id: 'learn-proposed', to: 'awaiting-approval', expectedStatus: 'doing' });
 
-  // Pass through compound-learn before the proposed->done close (D3).
+  // Pass through compound-learn before the awaiting-approval->done close (D3).
   moveStage(dir, { id: 'learn-proposed', to: 'compound-learn' });
-  const { view } = moveWork(dir, { id: 'learn-proposed', to: 'done', expectedStatus: 'proposed', role: 'human' });
+  const { view } = moveWork(dir, { id: 'learn-proposed', to: 'done', expectedStatus: 'awaiting-approval', role: 'human' });
 
-  assert.ok(view.learnings?.['learn-proposed'], 'proposed->done must also produce a learning record');
+  assert.ok(view.learnings?.['learn-proposed'], 'awaiting-approval->done must also produce a learning record');
   assert.equal(view.learnings['learn-proposed'].length, 1);
   assert.deepEqual(view.learnings['learn-proposed'][0].settlements, { 'close/human': 1 });
 });
@@ -207,12 +207,12 @@ test('moveWork stamps branchHeadAtTake onto the appended event payload for a blo
   assert.equal('headAtTake' in event.payload, false, 'a branch take never also stamps the main-based headAtTake');
 });
 
-test('moveWork stamps branchHeadAtReturn onto the appended event payload for a doing -> proposed move that carries it, never headAtReturn', () => {
+test('moveWork stamps branchHeadAtReturn onto the appended event payload for a doing -> awaiting-approval move that carries it, never headAtReturn', () => {
   const dir = tmpDir();
   addSampleWork(dir, 'branch-return', { status: 'blocked' });
   moveWork(dir, { id: 'branch-return', to: 'doing', expectedStatus: 'blocked', role: 'human', branchHeadAtTake: 'branch-deadbeef' });
 
-  const { event } = moveWork(dir, { id: 'branch-return', to: 'proposed', expectedStatus: 'doing', branchHeadAtReturn: 'branch-c0ffee' });
+  const { event } = moveWork(dir, { id: 'branch-return', to: 'awaiting-approval', expectedStatus: 'doing', branchHeadAtReturn: 'branch-c0ffee' });
 
   assert.equal(event.payload.branchHeadAtReturn, 'branch-c0ffee');
   assert.equal('headAtReturn' in event.payload, false, 'a branch return never also stamps the main-based headAtReturn (D2 CẤM)');

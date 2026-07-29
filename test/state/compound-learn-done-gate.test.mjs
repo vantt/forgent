@@ -45,18 +45,18 @@ function addSynthetic(dir, id) {
   });
 }
 
-test('a coding item at stage executing is refused proposed->done — it must pass through compound-learn first', () => {
+test('a coding item at stage executing is refused awaiting-approval->done — it must pass through compound-learn first', () => {
   const dir = tmpDir();
   addCoding(dir, 'gate-proposed');
   moveWork(dir, { id: 'gate-proposed', to: 'doing', expectedStatus: 'todo' });
-  moveWork(dir, { id: 'gate-proposed', to: 'proposed', expectedStatus: 'doing' });
+  moveWork(dir, { id: 'gate-proposed', to: 'awaiting-approval', expectedStatus: 'doing' });
 
   assert.throws(
-    () => moveWork(dir, { id: 'gate-proposed', to: 'done', expectedStatus: 'proposed' }),
+    () => moveWork(dir, { id: 'gate-proposed', to: 'done', expectedStatus: 'awaiting-approval' }),
     (err) => err instanceof StoreError && err.category === 'precondition' && /compound-learn/.test(err.message),
   );
   // Nothing persisted: the item is still proposed after the refusal.
-  const { view } = moveWork(dir, { id: 'gate-proposed', to: 'todo', expectedStatus: 'proposed', reason: 'reopen' });
+  const { view } = moveWork(dir, { id: 'gate-proposed', to: 'todo', expectedStatus: 'awaiting-approval', reason: 'reopen' });
   assert.equal(view.work['gate-proposed'].status, 'todo');
 });
 
@@ -75,10 +75,10 @@ test('a coding item at stage compound-learn is allowed to reach done, and the cl
   const dir = tmpDir();
   addCoding(dir, 'gate-allowed');
   moveWork(dir, { id: 'gate-allowed', to: 'doing', expectedStatus: 'todo' });
-  moveWork(dir, { id: 'gate-allowed', to: 'proposed', expectedStatus: 'doing' });
+  moveWork(dir, { id: 'gate-allowed', to: 'awaiting-approval', expectedStatus: 'doing' });
   moveStage(dir, { id: 'gate-allowed', to: 'compound-learn' });
 
-  const { event, view } = moveWork(dir, { id: 'gate-allowed', to: 'done', expectedStatus: 'proposed', role: 'human' });
+  const { event, view } = moveWork(dir, { id: 'gate-allowed', to: 'done', expectedStatus: 'awaiting-approval', role: 'human' });
   assert.equal(view.work['gate-allowed'].status, 'done');
   // composeLearning preserved: the close event still carries the learning field.
   assert.ok(event.payload.learning, 'the close event carries the composed learning record');
@@ -98,7 +98,7 @@ test('a stale expectedStatus on a not-yet-compound coding item still yields conf
   const dir = tmpDir();
   addCoding(dir, 'cas-order');
   moveWork(dir, { id: 'cas-order', to: 'doing', expectedStatus: 'todo' });
-  moveWork(dir, { id: 'cas-order', to: 'proposed', expectedStatus: 'doing' });
+  moveWork(dir, { id: 'cas-order', to: 'awaiting-approval', expectedStatus: 'doing' });
 
   // The item is proposed at stage executing — the done-gate WOULD refuse it as
   // precondition, but a stale --expect must be caught FIRST as a conflict,

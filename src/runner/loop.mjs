@@ -325,7 +325,7 @@ function safeRemoveWorktree(repoRoot, worktreePath, log) {
  * 1. Stale-doing resolution: any item sitting in `doing` (at most one under
  *    A1, but all are handled) has no live worker — the runner that claimed
  *    it is gone. Resolve per `resolveStaleDoing`: a branch carrying a commit
- *    whose verify passes completes the work (`doing -> proposed`); anything
+ *    whose verify passes completes the work (`doing -> awaiting-approval`); anything
  *    less reclaims it (`doing -> blocked`, reason runner-crash-reclaim).
  *    The verify for the completed case runs in a throwaway worktree of the
  *    item's own branch, torn down in a finally.
@@ -703,7 +703,7 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
       if (check.passed && facts.aheadCount > 0) {
         breaker.recordHit(item.id);
         await queue.enqueue(async () => {
-          moveWork(dir, { id: item.id, to: 'proposed', expectedStatus: 'doing', role: 'runner' });
+          moveWork(dir, { id: item.id, to: 'awaiting-approval', expectedStatus: 'doing', role: 'runner' });
         });
         log(`fgos-runner: "${item.id}" proposed on branch ${wt.branch} (${facts.aheadCount} commit(s))`);
         log(`fgos-runner: verify tail:\n${tailLines(check.output)}`);
@@ -712,7 +712,7 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
           addOutcome(dir, {
             id: item.id,
             actual: {
-              outcome: 'proposed',
+              outcome: 'awaiting-approval',
               passed: true,
               attempts: attempt,
               errorClass: null,
@@ -721,7 +721,7 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
             },
           });
         });
-        return { outcome: 'proposed', id: item.id, branch: wt.branch, attempts: attempt, exitCode: 0 };
+        return { outcome: 'awaiting-approval', id: item.id, branch: wt.branch, attempts: attempt, exitCode: 0 };
       }
 
       failure = {

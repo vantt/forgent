@@ -86,6 +86,24 @@ verify/Execute của item):**
    3 item đang `proposed` (`tsk-5oa`, `tsk-63c`, `tsk-2z3`) đã fold đúng thành
    `awaiting-approval`.
 
+**Chặn thật đã phát hiện khi dry-run script (Execute, `scripts/migrate-status-
+proposed-to-awaiting-approval.mjs`), CHƯA giải quyết — để lại cho người chạy
+Pha B:** dry-run trên bản sao `dogfood-fixture/.fgos` (9 dòng đổi) và
+`fgos-test-drive/.fgos` (2 dòng đổi) sạch, không lỗi. Dry-run trên bản sao KHO
+SỐNG throw `seq gap at line 273 -- expected 273, got 272` — đọc trực tiếp: dòng
+272 VÀ 273 cùng mang `seq: 272` (2 event `work.move` khác nhau của `tsk-53f`,
+cùng `todo->doing`). Đây KHÔNG PHẢI lỗi do script hay do rename gây ra — là lớp
+corruption ĐÃ ĐƯỢC BIẾT TRƯỚC, ghi rõ tại `src/state/events.mjs:25`
+("spike-confirmed duplicate-seq corruption" — 2 process đọc cùng seq N, cùng
+ghi N+1, trước khi `events.lock` hiện tại được thêm để khoá cửa sổ đó). Migration
+script kế thừa đúng kỷ luật `migrate-actor-to-role.mjs` (seq phải liên tục),
+nên từ chối đúng — không nới lỏng check này chỉ để chạy qua.
+
+Đây là chặn thật cho Pha B trên KHO SỐNG cụ thể, KHÔNG chặn Pha A (rename source/
+test/docs của chính item này đã xong, `npm test` xanh). Quyết định sửa
+corruption lịch sử này (tay hay bằng công cụ riêng) là quyết định phạm vi khác,
+ngoài item tsk-66l — nêu rõ cho người chạy Pha B, không tự ý sửa ở đây.
+
 ## Risk map
 
 | Thành phần | Rủi ro | Điểm chứng minh (cho fgos-validating) |

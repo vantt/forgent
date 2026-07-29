@@ -8,7 +8,7 @@
 import { getDomain, stageForStep } from './workflow-stage-graphs.mjs';
 //
 // Ready = status 'todo' AND every dep's status is 'done' (per D5: done
-// means "accepted into the main tree" — a dep sitting at 'proposed',
+// means "accepted into the main tree" — a dep sitting at 'awaiting-approval',
 // 'doing', or 'blocked' does NOT unblock its dependents) AND stage at the
 // item's own domain's Execute-mapped stage ('executing' for the 'coding'
 // domain — per stage-clarify D1: an item still at stage `clarify` is not

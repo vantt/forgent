@@ -413,7 +413,7 @@ function collectLearningData(view, id) {
 // listing the ones that don't keeps the predicted→actual loop honest.
 function collectMissingOutcomeNag(view, id) {
   const outcomes = view.outcomes ?? {};
-  const FINAL_STATUSES = new Set(['proposed', 'blocked', 'done']);
+  const FINAL_STATUSES = new Set(['awaiting-approval', 'blocked', 'done']);
   const missing = Object.values(view.work ?? {})
     .filter((w) => (!id || w.id === id) && FINAL_STATUSES.has(w.status) && !outcomes[w.id]?.actual)
     .map((w) => w.id);
@@ -817,8 +817,8 @@ async function runVerb(verb, flags, positional, dir) {
       const id = requireField(positional[0] ?? flags.id, 'move requires an id: fgos move <id> --to <status> [--expect <status>]');
       const to = requireField(flags.to, 'move requires --to <status>');
       const expectedStatus = optionalField(flags.expect, 'move --expect requires a status value (omit --expect entirely to skip the CAS check)');
-      // --reason only matters on the proposed -> todo rejection edge (per
-      // D5) and the proposed -> blocked park edge (per pr-lifecycle D3);
+      // --reason only matters on the awaiting-approval -> todo rejection edge (per
+      // D5) and the awaiting-approval -> blocked park edge (per pr-lifecycle D3);
       // fsm.mjs is the single place that enforces "required there, ignored
       // everywhere else" — this verb just forwards whatever the caller
       // supplied.
@@ -831,7 +831,7 @@ async function runVerb(verb, flags, positional, dir) {
     // D2/D3): unlike `move`, this is not a generic status/stage door — it is
     // the one act that makes the synthesis stage non-vacuous (an auto-advance
     // on return/approve would let the stage transit with nothing synthesised,
-    // exactly what D3 forbids). Requires `status === 'proposed'` (work
+    // exactly what D3 forbids). Requires `status === 'awaiting-approval'` (work
     // returned, verify green) so the item is at a settled checkpoint before it
     // moves into compound-learn; persists via store.mjs's moveStage (not the
     // pure stage.mjs transitionStage) so the move is actually written to the
@@ -869,8 +869,8 @@ async function runVerb(verb, flags, positional, dir) {
       if (!item) {
         throw new StoreError('validation', `compound: work "${id}" not found.`);
       }
-      if (item.status !== 'proposed') {
-        throw new StoreError('validation', `compound: work "${id}" is "${item.status}", not "proposed" — cannot move into compound-learn.`);
+      if (item.status !== 'awaiting-approval') {
+        throw new StoreError('validation', `compound: work "${id}" is "${item.status}", not "awaiting-approval" — cannot move into compound-learn.`);
       }
       const docType = optionalField(flags['doc-type'], 'compound --doc-type requires a non-empty value: tutorial | how-to | reference | explanation.');
       if (docType !== undefined) {
@@ -1421,7 +1421,7 @@ async function runVerb(verb, flags, positional, dir) {
     // exit status decides. Mirrors the runner's own proposed contract
     // exactly: working tree clean (work committed) + HEAD advanced past
     // headAtTake (real progress, not a no-op) are both required BEFORE verify
-    // even runs; verify green -> doing->proposed (actual, no settlement —
+    // even runs; verify green -> doing->awaiting-approval (actual, no settlement —
     // settlement belongs to the ->done edge, D4); verify red ->
     // doing->blocked + friction (mirrors the runner's own park path).
     case 'return': {
@@ -1500,9 +1500,9 @@ async function runVerb(verb, flags, positional, dir) {
         if (check.passed) {
           // STR63: advisory only (per cos) — a hit never blocks this return.
           const frozenJudge = frozenJudgeHits(changedFilesSince(repoRoot, item.branchHeadAtTake, branchHead), item.footprint);
-          const { event } = moveWork(dir, { id, to: 'proposed', expectedStatus: 'doing', branchHeadAtReturn: branchHead });
-          addOutcome(dir, { id, actual: { outcome: 'proposed', passed: true, attempts: 1, errorClass: null, aheadCount: branchAheadCount } });
-          return { id, from: 'doing', to: 'proposed', source: 'branch', branch, aheadCount: branchAheadCount, passed: true, seq: event.seq, output: check.output, frozenJudgeHits: frozenJudge };
+          const { event } = moveWork(dir, { id, to: 'awaiting-approval', expectedStatus: 'doing', branchHeadAtReturn: branchHead });
+          addOutcome(dir, { id, actual: { outcome: 'awaiting-approval', passed: true, attempts: 1, errorClass: null, aheadCount: branchAheadCount } });
+          return { id, from: 'doing', to: 'awaiting-approval', source: 'branch', branch, aheadCount: branchAheadCount, passed: true, seq: event.seq, output: check.output, frozenJudgeHits: frozenJudge };
         }
 
         moveWork(dir, { id, to: 'blocked', expectedStatus: 'doing', reason: 'verify-fail', role: 'system' });
@@ -1545,8 +1545,8 @@ async function runVerb(verb, flags, positional, dir) {
       if (check.passed) {
         // STR63: advisory only (per cos) — a hit never blocks this return.
         const frozenJudge = frozenJudgeHits(ownDiff, item.footprint);
-        const { event } = moveWork(dir, { id, to: 'proposed', expectedStatus: 'doing', headAtReturn: head });
-        addOutcome(dir, { id, actual: { outcome: 'proposed', passed: true, attempts: 1, errorClass: null, aheadCount } });
+        const { event } = moveWork(dir, { id, to: 'awaiting-approval', expectedStatus: 'doing', headAtReturn: head });
+        addOutcome(dir, { id, actual: { outcome: 'awaiting-approval', passed: true, attempts: 1, errorClass: null, aheadCount } });
         // tsk-45z D1/D2: this session's own commits (landed straight on the
         // main checkout, not a branch/worktree) may still hold
         // main-checkout.lock, refreshed by .githooks/pre-commit on each one
@@ -1557,7 +1557,7 @@ async function runVerb(verb, flags, positional, dir) {
         // Identity-checked (never a blind unlink, D2): only removes the
         // lock if it is still recorded under this session's own identity.
         releaseMainCheckoutLockIfOwn(dir, resolveWriterIdentity(dir).id);
-        return { id, from: 'doing', to: 'proposed', source: 'main', aheadCount, passed: true, seq: event.seq, output: check.output, frozenJudgeHits: frozenJudge };
+        return { id, from: 'doing', to: 'awaiting-approval', source: 'main', aheadCount, passed: true, seq: event.seq, output: check.output, frozenJudgeHits: frozenJudge };
       }
 
       moveWork(dir, { id, to: 'blocked', expectedStatus: 'doing', reason: 'verify-fail', role: 'system' });
@@ -1590,8 +1590,8 @@ async function runVerb(verb, flags, positional, dir) {
       if (!item) {
         throw new StoreError('validation', `review: work "${id}" not found.`);
       }
-      if (item.status !== 'proposed') {
-        throw new StoreError('precondition', `review: work "${id}" is "${item.status}", not "proposed" — nothing to review.`);
+      if (item.status !== 'awaiting-approval') {
+        throw new StoreError('precondition', `review: work "${id}" is "${item.status}", not "awaiting-approval" — nothing to review.`);
       }
 
       // GitHub transport (github-adapter D1/D5): `review <id> --github` opens a
@@ -1692,8 +1692,8 @@ async function runVerb(verb, flags, positional, dir) {
       if (!item) {
         throw new StoreError('validation', `approve: work "${id}" not found.`);
       }
-      if (item.status !== 'proposed') {
-        throw new StoreError('precondition', `approve: work "${id}" is "${item.status}", not "proposed" — nothing to approve.`);
+      if (item.status !== 'awaiting-approval') {
+        throw new StoreError('precondition', `approve: work "${id}" is "${item.status}", not "awaiting-approval" — nothing to approve.`);
       }
 
       const repoRoot = process.cwd();
@@ -1811,15 +1811,15 @@ async function runVerb(verb, flags, positional, dir) {
           // cleanupMergedBranch runs — the local fgw/<id> branch and its pushed
           // origin copy are both left in place after a server-side merge (no
           // local cleanup mechanism exists for a branch merged on GitHub).
-          const { event } = moveWork(dir, { id, to: 'done', expectedStatus: 'proposed', role: 'human' });
+          const { event } = moveWork(dir, { id, to: 'done', expectedStatus: 'awaiting-approval', role: 'human' });
           return { id, mode: 'github', to: 'done', prNumber, seq: event.seq };
         }
         // blocked — mirrors the local merge-conflict/verify-fail-post-merge
-        // shape: park proposed -> blocked with the classifyGhFailure reason,
+        // shape: park awaiting-approval -> blocked with the classifyGhFailure reason,
         // plus a friction record carrying the failure layer and gh's stderr.
         const reason = result.reason;
         const layer = { 'auth-failure': 'environment', 'rate-limited': 'environment', 'unreachable': 'environment', 'gh-invocation-failed': 'state' }[reason] || 'state';
-        moveWork(dir, { id, to: 'blocked', expectedStatus: 'proposed', reason, role: 'system' });
+        moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason, role: 'system' });
         addFriction(dir, {
           id,
           disposition: 'blocked',
@@ -1849,7 +1849,7 @@ async function runVerb(verb, flags, positional, dir) {
         if (rootId !== id) {
           const rootBranch = branchNameFor(rootId);
           // Ephemeral worktree checked out on fgw/<rootId> (guaranteed to
-          // exist by the time a leaf reaches "proposed" — dispatch-side
+          // exist by the time a leaf reaches "awaiting-approval" — dispatch-side
           // wiring, cell fan-out-parallel-9) — never the human's own main
           // checkout. ASSUMPTION (acknowledged, not fixed in this cell):
           // this races a concurrent approval of a sibling leaf of the same
@@ -1863,7 +1863,7 @@ async function runVerb(verb, flags, positional, dir) {
             const result = await mergeRunnerItem(ephemeral.path, item, { timeoutMs });
 
             if (result.outcome === 'conflict') {
-              moveWork(dir, { id, to: 'blocked', expectedStatus: 'proposed', reason: 'merge-conflict', role: 'system' });
+              moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: 'merge-conflict', role: 'system' });
               addFriction(dir, {
                 id,
                 disposition: 'blocked',
@@ -1876,7 +1876,7 @@ async function runVerb(verb, flags, positional, dir) {
             }
 
             if (result.outcome === 'fgos-write-rejected') {
-              moveWork(dir, { id, to: 'blocked', expectedStatus: 'proposed', reason: 'fgos-write-rejected', role: 'system' });
+              moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: 'fgos-write-rejected', role: 'system' });
               addFriction(dir, {
                 id,
                 disposition: 'blocked',
@@ -1889,7 +1889,7 @@ async function runVerb(verb, flags, positional, dir) {
             }
 
             if (result.outcome === 'verify-fail') {
-              moveWork(dir, { id, to: 'blocked', expectedStatus: 'proposed', reason: 'verify-fail-post-merge', role: 'system' });
+              moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: 'verify-fail-post-merge', role: 'system' });
               addFriction(dir, {
                 id,
                 disposition: 'blocked',
@@ -1909,7 +1909,7 @@ async function runVerb(verb, flags, positional, dir) {
             // the branch is merged INTO; running it from repoRoot/main
             // would have git silently refuse the delete (swallowed as a
             // warning), leaking the leaf's branch forever.
-            const { event } = moveWork(dir, { id, to: 'done', expectedStatus: 'proposed', role: 'human' });
+            const { event } = moveWork(dir, { id, to: 'done', expectedStatus: 'awaiting-approval', role: 'human' });
             const cleanup = cleanupMergedBranch(ephemeral.path, result.branch);
             return {
               id,
@@ -1950,7 +1950,7 @@ async function runVerb(verb, flags, positional, dir) {
           const detail = hadChildren
             ? `cross-root integration drift at main@${currentHead(repoRoot)}; git merge --no-commit --no-ff ${result.branch} conflicted; merge aborted, main unchanged`
             : `git merge --no-commit --no-ff ${result.branch} conflicted; merge aborted, main unchanged`;
-          moveWork(dir, { id, to: 'blocked', expectedStatus: 'proposed', reason, role: 'system' });
+          moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason, role: 'system' });
           addFriction(dir, {
             id,
             disposition: 'blocked',
@@ -1963,7 +1963,7 @@ async function runVerb(verb, flags, positional, dir) {
         }
 
         if (result.outcome === 'fgos-write-rejected') {
-          moveWork(dir, { id, to: 'blocked', expectedStatus: 'proposed', reason: 'fgos-write-rejected', role: 'system' });
+          moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: 'fgos-write-rejected', role: 'system' });
           addFriction(dir, {
             id,
             disposition: 'blocked',
@@ -1980,7 +1980,7 @@ async function runVerb(verb, flags, positional, dir) {
           const detail = hadChildren
             ? `cross-root integration drift at main@${currentHead(repoRoot)}; goal-check failed on staged merge (exit ${result.check.status}); merge aborted, main unchanged`
             : `goal-check failed on staged merge (exit ${result.check.status}); merge aborted, main unchanged`;
-          moveWork(dir, { id, to: 'blocked', expectedStatus: 'proposed', reason, role: 'system' });
+          moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason, role: 'system' });
           addFriction(dir, {
             id,
             disposition: 'blocked',
@@ -1992,7 +1992,7 @@ async function runVerb(verb, flags, positional, dir) {
           return { id, mode: 'merge', to: 'blocked', reason, target: 'main', exitStatus: result.check.status, output: result.check.output };
         }
 
-        const { event } = moveWork(dir, { id, to: 'done', expectedStatus: 'proposed', role: 'human' });
+        const { event } = moveWork(dir, { id, to: 'done', expectedStatus: 'awaiting-approval', role: 'human' });
         const cleanup = cleanupMergedBranch(repoRoot, result.branch);
         return {
           id,
@@ -2011,7 +2011,7 @@ async function runVerb(verb, flags, positional, dir) {
       // tree, exactly the goal-check contract `return` already uses.
       const check = await runGoalCheck(item, repoRoot, timeoutMs);
       if (!check.passed) {
-        moveWork(dir, { id, to: 'blocked', expectedStatus: 'proposed', reason: 'verify-fail', role: 'system' });
+        moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: 'verify-fail', role: 'system' });
         addFriction(dir, {
           id,
           disposition: 'blocked',
@@ -2022,11 +2022,11 @@ async function runVerb(verb, flags, positional, dir) {
         });
         return { id, mode: 'verify-only', to: 'blocked', reason: 'verify-fail', exitStatus: check.status, output: check.output };
       }
-      const { event } = moveWork(dir, { id, to: 'done', expectedStatus: 'proposed', role: 'human' });
+      const { event } = moveWork(dir, { id, to: 'done', expectedStatus: 'awaiting-approval', role: 'human' });
       return { id, mode: 'verify-only', to: 'done', seq: event.seq, output: check.output };
     }
 
-    // Cổng duyệt — reject (pr-lifecycle D4): proposed -> todo, reason
+    // Cổng duyệt — reject (pr-lifecycle D4): awaiting-approval -> todo, reason
     // mandatory (fsm.mjs already enforces this edge). NEVER runs a single git
     // command — the code (if any landed on main via a pull-door item) is
     // history, not something this verb rewrites; a human who wants it gone
@@ -2038,11 +2038,11 @@ async function runVerb(verb, flags, positional, dir) {
       if (!item) {
         throw new StoreError('validation', `reject: work "${id}" not found.`);
       }
-      if (item.status !== 'proposed') {
-        throw new StoreError('precondition', `reject: work "${id}" is "${item.status}", not "proposed" — nothing to reject.`);
+      if (item.status !== 'awaiting-approval') {
+        throw new StoreError('precondition', `reject: work "${id}" is "${item.status}", not "awaiting-approval" — nothing to reject.`);
       }
-      const { event } = moveWork(dir, { id, to: 'todo', expectedStatus: 'proposed', reason, role: 'human' });
-      return { id, from: 'proposed', to: 'todo', reason, seq: event.seq };
+      const { event } = moveWork(dir, { id, to: 'todo', expectedStatus: 'awaiting-approval', reason, role: 'human' });
+      return { id, from: 'awaiting-approval', to: 'todo', reason, seq: event.seq };
     }
 
     // Catch-up-by-merge (D6/D7/D11, fan-out-parallel): the unified mechanism
@@ -2052,7 +2052,7 @@ async function runVerb(verb, flags, positional, dir) {
     // (.bee/spikes/fan-out-parallel/catchup-real-conflict-probe.sh) — by
     // merging the current TARGET (main for a root/standalone item, the
     // resolved parent's branch for a leaf) into the item's OWN branch,
-    // re-verifying, and either landing the merge (blocked -> proposed, D18's
+    // re-verifying, and either landing the merge (blocked -> awaiting-approval, D18's
     // edge, mechanical/uncounted per D11) or aborting clean and leaving the
     // item blocked for a human. Deliberately does NOT call mergeRunnerItem
     // (merge.mjs) — that merges the item's branch INTO the caller's checkout,
@@ -2173,8 +2173,8 @@ async function runVerb(verb, flags, positional, dir) {
         // D18's edge: mechanical, uncounted reconcile-success — never
         // touches 'doing', so anti-loop's visitCount never sees it. No
         // reason/ask required on this edge (fsm.mjs).
-        const { event } = moveWork(dir, { id, to: 'proposed', expectedStatus: 'blocked', role: 'runner' });
-        return { id, outcome: 'merged', from: 'blocked', to: 'proposed', target, branch: ownBranch, seq: event.seq, output: check.output };
+        const { event } = moveWork(dir, { id, to: 'awaiting-approval', expectedStatus: 'blocked', role: 'runner' });
+        return { id, outcome: 'merged', from: 'blocked', to: 'awaiting-approval', target, branch: ownBranch, seq: event.seq, output: check.output };
       } finally {
         removeWorktree(repoRoot, ephemeral.path, { force: true });
       }

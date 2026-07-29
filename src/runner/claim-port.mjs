@@ -171,7 +171,7 @@ export function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoot = pr
     // plan.md, or code already committed). Only THIS specific release is
     // exempted, via `latestTodoReleaseTrigger`'s positive marker check —
     // never inferred from status/branch-existence alone, since a reject
-    // (`proposed -> todo`) or a verify-fail park lands an item in the exact
+    // (`awaiting-approval -> todo`) or a verify-fail park lands an item in the exact
     // same shape without deleting the branch, and MUST still recompute
     // fresh (that recompute is the deliberate anti-cheat gate forcing new
     // work before a retaken item can `return` again).

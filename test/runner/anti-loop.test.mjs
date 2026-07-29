@@ -28,7 +28,7 @@ test('visitCount counts every entry into doing for the given id', () => {
     move('a', 'doing', 1),
     move('a', 'blocked', 2),
     move('a', 'doing', 3),
-    move('a', 'proposed', 4),
+    move('a', 'awaiting-approval', 4),
     move('a', 'todo', 5),
     move('a', 'doing', 6),
   ];
@@ -44,7 +44,7 @@ test('visitCount ignores moves for other ids', () => {
 test('visitCount ignores non-"doing" targets and non-work.move event types', () => {
   const events = [
     move('a', 'blocked', 1),
-    move('a', 'proposed', 2),
+    move('a', 'awaiting-approval', 2),
     { seq: 3, ts: new Date().toISOString(), type: 'decision', payload: { text: 'unrelated' }, v: 2 },
   ];
   assert.equal(visitCount(events, 'a'), 0);
@@ -141,7 +141,7 @@ test('visitsSinceLastHumanEvent also excludes clarify/decompose-phase claims fro
 // metric. `humanMove` mints the two CLOSED trigger shapes (D1c): an `answer`
 // leaving awaiting-human, or a `reason`-carrying move — both require
 // `role: 'human'`, matching fsm.mjs's transitionWork (answer only appears
-// on `awaiting-human -> todo`; reason only on `proposed -> todo`/`blocked`).
+// on `awaiting-human -> todo`; reason only on `awaiting-approval -> todo`/`blocked`).
 
 function humanMove(id, to, seq, extra = {}) {
   return { seq, ts: new Date(2026, 0, seq).toISOString(), type: 'work.move', payload: { id, from: 'x', to, role: 'human', ...extra }, v: 2 };

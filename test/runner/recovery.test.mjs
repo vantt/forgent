@@ -79,8 +79,8 @@ test('resolveAction defaults attempt to 1 when omitted', () => {
 
 // -- resolveStaleDoing: branch-state truth table --------------------------
 
-test('resolveStaleDoing: commit + verify pass -> completes (doing -> proposed)', () => {
-  assert.deepEqual(resolveStaleDoing({ hasCommit: true, verifyPassed: true }), { to: 'proposed' });
+test('resolveStaleDoing: commit + verify pass -> completes (doing -> awaiting-approval)', () => {
+  assert.deepEqual(resolveStaleDoing({ hasCommit: true, verifyPassed: true }), { to: 'awaiting-approval' });
 });
 
 test('resolveStaleDoing: commit but verify did not pass -> reclaim-blocked', () => {

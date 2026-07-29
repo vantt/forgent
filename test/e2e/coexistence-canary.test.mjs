@@ -14,7 +14,7 @@
 //   (ii)  fgos->bee: fgos ships no runtime gate yet, so this direction is
 //         vacuous-by-absence — stated plainly rather than asserting a check
 //         that doesn't exist. In its place, a footprint proof: a REAL fgos
-//         round (init -> submit -> runner --once -> proposed) must not write
+//         round (init -> submit -> runner --once -> awaiting-approval) must not write
 //         a single byte into the fixture tree outside fgos's own territory
 //         (`.fgos/`) and the source-repo surface D2 names as an OWNED door
 //         (`.git/` — a real worker dispatch commits onto a `fgw/*` branch,
@@ -279,13 +279,13 @@ test('canary (iii) fgos init detects bee and leaves it untouched (nhường-nh�
 
 // --- (ii) footprint: real fgos round, snapshot diff -------------------------
 
-test('canary (ii) footprint: a real fgos round (init->submit->runner --once->proposed) writes no byte outside .fgos/ and the owned .git/ door; bee-fixture files stay byte-identical; fgos->bee stays vacuous-by-absence', { skip: BEE_SKIP }, () => {
+test('canary (ii) footprint: a real fgos round (init->submit->runner --once->awaiting-approval) writes no byte outside .fgos/ and the owned .git/ door; bee-fixture files stay byte-identical; fgos->bee stays vacuous-by-absence', { skip: BEE_SKIP }, () => {
   const fx = makeFixture();
   assert.equal(spawnSync(process.execPath, [FGOS, 'init'], { cwd: fx, encoding: 'utf8' }).status, 0);
 
   // A minimal discovery+dispatch executor (mirrors runner-loop.test.mjs's own
   // clear-discovery pattern) so `submit` chains clarify -> decompose ->
-  // executing -> proposed in one --once call, same as that suite's stage-
+  // executing -> awaiting-approval in one --once call, same as that suite's stage-
   // decompose (a) case — nothing new invented here, just reused inline
   // since this cell may not edit that file.
   const scriptDir = mkTemp('fgos-coexist-canary-exec-');
@@ -329,7 +329,7 @@ if (prompt.includes('# Context-discovery')) {
 
   const runOnce = spawnSync(process.execPath, [RUNNER, '--once'], { cwd: fx, encoding: 'utf8' });
   assert.equal(runOnce.status, 0, `runner --once failed: ${runOnce.stderr}`);
-  assert.match(runOnce.stdout, /proposed/);
+  assert.match(runOnce.stdout, /awaiting-approval/);
 
   const after = snapshotTree(fx, ['.fgos', '.git']);
   const diff = diffSnapshots(before, after);

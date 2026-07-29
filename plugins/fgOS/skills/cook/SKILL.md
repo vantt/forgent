@@ -7,14 +7,14 @@ description: >-
   description>. Pauses for real human approval at every dev-skill gate
   (fgos-exploring/fgos-planning/fgos-validating), auto-implements at stage
   executing, and stops once the item (and every child it split into) reaches
-  status proposed — final merge review stays a human decision, never
+  status awaiting-approval — final merge review stays a human decision, never
   auto-approved. Examples: "/fgOS:cook add pagination to the list view",
   "/fgOS:cook fix the flaky retry test".
 ---
 
 # fgOS cook
 
-Drives a task from a single sentence to a real, verified, `proposed`
+Drives a task from a single sentence to a real, verified, `awaiting-approval`
 change — chaining the same verbs and dev-skills a person would use one at a
 time (`submit` → `fgos-exploring` → `fgos-planning`/`fgos-validating` →
 real implementation → `return`), so the user doesn't have to drive each
@@ -29,8 +29,8 @@ never re-implements a dev-skill's substance inline; it invokes them.
   a real question to the user. Ask it, wait for a real answer, and only
   proceed once it is actually approved — do not answer on the user's behalf
   and do not skip the question because the answer "seems obvious."
-- **Stop at `proposed`, never merge.** Once `fgos return <id>` succeeds the
-  id is `proposed`. That is the finish line for this skill — never call
+- **Stop at `awaiting-approval`, never merge.** Once `fgos return <id>` succeeds the
+  id is `awaiting-approval`. That is the finish line for this skill — never call
   `fgos approve`/`fgos reject`/`fgos review` yourself; the internal PR
   review gate is a human decision, always.
 - **Claiming only works at stage `executing`.** Verified empirically against
@@ -93,7 +93,7 @@ never re-implements a dev-skill's substance inline; it invokes them.
      - `decompose` — children were created (`data.childIds`). Push every
        child id onto the FRONT of the queue, ahead of the root — the root
        cannot clear decompose's "no unfinished descendants" gate until they
-       are all `proposed`. Continue the loop.
+       are all `awaiting-approval`. Continue the loop.
      - `already-decomposed` — children already exist from an earlier
        interrupted run; do not recreate them, just re-read and continue.
      - `need-human` — treat exactly like the `awaiting-human` branch above,
@@ -119,10 +119,10 @@ never re-implements a dev-skill's substance inline; it invokes them.
         tree, advanced HEAD, verify actually green); it does not take your
         word for it. If it rejects the return, fix the real gap and
         retry — never argue with it or fabricate progress.
-     4. Once `return` succeeds the id is `proposed` — pop it off the queue.
+     4. Once `return` succeeds the id is `awaiting-approval` — pop it off the queue.
 
 3. **Report.** Once the queue is empty, summarize every id touched and its
-   final status (`proposed`), list every `CONTEXT.md`/`plan.md` path written
+   final status (`awaiting-approval`), list every `CONTEXT.md`/`plan.md` path written
    along the way, and tell the user the review gate
    (`fgos review`/`fgos approve`/`fgos reject`) is theirs to run next — this
    skill never calls it.

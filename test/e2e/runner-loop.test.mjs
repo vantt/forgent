@@ -331,7 +331,7 @@ test('e2e stage-clarify (a) clear verdict: submit -> --once takes the item stage
   // still status:todo the whole time — became the frontier head in the same
   // tick and was dispatched to proposed via the SAME scripted executor's
   // worker-prompt branch, all within this one --once call.
-  assert.equal(item.status, 'proposed');
+  assert.equal(item.status, 'awaiting-approval');
   assert.equal(branchExists(repoRoot, `fgw/${submitted.id}`), true);
   assert.match(branchLog(repoRoot, `fgw/${submitted.id}`), /worker: output\.txt/);
 
@@ -426,7 +426,7 @@ test('e2e stage-decompose (a) simple item pass-through: submit -> --once chains 
   const view = stateView(repoRoot);
   const item = view.work[submitted.id];
   assert.equal(item.stage, 'executing', 'clarify->decompose->executing chained within one sweep pass (D2)');
-  assert.equal(item.status, 'proposed', 'pass-through leaves the item dispatchable in the same tick');
+  assert.equal(item.status, 'awaiting-approval', 'pass-through leaves the item dispatchable in the same tick');
   assert.equal(item.verify, 'test -f simple-done.txt && echo SIMPLE_OK');
   assert.equal(branchExists(repoRoot, `fgw/${submitted.id}`), true);
   assert.match(branchLog(repoRoot, `fgw/${submitted.id}`), /worker: simple-done\.txt/);
@@ -442,7 +442,7 @@ test('e2e stage-decompose (a) simple item pass-through: submit -> --once chains 
   assert.equal(Object.values(view.work).some((w) => w.parent === submitted.id), false);
 });
 
-test('e2e stage-decompose (b) complex item: decompose sweep writes 2 children (real parent+deps+verify), the root is frontier-blocked until both children reach done, then it lots frontier and runs its OWN verify -> proposed', () => {
+test('e2e stage-decompose (b) complex item: decompose sweep writes 2 children (real parent+deps+verify), the root is frontier-blocked until both children reach done, then it lots frontier and runs its OWN verify -> awaiting-approval', () => {
   const repoRoot = initTempRepo();
   const scriptDir = mkTempDir('fgos-runner-e2e-decompose-');
 
@@ -486,7 +486,7 @@ test('e2e stage-decompose (b) complex item: decompose sweep writes 2 children (r
   assert.equal(childB.stage, 'executing');
   assert.equal(childA.verify, 'test -f child-a.txt');
   assert.equal(childB.verify, 'test -f child-b.txt');
-  assert.equal(childA.status, 'proposed', 'childA (no deps) was the frontier head this same tick and got dispatched');
+  assert.equal(childA.status, 'awaiting-approval', 'childA (no deps) was the frontier head this same tick and got dispatched');
   assert.equal(childB.status, 'todo', 'childB is blocked on childA, which is only proposed (not done) yet');
 
   // Accept childA into the tree (human close via the normal `done` door).
@@ -498,7 +498,7 @@ test('e2e stage-decompose (b) complex item: decompose sweep writes 2 children (r
   const second = runner(repoRoot, ['--once']);
   assert.equal(second.status, 0, `second --once failed: ${second.stderr}`);
   view = stateView(repoRoot);
-  assert.equal(view.work[childB.id].status, 'proposed');
+  assert.equal(view.work[childB.id].status, 'awaiting-approval');
   assert.equal(view.work[submitted.id].status, 'todo', 'the root is still blocked — childB is proposed, not done, yet');
 
   // childB must also pass through compound-learn before done (D3).
@@ -511,7 +511,7 @@ test('e2e stage-decompose (b) complex item: decompose sweep writes 2 children (r
   const third = runner(repoRoot, ['--once']);
   assert.equal(third.status, 0, `third --once failed: ${third.stderr}`);
   view = stateView(repoRoot);
-  assert.equal(view.work[submitted.id].status, 'proposed', 'the root lot frontier and proved itself with its own verify (D4)');
+  assert.equal(view.work[submitted.id].status, 'awaiting-approval', 'the root lot frontier and proved itself with its own verify (D4)');
   assert.match(branchLog(repoRoot, `fgw/${submitted.id}`), /worker: root-done\.txt/);
   assert.equal(view.work[childA.id].status, 'done');
   assert.equal(view.work[childB.id].status, 'done');
@@ -631,16 +631,16 @@ test('e2e S2-pull: submit pass-throughs 2 stages via discover, a human takes the
   const returned = fgos(repoRoot, ['return', submitted.id]);
   assert.equal(returned.status, 0, `return failed: ${returned.stderr}`);
   const returnedData = envelopeData(returned.stdout);
-  assert.equal(returnedData.to, 'proposed');
+  assert.equal(returnedData.to, 'awaiting-approval');
   assert.match(returnedData.output, /PULL_OK/, 'the real goal-check ran and its output surfaced, not just a status word');
 
   view = stateView(repoRoot);
-  assert.equal(view.work[submitted.id].status, 'proposed');
-  assert.equal(view.outcomes[submitted.id].actual.outcome, 'proposed');
+  assert.equal(view.work[submitted.id].status, 'awaiting-approval');
+  assert.equal(view.outcomes[submitted.id].actual.outcome, 'awaiting-approval');
   assert.equal(view.outcomes[submitted.id].actual.passed, true);
   assert.ok(view.outcomes[submitted.id].actual.aheadCount >= 1);
 
-  // No settlement from this doing -> proposed edge (D4: settlement belongs
+  // No settlement from this doing -> awaiting-approval edge (D4: settlement belongs
   // only to the -> done edge) — the earlier clarify-pass settlement (from
   // the discover step) is the only one on record.
   const settlementKinds = (view.settlements?.[submitted.id] ?? []).map((s) => s.kind);
@@ -649,7 +649,7 @@ test('e2e S2-pull: submit pass-throughs 2 stages via discover, a human takes the
 
 // --- case 1: full journey, two items with a dep -----------------------------
 
-test('e2e full journey: item1 (no deps) -> proposed with a worker commit on fgw/, item2 (dep on item1) stays closed while item1 is only proposed, second --once dispatches nothing', () => {
+test('e2e full journey: item1 (no deps) -> awaiting-approval with a worker commit on fgw/, item2 (dep on item1) stays closed while item1 is only proposed, second --once dispatches nothing', () => {
   const repoRoot = initTempRepo();
   const scriptDir = mkTempDir('fgos-runner-e2e-exec-');
 
@@ -666,12 +666,12 @@ test('e2e full journey: item1 (no deps) -> proposed with a worker commit on fgw/
 
   const first = runner(repoRoot, ['--once']);
   assert.equal(first.status, 0, `first --once failed: ${first.stderr}`);
-  assert.match(first.stdout, /proposed/);
+  assert.match(first.stdout, /awaiting-approval/);
   assert.match(first.stdout, /item1/);
 
   // item1 proposed, item2 untouched (still todo — its dep is not `done`).
   const afterFirst = stateView(repoRoot);
-  assert.equal(afterFirst.work.item1.status, 'proposed');
+  assert.equal(afterFirst.work.item1.status, 'awaiting-approval');
   assert.equal(afterFirst.work.item2.status, 'todo');
 
   // fgw/item1 exists and carries exactly the worker's commit.
@@ -699,12 +699,12 @@ test('e2e full journey: item1 (no deps) -> proposed with a worker commit on fgw/
       'work.add:item2:add',
       'work.move:item1:doing',
       'work.outcome:item1:predicted',
-      'work.move:item1:proposed',
+      'work.move:item1:awaiting-approval',
       'work.outcome:item1:actual',
     ],
   );
   const doingEvent = afterFirstEvents.find((e) => e.type === 'work.move' && e.payload.to === 'doing');
-  const proposedEvent = afterFirstEvents.find((e) => e.type === 'work.move' && e.payload.to === 'proposed');
+  const proposedEvent = afterFirstEvents.find((e) => e.type === 'work.move' && e.payload.to === 'awaiting-approval');
   assert.equal(doingEvent.payload.id, 'item1');
   assert.equal(proposedEvent.payload.id, 'item1');
   assert.equal(typeof doingEvent.v, 'number', 'doing event carries a schema version');
@@ -712,7 +712,7 @@ test('e2e full journey: item1 (no deps) -> proposed with a worker commit on fgw/
   // actual is real dispatch evidence (real subprocess, real goal-check),
   // sourced from the runner's own branchFacts — never the worker's report.
   const actualOutcomeEvent = afterFirstEvents.find((e) => e.type === 'work.outcome' && e.payload.actual);
-  assert.equal(actualOutcomeEvent.payload.actual.outcome, 'proposed');
+  assert.equal(actualOutcomeEvent.payload.actual.outcome, 'awaiting-approval');
   assert.equal(actualOutcomeEvent.payload.actual.passed, true);
   assert.equal(actualOutcomeEvent.payload.actual.aheadCount, 1);
 
@@ -733,12 +733,12 @@ test('e2e full journey: item1 (no deps) -> proposed with a worker commit on fgw/
   const checkData = envelopeData(check.stdout);
   assert.equal(checkData.outcomes[0].id, 'item1');
   assert.equal(checkData.outcomes[0].predicted.tier, 'standard', 'predicted half carries the real claimed tier');
-  assert.equal(checkData.outcomes[0].actual.outcome, 'proposed', 'actual half carries the real dispatch outcome');
+  assert.equal(checkData.outcomes[0].actual.outcome, 'awaiting-approval', 'actual half carries the real dispatch outcome');
   assert.equal(checkData.outcomes[0].actual.passed, true);
 });
 
 // CoS evidence (D2/l2-3): the "full journey" test above already asserts
-// `first.stdout` against /proposed/ and /item1/ substring regexes, but those
+// `first.stdout` against /awaiting-approval/ and /item1/ substring regexes, but those
 // match loop.mjs's own untouched progress-trace lines (loop.mjs:730-731), not
 // printResult()'s envelope line — it never parses stdout as structured data.
 // This test covers that new case: the runner's own trailing line is a real,
@@ -763,7 +763,7 @@ test('e2e runner --once prints a trailing fgos.v1 envelope: the last stdout line
   assert.equal(envelope.contract, 'fgos.v1');
   assert.equal(typeof envelope.data_hash, 'string');
   assert.ok(envelope.data_hash.length > 0, 'data_hash is a non-empty string');
-  assert.equal(envelope.data.dispatched[0].outcome, 'proposed');
+  assert.equal(envelope.data.dispatched[0].outcome, 'awaiting-approval');
 });
 
 // --- case 2: verify-red -> blocked, never proposed --------------------------
@@ -781,7 +781,7 @@ test('e2e verify-red: a worker that commits the wrong thing fails goal-check on 
   assert.match(result.stdout, /parked/);
 
   assert.equal(stateView(repoRoot).work['item-red'].status, 'blocked');
-  assert.notEqual(stateView(repoRoot).work['item-red'].status, 'proposed');
+  assert.notEqual(stateView(repoRoot).work['item-red'].status, 'awaiting-approval');
   assert.equal(branchExists(repoRoot, 'fgw/item-red'), true, 'the (wrong) attempt still leaves its branch behind');
 
   const redEvents = events(repoRoot);
@@ -848,7 +848,7 @@ test('e2e crash-idempotency: runner killed mid-item (after doing, before propose
 
   const finalStatus = stateView(repoRoot).work['item-crash'].status;
   assert.ok(
-    finalStatus === 'proposed' || finalStatus === 'blocked',
+    finalStatus === 'awaiting-approval' || finalStatus === 'blocked',
     `expected the crashed item to reap to a defined state (proposed/blocked), got "${finalStatus}"`,
   );
 

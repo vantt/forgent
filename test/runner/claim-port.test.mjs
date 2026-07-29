@@ -113,7 +113,7 @@ test('claimWork on a claim-lock §3b-marked release preserves the ORIGINAL branc
   );
 });
 
-// tsk-2zv D2/D3: a reject (`proposed -> todo`) lands an item in the exact
+// tsk-2zv D2/D3: a reject (`awaiting-approval -> todo`) lands an item in the exact
 // same status+branch-existence shape as a §3b release, but never carries
 // the marker — it MUST still recompute fresh, the deliberate anti-cheat
 // gate that forces new work before a retaken item can `return` again.
@@ -130,7 +130,7 @@ test('claimWork on an UNMARKED todo-with-branch reclaim (e.g. reject) still reco
   const tipAfterAttempt = execFileSync('git', ['rev-parse', 'fgw/item-a'], { cwd: repoRoot, encoding: 'utf8' }).trim();
 
   // No releaseTrigger here — an unmarked doing -> todo move, standing in
-  // for reject's own proposed -> todo (same shape: status todo, branch
+  // for reject's own awaiting-approval -> todo (same shape: status todo, branch
   // alive, no marker).
   moveWork(dir, { id: 'item-a', to: 'todo', expectedStatus: 'doing' });
 

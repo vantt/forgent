@@ -34,7 +34,7 @@ const ID_PATTERN = /^[a-z][a-z0-9]*(-[a-z0-9]+)*$/;
  * owns domain) — fsm.mjs imports and re-exports this rather than defining
  * its own copy, so there is exactly one list of legal statuses.
  */
-export const STATUSES = Object.freeze(['todo', 'doing', 'blocked', 'proposed', 'done', 'awaiting-human', 'wontfix']);
+export const STATUSES = Object.freeze(['todo', 'doing', 'blocked', 'awaiting-approval', 'done', 'awaiting-human', 'wontfix']);
 
 /**
  * Tier domain for `work.tier` (per D6) — the cost/cognitive weight a work

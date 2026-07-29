@@ -394,11 +394,11 @@ test('foldEvents folds the latest move reason onto the item (reject loop feedbac
   const events = [
     { seq: 1, ts: '2026-07-17T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo' }, v: 2 },
     { seq: 2, ts: '2026-07-17T00:00:01.000Z', type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing', role: 'runner' }, v: 2 },
-    { seq: 3, ts: '2026-07-17T00:00:02.000Z', type: 'work.move', payload: { id: 'a', from: 'doing', to: 'proposed' }, v: 2 },
-    { seq: 4, ts: '2026-07-17T00:00:03.000Z', type: 'work.move', payload: { id: 'a', from: 'proposed', to: 'todo', reason: 'first objection' }, v: 2 },
+    { seq: 3, ts: '2026-07-17T00:00:02.000Z', type: 'work.move', payload: { id: 'a', from: 'doing', to: 'awaiting-approval' }, v: 2 },
+    { seq: 4, ts: '2026-07-17T00:00:03.000Z', type: 'work.move', payload: { id: 'a', from: 'awaiting-approval', to: 'todo', reason: 'first objection' }, v: 2 },
     { seq: 5, ts: '2026-07-17T00:00:04.000Z', type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing', role: 'runner' }, v: 2 },
-    { seq: 6, ts: '2026-07-17T00:00:05.000Z', type: 'work.move', payload: { id: 'a', from: 'doing', to: 'proposed' }, v: 2 },
-    { seq: 7, ts: '2026-07-17T00:00:06.000Z', type: 'work.move', payload: { id: 'a', from: 'proposed', to: 'todo', reason: 'second objection wins' }, v: 2 },
+    { seq: 6, ts: '2026-07-17T00:00:05.000Z', type: 'work.move', payload: { id: 'a', from: 'doing', to: 'awaiting-approval' }, v: 2 },
+    { seq: 7, ts: '2026-07-17T00:00:06.000Z', type: 'work.move', payload: { id: 'a', from: 'awaiting-approval', to: 'todo', reason: 'second objection wins' }, v: 2 },
   ];
   const view = foldEvents(events);
   assert.equal(view.work.a.reason, 'second objection wins');
@@ -446,7 +446,7 @@ test('foldEvents does not fold claimRole/headAtTake on a non-doing move even whe
   const events = [
     { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo' }, v: 2 },
     { seq: 2, ts: '2026-07-16T00:00:01.000Z', type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing', role: 'human', headAtTake: 'aaa' }, v: 2 },
-    { seq: 3, ts: '2026-07-16T00:00:02.000Z', type: 'work.move', payload: { id: 'a', from: 'doing', to: 'proposed', role: 'human', headAtTake: 'ignored-on-this-edge' }, v: 2 },
+    { seq: 3, ts: '2026-07-16T00:00:02.000Z', type: 'work.move', payload: { id: 'a', from: 'doing', to: 'awaiting-approval', role: 'human', headAtTake: 'ignored-on-this-edge' }, v: 2 },
   ];
   const view = foldEvents(events);
   assert.equal(view.work.a.claimRole, 'human', 'the doing edge already set claimRole — a later non-doing move never touches it');
@@ -494,25 +494,25 @@ test('foldEvents leaves claimTrigger absent when the claim never carried one', (
 // --- return marker (pr-lifecycle D3/D4, mirrors headAtTake above) ---------
 //
 // `headAtReturn` folds onto the item from a `work.move` return (`to:
-// 'proposed'`) that carries it — together with the claim's own `headAtTake`
+// 'awaiting-approval'`) that carries it — together with the claim's own `headAtTake`
 // this gives the review gate an honest diff range for a pull-door proposal.
 
 test('foldEvents folds headAtReturn onto the item from a proposed move that carries it (pull-door return)', () => {
   const events = [
     { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo' }, v: 2 },
     { seq: 2, ts: '2026-07-16T00:00:01.000Z', type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing', role: 'human', headAtTake: 'deadbeef' }, v: 2 },
-    { seq: 3, ts: '2026-07-16T00:00:02.000Z', type: 'work.move', payload: { id: 'a', from: 'doing', to: 'proposed', headAtReturn: 'c0ffee' }, v: 2 },
+    { seq: 3, ts: '2026-07-16T00:00:02.000Z', type: 'work.move', payload: { id: 'a', from: 'doing', to: 'awaiting-approval', headAtReturn: 'c0ffee' }, v: 2 },
   ];
   const view = foldEvents(events);
   assert.equal(view.work.a.headAtTake, 'deadbeef');
   assert.equal(view.work.a.headAtReturn, 'c0ffee');
 });
 
-test('foldEvents leaves headAtReturn absent for a runner proposal (doing -> proposed with no headAtReturn)', () => {
+test('foldEvents leaves headAtReturn absent for a runner proposal (doing -> awaiting-approval with no headAtReturn)', () => {
   const events = [
     { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo' }, v: 2 },
     { seq: 2, ts: '2026-07-16T00:00:01.000Z', type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing', role: 'runner' }, v: 2 },
-    { seq: 3, ts: '2026-07-16T00:00:02.000Z', type: 'work.move', payload: { id: 'a', from: 'doing', to: 'proposed' }, v: 2 },
+    { seq: 3, ts: '2026-07-16T00:00:02.000Z', type: 'work.move', payload: { id: 'a', from: 'doing', to: 'awaiting-approval' }, v: 2 },
   ];
   const view = foldEvents(events);
   assert.equal('headAtReturn' in view.work.a, false);
@@ -529,7 +529,7 @@ test('foldEvents ignores headAtReturn on a non-proposed move even when the paylo
 
 test('foldEvents ignores headAtReturn on a proposed move for an id that was never added — ghost id stays a true no-op', () => {
   const events = [
-    { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.move', payload: { id: 'ghost', from: 'doing', to: 'proposed', headAtReturn: 'c0ffee' }, v: 2 },
+    { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.move', payload: { id: 'ghost', from: 'doing', to: 'awaiting-approval', headAtReturn: 'c0ffee' }, v: 2 },
   ];
   assert.doesNotThrow(() => foldEvents(events));
   const view = foldEvents(events);
@@ -539,7 +539,7 @@ test('foldEvents ignores headAtReturn on a proposed move for an id that was neve
 // --- branch-source take/return markers (human-rounds D2) -------------------
 //
 // `branchHeadAtTake`/`branchHeadAtReturn` fold onto the item on the SAME
-// `to: 'doing'`/`to: 'proposed'` edges as headAtTake/headAtReturn above, but
+// `to: 'doing'`/`to: 'awaiting-approval'` edges as headAtTake/headAtReturn above, but
 // are a strict addition — never a rewrite — of the main-based pair: a
 // branch-source take/return never carries headAtTake/headAtReturn at all
 // (CẤM per D2), so the two marker pairs are always mutually exclusive on a
@@ -560,7 +560,7 @@ test('foldEvents ignores branchHeadAtTake on a non-doing move even when the payl
   const events = [
     { seq: 1, ts: '2026-07-17T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo' }, v: 2 },
     { seq: 2, ts: '2026-07-17T00:00:01.000Z', type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing', role: 'human', branchHeadAtTake: 'aaa' }, v: 2 },
-    { seq: 3, ts: '2026-07-17T00:00:02.000Z', type: 'work.move', payload: { id: 'a', from: 'doing', to: 'proposed', branchHeadAtTake: 'ignored-on-this-edge' }, v: 2 },
+    { seq: 3, ts: '2026-07-17T00:00:02.000Z', type: 'work.move', payload: { id: 'a', from: 'doing', to: 'awaiting-approval', branchHeadAtTake: 'ignored-on-this-edge' }, v: 2 },
   ];
   const view = foldEvents(events);
   assert.equal(view.work.a.branchHeadAtTake, 'aaa', 'the proposed move carries branchHeadAtTake in its payload but it is not the doing edge, so it is never read');
@@ -579,7 +579,7 @@ test('foldEvents folds branchHeadAtReturn onto the item from a proposed move tha
   const events = [
     { seq: 1, ts: '2026-07-17T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'blocked' }, v: 2 },
     { seq: 2, ts: '2026-07-17T00:00:01.000Z', type: 'work.move', payload: { id: 'a', from: 'blocked', to: 'doing', role: 'human', branchHeadAtTake: 'branch-deadbeef' }, v: 2 },
-    { seq: 3, ts: '2026-07-17T00:00:02.000Z', type: 'work.move', payload: { id: 'a', from: 'doing', to: 'proposed', branchHeadAtReturn: 'branch-c0ffee' }, v: 2 },
+    { seq: 3, ts: '2026-07-17T00:00:02.000Z', type: 'work.move', payload: { id: 'a', from: 'doing', to: 'awaiting-approval', branchHeadAtReturn: 'branch-c0ffee' }, v: 2 },
   ];
   const view = foldEvents(events);
   assert.equal(view.work.a.branchHeadAtTake, 'branch-deadbeef');
@@ -598,7 +598,7 @@ test('foldEvents ignores branchHeadAtReturn on a non-proposed move even when the
 
 test('foldEvents ignores branchHeadAtReturn on a proposed move for an id that was never added — ghost id stays a true no-op', () => {
   const events = [
-    { seq: 1, ts: '2026-07-17T00:00:00.000Z', type: 'work.move', payload: { id: 'ghost', from: 'doing', to: 'proposed', branchHeadAtReturn: 'branch-c0ffee' }, v: 2 },
+    { seq: 1, ts: '2026-07-17T00:00:00.000Z', type: 'work.move', payload: { id: 'ghost', from: 'doing', to: 'awaiting-approval', branchHeadAtReturn: 'branch-c0ffee' }, v: 2 },
   ];
   assert.doesNotThrow(() => foldEvents(events));
   const view = foldEvents(events);

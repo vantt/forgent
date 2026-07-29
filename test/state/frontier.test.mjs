@@ -22,10 +22,10 @@ test('an item with no deps is always in the frontier when todo', () => {
   assert.deepEqual(frontier(view).map((i) => i.id), ['a']);
 });
 
-test('an item is excluded from the frontier when its dep is only "proposed"', () => {
+test('an item is excluded from the frontier when its dep is only "awaiting-approval"', () => {
   const view = {
     work: {
-      base: item('base', 'proposed'),
+      base: item('base', 'awaiting-approval'),
       dependent: item('dependent', 'todo', ['base']),
     },
   };
@@ -65,7 +65,7 @@ test('multi-tier deps: a mid-chain dep stuck at doing blocks the whole chain', (
   assert.deepEqual(frontier(view), []);
 });
 
-for (const status of ['blocked', 'doing', 'proposed', 'done', 'wontfix']) {
+for (const status of ['blocked', 'doing', 'awaiting-approval', 'done', 'wontfix']) {
   test(`an item itself at status "${status}" (not todo) is excluded from the frontier`, () => {
     const view = { work: { a: item('a', status) } };
     assert.deepEqual(frontier(view), []);
