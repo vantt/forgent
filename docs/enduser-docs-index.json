@@ -72,6 +72,14 @@
     "sourceCaptureId": "tsk-56t"
   },
   {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/see-done-items-in-list-and-triage.md",
+    "title": "How to see done items in `fgos list` / `fgos triage`",
+    "sourceCaptureId": "tsk-5oa"
+  },
+  {
     "quadrant": "reference",
     "purpose": "Describe the machinery accurately and completely for lookup.",
     "audience": "A user who needs precise facts about a specific field/command/API.",

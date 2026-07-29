@@ -186,3 +186,64 @@ test('rankImpact excludes a done member from componentSize/isIsolated: a finishe
   assert.equal(openRow.componentSize, 1);
   assert.equal(openRow.isIsolated, true);
 });
+
+// --- opts.includeDone (tsk-5oa D1) ----------------------------------------
+
+test('rankImpact with no second argument (or includeDone falsy) is byte-identical to today\'s single-arg behavior', () => {
+  const view = {
+    work: {
+      base: item('base', 'todo'),
+      dep1: item('dep1', 'todo', ['base']),
+      finished: item('finished', 'done'),
+    },
+  };
+  assert.deepEqual(rankImpact(view), rankImpact(view, {}));
+  assert.deepEqual(rankImpact(view), rankImpact(view, { includeDone: false }));
+});
+
+test('rankImpact({includeDone: true}) appends done items after every ranked open row', () => {
+  const view = {
+    work: {
+      base: item('base', 'todo'),
+      dep1: item('dep1', 'todo', ['base']),
+      finished: item('finished', 'done'),
+    },
+  };
+  const withDone = rankImpact(view, { includeDone: true });
+  const withoutDone = rankImpact(view);
+  assert.deepEqual(withDone.slice(0, withoutDone.length), withoutDone);
+  assert.deepEqual(withDone.map((r) => r.id).slice(-1), ['finished']);
+});
+
+test('rankImpact({includeDone: true}) always gives a done row blocks:0, componentSize:0, isIsolated:true, componentId:null', () => {
+  const view = {
+    work: {
+      base: item('base', 'todo'),
+      dependent: item('dependent', 'todo', ['base']),
+      finished: item('finished', 'done', ['base']),
+    },
+  };
+  const [doneRow] = rankImpact(view, { includeDone: true }).filter((r) => r.id === 'finished');
+  assert.deepEqual(doneRow, {
+    id: 'finished', title: 'title-finished', status: 'done', blocks: 0,
+    stage: 'executing', goalTier: null, componentId: null, componentSize: 0, isIsolated: true,
+  });
+});
+
+test('rankImpact({includeDone: true}) sorts multiple done rows by goalTier then ascending id, never interleaved with open rows', () => {
+  const view = {
+    work: {
+      open: item('open', 'todo'),
+      zed: item('zed', 'done'),
+      alpha: item('alpha', 'done', [], { goalTier: 'mvp' }),
+      mid: item('mid', 'done'),
+    },
+  };
+  const ids = rankImpact(view, { includeDone: true }).map((r) => r.id);
+  assert.deepEqual(ids, ['open', 'alpha', 'mid', 'zed']);
+});
+
+test('rankImpact({includeDone: true}) on a view with only done items returns just the done rows, in tier/id order', () => {
+  const view = { work: { b: item('b', 'done'), a: item('a', 'done') } };
+  assert.deepEqual(rankImpact(view, { includeDone: true }).map((r) => r.id), ['a', 'b']);
+});

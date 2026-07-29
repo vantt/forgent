@@ -1026,7 +1026,16 @@ async function runVerb(verb, flags, positional, dir) {
     }
 
     case 'list': {
-      const view = listWork(dir);
+      const rawView = listWork(dir);
+      // Open-only default (tsk-5oa D1/D2): `list` shows only
+      // status !== 'done' items unless `--all` is passed, matching
+      // `triage`'s pre-existing open-only default. Only the `work` map
+      // changes shape here — every other view key (decisions/gates/
+      // settlements/etc.) is untouched either way.
+      const showAll = Boolean(flags.all);
+      const view = showAll
+        ? rawView
+        : { ...rawView, work: Object.fromEntries(Object.entries(rawView.work).filter(([, item]) => item.status !== 'done')) };
       // Parent-anchored context (str61 D1/D2/D3): additive-only key,
       // computed fresh from `view` on every read (D1 — never a persisted
       // "session"), never touching store.listWork itself. Only
@@ -2172,7 +2181,7 @@ async function runVerb(verb, flags, positional, dir) {
     // risk/lane classification: this ranks open work by blocking fan-out
     // (how many other open items it unblocks), not by how risky it is.
     case 'triage': {
-      return paginateVerbResult(rankImpact(listWork(dir)), flags, 'triage-v1', 'triage');
+      return paginateVerbResult(rankImpact(listWork(dir), { includeDone: Boolean(flags.all) }), flags, 'triage-v1', 'triage');
     }
 
     // Opt-in per-session git worktree lifecycle (fgos-multi-session-checkout
