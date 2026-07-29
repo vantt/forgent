@@ -9,11 +9,28 @@ gates on `deps`, so this item cannot reach `executing`/be merged before
 
 Add one new thin wrapper skill, `plugins/fgOS/skills/merge-loop/SKILL.md`,
 alongside the existing `merge-list/` and `merge-next/` skill dirs (found on
-`fgw/tsk-4j9`, not yet on `main`). It packages the existing `/loop` (ck-loop)
-skill plus the existing `/fgOS:merge-next` skill into one command that
-repeatedly merges ready items, encoding the stop rules a person would
-otherwise have to remember to state every time they call `/loop
-/fgOS:merge-next` themselves.
+`fgw/tsk-4j9`, not yet on `main`). It packages the existing `loop` skill
+(invoked as `/loop`) plus the existing `/fgOS:merge-next` skill into one
+command that repeatedly merges ready items, encoding the stop rules a
+person would otherwise have to remember to state every time they call
+`/loop /fgOS:merge-next` themselves.
+
+**Correction (found at `fgos-validating`, 2026-07-29):** the requester's
+own description parenthetically called this "`/loop` (ck-loop)", treating
+`/loop` and the ClaudeKit `ck-loop` skill as the same thing. They are not.
+Reading `~/.claude/skills/ck-loop/SKILL.md` directly shows `ck-loop` is an
+autonomous **mechanical-metric optimization** loop — it requires a
+`Goal`/`Scope`/`Verify` (a shell command that prints a single number)/
+`Guard`/`Iterations` config, git-commits each iteration, and auto-keeps or
+discards based on whether the metric improved. There is no metric to
+optimize here. The skill this item actually needs is the plain, separate
+`loop` skill — a built-in Claude Code skill ("Run a prompt or slash
+command on a recurring interval... Omit the interval to let the model
+self-pace"), which has no on-disk `SKILL.md` of its own to cite (it ships
+with the harness, not as a project/plugin file) but is confirmed present
+in this session's own available-skills listing, distinct from `ck-loop`.
+Every reference below to "`/loop`" means this built-in skill, never
+`ck-loop`.
 
 No new CLI verb in `bin/fgos.mjs`. No changes to `merge-next`/`merge-list`/
 `approve` mechanics. Classified as a mutation/operational skill (STR88's
@@ -55,9 +72,15 @@ iteration:
   grounds D1.
 - `docs/backlog.md:127` (STR88) — mutation vs read/check grouping this item
   cites for its own classification.
-- `~/.claude/skills/ck-loop/SKILL.md` — the existing `/loop` dynamic
-  self-pacing mechanism this skill must recurse into (D6 of `tsk-4j9`'s own
-  CONTEXT.md: "cải tiến process có sẵn tại chỗ, không xây đường song song").
+- `~/.claude/skills/ck-loop/SKILL.md` — read in full at `fgos-validating`
+  and confirmed to be a *different* skill (mechanical-metric optimization,
+  Goal/Scope/Verify-number/Guard config) than the one this item needs;
+  cited here only to record why it was ruled out, not as the recursion
+  target.
+- the built-in `loop` skill (invoked as `/loop`, no project-local
+  `SKILL.md` file) — the actual dynamic self-pacing mechanism this skill
+  recurses into (D6 of `tsk-4j9`'s own CONTEXT.md: "cải tiến process có
+  sẵn tại chỗ, không xây đường song song").
 
 ## Deferred / out of scope (not asked, marked here per Socratic-lock rule)
 

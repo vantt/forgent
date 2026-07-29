@@ -36,11 +36,19 @@ yet on `main` — see Ordering below). The skill's own steps:
    and if the tree is not clean, print a reminder that a clean tree is
    expected before merging — then proceed anyway, regardless of the
    result.
-2. Invoke the existing `/loop` (ck-loop) skill with
+2. Invoke the existing, built-in `loop` skill (via `/loop`) with
    `prompt: "/fgOS:merge-next"`, dynamic self-pacing (no fixed short
    interval — each `merge-next` call runs a real `npm test`-class verify,
    so duration varies per item; matches `ScheduleWakeup`'s own guidance to
-   pace to what's actually being waited on).
+   pace to what's actually being waited on). **Not** `ck-loop` — that is a
+   separate, unrelated skill (mechanical-metric optimization: requires
+   `Goal`/`Scope`/`Verify`-single-number/`Guard` config, git-commit-then-
+   measure per iteration); confirmed by reading
+   `~/.claude/skills/ck-loop/SKILL.md` in full at `fgos-validating` and
+   ruled out — there is no metric to optimize here, only a repeat-until-
+   stop-condition task, which is exactly what the plain `loop` skill's own
+   description covers ("run a prompt on a recurring interval... omit the
+   interval to let the model self-pace").
 3. Each iteration, read `merge-next`'s JSON `data` envelope (exact shapes
    confirmed against `fgw/tsk-4j9:plugins/fgOS/skills/merge-next/
    SKILL.md`):
@@ -59,6 +67,11 @@ yet on `main` — see Ordering below). The skill's own steps:
    text, same shape as `merge-list`/`merge-next` themselves.
 
 **Alternatives rejected:**
+- Recursing into `ck-loop` instead of the plain `loop` skill — rejected:
+  wrong tool. `ck-loop` demands a mechanical metric (`Goal`/`Scope`/
+  `Verify`-single-number/`Guard`) to optimize over N iterations with git
+  keep/discard; this task has no metric, just a repeat-until-a-named-
+  stop-condition shape, which is what the plain `loop` skill is for.
 - A bespoke interval/timer loop written inside this skill instead of
   recursing into `/loop` — rejected: violates `tsk-4j9`'s own D6
   ("improve the existing process in place, don't build a parallel path"),
@@ -75,7 +88,7 @@ yet on `main` — see Ordering below). The skill's own steps:
 | Component | Risk | Proof point (for `fgos-validating`) |
 |---|---|---|
 | Same-id-blocked-2-consecutive-turns tracking | Medium — this state must persist across `ScheduleWakeup` wake-ups within one `/loop` run without misfiring (false-stop on the first block, or never stopping) | Trace the exact stop-condition prose above against `merge-next`'s three real envelope shapes; confirm the SKILL.md text leaves no ambiguity about "consecutive" (same id, immediately-prior iteration only) |
-| Recursing into `/loop`'s dynamic self-pace | Low-medium — wrong pacing guidance could read as a fixed short interval instead of dynamic | Confirm SKILL.md's `/loop` invocation instructions match ck-loop's own dynamic-mode contract (no hardcoded interval) |
+| Recursing into `/loop`'s dynamic self-pace | Low-medium — wrong pacing guidance could read as a fixed short interval instead of dynamic, or could wrongly target `ck-loop` instead | Confirm SKILL.md's `/loop` invocation instructions match the plain `loop` skill's own self-pace contract (`prompt` + omitted interval), and explicitly does not reference `ck-loop` |
 | New public-contract surface (`/fgOS:merge-loop`) | Low — mitigated by going through this exact clarify → plan → validate lifecycle instead of ad hoc | Confirm this plan and `CONTEXT.md` were both approved before any execution |
 | Dependency chain unmerged (`worktree-in-out` → `tsk-4j9` → `tsk-1sm`, per `fgos graph --json`'s component listing) | High for *today's* buildability, but structurally gated | `fgos-validating`/executing must confirm `tsk-4j9` has actually merged to `main` (and `merge-next`/`merge-list` exist there) before this item is allowed into `executing` — the frontier already enforces this via `deps`, not a new check this item invents |
 
