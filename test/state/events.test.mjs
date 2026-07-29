@@ -227,7 +227,7 @@ test('appendEvent under concurrent OS processes yields unique, gapless, strictly
   const workDir = path.dirname(logPath);
   fs.writeFileSync(logPath, '');
 
-  const N_PROC = 6;
+  const N_PROC = 20;
   const N_APPEND = 40;
 
   // Each child imports the REAL appendEvent, waits until `startAt` (a shared
