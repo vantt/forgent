@@ -39,6 +39,23 @@ against. Rejected: `ftui` (used by `upstreams/beads-viewer-rust/Cargo.toml:
 This is an execution-time detail, not a re-opening of any `CONTEXT.md`
 decision — no D-ID covers language/library.
 
+**Rust vs. Node, weighed explicitly (`fgos-validating` flagged this as
+missing from the first draft):** a Node-based plugin was a real smaller
+alternative — herdr accepts any argv-launchable program as a plugin
+(`plugins.mdx`), Node is already this repo's own language, and per decision
+`0014` (`docs/decisions/0014-kien-truc-giao-tiep-nguoi-fgos.md:57`) a
+same-process **"TUI local"** is explicitly allowed to link the fgOS core
+lib directly — skipping the subprocess-spawn-plus-JSON-parse a Rust binary
+is structurally required to do. Weighed against that: the ratatui-precedent
+argument above, plus the user's own original stated preference ("vì herdr
+là rust nên nên viết rust"). Presented to the user directly with both sides
+named; **decision: keep Rust + ratatui**. The CLI-JSON path Rust is left
+with is not a consolation prize — it is the same durable, versioned
+contract decision `0014` designed for every non-same-process consumer
+(`fgos triage --json`/`fgos list --json`, already relied on by
+`herdr-cockpit-notify.mjs`), so the cost of not linking the lib directly is
+low in practice.
+
 **Data path:** the plugin binary is a separate OS process (Rust), so per
 `CONTEXT.md`'s cited decision 0014, it talks to fgOS only through the CLI —
 same external-consumer shape `scripts/herdr-cockpit-notify.mjs` already
