@@ -82,6 +82,7 @@ import { runGoalCheck } from './goal-check.mjs';
 import { createWriteQueue } from './write-queue.mjs';
 import { createOwnershipStore, resolveRoot, claimRoot, steerFrontier } from './root-affinity.mjs';
 import { claimWork, ClaimError } from './claim-port.mjs';
+import { resolveRepoRoot, fgosDirFromRoot } from './paths.mjs';
 import { resolveDiscovery, FALLBACK_VERIFY } from '../intake/discovery.mjs';
 import { resolveDecompose } from '../intake/decompose.mjs';
 import { classify, generateId } from '../intake/classify.mjs';
@@ -274,38 +275,10 @@ export function acquireRunnerLock(dir, { pid = process.pid } = {}) {
   return { acquired: false, holderPid: null, lockPath };
 }
 
-/** Resolve the repo root from `cwd` via git itself (never from __dirname —
- * the runner binary may live in a different repo than the one it runs on).
- * Throws with category 'validation' when `cwd` is not inside a git repo, or
- * when the repo has no resolvable HEAD (no commits yet). */
-export function resolveRepoRoot(cwd = process.cwd()) {
-  let repoRoot;
-  try {
-    repoRoot = execFileSync('git', ['rev-parse', '--show-toplevel'], {
-      cwd,
-      encoding: 'utf8',
-      shell: false,
-    }).trim();
-  } catch (err) {
-    const error = new Error(`fgos-runner must run inside a git repository (cwd: ${cwd}): ${err.message}`);
-    error.category = 'validation';
-    throw error;
-  }
-  try {
-    execFileSync('git', ['rev-parse', '--verify', '--quiet', 'HEAD'], {
-      cwd: repoRoot,
-      encoding: 'utf8',
-      shell: false,
-    });
-  } catch {
-    const error = new Error(
-      `fgos-runner requires at least one commit in ${repoRoot} (HEAD does not resolve) -- run "git commit" (e.g. an initial commit) before running fgos-runner`,
-    );
-    error.category = 'validation';
-    throw error;
-  }
-  return repoRoot;
-}
+// resolveRepoRoot moved to paths.mjs (tsk-63j D1/D2/D5, the canonical
+// resolver) — re-exported here so bin/fgos-runner.mjs's existing import
+// path keeps working unchanged.
+export { resolveRepoRoot };
 
 function git(repoRoot, args) {
   return execFileSync('git', args, { cwd: repoRoot, encoding: 'utf8', shell: false });
@@ -939,7 +912,7 @@ export async function runOnce(options = {}) {
   const log = options.log ?? ((...args) => console.log(...args));
   const dryRun = options.dryRun ?? false;
   const repoRoot = options.repoRoot ?? resolveRepoRoot(options.cwd ?? process.cwd());
-  const dir = options.dir ?? path.join(repoRoot, '.fgos');
+  const dir = options.dir ?? fgosDirFromRoot(repoRoot);
   const config = options.config;
   const worktreeDir = options.worktreeDir;
   const maxVisits = options.maxVisits ?? MAX_VISITS;
