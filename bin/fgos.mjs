@@ -16,7 +16,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { initStore, addWork, moveWork, moveStage, editWork, addDecision, addOutcome, addFriction, listWork, readyWork, graphMetrics, graphWhatIf, staleDoingAdvisory, footprintConflicts, readRawEvents, rebuild, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, StoreError, EXIT_CODES, categoryOf, assertValidDocType } from '../src/state/store.mjs';
+import { initStore, addWork, moveWork, moveStage, editWork, addDecision, addOutcome, addFriction, listWork, readyWork, isDepsAndLineageReady, graphMetrics, graphWhatIf, staleDoingAdvisory, footprintConflicts, readRawEvents, rebuild, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, StoreError, EXIT_CODES, categoryOf, assertValidDocType } from '../src/state/store.mjs';
 import { repairTruncatedLastLine } from '../src/state/events.mjs';
 import { deriveTitle, classify, generateId } from '../src/intake/classify.mjs';
 import { wrapEnvelope } from '../src/state/envelope.mjs';
@@ -1412,14 +1412,21 @@ async function runVerb(verb, flags, positional, dir) {
         }
         id = head.id;
       } else {
+        // Explicit `--id` (choke-point-take-vs-pick-claim-eligibility): only
+        // deps-done + no-open-descendant gate this branch, not stage — a
+        // clarify/decompose item is claimable here exactly like `pick`
+        // already allows (status and stage are independent axes, fsm.mjs).
+        // The no-`--id` branch above still only ever opens `readyWork`'s own
+        // frontier head, so D1 (take mirrors the runner's own auto-dispatch
+        // set) stays true for that path, unchanged.
         const item = listWork(dir).work[id];
         if (!item) {
           throw new StoreError('validation', `take: work "${id}" not found.`);
         }
-        if (item.status === 'todo' && !readyWork(dir).some((w) => w.id === id)) {
+        if (item.status === 'todo' && !isDepsAndLineageReady(dir, id)) {
           throw new StoreError(
             'validation',
-            `take: "${id}" is todo but not in the frontier yet (stage/deps/lineage) — take only opens the same set the runner would dispatch (D1).`,
+            `take: "${id}" is todo but has an unmet dependency or an open decomposed child — take only opens work the runner could actually dispatch (D1).`,
           );
         }
       }

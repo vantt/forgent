@@ -64,6 +64,19 @@ choke-point rõ nhất tìm được: 1 câu hỏi quyết định ("id này cla
 chưa"), 2 verb code trả lời khác nhau, và tài liệu skill chính thức
 (`fgos-routing`) đang hướng dẫn sai theo nhánh `take` bị chặn.
 
+**Đã sửa** (item `choke-point-take-vs-pick-claim-eligibility`): đồng bộ
+guard giữa `take`/`pick` cho nhánh `--id` tường minh, KHÔNG nới `take`'s
+no-`--id` default (D1 "take mirrors runner dispatch" giữ nguyên cho nhánh
+đó). `take`'s explicit-`--id` branch (`bin/fgos.mjs`) giờ gọi
+`isDepsAndLineageReady` (`src/state/frontier.mjs`, factored từ `frontier`'s
+own deps+lineage clause, trừ stage clause) thay vì `readyWork(dir).some(...)`
+— dep-chưa-xong và open-descendant vẫn chặn claim y như cũ (test cũ
+`pull-dep-blocked` vẫn xanh), chỉ riêng stage `clarify`/`decompose` không
+còn chặn nữa, khớp đúng hành vi `pick` đã có từ trước. `fgos-routing`'s
+prose ("claim it specifically with `--id <id>`" dùng `take --role session
+[--id <id>]`) giờ ĐÚNG với hành vi thật, không cần sửa. Regression:
+`test/cli/take-pick-claim-eligibility.test.mjs`.
+
 #### 2. Kiểm tra working-tree sạch — 2 định nghĩa độc lập cho `return` và `approve`
 
 Xác nhận lại tsk-63j D1 với citation mới (file đã đổi dòng từ lúc D1 ghi):
