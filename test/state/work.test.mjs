@@ -125,6 +125,24 @@ test('validateWork accepts a stable kebab-case id', () => {
   assert.doesNotThrow(() => validateWork(baseWork({ id: 'add-login-form' })));
 });
 
+// long-work-item-ids D2: fgos add took a caller-typed id with no length
+// bound, so callers slugified the whole title into it. 30 chars is the cap.
+test('validateWork accepts an id at exactly the 30-character max length', () => {
+  const id = 'a'.repeat(30);
+  assert.equal(id.length, 30);
+  assert.doesNotThrow(() => validateWork(baseWork({ id })));
+});
+
+test('validateWork rejects an id over the 30-character max length', () => {
+  const id = 'a'.repeat(31);
+  assert.equal(id.length, 31);
+  assert.throws(
+    () => validateWork(baseWork({ id })),
+    (err) => err instanceof WorkValidationError
+      && /work\.id must be at most 30 characters \(got 31\)/.test(err.message),
+  );
+});
+
 test('validateWork rejects a status outside the STATUSES domain', () => {
   assert.throws(
     () => validateWork(baseWork({ status: 'archived' })),
