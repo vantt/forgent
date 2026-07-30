@@ -22,7 +22,7 @@ import path from 'node:path';
 import { modelForTier } from '../runner/dispatch.mjs';
 import { runJudgeExecutor, JUDGE_STRICT_JSON_SUFFIX } from './judge-executor.mjs';
 import { DEFAULTS } from '../state/work.mjs';
-import { listWork, moveStage, moveWork, addWork, putInAwaiting, StoreError } from '../state/store.mjs';
+import { listWork, moveStage, moveWork, addWork, putInAwaiting, addDecision, StoreError } from '../state/store.mjs';
 
 // Best-effort read of the locked-decisions artifacts fgos-exploring/
 // fgos-planning write under `work.docsRef` (docs/history/<feature>/). A
@@ -58,6 +58,24 @@ const DEFAULT_NEED_HUMAN_REASON =
 // 'heavy' is the one value that gates.
 const HEAVY_RISK = 'heavy';
 const DEFAULT_RISK_GATE_REASON = 'Item gốc có risk cao (heavy) — cần xác nhận trước khi chia.';
+
+// tsk-6b6 D1/D3: fixed rationale for the one branch with no trustworthy
+// model text to draw from -- a parse/model failure, never a real verdict.
+const DEFAULT_INVALID_RATIONALE = 'Model/parse thất bại — không phán được verdict.';
+// tsk-6b6 D2: fallback when the model was asked for a pass-through reason
+// but didn't answer -- distinct from decompose's reason, which is required
+// (D3) and never falls back.
+const DEFAULT_PASS_THROUGH_RATIONALE = 'Không có lý do cụ thể từ model — pass-through mặc định.';
+
+// tsk-6b6 D1: log every judgeDecompose verdict branch via the shipped
+// addDecision (tsk-63c, store.mjs) -- `outcome` is what resolveDecompose
+// actually did (never just verdict.kind, since the heavy-risk gate can force
+// a `need-human` outcome out of a pass-through/decompose verdict), `label`
+// is the extra bit worth naming in `text` (e.g. child count).
+function logDecomposeVerdict(dir, id, outcome, rationale, label) {
+  const text = label ? `decompose verdict: ${outcome} (${label})` : `decompose verdict: ${outcome}`;
+  addDecision(dir, { id, text, source: 'judgeDecompose', rationale });
+}
 
 function buildDecomposePrompt(work, lockedContext, view) {
   const refs = Array.isArray(work.refs) && work.refs.length ? work.refs.join(', ') : '(none)';
@@ -106,8 +124,10 @@ ${qa}
 # Câu hỏi
 Item này đơn giản, thi công thẳng được không, hay cần chia thành nhiều việc
 con độc lập, dependency rõ?
-- Đơn giản: trả "verdict": "pass-through".
-- Cần chia: liệt kê MỖI việc con với "title", "verify" (một lệnh chạy được
+- Đơn giản: trả "verdict": "pass-through", kèm "reason" ngắn gọn vì sao
+  không cần chia (tùy chọn, nhưng nên có).
+- Cần chia: trả "reason" TÓM TẮT vì sao phải chia (BẮT BUỘC, không được bỏ
+  trống), và liệt kê MỖI việc con với "title", "verify" (một lệnh chạy được
   THẬT để chứng minh việc con đã xong — không được bỏ trống, không được là
   một câu mô tả suông), và tùy chọn "kind", "risk", "refs", "footprint" (danh
   sách đường dẫn file việc con này dự kiến đụng tới, nếu biết), "deps"
@@ -117,7 +137,7 @@ con độc lập, dependency rõ?
 
 # Định dạng trả lời
 Trả lời DUY NHẤT bằng một dòng JSON, không kèm chữ nào khác:
-{"verdict": "pass-through" | "decompose" | "need-human", "reason": string (chỉ khi need-human), "children": [{"title": string, "verify": string, "kind": string, "risk": string, "refs": string[], "footprint": string[], "deps": number[]}] (chỉ khi decompose)}
+{"verdict": "pass-through" | "decompose" | "need-human", "reason": string (bắt buộc khi need-human hoặc decompose; tùy chọn khi pass-through), "children": [{"title": string, "verify": string, "kind": string, "risk": string, "refs": string[], "footprint": string[], "deps": number[]}] (chỉ khi decompose)}
 `;
 }
 
@@ -152,10 +172,11 @@ function normalizeChild(child) {
  * unsplit, split into children, or park for human review, by calling the
  * real model configured for its tier (per D2/D3, never a mechanical
  * classifier). Always returns one of:
- *   { kind: 'pass-through' }
- *   { kind: 'decompose', children: [{title, verify, kind?, risk?, refs, footprint?, deps}] }
+ *   { kind: 'pass-through', reason? }
+ *   { kind: 'decompose', reason, children: [{title, verify, kind?, risk?, refs, footprint?, deps}] }
  *   { kind: 'need-human', reason }
- *   { kind: 'invalid' }  // fail-safe: model/parse failure, or a child missing verify
+ *   { kind: 'invalid' }  // fail-safe: model/parse failure, a child missing verify,
+ *                        // or (tsk-6b6 D3) a decompose verdict missing its own reason
  * and never throws. A "decompose" verdict with zero children normalizes to
  * "pass-through" (0 con = pass-through, chốt tại validating test matrix). A
  * child's `deps` is filtered down to indices strictly before its own
@@ -179,7 +200,11 @@ export function judgeDecompose(work, cfg, lockedContext, view) {
     }
 
     if (verdict.verdict === 'pass-through') {
-      return { kind: 'pass-through' };
+      // tsk-6b6 D2: reason is optional here -- the model was asked, but a
+      // blank/omitted answer is still a valid pass-through (unlike decompose
+      // below, where a missing reason invalidates the whole verdict).
+      const reason = typeof verdict.reason === 'string' && verdict.reason.trim() ? verdict.reason : undefined;
+      return reason ? { kind: 'pass-through', reason } : { kind: 'pass-through' };
     }
 
     if (verdict.verdict === 'need-human') {
@@ -190,7 +215,15 @@ export function judgeDecompose(work, cfg, lockedContext, view) {
 
     if (verdict.verdict === 'decompose') {
       if (!Array.isArray(verdict.children) || verdict.children.length === 0) {
-        return { kind: 'pass-through' };
+        const reason = typeof verdict.reason === 'string' && verdict.reason.trim() ? verdict.reason : undefined;
+        return reason ? { kind: 'pass-through', reason } : { kind: 'pass-through' };
+      }
+
+      // tsk-6b6 D3: a decompose verdict with no real top-level reason (the
+      // why-split summary) is invalid -- same rule as a child missing
+      // verify below, never a placeholder or a silently-accepted blank.
+      if (typeof verdict.reason !== 'string' || !verdict.reason.trim()) {
+        return { kind: 'invalid' };
       }
 
       const normalized = verdict.children.map(normalizeChild);
@@ -203,7 +236,7 @@ export function judgeDecompose(work, cfg, lockedContext, view) {
         const { rawDeps, ...rest } = child;
         return { ...rest, deps };
       });
-      return { kind: 'decompose', children };
+      return { kind: 'decompose', reason: verdict.reason, children };
     }
 
     return { kind: 'invalid' };
@@ -296,6 +329,7 @@ export function resolveDecompose(dir, id, cfg, role) {
   const verdict = judgeDecompose(work, cfg, lockedContext, view);
 
   if (verdict.kind === 'invalid') {
+    logDecomposeVerdict(dir, id, 'invalid', DEFAULT_INVALID_RATIONALE);
     return { outcome: 'invalid', id };
   }
 
@@ -321,11 +355,16 @@ export function resolveDecompose(dir, id, cfg, role) {
 
   if (verdict.kind === 'need-human' || risksGate) {
     const reason = verdict.kind === 'need-human' ? verdict.reason : DEFAULT_RISK_GATE_REASON;
+    // Logged outcome is 'need-human' (what actually happened), not
+    // verdict.kind -- a risk-heavy root can force this parking out of a
+    // pass-through/decompose verdict underneath it.
+    logDecomposeVerdict(dir, id, 'need-human', reason);
     putInAwaiting(dir, { id, ask: formatProposalAsk(verdict, reason), statusAtAsk: work.status });
     return { outcome: 'need-human', id, verdict };
   }
 
   if (verdict.kind === 'pass-through') {
+    logDecomposeVerdict(dir, id, 'pass-through', verdict.reason ?? DEFAULT_PASS_THROUGH_RATIONALE);
     moveStage(dir, { id, to: 'executing', expectedStage: 'decompose', role });
     releaseClaimOnExecuting();
     return { outcome: 'pass-through', id };
@@ -355,6 +394,7 @@ export function resolveDecompose(dir, id, cfg, role) {
     });
   });
 
+  logDecomposeVerdict(dir, id, 'decompose', verdict.reason, `${childIds.length} children`);
   moveStage(dir, { id, to: 'executing', expectedStage: 'decompose', role });
   releaseClaimOnExecuting();
   return { outcome: 'decompose', id, childIds };
