@@ -103,6 +103,24 @@ Two children, independently workable, no dependency between them (confirmed
 by the graph context above — `tsk-5q5` unblocks nothing today, so there is
 no cross-item ordering signal to defer to). Both parent `tsk-5q5`.
 
+**Write mechanism (repo-fit correction):** neither `add`, `submit`, nor
+`edit` exposes a `--parent` flag anywhere in `bin/fgos.mjs` (confirmed by a
+full grep across all verb cases) — `parent` is only ever set inside
+`resolveDecompose`'s own `addWork` call (`src/intake/decompose.mjs:380-395`),
+fired by the `fgos discover` verb (or the runner's async sweep) once
+`judgeDecompose`'s model verdict resolves to `decompose`. There is no
+session-side CLI door to hand-write a parent-tagged child directly. This
+plan therefore does not create the children itself — it documents the exact
+split `judgeDecompose` should arrive at once `fgos discover` is called on
+`tsk-5q5`: `buildDecomposePrompt` already feeds this plan's own content in
+via `readLockedContext` (`decompose.mjs:36-50`, reading both `CONTEXT.md`
+and `plan.md` under `docsRef`) and explicitly instructs the model not to
+propose anything different from what's locked here (`decompose.mjs:116-118`
+in the prompt text). The two child descriptions below are that locked
+target, written precisely enough for the model to reproduce them; whoever
+next calls `fgos discover tsk-5q5` (or the runner sweep, once it's todo) is
+the actual write step.
+
 1. **`tsk-5q5-1`** — "Add a second-pass semantic-correctness check to
    judgeDiscovery/judgeDecompose's verify, parking on disagreement"
    Verify: `node --test test/intake/discovery.test.mjs test/intake/decompose.test.mjs`
@@ -114,6 +132,35 @@ no cross-item ordering signal to defer to). Both parent `tsk-5q5`.
 its own stage move (`decompose`→`executing`) is a pass-through once
 children exist (per `resolveDecompose`'s existing "already-decomposed"
 idempotency), same shape any other split-into-children item takes.
+
+This plan's target split is advisory input to `judgeDecompose`, not a
+guaranteed commit — every clarify/decompose transition in this system works
+this way (the same is already true of `CONTEXT.md` feeding `judgeDiscovery`),
+so it is not a risk unique to this plan. It is not re-litigated as a
+feasibility-matrix row below for that reason; if `judgeDecompose` ever
+proposes something materially different from this split, that is a
+`need-human` or mismatched-verdict outcome the existing gate/ask-answer
+contract already handles (`fgos-routing`'s gate contract section), not a
+gap this plan needs to close.
+
+**Post-split docsRef backfill (proof-surface fix):** `normalizeChild`
+(`decompose.mjs:144-168`) and `resolveDecompose`'s `addWork` call
+(`decompose.mjs:380-395`) only carry `title`/`verify`/`kind`/`risk`/`refs`/
+`footprint`/`deps`/`parent`/`tier` onto a new child — no `description`, no
+`docsRef`. `fgos-executing`'s own Orient step only reads a `docsRef` "if
+present" (`.claude/skills/fgos-executing/SKILL.md:57-59`), and absent one,
+treats the bare title as the whole spec. Without a fix, `tsk-5q5-1`/
+`tsk-5q5-2` would be born with only their one-line titles, orphaned from
+every risk-map row, file list, and concrete case in this plan. Mitigation:
+immediately after `fgos discover tsk-5q5` creates the children, run
+`fgos edit --id tsk-5q5-1 --docs-ref docs/history/judge-verdict-evidence-discipline/`
+and the same for `tsk-5q5-2` — both children point at the same shared
+`CONTEXT.md`/`plan.md` (one plan covers both tracks), so `fgos-executing`'s
+Orient step picks up this plan's Track A/Track B detail instead of working
+from title alone. This is a real, available `edit` call (confirmed generic,
+not root-only, at `bin/fgos.mjs`'s `edit` verb) — the next session handling
+`tsk-5q5`'s `decompose`→`executing` edge must run it before either child is
+executed.
 
 ## Leave execution alone
 
