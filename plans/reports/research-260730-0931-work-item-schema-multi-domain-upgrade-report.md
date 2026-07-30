@@ -28,8 +28,9 @@ trước khi code.
 5. [Phân tích 4 đề xuất](#phân-tích-4-đề-xuất)
 6. [Tổng quát hóa: tách CATEGORY (cơ học, chung) khỏi LABEL (từ vựng domain)](#tổng-quát-hóa-category-vs-label)
 7. [Đề xuất tổng hợp](#đề-xuất-tổng-hợp)
-8. [Câu hỏi chưa giải quyết](#câu-hỏi-chưa-giải-quyết)
-9. [Nguồn](#nguồn)
+8. [Chưa bàn tới — gap cần đào sâu thêm](#chưa-bàn-tới)
+9. [Câu hỏi chưa giải quyết](#câu-hỏi-chưa-giải-quyết)
+10. [Nguồn](#nguồn)
 
 ## Tóm tắt điều hành
 
@@ -208,6 +209,85 @@ lập trong mọi hệ thống tham chiếu được, không riêng gì fgOS.
   tính — 2 shape khác nhau kéo theo validate khác nhau. User đã nói quan hệ
   "xét sau" — hợp lý, nhưng khi xét, đừng mặc định chain chỉ vì cách viết
   liệt kê ban đầu dùng dấu `>`.
+
+**Mở rộng — vì sao epic KHÔNG cần sửa gì (round 5, khác hẳn `status`/`kind`):**
+
+`parent`/`deps` là field STRUCTURAL (chỉ chứa id trỏ tới item khác), không
+phải field VOCAB (chuỗi chữ mang nghĩa domain) — không có "giá trị" nào để
+domain tự đặt tên riêng, trỏ id thì domain nào cũng giống nhau. Đây chính là
+lý do epic không bị coding-bias như `status`/`kind`. Rút ra 1 quy luật áp
+được cho TOÀN BỘ schema, không riêng epic:
+
+| Loại field | Ví dụ | Rủi ro domain-bias | Cần category/label không |
+|---|---|---|---|
+| Structural (chỉ chứa id/reference) | `parent`, `deps` | KHÔNG | Không cần |
+| Vocabulary (chuỗi chữ mang nghĩa) | `status`, `kind` | CÓ | Cần (mục 6) |
+| Declared marker (field riêng, value đã generic sẵn) | `goalTier` | Thấp | Không cần, đã ổn |
+
+**Đối chiếu Jira:** Jira KHÔNG làm epic thuần structural — gán epic là 1 GIÁ
+TRỊ issue-type thật (`type: Epic`), item con link qua field `Epic Link`
+RIÊNG (không dùng chung cơ chế parent/subtask). fgOS chọn khác: epic = item
+thường + có con qua `parent`/`deps` — TÁI DÙNG cây phân rã sẵn có, không
+thêm khái niệm mới. Đơn giản hơn Jira, đổi lại: không có field "đây LÀ
+epic" tường minh — phải SUY RA (item có con hay không), không lưu trực
+tiếp.
+
+**Muốn hiển thị/lọc "epic" thì sao (không thêm field):**
+
+```js
+const isEpic = (item, allItems) =>
+  allItems.some((i) => i.parent === item.id || i.deps.includes(item.id));
+```
+
+Tính lúc đọc (derived), domain-agnostic 100% vì dựa trên `parent`/`deps`
+sẵn có — KHÔNG cần thêm field `isEpic`/`type: 'epic'` vào schema. Nếu 1
+domain muốn trang trí thêm cho epic của riêng nó (VD marketing gọi là
+"campaign", gắn icon/màu riêng) — đó là việc của `domainFields` (mục #3),
+không đụng cơ chế cây chung.
+
+**Liên hệ `goalTier`:** `goalTier` và "epic" là 2 trục KHÁC NHAU, cả 2 đều
+foundation-level nhưng cơ chế khác — `goalTier` là field KHAI BÁO (người
+submit tự đánh dấu lúc `add`), epic là thuộc tính SUY RA (tính từ cấu trúc
+cây). 1 item có thể vừa là epic (có con) vừa mang `goalTier: milestone` —
+không xung đột, không trùng lặp.
+
+**Nếu enum hóa `kind` — áp ĐÚNG khuôn category/label của `status` (round 6):**
+`kind` rơi vào nhóm VOCABULARY (bảng phân loại field ở trên) — giống
+`status`, không giống `parent`/`deps`/`goalTier` — nên nếu enum hóa, cần
+tách `kindLabels` (domain tự khai) khỏi `kindCategory` (foundation, nhỏ,
+cố định), y hệt cơ chế `status`/`statusCategory` đã chốt ở mục 6.
+
+```js
+coding: {
+  kindLabels: {
+    feature: 'deliverable',
+    task:    'deliverable',
+    bug:     'defect',
+    devops:  'infra',
+  },
+},
+marketing: {
+  kindLabels: {
+    'long-content': 'deliverable',
+    social:         'deliverable',
+    banner:         'deliverable',
+  },
+},
+```
+
+`kindCategory` đề xuất: `deliverable / defect / infra / chore`. Marketing cả
+3 label đều rơi `deliverable` — KHÔNG SAO, nhiều label 1 domain trỏ về cùng
+1 category là bình thường (y hệt `blocked`/`awaiting-human` coding từng gộp
+chung `in-progress`); domain không bắt buộc phủ đủ mọi category.
+
+**Khác biệt ưu tiên so với `statusCategory`:** `statusCategory` CẦN THIẾT
+THẬT (compound-learn/frontier/rollup dựa vào nó để chạy domain-agnostic —
+mục 6). `kindCategory` thì KHÔNG — `kind` hôm nay không tham gia bất kỳ
+transition/gate nào (`fsm.mjs` không đọc `kind`), thuần mô tả. `kindCategory`
+chỉ có giá trị cho báo cáo/lọc chéo-domain ("đếm bao nhiêu defect toàn hệ
+thống"), KHÔNG phải điều kiện bắt buộc hệ thống chạy đúng — ưu tiên thấp
+hơn nhiều, làm sau khi có domain thật thứ 2 cũng không sao (khớp câu hỏi mở
+#2/#9).
 
 ### 3. Nested domain fields (`{coding: {}, marketing: {}}`)
 
@@ -465,6 +545,135 @@ lên.
 **Về câu hỏi riêng "skill fgos-planning coi lại việc dùng harness ghi task
 cho đúng quan hệ/type":** phụ thuộc kết quả quyết định mục 2 (type hierarchy)
 trước — chưa nên implement, để ở mục câu hỏi mở dưới.
+
+## Chưa bàn tới
+
+Report tới giờ tập trung vào `status`/`kind` (2 field vocab). Rà lại toàn bộ
+cuộc thảo luận + spec đã đọc, còn 6 khoảng trống LIÊN QUAN trực tiếp mục tiêu
+multi-domain mà CHƯA đào sâu — xếp theo mức độ nghiêm trọng:
+
+### 1. `verify` + `return` — coding-bias NẶNG NHẤT, sâu hơn cả status/kind
+
+`verify` là free text, nhưng `fgos return` **TỰ ĐỘNG CHẠY nó như 1 lệnh
+shell thật** trong working directory (goal-check). Coding: `npm test && ...`
+chạy được. Marketing: "verify" kiểu "khách đã ký duyệt chưa" — không có
+lệnh shell nào trả về true/false cho việc đó. Nếu không giải quyết được,
+toàn bộ cửa pull `take`/`return` có thể KHÔNG dùng được cho domain không
+phải code — nặng hơn vấn đề status/kind vì nó chặn domain "chạy được", không
+chỉ "khai được".
+
+Cùng nhóm: `headAtTake`/`headAtReturn`/`branchHeadAtTake`/`branchHeadAtReturn`
+— literally commit hash của git repo, vô nghĩa với domain không có
+git-tracked deliverable (Google Doc, banner Canva).
+
+**Đào sâu (round 7, grounded qua code thật) — nặng hơn dự đoán ban đầu:**
+
+`src/runner/goal-check.mjs` — `runGoalCheck(item, cwd, timeoutMs)` gọi thẳng
+`spawn(item.verify, { shell: true, cwd })`. Comment đầu file ghi rõ chủ đích:
+*"one goal-check implementation, never two"*. Grep thật trong `bin/fgos.mjs`
+xác nhận hàm NÀY được dùng ở **cả 3 verb**: `return` (dòng ~1488/1543, worker
+tự báo xong), `approve` (dòng ~2008, người duyệt merge cuối), `reject` (dòng
+~2158, re-verify để log). Nghĩa là: **KHÔNG có đường "người chỉ cần nói yes"
+nào tồn tại hôm nay** — kể cả `approve` (cửa người duyệt cuối) vẫn bắt buộc 1
+lệnh shell chạy ra exit-0 THẬT mới cho merge. Marketing không có lệnh shell
+nào trả lời "khách đã ký duyệt banner chưa" → cả `return` VÀ `approve` đều
+kẹt, không chỉ `return`.
+
+**Vì sao đây là thay đổi kiến trúc LỚN HƠN status/kind:** `goal-check` không
+phải 1 field work-item bình thường — nó là NGUYÊN TẮC LÕI của toàn hệ thống
+("không tin lời tự báo của caller, luôn tự verify độc lập"). Sửa nó ảnh
+hưởng runner + cả 2 cửa pull (`take`/`return`) + cổng duyệt PR nội bộ —
+phạm vi audit rộng hơn hẳn `fsm.mjs`.
+
+**Đề xuất tối thiểu (YAGNI — không làm executor framework tổng quát ngay):**
+thêm 1 field foundation nhỏ, `verifyKind`, enum CHỈ 2 giá trị (không nhiều
+loại executor ngay từ đầu):
+
+- `verifyKind: 'shell'` (mặc định, coding) — y hệt hôm nay, `runGoalCheck`
+  spawn như cũ, 0 thay đổi hành vi coding.
+- `verifyKind: 'manual-confirm'` (mới) — `runGoalCheck` KHÔNG spawn gì cả;
+  goal-check pass = "1 người (role `human`, không phải `session`/`runner`)
+  đã gọi `approve`". Tái dùng ĐÚNG cơ chế người-duyệt sẵn có (`approve` đã
+  tách bạch role người/máy qua `claimRole`) — không phát minh cửa mới, chỉ
+  đổi ĐIỀU KIỆN pass bên trong `runGoalCheck` theo `verifyKind`. `return`
+  (worker tự báo) không dùng được cho domain `manual-confirm` — không ai
+  "tự verify" thay người được; item domain đó luôn phải đi qua người.
+
+**Risk: HIGH** — sửa `runGoalCheck` (dùng ở runner + 2 cửa pull + `reject`)
+là core trust mechanism, cần audit rộng hơn hẳn mọi thứ đã bàn trước đây
+trong report này.
+
+**Đang handle:** `tsk-2rp` (stage `clarify`, tier `heavy`, risk `high`) —
+`refs` trỏ ngược report này + `src/runner/goal-check.mjs` + `bin/fgos.mjs`.
+
+### 2. Context-discovery/decompose CỨNG vào tên stage của `coding` (đã tự nhận trong spec, đọc lúc grounding nhưng chưa mang vào bàn)
+
+`work-state.md`: *"`resolveDiscovery`/`resolveDecompose` là hai bộ máy phán
+CỐ ĐỊNH theo tên stage của `coding` (`clarify`/`decompose`), chưa
+domain-hóa"* — domain thứ 2 THẬT (marketing) hôm nay tự động KHÔNG dùng được
+context-discovery/chia-việc. Không phải rủi ro tương lai — giới hạn ĐÃ CÓ
+SẴN, tự nhận trong spec ("Open Gaps").
+
+### 3. `DOMAINS` registry là literal JS đóng băng — thêm domain = sửa code
+
+`workflow-stage-graphs.mjs`'s `DOMAINS` là `Object.freeze` cứng trong
+source — thêm `marketing` phải sửa file JS + deploy, không khai qua CLI/data
+được. Cần hỏi: domain có cần add được runtime (giống `submit` 1 item) không,
+hay sửa code là chấp nhận được?
+
+### 4. CLI/reporting layer hardcode literal status
+
+`docs/reference/triage-table-columns.md`: cột `status` render "raw status
+..., rendered as-is" — nếu domain khác dùng label khác, hiển thị sẽ lẫn
+nhiều domain khác nhau trong 1 cột, không thống nhất. Chưa liệt vào danh sách
+consumer cần audit (mục 6 mới có 6 cơ chế compound-learn/frontier/..., thiếu
+tầng CLI display).
+
+### 5. Kế hoạch version hóa event schema (`v`) khi dồn nhiều field mới
+
+`statusCategory`, `domainFields`, (sau này) `kindCategory` — mỗi field mới
+nên bump `SCHEMA_VERSION` (hiện `v: 3`) theo đúng khuôn đã có, nhưng ship
+RIÊNG LẺ từng field hay GỘP 1 đợt version? Chưa bàn thứ tự triển khai.
+
+### 6. Chưa có kế hoạch TEST chứng minh thiết kế mới đúng
+
+`synthetic` domain có `test/e2e/synthetic-domain.test.mjs` CHỨNG MINH
+domain-agnostic — thiết kế category/label mới (round 4-6) chưa có kế hoạch
+test tương tự (1 domain giả lập thứ 2 thật, có `statusLabels`/`kindLabels`
+riêng, chạy qua `take`/`return`/`compound`) để verify trước khi tin tưởng.
+
+**Ưu tiên đào sâu tiếp:** #1 (verify/return) — nếu domain marketing không
+dùng được `take`/`return` do giả định shell-command, mọi thiết kế
+status/kind vừa chốt chưa đủ để domain đó "chạy được", chỉ mới đủ để nó
+"khai được".
+
+## Thứ tự triển khai (2 phase, round 8)
+
+Chốt: `verifyKind` (mục "Chưa bàn tới" #1) và `statusCategory`/`kindCategory`
+(mục 6) KHÔNG phụ thuộc lẫn nhau về kỹ thuật — đụng 2 subsystem khác nhau
+(`goal-check.mjs` vs `fsm.mjs`), tách phase được, không phải tách cho vui.
+
+**Phase 1 — `verifyKind` (làm/quyết TRƯỚC, đã tạo `tsk-2rp`):**
+
+- Lý do đi trước: đây là cái CHẶN CHỨC NĂNG thật — thiếu nó, `return`/
+  `approve` của domain không phải coding (VD marketing) KHÔNG CHẠY ĐƯỢC, bất
+  kể `status`/`kind` có đẹp/generic cỡ nào. `status`/`kind` coding-bias chỉ
+  là vấn đề ngữ nghĩa/hiển thị — domain khác vẫn CHẠY ĐƯỢC nếu tạm dùng chữ
+  coding, chỉ không tự nhiên.
+- Phạm vi audit hẹp hơn hẳn: đúng 4 call site (`return` x2, `approve`,
+  `reject`) trong `runGoalCheck`, so với `fsm.mjs` rải khắp frontier/runner/
+  pull-door/rollup.
+- KHÔNG cần decision record supersede base-workflow-model D1-D3 (đó là
+  chuyện riêng của `status` FSM) — `verifyKind` có thể cần 1 quyết định
+  riêng, nhỏ hơn, vì đụng invariant "one goal-check implementation, never
+  two" (comment gốc `goal-check.mjs`) — nhưng KHÔNG phải supersede D1-D3.
+
+**Phase 2 — `status`/`statusCategory` + `kind`/`kindCategory` (sau, không bị
+Phase 1 chặn):**
+
+- Domain sở hữu bảng transition riêng (đảo thật D1-D3, cần decision record
+  mới) + `domainFields` (mục #3) — làm sau khi Phase 1 xong hoặc song song,
+  miễn không tranh cùng file/subsystem với Phase 1.
 
 ## Câu hỏi chưa giải quyết
 

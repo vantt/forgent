@@ -331,7 +331,7 @@ export function setFocus(dir, { id, role } = {}) {
  * first's event already in the log, so its own `expectedStatus` compare
  * correctly conflicts.
  */
-export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, role, headAtTake, headAtReturn, branchHeadAtTake, branchHeadAtReturn, parentSnapshotAtAsk, claimTrigger, statusAtAsk, releaseTrigger, rationale, alternatives, source } = {}) {
+export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, role, headAtTake, headAtReturn, branchHeadAtTake, branchHeadAtReturn, parentSnapshotAtAsk, claimTrigger, statusAtAsk, releaseTrigger, rationale, alternatives, source, askRationale, askAlternatives, askSource } = {}) {
   const { logPath } = paths(dir);
   const event = withEventsLock(logPath, () => {
   const before = rebuildView(logPath);
@@ -440,6 +440,20 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, rol
   if (source !== undefined) {
     rawEvent.payload.source = source;
   }
+  // askRationale/askAlternatives/askSource (tsk-19zm D2): the agent's
+  // checkpoint distillate as of THIS ask, distinct from rationale/
+  // alternatives/source above (the human's answer, still authoritative) —
+  // same additive, fsm-ignored stamp pattern, carried only via putInAwaiting
+  // (never answerAwaiting, which keeps using the plain field names above).
+  if (askRationale !== undefined) {
+    rawEvent.payload.askRationale = askRationale;
+  }
+  if (askAlternatives !== undefined) {
+    rawEvent.payload.askAlternatives = askAlternatives;
+  }
+  if (askSource !== undefined) {
+    rawEvent.payload.askSource = askSource;
+  }
   // Release-trigger marker (claim-lock §3b, tsk-2zv): what released this
   // specific `doing -> todo` move — additive, fsm-ignored, same
   // post-transition stamp pattern as claimTrigger above. Only
@@ -540,9 +554,26 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, rol
  * waiting on (per D2/D5). Thin wrapper over `moveWork` — same
  * append-then-refresh tail, same CAS/validation errors — fsm.mjs requires a
  * non-empty `ask` on this edge.
+ *
+ * tsk-19zm D2: `rationale`/`alternatives`/`source` here are the AGENT's
+ * checkpoint distillate as of this `ask` — kept a caller-facing param name
+ * matching `answerAwaiting`'s below (same CLI flag names either side), but
+ * written into the payload as `askRationale`/`askAlternatives`/`askSource`
+ * so a later `answer` on the same item never overwrites this checkpoint —
+ * the two snapshots live side by side in `gates[id]` (replay.mjs's fold).
  */
 export function putInAwaiting(dir, { id, ask, expectedStatus, parentSnapshotAtAsk, statusAtAsk, rationale, alternatives, source } = {}) {
-  return moveWork(dir, { id, to: 'awaiting-human', expectedStatus, ask, parentSnapshotAtAsk, statusAtAsk, rationale, alternatives, source });
+  return moveWork(dir, {
+    id,
+    to: 'awaiting-human',
+    expectedStatus,
+    ask,
+    parentSnapshotAtAsk,
+    statusAtAsk,
+    askRationale: rationale,
+    askAlternatives: alternatives,
+    askSource: source,
+  });
 }
 
 /**

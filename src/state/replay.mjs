@@ -45,7 +45,7 @@ function applyEvent(view, event) {
       break;
     }
     case 'work.move': {
-      const { id, from, to, ask, answer, role, learning, headAtTake, headAtReturn, branchHeadAtTake, branchHeadAtReturn, reason, parentSnapshotAtAsk, claimTrigger, statusAtAsk, writer, rationale, alternatives, source } = event.payload ?? {};
+      const { id, from, to, ask, answer, role, learning, headAtTake, headAtReturn, branchHeadAtTake, branchHeadAtReturn, reason, parentSnapshotAtAsk, claimTrigger, statusAtAsk, writer, rationale, alternatives, source, askRationale, askAlternatives, askSource } = event.payload ?? {};
       const item = view.work[id];
       if (item) {
         item.status = to;
@@ -172,10 +172,21 @@ function applyEvent(view, event) {
           // rationale/alternatives/source (tsk-63c D1, decision-schema-
           // rationale-alternatives-source): same guarded fold as
           // parentSnapshotAtAsk/statusAtAsk above — only stamped when
-          // present, overwritten by a fresh ask/answer the same way.
+          // present, overwritten by a fresh ask/answer the same way. Only
+          // `answer` ever carries these now (tsk-19zm D2 moved `ask`'s own
+          // values to askRationale/askAlternatives/askSource below), so
+          // this trio stays the human's answer, still authoritative.
           ...(rationale !== undefined ? { rationale } : {}),
           ...(alternatives !== undefined ? { alternatives } : {}),
           ...(source !== undefined ? { source } : {}),
+          // askRationale/askAlternatives/askSource (tsk-19zm D2): the
+          // agent's checkpoint distillate as of the latest `ask` — kept
+          // separate from rationale/alternatives/source above so a later
+          // `answer` never overwrites it; a fresh `ask` overwrites only
+          // this trio, never the answer-side one.
+          ...(askRationale !== undefined ? { askRationale } : {}),
+          ...(askAlternatives !== undefined ? { askAlternatives } : {}),
+          ...(askSource !== undefined ? { askSource } : {}),
         };
       }
       // Settlement channel (kênh 1 của capture 2 kênh, per Phase 3
