@@ -3513,6 +3513,50 @@ test('return refuses when HEAD has not advanced past headAtTake — a clean tree
   assert.equal(stateView(cwd).work['pull-return-stale'].status, 'doing');
 });
 
+test('return --no-new-commits-ok closes out a main-source claim whose HEAD already reflects fully-done, verify-passing work before this claim (tsk-4on) — succeeds, records aheadCount:0', () => {
+  const cwd = tmpCwd();
+  execFileSync('git', ['init', '-q'], { cwd });
+  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd });
+  execFileSync('git', ['config', 'user.name', 'Test'], { cwd });
+  fs.writeFileSync(path.join(cwd, '.gitignore'), '.fgos/\n');
+  fs.writeFileSync(path.join(cwd, 'proof.txt'), 'already done\n');
+  execFileSync('git', ['add', '-A'], { cwd });
+  execFileSync('git', ['commit', '-q', '-m', 'work already done before claim'], { cwd });
+
+  run(cwd, ['init']);
+  addOk(cwd, 'main-return-predone', { verify: 'test -f proof.txt' });
+  assert.equal(run(cwd, ['take', '--id', 'main-return-predone']).status, 0);
+
+  const result = run(cwd, ['return', 'main-return-predone', '--no-new-commits-ok']);
+  assert.equal(result.status, 0, `return failed: ${result.stderr}`);
+  assert.match(result.stdout, /awaiting-approval/);
+  const view = stateView(cwd);
+  assert.equal(view.work['main-return-predone'].status, 'awaiting-approval');
+  assert.equal(view.outcomes['main-return-predone'].actual.aheadCount, 0);
+});
+
+test('return --no-new-commits-ok never bypasses verify itself for a main-source claim — still parks doing -> blocked + friction when verify fails (tsk-4on)', () => {
+  const cwd = tmpCwd();
+  execFileSync('git', ['init', '-q'], { cwd });
+  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd });
+  execFileSync('git', ['config', 'user.name', 'Test'], { cwd });
+  fs.writeFileSync(path.join(cwd, '.gitignore'), '.fgos/\n');
+  fs.writeFileSync(path.join(cwd, 'seed.txt'), 'seed\n');
+  execFileSync('git', ['add', '-A'], { cwd });
+  execFileSync('git', ['commit', '-q', '-m', 'seed'], { cwd });
+
+  run(cwd, ['init']);
+  addOk(cwd, 'main-return-flag-verify-fail', { verify: 'test -f proof.txt' }); // never created
+  assert.equal(run(cwd, ['take', '--id', 'main-return-flag-verify-fail']).status, 0);
+
+  const result = run(cwd, ['return', 'main-return-flag-verify-fail', '--no-new-commits-ok']);
+  assert.equal(result.status, 0, `return should exit 0 for a defined blocked outcome: ${result.stderr}`);
+  assert.equal(envelopeData(result.stdout).to, 'blocked');
+  const view = stateView(cwd);
+  assert.equal(view.work['main-return-flag-verify-fail'].status, 'blocked');
+  assert.equal(view.outcomes['main-return-flag-verify-fail'].actual.outcome, 'blocked');
+});
+
 test('return verify-fail: doing -> blocked + friction (verification layer), exit 0 (a defined outcome, not a CLI error) — mirrors the runner\'s own park path', () => {
   const cwd = initGitCwd();
   run(cwd, ['init']);
@@ -5416,6 +5460,98 @@ test('return on a branch-source take refuses when the branch has NOT advanced pa
   assert.equal(result.status, 4);
   assert.match(result.stderr, /has not advanced past branchHeadAtTake/);
   assert.equal(stateView(cwd).work['branch-return-stale'].status, 'doing');
+});
+
+test('return without --no-new-commits-ok still refuses a branch-source claim with zero commits since take, even when the branch already satisfies verify (tsk-4on default-unchanged)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  addOk(cwd, 'branch-return-predone-noflag', { verify: 'test -f proof.txt' });
+  // The real work is already done and committed BEFORE this claim — mirrors
+  // tsk-4j9: a parent whose children's merged content already sits on its
+  // own branch from a prior session.
+  fs.writeFileSync(path.join(cwd, 'proof.txt'), 'already done\n');
+  execFileSync('git', ['add', '-A'], { cwd });
+  execFileSync('git', ['commit', '-q', '-m', 'work already done before claim'], { cwd });
+
+  assert.equal(run(cwd, ['pick', '--id', 'branch-return-predone-noflag']).status, 0);
+
+  const result = run(cwd, ['return', 'branch-return-predone-noflag']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /has not advanced past branchHeadAtTake/);
+  assert.equal(stateView(cwd).work['branch-return-predone-noflag'].status, 'doing');
+});
+
+test('return --no-new-commits-ok closes out a branch-source claim whose branch already reflects fully-done, verify-passing work before this claim (tsk-4on) — succeeds, records aheadCount:0', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  addOk(cwd, 'branch-return-predone', { verify: 'test -f proof.txt' });
+  fs.writeFileSync(path.join(cwd, 'proof.txt'), 'already done\n');
+  execFileSync('git', ['add', '-A'], { cwd });
+  execFileSync('git', ['commit', '-q', '-m', 'work already done before claim'], { cwd });
+
+  assert.equal(run(cwd, ['pick', '--id', 'branch-return-predone']).status, 0);
+
+  // Zero commits on the branch since take — nothing new to prove, the work
+  // was already there before the claim.
+  const result = run(cwd, ['return', 'branch-return-predone', '--no-new-commits-ok']);
+  assert.equal(result.status, 0, `return failed: ${result.stderr}`);
+  assert.match(result.stdout, /awaiting-approval/);
+
+  const view = stateView(cwd);
+  assert.equal(view.work['branch-return-predone'].status, 'awaiting-approval');
+  assert.equal(view.outcomes['branch-return-predone'].actual.outcome, 'awaiting-approval');
+  assert.equal(view.outcomes['branch-return-predone'].actual.passed, true);
+  assert.equal(view.outcomes['branch-return-predone'].actual.aheadCount, 0);
+});
+
+test('return --no-new-commits-ok refuses a branch-source claim that was already blocked by a real verify-fail — the flag closes out work never returned, never rescues a failed retry (tsk-4on D2)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  addOk(cwd, 'branch-return-cheat', { verify: 'test -f proof.txt' });
+
+  const pickResult = run(cwd, ['pick', '--id', 'branch-return-cheat']);
+  assert.equal(pickResult.status, 0, `pick failed: ${pickResult.stderr}`);
+  const worktreePath = envelopeData(pickResult.stdout).worktree.path;
+
+  // A genuine verify-fail: commits a WRONG file, never satisfies verify.
+  fs.writeFileSync(path.join(worktreePath, 'wrong-file.txt'), 'nope\n');
+  execFileSync('git', ['add', '-A'], { cwd: worktreePath });
+  execFileSync('git', ['commit', '-q', '-m', 'wrong fix'], { cwd: worktreePath });
+
+  const failResult = run(cwd, ['return', 'branch-return-cheat']);
+  assert.equal(failResult.status, 0, `return should exit 0 for a defined blocked outcome: ${failResult.stderr}`);
+  assert.equal(envelopeData(failResult.stdout).to, 'blocked');
+  assert.equal(stateView(cwd).outcomes['branch-return-cheat'].actual.outcome, 'blocked');
+
+  // Retake resets branchHeadAtTake to the (still-failing) tip — the
+  // deliberate anti-cheat gate for a blocked-branch retake (human-rounds D2).
+  const retakeResult = run(cwd, ['take', '--id', 'branch-return-cheat']);
+  assert.equal(retakeResult.status, 0, `retake failed: ${retakeResult.stderr}`);
+
+  // Zero new commits since the retake, flag passed — refused: a real
+  // blocked outcome is still on record for this item.
+  const result = run(cwd, ['return', 'branch-return-cheat', '--no-new-commits-ok']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /cannot use --no-new-commits-ok/);
+  assert.equal(stateView(cwd).work['branch-return-cheat'].status, 'doing');
+});
+
+test('return --no-new-commits-ok never bypasses verify itself — a genuinely-fresh branch-source claim whose branch tip still fails verify still parks doing -> blocked + friction (tsk-4on)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  addOk(cwd, 'branch-return-flag-verify-fail', { verify: 'test -f proof.txt' }); // proof.txt never created anywhere
+
+  assert.equal(run(cwd, ['pick', '--id', 'branch-return-flag-verify-fail']).status, 0);
+
+  // Zero commits since take, flag passed — the advance-check is skipped,
+  // but verify still runs and still fails.
+  const result = run(cwd, ['return', 'branch-return-flag-verify-fail', '--no-new-commits-ok']);
+  assert.equal(result.status, 0, `return should exit 0 for a defined blocked outcome: ${result.stderr}`);
+  assert.equal(envelopeData(result.stdout).to, 'blocked');
+  const view = stateView(cwd);
+  assert.equal(view.work['branch-return-flag-verify-fail'].status, 'blocked');
+  assert.equal(view.outcomes['branch-return-flag-verify-fail'].actual.outcome, 'blocked');
+  assert.equal(view.frictions['branch-return-flag-verify-fail'][0].errorClass, 'verify-miss');
 });
 
 test('return on a branch-source take never requires the human\'s own main tree to be clean ("tree người là việc của người") — a dirty main tree never blocks it and is left untouched', () => {
