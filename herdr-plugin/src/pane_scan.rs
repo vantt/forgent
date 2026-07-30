@@ -1,0 +1,201 @@
+use std::collections::HashMap;
+use std::io;
+use std::process::Command;
+
+use serde::Deserialize;
+
+use crate::pick::is_valid_id;
+use crate::ports::PaneRegistry;
+
+/// The two pane-identity fields tsk-4zo D1 requires — no `workspace_id`
+/// field, since scan scope is the dashboard's own workspace by
+/// construction (`HerdrPaneScanner` below is already scoped to one).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PaneIdentity {
+    pub pane_id: String,
+    pub tab_id: String,
+}
+
+#[derive(Debug)]
+pub enum PaneScanError {
+    Io(io::Error),
+    ExitStatus(String),
+    Parse(serde_json::Error),
+}
+
+impl std::fmt::Display for PaneScanError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            PaneScanError::Io(err) => write!(f, "herdr CLI spawn failed: {err}"),
+            PaneScanError::ExitStatus(detail) => write!(f, "herdr CLI exited non-zero: {detail}"),
+            PaneScanError::Parse(err) => write!(f, "herdr CLI output parse failed: {err}"),
+        }
+    }
+}
+
+impl From<io::Error> for PaneScanError {
+    fn from(err: io::Error) -> Self {
+        PaneScanError::Io(err)
+    }
+}
+
+/// One row from `herdr pane list --workspace <id>`'s real `result.panes`
+/// array — `label` is genuinely optional (a live capture showed panes
+/// with no `label` key at all: never renamed by `/fgOS:pick`'s flow).
+#[derive(Debug, Deserialize)]
+struct PaneRow {
+    pane_id: String,
+    tab_id: String,
+    label: Option<String>,
+}
+
+#[derive(Debug, Deserialize)]
+struct PaneListResult {
+    panes: Vec<PaneRow>,
+}
+
+#[derive(Debug, Deserialize)]
+struct PaneListEnvelope {
+    result: PaneListResult,
+}
+
+/// Extracts the leading `<taskid>` segment from a pane label built per the
+/// locked convention (`docs/history/fgos-terminal-pane-rename/CONTEXT.md`
+/// D4: `<taskid> | fg.ssid:<v> | a.ssid:<v>`, unresolved segments
+/// dropped) — splits on `" | "` and validates the leading segment against
+/// fgOS's own id grammar (`pick::is_valid_id`), never trusting an
+/// arbitrary leading substring as a task-id.
+fn extract_task_id(label: &str) -> Option<&str> {
+    let leading = label.split(" | ").next()?;
+    is_valid_id(leading).then_some(leading)
+}
+
+/// Parses `herdr pane list --workspace <id>`'s real response shape
+/// (`{"id":..., "result":{"panes":[...], "type":"pane_list"}}`, captured
+/// live this session) into a task-id → pane identity map, skipping any
+/// pane with no `label` or a leading segment that isn't a valid fgOS
+/// task-id — D1: only pick-launched, labeled panes are tracked.
+pub fn parse_pane_list(json: &str) -> Result<HashMap<String, PaneIdentity>, serde_json::Error> {
+    let envelope: PaneListEnvelope = serde_json::from_str(json)?;
+    let mut map = HashMap::new();
+    for pane in envelope.result.panes {
+        let Some(label) = &pane.label else { continue };
+        let Some(task_id) = extract_task_id(label) else {
+            continue;
+        };
+        map.insert(
+            task_id.to_string(),
+            PaneIdentity {
+                pane_id: pane.pane_id,
+                tab_id: pane.tab_id,
+            },
+        );
+    }
+    Ok(map)
+}
+
+fn run_pane_list(herdr_bin: &str, workspace_id: &str) -> Result<String, PaneScanError> {
+    let output = Command::new(herdr_bin)
+        .args(["pane", "list", "--workspace", workspace_id])
+        .output()?;
+    if !output.status.success() {
+        return Err(PaneScanError::ExitStatus(
+            String::from_utf8_lossy(&output.stderr).to_string(),
+        ));
+    }
+    Ok(String::from_utf8_lossy(&output.stdout).to_string())
+}
+
+/// The `PaneRegistry` adapter (tsk-4zo D1): the concrete herdr-CLI
+/// implementation of the pane-scan port, scoped to one workspace (the
+/// dashboard's own).
+pub struct HerdrPaneScanner {
+    pub herdr_bin: String,
+    pub workspace_id: String,
+}
+
+impl PaneRegistry for HerdrPaneScanner {
+    fn scan(&self) -> Result<HashMap<String, PaneIdentity>, PaneScanError> {
+        let stdout = run_pane_list(&self.herdr_bin, &self.workspace_id)?;
+        parse_pane_list(&stdout).map_err(PaneScanError::Parse)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // Captured live this session: `herdr pane list --workspace wS` from
+    // inside this very session's own herdr-managed pane. 7 real panes:
+    // 2 with no `label` key at all, 5 with a 2-segment label
+    // (`taskid | a.ssid:<v>` — no `fg.ssid`, dropped because unresolved
+    // in these live sessions), never a 3-segment label in this capture.
+    const PANE_LIST_FIXTURE: &str = r#"{"id":"cli:pane:list","result":{"panes":[
+        {"agent":"claude","agent_status":"idle","cwd":"/x","focused":false,
+         "pane_id":"wS:pW","tab_id":"wS:t8","workspace_id":"wS",
+         "label":"tsk-n4i-2 | a.ssid:afffd875-be95-41cb-8eb2-fa2cf1276eb5"},
+        {"agent":"claude","agent_status":"idle","cwd":"/x","focused":false,
+         "pane_id":"wS:p1D","tab_id":"wS:t8","workspace_id":"wS"},
+        {"agent":"claude","agent_status":"working","cwd":"/x","focused":false,
+         "pane_id":"wS:p1C","tab_id":"wS:tD","workspace_id":"wS",
+         "label":"tsk-4zo | a.ssid:01d4c06d-70dc-4e06-a4b0-2bcf85668f28"}
+    ],"type":"pane_list"}}"#;
+
+    #[test]
+    fn pane_registry_parses_real_captured_pane_list_shape() {
+        let map = parse_pane_list(PANE_LIST_FIXTURE).expect("fixture should parse");
+        assert_eq!(map.len(), 2);
+        assert_eq!(
+            map.get("tsk-n4i-2"),
+            Some(&PaneIdentity {
+                pane_id: "wS:pW".into(),
+                tab_id: "wS:t8".into(),
+            })
+        );
+        assert_eq!(
+            map.get("tsk-4zo"),
+            Some(&PaneIdentity {
+                pane_id: "wS:p1C".into(),
+                tab_id: "wS:tD".into(),
+            })
+        );
+    }
+
+    #[test]
+    fn pane_registry_skips_panes_with_no_label() {
+        let map = parse_pane_list(PANE_LIST_FIXTURE).expect("fixture should parse");
+        // wS:p1D carries no `label` key at all — must never appear.
+        assert!(!map.values().any(|identity| identity.pane_id == "wS:p1D"));
+    }
+
+    #[test]
+    fn pane_registry_extracts_taskid_from_two_segment_label() {
+        // The real, live-observed shape: no fg.ssid segment at all.
+        assert_eq!(
+            extract_task_id("tsk-4zo | a.ssid:01d4c06d-70dc-4e06-a4b0-2bcf85668f28"),
+            Some("tsk-4zo")
+        );
+    }
+
+    #[test]
+    fn pane_registry_extracts_taskid_from_three_segment_label() {
+        assert_eq!(
+            extract_task_id("tsk-62x-1 | fg.ssid:649e49f0-1ea5 | a.ssid:649e49f0-1ea5"),
+            Some("tsk-62x-1")
+        );
+    }
+
+    #[test]
+    fn pane_registry_extracts_taskid_from_bare_taskid_label() {
+        assert_eq!(extract_task_id("tsk-19y"), Some("tsk-19y"));
+    }
+
+    #[test]
+    fn pane_registry_rejects_a_leading_segment_that_is_not_a_valid_taskid() {
+        // A pane manually renamed by a person to something that doesn't
+        // match fgOS's own id grammar (uppercase, here) must never be
+        // mistaken for a task-id — mirrors pick.rs's own grammar tests.
+        assert_eq!(extract_task_id("Reviewer | a.ssid:abc"), None);
+        assert_eq!(extract_task_id(""), None);
+    }
+}

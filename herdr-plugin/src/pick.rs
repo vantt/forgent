@@ -3,6 +3,8 @@ use std::process::Command;
 
 use serde_json::Value;
 
+use crate::ports::PaneOrchestrator;
+
 /// The exact slash command a person would type by hand to claim and route
 /// into an item — this action never calls `fgos pick` itself, only opens
 /// the same door (D4/STR40: never make herdr, or a plugin, a second
@@ -24,8 +26,10 @@ impl std::error::Error for InvalidId {}
 /// `/^[a-z][a-z0-9]*(-[a-z0-9]+)*$/`), re-checked here defensively:
 /// `herdr pane run` types its command text literally into whatever shell
 /// is running in the target pane (no shell-safe argv boundary), so an id
-/// containing a stray quote would break out of it.
-fn is_valid_id(id: &str) -> bool {
+/// containing a stray quote would break out of it. `pub(crate)` so
+/// `pane_scan.rs` can validate a parsed pane label's leading segment
+/// against the same grammar (tsk-4zo) instead of duplicating this check.
+pub(crate) fn is_valid_id(id: &str) -> bool {
     let mut segments = id.split('-');
     let Some(first) = segments.next() else {
         return false;
@@ -104,6 +108,19 @@ pub fn open_pick_pane(herdr_bin: &str, id: &str) -> io::Result<()> {
     // session's own lifetime, only on herdr accepting the typed command.
     Command::new(herdr_bin).args(run_args).spawn()?;
     Ok(())
+}
+
+/// The `PaneOrchestrator` adapter (tsk-3t9 D1): the concrete herdr-CLI
+/// implementation of the pane-orchestration port. Holds the resolved
+/// `herdr_bin` path so the composition root (`main.rs`) resolves it once.
+pub struct HerdrPaneAdapter {
+    pub herdr_bin: String,
+}
+
+impl PaneOrchestrator for HerdrPaneAdapter {
+    fn open_pick_pane(&self, id: &str) -> io::Result<()> {
+        open_pick_pane(&self.herdr_bin, id)
+    }
 }
 
 #[cfg(test)]
