@@ -221,11 +221,15 @@ test('a second ask after an answer overwrites the prior statusAtAsk, never merge
   assert.equal(view.work['item-x'].status, 'doing');
 });
 
-// tsk-63c D1/D3 (decision-schema-rationale-alternatives-source): rationale/
-// alternatives/source fold into gates[id] on BOTH the ask and the answer
-// edge, same guarded-spread pattern as parentSnapshotAtAsk/statusAtAsk
-// above.
-test('putInAwaiting with rationale/alternatives/source -> all three land on gates[id]', () => {
+// tsk-63c D1/D3 (decision-schema-rationale-alternatives-source), REVISED by
+// tsk-19zm D2: rationale/alternatives/source passed to `putInAwaiting` now
+// land on gates[id]'s askRationale/askAlternatives/askSource instead — the
+// agent's checkpoint distillate as of THIS ask, kept separate from
+// answerAwaiting's own rationale/alternatives/source (still the
+// authoritative answer-side trio, unchanged below) so a later answer never
+// overwrites it. Same guarded-spread pattern as parentSnapshotAtAsk/
+// statusAtAsk above.
+test('putInAwaiting with rationale/alternatives/source -> all three land on gates[id] as askRationale/askAlternatives/askSource', () => {
   const dir = tmpDir();
   addSampleWork(dir);
 
@@ -237,22 +241,25 @@ test('putInAwaiting with rationale/alternatives/source -> all three land on gate
     alternatives: 'password auth was considered, rejected for storage risk',
     source: 'session',
   });
-  assert.equal(view.gates['item-x'].rationale, 'OAuth avoids storing a password hash at all');
-  assert.equal(view.gates['item-x'].alternatives, 'password auth was considered, rejected for storage risk');
-  assert.equal(view.gates['item-x'].source, 'session');
+  assert.equal(view.gates['item-x'].askRationale, 'OAuth avoids storing a password hash at all');
+  assert.equal(view.gates['item-x'].askAlternatives, 'password auth was considered, rejected for storage risk');
+  assert.equal(view.gates['item-x'].askSource, 'session');
+  assert.ok(!('rationale' in view.gates['item-x']));
+  assert.ok(!('alternatives' in view.gates['item-x']));
+  assert.ok(!('source' in view.gates['item-x']));
 
   const rebuilt = listWork(dir);
-  assert.equal(rebuilt.gates['item-x'].rationale, 'OAuth avoids storing a password hash at all');
+  assert.equal(rebuilt.gates['item-x'].askRationale, 'OAuth avoids storing a password hash at all');
 });
 
-test('putInAwaiting with no rationale/alternatives/source -> none of the three keys appear on gates[id]', () => {
+test('putInAwaiting with no rationale/alternatives/source -> none of the ask-checkpoint keys appear on gates[id]', () => {
   const dir = tmpDir();
   addSampleWork(dir);
 
   const { view } = putInAwaiting(dir, { id: 'item-x', ask: 'OAuth or password?', expectedStatus: 'todo' });
-  assert.ok(!('rationale' in view.gates['item-x']));
-  assert.ok(!('alternatives' in view.gates['item-x']));
-  assert.ok(!('source' in view.gates['item-x']));
+  assert.ok(!('askRationale' in view.gates['item-x']));
+  assert.ok(!('askAlternatives' in view.gates['item-x']));
+  assert.ok(!('askSource' in view.gates['item-x']));
 });
 
 test('answerAwaiting with rationale/source -> both land on gates[id] alongside the answer', () => {
@@ -272,4 +279,31 @@ test('answerAwaiting with rationale/source -> both land on gates[id] alongside t
   assert.equal(view.gates['item-x'].answer, 'OAuth');
   assert.equal(view.gates['item-x'].rationale, 'the team already has an OIDC provider available');
   assert.equal(view.gates['item-x'].source, 'human');
+});
+
+test('putInAwaiting then answerAwaiting, both carrying rationale -> checkpoint and answer coexist, neither overwrites the other (tsk-19zm D2)', () => {
+  const dir = tmpDir();
+  addSampleWork(dir);
+  putInAwaiting(dir, {
+    id: 'item-x',
+    ask: 'OAuth or password?',
+    expectedStatus: 'todo',
+    rationale: 'leaning OAuth: fewer support tickets historically',
+    source: 'session',
+  });
+
+  const { view } = answerAwaiting(dir, {
+    id: 'item-x',
+    answer: 'OAuth',
+    expectedStatus: 'awaiting-human',
+    role: 'human',
+    rationale: 'confirmed OAuth per compliance requirement',
+    source: 'human',
+  });
+  // Answer's own trio, still authoritative.
+  assert.equal(view.gates['item-x'].rationale, 'confirmed OAuth per compliance requirement');
+  assert.equal(view.gates['item-x'].source, 'human');
+  // The agent's original checkpoint from the ask is untouched.
+  assert.equal(view.gates['item-x'].askRationale, 'leaning OAuth: fewer support tickets historically');
+  assert.equal(view.gates['item-x'].askSource, 'session');
 });
