@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { addOutcome, addFriction, moveWork, moveStage, addWork, editWork, StoreError } from '../../src/state/store.mjs';
 import { createSession, endSession } from '../../src/runner/session.mjs';
+import { DEFAULT_TTL_MS } from '../../src/runner/main-checkout-lock.mjs';
 
 // The CLI under test, resolved by absolute path so it works regardless of
 // the spawned process's cwd (which every test below points at a fresh
@@ -6348,4 +6349,144 @@ test('lock-status: registered in the --help --json manifest as read-only (touche
   assert.ok(entry, 'lock-status entry missing from --help --json manifest');
   assert.equal(entry.touchesState, false);
   assert.equal(entry.externalEffect, false);
+});
+
+// --- take/pick/approve --wait/--no-wait (tsk-6c2): retry-with-backoff on
+// main-checkout-lock contention, default ON, opt-out via --no-wait --------
+
+function writeLiveLock(cwd, ageMs) {
+  fs.mkdirSync(path.dirname(mainCheckoutLockPath(cwd)), { recursive: true });
+  // This TEST process's own pid is genuinely alive -- reads as a real live
+  // holder, mirroring the existing "unlock: genuinely held" fixture.
+  fs.writeFileSync(mainCheckoutLockPath(cwd), JSON.stringify({ pid: process.pid, ts: Date.now() - ageMs }));
+}
+
+test('take --no-wait fails immediately on a live-held lock, same message/exit code as an unwaited claim, no retry delay', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  addOk(cwd, 'wait-no-wait-take', { verify: 'true' });
+  writeLiveLock(cwd, 1000); // well within DEFAULT_TTL_MS -- would never clear on its own during this test
+
+  const start = Date.now();
+  const result = run(cwd, ['take', 'wait-no-wait-take', '--no-wait']);
+  const elapsed = Date.now() - start;
+
+  assert.equal(result.status, 7, result.stderr);
+  assert.match(result.stderr, /main checkout locked by pid/);
+  assert.doesNotMatch(result.stderr, /waited \d+ms before giving up/, '--no-wait must never engage the retry loop at all');
+  assert.ok(elapsed < 2000, `--no-wait must fail fast, not wait out any budget (took ${elapsed}ms)`);
+});
+
+test('take (default, no flags) retries through a lock whose remainingTtlMs is short, and succeeds once it clears -- D3\'s default-ON behavior', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  addOk(cwd, 'wait-default-take', { verify: 'true' });
+  // remainingTtlMs ~= 3s at write time: short enough to clear inside this
+  // test without waiting out the real DEFAULT_TTL_MS (3 minutes). The
+  // budget's own BOUNDARY_GRACE_MS (lock-wait.mjs) is what actually makes
+  // this reliable, not a large margin here -- without it, the loop's own
+  // give-up instant and the lock's real clearance instant are derived from
+  // the same clock read and coincide almost exactly, racing event-loop
+  // timer jitter regardless of how big this margin is.
+  writeLiveLock(cwd, DEFAULT_TTL_MS - 3000);
+
+  const start = Date.now();
+  const result = run(cwd, ['take', 'wait-default-take']);
+  const elapsed = Date.now() - start;
+
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(envelopeData(result.stdout).id, 'wait-default-take');
+  assert.ok(elapsed >= 500, `must have actually waited for the lock to clear, not raced past it (took ${elapsed}ms)`);
+});
+
+test('take --wait <ms> tightens the budget below the lock\'s own remainingTtlMs, and fails with the exhausted-budget message once spent', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  addOk(cwd, 'wait-tight-budget-take', { verify: 'true' });
+  writeLiveLock(cwd, 1000); // remainingTtlMs ~179s -- would never clear naturally in a test
+
+  const start = Date.now();
+  const result = run(cwd, ['take', 'wait-tight-budget-take', '--wait', '600']);
+  const elapsed = Date.now() - start;
+
+  assert.equal(result.status, 7, result.stderr);
+  assert.match(result.stderr, /waited \d+ms before giving up/, 'an exhausted explicit --wait budget must be distinguishable from an immediate-fail');
+  assert.ok(elapsed >= 500 && elapsed < 5000, `must have waited roughly the --wait budget, not the full remainingTtlMs (took ${elapsed}ms)`);
+});
+
+test('take --wait rejects a non-numeric or non-positive value the same way --timeout already does', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  addOk(cwd, 'wait-bad-value-take');
+
+  const result = run(cwd, ['take', 'wait-bad-value-take', '--wait', 'nope']);
+  assert.equal(result.status, 4, result.stderr);
+  assert.match(result.stderr, /--wait must be a positive number of milliseconds/);
+});
+
+test('pick --no-wait fails immediately on a live-held lock, same as take --no-wait', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  addOk(cwd, 'wait-no-wait-pick', { verify: 'true' });
+  writeLiveLock(cwd, 1000);
+
+  const start = Date.now();
+  const result = run(cwd, ['pick', 'wait-no-wait-pick', '--no-wait']);
+  const elapsed = Date.now() - start;
+
+  assert.equal(result.status, 7, result.stderr);
+  assert.match(result.stderr, /main checkout locked by pid/);
+  assert.ok(elapsed < 2000, `--no-wait must fail fast (took ${elapsed}ms)`);
+});
+
+test('approve --no-wait fails immediately on a live-held lock, main left untouched -- merge next inherits the same flag by forwarding, per bin/fgos.mjs:1152', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeRunnerProposedItem(cwd, 'wait-no-wait-approve', { verify: 'true' });
+  compoundAndCommit(cwd, 'wait-no-wait-approve');
+  writeLiveLock(cwd, 1000);
+
+  const start = Date.now();
+  const result = run(cwd, ['approve', 'wait-no-wait-approve', '--no-wait']);
+  const elapsed = Date.now() - start;
+
+  // 9 ('merge-fail'), not 7 ('lock-timeout') -- MergeError's category is
+  // unconditionally 'merge-fail' for every failure mode (pre-existing,
+  // unrelated to this item's own `code` discriminator addition).
+  assert.equal(result.status, 9, result.stderr);
+  assert.match(result.stderr, /main checkout is locked by another live session/);
+  assert.ok(elapsed < 2000, `--no-wait must fail fast (took ${elapsed}ms)`);
+  assert.equal(stateView(cwd).work['wait-no-wait-approve'].status, 'awaiting-approval', 'a refused-before-merge attempt must leave the item exactly where it was');
+});
+
+test('merge next --no-wait fails immediately on a live-held lock -- proves the flag actually forwards into approve (bin/fgos.mjs:1152), not just documented as if it did', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeRunnerProposedItem(cwd, 'wait-merge-next-no-wait', { verify: 'true' });
+  compoundAndCommit(cwd, 'wait-merge-next-no-wait');
+  writeLiveLock(cwd, 1000);
+
+  const start = Date.now();
+  const result = run(cwd, ['merge', 'next', '--no-wait']);
+  const elapsed = Date.now() - start;
+
+  // `merge next` only special-cases an Iron Law rejection (bin/fgos.mjs's
+  // `sub === 'next'` case) -- any other error from the inner `runVerb('approve', ...)`
+  // rethrows as-is, so this fails exactly like a direct `approve` call does.
+  assert.equal(result.status, 9, result.stderr);
+  assert.match(result.stderr, /main checkout is locked by another live session/);
+  assert.ok(elapsed < 2000, `--no-wait forwarded through merge next must still fail fast, not wait (took ${elapsed}ms)`);
+});
+
+test('take/pick/approve are documented in the --help --json manifest with wait/no-wait properties', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['--help', '--json']);
+  assert.equal(result.status, 0, result.stderr);
+  const manifest = JSON.parse(result.stdout);
+  for (const name of ['take', 'pick', 'approve']) {
+    const entry = manifest.commands.find((c) => c.name === name);
+    assert.ok(entry, `${name} entry missing from --help --json manifest`);
+    assert.ok(entry.parameters.properties.wait, `${name} manifest entry missing "wait" property`);
+    assert.ok(entry.parameters.properties['no-wait'], `${name} manifest entry missing "no-wait" property`);
+  }
 });

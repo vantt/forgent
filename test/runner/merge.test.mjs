@@ -572,10 +572,37 @@ test('mergeRunnerItem refuses to even attempt the merge when another identity al
   const headBefore = headOf(repoRoot);
   await assert.rejects(
     () => mergeRunnerItem(repoRoot, makeItem({ verify: 'true' })),
-    /cannot merge "fgw\/demo-item": main checkout is locked by another live session/,
+    (err) => {
+      assert.match(err.message, /cannot merge "fgw\/demo-item": main checkout is locked by another live session/);
+      // tsk-6c2: a caller-side retry wrapper needs a way to tell "lock
+      // contested, worth retrying" apart from a real merge conflict or
+      // verify failure — errorClass/category alone can't (both are always
+      // 'merge-fail'). This `code` is that discriminator.
+      assert.equal(err.code, 'lock-held');
+      assert.equal(typeof err.remainingTtlMs, 'number');
+      return true;
+    },
   );
   assert.equal(headOf(repoRoot), headBefore, 'HEAD must be unchanged — the merge must never even start while locked');
   assert.equal(isWorkingTreeClean(repoRoot), true, 'tree must stay clean — refusing before the merge means nothing was ever staged');
+});
+
+test('mergeRunnerItem: an ambiguous (unparseable) lock file carries code "lock-ambiguous", distinct from "lock-held" -- a retry wrapper must never retry this one either', async () => {
+  const repoRoot = initRepo();
+  makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
+
+  const fgosDir = path.join(repoRoot, '.fgos');
+  fs.mkdirSync(fgosDir, { recursive: true });
+  fs.writeFileSync(path.join(fgosDir, 'main-checkout.lock'), 'not json at all {{{');
+
+  await assert.rejects(
+    () => mergeRunnerItem(repoRoot, makeItem({ verify: 'true' })),
+    (err) => {
+      assert.match(err.message, /main checkout lock is ambiguous/);
+      assert.equal(err.code, 'lock-ambiguous');
+      return true;
+    },
+  );
 });
 
 test('mergeRunnerItem merges normally when the lock is free, and releases it afterward', async () => {

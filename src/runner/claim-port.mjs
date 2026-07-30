@@ -62,11 +62,12 @@ const CLAIM_ERROR_CATEGORY = Object.freeze({
 });
 
 export class ClaimError extends Error {
-  constructor(code, message) {
+  constructor(code, message, details = {}) {
     super(message);
     this.name = 'ClaimError';
     this.code = code;
     this.category = CLAIM_ERROR_CATEGORY[code] ?? 'unexpected';
+    Object.assign(this, details);
   }
 }
 
@@ -106,11 +107,12 @@ export function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoot = pr
     throw new ClaimError(
       'lock-held',
       `claimWork: main checkout locked by pid ${lockResult.holderPid} (held ${formatLockDurationMs(lockResult.lockAgeMs)}${ttlPart})`,
+      { remainingTtlMs: lockResult.remainingTtlMs, holderPid: lockResult.holderPid, lockAgeMs: lockResult.lockAgeMs },
     );
   }
   if (lockResult.status === AMBIGUOUS) {
     const agePart = lockResult.lockAgeMs != null ? ` (lock age ${formatLockDurationMs(lockResult.lockAgeMs)})` : '';
-    throw new ClaimError('lock-ambiguous', `claimWork: main checkout lock state ambiguous${agePart}`);
+    throw new ClaimError('lock-ambiguous', `claimWork: main checkout lock state ambiguous${agePart}`, { lockAgeMs: lockResult.lockAgeMs });
   }
 
   try {
