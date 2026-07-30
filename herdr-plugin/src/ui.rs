@@ -13,8 +13,20 @@ use ratatui::text::Span;
 use ratatui::widgets::{Block, Borders, List, ListItem, ListState, Paragraph};
 use ratatui::{Frame, Terminal};
 
-use crate::app::App;
+use crate::app::{App, InProcessTask};
 use crate::ports::{TerminalUi as TerminalUiPort, UiEvent};
+
+/// tsk-4zo D2: an orphaned task (no matching herdr pane found by the most
+/// recent scan) gets an explicit `[pane missing]` badge — no jump-to-pane
+/// affordance exists yet for any row (that's `tsk-1eu`'s job), so there is
+/// nothing else to disable here today.
+fn in_process_label(task: &InProcessTask) -> String {
+    if task.pane.is_some() {
+        format!("{} — {}", task.id, task.title)
+    } else {
+        format!("[pane missing] {} — {}", task.id, task.title)
+    }
+}
 
 /// The render-framework adapter (tsk-3t9 D1): owns the ratatui `Terminal`
 /// and its raw-mode/alternate-screen lifecycle (moved from `main.rs`).
@@ -116,10 +128,7 @@ pub fn draw(frame: &mut Frame, app: &mut App) {
     let in_process: Vec<ListItem> = app
         .in_process
         .iter()
-        .map(|task| {
-            ListItem::new(format!("{} — {}", task.id, task.title))
-                .style(Style::default().fg(Color::Yellow))
-        })
+        .map(|task| ListItem::new(in_process_label(task)).style(Style::default().fg(Color::Yellow)))
         .collect();
     frame.render_widget(
         List::new(in_process).block(
@@ -141,4 +150,33 @@ pub fn draw(frame: &mut Frame, app: &mut App) {
         Paragraph::new("↑/↓ select · Enter: pick · q/Esc: quit")
     };
     frame.render_widget(status, rows[1]);
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::pane_scan::PaneIdentity;
+
+    #[test]
+    fn orphan_task_gets_pane_missing_badge() {
+        let task = InProcessTask {
+            id: "tsk-b".into(),
+            title: "Missing".into(),
+            pane: None,
+        };
+        assert_eq!(in_process_label(&task), "[pane missing] tsk-b — Missing");
+    }
+
+    #[test]
+    fn found_task_gets_no_badge() {
+        let task = InProcessTask {
+            id: "tsk-a".into(),
+            title: "Found".into(),
+            pane: Some(PaneIdentity {
+                pane_id: "wS:p1".into(),
+                tab_id: "wS:t1".into(),
+            }),
+        };
+        assert_eq!(in_process_label(&task), "tsk-a — Found");
+    }
 }
