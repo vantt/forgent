@@ -21,6 +21,15 @@ export class WorkValidationError extends Error {
 // Stable, file/CLI-safe id: lowercase kebab-case, starting with a letter.
 const ID_PATTERN = /^[a-z][a-z0-9]*(-[a-z0-9]+)*$/;
 
+// Per long-work-item-ids D2: `fgos add` took a caller-typed id straight
+// through with no length bound, so callers slugified the whole title into
+// the id (e.g. "choke-point-createworktree-callsite-wrapper", 43 chars).
+// 30 sits in the gap between the longest observed legitimate id (26 chars)
+// and the shortest observed offending one (41 chars) — see plan.md for the
+// full data. Only checked at write time (addWork/patch); replay never
+// calls validateWorkShape, so existing longer ids keep replaying untouched.
+const MAX_ID_LENGTH = 30;
+
 /**
  * The full status domain for `work` (per D4's single flat FSM, extended by
  * D5 with `proposed`: a goal-check pass sitting on a branch, awaiting
@@ -127,6 +136,11 @@ export function validateWorkShape(work) {
   if (typeof work.id !== 'string' || !ID_PATTERN.test(work.id)) {
     throw new WorkValidationError(
       `work.id must be a stable kebab-case identifier (e.g. "add-login-form"), got: ${JSON.stringify(work.id)}`,
+    );
+  }
+  if (work.id.length > MAX_ID_LENGTH) {
+    throw new WorkValidationError(
+      `work.id must be at most ${MAX_ID_LENGTH} characters (got ${work.id.length}): ${JSON.stringify(work.id)} — pick a short descriptive id, not a slugified title.`,
     );
   }
   requireNonEmptyString(work, 'title');
