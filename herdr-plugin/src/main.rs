@@ -110,6 +110,10 @@ fn run(
                 // tsk-1eu D1: Enter's effect depends on which panel has
                 // focus — "Work items" keeps today's pick action, "In
                 // process" jumps to the selected task's pane (D2).
+                // Already tsk-3t9-4's asked-for port/adapter shape: both
+                // arms below call only `pane_orchestrator`'s
+                // `PaneOrchestrator` methods, never a concrete adapter
+                // directly.
                 UiEvent::Pick => match app.focused_panel {
                     Panel::WorkItems => {
                         app.pick_status = Some(match app.selected_id() {
