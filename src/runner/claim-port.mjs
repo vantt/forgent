@@ -10,7 +10,7 @@
 import { moveWork, addOutcome, listWork, readRawEvents } from '../state/store.mjs';
 import { visitCount } from './anti-loop.mjs';
 import { acquireMainCheckoutLock, HELD, AMBIGUOUS, DEFAULT_TTL_MS, formatLockDurationMs } from './main-checkout-lock.mjs';
-import { createWorktree, branchNameFor, branchExists } from './worktree.mjs';
+import { createClaimWorktree, branchNameFor, branchExists } from './worktree.mjs';
 import { resolveRoot } from './root-affinity.mjs';
 import { execFileSync } from 'node:child_process';
 
@@ -240,7 +240,7 @@ export function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoot = pr
 
     // Create worktree if isolating
     if (isolate) {
-      const worktree = createWorktree(repoRoot, id, { worktreeDir, baseRef });
+      const worktree = createClaimWorktree(repoRoot, id, { worktreeDir, baseRef });
       return { ...claim, worktree };
     }
 

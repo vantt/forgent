@@ -77,7 +77,7 @@ import {
 } from './anti-loop.mjs';
 import { spawnWorker, modelForTier } from './dispatch.mjs';
 import { appendWorkerLog, appendWorkerLogChunk } from './worker-log.mjs';
-import { createWorktree, removeWorktree, listLeftovers, branchNameFor, createBranchRef } from './worktree.mjs';
+import { createDispatchWorktree, removeDispatchWorktree, listLeftovers, branchNameFor, createBranchRef } from './worktree.mjs';
 import { runGoalCheck } from './goal-check.mjs';
 import { createWriteQueue } from './write-queue.mjs';
 import { createOwnershipStore, resolveRoot, claimRoot, steerFrontier } from './root-affinity.mjs';
@@ -307,17 +307,6 @@ function tailLines(text, n = 10) {
   return lines.slice(-n).join('\n');
 }
 
-/** Teardown that never masks the real outcome: a failed removal is logged
- * and swallowed (the item's propose/park/halt result must still surface).
- * `force` because a failed worker may leave the checkout dirty. */
-function safeRemoveWorktree(repoRoot, worktreePath, log) {
-  try {
-    removeWorktree(repoRoot, worktreePath, { force: true });
-  } catch (err) {
-    log(`fgos-runner: worktree cleanup failed for "${worktreePath}": ${err.message}`);
-  }
-}
-
 /**
  * STARTUP REAP (reliability panel a/e/f): run BEFORE the frontier is even
  * computed, so `--once` is idempotent after a crash.
@@ -368,7 +357,7 @@ export async function startupReap({ repoRoot, dir, worktreeDir, verifyTimeoutMs,
     if (hasCommit) {
       let wt = null;
       try {
-        wt = createWorktree(repoRoot, id, { worktreeDir });
+        wt = createDispatchWorktree(repoRoot, id, { worktreeDir });
         verifyPassed = (await runGoalCheck(item, wt.path, verifyTimeoutMs)).passed;
       } catch (err) {
         // A worktree-fail here (e.g. this branch is irreconcilably checked
@@ -383,7 +372,7 @@ export async function startupReap({ repoRoot, dir, worktreeDir, verifyTimeoutMs,
           throw err;
         }
       } finally {
-        if (wt) safeRemoveWorktree(repoRoot, wt.path, log);
+        if (wt) removeDispatchWorktree(repoRoot, wt.path, log);
       }
     }
 
@@ -649,9 +638,9 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
         // already exists (an earlier sibling leaf, or the root's own prior
         // dispatch, already created it).
         createBranchRef(repoRoot, rootId, { baseRef: 'main' });
-        wt = createWorktree(repoRoot, item.id, { worktreeDir, baseRef: branchNameFor(rootId) });
+        wt = createDispatchWorktree(repoRoot, item.id, { worktreeDir, baseRef: branchNameFor(rootId) });
       } else {
-        wt = createWorktree(repoRoot, item.id, { worktreeDir });
+        wt = createDispatchWorktree(repoRoot, item.id, { worktreeDir });
       }
       if (dispatchBaseline === null) {
         dispatchBaseline = git(repoRoot, ['rev-parse', wt.branch]).trim();
@@ -763,7 +752,7 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
         throw err;
       }
     } finally {
-      if (wt) safeRemoveWorktree(repoRoot, wt.path, log);
+      if (wt) removeDispatchWorktree(repoRoot, wt.path, log);
     }
 
     const decision = resolveAction(failure.errorClass, attempt);

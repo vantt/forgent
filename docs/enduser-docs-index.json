@@ -11,6 +11,14 @@
     "quadrant": "how-to",
     "purpose": "Show the steps to accomplish one specific, already-understood goal.",
     "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/add-a-new-createworktree-call-site.md",
+    "title": "How to add a new `createWorktree` call site without hand-writing cleanup",
+    "sourceCaptureId": "choke-point-createworktree-callsite-wrapper"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
     "docPath": "docs/how-to/add-a-read-only-fgos-verb-and-plugin-skill.md",
     "title": "Add a read-only fgOS verb and its plugin skill",
     "sourceCaptureId": "tsk-4j9-3"
@@ -107,6 +115,22 @@
     "quadrant": "how-to",
     "purpose": "Show the steps to accomplish one specific, already-understood goal.",
     "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/launch-claude-in-a-new-herdr-pane-from-a-plugin.md",
+    "title": "Launch claude in a new herdr pane from a plugin",
+    "sourceCaptureId": "tsk-19y-3"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/poll-fgos-cli-data-from-a-rust-plugin.md",
+    "title": "Poll fgOS CLI data from a Rust plugin",
+    "sourceCaptureId": "tsk-19y-2"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
     "docPath": "docs/how-to/resolve-a-decision-id-collision-merge-conflict-on-approve.md",
     "title": "How to resolve an `fgos approve` merge-conflict caused by two branches claiming the same decision ID",
     "sourceCaptureId": "tsk-66l"
@@ -123,6 +147,14 @@
     "quadrant": "how-to",
     "purpose": "Show the steps to accomplish one specific, already-understood goal.",
     "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/scaffold-and-link-a-herdr-plugin.md",
+    "title": "Scaffold and link a herdr plugin",
+    "sourceCaptureId": "tsk-19y-1"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
     "docPath": "docs/how-to/see-done-items-in-list-and-triage.md",
     "title": "How to see done items in `fgos list` / `fgos triage`",
     "sourceCaptureId": "tsk-5oa"
@@ -134,6 +166,14 @@
     "docPath": "docs/how-to/smoke-test-fgos-executing-with-a-trivial-item.md",
     "title": "How to smoke-test fgos-executing with a trivial verify=true item",
     "sourceCaptureId": "str89-case-study-executing"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/unify-a-duplicated-clean-tree-check-across-return-and-approve.md",
+    "title": "How to unify two independently-written working-tree-clean checks into one scope-parameterized function",
+    "sourceCaptureId": "choke-point-workingtree-clean-duplication"
   },
   {
     "quadrant": "reference",
@@ -214,6 +254,14 @@
     "docPath": "docs/explanation/gate-bypass-design.md",
     "title": "Why gate-bypass is shaped the way it is",
     "sourceCaptureId": "tsk-6bx"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/herdr-fgos-dashboard-three-piece-build.md",
+    "title": "Why the herdr fgOS dashboard shipped as three sequential children, and what surfaced along the way",
+    "sourceCaptureId": "tsk-19y"
   },
   {
     "quadrant": "explanation",

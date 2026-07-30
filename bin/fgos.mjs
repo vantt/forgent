@@ -36,7 +36,7 @@ import { frozenJudgeHits } from '../src/runner/frozen-judge.mjs';
 import { classifySource, reviewDiff, mergeRunnerItem, cleanupMergedBranch, changedFiles, isWorkingTreeClean as isMainTreeClean, isFgosOnlyStatusLine, buildOwnFileSet, detectTrunk, isMainWorktree } from '../src/runner/merge.mjs';
 import { createGitHubPR, mergeGitHubPR, viewGitHubPRStatus } from '../src/runner/github-adapter.mjs';
 import { classifyIronLaw } from '../src/evolve/iron-law.mjs';
-import { branchNameFor, branchExists, createWorktree, removeWorktree } from '../src/runner/worktree.mjs';
+import { branchNameFor, branchExists, withMergeEphemeralWorktree } from '../src/runner/worktree.mjs';
 import { claimWork, ClaimError } from '../src/runner/claim-port.mjs';
 import {
   acquireMainCheckoutLock,
@@ -109,33 +109,17 @@ function currentHead(cwd) {
   return gitAt(cwd, ['rev-parse', 'HEAD']).trim();
 }
 
-// `.fgos/` is excluded from this check the same way merge.mjs's own
-// isWorkingTreeClean excludes it (isFgosOnlyStatusLine, shared rule): the
-// store is a live, self-mutating write door — return's own headAtReturn
-// event lands there as part of this very call — never a signal that the
-// code tree itself is dirty.
-//
-// Unlike merge.mjs's isWorkingTreeClean (approve's whole-repo gate), this is
 // `return`'s per-item gate — scoped to `cwd`'s OWN subtree, never the whole
-// real repo. `cwd` is the item's working directory, not necessarily the git
-// top-level (STR60 dogfood-fixture: `.fgos` under `repo/dogfood-fixture/`,
-// real top-level at `repo/`); an unrelated uncommitted file elsewhere in the
-// repo (outside `cwd`'s subtree) must never block a return for THIS item.
-// `git status --porcelain -- .`, run with `cwd` as the actual process cwd,
-// scopes git's own output to that subtree — but the reported paths are
-// STILL top-level-relative (verified empirically, same as the whole-repo
-// case), so the `.fgos/` exclusion still needs the same prefix fix
-// isWorkingTreeClean(repoRoot) above uses.
-//
-// `ownFileSet` (tsk-598, D2/D3): threaded straight through to
-// isFgosOnlyStatusLine, same fail-safe `null` default as merge.mjs's own
-// isWorkingTreeClean.
+// real repo (`cwd` is the item's working directory, not necessarily the git
+// top-level: STR60 dogfood-fixture has `.fgos` under `repo/dogfood-fixture/`,
+// real top-level at `repo/`; an unrelated uncommitted file elsewhere in the
+// repo must never block a return for THIS item). Delegates to merge.mjs's
+// isWorkingTreeClean (imported above as isMainTreeClean) with `scope:
+// 'subtree'` — the single shared implementation `approve`'s whole-repo gate
+// also uses, so both gates share one prefix computation and one `.fgos/`
+// exclusion rule instead of two.
 function isWorkingTreeClean(cwd, ownFileSet = null) {
-  const prefix = gitAt(cwd, ['rev-parse', '--show-prefix']).trim();
-  return gitAt(cwd, ['status', '--porcelain', '--', '.'])
-    .split('\n')
-    .filter((line) => line.trim() !== '')
-    .every((line) => isFgosOnlyStatusLine(line, prefix, ownFileSet));
+  return isMainTreeClean(cwd, ownFileSet, { scope: 'subtree' });
 }
 
 function commitsSince(cwd, from, to) {
@@ -1873,8 +1857,14 @@ async function runVerb(verb, flags, positional, dir) {
           // checkout of fgw/<rootId>; low-likelihood under single-operator
           // P6, D16's per-root merge-mutex lives in the runner's
           // write-queue, not this human-driven CLI verb.
-          const ephemeral = createWorktree(repoRoot, rootId, {});
-          try {
+          //
+          // withMergeEphemeralWorktree's own finally (worktree.mjs) removes
+          // the checkout on every exit path below (conflict, verify-fail,
+          // merged) — per D4/D17 that never deletes the branch itself.
+          // mergeRunnerItem's own conflict/verify-fail outcomes already
+          // leave the ephemeral checkout clean via `git merge --abort`, so
+          // no cleanupMergedBranch call is needed on those paths.
+          return await withMergeEphemeralWorktree(repoRoot, rootId, async (ephemeral) => {
             const result = await mergeRunnerItem(ephemeral.path, item, { timeoutMs });
 
             if (result.outcome === 'conflict') {
@@ -1936,16 +1926,7 @@ async function runVerb(verb, flags, positional, dir) {
               output: result.check.output,
               cleanupWarnings: cleanup.warnings,
             };
-          } finally {
-            // Per D4/D17: only the branch is durable, the worktree is
-            // always ephemeral — removeWorktree never deletes the branch,
-            // only the checkout. Runs on every exit path (conflict,
-            // verify-fail, merged) — mergeRunnerItem's own conflict/
-            // verify-fail outcomes already leave the ephemeral checkout
-            // clean via `git merge --abort`, so no cleanupMergedBranch call
-            // is needed on those paths.
-            removeWorktree(repoRoot, ephemeral.path, { force: true });
-          }
+          });
         }
 
         // Root merge into main — unchanged except for D8: a root that
@@ -2131,9 +2112,9 @@ async function runVerb(verb, flags, positional, dir) {
       // Ephemeral worktree checked out on the item's OWN branch (confirmed
       // to exist above, so this always takes the branch-reuse path — no
       // baseRef needed, D17: only the branch is durable, every checkout is
-      // ephemeral). Removed on every exit path via the finally block below.
-      const ephemeral = createWorktree(repoRoot, id, {});
-      try {
+      // ephemeral). Removed on every exit path via withMergeEphemeralWorktree's
+      // own finally (worktree.mjs).
+      return await withMergeEphemeralWorktree(repoRoot, id, async (ephemeral) => {
         let conflicted = false;
         try {
           execFileSync('git', ['merge', '--no-commit', '--no-ff', target], { cwd: ephemeral.path, encoding: 'utf8', shell: false });
@@ -2190,9 +2171,7 @@ async function runVerb(verb, flags, positional, dir) {
         // reason/ask required on this edge (fsm.mjs).
         const { event } = moveWork(dir, { id, to: 'awaiting-approval', expectedStatus: 'blocked', role: 'runner' });
         return { id, outcome: 'merged', from: 'blocked', to: 'awaiting-approval', target, branch: ownBranch, seq: event.seq, output: check.output };
-      } finally {
-        removeWorktree(repoRoot, ephemeral.path, { force: true });
-      }
+      });
     }
 
     // Gate A — candidate ranking (self-improve-loop P13 Slice 1, D1/D3/D6):
