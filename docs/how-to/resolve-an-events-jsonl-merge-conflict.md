@@ -122,7 +122,32 @@ applying:
 
 This doc's path (`docs/how-to/resolve-an-events-jsonl-merge-conflict.md`)
 is linked to a real compound-learn capture, gathered via `fgos doc-sources
-docs/how-to/resolve-an-events-jsonl-merge-conflict.md` once tagged. If a
-later item hits this same class of conflict, the export skill accumulates
-its capture here too, additively, without losing this section or anything
-above it.
+docs/how-to/resolve-an-events-jsonl-merge-conflict.md`:
+
+> ```json
+> {
+>   "id": "tsk-n4i-2",
+>   "predicted": {"tier":"heavy","deps":1,"priorVisits":0,"role":"session","branchHeadAtTake":"936a6a40443b6aa6ca1f1c216898180390e25f4a"},
+>   "actual": {"outcome":"awaiting-approval","passed":true,"attempts":1,"errorClass":null,"aheadCount":1},
+>   "docType": "how-to",
+>   "docPath": "docs/how-to/resolve-an-events-jsonl-merge-conflict.md"
+> }
+> ```
+> — real `work.outcome` capture, id `tsk-n4i-2`
+
+That capture's own work item is the task that wrote this document and its
+paired check script, as the second half of the same fix:
+
+> "Add fast-fail seq-contiguity check + resolution how-to for events.jsonl (tsk-n4i piece B)"
+> — real work item title, id `tsk-n4i-2`
+
+This item's own execution landed clean on the first attempt (`"attempts":1,
+"errorClass":null`) — the lesson this doc's Steps section captures (renumber
+via a targeted `seq` prefix replace, never a manual conflict-marker
+resolution) was already proven once, directly, while fixing `tsk-n4i-1`'s
+own historical corruption; this item packaged that proof into a reusable
+script and procedure rather than rediscovering it.
+
+If a later item hits this same class of conflict, the export skill
+accumulates its capture here too, additively, without losing this section
+or anything above it.
