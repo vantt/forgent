@@ -59,25 +59,71 @@ self-pace."
      empty. Stop the loop cleanly. Nothing to report as a problem.
    - `{picked: <id>, approve: {done}}` — a normal successful merge.
      Continue to the next iteration; forget any previously-tracked
-     blocked id (a successful merge always resets the count for whatever
-     was picked).
-   - `{picked: <id>, approve: {blocked, reason: ...}}` (merge-conflict,
-     verify-fail, or any other `approve`-reported block) or
-     `{picked: <id>, blocked: "iron-law", ...}` — a blocked pick. Compare
-     `<id>` against the id picked (and blocked) on the immediately
-     preceding iteration:
+     blocked id AND any previously-tracked self-resolve attempt (tsk-3mv D3:
+     a successful merge always resets both for whatever was picked).
+   - `{picked: <id>, approve: {blocked, reason: "verify-fail-post-merge"}}`,
+     and no self-resolve attempt has been made for this `<id>` yet in this
+     loop run — **agent-diagnose it before counting the block at all**
+     (tsk-3mv-2 D1b, CONTEXT.md's locked scope: this is the ONE block
+     reason this skill ever investigates; every other reason skips
+     straight to the plain block-counting bullets below). Walk
+     `docs/how-to/diagnose-a-verify-fail-post-merge-block-on-approve.md`'s
+     steps directly, in this same session:
+     1. Read `approve`'s own `output` field from the response (the full
+        test-suite output, not just the recorded `verify` command) and
+        identify exactly which test(s) failed.
+     2. Check whether the failing test's file is inside the item's own
+        diff (`fgos review <id>` or the branch's changed files) — a
+        failure in a file the item never touched is the first signal it's
+        unrelated noise.
+     3. Re-run the failing test file alone a few times
+        (`node --test path/to/the-failing.test.mjs`) — reproduces
+        deterministically (a genuine pre-existing bug) or only fails under
+        the full-suite run (load-induced flake).
+     4. If it's a genuine pre-existing bug, fix it as its own separate
+        commit directly on `main` — never folded into `<id>`'s own
+        branch/commits. Confirm the fix with the specific failing test,
+        then the full suite, before moving on. If it's flake, no fix is
+        needed.
+     5. Either way, retry once: `fgos move <id> --to proposed` (the FSM's
+        `blocked -> proposed` recovery door for this exact reason), then
+        run `/fgOS:merge-next` again.
+     Record `<id>` as "self-resolve already attempted" before retrying,
+     regardless of outcome — this playbook runs **at most once per id per
+     loop run** (tsk-3mv D3: no hard attempt-count cap overall, but never a
+     second blind attempt at the same fix). Then read the retry's own
+     result:
+     - `{picked: <id>, approve: {done}}` — continue the loop normally (the
+       successful-merge bullet above already covers forgetting the tracked
+       state).
+     - Blocked again, for any reason (identical `verify-fail-post-merge`
+       with no progress, or now a different reason) — this **is** the
+       tsk-3mv D3 "no progress" stop condition. Do not retry the playbook
+       a second time and do not fall through to the block-counting bullets
+       below — stop the loop immediately and report, same as the
+       same-id-blocked-twice bullet already does.
+   - `{picked: <id>, approve: {blocked, reason: ...}}` (`merge-conflict`,
+     plain `verify-fail`, `integration-drift`, or any other
+     `approve`-reported block this skill never investigates — including a
+     `verify-fail-post-merge` block on an `<id>` already self-resolve-
+     attempted this run) or `{picked: <id>, blocked: "iron-law", ...}` — a
+     blocked pick. Compare `<id>` against the id picked (and blocked) on
+     the immediately preceding iteration:
      - **Different id, or this is the first blocked pick of the run** —
        normal. Continue to the next iteration, remembering this `<id>` as
        "last blocked."
      - **Same `<id>` blocked on two consecutive iterations in a row**
-       (whether both are Iron Law, both are merge-conflict/verify-fail,
-       or one of each) — stop the loop. Report the id and the block
-       reason(s) in a plain chat message in the current conversation.
-       Never call `fgos ask <id>` to park it, and never run
-       `/fgOS:approve <id> --acknowledge-iron-law` on this skill's own
-       authority — a person has to look at it.
+       (whether both are Iron Law, both are merge-conflict/verify-fail, or
+       one of each) — stop the loop. Report the id and the block reason(s)
+       in a plain chat message in the current conversation. Never call
+       `fgos ask <id>` to park it, and never run `/fgOS:approve <id>
+       --acknowledge-iron-law` on this skill's own authority — an Iron Law
+       block always needs a real human operator (RUL34/RUL37,
+       `docs/specs/runner.md`), with no exception this skill is ever
+       allowed to apply.
 
 5. **Report on stop.** Whichever condition ends the loop, say plainly
-   which one it was (frontier empty vs. same-id-blocked-twice) and, for
-   the latter, which id and why. There is nothing further to do
-   automatically past that point.
+   which one it was (frontier empty, a D1b self-resolve attempt that made
+   no progress, or same-id-blocked-twice) and, for the latter two, which
+   id and why. There is nothing further to do automatically past that
+   point.

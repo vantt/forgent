@@ -14,6 +14,7 @@ import {
   isWorkingTreeClean,
   isFgosOnlyStatusLine,
   buildOwnFileSet,
+  classifyDecisionIndexCollision,
 } from '../../src/runner/merge.mjs';
 import { branchNameFor } from '../../src/runner/worktree.mjs';
 import { acquireMainCheckoutLock, ACQUIRED } from '../../src/runner/main-checkout-lock.mjs';
@@ -350,6 +351,173 @@ test('mergeRunnerItem aborts cleanly on a real conflict — main left byte-for-b
   assert.equal(headOf(repoRoot), headBefore, 'HEAD must be unchanged after an aborted merge');
   assert.equal(isWorkingTreeClean(repoRoot), true, 'tree must be clean after merge --abort');
   assert.equal(fs.readFileSync(path.join(repoRoot, 'shared.txt'), 'utf8'), 'main-change\n');
+});
+
+// --- mergeRunnerItem: decision-ID collision auto-resolve (tsk-3mv-1 D1a) ---
+// Mirrors the real occurrence (tsk-66l,
+// docs/how-to/resolve-a-decision-id-collision-merge-conflict-on-approve.md):
+// two branches independently pick the same "next free" decision id and each
+// insert their own row for it into docs/decisions/0000-index.md at the same
+// position, while adding two DIFFERENT decision files under that id.
+
+function writeDecisionIndex(repoRoot, rows) {
+  const content = ['---', 'title: index', '---', '', '# Index', '', ...rows, ''].join('\n');
+  fs.mkdirSync(path.join(repoRoot, 'docs/decisions'), { recursive: true });
+  fs.writeFileSync(path.join(repoRoot, 'docs/decisions/0000-index.md'), content);
+}
+
+function writeDecisionFile(repoRoot, id, slug, title) {
+  const relPath = `docs/decisions/${id}-${slug}.md`;
+  const content = ['---', `title: ${id} — ${title}`, '---', '', `# ${id} — ${title}`, '', 'body', ''].join('\n');
+  fs.mkdirSync(path.join(repoRoot, 'docs/decisions'), { recursive: true });
+  fs.writeFileSync(path.join(repoRoot, relPath), content);
+  return relPath;
+}
+
+test('mergeRunnerItem self-resolves a decision-ID collision (both sides independently claim the same next-free id under two different files) -- renumbers the branch\'s file to the real next-free id, keeps both rows, outcome "merged" with selfResolved', async () => {
+  const repoRoot = initRepo();
+  writeDecisionFile(repoRoot, '0021', 'x', 'X');
+  writeDecisionIndex(repoRoot, ['| [0021](0021-x.md) | X |']);
+  git(repoRoot, ['add', 'docs/decisions']);
+  git(repoRoot, ['commit', '-q', '-m', 'seed decisions']);
+
+  git(repoRoot, ['checkout', '-b', 'fgw/demo-item']);
+  writeDecisionFile(repoRoot, '0022', 'branch-decision', 'Branch decision');
+  writeDecisionIndex(repoRoot, ['| [0021](0021-x.md) | X |', '| [0022](0022-branch-decision.md) | Branch decision |']);
+  git(repoRoot, ['add', 'docs/decisions']);
+  git(repoRoot, ['commit', '-q', '-m', 'branch: add 0022']);
+  git(repoRoot, ['checkout', 'main']);
+
+  writeDecisionFile(repoRoot, '0022', 'main-decision', 'Main decision');
+  writeDecisionIndex(repoRoot, ['| [0021](0021-x.md) | X |', '| [0022](0022-main-decision.md) | Main decision |']);
+  git(repoRoot, ['add', 'docs/decisions']);
+  git(repoRoot, ['commit', '-q', '-m', 'main: add 0022']);
+
+  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'true' }));
+  assert.equal(result.outcome, 'merged');
+  assert.equal(result.selfResolved, true);
+  assert.equal(fs.existsSync(path.join(repoRoot, 'docs/decisions/0022-branch-decision.md')), false, 'branch\'s colliding file must be renamed away, not left under its old id');
+  assert.equal(fs.existsSync(path.join(repoRoot, 'docs/decisions/0023-branch-decision.md')), true, 'renamed to the real next-free id (0021,0022 already taken)');
+  const renamed = fs.readFileSync(path.join(repoRoot, 'docs/decisions/0023-branch-decision.md'), 'utf8');
+  assert.match(renamed, /title: 0023 — Branch decision/, 'frontmatter title self-reference must be rewritten to the new id');
+  assert.match(renamed, /^# 0023 — Branch decision/m, 'heading self-reference must be rewritten to the new id');
+  const index = fs.readFileSync(path.join(repoRoot, 'docs/decisions/0000-index.md'), 'utf8');
+  assert.doesNotMatch(index, /<<<<<<</, 'no leftover conflict markers');
+  assert.match(index, /\| \[0022\]\(0022-main-decision\.md\) \| Main decision \|/, 'ours (main\'s own) row is never touched');
+  assert.match(index, /\| \[0023\]\(0023-branch-decision\.md\) \| Branch decision \|/, 'theirs row reflects the rename, both rows kept');
+  assert.equal(isWorkingTreeClean(repoRoot), true);
+});
+
+test('mergeRunnerItem self-resolves a purely positional decision-index collision (two DIFFERENT, non-colliding ids inserted at the same position) without renumbering either side', async () => {
+  const repoRoot = initRepo();
+  writeDecisionFile(repoRoot, '0021', 'x', 'X');
+  writeDecisionIndex(repoRoot, ['| [0021](0021-x.md) | X |']);
+  git(repoRoot, ['add', 'docs/decisions']);
+  git(repoRoot, ['commit', '-q', '-m', 'seed decisions']);
+
+  git(repoRoot, ['checkout', '-b', 'fgw/demo-item']);
+  writeDecisionFile(repoRoot, '0030', 'branch-only', 'Branch only');
+  writeDecisionIndex(repoRoot, ['| [0021](0021-x.md) | X |', '| [0030](0030-branch-only.md) | Branch only |']);
+  git(repoRoot, ['add', 'docs/decisions']);
+  git(repoRoot, ['commit', '-q', '-m', 'branch: add 0030']);
+  git(repoRoot, ['checkout', 'main']);
+
+  writeDecisionFile(repoRoot, '0025', 'main-only', 'Main only');
+  writeDecisionIndex(repoRoot, ['| [0021](0021-x.md) | X |', '| [0025](0025-main-only.md) | Main only |']);
+  git(repoRoot, ['add', 'docs/decisions']);
+  git(repoRoot, ['commit', '-q', '-m', 'main: add 0025']);
+
+  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'true' }));
+  assert.equal(result.outcome, 'merged');
+  assert.equal(result.selfResolved, true);
+  assert.equal(fs.existsSync(path.join(repoRoot, 'docs/decisions/0030-branch-only.md')), true, 'no collision -- branch\'s file keeps its own id, never renamed');
+  const index = fs.readFileSync(path.join(repoRoot, 'docs/decisions/0000-index.md'), 'utf8');
+  assert.doesNotMatch(index, /<<<<<<</);
+  const rowOrder = [...index.matchAll(/\| \[(\d{4})\]/g)].map((m) => m[1]);
+  assert.deepEqual(rowOrder, ['0021', '0025', '0030'], 'both new rows kept, in numeric order');
+});
+
+test('mergeRunnerItem does NOT self-resolve a same-row edit dispute inside docs/decisions/0000-index.md (both sides change the SAME existing row\'s text) -- classifyDecisionIndexCollision returns null, outcome stays "conflict"', async () => {
+  const repoRoot = initRepo();
+  writeDecisionFile(repoRoot, '0021', 'x', 'X');
+  writeDecisionIndex(repoRoot, ['| [0021](0021-x.md) | Original |']);
+  git(repoRoot, ['add', 'docs/decisions']);
+  git(repoRoot, ['commit', '-q', '-m', 'seed decisions']);
+
+  git(repoRoot, ['checkout', '-b', 'fgw/demo-item']);
+  writeDecisionIndex(repoRoot, ['| [0021](0021-x.md) | Branch-edited |']);
+  git(repoRoot, ['add', 'docs/decisions']);
+  git(repoRoot, ['commit', '-q', '-m', 'branch: edit 0021 row text']);
+  git(repoRoot, ['checkout', 'main']);
+
+  writeDecisionIndex(repoRoot, ['| [0021](0021-x.md) | Main-edited |']);
+  git(repoRoot, ['add', 'docs/decisions']);
+  git(repoRoot, ['commit', '-q', '-m', 'main: edit 0021 row text']);
+
+  const headBefore = headOf(repoRoot);
+  const result = await mergeRunnerItem(repoRoot, makeItem());
+  assert.equal(result.outcome, 'conflict');
+  assert.equal(result.selfResolved, undefined, 'a same-row edit must never be reported as self-resolved');
+  assert.equal(headOf(repoRoot), headBefore, 'HEAD must be unchanged -- an edit dispute is never auto-resolved');
+  assert.equal(isWorkingTreeClean(repoRoot), true);
+  assert.equal(fs.readFileSync(path.join(repoRoot, 'docs/decisions/0000-index.md'), 'utf8'), '---\ntitle: index\n---\n\n# Index\n\n| [0021](0021-x.md) | Main-edited |\n', 'main\'s own row content is untouched after the abort');
+});
+
+test('classifyDecisionIndexCollision returns null for a same-row edit dispute even in isolation (shared link target between ours/theirs)', async () => {
+  const repoRoot = initRepo();
+  writeDecisionFile(repoRoot, '0021', 'x', 'X');
+  writeDecisionIndex(repoRoot, ['| [0021](0021-x.md) | Original |']);
+  git(repoRoot, ['add', 'docs/decisions']);
+  git(repoRoot, ['commit', '-q', '-m', 'seed decisions']);
+
+  git(repoRoot, ['checkout', '-b', 'fgw/demo-item']);
+  writeDecisionIndex(repoRoot, ['| [0021](0021-x.md) | Branch-edited |']);
+  git(repoRoot, ['add', 'docs/decisions']);
+  git(repoRoot, ['commit', '-q', '-m', 'branch: edit 0021 row text']);
+  git(repoRoot, ['checkout', 'main']);
+
+  writeDecisionIndex(repoRoot, ['| [0021](0021-x.md) | Main-edited |']);
+  git(repoRoot, ['add', 'docs/decisions']);
+  git(repoRoot, ['commit', '-q', '-m', 'main: edit 0021 row text']);
+
+  try {
+    git(repoRoot, ['merge', '--no-commit', '--no-ff', 'fgw/demo-item']);
+    assert.fail('expected the merge to conflict');
+  } catch {
+    // expected -- stay mid-conflict to classify it, same state mergeRunnerItemLocked sees
+  }
+  assert.equal(classifyDecisionIndexCollision(repoRoot), null);
+  git(repoRoot, ['merge', '--abort']);
+});
+
+test('mergeRunnerItem does NOT self-resolve when the conflict is not confined to docs/decisions/0000-index.md (an otherwise-self-resolvable index collision alongside an unrelated real conflict)', async () => {
+  const repoRoot = initRepo();
+  writeDecisionFile(repoRoot, '0021', 'x', 'X');
+  writeDecisionIndex(repoRoot, ['| [0021](0021-x.md) | X |']);
+  fs.writeFileSync(path.join(repoRoot, 'shared.txt'), 'base\n');
+  git(repoRoot, ['add', 'docs/decisions', 'shared.txt']);
+  git(repoRoot, ['commit', '-q', '-m', 'seed decisions + shared.txt']);
+
+  git(repoRoot, ['checkout', '-b', 'fgw/demo-item']);
+  writeDecisionFile(repoRoot, '0022', 'branch-decision', 'Branch decision');
+  writeDecisionIndex(repoRoot, ['| [0021](0021-x.md) | X |', '| [0022](0022-branch-decision.md) | Branch decision |']);
+  fs.writeFileSync(path.join(repoRoot, 'shared.txt'), 'branch-change\n');
+  git(repoRoot, ['add', 'docs/decisions', 'shared.txt']);
+  git(repoRoot, ['commit', '-q', '-m', 'branch: add 0022 + edit shared.txt']);
+  git(repoRoot, ['checkout', 'main']);
+
+  writeDecisionFile(repoRoot, '0022', 'main-decision', 'Main decision');
+  writeDecisionIndex(repoRoot, ['| [0021](0021-x.md) | X |', '| [0022](0022-main-decision.md) | Main decision |']);
+  fs.writeFileSync(path.join(repoRoot, 'shared.txt'), 'main-change\n');
+  git(repoRoot, ['add', 'docs/decisions', 'shared.txt']);
+  git(repoRoot, ['commit', '-q', '-m', 'main: add 0022 + edit shared.txt']);
+
+  const headBefore = headOf(repoRoot);
+  const result = await mergeRunnerItem(repoRoot, makeItem());
+  assert.equal(result.outcome, 'conflict');
+  assert.equal(result.selfResolved, undefined);
+  assert.equal(headOf(repoRoot), headBefore);
+  assert.equal(isWorkingTreeClean(repoRoot), true);
 });
 
 test('mergeRunnerItem aborts cleanly when the staged merge fails its own verify — main left unchanged, outcome "verify-fail"', async () => {
