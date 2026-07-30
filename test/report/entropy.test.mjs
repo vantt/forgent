@@ -66,6 +66,26 @@ test('computeEntropy does not flag an item whose stage has already advanced past
   assert.equal(computeEntropy(view).score, 0);
 });
 
+// wontfix-terminal-status-filter-consistency D3: status is never reset by a
+// stage transition and vice versa -- an item closed done/wontfix while
+// still carrying its old stage:'clarify' must not inflate this signal, since
+// nothing further will ever happen at that stage for a resolved item.
+for (const status of ['done', 'wontfix']) {
+  test(`computeEntropy does not flag a "${status}" item still carrying stage "clarify" -- resolved items are no longer waiting anywhere (D3)`, () => {
+    const view = { work: { a: { id: 'a', status, stage: 'clarify' } } };
+    const { parts } = computeEntropy(view);
+    assert.equal(parts.find((p) => p.label === 'stage-clarify').count, 0);
+  });
+}
+
+for (const status of ['todo', 'doing', 'blocked', 'awaiting-human']) {
+  test(`computeEntropy still flags a "${status}" item at stage "clarify" (D3 does not over-broaden past done/wontfix)`, () => {
+    const view = { work: { a: { id: 'a', status, stage: 'clarify' } } };
+    const { parts } = computeEntropy(view);
+    assert.equal(parts.find((p) => p.label === 'stage-clarify').count, 1);
+  });
+}
+
 test('computeEntropy weighs a friction record with no later settlement on the same id at ×2', () => {
   const view = {
     work: { a: { id: 'a', status: 'todo' } },

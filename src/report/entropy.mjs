@@ -12,6 +12,8 @@
 // CLI-layer concern (bin/fgos.mjs's `check` verb) — this module never
 // resolves a data dir and never writes.
 
+import { RESOLVED_STATUSES } from '../state/frontier.mjs';
+
 const FINAL_STATUSES = new Set(['awaiting-approval', 'blocked', 'done']);
 
 // Weights modeled on the consult report's sample scheme (L107 — cited, not
@@ -82,8 +84,17 @@ function countAwaitingHuman(view) {
   return Object.values(view.work ?? {}).filter((w) => w.status === 'awaiting-human').length;
 }
 
+// wontfix-terminal-status-filter-consistency D3: `stage` is never reset by
+// any status transition (replay.mjs's `work.move` only ever writes
+// `item.status`; only a dedicated move-stage event touches `item.stage`) —
+// so an item closed `done`/`wontfix` while still carrying stage `clarify`
+// from before it was ever explored would otherwise inflate this signal
+// forever. A RESOLVED item is no longer "waiting" at any stage; its stage
+// field is a historical artifact, not a live entropy signal.
 function countStageClarify(view) {
-  return Object.values(view.work ?? {}).filter((w) => w.stage === 'clarify').length;
+  return Object.values(view.work ?? {}).filter(
+    (w) => w.stage === 'clarify' && !RESOLVED_STATUSES.has(w.status),
+  ).length;
 }
 
 /**
