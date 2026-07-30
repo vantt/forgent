@@ -82,10 +82,10 @@ test('rankImpact is deterministic: same view always yields the same ordered outp
   assert.deepEqual(rankImpact(view), rankImpact(view));
 });
 
-test('rankImpact emits every human-facing field: id, title, status, blocks, stage, goalTier, componentId, componentSize, isIsolated', () => {
+test('rankImpact emits every human-facing field: id, title, status, blocks, blockedBy, stage, goalTier, componentId, componentSize, isIsolated', () => {
   const view = { work: { a: item('a', 'blocked', []) } };
   assert.deepEqual(rankImpact(view), [{
-    id: 'a', title: 'title-a', status: 'blocked', blocks: 0,
+    id: 'a', title: 'title-a', status: 'blocked', blocks: 0, blockedBy: [],
     stage: 'executing', goalTier: null, componentId: 0, componentSize: 1, isIsolated: true,
   }]);
 });
@@ -187,6 +187,65 @@ test('rankImpact excludes a done member from componentSize/isIsolated: a finishe
   assert.equal(openRow.isIsolated, true);
 });
 
+// --- blockedBy (tsk-dus D1/D2) ---------------------------------------------
+
+test('rankImpact.blockedBy lists a deps-only item\'s unmet deps', () => {
+  const view = {
+    work: {
+      base: item('base', 'todo'),
+      dep1: item('dep1', 'todo', ['base']),
+      dep2: item('dep2', 'todo', ['base']),
+    },
+  };
+  const rows = Object.fromEntries(rankImpact(view).map((r) => [r.id, r.blockedBy]));
+  assert.deepEqual(rows, { base: [], dep1: ['base'], dep2: ['base'] });
+});
+
+test('rankImpact.blockedBy lists a parent\'s still-open child, not the other way around', () => {
+  const view = {
+    work: {
+      root: item('root', 'todo'),
+      child: item('child', 'todo', [], { parent: 'root' }),
+    },
+  };
+  const rows = Object.fromEntries(rankImpact(view).map((r) => [r.id, r.blockedBy]));
+  assert.deepEqual(rows, { root: ['child'], child: [] });
+});
+
+test('rankImpact.blockedBy combines deps-credit and parent-credit on the same item', () => {
+  const view = {
+    work: {
+      hub: item('hub', 'todo'),
+      dependent: item('dependent', 'todo', ['hub']),
+      child: item('child', 'todo', [], { parent: 'hub' }),
+    },
+  };
+  const rows = Object.fromEntries(rankImpact(view).map((r) => [r.id, r.blockedBy]));
+  assert.deepEqual(rows, { hub: ['child'], dependent: ['hub'], child: [] });
+});
+
+test('rankImpact.blockedBy excludes a done dependency: a finished dep never appears', () => {
+  const view = {
+    work: {
+      openItem: item('openItem', 'todo', ['finishedDep']),
+      finishedDep: item('finishedDep', 'done'),
+    },
+  };
+  const [openRow] = rankImpact(view);
+  assert.deepEqual(openRow.blockedBy, []);
+});
+
+test('rankImpact({includeDone: true}).blockedBy is always [] for a done row', () => {
+  const view = {
+    work: {
+      base: item('base', 'todo', ['finished']),
+      finished: item('finished', 'done'),
+    },
+  };
+  const [doneRow] = rankImpact(view, { includeDone: true }).filter((r) => r.id === 'finished');
+  assert.deepEqual(doneRow.blockedBy, []);
+});
+
 // --- opts.includeDone (tsk-5oa D1) ----------------------------------------
 
 test('rankImpact with no second argument (or includeDone falsy) is byte-identical to today\'s single-arg behavior', () => {
@@ -225,7 +284,7 @@ test('rankImpact({includeDone: true}) always gives a done row blocks:0, componen
   };
   const [doneRow] = rankImpact(view, { includeDone: true }).filter((r) => r.id === 'finished');
   assert.deepEqual(doneRow, {
-    id: 'finished', title: 'title-finished', status: 'done', blocks: 0,
+    id: 'finished', title: 'title-finished', status: 'done', blocks: 0, blockedBy: [],
     stage: 'executing', goalTier: null, componentId: null, componentSize: 0, isIsolated: true,
   });
 });
