@@ -155,6 +155,51 @@ npm test
 
 `npm test` green is this item's done-proof (`AGENTS.md` L5 question 5).
 
+## Validating verdict: READY WITH CONSTRAINTS
+
+Baseline, actually run before any edit —
+`node --test test/runner/worktree.test.mjs test/runner/loop.test.mjs test/cli/take-pick-claim-eligibility.test.mjs`
+→ `tests 76 / pass 76 / fail 0` (5.34s). That is the unedited-green bar rows
+C1/C2 below are measured against.
+
+Four constraints, each from evidence found while proving this plan. None
+reopens `CONTEXT.md`; C1 and C4 choose between options this plan already
+wrote, C2 and C3 correct its call-site inventory.
+
+- **C1 — implement reattach in `createClaimWorktree`, not in
+  `createWorktree`'s reuse path.** This plan's Phase 1 allowed either. The
+  narrower one is strictly safer: `createClaimWorktree`
+  (`worktree.mjs:319`) can call the module-private `findCheckoutPath`
+  (`:110`, same module, no export needed) and early-return before
+  `createWorktree` is ever entered, leaving that function byte-identical.
+  The leak risk then cannot happen structurally, rather than being
+  prevented by an opt that defaults off.
+- **C2 — `reclaimOrphanedCheckout` has a second direct caller this plan's
+  risk map missed: `src/runner/merge.mjs:786` (`cleanupMergedBranch`).** So
+  the guard is reached from exactly two places — `worktree.mjs:257` and
+  that one — not just the reuse path. Under C1 both stay untouched;
+  recorded because the plan's inventory said otherwise.
+- **C3 — reattach only accepts a found checkout under the caller's own
+  `worktreeDir`.** `pick` always passes `<cwd>/.claude/worktrees`
+  (`bin/fgos.mjs:1573`), and every checkout registered in this repo today
+  sits there (`git worktree list --porcelain`, 7 `fgw/*` entries, all under
+  `.claude/worktrees/`). But `createWorktree`'s own default is
+  `os.tmpdir()/fgos-worktrees`, so a runner-dispatch checkout for the same
+  id could be registered elsewhere — and a *live* one implies a running
+  runner, which must not be reattached to. Anything outside the caller's
+  `worktreeDir` falls through to today's behavior.
+- **C4 — reattach must `fs.existsSync` the path `findCheckoutPath`
+  returns.** That helper (`:110-123`) reports the registration without
+  checking the disk. When the directory is gone, fall through to the
+  existing prune-then-add path (`worktree.mjs:183-195`) rather than
+  returning a dead path.
+
+Where the new coverage lands: `test/cli/fgos.test.mjs:3315-3346` is already
+the §3b second-pick test. It asserts `from`, `branchHeadAtTake`,
+`worktree.branch`, and `worktree.reused === true` — all four still hold
+under reattach, so it stays green unmodified, and the path-identity
+assertion belongs there.
+
 ## Open questions for `fgos-validating`
 
 - Does any caller need to distinguish a reattached existing checkout from a
