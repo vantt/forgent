@@ -7,6 +7,8 @@
 //   risk       -> risk   | proof of done -> verify      | learning left    -> learn (optional)
 // plus id/title/status/deps to identify, name, place-in-FSM, and link work.
 
+import fs from 'node:fs';
+import path from 'node:path';
 import { DOMAINS, DEFAULT_DOMAIN } from './workflow-stage-graphs.mjs';
 
 /** Error raised by this module. `category` is the CLI exit-code contract (R4). */
@@ -402,6 +404,63 @@ export function validateWork(work, existingIds) {
   validateWorkShape(work);
   if (existingIds !== undefined) {
     validateDeps(work, existingIds);
+  }
+  return true;
+}
+
+// Path-like substring: at least one "/" separator and a file extension,
+// e.g. "docs/history/foo/CONTEXT.md" or "src/state/work.mjs". Deliberately
+// excludes a bare filename with no directory separator (e.g. "work.mjs"
+// alone) -- requiring a directory segment cuts down on false positives
+// against ordinary prose ("e.g.", "v1.2", etc.).
+const PATH_LIKE_TOKEN = /[\w.-]+(?:\/[\w.-]+)+\.[\w-]+/g;
+
+/**
+ * tsk-5q5-2 (D1/D3, docs/history/judge-verdict-evidence-discipline/): a
+ * narrow write-time check on `work.acceptance` clauses that supply `text`
+ * AND `evidence` TOGETHER in the same write — never a clause with `text`
+ * only (RUL58 D4's existing "evidence added later" allowance is untouched,
+ * since such a clause never enters the loop below). Confirmed failure this
+ * backstops: `tsk-d3c`'s own acceptance array asserted a root cause and an
+ * evidence citation for it at the same time, both wrong.
+ *
+ * "Traceable" here is MECHANICAL, not semantic: at least one path-like
+ * substring in `evidence` must resolve to a real file under `repoRoot`. This
+ * catches an evidence string that cites nothing checkable at all — it does
+ * NOT verify the cited file actually says what the clause claims, which is
+ * a judgment call this item's own CONTEXT.md D3 leaves open, not something
+ * a pure shape validator can prove.
+ *
+ * Throws `WorkValidationError` (category='validation', same contract as
+ * every other shape rule in this file) naming the offending clause. A
+ * clause with `text` only (no `evidence`), a missing `work.acceptance`, or
+ * an omitted `repoRoot` all leave this a no-op — opt-in, called only from
+ * store.mjs's `addWork`/`editWork`, the only callers with a real repo root
+ * to check against.
+ */
+export function checkAcceptanceEvidenceTraceable(work, repoRoot) {
+  if (!Array.isArray(work?.acceptance) || typeof repoRoot !== 'string' || !repoRoot) {
+    return true;
+  }
+  for (const clause of work.acceptance) {
+    const hasText = typeof clause?.text === 'string' && clause.text.trim();
+    const hasEvidence = typeof clause?.evidence === 'string' && clause.evidence.trim();
+    if (!hasText || !hasEvidence) continue;
+
+    const candidates = clause.evidence.match(PATH_LIKE_TOKEN) ?? [];
+    const traceable = candidates.some((candidate) => {
+      try {
+        return fs.existsSync(path.join(repoRoot, candidate));
+      } catch {
+        return false;
+      }
+    });
+    if (!traceable) {
+      throw new WorkValidationError(
+        `work.acceptance clause with both "text" and "evidence" must cite a real, existing path in ` +
+          `"evidence" — none found/resolved in: ${JSON.stringify(clause.evidence)}`,
+      );
+    }
   }
   return true;
 }
