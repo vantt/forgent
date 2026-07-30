@@ -57,27 +57,24 @@ read never appends an event).
 
 3. **Report as a table and stop.** Render every row from `data`, in the
    order given (do not re-sort), as a markdown table with exactly these
-   columns, in this order: **id**, **blocks**, **goalTier**, **stage**,
-   **component**, **title**.
+   columns, in this order: **id**, **status**, **stage**, **blocked-by**,
+   **blocks**, **tier**, **title**.
+   - `status` is the item's raw status (`todo` | `doing` | `blocked` |
+     `awaiting-human` | `awaiting-approval` | `done`), rendered as-is.
+   - `stage` (`clarify` | `decompose` | `executing` | `compound-learn`) is
+     always present (defaults to `executing` when the raw record has none).
+   - `blocked-by` renders `blockedBy` — the ids of OTHER still-open items
+     THIS row directly waits on (its own unmet `deps`, plus — when this row
+     is itself a parent — any still-open child naming it as `parent`) — as
+     a comma-joined list (e.g. `tsk-a, tsk-b`). Render `-` when the list is
+     empty, not a blank cell.
    - `blocks` is how many other still-open items directly wait on this one
      — either through a `deps` entry, or (for a parent item) an open child
      naming it as `parent`. A done row (only present with `--all`) always
      carries `blocks: 0` — a finished item can never block anything.
-   - `goalTier` is optional (`mvp` | `milestone`) — an item with no declared
-     tier is a plain work-item; render its cell as `-`, not blank or
-     "undefined".
-   - `stage` (`clarify` | `decompose` | `executing` | `compound-learn`) is
-     always present (defaults to `executing` when the raw record has none).
-   - `component`: when `isIsolated` is `true` and `componentSize` is not
-     `0`, render `isolated` — the item shares no dependency or lineage edge
-     with any OTHER STILL-OPEN item, so finishing it has no remaining
-     structural fan-out beyond its own `blocks` count. When `componentSize`
-     is `0` (a done row, only present with `--all`), render `-` instead —
-     a finished item was never really "isolated" or "clustered", it is
-     just outside the open-item graph entirely. Otherwise render `cluster
-     of <componentSize>` — it shares a dependency or lineage chain with
-     other still-open work (a finished dependency or parent never counts
-     toward this).
+   - `tier` renders `goalTier`, optional (`mvp` | `milestone`) — an item
+     with no declared tier is a plain work-item; render its cell as `-`,
+     not blank or "undefined".
 
    If `data` is empty, say so plainly — an empty result is valid (nothing
    open right now, or nothing at all with `--all`), not a failure.

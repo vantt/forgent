@@ -54,14 +54,24 @@ function tierRank(goalTier) {
  * descending (a bigger cluster is a higher-leverage pick at an equal blocks
  * count), ties broken by ascending id.
  *
+ * Each row also carries `blockedBy` (tsk-dus D1/D2) — the ids of OTHER
+ * still-open items THIS item directly waits on: its own unmet `deps`
+ * entries, plus (when this item is itself a parent) any still-open child
+ * naming it as `parent`. It is the exact reverse of `blocks`' own edge
+ * direction over the same unified graph, so a parent item's `blockedBy`
+ * correctly lists its still-open children (finishing the last one is what
+ * actually unblocks the parent), not just its own `deps`. Sorted ascending
+ * for deterministic output — edge order otherwise follows declaration
+ * order, not id order.
+ *
  * `opts.includeDone` (tsk-5oa D1, default falsy — byte-identical to the
  * pre-existing single-arg call): when true, appends one row per
  * `status === 'done'` item after every open row. A done item can never
  * block anything (its dependents are already unblocked) or add real
  * leverage to a cluster, so each done row always carries `blocks: 0`,
- * `componentId: null`, `componentSize: 0`, `isIsolated: true` — done rows
- * are sorted only by tier then id among themselves, never interleaved with
- * open rows.
+ * `blockedBy: []`, `componentId: null`, `componentSize: 0`,
+ * `isIsolated: true` — done rows are sorted only by tier then id among
+ * themselves, never interleaved with open rows.
  */
 export function rankImpact(view, opts = {}) {
   const work = view?.work ?? {};
@@ -69,11 +79,16 @@ export function rankImpact(view, opts = {}) {
   const openSet = new Set(openIds);
 
   const blockCounts = new Map(openIds.map((id) => [id, 0]));
+  const blockedByOf = new Map(openIds.map((id) => [id, []]));
   for (const { from, to } of buildUnifiedEdges(work)) {
     if (openSet.has(from) && blockCounts.has(to)) {
       blockCounts.set(to, blockCounts.get(to) + 1);
     }
+    if (blockedByOf.has(from) && openSet.has(to)) {
+      blockedByOf.get(from).push(to);
+    }
   }
+  for (const ids of blockedByOf.values()) ids.sort();
 
   // connectedComponents groups over every id in `.work` with no status
   // filter of its own (it is a whole-graph structural view, correctly so
@@ -97,6 +112,7 @@ export function rankImpact(view, opts = {}) {
       title: item.title,
       status: item.status,
       blocks: blockCounts.get(id),
+      blockedBy: blockedByOf.get(id),
       stage: item.stage ?? 'executing',
       goalTier: item.goalTier ?? null,
       componentId,
@@ -122,6 +138,7 @@ export function rankImpact(view, opts = {}) {
         title: item.title,
         status: item.status,
         blocks: 0,
+        blockedBy: [],
         stage: item.stage ?? 'executing',
         goalTier: item.goalTier ?? null,
         componentId: null,
