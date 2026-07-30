@@ -14,8 +14,9 @@ an item that has not yet reached the frontier (`fgos ready`) — i.e. its
 ## Before you start
 
 - You need the item's id (`fgos list` shows every item's `stage`).
-- This applies to a fresh session about to do clarify/decompose work, not
-  to resuming an item you already claimed.
+- This applies to a fresh session about to do clarify/decompose work.
+  Re-claiming an item whose claim was already released once is the separate
+  case below.
 
 ## Steps
 
@@ -36,6 +37,31 @@ an item that has not yet reached the frontier (`fgos ready`) — i.e. its
    refuses the claim.** Stage never bypasses those two — only the
    `executing`-only stage gate is stage-independent for an explicit `--id`
    claim.
+
+## Re-claiming after the claim is released at the `executing` boundary
+
+A claim held through `clarify`/`decompose` is released back to `todo` the
+moment the item reaches stage `executing` (`releaseClaimOnExecuting`, the
+claim-lock §3b lifecycle) — including the common case where the session that
+held it is still sitting in the item's worktree and wants to keep going.
+
+**Use `fgos pick <id>` to re-claim.** It reattaches: same `fgw/<id>` branch,
+and the same worktree if that checkout is still standing — clean or dirty,
+untouched either way, uncommitted work included.
+
+**Do not use `fgos take` for this.** It refuses, on purpose: the work lives
+on `fgw/<id>`, but a main-checkout take would record `source: main` and a
+`headAtTake` pointing at the main checkout's HEAD, which that work never
+advances. The claim itself would look fine and the damage would only appear
+later, as a `return` that refuses to believe any progress was made. The
+refusal names `pick` so you don't have to remember why.
+
+The older workaround — `fgos move <id> --to blocked --expect todo`, then
+`fgos take`, to reach the branch-take path — is no longer needed. Avoid it:
+outside a §3b release (after a reject, or a verify-fail park) that route
+recomputes `branchHeadAtTake` to the branch's live tip, which is a
+deliberate gate there, and using it as a re-claim shortcut resets the
+baseline your earlier commits were measured against.
 
 ## Why this used to be one door only
 

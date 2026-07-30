@@ -6,6 +6,8 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import {
   createWorktree,
+  createClaimWorktree,
+  createDispatchWorktree,
   createBranchRef,
   removeWorktree,
   listLeftovers,
@@ -393,4 +395,100 @@ test('createWorktree with opts.baseRef on an existing (reused) branch ignores ba
   );
 
   removeWorktree(repoRoot, second.path);
+});
+
+// --- claim reattach: a claim whose checkout is still standing gets that same
+// checkout back, instead of the reuse path reclaiming it out from under the
+// session running in it -------------------------------------------------------
+
+test('createClaimWorktree reattaches to the live checkout of fgw/<id> instead of removing it, and reports reused:true', () => {
+  const repoRoot = initTempRepo();
+  const worktreeDir = mkWorktreeDir();
+  const first = createClaimWorktree(repoRoot, 'reattach-clean', { worktreeDir });
+  commitOnWorktree(first.path, 'context.md', '# decisions\n');
+
+  const second = createClaimWorktree(repoRoot, 'reattach-clean', { worktreeDir });
+
+  assert.equal(second.path, first.path, 'the same checkout is handed back, not a new directory');
+  assert.equal(second.branch, 'fgw/reattach-clean');
+  assert.equal(second.reused, true);
+  assert.equal(fs.existsSync(first.path), true, 'the live checkout survives the second claim');
+  assert.equal(fs.existsSync(path.join(first.path, 'context.md')), true);
+  // exactly one checkout for the branch — nothing was added alongside it
+  const listing = execFileSync('git', ['worktree', 'list', '--porcelain'], { cwd: repoRoot, encoding: 'utf8' });
+  assert.equal(listing.split('\n').filter((l) => l === 'branch refs/heads/fgw/reattach-clean').length, 1);
+
+  removeWorktree(repoRoot, first.path, { force: true });
+});
+
+test('createClaimWorktree reattaches a DIRTY checkout with its uncommitted work intact (where createWorktree refuses outright)', () => {
+  const repoRoot = initTempRepo();
+  const worktreeDir = mkWorktreeDir();
+  const first = createClaimWorktree(repoRoot, 'reattach-dirty', { worktreeDir });
+  commitOnWorktree(first.path, 'context.md', '# decisions\n');
+  fs.writeFileSync(path.join(first.path, 'in-progress.txt'), 'not yet committed\n');
+
+  const second = createClaimWorktree(repoRoot, 'reattach-dirty', { worktreeDir });
+
+  assert.equal(second.path, first.path);
+  assert.equal(second.reused, true);
+  assert.equal(fs.readFileSync(path.join(first.path, 'in-progress.txt'), 'utf8'), 'not yet committed\n');
+  // the same call through the low-level primitive still refuses — the guard
+  // it relies on is untouched, the claim wrapper just never reaches it
+  assert.throws(() => createWorktree(repoRoot, 'reattach-dirty', { worktreeDir }), WorktreeError);
+
+  removeWorktree(repoRoot, first.path, { force: true });
+});
+
+test('createClaimWorktree ignores a checkout outside its own worktreeDir (a runner dispatch checkout is never reattached to)', () => {
+  const repoRoot = initTempRepo();
+  const dispatchDir = mkWorktreeDir();
+  const claimDir = mkWorktreeDir();
+  const dispatch = createDispatchWorktree(repoRoot, 'reattach-elsewhere', { worktreeDir: dispatchDir });
+  commitOnWorktree(dispatch.path, 'attempt.txt', 'worker output\n');
+
+  const claim = createClaimWorktree(repoRoot, 'reattach-elsewhere', { worktreeDir: claimDir });
+
+  assert.notEqual(claim.path, dispatch.path, 'a checkout in another caller\'s directory is not reattachable');
+  assert.equal(path.dirname(claim.path), fs.realpathSync(claimDir));
+  assert.equal(claim.reused, true, 'still a branch reuse — just not a checkout reattach');
+  assert.equal(fs.existsSync(dispatch.path), false, 'the out-of-dir checkout goes through the normal reclaim path');
+
+  removeWorktree(repoRoot, claim.path, { force: true });
+});
+
+test('createClaimWorktree falls through to a fresh checkout when the registered path is gone from disk', () => {
+  const repoRoot = initTempRepo();
+  const worktreeDir = mkWorktreeDir();
+  const first = createClaimWorktree(repoRoot, 'reattach-vanished', { worktreeDir });
+  commitOnWorktree(first.path, 'context.md', '# decisions\n');
+  // the directory disappears without a prune — `git worktree list` still
+  // reports it
+  fs.rmSync(first.path, { recursive: true, force: true });
+
+  const second = createClaimWorktree(repoRoot, 'reattach-vanished', { worktreeDir });
+
+  assert.notEqual(second.path, first.path);
+  assert.equal(fs.existsSync(second.path), true);
+  assert.equal(second.reused, true);
+  // the branch's own commit survived — reused, not recreated
+  assert.equal(fs.existsSync(path.join(second.path, 'context.md')), true);
+
+  removeWorktree(repoRoot, second.path, { force: true });
+});
+
+test('createDispatchWorktree still allocates a FRESH directory on a reused branch — the reattach never leaks to the runner retry path', () => {
+  const repoRoot = initTempRepo();
+  const worktreeDir = mkWorktreeDir();
+  const first = createDispatchWorktree(repoRoot, 'dispatch-retry', { worktreeDir });
+  commitOnWorktree(first.path, 'attempt.txt', 'first attempt\n');
+
+  const retry = createDispatchWorktree(repoRoot, 'dispatch-retry', { worktreeDir });
+
+  assert.notEqual(retry.path, first.path, 'a retry never builds in the previous attempt\'s directory');
+  assert.equal(retry.reused, true);
+  assert.equal(fs.existsSync(first.path), false, 'the previous attempt\'s checkout is reclaimed as before');
+  assert.equal(fs.existsSync(path.join(retry.path, 'attempt.txt')), true, 'same branch, so its commit is there');
+
+  removeWorktree(repoRoot, retry.path, { force: true });
 });

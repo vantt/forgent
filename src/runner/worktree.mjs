@@ -309,14 +309,80 @@ export function createWorktree(repoRoot, id, opts = {}) {
 // implementation.
 
 /**
+ * The checkout of `branch` a claim may reattach to instead of standing up a
+ * new one, or `null` when there is none to reattach to. Deliberately
+ * stricter than `findCheckoutPath` alone, on two counts:
+ *
+ * - the registration must still exist on disk. `git worktree list` reports
+ *   a path whose directory was deleted out from under it until someone
+ *   prunes, and handing that back would be a checkout that isn't there.
+ * - the checkout must live under `baseDir`, the directory THIS caller
+ *   allocates its own worktrees in. A runner dispatch worktree for the same
+ *   item lands elsewhere (the runner passes no `worktreeDir`, so its
+ *   checkouts go to the `os.tmpdir()` default while a `pick` claim uses
+ *   `.claude/worktrees`), and a live one means a worker is running in it
+ *   right now — reattaching a second claim into that directory would put two
+ *   workers in one checkout.
+ *
+ * Cleanliness is deliberately NOT a condition here: nothing is removed on
+ * this path, so `reclaimOrphanedCheckout`'s data-loss guard has nothing to
+ * protect against. A checkout with uncommitted work is precisely the session
+ * that most needs to resume where it left off.
+ */
+function reattachableCheckout(repoRoot, branch, baseDir) {
+  let listing;
+  try {
+    listing = git(repoRoot, ['worktree', 'list', '--porcelain']);
+  } catch {
+    return null;
+  }
+  const registered = findCheckoutPath(listing, branch);
+  if (!registered || !fs.existsSync(registered) || !fs.existsSync(baseDir)) return null;
+
+  let relative;
+  try {
+    // realpath both sides: `git worktree list` reports resolved paths, while
+    // a caller's baseDir can still carry a symlinked segment.
+    relative = path.relative(fs.realpathSync(baseDir), fs.realpathSync(registered));
+  } catch {
+    return null;
+  }
+  if (!relative || relative.startsWith('..') || path.isAbsolute(relative)) return null;
+  return registered;
+}
+
+/**
  * claim-isolate: the worktree returned here IS the work — it outlives this
  * call, and its owning claim (`claim-port.mjs`'s `claimWork`) tears it down
- * later at return/reject time, never inline here. Thin passthrough, kept so
- * a claim call site names its shape instead of calling the low-level
- * primitive directly (and so a future claim-isolate call site has one
- * documented place to land instead of a fourth ad hoc `createWorktree` call).
+ * later at return/reject time, never inline here.
+ *
+ * REATTACH (tsk-65n): a claim whose `fgw/<id>` checkout is still standing
+ * gets that same checkout back, untouched. The case is routine rather than
+ * exotic — an item's claim is released back to `todo` the moment it reaches
+ * stage `executing` (`decompose.mjs`'s `releaseClaimOnExecuting`), and the
+ * session that held it then claims it again to do the work, from inside the
+ * very worktree the claim stands up. Going through `createWorktree`'s reuse
+ * path there would reclaim that live checkout: force-removed when clean —
+ * pulling the directory out from under the running session — or a hard
+ * failure when dirty. Neither is what a re-claim means.
+ *
+ * This is why the reattach lives here and not in `createWorktree`: the reuse
+ * path is shared with the runner's own retry, which deliberately wants a
+ * FRESH directory on the reused branch so a retry never builds on a previous
+ * attempt's debris (see RETRY-WITHOUT-SELF-COLLISION in the module doc).
+ * Keeping the decision in this wrapper leaves that path, and the
+ * merge-ephemeral one, byte-for-byte unchanged.
  */
 export function createClaimWorktree(repoRoot, id, opts = {}) {
+  const branch = branchNameFor(id);
+  if (branchExists(repoRoot, branch)) {
+    const baseDir = opts.worktreeDir ?? path.join(os.tmpdir(), 'fgos-worktrees');
+    const existing = reattachableCheckout(repoRoot, branch, baseDir);
+    // `reused: true` is the same answer the add-on-an-existing-branch path
+    // already gives, and means the same thing to a caller: this claim did not
+    // fork a new branch.
+    if (existing) return { path: existing, branch, reused: true };
+  }
   return createWorktree(repoRoot, id, opts);
 }
 
