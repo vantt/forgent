@@ -88,7 +88,35 @@ re-shapes the work; that already happened at `clarify`/`decompose`.
    command — never weaken the command or swap in an easier one to make it
    pass.
 
-4. **Return.** Hand the item back with:
+4. **Iron Law evidence (when applicable).** Before returning, check whether
+   this item's own diff will trip the Iron Law gate at `approve` — compute
+   the exact file set the gate itself uses (`changedFiles`,
+   `src/runner/merge.mjs`) and classify it the same way (`classifyIronLaw`,
+   `src/evolve/iron-law.mjs`), never a separate early-prediction heuristic
+   (`docs/history/tsk-5t3-iron-law-evidence-contract/CONTEXT.md` D2):
+
+   ```bash
+   root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
+   node --input-type=module -e "
+   import { changedFiles } from './src/runner/merge.mjs';
+   import { classifyIronLaw } from './src/evolve/iron-law.mjs';
+   import { listWork } from './src/state/store.mjs';
+   const item = listWork(process.argv[1] + '/.fgos').work[process.argv[2]];
+   const filesChanged = changedFiles(process.argv[1], item);
+   console.log(JSON.stringify(classifyIronLaw({ filesChanged, description: item.description })));
+   " "$root" "<id>"
+   ```
+
+   When the result's `required` is `true`, write
+   `docs/history/<id>/iron-law-evidence.md` — the matched flags/modules
+   from that same result, the test command step 3 already ran, and its
+   real failing-before/passing-after transcript excerpts (the
+   "failing-test-first proof" `CONTEXT.md` D1 pins) — and commit it in
+   the same commit as the implementation (the "one commit per item" rule
+   above). When `required` is `false`, write nothing; this cost is only
+   paid for the items the gate will actually apply to.
+
+5. **Return.** Hand the item back with:
 
    ```
    fgos return <id>
@@ -137,6 +165,10 @@ ends at a returned, verified item.
 - classifying the item's domain or re-deciding its stage — not this
   skill's job
 - splicing an item's raw `title`/`description` into a shell command
+- fabricating or paraphrasing the failing-test-first transcript in
+  `iron-law-evidence.md` instead of pasting the real command output
+- writing `iron-law-evidence.md` for an item `classifyIronLaw` says
+  `required: false` for
 
 Violating the letter of the rules is violating the spirit of the rules.
 
