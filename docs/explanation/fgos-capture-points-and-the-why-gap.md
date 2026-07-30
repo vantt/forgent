@@ -85,6 +85,44 @@ exchange; its only trace is whatever prose a session chooses to write into
 STR70b, STR71) targets this case — they are all scoped to the async
 `awaiting-human` gate, not to synchronous in-session dialogue.
 
+## Update: the `decompose` gap above is now closed (tsk-6b6)
+
+The gap named two sections up — `judgeDecompose`'s `pass-through` and
+`decompose`-with-children branches leaving "no trace of their own
+reasoning at all" — is closed. `resolveDecompose`'s four outcome branches
+(`invalid`/`need-human`/`pass-through`/`decompose`) each now call
+`addDecision` (`src/intake/decompose.mjs`), folding into
+`view.decisionsById[id]` — the same per-item, append-only shape
+`view.discovery[id]` already had, so a decompose-stage judgment can no
+longer move or park an item while leaving zero trace behind.
+
+The model prompt changed too, not just the storage: `buildDecomposePrompt`
+now asks for a top-level `"reason"` on every branch, not only
+`need-human`. `pass-through`'s reason is optional (a fixed fallback
+rationale is logged if the model doesn't answer); `decompose`'s reason is
+**required** — a decompose verdict with a blank or missing top-level
+reason normalizes the whole verdict to `invalid`, the same rule
+`normalizeChild` already applied to a child missing `verify`.
+
+**How the fix was actually shaped, closing a second gap along the way:**
+tsk-6b6's own locked decision record (`docs/history/decompose-verdict-capture/CONTEXT.md`,
+D1) originally chose to build this recording mechanism itself — reusing
+`addDecision` by extending its schema with `rationale`/`alternatives`/`source`
+and an optional `id`. Partway through execution, a *different* item
+(`tsk-63c`) landed that exact extension first, with a different concrete
+shape than CONTEXT.md had guessed (`rationale` required unconditionally,
+not scoped to `id`-present; a dual fold — `view.decisions` unconditionally,
+`view.decisionsById[id]` additionally — never the either/or branch
+originally planned). Rather than build on a stale assumption, CONTEXT.md
+and `plan.md` were revised in place (marked `REVISED`/`SUPERSEDED`, citing
+the new evidence) to match what actually shipped, shrinking tsk-6b6's own
+scope down to just `decompose.mjs` — the schema/CLI/replay work it
+originally planned to own was already done. This is itself evidence for
+this document's own recurring theme: a locked `CONTEXT.md` is worth
+revising the moment new evidence contradicts it, and worth citing when it
+does, rather than either freezing the plan or silently ignoring the
+mismatch.
+
 ## What this means for `gates[id]` specifically (STR70a's target)
 
 STR70a proposes folding an actor/role stamp into `gates[id]`. Confirmed
