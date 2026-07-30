@@ -211,6 +211,14 @@
     "quadrant": "explanation",
     "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
     "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/cli-invocation-fault-provenance.md",
+    "title": "Why malformed CLI invocations now leave a provenance trace",
+    "sourceCaptureId": "tsk-5z0"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/explanation/event-log-evolution-discipline.md",
     "title": "How fgOS's event log is allowed to evolve without breaking replay",
     "sourceCaptureId": null
@@ -286,6 +294,14 @@
     "docPath": "docs/explanation/iron-law-evidence-contract-stays-human-gated.md",
     "title": "Why the Iron Law evidence contract gathers proof but never acknowledges",
     "sourceCaptureId": "tsk-5t3"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/judge-verdict-second-pass-semantic-check.md",
+    "title": "Why judgeDiscovery/judgeDecompose run a second, independent judge pass on `verify`",
+    "sourceCaptureId": "tsk-5q5-1"
   },
   {
     "quadrant": "explanation",
@@ -558,6 +574,14 @@
     "docPath": "docs/how-to/fix-a-verify-command-broken-by-mixed-in-prose.md",
     "title": "How to fix a verify command that mixes prose with a real command",
     "sourceCaptureId": "tsk-34y"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/fix-dead-fgos-shell-rc-source-lines.md",
+    "title": "Fix dead fgOS shell-rc source lines",
+    "sourceCaptureId": "tsk-5lk"
   },
   {
     "quadrant": "how-to",
