@@ -3,9 +3,10 @@
 Item: `tsk-5z0`. Stage when written: `decompose` (shaping).
 Locked decisions: `CONTEXT.md` D1–D5 — cited, never reopened here.
 
-**Revision 3.** Revision 2 answered `fgos-validating`'s `NOT READY`; revision 3
-adds in-process visibility per the newly recorded `CONTEXT.md` **D6**. Both
-changes are recorded in "Revision history" at the end. Mode unchanged.
+**Revision 4.** Revision 2 answered the first `NOT READY`, revision 3 added
+in-process visibility (**D6**), and revision 4 answers the second `NOT READY` by
+narrowing the recordable scope to what the failure handler can actually observe
+(**D7**). All three are in "Revision history" at the end. Mode unchanged.
 
 ## Mode: high-risk
 
@@ -38,20 +39,28 @@ reality check earning a `NOT READY` on exactly (a) is this mode doing its job.
 Add one classifier + writer, invoked from the single existing failure handler.
 Nothing else changes.
 
-1. **Classify the fault before recording it (honors D1).** `main()`'s catch is
-   the only failure handler, but it sees in-handler business refusals and
-   pre-handler input faults through the same `StoreError('validation', ...)`
-   shape — D1 records only the latter. The classifier therefore keys off
-   *where* the fault was raised, not off the message text: the pre-handler
-   region in `main()` is already explicit and small (unknown verb, the
-   `requiresExistingStore` refusal, the `init`-inside-worktree refusal, arg
-   parsing) and sits above `runVerb`. Faults raised at or below `runVerb` are
-   business refusals and are never recorded.
+1. **Classify the fault by where it was raised (honors D1 as narrowed by D7).**
+   `main()`'s catch is the only failure handler, and it sees in-handler business
+   refusals and pre-handler input faults through the same
+   `StoreError('validation', ...)` shape. The classifier keys off *position*,
+   never message text: faults raised in the explicit pre-handler region above
+   `runVerb` are recorded; faults raised at or below `runVerb` are business
+   refusals and never are.
    - Rejected: string-matching `err.message` to decide the class. It would
      couple the log to 73 hand-written message strings and silently
      misclassify the moment one is reworded.
    - Rejected: consulting the registry's `required` to decide the class.
      That is enforcement, which D4 forbids.
+   - **What this actually covers (D7, and no more):** unknown verb, the
+     `requiresExistingStore` refusal, the `init`-inside-worktree refusal,
+     `dataDir`/`--dir` faults, and arg-parse faults once P4 below lands.
+   - **What it does not cover:** missing-required-flag and invalid-id faults,
+     both named in D1. They are raised below `runVerb` (e.g. the `--domain`
+     diagnostic at `bin/fgos.mjs:666`) across 73 sites, indistinguishable by
+     position, and both mechanisms that could separate them are closed by the
+     two rejections above. Deferred to P38 per D7. The originating incidents
+     (p-af05e742, p-4c81ca74) were wrong-cwd/wrong-store faults and **are**
+     covered.
 2. **Resolve the destination (honors D2, D5).** Prefer the resolved `dir`'s
    `.fgos/` when it exists and cwd is the main checkout. Otherwise resolve the
    main checkout via `git rev-parse --path-format=absolute --git-common-dir`
@@ -96,7 +105,13 @@ Nothing else changes.
    unaffected); each either passes untouched or its exact-match reason settles
    the wording, per D6's own cost column. `scripts/herdr-cockpit-notify.mjs`
    and the `terminal` skill are the only non-test stderr consumers and need
-   the same check.
+   the same check. That audit is **already done** — see the revision-4 note.
+8. **Move `parseArgs` inside `main()`'s `try` (P4, honors D7).** Today
+   `parseArgs(rest)` runs at `bin/fgos.mjs:2717` while the `try` opens at
+   `2724`, so an arg-parse fault never reaches the catch and cannot be recorded
+   by anything placed there. Move the call inside the `try`. The two `--help`
+   blocks between them must keep behaving identically, including their
+   `process.exitCode = 0` early returns.
 
 ### Ordering input from the graph
 
@@ -112,7 +127,8 @@ writer → `.gitignore` + manifest row → wiring in `main()` → tests.
 | Component | Risk | What would prove it |
 |---|---|---|
 | argv capture reaching a plaintext log (D3) | **high** | Confirm `.gitignore` carries the new log's path, so recorded argv never enters git history. Residual after that: a local plaintext file readable by anything with filesystem access — bounded, not eliminated, and accepted (see the residual note below). Proof at validating: read `.gitignore` and confirm `git status` does not offer the log. |
-| D6's added stderr line vs. existing stderr assertions | **medium** | Measured: 85 `assert.match` (unaffected) vs **12** `assert.equal` under `test/`, plus `scripts/herdr-cockpit-notify.mjs` and the `terminal` skill as the only non-test consumers. Proof at validating: enumerate the 12 and confirm none of them asserts equality on a *fault* path — or name the ones that do. |
+| D6's added stderr line vs. existing stderr assertions | **closed** | Enumerated at validating, all 12 safe: `fgos-help.test.mjs:43,54` (help, exit 0); `fgos.test.mjs:318,326` (`list` exit 0, a legitimately empty view, not a fault); `dispatch.test.mjs:488,561,768,785,805,824,854` (stderr of a worker subprocess the runner spawns, not the CLI's fault path); `fgos.test.mjs:2602` "exactly one stderr line" (`submit --domain bogus`, exit 4 — validated below `runVerb` at `bin/fgos.mjs:666`, so D7 does not record it and no line is added). |
+| P4 moving `parseArgs` inside the `try` | **medium** | It sits above two `--help` early-return blocks that must keep their exact behavior. Proof at validating: `test/cli/fgos-help.test.mjs` green, including its two empty-stderr assertions. |
 | Line emitted when no record was written | **medium** | A line claiming a record that does not exist. Proof at validating: the emit is genuinely downstream of a successful write, and the swallow path (unwritable dir, no git repo) stays silent. |
 | `main()` catch edits vs. byte-identical exit codes (D4) | **high** | `test/cli/fgos.test.mjs:459` must pass unedited: it asserts exit 4, `/\.fgos\/ not found/`, and *"the refused verb must not create .fgos/ as a side effect"*. Plus the worktree/`--dir` tests at lines 181, 191, 295, 304, 312, 321 and the `init`-in-worktree refusal at 469. Proof at validating: those are assertions on this path, and none are modified. |
 | new module's layer position | **medium** | Resolved to a determinate constraint (P2 above): declare `infra`, add the manifest row. Proof at validating: `node --test test/architecture.test.mjs` green with the row present. |
@@ -132,7 +148,7 @@ item, not a redactor bolted onto this one.
 - `src/cli/invocation-fault-log.mjs` — new: classifier + destination resolver + writer.
 - `docs/architecture-manifest.json` — new row for the above, layer `infra` (P2, mandatory).
 - `.gitignore` — one line for the new log (P1, mandatory, same change).
-- `bin/fgos.mjs` — `main()`: one call in the catch; no change to the two existing statements.
+- `bin/fgos.mjs` — `main()`: one call in the catch, plus P4 moving `parseArgs` inside the `try`; no change to the existing stderr write or `exitCode` assignment.
 - `test/cli/` — new assertions: fault recorded, business refusal *not* recorded, no write to `events.jsonl`, exit codes unchanged, worktree cwd never gains `.fgos/`, log path is git-ignored.
 - `docs/specs/` — one note on the new log, only if the spec already documents `.fgos/` contents.
 
@@ -182,6 +198,24 @@ shared by every verb the suite exercises. `test/architecture.test.mjs` is in the
 command specifically because of P2.
 
 ## Revision history
+
+### Revision 4 — scope narrowed to what the handler can see (D7)
+
+`fgos-validating` returned `NOT READY` a second time, on Assumptions again.
+Two things were proven false by reading, not argued:
+
+1. **`parseArgs` runs outside the `try`** — `bin/fgos.mjs:2717` vs the `try` at
+   `2724`. Revision 3's step 1 listed "arg parsing" as recordable; it was not,
+   because the fault never reaches the catch. Now **P4**: move the call inside.
+2. **D1 promised more than position-based classification can deliver.**
+   Missing-required-flag and invalid-id faults are raised below `runVerb` across
+   73 sites (e.g. `bin/fgos.mjs:666`), indistinguishable from business refusals
+   by position — and both separating mechanisms were already closed
+   (message-matching rejected here, registry enforcement forbidden by D4). D7
+   narrows the scope and states the gap plainly instead of implying coverage.
+
+The 12 exact-match stderr assertions were enumerated in the same pass and are
+all safe; the risk-map row is closed with the list rather than carried forward.
 
 ### Revision 3 — in-process visibility (D6)
 
