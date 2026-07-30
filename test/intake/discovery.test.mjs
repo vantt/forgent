@@ -6,6 +6,7 @@ import path from 'node:path';
 import { judgeDiscovery, resolveDiscovery } from '../../src/intake/discovery.mjs';
 import { addWork, listWork, StoreError, categoryOf, putInAwaiting, answerAwaiting, moveWork } from '../../src/state/store.mjs';
 import { appendEvent, readEvents } from '../../src/state/events.mjs';
+import { judgeVerifySemanticCorrectness } from '../../src/intake/judge-executor.mjs';
 
 // Fake executors only — every "command" spawned here is a node script this
 // file writes to a mkdtemp directory at test time, mirroring dispatch.test.mjs's
@@ -18,6 +19,29 @@ function mkTempDir() {
 function writeVerdictExecutor(dir, verdict) {
   const scriptPath = path.join(dir, 'verdict-executor.mjs');
   fs.writeFileSync(scriptPath, `process.stdout.write(${JSON.stringify(JSON.stringify(verdict))}); process.exit(0);`);
+  return scriptPath;
+}
+
+// tsk-5q5-1: a clear verdict carrying a real `verify` now triggers ONE more
+// call to the same configured executor — judgeVerifySemanticCorrectness's
+// own second-pass prompt (judge-executor.mjs). The prompt text is
+// substituted into argv (resolveExecutorCommand), so this fake sniffs
+// argv[2] for a marker unique to that second prompt and answers it
+// separately from the first-pass verdict — one script covers both calls.
+function writeVerdictWithVerifyCheckExecutor(dir, verdict, agrees = true, reason = 'test-forced-disagree') {
+  const scriptPath = path.join(dir, 'verdict-with-verify-check-executor.mjs');
+  fs.writeFileSync(
+    scriptPath,
+    `
+    const prompt = process.argv[2] ?? '';
+    if (prompt.includes('Kiểm tra độc lập một lệnh verify')) {
+      process.stdout.write(${JSON.stringify(JSON.stringify({ agrees, reason }))});
+    } else {
+      process.stdout.write(${JSON.stringify(JSON.stringify(verdict))});
+    }
+    process.exit(0);
+    `,
+  );
   return scriptPath;
 }
 
@@ -342,7 +366,7 @@ function tmpStoreDir() {
 
 test('resolveDiscovery on a clear verdict writes the discovery record and moves stage to decompose with the proposed verify', () => {
   const scriptDir = mkTempDir();
-  const scriptPath = writeVerdictExecutor(scriptDir, { clear: true, verify: 'npm test -- discovered' });
+  const scriptPath = writeVerdictWithVerifyCheckExecutor(scriptDir, { clear: true, verify: 'npm test -- discovered' });
   const cfg = cfgFor([scriptPath, '{prompt}']);
 
   const storeDir = tmpStoreDir();
@@ -356,6 +380,69 @@ test('resolveDiscovery on a clear verdict writes the discovery record and moves 
   assert.equal(view.work['item-x'].verify, 'npm test -- discovered');
   assert.equal(view.discovery['item-x'].length, 1);
   assert.equal(view.discovery['item-x'][0].clear, true);
+});
+
+// tsk-5q5-1 (D2/D4, docs/history/judge-verdict-evidence-discipline/): the
+// second-pass semantic-correctness check on a clear verdict's proposed
+// `verify` — never checked before this item.
+
+test('resolveDiscovery parks in awaiting-human when the second-pass check disagrees with a clear verdict\'s proposed verify', () => {
+  const scriptDir = mkTempDir();
+  const scriptPath = writeVerdictWithVerifyCheckExecutor(
+    scriptDir,
+    { clear: true, verify: 'Skill("fgOS:ready") loads without \'Unknown skill\' error' },
+    false,
+    'không phải shell hợp lệ, và nhắm sai mục tiêu',
+  );
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork());
+
+  const result = resolveDiscovery(storeDir, 'item-x', cfg);
+  assert.equal(result.outcome, 'verify-disputed');
+
+  const view = listWork(storeDir);
+  // stage never advances -- the disagreement blocks the clarify->decompose
+  // edge exactly like an unclear first-pass verdict does.
+  assert.equal(view.work['item-x'].stage, 'clarify');
+  assert.equal(view.work['item-x'].status, 'awaiting-human');
+  assert.match(view.gates['item-x'].ask, /không phải shell hợp lệ, và nhắm sai mục tiêu/);
+  assert.match(view.gates['item-x'].ask, /Skill\("fgOS:ready"\)/);
+});
+
+test('resolveDiscovery still advances to decompose when the second-pass check agrees with a clear verdict\'s proposed verify', () => {
+  const scriptDir = mkTempDir();
+  const scriptPath = writeVerdictWithVerifyCheckExecutor(scriptDir, { clear: true, verify: 'npm test -- discovered' }, true);
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork());
+
+  const result = resolveDiscovery(storeDir, 'item-x', cfg);
+  assert.equal(result.outcome, 'clear');
+  assert.equal(listWork(storeDir).work['item-x'].stage, 'decompose');
+});
+
+test('judgeVerifySemanticCorrectness folds a spawn failure to a disagreement (fail-safe never treats an uncertain check as a pass)', () => {
+  const scriptDir = mkTempDir();
+  const cfg = {
+    executor: { command: path.join(scriptDir, 'does-not-exist-binary'), args: ['{prompt}'] },
+    models: { light: 'haiku', standard: 'sonnet', heavy: 'opus' },
+    timeoutMs: 5000,
+  };
+  const result = judgeVerifySemanticCorrectness({ title: 'x', tier: 'standard' }, 'npm test', cfg);
+  assert.equal(result.agrees, false);
+  assert.equal(typeof result.reason, 'string');
+  assert.ok(result.reason.length > 0);
+});
+
+test('judgeVerifySemanticCorrectness returns agrees:true when the executor agrees', () => {
+  const scriptDir = mkTempDir();
+  const scriptPath = writeVerdictExecutor(scriptDir, { agrees: true });
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+  const result = judgeVerifySemanticCorrectness({ title: 'x', tier: 'standard' }, 'npm test', cfg);
+  assert.deepEqual(result, { agrees: true });
 });
 
 test('resolveDiscovery on a clear verdict with no model-proposed verify falls back to a placeholder distinct from the retired P14 sentinel', () => {
@@ -618,7 +705,7 @@ test('resolveDiscovery writes EXACTLY ONE work.edit event carrying intent per ca
 
 test('resolveDiscovery still completes clear/unclear resolution when editWork throws for a corrupted item shape (fail-safe)', () => {
   const scriptDir = mkTempDir();
-  const scriptPath = writeVerdictExecutor(scriptDir, {
+  const scriptPath = writeVerdictWithVerifyCheckExecutor(scriptDir, {
     clear: true,
     verify: 'npm test -- discovered',
     intentScore: 60,

@@ -23,7 +23,7 @@
 // pass.
 
 import { modelForTier } from '../runner/dispatch.mjs';
-import { runJudgeExecutor, JUDGE_STRICT_JSON_SUFFIX } from './judge-executor.mjs';
+import { runJudgeExecutor, JUDGE_STRICT_JSON_SUFFIX, judgeVerifySemanticCorrectness } from './judge-executor.mjs';
 import { DEFAULTS } from '../state/work.mjs';
 import { listWork, moveStage, addDiscovery, putInAwaiting, editWork, StoreError } from '../state/store.mjs';
 import { graphMetrics } from '../state/graph-metrics.mjs';
@@ -255,6 +255,28 @@ export function resolveDiscovery(dir, id, cfg, role) {
   }
 
   if (verdict.clear) {
+    // tsk-5q5-1 (D2/D4): a model-proposed `verify` never rode into the
+    // item's record unchecked before — only "is it a non-empty string"
+    // (D10's own FALLBACK_VERIFY case has nothing to check, since it's a
+    // fixed system string, not a model claim). A second, independent judge
+    // call checks whether the proposal actually proves THIS item's claim,
+    // not just that it's syntactically a command. Disagreement parks the
+    // item exactly like an unclear first-pass verdict does — an uncertain
+    // judgement is never treated as a pass (discovery.mjs's own D4 above).
+    if (typeof verdict.verify === 'string' && verdict.verify.trim()) {
+      const secondPass = judgeVerifySemanticCorrectness(work, verdict.verify, cfg);
+      if (!secondPass.agrees) {
+        const ask =
+          `Đề xuất verify bị nghi ngờ (chưa ghi vào clarify->decompose, cần xác nhận) — ` +
+          `vòng 1 đề xuất: ${verdict.verify}\n` +
+          `vòng 2 (kiểm tra độc lập) không đồng ý: ${secondPass.reason}`;
+        // statusAtAsk (claim-lock §5.1): same rule as the unclear branch
+        // below — read at function entry, before this park.
+        putInAwaiting(dir, { id, ask, statusAtAsk: work.status });
+        return { outcome: 'verify-disputed', id, verdict, secondPass };
+      }
+    }
+
     moveStage(dir, {
       id,
       to: 'decompose',
