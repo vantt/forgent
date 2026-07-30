@@ -22,7 +22,8 @@
   "scripts": {
     "test": "node --test 'test/**/*.test.mjs'",
     "setup:hooks": "node scripts/install-git-hooks.mjs",
-    "cli": "node bin/fgos.mjs"
+    "cli": "node bin/fgos.mjs",
+    "check:events-seq": "node scripts/check-events-seq-contiguity.mjs --log .fgos/events.jsonl"
   },
   "exports": {
     "./state/porting": "./src/state/porting.mjs",
