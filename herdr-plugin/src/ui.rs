@@ -10,21 +10,21 @@ use ratatui::backend::CrosstermBackend;
 use ratatui::layout::{Constraint, Direction, Layout};
 use ratatui::style::{Color, Modifier, Style};
 use ratatui::text::Span;
-use ratatui::widgets::{Block, Borders, List, ListItem, ListState, Paragraph};
+use ratatui::widgets::{Block, Borders, Paragraph, Row, Table, TableState};
 use ratatui::{Frame, Terminal};
 
 use crate::app::{App, InProcessTask, Panel};
 use crate::ports::{TerminalUi as TerminalUiPort, UiEvent};
 
 /// tsk-4zo D2: an orphaned task (no matching herdr pane found by the most
-/// recent scan) gets an explicit `[pane missing]` badge — no jump-to-pane
-/// affordance exists yet for any row (that's `tsk-1eu`'s job), so there is
-/// nothing else to disable here today.
-fn in_process_label(task: &InProcessTask) -> String {
+/// recent scan) gets an explicit `[pane missing]` badge in its Title cell
+/// — no jump-to-pane affordance exists yet for any row (that's
+/// `tsk-1eu`'s job), so there is nothing else to disable here today.
+fn in_process_title_cell(task: &InProcessTask) -> String {
     if task.pane.is_some() {
-        format!("{} — {}", task.id, task.title)
+        task.title.clone()
     } else {
-        format!("[pane missing] {} — {}", task.id, task.title)
+        format!("[pane missing] {}", task.title)
     }
 }
 
@@ -104,63 +104,81 @@ pub fn draw(frame: &mut Frame, app: &mut App) {
     let focused_border_style = Style::default().fg(Color::Cyan).add_modifier(Modifier::BOLD);
     let unfocused_border_style = Style::default();
 
-    let work_items: Vec<ListItem> = app
+    // tsk-4vo: both lists render as a `Table` — its header row is
+    // structurally separate from the scrollable body, so it stays fixed
+    // ("sticky") without any custom logic, unlike the plain `List` this
+    // replaces.
+    let header_style = Style::default().add_modifier(Modifier::BOLD);
+
+    let work_items_header = Row::new(["Tier", "ID", "Title"]).style(header_style);
+    let work_items_rows: Vec<Row> = app
         .work_items
         .iter()
-        .map(|item| {
-            ListItem::new(format!(
-                "[{}] {} — {}",
-                item.goal_tier, item.id, item.title
-            ))
-        })
+        .map(|item| Row::new([item.goal_tier.clone(), item.id.clone(), item.title.clone()]))
         .collect();
-    let mut list_state = ListState::default();
-    list_state.select(app.selected);
+    let mut work_items_state = TableState::default();
+    work_items_state.select(app.selected);
     frame.render_stateful_widget(
-        List::new(work_items)
-            .block(
-                Block::default()
-                    .borders(Borders::ALL)
-                    .border_style(if app.focused_panel == Panel::WorkItems {
-                        focused_border_style
-                    } else {
-                        unfocused_border_style
-                    })
-                    .title(Span::styled(
-                        "Work items (by impact) — ↑/↓ select, Enter to pick",
-                        Style::default().add_modifier(Modifier::BOLD),
-                    )),
-            )
-            .highlight_style(Style::default().add_modifier(Modifier::REVERSED)),
+        Table::new(
+            work_items_rows,
+            [
+                Constraint::Length(10),
+                Constraint::Length(16),
+                Constraint::Fill(1),
+            ],
+        )
+        .header(work_items_header)
+        .block(
+            Block::default()
+                .borders(Borders::ALL)
+                .border_style(if app.focused_panel == Panel::WorkItems {
+                    focused_border_style
+                } else {
+                    unfocused_border_style
+                })
+                .title(Span::styled(
+                    "Work items (by impact) — ↑/↓ select, Enter to pick",
+                    Style::default().add_modifier(Modifier::BOLD),
+                )),
+        )
+        .row_highlight_style(Style::default().add_modifier(Modifier::REVERSED)),
         columns[0],
-        &mut list_state,
+        &mut work_items_state,
     );
 
-    let in_process: Vec<ListItem> = app
+    let in_process_header = Row::new(["ID", "Title"]).style(header_style);
+    let in_process_rows: Vec<Row> = app
         .in_process
         .iter()
-        .map(|task| ListItem::new(in_process_label(task)).style(Style::default().fg(Color::Yellow)))
+        .map(|task| {
+            Row::new([task.id.clone(), in_process_title_cell(task)])
+                .style(Style::default().fg(Color::Yellow))
+        })
         .collect();
-    let mut in_process_list_state = ListState::default();
-    in_process_list_state.select(app.in_process_selected);
+    let mut in_process_state = TableState::default();
+    in_process_state.select(app.in_process_selected);
     frame.render_stateful_widget(
-        List::new(in_process)
-            .block(
-                Block::default()
-                    .borders(Borders::ALL)
-                    .border_style(if app.focused_panel == Panel::InProcess {
-                        focused_border_style
-                    } else {
-                        unfocused_border_style
-                    })
-                    .title(Span::styled(
-                        "In process — Tab to focus, Enter to jump",
-                        Style::default().add_modifier(Modifier::BOLD),
-                    )),
-            )
-            .highlight_style(Style::default().add_modifier(Modifier::REVERSED)),
+        Table::new(
+            in_process_rows,
+            [Constraint::Length(16), Constraint::Fill(1)],
+        )
+        .header(in_process_header)
+        .block(
+            Block::default()
+                .borders(Borders::ALL)
+                .border_style(if app.focused_panel == Panel::InProcess {
+                    focused_border_style
+                } else {
+                    unfocused_border_style
+                })
+                .title(Span::styled(
+                    "In process — Tab to focus, Enter to jump",
+                    Style::default().add_modifier(Modifier::BOLD),
+                )),
+        )
+        .row_highlight_style(Style::default().add_modifier(Modifier::REVERSED)),
         columns[1],
-        &mut in_process_list_state,
+        &mut in_process_state,
     );
 
     let status = if let Some(err) = &app.last_error {
@@ -179,17 +197,17 @@ mod tests {
     use crate::pane_scan::PaneIdentity;
 
     #[test]
-    fn orphan_task_gets_pane_missing_badge() {
+    fn dashboard_table_orphan_task_gets_pane_missing_badge_in_title_cell() {
         let task = InProcessTask {
             id: "tsk-b".into(),
             title: "Missing".into(),
             pane: None,
         };
-        assert_eq!(in_process_label(&task), "[pane missing] tsk-b — Missing");
+        assert_eq!(in_process_title_cell(&task), "[pane missing] Missing");
     }
 
     #[test]
-    fn found_task_gets_no_badge() {
+    fn dashboard_table_found_task_gets_no_badge_in_title_cell() {
         let task = InProcessTask {
             id: "tsk-a".into(),
             title: "Found".into(),
@@ -198,6 +216,6 @@ mod tests {
                 tab_id: "wS:t1".into(),
             }),
         };
-        assert_eq!(in_process_label(&task), "tsk-a — Found");
+        assert_eq!(in_process_title_cell(&task), "Found");
     }
 }
