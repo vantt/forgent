@@ -51,9 +51,17 @@ Nothing else changes.
      misclassify the moment one is reworded.
    - Rejected: consulting the registry's `required` to decide the class.
      That is enforcement, which D4 forbids.
-   - **What this actually covers (D7, and no more):** unknown verb, the
-     `requiresExistingStore` refusal, the `init`-inside-worktree refusal,
+   - **What this actually covers (D7, and no more):** unknown verb (see P5),
+     the `requiresExistingStore` refusal, the `init`-inside-worktree refusal,
      `dataDir`/`--dir` faults, and arg-parse faults once P4 below lands.
+   - **P5 (found at validating): unknown verb is detected by lookup, not by
+     position.** Its error is thrown at `bin/fgos.mjs:2567`, inside `runVerb`
+     (which opens at `698`), so position alone would classify it as a business
+     refusal. `main()` already performs the lookup that answers it —
+     `COMMAND_REGISTRY.find((e) => e.name === verb)` — one line above the
+     `requiresExistingStore` guard, so `!entry` is an observable pre-handler
+     signal needing no new machinery. The error itself still comes from `2567`
+     unchanged, so D4 holds.
    - **What it does not cover:** missing-required-flag and invalid-id faults,
      both named in D1. They are raised below `runVerb` (e.g. the `--domain`
      diagnostic at `bin/fgos.mjs:666`) across 73 sites, indistinguishable by
