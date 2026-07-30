@@ -76,6 +76,20 @@ test('every registry entry has touchesState, externalEffect, paginated, requires
   }
 });
 
+test('docs-index registry flags reflect what the verb actually does (tsk-1wn D2/D4)', () => {
+  const entry = COMMAND_REGISTRY.find((e) => e.name === 'docs-index');
+  assert.ok(entry, 'docs-index entry not found in COMMAND_REGISTRY');
+  // externalEffect: true -- it writes docs/enduser-docs-index.json, a real
+  // file outside .fgos/.
+  assert.equal(entry.externalEffect, true);
+  // touchesState: false -- it never appends an event or overwrites
+  // .fgos/state.json.
+  assert.equal(entry.touchesState, false);
+  // requiresExistingStore stays false (D4): flipping it would need
+  // touchesState: true too (the invariant above), which would be false.
+  assert.equal(entry.requiresExistingStore, false);
+});
+
 test('no duplicate verb names in the registry', () => {
   const names = COMMAND_REGISTRY.map((entry) => entry.name);
   assert.deepEqual(names, [...new Set(names)]);

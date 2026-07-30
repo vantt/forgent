@@ -1273,7 +1273,14 @@ async function runVerb(verb, flags, positional, dir) {
     // OVERWRITES enduser-docs-index.json whole — there is no accumulating
     // state for a re-run to duplicate (D12 validation constraint (d)).
     case 'docs-index': {
-      const repoRoot = process.cwd();
+      // repoRoot must track `dir` (the --dir-aware, main-checkout-resolved
+      // store path), never raw process.cwd(): a worktree session's cwd is
+      // its own local checkout (ADR0020), and scanning/writing against cwd
+      // instead of the real shared root silently targets the wrong docs/
+      // tree entirely. `dir` is always exactly `<repoRoot>/.fgos`
+      // (fgosDirFromRoot, src/runner/paths.mjs), so its parent recovers the
+      // one true root regardless of where this command was invoked from.
+      const repoRoot = path.dirname(dir);
       const docEntries = [];
       // Scans one on-disk dir for `.md` files and pushes each as a docEntry
       // tagged with `quadrant` — the quadrant this dir counts as, which for
@@ -1303,10 +1310,25 @@ async function runVerb(verb, flags, positional, dir) {
           scanDirAsQuadrant(path.join(repoRoot, 'docs', alias), quadrant);
         }
       }
+      // fs.readdirSync order is not guaranteed stable across worktree
+      // checkouts of the same doc set — sort before building the manifest
+      // so re-runs over unchanged docs produce byte-identical output (a
+      // prerequisite for the write-only-if-changed guard below to ever
+      // actually skip a write).
+      docEntries.sort((a, b) => (a.quadrant === b.quadrant ? (a.docPath < b.docPath ? -1 : 1) : (a.quadrant < b.quadrant ? -1 : 1)));
       const view = listWork(dir);
       const entries = buildEnduserIndex(docEntries, view.outcomes ?? {});
       const manifestPath = path.join(repoRoot, 'docs', 'enduser-docs-index.json');
-      fs.writeFileSync(manifestPath, `${JSON.stringify(entries, null, 2)}\n`, 'utf8');
+      const nextContent = `${JSON.stringify(entries, null, 2)}\n`;
+      let previousContent;
+      try {
+        previousContent = fs.readFileSync(manifestPath, 'utf8');
+      } catch (err) {
+        if (err.code !== 'ENOENT') throw err;
+      }
+      if (previousContent !== nextContent) {
+        fs.writeFileSync(manifestPath, nextContent, 'utf8');
+      }
       return {
         path: path.relative(repoRoot, manifestPath).split(path.sep).join('/'),
         count: entries.length,

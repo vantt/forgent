@@ -218,6 +218,71 @@ test('--dir pointed at the main checkout itself (from main\'s own cwd) is a no-o
   assert.equal(eventLines(main).length, before + 1);
 });
 
+// tsk-1wn D1: `docs-index` used to derive its scan/write root from raw
+// process.cwd(), independent of --dir -- a worktree-resident session
+// running it as instructed (bare `fgos docs-index --dir <main>`) would
+// silently scan and write the WORKTREE's own docs/ tree instead of the
+// real shared one. These pin repoRoot to track --dir like every other
+// verb.
+function docsIndexManifestPath(root) {
+  return path.join(root, 'docs', 'enduser-docs-index.json');
+}
+
+test('docs-index run from a .fgos/-less worktree cwd with --dir writes the shared manifest at the real root, not the worktree cwd (tsk-1wn D1)', () => {
+  const { main, wt } = tmpLinkedWorktree();
+  fs.mkdirSync(path.join(main, 'docs', 'how-to'), { recursive: true });
+  fs.writeFileSync(path.join(main, 'docs', 'how-to', 'sample.md'), '# Sample Doc\n');
+
+  const result = run(wt, ['docs-index', '--dir', main]);
+  assert.equal(result.status, 0, `docs-index --dir unexpectedly failed: ${result.stderr}`);
+
+  const data = envelopeData(result.stdout);
+  assert.equal(data.count, 1);
+  assert.equal(data.entries[0].docPath, 'docs/how-to/sample.md');
+  assert.ok(fs.existsSync(docsIndexManifestPath(main)), 'manifest must land at the real main-checkout root');
+  assert.ok(!fs.existsSync(docsIndexManifestPath(wt)), 'docs-index must never write into the worktree cwd\'s own docs/ tree');
+});
+
+test('docs-index re-run with no doc changes does not rewrite the manifest file (tsk-1wn D3 write-only-if-changed guard)', () => {
+  const cwd = tmpCwd();
+  fs.mkdirSync(path.join(cwd, 'docs', 'how-to'), { recursive: true });
+  fs.writeFileSync(path.join(cwd, 'docs', 'how-to', 'sample.md'), '# Sample Doc\n');
+
+  assert.equal(run(cwd, ['docs-index']).status, 0);
+  const mtimeAfterFirst = fs.statSync(docsIndexManifestPath(cwd)).mtimeMs;
+
+  assert.equal(run(cwd, ['docs-index']).status, 0);
+  const mtimeAfterSecond = fs.statSync(docsIndexManifestPath(cwd)).mtimeMs;
+
+  assert.equal(mtimeAfterSecond, mtimeAfterFirst, 'unchanged doc content must skip the write, not touch the file');
+});
+
+test('docs-index re-run after a real doc change DOES rewrite the manifest (tsk-1wn D3 guard does not mask real updates)', () => {
+  const cwd = tmpCwd();
+  fs.mkdirSync(path.join(cwd, 'docs', 'how-to'), { recursive: true });
+  fs.writeFileSync(path.join(cwd, 'docs', 'how-to', 'sample.md'), '# Sample Doc\n');
+  assert.equal(run(cwd, ['docs-index']).status, 0);
+  assert.equal(JSON.parse(fs.readFileSync(docsIndexManifestPath(cwd), 'utf8')).length, 1);
+
+  fs.writeFileSync(path.join(cwd, 'docs', 'how-to', 'second.md'), '# Second Doc\n');
+  assert.equal(run(cwd, ['docs-index']).status, 0);
+  assert.equal(JSON.parse(fs.readFileSync(docsIndexManifestPath(cwd), 'utf8')).length, 2, 'a real doc addition must still update the manifest');
+});
+
+test('docs-index manifest entries come out in deterministic order regardless of directory-read order (tsk-1wn D3 sort)', () => {
+  const cwd = tmpCwd();
+  fs.mkdirSync(path.join(cwd, 'docs', 'how-to'), { recursive: true });
+  // Written deliberately out of alphabetical order.
+  fs.writeFileSync(path.join(cwd, 'docs', 'how-to', 'b-doc.md'), '# B Doc\n');
+  fs.writeFileSync(path.join(cwd, 'docs', 'how-to', 'a-doc.md'), '# A Doc\n');
+
+  const result = run(cwd, ['docs-index']);
+  assert.equal(result.status, 0);
+  const data = envelopeData(result.stdout);
+  const paths = data.entries.filter((e) => e.quadrant === 'how-to').map((e) => e.docPath);
+  assert.deepEqual(paths, ['docs/how-to/a-doc.md', 'docs/how-to/b-doc.md']);
+});
+
 // tsk-56t D2: `list`/`ready`/etc. stay `requiresExistingStore: false` (a
 // fresh non-worktree dir with no store is legitimately "not evaluated",
 // not an error) — but a worktree-resident session that forgets `--dir`
