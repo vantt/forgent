@@ -95,6 +95,11 @@ pub fn herdr_bin() -> String {
 /// layout manager (`layout::place_new_agent_pane`, tsk-1q3's `fg:agents-N`
 /// tab/grid logic) instead of always splitting the caller's own pane —
 /// superseding this function's old `pane split --current`-only shape.
+/// Already tsk-3t9-3's asked-for port/adapter shape: `layout` is this
+/// function's own implementation detail, never touched by `app.rs`/
+/// `main.rs`'s event loop directly — the domain only ever calls
+/// `PaneOrchestrator::open_pick_pane`/`focus_pane` (this `impl` block,
+/// below), never `layout::` or this free function itself.
 pub fn open_pick_pane(herdr_bin: &str, workspace_id: &str, id: &str) -> io::Result<()> {
     let pane_id = layout::place_new_agent_pane(herdr_bin, workspace_id).map_err(io::Error::other)?;
 
