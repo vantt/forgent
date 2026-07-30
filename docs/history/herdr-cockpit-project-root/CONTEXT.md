@@ -76,6 +76,19 @@ Ngoài phạm vi (đã nêu ra và defer, không hấp thụ vào item này):
   - `herdr plugin config-dir <plugin_id>`
   - `herdr workspace list`
 
+## Đính chính bằng chứng (probe live 2026-07-30, trong `fgos-validating` của tsk-45u)
+
+- D6 viết "cwd của mọi herdr workspace khác qua `herdr workspace list`" — **sai**.
+  `herdr workspace list` và `herdr workspace get <id>` **không** trả field `cwd`
+  (probe thật: chỉ có `workspace_id`, `label`, `number`, `pane_count`,
+  `tab_count`, `active_tab_id`, `agent_status`, `focused`).
+  Chỗ thật sự mang cwd là `herdr pane list --workspace <id>`: mỗi pane có
+  `cwd` và `foreground_cwd`. Ý định của D6 (gom ứng viên từ các workspace
+  khác) không đổi; chỉ nguồn dữ liệu đổi sang `pane list`. Thuộc `tsk-3b0`.
+- Xác nhận live cho `tsk-45u`: `herdr tab create --cwd /tmp` cho root pane
+  `cwd":"/tmp"`, và `herdr pane split --cwd /home/vantt` cho pane mới
+  `cwd":"/home/vantt"` — cả hai cờ đều được honor thật.
+
 ## Canonical references
 
 - `docs/history/herdr-fgos-tui-plugin/CONTEXT.md` — quyết định gốc dựng plugin.
