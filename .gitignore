@@ -15,6 +15,11 @@ output.txt
 # main-checkout activity lock + sibling lock files (STR65) — process state, never committed
 .fgos/*.lock
 
+# malformed-invocation records — local forensics only. The records carry the
+# raw argv of the bad call, so committing them would push whatever flag values
+# it happened to contain.
+.fgos/invocation-faults.jsonl
+
 # BEE:START
 .bee/state.json
 .bee/reservations.json

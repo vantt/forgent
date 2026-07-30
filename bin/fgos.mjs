@@ -59,6 +59,7 @@ import { DEFAULTS } from '../src/state/work.mjs';
 import { getDomain, stageForStep } from '../src/state/workflow-stage-graphs.mjs';
 import { writeCoexistenceManifest } from '../src/install/coexist.mjs';
 import { MANIFEST_SCHEMA_VERSION, COMMAND_REGISTRY } from '../src/cli/command-registry.mjs';
+import { recordInvocationFault } from '../src/cli/invocation-fault-log.mjs';
 import { computeAwaitingContext } from '../src/state/awaiting-context.mjs';
 import { DOCTOR_CHECKS, integrationScriptPath } from '../src/setup/checks.mjs';
 import { installGitHooks } from '../src/setup/git-hooks.mjs';
@@ -2714,15 +2715,26 @@ async function main() {
     return;
   }
 
-  const { flags, positional } = parseArgs(rest);
-
-  if (flags.help && !flags.json && handleVerbHelp(verb)) {
-    process.exitCode = 0;
-    return;
-  }
-
+  // tsk-5z0: which pre-handler fault the code is currently exposed to, so the
+  // catch below can tell a malformed CALL apart from a verb's own refusal
+  // without reading `err.message` (that would couple this to ~73 hand-written
+  // strings and misclassify the moment one is reworded). Each assignment
+  // names what the very next statement can throw; `null` means "past the
+  // pre-handler region — whatever fails now is the verb answering correctly".
+  // `parseArgs` sits inside the try for exactly this reason: outside it, an
+  // arg-parse fault never reached this catch at all and could not be recorded.
+  let faultClass = 'arg-parse';
+  let dir;
   try {
-    const dir = dataDir(flags.dir);
+    const { flags, positional } = parseArgs(rest);
+
+    if (flags.help && !flags.json && handleVerbHelp(verb)) {
+      process.exitCode = 0;
+      return;
+    }
+
+    faultClass = 'dir-invalid';
+    dir = dataDir(flags.dir);
     // tsk-4fu-2: a verb registered `requiresExistingStore: true`
     // (command-registry.mjs) reads/writes through this `dir` — refuse
     // before ever reaching its handler when `.fgos/` isn't there yet,
@@ -2733,12 +2745,14 @@ async function main() {
     // check: refuse when `cwd` is a linked worktree, the one remaining
     // path that could recreate a live `.fgos/` there and defeat ADR0020.
     const entry = COMMAND_REGISTRY.find((e) => e.name === verb);
+    faultClass = 'store-missing';
     if (entry?.requiresExistingStore && !fs.existsSync(dir)) {
       throw new StoreError(
         'validation',
         `.fgos/ not found at "${dir}" -- run "fgos init" here first, or check you are not inside a linked worktree (worktrees never carry .fgos/, per ADR0020: docs/decisions/0020-chan-fgos-khoi-worktree-worker.md).`,
       );
     }
+    faultClass = 'init-in-worktree';
     if (verb === 'init' && !isMainWorktree(process.cwd())) {
       throw new StoreError(
         'validation',
@@ -2760,6 +2774,14 @@ async function main() {
         `fgos: warning: .fgos/ not found at "${dir}" -- this view may be empty because the real store lives elsewhere (worktrees never carry .fgos/, per ADR0020); pass --dir <mainRoot> to read it.\n`,
       );
     }
+    // Past this line the verb's own handler runs, and its refusals ("work X
+    // not found", an Iron Law trip, a held lock) are correct answers rather
+    // than misuse — so nothing there is recorded. The one exception is an
+    // unknown verb: its error is thrown deep inside `runVerb`, where position
+    // alone would file it as an ordinary refusal, but the registry lookup
+    // above already answers it without new machinery. The error itself still
+    // comes from `runVerb` unchanged.
+    faultClass = entry ? null : 'unknown-verb';
     const data = await runVerb(verb, flags, positional, dir);
     if (flags.pretty && (verb === 'setup' || verb === 'doctor')) {
       process.stdout.write(renderPretty(verb, data));
@@ -2768,7 +2790,23 @@ async function main() {
     }
     process.exitCode = 0;
   } catch (err) {
+    // tsk-5z0: record before reporting, and only say the record exists when
+    // one actually landed — `recordInvocationFault` returns null when the
+    // fault is a verb's own refusal, when there is no store to write to, or
+    // when the write itself failed. It never throws, so the two statements
+    // below stay exactly what they were.
+    const recorded = recordInvocationFault({
+      fgosDir: dir,
+      cwd: process.cwd(),
+      verb,
+      faultClass,
+      message: err.message,
+      argv: process.argv.slice(2),
+    });
     process.stderr.write(`fgos: ${err.message}\n`);
+    if (recorded) {
+      process.stderr.write(`fgos: invocation fault recorded to ${recorded}\n`);
+    }
     process.exitCode = EXIT_CODES[categoryOf(err)] ?? 1;
   }
 }
