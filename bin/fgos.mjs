@@ -1027,6 +1027,25 @@ async function runVerb(verb, flags, positional, dir) {
 
     case 'list': {
       const rawView = listWork(dir);
+      // Single-item lookup (tsk-42m D1/D2): `--id` bypasses the open-only
+      // default and `--all` entirely -- naming a specific id already
+      // commits to that item regardless of status, the same way every
+      // other id-based verb (take/return/review/approve/reject/rollup/
+      // compound/discover) resolves `work[id]` directly and throws the
+      // same not-found shape on a miss.
+      if (flags.id !== undefined) {
+        const id = requireField(flags.id, 'list --id requires a non-empty work id');
+        const item = rawView.work[id];
+        if (!item) {
+          throw new StoreError('validation', `list: work "${id}" not found.`);
+        }
+        const singleView = { ...rawView, work: { [id]: item } };
+        if (item.status === 'awaiting-human') {
+          const ctx = computeAwaitingContext(singleView, id);
+          if (ctx) return { ...singleView, awaitingContext: { [id]: ctx } };
+        }
+        return singleView;
+      }
       // Open-only default (tsk-5oa D1/D2): `list` shows only
       // status !== 'done' items unless `--all` is passed, matching
       // `triage`'s pre-existing open-only default. Only the `work` map

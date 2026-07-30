@@ -284,6 +284,34 @@ test('list --all restores the done item alongside the open one', () => {
   assert.ok(work['finished-item']);
 });
 
+test('list --id returns only that item, ignoring the open-only default and --all entirely (tsk-42m D2)', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'open-item', { title: 'Open Item' });
+  addOk(cwd, 'other-item', { title: 'Other Item' });
+
+  const work = envelopeData(run(cwd, ['list', '--id', 'open-item']).stdout).work;
+  assert.deepEqual(Object.keys(work), ['open-item']);
+  assert.equal(work['open-item'].title, 'Open Item');
+});
+
+test('list --id on a done item returns it without needing --all (tsk-42m D2: --id bypasses the open-only default entirely)', () => {
+  const cwd = tmpCwd();
+  const dir = path.join(cwd, '.fgos');
+  addWork(dir, { id: 'finished-item', title: 'Finished Item', kind: 'task', status: 'done', deps: [], risk: 'low', refs: [], verify: 'npm test' });
+
+  const work = envelopeData(run(cwd, ['list', '--id', 'finished-item']).stdout).work;
+  assert.equal(work['finished-item'].status, 'done');
+});
+
+test('list --id on an unknown id is rejected as validation (not-found), exit 4 (tsk-42m D2)', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'open-item');
+
+  const result = run(cwd, ['list', '--id', 'no-such-item']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /list: work "no-such-item" not found/);
+});
+
 test('list default keeps an awaiting-human item visible (D2: "not done" is exactly status !== done, not a broader closed/terminal set)', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'parked-item', { title: 'Parked Item' });
