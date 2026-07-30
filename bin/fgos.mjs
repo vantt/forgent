@@ -38,6 +38,7 @@ import { createGitHubPR, mergeGitHubPR, viewGitHubPRStatus } from '../src/runner
 import { classifyIronLaw } from '../src/evolve/iron-law.mjs';
 import { branchNameFor, branchExists, withMergeEphemeralWorktree } from '../src/runner/worktree.mjs';
 import { claimWork, ClaimError } from '../src/runner/claim-port.mjs';
+import { withLockRetry } from '../src/runner/lock-wait.mjs';
 import {
   acquireMainCheckoutLock,
   releaseMainCheckoutLock,
@@ -191,6 +192,24 @@ function requireField(value, message) {
 function optionalField(value, message) {
   if (value === undefined) return undefined;
   return requireField(value, message);
+}
+
+// tsk-6c2 D3: retry-with-backoff on main-checkout-lock contention is
+// default ON for take/pick/approve -- no flag needed. `--wait <ms>` tightens
+// the wait budget (never extends past the lock's own remainingTtlMs,
+// withLockRetry's job); bare `--wait` (no value) is a harmless no-op alias
+// for the default. `--no-wait` is the opt-out, restoring today's exact
+// immediate-fail-on-HELD behavior.
+function parseWaitFlags(flags, verbName) {
+  const noWait = Boolean(flags['no-wait']);
+  let waitMs;
+  if (flags.wait !== undefined && flags.wait !== true) {
+    waitMs = Number(flags.wait);
+    if (!Number.isFinite(waitMs) || waitMs <= 0) {
+      throw new StoreError('validation', `${verbName} --wait must be a positive number of milliseconds (got "${flags.wait}").`);
+    }
+  }
+  return { noWait, waitMs };
 }
 
 // Shared --timeout/--no-timeout resolution for return/approve/catchup
@@ -1385,13 +1404,15 @@ async function runVerb(verb, flags, positional, dir) {
 
       // Delegate to claim-port.mjs — single choke-point for all claim flows
       // (tsk-53f D1). take uses isolate:false (no worktree creation).
+      const { noWait, waitMs } = parseWaitFlags(flags, 'take');
+      const doTake = () => claimWork(dir, {
+        id,
+        actor: role,
+        isolate: false,
+        repoRoot: process.cwd(),
+      });
       try {
-        return claimWork(dir, {
-          id,
-          actor: role,
-          isolate: false,
-          repoRoot: process.cwd(),
-        });
+        return noWait ? doTake() : await withLockRetry(doTake, { waitMs });
       } catch (err) {
         if (err instanceof ClaimError) {
           throw new StoreError(err.category, `take: ${err.message}`);
@@ -1438,22 +1459,24 @@ async function runVerb(verb, flags, positional, dir) {
       // stands (released back to `todo` at the clarify/decompose ->
       // executing boundary, claim-lock §3b) reattaches to that same branch
       // tip via createWorktree's reuse path instead of forking a new one.
+      const { noWait, waitMs } = parseWaitFlags(flags, 'pick');
+      // worktreeDir under .claude/worktrees/ (tsk-424 D1/D2): the harness's
+      // own EnterWorktree tool only allows a second-or-later in-session
+      // switch when the target sits there, e.g. a root item decomposing
+      // into a child mid-session. os.tmpdir()/fgos-worktrees (createWorktree's
+      // own default) fails that check past the first switch — pick is the
+      // only caller that needs the harness-chainable location; runner/
+      // merge-ephemeral callers are untouched.
+      const doPick = () => claimWork(dir, {
+        id,
+        actor: 'session',
+        isolate: true,
+        claimTrigger,
+        repoRoot: process.cwd(),
+        worktreeDir: path.join(process.cwd(), '.claude', 'worktrees'),
+      });
       try {
-        // worktreeDir under .claude/worktrees/ (tsk-424 D1/D2): the harness's
-        // own EnterWorktree tool only allows a second-or-later in-session
-        // switch when the target sits there, e.g. a root item decomposing
-        // into a child mid-session. os.tmpdir()/fgos-worktrees (createWorktree's
-        // own default) fails that check past the first switch — pick is the
-        // only caller that needs the harness-chainable location; runner/
-        // merge-ephemeral callers are untouched.
-        return claimWork(dir, {
-          id,
-          actor: 'session',
-          isolate: true,
-          claimTrigger,
-          repoRoot: process.cwd(),
-          worktreeDir: path.join(process.cwd(), '.claude', 'worktrees'),
-        });
+        return noWait ? doPick() : await withLockRetry(doPick, { waitMs });
       } catch (err) {
         if (err instanceof ClaimError) {
           throw new StoreError(err.category, `pick: ${err.message}`);
@@ -1719,6 +1742,8 @@ async function runVerb(verb, flags, positional, dir) {
     case 'approve': {
       const id = requireField(positional[0] ?? flags.id, 'approve requires an id: fgos approve <id> [--timeout <ms>|--no-timeout]');
       const timeoutMs = resolveVerifyTimeoutMs('approve', flags, process.cwd());
+      const { noWait, waitMs } = parseWaitFlags(flags, 'approve');
+      const runMerge = (mergeFn) => (noWait ? mergeFn() : withLockRetry(mergeFn, { waitMs }));
 
       const view = listWork(dir);
       const item = view.work[id];
@@ -1899,7 +1924,7 @@ async function runVerb(verb, flags, positional, dir) {
           // leave the ephemeral checkout clean via `git merge --abort`, so
           // no cleanupMergedBranch call is needed on those paths.
           return await withMergeEphemeralWorktree(repoRoot, rootId, async (ephemeral) => {
-            const result = await mergeRunnerItem(ephemeral.path, item, { timeoutMs });
+            const result = await runMerge(() => mergeRunnerItem(ephemeral.path, item, { timeoutMs }));
 
             if (result.outcome === 'conflict') {
               moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: 'merge-conflict', role: 'system' });
@@ -1973,7 +1998,7 @@ async function runVerb(verb, flags, positional, dir) {
         // zero behavior change for the common case.
         const hadChildren = Object.values(view.work).some((w) => w.parent === id);
 
-        const result = await mergeRunnerItem(repoRoot, item, { timeoutMs });
+        const result = await runMerge(() => mergeRunnerItem(repoRoot, item, { timeoutMs }));
 
         if (result.outcome === 'conflict') {
           const reason = hadChildren ? 'integration-drift' : 'merge-conflict';

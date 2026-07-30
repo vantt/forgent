@@ -60,6 +60,10 @@ test('claimWork throws a categorized ClaimError (not an uncategorized crash) whe
       assert.ok(err instanceof ClaimError);
       assert.equal(err.code, 'lock-held');
       assert.equal(err.category, 'lock-timeout', 'must be categorized so the runner halts gracefully instead of crashing the whole drain-run');
+      // tsk-6c2: a caller-side retry wrapper needs remainingTtlMs to bound
+      // its wait budget without parsing it back out of the message string.
+      assert.equal(typeof err.remainingTtlMs, 'number');
+      assert.equal(err.holderPid, 'some-writer-session-id');
       return true;
     },
   );
@@ -76,6 +80,9 @@ test('claimWork throws a categorized ClaimError (unreadable/corrupt lock content
       assert.ok(err instanceof ClaimError);
       assert.equal(err.code, 'lock-ambiguous');
       assert.equal(err.category, 'lock-timeout');
+      // tsk-6c2: a retry wrapper checking `err.code === 'lock-held'` must
+      // never mistake this for a retryable state.
+      assert.equal(err.remainingTtlMs, undefined);
       return true;
     },
   );
