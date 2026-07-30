@@ -6,7 +6,7 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { claimWork, ClaimError } from '../../src/runner/claim-port.mjs';
 import { LOCK_FILE, DEFAULT_TTL_MS } from '../../src/runner/main-checkout-lock.mjs';
-import { initStore, addWork, moveWork } from '../../src/state/store.mjs';
+import { initStore, addWork, moveWork, listWork, FsmError } from '../../src/state/store.mjs';
 
 // claim-port.mjs's claimWork shares main-checkout.lock with .githooks/
 // pre-commit (tsk-3w8) — the hook writes a STRING-identity record per commit
@@ -138,4 +138,32 @@ test('claimWork on an UNMARKED todo-with-branch reclaim (e.g. reject) still reco
 
   assert.notEqual(reclaim.branchHeadAtTake, originalBranchHeadAtTake, 'must NOT preserve the stale pre-attempt marker');
   assert.equal(reclaim.branchHeadAtTake, tipAfterAttempt, 'must recompute fresh to the live tip, demanding new work before a future return');
+});
+
+// tsk-49a: proves the guarantee this item was filed to check — a runner
+// claimItem() call must be rejected while an item sits status:doing under a
+// live claimRole:session claim, never allowed to race it into a second
+// "doing" write. Both take and the runner's own claimItem funnel through
+// THIS SAME claimWork choke point (claim-port.mjs's own module comment), so
+// exercising both actors through claimWork directly is a faithful proof of
+// the real call sites, not a stand-in for them.
+test('claimWork rejects a runner claim on an item already claimed (doing) by a live session claim, and leaves the session claim untouched (tsk-49a)', () => {
+  const { repoRoot, dir } = setup();
+
+  const sessionClaim = claimWork(dir, { id: 'item-a', actor: 'session', isolate: false, repoRoot });
+  assert.equal(sessionClaim.to, 'doing');
+
+  assert.throws(
+    () => claimWork(dir, { id: 'item-a', actor: 'runner', isolate: false, repoRoot }),
+    (err) => {
+      assert.ok(err instanceof FsmError, 'must be the CAS-conflict error, not some other failure');
+      assert.equal(err.category, 'conflict', 'must be categorized as a conflict so the runner halts gracefully instead of overwriting the live claim');
+      return true;
+    },
+  );
+
+  const afterRejectedClaim = listWork(dir).work['item-a'];
+  assert.equal(afterRejectedClaim.status, 'doing', 'the rejected runner claim must not have moved the item off doing');
+  assert.equal(afterRejectedClaim.claimRole, 'session', 'the original session claim must survive completely untouched');
+  assert.equal(afterRejectedClaim.headAtTake, sessionClaim.headAtTake, 'the session claim\'s own headAtTake must not be overwritten by the rejected runner attempt');
 });

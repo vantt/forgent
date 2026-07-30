@@ -149,6 +149,36 @@ feature: nothing yet makes a live session-role claim visible to the
 runner's own frontier/dispatch selection the way a main-checkout-lock
 holder already is.
 
+**Correction (`tsk-49a`, 2026-07-30):** the paragraph above does not hold up
+against the real event log and is kept here only as the historical belief
+that motivated `tsk-49a`'s filing, not as an accurate description of
+today's behavior. A full scan of `.fgos/events.jsonl` (565 `work.move`
+events, every one of them, not a sample) found **zero** genuine
+runner-vs-session double-claims anywhere in the log — including on
+`tsk-4fu-2` itself, whose actual event trail (`work.move` seq 775 take →
+seq 798 return, both `writer.id: e5001984-…`, `passed: true`) shows a
+single actor completing an ordinary take → implement → return → done
+cycle, not two competing actors. The "independent commit… landed directly
+on `main`" observation above is explained by `fgos take`'s own documented
+semantics, not a race: `take` (`isolate: false`, no `fgw/<id>` branch yet)
+deliberately works directly against the main checkout's current HEAD
+(`src/runner/claim-port.mjs`'s `useBranchSource` is `false` in this case;
+only `pick` isolates into a worktree/branch) — a mid-task commit by the
+*same* claiming session lands on `main` by design, and is easy to mistake
+for a foreign actor's parallel work if found before that session has run
+its own `return`. `claim-port.mjs`'s single choke point (`take`/`pick`/the
+runner's own `claimItem` all funnel through the same `claimWork`, CAS-
+guarded via `moveWork`'s `expectedStatus`) already rejects a second
+claimant once the first has flipped an item to `doing` — confirmed both by
+reading that code and by a live repro (session claims, then a runner claim
+on the same id throws `FsmError`, `category: 'conflict'`, with the
+session's own claim left completely untouched) — and this guarantee is now
+additionally locked in by a regression test
+(`test/runner/claim-port.test.mjs`, "claimWork rejects a runner claim on an
+item already claimed (doing) by a live session claim…"). See
+`docs/history/tsk-49a-runner-claim-race/CONTEXT.md` for the full scout
+evidence trail.
+
 ---
 
 **Source:** `docs/history/learnings/critical-patterns.md` —
@@ -163,4 +193,8 @@ phase-2-routing, 2026-07-14);
 and fixed at `962eb6b` (feature tsk-3ld, 2026-07-29);
 `docs/history/fgos-worktree-state-write-guard/CONTEXT.md` and `plan.md` —
 `requiresExistingStore` guard locked, planned, and reality-gated (feature
-tsk-4fu-2, 2026-07-29).
+tsk-4fu-2, 2026-07-29);
+`docs/history/tsk-49a-runner-claim-race/CONTEXT.md` and `plan.md` — the
+runner-vs-session claim-race premise checked against the full event log
+and found not to hold; regression test locks the real guarantee in
+instead (feature tsk-49a, 2026-07-30).
