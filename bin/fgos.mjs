@@ -443,6 +443,28 @@ function collectLearningData(view, id) {
 // the check surface reminds records that reached an end state without their
 // outcome). An item sitting in a final status should carry its actual half;
 // listing the ones that don't keeps the predicted→actual loop honest.
+// tsk-4on D2: gates `return --no-new-commits-ok` (bin/fgos.mjs's `return`
+// case) — refuses the flag whenever this item's outcome history has EVER
+// recorded a `blocked` actual outcome, item-wide, not scoped to the
+// current claim. `view.outcomes[id].actual` survives an intervening
+// retake untouched (replay.mjs's fold only spreads whichever of
+// `predicted`/`actual` a given `work.outcome` event's payload carries; a
+// retake's claim-time event only ever carries `predicted`), so this keeps
+// seeing a real past verify-fail even after a blocked-retake resets
+// `branchHeadAtTake`/`headAtTake` to the retake-time tip — closing the
+// exact loop the flag would otherwise open: retake a blocked item, invoke
+// the flag with zero new commits, hope verify passes for unrelated
+// reasons. The flag can only close out work that was never returned at
+// all, never rescue a failed retry.
+function assertNoPriorBlockedOutcome(view, id) {
+  if (view.outcomes?.[id]?.actual?.outcome === 'blocked') {
+    throw new StoreError(
+      'validation',
+      `return: "${id}" cannot use --no-new-commits-ok — this item was previously blocked by a failed verify; the flag only closes out work that was never returned, never rescues a failed retry. Commit new work and retry return normally.`,
+    );
+  }
+}
+
 function collectMissingOutcomeNag(view, id) {
   const outcomes = view.outcomes ?? {};
   const FINAL_STATUSES = new Set(['awaiting-approval', 'blocked', 'done']);
@@ -1524,10 +1546,17 @@ async function runVerb(verb, flags, positional, dir) {
     // settlement belongs to the ->done edge, D4); verify red ->
     // doing->blocked + friction (mirrors the runner's own park path).
     case 'return': {
-      const id = requireField(positional[0] ?? flags.id, 'return requires an id: fgos return <id> [--timeout <ms>|--no-timeout]');
+      const id = requireField(positional[0] ?? flags.id, 'return requires an id: fgos return <id> [--timeout <ms>|--no-timeout] [--no-new-commits-ok]');
       const timeoutMs = resolveVerifyTimeoutMs('return', flags, process.cwd());
+      // tsk-4on D1-D3: explicit escape hatch for work already fully done
+      // BEFORE this claim (e.g. a parent whose children's merged content
+      // already sits on its own branch from a prior session) — return's
+      // default contract (prove new work since take) stays byte-identical
+      // when this flag is absent.
+      const noNewCommitsOk = flags['no-new-commits-ok'] === true;
 
-      const item = listWork(dir).work[id];
+      const view = listWork(dir);
+      const item = view.work[id];
       if (!item) {
         throw new StoreError('validation', `return: work "${id}" not found.`);
       }
@@ -1559,10 +1588,13 @@ async function runVerb(verb, flags, positional, dir) {
         }
         const branchAheadCount = commitsSince(repoRoot, item.branchHeadAtTake, branchHead);
         if (branchAheadCount <= 0) {
-          throw new StoreError(
-            'validation',
-            `return: branch "${branch}" has not advanced past branchHeadAtTake for "${id}" (${item.branchHeadAtTake} -> ${branchHead}) — commit the work on the branch before returning.`,
-          );
+          if (!noNewCommitsOk) {
+            throw new StoreError(
+              'validation',
+              `return: branch "${branch}" has not advanced past branchHeadAtTake for "${id}" (${item.branchHeadAtTake} -> ${branchHead}) — commit the work on the branch before returning, or pass --no-new-commits-ok if the work was already done before this claim.`,
+            );
+          }
+          assertNoPriorBlockedOutcome(view, id);
         }
 
         // No cwd-clean requirement here (D2: "tree người là việc của
@@ -1627,10 +1659,13 @@ async function runVerb(verb, flags, positional, dir) {
       }
       const aheadCount = commitsSince(cwd, item.headAtTake, head);
       if (aheadCount <= 0) {
-        throw new StoreError(
-          'validation',
-          `return: HEAD has not advanced past headAtTake for "${id}" (${item.headAtTake} -> ${head}) — commit the work before returning.`,
-        );
+        if (!noNewCommitsOk) {
+          throw new StoreError(
+            'validation',
+            `return: HEAD has not advanced past headAtTake for "${id}" (${item.headAtTake} -> ${head}) — commit the work before returning, or pass --no-new-commits-ok if the work was already done before this claim.`,
+          );
+        }
+        assertNoPriorBlockedOutcome(view, id);
       }
 
       const check = await runGoalCheck(item, cwd, timeoutMs);
