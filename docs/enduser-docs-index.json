@@ -208,6 +208,14 @@
     "sourceCaptureId": "tsk-3wr-3"
   },
   {
+    "quadrant": "reference",
+    "purpose": "Describe the machinery accurately and completely for lookup.",
+    "audience": "A user who needs precise facts about a specific field/command/API.",
+    "docPath": "docs/reference/triage-table-columns.md",
+    "title": "`/fgOS:triage` table columns",
+    "sourceCaptureId": "tsk-dus"
+  },
+  {
     "quadrant": "explanation",
     "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
     "audience": "A user seeking understanding of the design, not a task to complete.",
