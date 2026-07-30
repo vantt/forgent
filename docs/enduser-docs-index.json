@@ -27,6 +27,14 @@
     "quadrant": "how-to",
     "purpose": "Show the steps to accomplish one specific, already-understood goal.",
     "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/avoid-a-hung-verify-on-return-approve-catchup.md",
+    "title": "How to avoid a hung `verify` command on `fgos return`/`approve`/`catchup`",
+    "sourceCaptureId": "tsk-3vo"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
     "docPath": "docs/how-to/check-rollup-progress.md",
     "title": "How to check a root item's progress with `fgos rollup`",
     "sourceCaptureId": "doc-fgos-rollup-howto"
@@ -629,6 +637,14 @@
     "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/decisions/0024-doi-ten-status-proposed-thanh-awaiting-approval.md",
     "title": "0024 — Đổi tên status `proposed` thành `awaiting-approval`",
+    "sourceCaptureId": null
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/decisions/0025-mo-rong-uu-tien-san-pham-them-ux-van-hanh-vao-ship-faster.md",
+    "title": "0025 — Thứ tự ưu tiên sản phẩm (chi tiết hoá 0023), nạp always-loaded qua AGENTS.md",
     "sourceCaptureId": null
   }
 ]

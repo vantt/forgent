@@ -3602,7 +3602,10 @@ test('return --timeout error text no longer claims omitting --timeout means no t
   assert.equal(run(cwd, ['take', '--id', 'pull-return-timeout-error-text']).status, 0);
   commitFile(cwd, 'proof.txt');
 
-  const result = run(cwd, ['return', 'pull-return-timeout-error-text', '--timeout', 'soon']);
+  // A bare --timeout (no value, last arg) is what actually triggers this
+  // specific message -- 'soon' fails the separate numeric-check message
+  // instead, which never carried the old "omit ... for no timeout" wording.
+  const result = run(cwd, ['return', 'pull-return-timeout-error-text', '--timeout']);
   assert.equal(result.status, 4);
   assert.doesNotMatch(result.stderr, /omit --timeout entirely for no timeout/);
 });
