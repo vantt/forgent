@@ -24,6 +24,9 @@ pub trait PaneRegistry {
 /// independently of the render seam below.
 pub trait PaneOrchestrator {
     fn open_pick_pane(&self, id: &str) -> io::Result<()>;
+    /// Switches herdr's focus directly to an already-running pane
+    /// (tsk-1eu D2), never opening a new one.
+    fn focus_pane(&self, pane_id: &str) -> io::Result<()>;
 }
 
 /// Domain-level input the render adapter translates real terminal events
@@ -33,7 +36,12 @@ pub trait PaneOrchestrator {
 pub enum UiEvent {
     Up,
     Down,
+    /// Enter — its effect depends on which panel has focus (tsk-1eu D1):
+    /// "Work items" runs the existing pick action, "In process" jumps to
+    /// the selected task's pane.
     Pick,
+    /// Tab — switches which panel has keyboard focus (tsk-1eu D1).
+    SwitchPanel,
     Quit,
 }
 

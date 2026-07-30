@@ -105,6 +105,31 @@ pub fn open_pick_pane(herdr_bin: &str, workspace_id: &str, id: &str) -> io::Resu
     Ok(())
 }
 
+/// argv for `focus_pane` below (tsk-1eu D2).
+fn focus_pane_argv(pane_id: &str) -> Vec<String> {
+    ["pane", "zoom", pane_id, "--on"]
+        .into_iter()
+        .map(String::from)
+        .collect()
+}
+
+/// Switches herdr's focus directly to `pane_id` (tsk-1eu D2) via `pane
+/// zoom <pane_id> --on` — the only herdr CLI command proven (live, that
+/// item's own CONTEXT.md) to deterministically focus an arbitrary
+/// existing pane id regardless of which tab it lives in. This zooms the
+/// target pane full-screen within its tab as a real, accepted side
+/// effect; this function never un-zooms anything.
+pub fn focus_pane(herdr_bin: &str, pane_id: &str) -> io::Result<()> {
+    let output = Command::new(herdr_bin).args(focus_pane_argv(pane_id)).output()?;
+    if !output.status.success() {
+        return Err(io::Error::other(format!(
+            "herdr pane zoom failed: {}",
+            String::from_utf8_lossy(&output.stderr)
+        )));
+    }
+    Ok(())
+}
+
 /// The `PaneOrchestrator` adapter (tsk-3t9 D1): the concrete herdr-CLI
 /// implementation of the pane-orchestration port. Holds the resolved
 /// `herdr_bin`/`workspace_id` so the composition root (`main.rs`)
@@ -118,11 +143,23 @@ impl PaneOrchestrator for HerdrPaneAdapter {
     fn open_pick_pane(&self, id: &str) -> io::Result<()> {
         open_pick_pane(&self.herdr_bin, &self.workspace_id, id)
     }
+
+    fn focus_pane(&self, pane_id: &str) -> io::Result<()> {
+        focus_pane(&self.herdr_bin, pane_id)
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn pane_focus_argv_targets_the_given_pane_id() {
+        assert_eq!(
+            focus_pane_argv("wS:p1H"),
+            vec!["pane", "zoom", "wS:p1H", "--on"]
+        );
+    }
 
     #[test]
     fn launch_agent_run_argv_includes_skip_permissions_by_default() {
