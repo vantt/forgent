@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
-import { detectRcFiles, hasSourceLine, insertSourceLine } from '../../src/setup/shell-rc.mjs';
+import { detectRcFiles, hasSourceLine, insertSourceLine, deadSourceLines } from '../../src/setup/shell-rc.mjs';
 
 function mkTempDir(prefix) {
   return fs.mkdtempSync(path.join(os.tmpdir(), prefix));
@@ -183,5 +183,64 @@ test('insertSourceLine never creates a new rc file that does not already exist',
 
   assert.throws(() => insertSourceLine(rcFile, scriptPath));
   assert.equal(fs.existsSync(rcFile), false);
+  fs.rmSync(homeDir, { recursive: true, force: true });
+});
+
+test('deadSourceLines reports an fgos source line whose target no longer exists', () => {
+  const homeDir = mkTempDir('shell-rc-dead-');
+  const rcFile = path.join(homeDir, '.bashrc');
+  const gone = path.join(homeDir, 'removed-worktree', 'scripts', 'fgos-shell-integration.sh');
+  fs.writeFileSync(rcFile, `echo hi\nsource "${gone}"\n`);
+
+  assert.deepEqual(deadSourceLines(rcFile), [gone]);
+  fs.rmSync(homeDir, { recursive: true, force: true });
+});
+
+test('deadSourceLines never reports a line whose target still exists', () => {
+  const homeDir = mkTempDir('shell-rc-alive-');
+  const rcFile = path.join(homeDir, '.bashrc');
+  const live = path.join(homeDir, 'fgos-shell-integration.sh');
+  fs.writeFileSync(live, '');
+  fs.writeFileSync(rcFile, `source "${live}"\n`);
+
+  assert.deepEqual(deadSourceLines(rcFile), []);
+  fs.rmSync(homeDir, { recursive: true, force: true });
+});
+
+test('deadSourceLines reports every dead line, not just the first', () => {
+  const homeDir = mkTempDir('shell-rc-dead-many-');
+  const rcFile = path.join(homeDir, '.bashrc');
+  const first = path.join(homeDir, 'a', 'scripts', 'fgos-shell-integration.sh');
+  const second = path.join(homeDir, 'b', 'scripts', 'fgos-shell-integration.sh');
+  fs.writeFileSync(rcFile, `source "${first}"\nexport X=1\nsource "${second}"\n`);
+
+  assert.deepEqual(deadSourceLines(rcFile), [first, second]);
+  fs.rmSync(homeDir, { recursive: true, force: true });
+});
+
+test('deadSourceLines matches the unquoted and dot forms the insert pattern accepts', () => {
+  const homeDir = mkTempDir('shell-rc-dead-forms-');
+  const rcFile = path.join(homeDir, '.bashrc');
+  const unquoted = path.join(homeDir, 'a', 'scripts', 'fgos-shell-integration.sh');
+  const dotForm = path.join(homeDir, 'b', 'scripts', 'fgos-shell-integration.sh');
+  fs.writeFileSync(rcFile, `source ${unquoted}\n. "${dotForm}"\n`);
+
+  assert.deepEqual(deadSourceLines(rcFile), [unquoted, dotForm]);
+  fs.rmSync(homeDir, { recursive: true, force: true });
+});
+
+test('deadSourceLines ignores source lines the user wrote for their own scripts', () => {
+  const homeDir = mkTempDir('shell-rc-dead-foreign-');
+  const rcFile = path.join(homeDir, '.bashrc');
+  fs.writeFileSync(rcFile, `source "${path.join(homeDir, 'gone', 'my-own-thing.sh')}"\n`);
+
+  assert.deepEqual(deadSourceLines(rcFile), []);
+  fs.rmSync(homeDir, { recursive: true, force: true });
+});
+
+test('deadSourceLines returns nothing for an rc file that does not exist', () => {
+  const homeDir = mkTempDir('shell-rc-dead-absent-');
+
+  assert.deepEqual(deadSourceLines(path.join(homeDir, '.bashrc')), []);
   fs.rmSync(homeDir, { recursive: true, force: true });
 });
