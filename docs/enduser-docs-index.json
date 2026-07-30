@@ -99,6 +99,14 @@
     "quadrant": "how-to",
     "purpose": "Show the steps to accomplish one specific, already-understood goal.",
     "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/fix-fgos-write-rejected-merge-block.md",
+    "title": "How to fix a `fgos-write-rejected` merge block on a `.fgos/` change",
+    "sourceCaptureId": "tsk-n4i-1"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
     "docPath": "docs/how-to/fix-invisible-nested-project-skills.md",
     "title": "Fix a project skill that `Skill()` reports as \"Unknown skill\"",
     "sourceCaptureId": "tsk-d3c"
@@ -134,6 +142,14 @@
     "docPath": "docs/how-to/resolve-a-decision-id-collision-merge-conflict-on-approve.md",
     "title": "How to resolve an `fgos approve` merge-conflict caused by two branches claiming the same decision ID",
     "sourceCaptureId": "tsk-66l"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/resolve-an-events-jsonl-merge-conflict.md",
+    "title": "How to resolve a git merge conflict on `.fgos/events.jsonl` without breaking seq contiguity",
+    "sourceCaptureId": "tsk-n4i-2"
   },
   {
     "quadrant": "how-to",
@@ -350,6 +366,14 @@
     "docPath": "docs/explanation/why-a-verify-command-cannot-mutate-live-work-state.md",
     "title": "Why a `verify` command cannot itself mutate live work state",
     "sourceCaptureId": "tsk-4j9-4"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/why-live-events-jsonl-corrupted-and-how-it-was-fixed.md",
+    "title": "Why the live events.jsonl corrupted, and why the fix needed a split",
+    "sourceCaptureId": "tsk-n4i"
   },
   {
     "quadrant": "explanation",
