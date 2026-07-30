@@ -1,8 +1,14 @@
 # Research Report: Nâng cấp schema work-item (status branch, type hierarchy, nested domain fields, per-domain status flow)
 
-**Thời điểm nghiên cứu:** 2026-07-30 09:31 (Asia/Saigon), cập nhật 10:10, 10:35 (chốt kiến trúc round 4)
+**Thời điểm nghiên cứu:** 2026-07-30 09:31 (Asia/Saigon), cập nhật 10:10, 10:35 (chốt kiến trúc round 4), 15:10 (milestone `tsk-3w3`)
+
+**Task chính quản lý cụm này:** `tsk-3w3` (`goalTier: milestone`, `deps: [tsk-2rp, tsk-3p1]`) — coi là đạt khi `tsk-2rp` (Phase 1, `verifyKind`) và `tsk-3p1` (RUL12 marker) xong; Phase 2 (`statusCategory`/`kindCategory`/`domainFields` chính) chưa có task riêng, thêm vào `deps` của `tsk-3w3` sau khi file.
 
 ## Mục tiêu report này
+
+**Mục tiêu chính, 1 câu:** làm cho work-item schema fgOS THẬT SỰ chạy được
+với domain thứ 2 không phải code (không chỉ đặt tên được) — trong khi
+coding giữ nguyên 100% hành vi, 0 regression.
 
 fgOS chuẩn bị mở rộng ra ngoài domain `coding` (duy nhất domain thật hôm
 nay, cộng `synthetic` chỉ để minh họa) — user chuẩn bị cho multi-domain
@@ -508,6 +514,7 @@ sang đọc `statusCategory`:
 - **Frontier** (`fgos ready`) — đổi sang `statusCategory === 'todo'`.
 - **Rollup** ("k/n done") — đổi sang `statusCategory === 'completed'`.
 - **Discovery-judge/agent feedback** — mọi chỗ hỏi "item còn mở/đã chốt chưa" — đọc category.
+- **RUL12 (mở dependent khi dep `done`)** — cơ chế thứ 7, phát hiện muộn (round 9) qua `tsk-3p1` (xem "Thứ tự triển khai" dưới) — hôm nay đọc literal `done`; ứng viên đổi sang đọc `statusCategory === 'completed'`, NHƯNG `tsk-3p1` cho thấy `completed` có thể KHÔNG ĐỦ MỊN (cần phân biệt "merge xong" với "đóng ceremony/compound-learn xong" ngay trong category đó) — chưa có đáp án, xem câu hỏi mở.
 
 7 giá trị `STATUSES` hôm nay KHÔNG đổi tên — chúng trở thành "bảng transition
 + label của domain `coding`" nguyên xi, migration = 0 cho field `status`.
@@ -674,6 +681,26 @@ Phase 1 chặn):**
 - Domain sở hữu bảng transition riêng (đảo thật D1-D3, cần decision record
   mới) + `domainFields` (mục #3) — làm sau khi Phase 1 xong hoặc song song,
   miễn không tranh cùng file/subsystem với Phase 1.
+
+**Việc liên quan phát hiện thêm (round 9) — `tsk-3p1`, GỘP vào trước khi code Phase 2:**
+
+`tsk-3p1` ("Tách tín hiệu mở-dependent RUL12 khỏi status `done` nghiêm ngặt —
+marker 'code đã ship' cộng thêm, không status FSM mới") đang tự giải quyết
+ĐÚNG loại xung đột report này lặp lại nhiều lần (1 status trả lời 2 câu hỏi
+khác nhau cùng lúc: `done` = "code merge xong" VÀ "đã qua ceremony
+compound-learn xong", RUL50 gate cả 2 lối vào `done` bằng compound-learn).
+2 lý do phải gộp, không làm tách rời:
+
+- RUL12 là cơ chế domain-agnostic THỨ 7 (mục 6 trên) — marker của tsk-3p1
+  ăn khớp `statusCategory` thế nào (giá trị con trong `completed`? đọc từ
+  `stage` sẵn có? field thứ 3 riêng?) CHƯA có đáp án — quyết cùng lúc với
+  thiết kế `statusCategory` để khỏi làm 2 lần/đá nhau.
+- `tsk-3p1` refs `src/state/store.mjs` — ĐÚNG file Phase 2 sẽ sửa
+  (`EDITABLE_FIELDS`, event fold) — làm song song không phối hợp dễ conflict
+  thật.
+
+**Khuyến nghị:** đưa `tsk-3p1` vào CHUNG 1 vòng fgos-exploring với thiết kế
+`statusCategory` (Phase 2), không tách 2 vòng riêng.
 
 ## Câu hỏi chưa giải quyết
 
