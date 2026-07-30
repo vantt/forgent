@@ -107,6 +107,14 @@
     "quadrant": "how-to",
     "purpose": "Show the steps to accomplish one specific, already-understood goal.",
     "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/resolve-a-decision-id-collision-merge-conflict-on-approve.md",
+    "title": "How to resolve an `fgos approve` merge-conflict caused by two branches claiming the same decision ID",
+    "sourceCaptureId": "tsk-66l"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
     "docPath": "docs/how-to/run-a-state-verb-from-inside-a-worktree.md",
     "title": "How to run a state-writing `fgos` verb from inside a picked worktree",
     "sourceCaptureId": "tsk-56t"
@@ -158,6 +166,14 @@
     "docPath": "docs/reference/test-suite-legibility-cleanup-numbers.md",
     "title": "Test suite legibility/dedup cleanup — before/after numbers",
     "sourceCaptureId": "tsk-3wr-3"
+  },
+  {
+    "quadrant": "reference",
+    "purpose": "Describe the machinery accurately and completely for lookup.",
+    "audience": "A user who needs precise facts about a specific field/command/API.",
+    "docPath": "docs/reference/triage-table-columns.md",
+    "title": "`/fgOS:triage` table columns",
+    "sourceCaptureId": "tsk-dus"
   },
   {
     "quadrant": "explanation",
