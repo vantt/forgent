@@ -19,6 +19,7 @@ import { fork } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { addWork, editWork, moveWork, moveStage, addOutcome, addFriction, listWork, readRawEvents, setFocus, StoreError } from '../../src/state/store.mjs';
 import { REGISTRY, ENV, PID, UNRESOLVED } from "../../src/runner/session-identity.mjs";
+import { MAX_TITLE_LENGTH } from '../../src/state/work.mjs';
 
 const WRITER_SOURCES = new Set([REGISTRY, ENV, PID, UNRESOLVED]);
 
@@ -690,4 +691,53 @@ test("editWork, moveWork and moveStage each stamp the event payload with writer 
     assert.deepEqual(Object.keys(writer).sort(), ["id", "source"], name + ": writer has exactly two children, id and source");
     assert.ok(WRITER_SOURCES.has(writer.source), name + ": source must be one of registry/env/pid/unresolved");
   }
+});
+
+// --- title bound at the write doors (work-item-title-contract D2/D5) ---
+// The bound truncates instead of rejecting: a long title arriving from a
+// script or an agent must not break the call that carried it.
+
+test('addWork truncates an over-length title instead of rejecting the write', () => {
+  const dir = tmpDir();
+  const long = `${'word '.repeat(60).trim()}`;
+  addSampleWork(dir, 'long-add', { title: long });
+
+  const stored = listWork(dir).work['long-add'];
+  assert.ok(stored, 'the write went through rather than throwing');
+  assert.ok(stored.title.length <= MAX_TITLE_LENGTH);
+  assert.equal(long.startsWith(stored.title), true);
+});
+
+test('addWork leaves a title already within the bound byte-identical', () => {
+  const dir = tmpDir();
+  addSampleWork(dir, 'short-add', { title: 'Bound the title at both write doors' });
+  assert.equal(listWork(dir).work['short-add'].title, 'Bound the title at both write doors');
+});
+
+test('editWork truncates a title patch, and the appended event carries the truncated value', () => {
+  const dir = tmpDir();
+  addSampleWork(dir, 'long-edit');
+  const long = `${'word '.repeat(60).trim()}`;
+  editWork(dir, { id: 'long-edit', patch: { title: long } });
+
+  const stored = listWork(dir).work['long-edit'];
+  assert.ok(stored.title.length <= MAX_TITLE_LENGTH);
+
+  // The event log is the truth and the view is only its projection, so the
+  // two have to agree: bounding the candidate alone would leave replay
+  // rebuilding the untruncated title.
+  const edits = readRawEvents(dir).filter((e) => e.type === 'work.edit' && e.payload?.id === 'long-edit');
+  assert.equal(edits.length, 1);
+  assert.equal(edits[0].payload.patch.title, stored.title);
+});
+
+test('editWork does not reshape a stored title when the patch does not carry one', () => {
+  const dir = tmpDir();
+  const long = `${'word '.repeat(60).trim()}`;
+  addSampleWork(dir, 'untouched-title', { title: long });
+  const afterAdd = listWork(dir).work['untouched-title'].title;
+
+  editWork(dir, { id: 'untouched-title', patch: { verify: 'npm run lint' } });
+
+  assert.equal(listWork(dir).work['untouched-title'].title, afterAdd);
 });

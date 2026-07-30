@@ -30,6 +30,35 @@ const ID_PATTERN = /^[a-z][a-z0-9]*(-[a-z0-9]+)*$/;
 // calls validateWorkShape, so existing longer ids keep replaying untouched.
 const MAX_ID_LENGTH = 30;
 
+// Per work-item-title-contract D2/D5: a title is bounded at write time, and
+// the bound TRUNCATES rather than rejects — an over-length title arriving from
+// a script or an agent must not break the call that carried it. 100 sits above
+// every title a human writes by hand and below the run-on blobs a whole
+// submitted paragraph produced (32 of 54 stored titles were past it when this
+// was measured); see CONTEXT.md for the distribution.
+//
+// The bound is applied at the store's own normalize points (addWork/editWork
+// in store.mjs), which every write door passes through, and reused by
+// deriveTitle so a submitted title is already within bounds by the time
+// generateId hashes it. Deliberately NOT enforced in validateWorkShape: that
+// function only ever throws or returns, so a bound placed there could only
+// reject — the one behavior this contract rules out.
+export const MAX_TITLE_LENGTH = 100;
+
+/**
+ * Bound a title to MAX_TITLE_LENGTH, cutting at a word edge when one exists
+ * within the bound and falling back to a hard cut when a single token runs
+ * past it. Anything already short enough — and any non-string, which
+ * validateWorkShape is still the one to reject — is returned untouched, so
+ * this is safe to apply ahead of validation on every path.
+ */
+export function truncateTitle(title) {
+  if (typeof title !== 'string' || title.length <= MAX_TITLE_LENGTH) return title;
+  const cut = title.slice(0, MAX_TITLE_LENGTH);
+  const lastSpace = cut.lastIndexOf(' ');
+  return (lastSpace > 0 ? cut.slice(0, lastSpace) : cut).trim();
+}
+
 /**
  * The full status domain for `work` (per D4's single flat FSM, extended by
  * D5 with `proposed`: a goal-check pass sitting on a branch, awaiting
