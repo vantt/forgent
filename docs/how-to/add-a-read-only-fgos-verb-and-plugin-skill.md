@@ -44,6 +44,18 @@ paginated: false,
 A sub-verb needs a `positional`/`enum` shape like `session`'s registry
 entry, not a flat `properties` object.
 
+**Only mirror this block verbatim for a verb that reads and returns data —
+never for one that writes any real file.** `docs-index` copied exactly
+this block (`false`/`false`/`false`) despite writing
+`docs/enduser-docs-index.json`, a real file outside `.fgos/`; it should
+have been `externalEffect: true` from the start (`tsk-1wn`,
+`docs/history/docs-index-repo-root-fix/CONTEXT.md` D2/D4). If the new
+verb's handler ever calls `fs.writeFileSync`/`fs.appendFileSync` (or
+similar) against anything outside `.fgos/`, set `externalEffect: true`
+instead — and derive that write's target root from the SAME resolved
+root `dir` uses, never a second, independent `process.cwd()` read (see
+`docs/how-to/run-a-state-verb-from-inside-a-worktree.md`'s third case).
+
 ## 3. Add the plugin skill wrapper
 
 `plugins/fgOS/skills/<name>/SKILL.md`, same shape as `conflicts`'s:

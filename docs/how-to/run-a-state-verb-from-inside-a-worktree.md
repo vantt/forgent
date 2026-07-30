@@ -3,7 +3,7 @@ type: how-to
 title: How to run a state-writing `fgos` verb from inside a picked worktree
 tags: []
 timestamp: 2026-07-29T08:40:07.000Z
-source_capture_ids: [tsk-56t]
+source_capture_ids: [tsk-56t, tsk-1wn]
 ---
 
 # How to run a state-writing `fgos` verb from inside a picked worktree
@@ -110,6 +110,41 @@ moved the item `doing -> proposed` — real `work.move` event landing in
 the main checkout's `.fgos/events.jsonl`, visible via a plain `fgos list`
 from main immediately after, with no manual `cd`, subshell, or sync step.
 
+## A third case: a verb whose write target ignores `--dir` entirely
+
+The two categories above (`requiresExistingStore: true` refuses loudly;
+the eight read verbs warn) assumed those were the only two ways a
+worktree-resident call could go wrong. `tsk-1wn` (2026-07-30) found a
+third: a verb registered `requiresExistingStore: false` that still writes
+a real file, using a variable derived from `process.cwd()` instead of the
+already-`--dir`-aware `dir` — neither refusing nor warning, just silently
+targeting the wrong location.
+
+`fgos docs-index`'s handler set `const repoRoot = process.cwd();`
+(`bin/fgos.mjs`), completely independent of the `dir` variable its own
+`listWork(dir)` call two lines later used for state. A worktree session
+running the `fgos-indexing`-instructed bare `fgos docs-index` (no `--dir`
+at all, since the verb never refused to prompt for one) would:
+
+- read an empty outcomes view — `listWork` on a missing store rebuilds to
+  `{}` silently, no crash, no warning (`docs-index` isn't in the read
+  verbs' `STORE_MISSING_WARNING_VERBS` set either) — so every entry's
+  `sourceCaptureId` came back `null`;
+- scan and write `docs/enduser-docs-index.json` inside the **worktree's
+  own local checkout**, never the shared main-checkout file.
+
+Fixed by deriving the write-target root from `dir` itself
+(`repoRoot = path.dirname(dir)` — `dir` is always exactly
+`<repoRoot>/.fgos`, per `fgosDirFromRoot`, `src/runner/paths.mjs`), the
+same root `--dir` already resolves, instead of a second, independent
+`process.cwd()` read. The lesson generalizes: any verb whose handler
+writes a real file (not just event-log state) needs that write's root
+derived from the SAME resolved root as `dir`, never a second,
+independent `process.cwd()`/`__dirname`-style read — two different root
+resolutions in the same handler is exactly how a fix like `--dir` support
+stops covering the whole handler. Full evidence and the locked decisions:
+`docs/history/docs-index-repo-root-fix/CONTEXT.md` (D1).
+
 ## Related
 
 - `docs/decisions/0020-chan-fgos-khoi-worktree-worker.md` — why a linked
@@ -119,3 +154,9 @@ from main immediately after, with no manual `cd`, subshell, or sync step.
 - `docs/how-to/clear-a-stuck-main-checkout-lock.md` — a related
   worktree/main-checkout-boundary recovery, for the claim lock rather than
   the store path.
+- `docs/how-to/add-a-read-only-fgos-verb-and-plugin-skill.md` — its own
+  step 2 mirrors an existing read-only entry's flags for any new verb;
+  that recipe alone would have reproduced this exact bug for a verb that
+  writes a real file, so it now flags the case.
+- `docs/history/docs-index-repo-root-fix/CONTEXT.md` — the full D1-D4
+  decision trail behind the third case above.
