@@ -201,3 +201,15 @@ This is a shaping gap from the original plan, not a re-litigation of D4 --
 D4's "in-place overwrite, live store only" still holds; only the
 *mechanism* for landing it (direct operator action, not a branch commit)
 was missing from the original approach.
+
+## Closed
+
+Both children done: `tsk-n4i-1` (repair -- merged, compound-learn tagged
+`how-to`/`docs/how-to/fix-fgos-write-rejected-merge-block.md`, and the
+live `.fgos/events.jsonl` renumber applied directly to the main checkout,
+confirmed contiguous 1..1542 with both migrate scripts' `--dry-run`
+succeeding) and `tsk-n4i-2` (prevention -- merged, compound-learn tagged
+`how-to`/`docs/how-to/resolve-an-events-jsonl-merge-conflict.md`, the new
+`scripts/check-events-seq-contiguity.mjs` wired into `npm test`). Rollup:
+`doneCount: 2, totalCount: 2`. This root item carries no further work of
+its own.
