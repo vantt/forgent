@@ -35,7 +35,7 @@ write root cause.
 | Component | Risk | Proof point (for fgos-validating) |
 |---|---|---|
 | `repoRoot` resolution | medium — must match `dir`'s own `--dir`-aware resolution exactly, including the no-`--dir`-passed default case | a test that runs the verb from a cwd that is NOT the resolved root and asserts the manifest lands at the resolved root, not cwd |
-| Registry label correctness | low — pure metadata, `fgos-manifest.test.mjs` already exists to pin manifest shape | extend that test file's existing assertions to cover `docs-index`'s three fields |
+| Registry label correctness | low — pure metadata, `fgos-manifest.test.mjs` already exists to pin manifest shape and its own `requiresExistingStore ⇒ touchesState` invariant (D4) | extend that test file's existing assertions to cover `docs-index`'s `externalEffect` field; existing invariant test already guards the other two |
 | Write-only-if-changed guard | low — pure logic, no I/O ordering risk | a test that runs the verb twice with unchanged doc content and asserts no error /consistent output; a second run with changed content asserts the file DOES update |
 | Deterministic sort | low | a test with docs seeded in reverse-alphabetical dir order, asserting manifest order is stable/sorted |
 | `fgos-indexing` SKILL.md wording | low — prose only | none needed; covered by the item's own review, not an automated check |
@@ -47,7 +47,9 @@ write root cause.
   `docEntries` before building the manifest; add the write-only-if-changed
   guard around the final `fs.writeFileSync`.
 - `src/cli/command-registry.mjs` — `docs-index` entry: `externalEffect:
-  true`, `requiresExistingStore: true`.
+  true` only (D4: `requiresExistingStore` stays `false` — flipping it
+  would fail the existing `requiresExistingStore ⇒ touchesState`
+  invariant test in `test/cli/fgos-manifest.test.mjs:60-67`).
 - `.claude/skills/fgos-indexing/SKILL.md` and every other committed copy
   (`command grep -rl "Run \`fgos docs-index\`"` to find all of them, e.g.
   `.agents/skills/fgos-indexing/SKILL.md` mirrors it today) — instruct

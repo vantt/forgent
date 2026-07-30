@@ -13,8 +13,9 @@ verb.
 | ID | Decision |
 |----|----------|
 | D1 | `repoRoot` in the `docs-index` handler must resolve from the same main-checkout root as `dir` (the `--dir`-resolved store path), not raw `process.cwd()`. `fgos-indexing` SKILL.md must be updated to have callers pass `--dir <mainRoot>`, matching the convention every other cross-worktree verb already follows. |
-| D2 | Registry flags for `docs-index` in `src/cli/command-registry.mjs`: `externalEffect: true` (real write outside `.fgos/`); `requiresExistingStore: true` (handler reads `.fgos/` via `listWork(dir)`); `touchesState` stays `false` (never appends an event or overwrites `.fgos/state.json`). |
+| D2 | Registry flags for `docs-index` in `src/cli/command-registry.mjs`: `externalEffect: true` (real write outside `.fgos/`); `touchesState` stays `false` (never appends an event or overwrites `.fgos/state.json`). ~~`requiresExistingStore: true`~~ — superseded by D4. |
 | D3 | No `main-checkout-lock` for `docs-index`. Add a write-only-if-changed guard (skip `fs.writeFileSync` when the newly computed JSON is byte-identical to what's on disk) and a deterministic sort of `docEntries` (currently unsorted `fs.readdirSync` order). The true-simultaneous-same-root-race-with-differing-content case is left unguarded (YAGNI — no observed instance, and D1 removes the dominant real-world trigger). |
+| D4 | `requiresExistingStore` for `docs-index` stays `false`, contra D2's original text. `test/cli/fgos-manifest.test.mjs:60-67` (tsk-4fu-2) enforces `requiresExistingStore: true` implies `touchesState: true` for every entry except `init`; flipping `requiresExistingStore` alone would fail that existing test, and flipping `touchesState` too would be factually wrong (docs-index never writes `.fgos/state.json`). D1's fix (repoRoot/dir resolved consistently, callers pass `--dir`) already addresses the practical missing-store-silent-degrade concern that originally motivated D2's `requiresExistingStore` clause. Found during `fgos-validating`'s reality gate. |
 
 ## Scout evidence
 
