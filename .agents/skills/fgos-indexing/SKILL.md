@@ -20,11 +20,21 @@ exist under `docs/<quadrant>/`.
 
 ## When to run
 
-Run `fgos docs-index` once, right after step 4/5 of `fgos-compounding`
-(the document is on disk and the capture's `docType`/`docPath` are
-confirmed). It is read-only and safe to re-run any time the set of
-end-user documents changes — it always regenerates the whole manifest
-fresh from disk, never accumulates or appends across runs.
+Run it with the main-checkout root resolved explicitly, the same way
+every other cross-worktree verb is invoked from a claimed item's own
+worktree (ADR0020 — a worktree never carries its own `.fgos/`):
+
+```bash
+root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
+node "$root/bin/fgos.mjs" docs-index --dir "$root"
+```
+
+Run this once, right after step 4/5 of `fgos-compounding` (the document
+is on disk and the capture's `docType`/`docPath` are confirmed). It is
+safe to re-run any time the set of end-user documents changes — it always
+regenerates the whole manifest fresh from disk (skipping the actual write
+when the computed content is unchanged), never accumulates or appends
+across runs.
 
 ## What it produces
 
