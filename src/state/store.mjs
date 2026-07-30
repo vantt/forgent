@@ -35,7 +35,7 @@ import { transitionStage } from './stage.mjs';
 import { getDomain, stageForStep } from './workflow-stage-graphs.mjs';
 import { validateWork, WorkValidationError, DEFAULTS, GOAL_TIERS } from './work.mjs';
 import { EventLogError } from './events.mjs';
-import { frontier } from './frontier.mjs';
+import { frontier, isDepsAndLineageReady as depsAndLineageReadyView } from './frontier.mjs';
 import { assertNoCycle, assertNoUnifiedCycle } from './dep-graph.mjs';
 import { resolveWriterIdentity } from '../runner/session-identity.mjs';
 
@@ -765,6 +765,19 @@ export function listWork(dir) {
 export function readyWork(dir) {
   const { logPath } = paths(dir);
   return frontier(rebuildView(logPath));
+}
+
+/**
+ * Read-only stage-independent readiness check (choke-point-take-vs-pick-
+ * claim-eligibility): true when `id` has every dep done and no open
+ * decomposed child, regardless of its `stage` — see frontier.mjs's
+ * `isDepsAndLineageReady` for the full rationale. `take`'s explicit `--id`
+ * branch uses this instead of `readyWork` so it can claim a clarify/decompose
+ * item without losing the deps/lineage guard.
+ */
+export function isDepsAndLineageReady(dir, id) {
+  const { logPath } = paths(dir);
+  return depsAndLineageReadyView(rebuildView(logPath), id);
 }
 
 /**

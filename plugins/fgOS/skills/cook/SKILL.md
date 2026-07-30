@@ -33,12 +33,13 @@ never re-implements a dev-skill's substance inline; it invokes them.
   id is `awaiting-approval`. That is the finish line for this skill — never call
   `fgos approve`/`fgos reject`/`fgos review` yourself; the internal PR
   review gate is a human decision, always.
-- **Claiming only works at stage `executing`.** Verified empirically against
-  this repo: `fgos take --actor session --id <id>` on a `clarify`-stage item
-  is rejected — `"<id> is todo but not in the frontier yet (stage/deps/
-  lineage)"`. Clarify/decompose work happens on the item while it is still
-  `todo`, through `discover`/`ask`/`answer`/`decision` — never try to
-  `take`/`pick` it before it reaches `executing`.
+- **This skill still never claims before stage `executing`.** `take`/`pick`
+  now both accept an explicit `--id` claim on a `clarify`/`decompose` item
+  too (`choke-point-take-vs-pick-claim-eligibility` fixed the prior
+  disagreement between the two verbs — see "Known gap" below), but this
+  skill's own sequencing has no use for that: clarify/decompose work
+  happens on the item while it is still `todo`, through
+  `discover`/`ask`/`answer`/`decision`, never by claiming it first.
 - **Reuse, never duplicate.** `fgos-exploring`, `fgos-planning`, and
   `fgos-validating` already define the Socratic/shaping/proving substance —
   invoke them (Skill tool) for their real work; this skill only owns the
@@ -127,11 +128,16 @@ never re-implements a dev-skill's substance inline; it invokes them.
    (`fgos review`/`fgos approve`/`fgos reject`) is theirs to run next — this
    skill never calls it.
 
-## Known gap (flagged, not guessed around)
+## Known gap (fixed)
 
 `fgos-routing`'s own "Claim" section states an item still at
 `clarify`/`decompose` can be claimed directly with `fgos take --id <id>`.
-Tested against this repo's actual CLI, that call is rejected outright
-("not in the frontier yet (stage/deps/lineage)"). This skill follows the
-verified behavior — no claim before `executing` — rather than that prose;
-reconciling `fgos-routing` itself is a separate, out-of-scope fix.
+That prose used to be wrong — `take --id <id>` on a `clarify`-stage item
+was rejected outright ("not in the frontier yet (stage/deps/lineage)"),
+while `pick --id <id>` accepted the same claim. `choke-point-
+take-vs-pick-claim-eligibility` closed that gap: `take`'s explicit `--id`
+branch now checks deps-done + no-open-descendant only, the same
+stage-independent stance `pick` already took, so the prose is accurate
+again. This skill's own sequencing is unaffected — it still never claims
+before stage `executing` (see the hard rule above), by choice, not by
+working around a broken `take`.

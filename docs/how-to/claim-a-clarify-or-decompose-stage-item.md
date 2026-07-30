@@ -3,7 +3,7 @@ type: how-to
 title: How to claim an item that is still at stage `clarify` or `decompose`
 tags: []
 timestamp: 2026-07-29T03:25:44.000Z
-source_capture_ids: [tsk-1ab-1]
+source_capture_ids: [tsk-1ab-1, choke-point-take-vs-pick-claim-eligibility]
 ---
 # How to claim an item that is still at stage `clarify` or `decompose`
 
@@ -19,48 +19,45 @@ an item that has not yet reached the frontier (`fgos ready`) — i.e. its
 
 ## Steps
 
-1. **Use `fgos pick --id <id>`, never `fgos take --id <id>`.** Only `pick`
-   accepts an item outside the frontier:
+1. **Either `fgos take --id <id>` or `fgos pick --id <id>` works.** Both
+   verbs' explicit `--id` branch accept an item outside the frontier — the
+   choice is about worktree isolation, not eligibility:
 
    ```
-   fgos pick --id <id>
+   fgos take --role session --id <id>
    ```
 
-   `pick` also stands up the item's isolated `fgw/<id>` worktree as part of
-   the same call — useful even if you plan to do clarify/decompose work
-   directly on the id without a separate worktree, since it is the only
-   claim verb that does not reject on stage.
+   claims in place, on the main checkout, no worktree created. `fgos pick
+   --id <id>` claims AND stands up the item's isolated `fgw/<id>` worktree
+   in the same call. Pick `take` when you want to stay in the main
+   checkout; pick `pick` when you want the isolated worktree.
 
-2. **Do not follow `fgos-routing`'s own literal `take` example for this
-   case.** That skill's "Claim" section currently reads `fgos take --role
-   session [--id <id>]` — this is broken for a `clarify`/`decompose` item;
-   see "Why this exists" below.
+2. **Either way, an unmet dependency or an open decomposed child still
+   refuses the claim.** Stage never bypasses those two — only the
+   `executing`-only stage gate is stage-independent for an explicit `--id`
+   claim.
 
-## Why this exists
+## Why this used to be one door only
 
 `take` and `pick` both delegate the actual claim write to the same
 `claimWork` (`src/runner/claim-port.mjs`, unified per `tsk-53f` D1) — but
-each verb gates *before* that call with its own separate eligibility
-check, and the two checks disagree for an item outside the frontier:
+each verb gated *before* that call with its own separate eligibility
+check, and until `choke-point-take-vs-pick-claim-eligibility` fixed it, the
+two checks disagreed for an item outside the frontier: `take --id <id>`
+hard-rejected any `todo` item not in `readyWork()` (the frontier —
+`executing`-stage-only by definition), while `pick --id <id>` had no such
+check at all. `fgos-routing`'s own "Claim" section always told a reader to
+`take --id <id>` for exactly the case that call rejected —
+`plugins/fgOS/skills/cook/SKILL.md`'s "Known gap" section is the prior,
+narrower workaround written before this was fixed.
 
-- `take --id <id>` (`bin/fgos.mjs:1233-1237`) hard-rejects a `todo` item
-  that is not in `readyWork()` (the frontier — `executing`-stage-only by
-  definition):
-
-  > `"take: "${id}" is todo but not in the frontier yet (stage/deps/lineage) — take only opens the same set the runner would dispatch (D1)."`
-
-- `pick --id <id>` (`bin/fgos.mjs:1272-1285`) has no such check. The
-  comment right above it confirms this is intentional:
-
-  > `"the frontier-membership guard removed below was a hard check at THIS verb layer, never an FSM law"` — `bin/fgos.mjs:1266-1267`
-
-`plugins/fgOS/skills/cook/SKILL.md` already found this the hard way and
-worked around it in its own flow:
-
-> `"Claiming only works at stage executing. Verified empirically against this repo: fgos take --actor session --id <id> on a clarify-stage item is rejected — ... This skill follows the verified behavior — no claim before executing — rather than that prose; reconciling fgos-routing itself is a separate, out-of-scope fix."` — `plugins/fgOS/skills/cook/SKILL.md:36-39,133-134`
-
-`fgos-routing` itself was never updated to match — it still tells a reader
-to `take --id <id>` for exactly the case that call rejects.
+The fix (`bin/fgos.mjs`'s `take` case) made the explicit `--id` branch
+check `isDepsAndLineageReady` (`src/state/frontier.mjs`) instead of full
+frontier membership — deps-done and no-open-descendant still gate the
+claim, exactly as before, but the `executing`-only stage requirement no
+longer does, matching `pick`'s own already-established stance that stage
+and status are independent axes (`fsm.mjs`) for an explicit, deliberate
+claim.
 
 ## Real example
 
@@ -72,9 +69,10 @@ of an earlier `/fgOS:pick tsk-1ab` invocation). The claim event:
 > seq 502, item stage `clarify` at claim time (confirmed via `fgos list`
 > immediately after: `"stage": "clarify"`).
 
-Had the same claim been attempted with `fgos take --id tsk-1ab` instead,
-the `bin/fgos.mjs:1233-1237` guard above would have rejected it outright,
-since `tsk-1ab` was `todo` and not yet in `readyWork()`.
+At the time, the same claim attempted with `fgos take --id tsk-1ab`
+instead would have been rejected outright, since `tsk-1ab` was `todo` and
+not yet in `readyWork()` — this is exactly the gap
+`choke-point-take-vs-pick-claim-eligibility` closed.
 
 ## Related
 
@@ -82,8 +80,9 @@ since `tsk-1ab` was `todo` and not yet in `readyWork()`.
   finding came out of (`tsk-1ab`), including two other confirmed
   choke-points (`isWorkingTreeClean` duplication, `createWorktree` call-site
   divergence) and candidates checked and ruled out.
-- `plugins/fgOS/skills/cook/SKILL.md`'s "Known gap" section — the prior,
-  narrower workaround for this same divergence.
+- `test/cli/take-pick-claim-eligibility.test.mjs` — regression coverage
+  locking in the fixed behavior (stage-independent explicit `--id` claim,
+  deps/lineage guard preserved).
 - `plans/reports/choke-point-investigation-260728-1717-claim-worktree-report.md`
   (`tsk-53f`) — the original claim/worktree-isolation choke-point this
   survey's D2 explicitly re-verified rather than reused.

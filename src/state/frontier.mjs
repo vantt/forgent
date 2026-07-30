@@ -93,6 +93,23 @@ export function frontier(view) {
   return ready;
 }
 
+// Stage-independent readiness (choke-point-take-vs-pick-claim-eligibility):
+// the same deps-done + no-open-descendant clauses `frontier` enforces,
+// minus its stage clause — for a caller that intentionally wants to claim
+// an item still at `clarify`/`decompose` (status and stage are independent
+// axes, fsm.mjs; the same stance `pick`'s explicit-`--id` branch already
+// takes) while still refusing a genuinely-blocked item (unmet dep, or
+// anchored by an open decomposed child) — those two reasons stay real
+// "not dispatchable" regardless of stage.
+export function isDepsAndLineageReady(view, id) {
+  const work = view?.work ?? {};
+  const item = work[id];
+  if (!item) return false;
+  const childrenByParent = indexChildrenByParent(work);
+  if (hasOpenDescendant(id, work, childrenByParent)) return false;
+  return item.deps.every((dep) => work[dep]?.status === 'done');
+}
+
 // v2 comparator (D2/D6): priority ASC absent-last, then intent DESC
 // absent-last, then declaration order — the last key falls out of
 // Array.prototype.sort's guaranteed stability (see header comment above),
