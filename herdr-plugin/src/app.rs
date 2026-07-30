@@ -1,8 +1,4 @@
-use std::path::Path;
-
-use ratatui::widgets::ListState;
-
-use crate::fgos;
+use crate::ports::WorkItemSource;
 
 pub struct WorkItem {
     pub id: String,
@@ -21,7 +17,10 @@ pub struct App {
     pub work_items: Vec<WorkItem>,
     pub in_process: Vec<InProcessTask>,
     pub last_error: Option<String>,
-    pub selected: ListState,
+    /// Plain row index — no ratatui type in the domain (D2). The render
+    /// adapter (`ui.rs`) converts this to its own widget state at draw
+    /// time.
+    pub selected: Option<usize>,
     /// Set right after a pick pane is opened, cleared on the next
     /// keypress — a one-line status confirmation, never a blocking modal.
     pub pick_status: Option<String>,
@@ -33,7 +32,7 @@ impl App {
             work_items: Vec::new(),
             in_process: Vec::new(),
             last_error: None,
-            selected: ListState::default(),
+            selected: None,
             pick_status: None,
         }
     }
@@ -42,27 +41,26 @@ impl App {
         if self.work_items.is_empty() {
             return;
         }
-        let next = match self.selected.selected() {
+        let next = match self.selected {
             Some(i) => (i + 1) % self.work_items.len(),
             None => 0,
         };
-        self.selected.select(Some(next));
+        self.selected = Some(next);
     }
 
     pub fn select_previous(&mut self) {
         if self.work_items.is_empty() {
             return;
         }
-        let prev = match self.selected.selected() {
+        let prev = match self.selected {
             Some(0) | None => self.work_items.len() - 1,
             Some(i) => i - 1,
         };
-        self.selected.select(Some(prev));
+        self.selected = Some(prev);
     }
 
     pub fn selected_id(&self) -> Option<&str> {
         self.selected
-            .selected()
             .and_then(|i| self.work_items.get(i))
             .map(|item| item.id.as_str())
     }
@@ -71,13 +69,13 @@ impl App {
     /// bounds rather than pointing at a row that no longer exists.
     fn clamp_selection(&mut self) {
         if self.work_items.is_empty() {
-            self.selected.select(None);
-        } else if let Some(i) = self.selected.selected() {
+            self.selected = None;
+        } else if let Some(i) = self.selected {
             if i >= self.work_items.len() {
-                self.selected.select(Some(self.work_items.len() - 1));
+                self.selected = Some(self.work_items.len() - 1);
             }
         } else {
-            self.selected.select(Some(0));
+            self.selected = Some(0);
         }
     }
 
@@ -108,17 +106,20 @@ impl App {
                 title: "Wire real fgOS data into the dashboard".into(),
             }],
             last_error: None,
-            selected: ListState::default(),
+            selected: None,
             pick_status: None,
         }
     }
 
-    /// Replace `work_items`/`in_process` with real fgOS-CLI data (D4/D5).
+    /// Replace `work_items`/`in_process` with real fgOS-CLI data (D4/D5),
+    /// sourced through the `WorkItemSource` port (tsk-3t9 D1) rather than
+    /// a concrete module — `source` is the composition root's adapter, not
+    /// something this method constructs itself.
     /// On a poll failure, the previous rows are left untouched and the
     /// failure is surfaced via `last_error` — a transient CLI hiccup must
     /// never blank an already-populated dashboard.
-    pub fn refresh_from_fgos(&mut self, root: &Path) {
-        match fgos::fetch_triage(root) {
+    pub fn refresh_from_fgos(&mut self, source: &dyn WorkItemSource) {
+        match source.fetch_triage() {
             Ok(rows) => {
                 self.work_items = rows
                     .into_iter()
@@ -134,7 +135,7 @@ impl App {
             Err(err) => self.last_error = Some(err.to_string()),
         }
 
-        match fgos::fetch_doing(root) {
+        match source.fetch_doing() {
             Ok(rows) => {
                 self.in_process = rows
                     .into_iter()

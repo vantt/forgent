@@ -4,6 +4,8 @@ use std::process::Command;
 
 use serde::Deserialize;
 
+use crate::ports::WorkItemSource;
+
 /// One row from `fgos triage --json`'s `data` array — already sorted by
 /// `rankImpact` (D5), so this module never re-sorts it.
 #[derive(Debug, Clone, Deserialize, PartialEq)]
@@ -137,6 +139,23 @@ pub fn fetch_triage(root: &Path) -> Result<Vec<TriageRow>, FgosError> {
 pub fn fetch_doing(root: &Path) -> Result<Vec<DoingRow>, FgosError> {
     let stdout = run_fgos(root, &["list", "--all", "--json"])?;
     parse_doing(&stdout).map_err(FgosError::Parse)
+}
+
+/// The `WorkItemSource` adapter (tsk-3t9 D1): the concrete fgOS-CLI
+/// implementation of the port `app.rs`'s domain depends on. Holds `root`
+/// so the composition root (`main.rs`) resolves it once, not per call.
+pub struct FgosCliSource {
+    pub root: PathBuf,
+}
+
+impl WorkItemSource for FgosCliSource {
+    fn fetch_triage(&self) -> Result<Vec<TriageRow>, FgosError> {
+        fetch_triage(&self.root)
+    }
+
+    fn fetch_doing(&self) -> Result<Vec<DoingRow>, FgosError> {
+        fetch_doing(&self.root)
+    }
 }
 
 #[cfg(test)]
