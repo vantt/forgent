@@ -275,6 +275,14 @@
     "quadrant": "explanation",
     "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
     "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/gate-checkpoint-vs-answer-separation.md",
+    "title": "Why a gate dialogue keeps the agent's checkpoint separate from the human's answer",
+    "sourceCaptureId": "tsk-19zm"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/explanation/herdr-fgos-dashboard-three-piece-build.md",
     "title": "Why the herdr fgOS dashboard shipped as three sequential children, and what surfaced along the way",
     "sourceCaptureId": "tsk-19y"
@@ -629,6 +637,14 @@
     "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/decisions/0024-doi-ten-status-proposed-thanh-awaiting-approval.md",
     "title": "0024 — Đổi tên status `proposed` thành `awaiting-approval`",
+    "sourceCaptureId": null
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/decisions/0025-mo-rong-uu-tien-san-pham-them-ux-van-hanh-vao-ship-faster.md",
+    "title": "0025 — Thứ tự ưu tiên sản phẩm (chi tiết hoá 0023), nạp always-loaded qua AGENTS.md",
     "sourceCaptureId": null
   }
 ]
