@@ -12,6 +12,14 @@ Forgent (fgOS) is the platform layer for building and running agent applications
 - docs/routing-handoff-contract.md — agent-to-agent handoff contract + trust boundary
 - docs/decisions/ — long-form decision records
 
+## Product priority order (docs/decisions/0025)
+
+1. **Ship Faster** — giao nhanh hơn, không đoán mò, giảm friction/better-dev-ux, ít chờ đợi.
+2. **DoD** — reproducibly verifiable result + evidence-linked documentation.
+3. **Polish Sau DoD** — hoàn thiện sau ngưỡng, không mở scope.
+
+Thứ tự cố định — bậc dưới không ghi đè bậc trên. Chi tiết: docs/decisions/0025.
+
 ## Before touching code
 
 Read `docs/specs/reading-map.md`, then the area spec under `docs/specs/` for whatever
