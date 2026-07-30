@@ -26,8 +26,10 @@ impl std::error::Error for InvalidId {}
 /// `/^[a-z][a-z0-9]*(-[a-z0-9]+)*$/`), re-checked here defensively:
 /// `herdr pane run` types its command text literally into whatever shell
 /// is running in the target pane (no shell-safe argv boundary), so an id
-/// containing a stray quote would break out of it.
-fn is_valid_id(id: &str) -> bool {
+/// containing a stray quote would break out of it. `pub(crate)` so
+/// `pane_scan.rs` can validate a parsed pane label's leading segment
+/// against the same grammar (tsk-4zo) instead of duplicating this check.
+pub(crate) fn is_valid_id(id: &str) -> bool {
     let mut segments = id.split('-');
     let Some(first) = segments.next() else {
         return false;

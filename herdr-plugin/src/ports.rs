@@ -1,14 +1,23 @@
+use std::collections::HashMap;
 use std::io;
 use std::time::Duration;
 
 use crate::app::App;
 use crate::fgos::{DoingRow, FgosError, TriageRow};
+use crate::pane_scan::{PaneIdentity, PaneScanError};
 
 /// (a) fgOS data source seam (tsk-3t9 D1) — the domain asks for rows
 /// through this trait instead of importing `crate::fgos` directly.
 pub trait WorkItemSource {
     fn fetch_triage(&self) -> Result<Vec<TriageRow>, FgosError>;
     fn fetch_doing(&self) -> Result<Vec<DoingRow>, FgosError>;
+}
+
+/// Pane-tracking seam (tsk-4zo D1): scans the dashboard's own herdr
+/// workspace and maps task-id to pane identity. The domain never shells
+/// out to `herdr` itself — only through this port.
+pub trait PaneRegistry {
+    fn scan(&self) -> Result<HashMap<String, PaneIdentity>, PaneScanError>;
 }
 
 /// (b1) herdr pane-orchestration seam (tsk-3t9 D1) — swappable

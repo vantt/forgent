@@ -1,4 +1,5 @@
-use crate::ports::WorkItemSource;
+use crate::pane_scan::PaneIdentity;
+use crate::ports::{PaneRegistry, WorkItemSource};
 
 pub struct WorkItem {
     pub id: String,
@@ -11,6 +12,10 @@ pub struct WorkItem {
 pub struct InProcessTask {
     pub id: String,
     pub title: String,
+    /// `Some` when the most recent pane scan found a matching herdr pane
+    /// (tsk-4zo D1); `None` means orphaned — the task is `doing` but no
+    /// live pane was found for it.
+    pub pane: Option<PaneIdentity>,
 }
 
 pub struct App {
@@ -104,6 +109,7 @@ impl App {
             in_process: vec![InProcessTask {
                 id: "tsk-19y-2".into(),
                 title: "Wire real fgOS data into the dashboard".into(),
+                pane: None,
             }],
             last_error: None,
             selected: None,
@@ -142,11 +148,83 @@ impl App {
                     .map(|row| InProcessTask {
                         id: row.id,
                         title: row.title,
+                        pane: None,
                     })
                     .collect();
                 self.last_error = None;
             }
             Err(err) => self.last_error = Some(err.to_string()),
         }
+    }
+
+    /// Map each `in_process` task to its herdr pane identity (tsk-4zo D1),
+    /// sourced through the `PaneRegistry` port rather than shelling to
+    /// `herdr` directly. A task-id absent from the scan result is left
+    /// `None` — orphaned (D2's badge, rendered by `ui.rs`, reads this
+    /// field; this method only produces it).
+    /// On a scan failure, existing `pane` values are left untouched and
+    /// the failure is surfaced via `last_error` — same transient-failure
+    /// discipline `refresh_from_fgos` already uses.
+    pub fn refresh_pane_state(&mut self, registry: &dyn PaneRegistry) {
+        match registry.scan() {
+            Ok(map) => {
+                for task in &mut self.in_process {
+                    task.pane = map.get(&task.id).cloned();
+                }
+                self.last_error = None;
+            }
+            Err(err) => self.last_error = Some(err.to_string()),
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::collections::HashMap;
+
+    struct FakeRegistry(HashMap<String, PaneIdentity>);
+
+    impl PaneRegistry for FakeRegistry {
+        fn scan(&self) -> Result<HashMap<String, PaneIdentity>, crate::pane_scan::PaneScanError> {
+            Ok(self.0.clone())
+        }
+    }
+
+    #[test]
+    fn pane_registry_refresh_pane_state_maps_found_and_orphaned_tasks() {
+        let mut app = App::empty();
+        app.in_process = vec![
+            InProcessTask {
+                id: "tsk-a".into(),
+                title: "A".into(),
+                pane: None,
+            },
+            InProcessTask {
+                id: "tsk-b".into(),
+                title: "B".into(),
+                pane: None,
+            },
+        ];
+        let mut found = HashMap::new();
+        found.insert(
+            "tsk-a".to_string(),
+            PaneIdentity {
+                pane_id: "wS:p1".into(),
+                tab_id: "wS:t1".into(),
+            },
+        );
+        let registry = FakeRegistry(found);
+
+        app.refresh_pane_state(&registry);
+
+        assert_eq!(
+            app.in_process[0].pane,
+            Some(PaneIdentity {
+                pane_id: "wS:p1".into(),
+                tab_id: "wS:t1".into(),
+            })
+        );
+        assert_eq!(app.in_process[1].pane, None);
     }
 }
