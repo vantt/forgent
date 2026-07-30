@@ -28,8 +28,10 @@ removing-a-validation) → **standard**.
 in neither `criticalPath` nor `topUnblock` — nothing else in the backlog is
 waiting on this item to unblock. No parallelism or sequencing pressure from
 other work. Combined with the mode-3 flag count (not high-risk) and the
-scope already narrowed by D1 (4 verbs, not 5): this is **one honest piece
-of work**, not split into child items. It proceeds as `tsk-6c2` itself.
+scope already narrowed by D1 (take/pick/merge/approve behaviorally, 3 real
+parse sites since `merge` forwards to `approve` — see file list below):
+this is **one honest piece of work**, not split into child items. It
+proceeds as `tsk-6c2` itself.
 
 ## Approach
 
@@ -68,35 +70,52 @@ layer gets patience).
 | Component | Risk | Proof point (for `fgos-validating`) |
 |---|---|---|
 | `lock-wait.mjs` retry/backoff/TTL-bound logic | medium — must stop retrying exactly when the budget is spent, never loop past it, never retry `AMBIGUOUS` | unit test: fake `HELD` with a short `remainingTtlMs` (e.g. 1s), assert retry stops and reports failure at or just after that bound, not before and not indefinitely after |
-| `claimWork`/`mergeRunnerItem` call-site swap | medium — existing tests assert today's immediate-fail shape; swapping the call underneath must not silently change that shape when `--no-wait` is passed | run existing `claim-port` and `merge` test files first, unmodified, to find any assertion that assumes immediate-fail with no flags at all (that assumption is now wrong under D3's default-ON) — list what needs updating before writing new code |
-| `--no-wait` opt-out wiring across 4 verb cases in `bin/fgos.mjs` | low — mechanical flag threading | one test per verb (take/pick/merge/approve) asserting `--no-wait` reproduces byte-for-byte today's error on a forced `HELD` fixture |
+| `claimWork` sync→async signature change | **medium-high** (found at first `fgos-validating` pass, `test/runner/claim-port.test.mjs:47,58,74,91,107,123,137` all call `claimWork` synchronously today; `assert.throws(() => claimWork(...))` at lines 58/74 stops catching anything once `claimWork` returns a rejected Promise instead of throwing) — `claimWork` (`src/runner/claim-port.mjs:86`) is a plain sync function today; a sleep-based retry loop forces it to become `async`. `mergeRunnerItem` (`merge.mjs:619`) is already `async`, so only the `claimWork` side carries this risk | rewrite all 7 call sites in `claim-port.test.mjs` to `await`/`assert.rejects` before touching `claim-port.mjs` itself, so the rewrite's correctness is visible against today's behavior first, then swap the implementation underneath |
+| `loop.mjs`'s own `claimWork` call (**found at first `fgos-validating` pass** — omitted from the original file list) | medium — `src/runner/loop.mjs:452` calls `claimWork(dir, { ..., actor: 'runner', ... })` from the autonomous runner dispatcher; D3's default-ON would silently make the runner loop start blocking/retrying on lock contention too, a context `research-260730-1133-cli-wait-flag-main-checkout-lock-design.md` §9's own second unresolved question explicitly said should stay excluded (scope is the interactive CLI-verb layer, not the automated dispatcher) | pass `noWait: true` explicitly at `loop.mjs:452`, preserving today's exact immediate-fail behavior there; add a test asserting the runner loop's dispatch-claim behavior is byte-for-byte unchanged by this item |
+| `--no-wait` opt-out wiring across verb cases in `bin/fgos.mjs` | low — mechanical flag threading | one test per verb (take/pick/approve) asserting `--no-wait` reproduces byte-for-byte today's error on a forced `HELD` fixture |
 | exhausted-wait failure message | low — UX only, no logic risk | assert the message states elapsed wait time, distinguishable from today's immediate-fail message (design report's own suggestion) |
 
 **Files touched, in order**:
 1. `src/runner/lock-wait.mjs` (new) — the shared wrapper, unit-tested in
    isolation first since every call site depends on its correctness.
-2. `src/runner/claim-port.mjs` — swap `claimWork`'s direct
-   `acquireMainCheckoutLock` call (current code at the lines matching
-   CONTEXT.md's scout citation) for the wrapper; add `noWait`/`waitMs` to
-   `claimWork`'s existing options bag (`{ id, actor, isolate, claimTrigger,
-   repoRoot, worktreeDir, skipOutcome }` — additive fields only).
-3. `src/runner/merge.mjs` — same swap inside `mergeRunnerItem`; add
-   `noWait`/`waitMs` to its existing `{ timeoutMs }` options bag.
-4. `bin/fgos.mjs` — parse `--wait`/`--no-wait` on the `take`, `pick`,
-   `merge`, `approve` verb cases (identified in CONTEXT.md's scout: lines
-   1311/1369 for take/pick, 1678/1868/1942 for approve/merge's
-   `mergeRunnerItem` calls) and thread them into the calls from step 2/3.
-5. Tests alongside 1-4 (see risk map) — no change needed to
+2. `test/runner/claim-port.test.mjs` — rewrite the 7 existing synchronous
+   `claimWork` call sites to `await`/`assert.rejects` (lines 47, 58, 74, 91,
+   107, 123, 137) **before** step 3, so the async-signature migration is
+   proven against today's behavior first, not bundled invisibly into the
+   feature change.
+3. `src/runner/claim-port.mjs` — make `claimWork` `async`; swap its direct
+   `acquireMainCheckoutLock` call for the wrapper; add `noWait`/`waitMs` to
+   its existing options bag (`{ id, actor, isolate, claimTrigger, repoRoot,
+   worktreeDir, skipOutcome }` — additive fields only).
+4. `src/runner/loop.mjs:452` — add `noWait: true` to its existing
+   `claimWork` call, preserving today's immediate-fail behavior for the
+   autonomous runner dispatcher (see risk map row above).
+5. `src/runner/merge.mjs` — same swap inside `mergeRunnerItem` (already
+   `async`, no signature change needed here); add `noWait`/`waitMs` to its
+   existing `{ timeoutMs }` options bag.
+6. `bin/fgos.mjs` — parse `--wait`/`--no-wait` on the `take`, `pick`, and
+   `approve` verb cases only (lines 1311/1369/1678) and thread them into
+   the calls from steps 3/5. **Not `merge`** (line 1126): `merge next`
+   never calls `mergeRunnerItem` directly — it recurses into
+   `runVerb('approve', flags, [id], dir)` (line 1152), forwarding `flags`
+   unchanged, so it inherits the new flags automatically through `approve`
+   with no separate parsing needed (found at first `fgos-validating` pass;
+   corrects the original file list, which counted `merge` as a fourth
+   parse site).
+7. Remaining tests alongside 1-6 (see risk map) — no change needed to
    `main-checkout-lock.test.mjs` (the primitive itself is untouched, per
-   D1/CONTEXT.md).
+   D1/CONTEXT.md); no change needed to `merge.test.mjs`'s call signature
+   (already async).
 
 ## Cases to prove (standard-mode depth)
 
 - Boundary: `HELD` clears with 1 tick left in the backoff schedule (retry
   succeeds right at the edge of the wait budget, not one tick late).
-- Existing behavior that must not regress: a plain `take`/`pick`/`merge`/
-  `approve` call with `--no-wait` fails exactly as today's call with no
-  flags at all does right now (same error class, same message shape).
+- Existing behavior that must not regress: a plain `take`/`pick`/`approve`
+  (and, through it, `merge next`) call with `--no-wait` fails exactly as
+  today's call with no flags at all does right now (same error class, same
+  message shape) — and the autonomous runner loop's own dispatch-claim call
+  (`loop.mjs:452`, always `noWait: true`) is unchanged in every case.
 - Concurrent-ish: two back-to-back acquire attempts within the same process
   (simulating the hook-just-committed case from CONTEXT.md's root-cause
   section) — second attempt retries into an `ACQUIRED` once the first
