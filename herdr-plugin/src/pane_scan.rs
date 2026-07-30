@@ -108,7 +108,12 @@ fn run_pane_list(herdr_bin: &str, workspace_id: &str) -> Result<String, PaneScan
 
 /// The `PaneRegistry` adapter (tsk-4zo D1): the concrete herdr-CLI
 /// implementation of the pane-scan port, scoped to one workspace (the
-/// dashboard's own).
+/// dashboard's own). Already the port/adapter shape tsk-3t9-2 asked for —
+/// `app.rs` only ever consumes pane tracking through `&dyn PaneRegistry`
+/// (`refresh_pane_state`), never this concrete struct directly; only the
+/// composition root (`main.rs`) constructs it. Built this way from the
+/// start since `tsk-3t9-1`'s foundation had already merged, so there was
+/// nothing left for tsk-3t9-2 to refactor.
 pub struct HerdrPaneScanner {
     pub herdr_bin: String,
     pub workspace_id: String,
