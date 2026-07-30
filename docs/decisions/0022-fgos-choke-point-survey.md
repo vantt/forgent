@@ -56,7 +56,8 @@ Hệ quả đã xác nhận thật, không suy đoán:
   fgos-routing itself is a separate, out-of-scope fix".
 - Phiên làm việc khảo sát item NÀY (tsk-1ab) tự confirm thêm 1 lần nữa:
   `pick tsk-1ab` thành công thật khi item còn stage `clarify` (log claim
-  seq 502, `"from":"todo","to":"doing"`), đúng khớp phân tích code trên.
+  seq 518 (renumbered by tsk-n4i-1; was 502), `"from":"todo","to":"doing"`),
+  đúng khớp phân tích code trên.
 
 3 nguồn (code, cook's known-gap note, phiên này) đồng nhất — đây là
 choke-point rõ nhất tìm được: 1 câu hỏi quyết định ("id này claim được
