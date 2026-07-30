@@ -52,20 +52,33 @@ tsk-2fw`, seq 1894/1895) alongside this doc.
     gains the same...", "two snapshots live side by side in gates[id]").
   - `view.outcomes[id]?.actual` — per-item (store.mjs:269).
   - `view.learnings[id]` — array, lazy key (replay.mjs:243-247).
-  - `view.frictions[layer]` and `view.settlements[key]` are **global
-    aggregate counters**, not per-item logs (store.mjs:277/284:
-    `frictions[layer] = (frictions[layer] ?? 0) + 1`,
-    `settlements[key] = (settlements[key] ?? 0) + 1` — keyed by
-    layer/settlement-key, not by work id). These have no per-item slice to
-    filter to and are out of scope for `show`'s output — planning should
-    exclude them entirely rather than force a filter that doesn't exist.
+  - `view.frictions[id]` and `view.settlements[id]` — arrays, lazy keys,
+    per-item (replay.mjs:224-225/350-351/405-406). **Correction (found at
+    executing time): an earlier pass of this doc misread
+    `store.mjs`'s `composeLearning(view, id, ...)` — the `frictions[layer]
+    = (frictions[layer] ?? 0) + 1` / `settlements[key] = (settlements[key]
+    ?? 0) + 1` lines there (store.mjs:274-285) are a LOCAL summary object
+    that function builds by iterating `view.frictions?.[id]` /
+    `view.settlements?.[id]` for the one id it was called with — not a
+    global aggregate keyed by layer. The real `view.frictions[id]` /
+    `view.settlements[id]` are per-item, exactly like `discovery`/
+    `decisionsById`/`gates`/`outcomes`/`learnings`, and belong in `show`'s
+    scoped output too.** `bin/fgos.mjs` already has exactly the reusable
+    per-item collectors `show` needs: `collectFrictionData(view, id)`,
+    `collectSettlementData(view, id)`, `collectLearningData(view, id)`,
+    `collectOutcomeEntry(id, entry)` (lines 335-440, built for the `check`
+    verb) — `show` reuses these directly rather than reimplementing the
+    slice, so the two verbs render identical shapes for identical data.
 
 ## Pinned terms
 
 - "Full detail of 1 task" (from the original ask) means: the `work`
   record plus every per-item log keyed by that item's id (`discovery`,
-  `decisionsById`, `gates`, `outcomes`, `learnings`) — not the global
-  `decisions`/`frictions`/`settlements` aggregates.
+  `decisionsById`/`decisions`, `gates`, `outcomes`/`outcome`,
+  `learnings`/`learning`, `frictions`/`friction`,
+  `settlements`/`settlement`) — not the single global `decisions` array
+  (the append-only log across every item), which stays out of `show`'s
+  scope on purpose (it is genuinely global, unlike frictions/settlements).
 
 ## docsRef
 

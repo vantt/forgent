@@ -457,6 +457,25 @@ export const COMMAND_REGISTRY = [
     deprecated: null,
   },
   {
+    name: 'show',
+    invoke: 'fgos show',
+    description: 'Full detail of one work item, scoped to its own id: the work record plus every per-item log (discovery, decisions, gates, outcome, friction, settlement, learning). Unlike "list --id", which only scopes the work map and leaves those logs global, "show" filters all of them to just this item. Output is always JSON.stringify(data, null, 2) -- --json is accepted but a no-op, since only "setup"/"doctor" --pretty ever render differently.',
+    parameters: {
+      type: 'object',
+      properties: {
+        id: { type: 'string', description: 'Work item id (positional or --id).' },
+      },
+      positional: ['id'],
+      required: ['id'],
+    },
+    examples: ['fgos show build-cli', 'fgos show build-cli --json'],
+    touchesState: false,
+    requiresExistingStore: false,
+    externalEffect: false,
+    paginated: false,
+    deprecated: null,
+  },
+  {
     name: 'take',
     invoke: 'fgos take',
     description: 'Claim one item through the pull door (defaults to the frontier head): moves it to doing and records the predicted outcome.',

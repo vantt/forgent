@@ -42,7 +42,7 @@ Risk map:
 | Component | Risk | Proof point (for validating) |
 |---|---|---|
 | id-not-found path | low | mirror `list --id`'s exact error shape/message convention (`StoreError('validation', ...)`) so callers get a consistent contract across both verbs |
-| output shape (D1: scoped, not global) | low-medium | a live run against an item that actually has entries in `discovery`/`decisionsById`/`gates`/`outcomes`/`learnings` must show only that item's slice, and a second item's data must be absent |
+| output shape (D1: scoped, not global) | low-medium | a live run against an item that actually has entries in `discovery`/`decisions`/`gates`/`outcome`/`friction`/`settlement`/`learning` must show only that item's slice, and a second item's data must be absent |
 | `--json` no-op (D2) | low | byte-identical output with and without `--json` on the same item |
 | command-registry.mjs schema registration | low | matches the existing pattern other id-taking verbs (`take`, `pick`, `rollup`) already use for their `id` positional/flag entry |
 
@@ -59,16 +59,21 @@ Files touched, in build order:
    other id-taking verb already does exactly this). Looks up
    `rawView.work[id]`, throws the same not-found `StoreError` shape
    `list --id` throws on a miss. Assembles the result as `{ work: item,
-   discovery: rawView.discovery?.[id] ?? [], decisionsById:
+   discovery: rawView.discovery?.[id] ?? [], decisions:
    rawView.decisionsById?.[id] ?? [], gates: rawView.gates?.[id] ?? null,
-   outcomes: rawView.outcomes?.[id] ?? null, learnings:
-   rawView.learnings?.[id] ?? [] }` — deliberately omitting
-   `frictions`/`settlements` per CONTEXT.md's scout finding that they are
-   global aggregate counters, not per-item logs. The CLI's outer
-   print/output path already renders every verb's return value as
-   `JSON.stringify(result, null, 2)` regardless of `--json` — confirm
-   this by reading the existing output/print call site once, since D2
-   depends on that already being true rather than something this verb
+   outcome: collectOutcomeEntry(id, rawView.outcomes?.[id]), friction:
+   collectFrictionData(rawView, id), settlement:
+   collectSettlementData(rawView, id), learning:
+   collectLearningData(rawView, id) }` — reusing the exact per-item
+   collectors `check` already built (`bin/fgos.mjs:335-440`) for
+   friction/settlement/learning/outcome, per CONTEXT.md's corrected scout
+   finding that these ARE per-item (`view.frictions[id]`/
+   `view.settlements[id]`), not global aggregates as an earlier pass of
+   that doc wrongly claimed. The CLI's outer print/output path already
+   renders every verb's return value as `JSON.stringify(result, null, 2)`
+   regardless of `--json` (confirmed: `bin/fgos.mjs:2676-2680`, the
+   `renderPretty` branch only fires for `setup`/`doctor` with
+   `--pretty`) — D2 depends on that already being true, nothing this verb
    needs to special-case.
 2. `src/cli/command-registry.mjs` — register `show` alongside `list`
    entries: description citing this is the per-item scoped detail view
