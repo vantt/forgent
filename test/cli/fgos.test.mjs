@@ -488,10 +488,17 @@ test('session start inside a .fgos/-less linked worktree still succeeds (D10 sym
   assert.equal(result.status, 0, `session start unexpectedly refused: ${result.stderr}`);
 });
 
+// `setup` appends a source line to every rc file it detects under $HOME, so
+// this must run against a throwaway HOME: inheriting the real one made every
+// `npm test` run permanently append a line naming a temp worktree that the
+// test then deletes, leaving a dead `source` in the developer's own profile
+// that errors on every interactive shell open. `run`'s `extraEnv` already
+// merges over process.env, the same sandboxing test/setup/checks.test.mjs
+// does when it spawns `setup`.
 test('setup inside a .fgos/-less linked worktree still succeeds (setup never touches .fgos/, exempt from the guard)', () => {
   const { wt } = tmpLinkedWorktree();
   assert.ok(!fs.existsSync(path.join(wt, '.fgos')));
-  const result = run(wt, ['setup']);
+  const result = run(wt, ['setup'], { HOME: rawTmpCwd() });
   assert.equal(result.status, 0, `setup unexpectedly refused: ${result.stderr}`);
 });
 

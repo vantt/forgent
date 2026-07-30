@@ -11,7 +11,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync, spawnSync } from 'node:child_process';
 
-import { DOCTOR_CHECKS, integrationScriptPath, mainCheckoutHookWired } from '../../src/setup/checks.mjs';
+import { DOCTOR_CHECKS, integrationScriptPath, mainCheckoutHookWired, resolveMainCheckout } from '../../src/setup/checks.mjs';
 import { DEFAULT_RUNNER_CONFIG } from '../../src/runner/dispatch.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -263,4 +263,196 @@ test('fgos doctor against a fresh cwd with no .fgos-runner.json never creates th
   assert.equal(configCheck.passed, false);
   fs.rmSync(cwd, { recursive: true, force: true });
   fs.rmSync(homeDir, { recursive: true, force: true });
+});
+
+// ─── D2/D3: the shell-integration path is canonicalized to the main checkout ─
+
+function initRepo(prefix) {
+  const dir = mkTemp(prefix);
+  execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: dir });
+  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: dir });
+  execFileSync('git', ['config', 'user.name', 'Test'], { cwd: dir });
+  fs.writeFileSync(path.join(dir, 'seed.txt'), 'seed\n');
+  execFileSync('git', ['add', 'seed.txt'], { cwd: dir });
+  execFileSync('git', ['commit', '-qm', 'seed'], { cwd: dir });
+  return dir;
+}
+
+test('resolveMainCheckout from inside a linked worktree resolves the main checkout, not the worktree', () => {
+  const main = initRepo('checks-main-');
+  const wt = path.join(mkTemp('checks-wt-parent-'), 'wt');
+  execFileSync('git', ['worktree', 'add', '-q', '-b', 'side', wt], { cwd: main });
+
+  // The distinction the dead-source-line bug turned on: --show-toplevel would
+  // report the worktree itself here, which is why each worktree used to earn
+  // its own shell-profile line.
+  assert.equal(
+    fs.realpathSync(execFileSync('git', ['rev-parse', '--show-toplevel'], { cwd: wt, encoding: 'utf8' }).trim()),
+    fs.realpathSync(wt),
+  );
+  assert.equal(fs.realpathSync(resolveMainCheckout(wt)), fs.realpathSync(main));
+
+  execFileSync('git', ['worktree', 'remove', '--force', wt], { cwd: main });
+  fs.rmSync(main, { recursive: true, force: true });
+});
+
+test('resolveMainCheckout returns null outside a git checkout entirely', () => {
+  const plain = mkTemp('checks-plain-');
+  assert.equal(resolveMainCheckout(plain), null);
+  fs.rmSync(plain, { recursive: true, force: true });
+});
+
+test('integrationScriptPath returns a path that actually exists on disk', () => {
+  const resolved = integrationScriptPath();
+  assert.notEqual(resolved, null, 'this test runs from a git checkout, so a path must resolve');
+  assert.equal(fs.existsSync(resolved), true, `${resolved} does not exist`);
+});
+
+test('integrationScriptPath names the main checkout even when this copy runs from a linked worktree', () => {
+  // Proves the fix at the level the bug lived at: the path handed to a shell
+  // profile must outlive the worktree the command happened to run from.
+  const resolved = integrationScriptPath();
+  const owningCheckout = resolveMainCheckout(path.dirname(resolved));
+  assert.equal(fs.realpathSync(path.join(owningCheckout, 'scripts')), fs.realpathSync(path.dirname(resolved)));
+});
+
+// ─── D1/D5: dead source lines are reported as a failed check ────────────────
+
+test('shell-integration-sourced fails on a dead fgos source line even when the live line is present', () => {
+  const homeDir = mkTemp('doctor-shell-dead-');
+  const gone = path.join(homeDir, 'removed-worktree', 'scripts', 'fgos-shell-integration.sh');
+  fs.writeFileSync(
+    path.join(homeDir, '.bashrc'),
+    `source "${integrationScriptPath()}"\nsource "${gone}"\n`,
+  );
+  const prevHome = process.env.HOME;
+  process.env.HOME = homeDir;
+  try {
+    const { passed, message } = checkById('shell-integration-sourced').check(process.cwd());
+    assert.equal(passed, false);
+    assert.ok(message.includes(gone), `message did not name the dead path: ${message}`);
+    assert.ok(message.includes('1 dead'), `message did not count the dead lines: ${message}`);
+  } finally {
+    process.env.HOME = prevHome;
+    fs.rmSync(homeDir, { recursive: true, force: true });
+  }
+});
+
+test('shell-integration-sourced counts dead lines per rc file across both bash and zsh', () => {
+  const homeDir = mkTemp('doctor-shell-dead-both-');
+  const live = `source "${integrationScriptPath()}"\n`;
+  const gone = path.join(homeDir, 'gone', 'scripts', 'fgos-shell-integration.sh');
+  fs.writeFileSync(path.join(homeDir, '.bashrc'), `${live}source "${gone}"\n`);
+  fs.writeFileSync(path.join(homeDir, '.zshrc'), `${live}source "${gone}"\nsource "${gone}"\n`);
+  const prevHome = process.env.HOME;
+  process.env.HOME = homeDir;
+  try {
+    const { passed, message } = checkById('shell-integration-sourced').check(process.cwd());
+    assert.equal(passed, false);
+    assert.ok(message.includes('3 dead'), `expected 3 dead across both files: ${message}`);
+    assert.ok(message.includes(`${path.join(homeDir, '.bashrc')} (1)`), message);
+    assert.ok(message.includes(`${path.join(homeDir, '.zshrc')} (2)`), message);
+  } finally {
+    process.env.HOME = prevHome;
+    fs.rmSync(homeDir, { recursive: true, force: true });
+  }
+});
+
+test('shell-integration-sourced still passes when every rc file has only the live line', () => {
+  const homeDir = mkTemp('doctor-shell-clean-');
+  fs.writeFileSync(path.join(homeDir, '.bashrc'), `source "${integrationScriptPath()}"\n`);
+  const prevHome = process.env.HOME;
+  process.env.HOME = homeDir;
+  try {
+    const { passed } = checkById('shell-integration-sourced').check(process.cwd());
+    assert.equal(passed, true);
+  } finally {
+    process.env.HOME = prevHome;
+    fs.rmSync(homeDir, { recursive: true, force: true });
+  }
+});
+
+test('setup from a copy of fgos that is not in a git checkout declines the rc write and says why', () => {
+  // The `/tmp/tmp.XXXXXXXX` shape observed in the wild: an unpacked copy with
+  // no `.git` of its own. Its path is ephemeral, so writing it into a shell
+  // profile leaves a `source` line that outlives the directory.
+  const copyRoot = mkTemp('checks-nongit-copy-');
+  const repoRoot = path.resolve(__dirname, '../..');
+  for (const entry of ['bin', 'src', 'scripts', 'package.json']) {
+    fs.cpSync(path.join(repoRoot, entry), path.join(copyRoot, entry), { recursive: true });
+  }
+  assert.equal(fs.existsSync(path.join(copyRoot, '.git')), false);
+
+  const homeDir = mkTemp('checks-nongit-home-');
+  const rcFile = path.join(homeDir, '.bashrc');
+  fs.writeFileSync(rcFile, 'echo hi\n');
+
+  const result = spawnSync(process.execPath, [path.join(copyRoot, 'bin', 'fgos.mjs'), 'setup'], {
+    cwd: copyRoot,
+    encoding: 'utf8',
+    env: { ...process.env, HOME: homeDir },
+  });
+
+  assert.equal(result.status, 0, `setup failed: ${result.stderr}`);
+  const { data } = JSON.parse(result.stdout);
+  assert.deepEqual(data.rcFilesInserted, []);
+  assert.deepEqual(data.rcFilesAlreadyConfigured, []);
+  assert.ok(
+    /not inside a git checkout/.test(data.rcWriteDeclinedReason ?? ''),
+    `expected a stated reason, got: ${JSON.stringify(data.rcWriteDeclinedReason)}`,
+  );
+  // The whole point: nothing was appended to the profile.
+  assert.equal(fs.readFileSync(rcFile, 'utf8'), 'echo hi\n');
+  // Setup's other work still happened.
+  assert.equal(fs.existsSync(path.join(copyRoot, '.fgos-runner.json')), true);
+
+  fs.rmSync(copyRoot, { recursive: true, force: true });
+  fs.rmSync(homeDir, { recursive: true, force: true });
+});
+
+test('setup from a real checkout still writes the rc line and reports no declined reason', () => {
+  const homeDir = mkTemp('checks-git-home-');
+  fs.writeFileSync(path.join(homeDir, '.bashrc'), 'echo hi\n');
+  const cwd = initRepo('checks-git-cwd-');
+
+  const result = spawnSync(process.execPath, [FGOS, 'setup'], {
+    cwd,
+    encoding: 'utf8',
+    env: { ...process.env, HOME: homeDir },
+  });
+
+  assert.equal(result.status, 0, `setup failed: ${result.stderr}`);
+  const { data } = JSON.parse(result.stdout);
+  assert.equal(data.rcWriteDeclinedReason, undefined);
+  assert.deepEqual(data.rcFilesInserted, [path.join(homeDir, '.bashrc')]);
+  assert.ok(fs.readFileSync(path.join(homeDir, '.bashrc'), 'utf8').includes('fgos-shell-integration.sh'));
+
+  fs.rmSync(cwd, { recursive: true, force: true });
+  fs.rmSync(homeDir, { recursive: true, force: true });
+});
+
+test('shell-integration-sourced samples dead paths instead of printing all of them', () => {
+  // Real profiles accumulate these into the hundreds; a check message that
+  // names every one scrolls the rest of the doctor report off the screen.
+  const homeDir = mkTemp('doctor-shell-dead-many-');
+  const dead = Array.from({ length: 12 }, (_, i) =>
+    path.join(homeDir, `gone-${i}`, 'scripts', 'fgos-shell-integration.sh'),
+  );
+  fs.writeFileSync(
+    path.join(homeDir, '.bashrc'),
+    `source "${integrationScriptPath()}"\n${dead.map((d) => `source "${d}"`).join('\n')}\n`,
+  );
+  const prevHome = process.env.HOME;
+  process.env.HOME = homeDir;
+  try {
+    const { passed, message } = checkById('shell-integration-sourced').check(process.cwd());
+    assert.equal(passed, false);
+    assert.ok(message.includes('12 dead'), `expected the full count: ${message}`);
+    assert.ok(message.includes('(+9 more path(s))'), `expected the remainder note: ${message}`);
+    const named = dead.filter((d) => message.includes(d));
+    assert.equal(named.length, 3, `expected exactly 3 sampled paths, got ${named.length}`);
+  } finally {
+    process.env.HOME = prevHome;
+    fs.rmSync(homeDir, { recursive: true, force: true });
+  }
 });

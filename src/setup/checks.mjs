@@ -14,7 +14,7 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
-import { detectRcFiles, hasSourceLine } from './shell-rc.mjs';
+import { detectRcFiles, hasSourceLine, deadSourceLines } from './shell-rc.mjs';
 import { mergeConfigDefaults } from './config-merge.mjs';
 import { mainCheckoutHookWired } from './git-hooks.mjs';
 import { DEFAULT_RUNNER_CONFIG } from '../runner/dispatch.mjs';
@@ -23,15 +23,70 @@ export { mainCheckoutHookWired } from './git-hooks.mjs';
 
 const MIN_NODE_MAJOR = 18;
 
+// How many distinct dead paths the shell-integration check names before
+// falling back to a count. Observed real profiles carry over a hundred.
+const DEAD_LINE_SAMPLE_SIZE = 3;
+
 /**
- * Absolute path to the sourceable shell-integration script, resolved from
- * this file's own on-disk location via `import.meta.url` — never a cwd-based
- * git lookup, since this file's location is fixed at import time (unlike the
- * script's own runtime cwd-based worktree resolution, which is a separate,
- * already-solved problem — see CONTEXT.md's "Established Patterns").
+ * The main checkout that owns `dir` — the directory holding the real `.git` —
+ * or `null` when `dir` is not inside a git checkout at all.
+ *
+ * `--show-toplevel` is deliberately not used: inside a linked worktree it
+ * returns that worktree's own root, and treating that as the shell
+ * integration's home is what made every worktree earn its own `source` line,
+ * one dead line left behind per removed worktree. `--git-common-dir` points
+ * at the main checkout's `.git` from anywhere in the repo, so its parent is
+ * the one location stable enough for a user's rc file to name. Same
+ * resolution `scripts/fgos-shell-integration.sh` already uses, and the same
+ * common-dir-parent shape as `merge.mjs`'s `isMainWorktree`.
+ */
+export function resolveMainCheckout(dir) {
+  let commonDir;
+  try {
+    commonDir = execFileSync('git', ['rev-parse', '--path-format=absolute', '--git-common-dir'], {
+      cwd: dir,
+      encoding: 'utf8',
+      shell: false,
+      stdio: ['ignore', 'pipe', 'pipe'],
+    }).trim();
+  } catch {
+    return null;
+  }
+  return commonDir ? path.dirname(commonDir) : null;
+}
+
+/**
+ * Absolute path to the sourceable shell-integration script, canonicalized to
+ * the main checkout, or `null` when no stable location exists for it.
+ *
+ * Starts from this file's own on-disk location via `import.meta.url` — that
+ * is the copy actually being executed, and the only one guaranteed to exist.
+ * When that copy sits inside a linked worktree, the equivalent path in the
+ * main checkout is returned instead, so a worktree never earns its own rc
+ * line and `checkShellIntegrationSourced` stops reporting a working setup as
+ * unconfigured.
+ *
+ * The `existsSync` guard keeps the canonical rewrite honest for a checkout
+ * that is not fgOS's own — fgOS installed under another repo's
+ * `node_modules/` resolves that repo as its main checkout, which has no
+ * `scripts/` of its own; the executing copy's real path is correct there.
+ *
+ * `null` means the executing copy is not inside a git checkout at all (an
+ * unpacked tarball, an npx cache, a bare temp copy). Such a location is
+ * ephemeral by nature, so there is no path worth writing into a shell
+ * profile that will outlive it.
  */
 export function integrationScriptPath() {
-  return path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../scripts/fgos-shell-integration.sh');
+  const executingCopy = path.resolve(
+    path.dirname(fileURLToPath(import.meta.url)),
+    '../../scripts/fgos-shell-integration.sh',
+  );
+  const mainCheckout = resolveMainCheckout(path.dirname(executingCopy));
+  if (mainCheckout === null) {
+    return null;
+  }
+  const canonical = path.join(mainCheckout, 'scripts', 'fgos-shell-integration.sh');
+  return fs.existsSync(canonical) ? canonical : executingCopy;
 }
 
 function checkNodeAndGit() {
@@ -53,9 +108,44 @@ function checkShellIntegrationSourced() {
   if (rcFiles.length === 0) {
     return { passed: true, message: 'no shell rc file(s) detected — nothing to check' };
   }
+  if (scriptPath === null) {
+    return {
+      passed: true,
+      message: 'this copy of fgos is not inside a git checkout — no stable path to check for',
+    };
+  }
+  // Reported even when the integration itself is correctly sourced: each dead
+  // line makes an interactive shell emit its own `no such file or directory`
+  // error on open, which is the failure a user actually sees. Reported per rc
+  // file because setup writes to every rc file it detects, so they drift apart.
+  const dead = rcFiles.flatMap((rcFile) =>
+    deadSourceLines(rcFile).map((target) => ({ rcFile, target })),
+  );
   const missing = rcFiles.filter((rcFile) => !hasSourceLine(rcFile, scriptPath));
+  const problems = [];
   if (missing.length > 0) {
-    return { passed: false, message: `not sourced in: ${missing.join(', ')} — run fgos setup` };
+    problems.push(`not sourced in: ${missing.join(', ')} — run fgos setup`);
+  }
+  if (dead.length > 0) {
+    const byFile = new Map();
+    for (const { rcFile, target } of dead) {
+      byFile.set(rcFile, (byFile.get(rcFile) ?? 0) + 1);
+    }
+    const counts = [...byFile].map(([rcFile, count]) => `${rcFile} (${count})`).join(', ');
+    // Only a sample of the paths: these accumulate into the hundreds, and a
+    // check message that prints every one of them scrolls the rest of the
+    // report off the screen. The counts above are the actionable part.
+    const unique = [...new Set(dead.map(({ target }) => target))];
+    const sample = unique.slice(0, DEAD_LINE_SAMPLE_SIZE).join(', ');
+    const rest = unique.length - DEAD_LINE_SAMPLE_SIZE;
+    problems.push(
+      `${dead.length} dead fgos source line(s) in ${counts} — each one errors on every shell open; ` +
+        `delete them by hand (fgos never edits your shell profile to remove a line). ` +
+        `e.g. ${sample}${rest > 0 ? ` (+${rest} more path(s))` : ''}`,
+    );
+  }
+  if (problems.length > 0) {
+    return { passed: false, message: problems.join('; ') };
   }
   return { passed: true, message: `sourced in: ${rcFiles.join(', ')}` };
 }

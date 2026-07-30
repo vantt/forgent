@@ -2481,11 +2481,21 @@ async function runVerb(verb, flags, positional, dir) {
       const rcFiles = detectRcFiles(os.homedir());
       const rcFilesInserted = [];
       const rcFilesAlreadyConfigured = [];
-      for (const rcFile of rcFiles) {
-        if (insertSourceLine(rcFile, scriptPath)) {
-          rcFilesInserted.push(rcFile);
-        } else {
-          rcFilesAlreadyConfigured.push(rcFile);
+      // A null scriptPath means this copy of fgos has no location stable enough
+      // to name in a shell profile — it is not inside a git checkout, so it is
+      // ephemeral by nature. Writing its path would leave a `source` line that
+      // outlives the directory it points at and errors on every shell open.
+      // Everything else setup does still runs; only the rc write is declined.
+      const rcWriteDeclinedReason = scriptPath === null
+        ? 'this copy of fgos is not inside a git checkout, so it has no stable path to source — source scripts/fgos-shell-integration.sh by hand from a permanent checkout'
+        : null;
+      if (scriptPath !== null) {
+        for (const rcFile of rcFiles) {
+          if (insertSourceLine(rcFile, scriptPath)) {
+            rcFilesInserted.push(rcFile);
+          } else {
+            rcFilesAlreadyConfigured.push(rcFile);
+          }
         }
       }
       const configPath = path.join(repoRoot, '.fgos-runner.json');
@@ -2504,6 +2514,7 @@ async function runVerb(verb, flags, positional, dir) {
       return {
         rcFilesInserted,
         rcFilesAlreadyConfigured,
+        ...(rcWriteDeclinedReason !== null && { rcWriteDeclinedReason }),
         configPath,
         configCreated: !configExisted,
         configAddedKeys: configExisted ? addedKeys : [],
@@ -2672,6 +2683,9 @@ function renderPretty(verb, data) {
     }
     for (const rc of data.rcFilesAlreadyConfigured) {
       lines.push(formatCheck(true, `already sourced`, rc));
+    }
+    if (data.rcWriteDeclinedReason) {
+      lines.push(formatCheck(false, 'skipped shell-profile line', data.rcWriteDeclinedReason));
     }
     lines.push(
       formatCheck(
