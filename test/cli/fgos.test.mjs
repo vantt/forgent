@@ -5,7 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync, spawnSync } from 'node:child_process';
-import { addOutcome, addFriction, moveWork, moveStage, addWork, editWork, StoreError } from '../../src/state/store.mjs';
+import { addOutcome, addFriction, addDiscovery, moveWork, moveStage, addWork, editWork, StoreError } from '../../src/state/store.mjs';
 import { createSession, endSession } from '../../src/runner/session.mjs';
 import { DEFAULT_TTL_MS } from '../../src/runner/main-checkout-lock.mjs';
 
@@ -1893,6 +1893,111 @@ test('rollup never mutates state: no event is appended and no children of an unr
   assert.equal(data.doneCount, 1);
   assert.equal(data.totalCount, 1);
   assert.ok(!data.children.some((c) => c.id === 'unrelated-item'));
+  assert.deepEqual(eventLines(cwd), before);
+});
+
+// --- fgos show: scoped single-task full detail ------------------------------
+//
+// Unlike `list --id`, which only scopes the `work` map and leaves every
+// other per-item log global, `show` scopes ALL of them to the one id given.
+// docs/history/fgos-show-scoped-detail/CONTEXT.md D1/D2.
+
+test('show returns the work record plus every per-item log scoped to just that id, leaving a second item\'s data out entirely, exit 0', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'show-detail-item', { title: 'Show Detail Item' });
+  addOk(cwd, 'other-item', { title: 'Other Item' });
+  const dir = path.join(cwd, '.fgos');
+
+  addDiscovery(dir, { id: 'show-detail-item', clear: true, verify: 'run the thing' });
+  addDiscovery(dir, { id: 'other-item', clear: false, question: 'unrelated question' });
+  run(cwd, ['decision', '--id', 'show-detail-item', '--text', 'D1: scoped detail', '--rationale', 'test fixture']);
+  run(cwd, ['decision', '--id', 'other-item', '--text', 'D1: unrelated decision', '--rationale', 'test fixture']);
+  run(cwd, ['ask', 'show-detail-item', '--text', 'which shape?']);
+  run(cwd, ['answer', 'show-detail-item', '--text', 'this one']);
+  run(cwd, ['ask', 'other-item', '--text', 'unrelated ask']);
+  addOutcome(dir, { id: 'show-detail-item', predicted: { tier: 'standard', deps: 0, priorVisits: 0 } });
+  addOutcome(dir, { id: 'other-item', predicted: { tier: 'light', deps: 0, priorVisits: 0 } });
+  addFriction(dir, { id: 'show-detail-item', disposition: 'parked', errorClass: 'verify-miss', layer: 'verification', attempts: 1, detail: 'goal-check failed' });
+  addFriction(dir, { id: 'other-item', disposition: 'halted', errorClass: 'worker-timeout', layer: 'environment', attempts: 1, detail: 'timed out' });
+
+  const result = run(cwd, ['show', 'show-detail-item']);
+  assert.equal(result.status, 0);
+  const data = envelopeData(result.stdout);
+
+  assert.equal(data.work.id, 'show-detail-item');
+  assert.equal(data.work.title, 'Show Detail Item');
+
+  assert.equal(data.discovery.length, 1);
+  assert.equal(data.discovery[0].clear, true);
+
+  assert.equal(data.decisions.length, 1);
+  assert.equal(data.decisions[0].text, 'D1: scoped detail');
+
+  assert.equal(data.gates.ask, 'which shape?');
+  assert.equal(data.gates.answer, 'this one');
+
+  assert.equal(data.outcome.id, 'show-detail-item');
+  assert.equal(data.outcome.predicted.tier, 'standard');
+
+  assert.equal(data.friction.count, 1);
+  assert.equal(data.friction.recent[0].errorClass, 'verify-miss');
+
+  // Nothing from 'other-item' leaked into 'show-detail-item's scoped view.
+  assert.ok(!JSON.stringify(data).includes('unrelated'));
+  assert.ok(!JSON.stringify(data).includes('worker-timeout'));
+});
+
+test('show on a fresh item with no logs yet returns every key present but empty/null, not omitted, exit 0', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'bare-item');
+
+  const result = run(cwd, ['show', 'bare-item']);
+  assert.equal(result.status, 0);
+  const data = envelopeData(result.stdout);
+
+  assert.equal(data.work.id, 'bare-item');
+  assert.deepEqual(data.discovery, []);
+  assert.deepEqual(data.decisions, []);
+  assert.equal(data.gates, null);
+  assert.deepEqual(data.outcome, { id: 'bare-item', predicted: null, actual: null, docType: null, docPath: null });
+  assert.equal(data.friction, null);
+  assert.equal(data.settlement, null);
+  assert.equal(data.learning, null);
+});
+
+test('show on an unknown id is rejected as validation (not-found), exit 4, same shape as list --id\'s miss', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'some-item');
+
+  const result = run(cwd, ['show', 'no-such-item']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /show: work "no-such-item" not found/);
+});
+
+test('show with no id at all is rejected as validation, exit 4', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['show']);
+  assert.equal(result.status, 4);
+});
+
+test('show --json is a byte-identical no-op: output matches show without --json exactly, except generated_at', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'json-noop-item');
+
+  const withoutJson = run(cwd, ['show', 'json-noop-item']).stdout;
+  const withJson = run(cwd, ['show', 'json-noop-item', '--json']).stdout;
+
+  const stripGeneratedAt = (s) => s.replace(/"generated_at": "[^"]*"/, '"generated_at": ""');
+  assert.equal(stripGeneratedAt(withoutJson), stripGeneratedAt(withJson));
+});
+
+test('show never mutates state: no event is appended', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'read-only-item');
+
+  const before = eventLines(cwd);
+  const result = run(cwd, ['show', 'read-only-item']);
+  assert.equal(result.status, 0);
   assert.deepEqual(eventLines(cwd), before);
 });
 

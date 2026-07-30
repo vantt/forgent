@@ -1153,6 +1153,36 @@ async function runVerb(verb, flags, positional, dir) {
       return { ...base, work: { items: workPage, nextCursor } };
     }
 
+    // Request-class per D1 (same contract as `list`): a pure read — never
+    // appends an event, never touches state.json. Unlike `list --id`,
+    // which only scopes the `work` map and leaves every per-item log
+    // global, `show` scopes ALL of them to this one id -- the true
+    // full-detail view of a single task
+    // (docs/history/fgos-show-scoped-detail/CONTEXT.md D1). Reuses
+    // `check`'s own per-item collectors (collectOutcomeEntry/
+    // collectFrictionData/collectSettlementData/collectLearningData,
+    // lines 335-440) for outcome/friction/settlement/learning so the two
+    // verbs render identical shapes for identical data, rather than
+    // reimplementing the slice.
+    case 'show': {
+      const id = requireField(positional[0] ?? flags.id, 'show requires an id: fgos show <id>');
+      const rawView = listWork(dir);
+      const item = rawView.work[id];
+      if (!item) {
+        throw new StoreError('validation', `show: work "${id}" not found.`);
+      }
+      return {
+        work: item,
+        discovery: rawView.discovery?.[id] ?? [],
+        decisions: rawView.decisionsById?.[id] ?? [],
+        gates: rawView.gates?.[id] ?? null,
+        outcome: collectOutcomeEntry(id, rawView.outcomes?.[id]),
+        friction: collectFrictionData(rawView, id),
+        settlement: collectSettlementData(rawView, id),
+        learning: collectLearningData(rawView, id),
+      };
+    }
+
     // Request-class per D1: a pure read — never appends an event, never
     // touches state.json, never creates `.fgos/` if it's missing. Goes
     // through store.readyWork only; this file never imports frontier.mjs
@@ -2657,7 +2687,7 @@ function renderPretty(verb, data) {
 // `requiresExistingStore: false` verb (that set also includes `session`/
 // `setup`/`doctor`, which never touch `.fgos/` at all, and `init`, which
 // gets its own opposite linked-worktree refusal above).
-const STORE_MISSING_WARNING_VERBS = new Set(['list', 'ready', 'graph', 'stale', 'check', 'rollup', 'conflicts', 'triage']);
+const STORE_MISSING_WARNING_VERBS = new Set(['list', 'ready', 'graph', 'stale', 'check', 'rollup', 'show', 'conflicts', 'triage']);
 
 async function main() {
   const [, , verb, ...rest] = process.argv;
