@@ -1,4 +1,5 @@
 use std::io;
+use std::path::{Path, PathBuf};
 use std::process::Command;
 
 use crate::layout;
@@ -100,8 +101,17 @@ pub fn herdr_bin() -> String {
 /// `main.rs`'s event loop directly — the domain only ever calls
 /// `PaneOrchestrator::open_pick_pane`/`focus_pane` (this `impl` block,
 /// below), never `layout::` or this free function itself.
-pub fn open_pick_pane(herdr_bin: &str, workspace_id: &str, id: &str) -> io::Result<()> {
-    let pane_id = layout::place_new_agent_pane(herdr_bin, workspace_id).map_err(io::Error::other)?;
+/// `project_root` is where the launched session starts (tsk-45u D1) — the
+/// main fgOS checkout, so `/fgOS:pick` can reach `.fgos/` and switch into
+/// the item's worktree itself.
+pub fn open_pick_pane(
+    herdr_bin: &str,
+    workspace_id: &str,
+    id: &str,
+    project_root: &Path,
+) -> io::Result<()> {
+    let pane_id = layout::place_new_agent_pane(herdr_bin, workspace_id, project_root)
+        .map_err(io::Error::other)?;
 
     let run_args = run_argv(&pane_id, id, skip_permissions_enabled()).map_err(io::Error::other)?;
     // Fire-and-forget: the dashboard never waits on the launched claude
@@ -142,11 +152,21 @@ pub fn focus_pane(herdr_bin: &str, pane_id: &str) -> io::Result<()> {
 pub struct HerdrPaneAdapter {
     pub herdr_bin: String,
     pub workspace_id: String,
+    /// The main fgOS checkout the dashboard is bound to, `None` when it
+    /// could not be resolved. tsk-45u D3: with no root there is nowhere
+    /// correct to launch, so the launch is refused outright rather than
+    /// opening a session in whatever directory herdr happened to inherit.
+    pub project_root: Option<PathBuf>,
 }
 
 impl PaneOrchestrator for HerdrPaneAdapter {
     fn open_pick_pane(&self, id: &str) -> io::Result<()> {
-        open_pick_pane(&self.herdr_bin, &self.workspace_id, id)
+        let Some(project_root) = &self.project_root else {
+            return Err(io::Error::other(
+                "project root unresolved — refusing to launch an agent outside a project",
+            ));
+        };
+        open_pick_pane(&self.herdr_bin, &self.workspace_id, id, project_root)
     }
 
     fn focus_pane(&self, pane_id: &str) -> io::Result<()> {
@@ -157,6 +177,29 @@ impl PaneOrchestrator for HerdrPaneAdapter {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// tsk-45u D3: with no project root there is nowhere correct to
+    /// launch, so the adapter refuses before touching herdr at all —
+    /// `herdr_bin` here points at a binary that would fail loudly if it
+    /// were ever spawned, which it must not be.
+    fn adapter_without_a_project_root_refuses_to_launch() -> io::Result<()> {
+        let adapter = HerdrPaneAdapter {
+            herdr_bin: "/nonexistent/herdr".into(),
+            workspace_id: "wS".into(),
+            project_root: None,
+        };
+        adapter.open_pick_pane("tsk-45u")
+    }
+
+    #[test]
+    fn launch_is_refused_when_the_project_root_is_unresolved() {
+        let err = adapter_without_a_project_root_refuses_to_launch()
+            .expect_err("a rootless dashboard must never open an agent pane");
+        assert!(
+            err.to_string().contains("project root unresolved"),
+            "the refusal must say why: {err}"
+        );
+    }
 
     #[test]
     fn pane_focus_argv_targets_the_given_pane_id() {

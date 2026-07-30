@@ -32,9 +32,14 @@ fn main() -> io::Result<()> {
         app.refresh_from_fgos(source);
     }
 
+    // tsk-45u D1: the one already-resolved root is what every pane this
+    // dashboard opens starts in — resolved here once, never a second time
+    // deeper in, so the work list and the launched agents can never end up
+    // pointed at two different projects.
     let pane_orchestrator = HerdrPaneAdapter {
         herdr_bin: pick::herdr_bin(),
         workspace_id: std::env::var("HERDR_WORKSPACE_ID").unwrap_or_default(),
+        project_root: root.as_ref().ok().cloned(),
     };
 
     // Absent outside a real herdr-managed pane (dev/test) — pane refresh
