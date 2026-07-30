@@ -72,6 +72,27 @@ holderPid, lockAgeMs }` alongside what they already pass. Existing
 assertions on `err.code`/`err.category`/the message text are untouched —
 this only adds new properties.
 
+**`MergeError` discriminator gap (found at fourth `fgos-validating` pass)**:
+`ClaimError` already carries a specific `.code` (`'lock-held'`,
+`'lock-ambiguous'`, `'not-found'`, `'deps-not-merged'` — confirmed via every
+`throw new ClaimError(...)` site in `claim-port.mjs`), so `withLockRetry`
+can safely check `err.code === 'lock-held'` and retry nothing else.
+`MergeError`, however, sets `this.errorClass = 'merge-fail'` and
+`this.category = 'merge-fail'` **unconditionally in its constructor** for
+every throw site in `merge.mjs` (diff failures, merge conflicts,
+verify-fail, git-commit-fail, AND the lock-held/lock-ambiguous throws at
+lines 656/662) — there is no existing field distinguishing "lock held,
+worth retrying" from "real merge conflict or verify failure, must never
+retry". Retrying on `errorClass === 'merge-fail'` alone would blindly
+re-attempt a genuinely conflicted or red-verify merge, which is wrong and
+could waste the wait budget on a problem retrying can't fix. Fix: add
+`code: 'lock-held'` / `code: 'lock-ambiguous'` into the `details` object at
+`merge.mjs`'s two lock-throw sites (656-659, 662) — mirrors `ClaimError`'s
+own convention, additive (confirmed via grep: `test/runner/merge.test.mjs`
+asserts nothing on `.category`/`.errorClass`/`.code` today, so this cannot
+break an existing test). `withLockRetry` then checks `err.code ===
+'lock-held'` identically for both wrapped calls.
+
 **Why this is smaller than the first two drafts of this plan**: neither
 `claimWork` nor `mergeRunnerItem`'s call signature or async-ness changes, so
 `loop.mjs:452` (the autonomous runner's own `claimWork` call) is never
@@ -98,6 +119,7 @@ contract, none of the 7 existing synchronous call sites in
 | Component | Risk | Proof point (for `fgos-validating`) |
 |---|---|---|
 | `withLockRetry`'s backoff/TTL-bound logic | medium — must stop retrying exactly when the budget is spent, never loop past it, never retry a non-lock-held error | unit test: a thunk that throws a `ClaimError('lock-held', ..., { remainingTtlMs: 1000 })` a few times then succeeds, assert retry stops and reports failure at or just after that 1s bound, not before and not indefinitely after; a thunk throwing `lock-ambiguous` or any other error must never retry |
+| `MergeError` retry-discriminator gap (found at fourth `fgos-validating` pass) | **medium-high** — without `code: 'lock-held'` added, `withLockRetry` has no safe way to tell a lock-contention `MergeError` apart from a real merge conflict or verify-fail `MergeError` (both share identical `errorClass`/`category` today) | unit test: a thunk that throws a `MergeError('...conflict...', { branch })` with **no** `code` field must never retry (proves the wrapper checks `err.code`, not `errorClass`/`category`); a thunk throwing `MergeError('...', { code: 'lock-held', remainingTtlMs })` must retry exactly like the `ClaimError` case |
 | `ClaimError`/`MergeError` gaining `details` properties | low — additive only | existing `claim-port.test.mjs`/`merge.test.mjs` assertions on `err.code`/`err.category`/message text run unmodified and still pass (no rewrite needed, unlike the rejected approach) |
 | `--no-wait` opt-out wiring across `take`/`pick`/`approve` in `bin/fgos.mjs` | low — mechanical flag threading | one test per verb asserting `--no-wait` reproduces byte-for-byte today's error on a forced `HELD` fixture |
 | exhausted-wait failure message | low — UX only, no logic risk | assert the message states elapsed wait time, distinguishable from today's immediate-fail message (design report's own suggestion) |
@@ -108,10 +130,13 @@ contract, none of the 7 existing synchronous call sites in
    lockAgeMs }` at its `lock-held` throw site. `claimWork` itself is
    otherwise untouched — still synchronous, still throws at the same
    point.
-2. `src/runner/merge.mjs` — add `remainingTtlMs`/`holderPid`/`lockAgeMs`
-   into the existing `details` object at the `HELD` throw site inside
-   `mergeRunnerItem` (constructor already supports this). `mergeRunnerItem`
-   itself is otherwise untouched.
+2. `src/runner/merge.mjs` — add `code: 'lock-held'` plus
+   `remainingTtlMs`/`holderPid`/`lockAgeMs` into the existing `details`
+   object at the `HELD` throw site (line 656-659), and `code:
+   'lock-ambiguous'` at the `AMBIGUOUS` throw site (line 662) —
+   constructor already supports arbitrary `details` via `Object.assign`.
+   `mergeRunnerItem` itself and every other `MergeError` throw site in this
+   file are otherwise untouched.
 3. `src/runner/lock-wait.mjs` (new) — `withLockRetry(fn, waitOpts)`,
    unit-tested in isolation first since both CLI call sites depend on its
    correctness.
