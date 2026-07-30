@@ -63,11 +63,11 @@ export const COMMAND_REGISTRY = [
   {
     name: 'add',
     invoke: 'fgos add',
-    description: 'Add a work item directly with explicit fields (id/title/kind/risk/verify required).',
+    description: 'Add a work item directly with explicit fields (title/kind/risk/verify required). Omit id to auto-generate a collision-free "tsk-<hash>" id from title, same generator submit uses.',
     parameters: {
       type: 'object',
       properties: {
-        id: { type: 'string', description: 'Work item id (positional or --id).' },
+        id: { type: 'string', description: 'Optional work item id (positional or --id); omit to auto-generate one from --title.' },
         title: { type: 'string', description: 'Work item title.' },
         kind: { type: 'string', description: 'Work item kind.' },
         risk: { type: 'string', description: 'Work item risk level.' },
@@ -85,9 +85,12 @@ export const COMMAND_REGISTRY = [
         targets: { type: 'string', description: 'Optional comma-separated list of ids this goal item considers "part of" it (an MVP\'s targets are milestone ids; a milestone\'s targets are ordinary work ids).', multiValueFormat: 'csv' },
       },
       positional: ['id'],
-      required: ['id', 'title', 'kind', 'risk', 'verify'],
+      required: ['title', 'kind', 'risk', 'verify'],
     },
-    examples: ['fgos add build-cli --title "Build CLI" --kind feature --risk medium --verify "npm test"'],
+    examples: [
+      'fgos add build-cli --title "Build CLI" --kind feature --risk medium --verify "npm test"',
+      'fgos add --title "Build CLI" --kind feature --risk medium --verify "npm test"',
+    ],
     touchesState: true,
     requiresExistingStore: true,
     externalEffect: false,

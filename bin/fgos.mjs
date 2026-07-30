@@ -722,7 +722,20 @@ async function runVerb(verb, flags, positional, dir) {
     }
 
     case 'add': {
-      const id = requireField(positional[0] ?? flags.id, 'add requires an id: fgos add <id> --title ... --kind ... --risk ... --verify ...');
+      // --id is optional (was required): an explicit id is still honored
+      // as-is (e.g. a deliberately chosen or parent-lineage child id like
+      // "tsk-4vo-1"), but omitting it now reuses `submit`'s own generateId
+      // (src/intake/classify.mjs) to derive a collision-free "tsk-<hash>"
+      // id from --title, instead of forcing the caller to invent one by
+      // hand. This closes the gap that let `add` accept an arbitrarily
+      // long slugified-title id in the first place (docs/explanation/
+      // long-work-item-ids-max-length-guard.md) — generateId is now the
+      // path of least resistance, not a manually-typed guess.
+      const idFlag = optionalField(positional[0] ?? flags.id, 'add --id requires a non-empty value; omit --id entirely to auto-generate one from --title.');
+      const id = idFlag ?? generateId(
+        requireField(flags.title, 'add requires --title (used to derive the id when --id is omitted, and always required as the item\'s own title regardless)'),
+        Object.keys(listWork(dir).work),
+      );
       const work = {
         id,
         title: flags.title,

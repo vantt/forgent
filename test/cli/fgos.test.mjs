@@ -1002,9 +1002,24 @@ test('an unknown verb is rejected as validation, exit 4', () => {
   assert.throws(() => JSON.parse(result.stdout), 'stdout is not parseable JSON on the error path');
 });
 
-test('add with no id at all is rejected as validation, exit 4', () => {
+test('add with no flags at all is rejected as validation (missing --title), exit 4', () => {
   const cwd = tmpCwd();
   const result = run(cwd, ['add']);
+  assert.equal(result.status, 4);
+});
+
+test('add omitting --id auto-generates a collision-free tsk-<hash> id from --title, exit 0', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['add', '--title', 'Auto id from title', '--kind', 'task', '--risk', 'low', '--verify', 'x']);
+  assert.equal(result.status, 0);
+  const generatedId = envelopeData(result.stdout).id;
+  assert.match(generatedId, /^tsk-[0-9a-z]{3,8}$/, `generated id "${generatedId}" should match generateId's tsk-<hash> shape`);
+  assert.equal(stateView(cwd).work[generatedId].title, 'Auto id from title');
+});
+
+test('add with --title but no --id is rejected the same as a fully bare call (missing --title still checked first)', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['add', '--kind', 'task', '--risk', 'low', '--verify', 'x']);
   assert.equal(result.status, 4);
 });
 
