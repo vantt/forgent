@@ -27,6 +27,14 @@
     "quadrant": "how-to",
     "purpose": "Show the steps to accomplish one specific, already-understood goal.",
     "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/add-a-single-item-id-filter-to-an-existing-list-verb.md",
+    "title": "Add a single-item `--id` filter to an existing `list`-style verb",
+    "sourceCaptureId": "tsk-42m"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
     "docPath": "docs/how-to/avoid-a-hung-verify-on-return-approve-catchup.md",
     "title": "How to avoid a hung `verify` command on `fgos return`/`approve`/`catchup`",
     "sourceCaptureId": "tsk-3vo"
