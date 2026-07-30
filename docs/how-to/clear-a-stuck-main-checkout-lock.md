@@ -95,8 +95,8 @@ verbal assurance that the other side was "probably done":
 
 The claim only succeeded once that session's own work genuinely finished
 (`{"id":"tsk-3h4","from":"todo","to":"doing", ...}`, real `work.move`
-event, seq 647) — confirming the wait, not a forced clear, was the correct
-call.
+event, seq 663, renumbered by tsk-n4i-1; was 647) — confirming the wait, not
+a forced clear, was the correct call.
 
 ## Related
 
