@@ -1,8 +1,7 @@
 use std::io;
 use std::process::Command;
 
-use serde_json::Value;
-
+use crate::layout;
 use crate::ports::PaneOrchestrator;
 
 /// The exact slash command a person would type by hand to claim and route
@@ -51,32 +50,35 @@ pub(crate) fn is_valid_id(id: &str) -> bool {
     })
 }
 
-/// argv (excluding the `herdr` binary itself) for opening a new pane
-/// beside the dashboard's own — `--current` resolves to the calling
-/// plugin process's own pane via herdr's own `HERDR_PANE_ID` injection.
-pub fn split_argv() -> Vec<String> {
-    ["pane", "split", "--current", "--direction", "right", "--focus"]
-        .into_iter()
-        .map(String::from)
-        .collect()
+/// D1: `--dangerously-skip-permissions` is on by default for every agent
+/// launched through this shared function (including a future unattended
+/// auto-dispatcher, per the item's own description) — set
+/// `FGOS_HERDR_SKIP_PERMISSIONS=0` (or `false`) to opt out for a more
+/// cautious launch. Read once per launch, never cached, so a change takes
+/// effect on the very next agent this function opens.
+pub fn skip_permissions_enabled() -> bool {
+    match std::env::var("FGOS_HERDR_SKIP_PERMISSIONS") {
+        Ok(value) => value != "0" && value.to_lowercase() != "false",
+        Err(_) => true,
+    }
 }
 
 /// argv for launching `claude` in the newly opened pane with
 /// `/fgOS:pick <id>` piped in as the initial prompt — the automated
 /// equivalent of a person typing the slash command by hand.
-pub fn run_argv(pane_id: &str, id: &str) -> Result<Vec<String>, InvalidId> {
+/// `skip_permissions` is threaded in explicitly (never read from env
+/// inside this pure function) so it stays deterministically testable —
+/// D1's actual env resolution lives in `skip_permissions_enabled` above.
+pub fn run_argv(pane_id: &str, id: &str, skip_permissions: bool) -> Result<Vec<String>, InvalidId> {
     if !is_valid_id(id) {
         return Err(InvalidId(id.to_string()));
     }
-    let command = format!("claude '{PICK_SLASH_COMMAND} {id}'");
+    let command = if skip_permissions {
+        format!("claude --dangerously-skip-permissions '{PICK_SLASH_COMMAND} {id}'")
+    } else {
+        format!("claude '{PICK_SLASH_COMMAND} {id}'")
+    };
     Ok(vec!["pane".into(), "run".into(), pane_id.into(), command])
-}
-
-fn parse_split_pane_id(json: &str) -> Option<String> {
-    let value: Value = serde_json::from_str(json).ok()?;
-    value["result"]["pane"]["pane_id"]
-        .as_str()
-        .map(String::from)
 }
 
 /// Resolve the herdr binary the same way the plugin docs recommend:
@@ -86,24 +88,17 @@ pub fn herdr_bin() -> String {
     std::env::var("HERDR_BIN_PATH").unwrap_or_else(|_| "herdr".into())
 }
 
-/// Open a new pane beside the dashboard and launch `claude` in it with
-/// `/fgOS:pick <id>` as the initial prompt (D1's "Pick action").
-pub fn open_pick_pane(herdr_bin: &str, id: &str) -> io::Result<()> {
-    let split_output = Command::new(herdr_bin).args(split_argv()).output()?;
-    if !split_output.status.success() {
-        return Err(io::Error::other(format!(
-            "herdr pane split failed: {}",
-            String::from_utf8_lossy(&split_output.stderr)
-        )));
-    }
-    let stdout = String::from_utf8_lossy(&split_output.stdout);
-    let pane_id = parse_split_pane_id(&stdout).ok_or_else(|| {
-        io::Error::other(format!(
-            "herdr pane split: could not read pane_id from response: {stdout}"
-        ))
-    })?;
+/// Open a new agent pane for `id` and launch `claude` in it with
+/// `/fgOS:pick <id>` as the initial prompt — the shared launch-agent
+/// function (tsk-1q3), used identically by the manual dashboard action
+/// and, later, an auto-dispatcher. Pane placement goes through the
+/// layout manager (`layout::place_new_agent_pane`, tsk-1q3's `fg:agents-N`
+/// tab/grid logic) instead of always splitting the caller's own pane —
+/// superseding this function's old `pane split --current`-only shape.
+pub fn open_pick_pane(herdr_bin: &str, workspace_id: &str, id: &str) -> io::Result<()> {
+    let pane_id = layout::place_new_agent_pane(herdr_bin, workspace_id).map_err(io::Error::other)?;
 
-    let run_args = run_argv(&pane_id, id).map_err(io::Error::other)?;
+    let run_args = run_argv(&pane_id, id, skip_permissions_enabled()).map_err(io::Error::other)?;
     // Fire-and-forget: the dashboard never waits on the launched claude
     // session's own lifetime, only on herdr accepting the typed command.
     Command::new(herdr_bin).args(run_args).spawn()?;
@@ -112,14 +107,16 @@ pub fn open_pick_pane(herdr_bin: &str, id: &str) -> io::Result<()> {
 
 /// The `PaneOrchestrator` adapter (tsk-3t9 D1): the concrete herdr-CLI
 /// implementation of the pane-orchestration port. Holds the resolved
-/// `herdr_bin` path so the composition root (`main.rs`) resolves it once.
+/// `herdr_bin`/`workspace_id` so the composition root (`main.rs`)
+/// resolves them once.
 pub struct HerdrPaneAdapter {
     pub herdr_bin: String,
+    pub workspace_id: String,
 }
 
 impl PaneOrchestrator for HerdrPaneAdapter {
     fn open_pick_pane(&self, id: &str) -> io::Result<()> {
-        open_pick_pane(&self.herdr_bin, id)
+        open_pick_pane(&self.herdr_bin, &self.workspace_id, id)
     }
 }
 
@@ -128,55 +125,65 @@ mod tests {
     use super::*;
 
     #[test]
-    fn split_argv_targets_the_calling_pane() {
-        assert_eq!(
-            split_argv(),
-            vec!["pane", "split", "--current", "--direction", "right", "--focus"]
-        );
-    }
-
-    #[test]
-    fn run_argv_matches_exact_pane_run_shape() {
-        let argv = run_argv("wS:p16", "tsk-19y-3").expect("valid id");
+    fn launch_agent_run_argv_includes_skip_permissions_by_default() {
+        let argv = run_argv("wS:p16", "tsk-19y-3", true).expect("valid id");
         assert_eq!(
             argv,
             vec![
                 "pane",
                 "run",
                 "wS:p16",
-                "claude '/fgOS:pick tsk-19y-3'",
+                "claude --dangerously-skip-permissions '/fgOS:pick tsk-19y-3'",
             ]
         );
     }
 
     #[test]
+    fn launch_agent_run_argv_omits_skip_permissions_when_disabled() {
+        let argv = run_argv("wS:p16", "tsk-19y-3", false).expect("valid id");
+        assert_eq!(
+            argv,
+            vec!["pane", "run", "wS:p16", "claude '/fgOS:pick tsk-19y-3'",]
+        );
+    }
+
+    #[test]
+    fn launch_agent_skip_permissions_enabled_reads_env_with_safe_default() {
+        // All assertions run sequentially inside one test (not split
+        // across several) to avoid a real race: `cargo test` runs test
+        // functions in parallel threads, and env vars are process-global
+        // — two tests mutating the same var concurrently would flake.
+        std::env::remove_var("FGOS_HERDR_SKIP_PERMISSIONS");
+        assert!(skip_permissions_enabled(), "unset must default to on (D1)");
+
+        std::env::set_var("FGOS_HERDR_SKIP_PERMISSIONS", "0");
+        assert!(!skip_permissions_enabled(), "\"0\" must disable it");
+
+        std::env::set_var("FGOS_HERDR_SKIP_PERMISSIONS", "false");
+        assert!(!skip_permissions_enabled(), "\"false\" must disable it");
+
+        std::env::set_var("FGOS_HERDR_SKIP_PERMISSIONS", "1");
+        assert!(skip_permissions_enabled(), "any other value stays enabled");
+
+        std::env::remove_var("FGOS_HERDR_SKIP_PERMISSIONS");
+    }
+
+    #[test]
     fn run_argv_rejects_an_id_that_could_break_out_of_the_typed_command() {
-        let err = run_argv("wS:p16", "tsk'; rm -rf ~ #").unwrap_err();
+        let err = run_argv("wS:p16", "tsk'; rm -rf ~ #", true).unwrap_err();
         assert_eq!(err, InvalidId("tsk'; rm -rf ~ #".to_string()));
     }
 
     #[test]
     fn run_argv_rejects_ids_fgos_itself_would_reject() {
         // Mirrors src/state/work.mjs's ID_PATTERN test cases.
-        assert!(run_argv("p", "").is_err());
-        assert!(run_argv("p", "-leading-hyphen").is_err());
-        assert!(run_argv("p", "trailing-hyphen-").is_err());
-        assert!(run_argv("p", "double--hyphen").is_err());
-        assert!(run_argv("p", "1starts-with-digit").is_err());
-        assert!(run_argv("p", "Has-Upper-Case").is_err());
-        assert!(run_argv("p", "tsk-19y-3").is_ok());
-        assert!(run_argv("p", "choke-point-take-vs-pick-claim-eligibility").is_ok());
-    }
-
-    #[test]
-    fn parse_split_pane_id_reads_the_real_herdr_response_shape() {
-        // Captured live from `herdr pane split --current --direction right`.
-        let response = r#"{"id":"cli:pane:split","result":{"pane":{"agent_status":"unknown","cwd":"/x","focused":false,"pane_id":"wS:p16","tab_id":"wS:t9","workspace_id":"wS"},"type":"pane_info"}}"#;
-        assert_eq!(parse_split_pane_id(response).as_deref(), Some("wS:p16"));
-    }
-
-    #[test]
-    fn parse_split_pane_id_returns_none_on_unexpected_shape() {
-        assert_eq!(parse_split_pane_id(r#"{"error":{"message":"boom"}}"#), None);
+        assert!(run_argv("p", "", true).is_err());
+        assert!(run_argv("p", "-leading-hyphen", true).is_err());
+        assert!(run_argv("p", "trailing-hyphen-", true).is_err());
+        assert!(run_argv("p", "double--hyphen", true).is_err());
+        assert!(run_argv("p", "1starts-with-digit", true).is_err());
+        assert!(run_argv("p", "Has-Upper-Case", true).is_err());
+        assert!(run_argv("p", "tsk-19y-3", true).is_ok());
+        assert!(run_argv("p", "choke-point-take-vs-pick-claim-eligibility", true).is_ok());
     }
 }
