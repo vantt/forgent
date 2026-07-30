@@ -20,6 +20,7 @@
 // work.
 import { buildUnifiedEdges } from './dep-graph.mjs';
 import { connectedComponents } from './graph-metrics.mjs';
+import { RESOLVED_STATUSES } from './frontier.mjs';
 
 // Tier ordering used to sort mvp/milestone goals ahead of ungrouped work —
 // lower sorts first. An absent goalTier (plain work item, the common case)
@@ -33,12 +34,13 @@ function tierRank(goalTier) {
 /**
  * Rank open work items by blocking fan-out, highest first.
  *
- * `blocks` for an item is the count of OTHER items with status !== 'done'
+ * `blocks` for an item is the count of OTHER items not yet RESOLVED
+ * ('done' or, per wontfix-terminal-status-filter-consistency D2, 'wontfix')
  * that directly wait on it in the unified graph — either a `deps` entry
  * naming it, or (for a parent item) an open child naming it as `parent`.
- * Done items never count on either side: a done item is never ranked
- * (nothing left to unblock by finishing it) and never counted as something
- * still blocked.
+ * A resolved item never counts on either side: it is never ranked (nothing
+ * left to unblock by finishing it, whether it was actually built or closed
+ * without being built) and never counted as something still blocked.
  *
  * Each row also carries which connected component (RUL44 — dependency or
  * lineage cluster) the item belongs to, reusing graph-metrics.mjs's own
@@ -65,17 +67,20 @@ function tierRank(goalTier) {
  * order, not id order.
  *
  * `opts.includeDone` (tsk-5oa D1, default falsy — byte-identical to the
- * pre-existing single-arg call): when true, appends one row per
- * `status === 'done'` item after every open row. A done item can never
- * block anything (its dependents are already unblocked) or add real
- * leverage to a cluster, so each done row always carries `blocks: 0`,
- * `blockedBy: []`, `componentId: null`, `componentSize: 0`,
- * `isIsolated: true` — done rows are sorted only by tier then id among
- * themselves, never interleaved with open rows.
+ * pre-existing single-arg call; per wontfix-terminal-status-filter-
+ * consistency D2, its name stays `includeDone` — the pre-existing public
+ * flag — even though it now also appends `wontfix` rows): when true,
+ * appends one row per RESOLVED (`done` or `wontfix`) item after every open
+ * row. A resolved item can never block anything (its dependents are
+ * already unblocked, whether by real completion or by the dependency
+ * being abandoned) or add real leverage to a cluster, so each resolved row
+ * always carries `blocks: 0`, `blockedBy: []`, `componentId: null`,
+ * `componentSize: 0`, `isIsolated: true` — resolved rows are sorted only
+ * by tier then id among themselves, never interleaved with open rows.
  */
 export function rankImpact(view, opts = {}) {
   const work = view?.work ?? {};
-  const openIds = Object.keys(work).filter((id) => work[id].status !== 'done');
+  const openIds = Object.keys(work).filter((id) => !RESOLVED_STATUSES.has(work[id].status));
   const openSet = new Set(openIds);
 
   const blockCounts = new Map(openIds.map((id) => [id, 0]));
@@ -130,7 +135,7 @@ export function rankImpact(view, opts = {}) {
   if (!opts.includeDone) return ranked;
 
   const doneRows = Object.keys(work)
-    .filter((id) => work[id].status === 'done')
+    .filter((id) => RESOLVED_STATUSES.has(work[id].status))
     .map((id) => {
       const item = work[id];
       return {

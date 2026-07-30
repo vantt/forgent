@@ -141,6 +141,19 @@ test('staleBlocked: lists todo/blocked items with an unmet dep (missing dep incl
   ]);
 });
 
+// wontfix-terminal-status-filter-consistency D2: a wontfix dep is RESOLVED
+// the same as done -- an item whose only unmet dep is wontfix is ready, not
+// stale-blocked.
+test('staleBlocked: a dep at wontfix is RESOLVED, same as done -- never names a wontfix id as a blocker', () => {
+  const view = {
+    work: {
+      closed: item('closed', { status: 'wontfix' }),
+      ready: item('ready', { deps: ['closed'] }), // dep wontfix -> resolved, not stale
+    },
+  };
+  assert.deepEqual(staleBlocked(view), []);
+});
+
 test('greedyTopUnblock: ranks by marginal not-done coverage — the chain root wins, then leftovers', () => {
   // a unblocks b,c,d (transitively); e/f a separate pair; g isolated.
   const view = {
@@ -177,6 +190,21 @@ test('greedyTopUnblock: a done item is never a candidate and never counts as dow
   // root's downstream among NOT-done is just {pending}; finished is ignored.
   assert.deepEqual(picks[0], { id: 'root', unblocks: 1, newlyUnblocks: 2 });
   assert.ok(!picks.some((p) => p.id === 'finished'));
+});
+
+// wontfix-terminal-status-filter-consistency D2: a wontfix item is RESOLVED
+// the same as done -- never a candidate, never counted as downstream.
+test('greedyTopUnblock: a wontfix item is never a candidate and never counts as downstream, same as done', () => {
+  const view = {
+    work: {
+      root: item('root'),
+      closed: item('closed', { status: 'wontfix', deps: ['root'] }), // wontfix -> not counted
+      pending: item('pending', { deps: ['root'] }),
+    },
+  };
+  const picks = greedyTopUnblock(view);
+  assert.deepEqual(picks[0], { id: 'root', unblocks: 1, newlyUnblocks: 2 });
+  assert.ok(!picks.some((p) => p.id === 'closed'));
 });
 
 test('greedyTopUnblock: completing an open child counts toward unblocking its parent, the same way a deps entry would', () => {
@@ -354,6 +382,26 @@ test('whatIf: an unknown id is exists:false with zero impact', () => {
 test('whatIf: a done dependent is never counted as newly-unblocked', () => {
   const view = { work: { root: item('root'), done: item('done', { status: 'done', deps: ['root'] }) } };
   assert.deepEqual(whatIf(view, 'root'), { id: 'root', exists: true, unblocksTransitive: 0, newlyReady: [] });
+});
+
+// wontfix-terminal-status-filter-consistency D2: a wontfix item is RESOLVED
+// the same as done -- never counted in unblocksTransitive, and a dependent
+// whose OTHER dep is wontfix (not the completed `id`) still counts as
+// newly-ready.
+test('whatIf: a wontfix dependent is never counted as newly-unblocked, same as done', () => {
+  const view = { work: { root: item('root'), closed: item('closed', { status: 'wontfix', deps: ['root'] }) } };
+  assert.deepEqual(whatIf(view, 'root'), { id: 'root', exists: true, unblocksTransitive: 0, newlyReady: [] });
+});
+
+test('whatIf: newlyReady still includes a dependent whose OTHER dep is already wontfix, same as done', () => {
+  const view = {
+    work: {
+      closed: item('closed', { status: 'wontfix' }),
+      root: item('root'),
+      dependent: item('dependent', { deps: ['root', 'closed'] }),
+    },
+  };
+  assert.deepEqual(whatIf(view, 'root').newlyReady, ['dependent']);
 });
 
 test('metricsFrame: carries the deterministic revision + node count, all cheap metrics computed', () => {

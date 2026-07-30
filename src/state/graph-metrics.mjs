@@ -12,7 +12,7 @@
 // the log itself; the store facade hands it the view).
 
 import { buildUnifiedEdges } from './dep-graph.mjs';
-import { FRONTIER_ORDER_VERSION, frontier } from './frontier.mjs';
+import { FRONTIER_ORDER_VERSION, frontier, RESOLVED_STATUSES } from './frontier.mjs';
 import { viewRevision } from './replay.mjs';
 
 /**
@@ -280,11 +280,13 @@ export function goalScopedCriticalPath(view, focusId) {
 }
 
 /**
- * STALE-BLOCKED items: those parked waiting on work that is not done. An item
- * is listed when its status is `todo` or `blocked` AND at least one of its
- * deps is not `done` (a MISSING dep counts — it can never complete, a
- * permanent blocker). Each entry names the unmet deps holding it. A fully
- * ready item (every dep done) is never listed. Declaration order throughout.
+ * STALE-BLOCKED items: those parked waiting on work that is not RESOLVED. An
+ * item is listed when its status is `todo` or `blocked` AND at least one of
+ * its deps is not RESOLVED (`done` or, per
+ * wontfix-terminal-status-filter-consistency D2, `wontfix` — a MISSING dep
+ * also counts, since a nonexistent id can never complete either, a permanent
+ * blocker). Each entry names the unmet deps holding it. A fully ready item
+ * (every dep resolved) is never listed. Declaration order throughout.
  */
 export function staleBlocked(view) {
   const work = view?.work ?? {};
@@ -293,7 +295,7 @@ export function staleBlocked(view) {
     const item = work[id];
     if (item.status !== 'todo' && item.status !== 'blocked') continue;
     const deps = Array.isArray(item.deps) ? item.deps : [];
-    const blockedBy = deps.filter((dep) => work[dep]?.status !== 'done');
+    const blockedBy = deps.filter((dep) => !RESOLVED_STATUSES.has(work[dep]?.status));
     if (blockedBy.length > 0) {
       result.push({ id, status: item.status, blockedBy });
     }
@@ -353,7 +355,7 @@ function computeGreedyTopUnblock(candidates, notDone, deps, k) {
 export function greedyTopUnblock(view, k = 10) {
   const work = view?.work ?? {};
   const deps = knownUnifiedDeps(work);
-  const notDone = new Set(Object.keys(work).filter((id) => work[id].status !== 'done'));
+  const notDone = new Set(Object.keys(work).filter((id) => !RESOLVED_STATUSES.has(work[id].status)));
   return computeGreedyTopUnblock([...notDone], notDone, deps, k); // declaration order
 }
 
@@ -373,19 +375,21 @@ export function goalScopedGreedyTopUnblock(view, focusId, k = 10) {
   const scope = goalScopedSet(view, focusId);
   if (scope.size === 0) return [];
   const deps = knownUnifiedDeps(work);
-  const notDone = new Set(Object.keys(work).filter((id) => scope.has(id) && work[id].status !== 'done'));
+  const notDone = new Set(Object.keys(work).filter((id) => scope.has(id) && !RESOLVED_STATUSES.has(work[id].status)));
   return computeGreedyTopUnblock([...notDone], notDone, deps, k); // declaration order, scope-filtered
 }
 
 /**
  * WHAT-IF (S7): "if I complete `id`, what does it unblock?" — the cheap answer
  * a human gate wants. `unblocksTransitive` is the size of `id`'s transitive
- * not-done downstream (the same definition greedyTopUnblock ranks by).
- * `newlyReady` is the direct dependents that become DEP-SATISFIED the moment
- * `id` is done: status `todo` and every OTHER dep already `done`. That is a
- * graph fact about dependencies only — NOT full frontier eligibility (it does
- * not check stage/lineage), so a `newlyReady` item may still wait on
- * context-discovery or an open descendant. An unknown id yields exists:false.
+ * not-RESOLVED downstream (the same definition greedyTopUnblock ranks by;
+ * RESOLVED = `done` or, per wontfix-terminal-status-filter-consistency D2,
+ * `wontfix`). `newlyReady` is the direct dependents that become
+ * DEP-SATISFIED the moment `id` is done: status `todo` and every OTHER dep
+ * already RESOLVED. That is a graph fact about dependencies only — NOT full
+ * frontier eligibility (it does not check stage/lineage), so a `newlyReady`
+ * item may still wait on context-discovery or an open descendant. An
+ * unknown id yields exists:false.
  */
 export function whatIf(view, id) {
   const work = view?.work ?? {};
@@ -394,12 +398,12 @@ export function whatIf(view, id) {
   }
   const deps = knownUnifiedDeps(work);
   const rev = reverseDeps(deps);
-  const notDone = new Set(Object.keys(work).filter((x) => work[x].status !== 'done'));
+  const notDone = new Set(Object.keys(work).filter((x) => !RESOLVED_STATUSES.has(work[x].status)));
   const downstream = transitiveDownstream(id, rev, notDone);
   const newlyReady = (rev.get(id) ?? []).filter((depId) => {
     const item = work[depId];
     if (item.status !== 'todo') return false;
-    return (Array.isArray(item.deps) ? item.deps : []).every((d) => d === id || work[d]?.status === 'done');
+    return (Array.isArray(item.deps) ? item.deps : []).every((d) => d === id || RESOLVED_STATUSES.has(work[d]?.status));
   });
   return { id, exists: true, unblocksTransitive: downstream.size, newlyReady };
 }

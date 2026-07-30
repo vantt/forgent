@@ -41,6 +41,31 @@ test('rankImpact excludes done items from the denominator: a done item is never 
   assert.deepEqual(rankImpact(view).map((r) => r.id), ['open']);
 });
 
+// wontfix-terminal-status-filter-consistency D2: a wontfix item is RESOLVED
+// the same as done -- nothing further will ever happen to it, so it must
+// not count on either side of the ranking.
+test('rankImpact excludes wontfix items from the denominator: a wontfix item is never ranked', () => {
+  const view = {
+    work: {
+      closed: item('closed', 'wontfix'),
+      open: item('open', 'todo', ['closed']),
+    },
+  };
+  assert.deepEqual(rankImpact(view).map((r) => r.id), ['open']);
+});
+
+test('rankImpact excludes wontfix items from the numerator: a wontfix dependent does not count as blocked', () => {
+  const view = {
+    work: {
+      base: item('base', 'todo'),
+      closedDependent: item('closedDependent', 'wontfix', ['base']),
+    },
+  };
+  const [ranked] = rankImpact(view);
+  assert.equal(ranked.id, 'base');
+  assert.equal(ranked.blocks, 0);
+});
+
 test('rankImpact excludes done items from the numerator: a done dependent does not count as blocked', () => {
   const view = {
     work: {
@@ -272,6 +297,38 @@ test('rankImpact({includeDone: true}) appends done items after every ranked open
   const withoutDone = rankImpact(view);
   assert.deepEqual(withDone.slice(0, withoutDone.length), withoutDone);
   assert.deepEqual(withDone.map((r) => r.id).slice(-1), ['finished']);
+});
+
+// wontfix-terminal-status-filter-consistency D2: includeDone's name stays
+// (the pre-existing public flag) but its done-tail now also appends
+// wontfix rows, same shape as a done row.
+test('rankImpact({includeDone: true}) appends wontfix items after every ranked open row, same as done', () => {
+  const view = {
+    work: {
+      base: item('base', 'todo'),
+      dep1: item('dep1', 'todo', ['base']),
+      closed: item('closed', 'wontfix'),
+    },
+  };
+  const withDone = rankImpact(view, { includeDone: true });
+  const withoutDone = rankImpact(view);
+  assert.deepEqual(withDone.slice(0, withoutDone.length), withoutDone);
+  assert.deepEqual(withDone.map((r) => r.id).slice(-1), ['closed']);
+});
+
+test('rankImpact({includeDone: true}) always gives a wontfix row blocks:0, componentSize:0, isIsolated:true, componentId:null', () => {
+  const view = {
+    work: {
+      base: item('base', 'todo'),
+      dependent: item('dependent', 'todo', ['base']),
+      closed: item('closed', 'wontfix', ['base']),
+    },
+  };
+  const [closedRow] = rankImpact(view, { includeDone: true }).filter((r) => r.id === 'closed');
+  assert.deepEqual(closedRow, {
+    id: 'closed', title: 'title-closed', status: 'wontfix', blocks: 0, blockedBy: [],
+    stage: 'executing', goalTier: null, componentId: null, componentSize: 0, isIsolated: true,
+  });
 });
 
 test('rankImpact({includeDone: true}) always gives a done row blocks:0, componentSize:0, isIsolated:true, componentId:null', () => {

@@ -29,6 +29,7 @@ import { computeEntropy, computeCounts } from '../src/report/entropy.mjs';
 import { buildEnduserIndex, QUADRANTS, QUADRANT_DIR_ALIASES, findSourceCaptureIds } from '../src/report/enduser-index.mjs';
 import { rankCandidates } from '../src/evolve/candidates.mjs';
 import { rankImpact } from '../src/state/impact.mjs';
+import { RESOLVED_STATUSES } from '../src/state/frontier.mjs';
 import { mergeReadiness } from '../src/state/graph-harness.mjs';
 import { paginate } from '../src/state/cursor.mjs';
 import { runGoalCheck } from '../src/runner/goal-check.mjs';
@@ -1094,15 +1095,16 @@ async function runVerb(verb, flags, positional, dir) {
         }
         return singleView;
       }
-      // Open-only default (tsk-5oa D1/D2): `list` shows only
-      // status !== 'done' items unless `--all` is passed, matching
-      // `triage`'s pre-existing open-only default. Only the `work` map
-      // changes shape here — every other view key (decisions/gates/
+      // Open-only default (tsk-5oa D1/D2; broadened by
+      // wontfix-terminal-status-filter-consistency D2): `list` shows only
+      // not-RESOLVED (`done`/`wontfix`) items unless `--all` is passed,
+      // matching `triage`'s pre-existing open-only default. Only the `work`
+      // map changes shape here — every other view key (decisions/gates/
       // settlements/etc.) is untouched either way.
       const showAll = Boolean(flags.all);
       const view = showAll
         ? rawView
-        : { ...rawView, work: Object.fromEntries(Object.entries(rawView.work).filter(([, item]) => item.status !== 'done')) };
+        : { ...rawView, work: Object.fromEntries(Object.entries(rawView.work).filter(([, item]) => !RESOLVED_STATUSES.has(item.status))) };
       // Parent-anchored context (str61 D1/D2/D3): additive-only key,
       // computed fresh from `view` on every read (D1 — never a persisted
       // "session"), never touching store.listWork itself. Only
