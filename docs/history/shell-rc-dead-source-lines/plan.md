@@ -146,6 +146,63 @@ sandboxed `HOME` (D4), with no dependence on one machine's shell profile.
 Flagged here as a proof point for `fgos-validating`; this plan does not edit
 the field itself.
 
+## Validated at `fgos-validating` — READY WITH CONSTRAINTS
+
+Reality gate: all five dimensions PASS. Mode, shape, and ordering unchanged.
+Baseline suite green before any change: **1827 tests, 1822 pass, 0 fail, 5
+skipped**.
+
+Proven, not assumed:
+
+- **D2's divergence is real.** From inside a linked worktree,
+  `git rev-parse --show-toplevel` → the worktree's own path, while
+  `--git-common-dir | dirname` → `/home/vantt/projects/forgentX`.
+- **The pre-existing live line is already recognized.** `hasSourceLine`
+  called against the real `~/.zshrc`: main-checkout path `true`, this
+  worktree's path `false`. After D2, setup reports already-configured and
+  appends nothing.
+- **win32 is already covered** by `test/setup/shell-rc.test.mjs:43,56,69`.
+- **paths.mjs really does have 5 production importers**
+  (`worker-log.mjs`, `session.mjs`, `loop.mjs`,
+  `scripts/fgos-session-start-hook.mjs`, `bin/fgos.mjs`, plus
+  `bin/fgos-runner.mjs` transitively). The rejection of a third resolver
+  mode stands.
+
+### C1 — the stored `verify` field is inverted and must be replaced
+
+Run verbatim, the stored verify
+(`zsh -ic exit 2>&1 | grep -c 'no such file or directory' ; ... ; grep -n
+'fgos-shell-integration.sh' ~/.zshrc`) returns a **count** and exits **0**,
+because `grep` exits 0 when it finds matches. So `runGoalCheck`
+(`merge.mjs:748`) would see it **pass right now, with no code written** — and
+it would only begin failing once the dead lines are gone, which D1 forbids
+fgOS from doing. `npm test` is the honest gate (see "Verify" above). This
+must be settled at `executing` before the item can reach done.
+
+### C2 — D4 is a one-call-site change
+
+`run()` at `test/cli/fgos.test.mjs:41` **already** accepts `extraEnv` and
+merges it over `process.env`, and `test/setup/checks.test.mjs:167` already
+uses exactly this pattern (`env: { ...process.env, HOME: homeDir }`). The
+shared helper stays untouched; only the call at `:491` passes a sandboxed
+`HOME`. Proven: running that test alone under a sandboxed `HOME` put the
+line in the sandbox and left the real profile unchanged (43 → 43).
+
+### C3 — `~/.bashrc` is the larger half
+
+Measured: `~/.bashrc` carries **104** integration lines, **101 dead**, in a
+447-line file — against `~/.zshrc`'s 43/39. Roughly **140 dead lines** total,
+not 39. `detectRcFiles` returns both (`shell-rc.mjs:19`), so D1/D5's report
+must cover both files.
+
+### C4 — never use the real shell profile as a test fixture
+
+A **live concurrent writer** was observed appending to the real profile
+mid-session: the two newest lines point at `tsk-45u-Gudl0S` (already removed,
+so already dead) and `tsk-5q5-SBbMIG` (present in `git worktree list` at the
+time of validation). Any before/after assertion against the real profile
+would be flaky by construction.
+
 ## Deferred (from CONTEXT.md, still deferred)
 
 - Whether the dead-line report is a new `doctor` check id or an extension of
