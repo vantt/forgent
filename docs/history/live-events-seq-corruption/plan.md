@@ -165,3 +165,39 @@ User approved proceeding with these constraints attached (not folded back
 through a second `fgos-planning` pass, since neither changes the chosen
 mode, approach, or split -- both only sharpen proof-surface detail within
 what was already approved).
+
+## Correction during executing: one-door-write (ADR0020)
+
+Piece A's first execution pass committed the renumbered `.fgos/events.jsonl`
+onto `fgw/tsk-n4i-1` itself. `fgos merge next` correctly rejected that merge
+(`fgos-write-rejected`, `src/runner/merge.mjs`'s staged-diff guard) -- a
+worker branch must never carry a change under `.fgos/`; the store's one
+write door is the `fgos` CLI run directly against the main checkout
+(`0005`), never a worker's own commit. `createWorktree` already strips
+`.fgos/` from every worker worktree for the same reason.
+
+Corrected split, still one item (tsk-n4i-1), two separate actions:
+
+- **Branch-committed** (goes through the normal `fgw/tsk-n4i-1` → merge
+  path): the source/doc changes -- `replay.mjs`, `store.mjs`, and every doc
+  citation the renumber shifts. Verify narrowed to `npm test` accordingly --
+  a branch-context verify can never see the live `.fgos/events.jsonl` (per
+  ADR0020, and confirmed empirically: `fgos return`'s own re-verify for a
+  branch-source item runs in a disposable *detached* worktree checked out
+  at the branch's commit, which never carries `.fgos/` either), so a verify
+  command that checks it can never pass through this path regardless of
+  whether the fix is correct.
+- **Applied directly to the main checkout, out of band**: the actual
+  `.fgos/events.jsonl` renumber, run once as an operator action against
+  `repoRoot` (mirroring how `fgos repair` already handles the truncated-
+  line corruption case) -- never staged, never committed on any branch.
+  Proof for this half lives in this session's own direct verification
+  (contiguity check + both migrate scripts' `--dry-run` + `npm test`, all
+  run against the real live file), not in the automated `return`/merge
+  machinery, since that machinery structurally cannot observe `.fgos/`
+  content on a branch by design.
+
+This is a shaping gap from the original plan, not a re-litigation of D4 --
+D4's "in-place overwrite, live store only" still holds; only the
+*mechanism* for landing it (direct operator action, not a branch commit)
+was missing from the original approach.
