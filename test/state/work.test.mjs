@@ -1,9 +1,13 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 import {
   validateWork,
   validateWorkShape,
   validateDeps,
+  checkAcceptanceEvidenceTraceable,
   WorkValidationError,
   STATUSES,
   TIERS,
@@ -12,6 +16,10 @@ import {
   DEFAULTS,
   SCHEMA_VERSION,
 } from '../../src/state/work.mjs';
+
+function mkRepoRoot() {
+  return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-work-repo-'));
+}
 
 function baseWork(overrides = {}) {
   return {
@@ -537,4 +545,52 @@ test('validateWork does not add goalTier or targets to SCHEMA_VERSION or DEFAULT
   assert.equal(SCHEMA_VERSION, 3);
   assert.equal(Object.hasOwn(DEFAULTS, 'goalTier'), false);
   assert.equal(Object.hasOwn(DEFAULTS, 'targets'), false);
+});
+
+// --- tsk-5q5-2 (D1/D3, docs/history/judge-verdict-evidence-discipline/):
+// checkAcceptanceEvidenceTraceable's narrow write-time evidence check -----
+
+test('checkAcceptanceEvidenceTraceable accepts a clause whose evidence resolves to a real path under repoRoot', () => {
+  const repoRoot = mkRepoRoot();
+  fs.mkdirSync(path.join(repoRoot, 'docs/history/foo'), { recursive: true });
+  fs.writeFileSync(path.join(repoRoot, 'docs/history/foo/CONTEXT.md'), 'D3: real decision');
+
+  const work = baseWork({
+    acceptance: [{ text: 'root cause confirmed', evidence: 'docs/history/foo/CONTEXT.md D3: real decision' }],
+  });
+  assert.equal(checkAcceptanceEvidenceTraceable(work, repoRoot), true);
+});
+
+test('checkAcceptanceEvidenceTraceable rejects a clause whose evidence cites no real path (the confirmed tsk-d3c failure shape)', () => {
+  const repoRoot = mkRepoRoot();
+  const work = baseWork({
+    acceptance: [{ text: 'root cause confirmed', evidence: 'trust me, this is definitely the real root cause' }],
+  });
+  assert.throws(() => checkAcceptanceEvidenceTraceable(work, repoRoot), WorkValidationError);
+});
+
+test('checkAcceptanceEvidenceTraceable rejects a clause whose evidence cites a path-like string that does not actually exist', () => {
+  const repoRoot = mkRepoRoot();
+  const work = baseWork({
+    acceptance: [{ text: 'root cause confirmed', evidence: 'docs/history/does-not-exist/CONTEXT.md D3: made up' }],
+  });
+  assert.throws(() => checkAcceptanceEvidenceTraceable(work, repoRoot), WorkValidationError);
+});
+
+test('checkAcceptanceEvidenceTraceable leaves a text-only clause (no evidence yet) completely unaffected, preserving RUL58 D4', () => {
+  const repoRoot = mkRepoRoot();
+  const work = baseWork({ acceptance: [{ text: 'ship it' }] });
+  assert.equal(checkAcceptanceEvidenceTraceable(work, repoRoot), true);
+});
+
+test('checkAcceptanceEvidenceTraceable is a no-op when work.acceptance is absent', () => {
+  const repoRoot = mkRepoRoot();
+  assert.equal(checkAcceptanceEvidenceTraceable(baseWork(), repoRoot), true);
+});
+
+test('checkAcceptanceEvidenceTraceable is a no-op when repoRoot is omitted (opt-in, callers without a real repo root are unaffected)', () => {
+  const work = baseWork({
+    acceptance: [{ text: 'root cause confirmed', evidence: 'trust me, no real citation here' }],
+  });
+  assert.equal(checkAcceptanceEvidenceTraceable(work, undefined), true);
 });

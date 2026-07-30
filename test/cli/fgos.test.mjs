@@ -6549,10 +6549,50 @@ test('merge next on a runner-sourced pick that trips the Iron Law: reports block
 
 test('add --acceptance persists work.acceptance as the given array, validated through validateWork', () => {
   const cwd = tmpCwd();
-  const clauses = [{ text: 'CLI exits 0 on success' }, { text: 'field round-trips', evidence: 'test/x.mjs:1' }];
+  // tsk-5q5-2: evidence must resolve to a real path under cwd (the new
+  // write-time traceability gate) -- tmpCwd() only guarantees `.fgos/`
+  // files exist, so this points there rather than a fictional source path.
+  const clauses = [{ text: 'CLI exits 0 on success' }, { text: 'field round-trips', evidence: '.fgos/events.jsonl' }];
   const result = run(cwd, ['add', 'with-acceptance', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--acceptance', JSON.stringify(clauses)]);
   assert.equal(result.status, 0);
   assert.deepEqual(stateView(cwd).work['with-acceptance'].acceptance, clauses);
+});
+
+// tsk-5q5-2 (D1/D3, docs/history/judge-verdict-evidence-discipline/): the new
+// narrow write-time evidence-traceability gate, end to end through the CLI.
+
+test('add --acceptance is refused when a clause supplies text+evidence together but evidence cites no real path', () => {
+  const cwd = tmpCwd();
+  const clauses = [{ text: 'root cause confirmed', evidence: 'trust me, this is definitely correct' }];
+  const result = run(cwd, ['add', 'untraceable', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--acceptance', JSON.stringify(clauses)]);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /evidence/);
+  assert.equal(stateView(cwd).work['untraceable'], undefined, 'nothing is written on a rejected acceptance clause');
+});
+
+test('add --acceptance succeeds when a text+evidence clause cites a real path that exists under cwd', () => {
+  const cwd = tmpCwd();
+  const clauses = [{ text: 'root cause confirmed', evidence: '.fgos/events.jsonl documents the real event log' }];
+  const result = run(cwd, ['add', 'traceable', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--acceptance', JSON.stringify(clauses)]);
+  assert.equal(result.status, 0);
+  assert.deepEqual(stateView(cwd).work['traceable'].acceptance, clauses);
+});
+
+test('add --acceptance with a text-only clause (no evidence yet) is completely unaffected by the traceability gate', () => {
+  const cwd = tmpCwd();
+  const clauses = [{ text: 'ship it' }];
+  const result = run(cwd, ['add', 'text-only', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--acceptance', JSON.stringify(clauses)]);
+  assert.equal(result.status, 0);
+  assert.deepEqual(stateView(cwd).work['text-only'].acceptance, clauses);
+});
+
+test('edit --acceptance is refused when a clause supplies text+evidence together but evidence cites no real path', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'edit-untraceable');
+  const result = run(cwd, ['edit', 'edit-untraceable', '--acceptance', JSON.stringify([{ text: 'root cause confirmed', evidence: 'nothing checkable here' }])]);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /evidence/);
+  assert.equal(stateView(cwd).work['edit-untraceable'].acceptance, undefined, 'the rejected patch never applies');
 });
 
 test('submit --acceptance persists work.acceptance as the given array (opts -> submitWork work object)', () => {
@@ -6675,7 +6715,13 @@ test('move --to done is refused when a populated acceptance clause has no eviden
 test('move --to done succeeds when every acceptance clause has non-empty evidence, exactly as before this cell', () => {
   const cwd = tmpCwd();
   toCompoundLearn(cwd, 'cli-cos-evidenced');
-  run(cwd, ['edit', 'cli-cos-evidenced', '--acceptance', JSON.stringify([{ text: 'ship it', evidence: 'test/cli/fgos.test.mjs:1' }])]);
+  // tsk-5q5-2: evidence must resolve to a real path under cwd -- assert the
+  // edit itself succeeds too, so a future regression in the new write-time
+  // gate can't silently no-op this edit and let the item coast through on
+  // an acceptance field that was never actually set (RUL58's own
+  // absent-is-unaffected rule would otherwise mask exactly that).
+  const editResult = run(cwd, ['edit', 'cli-cos-evidenced', '--acceptance', JSON.stringify([{ text: 'ship it', evidence: '.fgos/events.jsonl' }])]);
+  assert.equal(editResult.status, 0, 'edit --acceptance with real, traceable evidence must succeed');
 
   const result = run(cwd, ['move', 'cli-cos-evidenced', '--to', 'done']);
   assert.equal(result.status, 0);
@@ -6703,7 +6749,9 @@ test('editing in the missing evidence after a refusal, then retrying move --to d
   assert.equal(run(cwd, ['move', 'cli-cos-retry', '--to', 'done']).status, 2);
   assert.equal(stateView(cwd).work['cli-cos-retry'].status, 'awaiting-approval');
 
-  run(cwd, ['edit', 'cli-cos-retry', '--acceptance', JSON.stringify([{ text: 'ship it', evidence: 'test/cli/fgos.test.mjs:1' }])]);
+  // tsk-5q5-2: evidence must resolve to a real path under cwd.
+  const retryEdit = run(cwd, ['edit', 'cli-cos-retry', '--acceptance', JSON.stringify([{ text: 'ship it', evidence: '.fgos/events.jsonl' }])]);
+  assert.equal(retryEdit.status, 0, 'edit --acceptance with real, traceable evidence must succeed');
   const result = run(cwd, ['move', 'cli-cos-retry', '--to', 'done']);
   assert.equal(result.status, 0, 'the retry must re-read the just-edited evidence, not a cached refusal');
   assert.equal(stateView(cwd).work['cli-cos-retry'].status, 'done');
