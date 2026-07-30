@@ -5,17 +5,18 @@ Stage khi viết doc này: `clarify`.
 
 ## Feature boundary
 
-Trong phạm vi:
+Trong phạm vi (`tsk-45u`):
 
+- dashboard tự xác định project root từ cwd của chính pane nó đang chạy.
 - cwd của pane agent mà dashboard mở ra khi người bấm launch một task
-  (`herdr-plugin/src/pick.rs` → `herdr-plugin/src/layout.rs`).
-- cách một cockpit (một pane instance của plugin `fgos.dashboard`) xác định
-  project nào nó đang quản, và cách nhiều cockpit cùng sống trên nhiều
-  project trong cùng một herdr install.
-- hành vi khi không xác định được project root.
+  (`herdr-plugin/src/pick.rs` → `herdr-plugin/src/layout.rs`) — phải là main
+  checkout root.
+- hành vi khi không xác định được project root: chặn launch, báo lỗi.
 
 Ngoài phạm vi (đã nêu ra và defer, không hấp thụ vào item này):
 
+- **multi-project → `tsk-3b0`** (nhiều cockpit trên nhiều project cùng lúc,
+  detect ứng viên + nhớ lại + selectbox chọn root). Xem D2-a bên dưới.
 - thay đổi bản thân luồng `/fgOS:pick` hay `EnterWorktree`.
 - chia sẻ trạng thái / notify chéo giữa nhiều cockpit đang chạy song song.
 - `scripts/herdr-cockpit.sh` (cockpit bash của STR40) — nó đã tự `cd` đúng
@@ -26,11 +27,12 @@ Ngoài phạm vi (đã nêu ra và defer, không hấp thụ vào item này):
 | ID | Quyết định | Ghi chú |
 |----|-----------|---------|
 | D1 | cwd của pane task mới mở là **main checkout root** (thư mục chứa `.fgos/`), không phải worktree của item. | `/fgOS:pick` tự `EnterWorktree` vào `.claude/worktrees/<id>` sau đó; worktree cũng chưa tồn tại trước khi `pick` chạy. |
-| D2 | Item `tsk-45u` bao gồm **cả** fix cwd **và** phần multi-project (một cockpit ↔ một project, nhiều cockpit song song). | Mô tả item gộp cả hai; người chốt giữ chung, không tách. |
-| D3 | Không resolve được project root thì **không** degrade im lặng — phải đưa người vào đường chọn root (chi tiết D5/D6). | Khác hành vi hôm nay ở `herdr-plugin/src/main.rs:26-29` (chỉ set `last_error` rồi chạy tiếp với danh sách rỗng). |
-| D4 | **Một herdr workspace = một project.** Dashboard resolve project root từ cwd của chính pane nó đang chạy. | herdr đã hỗ trợ: `herdr workspace create [--cwd PATH]`. Tab label `fg:cockpit` / `fg:agents-N` scope theo `HERDR_WORKSPACE_ID` nên không đụng nhau giữa các project. |
-| D5 | Khi root không resolve được: **detect quanh vị trí đang đứng → gộp với danh sách đã nhớ → selectbox cho người chọn → nhớ lại lựa chọn.** | Người yêu cầu đúng ba phần này: search/detection + nhớ + selectbox. |
-| D6 | Nguồn ứng viên cho selectbox: **thư mục tổ tiên của cwd + danh sách đã nhớ + cwd của mọi herdr workspace khác**. Không readdir anh em, không quét đĩa sâu. | `herdr workspace list` đã trả cwd; `herdr plugin config-dir fgos.dashboard` là chỗ ghi nhớ hợp lệ. Giữ rẻ và deterministic vì dashboard poll 5s/lần (`main.rs:15`). |
+| D2 | ~~Item `tsk-45u` bao gồm **cả** fix cwd **và** phần multi-project.~~ **Bị D2-a thay thế.** | Giữ lại để đọc được lịch sử; không còn hiệu lực. |
+| D2-a | Tách đôi: `tsk-45u` **chỉ** là fix cwd (tự xác định project/workspace hiện tại để agent bật lên đúng main checkout). Phần multi-project thành item riêng **`tsk-3b0`**. | Người chốt sau khi thấy D1-D6, lật D2. |
+| D3 | Không resolve được project root thì **không** degrade im lặng. Với `tsk-45u`: **chặn launch, báo lỗi** — không bao giờ đẻ ra một session `claude` chạy sai chỗ. | Khác hành vi hôm nay ở `herdr-plugin/src/main.rs:26-29` (chỉ set `last_error` rồi chạy tiếp với danh sách rỗng). |
+| D4 | **Một herdr workspace = một project.** Dashboard resolve project root từ cwd của chính pane nó đang chạy. Phần "nhiều cockpit song song" thuộc `tsk-3b0`; `tsk-45u` chỉ dùng vế resolve-từ-cwd. | herdr đã hỗ trợ: `herdr workspace create [--cwd PATH]`. Tab label `fg:cockpit` / `fg:agents-N` scope theo `HERDR_WORKSPACE_ID` nên không đụng nhau giữa các project. |
+| D5 | Khi root không resolve được: **detect quanh vị trí đang đứng → gộp với danh sách đã nhớ → selectbox cho người chọn → nhớ lại lựa chọn.** **Thuộc `tsk-3b0`**, không phải `tsk-45u` (D2-a). | Người yêu cầu đúng ba phần này: search/detection + nhớ + selectbox. |
+| D6 | Nguồn ứng viên cho selectbox: **thư mục tổ tiên của cwd + danh sách đã nhớ + cwd của mọi herdr workspace khác**. Không readdir anh em, không quét đĩa sâu. **Thuộc `tsk-3b0`** (D2-a). | `herdr workspace list` đã trả cwd; `herdr plugin config-dir fgos.dashboard` là chỗ ghi nhớ hợp lệ. Giữ rẻ và deterministic vì dashboard poll 5s/lần (`main.rs:15`). |
 
 ## Pinned terms
 
@@ -87,11 +89,18 @@ Ngoài phạm vi (đã nêu ra và defer, không hấp thụ vào item này):
 
 ## Câu còn để lại cho planning
 
-Đây là những thứ chỉ người implement mới quan tâm, cố ý không chốt ở đây:
+Đây là những thứ chỉ người implement mới quan tâm, cố ý không chốt ở đây.
+
+Cho `tsk-45u`:
 
 - Ép cwd bằng `pane split --cwd <root>` (herdr-native) hay bằng cách prefix
   `cd '<root>' &&` vào lệnh gõ (giống `herdr-cockpit.sh`) — hay cả hai.
+- Lỗi "không resolve được root" hiện ở đâu trong UI, và nút launch bị chặn
+  bằng cách nào.
+- Verify command cho item (`verify` hiện đang là "chưa xác định — P15 bổ sung").
+
+Cho `tsk-3b0` (D5/D6):
+
 - Định dạng và tên file của danh sách "đã nhớ" trong plugin config-dir.
 - Selectbox dựng bằng widget nào trong `ui.rs`, và nó chiếm chỗ nào trong layout.
 - Thứ tự / khử trùng lặp ứng viên D6 khi cùng một root đến từ nhiều nguồn.
-- Verify command cho item (`verify` hiện đang là "chưa xác định — P15 bổ sung").
