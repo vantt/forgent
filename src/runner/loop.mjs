@@ -64,7 +64,7 @@ import {
   categoryOf,
   EXIT_CODES,
 } from '../state/store.mjs';
-import { DEFAULTS } from '../state/work.mjs';
+import { DEFAULTS, truncateTitle } from '../state/work.mjs';
 import { getDomain, stageForStep } from '../state/workflow-stage-graphs.mjs';
 import { resolveAction, resolveStaleDoing } from './recovery.mjs';
 import {
@@ -574,7 +574,12 @@ async function captureDiscoveredWork({ output, item, queue, dir, log }) {
     try {
       await queue.enqueue(async () => {
         const view = listWork(dir).work;
-        const normalizedTitle = block.title.trim().toLowerCase();
+        // Compare against the title the store will actually hold, not the raw
+        // block title: addWork bounds titles on the way in (work.mjs
+        // truncateTitle, work-item-title-contract D5), so a block whose title
+        // runs past the bound would never match its own stored record and
+        // every re-run would capture it again.
+        const normalizedTitle = truncateTitle(block.title).trim().toLowerCase();
         const alreadyCaptured = Object.values(view).some(
           (w) => w.discoveredFrom === item.id && w.title.trim().toLowerCase() === normalizedTitle,
         );

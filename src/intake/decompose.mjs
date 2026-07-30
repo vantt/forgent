@@ -127,12 +127,14 @@ con độc lập, dependency rõ?
 - Đơn giản: trả "verdict": "pass-through", kèm "reason" ngắn gọn vì sao
   không cần chia (tùy chọn, nhưng nên có).
 - Cần chia: trả "reason" TÓM TẮT vì sao phải chia (BẮT BUỘC, không được bỏ
-  trống), và liệt kê MỖI việc con với "title", "verify" (một lệnh chạy được
-  THẬT để chứng minh việc con đã xong — không được bỏ trống, không được là
-  một câu mô tả suông), và tùy chọn "kind", "risk", "refs", "footprint" (danh
-  sách đường dẫn file việc con này dự kiến đụng tới, nếu biết), "deps"
-  ("deps" là mảng chỉ số 0-based trỏ vào các việc con KHÁC đứng TRƯỚC nó
-  trong danh sách mà nó phụ thuộc).
+  trống), và liệt kê MỖI việc con với "title" (PHẢI nêu rõ đối tượng + hành
+  động + phạm vi — cái gì bị đụng tới, làm gì với nó, giới hạn ở đâu; không
+  được là một mệnh đề cụt thiếu chủ ngữ hay tân ngữ), "verify" (một lệnh
+  chạy được THẬT để chứng minh việc con đã xong — không được bỏ trống,
+  không được là một câu mô tả suông), và tùy chọn "kind", "risk", "refs",
+  "footprint" (danh sách đường dẫn file việc con này dự kiến đụng tới, nếu
+  biết), "deps" ("deps" là mảng chỉ số 0-based trỏ vào các việc con KHÁC
+  đứng TRƯỚC nó trong danh sách mà nó phụ thuộc).
 - Mơ hồ, không phán chắc được: trả "verdict": "need-human" kèm "reason".
 
 # Định dạng trả lời
