@@ -1398,6 +1398,7 @@ async function runVerb(verb, flags, positional, dir) {
         if (err.code !== 'ENOENT') throw err;
       }
       if (previousContent !== nextContent) {
+        fs.mkdirSync(path.dirname(manifestPath), { recursive: true });
         fs.writeFileSync(manifestPath, nextContent, 'utf8');
       }
       return {
