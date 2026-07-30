@@ -22,17 +22,36 @@ struct TriageEnvelope {
 }
 
 /// One row from `fgos list --all --json`'s `data.work` map, kept only when
-/// `status == "doing"` (D4 — never herdr's own `agent_status`).
+/// `status` is `doing` or `awaiting-approval` (tsk-4vo D1, amending
+/// tsk-19y's original D4 — never herdr's own `agent_status` either way).
 #[derive(Debug, Clone, Deserialize, PartialEq)]
 pub struct DoingRow {
     pub id: String,
     pub title: String,
+    pub status: String,
+    pub stage: String,
 }
 
 #[derive(Debug, Deserialize)]
 struct WorkItemRaw {
     title: String,
     status: String,
+    stage: String,
+}
+
+/// tsk-4vo D2: Tier A (`awaiting-approval`, closest to done) sorts first;
+/// Tier B (`doing`) sub-sorts by stage in pipeline order — `executing`
+/// (closest to `compound-learn`) before `decompose` before `clarify`.
+fn doing_tier(status: &str, stage: &str) -> u8 {
+    if status == "awaiting-approval" {
+        return 0;
+    }
+    match stage {
+        "executing" => 1,
+        "decompose" => 2,
+        "clarify" => 3,
+        _ => 4,
+    }
 }
 
 #[derive(Debug, Deserialize)]
@@ -69,27 +88,38 @@ impl From<io::Error> for FgosError {
 }
 
 /// Parse `fgos triage --json`'s stdout, preserving the CLI's own row order
+/// — already the impact-first sort tsk-4vo asks for (see
+/// `parse_triage_preserves_rank_impact_order` below); no change needed
+/// here for that part of the item, only `parse_doing`'s sort (D1/D2).
 /// (the D5 `rankImpact` order) without re-sorting it here.
 pub fn parse_triage(json: &str) -> Result<Vec<TriageRow>, serde_json::Error> {
     let envelope: TriageEnvelope = serde_json::from_str(json)?;
     Ok(envelope.data)
 }
 
-/// Parse `fgos list --all --json`'s stdout, keeping only `status: "doing"`
-/// items (D4's definition of "in-process task").
+/// Parse `fgos list --all --json`'s stdout, keeping `status: doing` and
+/// `status: awaiting-approval` items (tsk-4vo D1's expanded "in-process"
+/// definition), sorted by D2's tier (id ascending breaks ties within a
+/// tier, for determinism).
 pub fn parse_doing(json: &str) -> Result<Vec<DoingRow>, serde_json::Error> {
     let envelope: ListEnvelope = serde_json::from_str(json)?;
     let mut rows: Vec<DoingRow> = envelope
         .data
         .work
         .into_iter()
-        .filter(|(_, item)| item.status == "doing")
+        .filter(|(_, item)| item.status == "doing" || item.status == "awaiting-approval")
         .map(|(id, item)| DoingRow {
             id,
             title: item.title,
+            status: item.status,
+            stage: item.stage,
         })
         .collect();
-    rows.sort_by(|a, b| a.id.cmp(&b.id));
+    rows.sort_by(|a, b| {
+        doing_tier(&a.status, &a.stage)
+            .cmp(&doing_tier(&b.status, &b.stage))
+            .then_with(|| a.id.cmp(&b.id))
+    });
     Ok(rows)
 }
 
@@ -211,15 +241,56 @@ mod tests {
             "work": {
                 "tsk-19y-2": {
                     "title": "Wire real fgOS data into the dashboard",
-                    "status": "doing"
+                    "status": "doing",
+                    "stage": "executing"
                 },
                 "tsk-done-item": {
                     "title": "Already finished",
-                    "status": "done"
+                    "status": "done",
+                    "stage": "compound-learn"
                 },
                 "choke-point-createworktree-callsite-wrapper": {
                     "title": "Choke-point: createWorktree's 6 call sites",
-                    "status": "doing"
+                    "status": "doing",
+                    "stage": "executing"
+                }
+            }
+        }
+    }"#;
+
+    /// tsk-4vo D1/D2: one `awaiting-approval` row, plus `doing` rows at
+    /// every pipeline stage, deliberately listed out of sort order in the
+    /// raw JSON to prove `parse_doing` does the sorting itself.
+    const TIER_SORT_FIXTURE: &str = r#"{
+        "contract": "fgos.v1",
+        "generated_at": "2026-07-29T15:41:13.319Z",
+        "data_hash": "abc",
+        "data": {
+            "work": {
+                "tsk-clarify": {
+                    "title": "Still fuzzy",
+                    "status": "doing",
+                    "stage": "clarify"
+                },
+                "tsk-approval": {
+                    "title": "Awaiting approval",
+                    "status": "awaiting-approval",
+                    "stage": "executing"
+                },
+                "tsk-executing": {
+                    "title": "Building",
+                    "status": "doing",
+                    "stage": "executing"
+                },
+                "tsk-decompose": {
+                    "title": "Shaping",
+                    "status": "doing",
+                    "stage": "decompose"
+                },
+                "tsk-blocked": {
+                    "title": "Not in-process",
+                    "status": "blocked",
+                    "stage": "executing"
                 }
             }
         }
@@ -245,7 +316,7 @@ mod tests {
     }
 
     #[test]
-    fn parse_doing_keeps_only_doing_status() {
+    fn parse_doing_excludes_done_items() {
         let rows = parse_doing(LIST_FIXTURE).expect("fixture should parse");
         let ids: Vec<&str> = rows.iter().map(|r| r.id.as_str()).collect();
         assert_eq!(
@@ -253,5 +324,19 @@ mod tests {
             vec!["choke-point-createworktree-callsite-wrapper", "tsk-19y-2"]
         );
         assert!(rows.iter().all(|r| r.title != "Already finished"));
+    }
+
+    #[test]
+    fn sort_status_tier_ranks_awaiting_approval_first_then_stage_order() {
+        let rows = parse_doing(TIER_SORT_FIXTURE).expect("fixture should parse");
+        let ids: Vec<&str> = rows.iter().map(|r| r.id.as_str()).collect();
+        // D2: awaiting-approval first, then doing sub-sorted executing ->
+        // decompose -> clarify. "blocked" status never appears (D1's
+        // expanded set is still only doing/awaiting-approval).
+        assert_eq!(
+            ids,
+            vec!["tsk-approval", "tsk-executing", "tsk-decompose", "tsk-clarify"]
+        );
+        assert!(rows.iter().all(|r| r.id != "tsk-blocked"));
     }
 }
