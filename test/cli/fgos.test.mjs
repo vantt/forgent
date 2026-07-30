@@ -2514,9 +2514,28 @@ test('submit with no text at all is rejected as validation, exit 4, no event wri
 // (D5/D8/D10). A scripted verdict-executor (a node script this test writes)
 // stands in for the real model — no agent CLI is ever invoked.
 
+// tsk-5q5-1: a clear verdict carrying a real `verify` now triggers ONE more
+// call to the same configured executor — judgeVerifySemanticCorrectness's
+// own second-pass prompt (judge-executor.mjs). The prompt text is
+// substituted into argv (resolveExecutorCommand), so this script sniffs
+// argv[2] for the marker unique to that second prompt and answers it with
+// agreement, separately from the first-pass verdict — one script covers
+// both calls, mirroring test/intake/discovery.test.mjs's
+// writeVerdictWithVerifyCheckExecutor.
 function writeRunnerConfig(cwd, verdict) {
   const scriptPath = path.join(cwd, 'verdict-executor.mjs');
-  fs.writeFileSync(scriptPath, `process.stdout.write(${JSON.stringify(JSON.stringify(verdict))}); process.exit(0);`);
+  fs.writeFileSync(
+    scriptPath,
+    `
+    const prompt = process.argv[2] ?? '';
+    if (prompt.includes('Kiểm tra độc lập một lệnh verify')) {
+      process.stdout.write(${JSON.stringify(JSON.stringify({ agrees: true }))});
+    } else {
+      process.stdout.write(${JSON.stringify(JSON.stringify(verdict))});
+    }
+    process.exit(0);
+    `,
+  );
   const cfg = {
     executor: { command: process.execPath, args: [scriptPath, '{prompt}'] },
     models: { light: 'haiku', standard: 'sonnet', heavy: 'opus' },
