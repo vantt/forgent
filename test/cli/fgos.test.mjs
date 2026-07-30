@@ -7018,3 +7018,78 @@ test('take/pick/approve are documented in the --help --json manifest with wait/n
     assert.ok(entry.parameters.properties['no-wait'], `${name} manifest entry missing "no-wait" property`);
   }
 });
+
+// --- re-claiming an item whose branch and worktree are still standing
+// (tsk-65n) -----------------------------------------------------------------
+
+test('pick on an item whose fgw/<id> worktree is still live hands back that SAME worktree instead of removing it out from under the session working there', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  addOk(cwd, 'repick-live-item');
+
+  const firstPick = envelopeData(run(cwd, ['pick', '--id', 'repick-live-item']).stdout);
+  const worktreePath = firstPick.worktree.path;
+  fs.writeFileSync(path.join(worktreePath, 'CONTEXT.md'), '# decisions\n');
+  execFileSync('git', ['add', 'CONTEXT.md'], { cwd: worktreePath });
+  execFileSync('git', ['commit', '-m', 'lock decisions'], { cwd: worktreePath });
+  // A claim released at the clarify/decompose -> executing boundary, with the
+  // session still sitting in its worktree.
+  assert.equal(run(cwd, ['move', 'repick-live-item', '--to', 'todo', '--expect', 'doing']).status, 0);
+
+  const secondPick = envelopeData(run(cwd, ['pick', '--id', 'repick-live-item']).stdout);
+
+  assert.equal(secondPick.worktree.path, worktreePath, 'the live worktree is reattached, not replaced');
+  assert.equal(secondPick.worktree.reused, true);
+  assert.equal(fs.existsSync(worktreePath), true);
+  assert.equal(fs.existsSync(path.join(worktreePath, 'CONTEXT.md')), true, 'work committed before the release is still there');
+});
+
+test('pick reattaches even when the live worktree has uncommitted work, leaving that work untouched', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  addOk(cwd, 'repick-dirty-item');
+
+  const firstPick = envelopeData(run(cwd, ['pick', '--id', 'repick-dirty-item']).stdout);
+  const worktreePath = firstPick.worktree.path;
+  fs.writeFileSync(path.join(worktreePath, 'CONTEXT.md'), '# decisions\n');
+  execFileSync('git', ['add', 'CONTEXT.md'], { cwd: worktreePath });
+  execFileSync('git', ['commit', '-m', 'lock decisions'], { cwd: worktreePath });
+  fs.writeFileSync(path.join(worktreePath, 'draft.md'), 'half-written\n');
+  assert.equal(run(cwd, ['move', 'repick-dirty-item', '--to', 'todo', '--expect', 'doing']).status, 0);
+
+  const secondPick = envelopeData(run(cwd, ['pick', '--id', 'repick-dirty-item']).stdout);
+
+  assert.equal(secondPick.worktree.path, worktreePath);
+  assert.equal(fs.readFileSync(path.join(worktreePath, 'draft.md'), 'utf8'), 'half-written\n');
+});
+
+test('take refuses a todo item whose own fgw/<id> branch already exists, naming pick instead of silently claiming source:main', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  addOk(cwd, 'take-with-branch-item');
+
+  // the branch (and worktree) come into being via pick; the claim is then
+  // released, leaving a todo item whose work lives on the branch
+  envelopeData(run(cwd, ['pick', '--id', 'take-with-branch-item']).stdout);
+  assert.equal(run(cwd, ['move', 'take-with-branch-item', '--to', 'todo', '--expect', 'doing']).status, 0);
+
+  const taken = run(cwd, ['take', '--id', 'take-with-branch-item']);
+
+  assert.notEqual(taken.status, 0, 'a main-checkout take of branch-resident work is refused');
+  assert.match(taken.stderr, /already has its own branch fgw\/take-with-branch-item/);
+  assert.match(taken.stderr, /fgos pick take-with-branch-item/);
+  assert.equal(stateView(cwd).work['take-with-branch-item'].status, 'todo', 'the refusal is a clean no-op');
+});
+
+test('take still claims a todo item that has no fgw/<id> branch of its own', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  addOk(cwd, 'take-no-branch-item');
+
+  const taken = run(cwd, ['take', '--id', 'take-no-branch-item']);
+
+  assert.equal(taken.status, 0, `take failed: ${taken.stderr}`);
+  const data = envelopeData(taken.stdout);
+  assert.equal(data.source, 'main');
+  assert.equal(stateView(cwd).work['take-no-branch-item'].status, 'doing');
+});

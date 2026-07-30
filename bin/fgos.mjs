@@ -1499,6 +1499,29 @@ async function runVerb(verb, flags, positional, dir) {
         }
       }
 
+      // A `todo` item whose own `fgw/<id>` branch already stands is never an
+      // honest main-checkout take (tsk-65n). `claimWork` with isolate:false
+      // records `source: main` + `headAtTake` — so `return` would later
+      // measure progress against the main checkout's HEAD, which the work
+      // never advances, because the work is on the branch. The claim
+      // succeeds and the lie only surfaces much later, as a `return` that
+      // refuses for no visible reason. Refuse here instead, naming the door
+      // that claims the branch.
+      //
+      // Deliberately at this verb layer and NOT inside `claimWork`: the
+      // runner claims through that same function with isolate:false
+      // (`loop.mjs`) and must keep being able to. `blocked` + branch-exists
+      // is likewise untouched — that is the branch-take path (`isBranchTake`),
+      // a main-checkout claim that already records branch source correctly.
+      const claiming = listWork(dir).work[id];
+      const claimingBranch = branchNameFor(id);
+      if (claiming?.status === 'todo' && branchExists(process.cwd(), claimingBranch)) {
+        throw new StoreError(
+          'validation',
+          `take: "${id}" already has its own branch ${claimingBranch}, so its work lives there, not on the main checkout — a take here would claim source:main and record a headAtTake that never advances, making a later "return" refuse. Use "fgos pick ${id}" to claim the branch and its worktree instead.`,
+        );
+      }
+
       // Delegate to claim-port.mjs — single choke-point for all claim flows
       // (tsk-53f D1). take uses isolate:false (no worktree creation).
       const { noWait, waitMs } = parseWaitFlags(flags, 'take');
