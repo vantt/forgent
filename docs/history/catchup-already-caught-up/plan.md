@@ -11,9 +11,14 @@ Flags counted: **2 of 10**.
   output, and `docs/specs/runner.md:1021` is a locked contract describing
   `catchup`'s exact branch structure. Both change.
 - **existing covered behavior** — D1's guard runs before the merge on
-  *every* `catchup` call, so all existing covered scenarios
-  (`test/cli/fgos.test.mjs:5250`+: clean, real-conflict,
-  inapplicable-reason) execute through new code.
+  *every* `catchup` call, so all existing covered scenarios execute through
+  new code. There are **7** of them in `test/cli/fgos.test.mjs:5250`+, not
+  the three the spec prose implies — counted by running
+  `node --test --test-name-pattern 'catchup' test/cli/fgos.test.mjs`
+  (8 pass, the eighth being the unknown-verb usage-string test): root
+  integration-drift, leaf targeting the parent branch, real same-line
+  conflict, inapplicable blocked reason, `--timeout`/`--no-timeout`
+  conflict, nonexistent id, non-`blocked` status.
 
 Not flagged: auth, authorization, data model, audit/security, external
 systems, cross-platform, weak proof (the area has real CLI tests),
@@ -72,7 +77,7 @@ Rejected alternatives:
 |---|---|---|
 | `merge-base --is-ancestor` exit-code handling — `catchup` uses `execFileSync` directly, not `merge.mjs`'s `git()` helper, so exit 1 arrives as a thrown `Error` with `status === 1` and must be read as boolean `false`, never an error | medium | A CLI test on an already-caught-up branch observes `outcome: 'already-caught-up'`, and a normal not-caught-up `catchup` still reaches the merge path — proving both exit codes route correctly |
 | The red-verify branch skipping `git merge --abort` | medium | A CLI test with a failing verify on an already-caught-up branch returns `outcome: 'verify-fail'`, leaves the item `blocked`, and does not throw |
-| Regression on the three existing `catchup` scenarios, all of which now run through the guard | medium | `test/cli/fgos.test.mjs:5250`+ stays green unchanged — no test edited to accommodate the guard |
+| Regression on the seven existing `catchup` scenarios, all of which now run through the guard | medium | `node --test --test-name-pattern 'catchup' test/cli/fgos.test.mjs` stays at 8 pass / 0 fail, with no test edited to accommodate the guard (that is the pre-change baseline, measured) |
 | The `blocked → awaiting-approval` move on a path that created no commit | low | The already-caught-up green test asserts the item's status moved and that `git rev-parse HEAD` on the branch is unchanged from before the call |
 
 Every medium above carries to `fgos-validating` as a proof point; none is
@@ -87,7 +92,7 @@ settled by argument here.
 2. **Tests** — `test/cli/fgos.test.mjs`, in the existing `catchup` block:
    already-caught-up green (status moves, outcome is the new value, branch
    HEAD unchanged) and already-caught-up red (stays `blocked`, no throw).
-   The three existing scenarios stay untouched.
+   All seven existing scenarios stay untouched.
 3. **Docs** — `docs/specs/runner.md:1021`: add the already-caught-up branch
    and the new `outcome` value to the recorded contract.
    `docs/how-to/recover-a-blocked-merge-conflict-when-catchup-cannot-reconcile-it.md:43`
