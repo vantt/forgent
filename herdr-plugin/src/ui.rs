@@ -13,7 +13,7 @@ use ratatui::text::Span;
 use ratatui::widgets::{Block, Borders, List, ListItem, ListState, Paragraph};
 use ratatui::{Frame, Terminal};
 
-use crate::app::{App, InProcessTask};
+use crate::app::{App, InProcessTask, Panel};
 use crate::ports::{TerminalUi as TerminalUiPort, UiEvent};
 
 /// tsk-4zo D2: an orphaned task (no matching herdr pane found by the most
@@ -82,6 +82,7 @@ impl TerminalUiPort for RatatuiTerminalUi {
             KeyCode::Down | KeyCode::Char('j') => Some(UiEvent::Down),
             KeyCode::Up | KeyCode::Char('k') => Some(UiEvent::Up),
             KeyCode::Enter => Some(UiEvent::Pick),
+            KeyCode::Tab => Some(UiEvent::SwitchPanel),
             _ => None,
         })
     }
@@ -97,6 +98,11 @@ pub fn draw(frame: &mut Frame, app: &mut App) {
         .direction(Direction::Horizontal)
         .constraints([Constraint::Percentage(60), Constraint::Percentage(40)])
         .split(rows[0]);
+
+    // tsk-1eu D1: the focused panel's border stands out from the
+    // unfocused one, so it's visible which panel Up/Down/Enter apply to.
+    let focused_border_style = Style::default().fg(Color::Cyan).add_modifier(Modifier::BOLD);
+    let unfocused_border_style = Style::default();
 
     let work_items: Vec<ListItem> = app
         .work_items
@@ -115,6 +121,11 @@ pub fn draw(frame: &mut Frame, app: &mut App) {
             .block(
                 Block::default()
                     .borders(Borders::ALL)
+                    .border_style(if app.focused_panel == Panel::WorkItems {
+                        focused_border_style
+                    } else {
+                        unfocused_border_style
+                    })
                     .title(Span::styled(
                         "Work items (by impact) — ↑/↓ select, Enter to pick",
                         Style::default().add_modifier(Modifier::BOLD),
@@ -130,16 +141,26 @@ pub fn draw(frame: &mut Frame, app: &mut App) {
         .iter()
         .map(|task| ListItem::new(in_process_label(task)).style(Style::default().fg(Color::Yellow)))
         .collect();
-    frame.render_widget(
-        List::new(in_process).block(
-            Block::default()
-                .borders(Borders::ALL)
-                .title(Span::styled(
-                    "In process",
-                    Style::default().add_modifier(Modifier::BOLD),
-                )),
-        ),
+    let mut in_process_list_state = ListState::default();
+    in_process_list_state.select(app.in_process_selected);
+    frame.render_stateful_widget(
+        List::new(in_process)
+            .block(
+                Block::default()
+                    .borders(Borders::ALL)
+                    .border_style(if app.focused_panel == Panel::InProcess {
+                        focused_border_style
+                    } else {
+                        unfocused_border_style
+                    })
+                    .title(Span::styled(
+                        "In process — Tab to focus, Enter to jump",
+                        Style::default().add_modifier(Modifier::BOLD),
+                    )),
+            )
+            .highlight_style(Style::default().add_modifier(Modifier::REVERSED)),
         columns[1],
+        &mut in_process_list_state,
     );
 
     let status = if let Some(err) = &app.last_error {

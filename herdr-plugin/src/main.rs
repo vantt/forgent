@@ -1,7 +1,7 @@
 use std::io;
 use std::time::{Duration, Instant};
 
-use herdr_fgos::app::App;
+use herdr_fgos::app::{App, Panel};
 use herdr_fgos::fgos::{self, FgosCliSource};
 use herdr_fgos::layout;
 use herdr_fgos::pane_scan::HerdrPaneScanner;
@@ -89,23 +89,47 @@ fn run(
         if let Some(event) = ui.poll_event(Duration::from_millis(250))? {
             match event {
                 UiEvent::Quit => return Ok(()),
+                UiEvent::SwitchPanel => {
+                    app.pick_status = None;
+                    app.switch_panel();
+                }
                 UiEvent::Down => {
                     app.pick_status = None;
-                    app.select_next();
+                    match app.focused_panel {
+                        Panel::WorkItems => app.select_next(),
+                        Panel::InProcess => app.select_next_in_process(),
+                    }
                 }
                 UiEvent::Up => {
                     app.pick_status = None;
-                    app.select_previous();
+                    match app.focused_panel {
+                        Panel::WorkItems => app.select_previous(),
+                        Panel::InProcess => app.select_previous_in_process(),
+                    }
                 }
-                UiEvent::Pick => {
-                    app.pick_status = Some(match app.selected_id() {
-                        Some(id) => match pane_orchestrator.open_pick_pane(id) {
-                            Ok(()) => format!("opened pane for /fgOS:pick {id}"),
-                            Err(err) => format!("pick failed for {id}: {err}"),
-                        },
-                        None => "no row selected".to_string(),
-                    });
-                }
+                // tsk-1eu D1: Enter's effect depends on which panel has
+                // focus — "Work items" keeps today's pick action, "In
+                // process" jumps to the selected task's pane (D2).
+                UiEvent::Pick => match app.focused_panel {
+                    Panel::WorkItems => {
+                        app.pick_status = Some(match app.selected_id() {
+                            Some(id) => match pane_orchestrator.open_pick_pane(id) {
+                                Ok(()) => format!("opened pane for /fgOS:pick {id}"),
+                                Err(err) => format!("pick failed for {id}: {err}"),
+                            },
+                            None => "no row selected".to_string(),
+                        });
+                    }
+                    Panel::InProcess => {
+                        app.pick_status = Some(match app.selected_in_process_pane_id() {
+                            Some(pane_id) => match pane_orchestrator.focus_pane(pane_id) {
+                                Ok(()) => format!("focused pane {pane_id}"),
+                                Err(err) => format!("focus failed for {pane_id}: {err}"),
+                            },
+                            None => "no pane to jump to".to_string(),
+                        });
+                    }
+                },
             }
         }
 
@@ -164,6 +188,49 @@ mod tests {
         fn open_pick_pane(&self, _id: &str) -> io::Result<()> {
             Ok(())
         }
+
+        fn focus_pane(&self, _pane_id: &str) -> io::Result<()> {
+            Ok(())
+        }
+    }
+
+    /// Records every pane id it was asked to focus, so a test can assert
+    /// on it without a real herdr binary.
+    struct RecordingPaneOrchestrator {
+        focused: std::cell::RefCell<Vec<String>>,
+    }
+
+    impl PaneOrchestrator for RecordingPaneOrchestrator {
+        fn open_pick_pane(&self, _id: &str) -> io::Result<()> {
+            Ok(())
+        }
+
+        fn focus_pane(&self, pane_id: &str) -> io::Result<()> {
+            self.focused.borrow_mut().push(pane_id.to_string());
+            Ok(())
+        }
+    }
+
+    /// Returns, in order: `SwitchPanel`, then `Pick`, then `Quit` — enough
+    /// to drive one full "switch to In process, press Enter" sequence.
+    struct SwitchThenPickThenQuit {
+        calls: Cell<u32>,
+    }
+
+    impl TerminalUi for SwitchThenPickThenQuit {
+        fn draw(&mut self, _app: &mut App) -> io::Result<()> {
+            Ok(())
+        }
+
+        fn poll_event(&mut self, _timeout: Duration) -> io::Result<Option<UiEvent>> {
+            let n = self.calls.get();
+            self.calls.set(n + 1);
+            Ok(match n {
+                0 => Some(UiEvent::SwitchPanel),
+                1 => Some(UiEvent::Pick),
+                _ => Some(UiEvent::Quit),
+            })
+        }
     }
 
     /// Returns `None` (let the tick fire) on the first call, then
@@ -183,6 +250,51 @@ mod tests {
             self.calls.set(n + 1);
             Ok(if n == 0 { None } else { Some(UiEvent::Quit) })
         }
+    }
+
+    #[test]
+    fn pane_focus_jumps_to_selected_in_process_pane_after_switching_panels() {
+        let mut ui = SwitchThenPickThenQuit { calls: Cell::new(0) };
+        let mut app = App::empty();
+        app.in_process = vec![herdr_fgos::app::InProcessTask {
+            id: "tsk-a".into(),
+            title: "A".into(),
+            pane: Some(PaneIdentity {
+                pane_id: "wS:p1H".into(),
+                tab_id: "wS:tE".into(),
+            }),
+        }];
+        app.select_next_in_process(); // selects index 0
+        let pane_orchestrator = RecordingPaneOrchestrator {
+            focused: std::cell::RefCell::new(Vec::new()),
+        };
+
+        run(&mut ui, &mut app, None, None, &pane_orchestrator, Duration::ZERO)
+            .expect("run should exit cleanly on Quit");
+
+        assert_eq!(app.focused_panel, Panel::InProcess);
+        assert_eq!(*pane_orchestrator.focused.borrow(), vec!["wS:p1H".to_string()]);
+    }
+
+    #[test]
+    fn pane_focus_reports_no_pane_when_selected_in_process_task_is_orphaned() {
+        let mut ui = SwitchThenPickThenQuit { calls: Cell::new(0) };
+        let mut app = App::empty();
+        app.in_process = vec![herdr_fgos::app::InProcessTask {
+            id: "tsk-b".into(),
+            title: "B".into(),
+            pane: None,
+        }];
+        app.select_next_in_process();
+        let pane_orchestrator = RecordingPaneOrchestrator {
+            focused: std::cell::RefCell::new(Vec::new()),
+        };
+
+        run(&mut ui, &mut app, None, None, &pane_orchestrator, Duration::ZERO)
+            .expect("run should exit cleanly on Quit");
+
+        assert!(pane_orchestrator.focused.borrow().is_empty());
+        assert_eq!(app.pick_status.as_deref(), Some("no pane to jump to"));
     }
 
     #[test]

@@ -7,6 +7,14 @@ pub struct WorkItem {
     pub goal_tier: String,
 }
 
+/// Which list currently has keyboard focus (tsk-1eu D1) — `Up`/`Down`/
+/// `Enter` always apply to whichever panel this names.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Panel {
+    WorkItems,
+    InProcess,
+}
+
 /// D4: an fgOS item with `status: doing` — always "doing" by definition, so
 /// no separate status field is carried here.
 pub struct InProcessTask {
@@ -26,6 +34,12 @@ pub struct App {
     /// adapter (`ui.rs`) converts this to its own widget state at draw
     /// time.
     pub selected: Option<usize>,
+    /// Independent cursor for the `in_process` list (tsk-1eu D1) — same
+    /// plain-index shape as `selected`, never shared with it, so
+    /// switching panels never loses your place in the other one.
+    pub in_process_selected: Option<usize>,
+    /// Which list currently has keyboard focus (tsk-1eu D1).
+    pub focused_panel: Panel,
     /// Set right after a pick pane is opened, cleared on the next
     /// keypress — a one-line status confirmation, never a blocking modal.
     pub pick_status: Option<String>,
@@ -38,6 +52,8 @@ impl App {
             in_process: Vec::new(),
             last_error: None,
             selected: None,
+            in_process_selected: None,
+            focused_panel: Panel::WorkItems,
             pick_status: None,
         }
     }
@@ -84,6 +100,64 @@ impl App {
         }
     }
 
+    /// tsk-1eu D1: same wrap-around shape as `select_next`, targeting
+    /// `in_process` instead.
+    pub fn select_next_in_process(&mut self) {
+        if self.in_process.is_empty() {
+            return;
+        }
+        let next = match self.in_process_selected {
+            Some(i) => (i + 1) % self.in_process.len(),
+            None => 0,
+        };
+        self.in_process_selected = Some(next);
+    }
+
+    /// tsk-1eu D1: same wrap-around shape as `select_previous`, targeting
+    /// `in_process` instead.
+    pub fn select_previous_in_process(&mut self) {
+        if self.in_process.is_empty() {
+            return;
+        }
+        let prev = match self.in_process_selected {
+            Some(0) | None => self.in_process.len() - 1,
+            Some(i) => i - 1,
+        };
+        self.in_process_selected = Some(prev);
+    }
+
+    /// `Some(pane_id)` only when the selected `in_process` row actually
+    /// has a live pane (tsk-1eu D2) — an orphaned row (`pane: None`, D2's
+    /// badge from `tsk-4zo`) has nothing to jump to.
+    pub fn selected_in_process_pane_id(&self) -> Option<&str> {
+        self.in_process_selected
+            .and_then(|i| self.in_process.get(i))
+            .and_then(|task| task.pane.as_ref())
+            .map(|pane| pane.pane_id.as_str())
+    }
+
+    /// A live poll can shrink or grow `in_process`; same clamp discipline
+    /// `clamp_selection` already gives `work_items`.
+    fn clamp_in_process_selection(&mut self) {
+        if self.in_process.is_empty() {
+            self.in_process_selected = None;
+        } else if let Some(i) = self.in_process_selected {
+            if i >= self.in_process.len() {
+                self.in_process_selected = Some(self.in_process.len() - 1);
+            }
+        } else {
+            self.in_process_selected = Some(0);
+        }
+    }
+
+    /// tsk-1eu D1: toggles which panel has keyboard focus.
+    pub fn switch_panel(&mut self) {
+        self.focused_panel = match self.focused_panel {
+            Panel::WorkItems => Panel::InProcess,
+            Panel::InProcess => Panel::WorkItems,
+        };
+    }
+
     /// Fake/hardcoded rows — kept only for offline rendering smoke tests
     /// (D6's original mock-only slice); the running binary uses
     /// `refresh_from_fgos` instead.
@@ -113,6 +187,8 @@ impl App {
             }],
             last_error: None,
             selected: None,
+            in_process_selected: None,
+            focused_panel: Panel::WorkItems,
             pick_status: None,
         }
     }
@@ -152,6 +228,7 @@ impl App {
                     })
                     .collect();
                 self.last_error = None;
+                self.clamp_in_process_selection();
             }
             Err(err) => self.last_error = Some(err.to_string()),
         }
