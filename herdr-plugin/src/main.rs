@@ -3,6 +3,7 @@ use std::time::{Duration, Instant};
 
 use herdr_fgos::app::App;
 use herdr_fgos::fgos::{self, FgosCliSource};
+use herdr_fgos::layout;
 use herdr_fgos::pane_scan::HerdrPaneScanner;
 use herdr_fgos::pick::{self, HerdrPaneAdapter};
 use herdr_fgos::ports::{PaneOrchestrator, PaneRegistry, TerminalUi, UiEvent, WorkItemSource};
@@ -33,6 +34,7 @@ fn main() -> io::Result<()> {
 
     let pane_orchestrator = HerdrPaneAdapter {
         herdr_bin: pick::herdr_bin(),
+        workspace_id: std::env::var("HERDR_WORKSPACE_ID").unwrap_or_default(),
     };
 
     // Absent outside a real herdr-managed pane (dev/test) — pane refresh
@@ -47,6 +49,15 @@ fn main() -> io::Result<()> {
             });
     if let Some(registry) = &pane_registry {
         app.refresh_pane_state(registry);
+    }
+
+    // tsk-1q3 D2: the dashboard renames its own tab to `fg:cockpit` if it
+    // isn't already — absent `HERDR_TAB_ID` (outside a real herdr pane)
+    // just skips it, same degrade-gracefully shape as the pieces above.
+    if let Ok(tab_id) = std::env::var("HERDR_TAB_ID") {
+        if let Err(err) = layout::ensure_cockpit_label(&pick::herdr_bin(), &tab_id) {
+            app.last_error = Some(format!("could not label dashboard tab fg:cockpit: {err}"));
+        }
     }
 
     let result = run(
