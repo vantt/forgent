@@ -7,9 +7,13 @@
 // `item.domain` value — never a throw, see base-workflow-model D2/D3).
 import { getDomain, stageForStep } from './workflow-stage-graphs.mjs';
 //
-// Ready = status 'todo' AND every dep's status is 'done' (per D5: done
+// Ready = status 'todo' AND every dep's status is RESOLVED (per D5: 'done'
 // means "accepted into the main tree" — a dep sitting at 'awaiting-approval',
-// 'doing', or 'blocked' does NOT unblock its dependents) AND stage at the
+// 'doing', or 'blocked' does NOT unblock its dependents; per
+// wontfix-terminal-status-filter-consistency D1, a dep at 'wontfix' DOES
+// unblock its dependents — abandoned, nothing further will ever land for
+// it, so waiting on it forever would be a silent permanent deadlock) AND
+// stage at the
 // item's own domain's Execute-mapped stage ('executing' for the 'coding'
 // domain — per stage-clarify D1: an item still at stage `clarify` is not
 // yet "ready to start" no matter its status — `fgos ready` would otherwise
@@ -86,7 +90,7 @@ export function frontier(view) {
     const executeStage = stageForStep(domain, 'Execute');
     if ((item.stage ?? executeStage) !== executeStage) continue;
     if (hasOpenDescendant(id, work, childrenByParent)) continue;
-    const depsReady = item.deps.every((dep) => work[dep]?.status === 'done');
+    const depsReady = item.deps.every((dep) => RESOLVED_STATUSES.has(work[dep]?.status));
     if (depsReady) ready.push(item);
   }
   ready.sort(compareReadyOrder);
@@ -143,16 +147,23 @@ function indexChildrenByParent(work) {
   return index;
 }
 
+// A status is RESOLVED when nothing further will ever happen to an item
+// holding it — the FSM's two terminal states (fsm.mjs: zero outgoing
+// edges from either): 'done' (actually built) and, per
+// fsm-wontfix-terminal-status D1/D4, 'wontfix' (deliberately closed
+// without being built, symmetric with 'done'). Exported so every other
+// consumer that needs "is this item resolved enough to stop counting it
+// as open" (deps-readiness in this module's own `depsReady`, plus
+// claim-port.mjs/impact.mjs/graph-metrics.mjs/entropy.mjs — see
+// wontfix-terminal-status-filter-consistency D1/D2/D3) shares this one
+// two-element set instead of six separate ad-hoc re-declarations.
+export const RESOLVED_STATUSES = new Set(['done', 'wontfix']);
+
 // True when `id` has any descendant (direct child, or a descendant reachable
 // through further `parent` chains below a child) whose status is not yet
-// resolved — 'done', or, per fsm-wontfix-terminal-status D1, 'wontfix' (a
-// second terminal state for an item deliberately closed without being
-// built; without this, a permanently-`wontfix` child would anchor its
-// parent out of the frontier forever, the same structural bug `wontfix`
-// exists to fix for `blocked`). `seen` guards against a malformed/cyclic
-// parent chain turning this into an infinite walk — it never occurs on
-// data produced by the decompose engine, only a defensive backstop.
-const RESOLVED_STATUSES = new Set(['done', 'wontfix']);
+// RESOLVED. `seen` guards against a malformed/cyclic parent chain turning
+// this into an infinite walk — it never occurs on data produced by the
+// decompose engine, only a defensive backstop.
 
 function hasOpenDescendant(id, work, childrenByParent, seen = new Set()) {
   const children = childrenByParent[id];

@@ -350,6 +350,32 @@ test('list --all restores the done item alongside the open one', () => {
   assert.ok(work['finished-item']);
 });
 
+// wontfix-terminal-status-filter-consistency D2: the open-only default
+// broadens past tsk-5oa's original done-only exclusion to also exclude
+// wontfix -- a wontfix item is resolved (nothing further will ever happen
+// to it) the same as a done one.
+test('list by default excludes a wontfix item, but keeps a todo item', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'open-item', { title: 'Open Item' });
+  const dir = path.join(cwd, '.fgos');
+  addWork(dir, { id: 'closed-item', title: 'Closed Item', kind: 'task', status: 'wontfix', deps: [], risk: 'low', refs: [], verify: 'npm test' });
+
+  const work = envelopeData(run(cwd, ['list']).stdout).work;
+  assert.ok(work['open-item']);
+  assert.equal(work['closed-item'], undefined);
+});
+
+test('list --all restores the wontfix item alongside the open one', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'open-item', { title: 'Open Item' });
+  const dir = path.join(cwd, '.fgos');
+  addWork(dir, { id: 'closed-item', title: 'Closed Item', kind: 'task', status: 'wontfix', deps: [], risk: 'low', refs: [], verify: 'npm test' });
+
+  const work = envelopeData(run(cwd, ['list', '--all']).stdout).work;
+  assert.ok(work['open-item']);
+  assert.ok(work['closed-item']);
+});
+
 test('list --id returns only that item, ignoring the open-only default and --all entirely (tsk-42m D2)', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'open-item', { title: 'Open Item' });
@@ -378,7 +404,7 @@ test('list --id on an unknown id is rejected as validation (not-found), exit 4 (
   assert.match(result.stderr, /list: work "no-such-item" not found/);
 });
 
-test('list default keeps an awaiting-human item visible (D2: "not done" is exactly status !== done, not a broader closed/terminal set)', () => {
+test('list default keeps an awaiting-human item visible (D2: excludes only the two terminal statuses done/wontfix, per wontfix-terminal-status-filter-consistency D2 -- never a broader ad-hoc closed/parked set like awaiting-human)', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'parked-item', { title: 'Parked Item' });
   run(cwd, ['ask', 'parked-item', '--text', 'need a decision']);

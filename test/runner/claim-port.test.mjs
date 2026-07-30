@@ -147,6 +147,42 @@ test('claimWork on an UNMARKED todo-with-branch reclaim (e.g. reject) still reco
   assert.equal(reclaim.branchHeadAtTake, tipAfterAttempt, 'must recompute fresh to the live tip, demanding new work before a future return');
 });
 
+// wontfix-terminal-status-filter-consistency D1: a leaf's dep at 'wontfix'
+// never had content to merge in the first place (abandoned, nothing was
+// ever built for it) — the unmergedDeps guard must not treat it as
+// "missing" content, the same as it already doesn't for 'done'.
+test('claimWork isolates a leaf whose dep is "wontfix" without throwing deps-not-merged (D1: wontfix satisfies the merge-guard, same as done)', () => {
+  const repoRoot = initTempRepo();
+  const dir = path.join(repoRoot, '.fgos');
+  initStore(dir);
+  addWork(dir, { id: 'root-x', title: 'Root', kind: 'task', status: 'todo', deps: [], risk: 'low', refs: [], verify: 'true' });
+  addWork(dir, { id: 'dep-x', title: 'Dep', kind: 'task', status: 'wontfix', deps: [], risk: 'low', refs: [], verify: 'true' });
+  addWork(dir, { id: 'leaf-x', title: 'Leaf', kind: 'task', status: 'todo', deps: ['dep-x'], risk: 'low', refs: [], verify: 'true', parent: 'root-x' });
+
+  const claim = claimWork(dir, { id: 'leaf-x', actor: 'session', isolate: true, repoRoot });
+
+  assert.equal(claim.id, 'leaf-x');
+  assert.equal(claim.to, 'doing');
+});
+
+test('claimWork still refuses to isolate a leaf whose dep is only "blocked" (D1 does not over-broaden the merge-guard past done/wontfix)', () => {
+  const repoRoot = initTempRepo();
+  const dir = path.join(repoRoot, '.fgos');
+  initStore(dir);
+  addWork(dir, { id: 'root-y', title: 'Root', kind: 'task', status: 'todo', deps: [], risk: 'low', refs: [], verify: 'true' });
+  addWork(dir, { id: 'dep-y', title: 'Dep', kind: 'task', status: 'blocked', deps: [], risk: 'low', refs: [], verify: 'true' });
+  addWork(dir, { id: 'leaf-y', title: 'Leaf', kind: 'task', status: 'todo', deps: ['dep-y'], risk: 'low', refs: [], verify: 'true', parent: 'root-y' });
+
+  assert.throws(
+    () => claimWork(dir, { id: 'leaf-y', actor: 'session', isolate: true, repoRoot }),
+    (err) => {
+      assert.ok(err instanceof ClaimError);
+      assert.equal(err.code, 'deps-not-merged');
+      return true;
+    },
+  );
+});
+
 // tsk-49a: proves the guarantee this item was filed to check — a runner
 // claimItem() call must be rejected while an item sits status:doing under a
 // live claimRole:session claim, never allowed to race it into a second
