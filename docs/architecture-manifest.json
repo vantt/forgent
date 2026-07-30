@@ -50,6 +50,7 @@
     "src/intake/decompose.mjs": "use-case",
     "src/intake/judge-executor.mjs": "infra",
     "src/cli/command-registry.mjs": "kernel",
+    "src/cli/invocation-fault-log.mjs": "infra",
     "src/report/entropy.mjs": "domain",
     "src/report/enduser-index.mjs": "domain",
     "src/report/frontmatter.mjs": "domain",
