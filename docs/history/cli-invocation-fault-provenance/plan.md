@@ -3,9 +3,9 @@
 Item: `tsk-5z0`. Stage when written: `decompose` (shaping).
 Locked decisions: `CONTEXT.md` D1–D5 — cited, never reopened here.
 
-**Revision 2**, after `fgos-validating` returned `NOT READY`. What changed is
-recorded in "Revision after the reality check" at the end; the mode, the
-approach, and the split are unchanged.
+**Revision 3.** Revision 2 answered `fgos-validating`'s `NOT READY`; revision 3
+adds in-process visibility per the newly recorded `CONTEXT.md` **D6**. Both
+changes are recorded in "Revision history" at the end. Mode unchanged.
 
 ## Mode: high-risk
 
@@ -15,7 +15,7 @@ Flags counted — **4 apply**, one of them a hard gate:
 |---|---|---|
 | audit/security | **yes (hard gate)** | The deliverable *is* an audit trail, and D3 captures raw argv. Any `--text`/`--rationale` payload of a malformed call lands in a plaintext file. |
 | data model | **yes** | D2 introduces a new persisted record schema under `.fgos/` that later readers depend on. |
-| public contracts | **yes** | `bin/fgos.mjs` `main()` is the single CLI door for every verb and every skill that shells out. D4 requires exit codes and stderr text stay byte-identical, so every edit sits on a public surface under a must-not-regress constraint. |
+| public contracts | **yes** | `bin/fgos.mjs` `main()` is the single CLI door for every verb and every skill that shells out. D4 requires exit codes and every verb's validation stay byte-identical; D6 permits exactly one *appended* stderr line and nothing else. Every edit sits on a public surface under a must-not-regress constraint. |
 | existing covered behavior | **yes** | `test/cli/fgos.test.mjs` already asserts on this exact code region — see the proof-surface row below for the real assertions. |
 | auth | no | — |
 | authorization | no | — |
@@ -80,11 +80,23 @@ Nothing else changes.
    regardless of layer: `test/architecture.test.mjs`'s `đủ sổ` test asserts a
    one-to-one match between `.mjs` files on disk and manifest rows, so a new
    file with no row turns it red.
-6. **Keep the observable surface identical (honors D4).** The stderr line and
-   `process.exitCode` assignment stay exactly as they are; the recording call
-   is additive and must never throw into the caller's path — a failed record
-   write is swallowed, because an observability layer that turns a clean
-   exit-4 into an unexpected exit-1 is worse than no layer.
+6. **Keep the observable surface identical apart from D6's one line (honors
+   D4, D6).** The existing `fgos: <message>` line and the `process.exitCode`
+   assignment stay exactly as they are. The recording call is additive and must
+   never throw into the caller's path — a failed record write is swallowed,
+   because an observability layer that turns a clean exit-4 into an unexpected
+   exit-1 is worse than no layer.
+7. **Surface the record in-process (P3, honors D6).** After a successful
+   record, append one stderr line naming where it went. It is emitted **only**
+   when a record was actually written — never when the write was skipped
+   (business refusal, per D1) or swallowed (unwritable destination, or no git
+   repo to resolve per D5), because a line claiming a record that does not
+   exist is worse than silence. Audit the **12** `assert.equal`-on-stderr
+   assertions under `test/` (`assert.match` accounts for the other 85 and is
+   unaffected); each either passes untouched or its exact-match reason settles
+   the wording, per D6's own cost column. `scripts/herdr-cockpit-notify.mjs`
+   and the `terminal` skill are the only non-test stderr consumers and need
+   the same check.
 
 ### Ordering input from the graph
 
@@ -100,7 +112,9 @@ writer → `.gitignore` + manifest row → wiring in `main()` → tests.
 | Component | Risk | What would prove it |
 |---|---|---|
 | argv capture reaching a plaintext log (D3) | **high** | Confirm `.gitignore` carries the new log's path, so recorded argv never enters git history. Residual after that: a local plaintext file readable by anything with filesystem access — bounded, not eliminated, and accepted (see the residual note below). Proof at validating: read `.gitignore` and confirm `git status` does not offer the log. |
-| `main()` catch edits vs. byte-identical exit codes/stderr (D4) | **high** | `test/cli/fgos.test.mjs:459` must pass unedited: it asserts exit 4, `/\.fgos\/ not found/`, and *"the refused verb must not create .fgos/ as a side effect"*. Plus the worktree/`--dir` tests at lines 181, 191, 295, 304, 312, 321 and the `init`-in-worktree refusal at 469. Proof at validating: those are assertions on this path, and none are modified. |
+| D6's added stderr line vs. existing stderr assertions | **medium** | Measured: 85 `assert.match` (unaffected) vs **12** `assert.equal` under `test/`, plus `scripts/herdr-cockpit-notify.mjs` and the `terminal` skill as the only non-test consumers. Proof at validating: enumerate the 12 and confirm none of them asserts equality on a *fault* path — or name the ones that do. |
+| Line emitted when no record was written | **medium** | A line claiming a record that does not exist. Proof at validating: the emit is genuinely downstream of a successful write, and the swallow path (unwritable dir, no git repo) stays silent. |
+| `main()` catch edits vs. byte-identical exit codes (D4) | **high** | `test/cli/fgos.test.mjs:459` must pass unedited: it asserts exit 4, `/\.fgos\/ not found/`, and *"the refused verb must not create .fgos/ as a side effect"*. Plus the worktree/`--dir` tests at lines 181, 191, 295, 304, 312, 321 and the `init`-in-worktree refusal at 469. Proof at validating: those are assertions on this path, and none are modified. |
 | new module's layer position | **medium** | Resolved to a determinate constraint (P2 above): declare `infra`, add the manifest row. Proof at validating: `node --test test/architecture.test.mjs` green with the row present. |
 | destination resolution in a non-git dir (D5) | **medium** | `git rev-parse` fails there; the swallow path must hold. Proof at validating: the fallback is genuinely reachable and silent, and `fgos.test.mjs:459`'s `rawTmpCwd()` case still passes. |
 | unbounded log growth | **low** | Append-only with no rotation. Faults are rare by nature; revisit only if volume proves otherwise. |
@@ -128,19 +142,34 @@ item, not a redactor bolted onto this one.
 - **Must not regress**: `.fgos/ not found` refusal still exits 4 with identical text; the `STORE_MISSING_WARNING_VERBS` stderr warning still fires unchanged; `fgos init` inside a worktree still refuses.
 - **Correct non-recording**: `fgos pick <nonexistent-id>` (the exact business refusal hit while claiming this item) records nothing.
 - **Not tracked**: after a fault is recorded, `git status --porcelain` shows nothing for the log path.
+- **D6 line**: present on a recorded fault; **absent** on a business refusal, on an unwritable destination, and outside a git repo.
 - **Concurrent access**: two sessions faulting at once append without interleaving a partial line.
 - **Partial failure**: destination unwritable (read-only dir) — stderr and exit code stay identical, nothing thrown.
 - **Worktree**: faulting from inside a linked worktree writes to the main checkout's store and leaves no `.fgos/` in the worktree.
 
-## Split: none
+## Split: none for this item; one follow-on item created
 
-One honest piece of work: one new module, one wiring site, one test group, plus
-the two mandatory one-line declarations (P1, P2). No candidate sub-piece is
-independently shippable — a classifier with no writer records nothing, a writer
-with no classifier violates D1, and a writer without P1 leaks argv into git.
+This item stays one honest piece of work: one new module, one wiring site, one
+test group, plus the mandatory declarations (P1, P2) and D6's one line (P3). No
+candidate sub-piece is independently shippable — a classifier with no writer
+records nothing, a writer with no classifier violates D1, a writer without P1
+leaks argv into git, and P3 without a writer has nothing to announce.
 `fgos graph --what-if` per candidate is moot here: the item has no deps and no
 children, so every candidate yields the same unchanged
 `topUnblock`/`criticalPath` shown above.
+
+**Follow-on item: `tsk-1wdf`** — "fgos faults: read surface for the
+invocation-fault log", the machine-readable surface D6 explicitly split out.
+Its verify: `node --test test/cli/fgos.test.mjs && node --test
+test/cli/fgos-manifest.test.mjs && npm test` (the manifest test is in there
+because a new verb needs a registry row).
+
+Lineage is recorded as `discoveredFrom: tsk-5z0`, **not** `parent`, for two
+reasons: no CLI flag sets `parent` at all — `src/intake/decompose.mjs:392` is
+its only writer, the engine's own split path — and `parent` would be wrong here
+anyway, because `src/state/frontier.mjs` blocks a parent until every descendant
+is `done`, which would hold `tsk-5z0` open waiting on a read surface it does
+not depend on.
 
 ## Verify
 
@@ -152,10 +181,36 @@ Narrowest-first, then the full suite because `bin/fgos.mjs`'s failure handler is
 shared by every verb the suite exercises. `test/architecture.test.mjs` is in the
 command specifically because of P2.
 
-## Revision after the reality check
+## Revision history
+
+### Revision 3 — in-process visibility (D6)
+
+Asked directly: does this slow anything down, and should it be visible across
+the process? Both answered with measurements, then D6 was recorded.
+
+**Cost, measured on this machine.** A failing `fgos` invocation costs **60 ms**
+today, almost all of it node startup. On top of that: `resolveWriterIdentity`
+**0.018 ms** with an agent session env present, **28.4 ms** on the pid-walk
+fallback (bare human terminal, no session env); `git rev-parse
+--git-common-dir` **2.2 ms**, only on D5's fallback branch; one record append
+**0.018 ms**. So a successful invocation pays **nothing** — none of this runs
+outside the catch — and an agent-session fault pays **+0.04 ms**. Worst case, a
+bare human terminal with a wrong cwd, is **+30.6 ms on a run that already
+failed**. The pid-walk cost is also not a new class of cost: `store.mjs`
+already calls `resolveWriterIdentity` on every event append
+(lines 250, 362, 626), so the repo already pays it on every successful write.
+
+**Visibility.** `doctor` was considered and rejected as the home: its real
+output is environment health (node/git present, shell-integration rc line,
+`.fgos-runner.json` keys, `core.hooksPath`) and it shares the `--pretty`
+renderer with `setup` — its audience is "did I install fgOS correctly", not
+"who called wrong". Chosen instead: D6's one stderr line here (P3), plus
+`tsk-1wdf` for the read surface.
+
+### Revision 2 — after the reality check
 
 `fgos-validating` returned `NOT READY - RETURN TO PLANNING` on the Assumptions
-dimension. Three things changed here; no locked decision was reopened.
+dimension. Three things changed; no locked decision was reopened.
 
 1. **Disproven assumption, now a mandatory step.** Revision 1's risk map claimed
    "`.fgos/` is gitignored and local, which bounds exposure". False: `.gitignore`
