@@ -44,7 +44,7 @@ const MATERIAL_FIELDS = ['title', 'status'];
  *
  * @param {object} view - a folded view (replay.mjs's rebuildView/foldEvents shape)
  * @param {string} id - the work item id to compute context for
- * @returns {{ parent: { id: string, title: string, status: string }, changedSinceAsk?: Array<{ field: string, from: unknown, to: unknown }>, ask?: string } | null}
+ * @returns {{ parent: { id: string, title: string, status: string }, changedSinceAsk?: Array<{ field: string, from: unknown, to: unknown }>, ask?: string, askRationale?: string, askAlternatives?: string, askSource?: string, rationale?: string, alternatives?: string, source?: string } | null}
  */
 export function computeAwaitingContext(view, id) {
   const item = view?.work?.[id];
@@ -73,6 +73,31 @@ export function computeAwaitingContext(view, id) {
 
   if (gate?.ask !== undefined) {
     result.ask = gate.ask;
+  }
+
+  // Checkpoint distillate + answer, both optional (tsk-19zm D2/D4): the
+  // agent's checkpoint as of the latest `ask` (askRationale/
+  // askAlternatives/askSource) and the human's final word as of `answer`
+  // (rationale/alternatives/source, still authoritative) — same
+  // guarded-presence idiom as `ask` above, so an item with neither leaves
+  // the return shape exactly as it was before this feature.
+  if (gate?.askRationale !== undefined) {
+    result.askRationale = gate.askRationale;
+  }
+  if (gate?.askAlternatives !== undefined) {
+    result.askAlternatives = gate.askAlternatives;
+  }
+  if (gate?.askSource !== undefined) {
+    result.askSource = gate.askSource;
+  }
+  if (gate?.rationale !== undefined) {
+    result.rationale = gate.rationale;
+  }
+  if (gate?.alternatives !== undefined) {
+    result.alternatives = gate.alternatives;
+  }
+  if (gate?.source !== undefined) {
+    result.source = gate.source;
   }
 
   return result;
