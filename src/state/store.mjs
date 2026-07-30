@@ -33,7 +33,7 @@ import { graphMetrics as computeGraphMetrics, whatIf as computeWhatIf, classifyS
 import { transitionWork, FsmError } from './fsm.mjs';
 import { transitionStage } from './stage.mjs';
 import { getDomain, stageForStep } from './workflow-stage-graphs.mjs';
-import { validateWork, WorkValidationError, DEFAULTS, GOAL_TIERS } from './work.mjs';
+import { validateWork, WorkValidationError, DEFAULTS, GOAL_TIERS, truncateTitle } from './work.mjs';
 import { EventLogError } from './events.mjs';
 import { frontier, isDepsAndLineageReady as depsAndLineageReadyView } from './frontier.mjs';
 import { assertNoCycle, assertNoUnifiedCycle } from './dep-graph.mjs';
@@ -151,7 +151,13 @@ export function addWork(dir, work) {
     // was in effect at write time. `??` only fills in when `tier` is missing
     // or nullish; an explicit (even invalid) value passes through unchanged
     // so validateWork below still rejects it as validation.
-    const item = { ...work, tier: work?.tier ?? DEFAULTS.tier };
+    //
+    // Per work-item-title-contract D2/D5, the title bound is applied HERE, on
+    // the same normalize step as tier and before validateWork — so the
+    // truncated title is what the appended event carries, and every caller
+    // reaching this door (submit and add in bin/fgos.mjs, decompose's children,
+    // the runner loop) obeys one rule without any of them repeating it.
+    const item = { ...work, tier: work?.tier ?? DEFAULTS.tier, title: truncateTitle(work?.title) };
     validateWork(item, Object.keys(before.work));
     // work-graph-intelligence S1 (D f176c18a): the acyclic invariant on `deps`
     // is enforced at this SAME write door, right after shape/existence
@@ -223,7 +229,18 @@ export function editWork(dir, { id, patch, role } = {}) {
       }
     }
 
-    const candidate = { ...work, ...patch };
+    // Per work-item-title-contract D2/D5, the same title bound addWork applies,
+    // applied to the PATCH rather than to the candidate: the event this door
+    // appends carries `patch` verbatim (see payload below), so bounding only
+    // the candidate would leave replay rebuilding the untruncated title and the
+    // view disagreeing with its own log. A patch that does not carry a title is
+    // passed through untouched, so an unrelated edit never silently reshapes a
+    // title that was already stored.
+    const normalizedPatch = typeof patch.title === 'string'
+      ? { ...patch, title: truncateTitle(patch.title) }
+      : patch;
+
+    const candidate = { ...work, ...normalizedPatch };
     validateWork(candidate, Object.keys(before.work));
     // Same guard pair as addWork above. deps-only first (work-graph-intelligence
     // S1) — this is the gap that used to close silently: a patch introducing an
@@ -238,7 +255,7 @@ export function editWork(dir, { id, patch, role } = {}) {
     assertNoCycle(candidate, before.work);
     assertNoUnifiedCycle(candidate, before.work);
 
-    const payload = { id, patch };
+    const payload = { id, patch: normalizedPatch };
     if (role !== undefined) {
       payload.role = role;
     }

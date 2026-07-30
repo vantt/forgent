@@ -7,6 +7,7 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 import { initStore, addWork, moveWork, listWork, readRawEvents, readyWork } from '../../src/state/store.mjs';
 import { appendEvent } from '../../src/state/events.mjs';
+import { MAX_TITLE_LENGTH } from '../../src/state/work.mjs';
 import { createWorktree, removeWorktree, createBranchRef, branchNameFor } from '../../src/runner/worktree.mjs';
 import { runOnce, runWatch, resolveRepoRoot } from '../../src/runner/loop.mjs';
 import { createMissBreaker } from '../../src/runner/anti-loop.mjs';
@@ -1283,7 +1284,7 @@ test('S10: two genuinely distinct blocks in one output still both create items (
 
 // --- S11 review-fix: sanitize discovery-block title before logging (1 P3 finding) ---
 
-test('S11: a discovery block title with embedded newlines cannot forge extra log lines (sanitized in the idempotent-skip log), and a very long title is clamped in the log but the stored item keeps the full original title', async () => {
+test('S11: a discovery block title with embedded newlines cannot forge extra log lines (sanitized in the idempotent-skip log), and a very long title is clamped in the log and bounded in the stored item', async () => {
   const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
   seedItem(dir, { id: 'item-newline-title' });
   const craftedTitle = `${'A'.repeat(200)}\nfgos-runner: FORGED — fake halt event`;
@@ -1299,7 +1300,14 @@ test('S11: a discovery block title with embedded newlines cannot forge extra log
   assert.equal(result.dispatched[0].outcome, 'awaiting-approval');
   const discovered = Object.values(listWork(dir).work).filter((w) => w.discoveredFrom === 'item-newline-title');
   assert.equal(discovered.length, 1, 'the second, identical block is recognized as already-captured');
-  assert.equal(discovered[0].title, craftedTitle, 'the stored item keeps the full, untouched title');
+  // The store bounds every title it accepts (work-item-title-contract D5), so
+  // the stored record holds the bounded prefix rather than the whole crafted
+  // string. The bound lands before the crafted newline, which means the forged
+  // suffix cannot reach the stored title either — the same property this test
+  // already asserts for the log line.
+  assert.equal(discovered[0].title, 'A'.repeat(MAX_TITLE_LENGTH), 'the stored title is bounded at the write door');
+  assert.ok(!discovered[0].title.includes('FORGED'), 'the bounded title never reaches the forged suffix');
+  assert.equal(discovered[0].title.split('\n').length, 1, 'the stored title carries no embedded newline');
 
   const skipLines = lines.filter((line) => line.includes('already captured'));
   assert.equal(skipLines.length, 1, 'exactly one skip log line, not forged into extra lines');
