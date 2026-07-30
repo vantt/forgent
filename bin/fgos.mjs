@@ -2277,6 +2277,50 @@ async function runVerb(verb, flags, positional, dir) {
       // ephemeral). Removed on every exit path via withMergeEphemeralWorktree's
       // own finally (worktree.mjs).
       return await withMergeEphemeralWorktree(repoRoot, id, async (ephemeral) => {
+        // The branch can already contain the target's tip (a person merged it
+        // by hand, or a prior catch-up landed the merge and died later). The
+        // merge below is then a genuine no-op that stages nothing, so the
+        // `git commit` at the end of this function fails with "nothing to
+        // commit" and the item is stuck blocked forever — no retry can change
+        // the condition. Checked up front rather than inferred from that
+        // commit failure: the failure wording is locale/git-version
+        // dependent, `is-ancestor` is not. `HEAD` here is the item's own
+        // branch (withMergeEphemeralWorktree checks it out).
+        let alreadyCaughtUp = false;
+        try {
+          execFileSync('git', ['merge-base', '--is-ancestor', target, 'HEAD'], { cwd: ephemeral.path, encoding: 'utf8', shell: false });
+          alreadyCaughtUp = true;
+        } catch (ancestorErr) {
+          // Exit 1 is the documented "not an ancestor" answer, not a failure;
+          // anything else (a bad ref, a broken repo) is a real error.
+          if (ancestorErr.status !== 1) {
+            throw ancestorErr;
+          }
+        }
+
+        if (alreadyCaughtUp) {
+          // Nothing to merge or commit, but the status move still has to rest
+          // on a freshly-executed check: "caught up" says nothing about
+          // whether this item deserves to leave `blocked`.
+          const caughtUpCheck = await runGoalCheck(item, ephemeral.path, timeoutMs);
+          if (!caughtUpCheck.passed) {
+            // No `git merge --abort` on this path — no merge was started, and
+            // aborting without MERGE_HEAD fails outright.
+            return { id, outcome: 'verify-fail', target, branch: ownBranch, exitStatus: caughtUpCheck.status, output: caughtUpCheck.output };
+          }
+          const { event } = moveWork(dir, { id, to: 'awaiting-approval', expectedStatus: 'blocked', role: 'runner' });
+          return {
+            id,
+            outcome: 'already-caught-up',
+            from: 'blocked',
+            to: 'awaiting-approval',
+            target,
+            branch: ownBranch,
+            seq: event.seq,
+            output: caughtUpCheck.output,
+          };
+        }
+
         let conflicted = false;
         try {
           execFileSync('git', ['merge', '--no-commit', '--no-ff', target], { cwd: ephemeral.path, encoding: 'utf8', shell: false });
