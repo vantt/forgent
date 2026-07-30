@@ -42,6 +42,32 @@ test('an item is included once its dep reaches "done"', () => {
   assert.deepEqual(frontier(view).map((i) => i.id), ['dependent']);
 });
 
+// wontfix-terminal-status-filter-consistency D1: a dep at 'wontfix' unblocks
+// its dependent the same as 'done' — abandoned, nothing further will ever
+// land for it, so treating it as a permanent block would be a silent
+// deadlock nobody notices.
+test('an item is included once its dep reaches "wontfix" (D1: wontfix satisfies deps, same as done)', () => {
+  const view = {
+    work: {
+      base: item('base', 'wontfix'),
+      dependent: item('dependent', 'todo', ['base']),
+    },
+  };
+  assert.deepEqual(frontier(view).map((i) => i.id), ['dependent']);
+});
+
+for (const status of ['blocked', 'doing', 'awaiting-approval', 'awaiting-human']) {
+  test(`an item is still excluded from the frontier when its dep is only "${status}" (D1 does not over-broaden past done/wontfix)`, () => {
+    const view = {
+      work: {
+        base: item('base', status),
+        dependent: item('dependent', 'todo', ['base']),
+      },
+    };
+    assert.deepEqual(frontier(view), []);
+  });
+}
+
 test('multi-tier deps (A depends on B depends on C): only fully-done chains open', () => {
   // A <- B <- C : A is ready only once both B and C are done.
   const view = {

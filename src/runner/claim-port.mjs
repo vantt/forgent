@@ -8,6 +8,7 @@
 // calls outside this module except for FSM-internal transitions.
 
 import { moveWork, addOutcome, listWork, readRawEvents } from '../state/store.mjs';
+import { RESOLVED_STATUSES } from '../state/frontier.mjs';
 import { visitCount } from './anti-loop.mjs';
 import { acquireMainCheckoutLock, HELD, AMBIGUOUS, DEFAULT_TTL_MS, formatLockDurationMs } from './main-checkout-lock.mjs';
 import { createClaimWorktree, branchNameFor, branchExists } from './worktree.mjs';
@@ -144,14 +145,18 @@ export function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoot = pr
     // `approve`'s leaf path, which never lands `done` without first
     // merging that dep's branch into `rootBranch` (bin/fgos.mjs's leaf
     // `approve` case) — so `done` on every dep already guarantees their
-    // content is on `rootBranch` by the time this leaf forks from it.
+    // content is on `rootBranch` by the time this leaf forks from it. A dep
+    // at `wontfix` (per wontfix-terminal-status-filter-consistency D1)
+    // never had content to merge in the first place — abandoned, nothing
+    // was ever built for it — so it can never be "unmerged" and is
+    // excluded from this guard the same as `done`.
     // Checked and refused BEFORE moveWork below, on purpose: passing a
     // baseRef/expectation that later fails AFTER moveWork has committed is
     // exactly the orphaning bug `268b172` already fixed once for a
     // nonexistent baseRef — refusing here keeps this a clean no-op claim
     // instead of repeating that failure mode for a different cause.
     if (isolate && isLeaf) {
-      const unmergedDeps = (item.deps ?? []).filter((dep) => view.work[dep]?.status !== 'done');
+      const unmergedDeps = (item.deps ?? []).filter((dep) => !RESOLVED_STATUSES.has(view.work[dep]?.status));
       if (unmergedDeps.length > 0) {
         throw new ClaimError(
           'deps-not-merged',
