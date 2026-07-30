@@ -24,6 +24,16 @@ work item without leaving the session or hand-typing the CLI. Never writes
    ask the user for the text before doing anything else — `fgos submit`
    requires non-empty text and will reject an empty call anyway.
 
+   `submit` derives the item's title mechanically from this text — the
+   first sentence or line, cut at whatever boundary comes first (never an
+   LLM call, never this skill's own judgment). A title that reads clearly
+   in a task list names the object being touched, the action being taken,
+   and the scope it's bounded to (đối tượng + hành động + phạm vi). Nothing
+   here rewrites the user's text to force that shape — but if you are the
+   one composing `$ARGUMENTS` from a looser request (rather than passing
+   the user's own words through untouched), lead with a sentence that
+   already carries all three, so the derived title does too.
+
 2. **Scan the current fgOS view for a dependency candidate.** Run:
 
    ```
