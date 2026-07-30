@@ -193,6 +193,35 @@ function optionalField(value, message) {
   return requireField(value, message);
 }
 
+// Shared --timeout/--no-timeout resolution for return/approve/catchup
+// (tsk-3vo D2/D3/D5): omitting both falls back to .fgos-runner.json's own
+// timeoutMs -- the same value and the same runGoalCheck primitive the
+// runner loop already uses at loop.mjs -- instead of silently running
+// verify unbounded, which used to leave a hung verify command with no
+// diagnosis and the main-checkout lock held until TTL expiry. --no-timeout
+// is the only way left to opt into an actually-unbounded verify run.
+function resolveVerifyTimeoutMs(verb, flags, repoRoot) {
+  const timeoutFlag = optionalField(
+    flags.timeout,
+    `${verb} --timeout requires a numeric millisecond value (omit both --timeout and --no-timeout to use the configured default; pass --no-timeout for no limit)`,
+  );
+  const noTimeout = flags['no-timeout'] !== undefined;
+  if (noTimeout && timeoutFlag !== undefined) {
+    throw new StoreError('validation', `${verb}: --timeout and --no-timeout are mutually exclusive -- pass at most one.`);
+  }
+  if (noTimeout) {
+    return undefined;
+  }
+  if (timeoutFlag !== undefined) {
+    const timeoutMs = Number(timeoutFlag);
+    if (!Number.isFinite(timeoutMs) || timeoutMs <= 0) {
+      throw new StoreError('validation', `${verb} --timeout must be a positive number of milliseconds (got "${timeoutFlag}").`);
+    }
+    return timeoutMs;
+  }
+  return ensureRunnerConfig(path.join(repoRoot, '.fgos-runner.json')).timeoutMs;
+}
+
 // Minimal argv parser: `--flag value` or bare `--flag` (boolean), plus
 // positional args. No dependency, no dashes-in-values ambiguity handling
 // beyond what this CLI's own verbs need.
@@ -1424,15 +1453,8 @@ async function runVerb(verb, flags, positional, dir) {
     // settlement belongs to the ->done edge, D4); verify red ->
     // doing->blocked + friction (mirrors the runner's own park path).
     case 'return': {
-      const id = requireField(positional[0] ?? flags.id, 'return requires an id: fgos return <id> [--timeout <ms>]');
-      const timeoutFlag = optionalField(flags.timeout, 'return --timeout requires a numeric millisecond value (omit --timeout entirely for no timeout)');
-      let timeoutMs;
-      if (timeoutFlag !== undefined) {
-        timeoutMs = Number(timeoutFlag);
-        if (!Number.isFinite(timeoutMs) || timeoutMs <= 0) {
-          throw new StoreError('validation', `return --timeout must be a positive number of milliseconds (got "${timeoutFlag}").`);
-        }
-      }
+      const id = requireField(positional[0] ?? flags.id, 'return requires an id: fgos return <id> [--timeout <ms>|--no-timeout]');
+      const timeoutMs = resolveVerifyTimeoutMs('return', flags, process.cwd());
 
       const item = listWork(dir).work[id];
       if (!item) {
@@ -1676,15 +1698,8 @@ async function runVerb(verb, flags, positional, dir) {
     // `done`'s role is always "human" (D3: the person who ran approve is
     // the settlement, the merge itself is only the mechanical consequence).
     case 'approve': {
-      const id = requireField(positional[0] ?? flags.id, 'approve requires an id: fgos approve <id> [--timeout <ms>]');
-      const timeoutFlag = optionalField(flags.timeout, 'approve --timeout requires a numeric millisecond value (omit --timeout entirely for no timeout)');
-      let timeoutMs;
-      if (timeoutFlag !== undefined) {
-        timeoutMs = Number(timeoutFlag);
-        if (!Number.isFinite(timeoutMs) || timeoutMs <= 0) {
-          throw new StoreError('validation', `approve --timeout must be a positive number of milliseconds (got "${timeoutFlag}").`);
-        }
-      }
+      const id = requireField(positional[0] ?? flags.id, 'approve requires an id: fgos approve <id> [--timeout <ms>|--no-timeout]');
+      const timeoutMs = resolveVerifyTimeoutMs('approve', flags, process.cwd());
 
       const view = listWork(dir);
       const item = view.work[id];
@@ -2058,15 +2073,8 @@ async function runVerb(verb, flags, positional, dir) {
     // mirroring the spike's proven shape (merge --no-commit --no-ff ->
     // verify -> commit-or-abort, verify strictly before any commit).
     case 'catchup': {
-      const id = requireField(positional[0] ?? flags.id, 'catchup requires an id: fgos catchup <id> [--timeout <ms>]');
-      const timeoutFlag = optionalField(flags.timeout, 'catchup --timeout requires a numeric millisecond value (omit --timeout entirely for no timeout)');
-      let timeoutMs;
-      if (timeoutFlag !== undefined) {
-        timeoutMs = Number(timeoutFlag);
-        if (!Number.isFinite(timeoutMs) || timeoutMs <= 0) {
-          throw new StoreError('validation', `catchup --timeout must be a positive number of milliseconds (got "${timeoutFlag}").`);
-        }
-      }
+      const id = requireField(positional[0] ?? flags.id, 'catchup requires an id: fgos catchup <id> [--timeout <ms>|--no-timeout]');
+      const timeoutMs = resolveVerifyTimeoutMs('catchup', flags, process.cwd());
 
       const view = listWork(dir);
       const item = view.work[id];

@@ -3524,6 +3524,89 @@ test('return --timeout with a non-numeric or non-positive value is rejected as v
   assert.equal(stateView(cwd).work['pull-return-bad-timeout'].status, 'doing', 'a rejected --timeout never runs verify or moves the item');
 });
 
+// tsk-3vo D2/D3/D5: omitting --timeout on return/approve/catchup used to
+// mean an unbounded verify, silently diverging from the runner loop's own
+// runGoalCheck call (which always passes config.timeoutMs). It now falls
+// back to .fgos-runner.json's own timeoutMs instead -- --no-timeout is the
+// only way left to actually opt into unbounded. `hang.mjs` (same style as
+// goal-check.test.mjs's own timeout test) sleeps 1.5s, well past the 200ms
+// config timeout below, so a fallback that fires kills it and a real
+// --no-timeout override does not.
+function writeShortRunnerConfig(cwd, timeoutMs) {
+  // Every DEFAULT_RUNNER_CONFIG key present (dispatch.mjs) so
+  // ensureRunnerConfig's mergeConfigDefaults finds nothing missing to
+  // rewrite -- an in-call rewrite would dirty the working tree and trip
+  // return's own clean-tree check, unrelated to what this test proves.
+  const cfg = {
+    executor: { command: process.execPath, args: ['{prompt}'] },
+    models: { light: 'haiku', standard: 'sonnet', heavy: 'opus' },
+    timeoutMs,
+    parallel: { maxRoots: 4, maxLeavesPerRoot: 4 },
+  };
+  fs.writeFileSync(path.join(cwd, '.fgos-runner.json'), JSON.stringify(cfg));
+}
+
+function writeHangScript(cwd, ms) {
+  const scriptPath = path.join(cwd, 'hang.mjs');
+  fs.writeFileSync(scriptPath, `const until = Date.now() + ${ms}; while (Date.now() < until) { /* busy-wait */ }`);
+  return scriptPath;
+}
+
+test('return omitting --timeout falls back to .fgos-runner.json\'s timeoutMs, blocking a verify that outlives it', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  writeShortRunnerConfig(cwd, 200);
+  const scriptPath = writeHangScript(cwd, 1500);
+  addOk(cwd, 'pull-return-fallback-timeout', { verify: `${process.execPath} ${JSON.stringify(scriptPath)}` });
+  assert.equal(run(cwd, ['take', '--id', 'pull-return-fallback-timeout']).status, 0);
+  commitFile(cwd, 'proof.txt');
+
+  const result = run(cwd, ['return', 'pull-return-fallback-timeout']);
+  assert.equal(result.status, 0, `return should exit 0 for a defined blocked outcome: ${result.stderr}`);
+  assert.equal(envelopeData(result.stdout).to, 'blocked', 'the 200ms fallback timeout should have killed the 1.5s verify');
+  assert.equal(stateView(cwd).work['pull-return-fallback-timeout'].status, 'blocked');
+});
+
+test('return --no-timeout opts out of the fallback, letting a verify that outlives the config timeout finish and pass', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  writeShortRunnerConfig(cwd, 200);
+  const scriptPath = writeHangScript(cwd, 500);
+  addOk(cwd, 'pull-return-no-timeout', { verify: `${process.execPath} ${JSON.stringify(scriptPath)}` });
+  assert.equal(run(cwd, ['take', '--id', 'pull-return-no-timeout']).status, 0);
+  commitFile(cwd, 'proof.txt');
+
+  const result = run(cwd, ['return', 'pull-return-no-timeout', '--no-timeout']);
+  assert.equal(result.status, 0, `return should succeed: ${result.stderr}`);
+  assert.equal(envelopeData(result.stdout).to, 'awaiting-approval', '--no-timeout should have let the 500ms verify finish past the 200ms config timeout');
+  assert.equal(stateView(cwd).work['pull-return-no-timeout'].status, 'awaiting-approval');
+});
+
+test('return --timeout and --no-timeout together are rejected as validation, exit 4', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  addOk(cwd, 'pull-return-timeout-conflict', { verify: 'test -f proof.txt' });
+  assert.equal(run(cwd, ['take', '--id', 'pull-return-timeout-conflict']).status, 0);
+  commitFile(cwd, 'proof.txt');
+
+  const result = run(cwd, ['return', 'pull-return-timeout-conflict', '--timeout', '1000', '--no-timeout']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /mutually exclusive/);
+  assert.equal(stateView(cwd).work['pull-return-timeout-conflict'].status, 'doing', 'a rejected flag combination never runs verify or moves the item');
+});
+
+test('return --timeout error text no longer claims omitting --timeout means no timeout', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  addOk(cwd, 'pull-return-timeout-error-text', { verify: 'test -f proof.txt' });
+  assert.equal(run(cwd, ['take', '--id', 'pull-return-timeout-error-text']).status, 0);
+  commitFile(cwd, 'proof.txt');
+
+  const result = run(cwd, ['return', 'pull-return-timeout-error-text', '--timeout', 'soon']);
+  assert.equal(result.status, 4);
+  assert.doesNotMatch(result.stderr, /omit --timeout entirely for no timeout/);
+});
+
 // --- pr-lifecycle S1-gate: review/approve/reject (pr-lifecycle-2) ---------
 //
 // Cổng duyệt PR nội bộ (D1/D4): `review` is a pure read over whichever diff
@@ -4312,6 +4395,21 @@ test('approve of a legacy item with a passing verify closes it to done — legac
   assert.equal(stateView(cwd).work['approve-legacy-ok-item'].status, 'done');
 });
 
+// tsk-3vo D5: same shared --timeout/--no-timeout resolution as `return`
+// (resolveVerifyTimeoutMs), wired into `approve` too — must reject the same
+// way, before any verify runs.
+test('approve --timeout and --no-timeout together are rejected as validation, exit 4', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'approve-timeout-conflict', { verify: 'true' });
+  run(cwd, ['move', 'approve-timeout-conflict', '--to', 'doing']);
+  run(cwd, ['move', 'approve-timeout-conflict', '--to', 'awaiting-approval']);
+
+  const result = run(cwd, ['approve', 'approve-timeout-conflict', '--timeout', '1000', '--no-timeout']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /mutually exclusive/);
+  assert.equal(stateView(cwd).work['approve-timeout-conflict'].status, 'awaiting-approval', 'a rejected flag combination never runs verify or moves the item');
+});
+
 test('approve twice: the second approve on an already-done item is rejected as precondition, exit 2 (done is terminal)', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'approve-twice-item', { verify: 'true' });
@@ -4959,6 +5057,22 @@ test('catchup on an item blocked for an unrelated reason (e.g. anti-loop-max-vis
   assert.equal(result.status, 4);
   assert.match(result.stderr, /anti-loop-max-visits/);
   assert.equal(stateView(cwd).work['catchup-unrelated-reason'].status, 'blocked');
+});
+
+// tsk-3vo D5: same shared --timeout/--no-timeout resolution as `return`
+// (resolveVerifyTimeoutMs), wired into `catchup` too — must reject the same
+// way, before any git operation runs.
+test('catchup --timeout and --no-timeout together are rejected as validation, exit 4', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'catchup-timeout-conflict');
+  run(cwd, ['move', 'catchup-timeout-conflict', '--to', 'doing']);
+  run(cwd, ['move', 'catchup-timeout-conflict', '--to', 'awaiting-approval']);
+  run(cwd, ['move', 'catchup-timeout-conflict', '--to', 'blocked', '--reason', 'merge-conflict']);
+
+  const result = run(cwd, ['catchup', 'catchup-timeout-conflict', '--timeout', '1000', '--no-timeout']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /mutually exclusive/);
+  assert.equal(stateView(cwd).work['catchup-timeout-conflict'].status, 'blocked', 'a rejected flag combination never runs verify or moves the item');
 });
 
 test('catchup on a nonexistent id is rejected as validation, exit 4', () => {
