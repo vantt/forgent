@@ -37,15 +37,23 @@ proportionate to that history, not decorative.
 
 ## Approach
 
-**Chosen path** (per CONTEXT.md D2/D4, cited not reopened): add a `role`
-dimension to `resolveExecutorCommand`/`resolveExecutorConfig`, parallel to
-the existing `tier` dimension (P41 precedent), so `judge-executor.mjs`'s
-`spawnAttempt` resolves through `cfg.executors.judge` (falling back to
-`cfg.executor` when absent — same fallback shape `resolveExecutorConfig`
-already uses for `tier`, so an operator who never configures
-`executors.judge` gets today's exact behavior, no scout, no regression).
-Extract the "how to run one scout pass" instruction into a committed
-prompt-template file (D4), following the existing `RUL44`
+**Chosen path** (per CONTEXT.md D2/D4, cited not reopened) — REVISED after a
+`fgos-validating` "smaller path" catch (below): `resolveExecutorConfig`
+(`dispatch.mjs:404-411`) already resolves `cfg.executors[tier]` as a fully
+generic string-keyed map — `validateRunnerConfigShape` (`dispatch.mjs:350-357`)
+validates every key in `cfg.executors` uniformly, with no restriction to
+real tier names. `judge-executor.mjs`'s `spawnAttempt` today calls
+`resolveExecutorCommand(cfg, { prompt, model })` **without a `tier` at
+all** — meaning `cfg.executors.judge` is already reachable through the
+EXISTING `tier` parameter, no new dimension needed: pass the literal
+string `tier: 'judge'` from `spawnAttempt`, and `dispatch.mjs` needs zero
+changes. (Original plan proposed adding a distinct `role` param to
+`resolveExecutorCommand`/`resolveExecutorConfig` — dropped as unnecessary
+duplication of a mechanism the code already generalizes; CONTEXT.md D2's
+actual decision — config-based, role-scoped override, not hard-coded args
+— is unaffected, only the implementation mechanic simplifies.) Extract the
+"how to run one scout pass" instruction into a committed prompt-template
+file (D4), following the existing `RUL44`
 (`src/runner/prompt-templates/*.txt`) pattern, referenced from both
 `discovery.mjs`'s and `decompose.mjs`'s prompt builders.
 
@@ -77,18 +85,20 @@ isolated one-item component (`componentCount` entry `{"size":1,"items":
 item needs to land first — ordering below is purely internal to this
 item, no cross-item constraint to honor.
 
-1. **Config plumbing (no behavior change).** Add `role` param to
-   `resolveExecutorCommand`/`resolveExecutorConfig` reading
-   `cfg.executors.judge` ahead of `cfg.executor`, mirroring the existing
-   `tier` branch. `DEFAULT_RUNNER_CONFIG` and `spawnWorker`'s call site
-   stay untouched (`role` omitted there, same as today). Absent
-   `executors.judge` in a caller's config → identical behavior to today
-   (fail-safe-by-default, per the same discipline RUL48 already applies
-   elsewhere in this area).
-2. **Wire judge-executor.mjs to the new dimension.** `spawnAttempt` passes
-   `role: 'judge'` to `resolveExecutorCommand`. Still no observable
-   behavior change while no `executors.judge` override exists in the
-   config actually loaded.
+1. **Wire judge-executor.mjs (no behavior change yet, no dispatch.mjs
+   edit).** `spawnAttempt` passes `tier: 'judge'` to
+   `resolveExecutorCommand` — reuses the existing generic
+   `cfg.executors[tier]` lookup (`dispatch.mjs:404-411`, already
+   string-keyed, already validated generically by
+   `validateRunnerConfigShape`). `DEFAULT_RUNNER_CONFIG` and
+   `spawnWorker`'s own call site are untouched — `dispatch.mjs` gets zero
+   edits this step. Absent `executors.judge` in a caller's config → falls
+   back to `cfg.executor`, identical to today's behavior (fail-safe by
+   construction, the same fallback path `tier`-based overrides already
+   exercise for real tiers).
+2. *(folded into step 1 — no separate config-plumbing step needed; the
+   smaller path found at `fgos-validating` removed this as its own
+   phase.)*
 3. **Shared prompt-template file + prompt wiring.** New
    `src/runner/prompt-templates/judge-scout-instructions.txt` (RUL44
    shape: substitution only, no logic), referenced from
@@ -111,7 +121,8 @@ per `CLAUDE.md`'s binding rule at this posture level — not optional here.
 
 | Component | Risk | Proof point (carried to `fgos-validating`) |
 |---|---|---|
-| `resolveExecutorCommand`/`resolveExecutorConfig` (`dispatch.mjs`) | Medium — shared with `spawnWorker`; a mistake here can change the real worker's `allowedTools`, not just the judge's | `impact({target: "resolveExecutorCommand", direction: "upstream"})` before editing (full posture); existing `dispatch.test.mjs` green unmodified; new test asserting a `cfg.executors.judge`-only config leaves `spawnWorker`'s resolved args byte-identical to `cfg.executor` |
+| `dispatch.mjs` (`resolveExecutorCommand`/`resolveExecutorConfig`) | None — file not edited (smaller-path finding: existing generic `tier`-keyed lookup already covers this need) | `dispatch.test.mjs` stays green unmodified — the absence of a diff here IS the proof; no `impact()` needed since no symbol in this file changes |
+| `judge-executor.mjs`'s call site (passes `tier: 'judge'`) | Low — a 1-line change to which string is passed, not to resolution logic itself | `impact({target: "spawnAttempt", direction: "upstream"})` before editing (full posture); existing `judge-executor.test.mjs` green; new test asserting `tier: 'judge'` reaches `resolveExecutorCommand` and resolves `cfg.executors.judge` when present |
 | `judge-executor.mjs` (`spawnAttempt`/`runJudgeExecutor`) | Medium — str68's retry/fail-safe discipline must survive a tool-using attempt, unproven today | existing `judge-executor.test.mjs` green; new test exercising a tool-call-containing response through the full 3-attempt retry path; a real measured parse-fail-rate delta (scout-enabled vs baseline), not assumed |
 | `discovery.mjs`/`decompose.mjs` prompt builders | Low-medium — prompt wording change can shift verdict behavior, including re-litigating already-passing cases | existing `discovery.test.mjs`/`decompose.test.mjs` green; one live end-to-end discover/decompose run observed manually (same pattern already exercised on tsk-62d itself this session) |
 | new prompt-template file | Low — mechanical, mirrors `RUL44`'s already-proven `worker-prompt-default.txt` shape | template hash pinned the same way `hashTemplate`/`templateName` already pin the worker's template |
