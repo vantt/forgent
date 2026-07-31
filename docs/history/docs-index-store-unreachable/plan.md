@@ -1,8 +1,10 @@
 # plan — `docs-index` on an unreachable store
 
 Item: `tsk-f31`. Decisions: `CONTEXT.md` D1 (preserve on-disk value when
-store unreachable), D2 (test points `--dir` at a real store). Verify (engine
--set, `fgos discover`): `npm test && test -z "$(git status --porcelain
+store unreachable). D2 (test points `--dir` at a real store) is superseded
+by D3 — dropped, `runDocsIndex()` stays unchanged; see `CONTEXT.md` for the
+two `fgos-validating` findings that drove this. Verify (engine-set, `fgos
+discover`): `npm test && test -z "$(git status --porcelain
 docs/enduser-docs-index.json)"`.
 
 ## Mode: standard
@@ -16,11 +18,12 @@ Flags counted: **2 of 10**.
   The spec must gain the new case.
 - **existing covered behavior** — `test/report/enduser-index.test.mjs` has
   **15** passing tests today (measured: `node --test
-  test/report/enduser-index.test.mjs` → 15/15), 4 of which call the real
-  `runDocsIndex()` helper D2 changes: the demo-entry test, the
+  test/report/enduser-index.test.mjs` → 15/15). D1's reorder touches
+  `case 'docs-index'` itself, so all 4 tests that call the real
+  `runDocsIndex()` helper (unchanged, no `--dir`) — the demo-entry test, the
   missing-quadrant-dir test, the decisions-alias test, and the idempotent
-  re-run test (R7's own proof). All 4 execute through the reordered code
-  D1 needs.
+  re-run test (R7's own proof) — execute through the reordered code even
+  though D2 is dropped and their own call site is untouched.
 
 Not flagged: auth, authorization, data model, audit/security, external
 systems, cross-platform, weak proof (dedicated spec + 15 tests already),
@@ -84,10 +87,25 @@ resolved here in favor of keeping the merge in the write layer, which
 already reads `previousContent` for the unchanged-guard and needs no new
 parameter threaded through a tested pure function.
 
-For D2, `runDocsIndex()` in `test/report/enduser-index.test.mjs` gains
-`--dir <root>/.fgos`, resolved once at module load via the same
-`git rev-parse --path-format=absolute --git-common-dir` the skills in this
-repo already standardize on, passed through `spawnSync`'s args.
+D1's own new tests spawn the real `fgos docs-index` binary against a fresh,
+fully isolated temp directory per test — never `REPO_ROOT`, never `--dir`.
+`dataDir()` (`bin/fgos.mjs:83`-`94`) resolves `dir` from `flags.dir` when
+given, or falls back to `resolveFgosDir(process.cwd(), { strict: true })`
+otherwise — and `resolveRepoRoot`'s `strict` branch
+(`src/runner/paths.mjs:26`: `if (strict) return cwd;`) returns `cwd`
+unchanged with **no git command run at all**. So spawning
+`fgos docs-index` with `cwd: tmpDir` and no `--dir` flag makes `dir =
+tmpDir/.fgos` and `repoRoot = tmpDir` directly — no git init needed (unlike
+`test/cli/fgos.test.mjs`'s `initGitCwdMain`/`tmpCwd` helpers, which exist
+for verbs that DO shell out to git). Each test builds its own
+`tmpDir/docs/<quadrant>/*.md` tree, an optional `tmpDir/.fgos/events.jsonl`
+(present = store reachable; absent = unreachable, the condition under test),
+and an optional pre-seeded `tmpDir/docs/enduser-docs-index.json` (the "prior
+on-disk value" to preserve or not). This is the same isolation shape
+`buildEnduserIndex`'s own unit tests already use (hand-built inputs, no
+shared state) extended to the real I/O verb — it cannot touch or be
+affected by `REPO_ROOT`'s real `docs/` tree or manifest, which is exactly
+what broke D2's `--dir`-on-`REPO_ROOT` attempt.
 
 Rejected alternatives:
 
@@ -110,15 +128,28 @@ Rejected alternatives:
   (D1's declined "keep current behavior" option).* Declined at the gate
   question already — restated here only as the alternative D1 rejected, not
   reopened.
+- *Point the shared `REPO_ROOT`-based `runDocsIndex()` at a real store via
+  `--dir` (D2, as originally locked).* Tried, then dropped (`CONTEXT.md`
+  D3): `case 'docs-index'` derives `repoRoot = path.dirname(dir)`, so
+  `--dir` doesn't just pick which store informs `sourceCaptureId` — it
+  redirects the entire docs-tree scan and manifest write target.
+  Reproduced live: pointing `--dir` at main checkout broke `fgos docs-index
+  tolerates a missing quadrant dir` (it hides the WORKTREE's own
+  `docs/tutorials/`, but the redirected verb scanned main checkout's
+  untouched copy instead). Separately shown moot: D1 alone reconstructs
+  content byte-identical to a worktree's `HEAD`-identical starting manifest
+  when the store is unreachable, so D2's goal (test outcome independent of
+  physical location) is already met without touching `repoRoot`.
 
 ## Risk map
 
 | Component | Risk | What would prove it |
 |---|---|---|
 | Reorder must not defeat write-only-if-changed: `nextContent` has to be computed from the merged entries, not the pre-merge ones | medium | A test where the store is reachable and content is genuinely unchanged from a prior run still results in NO write (existing idempotent-rerun test, still green, plus a new assertion that mtime/content is untouched) |
-| `fs.existsSync(path.join(dir, 'events.jsonl'))` is the correct, sufficient signal for "store unreachable" in this exact code path | medium | A test that runs `docs-index` with `--dir` pointing at a directory that exists but has no `events.jsonl` (the exact shape observed live: a worktree's `.fgos/` holding only `main-checkout.lock`), asserts a docPath with a real prior on-disk id keeps that id |
+| `fs.existsSync(path.join(dir, 'events.jsonl'))` is the correct, sufficient signal for "store unreachable" in this exact code path | medium | A test that runs `docs-index` (`cwd: tmpDir`, no `--dir`) against a `tmpDir/.fgos/` that exists but has no `events.jsonl` (the exact shape observed live: a worktree's `.fgos/` holding only `main-checkout.lock`), asserts a docPath with a real prior on-disk id keeps that id |
 | R7 (convergence) survives D1: running docs-index twice in a row under the SAME unreachable-store condition must not churn on the second run | medium | A test that runs `docs-index` twice with an unreachable store and asserts byte-identical manifest content and no second write (mtime unchanged) between run 1 and run 2 |
-| All 4 existing `runDocsIndex()`-based tests keep passing after D2's `--dir` addition, not just the one demo test | medium | `node --test test/report/enduser-index.test.mjs` stays at the pre-change baseline of 15 pass / 0 fail, all four integration tests included, none edited beyond the `--dir` plumbing |
+| All 4 existing `runDocsIndex()`-based tests keep passing after D1's reorder — their own call site is untouched (D2 dropped), but they still run through the modified `case 'docs-index'` block | medium | `node --test test/report/enduser-index.test.mjs` stays at the pre-change baseline of 15 pass / 0 fail, all four integration tests included, unedited |
+| The new isolated-tmpdir tests genuinely never touch `REPO_ROOT` (the exact mistake D2's `--dir` attempt made) | medium | Each new test constructs its own `tmpDir`, spawns `fgos docs-index` with `cwd: tmpDir` and no `--dir` flag, and asserts against `tmpDir`'s own manifest — never `REPO_ROOT`/`MANIFEST_PATH` |
 | First-ever run: no prior manifest file exists AND store is unreachable | low | A test asserts no crash and every entry's `sourceCaptureId` is `null` (nothing to preserve — matches the existing legitimate-null case, CONTEXT.md's own scope boundary) |
 
 Every medium above carries to `fgos-validating` as a proof point; none is
@@ -129,13 +160,13 @@ settled by argument here.
 1. **Reorder + merge** — `bin/fgos.mjs`, `case 'docs-index'`: move the
    `previousContent` read earlier, add the `storeReachable` check and the
    merge step, compute `nextContent` from the merged entries.
-2. **Tests** — `test/report/enduser-index.test.mjs`: add `--dir` to
-   `runDocsIndex()` (D2); add two new tests for D1 (store-unreachable
-   preserves an existing prior value; store-unreachable with no prior value
-   stays `null`); add one test for the R7-survives-D1 risk-map row
-   (two consecutive unreachable-store runs converge, no second write). All
-   15 pre-existing tests stay green, none edited beyond the `--dir` call
-   site.
+2. **Tests** — `test/report/enduser-index.test.mjs`: `runDocsIndex()` and
+   all 15 pre-existing tests stay byte-for-byte unedited (D2 dropped). Add
+   three new tests, each against its own fresh `tmpDir` (no `--dir`, no
+   git init — see Approach): store-unreachable preserves an existing prior
+   value; store-unreachable with no prior value stays `null`; two
+   consecutive unreachable-store runs converge (R7 survives D1, no second
+   write on the second run).
 3. **Docs** — `docs/specs/enduser-docs-index.md`: extend step 3 of "Điều gì
    xảy ra" with the store-unreachable case, and add a companion bullet next
    to the existing "Tài liệu không có capture nào khai `docPath`... vẫn

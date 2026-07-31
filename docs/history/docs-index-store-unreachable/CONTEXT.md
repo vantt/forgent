@@ -56,8 +56,9 @@ inspected before staging.
 
 | ID | Decision | Why |
 |---|---|---|
-| D1 | `docs-index` preserves a docPath's existing on-disk `sourceCaptureId` when the resolved `.fgos/` directory does not exist, instead of overwriting it with `null`. Only a genuinely reachable store — present and actually lacking a capture for that doc — is allowed to write `null` over a prior value. | Fixes the real defect, not just the test's own symptom: any human or session running `docs-index` for real inside a worktree (the normal path — `fgos pick` stands one up) hits the identical silent corruption, not only the one integration test. Directly reproduced above. |
-| D2 | `test/report/enduser-index.test.mjs`'s own `runDocsIndex()` passes `--dir` pointing at a real, resolvable store — the main checkout's `.fgos/`, resolved the same way `fgos-routing`'s own root resolution already does (`git rev-parse --path-format=absolute --git-common-dir \| xargs dirname`) — instead of relying on `docs-index`'s default `process.cwd()` resolution. | The test's own outcome should not depend on which physical location happens to run it (main checkout vs. any worktree). This is additive to D1, not a substitute for it: D1 protects every other caller of `docs-index` that never passes `--dir` at all. |
+| D1 | `docs-index` preserves a docPath's existing on-disk `sourceCaptureId` when the store is unreachable, instead of overwriting it with `null`. Only a genuinely reachable store — present and actually lacking a capture for that doc — is allowed to write `null` over a prior value. Precise signal (corrected at `fgos-validating`, see D3): the resolved `.fgos/` directory can exist while carrying no `events.jsonl` (observed live: a worktree's `.fgos/` holding only `main-checkout.lock`) — "unreachable" means the **log file** is absent, not the directory. | Fixes the real defect, not just the test's own symptom: any human or session running `docs-index` for real inside a worktree (the normal path — `fgos pick` stands one up) hits the identical silent corruption, not only the one integration test. Directly reproduced above. |
+| D2 | ~~`test/report/enduser-index.test.mjs`'s own `runDocsIndex()` passes `--dir` pointing at a real, resolvable store...~~ **Superseded by D3 below — never implemented.** | Original reasoning: the test's own outcome should not depend on which physical location happens to run it. See D3 for why this was dropped. |
+| D3 | D2 is dropped. `runDocsIndex()` stays exactly as it is today — no `--dir`, no change. | `fgos-validating` proved live that `--dir` redirects `docs-index`'s own `repoRoot` (`case 'docs-index'`: `const repoRoot = path.dirname(dir)`), not just which store informs `sourceCaptureId` — pointing it at main checkout broke a real, unrelated test (`fgos docs-index tolerates a missing quadrant dir`, which hides the WORKTREE's own `docs/tutorials/` and expects it absent from the manifest; with `--dir` redirecting `repoRoot` to main, the verb scanned main's untouched `docs/tutorials/` instead). Separately, D1 alone was shown (dry-run simulation) to reconstruct content byte-identical to a worktree's freshly-checked-out (`HEAD`-identical) manifest when the store is unreachable — the same real ids main checkout would re-resolve are already the prior on-disk values D1 preserves. D2's goal is met by D1 alone; its mechanism was actively harmful. User confirmed dropping D2 after this trade-off was presented. |
 
 D1's rejected alternative — making `docs-index` refuse outright without a
 reachable store (raising `requiresExistingStore` from its current `false`)
@@ -70,14 +71,17 @@ one test — to start supplying one.
 
 ## Pinned terms
 
-- **store unreachable** — the directory `dataDir()`/`resolveFgosDir` resolves
-  to (`.fgos/` under the effective repo root) does not exist on disk at all.
-  Distinct from **store reachable but genuinely empty** (the directory
-  exists, `rebuildView` succeeds, and the view's `outcomes` simply has no
-  entry for a given docPath) — that case is real "no capture recorded" and
-  must still write `null`, per D1's own scope. The live repro above is
-  exclusively the first case: `ls -la .fgos/` returned ENOENT, not an empty
-  directory.
+- **store unreachable** — the log file `listWork`/`rebuildView` reads
+  (`events.jsonl` under the `.fgos/` directory `dataDir()`/`resolveFgosDir`
+  resolves to) does not exist on disk. **Not** the same as the `.fgos/`
+  directory itself being absent — corrected at `fgos-validating` (D3):
+  caught live that a worktree's `.fgos/` can exist (holding only
+  `main-checkout.lock`) while `events.jsonl` inside it is absent, so a
+  directory-existence check would misread this exact condition as
+  "reachable." Distinct from **store reachable but genuinely empty** (the
+  log exists, `rebuildView` succeeds, and the view's `outcomes` simply has
+  no entry for a given docPath) — that case is real "no capture recorded"
+  and must still write `null`, per D1's own scope.
 - **on-disk value** — the `sourceCaptureId` currently present for a docPath
   in the manifest file (`docs/enduser-docs-index.json`) as it exists on disk
   *before* the current `docs-index` run writes anything.
@@ -123,8 +127,10 @@ one test — to start supplying one.
   location already reads `previousContent` for the unchanged-guard, so
   keeping the merge there avoids touching the pure function's contract, but
   that's an implementation call, not decided here.
-- Whether "store unreachable" is detected via `fs.existsSync` on the
-  resolved `.fgos/` directory directly, or some other existing signal —
-  not investigated at this stage.
+- ~~Whether "store unreachable" is detected via `fs.existsSync` on the
+  resolved `.fgos/` directory directly, or some other existing signal.~~
+  Resolved at `fgos-validating` (D3): `fs.existsSync(path.join(dir,
+  'events.jsonl'))`, matching `readEvents`'s own `ENOENT` check — see the
+  pinned term above.
 - The item's own `verify` field is still the intake placeholder
   (`chưa xác định — P15 bổ sung`) and needs a real command before `return`.
