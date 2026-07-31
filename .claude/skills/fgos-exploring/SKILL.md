@@ -17,7 +17,7 @@ Turns a fuzzy request into locked decisions written down in
 ## Hard rules
 
 - Every bare `fgos <verb>` this skill calls (`add`, `ask`, `answer`,
-  `decision`, `discover`) is `requiresExistingStore: true` — resolve the
+  `decision`, `discover`, `tool`) is `requiresExistingStore: true` — resolve the
   main checkout root the same way the gate check below already does
   (`git rev-parse --path-format=absolute --git-common-dir | xargs
   dirname`) and pass `--dir "$root"` on every one of them. This session's
@@ -70,6 +70,30 @@ Turns a fuzzy request into locked decisions written down in
    keyword="<one-word-you-picked>"
    rg -- "$keyword" src bin test docs dogfood-fixture --glob "*.{mjs,cjs,md}" | head -20
    ```
+
+   Also query `CLAUDE.md`'s impact-analysis capability gate — the same
+   check `fgos-planning`/`fgos-validating`/`fgos-executing` already run
+   (`fgos tool query --capability impact-analysis --status present`) —
+   rather than assuming GitNexus is on this machine, since this is the only
+   clarify-stage session with real tool access (`judgeDiscovery` itself has
+   none: `src/runner/dispatch.mjs:207-220`'s `--allowedTools` permits only
+   `git add`/`git commit`). The `tool` sub-verb `query` is also
+   `requiresExistingStore: true` (`src/cli/command-registry.mjs:750`), so
+   run it with `--dir` explicitly the same as every other bare verb this
+   skill calls:
+
+   ```bash
+   root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
+   node "$root/bin/fgos.mjs" tool query --capability impact-analysis --status present --dir "$root"
+   ```
+
+   Fold the result into `CLAUDE.md`'s three-way framing
+   (`impact-analysis: inactive|degraded|full`) and record that line in
+   `CONTEXT.md` in step 3, next to the other scout evidence. This is
+   informational only — `fgos-exploring` edits no code and produces no
+   proof points, so the posture never gates or reshapes which candidate
+   decisions get asked here; it exists so a later reader of this item's
+   `CONTEXT.md` sees the posture without re-deriving it.
 
    Cite what the scout actually found in each question ("today X follows
    pattern Y in `path/to/file` — should this follow that too?"). Generate
