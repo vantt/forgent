@@ -3252,7 +3252,7 @@ test('pick --id on an item already claimed (doing) fails the same way take does 
   assert.equal(stateView(cwd).work['pick-double'].status, 'doing');
 });
 
-test('pick surfaces a real createWorktree failure as-is after the claim already succeeded — the claim is never silently rolled back or hidden', () => {
+test('pick surfaces a real createWorktree failure and reverts the claim it already made, instead of orphaning the item in doing (tsk-4m0 D1)', () => {
   const cwd = initGitCwd();
   run(cwd, ['init']);
   addOk(cwd, 'pick-wt-fail');
@@ -3268,11 +3268,14 @@ test('pick surfaces a real createWorktree failure as-is after the claim already 
   assert.notEqual(result.status, 0, 'pick must fail when createWorktree fails');
   assert.match(result.stderr, /git worktree add failed/);
 
-  // The claim itself is NOT rolled back: the item is left "doing" with no
-  // worktree, exactly as the cell's must_haves truth 5 requires.
+  // tsk-4m0: previously the claim was NOT rolled back here (this test used
+  // to assert status stayed "doing" with no worktree, per the original
+  // pick cell's must_haves truth 5) — reproduced live on tsk-f31 as an
+  // item permanently orphaned in doing with no automatic recovery
+  // (docs/history/pick-worktree-claim-race/CONTEXT.md). The claim now
+  // reverts back to todo so a failed pick looks like it never happened.
   const view = stateView(cwd);
-  assert.equal(view.work['pick-wt-fail'].status, 'doing');
-  assert.equal(view.work['pick-wt-fail'].claimRole, 'session');
+  assert.equal(view.work['pick-wt-fail'].status, 'todo');
 });
 
 // --- pick: claim-lock §3a/§3c/§7 (guard loosen, branch-reuse generalize, claimTrigger) ---
