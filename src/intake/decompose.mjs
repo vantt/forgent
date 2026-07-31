@@ -61,6 +61,14 @@ const DEFAULT_NEED_HUMAN_REASON =
 const HEAVY_RISK = 'heavy';
 const DEFAULT_RISK_GATE_REASON = 'Item gốc có risk cao (heavy) — cần xác nhận trước khi chia.';
 
+// work-item-priority-matrix D4/D8, Phase C: a real blast-radius measurement
+// ADDS caution, never removes it -- a keyword-light item with a large
+// enough blast-radius still gates, same as HEAVY_RISK above, and neither
+// gate ever loosens the other (both are checked, either can force it).
+const BLAST_RADIUS_GATE_THRESHOLD = 20;
+const DEFAULT_BLAST_RADIUS_GATE_REASON =
+  'Blast-radius (impact-analysis) vượt ngưỡng cảnh báo — cần xác nhận trước khi chia.';
+
 // tsk-6b6 D1/D3: fixed rationale for the one branch with no trustworthy
 // model text to draw from -- a parse/model failure, never a real verdict.
 const DEFAULT_INVALID_RATIONALE = 'Model/parse thất bại — không phán được verdict.';
@@ -410,10 +418,23 @@ export function resolveDecompose(dir, id, cfg, role) {
   const gate = view?.gates?.[id];
   const heavyRiskAlreadyConfirmed =
     typeof gate?.answer === 'string' && gate.answer.trim() && typeof gate?.ask === 'string' && gate.ask.includes(DEFAULT_RISK_GATE_REASON);
-  const risksGate = work.risk === HEAVY_RISK && !heavyRiskAlreadyConfirmed;
+  const keywordRiskGate = work.risk === HEAVY_RISK && !heavyRiskAlreadyConfirmed;
+
+  // work-item-priority-matrix D4/D8, Phase C: same bypass-detection shape as
+  // keywordRiskGate above (matched by its own reason text, never a stale
+  // answer from an unrelated gate) -- an INDEPENDENT gate, checked in
+  // addition to keywordRiskGate, never instead of it.
+  const blastRadiusAlreadyConfirmed =
+    typeof gate?.answer === 'string' && gate.answer.trim() && typeof gate?.ask === 'string' && gate.ask.includes(DEFAULT_BLAST_RADIUS_GATE_REASON);
+  const blastRadiusGate =
+    Number.isFinite(verdict.blastRadius) && verdict.blastRadius >= BLAST_RADIUS_GATE_THRESHOLD && !blastRadiusAlreadyConfirmed;
+  const risksGate = keywordRiskGate || blastRadiusGate;
 
   if (verdict.kind === 'need-human' || risksGate) {
-    const reason = verdict.kind === 'need-human' ? verdict.reason : DEFAULT_RISK_GATE_REASON;
+    // keywordRiskGate's reason always wins when both apply -- it is the
+    // existing floor (Phase C's own rule: capability signal only ever adds
+    // caution, never replaces the keyword check it sits alongside).
+    const reason = verdict.kind === 'need-human' ? verdict.reason : keywordRiskGate ? DEFAULT_RISK_GATE_REASON : DEFAULT_BLAST_RADIUS_GATE_REASON;
     // Logged outcome is 'need-human' (what actually happened), not
     // verdict.kind -- a risk-heavy root can force this parking out of a
     // pass-through/decompose verdict underneath it.

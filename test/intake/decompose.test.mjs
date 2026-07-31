@@ -872,6 +872,88 @@ test('resolveDecompose does NOT release the risk-heavy gate on a stale/unrelated
   assert.equal(view.work['item-x'].stage, 'decompose');
 });
 
+// --- work-item-priority-matrix D4/D8, Phase C: blast-radius is an
+// INDEPENDENT gate alongside the keyword-risk gate -- either can force
+// need-human, neither ever loosens the other. --------------------------
+
+test('resolveDecompose routes a keyword-LIGHT root through the human gate when blastRadius is over threshold (capability signal adds caution, never skipped)', () => {
+  const scriptDir = mkTempDir();
+  const scriptPath = writeVerdictExecutor(scriptDir, { verdict: 'pass-through', blastRadius: 25 });
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork({ risk: 'light' }));
+
+  const result = resolveDecompose(storeDir, 'item-x', cfg, 'runner');
+  assert.equal(result.outcome, 'need-human');
+  const view = listWork(storeDir);
+  assert.equal(view.work['item-x'].stage, 'decompose');
+  assert.match(view.gates?.['item-x']?.ask ?? '', /Blast-radius/);
+});
+
+test('resolveDecompose keeps the keyword-heavy gate even when blastRadius is LOW (floor holds — capability signal never loosens the existing gate)', () => {
+  const scriptDir = mkTempDir();
+  const scriptPath = writeVerdictExecutor(scriptDir, { verdict: 'pass-through', blastRadius: 1 });
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork({ risk: 'heavy' }));
+
+  const result = resolveDecompose(storeDir, 'item-x', cfg, 'runner');
+  assert.equal(result.outcome, 'need-human');
+  const view = listWork(storeDir);
+  assert.equal(view.work['item-x'].stage, 'decompose');
+});
+
+test('resolveDecompose proceeds (no gate) when risk is light AND blastRadius is under threshold', () => {
+  const scriptDir = mkTempDir();
+  const scriptPath = writeVerdictExecutor(scriptDir, { verdict: 'pass-through', blastRadius: 5 });
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork({ risk: 'light' }));
+
+  const result = resolveDecompose(storeDir, 'item-x', cfg, 'runner');
+  assert.equal(result.outcome, 'pass-through');
+  const view = listWork(storeDir);
+  assert.equal(view.work['item-x'].stage, 'executing');
+});
+
+test('resolveDecompose releases the blast-radius gate once the human has answered THIS gate\'s own prior ask', () => {
+  const scriptDir = mkTempDir();
+  const scriptPath = writeVerdictExecutor(scriptDir, { verdict: 'pass-through', blastRadius: 25 });
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork({ risk: 'light' }));
+
+  const first = resolveDecompose(storeDir, 'item-x', cfg, 'runner');
+  assert.equal(first.outcome, 'need-human');
+
+  const gate = listWork(storeDir).gates?.['item-x'];
+  moveWork(storeDir, { id: 'item-x', to: 'todo', expectedStatus: 'awaiting-human', answer: 'Confirmed, proceed.' });
+  assert.match(gate.ask, /Blast-radius/);
+
+  const second = resolveDecompose(storeDir, 'item-x', cfg, 'runner');
+  assert.equal(second.outcome, 'pass-through');
+  const view = listWork(storeDir);
+  assert.equal(view.work['item-x'].stage, 'executing');
+});
+
+test('resolveDecompose does NOT release the blast-radius gate on a stale/unrelated gate answer (never a false bypass)', () => {
+  const scriptDir = mkTempDir();
+  const scriptPath = writeVerdictExecutor(scriptDir, { verdict: 'pass-through', blastRadius: 25 });
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork({ risk: 'light' }));
+  moveWork(storeDir, { id: 'item-x', to: 'awaiting-human', ask: 'Which file exactly?', statusAtAsk: 'todo' });
+  moveWork(storeDir, { id: 'item-x', to: 'todo', expectedStatus: 'awaiting-human', answer: 'The parser module.' });
+
+  const result = resolveDecompose(storeDir, 'item-x', cfg, 'human');
+  assert.equal(result.outcome, 'need-human', 'an unrelated prior answer must not bypass the blast-radius gate');
+});
+
 test('resolveDecompose leaves the item untouched (invalid, fail-safe) on a spawn failure — no awaiting-human, no move', () => {
   const cfg = {
     executor: { command: '/no/such/executor-binary-xyz', args: ['{prompt}'] },
