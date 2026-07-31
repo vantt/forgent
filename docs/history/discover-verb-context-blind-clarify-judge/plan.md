@@ -120,10 +120,17 @@ working mechanical path, this plan does not redesign that — it only names
 the one command that proves the piece done:
 
 ```
-npm test test/intake/discovery.test.mjs
+node --test test/intake/discovery.test.mjs
 ```
 
 (the item's stored `verify` from the live `clear` verdict,
-`npm test src/intake/discovery.test.mjs`, points at the wrong path — the
-real test file is `test/intake/discovery.test.mjs`; `fgos-executing`
-should use the corrected path above.)
+`npm test src/intake/discovery.test.mjs`, points at the wrong path AND the
+wrong invocation — the real test file is `test/intake/discovery.test.mjs`,
+and `npm test <path>` does not scope the suite: the `test` script hardcodes
+`node --test 'test/**/*.test.mjs'`, so npm appends the path as an
+*additional* target rather than filtering to it — confirmed by actually
+running it during `fgos-validating` (ran the full 1919-test, 111.8s suite
+instead of the intended file). `node --test <path>` directly is the real
+scoped command — confirmed: 36 tests, ~1s, all passing today as the
+pre-change baseline. `fgos-executing` should use the corrected command
+above.)
