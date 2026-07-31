@@ -675,6 +675,36 @@ Chốt: `verifyKind` (mục "Chưa bàn tới" #1) và `statusCategory`/`kindCat
   riêng, nhỏ hơn, vì đụng invariant "one goal-check implementation, never
   two" (comment gốc `goal-check.mjs`) — nhưng KHÔNG phải supersede D1-D3.
 
+**Đào sâu (round 10) — phạm vi Phase 1 RỘNG HƠN mô tả ban đầu, ghi bằng
+4 acceptance clause trên `tsk-2rp`:** khảo sát test thật (`test/cli/fgos.test.mjs`,
+40+ test case về `return`) + 3 incident thật đã xảy ra
+(`docs/history/return-approve-scoped-clean-tree/CONTEXT.md` tsk-598,
+`docs/history/return-close-pre-done-work/CONTEXT.md` tsk-4on,
+`docs/history/fgos-auto-release-main-checkout-lock/CONTEXT.md` tsk-45z) cho
+thấy `return` KHÔNG CHỈ có 1 cổng (`verify`) mà có 3 cổng xếp chồng:
+
+1. **Clean-tree gate** — working tree phải sạch (trừ `.fgos/`), scoped đúng
+   file của item.
+2. **HEAD-advance gate** — HEAD/branch phải TIẾN so `headAtTake`/
+   `branchHeadAtTake` (chống-gian-lận). Có khe hẹp `--no-new-commits-ok`
+   (tsk-4on) cho ca việc thật đã xong TRƯỚC claim này.
+3. **Verify gate** — cái `verifyKind` đang nhắm sửa.
+
+Thiết kế ban đầu (`shell`/`manual-confirm`, chỉ đổi `runGoalCheck`) CHỈ đụng
+gate #3. Domain `manual-confirm` (không có commit git thật) sẽ LUÔN fail
+gate #2 (y hệt shape bug `tsk-4on`) và gate #1 có thể không áp dụng được —
+nếu không xử lý, `verifyKind` một mình không đủ cho domain đó chạy được.
+`approve` còn có gate RIÊNG (refuse nếu chạy từ worktree không qua `session
+start`) — chưa rõ domain `manual-confirm` có cần đường chạy khác không.
+Mọi gate đều DUPLICATE qua 2 đường tách biệt (main-source/branch-source,
+`test/cli/fgos.test.mjs` dòng 3416-3887 và 5556-5764) — sửa gì cũng x2 bề
+mặt.
+
+**Câu hỏi kiến trúc chưa quyết (để `fgos-exploring` đào, không tự chốt ở
+đây):** domain `manual-confirm` có nên đi qua `return` luôn hay không, hay
+bỏ qua `return` hoàn toàn — đi thẳng `doing→awaiting-approval` qua verb/
+đường riêng — thay vì nhét vào `return` rồi tắt từng gate một.
+
 **Phase 2 — `status`/`statusCategory` + `kind`/`kindCategory` (sau, không bị
 Phase 1 chặn):**
 
