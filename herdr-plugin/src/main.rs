@@ -15,9 +15,31 @@ use herdr_fgos::ui::RatatuiTerminalUi;
 const POLL_INTERVAL: Duration = Duration::from_secs(5);
 
 fn main() -> io::Result<()> {
+    // tsk-3i3 D2/D3: before touching the terminal at all, check whether a
+    // `fg:cockpit` tab already exists for this workspace. If so, hand off
+    // to it and close this (now-redundant) tab instead of ever rendering
+    // a second dashboard. Absent HERDR_WORKSPACE_ID/HERDR_TAB_ID (outside
+    // a real herdr-managed pane, e.g. local dev/test) just skips this,
+    // same degrade-gracefully shape the rest of this function already
+    // uses.
+    let mut cockpit_error: Option<String> = None;
+    if let (Ok(workspace_id), Ok(tab_id)) = (
+        std::env::var("HERDR_WORKSPACE_ID"),
+        std::env::var("HERDR_TAB_ID"),
+    ) {
+        match layout::ensure_cockpit_tab(&pick::herdr_bin(), &workspace_id, &tab_id) {
+            Ok(true) => return Ok(()), // handed off to the existing cockpit tab
+            Ok(false) => {}            // this tab is now the cockpit tab
+            Err(err) => cockpit_error = Some(format!("could not ensure dashboard's own cockpit tab: {err}")),
+        }
+    }
+
     let mut ui = RatatuiTerminalUi::init()?;
 
     let mut app = App::empty();
+    if let Some(err) = cockpit_error {
+        app.last_error = Some(err);
+    }
     let root = fgos::repo_root();
     let source: Option<FgosCliSource> = match &root {
         Ok(root) => Some(FgosCliSource {
@@ -54,15 +76,6 @@ fn main() -> io::Result<()> {
             });
     if let Some(registry) = &pane_registry {
         app.refresh_pane_state(registry);
-    }
-
-    // tsk-1q3 D2: the dashboard renames its own tab to `fg:cockpit` if it
-    // isn't already — absent `HERDR_TAB_ID` (outside a real herdr pane)
-    // just skips it, same degrade-gracefully shape as the pieces above.
-    if let Ok(tab_id) = std::env::var("HERDR_TAB_ID") {
-        if let Err(err) = layout::ensure_cockpit_label(&pick::herdr_bin(), &tab_id) {
-            app.last_error = Some(format!("could not label dashboard tab fg:cockpit: {err}"));
-        }
     }
 
     let result = run(

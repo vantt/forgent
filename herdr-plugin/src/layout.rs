@@ -324,6 +324,41 @@ pub fn ensure_cockpit_label(herdr_bin: &str, tab_id: &str) -> Result<(), LayoutE
     Ok(())
 }
 
+/// Finds an existing `fg:cockpit` tab in `workspace_id` other than
+/// `own_tab_id` and hands off to it -- focuses it, then closes
+/// `own_tab_id` (tsk-3i3 D2/D3). `placement = "tab"`
+/// (`herdr-plugin.toml`) means `own_tab_id` is always a brand-new tab
+/// herdr just created for this launch, never the operator's pre-existing
+/// tab, so closing it here never loses anything the operator was using.
+/// When no other `fg:cockpit` tab exists yet, labels `own_tab_id` itself
+/// instead (the same rename `ensure_cockpit_label` already does).
+/// Returns `true` when this call handed off to an existing tab and closed
+/// its own -- the caller must stop there and never render the dashboard.
+pub fn ensure_cockpit_tab(herdr_bin: &str, workspace_id: &str, own_tab_id: &str) -> Result<bool, LayoutError> {
+    let stdout = run_herdr(herdr_bin, &["tab", "list", "--workspace", workspace_id])?;
+    let tabs = parse_tab_list(&stdout).map_err(LayoutError::Parse)?;
+
+    if let Some(existing) = find_other_cockpit_tab(&tabs, own_tab_id) {
+        run_herdr(herdr_bin, &["tab", "focus", existing.as_str()])?;
+        run_herdr(herdr_bin, &["tab", "close", own_tab_id])?;
+        return Ok(true);
+    }
+
+    ensure_cockpit_label(herdr_bin, own_tab_id)?;
+    Ok(false)
+}
+
+/// Pure decision `ensure_cockpit_tab` dispatches on: the `tab_id` of a
+/// tab already labeled `fg:cockpit` other than `own_tab_id`, if any. Kept
+/// separate from the live herdr calls so it stays unit-testable against a
+/// `tab list` fixture, the same shape `agents_tab_index`/`parse_tab_list`
+/// already are.
+fn find_other_cockpit_tab(tabs: &[TabRow], own_tab_id: &str) -> Option<String> {
+    tabs.iter()
+        .find(|tab| tab.tab_id != own_tab_id && tab.label.as_deref() == Some("fg:cockpit"))
+        .map(|tab| tab.tab_id.clone())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -380,6 +415,13 @@ mod tests {
         {"agent_status":"idle","focused":false,"label":"fg:agents-2","number":14,"pane_count":4,"tab_id":"wS:tE","workspace_id":"wS"}
     ],"type":"tab_list"}}"#;
 
+    // Same shape as TAB_LIST_FIXTURE, plus a tab already labeled
+    // `fg:cockpit` -- a prior cockpit launch's own tab.
+    const TAB_LIST_WITH_COCKPIT_FIXTURE: &str = r#"{"id":"cli:tab:list","result":{"tabs":[
+        {"agent_status":"idle","focused":false,"label":"workers-3","number":8,"pane_count":3,"tab_id":"wS:t8","workspace_id":"wS"},
+        {"agent_status":"idle","focused":false,"label":"fg:cockpit","number":9,"pane_count":4,"tab_id":"wS:tC","workspace_id":"wS"}
+    ],"type":"tab_list"}}"#;
+
     // Captured live this session: `herdr tab create --workspace wS
     // --label fg-test-scratch --no-focus` (scratch tab, closed right
     // after capture).
@@ -409,6 +451,28 @@ mod tests {
         let envelope: TabGetEnvelope = serde_json::from_str(TAB_GET_FIXTURE).expect("fixture should parse");
         assert_eq!(envelope.result.tab.label.as_deref(), Some("3"));
         assert_ne!(envelope.result.tab.label.as_deref(), Some("fg:cockpit"));
+    }
+
+    #[test]
+    fn find_other_cockpit_tab_finds_the_existing_one() {
+        let tabs = parse_tab_list(TAB_LIST_WITH_COCKPIT_FIXTURE).expect("fixture should parse");
+        // Our own fresh tab (wS:tF) is not in this fixture at all --
+        // exactly what a brand-new `placement = "tab"` launch looks like.
+        assert_eq!(find_other_cockpit_tab(&tabs, "wS:tF"), Some("wS:tC".to_string()));
+    }
+
+    #[test]
+    fn find_other_cockpit_tab_excludes_its_own_tab_id() {
+        let tabs = parse_tab_list(TAB_LIST_WITH_COCKPIT_FIXTURE).expect("fixture should parse");
+        // If our own tab is somehow already the one labeled fg:cockpit,
+        // it is never treated as "another" tab to hand off to.
+        assert_eq!(find_other_cockpit_tab(&tabs, "wS:tC"), None);
+    }
+
+    #[test]
+    fn find_other_cockpit_tab_returns_none_when_none_exists() {
+        let tabs = parse_tab_list(TAB_LIST_FIXTURE).expect("fixture should parse");
+        assert_eq!(find_other_cockpit_tab(&tabs, "wS:tF"), None);
     }
 
     #[test]
