@@ -53,11 +53,18 @@ write-only-if-changed comparison would run against pre-merge content:
 1. Read `previousContent` from `manifestPath` first (same
    try/catch-on-ENOENT this block already has — a first-ever run with no
    prior manifest is not an error).
-2. Compute `storeReachable = fs.existsSync(dir)` — `dir` is already the
-   resolved `.fgos/` path in this scope (`dataDir()`'s return value, the
-   same variable `repoRoot = path.dirname(dir)` derives from two lines
-   above), so this directly tests D1's pinned term ("the resolved `.fgos/`
-   directory does not exist") with no new resolution logic.
+2. Compute `storeReachable = fs.existsSync(path.join(dir, 'events.jsonl'))`
+   — **not** `fs.existsSync(dir)` on the directory itself: caught live in
+   this item's own worktree (`fgw/tsk-f31`) that `.fgos/` the directory can
+   exist (holding only `main-checkout.lock`, per `git status --short .fgos`
+   showing `events.jsonl`/`state.json` etc. as locally-deleted-but-tracked)
+   while the log file the store actually needs is absent — `fs.existsSync(dir)`
+   would read `true` in exactly the condition this guard exists to catch.
+   The log path matches `paths(dir)`'s own `logPath` definition
+   (`src/state/store.mjs:88`: `path.join(dir, 'events.jsonl')`), the exact
+   file `readEvents` catches `ENOENT` on to degrade to an empty view
+   (`src/state/events.mjs:78`-`85`) — this is the real signal
+   `listWork(dir)` itself keys off, not a directory-level proxy for it.
 3. Parse `previousContent` (guard against a malformed/absent file the same
    way — falls back to `[]`, never crashes) into a `docPath → sourceCaptureId`
    map.
@@ -91,8 +98,14 @@ Rejected alternatives:
 - *Detect "store unreachable" by checking whether `view.outcomes` is empty.*
   Rejected: an empty outcomes view is also the legitimate shape of a
   reachable-but-genuinely-empty store (CONTEXT.md's own pinned distinction)
-  — `fs.existsSync(dir)` is the only signal that actually distinguishes the
-  two, and it's already available with no new plumbing.
+  — only the log file's own existence distinguishes the two.
+- *Detect "store unreachable" via `fs.existsSync(dir)` on the whole `.fgos/`
+  directory.* Tried first, rejected at `fgos-validating`: caught live that
+  the directory can exist (holding only `main-checkout.lock`) while
+  `events.jsonl` inside it is absent — the exact condition this guard needs
+  to catch would have read as "reachable." `fs.existsSync(path.join(dir,
+  'events.jsonl'))` is the real signal, matching `readEvents`'s own
+  `ENOENT` check.
 - *Fix only the test (D2) and leave the generator's real behavior as today
   (D1's declined "keep current behavior" option).* Declined at the gate
   question already — restated here only as the alternative D1 rejected, not
@@ -103,7 +116,7 @@ Rejected alternatives:
 | Component | Risk | What would prove it |
 |---|---|---|
 | Reorder must not defeat write-only-if-changed: `nextContent` has to be computed from the merged entries, not the pre-merge ones | medium | A test where the store is reachable and content is genuinely unchanged from a prior run still results in NO write (existing idempotent-rerun test, still green, plus a new assertion that mtime/content is untouched) |
-| `fs.existsSync(dir)` is the correct, sufficient signal for "store unreachable" in this exact code path | medium | A test that runs `docs-index` with `--dir` pointing at a path that genuinely does not exist, asserts a docPath with a real prior on-disk id keeps that id | PASS/FAIL decided at `fgos-validating`, not here |
+| `fs.existsSync(path.join(dir, 'events.jsonl'))` is the correct, sufficient signal for "store unreachable" in this exact code path | medium | A test that runs `docs-index` with `--dir` pointing at a directory that exists but has no `events.jsonl` (the exact shape observed live: a worktree's `.fgos/` holding only `main-checkout.lock`), asserts a docPath with a real prior on-disk id keeps that id |
 | R7 (convergence) survives D1: running docs-index twice in a row under the SAME unreachable-store condition must not churn on the second run | medium | A test that runs `docs-index` twice with an unreachable store and asserts byte-identical manifest content and no second write (mtime unchanged) between run 1 and run 2 |
 | All 4 existing `runDocsIndex()`-based tests keep passing after D2's `--dir` addition, not just the one demo test | medium | `node --test test/report/enduser-index.test.mjs` stays at the pre-change baseline of 15 pass / 0 fail, all four integration tests included, none edited beyond the `--dir` plumbing |
 | First-ever run: no prior manifest file exists AND store is unreachable | low | A test asserts no crash and every entry's `sourceCaptureId` is `null` (nothing to preserve — matches the existing legitimate-null case, CONTEXT.md's own scope boundary) |
