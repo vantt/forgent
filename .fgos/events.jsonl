@@ -2464,3 +2464,5 @@
 {"seq":2464,"ts":"2026-07-31T00:39:05.945Z","type":"work.stage","payload":{"id":"tsk-4zg","from":"executing","to":"compound-learn","role":"human","writer":{"id":"ce58b2d7-67ce-4484-af14-9aa053588c82","source":"env"}},"v":3}
 {"seq":2465,"ts":"2026-07-31T00:40:15.834Z","type":"work.outcome","payload":{"id":"tsk-4zg","docType":"explanation","docPath":"docs/explanation/pure-fgos-state-items-cannot-close-through-return.md"},"v":3}
 {"seq":2466,"ts":"2026-07-31T00:40:20.237Z","type":"work.move","payload":{"id":"tsk-4zg","from":"awaiting-approval","to":"done","role":"human","writer":{"id":"ce58b2d7-67ce-4484-af14-9aa053588c82","source":"env"},"learning":{"outcome":null,"frictions":{},"settlements":{"close/human":1}}},"v":3}
+{"seq":2467,"ts":"2026-07-31T01:21:14.895Z","type":"work.stage","payload":{"id":"tsk-2br","from":"executing","to":"compound-learn","role":"human","writer":{"id":"7278d3da-569f-4ce8-adaa-da49ca099c97","source":"env"}},"v":3}
+{"seq":2468,"ts":"2026-07-31T01:21:14.915Z","type":"work.outcome","payload":{"id":"tsk-2br","docType":"explanation","docPath":"docs/explanation/tool-registry-capability-is-a-prose-contract-not-compiled-logic.md"},"v":3}
