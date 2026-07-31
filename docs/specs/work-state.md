@@ -635,6 +635,74 @@ ví dụ) — không phải toàn bộ sổ verb. Áp dụng ĐỒNG NHẤT cho 
   mã 0 — không bao giờ thoát ở phạm trù lỗi (mã 4) vì thiếu tham số bắt buộc,
   dù tham số đó có mặt hay không (per D3 str77-79-doc-gap-fixes / ea8b9a8d — RUL55).
 
+### Sổ đăng ký công cụ (tool registry) — hai chiều, tách chuẩn "đăng ký" khỏi "đang hiện diện"
+
+Cổng vào cho một mảnh distillery đã porting (tsk-1dj, ported từ
+repository-harness's tool-registry-capability — xem
+`docs/distillery/deep-dives/tool-registry.md`): một registry hai chiều —
+project **đăng ký** công cụ (tool) nào phục vụ **capability** (nhãn tự do,
+chuẩn hóa kebab-case) nào, rồi bất kỳ bước nào cần capability đó **hỏi**
+registry thay vì hardcode tên tool cụ thể ("core consults capabilities,
+never tools" — US-027, ported nguyên vẹn).
+
+- `view.tools` (bản chiếu, gộp từ hai sự kiện mới `tool.register`/
+  `tool.remove` cùng cơ chế fold sẵn có — không store riêng, không schema
+  SQL riêng): `{ [name]: { name, kind, capability, command, scanTarget?,
+  responsibility?, description? } }`. `kind` ∈ `cli|binary|mcp|skill|http`
+  — quyết định `tool check` probe bằng cách nào (PATH cho cli/binary; quét
+  `scanTarget` trên đĩa cho mcp/skill — hai kind này vốn không nằm trên
+  PATH; TCP probe ngắn cho http). `capability` LUÔN chuẩn hóa kebab-case
+  lúc `register` (nhiều cách viết cùng gộp về một chuỗi).
+- **`register`/`remove` là quyết định TEAM** — qua `.fgos/events.jsonl`
+  như mọi sự kiện khác, cùng cửa ghi CTR002, `view.tools` fold y hệt
+  `view.work` fold từ `work.add`/`work.move`.
+- **`check`'s kết quả (`status`, `checkedAt`) là SỰ THẬT VỀ MÁY NÀY, không
+  phải quyết định team** — KHÔNG qua event-log. Ghi vào một file cục bộ
+  gitignored riêng, `.fgos/tool-status.local.json` (đặt cạnh
+  `events.jsonl`, không phải trong nó) — cùng tinh thần "trạng thái máy
+  này tách khỏi cấu hình được chia sẻ" mà `.fgos/sessions.json`/
+  `.fgos/*.lock` đã theo trong `.gitignore`. `tool check` LUÔN thoát mã 0
+  — thiếu tool là một sự thật cần báo cáo, không phải lỗi CLI ("absent
+  capability = clean skip, never a failure" — nguyên tắc lõi item này
+  port qua).
+- **Đọc gộp lúc `query`:** `view.tools` (đăng ký) overlay file cục bộ
+  (trạng thái máy này). Một tool đã đăng ký nhưng CHƯA từng `check` trên
+  máy này đọc là `unknown` — KHÔNG BAO GIỜ là `missing` (`missing` nghĩa
+  là đã probe và không thấy). Đây là phân biệt cốt lõi của US-027: "chưa
+  đăng ký" (vô hại, `inactive`) khác hẳn "đăng ký rồi mà probe ra
+  missing/unknown" (gap thật, `degraded`).
+
+### Đăng ký/gỡ/probe/hỏi công cụ (tool register / check / query / remove)
+
+- **Runs when:** người/agent gọi `fgos tool <register|check|query|remove>
+  ...`.
+- **Blocked when:** `register` — thiếu `--name`/`--kind`/`--capability`/
+  `--command`, `--kind` ngoài `cli|binary|mcp|skill|http`, `--capability`
+  chuẩn hóa ra rỗng, hoặc `--kind mcp|skill` thiếu `--scan` (hai kind này
+  không nằm trên PATH) — tất cả `validation`; `--name` đã tồn tại —
+  `validation`. `remove` — `--name` chưa từng đăng ký — `validation`.
+  `check --name x` — `x` chưa đăng ký — `validation`. `check`/`query`
+  không có điều kiện chặn nào khác — `check` LUÔN thoát 0 kể cả khi mọi
+  tool được probe đều `missing`.
+- **What changes:** `register` — một sự kiện `tool.register` (bản ghi ĐẦY
+  ĐỦ, ghi đè theo `name` — không có `tool.edit`, đăng ký lại một `name` đã
+  gỡ là một `tool.register` mới, sạch). `remove` — một sự kiện
+  `tool.remove` (xóa hẳn key khỏi `view.tools`, không phải tombstone).
+  `check` — KHÔNG sự kiện nào; ghi đè các entry được probe trong
+  `.fgos/tool-status.local.json` (entry của tool không nằm trong lượt
+  probe này, vd gọi kèm `--name`, giữ nguyên). `query` — không gì, đọc
+  thuần.
+- **Side effects:** `check` gọi `command -v`-tương-đương qua PATH thật
+  (cli/binary) hoặc mở một kết nối TCP ngắn thật (http) — không mock.
+- **Afterwards:** `query --capability X [--status present]` trả về TẬP
+  provider (nhiều tool cùng phục vụ một capability, bổ sung lẫn nhau —
+  không loại trừ), mỗi provider kèm `status` đã gộp overlay cục bộ. Bất kỳ
+  bước nào (skill/AGENTS.md của một project khác) muốn "hỏi trước khi làm
+  X" tự chèn câu gọi `query` vào đúng chỗ cần — injection là hợp đồng văn
+  xuôi (prose contract), KHÔNG có hook cấu trúc nào tự động gọi `query` hộ
+  (phát hiện cốt lõi của deep-dive: ngay cả repository-harness, nơi sinh
+  ra cơ chế này, cũng không tự động hóa bước đó).
+
 ## Behaviors & Operations
 
 ### Khởi tạo (init)
