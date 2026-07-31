@@ -29,11 +29,17 @@ function checkById(id) {
 
 // ─── Unit tests: DOCTOR_CHECKS ─────────────────────────────────────────────
 
-test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-checkout-hook-wired', () => {
+test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-checkout-hook-wired and tool-registry-configured', () => {
   assert.deepEqual(
     DOCTOR_CHECKS.map((c) => c.id).sort(),
-    ['config-not-stale', 'main-checkout-hook-wired', 'node-version-and-git', 'shell-integration-sourced'].sort(),
+    ['config-not-stale', 'main-checkout-hook-wired', 'node-version-and-git', 'shell-integration-sourced', 'tool-registry-configured'].sort(),
   );
+});
+
+test('tool-registry-configured always passes — inactive is a clean skip, never a failure', () => {
+  const { passed, message } = checkById('tool-registry-configured').check(process.cwd());
+  assert.equal(passed, true);
+  assert.equal(typeof message, 'string');
 });
 
 test('node-version-and-git passes under the current process (real Node, real git)', () => {
