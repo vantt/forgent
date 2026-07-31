@@ -107,12 +107,19 @@ test('rankImpact is deterministic: same view always yields the same ordered outp
   assert.deepEqual(rankImpact(view), rankImpact(view));
 });
 
-test('rankImpact emits every human-facing field: id, title, status, blocks, blockedBy, stage, goalTier, componentId, componentSize, isIsolated', () => {
+test('rankImpact emits every human-facing field: id, title, status, blocks, blockedBy, stage, goalTier, priority, componentId, componentSize, isIsolated', () => {
   const view = { work: { a: item('a', 'blocked', []) } };
   assert.deepEqual(rankImpact(view), [{
     id: 'a', title: 'title-a', status: 'blocked', blocks: 0, blockedBy: [],
-    stage: 'executing', goalTier: null, componentId: 0, componentSize: 1, isIsolated: true,
+    stage: 'executing', goalTier: null, priority: null, componentId: 0, componentSize: 1, isIsolated: true,
   }]);
+});
+
+test('rankImpact reads priority as-is when the item carries one, null when absent', () => {
+  const view = { work: { a: item('a', 'todo', [], { priority: 2 }), b: item('b', 'todo') } };
+  const [aRow, bRow] = rankImpact(view).sort((x, y) => (x.id < y.id ? -1 : 1));
+  assert.equal(aRow.priority, 2);
+  assert.equal(bRow.priority, null);
 });
 
 test('rankImpact reads stage as-is when the item carries one, defaulting to executing when absent', () => {
@@ -327,7 +334,7 @@ test('rankImpact({includeDone: true}) always gives a wontfix row blocks:0, compo
   const [closedRow] = rankImpact(view, { includeDone: true }).filter((r) => r.id === 'closed');
   assert.deepEqual(closedRow, {
     id: 'closed', title: 'title-closed', status: 'wontfix', blocks: 0, blockedBy: [],
-    stage: 'executing', goalTier: null, componentId: null, componentSize: 0, isIsolated: true,
+    stage: 'executing', goalTier: null, priority: null, componentId: null, componentSize: 0, isIsolated: true,
   });
 });
 
@@ -342,7 +349,7 @@ test('rankImpact({includeDone: true}) always gives a done row blocks:0, componen
   const [doneRow] = rankImpact(view, { includeDone: true }).filter((r) => r.id === 'finished');
   assert.deepEqual(doneRow, {
     id: 'finished', title: 'title-finished', status: 'done', blocks: 0, blockedBy: [],
-    stage: 'executing', goalTier: null, componentId: null, componentSize: 0, isIsolated: true,
+    stage: 'executing', goalTier: null, priority: null, componentId: null, componentSize: 0, isIsolated: true,
   });
 });
 

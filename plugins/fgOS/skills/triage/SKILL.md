@@ -58,7 +58,7 @@ read never appends an event).
 3. **Report as a table and stop.** Render every row from `data`, in the
    order given (do not re-sort), as a markdown table with exactly these
    columns, in this order: **id**, **status**, **stage**, **blocked-by**,
-   **blocks**, **tier**, **title**.
+   **blocks**, **tier**, **priority**, **title**.
    - `status` is the item's raw status (`todo` | `doing` | `blocked` |
      `awaiting-human` | `awaiting-approval` | `done`), rendered as-is.
    - `stage` (`clarify` | `decompose` | `executing` | `compound-learn`) is
@@ -75,6 +75,12 @@ read never appends an event).
    - `tier` renders `goalTier`, optional (`mvp` | `milestone`) — an item
      with no declared tier is a plain work-item; render its cell as `-`,
      not blank or "undefined".
+   - `priority` renders `priority` — the human/agent-set frontier field
+     (`fgos edit --priority`), a non-negative integer, ascending (lower
+     number = higher priority). It never drives this ranking's own sort
+     order — the ranking stays blocking-fan-out first, as described in step
+     2. An item with no explicit priority renders its cell as `-`, not
+     blank, `0`, or "undefined" — never confuse absent with priority 0.
 
    If `data` is empty, say so plainly — an empty result is valid (nothing
    open right now, or nothing at all with `--all`), not a failure.
