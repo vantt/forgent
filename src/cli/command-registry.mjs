@@ -79,6 +79,7 @@ export const COMMAND_REGISTRY = [
         domain: { type: 'string', description: 'Optional domain; omit to use the store default.' },
         footprint: { type: 'string', description: 'Optional comma-separated list of file paths this item is expected to touch (advisory only).', multiValueFormat: 'csv' },
         'discovered-from': { type: 'string', description: 'Optional id of the item this one was discovered from (provenance, not a dependency).' },
+        parent: { type: 'string', description: 'Optional id of the item this one is a decomposed child of (lineage, not a dependency); omit to leave unset.' },
         'docs-ref': { type: 'string', description: 'Optional relative path to this item\'s docs/history/<feature>/ directory (its own CONTEXT.md/plan.md).' },
         acceptance: { type: 'string', description: 'Optional JSON-encoded array of {text, evidence} Condition-of-Satisfaction clauses (NOT comma-separated — clause text may contain commas).', multiValueFormat: 'json-array' },
         'goal-tier': { type: 'string', description: "Optional goal tier ('mvp' or 'milestone'); omit to leave unset (not a goal)." },
@@ -190,7 +191,7 @@ export const COMMAND_REGISTRY = [
   {
     name: 'edit',
     invoke: 'fgos edit',
-    description: 'Patch fields on an existing item (title/kind/risk/verify/tier/refs/deps/acceptance/priority/intent/docs-ref). At least one field must be given.',
+    description: 'Patch fields on an existing item (title/kind/risk/verify/tier/refs/deps/acceptance/priority/intent/docs-ref/parent). At least one field must be given.',
     parameters: {
       type: 'object',
       properties: {
@@ -202,6 +203,7 @@ export const COMMAND_REGISTRY = [
         tier: { type: 'string', description: 'New tier.' },
         refs: { type: 'string', description: 'Comma-separated list of reference ids/links (empty string clears the field).', multiValueFormat: 'csv' },
         deps: { type: 'string', description: 'Comma-separated list of dependency ids (empty string clears the field).', multiValueFormat: 'csv' },
+        parent: { type: 'string', description: 'New lineage parent id (empty string "" clears the field, un-parenting the item).' },
         acceptance: { type: 'string', description: 'Optional JSON-encoded array of {text, evidence} Condition-of-Satisfaction clauses — replaces the whole array (empty array "[]" clears the field). NOT comma-separated — clause text may contain commas.', multiValueFormat: 'json-array' },
         priority: { type: 'integer', description: 'New priority: a non-negative integer, ascending sort (lower = higher priority). Absent stays absent — items without a priority sort after every item that has one.' },
         intent: { type: 'integer', description: 'New intent score: any integer, descending sort (higher = more urgent). Absent stays absent — items without an intent sort after every item that has one.' },

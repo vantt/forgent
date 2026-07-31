@@ -190,7 +190,7 @@ export function addWork(dir, work) {
 // write path (identity is immutable; `status` is `move`'s; `stage` is
 // `moveStage`'s) and mixing them into `edit` would open a second door onto
 // the same field.
-const EDITABLE_FIELDS = new Set(['title', 'kind', 'risk', 'verify', 'tier', 'refs', 'deps', 'acceptance', 'priority', 'intent', 'docsRef']);
+const EDITABLE_FIELDS = new Set(['title', 'kind', 'risk', 'verify', 'tier', 'refs', 'deps', 'acceptance', 'priority', 'intent', 'docsRef', 'parent']);
 
 /**
  * Patch fields on an existing work item, through the SAME single write door
@@ -249,10 +249,14 @@ export function editWork(dir, { id, patch, role } = {}) {
     // through, since validateDeps only checks existence, never acyclicity — and
     // it keeps the S1 "dependency cycle" message for that pure-deps case. Then
     // the UNIFIED check (S2a, record 0012) catches a cycle that a `parent` edge
-    // participates in: `parent` is NOT editable, so an edit closes such a cycle
-    // only by patching `deps` into a loop against a parent edge fixed at add
-    // time (a MIXED cycle the deps-only walk cannot see), reported as a "graph
-    // cycle". Same validation/exit-4 contract; no schema change (R11).
+    // participates in — now including a cycle closed by a `parent` patch
+    // itself (parent-flag-cli D1): `assertNoUnifiedCycle` revalidates the
+    // whole merged candidate unconditionally, so allowing `parent` into
+    // EDITABLE_FIELDS needed no new guard code, only the new allowed key.
+    // Both the deps-patch-against-a-fixed-parent-edge case (the original gap)
+    // and the parent-patch-itself case are caught by this one call, reported
+    // as a "graph cycle". Same validation/exit-4 contract; no schema change
+    // (R11).
     assertNoCycle(candidate, before.work);
     assertNoUnifiedCycle(candidate, before.work);
 

@@ -720,6 +720,69 @@ test('edit omitting --refs/--deps leaves the field untouched; an explicit empty 
   assert.deepEqual(stateView(cwd).work['edit-refs'].refs, []);
 });
 
+// parent-flag-cli D1/D2: --parent on add/edit was a CLI gap — the field
+// existed and was validated (work.mjs) and cycle-guarded (store.mjs) since
+// record 0012, but no sanctioned CLI door could ever set it. `fgos-planning`
+// SKILL.md step 5 assumed this door already existed.
+
+test('add --parent sets lineage; omitting --parent leaves it unset', () => {
+  const cwd = tmpCwd();
+  assert.equal(addOk(cwd, 'parent-root').status, 0);
+
+  const withParent = run(cwd, ['add', 'parent-child', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--parent', 'parent-root']);
+  assert.equal(withParent.status, 0);
+  assert.equal(stateView(cwd).work['parent-child'].parent, 'parent-root');
+
+  assert.equal(addOk(cwd, 'parent-none').status, 0);
+  assert.equal(stateView(cwd).work['parent-none'].parent, undefined);
+});
+
+test('add --parent "" (bare, no value) is rejected as a valueless flag, same as add --discovered-from', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['add', 'parent-bad', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--parent']);
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /--parent requires a non-empty id/);
+});
+
+test('edit omitting --parent leaves it untouched; an explicit --parent sets it; --parent "" clears it', () => {
+  const cwd = tmpCwd();
+  assert.equal(addOk(cwd, 'parent-edit-root').status, 0);
+  assert.equal(addOk(cwd, 'parent-edit-child').status, 0);
+  assert.equal(stateView(cwd).work['parent-edit-child'].parent, undefined);
+
+  const untouched = run(cwd, ['edit', 'parent-edit-child', '--risk', 'high']);
+  assert.equal(untouched.status, 0);
+  assert.equal(stateView(cwd).work['parent-edit-child'].parent, undefined);
+
+  const setParent = run(cwd, ['edit', 'parent-edit-child', '--parent', 'parent-edit-root']);
+  assert.equal(setParent.status, 0);
+  assert.equal(stateView(cwd).work['parent-edit-child'].parent, 'parent-edit-root');
+
+  const cleared = run(cwd, ['edit', 'parent-edit-child', '--parent', '']);
+  assert.equal(cleared.status, 0);
+  assert.equal(stateView(cwd).work['parent-edit-child'].parent, null);
+});
+
+test('edit --parent (bare, no value) is rejected as a valueless flag, distinct from --parent ""', () => {
+  const cwd = tmpCwd();
+  assert.equal(addOk(cwd, 'parent-edit-bad').status, 0);
+  const result = run(cwd, ['edit', 'parent-edit-bad', '--parent']);
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /--parent requires a value; use --parent "" to clear it/);
+});
+
+test('edit --parent closing a cycle is rejected at the CLI, same "graph cycle" message as the store-layer test', () => {
+  const cwd = tmpCwd();
+  assert.equal(addOk(cwd, 'parent-cycle-a').status, 0);
+  const withParent = run(cwd, ['add', 'parent-cycle-b', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--parent', 'parent-cycle-a']);
+  assert.equal(withParent.status, 0);
+
+  const result = run(cwd, ['edit', 'parent-cycle-a', '--parent', 'parent-cycle-b']);
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /would close a graph cycle/);
+  assert.equal(stateView(cwd).work['parent-cycle-a'].parent, undefined, 'the rejected patch never landed');
+});
+
 test('editWork rejects a patch containing id/status/stage/domain as validation, before merge, no event written', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'edit-store-locked');

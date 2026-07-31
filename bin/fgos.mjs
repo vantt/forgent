@@ -774,6 +774,13 @@ async function runVerb(verb, flags, positional, dir) {
         // the referenced id is deliberately never enforced here (work-graph-
         // intelligence-6, mirrors `parent`'s norm).
         discoveredFrom: optionalField(flags['discovered-from'], 'add --discovered-from requires a non-empty id; omit it to leave unset.'),
+        // parent-flag-cli D1/D2: --parent is an optional scalar lineage flag,
+        // same omitted-leaves-undefined shape as --discovered-from above
+        // (whose own comment already calls out mirroring `parent`'s norm).
+        // Existence of the referenced id is deliberately never enforced here
+        // — work.mjs's shape validation (non-empty, non-self-referencing) is
+        // the only guard, same as discoveredFrom.
+        parent: optionalField(flags.parent, 'add --parent requires a non-empty id; omit --parent entirely to leave unset.'),
         // Per work-graph-intelligence S9: --footprint is an optional list of
         // the file paths this item is expected to touch (feeds the
         // footprint-intersection advisory). Set ONLY when the flag is present
@@ -1004,6 +1011,21 @@ async function runVerb(verb, flags, positional, dir) {
       if (flags['docs-ref'] !== undefined) {
         patch.docsRef = optionalField(flags['docs-ref'], 'edit --docs-ref requires a non-empty path.');
       }
+      // parent-flag-cli D2: --parent "" CLEARS the field (un-parents the
+      // item), matching --refs ''/--deps '' above — but `parent` is a scalar,
+      // not a list, so the clear sentinel is `null` (the value work.mjs:255
+      // already treats as absent), not `[]`. Cannot reuse optionalField
+      // here (add's --parent does): optionalField's requireField rejects ''
+      // outright, which is correct for add (nothing to clear at creation)
+      // but wrong for edit's clear semantics. A bare --parent with no value
+      // (flags.parent === true) is the same valueless-flag error priority/
+      // intent guard against below, not a value to fold in.
+      if (flags.parent !== undefined) {
+        if (flags.parent === true) {
+          throw new StoreError('validation', '--parent requires a value; use --parent "" to clear it.');
+        }
+        patch.parent = flags.parent === '' ? null : flags.parent;
+      }
       // Priority/intent (per str7-str8-priority-intent D1/D3/D6): both are
       // numeric fields, unlike the string flags in the loop above, so each
       // gets its own coercion. parseArgs sets flags[field] = true (boolean)
@@ -1041,7 +1063,7 @@ async function runVerb(verb, flags, positional, dir) {
       if (Object.keys(patch).length === 0) {
         throw new StoreError(
           'validation',
-          'edit requires at least one field to change: --title/--kind/--risk/--verify/--tier/--refs/--deps/--acceptance/--priority/--intent/--docs-ref.',
+          'edit requires at least one field to change: --title/--kind/--risk/--verify/--tier/--refs/--deps/--acceptance/--priority/--intent/--docs-ref/--parent.',
         );
       }
       const { event } = editWork(dir, { id, patch, role: 'human' });
