@@ -787,6 +787,14 @@
     "quadrant": "how-to",
     "purpose": "Show the steps to accomplish one specific, already-understood goal.",
     "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/set-or-clear-a-work-items-parent-lineage-via-cli.md",
+    "title": "Set or clear a work item's `parent` lineage via CLI",
+    "sourceCaptureId": "tsk-1xx"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
     "docPath": "docs/how-to/smoke-test-fgos-executing-with-a-trivial-item.md",
     "title": "How to smoke-test fgos-executing with a trivial verify=true item",
     "sourceCaptureId": "str89-case-study-executing"
@@ -843,6 +851,14 @@
     "quadrant": "reference",
     "purpose": "Describe the machinery accurately and completely for lookup.",
     "audience": "A user who needs precise facts about a specific field/command/API.",
+    "docPath": "docs/reference/priority-formula-and-intent-retirement.md",
+    "title": "Work-item `priority`: calculated formula, and `intent`'s retirement",
+    "sourceCaptureId": "tsk-4y5"
+  },
+  {
+    "quadrant": "reference",
+    "purpose": "Describe the machinery accurately and completely for lookup.",
+    "audience": "A user who needs precise facts about a specific field/command/API.",
     "docPath": "docs/reference/rankimpact-sort-key-order.md",
     "title": "`rankImpact`'s real sort-key order",
     "sourceCaptureId": "tsk-4j9-2"
@@ -862,6 +878,14 @@
     "docPath": "docs/reference/triage-table-columns.md",
     "title": "`/fgOS:triage` table columns",
     "sourceCaptureId": "tsk-dus"
+  },
+  {
+    "quadrant": "reference",
+    "purpose": "Describe the machinery accurately and completely for lookup.",
+    "audience": "A user who needs precise facts about a specific field/command/API.",
+    "docPath": "docs/reference/work-item-pipeline-stages-verbs-and-handoffs.md",
+    "title": "Work-item pipeline: stages, verbs, actors, handoffs",
+    "sourceCaptureId": null
   },
   {
     "quadrant": "tutorials",
