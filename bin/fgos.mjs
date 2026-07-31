@@ -858,29 +858,47 @@ async function runVerb(verb, flags, positional, dir) {
       return submitWork(dir, text, opts);
     }
 
-    // The sync branch's entry point into context-discovery/chia-việc (per
-    // D5/stage-decompose D3): a live session runs the SAME engine the async
-    // runner sweep calls for whichever stage the item is currently sitting
-    // at — `resolveDiscovery` for `clarify`, `resolveDecompose` for
-    // `decompose` (D3's sync/async parity: identical trace either way, only
-    // the role differs). A clear discovery verdict moves the item to
-    // `decompose` (carrying a real verify, D10); chia-việc then either
-    // passes it through to `executing`, splits it into children, or parks it
-    // in `awaiting-human` (D3). The runner config (executor + tier models)
-    // is loaded the same way bin/fgos-runner.mjs loads it.
+    // The sync branch's entry point into context-discovery (tsk-2b0 D1: hard
+    // split, no fallback — this verb only ever wraps `resolveDiscovery`/
+    // `judgeDiscovery`, for an item at stage `clarify`). A live session runs
+    // the SAME engine the async runner sweep calls (RUL19). A clear verdict
+    // moves the item to `decompose` (carrying a real verify, D10); the
+    // sibling `decompose` verb below is what carries it the rest of the way.
+    // The runner config (executor + tier models) is loaded the same way
+    // bin/fgos-runner.mjs loads it.
     case 'discover': {
       const id = requireField(positional[0] ?? flags.id, 'discover requires an id: fgos discover <id> [--config <path>]');
+      const stage = listWork(dir).work[id]?.stage;
+      if (stage !== 'clarify') {
+        throw new StoreError('validation', `discover: work "${id}" is at stage "${stage}", not "clarify" -- use "fgos decompose ${id}" instead.`);
+      }
       // An explicit --config path stays a loud, unmodified failure on ENOENT
       // (loadRunnerConfig); only the default, unflagged path bootstraps a
       // missing config (D1/D3, ensureRunnerConfig).
       const cfg = flags.config
         ? loadRunnerConfig(flags.config)
         : ensureRunnerConfig(path.join(process.cwd(), '.fgos-runner.json'));
+      return resolveDiscovery(dir, id, cfg, 'session');
+    }
+
+    // The sync branch's entry point into chia-việc/split-work judgment
+    // (tsk-2b0 D1: hard split, no fallback — this verb only ever wraps
+    // `resolveDecompose`/`judgeDecompose`, for an item at stage
+    // `decompose`). A live session runs the SAME engine the async runner
+    // sweep calls (D3's sync/async parity: identical trace either way, only
+    // the role differs). `resolveDecompose` either passes the item through
+    // to `executing`, splits it into children, or parks it in
+    // `awaiting-human` (D3).
+    case 'decompose': {
+      const id = requireField(positional[0] ?? flags.id, 'decompose requires an id: fgos decompose <id> [--config <path>]');
       const stage = listWork(dir).work[id]?.stage;
-      const result = stage === 'decompose'
-        ? resolveDecompose(dir, id, cfg, 'session')
-        : resolveDiscovery(dir, id, cfg, 'session');
-      return result;
+      if (stage !== 'decompose') {
+        throw new StoreError('validation', `decompose: work "${id}" is at stage "${stage}", not "decompose" -- use "fgos discover ${id}" instead.`);
+      }
+      const cfg = flags.config
+        ? loadRunnerConfig(flags.config)
+        : ensureRunnerConfig(path.join(process.cwd(), '.fgos-runner.json'));
+      return resolveDecompose(dir, id, cfg, 'session');
     }
 
     case 'move': {
@@ -2733,7 +2751,7 @@ async function runVerb(verb, flags, positional, dir) {
     }
 
     default:
-      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <init|add|submit|discover|move|edit|ask|answer|decision|list|ready|rebuild|repair|check|rollup|take|return|review|approve|reject|catchup|evolve|triage|session|goal|tool|setup|doctor|unlock|lock-status> ...`);
+      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <init|add|submit|discover|decompose|move|edit|ask|answer|decision|list|ready|rebuild|repair|check|rollup|take|return|review|approve|reject|catchup|evolve|triage|session|goal|tool|setup|doctor|unlock|lock-status> ...`);
   }
 }
 

@@ -2,6 +2,11 @@
 
 CONTEXT.md: `docs/history/discover-decompose-verb-split/CONTEXT.md` (D1-D3).
 
+**Post-execution note:** `fgos-executing` found one live caller this
+plan's scout missed — `test/e2e/runner-loop.test.mjs` (a second `discover`
+call assuming decompose-stage dynamic dispatch, same pattern as the
+CLI-level test). Fixed in the same commit as the implementation, per D2.
+
 ## Mode gate
 
 Flags counted against the standard checklist:

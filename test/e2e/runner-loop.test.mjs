@@ -585,19 +585,20 @@ test('e2e S2-pull: submit pass-throughs 2 stages via discover, a human takes the
   const submitted = submit(repoRoot, 'Rename a single config key, take by hand');
   assert.equal(submitted.stage, 'clarify');
 
-  // Pass-through both stages via the SYNC session-role `discover` verb
-  // (mirrors the existing "discover called a second time" CLI test) — this
-  // never touches the runner's own dispatch loop, so once the item reaches
-  // stage executing it is left sitting at status todo: the exact frontier
-  // head a human `take` picks up next, never auto-dispatched to a worker.
+  // Pass-through both stages via the SYNC session-role `discover`/`decompose`
+  // verbs (tsk-2b0 D1: hard split, no fallback — mirrors the equivalent CLI
+  // test) — this never touches the runner's own dispatch loop, so once the
+  // item reaches stage executing it is left sitting at status todo: the
+  // exact frontier head a human `take` picks up next, never auto-dispatched
+  // to a worker.
   const firstDiscover = fgos(repoRoot, ['discover', submitted.id]);
   assert.equal(firstDiscover.status, 0, `first discover failed: ${firstDiscover.stderr}`);
   assert.equal(stateView(repoRoot).work[submitted.id].stage, 'decompose');
 
-  const secondDiscover = fgos(repoRoot, ['discover', submitted.id]);
-  assert.equal(secondDiscover.status, 0, `second discover failed: ${secondDiscover.stderr}`);
+  const decomposed = fgos(repoRoot, ['decompose', submitted.id]);
+  assert.equal(decomposed.status, 0, `decompose failed: ${decomposed.stderr}`);
   let view = stateView(repoRoot);
-  assert.equal(view.work[submitted.id].stage, 'executing', 'clarify->decompose->executing chained via discover alone');
+  assert.equal(view.work[submitted.id].stage, 'executing', 'clarify->decompose->executing chained via discover then decompose');
   assert.equal(view.work[submitted.id].status, 'todo', 'pass-through never dispatches — a human takes it next');
   assert.equal(view.work[submitted.id].verify, 'test -f pull-done.txt && echo PULL_OK');
 
