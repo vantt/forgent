@@ -804,6 +804,58 @@ test('add with no --priority/--intent leaves both fields absent (undefined), not
   assert.equal(item.intent, undefined);
 });
 
+// --- work-item-priority-matrix D2/D3/D5: --urgent (add + edit),
+// --impact/--effort (edit only) ---
+//
+// --urgent exists on BOTH `add` and `edit` (D2, human-entered at intake or
+// later); --impact/--effort exist ONLY on `edit` (D3/D5, computed fields --
+// no --impact/--effort equivalent on `add`'s parser wiring, same
+// established shape --priority/--intent already use above).
+
+test('add --urgent sets the item urgent field, exit 0', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['add', 'add-urgent', '--title', 'Add urgent', '--kind', 'task', '--risk', 'light', '--verify', 'npm test', '--urgent', 'high']);
+  assert.equal(result.status, 0);
+  assert.equal(stateView(cwd).work['add-urgent'].urgent, 'high');
+});
+
+test('add with no --urgent leaves the field absent (undefined), not a default of medium', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'add-no-urgent');
+  assert.equal(stateView(cwd).work['add-no-urgent'].urgent, undefined);
+});
+
+test('edit --urgent/--impact/--effort set the item fields to the given values, exit 0', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'edit-priority-matrix');
+  const result = run(cwd, ['edit', 'edit-priority-matrix', '--urgent', 'critical', '--impact', '12.5', '--effort', '3']);
+  assert.equal(result.status, 0);
+  const item = stateView(cwd).work['edit-priority-matrix'];
+  assert.equal(item.urgent, 'critical');
+  assert.equal(item.impact, 12.5);
+  assert.equal(item.effort, 3);
+});
+
+const EDIT_PRIORITY_MATRIX_BAD_FLAG_CASES = [
+  ['an out-of-domain --urgent', ['--urgent', 'extreme'], 'urgent'],
+  ['a negative --impact', ['--impact', '-1'], 'impact'],
+  ['a bare --impact (no following value)', ['--impact'], 'impact'],
+  ['a non-numeric --effort', ['--effort', 'notanumber'], 'effort'],
+  ['a bare --effort (no following value)', ['--effort'], 'effort'],
+];
+
+for (const [label, badFlagArgs, fieldName] of EDIT_PRIORITY_MATRIX_BAD_FLAG_CASES) {
+  test(`edit with ${label} is rejected as validation, exit 4, no event written, field left unset`, () => {
+    const cwd = tmpCwd();
+    addOk(cwd, 'edit-priority-matrix-bad-flag');
+    const before = eventLines(cwd).length;
+    const result = run(cwd, ['edit', 'edit-priority-matrix-bad-flag', ...badFlagArgs]);
+    assert.equal(result.status, 4);
+    assert.equal(eventLines(cwd).length, before);
+    assert.equal(stateView(cwd).work['edit-priority-matrix-bad-flag'][fieldName], undefined);
+  });
+}
+
 test('decision logs one event and appears in the view, exit 0', () => {
   const cwd = tmpCwd();
   run(cwd, ['init']);

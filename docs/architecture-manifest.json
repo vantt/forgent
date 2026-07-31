@@ -40,6 +40,7 @@
     "src/state/porting.mjs": "domain",
     "src/state/frontier.mjs": "domain",
     "src/state/impact.mjs": "domain",
+    "src/state/priority-formula.mjs": "domain",
     "src/state/stage.mjs": "domain",
     "src/state/replay.mjs": "domain",
     "src/state/dep-graph.mjs": "domain",

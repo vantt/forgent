@@ -30,6 +30,7 @@ import { DEFAULTS } from '../state/work.mjs';
 import { listWork, moveStage, addDiscovery, addDecision, putInAwaiting, editWork, StoreError } from '../state/store.mjs';
 import { graphMetrics } from '../state/graph-metrics.mjs';
 import { rankImpact } from '../state/impact.mjs';
+import { computeImpact, computePriority } from '../state/priority-formula.mjs';
 
 const DEFAULT_UNCLEAR_QUESTION =
   'Không phán được rõ ràng — cần người xác nhận thủ công.';
@@ -58,11 +59,18 @@ export const FALLBACK_VERIFY = 'chưa xác định — bổ sung thủ công';
 // over the same view the judge already has. Only called when `view` is
 // truthy (see the call site's guard) since graphMetrics(view) hashes the view
 // internally and throws on undefined.
+// work-item-priority-matrix D3: pulled out of buildGraphContextBlock so
+// resolveDiscovery can read the same real number the prompt's prose cites,
+// instead of re-deriving it or trusting the model to echo it back.
+function blocksForItem(work, view) {
+  const ranked = rankImpact(view);
+  const entry = ranked.find((r) => r.id === work.id);
+  return entry ? entry.blocks : 0;
+}
+
 function buildGraphContextBlock(work, view) {
   const metrics = graphMetrics(view);
-  const ranked = rankImpact(view);
-  const impactEntry = ranked.find((r) => r.id === work.id);
-  const blocks = impactEntry ? impactEntry.blocks : 0;
+  const blocks = blocksForItem(work, view);
   const isStaleBlocked = metrics.staleBlocked.some((entry) => entry.id === work.id);
   const component = metrics.components.find((c) => c.items.includes(work.id));
   const componentSize = component ? component.size : 1;
@@ -104,8 +112,9 @@ function buildDiscoveryPrompt(work, view) {
         .join('\n')
     : '(chưa phán lần nào)';
 
-  // STR8 (D4): mechanical graph/impact context for the judge's intentScore —
-  // read-only, never re-derived by the model. `view` is documented-optional
+  // work-item-priority-matrix D3 (was STR8 D4's intentScore): mechanical
+  // graph/impact context for the judge's impactScore — read-only, never
+  // re-derived by the model. `view` is documented-optional
   // above (P30 backward-compat, old 2-arg callers pass none); graphMetrics
   // throws on an undefined view (it hashes the view internally), so this
   // follows the exact same guard-on-`view`-truthiness idiom `qa`/`history`
@@ -141,14 +150,15 @@ một \`verify\` chạy được thật.
 # Câu hỏi
 Item này đã đủ rõ để thi công chưa? Nếu đủ, đề xuất một lệnh \`verify\` chạy
 được thật để chứng minh việc đã xong. Nếu chưa đủ, nêu MỘT câu hỏi cụ thể cần
-người trả lời để làm rõ. Ngoài ra, dựa trên ngữ cảnh đồ thị ở trên, ước lượng
-mức độ khẩn cấp của item này bằng một số nguyên intentScore từ 0 đến 100
-(0 = không gấp, 100 = cực gấp/nên làm ngay) — trường này TÙY CHỌN, không ảnh
-hưởng đến quyết định clear/unclear.
+người trả lời để làm rõ. Ngoài ra, ƯỚC LƯỢNG (không tính lại số \`blocks\` đã
+cho ở trên) mức độ item này LIÊN QUAN tới feature/release khác — có giải
+quyết/mở khoá được gì ngoài phạm vi hẹp của chính nó không — bằng một số
+nguyên impactScore từ 0 đến 100 (0 = biệt lập, 100 = ảnh hưởng rất rộng);
+trường này TÙY CHỌN, không ảnh hưởng đến quyết định clear/unclear.
 
 # Định dạng trả lời
 Trả lời DUY NHẤT bằng một dòng JSON, không kèm chữ nào khác:
-{"clear": boolean, "question": string (chỉ khi clear=false), "verify": string (chỉ khi clear=true), "intentScore": number nguyên từ 0 đến 100 (tùy chọn)}
+{"clear": boolean, "question": string (chỉ khi clear=false), "verify": string (chỉ khi clear=true), "impactScore": number nguyên từ 0 đến 100 (tùy chọn)}
 `;
 }
 
@@ -179,11 +189,12 @@ export function judgeDiscovery(work, cfg, view) {
       return { clear: false, question: DEFAULT_UNCLEAR_QUESTION };
     }
 
-    // STR8 (D4): intentScore rides on EITHER outcome — it never gates or
-    // changes the clear/unclear decision. An invalid/missing value is
-    // silently omitted (fail-safe discipline, same as `verify`/`question`
-    // above), never thrown, on both return sites below.
-    const intentScore = Number.isInteger(verdict.intentScore) ? verdict.intentScore : undefined;
+    // work-item-priority-matrix D3 (was STR8 D4's intentScore): rides on
+    // EITHER outcome — it never gates or changes the clear/unclear
+    // decision. An invalid/missing value is silently omitted (fail-safe
+    // discipline, same as `verify`/`question` above), never thrown, on
+    // both return sites below.
+    const impactScore = Number.isInteger(verdict.impactScore) ? verdict.impactScore : undefined;
 
     if (!verdict.clear) {
       const question =
@@ -191,8 +202,8 @@ export function judgeDiscovery(work, cfg, view) {
           ? verdict.question
           : DEFAULT_UNCLEAR_QUESTION;
       const out = { clear: false, question };
-      if (intentScore !== undefined) {
-        out.intentScore = intentScore;
+      if (impactScore !== undefined) {
+        out.impactScore = impactScore;
       }
       return out;
     }
@@ -201,8 +212,8 @@ export function judgeDiscovery(work, cfg, view) {
     if (typeof verdict.verify === 'string' && verdict.verify.trim()) {
       out.verify = verdict.verify;
     }
-    if (intentScore !== undefined) {
-      out.intentScore = intentScore;
+    if (impactScore !== undefined) {
+      out.impactScore = impactScore;
     }
     return out;
   } catch {
@@ -277,20 +288,28 @@ export function resolveDiscovery(dir, id, cfg, role) {
   const verdict = judgeDiscovery(work, cfg, view);
   addDiscovery(dir, { id, ...verdict });
 
-  // STR8 (D4): a SECOND standard-door write, never merged into moveStage's or
-  // putInAwaiting's payload below — intent is scored on EITHER outcome (an
-  // unclear verdict still gets scored if the judge produced one; the item
-  // just doesn't advance stage). Wrapped in its own try/catch so a write-door
-  // rejection (e.g. a legacy item shape editWork's validateWork rejects)
-  // never aborts the clarify/unclear resolution that follows — same
-  // file-level fail-safe discipline this module's header states for
+  // work-item-priority-matrix D6/D7 (was STR8 D4's intentScore -> work.intent):
+  // a SECOND standard-door write, never merged into moveStage's or
+  // putInAwaiting's payload below — scored on EITHER outcome (an unclear
+  // verdict still gets scored if the judge produced one; the item just
+  // doesn't advance stage). D7: `intent` is retired IN PLACE — this is the
+  // rough clarify-stage pass computing `priority` instead (effort is not
+  // yet known here, so it defaults to EFFORT_FLOOR inside computePriority;
+  // `decompose`'s refined pass recomputes once effort/blast-radius are
+  // known, per plan.md Phase B). Wrapped in its own try/catch so a
+  // write-door rejection (e.g. a legacy item shape editWork's validateWork
+  // rejects) never aborts the clarify/unclear resolution that follows —
+  // same file-level fail-safe discipline this module's header states for
   // judgeDiscovery itself.
-  if (Number.isInteger(verdict.intentScore)) {
-    try {
-      editWork(dir, { id, patch: { intent: verdict.intentScore }, role });
-    } catch {
-      // Swallowed intentionally — see comment above.
-    }
+  try {
+    const impact = computeImpact({
+      blocks: blocksForItem(work, view),
+      semanticRelatedness: Number.isInteger(verdict.impactScore) ? verdict.impactScore : 0,
+    });
+    const priority = computePriority({ impact, urgent: work.urgent, risk: work.risk });
+    editWork(dir, { id, patch: { priority }, role });
+  } catch {
+    // Swallowed intentionally — see comment above.
   }
 
   if (verdict.clear) {

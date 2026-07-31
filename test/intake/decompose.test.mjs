@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { judgeDecompose, resolveDecompose } from '../../src/intake/decompose.mjs';
+import { computeImpact, computePriority, effortForMode } from '../../src/state/priority-formula.mjs';
 import { addWork, listWork, StoreError, categoryOf, moveWork, readRawEvents } from '../../src/state/store.mjs';
 
 // Fake executors only — every "command" spawned here is a node script this
@@ -141,6 +142,45 @@ test('judgeDecompose returns pass-through when the model says the item is simple
   const cfg = cfgFor([scriptPath, '{prompt}']);
   const verdict = judgeDecompose(sampleWork(), cfg);
   assert.deepEqual(verdict, { kind: 'pass-through' });
+});
+
+// --- work-item-priority-matrix D5/D8: mode/blastRadius ride on every
+// non-invalid outcome, same "never gates the decision" discipline as
+// reason/children above. ------------------------------------------------
+
+test('judgeDecompose includes a recognized mode and a valid blastRadius on a pass-through verdict', () => {
+  const dir = mkTempDir();
+  const scriptPath = writeVerdictExecutor(dir, { verdict: 'pass-through', mode: 'standard', blastRadius: 5 });
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+  const verdict = judgeDecompose(sampleWork(), cfg);
+  assert.deepEqual(verdict, { kind: 'pass-through', mode: 'standard', blastRadius: 5 });
+});
+
+test('judgeDecompose omits an unrecognized mode string but keeps a valid blastRadius', () => {
+  const dir = mkTempDir();
+  const scriptPath = writeVerdictExecutor(dir, { verdict: 'pass-through', mode: 'gigantic', blastRadius: 3 });
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+  const verdict = judgeDecompose(sampleWork(), cfg);
+  assert.deepEqual(verdict, { kind: 'pass-through', blastRadius: 3 });
+});
+
+test('judgeDecompose omits a negative or non-numeric blastRadius but keeps a valid mode', () => {
+  for (const blastRadius of [-1, 'nine', null, NaN]) {
+    const dir = mkTempDir();
+    const scriptPath = writeVerdictExecutor(dir, { verdict: 'pass-through', mode: 'tiny', blastRadius });
+    const cfg = cfgFor([scriptPath, '{prompt}']);
+    const verdict = judgeDecompose(sampleWork(), cfg);
+    assert.deepEqual(verdict, { kind: 'pass-through', mode: 'tiny' });
+  }
+});
+
+test('judgeDecompose omits both mode and blastRadius (never throws) when the model supplies neither', () => {
+  const dir = mkTempDir();
+  const scriptPath = writeVerdictExecutor(dir, { verdict: 'pass-through' });
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+  const verdict = judgeDecompose(sampleWork(), cfg);
+  assert.equal('mode' in verdict, false);
+  assert.equal('blastRadius' in verdict, false);
 });
 
 test('judgeDecompose returns decompose with normalized children including resolved sibling deps', () => {
@@ -382,6 +422,67 @@ test('resolveDecompose on a pass-through verdict moves the item straight to exec
   const view = listWork(storeDir);
   assert.equal(view.work['item-x'].stage, 'executing');
   assert.equal(view.work['item-x'].verify, 'npm test -- reporting');
+});
+
+// --- work-item-priority-matrix D6/D8: the refined pass writes `priority`
+// on the root using real `mode`/`blastRadius` when the judge supplies them,
+// same as discovery.mjs's rough pass but with EFFORT_FLOOR replaced by the
+// judge-read mode. Expected values derived from computeImpact/
+// computePriority directly, not hand-duplicated arithmetic. ------------
+
+test('resolveDecompose writes a refined priority using mode/blastRadius when the judge supplies them', () => {
+  const scriptDir = mkTempDir();
+  const scriptPath = writeVerdictExecutor(scriptDir, { verdict: 'pass-through', mode: 'high-risk', blastRadius: 9 });
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  const work = sampleWork();
+  addWork(storeDir, work);
+
+  resolveDecompose(storeDir, 'item-x', cfg, 'runner');
+  const view = listWork(storeDir);
+  const expected = computePriority({
+    impact: computeImpact({ blocks: 0, blastRadius: 9 }),
+    urgent: work.urgent,
+    effort: effortForMode('high-risk'),
+    risk: work.risk,
+    blastRadius: 9,
+  });
+  assert.equal(view.work['item-x'].priority, expected);
+});
+
+test('resolveDecompose still computes a priority (EFFORT_FLOOR default) when the judge supplies neither mode nor blastRadius', () => {
+  const scriptDir = mkTempDir();
+  const scriptPath = writeVerdictExecutor(scriptDir, { verdict: 'pass-through' });
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  const work = sampleWork();
+  addWork(storeDir, work);
+
+  resolveDecompose(storeDir, 'item-x', cfg, 'runner');
+  const view = listWork(storeDir);
+  const expected = computePriority({
+    impact: computeImpact({ blocks: 0 }),
+    urgent: work.urgent,
+    risk: work.risk,
+  });
+  assert.equal(view.work['item-x'].priority, expected);
+});
+
+test('resolveDecompose ignores an unrecognized mode string from the judge (falls back to EFFORT_FLOOR, never throws)', () => {
+  const scriptDir = mkTempDir();
+  const scriptPath = writeVerdictExecutor(scriptDir, { verdict: 'pass-through', mode: 'not-a-real-mode' });
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  const work = sampleWork();
+  addWork(storeDir, work);
+
+  assert.doesNotThrow(() => resolveDecompose(storeDir, 'item-x', cfg, 'runner'));
+  const view = listWork(storeDir);
+  const expected = computePriority({ impact: computeImpact({ blocks: 0 }), urgent: work.urgent, risk: work.risk });
+  assert.equal(view.work['item-x'].priority, expected);
 });
 
 // claim-lock §3b: a pick claim held through clarify/decompose (status
@@ -769,6 +870,88 @@ test('resolveDecompose does NOT release the risk-heavy gate on a stale/unrelated
   assert.equal(result.outcome, 'need-human', 'an unrelated prior answer must not bypass the heavy-risk gate');
   const view = listWork(storeDir);
   assert.equal(view.work['item-x'].stage, 'decompose');
+});
+
+// --- work-item-priority-matrix D4/D8, Phase C: blast-radius is an
+// INDEPENDENT gate alongside the keyword-risk gate -- either can force
+// need-human, neither ever loosens the other. --------------------------
+
+test('resolveDecompose routes a keyword-LIGHT root through the human gate when blastRadius is over threshold (capability signal adds caution, never skipped)', () => {
+  const scriptDir = mkTempDir();
+  const scriptPath = writeVerdictExecutor(scriptDir, { verdict: 'pass-through', blastRadius: 25 });
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork({ risk: 'light' }));
+
+  const result = resolveDecompose(storeDir, 'item-x', cfg, 'runner');
+  assert.equal(result.outcome, 'need-human');
+  const view = listWork(storeDir);
+  assert.equal(view.work['item-x'].stage, 'decompose');
+  assert.match(view.gates?.['item-x']?.ask ?? '', /Blast-radius/);
+});
+
+test('resolveDecompose keeps the keyword-heavy gate even when blastRadius is LOW (floor holds — capability signal never loosens the existing gate)', () => {
+  const scriptDir = mkTempDir();
+  const scriptPath = writeVerdictExecutor(scriptDir, { verdict: 'pass-through', blastRadius: 1 });
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork({ risk: 'heavy' }));
+
+  const result = resolveDecompose(storeDir, 'item-x', cfg, 'runner');
+  assert.equal(result.outcome, 'need-human');
+  const view = listWork(storeDir);
+  assert.equal(view.work['item-x'].stage, 'decompose');
+});
+
+test('resolveDecompose proceeds (no gate) when risk is light AND blastRadius is under threshold', () => {
+  const scriptDir = mkTempDir();
+  const scriptPath = writeVerdictExecutor(scriptDir, { verdict: 'pass-through', blastRadius: 5 });
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork({ risk: 'light' }));
+
+  const result = resolveDecompose(storeDir, 'item-x', cfg, 'runner');
+  assert.equal(result.outcome, 'pass-through');
+  const view = listWork(storeDir);
+  assert.equal(view.work['item-x'].stage, 'executing');
+});
+
+test('resolveDecompose releases the blast-radius gate once the human has answered THIS gate\'s own prior ask', () => {
+  const scriptDir = mkTempDir();
+  const scriptPath = writeVerdictExecutor(scriptDir, { verdict: 'pass-through', blastRadius: 25 });
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork({ risk: 'light' }));
+
+  const first = resolveDecompose(storeDir, 'item-x', cfg, 'runner');
+  assert.equal(first.outcome, 'need-human');
+
+  const gate = listWork(storeDir).gates?.['item-x'];
+  moveWork(storeDir, { id: 'item-x', to: 'todo', expectedStatus: 'awaiting-human', answer: 'Confirmed, proceed.' });
+  assert.match(gate.ask, /Blast-radius/);
+
+  const second = resolveDecompose(storeDir, 'item-x', cfg, 'runner');
+  assert.equal(second.outcome, 'pass-through');
+  const view = listWork(storeDir);
+  assert.equal(view.work['item-x'].stage, 'executing');
+});
+
+test('resolveDecompose does NOT release the blast-radius gate on a stale/unrelated gate answer (never a false bypass)', () => {
+  const scriptDir = mkTempDir();
+  const scriptPath = writeVerdictExecutor(scriptDir, { verdict: 'pass-through', blastRadius: 25 });
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork({ risk: 'light' }));
+  moveWork(storeDir, { id: 'item-x', to: 'awaiting-human', ask: 'Which file exactly?', statusAtAsk: 'todo' });
+  moveWork(storeDir, { id: 'item-x', to: 'todo', expectedStatus: 'awaiting-human', answer: 'The parser module.' });
+
+  const result = resolveDecompose(storeDir, 'item-x', cfg, 'human');
+  assert.equal(result.outcome, 'need-human', 'an unrelated prior answer must not bypass the blast-radius gate');
 });
 
 test('resolveDecompose leaves the item untouched (invalid, fail-safe) on a spawn failure — no awaiting-human, no move', () => {

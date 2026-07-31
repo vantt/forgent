@@ -9,6 +9,7 @@ import {
   TIERS,
   STAGES,
   GOAL_TIERS,
+  URGENCY_LEVELS,
   DEFAULTS,
   SCHEMA_VERSION,
 } from '../../src/state/work.mjs';
@@ -468,6 +469,61 @@ test('validateWork does not add priority or intent to SCHEMA_VERSION or DEFAULTS
   assert.equal(SCHEMA_VERSION, 3);
   assert.equal(Object.hasOwn(DEFAULTS, 'priority'), false);
   assert.equal(Object.hasOwn(DEFAULTS, 'intent'), false);
+});
+
+// --- `urgent`/`impact`/`effort` fields (per work-item-priority-matrix
+// D2/D3/D5): optional additive fields feeding the calculated `priority`,
+// no schema bump. Same optional-additive validation shape as
+// priority/intent above.
+
+test('validateWork accepts a work item missing urgent, impact, or effort (optional, no default, stays absent)', () => {
+  const work = baseWork();
+  assert.equal(work.urgent, undefined);
+  assert.equal(work.impact, undefined);
+  assert.equal(work.effort, undefined);
+  assert.doesNotThrow(() => validateWork(work));
+});
+
+test('validateWork accepts urgent as any URGENCY_LEVELS value', () => {
+  for (const urgent of URGENCY_LEVELS) {
+    assert.doesNotThrow(() => validateWork(baseWork({ urgent })));
+  }
+});
+
+test('validateWork rejects an out-of-domain urgent value', () => {
+  for (const urgent of ['URGENT', 'extreme', '', 1, true]) {
+    assert.throws(
+      () => validateWork(baseWork({ urgent })),
+      (err) => err instanceof WorkValidationError && /urgent/.test(err.message),
+    );
+  }
+});
+
+test('validateWork accepts impact/effort as 0 or any non-negative number, including fractional', () => {
+  for (const value of [0, 1, 42.5, 1000]) {
+    assert.doesNotThrow(() => validateWork(baseWork({ impact: value })));
+    assert.doesNotThrow(() => validateWork(baseWork({ effort: value })));
+  }
+});
+
+test('validateWork rejects a negative or non-numeric impact/effort', () => {
+  for (const value of [-1, -0.5, 'high', true, NaN, Infinity]) {
+    assert.throws(
+      () => validateWork(baseWork({ impact: value })),
+      (err) => err instanceof WorkValidationError && /impact/.test(err.message),
+    );
+    assert.throws(
+      () => validateWork(baseWork({ effort: value })),
+      (err) => err instanceof WorkValidationError && /effort/.test(err.message),
+    );
+  }
+});
+
+test('validateWork does not add urgent/impact/effort to SCHEMA_VERSION or DEFAULTS (optional additive fields, no schema bump)', () => {
+  assert.equal(SCHEMA_VERSION, 3);
+  assert.equal(Object.hasOwn(DEFAULTS, 'urgent'), false);
+  assert.equal(Object.hasOwn(DEFAULTS, 'impact'), false);
+  assert.equal(Object.hasOwn(DEFAULTS, 'effort'), false);
 });
 
 // --- `goalTier`/`targets` fields (per str67-goal-directed-planning D1/D2):
