@@ -211,9 +211,25 @@
     "quadrant": "explanation",
     "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
     "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/acceptance-evidence-traceability-gate.md",
+    "title": "Why `work.acceptance` gets a narrow write-time evidence-traceability check",
+    "sourceCaptureId": "tsk-5q5-2"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/explanation/cli-invocation-fault-provenance.md",
     "title": "Why malformed CLI invocations now leave a provenance trace",
     "sourceCaptureId": "tsk-5z0"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/decisions-locked-with-a-person-still-need-restating-to-the-machine-judge.md",
+    "title": "Why decisions already locked and approved by a person still had to be restated to the engine's own clarify judge",
+    "sourceCaptureId": "tsk-52g"
   },
   {
     "quadrant": "explanation",
@@ -395,6 +411,14 @@
     "quadrant": "explanation",
     "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
     "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/pure-fgos-state-items-cannot-close-through-return.md",
+    "title": "Why a work item whose whole content is a `.fgos/` state mutation can't close through `fgos return`/`approve`",
+    "sourceCaptureId": "tsk-4zg"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/explanation/runner-execution-safety.md",
     "title": "Design safeguards in fgOS's runner — anti-loop breakers, model-judgment fail-safes, and guard ordering",
     "sourceCaptureId": null
@@ -411,9 +435,33 @@
     "quadrant": "explanation",
     "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
     "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/title-semantic-contract-lives-in-submitting-skills.md",
+    "title": "Why a work item title's \"object + action + scope\" rule lives in the submitting skills, not just the decompose prompt",
+    "sourceCaptureId": "tsk-52g-2"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/tool-registry-capability-is-a-prose-contract-not-compiled-logic.md",
+    "title": "Tool-registry: capability lookup is a prose contract, not compiled logic",
+    "sourceCaptureId": "tsk-2br"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/explanation/why-a-verify-command-cannot-mutate-live-work-state.md",
     "title": "Why a `verify` command cannot itself mutate live work state",
     "sourceCaptureId": "tsk-4j9-4"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/why-catchup-needed-its-own-already-caught-up-guard.md",
+    "title": "Why `fgos catchup` needed its own already-caught-up guard",
+    "sourceCaptureId": "tsk-k7i"
   },
   {
     "quadrant": "explanation",
@@ -454,6 +502,14 @@
     "docPath": "docs/explanation/work-item-lifecycle-and-domain-model.md",
     "title": "Why the work-item lifecycle keeps status and stage separate, and what extending it costs",
     "sourceCaptureId": "tsk-2zv"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/work-item-title-length-ceiling.md",
+    "title": "Why work-item titles get a 100-character ceiling at the store layer",
+    "sourceCaptureId": "tsk-52g-1"
   },
   {
     "quadrant": "explanation",
@@ -686,6 +742,14 @@
     "docPath": "docs/how-to/unify-a-duplicated-clean-tree-check-across-return-and-approve.md",
     "title": "How to unify two independently-written working-tree-clean checks into one scope-parameterized function",
     "sourceCaptureId": "choke-point-workingtree-clean-duplication"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/verify-herdr-cockpit-reuses-existing-tab-instead-of-losing-one.md",
+    "title": "How to verify herdr cockpit reuses its existing tab instead of overwriting yours",
+    "sourceCaptureId": "tsk-3i3"
   },
   {
     "quadrant": "reference",
