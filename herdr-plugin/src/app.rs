@@ -43,6 +43,10 @@ pub struct App {
     /// Set right after a pick pane is opened, cleared on the next
     /// keypress — a one-line status confirmation, never a blocking modal.
     pub pick_status: Option<String>,
+    /// True while the work-item detail dialog is showing. Enter on the
+    /// "Work items" panel opens it instead of picking directly; while
+    /// open, Up/Down/Tab are inert and Esc closes it without quitting.
+    pub detail_modal_open: bool,
 }
 
 impl App {
@@ -55,6 +59,7 @@ impl App {
             in_process_selected: None,
             focused_panel: Panel::WorkItems,
             pick_status: None,
+            detail_modal_open: false,
         }
     }
 
@@ -84,6 +89,12 @@ impl App {
         self.selected
             .and_then(|i| self.work_items.get(i))
             .map(|item| item.id.as_str())
+    }
+
+    /// Full row for the currently selected work item — the detail modal
+    /// needs the title and goal tier, not just the id `selected_id` gives.
+    pub fn selected_work_item(&self) -> Option<&WorkItem> {
+        self.selected.and_then(|i| self.work_items.get(i))
     }
 
     /// A live poll can shrink or grow `work_items`; keep the cursor inside
@@ -190,6 +201,7 @@ impl App {
             in_process_selected: None,
             focused_panel: Panel::WorkItems,
             pick_status: None,
+            detail_modal_open: false,
         }
     }
 
