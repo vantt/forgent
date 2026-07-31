@@ -7,10 +7,9 @@ CONTEXT.md: `docs/history/discover-decompose-verb-split/CONTEXT.md` (D1-D3).
 Flags counted against the standard checklist:
 
 - **public contracts** — YES. `discover` is a documented CLI verb
-  (`src/cli/command-registry.mjs`, `docs/reference/
-  work-item-pipeline-stages-verbs-and-handoffs.md`) and a slash-command
-  surface (`plugins/fgOS/skills/discover/SKILL.md`) other sessions/skills
-  call directly.
+  (`src/cli/command-registry.mjs`) and a slash-command surface
+  (`plugins/fgOS/skills/discover/SKILL.md`) other sessions/skills call
+  directly.
 - **existing covered behavior** — YES. `test/cli/fgos.test.mjs:2738-2884`
   already exercises both branches of the current dynamic dispatch through
   the one verb name; those tests must keep passing (reshaped, not broken)
