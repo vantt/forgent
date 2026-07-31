@@ -127,6 +127,31 @@ stage values — the same way `fgos-routing` describes it.
    design or re-plan any of that — it only needs to name, for each piece it
    describes, the one command that proves it done.
 
+7. **Mid-planning `CONTEXT.md` gap.** If, at any step above, `CONTEXT.md`'s
+   locked decisions turn out to be silent on something this plan actually
+   needs, apply the same material/grounded/answerable filter
+   `fgos-exploring` already uses to its own candidate questions:
+   - **Not material** — the answer would not change scope, behavior, data
+     shape, or acceptance criteria; a genuine implementation-only detail
+     `CONTEXT.md` correctly left unaddressed. Pin it as a labeled
+     assumption in `plan.md`'s own Assumptions instead of asking anyone —
+     `fgos-validating`'s reality gate already checks every assumption the
+     plan depends on is either proven or flagged as unproven, so this needs
+     no new container.
+   - **Material** — the answer would change scope, behavior, data shape, or
+     acceptance criteria. Hand back to `fgos-exploring` directly, in this
+     same session: invoke its flow (Socratic lock, the same three-test
+     filter, appending a new D-ID decision to `CONTEXT.md`) while
+     `item.stage` stays `decompose` the entire time — there is no
+     `decompose -> clarify` edge in the FSM (`src/state/
+     workflow-stage-graphs.mjs`'s `DOMAINS.coding.transitions` carries no
+     backward edge), so never attempt to move the item's stage back. This
+     is the same no-stage-move shape `fgos-validating` already uses when it
+     hands an item back to this skill directly (both stay in `decompose`).
+     Never reopen or reinterpret a decision `CONTEXT.md` already locked —
+     this path exists only for a gap it never addressed, not a second
+     chance to override one it did.
+
 ## Gate
 
 Before asking, check whether this gate can auto-approve instead
@@ -190,6 +215,12 @@ reality itself.
 - applying a stage move directly instead of leaving it to the engine
 - running `fgos-validating`'s reality check here to skip the gate
 - classifying the item's domain — not this skill's job
+- guessing a product assumption for a material `CONTEXT.md` gap instead of
+  handing back to `fgos-exploring`, or asking a question that fails the
+  material/grounded/answerable filter instead of pinning it as an
+  assumption
+- moving `item.stage` back to `clarify` for a mid-planning gap — no such
+  edge exists; hand back via direct invocation instead
 
 Violating the letter of the rules is violating the spirit of the rules.
 
