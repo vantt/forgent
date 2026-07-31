@@ -12,6 +12,21 @@
       "Bash(git add:*),Bash(git commit:*)"
     ]
   },
+  "executors": {
+    "judge": {
+      "command": "claude",
+      "args": [
+        "-p",
+        "{prompt}",
+        "--model",
+        "{model}",
+        "--permission-mode",
+        "acceptEdits",
+        "--allowedTools",
+        "Bash(rg:*),Bash(git add:*),Bash(git commit:*)"
+      ]
+    }
+  },
   "models": {
     "light": "haiku",
     "standard": "sonnet",

@@ -295,3 +295,34 @@ test('runJudgeExecutor fails safe (no retry) when the first attempt hangs past c
   const verdict = runJudgeExecutor(cfg, 'sonnet', 'prompt', 'stricter prompt');
   assert.equal(verdict, null);
 });
+
+// tsk-62d D2: spawnAttempt passes `tier: 'judge'` to resolveExecutorCommand
+// (dispatch.mjs's existing generic tier-keyed executors lookup, reused as a
+// synthetic role key) — an `executors.judge` override must win over the
+// base `executor`, and the base `executor` here is a failing script so a
+// verdict can only come back if the override was actually honored.
+test('runJudgeExecutor resolves through cfg.executors.judge when present, ahead of the base cfg.executor', () => {
+  const dir = mkTempDir();
+  const { scriptPath: failingScript } = writeFailingExecutor(dir);
+  const { scriptPath: judgeScript, counterPath } = writeValidExecutor(dir, { clear: true, verify: 'from judge override' });
+  const cfg = {
+    executor: { command: process.execPath, args: [failingScript, '{prompt}'] },
+    executors: { judge: { command: process.execPath, args: [judgeScript, '{prompt}'] } },
+    timeoutMs: 5000,
+  };
+  const verdict = runJudgeExecutor(cfg, 'sonnet', 'prompt', 'stricter prompt');
+  assert.deepEqual(verdict, { clear: true, verify: 'from judge override' });
+  assert.equal(readCount(counterPath), 1);
+});
+
+// Absent-safe fallback (D2): a config with no `executors.judge` block must
+// still resolve through the base `executor`, byte-identical to pre-tsk-62d
+// behavior — no regression for every operator config that never opts in.
+test('runJudgeExecutor falls back to the base cfg.executor when cfg.executors.judge is absent', () => {
+  const dir = mkTempDir();
+  const { scriptPath, counterPath } = writeValidExecutor(dir, { clear: false, question: 'from base executor' });
+  const cfg = cfgFor(scriptPath);
+  const verdict = runJudgeExecutor(cfg, 'sonnet', 'prompt', 'stricter prompt');
+  assert.deepEqual(verdict, { clear: false, question: 'from base executor' });
+  assert.equal(readCount(counterPath), 1);
+});
