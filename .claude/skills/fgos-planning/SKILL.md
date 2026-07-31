@@ -91,6 +91,14 @@ stage values — the same way `fgos-routing` describes it.
    honors. A medium or high risk in the map needs a proof point at
    `fgos-validating`, not a guess here.
 
+   Before writing a proof point that would lean on blast-radius evidence,
+   run `CLAUDE.md`'s impact-analysis capability gate (`fgos tool query
+   --capability impact-analysis --status present`) instead of assuming
+   GitNexus is on this machine. Record the resulting posture
+   (`impact-analysis: inactive|degraded|full`) in `plan.md` next to that
+   proof point — inactive drops the requirement, degraded keeps it but
+   marks the evidence weak, full keeps it exactly as before.
+
 4. **Shape.** Write (or enrich) `plan.md` scaled to the mode: a direct note
    for `tiny`, one open question for `spike`, a short plan for `small`, a
    phased plan for `standard`, a fuller map for `high-risk`. Sketch the

@@ -77,6 +77,13 @@ pass to keep the item moving.
    - **Proof surface** — does every piece in the plan already carry a real,
      runnable verify command (never a placeholder or a description standing
      in for one)?
+   - **Impact-analysis posture** — where the plan leans on blast-radius
+     evidence, does its recorded `impact-analysis: inactive|degraded|full`
+     posture (`fgos-planning`'s step 3) match what `CLAUDE.md`'s
+     impact-analysis capability gate actually reports right now
+     (`fgos tool query --capability impact-analysis --status present`)? A
+     stale or missing posture is a FAIL here, not a skip — never assume
+     GitNexus is present because the plan says so.
 
    A FAIL on any dimension stops here: return the item to `fgos-planning`
    with the failing dimension and the reason, named plainly. Never continue
@@ -88,7 +95,11 @@ pass to keep the item moving.
    command actually run with its real output, an existing test result, or an
    official version/doc confirmation — never "should work" or model
    knowledge alone. A row with no accepted evidence is an automatic **NOT
-   READY**, regardless of how reasonable the assumption sounds.
+   READY**, regardless of how reasonable the assumption sounds. A row
+   requiring blast-radius evidence is the one exception: an `inactive`
+   posture (checked above) satisfies the row by itself — no provider means
+   nothing to run — while `degraded` requires the gap named plainly in the
+   row's result, never silently dropped.
 
 4. **Decide**, using this vocabulary only:
    ```text
