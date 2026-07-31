@@ -616,6 +616,106 @@ test('resolveDiscovery writes EXACTLY ONE work.edit event carrying intent per ca
   assert.equal(intentEdits.length, 1);
 });
 
+// --- trust signal (tsk-ozl D1-D3): resolveDiscovery skips judgeDiscovery
+// entirely when the item already carries a committed, non-empty
+// CONTEXT.md under its docsRef, instead of re-judging blind past a
+// decision a human already locked. Same signal for both `session` and
+// `runner` callers — no role branch. ---------------------------------
+
+// Builds a docsRef fixture directory as a sibling of storeDir (both live
+// directly under os.tmpdir(), so repoRoot = path.dirname(storeDir) is
+// their shared parent, exactly matching readLockedContext's real
+// `path.join(repoRoot, docsRef)` resolution) and returns the relative
+// docsRef string to set on the work item.
+function mkLockedContextFixture(storeDir, content = '# CONTEXT\n\nD1: locked.\n') {
+  const repoRoot = path.dirname(storeDir);
+  const featureDir = fs.mkdtempSync(path.join(repoRoot, 'fgos-context-'));
+  fs.writeFileSync(path.join(featureDir, 'CONTEXT.md'), content);
+  return path.basename(featureDir);
+}
+
+test('resolveDiscovery skips judgeDiscovery and advances to decompose when docsRef points at a real, non-empty CONTEXT.md', () => {
+  const scriptDir = mkTempDir();
+  const { scriptPath, counterPath } = writeCountingRawStdoutExecutor(scriptDir, JSON.stringify({ clear: true, verify: 'should never run' }));
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  const docsRef = mkLockedContextFixture(storeDir);
+  addWork(storeDir, sampleWork({ docsRef }));
+
+  const result = resolveDiscovery(storeDir, 'item-x', cfg, 'session');
+  assert.equal(result.outcome, 'clear');
+  assert.equal(result.verdict.skipped, true);
+  assert.equal(readCount(counterPath), 0, 'judgeDiscovery must never spawn the executor on the skip path');
+
+  const view = listWork(storeDir);
+  assert.equal(view.work['item-x'].stage, 'decompose');
+  assert.equal(view.discovery['item-x'].length, 1);
+  assert.equal(view.discovery['item-x'][0].clear, true);
+  const decisions = view.decisionsById?.['item-x'] ?? [];
+  assert.ok(decisions.some((d) => d.text.startsWith('discovery skip:')), 'skip must log an audit-trail decision');
+});
+
+test('resolveDiscovery skip path applies identically for role "runner" (RUL19 sweep) as for role "session" — content-based, no role branch', () => {
+  const scriptDir = mkTempDir();
+  const { scriptPath, counterPath } = writeCountingRawStdoutExecutor(scriptDir, JSON.stringify({ clear: true, verify: 'should never run' }));
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  const docsRef = mkLockedContextFixture(storeDir);
+  addWork(storeDir, sampleWork({ docsRef }));
+
+  const result = resolveDiscovery(storeDir, 'item-x', cfg, 'runner');
+  assert.equal(result.outcome, 'clear');
+  assert.equal(result.verdict.skipped, true);
+  assert.equal(readCount(counterPath), 0);
+});
+
+test('resolveDiscovery still calls judgeDiscovery when docsRef is set but CONTEXT.md is missing (fail-open, unchanged behavior)', () => {
+  const scriptDir = mkTempDir();
+  const { scriptPath, counterPath } = writeCountingRawStdoutExecutor(scriptDir, JSON.stringify({ clear: true, verify: 'ok' }));
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  // docsRef points at a directory that is never created — mirrors an item
+  // that predates fgos-exploring or has a stale/incorrect docsRef.
+  addWork(storeDir, sampleWork({ docsRef: 'docs/history/never-written/' }));
+
+  const result = resolveDiscovery(storeDir, 'item-x', cfg);
+  assert.equal(result.outcome, 'clear');
+  assert.equal(result.verdict.skipped, undefined);
+  assert.equal(readCount(counterPath), 1, 'no trust signal means judgeDiscovery must still run the model exactly once');
+});
+
+test('resolveDiscovery still calls judgeDiscovery when docsRef points at an existing but empty CONTEXT.md (fail-open, unchanged behavior)', () => {
+  const scriptDir = mkTempDir();
+  const { scriptPath, counterPath } = writeCountingRawStdoutExecutor(scriptDir, JSON.stringify({ clear: true, verify: 'ok' }));
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  const docsRef = mkLockedContextFixture(storeDir, '   \n');
+  addWork(storeDir, sampleWork({ docsRef }));
+
+  const result = resolveDiscovery(storeDir, 'item-x', cfg);
+  assert.equal(result.outcome, 'clear');
+  assert.equal(result.verdict.skipped, undefined);
+  assert.equal(readCount(counterPath), 1);
+});
+
+test('resolveDiscovery calls judgeDiscovery as before when the item has no docsRef at all (default, most items)', () => {
+  const scriptDir = mkTempDir();
+  const { scriptPath, counterPath } = writeCountingRawStdoutExecutor(scriptDir, JSON.stringify({ clear: true, verify: 'ok' }));
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork());
+
+  const result = resolveDiscovery(storeDir, 'item-x', cfg);
+  assert.equal(result.outcome, 'clear');
+  assert.equal(result.verdict.skipped, undefined);
+  assert.equal(readCount(counterPath), 1);
+});
+
 test('resolveDiscovery still completes clear/unclear resolution when editWork throws for a corrupted item shape (fail-safe)', () => {
   const scriptDir = mkTempDir();
   const scriptPath = writeVerdictExecutor(scriptDir, {
