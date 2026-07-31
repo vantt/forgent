@@ -439,8 +439,10 @@ test('a MIXED cycle closed by an editWork patch is rejected — the parent edge 
   assert.ok(listWork(dir).work['edit-mix-b']);
 
   // Patching edit-mix-b.deps = [edit-mix-a] adds edge edit-mix-b -> edit-mix-a,
-  // closing edit-mix-a -> edit-mix-b -> edit-mix-a. `deps` is editable; `parent`
-  // is not — the parent edge was fixed at add time. The deps-only guard misses
+  // closing edit-mix-a -> edit-mix-b -> edit-mix-a. This is the deps-patch
+  // route to the same MIXED cycle the test below closes via a parent-patch
+  // instead (parent-flag-cli D1 made `parent` editable too, both routes go
+  // through the same assertNoUnifiedCycle call). The deps-only guard misses
   // this (edit-mix-a has no deps), the unified guard catches it.
   assert.throws(
     () => editWork(dir, { id: 'edit-mix-b', patch: { deps: ['edit-mix-a'] } }),
@@ -472,6 +474,51 @@ test('a valid parent chain (no cycle) is still accepted — the unified guard ha
   addWork(dir, { id: 'tree-child', title: 'Tree Child', kind: 'task', status: 'todo', parent: 'tree-root', deps: [], risk: 'low', refs: [], verify: 'npm test' });
   addWork(dir, { id: 'tree-grandchild', title: 'Tree Grandchild', kind: 'task', status: 'todo', parent: 'tree-child', deps: [], risk: 'low', refs: [], verify: 'npm test' });
   assert.ok(listWork(dir).work['tree-grandchild'], 'a plain parent chain is a DAG, not a cycle');
+});
+
+// --- parent now editable (parent-flag-cli D1/D2) ----------------------------
+// `parent` joined EDITABLE_FIELDS; the new attack surface this opens is a
+// cycle closed by a PARENT-ONLY edit — structurally impossible before D1
+// (no test above exercises it, since it couldn't happen). `editWork`'s
+// assertNoUnifiedCycle call is unconditional on the merged candidate, so no
+// new guard code was needed — this proves that claim rather than assuming it.
+
+test('a MIXED cycle closed by an editWork patch that changes ONLY parent (no deps involved) is rejected', () => {
+  const dir = tmpDir();
+  addSampleWork(dir, 'pmix-a', { deps: [] });
+  // pmix-b's parent is pmix-a -> edge pmix-a -> pmix-b. No cycle yet.
+  addWork(dir, { id: 'pmix-b', title: 'Parent Mix B', kind: 'task', status: 'todo', parent: 'pmix-a', deps: [], risk: 'low', refs: [], verify: 'npm test' });
+  assert.ok(listWork(dir).work['pmix-b']);
+
+  // Before D1 this patch was rejected outright ("parent" not in
+  // EDITABLE_FIELDS) — never reached the cycle guard at all. Now it does:
+  // patching pmix-a.parent = pmix-b adds edge pmix-b -> pmix-a, closing
+  // pmix-a -> pmix-b -> pmix-a with zero deps anywhere.
+  assert.throws(
+    () => editWork(dir, { id: 'pmix-a', patch: { parent: 'pmix-b' } }),
+    /would close a graph cycle/,
+  );
+  assert.equal(listWork(dir).work['pmix-a'].parent, undefined, 'the rejected patch never landed');
+});
+
+test('editWork can set parent on an item that had none — accepted when it introduces no cycle', () => {
+  const dir = tmpDir();
+  addSampleWork(dir, 'padd-root', { deps: [] });
+  addSampleWork(dir, 'padd-child', { deps: [] });
+  assert.equal(listWork(dir).work['padd-child'].parent, undefined);
+
+  editWork(dir, { id: 'padd-child', patch: { parent: 'padd-root' } });
+  assert.equal(listWork(dir).work['padd-child'].parent, 'padd-root');
+});
+
+test('editWork patch { parent: null } clears an existing parent (edit --parent "" clear semantics, D2)', () => {
+  const dir = tmpDir();
+  addSampleWork(dir, 'pclear-root', { deps: [] });
+  addWork(dir, { id: 'pclear-child', title: 'Clear Child', kind: 'task', status: 'todo', parent: 'pclear-root', deps: [], risk: 'low', refs: [], verify: 'npm test' });
+  assert.equal(listWork(dir).work['pclear-child'].parent, 'pclear-root');
+
+  editWork(dir, { id: 'pclear-child', patch: { parent: null } });
+  assert.equal(listWork(dir).work['pclear-child'].parent, null, 'null is the work.mjs "absent" sentinel, same as an item that never had a parent');
 });
 
 // Cross-process regression (store-atomic-rmw): before this fix, addWork's
