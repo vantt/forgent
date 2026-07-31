@@ -28,6 +28,7 @@
     "src/state/gate-bypass.mjs": "infra",
     "src/state/cursor.mjs": "use-case",
     "src/state/porting-store.mjs": "infra",
+    "src/state/tool-registry.mjs": "domain",
     "src/install/coexist.mjs": "infra",
     "src/runner/recovery.mjs": "domain",
     "src/runner/anti-loop.mjs": "domain",

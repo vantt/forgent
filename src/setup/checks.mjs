@@ -18,6 +18,8 @@ import { detectRcFiles, hasSourceLine, deadSourceLines } from './shell-rc.mjs';
 import { mergeConfigDefaults } from './config-merge.mjs';
 import { mainCheckoutHookWired } from './git-hooks.mjs';
 import { DEFAULT_RUNNER_CONFIG } from '../runner/dispatch.mjs';
+import { listWork } from '../state/store.mjs';
+import { readLocalStatus, classifyRegistryPosture } from '../state/tool-registry.mjs';
 
 export { mainCheckoutHookWired } from './git-hooks.mjs';
 
@@ -170,6 +172,34 @@ function checkMainCheckoutHookWired(cwd) {
   return { passed: false, message: 'core.hooksPath not wired to .githooks — commits here are NOT guarded against concurrent-writer clobbering (str65) — run fgos setup' };
 }
 
+// tsk-1dj (tool-registry-capability port), CONTEXT.md D1: reports the tool
+// registry's posture (inactive/degraded/full), never a hard failure — an
+// empty or partially-present registry is never itself a problem (the core
+// "absent capability = clean skip" contract this whole item ports), so
+// `passed` is always `true` here; only the message carries the posture.
+// Reports across every registered tool, never a single hardcoded capability
+// (e.g. "impact-analysis") — the registry itself never names one.
+function checkToolRegistryConfigured(cwd) {
+  const mainCheckout = resolveMainCheckout(cwd);
+  if (mainCheckout === null) {
+    return { passed: true, message: 'not inside a git checkout — nothing to check' };
+  }
+  const fgosDir = path.join(mainCheckout, '.fgos');
+  const view = listWork(fgosDir);
+  const localStatus = readLocalStatus(fgosDir);
+  const { posture, registeredCount, presentCount, missingCount, unknownCount } = classifyRegistryPosture(view.tools, localStatus);
+  if (posture === 'inactive') {
+    return { passed: true, message: 'inactive — no tools registered (fgos tool register to add one)' };
+  }
+  if (posture === 'full') {
+    return { passed: true, message: `full — ${presentCount}/${registeredCount} registered tool(s) present` };
+  }
+  return {
+    passed: true,
+    message: `degraded — ${presentCount}/${registeredCount} registered tool(s) present (${missingCount} missing, ${unknownCount} never checked — run fgos tool check)`,
+  };
+}
+
 export const DOCTOR_CHECKS = [
   {
     id: 'node-version-and-git',
@@ -190,5 +220,10 @@ export const DOCTOR_CHECKS = [
     id: 'main-checkout-hook-wired',
     description: 'core.hooksPath wired to .githooks (str65 main-checkout lock guards every commit)',
     check: (cwd) => checkMainCheckoutHookWired(cwd),
+  },
+  {
+    id: 'tool-registry-configured',
+    description: 'tool registry posture — inactive/degraded/full (tsk-1dj)',
+    check: (cwd) => checkToolRegistryConfigured(cwd),
   },
 ];

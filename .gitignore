@@ -20,6 +20,11 @@ output.txt
 # it happened to contain.
 .fgos/invocation-faults.jsonl
 
+# tool registry local status overlay — a fact about THIS machine (what `tool
+# check` last observed), never a team decision, so it never goes through
+# events.jsonl (tsk-1dj, tool-registry-capability port)
+.fgos/tool-status.local.json
+
 # BEE:START
 .bee/state.json
 .bee/reservations.json

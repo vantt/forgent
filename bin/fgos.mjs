@@ -16,7 +16,8 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { initStore, addWork, moveWork, moveStage, editWork, addDecision, addOutcome, addFriction, listWork, readyWork, isDepsAndLineageReady, graphMetrics, graphWhatIf, staleDoingAdvisory, footprintConflicts, readRawEvents, rebuild, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, StoreError, EXIT_CODES, categoryOf, assertValidDocType } from '../src/state/store.mjs';
+import { initStore, addWork, moveWork, moveStage, editWork, addDecision, addOutcome, addFriction, listWork, readyWork, isDepsAndLineageReady, graphMetrics, graphWhatIf, staleDoingAdvisory, footprintConflicts, readRawEvents, rebuild, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, registerTool, removeTool, StoreError, EXIT_CODES, categoryOf, assertValidDocType } from '../src/state/store.mjs';
+import { probeTool, readLocalStatus, writeLocalStatus, resolvedStatus, normalizeCapability } from '../src/state/tool-registry.mjs';
 import { repairTruncatedLastLine } from '../src/state/events.mjs';
 import { deriveTitle, classify, generateId } from '../src/intake/classify.mjs';
 import { wrapEnvelope } from '../src/state/envelope.mjs';
@@ -2535,6 +2536,73 @@ async function runVerb(verb, flags, positional, dir) {
       throw new StoreError('validation', `unknown goal sub-verb "${sub}". Usage: fgos goal <set|show> ...`);
     }
 
+    // Two-way tool registry (tsk-1dj, ported from repository-harness's
+    // tool-registry-capability per docs/distillery/deep-dives/
+    // tool-registry.md): `register`/`remove` are TEAM decisions through the
+    // shared event log (store.mjs's registerTool/removeTool, same
+    // single-write-door discipline as every other mutating verb); `check`
+    // writes ONLY the local, gitignored status overlay
+    // (tool-registry.mjs's readLocalStatus/writeLocalStatus) — never an
+    // event, per CONTEXT.md's pinned "registered vs present" term, and it
+    // always succeeds even when every probed tool comes back missing
+    // (absent capability is a fact to report, never a CLI error); `query`
+    // merges the two (registry + local overlay) at read time.
+    case 'tool': {
+      const sub = requireField(positional[0], 'tool requires a sub-verb: fgos tool <register|check|query|remove> ...');
+      if (sub === 'register') {
+        const fields = {
+          name: requireField(flags.name, 'tool register requires --name.'),
+          kind: requireField(flags.kind, 'tool register requires --kind (cli/binary/mcp/skill/http).'),
+          capability: requireField(flags.capability, 'tool register requires --capability.'),
+          command: requireField(flags.command, 'tool register requires --command.'),
+          scanTarget: optionalField(flags.scan, 'tool register --scan requires a non-empty path.'),
+          responsibility: optionalField(flags.responsibility, 'tool register --responsibility requires a non-empty value.'),
+          description: optionalField(flags.description, 'tool register --description requires a non-empty value.'),
+        };
+        const { view } = registerTool(dir, fields);
+        return { name: fields.name, tool: view.tools[fields.name] };
+      }
+      if (sub === 'check') {
+        const view = listWork(dir);
+        const tools = view.tools ?? {};
+        const name = optionalField(flags.name, 'tool check --name requires a non-empty value.');
+        if (name !== undefined && !tools[name]) {
+          throw new StoreError('validation', `tool "${name}" not found.`);
+        }
+        const targets = name !== undefined ? [name] : Object.keys(tools);
+        const localStatus = readLocalStatus(dir);
+        const repoRoot = path.dirname(dir);
+        const results = {};
+        for (const toolName of targets) {
+          const status = await probeTool(tools[toolName], repoRoot);
+          const checkedAt = new Date().toISOString();
+          localStatus[toolName] = { status, checkedAt };
+          results[toolName] = { status, checkedAt };
+        }
+        writeLocalStatus(dir, localStatus);
+        return { checked: results };
+      }
+      if (sub === 'query') {
+        const view = listWork(dir);
+        const tools = view.tools ?? {};
+        const localStatus = readLocalStatus(dir);
+        const capabilityFlag = optionalField(flags.capability, 'tool query --capability requires a non-empty value.');
+        const normalizedCapability = capabilityFlag !== undefined ? normalizeCapability(capabilityFlag) : undefined;
+        const statusFlag = optionalField(flags.status, 'tool query --status requires a non-empty value.');
+        const providers = Object.values(tools)
+          .filter((tool) => normalizedCapability === undefined || tool.capability === normalizedCapability)
+          .map((tool) => ({ ...tool, status: resolvedStatus(tool.name, localStatus) }))
+          .filter((tool) => statusFlag === undefined || tool.status === statusFlag);
+        return { providers };
+      }
+      if (sub === 'remove') {
+        const name = requireField(positional[1] ?? flags.name, 'tool remove requires --name (or a positional name).');
+        removeTool(dir, { name });
+        return { name, removed: true };
+      }
+      throw new StoreError('validation', `unknown tool sub-verb "${sub}". Usage: fgos tool <register|check|query|remove> ...`);
+    }
+
     // Do-and-announce shell-integration + config bootstrap (str87-fgos-setup-doctor
     // D6): inserts the shell-integration source line into every DETECTED rc
     // file (bash/zsh, D4) — never creates a new rc file (shell-rc.mjs's own
@@ -2643,7 +2711,7 @@ async function runVerb(verb, flags, positional, dir) {
     }
 
     default:
-      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <init|add|submit|discover|move|edit|ask|answer|decision|list|ready|rebuild|repair|check|rollup|take|return|review|approve|reject|catchup|evolve|triage|session|goal|setup|doctor|unlock|lock-status> ...`);
+      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <init|add|submit|discover|move|edit|ask|answer|decision|list|ready|rebuild|repair|check|rollup|take|return|review|approve|reject|catchup|evolve|triage|session|goal|tool|setup|doctor|unlock|lock-status> ...`);
   }
 }
 

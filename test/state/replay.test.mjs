@@ -733,3 +733,40 @@ test("foldEvents on a work.move with no writer leaves item.writer absent (legacy
   const view = foldEvents(events);
   assert.equal(view.work.a.writer, undefined);
 });
+
+test("foldEvents on a log with no tool.register events yields a view with no tools key (lazy key, backward-compat)", () => {
+  const view = foldEvents([{ seq: 1, ts: "2026-07-31T00:00:00.000Z", type: "work.add", payload: { id: "a", title: "A", status: "todo" } }]);
+  assert.equal(Object.hasOwn(view, "tools"), false);
+});
+
+test("foldEvents folds tool.register into view.tools keyed by name", () => {
+  const events = [
+    {
+      seq: 1,
+      ts: "2026-07-31T00:00:00.000Z",
+      type: "tool.register",
+      payload: { name: "gitnexus", kind: "mcp", capability: "impact-analysis", command: "mcp:gitnexus", scanTarget: ".gitnexus" },
+    },
+  ];
+  const view = foldEvents(events);
+  assert.deepEqual(view.tools.gitnexus, { name: "gitnexus", kind: "mcp", capability: "impact-analysis", command: "mcp:gitnexus", scanTarget: ".gitnexus" });
+});
+
+test("foldEvents folds tool.remove by deleting the keyed entry", () => {
+  const events = [
+    { seq: 1, ts: "2026-07-31T00:00:00.000Z", type: "tool.register", payload: { name: "gitnexus", kind: "mcp", capability: "impact-analysis", command: "mcp:gitnexus" } },
+    { seq: 2, ts: "2026-07-31T00:00:01.000Z", type: "tool.remove", payload: { name: "gitnexus" } },
+  ];
+  const view = foldEvents(events);
+  assert.equal(view.tools.gitnexus, undefined);
+});
+
+test("foldEvents' tool.register is a full-record overwrite, never a merge with a prior registration under the same name", () => {
+  const events = [
+    { seq: 1, ts: "2026-07-31T00:00:00.000Z", type: "tool.register", payload: { name: "gitnexus", kind: "mcp", capability: "impact-analysis", command: "mcp:gitnexus", responsibility: "Verification" } },
+    { seq: 2, ts: "2026-07-31T00:00:01.000Z", type: "tool.remove", payload: { name: "gitnexus" } },
+    { seq: 3, ts: "2026-07-31T00:00:02.000Z", type: "tool.register", payload: { name: "gitnexus", kind: "mcp", capability: "impact-analysis", command: "mcp:gitnexus" } },
+  ];
+  const view = foldEvents(events);
+  assert.equal(view.tools.gitnexus.responsibility, undefined);
+});
