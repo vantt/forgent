@@ -22,10 +22,12 @@
 // verdict. The system is never allowed to treat an uncertain judgement as a
 // pass.
 
+import path from 'node:path';
 import { modelForTier } from '../runner/dispatch.mjs';
 import { runJudgeExecutor, JUDGE_STRICT_JSON_SUFFIX } from './judge-executor.mjs';
+import { readLockedContext } from './decompose.mjs';
 import { DEFAULTS } from '../state/work.mjs';
-import { listWork, moveStage, addDiscovery, putInAwaiting, editWork, StoreError } from '../state/store.mjs';
+import { listWork, moveStage, addDiscovery, addDecision, putInAwaiting, editWork, StoreError } from '../state/store.mjs';
 import { graphMetrics } from '../state/graph-metrics.mjs';
 import { rankImpact } from '../state/impact.mjs';
 
@@ -214,6 +216,22 @@ export function judgeDiscovery(work, cfg, view) {
  * the async runner sweep call (D5/D13), so the clarify-loop logic never
  * duplicates.
  *
+ * TRUST SIGNAL (tsk-ozl D1-D3): before judging blind, check whether the
+ * item already carries a committed, non-empty CONTEXT.md under its
+ * `docsRef` (`readLockedContext`, shared with decompose.mjs's own
+ * locked-context read). When it does, decisions are already locked and
+ * approved — re-judging via the model can only re-derive a possibly
+ * contradicting verdict, including re-asking a question the human just
+ * answered by writing CONTEXT.md in the first place (confirmed live,
+ * tsk-ozl 2026-07-31: exactly this happened). Skip the model call, log a
+ * `discovery skip:` decision for the audit trail (mirrors
+ * `logDecomposeVerdict`'s pattern in decompose.mjs), and advance the item
+ * directly — same content-based signal for BOTH the sync `session` caller
+ * and the runner's RUL19 sweep (`role: 'runner'`), never a role branch: a
+ * sweep that finds a real committed CONTEXT.md on an untouched item trusts
+ * it too, which also covers the crashed-mid-explore-session case RUL19
+ * exists to catch.
+ *
  * Per D3/D6: the discovery record is written for BOTH outcomes (clear and
  * unclear), never only the failure path. A clear verdict moves the item to
  * `decompose` (stage-decompose D2 retarget — chia-việc is the next stop,
@@ -233,6 +251,27 @@ export function resolveDiscovery(dir, id, cfg, role) {
   const work = view.work[id];
   if (!work) {
     throw new StoreError('validation', `resolveDiscovery: work "${id}" not found.`);
+  }
+
+  const repoRoot = path.dirname(dir);
+  const lockedContext = readLockedContext(repoRoot, work.docsRef);
+  if (lockedContext) {
+    addDecision(dir, {
+      id,
+      text: 'discovery skip: trusted committed CONTEXT.md, no model call',
+      source: 'resolveDiscovery',
+      rationale:
+        'docsRef points at a non-empty CONTEXT.md (D2 trust signal, tsk-ozl) — skipping judgeDiscovery to avoid re-judging a decision already locked and approved',
+    });
+    addDiscovery(dir, { id, clear: true });
+    moveStage(dir, {
+      id,
+      to: 'decompose',
+      expectedStage: 'clarify',
+      verify: FALLBACK_VERIFY,
+      role,
+    });
+    return { outcome: 'clear', id, verdict: { clear: true, skipped: true } };
   }
 
   const verdict = judgeDiscovery(work, cfg, view);

@@ -33,7 +33,12 @@ import { listWork, moveStage, moveWork, addWork, putInAwaiting, addDecision, Sto
 // work.description NOR CONTEXT.md/plan.md, only a possibly-truncated
 // title — the split-work judgment silently reinvented an architecture the
 // item's own locked decisions had already ruled out.
-function readLockedContext(repoRoot, docsRef) {
+//
+// EXPORTED (tsk-ozl D2): discovery.mjs's resolveDiscovery reuses this same
+// read as its clarify-stage trust signal — a non-empty result means a
+// human already locked decisions into CONTEXT.md, so re-judging blind is
+// both wasteful and can re-ask an already-answered question.
+export function readLockedContext(repoRoot, docsRef) {
   if (typeof docsRef !== 'string' || !docsRef.trim()) return '';
   const featureDir = path.join(repoRoot, docsRef);
   const sections = [];
