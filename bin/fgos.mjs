@@ -1403,16 +1403,38 @@ async function runVerb(verb, flags, positional, dir) {
       // prerequisite for the write-only-if-changed guard below to ever
       // actually skip a write).
       docEntries.sort((a, b) => (a.quadrant === b.quadrant ? (a.docPath < b.docPath ? -1 : 1) : (a.quadrant < b.quadrant ? -1 : 1)));
-      const view = listWork(dir);
-      const entries = buildEnduserIndex(docEntries, view.outcomes ?? {});
       const manifestPath = path.join(repoRoot, 'docs', 'enduser-docs-index.json');
-      const nextContent = `${JSON.stringify(entries, null, 2)}\n`;
       let previousContent;
       try {
         previousContent = fs.readFileSync(manifestPath, 'utf8');
       } catch (err) {
         if (err.code !== 'ENOENT') throw err;
       }
+      // tsk-f31: sourceCaptureId can be unresolvable this run not because
+      // the doc genuinely lacks a capture, but because the store itself is
+      // unreachable (a worktree's .fgos/ carries no events.jsonl -- ADR0020).
+      // Detected on the log file itself, not the .fgos/ directory: the
+      // directory can exist (e.g. holding only main-checkout.lock) while
+      // events.jsonl is absent -- readEvents' own ENOENT check
+      // (src/state/events.mjs) is the real signal listWork keys off, not a
+      // directory-level proxy for it. When unreachable, preserve a docPath's
+      // existing on-disk value instead of regressing it to null; a
+      // genuinely reachable store is the only thing allowed to overwrite a
+      // prior value with null.
+      const storeReachable = fs.existsSync(path.join(dir, 'events.jsonl'));
+      const previousById = new Map();
+      if (previousContent) {
+        for (const e of JSON.parse(previousContent)) previousById.set(e.docPath, e.sourceCaptureId);
+      }
+      const view = listWork(dir);
+      const rawEntries = buildEnduserIndex(docEntries, view.outcomes ?? {});
+      const entries = rawEntries.map((e) => {
+        if (!storeReachable && e.sourceCaptureId === null && previousById.get(e.docPath)) {
+          return { ...e, sourceCaptureId: previousById.get(e.docPath) };
+        }
+        return e;
+      });
+      const nextContent = `${JSON.stringify(entries, null, 2)}\n`;
       if (previousContent !== nextContent) {
         fs.mkdirSync(path.dirname(manifestPath), { recursive: true });
         fs.writeFileSync(manifestPath, nextContent, 'utf8');
