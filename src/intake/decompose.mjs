@@ -22,7 +22,9 @@ import path from 'node:path';
 import { modelForTier } from '../runner/dispatch.mjs';
 import { runJudgeExecutor, JUDGE_STRICT_JSON_SUFFIX } from './judge-executor.mjs';
 import { DEFAULTS } from '../state/work.mjs';
-import { listWork, moveStage, moveWork, addWork, putInAwaiting, addDecision, StoreError } from '../state/store.mjs';
+import { listWork, moveStage, moveWork, addWork, putInAwaiting, addDecision, editWork, StoreError } from '../state/store.mjs';
+import { rankImpact } from '../state/impact.mjs';
+import { computeImpact, computePriority, effortForMode, MODE_EFFORT } from '../state/priority-formula.mjs';
 
 // Best-effort read of the locked-decisions artifacts fgos-exploring/
 // fgos-planning write under `work.docsRef` (docs/history/<feature>/). A
@@ -33,7 +35,12 @@ import { listWork, moveStage, moveWork, addWork, putInAwaiting, addDecision, Sto
 // work.description NOR CONTEXT.md/plan.md, only a possibly-truncated
 // title — the split-work judgment silently reinvented an architecture the
 // item's own locked decisions had already ruled out.
-function readLockedContext(repoRoot, docsRef) {
+//
+// EXPORTED (tsk-ozl D2): discovery.mjs's resolveDiscovery reuses this same
+// read as its clarify-stage trust signal — a non-empty result means a
+// human already locked decisions into CONTEXT.md, so re-judging blind is
+// both wasteful and can re-ask an already-answered question.
+export function readLockedContext(repoRoot, docsRef) {
   if (typeof docsRef !== 'string' || !docsRef.trim()) return '';
   const featureDir = path.join(repoRoot, docsRef);
   const sections = [];
@@ -58,6 +65,14 @@ const DEFAULT_NEED_HUMAN_REASON =
 // 'heavy' is the one value that gates.
 const HEAVY_RISK = 'heavy';
 const DEFAULT_RISK_GATE_REASON = 'Item gốc có risk cao (heavy) — cần xác nhận trước khi chia.';
+
+// work-item-priority-matrix D4/D8, Phase C: a real blast-radius measurement
+// ADDS caution, never removes it -- a keyword-light item with a large
+// enough blast-radius still gates, same as HEAVY_RISK above, and neither
+// gate ever loosens the other (both are checked, either can force it).
+const BLAST_RADIUS_GATE_THRESHOLD = 20;
+const DEFAULT_BLAST_RADIUS_GATE_REASON =
+  'Blast-radius (impact-analysis) vượt ngưỡng cảnh báo — cần xác nhận trước khi chia.';
 
 // tsk-6b6 D1/D3: fixed rationale for the one branch with no trustworthy
 // model text to draw from -- a parse/model failure, never a real verdict.
@@ -137,9 +152,17 @@ con độc lập, dependency rõ?
   đứng TRƯỚC nó trong danh sách mà nó phụ thuộc).
 - Mơ hồ, không phán chắc được: trả "verdict": "need-human" kèm "reason".
 
+Ngoài ra, đọc phần "Quyết định đã khoá" ở trên (nếu có nhắc mode
+tiny/small/standard/high-risk/spike từ fgos-planning) và trả lại ĐÚNG
+nhãn mode đó qua "mode" — trường này TÙY CHỌN, không ảnh hưởng verdict.
+Nếu plan.md có ghi posture capability impact-analysis KÈM 1 con số blast-
+radius thật (vd số file/symbol bị ảnh hưởng), trả lại ĐÚNG con số đó qua
+"blastRadius"; nếu posture là inactive hoặc không có con số nào, bỏ trống
+trường này — KHÔNG được tự bịa số.
+
 # Định dạng trả lời
 Trả lời DUY NHẤT bằng một dòng JSON, không kèm chữ nào khác:
-{"verdict": "pass-through" | "decompose" | "need-human", "reason": string (bắt buộc khi need-human hoặc decompose; tùy chọn khi pass-through), "children": [{"title": string, "verify": string, "kind": string, "risk": string, "refs": string[], "footprint": string[], "deps": number[]}] (chỉ khi decompose)}
+{"verdict": "pass-through" | "decompose" | "need-human", "reason": string (bắt buộc khi need-human hoặc decompose; tùy chọn khi pass-through), "children": [{"title": string, "verify": string, "kind": string, "risk": string, "refs": string[], "footprint": string[], "deps": number[]}] (chỉ khi decompose), "mode": "tiny" | "small" | "standard" | "high-risk" | "spike" (tùy chọn, đọc lại từ plan.md nếu có), "blastRadius": number không âm (tùy chọn, đọc lại từ plan.md nếu có con số thật)}
 `;
 }
 
@@ -201,24 +224,45 @@ export function judgeDecompose(work, cfg, lockedContext, view) {
       return { kind: 'invalid' };
     }
 
+    // work-item-priority-matrix D5/D8: mode/blastRadius ride on every
+    // non-invalid outcome, same "never gates the decision" discipline
+    // discovery.mjs's impactScore already uses -- an invalid/missing value
+    // is silently omitted, never thrown.
+    const mode = typeof verdict.mode === 'string' && Object.hasOwn(MODE_EFFORT, verdict.mode) ? verdict.mode : undefined;
+    const blastRadius =
+      typeof verdict.blastRadius === 'number' && Number.isFinite(verdict.blastRadius) && verdict.blastRadius >= 0
+        ? verdict.blastRadius
+        : undefined;
+
     if (verdict.verdict === 'pass-through') {
       // tsk-6b6 D2: reason is optional here -- the model was asked, but a
       // blank/omitted answer is still a valid pass-through (unlike decompose
       // below, where a missing reason invalidates the whole verdict).
       const reason = typeof verdict.reason === 'string' && verdict.reason.trim() ? verdict.reason : undefined;
-      return reason ? { kind: 'pass-through', reason } : { kind: 'pass-through' };
+      const out = { kind: 'pass-through' };
+      if (reason) out.reason = reason;
+      if (mode) out.mode = mode;
+      if (blastRadius !== undefined) out.blastRadius = blastRadius;
+      return out;
     }
 
     if (verdict.verdict === 'need-human') {
       const reason =
         typeof verdict.reason === 'string' && verdict.reason.trim() ? verdict.reason : DEFAULT_NEED_HUMAN_REASON;
-      return { kind: 'need-human', reason };
+      const out = { kind: 'need-human', reason };
+      if (mode) out.mode = mode;
+      if (blastRadius !== undefined) out.blastRadius = blastRadius;
+      return out;
     }
 
     if (verdict.verdict === 'decompose') {
       if (!Array.isArray(verdict.children) || verdict.children.length === 0) {
         const reason = typeof verdict.reason === 'string' && verdict.reason.trim() ? verdict.reason : undefined;
-        return reason ? { kind: 'pass-through', reason } : { kind: 'pass-through' };
+        const out = { kind: 'pass-through' };
+        if (reason) out.reason = reason;
+        if (mode) out.mode = mode;
+        if (blastRadius !== undefined) out.blastRadius = blastRadius;
+        return out;
       }
 
       // tsk-6b6 D3: a decompose verdict with no real top-level reason (the
@@ -238,7 +282,10 @@ export function judgeDecompose(work, cfg, lockedContext, view) {
         const { rawDeps, ...rest } = child;
         return { ...rest, deps };
       });
-      return { kind: 'decompose', reason: verdict.reason, children };
+      const out = { kind: 'decompose', reason: verdict.reason, children };
+      if (mode) out.mode = mode;
+      if (blastRadius !== undefined) out.blastRadius = blastRadius;
+      return out;
     }
 
     return { kind: 'invalid' };
@@ -335,6 +382,29 @@ export function resolveDecompose(dir, id, cfg, role) {
     return { outcome: 'invalid', id };
   }
 
+  // work-item-priority-matrix D6/D8: the REFINED pass -- unlike discovery.mjs's
+  // rough pass (impact = blocks + semantic scan only, effort assumed at
+  // EFFORT_FLOOR), this one has real `effort` (from fgos-planning's own
+  // mode, read back by the judge above) and a real `blastRadius` (when
+  // fgos-planning/fgos-validating actually recorded one in plan.md, per
+  // tsk-1e4's capability-gate). Rides on every non-invalid outcome, same
+  // fail-safe try/catch discipline discovery.mjs's rough pass uses.
+  try {
+    const impact = computeImpact({ blocks: rankImpact(view).find((r) => r.id === id)?.blocks ?? 0, blastRadius: verdict.blastRadius });
+    const priority = computePriority({
+      impact,
+      urgent: work.urgent,
+      effort: verdict.mode ? effortForMode(verdict.mode) : undefined,
+      risk: work.risk,
+      blastRadius: verdict.blastRadius,
+    });
+    editWork(dir, { id, patch: { priority }, role });
+  } catch {
+    // Swallowed intentionally — same fail-safe discipline as discovery.mjs's
+    // rough pass: a corrupted item shape or write-door rejection here must
+    // never abort the pass-through/decompose/need-human resolution below.
+  }
+
   // D3: need-human (the model's own call) OR a risk-heavy root (classify's
   // signal) routes through the human gate — carrying whatever the verdict
   // proposed as context, but writing nothing into the queue yet (Terms:
@@ -353,10 +423,23 @@ export function resolveDecompose(dir, id, cfg, role) {
   const gate = view?.gates?.[id];
   const heavyRiskAlreadyConfirmed =
     typeof gate?.answer === 'string' && gate.answer.trim() && typeof gate?.ask === 'string' && gate.ask.includes(DEFAULT_RISK_GATE_REASON);
-  const risksGate = work.risk === HEAVY_RISK && !heavyRiskAlreadyConfirmed;
+  const keywordRiskGate = work.risk === HEAVY_RISK && !heavyRiskAlreadyConfirmed;
+
+  // work-item-priority-matrix D4/D8, Phase C: same bypass-detection shape as
+  // keywordRiskGate above (matched by its own reason text, never a stale
+  // answer from an unrelated gate) -- an INDEPENDENT gate, checked in
+  // addition to keywordRiskGate, never instead of it.
+  const blastRadiusAlreadyConfirmed =
+    typeof gate?.answer === 'string' && gate.answer.trim() && typeof gate?.ask === 'string' && gate.ask.includes(DEFAULT_BLAST_RADIUS_GATE_REASON);
+  const blastRadiusGate =
+    Number.isFinite(verdict.blastRadius) && verdict.blastRadius >= BLAST_RADIUS_GATE_THRESHOLD && !blastRadiusAlreadyConfirmed;
+  const risksGate = keywordRiskGate || blastRadiusGate;
 
   if (verdict.kind === 'need-human' || risksGate) {
-    const reason = verdict.kind === 'need-human' ? verdict.reason : DEFAULT_RISK_GATE_REASON;
+    // keywordRiskGate's reason always wins when both apply -- it is the
+    // existing floor (Phase C's own rule: capability signal only ever adds
+    // caution, never replaces the keyword check it sits alongside).
+    const reason = verdict.kind === 'need-human' ? verdict.reason : keywordRiskGate ? DEFAULT_RISK_GATE_REASON : DEFAULT_BLAST_RADIUS_GATE_REASON;
     // Logged outcome is 'need-human' (what actually happened), not
     // verdict.kind -- a risk-heavy root can force this parking out of a
     // pass-through/decompose verdict underneath it.

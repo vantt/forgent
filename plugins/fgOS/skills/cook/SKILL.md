@@ -87,8 +87,16 @@ never re-implements a dev-skill's substance inline; it invokes them.
      approval gate) then `fgos-validating` (proving: validates the plan
      against reality; ends on its own approval gate) — two separate real
      pauses, never one collapsed into the other. Once both are approved,
-     call the same engine command as above (`fgos discover <id> --json`; its
-     decompose branch runs the split-work judgment) and handle `data.outcome`:
+     call the sibling engine command (tsk-2b0 D1: `discover`/`decompose` are
+     now two separate verbs, hard split, no fallback):
+
+     ```
+     node ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs decompose <id> --json --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
+     ```
+
+     (Same call the `decompose` skill wraps — see
+     `plugins/fgOS/skills/decompose/SKILL.md` for its full outcome contract.)
+     Handle `data.outcome`:
      - `pass-through` / `noop` — item is now `executing`; re-read and
        continue.
      - `decompose` — children were created (`data.childIds`). Push every
@@ -101,7 +109,7 @@ never re-implements a dev-skill's substance inline; it invokes them.
        using `data.verdict`'s proposal as the question.
      - `invalid` — the judgment came back unusable and nothing changed on
        the item. Stop and report this to the user rather than silently
-       retrying — this is `discover`'s own fail-safe, not something to
+       retrying — this is `decompose`'s own fail-safe, not something to
        route around.
 
    - **`stage: executing`** — real implementation, not paperwork:

@@ -190,7 +190,7 @@ export function addWork(dir, work) {
 // write path (identity is immutable; `status` is `move`'s; `stage` is
 // `moveStage`'s) and mixing them into `edit` would open a second door onto
 // the same field.
-const EDITABLE_FIELDS = new Set(['title', 'kind', 'risk', 'verify', 'tier', 'refs', 'deps', 'acceptance', 'priority', 'intent', 'docsRef', 'parent']);
+const EDITABLE_FIELDS = new Set(['title', 'kind', 'risk', 'verify', 'tier', 'refs', 'deps', 'acceptance', 'priority', 'intent', 'docsRef', 'parent', 'urgent', 'impact', 'effort']);
 
 /**
  * Patch fields on an existing work item, through the SAME single write door

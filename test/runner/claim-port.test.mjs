@@ -210,3 +210,56 @@ test('claimWork rejects a runner claim on an item already claimed (doing) by a l
   assert.equal(afterRejectedClaim.claimRole, 'session', 'the original session claim must survive completely untouched');
   assert.equal(afterRejectedClaim.headAtTake, sessionClaim.headAtTake, 'the session claim\'s own headAtTake must not be overwritten by the rejected runner attempt');
 });
+
+// tsk-4m0: a worktreeDir whose parent path segment is a plain FILE, not a
+// directory, makes createWorktree's own `fs.mkdirSync(baseDir, {recursive:
+// true})` throw ENOTDIR before it ever touches git or an existing checkout
+// -- a real, reliable failure trigger for createClaimWorktree, no mocking.
+function unusableWorktreeDir() {
+  const blockerFile = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-claim-port-blocker-'));
+  const filePath = path.join(blockerFile, 'not-a-directory');
+  fs.writeFileSync(filePath, 'blocks mkdirSync recursive\n');
+  return path.join(filePath, 'nested-worktree-dir');
+}
+
+// tsk-4m0: previously, moveWork(to:'doing') committed durably BEFORE
+// createClaimWorktree ran, so a worktree-creation failure orphaned the item
+// in `doing` with no branch/worktree and no automatic recovery (reproduced
+// live on tsk-f31, docs/history/pick-worktree-claim-race/CONTEXT.md D1).
+test('claimWork reverts the todo->doing claim back to todo when createClaimWorktree fails, instead of orphaning the item in doing (tsk-4m0 D1)', () => {
+  const { repoRoot, dir } = setup();
+
+  assert.throws(
+    () => claimWork(dir, { id: 'item-a', actor: 'session', isolate: true, repoRoot, worktreeDir: unusableWorktreeDir() }),
+    (err) => {
+      assert.equal(err.code, 'ENOTDIR');
+      return true;
+    },
+  );
+
+  const after = listWork(dir).work['item-a'];
+  assert.equal(after.status, 'todo', 'a failed worktree creation must leave the item claimable again, not stuck in doing');
+});
+
+// tsk-4m0: the branch-take path (blocked item, branch already exists) runs
+// through the identical moveWork-before-createClaimWorktree ordering, so it
+// needs the identical revert -- back to `blocked`, not `todo`.
+test('claimWork reverts a branch-take blocked->doing claim back to blocked when createClaimWorktree fails (tsk-4m0 D1)', () => {
+  const { repoRoot, dir } = setup();
+
+  const firstClaim = claimWork(dir, { id: 'item-a', actor: 'session', isolate: true, repoRoot });
+  assert.equal(firstClaim.source, 'branch');
+
+  moveWork(dir, { id: 'item-a', to: 'blocked', expectedStatus: 'doing' });
+
+  assert.throws(
+    () => claimWork(dir, { id: 'item-a', actor: 'session', isolate: true, repoRoot, worktreeDir: unusableWorktreeDir() }),
+    (err) => {
+      assert.equal(err.code, 'ENOTDIR');
+      return true;
+    },
+  );
+
+  const after = listWork(dir).work['item-a'];
+  assert.equal(after.status, 'blocked', 'a failed worktree creation on a branch-take must revert back to blocked, not fall through to todo');
+});

@@ -245,9 +245,22 @@ export function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoot = pr
       headAtTake: useBranchSource ? undefined : currentHead(repoRoot),
     };
 
-    // Create worktree if isolating
+    // Create worktree if isolating. moveWork above already committed the
+    // claim durably (tsk-4m0: this was previously unguarded) -- a
+    // createClaimWorktree failure here must not leave the item orphaned in
+    // `doing` with no branch/worktree and no automatic recovery
+    // (startupReap skips human/session claims by design, per
+    // docs/history/pick-worktree-claim-race/CONTEXT.md D1/D3). Revert the
+    // claim back to expectedStatus before rethrowing, so a failed pick
+    // looks like it never happened and a retry sees ordinary CAS semantics.
     if (isolate) {
-      const worktree = createClaimWorktree(repoRoot, id, { worktreeDir, baseRef });
+      let worktree;
+      try {
+        worktree = createClaimWorktree(repoRoot, id, { worktreeDir, baseRef });
+      } catch (err) {
+        moveWork(dir, { id, to: expectedStatus, expectedStatus: 'doing', role: actor });
+        throw err;
+      }
       return { ...claim, worktree };
     }
 

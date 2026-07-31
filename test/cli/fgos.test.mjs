@@ -867,6 +867,58 @@ test('add with no --priority/--intent leaves both fields absent (undefined), not
   assert.equal(item.intent, undefined);
 });
 
+// --- work-item-priority-matrix D2/D3/D5: --urgent (add + edit),
+// --impact/--effort (edit only) ---
+//
+// --urgent exists on BOTH `add` and `edit` (D2, human-entered at intake or
+// later); --impact/--effort exist ONLY on `edit` (D3/D5, computed fields --
+// no --impact/--effort equivalent on `add`'s parser wiring, same
+// established shape --priority/--intent already use above).
+
+test('add --urgent sets the item urgent field, exit 0', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['add', 'add-urgent', '--title', 'Add urgent', '--kind', 'task', '--risk', 'light', '--verify', 'npm test', '--urgent', 'high']);
+  assert.equal(result.status, 0);
+  assert.equal(stateView(cwd).work['add-urgent'].urgent, 'high');
+});
+
+test('add with no --urgent leaves the field absent (undefined), not a default of medium', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'add-no-urgent');
+  assert.equal(stateView(cwd).work['add-no-urgent'].urgent, undefined);
+});
+
+test('edit --urgent/--impact/--effort set the item fields to the given values, exit 0', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'edit-priority-matrix');
+  const result = run(cwd, ['edit', 'edit-priority-matrix', '--urgent', 'critical', '--impact', '12.5', '--effort', '3']);
+  assert.equal(result.status, 0);
+  const item = stateView(cwd).work['edit-priority-matrix'];
+  assert.equal(item.urgent, 'critical');
+  assert.equal(item.impact, 12.5);
+  assert.equal(item.effort, 3);
+});
+
+const EDIT_PRIORITY_MATRIX_BAD_FLAG_CASES = [
+  ['an out-of-domain --urgent', ['--urgent', 'extreme'], 'urgent'],
+  ['a negative --impact', ['--impact', '-1'], 'impact'],
+  ['a bare --impact (no following value)', ['--impact'], 'impact'],
+  ['a non-numeric --effort', ['--effort', 'notanumber'], 'effort'],
+  ['a bare --effort (no following value)', ['--effort'], 'effort'],
+];
+
+for (const [label, badFlagArgs, fieldName] of EDIT_PRIORITY_MATRIX_BAD_FLAG_CASES) {
+  test(`edit with ${label} is rejected as validation, exit 4, no event written, field left unset`, () => {
+    const cwd = tmpCwd();
+    addOk(cwd, 'edit-priority-matrix-bad-flag');
+    const before = eventLines(cwd).length;
+    const result = run(cwd, ['edit', 'edit-priority-matrix-bad-flag', ...badFlagArgs]);
+    assert.equal(result.status, 4);
+    assert.equal(eventLines(cwd).length, before);
+    assert.equal(stateView(cwd).work['edit-priority-matrix-bad-flag'][fieldName], undefined);
+  });
+}
+
 test('decision logs one event and appears in the view, exit 0', () => {
   const cwd = tmpCwd();
   run(cwd, ['init']);
@@ -2809,11 +2861,12 @@ test('discover on a clear verdict moves the submitted item to stage decompose wi
   assert.equal(item.verify, 'npm test -- proven');
 });
 
-// The sync path's second hop (stage-decompose D3 parity): calling `discover`
-// again on the same item, now sitting at stage `decompose`, dispatches to
-// `resolveDecompose` instead of `resolveDiscovery` — same verb, same role
-// attribution, the engine picked by the item's CURRENT stage.
-test("discover called a second time, once the item sits at stage decompose, dispatches to resolveDecompose and pass-throughs it on to executing (sync/async parity)", () => {
+// tsk-2b0 D1 (hard split, no fallback): `discover` and `decompose` are now
+// two separate verbs, each bound to exactly one stage. The old combined
+// "call discover twice" scenario is split below into its own `decompose`
+// calls plus two new wrong-stage-error tests proving the split actually
+// removed the old dynamic-dispatch fallback, not just renamed it.
+test("decompose on an item sitting at stage decompose dispatches to resolveDecompose and pass-throughs it on to executing (sync/async parity)", () => {
   const cwd = tmpCwd();
   writeRunnerConfig(cwd, { clear: true, verify: 'npm test -- proven' });
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
@@ -2825,19 +2878,51 @@ test("discover called a second time, once the item sits at stage decompose, disp
   // valid chia-việc verdict shape (no `verdict` key) — judgeDecompose's
   // fail-safe folds it to `invalid`, and resolveDecompose leaves the item
   // exactly where it was for the next sweep/call to retry (mẫu C9).
-  const invalidAttempt = run(cwd, ['discover', id]);
+  const invalidAttempt = run(cwd, ['decompose', id]);
   assert.equal(invalidAttempt.status, 0);
   assert.equal(JSON.parse(invalidAttempt.stdout).data.outcome, 'invalid');
   assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'decompose', 'invalid verdict leaves the item untouched, not silently advanced');
 
   // Rewrite the executor config with a real pass-through chia-việc verdict
-  // and call `discover` a third time — now it dispatches to resolveDecompose
-  // and carries the item the rest of the way.
+  // and call `decompose` again — now it carries the item the rest of the way.
   writeRunnerConfig(cwd, { verdict: 'pass-through' });
-  const passThrough = run(cwd, ['discover', id]);
+  const passThrough = run(cwd, ['decompose', id]);
   assert.equal(passThrough.status, 0);
   assert.equal(JSON.parse(passThrough.stdout).data.outcome, 'pass-through');
   assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'executing');
+});
+
+test('discover on a decompose-stage item errors instead of silently dispatching to resolveDecompose (tsk-2b0 D1: hard split, no fallback)', () => {
+  const cwd = tmpCwd();
+  writeRunnerConfig(cwd, { clear: true, verify: 'npm test -- proven' });
+  const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
+
+  run(cwd, ['discover', id]);
+  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'decompose');
+
+  const result = run(cwd, ['discover', id]);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /not "clarify"/);
+  assert.match(result.stderr, /fgos decompose/);
+  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'decompose', 'a rejected call must never mutate the item');
+});
+
+test('decompose on a clarify-stage item errors instead of silently dispatching to resolveDiscovery (tsk-2b0 D1: hard split, no fallback)', () => {
+  const cwd = tmpCwd();
+  const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
+  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'clarify');
+
+  const result = run(cwd, ['decompose', id]);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /not "decompose"/);
+  assert.match(result.stderr, /fgos discover/);
+  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'clarify', 'a rejected call must never mutate the item');
+});
+
+test('decompose with no id is rejected as validation, exit 4', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['decompose']);
+  assert.equal(result.status, 4);
 });
 
 test('discover on an unclear verdict parks the submitted item in awaiting-human with the question, still stage clarify', () => {
@@ -3315,7 +3400,7 @@ test('pick --id on an item already claimed (doing) fails the same way take does 
   assert.equal(stateView(cwd).work['pick-double'].status, 'doing');
 });
 
-test('pick surfaces a real createWorktree failure as-is after the claim already succeeded — the claim is never silently rolled back or hidden', () => {
+test('pick surfaces a real createWorktree failure and reverts the claim it already made, instead of orphaning the item in doing (tsk-4m0 D1)', () => {
   const cwd = initGitCwd();
   run(cwd, ['init']);
   addOk(cwd, 'pick-wt-fail');
@@ -3331,11 +3416,14 @@ test('pick surfaces a real createWorktree failure as-is after the claim already 
   assert.notEqual(result.status, 0, 'pick must fail when createWorktree fails');
   assert.match(result.stderr, /git worktree add failed/);
 
-  // The claim itself is NOT rolled back: the item is left "doing" with no
-  // worktree, exactly as the cell's must_haves truth 5 requires.
+  // tsk-4m0: previously the claim was NOT rolled back here (this test used
+  // to assert status stayed "doing" with no worktree, per the original
+  // pick cell's must_haves truth 5) — reproduced live on tsk-f31 as an
+  // item permanently orphaned in doing with no automatic recovery
+  // (docs/history/pick-worktree-claim-race/CONTEXT.md). The claim now
+  // reverts back to todo so a failed pick looks like it never happened.
   const view = stateView(cwd);
-  assert.equal(view.work['pick-wt-fail'].status, 'doing');
-  assert.equal(view.work['pick-wt-fail'].claimRole, 'session');
+  assert.equal(view.work['pick-wt-fail'].status, 'todo');
 });
 
 // --- pick: claim-lock §3a/§3c/§7 (guard loosen, branch-reuse generalize, claimTrigger) ---

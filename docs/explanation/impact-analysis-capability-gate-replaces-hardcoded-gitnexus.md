@@ -85,3 +85,34 @@ not, by itself, make any workflow step ask the registry — "injection is a
 prose contract, never automatic." `tsk-1e4` is the item that actually
 performs that injection into the three lifecycle skills plus `CLAUDE.md`;
 without it, the registry existing was inert.
+
+## The fourth skill: `fgos-exploring` (`tsk-17w`)
+
+`tsk-1e4` covered `fgos-planning`/`fgos-validating`/`fgos-executing`, but
+left the earliest lifecycle stage — `fgos-exploring`, stage `clarify` —
+without the same gate. `tsk-17w` closed that gap, adding the query to
+`fgos-exploring`'s own scout step:
+
+> Also query `CLAUDE.md`'s impact-analysis capability gate — the same
+> check `fgos-planning`/`fgos-validating`/`fgos-executing` already run
+> (`fgos tool query --capability impact-analysis --status present`) —
+> rather than assuming GitNexus is on this machine, since this is the only
+> clarify-stage session with real tool access (`judgeDiscovery` itself has
+> none: `src/runner/dispatch.mjs:207-220`'s `--allowedTools` permits only
+> `git add`/`git commit`).
+
+Why `fgos-exploring` records the posture but never gates on it, unlike the
+other three skills:
+
+> Fold the result into `CLAUDE.md`'s three-way framing
+> (`impact-analysis: inactive|degraded|full`) and record that line in
+> `CONTEXT.md` in step 3, next to the other scout evidence. This is
+> informational only — `fgos-exploring` edits no code and produces no
+> proof points, so the posture never gates or reshapes which candidate
+> decisions get asked here; it exists so a later reader of this item's
+> `CONTEXT.md` sees the posture without re-deriving it.
+
+With this item, all four lifecycle skills (`fgos-exploring`,
+`fgos-planning`, `fgos-validating`, `fgos-executing`) plus `CLAUDE.md`
+consult the same capability query — the injection `tsk-1dj`'s own D3 first
+flagged as still-needed is now complete across the full item lifecycle.

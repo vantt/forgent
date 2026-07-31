@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { judgeDiscovery, resolveDiscovery } from '../../src/intake/discovery.mjs';
+import { computeImpact, computePriority } from '../../src/state/priority-formula.mjs';
 import { addWork, listWork, StoreError, categoryOf, putInAwaiting, answerAwaiting, moveWork } from '../../src/state/store.mjs';
 import { appendEvent, readEvents } from '../../src/state/events.mjs';
 
@@ -476,31 +477,32 @@ test('resolveDiscovery threads the real store view so a re-judge after an answer
   assert.match(verdict.verdict.verify, /CHỐT: auto-detect, fallback "main"\. KHÔNG hỏi thêm\./);
 });
 
-// --- STR8 (D4): judgeDiscovery gains an optional intentScore, computed from
-// STR43's graphMetrics + STR21's rankImpact context, never gating clear/unclear -
+// --- work-item-priority-matrix D3 (was STR8 D4's intentScore): judgeDiscovery
+// gains an optional impactScore, computed from STR43's graphMetrics + STR21's
+// rankImpact context, never gating clear/unclear -
 
-test('judgeDiscovery includes a valid integer intentScore on a clear verdict', () => {
+test('judgeDiscovery includes a valid integer impactScore on a clear verdict', () => {
   const dir = mkTempDir();
-  const scriptPath = writeVerdictExecutor(dir, { clear: true, verify: 'ok', intentScore: 72 });
+  const scriptPath = writeVerdictExecutor(dir, { clear: true, verify: 'ok', impactScore: 72 });
   const cfg = cfgFor([scriptPath, '{prompt}']);
   const verdict = judgeDiscovery(sampleWork(), cfg);
-  assert.deepEqual(verdict, { clear: true, verify: 'ok', intentScore: 72 });
+  assert.deepEqual(verdict, { clear: true, verify: 'ok', impactScore: 72 });
 });
 
-test('judgeDiscovery includes a valid integer intentScore on an unclear verdict too (not gated on clear)', () => {
+test('judgeDiscovery includes a valid integer impactScore on an unclear verdict too (not gated on clear)', () => {
   const dir = mkTempDir();
-  const scriptPath = writeVerdictExecutor(dir, { clear: false, question: 'Which file?', intentScore: 15 });
+  const scriptPath = writeVerdictExecutor(dir, { clear: false, question: 'Which file?', impactScore: 15 });
   const cfg = cfgFor([scriptPath, '{prompt}']);
   const verdict = judgeDiscovery(sampleWork(), cfg);
-  assert.deepEqual(verdict, { clear: false, question: 'Which file?', intentScore: 15 });
+  assert.deepEqual(verdict, { clear: false, question: 'Which file?', impactScore: 15 });
 });
 
-test('judgeDiscovery omits intentScore (never throws) when the model supplies a missing or non-integer value', () => {
+test('judgeDiscovery omits impactScore (never throws) when the model supplies a missing or non-integer value', () => {
   const cases = [
     { label: 'missing', raw: { clear: true, verify: 'ok' } },
-    { label: 'string', raw: { clear: true, verify: 'ok', intentScore: '80' } },
-    { label: 'float', raw: { clear: true, verify: 'ok', intentScore: 12.5 } },
-    { label: 'null', raw: { clear: true, verify: 'ok', intentScore: null } },
+    { label: 'string', raw: { clear: true, verify: 'ok', impactScore: '80' } },
+    { label: 'float', raw: { clear: true, verify: 'ok', impactScore: 12.5 } },
+    { label: 'null', raw: { clear: true, verify: 'ok', impactScore: null } },
   ];
   for (const { label, raw } of cases) {
     const dir = mkTempDir();
@@ -510,16 +512,16 @@ test('judgeDiscovery omits intentScore (never throws) when the model supplies a 
     assert.doesNotThrow(() => {
       verdict = judgeDiscovery(sampleWork(), cfg);
     }, `case: ${label}`);
-    assert.equal('intentScore' in verdict, false, `case: ${label}`);
+    assert.equal('impactScore' in verdict, false, `case: ${label}`);
   }
 });
 
-test('the judge prompt states the intentScore response-format range as 0 to 100', () => {
+test('the judge prompt states the impactScore response-format range as 0 to 100', () => {
   const dir = mkTempDir();
   const scriptPath = echoPromptExecutor(dir);
   const cfg = cfgFor([scriptPath, '{prompt}']);
   const verdict = judgeDiscovery(sampleWork(), cfg);
-  assert.match(verdict.verify, /intentScore[^\n]*0[^\n]*100/);
+  assert.match(verdict.verify, /impactScore[^\n]*0[^\n]*100/);
 });
 
 test('judgeDiscovery with a view embeds the exact graph-context heading and mechanical graph/impact numbers', () => {
@@ -548,59 +550,81 @@ test('judgeDiscovery with a view but no graph edges degrades the graph-context s
   assert.match(verdict.verify, /chặn 0 việc khác còn mở/);
 });
 
-// --- STR8 (D4): resolveDiscovery writes `intent` via a second, try/catch-
-// wrapped editWork call, right after addDiscovery, before the clear/unclear
-// branch -----------------------------------------------------------------
+// --- work-item-priority-matrix D6/D7 (was STR8 D4's intent write): `intent`
+// is retired in place -- resolveDiscovery now computes+writes `priority` via
+// a second, try/catch-wrapped editWork call, right after addDiscovery,
+// before the clear/unclear branch. Expected values are derived from the same
+// computeImpact/computePriority functions (not hand-duplicated arithmetic)
+// so these stay integration tests, not a second copy of the formula. -----
 
-test('resolveDiscovery writes intent when a clear verdict carries a valid integer intentScore', () => {
+test('resolveDiscovery writes priority (never intent) when a clear verdict carries a valid integer impactScore', () => {
   const scriptDir = mkTempDir();
   const scriptPath = writeVerdictExecutor(scriptDir, {
     clear: true,
     verify: 'npm test -- discovered',
-    intentScore: 88,
+    impactScore: 88,
   });
   const cfg = cfgFor([scriptPath, '{prompt}']);
 
   const storeDir = tmpStoreDir();
-  addWork(storeDir, sampleWork());
+  const work = sampleWork();
+  addWork(storeDir, work);
 
   resolveDiscovery(storeDir, 'item-x', cfg);
   const view = listWork(storeDir);
-  assert.equal(view.work['item-x'].intent, 88);
+  const expected = computePriority({
+    impact: computeImpact({ blocks: 0, semanticRelatedness: 88 }),
+    urgent: work.urgent,
+    risk: work.risk,
+  });
+  assert.equal(view.work['item-x'].priority, expected);
+  assert.equal(view.work['item-x'].intent, undefined);
 });
 
-test('resolveDiscovery writes intent when an unclear verdict carries a valid integer intentScore too (not gated on clear)', () => {
+test('resolveDiscovery writes priority when an unclear verdict carries a valid integer impactScore too (not gated on clear)', () => {
   const scriptDir = mkTempDir();
-  const scriptPath = writeVerdictExecutor(scriptDir, { clear: false, question: 'Which file?', intentScore: 40 });
+  const scriptPath = writeVerdictExecutor(scriptDir, { clear: false, question: 'Which file?', impactScore: 40 });
   const cfg = cfgFor([scriptPath, '{prompt}']);
 
   const storeDir = tmpStoreDir();
-  addWork(storeDir, sampleWork());
+  const work = sampleWork();
+  addWork(storeDir, work);
 
   resolveDiscovery(storeDir, 'item-x', cfg);
   const view = listWork(storeDir);
-  assert.equal(view.work['item-x'].intent, 40);
+  const expected = computePriority({
+    impact: computeImpact({ blocks: 0, semanticRelatedness: 40 }),
+    urgent: work.urgent,
+    risk: work.risk,
+  });
+  assert.equal(view.work['item-x'].priority, expected);
 });
 
-test('resolveDiscovery leaves intent absent when the verdict carries no intentScore', () => {
+test('resolveDiscovery still computes priority from blocks alone when the verdict carries no impactScore', () => {
   const scriptDir = mkTempDir();
   const scriptPath = writeVerdictExecutor(scriptDir, { clear: true, verify: 'npm test -- discovered' });
   const cfg = cfgFor([scriptPath, '{prompt}']);
 
   const storeDir = tmpStoreDir();
-  addWork(storeDir, sampleWork());
+  const work = sampleWork();
+  addWork(storeDir, work);
 
   resolveDiscovery(storeDir, 'item-x', cfg);
   const view = listWork(storeDir);
-  assert.equal(view.work['item-x'].intent, undefined);
+  const expected = computePriority({
+    impact: computeImpact({ blocks: 0, semanticRelatedness: 0 }),
+    urgent: work.urgent,
+    risk: work.risk,
+  });
+  assert.equal(view.work['item-x'].priority, expected);
 });
 
-test('resolveDiscovery writes EXACTLY ONE work.edit event carrying intent per call (no duplicate write)', () => {
+test('resolveDiscovery writes EXACTLY ONE work.edit event carrying priority per call (no duplicate write)', () => {
   const scriptDir = mkTempDir();
   const scriptPath = writeVerdictExecutor(scriptDir, {
     clear: true,
     verify: 'npm test -- discovered',
-    intentScore: 55,
+    impactScore: 55,
   });
   const cfg = cfgFor([scriptPath, '{prompt}']);
 
@@ -610,10 +634,110 @@ test('resolveDiscovery writes EXACTLY ONE work.edit event carrying intent per ca
   resolveDiscovery(storeDir, 'item-x', cfg);
 
   const events = readEvents(path.join(storeDir, 'events.jsonl'));
-  const intentEdits = events.filter(
-    (e) => e.type === 'work.edit' && e.payload?.id === 'item-x' && e.payload?.patch?.intent !== undefined,
+  const priorityEdits = events.filter(
+    (e) => e.type === 'work.edit' && e.payload?.id === 'item-x' && e.payload?.patch?.priority !== undefined,
   );
-  assert.equal(intentEdits.length, 1);
+  assert.equal(priorityEdits.length, 1);
+});
+
+// --- trust signal (tsk-ozl D1-D3): resolveDiscovery skips judgeDiscovery
+// entirely when the item already carries a committed, non-empty
+// CONTEXT.md under its docsRef, instead of re-judging blind past a
+// decision a human already locked. Same signal for both `session` and
+// `runner` callers — no role branch. ---------------------------------
+
+// Builds a docsRef fixture directory as a sibling of storeDir (both live
+// directly under os.tmpdir(), so repoRoot = path.dirname(storeDir) is
+// their shared parent, exactly matching readLockedContext's real
+// `path.join(repoRoot, docsRef)` resolution) and returns the relative
+// docsRef string to set on the work item.
+function mkLockedContextFixture(storeDir, content = '# CONTEXT\n\nD1: locked.\n') {
+  const repoRoot = path.dirname(storeDir);
+  const featureDir = fs.mkdtempSync(path.join(repoRoot, 'fgos-context-'));
+  fs.writeFileSync(path.join(featureDir, 'CONTEXT.md'), content);
+  return path.basename(featureDir);
+}
+
+test('resolveDiscovery skips judgeDiscovery and advances to decompose when docsRef points at a real, non-empty CONTEXT.md', () => {
+  const scriptDir = mkTempDir();
+  const { scriptPath, counterPath } = writeCountingRawStdoutExecutor(scriptDir, JSON.stringify({ clear: true, verify: 'should never run' }));
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  const docsRef = mkLockedContextFixture(storeDir);
+  addWork(storeDir, sampleWork({ docsRef }));
+
+  const result = resolveDiscovery(storeDir, 'item-x', cfg, 'session');
+  assert.equal(result.outcome, 'clear');
+  assert.equal(result.verdict.skipped, true);
+  assert.equal(readCount(counterPath), 0, 'judgeDiscovery must never spawn the executor on the skip path');
+
+  const view = listWork(storeDir);
+  assert.equal(view.work['item-x'].stage, 'decompose');
+  assert.equal(view.discovery['item-x'].length, 1);
+  assert.equal(view.discovery['item-x'][0].clear, true);
+  const decisions = view.decisionsById?.['item-x'] ?? [];
+  assert.ok(decisions.some((d) => d.text.startsWith('discovery skip:')), 'skip must log an audit-trail decision');
+});
+
+test('resolveDiscovery skip path applies identically for role "runner" (RUL19 sweep) as for role "session" — content-based, no role branch', () => {
+  const scriptDir = mkTempDir();
+  const { scriptPath, counterPath } = writeCountingRawStdoutExecutor(scriptDir, JSON.stringify({ clear: true, verify: 'should never run' }));
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  const docsRef = mkLockedContextFixture(storeDir);
+  addWork(storeDir, sampleWork({ docsRef }));
+
+  const result = resolveDiscovery(storeDir, 'item-x', cfg, 'runner');
+  assert.equal(result.outcome, 'clear');
+  assert.equal(result.verdict.skipped, true);
+  assert.equal(readCount(counterPath), 0);
+});
+
+test('resolveDiscovery still calls judgeDiscovery when docsRef is set but CONTEXT.md is missing (fail-open, unchanged behavior)', () => {
+  const scriptDir = mkTempDir();
+  const { scriptPath, counterPath } = writeCountingRawStdoutExecutor(scriptDir, JSON.stringify({ clear: true, verify: 'ok' }));
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  // docsRef points at a directory that is never created — mirrors an item
+  // that predates fgos-exploring or has a stale/incorrect docsRef.
+  addWork(storeDir, sampleWork({ docsRef: 'docs/history/never-written/' }));
+
+  const result = resolveDiscovery(storeDir, 'item-x', cfg);
+  assert.equal(result.outcome, 'clear');
+  assert.equal(result.verdict.skipped, undefined);
+  assert.equal(readCount(counterPath), 1, 'no trust signal means judgeDiscovery must still run the model exactly once');
+});
+
+test('resolveDiscovery still calls judgeDiscovery when docsRef points at an existing but empty CONTEXT.md (fail-open, unchanged behavior)', () => {
+  const scriptDir = mkTempDir();
+  const { scriptPath, counterPath } = writeCountingRawStdoutExecutor(scriptDir, JSON.stringify({ clear: true, verify: 'ok' }));
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  const docsRef = mkLockedContextFixture(storeDir, '   \n');
+  addWork(storeDir, sampleWork({ docsRef }));
+
+  const result = resolveDiscovery(storeDir, 'item-x', cfg);
+  assert.equal(result.outcome, 'clear');
+  assert.equal(result.verdict.skipped, undefined);
+  assert.equal(readCount(counterPath), 1);
+});
+
+test('resolveDiscovery calls judgeDiscovery as before when the item has no docsRef at all (default, most items)', () => {
+  const scriptDir = mkTempDir();
+  const { scriptPath, counterPath } = writeCountingRawStdoutExecutor(scriptDir, JSON.stringify({ clear: true, verify: 'ok' }));
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork());
+
+  const result = resolveDiscovery(storeDir, 'item-x', cfg);
+  assert.equal(result.outcome, 'clear');
+  assert.equal(result.verdict.skipped, undefined);
+  assert.equal(readCount(counterPath), 1);
 });
 
 test('resolveDiscovery still completes clear/unclear resolution when editWork throws for a corrupted item shape (fail-safe)', () => {
@@ -621,7 +745,7 @@ test('resolveDiscovery still completes clear/unclear resolution when editWork th
   const scriptPath = writeVerdictExecutor(scriptDir, {
     clear: true,
     verify: 'npm test -- discovered',
-    intentScore: 60,
+    impactScore: 60,
   });
   const cfg = cfgFor([scriptPath, '{prompt}']);
 
@@ -629,7 +753,7 @@ test('resolveDiscovery still completes clear/unclear resolution when editWork th
   const logPath = path.join(storeDir, 'events.jsonl');
   // Bypass the normal addWork write door to plant a corrupted item shape
   // (empty `risk`) — replay never validates on fold, so it reads back fine,
-  // but editWork's validateWork rejects it when merging the intent patch.
+  // but editWork's validateWork rejects it when merging the priority patch.
   // This proves resolveDiscovery's try/catch around editWork never aborts
   // the moveStage/putInAwaiting resolution that follows.
   appendEvent(logPath, { type: 'work.add', payload: { ...sampleWork(), risk: '' } });
@@ -637,5 +761,5 @@ test('resolveDiscovery still completes clear/unclear resolution when editWork th
   assert.doesNotThrow(() => resolveDiscovery(storeDir, 'item-x', cfg));
   const view = listWork(storeDir);
   assert.equal(view.work['item-x'].stage, 'decompose');
-  assert.equal(view.work['item-x'].intent, undefined);
+  assert.equal(view.work['item-x'].priority, undefined);
 });

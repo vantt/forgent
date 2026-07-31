@@ -235,6 +235,14 @@
     "quadrant": "explanation",
     "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
     "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/docs-index-preserves-prior-id-when-the-store-is-unreachable.md",
+    "title": "Why `docs-index` preserves a doc's prior id when the store is unreachable",
+    "sourceCaptureId": "tsk-f31"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/explanation/event-log-evolution-discipline.md",
     "title": "How fgOS's event log is allowed to evolve without breaking replay",
     "sourceCaptureId": null
@@ -254,6 +262,14 @@
     "docPath": "docs/explanation/fgos-choke-point-pattern.md",
     "title": "Why fgOS keeps growing the same decision logic in more than one place",
     "sourceCaptureId": "tsk-1ab"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/fgos-discover-trusts-a-locked-context-instead-of-blind-rejudging.md",
+    "title": "Why `fgos discover` now trusts a locked CONTEXT.md instead of blindly re-judging",
+    "sourceCaptureId": "tsk-ozl"
   },
   {
     "quadrant": "explanation",
@@ -302,6 +318,14 @@
     "docPath": "docs/explanation/id-generation-design.md",
     "title": "Why a work item's id is TSK<hash>, not a bare hash",
     "sourceCaptureId": null
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/impact-analysis-capability-gate-replaces-hardcoded-gitnexus.md",
+    "title": "Why workflow prose gates on a capability query, not a hardcoded tool name",
+    "sourceCaptureId": "tsk-1e4"
   },
   {
     "quadrant": "explanation",
@@ -555,6 +579,14 @@
     "quadrant": "how-to",
     "purpose": "Show the steps to accomplish one specific, already-understood goal.",
     "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/advance-a-clarify-or-decompose-stage-item-with-discover-decompose.md",
+    "title": "How to advance a work item through `clarify` and `decompose` with `discover`/`decompose`",
+    "sourceCaptureId": "tsk-2b0"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
     "docPath": "docs/how-to/avoid-a-hung-verify-on-return-approve-catchup.md",
     "title": "How to avoid a hung `verify` command on `fgos return`/`approve`/`catchup`",
     "sourceCaptureId": "tsk-3vo"
@@ -675,6 +707,14 @@
     "quadrant": "how-to",
     "purpose": "Show the steps to accomplish one specific, already-understood goal.",
     "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/keep-a-real-fs-writing-integration-test-from-leaving-a-tracked-file-dirty.md",
+    "title": "Keep a real-fs-writing integration test from leaving a tracked file dirty",
+    "sourceCaptureId": "tsk-2ce"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
     "docPath": "docs/how-to/launch-claude-in-a-new-herdr-pane-from-a-plugin.md",
     "title": "Launch claude in a new herdr pane from a plugin",
     "sourceCaptureId": "tsk-19y-3"
@@ -694,6 +734,14 @@
     "docPath": "docs/how-to/recover-a-blocked-merge-conflict-when-catchup-cannot-reconcile-it.md",
     "title": "How to recover a blocked merge-conflict item when `fgos catchup` itself can't reconcile it",
     "sourceCaptureId": "tsk-6c2"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/recover-a-stuck-doing-claim-after-worktree-creation-failure.md",
+    "title": "How to recover a stuck `doing` claim after a worktree-creation failure",
+    "sourceCaptureId": "tsk-4m0"
   },
   {
     "quadrant": "how-to",
@@ -774,6 +822,14 @@
     "docPath": "docs/reference/fgos-show-verb-output-fields.md",
     "title": "`fgos show <id>` output fields",
     "sourceCaptureId": "tsk-2fw"
+  },
+  {
+    "quadrant": "reference",
+    "purpose": "Describe the machinery accurately and completely for lookup.",
+    "audience": "A user who needs precise facts about a specific field/command/API.",
+    "docPath": "docs/reference/forgentx-tool-registry-configuration.md",
+    "title": "forgentX repo's tool-registry configuration",
+    "sourceCaptureId": "tsk-4ad"
   },
   {
     "quadrant": "reference",

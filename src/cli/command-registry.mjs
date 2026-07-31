@@ -84,6 +84,7 @@ export const COMMAND_REGISTRY = [
         acceptance: { type: 'string', description: 'Optional JSON-encoded array of {text, evidence} Condition-of-Satisfaction clauses (NOT comma-separated — clause text may contain commas).', multiValueFormat: 'json-array' },
         'goal-tier': { type: 'string', description: "Optional goal tier ('mvp' or 'milestone'); omit to leave unset (not a goal)." },
         targets: { type: 'string', description: 'Optional comma-separated list of ids this goal item considers "part of" it (an MVP\'s targets are milestone ids; a milestone\'s targets are ordinary work ids).', multiValueFormat: 'csv' },
+        urgent: { type: 'string', description: 'Optional urgency level: one of low/medium/high/critical, human-entered. Omit to leave unset — the priority formula reads an absent value as medium, never stored as a default here.' },
       },
       positional: ['id'],
       required: ['title', 'kind', 'risk', 'verify'],
@@ -129,7 +130,7 @@ export const COMMAND_REGISTRY = [
   {
     name: 'discover',
     invoke: 'fgos discover',
-    description: 'Run context-discovery (clarify) or chia-viec (decompose) for an item, moving it forward per its current stage.',
+    description: 'Run context-discovery for an item at stage clarify, moving it forward to decompose (or parking it in awaiting-human). Errors if the item is not at stage clarify -- use "decompose" for a decompose-stage item.',
     parameters: {
       type: 'object',
       properties: {
@@ -140,6 +141,26 @@ export const COMMAND_REGISTRY = [
       required: ['id'],
     },
     examples: ['fgos discover build-cli'],
+    touchesState: true,
+    requiresExistingStore: true,
+    externalEffect: false,
+    paginated: false,
+    deprecated: null,
+  },
+  {
+    name: 'decompose',
+    invoke: 'fgos decompose',
+    description: 'Run chia-viec (split-work judgment) for an item at stage decompose, moving it forward to executing (pass-through or split into children) or parking it in awaiting-human. Errors if the item is not at stage decompose -- use "discover" for a clarify-stage item.',
+    parameters: {
+      type: 'object',
+      properties: {
+        id: { type: 'string', description: 'Work item id (positional or --id).' },
+        config: { type: 'string', description: 'Path to the runner config (default .fgos-runner.json in cwd).' },
+      },
+      positional: ['id'],
+      required: ['id'],
+    },
+    examples: ['fgos decompose build-cli'],
     touchesState: true,
     requiresExistingStore: true,
     externalEffect: false,
@@ -191,7 +212,7 @@ export const COMMAND_REGISTRY = [
   {
     name: 'edit',
     invoke: 'fgos edit',
-    description: 'Patch fields on an existing item (title/kind/risk/verify/tier/refs/deps/acceptance/priority/intent/docs-ref/parent). At least one field must be given.',
+    description: 'Patch fields on an existing item (title/kind/risk/verify/tier/refs/deps/acceptance/priority/intent/docs-ref/parent/urgent/impact/effort). At least one field must be given.',
     parameters: {
       type: 'object',
       properties: {
@@ -208,6 +229,9 @@ export const COMMAND_REGISTRY = [
         priority: { type: 'integer', description: 'New priority: a non-negative integer, ascending sort (lower = higher priority). Absent stays absent — items without a priority sort after every item that has one.' },
         intent: { type: 'integer', description: 'New intent score: any integer, descending sort (higher = more urgent). Absent stays absent — items without an intent sort after every item that has one.' },
         'docs-ref': { type: 'string', description: 'New relative path to this item\'s docs/history/<feature>/ directory (its own CONTEXT.md/plan.md) — lets an item gain or change this link after creation, e.g. one created via submit (which had no --docs-ref of its own before this field was added here).' },
+        urgent: { type: 'string', description: 'New urgency level: one of low/medium/high/critical, human-entered. Absent reads as medium at the priority formula, never stored as a default here.' },
+        impact: { type: 'number', description: 'New impact score: a non-negative number, computed (blocking fan-out + semantic scan + de-risk bonus) — not typically human-entered directly.' },
+        effort: { type: 'number', description: 'New effort score: a non-negative number, computed from fgos-planning\'s mode/flag-count — not typically human-entered directly.' },
       },
       positional: ['id'],
       required: ['id'],
