@@ -49,12 +49,13 @@ or several — all three are `fgos-planning`'s job, not this skill's.
 
 ## Related / prior-art items (not dependencies, same problem space)
 
-- `tsk-ozl` — pre-existing, independent flag of the same `discover` verb overload D1 resolves.
+- `tsk-ozl` — pre-existing, narrower bug on the same `discover` verb (see D1's correction above); now a `deps` entry of `tsk-2b0`.
+- `tsk-2b0` (filed this session) — D1 (verb split) spun off into its own item, `deps: [tsk-ozl]` (confirmed by the person driving this exploration — bundling the two fixes on the same verb touch, not a strict technical blocker). Resolves the "ship as one item or several" question for D1's slice specifically.
 - `tsk-1xx` (filed this session) — `add`/`edit` missing `--parent` flag; unrelated mechanism, found during the same research pass.
 - `tsk-17w` (filed this session) — `fgos-exploring` missing the `impact-analysis` capability-gate that `fgos-planning`/`fgos-validating`/`fgos-executing` already have (`tsk-1e4`, confirmed `status: done`). **Resolved (post-lock audit): NOT a hard dependency.** D3/D8's rough pass at `clarify` deliberately uses only `blocks`+semantic-scan (no capability query at all); the refined pass at `decompose` already has the capability-gate wired via `tsk-1e4` (done, not blocked on `tsk-17w`). `tsk-17w` would only make the *rough* pass at `clarify` slightly more informed — a genuine independent improvement, not a prerequisite this item's design needs to function.
 - `docs/reference/work-item-pipeline-stages-verbs-and-handoffs.md` — hand-authored reference doc capturing the pipeline's current (pre-this-feature) shape; this feature will need a follow-up pass over that doc once shipped.
 
 ## Outstanding questions deferred to `fgos-planning`
 
-- Ship as one item or split into the two efforts the exploration itself surfaced: (1) front-of-flow (D1 verb split + `tsk-17w`'s capability-gate), (2) field reorg (D2-D8)? The person driving this exploration already named this split verbally; `fgos-planning` still owns the formal shape/size call (not `fgos-exploring`'s job per this skill's own hard rules).
+- D1 (front-of-flow: verb split) is now its own item (`tsk-2b0`), filed and out of this item's scope. Remaining question for `fgos-planning`: does the field-reorg half (D2-D8) still need splitting into more than one item, or is it one honest piece of work?
 - Exact numeric tables for `weight(urgent)`, `discount(risk)`, `effort` mode→number mapping, and the `floor`/inversion constants — deliberately left as implementation detail, not locked here.
