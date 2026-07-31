@@ -86,9 +86,17 @@ duy nhất của linkage vẫn là nhật ký capture, tra qua `fgos doc-sources
      khác nhưng vẫn gắn đúng ngăn), tra
      `purpose`/`audience` từ bảng cố định, đọc `title` là tiêu đề cấp cao nhất đầu tiên
      của tệp, và ghi `docPath`.
-  3. Truy `sourceCaptureId`: dựng bản chiếu capture từ nhật ký sự kiện (đọc-thuần) và
-     tìm bản ghi outcome nào khai `docPath` trùng đúng tệp này; thấy thì lấy mã việc
-     của nó, không thấy thì để `null`.
+  3. Truy `sourceCaptureId`: kiểm nhật ký sự kiện (`events.jsonl` dưới `.fgos/`) có
+     tới được không (tsk-f31) — nhật ký vắng mặt (vd một worktree theo ADR0020, không
+     mang `.fgos/` riêng) khác với nhật ký tới được nhưng thật sự rỗng; `.fgos/` bản
+     thân thư mục có thể tồn tại (giữ mỗi `main-checkout.lock`) trong khi
+     `events.jsonl` bên trong vắng mặt — tín hiệu đúng là sự tồn tại của chính tệp
+     nhật ký, không phải thư mục `.fgos/`. Nhật ký tới được: dựng bản chiếu capture
+     (đọc-thuần) và tìm bản ghi outcome nào khai `docPath` trùng đúng tệp này; thấy
+     thì lấy mã việc của nó, không thấy thì để `null` (như cũ). Nhật ký KHÔNG tới
+     được: nếu manifest đang có trên đĩa đã mang một `sourceCaptureId` thật (khác
+     `null`) cho đúng `docPath` này, giữ nguyên giá trị đó thay vì ghi đè `null` —
+     chỉ một nhật ký thật sự tới được mới được phép ghi `null` đè lên giá trị cũ.
   4. Ghi/ghi-đè manifest thành một tệp máy-đọc-được ở vị trí cố định ngoài cây spec.
 - **Side effects:** chỉ tạo/ghi-đè đúng một tệp manifest. Không ghi sự kiện, không đổi
   trạng thái việc, không đụng vào bất kỳ tài liệu người-dùng-cuối nào.
@@ -184,6 +192,11 @@ duy nhất của linkage vẫn là nhật ký capture, tra qua `fgos doc-sources
   `sourceCaptureId: null` — không phải lỗi (per D13/D15). (Tài liệu how-to đầu tiên nay
   ĐÃ được liên kết tới capture `doc-fgos-rollup-howto` qua slice gộp-sống, nên mục của
   nó mang `sourceCaptureId` thật, không còn `null`.)
+- Nhật ký sự kiện không tới được (vd một worktree theo ADR0020) trong khi manifest đang
+  có trên đĩa đã mang `sourceCaptureId` thật cho một `docPath`: khác với bullet trên —
+  đây KHÔNG phải "tài liệu không có capture", giá trị thật vẫn tồn tại, chỉ là lần chạy
+  này không tra được. Giữ nguyên giá trị cũ trên đĩa thay vì null-hóa (tsk-f31; xem
+  bước 3 ở trên).
 - Tài liệu backfill từ nội dung di sản (không qua compound-learn): đầu-mô-tả của nó
   khai `móc-liên-kết-nguồn` rỗng một cách trung thực — không bịa linkage giả (per D1/D4
   của str64-backfill).
