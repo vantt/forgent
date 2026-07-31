@@ -128,7 +128,7 @@ export const COMMAND_REGISTRY = [
   {
     name: 'discover',
     invoke: 'fgos discover',
-    description: 'Run context-discovery (clarify) or chia-viec (decompose) for an item, moving it forward per its current stage.',
+    description: 'Run context-discovery for an item at stage clarify, moving it forward to decompose (or parking it in awaiting-human). Errors if the item is not at stage clarify -- use "decompose" for a decompose-stage item.',
     parameters: {
       type: 'object',
       properties: {
@@ -139,6 +139,26 @@ export const COMMAND_REGISTRY = [
       required: ['id'],
     },
     examples: ['fgos discover build-cli'],
+    touchesState: true,
+    requiresExistingStore: true,
+    externalEffect: false,
+    paginated: false,
+    deprecated: null,
+  },
+  {
+    name: 'decompose',
+    invoke: 'fgos decompose',
+    description: 'Run chia-viec (split-work judgment) for an item at stage decompose, moving it forward to executing (pass-through or split into children) or parking it in awaiting-human. Errors if the item is not at stage decompose -- use "discover" for a clarify-stage item.',
+    parameters: {
+      type: 'object',
+      properties: {
+        id: { type: 'string', description: 'Work item id (positional or --id).' },
+        config: { type: 'string', description: 'Path to the runner config (default .fgos-runner.json in cwd).' },
+      },
+      positional: ['id'],
+      required: ['id'],
+    },
+    examples: ['fgos decompose build-cli'],
     touchesState: true,
     requiresExistingStore: true,
     externalEffect: false,

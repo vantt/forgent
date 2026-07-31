@@ -2746,11 +2746,12 @@ test('discover on a clear verdict moves the submitted item to stage decompose wi
   assert.equal(item.verify, 'npm test -- proven');
 });
 
-// The sync path's second hop (stage-decompose D3 parity): calling `discover`
-// again on the same item, now sitting at stage `decompose`, dispatches to
-// `resolveDecompose` instead of `resolveDiscovery` — same verb, same role
-// attribution, the engine picked by the item's CURRENT stage.
-test("discover called a second time, once the item sits at stage decompose, dispatches to resolveDecompose and pass-throughs it on to executing (sync/async parity)", () => {
+// tsk-2b0 D1 (hard split, no fallback): `discover` and `decompose` are now
+// two separate verbs, each bound to exactly one stage. The old combined
+// "call discover twice" scenario is split below into its own `decompose`
+// calls plus two new wrong-stage-error tests proving the split actually
+// removed the old dynamic-dispatch fallback, not just renamed it.
+test("decompose on an item sitting at stage decompose dispatches to resolveDecompose and pass-throughs it on to executing (sync/async parity)", () => {
   const cwd = tmpCwd();
   writeRunnerConfig(cwd, { clear: true, verify: 'npm test -- proven' });
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
@@ -2762,19 +2763,51 @@ test("discover called a second time, once the item sits at stage decompose, disp
   // valid chia-việc verdict shape (no `verdict` key) — judgeDecompose's
   // fail-safe folds it to `invalid`, and resolveDecompose leaves the item
   // exactly where it was for the next sweep/call to retry (mẫu C9).
-  const invalidAttempt = run(cwd, ['discover', id]);
+  const invalidAttempt = run(cwd, ['decompose', id]);
   assert.equal(invalidAttempt.status, 0);
   assert.equal(JSON.parse(invalidAttempt.stdout).data.outcome, 'invalid');
   assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'decompose', 'invalid verdict leaves the item untouched, not silently advanced');
 
   // Rewrite the executor config with a real pass-through chia-việc verdict
-  // and call `discover` a third time — now it dispatches to resolveDecompose
-  // and carries the item the rest of the way.
+  // and call `decompose` again — now it carries the item the rest of the way.
   writeRunnerConfig(cwd, { verdict: 'pass-through' });
-  const passThrough = run(cwd, ['discover', id]);
+  const passThrough = run(cwd, ['decompose', id]);
   assert.equal(passThrough.status, 0);
   assert.equal(JSON.parse(passThrough.stdout).data.outcome, 'pass-through');
   assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'executing');
+});
+
+test('discover on a decompose-stage item errors instead of silently dispatching to resolveDecompose (tsk-2b0 D1: hard split, no fallback)', () => {
+  const cwd = tmpCwd();
+  writeRunnerConfig(cwd, { clear: true, verify: 'npm test -- proven' });
+  const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
+
+  run(cwd, ['discover', id]);
+  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'decompose');
+
+  const result = run(cwd, ['discover', id]);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /not "clarify"/);
+  assert.match(result.stderr, /fgos decompose/);
+  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'decompose', 'a rejected call must never mutate the item');
+});
+
+test('decompose on a clarify-stage item errors instead of silently dispatching to resolveDiscovery (tsk-2b0 D1: hard split, no fallback)', () => {
+  const cwd = tmpCwd();
+  const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
+  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'clarify');
+
+  const result = run(cwd, ['decompose', id]);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /not "decompose"/);
+  assert.match(result.stderr, /fgos discover/);
+  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'clarify', 'a rejected call must never mutate the item');
+});
+
+test('decompose with no id is rejected as validation, exit 4', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['decompose']);
+  assert.equal(result.status, 4);
 });
 
 test('discover on an unclear verdict parks the submitted item in awaiting-human with the question, still stage clarify', () => {
