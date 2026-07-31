@@ -11,8 +11,13 @@ description: >-
 # fgos-exploring
 
 Turns a fuzzy request into locked decisions written down in
-`docs/history/<feature>/CONTEXT.md`. This skill runs while a claimed item's
-`stage` is `clarify` — it finds the flowers; it does not build the comb.
+`docs/history/<feature>/CONTEXT.md`. This skill normally runs while a
+claimed item's `stage` is `clarify` — it finds the flowers; it does not
+build the comb. It can also be invoked directly by `fgos-planning`,
+mid-`decompose`, when that skill finds `CONTEXT.md` silent on something
+material to the plan (`fgos-planning/SKILL.md`'s own hand-back step);
+`item.stage` stays `decompose` the entire time in that case — this skill
+never moves it.
 
 ## Hard rules
 
