@@ -811,6 +811,11 @@ async function runVerb(verb, flags, positional, dir) {
         // empty `--targets ''` (or a bare `--targets` with no value)
         // parses to [] explicitly, same as --footprint.
         targets: flags.targets === undefined ? undefined : parseListFlag(flags.targets),
+        // Per work-item-priority-matrix D2: --urgent is optional, human-
+        // entered, same omitted-leaves-undefined shape as --tier/--domain
+        // above. work.mjs's validateWorkShape is the single source for the
+        // URGENCY_LEVELS domain and rejects an out-of-domain value.
+        urgent: optionalField(flags.urgent, "add --urgent requires a value ('low'/'medium'/'high'/'critical'); omit --urgent entirely to leave unset."),
       };
       const { event } = addWork(dir, work);
       return { id: event.payload.id, seq: event.seq };
@@ -977,7 +982,7 @@ async function runVerb(verb, flags, positional, dir) {
     case 'edit': {
       const id = requireField(positional[0] ?? flags.id, 'edit requires an id: fgos edit <id> --<field> <value> [...]');
       const patch = {};
-      for (const field of ['title', 'kind', 'risk', 'verify', 'tier']) {
+      for (const field of ['title', 'kind', 'risk', 'verify', 'tier', 'urgent']) {
         if (flags[field] !== undefined) {
           patch[field] = flags[field];
         }
@@ -1038,10 +1043,29 @@ async function runVerb(verb, flags, positional, dir) {
         }
         patch.intent = intent;
       }
+      // Impact/effort (per work-item-priority-matrix D3/D5): both computed,
+      // non-negative NUMBERS (not integer-only like priority/intent, since
+      // they can carry a fractional composite score) -- same valueless-flag
+      // guard as priority/intent above.
+      for (const field of ['impact', 'effort']) {
+        if (flags[field] !== undefined) {
+          if (flags[field] === true) {
+            throw new StoreError('validation', `--${field} requires a numeric value.`);
+          }
+          const value = Number(flags[field]);
+          if (!Number.isFinite(value) || value < 0) {
+            throw new StoreError(
+              'validation',
+              `--${field} must be a non-negative number, got: ${JSON.stringify(flags[field])}`,
+            );
+          }
+          patch[field] = value;
+        }
+      }
       if (Object.keys(patch).length === 0) {
         throw new StoreError(
           'validation',
-          'edit requires at least one field to change: --title/--kind/--risk/--verify/--tier/--refs/--deps/--acceptance/--priority/--intent/--docs-ref.',
+          'edit requires at least one field to change: --title/--kind/--risk/--verify/--tier/--refs/--deps/--acceptance/--priority/--intent/--docs-ref/--urgent/--impact/--effort.',
         );
       }
       const { event } = editWork(dir, { id, patch, role: 'human' });

@@ -83,6 +83,7 @@ export const COMMAND_REGISTRY = [
         acceptance: { type: 'string', description: 'Optional JSON-encoded array of {text, evidence} Condition-of-Satisfaction clauses (NOT comma-separated — clause text may contain commas).', multiValueFormat: 'json-array' },
         'goal-tier': { type: 'string', description: "Optional goal tier ('mvp' or 'milestone'); omit to leave unset (not a goal)." },
         targets: { type: 'string', description: 'Optional comma-separated list of ids this goal item considers "part of" it (an MVP\'s targets are milestone ids; a milestone\'s targets are ordinary work ids).', multiValueFormat: 'csv' },
+        urgent: { type: 'string', description: 'Optional urgency level: one of low/medium/high/critical, human-entered. Omit to leave unset — the priority formula reads an absent value as medium, never stored as a default here.' },
       },
       positional: ['id'],
       required: ['title', 'kind', 'risk', 'verify'],
@@ -190,7 +191,7 @@ export const COMMAND_REGISTRY = [
   {
     name: 'edit',
     invoke: 'fgos edit',
-    description: 'Patch fields on an existing item (title/kind/risk/verify/tier/refs/deps/acceptance/priority/intent/docs-ref). At least one field must be given.',
+    description: 'Patch fields on an existing item (title/kind/risk/verify/tier/refs/deps/acceptance/priority/intent/docs-ref/urgent/impact/effort). At least one field must be given.',
     parameters: {
       type: 'object',
       properties: {
@@ -206,6 +207,9 @@ export const COMMAND_REGISTRY = [
         priority: { type: 'integer', description: 'New priority: a non-negative integer, ascending sort (lower = higher priority). Absent stays absent — items without a priority sort after every item that has one.' },
         intent: { type: 'integer', description: 'New intent score: any integer, descending sort (higher = more urgent). Absent stays absent — items without an intent sort after every item that has one.' },
         'docs-ref': { type: 'string', description: 'New relative path to this item\'s docs/history/<feature>/ directory (its own CONTEXT.md/plan.md) — lets an item gain or change this link after creation, e.g. one created via submit (which had no --docs-ref of its own before this field was added here).' },
+        urgent: { type: 'string', description: 'New urgency level: one of low/medium/high/critical, human-entered. Absent reads as medium at the priority formula, never stored as a default here.' },
+        impact: { type: 'number', description: 'New impact score: a non-negative number, computed (blocking fan-out + semantic scan + de-risk bonus) — not typically human-entered directly.' },
+        effort: { type: 'number', description: 'New effort score: a non-negative number, computed from fgos-planning\'s mode/flag-count — not typically human-entered directly.' },
       },
       positional: ['id'],
       required: ['id'],

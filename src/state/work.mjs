@@ -86,6 +86,14 @@ export const STATUSES = Object.freeze(['todo', 'doing', 'blocked', 'awaiting-app
 export const TIERS = Object.freeze(['light', 'standard', 'heavy']);
 
 /**
+ * Urgency domain for `work.urgent` (per work-item-priority-matrix D2) —
+ * human-entered, optional. Absent reads as `medium` at the consuming
+ * formula, never stored as a default here (same absent-stays-absent shape
+ * as tier/domain above).
+ */
+export const URGENCY_LEVELS = Object.freeze(['low', 'medium', 'high', 'critical']);
+
+/**
  * Goal-tier domain for `work.goalTier` (per str67-goal-directed-planning D1)
  * — marks a work item as a declared goal. A goal is not a new entity: it is
  * an ordinary work item carrying this optional field, always set at `add`
@@ -222,6 +230,34 @@ export function validateWorkShape(work) {
   if (work.intent !== undefined && !Number.isInteger(work.intent)) {
     throw new WorkValidationError(
       `work.intent must be an integer when present, got: ${JSON.stringify(work.intent)}`,
+    );
+  }
+  // Urgent (per work-item-priority-matrix D2): OPTIONAL additive string,
+  // human-entered via `fgos add/edit --urgent`. Same optional-additive
+  // shape as tier/domain above; absent stays absent (the "medium" default
+  // is applied by the priority formula that reads it, never stored here).
+  if (work.urgent !== undefined && !URGENCY_LEVELS.includes(work.urgent)) {
+    throw new WorkValidationError(
+      `work.urgent must be one of ${JSON.stringify(URGENCY_LEVELS)} when present, got: ${JSON.stringify(work.urgent)}`,
+    );
+  }
+  // Impact (per work-item-priority-matrix D3): OPTIONAL additive number,
+  // computed (blocking fan-out + semantic scan, refined with a de-risk
+  // bonus at decompose per D8) — never human-entered directly. Same
+  // non-negative-number shape priority/intent already use; absent stays
+  // absent.
+  if (work.impact !== undefined && !(typeof work.impact === 'number' && Number.isFinite(work.impact) && work.impact >= 0)) {
+    throw new WorkValidationError(
+      `work.impact must be a non-negative number when present, got: ${JSON.stringify(work.impact)}`,
+    );
+  }
+  // Effort (per work-item-priority-matrix D5): OPTIONAL additive number,
+  // computed at decompose from fgos-planning's own mode/flag-count — never
+  // human-entered directly. Same non-negative-number shape as impact;
+  // absent stays absent.
+  if (work.effort !== undefined && !(typeof work.effort === 'number' && Number.isFinite(work.effort) && work.effort >= 0)) {
+    throw new WorkValidationError(
+      `work.effort must be a non-negative number when present, got: ${JSON.stringify(work.effort)}`,
     );
   }
   if (work.stage !== undefined) {
