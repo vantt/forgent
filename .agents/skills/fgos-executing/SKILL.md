@@ -62,8 +62,13 @@ re-shapes the work; that already happened at `clarify`/`decompose`.
    are the whole spec — do not manufacture ceremony it doesn't need.
 
 2. **Implement.** Make the real change the item describes, reading every
-   file before editing it. When reality disagrees with what the item
-   assumed:
+   file before editing it. Before editing a symbol, apply `CLAUDE.md`'s
+   impact-analysis capability gate rather than assuming GitNexus is on this
+   machine: `fgos tool query --capability impact-analysis --status present`
+   decides whether the MUST-run-impact rule below is Full (present — run
+   it), Degraded (registered but not present — proceed, but say the blast
+   radius is unconfirmed), or Inactive (nothing registered — proceed
+   without it). When reality disagrees with what the item assumed:
    - a bug found in code you are already touching → fix it, and say so
      plainly when you return the item;
    - functionality the item's own outcome depends on turns out to be
