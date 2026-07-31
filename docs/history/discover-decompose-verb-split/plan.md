@@ -55,7 +55,12 @@ sweep's pre-filtered calls and the CLI's now-guarded calls for no benefit.
 | `plugins/fgOS/skills/discover/SKILL.md` + new `plugins/fgOS/skills/decompose/SKILL.md` | Medium — the existing skill's whole step 2/3 contract (one call, branch on `data.outcome` shape) is built on dynamic dispatch; splitting it wrong could leave a stage with no slash-command path | Manually walk both skills' steps against a real `clarify`-stage and a real `decompose`-stage item id; confirm each skill's own step 2 command succeeds and step 3's outcome-branch table still matches what the CLI actually returns |
 | `.claude/skills/fgos-exploring/SKILL.md`, `.claude/skills/fgos-validating/SKILL.md` (+ `.agents/skills/` mirrors) | Low — prose-only hand-off references, no executable contract | Grep confirms no remaining bare `fgos discover` reference where a `decompose`-stage hand-off is meant (`fgos-validating`'s hand-off should now say `fgos decompose`) |
 | `test/cli/fgos.test.mjs` | Medium — 9 existing call sites assume one verb name; some test the decompose branch by calling `discover` a second time after the item already advanced to `decompose` | Full `npm test` green; specifically the reshaped `discover`/`decompose` test block covers: clear verdict, unclear verdict (parks `awaiting-human`), missing id, wrong-stage call to each verb (new case), invalid judge response, pass-through, already-decomposed |
-| `docs/reference/work-item-pipeline-stages-verbs-and-handoffs.md` | Low — reference doc, no runtime effect | Read-through confirms it now shows two verbs, no lingering reference to `discover` covering both stages |
+(`docs/reference/work-item-pipeline-stages-verbs-and-handoffs.md`, cited in
+`tsk-4y5`'s CONTEXT.md as a follow-up target, was checked at
+`fgos-validating` time and found untracked/uncommitted — not reachable from
+any commit on this or any branch, only a WIP file in another session's
+working directory. Dropped from this item's scope below; a genuinely
+committed version is a later item's concern, not this one's.)
 
 Impact-analysis capability gate (per `CLAUDE.md`): checked below before
 leaning on GitNexus for blast-radius evidence on the `bin/fgos.mjs` case
@@ -87,10 +92,13 @@ split.
    decompose` (it hands off at `decompose`).
 7. `test/cli/fgos.test.mjs:2738-2884` — reshape the 9 call sites per the
    risk-map proof point above.
-8. `docs/reference/work-item-pipeline-stages-verbs-and-handoffs.md` —
-   update the verb reference per D2 (this is the live/prescriptive doc
-   `tsk-4y5`'s CONTEXT.md flagged, not exempted by D3's historical-docs
-   carve-out).
+
+`docs/reference/work-item-pipeline-stages-verbs-and-handoffs.md` is
+**out of scope** (see risk-map note above) — untracked/uncommitted, not
+reachable on this branch as of `fgos-validating`'s check. D2's "every live
+caller in scope" only covers files this item can actually see and commit
+against; a file that doesn't exist yet in git history isn't a live caller
+this item can update.
 
 ## Order
 
@@ -113,9 +121,8 @@ further split to compare candidates for):
    verb names/output shapes.
 4. `plugins/fgOS/skills/cook/SKILL.md`, `.claude/skills/fgos-exploring/
    SKILL.md`, `.claude/skills/fgos-validating/SKILL.md` (+ `.agents/
-   skills/` mirrors), `docs/reference/
-   work-item-pipeline-stages-verbs-and-handoffs.md` — prose-only updates,
-   last since nothing else depends on them.
+   skills/` mirrors) — prose-only updates, last since nothing else depends
+   on them.
 
 ## Impact-analysis capability gate
 
@@ -132,6 +139,17 @@ case and `resolveDiscovery`/`resolveDecompose` before editing, per
 `impact-analysis: inactive` or `degraded` next to those proof points and
 rely on the `test/cli/fgos.test.mjs` full-suite proof instead — not a
 gap, per the capability gate's own inactive/degraded posture.
+
+**Run at `fgos-validating` time (2026-07-31):** `present` (GitNexus
+registered). `impact(resolveDiscovery, upstream)` and
+`impact(resolveDecompose, upstream)` both returned `impactedCount: 0,
+risk: LOW` — but GitNexus's index is 205 commits behind HEAD
+(`gitnexus list_repos`), and this directly contradicts the direct-read
+evidence already in the risk map (`bin/fgos.mjs:881-882`,
+`loop.mjs:957,977` both call these functions). Treated as stale/unreliable
+rather than a clean LOW-risk confirmation; the `test/cli/fgos.test.mjs`
+full-suite proof point remains the real evidence for this row, not the
+GitNexus result.
 
 ## Split decision
 
