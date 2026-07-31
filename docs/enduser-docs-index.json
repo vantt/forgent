@@ -563,6 +563,14 @@
     "quadrant": "how-to",
     "purpose": "Show the steps to accomplish one specific, already-understood goal.",
     "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/add-a-scoped-allowedtools-override-for-a-nested-executor-call.md",
+    "title": "How to grant a nested `claude -p` executor call its own scoped `allowedTools`",
+    "sourceCaptureId": "tsk-62d"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
     "docPath": "docs/how-to/add-a-single-item-id-filter-to-an-existing-list-verb.md",
     "title": "Add a single-item `--id` filter to an existing `list`-style verb",
     "sourceCaptureId": "tsk-42m"
