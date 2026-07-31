@@ -20,6 +20,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { modelForTier } from '../runner/dispatch.mjs';
+import { loadTemplate } from '../runner/prompt-templates.mjs';
 import { runJudgeExecutor, JUDGE_STRICT_JSON_SUFFIX } from './judge-executor.mjs';
 import { DEFAULTS } from '../state/work.mjs';
 import { listWork, moveStage, moveWork, addWork, putInAwaiting, addDecision, editWork, StoreError } from '../state/store.mjs';
@@ -136,6 +137,7 @@ ${locked}
 câu trả lời đó để phán — không hỏi lại cùng một câu)
 ${qa}
 
+${loadTemplate('judge-scout-instructions.txt')}
 # Câu hỏi
 Item này đơn giản, thi công thẳng được không, hay cần chia thành nhiều việc
 con độc lập, dependency rõ?

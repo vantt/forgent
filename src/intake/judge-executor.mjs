@@ -21,8 +21,14 @@ export const JUDGE_STRICT_JSON_SUFFIX =
 // single retry wasn't enough headroom.
 const MAX_JUDGE_ATTEMPTS = 3;
 
+// tsk-62d D2/D4: `tier: 'judge'` reuses the existing generic `cfg.executors`
+// string-keyed lookup (`resolveExecutorConfig`, dispatch.mjs) as a synthetic
+// role key — a repo can grant judge calls their own `executors.judge` block
+// (e.g. `Bash(rg:*)` for scout capability) without touching the worker's own
+// `cfg.executor`/`cfg.executors[<real tier>]` blocks. Absent `executors.judge`
+// falls back to `cfg.executor`, identical to pre-tsk-62d behavior.
 function spawnAttempt(cfg, model, prompt) {
-  const { command, args } = resolveExecutorCommand(cfg, { prompt, model });
+  const { command, args } = resolveExecutorCommand(cfg, { prompt, model, tier: 'judge' });
   return spawnSync(command, args, {
     shell: false,
     timeout: cfg?.timeoutMs,

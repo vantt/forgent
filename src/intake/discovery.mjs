@@ -24,6 +24,7 @@
 
 import path from 'node:path';
 import { modelForTier } from '../runner/dispatch.mjs';
+import { loadTemplate } from '../runner/prompt-templates.mjs';
 import { runJudgeExecutor, JUDGE_STRICT_JSON_SUFFIX } from './judge-executor.mjs';
 import { readLockedContext } from './decompose.mjs';
 import { DEFAULTS } from '../state/work.mjs';
@@ -143,6 +144,7 @@ ${qa}
 # Các lần phán trước
 ${history}
 
+${loadTemplate('judge-scout-instructions.txt')}
 Câu trả lời của người ở trên là QUYẾT ĐỊNH CUỐI CÙNG — KHÔNG hỏi lại một chủ đề
 đã được trả lời. Nếu câu trả lời đã đủ để thi công, verdict phải clear=true kèm
 một \`verify\` chạy được thật.

@@ -1,0 +1,11 @@
+# Scout trước khi phán (nếu có công cụ)
+
+Nếu bạn có quyền chạy `rg` (ripgrep), hãy tự tìm bằng chứng thật trong repo
+TRƯỚC KHI kết luận clear/unclear: chọn MỘT từ khóa gắn với term của item
+này, chạy MỘT lượt `rg` có giới hạn (không lặp lại nhiều lần tùy tiện), rồi
+dùng kết quả (đường dẫn file thật, nếu có) làm căn cứ cho verdict. Không có
+kết quả cũng là bằng chứng hợp lệ (nghĩa là term đó chưa tồn tại trong repo)
+— không phải lý do để bỏ qua bước scout.
+
+Nếu bạn KHÔNG có quyền chạy tool nào, bỏ qua mục này và phán như bình
+thường — không tự bịa bằng chứng, không giả vờ đã scout.
