@@ -148,6 +148,69 @@ Lấy **data model + degrade ladder của repository-harness/symphony** (vì fgO
 
 *(R/E/F giữ nguyên rubric distillery hiện có; đây là đề xuất điều chỉnh dòng đã tồn tại ở porting-log.md:34, không tạo dòng mới trùng — cần human xác nhận trước khi sửa porting-log.)*
 
+## Cấu hình forgentX hiện tại (tsk-4ad)
+
+Verb-group `fgos tool` (port của tsk-1dj) đã sống trong `bin/fgos.mjs`; mục
+này chỉ ghi lại cấu hình THẬT của repo forgentX hôm nay, và cách một người
+khác tự chỉnh/mở rộng nó mà không cần hỏi lại.
+
+**Đăng ký sống** (xác nhận bằng `fgos tool query --capability impact-analysis --json`):
+
+- `gitnexus` — `kind: mcp`, `capability: impact-analysis`, `scan: .gitnexus`,
+  `responsibility: Verification`, `description: Code-graph blast radius`.
+  Provider đầu tiên và duy nhất cho `impact-analysis` hôm nay.
+
+**Capability vocab đang dùng**: đúng 1 nhãn — `impact-analysis` (kebab-case,
+tự chuẩn hoá qua `normalizeCapability`, `src/state/tool-registry.mjs`). Thêm
+nhãn mới không cần sửa code: chỉ cần `--capability <ten-moi>` lúc `register`
+— consumer (một skill, hay CLAUDE.md) tự quyết định có hỏi nhãn đó hay
+không, registry không áp policy.
+
+**Thêm 1 provider mới** (cho `impact-analysis` hoặc một capability khác):
+
+```
+fgos tool register --name <ten> --kind <cli|binary|mcp|skill|http> \
+  --capability <nhan> --command <lenh-hoac-mcp:ten> \
+  [--scan <duong-dan>] [--responsibility <vai-tro>] [--description "..."] \
+  --dir <main-checkout-root>
+```
+
+`--scan` bắt buộc cho `kind` `mcp`/`skill` (không nằm trên `PATH`, presence
+check bằng scan path trên đĩa thay vì `command -v`). `--name` phải duy nhất
+— đăng ký trùng tên bị từ chối thẳng (`validateToolRegistration`); muốn thay
+một provider đã có, `fgos tool remove --name <ten>` trước rồi `register`
+lại. Chạy từ một worktree (không phải main checkout) luôn cần `--dir` trỏ
+về main checkout — registry là state chia sẻ chung một chỗ, không phải
+per-branch (ADR0020).
+
+**Probe & đọc trạng thái**:
+
+- `fgos tool check [--name x] [--json]` — probe từng tool đã đăng ký, ghi
+  `status`+`checkedAt` vào `.fgos/tool-status.local.json` (cục bộ,
+  gitignored, KHÔNG qua event-log — sự thật về máy đang chạy, không phải
+  quyết định team). Luôn exit 0, kể cả khi tool thiếu.
+- `fgos tool query --capability <nhan> [--status present]` — trả provider
+  set, gộp đăng ký (chia sẻ) với overlay trạng thái cục bộ (máy này).
+- `fgos doctor` — check `tool-registry-configured` (`src/setup/checks.mjs`)
+  tự báo posture tổng quát, không cần tự gọi `tool query` tay.
+
+**Đọc 3 nấc trạng thái** (degrade ladder, xem "Giải pháp tổng hợp" ở trên):
+
+- **inactive** — 0 tool đăng ký cho capability này. Vô hại, bỏ qua sạch,
+  không phải thiếu sót.
+- **degraded** — có đăng ký nhưng probe ra `missing`, hoặc chưa từng
+  `check` (`unknown`). Gap thật — cảnh báo weak-proof trong verify/plan
+  note, nhưng vẫn chạy tiếp phần khác.
+- **full** — mọi tool đăng ký đều `present`. Giữ nguyên hành vi MUST hiện
+  tại không đổi.
+
+Việc CHƯA nằm trong tsk-4ad: sửa prose 3 skill (fgos-planning/validating/
+executing) + CLAUDE.md để MỖI BƯỚC workflow tự hỏi capability
+(`fgos tool query --capability impact-analysis --status present`) thay vì
+hardcode tên "GitNexus" trong logic gate — đó là injection thật sự (xem
+mục "Ví dụ end-to-end" ở trên), và là việc riêng của tsk-1e4. tsk-4ad dừng
+ở: đăng ký provider, có DOCTOR_CHECKS entry, và ghi chú đọc-hiểu-được này.
+
 ## Open questions
 
 - ~~fgOS event-log hiện có cơ chế fold multi-value map...~~ **Đã xác nhận**: `src/state/replay.mjs:30` `foldEvents()` là 1 switch phẳng theo `event.type` (`work.add`, `work.move`, `work.edit`, `decision`, `work.outcome`, `work.stage`, `work.discovery`, `goal.focus`, `work.friction`...) sinh ra `view`. Thêm `tool.register`/`tool.check`/`tool.remove` là 3 case mới cùng khuôn, fold vào `view.tools`. Không cần store mới; có thể tách logic validate/query ra 1 file riêng (`src/state/tool-registry.mjs`, theo mẫu `porting-store.mjs` đã tách khỏi `replay.mjs`) rồi gọi từ case trong `replay.mjs`, giữ switch mỏng.
