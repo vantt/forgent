@@ -11,9 +11,16 @@ consumes from the step before it / produces for the step after it.
 is now a calculated field (rough pass at `clarify`, refined pass at
 `decompose`); `intent` is retired in place (stops being written, field/flag
 untouched). See `docs/history/work-item-priority-matrix/CONTEXT.md`/
-`plan.md` for the full design. `tsk-2b0` (verb split `discover`/
-`decompose`) is filed but not yet shipped — this doc still describes the
-one overloaded `discover` verb.
+`plan.md` for the full design.
+
+**Updated 2026-07-31 (`tsk-2b0`, shipped after this doc was first
+written):** the overloaded `discover` verb described below is SPLIT now —
+`discover` only accepts an item at stage `clarify` (refuses otherwise,
+naming `fgos decompose <id>` instead); `decompose` is a separate verb only
+accepting stage `decompose` (`bin/fgos.mjs:881-910`, hard split per D1, no
+fallback). The diagram/table below are corrected for this split; treat any
+remaining bare "`discover`" reference to the decompose-stage judge
+elsewhere in this repo's older docs as stale.
 
 ## Stage/status flow
 
@@ -24,7 +31,7 @@ flowchart TD
     C -->|"clear"| E1["decompose or executing<br/>(2 edges exist from clarify)"]
     C -->|"unclear"| D["awaiting-human<br/>fgos-exploring: scout (rg, 1 keyword)<br/>+ 3-test filter, ask/answer"]
     D -->|"answered"| C
-    E1 -->|"stage: decompose"| F{"discover<br/>(judgeDecompose)<br/>writes refined priority"}
+    E1 -->|"stage: decompose"| F{"decompose<br/>(judgeDecompose, separate verb, tsk-2b0)<br/>writes refined priority"}
     F -->|"pass-through"| H["executing"]
     F -->|"decompose"| G["children created<br/>(deps-linked, stage: executing directly)"]
     F -->|"need-human / risk:heavy / blast-radius"| D2["awaiting-human<br/>fgos-planning + fgos-validating<br/>(plan.md / CONTEXT.md, graph --what-if,<br/>capability-gate impact-analysis)"]
@@ -48,7 +55,7 @@ flowchart TD
 | pull door (`take`/`pick`) | Human/agent | Claim exactly one item | Frontier order (`priority` ASC → `intent` DESC → FIFO — v2 contract unchanged; `intent` now silently vacuous for every new item, per `tsk-4y5` D7) | `status: doing`; `pick` also creates `fgw/<id>` worktree |
 | `discover` @ `clarify` (`judgeDiscovery`) | Mechanical, nested `claude -p`, **zero tool access** (`--allowedTools` limited to `git add`/`git commit`, `src/runner/dispatch.mjs:207-220`) | Verdict clear/unclear + `impactScore` (0-100 semantic-relatedness estimate, renamed from `intentScore` by `tsk-4y5` D3) | Item text + `graphMetrics`/`rankImpact` (work-graph metadata only, no code/docs read) | `clear` → next edge fires; `unclear` → `awaiting-human` + question; **rough `priority`** computed+written regardless of outcome (`impact` = `blocks` + `impactScore`, `effort` defaulted to floor, `urgent`/`risk` read from the item — `src/state/priority-formula.mjs`) |
 | `fgos-exploring` (only when parked) | Skill session, real tool access | Lock product decisions Socratically, filtered by material/grounded/answerable | Prior `judgeDiscovery` verdict, **one keyword `rg` scout pass** | `CONTEXT.md`, `fgos decision` log entries, `docsRef` pointer |
-| `discover` @ `decompose` (`judgeDecompose`) | Mechanical, same zero-tool-access executor | Verdict pass-through / decompose (auto children) / need-human | `docsRef` → `CONTEXT.md`/`plan.md` (post `tsk-1wd` fix — used to run blind, now grounded); also reads `plan.md`'s recorded mode + any real blast-radius figure (`tsk-4y5` D5/D8) | pass-through → `executing`; decompose → children (`deps`-linked, `stage: executing` directly — no separate clarify/decompose for auto-children, since D2 already forces each a real `verify`); need-human/`risk:heavy`/**blast-radius-over-threshold** → `awaiting-human`; **refined `priority`** recomputed on every non-invalid outcome (real `effort` from `plan.md`'s mode, real blast-radius when present) |
+| `decompose` (`judgeDecompose`, **separate verb from `discover` now**, `tsk-2b0`) | Mechanical, same zero-tool-access executor | Verdict pass-through / decompose (auto children) / need-human | `docsRef` → `CONTEXT.md`/`plan.md` (post `tsk-1wd` fix — used to run blind, now grounded); also reads `plan.md`'s recorded mode + any real blast-radius figure (`tsk-4y5` D5/D8) | pass-through → `executing`; decompose → children (`parent`-linked when `fgos-planning` created them — `--parent` is a real CLI flag now, `tsk-1xx` — or `deps`-linked when the judge auto-splits, `stage: executing` directly since D2 already forces each a real `verify`); need-human/`risk:heavy`/**blast-radius-over-threshold** → `awaiting-human`; **refined `priority`** recomputed on every non-invalid outcome (real `effort` from `plan.md`'s mode, real blast-radius when present) |
 | `fgos-planning` (session, first half of `decompose`) | Skill session, real tool access | Mode-size the item (mechanical flag count), write approach + risk map, decide split if any, **query `impact-analysis` capability** (`fgos tool query --capability impact-analysis --status present`, wired by `tsk-1e4`) | `CONTEXT.md`, `fgos graph --json`/`--what-if` | `plan.md` (mode, approach, risk map, capability posture) |
 | `fgos-validating` (session, second half of `decompose`) | Skill session, real tool access | Prove `plan.md` against real evidence, re-check `impact-analysis` posture live (never trust plan.md's stale note) | `plan.md`, live `fgos tool query` | READY / READY WITH CONSTRAINTS / NOT READY (hands back to `fgos-planning` on fail) |
 | `fgos-executing` (stage `executing`) | Skill session (or runner auto-dispatch) | Implement, run item's own `verify`, check Iron Law evidence need, **query `impact-analysis` capability** before editing a symbol | `plan.md`/`CONTEXT.md` (when present), item's `verify` | Real diff, one commit; `fgos return` |
@@ -71,7 +78,7 @@ log — never applies the stage move itself.
 | | Mechanical judge (fires the edge) | Skill session (grounds the decision) |
 |---|---|---|
 | `clarify` | `judgeDiscovery` — zero scout | `fgos-exploring` — 1-keyword `rg` scout, 3-test question filter |
-| `decompose` | `judgeDecompose` — reads `docsRef` (post `tsk-1wd` fix), still zero tool access itself | `fgos-planning`+`fgos-validating` — `fgos graph --what-if`, **`impact-analysis` capability gate (wired, `tsk-1e4`)** |
+| `decompose` | `decompose` verb, `judgeDecompose` — separate verb from `discover` now (`tsk-2b0`), reads `docsRef` (post `tsk-1wd` fix), still zero tool access itself | `fgos-planning`+`fgos-validating` — `fgos graph --what-if`, **`impact-analysis` capability gate (wired, `tsk-1e4`)** |
 
 `impact-analysis` capability gate (`fgos tool query --capability
 impact-analysis --status present`, `src/state/tool-registry.mjs`) is wired
@@ -80,29 +87,22 @@ at `decompose` (planning+validating) and `executing` — **not yet at
 
 ## Known gaps (verified against source, not inferred)
 
-1. **`parent` field has no CLI writer.** `parent` is load-bearing
-   (`frontier.mjs`, `dep-graph.mjs`'s `buildUnifiedEdges`, `impact.mjs`'s
-   blocking-fan-out, `decompose.mjs`'s re-entrancy check), but neither
-   `add` (`bin/fgos.mjs:726-816`, fixed object literal, no `parent` key)
-   nor `edit` (`src/cli/command-registry.mjs` field list) exposes a
-   `--parent` flag. The only writer in the whole repo is
-   `decompose.mjs`'s own internal `addWork()` call inside
-   `judgeDecompose`'s auto-split path (`src/intake/decompose.mjs:382-397`,
-   `deps`-linked, not `parent`-only — it sets both). `fgos-planning`
-   SKILL.md's step 5 ("each item created this way carries this item's own
-   id as its parent") describes a capability that does not exist on the
-   CLI surface today — a session following that skill under
-   one-door-write discipline cannot actually execute it. The repo's own
-   `STR92` audit (`docs/backlog.md:132`, 2026-07-23) caught an adjacent
-   gap (missing `--footprint`) on the same step but missed this one.
-2. **`clarify` has no capability-gate for `impact-analysis`.**
-   `fgos-planning`/`fgos-validating`/`fgos-executing` all query it
-   (`tsk-1e4`, merged 2026-07-31); `fgos-exploring` does not. Since
-   `judgeDiscovery` itself has zero tool access (verified —
-   `DEFAULT_RUNNER_CONFIG.executor.args`'s `--allowedTools` only permits
-   `git add`/`git commit`), any scouting or capability query at `clarify`
-   can only happen in the `fgos-exploring` skill session, not the
-   mechanical judge.
+1. ~~**`parent` field has no CLI writer.**~~ **RESOLVED (`tsk-1xx`,
+   merged 2026-07-31.)** `add --parent`/`edit --parent` are real now
+   (`src/cli/command-registry.mjs:82,227`, `bin/fgos.mjs:783,1046-1050`).
+   `fgos-planning` SKILL.md's step 5 can actually be executed as written.
+2. ~~**`clarify` has no capability-gate for `impact-analysis`.**~~
+   **RESOLVED (`tsk-17w`, merged 2026-07-31.)** `fgos-exploring/SKILL.md`
+   now queries it too, matching `fgos-planning`/`fgos-validating`/
+   `fgos-executing`.
+3. **`priority` has no guard against a human's explicit `edit --priority`
+   being silently overwritten by the next automated `discover`/`decompose`
+   pass** (`tsk-4y5`, found in post-merge review; filed as `tsk-sq9`,
+   `urgent: low`). `resolveDiscovery`
+   (`src/intake/discovery.mjs:309-310`) and `resolveDecompose`
+   (`src/intake/decompose.mjs:394-401`) both write `priority`
+   unconditionally, every pass, with no check for a pre-existing
+   human-set value.
 
 ## Sources (file:line, read directly 2026-07-31)
 
