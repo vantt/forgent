@@ -1,4 +1,4 @@
-import { test } from 'node:test';
+import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -38,6 +38,37 @@ function hasRealCompoundHistory(outcomeId) {
     return false;
   }
 }
+
+// tsk-2ce: `runDocsIndex()` above deliberately writes the REAL tracked
+// MANIFEST_PATH (no proxy, see its own comment) -- run from a linked
+// worktree (no `.fgos/`, ADR0020) the outcomes view it folds is empty, so
+// every sourceCaptureId in the regenerated file comes back null and a
+// plain `npm test` leaves the tracked file dirty with degraded content.
+// Snapshotting the real content here and restoring it once the whole
+// suite finishes keeps every assertion below reading the real freshly
+// regenerated manifest during the run, while leaving no side effect on
+// disk afterward -- npm test verifies, it does not regenerate (that is
+// `fgos-indexing`'s own deliberate, separate action). Plain fs, no git,
+// mirrors this file's own tutorialsDir/hiddenDir rename-then-restore
+// precedent below.
+let manifestSnapshot;
+
+before(() => {
+  try {
+    manifestSnapshot = fs.readFileSync(MANIFEST_PATH, 'utf8');
+  } catch (err) {
+    if (err.code !== 'ENOENT') throw err;
+    manifestSnapshot = undefined;
+  }
+});
+
+after(() => {
+  if (manifestSnapshot === undefined) {
+    fs.rmSync(MANIFEST_PATH, { force: true });
+  } else {
+    fs.writeFileSync(MANIFEST_PATH, manifestSnapshot, 'utf8');
+  }
+});
 
 // --- pure buildEnduserIndex/findSourceCaptureId (per entropy.test.mjs's own
 // precedent: hand-built inputs, no fs, no real store) -----------------------
