@@ -5376,6 +5376,56 @@ test('catchup on an item whose target has a REAL same-line conflict leaves it bl
   assert.equal(stateView(cwd).work['catchup-conflict-item'].status, 'blocked');
 });
 
+// The branch already contains the target's tip, so catchup's own merge would
+// stage nothing and its `git commit` would die with "nothing to commit",
+// leaving the item blocked forever. Reproduced here the way it happens for
+// real: a person merges the target by hand (or a prior catch-up landed the
+// merge and died later), then calls catchup.
+function makeAlreadyCaughtUpItem(cwd, id, verify) {
+  makeBlockedRunnerItem(cwd, id, 'integration-drift', { verify });
+  gitAtCwd(cwd, ['checkout', '-q', `fgw/${id}`]);
+  gitAtCwd(cwd, ['merge', '--no-edit', '-q', 'main']);
+  gitAtCwd(cwd, ['checkout', '-q', 'main']);
+}
+
+test('catchup on a branch that already contains the target reports outcome "already-caught-up", still runs verify, and bounces blocked -> awaiting-approval without creating a commit', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeAlreadyCaughtUpItem(cwd, 'catchup-caught-up', 'test -f catchup-caught-up-produced.txt');
+
+  const mainHeadBefore = gitHead(cwd);
+  const branchHeadBefore = gitAtCwd(cwd, ['rev-parse', 'fgw/catchup-caught-up']).trim();
+  const worktreesBefore = gitAtCwd(cwd, ['worktree', 'list', '--porcelain']);
+
+  const result = run(cwd, ['catchup', 'catchup-caught-up']);
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.outcome, 'already-caught-up');
+  assert.equal(data.from, 'blocked');
+  assert.equal(data.to, 'awaiting-approval');
+
+  assert.equal(stateView(cwd).work['catchup-caught-up'].status, 'awaiting-approval');
+  assert.equal(gitAtCwd(cwd, ['rev-parse', 'fgw/catchup-caught-up']).trim(), branchHeadBefore, 'no commit is created when there was nothing to merge');
+  assert.equal(gitHead(cwd), mainHeadBefore, "catchup must never touch the human's own main checkout");
+  assert.equal(gitAtCwd(cwd, ['worktree', 'list', '--porcelain']), worktreesBefore, 'the ephemeral catchup worktree is cleaned up — no leftover');
+});
+
+test('catchup on an already-caught-up branch whose verify is RED stays blocked and reports verify-fail, without attempting a merge --abort that has no merge to abort', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeAlreadyCaughtUpItem(cwd, 'catchup-caught-up-red', 'test -f never-produced.txt');
+
+  const branchHeadBefore = gitAtCwd(cwd, ['rev-parse', 'fgw/catchup-caught-up-red']).trim();
+
+  const result = run(cwd, ['catchup', 'catchup-caught-up-red']);
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.outcome, 'verify-fail');
+
+  assert.equal(stateView(cwd).work['catchup-caught-up-red'].status, 'blocked');
+  assert.equal(gitAtCwd(cwd, ['rev-parse', 'fgw/catchup-caught-up-red']).trim(), branchHeadBefore);
+});
+
 test('catchup on an item blocked for an unrelated reason (e.g. anti-loop-max-visits) is rejected with a validation error naming the actual reason, before any git operation runs', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'catchup-unrelated-reason');

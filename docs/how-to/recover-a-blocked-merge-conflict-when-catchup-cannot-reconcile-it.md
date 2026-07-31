@@ -22,8 +22,8 @@ fgos: Command failed: git commit -m catch-up: merge main into fgw/<id>
   the item's branch/worktree, resolved the real conflicting hunks, and
   committed — i.e. the branch is **already** caught up with `main`.
   `fgos catchup` is the normal, correct door out of a `merge-conflict`
-  block; only reach for this when catchup's own re-merge attempt fails
-  *because* your branch has nothing left to merge.
+  block, and since `tsk-k7i` it handles this exact case itself — the
+  failure above only happens on an fgOS checkout predating that fix.
 
 ## Steps
 
@@ -34,28 +34,30 @@ fgos: Command failed: git commit -m catch-up: merge main into fgw/<id>
    git merge-base --is-ancestor main fgw/<id> && echo "main is an ancestor -- already caught up"
    ```
 
-2. **Understand why `fgos catchup` fails here.** `catchup`'s own
-   implementation (`bin/fgos.mjs`, `case 'catchup'`) always runs
-   `git merge --no-commit --no-ff <target>` in a fresh ephemeral checkout of
-   the item's branch, then unconditionally runs `git commit`. If the branch
-   already contains `<target>`'s tip, that merge reports "Already up to
-   date" and stages nothing — the following `git commit` then fails with
-   "nothing to commit". This is a real gap in `catchup`'s own "already
-   caught up" edge case, not something wrong with your manual merge.
+2. **Just run `fgos catchup <id>`.** It handles this case now
+   (`tsk-k7i`): before merging, it checks
+   `git merge-base --is-ancestor <target> HEAD` inside its ephemeral
+   checkout. When the branch already contains the target, it skips the
+   merge and the commit entirely, still runs the item's own verify on the
+   existing tree, and on green takes the same
+   `blocked -> awaiting-approval` edge a clean reconcile takes — reporting
+   `outcome: "already-caught-up"` rather than `"merged"`, since no commit
+   was created. On red it leaves the item `blocked` and reports
+   `verify-fail`.
 
-3. **Move the item back to `awaiting-approval` directly**, bypassing
-   `catchup`'s own (broken, for this case) re-merge — safe specifically
-   because you already did the real merge and can point to real evidence
-   (a passing full test run on the actual merged tree) backing the move:
+   The manual `fgos move <id> --to awaiting-approval --expect blocked`
+   this how-to used to prescribe here is no longer needed for this case.
+   Reach for it only if `catchup` still refuses for some *other* reason —
+   and note that it bypasses verify entirely, so it is only honest when you
+   can point at real evidence (a passing full test run on the actual merged
+   tree) yourself.
 
-   ```
-   fgos move <id> --to awaiting-approval --expect blocked
-   ```
-
-   This uses the FSM's existing `blocked -> awaiting-approval` door
-   (fan-out-parallel D18) — the same edge `catchup` itself would have taken
-   on a clean reconcile, just applied by hand here instead of by the
-   (in this one case, buggy) automated path.
+3. **Why it used to fail.** `catchup` ran
+   `git merge --no-commit --no-ff <target>` and then `git commit`
+   unconditionally. On an already-caught-up branch the merge stages
+   nothing, so the commit died with "nothing to commit" — permanently, for
+   that item, since retrying never changes the condition. Kept here because
+   any fgOS checkout predating `tsk-k7i` still behaves this way.
 
 4. **Retry approve.** `mergeRunnerItem` (`src/runner/merge.mjs`) is
    idempotent for an already-merged branch — it returns `outcome: "merged"`
@@ -94,10 +96,12 @@ tsk-6c2 --acknowledge-iron-law` came back:
 `git merge main` inside the item's own worktree surfaced exactly one
 conflicted file (`bin/fgos.mjs`, two adjacent-insertion hunks); resolved by
 keeping both functions as siblings, then committing the merge. Re-running
-`fgos catchup tsk-6c2` then failed exactly as step 2 above describes
-(`git commit` on nothing to commit); `fgos move tsk-6c2 --to
-awaiting-approval --expect blocked` followed by a full local `npm test`
-(1772 passing) confirmed the merge was sound before retrying `approve`.
+`fgos catchup tsk-6c2` then failed exactly as step 3 above describes
+(`git commit` on nothing to commit) — this account predates `tsk-k7i`, so
+today's `catchup` would have handled it in one call; `fgos move tsk-6c2
+--to awaiting-approval --expect blocked` followed by a full local `npm
+test` (1772 passing) confirmed the merge was sound before retrying
+`approve`.
 
 > `{"id":"tsk-6c2","mode":"merge","to":"blocked","reason":"verify-fail-post-merge","target":"main","exitStatus":1}`
 > — real `fgos approve` response, second attempt — the unrelated flake
