@@ -5,6 +5,33 @@ context-load time. Never wrap it in backticks; that disables it.
 
 @AGENTS.md
 
+## Impact-analysis capability gate
+
+The GitNexus "Always Do" / "Never Do" rules below assume GitNexus is
+present on this machine. Before treating them as binding — and before
+`fgos-planning`/`fgos-validating`/`fgos-executing` decide how much
+impact-analysis evidence a plan's verify/test scope needs — query the
+capability instead of assuming the tool:
+
+```bash
+fgos tool query --capability impact-analysis --status present
+```
+
+- **0 providers registered** — Inactive: skip impact-analysis evidence in
+  verify/test scope; note `impact-analysis: inactive` in the plan/verify
+  note. Not a gap.
+- **Registered but not `present`** — Degraded: run every other required
+  check, mark that proof weak, and name the gap plainly (e.g. "GitNexus
+  registered but not present on this machine — blast radius not
+  confirmed").
+- **`present`** — Full: the MUST rules below apply exactly as written.
+
+This gate is prose the agent reads, never compiled logic — GitNexus is
+the first registered provider for `impact-analysis`, not the only one
+this gate can ever recognize. The block below regenerates from
+GitNexus's own template on `gitnexus analyze`; edit this gate section
+when the policy changes, never the rules inside the block.
+
 <!-- gitnexus:start -->
 # GitNexus — Code Intelligence
 
