@@ -1,7 +1,11 @@
 # CONTEXT: fgOS awareness hai cấp cài đặt global vs project (+ context thứ 3: dev-checkout self-hosting)
 
 **Item:** tsk-2ta
-**Trạng thái:** decisions locked, gate pending
+**Trạng thái:** D1 core + D1's doctor check + D2 đã thi công và merge
+(`tsk-2ta-1`, `tsk-2ta-2`, `tsk-2ta-3`, xem §"Kết quả thi công thật" bên
+dưới). D1 amended (di dời `.fgos-runner.json` → `.fgos/config.json`) và
+wiring vào runtime thật (`src/runner/dispatch.mjs`) **chưa** thi công — gap
+thật, xem §"Chưa làm — khác Outstanding cũ".
 **Nguồn:** docs/distribution-vision.md §2 trụ cột 6, §3, §5 câu hỏi mở 2 + 2b
 
 ## Feature boundary
@@ -77,16 +81,56 @@ cho doctor checks/config defaults (trụ cột 4, §5-Q1) — thuộc `tsk-2cs`,
 - `docs/coexistence.md` — phạm vi liên quan (harness khác), KHÔNG phải phạm vi item
   này (item này là hai/ba bản fgOS, không phải fgOS-vs-harness-khác).
 - `docs/specs/distribution.md` — Data Dictionary #5 (dev checkout shell helper),
-  #7 (doctor check registry hiện có 3 check cố định — D1 thêm check thứ 4, chưa
-  cần registry mở-rộng của `tsk-2cs` để làm việc này).
+  #7 (doctor check registry — cập nhật lúc `tsk-2ta-2` merge để liệt kê đúng 6
+  check thật hiện có, gồm `config-awareness` D1 thêm; không còn "3 check cố
+  định" như bản trước — đã stale từ trước cả item này, xem
+  `docs/explanation/spec-docs-drift-silently-when-only-code-has-an-exact-match-test.md`).
 
-## Outstanding — deferred to fgos-planning
+## Kết quả thi công thật (tsk-2ta-1/2/3, đã merge lên main qua fgw/tsk-2ta)
 
-- Hình dạng cụ thể của `~/.fgos/config.json` (schema, field nào ngoài những gì đã
-  có trong `.fgos-runner.json`) — implementer detail, không phải product decision.
-- Tên chính xác + message text của doctor check mới (D1) — implementer detail.
+- **`src/config/global-config.mjs`** (tsk-2ta-1, mới) — `loadGlobalConfig`,
+  `mergeWithGlobalConfig` (tái dùng `mergeConfigDefaults` có sẵn thay vì viết
+  merge logic mới — xem
+  `docs/explanation/global-config-merge-reuses-fill-missing-only-primitive.md`),
+  `describeConfigAwareness`. Test thật: `test/config/global-config.test.mjs`
+  (9 case, precedence project-thắng-global đã chứng minh bằng test).
+- **`src/setup/checks.mjs`** (tsk-2ta-2) — thêm check `config-awareness` vào
+  `DOCTOR_CHECKS` (giờ 6 entry), dùng `describeConfigAwareness`. Luôn
+  `passed: true` (read-only, informational, cùng pattern
+  `tool-registry-configured`).
+- **`scripts/fgos-shell-integration.sh`** (tsk-2ta-3) — `fgos()`/`fgos-runner()`
+  fallback `command fgos "$@"` khi root resolve được nhưng thiếu
+  `bin/fgos.mjs`; dùng `type -P` để detect PATH binary thật (không phải
+  `command -v`, vốn trả về chính tên shell function — xem
+  `docs/explanation/shell-fallback-detection-needs-type-p-not-command-v.md`).
+  3 test case mới thêm vào case thứ 3 D2 nhắc ở Scout evidence.
+
+## Chưa làm — khác Outstanding cũ, đây là gap thật đã xác nhận
+
+- **D1 amended (di dời `.fgos-runner.json` → `.fgos/config.json`) chưa thi
+  công.** Không con nào trong 4 con `fgos decompose` tự tách (`tsk-2ta-1..4`)
+  có việc này trong footprint — `tsk-2ta-1` chỉ thêm module đọc **global**,
+  không đổi vị trí file **project**. Project config hôm nay vẫn nằm ở
+  `.fgos-runner.json` tại cwd gốc, chưa dời vào `.fgos/`.
+- **Global config chưa được wire vào runtime thật.** `src/runner/dispatch.mjs`'s
+  `ensureRunnerConfig`/`loadRunnerConfig` — đường mà `fgos`/`fgos-runner`
+  thật sự chạy qua — vẫn chỉ đọc `.fgos-runner.json`, chưa gọi
+  `mergeWithGlobalConfig`. `~/.fgos/config.json` hiện đọc được (qua
+  `describeConfigAwareness`, hiển thị trong `fgos doctor`) nhưng **không ảnh
+  hưởng hành vi thật** của `fgos`/`fgos-runner` khi chạy — chỉ có tác dụng
+  chẩn đoán, chưa có tác dụng vận hành. Đã ghi rõ trong commit message
+  `tsk-2ta-1` (`feat: add global config read+merge primitive`) lúc thi công,
+  nhắc lại ở đây để không mất khi đọc riêng CONTEXT.md.
+- Hai gap trên là việc thật còn lại của trụ cột 6 (global/project không xung
+  đột) — hiện tại global chỉ "nhìn thấy được" (visible), chưa "có hiệu lực"
+  (effective). Cần item mới nếu muốn đóng nốt (ngoài phạm vi `tsk-2ta` bốn
+  con hiện tại).
+
+## Outstanding cũ — vẫn còn treo, chưa ai quyết khi thi công
+
 - Có cần `fgos setup` cũng ghi/khởi tạo `~/.fgos/config.json` hay chỉ `doctor` đọc
-  read-only — cần fgos-planning cân nhắc cùng lúc với shape D1, vì đụng cùng file.
-- Đường migrate cụ thể cho ai đã có `.fgos-runner.json` cũ (D1 amended: di dời vào
-  `.fgos/config.json`) — auto-migrate lúc `fgos setup` chạy, hay chỉ đọc file cũ
-  làm fallback nếu file mới chưa có? Implementer detail, fgos-planning quyết.
+  read-only — chưa quyết, vì runtime wiring (mục trên) còn chưa có nên câu hỏi
+  này chưa tới lượt.
+- Đường migrate cụ thể cho ai đã có `.fgos-runner.json` cũ khi D1 amended thi
+  công thật (auto-migrate lúc `fgos setup` chạy, hay đọc file cũ làm fallback)
+  — chưa tới lượt vì D1 amended tự nó chưa thi công.
