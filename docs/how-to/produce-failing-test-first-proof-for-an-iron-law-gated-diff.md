@@ -1,0 +1,78 @@
+# Produce failing-test-first proof for an Iron Law-gated diff
+
+`tsk-62v` touched `src/runner/dispatch.mjs` and `src/runner/loop.mjs` —
+both on the Iron Law's self-modifying-capable module list
+(`src/evolve/iron-law.mjs`'s `MODULE_RULES`) — so `fgos approve` refused
+to merge it without `--acknowledge-iron-law`, and that flag only means
+something if the failing-test-first proof behind it is real. Here is the
+concrete recipe this item actually used to produce that proof, from its
+own committed `docs/history/tsk-62v/iron-law-evidence.md`.
+
+## The recipe
+
+1. Identify exactly which test files the item's own diff touches or adds:
+   ```
+   test/runner/dispatch.test.mjs test/runner/loop.test.mjs test/e2e/runner-loop.test.mjs
+   ```
+   This is the same command run before and after — not two different
+   scopes.
+
+2. **Get to red honestly** — stash only the implementation files, keep the
+   new/modified test files exactly as they'll ship:
+   ```
+   git stash push -- src/runner/dispatch.mjs src/runner/loop.mjs src/state/tool-registry.mjs
+   ```
+   Running the test command now against pre-implementation code produces
+   real failures — not invented ones. In this item's case: one test file
+   failed to even load (`SyntaxError: ... does not provide an export
+   named 'CAPACITY_KINDS'`) because the test imports a symbol the
+   implementation hasn't created yet; two other test files had real
+   assertion mismatches (`actual` vs `expected` event sequences missing
+   the new `capacity.dispatch` event). Paste the real stderr/assertion
+   output into the evidence file — never a paraphrase or a "would have
+   failed because...".
+
+3. **Get back to green** — restore the exact same stash:
+   ```
+   git stash apply
+   ```
+   (`apply`, not `pop`, so the stash isn't dropped until the green run is
+   actually confirmed — a safety margin against a broken restore).
+   Running the identical test command now should pass in full:
+   `143/143` in this item's case.
+
+4. Also run the full suite (`npm test`) once more and record the pass
+   count — proof the fix didn't regress anything the scoped test command
+   wouldn't have caught (`1996/2001`, 5 pre-existing skips, matching the
+   pre-implementation baseline).
+
+5. If GitNexus is available, run `detect_changes()` against the real diff
+   (`base_ref: main`) and record its risk level and affected-process list
+   — a second, independent confirmation that the blast radius matches
+   what the plan actually described, not a symbol or process nobody
+   scoped for.
+
+6. Write all of the above into `docs/history/<id>/iron-law-evidence.md`
+   and commit it in the same commit as the implementation
+   (`fgos-executing`'s "one commit per item" rule) — before `fgos return`.
+
+## Why the stash-and-restore shape, not two separate branches or commits
+
+Stashing only the implementation files (never the test files) is what
+makes the before/after comparison honest: the exact same test code runs
+both times, so a real behavior difference — not a difference in what's
+being tested — is what produces the red-then-green result. Reverting via
+a full `git checkout <parent-commit>` would also revert the test files
+themselves, and then "red" would just mean "the old tests still pass
+against old code," which proves nothing about whether the new
+implementation is what makes the new tests pass.
+
+## Why this survives review even without re-running it
+
+A reviewer (human or a later session) reading `iron-law-evidence.md` gets
+the real stderr/assertion text, not a claim — the SyntaxError naming the
+exact missing export, the exact expected-vs-actual event-sequence diffs.
+That specificity is itself evidence the failure was really observed, not
+guessed at: a fabricated "before" transcript is expensive to fake
+convincingly at that level of detail, and cheap to write once you've
+actually run the command.
