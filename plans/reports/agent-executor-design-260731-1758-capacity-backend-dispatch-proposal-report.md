@@ -31,6 +31,111 @@ domain 2 nó chỉ là 1 SKILL chạy BÊN TRONG harness của người khác. T
 dưới đây tách rõ 2 domain, dùng CHUNG 1 config schema và 1 khái niệm
 "capacity" cho cả hai, nhưng cơ chế enforce khác nhau.
 
+## 0.5. Mục tiêu tối thượng + 4 thuộc tính bắt buộc mỗi hop (bổ sung 2026-08-01)
+
+**Mục tiêu tối thượng của agent-executor** (anh xác nhận 2026-08-01): dùng
+đúng agent-type/model để đạt **chất lượng phù hợp với giá RẺ NHẤT** — mọi
+quyết định thiết kế khác (backend nào, tool nào, hiện thị ra sao) là PHƯƠNG
+TIỆN phục vụ mục tiêu này, không phải mục tiêu riêng lẻ. Đây là lý do gốc
+việc `cognitive-tier-model-decoupling` (candidate porting-log, mục 2) và
+"model rẻ hơn cho việc rẻ hơn" (mục 4.2) tồn tại — không phải tiện ích phụ,
+mà LÀ lý do agent-executor được xây.
+
+**"Trơn tru"** (anh định nghĩa 2026-08-01) = 4 thuộc tính bắt buộc, kiểm ở
+MỖI HOP dispatch (không chỉ hop đầu):
+
+1. **Thông suốt** — không dead-end giữa chuỗi: tại mọi hop, luôn có đường
+   đi hợp lệ tới capacity cần gọi (hoặc degrade sạch có báo, mục 5) — không
+   bao giờ kẹt giữa chừng không biết làm sao tiếp.
+2. **Đầy đủ tool** — process đang chạy ở hop đó PHẢI có đủ quyền/tool để
+   làm xong việc của nó (không thiếu tới mức phải dừng giữa chừng).
+3. **An toàn** — bù trừ trực tiếp cho #2: đủ nhưng KHÔNG THỪA — least
+   privilege đúng nghĩa cả 2 chiều (mục 9: `allowedTools` scope đúng, không
+   cấp dư như Cách A của mục 9 từng cảnh báo).
+4. **Quan sát được** — announce/audit (mục 8) phải sống sót qua MỌI hop
+   của 1 chuỗi đa-process, không chỉ hop đầu tiên forgent's runner spawn.
+   Đây là chỗ dễ vỡ nhất: chuỗi càng nhiều hop, càng nhiều backend khác
+   họ, càng dễ trở thành hộp đen đúng lúc quan sát cần nhất.
+
+### Trục mới: process hiện tại đứng ở đâu (đánh giá LẠI mỗi hop, không tĩnh)
+
+Mục 0 chia domain 1/domain 2 theo **ai khởi xướng đầu chuỗi** — đúng nhưng
+CHƯA đủ cho đệ quy: 1 capacity đang chạy TRONG 1 process nào đó, tự nó lại
+cần gọi capacity khác, phải hỏi LẠI câu hỏi domain tại CHÍNH HOP ĐÓ, dựa
+trên process hiện tại, không phải dựa trên gốc chuỗi. Ba dạng process khả
+dĩ, mỗi dạng có "năng lực điều phối native" khác nhau:
+
+- **Agent-terminal tương tác** (domain 2 gốc) — Task/Agent/AgentTeam sẵn,
+  người xem.
+- **`claude -p` headless** (dù forgent's runner spawn, hay 1 capacity khác
+  đệ quy spawn ra) — KHÔNG người xem, NHƯNG VẪN cùng 1 Claude Code engine
+  → Task/Agent tool **vẫn dùng native được y hệt domain 2** nếu
+  `allowedTools` cho phép (bee's cell chạy trong `claude -p` vẫn tự
+  fan-out subagent là bằng chứng). Đây là ĐIỂM QUAN TRỌNG: không phải cứ
+  headless là phải shell-out — chỉ shell-out khi CROSS họ backend.
+- **Process khác họ Claude** (codex app-server, agy, hay chính forgent's
+  Node code không LLM nào trong vòng lặp) — KHÔNG có Task/Agent tool, PHẢI
+  spawn process mới hoặc nói qua giao thức riêng (symphony's
+  `agent-adapter-codex-jsonrpc`, mục 6 — vẫn deferred, chỉ ghi nhận đây là
+  ĐÚNG chỗ nó cắm vào khi cần).
+
+**Nguyên tắc chọn (phục vụ "trơn tru" #1+#2, và mục tiêu tối thượng —
+rẻ/nhẹ nhất mà vẫn đủ)**: ở mỗi hop, ƯU TIÊN Ở LẠI NATIVE trong process
+hiện tại (dùng Task tool sẵn có, không tốn process mới, giữ nguyên
+context) — CHỈ cross sang process khác khi capacity kế tiếp khai backend
+khác họ trong `cfg.capacities.<id>` (mục 4). Mỗi lần cross là 1 chi phí
+thật (process mới, mất context, round-trip nặng hơn) — đây CHÍNH LÀ nhánh
+"rẻ nhất mà vẫn đủ chất lượng" của mục tiêu tối thượng, áp ở tầng cơ chế
+(không native thì đắt hơn, không phải chỉ tier/model mới đắt hơn).
+
+### Khi nào THẬT SỰ cần dừng hỏi người (không phải "tự thấy chưa chắc")
+
+Anh chốt (2026-08-01): cơ chế hỏi ĐÃ CÓ (`awaiting-human` park, `fgos
+ask`/`fgos answer` — dùng suốt phiên này) — cái thiếu KHÔNG PHẢI cách hỏi,
+mà là **ngưỡng xác định lúc nào ĐÁNG hỏi**, tránh 2 lỗi đối xứng: hỏi lắt
+nhắt việc tầm thường, VÀ tự quyết liều lĩnh việc lẽ ra phải hỏi.
+
+forgent **đã locked đúng khung này rồi**, chỗ khác (`docs/history/gate-bypass/CONTEXT.md`,
+tsk-6bx D1-D5) — không bịa mới, PORT nguyên hình dạng quyết định đó sang
+agent-executor:
+
+- **D2 (đã locked) — sửa lại cách hiểu cho đúng (2026-08-01):** "cơ học"
+  KHÔNG có nghĩa "không ai phán xét" — phán xét vẫn có, chỉ **dời sang lúc
+  khác, người khác**: người quyết 1 LẦN lúc author config, agent lúc chạy
+  chỉ TRA LẠI, không tự phán lại. Nguy hiểm thật của "tự tin lúc runtime"
+  không phải vì tự tin hay sai — mà vì **agent đang tự chấm bài chính
+  mình** (self-grading) đúng lúc input mập mờ/độc hại có thể đánh lừa nó
+  tự tin sai chỗ (bee's `gate_bypass` tự nói nguyên văn: "untrusted item
+  text could talk a session into faking confidence"). Áp cho
+  agent-executor: capacity CÓ entry trong `cfg.capacities.<id>` (mục 4) →
+  chạy theo config, KHÔNG hỏi — vì phán xét đã xảy ra RỒI, lúc người viết
+  entry đó. Capacity KHÔNG có entry → rơi về default tier/global hôm nay
+  (mục 5) → CŨNG không hỏi — vì đó là hành vi đã được chấp nhận an toàn
+  TỪ TRƯỚC (chính hành vi hôm nay), không phải 1 phán xét mới. Native-vs-
+  cross-process (mục 0.5 trên) tự nó KHÔNG BAO GIỜ là lý do để hỏi — nó
+  luôn tra được từ config có/không, đúng nguyên tắc D2.
+- **D4-tương-đương (sàn bất di bất dịch, nối mục 9):** CHỈ 1 trường hợp
+  THẬT SỰ đáng hỏi trong agent-executor — khi resolve ra 1 capacity đòi
+  **cấp tool-scope/quyền CAO HƠN baseline an toàn hôm nay**
+  (`Bash(git add:*),Bash(git commit:*)`), ví dụ `Write` cho 1 process
+  unattended (đúng rủi ro Cách A, mục 9). Đây là sàn không thoả hiệp —
+  hỏi 1 LẦN lúc AUTHOR config (người duyệt `allowedTools` mới trước khi
+  commit vào `.fgos-runner.json`), không phải hỏi runtime mỗi lần dispatch.
+  Sau khi người đã duyệt 1 lần, lần dispatch sau CƠ HỌC theo config (D2),
+  không hỏi lại — đúng tinh thần "an toàn + không lắt nhắt" cùng lúc.
+- **D3-tương-đương (nối mục 8):** kể cả khi KHÔNG hỏi (chạy cơ học theo
+  config hoặc fallback), vẫn phải HIỆN RA (announce mục 8) — không bao
+  giờ skip trong im lặng.
+
+Kết quả: câu hỏi mở ban đầu ("process tự biết nó đứng ở đâu để CHỌN native
+hay cross") thu hẹp lại đúng phạm vi — đó KHÔNG PHẢI 1 quyết định cần hỏi
+người (luôn suy ra cơ học từ config có/không), CHỈ CÒN 1 việc thật sự cần
+người: duyệt tool-scope mới TRƯỚC KHI nó vào config, 1 lần, không phải mỗi
+lần chạy. Vẫn còn 1 câu hỏi kỹ thuật hẹp hơn nhiều, KHÔNG PHẢI triết học
+nữa: implementation cụ thể để 1 process (đặc biệt headless) đọc được
+`cfg.capacities`/biết mình đang chạy trong process nào — đây là chi tiết
+code, không phải quyết định thiết kế còn treo.
+
 ## 1. Đã có sẵn — đừng xây lại
 
 `src/runner/dispatch.mjs` (domain 1) đã đi được 80% đường:
@@ -306,23 +411,115 @@ file này. Đây là phần DUY NHẤT không cần quyết định gì thêm đ
 | `multi-target-converter-engine` (R3 E2 F3) | không áp — đó là build-time projection sang N platform, khác domain (runtime dispatch) |
 | `intent-scoring-agent-dispatch` (R2 E1 F2) | mục 6 — deferred, điều kiện chưa chín |
 
-## Đã chốt (2026-07-31)
+## 9. Tool-scope/permission — trục thứ 3 (bổ sung 2026-08-01)
+
+Nguồn: `plans/reports/research-260801-1001-judge-scout-result-not-persisted-reused-report.md`
+(đã tự verify lại code, không chỉ tin report). Phát hiện: `.fgos-runner.json`
+hôm nay đã có `executors.judge` — nhưng đọc comment thật trong
+`judge-executor.mjs` (`spawnAttempt`):
+
+> "tier: 'judge' reuses the existing generic cfg.executors string-keyed
+> lookup... as a **synthetic role key** — a repo can grant judge calls
+> their own executors.judge block (e.g. Bash(rg:*)) without touching the
+> worker's own tier blocks."
+
+Nói thẳng: `judge` không phải cost-tier (không nằm trong `models.{light,
+standard,heavy}`) — nó đang MƯỢN field `tier`/`executors` để chở 1 thứ khác
+hẳn: **allowedTools/permission grant riêng cho 1 loại lời gọi**. Đây chính
+là bằng chứng SỐNG rằng thiết kế 2 trục (backend, model) ở mục 4 CHƯA ĐỦ —
+thiếu hẳn trục thứ 3: **tool-scope/permission PER CAPACITY**, tách khỏi cả
+model-tier lẫn backend-choice.
+
+Sửa schema mục 4: `capacities.<id>` nhận thêm field optional `allowedTools`
+(và về sau `permissionMode` nếu cần):
+
+```jsonc
+"capacities": {
+  "judgeDiscovery": {
+    "invocation": "cli-spawn",
+    "tier": "judge",                 // model-tier như hôm nay, KHÔNG đổi
+    "allowedTools": ["Bash(rg:*)"]   // MỚI — tool-scope, tách khỏi tier
+  }
+}
+```
+
+`resolveExecutorConfig` (mục 4.1) khi build `args` cho block resolve từ
+capacity, nối `allowedTools` (nếu có) vào đúng vị trí `--allowedTools` của
+executor — thay vì tiếp tục đè lên `executors.judge` như "synthetic role
+key" (hack tsk-62d TỰ đặt tên đúng vậy, dự tính rõ ràng chỉ để tạm). tsk-62v
+là chỗ ĐÚNG để dọn việc này — vì đây chính là công việc tsk-62v đang làm
+(tổng quát hoá resolve theo capacity), không phải việc mới ngoài scope.
+
+### Vì sao đây là rủi ro thật, không phải lý thuyết
+
+`judgeDiscovery`/`judgeDecompose` chạy **domain 1 hoàn toàn** — nested
+`claude -p` qua `spawnSync`, KHÔNG người xem giữa chừng, đúng 2 điều kiện
+mục 6 từng nói "chưa hội đủ nên chưa cần hook" (nhiều call site + không ai
+xem). judge KHÔNG mới có 2 điều kiện đó — nó ĐÃ unattended từ tsk-62d. May
+mắn là tsk-62d tự khoá scope chặt (chỉ `Bash(rg:*)`, tự note *"nếu rg không
+đủ, đó là item follow-up riêng, ngoài scope"*) — đúng bản năng
+`bee:read-only-agent-type-for-analysts` (safeguard = TOOL SET, không phải
+lời dặn trong prompt) dù tsk-62d không trích dẫn nguồn đó.
+
+**Cách A (model tự ghi file, cấp thêm `Write`) lặp lại NGUYÊN VĂN lỗi bee
+từng trả giá**: cấp `Write` cho 1 process tự động không người giám sát,
+tin vào PROMPT ("chỉ ghi vào scout-notes.md") thay vì CAPABILITY giới hạn
+đường ghi. Câu hỏi #3 của report gốc ("Write có path-scope được không, hay
+chỉ all-or-nothing") CHƯA verify được — và đó chính là điểm bee từng bị:
+tưởng prompt đủ, hoá ra tool full quyền vẫn ghi được chỗ khác.
+
+**Cách B (parent parse transcript qua `--output-format stream-json`,
+KHÔNG cấp Write cho judge)** né được toàn bộ rủi ro trên — judge vẫn
+read-only tuyệt đối, an toàn hơn đúng theo nguyên tắc đã học. Phức tạp hơn
+(phải tự parse transcript), nhưng KHÔNG mở lỗ quyền mới.
+
+**Đề xuất: Cách B**, trừ khi Q3 (path-scope Write) verify được là AN TOÀN
+THẬT (không chỉ "CLI chấp nhận cú pháp" mà "CLI THỰC SỰ chặn ghi ngoài
+path đó") — chưa verify thì mặc định chọn hướng không cần tin tưởng.
+
+### Việc này đổi gì ở phần "Đã chốt"/"Còn mở" bên dưới
+
+Không đổi domain-1/domain-2 gì đã chốt — chỉ CHỨNG MINH bằng ca thật rằng
+trục tool-scope phải vào `capacities` schema của tsk-62v, và cho thấy rủi ro
+cấp quyền cho unattended process là chuyện ĐANG XẢY RA (judge), không phải
+giả định tương lai — khác với domain-2 hook (mục 6) vẫn đang đợi điều kiện
+trigger multi-agent thật.
+
+## Đã chốt
 
 1. Agent-type: forgent tự sở hữu, gốc platform-agnostic ở `.fgos/agents/`,
    `.claude/agents/` là bản chiếu sinh ra, không hand-maintain riêng — mục 4.3.
 2. Domain 2: KHÔNG phải phòng thủ — là capability thật (tiết kiệm + đa dạng
    hoá model cho quyết định), build cùng đợt, không hoãn — mục 4.2.
 3. Marker/hook enforcement: bỏ hẳn, không phải nhu cầu — mục 6.
-4. Domain 1 (generalize `resolveExecutorConfig`): làm ngay, work item riêng.
+4. Domain 1 (generalize `resolveExecutorConfig`): làm ngay, work item riêng
+   (tsk-62v, đã bao gồm luôn announce mục 8 — không tách 2 item).
+5. Format announce mục 8: `capacityId — provider — model`, đúng ví dụ anh
+   cho ban đầu — không thêm trường, không cần hỏi lại (anh đã tự chốt lúc
+   đưa ví dụ).
+6. Audit dispatch: tái dùng `.fgos/events.jsonl` có sẵn, không mở file
+   riêng — đúng doctrine đã tự tìm thấy trong deep-dive `tool-registry.md`
+   của chính distillery này ("đừng mở audit file riêng khi one-door-write
+   log đã có") — không phải chọn tuỳ ý, có căn cứ trong repo.
+7. `.fgos/agents/<name>.yaml` field cụ thể: để build tự quyết theo mẫu
+   marketing-cockpit `agent.schema.yaml` — đã ghi rõ vậy trong scope
+   tsk-slq lúc submit, không phải câu hỏi còn treo.
+8. Mục 9 — chọn **Cách B** (parent parse transcript, judge giữ read-only
+   tuyệt đối), không phải Cách A. Lý do quyết được mà không cần hỏi: B là
+   lựa chọn AN TOÀN HƠN + DỄ ĐẢO NGƯỢC HƠN — thêm Write sau (nếu B tỏ ra
+   không đủ) rẻ hơn hẳn việc gỡ Write ra sau khi skill đã lỡ phụ thuộc vào
+   nó. Bias đúng hướng khi chưa chắc: chọn nhánh rẻ-để-sửa-sau, không phải
+   nhánh rẻ-để-làm-trước.
+9. Mục 9 = work item riêng (`depends: [tsk-62v]`, cùng cụm tsk-64p) — không
+   gộp vào tsk-62v. Lý do: tsk-62v scope gốc là announce/audit theo
+   capacity, không phải permission/tool-scope; gộp thêm phình 1 item ra 2
+   concern khác hẳn nhau, khó review/khó rollback riêng lẻ.
+10. Ngưỡng ép duyệt tool-scope escalation (mục 0.5's D4-tương-đương):
+    KHÔNG thêm lint/CI riêng — `.fgos-runner.json` đã committed, review Git
+    thường đã là "duyệt 1 lần". Thêm lint là phòng thủ cho rủi ro chưa
+    từng xảy ra (YAGNI, cùng lý do domain-2 hook hoãn ở mục 6).
 
-## Còn mở — cần anh xác nhận
-
-1. Format announce mục 8 (`capacityId — provider — model`) đúng ý chưa, hay
-   muốn thêm/bớt trường (vd thêm lý do chọn: cost/diversity)?
-2. Ghi audit vào `.fgos/events.jsonl` — đồng ý tái dùng event-log có sẵn,
-   hay muốn 1 file log riêng cho capacity dispatch?
-3. `.fgos/agents/<name>.yaml` — có muốn tôi khảo trước 1-2 field mẫu cụ thể
-   (persona/model-tier/tool-scope) trước khi viết work item, hay để lúc
-   build tự quyết theo mẫu marketing-cockpit `agent.schema.yaml`?
-4. Sẵn sàng để tôi soạn work item (fgOS submit) cho phần domain 1 + mục 8
-   (announce, cả 2 domain) làm 1 đợt, hay tách riêng 2 work item?
+Không còn câu hỏi thiết kế nào cần anh quyết ở tài liệu này — mọi điểm trên
+đều có tiền lệ/bằng chứng đủ để tự quyết (đúng nguyên tắc D2 vừa sửa: phán
+xét đã có, không phải "để trống rồi hỏi lại"). Việc còn lại là build, theo
+đúng thứ tự phụ thuộc đã có trong cụm tsk-64p.
