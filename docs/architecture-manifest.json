@@ -68,6 +68,8 @@
     "src/setup/config-merge.mjs": "domain",
     "src/setup/shell-rc.mjs": "infra",
     "src/setup/git-hooks.mjs": "infra",
-    "src/setup/checks.mjs": "use-case"
+    "src/setup/checks.mjs": "use-case",
+    "src/config/global-config.mjs": "infra",
+    "src/setup/registrations.mjs": "use-case"
   }
 }
