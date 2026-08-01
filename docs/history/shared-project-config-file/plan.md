@@ -67,11 +67,13 @@ constructing that path themselves.
 
 ### Step 4 — doctor discoverability (D5)
 
-`checkConfigNotStale` (`src/setup/checks.mjs`) reads through the assembler
-and reports staleness against the registry's default shape (natural
-consequence of D4 — pinned as an assumption below, not re-opened in
-`CONTEXT.md`, since it does not change scope/behavior, only how far the
-already-decided genericity extends). `describeConfigAwareness`'s default
+`checkConfigNotStale` — defined in `src/setup/registrations.mjs:224-235`
+(registered there via `registerCheck` at `:284-288`; `src/setup/checks.mjs`
+is a pure re-export shim, per its own header comment, and needs no edit)
+— reads through the assembler and reports staleness against the registry's
+default shape (natural consequence of D4 — pinned as an assumption below,
+not re-opened in `CONTEXT.md`, since it does not change scope/behavior,
+only how far the already-decided genericity extends). `describeConfigAwareness`'s default
 `projectConfigPath` (`src/config/global-config.mjs`) points at
 `.fgos/config.json`, with presence-detection aware of the legacy-fallback
 case so "project config active" stays true for an install that has not run
@@ -125,10 +127,11 @@ CLAUDE.md/AGENTS.md gate.
   retargeted to the assembler's `runner` section
 - `bin/fgos.mjs` — 4 call sites (`:244,892,912,2727`) retargeted
 - `bin/fgos-runner.mjs` — 1 call site (`:105`) retargeted
-- `src/setup/checks.mjs` — `checkConfigNotStale` retargeted (D5)
-- `src/setup/registrations.mjs` — likely unchanged in shape (registry
-  mechanism itself already exists from `tsk-2cs`), confirm no touch needed
-  once executing starts
+- `src/setup/registrations.mjs` — `checkConfigNotStale` (the function's
+  real home, `:224-235`) retargeted (D5); `registerConfigDefault`/
+  `registerCheck` mechanism itself unchanged, already exists from `tsk-2cs`
+- `src/setup/checks.mjs` — pure re-export shim (confirmed via read, `:1-17`);
+  no edit needed
 - `test/config/global-config.test.mjs` — new cases for the real
   `mergeWithGlobalConfig` caller
 - `test/runner/dispatch.test.mjs` — updated for the new config path
@@ -185,6 +188,8 @@ and `bin/`, each already covered by existing tests that must stay green
 - `.fgos-runner.json` is never deleted automatically by any step in this
   item — only `fgos setup` performs the real move/write, matching D2 and
   `tsk-2ta`'s own plan precedent.
-- `src/setup/registrations.mjs`'s registry mechanism itself needs no
-  changes — this item is purely a new consumer of what `tsk-2cs` already
-  built and merged.
+- `src/setup/registrations.mjs`'s registry MECHANISM itself
+  (`registerCheck`/`registerConfigDefault`) needs no changes — this item is
+  purely a new consumer of what `tsk-2cs` already built and merged. The
+  file itself IS touched (Files likely touched) because `checkConfigNotStale`
+  is physically defined there, not in `checks.mjs`.
