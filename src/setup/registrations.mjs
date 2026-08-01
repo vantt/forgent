@@ -11,6 +11,15 @@
 // may register only a check, only a config-default, or both — never a
 // forced pairing. 4 of the 5 built-in checks below have no config-default at
 // all, which is exactly why D2 rejected a mandatory pair.
+//
+// `fix` is a third, equally independent registration capability
+// (docs/history/doctor-fix-gate-bypass/CONTEXT.md D3, tsk-2qz): a module may
+// register a `fix` function alongside its `check`/`configDefault`, or none
+// of the above three together — same "independent, not forced pairing"
+// style D2 already established. `fgos doctor --fix` (bin/fgos.mjs) runs
+// every registered fix via `runFixes` below; `doctor` without `--fix` stays
+// exactly as before (D2 of the gate-bypass item — no default-behavior
+// change).
 
 import fs from 'node:fs';
 import os from 'node:os';
@@ -26,6 +35,7 @@ import { listWork } from '../state/store.mjs';
 import { readLocalStatus, classifyRegistryPosture } from '../state/tool-registry.mjs';
 import { describeConfigAwareness } from '../config/global-config.mjs';
 import { sharedConfigFilePath, legacyRunnerConfigPath, readSharedConfig, writeSharedConfig } from '../config/shared-config-file.mjs';
+import { DEFAULT_LEVEL, LEVELS } from '../state/gate-bypass.mjs';
 
 export { mainCheckoutHookWired } from './git-hooks.mjs';
 
@@ -43,6 +53,7 @@ const DEAD_LINE_SAMPLE_SIZE = 3;
 // to the same array object, not a snapshot).
 export const DOCTOR_CHECKS = [];
 export const CONFIG_DEFAULT_REGISTRATIONS = [];
+export const FIX_REGISTRATIONS = [];
 
 /**
  * Register a doctor check (D1/D2). `id` must be unique among registered
@@ -84,6 +95,42 @@ export function registerConfigDefault({ id, key, shape }) {
     throw new Error(`registerConfigDefault("${id}") requires a plain-object shape`);
   }
   CONFIG_DEFAULT_REGISTRATIONS.push({ id, key, shape });
+}
+
+/**
+ * Register a fix (D3, docs/history/doctor-fix-gate-bypass/CONTEXT.md):
+ * `fix` is a function `(cwd) => { changed, message }` that repairs whatever
+ * this entry's own `check` (if any) reports as failing — idempotent, and
+ * scoped only to this entry's own concern, never another entry's. `fix`
+ * registration is independent of `check`/`configDefault` (same D2 style
+ * those two already follow) — a module may register any subset of the
+ * three.
+ */
+export function registerFix({ id, fix }) {
+  if (typeof id !== 'string' || !id.trim()) {
+    throw new Error('registerFix requires a non-empty id');
+  }
+  if (FIX_REGISTRATIONS.some((entry) => entry.id === id)) {
+    throw new Error(`registerFix: "${id}" is already registered`);
+  }
+  if (typeof fix !== 'function') {
+    throw new Error(`registerFix("${id}") requires a fix function`);
+  }
+  FIX_REGISTRATIONS.push({ id, fix });
+}
+
+/**
+ * Run every registered fix against `cwd` (`fgos doctor --fix`'s own write
+ * path — the one place doctor writes, gated behind the explicit `--fix`
+ * flag; without it doctor stays exactly as before). Each fix's own
+ * `{changed, message}` is reported per entry, mirroring `DOCTOR_CHECKS`'
+ * per-entry `{passed, message}` report shape.
+ */
+export function runFixes(cwd) {
+  return FIX_REGISTRATIONS.map(({ id, fix }) => {
+    const { changed, message } = fix(cwd);
+    return { id, changed, message };
+  });
 }
 
 /**
@@ -408,4 +455,62 @@ registerCheck({
   id: 'dependencies-installed',
   description: 'package.json dependencies are present in node_modules (tsk-slq D6)',
   check: (cwd) => checkDependenciesInstalled(cwd),
+});
+
+// gate-bypass.json's real registry entry (docs/history/doctor-fix-gate-bypass/
+// CONTEXT.md D1/D3, tsk-2qz-2) -- the registry's first consumer to register
+// all three independent capabilities (check + configDefault + fix), per
+// tsk-2cs's own D5 ("gate-bypass is the registry's first real consumer").
+// `checkConfigNotStale` above already detects a MISSING `gateBypass` key
+// generically via `assembleRegistryDefaults()` once the configDefault below
+// is registered; this dedicated check adds the one thing that generic
+// staleness check cannot: whether a PRESENT `level` value is actually one of
+// `LEVELS`, since a malformed-but-present value is never "missing" from
+// `mergeConfigDefaults`' point of view.
+function checkGateBypassConfigured(cwd) {
+  const shared = readSharedConfig(cwd);
+  const level = shared?.gateBypass?.level;
+  if (typeof level !== 'string' || !LEVELS.includes(level)) {
+    return {
+      passed: false,
+      message: `gateBypass.level missing or not a recognized level (${LEVELS.join('/')}) -- run fgos doctor --fix`,
+    };
+  }
+  return { passed: true, message: `gateBypass.level = "${level}"` };
+}
+
+// Idempotent (D3 of the parent CONTEXT.md's pinned "fix" term): a
+// already-valid level is left untouched and reported unchanged, mirroring
+// `ensureSharedConfigDefaults`'s own "only write when something was actually
+// added" discipline.
+function fixGateBypassConfigured(cwd) {
+  const shared = readSharedConfig(cwd);
+  const currentLevel = shared?.gateBypass?.level;
+  if (typeof currentLevel === 'string' && LEVELS.includes(currentLevel)) {
+    return { changed: false, message: `gateBypass.level already "${currentLevel}"` };
+  }
+  const existingGateBypass =
+    shared.gateBypass && typeof shared.gateBypass === 'object' && !Array.isArray(shared.gateBypass)
+      ? shared.gateBypass
+      : {};
+  const merged = { ...shared, gateBypass: { ...existingGateBypass, level: DEFAULT_LEVEL } };
+  writeSharedConfig(cwd, merged);
+  return { changed: true, message: `wrote gateBypass.level = "${DEFAULT_LEVEL}" to ${sharedConfigFilePath(cwd)}` };
+}
+
+registerConfigDefault({
+  id: 'gateBypass',
+  key: 'gateBypass',
+  shape: { level: DEFAULT_LEVEL },
+});
+
+registerCheck({
+  id: 'gate-bypass-configured',
+  description: 'gateBypass.level in the shared config file is present and a recognized level',
+  check: (cwd) => checkGateBypassConfigured(cwd),
+});
+
+registerFix({
+  id: 'gate-bypass-configured',
+  fix: (cwd) => fixGateBypassConfigured(cwd),
 });

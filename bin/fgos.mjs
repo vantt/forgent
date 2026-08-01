@@ -62,7 +62,7 @@ import { writeCoexistenceManifest } from '../src/install/coexist.mjs';
 import { MANIFEST_SCHEMA_VERSION, COMMAND_REGISTRY } from '../src/cli/command-registry.mjs';
 import { recordInvocationFault } from '../src/cli/invocation-fault-log.mjs';
 import { computeAwaitingContext } from '../src/state/awaiting-context.mjs';
-import { DOCTOR_CHECKS, integrationScriptPath, ensureSharedConfigDefaults } from '../src/setup/checks.mjs';
+import { DOCTOR_CHECKS, integrationScriptPath, ensureSharedConfigDefaults, runFixes } from '../src/setup/checks.mjs';
 import { sharedConfigFilePath } from '../src/config/shared-config-file.mjs';
 import { installGitHooks } from '../src/setup/git-hooks.mjs';
 import { detectRcFiles, insertSourceLine } from '../src/setup/shell-rc.mjs';
@@ -2747,15 +2747,24 @@ async function runVerb(verb, flags, positional, dir) {
       };
     }
 
-    // Read-only diagnostic (D2): runs every DOCTOR_CHECKS entry against the
-    // current cwd. Never writes anything — no rc file insertion, no config
-    // write — matching this verb's `access: 'read'` declaration.
+    // Diagnostic by default (D2, docs/specs/distribution.md RUL9): runs every
+    // DOCTOR_CHECKS entry against the current cwd, writing nothing — no rc
+    // file insertion, no config write — unless `--fix` is given.
+    //
+    // `--fix` (docs/history/doctor-fix-gate-bypass/CONTEXT.md D2, deliberate
+    // reversal of RUL9/RUL11 per distribution-vision.md §3): runs every
+    // registered `fix` (`runFixes`, `src/setup/registrations.mjs`) BEFORE
+    // re-running the checks, so the returned `checks` array reflects
+    // post-fix state — the same "report what changed" shape
+    // `ensureRunnerConfig`/`ensureSharedConfigDefaults` already use. Without
+    // `--fix`, behavior is byte-identical to before this flag existed.
     case 'doctor': {
+      const fixed = flags.fix ? runFixes(process.cwd()) : undefined;
       const checks = DOCTOR_CHECKS.map(({ id, description, check }) => {
         const { passed, message } = check(process.cwd());
         return { id, description, passed, message };
       });
-      return { checks };
+      return fixed === undefined ? { checks } : { fixed, checks };
     }
 
     // Safely clears .fgos/main-checkout.lock (tsk-3h4). Never force-deletes:
@@ -2897,6 +2906,11 @@ function renderPretty(verb, data) {
   const lines = [];
   if (verb === 'doctor') {
     lines.push(bold('fgos doctor'));
+    if (data.fixed) {
+      for (const f of data.fixed) {
+        lines.push(formatCheck(f.changed, `fix: ${f.id}`, f.message));
+      }
+    }
     for (const c of data.checks) {
       lines.push(formatCheck(c.passed, c.description, c.message));
     }

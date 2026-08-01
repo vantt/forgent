@@ -9,7 +9,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
-import { DOCTOR_CHECKS, CONFIG_DEFAULT_REGISTRATIONS, registerCheck, registerConfigDefault, ensureSharedConfigDefaults } from '../../src/setup/checks.mjs';
+import { DOCTOR_CHECKS, CONFIG_DEFAULT_REGISTRATIONS, FIX_REGISTRATIONS, registerCheck, registerConfigDefault, registerFix, runFixes, ensureSharedConfigDefaults } from '../../src/setup/checks.mjs';
 import { DEFAULT_RUNNER_CONFIG } from '../../src/runner/dispatch.mjs';
 
 function mkTempDir() {
@@ -69,6 +69,50 @@ test('the runner\'s own config-default is registered under the "runner" key (bui
   assert.ok(entry, 'the built-in runner config-default is missing from CONFIG_DEFAULT_REGISTRATIONS');
   assert.equal(entry.key, 'runner');
   assert.equal(typeof entry.shape, 'object');
+});
+
+// ─── fix (docs/history/doctor-fix-gate-bypass/CONTEXT.md D3, tsk-2qz-1): a
+// third registration capability, independent of check/configDefault, proven
+// here with a throwaway entry -- never the real gate-bypass entry (that's
+// tsk-2qz-2's own job, per the plan's piece boundary).
+
+test('a new module can register a fix via registrations.mjs and see it in checks.mjs\'s own FIX_REGISTRATIONS, without checks.mjs being edited', () => {
+  const before = FIX_REGISTRATIONS.length;
+  registerFix({
+    id: 'registrations-test-throwaway-fix',
+    fix: () => ({ changed: true, message: 'throwaway fix ran' }),
+  });
+  assert.equal(FIX_REGISTRATIONS.length, before + 1);
+  const entry = FIX_REGISTRATIONS.find((f) => f.id === 'registrations-test-throwaway-fix');
+  assert.ok(entry, 'FIX_REGISTRATIONS (re-exported from checks.mjs) did not pick up the new registration');
+  assert.deepEqual(entry.fix(), { changed: true, message: 'throwaway fix ran' });
+});
+
+test('registering a fix with a duplicate id throws rather than silently shadowing the original', () => {
+  registerFix({ id: 'registrations-test-dup-fix', fix: () => ({ changed: false, message: '' }) });
+  assert.throws(
+    () => registerFix({ id: 'registrations-test-dup-fix', fix: () => ({ changed: false, message: '' }) }),
+    /already registered/,
+  );
+});
+
+test('registerFix requires a fix function', () => {
+  assert.throws(
+    () => registerFix({ id: 'registrations-test-no-fn' }),
+    /requires a fix function/,
+  );
+});
+
+test('runFixes invokes every registered fix against the given cwd and reports id/changed/message per entry', () => {
+  const before = FIX_REGISTRATIONS.length;
+  registerFix({
+    id: 'registrations-test-runfixes-throwaway',
+    fix: (cwd) => ({ changed: true, message: `ran against ${cwd}` }),
+  });
+  const results = runFixes('/tmp/some-cwd');
+  assert.equal(results.length, before + 1);
+  const entry = results.find((r) => r.id === 'registrations-test-runfixes-throwaway');
+  assert.deepEqual(entry, { id: 'registrations-test-runfixes-throwaway', changed: true, message: 'ran against /tmp/some-cwd' });
 });
 
 // ─── ensureSharedConfigDefaults (tsk-5vf D4): the registry-driven assembler

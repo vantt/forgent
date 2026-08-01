@@ -17,6 +17,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { TIERS } from './work.mjs';
 import { HEAVY_KEYWORDS } from '../intake/risk-keywords.mjs';
+import { readSharedConfig } from '../config/shared-config-file.mjs';
 
 /** Level order, weakest to strongest. 'off' auto-approves nothing. */
 export const LEVELS = Object.freeze(['off', ...TIERS]);
@@ -26,12 +27,45 @@ export const DEFAULT_LEVEL = 'off';
 const CONFIG_FILE_NAME = 'gate-bypass.json';
 
 /**
- * Read the configured bypass level from `<dir>/gate-bypass.json`. Fails
- * closed to `DEFAULT_LEVEL` on a missing file, invalid JSON, or a shape/value
- * that isn't a recognized level — never throws, per D2/D4's "never fails
- * open" requirement.
+ * Read the configured bypass level. `dir` is the `.fgos` directory (every
+ * existing caller already resolves this before calling — bin/fgos.mjs's
+ * `gate-bypass` verb, both skill-embedded gate checks in fgos-exploring/
+ * fgos-planning).
+ *
+ * Tries the shared config file first (`config.gateBypass.level`,
+ * docs/history/doctor-fix-gate-bypass/CONTEXT.md D1/D3 — gate-bypass's real
+ * registry entry, `registrations.mjs`); `readSharedConfig` takes the repo
+ * root (`.fgos`'s parent), not `.fgos` itself, so that's resolved here via
+ * `path.dirname(dir)`. Falls back to the legacy standalone
+ * `<dir>/gate-bypass.json` (never deleted, same "read the old file until a
+ * real migration writes the new one" discipline `readSharedConfig` itself
+ * already applies to `.fgos-runner.json`) when the shared file has no valid
+ * `gateBypass` entry yet.
+ *
+ * Fails closed to `DEFAULT_LEVEL` on a missing file, invalid JSON, or a
+ * shape/value that isn't a recognized level, at either layer — never
+ * throws, per D2/D4's "never fails open" requirement.
  */
 export function readGateBypassLevel(dir) {
+  let shared;
+  try {
+    shared = readSharedConfig(path.dirname(dir));
+  } catch {
+    shared = undefined;
+  }
+  const sharedLevel = shared?.gateBypass?.level;
+  if (typeof sharedLevel === 'string' && LEVELS.includes(sharedLevel)) {
+    return sharedLevel;
+  }
+  return readLegacyStandaloneLevel(dir);
+}
+
+/**
+ * Legacy standalone `<dir>/gate-bypass.json` read (pre-D1 shape, D2 of this
+ * item's own CONTEXT.md) — byte-identical logic to what `readGateBypassLevel`
+ * used to be before the shared-file read was added above.
+ */
+function readLegacyStandaloneLevel(dir) {
   const filePath = path.join(dir, CONFIG_FILE_NAME);
   let raw;
   try {

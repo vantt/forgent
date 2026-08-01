@@ -10,8 +10,11 @@
 export {
   DOCTOR_CHECKS,
   CONFIG_DEFAULT_REGISTRATIONS,
+  FIX_REGISTRATIONS,
   registerCheck,
   registerConfigDefault,
+  registerFix,
+  runFixes,
   resolveMainCheckout,
   integrationScriptPath,
   mainCheckoutHookWired,
