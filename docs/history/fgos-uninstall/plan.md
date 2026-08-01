@@ -63,8 +63,8 @@ at `fgos-validating`, not carry a "weak evidence" caveat for that part.
 | Git-hooks reversal (D2) | low-medium | round-trip test: unwires only when `core.hooksPath` is still exactly `.githooks`; a hooksPath the caller changed to something else is left untouched — mirrors `installGitHooks`'s existing fill-only test pattern |
 | Confirmation gate (D3) | medium | test asserting `fgos uninstall` (no flag) refuses to touch anything and exits without side effects; explicit opt-in actually runs |
 | Config preservation (pinned constraint) | medium | test asserting `.fgos/` data, `~/.fgos/config.json`, and project `config.json` are byte-identical before/after a full `fgos uninstall` run |
-| Package self-removal (D1) | **high** | integration test: `npm pack` + install into a temp prefix + run `fgos uninstall --yes` + assert the package's files are gone and the command no longer resolves on `PATH` |
-| Cross-platform self-deletion | **high, unresolved** | no CI matrix exists yet for this repo (`tsk-3nx`, separate item, still `todo`) — Windows file-locking behavior for a running process deleting its own files is flagged as an open risk, not provable in this plan; carried forward as an explicit unproven assumption |
+| Package self-removal (D1) — **reshaped as a spike, see below** (`fgos-validating` returned this row NOT READY on 2026-08-01: zero precedent anywhere in this repo for a process removing its own installed package; plausibility only) | **high** | spike answers this before any build verify is written |
+| Cross-platform self-deletion | **high, unresolved** | no CI matrix exists yet for this repo (`tsk-3nx`, separate item, still `todo`) — Windows file-locking behavior for a running process deleting its own files is flagged as an open risk, explicitly out of scope for the spike below (npm + Linux/macOS only); carried forward as an explicit unproven assumption |
 
 ### Files likely touched
 
@@ -96,19 +96,34 @@ at `fgos-validating`, not carry a "weak evidence" caveat for that part.
 ## Split
 
 Two independently workable pieces — the well-precedented wiring reversal
-(mirrors existing, tested fill-only patterns) versus the genuinely novel,
-high-risk package self-removal. Splitting lets the low-risk piece land
-and prove itself before the high-risk piece's weak-proof area is
-tackled. Both carry `parent: tsk-4iv`.
+(mirrors existing, tested fill-only patterns) versus the genuinely novel
+package self-removal. Splitting lets the low-risk piece land and prove
+itself while the novel piece answers its own feasibility question first.
+Both carry `parent: tsk-4iv`.
 
 | id | title | verify |
 |---|---|---|
 | `tsk-4iv-1` | `fgos uninstall`: gỡ wiring của fgOS — unwire core.hooksPath/.githooks (fill-only, D2), CHỈ report (không tự xoá) dòng shell-rc source line cho người tự xoá tay (D4) — sau xác nhận (D3), giữ nguyên `.fgos/` data + config | `node --test test/setup/uninstall-wiring.test.mjs` |
-| `tsk-4iv-2` | `fgos uninstall`: gỡ luôn package đã cài qua package manager phát hiện được (npm/pnpm/yarn, D1), tự xoá file cài đặt kể cả khi process đang chạy | `node --test test/setup/uninstall-package-removal.test.mjs` |
+| `tsk-4iv-2` | **SPIKE**: process tự gỡ package npm-installed của chính nó (Linux/macOS) có tin cậy được không — file biến mất sạch, lệnh hết resolve trên PATH, không lỗi file-lock giữa chừng? Phạm vi CHỈ npm + Linux/macOS; pnpm/yarn và Windows nằm ngoài spike này | `node --test test/setup/self-uninstall-spike.test.mjs` |
 
-`tsk-4iv-2` carries `deps: [tsk-4iv-1]` — it extends the same `uninstall`
-verb piece 1 builds (confirmation gate + wiring reversal scaffold), rather
-than starting a second CLI entry point.
+`tsk-4iv-2` carries `deps: [tsk-4iv-1]` (reuses the same `uninstall` verb
+scaffold piece 1 builds) and is reshaped as a spike per
+`fgos-validating`'s 2026-08-01 NOT READY verdict on the original
+`Package self-removal` risk-map row — that row had zero accepted evidence
+anywhere in this repo (no precedent for a process removing its own
+installed package), which is exactly the "one yes/no question decides
+whether the plan is even real" shape a spike exists for. D1 itself is not
+reopened: `tsk-4iv-2` still targets real package removal via a real
+integration test (pack + install into a temp global prefix + attempt
+self-removal), it just answers the feasibility question narrowly (one
+package manager, two OSes) before any pnpm/yarn/Windows-matrix build work
+is planned. If the spike's finding is "yes, reliable" — a follow-up item
+extending it to pnpm/yarn (and, separately, whatever `tsk-3nx`'s CI matrix
+enables for Windows) gets created then, not now (YAGNI — no point
+shaping a 3-package-manager build plan before the one-package-manager
+question is even answered). If the finding is "no, unreliable" — that
+result itself is the deliverable, and `tsk-4iv`'s own scope (specifically
+D1) goes back through `fgos-exploring` with real evidence in hand.
 
 ## Gate
 
