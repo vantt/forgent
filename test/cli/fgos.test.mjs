@@ -5931,6 +5931,43 @@ test('return on a branch-source take is a clean no-op for the node_modules symli
   assert.match(result.stdout, /awaiting-approval/);
 });
 
+test('return on a branch-source take finds node_modules by walking UP from repoRoot when repoRoot itself has none of its own (tsk-5l2-1: a nested worktree checkout relies on an ancestor\'s install, exactly like Node\'s own ESM resolver does -- a naive single-directory existsSync check misses this)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  fs.appendFileSync(path.join(cwd, '.gitignore'), 'node_modules/\n');
+
+  const pkgDir = path.join(cwd, 'node_modules', 'fake-esm-dep');
+  fs.mkdirSync(pkgDir, { recursive: true });
+  fs.writeFileSync(
+    path.join(pkgDir, 'package.json'),
+    JSON.stringify({ name: 'fake-esm-dep', version: '1.0.0', main: 'index.mjs', type: 'module' }),
+  );
+  fs.writeFileSync(path.join(pkgDir, 'index.mjs'), 'export const ok = true;\n');
+
+  fs.writeFileSync(path.join(cwd, 'verify-dep.mjs'), "import { ok } from 'fake-esm-dep';\nprocess.exit(ok ? 0 : 1);\n");
+  gitAtCwd(cwd, ['add', 'verify-dep.mjs']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', 'add verify-dep.mjs']);
+
+  makeBlockedBranchItem(cwd, 'branch-return-nested', { verify: 'node verify-dep.mjs' });
+  assert.equal(run(cwd, ['take', '--id', 'branch-return-nested']).status, 0);
+  commitPending(cwd, 'state: take branch-return-nested');
+
+  gitAtCwd(cwd, ['checkout', 'fgw/branch-return-nested']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', 'human fix', '--allow-empty']);
+  gitAtCwd(cwd, ['checkout', 'main']);
+
+  // Invoke fgos from a NESTED subdirectory with no node_modules of its
+  // own -- the real tsk-5l2-1 scenario (a linked worktree several levels
+  // deep). --dir keeps state resolution pointed at the real fixture root;
+  // only the CLI's own process.cwd() (repoRoot, used for the git
+  // operations and the node_modules walk) is the nested directory.
+  const nestedCwd = path.join(cwd, 'nested', 'deeper');
+  fs.mkdirSync(nestedCwd, { recursive: true });
+  const result = spawnSync(process.execPath, [FGOS, 'return', 'branch-return-nested', '--dir', cwd], { cwd: nestedCwd, encoding: 'utf8' });
+  assert.equal(result.status, 0, `return failed: ${result.stderr}`);
+  assert.match(result.stdout, /awaiting-approval/);
+});
+
 test('return on a branch-source take never touches a live main-checkout.lock (tsk-45z D1 scope: only the main-source path releases early — worktree commits never contend for this shared lock)', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
