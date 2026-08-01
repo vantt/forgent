@@ -1,7 +1,17 @@
 # Plan: platform-agnostic canonical root for forgent's own agent definitions (tsk-slq)
 
-Status: built (D5 relocated the canonical root mid-`executing`; see Revision note 2 below). Final paths: `agents/fgos-placeholder.yaml`, `scripts/project-agents.mjs` (not `project-agent-definitions.mjs` as first drafted — renamed to match the engine's own `judgeDiscovery`-generated `verify` command literally, per fgos-executing's "run the verify command exactly as recorded" rule).
-Decisions: `docs/history/agent-executor-agent-definitions/CONTEXT.md` (D1, D2, D3, D4, D5).
+Status: built (D5 relocated the canonical root mid-`executing`, D6 registered the new dependency + fixed `verify`; see Revision notes below). Final paths: `agents/fgos-placeholder.yaml`, `scripts/project-agents.mjs` (not `project-agent-definitions.mjs` as first drafted — renamed to match the engine's own `judgeDiscovery`-generated `verify` command literally, per fgos-executing's "run the verify command exactly as recorded" rule). Final `verify`: `npm install && npm test && node scripts/project-agents.mjs && git diff --exit-code -- .claude/agents/`.
+Decisions: `docs/history/agent-executor-agent-definitions/CONTEXT.md` (D1, D2, D3, D4, D5, D6).
+
+## Revision note 3 (post-executing, D6)
+
+Mid-build, `fgw/tsk-slq` merged `main` (31+ commits ahead at the fork
+point) to pick up `tsk-2cs`'s real extensible doctor-check registry
+(`src/setup/registrations.mjs`), and registered D4's new `yaml` dependency
+there as `dependencies-installed` — required by `AGENTS.md`'s own
+install/setup/doctor gate, not optional. Also discovered `fgos return`'s
+disposable detached-worktree goal-check never runs `npm install`, so
+`verify` now starts with it. See `CONTEXT.md` D6 for full evidence.
 
 ## Revision note 2 (post-executing)
 
