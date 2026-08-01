@@ -504,6 +504,19 @@ registerConfigDefault({
   shape: { level: DEFAULT_LEVEL },
 });
 
+// work-item-status-delivered-retrospective-cleanup D7: the cleanup-stage
+// TTL is global config, not per-item/per-domain (YAGNI — no demonstrated
+// need yet). cleanup-harness.mjs's checkCleanupTTLElapsed reads this via
+// readSharedConfig; the value here is only the doctor/setup-visible
+// default, same shape as gateBypass's own registration immediately above.
+export const DEFAULT_CLEANUP_TTL_DAYS = 7;
+
+registerConfigDefault({
+  id: 'cleanup',
+  key: 'cleanup',
+  shape: { ttlDays: DEFAULT_CLEANUP_TTL_DAYS },
+});
+
 registerCheck({
   id: 'gate-bypass-configured',
   description: 'gateBypass.level in the shared config file is present and a recognized level',

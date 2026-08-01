@@ -63,7 +63,9 @@ import { MANIFEST_SCHEMA_VERSION, COMMAND_REGISTRY } from '../src/cli/command-re
 import { recordInvocationFault } from '../src/cli/invocation-fault-log.mjs';
 import { computeAwaitingContext } from '../src/state/awaiting-context.mjs';
 import { DOCTOR_CHECKS, integrationScriptPath, ensureSharedConfigDefaults, runFixes } from '../src/setup/checks.mjs';
-import { sharedConfigFilePath } from '../src/config/shared-config-file.mjs';
+import { sharedConfigFilePath, readSharedConfig } from '../src/config/shared-config-file.mjs';
+import { assessCleanupReadiness } from '../src/state/cleanup-harness.mjs';
+import { DEFAULT_CLEANUP_TTL_DAYS } from '../src/setup/registrations.mjs';
 import { installGitHooks, uninstallGitHooks } from '../src/setup/git-hooks.mjs';
 import { detectRcFiles, insertSourceLine, hasSourceLine } from '../src/setup/shell-rc.mjs';
 import { formatCheck, bold } from '../src/setup/ansi.mjs';
@@ -925,6 +927,85 @@ async function runVerb(verb, flags, positional, dir) {
       const reason = optionalField(flags.reason, 'move --reason requires a non-empty reason value (omit --reason entirely when not rejecting a proposal)');
       const { event } = moveWork(dir, { id, to, expectedStatus, reason, role: 'human' });
       return { id, from: event.payload.from, to: event.payload.to, seq: event.seq };
+    }
+
+    // work-item-status-delivered-retrospective-cleanup D9: the mechanical
+    // half of retrospective — a batch sweep, run once per invocation,
+    // moving every `delivered` item to `retrospective` (marking it picked
+    // up for the batch synthesis pass). Never runs inline in
+    // return/approve, per the same D9 decision. The actual synthesis
+    // (settlement/decision/enduser-docs, formerly `fgos-compounding`'s
+    // stage-triggered job) is a session's own separate work while an item
+    // sits at `retrospective`; this verb only performs the mechanical
+    // claim-like transition, exactly once per swept item, never the
+    // synthesis itself. Moving on to `cleanup` afterward is the plain
+    // generic `fgos move <id> --to cleanup` — no dedicated verb needed,
+    // since `cleanup`'s own harness (below) re-verifies real content
+    // exists before it will ever reach `done`.
+    case 'retrospective': {
+      const view = listWork(dir);
+      const swept = [];
+      for (const item of Object.values(view.work)) {
+        if (item.status !== 'delivered') continue;
+        const { event } = moveWork(dir, { id: item.id, to: 'retrospective', expectedStatus: 'delivered', role: 'system' });
+        swept.push({ id: item.id, seq: event.seq });
+      }
+      return { swept, count: swept.length };
+    }
+
+    // work-item-status-delivered-retrospective-cleanup D8: the dedicated
+    // harness gating `cleanup -> done`, never folded into return/compound.
+    // Checks (cleanup-harness.mjs's assessCleanupReadiness): (1) the
+    // global TTL (D7) has elapsed since the item actually entered
+    // `cleanup`; (2) retrospective produced real content; (3) — only for a
+    // worktree-backed domain (D5) — the merge still resolves on main. All
+    // ready: performs the actual branch/worktree cleanup (cleanupMergedBranch,
+    // idempotent if a synchronous cleanup already ran elsewhere) and closes
+    // to `done`. Any check failing: parks `cleanup -> blocked` with every
+    // failing reason joined into one `reason` string (fsm.mjs requires
+    // this edge to carry one, mirroring `awaiting-approval -> blocked`).
+    case 'cleanup': {
+      const id = requireField(positional[0] ?? flags.id, 'cleanup requires an id: fgos cleanup <id>');
+      const view = listWork(dir);
+      const item = view.work[id];
+      if (!item) {
+        throw new StoreError('validation', `cleanup: work "${id}" not found.`);
+      }
+      if (item.status !== 'cleanup') {
+        throw new StoreError('precondition', `cleanup: work "${id}" is "${item.status}", not "cleanup" — nothing to finish.`);
+      }
+
+      const domain = getDomain(item.domain);
+      const rawEvents = readRawEvents(dir);
+      const repoRoot = process.cwd();
+      const sharedConfig = readSharedConfig(repoRoot);
+      const ttlDays = sharedConfig?.cleanup?.ttlDays ?? DEFAULT_CLEANUP_TTL_DAYS;
+
+      const assessment = assessCleanupReadiness({
+        view,
+        rawEvents,
+        id,
+        repoRoot,
+        worktreeBacked: domain.worktreeBacked ?? false,
+        ttlDays,
+      });
+
+      if (!assessment.ready) {
+        const reason = assessment.reasons.join('; ');
+        const { event } = moveWork(dir, { id, to: 'blocked', expectedStatus: 'cleanup', reason, role: 'system' });
+        return { id, to: 'blocked', reason, seq: event.seq };
+      }
+
+      let cleanupWarnings = [];
+      if (domain.worktreeBacked) {
+        const branch = branchNameFor(id);
+        if (branchExists(repoRoot, branch)) {
+          const result = cleanupMergedBranch(repoRoot, branch);
+          cleanupWarnings = result.warnings;
+        }
+      }
+      const { event } = moveWork(dir, { id, to: 'done', expectedStatus: 'cleanup', role: 'human' });
+      return { id, to: 'done', seq: event.seq, cleanupWarnings };
     }
 
     // Patches fields on an existing item (P23, D2-D5) — the "always
@@ -2826,7 +2907,7 @@ async function runVerb(verb, flags, positional, dir) {
     }
 
     default:
-      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <init|add|submit|discover|decompose|move|edit|ask|answer|decision|list|ready|rebuild|repair|check|rollup|take|return|review|approve|reject|catchup|evolve|triage|session|goal|tool|setup|doctor|unlock|lock-status> ...`);
+      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <init|add|submit|discover|decompose|move|retrospective|cleanup|edit|ask|answer|decision|list|ready|rebuild|repair|check|rollup|take|return|review|approve|reject|catchup|evolve|triage|session|goal|tool|setup|doctor|unlock|lock-status> ...`);
   }
 }
 
