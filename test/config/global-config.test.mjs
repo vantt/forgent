@@ -113,3 +113,30 @@ test('describeConfigAwareness: active is "none" when neither project nor global 
   assert.equal(result.projectPresent, false);
   fs.rmSync(dir, { recursive: true, force: true });
 });
+
+// Regression: the default globalConfigPath must resolve os.homedir() fresh
+// on every call, never a value frozen at module-load time -- a caller that
+// overrides process.env.HOME after this module already loaded (any test in
+// the same process, since Node modules load once) must see the override
+// take effect on the DEFAULT path, not just when an explicit path is passed.
+test('describeConfigAwareness: default globalConfigPath honors process.env.HOME set after module load, not a frozen value', () => {
+  const homeDir = mkTempDir('global-config-home-override-');
+  fs.mkdirSync(path.join(homeDir, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(homeDir, '.fgos', 'config.json'), '{}');
+  const projectDir = mkTempDir('global-config-home-override-project-');
+
+  const prevHome = process.env.HOME;
+  process.env.HOME = homeDir;
+  let result;
+  try {
+    result = describeConfigAwareness(projectDir);
+  } finally {
+    process.env.HOME = prevHome;
+  }
+
+  assert.equal(result.globalConfigPath, path.join(homeDir, '.fgos', 'config.json'));
+  assert.equal(result.globalPresent, true);
+  assert.equal(result.active, 'global');
+  fs.rmSync(homeDir, { recursive: true, force: true });
+  fs.rmSync(projectDir, { recursive: true, force: true });
+});

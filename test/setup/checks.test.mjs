@@ -11,7 +11,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync, spawnSync } from 'node:child_process';
 
-import { DOCTOR_CHECKS, integrationScriptPath, mainCheckoutHookWired, resolveMainCheckout, checkGlobalProjectAwareness } from '../../src/setup/checks.mjs';
+import { DOCTOR_CHECKS, integrationScriptPath, mainCheckoutHookWired, resolveMainCheckout } from '../../src/setup/checks.mjs';
 import { DEFAULT_RUNNER_CONFIG } from '../../src/runner/dispatch.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -120,8 +120,20 @@ test('config-not-stale fails when the existing config is missing a default key',
 // ─── config-awareness (docs/history/global-project-config-awareness/ ──────
 // CONTEXT.md D1): always passes (informational, read-only, same contract as
 // tool-registry-configured) -- only the message and `active` distinguish
-// which level is in play. Every case overrides both globalConfigPath and
-// projectConfigPath so this never touches the real ~/.fgos/config.json.
+// which level is in play. Every case overrides HOME (same pattern the
+// shell-integration-sourced tests above already use) so this never touches
+// the real ~/.fgos/config.json; project config is checked at the temp cwd's
+// own .fgos-runner.json, matching describeConfigAwareness's real defaults.
+
+function withHome(homeDir, fn) {
+  const prevHome = process.env.HOME;
+  process.env.HOME = homeDir;
+  try {
+    return fn();
+  } finally {
+    process.env.HOME = prevHome;
+  }
+}
 
 test('config-awareness is registered on DOCTOR_CHECKS and always passes', () => {
   const { passed, message } = checkById('config-awareness').check(process.cwd());
@@ -130,49 +142,59 @@ test('config-awareness is registered on DOCTOR_CHECKS and always passes', () => 
 });
 
 test('config-awareness reports "none" when neither project nor global config exists', () => {
-  const cwd = mkTemp('doctor-awareness-none-');
-  const globalConfigPath = path.join(cwd, 'never-created-global.json');
-  const projectConfigPath = path.join(cwd, 'never-created-project.json');
-  const { passed, message } = checkGlobalProjectAwareness(cwd, { globalConfigPath, projectConfigPath });
-  assert.equal(passed, true);
-  assert.match(message, /no config at either level/);
+  const homeDir = mkTemp('doctor-awareness-none-home-');
+  const cwd = mkTemp('doctor-awareness-none-cwd-');
+  withHome(homeDir, () => {
+    const { passed, message } = checkById('config-awareness').check(cwd);
+    assert.equal(passed, true);
+    assert.match(message, /no config at either level/);
+  });
+  fs.rmSync(homeDir, { recursive: true, force: true });
   fs.rmSync(cwd, { recursive: true, force: true });
 });
 
 test('config-awareness reports project active with global not present, when only project config exists', () => {
-  const cwd = mkTemp('doctor-awareness-project-only-');
-  const globalConfigPath = path.join(cwd, 'never-created-global.json');
-  const projectConfigPath = path.join(cwd, 'project.json');
-  fs.writeFileSync(projectConfigPath, '{}');
-  const { passed, message } = checkGlobalProjectAwareness(cwd, { globalConfigPath, projectConfigPath });
-  assert.equal(passed, true);
-  assert.match(message, /active: project/);
-  assert.match(message, /global config not present/);
+  const homeDir = mkTemp('doctor-awareness-project-only-home-');
+  const cwd = mkTemp('doctor-awareness-project-only-cwd-');
+  fs.writeFileSync(path.join(cwd, '.fgos-runner.json'), '{}');
+  withHome(homeDir, () => {
+    const { passed, message } = checkById('config-awareness').check(cwd);
+    assert.equal(passed, true);
+    assert.match(message, /active: project/);
+    assert.match(message, /global config not present/);
+  });
+  fs.rmSync(homeDir, { recursive: true, force: true });
   fs.rmSync(cwd, { recursive: true, force: true });
 });
 
 test('config-awareness reports project active with global also present, when both exist', () => {
-  const cwd = mkTemp('doctor-awareness-both-');
-  const globalConfigPath = path.join(cwd, 'global.json');
-  const projectConfigPath = path.join(cwd, 'project.json');
-  fs.writeFileSync(globalConfigPath, '{}');
-  fs.writeFileSync(projectConfigPath, '{}');
-  const { passed, message } = checkGlobalProjectAwareness(cwd, { globalConfigPath, projectConfigPath });
-  assert.equal(passed, true);
-  assert.match(message, /active: project/);
-  assert.match(message, /global config also present/);
+  const homeDir = mkTemp('doctor-awareness-both-home-');
+  fs.mkdirSync(path.join(homeDir, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(homeDir, '.fgos', 'config.json'), '{}');
+  const cwd = mkTemp('doctor-awareness-both-cwd-');
+  fs.writeFileSync(path.join(cwd, '.fgos-runner.json'), '{}');
+  withHome(homeDir, () => {
+    const { passed, message } = checkById('config-awareness').check(cwd);
+    assert.equal(passed, true);
+    assert.match(message, /active: project/);
+    assert.match(message, /global config also present/);
+  });
+  fs.rmSync(homeDir, { recursive: true, force: true });
   fs.rmSync(cwd, { recursive: true, force: true });
 });
 
 test('config-awareness falls back to global active with project not present, when only global config exists', () => {
-  const cwd = mkTemp('doctor-awareness-global-only-');
-  const globalConfigPath = path.join(cwd, 'global.json');
-  const projectConfigPath = path.join(cwd, 'never-created-project.json');
-  fs.writeFileSync(globalConfigPath, '{}');
-  const { passed, message } = checkGlobalProjectAwareness(cwd, { globalConfigPath, projectConfigPath });
-  assert.equal(passed, true);
-  assert.match(message, /active: global/);
-  assert.match(message, /project config not present/);
+  const homeDir = mkTemp('doctor-awareness-global-only-home-');
+  fs.mkdirSync(path.join(homeDir, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(homeDir, '.fgos', 'config.json'), '{}');
+  const cwd = mkTemp('doctor-awareness-global-only-cwd-');
+  withHome(homeDir, () => {
+    const { passed, message } = checkById('config-awareness').check(cwd);
+    assert.equal(passed, true);
+    assert.match(message, /active: global/);
+    assert.match(message, /project config not present/);
+  });
+  fs.rmSync(homeDir, { recursive: true, force: true });
   fs.rmSync(cwd, { recursive: true, force: true });
 });
 

@@ -14,7 +14,18 @@ import path from 'node:path';
 
 import { mergeConfigDefaults } from '../setup/config-merge.mjs';
 
-export const GLOBAL_CONFIG_PATH = path.join(os.homedir(), '.fgos', 'config.json');
+// A function, not a module-load-time const: os.homedir() must be read fresh
+// on every call, not frozen the first time this module is imported --
+// otherwise a caller overriding process.env.HOME (tests; anything else that
+// legitimately runs with a different HOME) after this module already
+// loaded would see the wrong, stale path. `GLOBAL_CONFIG_PATH` below is
+// still exported as a snapshot for display purposes (messages, docs), but
+// every function's own default resolution calls this, never the constant.
+function defaultGlobalConfigPath() {
+  return path.join(os.homedir(), '.fgos', 'config.json');
+}
+
+export const GLOBAL_CONFIG_PATH = defaultGlobalConfigPath();
 
 /**
  * Read+parse the global config file. A missing file is not an error --
@@ -22,7 +33,7 @@ export const GLOBAL_CONFIG_PATH = path.join(os.homedir(), '.fgos', 'config.json'
  * file throws, the same discipline dispatch.mjs's loadRunnerConfig already
  * applies to the project-level file.
  */
-export function loadGlobalConfig(globalConfigPath = GLOBAL_CONFIG_PATH) {
+export function loadGlobalConfig(globalConfigPath = defaultGlobalConfigPath()) {
   if (!fs.existsSync(globalConfigPath)) return {};
   const raw = fs.readFileSync(globalConfigPath, 'utf8');
   try {
@@ -36,7 +47,7 @@ export function loadGlobalConfig(globalConfigPath = GLOBAL_CONFIG_PATH) {
  * `projectConfig` merged with the global config, project winning any key
  * present in both.
  */
-export function mergeWithGlobalConfig(projectConfig, globalConfigPath = GLOBAL_CONFIG_PATH) {
+export function mergeWithGlobalConfig(projectConfig, globalConfigPath = defaultGlobalConfigPath()) {
   const globalConfig = loadGlobalConfig(globalConfigPath);
   return mergeConfigDefaults(projectConfig ?? {}, globalConfig).merged;
 }
@@ -46,7 +57,7 @@ export function mergeWithGlobalConfig(projectConfig, globalConfigPath = GLOBAL_C
  * when present, per D1), and whether the other level is also present --
  * the awareness data `fgos doctor`'s config-awareness check reports on.
  */
-export function describeConfigAwareness(cwd, { globalConfigPath = GLOBAL_CONFIG_PATH, projectConfigPath } = {}) {
+export function describeConfigAwareness(cwd, { globalConfigPath = defaultGlobalConfigPath(), projectConfigPath } = {}) {
   const resolvedProjectPath = projectConfigPath ?? path.join(cwd, '.fgos-runner.json');
   const globalPresent = fs.existsSync(globalConfigPath);
   const projectPresent = fs.existsSync(resolvedProjectPath);
