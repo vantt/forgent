@@ -35,6 +35,25 @@ function runBash(cwd, script) {
   return execFileSync('bash', ['-c', script], { cwd, encoding: 'utf8' });
 }
 
+function writePathStub(dir, name, marker) {
+  fs.mkdirSync(dir, { recursive: true });
+  const stubPath = path.join(dir, name);
+  fs.writeFileSync(stubPath, `#!/usr/bin/env bash\necho "${marker}" "$@"\n`);
+  fs.chmodSync(stubPath, 0o755);
+  return stubPath;
+}
+
+function setupRepoWithoutBin(prefix) {
+  const repoRoot = mkTempDir(prefix);
+  execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: repoRoot });
+  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: repoRoot });
+  execFileSync('git', ['config', 'user.name', 'Test'], { cwd: repoRoot });
+  fs.writeFileSync(path.join(repoRoot, 'placeholder.txt'), '');
+  execFileSync('git', ['add', '-A'], { cwd: repoRoot });
+  execFileSync('git', ['commit', '-q', '-m', 'init'], { cwd: repoRoot });
+  return repoRoot;
+}
+
 test('fgos resolves and invokes bin/fgos.mjs from the repo root', () => {
   const repoRoot = setupRepo();
 
@@ -93,4 +112,50 @@ test('fgos-runner returns non-zero and prints an error to stderr outside any git
   assert.notEqual(result.status, 0);
   assert.match(result.stderr, /not a git repository/);
   fs.rmSync(noGitDir, { recursive: true, force: true });
+});
+
+test('fgos falls back to a real PATH install when the resolved root has no bin/fgos.mjs', () => {
+  const repoRoot = setupRepoWithoutBin('fgos-shell-integration-no-bin-');
+  const pathStubDir = mkTempDir('fgos-shell-integration-pathstub-');
+  writePathStub(pathStubDir, 'fgos', 'PATH_FGOS_MARKER');
+
+  const out = runBash(repoRoot, `export PATH="${pathStubDir}:$PATH"; source "${scriptPath}"; fgos --w`);
+
+  assert.match(out, /PATH_FGOS_MARKER/);
+  assert.match(out, /--w/);
+
+  fs.rmSync(repoRoot, { recursive: true, force: true });
+  fs.rmSync(pathStubDir, { recursive: true, force: true });
+});
+
+test('fgos-runner falls back to a real PATH install when the resolved root has no bin/fgos-runner.mjs', () => {
+  const repoRoot = setupRepoWithoutBin('fgos-shell-integration-no-bin-');
+  const pathStubDir = mkTempDir('fgos-shell-integration-pathstub-');
+  writePathStub(pathStubDir, 'fgos-runner', 'PATH_FGOS_RUNNER_MARKER');
+
+  const out = runBash(repoRoot, `export PATH="${pathStubDir}:$PATH"; source "${scriptPath}"; fgos-runner --w`);
+
+  assert.match(out, /PATH_FGOS_RUNNER_MARKER/);
+  assert.match(out, /--w/);
+
+  fs.rmSync(repoRoot, { recursive: true, force: true });
+  fs.rmSync(pathStubDir, { recursive: true, force: true });
+});
+
+test('fgos prints a clear error, not a raw Node stack, when the resolved root has no bin/fgos.mjs and no PATH install exists', () => {
+  const repoRoot = setupRepoWithoutBin('fgos-shell-integration-no-bin-no-path-');
+  const bashDir = path.dirname(execFileSync('which', ['bash']).toString().trim());
+  const gitDir = path.dirname(execFileSync('which', ['git']).toString().trim());
+  const minimalPath = [...new Set([bashDir, gitDir])].join(':');
+
+  const result = spawnSync('bash', ['-c', `source "${scriptPath}"; fgos --x`], {
+    cwd: repoRoot,
+    encoding: 'utf8',
+    env: { PATH: minimalPath },
+  });
+
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /no bin\/fgos\.mjs/);
+  assert.doesNotMatch(result.stderr, /Cannot find module/);
+  fs.rmSync(repoRoot, { recursive: true, force: true });
 });

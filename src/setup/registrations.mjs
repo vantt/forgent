@@ -24,6 +24,7 @@ import { mainCheckoutHookWired } from './git-hooks.mjs';
 import { DEFAULT_RUNNER_CONFIG } from '../runner/dispatch.mjs';
 import { listWork } from '../state/store.mjs';
 import { readLocalStatus, classifyRegistryPosture } from '../state/tool-registry.mjs';
+import { describeConfigAwareness } from '../config/global-config.mjs';
 
 export { mainCheckoutHookWired } from './git-hooks.mjs';
 
@@ -296,6 +297,35 @@ registerCheck({
   id: 'tool-registry-configured',
   description: 'tool registry posture — inactive/degraded/full (tsk-1dj)',
   check: (cwd) => checkToolRegistryConfigured(cwd),
+});
+
+// docs/history/global-project-config-awareness/CONTEXT.md D1: reports which
+// config level is currently active (project always wins when present) and
+// whether the other level is also on disk, so "aware" means visible in
+// `fgos doctor` output, not just correct-but-silent precedence at runtime.
+// READ-ONLY by construction (same as every other check here) —
+// describeConfigAwareness only calls fs.existsSync, never writes.
+function checkGlobalProjectAwareness(cwd) {
+  const { active, globalPresent, projectPresent, globalConfigPath, projectConfigPath } =
+    describeConfigAwareness(cwd);
+  if (active === 'none') {
+    return {
+      passed: true,
+      message: `no config at either level yet — project: ${projectConfigPath}, global: ${globalConfigPath}`,
+    };
+  }
+  const other = active === 'project' ? 'global' : 'project';
+  const otherPresent = active === 'project' ? globalPresent : projectPresent;
+  return {
+    passed: true,
+    message: `active: ${active} (${active === 'project' ? projectConfigPath : globalConfigPath}) — ${other} config ${otherPresent ? 'also present' : 'not present'}`,
+  };
+}
+
+registerCheck({
+  id: 'config-awareness',
+  description: 'which config level (global/project) is active, and whether the other is also present (tsk-2ta-2)',
+  check: (cwd) => checkGlobalProjectAwareness(cwd),
 });
 
 // The runner's own config-default, registered under the key it will

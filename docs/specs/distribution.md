@@ -43,7 +43,7 @@ of it).
 | 4 | CLI entry points | The commands exposed once installed | `fgos` → runs `bin/fgos.mjs`; `fgos-runner` → runs `bin/fgos-runner.mjs` (the autonomous-loop runner, see spec Runner) | yes | — |
 | 5 | Dev checkout shell helper | An opt-in file, sourced from a contributor's own shell profile, exposing the same two CLI entry points from inside a checkout of the source repository — no install, no package fetch | one file, both commands | no (contributor's own choice) | not sourced automatically anywhere |
 | 6 | Local config staleness | Whether the local config file already has every setting the current default schema defines | up to date / missing one or more default settings | yes (computed, not stored) | — |
-| 7 | Doctor check | One named diagnostic `fgos doctor` reports on | `node-and-git` (Node/git present), `shell-integration-sourced` (helper wired into every shell profile the caller has), `config-not-stale` (local config has every current default setting) | yes | — |
+| 7 | Doctor check | One named diagnostic `fgos doctor` reports on | `node-version-and-git` (Node/git present), `shell-integration-sourced` (helper wired into every shell profile the caller has), `config-not-stale` (local config has every current default setting), `main-checkout-hook-wired` (core.hooksPath wired to .githooks), `tool-registry-configured` (tool registry posture), `config-awareness` (which config level — global/project — is active, and whether the other is also present) | yes | — |
 | 8 | Output rendering mode | How `fgos setup`/`fgos doctor` present their result | enveloped JSON (every other verb's shape, unchanged) / colored plain text (`--pretty`) | yes | enveloped JSON |
 
 ## Behaviors & Operations
