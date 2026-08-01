@@ -61,18 +61,35 @@ export function truncateTitle(title) {
 
 /**
  * The full status domain for `work` (per D4's single flat FSM, extended by
- * D5 with `proposed`: a goal-check pass sitting on a branch, awaiting
- * approval/merge before it becomes `done`; extended by async-human-gate D1/D3
- * with `awaiting-human`: a single generic human-gate state, separate from
+ * D5 with `proposed`/`awaiting-approval`: a goal-check pass sitting on a
+ * branch, awaiting approval/merge; extended by async-human-gate D1/D3 with
+ * `awaiting-human`: a single generic human-gate state, separate from
  * `blocked`, that a work item parks in while waiting for a person to answer
  * a question; extended by fsm-wontfix-terminal-status D1/D2 with `wontfix`:
  * a second terminal state alongside `done`, for an item deliberately closed
  * without being built (superseded, duplicate, admin decision) rather than
- * completed — see fsm.mjs for its transition edges). Owned here (schema
- * owns domain) — fsm.mjs imports and re-exports this rather than defining
- * its own copy, so there is exactly one list of legal statuses.
+ * completed. Extended by work-item-status-delivered-retrospective-cleanup
+ * D1/D2 with `delivered`/`retrospective`/`cleanup`, inserted between
+ * `awaiting-approval` and `done`: `delivered` means "code accepted into the
+ * main tree" (the sole trigger for RUL12 dependent-open); `retrospective`
+ * is the batched learning-synthesis step (formerly the `compound-learn`
+ * stage, now retired); `cleanup` is a TTL-bounded worktree-reclaim park —
+ * see fsm.mjs for the full transition edges). Owned here (schema owns
+ * domain) — fsm.mjs imports and re-exports this rather than defining its
+ * own copy, so there is exactly one list of legal statuses.
  */
-export const STATUSES = Object.freeze(['todo', 'doing', 'blocked', 'awaiting-approval', 'done', 'awaiting-human', 'wontfix']);
+export const STATUSES = Object.freeze([
+  'todo',
+  'doing',
+  'blocked',
+  'awaiting-approval',
+  'delivered',
+  'retrospective',
+  'cleanup',
+  'done',
+  'awaiting-human',
+  'wontfix',
+]);
 
 /**
  * Tier domain for `work.tier` (per D6) — the cost/cognitive weight a work

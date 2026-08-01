@@ -109,11 +109,12 @@ test('moveWork doing->done composes a learning record reflecting the item\'s act
     detail: 'first miss',
   });
 
-  // A coding item must pass through the compound-learn stage before it can
-  // close (D3) — advance the stage before the doing->done move the learning
-  // record is asserted on.
-  moveStage(dir, { id: 'learn-doing', to: 'compound-learn' });
-  const { view } = moveWork(dir, { id: 'learn-doing', to: 'done', expectedStatus: 'doing', role: 'human' });
+  // done's one remaining door in is cleanup->done (work-item-status-
+  // delivered-retrospective-cleanup D1) — walk the sequential chain to it.
+  moveWork(dir, { id: 'learn-doing', to: 'delivered', expectedStatus: 'doing' });
+  moveWork(dir, { id: 'learn-doing', to: 'retrospective', expectedStatus: 'delivered' });
+  moveWork(dir, { id: 'learn-doing', to: 'cleanup', expectedStatus: 'retrospective' });
+  const { view } = moveWork(dir, { id: 'learn-doing', to: 'done', expectedStatus: 'cleanup', role: 'human' });
 
   assert.ok(view.learnings, 'learnings key must exist once an item has closed');
   const records = view.learnings['learn-doing'];
@@ -125,17 +126,25 @@ test('moveWork doing->done composes a learning record reflecting the item\'s act
   assert.equal(typeof record.ts, 'string');
 });
 
-test('moveWork awaiting-approval->done (the SECOND door into done) also composes a learning record — not only doing->done', () => {
+// Changed (work-item-status-delivered-retrospective-cleanup D1): done now
+// has exactly ONE door in (cleanup->done, not two) — this test's original
+// point (both old doors into done compose a learning record) is replaced by
+// the equivalent question for the new shape: does the awaiting-approval
+// STARTING path (as opposed to the doing hand-move path) still converge on
+// the same composeLearning behavior once it reaches the shared cleanup->done
+// close? Yes — both paths funnel through the identical chain from delivered
+// onward.
+test('moveWork via the awaiting-approval path (not just the doing hand-move path) also composes a learning record at the shared cleanup->done close', () => {
   const dir = tmpDir();
   addSampleWork(dir, 'learn-proposed');
   moveWork(dir, { id: 'learn-proposed', to: 'doing', expectedStatus: 'todo' });
   moveWork(dir, { id: 'learn-proposed', to: 'awaiting-approval', expectedStatus: 'doing' });
+  moveWork(dir, { id: 'learn-proposed', to: 'delivered', expectedStatus: 'awaiting-approval' });
+  moveWork(dir, { id: 'learn-proposed', to: 'retrospective', expectedStatus: 'delivered' });
+  moveWork(dir, { id: 'learn-proposed', to: 'cleanup', expectedStatus: 'retrospective' });
+  const { view } = moveWork(dir, { id: 'learn-proposed', to: 'done', expectedStatus: 'cleanup', role: 'human' });
 
-  // Pass through compound-learn before the awaiting-approval->done close (D3).
-  moveStage(dir, { id: 'learn-proposed', to: 'compound-learn' });
-  const { view } = moveWork(dir, { id: 'learn-proposed', to: 'done', expectedStatus: 'awaiting-approval', role: 'human' });
-
-  assert.ok(view.learnings?.['learn-proposed'], 'awaiting-approval->done must also produce a learning record');
+  assert.ok(view.learnings?.['learn-proposed'], 'the awaiting-approval path must also produce a learning record');
   assert.equal(view.learnings['learn-proposed'].length, 1);
   assert.deepEqual(view.learnings['learn-proposed'][0].settlements, { 'close/human': 1 });
 });
@@ -144,10 +153,10 @@ test('moveWork to done for an item with no outcome and no friction still produce
   const dir = tmpDir();
   addSampleWork(dir, 'learn-empty');
   moveWork(dir, { id: 'learn-empty', to: 'doing', expectedStatus: 'todo' });
-
-  // Pass through compound-learn before the doing->done close (D3).
-  moveStage(dir, { id: 'learn-empty', to: 'compound-learn' });
-  const { view } = moveWork(dir, { id: 'learn-empty', to: 'done', expectedStatus: 'doing', role: 'human' });
+  moveWork(dir, { id: 'learn-empty', to: 'delivered', expectedStatus: 'doing' });
+  moveWork(dir, { id: 'learn-empty', to: 'retrospective', expectedStatus: 'delivered' });
+  moveWork(dir, { id: 'learn-empty', to: 'cleanup', expectedStatus: 'retrospective' });
+  const { view } = moveWork(dir, { id: 'learn-empty', to: 'done', expectedStatus: 'cleanup', role: 'human' });
 
   const record = view.learnings['learn-empty'][0];
   assert.equal(record.outcome, null, 'no outcome recorded -> null, never fabricated');
@@ -162,16 +171,19 @@ test('the learning record rides the SAME work.move event that closes the item �
   const dir = tmpDir();
   addSampleWork(dir, 'learn-rebuild');
   moveWork(dir, { id: 'learn-rebuild', to: 'doing', expectedStatus: 'todo' });
-  // Pass through compound-learn before the close (D3); snapshot the log AFTER
-  // this so the assertion below still proves the CLOSE itself appends exactly
-  // one event (the stage move is a separate, earlier lifecycle step).
-  moveStage(dir, { id: 'learn-rebuild', to: 'compound-learn' });
+  // Walk the sequential chain up to (but not through) the final close;
+  // snapshot the log AFTER this so the assertion below still proves the
+  // CLOSE itself (cleanup->done) appends exactly one event, not the chain
+  // as a whole.
+  moveWork(dir, { id: 'learn-rebuild', to: 'delivered', expectedStatus: 'doing' });
+  moveWork(dir, { id: 'learn-rebuild', to: 'retrospective', expectedStatus: 'delivered' });
+  moveWork(dir, { id: 'learn-rebuild', to: 'cleanup', expectedStatus: 'retrospective' });
 
   const logPath = path.join(dir, 'events.jsonl');
   const filesBefore = fs.readdirSync(dir).sort();
   const eventsBefore = fs.readFileSync(logPath, 'utf8').split('\n').filter(Boolean).length;
 
-  const { event } = moveWork(dir, { id: 'learn-rebuild', to: 'done', expectedStatus: 'doing', role: 'human' });
+  const { event } = moveWork(dir, { id: 'learn-rebuild', to: 'done', expectedStatus: 'cleanup', role: 'human' });
 
   const filesAfter = fs.readdirSync(dir).sort();
   assert.deepEqual(filesAfter, filesBefore, 'no new file appears — the learning record rides the events.jsonl append that already happens');
@@ -179,7 +191,7 @@ test('the learning record rides the SAME work.move event that closes the item �
   const lines = fs.readFileSync(logPath, 'utf8').split('\n').filter(Boolean);
   assert.equal(lines.length, eventsBefore + 1, 'exactly ONE event appended for the close — not two');
   const types = lines.map((l) => JSON.parse(l).type);
-  assert.deepEqual(types, ['work.add', 'work.move', 'work.stage', 'work.move']);
+  assert.deepEqual(types, ['work.add', 'work.move', 'work.move', 'work.move', 'work.move', 'work.move']);
   assert.equal(event.type, 'work.move');
   assert.ok(event.payload.learning, 'the returned move event itself carries the learning field');
 
@@ -561,14 +573,11 @@ test('moveWork under concurrent OS processes racing the SAME expectedStatus CAS 
   const dir = tmpDir();
   addSampleWork(dir, 'race-move');
   moveWork(dir, { id: 'race-move', to: 'doing', expectedStatus: 'todo' });
-  // Advance to compound-learn so the raced doing->done move is gated only by
-  // the status CAS (D3) — the race is about concurrent CAS, not the stage gate.
-  moveStage(dir, { id: 'race-move', to: 'compound-learn' });
   const N = 6;
 
   const results = await raceAcrossProcesses(
     dir,
-    `moveWork(dir, { id: 'race-move', to: 'done', expectedStatus: 'doing' });`,
+    `moveWork(dir, { id: 'race-move', to: 'delivered', expectedStatus: 'doing' });`,
     N,
   );
 
@@ -580,43 +589,36 @@ test('moveWork under concurrent OS processes racing the SAME expectedStatus CAS 
     assert.equal(r.category, 'conflict', 'a losing moveWork must fail as FsmError("conflict"), not crash or hang');
   }
 
-  const moveToDoneEvents = readRawEvents(dir).filter(
-    (e) => e.type === 'work.move' && e.payload?.id === 'race-move' && e.payload?.to === 'done',
+  const moveToDeliveredEvents = readRawEvents(dir).filter(
+    (e) => e.type === 'work.move' && e.payload?.id === 'race-move' && e.payload?.to === 'delivered',
   );
-  assert.equal(moveToDoneEvents.length, 1, 'the log must carry exactly one doing->done work.move event for the raced id');
+  assert.equal(moveToDeliveredEvents.length, 1, 'the log must carry exactly one doing->delivered work.move event for the raced id');
 });
 
 // --- str73-done-flip-cos-check cell 2: per-clause CoS done-gate ------------
 //
-// Mirrors the RUL50 compound-learn done-gate tests above: same "advance to
-// compound-learn, then attempt the doing->done close" shape, since a coding
-// item must clear BOTH gates. These tests exercise the sibling `acceptance`
-// gate store.mjs's `moveWork` now enforces (D2/D3): a populated clause
-// missing evidence refuses the close as `precondition`, the same category/
-// error class RUL50's own stage check already uses.
+// Retargeted by work-item-status-delivered-retrospective-cleanup D3: this
+// gate now runs on `to==='delivered'` (all three doors in), not `to==='done'`
+// — a dependent that opens on `delivered` (RUL12) is exactly as protected
+// as it was when `done` was the trigger. The old "advance to compound-learn
+// first" setup is gone along with the retired RUL50 stage-gate (D11) — a
+// bare `doing -> delivered` attempt is all these tests need now.
 
-// Advance `id` to `doing`, then to `compound-learn` stage — the shared setup
-// every test below needs before it can attempt a doing->done close.
-function toDoingAtCompoundLearn(dir, id) {
-  moveWork(dir, { id, to: 'doing', expectedStatus: 'todo' });
-  moveStage(dir, { id, to: 'compound-learn' });
-}
-
-test('moveWork refuses a doing->done close when a populated acceptance clause has no evidence: precondition, item stays "doing", no event written', () => {
+test('moveWork refuses a doing->delivered close when a populated acceptance clause has no evidence: precondition, item stays "doing", no event written', () => {
   const dir = tmpDir();
   addSampleWork(dir, 'cos-missing-evidence', { acceptance: [{ text: 'field round-trips' }] });
-  toDoingAtCompoundLearn(dir, 'cos-missing-evidence');
+  moveWork(dir, { id: 'cos-missing-evidence', to: 'doing', expectedStatus: 'todo' });
 
   const before = readRawEvents(dir).length;
   assert.throws(
-    () => moveWork(dir, { id: 'cos-missing-evidence', to: 'done', expectedStatus: 'doing' }),
+    () => moveWork(dir, { id: 'cos-missing-evidence', to: 'delivered', expectedStatus: 'doing' }),
     (err) => err instanceof StoreError && err.category === 'precondition' && /field round-trips/.test(err.message),
   );
   assert.equal(listWork(dir).work['cos-missing-evidence'].status, 'doing', 'a refused close must leave the item at its prior status');
   assert.equal(readRawEvents(dir).length, before, 'a refused close must append no event');
 });
 
-test('moveWork allows a doing->done close when every acceptance clause has non-empty evidence, exactly as before this cell', () => {
+test('moveWork allows a doing->delivered close when every acceptance clause has non-empty evidence, exactly as before this cell', () => {
   const dir = tmpDir();
   addSampleWork(dir, 'cos-all-evidenced', {
     acceptance: [
@@ -624,41 +626,41 @@ test('moveWork allows a doing->done close when every acceptance clause has non-e
       { text: 'CLI exits 0', evidence: 'test/cli/fgos.test.mjs:1' },
     ],
   });
-  toDoingAtCompoundLearn(dir, 'cos-all-evidenced');
+  moveWork(dir, { id: 'cos-all-evidenced', to: 'doing', expectedStatus: 'todo' });
 
-  const { view } = moveWork(dir, { id: 'cos-all-evidenced', to: 'done', expectedStatus: 'doing', role: 'human' });
-  assert.equal(view.work['cos-all-evidenced'].status, 'done');
+  const { view } = moveWork(dir, { id: 'cos-all-evidenced', to: 'delivered', expectedStatus: 'doing', role: 'human' });
+  assert.equal(view.work['cos-all-evidenced'].status, 'delivered');
 });
 
-test('moveWork leaves a doing->done close completely unaffected when acceptance is absent, or an empty array — a no-op', () => {
+test('moveWork leaves a doing->delivered close completely unaffected when acceptance is absent, or an empty array — a no-op', () => {
   const dir = tmpDir();
   addSampleWork(dir, 'cos-absent'); // no `acceptance` field at all
   addSampleWork(dir, 'cos-empty', { acceptance: [] });
-  toDoingAtCompoundLearn(dir, 'cos-absent');
-  toDoingAtCompoundLearn(dir, 'cos-empty');
+  moveWork(dir, { id: 'cos-absent', to: 'doing', expectedStatus: 'todo' });
+  moveWork(dir, { id: 'cos-empty', to: 'doing', expectedStatus: 'todo' });
 
-  const { view: viewAbsent } = moveWork(dir, { id: 'cos-absent', to: 'done', expectedStatus: 'doing', role: 'human' });
-  assert.equal(viewAbsent.work['cos-absent'].status, 'done');
+  const { view: viewAbsent } = moveWork(dir, { id: 'cos-absent', to: 'delivered', expectedStatus: 'doing', role: 'human' });
+  assert.equal(viewAbsent.work['cos-absent'].status, 'delivered');
 
-  const { view: viewEmpty } = moveWork(dir, { id: 'cos-empty', to: 'done', expectedStatus: 'doing', role: 'human' });
-  assert.equal(viewEmpty.work['cos-empty'].status, 'done');
+  const { view: viewEmpty } = moveWork(dir, { id: 'cos-empty', to: 'delivered', expectedStatus: 'doing', role: 'human' });
+  assert.equal(viewEmpty.work['cos-empty'].status, 'delivered');
 });
 
 test('moveWork re-reads fresh state on retry: editing in the missing evidence after a refusal, then retrying, succeeds — no cached verdict', () => {
   const dir = tmpDir();
   addSampleWork(dir, 'cos-retry', { acceptance: [{ text: 'field round-trips' }] });
-  toDoingAtCompoundLearn(dir, 'cos-retry');
+  moveWork(dir, { id: 'cos-retry', to: 'doing', expectedStatus: 'todo' });
 
   assert.throws(
-    () => moveWork(dir, { id: 'cos-retry', to: 'done', expectedStatus: 'doing' }),
+    () => moveWork(dir, { id: 'cos-retry', to: 'delivered', expectedStatus: 'doing' }),
     (err) => err instanceof StoreError && err.category === 'precondition',
   );
   assert.equal(listWork(dir).work['cos-retry'].status, 'doing');
 
   editWork(dir, { id: 'cos-retry', patch: { acceptance: [{ text: 'field round-trips', evidence: 'test/state/work.test.mjs:1' }] } });
 
-  const { view } = moveWork(dir, { id: 'cos-retry', to: 'done', expectedStatus: 'doing', role: 'human' });
-  assert.equal(view.work['cos-retry'].status, 'done', 'the retry must re-read the just-edited evidence, not a cached refusal');
+  const { view } = moveWork(dir, { id: 'cos-retry', to: 'delivered', expectedStatus: 'doing', role: 'human' });
+  assert.equal(view.work['cos-retry'].status, 'delivered', 'the retry must re-read the just-edited evidence, not a cached refusal');
 });
 
 // --- `priority`/`intent` in EDITABLE_FIELDS (per str7-str8-priority-intent

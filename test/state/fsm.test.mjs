@@ -7,19 +7,33 @@ function work(status, overrides = {}) {
 }
 
 test('STATUSES exposes the full flat status domain', () => {
-  assert.deepEqual(STATUSES, ['todo', 'doing', 'blocked', 'awaiting-approval', 'done', 'awaiting-human', 'wontfix']);
+  assert.deepEqual(STATUSES, [
+    'todo',
+    'doing',
+    'blocked',
+    'awaiting-approval',
+    'delivered',
+    'retrospective',
+    'cleanup',
+    'done',
+    'awaiting-human',
+    'wontfix',
+  ]);
 });
 
 for (const [from, to] of [
   ['todo', 'doing'],
-  ['doing', 'done'],
   ['todo', 'blocked'],
   ['doing', 'blocked'],
   ['blocked', 'todo'],
   ['blocked', 'doing'],
   ['blocked', 'awaiting-approval'],
   ['doing', 'awaiting-approval'],
-  ['awaiting-approval', 'done'],
+  ['doing', 'delivered'],
+  ['awaiting-approval', 'delivered'],
+  ['delivered', 'retrospective'],
+  ['retrospective', 'cleanup'],
+  ['cleanup', 'done'],
   ['blocked', 'wontfix'],
   ['todo', 'wontfix'],
   ['doing', 'wontfix'],
@@ -42,6 +56,17 @@ test('transitionWork allows blocked -> awaiting-approval, and its event is never
   const event = transitionWork({ work: work('blocked'), to: 'awaiting-approval' });
   assert.deepEqual(event, { type: 'work.move', payload: { id: 'w1', from: 'blocked', to: 'awaiting-approval' } });
   assert.equal(event.payload.to, 'awaiting-approval');
+  assert.notEqual(event.payload.to, 'doing');
+});
+
+// work-item-status-delivered-retrospective-cleanup D2: blocked -> delivered
+// is a mechanical retry door (mirrors blocked -> awaiting-approval exactly)
+// for an item parked via cleanup -> blocked that just needs its
+// retrospective/cleanup retried, not real rework — no reason required, not
+// counted by anti-loop.mjs (payload.to is "delivered", not "doing").
+test('transitionWork allows blocked -> delivered (mechanical retry) with no extra payload keys', () => {
+  const event = transitionWork({ work: work('blocked'), to: 'delivered' });
+  assert.deepEqual(event, { type: 'work.move', payload: { id: 'w1', from: 'blocked', to: 'delivered' } });
   assert.notEqual(event.payload.to, 'doing');
 });
 
@@ -85,33 +110,62 @@ test('transitionWork rejects awaiting-approval -> blocked without a reason as va
   );
 });
 
-// Changed (pr-lifecycle-1): was "... other than awaiting-approval -> todo" — now two
-// edges require reason (awaiting-approval -> todo, awaiting-approval -> blocked, per D3), so
-// the description and the edge exercised below are updated to name both.
-test('reason is ignored (never appears in payload) for every edge other than awaiting-approval -> todo/blocked', () => {
+// work-item-status-delivered-retrospective-cleanup D2/D8: cleanup -> blocked
+// (the final harness check failed) requires a reason exactly like
+// awaiting-approval -> todo/blocked.
+test('transitionWork allows cleanup -> blocked and carries the reason in the payload', () => {
+  const event = transitionWork({ work: work('cleanup'), to: 'blocked', reason: 'merge no longer resolves on main' });
+  assert.deepEqual(event, {
+    type: 'work.move',
+    payload: { id: 'w1', from: 'cleanup', to: 'blocked', reason: 'merge no longer resolves on main' },
+  });
+});
+
+test('transitionWork rejects cleanup -> blocked without a reason as validation, not precondition', () => {
+  assert.throws(
+    () => transitionWork({ work: work('cleanup'), to: 'blocked' }),
+    (err) => err instanceof FsmError && err.category === 'validation',
+  );
+  assert.throws(
+    () => transitionWork({ work: work('cleanup'), to: 'blocked', reason: '   ' }),
+    (err) => err instanceof FsmError && err.category === 'validation',
+  );
+});
+
+// Changed (work-item-status-delivered-retrospective-cleanup D2): now three
+// edges require reason (awaiting-approval -> todo, awaiting-approval ->
+// blocked, cleanup -> blocked, per D2/D8), so the description and the edge
+// exercised below are updated to name all three.
+test('reason is ignored (never appears in payload) for every edge other than awaiting-approval -> todo/blocked and cleanup -> blocked', () => {
   const event = transitionWork({ work: work('todo'), to: 'doing', reason: 'should be dropped' });
   assert.deepEqual(event, { type: 'work.move', payload: { id: 'w1', from: 'todo', to: 'doing' } });
 });
 
-// Changed (pr-lifecycle-1): added 'awaiting-approval->blocked' to legalEdges (per D3's
-// new table entry) and to the reason-required branch below, alongside the
-// existing 'awaiting-approval->todo' — this sweep asserts the FULL table, so a new
-// edge left out here would silently pass as "still precondition" and hide
-// the addition.
+// Changed (work-item-status-delivered-retrospective-cleanup D1/D2, supersedes
+// pr-lifecycle-1's own comment here): doing->done/awaiting-approval->done are
+// GONE, replaced by doing->delivered/awaiting-approval->delivered; added
+// blocked->delivered, delivered->retrospective, retrospective->cleanup,
+// cleanup->done, cleanup->blocked. This sweep asserts the FULL table, so a
+// missed edge would silently pass as "still precondition" and hide it.
 test('every legal edge is exactly the declared table; every other status pair is precondition', () => {
   const legalEdges = new Set([
     'todo->doing',
-    'doing->done',
     'todo->blocked',
     'doing->blocked',
     'blocked->todo',
     'blocked->doing',
     'blocked->awaiting-approval',
+    'blocked->delivered',
     'doing->awaiting-approval',
     'doing->todo',
-    'awaiting-approval->done',
+    'doing->delivered',
+    'awaiting-approval->delivered',
     'awaiting-approval->todo',
     'awaiting-approval->blocked',
+    'delivered->retrospective',
+    'retrospective->cleanup',
+    'cleanup->done',
+    'cleanup->blocked',
     'todo->awaiting-human',
     'doing->awaiting-human',
     'awaiting-human->todo',
@@ -125,7 +179,9 @@ test('every legal edge is exactly the declared table; every other status pair is
       const key = `${from}->${to}`;
       if (legalEdges.has(key)) {
         const args = { work: work(from), to };
-        if (key === 'awaiting-approval->todo' || key === 'awaiting-approval->blocked') args.reason = 'sweep-test reason';
+        if (key === 'awaiting-approval->todo' || key === 'awaiting-approval->blocked' || key === 'cleanup->blocked') {
+          args.reason = 'sweep-test reason';
+        }
         if (to === 'awaiting-human') args.ask = 'sweep-test ask';
         if (from === 'awaiting-human') args.answer = 'sweep-test answer';
         assert.doesNotThrow(() => transitionWork(args), `expected ${key} to be legal`);
@@ -241,7 +297,7 @@ test('transitionWork rejects a transition not in the table and returns no event'
 });
 
 test('done is terminal single-door: no transition out of done, no matter the target', () => {
-  for (const to of ['todo', 'doing', 'blocked', 'awaiting-human']) {
+  for (const to of ['todo', 'doing', 'blocked', 'awaiting-human', 'delivered', 'retrospective', 'cleanup']) {
     assert.throws(
       () => transitionWork({ work: work('done'), to }),
       (err) => err instanceof FsmError && err.category === 'precondition',
@@ -249,13 +305,19 @@ test('done is terminal single-door: no transition out of done, no matter the tar
   }
 });
 
-test('done is reachable only through the doing -> done edge, never directly from todo or blocked', () => {
-  for (const from of ['todo', 'blocked']) {
+// Changed (work-item-status-delivered-retrospective-cleanup D1/D2, supersedes
+// this test's own prior name): done's one remaining door in is cleanup ->
+// done — doing/awaiting-approval/blocked/delivered/retrospective can no
+// longer reach done directly (they target delivered, or the next step in
+// the sequential chain, instead).
+test('done is reachable only through the cleanup -> done edge, never directly from any other status', () => {
+  for (const from of ['todo', 'doing', 'blocked', 'awaiting-approval', 'delivered', 'retrospective']) {
     assert.throws(
       () => transitionWork({ work: work(from), to: 'done' }),
       (err) => err instanceof FsmError && err.category === 'precondition',
     );
   }
+  assert.doesNotThrow(() => transitionWork({ work: work('cleanup'), to: 'done' }));
 });
 
 // fsm-wontfix-terminal-status D1/D4: wontfix is a SECOND terminal state
@@ -296,7 +358,7 @@ test('transitionWork CAS: matching expectedStatus proceeds normally', () => {
 
 test('transitionWork CAS: mismatched expectedStatus is refused as conflict, not precondition', () => {
   assert.throws(
-    () => transitionWork({ work: work('doing'), to: 'done', expectedStatus: 'todo' }),
+    () => transitionWork({ work: work('doing'), to: 'delivered', expectedStatus: 'todo' }),
     (err) => err instanceof FsmError && err.category === 'conflict',
   );
 });

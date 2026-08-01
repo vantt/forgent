@@ -32,7 +32,6 @@ import { rebuildView, viewRevision } from './replay.mjs';
 import { graphMetrics as computeGraphMetrics, whatIf as computeWhatIf, classifyStaleDoing, footprintOverlap, goalScopedCriticalPath, goalScopedGreedyTopUnblock } from './graph-metrics.mjs';
 import { transitionWork, FsmError } from './fsm.mjs';
 import { transitionStage } from './stage.mjs';
-import { getDomain, stageForStep } from './workflow-stage-graphs.mjs';
 import { validateWork, WorkValidationError, DEFAULTS, GOAL_TIERS, truncateTitle } from './work.mjs';
 import { EventLogError } from './events.mjs';
 import { validateToolRegistration, ToolRegistryError } from './tool-registry.mjs';
@@ -487,52 +486,36 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, rol
   if (releaseTrigger !== undefined) {
     rawEvent.payload.releaseTrigger = releaseTrigger;
   }
-  // Compound-learn done-gate: a work item whose domain declares a
-  // Compound-learn stage can never reach `done` without first passing through
-  // that stage — the synthesis layer is FSM-enforced, never left to a reflex
-  // that can be silently lost. Placed AFTER transitionWork's CAS + precondition
-  // checks (line above) so a stale caller still gets 'conflict' first, and
-  // BEFORE the append below so a refused close persists nothing (the whole
-  // block runs under the held events.lock). Both doors into `done` — the
-  // awaiting-approval->done approval and the doing->done hand-move — converge on this
-  // one call, so gating here covers both. Domains that declare no
-  // Compound-learn stage (e.g. synthetic) are exempt: coding-only enforcement.
-  // The current stage is read lazily, exactly as stage.mjs does — a missing
-  // `stage` reads as the domain's Execute stage — so a coding item that never
-  // moved past execution is correctly refused.
-  if (to === 'done') {
-    const domain = getDomain(work.domain);
-    const compoundLearnStage = stageForStep(domain, 'Compound-learn');
-    if (compoundLearnStage !== undefined) {
-      const currentStage = work.stage ?? stageForStep(domain, 'Execute');
-      if (currentStage !== compoundLearnStage) {
-        throw new StoreError(
-          'precondition',
-          `work "${id}" cannot move to "done" from stage "${currentStage}" — it must pass through the "${compoundLearnStage}" stage first so the compound-learn synthesis is never silently skipped.`,
-        );
-      }
-    }
-  }
+  // Compound-learn done-gate RETIRED (work-item-status-delivered-
+  // retrospective-cleanup D1/D4/D11, supersedes RUL49/RUL50/RUL51): `done`
+  // is no longer reached directly from `doing`/`awaiting-approval` at all
+  // (those now target `delivered`), so a stage-based gate on `to==='done'`
+  // no longer makes sense here — the real "has retrospective/cleanup
+  // actually completed" check moves to a dedicated harness gating
+  // `cleanup -> done` (D8), not this inline block.
 
-  // Per-clause CoS done-gate (str73-done-flip-cos-check D2/D3): a work item
-  // that has opted into `acceptance` clauses (per work.mjs's optional-additive
-  // shape) can never reach `done` while any populated clause still lacks
-  // evidence — mirrors bee's own per-clause CoS discipline (D1), mechanically
-  // checking only *presence* of evidence, never its truth. Sibling to RUL50's
-  // Compound-learn block immediately above: same `to === 'done'` guard, same
-  // held `events.lock`, same `precondition` category, placed BEFORE the
-  // append so a refused close persists nothing. `work.acceptance` absent,
-  // null, or an empty array is a complete no-op (D4) — an item that never
-  // opted in is unaffected. Both doors into `done` (doing->done, awaiting-approval->
-  // done) converge on this one `moveWork` call, so gating here covers both,
-  // exactly like RUL50's own comment describes for itself.
-  if (to === 'done' && Array.isArray(work.acceptance) && work.acceptance.length > 0) {
+  // Per-clause CoS done-gate (str73-done-flip-cos-check D2/D3, retargeted
+  // by work-item-status-delivered-retrospective-cleanup D3): a work item
+  // that has opted into `acceptance` clauses (per work.mjs's optional-
+  // additive shape) can never reach `delivered` while any populated clause
+  // still lacks evidence — mirrors bee's own per-clause CoS discipline
+  // (D1), mechanically checking only *presence* of evidence, never its
+  // truth. Placed AFTER transitionWork's CAS + precondition checks so a
+  // stale caller still gets 'conflict' first, and BEFORE the append below
+  // so a refused close persists nothing. `work.acceptance` absent, null,
+  // or an empty array is a complete no-op (D4) — an item that never opted
+  // in is unaffected. All three doors into `delivered` (`doing`,
+  // `awaiting-approval`, and the mechanical `blocked` retry) converge on
+  // this one `moveWork` call, so gating on `to==='delivered'` here covers
+  // all three — a dependent that opens on `delivered` (RUL12) is exactly
+  // as protected as it was when `done` was the trigger, never less.
+  if (to === 'delivered' && Array.isArray(work.acceptance) && work.acceptance.length > 0) {
     for (const clause of work.acceptance) {
       if (typeof clause?.text !== 'string' || !clause.text.trim()) continue;
       if (typeof clause.evidence !== 'string' || !clause.evidence.trim()) {
         throw new StoreError(
           'precondition',
-          `work "${id}" cannot move to "done" — acceptance clause "${clause.text}" has no evidence yet; edit --acceptance must supply it before "done".`,
+          `work "${id}" cannot move to "delivered" — acceptance clause "${clause.text}" has no evidence yet; edit --acceptance must supply it before "delivered".`,
         );
       }
     }
