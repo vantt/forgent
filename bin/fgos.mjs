@@ -64,8 +64,8 @@ import { recordInvocationFault } from '../src/cli/invocation-fault-log.mjs';
 import { computeAwaitingContext } from '../src/state/awaiting-context.mjs';
 import { DOCTOR_CHECKS, integrationScriptPath, ensureSharedConfigDefaults, runFixes } from '../src/setup/checks.mjs';
 import { sharedConfigFilePath } from '../src/config/shared-config-file.mjs';
-import { installGitHooks } from '../src/setup/git-hooks.mjs';
-import { detectRcFiles, insertSourceLine } from '../src/setup/shell-rc.mjs';
+import { installGitHooks, uninstallGitHooks } from '../src/setup/git-hooks.mjs';
+import { detectRcFiles, insertSourceLine, hasSourceLine } from '../src/setup/shell-rc.mjs';
 import { formatCheck, bold } from '../src/setup/ansi.mjs';
 
 // D5: `verify` is a required non-empty field on every work item, but a
@@ -2743,6 +2743,52 @@ async function runVerb(verb, flags, positional, dir) {
         configCreated: !configExisted,
         configAddedKeys: configExisted ? addedKeys : [],
         hooksWired,
+        hooksSkippedExisting,
+      };
+    }
+
+    // Reverses `setup`'s own wiring (tsk-4iv-1, docs/history/fgos-uninstall/
+    // CONTEXT.md D2-D4). Requires `--yes` (D3): with no flag, refuses before
+    // touching anything — destructive, unlike `setup`/`doctor`, which never
+    // ask. Two side effects, both mirroring `setup`'s own fill-only rules in
+    // the opposite direction:
+    //   - git hooks (D2): `uninstallGitHooks` unwires `core.hooksPath` and
+    //     deletes `.githooks/pre-commit` (+ the dir, if left empty) ONLY when
+    //     hooksPath is still exactly `.githooks` — a custom value the caller
+    //     repointed is left untouched, same as `installGitHooks` leaves one
+    //     alone when installing.
+    //   - shell-rc (D4): never edits an rc file — reuses `hasSourceLine`
+    //     read-only, the same primitive `deadSourceLines`/`doctor` already
+    //     use, to report which rc file(s) still carry the fgOS source line so
+    //     the caller can remove it by hand (docs/history/
+    //     shell-rc-dead-source-lines/CONTEXT.md D1: "deletion stays a human
+    //     act" — this item does not carve out an exception to that).
+    // Never touches `.fgos/` data or `.fgos/config.json` (pinned constraint,
+    // CONTEXT.md) — structurally true: this case never imports or calls any
+    // config-writing function (`ensureSharedConfigDefaults`/`writeSharedConfig`).
+    // Package removal (D1) is out of scope here — that's tsk-4iv-2's own
+    // spike, layered onto this same verb later.
+    case 'uninstall': {
+      if (!flags.yes) {
+        throw new StoreError(
+          'validation',
+          'fgos uninstall requires --yes to confirm — it unwires git hooks (core.hooksPath/.githooks) and reports (never deletes) the shell-rc source line. Rerun with --yes once ready.',
+        );
+      }
+      const repoRoot = process.cwd();
+      const scriptPath = integrationScriptPath();
+      const shellRcSourceLinesFound = scriptPath === null
+        ? []
+        : detectRcFiles(os.homedir())
+          .filter((rcFile) => hasSourceLine(rcFile, scriptPath))
+          .map((rcFile) => ({ rcFile, sourceLine: `source "${scriptPath}"` }));
+      const { unwired: hooksUnwired, skippedExisting: hooksSkippedExisting } = uninstallGitHooks(repoRoot);
+      return {
+        shellRcSourceLinesFound,
+        shellRcRemovalInstructions: shellRcSourceLinesFound.length > 0
+          ? 'fgOS never edits your shell profile — remove the line(s) above by hand.'
+          : null,
+        hooksUnwired,
         hooksSkippedExisting,
       };
     }

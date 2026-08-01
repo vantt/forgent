@@ -831,6 +831,25 @@ export const COMMAND_REGISTRY = [
     deprecated: null,
   },
   {
+    name: 'uninstall',
+    invoke: 'fgos uninstall',
+    description: 'Reverse fgos setup\'s own wiring: unwire core.hooksPath/.githooks (fill-only — only when still exactly .githooks, mirroring installGitHooks) and report (never delete) any fgos shell-rc source line found, since deletion stays a human act. Never touches .fgos/ data or config. Requires --yes; refuses with no side effects otherwise.',
+    parameters: {
+      type: 'object',
+      properties: {
+        pretty: { type: 'boolean', description: 'Render colored human-readable text instead of the JSON envelope.' },
+        yes: { type: 'boolean', description: 'Confirm the destructive steps (unwiring git hooks). Required — omitting it refuses before touching anything.' },
+      },
+      required: [],
+    },
+    examples: ['fgos uninstall --yes', 'fgos uninstall --yes --pretty'],
+    touchesState: true,
+    requiresExistingStore: false,
+    externalEffect: false,
+    paginated: false,
+    deprecated: null,
+  },
+  {
     name: 'doctor',
     invoke: 'fgos doctor',
     description: 'Diagnostic by default (Node/git availability, whether the shell-integration source line is present in detected rc file(s), and whether the shared config file is not stale relative to every registered default). --fix runs every registered fix (docs/history/doctor-fix-gate-bypass/CONTEXT.md D2/D3) before re-reporting checks -- a deliberate reversal of RUL9/RUL11 (docs/specs/distribution.md); without --fix, behavior is unchanged and writes nothing.',
