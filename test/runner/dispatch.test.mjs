@@ -18,7 +18,10 @@ import {
   DispatchError,
   EXECUTOR_ADAPTERS,
   DEFAULT_ADAPTER,
+  CAPACITY_KINDS,
 } from '../../src/runner/dispatch.mjs';
+import { initStore, registerTool } from '../../src/state/store.mjs';
+import { writeLocalStatus, findExecutableOnPath } from '../../src/state/tool-registry.mjs';
 
 // Fake executors only — every "command" spawned here is a node script this
 // file writes to a mkdtemp directory at test time. No real agent CLI is
@@ -358,6 +361,118 @@ test('loadRunnerConfig rejects an unknown "adapter" value on a per-tier executor
     JSON.stringify({
       executor: { command: 'claude', args: ['{prompt}'] },
       executors: { light: { command: 'cheap-cli', args: ['{prompt}'], adapter: 'app-server' } },
+      models: {},
+      timeoutMs: 1000,
+    }),
+  );
+  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
+});
+
+// --- tsk-62v: capacity-aware `capacities` schema (D1/D2) -----------------
+
+test('CAPACITY_KINDS reuses tool-registry\'s KINDS verbatim plus "task" (D2) — never a separate vocabulary', () => {
+  assert.deepEqual(CAPACITY_KINDS, ['cli', 'binary', 'mcp', 'skill', 'http', 'task']);
+});
+
+test('loadRunnerConfig accepts a config with no "capacities" block at all — pre-tsk-62v shape, unchanged', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'no-capacities.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      models: { standard: 'sonnet' },
+      timeoutMs: 1000,
+    }),
+  );
+  const cfg = loadRunnerConfig(configPath);
+  assert.equal(cfg.capacities, undefined);
+});
+
+test('loadRunnerConfig accepts a well-formed "capacities" entry carrying its own executor', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'with-capacities.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      capacities: { 'fgos-executing': { kind: 'cli', command: 'agy', args: ['{prompt}'] } },
+      models: { standard: 'sonnet' },
+      timeoutMs: 1000,
+    }),
+  );
+  const cfg = loadRunnerConfig(configPath);
+  assert.equal(cfg.capacities['fgos-executing'].command, 'agy');
+});
+
+test('loadRunnerConfig accepts a "capacities" entry naming only "kind" (metadata-only, falls through for its executor)', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'metadata-only-capacity.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      capacities: { distill: { kind: 'task', target: 'general-purpose', tier: 'standard' } },
+      models: { standard: 'sonnet' },
+      timeoutMs: 1000,
+    }),
+  );
+  assert.doesNotThrow(() => loadRunnerConfig(configPath));
+});
+
+test('loadRunnerConfig rejects a "capacities" block that is not an object', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'bad-capacities-shape.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      capacities: 'nope',
+      models: {},
+      timeoutMs: 1000,
+    }),
+  );
+  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
+});
+
+test('loadRunnerConfig rejects a "capacities.<id>" entry with an unknown "kind"', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'bad-capacity-kind.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      capacities: { distill: { kind: 'not-a-real-kind' } },
+      models: {},
+      timeoutMs: 1000,
+    }),
+  );
+  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
+});
+
+test('loadRunnerConfig accepts "task" as a "capacities.<id>.kind" value (the one kind fgos tool never sees)', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'task-kind-capacity.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      capacities: { distill: { kind: 'task', target: 'general-purpose' } },
+      models: {},
+      timeoutMs: 1000,
+    }),
+  );
+  assert.doesNotThrow(() => loadRunnerConfig(configPath));
+});
+
+test('loadRunnerConfig rejects a "capacities.<id>" entry declaring "command" without "args"', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'bad-capacity-entry.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      capacities: { 'fgos-executing': { kind: 'cli', command: 'agy' } },
       models: {},
       timeoutMs: 1000,
     }),
@@ -743,6 +858,12 @@ test('detectAssistantCli returns null when none of the candidates are present on
   assert.equal(found, null);
 });
 
+test('detectAssistantCli delegates to tool-registry.mjs\'s shared findExecutableOnPath (D5) — same result, one implementation', () => {
+  const dir = mkTempDir();
+  fs.writeFileSync(path.join(dir, 'claude'), '#!/bin/sh\nexit 0\n', { mode: 0o755 });
+  assert.equal(detectAssistantCli(['claude', 'codex'], dir), findExecutableOnPath(['claude', 'codex'], dir));
+});
+
 // --- modelForTier: tier -> model, unknown tier is a validation error ----
 
 test('modelForTier resolves each declared tier to its configured model', () => {
@@ -811,6 +932,119 @@ test('resolveExecutorCommand honors an executors.<tier> override ahead of the gl
 test('resolveExecutorCommand throws for an unknown adapter even on a raw config object that skipped loadRunnerConfig validation', () => {
   const cfg = { executor: { command: 'x', args: ['{prompt}'], adapter: 'not-a-real-adapter' }, models: {}, timeoutMs: 5000 };
   assert.throws(() => resolveExecutorCommand(cfg, { prompt: 'p', model: 'm' }), RunnerConfigError);
+});
+
+// --- tsk-62v: capacity-aware resolve precedence (D4) — capacities > executors.<tier> > global executor
+
+test('resolveExecutorCommand honors a capacities.<capacityId> override ahead of executors.<tier> and the global executor', () => {
+  const cfg = {
+    executor: { command: '/global/executor', args: ['{prompt}'] },
+    executors: { heavy: { command: '/heavy/executor', args: ['{prompt}'] } },
+    capacities: { 'fgos-executing': { kind: 'cli', command: '/capacity/executor', args: ['{prompt}'] } },
+    models: { heavy: 'opus' },
+    timeoutMs: 5000,
+  };
+  const byCapacity = resolveExecutorCommand(cfg, { prompt: 'p', model: 'opus', tier: 'heavy', capacityId: 'fgos-executing' });
+  assert.equal(byCapacity.command, '/capacity/executor');
+  // no capacityId at all -> falls back to today's tier/global precedence, unaffected
+  const byTierOnly = resolveExecutorCommand(cfg, { prompt: 'p', model: 'opus', tier: 'heavy' });
+  assert.equal(byTierOnly.command, '/heavy/executor');
+});
+
+test('resolveExecutorCommand falls back to executors.<tier> when the capacities entry names no executor of its own (metadata-only)', () => {
+  const cfg = {
+    executor: { command: '/global/executor', args: ['{prompt}'] },
+    executors: { heavy: { command: '/heavy/executor', args: ['{prompt}'] } },
+    capacities: { 'fgos-executing': { kind: 'task', target: 'general-purpose', tier: 'heavy' } },
+    models: { heavy: 'opus' },
+    timeoutMs: 5000,
+  };
+  const resolved = resolveExecutorCommand(cfg, { prompt: 'p', model: 'opus', tier: 'heavy', capacityId: 'fgos-executing' });
+  assert.equal(resolved.command, '/heavy/executor');
+});
+
+test('resolveExecutorCommand with a capacities block present but no matching capacityId stays on today\'s tier/global behavior, byte-identical', () => {
+  const cfg = {
+    executor: { command: '/global/executor', args: ['{prompt}'] },
+    capacities: { 'some-other-capacity': { kind: 'cli', command: '/other/executor', args: ['{prompt}'] } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  };
+  const resolved = resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', capacityId: 'fgos-executing' });
+  assert.equal(resolved.command, '/global/executor');
+});
+
+test('resolveExecutorCommand result carries "provider", defaulting to "command" when the executor block declares no explicit provider alias', () => {
+  const cfg = { executor: { command: '/global/executor', args: ['{prompt}'] }, models: {}, timeoutMs: 5000 };
+  const resolved = resolveExecutorCommand(cfg, { prompt: 'p', model: 'm' });
+  assert.equal(resolved.provider, '/global/executor');
+});
+
+test('resolveExecutorCommand result carries an explicit "provider" alias when the executor block declares one', () => {
+  const cfg = { executor: { command: '/usr/local/bin/agy-cli', provider: 'agy', args: ['{prompt}'] }, models: {}, timeoutMs: 5000 };
+  const resolved = resolveExecutorCommand(cfg, { prompt: 'p', model: 'm' });
+  assert.equal(resolved.provider, 'agy');
+  assert.equal(resolved.command, '/usr/local/bin/agy-cli');
+});
+
+test('resolveExecutorCommand throws a RunnerConfigError when a kind:"cli" capacity is not registered and fgosDir is given', () => {
+  const dir = mkTempDir();
+  initStore(dir);
+  const cfg = {
+    executor: { command: '/global/executor', args: ['{prompt}'] },
+    capacities: { 'fgos-executing': { kind: 'cli', target: 'agy' } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  };
+  assert.throws(
+    () => resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', capacityId: 'fgos-executing', fgosDir: dir }),
+    RunnerConfigError,
+  );
+});
+
+test('resolveExecutorCommand throws a RunnerConfigError when a kind:"cli" capacity is registered but not present on this machine', () => {
+  const dir = mkTempDir();
+  initStore(dir);
+  registerTool(dir, { name: 'fgos-executing', kind: 'cli', capability: 'coding', command: 'agy-definitely-not-on-path-xyz' });
+  writeLocalStatus(dir, { 'fgos-executing': { status: 'missing', checkedAt: new Date().toISOString() } });
+  const cfg = {
+    executor: { command: '/global/executor', args: ['{prompt}'] },
+    capacities: { 'fgos-executing': { kind: 'cli', target: 'agy-definitely-not-on-path-xyz' } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  };
+  assert.throws(
+    () => resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', capacityId: 'fgos-executing', fgosDir: dir }),
+    RunnerConfigError,
+  );
+});
+
+test('resolveExecutorCommand resolves a kind:"cli" capacity through fgos-tool-query presence, falling through to executors.<tier> for the command, when registered and present', () => {
+  const dir = mkTempDir();
+  initStore(dir);
+  registerTool(dir, { name: 'fgos-executing', kind: 'cli', capability: 'coding', command: 'agy' });
+  writeLocalStatus(dir, { 'fgos-executing': { status: 'present', checkedAt: new Date().toISOString() } });
+  const cfg = {
+    executor: { command: '/global/executor', args: ['{prompt}'] },
+    executors: { standard: { command: '/standard/executor', args: ['{prompt}'] } },
+    capacities: { 'fgos-executing': { kind: 'cli', target: 'agy', tier: 'standard' } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  };
+  const resolved = resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', capacityId: 'fgos-executing', fgosDir: dir });
+  assert.equal(resolved.command, '/standard/executor');
+});
+
+test('resolveExecutorCommand skips the fgos-tool-query presence check entirely when fgosDir is omitted, even with a kind:"cli" capacity present', () => {
+  const cfg = {
+    executor: { command: '/global/executor', args: ['{prompt}'] },
+    capacities: { 'fgos-executing': { kind: 'cli', target: 'agy-not-registered-anywhere' } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  };
+  assert.doesNotThrow(() =>
+    resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', capacityId: 'fgos-executing' }),
+  );
 });
 
 // --- spawnWorker: fake executor, tier->model, cwd, timeout, spawn-fail --
@@ -889,6 +1123,55 @@ test('spawnWorker (P41): light and heavy each dispatch through their own per-tie
   assert.deepEqual(heavyPayload.args.slice(-1), ['via-heavy']);
   assert.equal(heavyPayload.marker, 'heavy-executor');
   assert.deepEqual(JSON.parse(standardResult.stdout).args.slice(-1), ['via-global']);
+});
+
+// --- tsk-62v: spawnWorker's additive capacityId/provider result fields (D7) ---
+
+test('spawnWorker result carries capacityId and provider alongside every existing field, unaffected by tier/config unrelated to capacities', async () => {
+  const dir = mkTempDir();
+  const scriptPath = writeEchoExecutor(dir);
+  const cfg = baseConfig([scriptPath, '{prompt}', '--model', '{model}']);
+
+  const result = await spawnWorker(sampleWork(), cfg, mkTempDir());
+
+  assert.equal(result.capacityId, 'fgos-executing');
+  assert.equal(result.provider, process.execPath);
+  // every pre-tsk-62v field still present, unchanged
+  assert.equal(result.tier, 'standard');
+  assert.equal(result.model, 'sonnet');
+  assert.equal(typeof result.templateName, 'string');
+  assert.equal(typeof result.templateHash, 'string');
+});
+
+test('spawnWorker threads opts.fgosDir into a kind:"cli" capacity\'s presence check end-to-end, resolving through fgos tool query', async () => {
+  const dir = mkTempDir();
+  const fgosDir = mkTempDir();
+  initStore(fgosDir);
+  registerTool(fgosDir, { name: 'fgos-executing', kind: 'cli', capability: 'coding', command: 'agy' });
+  writeLocalStatus(fgosDir, { 'fgos-executing': { status: 'present', checkedAt: new Date().toISOString() } });
+  const scriptPath = writeEchoExecutor(dir);
+  const cfg = {
+    executor: { command: process.execPath, args: [scriptPath, '{prompt}'] },
+    capacities: { 'fgos-executing': { kind: 'cli', tier: 'standard' } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  };
+
+  const result = await spawnWorker(sampleWork(), cfg, mkTempDir(), { fgosDir });
+  assert.equal(result.capacityId, 'fgos-executing');
+
+  const cfgUnregistered = {
+    executor: { command: process.execPath, args: [scriptPath, '{prompt}'] },
+    capacities: { 'fgos-executing': { kind: 'cli', target: 'not-registered' } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  };
+  const emptyFgosDir = mkTempDir();
+  initStore(emptyFgosDir);
+  assert.throws(
+    () => spawnWorker(sampleWork(), cfgUnregistered, mkTempDir(), { fgosDir: emptyFgosDir }),
+    RunnerConfigError,
+  );
 });
 
 test('spawnWorker throws worker-timeout and kills the process when it runs past the time budget', async () => {

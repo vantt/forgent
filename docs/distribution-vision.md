@@ -126,42 +126,44 @@ tầng setup riêng hay không trước khi coi là xong — xem `AGENTS.md`
    `test/install-packaging.test.mjs` trên matrix OS/package-manager, hay còn
    thêm kiểm khác (vd doctor chạy sạch trên máy CI mới tinh)?
 
-## 6. Lộ trình triển khai (thứ tự đề xuất)
+## 6. Lộ trình triển khai — milestone/MVP chính thức (2026-08-01)
 
-Bốn work item ở §7 không độc lập ngang hàng — có thứ tự làm giảm rủi ro
-làm-lại. Xếp theo mức độ nền tảng và rủi ro:
+Năm work item ở §7 không độc lập ngang hàng — có thứ tự làm giảm rủi ro
+làm-lại. Lộ trình giờ hình thức hóa qua cơ chế `goalTier`/`targets` sẵn có
+của fgOS (tiền lệ: `tsk-u9k`, `worktree-in-out`), không chỉ nằm trong prose:
 
-- **Phase 0 — CI trước (`tsk-49r`).** Không đụng câu hỏi kiến trúc nào, tier
-  `light`. Làm trước để có lưới an toàn (regression net) cho chính những
-  thay đổi rủi ro hơn ở các phase sau đụng vào `src/setup/*`. Không có
-  `deps`.
-- **Phase 1 — Quyết kiến trúc nền (`tsk-2ta`, global/project precedence).**
-  Chưa có `deps` cứng, nhưng nên chốt TRƯỚC Phase 2 — quyết định này có thể
-  sinh ra khái niệm mới (vd một doctor check báo "đang chạy bản nào") mà
-  registry ở Phase 2 cần tính vào hình dạng của nó.
-- **Phase 2 — Cơ chế mở-rộng (`tsk-2cs`, registry doctor-checks/config).**
-  Xây trên quyết định Phase 1 (không hard-block, nhưng làm sau tránh phải
-  sửa lại hình dạng registry).
-- **Phase 3 — Consumer đầu tiên, chứng minh thiết kế (`tsk-2qz`, doctor
-  --fix gate-bypass.json).** **`deps: [tsk-2cs]`** — đã wire thật vào
-  work-item (không phải chỉ ghi trong tài liệu): `tsk-2qz` PHẢI vào registry
-  của `tsk-2cs` làm entry đầu tiên, không hardcode riêng rồi refactor sau —
-  làm trước sẽ phải làm lại.
-- **Phase 4 — Đóng spec.** Sau khi Phase 2/3 xong: supersede RUL11 +
-  viết lại Data Dictionary #7 trong `docs/specs/distribution.md` (per
-  AGENTS.md Definition-of-done #6 — settled spec fact).
+| Milestone (goalTier) | Targets | Trụ cột | Thứ tự |
+|---|---|---|---|
+| `tsk-3nx` — CI an toàn cho cài đặt | `tsk-49r` | 7 | Phase 0, độc lập, làm trước để có lưới an toàn |
+| `tsk-4c05` — aware 3 context (global/project/dev-checkout self-hosting) | `tsk-2ta` | 6 | Phase 1, độc lập, nên chốt trước Phase 2 (không hard-block) |
+| `tsk-3uj` — registry mở-rộng + doctor-fix thật | `tsk-2cs`, `tsk-2qz` | 3+4 | Phase 2+3, `tsk-2qz` mang `deps: [tsk-2cs]` thật |
+| `tsk-2jc` — đóng spec distribution.md | `tsk-1qm` | — (settled learning) | Phase 4, `tsk-1qm` mang `deps: [tsk-2cs, tsk-2qz]` thật |
 
-Mỗi phase vẫn phải qua `fgos-exploring` để chốt câu hỏi mở tương ứng (§5)
-trước khi `fgos-planning`/thi công — chưa item nào được tự thi công thẳng.
+**MVP `tsk-4bc`** — "fgOS install/setup/doctor ổn định + tái dùng được" —
+targets cả 4 milestone trên. Done khi cả 4 done.
+
+**Giới hạn tooling đã xác nhận (đọc code thật):** `fgos rollup <id>` chỉ đọc
+field `parent` (cây decompose), KHÔNG đọc `targets` (goalTier) — chạy
+`fgos rollup tsk-4bc` trả về `0/0` dù targets đã gắn đúng. Theo dõi tiến độ
+milestone/MVP này phải tự `fgos show <id>` rồi đối chiếu status từng target
+bằng tay; không có lệnh rollup tự động cho goal-tier item ở thời điểm này.
+
+Mỗi milestone vẫn phải qua `fgos-exploring` cho từng target-item để chốt câu
+hỏi mở tương ứng (§5) trước khi `fgos-planning`/thi công — chưa item nào
+được tự thi công thẳng.
 
 ## 7. Backlog liên quan
 
-- `tsk-2qz` (fgOS work item, stage `clarify`, todo) — thêm khả năng `fgos
-  doctor` tự fix `.fgos/gate-bypass.json`; đây là **slice đầu tiên** của trụ
-  cột 3, không phải toàn bộ trụ cột.
+- `tsk-2qz` (stage `clarify`, todo, `deps: [tsk-2cs]`) — thêm khả năng
+  `fgos doctor` tự fix `.fgos/gate-bypass.json`; slice đầu tiên của trụ cột
+  3, làm ĐÚNG như entry đầu tiên của registry `tsk-2cs`.
 - `tsk-2cs` (stage `clarify`, todo) — registry mở-rộng-được cho
   doctor-checks + config-defaults (trụ cột 4).
 - `tsk-2ta` (stage `clarify`, todo) — global/project config precedence +
-  awareness (trụ cột 6).
+  dev-checkout self-hosting awareness, gồm cả context thứ 3 (trụ cột 6).
 - `tsk-49r` (stage `clarify`, todo) — CI/GitHub Actions workflow như một
   phần của setup (trụ cột 7).
+- `tsk-1qm` (stage `clarify`, todo, `deps: [tsk-2cs, tsk-2qz]`) — đóng spec
+  `docs/specs/distribution.md` (supersede RUL11 + Data Dictionary #7).
+- `tsk-3nx`, `tsk-4c05`, `tsk-3uj`, `tsk-2jc` (goalTier `milestone`) +
+  `tsk-4bc` (goalTier `mvp`) — xem bảng §6.

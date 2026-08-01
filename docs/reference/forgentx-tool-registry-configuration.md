@@ -97,6 +97,43 @@ never `check`ed (`unknown`); a real gap — flag a weak-proof warning in a
 verify/plan note, but keep going on everything else. **full** — every
 registered tool is `present`; existing MUST behavior stays unchanged.)
 
+## Registering a capacity for capacity-aware dispatch (tsk-62v)
+
+> `.fgos-runner.json`'s optional `capacities.<capacityId>` block (D1) can
+> declare `"kind": "cli"` for a capacity dispatched through `dispatch.mjs`'s
+> `resolveExecutorConfig`. When it does, presence is checked by consulting
+> this SAME registry (`fgos tool query`'s own functions, called
+> in-process) instead of re-probing PATH independently — reusing the
+> discovery layer above, not building a second one. This only works if the
+> capacity was registered first, with `--name` matching the capacity's own
+> id exactly:
+>
+> ```
+> fgos tool register --name <capacityId> --kind cli \
+>   --capability <nhan> --command <lenh> --dir <main-checkout-root>
+> fgos tool check --name <capacityId> --dir <main-checkout-root>
+> ```
+>
+> Thiếu bước đăng ký này, `resolveExecutorConfig` từ chối thẳng
+> (`RunnerConfigError`) tại resolve-time — trước khi spawn bất cứ gì, cùng
+> phong cách "lỗi rõ ràng" executor block hiện có đã dùng cho một block
+> thiếu `command`/`args`. Đăng ký rồi nhưng `fgos tool check` chưa từng
+> chạy (hoặc trả `missing`) cũng từ chối — chỉ `status: present` mới cho
+> qua.
+
+(A `.fgos-runner.json` `capacities.<capacityId>` entry declaring `"kind":
+"cli"` (D1) has its presence checked by consulting this same registry —
+`fgos tool query`'s own functions, called in-process — instead of
+re-probing PATH independently, reusing the discovery layer above rather
+than building a second one. This only works once the capacity is
+registered, with `--name` matching the capacity's own id exactly. Skipping
+that registration step makes `resolveExecutorConfig` refuse outright
+(`RunnerConfigError`) at resolve time, before anything is spawned — the
+same "fail loud" style the existing executor-block check already uses for
+a block missing `command`/`args`. Registered but never `fgos tool check`ed
+(or checked `missing`) refuses the same way — only `status: present`
+passes.)
+
 ## Explicitly out of scope for tsk-4ad
 
 > Việc CHƯA nằm trong tsk-4ad: sửa prose 3 skill

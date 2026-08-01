@@ -701,6 +701,7 @@ test('e2e full journey: item1 (no deps) -> awaiting-approval with a worker commi
       'work.add:item2:add',
       'work.move:item1:doing',
       'work.outcome:item1:predicted',
+      'capacity.dispatch:item1:add', // D8, tsk-62v: dispatch announce/audit entry
       'work.move:item1:awaiting-approval',
       'work.outcome:item1:actual',
     ],
@@ -794,6 +795,10 @@ test('e2e verify-red: a worker that commits the wrong thing fails goal-check on 
     'work.add:item-red',
     'work.move:doing',
     'work.outcome:predicted',
+    // D8, tsk-62v: one dispatch announce/audit entry per attempt — two
+    // retry attempts run before the item parks to blocked.
+    'capacity.dispatch:item-red',
+    'capacity.dispatch:item-red',
     'work.move:blocked',
     'work.outcome:actual',
     'work.friction:item-red',

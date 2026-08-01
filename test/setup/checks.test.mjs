@@ -29,11 +29,39 @@ function checkById(id) {
 
 // ─── Unit tests: DOCTOR_CHECKS ─────────────────────────────────────────────
 
-test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-checkout-hook-wired, tool-registry-configured, and config-awareness', () => {
+test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-checkout-hook-wired, tool-registry-configured, config-awareness, and dependencies-installed', () => {
   assert.deepEqual(
     DOCTOR_CHECKS.map((c) => c.id).sort(),
-    ['config-not-stale', 'main-checkout-hook-wired', 'node-version-and-git', 'shell-integration-sourced', 'tool-registry-configured', 'config-awareness'].sort(),
+    ['config-not-stale', 'main-checkout-hook-wired', 'node-version-and-git', 'shell-integration-sourced', 'tool-registry-configured', 'config-awareness', 'dependencies-installed'].sort(),
   );
+});
+
+test('dependencies-installed passes when package.json has no dependencies field (pre-tsk-slq behavior)', () => {
+  const tmp = mkTemp('fgos-deps-check-');
+  fs.writeFileSync(path.join(tmp, 'package.json'), JSON.stringify({ name: 'x' }));
+  const { passed, message } = checkById('dependencies-installed').check(tmp);
+  assert.equal(passed, true);
+  assert.match(message, /no runtime dependencies declared/);
+  fs.rmSync(tmp, { recursive: true, force: true });
+});
+
+test('dependencies-installed fails when a declared dependency is missing from node_modules', () => {
+  const tmp = mkTemp('fgos-deps-check-');
+  fs.writeFileSync(path.join(tmp, 'package.json'), JSON.stringify({ name: 'x', dependencies: { yaml: '^2.9.0' } }));
+  const { passed, message } = checkById('dependencies-installed').check(tmp);
+  assert.equal(passed, false);
+  assert.match(message, /missing from node_modules: yaml/);
+  fs.rmSync(tmp, { recursive: true, force: true });
+});
+
+test('dependencies-installed passes when every declared dependency is present in node_modules', () => {
+  const tmp = mkTemp('fgos-deps-check-');
+  fs.writeFileSync(path.join(tmp, 'package.json'), JSON.stringify({ name: 'x', dependencies: { yaml: '^2.9.0' } }));
+  fs.mkdirSync(path.join(tmp, 'node_modules', 'yaml'), { recursive: true });
+  const { passed, message } = checkById('dependencies-installed').check(tmp);
+  assert.equal(passed, true);
+  assert.match(message, /1 dependency installed/);
+  fs.rmSync(tmp, { recursive: true, force: true });
 });
 
 test('tool-registry-configured always passes — inactive is a clean skip, never a failure', () => {

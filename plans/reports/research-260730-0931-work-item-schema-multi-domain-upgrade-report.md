@@ -1,6 +1,6 @@
 # Research Report: Nâng cấp schema work-item (status branch, type hierarchy, nested domain fields, per-domain status flow)
 
-**Thời điểm nghiên cứu:** 2026-07-30 09:31 (Asia/Saigon), cập nhật 10:10, 10:35 (chốt kiến trúc round 4), 15:10 (milestone `tsk-3w3`), 2026-08-01 09:58 (round 11 — file `tsk-38t`, sửa lỗi `goalTier`)
+**Thời điểm nghiên cứu:** 2026-07-30 09:31 (Asia/Saigon), cập nhật 10:10, 10:35 (chốt kiến trúc round 4), 15:10 (milestone `tsk-3w3`), 2026-08-01 09:58 (round 11 — file `tsk-38t`, sửa lỗi `goalTier`), 14:47 (round 12 — re-audit `tsk-2rp`: phát hiện verb `catchup` bị bỏ sót, 9 call site không phải 8)
 
 **Task chính quản lý cụm này:** `tsk-3w3` (`deps: [tsk-2rp, tsk-3p1, tsk-38t]`) —
 coi là đạt khi cả 3 dep xong: `tsk-2rp` (Phase 1, `verifyKind`), `tsk-3p1`
@@ -627,6 +627,28 @@ trong report này.
 
 **Đang handle:** `tsk-2rp` (stage `clarify`, tier `heavy`, risk `high`) —
 `refs` trỏ ngược report này + `src/runner/goal-check.mjs` + `bin/fgos.mjs`.
+
+**Re-audit (round 12, 2026-08-01) — con số "8 call site" (round 10) SAI, đúng
+là 9, và thiếu đúng verb nguy hiểm nhất:** đọc lại `bin/fgos.mjs` dòng
+2310-2484 phát hiện `case 'catchup':` (dòng 2340) — verb RIÊNG BIỆT đứng
+ngay sau `case 'reject':`, KHÔNG phải một nhánh của `reject` như lần audit
+trước lầm tưởng. `reject` (2310-2322) đúng là không gọi `runGoalCheck`;
+`catchup` thì gọi 2 lần (2416 nhánh "already-caught-up", 2475 nhánh
+"clean-merge"). Danh sách 9 call site chính xác: `return` branch-source
+(1770) + main-source (1828), `approve` (2288), `catchup` x2 (2416/2475),
+`merge.mjs` already-merged (702) + verify-before-commit (748), `loop.mjs`
+startupReap (361) + dispatchClaimedItem (694).
+
+`catchup` nguy hiểm hơn cả `return`'s vòng-tròn-tự-báo (round trước đã ghi):
+nó chạy với `role: 'runner'` (dòng 2422) — **không có người nào trong đường
+này để "gọi approve"** cả, khác `return` (ít nhất còn 1 claimant người/session
+thật đứng gọi). Định nghĩa `manual-confirm: pass = human đã gọi approve` gặp
+2 đường đều sai với `catchup`: áp cứng → item domain đó kẹt `blocked` vĩnh
+viễn mỗi lần catchup chạy (không ai thỏa điều kiện); mặc định luôn-pass →
+runner tự merge mà không ai xác nhận gì, phá đúng mục đích `manual-confirm`
+định bảo vệ. Chưa có lời giải — `catchup` cần 1 thiết kế RIÊNG, không dùng
+chung logic với `return`. Đã sửa vào acceptance clause 4 + clause 8 mới của
+`tsk-2rp` (13 clause, tăng từ 7 lần trước).
 
 ### 2. Context-discovery/decompose CỨNG vào tên stage của `coding` (đã tự nhận trong spec, đọc lúc grounding nhưng chưa mang vào bàn)
 
