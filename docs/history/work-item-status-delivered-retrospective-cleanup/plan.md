@@ -84,7 +84,7 @@ Each child carries `parent: tsk-1ca`. Order 1→5 is a real dependency chain,
 not a suggestion — 2/3 both require 1; 4 requires 1 and 2; 5 requires all
 of 1-4 to exist to regression-test against.
 
-1. **FSM core: delivered/retrospective/cleanup states + gate split**
+1. **FSM core: delivered/retrospective/cleanup states + gate split** (`tsk-5e9`)
    Add `delivered`/`retrospective`/`cleanup` to `work.mjs`'s `STATUSES`;
    add the 7 edges to `fsm.mjs`'s `TRANSITIONS` (D2); move RUL58's
    acceptance-clause check onto `doing->delivered`/`awaiting-approval-
@@ -92,7 +92,7 @@ of 1-4 to exist to regression-test against.
    `cleanup->done` only (D4). `done` keeps exactly one incoming edge.
    Verify: `node --test test/state/fsm.test.mjs`
 
-2. **Retire `compound-learn` stage; retarget `fgos-compounding`**
+2. **Retire `compound-learn` stage; retarget `fgos-compounding`** (`tsk-1zi`, dep tsk-5e9)
    Remove `compound-learn` from `coding`'s `stages`/`stepMap`/
    `transitions`/`skillMap` in `workflow-stage-graphs.mjs` (supersedes
    RUL49); remove the `compound` verb's stage-move behavior (supersedes
@@ -102,13 +102,13 @@ of 1-4 to exist to regression-test against.
    to assert the new trigger.
    Verify: `node --test test/state/stage.test.mjs test/state/workflow-stage-graphs.test.mjs test/state/compound-learn-done-gate.test.mjs test/e2e/compound-learn-lifecycle.test.mjs`
 
-3. **RUL12 fix: `RESOLVED_STATUSES` single-set expansion**
+3. **RUL12 fix: `RESOLVED_STATUSES` single-set expansion** (`tsk-1d4`, dep tsk-5e9)
    `frontier.mjs:160` — `{done, wontfix}` → `{delivered, retrospective,
    cleanup, done, wontfix}` (D13). No change to `fgos rollup`'s separate
    done-only counter.
    Verify: `node --test test/state/frontier.test.mjs test/state/graph-metrics.test.mjs test/runner/claim-port.test.mjs test/state/impact.test.mjs test/report/entropy.test.mjs`
 
-4. **cleanup harness, retrospective loop, TTL config, reject/retry edges**
+4. **cleanup harness, retrospective loop, TTL config, reject/retry edges** (`tsk-3wo`, deps tsk-5e9,tsk-1zi)
    Two new runtime pieces: (a) a retrospective loop, run-once-per-
    invocation, scanning `status==='delivered'` items, invoking
    `fgos-compounding`'s work, transitioning `delivered->retrospective-
