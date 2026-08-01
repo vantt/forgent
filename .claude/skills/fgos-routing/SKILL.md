@@ -11,7 +11,7 @@ description: >-
 # fgos-routing
 
 Entry point for a session working an fgOS item through the core loop
-(`clarify` → `decompose` → `executing` → `compound-learn`). This skill never does the work
+(`clarify` → `decompose` → `executing`). This skill never does the work
 itself — it locates where an item stands right now and names the one
 other skill to load next. Load it first when a session opens in this
 repo.
@@ -104,7 +104,12 @@ call, not a different table:
 | `decompose` — shaping | scope is settled; the work now needs shaping and, where it doesn't fit in one pass, splitting into child items | `fgos-planning` (the registry's entry-point default for `decompose`) |
 | `decompose` — proving | shape and children (if any) exist; what's left is proving the plan against reality before the item is allowed to move to `executing` | `fgos-validating` — this branch is this skill's own session-side judgment layered on top of the registry's single `decompose` default, never a second registry entry |
 | `executing` | the item has already cleared clarification and shaping (or never needed either), and is ready for direct implementation | `null` today (the already-mechanical build/verify/return path) — a domain that registers a skill here loads it instead |
-| `compound-learn` | the item has completed execution; the synthesis layer composes learnings from outcomes and classi­fies them as end-user documentation | `fgos-compounding` |
+
+`compound-learn` is retired as a stage (work-item-status-delivered-
+retrospective-cleanup D11, supersedes RUL49/RUL50/RUL51) — the synthesis
+layer it used to gate (`fgos-compounding`) now triggers on the status
+`retrospective` instead, driven by a separate retrospective loop, not this
+stage-routing table.
 
 `decompose` is one stage in the data, not two — "shaping" and "proving"
 above are a judgment call inside that single stage, never a value `stage`

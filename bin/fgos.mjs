@@ -16,7 +16,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { initStore, addWork, moveWork, moveStage, editWork, addDecision, addOutcome, addFriction, listWork, readyWork, isDepsAndLineageReady, graphMetrics, graphWhatIf, staleDoingAdvisory, footprintConflicts, readRawEvents, rebuild, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, registerTool, removeTool, StoreError, EXIT_CODES, categoryOf, assertValidDocType } from '../src/state/store.mjs';
+import { initStore, addWork, moveWork, editWork, addDecision, addOutcome, addFriction, listWork, readyWork, isDepsAndLineageReady, graphMetrics, graphWhatIf, staleDoingAdvisory, footprintConflicts, readRawEvents, rebuild, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, registerTool, removeTool, StoreError, EXIT_CODES, categoryOf } from '../src/state/store.mjs';
 import { probeTool, readLocalStatus, writeLocalStatus, resolvedStatus, normalizeCapability } from '../src/state/tool-registry.mjs';
 import { repairTruncatedLastLine } from '../src/state/events.mjs';
 import { deriveTitle, classify, generateId } from '../src/intake/classify.mjs';
@@ -924,76 +924,6 @@ async function runVerb(verb, flags, positional, dir) {
       // supplied.
       const reason = optionalField(flags.reason, 'move --reason requires a non-empty reason value (omit --reason entirely when not rejecting a proposal)');
       const { event } = moveWork(dir, { id, to, expectedStatus, reason, role: 'human' });
-      return { id, from: event.payload.from, to: event.payload.to, seq: event.seq };
-    }
-
-    // The deliberate entry into Compound-learn (per compound-learn-enduser-docs
-    // D2/D3): unlike `move`, this is not a generic status/stage door — it is
-    // the one act that makes the synthesis stage non-vacuous (an auto-advance
-    // on return/approve would let the stage transit with nothing synthesised,
-    // exactly what D3 forbids). Requires `status === 'awaiting-approval'` (work
-    // returned, verify green) so the item is at a settled checkpoint before it
-    // moves into compound-learn; persists via store.mjs's moveStage (not the
-    // pure stage.mjs transitionStage) so the move is actually written to the
-    // log, mirroring moveWork's own persisting-wrapper shape above.
-    //
-    // `--doc-type <quadrant>` (slice 3, CONTEXT D4/D8) is the minimal producer
-    // surface the inducted `fgos-compounding` skill uses to store its Diataxis
-    // classification: when given, it is PRE-VALIDATED via store.mjs's exported
-    // `assertValidDocType` (the single `DIATAXIS_DOC_TYPES` set, not
-    // re-implemented here) BEFORE any write — a non-quadrant value is
-    // rejected with zero events, on every stage. Real guarantee, not
-    // "reject clean, no partial write" in general: once validation passes,
-    // this case is STAGE-AWARE (P1 fix, slice-3 review). An item already at
-    // stage `compound-learn` is the routed case (`fgos-compounding` runs
-    // only once an item has already arrived there) — the docType is tagged
-    // via `addOutcome` WITHOUT a stage move, because `moveStage` has no
-    // compound-learn -> compound-learn edge and would throw; writing the
-    // outcome first and then hitting that throw is exactly the dangling-
-    // outcome bug this fix closes. Every other source stage keeps the
-    // original order — `moveStage` first, `addOutcome` second — so an
-    // illegal source stage throws before any outcome is written. Omitted
-    // entirely, `compound` stays byte-identical to pre-slice-3: `moveStage`
-    // only, no outcome written, still rejecting an already-compound-learn
-    // re-compound.
-    //
-    // `--doc-path <path>` (bước-3, CONTEXT D12/D15) is an additive linkage
-    // field alongside `--doc-type`: it records which real end-user doc the
-    // tagged capture belongs to, so a later read-side index can back-link a
-    // doc to its source capture with no loss of detail (D13). Omitted
-    // entirely, or omitted while `--doc-type` is given, `compound` is
-    // byte-identical to pre-docPath behavior.
-    case 'compound': {
-      const id = requireField(positional[0] ?? flags.id, 'compound requires an id: fgos compound <id>');
-      const item = listWork(dir).work[id];
-      if (!item) {
-        throw new StoreError('validation', `compound: work "${id}" not found.`);
-      }
-      if (item.status !== 'awaiting-approval') {
-        throw new StoreError('validation', `compound: work "${id}" is "${item.status}", not "awaiting-approval" — cannot move into compound-learn.`);
-      }
-      const docType = optionalField(flags['doc-type'], 'compound --doc-type requires a non-empty value: tutorial | how-to | reference | explanation.');
-      if (docType !== undefined) {
-        assertValidDocType({ docType });
-      }
-      // `--doc-path <path>` (bước-3, CONTEXT D12/D15) is the additive
-      // doc-capture linkage: the end-user doc path the `docType`-tagged
-      // outcome was written for, so the deferred index/manifest can back-
-      // link a real doc to the capture it came from. Same optional-shape
-      // idiom as `docType` above (only a bare/empty value is refused); rides
-      // the same addOutcome payload spread with zero store.mjs change (D6's
-      // additive pattern). Only meaningful alongside `--doc-type` — it never
-      // gates whether an outcome is written on its own, matching the
-      // pre-existing docType-gated write below.
-      const docPath = optionalField(flags['doc-path'], 'compound --doc-path requires a non-empty value.');
-      if (docType !== undefined && item.stage === 'compound-learn') {
-        const { event } = addOutcome(dir, { id, docType, ...(docPath !== undefined ? { docPath } : {}) });
-        return { id, docType, docPath: docPath ?? null, stage: item.stage, seq: event.seq };
-      }
-      const { event } = moveStage(dir, { id, to: 'compound-learn', role: 'human' });
-      if (docType !== undefined) {
-        addOutcome(dir, { id, docType, ...(docPath !== undefined ? { docPath } : {}) });
-      }
       return { id, from: event.payload.from, to: event.payload.to, seq: event.seq };
     }
 

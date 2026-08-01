@@ -190,26 +190,6 @@ export const COMMAND_REGISTRY = [
     deprecated: null,
   },
   {
-    name: 'compound',
-    invoke: 'fgos compound',
-    description: 'Move an awaiting-approval work item into the compound-learn stage — the deliberate transition (D2) through which captured signals get synthesised before the item can reach done. Optional --doc-type stores a Diataxis-tagged outcome (tutorial | how-to | reference | explanation) surfaced by `fgos check`.',
-    parameters: {
-      type: 'object',
-      properties: {
-        id: { type: 'string', description: 'Work item id (positional or --id).' },
-        'doc-type': { type: 'string', description: 'Optional Diataxis quadrant to tag the compound-learn capture with: tutorial | how-to | reference | explanation. Omit to leave the item untagged (byte-identical to the pre-docType behavior).' },
-      },
-      positional: ['id'],
-      required: ['id'],
-    },
-    examples: ['fgos compound build-cli', 'fgos compound build-cli --doc-type how-to'],
-    touchesState: true,
-    requiresExistingStore: true,
-    externalEffect: false,
-    paginated: false,
-    deprecated: null,
-  },
-  {
     name: 'edit',
     invoke: 'fgos edit',
     description: 'Patch fields on an existing item (title/description/kind/risk/verify/tier/refs/deps/footprint/acceptance/priority/intent/docs-ref/parent/urgent/impact/effort). At least one field must be given.',
