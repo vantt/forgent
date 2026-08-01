@@ -1,8 +1,23 @@
 # Research Report: Nâng cấp schema work-item (status branch, type hierarchy, nested domain fields, per-domain status flow)
 
-**Thời điểm nghiên cứu:** 2026-07-30 09:31 (Asia/Saigon), cập nhật 10:10, 10:35 (chốt kiến trúc round 4), 15:10 (milestone `tsk-3w3`)
+**Thời điểm nghiên cứu:** 2026-07-30 09:31 (Asia/Saigon), cập nhật 10:10, 10:35 (chốt kiến trúc round 4), 15:10 (milestone `tsk-3w3`), 2026-08-01 09:58 (round 11 — file `tsk-38t`, sửa lỗi `goalTier`)
 
-**Task chính quản lý cụm này:** `tsk-3w3` (`goalTier: milestone`, `deps: [tsk-2rp, tsk-3p1]`) — coi là đạt khi `tsk-2rp` (Phase 1, `verifyKind`) và `tsk-3p1` (RUL12 marker) xong; Phase 2 (`statusCategory`/`kindCategory`/`domainFields` chính) chưa có task riêng, thêm vào `deps` của `tsk-3w3` sau khi file.
+**Task chính quản lý cụm này:** `tsk-3w3` (`deps: [tsk-2rp, tsk-3p1, tsk-38t]`) —
+coi là đạt khi cả 3 dep xong: `tsk-2rp` (Phase 1, `verifyKind`), `tsk-3p1`
+(RUL12 marker), `tsk-38t` (Phase 2, `statusCategory`/`kindCategory`/
+`domainFields` — filed round 11, xem "Thứ tự triển khai" dưới).
+
+**Sửa lỗi thật (round 11):** dòng này TỪNG ghi `tsk-3w3 (goalTier: milestone`
+— SAI, đã kiểm qua `fgos show tsk-3w3` thật: item KHÔNG mang `goalTier`.
+Nguyên nhân gốc, đáng ghi lại vì tự nó là 1 data-point cho câu hỏi #2 gốc
+("goalTier có generic/dùng đúng không"): `tsk-3w3` được tạo qua `fgos submit`
+(có `mode: sync`), nhưng verb `submit` KHÔNG expose `--goal-tier` (chỉ `add`
+có flag đó — `bin/fgos.mjs` case `'submit'`, so với case `'add'`). Cộng thêm
+`goalTier` bị loại khỏi `EDITABLE_FIELDS` (`store.mjs:186`, cố ý — "luôn set
+lúc `add`, không bao giờ retrofit") — nghĩa là **item này đã VĨNH VIỄN không
+gắn `goalTier` được nữa**, không có đường sửa. Đây là 1 khoảng hở thật giữa
+2 cửa vào work-item (`add` đầy field, `submit` thiếu vài field so với `add`)
+— đáng thêm vào câu hỏi mở.
 
 ## Mục tiêu report này
 
@@ -706,11 +721,20 @@ bỏ qua `return` hoàn toàn — đi thẳng `doing→awaiting-approval` qua ve
 đường riêng — thay vì nhét vào `return` rồi tắt từng gate một.
 
 **Phase 2 — `status`/`statusCategory` + `kind`/`kindCategory` (sau, không bị
-Phase 1 chặn):**
+Phase 1 chặn) — filed round 11 là `tsk-38t`:**
 
 - Domain sở hữu bảng transition riêng (đảo thật D1-D3, cần decision record
   mới) + `domainFields` (mục #3) — làm sau khi Phase 1 xong hoặc song song,
   miễn không tranh cùng file/subsystem với Phase 1.
+- `tsk-38t` mang 6 acceptance clause grounded (bảng transition per-domain
+  thay statusCategory để validate move, decision record supersede D1-D3,
+  danh sách 6 cơ chế domain-agnostic cần đổi, gộp chung vòng explore với
+  `tsk-3p1`, migration=0 cho `STATUSES` hiện có, backfill `statusCategory`
+  event cũ chưa chốt) — `refs` trỏ report này + `work-state.md` +
+  `0024` + `work.mjs`/`workflow-stage-graphs.mjs`/`fsm.mjs`/`store.mjs`/
+  `frontier.mjs` + `tsk-3p1`. Không set `deps: [tsk-3p1]` cố ý — 2 việc GỘP
+  CHUNG 1 vòng explore (xem dưới), không phải quan hệ block-trước-sau mà
+  `deps` diễn tả.
 
 **Việc liên quan phát hiện thêm (round 9) — `tsk-3p1`, GỘP vào trước khi code Phase 2:**
 
@@ -775,6 +799,16 @@ compound-learn xong", RUL50 gate cả 2 lối vào `done` bằng compound-learn)
     (compound-learn, bài học lúc đóng, outcome/friction, frontier, rollup,
     discovery-judge) — đã đủ chưa, hay còn chỗ khác trong code đang đọc
     literal `status` mà report này chưa quét hết?
+14. (round 11, phát hiện lúc file `tsk-38t`) `add` và `submit` KHÔNG cùng bề
+    mặt field — `submit` thiếu `--refs`/`--goal-tier`/`--parent`/
+    `--footprint` mà `add` có (`bin/fgos.mjs`, so 2 case). Vài field
+    (`goalTier`) còn bị loại khỏi `EDITABLE_FIELDS` nên item tạo qua `submit`
+    KHÔNG BAO GIỜ gắn được về sau — item CÓ THẬT đã dính lỗi này: `tsk-3w3`
+    (xem sửa lỗi round 11 ở đầu report). Có nên cho `submit` đủ field ngang
+    `add`, hay đây là khoảng cách CỐ Ý ("cửa công khai" `submit` tối giản
+    hơn `add` có chủ đích)? Ngoài phạm vi 4 đề xuất gốc nhưng cùng họ vấn đề
+    (field vắng mặt vĩnh viễn không sửa được) — nên hỏi riêng, không lẫn vào
+    quyết định status/kind.
 
 ## Nguồn
 
