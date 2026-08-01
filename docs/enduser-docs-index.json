@@ -707,6 +707,14 @@
     "quadrant": "how-to",
     "purpose": "Show the steps to accomplish one specific, already-understood goal.",
     "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/hand-back-a-material-context-gap-during-planning.md",
+    "title": "How to hand a material CONTEXT.md gap back from fgos-planning to fgos-exploring",
+    "sourceCaptureId": "tsk-4y8"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
     "docPath": "docs/how-to/handle-a-duplicate-work-item.md",
     "title": "How to close a duplicate, superseded, or admin-decided work item",
     "sourceCaptureId": "tsk-1ua"
