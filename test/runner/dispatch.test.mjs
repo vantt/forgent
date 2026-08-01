@@ -1251,7 +1251,7 @@ test('resolveCapacityCli propagates resolveExecutorConfig\'s own RunnerConfigErr
 
 test('the "resolve" CLI entry point (node src/runner/dispatch.mjs resolve <capacityId>) prints {command,args,provider,model} JSON to stdout for a real invocation against this repo\'s own .fgos-runner.json', () => {
   const dispatchPath = path.resolve('src/runner/dispatch.mjs');
-  const result = spawnSync('node', [dispatchPath, 'resolve', 'no-such-capacity-configured', '--prompt', 'hello'], {
+  const result = spawnSync(process.execPath, [dispatchPath, 'resolve', 'no-such-capacity-configured', '--prompt', 'hello'], {
     encoding: 'utf8',
   });
   assert.equal(result.status, 0, result.stderr);
@@ -1264,7 +1264,7 @@ test('the "resolve" CLI entry point (node src/runner/dispatch.mjs resolve <capac
 
 test('the "resolve" CLI entry point exits non-zero with a usage message when capacityId is omitted', () => {
   const dispatchPath = path.resolve('src/runner/dispatch.mjs');
-  const result = spawnSync('node', [dispatchPath, 'resolve'], { encoding: 'utf8' });
+  const result = spawnSync(process.execPath, [dispatchPath, 'resolve'], { encoding: 'utf8' });
   assert.notEqual(result.status, 0);
   assert.match(result.stderr, /usage: node src\/runner\/dispatch\.mjs resolve/);
 });
