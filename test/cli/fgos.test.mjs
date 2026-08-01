@@ -5911,6 +5911,26 @@ test('return on a branch-source take symlinks the real repo\'s node_modules into
   assert.match(result.stdout, /awaiting-approval/);
 });
 
+test('return on a branch-source take is a clean no-op for the node_modules symlink when the real repo has none at all -- never an error, matching the fix\'s own existsSync guard', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  // No node_modules anywhere under cwd -- the fix must skip the symlink
+  // silently rather than throwing on a missing source path.
+  makeBlockedBranchItem(cwd, 'branch-return-no-deps', { verify: 'test -f proof.txt' });
+  assert.equal(run(cwd, ['take', '--id', 'branch-return-no-deps']).status, 0);
+  commitPending(cwd, 'state: take branch-return-no-deps');
+
+  gitAtCwd(cwd, ['checkout', 'fgw/branch-return-no-deps']);
+  fs.writeFileSync(path.join(cwd, 'proof.txt'), 'fixed by hand\n');
+  gitAtCwd(cwd, ['add', '-A']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', 'human fix']);
+  gitAtCwd(cwd, ['checkout', 'main']);
+
+  const result = run(cwd, ['return', 'branch-return-no-deps']);
+  assert.equal(result.status, 0, `return failed: ${result.stderr}`);
+  assert.match(result.stdout, /awaiting-approval/);
+});
+
 test('return on a branch-source take never touches a live main-checkout.lock (tsk-45z D1 scope: only the main-source path releases early — worktree commits never contend for this shared lock)', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
