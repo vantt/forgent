@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { runJudgeExecutor, readScoutNotes } from '../../src/intake/judge-executor.mjs';
+import { runJudgeExecutor, runRetryingExecutor, readScoutNotes } from '../../src/intake/judge-executor.mjs';
 
 // Fake executors only — every "command" spawned here is a node script this
 // file writes to a mkdtemp directory at test time, mirroring
@@ -182,6 +182,22 @@ function writeFlakyTwiceThenValidExecutor(dir, badStdout, validVerdict) {
   return { scriptPath, counterPath };
 }
 
+// Echoes back whichever prompt argument it received, on its one and only
+// invocation — used to prove which prompt an escalation attempt actually
+// sends, without needing a multi-invocation counter.
+function writeEchoExecutor(dir) {
+  const scriptPath = path.join(dir, 'echo-executor.mjs');
+  fs.writeFileSync(
+    scriptPath,
+    `
+    const prompt = process.argv[2];
+    process.stdout.write(JSON.stringify({ echoed: prompt }));
+    process.exit(0);
+    `,
+  );
+  return scriptPath;
+}
+
 function cfgFor(scriptPath, overrides = {}) {
   return {
     executor: { command: process.execPath, args: [scriptPath, '{prompt}'] },
@@ -325,6 +341,138 @@ test('runJudgeExecutor falls back to the base cfg.executor when cfg.executors.ju
   const verdict = runJudgeExecutor(cfg, 'sonnet', 'prompt', 'stricter prompt');
   assert.deepEqual(verdict, { clear: false, question: 'from base executor' });
   assert.equal(readCount(counterPath), 1);
+});
+
+// tsk-418-2: runRetryingExecutor's opt-in escalation step. `runJudgeExecutor`
+// never passes `escalateTier`, so every test above stays byte-identical —
+// these tests call the generic function directly instead.
+
+test('runRetryingExecutor escalates to escalateTier after base attempts exhaust on parse-shaped failures', () => {
+  const dir = mkTempDir();
+  const { scriptPath: baseScript, counterPath: baseCount } = writeRawStdoutExecutor(dir, 'not json at all');
+  const { scriptPath: fallbackScript, counterPath: fallbackCount } = writeValidExecutor(dir, { clear: true, verify: 'from fallback' });
+  const cfg = {
+    executor: { command: '/no/such/executor-binary-xyz', args: ['{prompt}'] },
+    executors: {
+      primary: { command: process.execPath, args: [baseScript, '{prompt}'] },
+      fallback: { command: process.execPath, args: [fallbackScript, '{prompt}'] },
+    },
+    timeoutMs: 5000,
+  };
+  const verdict = runRetryingExecutor(cfg, 'sonnet', 'prompt', 'stricter prompt', {
+    tier: 'primary',
+    maxAttempts: 3,
+    escalateTier: 'fallback',
+  });
+  assert.deepEqual(verdict, { clear: true, verify: 'from fallback' });
+  assert.equal(readCount(baseCount), 3);
+  assert.equal(readCount(fallbackCount), 1);
+});
+
+test('runRetryingExecutor escalates to escalateTier after an immediate non-parse failure (no base retries)', () => {
+  const dir = mkTempDir();
+  const { scriptPath: baseScript, counterPath: baseCount } = writeFailingExecutor(dir, 9);
+  const { scriptPath: fallbackScript, counterPath: fallbackCount } = writeValidExecutor(dir, { clear: true });
+  const cfg = {
+    executor: { command: '/no/such/executor-binary-xyz', args: ['{prompt}'] },
+    executors: {
+      primary: { command: process.execPath, args: [baseScript, '{prompt}'] },
+      fallback: { command: process.execPath, args: [fallbackScript, '{prompt}'] },
+    },
+    timeoutMs: 5000,
+  };
+  const verdict = runRetryingExecutor(cfg, 'sonnet', 'prompt', 'stricter prompt', {
+    tier: 'primary',
+    maxAttempts: 3,
+    escalateTier: 'fallback',
+  });
+  assert.deepEqual(verdict, { clear: true });
+  assert.equal(readCount(baseCount), 1);
+  assert.equal(readCount(fallbackCount), 1);
+});
+
+test('runRetryingExecutor sends stricterPrompt (not the original prompt) to the escalation attempt', () => {
+  const dir = mkTempDir();
+  const { scriptPath: baseScript } = writeFailingExecutor(dir);
+  const echoScript = writeEchoExecutor(dir);
+  const cfg = {
+    executor: { command: '/no/such/executor-binary-xyz', args: ['{prompt}'] },
+    executors: {
+      primary: { command: process.execPath, args: [baseScript, '{prompt}'] },
+      fallback: { command: process.execPath, args: [echoScript, '{prompt}'] },
+    },
+    timeoutMs: 5000,
+  };
+  const verdict = runRetryingExecutor(cfg, 'sonnet', 'original prompt', 'stricter prompt', {
+    tier: 'primary',
+    maxAttempts: 1,
+    escalateTier: 'fallback',
+  });
+  assert.deepEqual(verdict, { echoed: 'stricter prompt' });
+});
+
+test('runRetryingExecutor returns null when escalateTier is not declared and base attempts exhaust — zero-config unchanged behavior', () => {
+  const dir = mkTempDir();
+  const { scriptPath } = writeFailingExecutor(dir);
+  const cfg = {
+    executor: { command: '/no/such/executor-binary-xyz', args: ['{prompt}'] },
+    executors: { primary: { command: process.execPath, args: [scriptPath, '{prompt}'] } },
+    timeoutMs: 5000,
+  };
+  const verdict = runRetryingExecutor(cfg, 'sonnet', 'prompt', 'stricter prompt', {
+    tier: 'primary',
+    maxAttempts: 2,
+  });
+  assert.equal(verdict, null);
+});
+
+test('runRetryingExecutor returns null when the escalation attempt itself fails — single-shot, no further retry', () => {
+  const dir = mkTempDir();
+  const fallbackDir = mkTempDir();
+  const { scriptPath: baseScript } = writeFailingExecutor(dir, 1);
+  const { scriptPath: fallbackScript, counterPath: fallbackCount } = writeFailingExecutor(fallbackDir, 2);
+  const cfg = {
+    executor: { command: '/no/such/executor-binary-xyz', args: ['{prompt}'] },
+    executors: {
+      primary: { command: process.execPath, args: [baseScript, '{prompt}'] },
+      fallback: { command: process.execPath, args: [fallbackScript, '{prompt}'] },
+    },
+    timeoutMs: 5000,
+  };
+  const verdict = runRetryingExecutor(cfg, 'sonnet', 'prompt', 'stricter prompt', {
+    tier: 'primary',
+    maxAttempts: 1,
+    escalateTier: 'fallback',
+  });
+  assert.equal(verdict, null);
+  assert.equal(readCount(fallbackCount), 1);
+});
+
+// D3 (docs/history/agent-executor-retry-escalate-helper/CONTEXT.md): a
+// non-judge capacity opts into the same retry/escalate helper via a test
+// double, standing in for a real capacity like tsk-5l2's
+// submit-assist-classify — this item's own scope stops at proving the
+// helper is reusable, not at wiring a real second consumer.
+test('a non-judge test-double capacity opts into runRetryingExecutor with its own tier and escalateTier', () => {
+  const dir = mkTempDir();
+  const { scriptPath: classifyScript } = writeRawStdoutExecutor(dir, 'não consigo responder em json');
+  const { scriptPath: fallbackScript } = writeValidExecutor(dir, { tier: 'light', kind: 'bug', risk: 'low' });
+  const cfg = {
+    executor: { command: '/no/such/executor-binary-xyz', args: ['{prompt}'] },
+    executors: {
+      'submit-assist-classify': { command: process.execPath, args: [classifyScript, '{prompt}'] },
+      'submit-assist-classify-fallback': { command: process.execPath, args: [fallbackScript, '{prompt}'] },
+    },
+    timeoutMs: 5000,
+  };
+  // Stands in for a real capacity's own dispatch call — not judge-executor's
+  // internal wrapper — demonstrating the helper is genuinely capacity-agnostic.
+  const verdict = runRetryingExecutor(cfg, 'haiku', 'classify this task', 'classify this task, JSON only', {
+    tier: 'submit-assist-classify',
+    maxAttempts: 2,
+    escalateTier: 'submit-assist-classify-fallback',
+  });
+  assert.deepEqual(verdict, { tier: 'light', kind: 'bug', risk: 'low' });
 });
 
 // --- tsk-g18: parent-side scout-notes persistence (Cách B) -----------------

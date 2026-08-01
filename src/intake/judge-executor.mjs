@@ -1,10 +1,16 @@
-// judge-executor.mjs — shared spawn+parse+retry-once helper for the intake
-// judge calls (str68 D1/D5). judgeDiscovery (discovery.mjs) and
-// judgeDecompose (decompose.mjs) both spawn the nested `claude -p` executor
-// via the identical resolveExecutorCommand -> spawnSync -> JSON.parse shape,
-// and both are exposed to the same nested-session prose-vs-JSON failure mode
-// (a process that exits 0 but returns prose instead of JSON). This helper
-// lives once, used by both.
+// judge-executor.mjs — shared spawn+parse+retry helper. judgeDiscovery
+// (discovery.mjs) and judgeDecompose (decompose.mjs) both spawn the nested
+// `claude -p` executor via the identical resolveExecutorCommand ->
+// spawnSync -> JSON.parse shape, and both are exposed to the same
+// nested-session prose-vs-JSON failure mode (a process that exits 0 but
+// returns prose instead of JSON). `runRetryingExecutor` is the
+// capacity-agnostic core of that pattern (bounded attempts, a
+// stricter-instruction suffix on retry, JSON-parse-or-retry, optional
+// escalation to a fallback tier) — any capacity dispatch can call it with
+// its own `tier`/`maxAttempts`, not just judge calls. `runJudgeExecutor` is
+// judge-executor's own thin wrapper over it, preserving its exact prior
+// behavior for its two existing callers, plus the judge-specific scout-notes
+// capture described below.
 
 import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
@@ -127,12 +133,12 @@ function extractScoutTranscript(stdout) {
   return { entries, finalResult };
 }
 
-// tsk-62d D2/D4: `tier: 'judge'` reuses the existing generic `cfg.executors`
-// string-keyed lookup (`resolveExecutorConfig`, dispatch.mjs) as a synthetic
-// role key — a repo can grant judge calls their own `executors.judge` block
-// (e.g. `Bash(rg:*)` for scout capability) without touching the worker's own
-// `cfg.executor`/`cfg.executors[<real tier>]` blocks. Absent `executors.judge`
-// falls back to `cfg.executor`, identical to pre-tsk-62d behavior.
+// `tier` reuses the existing generic `cfg.executors` string-keyed lookup
+// (`resolveExecutorConfig`, dispatch.mjs) as a synthetic role key — a repo
+// can grant a tier its own `executors.<tier>` block (e.g. `Bash(rg:*)` for
+// scout capability) without touching the worker's own
+// `cfg.executor`/`cfg.executors[<real tier>]` blocks. A tier absent from
+// `cfg.executors` falls back to `cfg.executor`.
 //
 // `scoutCapture` (tsk-g18, optional): non-null only when the caller wants
 // this attempt's transcript captured (no fresh scout-notes.md yet). Adds
@@ -144,8 +150,8 @@ function extractScoutTranscript(stdout) {
 // (`parseVerdict`) keeps reading a single JSON-verdict string exactly as
 // before — `null`/omitted `scoutCapture` skips all of this, byte-identical
 // to pre-tsk-g18 behavior.
-function spawnAttempt(cfg, model, prompt, scoutCapture) {
-  const { command, args } = resolveExecutorCommand(cfg, { prompt, model, tier: 'judge' });
+function spawnAttempt(cfg, model, prompt, tier, scoutCapture) {
+  const { command, args } = resolveExecutorCommand(cfg, { prompt, model, tier });
   const finalArgs = scoutCapture ? [...args, '--output-format', 'stream-json', '--verbose'] : args;
   const result = spawnSync(command, finalArgs, {
     shell: false,
@@ -190,23 +196,95 @@ function parseVerdict(stdout) {
   }
 }
 
+// Run bounded attempts against `tier`'s resolved executor, retrying with
+// `stricterPrompt` on a parse-shaped failure only, up to `maxAttempts`
+// total attempts. A non-parse failure — spawn error, non-zero exit, or
+// timeout — on ANY attempt returns `null` immediately, never retries. Each
+// attempt is bounded by the same `cfg.timeoutMs`, not a shared/extended
+// budget. `scoutCapture`, when given, is threaded to every attempt exactly
+// like `spawnAttempt` itself expects — the same mutable object accumulates
+// whichever attempt's transcript entries last ran. Returns the
+// parsed-but-unvalidated verdict object on success, or `null` once all
+// attempts are exhausted (whether from exhausting parse-shaped retries, or
+// from an immediate non-parse failure on any single attempt) — the two
+// failure origins are indistinguishable on purpose, so a caller wrapping
+// this in escalation never needs a failure-type field to decide whether to
+// fall back.
+function runBoundedAttempts(cfg, model, prompt, stricterPrompt, tier, maxAttempts, scoutCapture) {
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    const result = spawnAttempt(cfg, model, attempt === 1 ? prompt : stricterPrompt, tier, scoutCapture);
+    if (result.error || result.status !== 0) {
+      return null;
+    }
+
+    const verdict = parseVerdict(result.stdout);
+    if (verdict.parsed) {
+      return verdict.verdict;
+    }
+  }
+
+  return null;
+}
+
 /**
- * Run a judge call attempt against `prompt`, retrying with `stricterPrompt`
- * on a parse-shaped failure only, up to `MAX_JUDGE_ATTEMPTS` total attempts
- * (str68 D2, raised to 3 by str68 nested-judge-fix). A non-parse failure —
- * spawn error, non-zero exit, or timeout — on ANY attempt returns `null`
- * immediately, never retries (str68 D2/D3, unchanged). Each attempt is
- * bounded by the same `cfg.timeoutMs` (str68 D4), not a shared/extended
- * budget. Returns the parsed-but-unvalidated verdict object on success, or
- * `null` once all attempts are exhausted — callers apply their own existing
- * field validation and fail-safe branching to whichever of these two
- * outcomes they get.
+ * Run `runBoundedAttempts` against `tier`, and — when the base attempts
+ * return `null` and the caller declared `escalateTier` — make exactly one
+ * further attempt against `escalateTier`'s resolved executor before giving
+ * up. The escalation attempt reuses `stricterPrompt` (already biased toward
+ * a clean-JSON response) and defaults to the same `model` unless
+ * `escalateModel` is given; it is single-shot, not its own bounded retry
+ * loop. Returns the parsed-but-unvalidated verdict object on success (from
+ * either the base attempts or the escalation attempt), or `null` once both
+ * are exhausted — callers still apply their own field validation.
+ *
+ * Capacity-agnostic: `tier`/`escalateTier` select which `cfg.executors.<id>`
+ * (or the global `cfg.executor`) attempts spawn through, so any capacity
+ * dispatch can call this directly with its own tier and attempt budget, and
+ * opt into escalation only by passing `escalateTier` — it is not hardcoded
+ * to judge calls, and a caller that never passes `escalateTier` sees no
+ * change in behavior. `scoutCapture` (optional, additive) is threaded
+ * through both the base attempts and the escalation attempt identically to
+ * `tier`/`model` — today only `runJudgeExecutor`'s own wrapper ever sets it,
+ * and it never also sets `escalateTier`, so the two features never actually
+ * interact in practice; threading it uniformly just avoids a second,
+ * escalation-only code path.
+ */
+export function runRetryingExecutor(
+  cfg,
+  model,
+  prompt,
+  stricterPrompt,
+  { tier, maxAttempts, escalateTier, escalateModel, scoutCapture },
+) {
+  const verdict = runBoundedAttempts(cfg, model, prompt, stricterPrompt, tier, maxAttempts, scoutCapture);
+  if (verdict !== null) {
+    return verdict;
+  }
+
+  if (!escalateTier) {
+    return null;
+  }
+
+  const result = spawnAttempt(cfg, escalateModel ?? model, stricterPrompt, escalateTier, scoutCapture);
+  if (result.error || result.status !== 0) {
+    return null;
+  }
+  const escalated = parseVerdict(result.stdout);
+  return escalated.parsed ? escalated.verdict : null;
+}
+
+/**
+ * judge-executor's own call into `runRetryingExecutor` — `tier: 'judge'`,
+ * `maxAttempts: MAX_JUDGE_ATTEMPTS` (str68 D2, raised to 3 by str68
+ * nested-judge-fix's probabilistic-refusal headroom). Same exported name and
+ * signature judgeDiscovery/judgeDecompose already call; behavior is
+ * unchanged from before the tsk-418 extraction.
  *
  * `scout` (tsk-g18, optional, additive): `{ repoRoot, docsRef, capture }`.
  * Omitted (every pre-tsk-g18 caller) keeps this function byte-identical to
  * before. When supplied with `capture: true` (the caller found no existing
  * scout-notes.md for this item), each attempt spawns with transcript
- * capture on; on the first attempt that produces a parsed verdict, any
+ * capture on; on whichever attempt actually produces a parsed verdict, any
  * captured `Bash(rg:*)` entries are persisted to
  * `docs/history/<docsRef>/scout-notes.md`. `capture: false` (fresh notes
  * already exist) spawns exactly like a pre-tsk-g18 call — no transcript
@@ -215,20 +293,15 @@ function parseVerdict(stdout) {
 export function runJudgeExecutor(cfg, model, prompt, stricterPrompt, scout) {
   const capture = scout?.capture ? {} : null;
 
-  for (let attempt = 1; attempt <= MAX_JUDGE_ATTEMPTS; attempt += 1) {
-    const result = spawnAttempt(cfg, model, attempt === 1 ? prompt : stricterPrompt, capture);
-    if (result.error || result.status !== 0) {
-      return null;
-    }
+  const verdict = runRetryingExecutor(cfg, model, prompt, stricterPrompt, {
+    tier: 'judge',
+    maxAttempts: MAX_JUDGE_ATTEMPTS,
+    scoutCapture: capture,
+  });
 
-    const verdict = parseVerdict(result.stdout);
-    if (verdict.parsed) {
-      if (capture?.entries?.length) {
-        writeScoutNotes(scout.repoRoot, scout.docsRef, capture.entries);
-      }
-      return verdict.verdict;
-    }
+  if (verdict !== null && capture?.entries?.length) {
+    writeScoutNotes(scout.repoRoot, scout.docsRef, capture.entries);
   }
 
-  return null;
+  return verdict;
 }
