@@ -11,6 +11,15 @@
 // may register only a check, only a config-default, or both — never a
 // forced pairing. 4 of the 5 built-in checks below have no config-default at
 // all, which is exactly why D2 rejected a mandatory pair.
+//
+// `fix` is a third, equally independent registration capability
+// (docs/history/doctor-fix-gate-bypass/CONTEXT.md D3, tsk-2qz): a module may
+// register a `fix` function alongside its `check`/`configDefault`, or none
+// of the above three together — same "independent, not forced pairing"
+// style D2 already established. `fgos doctor --fix` (bin/fgos.mjs) runs
+// every registered fix via `runFixes` below; `doctor` without `--fix` stays
+// exactly as before (D2 of the gate-bypass item — no default-behavior
+// change).
 
 import fs from 'node:fs';
 import os from 'node:os';
@@ -43,6 +52,7 @@ const DEAD_LINE_SAMPLE_SIZE = 3;
 // to the same array object, not a snapshot).
 export const DOCTOR_CHECKS = [];
 export const CONFIG_DEFAULT_REGISTRATIONS = [];
+export const FIX_REGISTRATIONS = [];
 
 /**
  * Register a doctor check (D1/D2). `id` must be unique among registered
@@ -84,6 +94,42 @@ export function registerConfigDefault({ id, key, shape }) {
     throw new Error(`registerConfigDefault("${id}") requires a plain-object shape`);
   }
   CONFIG_DEFAULT_REGISTRATIONS.push({ id, key, shape });
+}
+
+/**
+ * Register a fix (D3, docs/history/doctor-fix-gate-bypass/CONTEXT.md):
+ * `fix` is a function `(cwd) => { changed, message }` that repairs whatever
+ * this entry's own `check` (if any) reports as failing — idempotent, and
+ * scoped only to this entry's own concern, never another entry's. `fix`
+ * registration is independent of `check`/`configDefault` (same D2 style
+ * those two already follow) — a module may register any subset of the
+ * three.
+ */
+export function registerFix({ id, fix }) {
+  if (typeof id !== 'string' || !id.trim()) {
+    throw new Error('registerFix requires a non-empty id');
+  }
+  if (FIX_REGISTRATIONS.some((entry) => entry.id === id)) {
+    throw new Error(`registerFix: "${id}" is already registered`);
+  }
+  if (typeof fix !== 'function') {
+    throw new Error(`registerFix("${id}") requires a fix function`);
+  }
+  FIX_REGISTRATIONS.push({ id, fix });
+}
+
+/**
+ * Run every registered fix against `cwd` (`fgos doctor --fix`'s own write
+ * path — the one place doctor writes, gated behind the explicit `--fix`
+ * flag; without it doctor stays exactly as before). Each fix's own
+ * `{changed, message}` is reported per entry, mirroring `DOCTOR_CHECKS`'
+ * per-entry `{passed, message}` report shape.
+ */
+export function runFixes(cwd) {
+  return FIX_REGISTRATIONS.map(({ id, fix }) => {
+    const { changed, message } = fix(cwd);
+    return { id, changed, message };
+  });
 }
 
 /**
