@@ -38,6 +38,11 @@ mảng còn lại của sản phẩm có tái dùng được hay không.
    hai cấp đang tồn tại; nếu project có cài fgOS riêng thì bộ ở project được
    ưu tiên vận hành, không có thì rơi về global; **cấu hình của project luôn
    ghi đè (overwrite) cấu hình global** — không phải hợp nhất mù hai bên.
+   **Cập nhật 2026-08-01:** còn một CONTEXT THỨ 3 nằm ngoài cặp global/project
+   — dev-checkout self-hosting (contributor phát triển CHÍNH fgOS qua
+   `scripts/fgos-shell-integration.sh`, không cài đặt gì). Ba context này
+   phải cùng "không xung đột" trên một máy, không chỉ hai. Xem §3 cho phát
+   hiện thật (đọc code) về va chạm cụ thể giữa context này với global-install.
 7. **CI/GitHub CI workflow là một phần của bộ setup.** CI giúp fgOS ổn định +
    sẵn sàng ngay khi cài, giảm bớt việc phải tự dò các ràng buộc môi trường
    ngay tại máy người dùng — kiểm trước ở CI thay vì để người dùng tự đụng.
@@ -68,6 +73,27 @@ mảng còn lại của sản phẩm có tái dùng được hay không.
   flags của người dùng tự chọn global/project) — coi như baseline đã đạt,
   chưa cần việc mới trừ khi có yêu cầu thêm đường cài khác (vd script cài
   một dòng, `npx`).
+- **Context thứ 3 va chạm với global-install (xác nhận bằng đọc code thật,
+  `scripts/fgos-shell-integration.sh:13-32`, 2026-08-01).** `_fgos_repo_root`
+  resolve theo cwd MỖI LẦN GỌI qua `git rev-parse --git-common-dir`; `fgos`/
+  `fgos-runner` là SHELL FUNCTION — function luôn thắng PATH binary cùng
+  tên, không phân biệt cwd. Một contributor vừa source helper này (dev
+  fgOS) vừa có `fgos` global-install (dùng cho project KHÁC, không phải
+  forgent) trên cùng shell session: source helper **shadow chết global
+  binary ở MỌI thư mục**; đứng trong project khác gõ `fgos`, root resolve ra
+  được (project khác cũng là git repo) nhưng không có `bin/fgos.mjs` ở đó →
+  lỗi Node xấu (`Cannot find module`), không phải lỗi rõ ràng như case
+  "not a git repository" đã có (`test/scripts/fgos-shell-integration.test.mjs:38-94`
+  chỉ phủ 2/3 case — case này chưa test, chưa xử lý). Đã loại trừ rủi ro sâu
+  hơn (dev-HEAD code chạy nhầm lên data project khác, version/schema drift)
+  — cơ chế chỉ resolve được khi root có `bin/fgos.mjs` thật (chỉ chính
+  forgent hoặc clone/fork của nó), không bao giờ chạm data project khác dù
+  đứng trong đó. Rủi ro thật CHỈ là shadow-and-break, không phải data
+  corruption. Hướng fix kỹ thuật đề xuất (chưa quyết): function nên fallback
+  `command fgos "$@"` (PATH binary thật) khi root resolve được nhưng KHÔNG
+  có `bin/fgos.mjs` ở đó, thay vì lỗi xấu + shadow chết global install. Gộp
+  vào scope `tsk-2ta` (không tách item riêng) — cùng trục "fgOS aware bao
+  nhiêu context trên một máy".
 
 ## 4. Gate áp dụng toàn project (trụ cột 5)
 
@@ -86,6 +112,13 @@ tầng setup riêng hay không trước khi coi là xong — xem `AGENTS.md`
    đâu (`~/.fgos/config.json`? biến môi trường?) trước khi merge với config
    project? Việc "aware" hai cấp cùng tồn tại có cần một check `doctor` mới
    không?
+2b. **Context thứ 3 (dev-checkout self-hosting) có nên fallback về PATH
+   binary thật không** (trụ cột 6, phát hiện 2026-08-01, §3): fix
+   `scripts/fgos-shell-integration.sh` để function fallback `command fgos`
+   khi cwd không phải checkout forgent, hay chấp nhận đây là trade-off có
+   chủ đích (như case linked-worktree đã "accepted as-is" trong
+   `docs/specs/distribution.md` Edge Cases Settled) và chỉ cần document rõ
+   cho contributor tự tránh source helper cùng lúc dùng global-install?
 3. **`doctor --fix` làm được tới đâu** (trụ cột 3): fix mọi thứ `doctor`
    phát hiện, hay giới hạn một danh sách named-fixable ban đầu rồi mở rộng
    dần? (liên quan trực tiếp `tsk-2qz` — xem §7)
