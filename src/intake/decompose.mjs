@@ -21,7 +21,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { modelForTier } from '../runner/dispatch.mjs';
 import { loadTemplate } from '../runner/prompt-templates.mjs';
-import { runJudgeExecutor, JUDGE_STRICT_JSON_SUFFIX } from './judge-executor.mjs';
+import { runJudgeExecutor, JUDGE_STRICT_JSON_SUFFIX, readScoutNotes } from './judge-executor.mjs';
 import { DEFAULTS } from '../state/work.mjs';
 import { listWork, moveStage, moveWork, addWork, putInAwaiting, addDecision, editWork, StoreError } from '../state/store.mjs';
 import { rankImpact } from '../state/impact.mjs';
@@ -93,7 +93,7 @@ function logDecomposeVerdict(dir, id, outcome, rationale, label) {
   addDecision(dir, { id, text, source: 'judgeDecompose', rationale });
 }
 
-function buildDecomposePrompt(work, lockedContext, view) {
+function buildDecomposePrompt(work, lockedContext, view, priorScoutNotes) {
   const refs = Array.isArray(work.refs) && work.refs.length ? work.refs.join(', ') : '(none)';
   const deps = Array.isArray(work.deps) && work.deps.length ? work.deps.join(', ') : '(none)';
   const description =
@@ -136,7 +136,11 @@ ${locked}
 # Vòng hỏi-đáp với người (nếu người đã xác nhận cách chia ở đây, dùng CHÍNH
 câu trả lời đó để phán — không hỏi lại cùng một câu)
 ${qa}
-
+${
+  priorScoutNotes
+    ? `\n# Kết quả scout đã lưu (LẦN TRƯỚC — dùng lại, KHÔNG rg lại cùng truy vấn)\n${priorScoutNotes}\n`
+    : ''
+}
 ${loadTemplate('judge-scout-instructions.txt')}
 # Câu hỏi
 Item này đơn giản, thi công thẳng được không, hay cần chia thành nhiều việc
@@ -213,15 +217,24 @@ function normalizeChild(child) {
  * `view` is optional (documented backward-compat, mirrors discovery.mjs's
  * own optional-view idiom) — an old 3-arg caller still works exactly as
  * before, just without the gate ask/answer consulted in the prompt.
+ *
+ * `scoutContext` (tsk-g18, optional, additive): `{ repoRoot, docsRef }` —
+ * same shape and effect as `judgeDiscovery`'s own `scoutContext` (see that
+ * doc comment). Omitted (every pre-tsk-g18 caller, including every existing
+ * test) keeps this function byte-identical.
  */
-export function judgeDecompose(work, cfg, lockedContext, view) {
+export function judgeDecompose(work, cfg, lockedContext, view, scoutContext) {
   try {
     const tier = work?.tier ?? DEFAULTS.tier;
     const model = modelForTier(cfg, tier);
-    const prompt = buildDecomposePrompt(work, lockedContext, view);
+    const priorScoutNotes = scoutContext ? readScoutNotes(scoutContext.repoRoot, scoutContext.docsRef) : '';
+    const prompt = buildDecomposePrompt(work, lockedContext, view, priorScoutNotes);
     const stricterPrompt = prompt + JUDGE_STRICT_JSON_SUFFIX;
 
-    const verdict = runJudgeExecutor(cfg, model, prompt, stricterPrompt);
+    const scout = scoutContext
+      ? { repoRoot: scoutContext.repoRoot, docsRef: scoutContext.docsRef, capture: !priorScoutNotes }
+      : undefined;
+    const verdict = runJudgeExecutor(cfg, model, prompt, stricterPrompt, scout);
     if (!verdict || typeof verdict.verdict !== 'string') {
       return { kind: 'invalid' };
     }
@@ -377,7 +390,7 @@ export function resolveDecompose(dir, id, cfg, role) {
 
   const repoRoot = path.dirname(dir);
   const lockedContext = readLockedContext(repoRoot, work.docsRef);
-  const verdict = judgeDecompose(work, cfg, lockedContext, view);
+  const verdict = judgeDecompose(work, cfg, lockedContext, view, { repoRoot, docsRef: work.docsRef });
 
   if (verdict.kind === 'invalid') {
     logDecomposeVerdict(dir, id, 'invalid', DEFAULT_INVALID_RATIONALE);
