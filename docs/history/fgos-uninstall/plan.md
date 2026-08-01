@@ -1,7 +1,7 @@
 # tsk-4iv — `fgos uninstall` plan
 
 **Stage:** decompose (fgos-planning). **Date:** 2026-08-01. Builds on
-`docs/history/fgos-uninstall/CONTEXT.md` (D1-D3, approved).
+`docs/history/fgos-uninstall/CONTEXT.md` (D1-D4, approved).
 
 ## Mode
 
@@ -59,7 +59,7 @@ at `fgos-validating`, not carry a "weak evidence" caveat for that part.
 
 | Component | Risk | Proof point (for `fgos-validating`) |
 |---|---|---|
-| Shell-rc reversal | low | round-trip test: `fgos setup` inserts the source line, `fgos uninstall` removes it, a second `uninstall` run is a clean no-op |
+| Shell-rc report (D4, not a deletion) | low | test asserting `fgos uninstall` detects the fgOS source line via the existing `hasSourceLine`/`deadSourceLines` primitives and reports its rc file + path in its result, without modifying the rc file's bytes at all — matches `docs/history/shell-rc-dead-source-lines/CONTEXT.md` D1's existing report-only contract |
 | Git-hooks reversal (D2) | low-medium | round-trip test: unwires only when `core.hooksPath` is still exactly `.githooks`; a hooksPath the caller changed to something else is left untouched — mirrors `installGitHooks`'s existing fill-only test pattern |
 | Confirmation gate (D3) | medium | test asserting `fgos uninstall` (no flag) refuses to touch anything and exits without side effects; explicit opt-in actually runs |
 | Config preservation (pinned constraint) | medium | test asserting `.fgos/` data, `~/.fgos/config.json`, and project `config.json` are byte-identical before/after a full `fgos uninstall` run |
@@ -69,16 +69,17 @@ at `fgos-validating`, not carry a "weak evidence" caveat for that part.
 ### Files likely touched
 
 - `bin/fgos.mjs` — new `case 'uninstall'`
-- `src/setup/shell-rc.mjs` — new reversal function alongside existing
-  `insertSourceLine`
+- `src/setup/shell-rc.mjs` — no new deletion function (D4); reuses the
+  existing `hasSourceLine`/`deadSourceLines` primitives to detect and
+  report the fgOS source line, never edits the rc file
 - `src/setup/git-hooks.mjs` — new reversal function alongside existing
   `installGitHooks`/`mainCheckoutHookWired`
 - new module for package-manager detection + removal (piece 2 below)
 - `docs/specs/distribution.md` — new Uninstall entry in Behaviors &
   Operations + Data Dictionary, per the Install/setup/doctor gate in
   `AGENTS.md` (this change touches how fgOS is installed/removed)
-- `test/setup-uninstall-wiring.test.mjs` (new)
-- `test/uninstall-package-removal.test.mjs` (new)
+- `test/setup/uninstall-wiring.test.mjs` (new)
+- `test/setup/uninstall-package-removal.test.mjs` (new)
 
 ## Assumptions (implementation-only, not material to CONTEXT.md's scope)
 
@@ -102,8 +103,8 @@ tackled. Both carry `parent: tsk-4iv`.
 
 | id | title | verify |
 |---|---|---|
-| `tsk-4iv-1` | `fgos uninstall`: gỡ wiring của fgOS (shell-rc source line + core.hooksPath/.githooks fill-only, D2) sau xác nhận (D3), giữ nguyên `.fgos/` data + config | `node --test test/setup-uninstall-wiring.test.mjs` |
-| `tsk-4iv-2` | `fgos uninstall`: gỡ luôn package đã cài qua package manager phát hiện được (npm/pnpm/yarn, D1), tự xoá file cài đặt kể cả khi process đang chạy | `node --test test/uninstall-package-removal.test.mjs` |
+| `tsk-4iv-1` | `fgos uninstall`: gỡ wiring của fgOS — unwire core.hooksPath/.githooks (fill-only, D2), CHỈ report (không tự xoá) dòng shell-rc source line cho người tự xoá tay (D4) — sau xác nhận (D3), giữ nguyên `.fgos/` data + config | `node --test test/setup/uninstall-wiring.test.mjs` |
+| `tsk-4iv-2` | `fgos uninstall`: gỡ luôn package đã cài qua package manager phát hiện được (npm/pnpm/yarn, D1), tự xoá file cài đặt kể cả khi process đang chạy | `node --test test/setup/uninstall-package-removal.test.mjs` |
 
 `tsk-4iv-2` carries `deps: [tsk-4iv-1]` — it extends the same `uninstall`
 verb piece 1 builds (confirmation gate + wiring reversal scaffold), rather
