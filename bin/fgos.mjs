@@ -1767,6 +1767,24 @@ async function runVerb(verb, flags, positional, dir) {
         let check;
         try {
           gitAt(repoRoot, ['worktree', 'add', '--detach', tmpWorktree, branchHead]);
+          // tsk-5l2-1 bug find: tmpWorktree lives under os.tmpdir(), outside
+          // the repo tree — Node's ESM loader resolves a bare-specifier
+          // import (e.g. "yaml") by looking for a node_modules directory
+          // named exactly that, walking up from cwd; it never reaches
+          // repoRoot's real node_modules from a /tmp path, and (unlike
+          // CommonJS require) does NOT consult NODE_PATH at all (verified:
+          // an ESM import outside the repo tree fails identically whether
+          // NODE_PATH is set or not). Any verify command whose code imports
+          // a real npm dependency (not just repo-relative paths/builtins,
+          // e.g. scripts/project-agents.mjs's "yaml") fails here
+          // deterministically without this. A symlink named "node_modules"
+          // is what Node's resolution actually looks for, so it works where
+          // NODE_PATH cannot.
+          const nodeModulesLink = path.join(tmpWorktree, 'node_modules');
+          const realNodeModules = path.join(repoRoot, 'node_modules');
+          if (fs.existsSync(realNodeModules)) {
+            fs.symlinkSync(realNodeModules, nodeModulesLink, 'dir');
+          }
           check = await runGoalCheck(item, tmpWorktree, timeoutMs);
         } finally {
           try {
