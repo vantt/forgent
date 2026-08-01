@@ -27,6 +27,7 @@ Out of scope (explicitly deferred, see design doc §4.3, §6, §7):
 | D1 | `.fgos/agents/<name>.yaml`'s `tool-scope` field is **authoritative**: the projection script writes it straight into the generated `.claude/agents/<name>.md`'s `tools:` frontmatter, which is the real, harness-enforced tool restriction for Task-tool-dispatched subagents (domain 2). tsk-62v's `capacities.<id>.allowedTools` (design doc §9) stays a **separate, also-enforced** axis for domain-1 headless CLI dispatch (`--allowedTools` passed to a nested `claude -p`), keyed by `capacityId` rather than agent-type name. The two are not the same field named twice by accident — they gate different dispatch domains and never collide because they key differently. Neither is dropped, and neither is demoted to purely descriptive. |
 | D2 | tsk-slq authors exactly **one minimal, honestly-labeled proof-of-mechanism placeholder agent** — not tied to any real current dispatch need. Its only job is proving the `.fgos/agents/` → `.claude/agents/` projection pipeline is real and idempotent (byte-identical on a re-run over an unchanged source, per acceptance). The exact name/persona content of this placeholder is an implementer detail, deferred to `fgos-planning`. |
 | D3 (pre-existing, ported from design doc "Đã chốt" #7) | The exact field set inside `.fgos/agents/<name>.yaml` is not a clarify-stage question — it was already settled at submit time: build follows marketing-cockpit's `agent.schema.yaml` shape (see Scout evidence below) as the reference pattern, adapted to drop anything Claude-Code-specific. `fgos-planning` picks the concrete field list from that pattern; this item does not re-litigate it. |
+| D4 (added mid-`decompose`, surfaced by `fgos-validating`'s reality gate) | `.fgos/agents/<name>.yaml` keeps the `.yaml` extension and format as originally named in scope. This requires a real YAML parsing library — the user explicitly chose to take this on as forgent's **first-ever npm dependency**, a deliberate break from the repo's zero-dependency convention (`package.json` has no `dependencies`/`devDependencies` field today, confirmed by reading it), rather than hand-rolling a scoped parser or switching the format to JSON. Rejected alternatives: (a) hand-rolled minimal YAML parser — real parsing code with real correctness risk for no clear benefit once a dependency is on the table; (b) switching to `.json` to match every other fgOS config file — would have silently overridden the extension named in the original submit text, which is exactly the kind of user-decision reversal that needs asking, not assuming. |
 
 ## Pinned terms
 
@@ -90,6 +91,12 @@ Out of scope (explicitly deferred, see design doc §4.3, §6, §7):
   `model:`) — confirms marketing-cockpit's own adapter projection does not
   wire tool-scope into Claude Code's real enforcement mechanism today,
   which is exactly the gap D1 closes for forgent's version.
+- `package.json` (repo root): no `dependencies` or `devDependencies` field at
+  all — confirmed by reading it directly. No `node:yaml` built-in exists
+  either (checked against the running Node v24.18.0). This repo is
+  deliberately zero-dependency today (matches `AGENTS.md`'s note that the
+  `distill` skill is "Node zero-dep"); D4 is the point where this item
+  knowingly breaks that convention, by explicit user choice, not by drift.
 - `CLAUDE.md`'s impact-analysis capability gate: queried
   `fgos tool query --capability impact-analysis --status present` →
   GitNexus registered and `present`. Posture: **full** — the MUST rules in
