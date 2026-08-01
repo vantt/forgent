@@ -35,6 +35,7 @@ import { listWork } from '../state/store.mjs';
 import { readLocalStatus, classifyRegistryPosture } from '../state/tool-registry.mjs';
 import { describeConfigAwareness } from '../config/global-config.mjs';
 import { sharedConfigFilePath, legacyRunnerConfigPath, readSharedConfig, writeSharedConfig } from '../config/shared-config-file.mjs';
+import { DEFAULT_LEVEL, LEVELS } from '../state/gate-bypass.mjs';
 
 export { mainCheckoutHookWired } from './git-hooks.mjs';
 
@@ -454,4 +455,62 @@ registerCheck({
   id: 'dependencies-installed',
   description: 'package.json dependencies are present in node_modules (tsk-slq D6)',
   check: (cwd) => checkDependenciesInstalled(cwd),
+});
+
+// gate-bypass.json's real registry entry (docs/history/doctor-fix-gate-bypass/
+// CONTEXT.md D1/D3, tsk-2qz-2) -- the registry's first consumer to register
+// all three independent capabilities (check + configDefault + fix), per
+// tsk-2cs's own D5 ("gate-bypass is the registry's first real consumer").
+// `checkConfigNotStale` above already detects a MISSING `gateBypass` key
+// generically via `assembleRegistryDefaults()` once the configDefault below
+// is registered; this dedicated check adds the one thing that generic
+// staleness check cannot: whether a PRESENT `level` value is actually one of
+// `LEVELS`, since a malformed-but-present value is never "missing" from
+// `mergeConfigDefaults`' point of view.
+function checkGateBypassConfigured(cwd) {
+  const shared = readSharedConfig(cwd);
+  const level = shared?.gateBypass?.level;
+  if (typeof level !== 'string' || !LEVELS.includes(level)) {
+    return {
+      passed: false,
+      message: `gateBypass.level missing or not a recognized level (${LEVELS.join('/')}) -- run fgos doctor --fix`,
+    };
+  }
+  return { passed: true, message: `gateBypass.level = "${level}"` };
+}
+
+// Idempotent (D3 of the parent CONTEXT.md's pinned "fix" term): a
+// already-valid level is left untouched and reported unchanged, mirroring
+// `ensureSharedConfigDefaults`'s own "only write when something was actually
+// added" discipline.
+function fixGateBypassConfigured(cwd) {
+  const shared = readSharedConfig(cwd);
+  const currentLevel = shared?.gateBypass?.level;
+  if (typeof currentLevel === 'string' && LEVELS.includes(currentLevel)) {
+    return { changed: false, message: `gateBypass.level already "${currentLevel}"` };
+  }
+  const existingGateBypass =
+    shared.gateBypass && typeof shared.gateBypass === 'object' && !Array.isArray(shared.gateBypass)
+      ? shared.gateBypass
+      : {};
+  const merged = { ...shared, gateBypass: { ...existingGateBypass, level: DEFAULT_LEVEL } };
+  writeSharedConfig(cwd, merged);
+  return { changed: true, message: `wrote gateBypass.level = "${DEFAULT_LEVEL}" to ${sharedConfigFilePath(cwd)}` };
+}
+
+registerConfigDefault({
+  id: 'gateBypass',
+  key: 'gateBypass',
+  shape: { level: DEFAULT_LEVEL },
+});
+
+registerCheck({
+  id: 'gate-bypass-configured',
+  description: 'gateBypass.level in the shared config file is present and a recognized level',
+  check: (cwd) => checkGateBypassConfigured(cwd),
+});
+
+registerFix({
+  id: 'gate-bypass-configured',
+  fix: (cwd) => fixGateBypassConfigured(cwd),
 });
