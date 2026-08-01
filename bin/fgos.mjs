@@ -2766,8 +2766,20 @@ async function runVerb(verb, flags, positional, dir) {
     // Never touches `.fgos/` data or `.fgos/config.json` (pinned constraint,
     // CONTEXT.md) — structurally true: this case never imports or calls any
     // config-writing function (`ensureSharedConfigDefaults`/`writeSharedConfig`).
-    // Package removal (D1) is out of scope here — that's tsk-4iv-2's own
-    // spike, layered onto this same verb later.
+    //
+    // Package removal (D1, tsk-4iv-2 SPIKE): opt-in via `--remove-package`,
+    // additive on top of tsk-4iv-1's already-shipped, already-documented
+    // default behavior (`--yes` alone stays wiring-only, byte-identical to
+    // before this flag existed — preserves that contract rather than
+    // silently widening it). Scoped narrowly per the spike's own locked
+    // scope: npm global installs only, Linux/macOS only — shells out to
+    // `npm uninstall -g forgent`, the officially-supported removal path,
+    // rather than hand-rolling file deletion. Runs LAST, after the
+    // confirmation gate and wiring reversal above, since removing the
+    // package first would strand the process mid-run before it could
+    // finish undoing its own wiring (plan.md's own ordering rationale).
+    // Never throws on failure — a failed removal is exactly the outcome
+    // this spike exists to measure, not a bug to crash on.
     case 'uninstall': {
       if (!flags.yes) {
         throw new StoreError(
@@ -2783,8 +2795,23 @@ async function runVerb(verb, flags, positional, dir) {
           .filter((rcFile) => hasSourceLine(rcFile, scriptPath))
           .map((rcFile) => ({ rcFile, sourceLine: `source "${scriptPath}"` }));
       const { unwired: hooksUnwired, skippedExisting: hooksSkippedExisting } = uninstallGitHooks(repoRoot);
+      let packageRemoval = { attempted: false, outcome: null };
+      if (flags['remove-package']) {
+        try {
+          const output = execFileSync('npm', ['uninstall', '-g', 'forgent'], { encoding: 'utf8' });
+          packageRemoval = { attempted: true, outcome: 'removed', output };
+        } catch (err) {
+          packageRemoval = {
+            attempted: true,
+            outcome: 'failed',
+            error: err.message,
+            stderr: typeof err.stderr === 'string' ? err.stderr : (err.stderr?.toString() ?? null),
+          };
+        }
+      }
       return {
         shellRcSourceLinesFound,
+        packageRemoval,
         shellRcRemovalInstructions: shellRcSourceLinesFound.length > 0
           ? 'fgOS never edits your shell profile — remove the line(s) above by hand.'
           : null,
