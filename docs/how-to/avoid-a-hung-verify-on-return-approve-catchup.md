@@ -22,10 +22,13 @@ specifically need one of them to run an unbounded `verify` on purpose.
 ## The default behavior (as of this change)
 
 Omitting `--timeout` entirely no longer means unbounded. It now falls back
-to `.fgos-runner.json`'s own `timeoutMs` — the same value and the same
-`runGoalCheck` call the runner loop itself already uses. If your repo's
-`.fgos-runner.json` doesn't set one yet, `ensureRunnerConfig` bootstraps the
-default (`900000`, 15 minutes) the first time any of these verbs runs.
+to the runner config's own `timeoutMs` — the same value and the same
+`runGoalCheck` call the runner loop itself already uses. That config lives
+at `.fgos/config.json`'s `runner` section (tsk-5vf; the legacy
+`.fgos-runner.json` still works as a fallback for a repo that hasn't run
+`fgos setup` since the move). If neither sets one yet,
+`ensureRunnerConfigForDir` bootstraps the default (`900000`, 15 minutes)
+the first time any of these verbs runs.
 
 ```
 fgos return <id>

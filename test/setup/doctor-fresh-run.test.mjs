@@ -98,6 +98,21 @@ test('e2e: fresh external project reaches expected fgos doctor state after init 
     const shellCheck = byId.get('shell-integration-sourced');
     assert.ok(shellCheck, 'doctor did not report a "shell-integration-sourced" check');
     assert.equal(typeof shellCheck.passed, 'boolean', 'shell-integration-sourced must report a real boolean, not crash or omit passed');
+
+    // --fix (docs/history/doctor-fix-gate-bypass/CONTEXT.md D2, tsk-2qz-1):
+    // real e2e proof that --fix is additive, never a behavior change to the
+    // default (no-flag) path above -- same checks array shape, plus a
+    // `fixed` array (empty here: no fix is registered yet at this point in
+    // the split, that's tsk-2qz-2's own job).
+    const doctorFix = run(['doctor', '--fix']);
+    assert.equal(doctorFix.status, 0, `fgos doctor --fix failed: ${doctorFix.stderr}`);
+    const doctorFixData = JSON.parse(doctorFix.stdout).data;
+    assert.ok(Array.isArray(doctorFixData.fixed), 'doctor --fix did not report a "fixed" array');
+    assert.deepEqual(
+      doctorFixData.checks.map((c) => c.id),
+      checks.map((c) => c.id),
+      'doctor --fix must report the same check set as doctor without --fix',
+    );
   } finally {
     fs.rmSync(packDir, { recursive: true, force: true });
     fs.rmSync(installPrefix, { recursive: true, force: true });

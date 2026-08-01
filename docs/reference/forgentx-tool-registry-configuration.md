@@ -99,7 +99,8 @@ registered tool is `present`; existing MUST behavior stays unchanged.)
 
 ## Registering a capacity for capacity-aware dispatch (tsk-62v)
 
-> `.fgos-runner.json`'s optional `capacities.<capacityId>` block (D1) can
+> The runner config's optional `capacities.<capacityId>` block (D1, in
+> `.fgos/config.json`'s `runner` section, fallback `.fgos-runner.json`) can
 > declare `"kind": "cli"` for a capacity dispatched through `dispatch.mjs`'s
 > `resolveExecutorConfig`. When it does, presence is checked by consulting
 > this SAME registry (`fgos tool query`'s own functions, called
@@ -121,7 +122,7 @@ registered tool is `present`; existing MUST behavior stays unchanged.)
 > chạy (hoặc trả `missing`) cũng từ chối — chỉ `status: present` mới cho
 > qua.
 
-(A `.fgos-runner.json` `capacities.<capacityId>` entry declaring `"kind":
+(A `capacities.<capacityId>` entry declaring `"kind":
 "cli"` (D1) has its presence checked by consulting this same registry —
 `fgos tool query`'s own functions, called in-process — instead of
 re-probing PATH independently, reusing the discovery layer above rather

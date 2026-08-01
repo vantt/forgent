@@ -219,6 +219,14 @@
     "quadrant": "explanation",
     "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
     "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/auto-decompose-can-drop-a-locked-decision-from-every-childs-footprint.md",
+    "title": "Auto-decompose can drop a locked decision from every child's footprint",
+    "sourceCaptureId": "tsk-2ta-4"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/explanation/cli-invocation-fault-provenance.md",
     "title": "Why malformed CLI invocations now leave a provenance trace",
     "sourceCaptureId": "tsk-5z0"
@@ -283,6 +291,14 @@
     "quadrant": "explanation",
     "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
     "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/fgos-return-executes-verify-as-a-literal-shell-command.md",
+    "title": "Explanation: `fgos return` runs `verify` as a literal shell command — a placeholder string is not special-cased",
+    "sourceCaptureId": "tsk-iun"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/explanation/gate-bypass-design.md",
     "title": "Why gate-bypass is shaped the way it is",
     "sourceCaptureId": "tsk-6bx"
@@ -294,6 +310,14 @@
     "docPath": "docs/explanation/gate-checkpoint-vs-answer-separation.md",
     "title": "Why a gate dialogue keeps the agent's checkpoint separate from the human's answer",
     "sourceCaptureId": "tsk-19zm"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/global-config-merge-reuses-fill-missing-only-primitive.md",
+    "title": "Global config merge reuses the existing fill-missing-only primitive",
+    "sourceCaptureId": "tsk-2ta-1"
   },
   {
     "quadrant": "explanation",
@@ -459,6 +483,22 @@
     "quadrant": "explanation",
     "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
     "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/shell-fallback-detection-needs-type-p-not-command-v.md",
+    "title": "Shell fallback detection needs `type -P`, not `command -v`",
+    "sourceCaptureId": "tsk-2ta-3"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/spec-docs-drift-silently-when-only-code-has-an-exact-match-test.md",
+    "title": "Spec docs drift silently when only the code has an exact-match test",
+    "sourceCaptureId": "tsk-2ta-2"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/explanation/title-semantic-contract-lives-in-submitting-skills.md",
     "title": "Why a work item title's \"object + action + scope\" rule lives in the submitting skills, not just the decompose prompt",
     "sourceCaptureId": "tsk-52g-2"
@@ -515,6 +555,14 @@
     "quadrant": "explanation",
     "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
     "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/windows-npm-global-install-has-no-lib-or-bin-subfolder.md",
+    "title": "Windows `npm install -g --prefix` has no `lib` or `bin` subfolder",
+    "sourceCaptureId": "tsk-49r"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/explanation/wontfix-terminal-status-filter-consistency.md",
     "title": "Why `wontfix` had to join `done` at every \"is this resolved?\" check site",
     "sourceCaptureId": "tsk-37u"
@@ -550,6 +598,14 @@
     "docPath": "docs/how-to/add-a-new-createworktree-call-site.md",
     "title": "How to add a new `createWorktree` call site without hand-writing cleanup",
     "sourceCaptureId": "choke-point-createworktree-callsite-wrapper"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/add-a-new-npm-dependency-to-forgent.md",
+    "title": "Add a new npm dependency to forgent",
+    "sourceCaptureId": "tsk-slq"
   },
   {
     "quadrant": "how-to",
@@ -627,6 +683,14 @@
     "quadrant": "how-to",
     "purpose": "Show the steps to accomplish one specific, already-understood goal.",
     "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/close-out-a-decomposed-root-item-after-all-children-are-done.md",
+    "title": "Close out a decomposed root item after all its children are done",
+    "sourceCaptureId": "tsk-2ta"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
     "docPath": "docs/how-to/close-out-a-work-item-already-done-before-claim.md",
     "title": "How to close out a work item whose real work was already done before this claim",
     "sourceCaptureId": "tsk-4on"
@@ -670,6 +734,14 @@
     "docPath": "docs/how-to/find-every-caller-before-requiring-a-cli-flag.md",
     "title": "How to find every caller before making a CLI flag required",
     "sourceCaptureId": "tsk-63c"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/fix-a-pre-existing-item-that-keeps-re-asking-an-already-answered-clarify-question.md",
+    "title": "Fix a pre-existing item that keeps re-asking an already-answered clarify question",
+    "sourceCaptureId": "tsk-2cs"
   },
   {
     "quadrant": "how-to",
@@ -742,6 +814,14 @@
     "docPath": "docs/how-to/poll-fgos-cli-data-from-a-rust-plugin.md",
     "title": "Poll fgOS CLI data from a Rust plugin",
     "sourceCaptureId": "tsk-19y-2"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md",
+    "title": "Produce failing-test-first proof for an Iron Law-gated diff",
+    "sourceCaptureId": "tsk-62v"
   },
   {
     "quadrant": "how-to",

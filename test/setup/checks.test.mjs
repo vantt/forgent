@@ -11,8 +11,9 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync, spawnSync } from 'node:child_process';
 
-import { DOCTOR_CHECKS, integrationScriptPath, mainCheckoutHookWired, resolveMainCheckout } from '../../src/setup/checks.mjs';
+import { DOCTOR_CHECKS, FIX_REGISTRATIONS, integrationScriptPath, mainCheckoutHookWired, resolveMainCheckout } from '../../src/setup/checks.mjs';
 import { DEFAULT_RUNNER_CONFIG } from '../../src/runner/dispatch.mjs';
+import { DEFAULT_LEVEL } from '../../src/state/gate-bypass.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FGOS = path.resolve(__dirname, '../../bin/fgos.mjs');
@@ -27,12 +28,18 @@ function checkById(id) {
   return entry;
 }
 
+function fixById(id) {
+  const entry = FIX_REGISTRATIONS.find((f) => f.id === id);
+  assert.ok(entry, `FIX_REGISTRATIONS is missing "${id}"`);
+  return entry;
+}
+
 // ─── Unit tests: DOCTOR_CHECKS ─────────────────────────────────────────────
 
-test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-checkout-hook-wired, tool-registry-configured, config-awareness, and dependencies-installed', () => {
+test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-checkout-hook-wired, tool-registry-configured, config-awareness, dependencies-installed, and gate-bypass-configured', () => {
   assert.deepEqual(
     DOCTOR_CHECKS.map((c) => c.id).sort(),
-    ['config-not-stale', 'main-checkout-hook-wired', 'node-version-and-git', 'shell-integration-sourced', 'tool-registry-configured', 'config-awareness', 'dependencies-installed'].sort(),
+    ['config-not-stale', 'main-checkout-hook-wired', 'node-version-and-git', 'shell-integration-sourced', 'tool-registry-configured', 'config-awareness', 'dependencies-installed', 'gate-bypass-configured'].sort(),
   );
 });
 
@@ -129,10 +136,27 @@ test('config-not-stale reports failed/not-configured, without creating .fgos-run
 });
 
 test('config-not-stale passes when the existing config already has every default key', () => {
+  // Written as the SHARED file directly, not the legacy .fgos-runner.json:
+  // a legacy file structurally can never carry a `gateBypass` key (D1/D3,
+  // tsk-2qz-2), so it can no longer satisfy "every default key" once
+  // gateBypass is a registered default alongside runner.
   const cwd = mkTemp('doctor-config-full-');
-  fs.writeFileSync(path.join(cwd, '.fgos-runner.json'), JSON.stringify(DEFAULT_RUNNER_CONFIG));
+  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+  fs.writeFileSync(
+    path.join(cwd, '.fgos', 'config.json'),
+    JSON.stringify({ runner: DEFAULT_RUNNER_CONFIG, gateBypass: { level: 'off' } }),
+  );
   const { passed } = checkById('config-not-stale').check(cwd);
   assert.equal(passed, true);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+test('config-not-stale fails when the legacy-only .fgos-runner.json is complete but the shared file has no gateBypass key', () => {
+  const cwd = mkTemp('doctor-config-legacy-only-');
+  fs.writeFileSync(path.join(cwd, '.fgos-runner.json'), JSON.stringify(DEFAULT_RUNNER_CONFIG));
+  const { passed, message } = checkById('config-not-stale').check(cwd);
+  assert.equal(passed, false);
+  assert.match(message, /gateBypass/);
   fs.rmSync(cwd, { recursive: true, force: true });
 });
 
@@ -142,6 +166,92 @@ test('config-not-stale fails when the existing config is missing a default key',
   const { passed, message } = checkById('config-not-stale').check(cwd);
   assert.equal(passed, false);
   assert.match(message, /stale config/);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+// ─── gate-bypass-configured (docs/history/doctor-fix-gate-bypass/CONTEXT.md
+// D1/D3, tsk-2qz-2): the registry's first entry to register all three
+// capabilities (check + configDefault + fix). check/fix here are both
+// keyed to "is config.gateBypass.level present and a recognized LEVEL",
+// deliberately distinct from config-not-stale's generic "key present at
+// all" scan above (a malformed-but-present level is never "missing").
+
+test('gate-bypass-configured check fails when the shared file has no gateBypass key at all', () => {
+  const cwd = mkTemp('doctor-gatebypass-absent-');
+  const { passed, message } = checkById('gate-bypass-configured').check(cwd);
+  assert.equal(passed, false);
+  assert.match(message, /missing or not a recognized level/);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+test('gate-bypass-configured check fails when gateBypass.level is present but not a recognized level', () => {
+  const cwd = mkTemp('doctor-gatebypass-bad-');
+  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ gateBypass: { level: 'total' } }));
+  const { passed, message } = checkById('gate-bypass-configured').check(cwd);
+  assert.equal(passed, false);
+  assert.match(message, /missing or not a recognized level/);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+test('gate-bypass-configured check passes when gateBypass.level is a recognized level', () => {
+  const cwd = mkTemp('doctor-gatebypass-ok-');
+  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ gateBypass: { level: 'standard' } }));
+  const { passed, message } = checkById('gate-bypass-configured').check(cwd);
+  assert.equal(passed, true);
+  assert.match(message, /"standard"/);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+test('gate-bypass-configured fix writes a default level when the shared file has no gateBypass key, preserving other keys', () => {
+  const cwd = mkTemp('doctor-gatebypass-fix-absent-');
+  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ runner: { timeoutMs: 5000 } }));
+  const { changed, message } = fixById('gate-bypass-configured').fix(cwd);
+  assert.equal(changed, true);
+  assert.match(message, new RegExp(`"${DEFAULT_LEVEL}"`));
+  const written = JSON.parse(fs.readFileSync(path.join(cwd, '.fgos', 'config.json'), 'utf8'));
+  assert.deepEqual(written.gateBypass, { level: DEFAULT_LEVEL });
+  assert.deepEqual(written.runner, { timeoutMs: 5000 });
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+test('gate-bypass-configured fix repairs a malformed level back to the default', () => {
+  const cwd = mkTemp('doctor-gatebypass-fix-bad-');
+  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ gateBypass: { level: 'total' } }));
+  const { changed } = fixById('gate-bypass-configured').fix(cwd);
+  assert.equal(changed, true);
+  const written = JSON.parse(fs.readFileSync(path.join(cwd, '.fgos', 'config.json'), 'utf8'));
+  assert.equal(written.gateBypass.level, DEFAULT_LEVEL);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+test('gate-bypass-configured fix is idempotent: reports unchanged and never rewrites when level is already valid', () => {
+  const cwd = mkTemp('doctor-gatebypass-fix-noop-');
+  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+  const sharedPath = path.join(cwd, '.fgos', 'config.json');
+  fs.writeFileSync(sharedPath, JSON.stringify({ gateBypass: { level: 'heavy' } }));
+  const before = fs.statSync(sharedPath).mtimeMs;
+  const { changed, message } = fixById('gate-bypass-configured').fix(cwd);
+  assert.equal(changed, false);
+  assert.match(message, /already "heavy"/);
+  assert.equal(fs.statSync(sharedPath).mtimeMs, before);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+test('fgos doctor --fix (CLI e2e) actually bootstraps gateBypass.level via the real fix', () => {
+  const cwd = mkTemp('doctor-cli-fix-gatebypass-');
+  execFileSync('git', ['init', '-q'], { cwd, encoding: 'utf8' });
+  const result = spawnSync(process.execPath, [FGOS, 'doctor', '--fix'], { cwd, encoding: 'utf8' });
+  assert.equal(result.status, 0, `fgos doctor --fix failed: ${result.stderr}`);
+  const { data } = JSON.parse(result.stdout);
+  const fixedEntry = data.fixed.find((f) => f.id === 'gate-bypass-configured');
+  assert.ok(fixedEntry, 'doctor --fix did not report the gate-bypass-configured fix');
+  assert.equal(fixedEntry.changed, true);
+  const written = JSON.parse(fs.readFileSync(path.join(cwd, '.fgos', 'config.json'), 'utf8'));
+  assert.equal(written.gateBypass.level, DEFAULT_LEVEL);
   fs.rmSync(cwd, { recursive: true, force: true });
 });
 
@@ -360,19 +470,19 @@ test('fgos setup --pretty prints colored ANSI text describing what it did, not J
   assert.equal(result.status, 0, result.stderr);
   assert.ok(result.stdout.includes('\x1b['), 'expected ANSI escape codes in --pretty output');
   assert.throws(() => JSON.parse(result.stdout), 'expected --pretty output to NOT be valid JSON');
-  assert.ok(result.stdout.includes('.fgos-runner.json'), 'expected --pretty output to describe the config file it touched');
+  assert.ok(result.stdout.includes('.fgos/config.json'), 'expected --pretty output to describe the config file it touched');
   fs.rmSync(cwd, { recursive: true, force: true });
   fs.rmSync(homeDir, { recursive: true, force: true });
 });
 
-test('fgos doctor against a fresh cwd with no .fgos-runner.json never creates that file (read-only proof)', () => {
+test('fgos doctor against a fresh cwd with no runner config never creates the shared config file (read-only proof)', () => {
   const cwd = mkTemp('doctor-cli-readonly-');
   const homeDir = mkTemp('doctor-cli-readonly-home-');
-  const configPath = path.join(cwd, '.fgos-runner.json');
+  const configPath = path.join(cwd, '.fgos', 'config.json');
   assert.equal(fs.existsSync(configPath), false);
   const result = spawnSync(process.execPath, [FGOS, 'doctor'], { cwd, encoding: 'utf8', env: { ...process.env, HOME: homeDir } });
   assert.equal(result.status, 0, result.stderr);
-  assert.equal(fs.existsSync(configPath), false, 'fgos doctor must never create .fgos-runner.json');
+  assert.equal(fs.existsSync(configPath), false, 'fgos doctor must never create .fgos/config.json');
   const envelope = JSON.parse(result.stdout);
   const configCheck = envelope.data.checks.find((c) => c.id === 'config-not-stale');
   assert.equal(configCheck.passed, false);
@@ -519,7 +629,7 @@ test('setup from a copy of fgos that is not in a git checkout declines the rc wr
   // The whole point: nothing was appended to the profile.
   assert.equal(fs.readFileSync(rcFile, 'utf8'), 'echo hi\n');
   // Setup's other work still happened.
-  assert.equal(fs.existsSync(path.join(copyRoot, '.fgos-runner.json')), true);
+  assert.equal(fs.existsSync(path.join(copyRoot, '.fgos', 'config.json')), true);
 
   fs.rmSync(copyRoot, { recursive: true, force: true });
   fs.rmSync(homeDir, { recursive: true, force: true });

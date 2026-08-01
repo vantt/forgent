@@ -833,16 +833,17 @@ export const COMMAND_REGISTRY = [
   {
     name: 'doctor',
     invoke: 'fgos doctor',
-    description: 'Read-only diagnostic: Node/git availability, whether the shell-integration source line is present in detected rc file(s), and whether .fgos-runner.json exists and is not stale relative to the current default schema.',
+    description: 'Diagnostic by default (Node/git availability, whether the shell-integration source line is present in detected rc file(s), and whether the shared config file is not stale relative to every registered default). --fix runs every registered fix (docs/history/doctor-fix-gate-bypass/CONTEXT.md D2/D3) before re-reporting checks -- a deliberate reversal of RUL9/RUL11 (docs/specs/distribution.md); without --fix, behavior is unchanged and writes nothing.',
     parameters: {
       type: 'object',
       properties: {
         pretty: { type: 'boolean', description: 'Render colored human-readable text instead of the JSON envelope.' },
+        fix: { type: 'boolean', description: 'Run every registered fix against the current cwd before reporting checks. Omit to keep doctor read-only (default, unchanged behavior).' },
       },
       required: [],
     },
-    examples: ['fgos doctor', 'fgos doctor --pretty'],
-    touchesState: false,
+    examples: ['fgos doctor', 'fgos doctor --pretty', 'fgos doctor --fix'],
+    touchesState: true,
     requiresExistingStore: false,
     externalEffect: false,
     paginated: false,

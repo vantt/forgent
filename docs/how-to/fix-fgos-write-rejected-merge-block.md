@@ -3,7 +3,7 @@ type: how-to
 title: How to fix a `fgos-write-rejected` merge block on a `.fgos/` change
 tags: []
 timestamp: 2026-07-30T00:00:00.000Z
-source_capture_ids: [tsk-n4i-1]
+source_capture_ids: [tsk-n4i-1, tsk-5vf]
 ---
 # How to fix a `fgos-write-rejected` merge block on a `.fgos/` change
 
@@ -135,6 +135,54 @@ The second merge attempt succeeded at the git level (`Merge branch
 'fgw/tsk-n4i-1' into fgw/tsk-n4i` landed cleanly) with no further
 `fgos-write-rejected` block.
 
+## Example: `tsk-5vf` — the block stacks with a second, unrelated one
+
+`tsk-5vf` hit this same block for a different reason than `tsk-n4i-1`: not a
+live `events.jsonl` repair, but the item's *own new feature* — moving
+project config from `.fgos-runner.json` into a new `.fgos/config.json` —
+committing the freshly-created file straight onto the branch that also
+carries the feature's code:
+
+> `"errorClass":"fgos-write-blocked","layer":"state","detail":"fgw/tsk-5vf staged a change under .fgos/ (.fgos/config.json); merge aborted, main unchanged — ADR0020"`
+> — real `work.friction` capture, id `tsk-5vf`
+
+Same fix as above — `git rm --cached .fgos/config.json` (kept the physical
+file on disk, untracked, for local re-verification) then a follow-up commit
+removing it from the branch's tracked tree entirely:
+
+> `git show --stat` of the offending commit: `.fgos/config.json | 42 ++++++++++` (new file, 42 insertions) alongside 14 legitimate source/test/doc files
+> `git show --stat` of the fix commit right after: `.fgos/config.json | 42 -` (only the file's removal, nothing else touched)
+> — real `git show` output, commits `26b5403` → `b59595c`, branch `fgw/tsk-5vf`
+
+The general lesson step 3's "belongs on main as an operator action, never
+bundled into the PR diff" already states, sharpened by this case: it
+applies just as much to a file a feature is *introducing for the first
+time* as it does to a repair of an existing `.fgos/` file — the ADR0020
+wall does not distinguish "new" from "repaired," only "under `.fgos/`."
+
+This item's `verify` also needed narrowing per step 5, but for a related,
+independent reason worth naming separately: it checked `test -f
+.fgos/config.json`, which cannot pass in `fgos return`'s disposable
+detached worktree once the file is no longer committed (same reasoning as
+step 5, applied to a file the branch creates rather than one it repairs):
+
+> before: `"verify":"npm test -- test/runner/dispatch.test.mjs && grep -r 'mergeWithGlobalConfig' src/runner/dispatch.mjs && test -f .fgos/config.json && git show main:.fgos-runner.json >/dev/null 2>&1 && echo 'Migration path exists'"`
+> after: `"verify":"npm install && npm test -- test/runner/dispatch.test.mjs && grep -r 'mergeWithGlobalConfig' src/runner/dispatch.mjs && node bin/fgos.mjs setup >/dev/null && test -f .fgos/config.json && git show main:.fgos-runner.json >/dev/null 2>&1 && echo 'Migration path exists'"`
+> — real `work.edit` capture, id `tsk-5vf`
+
+The fix here differs from a bare `npm test`: instead of dropping the
+file-existence check, the verify command now *creates* the file live via
+`node bin/fgos.mjs setup` before checking for it — proving the same
+migration mechanism the item ships, without requiring the file to be a
+committed branch artifact. The `npm install` prefix is this item's own
+second, unrelated block stacking on the first: `tsk-5vf`'s branch merged in
+concurrent work (`tsk-slq`) that added forgent's first-ever npm dependency
+(`yaml`) after this item's branch had already forked — see
+`docs/how-to/add-a-new-npm-dependency-to-forgent.md` step 2 for that half
+of the fix in full. Two independently-caused blocks on the same item is not
+a special case this recipe needs new steps for — each is fixed by its own
+already-documented recipe, applied in turn.
+
 ## Related
 
 - `fgos check <id>` — shows the `fgos-write-blocked` friction entry quoted
@@ -167,6 +215,28 @@ renumbering the live event log's corrupted `seq` values:
 
 > "Renumber corrupted seq in live .fgos/events.jsonl + fix stale seq citations (tsk-n4i piece A)"
 > — real work item title, id `tsk-n4i-1`
+
+A second capture, gathered the same way (`fgos doc-sources
+docs/how-to/fix-fgos-write-rejected-merge-block.md`), links `tsk-5vf` to
+this same doc path:
+
+> ```json
+> {
+>   "id": "tsk-5vf",
+>   "predicted": {"tier":"light","deps":0,"priorVisits":1,"role":"session","branchHeadAtTake":"3a7dc889d76eed5c5b8f52eaa33e9499025eb428"},
+>   "actual": {"outcome":"awaiting-approval","passed":true,"attempts":1,"errorClass":null,"aheadCount":24},
+>   "docType": "how-to",
+>   "docPath": "docs/how-to/fix-fgos-write-rejected-merge-block.md"
+> }
+> ```
+> — real `work.outcome` capture, id `tsk-5vf`
+
+That capture's own work item is the task that introduced `.fgos/config.json`
+as a brand-new file and, at first, committed it to the feature branch that
+also carried the code creating it:
+
+> "Di dời .fgos-runner.json (project-level config) vào .fgos/config.json — hoàn thành phần D1-amended"
+> — real work item title, id `tsk-5vf`
 
 If a later item hits this same block, the export skill accumulates its
 capture here too, additively, without losing this section or anything

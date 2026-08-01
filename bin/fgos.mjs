@@ -21,7 +21,7 @@ import { probeTool, readLocalStatus, writeLocalStatus, resolvedStatus, normalize
 import { repairTruncatedLastLine } from '../src/state/events.mjs';
 import { deriveTitle, classify, generateId } from '../src/intake/classify.mjs';
 import { wrapEnvelope } from '../src/state/envelope.mjs';
-import { loadRunnerConfig, ensureRunnerConfig, DEFAULT_RUNNER_CONFIG } from '../src/runner/dispatch.mjs';
+import { loadRunnerConfig, ensureRunnerConfigForDir } from '../src/runner/dispatch.mjs';
 import { readGateBypassLevel } from '../src/state/gate-bypass.mjs';
 import { resolveFgosDir, fgosDirFromRoot } from '../src/runner/paths.mjs';
 import { resolveDiscovery } from '../src/intake/discovery.mjs';
@@ -62,10 +62,10 @@ import { writeCoexistenceManifest } from '../src/install/coexist.mjs';
 import { MANIFEST_SCHEMA_VERSION, COMMAND_REGISTRY } from '../src/cli/command-registry.mjs';
 import { recordInvocationFault } from '../src/cli/invocation-fault-log.mjs';
 import { computeAwaitingContext } from '../src/state/awaiting-context.mjs';
-import { DOCTOR_CHECKS, integrationScriptPath } from '../src/setup/checks.mjs';
+import { DOCTOR_CHECKS, integrationScriptPath, ensureSharedConfigDefaults, runFixes } from '../src/setup/checks.mjs';
+import { sharedConfigFilePath } from '../src/config/shared-config-file.mjs';
 import { installGitHooks } from '../src/setup/git-hooks.mjs';
 import { detectRcFiles, insertSourceLine } from '../src/setup/shell-rc.mjs';
-import { mergeConfigDefaults } from '../src/setup/config-merge.mjs';
 import { formatCheck, bold } from '../src/setup/ansi.mjs';
 
 // D5: `verify` is a required non-empty field on every work item, but a
@@ -241,7 +241,7 @@ function resolveVerifyTimeoutMs(verb, flags, repoRoot) {
     }
     return timeoutMs;
   }
-  return ensureRunnerConfig(path.join(repoRoot, '.fgos-runner.json')).timeoutMs;
+  return ensureRunnerConfigForDir(repoRoot).timeoutMs;
 }
 
 // Minimal argv parser: `--flag value` or bare `--flag` (boolean), plus
@@ -886,10 +886,10 @@ async function runVerb(verb, flags, positional, dir) {
       }
       // An explicit --config path stays a loud, unmodified failure on ENOENT
       // (loadRunnerConfig); only the default, unflagged path bootstraps a
-      // missing config (D1/D3, ensureRunnerConfig).
+      // missing config (D1/D3, ensureRunnerConfigForDir — tsk-5vf D1/D2).
       const cfg = flags.config
         ? loadRunnerConfig(flags.config)
-        : ensureRunnerConfig(path.join(process.cwd(), '.fgos-runner.json'));
+        : ensureRunnerConfigForDir(process.cwd());
       return resolveDiscovery(dir, id, cfg, 'session');
     }
 
@@ -909,7 +909,7 @@ async function runVerb(verb, flags, positional, dir) {
       }
       const cfg = flags.config
         ? loadRunnerConfig(flags.config)
-        : ensureRunnerConfig(path.join(process.cwd(), '.fgos-runner.json'));
+        : ensureRunnerConfigForDir(process.cwd());
       return resolveDecompose(dir, id, cfg, 'session');
     }
 
@@ -2691,13 +2691,17 @@ async function runVerb(verb, flags, positional, dir) {
     }
 
     // Do-and-announce shell-integration + config bootstrap (str87-fgos-setup-doctor
-    // D6): inserts the shell-integration source line into every DETECTED rc
-    // file (bash/zsh, D4) — never creates a new rc file (shell-rc.mjs's own
-    // refusal) — then ensures `.fgos-runner.json` exists / has every current
-    // default key via dispatch.mjs's `ensureRunnerConfig` (the one write path
-    // allowed here; `doctor`, unlike `setup`, never calls it). The addedKeys
-    // report is computed read-only (mergeConfigDefaults) BEFORE the real
-    // write, purely so the returned data can describe what changed.
+    // D6, retargeted per tsk-2ta D1 amended / tsk-5vf D2/D4): inserts the
+    // shell-integration source line into every DETECTED rc file (bash/zsh,
+    // D4) — never creates a new rc file (shell-rc.mjs's own refusal) — then
+    // ensures the shared config file (`.fgos/config.json`) exists and has
+    // every current default key from EVERY registered `registerConfigDefault`
+    // entry, via `ensureSharedConfigDefaults` (the one write path allowed
+    // here; `doctor`, unlike `setup`, never calls it). This is also the verb
+    // that performs the actual move off the legacy `.fgos-runner.json`
+    // (tsk-5vf D2) — `ensureSharedConfigDefaults` reads it as a fallback via
+    // `readSharedConfig` and writes the assembled result to the NEW location,
+    // never deleting the old file.
     case 'setup': {
       const repoRoot = process.cwd();
       const scriptPath = integrationScriptPath();
@@ -2721,11 +2725,9 @@ async function runVerb(verb, flags, positional, dir) {
           }
         }
       }
-      const configPath = path.join(repoRoot, '.fgos-runner.json');
+      const configPath = sharedConfigFilePath(repoRoot);
       const configExisted = fs.existsSync(configPath);
-      const priorConfig = configExisted ? JSON.parse(fs.readFileSync(configPath, 'utf8')) : {};
-      const { addedKeys } = mergeConfigDefaults(priorConfig, DEFAULT_RUNNER_CONFIG);
-      ensureRunnerConfig(configPath);
+      const { addedKeys } = ensureSharedConfigDefaults(repoRoot);
       // str65-6/str88: wires core.hooksPath the same way `npm run setup:hooks`
       // does — a second, non-npm-lifecycle-dependent activation path for the
       // main-checkout lock hook, since pnpm 10+ blocks `prepare` for a
@@ -2746,15 +2748,24 @@ async function runVerb(verb, flags, positional, dir) {
       };
     }
 
-    // Read-only diagnostic (D2): runs every DOCTOR_CHECKS entry against the
-    // current cwd. Never writes anything — no rc file insertion, no config
-    // write — matching this verb's `access: 'read'` declaration.
+    // Diagnostic by default (D2, docs/specs/distribution.md RUL9): runs every
+    // DOCTOR_CHECKS entry against the current cwd, writing nothing — no rc
+    // file insertion, no config write — unless `--fix` is given.
+    //
+    // `--fix` (docs/history/doctor-fix-gate-bypass/CONTEXT.md D2, deliberate
+    // reversal of RUL9/RUL11 per distribution-vision.md §3): runs every
+    // registered `fix` (`runFixes`, `src/setup/registrations.mjs`) BEFORE
+    // re-running the checks, so the returned `checks` array reflects
+    // post-fix state — the same "report what changed" shape
+    // `ensureRunnerConfig`/`ensureSharedConfigDefaults` already use. Without
+    // `--fix`, behavior is byte-identical to before this flag existed.
     case 'doctor': {
+      const fixed = flags.fix ? runFixes(process.cwd()) : undefined;
       const checks = DOCTOR_CHECKS.map(({ id, description, check }) => {
         const { passed, message } = check(process.cwd());
         return { id, description, passed, message };
       });
-      return { checks };
+      return fixed === undefined ? { checks } : { fixed, checks };
     }
 
     // Safely clears .fgos/main-checkout.lock (tsk-3h4). Never force-deletes:
@@ -2896,6 +2907,11 @@ function renderPretty(verb, data) {
   const lines = [];
   if (verb === 'doctor') {
     lines.push(bold('fgos doctor'));
+    if (data.fixed) {
+      for (const f of data.fixed) {
+        lines.push(formatCheck(f.changed, `fix: ${f.id}`, f.message));
+      }
+    }
     for (const c of data.checks) {
       lines.push(formatCheck(c.passed, c.description, c.message));
     }
@@ -2914,7 +2930,7 @@ function renderPretty(verb, data) {
       formatCheck(
         true,
         data.configCreated
-          ? 'created .fgos-runner.json with current defaults'
+          ? 'created .fgos/config.json with current defaults'
           : data.configAddedKeys.length > 0
             ? `added missing config keys: ${data.configAddedKeys.join(', ')}`
             : 'config already up to date',

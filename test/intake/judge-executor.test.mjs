@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { runJudgeExecutor } from '../../src/intake/judge-executor.mjs';
+import { runJudgeExecutor, readScoutNotes } from '../../src/intake/judge-executor.mjs';
 
 // Fake executors only — every "command" spawned here is a node script this
 // file writes to a mkdtemp directory at test time, mirroring
@@ -325,4 +325,151 @@ test('runJudgeExecutor falls back to the base cfg.executor when cfg.executors.ju
   const verdict = runJudgeExecutor(cfg, 'sonnet', 'prompt', 'stricter prompt');
   assert.deepEqual(verdict, { clear: false, question: 'from base executor' });
   assert.equal(readCount(counterPath), 1);
+});
+
+// --- tsk-g18: parent-side scout-notes persistence (Cách B) -----------------
+
+function ndjson(events) {
+  return `${events.map((e) => JSON.stringify(e)).join('\n')}\n`;
+}
+
+// Fake `claude -p --output-format stream-json` transcript: one Bash(rg:*)
+// tool_use/tool_result pair plus the terminal `result` event carrying the
+// judge's actual verdict JSON — the exact shape extractScoutTranscript
+// (judge-executor.mjs) parses.
+function writeStreamJsonExecutor(dir, { rgCommand = 'rg foo src/', rgOutput = 'src/foo.mjs:12:function foo() {}', resultVerdict }) {
+  const scriptPath = path.join(dir, 'stream-json-executor.mjs');
+  const events = [
+    { type: 'system', subtype: 'init' },
+    {
+      type: 'assistant',
+      message: { role: 'assistant', content: [{ type: 'tool_use', id: 'tool_1', name: 'Bash', input: { command: rgCommand } }] },
+    },
+    {
+      type: 'user',
+      message: { role: 'user', content: [{ type: 'tool_result', tool_use_id: 'tool_1', content: rgOutput }] },
+    },
+    { type: 'result', subtype: 'success', result: JSON.stringify(resultVerdict) },
+  ];
+  fs.writeFileSync(scriptPath, `process.stdout.write(${JSON.stringify(ndjson(events))}); process.exit(0);`);
+  return scriptPath;
+}
+
+function writeArgvRecordingExecutor(dir, argvPath, stdoutContent) {
+  const scriptPath = path.join(dir, 'argv-recording-executor.mjs');
+  fs.writeFileSync(
+    scriptPath,
+    `
+    import fs from 'node:fs';
+    fs.writeFileSync(${JSON.stringify(argvPath)}, JSON.stringify(process.argv.slice(2)));
+    process.stdout.write(${JSON.stringify(stdoutContent)});
+    process.exit(0);
+    `,
+  );
+  return scriptPath;
+}
+
+test('readScoutNotes returns "" for a missing docsRef, an absent file, and trims a present one', () => {
+  const repoRoot = mkTempDir();
+  assert.equal(readScoutNotes(repoRoot, ''), '');
+  assert.equal(readScoutNotes(repoRoot, undefined), '');
+  assert.equal(readScoutNotes(repoRoot, 'docs/history/no-such-item'), '');
+
+  const featureDir = path.join(repoRoot, 'docs/history/real-item');
+  fs.mkdirSync(featureDir, { recursive: true });
+  fs.writeFileSync(path.join(featureDir, 'scout-notes.md'), '  ## Scout 1\n\ncontent  \n');
+  assert.equal(readScoutNotes(repoRoot, 'docs/history/real-item'), '## Scout 1\n\ncontent');
+});
+
+// Cách B core proof: a capture:true call parses the stream-json transcript,
+// resolves the verdict from the terminal `result` event (never the raw
+// NDJSON stdout), and persists the Bash(rg:*) call/output pair to
+// docs/history/<docsRef>/scout-notes.md — written by THIS parent code, never
+// by the judge subprocess (which was never granted Write).
+test('runJudgeExecutor with scout.capture:true parses the stream-json transcript, resolves the verdict from the result event, and persists the Bash(rg:*) transcript to scout-notes.md', () => {
+  const dir = mkTempDir();
+  const repoRoot = mkTempDir();
+  const scriptPath = writeStreamJsonExecutor(dir, {
+    rgCommand: 'rg TODO src/',
+    rgOutput: 'src/a.mjs:3:// TODO fix',
+    resultVerdict: { clear: true, verify: 'npm test -- from scout' },
+  });
+  const cfg = cfgFor(scriptPath);
+
+  const verdict = runJudgeExecutor(cfg, 'sonnet', 'prompt', 'stricter prompt', {
+    repoRoot,
+    docsRef: 'docs/history/tsk-scout-x',
+    capture: true,
+  });
+
+  assert.deepEqual(verdict, { clear: true, verify: 'npm test -- from scout' });
+
+  const notes = readScoutNotes(repoRoot, 'docs/history/tsk-scout-x');
+  assert.match(notes, /rg TODO src\//);
+  assert.match(notes, /src\/a\.mjs:3:\/\/ TODO fix/);
+});
+
+// A tool_use that is not an `rg` call (e.g. `ls`) must never be captured —
+// only Bash(rg:*) is the scout signal this item cares about — and with no
+// captured entries, writeScoutNotes must not create a file at all.
+test('runJudgeExecutor with scout.capture:true captures only Bash(rg:*) calls, never other tool calls, and writes no file when none were rg', () => {
+  const dir = mkTempDir();
+  const repoRoot = mkTempDir();
+  const scriptPath = writeStreamJsonExecutor(dir, {
+    rgCommand: 'ls -la src/',
+    rgOutput: 'a.mjs\nb.mjs',
+    resultVerdict: { clear: false, question: 'from non-rg tool call' },
+  });
+  const cfg = cfgFor(scriptPath);
+
+  const verdict = runJudgeExecutor(cfg, 'sonnet', 'prompt', 'stricter prompt', {
+    repoRoot,
+    docsRef: 'docs/history/tsk-scout-y',
+    capture: true,
+  });
+
+  assert.deepEqual(verdict, { clear: false, question: 'from non-rg tool call' });
+  assert.equal(readScoutNotes(repoRoot, 'docs/history/tsk-scout-y'), '');
+  assert.equal(fs.existsSync(path.join(repoRoot, 'docs/history/tsk-scout-y', 'scout-notes.md')), false);
+});
+
+// scout.capture:false (fresh notes already exist, per the caller's own
+// freshness check) must spawn exactly like a pre-tsk-g18 call: no
+// `--output-format`/`--verbose` flags appended, and no scout-notes.md
+// write — there is nothing new to persist.
+test('runJudgeExecutor with scout.capture:false spawns without the stream-json flags and writes no scout-notes.md', () => {
+  const dir = mkTempDir();
+  const repoRoot = mkTempDir();
+  const argvPath = path.join(dir, 'argv.json');
+  const scriptPath = writeArgvRecordingExecutor(dir, argvPath, JSON.stringify({ clear: true, verify: 'npm test -- reused notes' }));
+  const cfg = cfgFor(scriptPath);
+
+  const verdict = runJudgeExecutor(cfg, 'sonnet', 'prompt', 'stricter prompt', {
+    repoRoot,
+    docsRef: 'docs/history/tsk-scout-z',
+    capture: false,
+  });
+
+  assert.deepEqual(verdict, { clear: true, verify: 'npm test -- reused notes' });
+  const argv = JSON.parse(fs.readFileSync(argvPath, 'utf8'));
+  assert.equal(argv.includes('--output-format'), false);
+  assert.equal(argv.includes('stream-json'), false);
+  assert.equal(fs.existsSync(path.join(repoRoot, 'docs/history/tsk-scout-z', 'scout-notes.md')), false);
+});
+
+// Omitting `scout` entirely (every pre-tsk-g18 caller) must spawn without
+// the stream-json flags too — this is the same guarantee the test above
+// proves for capture:false, pinned separately since "omitted" and
+// "capture:false" are two different inputs reaching the same code path.
+test('runJudgeExecutor with scout omitted spawns without the stream-json flags (byte-identical to pre-tsk-g18)', () => {
+  const dir = mkTempDir();
+  const argvPath = path.join(dir, 'argv.json');
+  const scriptPath = writeArgvRecordingExecutor(dir, argvPath, JSON.stringify({ clear: true, verify: 'npm test -- no scout arg' }));
+  const cfg = cfgFor(scriptPath);
+
+  const verdict = runJudgeExecutor(cfg, 'sonnet', 'prompt', 'stricter prompt');
+
+  assert.deepEqual(verdict, { clear: true, verify: 'npm test -- no scout arg' });
+  const argv = JSON.parse(fs.readFileSync(argvPath, 'utf8'));
+  assert.equal(argv.includes('--output-format'), false);
 });

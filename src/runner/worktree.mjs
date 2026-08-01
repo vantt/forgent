@@ -320,6 +320,15 @@ export function createWorktree(repoRoot, id, opts = {}) {
     });
   }
 
+  // A symlink to repoRoot's node_modules was considered and rejected here
+  // (tsk-2vd D2): instant and no network, but only ever matches whatever
+  // repoRoot itself has installed — a worktree whose own package.json
+  // declares a dependency repoRoot hasn't installed yet (exactly the
+  // scenario that exposed this whole gap: a branch merging in a new
+  // dependency before that merge lands on repoRoot's own default branch)
+  // would still hit ERR_MODULE_NOT_FOUND. provisionDependencies installs
+  // for THIS worktree's own declared dependencies instead, correct for
+  // that case at the cost of the install itself.
   provisionDependencies(worktreePath);
 
   return { path: worktreePath, branch, reused };
