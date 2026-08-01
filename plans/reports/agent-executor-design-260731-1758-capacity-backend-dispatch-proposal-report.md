@@ -512,6 +512,60 @@ cấp quyền cho unattended process là chuyện ĐANG XẢY RA (judge), không
 giả định tương lai — khác với domain-2 hook (mục 6) vẫn đang đợi điều kiện
 trigger multi-agent thật.
 
+## 9.1 Sandbox — lớp phòng thủ bổ sung cho tool-scope (bổ sung 2026-08-01)
+
+Anh nêu: sandbox có thể hỗ trợ đúng bài toán tool-scope security ở mục 9.
+Đúng — sandbox biến `allowedTools` từ **ràng buộc mềm** (CLI tự khai đã
+tuân thủ, chưa verify được có enforce thật — đúng Q3 bỏ ngỏ ở mục 9) thành
+**ràng buộc cứng** (OS/kernel chặn vật lý, không phụ thuộc LLM bên trong có
+"nghe lời" hay không).
+
+Verify code thật (`judge-executor.mjs`): `spawnAttempt` gọi
+`spawnSync(command, args, {shell: false, ...})` — **Node code trần, KHÔNG
+qua Bash tool của Claude Code**. Điều này tách sandbox thành 2 tầng, chỉ 1
+tầng forgent kiểm soát được:
+
+- **Tầng trong** (không kiểm soát được): nếu nested `claude -p` tự gọi
+  `Bash(rg:*)` bên trong nó, có thể thừa hưởng sandbox mode mặc định của
+  chính Claude Code (chính phiên tương tác đang chạy design này CÓ tham số
+  `dangerouslyDisableSandbox` trên Bash tool — ngụ ý mặc định LÀ có
+  sandbox, tắt mới là ngoại lệ "dangerous"). Đây là suy luận hợp lý,
+  **CHƯA verify được** áp dụng y hệt cho `-p` headless mode hay không —
+  thuộc nội bộ Claude Code binary, forgent không kiểm soát, không nên
+  thiết kế dựa hẳn vào giả định này.
+- **Tầng ngoài** (forgent sở hữu 100%): chỗ `dispatch.mjs`/`judge-executor.mjs`
+  tự spawn CẢ process — hôm nay **chắc chắn KHÔNG có sandbox nào** (raw
+  `spawn`, không cwd giới hạn, không namespace/jail gì cả). Đây là chỗ
+  đáng thêm, vì forgent tự quyết được, không phải hy vọng vào hành vi nội
+  bộ của binary người khác.
+
+**Đề xuất cắm vào đúng chỗ đã có sẵn**: `EXECUTOR_ADAPTERS` (mục 1) đã là
+registry named-adapter, hôm nay chỉ có `cli-spawn`, đã chừa sẵn chỗ cho
+adapter thứ 2 ("rpc... deferred... only the interface's name is bought
+now"). Thêm 1 adapter MỚI cùng hàng — `sandboxed-cli-spawn` — wrap
+`command`/`args` qua 1 sandbox OS-level (vd Linux `bubblewrap`/
+`firejail`/seccomp, macOS `sandbox-exec`) trước khi spawn, giới hạn
+filesystem writable-path (vd CHỈ `docs/history/<docsRef>/` ghi được, phần
+còn lại read-only hoặc không thấy). Capacity chọn adapter này qua
+`capacities.<id>.adapter: "sandboxed-cli-spawn"` — không cần field mới,
+KHÔNG đổi schema, chỉ thêm 1 giá trị hợp lệ vào registry đã có.
+
+**Không đảo ngược Cách B đã chốt** (mục 9, "Đã chốt" #8) — chưa có bằng
+chứng THẬT (sandbox đã cài đặt, đã verify chặn ghi ngoài path) đủ mạnh để
+lật 1 quyết định đã verify (theo nguyên tắc: chỉ lật khi có bằng chứng
+mới, không phải lo ngại trừu tượng). Nhưng sandbox **CỘNG THÊM giá trị
+ngay cả dưới Cách B**: `Bash(rg:*)` read-only hôm nay VẪN đáng sandbox
+(giới hạn `rg` chỉ đọc trong phạm vi repo, không leo ra ngoài) — phòng
+thủ nhiều lớp, không phải thay thế Cách B.
+
+**Việc CHƯA làm** (deferred, không phải build ngay): `sandboxed-cli-spawn`
+là 1 work item RIÊNG, sau khi `tsk-62v`'s `EXECUTOR_ADAPTERS`-qua-capacity
+đã chạy — không mở rộng scope `tsk-g18` (Cách B) hay `tsk-62v` (generalize
+resolve) ngay bây giờ. Việc đầu tiên cần làm THẬT trước khi build là
+**verify** (không phải giả định): sandbox OS-level nào khả dụng/đáng tin
+trên máy chạy forgent thật (Linux? macOS? cả 2?), overhead khởi động có
+chấp nhận được cho 1 lời gọi judge ngắn hạn không.
+
 ## Đã chốt
 
 1. Agent-type: forgent tự sở hữu, gốc platform-agnostic ở `.fgos/agents/`,
@@ -550,3 +604,8 @@ Không còn câu hỏi thiết kế nào cần anh quyết ở tài liệu này 
 đều có tiền lệ/bằng chứng đủ để tự quyết (đúng nguyên tắc D2 vừa sửa: phán
 xét đã có, không phải "để trống rồi hỏi lại"). Việc còn lại là build, theo
 đúng thứ tự phụ thuộc đã có trong cụm tsk-64p.
+
+**Ngoại lệ — mục 9.1 (sandbox) là mục MỞ THẬT, không thuộc danh sách trên**:
+chưa đủ bằng chứng (chưa verify sandbox OS-level nào khả dụng/đáng tin trên
+máy thật) để tự quyết build ngay hay không — cần 1 bước verify trước khi
+có thể tự quyết, khác hẳn 10 điểm trên (đã đủ bằng chứng ngay lúc này).
