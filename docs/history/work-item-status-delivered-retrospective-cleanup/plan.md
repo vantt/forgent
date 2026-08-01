@@ -63,7 +63,10 @@ call at `fgos-executing` time, not a guess.
 
 ### Files likely touched (order of work)
 
-1. `src/state/fsm.mjs`, `src/state/work.mjs` (`STATUSES`) — D1/D2/D3/D4
+1. `src/state/fsm.mjs` (edge table, D1/D2), `src/state/work.mjs` (`STATUSES`, D1),
+   `src/state/store.mjs` `moveWork` lines ~501-536 (the ACTUAL RUL50/RUL58
+   gate code — confirmed by reading it during validating, not `fsm.mjs` as
+   an earlier draft of this plan assumed) — D3/D4
 2. `src/state/workflow-stage-graphs.mjs`, `src/state/stage.mjs` — D11 (retire `compound-learn` stage/edge), plus D5's new `worktreeBacked`-equivalent field for the harness (deferred detail, `CONTEXT.md`)
 3. `src/state/frontier.mjs` (`RESOLVED_STATUSES`) — D13
 4. New: cleanup harness module (name TBD at execute time, e.g.
@@ -86,11 +89,22 @@ of 1-4 to exist to regression-test against.
 
 1. **FSM core: delivered/retrospective/cleanup states + gate split** (`tsk-5e9`)
    Add `delivered`/`retrospective`/`cleanup` to `work.mjs`'s `STATUSES`;
-   add the 7 edges to `fsm.mjs`'s `TRANSITIONS` (D2); move RUL58's
-   acceptance-clause check onto `doing->delivered`/`awaiting-approval-
-   >delivered`/`blocked->delivered` (D3); move RUL50-content's check onto
-   `cleanup->done` only (D4). `done` keeps exactly one incoming edge.
-   Verify: `node --test test/state/fsm.test.mjs`
+   add the 7 edges to `fsm.mjs`'s `TRANSITIONS` (D2). The RUL50/RUL58 gate
+   blocks live in `src/state/store.mjs`'s `moveWork`, NOT `fsm.mjs` (both
+   are separate `if (to === 'done')` blocks, lines ~501-536, that run
+   after `transitionWork`'s pure edge check and before the event append —
+   confirmed by reading the file at `fgos-validating` time). Move the
+   acceptance-clause block's condition to `to === 'delivered'` (D3); leave
+   the compound-learn block's condition at `to === 'done'` but retarget it
+   to read `retrospective`/`cleanup` completion instead of stage
+   (superseded by D11 anyway once piece 2 lands) (D4). `done` keeps exactly
+   one incoming edge.
+   Verify: `node --test test/state/fsm.test.mjs test/state/compound-learn-done-gate.test.mjs`
+   (this test file covers BOTH RUL50 and RUL58's store.mjs gate blocks —
+   piece 1 only touches its acceptance/RUL58 assertions here; piece 2
+   below further rewrites this SAME file's compound-learn-stage
+   assertions — sequential, not a conflict, but noted so whoever executes
+   either piece doesn't clobber the other's edits.)
 
 2. **Retire `compound-learn` stage; retarget `fgos-compounding`** (`tsk-1zi`, dep tsk-5e9)
    Remove `compound-learn` from `coding`'s `stages`/`stepMap`/
