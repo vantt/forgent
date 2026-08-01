@@ -5906,9 +5906,15 @@ test('return on a branch-source take symlinks the real repo\'s node_modules into
   gitAtCwd(cwd, ['commit', '-q', '-m', 'human fix', '--allow-empty']);
   gitAtCwd(cwd, ['checkout', 'main']);
 
+  const worktreesBefore = gitAtCwd(cwd, ['worktree', 'list', '--porcelain']);
   const result = run(cwd, ['return', 'branch-return-dep']);
   assert.equal(result.status, 0, `return failed: ${result.stderr}`);
   assert.match(result.stdout, /awaiting-approval/);
+  assert.equal(
+    gitAtCwd(cwd, ['worktree', 'list', '--porcelain']),
+    worktreesBefore,
+    'the disposable verify worktree (and the node_modules symlink added into it) is cleaned up -- no leftover',
+  );
 });
 
 test('return on a branch-source take is a clean no-op for the node_modules symlink when the real repo has none at all -- never an error, matching the fix\'s own existsSync guard', () => {
