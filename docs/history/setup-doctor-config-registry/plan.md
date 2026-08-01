@@ -24,10 +24,13 @@ weak proof around the area / multi-domain):
   greenfield (no test today proves "add an entry without touching
   checks.mjs"); D6's runner-config nesting is a real behavior change with no
   existing test coverage for the new shape.
-- **multi-domain** — yes: touches setup (`src/setup/*`) and runner
-  (`src/runner/dispatch.mjs`) at once, and coordinates with a second,
-  concurrently in-flight item (`tsk-2ta`) sharing the same target config
-  file.
+- **multi-domain** — yes: touches setup (`src/setup/*`), runner
+  (`src/runner/dispatch.mjs`, `src/runner/loop.mjs`), intake
+  (`src/intake/judge-executor.mjs`), and both CLI entry points
+  (`bin/fgos.mjs`, `bin/fgos-runner.mjs`) at once — real footprint confirmed
+  at `fgos-validating`, wider than first drafted — and coordinates with a
+  second, concurrently in-flight item (`tsk-2ta`) sharing the same target
+  config file.
 
 5 flags ≥ 4 → **high-risk**, by count alone (no hard-gate flag like
 auth/data-loss/security/external-provider/validation-removal is present, but
@@ -105,6 +108,28 @@ half of the mechanism with a test-only registration, not a real
 keeps this item inside its declared consumer boundary (mechanism, not every
 consumer).
 
+**Real blast radius (found at `fgos-validating`, superseding the first draft
+of this section — see Risk map's GitNexus row for how this was found):**
+D6's flat→nested move is not contained to `dispatch.mjs`. Direct grep of
+every `cfg.executor`/`cfg.executors`/`cfg.models`/`cfg.timeoutMs`/
+`cfg.parallel` read site found real, non-test consumers in:
+
+- `src/runner/dispatch.mjs` — internal (`validateExecutorShape`,
+  `resolveExecutor`, `effectiveTimeout`, already in scope)
+- `src/runner/loop.mjs:143,694,929` — `config?.parallel`, `config.timeoutMs`
+  ×2 — the autonomous runner's own main loop
+- `src/intake/judge-executor.mjs:34` — `cfg?.timeoutMs`, plus prose
+  referencing `cfg.executors`/`cfg.executor` for judge-tier dispatch
+- `bin/fgos.mjs:244` — `ensureRunnerConfig(...).timeoutMs`, plus 3 more
+  `ensureRunnerConfig` call sites (244, 892, 912, 2727) whose returned
+  object feeds `resolveDiscovery`/`resolveDecompose`
+- `bin/fgos-runner.mjs:105` — `ensureRunnerConfig` call feeding the
+  standalone runner's own `config` object into `loop.mjs`
+
+Piece 2's real scope is: nest `DEFAULT_RUNNER_CONFIG` under a `runner` key,
+update every read site above to `cfg.runner.*`, and add/extend tests for
+each touched file — not `dispatch.mjs` alone.
+
 Alternatives rejected:
 
 - Each `configDefault` entry names its own target file path (my original
@@ -120,29 +145,56 @@ Alternatives rejected:
 |---|---|---|
 | `tsk-2ta`'s current children don't yet prove the shared-file rename | **High** — piece 2 assumes a shared config file exists at a stable, known path; `tsk-2ta-1`'s own verify command is too weak to prove it does | Before piece 2 starts: read `tsk-2ta`'s real merge state (has `fgw/tsk-2ta` merged to `main`?) and grep the actual shared-file path in its landed code — not the aspirational `plan.md` text. If unresolved, piece 2 waits; piece 1 does not. |
 | Existing 5 checks' behavior must survive the `registrations.mjs` refactor | Medium — real behavior regression risk on a well-tested file | `test/setup/checks.test.mjs` (existing) must stay green unmodified in assertions, only wiring changed |
-| `src/runner/dispatch.mjs` config-read shape change (D6) | Medium — `ensureRunnerConfig` is depended on by the runner loop, high blast radius if wrong | `impact({target: "ensureRunnerConfig", direction: "upstream"})` before editing (impact-analysis: full, GitNexus present — see below); existing runner tests plus a new test asserting `config.runner.*` reads |
+| Flat→nested config-read shape change (D6) real blast radius | **High** (revised at `fgos-validating`, was Medium) — real read sites in `src/runner/loop.mjs`, `src/intake/judge-executor.mjs`, `bin/fgos.mjs`, `bin/fgos-runner.mjs`, not just `dispatch.mjs` (see Approach's "Real blast radius" note) | Update every cited read site to `cfg.runner.*` in the same commit as the shape change (never landed partially); existing tests for each touched file plus new assertions for `config.runner.*` reads; `npm test` full suite (not a scoped subset) before this piece is considered done, given the spread |
+| GitNexus `impact()` unreliable for these symbols | **Confirmed, not hypothetical** — `impact({target:"ensureRunnerConfig", direction:"upstream"})` and same for `DEFAULT_RUNNER_CONFIG` both returned `impactedCount:0, risk:LOW` even after a fresh re-index (`node .gitnexus/run.cjs analyze`, was 38 commits stale) — directly contradicted by grep evidence of real callers in `bin/fgos.mjs`/`bin/fgos-runner.mjs`/tests | Do not trust `impact()` output for these two symbols at execution time either — re-verify with grep/direct read before editing, same as done here; re-run `impact()` after the fix lands to see if it now resolves correctly (informational, not a gate) |
 | Registry accepts a new entry without editing `checks.mjs` | Low-medium — the item's own core acceptance bar, currently unproven | New test in `test/setup/registrations.test.mjs`: register a throwaway check via `registrations.mjs` only, assert `DOCTOR_CHECKS`/doctor output includes it, assert `checks.mjs`'s own diff for that test is empty |
 | `docs/specs/distribution.md` Data Dictionary #7 drift | Low — already stale before this item (says 3, code has 5) | Leave the spec edit to `tsk-1qm` (its own locked scope, `deps: [tsk-2cs, tsk-2qz]`) — do not fix it here, avoid scope creep beyond this item's footprint |
 
-**impact-analysis: full** — GitNexus registered and `present` (confirmed via
-`fgos tool query --capability impact-analysis --status present` during
-`fgos-exploring`). Before editing any symbol in `src/setup/checks.mjs`,
-`src/setup/config-merge.mjs`, or `src/runner/dispatch.mjs`'s
-`ensureRunnerConfig`, run `impact()` and report the blast radius per the
-CLAUDE.md/AGENTS.md gate.
+**impact-analysis: degraded, for these specific symbols** (revised at
+`fgos-validating`; was recorded `full` at `fgos-planning` from the tool's
+registered/present status alone, before its actual output was checked
+against real evidence). GitNexus is registered and reports `present`, and a
+fresh re-index was run during validating, but its `impact()` call for
+`ensureRunnerConfig`/`DEFAULT_RUNNER_CONFIG` (upstream direction) returns
+`impactedCount: 0` — contradicted by direct grep of real callers in
+`bin/fgos.mjs`, `bin/fgos-runner.mjs`, `src/runner/loop.mjs`,
+`src/intake/judge-executor.mjs`, and `test/runner/dispatch.test.mjs`. Per
+the CLAUDE.md gate's degraded framing: every other required check still
+runs, but this piece's blast-radius evidence is grep/direct-read based, not
+`impact()`-based, and that gap is named here rather than silently dropped.
+Before editing any symbol in `src/setup/checks.mjs`, `src/setup/config-merge.mjs`,
+or the read sites listed above, still call `impact()` per the
+CLAUDE.md/AGENTS.md gate (it may resolve correctly for other symbols in this
+item, e.g. `checks.mjs`'s own `DOCTOR_CHECKS`), but cross-check its result
+against a grep of the target symbol's name before trusting a low/zero count.
 
 ## Files likely touched
 
 - `src/setup/registrations.mjs` (new) — the registry itself (piece 1)
 - `src/setup/checks.mjs` — `DOCTOR_CHECKS` derived from the registry;
   `checkConfigNotStale` composes config-defaults from the registry (piece 2)
-- `src/runner/dispatch.mjs` — `ensureRunnerConfig`/runner config reads move
-  under a `runner` key (piece 2, D6)
+- `src/runner/dispatch.mjs` — `ensureRunnerConfig`/internal runner config
+  reads move under a `runner` key (piece 2, D6)
+- `src/runner/loop.mjs` — `config?.parallel`, `config.timeoutMs` (×2) move to
+  `config.runner.parallel`/`config.runner.timeoutMs` (piece 2, D6, real
+  blast radius found at `fgos-validating`)
+- `src/intake/judge-executor.mjs` — `cfg?.timeoutMs` and the
+  `cfg.executor`/`cfg.executors` fallback chain move to `cfg.runner.*`
+  (piece 2, D6, same finding)
+- `bin/fgos.mjs` — 4 `ensureRunnerConfig` call sites (lines 244, 892, 912,
+  2727); line 244's `.timeoutMs` chain moves to `.runner.timeoutMs` (piece 2,
+  D6, same finding)
+- `bin/fgos-runner.mjs` — 1 `ensureRunnerConfig` call site (line 105)
+  feeding `loop.mjs` (piece 2, D6, same finding)
 - `test/setup/registrations.test.mjs` (new) — proves entry-without-edit
 - `test/setup/checks.test.mjs` — updated wiring, same assertions
 - `test/setup/config-merge.test.mjs` — likely unchanged (`mergeConfigDefaults`
   itself is not modified, only composed differently by its caller)
-- `test/runner/*.test.mjs` — new coverage for `config.runner.*` reads
+- `test/runner/dispatch.test.mjs`, `test/runner/loop.test.mjs` — updated for
+  `config.runner.*` shape (existing files, confirmed present)
+- `test/cli/fgos.test.mjs` — likely needs coverage for the entry-point call
+  sites in `bin/fgos.mjs` (confirmed to exist, not yet read for exact
+  assertions — execution-time task)
 
 Not touched by this item (deliberately, per CONTEXT.md D4/D5):
 `scripts/fgos-shell-integration.sh`, `src/state/gate-bypass.mjs`,
@@ -177,14 +229,19 @@ blockers (piece 2 alone is blocked on external state) and different files
   `node --test 'test/setup/**/*.test.mjs'`
 - **tsk-2cs-2** — "Wire config-default registrations into checkConfigNotStale
   against the shared config file; nest runner's own defaults under a
-  `runner` key; update `src/runner/dispatch.mjs` accordingly." `parent:
-  tsk-2cs`, depends on `tsk-2cs-1` (mechanism must exist first) and, in
-  practice though not as a formal graph `deps` entry until confirmed real,
-  on `tsk-2ta`'s shared file landing — flagged as the plan's top risk, not
-  silently wired into the dependency graph without the product owner's
-  confirmation (deps is a structural, user-owned field per the standing
-  rule against silently changing user-decided fields). Verify: `node --test
-  'test/setup/**/*.test.mjs' 'test/runner/*.test.mjs'`
+  `runner` key; update every real flat-config read site
+  (`src/runner/dispatch.mjs`, `src/runner/loop.mjs`,
+  `src/intake/judge-executor.mjs`, `bin/fgos.mjs`, `bin/fgos-runner.mjs`) to
+  `cfg.runner.*`." `parent: tsk-2cs`, depends on `tsk-2cs-1` (mechanism must
+  exist first) and, in practice though not as a formal graph `deps` entry
+  until confirmed real, on `tsk-2ta`'s shared file landing — flagged as the
+  plan's top risk, not silently wired into the dependency graph without the
+  product owner's confirmation (deps is a structural, user-owned field per
+  the standing rule against silently changing user-decided fields). Given
+  the confirmed wider footprint, this piece's own mode is high-risk on its
+  own merits, not just by inheriting its parent's. Verify: `npm test` (full
+  suite — the touched surface now spans setup/runner/intake/both CLI
+  entries, too wide for a safe scoped subset)
 
 Neither child is created yet — this plan names them; creating the actual
 items (and deciding whether `tsk-2cs-2` formally depends on `tsk-2ta` in the
@@ -213,7 +270,14 @@ execution.
   per-module-keyed defaults — based on reading its existing recursive
   plain-object handling (`src/setup/config-merge.mjs:21-39`), not yet proven
   against a real multi-module composed object.
-- No other code beyond `src/runner/dispatch.mjs` reads `DEFAULT_RUNNER_CONFIG`
-  or the runner config file's flat shape directly — not yet confirmed by a
-  full `impact()` call (flagged for execution time per the impact-analysis
-  gate above).
+- ~~No other code beyond `src/runner/dispatch.mjs` reads `DEFAULT_RUNNER_CONFIG`
+  or the runner config file's flat shape directly~~ — **resolved, false**:
+  confirmed at `fgos-validating` by direct grep (not `impact()`, which
+  under-reported) that `src/runner/loop.mjs`, `src/intake/judge-executor.mjs`,
+  `bin/fgos.mjs`, and `bin/fgos-runner.mjs` all read the flat shape too. See
+  Approach's "Real blast radius" note and the updated Files-touched list.
+- `test/cli/fgos.test.mjs` covers the `bin/fgos.mjs` call sites at line 244
+  (and 892/912/2727) closely enough to catch a `.runner.timeoutMs` regression
+  — confirmed the file exists (grep hit during validating), not yet read for
+  its exact assertions; if it does not cover these lines closely enough,
+  execution needs to add coverage before piece 2 is done, not skip it.
