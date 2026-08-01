@@ -40,7 +40,7 @@ $ fgos gate-bypass
 
 Wrapped in the standard `fgos.v1` envelope like every other verb. No CLI
 setter — edit `.fgos/gate-bypass.json` by hand, the same pattern
-`.fgos-runner.json` already uses.
+`.fgos/config.json` already uses.
 
 ## Coverage rule
 
