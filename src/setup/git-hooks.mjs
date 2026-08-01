@@ -9,7 +9,7 @@
 //   - mainCheckoutHookWired: the read-only check, used by `fgos doctor`
 //     (src/setup/checks.mjs) and by `fgos setup`'s own report of what it did.
 
-import { existsSync } from 'node:fs';
+import { existsSync, rmSync, readdirSync, rmdirSync } from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 
@@ -63,4 +63,34 @@ export function mainCheckoutHookWired(cwd) {
   } catch {
     return false;
   }
+}
+
+/**
+ * Reverses `installGitHooks` (tsk-4iv-1, CONTEXT.md D2): unsets
+ * `core.hooksPath` and deletes `.githooks/pre-commit` (plus the `.githooks`
+ * dir itself, if left empty), but ONLY when `core.hooksPath` is still
+ * exactly `.githooks` at call time -- the same fill-only detection
+ * `installGitHooks` uses to decide what it owns. Any other value (unset,
+ * or a custom hooks dir the caller pointed at deliberately) is left
+ * completely untouched, matching `installGitHooks`'s own "never touch a
+ * value the user already has" contract in the opposite direction. Returns
+ * `{ unwired, skippedExisting }`: `unwired` is true only when this call
+ * actually changed something; `skippedExisting` carries the untouched
+ * custom value when one was found (`null` otherwise).
+ */
+export function uninstallGitHooks(repoRoot) {
+  if (!existsSync(path.join(repoRoot, '.git'))) return { unwired: false, skippedExisting: null };
+  const current = readHooksPath(repoRoot);
+  if (current === '') return { unwired: false, skippedExisting: null };
+  if (current !== '.githooks') return { unwired: false, skippedExisting: current };
+  execFileSync('git', ['config', '--unset', 'core.hooksPath'], { cwd: repoRoot });
+  const hooksDir = path.join(repoRoot, '.githooks');
+  const preCommitPath = path.join(hooksDir, 'pre-commit');
+  if (existsSync(preCommitPath)) {
+    rmSync(preCommitPath);
+  }
+  if (existsSync(hooksDir) && readdirSync(hooksDir).length === 0) {
+    rmdirSync(hooksDir);
+  }
+  return { unwired: true, skippedExisting: null };
 }
