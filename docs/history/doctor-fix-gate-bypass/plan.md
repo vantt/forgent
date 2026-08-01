@@ -1,6 +1,10 @@
 # Plan: tsk-2qz — fgos doctor tự fix được .fgos/gate-bypass.json
 
-**Decisions source:** `docs/history/doctor-fix-gate-bypass/CONTEXT.md` (D1-D3)
+**Decisions source:** `docs/history/doctor-fix-gate-bypass/CONTEXT.md` (D1-D4)
+
+**Revised 2026-08-01 after `tsk-5vf` merged to `main`** (see CONTEXT.md D4):
+piece 2 is no longer blocked — real evidence below replaces the earlier
+"wait on tsk-2ta" framing throughout.
 
 ## Mode: high-risk
 
@@ -29,7 +33,9 @@ behavior / weak proof around the area / multi-domain):
   unchanged (CONTEXT.md D2).
 - **weak proof around the area** — yes: the `fix` registry capability is
   greenfield (no test today proves "register a fix, `doctor --fix` runs
-  it"); D1's tsk-2ta-landing dependency is itself unproven at this writing.
+  it"). D1's original tsk-2ta-landing dependency is now resolved with real
+  evidence (D4) — no longer a weak-proof source, kept here only because the
+  `fix` capability itself is still unbuilt.
 - **multi-domain** — yes: touches setup (`src/setup/registrations.mjs`),
   CLI (`bin/fgos.mjs`, `src/cli/command-registry.mjs`), and state
   (`src/state/gate-bypass.mjs`) — real footprint confirmed by direct file
@@ -79,34 +85,50 @@ Alternatives rejected:
   --fix` specifically, not a new verb; no evidence anyone asked for a
   separate verb.
 
-### Piece 2 — real gate-bypass entry, targeting the shared config file (D1)
+### Piece 2 — real gate-bypass entry, targeting the shared config file (D1, D4)
 
-Once `tsk-2ta`'s shared config file (`.fgos/config.json`, or wherever
-`tsk-2ta` lands it) is real: register gate-bypass's own entry in
-`registrations.mjs` with all three capabilities (`check` — is
-`config.gateBypass` present/well-shaped; `configDefault` — `{ level:
-'off' }` under the `gateBypass` key, mirroring `DEFAULT_LEVEL`; `fix` —
-create the key or patch a missing/malformed `level` back to a safe
-default, mirroring `ensureRunnerConfig`'s create-if-missing /
-merge-missing-keys shape). `src/state/gate-bypass.mjs`'s
-`readGateBypassLevel` moves from reading standalone `<dir>/gate-bypass.json`
-to reading `config.gateBypass.level` from the shared file (still fails
-closed to `DEFAULT_LEVEL` on anything missing/malformed — that contract
-does not change, only the file it reads).
+The shared config file is real: `.fgos/config.json` (confirmed on disk),
+read/written via `src/config/shared-config-file.mjs`'s
+`readSharedConfig(dir)`/`writeSharedConfig(dir, config)`/
+`sharedConfigFilePath(dir)`/`legacyRunnerConfigPath(dir)`, and its default
+shape assembled generically by `registrations.mjs`'s
+`assembleRegistryDefaults()`/`ensureSharedConfigDefaults(dir)` (tsk-5vf D4)
+from every `CONFIG_DEFAULT_REGISTRATIONS` entry.
 
-This piece is **blocked** on tsk-2ta per CONTEXT.md D1 — not started until
-its proof point below resolves.
+Register gate-bypass's own entry in `registrations.mjs`, following the
+exact pattern the `runner` entry already uses there (lines ~371-375):
+`registerConfigDefault({ id: 'gateBypass', key: 'gateBypass', shape: {
+level: DEFAULT_LEVEL } })` (`DEFAULT_LEVEL` from `src/state/gate-bypass.mjs`,
+already `'off'`) — `ensureSharedConfigDefaults` (already called by `fgos
+setup`, `bin/fgos.mjs:2729`) then bootstraps `config.gateBypass` for free,
+no new setup code. Plus `registerCheck` (is `config.gateBypass`
+present/well-shaped — mirrors `checkConfigNotStale`'s pattern) and Piece
+1's new `fix` capability (create the key or patch a missing/malformed
+`level` back to `DEFAULT_LEVEL`, invoked by `doctor --fix`).
+
+`src/state/gate-bypass.mjs`'s `readGateBypassLevel` moves from reading
+standalone `<dir>/gate-bypass.json` directly to calling
+`readSharedConfig(dir).gateBypass?.level`, with the same fail-closed
+contract to `DEFAULT_LEVEL` on anything missing/malformed unchanged — only
+the file/path it reads changes. `readSharedConfig` already falls back to
+legacy `.fgos-runner.json` for the `runner` key; it has no equivalent
+fallback for a standalone `gate-bypass.json`, so `readGateBypassLevel`
+itself needs its own narrow legacy-read (today's existing
+`<dir>/gate-bypass.json`, currently `{"level":"standard"}` on disk in this
+repo) for any caller whose `.fgos/config.json` doesn't have a `gateBypass`
+key yet — mirroring the same "never delete the old file, read it as
+fallback" discipline `readSharedConfig` already applies to `runner`.
 
 Alternatives rejected:
-- Bootstrap `.fgos/gate-bypass.json` standalone now, migrate later —
-  rejected per CONTEXT.md D1 (user explicitly chose to wait, citing
-  `tsk-2cs`'s own precedent of the identical risk).
+- Wait further / re-verify tsk-2ta a third time — rejected: evidence is
+  now doubly confirmed by direct read of landed `main` code (D4), not
+  just the item tracker's status field.
 
 ## Risk map
 
 | Component | Risk | Proof point (→ fgos-validating) |
 |---|---|---|
-| `tsk-2ta`'s shared config file doesn't exist yet | **High** — piece 2 has no real target path to write against | Before piece 2 starts: read `tsk-2ta`'s real merge state (`fgw/tsk-2ta` merged to `main`?) and confirm the shared file's real path/shape by direct read of landed code, not `plan.md` prose. If unresolved, piece 2 waits; piece 1 does not (CONTEXT.md D1). |
+| Shared config file existed only as a plan-time assumption | **Resolved** (was High) — `tsk-5vf` merged to `main` (`af2fc64`); `.fgos/config.json` confirmed on disk, `ensureSharedConfigDefaults`/`readSharedConfig` confirmed real by direct read (CONTEXT.md D4) | Done — re-confirm at execution time that `fgw/tsk-2qz` has actually merged `main` (not just read it) before editing `registrations.mjs`/`gate-bypass.mjs`, so the branch builds against the real code, not a stale local copy |
 | Doctor's read-only-by-default behavior must survive the `--fix` addition | Medium — real regression risk on a well-tested file (RUL9's own behavior, `test/setup/doctor-fresh-run.test.mjs`) | Existing doctor tests (no `--fix` passed) must stay green unmodified in assertions; new tests only cover the `--fix` path additively |
 | `fix` registry capability accepts an entry without any other file edit | Low-medium — item's own core acceptance bar for piece 1, currently unproven | New/extended assertions in `test/setup/registrations.test.mjs`: register a throwaway `fix` entry, assert `doctor --fix` runs it, assert no other file's diff is required |
 | `gate-bypass.mjs`'s fail-closed contract (missing/malformed → `DEFAULT_LEVEL`) must survive the read-path move (piece 2) | Medium — security-relevant behavior (audit-security flag above); a regression here silently changes what auto-approves | `test/state/gate-bypass.test.mjs`'s existing fail-closed assertions must stay green against the new read path; add assertions for the new `config.gateBypass` shape specifically |
@@ -131,34 +153,37 @@ Piece 1:
 - `test/setup/doctor-fresh-run.test.mjs`, `test/setup/checks.test.mjs` —
   updated/extended for the `--fix` path, existing assertions unmodified
 
-Piece 2 (blocked on tsk-2ta, per D1):
-- `src/setup/registrations.mjs` — real gate-bypass entry (check +
-  configDefault + fix)
+Piece 2 (unblocked — see D4):
+- `src/setup/registrations.mjs` — real gate-bypass entry (`registerCheck` +
+  `registerConfigDefault` + Piece 1's `fix`), following the `runner`
+  entry's own pattern
 - `src/state/gate-bypass.mjs` — `readGateBypassLevel` reads
-  `config.gateBypass.level` from the shared file instead of standalone
-  `gate-bypass.json`
+  `readSharedConfig(dir).gateBypass?.level`, with its own narrow
+  legacy-read fallback for today's standalone `gate-bypass.json`
 - `test/state/gate-bypass.test.mjs` — updated for the new read path,
   fail-closed assertions preserved
+- `test/config/shared-config-file.test.mjs` — likely needs a `gateBypass`
+  key assertion alongside its existing `runner`-key coverage
 
 Not touched by this item (deliberately, per CONTEXT.md feature boundary):
 `docs/specs/distribution.md` (RUL9/RUL11 formal supersede — `tsk-1qm`'s
-scope), any physical move of `.fgos-runner.json` (`tsk-2ta`'s scope).
+scope), `src/config/global-config.mjs` (global-vs-project precedence —
+already tsk-2ta/tsk-5vf's finished scope).
 
 ## Order
 
 `fgos graph --json`: tsk-2qz is not on `criticalPath`; it appears in
-`topUnblock` (unblocks 1 real, 2 newly — `tsk-1qm`). No ambiguity between
-piece 1/piece 2 ordering to resolve with `--what-if` — piece 2 mechanically
-depends on piece 1's registry shape existing, and is additionally blocked
-externally on `tsk-2ta` (CONTEXT.md D1), so the order is forced, not a
-judgment call:
+`topUnblock` (unblocks 1 real, 2 newly — `tsk-1qm`). Piece 2 mechanically
+depends on Piece 1's `fix` capability existing (its registry entry needs a
+`fix` field to register), so the order is still forced by that dependency
+alone now, not by any external block:
 
-1. **Piece 1 first** — self-contained, zero dependency on `tsk-2ta`,
-   proves the registry's actual minimum bar (a new entry needs no edit
-   beyond `registrations.mjs` + the CLI plumbing that already reads it).
-2. **Piece 2 second** — gated on confirming `tsk-2ta`'s shared file is
-   real (the plan's top risk); do not start `src/state/gate-bypass.mjs`
-   changes until that is confirmed at `fgos-validating` or execution time.
+1. **Piece 1 first** — self-contained, proves the registry's actual
+   minimum bar (a new entry needs no edit beyond `registrations.mjs` + the
+   CLI plumbing that already reads it).
+2. **Piece 2 second** — needs Piece 1's `fix` field to exist before
+   gate-bypass can register one; no longer needs any external landing to
+   proceed (D4).
 
 ## Split decision
 
@@ -174,18 +199,15 @@ class of risk):
   `node --test 'test/setup/**/*.test.mjs'`
 - **tsk-2qz-2** — "Register gate-bypass's real check/configDefault/fix
   entry against the shared config file; move `readGateBypassLevel` to read
-  `config.gateBypass.level`." `parent: tsk-2qz`, depends on `tsk-2qz-1`
-  (registry shape must exist first) and, in practice though not yet a
-  formal graph `deps` entry, on `tsk-2ta`'s shared file landing — flagged
-  as this plan's top risk, not silently wired into the graph without
-  confirming `tsk-2ta`'s real merge state first (CONTEXT.md D1's own
-  instruction — `fgos-validating`/execution decides the formal wiring).
-  Verify: `node --test 'test/state/gate-bypass.test.mjs' 'test/setup/**/*.test.mjs'`
+  `readSharedConfig(dir).gateBypass?.level`." `parent: tsk-2qz`, depends on
+  `tsk-2qz-1` (registry shape must exist first) — no external dependency
+  remains (D4). Verify:
+  `node --test 'test/state/gate-bypass.test.mjs' 'test/setup/**/*.test.mjs' 'test/config/shared-config-file.test.mjs'`
 
-Neither child is created yet — this plan names them; creating the actual
-items (and deciding whether `tsk-2qz-2` formally depends on `tsk-2ta` in
-the graph) is `fgos-validating`'s/execution's next step, consistent with
-this skill never applying its own shape directly.
+Both children already created (`fgos add`, during this planning pass):
+`tsk-2qz-1`, `tsk-2qz-2`, both `parent: tsk-2qz`. No `deps: [tsk-2ta]`
+needed on either, consistent with D4 — the external block this plan
+originally flagged never materializes into a real dependency edge.
 
 ## Verify command
 
@@ -201,15 +223,20 @@ above also carries its own narrower verify command for faster iteration.
 
 ## Assumptions (pending fgos-validating proof)
 
-- `tsk-2ta`'s eventual landed state provides a stable, discoverable path
-  for the shared config file that piece 2 can import/read, not a hardcoded
-  guess — flagged as the plan's top risk above, not assumed silently.
+- ~~`tsk-2ta`'s eventual landed state provides a stable, discoverable path
+  for the shared config file~~ — **resolved, true**: `.fgos/config.json`
+  confirmed real on disk, `readSharedConfig`/`ensureSharedConfigDefaults`
+  confirmed real by direct read of `src/config/shared-config-file.mjs` and
+  `src/setup/registrations.mjs` on `main` (D4).
 - `mergeConfigDefaults` (unchanged, `src/setup/config-merge.mjs`) needs no
-  code change to support piece 2's nested `gateBypass` key — based on
-  `tsk-2cs`'s own confirmed reading of its recursive plain-object handling,
-  not yet re-verified against this specific shape.
-- `test/cli/fgos.test.mjs` covers doctor's CLI entry point closely enough
-  to catch a manifest/`--fix`-flag regression — file exists (confirmed by
-  direct find during this planning session), not yet read for its exact
-  assertions; if it does not cover this closely enough, execution needs to
-  add coverage before piece 1 is done, not skip it.
+  code change to support a new `gateBypass` key alongside the existing
+  `runner` key — `assembleRegistryDefaults()` already proves this generic
+  composition for `runner`; adding a second registered key follows the
+  same, already-exercised path, not a new one.
+- ~~`test/cli/fgos.test.mjs` covers doctor's CLI entry point~~ — **checked,
+  false**: `grep -n doctor test/cli/fgos.test.mjs` returns zero hits. Real
+  doctor CLI e2e coverage lives in `test/setup/doctor-fresh-run.test.mjs`
+  instead (confirmed: `spawnSync`s the real `fgos` binary with `doctor`
+  args) — already correctly listed under Piece 1's files-touched above;
+  this assumption just named the wrong file. No coverage gap, just a
+  corrected citation.
