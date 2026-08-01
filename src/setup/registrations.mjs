@@ -337,3 +337,39 @@ registerConfigDefault({
   key: 'runner',
   shape: DEFAULT_RUNNER_CONFIG,
 });
+
+// tsk-slq D6 (AGENTS.md's install/setup/doctor gate — a new infra
+// dependency must register into doctor's check registry, not stand alone
+// undiscoverable by doctor): forgent had zero npm dependencies until tsk-slq
+// added `yaml` (D4) as the first one. A bare checkout (e.g. a fresh clone,
+// or a disposable worktree like `fgos return`'s own goal-check checkout)
+// never runs `npm install` on its own — this check makes that gap visible
+// to a human/session running `fgos doctor`, the same "absent capability =
+// clean skip, never hidden" contract `checkToolRegistryConfigured` already
+// gives tool-registry posture. READ-ONLY by construction (same as every
+// other check here) — only fs.existsSync, doctor never writes.
+function checkDependenciesInstalled(cwd) {
+  const mainCheckout = resolveMainCheckout(cwd);
+  const root = mainCheckout ?? cwd;
+  const packageJsonPath = path.join(root, 'package.json');
+  if (!fs.existsSync(packageJsonPath)) {
+    return { passed: true, message: 'no package.json — nothing to check' };
+  }
+  const pkg = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+  const deps = Object.keys(pkg.dependencies ?? {});
+  if (deps.length === 0) {
+    return { passed: true, message: 'no runtime dependencies declared — nothing to check' };
+  }
+  const nodeModulesPath = path.join(root, 'node_modules');
+  const missing = deps.filter((dep) => !fs.existsSync(path.join(nodeModulesPath, dep)));
+  if (missing.length > 0) {
+    return { passed: false, message: `missing from node_modules: ${missing.join(', ')} — run npm install` };
+  }
+  return { passed: true, message: `${deps.length} dependenc${deps.length === 1 ? 'y' : 'ies'} installed` };
+}
+
+registerCheck({
+  id: 'dependencies-installed',
+  description: 'package.json dependencies are present in node_modules (tsk-slq D6)',
+  check: (cwd) => checkDependenciesInstalled(cwd),
+});
