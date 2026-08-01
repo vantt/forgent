@@ -1,0 +1,123 @@
+# CONTEXT: platform-agnostic canonical root for forgent's own agent definitions (tsk-slq)
+
+## Feature boundary
+
+Establish `.fgos/agents/<name>.yaml` as the platform-agnostic, canonical
+source of forgent's own agent definitions (persona, decision-boundary,
+model-tier preference, tool-scope), plus a small projection script that
+generates `.claude/agents/<name>.md` from it with Claude-Code-specific
+frontmatter filled in. `.claude/agents/*.md` is never hand-maintained
+directly once this exists.
+
+Out of scope (explicitly deferred, see design doc §4.3, §6, §7):
+- A full N-platform converter/writer engine (YAGNI until a second real
+  platform target exists — `multi-target-converter-engine` porting-log
+  candidate stays deferred).
+- Domain-2 enforcement hooks/markers for capacity dispatch (tsk-64p §6,
+  unrelated axis).
+- The dispatch-resolution mechanism itself (`capacities.<id>` schema,
+  `resolveExecutorConfig` generalization) — that is tsk-62v, the companion
+  item in the same cluster (tsk-64p). This item is only about WHERE agent
+  definitions live and how they stay in sync.
+
+## Locked decisions
+
+| ID | Decision |
+|----|----------|
+| D1 | `.fgos/agents/<name>.yaml`'s `tool-scope` field is **authoritative**: the projection script writes it straight into the generated `.claude/agents/<name>.md`'s `tools:` frontmatter, which is the real, harness-enforced tool restriction for Task-tool-dispatched subagents (domain 2). tsk-62v's `capacities.<id>.allowedTools` (design doc §9) stays a **separate, also-enforced** axis for domain-1 headless CLI dispatch (`--allowedTools` passed to a nested `claude -p`), keyed by `capacityId` rather than agent-type name. The two are not the same field named twice by accident — they gate different dispatch domains and never collide because they key differently. Neither is dropped, and neither is demoted to purely descriptive. |
+| D2 | tsk-slq authors exactly **one minimal, honestly-labeled proof-of-mechanism placeholder agent** — not tied to any real current dispatch need. Its only job is proving the `.fgos/agents/` → `.claude/agents/` projection pipeline is real and idempotent (byte-identical on a re-run over an unchanged source, per acceptance). The exact name/persona content of this placeholder is an implementer detail, deferred to `fgos-planning`. |
+| D3 (pre-existing, ported from design doc "Đã chốt" #7) | The exact field set inside `.fgos/agents/<name>.yaml` is not a clarify-stage question — it was already settled at submit time: build follows marketing-cockpit's `agent.schema.yaml` shape (see Scout evidence below) as the reference pattern, adapted to drop anything Claude-Code-specific. `fgos-planning` picks the concrete field list from that pattern; this item does not re-litigate it. |
+
+## Pinned terms
+
+- **"Canonical root"** = `.fgos/agents/<name>.yaml`. Content must never name a
+  specific platform ("Claude", "Codex", etc.) anywhere in the file.
+- **"Adapter"** = `.claude/agents/<name>.md`, generated output only, carries
+  the Claude-Code-specific frontmatter (`name`, `description`, `model`,
+  `tools`).
+- **"Projection"** = the one-directional generation step, `.fgos/agents/` →
+  `.claude/agents/`. Never the reverse.
+- **domain 1 / domain 2** — per the agent-executor design doc §0: domain 1 is
+  forgent's own headless process-spawn (`src/runner/dispatch.mjs`,
+  `child_process.spawn`); domain 2 is an interactive Claude Code session's
+  own Task/Agent tool dispatch, owned by the harness, not forgent's Node
+  code.
+
+## Scout evidence
+
+- `/home/vantt/projects/forgentX/.claude/agents/` does not exist in the main
+  checkout — forgent has authored zero agent definitions of its own so far.
+- `rg subagent_type` / `Task tool` / `Agent tool` across
+  `.agents/skills/` (forgent's own fgOS skill set) → **zero hits**. No
+  existing forgent skill dispatches a custom `subagent_type` today.
+- tsk-5l2 (same cluster, tsk-64p) — the roadmap's own designated "first
+  real, end-to-end proof" of the capacity-executor mechanism — dispatches
+  via `kind: "cli"` (an external CLI like `gemini`/`agy`), **not**
+  `kind: "task"`. Confirms no concrete plan anywhere in the cluster yet
+  needs a Task-dispatched custom persona.
+- `~/.claude/agents/code-simplifier.md` (real, currently-active Claude Code
+  agent definition) frontmatter:
+  ```
+  ---
+  name: code-simplifier
+  description: ...
+  model: opus
+  tools: Glob, Grep, Read, Edit, MultiEdit, Write, NotebookEdit, Bash, ...
+  ---
+  ```
+  Confirms `tools:` in `.claude/agents/*.md` frontmatter is a real,
+  harness-enforced grant for that agent-type, not documentation.
+- `plans/reports/agent-executor-design-260731-1758-capacity-backend-dispatch-proposal-report.md`
+  §4.3 ("Đã chốt" #1, #7): agent-type root belongs at `.fgos/agents/`, not
+  `.claude/` (the latter name means "Claude-Code-specific", contradicting
+  the platform-agnostic goal); exact yaml fields deferred to build,
+  following marketing-cockpit's schema.
+  §9: introduces `capacities.<id>.allowedTools` as a *separate* tool-scope
+  axis for domain-1 CLI dispatch — this is the field tsk-slq's own
+  scope point 5 flags as a same-name-different-concept collision with this
+  item's own `tool-scope` field (resolved as D1 above).
+- `upstreams/marketing-cockpit/.fgOS/schemas/agent.schema.yaml` — the
+  reference schema design doc §4.3 points at. Required fields: `name`,
+  `version`, `description`, `role`, `category`, `persona`, `skills`,
+  `autonomy`, `decision_boundary`, `status_protocol`, `quality_gates`,
+  `escalation_rule`. Notably **has no `tool-scope`/`allowedTools` field at
+  all** — forgent's own addition of a tool-scope concept to its agent
+  schema is new, not copied from marketing-cockpit, and is exactly why D1
+  needed to be decided rather than assumed from the reference pattern.
+- `upstreams/marketing-cockpit/.claude/agents/copywriter.md` — an actual
+  projected adapter example from the reference implementation. It is a
+  thin prose file with **no YAML frontmatter at all** (no `tools:`,
+  `model:`) — confirms marketing-cockpit's own adapter projection does not
+  wire tool-scope into Claude Code's real enforcement mechanism today,
+  which is exactly the gap D1 closes for forgent's version.
+- `CLAUDE.md`'s impact-analysis capability gate: queried
+  `fgos tool query --capability impact-analysis --status present` →
+  GitNexus registered and `present`. Posture: **full** — the MUST rules in
+  `CLAUDE.md`/`AGENTS.md`'s GitNexus section apply as written for whoever
+  builds this item.
+
+## Canonical references
+
+- `plans/reports/agent-executor-design-260731-1758-capacity-backend-dispatch-proposal-report.md`
+  — primary design doc, §4.3 (agent-type ownership), §9 (tool-scope/permission
+  axis), "Đã chốt" #1/#7/#9.
+- `plans/reports/distill-consult-260731-1733-agent-executor-backend-dispatch-report.md`
+  — prior consult this design doc followed.
+- `upstreams/marketing-cockpit/.fgOS/schemas/agent.schema.yaml` — reference
+  schema shape for `.fgos/agents/<name>.yaml`'s eventual field set.
+- tsk-62v (same cluster) — companion item, defines `capacities.<id>` schema
+  and generalizes `resolveExecutorConfig`; this item's D1 depends on that
+  schema's `allowedTools` field existing there, not here.
+
+## Outstanding questions deferred to planning
+
+- Exact field list for `.fgos/agents/<name>.yaml` (name/persona/skills/etc.)
+  — per D3, follow marketing-cockpit's `agent.schema.yaml` shape, drop
+  anything Claude-Code-specific; `fgos-planning` picks the concrete set.
+- Name and persona content of the D2 placeholder agent.
+- Projection script mechanics (language/location/invocation) — implementer
+  detail, not a product decision.
+- Whether the projection script itself needs to be registered anywhere
+  (e.g. `fgos tool query` capability, per `AGENTS.md`'s install/setup/doctor
+  gate) — only applies if the script shells out to something not already
+  on PATH by default (Node itself); `fgos-planning` verifies.
