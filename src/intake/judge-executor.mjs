@@ -1,10 +1,14 @@
-// judge-executor.mjs — shared spawn+parse+retry-once helper for the intake
-// judge calls (str68 D1/D5). judgeDiscovery (discovery.mjs) and
-// judgeDecompose (decompose.mjs) both spawn the nested `claude -p` executor
-// via the identical resolveExecutorCommand -> spawnSync -> JSON.parse shape,
-// and both are exposed to the same nested-session prose-vs-JSON failure mode
-// (a process that exits 0 but returns prose instead of JSON). This helper
-// lives once, used by both.
+// judge-executor.mjs — shared spawn+parse+retry helper. judgeDiscovery
+// (discovery.mjs) and judgeDecompose (decompose.mjs) both spawn the nested
+// `claude -p` executor via the identical resolveExecutorCommand ->
+// spawnSync -> JSON.parse shape, and both are exposed to the same
+// nested-session prose-vs-JSON failure mode (a process that exits 0 but
+// returns prose instead of JSON). `runRetryingExecutor` is the
+// capacity-agnostic core of that pattern (bounded attempts, a
+// stricter-instruction suffix on retry, JSON-parse-or-retry) — any capacity
+// dispatch can call it with its own `tier`/`maxAttempts`, not just judge
+// calls. `runJudgeExecutor` is judge-executor's own thin wrapper over it,
+// preserving its exact prior behavior for its two existing callers.
 
 import { spawnSync } from 'node:child_process';
 import { resolveExecutorCommand } from '../runner/dispatch.mjs';
@@ -21,14 +25,14 @@ export const JUDGE_STRICT_JSON_SUFFIX =
 // single retry wasn't enough headroom.
 const MAX_JUDGE_ATTEMPTS = 3;
 
-// tsk-62d D2/D4: `tier: 'judge'` reuses the existing generic `cfg.executors`
-// string-keyed lookup (`resolveExecutorConfig`, dispatch.mjs) as a synthetic
-// role key — a repo can grant judge calls their own `executors.judge` block
-// (e.g. `Bash(rg:*)` for scout capability) without touching the worker's own
-// `cfg.executor`/`cfg.executors[<real tier>]` blocks. Absent `executors.judge`
-// falls back to `cfg.executor`, identical to pre-tsk-62d behavior.
-function spawnAttempt(cfg, model, prompt) {
-  const { command, args } = resolveExecutorCommand(cfg, { prompt, model, tier: 'judge' });
+// `tier` reuses the existing generic `cfg.executors` string-keyed lookup
+// (`resolveExecutorConfig`, dispatch.mjs) as a synthetic role key — a repo
+// can grant a tier its own `executors.<tier>` block (e.g. `Bash(rg:*)` for
+// scout capability) without touching the worker's own
+// `cfg.executor`/`cfg.executors[<real tier>]` blocks. A tier absent from
+// `cfg.executors` falls back to `cfg.executor`.
+function spawnAttempt(cfg, model, prompt, tier) {
+  const { command, args } = resolveExecutorCommand(cfg, { prompt, model, tier });
   return spawnSync(command, args, {
     shell: false,
     timeout: cfg?.timeoutMs,
@@ -65,20 +69,25 @@ function parseVerdict(stdout) {
 }
 
 /**
- * Run a judge call attempt against `prompt`, retrying with `stricterPrompt`
- * on a parse-shaped failure only, up to `MAX_JUDGE_ATTEMPTS` total attempts
- * (str68 D2, raised to 3 by str68 nested-judge-fix). A non-parse failure —
- * spawn error, non-zero exit, or timeout — on ANY attempt returns `null`
- * immediately, never retries (str68 D2/D3, unchanged). Each attempt is
- * bounded by the same `cfg.timeoutMs` (str68 D4), not a shared/extended
- * budget. Returns the parsed-but-unvalidated verdict object on success, or
- * `null` once all attempts are exhausted — callers apply their own existing
- * field validation and fail-safe branching to whichever of these two
- * outcomes they get.
+ * Run a call attempt against `prompt` through `tier`'s resolved executor,
+ * retrying with `stricterPrompt` on a parse-shaped failure only, up to
+ * `maxAttempts` total attempts. A non-parse failure — spawn error, non-zero
+ * exit, or timeout — on ANY attempt returns `null` immediately, never
+ * retries. Each attempt is bounded by the same `cfg.timeoutMs`, not a
+ * shared/extended budget. Returns the parsed-but-unvalidated verdict object
+ * on success, or `null` once all attempts are exhausted (whether from
+ * exhausting parse-shaped retries, or from an immediate non-parse failure on
+ * any single attempt) — callers apply their own field validation, and any
+ * escalation/fallback step, to whichever of these two outcomes they get.
+ *
+ * Capacity-agnostic: `tier` selects which `cfg.executors.<tier>` (or the
+ * global `cfg.executor`) attempts spawn through, so any capacity dispatch
+ * can call this directly with its own tier and attempt budget — it is not
+ * hardcoded to judge calls.
  */
-export function runJudgeExecutor(cfg, model, prompt, stricterPrompt) {
-  for (let attempt = 1; attempt <= MAX_JUDGE_ATTEMPTS; attempt += 1) {
-    const result = spawnAttempt(cfg, model, attempt === 1 ? prompt : stricterPrompt);
+export function runRetryingExecutor(cfg, model, prompt, stricterPrompt, { tier, maxAttempts }) {
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    const result = spawnAttempt(cfg, model, attempt === 1 ? prompt : stricterPrompt, tier);
     if (result.error || result.status !== 0) {
       return null;
     }
@@ -90,4 +99,18 @@ export function runJudgeExecutor(cfg, model, prompt, stricterPrompt) {
   }
 
   return null;
+}
+
+/**
+ * judge-executor's own call into `runRetryingExecutor` — `tier: 'judge'`,
+ * `maxAttempts: MAX_JUDGE_ATTEMPTS` (str68 D2, raised to 3 by str68
+ * nested-judge-fix's probabilistic-refusal headroom). Same exported name and
+ * signature judgeDiscovery/judgeDecompose already call; behavior is
+ * unchanged from before this extraction.
+ */
+export function runJudgeExecutor(cfg, model, prompt, stricterPrompt) {
+  return runRetryingExecutor(cfg, model, prompt, stricterPrompt, {
+    tier: 'judge',
+    maxAttempts: MAX_JUDGE_ATTEMPTS,
+  });
 }
