@@ -3,7 +3,7 @@ type: how-to
 title: How to extract a judge-only retry helper into a capacity-agnostic one
 tags: [judge-executor, retry, capacity-dispatch, runner, escalation]
 timestamp: 2026-08-01T10:10:37.000Z
-source_capture_ids: [tsk-418-1, tsk-418-2]
+source_capture_ids: [tsk-418-1, tsk-418-2, tsk-418]
 ---
 
 # How to extract a judge-only retry helper into a capacity-agnostic one
@@ -145,3 +145,23 @@ another parameter passed at the call site.
    judge test stays green with zero edits — that is itself part of the
    proof that escalation is additive, not a behavior change to the
    judge-only path.
+
+## Closing out the decomposed root item
+
+Both pieces above were built as separate work items (`tsk-418-1`,
+`tsk-418-2`) under one parent (`tsk-418`), sharing the parent's own
+`fgw/tsk-418` branch. Once both children were `done`, the root itself still
+needed its own claim → verify → return → compound-learn → approve cycle
+(it does not close itself automatically just because its children
+finished) — real capture: `aheadCount: 58` at return time, `passed: true`,
+confirming the branch had genuinely advanced since the root's own claim.
+Along the way, the root's return also had to absorb two unrelated pieces of
+concurrent main-branch churn before it could pass: a real merge conflict in
+`judge-executor.mjs` itself against `tsk-g18`'s independent scout-notes
+persistence work (reconciled by threading both features' new parameters —
+`tier`/`escalateTier` from this feature, `scoutCapture` from tsk-g18's —
+through the same `spawnAttempt`/`runBoundedAttempts` call chain rather than
+picking one side), and a separate pre-existing bug in `fgos return`'s own
+disposable verify worktree (missing `node_modules`, already tracked and
+fixed by another concurrent session as `tsk-2vd`) that had nothing to do
+with this feature's own diff.
