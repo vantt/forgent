@@ -28,5 +28,8 @@
   "exports": {
     "./state/porting": "./src/state/porting.mjs",
     "./state/porting-store": "./src/state/porting-store.mjs"
+  },
+  "dependencies": {
+    "yaml": "^2.9.0"
   }
 }
