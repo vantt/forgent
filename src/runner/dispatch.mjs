@@ -40,6 +40,8 @@ import { DEFAULTS } from '../state/work.mjs';
 import { DOMAINS, resolveDomainName, skillForStage } from '../state/workflow-stage-graphs.mjs';
 import { selectTemplate, renderTemplate, hashTemplate } from './prompt-templates.mjs';
 import { mergeConfigDefaults } from '../setup/config-merge.mjs';
+import { sharedConfigFilePath, legacyRunnerConfigPath } from '../config/shared-config-file.mjs';
+import { mergeWithGlobalConfig } from '../config/global-config.mjs';
 import { KINDS, findExecutableOnPath, resolvedStatus, readLocalStatus } from '../state/tool-registry.mjs';
 import { listWork } from '../state/store.mjs';
 
@@ -302,6 +304,117 @@ export function ensureRunnerConfig(configPath) {
     `fgos: added missing default config keys to ${configPath}: ${addedKeys.join(', ')}\n`,
   );
   return loadRunnerConfig(configPath);
+}
+
+/**
+ * Resolve+validate the runner section of the shared project config file at
+ * `dir` (`.fgos/config.json`'s `runner` key), falling back to the legacy
+ * `.fgos-runner.json` at `dir` — via `loadRunnerConfig` itself, unchanged —
+ * when the shared file doesn't exist yet (tsk-2ta D1 amended / tsk-5vf D2).
+ * The legacy-fallback branch stays byte-identical to before this item (no
+ * global-config merge) — that is the deliberate parity net for any install
+ * that hasn't run `fgos setup` since the move. Once the shared file is
+ * real, its content is merged against `~/.fgos/config.json` via
+ * `mergeWithGlobalConfig` (project wins any key present in both, tsk-5vf
+ * D2's "global config has real runtime effect" half of the gap) before the
+ * `runner` section is extracted and validated.
+ */
+export function loadRunnerConfigFromDir(dir) {
+  const sharedPath = sharedConfigFilePath(dir);
+  if (!fs.existsSync(sharedPath)) {
+    return loadRunnerConfig(legacyRunnerConfigPath(dir));
+  }
+  const raw = fs.readFileSync(sharedPath, 'utf8');
+  let parsed;
+  try {
+    parsed = JSON.parse(raw);
+  } catch (err) {
+    throw new RunnerConfigError(`shared config at "${sharedPath}" is not valid JSON: ${err.message}`);
+  }
+  const withGlobal = mergeWithGlobalConfig(parsed);
+  const runnerCfg = withGlobal.runner ?? {};
+  validateRunnerConfigShape(runnerCfg, `${sharedPath}#runner`);
+  return runnerCfg;
+}
+
+/**
+ * Build the default executor block for a fresh runner-config bootstrap
+ * (str82's `detectAssistantCli` logic, factored out so both the legacy
+ * `ensureRunnerConfig` bootstrap branch above and `ensureRunnerConfigForDir`
+ * below produce the identical shape/messages for the same detected CLI —
+ * `pathHint` is the literal string named in the placeholder command / stderr
+ * message when no verified template exists).
+ */
+function bootstrapDefaultExecutor(pathHint) {
+  const detected = detectAssistantCli();
+  const executor =
+    detected && detected in SUPPORTED_EXECUTOR_TEMPLATES
+      ? SUPPORTED_EXECUTOR_TEMPLATES[detected]
+      : {
+          command: detected
+            ? `NO_VERIFIED_TEMPLATE_FOR_${detected.toUpperCase()}__edit_${pathHint}`
+            : `NO_ASSISTANT_CLI_FOUND__edit_${pathHint}`,
+          args: ['{prompt}'],
+        };
+  return { detected, executor };
+}
+
+/**
+ * Bootstrap wrapper (retargeted per tsk-2ta D1 amended / tsk-5vf D1/D2/D4)
+ * around `loadRunnerConfigFromDir`: the shared-file counterpart to
+ * `ensureRunnerConfig` above, resolved against `dir` instead of a single
+ * file path.
+ *
+ * - Shared file (`.fgos/config.json`) already exists: fills any default
+ *   key its `runner` section is missing (same `mergeConfigDefaults`
+ *   discipline as `ensureRunnerConfig`), rewrites only when a key was
+ *   actually added, merges the result against `~/.fgos/config.json` via
+ *   `mergeWithGlobalConfig` (project wins), and validates the merged
+ *   `runner` section.
+ * - Shared file absent but the legacy `.fgos-runner.json` exists: delegates
+ *   to `ensureRunnerConfig` on the legacy path UNCHANGED — fills/writes the
+ *   OLD file in place. The physical move to the new location only happens
+ *   through `fgos setup`'s own explicit `ensureSharedConfigDefaults` call
+ *   (tsk-5vf D2) — never implicitly here.
+ * - Neither exists (true first run): bootstraps straight into the new
+ *   shared file, never writing a fresh `.fgos-runner.json` again.
+ */
+export function ensureRunnerConfigForDir(dir) {
+  const sharedPath = sharedConfigFilePath(dir);
+  const legacyPath = legacyRunnerConfigPath(dir);
+
+  if (fs.existsSync(sharedPath)) {
+    const parsed = JSON.parse(fs.readFileSync(sharedPath, 'utf8'));
+    const existingRunner = parsed.runner ?? {};
+    const { merged, addedKeys } = mergeConfigDefaults(existingRunner, DEFAULT_RUNNER_CONFIG);
+    let projectShared = parsed;
+    if (addedKeys.length > 0) {
+      projectShared = { ...parsed, runner: merged };
+      fs.writeFileSync(sharedPath, `${JSON.stringify(projectShared, null, 2)}\n`);
+      process.stderr.write(
+        `fgos: added missing default config keys to ${sharedPath}#runner: ${addedKeys.join(', ')}\n`,
+      );
+    }
+    const withGlobal = mergeWithGlobalConfig(projectShared);
+    const runnerCfg = withGlobal.runner ?? {};
+    validateRunnerConfigShape(runnerCfg, `${sharedPath}#runner`);
+    return runnerCfg;
+  }
+
+  if (fs.existsSync(legacyPath)) {
+    return ensureRunnerConfig(legacyPath);
+  }
+
+  const { detected, executor } = bootstrapDefaultExecutor('.fgos/config.json');
+  const runnerConfig = { ...DEFAULT_RUNNER_CONFIG, executor };
+  fs.mkdirSync(path.dirname(sharedPath), { recursive: true });
+  fs.writeFileSync(sharedPath, `${JSON.stringify({ runner: runnerConfig }, null, 2)}\n`);
+  process.stderr.write(
+    `fgos: no runner config found — ${
+      detected ? `detected "${detected}" on PATH` : 'no known assistant CLI found on PATH'
+    }; wrote a default (executor: ${executor.command}) at ${sharedPath}#runner; edit .fgos/config.json by hand to change.\n`,
+  );
+  return runnerConfig;
 }
 
 /**

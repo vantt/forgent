@@ -20,9 +20,8 @@
 // worker/verify output is printed to the console only, never persisted to
 // a committed path.
 
-import path from 'node:path';
 import { EXIT_CODES, categoryOf } from '../src/state/store.mjs';
-import { loadRunnerConfig, ensureRunnerConfig } from '../src/runner/dispatch.mjs';
+import { loadRunnerConfig, ensureRunnerConfigForDir } from '../src/runner/dispatch.mjs';
 import { resolveRepoRoot, runOnce, runWatch } from '../src/runner/loop.mjs';
 import { wrapEnvelope } from '../src/state/envelope.mjs';
 
@@ -99,10 +98,10 @@ async function main() {
     const repoRoot = resolveRepoRoot(process.cwd());
     // An explicit --config path stays a loud, unmodified failure on ENOENT
     // (loadRunnerConfig); only the default, unflagged path bootstraps a
-    // missing config (D1/D3, ensureRunnerConfig).
+    // missing config (D1/D3, ensureRunnerConfigForDir — tsk-5vf D1/D2).
     const config = flags.config
       ? loadRunnerConfig(flags.config)
-      : ensureRunnerConfig(path.join(repoRoot, '.fgos-runner.json'));
+      : ensureRunnerConfigForDir(repoRoot);
 
     if (flags.watch) {
       // Persistent mode (D8): the ONLY termination trigger is an explicit

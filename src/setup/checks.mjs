@@ -15,4 +15,5 @@ export {
   resolveMainCheckout,
   integrationScriptPath,
   mainCheckoutHookWired,
+  ensureSharedConfigDefaults,
 } from './registrations.mjs';
