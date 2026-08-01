@@ -5869,6 +5869,111 @@ test('return on a branch-source take: verify passes in a disposable detached wor
   assert.equal(gitAtCwd(cwd, ['worktree', 'list', '--porcelain']), worktreesBefore, 'the disposable detached verify worktree is cleaned up — no leftover');
 });
 
+test('return on a branch-source take symlinks the real repo\'s node_modules into the disposable detached verify worktree, so a verify command that imports a real npm dependency still resolves it (tsk-5l2-1 bug fix: the worktree lives under os.tmpdir(), outside the repo tree, so Node\'s ESM resolver -- which never consults NODE_PATH -- could not otherwise reach it)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+
+  // Real node_modules is always gitignored -- without this, the later
+  // `git add -A` calls (commitPending/makeBlockedBranchItem's own worker-
+  // attempt commit) would sweep the fake package into the branch itself,
+  // defeating the whole point (the branch tip would carry its own copy,
+  // masking the cross-directory resolution failure this test exists to
+  // catch).
+  fs.appendFileSync(path.join(cwd, '.gitignore'), 'node_modules/\n');
+
+  // A fake ESM npm dependency, present on disk but never git-added (real
+  // node_modules never is) -- proves the fix is the symlink itself, not
+  // some property of this repo's own real "yaml" package.
+  const pkgDir = path.join(cwd, 'node_modules', 'fake-esm-dep');
+  fs.mkdirSync(pkgDir, { recursive: true });
+  fs.writeFileSync(
+    path.join(pkgDir, 'package.json'),
+    JSON.stringify({ name: 'fake-esm-dep', version: '1.0.0', main: 'index.mjs', type: 'module' }),
+  );
+  fs.writeFileSync(path.join(pkgDir, 'index.mjs'), 'export const ok = true;\n');
+
+  // Tracked (committed to main, so the branch inherits it): the verify
+  // script itself, importing the fake dependency by bare specifier.
+  fs.writeFileSync(path.join(cwd, 'verify-dep.mjs'), "import { ok } from 'fake-esm-dep';\nprocess.exit(ok ? 0 : 1);\n");
+  gitAtCwd(cwd, ['add', 'verify-dep.mjs']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', 'add verify-dep.mjs']);
+
+  makeBlockedBranchItem(cwd, 'branch-return-dep', { verify: 'node verify-dep.mjs' });
+  assert.equal(run(cwd, ['take', '--id', 'branch-return-dep']).status, 0);
+  commitPending(cwd, 'state: take branch-return-dep');
+
+  gitAtCwd(cwd, ['checkout', 'fgw/branch-return-dep']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', 'human fix', '--allow-empty']);
+  gitAtCwd(cwd, ['checkout', 'main']);
+
+  const worktreesBefore = gitAtCwd(cwd, ['worktree', 'list', '--porcelain']);
+  const result = run(cwd, ['return', 'branch-return-dep']);
+  assert.equal(result.status, 0, `return failed: ${result.stderr}`);
+  assert.match(result.stdout, /awaiting-approval/);
+  assert.equal(
+    gitAtCwd(cwd, ['worktree', 'list', '--porcelain']),
+    worktreesBefore,
+    'the disposable verify worktree (and the node_modules symlink added into it) is cleaned up -- no leftover',
+  );
+});
+
+test('return on a branch-source take is a clean no-op for the node_modules symlink when the real repo has none at all -- never an error, matching the fix\'s own existsSync guard', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  // No node_modules anywhere under cwd -- the fix must skip the symlink
+  // silently rather than throwing on a missing source path.
+  makeBlockedBranchItem(cwd, 'branch-return-no-deps', { verify: 'test -f proof.txt' });
+  assert.equal(run(cwd, ['take', '--id', 'branch-return-no-deps']).status, 0);
+  commitPending(cwd, 'state: take branch-return-no-deps');
+
+  gitAtCwd(cwd, ['checkout', 'fgw/branch-return-no-deps']);
+  fs.writeFileSync(path.join(cwd, 'proof.txt'), 'fixed by hand\n');
+  gitAtCwd(cwd, ['add', '-A']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', 'human fix']);
+  gitAtCwd(cwd, ['checkout', 'main']);
+
+  const result = run(cwd, ['return', 'branch-return-no-deps']);
+  assert.equal(result.status, 0, `return failed: ${result.stderr}`);
+  assert.match(result.stdout, /awaiting-approval/);
+});
+
+test('return on a branch-source take finds node_modules by walking UP from repoRoot when repoRoot itself has none of its own (tsk-5l2-1: a nested worktree checkout relies on an ancestor\'s install, exactly like Node\'s own ESM resolver does -- a naive single-directory existsSync check misses this)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  fs.appendFileSync(path.join(cwd, '.gitignore'), 'node_modules/\n');
+
+  const pkgDir = path.join(cwd, 'node_modules', 'fake-esm-dep');
+  fs.mkdirSync(pkgDir, { recursive: true });
+  fs.writeFileSync(
+    path.join(pkgDir, 'package.json'),
+    JSON.stringify({ name: 'fake-esm-dep', version: '1.0.0', main: 'index.mjs', type: 'module' }),
+  );
+  fs.writeFileSync(path.join(pkgDir, 'index.mjs'), 'export const ok = true;\n');
+
+  fs.writeFileSync(path.join(cwd, 'verify-dep.mjs'), "import { ok } from 'fake-esm-dep';\nprocess.exit(ok ? 0 : 1);\n");
+  gitAtCwd(cwd, ['add', 'verify-dep.mjs']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', 'add verify-dep.mjs']);
+
+  makeBlockedBranchItem(cwd, 'branch-return-nested', { verify: 'node verify-dep.mjs' });
+  assert.equal(run(cwd, ['take', '--id', 'branch-return-nested']).status, 0);
+  commitPending(cwd, 'state: take branch-return-nested');
+
+  gitAtCwd(cwd, ['checkout', 'fgw/branch-return-nested']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', 'human fix', '--allow-empty']);
+  gitAtCwd(cwd, ['checkout', 'main']);
+
+  // Invoke fgos from a NESTED subdirectory with no node_modules of its
+  // own -- the real tsk-5l2-1 scenario (a linked worktree several levels
+  // deep). --dir keeps state resolution pointed at the real fixture root;
+  // only the CLI's own process.cwd() (repoRoot, used for the git
+  // operations and the node_modules walk) is the nested directory.
+  const nestedCwd = path.join(cwd, 'nested', 'deeper');
+  fs.mkdirSync(nestedCwd, { recursive: true });
+  const result = spawnSync(process.execPath, [FGOS, 'return', 'branch-return-nested', '--dir', cwd], { cwd: nestedCwd, encoding: 'utf8' });
+  assert.equal(result.status, 0, `return failed: ${result.stderr}`);
+  assert.match(result.stdout, /awaiting-approval/);
+});
+
 test('return on a branch-source take never touches a live main-checkout.lock (tsk-45z D1 scope: only the main-source path releases early — worktree commits never contend for this shared lock)', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);

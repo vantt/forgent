@@ -25,7 +25,7 @@
 import path from 'node:path';
 import { modelForTier } from '../runner/dispatch.mjs';
 import { loadTemplate } from '../runner/prompt-templates.mjs';
-import { runJudgeExecutor, JUDGE_STRICT_JSON_SUFFIX } from './judge-executor.mjs';
+import { runJudgeExecutor, JUDGE_STRICT_JSON_SUFFIX, readScoutNotes } from './judge-executor.mjs';
 import { readLockedContext } from './decompose.mjs';
 import { DEFAULTS } from '../state/work.mjs';
 import { listWork, moveStage, addDiscovery, addDecision, putInAwaiting, editWork, StoreError } from '../state/store.mjs';
@@ -85,7 +85,7 @@ function buildGraphContextBlock(work, view) {
   ].join('\n');
 }
 
-function buildDiscoveryPrompt(work, view) {
+function buildDiscoveryPrompt(work, view, priorScoutNotes) {
   const refs = Array.isArray(work.refs) && work.refs.length ? work.refs.join(', ') : '(none)';
   const deps = Array.isArray(work.deps) && work.deps.length ? work.deps.join(', ') : '(none)';
   const description =
@@ -143,7 +143,11 @@ ${qa}
 
 # Các lần phán trước
 ${history}
-
+${
+  priorScoutNotes
+    ? `\n# Kết quả scout đã lưu (LẦN TRƯỚC — dùng lại, KHÔNG rg lại cùng truy vấn)\n${priorScoutNotes}\n`
+    : ''
+}
 ${loadTemplate('judge-scout-instructions.txt')}
 Câu trả lời của người ở trên là QUYẾT ĐỊNH CUỐI CÙNG — KHÔNG hỏi lại một chủ đề
 đã được trả lời. Nếu câu trả lời đã đủ để thi công, verdict phải clear=true kèm
@@ -178,15 +182,27 @@ Trả lời DUY NHẤT bằng một dòng JSON, không kèm chữ nào khác:
  * prompt can carry description/ask-answer/prior-verdict context. Omitting it
  * (old 2-arg calls) still works: `buildDiscoveryPrompt` degrades every added
  * section to a placeholder instead of throwing.
+ *
+ * `scoutContext` (tsk-g18, optional, additive): `{ repoRoot, docsRef }` —
+ * when supplied, this call reads any already-persisted scout notes
+ * (`readScoutNotes`) for the prompt and, when none exist yet, captures this
+ * call's own `Bash(rg:*)` transcript and persists it (Cách B — the judge
+ * process itself never gains a Write grant; the parent, this function via
+ * `runJudgeExecutor`, does the writing). Omitted (every pre-tsk-g18 caller,
+ * including every existing test) keeps this function byte-identical.
  */
-export function judgeDiscovery(work, cfg, view) {
+export function judgeDiscovery(work, cfg, view, scoutContext) {
   try {
     const tier = work?.tier ?? DEFAULTS.tier;
     const model = modelForTier(cfg, tier);
-    const prompt = buildDiscoveryPrompt(work, view);
+    const priorScoutNotes = scoutContext ? readScoutNotes(scoutContext.repoRoot, scoutContext.docsRef) : '';
+    const prompt = buildDiscoveryPrompt(work, view, priorScoutNotes);
     const stricterPrompt = prompt + JUDGE_STRICT_JSON_SUFFIX;
 
-    const verdict = runJudgeExecutor(cfg, model, prompt, stricterPrompt);
+    const scout = scoutContext
+      ? { repoRoot: scoutContext.repoRoot, docsRef: scoutContext.docsRef, capture: !priorScoutNotes }
+      : undefined;
+    const verdict = runJudgeExecutor(cfg, model, prompt, stricterPrompt, scout);
     if (!verdict || typeof verdict.clear !== 'boolean') {
       return { clear: false, question: DEFAULT_UNCLEAR_QUESTION };
     }
@@ -287,7 +303,7 @@ export function resolveDiscovery(dir, id, cfg, role) {
     return { outcome: 'clear', id, verdict: { clear: true, skipped: true } };
   }
 
-  const verdict = judgeDiscovery(work, cfg, view);
+  const verdict = judgeDiscovery(work, cfg, view, { repoRoot, docsRef: work.docsRef });
   addDiscovery(dir, { id, ...verdict });
 
   // work-item-priority-matrix D6/D7 (was STR8 D4's intentScore -> work.intent):
