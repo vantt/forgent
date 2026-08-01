@@ -150,8 +150,15 @@ function extractScoutTranscript(stdout) {
 // (`parseVerdict`) keeps reading a single JSON-verdict string exactly as
 // before — `null`/omitted `scoutCapture` skips all of this, byte-identical
 // to pre-tsk-g18 behavior.
-function spawnAttempt(cfg, model, prompt, tier, scoutCapture) {
-  const { command, args } = resolveExecutorCommand(cfg, { prompt, model, tier });
+//
+// `capacityId`/`fgosDir` (tsk-2yp, optional): threaded straight into
+// `resolveExecutorCommand`'s own capacity-aware precedence
+// (`capacities.<capacityId>` > `executors.<tier>` > `executor`, tsk-62v).
+// Both omitted (every pre-tsk-2yp caller) resolves exactly as before —
+// `capacityId` absent skips the capacity lookup entirely, `fgosDir` absent
+// skips the `kind: "cli"` presence check.
+function spawnAttempt(cfg, model, prompt, tier, scoutCapture, capacityId, fgosDir) {
+  const { command, args } = resolveExecutorCommand(cfg, { prompt, model, tier, capacityId, fgosDir });
   const finalArgs = scoutCapture ? [...args, '--output-format', 'stream-json', '--verbose'] : args;
   const result = spawnSync(command, finalArgs, {
     shell: false,
@@ -209,10 +216,12 @@ function parseVerdict(stdout) {
 // from an immediate non-parse failure on any single attempt) — the two
 // failure origins are indistinguishable on purpose, so a caller wrapping
 // this in escalation never needs a failure-type field to decide whether to
-// fall back.
-function runBoundedAttempts(cfg, model, prompt, stricterPrompt, tier, maxAttempts, scoutCapture) {
+// fall back. `capacityId`/`fgosDir` (tsk-2yp, optional) are threaded to every
+// attempt exactly like `scoutCapture` — same mutable-object-style pass-through
+// to `spawnAttempt`.
+function runBoundedAttempts(cfg, model, prompt, stricterPrompt, tier, maxAttempts, scoutCapture, capacityId, fgosDir) {
   for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
-    const result = spawnAttempt(cfg, model, attempt === 1 ? prompt : stricterPrompt, tier, scoutCapture);
+    const result = spawnAttempt(cfg, model, attempt === 1 ? prompt : stricterPrompt, tier, scoutCapture, capacityId, fgosDir);
     if (result.error || result.status !== 0) {
       return null;
     }
@@ -248,15 +257,25 @@ function runBoundedAttempts(cfg, model, prompt, stricterPrompt, tier, maxAttempt
  * and it never also sets `escalateTier`, so the two features never actually
  * interact in practice; threading it uniformly just avoids a second,
  * escalation-only code path.
+ *
+ * `capacityId`/`fgosDir` (tsk-2yp, optional, additive): threaded through
+ * identically to `scoutCapture` — resolved on both the base attempts and the
+ * escalation attempt via `resolveExecutorCommand`'s own
+ * `capacities.<capacityId>` > `executors.<tier>` > `executor` precedence
+ * (tsk-62v). Note the same precedence applies on the escalation attempt too:
+ * a `capacityId` whose config entry declares its own `command`/`adapter`
+ * wins over `escalateTier` there as well, same as it wins over `tier` on the
+ * base attempts — today's only caller (`runJudgeExecutor`) never sets
+ * `escalateTier`, so this never actually happens in practice.
  */
 export function runRetryingExecutor(
   cfg,
   model,
   prompt,
   stricterPrompt,
-  { tier, maxAttempts, escalateTier, escalateModel, scoutCapture },
+  { tier, maxAttempts, escalateTier, escalateModel, scoutCapture, capacityId, fgosDir },
 ) {
-  const verdict = runBoundedAttempts(cfg, model, prompt, stricterPrompt, tier, maxAttempts, scoutCapture);
+  const verdict = runBoundedAttempts(cfg, model, prompt, stricterPrompt, tier, maxAttempts, scoutCapture, capacityId, fgosDir);
   if (verdict !== null) {
     return verdict;
   }
@@ -265,7 +284,7 @@ export function runRetryingExecutor(
     return null;
   }
 
-  const result = spawnAttempt(cfg, escalateModel ?? model, stricterPrompt, escalateTier, scoutCapture);
+  const result = spawnAttempt(cfg, escalateModel ?? model, stricterPrompt, escalateTier, scoutCapture, capacityId, fgosDir);
   if (result.error || result.status !== 0) {
     return null;
   }
@@ -289,14 +308,26 @@ export function runRetryingExecutor(
  * `docs/history/<docsRef>/scout-notes.md`. `capture: false` (fresh notes
  * already exist) spawns exactly like a pre-tsk-g18 call — no transcript
  * capture, no write — since there is nothing new worth persisting.
+ *
+ * `capacityId`/`fgosDir` (tsk-2yp, optional, additive): lets a caller opt
+ * this call into capacity-aware dispatch (`capacities.<capacityId>` ahead of
+ * `executors.judge`, tsk-62v) instead of always resolving straight to
+ * `executors.judge` (Claude). `judgeDiscovery`/`judgeDecompose` pass
+ * `'judge-discovery'`/`'judge-decompose'`. Both omitted (every
+ * pre-tsk-2yp caller) resolves exactly as before — no `capacities` entry
+ * configured for those ids means `resolveExecutorConfig` falls through to
+ * `executors.judge` regardless, so this is a no-op until an operator
+ * actually adds one.
  */
-export function runJudgeExecutor(cfg, model, prompt, stricterPrompt, scout) {
+export function runJudgeExecutor(cfg, model, prompt, stricterPrompt, scout, capacityId, fgosDir) {
   const capture = scout?.capture ? {} : null;
 
   const verdict = runRetryingExecutor(cfg, model, prompt, stricterPrompt, {
     tier: 'judge',
     maxAttempts: MAX_JUDGE_ATTEMPTS,
     scoutCapture: capture,
+    capacityId,
+    fgosDir,
   });
 
   if (verdict !== null && capture?.entries?.length) {

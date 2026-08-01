@@ -222,8 +222,12 @@ function normalizeChild(child) {
  * same shape and effect as `judgeDiscovery`'s own `scoutContext` (see that
  * doc comment). Omitted (every pre-tsk-g18 caller, including every existing
  * test) keeps this function byte-identical.
+ *
+ * `fgosDir` (tsk-2yp, optional, additive): same effect as `judgeDiscovery`'s
+ * own `fgosDir` (see that doc comment), paired here with the hardcoded
+ * `'judge-decompose'` capacity id instead.
  */
-export function judgeDecompose(work, cfg, lockedContext, view, scoutContext) {
+export function judgeDecompose(work, cfg, lockedContext, view, scoutContext, fgosDir) {
   try {
     const tier = work?.tier ?? DEFAULTS.tier;
     const model = modelForTier(cfg, tier);
@@ -234,7 +238,7 @@ export function judgeDecompose(work, cfg, lockedContext, view, scoutContext) {
     const scout = scoutContext
       ? { repoRoot: scoutContext.repoRoot, docsRef: scoutContext.docsRef, capture: !priorScoutNotes }
       : undefined;
-    const verdict = runJudgeExecutor(cfg, model, prompt, stricterPrompt, scout);
+    const verdict = runJudgeExecutor(cfg, model, prompt, stricterPrompt, scout, 'judge-decompose', fgosDir);
     if (!verdict || typeof verdict.verdict !== 'string') {
       return { kind: 'invalid' };
     }
@@ -390,7 +394,7 @@ export function resolveDecompose(dir, id, cfg, role) {
 
   const repoRoot = path.dirname(dir);
   const lockedContext = readLockedContext(repoRoot, work.docsRef);
-  const verdict = judgeDecompose(work, cfg, lockedContext, view, { repoRoot, docsRef: work.docsRef });
+  const verdict = judgeDecompose(work, cfg, lockedContext, view, { repoRoot, docsRef: work.docsRef }, dir);
 
   if (verdict.kind === 'invalid') {
     logDecomposeVerdict(dir, id, 'invalid', DEFAULT_INVALID_RATIONALE);

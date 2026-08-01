@@ -4,6 +4,9 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { runJudgeExecutor, runRetryingExecutor, readScoutNotes } from '../../src/intake/judge-executor.mjs';
+import { RunnerConfigError } from '../../src/runner/dispatch.mjs';
+import { initStore, registerTool } from '../../src/state/store.mjs';
+import { writeLocalStatus } from '../../src/state/tool-registry.mjs';
 
 // Fake executors only — every "command" spawned here is a node script this
 // file writes to a mkdtemp directory at test time, mirroring
@@ -340,6 +343,67 @@ test('runJudgeExecutor falls back to the base cfg.executor when cfg.executors.ju
   const cfg = cfgFor(scriptPath);
   const verdict = runJudgeExecutor(cfg, 'sonnet', 'prompt', 'stricter prompt');
   assert.deepEqual(verdict, { clear: false, question: 'from base executor' });
+  assert.equal(readCount(counterPath), 1);
+});
+
+// tsk-2yp: capacityId/fgosDir wiring — capacities.<capacityId> now wins
+// ahead of executors.<tier> for judge dispatch too, mirroring dispatch.mjs's
+// own resolveExecutorConfig precedence tests.
+
+test('runJudgeExecutor resolves through cfg.capacities.<capacityId> when configured, ahead of cfg.executors.judge', () => {
+  const dir = mkTempDir();
+  const { scriptPath: judgeScript } = writeValidExecutor(dir, { clear: false, question: 'from executors.judge' });
+  const { scriptPath: capacityScript, counterPath } = writeValidExecutor(dir, { clear: true, verify: 'from capacity' });
+  const cfg = {
+    executor: { command: '/no/such/executor-binary-xyz', args: ['{prompt}'] },
+    executors: { judge: { command: process.execPath, args: [judgeScript, '{prompt}'] } },
+    capacities: { 'judge-discovery': { command: process.execPath, args: [capacityScript, '{prompt}'] } },
+    timeoutMs: 5000,
+  };
+  const verdict = runJudgeExecutor(cfg, 'sonnet', 'prompt', 'stricter prompt', undefined, 'judge-discovery');
+  assert.deepEqual(verdict, { clear: true, verify: 'from capacity' });
+  assert.equal(readCount(counterPath), 1);
+});
+
+test('runJudgeExecutor falls back to cfg.executors.judge unchanged when capacityId is given but has no matching capacities entry', () => {
+  const dir = mkTempDir();
+  const { scriptPath, counterPath } = writeValidExecutor(dir, { clear: true, verify: 'from executors.judge' });
+  const cfg = {
+    executor: { command: '/no/such/executor-binary-xyz', args: ['{prompt}'] },
+    executors: { judge: { command: process.execPath, args: [scriptPath, '{prompt}'] } },
+    timeoutMs: 5000,
+  };
+  const verdict = runJudgeExecutor(cfg, 'sonnet', 'prompt', 'stricter prompt', undefined, 'judge-decompose');
+  assert.deepEqual(verdict, { clear: true, verify: 'from executors.judge' });
+  assert.equal(readCount(counterPath), 1);
+});
+
+test('runJudgeExecutor throws (propagates RunnerConfigError, no catch at this layer) when a kind:"cli" capacity is not registered and fgosDir is given', () => {
+  const dir = mkTempDir();
+  initStore(dir);
+  const cfg = {
+    executor: { command: process.execPath, args: [writeValidExecutor(dir, { clear: true }).scriptPath, '{prompt}'] },
+    capacities: { 'judge-discovery': { kind: 'cli', command: 'agy-definitely-not-registered-xyz', args: ['{prompt}'] } },
+    timeoutMs: 5000,
+  };
+  assert.throws(
+    () => runJudgeExecutor(cfg, 'sonnet', 'prompt', 'stricter prompt', undefined, 'judge-discovery', dir),
+    RunnerConfigError,
+  );
+});
+
+test('runJudgeExecutor skips the kind:"cli" presence check (byte-identical) when fgosDir is omitted, even with a matching capacities entry', () => {
+  const dir = mkTempDir();
+  const { scriptPath, counterPath } = writeValidExecutor(dir, { clear: true, verify: 'from capacity, no presence check' });
+  const cfg = {
+    executor: { command: '/no/such/executor-binary-xyz', args: ['{prompt}'] },
+    capacities: {
+      'judge-discovery': { kind: 'cli', command: process.execPath, args: [scriptPath, '{prompt}'], allowCrossProvider: true },
+    },
+    timeoutMs: 5000,
+  };
+  const verdict = runJudgeExecutor(cfg, 'sonnet', 'prompt', 'stricter prompt', undefined, 'judge-discovery');
+  assert.deepEqual(verdict, { clear: true, verify: 'from capacity, no presence check' });
   assert.equal(readCount(counterPath), 1);
 });
 

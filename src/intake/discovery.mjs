@@ -190,8 +190,15 @@ Trả lời DUY NHẤT bằng một dòng JSON, không kèm chữ nào khác:
  * process itself never gains a Write grant; the parent, this function via
  * `runJudgeExecutor`, does the writing). Omitted (every pre-tsk-g18 caller,
  * including every existing test) keeps this function byte-identical.
+ *
+ * `fgosDir` (tsk-2yp, optional, additive): passed straight through to
+ * `runJudgeExecutor` alongside the hardcoded `'judge-discovery'` capacity id
+ * — lets an operator route this call through `capacities.judge-discovery`
+ * (tsk-62v precedence) instead of always `executors.judge`. Omitted (every
+ * pre-tsk-2yp caller) keeps this function byte-identical: no configured
+ * capacity means resolution falls through to `executors.judge` regardless.
  */
-export function judgeDiscovery(work, cfg, view, scoutContext) {
+export function judgeDiscovery(work, cfg, view, scoutContext, fgosDir) {
   try {
     const tier = work?.tier ?? DEFAULTS.tier;
     const model = modelForTier(cfg, tier);
@@ -202,7 +209,7 @@ export function judgeDiscovery(work, cfg, view, scoutContext) {
     const scout = scoutContext
       ? { repoRoot: scoutContext.repoRoot, docsRef: scoutContext.docsRef, capture: !priorScoutNotes }
       : undefined;
-    const verdict = runJudgeExecutor(cfg, model, prompt, stricterPrompt, scout);
+    const verdict = runJudgeExecutor(cfg, model, prompt, stricterPrompt, scout, 'judge-discovery', fgosDir);
     if (!verdict || typeof verdict.clear !== 'boolean') {
       return { clear: false, question: DEFAULT_UNCLEAR_QUESTION };
     }
@@ -303,7 +310,7 @@ export function resolveDiscovery(dir, id, cfg, role) {
     return { outcome: 'clear', id, verdict: { clear: true, skipped: true } };
   }
 
-  const verdict = judgeDiscovery(work, cfg, view, { repoRoot, docsRef: work.docsRef });
+  const verdict = judgeDiscovery(work, cfg, view, { repoRoot, docsRef: work.docsRef }, dir);
   addDiscovery(dir, { id, ...verdict });
 
   // work-item-priority-matrix D6/D7 (was STR8 D4's intentScore -> work.intent):
