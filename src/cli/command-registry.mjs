@@ -190,6 +190,42 @@ export const COMMAND_REGISTRY = [
     deprecated: null,
   },
   {
+    name: 'retrospective',
+    invoke: 'fgos retrospective',
+    description: 'Batch sweep, run once per invocation: moves every delivered item to retrospective (the mechanical claim step). Never runs the synthesis itself — that is a session\'s own separate work while an item sits at retrospective.',
+    parameters: {
+      type: 'object',
+      properties: {},
+      positional: [],
+      required: [],
+    },
+    examples: ['fgos retrospective'],
+    touchesState: true,
+    requiresExistingStore: true,
+    externalEffect: false,
+    paginated: false,
+    deprecated: null,
+  },
+  {
+    name: 'cleanup',
+    invoke: 'fgos cleanup',
+    description: 'Finish a cleanup-parked item: verifies the global TTL has elapsed, retrospective produced real content, and (worktree-backed domains only) the merge still resolves on main, then deletes the branch/worktree and closes to done. Any check failing parks cleanup -> blocked with every failing reason.',
+    parameters: {
+      type: 'object',
+      properties: {
+        id: { type: 'string', description: 'Work item id (positional or --id).' },
+      },
+      positional: ['id'],
+      required: ['id'],
+    },
+    examples: ['fgos cleanup build-cli'],
+    touchesState: true,
+    requiresExistingStore: true,
+    externalEffect: true,
+    paginated: false,
+    deprecated: null,
+  },
+  {
     name: 'edit',
     invoke: 'fgos edit',
     description: 'Patch fields on an existing item (title/description/kind/risk/verify/tier/refs/deps/footprint/acceptance/priority/intent/docs-ref/parent/urgent/impact/effort). At least one field must be given.',
@@ -573,7 +609,7 @@ export const COMMAND_REGISTRY = [
   {
     name: 'approve',
     invoke: 'fgos approve',
-    description: 'Merge a runner item into main (or re-verify a pull/legacy item on main) and move it to done, or park it blocked on conflict/verify failure.',
+    description: 'Merge a runner item into main (or re-verify a pull/legacy item on main) and move it to delivered, or park it blocked on conflict/verify failure. done is reached later via retrospective/cleanup.',
     parameters: {
       type: 'object',
       properties: {

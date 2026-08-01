@@ -84,6 +84,13 @@ export const DOMAINS = Object.freeze({
       decompose: 'fgos-planning',
       executing: 'fgos-executing',
     }),
+    // work-item-status-delivered-retrospective-cleanup D5/D8 (deferred
+    // item from CONTEXT.md): does this domain's items go through a real
+    // git worktree/merge, such that cleanup-harness.mjs's
+    // checkMergeStillResolves has a real commit to verify? coding items
+    // always carry a genuine headAtTake/headAtReturn/branchHeadAt* pair
+    // from a real merge or return.
+    worktreeBacked: true,
   }),
   synthetic: Object.freeze({
     stages: Object.freeze(['assembling']),
@@ -97,6 +104,12 @@ export const DOMAINS = Object.freeze({
     skillMap: Object.freeze({
       assembling: null,
     }),
+    // No real worktree or merge ever happens for this domain (file header:
+    // "illustrative, disposable... exists only to prove... runs on the
+    // same base FSM") — the cleanup harness must not hold it to a
+    // merge-still-resolves check it was never claiming in the first
+    // place.
+    worktreeBacked: false,
   }),
 });
 

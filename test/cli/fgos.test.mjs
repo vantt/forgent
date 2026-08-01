@@ -7150,3 +7150,133 @@ test('take still claims a todo item that has no fgw/<id> branch of its own', () 
   assert.equal(data.source, 'main');
   assert.equal(stateView(cwd).work['take-no-branch-item'].status, 'doing');
 });
+
+// --- retrospective / cleanup (work-item-status-delivered-retrospective- ---
+// --- cleanup D7/D8/D9) ------------------------------------------------
+
+function writeCleanupTtlConfig(cwd, ttlDays) {
+  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ cleanup: { ttlDays } }));
+}
+
+test('retrospective sweeps every delivered item to retrospective, in one pass, leaving non-delivered items untouched', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'retro-todo-item'); // stays todo
+  addOk(cwd, 'retro-delivered-a');
+  run(cwd, ['move', 'retro-delivered-a', '--to', 'doing']);
+  run(cwd, ['move', 'retro-delivered-a', '--to', 'delivered']);
+  addOk(cwd, 'retro-delivered-b');
+  run(cwd, ['move', 'retro-delivered-b', '--to', 'doing']);
+  run(cwd, ['move', 'retro-delivered-b', '--to', 'delivered']);
+
+  const result = run(cwd, ['retrospective']);
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.count, 2);
+  assert.deepEqual(data.swept.map((s) => s.id).sort(), ['retro-delivered-a', 'retro-delivered-b']);
+
+  const view = stateView(cwd);
+  assert.equal(view.work['retro-todo-item'].status, 'todo', 'a non-delivered item is never touched');
+  assert.equal(view.work['retro-delivered-a'].status, 'retrospective');
+  assert.equal(view.work['retro-delivered-b'].status, 'retrospective');
+});
+
+test('retrospective on a store with no delivered items is a clean no-op, exit 0, empty sweep', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'nothing-delivered');
+  const result = run(cwd, ['retrospective']);
+  assert.equal(result.status, 0);
+  assert.deepEqual(envelopeData(result.stdout), { swept: [], count: 0 });
+});
+
+test('cleanup on a nonexistent id is rejected as validation, exit 4', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['cleanup', 'ghost']);
+  assert.equal(result.status, 4);
+});
+
+test('cleanup on an item not at status cleanup is rejected as precondition, exit 2', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'cleanup-wrong-status');
+  const result = run(cwd, ['cleanup', 'cleanup-wrong-status']);
+  assert.equal(result.status, 2);
+});
+
+test('cleanup parks cleanup -> blocked, with every failing reason joined, when the TTL has not elapsed and no retrospective content exists', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'cleanup-not-ready');
+  run(cwd, ['move', 'cleanup-not-ready', '--to', 'doing']);
+  run(cwd, ['move', 'cleanup-not-ready', '--to', 'delivered']);
+  run(cwd, ['move', 'cleanup-not-ready', '--to', 'retrospective']);
+  run(cwd, ['move', 'cleanup-not-ready', '--to', 'cleanup']);
+  // Default TTL (7d, no config written) — freshly entered, not elapsed.
+
+  const result = run(cwd, ['cleanup', 'cleanup-not-ready']);
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.to, 'blocked');
+  assert.match(data.reason, /not ready yet/);
+  assert.match(data.reason, /no outcome or decision record/);
+
+  assert.equal(stateView(cwd).work['cleanup-not-ready'].status, 'blocked');
+});
+
+test('cleanup closes to done when TTL is configured to 0 and retrospective content + a resolving merge both exist', () => {
+  // KNOWN GAP, deliberately left in place this item (flagged for a
+  // dedicated follow-up, not silently dropped): approve's merge paths
+  // still call cleanupMergedBranch synchronously today, the exact eager
+  // deletion D7 exists to move later — so the branch is typically already
+  // gone by the time this verb runs. cleanup's own cleanupMergedBranch
+  // call is idempotent (branchExists guards it, and the function itself
+  // never throws on an already-gone branch, per merge.test.mjs) — this
+  // test asserts the STATUS transition works correctly regardless of
+  // which point actually performed the git-level deletion.
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  writeCleanupTtlConfig(cwd, 0);
+  makeRunnerProposedItem(cwd, 'cleanup-ready-item', { verify: 'test -f cleanup-ready-item-produced.txt' });
+  commitPendingBeforeApprove(cwd, 'cleanup-ready-item');
+
+  const approve = run(cwd, ['approve', 'cleanup-ready-item']);
+  assert.equal(approve.status, 0, `approve failed: ${approve.stderr}`);
+  assert.equal(stateView(cwd).work['cleanup-ready-item'].status, 'delivered');
+
+  run(cwd, ['move', 'cleanup-ready-item', '--to', 'retrospective']);
+  const dir = path.join(cwd, '.fgos');
+  addOutcome(dir, { id: 'cleanup-ready-item', docType: 'how-to', actual: { outcome: 'pass', passed: true, attempts: 1, errorClass: null, aheadCount: 0, visits: 1 } });
+  run(cwd, ['move', 'cleanup-ready-item', '--to', 'cleanup']);
+
+  const result = run(cwd, ['cleanup', 'cleanup-ready-item']);
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.to, 'done');
+
+  assert.equal(stateView(cwd).work['cleanup-ready-item'].status, 'done');
+  const branchAfter = gitAtCwd(cwd, ['for-each-ref', '--format=%(refname:short)', 'refs/heads/fgw/']);
+  assert.doesNotMatch(branchAfter, /fgw\/cleanup-ready-item/, 'the branch is gone by the time cleanup finishes, whichever step actually deleted it');
+});
+
+test('cleanup parks cleanup -> blocked when the recorded commit no longer resolves on main (force-pushed/rewritten away)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  writeCleanupTtlConfig(cwd, 0);
+  const dir = path.join(cwd, '.fgos');
+  addWork(dir, {
+    id: 'cleanup-bad-merge',
+    title: 'Bad merge',
+    kind: 'task',
+    status: 'cleanup',
+    deps: [],
+    risk: 'low',
+    refs: [],
+    verify: 'true',
+    headAtReturn: '0'.repeat(40), // a well-formed but nonexistent sha
+  });
+  addOutcome(dir, { id: 'cleanup-bad-merge', actual: { outcome: 'pass', passed: true, attempts: 1, errorClass: null, aheadCount: 0, visits: 1 } });
+
+  const result = run(cwd, ['cleanup', 'cleanup-bad-merge']);
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.to, 'blocked');
+  assert.match(data.reason, /no longer reachable/);
+});

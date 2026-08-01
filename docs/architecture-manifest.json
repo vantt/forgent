@@ -48,6 +48,7 @@
     "src/state/graph-metrics.mjs": "domain",
     "src/state/graph-harness.mjs": "domain",
     "src/state/awaiting-context.mjs": "domain",
+    "src/state/cleanup-harness.mjs": "domain",
     "src/intake/discovery.mjs": "use-case",
     "src/intake/decompose.mjs": "use-case",
     "src/intake/judge-executor.mjs": "infra",

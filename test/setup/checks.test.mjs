@@ -14,6 +14,7 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { DOCTOR_CHECKS, FIX_REGISTRATIONS, integrationScriptPath, mainCheckoutHookWired, resolveMainCheckout } from '../../src/setup/checks.mjs';
 import { DEFAULT_RUNNER_CONFIG } from '../../src/runner/dispatch.mjs';
 import { DEFAULT_LEVEL } from '../../src/state/gate-bypass.mjs';
+import { DEFAULT_CLEANUP_TTL_DAYS } from '../../src/setup/registrations.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FGOS = path.resolve(__dirname, '../../bin/fgos.mjs');
@@ -144,7 +145,11 @@ test('config-not-stale passes when the existing config already has every default
   fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
   fs.writeFileSync(
     path.join(cwd, '.fgos', 'config.json'),
-    JSON.stringify({ runner: DEFAULT_RUNNER_CONFIG, gateBypass: { level: 'off' } }),
+    JSON.stringify({
+      runner: DEFAULT_RUNNER_CONFIG,
+      gateBypass: { level: 'off' },
+      cleanup: { ttlDays: DEFAULT_CLEANUP_TTL_DAYS },
+    }),
   );
   const { passed } = checkById('config-not-stale').check(cwd);
   assert.equal(passed, true);

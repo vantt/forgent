@@ -68,6 +68,16 @@ test('DOMAINS.synthetic.skillMap.assembling is null (synthetic has never loaded 
   assert.ok(Object.isFrozen(DOMAINS.synthetic.skillMap));
 });
 
+// --- worktreeBacked (work-item-status-delivered-retrospective-cleanup D5/D8) ---
+
+test('DOMAINS.coding.worktreeBacked is true (real git merges, cleanup-harness must verify them)', () => {
+  assert.equal(DOMAINS.coding.worktreeBacked, true);
+});
+
+test('DOMAINS.synthetic.worktreeBacked is false (no real worktree/merge ever happens for this domain)', () => {
+  assert.equal(DOMAINS.synthetic.worktreeBacked, false);
+});
+
 test('skillForStage resolves each of coding\'s mapped stages to its skill name', () => {
   assert.equal(skillForStage(DOMAINS.coding, 'clarify'), 'fgos-exploring');
   assert.equal(skillForStage(DOMAINS.coding, 'decompose'), 'fgos-planning');
