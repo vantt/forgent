@@ -242,6 +242,46 @@ test('a pure new log (every event carries v) replays correctly, not just old-alo
   assert.deepEqual(view, rebuildView(logPath));
 });
 
+test('D6 lazy-default: a pre-feature item that reached "done" via the old doing->done edge replays unchanged, no delivered/retrospective/cleanup history required', () => {
+  // Pre-tsk-5e9 logs only ever had a direct doing->done move (or
+  // awaiting-approval->done) — the new edge set retires both in favor of
+  // the delivered->retrospective->cleanup->done chain, but replay never
+  // re-validates old events against today's FSM edges (it only folds
+  // `to` onto `item.status`, see applyEvent's 'work.move' case), so an old
+  // log like this one must still fold to exactly what it said back then.
+  const dir = tmpDir();
+  const logPath = path.join(dir, 'events.jsonl');
+
+  appendEvent(logPath, {
+    type: 'work.add',
+    payload: {
+      id: 'old-closed-item',
+      title: 'Old closed item',
+      kind: 'chore',
+      status: 'todo',
+      deps: [],
+      risk: 'low',
+      refs: [],
+      verify: 'npm test',
+    },
+  });
+  appendEvent(logPath, { type: 'work.move', payload: { id: 'old-closed-item', from: 'todo', to: 'doing' } });
+  appendEvent(logPath, { type: 'work.move', payload: { id: 'old-closed-item', from: 'doing', to: 'done' } });
+
+  const view = rebuildView(logPath);
+  const item = view.work['old-closed-item'];
+
+  assert.equal(item.status, 'done');
+  // No delivered/retrospective/cleanup fields exist to backfill — D6 is
+  // "lazy default", never a rewrite of history that never happened.
+  assert.equal('stage' in item, false, 'stage stays absent, never injected by replay (D8 lazy-default)');
+  assert.equal('domain' in item, false, 'domain stays absent, never injected by replay (D8 lazy-default)');
+
+  // Deterministic on repeated rebuilds, same guarantee every other case in
+  // this suite already proves.
+  assert.deepEqual(view, rebuildView(logPath));
+});
+
 test('the fixture file itself is never modified by any test in this suite', () => {
   assert.equal(fs.readFileSync(FIXTURE_PATH, 'utf8'), FIXTURE_RAW_AT_LOAD);
 });
