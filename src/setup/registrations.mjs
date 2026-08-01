@@ -24,6 +24,8 @@ import { mainCheckoutHookWired } from './git-hooks.mjs';
 import { DEFAULT_RUNNER_CONFIG } from '../runner/dispatch.mjs';
 import { listWork } from '../state/store.mjs';
 import { readLocalStatus, classifyRegistryPosture } from '../state/tool-registry.mjs';
+import { describeConfigAwareness } from '../config/global-config.mjs';
+import { sharedConfigFilePath, legacyRunnerConfigPath, readSharedConfig, writeSharedConfig } from '../config/shared-config-file.mjs';
 
 export { mainCheckoutHookWired } from './git-hooks.mjs';
 
@@ -82,6 +84,42 @@ export function registerConfigDefault({ id, key, shape }) {
     throw new Error(`registerConfigDefault("${id}") requires a plain-object shape`);
   }
   CONFIG_DEFAULT_REGISTRATIONS.push({ id, key, shape });
+}
+
+/**
+ * Assemble the shared config file's DEFAULT shape from every registered
+ * entry (tsk-5vf D4): `{ [entry.key]: entry.shape, ... }`. Registry-driven
+ * -- a new `registerConfigDefault` call is automatically picked up here,
+ * never requiring an edit to this function.
+ */
+function assembleRegistryDefaults() {
+  const defaults = {};
+  for (const { key, shape } of CONFIG_DEFAULT_REGISTRATIONS) {
+    defaults[key] = shape;
+  }
+  return defaults;
+}
+
+/**
+ * Registry-driven bootstrap for the shared config file (tsk-5vf D4): reads
+ * whatever is currently at `dir` (the new file, or its legacy
+ * `.fgos-runner.json` fallback wrapped as `{runner: ...}` -- `readSharedConfig`),
+ * fills in any key any registered entry's default shape has that the
+ * current content is missing, at any depth, and writes back only when a
+ * key was actually added or the shared file did not exist yet. Never
+ * deletes the legacy file. This is the write path `fgos setup` calls
+ * (RUL9: doctor checks stay read-only; `setup` is the one write verb).
+ */
+export function ensureSharedConfigDefaults(dir) {
+  const existing = readSharedConfig(dir);
+  const defaults = assembleRegistryDefaults();
+  const { merged, addedKeys } = mergeConfigDefaults(existing, defaults);
+  const sharedExisted = fs.existsSync(sharedConfigFilePath(dir));
+  if (sharedExisted && addedKeys.length === 0) {
+    return { config: existing, addedKeys: [] };
+  }
+  writeSharedConfig(dir, merged);
+  return { config: merged, addedKeys };
 }
 
 /**
@@ -207,30 +245,29 @@ function checkShellIntegrationSourced() {
   return { passed: true, message: `sourced in: ${rcFiles.join(', ')}` };
 }
 
-// config-not-stale is READ-ONLY by construction: it reads and JSON.parses
-// .fgos-runner.json directly and calls mergeConfigDefaults (pure), but never
-// calls dispatch.mjs's ensureRunnerConfig — doctor never writes.
+// config-not-stale is READ-ONLY by construction: `readSharedConfig` only
+// calls fs.existsSync/readFileSync, never `ensureSharedConfigDefaults` or
+// `ensureRunnerConfig` — doctor never writes.
 //
-// Still targets `.fgos-runner.json` directly, unchanged (D6 does not apply
-// here yet): the shared config file D3/D6 describe lives on `tsk-2ta`'s own
-// branch, not yet landed — see docs/history/setup-doctor-config-registry/
-// plan.md's "Real blast radius" note. `registerConfigDefault` below proves
-// the config-default half of the registry mechanism generically (the
-// runner's own shape, registered under the `runner` key it will eventually
-// own), without wiring it into this check's real target file — that wiring
-// is `tsk-2cs`'s own explicitly deferred follow-up once the shared file is
-// real, not a silent partial migration done here.
+// Retargeted at the shared config file (`.fgos/config.json`, tsk-2ta D1
+// amended) with a legacy-`.fgos-runner.json` read fallback baked into
+// `readSharedConfig` itself, and made generic over every registered entry
+// (tsk-5vf D4/D5) — the `registerConfigDefault` follow-up
+// `docs/history/setup-doctor-config-registry/plan.md`'s "Real blast radius"
+// note deferred to once the shared file was real.
 function checkConfigNotStale(cwd) {
-  const configPath = path.join(cwd, '.fgos-runner.json');
-  if (!fs.existsSync(configPath)) {
+  const sharedPath = sharedConfigFilePath(cwd);
+  const legacyPath = legacyRunnerConfigPath(cwd);
+  if (!fs.existsSync(sharedPath) && !fs.existsSync(legacyPath)) {
     return { passed: false, message: 'not yet configured -- run fgos setup' };
   }
-  const existingConfig = JSON.parse(fs.readFileSync(configPath, 'utf8'));
-  const { addedKeys } = mergeConfigDefaults(existingConfig, DEFAULT_RUNNER_CONFIG);
+  const existingConfig = readSharedConfig(cwd);
+  const defaults = assembleRegistryDefaults();
+  const { addedKeys } = mergeConfigDefaults(existingConfig, defaults);
   if (addedKeys.length > 0) {
     return { passed: false, message: `stale config — missing keys: ${addedKeys.join(', ')} — run fgos setup` };
   }
-  return { passed: true, message: `config up to date at ${configPath}` };
+  return { passed: true, message: `config up to date at ${fs.existsSync(sharedPath) ? sharedPath : legacyPath}` };
 }
 
 function checkMainCheckoutHookWired(cwd) {
@@ -282,7 +319,7 @@ registerCheck({
 
 registerCheck({
   id: 'config-not-stale',
-  description: '.fgos-runner.json exists and has every current default key',
+  description: '.fgos/config.json (or its legacy .fgos-runner.json fallback) exists and has every current registered default key',
   check: (cwd) => checkConfigNotStale(cwd),
 });
 
@@ -298,12 +335,77 @@ registerCheck({
   check: (cwd) => checkToolRegistryConfigured(cwd),
 });
 
-// The runner's own config-default, registered under the key it will
-// eventually own in the shared file (D6) — proves a built-in module can
-// register a config-default the same way a brand-new module would, without
-// (yet) changing what checkConfigNotStale actually reads.
+// docs/history/global-project-config-awareness/CONTEXT.md D1: reports which
+// config level is currently active (project always wins when present) and
+// whether the other level is also on disk, so "aware" means visible in
+// `fgos doctor` output, not just correct-but-silent precedence at runtime.
+// READ-ONLY by construction (same as every other check here) —
+// describeConfigAwareness only calls fs.existsSync, never writes.
+function checkGlobalProjectAwareness(cwd) {
+  const { active, globalPresent, projectPresent, globalConfigPath, projectConfigPath } =
+    describeConfigAwareness(cwd);
+  if (active === 'none') {
+    return {
+      passed: true,
+      message: `no config at either level yet — project: ${projectConfigPath}, global: ${globalConfigPath}`,
+    };
+  }
+  const other = active === 'project' ? 'global' : 'project';
+  const otherPresent = active === 'project' ? globalPresent : projectPresent;
+  return {
+    passed: true,
+    message: `active: ${active} (${active === 'project' ? projectConfigPath : globalConfigPath}) — ${other} config ${otherPresent ? 'also present' : 'not present'}`,
+  };
+}
+
+registerCheck({
+  id: 'config-awareness',
+  description: 'which config level (global/project) is active, and whether the other is also present (tsk-2ta-2)',
+  check: (cwd) => checkGlobalProjectAwareness(cwd),
+});
+
+// The runner's own config-default, registered under its key in the shared
+// file (tsk-2cs D6) — `checkConfigNotStale`/`ensureSharedConfigDefaults`
+// above are both driven by this registration generically (tsk-5vf D4), not
+// a hardcoded reference to `DEFAULT_RUNNER_CONFIG`'s shape.
 registerConfigDefault({
   id: 'runner',
   key: 'runner',
   shape: DEFAULT_RUNNER_CONFIG,
+});
+
+// tsk-slq D6 (AGENTS.md's install/setup/doctor gate — a new infra
+// dependency must register into doctor's check registry, not stand alone
+// undiscoverable by doctor): forgent had zero npm dependencies until tsk-slq
+// added `yaml` (D4) as the first one. A bare checkout (e.g. a fresh clone,
+// or a disposable worktree like `fgos return`'s own goal-check checkout)
+// never runs `npm install` on its own — this check makes that gap visible
+// to a human/session running `fgos doctor`, the same "absent capability =
+// clean skip, never hidden" contract `checkToolRegistryConfigured` already
+// gives tool-registry posture. READ-ONLY by construction (same as every
+// other check here) — only fs.existsSync, doctor never writes.
+function checkDependenciesInstalled(cwd) {
+  const mainCheckout = resolveMainCheckout(cwd);
+  const root = mainCheckout ?? cwd;
+  const packageJsonPath = path.join(root, 'package.json');
+  if (!fs.existsSync(packageJsonPath)) {
+    return { passed: true, message: 'no package.json — nothing to check' };
+  }
+  const pkg = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+  const deps = Object.keys(pkg.dependencies ?? {});
+  if (deps.length === 0) {
+    return { passed: true, message: 'no runtime dependencies declared — nothing to check' };
+  }
+  const nodeModulesPath = path.join(root, 'node_modules');
+  const missing = deps.filter((dep) => !fs.existsSync(path.join(nodeModulesPath, dep)));
+  if (missing.length > 0) {
+    return { passed: false, message: `missing from node_modules: ${missing.join(', ')} — run npm install` };
+  }
+  return { passed: true, message: `${deps.length} dependenc${deps.length === 1 ? 'y' : 'ies'} installed` };
+}
+
+registerCheck({
+  id: 'dependencies-installed',
+  description: 'package.json dependencies are present in node_modules (tsk-slq D6)',
+  check: (cwd) => checkDependenciesInstalled(cwd),
 });

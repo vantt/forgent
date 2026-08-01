@@ -43,6 +43,7 @@ output.txt
 /.claude/*
 !/.claude/skills/
 !/.claude/settings.json
+!/.claude/agents/
 /.claude/skills/*
 !/.claude/skills/fgos-*/
 !/.claude/skills/distill/

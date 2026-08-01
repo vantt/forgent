@@ -29,11 +29,39 @@ function checkById(id) {
 
 // ─── Unit tests: DOCTOR_CHECKS ─────────────────────────────────────────────
 
-test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-checkout-hook-wired and tool-registry-configured', () => {
+test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-checkout-hook-wired, tool-registry-configured, config-awareness, and dependencies-installed', () => {
   assert.deepEqual(
     DOCTOR_CHECKS.map((c) => c.id).sort(),
-    ['config-not-stale', 'main-checkout-hook-wired', 'node-version-and-git', 'shell-integration-sourced', 'tool-registry-configured'].sort(),
+    ['config-not-stale', 'main-checkout-hook-wired', 'node-version-and-git', 'shell-integration-sourced', 'tool-registry-configured', 'config-awareness', 'dependencies-installed'].sort(),
   );
+});
+
+test('dependencies-installed passes when package.json has no dependencies field (pre-tsk-slq behavior)', () => {
+  const tmp = mkTemp('fgos-deps-check-');
+  fs.writeFileSync(path.join(tmp, 'package.json'), JSON.stringify({ name: 'x' }));
+  const { passed, message } = checkById('dependencies-installed').check(tmp);
+  assert.equal(passed, true);
+  assert.match(message, /no runtime dependencies declared/);
+  fs.rmSync(tmp, { recursive: true, force: true });
+});
+
+test('dependencies-installed fails when a declared dependency is missing from node_modules', () => {
+  const tmp = mkTemp('fgos-deps-check-');
+  fs.writeFileSync(path.join(tmp, 'package.json'), JSON.stringify({ name: 'x', dependencies: { yaml: '^2.9.0' } }));
+  const { passed, message } = checkById('dependencies-installed').check(tmp);
+  assert.equal(passed, false);
+  assert.match(message, /missing from node_modules: yaml/);
+  fs.rmSync(tmp, { recursive: true, force: true });
+});
+
+test('dependencies-installed passes when every declared dependency is present in node_modules', () => {
+  const tmp = mkTemp('fgos-deps-check-');
+  fs.writeFileSync(path.join(tmp, 'package.json'), JSON.stringify({ name: 'x', dependencies: { yaml: '^2.9.0' } }));
+  fs.mkdirSync(path.join(tmp, 'node_modules', 'yaml'), { recursive: true });
+  const { passed, message } = checkById('dependencies-installed').check(tmp);
+  assert.equal(passed, true);
+  assert.match(message, /1 dependency installed/);
+  fs.rmSync(tmp, { recursive: true, force: true });
 });
 
 test('tool-registry-configured always passes — inactive is a clean skip, never a failure', () => {
@@ -114,6 +142,87 @@ test('config-not-stale fails when the existing config is missing a default key',
   const { passed, message } = checkById('config-not-stale').check(cwd);
   assert.equal(passed, false);
   assert.match(message, /stale config/);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+// ─── config-awareness (docs/history/global-project-config-awareness/ ──────
+// CONTEXT.md D1): always passes (informational, read-only, same contract as
+// tool-registry-configured) -- only the message and `active` distinguish
+// which level is in play. Every case overrides HOME (same pattern the
+// shell-integration-sourced tests above already use) so this never touches
+// the real ~/.fgos/config.json; project config is checked at the temp cwd's
+// own .fgos-runner.json, matching describeConfigAwareness's real defaults.
+
+function withHome(homeDir, fn) {
+  const prevHome = process.env.HOME;
+  process.env.HOME = homeDir;
+  try {
+    return fn();
+  } finally {
+    process.env.HOME = prevHome;
+  }
+}
+
+test('config-awareness is registered on DOCTOR_CHECKS and always passes', () => {
+  const { passed, message } = checkById('config-awareness').check(process.cwd());
+  assert.equal(passed, true);
+  assert.equal(typeof message, 'string');
+});
+
+test('config-awareness reports "none" when neither project nor global config exists', () => {
+  const homeDir = mkTemp('doctor-awareness-none-home-');
+  const cwd = mkTemp('doctor-awareness-none-cwd-');
+  withHome(homeDir, () => {
+    const { passed, message } = checkById('config-awareness').check(cwd);
+    assert.equal(passed, true);
+    assert.match(message, /no config at either level/);
+  });
+  fs.rmSync(homeDir, { recursive: true, force: true });
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+test('config-awareness reports project active with global not present, when only project config exists', () => {
+  const homeDir = mkTemp('doctor-awareness-project-only-home-');
+  const cwd = mkTemp('doctor-awareness-project-only-cwd-');
+  fs.writeFileSync(path.join(cwd, '.fgos-runner.json'), '{}');
+  withHome(homeDir, () => {
+    const { passed, message } = checkById('config-awareness').check(cwd);
+    assert.equal(passed, true);
+    assert.match(message, /active: project/);
+    assert.match(message, /global config not present/);
+  });
+  fs.rmSync(homeDir, { recursive: true, force: true });
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+test('config-awareness reports project active with global also present, when both exist', () => {
+  const homeDir = mkTemp('doctor-awareness-both-home-');
+  fs.mkdirSync(path.join(homeDir, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(homeDir, '.fgos', 'config.json'), '{}');
+  const cwd = mkTemp('doctor-awareness-both-cwd-');
+  fs.writeFileSync(path.join(cwd, '.fgos-runner.json'), '{}');
+  withHome(homeDir, () => {
+    const { passed, message } = checkById('config-awareness').check(cwd);
+    assert.equal(passed, true);
+    assert.match(message, /active: project/);
+    assert.match(message, /global config also present/);
+  });
+  fs.rmSync(homeDir, { recursive: true, force: true });
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+test('config-awareness falls back to global active with project not present, when only global config exists', () => {
+  const homeDir = mkTemp('doctor-awareness-global-only-home-');
+  fs.mkdirSync(path.join(homeDir, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(homeDir, '.fgos', 'config.json'), '{}');
+  const cwd = mkTemp('doctor-awareness-global-only-cwd-');
+  withHome(homeDir, () => {
+    const { passed, message } = checkById('config-awareness').check(cwd);
+    assert.equal(passed, true);
+    assert.match(message, /active: global/);
+    assert.match(message, /project config not present/);
+  });
+  fs.rmSync(homeDir, { recursive: true, force: true });
   fs.rmSync(cwd, { recursive: true, force: true });
 });
 
@@ -251,19 +360,19 @@ test('fgos setup --pretty prints colored ANSI text describing what it did, not J
   assert.equal(result.status, 0, result.stderr);
   assert.ok(result.stdout.includes('\x1b['), 'expected ANSI escape codes in --pretty output');
   assert.throws(() => JSON.parse(result.stdout), 'expected --pretty output to NOT be valid JSON');
-  assert.ok(result.stdout.includes('.fgos-runner.json'), 'expected --pretty output to describe the config file it touched');
+  assert.ok(result.stdout.includes('.fgos/config.json'), 'expected --pretty output to describe the config file it touched');
   fs.rmSync(cwd, { recursive: true, force: true });
   fs.rmSync(homeDir, { recursive: true, force: true });
 });
 
-test('fgos doctor against a fresh cwd with no .fgos-runner.json never creates that file (read-only proof)', () => {
+test('fgos doctor against a fresh cwd with no runner config never creates the shared config file (read-only proof)', () => {
   const cwd = mkTemp('doctor-cli-readonly-');
   const homeDir = mkTemp('doctor-cli-readonly-home-');
-  const configPath = path.join(cwd, '.fgos-runner.json');
+  const configPath = path.join(cwd, '.fgos', 'config.json');
   assert.equal(fs.existsSync(configPath), false);
   const result = spawnSync(process.execPath, [FGOS, 'doctor'], { cwd, encoding: 'utf8', env: { ...process.env, HOME: homeDir } });
   assert.equal(result.status, 0, result.stderr);
-  assert.equal(fs.existsSync(configPath), false, 'fgos doctor must never create .fgos-runner.json');
+  assert.equal(fs.existsSync(configPath), false, 'fgos doctor must never create .fgos/config.json');
   const envelope = JSON.parse(result.stdout);
   const configCheck = envelope.data.checks.find((c) => c.id === 'config-not-stale');
   assert.equal(configCheck.passed, false);
@@ -410,7 +519,7 @@ test('setup from a copy of fgos that is not in a git checkout declines the rc wr
   // The whole point: nothing was appended to the profile.
   assert.equal(fs.readFileSync(rcFile, 'utf8'), 'echo hi\n');
   // Setup's other work still happened.
-  assert.equal(fs.existsSync(path.join(copyRoot, '.fgos-runner.json')), true);
+  assert.equal(fs.existsSync(path.join(copyRoot, '.fgos', 'config.json')), true);
 
   fs.rmSync(copyRoot, { recursive: true, force: true });
   fs.rmSync(homeDir, { recursive: true, force: true });

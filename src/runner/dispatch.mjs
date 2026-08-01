@@ -40,6 +40,10 @@ import { DEFAULTS } from '../state/work.mjs';
 import { DOMAINS, resolveDomainName, skillForStage } from '../state/workflow-stage-graphs.mjs';
 import { selectTemplate, renderTemplate, hashTemplate } from './prompt-templates.mjs';
 import { mergeConfigDefaults } from '../setup/config-merge.mjs';
+import { sharedConfigFilePath, legacyRunnerConfigPath } from '../config/shared-config-file.mjs';
+import { mergeWithGlobalConfig } from '../config/global-config.mjs';
+import { KINDS, findExecutableOnPath, resolvedStatus, readLocalStatus } from '../state/tool-registry.mjs';
+import { listWork } from '../state/store.mjs';
 
 /** Raised for malformed runner config or an unresolvable tier -> model
  * lookup. `category` follows the same CLI-facing vocabulary as
@@ -174,29 +178,21 @@ export const KNOWN_ASSISTANT_CLI_NAMES = ['claude', 'codex'];
 /**
  * Pure, side-effect-free PATH scan (str82): does an executable file named
  * one of `candidateNames` exist in one of `pathEnv`'s directories? Never
- * spawns or execs the candidate — this is a filesystem check only
- * (`fs.statSync` + POSIX exec-bit check via `mode & 0o111`). Returns the
- * first matching candidate name (in `candidateNames` order, so an earlier
- * name wins over a later one found elsewhere on PATH) or `null` when none is
- * found. `candidateNames`/`pathEnv` are both injectable so callers (and
- * tests) never have to mutate the real environment to control the result.
+ * spawns or execs the candidate — this is a filesystem check only. Returns
+ * the first matching candidate name (in `candidateNames` order, so an
+ * earlier name wins over a later one found elsewhere on PATH) or `null`
+ * when none is found. `candidateNames`/`pathEnv` are both injectable so
+ * callers (and tests) never have to mutate the real environment to control
+ * the result.
+ *
+ * D5 (tsk-62v): this was a second, independent implementation of the exact
+ * PATH-scan `tool-registry.mjs`'s `commandExistsOnPath` already did — both
+ * now call the one shared `findExecutableOnPath` (accessSync X_OK +
+ * platform-aware PATHEXT, tool-registry.mjs owns it since it already
+ * exported the kind vocabulary this scan is used alongside).
  */
 export function detectAssistantCli(candidateNames = KNOWN_ASSISTANT_CLI_NAMES, pathEnv = process.env.PATH) {
-  const dirs = typeof pathEnv === 'string' && pathEnv ? pathEnv.split(path.delimiter).filter(Boolean) : [];
-  for (const name of candidateNames) {
-    for (const dir of dirs) {
-      let stat;
-      try {
-        stat = fs.statSync(path.join(dir, name));
-      } catch {
-        continue;
-      }
-      if (stat.isFile() && (stat.mode & 0o111) !== 0) {
-        return name;
-      }
-    }
-  }
-  return null;
+  return findExecutableOnPath(candidateNames, pathEnv);
 }
 
 /**
@@ -311,6 +307,117 @@ export function ensureRunnerConfig(configPath) {
 }
 
 /**
+ * Resolve+validate the runner section of the shared project config file at
+ * `dir` (`.fgos/config.json`'s `runner` key), falling back to the legacy
+ * `.fgos-runner.json` at `dir` — via `loadRunnerConfig` itself, unchanged —
+ * when the shared file doesn't exist yet (tsk-2ta D1 amended / tsk-5vf D2).
+ * The legacy-fallback branch stays byte-identical to before this item (no
+ * global-config merge) — that is the deliberate parity net for any install
+ * that hasn't run `fgos setup` since the move. Once the shared file is
+ * real, its content is merged against `~/.fgos/config.json` via
+ * `mergeWithGlobalConfig` (project wins any key present in both, tsk-5vf
+ * D2's "global config has real runtime effect" half of the gap) before the
+ * `runner` section is extracted and validated.
+ */
+export function loadRunnerConfigFromDir(dir) {
+  const sharedPath = sharedConfigFilePath(dir);
+  if (!fs.existsSync(sharedPath)) {
+    return loadRunnerConfig(legacyRunnerConfigPath(dir));
+  }
+  const raw = fs.readFileSync(sharedPath, 'utf8');
+  let parsed;
+  try {
+    parsed = JSON.parse(raw);
+  } catch (err) {
+    throw new RunnerConfigError(`shared config at "${sharedPath}" is not valid JSON: ${err.message}`);
+  }
+  const withGlobal = mergeWithGlobalConfig(parsed);
+  const runnerCfg = withGlobal.runner ?? {};
+  validateRunnerConfigShape(runnerCfg, `${sharedPath}#runner`);
+  return runnerCfg;
+}
+
+/**
+ * Build the default executor block for a fresh runner-config bootstrap
+ * (str82's `detectAssistantCli` logic, factored out so both the legacy
+ * `ensureRunnerConfig` bootstrap branch above and `ensureRunnerConfigForDir`
+ * below produce the identical shape/messages for the same detected CLI —
+ * `pathHint` is the literal string named in the placeholder command / stderr
+ * message when no verified template exists).
+ */
+function bootstrapDefaultExecutor(pathHint) {
+  const detected = detectAssistantCli();
+  const executor =
+    detected && detected in SUPPORTED_EXECUTOR_TEMPLATES
+      ? SUPPORTED_EXECUTOR_TEMPLATES[detected]
+      : {
+          command: detected
+            ? `NO_VERIFIED_TEMPLATE_FOR_${detected.toUpperCase()}__edit_${pathHint}`
+            : `NO_ASSISTANT_CLI_FOUND__edit_${pathHint}`,
+          args: ['{prompt}'],
+        };
+  return { detected, executor };
+}
+
+/**
+ * Bootstrap wrapper (retargeted per tsk-2ta D1 amended / tsk-5vf D1/D2/D4)
+ * around `loadRunnerConfigFromDir`: the shared-file counterpart to
+ * `ensureRunnerConfig` above, resolved against `dir` instead of a single
+ * file path.
+ *
+ * - Shared file (`.fgos/config.json`) already exists: fills any default
+ *   key its `runner` section is missing (same `mergeConfigDefaults`
+ *   discipline as `ensureRunnerConfig`), rewrites only when a key was
+ *   actually added, merges the result against `~/.fgos/config.json` via
+ *   `mergeWithGlobalConfig` (project wins), and validates the merged
+ *   `runner` section.
+ * - Shared file absent but the legacy `.fgos-runner.json` exists: delegates
+ *   to `ensureRunnerConfig` on the legacy path UNCHANGED — fills/writes the
+ *   OLD file in place. The physical move to the new location only happens
+ *   through `fgos setup`'s own explicit `ensureSharedConfigDefaults` call
+ *   (tsk-5vf D2) — never implicitly here.
+ * - Neither exists (true first run): bootstraps straight into the new
+ *   shared file, never writing a fresh `.fgos-runner.json` again.
+ */
+export function ensureRunnerConfigForDir(dir) {
+  const sharedPath = sharedConfigFilePath(dir);
+  const legacyPath = legacyRunnerConfigPath(dir);
+
+  if (fs.existsSync(sharedPath)) {
+    const parsed = JSON.parse(fs.readFileSync(sharedPath, 'utf8'));
+    const existingRunner = parsed.runner ?? {};
+    const { merged, addedKeys } = mergeConfigDefaults(existingRunner, DEFAULT_RUNNER_CONFIG);
+    let projectShared = parsed;
+    if (addedKeys.length > 0) {
+      projectShared = { ...parsed, runner: merged };
+      fs.writeFileSync(sharedPath, `${JSON.stringify(projectShared, null, 2)}\n`);
+      process.stderr.write(
+        `fgos: added missing default config keys to ${sharedPath}#runner: ${addedKeys.join(', ')}\n`,
+      );
+    }
+    const withGlobal = mergeWithGlobalConfig(projectShared);
+    const runnerCfg = withGlobal.runner ?? {};
+    validateRunnerConfigShape(runnerCfg, `${sharedPath}#runner`);
+    return runnerCfg;
+  }
+
+  if (fs.existsSync(legacyPath)) {
+    return ensureRunnerConfig(legacyPath);
+  }
+
+  const { detected, executor } = bootstrapDefaultExecutor('.fgos/config.json');
+  const runnerConfig = { ...DEFAULT_RUNNER_CONFIG, executor };
+  fs.mkdirSync(path.dirname(sharedPath), { recursive: true });
+  fs.writeFileSync(sharedPath, `${JSON.stringify({ runner: runnerConfig }, null, 2)}\n`);
+  process.stderr.write(
+    `fgos: no runner config found — ${
+      detected ? `detected "${detected}" on PATH` : 'no known assistant CLI found on PATH'
+    }; wrote a default (executor: ${executor.command}) at ${sharedPath}#runner; edit .fgos/config.json by hand to change.\n`,
+  );
+  return runnerConfig;
+}
+
+/**
  * Shape-check one executor block ({command, args[], adapter?}) — shared by
  * the required global `cfg.executor` and every optional `cfg.executors.<tier>`
  * entry (P41/C9 v2). An `adapter` field, when present, must name a
@@ -338,6 +445,38 @@ function validateExecutorShape(executor, label) {
   }
 }
 
+/** kind vocabulary `capacities.<id>.kind` may take (D2, tsk-62v): reuses
+ * `tool-registry.mjs`'s `KINDS` verbatim plus `'task'` (in-session
+ * Agent/Task dispatch — the one kind `fgos tool` has no reason to know,
+ * since presence-on-this-machine is never the question for it). This is
+ * `capacities`' own vocabulary, not a change to `tool-registry.mjs`'s
+ * `KINDS` itself — `fgos tool register --kind` must never accept `"task"`.
+ */
+export const CAPACITY_KINDS = Object.freeze([...KINDS, 'task']);
+
+/**
+ * Shape-check one `capacities.<id>` entry (D1/D2, tsk-62v): requires
+ * `kind` (one of `CAPACITY_KINDS`). `command`/`args`, when either is
+ * present, must satisfy the same shape `validateExecutorShape` already
+ * requires for an executor block — a capacity entry naming its own
+ * executor is shaped exactly like one. A capacity entry naming neither is
+ * valid too: it carries only `kind`/`tier`/`target` metadata and falls
+ * through to `executors.<tier>`/global for the actual command (D4).
+ */
+function validateCapacityShape(capacity, label) {
+  if (!capacity || typeof capacity !== 'object' || Array.isArray(capacity)) {
+    throw new RunnerConfigError(`runner config (${label}) must be an object.`);
+  }
+  if (typeof capacity.kind !== 'string' || !CAPACITY_KINDS.includes(capacity.kind)) {
+    throw new RunnerConfigError(
+      `runner config (${label}) "kind" must be one of ${CAPACITY_KINDS.join('/')}, got: ${JSON.stringify(capacity.kind)}.`,
+    );
+  }
+  if (capacity.command !== undefined || capacity.args !== undefined) {
+    validateExecutorShape(capacity, label);
+  }
+}
+
 function validateRunnerConfigShape(cfg, sourceLabel) {
   if (!cfg || typeof cfg !== 'object' || Array.isArray(cfg)) {
     throw new RunnerConfigError(`runner config (${sourceLabel}) must be an object.`);
@@ -353,6 +492,17 @@ function validateRunnerConfigShape(cfg, sourceLabel) {
     }
     for (const [tier, executor] of Object.entries(cfg.executors)) {
       validateExecutorShape(executor, `${sourceLabel} executors.${tier}`);
+    }
+  }
+  // OPTIONAL cfg.capacities.<capacityId> map (D1, tsk-62v): additive, same
+  // style as `executors` above — absent keeps today's behavior byte-
+  // identical.
+  if (cfg.capacities !== undefined) {
+    if (!cfg.capacities || typeof cfg.capacities !== 'object' || Array.isArray(cfg.capacities)) {
+      throw new RunnerConfigError(`runner config (${sourceLabel}) "capacities" must be an object mapping capacityId -> capacity entry when present.`);
+    }
+    for (const [capacityId, capacity] of Object.entries(cfg.capacities)) {
+      validateCapacityShape(capacity, `${sourceLabel} capacities.${capacityId}`);
     }
   }
   if (!cfg.models || typeof cfg.models !== 'object' || Array.isArray(cfg.models)) {
@@ -396,14 +546,44 @@ export function modelForTier(cfg, tier) {
 }
 
 /**
- * Resolve which executor block applies for `tier` (P41/D a4fe4c2b): a tier
- * present in `cfg.executors` uses that block; otherwise (or with no `tier`
- * given at all, keeping every pre-P41 call site working unchanged) falls
- * back to the global `cfg.executor`.
+ * Resolve which executor block applies for `tier`/`capacityId` (P41/D
+ * a4fe4c2b, generalized capacity-aware, D4/D6 tsk-62v). Precedence (D4):
+ * `capacities.<capacityId>` (only when that entry declares its own
+ * `command`/`adapter` — a capacity entry naming neither is metadata-only
+ * and falls through) > `executors.<tier>` > `executor` (global). No
+ * `capacityId`/`tier` given at all keeps every pre-tsk-62v call site's
+ * behavior identical.
+ *
+ * For a `capacities.<capacityId>` entry declaring `kind: "cli"`, presence
+ * is checked via the same in-process functions `fgos tool query` already
+ * uses (`listWork`/`readLocalStatus`/`resolvedStatus`, D6) instead of
+ * re-probing PATH — throws `RunnerConfigError` at resolve time, before any
+ * spawn, the same "fail loud" style this function already uses for a
+ * malformed executor block. This check only runs when the caller supplies
+ * `fgosDir` (`spawnWorker`'s optional `opts.fgosDir`); omitted `fgosDir`
+ * skips it entirely — every pre-tsk-62v call site never passes it.
  */
-function resolveExecutorConfig(cfg, tier) {
+function resolveExecutorConfig(cfg, tier, capacityId, fgosDir) {
+  const capacity = capacityId && cfg && cfg.capacities && typeof cfg.capacities === 'object' ? cfg.capacities[capacityId] : undefined;
+
+  if (capacity && capacity.kind === 'cli' && fgosDir) {
+    const tools = listWork(fgosDir).tools ?? {};
+    if (!tools[capacityId]) {
+      throw new RunnerConfigError(
+        `capacity "${capacityId}" declares kind "cli" but is not registered — run "fgos tool register --name ${capacityId} --kind cli --command <cmd> --capability <label>" first.`,
+      );
+    }
+    const status = resolvedStatus(capacityId, readLocalStatus(fgosDir));
+    if (status !== 'present') {
+      throw new RunnerConfigError(
+        `capacity "${capacityId}" is registered but not present on this machine (status: "${status}") — run "fgos tool check --name ${capacityId}" to refresh, or install it.`,
+      );
+    }
+  }
+
+  const byCapacity = capacity && (capacity.adapter || capacity.command) ? capacity : undefined;
   const perTier = cfg && cfg.executors && typeof cfg.executors === 'object' ? cfg.executors[tier] : undefined;
-  const executor = perTier ?? (cfg && cfg.executor);
+  const executor = byCapacity ?? perTier ?? (cfg && cfg.executor);
   if (!executor || typeof executor.command !== 'string' || !Array.isArray(executor.args)) {
     throw new RunnerConfigError('runner config "executor" must have a string "command" and an "args" array.');
   }
@@ -414,14 +594,18 @@ function resolveExecutorConfig(cfg, tier) {
  * Substitute `{prompt}` and `{model}` into the resolved executor's `args` —
  * PER ARRAY ELEMENT (never joined into one shell string, per the security
  * panel). `tier`, when given, selects a per-tier executor override (P41)
- * ahead of the global `cfg.executor`; omitted keeps every pre-P41 caller's
- * behavior identical. Returns `{ command, args, adapter }` — `adapter` names
- * the C9 v2 executor interface's adapter (`EXECUTOR_ADAPTERS` key) this
- * command should run through, defaulting to `DEFAULT_ADAPTER` when the
- * executor block does not declare one.
+ * ahead of the global `cfg.executor`; `capacityId`/`fgosDir`, when given,
+ * select a capacity override ahead of that (D4/D6, tsk-62v); every field
+ * omitted keeps every pre-tsk-62v caller's behavior identical. Returns
+ * `{ command, args, adapter, provider }` — `adapter` names the C9 v2
+ * executor interface's adapter (`EXECUTOR_ADAPTERS` key) this command
+ * should run through, defaulting to `DEFAULT_ADAPTER` when the executor
+ * block does not declare one; `provider` (D7, tsk-62v, additive) is the
+ * executor block's own `provider` display alias when present, else
+ * `command` itself.
  */
-export function resolveExecutorCommand(cfg, { prompt, model, tier } = {}) {
-  const executor = resolveExecutorConfig(cfg, tier);
+export function resolveExecutorCommand(cfg, { prompt, model, tier, capacityId, fgosDir } = {}) {
+  const executor = resolveExecutorConfig(cfg, tier, capacityId, fgosDir);
   const adapter = executor.adapter ?? DEFAULT_ADAPTER;
   if (!(adapter in EXECUTOR_ADAPTERS)) {
     throw new RunnerConfigError(
@@ -434,7 +618,7 @@ export function resolveExecutorCommand(cfg, { prompt, model, tier } = {}) {
     }
     return arg.split('{prompt}').join(prompt).split('{model}').join(model);
   });
-  return { command: executor.command, args, adapter };
+  return { command: executor.command, args, adapter, provider: executor.provider ?? executor.command };
 }
 
 /**
@@ -599,11 +783,37 @@ function cliSpawnAdapter(command, args, cwd, opts) {
 export const EXECUTOR_ADAPTERS = { [DEFAULT_ADAPTER]: cliSpawnAdapter };
 
 /**
+ * Capacity identifier for a work item's executing-stage dispatch (D3,
+ * tsk-62v): the skill name executing-stage resolves to for the item's
+ * domain — the same `skillForStage`/`DOMAINS` formula `buildPrompt` already
+ * applies internally to build its own `skillPath` (never recomputed a
+ * different way, per D3). Kept as its own small function rather than
+ * folded into `buildPrompt` itself so `buildPrompt`'s own pinned
+ * "single console.warn on an unrecognized domain" behavior (str91 D6/D7)
+ * stays untouched — this calls `resolveDomainName` its own time, same as
+ * `selectTemplate` already being called a second time inside `spawnWorker`
+ * below for template logging (P49's same "cheap, deterministic, no
+ * duplicated LOGIC" precedent).
+ */
+function capacityIdForWork(work) {
+  const domainObj = DOMAINS[resolveDomainName(work.domain)];
+  return skillForStage(domainObj, 'executing');
+}
+
+/**
  * Run the headless executor for `work` inside `cwd` (the worktree checkout
  * — this function never touches the main working tree itself; the caller
  * decides `cwd`). Builds the prompt, resolves tier -> model, resolves the
- * (possibly per-tier, P41) executor + its C9 v2 adapter, substitutes the
- * config template, and delegates the actual spawn to that adapter.
+ * (possibly per-tier/per-capacity, P41/tsk-62v) executor + its C9 v2
+ * adapter, substitutes the config template, and delegates the actual spawn
+ * to that adapter.
+ *
+ * `opts.fgosDir` (optional, tsk-62v D6): the `.fgos/` directory, needed
+ * only so a `kind: "cli"` capacity's presence can be checked via
+ * `fgos tool query`'s own functions instead of re-probing PATH. Omitted
+ * (every pre-tsk-62v call site) skips that check entirely — the item's own
+ * `capacities`/`executors`/`executor` precedence still resolves exactly as
+ * before.
  *
  * Throws `DispatchError('worker-timeout', ...)` when the executor is killed
  * for exceeding `cfg.timeoutMs` (or `opts.timeoutMs`, test-only override),
@@ -623,7 +833,14 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
   const tier = work.tier ?? DEFAULTS.tier;
   const model = modelForTier(cfg, tier);
   const prompt = buildPrompt(work, opts.feedback);
-  const { command, args, adapter } = resolveExecutorCommand(cfg, { prompt, model, tier });
+  const capacityId = capacityIdForWork(work);
+  const { command, args, adapter, provider } = resolveExecutorCommand(cfg, {
+    prompt,
+    model,
+    tier,
+    capacityId,
+    fgosDir: opts.fgosDir,
+  });
   const adapterFn = EXECUTOR_ADAPTERS[adapter];
   if (!adapterFn) {
     throw new RunnerConfigError(`no executor adapter registered for "${adapter}".`);
@@ -645,7 +862,9 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
     tier,
     model,
   }).then(
-    (result) => ({ ...result, templateName, templateHash }),
+    // capacityId/provider (D7, tsk-62v): additive only — every field this
+    // function already returned stays exactly where it was.
+    (result) => ({ ...result, templateName, templateHash, capacityId, provider }),
     (err) => {
       if (err instanceof DispatchError) {
         err.templateName = templateName;
