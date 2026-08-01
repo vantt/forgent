@@ -198,6 +198,33 @@ Mở rộng `.fgos-runner.json` hiện có (KHÔNG tạo file thứ hai — bài
 cho cùng 1 khái niệm sẽ tự trôi). Thêm 1 block optional, additive, cùng
 style P41 (`executors` từng được thêm y hệt cách này):
 
+### 4.0 Hợp nhất từ vựng với `fgos tool` (bổ sung 2026-08-01, anh xác nhận)
+
+Anh chỉ ra đúng: `capacities` (tầng dispatch) và `fgos tool` registry
+(`src/state/tool-registry.mjs`, tsk-1dj, **đã build** — tầng discovery)
+đều là cùng 1 khái niệm "capacity", chỉ khác tầng. Verify code thật, phát
+hiện 1 trùng lặp cụ thể: `tool-registry.mjs`'s `commandExistsOnPath()` và
+`dispatch.mjs`'s `detectAssistantCli()` là **CÙNG 1 logic quét PATH, viết 2
+lần độc lập**. Không merge 2 schema làm 1 (tool-registry cố ý hẹp — chỉ
+presence-detect, không có `{prompt}`/`{model}` template, không nên gánh
+thêm việc dispatch), nhưng THỐNG NHẤT từ vựng và khử trùng lặp:
+
+- Field `invocation` đổi tên thành **`kind`**, giá trị dùng LẠI
+  `tool-registry.mjs`'s `KINDS = ['cli', 'binary', 'mcp', 'skill', 'http']`
+  nguyên vẹn, cộng thêm 1 giá trị mới **`task`** (in-session Task/Agent
+  tool dispatch — thứ duy nhất `fgos tool` không cần biết, vì đây không
+  phải câu hỏi "có mặt trên máy không", Task tool luôn sẵn trong phiên
+  tương tác).
+- `commandExistsOnPath()`/`detectAssistantCli()` gộp thành 1 helper dùng
+  chung (đặt ở đâu là chi tiết implementation, không phải quyết định thiết
+  kế — có thể `tool-registry.mjs` export, `dispatch.mjs` import lại).
+- Với `kind: "cli"`, `resolveExecutorConfig` (mục 4.1) NÊN hỏi
+  `fgos tool query --capability <capacityId>` để biết present/missing
+  thay vì tự probe lại — tái dùng máy discovery đã có, không xây máy thứ 2.
+  Đây là việc CẦN đăng ký capacity đó vào `fgos tool` trước (`fgos tool
+  register --kind cli ...`) — tự nhiên nối 2 tầng lại mà không cần đổi
+  schema của tool-registry.
+
 ```jsonc
 {
   "executor": { "command": "claude", "args": ["-p", "{prompt}", "--model", "{model}", "..."] },
@@ -209,13 +236,13 @@ style P41 (`executors` từng được thêm y hệt cách này):
   // MỚI — optional, absent = hành vi hôm nay giữ nguyên 100%
   "capacities": {
     "distill": {
-      "invocation": "task",        // "task" (in-session Agent/Task tool) | "cli-spawn" (reuse EXECUTOR_ADAPTERS) | "mcp" (deferred)
-      "target": "general-purpose", // subagent_type khi invocation=task; command name khi invocation=cli-spawn
-      "tier": "standard"           // optional — resolve model qua "models" như cũ, tách riêng khỏi target
+      "kind": "task",               // dùng chung KINDS của fgos tool + "task" mới (2026-08-01)
+      "target": "general-purpose",  // subagent_type khi kind=task; command name khi kind=cli
+      "tier": "standard"            // optional — resolve model qua "models" như cũ, tách riêng khỏi target
     },
     "fgos-planning": {
-      "invocation": "cli-spawn",
-      "adapter": "cli-spawn",      // trỏ thẳng EXECUTOR_ADAPTERS key đã có — domain 1 dùng lại y nguyên
+      "kind": "cli",
+      "adapter": "cli-spawn",       // trỏ thẳng EXECUTOR_ADAPTERS key đã có — domain 1 dùng lại y nguyên
       "tier": "heavy"
     }
   }
@@ -268,7 +295,7 @@ Domain 2 vì vậy chỉ cần:
 1. Skill đang cần dispatch 1 capacity tự đọc `cfg.capacities.<capacityId>`
    (đã biết chính xác nó đang gọi capacity nào — không cần nhét ID vào
    prompt cho ai khác đọc lại, vì không có ai đọc lại).
-2. Rẽ nhánh theo `.invocation`:
+2. Rẽ nhánh theo `.kind` (mục 4.0):
    - `"task"` → phát Agent/Task tool call bình thường, `subagent_type`/model
      lấy từ `.target`/tier resolve.
    - `"cli"` → Bash gọi CLI ngoài, build argv bằng ĐÚNG cơ chế
