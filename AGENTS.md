@@ -44,6 +44,24 @@ A stranger agent with no chat history should be able to answer, for any change:
    `docs/decisions/`; a settled spec fact goes into the relevant
    `docs/specs/<area>.md`.
 
+## Install/setup/doctor gate
+
+`docs/distribution-vision.md` sets the direction for this repo's own
+cài đặt/setup/doctor story. Before any change is done, ask:
+
+- Does this add a config default, env var, or infra dependency (a new
+  file it expects to exist, a tool it shells out to, a directory it
+  assumes is writable)? If yes, it must register into `fgos setup`'s
+  config-merge and `fgos doctor`'s check registry (`src/setup/checks.mjs`)
+  — not stand alone, undiscoverable by `doctor`.
+- Never hardcode an assumption about which install level (global vs
+  project) is active — per the vision doc, project config always
+  overwrites global, and fgOS stays aware of both without conflict.
+- If the change touches how fgOS gets installed, upgraded, or diagnosed at
+  all, read `docs/distribution-vision.md` and `docs/specs/distribution.md`
+  first — a new module gets a spec/config-registry entry before it gets
+  code, same bar as a new product area (question 2 above).
+
 ## Changing a locked law
 
 Laws in `docs/platform-foundations.md` are fixed until their named review

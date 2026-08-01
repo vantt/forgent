@@ -4,6 +4,7 @@
 - `docs/backlog.md` — product backlog (PBI rows, scribing-owned)
 - `docs/architecture-map.md` — bản chuẩn kiến trúc (v0.2, record ADR0010): 5 tầng + 2 lớp phủ, sổ component + sổ contract (CTR001–CTR009), nghi thức thẻ-căn-cước-trước-code
 - `docs/work-item-lifecycle-vision.md` — tầm nhìn nền tảng: chu trình sống của work-item (mixed-autonomy, base-workflow + domain-extension); khung cho các PBI STR14-STR18
+- `docs/distribution-vision.md` — tầm nhìn nền tảng: cài đặt/setup/doctor ổn định + tái dùng được (không cần clone, global/project không xung đột — project ghi đè global, doctor/setup tự fix hạ tầng + merge config thiếu, module mới tự đăng ký năng lực config, CI như một phần của setup); đảo RUL11 của distribution.md (doctor --fix không còn là Deferred Idea); khung cho backlog mở rộng docs/specs/distribution.md
 - `docs/specs/` — state layer: area spec + system-overview + bản đồ này
 - `docs/routing-handoff-contract.md` — hợp đồng handoff agent↔agent + ranh giới tin cậy
 - `docs/io-contract.md` — hợp đồng giao tiếp VÀO/RA của cửa CLI + bề mặt stdout `fgos-runner` (str46-io-contract): danh tính `writer`/`role`, envelope `fgos.v1` + ngoại lệ có lý do, exit-code một nguồn, sổ verb (`touchesState`/`externalEffect`/`paginated`/`multiValueFormat`), version token, ranh giới ngoài (STR38/STR48/STR83)
