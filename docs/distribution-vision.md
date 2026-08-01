@@ -88,12 +88,40 @@ tầng setup riêng hay không trước khi coi là xong — xem `AGENTS.md`
    không?
 3. **`doctor --fix` làm được tới đâu** (trụ cột 3): fix mọi thứ `doctor`
    phát hiện, hay giới hạn một danh sách named-fixable ban đầu rồi mở rộng
-   dần? (liên quan trực tiếp `tsk-2qz` — xem §6)
+   dần? (liên quan trực tiếp `tsk-2qz` — xem §7)
 4. **CI workflow (trụ cột 7) kiểm gì**: chỉ chạy lại
    `test/install-packaging.test.mjs` trên matrix OS/package-manager, hay còn
    thêm kiểm khác (vd doctor chạy sạch trên máy CI mới tinh)?
 
-## 6. Backlog liên quan
+## 6. Lộ trình triển khai (thứ tự đề xuất)
+
+Bốn work item ở §7 không độc lập ngang hàng — có thứ tự làm giảm rủi ro
+làm-lại. Xếp theo mức độ nền tảng và rủi ro:
+
+- **Phase 0 — CI trước (`tsk-49r`).** Không đụng câu hỏi kiến trúc nào, tier
+  `light`. Làm trước để có lưới an toàn (regression net) cho chính những
+  thay đổi rủi ro hơn ở các phase sau đụng vào `src/setup/*`. Không có
+  `deps`.
+- **Phase 1 — Quyết kiến trúc nền (`tsk-2ta`, global/project precedence).**
+  Chưa có `deps` cứng, nhưng nên chốt TRƯỚC Phase 2 — quyết định này có thể
+  sinh ra khái niệm mới (vd một doctor check báo "đang chạy bản nào") mà
+  registry ở Phase 2 cần tính vào hình dạng của nó.
+- **Phase 2 — Cơ chế mở-rộng (`tsk-2cs`, registry doctor-checks/config).**
+  Xây trên quyết định Phase 1 (không hard-block, nhưng làm sau tránh phải
+  sửa lại hình dạng registry).
+- **Phase 3 — Consumer đầu tiên, chứng minh thiết kế (`tsk-2qz`, doctor
+  --fix gate-bypass.json).** **`deps: [tsk-2cs]`** — đã wire thật vào
+  work-item (không phải chỉ ghi trong tài liệu): `tsk-2qz` PHẢI vào registry
+  của `tsk-2cs` làm entry đầu tiên, không hardcode riêng rồi refactor sau —
+  làm trước sẽ phải làm lại.
+- **Phase 4 — Đóng spec.** Sau khi Phase 2/3 xong: supersede RUL11 +
+  viết lại Data Dictionary #7 trong `docs/specs/distribution.md` (per
+  AGENTS.md Definition-of-done #6 — settled spec fact).
+
+Mỗi phase vẫn phải qua `fgos-exploring` để chốt câu hỏi mở tương ứng (§5)
+trước khi `fgos-planning`/thi công — chưa item nào được tự thi công thẳng.
+
+## 7. Backlog liên quan
 
 - `tsk-2qz` (fgOS work item, stage `clarify`, todo) — thêm khả năng `fgos
   doctor` tự fix `.fgos/gate-bypass.json`; đây là **slice đầu tiên** của trụ
