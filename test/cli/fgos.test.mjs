@@ -1437,15 +1437,6 @@ function toProposed(cwd, id) {
   return run(cwd, ['move', id, '--to', 'awaiting-approval']);
 }
 
-// A coding item must pass through the compound-learn stage before it can
-// close (D3). Mirrors toProposed one step further: it leaves the item at
-// status `proposed`, stage `compound-learn` — ready for `move --to done` /
-// `approve` to pass the done-gate.
-function toCompoundLearn(cwd, id) {
-  toProposed(cwd, id);
-  return run(cwd, ['compound', id]);
-}
-
 // Walk awaiting-approval -> delivered -> retrospective -> cleanup -> done via
 // the real CLI (work-item-status-delivered-retrospective-cleanup D1/D2/D10)
 // — done's one remaining door in. Assumes `id` is already at status
@@ -1470,234 +1461,6 @@ test('move awaiting-approval -> delivered (approval) applies via the real CLI, e
   const result = run(cwd, ['move', 'approved-item', '--to', 'delivered']);
   assert.equal(result.status, 0);
   assert.equal(stateView(cwd).work['approved-item'].status, 'delivered');
-});
-
-// --- D2/D3 compound-learn: the deliberate `fgos compound` transition ---
-
-test('compound rejects a non-proposed item as validation, exit 4, no event written', () => {
-  const cwd = tmpCwd();
-  addOk(cwd, 'not-proposed-yet');
-  const before = eventLines(cwd).length;
-  const result = run(cwd, ['compound', 'not-proposed-yet']);
-  assert.equal(result.status, 4);
-  assert.equal(eventLines(cwd).length, before);
-  assert.equal(stateView(cwd).work['not-proposed-yet'].stage, undefined);
-});
-
-test('compound accepts a proposed coding item and moves its stage to compound-learn, exit 0', () => {
-  const cwd = tmpCwd();
-  toProposed(cwd, 'compound-ready');
-  const before = eventLines(cwd).length;
-  const result = run(cwd, ['compound', 'compound-ready']);
-  assert.equal(result.status, 0);
-  assert.equal(eventLines(cwd).length, before + 1);
-  assert.equal(stateView(cwd).work['compound-ready'].stage, 'compound-learn');
-  assert.equal(stateView(cwd).work['compound-ready'].status, 'awaiting-approval');
-  const data = envelopeData(result.stdout);
-  assert.equal(data.id, 'compound-ready');
-  assert.equal(data.from, 'executing');
-  assert.equal(data.to, 'compound-learn');
-});
-
-test('compound on a nonexistent id is rejected as validation (not-found), exit 4', () => {
-  const cwd = tmpCwd();
-  const result = run(cwd, ['compound', 'never-added-for-compound']);
-  assert.equal(result.status, 4);
-});
-
-test('compound called twice on the same item rejects the second, illegal stage move as precondition, exit 2, no second event written', () => {
-  const cwd = tmpCwd();
-  toProposed(cwd, 'compound-twice');
-  assert.equal(run(cwd, ['compound', 'compound-twice']).status, 0);
-  const before = eventLines(cwd).length;
-  const result = run(cwd, ['compound', 'compound-twice']);
-  assert.equal(result.status, 2);
-  assert.equal(eventLines(cwd).length, before);
-  assert.equal(stateView(cwd).work['compound-twice'].stage, 'compound-learn');
-});
-
-// --- compound-learn-enduser-docs slice 3: `--doc-type` CLI producer (CONTEXT
-// D4/D8) — the minimal producer surface the inducted `fgos-compounding`
-// skill uses to store its first real Diataxis classification. Additive-
-// optional (candidate design from plan.md's slice-3 "Open question for
-// validating"): reuses slice 2's `addOutcome`/`assertValidDocType`
-// validation wholesale, no duplicate enum check in the CLI layer.
-
-const DIATAXIS_QUADRANTS = ['tutorial', 'how-to', 'reference', 'explanation'];
-
-for (const docType of DIATAXIS_QUADRANTS) {
-  test(`compound --doc-type ${docType} stores the tag on the item's outcome and check surfaces it, exit 0`, () => {
-    const cwd = tmpCwd();
-    toProposed(cwd, `compound-doctype-${docType}`);
-    const result = run(cwd, ['compound', `compound-doctype-${docType}`, '--doc-type', docType]);
-    assert.equal(result.status, 0);
-    assert.equal(stateView(cwd).work[`compound-doctype-${docType}`].stage, 'compound-learn');
-
-    const checkResult = run(cwd, ['check', `compound-doctype-${docType}`]);
-    assert.equal(checkResult.status, 0);
-    const data = envelopeData(checkResult.stdout);
-    assert.equal(data.outcomes[0].id, `compound-doctype-${docType}`);
-    assert.equal(data.outcomes[0].docType, docType);
-  });
-}
-
-test('compound rejects a non-quadrant --doc-type as validation, exit 4, no event written at all (no dangling stage-move)', () => {
-  const cwd = tmpCwd();
-  toProposed(cwd, 'compound-bad-doctype');
-  const before = eventLines(cwd).length;
-  const result = run(cwd, ['compound', 'compound-bad-doctype', '--doc-type', 'banana']);
-  assert.equal(result.status, 4);
-  assert.equal(eventLines(cwd).length, before, 'a rejected --doc-type must not leave a moveStage event behind');
-  assert.equal(stateView(cwd).work['compound-bad-doctype'].stage, undefined);
-});
-
-test('compound with NO --doc-type is byte-identical to pre-slice-3: moveStage only, no outcome written, check output unchanged', () => {
-  const cwd = tmpCwd();
-  toProposed(cwd, 'compound-no-doctype');
-  const before = eventLines(cwd).length;
-  const result = run(cwd, ['compound', 'compound-no-doctype']);
-  assert.equal(result.status, 0);
-  assert.equal(eventLines(cwd).length, before + 1, 'only the moveStage event is written when --doc-type is absent');
-  assert.equal(stateView(cwd).work['compound-no-doctype'].stage, 'compound-learn');
-  assert.equal(stateView(cwd).outcomes?.['compound-no-doctype'], undefined, 'no outcome record exists when --doc-type is absent');
-
-  const checkResult = run(cwd, ['check', 'compound-no-doctype']);
-  assert.equal(checkResult.status, 0);
-  assert.deepEqual(envelopeData(checkResult.stdout).outcomes, [
-    { id: 'compound-no-doctype', predicted: null, actual: null, docType: null, docPath: null },
-  ]);
-});
-
-test('a compound --doc-type tag survives a rebuild of the view from the log alone', () => {
-  const cwd = tmpCwd();
-  toProposed(cwd, 'compound-doctype-rebuild');
-  assert.equal(run(cwd, ['compound', 'compound-doctype-rebuild', '--doc-type', 'reference']).status, 0);
-  const before = stateView(cwd);
-  assert.equal(before.outcomes['compound-doctype-rebuild'].docType, 'reference');
-
-  fs.rmSync(viewPath(cwd));
-  const result = run(cwd, ['rebuild']);
-  assert.equal(result.status, 0);
-  assert.deepEqual(stateView(cwd), before);
-});
-
-// --- compound-learn-enduser-docs slice 3 P1 fix: stage-aware, atomic
-// `compound --doc-type` (routed-flow case + no-dangling-outcome guarantee).
-// `fgos-routing` loads `fgos-compounding` only once an item has already
-// arrived at stage `compound-learn`, and that skill's own producer call is
-// `fgos compound <id> --doc-type <quadrant>` — so the CLI must tag an
-// already-compound-learn item without attempting (and failing) a second
-// stage move, and a rejected --doc-type must never leave a dangling write
-// behind on ANY source stage, not just the from-executing one already
-// covered above.
-
-test('compound --doc-type on an item already at stage compound-learn (the routed case) tags the capture without moving stage again, exit 0', () => {
-  const cwd = tmpCwd();
-  toCompoundLearn(cwd, 'compound-doctype-retag');
-  const before = eventLines(cwd).length;
-  const result = run(cwd, ['compound', 'compound-doctype-retag', '--doc-type', 'how-to']);
-  assert.equal(result.status, 0);
-  assert.equal(eventLines(cwd).length, before + 1, 'only the outcome event is written — no second stage-move event');
-  assert.equal(stateView(cwd).work['compound-doctype-retag'].stage, 'compound-learn');
-
-  const checkResult = run(cwd, ['check', 'compound-doctype-retag']);
-  assert.equal(checkResult.status, 0);
-  const data = envelopeData(checkResult.stdout);
-  assert.equal(data.outcomes[0].id, 'compound-doctype-retag');
-  assert.equal(data.outcomes[0].docType, 'how-to');
-});
-
-test('compound rejects a non-quadrant --doc-type on an item already at stage compound-learn, exit 4, zero events (no dangling outcome from the illegal-move path)', () => {
-  const cwd = tmpCwd();
-  toCompoundLearn(cwd, 'compound-doctype-retag-bad');
-  const before = eventLines(cwd).length;
-  const result = run(cwd, ['compound', 'compound-doctype-retag-bad', '--doc-type', 'banana']);
-  assert.equal(result.status, 4);
-  assert.equal(eventLines(cwd).length, before, 'a rejected --doc-type on an already-compound-learn item must write nothing at all');
-  assert.equal(stateView(cwd).work['compound-doctype-retag-bad'].stage, 'compound-learn');
-});
-
-// --- bước-3: `--doc-path` doc-capture linkage (CONTEXT D12/D15) -------------
-//
-// Additive alongside `--doc-type`: the end-user doc path the tagged capture
-// belongs to, so a later read-side index can back-link a real doc to its
-// source capture (D13, "no loss of detail"). Covers BOTH `addOutcome` write
-// sites in the `compound` case: the fresh moveStage path (this item starts at
-// `executing`, per the `toProposed` fixture) and the re-compound / tag-only
-// path (item already at stage `compound-learn`) — a doc-path given on the
-// re-compound path is silently dropped if only one site is wired.
-
-test('compound --doc-type <q> --doc-path <p> stores both and check surfaces the docPath round-trip (fresh moveStage path), exit 0', () => {
-  const cwd = tmpCwd();
-  toProposed(cwd, 'compound-docpath-roundtrip');
-  const result = run(cwd, [
-    'compound',
-    'compound-docpath-roundtrip',
-    '--doc-type',
-    'how-to',
-    '--doc-path',
-    'docs/how-to/example.md',
-  ]);
-  assert.equal(result.status, 0);
-  assert.equal(stateView(cwd).work['compound-docpath-roundtrip'].stage, 'compound-learn');
-
-  const checkResult = run(cwd, ['check', 'compound-docpath-roundtrip']);
-  assert.equal(checkResult.status, 0);
-  const data = envelopeData(checkResult.stdout);
-  assert.equal(data.outcomes[0].docType, 'how-to');
-  assert.equal(data.outcomes[0].docPath, 'docs/how-to/example.md');
-});
-
-test('compound --doc-type <q> with NO --doc-path leaves docPath null while docType still works, exit 0', () => {
-  const cwd = tmpCwd();
-  toProposed(cwd, 'compound-docpath-absent');
-  const result = run(cwd, ['compound', 'compound-docpath-absent', '--doc-type', 'reference']);
-  assert.equal(result.status, 0);
-
-  const checkResult = run(cwd, ['check', 'compound-docpath-absent']);
-  assert.equal(checkResult.status, 0);
-  const data = envelopeData(checkResult.stdout);
-  assert.equal(data.outcomes[0].docType, 'reference');
-  assert.equal(data.outcomes[0].docPath, null);
-});
-
-test('compound --doc-type <q> --doc-path <p> on an item already at stage compound-learn (the re-compound path) records docPath too, exit 0', () => {
-  const cwd = tmpCwd();
-  toCompoundLearn(cwd, 'compound-docpath-retag');
-  const before = eventLines(cwd).length;
-  const result = run(cwd, [
-    'compound',
-    'compound-docpath-retag',
-    '--doc-type',
-    'explanation',
-    '--doc-path',
-    'docs/explanation/example.md',
-  ]);
-  assert.equal(result.status, 0);
-  assert.equal(eventLines(cwd).length, before + 1, 'only the outcome event is written — no second stage-move event');
-  assert.equal(stateView(cwd).work['compound-docpath-retag'].stage, 'compound-learn');
-
-  const checkResult = run(cwd, ['check', 'compound-docpath-retag']);
-  assert.equal(checkResult.status, 0);
-  const data = envelopeData(checkResult.stdout);
-  assert.equal(data.outcomes[0].docType, 'explanation');
-  assert.equal(data.outcomes[0].docPath, 'docs/explanation/example.md');
-});
-
-test('a compound --doc-path tag survives a rebuild of the view from the log alone (rides the docType spread-fold, zero store.mjs change)', () => {
-  const cwd = tmpCwd();
-  toProposed(cwd, 'compound-docpath-rebuild');
-  assert.equal(
-    run(cwd, ['compound', 'compound-docpath-rebuild', '--doc-type', 'tutorial', '--doc-path', 'docs/tutorials/example.md']).status,
-    0,
-  );
-  const before = stateView(cwd);
-  assert.equal(before.outcomes['compound-docpath-rebuild'].docPath, 'docs/tutorials/example.md');
-
-  fs.rmSync(viewPath(cwd));
-  const result = run(cwd, ['rebuild']);
-  assert.equal(result.status, 0);
-  assert.deepEqual(stateView(cwd), before);
 });
 
 test('move awaiting-approval -> todo (rejection) without --reason is refused as validation, exit 4, no event written', () => {
@@ -2518,13 +2281,14 @@ test('check never mutates state: events.jsonl and state.json are byte-identical 
 
 test('doc-sources returns every capture linked to a docPath (multiplicity)', () => {
   const cwd = tmpCwd();
+  const dir = path.join(cwd, '.fgos');
   toProposed(cwd, 'doc-sources-a');
-  run(cwd, ['compound', 'doc-sources-a', '--doc-type', 'how-to', '--doc-path', 'docs/how-to/shared.md']);
+  addOutcome(dir, { id: 'doc-sources-a', docType: 'how-to', docPath: 'docs/how-to/shared.md' });
   toProposed(cwd, 'doc-sources-b');
-  run(cwd, ['compound', 'doc-sources-b', '--doc-type', 'how-to', '--doc-path', 'docs/how-to/shared.md']);
+  addOutcome(dir, { id: 'doc-sources-b', docType: 'how-to', docPath: 'docs/how-to/shared.md' });
   // A third item linked to a DIFFERENT docPath must never leak into the result.
   toProposed(cwd, 'doc-sources-other');
-  run(cwd, ['compound', 'doc-sources-other', '--doc-type', 'how-to', '--doc-path', 'docs/how-to/other.md']);
+  addOutcome(dir, { id: 'doc-sources-other', docType: 'how-to', docPath: 'docs/how-to/other.md' });
 
   const result = run(cwd, ['doc-sources', 'docs/how-to/shared.md']);
   assert.equal(result.status, 0);
@@ -2554,8 +2318,9 @@ test('doc-sources on a docPath with zero linked captures is SUCCESS (exit 0), re
 
 test('doc-sources never mutates state: events.jsonl and state.json are byte-identical before/after', () => {
   const cwd = tmpCwd();
+  const dir = path.join(cwd, '.fgos');
   toProposed(cwd, 'doc-sources-readonly');
-  run(cwd, ['compound', 'doc-sources-readonly', '--doc-type', 'how-to', '--doc-path', 'docs/how-to/readonly.md']);
+  addOutcome(dir, { id: 'doc-sources-readonly', docType: 'how-to', docPath: 'docs/how-to/readonly.md' });
 
   const logBefore = fs.readFileSync(logPath(cwd), 'utf8');
   const viewBefore = fs.readFileSync(viewPath(cwd), 'utf8');
@@ -4178,11 +3943,18 @@ function commitPending(cwd, message) {
 // and fold the resulting stage event into main's commit, so the tree stays
 // clean and `approve` can close it to done. Mirrors the state a real
 // compound-learn transition leaves behind for a git-backed proposed item.
-function compoundAndCommit(cwd, id) {
-  const result = run(cwd, ['compound', id]);
-  assert.equal(result.status, 0, `compound ${id} should succeed: ${result.stderr}`);
-  commitPending(cwd, `state: compound ${id}`);
-  return result;
+// Folds pending .fgos/ state (deps/claim/propose events) into a real git
+// commit before approve's own clean-tree gate — the compound-learn stage
+// (and its `compound` verb) is retired (work-item-status-delivered-
+// retrospective-cleanup D11), so this no longer advances any stage, only
+// commits. Some callers' setup (e.g. makeRunnerProposedItem) already
+// commits its own pending state, leaving nothing dirty here — `git commit`
+// with nothing staged exits nonzero, so skip when the tree is already
+// clean instead of always committing unconditionally.
+function commitPendingBeforeApprove(cwd, id) {
+  const status = execFileSync('git', ['status', '--porcelain'], { cwd, encoding: 'utf8' });
+  if (status.trim() === '') return;
+  commitPending(cwd, `state: propose ${id}`);
 }
 
 // Simulates what the real runner (loop.mjs/worktree.mjs) leaves behind for a
@@ -4616,7 +4388,7 @@ test('approve of a runner item (happy path): merges fgw/<id> into main, verifies
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   makeRunnerProposedItem(cwd, 'approve-runner-item', { verify: 'test -f approve-runner-item-produced.txt' });
-  compoundAndCommit(cwd, 'approve-runner-item');
+  commitPendingBeforeApprove(cwd, 'approve-runner-item');
 
   const result = run(cwd, ['approve', 'approve-runner-item']);
   assert.equal(result.status, 0, result.stderr);
@@ -4639,7 +4411,7 @@ test('approve of a runner item succeeds when ONLY .fgos/ (the live event log) is
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   makeRunnerProposedItem(cwd, 'approve-fgos-only-dirty', { verify: 'test -f approve-fgos-only-dirty-produced.txt' });
-  compoundAndCommit(cwd, 'approve-fgos-only-dirty');
+  commitPendingBeforeApprove(cwd, 'approve-fgos-only-dirty');
 
   // Dirty ONLY `.fgos/events.jsonl` on main after the item is proposed —
   // an unrelated `add` appends an event and never touches any other file —
@@ -4662,7 +4434,7 @@ test('approve of a runner item succeeds when a dirty file on main is UNRELATED t
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   makeRunnerProposedItem(cwd, 'approve-unrelated-dirty', { verify: 'test -f approve-unrelated-dirty-produced.txt' });
-  compoundAndCommit(cwd, 'approve-unrelated-dirty');
+  commitPendingBeforeApprove(cwd, 'approve-unrelated-dirty');
 
   // A path the item's own branch-vs-trunk diff never touches — another
   // session's uncommitted work sitting on main, the exact repro shape
@@ -4680,7 +4452,7 @@ test('approve of a runner item still refuses when the SAME path the item touched
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   makeRunnerProposedItem(cwd, 'approve-real-conflict', { verify: 'test -f approve-real-conflict-produced.txt' });
-  compoundAndCommit(cwd, 'approve-real-conflict');
+  commitPendingBeforeApprove(cwd, 'approve-real-conflict');
 
   // approve-real-conflict-produced.txt IS in this item's own branch-vs-trunk
   // diff (makeRunnerProposedItem committed it on fgw/approve-real-conflict);
@@ -4701,7 +4473,7 @@ test('approve of a runner item with a declared footprint still refuses on an unc
     verify: 'test -f approve-footprint-dirty-produced.txt',
     footprint: 'footprint-guarded.txt',
   });
-  compoundAndCommit(cwd, 'approve-footprint-dirty');
+  commitPendingBeforeApprove(cwd, 'approve-footprint-dirty');
 
   // footprint-guarded.txt was never committed to fgw/approve-footprint-dirty
   // (so it is absent from the item's own committed diff) — only DECLARED in
@@ -4720,7 +4492,7 @@ test('approve of a leaf item with a clean merge lands the work on fgw/<root> (no
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   makeRunnerProposedLeafItem(cwd, 'approve-leaf-root', 'approve-leaf-child', { verify: 'test -f approve-leaf-child-produced.txt' });
-  compoundAndCommit(cwd, 'approve-leaf-child');
+  commitPendingBeforeApprove(cwd, 'approve-leaf-child');
 
   const headBefore = gitHead(cwd);
   const result = run(cwd, ['approve', 'approve-leaf-child']);
@@ -4870,7 +4642,7 @@ test('approve of a pull-door item (no merge, code already on main): re-verifies 
   run(cwd, ['take', '--id', 'approve-pull-item']);
   commitFile(cwd, 'proof.txt');
   run(cwd, ['return', 'approve-pull-item']);
-  compoundAndCommit(cwd, 'approve-pull-item');
+  commitPendingBeforeApprove(cwd, 'approve-pull-item');
 
   const result = run(cwd, ['approve', 'approve-pull-item']);
   assert.equal(result.status, 0, result.stderr);
@@ -4919,7 +4691,6 @@ test('approve of a legacy item with a passing verify closes it to done — legac
   addOk(cwd, 'approve-legacy-ok-item', { verify: 'true' });
   run(cwd, ['move', 'approve-legacy-ok-item', '--to', 'doing']);
   run(cwd, ['move', 'approve-legacy-ok-item', '--to', 'awaiting-approval']);
-  assert.equal(run(cwd, ['compound', 'approve-legacy-ok-item']).status, 0);
 
   const result = run(cwd, ['approve', 'approve-legacy-ok-item']);
   assert.equal(result.status, 0, result.stderr);
@@ -4946,7 +4717,6 @@ test('approve twice: the second approve on an already-done item is rejected as p
   addOk(cwd, 'approve-twice-item', { verify: 'true' });
   run(cwd, ['move', 'approve-twice-item', '--to', 'doing']);
   run(cwd, ['move', 'approve-twice-item', '--to', 'awaiting-approval']);
-  assert.equal(run(cwd, ['compound', 'approve-twice-item']).status, 0);
   assert.equal(run(cwd, ['approve', 'approve-twice-item']).status, 0);
 
   const result = run(cwd, ['approve', 'approve-twice-item']);
@@ -5027,7 +4797,7 @@ test('approve of the same self-modifying diff PROCEEDS with --acknowledge-iron-l
   makeRunnerProposedItemTouching(cwd, 'iron-ack-item', 'src/runner/probe.mjs', {
     verify: 'test -f src/runner/probe.mjs',
   });
-  compoundAndCommit(cwd, 'iron-ack-item');
+  commitPendingBeforeApprove(cwd, 'iron-ack-item');
 
   const result = run(cwd, ['approve', 'iron-ack-item', '--acknowledge-iron-law']);
   assert.equal(result.status, 0, `approve with acknowledgment must succeed: ${result.stderr}`);
@@ -5048,7 +4818,7 @@ test('approve of an ordinary runner item (diff touches no self-modifying module)
   makeRunnerProposedItemTouching(cwd, 'iron-plain-item', 'docs/notes.txt', {
     verify: 'test -f docs/notes.txt',
   });
-  compoundAndCommit(cwd, 'iron-plain-item');
+  commitPendingBeforeApprove(cwd, 'iron-plain-item');
 
   const result = run(cwd, ['approve', 'iron-plain-item']);
   assert.equal(result.status, 0, `an ordinary diff must approve without any acknowledgment: ${result.stderr}`);
@@ -5289,7 +5059,7 @@ test('approve --github with a dirty main tree is NOT blocked by the local dirty-
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   makeRunnerProposedItem(cwd, 'gh-approve-dirty');
-  compoundAndCommit(cwd, 'gh-approve-dirty');
+  commitPendingBeforeApprove(cwd, 'gh-approve-dirty');
   // An unrelated dirty file on main — a LOCAL approve would refuse this, but
   // a GitHub-side merge never touches the local tree, so it must not gate.
   fs.writeFileSync(path.join(cwd, 'unrelated-dirt.txt'), 'uncommitted\n');
@@ -5306,7 +5076,7 @@ test('approve --github --pr on a fake gh merge success transitions the item awai
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   makeRunnerProposedItem(cwd, 'gh-approve-merged');
-  compoundAndCommit(cwd, 'gh-approve-merged');
+  commitPendingBeforeApprove(cwd, 'gh-approve-merged');
   const fake = writeMergeSuccessFake(cwd);
 
   const result = run(cwd, ['approve', 'gh-approve-merged', '--github', '--pr', '42'], { FGOS_GH_COMMAND: fake });
@@ -6362,9 +6132,6 @@ test('approve from the main checkout is unaffected by the guard even while a ses
   const cwdR = initSessionSafeCwd();
   run(cwdR, ['init']);
   makeSessionSafeRunnerItem(cwdR, 'approve-main-runner', { verify: 'test -f approve-main-runner-produced.txt' });
-  // .fgos/ is git-ignored in a session-safe cwd (never committed), so advance
-  // the stage without folding it into a commit — plain compound, no commitPending.
-  assert.equal(run(cwdR, ['compound', 'approve-main-runner']).status, 0);
   const sessionR = createSession(cwdR, { sessionId: 'sess-active-runner' });
   try {
     const resR = run(cwdR, ['approve', 'approve-main-runner']);
@@ -6381,8 +6148,6 @@ test('approve from the main checkout is unaffected by the guard even while a ses
   run(cwdP, ['take', '--id', 'approve-main-pull']);
   commitFile(cwdP, 'proof.txt');
   run(cwdP, ['return', 'approve-main-pull']);
-  // .fgos/ is git-ignored in a session-safe cwd — plain compound, no commit.
-  assert.equal(run(cwdP, ['compound', 'approve-main-pull']).status, 0);
   const sessionP = createSession(cwdP, { sessionId: 'sess-active-pull' });
   try {
     const resP = run(cwdP, ['approve', 'approve-main-pull']);
@@ -6491,7 +6256,7 @@ test('approve from the main checkout is unaffected by the ad-hoc-worktree guard 
   const cwdR = initGitCwdMain();
   run(cwdR, ['init']);
   makeRunnerProposedItem(cwdR, 'approve-adhoc-main-runner', { verify: 'test -f approve-adhoc-main-runner-produced.txt' });
-  compoundAndCommit(cwdR, 'approve-adhoc-main-runner');
+  commitPendingBeforeApprove(cwdR, 'approve-adhoc-main-runner');
   const resR = run(cwdR, ['approve', 'approve-adhoc-main-runner']);
   assert.equal(resR.status, 0, `runner approve from main must still succeed: ${resR.stderr}`);
   assert.equal(stateView(cwdR).work['approve-adhoc-main-runner'].status, 'delivered');
@@ -6502,7 +6267,7 @@ test('approve from the main checkout is unaffected by the ad-hoc-worktree guard 
   run(cwdP, ['take', '--id', 'approve-adhoc-main-pull']);
   commitFile(cwdP, 'proof.txt');
   run(cwdP, ['return', 'approve-adhoc-main-pull']);
-  compoundAndCommit(cwdP, 'approve-adhoc-main-pull');
+  commitPendingBeforeApprove(cwdP, 'approve-adhoc-main-pull');
   const resP = run(cwdP, ['approve', 'approve-adhoc-main-pull']);
   assert.equal(resP.status, 0, `pull approve from main must still succeed: ${resP.stderr}`);
   assert.equal(stateView(cwdP).work['approve-adhoc-main-pull'].status, 'delivered');
@@ -6589,7 +6354,7 @@ test('approve --github --pr on the same self-modifying diff PROCEEDS with --ackn
   makeRunnerProposedItemTouching(cwd, 'gh-iron-ack-item', 'src/runner/probe.mjs', {
     verify: 'test -f src/runner/probe.mjs',
   });
-  compoundAndCommit(cwd, 'gh-iron-ack-item');
+  commitPendingBeforeApprove(cwd, 'gh-iron-ack-item');
   const fake = writeMergeSuccessFake(cwd);
 
   const result = run(cwd, ['approve', 'gh-iron-ack-item', '--github', '--acknowledge-iron-law', '--pr', '14'], { FGOS_GH_COMMAND: fake });
@@ -6741,7 +6506,6 @@ test('merge list: a proposed item whose dep is already done is ready', () => {
   assert.equal(run(cwd, ['add', 'dep', '--title', 'Dep', '--kind', 'task', '--risk', 'low', '--verify', 'true']).status, 0);
   assert.equal(run(cwd, ['move', 'dep', '--to', 'doing']).status, 0);
   assert.equal(run(cwd, ['move', 'dep', '--to', 'awaiting-approval']).status, 0);
-  assert.equal(run(cwd, ['compound', 'dep']).status, 0);
   const approveResult = envelopeData(run(cwd, ['approve', 'dep']).stdout);
   assert.equal(approveResult.to, 'delivered', `expected dep to reach delivered, got: ${JSON.stringify(approveResult)}`);
   // merge list still reads RESOLVED_STATUSES = {done, wontfix} at this point
@@ -6797,7 +6561,6 @@ test('merge next merges the single ready item by recursing into approve, item re
   assert.equal(run(cwd, ['add', 'solo', '--title', 'Solo', '--kind', 'task', '--risk', 'low', '--verify', 'true']).status, 0);
   assert.equal(run(cwd, ['move', 'solo', '--to', 'doing']).status, 0);
   assert.equal(run(cwd, ['move', 'solo', '--to', 'awaiting-approval']).status, 0);
-  assert.equal(run(cwd, ['compound', 'solo']).status, 0);
 
   const result = run(cwd, ['merge', 'next']);
   assert.equal(result.status, 0, `${result.stdout}${result.stderr}`);
@@ -6814,7 +6577,6 @@ test('merge next picks the higher-ranked (mvp goalTier) item first when two are 
     assert.equal(run(cwd, ['add', id, '--title', id, '--kind', 'task', '--risk', 'low', '--verify', 'true', ...(id === 'important' ? ['--goal-tier', 'mvp'] : [])]).status, 0);
     assert.equal(run(cwd, ['move', id, '--to', 'doing']).status, 0);
     assert.equal(run(cwd, ['move', id, '--to', 'awaiting-approval']).status, 0);
-    assert.equal(run(cwd, ['compound', id]).status, 0);
   }
   const data = envelopeData(run(cwd, ['merge', 'next']).stdout);
   assert.equal(data.picked, 'important', 'the mvp-goalTier item outranks the plain one per rankImpact');
@@ -7011,7 +6773,6 @@ test('approve on a proposed item with a missing-evidence acceptance clause is re
   run(cwd, ['edit', 'approve-cos-missing', '--acceptance', JSON.stringify([{ text: 'ship it' }])]);
   run(cwd, ['move', 'approve-cos-missing', '--to', 'doing']);
   run(cwd, ['move', 'approve-cos-missing', '--to', 'awaiting-approval']);
-  run(cwd, ['compound', 'approve-cos-missing']);
 
   const before = eventLines(cwd).length;
   const result = run(cwd, ['approve', 'approve-cos-missing']);
@@ -7267,7 +7028,7 @@ test('approve --no-wait fails immediately on a live-held lock, main left untouch
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   makeRunnerProposedItem(cwd, 'wait-no-wait-approve', { verify: 'true' });
-  compoundAndCommit(cwd, 'wait-no-wait-approve');
+  commitPendingBeforeApprove(cwd, 'wait-no-wait-approve');
   writeLiveLock(cwd, 1000);
 
   const start = Date.now();
@@ -7287,7 +7048,7 @@ test('merge next --no-wait fails immediately on a live-held lock -- proves the f
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   makeRunnerProposedItem(cwd, 'wait-merge-next-no-wait', { verify: 'true' });
-  compoundAndCommit(cwd, 'wait-merge-next-no-wait');
+  commitPendingBeforeApprove(cwd, 'wait-merge-next-no-wait');
   writeLiveLock(cwd, 1000);
 
   const start = Date.now();

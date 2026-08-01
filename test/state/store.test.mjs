@@ -725,12 +725,12 @@ test('setFocus throws StoreError("validation") when the item exists but has no g
 // doors exercise the exact same shape assertion, only the call differs.
 test("editWork, moveWork and moveStage each stamp the event payload with writer id/source, never a joined string, never routed through a validator", () => {
   const dir = tmpDir();
-  addSampleWork(dir, "writer-a");
+  addSampleWork(dir, "writer-a", { stage: "clarify" });
 
   const doors = [
     { name: "editWork", call: () => editWork(dir, { id: "writer-a", patch: { title: "Writer A edited" } }) },
     { name: "moveWork", call: () => moveWork(dir, { id: "writer-a", to: "doing", expectedStatus: "todo" }) },
-    { name: "moveStage", call: () => moveStage(dir, { id: "writer-a", to: "compound-learn" }) },
+    { name: "moveStage", call: () => moveStage(dir, { id: "writer-a", to: "decompose" }) },
   ];
 
   for (const { name, call } of doors) {
