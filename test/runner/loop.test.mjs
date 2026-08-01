@@ -285,12 +285,12 @@ test('runOnce full circle: todo -> doing -> worker commit -> goal-check pass -> 
   // worktree torn down, branch survives (D4 proposal artifact)
   assert.deepEqual(fs.readdirSync(worktreeDir), []);
   // one door: the log carries exactly the runner's writes — the worker
-  // never touched .fgos/ (add + claim + predicted + propose + actual,
-  // nothing else)
+  // never touched .fgos/ (add + claim + predicted + capacity-dispatch
+  // audit (D8, tsk-62v) + propose + actual, nothing else)
   const events = readRawEvents(dir);
   assert.deepEqual(
     events.map((e) => (e.type === 'work.outcome' ? `work.outcome:${e.payload.predicted ? 'predicted' : 'actual'}` : `${e.type}:${e.payload.to ?? 'add'}`)),
-    ['work.add:add', 'work.move:doing', 'work.outcome:predicted', 'work.move:awaiting-approval', 'work.outcome:actual'],
+    ['work.add:add', 'work.move:doing', 'work.outcome:predicted', 'capacity.dispatch:add', 'work.move:awaiting-approval', 'work.outcome:actual'],
   );
   // predicted is written right at claim time, before dispatch ever runs
   const predictedEvent = events.find((e) => e.type === 'work.outcome' && e.payload.predicted);
@@ -301,6 +301,33 @@ test('runOnce full circle: todo -> doing -> worker commit -> goal-check pass -> 
   assert.equal(actualEvent.payload.actual.outcome, 'awaiting-approval');
   assert.equal(actualEvent.payload.actual.passed, true);
   assert.equal(actualEvent.payload.actual.aheadCount, 1);
+});
+
+// --- capacity-aware dispatch announce/audit (D8, tsk-62v) ---------------
+
+test('runOnce logs the "<capacityId> — <provider> — <model>" announce line and appends a matching capacity.dispatch audit event', async () => {
+  const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
+  seedItem(dir, { id: 'item-announce' });
+  const config = configFor(writeCommittingExecutor(scriptDir, counterFile));
+  const logs = [];
+
+  await runOnce({ repoRoot, config, worktreeDir, log: (msg) => logs.push(msg) });
+
+  assert.ok(
+    logs.includes(`fgos-runner: fgos-executing — ${process.execPath} — sonnet`),
+    `expected an announce line in: ${JSON.stringify(logs)}`,
+  );
+  const events = readRawEvents(dir);
+  const auditEvent = events.find((e) => e.type === 'capacity.dispatch');
+  assert.ok(auditEvent, 'expected a capacity.dispatch event in the log');
+  assert.deepEqual(auditEvent.payload, {
+    id: 'item-announce',
+    capacityId: 'fgos-executing',
+    provider: process.execPath,
+    model: 'sonnet',
+  });
+  // the audit entry is unknown to the FSM view — never breaks replay/state.json
+  assert.equal(listWork(dir).work['item-announce'].status, 'awaiting-approval');
 });
 
 // --- settlement role attribution (phase-3-compound-learning-5,
