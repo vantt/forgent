@@ -44,6 +44,7 @@ import { sharedConfigFilePath, legacyRunnerConfigPath } from '../config/shared-c
 import { mergeWithGlobalConfig } from '../config/global-config.mjs';
 import { KINDS, findExecutableOnPath, resolvedStatus, readLocalStatus } from '../state/tool-registry.mjs';
 import { listWork } from '../state/store.mjs';
+import { resolveRepoRoot, fgosDirFromRoot } from './paths.mjs';
 
 /** Raised for malformed runner config or an unresolvable tier -> model
  * lookup. `category` follows the same CLI-facing vocabulary as
@@ -909,4 +910,60 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
       throw err;
     },
   );
+}
+
+/**
+ * `resolve <capacityId>` CLI subcommand (tsk-5l2-1, design doc §4.2): lets
+ * domain 2 (an in-session skill shelling out via Bash, e.g.
+ * `fgos-submit-assist`) resolve a capacity's real command/args/provider/
+ * model the exact same way domain-1's `spawnWorker` does — reusing
+ * `resolveExecutorConfig`/`resolveExecutorCommand`/`modelForTier` verbatim,
+ * no second argv-building implementation. Prints `{command,args,provider,
+ * model}` as JSON to stdout on success; a `RunnerConfigError` (unknown
+ * capacity, not registered, not present, malformed config) prints its
+ * message to stderr and exits non-zero — the same errors
+ * `resolveExecutorConfig` already raises for domain 1, not a new error
+ * vocabulary invented for this entry point.
+ *
+ * `repoRoot`, when given, skips the git-based `resolveRepoRoot` lookup
+ * entirely (tests pass a plain `mkdtemp` fixture dir here, the same way
+ * every other test in `dispatch.test.mjs` points `fgosDir`/config paths at
+ * a temp dir rather than a real git checkout).
+ */
+export async function resolveCapacityCli(capacityId, { prompt = '', cwd = process.cwd(), repoRoot } = {}) {
+  if (!capacityId) {
+    throw new RunnerConfigError('usage: node src/runner/dispatch.mjs resolve <capacityId> [--prompt <text>]');
+  }
+  const root = repoRoot ?? resolveRepoRoot(cwd);
+  const fgosDir = fgosDirFromRoot(root);
+  const cfg = ensureRunnerConfig(path.join(root, '.fgos-runner.json'));
+  const capacity = cfg.capacities?.[capacityId];
+  const tier = capacity?.tier ?? DEFAULTS.tier;
+  const model = modelForTier(cfg, tier);
+  const { command, args, provider } = resolveExecutorCommand(cfg, { prompt, model, tier, capacityId, fgosDir });
+  return { command, args, provider, model };
+}
+
+// CLI entry point — only runs when this file is executed directly (`node
+// src/runner/dispatch.mjs ...`), never on import (every existing caller
+// imports named exports, none execute this module as a script).
+if (import.meta.url === `file://${process.argv[1]}`) {
+  const [subcommand, capacityId, ...rest] = process.argv.slice(2);
+  if (subcommand !== 'resolve') {
+    process.stderr.write(`unknown subcommand ${JSON.stringify(subcommand)}. Usage: node src/runner/dispatch.mjs resolve <capacityId> [--prompt <text>]\n`);
+    process.exitCode = 1;
+  } else {
+    let prompt = '';
+    const promptFlagIndex = rest.indexOf('--prompt');
+    if (promptFlagIndex !== -1) prompt = rest[promptFlagIndex + 1] ?? '';
+    resolveCapacityCli(capacityId, { prompt }).then(
+      (resolved) => {
+        process.stdout.write(`${JSON.stringify(resolved)}\n`);
+      },
+      (err) => {
+        process.stderr.write(`${err.message}\n`);
+        process.exitCode = 1;
+      },
+    );
+  }
 }

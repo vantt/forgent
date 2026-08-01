@@ -1767,6 +1767,20 @@ async function runVerb(verb, flags, positional, dir) {
         let check;
         try {
           gitAt(repoRoot, ['worktree', 'add', '--detach', tmpWorktree, branchHead]);
+          // tsk-5l2-1 finding (real, kept as evidence): tmpWorktree lives
+          // under os.tmpdir(), outside the repo tree — Node's ESM loader
+          // never consults NODE_PATH, so a bare-specifier import (e.g.
+          // "yaml") can only resolve via a real node_modules directory
+          // reachable by walking up from tmpWorktree itself. A symlink
+          // pointed at the nearest real install was considered here too
+          // (tsk-5l2-1) and rejected for the same reason tsk-2vd D2
+          // already rejected it for createWorktree: it only reflects
+          // whatever the symlink source already has installed, never the
+          // checked-out branch's own declared dependencies — exactly the
+          // scenario (a branch merging in a new dependency before that
+          // merge lands on the source's own default branch) that exposed
+          // this whole gap. provisionDependencies installs for THIS
+          // worktree's own package.json instead.
           provisionDependencies(tmpWorktree);
           check = await runGoalCheck(item, tmpWorktree, timeoutMs);
         } finally {

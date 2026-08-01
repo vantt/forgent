@@ -27,6 +27,17 @@
       ]
     }
   },
+  "capacities": {
+    "submit-assist-classify": {
+      "kind": "cli",
+      "adapter": "cli-spawn",
+      "command": "agy",
+      "provider": "agy",
+      "args": ["-p", "{prompt}", "--model", "{model}"],
+      "tier": "light",
+      "allowCrossProvider": true
+    }
+  },
   "models": {
     "light": "haiku",
     "standard": "sonnet",

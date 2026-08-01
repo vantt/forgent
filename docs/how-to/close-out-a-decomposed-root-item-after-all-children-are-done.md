@@ -108,3 +108,49 @@ else does, on purpose, since that final claim+verify+return+compound cycle
 on the root is also where a synthesized, real-results-aware `CONTEXT.md`
 (if a "write the summary" child didn't already do that) or a last
 integration check has a natural place to happen.
+
+## Correction: a child's real merge target can skip an intermediate root entirely
+
+The claim above ("each child merges into the root's own branch") held for
+`tsk-2ta`'s flat one-level decomposition, but does not hold in general.
+Real example: `tsk-5l2` (this same doc's own earlier "Trap" section
+predicted it would need this close-out) decomposed into `tsk-5l2-1..3`.
+When those children were claimed and approved, `fgos approve` reported
+`"target": "fgw/tsk-64p"` for every one of them — `tsk-64p` being
+`tsk-5l2`'s own *grandparent* (the true top of that whole subtree), not
+`fgw/tsk-5l2` itself. `fgw/tsk-5l2` never received the children's commits
+at all; `root-affinity.mjs`'s `resolveRoot` resolves a leaf's real merge
+target to the topmost ancestor of its subtree, not necessarily its
+immediate parent.
+
+The practical consequence: step 2 above ("the root's own worktree already
+contains all the children's real work") was **false** for `tsk-5l2` — its
+worktree only had the `clarify`/`decompose` doc commits (`CONTEXT.md`,
+`plan.md`), and `fgos return tsk-5l2` failed on its first attempt for
+exactly this reason (compounded by the same disposable-worktree
+`node_modules` gap the sibling how-to documents — the branch predated that
+fix too, since it forked before any of its children had built it). The
+fix was a real, ordinary merge, done once, before retrying the close-out
+cycle:
+
+```
+git merge --no-ff fgw/tsk-64p   # from inside the root's own worktree, on fgw/<root-id>
+```
+
+This pulled in everything the children (and everything else) had already
+landed on the true root's branch, including fixes the root's own branch
+predated. After that merge, `npm test` was clean (2051/2051) and
+`fgos return tsk-5l2` succeeded (`aheadCount: 21`).
+
+**Before assuming a root's own branch already has its children's work,
+verify it directly** rather than trusting the immediate-parent assumption:
+
+```
+git log --oneline <root-branch> | grep <child-id>   # or: git branch -a --contains <child's commit>
+```
+
+If it's missing, `git merge --no-ff <the-real-root-branch>` into the
+item's own branch first — the same operation this how-to's own earlier
+"Trap" section describes for re-syncing `main`, just run one level lower,
+against whichever branch the children's `fgos approve` output actually
+named as `target`.
