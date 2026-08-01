@@ -1407,6 +1407,29 @@ test('edit --docs-ref replaces an existing docsRef (latest-wins), exit 0', () =>
   assert.equal(stateView(cwd).work['edit-docs-ref-replace'].docsRef, 'docs/history/new-feature/');
 });
 
+// --- edit --description/--footprint: `add` already accepted both fields,
+// but EDITABLE_FIELDS never listed them, so a description/footprint typo'd
+// or left blank at add time -- or an item added before either field
+// existed -- had no way to ever gain or correct one after creation. ---
+
+test('edit --description sets description on an item that had none, exit 0', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'edit-description-new');
+  assert.equal(stateView(cwd).work['edit-description-new'].description, undefined);
+  const result = run(cwd, ['edit', 'edit-description-new', '--description', 'the full story']);
+  assert.equal(result.status, 0);
+  assert.equal(stateView(cwd).work['edit-description-new'].description, 'the full story');
+});
+
+test('edit --footprint sets footprint on an item that had none, exit 0', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'edit-footprint-new');
+  assert.equal(stateView(cwd).work['edit-footprint-new'].footprint, undefined);
+  const result = run(cwd, ['edit', 'edit-footprint-new', '--footprint', 'src/a.mjs,src/b.mjs']);
+  assert.equal(result.status, 0);
+  assert.deepEqual(stateView(cwd).work['edit-footprint-new'].footprint, ['src/a.mjs', 'src/b.mjs']);
+});
+
 // --- D5 proposed: new edges + --reason on `move` (phase-2-routing-3) ---
 
 function toProposed(cwd, id) {
