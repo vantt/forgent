@@ -38,7 +38,7 @@ import { frozenJudgeHits } from '../src/runner/frozen-judge.mjs';
 import { classifySource, reviewDiff, mergeRunnerItem, cleanupMergedBranch, changedFiles, isWorkingTreeClean as isMainTreeClean, isFgosOnlyStatusLine, buildOwnFileSet, detectTrunk, isMainWorktree } from '../src/runner/merge.mjs';
 import { createGitHubPR, mergeGitHubPR, viewGitHubPRStatus } from '../src/runner/github-adapter.mjs';
 import { classifyIronLaw } from '../src/evolve/iron-law.mjs';
-import { branchNameFor, branchExists, withMergeEphemeralWorktree } from '../src/runner/worktree.mjs';
+import { branchNameFor, branchExists, withMergeEphemeralWorktree, provisionDependencies } from '../src/runner/worktree.mjs';
 import { claimWork, ClaimError } from '../src/runner/claim-port.mjs';
 import { withLockRetry } from '../src/runner/lock-wait.mjs';
 import {
@@ -1767,6 +1767,7 @@ async function runVerb(verb, flags, positional, dir) {
         let check;
         try {
           gitAt(repoRoot, ['worktree', 'add', '--detach', tmpWorktree, branchHead]);
+          provisionDependencies(tmpWorktree);
           check = await runGoalCheck(item, tmpWorktree, timeoutMs);
         } finally {
           try {

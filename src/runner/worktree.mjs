@@ -79,6 +79,31 @@ export function branchNameFor(id) {
   return `fgw/${id}`;
 }
 
+/**
+ * Provision `worktreePath`'s own `node_modules` before anything runs
+ * `verify` against it (tsk-2vd D1/D2): a disposable worktree never inherits
+ * the host repo's `node_modules` — git only checks out tracked files.
+ * No-ops when `worktreePath/package.json` is absent or declares no
+ * `dependencies`/`devDependencies` at all (same skip precedent as
+ * `checkDependenciesInstalled`, `src/setup/registrations.mjs`) — keeps
+ * every existing zero-dependency caller (this repo's own history until
+ * `tsk-slq` added `yaml`) byte-identical, no install cost paid when
+ * nothing is declared. Runs `npm ci` when `worktreePath/package-lock.json`
+ * exists (reproducible, matches the lockfile exactly), else `npm install`
+ * (D2) — never a `node_modules` symlink from the host repo (D2's rejected
+ * alternative: risks masking a real dependency mismatch when the
+ * worktree's own `package.json` diverged from the host's installed set).
+ */
+export function provisionDependencies(worktreePath) {
+  const packageJsonPath = path.join(worktreePath, 'package.json');
+  if (!fs.existsSync(packageJsonPath)) return;
+  const pkg = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+  const hasDeps = Object.keys(pkg.dependencies ?? {}).length > 0 || Object.keys(pkg.devDependencies ?? {}).length > 0;
+  if (!hasDeps) return;
+  const hasLockfile = fs.existsSync(path.join(worktreePath, 'package-lock.json'));
+  execFileSync('npm', [hasLockfile ? 'ci' : 'install'], { cwd: worktreePath, stdio: 'ignore' });
+}
+
 function git(repoRoot, args) {
   return execFileSync('git', args, { cwd: repoRoot, encoding: 'utf8', shell: false });
 }
@@ -295,26 +320,16 @@ export function createWorktree(repoRoot, id, opts = {}) {
     });
   }
 
-  // Reuse repoRoot's installed deps (never re-`npm install` here): `git
-  // worktree add` only checks out tracked files, and node_modules is never
-  // git-tracked, so a fresh worktree's own `npm test`/`npm run <verify>`
-  // hits ERR_MODULE_NOT_FOUND for every dependency the moment repoRoot last
-  // ran `npm install` after this worktree's checkout was forked. A symlink
-  // is instant (no network, no reinstall) and always matches whatever
-  // repoRoot actually has installed right now. Best-effort: a repoRoot with
-  // no node_modules yet (fresh clone, pre-install) or a symlink failure
-  // (unsupported filesystem) must never break worktree creation itself —
-  // callers that need it will surface a clear ERR_MODULE_NOT_FOUND from
-  // their own verify step instead, same as today's un-symlinked failure
-  // mode, just without the entirely-avoidable common case.
-  try {
-    const repoNodeModules = path.join(repoRoot, 'node_modules');
-    if (fs.existsSync(repoNodeModules)) {
-      fs.symlinkSync(repoNodeModules, path.join(worktreePath, 'node_modules'), 'dir');
-    }
-  } catch {
-    // best-effort only, see comment above
-  }
+  // A symlink to repoRoot's node_modules was considered and rejected here
+  // (tsk-2vd D2): instant and no network, but only ever matches whatever
+  // repoRoot itself has installed — a worktree whose own package.json
+  // declares a dependency repoRoot hasn't installed yet (exactly the
+  // scenario that exposed this whole gap: a branch merging in a new
+  // dependency before that merge lands on repoRoot's own default branch)
+  // would still hit ERR_MODULE_NOT_FOUND. provisionDependencies installs
+  // for THIS worktree's own declared dependencies instead, correct for
+  // that case at the cost of the install itself.
+  provisionDependencies(worktreePath);
 
   return { path: worktreePath, branch, reused };
 }
