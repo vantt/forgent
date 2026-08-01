@@ -109,21 +109,35 @@ export function validateToolRegistration(fields, existingNames) {
 // shelling out to `command -v`/`where` — avoids building a shell string out
 // of a registered tool's own `command` field entirely, never a shell
 // injection surface.
-function commandExistsOnPath(name) {
-  const pathEnv = process.env.PATH || '';
+//
+// Shared with `dispatch.mjs`'s `detectAssistantCli` (D5, tsk-62v): both
+// modules scanned PATH for an executable independently before this cell —
+// `findExecutableOnPath` is the one implementation both now call.
+// `pathEnv`/`candidateNames` are both injectable so callers (and tests)
+// never have to mutate the real environment to control the result. Checks
+// every directory for `candidateNames[0]` before moving to
+// `candidateNames[1]` — an earlier name wins over a later one found
+// elsewhere on PATH.
+export function findExecutableOnPath(candidateNames, pathEnv = process.env.PATH) {
+  const dirs = typeof pathEnv === 'string' && pathEnv ? pathEnv.split(path.delimiter).filter(Boolean) : [];
   const exts = process.platform === 'win32' ? (process.env.PATHEXT || '.EXE;.CMD;.BAT').split(';') : [''];
-  for (const dir of pathEnv.split(path.delimiter)) {
-    if (!dir) continue;
-    for (const ext of exts) {
-      try {
-        fs.accessSync(path.join(dir, name + ext), fs.constants.X_OK);
-        return true;
-      } catch {
-        // not found in this PATH entry — keep scanning
+  for (const name of candidateNames) {
+    for (const dir of dirs) {
+      for (const ext of exts) {
+        try {
+          fs.accessSync(path.join(dir, name + ext), fs.constants.X_OK);
+          return name;
+        } catch {
+          // not found in this PATH entry — keep scanning
+        }
       }
     }
   }
-  return false;
+  return null;
+}
+
+function commandExistsOnPath(name) {
+  return findExecutableOnPath([name]) !== null;
 }
 
 const HTTP_PROBE_TIMEOUT_MS = 2000;
