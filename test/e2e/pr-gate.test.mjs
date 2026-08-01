@@ -210,8 +210,15 @@ test('e2e pr-gate (a) runner item full loop: add -> runner dispatch -> awaiting-
   const approve = fgos(repoRoot, ['approve', 'pr-a-item']);
   assert.equal(approve.status, 0, `approve failed: ${approve.stderr}`);
   const approveData = envelopeData(approve.stdout);
-  assert.equal(approveData.to, 'done');
+  assert.equal(approveData.to, 'delivered');
   assert.match(approveData.output, /PR_A_OK/);
+  assert.equal(stateView(repoRoot).work['pr-a-item'].status, 'delivered');
+
+  // Walk the rest of the sequential chain (work-item-status-delivered-
+  // retrospective-cleanup D1/D2/D10) to reach done's one remaining door in.
+  assert.equal(fgos(repoRoot, ['move', 'pr-a-item', '--to', 'retrospective']).status, 0);
+  assert.equal(fgos(repoRoot, ['move', 'pr-a-item', '--to', 'cleanup']).status, 0);
+  assert.equal(fgos(repoRoot, ['move', 'pr-a-item', '--to', 'done']).status, 0);
 
   const view = stateView(repoRoot);
   assert.equal(view.work['pr-a-item'].status, 'done');
@@ -313,9 +320,14 @@ test('e2e pr-gate (c) pull-door item: take -> commit -> return -> awaiting-appro
   const approve = fgos(repoRoot, ['approve', 'pr-c-item']);
   assert.equal(approve.status, 0, `approve failed: ${approve.stderr}`);
   const approveData = envelopeData(approve.stdout);
-  assert.equal(approveData.to, 'done');
+  assert.equal(approveData.to, 'delivered');
   assert.match(approveData.output, /PULL_C_OK/);
   assert.equal(approveData.mode, 'verify-only', 'a pull-door approve never merges — code is already on main (D4)');
+  assert.equal(stateView(repoRoot).work['pr-c-item'].status, 'delivered');
+
+  assert.equal(fgos(repoRoot, ['move', 'pr-c-item', '--to', 'retrospective']).status, 0);
+  assert.equal(fgos(repoRoot, ['move', 'pr-c-item', '--to', 'cleanup']).status, 0);
+  assert.equal(fgos(repoRoot, ['move', 'pr-c-item', '--to', 'done']).status, 0);
 
   const view = stateView(repoRoot);
   assert.equal(view.work['pr-c-item'].status, 'done');
@@ -439,8 +451,13 @@ test('e2e pr-gate (e) branch-source item full loop: park (blocked + live branch)
   const approve = fgos(repoRoot, ['approve', 'pr-e-item']);
   assert.equal(approve.status, 0, `approve failed: ${approve.stderr}`);
   const approveEData = envelopeData(approve.stdout);
-  assert.equal(approveEData.to, 'done');
+  assert.equal(approveEData.to, 'delivered');
   assert.match(approveEData.output, /PR_E_OK/);
+  assert.equal(stateView(repoRoot).work['pr-e-item'].status, 'delivered');
+
+  assert.equal(fgos(repoRoot, ['move', 'pr-e-item', '--to', 'retrospective']).status, 0);
+  assert.equal(fgos(repoRoot, ['move', 'pr-e-item', '--to', 'cleanup']).status, 0);
+  assert.equal(fgos(repoRoot, ['move', 'pr-e-item', '--to', 'done']).status, 0);
 
   const view2 = stateView(repoRoot);
   assert.equal(view2.work['pr-e-item'].status, 'done');

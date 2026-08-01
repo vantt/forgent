@@ -196,15 +196,18 @@ test('e2e synthetic domain: add --domain synthetic (no --stage) dispatches throu
   assert.equal(list.work['synth-item'].status, 'awaiting-approval');
   assert.equal(list.work['coding-item'].status, 'awaiting-approval');
 
-  // Both reach `done` via the same normal human-close door — proving the
-  // synthetic domain rides the identical status FSM all the way to the end,
-  // exactly like coding (D3: a domain never touches the generic status FSM).
-  // The synthetic domain declares no Compound-learn stage, so it is exempt
-  // from the done-gate (D3) and closes directly. The coding item must first
-  // pass through its compound-learn stage — proving the gate is coding-only.
-  assert.equal(fgos(repoRoot, ['move', 'synth-item', '--to', 'done']).status, 0);
-  assert.equal(fgos(repoRoot, ['compound', 'coding-item']).status, 0);
-  assert.equal(fgos(repoRoot, ['move', 'coding-item', '--to', 'done']).status, 0);
+  // Both reach `done` via the identical sequential delivered->retrospective
+  // ->cleanup->done chain — proving the synthetic domain rides the same
+  // status FSM all the way to the end, exactly like coding (work-item-
+  // status-delivered-retrospective-cleanup D5: the chain is genuinely
+  // domain-agnostic, fsm.mjs never reads work.domain — no domain is exempt
+  // or special-cased at the FSM layer).
+  for (const id of ['synth-item', 'coding-item']) {
+    assert.equal(fgos(repoRoot, ['move', id, '--to', 'delivered']).status, 0);
+    assert.equal(fgos(repoRoot, ['move', id, '--to', 'retrospective']).status, 0);
+    assert.equal(fgos(repoRoot, ['move', id, '--to', 'cleanup']).status, 0);
+    assert.equal(fgos(repoRoot, ['move', id, '--to', 'done']).status, 0);
+  }
 
   const afterDone = stateView(repoRoot);
   assert.equal(afterDone.work['synth-item'].status, 'done');

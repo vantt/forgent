@@ -470,7 +470,7 @@ function assertNoPriorBlockedOutcome(view, id) {
 
 function collectMissingOutcomeNag(view, id) {
   const outcomes = view.outcomes ?? {};
-  const FINAL_STATUSES = new Set(['awaiting-approval', 'blocked', 'done']);
+  const FINAL_STATUSES = new Set(['awaiting-approval', 'blocked', 'delivered', 'retrospective', 'cleanup', 'done']);
   const missing = Object.values(view.work ?? {})
     .filter((w) => (!id || w.id === id) && FINAL_STATUSES.has(w.status) && !outcomes[w.id]?.actual)
     .map((w) => w.id);
@@ -2105,8 +2105,8 @@ async function runVerb(verb, flags, positional, dir) {
           // cleanupMergedBranch runs — the local fgw/<id> branch and its pushed
           // origin copy are both left in place after a server-side merge (no
           // local cleanup mechanism exists for a branch merged on GitHub).
-          const { event } = moveWork(dir, { id, to: 'done', expectedStatus: 'awaiting-approval', role: 'human' });
-          return { id, mode: 'github', to: 'done', prNumber, seq: event.seq };
+          const { event } = moveWork(dir, { id, to: 'delivered', expectedStatus: 'awaiting-approval', role: 'human' });
+          return { id, mode: 'github', to: 'delivered', prNumber, seq: event.seq };
         }
         // blocked — mirrors the local merge-conflict/verify-fail-post-merge
         // shape: park awaiting-approval -> blocked with the classifyGhFailure reason,
@@ -2209,12 +2209,12 @@ async function runVerb(verb, flags, positional, dir) {
             // the branch is merged INTO; running it from repoRoot/main
             // would have git silently refuse the delete (swallowed as a
             // warning), leaking the leaf's branch forever.
-            const { event } = moveWork(dir, { id, to: 'done', expectedStatus: 'awaiting-approval', role: 'human' });
+            const { event } = moveWork(dir, { id, to: 'delivered', expectedStatus: 'awaiting-approval', role: 'human' });
             const cleanup = cleanupMergedBranch(ephemeral.path, result.branch);
             return {
               id,
               mode: 'merge',
-              to: 'done',
+              to: 'delivered',
               target: rootBranch,
               branch: result.branch,
               seq: event.seq,
@@ -2283,12 +2283,12 @@ async function runVerb(verb, flags, positional, dir) {
           return { id, mode: 'merge', to: 'blocked', reason, target: 'main', exitStatus: result.check.status, output: result.check.output };
         }
 
-        const { event } = moveWork(dir, { id, to: 'done', expectedStatus: 'awaiting-approval', role: 'human' });
+        const { event } = moveWork(dir, { id, to: 'delivered', expectedStatus: 'awaiting-approval', role: 'human' });
         const cleanup = cleanupMergedBranch(repoRoot, result.branch);
         return {
           id,
           mode: 'merge',
-          to: 'done',
+          to: 'delivered',
           target: 'main',
           branch: result.branch,
           seq: event.seq,
@@ -2313,8 +2313,8 @@ async function runVerb(verb, flags, positional, dir) {
         });
         return { id, mode: 'verify-only', to: 'blocked', reason: 'verify-fail', exitStatus: check.status, output: check.output };
       }
-      const { event } = moveWork(dir, { id, to: 'done', expectedStatus: 'awaiting-approval', role: 'human' });
-      return { id, mode: 'verify-only', to: 'done', seq: event.seq, output: check.output };
+      const { event } = moveWork(dir, { id, to: 'delivered', expectedStatus: 'awaiting-approval', role: 'human' });
+      return { id, mode: 'verify-only', to: 'delivered', seq: event.seq, output: check.output };
     }
 
     // Cổng duyệt — reject (pr-lifecycle D4): awaiting-approval -> todo, reason

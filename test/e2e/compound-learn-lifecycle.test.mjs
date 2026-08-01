@@ -71,38 +71,47 @@ function toProposedPull(repoRoot, id, proofFile) {
   assert.equal(stateView(repoRoot).work[id].status, 'awaiting-approval');
 }
 
-test('e2e compound-learn happy path: take -> return -> compound -> approve -> done, closes green with the item at stage compound-learn', () => {
+// The stage-based compound-learn done-gate (RUL50) is RETIRED by
+// work-item-status-delivered-retrospective-cleanup D1/D4/D11 — approve no
+// longer checks stage at all, and reaches `delivered` (not `done` directly).
+// `done` is now reached only via the sequential delivered->retrospective->
+// cleanup->done chain (D1/D2/D10). The `compound` verb (stage move) itself
+// still exists at this point in the sequence — its full retirement is a
+// separate, later change — so it remains legal to call, just no longer
+// gates anything.
+
+test('e2e delivered/retrospective/cleanup happy path: take -> return -> approve -> delivered -> retrospective -> cleanup -> done, closes green', () => {
   const repoRoot = initTempRepo();
   assert.equal(fgos(repoRoot, ['init']).status, 0);
   add(repoRoot, 'lifecycle-ok', { verify: 'test -f lifecycle-ok-proof.txt' });
 
   toProposedPull(repoRoot, 'lifecycle-ok', 'lifecycle-ok-proof.txt');
 
-  // The deliberate compound-learn transition (executing -> compound-learn).
-  const compound = fgos(repoRoot, ['compound', 'lifecycle-ok']);
-  assert.equal(compound.status, 0, `compound failed: ${compound.stderr}`);
-  assert.equal(envelopeData(compound.stdout).to, 'compound-learn');
-  assert.equal(stateView(repoRoot).work['lifecycle-ok'].stage, 'compound-learn');
-
   const approve = fgos(repoRoot, ['approve', 'lifecycle-ok']);
   assert.equal(approve.status, 0, `approve failed: ${approve.stderr}`);
-  assert.equal(envelopeData(approve.stdout).to, 'done');
+  assert.equal(envelopeData(approve.stdout).to, 'delivered');
+  assert.equal(stateView(repoRoot).work['lifecycle-ok'].status, 'delivered');
+
+  assert.equal(fgos(repoRoot, ['move', 'lifecycle-ok', '--to', 'retrospective']).status, 0);
+  assert.equal(fgos(repoRoot, ['move', 'lifecycle-ok', '--to', 'cleanup']).status, 0);
+  const done = fgos(repoRoot, ['move', 'lifecycle-ok', '--to', 'done']);
+  assert.equal(done.status, 0, `move to done failed: ${done.stderr}`);
 
   const view = stateView(repoRoot);
   assert.equal(view.work['lifecycle-ok'].status, 'done');
-  assert.equal(view.work['lifecycle-ok'].stage, 'compound-learn', 'the item closes from the compound-learn stage');
 });
 
-test('e2e compound-learn gate: approve is blocked when the compound-learn stage is skipped — the item stays proposed, exit 2', () => {
+test('e2e approve no longer requires the compound-learn stage — the retired RUL50 gate does not block reaching delivered', () => {
   const repoRoot = initTempRepo();
   assert.equal(fgos(repoRoot, ['init']).status, 0);
-  add(repoRoot, 'lifecycle-skip', { verify: 'test -f lifecycle-skip-proof.txt' });
+  add(repoRoot, 'lifecycle-no-stage', { verify: 'test -f lifecycle-no-stage-proof.txt' });
 
-  toProposedPull(repoRoot, 'lifecycle-skip', 'lifecycle-skip-proof.txt');
+  toProposedPull(repoRoot, 'lifecycle-no-stage', 'lifecycle-no-stage-proof.txt');
 
-  // No `compound` step: approve must refuse to close the item to done.
-  const approve = fgos(repoRoot, ['approve', 'lifecycle-skip']);
-  assert.equal(approve.status, 2, `expected a precondition refusal, got: ${approve.stdout}${approve.stderr}`);
-  assert.match(approve.stderr, /compound-learn/);
-  assert.equal(stateView(repoRoot).work['lifecycle-skip'].status, 'awaiting-approval', 'a blocked close leaves the item proposed');
+  // No `compound` step at all: approve must still succeed, reaching
+  // delivered directly — the old stage-gate no longer applies.
+  const approve = fgos(repoRoot, ['approve', 'lifecycle-no-stage']);
+  assert.equal(approve.status, 0, `expected approve to succeed without a compound step: ${approve.stdout}${approve.stderr}`);
+  assert.equal(envelopeData(approve.stdout).to, 'delivered');
+  assert.equal(stateView(repoRoot).work['lifecycle-no-stage'].status, 'delivered');
 });
