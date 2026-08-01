@@ -141,3 +141,29 @@ test"`, `impactScore: 58`).
 - The RUL entry number in `docs/specs/runner.md` is assigned at execution
   time (next available number in that doc) — an implementation detail, not
   decided here.
+
+## Validating findings (fgos-validating, READY WITH CONSTRAINTS)
+
+Reality gate: all PASS (mode fit, repo fit, assumptions, smaller path, proof
+surface, impact-analysis posture — live `fgos tool query
+--capability impact-analysis --status present` re-run during validating:
+`gitnexus`, `status: "present"`, matches plan's recorded "full").
+
+**Constraint found — risk-map scenario (c) needs a test-fixture correction,
+not a design change.** The plan's scenario (c) ("`kind:'cli'` capacity with
+no `command` override, falls through to Claude's global executor, should
+NOT need `allowCrossProvider`") is not reachable as originally worded when
+`fgosDir` is passed: `dispatch.mjs:456-469`'s existing D6 check (`tsk-62v`)
+throws for **any** `kind:'cli'` capacity that isn't registered+present,
+regardless of whether it overrides `command`. Confirmed by the existing
+test `test/runner/dispatch.test.mjs:850-862` (`kind:'cli', target:'agy'`,
+no `command`, `fgosDir` given → throws for registration, not governance).
+
+Fix for the new D2/D3 tests: omit `fgosDir` for tests isolating the
+governance check alone — mirrors how the existing precedence tests at
+`dispatch.test.mjs:797-833` already do this. Only include `fgosDir` (with
+the capacityId registered+present, mirroring `dispatch.test.mjs:864-875`'s
+pattern) when specifically testing the D6+D2 interaction together.
+
+No change to D1-D4 or the chosen approach — this is a test-construction
+detail, not a plan revision.
