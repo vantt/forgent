@@ -68,24 +68,18 @@ function parseVerdict(stdout) {
   }
 }
 
-/**
- * Run a call attempt against `prompt` through `tier`'s resolved executor,
- * retrying with `stricterPrompt` on a parse-shaped failure only, up to
- * `maxAttempts` total attempts. A non-parse failure — spawn error, non-zero
- * exit, or timeout — on ANY attempt returns `null` immediately, never
- * retries. Each attempt is bounded by the same `cfg.timeoutMs`, not a
- * shared/extended budget. Returns the parsed-but-unvalidated verdict object
- * on success, or `null` once all attempts are exhausted (whether from
- * exhausting parse-shaped retries, or from an immediate non-parse failure on
- * any single attempt) — callers apply their own field validation, and any
- * escalation/fallback step, to whichever of these two outcomes they get.
- *
- * Capacity-agnostic: `tier` selects which `cfg.executors.<tier>` (or the
- * global `cfg.executor`) attempts spawn through, so any capacity dispatch
- * can call this directly with its own tier and attempt budget — it is not
- * hardcoded to judge calls.
- */
-export function runRetryingExecutor(cfg, model, prompt, stricterPrompt, { tier, maxAttempts }) {
+// Run bounded attempts against `tier`'s resolved executor, retrying with
+// `stricterPrompt` on a parse-shaped failure only, up to `maxAttempts`
+// total attempts. A non-parse failure — spawn error, non-zero exit, or
+// timeout — on ANY attempt returns `null` immediately, never retries. Each
+// attempt is bounded by the same `cfg.timeoutMs`, not a shared/extended
+// budget. Returns the parsed-but-unvalidated verdict object on success, or
+// `null` once all attempts are exhausted (whether from exhausting
+// parse-shaped retries, or from an immediate non-parse failure on any
+// single attempt) — the two failure origins are indistinguishable on
+// purpose, so a caller wrapping this in escalation never needs a
+// failure-type field to decide whether to fall back.
+function runBoundedAttempts(cfg, model, prompt, stricterPrompt, tier, maxAttempts) {
   for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
     const result = spawnAttempt(cfg, model, attempt === 1 ? prompt : stricterPrompt, tier);
     if (result.error || result.status !== 0) {
@@ -99,6 +93,48 @@ export function runRetryingExecutor(cfg, model, prompt, stricterPrompt, { tier, 
   }
 
   return null;
+}
+
+/**
+ * Run `runBoundedAttempts` against `tier`, and — when the base attempts
+ * return `null` and the caller declared `escalateTier` — make exactly one
+ * further attempt against `escalateTier`'s resolved executor before giving
+ * up. The escalation attempt reuses `stricterPrompt` (already biased toward
+ * a clean-JSON response) and defaults to the same `model` unless
+ * `escalateModel` is given; it is single-shot, not its own bounded retry
+ * loop. Returns the parsed-but-unvalidated verdict object on success (from
+ * either the base attempts or the escalation attempt), or `null` once both
+ * are exhausted — callers still apply their own field validation.
+ *
+ * Capacity-agnostic: `tier`/`escalateTier` select which `cfg.executors.<id>`
+ * (or the global `cfg.executor`) attempts spawn through, so any capacity
+ * dispatch can call this directly with its own tier and attempt budget, and
+ * opt into escalation only by passing `escalateTier` — it is not hardcoded
+ * to judge calls, and a caller that never passes `escalateTier` sees no
+ * change in behavior.
+ */
+export function runRetryingExecutor(
+  cfg,
+  model,
+  prompt,
+  stricterPrompt,
+  { tier, maxAttempts, escalateTier, escalateModel },
+) {
+  const verdict = runBoundedAttempts(cfg, model, prompt, stricterPrompt, tier, maxAttempts);
+  if (verdict !== null) {
+    return verdict;
+  }
+
+  if (!escalateTier) {
+    return null;
+  }
+
+  const result = spawnAttempt(cfg, escalateModel ?? model, stricterPrompt, escalateTier);
+  if (result.error || result.status !== 0) {
+    return null;
+  }
+  const escalated = parseVerdict(result.stdout);
+  return escalated.parsed ? escalated.verdict : null;
 }
 
 /**
