@@ -1007,12 +1007,12 @@ async function runVerb(verb, flags, positional, dir) {
     case 'edit': {
       const id = requireField(positional[0] ?? flags.id, 'edit requires an id: fgos edit <id> --<field> <value> [...]');
       const patch = {};
-      for (const field of ['title', 'kind', 'risk', 'verify', 'tier', 'urgent']) {
+      for (const field of ['title', 'description', 'kind', 'risk', 'verify', 'tier', 'urgent']) {
         if (flags[field] !== undefined) {
           patch[field] = flags[field];
         }
       }
-      for (const field of ['refs', 'deps']) {
+      for (const field of ['refs', 'deps', 'footprint']) {
         if (flags[field] !== undefined) {
           patch[field] = parseListFlag(flags[field]);
         }
@@ -1105,7 +1105,7 @@ async function runVerb(verb, flags, positional, dir) {
       if (Object.keys(patch).length === 0) {
         throw new StoreError(
           'validation',
-          'edit requires at least one field to change: --title/--kind/--risk/--verify/--tier/--refs/--deps/--acceptance/--priority/--intent/--docs-ref/--parent/--urgent/--impact/--effort.',
+          'edit requires at least one field to change: --title/--description/--kind/--risk/--verify/--tier/--refs/--deps/--footprint/--acceptance/--priority/--intent/--docs-ref/--parent/--urgent/--impact/--effort.',
         );
       }
       const { event } = editWork(dir, { id, patch, role: 'human' });
