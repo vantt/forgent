@@ -49,6 +49,27 @@ dispatch summary (D8). No alternative approach was seriously considered —
 `CONTEXT.md`'s D1-D9 already picked the shape; this is the concrete
 build-out of that shape, not a fresh design.
 
+### Reality-gate finding: `resolveExecutorConfig` needs `.fgos/` dir access for D6
+
+Found at `fgos-validating` time (repo-fit check), not a `CONTEXT.md` reopen:
+`resolveExecutorConfig(cfg, tier)` (`dispatch.mjs:404`), `resolveExecutorCommand`
+(`:423`), and `spawnWorker(work, cfg, cwd, opts)` (`:616`) have no `.fgos/`
+directory parameter today — `cwd` there is the dispatch **worktree** checkout
+(`wt.path` in `loop.mjs`), a different path entirely. D6's "consult `fgos
+tool query`" therefore needs one more thing named explicitly: `spawnWorker`
+gains an optional `opts.fgosDir` (loop.mjs already resolves this as `dir`,
+`loop.mjs:909` / passed to every other write at the `spawnWorker` call site
+already, e.g. `listWork(dir)` at `loop.mjs:665`) and threads it through to
+`resolveExecutorConfig` only for the `kind: "cli"` branch. The presence
+check itself reuses the exact same three functions `bin/fgos.mjs`'s own
+`query` sub-verb already calls in-process (`bin/fgos.mjs:2671-2682`:
+`listWork(fgosDir).tools`, `readLocalStatus(fgosDir)`,
+`resolvedStatus(name, localStatus)`) — no CLI shell-out, no new function,
+just the same in-process read `bin/fgos.mjs` already does. When
+`opts.fgosDir` is omitted (any call site that doesn't know about capacities,
+or a capacity with no `kind: "cli"` entry), this branch is simply never
+reached — backward-compatible with every existing call.
+
 ### Resolving CONTEXT.md's one open item: the events.jsonl audit-entry shape
 
 `CONTEXT.md` correctly left open *how* D8's audit entry lands in
@@ -94,7 +115,7 @@ view, which is not what D8 wants.
 | `resolveExecutorConfig`/`resolveExecutorCommand` signature change | **high** — every existing call site and the whole `dispatch.test.mjs` suite depends on today's exact tier-only behavior | existing test suite green, unchanged; new tests pin capacity > tier > global precedence and the "capacity absent → byte-identical to today" invariant, mirroring the P41 `executors` block's own pinned test (`dispatch.test.mjs:659`) |
 | `capacities` schema validation (`validateRunnerConfigShape`) | medium — malformed `kind` or missing `command`/`args` on a capacity entry could silently no-op instead of failing loud | new tests mirroring the existing `executors.<tier>` shape tests (`dispatch.test.mjs:322` pattern) for `capacities.<id>` |
 | PATH-scan dedup (`commandExistsOnPath`/`detectAssistantCli` → one helper) | medium — both `ensureRunnerConfig`'s bootstrap flow and `fgos tool query`'s presence check depend on this working exactly as before | `impact()` on both symbols before editing (full posture); existing tests for both stay green unchanged |
-| `kind: "cli"` → `fgos tool query` integration | medium — new cross-module call from `dispatch.mjs` into `tool-registry.mjs`'s query path; only works if the capacity was registered first (D6) | new test registering a fixture tool via `tool-registry.mjs`'s own API/`fgos tool register`, then asserting `resolveExecutorConfig` consults it instead of re-probing PATH |
+| `kind: "cli"` → `fgos tool query` integration, incl. `opts.fgosDir` threading | medium — new cross-module call from `dispatch.mjs` into `tool-registry.mjs`'s query path; only works if the capacity was registered first (D6), and requires `spawnWorker` to accept an optional `opts.fgosDir` it doesn't have today (reality-gate finding, see Approach above) | new test registering a fixture tool via `tool-registry.mjs`'s own API/`fgos tool register`, then asserting `resolveExecutorConfig` consults it (via `opts.fgosDir` passed through from `loop.mjs`'s already-resolved `dir`) instead of re-probing PATH; a call with `opts.fgosDir` omitted stays on today's PATH-probe path unchanged |
 | `spawnWorker` return shape | low — additive only | new test asserts `capacityId`/`provider` present alongside every existing field, existing return-shape assertions unchanged |
 | `events.jsonl` audit entry | was weak, now medium-low (see resolved approach above) | new test: append a `capacity.dispatch` event via `appendEvent`, then `rebuildView()` the log and assert `view.work`/`view.decisions` are byte-identical to before the append — proves the "ignored, not rejected" contract holds for this concrete new type |
 | Announce line format/placement | low | `loop.test.mjs` assertion on the exact `<capacityId> — <provider> — <model>` format at the `loop.mjs:678` call site |
@@ -117,12 +138,16 @@ tie-breaking — there was only one candidate order here)
 2. `src/runner/dispatch.mjs` — `validateRunnerConfigShape` gains the
    `capacities` block (D1/D2); `resolveExecutorConfig` gains `capacityId`
    (D4); `resolveExecutorCommand`/`spawnWorker` thread `capacityId`
-   through and add `provider` (D3/D7); `detectAssistantCli` calls the
-   shared helper instead of its own copy (D5); `kind: "cli"` resolution
-   calls `fgos tool query` (D6).
-3. `src/runner/loop.mjs` — announce line + `appendEvent('capacity.dispatch',
-   ...)` at the existing `loop.mjs:678` dispatch-log call site, queued via
-   `queue.enqueue()` (D8).
+   through and add `provider` (D3/D7); `spawnWorker` also gains an
+   optional `opts.fgosDir`, threaded into `resolveExecutorConfig` only for
+   the `kind: "cli"` presence-check branch (reality-gate finding, see
+   Approach above); `detectAssistantCli` calls the shared helper instead of
+   its own copy (D5); `kind: "cli"` resolution calls the same in-process
+   functions `bin/fgos.mjs`'s `query` sub-verb already uses (D6).
+3. `src/runner/loop.mjs` — pass the already-resolved `dir` as `spawnWorker`'s
+   new `opts.fgosDir` at the existing call site (`loop.mjs:666`); announce
+   line + `appendEvent('capacity.dispatch', ...)` at the existing dispatch-log
+   call site (`loop.mjs:678`), queued via `queue.enqueue()` (D8).
 4. `docs/reference/forgentx-tool-registry-configuration.md` (or a short
    how-to alongside it) — the D6 registration step, so a real operator
    wiring a `kind: "cli"` capacity has a documented path, not an assumption.
