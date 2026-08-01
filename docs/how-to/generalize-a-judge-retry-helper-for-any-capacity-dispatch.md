@@ -1,9 +1,9 @@
 ---
 type: how-to
 title: How to extract a judge-only retry helper into a capacity-agnostic one
-tags: [judge-executor, retry, capacity-dispatch, runner]
+tags: [judge-executor, retry, capacity-dispatch, runner, escalation]
 timestamp: 2026-08-01T10:10:37.000Z
-source_capture_ids: [tsk-418-1]
+source_capture_ids: [tsk-418-1, tsk-418-2]
 ---
 
 # How to extract a judge-only retry helper into a capacity-agnostic one
@@ -87,3 +87,61 @@ zero-risk parameter-threading refactor would have gated the safe change
 behind the riskier one for no reason. Extract the generic shape first,
 prove it costs nothing; add the new capability that depends on external
 schema state as its own following step.
+
+## Adding an opt-in escalation-to-fallback-tier step on top
+
+Once `runRetryingExecutor` exists (above), a capacity can opt into falling
+back to a different executor when its own attempts are exhausted — without
+touching any external config schema at all, since the fallback is just
+another parameter passed at the call site.
+
+1. **Let the base-attempt loop stay a single black box that returns
+   `null`.** The base loop already collapses two different failure origins
+   — exhausting parse-shaped retries, and an immediate spawn-error/non-zero-
+   exit/timeout that never got to retry at all — into the same bare `null`.
+   That collapse is what makes escalation trivial to bolt on: a wrapper that
+   only checks "did the base attempts return null" automatically covers
+   both origins, with no failure-type field to thread through first.
+
+2. **Add `escalateTier`/`escalateModel` as optional keys on the same
+   options object the base call already takes**, never a new function
+   parameter position — existing callers that never pass them see no
+   behavior change:
+
+   ```js
+   export function runRetryingExecutor(
+     cfg, model, prompt, stricterPrompt,
+     { tier, maxAttempts, escalateTier, escalateModel },
+   ) {
+     const verdict = runBoundedAttempts(cfg, model, prompt, stricterPrompt, tier, maxAttempts);
+     if (verdict !== null) return verdict;
+     if (!escalateTier) return null;
+
+     const result = spawnAttempt(cfg, escalateModel ?? model, stricterPrompt, escalateTier);
+     if (result.error || result.status !== 0) return null;
+     const escalated = parseVerdict(result.stdout);
+     return escalated.parsed ? escalated.verdict : null;
+   }
+   ```
+
+3. **Make the escalation attempt single-shot, not its own retry loop.** One
+   attempt against the fallback tier, using the already-stricter prompt
+   (the base attempts already established this call needs a clean-JSON
+   push) — not a second bounded-attempts loop. If the fallback also fails,
+   the whole call returns `null`, exactly like today.
+
+4. **Prove it with a non-judge capacity, as a test double — no real second
+   consumer required.** Reusability is provable without wiring in a second
+   production call site: write a test that calls `runRetryingExecutor`
+   directly (not through `runJudgeExecutor`) with its own made-up tier and
+   `escalateTier`, using fake executor scripts exactly like the existing
+   judge tests do. This is enough to demonstrate the helper is genuinely
+   capacity-agnostic; wiring a real second capacity (e.g. a submit-time
+   classification step) in for production is separate, later work with its
+   own scope and its own config.
+
+5. **Re-run the existing suite unchanged, plus the new escalation tests.**
+   `runJudgeExecutor` never passes `escalateTier`, so every pre-existing
+   judge test stays green with zero edits — that is itself part of the
+   proof that escalation is additive, not a behavior change to the
+   judge-only path.
