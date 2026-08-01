@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    name: test (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install
+
+      # Full suite (docs/distribution-vision.md tsk-49r D1): already
+      # includes test/install-packaging.test.mjs (the pack -> install -g ->
+      # fgos init proof) and test/setup/doctor-fresh-run.test.mjs (the
+      # fresh-runner fgos doctor proof, D4) on every OS in the matrix above.
+      - name: npm test (includes install-packaging matrix proof)
+        run: npm test
