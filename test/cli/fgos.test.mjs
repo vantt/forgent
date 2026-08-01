@@ -1057,8 +1057,8 @@ test('repair refuses mid-file corruption via the real CLI (valid, corrupt, valid
 
 test('done is terminal via the real CLI: moving out of done is refused as precondition, exit 2, no event written', () => {
   const cwd = tmpCwd();
-  toCompoundLearn(cwd, 'terminal-item');
-  run(cwd, ['move', 'terminal-item', '--to', 'done']);
+  toProposed(cwd, 'terminal-item');
+  toDoneViaChain(cwd, 'terminal-item');
   const before = eventLines(cwd).length;
 
   const result = run(cwd, ['move', 'terminal-item', '--to', 'doing']);
@@ -1355,8 +1355,7 @@ test('goal focus is not auto-cleared when the focused item reaches status done',
   run(cwd, ['goal', 'set', 'goal-target-done']);
   run(cwd, ['move', 'goal-target-done', '--to', 'doing']);
   run(cwd, ['move', 'goal-target-done', '--to', 'awaiting-approval']);
-  run(cwd, ['compound', 'goal-target-done']);
-  const moveResult = run(cwd, ['move', 'goal-target-done', '--to', 'done']);
+  const moveResult = toDoneViaChain(cwd, 'goal-target-done');
   assert.equal(moveResult.status, 0);
   assert.equal(stateView(cwd).work['goal-target-done'].status, 'done');
 
@@ -1447,6 +1446,17 @@ function toCompoundLearn(cwd, id) {
   return run(cwd, ['compound', id]);
 }
 
+// Walk awaiting-approval -> delivered -> retrospective -> cleanup -> done via
+// the real CLI (work-item-status-delivered-retrospective-cleanup D1/D2/D10)
+// — done's one remaining door in. Assumes `id` is already at status
+// awaiting-approval (e.g. via toProposed). Returns the final move's result.
+function toDoneViaChain(cwd, id) {
+  run(cwd, ['move', id, '--to', 'delivered']);
+  run(cwd, ['move', id, '--to', 'retrospective']);
+  run(cwd, ['move', id, '--to', 'cleanup']);
+  return run(cwd, ['move', id, '--to', 'done']);
+}
+
 test('move doing -> awaiting-approval applies via the real CLI, exit 0', () => {
   const cwd = tmpCwd();
   const result = toProposed(cwd, 'goal-checked');
@@ -1454,12 +1464,12 @@ test('move doing -> awaiting-approval applies via the real CLI, exit 0', () => {
   assert.equal(stateView(cwd).work['goal-checked'].status, 'awaiting-approval');
 });
 
-test('move awaiting-approval -> done (approval) applies via the real CLI, exit 0', () => {
+test('move awaiting-approval -> delivered (approval) applies via the real CLI, exit 0', () => {
   const cwd = tmpCwd();
-  toCompoundLearn(cwd, 'approved-item');
-  const result = run(cwd, ['move', 'approved-item', '--to', 'done']);
+  toProposed(cwd, 'approved-item');
+  const result = run(cwd, ['move', 'approved-item', '--to', 'delivered']);
   assert.equal(result.status, 0);
-  assert.equal(stateView(cwd).work['approved-item'].status, 'done');
+  assert.equal(stateView(cwd).work['approved-item'].status, 'delivered');
 });
 
 // --- D2/D3 compound-learn: the deliberate `fgos compound` transition ---
@@ -1788,8 +1798,8 @@ test('ready excludes a todo item whose dep sits at proposed (proposed is not don
 
 test('ready opens a todo item once its dep reaches done (approved, not merely proposed)', () => {
   const cwd = tmpCwd();
-  toCompoundLearn(cwd, 'dep-approved');
-  assert.equal(run(cwd, ['move', 'dep-approved', '--to', 'done']).status, 0);
+  toProposed(cwd, 'dep-approved');
+  assert.equal(toDoneViaChain(cwd, 'dep-approved').status, 0);
   assert.equal(
     run(cwd, ['add', 'unblocked-item', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--deps', 'dep-approved']).status,
     0,
@@ -3032,9 +3042,9 @@ test('answer via the real CLI stamps role "human" on the event payload and folds
 
 test('move to done via the real CLI stamps role "human" on the event payload and folds into a "close" settlement', () => {
   const cwd = tmpCwd();
-  toCompoundLearn(cwd, 'close-actor-item');
+  toProposed(cwd, 'close-actor-item');
 
-  const result = run(cwd, ['move', 'close-actor-item', '--to', 'done']);
+  const result = toDoneViaChain(cwd, 'close-actor-item');
   assert.equal(result.status, 0);
 
   const lines = eventLines(cwd);
@@ -3067,8 +3077,8 @@ test('discover (sync verb) on a clear verdict stamps role "session" on the work.
 
 test('check returns the settlement data — per-kind/role counts + recent records — when settlement data exists', () => {
   const cwd = tmpCwd();
-  toCompoundLearn(cwd, 'settle-item');
-  run(cwd, ['move', 'settle-item', '--to', 'done']);
+  toProposed(cwd, 'settle-item');
+  toDoneViaChain(cwd, 'settle-item');
 
   const result = run(cwd, ['check']);
   assert.equal(result.status, 0);
@@ -3234,8 +3244,11 @@ test('check returns the learning data — outcome/friction/settlement summary �
     detail: 'miss',
   });
 
-  // Pass through compound-learn before the doing->done close (D3).
-  moveStage(dir, { id: 'learning-item', to: 'compound-learn' });
+  // Walk the sequential chain to done's one remaining door in (work-item-
+  // status-delivered-retrospective-cleanup D1/D2/D10).
+  moveWork(dir, { id: 'learning-item', to: 'delivered', expectedStatus: 'doing' });
+  moveWork(dir, { id: 'learning-item', to: 'retrospective', expectedStatus: 'delivered' });
+  moveWork(dir, { id: 'learning-item', to: 'cleanup', expectedStatus: 'retrospective' });
   const result = run(cwd, ['move', 'learning-item', '--to', 'done']);
   assert.equal(result.status, 0);
 
@@ -4607,12 +4620,15 @@ test('approve of a runner item (happy path): merges fgw/<id> into main, verifies
 
   const result = run(cwd, ['approve', 'approve-runner-item']);
   assert.equal(result.status, 0, result.stderr);
-  assert.equal(envelopeData(result.stdout).to, 'done');
+  assert.equal(envelopeData(result.stdout).to, 'delivered');
 
   const view = stateView(cwd);
-  assert.equal(view.work['approve-runner-item'].status, 'done');
-  assert.equal(view.settlements['approve-runner-item'][0].kind, 'close');
-  assert.equal(view.settlements['approve-runner-item'][0].role, 'human');
+  assert.equal(view.work['approve-runner-item'].status, 'delivered');
+  // The 'close' settlement (RUL20) fires on the actual done-close only —
+  // now cleanup->done (work-item-status-delivered-retrospective-cleanup
+  // D1/D4), not on approve reaching delivered — so no settlement exists
+  // yet at this point in the sequence.
+  assert.equal(view.settlements?.['approve-runner-item'], undefined);
   assert.ok(fs.existsSync(path.join(cwd, 'approve-runner-item-produced.txt')), 'the merged file must be present on main');
 
   const branches = gitAtCwd(cwd, ['for-each-ref', '--format=%(refname:short)', 'refs/heads/fgw/']);
@@ -4639,7 +4655,7 @@ test('approve of a runner item succeeds when ONLY .fgos/ (the live event log) is
 
   const result = run(cwd, ['approve', 'approve-fgos-only-dirty']);
   assert.equal(result.status, 0, `approve should succeed with only .fgos/ dirty: ${result.stderr}`);
-  assert.equal(stateView(cwd).work['approve-fgos-only-dirty'].status, 'done');
+  assert.equal(stateView(cwd).work['approve-fgos-only-dirty'].status, 'delivered');
 });
 
 test('approve of a runner item succeeds when a dirty file on main is UNRELATED to the item (tsk-598 D1/D2) — own-file-set scoping, not a whole-tree gate', () => {
@@ -4656,7 +4672,7 @@ test('approve of a runner item succeeds when a dirty file on main is UNRELATED t
 
   const result = run(cwd, ['approve', 'approve-unrelated-dirty']);
   assert.equal(result.status, 0, `approve should succeed past an unrelated dirty file: ${result.stderr}`);
-  assert.equal(stateView(cwd).work['approve-unrelated-dirty'].status, 'done');
+  assert.equal(stateView(cwd).work['approve-unrelated-dirty'].status, 'delivered');
   assert.equal(fs.readFileSync(path.join(cwd, 'scratch.txt'), 'utf8'), 'unrelated uncommitted work\n', 'the unrelated dirty file must be left untouched, still uncommitted');
 });
 
@@ -4712,7 +4728,7 @@ test('approve of a leaf item with a clean merge lands the work on fgw/<root> (no
   const approveData = envelopeData(result.stdout);
   assert.equal(approveData.branch, 'fgw/approve-leaf-child');
   assert.equal(approveData.target, 'fgw/approve-leaf-root');
-  assert.equal(approveData.to, 'done');
+  assert.equal(approveData.to, 'delivered');
 
   // main must never be touched by a leaf approve.
   assert.equal(gitHead(cwd), headBefore, 'main HEAD must be unchanged by a leaf approve');
@@ -4723,7 +4739,7 @@ test('approve of a leaf item with a clean merge lands the work on fgw/<root> (no
   );
 
   const view = stateView(cwd);
-  assert.equal(view.work['approve-leaf-child'].status, 'done');
+  assert.equal(view.work['approve-leaf-child'].status, 'delivered');
 
   // fgw/<leaf> must be ACTUALLY deleted (git branch list), not just the
   // ephemeral worktree directory gone — the exact gap validating found.
@@ -4858,11 +4874,12 @@ test('approve of a pull-door item (no merge, code already on main): re-verifies 
 
   const result = run(cwd, ['approve', 'approve-pull-item']);
   assert.equal(result.status, 0, result.stderr);
-  assert.equal(envelopeData(result.stdout).to, 'done');
+  assert.equal(envelopeData(result.stdout).to, 'delivered');
 
   const view = stateView(cwd);
-  assert.equal(view.work['approve-pull-item'].status, 'done');
-  assert.equal(view.settlements['approve-pull-item'][0].role, 'human');
+  assert.equal(view.work['approve-pull-item'].status, 'delivered');
+  // No 'close' settlement yet -- that fires at cleanup->done, not delivered.
+  assert.equal(view.settlements?.['approve-pull-item'], undefined);
 });
 
 test('approve of a legacy item with a failing verify: blocked (reason verify-fail), not merge-related, exit 0', () => {
@@ -4906,7 +4923,7 @@ test('approve of a legacy item with a passing verify closes it to done — legac
 
   const result = run(cwd, ['approve', 'approve-legacy-ok-item']);
   assert.equal(result.status, 0, result.stderr);
-  assert.equal(stateView(cwd).work['approve-legacy-ok-item'].status, 'done');
+  assert.equal(stateView(cwd).work['approve-legacy-ok-item'].status, 'delivered');
 });
 
 // tsk-3vo D5: same shared --timeout/--no-timeout resolution as `return`
@@ -5014,11 +5031,12 @@ test('approve of the same self-modifying diff PROCEEDS with --acknowledge-iron-l
 
   const result = run(cwd, ['approve', 'iron-ack-item', '--acknowledge-iron-law']);
   assert.equal(result.status, 0, `approve with acknowledgment must succeed: ${result.stderr}`);
-  assert.equal(envelopeData(result.stdout).to, 'done');
+  assert.equal(envelopeData(result.stdout).to, 'delivered');
 
   const view = stateView(cwd);
-  assert.equal(view.work['iron-ack-item'].status, 'done');
-  assert.equal(view.settlements['iron-ack-item'][0].role, 'human');
+  assert.equal(view.work['iron-ack-item'].status, 'delivered');
+  // No 'close' settlement yet -- that fires at cleanup->done, not delivered.
+  assert.equal(view.settlements?.['iron-ack-item'], undefined);
   assert.ok(fs.existsSync(path.join(cwd, 'src/runner/probe.mjs')), 'the merged module file is present on main');
   const branches = gitAtCwd(cwd, ['for-each-ref', '--format=%(refname:short)', 'refs/heads/']);
   assert.doesNotMatch(branches, /fgw\/iron-ack-item/, 'the fully-merged branch is cleaned up');
@@ -5034,9 +5052,9 @@ test('approve of an ordinary runner item (diff touches no self-modifying module)
 
   const result = run(cwd, ['approve', 'iron-plain-item']);
   assert.equal(result.status, 0, `an ordinary diff must approve without any acknowledgment: ${result.stderr}`);
-  assert.equal(envelopeData(result.stdout).to, 'done');
+  assert.equal(envelopeData(result.stdout).to, 'delivered');
   assert.doesNotMatch(result.stdout, /Iron Law/);
-  assert.equal(stateView(cwd).work['iron-plain-item'].status, 'done');
+  assert.equal(stateView(cwd).work['iron-plain-item'].status, 'delivered');
 });
 
 test('reject on a nonexistent id is rejected as validation, exit 4', () => {
@@ -5280,11 +5298,11 @@ test('approve --github with a dirty main tree is NOT blocked by the local dirty-
   const result = run(cwd, ['approve', 'gh-approve-dirty', '--github', '--pr', '5'], { FGOS_GH_COMMAND: fake });
   assert.equal(result.status, 0, `${result.stdout}${result.stderr}`);
   assert.doesNotMatch(result.stdout, /not clean/);
-  assert.equal(envelopeData(result.stdout).to, 'done');
-  assert.equal(stateView(cwd).work['gh-approve-dirty'].status, 'done');
+  assert.equal(envelopeData(result.stdout).to, 'delivered');
+  assert.equal(stateView(cwd).work['gh-approve-dirty'].status, 'delivered');
 });
 
-test('approve --github --pr on a fake gh merge success transitions the item awaiting-approval -> done with role human', () => {
+test('approve --github --pr on a fake gh merge success transitions the item awaiting-approval -> delivered with role human', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   makeRunnerProposedItem(cwd, 'gh-approve-merged');
@@ -5295,11 +5313,12 @@ test('approve --github --pr on a fake gh merge success transitions the item awai
   assert.equal(result.status, 0, `${result.stdout}${result.stderr}`);
   const mergedData = envelopeData(result.stdout);
   assert.equal(mergedData.prNumber, '42');
-  assert.equal(mergedData.to, 'done');
+  assert.equal(mergedData.to, 'delivered');
 
   const view = stateView(cwd);
-  assert.equal(view.work['gh-approve-merged'].status, 'done');
-  assert.equal(view.settlements['gh-approve-merged'][0].role, 'human');
+  assert.equal(view.work['gh-approve-merged'].status, 'delivered');
+  // No 'close' settlement yet -- that fires at cleanup->done, not delivered.
+  assert.equal(view.settlements?.['gh-approve-merged'], undefined);
 });
 
 test('approve --github --pr on a fake gh merge failure transitions awaiting-approval -> blocked and records friction with the classified reason, layer, and gh detail', () => {
@@ -6350,7 +6369,7 @@ test('approve from the main checkout is unaffected by the guard even while a ses
   try {
     const resR = run(cwdR, ['approve', 'approve-main-runner']);
     assert.equal(resR.status, 0, `runner approve from main must still succeed with a session active: ${resR.stderr}`);
-    assert.equal(stateView(cwdR).work['approve-main-runner'].status, 'done');
+    assert.equal(stateView(cwdR).work['approve-main-runner'].status, 'delivered');
   } finally {
     endSession(cwdR, sessionR.sessionId, { force: true });
   }
@@ -6368,7 +6387,7 @@ test('approve from the main checkout is unaffected by the guard even while a ses
   try {
     const resP = run(cwdP, ['approve', 'approve-main-pull']);
     assert.equal(resP.status, 0, `pull approve from main must still succeed with a session active: ${resP.stderr}`);
-    assert.equal(stateView(cwdP).work['approve-main-pull'].status, 'done');
+    assert.equal(stateView(cwdP).work['approve-main-pull'].status, 'delivered');
   } finally {
     endSession(cwdP, sessionP.sessionId, { force: true });
   }
@@ -6475,7 +6494,7 @@ test('approve from the main checkout is unaffected by the ad-hoc-worktree guard 
   compoundAndCommit(cwdR, 'approve-adhoc-main-runner');
   const resR = run(cwdR, ['approve', 'approve-adhoc-main-runner']);
   assert.equal(resR.status, 0, `runner approve from main must still succeed: ${resR.stderr}`);
-  assert.equal(stateView(cwdR).work['approve-adhoc-main-runner'].status, 'done');
+  assert.equal(stateView(cwdR).work['approve-adhoc-main-runner'].status, 'delivered');
 
   const cwdP = initGitCwdMain();
   run(cwdP, ['init']);
@@ -6486,7 +6505,7 @@ test('approve from the main checkout is unaffected by the ad-hoc-worktree guard 
   compoundAndCommit(cwdP, 'approve-adhoc-main-pull');
   const resP = run(cwdP, ['approve', 'approve-adhoc-main-pull']);
   assert.equal(resP.status, 0, `pull approve from main must still succeed: ${resP.stderr}`);
-  assert.equal(stateView(cwdP).work['approve-adhoc-main-pull'].status, 'done');
+  assert.equal(stateView(cwdP).work['approve-adhoc-main-pull'].status, 'delivered');
 });
 
 // --- approve --github + worktree guard (approve-worktree-guard-github-fix) -
@@ -6575,8 +6594,8 @@ test('approve --github --pr on the same self-modifying diff PROCEEDS with --ackn
 
   const result = run(cwd, ['approve', 'gh-iron-ack-item', '--github', '--acknowledge-iron-law', '--pr', '14'], { FGOS_GH_COMMAND: fake });
   assert.equal(result.status, 0, `approve --github with acknowledgment must succeed: ${result.stdout}${result.stderr}`);
-  assert.equal(envelopeData(result.stdout).to, 'done');
-  assert.equal(stateView(cwd).work['gh-iron-ack-item'].status, 'done');
+  assert.equal(envelopeData(result.stdout).to, 'delivered');
+  assert.equal(stateView(cwd).work['gh-iron-ack-item'].status, 'delivered');
 });
 
 // --- work-graph-intelligence S5: `fgos graph` read verb -------------------
@@ -6724,7 +6743,13 @@ test('merge list: a proposed item whose dep is already done is ready', () => {
   assert.equal(run(cwd, ['move', 'dep', '--to', 'awaiting-approval']).status, 0);
   assert.equal(run(cwd, ['compound', 'dep']).status, 0);
   const approveResult = envelopeData(run(cwd, ['approve', 'dep']).stdout);
-  assert.equal(approveResult.to, 'done', `expected dep to reach done, got: ${JSON.stringify(approveResult)}`);
+  assert.equal(approveResult.to, 'delivered', `expected dep to reach delivered, got: ${JSON.stringify(approveResult)}`);
+  // merge list still reads RESOLVED_STATUSES = {done, wontfix} at this point
+  // in the sequence (RUL12's own fix is a separate piece) -- walk the rest
+  // of the chain so the dep genuinely reaches done.
+  assert.equal(run(cwd, ['move', 'dep', '--to', 'retrospective']).status, 0);
+  assert.equal(run(cwd, ['move', 'dep', '--to', 'cleanup']).status, 0);
+  assert.equal(run(cwd, ['move', 'dep', '--to', 'done']).status, 0);
   assert.equal(run(cwd, ['add', 'leaf', '--title', 'Leaf', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--deps', 'dep']).status, 0);
   toProposed(cwd, 'leaf');
   const data = envelopeData(run(cwd, ['merge', 'list']).stdout);
@@ -6778,8 +6803,8 @@ test('merge next merges the single ready item by recursing into approve, item re
   assert.equal(result.status, 0, `${result.stdout}${result.stderr}`);
   const data = envelopeData(result.stdout);
   assert.equal(data.picked, 'solo');
-  assert.equal(data.approve.to, 'done', `expected the picked item to reach done: ${JSON.stringify(data)}`);
-  assert.equal(stateView(cwd).work.solo.status, 'done');
+  assert.equal(data.approve.to, 'delivered', `expected the picked item to reach delivered: ${JSON.stringify(data)}`);
+  assert.equal(stateView(cwd).work.solo.status, 'delivered');
 });
 
 test('merge next picks the higher-ranked (mvp goalTier) item first when two are ready', () => {
@@ -6930,54 +6955,54 @@ test('submit with a malformed --acceptance is rejected as validation, exit 4, no
 // `moveWork(..., to: 'done')` a direct `move` uses — `verify: 'true'` keeps
 // that check trivially green so the test isolates the acceptance gate.
 
-test('move --to done is refused when a populated acceptance clause has no evidence: precondition, exit 2, item stays proposed, no event written', () => {
+test('move --to delivered is refused when a populated acceptance clause has no evidence: precondition, exit 2, item stays proposed, no event written', () => {
   const cwd = tmpCwd();
-  toCompoundLearn(cwd, 'cli-cos-missing');
+  toProposed(cwd, 'cli-cos-missing');
   run(cwd, ['edit', 'cli-cos-missing', '--acceptance', JSON.stringify([{ text: 'ship it' }])]);
 
   const before = eventLines(cwd).length;
-  const result = run(cwd, ['move', 'cli-cos-missing', '--to', 'done']);
+  const result = run(cwd, ['move', 'cli-cos-missing', '--to', 'delivered']);
   assert.equal(result.status, 2);
   assert.match(result.stderr, /ship it/);
   assert.equal(stateView(cwd).work['cli-cos-missing'].status, 'awaiting-approval');
   assert.equal(eventLines(cwd).length, before);
 });
 
-test('move --to done succeeds when every acceptance clause has non-empty evidence, exactly as before this cell', () => {
+test('move --to delivered succeeds when every acceptance clause has non-empty evidence, exactly as before this cell', () => {
   const cwd = tmpCwd();
-  toCompoundLearn(cwd, 'cli-cos-evidenced');
+  toProposed(cwd, 'cli-cos-evidenced');
   run(cwd, ['edit', 'cli-cos-evidenced', '--acceptance', JSON.stringify([{ text: 'ship it', evidence: 'test/cli/fgos.test.mjs:1' }])]);
 
-  const result = run(cwd, ['move', 'cli-cos-evidenced', '--to', 'done']);
+  const result = run(cwd, ['move', 'cli-cos-evidenced', '--to', 'delivered']);
   assert.equal(result.status, 0);
-  assert.equal(stateView(cwd).work['cli-cos-evidenced'].status, 'done');
+  assert.equal(stateView(cwd).work['cli-cos-evidenced'].status, 'delivered');
 });
 
-test('an item with acceptance absent, or an empty array, closes via move --to done completely unaffected (no-op)', () => {
+test('an item with acceptance absent, or an empty array, closes via move --to delivered completely unaffected (no-op)', () => {
   const cwd = tmpCwd();
-  toCompoundLearn(cwd, 'cli-cos-absent'); // no --acceptance ever set
-  assert.equal(run(cwd, ['move', 'cli-cos-absent', '--to', 'done']).status, 0);
-  assert.equal(stateView(cwd).work['cli-cos-absent'].status, 'done');
+  toProposed(cwd, 'cli-cos-absent'); // no --acceptance ever set
+  assert.equal(run(cwd, ['move', 'cli-cos-absent', '--to', 'delivered']).status, 0);
+  assert.equal(stateView(cwd).work['cli-cos-absent'].status, 'delivered');
 
   const cwd2 = tmpCwd();
-  toCompoundLearn(cwd2, 'cli-cos-empty');
+  toProposed(cwd2, 'cli-cos-empty');
   run(cwd2, ['edit', 'cli-cos-empty', '--acceptance', JSON.stringify([])]);
-  assert.equal(run(cwd2, ['move', 'cli-cos-empty', '--to', 'done']).status, 0);
-  assert.equal(stateView(cwd2).work['cli-cos-empty'].status, 'done');
+  assert.equal(run(cwd2, ['move', 'cli-cos-empty', '--to', 'delivered']).status, 0);
+  assert.equal(stateView(cwd2).work['cli-cos-empty'].status, 'delivered');
 });
 
-test('editing in the missing evidence after a refusal, then retrying move --to done, succeeds — no cached verdict', () => {
+test('editing in the missing evidence after a refusal, then retrying move --to delivered, succeeds — no cached verdict', () => {
   const cwd = tmpCwd();
-  toCompoundLearn(cwd, 'cli-cos-retry');
+  toProposed(cwd, 'cli-cos-retry');
   run(cwd, ['edit', 'cli-cos-retry', '--acceptance', JSON.stringify([{ text: 'ship it' }])]);
 
-  assert.equal(run(cwd, ['move', 'cli-cos-retry', '--to', 'done']).status, 2);
+  assert.equal(run(cwd, ['move', 'cli-cos-retry', '--to', 'delivered']).status, 2);
   assert.equal(stateView(cwd).work['cli-cos-retry'].status, 'awaiting-approval');
 
   run(cwd, ['edit', 'cli-cos-retry', '--acceptance', JSON.stringify([{ text: 'ship it', evidence: 'test/cli/fgos.test.mjs:1' }])]);
-  const result = run(cwd, ['move', 'cli-cos-retry', '--to', 'done']);
+  const result = run(cwd, ['move', 'cli-cos-retry', '--to', 'delivered']);
   assert.equal(result.status, 0, 'the retry must re-read the just-edited evidence, not a cached refusal');
-  assert.equal(stateView(cwd).work['cli-cos-retry'].status, 'done');
+  assert.equal(stateView(cwd).work['cli-cos-retry'].status, 'delivered');
 });
 
 test('approve on a proposed item with a missing-evidence acceptance clause is refused the same way as move --to done: precondition, exit 2, item stays proposed, no event written', () => {

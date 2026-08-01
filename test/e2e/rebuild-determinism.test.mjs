@@ -77,12 +77,14 @@ test('rebuild-determinism: init, add work with deps + unicode title, move throug
   // Move each item through a distinct path, always with --expect (CAS),
   // so the whole journey proves precondition + CAS on real transitions.
   assert.equal(move(cwd, 'a', 'doing', 'todo').status, 0);
-  // A coding item must pass through the compound-learn stage before it can
-  // close (D3): return for goal-check, take the deliberate compound-learn
-  // transition, then close from there.
+  // done's one remaining door in is the sequential delivered->retrospective
+  // ->cleanup->done chain (work-item-status-delivered-retrospective-cleanup
+  // D1/D2/D10) — walk it with --expect at each step.
   assert.equal(move(cwd, 'a', 'awaiting-approval', 'doing').status, 0);
-  assert.equal(run(cwd, ['compound', 'a']).status, 0);
-  assert.equal(move(cwd, 'a', 'done', 'awaiting-approval').status, 0);
+  assert.equal(move(cwd, 'a', 'delivered', 'awaiting-approval').status, 0);
+  assert.equal(move(cwd, 'a', 'retrospective', 'delivered').status, 0);
+  assert.equal(move(cwd, 'a', 'cleanup', 'retrospective').status, 0);
+  assert.equal(move(cwd, 'a', 'done', 'cleanup').status, 0);
 
   assert.equal(move(cwd, 'b', 'doing', 'todo').status, 0);
   assert.equal(move(cwd, 'b', 'blocked', 'doing').status, 0);

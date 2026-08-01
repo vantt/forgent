@@ -304,12 +304,20 @@ test(
     assert.equal(branchExists(repoRoot, `fgw/${submitted.id}`), true, 'the branch survives an Iron Law refusal');
 
     // (8) `approve <id> --acknowledge-iron-law` — the deliberate override
-    // succeeds: merges, verifies, awaiting-approval -> done, branch cleaned up.
+    // succeeds: merges, verifies, awaiting-approval -> delivered, branch
+    // cleaned up. done is now reached only via the sequential
+    // delivered->retrospective->cleanup->done chain (work-item-status-
+    // delivered-retrospective-cleanup D1/D2/D10).
     const approved = fgos(repoRoot, ['approve', submitted.id, '--acknowledge-iron-law']);
     assert.equal(approved.status, 0, `approve with acknowledgment must succeed: ${approved.stderr}`);
     const approvedData = envelopeData(approved.stdout);
-    assert.equal(approvedData.to, 'done');
+    assert.equal(approvedData.to, 'delivered');
     assert.match(approvedData.output, /FIX_OK/);
+    assert.equal(stateView(repoRoot).work[submitted.id].status, 'delivered');
+
+    assert.equal(fgos(repoRoot, ['move', submitted.id, '--to', 'retrospective']).status, 0);
+    assert.equal(fgos(repoRoot, ['move', submitted.id, '--to', 'cleanup']).status, 0);
+    assert.equal(fgos(repoRoot, ['move', submitted.id, '--to', 'done']).status, 0);
 
     const finalView = stateView(repoRoot);
     assert.equal(finalView.work[submitted.id].status, 'done');
