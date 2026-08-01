@@ -7,6 +7,8 @@ import {
   buildPrompt,
   loadRunnerConfig,
   ensureRunnerConfig,
+  loadRunnerConfigFromDir,
+  ensureRunnerConfigForDir,
   DEFAULT_RUNNER_CONFIG,
   detectAssistantCli,
   modelForTier,
@@ -478,6 +480,38 @@ test('loadRunnerConfig rejects a "capacities.<id>" entry declaring "command" wit
   assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
 });
 
+// --- capacities.<id>.allowCrossProvider (D1, tsk-32n) --------------------
+
+test('loadRunnerConfig accepts a "capacities.<id>" entry with allowCrossProvider: true', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'allow-cross-provider.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      capacities: { 'fgos-executing': { kind: 'cli', command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
+      models: { standard: 'sonnet' },
+      timeoutMs: 1000,
+    }),
+  );
+  assert.doesNotThrow(() => loadRunnerConfig(configPath));
+});
+
+test('loadRunnerConfig rejects a "capacities.<id>" entry whose allowCrossProvider is not a boolean', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'bad-allow-cross-provider.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      capacities: { 'fgos-executing': { kind: 'cli', command: 'agy', args: ['{prompt}'], allowCrossProvider: 'yes' } },
+      models: { standard: 'sonnet' },
+      timeoutMs: 1000,
+    }),
+  );
+  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
+});
+
 test('EXECUTOR_ADAPTERS registers exactly one adapter today: cli-spawn (the RPC/app-server adapter is deferred per D a4fe4c2b)', () => {
   assert.deepEqual(Object.keys(EXECUTOR_ADAPTERS), ['cli-spawn']);
   assert.equal(DEFAULT_ADAPTER, 'cli-spawn');
@@ -700,6 +734,143 @@ test('ensureRunnerConfig delegates shape validation to loadRunnerConfig, never r
   });
 });
 
+// --- loadRunnerConfigFromDir / ensureRunnerConfigForDir: shared-file ----
+// retarget (tsk-2ta D1 amended / tsk-5vf D1/D2/D4) ------------------------
+
+test('loadRunnerConfigFromDir falls back to loadRunnerConfig on the legacy path, byte-identical, when the shared file does not exist', () => {
+  const dir = mkTempDir();
+  const legacyConfig = {
+    executor: { command: 'claude', args: ['{prompt}'] },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  };
+  fs.writeFileSync(path.join(dir, '.fgos-runner.json'), JSON.stringify(legacyConfig));
+
+  const viaDir = loadRunnerConfigFromDir(dir);
+  const viaLegacyDirect = loadRunnerConfig(path.join(dir, '.fgos-runner.json'));
+  assert.deepEqual(viaDir, viaLegacyDirect);
+  assert.equal(viaDir.executor.command, 'claude');
+});
+
+test('loadRunnerConfigFromDir reads the runner section of the shared file when it exists, ignoring the legacy file', () => {
+  const dir = mkTempDir();
+  fs.writeFileSync(path.join(dir, '.fgos-runner.json'), JSON.stringify({ executor: { command: 'stale', args: [] }, models: {}, timeoutMs: 1 }));
+  fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
+  fs.writeFileSync(
+    path.join(dir, '.fgos', 'config.json'),
+    JSON.stringify({ runner: { executor: { command: 'claude', args: ['{prompt}'] }, models: { standard: 'sonnet' }, timeoutMs: 5000 } }),
+  );
+  const cfg = loadRunnerConfigFromDir(dir);
+  assert.equal(cfg.executor.command, 'claude');
+  assert.equal(cfg.timeoutMs, 5000);
+});
+
+test('loadRunnerConfigFromDir throws RunnerConfigError on invalid JSON in the shared file', () => {
+  const dir = mkTempDir();
+  fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(dir, '.fgos', 'config.json'), '{ not valid json');
+  assert.throws(() => loadRunnerConfigFromDir(dir), RunnerConfigError);
+});
+
+test('loadRunnerConfigFromDir merges a project runner section against ~/.fgos/config.json, project winning per key', () => {
+  const dir = mkTempDir();
+  fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
+  fs.writeFileSync(
+    path.join(dir, '.fgos', 'config.json'),
+    JSON.stringify({ runner: { executor: { command: 'claude', args: ['{prompt}'] }, models: { standard: 'sonnet' }, timeoutMs: 5000 } }),
+  );
+  const homeDir = mkTempDir();
+  fs.mkdirSync(path.join(homeDir, '.fgos'), { recursive: true });
+  fs.writeFileSync(
+    path.join(homeDir, '.fgos', 'config.json'),
+    JSON.stringify({ runner: { timeoutMs: 999999, retries: 3 } }),
+  );
+  const prevHome = process.env.HOME;
+  process.env.HOME = homeDir;
+  let cfg;
+  try {
+    cfg = loadRunnerConfigFromDir(dir);
+  } finally {
+    process.env.HOME = prevHome;
+  }
+  // Project's own timeoutMs wins over global's.
+  assert.equal(cfg.timeoutMs, 5000);
+  // Global fills a key the project never set.
+  assert.equal(cfg.retries, 3);
+});
+
+test('ensureRunnerConfigForDir bootstraps straight into the shared file on a true first run, never writing .fgos-runner.json', () => {
+  withKnownCliOnPath(['claude'], () => {
+    const dir = mkTempDir();
+    assert.equal(fs.existsSync(path.join(dir, '.fgos-runner.json')), false);
+    assert.equal(fs.existsSync(path.join(dir, '.fgos', 'config.json')), false);
+
+    const cfg = ensureRunnerConfigForDir(dir);
+
+    assert.equal(fs.existsSync(path.join(dir, '.fgos-runner.json')), false, 'must never write the legacy path on a fresh install');
+    assert.equal(fs.existsSync(path.join(dir, '.fgos', 'config.json')), true);
+    const written = JSON.parse(fs.readFileSync(path.join(dir, '.fgos', 'config.json'), 'utf8'));
+    assert.deepEqual(written.runner, cfg);
+    assert.equal(cfg.executor.command, 'claude');
+  });
+});
+
+test('ensureRunnerConfigForDir delegates to the unchanged legacy ensureRunnerConfig when only .fgos-runner.json exists (byte-for-byte parity)', () => {
+  withKnownCliOnPath(['claude'], () => {
+    const dir = mkTempDir();
+    const legacyPath = path.join(dir, '.fgos-runner.json');
+    // A COMPLETE, already-default-shaped config -- nothing for
+    // ensureRunnerConfig's own mergeConfigDefaults step to add -- proves
+    // this delegates through unchanged rather than diverging, without
+    // conflating it with ensureRunnerConfig's separate (already-tested)
+    // fill-missing-keys behavior.
+    const existing = JSON.parse(JSON.stringify(DEFAULT_RUNNER_CONFIG));
+    fs.writeFileSync(legacyPath, JSON.stringify(existing));
+
+    const viaDir = ensureRunnerConfigForDir(dir);
+    const viaLegacyDirect = ensureRunnerConfig(legacyPath);
+    // Confirm it took the legacy path: the shared file was never created.
+    assert.equal(fs.existsSync(path.join(dir, '.fgos', 'config.json')), false);
+    assert.deepEqual(viaDir, viaLegacyDirect);
+    assert.deepEqual(viaDir, existing);
+  });
+});
+
+test('ensureRunnerConfigForDir fills missing default keys into an existing shared file\'s runner section and rewrites only that section', () => {
+  const dir = mkTempDir();
+  fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
+  const sharedPath = path.join(dir, '.fgos', 'config.json');
+  fs.writeFileSync(
+    sharedPath,
+    JSON.stringify({
+      runner: { executor: { command: 'claude', args: ['{prompt}'] }, models: { standard: 'sonnet' }, timeoutMs: 1000 },
+      unrelatedSection: { keep: 'me' },
+    }),
+  );
+
+  const cfg = ensureRunnerConfigForDir(dir);
+
+  assert.deepEqual(cfg.parallel, DEFAULT_RUNNER_CONFIG.parallel);
+  assert.equal(cfg.models.standard, 'sonnet');
+  const written = JSON.parse(fs.readFileSync(sharedPath, 'utf8'));
+  // A sibling section this item never touches survives untouched.
+  assert.deepEqual(written.unrelatedSection, { keep: 'me' });
+  assert.deepEqual(written.runner.parallel, DEFAULT_RUNNER_CONFIG.parallel);
+});
+
+test('ensureRunnerConfigForDir on an already-complete shared file does not rewrite it', () => {
+  const dir = mkTempDir();
+  fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
+  const sharedPath = path.join(dir, '.fgos', 'config.json');
+  fs.writeFileSync(sharedPath, JSON.stringify({ runner: DEFAULT_RUNNER_CONFIG }));
+  const before = fs.statSync(sharedPath).mtimeMs;
+
+  const cfg = ensureRunnerConfigForDir(dir);
+
+  assert.deepEqual(cfg, DEFAULT_RUNNER_CONFIG);
+  assert.equal(fs.statSync(sharedPath).mtimeMs, before);
+});
+
 // --- detectAssistantCli: pure PATH scan, injected inputs (str82) --------
 
 test('detectAssistantCli finds a candidate on an injected PATH without touching the real environment', () => {
@@ -801,7 +972,7 @@ test('resolveExecutorCommand honors a capacities.<capacityId> override ahead of 
   const cfg = {
     executor: { command: '/global/executor', args: ['{prompt}'] },
     executors: { heavy: { command: '/heavy/executor', args: ['{prompt}'] } },
-    capacities: { 'fgos-executing': { kind: 'cli', command: '/capacity/executor', args: ['{prompt}'] } },
+    capacities: { 'fgos-executing': { kind: 'cli', command: '/capacity/executor', args: ['{prompt}'], allowCrossProvider: true } },
     models: { heavy: 'opus' },
     timeoutMs: 5000,
   };
@@ -888,7 +1059,7 @@ test('resolveExecutorCommand resolves a kind:"cli" capacity through fgos-tool-qu
   const cfg = {
     executor: { command: '/global/executor', args: ['{prompt}'] },
     executors: { standard: { command: '/standard/executor', args: ['{prompt}'] } },
-    capacities: { 'fgos-executing': { kind: 'cli', target: 'agy', tier: 'standard' } },
+    capacities: { 'fgos-executing': { kind: 'cli', target: 'agy', tier: 'standard', allowCrossProvider: true } },
     models: { standard: 'sonnet' },
     timeoutMs: 5000,
   };
@@ -899,7 +1070,7 @@ test('resolveExecutorCommand resolves a kind:"cli" capacity through fgos-tool-qu
 test('resolveExecutorCommand skips the fgos-tool-query presence check entirely when fgosDir is omitted, even with a kind:"cli" capacity present', () => {
   const cfg = {
     executor: { command: '/global/executor', args: ['{prompt}'] },
-    capacities: { 'fgos-executing': { kind: 'cli', target: 'agy-not-registered-anywhere' } },
+    capacities: { 'fgos-executing': { kind: 'cli', target: 'agy-not-registered-anywhere', allowCrossProvider: true } },
     models: { standard: 'sonnet' },
     timeoutMs: 5000,
   };
@@ -1013,7 +1184,7 @@ test('spawnWorker threads opts.fgosDir into a kind:"cli" capacity\'s presence ch
   const scriptPath = writeEchoExecutor(dir);
   const cfg = {
     executor: { command: process.execPath, args: [scriptPath, '{prompt}'] },
-    capacities: { 'fgos-executing': { kind: 'cli', tier: 'standard' } },
+    capacities: { 'fgos-executing': { kind: 'cli', tier: 'standard', allowCrossProvider: true } },
     models: { standard: 'sonnet' },
     timeoutMs: 5000,
   };
@@ -1199,4 +1370,101 @@ test('spawnWorker surfaces a non-zero exit status without throwing (goal-check i
   const cfg = baseConfig([scriptPath, '{prompt}']);
   const result = await spawnWorker(sampleWork(), cfg, mkTempDir());
   assert.equal(result.status, 7);
+});
+
+// --- cross-provider governance (D2/D3, tsk-32n) --------------------------
+// fgosDir omitted on purpose in most of these (mirroring the existing
+// precedence tests above): the D6 tool-registration check only fires when
+// fgosDir is given, and these tests isolate the D2/D3 governance check from
+// that unrelated existing behavior. The one test that exercises both
+// together registers+marks-present the capacity first, same as the
+// existing D6 tests do.
+
+test('resolveExecutorCommand throws when a kind:"cli" capacity resolves to a non-Claude command with no allowCrossProvider', () => {
+  const cfg = {
+    executor: { command: 'claude', args: ['{prompt}'] },
+    capacities: { 'fgos-executing': { kind: 'cli', command: 'agy', args: ['{prompt}'] } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  };
+  assert.throws(
+    () => resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', capacityId: 'fgos-executing' }),
+    RunnerConfigError,
+  );
+});
+
+test('resolveExecutorCommand dispatches normally when the same non-Claude capacity sets allowCrossProvider: true', () => {
+  const cfg = {
+    executor: { command: 'claude', args: ['{prompt}'] },
+    capacities: { 'fgos-executing': { kind: 'cli', command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  };
+  const resolved = resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', capacityId: 'fgos-executing' });
+  assert.equal(resolved.command, 'agy');
+});
+
+test('resolveExecutorCommand never requires allowCrossProvider for a kind:"cli" capacity naming no command of its own, falling through to the global Claude executor', () => {
+  // The exact false-positive D2 was written to rule out: kind:"cli" alone
+  // (metadata-only, no command/adapter override) must NOT gate on
+  // allowCrossProvider when the final resolved command is Claude's own.
+  const cfg = {
+    executor: { command: 'claude', args: ['{prompt}'] },
+    capacities: { 'fgos-executing': { kind: 'cli' } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  };
+  const resolved = resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', capacityId: 'fgos-executing' });
+  assert.equal(resolved.command, 'claude');
+});
+
+test('resolveExecutorCommand never requires allowCrossProvider for a kind:"cli" capacity that resolves to Claude\'s own CLI', () => {
+  const cfg = {
+    executor: { command: 'claude', args: ['{prompt}'] },
+    capacities: { 'fgos-executing': { kind: 'cli', command: 'claude', args: ['{prompt}'] } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  };
+  const resolved = resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', capacityId: 'fgos-executing' });
+  assert.equal(resolved.command, 'claude');
+});
+
+test('resolveExecutorCommand never triggers cross-provider governance for a non-"cli" kind, even with a non-Claude command', () => {
+  const cfg = {
+    executor: { command: 'claude', args: ['{prompt}'] },
+    capacities: { distill: { kind: 'task', target: 'general-purpose' } },
+    executors: { standard: { command: 'agy', args: ['{prompt}'] } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  };
+  const resolved = resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', capacityId: 'distill' });
+  assert.equal(resolved.command, 'agy');
+});
+
+test('resolveExecutorCommand with no capacities block at all never triggers cross-provider governance, byte-identical to pre-tsk-32n behavior', () => {
+  const cfg = {
+    executor: { command: 'agy', args: ['{prompt}'] },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  };
+  const resolved = resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard' });
+  assert.equal(resolved.command, 'agy');
+});
+
+test('resolveExecutorCommand throws for a non-Claude "cli" capacity even when fgosDir is given and the D6 registration/presence check already passed', () => {
+  const dir = mkTempDir();
+  initStore(dir);
+  registerTool(dir, { name: 'fgos-executing', kind: 'cli', capability: 'coding', command: 'agy' });
+  writeLocalStatus(dir, { 'fgos-executing': { status: 'present', checkedAt: new Date().toISOString() } });
+  const cfg = {
+    executor: { command: 'claude', args: ['{prompt}'] },
+    capacities: { 'fgos-executing': { kind: 'cli', command: 'agy', args: ['{prompt}'] } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  };
+  assert.throws(
+    () =>
+      resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', capacityId: 'fgos-executing', fgosDir: dir }),
+    RunnerConfigError,
+  );
 });

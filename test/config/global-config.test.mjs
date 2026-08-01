@@ -140,3 +140,20 @@ test('describeConfigAwareness: default globalConfigPath honors process.env.HOME 
   fs.rmSync(homeDir, { recursive: true, force: true });
   fs.rmSync(projectDir, { recursive: true, force: true });
 });
+
+// tsk-5vf D2: an install with only the legacy .fgos-runner.json (has not
+// re-run `fgos setup` since the move) must still read as "project active",
+// never "none" -- describeConfigAwareness's default projectConfigPath names
+// the NEW location, but presence-detection treats the legacy file as
+// equally real.
+test('describeConfigAwareness: default projectConfigPath treats a legacy-only .fgos-runner.json as project-active, still naming the new location', () => {
+  const dir = mkTempDir('global-config-awareness-legacy-only-');
+  fs.writeFileSync(path.join(dir, '.fgos-runner.json'), '{}');
+
+  const result = describeConfigAwareness(dir, { globalConfigPath: path.join(dir, 'no-such-global.json') });
+
+  assert.equal(result.active, 'project');
+  assert.equal(result.projectPresent, true);
+  assert.equal(result.projectConfigPath, path.join(dir, '.fgos', 'config.json'));
+  fs.rmSync(dir, { recursive: true, force: true });
+});

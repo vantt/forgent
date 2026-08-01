@@ -52,7 +52,11 @@ block falls back to `cfg.executor`, byte-identical to before your change —
 this fallback is what makes the change safe to ship without every operator
 config needing to opt in.
 
-## 3. Add the override block to `.fgos-runner.json`
+## 3. Add the override block to `.fgos/config.json`'s `runner` section
+
+(or the legacy `.fgos-runner.json`, still read as a fallback until `fgos
+setup` performs the move — same flat shape either way, just nested under a
+`runner` key in the new file)
 
 ```json
 "executors": {

@@ -2976,9 +2976,9 @@ test('discover with no id is rejected as validation, exit 4', () => {
 // executor, D1) so judge-executor's spawnSync fails fast (spawn-fail) on the
 // nested judge call, never invoking a live agent; judgeDiscovery's fail-safe
 // (discovery.mjs) then parks the item as unclear, not a bare "success".
-test('discover on a fresh cwd with no .fgos-runner.json bootstraps the default config instead of crashing on ENOENT', () => {
+test('discover on a fresh cwd with no runner config bootstraps the default config into the shared file instead of crashing on ENOENT', () => {
   const cwd = tmpCwd();
-  const configPath = path.join(cwd, '.fgos-runner.json');
+  const configPath = path.join(cwd, '.fgos', 'config.json');
   assert.equal(fs.existsSync(configPath), false);
 
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing with no config yet']).stdout).data.id;
@@ -2987,7 +2987,7 @@ test('discover on a fresh cwd with no .fgos-runner.json bootstraps the default c
   assert.equal(result.status, 0, `expected no RunnerConfigError/ENOENT crash, got stderr: ${result.stderr}`);
   assert.equal(JSON.parse(result.stdout).data.outcome, 'unclear');
 
-  assert.equal(fs.existsSync(configPath), true, 'discover should have auto-written the default .fgos-runner.json');
+  assert.equal(fs.existsSync(configPath), true, 'discover should have auto-written the default runner section into .fgos/config.json');
 
   const view = envelopeData(run(cwd, ['list']).stdout);
   assert.equal(view.work[id].status, 'awaiting-human');
@@ -4138,6 +4138,16 @@ function initGitCwdMain() {
 
 function gitAtCwd(cwd, args) {
   return execFileSync('git', args, { cwd, encoding: 'utf8' });
+}
+
+/** A tiny local package (tsk-2vd) — an absolute `file:` dependency resolves
+ * entirely offline, no registry/network hit, so the return-with-a-real-
+ * dependency test stays fast and deterministic. */
+function mkLocalDependency() {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-cli-test-localdep-'));
+  fs.writeFileSync(path.join(dir, 'package.json'), JSON.stringify({ name: 'fgos-test-localdep', version: '1.0.0' }));
+  fs.writeFileSync(path.join(dir, 'index.js'), 'module.exports = {};\n');
+  return dir;
 }
 
 // `.fgos/events.jsonl` is tracked-but-uncommitted the moment any fgos verb
@@ -5867,6 +5877,36 @@ test('return on a branch-source take: verify passes in a disposable detached wor
   assert.equal('headAtReturn' in view.work['branch-return-ok'], false, 'a branch return never records the main-based headAtReturn (D2 CẤM)');
   assert.equal(gitHead(cwd), mainHeadBefore, "return never advances or touches the human's own main checkout");
   assert.equal(gitAtCwd(cwd, ['worktree', 'list', '--porcelain']), worktreesBefore, 'the disposable detached verify worktree is cleaned up — no leftover');
+});
+
+test('return on a branch-source take whose branch declares a real npm dependency: verify passes because the disposable detached worktree gets its own node_modules provisioned first (tsk-2vd — reproduces the real failure that blocked tsk-32n\'s own return)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+
+  const localDep = mkLocalDependency();
+  fs.writeFileSync(
+    path.join(cwd, 'package.json'),
+    JSON.stringify({ name: 'x', version: '1.0.0', dependencies: { 'fgos-test-localdep': `file:${localDep}` } }),
+  );
+  gitAtCwd(cwd, ['add', 'package.json']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', 'declare a dependency']);
+
+  makeBlockedBranchItem(cwd, 'branch-return-deps', { verify: `node -e "require('fgos-test-localdep')"` });
+  assert.equal(run(cwd, ['take', '--id', 'branch-return-deps']).status, 0);
+  commitPending(cwd, 'state: take branch-return-deps');
+
+  gitAtCwd(cwd, ['checkout', 'fgw/branch-return-deps']);
+  fs.writeFileSync(path.join(cwd, 'proof.txt'), 'fixed by hand\n');
+  gitAtCwd(cwd, ['add', '-A']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', 'human fix']);
+  gitAtCwd(cwd, ['checkout', 'main']);
+
+  const result = run(cwd, ['return', 'branch-return-deps']);
+  assert.equal(result.status, 0, `return failed (before this item's fix, this failed with ERR_MODULE_NOT_FOUND exactly like tsk-32n's own return did): ${result.stderr}`);
+  assert.match(result.stdout, /awaiting-approval/);
+
+  const view = stateView(cwd);
+  assert.equal(view.work['branch-return-deps'].status, 'awaiting-approval');
 });
 
 test('return on a branch-source take never touches a live main-checkout.lock (tsk-45z D1 scope: only the main-source path releases early — worktree commits never contend for this shared lock)', () => {

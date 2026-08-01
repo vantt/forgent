@@ -13,6 +13,7 @@ import {
   listLeftovers,
   branchNameFor,
   reclaimOrphanedCheckout,
+  provisionDependencies,
   WorktreeError,
 } from '../../src/runner/worktree.mjs';
 
@@ -40,6 +41,16 @@ function commitOnWorktree(worktreePath, filename, contents) {
   fs.writeFileSync(path.join(worktreePath, filename), contents);
   execFileSync('git', ['add', filename], { cwd: worktreePath });
   execFileSync('git', ['commit', '-q', '-m', `worker: ${filename}`], { cwd: worktreePath });
+}
+
+/** A tiny local package (tsk-2vd) — an absolute `file:` dependency resolves
+ * entirely offline, no registry/network hit, so `provisionDependencies`'s
+ * tests stay fast and deterministic. */
+function mkLocalDependency() {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-worktree-test-localdep-'));
+  fs.writeFileSync(path.join(dir, 'package.json'), JSON.stringify({ name: 'fgos-test-localdep', version: '1.0.0' }));
+  fs.writeFileSync(path.join(dir, 'index.js'), 'module.exports = {};\n');
+  return dir;
 }
 
 test('branchNameFor is deterministic per id', () => {
@@ -491,4 +502,73 @@ test('createDispatchWorktree still allocates a FRESH directory on a reused branc
   assert.equal(fs.existsSync(path.join(retry.path, 'attempt.txt')), true, 'same branch, so its commit is there');
 
   removeWorktree(repoRoot, retry.path, { force: true });
+});
+
+// --- provisionDependencies (tsk-2vd D1/D2) --------------------------------
+
+test('provisionDependencies no-ops when the worktree has no package.json at all', () => {
+  const worktreeDir = mkWorktreeDir();
+  provisionDependencies(worktreeDir);
+  assert.equal(fs.existsSync(path.join(worktreeDir, 'node_modules')), false);
+});
+
+test('provisionDependencies no-ops when package.json declares no dependencies or devDependencies', () => {
+  const worktreeDir = mkWorktreeDir();
+  fs.writeFileSync(path.join(worktreeDir, 'package.json'), JSON.stringify({ name: 'x', version: '1.0.0' }));
+  provisionDependencies(worktreeDir);
+  assert.equal(fs.existsSync(path.join(worktreeDir, 'node_modules')), false);
+});
+
+test('provisionDependencies runs npm install (no lockfile) and the declared dependency ends up in this worktree\'s own node_modules', () => {
+  const worktreeDir = mkWorktreeDir();
+  const localDep = mkLocalDependency();
+  fs.writeFileSync(
+    path.join(worktreeDir, 'package.json'),
+    JSON.stringify({ name: 'x', version: '1.0.0', dependencies: { 'fgos-test-localdep': `file:${localDep}` } }),
+  );
+  provisionDependencies(worktreeDir);
+  assert.equal(fs.existsSync(path.join(worktreeDir, 'node_modules', 'fgos-test-localdep', 'package.json')), true);
+});
+
+test('provisionDependencies runs npm ci when package-lock.json is present', () => {
+  const worktreeDir = mkWorktreeDir();
+  const localDep = mkLocalDependency();
+  fs.writeFileSync(
+    path.join(worktreeDir, 'package.json'),
+    JSON.stringify({ name: 'x', version: '1.0.0', devDependencies: { 'fgos-test-localdep': `file:${localDep}` } }),
+  );
+  // Generate a real lockfile first (npm install), then re-provision a fresh
+  // worktree from scratch with that lockfile already in place — proving
+  // the npm-ci branch specifically, not just "some install happened".
+  execFileSync('npm', ['install', '--package-lock-only'], { cwd: worktreeDir });
+  fs.rmSync(path.join(worktreeDir, 'node_modules'), { recursive: true, force: true });
+  assert.equal(fs.existsSync(path.join(worktreeDir, 'package-lock.json')), true);
+
+  provisionDependencies(worktreeDir);
+  assert.equal(fs.existsSync(path.join(worktreeDir, 'node_modules', 'fgos-test-localdep', 'package.json')), true);
+});
+
+test('createWorktree provisions a declared dependency into the fresh worktree automatically', () => {
+  const repoRoot = initTempRepo();
+  const worktreeDir = mkWorktreeDir();
+  const localDep = mkLocalDependency();
+  fs.writeFileSync(
+    path.join(repoRoot, 'package.json'),
+    JSON.stringify({ name: 'x', version: '1.0.0', dependencies: { 'fgos-test-localdep': `file:${localDep}` } }),
+  );
+  execFileSync('git', ['add', 'package.json'], { cwd: repoRoot });
+  execFileSync('git', ['commit', '-q', '-m', 'declare a dependency'], { cwd: repoRoot });
+
+  const wt = createWorktree(repoRoot, 'item-deps', { worktreeDir });
+
+  assert.equal(fs.existsSync(path.join(wt.path, 'node_modules', 'fgos-test-localdep', 'package.json')), true);
+});
+
+test('createWorktree stays byte-identical (no node_modules created) for a repo with no package.json — every existing zero-dependency caller unaffected', () => {
+  const repoRoot = initTempRepo();
+  const worktreeDir = mkWorktreeDir();
+
+  const wt = createWorktree(repoRoot, 'item-nodeps', { worktreeDir });
+
+  assert.equal(fs.existsSync(path.join(wt.path, 'node_modules')), false);
 });
