@@ -2976,9 +2976,9 @@ test('discover with no id is rejected as validation, exit 4', () => {
 // executor, D1) so judge-executor's spawnSync fails fast (spawn-fail) on the
 // nested judge call, never invoking a live agent; judgeDiscovery's fail-safe
 // (discovery.mjs) then parks the item as unclear, not a bare "success".
-test('discover on a fresh cwd with no .fgos-runner.json bootstraps the default config instead of crashing on ENOENT', () => {
+test('discover on a fresh cwd with no runner config bootstraps the default config into the shared file instead of crashing on ENOENT', () => {
   const cwd = tmpCwd();
-  const configPath = path.join(cwd, '.fgos-runner.json');
+  const configPath = path.join(cwd, '.fgos', 'config.json');
   assert.equal(fs.existsSync(configPath), false);
 
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing with no config yet']).stdout).data.id;
@@ -2987,7 +2987,7 @@ test('discover on a fresh cwd with no .fgos-runner.json bootstraps the default c
   assert.equal(result.status, 0, `expected no RunnerConfigError/ENOENT crash, got stderr: ${result.stderr}`);
   assert.equal(JSON.parse(result.stdout).data.outcome, 'unclear');
 
-  assert.equal(fs.existsSync(configPath), true, 'discover should have auto-written the default .fgos-runner.json');
+  assert.equal(fs.existsSync(configPath), true, 'discover should have auto-written the default runner section into .fgos/config.json');
 
   const view = envelopeData(run(cwd, ['list']).stdout);
   assert.equal(view.work[id].status, 'awaiting-human');

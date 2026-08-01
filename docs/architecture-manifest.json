@@ -70,6 +70,7 @@
     "src/setup/git-hooks.mjs": "infra",
     "src/setup/checks.mjs": "use-case",
     "src/config/global-config.mjs": "infra",
-    "src/setup/registrations.mjs": "use-case"
+    "src/setup/registrations.mjs": "use-case",
+    "src/config/shared-config-file.mjs": "domain"
   }
 }

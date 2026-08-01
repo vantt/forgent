@@ -332,19 +332,19 @@ test('fgos setup --pretty prints colored ANSI text describing what it did, not J
   assert.equal(result.status, 0, result.stderr);
   assert.ok(result.stdout.includes('\x1b['), 'expected ANSI escape codes in --pretty output');
   assert.throws(() => JSON.parse(result.stdout), 'expected --pretty output to NOT be valid JSON');
-  assert.ok(result.stdout.includes('.fgos-runner.json'), 'expected --pretty output to describe the config file it touched');
+  assert.ok(result.stdout.includes('.fgos/config.json'), 'expected --pretty output to describe the config file it touched');
   fs.rmSync(cwd, { recursive: true, force: true });
   fs.rmSync(homeDir, { recursive: true, force: true });
 });
 
-test('fgos doctor against a fresh cwd with no .fgos-runner.json never creates that file (read-only proof)', () => {
+test('fgos doctor against a fresh cwd with no runner config never creates the shared config file (read-only proof)', () => {
   const cwd = mkTemp('doctor-cli-readonly-');
   const homeDir = mkTemp('doctor-cli-readonly-home-');
-  const configPath = path.join(cwd, '.fgos-runner.json');
+  const configPath = path.join(cwd, '.fgos', 'config.json');
   assert.equal(fs.existsSync(configPath), false);
   const result = spawnSync(process.execPath, [FGOS, 'doctor'], { cwd, encoding: 'utf8', env: { ...process.env, HOME: homeDir } });
   assert.equal(result.status, 0, result.stderr);
-  assert.equal(fs.existsSync(configPath), false, 'fgos doctor must never create .fgos-runner.json');
+  assert.equal(fs.existsSync(configPath), false, 'fgos doctor must never create .fgos/config.json');
   const envelope = JSON.parse(result.stdout);
   const configCheck = envelope.data.checks.find((c) => c.id === 'config-not-stale');
   assert.equal(configCheck.passed, false);
@@ -491,7 +491,7 @@ test('setup from a copy of fgos that is not in a git checkout declines the rc wr
   // The whole point: nothing was appended to the profile.
   assert.equal(fs.readFileSync(rcFile, 'utf8'), 'echo hi\n');
   // Setup's other work still happened.
-  assert.equal(fs.existsSync(path.join(copyRoot, '.fgos-runner.json')), true);
+  assert.equal(fs.existsSync(path.join(copyRoot, '.fgos', 'config.json')), true);
 
   fs.rmSync(copyRoot, { recursive: true, force: true });
   fs.rmSync(homeDir, { recursive: true, force: true });
