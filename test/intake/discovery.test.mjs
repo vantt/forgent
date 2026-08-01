@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { judgeDiscovery, resolveDiscovery } from '../../src/intake/discovery.mjs';
+import { readScoutNotes } from '../../src/intake/judge-executor.mjs';
 import { computeImpact, computePriority } from '../../src/state/priority-formula.mjs';
 import { addWork, listWork, StoreError, categoryOf, putInAwaiting, answerAwaiting, moveWork } from '../../src/state/store.mjs';
 import { appendEvent, readEvents } from '../../src/state/events.mjs';
@@ -762,4 +763,106 @@ test('resolveDiscovery still completes clear/unclear resolution when editWork th
   const view = listWork(storeDir);
   assert.equal(view.work['item-x'].stage, 'decompose');
   assert.equal(view.work['item-x'].priority, undefined);
+});
+
+// --- tsk-g18: resolveDiscovery threads scout-notes.md through judgeDiscovery
+
+// tmpStoreDir() (above) creates its store dir DIRECTLY under os.tmpdir(), so
+// resolveDiscovery's own `repoRoot = path.dirname(dir)` collapses to the
+// shared os.tmpdir() itself — fine for every other test here (none of them
+// touch the filesystem under repoRoot), but scout-notes.md tests write a
+// REAL file under `<repoRoot>/<docsRef>`, so reusing tmpStoreDir() would
+// leak state across separate test runs sharing the same os.tmpdir(). This
+// nests the store dir one level under its own fresh repo root instead, so
+// `path.dirname(storeDir)` is unique per test — the same shape a real repo
+// has (`.fgos/` directly under the repo root).
+function tmpRepoAndStoreDir() {
+  const repoRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-scout-notes-repo-'));
+  const storeDir = path.join(repoRoot, '.fgos');
+  fs.mkdirSync(storeDir);
+  return storeDir;
+}
+
+function writeArgvAndPromptRecordingExecutor(dir, argvPath, stdoutContent) {
+  const scriptPath = path.join(dir, 'argv-prompt-recording-executor.mjs');
+  fs.writeFileSync(
+    scriptPath,
+    `
+    import fs from 'node:fs';
+    fs.writeFileSync(${JSON.stringify(argvPath)}, JSON.stringify(process.argv.slice(2)));
+    process.stdout.write(${JSON.stringify(stdoutContent)});
+    process.exit(0);
+    `,
+  );
+  return scriptPath;
+}
+
+function ndjsonScoutTranscript(resultVerdict) {
+  const events = [
+    {
+      type: 'assistant',
+      message: { role: 'assistant', content: [{ type: 'tool_use', id: 't1', name: 'Bash', input: { command: 'rg produce-the-output' } }] },
+    },
+    { type: 'user', message: { role: 'user', content: [{ type: 'tool_result', tool_use_id: 't1', content: 'src/output.mjs:1:produce-the-output' }] } },
+    { type: 'result', subtype: 'success', result: JSON.stringify(resultVerdict) },
+  ];
+  return `${events.map((e) => JSON.stringify(e)).join('\n')}\n`;
+}
+
+// Freshness (D "presence alone means fresh", judge-executor.mjs): a
+// pre-existing scout-notes.md under the item's docsRef must (a) show up in
+// the judge's prompt so it can reuse the prior evidence instead of
+// re-scouting, and (b) skip stream-json transcript capture entirely — there
+// is nothing new to persist, so the spawn stays exactly like a pre-tsk-g18
+// call.
+test('resolveDiscovery with an existing scout-notes.md embeds it in the prompt and skips stream-json capture', () => {
+  const scriptDir = mkTempDir();
+  const argvPath = path.join(scriptDir, 'argv.json');
+  const scriptPath = writeArgvAndPromptRecordingExecutor(
+    scriptDir,
+    argvPath,
+    JSON.stringify({ clear: true, verify: 'ok' }),
+  );
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpRepoAndStoreDir();
+  const docsRef = 'docs/history/scout-fresh-item';
+  const featureDir = path.join(path.dirname(storeDir), docsRef);
+  fs.mkdirSync(featureDir, { recursive: true });
+  fs.writeFileSync(path.join(featureDir, 'scout-notes.md'), '## Scout 1\n\n**Command:** `rg PRIOR-EVIDENCE-MARKER`\n');
+  addWork(storeDir, sampleWork({ docsRef }));
+
+  const result = resolveDiscovery(storeDir, 'item-x', cfg);
+  assert.equal(result.outcome, 'clear');
+
+  const [prompt] = JSON.parse(fs.readFileSync(argvPath, 'utf8'));
+  assert.match(prompt, /PRIOR-EVIDENCE-MARKER/);
+  const argv = JSON.parse(fs.readFileSync(argvPath, 'utf8'));
+  assert.equal(argv.includes('--output-format'), false);
+});
+
+// No scout-notes.md yet: the judge call captures its own stream-json
+// transcript and this becomes the FIRST persisted scout-notes.md for the
+// item, written by resolveDiscovery's own call chain (parent code), never
+// by the judge subprocess.
+test('resolveDiscovery with no existing scout-notes.md captures the transcript and persists it under the item docsRef', () => {
+  const scriptDir = mkTempDir();
+  const scriptPath = path.join(scriptDir, 'stream-json-executor.mjs');
+  fs.writeFileSync(
+    scriptPath,
+    `process.stdout.write(${JSON.stringify(ndjsonScoutTranscript({ clear: true, verify: 'npm test -- scouted' }))}); process.exit(0);`,
+  );
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpRepoAndStoreDir();
+  const docsRef = 'docs/history/scout-new-item';
+  addWork(storeDir, sampleWork({ docsRef }));
+
+  const result = resolveDiscovery(storeDir, 'item-x', cfg);
+  assert.equal(result.outcome, 'clear');
+  assert.equal(result.verdict.verify, 'npm test -- scouted');
+
+  const notes = readScoutNotes(path.dirname(storeDir), docsRef);
+  assert.match(notes, /rg produce-the-output/);
+  assert.match(notes, /src\/output\.mjs:1:produce-the-output/);
 });

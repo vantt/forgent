@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { judgeDecompose, resolveDecompose } from '../../src/intake/decompose.mjs';
+import { readScoutNotes } from '../../src/intake/judge-executor.mjs';
 import { computeImpact, computePriority, effortForMode } from '../../src/state/priority-formula.mjs';
 import { addWork, listWork, StoreError, categoryOf, moveWork, readRawEvents } from '../../src/state/store.mjs';
 
@@ -1109,4 +1110,101 @@ test('resolveDecompose logs a decisionsById entry on a decompose verdict, includ
   assert.match(entries[0].text, /decompose/);
   assert.match(entries[0].text, /2 children/);
   assert.equal(entries[0].rationale, 'Two independent surfaces, no shared state');
+});
+
+// --- tsk-g18: resolveDecompose threads scout-notes.md through judgeDecompose
+
+function writeArgvAndPromptRecordingExecutor(dir, argvPath, stdoutContent) {
+  const scriptPath = path.join(dir, 'argv-prompt-recording-executor.mjs');
+  fs.writeFileSync(
+    scriptPath,
+    `
+    import fs from 'node:fs';
+    fs.writeFileSync(${JSON.stringify(argvPath)}, JSON.stringify(process.argv.slice(2)));
+    process.stdout.write(${JSON.stringify(stdoutContent)});
+    process.exit(0);
+    `,
+  );
+  return scriptPath;
+}
+
+function ndjsonScoutTranscript(resultVerdict) {
+  const events = [
+    {
+      type: 'assistant',
+      message: { role: 'assistant', content: [{ type: 'tool_use', id: 't1', name: 'Bash', input: { command: 'rg reporting-pipeline' } }] },
+    },
+    { type: 'user', message: { role: 'user', content: [{ type: 'tool_result', tool_use_id: 't1', content: 'src/report.mjs:1:reporting-pipeline' }] } },
+    { type: 'result', subtype: 'success', result: JSON.stringify(resultVerdict) },
+  ];
+  return `${events.map((e) => JSON.stringify(e)).join('\n')}\n`;
+}
+
+// tmpStoreDir() (above) creates its store dir DIRECTLY under os.tmpdir(), so
+// resolveDecompose's own `repoRoot = path.dirname(dir)` collapses to the
+// shared os.tmpdir() itself — fine for every other test here, but
+// scout-notes.md tests write a REAL file under `<repoRoot>/<docsRef>`, so
+// reusing tmpStoreDir() would leak state across separate test runs sharing
+// the same os.tmpdir(). This nests the store dir one level under its own
+// fresh repo root instead, so `path.dirname(storeDir)` is unique per test —
+// the same shape a real repo has (`.fgos/` directly under the repo root).
+function tmpRepoAndStoreDir() {
+  const repoRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-scout-notes-repo-'));
+  const storeDir = path.join(repoRoot, '.fgos');
+  fs.mkdirSync(storeDir);
+  return storeDir;
+}
+
+// Same freshness contract discovery.mjs proves for judgeDiscovery: a
+// pre-existing scout-notes.md under the item's docsRef shows up in
+// judgeDecompose's prompt and skips stream-json transcript capture — no new
+// evidence to persist, spawn stays exactly like a pre-tsk-g18 call.
+test('resolveDecompose with an existing scout-notes.md embeds it in the prompt and skips stream-json capture', () => {
+  const scriptDir = mkTempDir();
+  const argvPath = path.join(scriptDir, 'argv.json');
+  const scriptPath = writeArgvAndPromptRecordingExecutor(
+    scriptDir,
+    argvPath,
+    JSON.stringify({ verdict: 'pass-through' }),
+  );
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpRepoAndStoreDir();
+  const docsRef = 'docs/history/decompose-scout-fresh-item';
+  const featureDir = path.join(path.dirname(storeDir), docsRef);
+  fs.mkdirSync(featureDir, { recursive: true });
+  fs.writeFileSync(path.join(featureDir, 'scout-notes.md'), '## Scout 1\n\n**Command:** `rg PRIOR-DECOMPOSE-EVIDENCE`\n');
+  addWork(storeDir, sampleWork({ docsRef }));
+
+  const result = resolveDecompose(storeDir, 'item-x', cfg, 'runner');
+  assert.equal(result.outcome, 'pass-through');
+
+  const [prompt] = JSON.parse(fs.readFileSync(argvPath, 'utf8'));
+  assert.match(prompt, /PRIOR-DECOMPOSE-EVIDENCE/);
+  const argv = JSON.parse(fs.readFileSync(argvPath, 'utf8'));
+  assert.equal(argv.includes('--output-format'), false);
+});
+
+// No scout-notes.md yet: the judge call captures its own stream-json
+// transcript and resolveDecompose's own call chain persists it as the
+// item's first scout-notes.md — parent-written, never by the judge itself.
+test('resolveDecompose with no existing scout-notes.md captures the transcript and persists it under the item docsRef', () => {
+  const scriptDir = mkTempDir();
+  const scriptPath = path.join(scriptDir, 'stream-json-executor.mjs');
+  fs.writeFileSync(
+    scriptPath,
+    `process.stdout.write(${JSON.stringify(ndjsonScoutTranscript({ verdict: 'pass-through', reason: 'scouted, simple' }))}); process.exit(0);`,
+  );
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpRepoAndStoreDir();
+  const docsRef = 'docs/history/decompose-scout-new-item';
+  addWork(storeDir, sampleWork({ docsRef }));
+
+  const result = resolveDecompose(storeDir, 'item-x', cfg, 'runner');
+  assert.equal(result.outcome, 'pass-through');
+
+  const notes = readScoutNotes(path.dirname(storeDir), docsRef);
+  assert.match(notes, /rg reporting-pipeline/);
+  assert.match(notes, /src\/report\.mjs:1:reporting-pipeline/);
 });
