@@ -219,6 +219,22 @@
     "quadrant": "explanation",
     "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
     "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/agent-executor-capacity-aware-dispatch.md",
+    "title": "Why capacity-aware backend dispatch exists",
+    "sourceCaptureId": "tsk-64p"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/approve-verify-only-mode-checks-cwd-not-the-items-real-branch.md",
+    "title": "`fgos approve`'s \"verify-only\" mode checks the current cwd, not the item's real branch",
+    "sourceCaptureId": "tsk-2qz"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/explanation/auto-decompose-can-drop-a-locked-decision-from-every-childs-footprint.md",
     "title": "Auto-decompose can drop a locked decision from every child's footprint",
     "sourceCaptureId": "tsk-2ta-4"
@@ -238,6 +254,14 @@
     "docPath": "docs/explanation/decisions-locked-with-a-person-still-need-restating-to-the-machine-judge.md",
     "title": "Why decisions already locked and approved by a person still had to be restated to the engine's own clarify judge",
     "sourceCaptureId": "tsk-52g"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/disposable-worktree-dependency-provisioning.md",
+    "title": "Why disposable worktrees need their own dependency install",
+    "sourceCaptureId": "tsk-2vd"
   },
   {
     "quadrant": "explanation",
@@ -691,6 +715,14 @@
     "quadrant": "how-to",
     "purpose": "Show the steps to accomplish one specific, already-understood goal.",
     "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/close-out-a-goaltier-milestone-after-all-targets-are-done.md",
+    "title": "How to close out a goalTier milestone/MVP item once all its targets are done",
+    "sourceCaptureId": "tsk-u9k"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
     "docPath": "docs/how-to/close-out-a-work-item-already-done-before-claim.md",
     "title": "How to close out a work item whose real work was already done before this claim",
     "sourceCaptureId": "tsk-4on"
@@ -779,6 +811,14 @@
     "quadrant": "how-to",
     "purpose": "Show the steps to accomplish one specific, already-understood goal.",
     "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/generalize-a-judge-retry-helper-for-any-capacity-dispatch.md",
+    "title": "How to extract a judge-only retry helper into a capacity-agnostic one",
+    "sourceCaptureId": "tsk-418"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
     "docPath": "docs/how-to/hand-back-a-material-context-gap-during-planning.md",
     "title": "How to hand a material CONTEXT.md gap back from fgos-planning to fgos-exploring",
     "sourceCaptureId": "tsk-4y8"
@@ -838,6 +878,14 @@
     "docPath": "docs/how-to/recover-a-stuck-doing-claim-after-worktree-creation-failure.md",
     "title": "How to recover a stuck `doing` claim after a worktree-creation failure",
     "sourceCaptureId": "tsk-4m0"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/register-a-fixable-doctor-check-in-fgos.md",
+    "title": "How to register a fixable doctor check in fgOS",
+    "sourceCaptureId": "tsk-2qz-1"
   },
   {
     "quadrant": "how-to",
@@ -910,6 +958,30 @@
     "docPath": "docs/how-to/verify-herdr-cockpit-reuses-existing-tab-instead-of-losing-one.md",
     "title": "How to verify herdr cockpit reuses its existing tab instead of overwriting yours",
     "sourceCaptureId": "tsk-3i3"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/wire-a-headless-function-through-an-agent-executor-capacity.md",
+    "title": "How to wire a headless function through an agent-executor capacity",
+    "sourceCaptureId": "tsk-2yp"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/wire-a-skills-classify-step-through-an-agent-executor-capacity.md",
+    "title": "How to wire an existing skill's inline-reasoning step through an agent-executor capacity",
+    "sourceCaptureId": "tsk-5l2-3"
+  },
+  {
+    "quadrant": "reference",
+    "purpose": "Describe the machinery accurately and completely for lookup.",
+    "audience": "A user who needs precise facts about a specific field/command/API.",
+    "docPath": "docs/reference/capacity-cross-provider-governance.md",
+    "title": "capacity cross-provider governance",
+    "sourceCaptureId": "tsk-32n"
   },
   {
     "quadrant": "reference",
