@@ -188,3 +188,11 @@ together.
 - Exact YAML package choice (e.g. `yaml` vs. an alternative) — builder's
   call at install time, constrained by the risk-map row above (must pass
   `npm test` green, must not drag in a heavy transitive dependency tree).
+
+## Final verify confirmation (post-D6)
+
+`npm install && npm test && node scripts/project-agents.mjs && git diff
+--exit-code -- .claude/agents/` — the item's own recorded `verify` command,
+run in full after D6: **2016 tests, 2011 pass, 0 fail, 0 cancelled, 5
+skip**, projection re-ran clean, `git diff --exit-code` confirmed
+byte-identical (idempotent). Exit code 0.
