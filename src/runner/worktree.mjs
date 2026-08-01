@@ -79,6 +79,31 @@ export function branchNameFor(id) {
   return `fgw/${id}`;
 }
 
+/**
+ * Provision `worktreePath`'s own `node_modules` before anything runs
+ * `verify` against it (tsk-2vd D1/D2): a disposable worktree never inherits
+ * the host repo's `node_modules` — git only checks out tracked files.
+ * No-ops when `worktreePath/package.json` is absent or declares no
+ * `dependencies`/`devDependencies` at all (same skip precedent as
+ * `checkDependenciesInstalled`, `src/setup/registrations.mjs`) — keeps
+ * every existing zero-dependency caller (this repo's own history until
+ * `tsk-slq` added `yaml`) byte-identical, no install cost paid when
+ * nothing is declared. Runs `npm ci` when `worktreePath/package-lock.json`
+ * exists (reproducible, matches the lockfile exactly), else `npm install`
+ * (D2) — never a `node_modules` symlink from the host repo (D2's rejected
+ * alternative: risks masking a real dependency mismatch when the
+ * worktree's own `package.json` diverged from the host's installed set).
+ */
+export function provisionDependencies(worktreePath) {
+  const packageJsonPath = path.join(worktreePath, 'package.json');
+  if (!fs.existsSync(packageJsonPath)) return;
+  const pkg = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+  const hasDeps = Object.keys(pkg.dependencies ?? {}).length > 0 || Object.keys(pkg.devDependencies ?? {}).length > 0;
+  if (!hasDeps) return;
+  const hasLockfile = fs.existsSync(path.join(worktreePath, 'package-lock.json'));
+  execFileSync('npm', [hasLockfile ? 'ci' : 'install'], { cwd: worktreePath, stdio: 'ignore' });
+}
+
 function git(repoRoot, args) {
   return execFileSync('git', args, { cwd: repoRoot, encoding: 'utf8', shell: false });
 }
@@ -294,6 +319,8 @@ export function createWorktree(repoRoot, id, opts = {}) {
       worktreePath,
     });
   }
+
+  provisionDependencies(worktreePath);
 
   return { path: worktreePath, branch, reused };
 }
