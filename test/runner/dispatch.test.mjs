@@ -1059,8 +1059,17 @@ test('spawnWorker attaches stdout/stderr captured before a worker-timeout kill',
   const scriptPath = writeHangingExecutorWithOutput(dir);
   const cfg = baseConfig([scriptPath]);
 
+  // 2000ms (not the 200ms the companion test above uses): that test only
+  // asserts on an EMPTY stdout/stderr, which a too-fast kill still
+  // satisfies either way. This test asserts the captured content is the
+  // real 'partial stdout/stderr before hang' string, which requires the
+  // budget to survive a full child-process cold start (fork/exec + Node
+  // runtime init) PLUS the two synchronous writes reaching the parent's
+  // pipe before SIGTERM fires — 200ms was tight enough to flake under load
+  // (a slow/contended machine can blow past it before the child ever
+  // writes), killing the child before any output was captured.
   await assert.rejects(
-    () => spawnWorker(sampleWork(), cfg, mkTempDir(), { timeoutMs: 200 }),
+    () => spawnWorker(sampleWork(), cfg, mkTempDir(), { timeoutMs: 2000 }),
     (err) => {
       assert.ok(err instanceof DispatchError);
       assert.equal(err.errorClass, 'worker-timeout');

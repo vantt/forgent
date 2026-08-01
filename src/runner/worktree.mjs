@@ -295,6 +295,27 @@ export function createWorktree(repoRoot, id, opts = {}) {
     });
   }
 
+  // Reuse repoRoot's installed deps (never re-`npm install` here): `git
+  // worktree add` only checks out tracked files, and node_modules is never
+  // git-tracked, so a fresh worktree's own `npm test`/`npm run <verify>`
+  // hits ERR_MODULE_NOT_FOUND for every dependency the moment repoRoot last
+  // ran `npm install` after this worktree's checkout was forked. A symlink
+  // is instant (no network, no reinstall) and always matches whatever
+  // repoRoot actually has installed right now. Best-effort: a repoRoot with
+  // no node_modules yet (fresh clone, pre-install) or a symlink failure
+  // (unsupported filesystem) must never break worktree creation itself —
+  // callers that need it will surface a clear ERR_MODULE_NOT_FOUND from
+  // their own verify step instead, same as today's un-symlinked failure
+  // mode, just without the entirely-avoidable common case.
+  try {
+    const repoNodeModules = path.join(repoRoot, 'node_modules');
+    if (fs.existsSync(repoNodeModules)) {
+      fs.symlinkSync(repoNodeModules, path.join(worktreePath, 'node_modules'), 'dir');
+    }
+  } catch {
+    // best-effort only, see comment above
+  }
+
   return { path: worktreePath, branch, reused };
 }
 
