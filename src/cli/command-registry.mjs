@@ -833,16 +833,17 @@ export const COMMAND_REGISTRY = [
   {
     name: 'uninstall',
     invoke: 'fgos uninstall',
-    description: 'Reverse fgos setup\'s own wiring: unwire core.hooksPath/.githooks (fill-only — only when still exactly .githooks, mirroring installGitHooks) and report (never delete) any fgos shell-rc source line found, since deletion stays a human act. Never touches .fgos/ data or config. Requires --yes; refuses with no side effects otherwise.',
+    description: 'Reverse fgos setup\'s own wiring: unwire core.hooksPath/.githooks (fill-only — only when still exactly .githooks, mirroring installGitHooks) and report (never delete) any fgos shell-rc source line found, since deletion stays a human act. Never touches .fgos/ data or config. Requires --yes; refuses with no side effects otherwise. --remove-package additionally shells out to "npm uninstall -g forgent" (npm global installs only, Linux/macOS only — an unproven spike, tsk-4iv-2); omitted, behavior is unchanged from wiring-only.',
     parameters: {
       type: 'object',
       properties: {
         pretty: { type: 'boolean', description: 'Render colored human-readable text instead of the JSON envelope.' },
-        yes: { type: 'boolean', description: 'Confirm the destructive steps (unwiring git hooks). Required — omitting it refuses before touching anything.' },
+        yes: { type: 'boolean', description: 'Confirm the destructive steps (unwiring git hooks, and package removal if --remove-package is also given). Required — omitting it refuses before touching anything.' },
+        'remove-package': { type: 'boolean', description: 'Also attempt "npm uninstall -g forgent" after the wiring reversal. npm global installs only, Linux/macOS only (tsk-4iv-2 spike scope) — omit to keep the wiring-only default.' },
       },
       required: [],
     },
-    examples: ['fgos uninstall --yes', 'fgos uninstall --yes --pretty'],
+    examples: ['fgos uninstall --yes', 'fgos uninstall --yes --remove-package', 'fgos uninstall --yes --pretty'],
     touchesState: true,
     requiresExistingStore: false,
     externalEffect: false,
