@@ -75,6 +75,16 @@ broken, rule out an unrelated failure elsewhere in the full suite first.
    only retry after confirming (steps 2-4) the failure is genuinely
    unrelated, and after actually fixing it if it wasn't flake.
 
+   **Note (2026-08-01, tsk-g18):** the status value this recovery move
+   targets is named `awaiting-approval` today, not `proposed` — confirmed
+   against `src/state/work.mjs`'s own `STATUSES` export, which no longer
+   lists `proposed` at all:
+   `['todo', 'doing', 'blocked', 'awaiting-approval', 'done',
+   'awaiting-human', 'wontfix']`. The recovery command that actually works
+   right now is `fgos move <id> --to awaiting-approval`; if a future reader
+   hits a rejected-status error running the `--to proposed` command above,
+   this is why.
+
 ## Why this exists
 
 `approve`'s full-suite verify is a real safety net (D4-style
@@ -119,6 +129,55 @@ cleanly.
 
 > `{"id":"tsk-2z3","predicted":{"tier":"standard","deps":0,"priorVisits":0,"role":"session","headAtTake":"208893b2cc9e7f7102f498a42e0cbad447c57878"},"actual":{"outcome":"proposed","passed":true,"attempts":1,"errorClass":null,"aheadCount":3}}`
 > — real `work.outcome` capture, id `tsk-2z3` (the eventual successful outcome)
+
+## Real example: a genuine gap in the merge machinery itself, not a stale test
+
+Item `tsk-g18` (parent-side scout-notes persistence for
+`judgeDiscovery`/`judgeDecompose`, `src/intake/*.mjs` only) had its own
+change fully correct and green (`npm test` — 2032/2037, 5 pre-existing
+skips — before merge). `fgos approve --acknowledge-iron-law` still came
+back blocked:
+
+> `{"id":"tsk-g18","disposition":"blocked","errorClass":"verify-miss","layer":"verification","attempts":1,"detail":"goal-check failed on staged merge into fgw/tsk-64p (exit 1); merge aborted, fgw/tsk-64p unchanged","ts":"2026-08-01T10:04:54.863Z"}`
+> — real `work.friction` capture, id `tsk-g18`
+
+Unlike `tsk-2z3` above (a different already-merged item's bug), this one
+wasn't a stale test at all — it was a genuine gap in `approve`'s own
+merge tooling. `approve`'s full-suite verify runs inside a *disposable
+detached worktree* (`withMergeEphemeralWorktree` / `createWorktree`,
+`src/runner/worktree.mjs`) that `git worktree add`s a fresh checkout of
+tracked files only. `node_modules` is never git-tracked, so that fresh
+checkout never had it — `npm test` failed immediately with
+`ERR_MODULE_NOT_FOUND` for `yaml`, a dependency a sibling item
+(`tsk-slq`) had added to `package.json` moments earlier and installed in
+the *main* checkout, but which the disposable worktree's own checkout had
+no way to know about.
+
+Steps 2-3 above (does the failing file touch the item's own diff? isolate
+and re-run it) correctly rule this out as `tsk-g18`'s own regression — the
+failing file (`test/scripts/project-agents.test.mjs`) was untouched by
+`tsk-g18`'s diff. But step 4's usual fix (patch the specific pre-existing
+bug) doesn't apply cleanly here: the real fix is structural — make
+`createWorktree` symlink `repoRoot`'s already-installed `node_modules`
+into every fresh worktree it creates (instant, no reinstall, always
+matches whatever `repoRoot` actually has), landed as its own commit on
+`main` (`4123318`, `src/runner/worktree.mjs`). A second, unrelated flake
+in the same failing run (`spawnWorker attaches stdout/stderr captured
+before a worker-timeout kill`, a 200ms budget too tight for a cold
+child-process spawn under load) was fixed in the same commit by raising
+that one test's timeout budget to 2000ms.
+
+`fgos move tsk-g18 --to awaiting-approval` (see the status-name note
+above) followed by `fgos approve tsk-g18 --acknowledge-iron-law` on the
+next attempt merged cleanly.
+
+**Takeaway:** when the "unrelated" failing test is an entire file
+crashing on `ERR_MODULE_NOT_FOUND` for a *recently-added* dependency
+(check `git log -1 -- package.json` for a recent bump), suspect the
+disposable-worktree-has-no-`node_modules` gap before assuming it's a
+one-off flake — it will reproduce deterministically on every retry until
+`createWorktree`'s own symlink step (or a future `npm install` there) is
+actually in place.
 
 ## Related
 
