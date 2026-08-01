@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { spawnSync } from 'node:child_process';
 import {
   buildPrompt,
   loadRunnerConfig,
@@ -11,6 +12,7 @@ import {
   detectAssistantCli,
   modelForTier,
   resolveExecutorCommand,
+  resolveCapacityCli,
   spawnWorker,
   RunnerConfigError,
   DispatchError,
@@ -1190,4 +1192,79 @@ test('spawnWorker surfaces a non-zero exit status without throwing (goal-check i
   const cfg = baseConfig([scriptPath, '{prompt}']);
   const result = await spawnWorker(sampleWork(), cfg, mkTempDir());
   assert.equal(result.status, 7);
+});
+
+// --- tsk-5l2-1: `resolveCapacityCli` — domain-2's "resolve <capacityId>"
+// helper, reusing resolveExecutorConfig/resolveExecutorCommand/
+// modelForTier verbatim (design doc §4.2). `repoRoot` is passed explicitly
+// in every test here to skip the git-based lookup, the same way every
+// other test in this file points fgosDir/config paths at a temp dir
+// instead of a real git checkout.
+
+function writeRunnerConfigFixture(root, cfg) {
+  fs.writeFileSync(path.join(root, '.fgos-runner.json'), JSON.stringify(cfg, null, 2));
+}
+
+test('resolveCapacityCli rejects with a usage RunnerConfigError when capacityId is missing', async () => {
+  await assert.rejects(() => resolveCapacityCli(undefined, { repoRoot: mkTempDir() }), RunnerConfigError);
+  await assert.rejects(() => resolveCapacityCli('', { repoRoot: mkTempDir() }), RunnerConfigError);
+});
+
+test('resolveCapacityCli falls back to the global executor when the capacityId is not in cfg.capacities at all', async () => {
+  const root = mkTempDir();
+  writeRunnerConfigFixture(root, {
+    executor: { command: '/global/executor', args: ['{prompt}'] },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+  const resolved = await resolveCapacityCli('submit-assist-classify', { prompt: 'classify this', repoRoot: root });
+  assert.deepEqual(resolved, { command: '/global/executor', args: ['classify this'], provider: '/global/executor', model: 'sonnet' });
+});
+
+test('resolveCapacityCli resolves a kind:"cli" capacity through its own tier and command once registered+present', async () => {
+  const root = mkTempDir();
+  const fgosDir = path.join(root, '.fgos');
+  initStore(fgosDir);
+  registerTool(fgosDir, { name: 'submit-assist-classify', kind: 'cli', capability: 'submit-assist-classify', command: 'agy' });
+  writeLocalStatus(fgosDir, { 'submit-assist-classify': { status: 'present', checkedAt: new Date().toISOString() } });
+  writeRunnerConfigFixture(root, {
+    executor: { command: '/global/executor', args: ['{prompt}'] },
+    capacities: { 'submit-assist-classify': { kind: 'cli', command: 'agy', provider: 'agy', args: ['{prompt}'], tier: 'light' } },
+    models: { light: 'flash-3.5' },
+    timeoutMs: 5000,
+  });
+  const resolved = await resolveCapacityCli('submit-assist-classify', { prompt: 'classify this', repoRoot: root });
+  assert.deepEqual(resolved, { command: 'agy', args: ['classify this'], provider: 'agy', model: 'flash-3.5' });
+});
+
+test('resolveCapacityCli propagates resolveExecutorConfig\'s own RunnerConfigError for a kind:"cli" capacity that is not registered', async () => {
+  const root = mkTempDir();
+  initStore(path.join(root, '.fgos'));
+  writeRunnerConfigFixture(root, {
+    executor: { command: '/global/executor', args: ['{prompt}'] },
+    capacities: { 'submit-assist-classify': { kind: 'cli', command: 'agy', args: ['{prompt}'] } },
+    models: { light: 'flash-3.5' },
+    timeoutMs: 5000,
+  });
+  await assert.rejects(() => resolveCapacityCli('submit-assist-classify', { prompt: 'x', repoRoot: root }), RunnerConfigError);
+});
+
+test('the "resolve" CLI entry point (node src/runner/dispatch.mjs resolve <capacityId>) prints {command,args,provider,model} JSON to stdout for a real invocation against this repo\'s own .fgos-runner.json', () => {
+  const dispatchPath = path.resolve('src/runner/dispatch.mjs');
+  const result = spawnSync(process.execPath, [dispatchPath, 'resolve', 'no-such-capacity-configured', '--prompt', 'hello'], {
+    encoding: 'utf8',
+  });
+  assert.equal(result.status, 0, result.stderr);
+  const parsed = JSON.parse(result.stdout);
+  assert.ok(typeof parsed.command === 'string' && parsed.command.length > 0);
+  assert.ok(Array.isArray(parsed.args));
+  assert.ok(typeof parsed.provider === 'string');
+  assert.ok(typeof parsed.model === 'string');
+});
+
+test('the "resolve" CLI entry point exits non-zero with a usage message when capacityId is omitted', () => {
+  const dispatchPath = path.resolve('src/runner/dispatch.mjs');
+  const result = spawnSync(process.execPath, [dispatchPath, 'resolve'], { encoding: 'utf8' });
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /usage: node src\/runner\/dispatch\.mjs resolve/);
 });

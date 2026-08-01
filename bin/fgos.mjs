@@ -113,6 +113,29 @@ function currentHead(cwd) {
   return gitAt(cwd, ['rev-parse', 'HEAD']).trim();
 }
 
+/**
+ * Walk up from `startDir` looking for a real `node_modules` directory,
+ * mirroring exactly what Node's own ESM resolver does when it resolves a
+ * bare-specifier import — `startDir` itself may have none of its own (a
+ * nested nested worktree checkout has no local install; it works today
+ * only because Node's search continues past it to an ancestor that does).
+ * Returns the first match's absolute path, or `null` at the filesystem
+ * root with none found (tsk-5l2-1: a plain `existsSync(path.join(repoRoot,
+ * 'node_modules'))` check is wrong here for exactly this reason — it only
+ * ever checks one directory, not the whole chain a real Node process
+ * would).
+ */
+function findNearestNodeModules(startDir) {
+  let dir = path.resolve(startDir);
+  for (;;) {
+    const candidate = path.join(dir, 'node_modules');
+    if (fs.existsSync(candidate)) return candidate;
+    const parent = path.dirname(dir);
+    if (parent === dir) return null;
+    dir = parent;
+  }
+}
+
 // `return`'s per-item gate — scoped to `cwd`'s OWN subtree, never the whole
 // real repo (`cwd` is the item's working directory, not necessarily the git
 // top-level: STR60 dogfood-fixture has `.fgos` under `repo/dogfood-fixture/`,
@@ -1767,6 +1790,28 @@ async function runVerb(verb, flags, positional, dir) {
         let check;
         try {
           gitAt(repoRoot, ['worktree', 'add', '--detach', tmpWorktree, branchHead]);
+          // tsk-5l2-1 bug find: tmpWorktree lives under os.tmpdir(), outside
+          // the repo tree — Node's ESM loader resolves a bare-specifier
+          // import (e.g. "yaml") by looking for a node_modules directory
+          // named exactly that, walking up from cwd; it never reaches
+          // repoRoot's real node_modules from a /tmp path, and (unlike
+          // CommonJS require) does NOT consult NODE_PATH at all (verified:
+          // an ESM import outside the repo tree fails identically whether
+          // NODE_PATH is set or not). Any verify command whose code imports
+          // a real npm dependency (not just repo-relative paths/builtins,
+          // e.g. scripts/project-agents.mjs's "yaml") fails here
+          // deterministically without this. A symlink named "node_modules"
+          // is what Node's resolution actually looks for, so it works where
+          // NODE_PATH cannot. `repoRoot` itself may have no LOCAL
+          // node_modules of its own (a nested worktree checkout relies on
+          // Node's own upward search reaching a real install further up) —
+          // findNearestNodeModules walks up the same way Node's resolver
+          // would, rather than checking exactly one directory.
+          const nodeModulesLink = path.join(tmpWorktree, 'node_modules');
+          const realNodeModules = findNearestNodeModules(repoRoot);
+          if (realNodeModules) {
+            fs.symlinkSync(realNodeModules, nodeModulesLink, 'dir');
+          }
           check = await runGoalCheck(item, tmpWorktree, timeoutMs);
         } finally {
           try {
