@@ -1,7 +1,18 @@
 # Plan: platform-agnostic canonical root for forgent's own agent definitions (tsk-slq)
 
-Status: shaped, awaiting approval (revised after `fgos-validating` reality-gate FAIL on the original YAML-parsing assumption; see Revision note below).
-Decisions: `docs/history/agent-executor-agent-definitions/CONTEXT.md` (D1, D2, D3, D4).
+Status: built (D5 relocated the canonical root mid-`executing`; see Revision note 2 below). Final paths: `agents/fgos-placeholder.yaml`, `scripts/project-agents.mjs` (not `project-agent-definitions.mjs` as first drafted — renamed to match the engine's own `judgeDiscovery`-generated `verify` command literally, per fgos-executing's "run the verify command exactly as recorded" rule).
+Decisions: `docs/history/agent-executor-agent-definitions/CONTEXT.md` (D1, D2, D3, D4, D5).
+
+## Revision note 2 (post-executing)
+
+D5 moved the canonical root from `.fgos/agents/<name>.yaml` to
+`agents/<name>.yaml` — discovered live during `fgos-executing`, not
+predicted here: `.fgos/` is structurally reserved for runner state
+(`src/runner/worktree.mjs` wipes it on every worktree checkout,
+`src/runner/merge.mjs` rejects any merge touching it). Every `.fgos/agents/`
+reference below is the plan as shaped before that discovery; the paths in
+the Status line above are what actually shipped. See `CONTEXT.md`'s
+"Location note (post-D5)" for the same caveat applied to that document.
 
 ## Revision note (post-validating)
 

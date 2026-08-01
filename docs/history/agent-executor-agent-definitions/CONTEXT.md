@@ -1,8 +1,19 @@
 # CONTEXT: platform-agnostic canonical root for forgent's own agent definitions (tsk-slq)
 
+## Location note (post-D5)
+
+Every reference to `.fgos/agents/<name>.yaml` below is the **historical
+record** of the original scope wording and its reasoning up to
+mid-`executing`. **D5 relocated the actual canonical root to
+`agents/<name>.yaml`** (plain top-level directory, sibling to
+`docs/`/`scripts/`/`src/`) — `.fgos/agents/` never actually works in this
+repo (see D5). Nothing else D1-D4 decided changed; only the path prefix
+did. Current code (`scripts/project-agents.mjs`) and the real files on
+disk use `agents/`, not `.fgos/agents/`.
+
 ## Feature boundary
 
-Establish `.fgos/agents/<name>.yaml` as the platform-agnostic, canonical
+Establish `agents/<name>.yaml` as the platform-agnostic, canonical
 source of forgent's own agent definitions (persona, decision-boundary,
 model-tier preference, tool-scope), plus a small projection script that
 generates `.claude/agents/<name>.md` from it with Claude-Code-specific
@@ -28,15 +39,18 @@ Out of scope (explicitly deferred, see design doc §4.3, §6, §7):
 | D2 | tsk-slq authors exactly **one minimal, honestly-labeled proof-of-mechanism placeholder agent** — not tied to any real current dispatch need. Its only job is proving the `.fgos/agents/` → `.claude/agents/` projection pipeline is real and idempotent (byte-identical on a re-run over an unchanged source, per acceptance). The exact name/persona content of this placeholder is an implementer detail, deferred to `fgos-planning`. |
 | D3 (pre-existing, ported from design doc "Đã chốt" #7) | The exact field set inside `.fgos/agents/<name>.yaml` is not a clarify-stage question — it was already settled at submit time: build follows marketing-cockpit's `agent.schema.yaml` shape (see Scout evidence below) as the reference pattern, adapted to drop anything Claude-Code-specific. `fgos-planning` picks the concrete field list from that pattern; this item does not re-litigate it. |
 | D4 (added mid-`decompose`, surfaced by `fgos-validating`'s reality gate) | `.fgos/agents/<name>.yaml` keeps the `.yaml` extension and format as originally named in scope. This requires a real YAML parsing library — the user explicitly chose to take this on as forgent's **first-ever npm dependency**, a deliberate break from the repo's zero-dependency convention (`package.json` has no `dependencies`/`devDependencies` field today, confirmed by reading it), rather than hand-rolling a scoped parser or switching the format to JSON. Rejected alternatives: (a) hand-rolled minimal YAML parser — real parsing code with real correctness risk for no clear benefit once a dependency is on the table; (b) switching to `.json` to match every other fgOS config file — would have silently overridden the extension named in the original submit text, which is exactly the kind of user-decision reversal that needs asking, not assuming. |
+| D5 (added mid-`executing`, discovered live) | The canonical root moves from `.fgos/agents/<name>.yaml` (original scope wording) to **`agents/<name>.yaml`**, a plain top-level directory. Reason: `.fgos/` is structurally reserved for runner state, enforced at two points — `src/runner/worktree.mjs`'s `createWorktree()` unconditionally `fs.rmSync`'s the entire `.fgos/` directory from every freshly-created worktree (ADR0020), confirmed live when the already-committed `.fgos/agents/fgos-placeholder.yaml` vanished from a freshly recreated worktree; and `src/runner/merge.mjs` (~line 735) outright rejects any merge that stages a change under `.fgos/` (`outcome: 'fgos-write-rejected'`, `git merge --abort`). A canonical root under `.fgos/` could never survive a worktree cycle or be merged back to main — this is not a style preference, it is a hard wall the item's original scope wording did not anticipate. User chose the plain top-level `agents/` over the alternative `.fgos-agents/` (sibling dotfile, matching `.fgos-runner.json`'s own precedent). |
 
 ## Pinned terms
 
-- **"Canonical root"** = `.fgos/agents/<name>.yaml`. Content must never name a
-  specific platform ("Claude", "Codex", etc.) anywhere in the file.
+- **"Canonical root"** = `agents/<name>.yaml` (D5 — was `.fgos/agents/<name>.yaml`
+  in the original scope wording, moved because `.fgos/` cannot hold it, see
+  D5). Content must never name a specific platform ("Claude", "Codex", etc.)
+  anywhere in the file.
 - **"Adapter"** = `.claude/agents/<name>.md`, generated output only, carries
   the Claude-Code-specific frontmatter (`name`, `description`, `model`,
   `tools`).
-- **"Projection"** = the one-directional generation step, `.fgos/agents/` →
+- **"Projection"** = the one-directional generation step, `agents/` →
   `.claude/agents/`. Never the reverse.
 - **domain 1 / domain 2** — per the agent-executor design doc §0: domain 1 is
   forgent's own headless process-spawn (`src/runner/dispatch.mjs`,
