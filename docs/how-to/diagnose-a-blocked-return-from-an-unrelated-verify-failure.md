@@ -106,6 +106,67 @@ load). Moving the item `blocked -> doing` and returning again produced a
 clean pass with no code change in between — confirming the first block
 was pre-existing load noise, not a regression from the rename work.
 
+## Real example: two genuine gaps in `return`'s own branch-source verify path, not stale tests
+
+Item `tsk-5l2-1` (a new `resolve <capacityId>` CLI subcommand on
+`src/runner/dispatch.mjs`, footprint `src/runner/dispatch.mjs`/`test/`)
+had its own change fully correct and green (`npm test` clean, 2038-2041
+passing across several full runs). `fgos return tsk-5l2-1` still came back
+`blocked`, three separate times, each for a genuine reason step 2 above
+would correctly flag as *not* your own diff — but where step 4's "check
+for an already-tracked flaky item" didn't apply either, because these were
+real gaps in the tooling, not flaky tests:
+
+1. **`return`'s disposable branch-source worktree had no `node_modules`.**
+   Unlike `approve`'s ephemeral merge worktree (`createWorktree`, fixed for
+   that path by `tsk-g18` — see the sibling how-to's "genuine gap in the
+   merge machinery" section), `return`'s branch-source path builds its own
+   throwaway checkout inline (`bin/fgos.mjs`, `fs.mkdtempSync(os.tmpdir())`
+   + `git worktree add --detach`), a *different* code path `tsk-g18`'s
+   `createWorktree` fix never touches. The failing file
+   (`test/scripts/project-agents.test.mjs`, importing the real npm
+   dependency `yaml`) was untouched by `tsk-5l2-1`'s own diff — the
+   textbook "unrelated failure" signal from step 2 — but re-running it
+   alone always passed, and it failed *every* `return` attempt, never
+   intermittently: a real, deterministic gap, not noise. Fixed as its own
+   commit on `fgw/tsk-5l2-1` (`9ae7760`): symlink the real `node_modules`
+   into the disposable worktree before running verify.
+2. **A naive fix wasn't enough — `repoRoot` itself can lack a local
+   `node_modules`.** The first fix checked exactly
+   `path.join(repoRoot, 'node_modules')`; that's wrong when the session
+   invoking `return` is itself standing in a nested linked worktree
+   several levels deep (this exact session's own shape at the time), which
+   has no local install of its own and relies on Node's own upward
+   resolver search reaching a real one further up — a single-directory
+   `existsSync` check misses that. Fixed in a follow-up commit
+   (`bd9a0d0`): a small `findNearestNodeModules` helper that walks up from
+   `repoRoot` the same way Node's ESM resolver actually does.
+3. **A third, unrelated cause: a bare `fgos <verb>` in an item's own
+   `verify` field resolves to a stale global binary under `return`'s
+   non-interactive goal-check spawn.** This surfaced on a *different*
+   sibling item, `tsk-5l2-2`, whose own recorded `verify` was literally
+   `fgos tool query --capability submit-assist-classify --status present`
+   — correct when typed by hand in an interactive shell (where `fgos` is a
+   zsh/bash function resolving to *this* repo's own `bin/fgos.mjs`), but
+   `runGoalCheck` spawns verify via `spawn(cmd, {shell: true})`, which
+   uses `/bin/sh` — a non-interactive shell that never sources
+   `.zshrc`/`.bashrc` and therefore never defines that function. `fgos` on
+   a bare `/bin/sh` PATH resolved instead to an old, globally
+   `pnpm`-installed copy (`schema_version 1.0`, no `tool` verb at all),
+   producing `fgos: unknown verb "tool"` — a failure with zero connection
+   to the item's own diff. Fixed by editing the item's own `verify` field
+   (`fgos edit <id> --verify "..."`) to a form that never depends on the
+   interactive-only shell function: resolve the repo root via
+   `git rev-parse --path-format=absolute --git-common-dir` and invoke
+   `node "<that>/bin/fgos.mjs" ... --dir "<that>"` explicitly — the same
+   git-common-dir trick every other `--dir`-passing call site in this repo
+   already relies on. **Any future item whose `verify` field shells out to
+   `fgos` directly should use this form, never a bare `fgos ...` call.**
+
+Each of the three required a genuine fix (two code commits, one item-data
+edit) before a retry could ever succeed — never a blind retry on the same
+red state.
+
 ## Related
 
 - `fgos check <id>` — full outcome/friction history for an item, including

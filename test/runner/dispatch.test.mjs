@@ -502,6 +502,19 @@ test('the committed .fgos-runner.json grants the worker exactly acceptEdits + gi
   assert.ok(!args.includes('--dangerously-skip-permissions'));
 });
 
+test('the committed .fgos-runner.json declares the submit-assist-classify capacity per CONTEXT.md D1/D7 (tsk-5l2-2): kind cli, adapter cli-spawn, tier light, sensitiveData false, and its args are a well-formed {prompt}/{model} template', () => {
+  const repoRoot = path.resolve(import.meta.dirname, '..', '..');
+  const cfg = loadRunnerConfig(path.join(repoRoot, '.fgos-runner.json'));
+  const capacity = cfg.capacities?.['submit-assist-classify'];
+  assert.ok(capacity, 'capacities.submit-assist-classify must exist');
+  assert.equal(capacity.kind, 'cli');
+  assert.equal(capacity.adapter, 'cli-spawn');
+  assert.equal(capacity.tier, 'light');
+  assert.equal(capacity.sensitiveData, false);
+  assert.ok(typeof capacity.command === 'string' && capacity.command.length > 0);
+  assert.ok(Array.isArray(capacity.args) && capacity.args.includes('{prompt}') && capacity.args.includes('{model}'));
+});
+
 // --- ensureRunnerConfig: D1/D3 default-write bootstrap wrapper ----------
 
 /** Capture what's written to process.stderr during `fn()`; restores the
