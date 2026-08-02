@@ -565,9 +565,23 @@ export function resolveDiscovery(dir, id, cfg, role) {
     return { outcome: 'clear', id, verdict };
   }
 
+  // tsk-wcl: `putInAwaiting` always attempts a real `awaiting-human` status
+  // transition (moveWork), and fsm.mjs has no self-transition edge for it —
+  // calling it on an item that is ALREADY `awaiting-human` (re-running
+  // `fgos discover <id>` directly on a still-parked item, bypassing the
+  // pool picker that normally never re-selects a parked item) throws
+  // StoreError and the whole call dies, losing this round's verdict
+  // entirely. `addDiscovery` above already recorded the fresh verdict
+  // unconditionally — only the redundant re-park is guarded here, so a
+  // second consecutive unclear call on an already-parked item still
+  // succeeds (with the item staying parked, its discovery history gaining
+  // the new entry) instead of throwing.
+  //
   // statusAtAsk (claim-lock §5.1): `work.status` read at function entry,
   // before this park — `doing` when a pick claim is held through clarify,
   // `todo` otherwise. answerAwaiting resumes to this same status later.
-  putInAwaiting(dir, { id, ask: verdict.question, statusAtAsk: work.status });
+  if (work.status !== 'awaiting-human') {
+    putInAwaiting(dir, { id, ask: verdict.question, statusAtAsk: work.status });
+  }
   return { outcome: 'unclear', id, verdict };
 }
