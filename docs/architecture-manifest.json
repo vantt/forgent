@@ -51,6 +51,7 @@
     "src/state/graph-metrics.mjs": "domain",
     "src/state/awaiting-context.mjs": "domain",
     "src/state/cleanup-harness.mjs": "domain",
+    "src/state/cleanup-pool.mjs": "domain",
     "src/state/discover-pool.mjs": "domain",
     "src/intake/discovery.mjs": "use-case",
     "src/intake/decompose.mjs": "use-case",
