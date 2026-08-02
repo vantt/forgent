@@ -156,7 +156,11 @@ Each carries `parent: tsk-3bn`.
    `deps: [<drift-detection child id>]`
    Footprint: `src/state/graph-harness.mjs`, `src/state/dep-graph.mjs`, `src/state/work.mjs`, `bin/fgos.mjs`
 
-(Exact ids assigned at `fgos add` time in execution, not fixed here.)
+Filed: `tsk-5m7` (drift-detection), `tsk-50i` (sync-root, deps: `tsk-5m7`),
+`tsk-62y` (close-out guard, deps: `tsk-5m7`), `tsk-2u0` (clustering +
+mergeTier + mergeAfter, deps: `tsk-5m7`). `tsk-2ie`/`tsk-3gx` (D6's
+dependents) retargeted from `tsk-3bn` to `tsk-2u0` specifically, now that
+the real child holding their needed capability exists.
 
 ## Assumptions
 
