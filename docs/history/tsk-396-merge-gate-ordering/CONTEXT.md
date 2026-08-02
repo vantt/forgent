@@ -2,18 +2,20 @@
 
 ## Feature boundary
 
-`fgos approve`'s local-merge paths (leaf→root and root→main, both in
-`bin/fgos.mjs`'s `approve` command) call `mergeRunnerItem()`
-(`src/runner/merge.mjs`) — a real `git merge`/`git commit` onto the
-target branch — and only *after* that succeeds call `moveWork(..., to:
-'delivered')` (`src/state/store.mjs`). If `moveWork` then refuses the
-transition, the merge commit has already landed on the target branch
-while the item's status stays `awaiting-approval` — a state/reality
-mismatch. In scope: confirming and fixing this ordering for the gate
-that can currently trigger it. Out of scope: redesigning
-`mergeRunnerItem`/`moveWork` beyond what closes this ordering gap;
-the broader merge-harness-v2 design (drift detection, sync-root,
-merge-set clustering) tracked separately in
+`fgos approve`'s merge paths — local (leaf→root and root→main, both in
+`bin/fgos.mjs`'s `approve` command, calling `mergeRunnerItem()` in
+`src/runner/merge.mjs`) and the `--github` transport (`mergeGitHubPR()`,
+same file, ~line 2113) — all perform the real merge (local git
+merge/commit, or a server-side GitHub merge) and only *after* that
+succeeds call `moveWork(..., to: 'delivered')` (`src/state/store.mjs`).
+If `moveWork` then refuses the transition, the merge has already landed
+(on the target branch, or on GitHub) while the item's status stays
+`awaiting-approval` — a state/reality mismatch. In scope: confirming and
+fixing this ordering across all three call sites for the gate that can
+currently trigger it. Out of scope: redesigning
+`mergeRunnerItem`/`moveWork`/`mergeGitHubPR` beyond what closes this
+ordering gap; the broader merge-harness-v2 design (drift detection,
+sync-root, merge-set clustering) tracked separately in
 `plans/reports/internal-design-260802-0907-merge-harness-v2-locked-decisions-report.md`.
 
 ## Locked decisions
@@ -21,6 +23,7 @@ merge-set clustering) tracked separately in
 | ID | Decision |
 |----|----------|
 | D1 | Retarget scope from the retired `compound-learn` stage-gate (the mechanism tsk-396 was originally filed against) to the current live analog: the RUL58 acceptance-evidence check inside `moveWork`'s `awaiting-approval -> delivered` door (`src/state/store.mjs:512-519`), which still runs after `mergeRunnerItem`'s real git merge commits. The original mechanism no longer exists in the code; this is the structurally identical gap that does. |
+| D2 | Include the `--github` transport (`mergeGitHubPR()` then `moveWork(..., 'delivered')`, `bin/fgos.mjs:2108-2137`) in scope alongside the two local-merge paths — same merge-before-gate shape, same root cause, no existing decision doc or follow-up item covers it. Notably higher stakes than the local paths: a GitHub-side merge cannot be `git merge --abort`ed the way a local one can, so the window between "merge landed" and "moveWork confirms delivered" carries irreversible-merge risk the local paths don't. |
 
 ## Pinned terms
 
@@ -42,9 +45,9 @@ merge-set clustering) tracked separately in
 - **Acceptance bar (carried over from the original filing, applied to
   the current target)** — the RUL58 check should either run before the
   real merge is committed, or the merge should stay reversible until
-  the check passes. Both `approve` merge paths (leaf→root, root→main)
-  share the same `mergeRunnerItem()` → `moveWork()` shape and are both
-  in scope — not just one of the two call sites.
+  the check passes. All three `approve` transports (leaf→root,
+  root→main, `--github`) share the same merge-then-`moveWork()` shape
+  and are all in scope.
 
 ## Scout evidence
 
@@ -77,6 +80,14 @@ merge-set clustering) tracked separately in
 - `impact-analysis: full` — GitNexus registered and present
   (`fgos tool query --capability impact-analysis --status present`,
   one provider, `gitnexus`, status `present`).
+- `bin/fgos.mjs:2108-2137` — `--github` transport: `mergeGitHubPR()`
+  performs the real merge server-side, then `moveWork(..., 'delivered')`
+  at line 2119 can throw on the same RUL58 check. No `docs/history/`
+  entry matching `*github-adapter*` exists covering this ordering (`find
+  docs/history -iname "*github-adapter*"` returned no matches) — the
+  github-adapter decisions referenced in the surrounding code comments
+  (D1/D3/D5) cover transport dispatch and the worktree-guard precedence,
+  not this ordering question.
 
 ## Canonical references
 
