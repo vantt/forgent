@@ -328,6 +328,28 @@ export const COMMAND_REGISTRY = [
     deprecated: null,
   },
   {
+    name: 'gate-approve',
+    invoke: 'fgos gate-approve',
+    description: 'Record a structured approve for one of the 3 skill-embedded Gates (contextApprove/planApprove/validateApprove, tsk-19j D1/D11) — separate from the awaiting-human ask/answer mechanism.',
+    parameters: {
+      type: 'object',
+      properties: {
+        id: { type: 'string', description: 'Work item id the Gate belongs to.' },
+        gate: { type: 'string', description: 'Which Gate was approved: "contextApprove" (fgos-exploring), "planApprove" (fgos-planning), or "validateApprove" (fgos-validating).' },
+        actor: { type: 'string', description: 'Who approved it: "human" (a person answered the Gate question) or "bypass" (gate-bypass level auto-approved it).' },
+        verify: { type: 'string', description: 'The real verify command this Gate\'s artifact carries (never a placeholder).' },
+      },
+      positional: ['id'],
+      required: ['id', 'gate', 'actor', 'verify'],
+    },
+    examples: ['fgos gate-approve tsk-19j --gate contextApprove --actor bypass --verify "node --test test/intake/discovery.test.mjs"'],
+    touchesState: true,
+    requiresExistingStore: true,
+    externalEffect: false,
+    paginated: false,
+    deprecated: null,
+  },
+  {
     name: 'list',
     invoke: 'fgos list',
     description: 'List the work/decisions view. Defaults to open-only (status not "done"/"wontfix"); pass --all to include resolved items too. --cursor/--limit paginate the "work" map (opaque cursor, per D5/D35): omit both to get the flat id->item map unchanged; pass either to get {items, nextCursor} instead.',

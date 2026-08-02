@@ -33,17 +33,20 @@ never re-implements a dev-skill's substance inline; it invokes them.
   id is `awaiting-approval`. That is the finish line for this skill — never call
   `fgos approve`/`fgos reject`/`fgos review` yourself; the internal PR
   review gate is a human decision, always.
-- **This skill still never claims before stage `executing`.** `take`/`pick`
-  now both accept an explicit `--id` claim on a `clarify`/`decompose` item
-  too (`choke-point-take-vs-pick-claim-eligibility` fixed the prior
-  disagreement between the two verbs — see "Known gap" below), but this
-  skill's own sequencing has no use for that: clarify/decompose work
-  happens on the item while it is still `todo`, through
-  `discover`/`ask`/`answer`/`decision`, never by claiming it first.
-- **Reuse, never duplicate.** `fgos-exploring`, `fgos-planning`, and
-  `fgos-validating` already define the Socratic/shaping/proving substance —
-  invoke them (Skill tool) for their real work; this skill only owns the
-  sequencing and the mechanical CLI calls between them.
+- **This skill still never claims before stage `executing`** — now enforced
+  by `fgos-coding-driving`'s own claim-timing hard rule (tsk-19j-4), not by
+  this skill's own manual step ordering. `take`/`pick` both accept an
+  explicit `--id` claim on a `clarify`/`decompose` item too
+  (`choke-point-take-vs-pick-claim-eligibility` fixed the prior
+  disagreement between the two verbs — see "Known gap" below), but nothing
+  in this skill's own queue-draining ever needs that: clarify/decompose
+  work happens on the item while it is still `todo`, exactly as the driver
+  already handles it.
+- **Reuse, never duplicate.** `fgos-exploring`, `fgos-planning`,
+  `fgos-validating`, and `fgos-coding-driving` (tsk-19j-4) already define
+  the Socratic/shaping/proving/driving substance — invoke them (Skill tool)
+  for their real work; this skill only owns the id QUEUE the driver has no
+  concept of.
 
 ## Steps
 
@@ -54,81 +57,55 @@ never re-implements a dev-skill's substance inline; it invokes them.
    anything, then call `fgos submit "<text>" [--deps <ids>]`. Capture the
    returned id as the root id and push it onto a work queue.
 
-2. **Drain the queue.** While the queue is non-empty, take the id at its
-   front and re-read its live `stage`/`status`/`deps` via
-   `node ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs list --json` — always fresh,
-   never assumed, since every branch below can change it:
+2. **Drain the queue, one id at a time, via `fgos-coding-driving`
+   (tsk-19j-4).** While the queue is non-empty, take the id at its front and
+   invoke the `fgos-coding-driving` skill for it, no `ceiling` (omit it —
+   the driver's own implicit stops already cover everything this step used
+   to hand-roll: `awaiting-approval`, an anchor by open children, a
+   person-shaped stop, or a no-progress read). This skill never re-derives
+   which skill a stage maps to, never applies a stage/status transition
+   itself, and never decides claim-timing on its own — the driver already
+   owns all three (its own hard rules: registry-only stage lookup, "engine's
+   verb always wins", "claim right before the first `executing`-stage
+   invocation, never earlier"). This step's whole job is the QUEUE the
+   driver itself has no concept of — one id at a time, front to back — and
+   relaying the driver's stop reason:
 
-   - **`status: awaiting-human`** — read the question (either
-     `data.work[id]`'s own gate, or `data.discovery["<id>"]`'s latest entry's
-     `question` if a `discover` call parked it). Ask the user that question
-     directly in this chat, get a real answer, then
-     `fgos answer <id> --text "<answer>"`. Re-read and continue.
+   - **`awaiting-approval` reached** — the id is done for this pass. Pop it
+     off the queue and continue draining.
+   - **anchored by open children** — the driver just reports which child
+     ids are open (it never resolves this itself, by design). Push every
+     one of those child ids onto the FRONT of the queue, ahead of the id
+     that just anchored (which stays on the queue, behind them, to
+     naturally clear once they're all done) — same "children before root"
+     order this step always kept, now driven by the driver's own anchor
+     report instead of `decompose`'s raw `childIds`. Continue draining.
+   - **a person-shaped stop (`status: awaiting-human`)** — read the parked
+     question (`data.work[id]`'s own gate, or `data.discovery["<id>"]`'s
+     latest entry) and ask the user directly in this chat. Get a real
+     answer, then `fgos answer <id> --text "<answer>"`, and invoke the
+     driver again for the SAME id (never skip it or move on) — this is
+     this skill's own approval-gate contract (see Hard rules): the driver
+     stops at every real question, it never answers on the user's behalf.
+   - **a real block (`status: blocked`)** — stop and report this to the
+     user rather than silently retrying; this mirrors the old `invalid`
+     outcome's own stop (a judgment or a verify that came back unusable is
+     never something to route around).
+   - **no-progress** — same treatment as a real block: stop, report, let a
+     person look at it.
 
-   - **`stage: clarify`** — invoke the `fgos-exploring` skill for this id.
-     It scouts, runs its own Socratic round(s) directly in this chat, writes
-     `docs/history/<feature>/CONTEXT.md`, and records each decision via
-     `fgos decision`. It ends on its own gate ("Approve CONTEXT.md before
-     planning?") — that pause IS this skill's approval point; do not answer
-     it yourself. Once the user approves, call the mechanical engine:
-
-     ```
-     node ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs discover <id> --json --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
-     ```
-
-     (Same call the `discover` skill wraps — see
-     `plugins/fgOS/skills/discover/SKILL.md` for its full outcome contract.)
-     `clear` moves the item to `decompose` — re-read and continue. `unclear`
-     parks it `awaiting-human` — handled by the branch above on the next
-     pass.
-
-   - **`stage: decompose`** — invoke `fgos-planning` (shaping: produces
-     `plan.md`/phase files, decides split vs. single-shot; ends on its own
-     approval gate) then `fgos-validating` (proving: validates the plan
-     against reality; ends on its own approval gate) — two separate real
-     pauses, never one collapsed into the other. Once both are approved,
-     call the sibling engine command (tsk-2b0 D1: `discover`/`decompose` are
-     now two separate verbs, hard split, no fallback):
-
-     ```
-     node ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs decompose <id> --json --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
-     ```
-
-     (Same call the `decompose` skill wraps — see
-     `plugins/fgOS/skills/decompose/SKILL.md` for its full outcome contract.)
-     Handle `data.outcome`:
-     - `pass-through` / `noop` — item is now `executing`; re-read and
-       continue.
-     - `decompose` — children were created (`data.childIds`). Push every
-       child id onto the FRONT of the queue, ahead of the root — the root
-       cannot clear decompose's "no unfinished descendants" gate until they
-       are all `awaiting-approval`. Continue the loop.
-     - `already-decomposed` — children already exist from an earlier
-       interrupted run; do not recreate them, just re-read and continue.
-     - `need-human` — treat exactly like the `awaiting-human` branch above,
-       using `data.verdict`'s proposal as the question.
-     - `invalid` — the judgment came back unusable and nothing changed on
-       the item. Stop and report this to the user rather than silently
-       retrying — this is `decompose`'s own fail-safe, not something to
-       route around.
-
-   - **`stage: executing`** — real implementation, not paperwork:
-     1. `fgos pick <id>` — claims it and stands up its isolated `fgw/<id>`
-        worktree in one call (the first point in this whole loop where a
-        claim is even valid, per the hard rule above).
-     2. Enter that worktree (`EnterWorktree`, falling back the same way
-        `/fgOS:pick`'s own skill does if it's unavailable). Read the item's
-        description / linked `CONTEXT.md` / `plan.md`, implement the real
-        change, and run its attached `verify` command until it actually
-        passes. Commit.
-     3. `fgos return <id>` (same call, same `--dir` treatment, as
-        `plugins/fgOS/skills/return/SKILL.md` — the session is now inside
-        the worktree entered in step 2, which never carries its own
-        `.fgos/` per ADR0020) — it measures real progress itself (clean
-        tree, advanced HEAD, verify actually green); it does not take your
-        word for it. If it rejects the return, fix the real gap and
-        retry — never argue with it or fabricate progress.
-     4. Once `return` succeeds the id is `awaiting-approval` — pop it off the queue.
+   Every real gate a stage-skill hits along the way (`fgos-exploring`'s
+   "Approve CONTEXT.md?", `fgos-planning`'s "Approve before execution?",
+   `fgos-validating`'s "Approve moving to executing?") still surfaces
+   exactly as before — the driver invokes those skills unchanged, it does
+   not swallow or pre-answer their own gates. Same for the real
+   implementation work at `stage: executing`: the driver's own claim-timing
+   rule claims the id and enters its worktree at exactly the point this
+   step used to do it by hand (`fgos pick <id>` then `EnterWorktree`), then
+   invokes `fgos-executing`, which implements, verifies, and calls
+   `fgos return <id>` itself — never taking anyone's word for real progress,
+   the same "measures real progress itself" contract this step always
+   relied on.
 
 3. **Report.** Once the queue is empty, summarize every id touched and its
    final status (`awaiting-approval`), list every `CONTEXT.md`/`plan.md` path written

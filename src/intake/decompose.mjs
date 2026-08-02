@@ -400,14 +400,55 @@ export function resolveDecompose(dir, id, cfg, role) {
   // Detect prior children via the view instead, and only finish the root's
   // own stage-move.
   const hasChildren = Object.values(view.work).some((item) => item.parent === id);
+  // Real verify (tsk-19j D1/D11, closes gap 2): `gates[id].planApprove.verify`
+  // is the real command fgos-planning/fgos-validating recorded for this item
+  // — read once, reused by every moveStage call below that advances this item
+  // to `executing`, so none of them silently carry FALLBACK_VERIFY or leave
+  // `verify` untouched (transitionStage only overwrites it when passed a
+  // value — stage.mjs:59-64). Falls back to the item's own current `verify`
+  // when no approve record exists yet (an item that never went through
+  // Track A's Gates, e.g. from before this item, is unaffected).
+  const planApproveVerify = view.gates?.[id]?.planApprove?.verify ?? work.verify;
   if (hasChildren) {
-    moveStage(dir, { id, to: 'executing', expectedStage: 'decompose', role });
+    moveStage(dir, { id, to: 'executing', expectedStage: 'decompose', verify: planApproveVerify, role });
     releaseClaimOnExecuting();
     return { outcome: 'already-decomposed', id };
   }
 
   const repoRoot = path.dirname(dir);
   const lockedContext = readLockedContext(repoRoot, work.docsRef);
+
+  // DECOMPOSE-SIDE SKIP-AND-ADVANCE (tsk-19j D1/D3/D7, closes gap 3) —
+  // deliberately narrower than a literal port of resolveDiscovery's own
+  // trust signal: unlike a clarify-pass, a decompose verdict can WRITE REAL
+  // CHILDREN (addWork below) — skipping judgeDecompose blind would also
+  // skip the one thing that turns plan.md's documented split into real work
+  // items, which is never safe to assume away (this root's own tsk-19j
+  // needed exactly that real LLM call to produce its 3 children). The only
+  // case where skipping is provably safe is when fgos-planning's own mode
+  // gate (SKILL.md step 2) already guarantees no split is possible: `tiny`/
+  // `small` mode is single-piece by definition (0-1 risk flags). Detected by
+  // reading plan.md's own recorded mode line (fgos-planning always writes
+  // one, per its own step 2 "Record the count, the flags, and the chosen
+  // mode in plan.md itself") — any other mode, or no match at all, falls
+  // through to the real judgeDecompose call below unchanged (fail-safe: an
+  // uncertain read must never skip a real judgment, same discipline
+  // discovery.mjs's own header states for judgeDiscovery).
+  const passThroughModeMatch = /\bmode\s*[:=]\s*\*{0,2}(tiny|small)\b/i.exec(lockedContext);
+  if (lockedContext && passThroughModeMatch) {
+    const mode = passThroughModeMatch[1].toLowerCase();
+    addDecision(dir, {
+      id,
+      text: `decompose skip: plan.md declares mode "${mode}" (tiny/small are single-piece by fgos-planning's own mode gate), no model call`,
+      source: 'resolveDecompose',
+      rationale:
+        'tsk-19j D7 trust signal: plan.md already committed to no split, so judgeDecompose has nothing to judge — skipping avoids a pointless model round-trip, never a real child-generation decision',
+    });
+    moveStage(dir, { id, to: 'executing', expectedStage: 'decompose', verify: planApproveVerify, role });
+    releaseClaimOnExecuting();
+    return { outcome: 'pass-through', id };
+  }
+
   const verdict = judgeDecompose(work, cfg, lockedContext, view, { repoRoot, docsRef: work.docsRef }, dir);
 
   if (verdict.kind === 'invalid') {
@@ -483,7 +524,7 @@ export function resolveDecompose(dir, id, cfg, role) {
 
   if (verdict.kind === 'pass-through') {
     logDecomposeVerdict(dir, id, 'pass-through', verdict.reason ?? DEFAULT_PASS_THROUGH_RATIONALE);
-    moveStage(dir, { id, to: 'executing', expectedStage: 'decompose', role });
+    moveStage(dir, { id, to: 'executing', expectedStage: 'decompose', verify: planApproveVerify, role });
     releaseClaimOnExecuting();
     return { outcome: 'pass-through', id };
   }
@@ -533,7 +574,7 @@ export function resolveDecompose(dir, id, cfg, role) {
   });
 
   logDecomposeVerdict(dir, id, 'decompose', verdict.reason, `${childIds.length} children`);
-  moveStage(dir, { id, to: 'executing', expectedStage: 'decompose', role });
+  moveStage(dir, { id, to: 'executing', expectedStage: 'decompose', verify: planApproveVerify, role });
   releaseClaimOnExecuting();
   return { outcome: 'decompose', id, childIds };
 }

@@ -398,3 +398,36 @@ test('v2 REPLAY-COMPATIBILITY: a view where no item has priority or intent produ
   assert.deepEqual(frontier(view).map((i) => i.id), ['zeta', 'alpha']);
 });
 
+// --- `step` param (tsk-19j D9, generalizes the Execute hardcode) ---------
+
+test('frontier(view, {step}) omitted defaults to "Execute", byte-identical to every pre-existing caller', () => {
+  const view = { work: { a: item('a', 'todo') } };
+  assert.deepEqual(frontier(view), frontier(view, { step: 'Execute' }));
+});
+
+test('frontier(view, {step: "Clarify"}) selects items at the clarify stage instead of executing', () => {
+  const view = {
+    work: {
+      atClarify: { ...item('atClarify', 'todo'), stage: 'clarify' },
+      atExecuting: { ...item('atExecuting', 'todo'), stage: 'executing' },
+    },
+  };
+  assert.deepEqual(frontier(view, { step: 'Clarify' }).map((i) => i.id), ['atClarify']);
+  assert.deepEqual(frontier(view, { step: 'Divide' }).map((i) => i.id), []);
+  assert.deepEqual(frontier(view).map((i) => i.id), ['atExecuting']);
+});
+
+test('frontier(view, {step}) for a step the item\'s domain never maps excludes every item, even one with no stage field at all (no false-tie admit)', () => {
+  const view = {
+    work: {
+      synthetic: { ...item('synthetic', 'todo'), domain: 'synthetic' },
+    },
+  };
+  // synthetic only maps 'assembling' to Execute -- it has no Clarify/Divide
+  // step at all (stageForStep returns undefined for both).
+  assert.deepEqual(frontier(view, { step: 'Clarify' }), []);
+  assert.deepEqual(frontier(view, { step: 'Divide' }), []);
+  // Execute (the mapped step) still works unchanged.
+  assert.deepEqual(frontier(view).map((i) => i.id), ['synthetic']);
+});
+

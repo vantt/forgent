@@ -6,7 +6,7 @@ import path from 'node:path';
 import { judgeDiscovery, resolveDiscovery } from '../../src/intake/discovery.mjs';
 import { readScoutNotes } from '../../src/intake/judge-executor.mjs';
 import { computeImpact, computePriority } from '../../src/state/priority-formula.mjs';
-import { addWork, listWork, StoreError, categoryOf, putInAwaiting, answerAwaiting, moveWork } from '../../src/state/store.mjs';
+import { addWork, listWork, StoreError, categoryOf, putInAwaiting, answerAwaiting, moveWork, recordGateApprove } from '../../src/state/store.mjs';
 import { appendEvent, readEvents } from '../../src/state/events.mjs';
 
 // Fake executors only — every "command" spawned here is a node script this
@@ -835,6 +835,41 @@ test('resolveDiscovery still calls judgeDiscovery when docsRef is set but CONTEX
   assert.equal(result.outcome, 'clear');
   assert.equal(result.verdict.skipped, undefined);
   assert.equal(readCount(counterPath), 1, 'no trust signal means judgeDiscovery must still run the model exactly once');
+});
+
+// --- real verify on the skip path (tsk-19j D1/D11, closes gap 2) ---------
+
+test('resolveDiscovery skip path uses gates[id].contextApprove.verify when a Track A approve record exists, instead of FALLBACK_VERIFY', () => {
+  const scriptDir = mkTempDir();
+  const { scriptPath, counterPath } = writeCountingRawStdoutExecutor(scriptDir, JSON.stringify({ clear: true, verify: 'should never run' }));
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  const docsRef = mkLockedContextFixture(storeDir);
+  addWork(storeDir, sampleWork({ docsRef }));
+  recordGateApprove(storeDir, { id: 'item-x', gate: 'contextApprove', actor: 'bypass', verify: 'node --test test/real-item-x.test.mjs' });
+
+  const result = resolveDiscovery(storeDir, 'item-x', cfg, 'session');
+  assert.equal(result.outcome, 'clear');
+  assert.equal(readCount(counterPath), 0);
+
+  const view = listWork(storeDir);
+  assert.equal(view.work['item-x'].verify, 'node --test test/real-item-x.test.mjs');
+});
+
+test('resolveDiscovery skip path falls back to FALLBACK_VERIFY when no contextApprove record exists (unchanged behavior)', () => {
+  const scriptDir = mkTempDir();
+  const { scriptPath } = writeCountingRawStdoutExecutor(scriptDir, JSON.stringify({ clear: true, verify: 'should never run' }));
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  const docsRef = mkLockedContextFixture(storeDir);
+  addWork(storeDir, sampleWork({ docsRef }));
+
+  resolveDiscovery(storeDir, 'item-x', cfg, 'session');
+
+  const view = listWork(storeDir);
+  assert.equal(view.work['item-x'].verify, 'chưa xác định — bổ sung thủ công');
 });
 
 test('resolveDiscovery still calls judgeDiscovery when docsRef points at an existing but empty CONTEXT.md (fail-open, unchanged behavior)', () => {

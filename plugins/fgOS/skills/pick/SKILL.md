@@ -108,24 +108,47 @@ state or touches git worktrees directly — every write goes through the
    (e.g. the root decomposing into children mid-session) — that specific
    case no longer needs this fallback at all.
 
-5. **Load `fgos-routing` — do not stop after the switch.** If step 4
-   actually switched the session into the worktree, immediately invoke the
-   `fgos-routing` skill before saying anything else to the user. That
-   skill reads the claimed item's `stage` and `domain` and hands off to
-   whichever skill actually does the work for this item today; follow
-   that hand-off through and let it decide when to stop. This is what
+5. **Drive the claimed item via `fgos-coding-driving` (tsk-19j-4) — do not
+   stop after the switch.** If step 4 actually switched the session into
+   the worktree, immediately invoke the `fgos-coding-driving` skill for
+   this id, no `ceiling` (omit it — the driver's own implicit stops
+   already cover this correctly: `awaiting-approval`, an anchor by open
+   children, a person-shaped stop, or a no-progress read). The driver
+   reads the claimed item's `stage`/`domain` fresh and resolves each
+   stage's skill through the exact same registry lookup `fgos-routing`
+   itself uses — this step never re-derives that mapping on its own,
+   it only supplies the id and lets the driver run. Follow the driver's
+   own stop through to whatever it reports (see step 6) — this is what
    makes claiming through `/fgOS:pick` behave the same as an internal
    fgOS dev session, instead of leaving the person staring at a claimed
-   item with no next step.
+   item with no next step. The item was ALREADY claimed in step 2, before
+   this point — the driver's own claim-timing rule sees `status: doing`
+   on its first read and correctly skips claiming again, proceeding
+   straight into whichever stage-skill the item's `stage` resolves to.
 
    If step 4 fell back (no switch happened), skip this step — the
    session the user opens at the printed worktree path loads
    `fgos-routing` itself first, per that skill's own "load it first when a
-   session opens in this repo" convention.
+   session opens in this repo" convention (which, for a coding-domain
+   item, routes into `fgos-coding-driving` the same way this step does).
 
 6. **Report and stop.** In the fallback case, report right after step 4:
    tell the user which item id was claimed and the worktree path they
-   need to open. In the switched case, this is naturally where step 5's
-   hand-off ends up stopping — do not add a separate report step of your
-   own on top of it. Do not reimplement or orchestrate the item's
+   need to open. In the switched case, report whatever `fgos-coding-
+   driving` itself reported (tsk-19j-4):
+   - **`awaiting-approval` reached** — the item is built, verified, and
+     returned; tell the user and mention the review gate
+     (`fgos review`/`fgos approve`/`fgos reject`) is theirs to run next,
+     this skill never calls it.
+   - **anchored by open children** — the driver's own decompose pass split
+     this item; tell the user which child ids are still open and that
+     `/fgOS:pick <child-id>` is the way to continue on any of them.
+   - **a person-shaped stop (`awaiting-human`) or a real block
+     (`blocked`)** — relay the question or the block exactly as the driver
+     reported it; never guess an answer or retry blind on this skill's own
+     authority.
+   - **no-progress** — relay it plainly; this is a real stop that needs a
+     person's look, not a silent retry.
+   Do not add a separate report step of your own beyond relaying the
+   driver's own stop reason. Do not reimplement or orchestrate the item's
    lifecycle beyond this.

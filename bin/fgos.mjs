@@ -16,7 +16,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { initStore, addWork, moveWork, editWork, addDecision, addOutcome, addFriction, listWork, readyWork, isDepsAndLineageReady, graphMetrics, graphWhatIf, staleDoingAdvisory, footprintConflicts, readRawEvents, rebuild, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, registerTool, removeTool, assertAcceptanceEvidence, StoreError, EXIT_CODES, categoryOf } from '../src/state/store.mjs';
+import { initStore, addWork, moveWork, editWork, addDecision, addOutcome, addFriction, listWork, readyWork, isDepsAndLineageReady, graphMetrics, graphWhatIf, staleDoingAdvisory, footprintConflicts, readRawEvents, rebuild, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, registerTool, removeTool, assertAcceptanceEvidence, recordGateApprove, StoreError, EXIT_CODES, categoryOf } from '../src/state/store.mjs';
 import { probeTool, readLocalStatus, writeLocalStatus, resolvedStatus, normalizeCapability } from '../src/state/tool-registry.mjs';
 import { repairTruncatedLastLine, EventLogError } from '../src/state/events.mjs';
 import { deriveTitle, classify, generateId } from '../src/intake/classify.mjs';
@@ -1214,6 +1214,15 @@ async function runVerb(verb, flags, positional, dir) {
       const id = optionalField(flags.id, 'decision --id requires a non-empty value (omit --id entirely to skip per-item scoping)');
       const { event } = addDecision(dir, { text, rationale, alternatives, source, id });
       return { seq: event.seq };
+    }
+
+    case 'gate-approve': {
+      const id = requireField(positional[0] ?? flags.id, 'gate-approve requires an id: fgos gate-approve <id> --gate <name> --actor <human|bypass> --verify "..."');
+      const gate = requireField(flags.gate, 'gate-approve requires --gate <contextApprove|planApprove|validateApprove>');
+      const actor = requireField(flags.actor, 'gate-approve requires --actor <human|bypass>');
+      const verify = requireField(flags.verify, 'gate-approve requires --verify "..."');
+      const { event } = recordGateApprove(dir, { id, gate, actor, verify });
+      return { id, gate, actor, seq: event.seq };
     }
 
     case 'list': {

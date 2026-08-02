@@ -128,6 +128,17 @@ would cost to be wrong — with `plan.md` linked, then ask exactly: "Feasibility
 validated. Approve moving to executing?" A `NOT READY` verdict skips this
 question entirely; it returns to `fgos-planning` instead of asking anything.
 
+Once the person approves (`READY` or `READY WITH CONSTRAINTS`), record a
+structured approve record (tsk-19j D1/D11) — separate from, and in addition
+to, any `fgos decision` line this session already logged: `fgos gate-approve
+<item-id> --gate validateApprove --actor human --verify "<verify>"`. No
+auto-approve path exists for this Gate today (unlike fgos-exploring/
+fgos-planning's gate-bypass check above) — `actor` is always `human` here.
+`verify` reuses `gates[id].planApprove.verify` (`fgos list --id <item-id>
+--json`'s `data.gates[id].planApprove.verify`, read fresh) — this skill
+proves the plan's existing verify still holds against reality, it does not
+design a new one (per this skill's own "leave execution alone" rule).
+
 The verdict reached here does not, by itself, move the item anywhere. It
 only informs which of the item's own already-registered edges the session
 picks next once work resumes — the engine is still the only thing that
