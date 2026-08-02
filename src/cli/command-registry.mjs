@@ -226,6 +226,27 @@ export const COMMAND_REGISTRY = [
     deprecated: null,
   },
   {
+    name: 'compound',
+    invoke: 'fgos compound',
+    description: 'Tag a retrospective-status work item\'s outcome with a Diataxis doc-type/doc-path linkage (tutorial | how-to | reference | explanation) -- the producer surface fgos-compounding uses to record its synthesis classification. Requires the item to be at status "retrospective"; omitted --doc-type is a no-op.',
+    parameters: {
+      type: 'object',
+      properties: {
+        id: { type: 'string', description: 'Work item id (positional or --id).' },
+        'doc-type': { type: 'string', description: 'Optional Diataxis quadrant to tag the capture with: tutorial | how-to | reference | explanation. Omit to leave the item untagged (no-op).' },
+        'doc-path': { type: 'string', description: 'Optional end-user doc path this capture links to, alongside --doc-type.' },
+      },
+      positional: ['id'],
+      required: ['id'],
+    },
+    examples: ['fgos compound tsk-3o3 --doc-type how-to --doc-path docs/how-to/example.md'],
+    touchesState: true,
+    requiresExistingStore: true,
+    externalEffect: false,
+    paginated: false,
+    deprecated: null,
+  },
+  {
     name: 'edit',
     invoke: 'fgos edit',
     description: 'Patch fields on an existing item (title/description/kind/risk/verify/tier/refs/deps/footprint/acceptance/priority/intent/docs-ref/parent/urgent/impact/effort/merge-after). At least one field must be given.',

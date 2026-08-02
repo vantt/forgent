@@ -53,6 +53,7 @@
     "src/state/cleanup-harness.mjs": "domain",
     "src/state/cleanup-pool.mjs": "domain",
     "src/state/discover-pool.mjs": "domain",
+    "src/state/retro-pool.mjs": "domain",
     "src/intake/discovery.mjs": "use-case",
     "src/intake/decompose.mjs": "use-case",
     "src/intake/judge-executor.mjs": "infra",

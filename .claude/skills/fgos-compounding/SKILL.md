@@ -1,20 +1,27 @@
 ---
 name: fgos-compounding
 description: >-
-  Turn an awaiting-approval item's real captured signal into a Diataxis-classified,
+  Turn a retrospective-status item's real captured signal into a Diataxis-classified,
   evidence-quoted end-user document before the item is allowed toward `done`.
-  Use once a claimed item's stage reads `compound-learn` — the synthesis step
-  between `executing` and `done`. Examples: "synthesize what this item
+  Use once a claimed item's status reads `retrospective` — the synthesis step
+  between `delivered` and `cleanup`, driven by the retrospective loop
+  (/fgOS:retro-next). Examples: "synthesize what this item
   captured", "classify this capture and write the end-user doc", "the item
-  just reached compound-learn, what happens now".
+  just reached retrospective, what happens now".
 ---
 
 # fgos-compounding
 
-Runs while an awaiting-approval work item sits at stage `compound-learn` — the
-deliberate synthesis step that gates the item's path onward: no item takes
-the edge toward `done` without first passing through this step's synthesis
-of its real captured signal into an audience-facing document. This skill
+Runs while a work item sits at status `retrospective` (D11,
+work-item-status-delivered-retrospective-cleanup; superseded the retired
+stage `compound-learn`, tsk-1zi) — the deliberate synthesis step that
+gates the item's path onward: no item takes the edge toward `done`
+without first passing through this step's synthesis of its real captured
+signal into an audience-facing document. Driven by `/fgOS:retro-next`
+(tsk-3o3), never a stage-transition auto-trigger — the same D3
+"auto-advance would make synthesis vacuous" stance that governed the
+retired stage still applies, just enforced by the retro-loop's own
+explicit call instead of a stage edge. This skill
 turns the item's genuine outcome/friction capture into (a) a Diataxis
 quadrant classification, tagged onto the capture, and (b) at least one real,
 evidence-quoted end-user document.
@@ -66,11 +73,11 @@ evidence-quoted end-user document.
    --doc-path docs/<quadrant>/<file>.md` with the quadrant chosen above and
    the same path the document lands at in step 4. This is the one producer
    surface this step is allowed to use — it stores the Diataxis tag and the
-   doc-path linkage on the item's capture in one call. Since this step only
-   runs once the item is already at stage `compound-learn`, the call tags
-   the capture without moving stage again (there is no compound-learn ->
-   compound-learn move to make). Absent this call, the item's capture stays
-   untagged and unlinked, and synthesis is unfinished.
+   doc-path linkage on the item's capture in one call. `compound` requires
+   the item to be at status `retrospective` (it never moves status or
+   stage itself — that stays `/fgOS:retro-next`'s own job, once this
+   skill's steps confirm complete). Absent this call, the item's capture
+   stays untagged and unlinked, and synthesis is unfinished.
 
    `compound` is `requiresExistingStore: true` — this session is often
    still inside the item's worktree right after its own `return`, which
@@ -114,10 +121,14 @@ evidence-quoted end-user document.
 
 ## Next
 
-Once the tag is stored and the document is written and confirmed, load
-`fgos-routing` to re-read the item's stage and continue — routing decides
-whether the item's own already-registered move onward gets picked next;
-this skill's own job ends at a tagged capture and a written document.
+Once the tag is stored and the document is written and confirmed, this
+skill's own job ends — a tagged capture and a written document, nothing
+more. The `retrospective -> cleanup` move onward is `/fgOS:retro-next`'s
+own job (its step 5), never this skill's: when invoked from within
+`retro-next`, control returns there to run `fgos move <id> --to cleanup`.
+When invoked standalone (a person running this skill directly, outside
+the retro-loop), report the tag/document as done and stop — applying the
+status move is still not this skill's place.
 
 ## Red flags
 
@@ -140,4 +151,4 @@ this skill's own job ends at a tagged capture and a written document.
 Violating the letter of the rules is violating the spirit of the rules.
 
 Tag stored, document written, both confirmed against the real capture.
-Invoke `fgos-routing` to continue.
+Return to `/fgOS:retro-next` (or stop, if run standalone).

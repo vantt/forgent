@@ -16,7 +16,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { initStore, addWork, moveWork, editWork, addDecision, addOutcome, addFriction, listWork, readyWork, isDepsAndLineageReady, graphMetrics, graphWhatIf, staleDoingAdvisory, footprintConflicts, readRawEvents, rebuild, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, registerTool, removeTool, assertAcceptanceEvidence, recordGateApprove, StoreError, EXIT_CODES, categoryOf } from '../src/state/store.mjs';
+import { initStore, addWork, moveWork, editWork, addDecision, addOutcome, addFriction, listWork, readyWork, isDepsAndLineageReady, graphMetrics, graphWhatIf, staleDoingAdvisory, footprintConflicts, readRawEvents, rebuild, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, registerTool, removeTool, assertAcceptanceEvidence, assertValidDocType, recordGateApprove, StoreError, EXIT_CODES, categoryOf } from '../src/state/store.mjs';
 import { probeTool, readLocalStatus, writeLocalStatus, resolvedStatus, normalizeCapability } from '../src/state/tool-registry.mjs';
 import { repairTruncatedLastLine, EventLogError } from '../src/state/events.mjs';
 import { deriveTitle, classify, generateId } from '../src/intake/classify.mjs';
@@ -1009,6 +1009,49 @@ async function runVerb(verb, flags, positional, dir) {
       }
       const { event } = moveWork(dir, { id, to: 'done', expectedStatus: 'cleanup', role: 'human' });
       return { id, to: 'done', seq: event.seq, cleanupWarnings };
+    }
+
+    // Restored (tsk-3o3, git-recovered from fcfbae5/tsk-1zi which removed
+    // it along with the retired `compound-learn` stage): the producer
+    // surface `fgos-compounding` uses to store its Diataxis classification
+    // on a `retrospective`-status item's outcome. Unlike the removed
+    // version, this never moves stage — there is no `compound-learn` stage
+    // left to move into (D11); the only precondition is the item actually
+    // sitting at status `retrospective`, the status-based trigger that
+    // superseded the retired stage move (tsk-1zi).
+    //
+    // `--doc-type <quadrant>` is pre-validated via store.mjs's exported
+    // `assertValidDocType` (the single `DIATAXIS_DOC_TYPES` set, not
+    // re-implemented here) BEFORE any write — a non-quadrant value is
+    // rejected with zero events. Omitted entirely, `compound` writes
+    // nothing and returns a `docType: null` no-op (there is no stage move
+    // left for a bare call to perform).
+    //
+    // `--doc-path <path>` is an additive linkage field alongside
+    // `--doc-type`: it records which real end-user doc the tagged capture
+    // belongs to, so a later read-side index can back-link a doc to its
+    // source capture with no loss of detail. Only meaningful alongside
+    // `--doc-type` — same optional-shape idiom, only a bare/empty value is
+    // refused.
+    case 'compound': {
+      const id = requireField(positional[0] ?? flags.id, 'compound requires an id: fgos compound <id>');
+      const item = listWork(dir).work[id];
+      if (!item) {
+        throw new StoreError('validation', `compound: work "${id}" not found.`);
+      }
+      if (item.status !== 'retrospective') {
+        throw new StoreError('validation', `compound: work "${id}" is "${item.status}", not "retrospective" — nothing to tag.`);
+      }
+      const docType = optionalField(flags['doc-type'], 'compound --doc-type requires a non-empty value: tutorial | how-to | reference | explanation.');
+      if (docType !== undefined) {
+        assertValidDocType({ docType });
+      }
+      const docPath = optionalField(flags['doc-path'], 'compound --doc-path requires a non-empty value.');
+      if (docType === undefined) {
+        return { id, docType: null, docPath: null, status: item.status };
+      }
+      const { event } = addOutcome(dir, { id, docType, ...(docPath !== undefined ? { docPath } : {}) });
+      return { id, docType, docPath: docPath ?? null, status: item.status, seq: event.seq };
     }
 
     // Patches fields on an existing item (P23, D2-D5) — the "always
@@ -3395,7 +3438,7 @@ async function runVerb(verb, flags, positional, dir) {
     }
 
     default:
-      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <init|add|submit|discover|decompose|move|retrospective|cleanup|edit|ask|answer|decision|list|ready|rebuild|repair|check|rollup|take|return|review|approve|sync-root|reject|catchup|evolve|triage|session|goal|tool|setup|doctor|unlock|lock-status> ...`);
+      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <init|add|submit|discover|decompose|move|retrospective|cleanup|compound|edit|ask|answer|decision|list|ready|rebuild|repair|check|rollup|take|return|review|approve|sync-root|reject|catchup|evolve|triage|session|goal|tool|setup|doctor|unlock|lock-status> ...`);
   }
 }
 
