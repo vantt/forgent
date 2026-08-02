@@ -5,6 +5,8 @@ import {
   validateWorkShape,
   validateDeps,
   validateMergeAfter,
+  validateSupersededBy,
+  validateDuplicates,
   WorkValidationError,
   STATUSES,
   TIERS,
@@ -266,6 +268,110 @@ test('validateWork runs full mergeAfter-existence check when existingIds is pass
 test('validateWork does not add mergeAfter to SCHEMA_VERSION or DEFAULTS (optional additive field, no schema bump)', () => {
   assert.equal(SCHEMA_VERSION, 3);
   assert.equal(Object.hasOwn(DEFAULTS, 'mergeAfter'), false);
+});
+
+// --- supersededBy / duplicates (tsk-2ie D1-D3, docs/history/
+// tsk-2ie-duplicate-superseded-guard/) --------------------------------------
+
+test('validateWork accepts a work item missing supersededBy/duplicates (optional, no default, stays absent)', () => {
+  assert.doesNotThrow(() => validateWork(baseWork({})));
+});
+
+test('validateWork treats supersededBy: null and duplicates: null the same as absent', () => {
+  assert.doesNotThrow(() => validateWork(baseWork({ supersededBy: null, duplicates: null })));
+});
+
+test('validateWork rejects a supersededBy that is not a non-empty string', () => {
+  assert.throws(() => validateWork(baseWork({ supersededBy: 42 })), WorkValidationError);
+  assert.throws(() => validateWork(baseWork({ supersededBy: '' })), WorkValidationError);
+});
+
+test('validateWork rejects a work item that lists itself as its own supersededBy', () => {
+  assert.throws(
+    () => validateWork(baseWork({ id: 'a', supersededBy: 'a' })),
+    (err) => err instanceof WorkValidationError && /own supersededBy/.test(err.message),
+  );
+});
+
+test('validateWork rejects a duplicates that is not an array', () => {
+  assert.throws(() => validateWork(baseWork({ duplicates: 'a,b' })), WorkValidationError);
+});
+
+test('validateWork rejects a duplicates entry that is a non-string or empty string', () => {
+  assert.throws(
+    () => validateWork(baseWork({ duplicates: ['a', 42] })),
+    (err) => err instanceof WorkValidationError && /non-empty strings/.test(err.message),
+  );
+  assert.throws(
+    () => validateWork(baseWork({ duplicates: ['a', ''] })),
+    (err) => err instanceof WorkValidationError && /non-empty strings/.test(err.message),
+  );
+});
+
+test('validateWork rejects a work item that lists itself in its own duplicates', () => {
+  assert.throws(
+    () => validateWork(baseWork({ id: 'a', duplicates: ['a'] })),
+    (err) => err instanceof WorkValidationError && /own duplicates/.test(err.message),
+  );
+});
+
+test('validateWorkShape passes without checking supersededBy/duplicates existence', () => {
+  const work = baseWork({ id: 'b', supersededBy: 'ghost', duplicates: ['ghost2'] });
+  assert.doesNotThrow(() => validateWorkShape(work));
+});
+
+test('validateSupersededBy rejects a target pointing at a non-existent id', () => {
+  const work = baseWork({ id: 'b', supersededBy: 'ghost' });
+  assert.throws(
+    () => validateSupersededBy(work, new Set(['a'])),
+    (err) => err instanceof WorkValidationError && /not a known id/.test(err.message),
+  );
+});
+
+test('validateSupersededBy accepts a target that exists in existingIds (Set or array)', () => {
+  const work = baseWork({ id: 'b', supersededBy: 'a' });
+  assert.doesNotThrow(() => validateSupersededBy(work, new Set(['a', 'b'])));
+  assert.doesNotThrow(() => validateSupersededBy(work, ['a', 'b']));
+});
+
+test('validateSupersededBy is a no-op when supersededBy is absent', () => {
+  assert.doesNotThrow(() => validateSupersededBy(baseWork({}), new Set()));
+});
+
+test('validateDuplicates rejects a target pointing at a non-existent id', () => {
+  const work = baseWork({ id: 'b', duplicates: ['ghost'] });
+  assert.throws(
+    () => validateDuplicates(work, new Set(['a'])),
+    (err) => err instanceof WorkValidationError && /not a known id/.test(err.message),
+  );
+});
+
+test('validateDuplicates accepts targets that exist in existingIds (Set or array)', () => {
+  const work = baseWork({ id: 'b', duplicates: ['a'] });
+  assert.doesNotThrow(() => validateDuplicates(work, new Set(['a', 'b'])));
+  assert.doesNotThrow(() => validateDuplicates(work, ['a', 'b']));
+});
+
+test('validateDuplicates is a no-op when duplicates is absent', () => {
+  assert.doesNotThrow(() => validateDuplicates(baseWork({}), new Set()));
+});
+
+test('validateWork runs full supersededBy/duplicates-existence check when existingIds is passed', () => {
+  assert.doesNotThrow(() => validateWork(baseWork({ id: 'b', supersededBy: 'a', duplicates: ['a'] }), new Set(['a', 'b'])));
+  assert.throws(
+    () => validateWork(baseWork({ id: 'b', supersededBy: 'ghost' }), new Set(['a', 'b'])),
+    WorkValidationError,
+  );
+  assert.throws(
+    () => validateWork(baseWork({ id: 'b', duplicates: ['ghost'] }), new Set(['a', 'b'])),
+    WorkValidationError,
+  );
+});
+
+test('validateWork does not add supersededBy/duplicates to SCHEMA_VERSION or DEFAULTS (optional additive fields, no schema bump)', () => {
+  assert.equal(SCHEMA_VERSION, 3);
+  assert.equal(Object.hasOwn(DEFAULTS, 'supersededBy'), false);
+  assert.equal(Object.hasOwn(DEFAULTS, 'duplicates'), false);
 });
 
 test('validateWork accepts a work item missing tier (optional, defaulted by the caller per D7b)', () => {

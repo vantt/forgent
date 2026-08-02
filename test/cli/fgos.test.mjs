@@ -1466,6 +1466,89 @@ test('edit --merge-after does not require the deps field to have been touched (b
   assert.deepEqual(stateView(cwd).work['merge-after-independent-item'].deps, []);
 });
 
+// --- edit --superseded-by / --duplicates (tsk-2ie, docs/history/
+//     tsk-2ie-duplicate-superseded-guard/ D1-D3) ---------------------------
+
+test('edit --superseded-by sets supersededBy on an item that had none, exit 0', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'superseded-by-target');
+  addOk(cwd, 'superseded-by-item');
+  const result = run(cwd, ['edit', 'superseded-by-item', '--superseded-by', 'superseded-by-target']);
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(stateView(cwd).work['superseded-by-item'].supersededBy, 'superseded-by-target');
+});
+
+test('edit --superseded-by "" clears an existing supersededBy, exit 0', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'superseded-by-clear-target');
+  addOk(cwd, 'superseded-by-clear-item');
+  run(cwd, ['edit', 'superseded-by-clear-item', '--superseded-by', 'superseded-by-clear-target']);
+  const result = run(cwd, ['edit', 'superseded-by-clear-item', '--superseded-by', '']);
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(stateView(cwd).work['superseded-by-clear-item'].supersededBy, null);
+});
+
+test('edit --superseded-by rejects a target id that does not exist, exit 4, item unchanged', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'superseded-by-ghost-item');
+  const result = run(cwd, ['edit', 'superseded-by-ghost-item', '--superseded-by', 'no-such-item']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /not a known id/);
+  assert.equal(stateView(cwd).work['superseded-by-ghost-item'].supersededBy, undefined);
+});
+
+test('edit --superseded-by rejects an item listing itself, exit 4', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'superseded-by-self-item');
+  const result = run(cwd, ['edit', 'superseded-by-self-item', '--superseded-by', 'superseded-by-self-item']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /own supersededBy/);
+});
+
+test('edit --superseded-by with no value is a validation error, exit 4', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'superseded-by-noval-item');
+  const result = run(cwd, ['edit', 'superseded-by-noval-item', '--superseded-by']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /--superseded-by requires a value/);
+});
+
+test('edit --duplicates sets duplicates on an item that had none, exit 0', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'duplicates-target');
+  addOk(cwd, 'duplicates-item');
+  const result = run(cwd, ['edit', 'duplicates-item', '--duplicates', 'duplicates-target']);
+  assert.equal(result.status, 0, result.stderr);
+  assert.deepEqual(stateView(cwd).work['duplicates-item'].duplicates, ['duplicates-target']);
+});
+
+test('edit --duplicates "" clears an existing duplicates, exit 0', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'duplicates-clear-target');
+  addOk(cwd, 'duplicates-clear-item');
+  run(cwd, ['edit', 'duplicates-clear-item', '--duplicates', 'duplicates-clear-target']);
+  const result = run(cwd, ['edit', 'duplicates-clear-item', '--duplicates', '']);
+  assert.equal(result.status, 0, result.stderr);
+  assert.deepEqual(stateView(cwd).work['duplicates-clear-item'].duplicates, []);
+});
+
+test('edit --duplicates rejects a target id that does not exist, exit 4, item unchanged', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'duplicates-ghost-item');
+  const result = run(cwd, ['edit', 'duplicates-ghost-item', '--duplicates', 'no-such-item']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /not a known id/);
+  assert.equal(stateView(cwd).work['duplicates-ghost-item'].duplicates, undefined);
+});
+
+test('edit --duplicates rejects an item listing itself, exit 4', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'duplicates-self-item');
+  const result = run(cwd, ['edit', 'duplicates-self-item', '--duplicates', 'duplicates-self-item']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /own duplicates/);
+});
+
 // --- edit --description/--footprint: `add` already accepted both fields,
 // but EDITABLE_FIELDS never listed them, so a description/footprint typo'd
 // or left blank at add time -- or an item added before either field
@@ -6941,7 +7024,7 @@ test('merge list on an empty store: empty ready/waiting/conflicts, exit 0, no ev
   const before = eventLines(cwd).length;
   const result = run(cwd, ['merge', 'list']);
   assert.equal(result.status, 0);
-  assert.deepEqual(envelopeData(result.stdout), { ready: [], waiting: [], conflicts: [], mergeSets: [], blockedOnSync: [], mergeTier: {} });
+  assert.deepEqual(envelopeData(result.stdout), { ready: [], waiting: [], conflicts: [], mergeSets: [], blockedOnSync: [], mergeTier: {}, supersededOut: [] });
   assert.equal(eventLines(cwd).length, before, 'merge list must not append any event');
 });
 
@@ -6966,7 +7049,7 @@ test('merge list: a proposed item whose dep is already done is ready', () => {
   assert.equal(run(cwd, ['add', 'leaf', '--title', 'Leaf', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--deps', 'dep']).status, 0);
   toProposed(cwd, 'leaf');
   const data = envelopeData(run(cwd, ['merge', 'list']).stdout);
-  assert.deepEqual(data, { ready: ['leaf'], waiting: [], conflicts: [], mergeSets: [], blockedOnSync: [], mergeTier: { leaf: 'root-to-main' } });
+  assert.deepEqual(data, { ready: ['leaf'], waiting: [], conflicts: [], mergeSets: [], blockedOnSync: [], mergeTier: { leaf: 'root-to-main' }, supersededOut: [] });
 });
 
 test('merge list: a proposed item whose dep is NOT done waits, never ready', () => {
@@ -6976,7 +7059,7 @@ test('merge list: a proposed item whose dep is NOT done waits, never ready', () 
   assert.equal(run(cwd, ['add', 'leaf', '--title', 'Leaf', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--deps', 'dep']).status, 0);
   toProposed(cwd, 'leaf');
   const data = envelopeData(run(cwd, ['merge', 'list']).stdout);
-  assert.deepEqual(data, { ready: [], waiting: ['leaf'], conflicts: [], mergeSets: [], blockedOnSync: [], mergeTier: { leaf: 'root-to-main' } });
+  assert.deepEqual(data, { ready: [], waiting: ['leaf'], conflicts: [], mergeSets: [], blockedOnSync: [], mergeTier: { leaf: 'root-to-main' }, supersededOut: [] });
 });
 
 test('merge list: two dep-clear proposed items sharing a footprint are excluded from ready and listed as conflicts', () => {

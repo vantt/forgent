@@ -9,13 +9,13 @@ function item(id, status, deps = [], extra = {}) {
   return { id, title: `title-${id}`, status, deps, ...extra };
 }
 
-test('mergeReadiness on an empty view returns empty ready/waiting/conflicts/mergeSets/blockedOnSync/mergeTier', () => {
-  assert.deepEqual(mergeReadiness({ work: {} }), { ready: [], waiting: [], conflicts: [], mergeSets: [], blockedOnSync: [], mergeTier: {} });
+test('mergeReadiness on an empty view returns empty ready/waiting/conflicts/mergeSets/blockedOnSync/mergeTier/supersededOut', () => {
+  assert.deepEqual(mergeReadiness({ work: {} }), { ready: [], waiting: [], conflicts: [], mergeSets: [], blockedOnSync: [], mergeTier: {}, supersededOut: [] });
 });
 
 test('mergeReadiness: a proposed item with no deps is ready', () => {
   const view = { work: { a: item('a', 'awaiting-approval') } };
-  assert.deepEqual(mergeReadiness(view), { ready: ['a'], waiting: [], conflicts: [], mergeSets: [], blockedOnSync: [], mergeTier: { a: 'root-to-main' } });
+  assert.deepEqual(mergeReadiness(view), { ready: ['a'], waiting: [], conflicts: [], mergeSets: [], blockedOnSync: [], mergeTier: { a: 'root-to-main' }, supersededOut: [] });
 });
 
 test('mergeReadiness: a proposed item whose dep is NOT done waits, never ready', () => {
@@ -37,7 +37,7 @@ test('mergeReadiness: a proposed item whose dep IS done is ready, not waiting', 
       leaf: item('leaf', 'awaiting-approval', ['dep']),
     },
   };
-  assert.deepEqual(mergeReadiness(view), { ready: ['leaf'], waiting: [], conflicts: [], mergeSets: [], blockedOnSync: [], mergeTier: { leaf: 'root-to-main' } });
+  assert.deepEqual(mergeReadiness(view), { ready: ['leaf'], waiting: [], conflicts: [], mergeSets: [], blockedOnSync: [], mergeTier: { leaf: 'root-to-main' }, supersededOut: [] });
 });
 
 test('mergeReadiness: only proposed items are considered — todo/doing/done/blocked never appear in ready or waiting', () => {
@@ -50,7 +50,7 @@ test('mergeReadiness: only proposed items are considered — todo/doing/done/blo
       e: item('e', 'awaiting-approval'),
     },
   };
-  assert.deepEqual(mergeReadiness(view), { ready: ['e'], waiting: [], conflicts: [], mergeSets: [], blockedOnSync: [], mergeTier: { e: 'root-to-main' } });
+  assert.deepEqual(mergeReadiness(view), { ready: ['e'], waiting: [], conflicts: [], mergeSets: [], blockedOnSync: [], mergeTier: { e: 'root-to-main' }, supersededOut: [] });
 });
 
 test('mergeReadiness: two dep-clear proposed items sharing a footprint conflict are excluded from ready, not counted as waiting', () => {
@@ -316,4 +316,80 @@ test('mergeReadiness: mergeTier is leaf-to-root for any proposed item with a par
   };
   const result = mergeReadiness(view);
   assert.deepEqual(result.mergeTier, { leaf: 'leaf-to-root', standaloneRoot: 'root-to-main' });
+});
+
+// --- supersededOut / duplicates (tsk-2ie D1-D4) -----------------------------
+
+test('mergeReadiness: an item supersededBy a RESOLVED target is excluded from ready, lands in supersededOut', () => {
+  const view = {
+    work: {
+      winner: item('winner', 'done'),
+      loser: item('loser', 'awaiting-approval', [], { supersededBy: 'winner' }),
+    },
+  };
+  const result = mergeReadiness(view);
+  assert.deepEqual(result.ready, []);
+  assert.deepEqual(result.waiting, []);
+  assert.deepEqual(result.supersededOut, ['loser']);
+});
+
+test('mergeReadiness: an item supersededBy a target that is itself in THIS SAME call\'s ready-set is excluded too (the concurrent-race case)', () => {
+  const view = {
+    work: {
+      winner: item('winner', 'awaiting-approval'),
+      loser: item('loser', 'awaiting-approval', [], { supersededBy: 'winner' }),
+    },
+  };
+  const result = mergeReadiness(view);
+  assert.deepEqual(result.ready, ['winner']);
+  assert.deepEqual(result.supersededOut, ['loser']);
+});
+
+test('mergeReadiness: an item supersededBy a target that is neither resolved nor in this round\'s ready-set is NOT excluded, stays ready', () => {
+  const view = {
+    work: {
+      winner: item('winner', 'todo'),
+      candidate: item('candidate', 'awaiting-approval', [], { supersededBy: 'winner' }),
+    },
+  };
+  const result = mergeReadiness(view);
+  assert.deepEqual(result.ready, ['candidate']);
+  assert.deepEqual(result.supersededOut, []);
+});
+
+test('mergeReadiness: a MUTUAL supersededBy pair (A->B, B->A), both still awaiting-approval, excludes BOTH sides deterministically (stall, not a crash)', () => {
+  const view = {
+    work: {
+      a: item('a', 'awaiting-approval', [], { supersededBy: 'b' }),
+      b: item('b', 'awaiting-approval', [], { supersededBy: 'a' }),
+    },
+  };
+  const result = mergeReadiness(view);
+  assert.deepEqual(result.ready, []);
+  assert.deepEqual(new Set(result.supersededOut), new Set(['a', 'b']));
+});
+
+test('mergeReadiness: duplicates is informational only -- zero effect on ready/waiting/mergeSets/supersededOut (D4)', () => {
+  const view = {
+    work: {
+      a: item('a', 'awaiting-approval', [], { duplicates: ['b'] }),
+      b: item('b', 'awaiting-approval', [], { duplicates: ['a'] }),
+    },
+  };
+  const result = mergeReadiness(view);
+  assert.deepEqual(new Set(result.ready), new Set(['a', 'b']));
+  assert.deepEqual(result.waiting, []);
+  assert.deepEqual(result.mergeSets, []);
+  assert.deepEqual(result.supersededOut, []);
+});
+
+test('mergeReadiness: supersededOut is always empty for every item that never sets supersededBy (regression floor)', () => {
+  const view = {
+    work: {
+      a: item('a', 'awaiting-approval'),
+      b: item('b', 'awaiting-approval', ['a']),
+    },
+  };
+  const result = mergeReadiness(view);
+  assert.deepEqual(result.supersededOut, []);
 });

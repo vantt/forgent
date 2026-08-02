@@ -1057,6 +1057,23 @@ async function runVerb(verb, flags, positional, dir) {
       if (flags['merge-after'] !== undefined) {
         patch.mergeAfter = parseListFlag(flags['merge-after']);
       }
+      // --superseded-by / --duplicates (tsk-2ie, docs/history/
+      // tsk-2ie-duplicate-superseded-guard/ D1): same plumbing-only shape as
+      // --merge-after/--parent above, no new checks here -- existence/
+      // self-reference validation happens at the write door
+      // (work.mjs's validateSupersededBy/validateDuplicates via validateWork).
+      // --superseded-by is a scalar (mirrors --parent's clear-with-empty-
+      // string semantics, D3's directed-singular shape); --duplicates is a
+      // comma-separated list (mirrors --merge-after's array shape).
+      if (flags['superseded-by'] !== undefined) {
+        if (flags['superseded-by'] === true) {
+          throw new StoreError('validation', '--superseded-by requires a value; use --superseded-by "" to clear it.');
+        }
+        patch.supersededBy = flags['superseded-by'] === '' ? null : flags['superseded-by'];
+      }
+      if (flags.duplicates !== undefined) {
+        patch.duplicates = parseListFlag(flags.duplicates);
+      }
       // parent-flag-cli D2: --parent "" CLEARS the field (un-parents the
       // item), matching --refs ''/--deps '' above — but `parent` is a scalar,
       // not a list, so the clear sentinel is `null` (the value work.mjs:255
@@ -1128,7 +1145,7 @@ async function runVerb(verb, flags, positional, dir) {
       if (Object.keys(patch).length === 0) {
         throw new StoreError(
           'validation',
-          'edit requires at least one field to change: --title/--description/--kind/--risk/--verify/--tier/--refs/--deps/--footprint/--acceptance/--priority/--intent/--docs-ref/--parent/--urgent/--impact/--effort/--merge-after.',
+          'edit requires at least one field to change: --title/--description/--kind/--risk/--verify/--tier/--refs/--deps/--footprint/--acceptance/--priority/--intent/--docs-ref/--parent/--urgent/--impact/--effort/--merge-after/--superseded-by/--duplicates.',
         );
       }
       const { event } = editWork(dir, { id, patch, role: 'human' });
