@@ -26,6 +26,7 @@ import { DEFAULTS } from '../state/work.mjs';
 import { listWork, moveStage, moveWork, addWork, putInAwaiting, addDecision, editWork, StoreError } from '../state/store.mjs';
 import { rankImpact } from '../state/impact.mjs';
 import { computeImpact, computePriority, effortForMode, MODE_EFFORT } from '../state/priority-formula.mjs';
+import { footprintOverlapAmong } from '../state/graph-metrics.mjs';
 
 // Best-effort read of the locked-decisions artifacts fgos-exploring/
 // fgos-planning write under `work.docsRef` (docs/history/<feature>/). A
@@ -324,6 +325,19 @@ function formatProposalAsk(verdict, reason) {
   return `Đề xuất chia — ${reason}`;
 }
 
+// tsk-5e97 D1 (docs/history/tsk-5e97-decompose-footprint-overlap-gate/
+// CONTEXT.md): footprint overlap among the tentative children of a
+// `decompose` verdict names each conflicting pair, their shared paths, and
+// footprintOverlapAmong's own resolution suggestions (sequence/hoist/
+// re-slice) -- surfaced as the `reason` fed into formatProposalAsk below,
+// same gate shape as keywordRiskGate/blastRadiusGate.
+function formatFootprintOverlapReason(conflicts) {
+  const lines = conflicts.map(
+    (c) => `${c.a} ↔ ${c.b} (trùng: ${c.shared.join(', ')}; gợi ý: ${c.suggestions.join('/')})`,
+  );
+  return `Footprint trùng giữa các việc con dự kiến:\n${lines.join('\n')}`;
+}
+
 /**
  * Read `id` from the store at `dir`, judge it via `judgeDecompose`, and
  * resolve the verdict — the ONE function both the sync decompose-equivalent
@@ -480,6 +494,26 @@ export function resolveDecompose(dir, id, cfg, role) {
   // its own `work.id` (already `<root>-<m>`) becomes the base, producing
   // `<root>-<m>-<n>` with no special-case code.
   const childIds = verdict.children.map((child, index) => `${work.id}-${index + 1}`);
+
+  // tsk-5e97 D1: check declared footprint overlap among the TENTATIVE
+  // children (real ids, no work-item records yet) before any of them is
+  // written -- footprintOverlapAmong already exists for exactly this
+  // pairwise-candidate shape (merge-standardization D4-revised). No
+  // bypass-detection constant here (unlike keywordRiskGate/
+  // blastRadiusGate below): those gate on a static property of the root
+  // item that never changes call to call, so without a bypass a human's
+  // `fgos answer` would re-park on the identical reason forever. This
+  // check is re-derived from the FRESH model verdict every call -- once a
+  // human's answer leads the next judgeDecompose call to propose
+  // non-overlapping children, it passes on its own.
+  const footprintCandidates = verdict.children.map((child, index) => ({ id: childIds[index], footprint: child.footprint }));
+  const footprintConflicts = footprintOverlapAmong(footprintCandidates);
+  if (footprintConflicts.length > 0) {
+    const reason = formatFootprintOverlapReason(footprintConflicts);
+    logDecomposeVerdict(dir, id, 'need-human', reason, `${footprintConflicts.length} footprint conflicts`);
+    putInAwaiting(dir, { id, ask: formatProposalAsk(verdict, reason), statusAtAsk: work.status });
+    return { outcome: 'need-human', id, verdict };
+  }
 
   verdict.children.forEach((child, index) => {
     addWork(dir, {
