@@ -138,13 +138,21 @@ own shape-invalid check, and judge-executor's reported branch).
   null/wrong-shape check), not every downstream validation branch
   `judgeDecompose` happens to also return `{kind:'invalid'}` from. Revisit
   as a separate item if this turns out to matter in practice.
-- The model's own proposed `verify` command from the real `discover` call
-  on this item (`npm test -- --grep 'judgeDiscovery.*fail-safe'`) is a
-  starting point, not binding — `fgos-executing` picks the actual test
-  file/command that matches whatever test suite runner this repo uses
-  (`node --test`, per repo convention already seen elsewhere in this
-  history) and can override it via `fgos edit --verify` if the proposal
-  doesn't match reality.
+- **Correction (fgos-validating reality-gate FAIL, proof surface):** the
+  model's own proposed `verify` from the real `discover` call
+  (`npm test -- --grep 'judgeDiscovery.*fail-safe'`) is not runnable —
+  this repo's `package.json` test script is `node --test
+  'test/**/*.test.mjs'` (Node's built-in test runner), which has no
+  `--grep` flag (confirmed: `node --test --help` lists
+  `--test-name-pattern`, not `--grep`). Real verify for this item:
+  `node --test test/intake/judge-executor.test.mjs test/intake/discovery.test.mjs test/intake/decompose.test.mjs`
+  — the three existing files that already cover
+  `judgeDiscovery`/`judgeDecompose`/`judge-executor.mjs`
+  (`test/intake/judge-executor.test.mjs`, `test/intake/discovery.test.mjs`,
+  confirmed to exist; `test/intake/decompose.test.mjs` is this same
+  cluster's third file for `judgeDecompose`), plus the new fail-safe-branch
+  tests this item adds to them. `fgos edit tsk-5d2 --verify "..."` applies
+  this before `fgos-executing` runs.
 
 ## Proof points (carried to `fgos-validating`)
 
