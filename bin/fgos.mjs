@@ -18,7 +18,7 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { initStore, addWork, moveWork, editWork, addDecision, addOutcome, addFriction, listWork, readyWork, isDepsAndLineageReady, graphMetrics, graphWhatIf, staleDoingAdvisory, footprintConflicts, readRawEvents, rebuild, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, registerTool, removeTool, assertAcceptanceEvidence, StoreError, EXIT_CODES, categoryOf } from '../src/state/store.mjs';
 import { probeTool, readLocalStatus, writeLocalStatus, resolvedStatus, normalizeCapability } from '../src/state/tool-registry.mjs';
-import { repairTruncatedLastLine } from '../src/state/events.mjs';
+import { repairTruncatedLastLine, EventLogError } from '../src/state/events.mjs';
 import { deriveTitle, classify, generateId } from '../src/intake/classify.mjs';
 import { wrapEnvelope } from '../src/state/envelope.mjs';
 import { loadRunnerConfig, ensureRunnerConfigForDir } from '../src/runner/dispatch.mjs';
@@ -61,6 +61,7 @@ import { getDomain, stageForStep } from '../src/state/workflow-stage-graphs.mjs'
 import { writeCoexistenceManifest } from '../src/install/coexist.mjs';
 import { MANIFEST_SCHEMA_VERSION, COMMAND_REGISTRY } from '../src/cli/command-registry.mjs';
 import { recordInvocationFault } from '../src/cli/invocation-fault-log.mjs';
+import { recordApprovePostSuccessFault } from '../src/cli/approve-fault-log.mjs';
 import { computeAwaitingContext } from '../src/state/awaiting-context.mjs';
 import { DOCTOR_CHECKS, integrationScriptPath, ensureSharedConfigDefaults, runFixes } from '../src/setup/checks.mjs';
 import { sharedConfigFilePath, readSharedConfig } from '../src/config/shared-config-file.mjs';
@@ -1976,6 +1977,54 @@ async function runVerb(verb, flags, positional, dir) {
       return { id, mode: 'local', source, warnings, diff, trace: collectReviewTrace(view, id) };
     }
 
+    // tsk-480: approve's own success paths (merge landed, or verify-only
+    // passed) call `moveWork(...to:'delivered'...)` as their very last
+    // step. That write can throw on `events.lock` contention even though
+    // the precondition it's recording already succeeded permanently —
+    // without a guard, the exception would propagate uncaught, and (per
+    // `invocation-fault-log.mjs`'s own documented scope) a fault raised
+    // this deep inside a verb's handler is deliberately never recorded by
+    // that mechanism either, so nothing at all would be left to explain
+    // why a real merge landed while the item stayed `awaiting-approval`
+    // forever (CONTEXT.md D1). This wraps exactly that one call: on
+    // success, returns the real event; on failure, records a diagnostic
+    // through `approve-fault-log.mjs` (D2 — no shared lock with
+    // `events.jsonl`) and returns `event: null` instead of throwing, so
+    // every call site can still finish its own cleanup and return a
+    // truthful envelope.
+    function moveDeliveredOrRecordFault(dir, id, phase) {
+      try {
+        // Test-only failure seam (tsk-480 D3), same shape as
+        // FGOS_GH_COMMAND (bin/fgos.mjs ghCommandOpts): an env var read
+        // only here, scoped to the exact item id so it can never affect
+        // any other item in the same process, inert unless a test
+        // explicitly sets it. Production code never sets this variable.
+        if (process.env.FGOS_TEST_FORCE_APPROVE_LOCK_TIMEOUT === id) {
+          throw new EventLogError('lock-timeout', `approve: simulated lock-timeout for "${id}" (FGOS_TEST_FORCE_APPROVE_LOCK_TIMEOUT)`);
+        }
+        const { event } = moveWork(dir, { id, to: 'delivered', expectedStatus: 'awaiting-approval', role: 'human' });
+        return { event, error: null, diagnosticLog: null };
+      } catch (err) {
+        // Only an EventLogError (the write itself failing — e.g.
+        // 'lock-timeout', src/state/events.mjs) is the class of failure
+        // this guard exists for. A StoreError from transitionWork's own
+        // precondition/CAS check (e.g. a missing-evidence acceptance
+        // clause) is a legitimate refusal that must keep propagating
+        // exactly as before — swallowing it here would silently accept an
+        // item transitionWork correctly refused.
+        if (!(err instanceof EventLogError)) {
+          throw err;
+        }
+        const diagnosticLog = recordApprovePostSuccessFault(dir, { id, phase, detail: err.message });
+        process.stderr.write(
+          `fgos: warning: "${id}" ${phase} succeeded but its status write failed (${err.message}); `
+            + `item status remains "awaiting-approval" pending manual reconciliation; `
+            + `diagnostic recorded to ${diagnosticLog ?? '(unrecorded — see this stderr line)'}.\n`,
+        );
+        return { event: null, error: err, diagnosticLog };
+      }
+    }
+
     // Cổng duyệt — approve (pr-lifecycle D3/D4): merges a runner item's
     // branch into main (spike-proven mechanics: --no-commit --no-ff, verify
     // on the staged tree, commit only on green — merge.mjs's mergeRunnerItem)
@@ -2248,15 +2297,34 @@ async function runVerb(verb, flags, positional, dir) {
             // the branch is merged INTO; running it from repoRoot/main
             // would have git silently refuse the delete (swallowed as a
             // warning), leaking the leaf's branch forever.
-            const { event } = moveWork(dir, { id, to: 'delivered', expectedStatus: 'awaiting-approval', role: 'human' });
+            // tsk-480: the merge above is already real and permanent —
+            // cleanup must run either way, so it is no longer gated on the
+            // status write succeeding (previously: an unguarded moveWork
+            // throw here would skip cleanup too, leaking the leaf branch
+            // on top of the unrecorded status).
+            const moveResult = moveDeliveredOrRecordFault(dir, id, 'leaf-into-root merge');
             const cleanup = cleanupMergedBranch(ephemeral.path, result.branch);
+            if (!moveResult.event) {
+              return {
+                id,
+                mode: 'merge',
+                to: 'awaiting-approval',
+                deliveryUnrecorded: true,
+                target: rootBranch,
+                branch: result.branch,
+                output: result.check.output,
+                cleanupWarnings: cleanup.warnings,
+                error: moveResult.error.message,
+                diagnosticLog: moveResult.diagnosticLog,
+              };
+            }
             return {
               id,
               mode: 'merge',
               to: 'delivered',
               target: rootBranch,
               branch: result.branch,
-              seq: event.seq,
+              seq: moveResult.event.seq,
               output: result.check.output,
               cleanupWarnings: cleanup.warnings,
             };
@@ -2322,15 +2390,31 @@ async function runVerb(verb, flags, positional, dir) {
           return { id, mode: 'merge', to: 'blocked', reason, target: 'main', exitStatus: result.check.status, output: result.check.output };
         }
 
-        const { event } = moveWork(dir, { id, to: 'delivered', expectedStatus: 'awaiting-approval', role: 'human' });
+        // tsk-480: same cleanup-runs-either-way fix as the leaf-merge path
+        // above — the merge into main is already real and permanent.
+        const moveResult = moveDeliveredOrRecordFault(dir, id, 'root-into-main merge');
         const cleanup = cleanupMergedBranch(repoRoot, result.branch);
+        if (!moveResult.event) {
+          return {
+            id,
+            mode: 'merge',
+            to: 'awaiting-approval',
+            deliveryUnrecorded: true,
+            target: 'main',
+            branch: result.branch,
+            output: result.check.output,
+            cleanupWarnings: cleanup.warnings,
+            error: moveResult.error.message,
+            diagnosticLog: moveResult.diagnosticLog,
+          };
+        }
         return {
           id,
           mode: 'merge',
           to: 'delivered',
           target: 'main',
           branch: result.branch,
-          seq: event.seq,
+          seq: moveResult.event.seq,
           output: result.check.output,
           cleanupWarnings: cleanup.warnings,
         };
@@ -2352,8 +2436,24 @@ async function runVerb(verb, flags, positional, dir) {
         });
         return { id, mode: 'verify-only', to: 'blocked', reason: 'verify-fail', exitStatus: check.status, output: check.output };
       }
-      const { event } = moveWork(dir, { id, to: 'delivered', expectedStatus: 'awaiting-approval', role: 'human' });
-      return { id, mode: 'verify-only', to: 'delivered', seq: event.seq, output: check.output };
+      // tsk-480: no real merge lands on this path (code is already on
+      // main), so a moveWork failure here only desyncs status rather than
+      // hiding a permanent mutation — still guarded for consistency with
+      // the two merge paths above (CONTEXT.md D1: all three success
+      // paths share the same silent-throw shape).
+      const moveResult = moveDeliveredOrRecordFault(dir, id, 'pull-door verify-only');
+      if (!moveResult.event) {
+        return {
+          id,
+          mode: 'verify-only',
+          to: 'awaiting-approval',
+          deliveryUnrecorded: true,
+          output: check.output,
+          error: moveResult.error.message,
+          diagnosticLog: moveResult.diagnosticLog,
+        };
+      }
+      return { id, mode: 'verify-only', to: 'delivered', seq: moveResult.event.seq, output: check.output };
     }
 
     // Cổng duyệt — reject (pr-lifecycle D4): awaiting-approval -> todo, reason

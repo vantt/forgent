@@ -6918,6 +6918,71 @@ test('approve on a runner-sourced item with a missing-evidence acceptance clause
   assert.equal(stateView(cwd).work['runner-cos-missing'].status, 'awaiting-approval');
 });
 
+// --- tsk-480: approve's post-success moveWork guard ------------------------
+//
+// The bug: approve's own success paths call moveWork(...to:'delivered'...)
+// as their last step. Before this fix, a throw there (e.g. an
+// EventLogError('lock-timeout') from events.lock contention) propagated
+// uncaught even though the precondition it was recording (a real merge, or
+// a passed verify) had already happened — leaving the item stuck at
+// awaiting-approval with zero diagnostic trail. FGOS_TEST_FORCE_APPROVE_
+// LOCK_TIMEOUT (bin/fgos.mjs's moveDeliveredOrRecordFault) is a test-only
+// seam, same shape as FGOS_GH_COMMAND, that simulates exactly that failure
+// for one named item id without touching moveWork/store.mjs itself.
+
+test('approve (pull-door/verify-only): a simulated post-verify lock-timeout is caught, recorded, and left diagnosable instead of crashing uncaught', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'approve-lock-timeout', { verify: 'true' });
+  run(cwd, ['move', 'approve-lock-timeout', '--to', 'doing']);
+  run(cwd, ['move', 'approve-lock-timeout', '--to', 'awaiting-approval']);
+
+  const before = eventLines(cwd).length;
+  const result = run(cwd, ['approve', 'approve-lock-timeout'], { FGOS_TEST_FORCE_APPROVE_LOCK_TIMEOUT: 'approve-lock-timeout' });
+
+  // Caught, not an uncaught crash: exit 0, a well-formed envelope, not the
+  // generic "fgos: <message>" exit-1/exit-2 shape an unhandled throw would
+  // have produced.
+  assert.equal(result.status, 0, result.stderr);
+  const data = JSON.parse(result.stdout).data;
+  assert.equal(data.mode, 'verify-only');
+  assert.equal(data.to, 'awaiting-approval');
+  assert.equal(data.deliveryUnrecorded, true);
+  assert.match(data.error, /lock-timeout/);
+  assert.ok(data.diagnosticLog, 'envelope must point at a real diagnostic log path');
+
+  // Visible immediately to whoever is watching the terminal, not just to a
+  // later reader of the JSON envelope or the log file.
+  assert.match(result.stderr, /status write failed/);
+  assert.match(result.stderr, /diagnostic recorded/);
+
+  // The status write genuinely never happened — no new event, item stays
+  // exactly where it was, never silently promoted to "delivered".
+  assert.equal(stateView(cwd).work['approve-lock-timeout'].status, 'awaiting-approval');
+  assert.equal(eventLines(cwd).length, before);
+
+  // The diagnostic record is real and on disk, independent of events.jsonl.
+  const diagnosticLines = fs.readFileSync(data.diagnosticLog, 'utf8').trim().split('\n');
+  const record = JSON.parse(diagnosticLines.at(-1));
+  assert.equal(record.id, 'approve-lock-timeout');
+  assert.equal(record.phase, 'pull-door verify-only');
+  assert.match(record.detail, /lock-timeout/);
+});
+
+test('approve (pull-door/verify-only): with no simulated failure, the same item approves normally — the guard changes nothing on the happy path', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'approve-lock-timeout-control', { verify: 'true' });
+  run(cwd, ['move', 'approve-lock-timeout-control', '--to', 'doing']);
+  run(cwd, ['move', 'approve-lock-timeout-control', '--to', 'awaiting-approval']);
+
+  const result = run(cwd, ['approve', 'approve-lock-timeout-control']);
+  assert.equal(result.status, 0, result.stderr);
+  const data = JSON.parse(result.stdout).data;
+  assert.equal(data.to, 'delivered');
+  assert.equal(data.deliveryUnrecorded, undefined);
+  assert.equal(typeof data.seq, 'number');
+  assert.equal(stateView(cwd).work['approve-lock-timeout-control'].status, 'delivered');
+});
+
 test('graph verb on an empty store: zero components, still a valid envelope, exit 0', () => {
   const cwd = tmpCwd();
   assert.equal(run(cwd, ['init']).status, 0);
