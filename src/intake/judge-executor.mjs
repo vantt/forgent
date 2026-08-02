@@ -242,15 +242,36 @@ function parseVerdict(stdout) {
 // parsed-but-unvalidated verdict object on success, or `null` once all
 // attempts are exhausted (whether from exhausting parse-shaped retries, or
 // from an immediate non-parse failure on any single attempt) — the two
-// failure origins are indistinguishable on purpose, so a caller wrapping
-// this in escalation never needs a failure-type field to decide whether to
-// fall back. `capacityId`/`fgosDir` (tsk-2yp, optional) are threaded to every
-// attempt exactly like `scoutCapture` — same mutable-object-style pass-through
-// to `spawnAttempt`.
-function runBoundedAttempts(cfg, model, prompt, stricterPrompt, tier, maxAttempts, scoutCapture, capacityId, fgosDir) {
+// failure origins are indistinguishable on purpose for the RETURN VALUE, so
+// a caller wrapping this in escalation never needs a failure-type field to
+// decide whether to fall back. `capacityId`/`fgosDir` (tsk-2yp, optional) are
+// threaded to every attempt exactly like `scoutCapture` — same
+// mutable-object-style pass-through to `spawnAttempt`.
+//
+// `failDetail` (tsk-5d2, optional): the same mutable-object out-param
+// convention `scoutCapture` already uses — when given, stashes WHICH of the
+// two distinguishable null-causing branches fired plus its raw evidence,
+// for a caller to persist via `appendJudgeFailLog` (judge-fail-log.mjs).
+// This is purely additive debug reporting: it never changes which branch
+// runs or what this function returns. `reason: 'non-parse-exit'` (spawn
+// error/timeout/non-zero exit on the attempt that stopped the loop) or
+// `reason: 'parse-exhausted'` (every attempt produced unparsable stdout) —
+// the two return-`null` origins the caller-facing contract above
+// deliberately keeps indistinguishable in the RETURN VALUE stay fully
+// distinguishable here, in the out-param, for debugging.
+function runBoundedAttempts(cfg, model, prompt, stricterPrompt, tier, maxAttempts, scoutCapture, capacityId, fgosDir, failDetail) {
+  const parseAttempts = [];
   for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
     const result = spawnAttempt(cfg, model, attempt === 1 ? prompt : stricterPrompt, tier, scoutCapture, capacityId, fgosDir);
     if (result.error || result.status !== 0) {
+      if (failDetail) {
+        failDetail.reason = 'non-parse-exit';
+        failDetail.attempt = attempt;
+        failDetail.status = result.status ?? null;
+        failDetail.signal = result.signal ?? null;
+        failDetail.error = result.error?.message;
+        failDetail.stderr = typeof result.stderr === 'string' ? result.stderr : undefined;
+      }
       return null;
     }
 
@@ -258,8 +279,13 @@ function runBoundedAttempts(cfg, model, prompt, stricterPrompt, tier, maxAttempt
     if (verdict.parsed) {
       return verdict.verdict;
     }
+    parseAttempts.push({ attempt, stdout: typeof result.stdout === 'string' ? result.stdout : '' });
   }
 
+  if (failDetail) {
+    failDetail.reason = 'parse-exhausted';
+    failDetail.attempts = parseAttempts;
+  }
   return null;
 }
 
@@ -295,15 +321,21 @@ function runBoundedAttempts(cfg, model, prompt, stricterPrompt, tier, maxAttempt
  * wins over `escalateTier` there as well, same as it wins over `tier` on the
  * base attempts — today's only caller (`runJudgeExecutor`) never sets
  * `escalateTier`, so this never actually happens in practice.
+ *
+ * `failDetail` (tsk-5d2, optional, additive): threaded to `runBoundedAttempts`
+ * identically to `scoutCapture`, and also populated on an escalation-attempt
+ * failure (unreachable today — no caller sets `escalateTier` — but kept
+ * symmetric so the out-param is never silently empty on a path that could
+ * theoretically null out).
  */
 export function runRetryingExecutor(
   cfg,
   model,
   prompt,
   stricterPrompt,
-  { tier, maxAttempts, escalateTier, escalateModel, scoutCapture, capacityId, fgosDir },
+  { tier, maxAttempts, escalateTier, escalateModel, scoutCapture, capacityId, fgosDir, failDetail },
 ) {
-  const verdict = runBoundedAttempts(cfg, model, prompt, stricterPrompt, tier, maxAttempts, scoutCapture, capacityId, fgosDir);
+  const verdict = runBoundedAttempts(cfg, model, prompt, stricterPrompt, tier, maxAttempts, scoutCapture, capacityId, fgosDir, failDetail);
   if (verdict !== null) {
     return verdict;
   }
@@ -314,10 +346,25 @@ export function runRetryingExecutor(
 
   const result = spawnAttempt(cfg, escalateModel ?? model, stricterPrompt, escalateTier, scoutCapture, capacityId, fgosDir);
   if (result.error || result.status !== 0) {
+    if (failDetail) {
+      failDetail.reason = 'non-parse-exit';
+      failDetail.attempt = 'escalation';
+      failDetail.status = result.status ?? null;
+      failDetail.signal = result.signal ?? null;
+      failDetail.error = result.error?.message;
+      failDetail.stderr = typeof result.stderr === 'string' ? result.stderr : undefined;
+    }
     return null;
   }
   const escalated = parseVerdict(result.stdout);
-  return escalated.parsed ? escalated.verdict : null;
+  if (escalated.parsed) {
+    return escalated.verdict;
+  }
+  if (failDetail) {
+    failDetail.reason = 'parse-exhausted';
+    failDetail.attempts = [{ attempt: 'escalation', stdout: typeof result.stdout === 'string' ? result.stdout : '' }];
+  }
+  return null;
 }
 
 /**
@@ -360,7 +407,14 @@ export function runRetryingExecutor(
 // byte-identical. This exists so `judgeDiscovery` can measure how many
 // research tool calls a discover pass actually made — observability only,
 // no cap enforced here.
-export function runJudgeExecutor(cfg, model, prompt, stricterPrompt, scout, capacityId, fgosDir, scoutCaptureOut) {
+//
+// `failDetailOut` (tsk-5d2, optional, 10th trailing out-param, same
+// convention as `scoutCaptureOut`): a caller supplies `{}` to read back
+// which fail-safe branch fired (`.reason`) plus its raw evidence, after a
+// `null` return. Threaded straight to `runRetryingExecutor`'s own
+// `failDetail` option; omitted (every pre-tsk-5d2 caller) is
+// byte-identical.
+export function runJudgeExecutor(cfg, model, prompt, stricterPrompt, scout, capacityId, fgosDir, scoutCaptureOut, failDetailOut) {
   const capture = scout?.capture ? (scoutCaptureOut ?? {}) : null;
 
   const verdict = runRetryingExecutor(cfg, model, prompt, stricterPrompt, {
@@ -369,6 +423,7 @@ export function runJudgeExecutor(cfg, model, prompt, stricterPrompt, scout, capa
     scoutCapture: capture,
     capacityId,
     fgosDir,
+    failDetail: failDetailOut,
   });
 
   if (verdict !== null && capture?.entries?.length) {

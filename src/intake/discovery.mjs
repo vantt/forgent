@@ -26,6 +26,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { modelForTier } from '../runner/dispatch.mjs';
 import { runJudgeExecutor, JUDGE_STRICT_JSON_SUFFIX, readScoutNotes } from './judge-executor.mjs';
+import { appendJudgeFailLog } from './judge-fail-log.mjs';
 import { readLockedContext } from './decompose.mjs';
 import { DEFAULTS } from '../state/work.mjs';
 import { listWork, moveStage, addDiscovery, addDecision, putInAwaiting, editWork, StoreError } from '../state/store.mjs';
@@ -378,8 +379,19 @@ export function judgeDiscovery(work, cfg, view, scoutContext, fgosDir) {
     // widened set: Bash(rg:*)/Read/Grep/Glob/WebSearch/WebFetch/Task/Agent)
     // this particular attempt made, whether or not it ended up unclear.
     const scoutCaptureOut = scoutContext ? {} : undefined;
-    const verdict = runJudgeExecutor(cfg, model, prompt, stricterPrompt, scout, 'judge-discovery', fgosDir, scoutCaptureOut);
+    const failDetailOut = {};
+    const verdict = runJudgeExecutor(cfg, model, prompt, stricterPrompt, scout, 'judge-discovery', fgosDir, scoutCaptureOut, failDetailOut);
     if (!verdict || typeof verdict.clear !== 'boolean') {
+      // tsk-5d2 D1-D3: debug-only, never load-bearing on the fallback
+      // returned below. `verdict === null` means judge-executor already
+      // knows which of its two branches fired (`failDetailOut.reason`);
+      // a non-null-but-wrong-shape verdict is this function's OWN
+      // fail-safe branch (B3), logged with the parsed object itself.
+      if (verdict === null) {
+        appendJudgeFailLog(fgosDir, work?.id, failDetailOut);
+      } else {
+        appendJudgeFailLog(fgosDir, work?.id, { reason: 'shape-invalid', verdict: JSON.stringify(verdict) });
+      }
       return { clear: false, question: DEFAULT_UNCLEAR_QUESTION };
     }
 
@@ -452,7 +464,10 @@ export function judgeDiscovery(work, cfg, view, scoutContext, fgosDir) {
       out.researchToolCallCount = researchToolCallCount;
     }
     return out;
-  } catch {
+  } catch (err) {
+    // tsk-5d2 D1-D3: same debug-only, non-load-bearing logging — the
+    // returned fallback below is unchanged from before this item.
+    appendJudgeFailLog(fgosDir, work?.id, { reason: 'outer-exception', message: err?.message, stack: err?.stack });
     return { clear: false, question: DEFAULT_UNCLEAR_QUESTION };
   }
 }

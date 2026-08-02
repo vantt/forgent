@@ -345,6 +345,78 @@ test('judgeDecompose fails safe when the work item\'s tier has no configured mod
   assert.deepEqual(judgeDecompose(sampleWork({ tier: 'standard' }), cfg), { kind: 'invalid' });
 });
 
+// --- tsk-5d2: judge fail-safe debug log — each distinct branch tagged, ----
+// the returned fallback verdict never changes (fail-safe contract is the
+// same one the tests above already prove; these add the log-side proof).
+// Mirrors discovery.test.mjs's own tsk-5d2 block exactly (D2: same
+// shared fail-safe code path in judge-executor.mjs).
+
+function readJudgeFailLog(fgosDir, id) {
+  return fs.readFileSync(path.join(fgosDir, 'logs', `${id}-judge-fail.log`), 'utf8');
+}
+
+test('judgeDecompose fail-safe (outer-exception): logs reason:outer-exception with the real error message, verdict unchanged', () => {
+  const dir = mkTempDir();
+  const fgosDir = path.join(mkTempDir(), '.fgos');
+  const scriptPath = writeVerdictExecutor(dir, { verdict: 'pass-through' });
+  const cfg = { executor: { command: process.execPath, args: [scriptPath, '{prompt}'] }, models: {}, timeoutMs: 5000 };
+  const verdict = judgeDecompose(sampleWork({ id: 'item-outer-exc', tier: 'standard' }), cfg, undefined, undefined, undefined, fgosDir);
+  assert.deepEqual(verdict, { kind: 'invalid' });
+  const log = readJudgeFailLog(fgosDir, 'item-outer-exc');
+  assert.match(log, /reason outer-exception/);
+  assert.match(log, /message: /);
+});
+
+test('judgeDecompose fail-safe (non-parse-exit): logs reason:non-parse-exit with the real exit status, verdict unchanged', () => {
+  const dir = mkTempDir();
+  const fgosDir = path.join(mkTempDir(), '.fgos');
+  const { scriptPath } = writeCountingFailingExecutor(dir, 7);
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+  const verdict = judgeDecompose(sampleWork({ id: 'item-non-parse-exit' }), cfg, undefined, undefined, undefined, fgosDir);
+  assert.deepEqual(verdict, { kind: 'invalid' });
+  const log = readJudgeFailLog(fgosDir, 'item-non-parse-exit');
+  assert.match(log, /reason non-parse-exit/);
+  assert.match(log, /exit status: 7/);
+});
+
+test('judgeDecompose fail-safe (parse-exhausted): logs reason:parse-exhausted with all 3 attempts\' raw stdout, verdict unchanged', () => {
+  const dir = mkTempDir();
+  const fgosDir = path.join(mkTempDir(), '.fgos');
+  const { scriptPath, counterPath } = writeCountingRawStdoutExecutor(dir, 'not json at all');
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+  const verdict = judgeDecompose(sampleWork({ id: 'item-parse-exhausted' }), cfg, undefined, undefined, undefined, fgosDir);
+  assert.deepEqual(verdict, { kind: 'invalid' });
+  assert.equal(readCount(counterPath), 3);
+  const log = readJudgeFailLog(fgosDir, 'item-parse-exhausted');
+  assert.match(log, /reason parse-exhausted/);
+  assert.match(log, /ATTEMPT 1 STDOUT/);
+  assert.match(log, /ATTEMPT 3 STDOUT/);
+  assert.equal((log.match(/not json at all/g) || []).length, 3);
+});
+
+test('judgeDecompose fail-safe (shape-invalid): logs reason:shape-invalid with the parsed verdict object, verdict unchanged', () => {
+  const dir = mkTempDir();
+  const fgosDir = path.join(mkTempDir(), '.fgos');
+  const scriptPath = writeVerdictExecutor(dir, { reason: 'huh' });
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+  const verdict = judgeDecompose(sampleWork({ id: 'item-shape-invalid' }), cfg, undefined, undefined, undefined, fgosDir);
+  assert.deepEqual(verdict, { kind: 'invalid' });
+  const log = readJudgeFailLog(fgosDir, 'item-shape-invalid');
+  assert.match(log, /reason shape-invalid/);
+  assert.match(log, /"reason":"huh"/);
+});
+
+test('judgeDecompose fail-safe with fgosDir omitted writes no log and never throws (byte-identical to every pre-tsk-5d2 caller)', () => {
+  const dir = mkTempDir();
+  const { scriptPath } = writeCountingFailingExecutor(dir, 7);
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+  let verdict;
+  assert.doesNotThrow(() => {
+    verdict = judgeDecompose(sampleWork({ id: 'item-no-fgosdir' }), cfg);
+  });
+  assert.deepEqual(verdict, { kind: 'invalid' });
+});
+
 // --- judgeDecompose gate consultation (tsk-3w8 follow-up, mirrors --------
 // discovery.test.mjs's own P30 tests): a "need-human" verdict parks the item
 // via the SAME putInAwaiting/view.gates door discovery.mjs's "unclear" does
