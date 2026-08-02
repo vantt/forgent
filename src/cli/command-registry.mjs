@@ -661,6 +661,31 @@ export const COMMAND_REGISTRY = [
     deprecated: null,
   },
   {
+    name: 'promote-to-component',
+    invoke: 'fgos promote-to-component',
+    description: 'Take N flat sibling item ids (linked only via deps/mergeAfter) and converge them into one component: resolve or create a shared root (an existing member promoted, or a fresh milestone-style item), merge each member\'s own branch into it (never a rebase), and set parent only for a member whose merge truly succeeded. Never infers which items belong together — that judgment is the caller\'s.',
+    parameters: {
+      type: 'object',
+      properties: {
+        ids: { type: 'string', description: 'Comma-separated list of at least 2 flat sibling item ids (or pass them as positional args).' },
+        'root-id': { type: 'string', description: 'Promote this existing member to root instead of creating a new item (D1 reuse-member path).' },
+        'root-title': { type: 'string', description: 'Title for a freshly created root item (D1 new-item path) — required when --root-id is omitted.' },
+        timeout: { type: 'number', description: 'Optional verify timeout in milliseconds, forwarded per member.' },
+      },
+      positional: ['ids'],
+      required: [],
+    },
+    examples: [
+      'fgos promote-to-component --ids tsk-a,tsk-b --root-title "Component: X"',
+      'fgos promote-to-component tsk-a,tsk-b --root-id tsk-a',
+    ],
+    touchesState: true,
+    requiresExistingStore: true,
+    externalEffect: true,
+    paginated: false,
+    deprecated: null,
+  },
+  {
     name: 'reject',
     invoke: 'fgos reject',
     description: 'Reject an awaiting-approval item back to todo with a mandatory reason.',
