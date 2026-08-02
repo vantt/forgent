@@ -743,9 +743,20 @@ function branchContentMismatch(repoRoot, branch, ref) {
   if (introducedPaths.length === 0) {
     return [];
   }
-  return git(repoRoot, ['diff', '--name-only', branch, ref, '--', ...introducedPaths])
-    .split('\n')
-    .filter((p) => p !== '');
+  // tsk-107: compare against firstMerge itself (its content right as the
+  // merge landed), not against ref's CURRENT tree. A later, unrelated
+  // already-merged branch touching the same path makes ref's tree legitimately
+  // differ from branch's own tree forever after — that's not discarded
+  // content, just two branches sharing a file. The real "-s ours"-style
+  // discard signature is narrower: the merge commit itself made no change to
+  // that path relative to its own first parent, even though branch's diff
+  // touched it.
+  const changedByMerge = new Set(
+    git(repoRoot, ['diff', '--name-only', `${firstMerge}^1`, firstMerge, '--', ...introducedPaths])
+      .split('\n')
+      .filter((p) => p !== ''),
+  );
+  return introducedPaths.filter((p) => !changedByMerge.has(p));
 }
 
 async function mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs }) {

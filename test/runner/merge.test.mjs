@@ -729,6 +729,48 @@ test('mergeRunnerItem does not report "merged" when an already-ancestor branch h
   assert.match(result.check.output, /produced\.txt/);
 });
 
+// tsk-107: branchContentMismatch used to compare the branch's own tree
+// against ref's CURRENT tree — so once a LATER, unrelated already-merged
+// branch also touched the same path, the branch's own tree would legitimately
+// differ from HEAD forever after, even though the branch's real content was
+// never discarded. This false-flagged a re-approve of an already-merged item
+// as "verify-fail-post-merge" (reproduced live on tsk-2eq right after tsk-15k
+// landed this check — see docs/history/ for that item). The fix compares
+// against the merge commit itself (firstMerge vs firstMerge^1), which is
+// immune to any later commits on the same path.
+
+test('mergeRunnerItem does not false-flag an already-merged branch just because a later unrelated already-merged branch also touched the same file', async () => {
+  const repoRoot = initRepo();
+  fs.writeFileSync(path.join(repoRoot, 'shared.txt'), 'line1\n');
+  git(repoRoot, ['add', 'shared.txt']);
+  git(repoRoot, ['commit', '-q', '-m', 'add shared.txt']);
+
+  makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'shared.txt', 'line1\ndemo added\n');
+  makeBranchWithCommit(repoRoot, 'fgw/other-item', 'shared.txt', 'other added\nline1\n');
+
+  // Land the unrelated branch first — a real, ordinary merge, no conflict
+  // (it edits the top of the file; demo-item edits the bottom).
+  git(repoRoot, ['merge', '--no-ff', '-q', '-m', 'merge other-item first', 'fgw/other-item']);
+
+  // First real merge of demo-item: a normal 3-way merge combining both
+  // edits — exercises the ordinary (not-yet-ancestor) path.
+  const firstResult = await mergeRunnerItem(repoRoot, makeItem({ verify: 'true' }));
+  assert.equal(firstResult.outcome, 'merged');
+  assert.equal(
+    fs.readFileSync(path.join(repoRoot, 'shared.txt'), 'utf8'),
+    'other added\nline1\ndemo added\n',
+  );
+
+  // Re-approving the now-already-merged demo-item is exactly the path that
+  // runs branchContentMismatch. shared.txt legitimately differs between
+  // demo-item's own branch tip ("line1\ndemo added\n") and current HEAD
+  // ("other added\nline1\ndemo added\n") — that must not be mistaken for
+  // discarded content.
+  const secondResult = await mergeRunnerItem(repoRoot, makeItem({ verify: 'true' }));
+  assert.equal(secondResult.outcome, 'merged');
+  assert.equal(secondResult.check.passed, true);
+});
+
 // --- mergeRunnerItem rejects a .fgos/ write on the branch (ADR0020) -------
 //
 // worktree.mjs's createWorktree no longer checks .fgos/ out into a worker's
