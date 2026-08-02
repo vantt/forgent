@@ -192,14 +192,24 @@ ${
    lịch sử phán trước + scout notes nếu có), item đã đủ rõ để thi công
    chưa?
 
-4. **Nếu CHƯA đủ rõ và bạn có công cụ** (Bash chạy \`rg\`, Read/Grep/Glob để
-   đọc code, WebSearch/WebFetch để tra cứu ngoài, Task để giao việc song
-   song cho subagent) — TỰ ĐI TÌM THÊM bằng chứng trước khi kết luận
-   unclear: quét code liên quan trong repo cho câu hỏi riêng của repo này;
-   tra cứu online cho câu hỏi kỹ thuật chung (không riêng gì repo này).
-   Ngân sách: khoảng 5 lượt gọi công cụ nghiên cứu cho 1 lần phán — ưu tiên
-   chất lượng bằng chứng hơn số lượt gọi. CHỈ kết luận unclear SAU KHI đã
-   thử tìm thêm, không phải ngay khi thấy thiếu thông tin.
+4. **Nếu CHƯA đủ rõ và bạn có công cụ** — TỰ ĐI TÌM THÊM bằng chứng trước
+   khi kết luận unclear, chọn công cụ theo loại câu hỏi:
+   - Câu hỏi riêng của repo này (code hiện có làm gì, pattern nào đang
+     dùng, ai gọi ai) → \`Bash rg\`/Read/Grep/Glob, quét trực tiếp trong repo.
+   - Câu hỏi khái niệm/cơ chế/giải pháp kỹ thuật chung (không riêng gì repo
+     này — VD một thuật toán, một API bên ngoài, cách làm phổ biến cho một
+     vấn đề) → WebSearch/WebFetch, tra cứu ngoài thay vì đoán.
+   - Câu hỏi có NHIỀU nhánh độc lập (VD vừa cần hiểu code hiện có, vừa cần
+     tra khái niệm ngoài, hoặc 2+ phần code không liên quan nhau) → giao
+     việc qua Task cho nhiều subagent chạy SONG SONG thay vì tự làm tuần
+     tự từng phần — mỗi subagent nhận đúng một nhánh, gom kết quả lại rồi
+     mới phán. Nhánh đơn, phụ thuộc lẫn nhau (bước sau cần kết quả bước
+     trước) thì làm tuần tự bình thường, không ép song song.
+   Ngân sách: khoảng 5 lượt gọi công cụ nghiên cứu cho 1 lần phán (một lượt
+   Task giao song song tính là 1 lượt ở tầng này, dù bên trong nó có thể tự
+   gọi thêm) — ưu tiên chất lượng bằng chứng hơn số lượt gọi. CHỈ kết luận
+   unclear SAU KHI đã thử tìm thêm, không phải ngay khi thấy thiếu thông
+   tin.
 
 5. **Không có tool nào khả dụng** — bỏ qua bước 4, phán trên dữ liệu đã có,
    không tự bịa bằng chứng, không giả vờ đã scout. Không có kết quả tìm

@@ -597,6 +597,20 @@ test('judgeDiscovery with no deps states plainly that there are none, rather tha
   assert.match(verdict.verify, /item này không có dependency nào/);
 });
 
+// tsk-4rd (route A follow-up): the recipe's research step must actively
+// point at parallel Task dispatch for independent branches and split
+// internal-code (rg/Read/Grep) vs external-concept (WebSearch/WebFetch)
+// tool choice — granting the tools alone (allowedTools) is not the same as
+// instructing the model to actually use them that way.
+test('the judge prompt instructs parallel Task dispatch for independent research branches, not just tool availability', () => {
+  const dir = mkTempDir();
+  const scriptPath = echoPromptExecutor(dir);
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+  const verdict = judgeDiscovery(sampleWork(), cfg);
+  assert.match(verdict.verify, /SONG SONG/);
+  assert.match(verdict.verify, /WebSearch\/WebFetch/);
+});
+
 // --- tsk-4rd (route A, recipe step 1 "làm sạch yêu cầu"): optional
 // titleProposal/descriptionProposal ride on either outcome exactly like
 // impactScore, never gate clear/unclear, and are omitted whenever the model
