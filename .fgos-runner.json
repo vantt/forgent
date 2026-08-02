@@ -28,6 +28,12 @@
     }
   },
   "capacities": {
+    "judge-discovery": {
+      "kind": "task"
+    },
+    "judge-decompose": {
+      "kind": "task"
+    },
     "submit-assist-classify": {
       "kind": "cli",
       "adapter": "cli-spawn",
@@ -35,6 +41,7 @@
       "provider": "agy",
       "args": ["-p", "{prompt}", "--model", "{model}"],
       "tier": "light",
+      "model": "Gemini 3.5 Flash (Medium)",
       "allowCrossProvider": true
     }
   },
