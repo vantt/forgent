@@ -616,7 +616,7 @@ export function autoResolveDecisionIndexCollision(repoRoot, branch, classificati
  * introduces relative to current HEAD, correct for both a root->main merge
  * and a leaf->parent merge without needing to know either branch's trunk.
  */
-export async function mergeRunnerItem(repoRoot, item, { timeoutMs } = {}) {
+export async function mergeRunnerItem(repoRoot, item, { timeoutMs, lockRoot = repoRoot } = {}) {
   const branch = branchNameFor(item.id);
 
   // The pre-commit hook only locks the final `git commit` — everything
@@ -639,7 +639,16 @@ export async function mergeRunnerItem(repoRoot, item, { timeoutMs } = {}) {
   // the same "best-effort only" limitation session-identity.mjs already
   // documents for that fallback, now newly reachable from here too — not a
   // regression in kind, just a second call site inheriting a known gap.
-  const fgosDir = path.join(repoRoot, '.fgos');
+  // tsk-2eq: `lockRoot` defaults to `repoRoot` (root->main approve's own
+  // call site, unaffected) but a leaf->parent approve passes the real repo
+  // root here explicitly while `repoRoot` itself stays the ephemeral
+  // worktree used as the git-op cwd below. Resolving `fgosDir` off a bare
+  // `repoRoot` would point inside that ephemeral worktree — a directory
+  // `createWorktree` (worktree.mjs) already strips `.fgos/` from per
+  // ADR0020 — so `acquireMainCheckoutLock` would silently recreate it
+  // fresh every call and never actually contend with the real
+  // `<repoRoot>/.fgos/main-checkout.lock` a concurrent leaf merge holds.
+  const fgosDir = path.join(lockRoot, '.fgos');
   const identity = resolveWriterIdentity(fgosDir).id;
   // releaseOnExit (tsk-45z point 2): approve's own job is over once this
   // process exits, so a crash/interrupt mid-merge should release the lock
@@ -691,6 +700,54 @@ function isAlreadyMerged(repoRoot, branch, ref) {
   }
 }
 
+// tsk-15k: whether the paths `branch` actually introduced (relative to its
+// own true fork point, found via the EARLIEST merge commit on the
+// `branch..ref` ancestry path) are still reflected in `ref`'s current tree.
+// `isAlreadyMerged`'s bare `is-ancestor` check only proves branch's commit
+// is reachable from `ref` (parent-chain linkage) — it says nothing about
+// whether the resulting tree still carries branch's actual changes. A
+// manually-resolved `git merge -s ours` (or any history rewrite that keeps
+// branch as a parent while discarding its content) makes branch a real
+// ancestor while dropping 100% of what it introduced — reproduced
+// empirically against this exact function
+// (docs/history/merge-verify-only-false-done/plan.md). Returns the list of
+// mismatched paths (empty = parity holds, safe to trust the ancestry
+// alone).
+//
+// Deliberately does NOT use `merge-base(branch, ref)` directly for the
+// "before" state — that resolves trivially to branch's own tip once branch
+// is already an ancestor of ref, which would make every check pass
+// vacuously. Instead finds the specific merge commit that first brought
+// branch into ref's history and uses ITS first parent (the mainline tip
+// immediately before that merge landed) as the real fork point. No merge
+// commit found (a fast-forward, never produced by this codebase's own
+// `--no-ff` merges) means there was nothing to discard in the first place —
+// trusts ancestry unchanged, matching pre-existing behavior.
+function branchContentMismatch(repoRoot, branch, ref) {
+  const mergeCommits = git(repoRoot, ['log', '--merges', '--ancestry-path', '--reverse', '--format=%H', `${branch}..${ref}`])
+    .split('\n')
+    .filter((line) => line !== '');
+  if (mergeCommits.length === 0) {
+    return [];
+  }
+  const firstMerge = mergeCommits[0];
+  let base;
+  try {
+    base = git(repoRoot, ['merge-base', branch, `${firstMerge}^1`]).trim();
+  } catch {
+    return []; // no shared history to diff against — fail open, nothing to compare
+  }
+  const introducedPaths = git(repoRoot, ['diff', '--name-only', `${base}..${branch}`])
+    .split('\n')
+    .filter((p) => p !== '');
+  if (introducedPaths.length === 0) {
+    return [];
+  }
+  return git(repoRoot, ['diff', '--name-only', branch, ref, '--', ...introducedPaths])
+    .split('\n')
+    .filter((p) => p !== '');
+}
+
 async function mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs }) {
   // tsk-3yl D1: still run the real goal-check here, even though nothing
   // will be staged/committed — every 'merged' outcome must carry a real,
@@ -699,6 +756,22 @@ async function mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs }) {
   // drifted since the original merge landed still deserves a real check
   // before this is declared done again.
   if (isAlreadyMerged(repoRoot, branch, 'HEAD')) {
+    // tsk-15k D1: bare ancestry is not proof the content is really there —
+    // see branchContentMismatch above. Checked before the goal-check so a
+    // discarded-content case never gets a chance to pass on a coincidentally
+    // weak verify command.
+    const mismatchedPaths = branchContentMismatch(repoRoot, branch, 'HEAD');
+    if (mismatchedPaths.length > 0) {
+      return {
+        outcome: 'verify-fail',
+        branch,
+        check: {
+          passed: false,
+          status: null,
+          output: `integrity check failed: "${branch}" is an ancestor of HEAD but its own content is not reflected there for: ${mismatchedPaths.join(', ')} — a prior merge likely discarded this branch's changes (e.g. a manually-resolved "git merge -s ours") while still recording it as a parent`,
+        },
+      };
+    }
     const check = await runGoalCheck(item, repoRoot, timeoutMs);
     if (!check.passed) {
       return { outcome: 'verify-fail', branch, check };
