@@ -56,6 +56,67 @@ asserted to generalize automatically to a domain that does not exist yet.
 - `status: blocked` also always stops the loop immediately — a failed
   verify or a rejected merge is a real stop, never something to loop past
   silently.
+- **`status: awaiting-approval` also always stops the loop immediately**
+  (tsk-19j-4 — the safety gap an "unlimited" ceiling would otherwise hit on
+  its very first real run): this is `fgos return`'s own natural finish
+  line for the `executing`-stage skill, and there is no next stage-skill
+  registered past it for this loop to resolve — re-invoking the
+  `executing`-stage skill on an already-`awaiting-approval` item would be
+  invoking it on an item whose claim was already released, which is never
+  correct. Merge/approve past `awaiting-approval` stays out of this loop's
+  reach entirely (a human decision, same boundary `/fgOS:cook`'s own hard
+  rules already draw) — this skill's job ends here either way, ceiling or
+  not.
+- **Anchored-by-open-children always stops the loop, checked every
+  iteration, before the ceiling check** (tsk-19j-4 — the gap D14's original
+  "retrofit is nearly free" claim missed): a `decompose` outcome can turn
+  the current item into a root with real children (`addWork`, `parent:
+  id`) — the frontier/lineage rule (`frontier.mjs`'s `hasOpenDescendant`)
+  means this item is never itself dispatchable again while any child is
+  still open, no matter what its own `stage`/`status` now read. Blindly
+  looping past this would try to build the ROOT directly instead of
+  waiting for its children — the exact failure mode a literal "just keep
+  looping" driver would hit on its very first real split. Detect it the
+  same way `frontier.mjs` does, from the same fresh read: any item with
+  `parent == id` whose `status` is NOT one of `delivered`/`retrospective`/
+  `cleanup`/`done`/`wontfix` anchors this item. When anchored, stop — never
+  invoke a stage skill this turn — and report every anchoring child id back
+  to the caller. This is never this skill's own job to resolve: the caller
+  decides whether to drive each open child next (see the loops table below
+  for how `/fgOS:cook` uses this).
+- **No progress in an iteration is also a stop, never a silent re-loop**:
+  if invoking the resolved stage-skill leaves BOTH `stage` and `status`
+  unchanged from what this same iteration read at its top (compare the
+  fresh re-read at the NEXT loop start against what THIS iteration started
+  with), stop and report "no progress at stage `<stage>` after invoking
+  `<skill>`" instead of looping again. This is the fail-safe for a stage
+  skill whose own engine-verb call came back `invalid`/uncommitted (e.g.
+  `judgeDecompose`'s `{kind:'invalid'}` fail-safe leaves the item exactly
+  where it was, per `decompose.mjs`'s own header) — a real, already-existing
+  outcome this skill must never paper over by just trying again.
+- **Claim right before the FIRST invocation of the `executing`-stage
+  skill, never earlier, and only when not already claimed** (generalizes
+  `/fgOS:cook`'s existing hard rule "never claims before stage executing"
+  into this skill, since it is now the one thing that decides when a
+  stage-skill is about to run): immediately before invoking the skill this
+  loop resolved for stage `executing` (`fgos-executing` in the `coding`
+  domain's registry today), check the item's live `status` from the SAME
+  fresh read this iteration already did. If it is already `doing` (the
+  caller — e.g. `/fgOS:pick`'s own step 2 — already claimed it, or a prior
+  iteration of THIS loop already did), skip claiming and proceed straight
+  to invoking the skill; the session is assumed to already be inside the
+  claimed worktree in that case. Otherwise, claim it now exactly the way
+  `/fgOS:pick`'s own step 2 does:
+
+  ```bash
+  root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
+  node "$root/bin/fgos.mjs" pick "<id>" --dir "$root"
+  ```
+
+  then hand the session into the returned `data.worktree.path` the same
+  way `/fgOS:pick`'s own step 4 does (`EnterWorktree`, falling back to
+  printing the path and stopping if it is unavailable/refuses — never
+  fail or retry past that fallback) — only THEN invoke `fgos-executing`.
 - Every bare `fgos <verb>` this skill calls directly (`list`, to re-read
   state each iteration) is `requiresExistingStore: true` — resolve the main
   checkout root the same way every other stage-skill does and pass it
@@ -83,24 +144,36 @@ asserted to generalize automatically to a domain that does not exist yet.
   stops the moment `item.status === name` (status is not a strict linear
   order like stage is: `blocked`/`awaiting-human`/`wontfix` are branches,
   not points on one line, so this skill never tries to rank them; it only
-  ever needs exact-match ceilings in practice — `status:awaiting-approval`
-  for an execution-loop is the one case named in this item's own design
-  history). `ceiling: stage:executing` or omitting a ceiling entirely
-  means "unlimited" — loop until a person-shaped stop or the item leaves
-  the loop's reach (its own `executing`-stage skill returns it to
-  `awaiting-approval`).
+  ever needs exact-match ceilings in practice). `status:awaiting-approval`
+  no longer needs to be passed explicitly (tsk-19j-4): it is one of the
+  loop's own always-checked implicit stops now, same as `awaiting-human`/
+  `blocked`. Omitting `ceiling` entirely means "unlimited" — loop until a
+  person-shaped stop, an anchor, a no-progress read, or `awaiting-approval`
+  ends it.
 
 ## Loop
 
 ```text
 loop:
   read id's current {stage, status, domain} FRESH via `fgos list --id <id> --json`
+  iterationStartStage, iterationStartStatus = stage, status   # for the no-progress check below
 
   if status == 'awaiting-human':
     stop. Report the parked question back to the caller. Never answer it here.
 
   if status == 'blocked':
     stop. Report the block back to the caller. Never retry blind.
+
+  if status == 'awaiting-approval':
+    stop. Report "returned, awaiting-approval" back to the caller. There is
+    no next stage-skill past this point in this loop's reach.
+
+  openChildren = every item in a fresh `fgos list --all --json` with
+    `parent == id` and `status` NOT IN {delivered, retrospective, cleanup,
+    done, wontfix}
+  if openChildren is non-empty:
+    stop. Report every id in openChildren back to the caller. Do not
+    invoke anything this turn — this item is anchored, not actionable.
 
   domain = getDomain(item.domain)   # registry lookup, never guessed
   if ceiling is 'stage:<name>':
@@ -118,9 +191,18 @@ loop:
     declare no skill there) — nothing left for THIS skill to load; the
     caller's own next step (e.g. `fgos return`) already covers it.
 
+  if skill resolves to the domain's `executing`-stage skill AND status != 'doing':
+    claim `id` (`fgos pick`) and enter its worktree BEFORE invoking — see
+    the claim hard rule above.
+
   invoke `skill` (it runs its own Socratic/shape/implement pass, hits its
   own gate, and — once satisfied — calls the engine verb that actually
   advances stage/status: `fgos discover`/`fgos decompose`/`fgos return`)
+
+  re-read id's current {stage, status} FRESH
+  if stage == iterationStartStage AND status == iterationStartStatus:
+    stop. Report "no progress at stage <stage> after invoking <skill>" —
+    see the no-progress hard rule above. Never loop again on a stuck read.
 
   go back to loop start
 ```
@@ -133,17 +215,17 @@ skill never second-guesses or repeats a stage-skill's own gate.
 
 | Caller | `id` source | `ceiling` |
 |---|---|---|
-| `/fgOS:cook` | freshly submitted item, or a child a `decompose` outcome just created | unlimited (no ceiling) |
-| `/fgOS:pick` | one explicitly claimed item | unlimited (no ceiling) |
+| `/fgOS:cook` | freshly submitted item, or a child this loop's own anchor report just surfaced | none (safe now: `awaiting-approval`/anchor/no-progress are implicit stops, tsk-19j-4) |
+| `/fgOS:pick` | one explicitly claimed item | none (same implicit stops) |
 | a clarify-only sweep | `fgos ready --step Clarify` (needs `frontier(view, {step:'Clarify'})`, tsk-19j Track D's own `frontier.mjs` generalization) | `stage:decompose` |
 | a planning-only sweep | `fgos ready --step Divide` | `stage:executing` |
-| an execution-only sweep | `fgos ready --step Execute` (today's existing frontier default, unchanged) | `status:awaiting-approval` |
+| an execution-only sweep | `fgos ready --step Execute` (today's existing frontier default, unchanged) | none needed (`awaiting-approval` is now implicit — an explicit `status:awaiting-approval` ceiling still works identically, kept for this row's own historical naming) |
 
 This table is descriptive, not a retrofit checklist this skill performs —
 `cook`/`pick` calling this skill instead of their own inline stage-dispatch
-prose is a separate, explicit step (see `plugins/fgOS/skills/cook/SKILL.md`
-and `plugins/fgOS/skills/pick/SKILL.md`), done only once this skill itself
-has been proven correct against the existing behavior it replaces.
+prose is a separate, explicit step (tsk-19j-4: see
+`plugins/fgOS/skills/cook/SKILL.md` and `plugins/fgOS/skills/pick/SKILL.md`
+for how each one actually calls this skill today).
 
 ## Red flags
 
@@ -153,15 +235,24 @@ has been proven correct against the existing behavior it replaces.
   invoked stage-skill's own engine-verb call
 - checking the ceiling after invoking the current stage's skill instead of
   before
-- continuing to loop past `status: awaiting-human` or `status: blocked`
+- continuing to loop past `status: awaiting-human`, `status: blocked`, or
+  `status: awaiting-approval`
 - treating `status:<name>` as a ranked comparison instead of an exact match
 - reusing a stage/status snapshot from a prior loop turn instead of
   re-reading fresh
+- invoking a stage skill while the item is anchored by open children
+  instead of stopping and reporting them
+- looping again after a stage-skill invocation left both `stage` and
+  `status` unchanged, instead of stopping on the no-progress fail-safe
+- claiming an item before its FIRST invocation of the `executing`-stage
+  skill (e.g. at `clarify`/`decompose`), or claiming again when the item's
+  status already reads `doing`
 - asserting this loop generalizes to a domain other than `coding` without
   new evidence for that domain (D10)
 
 Violating the letter of the rules is violating the spirit of the rules.
 
-Ceiling reached, or the item left the loop's reach via a person-shaped
-stop. Report which one to the caller — this skill's own job ends there; it
-never decides what happens next on its own authority.
+Ceiling reached, `awaiting-approval` reached, an anchor by open children,
+a no-progress read, or a person-shaped stop. Report which one to the
+caller — this skill's own job ends there; it never decides what happens
+next on its own authority.

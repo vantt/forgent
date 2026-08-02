@@ -228,6 +228,29 @@ thể, không phải ngại việc:
 "gần như miễn phí") đúng cho phần MAPPING (stage→skill qua registry), sai cho
 phần QUEUE OWNERSHIP mà lúc thảo luận D14 chưa tách bạch.
 
+**`tsk-19j-4` (thi công sau, giải quyết gap trên):** Thiết kế lại kỹ hơn khi
+bắt tay thi công cho thấy "queue ownership" của `cook` thật ra tách được
+gọn thành 3 rule cơ học bổ sung vào chính `fgos-coding-driving` (không phải
+việc riêng của `cook`):
+1. **Anchor check** — item vừa `decompose` sinh con thật KHÔNG được driver
+   tự invoke tiếp (root bị neo bởi con còn mở, đúng `frontier.mjs`'s
+   `hasOpenDescendant`); driver dừng, báo id con còn mở, để caller (cook)
+   tự đẩy con lên đầu queue — đây CHÍNH LÀ phần "queue ownership" thật của
+   `cook`, còn lại (anchor detection) hoá ra thuộc về driver.
+2. **Claim đúng lúc** — driver tự claim (`fgos pick`) ngay trước lần đầu
+   invoke skill stage `executing`, CHỈ khi status chưa `doing` — generalize
+   đúng hard rule cũ của `cook` ("never claim before executing") vào chính
+   driver, `pick` (đã claim từ bước 2 của chính nó) tự nhiên no-op qua nhánh
+   này.
+3. **`awaiting-approval` là implicit stop** — phát hiện thêm: ceiling
+   "unlimited" (không truyền ceiling) tự nó KHÔNG an toàn nếu thiếu điểm
+   dừng tự nhiên này — driver sẽ cố invoke lại skill executing trên item đã
+   return xong. Thêm cùng tier với `awaiting-human`/`blocked`.
+
+Sau 3 bổ sung này, `cook`/`pick` retrofit thật sự "gần như miễn phí" đúng
+như D14 kỳ vọng ban đầu — chỉ còn lại phần queue thật (thứ tự id, push con
+lên đầu) là logic riêng của `cook`.
+
 ## 5. Thứ tự thi công
 
 `tsk-19j-1` trước (nền tảng schema) → `tsk-19j-2` sau (đọc field A vừa có)
