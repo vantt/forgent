@@ -2263,6 +2263,25 @@ async function runVerb(verb, flags, positional, dir) {
               return { id, mode: 'merge', to: 'blocked', reason: 'merge-conflict', target: rootBranch };
             }
 
+            if (result.outcome === 'merge-failed-unclassified') {
+              // tsk-18a D1: git merge --no-commit --no-ff failed but never
+              // created MERGE_HEAD -- not a real textual conflict, so this
+              // gets its own reason instead of being folded into
+              // 'merge-conflict'. Real stderr/exit-code carried through so
+              // this is actually diagnosable, unlike the static
+              // 'merge-conflict' detail string.
+              moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: 'merge-failed-unclassified', role: 'system' });
+              addFriction(dir, {
+                id,
+                disposition: 'blocked',
+                errorClass: 'merge-failed-unclassified',
+                layer: 'state',
+                attempts: 1,
+                detail: `git merge --no-commit --no-ff ${result.branch} into ${rootBranch} failed without a real conflict (exit ${result.error.status}): ${result.error.stderr || result.error.message}; merge aborted, ${rootBranch} unchanged`,
+              });
+              return { id, mode: 'merge', to: 'blocked', reason: 'merge-failed-unclassified', target: rootBranch, error: result.error };
+            }
+
             if (result.outcome === 'fgos-write-rejected') {
               moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: 'fgos-write-rejected', role: 'system' });
               addFriction(dir, {
@@ -2358,6 +2377,27 @@ async function runVerb(verb, flags, positional, dir) {
             detail,
           });
           return { id, mode: 'merge', to: 'blocked', reason, target: 'main' };
+        }
+
+        if (result.outcome === 'merge-failed-unclassified') {
+          // tsk-18a D1: same non-genuine-conflict class as the leaf→root
+          // call site above — never folded into 'merge-conflict'/
+          // 'integration-drift', regardless of hadChildren, since neither
+          // reason is accurate for a failure that never staged a real
+          // conflict in the first place.
+          const detail = hadChildren
+            ? `cross-root integration attempt at main@${currentHead(repoRoot)}; git merge --no-commit --no-ff ${result.branch} failed without a real conflict (exit ${result.error.status}): ${result.error.stderr || result.error.message}; merge aborted, main unchanged`
+            : `git merge --no-commit --no-ff ${result.branch} failed without a real conflict (exit ${result.error.status}): ${result.error.stderr || result.error.message}; merge aborted, main unchanged`;
+          moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: 'merge-failed-unclassified', role: 'system' });
+          addFriction(dir, {
+            id,
+            disposition: 'blocked',
+            errorClass: 'merge-failed-unclassified',
+            layer: 'state',
+            attempts: 1,
+            detail,
+          });
+          return { id, mode: 'merge', to: 'blocked', reason: 'merge-failed-unclassified', target: 'main', error: result.error };
         }
 
         if (result.outcome === 'fgos-write-rejected') {
@@ -2507,12 +2547,17 @@ async function runVerb(verb, flags, positional, dir) {
       // Only a merge-related park is something this mechanism can address —
       // any other blocked reason (e.g. anti-loop-max-visits,
       // runner-crash-reclaim) needs a human's real take/return rework
-      // instead, never an automated catch-up.
-      const CATCHUP_REASONS = new Set(['merge-conflict', 'verify-fail-post-merge', 'integration-drift']);
+      // instead, never an automated catch-up. tsk-18a D1: a
+      // 'merge-failed-unclassified' park is actually the BEST fit for
+      // catchup among these four — the failure wasn't a real conflict, so
+      // simply re-attempting the merge (which is exactly what catchup
+      // does) may just succeed once whatever transient condition caused it
+      // has passed.
+      const CATCHUP_REASONS = new Set(['merge-conflict', 'verify-fail-post-merge', 'integration-drift', 'merge-failed-unclassified']);
       if (!CATCHUP_REASONS.has(item.reason)) {
         throw new StoreError(
           'validation',
-          `catchup: work "${id}" is blocked for reason "${item.reason ?? '(none)'}" — catchup only resolves a merge-related park (merge-conflict/verify-fail-post-merge/integration-drift); use take/return for a manual rework instead.`,
+          `catchup: work "${id}" is blocked for reason "${item.reason ?? '(none)'}" — catchup only resolves a merge-related park (merge-conflict/verify-fail-post-merge/integration-drift/merge-failed-unclassified); use take/return for a manual rework instead.`,
         );
       }
 
