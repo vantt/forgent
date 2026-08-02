@@ -783,7 +783,26 @@ export function abortMergeIfPossible(repoRoot) {
   if (!mergeHeadExists(repoRoot)) {
     return;
   }
-  git(repoRoot, ['merge', '--abort']);
+  try {
+    git(repoRoot, ['merge', '--abort']);
+  } catch (err) {
+    // tsk-18a D2: a concurrent process resolving the SAME writer identity
+    // (main-checkout-lock.mjs's D6 self-recognition "refresh" path treats
+    // it as this call's own session, so tsk-2eq's lock never contends
+    // against it) can clear MERGE_HEAD in the window between the check
+    // above and this abort call -- empirically reproduced: two genuinely
+    // separate processes forced to share one resolved identity, real git
+    // ops racing on one shared checkout, "no merge to abort" on this exact
+    // line. If MERGE_HEAD is gone NOW, the abort's own goal -- no merge
+    // left in progress -- is already satisfied, whatever cleared it;
+    // treat this exactly like the up-front no-op case above, never as a
+    // fatal failure. Any OTHER abort failure (MERGE_HEAD still present)
+    // is a real one and still propagates unchanged.
+    if (!mergeHeadExists(repoRoot)) {
+      return;
+    }
+    throw err;
+  }
 }
 
 async function mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs }) {
@@ -831,12 +850,27 @@ async function mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs }) {
     if (classification && autoResolveDecisionIndexCollision(repoRoot, branch, classification)) {
       selfResolved = true;
     } else {
+      // tsk-18a D1: MERGE_HEAD only exists when git actually staged a real
+      // conflict -- captured BEFORE the abort below, which deletes it as a
+      // side effect of succeeding. Any OTHER failure of this merge call
+      // (e.g. an untracked file colliding with a path `branch` introduces)
+      // never creates MERGE_HEAD at all; blindly reporting 'conflict' on
+      // every failure would misclassify that case and discard the real
+      // git error entirely.
+      const genuineConflict = mergeHeadExists(repoRoot);
       try {
         abortMergeIfPossible(repoRoot);
       } catch (abortErr) {
-        throw new MergeError(`merge of "${branch}" conflicted and "git merge --abort" itself failed: ${abortErr.message}`, { branch });
+        throw new MergeError(`merge of "${branch}" failed and "git merge --abort" itself failed: ${abortErr.message}`, { branch });
       }
-      return { outcome: 'conflict', branch };
+      if (genuineConflict) {
+        return { outcome: 'conflict', branch };
+      }
+      return {
+        outcome: 'merge-failed-unclassified',
+        branch,
+        error: { message: err.message, stderr: err.stderr ?? null, status: err.status ?? null },
+      };
     }
   }
 

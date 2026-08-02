@@ -354,6 +354,38 @@ test('mergeRunnerItem aborts cleanly on a real conflict — main left byte-for-b
   assert.equal(fs.readFileSync(path.join(repoRoot, 'shared.txt'), 'utf8'), 'main-change\n');
 });
 
+// tsk-18a D1: `git merge --no-commit --no-ff` can fail WITHOUT ever
+// creating MERGE_HEAD -- git refuses up front, before starting the merge,
+// when an untracked file at the target checkout collides with a path the
+// incoming branch would introduce ("The following untracked working tree
+// files would be overwritten by merge"). This is not a real textual
+// conflict -- empirically confirmed in a real repo (no mocking): exit 128,
+// `git rev-parse --verify MERGE_HEAD` fails. Must be reported as its own
+// outcome, carrying the real error, never folded into 'conflict'.
+test('mergeRunnerItem reports "merge-failed-unclassified" (not "conflict") when the merge fails without ever creating MERGE_HEAD', async () => {
+  const repoRoot = initRepo();
+  makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'newfile.txt', 'from-branch\n');
+
+  // A stray untracked file already sitting at the exact path the branch
+  // introduces -- e.g. left behind by an interrupted concurrent operation
+  // on a shared checkout, the real-world shape this item's own description
+  // names.
+  fs.writeFileSync(path.join(repoRoot, 'newfile.txt'), 'stray-untracked\n');
+
+  const headBefore = headOf(repoRoot);
+  const result = await mergeRunnerItem(repoRoot, makeItem());
+  assert.equal(result.outcome, 'merge-failed-unclassified');
+  assert.equal(result.branch, 'fgw/demo-item');
+  assert.match(result.error.stderr, /untracked working tree files would be overwritten/);
+  assert.equal(result.error.status, 128);
+  assert.throws(
+    () => git(repoRoot, ['rev-parse', '--verify', 'MERGE_HEAD']),
+    'MERGE_HEAD must never have existed -- this was never a real conflict',
+  );
+  assert.equal(headOf(repoRoot), headBefore, 'HEAD must be unchanged');
+  assert.equal(fs.readFileSync(path.join(repoRoot, 'newfile.txt'), 'utf8'), 'stray-untracked\n', 'the stray untracked file must be left exactly as it was');
+});
+
 // --- mergeRunnerItem: decision-ID collision auto-resolve (tsk-3mv-1 D1a) ---
 // Mirrors the real occurrence (tsk-66l,
 // docs/how-to/resolve-a-decision-id-collision-merge-conflict-on-approve.md):
