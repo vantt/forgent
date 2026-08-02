@@ -477,6 +477,15 @@ export const CLAUDE_CLI_COMMANDS = Object.freeze(['claude']);
  * means blocked (restrictive-by-default, D1, tsk-32n); the actual refusal
  * happens in `resolveExecutorConfig` below, not here (validation-time can't
  * know the final resolved command).
+ *
+ * `model`, when present, must be a non-empty string (tsk-2yp follow-up):
+ * `cfg.models.<tier>` is a single vocabulary shared with the Claude
+ * executor's own tier dispatch (`spawnWorker`), so a cross-provider
+ * capacity whose backend uses a different model-name vocabulary (e.g.
+ * `agy`'s Gemini model strings vs. Claude's `haiku`/`sonnet`/`opus`)
+ * cannot borrow that shared table without breaking Claude's own
+ * tier-to-model resolution. This field lets `resolveCapacityCli`
+ * (domain-2 only, below) substitute a capacity-specific model instead.
  */
 function validateCapacityShape(capacity, label) {
   if (!capacity || typeof capacity !== 'object' || Array.isArray(capacity)) {
@@ -489,6 +498,9 @@ function validateCapacityShape(capacity, label) {
   }
   if (capacity.command !== undefined || capacity.args !== undefined) {
     validateExecutorShape(capacity, label);
+  }
+  if (capacity.model !== undefined && (typeof capacity.model !== 'string' || capacity.model.length === 0)) {
+    throw new RunnerConfigError(`runner config (${label}) "model" must be a non-empty string when present.`);
   }
   if (capacity.allowCrossProvider !== undefined && typeof capacity.allowCrossProvider !== 'boolean') {
     throw new RunnerConfigError(`runner config (${label}) "allowCrossProvider" must be a boolean when present.`);
@@ -917,8 +929,13 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
  * domain 2 (an in-session skill shelling out via Bash, e.g.
  * `fgos-submit-assist`) resolve a capacity's real command/args/provider/
  * model the exact same way domain-1's `spawnWorker` does — reusing
- * `resolveExecutorConfig`/`resolveExecutorCommand`/`modelForTier` verbatim,
- * no second argv-building implementation. Prints `{command,args,provider,
+ * `resolveExecutorConfig`/`resolveExecutorCommand` verbatim, no second
+ * argv-building implementation. Model resolution is the one deliberate
+ * divergence from `spawnWorker` (tsk-2yp follow-up): a capacity's own
+ * `model`, when declared, wins over `modelForTier(cfg, tier)` — needed
+ * for a cross-provider capacity whose backend doesn't share Claude's
+ * model-name vocabulary; `spawnWorker` never reads `capacity.model` and
+ * keeps using `modelForTier` unconditionally. Prints `{command,args,provider,
  * model}` as JSON to stdout on success; a `RunnerConfigError` (unknown
  * capacity, not registered, not present, malformed config) prints its
  * message to stderr and exits non-zero — the same errors
@@ -936,10 +953,16 @@ export async function resolveCapacityCli(capacityId, { prompt = '', cwd = proces
   }
   const root = repoRoot ?? resolveRepoRoot(cwd);
   const fgosDir = fgosDirFromRoot(root);
-  const cfg = ensureRunnerConfig(path.join(root, '.fgos-runner.json'));
+  // Was a direct `ensureRunnerConfig(path.join(root, '.fgos-runner.json'))`
+  // call, bypassing the shared-config-first resolution every other caller
+  // in this file already uses — the one entry point still writing to the
+  // legacy file even after `fgos setup` had already migrated a project to
+  // `.fgos/config.json` (tsk-5vf D2). Fixed to match `bin/fgos.mjs`'s own
+  // callers.
+  const cfg = ensureRunnerConfigForDir(root);
   const capacity = cfg.capacities?.[capacityId];
   const tier = capacity?.tier ?? DEFAULTS.tier;
-  const model = modelForTier(cfg, tier);
+  const model = capacity?.model ?? modelForTier(cfg, tier);
   const { command, args, provider } = resolveExecutorCommand(cfg, { prompt, model, tier, capacityId, fgosDir });
   return { command, args, provider, model };
 }

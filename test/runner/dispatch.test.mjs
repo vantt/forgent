@@ -1539,7 +1539,7 @@ test('resolveCapacityCli propagates resolveExecutorConfig\'s own RunnerConfigErr
   await assert.rejects(() => resolveCapacityCli('submit-assist-classify', { prompt: 'x', repoRoot: root }), RunnerConfigError);
 });
 
-test('the "resolve" CLI entry point (node src/runner/dispatch.mjs resolve <capacityId>) prints {command,args,provider,model} JSON to stdout for a real invocation against this repo\'s own .fgos-runner.json', () => {
+test('the "resolve" CLI entry point (node src/runner/dispatch.mjs resolve <capacityId>) prints {command,args,provider,model} JSON to stdout for a real invocation against this repo\'s own .fgos/config.json', () => {
   const dispatchPath = path.resolve('src/runner/dispatch.mjs');
   const result = spawnSync(process.execPath, [dispatchPath, 'resolve', 'no-such-capacity-configured', '--prompt', 'hello'], {
     encoding: 'utf8',
