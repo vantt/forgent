@@ -2456,6 +2456,113 @@ async function runVerb(verb, flags, positional, dir) {
       return { id, mode: 'verify-only', to: 'delivered', seq: moveResult.event.seq, output: check.output };
     }
 
+    // sync-root (tsk-50i, docs/history/tsk-3bn-merge-conductor-harness-v2/):
+    // merges fgw/<root-id>'s current tip into its real target — `main`, or
+    // fgw/<parentId> for a nested root — WITHOUT touching the root item's
+    // own status/stage (CONTEXT.md's locked contract: this replaces the
+    // ad-hoc `git merge` tsk-3bn's own origin incident required by hand).
+    // Reuses `mergeRunnerItem`'s exact lock/verify path (constraint #1,
+    // fgos-validating's gate) — never a second bespoke merge mechanism.
+    // Unlike `approve`'s root-into-main path, this never deletes fgw/<id>
+    // afterward: the root stays open for further leaf merges.
+    case 'sync-root': {
+      const id = requireField(positional[0] ?? flags.id, 'sync-root requires a root-id: fgos sync-root <root-id>');
+      const view = listWork(dir);
+      const item = view.work[id];
+      if (!item) {
+        throw new StoreError('validation', `sync-root: work "${id}" not found.`);
+      }
+
+      const repoRoot = process.cwd();
+      if (!isMainWorktree(repoRoot)) {
+        throw new StoreError(
+          'validation',
+          `sync-root: refusing to run from "${repoRoot}" — sync-root must land on the main checkout, which a linked worktree structurally is not.`,
+        );
+      }
+
+      const branch = branchNameFor(id);
+      if (!branchExists(repoRoot, branch)) {
+        throw new StoreError('validation', `sync-root: branch "${branch}" does not exist — nothing to sync.`);
+      }
+      const targetBranch = item.parent ? branchNameFor(item.parent) : detectTrunk(repoRoot);
+      if (item.parent && !branchExists(repoRoot, targetBranch)) {
+        throw new StoreError('validation', `sync-root: target branch "${targetBranch}" (from "${id}"'s parent "${item.parent}") does not exist.`);
+      }
+
+      // Iron Law gate — same evidence, same acknowledgment flag, same
+      // "refuse before any git mutation" discipline `approve` already
+      // applies to a runner-sourced item (source is 'runner' here by
+      // construction: branchExists(branch) just confirmed it above).
+      const runnerOwnDiff = changedFiles(repoRoot, item, item.parent ? { trunk: targetBranch } : {});
+      const ironLaw = classifyIronLaw({ filesChanged: runnerOwnDiff, description: item.description });
+      if (ironLaw.required && flags['acknowledge-iron-law'] !== true) {
+        throw new StoreError(
+          'validation',
+          `sync-root: "${id}" trips the Iron Law — a failing test must precede this self-modifying diff before it can land. `
+            + `Matched flags: [${ironLaw.matchedFlags.join(', ') || 'none'}]; matched modules: [${ironLaw.matchedModules.join(', ') || 'none'}]. `
+            + `Re-run with --acknowledge-iron-law to confirm failing-test-first proof and proceed.`,
+        );
+      }
+
+      const timeoutMs = resolveVerifyTimeoutMs('sync-root', flags, process.cwd());
+      const { noWait, waitMs } = parseWaitFlags(flags, 'sync-root');
+      const runMerge = (mergeFn) => (noWait ? mergeFn() : withLockRetry(mergeFn, { waitMs }));
+
+      const runAndReport = async (mergeRoot, lockRoot) => {
+        const result = await runMerge(() => mergeRunnerItem(mergeRoot, item, lockRoot ? { timeoutMs, lockRoot } : { timeoutMs }));
+
+        if (result.outcome === 'conflict') {
+          addFriction(dir, {
+            id,
+            disposition: 'blocked',
+            errorClass: 'merge-conflict',
+            layer: 'state',
+            attempts: 1,
+            detail: `sync-root: git merge --no-commit --no-ff ${branch} into ${targetBranch} conflicted; merge aborted, ${targetBranch} unchanged`,
+          });
+          return { id, mode: 'sync-root', outcome: 'blocked', reason: 'merge-conflict', target: targetBranch, branch };
+        }
+        if (result.outcome === 'fgos-write-rejected') {
+          addFriction(dir, {
+            id,
+            disposition: 'blocked',
+            errorClass: 'fgos-write-blocked',
+            layer: 'state',
+            attempts: 1,
+            detail: `sync-root: ${branch} staged a change under .fgos/ (${result.paths.join(', ')}); merge aborted, ${targetBranch} unchanged — ADR0020`,
+          });
+          return { id, mode: 'sync-root', outcome: 'blocked', reason: 'fgos-write-rejected', target: targetBranch, branch, paths: result.paths };
+        }
+        if (result.outcome === 'verify-fail') {
+          addFriction(dir, {
+            id,
+            disposition: 'blocked',
+            errorClass: 'verify-miss',
+            layer: 'verification',
+            attempts: 1,
+            detail: `sync-root: goal-check failed on staged merge of ${branch} into ${targetBranch} (exit ${result.check.status}); merge aborted, ${targetBranch} unchanged`,
+          });
+          return { id, mode: 'sync-root', outcome: 'blocked', reason: 'verify-fail', target: targetBranch, branch, exitStatus: result.check.status, output: result.check.output };
+        }
+
+        // Success — status/stage of `id` is deliberately UNTOUCHED (the
+        // locked contract). Only a real decision record marks this sync
+        // happened, same append door `fgos decision` itself uses.
+        const { event } = addDecision(dir, {
+          text: `sync-root: merged ${branch} into ${targetBranch} at ${currentHead(mergeRoot)}`,
+          rationale: `fgos sync-root ${id} — closes the drift window this item's own design exists to prevent`,
+          id,
+        });
+        return { id, mode: 'sync-root', outcome: 'synced', target: targetBranch, branch, seq: event.seq, output: result.check.output };
+      };
+
+      if (item.parent) {
+        return await withMergeEphemeralWorktree(repoRoot, item.parent, async (ephemeral) => runAndReport(ephemeral.path, repoRoot));
+      }
+      return await runAndReport(repoRoot);
+    }
+
     // Cổng duyệt — reject (pr-lifecycle D4): awaiting-approval -> todo, reason
     // mandatory (fsm.mjs already enforces this edge). NEVER runs a single git
     // command — the code (if any landed on main via a pull-door item) is
@@ -3035,7 +3142,7 @@ async function runVerb(verb, flags, positional, dir) {
     }
 
     default:
-      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <init|add|submit|discover|decompose|move|retrospective|cleanup|edit|ask|answer|decision|list|ready|rebuild|repair|check|rollup|take|return|review|approve|reject|catchup|evolve|triage|session|goal|tool|setup|doctor|unlock|lock-status> ...`);
+      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <init|add|submit|discover|decompose|move|retrospective|cleanup|edit|ask|answer|decision|list|ready|rebuild|repair|check|rollup|take|return|review|approve|sync-root|reject|catchup|evolve|triage|session|goal|tool|setup|doctor|unlock|lock-status> ...`);
   }
 }
 

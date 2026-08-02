@@ -4917,6 +4917,164 @@ test('approve of a leaf item whose OWN commit touches a gated module (src/runner
   assert.equal(stateView(cwd).work[leafId].status, 'awaiting-approval');
 });
 
+// --- sync-root (tsk-50i, docs/history/tsk-3bn-merge-conductor-harness-v2/) -
+//
+// Merges fgw/<root-id>'s current tip into its real target (main, or
+// fgw/<parentId> for a nested root) WITHOUT changing the root item's own
+// status/stage — unlike approve, which always advances an item's FSM
+// status. Reuses mergeRunnerItem's exact lock/verify path (constraint #1
+// from fgos-validating's feasibility gate).
+
+// Simulates a root whose branch has already advanced past main (a leaf's
+// work already landed on fgw/<rootId>, e.g. via approve's own leaf-into-root
+// path) — the exact drift shape tsk-3bn's own origin incident reproduced.
+// The root item's own status stays 'doing' throughout (a root mid-flight,
+// not yet closed) — sync-root must never touch it.
+function makeDriftedRoot(cwd, rootId, opts = {}) {
+  const dir = path.join(cwd, '.fgos');
+  addWork(dir, { id: rootId, title: `Title ${rootId}`, kind: 'task', status: 'todo', deps: [], risk: 'low', refs: [], verify: opts.verify ?? 'true', ...(opts.parent ? { parent: opts.parent } : {}) });
+  commitPending(cwd, `state: add ${rootId}`);
+  run(cwd, ['move', rootId, '--to', 'doing']);
+  commitPending(cwd, `state: claim ${rootId}`);
+
+  gitAtCwd(cwd, ['checkout', '-b', `fgw/${rootId}`]);
+  fs.writeFileSync(path.join(cwd, `${rootId}-produced.txt`), 'ok\n');
+  gitAtCwd(cwd, ['add', `${rootId}-produced.txt`]);
+  gitAtCwd(cwd, ['commit', '-q', '-m', `leaf work merged into fgw/${rootId}`]);
+  gitAtCwd(cwd, ['checkout', 'main']);
+}
+
+test('sync-root on a nonexistent id is rejected as validation, exit 4', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  const result = run(cwd, ['sync-root', 'sync-root-ghost']);
+  assert.equal(result.status, 4);
+});
+
+test('sync-root on a root with no fgw/<id> branch is rejected as validation, exit 4', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  addOk(cwd, 'sync-root-no-branch', { verify: 'true' });
+  const result = run(cwd, ['sync-root', 'sync-root-no-branch']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /does not exist/);
+});
+
+test('sync-root happy path: merges fgw/<root> into main, root item status/stage UNCHANGED, fgw/<root> survives (not deleted)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeDriftedRoot(cwd, 'sync-root-happy', { verify: `test -f sync-root-happy-produced.txt` });
+  commitPendingBeforeApprove(cwd, 'sync-root-happy');
+
+  const result = run(cwd, ['sync-root', 'sync-root-happy']);
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.outcome, 'synced');
+  assert.equal(data.target, 'main');
+  assert.equal(data.branch, 'fgw/sync-root-happy');
+
+  assert.ok(fs.existsSync(path.join(cwd, 'sync-root-happy-produced.txt')), 'the synced content must land on main');
+
+  const view = stateView(cwd);
+  assert.equal(view.work['sync-root-happy'].status, 'doing', 'sync-root must never change the root item\'s own status');
+
+  const branches = gitAtCwd(cwd, ['for-each-ref', '--format=%(refname:short)', 'refs/heads/fgw/']);
+  assert.match(branches, /fgw\/sync-root-happy\b/, 'sync-root must NOT delete the root branch — it stays open for further leaf merges');
+});
+
+test('sync-root records a real decision on the root item', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeDriftedRoot(cwd, 'sync-root-decision', { verify: 'true' });
+  commitPendingBeforeApprove(cwd, 'sync-root-decision');
+
+  const result = run(cwd, ['sync-root', 'sync-root-decision']);
+  assert.equal(result.status, 0, result.stderr);
+
+  const lines = eventLines(cwd);
+  const decisionEvents = lines.map((l) => JSON.parse(l)).filter((e) => e.type === 'decision' && e.payload?.id === 'sync-root-decision');
+  assert.equal(decisionEvents.length, 1, 'sync-root must append exactly one real decision record');
+  assert.match(decisionEvents[0].payload.text, /sync-root-decision|fgw\/sync-root-decision/);
+});
+
+test('sync-root nested: a root with a parent merges into fgw/<parentId>, not main; main stays untouched; the child root\'s status stays unchanged', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  // grandroot (target for the nested sync) is itself a plain root with a
+  // real branch but no drift of its own.
+  const dir = path.join(cwd, '.fgos');
+  addWork(dir, { id: 'sync-root-grandparent', title: 'Title grandparent', kind: 'task', status: 'todo', deps: [], risk: 'low', refs: [], verify: 'true' });
+  commitPending(cwd, 'state: add grandparent');
+
+  // fgw/<grandparent> must be cut AFTER the child's own state events (add +
+  // claim, inside makeDriftedRoot) already landed on main — cutting it
+  // earlier leaves fgw/child's later commits carrying a legitimate .fgos/
+  // diff relative to fgw/grandparent (the child's add/claim events main
+  // gained afterward), which mergeRunnerItem's ADR0020 guard correctly
+  // refuses as fgos-write-rejected. Same ordering makeDriftedRoot's own
+  // `checkout -b fgw/<rootId>` already relies on for its OWN branch.
+  makeDriftedRoot(cwd, 'sync-root-nested-child', { parent: 'sync-root-grandparent', verify: `test -f sync-root-nested-child-produced.txt` });
+  gitAtCwd(cwd, ['branch', 'fgw/sync-root-grandparent', 'main']);
+  commitPendingBeforeApprove(cwd, 'sync-root-nested-child');
+
+  const headBefore = gitHead(cwd);
+  const result = run(cwd, ['sync-root', 'sync-root-nested-child']);
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.target, 'fgw/sync-root-grandparent');
+
+  assert.equal(gitHead(cwd), headBefore, 'main must be byte-for-byte unchanged by a nested sync-root');
+  assert.equal(
+    fs.existsSync(path.join(cwd, 'sync-root-nested-child-produced.txt')),
+    false,
+    'the nested child\'s content must not land on the human\'s own main checkout',
+  );
+  const producedOnParent = gitAtCwd(cwd, ['show', 'fgw/sync-root-grandparent:sync-root-nested-child-produced.txt']);
+  assert.match(producedOnParent, /ok/);
+
+  const view = stateView(cwd);
+  assert.equal(view.work['sync-root-nested-child'].status, 'doing');
+});
+
+test('sync-root aborts cleanly on a genuine conflict: main left byte-for-byte unchanged, root status untouched', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeDriftedRoot(cwd, 'sync-root-conflict', { verify: 'true' });
+  // Create a conflicting change on main AFTER the root branch forked, on
+  // the exact same path the root's own commit touches.
+  fs.writeFileSync(path.join(cwd, 'sync-root-conflict-produced.txt'), 'conflicting main content\n');
+  gitAtCwd(cwd, ['add', 'sync-root-conflict-produced.txt']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', 'unrelated main edit that collides']);
+  commitPendingBeforeApprove(cwd, 'sync-root-conflict');
+
+  const headBefore = gitHead(cwd);
+  const result = run(cwd, ['sync-root', 'sync-root-conflict']);
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.outcome, 'blocked');
+  assert.equal(data.reason, 'merge-conflict');
+
+  assert.equal(gitHead(cwd), headBefore, 'main must be byte-for-byte unchanged after an aborted sync-root');
+  assert.equal(stateView(cwd).work['sync-root-conflict'].status, 'doing', 'a blocked sync-root must never touch the root item\'s status');
+});
+
+test('sync-root refuses from inside a linked worktree (must land on the real main checkout)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeDriftedRoot(cwd, 'sync-root-worktree-guard', { verify: 'true' });
+  commitPendingBeforeApprove(cwd, 'sync-root-worktree-guard');
+
+  const wtParent = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-cli-sync-root-wt-'));
+  const wt = path.join(wtParent, 'wt');
+  gitAtCwd(cwd, ['worktree', 'add', '-q', '-b', 'sync-root-side-branch', wt]);
+
+  const result = spawnSync(process.execPath, [FGOS, 'sync-root', 'sync-root-worktree-guard'], { cwd: wt, encoding: 'utf8' });
+  assert.equal(result.status, 4, result.stderr);
+  assert.match(result.stderr, /main checkout/);
+
+  gitAtCwd(cwd, ['worktree', 'remove', '--force', wt]);
+});
+
 test('reject on a nonexistent id is rejected as validation, exit 4', () => {
   const cwd = tmpCwd();
   const result = run(cwd, ['reject', 'ghost', '--reason', 'nope']);
@@ -4969,11 +5127,11 @@ test('reject moves awaiting-approval -> todo with the reason recorded, role huma
   assert.equal(lastEvent.payload.role, 'human');
 });
 
-test('the CLI usage message for an unknown verb lists review/approve/reject in the surface', () => {
+test('the CLI usage message for an unknown verb lists review/approve/sync-root/reject in the surface', () => {
   const cwd = tmpCwd();
   const result = run(cwd, ['bogus-verb']);
   assert.equal(result.status, 4);
-  assert.match(result.stderr, /review\|approve\|reject/);
+  assert.match(result.stderr, /review\|approve\|sync-root\|reject/);
 });
 
 // --- `review`/`approve` --github (github-adapter D1/D3/D5) -------------------
