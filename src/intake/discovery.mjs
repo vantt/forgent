@@ -24,7 +24,6 @@
 
 import path from 'node:path';
 import { modelForTier } from '../runner/dispatch.mjs';
-import { loadTemplate } from '../runner/prompt-templates.mjs';
 import { runJudgeExecutor, JUDGE_STRICT_JSON_SUFFIX, readScoutNotes } from './judge-executor.mjs';
 import { readLockedContext } from './decompose.mjs';
 import { DEFAULTS } from '../state/work.mjs';
@@ -85,9 +84,36 @@ function buildGraphContextBlock(work, view) {
   ].join('\n');
 }
 
+// tsk-4rd (route A, discover-research-recipe D2 "enrich"): `deps` are real
+// work-item ids (dep-graph invariant, RUL — never free text like `refs`),
+// so their actual title/description can be looked up in `view.work` and
+// shown in full — không chỉ liệt kê id — cho model hiểu "task liên đới đã
+// làm/chưa làm" thay vì suy đoán từ 1 chuỗi id. `refs` stays a raw list
+// (file paths/doc links, not guaranteed work-item ids — no safe lookup).
+// Truncated per entry so a heavy fan-in item's dep list stays bounded.
+const RELATED_ITEM_DESCRIPTION_MAX_CHARS = 300;
+
+function buildRelatedItemsBlock(work, view) {
+  const depIds = Array.isArray(work.deps) ? work.deps : [];
+  if (!depIds.length) return '(item này không có dependency nào)';
+  if (!view?.work) return '(không có view — không tra được nội dung dependency)';
+
+  return depIds
+    .map((id) => {
+      const dep = view.work[id];
+      if (!dep) return `- ${id}: (không tìm thấy trong store — có thể đã bị xoá/đổi id)`;
+      const desc = typeof dep.description === 'string' && dep.description.trim() ? dep.description.trim() : '(không có mô tả)';
+      const snippet =
+        desc.length > RELATED_ITEM_DESCRIPTION_MAX_CHARS ? `${desc.slice(0, RELATED_ITEM_DESCRIPTION_MAX_CHARS)}…` : desc;
+      return `- ${id} [status:${dep.status} stage:${dep.stage ?? '-'}] "${dep.title}"\n  ${snippet}`;
+    })
+    .join('\n');
+}
+
 function buildDiscoveryPrompt(work, view, priorScoutNotes) {
   const refs = Array.isArray(work.refs) && work.refs.length ? work.refs.join(', ') : '(none)';
   const deps = Array.isArray(work.deps) && work.deps.length ? work.deps.join(', ') : '(none)';
+  const relatedItems = buildRelatedItemsBlock(work, view);
   const description =
     typeof work.description === 'string' && work.description.trim() ? work.description : '(không có)';
 
@@ -138,6 +164,9 @@ ${graphContext}
 # Mô tả đầy đủ (nguyên văn lúc submit)
 ${description}
 
+# Task liên đới (nội dung thật của từng dependency, không chỉ id)
+${relatedItems}
+
 # Hỏi-đáp với người
 ${qa}
 
@@ -145,26 +174,56 @@ ${qa}
 ${history}
 ${
   priorScoutNotes
-    ? `\n# Kết quả scout đã lưu (LẦN TRƯỚC — dùng lại, KHÔNG rg lại cùng truy vấn)\n${priorScoutNotes}\n`
+    ? `\n# Kết quả scout đã lưu (từ lần phán trước — dùng làm nền, có thể bổ sung thêm nếu bạn thấy chưa đủ)\n${priorScoutNotes}\n`
     : ''
 }
-${loadTemplate('judge-scout-instructions.txt')}
-Câu trả lời của người ở trên là QUYẾT ĐỊNH CUỐI CÙNG — KHÔNG hỏi lại một chủ đề
-đã được trả lời. Nếu câu trả lời đã đủ để thi công, verdict phải clear=true kèm
-một \`verify\` chạy được thật.
+# Cách làm việc (theo thứ tự)
+
+1. **Làm sạch yêu cầu.** Đọc "Mô tả đầy đủ" ở trên, tự phát biểu lại trong
+   đầu cho hoàn chỉnh (đối tượng + hành động + phạm vi). Chỉ viết ra ở
+   \`titleProposal\`/\`descriptionProposal\` bên dưới nếu bản gốc thật sự
+   thiếu/mơ hồ và bản bạn viết lại RÕ RÀNG tốt hơn — không đổi chỉ để đổi.
+
+2. **Đọc "Task liên đới" ở trên.** Đây là nội dung thật (không chỉ id) của
+   từng dependency — dùng để hiểu phần nào của scope đã có người làm/quyết
+   định rồi, phần nào chưa.
+
+3. **Tự đánh giá.** Với dữ liệu đã có (mô tả + task liên đới + hỏi-đáp +
+   lịch sử phán trước + scout notes nếu có), item đã đủ rõ để thi công
+   chưa?
+
+4. **Nếu CHƯA đủ rõ và bạn có công cụ** (Bash chạy \`rg\`, Read/Grep/Glob để
+   đọc code, WebSearch/WebFetch để tra cứu ngoài, Task để giao việc song
+   song cho subagent) — TỰ ĐI TÌM THÊM bằng chứng trước khi kết luận
+   unclear: quét code liên quan trong repo cho câu hỏi riêng của repo này;
+   tra cứu online cho câu hỏi kỹ thuật chung (không riêng gì repo này).
+   Ngân sách: khoảng 5 lượt gọi công cụ nghiên cứu cho 1 lần phán — ưu tiên
+   chất lượng bằng chứng hơn số lượt gọi. CHỈ kết luận unclear SAU KHI đã
+   thử tìm thêm, không phải ngay khi thấy thiếu thông tin.
+
+5. **Không có tool nào khả dụng** — bỏ qua bước 4, phán trên dữ liệu đã có,
+   không tự bịa bằng chứng, không giả vờ đã scout. Không có kết quả tìm
+   kiếm cũng là bằng chứng hợp lệ (nghĩa là chưa có gì liên quan) — không
+   phải lý do để bỏ qua bước 4.
+
+Câu trả lời của người ở trên (mục "Hỏi-đáp với người") là QUYẾT ĐỊNH CUỐI
+CÙNG — KHÔNG hỏi lại một chủ đề đã được trả lời. Nếu câu trả lời đã đủ để
+thi công, verdict phải clear=true kèm một \`verify\` chạy được thật.
 
 # Câu hỏi
 Item này đã đủ rõ để thi công chưa? Nếu đủ, đề xuất một lệnh \`verify\` chạy
-được thật để chứng minh việc đã xong. Nếu chưa đủ, nêu MỘT câu hỏi cụ thể cần
-người trả lời để làm rõ. Ngoài ra, ƯỚC LƯỢNG (không tính lại số \`blocks\` đã
-cho ở trên) mức độ item này LIÊN QUAN tới feature/release khác — có giải
-quyết/mở khoá được gì ngoài phạm vi hẹp của chính nó không — bằng một số
-nguyên impactScore từ 0 đến 100 (0 = biệt lập, 100 = ảnh hưởng rất rộng);
-trường này TÙY CHỌN, không ảnh hưởng đến quyết định clear/unclear.
+được thật để chứng minh việc đã xong. Nếu chưa đủ — VÀ chỉ sau khi đã thử
+bước 4 ở trên — nêu MỘT câu hỏi cụ thể cần người trả lời để làm rõ, kèm tóm
+tắt ngắn những gì bạn đã thử tìm mà vẫn chưa đủ (để không ai phải scout lại
+từ đầu). Ngoài ra, ƯỚC LƯỢNG (không tính lại số \`blocks\` đã cho ở trên)
+mức độ item này LIÊN QUAN tới feature/release khác — có giải quyết/mở khoá
+được gì ngoài phạm vi hẹp của chính nó không — bằng một số nguyên
+impactScore từ 0 đến 100 (0 = biệt lập, 100 = ảnh hưởng rất rộng); trường
+này TÙY CHỌN, không ảnh hưởng đến quyết định clear/unclear.
 
 # Định dạng trả lời
 Trả lời DUY NHẤT bằng một dòng JSON, không kèm chữ nào khác:
-{"clear": boolean, "question": string (chỉ khi clear=false), "verify": string (chỉ khi clear=true), "impactScore": number nguyên từ 0 đến 100 (tùy chọn)}
+{"clear": boolean, "question": string (chỉ khi clear=false), "verify": string (chỉ khi clear=true), "impactScore": number nguyên từ 0 đến 100 (tùy chọn), "titleProposal": string (tùy chọn, chỉ khi bản gốc thật sự cần sửa), "descriptionProposal": string (tùy chọn, chỉ khi bản gốc thật sự cần sửa)}
 `;
 }
 
@@ -206,9 +265,19 @@ export function judgeDiscovery(work, cfg, view, scoutContext, fgosDir) {
     const prompt = buildDiscoveryPrompt(work, view, priorScoutNotes);
     const stricterPrompt = prompt + JUDGE_STRICT_JSON_SUFFIX;
 
-    const scout = scoutContext
-      ? { repoRoot: scoutContext.repoRoot, docsRef: scoutContext.docsRef, capture: !priorScoutNotes }
-      : undefined;
+    // tsk-4rd (route A): capture is now ALWAYS attempted when a
+    // scoutContext is given, never gated on `!priorScoutNotes`. Before this,
+    // a thin first-round scout note got reused forever — every later
+    // discover call on the same item saw the exact same (possibly
+    // insufficient) evidence, which is the direct cause of a stale item
+    // getting the same "unclear" verdict round after round (dogfood
+    // observed: 15-round discover-loop run, 0 cleared, 4 parked). Each
+    // call's own transcript now overwrites scout-notes.md with THIS round's
+    // fresh evidence (`writeScoutNotes` already overwrites wholesale) — a
+    // round that finds nothing new just leaves the file as the prior
+    // round's evidence, since `runJudgeExecutor` only writes when it
+    // actually captured entries.
+    const scout = scoutContext ? { repoRoot: scoutContext.repoRoot, docsRef: scoutContext.docsRef, capture: true } : undefined;
     const verdict = runJudgeExecutor(cfg, model, prompt, stricterPrompt, scout, 'judge-discovery', fgosDir);
     if (!verdict || typeof verdict.clear !== 'boolean') {
       return { clear: false, question: DEFAULT_UNCLEAR_QUESTION };
@@ -221,6 +290,23 @@ export function judgeDiscovery(work, cfg, view, scoutContext, fgosDir) {
     // both return sites below.
     const impactScore = Number.isInteger(verdict.impactScore) ? verdict.impactScore : undefined;
 
+    // tsk-4rd (route A, recipe step 1 "làm sạch yêu cầu"): PROPOSALS only —
+    // rides on either outcome exactly like `impactScore`, never gates
+    // clear/unclear, and is never applied to `work.title`/`work.description`
+    // by this function. Auto-overwriting a user-authored field is a product
+    // decision this item didn't make (review-audit-self-decision: don't
+    // silently undo a user decision) — `resolveDiscovery`'s existing
+    // `addDiscovery(dir, { id, ...verdict })` spread already persists
+    // whichever of these two fields are present, visible via
+    // `view.discovery[id]`/`fgos show <id>`, for a person to read and apply
+    // by hand (`fgos edit <id> --title/--description`) — no separate write.
+    const titleProposal =
+      typeof verdict.titleProposal === 'string' && verdict.titleProposal.trim() ? verdict.titleProposal.trim() : undefined;
+    const descriptionProposal =
+      typeof verdict.descriptionProposal === 'string' && verdict.descriptionProposal.trim()
+        ? verdict.descriptionProposal.trim()
+        : undefined;
+
     if (!verdict.clear) {
       const question =
         typeof verdict.question === 'string' && verdict.question.trim()
@@ -229,6 +315,12 @@ export function judgeDiscovery(work, cfg, view, scoutContext, fgosDir) {
       const out = { clear: false, question };
       if (impactScore !== undefined) {
         out.impactScore = impactScore;
+      }
+      if (titleProposal !== undefined) {
+        out.titleProposal = titleProposal;
+      }
+      if (descriptionProposal !== undefined) {
+        out.descriptionProposal = descriptionProposal;
       }
       return out;
     }
@@ -239,6 +331,12 @@ export function judgeDiscovery(work, cfg, view, scoutContext, fgosDir) {
     }
     if (impactScore !== undefined) {
       out.impactScore = impactScore;
+    }
+    if (titleProposal !== undefined) {
+      out.titleProposal = titleProposal;
+    }
+    if (descriptionProposal !== undefined) {
+      out.descriptionProposal = descriptionProposal;
     }
     return out;
   } catch {
