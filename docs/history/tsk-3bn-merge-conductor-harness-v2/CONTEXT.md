@@ -34,7 +34,8 @@ In scope:
   shared-root | deps-chain`); adds a `blocked-on-sync` bucket for items
   whose parent root has unresolved drift.
 - **Two-tier verification** — every `ready`/`mergeSets` entry gets a
-  `tier: leaf-to-root | root-to-main` field; `root-to-main` gets the
+  `mergeTier: leaf-to-root | root-to-main` field (D7 — named `mergeTier`,
+  not the canonical reports' bare `tier`); `root-to-main` gets the
   stricter verify/drift/footprint scope per the locked table (design
   report §G, reproduced under Canonical references below).
 - **`mergeAfter: [ids]`** (new field, D4/D5) — a weak, merge-order-only
@@ -79,6 +80,7 @@ Out of scope (explicitly deferred, not this item):
 | D4 | `mergeAfter: [ids]` — a new, weak, merge-order-only field — is IN v1 scope (tsk-3hk's original proposal, reconsidered). Initial analysis found no case in the 3 locked `mergeSets` reasons (`footprint-overlap`/`shared-root`/`deps-chain`) that needs it — each already resolves via an existing field. User overrode with real, grounded counter-evidence: release-order preference independent of code/footprint/shared-root is a real, recurring, often-spontaneous need ("want X to land first"), not hypothetical. Kept minimal: no new `mergeSets` reason category, no new escalation path — the field only extends the existing `waiting` gate (`graph-harness.mjs`) the same way unmet `deps` already does; `frontier.mjs` deliberately never reads it, so start-eligibility is unaffected. Settable anytime via `fgos edit --merge-after`, matching its spontaneous-decision nature — not fixed only at planning/decompose time. Unset (default/common case) is a pure no-op: existing auto-computed order (rankImpact + the new clustering) applies exactly as already locked; `mergeAfter` only fires when a person deliberately sets it. Set is a hard gate, not a soft priority nudge — matches "human has their own plan" being meant literally, not just a ranking hint another item's priority could override. |
 | D5 | `mergeAfter` is implemented as the `waits-for` edge kind `dep-graph.mjs`'s own header comment already reserves ("declared vocabulary only... that is S2b's job once a real stored form + producer exist") — not a bespoke second validation path. Setting it goes through the SAME write-door validation `deps`/`parent` already get in `store.mjs` (lines 178-179/259-260 today): target-id existence (mirrors `validateDeps`), no self-reference, and `assertNoUnifiedCycle` extended to include `waits-for` edges in the unified adjacency alongside `blocks`(deps)/`parent-child` — so a cycle MIXING `mergeAfter` with `deps`/`parent` (e.g. A `deps:[B]` + B `mergeAfter:[A]`, a real deadlock: A can't start until B resolved, B can't merge until A resolved) is caught at set-time, not discovered later as a stuck item. Answers the user's explicit ask: mergeAfter may only be set when it keeps the unified graph valid. |
 | D6 | Closing `tsk-3hk` `wontfix` (D3) had a real consequence caught in a follow-up review: `tsk-2ie` and `tsk-3gx` both had `deps` on `tsk-3hk`. `wontfix` is a RESOLVED status, so `tsk-2ie` (deps: `[tsk-3hk]` only) became falsely deps-ready (verified via direct `isDepsAndLineageReady()` call: `true` before, `false` after) despite the `graph-harness.mjs` layer it needs not existing yet. Both repointed: `tsk-2ie` → `deps: [tsk-3bn]`, `tsk-3gx` → `deps: [tsk-3bn]` (deduped, was `[tsk-3bn, tsk-3hk]`). Full backlog sweep after the fix found no other item still referencing `tsk-3hk` in `deps`, and no children of `tsk-3hk` (`parent` field) to orphan. |
+| D7 | The design's two-tier-verify field is named `mergeTier`, not the canonical reports' bare `tier`, on `mergeReadiness`'s output. Caught in a second review pass: `work.tier` already exists (`work.mjs`'s `TIERS = ['light','standard','heavy']`) as a stored, persistent field on every work item — the item's own cost/model-weight (tsk-3bn itself carries `tier: 'heavy'`). Reusing the bare name for `leaf-to-root`/`root-to-main` on the same entity type would either risk an implementer overwriting the real field or at minimum cause serious reader confusion (`item.tier` meaning two unrelated things depending on code path). No functional trade-off to weigh — pure rename before this reaches planning. |
 
 ## Pinned terms
 
@@ -95,9 +97,14 @@ redefined.)
 - **merge set** — the design report's DAG-computed cluster of items that
   must merge together in a determined order (footprint overlap, shared
   root, or deps chain) — not just a pairwise conflict exclusion.
-- **tier** (`leaf-to-root` / `root-to-main`) — which verify/drift/footprint
-  scope table row (design report §G) an item's merge falls under, derived
-  from whether its target is its own parent root or `main` directly.
+- **mergeTier** (`leaf-to-root` / `root-to-main`) — which verify/drift/
+  footprint scope table row (design report §G) an item's merge falls
+  under, derived from whether its target is its own parent root or `main`
+  directly. Named `mergeTier`, not the canonical reports' bare `tier`
+  (D7) — `work.tier` already exists as a stored, persistent field with a
+  completely different domain (`light`/`standard`/`heavy`, the item's own
+  cost/model-weight, `work.mjs`'s `TIERS`) and a different meaning; reusing
+  the bare name on `mergeReadiness`'s output would collide.
 - **mergeAfter** — a weak edge distinct from `deps`: blocks an item's
   *merge* until its targets are RESOLVED, but never blocks the item's own
   *start/dispatch* the way `deps` does. Exists specifically to let two
@@ -106,7 +113,12 @@ redefined.)
 ## Scout evidence
 
 - `src/state/graph-harness.mjs:40` — `mergeReadiness(view)` exists today,
-  pure, in-memory; no `driftStatus`, no `mergeSets`, no `tier` field yet.
+  pure, in-memory; no `driftStatus`, no `mergeSets`, no `mergeTier` field
+  yet.
+- `src/state/work.mjs` (`TIERS = ['light','standard','heavy']`) —
+  confirmed `work.tier` is a real, distinct, already-used field before
+  naming the new merge-scope field `mergeTier` instead of bare `tier`
+  (D7).
 - `bin/fgos.mjs:34,1336-1358` — `merge next`/`merge list` call
   `mergeReadiness` directly; no `sync-root` case exists in the verb
   dispatch today.
