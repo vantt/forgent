@@ -2062,18 +2062,28 @@ async function runVerb(verb, flags, positional, dir) {
       // gate, contradicting D16's "one common point for every runner-sourced
       // proposal, not just the local path". One check point now guards BOTH
       // merge transports identically, before either can run. changedFiles
-      // diffs the item's own branch against the default trunk, so a leaf
-      // over-reports its file set (superset of its real leaf-vs-root diff) —
-      // the fail-safe direction, accepted as-is (unchanged from before this
-      // hoist). Refuses BEFORE any git mutation or GitHub call: the item
-      // stays `proposed`, nothing is touched, neither transport is reached.
-      // Hoisted alongside the Iron Law gate (tsk-598 D1/D2): the local-merge
-      // branch's own clean-tree check, further below, reuses this exact
-      // array as its ownFileSet source instead of recomputing the same
-      // branch-vs-trunk diff a second time.
+      // diffs the item's own branch against its resolved root's branch (the
+      // same D3 leaf-vs-root split already used for the human-viewable diff,
+      // the GitHub PR base, the real merge target, and `catchup`'s target —
+      // never blind trunk for a leaf) so the file set reflects the item's
+      // own real diff, not every ancestor commit's files too
+      // (tsk-4voj-iron-law-leaf-scope CONTEXT.md D1; previously a leaf
+      // over-reported its file set, which is why this comment used to call
+      // that the "fail-safe direction, accepted as-is" — superseded, see
+      // CONTEXT.md D1). Refuses BEFORE any git mutation or GitHub call: the
+      // item stays `proposed`, nothing is touched, neither transport is
+      // reached. Hoisted alongside the Iron Law gate (tsk-598 D1/D2): the
+      // local-merge branch's own clean-tree check, further below, reuses
+      // this exact array as its ownFileSet source instead of recomputing
+      // the same diff a second time.
       let runnerOwnDiff;
       if (source === 'runner') {
-        runnerOwnDiff = changedFiles(repoRoot, item);
+        const rootIdForIronLaw = resolveRoot(view, id);
+        runnerOwnDiff = changedFiles(
+          repoRoot,
+          item,
+          rootIdForIronLaw !== id ? { trunk: branchNameFor(rootIdForIronLaw) } : {},
+        );
         const ironLaw = classifyIronLaw({ filesChanged: runnerOwnDiff, description: item.description });
         // review-20260718-self-improve-loop finding f02: only the bare flag
         // (parsed as boolean `true`, no following value) counts as

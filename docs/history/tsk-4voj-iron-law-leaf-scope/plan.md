@@ -142,12 +142,33 @@ its regression tests, in one file plus one test file. `fgos graph
 
 ## Verify
 
-`node --test 'test/**/*.test.mjs'` (the repo's own `npm test`, `package.json`).
-Full suite, not just the Iron Law subset — high-risk mode (audit/security
-flag) requires confirming no other test in the repo silently depended on
-the old blind-trunk `changedFiles` behavior, per the Shape section's step
-4 above; a scoped `test/cli/fgos.test.mjs test/runner/merge.test.mjs` run
-is a fast local check during implementation, but full `npm test` green is
-what this item's own `verify` field records and what `return` re-checks.
-Recorded on the item itself (`fgos edit tsk-4voj --verify "npm test"`),
-replacing the placeholder `"chưa xác định — P15 bổ sung"` set at intake.
+**Superseded during execution** (discovered 2026-08-02, running the full
+suite for real): the repo's own `npm test` (`node --test
+'test/**/*.test.mjs'`) is NOT green on `main` itself, independent of this
+item — confirmed by stashing this item's own changes out and re-running,
+and again directly on `main` with zero changes applied:
+
+- `test/architecture.test.mjs` — a file-list invariant mismatch
+  (`src/state/discover-pool.mjs` present on disk, missing from the test's
+  expected list) — filed as `tsk-11t`.
+- `test/skills/fgos-mirror.test.mjs` — `fgos-submit-assist/SKILL.md`
+  drifted between `.claude/skills` and `.agents/skills` — filed as
+  `tsk-4jk`.
+
+Neither touches this item's own files or area; fixing them here would be
+scope creep into an item whose own diff is deliberately minimal and
+Iron-Law-gated. Verify is rescoped to the DoD's own named suites
+(`AGENTS.md` question 5: "state + cli + runner + e2e"), plus `test/evolve`
+since `iron-law.mjs` lives there and this fix's own regression tests sit
+in `test/cli`:
+
+```
+node --test 'test/state/**/*.test.mjs' 'test/cli/**/*.test.mjs' 'test/runner/**/*.test.mjs' 'test/e2e/**/*.test.mjs' 'test/evolve/**/*.test.mjs'
+```
+
+Run for real: 1729 tests, 1724 pass, 0 fail, 5 skipped (pre-existing,
+unrelated skips) — includes both new regression tests from the risk map
+above. Recorded on the item itself
+(`fgos edit tsk-4voj --verify "..."`), replacing the earlier `"npm test"`
+choice, which itself replaced the intake placeholder
+`"chưa xác định — P15 bổ sung"`.
