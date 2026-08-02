@@ -372,6 +372,32 @@ function applyEvent(view, event) {
       }
       break;
     }
+    case 'work.gate-approve': {
+      // Additive event type (tsk-19j D1/D11): a structured, explicit approve
+      // record for a skill-embedded Gate ("Approve CONTEXT.md?"/"Approve
+      // plan.md?"/"Approve moving to executing?") — deliberately separate
+      // from the ask/answer fold above (that pair is the `awaiting-human`
+      // park, a different mechanism). Three parallel fields live side by
+      // side in the SAME lazy `gates[id]` object the ask/answer fold already
+      // creates: `contextApprove` (fgos-exploring), `planApprove`
+      // (fgos-planning), `validateApprove` (fgos-validating) — each an
+      // OVERWRITE of just that one field (last approve wins per gate, mirrors
+      // how a fresh `ask` overwrites the prior one above), never merged with
+      // the other two gates' fields. `gates` stays the same LAZY key as
+      // ask/answer — absent from the view on any log with no gate events at
+      // all (backward-compat).
+      const { id, gate, actor, verify } = event.payload ?? {};
+      if (typeof id === 'string' && typeof gate === 'string') {
+        if (!view.gates) {
+          view.gates = {};
+        }
+        view.gates[id] = {
+          ...view.gates[id],
+          [gate]: { actor, at: event.ts, verify },
+        };
+      }
+      break;
+    }
     case 'goal.focus': {
       // Additive event type (per str67-goal-directed-planning D3/D4): the
       // single persisted pointer to the currently active goal id — a

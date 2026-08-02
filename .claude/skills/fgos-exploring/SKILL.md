@@ -200,17 +200,31 @@ Treat anything other than exactly `true` on stdout — `false`, empty output,
 a thrown error — as `false`: fail closed, never skip the question on a
 check that couldn't run cleanly.
 
+Either branch below also records a structured approve record (tsk-19j
+D1/D11) — separate from, and in addition to, `fgos decision`'s free-text
+audit line: `fgos gate-approve <item-id> --gate contextApprove --actor
+<human|bypass> --verify "<item's current verify field>"` (`fgos list --id
+<item-id> --json`'s `data.work[id].verify`, read fresh right before this
+call — fgos-exploring does not design a new verify command, per this
+skill's own "do not research implementation" rule; it only snapshots
+whatever verify the item already carries into the structured record).
+
 - **`true`** — skip the question. Post the non-question line
   `auto-approved: CONTEXT.md (gate-bypass level <level>)`, log it
   (`fgos decision --text "auto-approved CONTEXT.md gate for <item-id> at
   level <level>" --rationale "gate-bypass level <level> permits
   auto-approval per docs/history/gate-bypass/CONTEXT.md D1-D5"`, D3's
-  audit trail), then continue straight to `fgos-planning`.
+  audit trail), record it (`fgos gate-approve <item-id> --gate
+  contextApprove --actor bypass --verify "..."`, per above), then continue
+  straight to `fgos-planning`.
 - **`false`** — surface the locked decisions in plain language — what was
   decided, why it can be trusted, what it costs if wrong — with CONTEXT.md
   linked, then ask exactly: "Decisions locked. Approve CONTEXT.md before
   planning?" CONTEXT.md is the source of truth for every downstream step;
-  its decision IDs are stable and cited, never silently reinterpreted.
+  its decision IDs are stable and cited, never silently reinterpreted. Once
+  the person approves, record it (`fgos gate-approve <item-id> --gate
+  contextApprove --actor human --verify "..."`, per above) before
+  continuing to `fgos-planning`.
 
 ## Red flags
 

@@ -17,7 +17,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fork } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { addWork, editWork, moveWork, moveStage, addOutcome, addFriction, listWork, readRawEvents, setFocus, StoreError } from '../../src/state/store.mjs';
+import { addWork, editWork, moveWork, moveStage, addOutcome, addFriction, recordGateApprove, listWork, readRawEvents, setFocus, StoreError } from '../../src/state/store.mjs';
 import { REGISTRY, ENV, PID, UNRESOLVED } from "../../src/runner/session-identity.mjs";
 import { MAX_TITLE_LENGTH } from '../../src/state/work.mjs';
 
@@ -789,4 +789,54 @@ test('editWork does not reshape a stored title when the patch does not carry one
   editWork(dir, { id: 'untouched-title', patch: { verify: 'npm run lint' } });
 
   assert.equal(listWork(dir).work['untouched-title'].title, afterAdd);
+});
+
+// tsk-19j D1/D11: recordGateApprove writes a structured approve record,
+// folded into gates[id][gate] — separate from, and alongside, the
+// ask/answer pair the SAME lazy `gates[id]` object already carries.
+test('recordGateApprove folds into gates[id].<gate> with actor/at/verify, one field per gate, never merged across gates', () => {
+  const dir = tmpDir();
+  addSampleWork(dir, 'gate-approve-item');
+
+  recordGateApprove(dir, { id: 'gate-approve-item', gate: 'contextApprove', actor: 'bypass', verify: 'npm test' });
+  const afterContext = listWork(dir).work; // sanity: does not disturb work.mjs's own view shape
+  assert.ok(afterContext['gate-approve-item']);
+
+  const viewAfterContext = listWork(dir);
+  assert.equal(viewAfterContext.gates['gate-approve-item'].contextApprove.actor, 'bypass');
+  assert.equal(viewAfterContext.gates['gate-approve-item'].contextApprove.verify, 'npm test');
+  assert.equal(typeof viewAfterContext.gates['gate-approve-item'].contextApprove.at, 'string');
+
+  recordGateApprove(dir, { id: 'gate-approve-item', gate: 'planApprove', actor: 'human', verify: 'node --test test/x.test.mjs' });
+  const viewAfterPlan = listWork(dir);
+  // planApprove lands alongside contextApprove, never overwriting it.
+  assert.equal(viewAfterPlan.gates['gate-approve-item'].contextApprove.actor, 'bypass');
+  assert.equal(viewAfterPlan.gates['gate-approve-item'].planApprove.actor, 'human');
+  assert.equal(viewAfterPlan.gates['gate-approve-item'].planApprove.verify, 'node --test test/x.test.mjs');
+
+  // A second approve on the SAME gate overwrites just that gate's own field.
+  recordGateApprove(dir, { id: 'gate-approve-item', gate: 'contextApprove', actor: 'human', verify: 'npm run lint' });
+  const viewAfterReapprove = listWork(dir);
+  assert.equal(viewAfterReapprove.gates['gate-approve-item'].contextApprove.actor, 'human');
+  assert.equal(viewAfterReapprove.gates['gate-approve-item'].contextApprove.verify, 'npm run lint');
+  assert.equal(viewAfterReapprove.gates['gate-approve-item'].planApprove.actor, 'human'); // untouched
+});
+
+test('recordGateApprove rejects a missing id, an unrecognized gate, an unrecognized actor, and an empty verify', () => {
+  const dir = tmpDir();
+  addSampleWork(dir, 'gate-approve-bad');
+
+  assert.throws(() => recordGateApprove(dir, { gate: 'contextApprove', actor: 'human', verify: 'npm test' }), StoreError);
+  assert.throws(
+    () => recordGateApprove(dir, { id: 'gate-approve-bad', gate: 'notAGate', actor: 'human', verify: 'npm test' }),
+    StoreError,
+  );
+  assert.throws(
+    () => recordGateApprove(dir, { id: 'gate-approve-bad', gate: 'contextApprove', actor: 'robot', verify: 'npm test' }),
+    StoreError,
+  );
+  assert.throws(
+    () => recordGateApprove(dir, { id: 'gate-approve-bad', gate: 'contextApprove', actor: 'human', verify: '  ' }),
+    StoreError,
+  );
 });
