@@ -131,8 +131,13 @@ export function branchExists(repoRoot, branch) {
  * `null` if the branch is not checked out anywhere. Porcelain records are
  * blank-line-separated stanzas, each starting with a `worktree <path>`
  * line followed by a `branch refs/heads/<name>` line (or `detached`).
+ *
+ * Exported (tsk-3gx-1): `promote-preflight.mjs` reuses this exact parse to
+ * judge whether a member branch is currently checked out elsewhere before
+ * a retarget — same "one implementation of this check" discipline
+ * `branchExists` above already documents for its own callers.
  */
-function findCheckoutPath(porcelainOutput, branch) {
+export function findCheckoutPath(porcelainOutput, branch) {
   const ref = `refs/heads/${branch}`;
   let currentPath = null;
   for (const line of porcelainOutput.split('\n')) {
@@ -155,8 +160,12 @@ function findCheckoutPath(porcelainOutput, branch) {
  * look dirty regardless of real activity. Mirrors session.mjs's
  * `reclaimOrphanedSessions` (same `:!.fgos` pathspec exclusion). Fails
  * closed (dirty) on an unreadable status — never assume clean.
+ *
+ * Exported (tsk-3gx-1): `promote-preflight.mjs` reuses this exact
+ * fail-closed dirty check for its own "is this branch actively in use"
+ * judgment — never a second implementation of "is this checkout dirty".
  */
-function isCheckoutDirty(repoRoot, worktreePath) {
+export function isCheckoutDirty(repoRoot, worktreePath) {
   let status;
   try {
     status = git(repoRoot, ['-C', worktreePath, 'status', '--porcelain', '--', ':!.fgos']);
