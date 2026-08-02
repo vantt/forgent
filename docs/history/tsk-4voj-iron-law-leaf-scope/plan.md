@@ -139,3 +139,15 @@ No split. One honest piece of work: a single caller-side scope fix plus
 its regression tests, in one file plus one test file. `fgos graph
 --what-if` above confirms real, non-trivial downstream unblock value
 (`tsk-3bn`) without needing to fan this out into child items.
+
+## Verify
+
+`node --test 'test/**/*.test.mjs'` (the repo's own `npm test`, `package.json`).
+Full suite, not just the Iron Law subset — high-risk mode (audit/security
+flag) requires confirming no other test in the repo silently depended on
+the old blind-trunk `changedFiles` behavior, per the Shape section's step
+4 above; a scoped `test/cli/fgos.test.mjs test/runner/merge.test.mjs` run
+is a fast local check during implementation, but full `npm test` green is
+what this item's own `verify` field records and what `return` re-checks.
+Recorded on the item itself (`fgos edit tsk-4voj --verify "npm test"`),
+replacing the placeholder `"chưa xác định — P15 bổ sung"` set at intake.
