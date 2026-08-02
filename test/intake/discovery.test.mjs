@@ -396,6 +396,42 @@ test('resolveDiscovery on an unclear verdict writes the discovery record and par
   assert.equal(view.discovery['item-x'][0].clear, false);
 });
 
+// tsk-wcl: real crash, reproduced live — calling `fgos discover <id>`
+// directly (bypassing the pool picker, which never re-selects an
+// already-parked item) on an item that is ALREADY `awaiting-human` used to
+// throw when the verdict came back unclear again, because `putInAwaiting`
+// always attempts a real `awaiting-human` -> `awaiting-human` status
+// transition and fsm.mjs has no self-transition edge for it. A second
+// consecutive unclear call must now succeed: item stays parked, discovery
+// history gains the new entry, no throw.
+test('resolveDiscovery on a SECOND consecutive unclear verdict for an already-awaiting-human item does not throw, and still records the new verdict', () => {
+  const scriptDir1 = mkTempDir();
+  const scriptPath1 = writeVerdictExecutor(scriptDir1, { clear: false, question: 'Which endpoint?' });
+  const cfg1 = cfgFor([scriptPath1, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork());
+
+  const first = resolveDiscovery(storeDir, 'item-x', cfg1);
+  assert.equal(first.outcome, 'unclear');
+  assert.equal(listWork(storeDir).work['item-x'].status, 'awaiting-human');
+
+  const scriptDir2 = mkTempDir();
+  const scriptPath2 = writeVerdictExecutor(scriptDir2, { clear: false, question: 'Still which endpoint, now with more detail?' });
+  const cfg2 = cfgFor([scriptPath2, '{prompt}']);
+
+  let second;
+  assert.doesNotThrow(() => {
+    second = resolveDiscovery(storeDir, 'item-x', cfg2);
+  });
+  assert.equal(second.outcome, 'unclear');
+
+  const view = listWork(storeDir);
+  assert.equal(view.work['item-x'].status, 'awaiting-human');
+  assert.equal(view.discovery['item-x'].length, 2);
+  assert.equal(view.discovery['item-x'][1].question, 'Still which endpoint, now with more detail?');
+});
+
 // claim-lock §5.1: the item's OWN status at the moment of park (not the
 // parent's) rides the same putInAwaiting call as statusAtAsk, so
 // answerAwaiting can resume to it later instead of always falling to 'todo'.
