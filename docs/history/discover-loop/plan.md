@@ -30,12 +30,13 @@ skipped `--what-if` accordingly (nothing to compare against).
      reads `frontier()` already does, `src/state/frontier.mjs:78-98` —
      same shape, different stage set).
    - If any `stage: 'clarify'` candidates exist, pick among them by D3:
-     `blocks` (via `rankImpact`, `src/state/graph-harness.mjs` — same
-     function `blocksForItem`, `src/intake/discovery.mjs:66-69`, already
-     calls) DESC, then `urgent` (truthy first), then declaration order
-     (FIFO) — clarify always wins over decompose when both pools are
-     non-empty, per the original description's "prioritizing clarify
-     first."
+     `blocks` (via `rankImpact`, `src/state/impact.mjs:88` — same function
+     `blocksForItem`, `src/intake/discovery.mjs:66-69`, already calls; NOT
+     `graph-harness.mjs`, which only calls `rankImpact` internally for its
+     own unrelated `mergeReadiness`, corrected at `fgos-validating` time)
+     DESC, then `urgent` (truthy first), then declaration order (FIFO) —
+     clarify always wins over decompose when both pools are non-empty, per
+     the original description's "prioritizing clarify first."
    - Else if any `stage: 'decompose'` candidates exist, pick among them by
      D2: `priority` ASC (`undefined`/`null` last), then FIFO — same
      comparator shape as `compareReadyOrder` (`frontier.mjs:121-133`), new
@@ -63,16 +64,22 @@ skipped `--what-if` accordingly (nothing to compare against).
    - Step 3: else run `fgos discover <id> --dir <root>` (stage `clarify`)
      or `fgos decompose <id> --dir <root>` (stage `decompose`) — the
      existing verbs, unchanged (D7/D8: no new verb, no worktree).
-   - Step 4: classify and report the result per D5's 3-way split:
-     - success (`outcome: 'clear'`/`'pass-through'`/`'decompose'`) —
-       report cleared/decomposed.
-     - `outcome: 'unclear'`/`'need-human'` — report parked
-       `awaiting-human`, this is normal, not a problem (D5).
-     - a thrown error — classify by its `kind`/`name`: `EventLogError`
-       with `'lock-timeout'` is the systemic case (D5(b), stop the whole
-       loop); an `FsmError` with `'conflict'` (or any other thrown error)
-       is scoped to this one item — report it as skipped, do not stop
-       (D5).
+   - Step 4: classify and report the result per D5's 3-way split. `fgos
+     discover`/`fgos decompose` run as a **Bash subprocess**, not a JS
+     import — there is no JS `Error` object to inspect here, only the
+     process's own exit code and JSON stdout/stderr. Classify by **exit
+     code**, per the real CLI contract (`EXIT_CODES`, `src/state/
+     store.mjs:65-73`; applied at `bin/fgos.mjs:3160` via
+     `categoryOf(err)`):
+     - exit `0` — success; read the JSON envelope's `outcome` field
+       (`'clear'`/`'pass-through'`/`'decompose'` vs
+       `'unclear'`/`'need-human'`) to report cleared/decomposed vs parked
+       `awaiting-human` (both normal, not a problem, per D5).
+     - exit `7` (`'lock-timeout'`) — the systemic case (D5(b)): stop the
+       whole loop.
+     - exit `3` (`'conflict'`, per-item CAS) — or any other non-zero exit
+       — scoped to this one item: report it as skipped, do not stop the
+       loop (D5).
    - Optional (D9, deferred): call `/fgOS:terminal <id>` for herdr-pane
      rename before step 3 — non-blocking, ship without it if it adds
      friction, this is explicitly not required for the core shape.
