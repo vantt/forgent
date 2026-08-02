@@ -1,5 +1,20 @@
 # Close out a decomposed root item after all its children are done
 
+**Update (tsk-3bn, docs/history/tsk-3bn-merge-conductor-harness-v2/):** the
+manual `git merge --no-ff` workaround this doc originally had to invent for
+the "Trap" section below is now a real, supported verb —
+`fgos sync-root <root-id>` — and `fgos doctor`'s `root-drift` check
+surfaces exactly this drift automatically instead of requiring the manual
+`git merge-base --is-ancestor`/`git branch -a --contains` forensics this
+doc used to walk through by hand. `fgos approve` also now refuses to close
+a milestone (a `targets`-bearing item) when one of its targets' resolved
+root branch still has unsynced drift, unless `--acknowledge-drift` is
+passed explicitly — the exact gap that let closing `tsk-u9k` miss
+`tsk-64p`'s drift in the incident below. The narrative and the specific
+git-forensics commands stay below as real, still-useful history and a
+still-valid manual fallback; read "The fix" in the Trap section as
+superseded by `fgos sync-root`, not removed.
+
 `tsk-2ta` was decomposed into four children (`tsk-2ta-1..4`). Once all four
 were individually claimed, implemented, verified, compound-learned, and
 merged, `fgos rollup tsk-2ta` reported `doneCount: 4, totalCount: 4` — but
@@ -74,17 +89,21 @@ same check against `fgw/tsk-64p` returned true. Nothing was lost — the
 commits were exactly where `fgos approve` put them, on `fgw/tsk-64p` —
 `main` was just never told to catch up a second time.
 
-**The fix is the same sync, repeated**: `git merge --no-ff fgw/<root-id>`
-into `main` again picks up everything the root's branch gained since the
-last sync, cleanly (a real `git merge`, so it will conflict loudly instead
-of silently dropping anything if two syncs' content actually overlaps).
-Do this *every time* a new child lands on a root's branch that has
-already been synced to `main` before — not just once, ever. Only run the
-root item's own full claim → verify → return → compound → approve close-out
-(the rest of this how-to) once **every one of its children is actually
-`done`** — running it while a sibling child (like `tsk-5l2` above) is
-still `todo` would prematurely mark the root `done` while more real work
-is still headed for its branch.
+**The fix is the same sync, repeated**: `fgos sync-root <root-id>` merges
+the root branch into its real target (`main`, or `fgw/<parentId>` for a
+nested root) again, picking up everything the branch gained since the
+last sync — a real `git merge` under the hood (the exact same lock/verify/
+Iron-Law path `fgos approve` itself uses), so it conflicts loudly instead
+of silently dropping anything if two syncs' content actually overlaps. It
+deliberately leaves the root item's own `status`/`stage` untouched, so it
+is safe to run mid-flight, before every child is done — unlike this doc's
+own close-out cycle below (claim → verify → return → compound → approve),
+which should still wait for **every child** to be actually `done` before
+running, since that cycle *does* move the root's own status. `fgos doctor`
+also runs this check on its own (the `root-drift` check) — if it warns, a
+plain `fgos sync-root <root-id>` is the fix, no forensics needed. Do this
+*every time* a new child lands on a root's branch that has already been
+synced to `main` before — not just once, ever.
 
 **Before concluding code is missing from `main`, always check**:
 ```

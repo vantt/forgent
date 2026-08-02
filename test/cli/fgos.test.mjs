@@ -1406,6 +1406,66 @@ test('edit --docs-ref replaces an existing docsRef (latest-wins), exit 0', () =>
   assert.equal(stateView(cwd).work['edit-docs-ref-replace'].docsRef, 'docs/history/new-feature/');
 });
 
+// --- edit --merge-after (tsk-2u0, docs/history/
+//     tsk-3bn-merge-conductor-harness-v2/D4/D5) -----------------------------
+
+test('edit --merge-after sets mergeAfter on an item that had none, exit 0', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'merge-after-target');
+  addOk(cwd, 'merge-after-item');
+  const result = run(cwd, ['edit', 'merge-after-item', '--merge-after', 'merge-after-target']);
+  assert.equal(result.status, 0, result.stderr);
+  assert.deepEqual(stateView(cwd).work['merge-after-item'].mergeAfter, ['merge-after-target']);
+});
+
+test('edit --merge-after "" clears an existing mergeAfter, exit 0', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'merge-after-clear-target');
+  addOk(cwd, 'merge-after-clear-item');
+  run(cwd, ['edit', 'merge-after-clear-item', '--merge-after', 'merge-after-clear-target']);
+  const result = run(cwd, ['edit', 'merge-after-clear-item', '--merge-after', '']);
+  assert.equal(result.status, 0, result.stderr);
+  assert.deepEqual(stateView(cwd).work['merge-after-clear-item'].mergeAfter, []);
+});
+
+test('edit --merge-after rejects a target id that does not exist, exit 4, item unchanged', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'merge-after-ghost-item');
+  const result = run(cwd, ['edit', 'merge-after-ghost-item', '--merge-after', 'no-such-item']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /not a known id/);
+  assert.equal(stateView(cwd).work['merge-after-ghost-item'].mergeAfter, undefined);
+});
+
+test('edit --merge-after rejects an item listing itself, exit 4', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'merge-after-self-item');
+  const result = run(cwd, ['edit', 'merge-after-self-item', '--merge-after', 'merge-after-self-item']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /own mergeAfter/);
+});
+
+test('edit --merge-after rejects a mergeAfter that would close a cycle mixed with deps, exit 4', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'merge-after-cycle-a');
+  addOk(cwd, 'merge-after-cycle-b');
+  run(cwd, ['edit', 'merge-after-cycle-b', '--deps', 'merge-after-cycle-a']);
+  // a deps:[] currently; setting a.mergeAfter:[b] would close a -> b (waits-for) -> a (blocks).
+  const result = run(cwd, ['edit', 'merge-after-cycle-a', '--merge-after', 'merge-after-cycle-b']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /cycle/);
+  assert.equal(stateView(cwd).work['merge-after-cycle-a'].mergeAfter, undefined);
+});
+
+test('edit --merge-after does not require the deps field to have been touched (byte-identical to other list edits)', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'merge-after-independent-target');
+  addOk(cwd, 'merge-after-independent-item');
+  const result = run(cwd, ['edit', 'merge-after-independent-item', '--merge-after', 'merge-after-independent-target']);
+  assert.equal(result.status, 0, result.stderr);
+  assert.deepEqual(stateView(cwd).work['merge-after-independent-item'].deps, []);
+});
+
 // --- edit --description/--footprint: `add` already accepted both fields,
 // but EDITABLE_FIELDS never listed them, so a description/footprint typo'd
 // or left blank at add time -- or an item added before either field
@@ -4917,6 +4977,247 @@ test('approve of a leaf item whose OWN commit touches a gated module (src/runner
   assert.equal(stateView(cwd).work[leafId].status, 'awaiting-approval');
 });
 
+// --- sync-root (tsk-50i, docs/history/tsk-3bn-merge-conductor-harness-v2/) -
+//
+// Merges fgw/<root-id>'s current tip into its real target (main, or
+// fgw/<parentId> for a nested root) WITHOUT changing the root item's own
+// status/stage — unlike approve, which always advances an item's FSM
+// status. Reuses mergeRunnerItem's exact lock/verify path (constraint #1
+// from fgos-validating's feasibility gate).
+
+// Simulates a root whose branch has already advanced past main (a leaf's
+// work already landed on fgw/<rootId>, e.g. via approve's own leaf-into-root
+// path) — the exact drift shape tsk-3bn's own origin incident reproduced.
+// The root item's own status stays 'doing' throughout (a root mid-flight,
+// not yet closed) — sync-root must never touch it.
+function makeDriftedRoot(cwd, rootId, opts = {}) {
+  const dir = path.join(cwd, '.fgos');
+  addWork(dir, { id: rootId, title: `Title ${rootId}`, kind: 'task', status: 'todo', deps: [], risk: 'low', refs: [], verify: opts.verify ?? 'true', ...(opts.parent ? { parent: opts.parent } : {}) });
+  commitPending(cwd, `state: add ${rootId}`);
+  run(cwd, ['move', rootId, '--to', 'doing']);
+  commitPending(cwd, `state: claim ${rootId}`);
+
+  gitAtCwd(cwd, ['checkout', '-b', `fgw/${rootId}`]);
+  fs.writeFileSync(path.join(cwd, `${rootId}-produced.txt`), 'ok\n');
+  gitAtCwd(cwd, ['add', `${rootId}-produced.txt`]);
+  gitAtCwd(cwd, ['commit', '-q', '-m', `leaf work merged into fgw/${rootId}`]);
+  gitAtCwd(cwd, ['checkout', 'main']);
+}
+
+test('sync-root on a nonexistent id is rejected as validation, exit 4', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  const result = run(cwd, ['sync-root', 'sync-root-ghost']);
+  assert.equal(result.status, 4);
+});
+
+test('sync-root on a root with no fgw/<id> branch is rejected as validation, exit 4', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  addOk(cwd, 'sync-root-no-branch', { verify: 'true' });
+  const result = run(cwd, ['sync-root', 'sync-root-no-branch']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /does not exist/);
+});
+
+test('sync-root happy path: merges fgw/<root> into main, root item status/stage UNCHANGED, fgw/<root> survives (not deleted)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeDriftedRoot(cwd, 'sync-root-happy', { verify: `test -f sync-root-happy-produced.txt` });
+  commitPendingBeforeApprove(cwd, 'sync-root-happy');
+
+  const result = run(cwd, ['sync-root', 'sync-root-happy']);
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.outcome, 'synced');
+  assert.equal(data.target, 'main');
+  assert.equal(data.branch, 'fgw/sync-root-happy');
+
+  assert.ok(fs.existsSync(path.join(cwd, 'sync-root-happy-produced.txt')), 'the synced content must land on main');
+
+  const view = stateView(cwd);
+  assert.equal(view.work['sync-root-happy'].status, 'doing', 'sync-root must never change the root item\'s own status');
+
+  const branches = gitAtCwd(cwd, ['for-each-ref', '--format=%(refname:short)', 'refs/heads/fgw/']);
+  assert.match(branches, /fgw\/sync-root-happy\b/, 'sync-root must NOT delete the root branch — it stays open for further leaf merges');
+});
+
+test('sync-root records a real decision on the root item', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeDriftedRoot(cwd, 'sync-root-decision', { verify: 'true' });
+  commitPendingBeforeApprove(cwd, 'sync-root-decision');
+
+  const result = run(cwd, ['sync-root', 'sync-root-decision']);
+  assert.equal(result.status, 0, result.stderr);
+
+  const lines = eventLines(cwd);
+  const decisionEvents = lines.map((l) => JSON.parse(l)).filter((e) => e.type === 'decision' && e.payload?.id === 'sync-root-decision');
+  assert.equal(decisionEvents.length, 1, 'sync-root must append exactly one real decision record');
+  assert.match(decisionEvents[0].payload.text, /sync-root-decision|fgw\/sync-root-decision/);
+});
+
+test('sync-root nested: a root with a parent merges into fgw/<parentId>, not main; main stays untouched; the child root\'s status stays unchanged', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  // grandroot (target for the nested sync) is itself a plain root with a
+  // real branch but no drift of its own.
+  const dir = path.join(cwd, '.fgos');
+  addWork(dir, { id: 'sync-root-grandparent', title: 'Title grandparent', kind: 'task', status: 'todo', deps: [], risk: 'low', refs: [], verify: 'true' });
+  commitPending(cwd, 'state: add grandparent');
+
+  // fgw/<grandparent> must be cut AFTER the child's own state events (add +
+  // claim, inside makeDriftedRoot) already landed on main — cutting it
+  // earlier leaves fgw/child's later commits carrying a legitimate .fgos/
+  // diff relative to fgw/grandparent (the child's add/claim events main
+  // gained afterward), which mergeRunnerItem's ADR0020 guard correctly
+  // refuses as fgos-write-rejected. Same ordering makeDriftedRoot's own
+  // `checkout -b fgw/<rootId>` already relies on for its OWN branch.
+  makeDriftedRoot(cwd, 'sync-root-nested-child', { parent: 'sync-root-grandparent', verify: `test -f sync-root-nested-child-produced.txt` });
+  gitAtCwd(cwd, ['branch', 'fgw/sync-root-grandparent', 'main']);
+  commitPendingBeforeApprove(cwd, 'sync-root-nested-child');
+
+  const headBefore = gitHead(cwd);
+  const result = run(cwd, ['sync-root', 'sync-root-nested-child']);
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.target, 'fgw/sync-root-grandparent');
+
+  assert.equal(gitHead(cwd), headBefore, 'main must be byte-for-byte unchanged by a nested sync-root');
+  assert.equal(
+    fs.existsSync(path.join(cwd, 'sync-root-nested-child-produced.txt')),
+    false,
+    'the nested child\'s content must not land on the human\'s own main checkout',
+  );
+  const producedOnParent = gitAtCwd(cwd, ['show', 'fgw/sync-root-grandparent:sync-root-nested-child-produced.txt']);
+  assert.match(producedOnParent, /ok/);
+
+  const view = stateView(cwd);
+  assert.equal(view.work['sync-root-nested-child'].status, 'doing');
+});
+
+test('sync-root aborts cleanly on a genuine conflict: main left byte-for-byte unchanged, root status untouched', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeDriftedRoot(cwd, 'sync-root-conflict', { verify: 'true' });
+  // Create a conflicting change on main AFTER the root branch forked, on
+  // the exact same path the root's own commit touches.
+  fs.writeFileSync(path.join(cwd, 'sync-root-conflict-produced.txt'), 'conflicting main content\n');
+  gitAtCwd(cwd, ['add', 'sync-root-conflict-produced.txt']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', 'unrelated main edit that collides']);
+  commitPendingBeforeApprove(cwd, 'sync-root-conflict');
+
+  const headBefore = gitHead(cwd);
+  const result = run(cwd, ['sync-root', 'sync-root-conflict']);
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.outcome, 'blocked');
+  assert.equal(data.reason, 'merge-conflict');
+
+  assert.equal(gitHead(cwd), headBefore, 'main must be byte-for-byte unchanged after an aborted sync-root');
+  assert.equal(stateView(cwd).work['sync-root-conflict'].status, 'doing', 'a blocked sync-root must never touch the root item\'s status');
+});
+
+test('sync-root refuses from inside a linked worktree (must land on the real main checkout)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeDriftedRoot(cwd, 'sync-root-worktree-guard', { verify: 'true' });
+  commitPendingBeforeApprove(cwd, 'sync-root-worktree-guard');
+
+  const wtParent = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-cli-sync-root-wt-'));
+  const wt = path.join(wtParent, 'wt');
+  gitAtCwd(cwd, ['worktree', 'add', '-q', '-b', 'sync-root-side-branch', wt]);
+
+  const result = spawnSync(process.execPath, [FGOS, 'sync-root', 'sync-root-worktree-guard'], { cwd: wt, encoding: 'utf8' });
+  assert.equal(result.status, 4, result.stderr);
+  assert.match(result.stderr, /main checkout/);
+
+  gitAtCwd(cwd, ['worktree', 'remove', '--force', wt]);
+});
+
+// --- close-out drift guard (tsk-62y, docs/history/
+//     tsk-3bn-merge-conductor-harness-v2/) ----------------------------------
+//
+// tsk-3bn's own origin incident: closing a milestone (a `targets`-bearing
+// item) while one of its targets' resolved root branch had drifted ahead of
+// main from a later leaf merge — nothing warned or blocked it. This guard
+// runs inside `approve`, before any git mutation, whenever the item being
+// approved carries a non-empty `targets` array.
+
+function makeMilestone(cwd, id, targets) {
+  const dir = path.join(cwd, '.fgos');
+  addWork(dir, { id, title: `Title ${id}`, kind: 'task', status: 'todo', deps: [], risk: 'low', refs: [], verify: 'true', targets });
+  run(cwd, ['move', id, '--to', 'doing']);
+  run(cwd, ['move', id, '--to', 'awaiting-approval']);
+  commitPending(cwd, `state: propose ${id}`);
+}
+
+test('approve of a milestone blocks when a targeted item\'s root has unsynced drift, exit 4, item stays awaiting-approval', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeDriftedRoot(cwd, 'closeout-root', { verify: 'true' });
+  const dir = path.join(cwd, '.fgos');
+  addWork(dir, { id: 'closeout-child', title: 'child', kind: 'task', status: 'todo', deps: [], risk: 'low', refs: [], verify: 'true', parent: 'closeout-root' });
+  commitPending(cwd, 'state: add closeout-child');
+
+  makeMilestone(cwd, 'closeout-milestone', ['closeout-child']);
+
+  const headBefore = gitHead(cwd);
+  const result = run(cwd, ['approve', 'closeout-milestone']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /unsynced drift/);
+  assert.match(result.stderr, /closeout-child/);
+  assert.match(result.stderr, /closeout-root/);
+  assert.match(result.stderr, /fgos sync-root/);
+  assert.equal(gitHead(cwd), headBefore, 'a blocked close-out attempts no merge');
+  assert.equal(stateView(cwd).work['closeout-milestone'].status, 'awaiting-approval');
+});
+
+test('approve of a milestone succeeds with --acknowledge-drift despite a targeted item\'s root having unsynced drift', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeDriftedRoot(cwd, 'closeout-ack-root', { verify: 'true' });
+  const dir = path.join(cwd, '.fgos');
+  addWork(dir, { id: 'closeout-ack-child', title: 'child', kind: 'task', status: 'todo', deps: [], risk: 'low', refs: [], verify: 'true', parent: 'closeout-ack-root' });
+  commitPending(cwd, 'state: add closeout-ack-child');
+
+  makeMilestone(cwd, 'closeout-ack-milestone', ['closeout-ack-child']);
+
+  const result = run(cwd, ['approve', 'closeout-ack-milestone', '--acknowledge-drift']);
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(stateView(cwd).work['closeout-ack-milestone'].status, 'delivered');
+});
+
+test('approve of a milestone with no drift on any target succeeds normally, unaffected by the guard', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  // A root with a real branch but zero drift (no leaf work landed on it
+  // beyond main's own tip).
+  const dir = path.join(cwd, '.fgos');
+  addWork(dir, { id: 'closeout-clean-root', title: 'root', kind: 'task', status: 'todo', deps: [], risk: 'low', refs: [], verify: 'true' });
+  commitPending(cwd, 'state: add closeout-clean-root');
+  gitAtCwd(cwd, ['branch', 'fgw/closeout-clean-root', 'main']);
+  addWork(dir, { id: 'closeout-clean-child', title: 'child', kind: 'task', status: 'todo', deps: [], risk: 'low', refs: [], verify: 'true', parent: 'closeout-clean-root' });
+  commitPending(cwd, 'state: add closeout-clean-child');
+
+  makeMilestone(cwd, 'closeout-clean-milestone', ['closeout-clean-child']);
+
+  const result = run(cwd, ['approve', 'closeout-clean-milestone']);
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(stateView(cwd).work['closeout-clean-milestone'].status, 'delivered');
+});
+
+test('approve of an ordinary item with no targets is completely unaffected by the close-out guard (regression)', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'closeout-no-targets-item', { verify: 'true' });
+  run(cwd, ['move', 'closeout-no-targets-item', '--to', 'doing']);
+  run(cwd, ['move', 'closeout-no-targets-item', '--to', 'awaiting-approval']);
+
+  const result = run(cwd, ['approve', 'closeout-no-targets-item']);
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(stateView(cwd).work['closeout-no-targets-item'].status, 'delivered');
+});
+
 test('reject on a nonexistent id is rejected as validation, exit 4', () => {
   const cwd = tmpCwd();
   const result = run(cwd, ['reject', 'ghost', '--reason', 'nope']);
@@ -4969,11 +5270,11 @@ test('reject moves awaiting-approval -> todo with the reason recorded, role huma
   assert.equal(lastEvent.payload.role, 'human');
 });
 
-test('the CLI usage message for an unknown verb lists review/approve/reject in the surface', () => {
+test('the CLI usage message for an unknown verb lists review/approve/sync-root/reject in the surface', () => {
   const cwd = tmpCwd();
   const result = run(cwd, ['bogus-verb']);
   assert.equal(result.status, 4);
-  assert.match(result.stderr, /review\|approve\|reject/);
+  assert.match(result.stderr, /review\|approve\|sync-root\|reject/);
 });
 
 // --- `review`/`approve` --github (github-adapter D1/D3/D5) -------------------
@@ -6640,7 +6941,7 @@ test('merge list on an empty store: empty ready/waiting/conflicts, exit 0, no ev
   const before = eventLines(cwd).length;
   const result = run(cwd, ['merge', 'list']);
   assert.equal(result.status, 0);
-  assert.deepEqual(envelopeData(result.stdout), { ready: [], waiting: [], conflicts: [] });
+  assert.deepEqual(envelopeData(result.stdout), { ready: [], waiting: [], conflicts: [], mergeSets: [], blockedOnSync: [], mergeTier: {} });
   assert.equal(eventLines(cwd).length, before, 'merge list must not append any event');
 });
 
@@ -6665,7 +6966,7 @@ test('merge list: a proposed item whose dep is already done is ready', () => {
   assert.equal(run(cwd, ['add', 'leaf', '--title', 'Leaf', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--deps', 'dep']).status, 0);
   toProposed(cwd, 'leaf');
   const data = envelopeData(run(cwd, ['merge', 'list']).stdout);
-  assert.deepEqual(data, { ready: ['leaf'], waiting: [], conflicts: [] });
+  assert.deepEqual(data, { ready: ['leaf'], waiting: [], conflicts: [], mergeSets: [], blockedOnSync: [], mergeTier: { leaf: 'root-to-main' } });
 });
 
 test('merge list: a proposed item whose dep is NOT done waits, never ready', () => {
@@ -6675,7 +6976,7 @@ test('merge list: a proposed item whose dep is NOT done waits, never ready', () 
   assert.equal(run(cwd, ['add', 'leaf', '--title', 'Leaf', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--deps', 'dep']).status, 0);
   toProposed(cwd, 'leaf');
   const data = envelopeData(run(cwd, ['merge', 'list']).stdout);
-  assert.deepEqual(data, { ready: [], waiting: ['leaf'], conflicts: [] });
+  assert.deepEqual(data, { ready: [], waiting: ['leaf'], conflicts: [], mergeSets: [], blockedOnSync: [], mergeTier: { leaf: 'root-to-main' } });
 });
 
 test('merge list: two dep-clear proposed items sharing a footprint are excluded from ready and listed as conflicts', () => {

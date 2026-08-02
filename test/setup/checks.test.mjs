@@ -15,6 +15,7 @@ import { DOCTOR_CHECKS, FIX_REGISTRATIONS, integrationScriptPath, mainCheckoutHo
 import { DEFAULT_RUNNER_CONFIG } from '../../src/runner/dispatch.mjs';
 import { DEFAULT_LEVEL } from '../../src/state/gate-bypass.mjs';
 import { DEFAULT_CLEANUP_TTL_DAYS } from '../../src/setup/registrations.mjs';
+import { initStore, addWork } from '../../src/state/store.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FGOS = path.resolve(__dirname, '../../bin/fgos.mjs');
@@ -37,11 +38,45 @@ function fixById(id) {
 
 // ─── Unit tests: DOCTOR_CHECKS ─────────────────────────────────────────────
 
-test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-checkout-hook-wired, tool-registry-configured, config-awareness, dependencies-installed, and gate-bypass-configured', () => {
+test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-checkout-hook-wired, tool-registry-configured, config-awareness, dependencies-installed, gate-bypass-configured, and root-drift', () => {
   assert.deepEqual(
     DOCTOR_CHECKS.map((c) => c.id).sort(),
-    ['config-not-stale', 'main-checkout-hook-wired', 'node-version-and-git', 'shell-integration-sourced', 'tool-registry-configured', 'config-awareness', 'dependencies-installed', 'gate-bypass-configured'].sort(),
+    ['config-not-stale', 'main-checkout-hook-wired', 'node-version-and-git', 'shell-integration-sourced', 'tool-registry-configured', 'config-awareness', 'dependencies-installed', 'gate-bypass-configured', 'root-drift'].sort(),
   );
+});
+
+test('root-drift passes when no fgw/<root> branch is ahead of its target', () => {
+  const dir = initRepo('checks-root-drift-clean-');
+  execFileSync('git', ['checkout', '-q', '-b', 'fgw/root'], { cwd: dir });
+  execFileSync('git', ['checkout', '-q', 'main'], { cwd: dir });
+  const fgosDir = path.join(dir, '.fgos');
+  initStore(fgosDir);
+  addWork(fgosDir, { id: 'root', title: 'root', kind: 'feature', risk: 'light', verify: 'true', status: 'todo', deps: [], refs: [] });
+  addWork(fgosDir, { id: 'leaf', title: 'leaf', kind: 'feature', risk: 'light', verify: 'true', status: 'todo', deps: [], refs: [], parent: 'root' });
+
+  const { passed, message } = checkById('root-drift').check(dir);
+  assert.equal(passed, true);
+  assert.match(message, /no root branch is drifted/);
+  fs.rmSync(dir, { recursive: true, force: true });
+});
+
+test('root-drift fails and names the drifted root when fgw/<root> is ahead of main', () => {
+  const dir = initRepo('checks-root-drift-dirty-');
+  execFileSync('git', ['checkout', '-q', '-b', 'fgw/root'], { cwd: dir });
+  fs.writeFileSync(path.join(dir, 'child-work.txt'), 'merged leaf work\n');
+  execFileSync('git', ['add', 'child-work.txt'], { cwd: dir });
+  execFileSync('git', ['commit', '-qm', 'leaf merged into root'], { cwd: dir });
+  execFileSync('git', ['checkout', '-q', 'main'], { cwd: dir });
+  const fgosDir = path.join(dir, '.fgos');
+  initStore(fgosDir);
+  addWork(fgosDir, { id: 'root', title: 'root', kind: 'feature', risk: 'light', verify: 'true', status: 'todo', deps: [], refs: [] });
+  addWork(fgosDir, { id: 'leaf', title: 'leaf', kind: 'feature', risk: 'light', verify: 'true', status: 'todo', deps: [], refs: [], parent: 'root' });
+
+  const { passed, message } = checkById('root-drift').check(dir);
+  assert.equal(passed, false);
+  assert.match(message, /root/);
+  assert.match(message, /fgos sync-root/);
+  fs.rmSync(dir, { recursive: true, force: true });
 });
 
 test('dependencies-installed passes when package.json has no dependencies field (pre-tsk-slq behavior)', () => {
