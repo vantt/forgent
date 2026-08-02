@@ -37,6 +37,18 @@ In scope:
   `tier: leaf-to-root | root-to-main` field; `root-to-main` gets the
   stricter verify/drift/footprint scope per the locked table (design
   report §G, reproduced under Canonical references below).
+- **`mergeAfter: [ids]`** (new field, D4/D5) — a weak, merge-order-only
+  edge, implemented as the `waits-for` kind `dep-graph.mjs` already
+  reserves: read ONLY by `mergeReadiness`'s `waiting` gate (extends the
+  existing `depsClear` check to also require every `mergeAfter` target
+  RESOLVED), explicitly NOT read by `frontier.mjs`'s start-eligibility.
+  Validated at set-time through the same write-door guard `deps`/`parent`
+  already get (`store.mjs`): target existence, no self-reference, no
+  cycle — `assertNoUnifiedCycle` extended to include `waits-for` edges, so
+  a cycle mixing `mergeAfter` with `deps`/`parent` is rejected at set-time.
+  Settable anytime via `fgos edit <id> --merge-after <ids>`, not just at
+  decompose/planning time — the need is often decided spontaneously
+  mid-work ("want X to land first"), not upfront.
 
 Out of scope (explicitly deferred, not this item):
 - §A (lock scope) and §E (single-queue-per-target) — already closed by
@@ -58,6 +70,8 @@ Out of scope (explicitly deferred, not this item):
 | D1 | tsk-3bn's scope is the **full** Harness v2 package (drift + sync-root + merge-set clustering + two-tier verify), not just the original gap B/C slice. Locked by the user 2026-08-02, confirming the design-decisions report's D2 ("full package, not smallest slice") applies to this item specifically, after confirming none of tsk-3bn's dependency chain (tsk-4voj, tsk-2eq, tsk-480, tsk-396, tsk-15k, tsk-66x, tsk-2vd — all delivered/done) implements any part of drift/sync-root/clustering/tier itself; they are Layer-2 correctness prerequisites only, verified by code grep (no `driftStatus`, `sync-root`, or clustering logic exists anywhere in `src/`/`bin/` today). |
 | D2 | Merge-set clustering ships v1 with the **permissive** escalation default: a merge set with a resolvable order (footprint overlap between two independently-ready items) auto-serializes — merge one, re-diff the other against the new tip, then merge — and escalates to a human only if that serialized re-check itself still conflicts. Matches research report §D.3 and §H.5 exactly (no deviation). Locked by the user 2026-08-02, resolving the design-decisions report's open question 3 (conservative-vs-permissive, given only 1 real incident to validate clustering against). |
 | D3 | Conflict discovered mid-planning: a prior decision on this item (2026-08-02T03:43, before this session) had narrowed tsk-3bn to gap B/C only, precisely to avoid duplicating `tsk-3hk`'s clustering+tier scope. D1 (above) unknowingly reversed that narrowing. Presented to the user as a real fork — revert D1, or keep D1 wide and fold `tsk-3hk` in — user chose to keep D1 wide. `tsk-3hk` closed `wontfix` as superseded, its decision log cross-referencing this one. D1 stands as tsk-3bn's final, current scope. |
+| D4 | `mergeAfter: [ids]` — a new, weak, merge-order-only field — is IN v1 scope (tsk-3hk's original proposal, reconsidered). Initial analysis found no case in the 3 locked `mergeSets` reasons (`footprint-overlap`/`shared-root`/`deps-chain`) that needs it — each already resolves via an existing field. User overrode with real, grounded counter-evidence: release-order preference independent of code/footprint/shared-root is a real, recurring, often-spontaneous need ("want X to land first"), not hypothetical. Kept minimal: no new `mergeSets` reason category, no new escalation path — the field only extends the existing `waiting` gate (`graph-harness.mjs`) the same way unmet `deps` already does; `frontier.mjs` deliberately never reads it, so start-eligibility is unaffected. Settable anytime via `fgos edit --merge-after`, matching its spontaneous-decision nature — not fixed only at planning/decompose time. Unset (default/common case) is a pure no-op: existing auto-computed order (rankImpact + the new clustering) applies exactly as already locked; `mergeAfter` only fires when a person deliberately sets it. Set is a hard gate, not a soft priority nudge — matches "human has their own plan" being meant literally, not just a ranking hint another item's priority could override. |
+| D5 | `mergeAfter` is implemented as the `waits-for` edge kind `dep-graph.mjs`'s own header comment already reserves ("declared vocabulary only... that is S2b's job once a real stored form + producer exist") — not a bespoke second validation path. Setting it goes through the SAME write-door validation `deps`/`parent` already get in `store.mjs` (lines 178-179/259-260 today): target-id existence (mirrors `validateDeps`), no self-reference, and `assertNoUnifiedCycle` extended to include `waits-for` edges in the unified adjacency alongside `blocks`(deps)/`parent-child` — so a cycle MIXING `mergeAfter` with `deps`/`parent` (e.g. A `deps:[B]` + B `mergeAfter:[A]`, a real deadlock: A can't start until B resolved, B can't merge until A resolved) is caught at set-time, not discovered later as a stuck item. Answers the user's explicit ask: mergeAfter may only be set when it keeps the unified graph valid. |
 
 ## Pinned terms
 
@@ -77,6 +91,10 @@ redefined.)
 - **tier** (`leaf-to-root` / `root-to-main`) — which verify/drift/footprint
   scope table row (design report §G) an item's merge falls under, derived
   from whether its target is its own parent root or `main` directly.
+- **mergeAfter** — a weak edge distinct from `deps`: blocks an item's
+  *merge* until its targets are RESOLVED, but never blocks the item's own
+  *start/dispatch* the way `deps` does. Exists specifically to let two
+  independently-codeable items still merge in a chosen order.
 
 ## Scout evidence
 
@@ -105,6 +123,16 @@ redefined.)
   (now delivered → unblocked), `footprint: null`, `verify: "chưa xác định
   — P15 bổ sung"` (undetermined — left for planning, not a clarify-stage
   concern).
+- `src/state/dep-graph.mjs` — the unified typed-edge cycle detector
+  (`blocks`=deps, `parent-child`=parent) already exists and is wired at
+  `store.mjs`'s write door (`assertNoCycle`/`assertNoUnifiedCycle`, lines
+  178-179 for `add`, 259-260 for `edit`). Its own header comment already
+  reserves `waits-for` as declared-but-unimplemented vocabulary for
+  exactly this kind of edge ("S2b's job once a real stored form +
+  producer exist") — `mergeAfter` (D4/D5) is that producer, not a new
+  mechanism. No `docs/history/` doc found for the referenced decision IDs
+  (`f176c18a`/`2ccf9804`) — those are `fgos decision` hash ids, not a
+  feature dir.
 - `fgos graph --what-if tsk-3bn --json` — completing tsk-3bn unblocks 3
   items transitively, newly-readying `tsk-3hk` (its `deps` included
   `tsk-3bn`) — this is what surfaced the D3 conflict: reading `tsk-3hk`'s
