@@ -114,24 +114,47 @@ execute time.
 - Partial failure: `sync-root`'s git merge itself conflicts — must
   surface as a real escalation (§H.5-style), never a silent partial merge.
 
-## Split — child items
+## Split — child items (reconciled with engine's `judgeDecompose`, D8)
+
+`fgos decompose tsk-3bn` returned `need-human`: the engine's own
+independent judgment (reading only the item's title/description/refs, no
+visibility into `CONTEXT.md`/this file) proposed a 3-child split covering
+`sync-root` / drift-detection wired into `fgos doctor` / a close-out
+guard — none of which mention clustering/`mergeTier`/`mergeAfter` at all,
+since the engine never sees the locked D1-D7 chain. Presented to the
+user as a real fork (keep the engine's shape, keep this plan's shape, or
+merge both). User chose **merge both — 4 children**. The engine caught a
+real, independent gap this plan had missed: AGENTS.md's install/setup/
+doctor gate ("any new capability with an infra dependency must register
+into `fgos doctor`'s check registry... not stand alone, undiscoverable by
+doctor") — drift-detection is exactly such a capability and this plan's
+original child 1 never wired it in. Folded into child 1 below.
 
 Each carries `parent: tsk-3bn`.
 
-1. **drift-detection**
-   Title: `driftStatus(repoRoot, view): read-only ahead/behind drift check per root branch`
+1. **drift-detection** (engine-caught doctor-wiring folded in)
+   Title: `driftStatus(repoRoot, view) + fgos doctor wiring: read-only ahead/behind drift check per root branch, registered in src/setup/checks.mjs`
    Verify: `node --test test/state/drift-status.test.mjs`
    `deps: []`
+   Footprint: `src/state/drift-status.mjs`, `src/setup/checks.mjs`
 
 2. **sync-root action**
    Title: `fgos sync-root <root-id>: merge a root branch's tip into its target without changing item status/stage`
    Verify: `node --test test/runner/merge.test.mjs`
    `deps: [<drift-detection child id>]`
+   Footprint: `bin/fgos.mjs`, `src/runner/merge.mjs`
 
-3. **merge-set clustering + mergeTier + mergeAfter**
+3. **close-out guard** (from the engine's own proposal — real, not in either canonical report, but directly closes tsk-3bn's own origin incident)
+   Title: `Wire drift check into root/milestone close-out: warn/block approving or closing a decomposed root (or a milestone targeting its children) when fgw/<root> still has commits unreachable from main; update docs/how-to/close-out-a-decomposed-root-item-after-all-children-are-done.md to point at the real verbs instead of the manual trap note`
+   Verify: `npm test`
+   `deps: [<drift-detection child id>]`
+   Footprint: `bin/fgos.mjs`, `docs/how-to/close-out-a-decomposed-root-item-after-all-children-are-done.md`
+
+4. **merge-set clustering + mergeTier + mergeAfter** (this plan's own D1-D7 work, unchanged)
    Title: `mergeReadiness v2: merge-set clustering, blocked-on-sync, mergeTier, and the mergeAfter (waits-for) edge`
    Verify: `node --test test/state/graph-harness.test.mjs test/state/dep-graph.test.mjs test/state/work.test.mjs`
    `deps: [<drift-detection child id>]`
+   Footprint: `src/state/graph-harness.mjs`, `src/state/dep-graph.mjs`, `src/state/work.mjs`, `bin/fgos.mjs`
 
 (Exact ids assigned at `fgos add` time in execution, not fixed here.)
 
