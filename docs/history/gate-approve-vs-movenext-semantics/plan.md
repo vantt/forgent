@@ -108,20 +108,35 @@ tồn tại thì không có gì đọc).
 
 **Title:** "Port trust-signal skip-and-advance (tsk-ozl pattern) sang `resolveDecompose`; thay `FALLBACK_VERIFY` bằng verify thật từ approve record ở cả 2 skip path (discovery + decompose)"
 
-**Phạm vi:**
-- `src/intake/decompose.mjs` — `resolveDecompose` (dòng ~359-408 hiện tại):
-  trước khi gọi `judgeDecompose`, check `readLockedContext` (đã export sẵn,
-  dùng lại y hệt tsk-ozl's pattern trong `discovery.mjs:285-311`) — có
-  `plan.md` non-empty → skip model, `moveStage` thẳng sang `executing`,
-  dùng `verify: view.gates?.[id]?.planApprove?.verify` (từ item con 1) thay
-  vì gọi `judgeDecompose`. Đây đúng gap 3 CONTEXT.md §0 nêu
-  ("`resolveDecompose` KHÔNG có skip-and-advance").
+**Phạm vi (đã điều chỉnh lúc thi công — xem "Phát hiện lúc thi công" bên
+dưới):**
+- `src/intake/decompose.mjs` — `resolveDecompose`: skip `judgeDecompose`
+  CHỈ khi `plan.md` (đọc qua `readLockedContext`, có sẵn) khai `mode =
+  tiny`/`small` — không skip vô điều kiện chỉ vì `plan.md` tồn tại. Mọi
+  nhánh advance sang `executing` (skip, pass-through thật, decompose thật,
+  already-decomposed) đều dùng `verify: view.gates?.[id]?.planApprove?.verify
+  ?? work.verify` thay vì bỏ trống/FALLBACK_VERIFY. Đây đúng gap 3 CONTEXT.md
+  §0 nêu, phạm vi hẹp hơn "port y hệt tsk-ozl" như đề xuất ban đầu.
 - `src/intake/discovery.mjs` — `resolveDiscovery`'s skip path (dòng
   294-311): đổi `verify: FALLBACK_VERIFY` (dòng 307) thành
   `view.gates?.[id]?.contextApprove?.verify ?? FALLBACK_VERIFY` — giữ
   fallback cho item chưa qua track A (backward-compat), ưu tiên verify
   thật khi có. Đây đúng gap 2 CONTEXT.md §0 ("verify khi skip-and-advance
   vẫn là placeholder").
+
+**Phát hiện lúc thi công (tsk-19j-2, quan trọng — lệch khỏi mô tả gốc ở
+trên có chủ đích):** "port y hệt trust-signal của resolveDiscovery" không
+an toàn 1:1 cho decompose. Khác biệt cốt lõi: `resolveDiscovery`'s skip chỉ
+đổi `stage` (không sinh dữ liệu mới); `resolveDecompose` có thể SINH CON
+THẬT (`addWork`) — skip mù (chỉ dựa "plan.md tồn tại") sẽ bỏ qua chính việc
+LLM đọc plan.md để tạo children, đúng thứ chính root `tsk-19j` này vừa cần
+thật (`fgos decompose tsk-19j` phải gọi `judgeDecompose` thật để sinh 3
+item con — không skip được). Sửa: chỉ skip khi `plan.md` tự khai `mode =
+tiny`/`small` (fgos-planning's mode gate: 0-1 cờ → luôn single-piece, không
+bao giờ chia) — mode khác hoặc không đọc được mode → fail-safe, vẫn gọi
+`judgeDecompose` thật như hôm nay. Ghi qua `fgos decision` lúc thi công,
+test `test/intake/decompose.test.mjs` phủ cả 2 nhánh (skip đúng lúc tiny/
+small, không skip lúc standard/high-risk hoặc thiếu plan.md).
 
 **Rủi ro:** vừa-cao — sửa hành vi 2 engine function đang có test bao phủ
 sống (`resolveDiscovery`/`resolveDecompose`), đường skip-and-advance là

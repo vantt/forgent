@@ -6,7 +6,7 @@ import path from 'node:path';
 import { judgeDecompose, resolveDecompose } from '../../src/intake/decompose.mjs';
 import { readScoutNotes } from '../../src/intake/judge-executor.mjs';
 import { computeImpact, computePriority, effortForMode } from '../../src/state/priority-formula.mjs';
-import { addWork, listWork, StoreError, categoryOf, moveWork, readRawEvents } from '../../src/state/store.mjs';
+import { addWork, listWork, StoreError, categoryOf, moveWork, readRawEvents, recordGateApprove } from '../../src/state/store.mjs';
 
 // Fake executors only — every "command" spawned here is a node script this
 // file writes to a mkdtemp directory at test time, mirroring
@@ -1352,4 +1352,105 @@ test('resolveDecompose with no existing scout-notes.md captures the transcript a
   const notes = readScoutNotes(path.dirname(storeDir), docsRef);
   assert.match(notes, /rg reporting-pipeline/);
   assert.match(notes, /src\/report\.mjs:1:reporting-pipeline/);
+});
+
+// --- decompose-side skip-and-advance + real verify (tsk-19j D1/D3/D7,
+// closes gaps 2/3): resolveDecompose skips judgeDecompose ONLY when
+// plan.md's own recorded mode is tiny/small (single-piece by fgos-planning's
+// mode gate, so there is nothing for the model to judge) -- any other mode,
+// or no locked plan.md at all, still calls the real model unchanged. Every
+// advance to executing prefers gates[id].planApprove.verify over the item's
+// existing verify/FALLBACK_VERIFY when a Track A approve record exists. ---
+
+function mkPlanFixture(storeDir, planContent) {
+  const repoRoot = path.dirname(storeDir);
+  const featureDir = fs.mkdtempSync(path.join(repoRoot, 'fgos-plan-'));
+  fs.writeFileSync(path.join(featureDir, 'CONTEXT.md'), '# CONTEXT\n\nD1: locked.\n');
+  fs.writeFileSync(path.join(featureDir, 'plan.md'), planContent);
+  return path.basename(featureDir);
+}
+
+test('resolveDecompose skips judgeDecompose and advances straight to executing when plan.md declares mode "tiny"', () => {
+  const dir = mkTempDir();
+  const { scriptPath, counterPath } = writeCountingRawStdoutExecutor(dir, JSON.stringify({ verdict: 'decompose', reason: 'should never run', children: [{ title: 'x', verify: 'npm test' }] }));
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  const docsRef = mkPlanFixture(storeDir, '# plan\n\nmode = **tiny** (1 file, direct task).\n');
+  addWork(storeDir, sampleWork({ docsRef }));
+  recordGateApprove(storeDir, { id: 'item-x', gate: 'planApprove', actor: 'human', verify: 'npm test -- tiny-item' });
+
+  const result = resolveDecompose(storeDir, 'item-x', cfg, 'session');
+  assert.equal(result.outcome, 'pass-through');
+  assert.equal(readCount(counterPath), 0, 'judgeDecompose must never spawn the executor on the skip path');
+
+  const view = listWork(storeDir);
+  assert.equal(view.work['item-x'].stage, 'executing');
+  assert.equal(view.work['item-x'].verify, 'npm test -- tiny-item');
+  assert.equal(Object.values(view.work).some((item) => item.parent === 'item-x'), false, 'no children ever get written on the skip path');
+  const decisions = view.decisionsById?.['item-x'] ?? [];
+  assert.ok(decisions.some((d) => d.text.startsWith('decompose skip:')), 'skip must log an audit-trail decision');
+});
+
+test('resolveDecompose skips judgeDecompose for mode "small" too, falling back to the item\'s own verify when no planApprove record exists', () => {
+  const dir = mkTempDir();
+  const { scriptPath, counterPath } = writeCountingRawStdoutExecutor(dir, JSON.stringify({ verdict: 'pass-through' }));
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  const docsRef = mkPlanFixture(storeDir, '# plan\n\nMode: small — a few files, no gray areas.\n');
+  addWork(storeDir, sampleWork({ docsRef }));
+
+  const result = resolveDecompose(storeDir, 'item-x', cfg, 'session');
+  assert.equal(result.outcome, 'pass-through');
+  assert.equal(readCount(counterPath), 0);
+
+  const view = listWork(storeDir);
+  assert.equal(view.work['item-x'].verify, 'npm test -- reporting', 'unchanged from sampleWork\'s own verify — no planApprove to prefer');
+});
+
+test('resolveDecompose still calls judgeDecompose when plan.md declares mode "standard" or "high-risk" (skip never applies past tiny/small)', () => {
+  for (const mode of ['standard', 'high-risk']) {
+    const dir = mkTempDir();
+    const { scriptPath, counterPath } = writeCountingRawStdoutExecutor(dir, JSON.stringify({ verdict: 'pass-through', reason: 'real judgment ran' }));
+    const cfg = cfgFor([scriptPath, '{prompt}']);
+
+    const storeDir = tmpStoreDir();
+    const docsRef = mkPlanFixture(storeDir, `# plan\n\nmode = **${mode}**.\n`);
+    addWork(storeDir, sampleWork({ docsRef }));
+
+    const result = resolveDecompose(storeDir, 'item-x', cfg, 'session');
+    assert.equal(result.outcome, 'pass-through');
+    assert.equal(readCount(counterPath), 1, `judgeDecompose must still run for mode "${mode}"`);
+  }
+});
+
+test('resolveDecompose still calls judgeDecompose when no plan.md is locked at all (unchanged behavior)', () => {
+  const dir = mkTempDir();
+  const { scriptPath, counterPath } = writeCountingRawStdoutExecutor(dir, JSON.stringify({ verdict: 'pass-through' }));
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork({ docsRef: 'docs/history/never-written/' }));
+
+  const result = resolveDecompose(storeDir, 'item-x', cfg, 'session');
+  assert.equal(result.outcome, 'pass-through');
+  assert.equal(readCount(counterPath), 1);
+});
+
+test('resolveDecompose real pass-through path (via judgeDecompose) still prefers gates[id].planApprove.verify when present', () => {
+  const dir = mkTempDir();
+  const scriptPath = writeVerdictExecutor(dir, { verdict: 'pass-through', reason: 'simple enough' });
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  const docsRef = mkPlanFixture(storeDir, '# plan\n\nmode = **standard** (real judgment needed).\n');
+  addWork(storeDir, sampleWork({ docsRef }));
+  recordGateApprove(storeDir, { id: 'item-x', gate: 'planApprove', actor: 'human', verify: 'node --test test/real-standard-item.test.mjs' });
+
+  const result = resolveDecompose(storeDir, 'item-x', cfg, 'session');
+  assert.equal(result.outcome, 'pass-through');
+
+  const view = listWork(storeDir);
+  assert.equal(view.work['item-x'].verify, 'node --test test/real-standard-item.test.mjs');
 });
