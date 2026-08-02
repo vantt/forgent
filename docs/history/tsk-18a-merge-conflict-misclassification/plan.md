@@ -165,6 +165,25 @@ done.
 this single item; D1 and D2 can proceed in either order (D1 does not
 depend on D2's result), but both must land before `fgos return`.
 
+## Verify
+
+Real, runnable command replacing the item's current placeholder
+(`"chưa xác định — P15 bổ sung"`):
+
+```
+test -f docs/history/tsk-18a-merge-conflict-misclassification/repro-notes.md && node --test test/runner/merge.test.mjs test/cli/fgos.test.mjs
+```
+
+The `test -f` clause enforces D2's own gate (the repro attempt's result
+must exist on disk before this item can be reported done, not just
+described in prose); `node --test ...` runs D1's new deterministic test
+alongside every existing `'conflict'`-outcome and `catchup` test, proving
+no regression. (`npm test --` was tried first and rejected: the package's
+`test` script hardcodes its own glob, so appended file args ran the full
+2173-test suite instead of scoping down — confirmed by actually running
+it. `node --test <files>` directly does scope correctly, confirmed the
+same way: 520 tests, 0 fail, baseline green before any code change.)
+
 ## Assumptions (unproven, flagged for `fgos-validating`)
 
 - The untracked-file-collision scenario is assumed to be a real,
