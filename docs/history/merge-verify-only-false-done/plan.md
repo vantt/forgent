@@ -99,3 +99,67 @@ of work — proceeds as itself, not decomposed into child items.
   `mergeRunnerItemLocked`/`isAlreadyMerged` without needing new state or
   a new outcome value — reasonable given the existing outcome enum, but
   not verified against the as-yet-unknown exact trigger shape.
+
+## Feasibility validation (`fgos-validating`, this session)
+
+Both assumptions above are now resolved with real, executed evidence —
+neither is "unproven" anymore.
+
+### Reality gate
+
+| Dimension | Result | Evidence |
+|---|---|---|
+| Mode fit | PASS | high-risk confirmed correct — the bug is real, not hypothetical (see repro below), and still carries the same 4 flags from `fgos-planning`. |
+| Repo fit | PASS | Every path/function this plan cites was read directly: `isAlreadyMerged` (`src/runner/merge.mjs:682-692`), `mergeRunnerItemLocked` (`:694-707`), `changedFiles` (`:316-330`), existing tests (`test/runner/merge.test.mjs:622,628,643`). |
+| Assumptions | PASS | See "Central risk #1 — proven" below. |
+| Smaller path | PASS | No smaller mode overlooked. The confirmed fix (content-diff check via the already-existing `changedFiles` primitive) is well-contained, but the surrounding proof (contract compatibility, not regressing 2 existing tests, audit implications) still legitimately needs high-risk's fuller map. |
+| Proof surface | PASS | `node --test test/runner/merge.test.mjs` run for real just now: **51/51 passing**, confirmed baseline before any fix lands. |
+| Impact-analysis posture | PASS | Re-queried `fgos tool query --capability impact-analysis --status present` this session — still returns `gitnexus`/`present` → `full`, matching this plan's recorded posture exactly (no drift since `fgos-planning` ran). |
+
+### Central risk #1 — proven, not hypothetical
+
+Constructed the scenario directly against a real repo and the actual
+`mergeRunnerItem` code (not a mock):
+
+1. Branch `fgw/demo-item` commits real content (`produced.txt`).
+2. `git merge --no-ff -s ours fgw/demo-item` on `main` — the `-s ours`
+   strategy keeps `fgw/demo-item` as a real second parent (so
+   `git merge-base --is-ancestor` reports `true`) while discarding 100%
+   of the branch's tree content. Confirmed empirically:
+   `git ls-tree -r --name-only HEAD` after this merge shows only
+   `base.txt` — `produced.txt` is absent.
+3. Called the real `mergeRunnerItem(repoRoot, item)` from this exact
+   checkout's `src/runner/merge.mjs` against that repo state:
+   - `item.verify = 'test -f produced.txt'` (a verify scoped to the
+     item's own artifact) → `outcome: 'verify-fail'`, correctly caught.
+   - `item.verify = 'true'` (a generic/weak verify, not scoped to the
+     item's own artifact) → **`outcome: 'merged'`**, `check.passed: true`
+     — the false-done case, reproduced for real.
+
+This confirms the bug's exact shape: `isAlreadyMerged`'s fast path
+trusting bare ancestor-reachability is not itself wrong (ancestry is a
+real git invariant), but it is *insufficient alone* whenever the item's
+own verify command isn't scoped to the content the branch actually
+introduced. The gap is real and does not depend on any hypothetical
+edge case — any actor producing an ancestor-true-but-content-discarded
+merge commit (a manual `-s ours` resolution being the concrete case
+constructed here) triggers it, combined with the pre-existing "weak
+proof" flag (item verify commands are not guaranteed to be scoped to
+their own branch's changed files).
+
+### Feasibility matrix
+
+| Assumption / risk | Risk | Proof required | Evidence found | Result |
+|---|---|---|---|---|
+| A real false-positive trigger exists (risk #1) | High | A constructed failing scenario against real code | Empirical repro above — real `mergeRunnerItem` call returned `outcome: 'merged'` on genuinely discarded content | **PASS** |
+| Integrity-check design (D1) is buildable without inventing new primitives | Medium | An existing, reusable content-diff primitive | `changedFiles(repoRoot, item, opts)` (`merge.mjs:316-330`) already computes `git diff --name-only trunk...branch` — the exact shape a content-parity check needs (diff branch's own changed paths against HEAD) | **PASS** |
+| Fix stays contract-compatible (no new outcome value forced) | Medium | Confirm every consumer of `mergeRunnerItem`'s outcome | `bin/fgos.mjs` only branches on the 4 existing literal outcome strings (`'merged'`/`'conflict'`/`'fgos-write-rejected'`/`'verify-fail'`, lines 2114/2176/2189/2202/2250/2267/2280) — mapping the newly-caught case to `'verify-fail'` requires zero changes there | **PASS** |
+| Regression test fits the existing file's pattern (D2) | Low | An established pattern to extend | `test/runner/merge.test.mjs:622-656` already has the tsk-3yl idempotent-merge tests in the identical shape a new test would extend | **PASS** |
+
+### Verdict
+
+**READY.** Every reality-gate dimension and every medium+ risk row has
+real, executed evidence — no plausibility language, no open gap. The
+central uncertainty this plan flagged (whether the bug is real at all)
+is resolved: it is, concretely, and the fix's building block
+(`changedFiles`) already exists in the codebase.
