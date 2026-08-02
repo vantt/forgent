@@ -2181,7 +2181,11 @@ async function runVerb(verb, flags, positional, dir) {
           // leave the ephemeral checkout clean via `git merge --abort`, so
           // no cleanupMergedBranch call is needed on those paths.
           return await withMergeEphemeralWorktree(repoRoot, rootId, async (ephemeral) => {
-            const result = await runMerge(() => mergeRunnerItem(ephemeral.path, item, { timeoutMs }));
+            // tsk-2eq: lockRoot pins the main-checkout lock to the real
+            // repo root — ephemeral.path stays the git-op cwd (unchanged)
+            // but is never the lock's own root, since it's a throwaway
+            // worktree with no writable .fgos/ (ADR0020).
+            const result = await runMerge(() => mergeRunnerItem(ephemeral.path, item, { timeoutMs, lockRoot: repoRoot }));
 
             if (result.outcome === 'conflict') {
               moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: 'merge-conflict', role: 'system' });
