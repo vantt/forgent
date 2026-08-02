@@ -5135,6 +5135,241 @@ test('sync-root refuses from inside a linked worktree (must land on the real mai
   gitAtCwd(cwd, ['worktree', 'remove', '--force', wt]);
 });
 
+// --- promote-to-component (tsk-3gx-3, docs/history/promote-to-component/) -
+//
+// Takes N flat sibling item ids (D2: caller's own explicit list) and
+// converges them into one component: resolve/create a shared root (D1),
+// merge each member's own branch into it (never a rebase, reusing
+// mergeRunnerItem via tsk-3gx-2's engine), and set `parent` ONLY for a
+// member whose real merge truly succeeded (never on say-so).
+
+// Register a flat member's state (add + claim) WITHOUT cutting its branch
+// yet. Split from the branch-cut step below so a multi-member test can fold
+// every member's state onto ONE shared main commit before any branch
+// exists — cutting branches at different points in main's history would
+// leave their .fgos/events.jsonl content genuinely diverged (each branch
+// carrying a different subset of add/claim events), which mergeRunnerItem's
+// real ADR0020 guard correctly refuses as a staged .fgos/ change. A
+// single-member test can use makeFlatMember below instead, where this
+// distinction never matters.
+function registerFlatMember(cwd, id, opts = {}) {
+  const dir = path.join(cwd, '.fgos');
+  addWork(dir, { id, title: `Title ${id}`, kind: 'task', status: 'todo', deps: opts.deps ?? [], mergeAfter: opts.mergeAfter, risk: 'low', refs: [], verify: opts.verify ?? 'true' });
+  run(cwd, ['move', id, '--to', 'doing']);
+}
+
+// Cut `id`'s own `fgw/<id>` branch from whatever main currently is, with one
+// real commit. Callers with more than one member must commitPending() all
+// registerFlatMember() calls first, THEN cut every branch — see the comment
+// above.
+function cutMemberBranch(cwd, id) {
+  gitAtCwd(cwd, ['checkout', '-b', `fgw/${id}`]);
+  fs.writeFileSync(path.join(cwd, `${id}-produced.txt`), 'ok\n');
+  gitAtCwd(cwd, ['add', `${id}-produced.txt`]);
+  gitAtCwd(cwd, ['commit', '-q', '-m', `work for ${id}`]);
+  gitAtCwd(cwd, ['checkout', 'main']);
+}
+
+// A plain flat member: its own `fgw/<id>` branch exists with one real
+// commit, item status stays 'doing' (claimed, mid-flight — no parent set).
+// Safe for single-member setups; a multi-member test that needs the merged
+// branches to actually share history should use registerFlatMember +
+// cutMemberBranch directly instead (see their own comments above).
+function makeFlatMember(cwd, id, opts = {}) {
+  registerFlatMember(cwd, id, opts);
+  commitPending(cwd, `state: setup ${id}`);
+  cutMemberBranch(cwd, id);
+}
+
+test('promote-to-component requires at least 2 ids, exit 4', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeFlatMember(cwd, 'ptc-solo-a');
+
+  const result = run(cwd, ['promote-to-component', '--ids', 'ptc-solo-a', '--root-title', 'Component solo']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /at least 2/);
+});
+
+test('promote-to-component on a nonexistent member id is rejected as validation, exit 4', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeFlatMember(cwd, 'ptc-real-a');
+
+  const result = run(cwd, ['promote-to-component', '--ids', 'ptc-real-a,ptc-ghost', '--root-title', 'Component ghost']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /ptc-ghost.*not found/);
+});
+
+test('promote-to-component refuses a member that already has a parent, exit 4', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeFlatMember(cwd, 'ptc-sibling');
+  makeFlatMember(cwd, 'ptc-already-parented', { deps: ['ptc-sibling'] });
+  editWork(path.join(cwd, '.fgos'), { id: 'ptc-already-parented', patch: { parent: 'some-other-root' } });
+  commitPending(cwd, 'state: pre-parent ptc-already-parented');
+
+  const result = run(cwd, ['promote-to-component', '--ids', 'ptc-already-parented,ptc-sibling', '--root-title', 'Component reject']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /already has parent/);
+});
+
+test('promote-to-component refuses ids that are not connected via deps/mergeAfter, exit 4', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeFlatMember(cwd, 'ptc-disconnected-a');
+  makeFlatMember(cwd, 'ptc-disconnected-b');
+
+  const result = run(cwd, ['promote-to-component', '--ids', 'ptc-disconnected-a,ptc-disconnected-b', '--root-title', 'Component disconnected']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /not all connected/);
+});
+
+test('promote-to-component happy path (D1 new-item): creates a fresh root, merges both members into it, sets parent only after real success, records one decision', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  registerFlatMember(cwd, 'ptc-new-root-a');
+  registerFlatMember(cwd, 'ptc-new-root-b', { deps: ['ptc-new-root-a'] });
+  commitPending(cwd, 'state: setup ptc-new-root members');
+  cutMemberBranch(cwd, 'ptc-new-root-a');
+  cutMemberBranch(cwd, 'ptc-new-root-b');
+
+  const result = run(cwd, ['promote-to-component', '--ids', 'ptc-new-root-a,ptc-new-root-b', '--root-title', 'Component new root']);
+  assert.equal(result.status, 0, result.stderr);
+  const data = JSON.parse(result.stdout).data;
+  assert.equal(data.rootCreated, true);
+  assert.equal(data.results.find((r) => r.id === 'ptc-new-root-a').outcome, 'merged');
+  assert.equal(data.results.find((r) => r.id === 'ptc-new-root-b').outcome, 'merged');
+
+  const view = stateView(cwd);
+  assert.equal(view.work['ptc-new-root-a'].parent, data.rootId);
+  assert.equal(view.work['ptc-new-root-b'].parent, data.rootId);
+  assert.equal(view.work[data.rootId].status, 'todo', 'a freshly created root is not claimed by this action');
+
+  const rootFiles = gitAtCwd(cwd, ['ls-tree', '-r', '--name-only', `fgw/${data.rootId}`]);
+  assert.match(rootFiles, /ptc-new-root-a-produced\.txt/);
+  assert.match(rootFiles, /ptc-new-root-b-produced\.txt/);
+
+  const decisionEvents = eventLines(cwd).map((l) => JSON.parse(l)).filter((e) => e.type === 'decision' && e.payload?.id === data.rootId);
+  assert.equal(decisionEvents.length, 1, 'promote-to-component must append exactly one real decision record');
+  assert.match(decisionEvents[0].payload.text, /ptc-new-root-a/);
+  assert.match(decisionEvents[0].payload.text, /ptc-new-root-b/);
+});
+
+test('promote-to-component happy path (D1 reuse-member): promotes an existing member to root, root itself is skipped not merged', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  // Connectivity edge direction matters here: buildUnifiedAdjacency
+  // (src/state/dep-graph.mjs) adds parent -> child for a `parent` edge and
+  // id -> target for both `deps` and `mergeAfter` — the SAME direction.
+  // Promoting ptc-reuse-root to root sets ptc-reuse-other.parent =
+  // 'ptc-reuse-root' (edge root -> other); if the connectivity edge were
+  // ptc-reuse-other -> ptc-reuse-root (either field), that closes a real
+  // cycle (see the dedicated merged-parent-rejected test below). Declaring
+  // the edge on the ROOT side instead (root -> other) matches the parent
+  // edge's own direction, so no cycle — this is the genuine happy path.
+  registerFlatMember(cwd, 'ptc-reuse-other');
+  registerFlatMember(cwd, 'ptc-reuse-root', { mergeAfter: ['ptc-reuse-other'] });
+  commitPending(cwd, 'state: setup ptc-reuse members');
+  cutMemberBranch(cwd, 'ptc-reuse-root');
+  cutMemberBranch(cwd, 'ptc-reuse-other');
+
+  const result = run(cwd, ['promote-to-component', '--ids', 'ptc-reuse-root,ptc-reuse-other', '--root-id', 'ptc-reuse-root']);
+  assert.equal(result.status, 0, result.stderr);
+  const data = JSON.parse(result.stdout).data;
+  assert.equal(data.rootCreated, false);
+  assert.equal(data.rootId, 'ptc-reuse-root');
+  assert.equal(data.results.find((r) => r.id === 'ptc-reuse-root').outcome, 'skipped');
+  assert.equal(data.results.find((r) => r.id === 'ptc-reuse-other').outcome, 'merged');
+
+  const view = stateView(cwd);
+  assert.equal(view.work['ptc-reuse-other'].parent, 'ptc-reuse-root');
+  assert.equal(view.work['ptc-reuse-root'].parent, undefined, 'root never sets its own parent to itself');
+
+  const rootFiles = gitAtCwd(cwd, ['ls-tree', '-r', '--name-only', 'fgw/ptc-reuse-root']);
+  assert.match(rootFiles, /ptc-reuse-other-produced\.txt/);
+});
+
+test('promote-to-component reports merged-parent-rejected (never crashes) when the real git merge succeeds but setting parent would close a deps+parent cycle', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  registerFlatMember(cwd, 'ptc-cycle-root');
+  // deps (not mergeAfter) deliberately: ptc-cycle-other depends on the very
+  // item this test promotes to root, so setting ptc-cycle-other.parent =
+  // 'ptc-cycle-root' afterward closes a real deps+parent cycle
+  // (assertNoUnifiedCycle) — the exact failure mode the try/catch around
+  // editWork above exists for.
+  registerFlatMember(cwd, 'ptc-cycle-other', { deps: ['ptc-cycle-root'] });
+  commitPending(cwd, 'state: setup ptc-cycle members');
+  cutMemberBranch(cwd, 'ptc-cycle-root');
+  cutMemberBranch(cwd, 'ptc-cycle-other');
+
+  const result = run(cwd, ['promote-to-component', '--ids', 'ptc-cycle-root,ptc-cycle-other', '--root-id', 'ptc-cycle-root']);
+  assert.equal(result.status, 0, result.stderr);
+  const data = JSON.parse(result.stdout).data;
+  const otherResult = data.results.find((r) => r.id === 'ptc-cycle-other');
+  assert.equal(otherResult.outcome, 'merged-parent-rejected');
+  assert.match(otherResult.reason, /graph cycle/);
+
+  // The real git merge landed regardless of the state-layer rejection —
+  // this outcome exists precisely because git succeeded where state didn't.
+  const rootFiles = gitAtCwd(cwd, ['ls-tree', '-r', '--name-only', 'fgw/ptc-cycle-root']);
+  assert.match(rootFiles, /ptc-cycle-other-produced\.txt/);
+
+  const view = stateView(cwd);
+  assert.equal(view.work['ptc-cycle-other'].parent, undefined, 'a rejected parent-set never silently applies anyway');
+
+  const decisionEvents = eventLines(cwd).map((l) => JSON.parse(l)).filter((e) => e.type === 'decision' && e.payload?.id === data.rootId);
+  assert.equal(decisionEvents.length, 1, 'a per-member rejection still gets exactly one real decision record');
+  assert.match(decisionEvents[0].payload.text, /ptc-cycle-other/);
+});
+
+test('promote-to-component bails a conflicting member without setting its parent, still processes and merges the rest', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+
+  const dir = path.join(cwd, '.fgos');
+  addWork(dir, { id: 'ptc-conflict-b', title: 'Title conflict b', kind: 'task', status: 'todo', deps: [], risk: 'low', refs: [], verify: 'true' });
+  addWork(dir, { id: 'ptc-conflict-a', title: 'Title conflict a', kind: 'task', status: 'todo', deps: ['ptc-conflict-b'], risk: 'low', refs: [], verify: 'true' });
+  commitPending(cwd, 'state: add ptc-conflict members');
+  run(cwd, ['move', 'ptc-conflict-a', '--to', 'doing']);
+  run(cwd, ['move', 'ptc-conflict-b', '--to', 'doing']);
+  commitPending(cwd, 'state: claim ptc-conflict members');
+
+  // ptc-conflict-a edits seed.txt one way; the fresh root (branched from
+  // current main) will independently... actually the root is created AFTER
+  // this, from main's current tip, so give the root-to-be a conflicting
+  // edit by pre-seeding seed.txt differently on a throwaway commit on main
+  // first, then letting ptc-conflict-a diverge from an EARLIER point.
+  gitAtCwd(cwd, ['checkout', '-b', 'fgw/ptc-conflict-a']);
+  fs.writeFileSync(path.join(cwd, 'seed.txt'), 'edited by ptc-conflict-a\n');
+  gitAtCwd(cwd, ['add', 'seed.txt']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', 'ptc-conflict-a edits seed.txt']);
+  gitAtCwd(cwd, ['checkout', 'main']);
+  fs.writeFileSync(path.join(cwd, 'seed.txt'), 'edited by main after branch cut\n');
+  gitAtCwd(cwd, ['add', 'seed.txt']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', 'main also edits seed.txt']);
+
+  gitAtCwd(cwd, ['checkout', '-b', 'fgw/ptc-conflict-b']);
+  fs.writeFileSync(path.join(cwd, 'ptc-conflict-b-produced.txt'), 'ok\n');
+  gitAtCwd(cwd, ['add', 'ptc-conflict-b-produced.txt']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', 'work for ptc-conflict-b']);
+  gitAtCwd(cwd, ['checkout', 'main']);
+
+  const result = run(cwd, ['promote-to-component', '--ids', 'ptc-conflict-a,ptc-conflict-b', '--root-title', 'Component conflict']);
+  assert.equal(result.status, 0, result.stderr);
+  const data = JSON.parse(result.stdout).data;
+  const aResult = data.results.find((r) => r.id === 'ptc-conflict-a');
+  const bResult = data.results.find((r) => r.id === 'ptc-conflict-b');
+  assert.equal(aResult.outcome, 'bailed');
+  assert.equal(aResult.reason, 'merge-conflict');
+  assert.equal(bResult.outcome, 'merged');
+
+  const view = stateView(cwd);
+  assert.equal(view.work['ptc-conflict-a'].parent, undefined, 'a bailed member never gets parent set');
+  assert.equal(view.work['ptc-conflict-b'].parent, data.rootId);
+});
+
 // --- close-out drift guard (tsk-62y, docs/history/
 //     tsk-3bn-merge-conductor-harness-v2/) ----------------------------------
 //
