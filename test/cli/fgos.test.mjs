@@ -6598,6 +6598,42 @@ test('merge list: unknown sub-verb is rejected as validation, exit 4', () => {
   assert.equal(result.status, 4);
 });
 
+// tsk-66x: `merge` is a `requiresExistingStore: true` verb (like `submit`/
+// `approve`) -- a missing `.fgos/` must refuse loudly, never fold silently
+// into an empty-but-valid-looking ready/waiting/conflicts result.
+test('merge list on a directory with no .fgos/ at all is refused, exit 4, writes nothing (no auto-vivify)', () => {
+  const cwd = rawTmpCwd();
+  assert.ok(!fs.existsSync(path.join(cwd, '.fgos')));
+  const result = run(cwd, ['merge', 'list']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /\.fgos\/ not found/);
+  assert.ok(!fs.existsSync(path.join(cwd, '.fgos')), 'the refused verb must not create .fgos/ as a side effect');
+});
+
+test('merge next on a directory with no .fgos/ at all is refused, exit 4, no merge attempted', () => {
+  const cwd = rawTmpCwd();
+  assert.ok(!fs.existsSync(path.join(cwd, '.fgos')));
+  const result = run(cwd, ['merge', 'next']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /\.fgos\/ not found/);
+  assert.ok(!fs.existsSync(path.join(cwd, '.fgos')), 'the refused verb must not create .fgos/ as a side effect');
+});
+
+test('merge next run from inside a linked worktree without --dir is refused, exit 4 -- never the old silent "nothing ready" false negative even though the real store has a ready item', () => {
+  const { main, wt } = tmpLinkedWorktree();
+  assert.equal(run(main, ['add', 'solo', '--title', 'Solo', '--kind', 'task', '--risk', 'low', '--verify', 'true']).status, 0);
+  assert.equal(run(main, ['move', 'solo', '--to', 'doing']).status, 0);
+  assert.equal(run(main, ['move', 'solo', '--to', 'awaiting-approval']).status, 0);
+  // Confirm the real store genuinely has a ready item, so a refusal below
+  // cannot be mistaken for a true "nothing ready" negative.
+  assert.deepEqual(envelopeData(run(main, ['merge', 'list']).stdout).ready, ['solo']);
+
+  const result = run(wt, ['merge', 'next']);
+  assert.equal(result.status, 4, `expected a refusal, not the old silent false negative: ${result.stdout}${result.stderr}`);
+  assert.match(result.stderr, /\.fgos\/ not found/);
+  assert.equal(stateView(main).work.solo.status, 'awaiting-approval', 'the ready item at the real store must be untouched');
+});
+
 test('merge list on an empty store: empty ready/waiting/conflicts, exit 0, no event appended', () => {
   const cwd = tmpCwd();
   assert.equal(run(cwd, ['init']).status, 0);

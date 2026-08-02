@@ -436,7 +436,11 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos merge list', 'fgos merge next'],
     touchesState: true,
-    requiresExistingStore: false,
+    // tsk-66x: both list and next read/write through dataDir()'s `dir` --
+    // without this, a missing store (e.g. cwd is a linked worktree with no
+    // --dir) folds silently into an empty-but-valid ready/waiting/conflicts
+    // result instead of refusing, the false negative this item closes.
+    requiresExistingStore: true,
     externalEffect: false,
     paginated: false,
     deprecated: null,
