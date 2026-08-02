@@ -62,6 +62,12 @@ Out of scope (explicitly deferred, not this item):
   part of the locked D2 package captured here.
 - `tsk-45y` / `tsk-19j` / `tsk-18a` / `tsk-3wq` / `tsk-280` / `tsk-3au` —
   separate items, unrelated to this scope; not touched.
+- `tsk-2ie` ("loại quan hệ 5" — `duplicates`/`supersededBy` field) and
+  `tsk-3gx` ("loại quan hệ 4" — `promote-to-component` action) — both
+  filed today, both `deps` on this item (repointed from `tsk-3hk`, see
+  D6), both explicitly self-scope away from this item's boundary in their
+  own descriptions. Real downstream consumers of the `graph-harness.mjs`
+  layer this item builds, not part of it.
 
 ## Locked decisions
 
@@ -72,6 +78,7 @@ Out of scope (explicitly deferred, not this item):
 | D3 | Conflict discovered mid-planning: a prior decision on this item (2026-08-02T03:43, before this session) had narrowed tsk-3bn to gap B/C only, precisely to avoid duplicating `tsk-3hk`'s clustering+tier scope. D1 (above) unknowingly reversed that narrowing. Presented to the user as a real fork — revert D1, or keep D1 wide and fold `tsk-3hk` in — user chose to keep D1 wide. `tsk-3hk` closed `wontfix` as superseded, its decision log cross-referencing this one. D1 stands as tsk-3bn's final, current scope. |
 | D4 | `mergeAfter: [ids]` — a new, weak, merge-order-only field — is IN v1 scope (tsk-3hk's original proposal, reconsidered). Initial analysis found no case in the 3 locked `mergeSets` reasons (`footprint-overlap`/`shared-root`/`deps-chain`) that needs it — each already resolves via an existing field. User overrode with real, grounded counter-evidence: release-order preference independent of code/footprint/shared-root is a real, recurring, often-spontaneous need ("want X to land first"), not hypothetical. Kept minimal: no new `mergeSets` reason category, no new escalation path — the field only extends the existing `waiting` gate (`graph-harness.mjs`) the same way unmet `deps` already does; `frontier.mjs` deliberately never reads it, so start-eligibility is unaffected. Settable anytime via `fgos edit --merge-after`, matching its spontaneous-decision nature — not fixed only at planning/decompose time. Unset (default/common case) is a pure no-op: existing auto-computed order (rankImpact + the new clustering) applies exactly as already locked; `mergeAfter` only fires when a person deliberately sets it. Set is a hard gate, not a soft priority nudge — matches "human has their own plan" being meant literally, not just a ranking hint another item's priority could override. |
 | D5 | `mergeAfter` is implemented as the `waits-for` edge kind `dep-graph.mjs`'s own header comment already reserves ("declared vocabulary only... that is S2b's job once a real stored form + producer exist") — not a bespoke second validation path. Setting it goes through the SAME write-door validation `deps`/`parent` already get in `store.mjs` (lines 178-179/259-260 today): target-id existence (mirrors `validateDeps`), no self-reference, and `assertNoUnifiedCycle` extended to include `waits-for` edges in the unified adjacency alongside `blocks`(deps)/`parent-child` — so a cycle MIXING `mergeAfter` with `deps`/`parent` (e.g. A `deps:[B]` + B `mergeAfter:[A]`, a real deadlock: A can't start until B resolved, B can't merge until A resolved) is caught at set-time, not discovered later as a stuck item. Answers the user's explicit ask: mergeAfter may only be set when it keeps the unified graph valid. |
+| D6 | Closing `tsk-3hk` `wontfix` (D3) had a real consequence caught in a follow-up review: `tsk-2ie` and `tsk-3gx` both had `deps` on `tsk-3hk`. `wontfix` is a RESOLVED status, so `tsk-2ie` (deps: `[tsk-3hk]` only) became falsely deps-ready (verified via direct `isDepsAndLineageReady()` call: `true` before, `false` after) despite the `graph-harness.mjs` layer it needs not existing yet. Both repointed: `tsk-2ie` → `deps: [tsk-3bn]`, `tsk-3gx` → `deps: [tsk-3bn]` (deduped, was `[tsk-3bn, tsk-3hk]`). Full backlog sweep after the fix found no other item still referencing `tsk-3hk` in `deps`, and no children of `tsk-3hk` (`parent` field) to orphan. |
 
 ## Pinned terms
 
@@ -179,3 +186,13 @@ redefined.)
   as a real follow-on need but explicitly out of this item's locked scope
   (see Feature boundary); planning should note it as a likely next item
   rather than silently fold it in.
+- Whether `deps-chain`-reason items move from today's plain `waiting`
+  bucket into the new `mergeSets` structure, or stay conceptually in
+  `waiting` with `mergeSets` metadata layered on top — the two canonical
+  reports use "`deps-chain`" as a `mergeSets` `reason` without pinning
+  this mechanically. `mergeAfter` (D4/D5) was deliberately kept consistent
+  with today's simpler behavior (extends `waiting`, not `mergeSets`) —
+  if planning resolves `deps-chain` the other way (promoted into
+  `mergeSets` proper), `mergeAfter` should very likely follow the same
+  shape for consistency. Implementation-shape, not product scope — left
+  to planning, flagged here so it isn't silently decided either way.
