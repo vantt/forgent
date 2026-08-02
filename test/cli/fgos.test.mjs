@@ -4827,6 +4827,96 @@ test('approve of an ordinary runner item (diff touches no self-modifying module)
   assert.equal(stateView(cwd).work['iron-plain-item'].status, 'delivered');
 });
 
+// tsk-4voj-iron-law-leaf-scope CONTEXT.md D1: the Iron Law's own
+// changedFiles input now diffs a leaf against its resolved root's branch
+// (the same D3 leaf-vs-root split `approve`'s merge target and `review`'s
+// diff already use), not blind trunk. Before this fix, a leaf forked AFTER
+// a sibling already merged a gated-module change into the root inherited
+// that sibling's files as if they were its own -- live-reproduced on
+// tsk-52g-2. These two tests prove the false-positive is closed (below)
+// without under-scoping a leaf's own genuine hit (further below).
+
+test('approve of a leaf item forked AFTER a sibling already merged a gated-module change into the root does NOT trip Iron Law on the ancestor\'s file (tsk-4voj false-positive closed)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+
+  const rootId = 'iron-leaf-root';
+  const leafId = 'iron-leaf-child';
+  const dir = path.join(cwd, '.fgos');
+  addWork(dir, { id: rootId, title: `Title ${rootId}`, kind: 'task', status: 'todo', deps: [], risk: 'low', refs: [], verify: 'true' });
+  commitPending(cwd, `state: add ${rootId}`);
+  gitAtCwd(cwd, ['branch', `fgw/${rootId}`, 'main']);
+
+  // A sibling child's already-merged gated-module change, landed on the
+  // root's own integration branch BEFORE this leaf forks from it -- the
+  // exact tsk-52g-2 shape.
+  gitAtCwd(cwd, ['checkout', `fgw/${rootId}`]);
+  fs.mkdirSync(path.join(cwd, 'src/runner'), { recursive: true });
+  fs.writeFileSync(path.join(cwd, 'src/runner/sibling-produced.mjs'), 'export const sibling = true;\n');
+  gitAtCwd(cwd, ['add', '-A']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', 'sibling child merged into root (already has its own evidence elsewhere)']);
+  gitAtCwd(cwd, ['checkout', 'main']);
+
+  addWork(dir, {
+    id: leafId, title: `Title ${leafId}`, kind: 'task', status: 'todo', deps: [], risk: 'low', refs: [],
+    verify: 'test -f docs/leaf-note.txt', parent: rootId,
+  });
+  run(cwd, ['move', leafId, '--to', 'doing']);
+  commitPending(cwd, `state: claim ${leafId}`);
+
+  gitAtCwd(cwd, ['checkout', '-b', `fgw/${leafId}`, `fgw/${rootId}`]);
+  fs.mkdirSync(path.join(cwd, 'docs'), { recursive: true });
+  fs.writeFileSync(path.join(cwd, 'docs/leaf-note.txt'), 'ok\n');
+  gitAtCwd(cwd, ['add', '-A']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', `worker output for ${leafId}`]);
+  gitAtCwd(cwd, ['checkout', 'main']);
+
+  run(cwd, ['move', leafId, '--to', 'awaiting-approval']);
+  commitPendingBeforeApprove(cwd, leafId);
+
+  const result = run(cwd, ['approve', leafId]);
+  assert.equal(result.status, 0, `leaf's own diff never touches a gated module -- must approve without --acknowledge-iron-law: ${result.stdout}${result.stderr}`);
+  assert.doesNotMatch(result.stdout, /Iron Law/);
+  assert.equal(stateView(cwd).work[leafId].status, 'delivered');
+});
+
+test('approve of a leaf item whose OWN commit touches a gated module (src/runner/**) still REFUSES without --acknowledge-iron-law, even with leaf-scoped diff (tsk-4voj D1 does not under-scope)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+
+  const rootId = 'iron-leaf-genuine-root';
+  const leafId = 'iron-leaf-genuine-child';
+  const dir = path.join(cwd, '.fgos');
+  addWork(dir, { id: rootId, title: `Title ${rootId}`, kind: 'task', status: 'todo', deps: [], risk: 'low', refs: [], verify: 'true' });
+  commitPending(cwd, `state: add ${rootId}`);
+  gitAtCwd(cwd, ['branch', `fgw/${rootId}`, 'main']);
+
+  addWork(dir, {
+    id: leafId, title: `Title ${leafId}`, kind: 'task', status: 'todo', deps: [], risk: 'low', refs: [],
+    verify: 'test -f src/runner/iron-leaf-genuine-child-produced.mjs', parent: rootId,
+  });
+  run(cwd, ['move', leafId, '--to', 'doing']);
+  commitPending(cwd, `state: claim ${leafId}`);
+
+  gitAtCwd(cwd, ['checkout', '-b', `fgw/${leafId}`, `fgw/${rootId}`]);
+  fs.mkdirSync(path.join(cwd, 'src/runner'), { recursive: true });
+  fs.writeFileSync(path.join(cwd, 'src/runner/iron-leaf-genuine-child-produced.mjs'), 'export const producedByLeaf = true;\n');
+  gitAtCwd(cwd, ['add', '-A']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', `worker output for ${leafId}`]);
+  gitAtCwd(cwd, ['checkout', 'main']);
+
+  run(cwd, ['move', leafId, '--to', 'awaiting-approval']);
+  commitPendingBeforeApprove(cwd, leafId);
+
+  const headBefore = gitHead(cwd);
+  const result = run(cwd, ['approve', leafId]);
+  assert.equal(result.status, 4, `leaf's own commit genuinely touches a gated module -- must still refuse: ${result.stdout}${result.stderr}`);
+  assert.match(result.stderr, /Iron Law/);
+  assert.match(result.stderr, /src\/runner\/iron-leaf-genuine-child-produced\.mjs/, 'the refusal must name the leaf\'s own tripped module');
+  assert.equal(gitHead(cwd), headBefore, 'a refused approve attempts no merge');
+  assert.equal(stateView(cwd).work[leafId].status, 'awaiting-approval');
+});
+
 test('reject on a nonexistent id is rejected as validation, exit 4', () => {
   const cwd = tmpCwd();
   const result = run(cwd, ['reject', 'ghost', '--reason', 'nope']);
