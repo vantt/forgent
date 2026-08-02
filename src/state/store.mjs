@@ -675,6 +675,43 @@ export function addDiscovery(dir, payload) {
   return { event, view };
 }
 
+// Gate approve record shape (tsk-19j D1/D11): the 3 skill-embedded Gates
+// this schema covers — one per stage in the clarify->decompose sequence —
+// and the only 2 actors a real approve record can name (a person, or the
+// gate-bypass mechanism auto-approving on the person's behalf).
+const GATE_APPROVE_GATES = new Set(['contextApprove', 'planApprove', 'validateApprove']);
+const GATE_APPROVE_ACTORS = new Set(['human', 'bypass']);
+
+/**
+ * Log a structured gate-approve event (tsk-19j D1/D11) — an explicit,
+ * durable record that a skill-embedded Gate was approved, separate from the
+ * `awaiting-human` ask/answer mechanism (putInAwaiting/answerAwaiting
+ * above). No FSM/work validation beyond requiring `id`; each call is its own
+ * occurrence, folded by `gate` into `gates[id]` in replay.mjs (a later
+ * approve on the SAME gate overwrites that gate's own field, never the other
+ * two). Mirrors `addDiscovery`'s shape exactly: single write door,
+ * append-then-refresh tail, no CAS — an approve record never itself moves
+ * the item.
+ */
+export function recordGateApprove(dir, { id, gate, actor, verify } = {}) {
+  const { logPath } = paths(dir);
+  if (typeof id !== 'string' || !id.trim()) {
+    throw new StoreError('validation', 'gate-approve requires a non-empty "id".');
+  }
+  if (typeof gate !== 'string' || !GATE_APPROVE_GATES.has(gate)) {
+    throw new StoreError('validation', `gate-approve requires "gate" to be one of: ${[...GATE_APPROVE_GATES].join(', ')}.`);
+  }
+  if (typeof actor !== 'string' || !GATE_APPROVE_ACTORS.has(actor)) {
+    throw new StoreError('validation', `gate-approve requires "actor" to be one of: ${[...GATE_APPROVE_ACTORS].join(', ')}.`);
+  }
+  if (typeof verify !== 'string' || !verify.trim()) {
+    throw new StoreError('validation', 'gate-approve requires a non-empty "verify".');
+  }
+  const event = appendEvent(logPath, { type: 'work.gate-approve', payload: { id, gate, actor, verify } });
+  const view = refreshView(dir);
+  return { event, view };
+}
+
 /**
  * Log a decision event (no FSM/work validation — decisions are freeform).
  *

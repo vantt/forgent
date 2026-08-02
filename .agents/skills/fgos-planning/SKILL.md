@@ -177,16 +177,29 @@ Treat anything other than exactly `true` on stdout — `false`, empty output,
 a thrown error — as `false`: fail closed, never skip the question on a
 check that couldn't run cleanly.
 
+Either branch below also records a structured approve record (tsk-19j
+D1/D11) — separate from, and in addition to, `fgos decision`'s free-text
+audit line: `fgos gate-approve <item-id> --gate planApprove --actor
+<human|bypass> --verify "<the plan's own real verify for this item>"` — the
+real, runnable command `plan.md` itself already names for this item as a
+whole (when the shape does not split it) or for the item's own piece when
+it does; never a placeholder, per this skill's own "Proof surface" rule.
+
 - **`true`** — skip the question. Post the non-question line
   `auto-approved: plan.md (gate-bypass level <level>)`, log it
   (`fgos decision --text "auto-approved plan.md gate for <item-id> at
   level <level>" --rationale "gate-bypass level <level> permits
   auto-approval per docs/history/gate-bypass/CONTEXT.md D1-D5"`, D3's
-  audit trail), then continue straight to `fgos-validating`.
+  audit trail), record it (`fgos gate-approve <item-id> --gate planApprove
+  --actor bypass --verify "..."`, per above), then continue straight to
+  `fgos-validating`.
 - **`false`** — present the mode, the approach, and the shape in plain
   language — what gets built, why this size and not a bigger or smaller
   one, what it costs if the shape turns out wrong — with `plan.md` linked,
-  then ask exactly: "Work shape is ready. Approve before execution?"
+  then ask exactly: "Work shape is ready. Approve before execution?" Once
+  the person approves, record it (`fgos gate-approve <item-id> --gate
+  planApprove --actor human --verify "..."`, per above) before continuing
+  to `fgos-validating`.
   `plan.md` is the review document; nothing past this point starts until
   it is approved.
 
