@@ -15,6 +15,7 @@ import {
   isFgosOnlyStatusLine,
   buildOwnFileSet,
   classifyDecisionIndexCollision,
+  abortMergeIfPossible,
 } from '../../src/runner/merge.mjs';
 import { branchNameFor } from '../../src/runner/worktree.mjs';
 import { acquireMainCheckoutLock, ACQUIRED } from '../../src/runner/main-checkout-lock.mjs';
@@ -653,6 +654,46 @@ test('mergeRunnerItem on an already-merged branch still re-runs verify and retur
   const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'test -f produced.txt' }));
   assert.equal(result.outcome, 'verify-fail');
   assert.equal(result.check.passed, false);
+});
+
+// tsk-2j9: `abortMergeIfPossible` guards every abort call in
+// `mergeRunnerItemLocked` against a genuine `git merge --no-commit --no-ff`
+// no-op (branch already an ancestor of HEAD by merge-attempt time — the
+// TOCTOU window between `isAlreadyMerged`'s pre-check and this call, e.g. a
+// main-checkout writer that bypasses `acquireMainCheckoutLock`). That no-op
+// exits 0 with "Already up to date." and creates no `MERGE_HEAD`, so the
+// unconditional `git merge --abort` this replaced used to crash with
+// "fatal: There is no merge to abort (MERGE_HEAD missing)" on the very next
+// abort attempt. `isAlreadyMerged`'s own ancestor check and git's own
+// up-to-date determination test the same condition, so this scenario is not
+// reproducible through `mergeRunnerItem`'s public entry point without real
+// concurrency — these two tests instead prove the exported guard directly,
+// the same direct-unit-test pattern this file already uses for the other
+// merge-conflict helpers (`classifyDecisionIndexCollision` and siblings).
+
+test('abortMergeIfPossible is a no-op when there is no MERGE_HEAD (the tsk-2j9 no-op-merge case) — never throws "no merge to abort"', () => {
+  const repoRoot = initRepo();
+  const headBefore = headOf(repoRoot);
+
+  assert.doesNotThrow(() => abortMergeIfPossible(repoRoot));
+
+  assert.equal(headOf(repoRoot), headBefore, 'HEAD must be untouched');
+  assert.equal(isWorkingTreeClean(repoRoot), true);
+});
+
+test('abortMergeIfPossible still aborts a real in-progress merge when MERGE_HEAD does exist', () => {
+  const repoRoot = initRepo();
+  makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
+
+  git(repoRoot, ['merge', '--no-commit', '--no-ff', 'fgw/demo-item']);
+  assert.doesNotThrow(() => git(repoRoot, ['rev-parse', '--verify', 'MERGE_HEAD']), 'merge must actually be in progress before this test proves anything');
+  const headBefore = headOf(repoRoot);
+
+  abortMergeIfPossible(repoRoot);
+
+  assert.throws(() => git(repoRoot, ['rev-parse', '--verify', 'MERGE_HEAD']), 'MERGE_HEAD must be gone after the abort');
+  assert.equal(headOf(repoRoot), headBefore, 'abort must not move HEAD');
+  assert.equal(isWorkingTreeClean(repoRoot), true);
 });
 
 // --- mergeRunnerItem rejects a .fgos/ write on the branch (ADR0020) -------

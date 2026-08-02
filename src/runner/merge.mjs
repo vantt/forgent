@@ -691,6 +691,33 @@ function isAlreadyMerged(repoRoot, branch, ref) {
   }
 }
 
+// tsk-2j9 D1/D2: a genuine `git merge --no-commit --no-ff branch` no-op
+// (branch already an ancestor of HEAD by the time this call runs -- the
+// TOCTOU window between `isAlreadyMerged`'s pre-check above and this call,
+// e.g. a main-checkout writer that bypasses `acquireMainCheckoutLock`)
+// exits 0 with "Already up to date." and creates no `MERGE_HEAD`. Every
+// abort call below used to run unconditionally on that path and crash with
+// "fatal: There is no merge to abort (MERGE_HEAD missing)" instead of
+// returning the outcome the code was already about to return. Guarding on
+// `MERGE_HEAD`'s existence closes that gap without changing any call
+// site's own error message or returned outcome on every already-covered
+// case -- this only ever changes behavior when there was nothing to abort.
+function mergeHeadExists(repoRoot) {
+  try {
+    git(repoRoot, ['rev-parse', '--verify', 'MERGE_HEAD']);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export function abortMergeIfPossible(repoRoot) {
+  if (!mergeHeadExists(repoRoot)) {
+    return;
+  }
+  git(repoRoot, ['merge', '--abort']);
+}
+
 async function mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs }) {
   // tsk-3yl D1: still run the real goal-check here, even though nothing
   // will be staged/committed — every 'merged' outcome must carry a real,
@@ -721,7 +748,7 @@ async function mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs }) {
       selfResolved = true;
     } else {
       try {
-        git(repoRoot, ['merge', '--abort']);
+        abortMergeIfPossible(repoRoot);
       } catch (abortErr) {
         throw new MergeError(`merge of "${branch}" conflicted and "git merge --abort" itself failed: ${abortErr.message}`, { branch });
       }
@@ -735,7 +762,7 @@ async function mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs }) {
   const fgosPaths = stagedPaths.filter((p) => p === '.fgos' || p.startsWith('.fgos/'));
   if (fgosPaths.length > 0) {
     try {
-      git(repoRoot, ['merge', '--abort']);
+      abortMergeIfPossible(repoRoot);
     } catch (abortErr) {
       throw new MergeError(
         `merge of "${branch}" staged a change under ".fgos/" and "git merge --abort" itself failed: ${abortErr.message}`,
@@ -748,7 +775,7 @@ async function mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs }) {
   const check = await runGoalCheck(item, repoRoot, timeoutMs);
   if (!check.passed) {
     try {
-      git(repoRoot, ['merge', '--abort']);
+      abortMergeIfPossible(repoRoot);
     } catch (abortErr) {
       throw new MergeError(`post-merge verify failed for "${branch}" and "git merge --abort" itself failed: ${abortErr.message}`, { branch });
     }
@@ -759,7 +786,7 @@ async function mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs }) {
     git(repoRoot, ['commit', '--no-edit']);
   } catch (err) {
     try {
-      git(repoRoot, ['merge', '--abort']);
+      abortMergeIfPossible(repoRoot);
     } catch (abortErr) {
       throw new MergeError(
         `verify passed for "${branch}" but "git commit" failed, and "git merge --abort" itself failed: ${abortErr.message} (commit error: ${err.message})`,
