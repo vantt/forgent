@@ -17,6 +17,17 @@ work item without leaving the session or hand-typing the CLI. Never writes
 `.fgos/` state directly — every write goes through the `submit` verb
 (one-door-write, CTR001).
 
+This skill's own classification of `kind`/`tier`/`risk` is whatever
+`submit`'s mechanical keyword-count fallback produces (never reasoned
+about here) — deliberately, so `dogfood-fixture:submit`'s replay of a
+scenario's canonical text through this exact skill stays byte-identical
+run to run. When the ask actually needs a considered `tier`/`kind`/`risk`
+(not a quick one-liner), use `fgos-submit-assist`
+(`.claude/skills/fgos-submit-assist/SKILL.md`) instead — it reasons about
+the text itself, prints its reasoning, then calls this same underlying
+`fgos submit` verb with `--tier`/`--kind`/`--risk` pre-filled. Either way
+a wrong guess is cheaply correctable later via `fgos edit <id>`.
+
 ## Steps
 
 1. **Read the free-text description.** The argument the user passed after
