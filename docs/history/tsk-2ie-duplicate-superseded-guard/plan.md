@@ -41,6 +41,20 @@ reference to this precedent.
 
 ### Files touched, in order
 
+0. **Set a real `verify` command on tsk-2ie itself.** Caught at
+   `fgos-validating`'s reality gate: `fgos list --id tsk-2ie --json` shows
+   `work.verify` is currently the literal placeholder string `"chưa xác
+   định — P15 bổ sung"` — not runnable. Execute's mechanical proof path
+   (and `return`'s re-verify) runs this field verbatim, so it must become a
+   real command before that stage, not after. Run once, any time before
+   dispatch (no ordering dependency on steps 1-4 below):
+   ```
+   fgos edit tsk-2ie --verify "npm test -- test/state/work.test.mjs test/state/store.test.mjs test/state/graph-harness.test.mjs test/cli/fgos.test.mjs"
+   ```
+   Scoped to exactly the four touched-behavior test files (narrowest
+   useful test first, per dev rules) rather than the full `npm test`
+   suite — `fgos-executing`/`return` can still broaden to the full suite
+   if a shared contract turns out touched.
 1. **`src/state/work.mjs`** — `validateWorkShape`: add a `supersededBy`
    block (optional non-empty string, self-reference rejected — mirrors
    `parent`, `work.mjs:329-338`) and a `duplicates` block (optional array
@@ -48,14 +62,20 @@ reference to this precedent.
    `mergeAfter`, `work.mjs:214-234`). Add `validateSupersededBy(work,
    existingIds)` and `validateDuplicates(work, existingIds)`, both
    mirroring `validateMergeAfter` (`work.mjs:507-520`) — existence-checked
-   per D3/assumption-3 in CONTEXT.md.
+   per D3/assumption-3 in CONTEXT.md. Call both from `validateWork`
+   (`work.mjs:523-529`), alongside the existing `validateDeps`/
+   `validateMergeAfter` calls at `work.mjs:526-527` — confirmed by direct
+   read that this is where those two calls actually live, not `store.mjs`
+   (caught at `fgos-validating`'s reality gate: the plan's first draft
+   mis-cited this as a `store.mjs` change).
 2. **`src/state/store.mjs`** — add `'supersededBy'`, `'duplicates'` to
-   `EDITABLE_FIELDS` (`store.mjs:192`); wire `validateSupersededBy`/
-   `validateDuplicates` into `addWork`/`editWork` alongside the existing
-   `validateDeps`/`validateMergeAfter` calls (`store.mjs:526-527`).
-   Neither field is added to `assertNoCycle`/`assertNoUnifiedCycle` — per
-   CONTEXT.md's assumption, they carry knowledge only, never participate
-   in the blocking-cycle graph.
+   `EDITABLE_FIELDS` (`store.mjs:192`). No other `store.mjs` change is
+   needed: `addWork` (`store.mjs:161`) and `editWork` (`store.mjs:244`)
+   both already call `validateWork(candidate, existingIds)`, so step 1's
+   new validators are picked up automatically once `EDITABLE_FIELDS`
+   admits the two new keys. Neither field is added to `assertNoCycle`/
+   `assertNoUnifiedCycle` — per CONTEXT.md's assumption, they carry
+   knowledge only, never participate in the blocking-cycle graph.
 3. **`src/state/graph-harness.mjs`** — `mergeReadiness`: after computing
    `syncClear` (the existing dep/mergeAfter/drift-clear candidate set,
    `graph-harness.mjs:106-115`), split out any candidate whose
