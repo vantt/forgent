@@ -8136,3 +8136,90 @@ test('cleanup parks cleanup -> blocked when the recorded commit no longer resolv
   assert.equal(data.to, 'blocked');
   assert.match(data.reason, /no longer reachable/);
 });
+
+// --- `fgos compound` (tsk-3o3, restored from fcfbae5/tsk-1zi's removal,
+// adapted to gate on status `retrospective` instead of the retired
+// `compound-learn` stage move) ------------------------------------------
+
+test('compound on a nonexistent id is rejected as validation, exit 4', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['compound', 'ghost']);
+  assert.equal(result.status, 4);
+});
+
+test('compound on an item not at status retrospective is rejected as validation, exit 4, no events written', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'compound-wrong-status');
+  const before = eventLines(cwd).length;
+  const result = run(cwd, ['compound', 'compound-wrong-status', '--doc-type', 'how-to']);
+  assert.equal(result.status, 4);
+  assert.equal(eventLines(cwd).length, before, 'a rejected compound writes zero events');
+  assert.equal(stateView(cwd).work['compound-wrong-status'].status, 'todo');
+});
+
+test('compound with an invalid --doc-type is rejected as validation, exit 4, before any write', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'compound-bad-doctype');
+  run(cwd, ['move', 'compound-bad-doctype', '--to', 'doing']);
+  run(cwd, ['move', 'compound-bad-doctype', '--to', 'delivered']);
+  run(cwd, ['move', 'compound-bad-doctype', '--to', 'retrospective']);
+  const before = eventLines(cwd).length;
+
+  const result = run(cwd, ['compound', 'compound-bad-doctype', '--doc-type', 'not-a-real-quadrant']);
+  assert.equal(result.status, 4);
+  assert.equal(eventLines(cwd).length, before, 'a rejected --doc-type writes zero events');
+});
+
+test('compound with no --doc-type is a no-op: exit 0, docType null, no events written', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'compound-noop');
+  run(cwd, ['move', 'compound-noop', '--to', 'doing']);
+  run(cwd, ['move', 'compound-noop', '--to', 'delivered']);
+  run(cwd, ['move', 'compound-noop', '--to', 'retrospective']);
+  const before = eventLines(cwd).length;
+
+  const result = run(cwd, ['compound', 'compound-noop']);
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.deepEqual(data, { id: 'compound-noop', docType: null, docPath: null, status: 'retrospective' });
+  assert.equal(eventLines(cwd).length, before, 'an omitted --doc-type writes zero events');
+});
+
+test('compound with --doc-type tags the outcome, surfaced by `show`; item stays at status retrospective (no stage/status move)', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'compound-tag-only');
+  run(cwd, ['move', 'compound-tag-only', '--to', 'doing']);
+  run(cwd, ['move', 'compound-tag-only', '--to', 'delivered']);
+  run(cwd, ['move', 'compound-tag-only', '--to', 'retrospective']);
+
+  const result = run(cwd, ['compound', 'compound-tag-only', '--doc-type', 'how-to']);
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.docType, 'how-to');
+  assert.equal(data.docPath, null);
+
+  assert.equal(stateView(cwd).work['compound-tag-only'].status, 'retrospective', 'compound never moves status — that stays the retro-loop\'s own job');
+
+  const showResult = run(cwd, ['show', 'compound-tag-only']);
+  assert.equal(showResult.status, 0, showResult.stderr);
+  assert.equal(envelopeData(showResult.stdout).outcome.docType, 'how-to');
+});
+
+test('compound with --doc-type and --doc-path tags both, surfaced by `show`', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'compound-tag-path');
+  run(cwd, ['move', 'compound-tag-path', '--to', 'doing']);
+  run(cwd, ['move', 'compound-tag-path', '--to', 'delivered']);
+  run(cwd, ['move', 'compound-tag-path', '--to', 'retrospective']);
+
+  const result = run(cwd, ['compound', 'compound-tag-path', '--doc-type', 'explanation', '--doc-path', 'docs/explanation/example.md']);
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.docType, 'explanation');
+  assert.equal(data.docPath, 'docs/explanation/example.md');
+
+  const showResult = run(cwd, ['show', 'compound-tag-path']);
+  const outcome = envelopeData(showResult.stdout).outcome;
+  assert.equal(outcome.docType, 'explanation');
+  assert.equal(outcome.docPath, 'docs/explanation/example.md');
+});
