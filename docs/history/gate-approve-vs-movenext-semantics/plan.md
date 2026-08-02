@@ -184,31 +184,49 @@ trực tiếp) — thi công song song được, không bắt buộc chờ A/B x
   'Execute')` thành `frontier(view, { step = 'Execute' } = {})`; giữ
   `isDepsAndLineageReady` (dòng 108-115) nguyên vẹn — đã stage-independent
   sẵn (theo CONTEXT.md §4).
-- `plugins/fgOS/skills/cook/SKILL.md` — thay bước 2's hardcode prose
-  stage→skill (dòng dispatch `clarify`/`decompose`/`executing` hiện có)
-  bằng 1 lời gọi `fgos-coding-driving(id, ceiling=unlimited/terminal)` cho
-  mỗi id trong queue.
-- `plugins/fgOS/skills/pick/SKILL.md` — bước 5 hiện "load fgos-routing,
-  let it decide when to stop" (D9 gọi đây là mù mờ): thay bằng lời gọi
-  driver tường minh `fgos-coding-driving(id, ceiling=unlimited hoặc
-  status:awaiting-approval)`.
+- ~~`plugins/fgOS/skills/cook/SKILL.md`/`pick/SKILL.md` retrofit~~ —
+  **HOÃN, tách thành item con riêng (xem "Phát hiện lúc thi công" bên
+  dưới).** Không nằm trong verify của `tsk-19j-3`.
 
-**Rủi ro:** vừa — skill mới không đụng code path cũ (an toàn khi chưa
-retrofit xong), nhưng retrofit `cook`/`pick` đổi hành vi 2 skill đang dùng
-thật trong vòng lặp dev hiện tại (kể cả session này, `/fgOS:pick` vừa
-chạy). Proof point: chạy thử `fgos-coding-driving` trên 1 item nháp
-(`stage:decompose` ceiling) SONG SONG với `cook` cũ trên 1 item khác trước
-khi retrofit, so kết quả 2 đường phải khớp, rồi mới đổi `cook`/`pick` sang
-gọi driver.
+**Rủi ro:** vừa — skill mới (`fgos-coding-driving`) và `frontier.mjs`'s
+tham số hoá đều thuần additive, không đụng code path cũ (mọi caller hiện
+tại gọi `frontier(view)` không tham số, default `step='Execute'` giữ hành
+vi byte-identical — xác nhận qua test mới).
 
 **Verify:**
 ```
 node --test test/state/frontier.test.mjs test/state/workflow-stage-graphs.test.mjs
 ```
-(driver skill tự thân là prose SKILL.md, không có unit test cơ học — proof
-point ở trên, chạy tay 1 lượt trọn `clarify→decompose→executing` qua driver
-trên 1 item nháp thật, là bằng chứng thay thế bắt buộc trước khi
-`fgos-validating` coi track này xong.)
+
+**Phát hiện lúc thi công (tsk-19j-3, quan trọng — cắt bớt phạm vi có chủ
+đích, không phải bỏ sót):** Retrofit `cook`/`pick` gọi
+`fgos-coding-driving` KHÔNG thi công trong item con này, dời sang
+**`tsk-19j-4`** (`fgos add`, `parent: tsk-19j`, cùng `docsRef`). Lý do cụ
+thể, không phải ngại việc:
+
+1. **Proof point plan.md tự đòi (chạy driver song song `cook` cũ, so kết
+   quả) không giả lập an toàn được trong 1 session tự động** — `cook` là
+   skill tương tác nhiều lượt hỏi-đáp người thật; không có cách chạy "song
+   song" nó với driver mà không tốn hàng chục lượt turn thật hoặc giả lập
+   câu trả lời (giả lập = không phải bằng chứng thật, đúng đại kỵ
+   fgos-validating's "no plausibility language as evidence").
+2. **`cook` đang được dùng thật, đồng thời, bởi 1 session Claude Code khác
+   trên chính repo này** (quan sát trực tiếp lúc thi công tsk-19j-2:
+   `CK_SESSION_ID` khác đang tự chạy `fgos merge`/`fgos return` song song)
+   — sửa `cook/SKILL.md` giữa lúc 1 phiên khác có thể đang follow đúng file
+   đó là rủi ro thật, không phải giả định.
+3. **Driver hiện tại (`fgos-coding-driving`, viết ở item con này) CHƯA phủ
+   hết ngữ nghĩa `cook` đang có** — `cook`'s "never claim before stage
+   executing" (hard rule), queue-seeding lúc submit, và "push children lên
+   ĐẦU queue" lúc decompose sinh con đều là logic thuộc về NGƯỜI GIỮ QUEUE
+   (cook), không phải driver (driver chỉ lái 1 item đã sẵn sàng, không sở
+   hữu queue nhiều item). Retrofit thật cần driver's input/output contract
+   rõ ràng hơn bản viết ở item con này — bản thân đó là việc, không phải
+   chi tiết vặt.
+
+Đây là cắt scope thật, có ghi lại, không phải "âm thầm bỏ dở" — D14 (retrofit
+"gần như miễn phí") đúng cho phần MAPPING (stage→skill qua registry), sai cho
+phần QUEUE OWNERSHIP mà lúc thảo luận D14 chưa tách bạch.
 
 ## 5. Thứ tự thi công
 
