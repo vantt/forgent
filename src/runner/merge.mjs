@@ -616,7 +616,7 @@ export function autoResolveDecisionIndexCollision(repoRoot, branch, classificati
  * introduces relative to current HEAD, correct for both a root->main merge
  * and a leaf->parent merge without needing to know either branch's trunk.
  */
-export async function mergeRunnerItem(repoRoot, item, { timeoutMs } = {}) {
+export async function mergeRunnerItem(repoRoot, item, { timeoutMs, lockRoot = repoRoot } = {}) {
   const branch = branchNameFor(item.id);
 
   // The pre-commit hook only locks the final `git commit` — everything
@@ -639,7 +639,16 @@ export async function mergeRunnerItem(repoRoot, item, { timeoutMs } = {}) {
   // the same "best-effort only" limitation session-identity.mjs already
   // documents for that fallback, now newly reachable from here too — not a
   // regression in kind, just a second call site inheriting a known gap.
-  const fgosDir = path.join(repoRoot, '.fgos');
+  // tsk-2eq: `lockRoot` defaults to `repoRoot` (root->main approve's own
+  // call site, unaffected) but a leaf->parent approve passes the real repo
+  // root here explicitly while `repoRoot` itself stays the ephemeral
+  // worktree used as the git-op cwd below. Resolving `fgosDir` off a bare
+  // `repoRoot` would point inside that ephemeral worktree — a directory
+  // `createWorktree` (worktree.mjs) already strips `.fgos/` from per
+  // ADR0020 — so `acquireMainCheckoutLock` would silently recreate it
+  // fresh every call and never actually contend with the real
+  // `<repoRoot>/.fgos/main-checkout.lock` a concurrent leaf merge holds.
+  const fgosDir = path.join(lockRoot, '.fgos');
   const identity = resolveWriterIdentity(fgosDir).id;
   // releaseOnExit (tsk-45z point 2): approve's own job is over once this
   // process exits, so a crash/interrupt mid-merge should release the lock

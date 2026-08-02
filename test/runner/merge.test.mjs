@@ -587,6 +587,45 @@ test('mergeRunnerItem refuses to even attempt the merge when another identity al
   assert.equal(isWorkingTreeClean(repoRoot), true, 'tree must stay clean — refusing before the merge means nothing was ever staged');
 });
 
+// tsk-2eq: a leaf approve calls mergeRunnerItem with an ephemeral,
+// freshly-.fgos-stripped worktree as `repoRoot` (the git-op cwd) — before
+// this fix, the lock resolved against that same ephemeral path and so
+// never contended with a real concurrent leaf merge. The two tests below
+// simulate that shape with two separate directories: `repoRoot` (a real
+// git checkout, standing in for the ephemeral worktree) and `lockRoot` (a
+// plain directory, standing in for the real main checkout).
+test('mergeRunnerItem resolves the main-checkout lock against lockRoot, not repoRoot', async () => {
+  const repoRoot = initRepo();
+  makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
+  const lockRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-merge-test-lockroot-'));
+
+  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'true' }), { lockRoot });
+
+  assert.equal(result.outcome, 'merged');
+  assert.equal(fs.existsSync(path.join(lockRoot, '.fgos')), true, 'the lock directory must be created under lockRoot');
+  assert.equal(fs.existsSync(path.join(repoRoot, '.fgos')), false, 'repoRoot must never receive a lock directory when lockRoot is set explicitly');
+});
+
+test('mergeRunnerItem refuses when lockRoot (not repoRoot) already holds the main-checkout lock — proves a leaf-approve-shaped call now actually contends', async () => {
+  const repoRoot = initRepo();
+  makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
+  const lockRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-merge-test-lockroot-'));
+
+  const fgosDir = path.join(lockRoot, '.fgos');
+  const otherLock = acquireMainCheckoutLock(fgosDir, { identity: 'a-different-live-session' });
+  assert.equal(otherLock.status, ACQUIRED);
+
+  const headBefore = headOf(repoRoot);
+  await assert.rejects(
+    () => mergeRunnerItem(repoRoot, makeItem({ verify: 'true' }), { lockRoot }),
+    (err) => {
+      assert.equal(err.code, 'lock-held');
+      return true;
+    },
+  );
+  assert.equal(headOf(repoRoot), headBefore, 'HEAD must be unchanged — refused before the merge ever started');
+});
+
 test('mergeRunnerItem: an ambiguous (unparseable) lock file carries code "lock-ambiguous", distinct from "lock-held" -- a retry wrapper must never retry this one either', async () => {
   const repoRoot = initRepo();
   makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
