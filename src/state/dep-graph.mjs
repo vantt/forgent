@@ -33,9 +33,18 @@
 // child -> parent direction would make a mixed blocks/parent-child cycle
 // undetectable.
 //
-// `waits-for` and `discovered-from` are declared vocabulary only (no
-// producer exists yet, see CONTEXT.md) — they contribute NO edge here; that
-// is S2b's job once a real stored form + producer exist.
+// `waits-for` (tsk-2u0, docs/history/tsk-3bn-merge-conductor-harness-v2/)
+// is S2b's producer: the `mergeAfter` field (work.mjs) projects into this
+// unified graph as a `waits-for` edge, same direction convention as
+// `blocks` (`id -> target`, "id waits for target") — deliberately NOT the
+// reversed `parent-child` direction, since `mergeAfter` never expresses a
+// containment/lineage relationship, only an ordering one. Participates in
+// the SAME cycle detection as `blocks`/`parent-child` (buildUnifiedAdjacency/
+// findUnifiedCycle/assertNoUnifiedCycle below, all unchanged in shape) — a
+// cycle mixing `mergeAfter` with `deps`/`parent` (e.g. A deps:[B] + B
+// mergeAfter:[A], a real deadlock: A can't start until B resolved, B can't
+// merge until A resolved) is caught the same way a same-field cycle is.
+// `discovered-from` remains declared vocabulary only (no producer yet).
 import { WorkValidationError } from './work.mjs';
 
 // Build an id -> deps[] adjacency view from a work map (an object keyed by
@@ -145,6 +154,8 @@ function buildUnifiedAdjacency(workMap) {
     for (const dep of deps) addEdge(id, dep); // blocks: id -> dep
     const parent = item?.parent;
     if (parent) addEdge(parent, id); // parent-child: parent -> child (parent waits for child)
+    const mergeAfter = Array.isArray(item?.mergeAfter) ? item.mergeAfter : [];
+    for (const target of mergeAfter) addEdge(id, target); // waits-for: id -> target (id waits for target), same direction as blocks
   }
   return adjacency;
 }
@@ -168,6 +179,10 @@ export function buildUnifiedEdges(workMap) {
     const parent = item?.parent;
     if (parent) {
       edges.push({ from: parent, to: id, kind: 'parent-child' });
+    }
+    const mergeAfter = Array.isArray(item?.mergeAfter) ? item.mergeAfter : [];
+    for (const target of mergeAfter) {
+      edges.push({ from: id, to: target, kind: 'waits-for' });
     }
   }
   return edges;

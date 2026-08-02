@@ -228,7 +228,7 @@ export const COMMAND_REGISTRY = [
   {
     name: 'edit',
     invoke: 'fgos edit',
-    description: 'Patch fields on an existing item (title/description/kind/risk/verify/tier/refs/deps/footprint/acceptance/priority/intent/docs-ref/parent/urgent/impact/effort). At least one field must be given.',
+    description: 'Patch fields on an existing item (title/description/kind/risk/verify/tier/refs/deps/footprint/acceptance/priority/intent/docs-ref/parent/urgent/impact/effort/merge-after). At least one field must be given.',
     parameters: {
       type: 'object',
       properties: {
@@ -250,6 +250,7 @@ export const COMMAND_REGISTRY = [
         urgent: { type: 'string', description: 'New urgency level: one of low/medium/high/critical, human-entered. Absent reads as medium at the priority formula, never stored as a default here.' },
         impact: { type: 'number', description: 'New impact score: a non-negative number, computed (blocking fan-out + semantic scan + de-risk bonus) — not typically human-entered directly.' },
         effort: { type: 'number', description: 'New effort score: a non-negative number, computed from fgos-planning\'s mode/flag-count — not typically human-entered directly.' },
+        'merge-after': { type: 'string', description: 'Comma-separated list of ids this item must merge AFTER (empty string clears the field). A weak, merge-order-only edge — blocks this item\'s MERGE until every target is resolved, but never blocks its own start/dispatch the way deps does. Validated at set-time: target existence, no self-reference, no cycle (including a cycle mixed with deps/parent).', multiValueFormat: 'csv' },
       },
       positional: ['id'],
       required: ['id'],

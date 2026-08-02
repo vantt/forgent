@@ -1047,6 +1047,16 @@ async function runVerb(verb, flags, positional, dir) {
       if (flags['docs-ref'] !== undefined) {
         patch.docsRef = optionalField(flags['docs-ref'], 'edit --docs-ref requires a non-empty path.');
       }
+      // --merge-after (tsk-2u0, docs/history/tsk-3bn-merge-conductor-harness-v2/
+      // D4/D5): same latest-wins comma-separated shape as --refs/--deps
+      // above, kebab flag vs camelCase field so it cannot join that simple
+      // same-name loop either (same reason --docs-ref needs its own
+      // handling, right above). Existence/self-reference/cycle validation
+      // all happen at the write door (work.mjs's validateWork, dep-graph.mjs's
+      // assertNoUnifiedCycle) — this is pure flag plumbing, no new checks.
+      if (flags['merge-after'] !== undefined) {
+        patch.mergeAfter = parseListFlag(flags['merge-after']);
+      }
       // parent-flag-cli D2: --parent "" CLEARS the field (un-parents the
       // item), matching --refs ''/--deps '' above — but `parent` is a scalar,
       // not a list, so the clear sentinel is `null` (the value work.mjs:255
@@ -1118,7 +1128,7 @@ async function runVerb(verb, flags, positional, dir) {
       if (Object.keys(patch).length === 0) {
         throw new StoreError(
           'validation',
-          'edit requires at least one field to change: --title/--description/--kind/--risk/--verify/--tier/--refs/--deps/--footprint/--acceptance/--priority/--intent/--docs-ref/--parent/--urgent/--impact/--effort.',
+          'edit requires at least one field to change: --title/--description/--kind/--risk/--verify/--tier/--refs/--deps/--footprint/--acceptance/--priority/--intent/--docs-ref/--parent/--urgent/--impact/--effort/--merge-after.',
         );
       }
       const { event } = editWork(dir, { id, patch, role: 'human' });
@@ -1338,8 +1348,17 @@ async function runVerb(verb, flags, positional, dir) {
     // reimplements the ranking here.
     case 'merge': {
       const sub = requireField(positional[0], 'merge requires a sub-verb: fgos merge <list|next>');
+      // driftStatus (tsk-2u0) is computed here, once, and handed into the
+      // pure mergeReadiness as opts.drift — mergeReadiness itself never
+      // shells git (stays pure), this verb wrapper does the one real,
+      // read-only git read that populates blockedOnSync. Best-effort: a
+      // repo-less/detached cwd still returns a usable ranking (driftStatus
+      // just reports no roots), same "read never throws on a legacy
+      // shape" posture `review`'s own diff already has.
+      const mergeView = listWork(dir);
+      const drift = driftStatus(process.cwd(), mergeView);
       if (sub === 'list') {
-        return mergeReadiness(listWork(dir));
+        return mergeReadiness(mergeView, { drift });
       }
       if (sub === 'next') {
         // Picks the single top-ranked ready item and merges it by recursing
@@ -1356,7 +1375,7 @@ async function runVerb(verb, flags, positional, dir) {
         // reports which item and why, merges nothing, and stops — it does
         // NOT fall through to the next-ranked item (that would silently
         // change merge order semantics `merge list` already promised).
-        const { ready } = mergeReadiness(listWork(dir));
+        const { ready } = mergeReadiness(mergeView, { drift });
         if (ready.length === 0) {
           return { picked: null, reason: 'nothing ready to merge' };
         }

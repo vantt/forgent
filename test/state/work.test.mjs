@@ -4,6 +4,7 @@ import {
   validateWork,
   validateWorkShape,
   validateDeps,
+  validateMergeAfter,
   WorkValidationError,
   STATUSES,
   TIERS,
@@ -197,6 +198,74 @@ test('validateWork runs full dep-existence check when existingIds is passed', ()
     () => validateWork(baseWork({ id: 'b', deps: ['ghost'] }), new Set(['a', 'b'])),
     WorkValidationError,
   );
+});
+
+// --- mergeAfter (D4/D5, docs/history/tsk-3bn-merge-conductor-harness-v2/) --
+
+test('validateWork accepts a work item missing mergeAfter (optional, no default, stays absent)', () => {
+  assert.doesNotThrow(() => validateWork(baseWork({})));
+});
+
+test('validateWork treats mergeAfter: null the same as absent', () => {
+  assert.doesNotThrow(() => validateWork(baseWork({ mergeAfter: null })));
+});
+
+test('validateWork rejects a mergeAfter that is not an array', () => {
+  assert.throws(() => validateWork(baseWork({ mergeAfter: 'a,b' })), WorkValidationError);
+});
+
+test('validateWork rejects a mergeAfter entry that is a non-string or empty string', () => {
+  assert.throws(
+    () => validateWork(baseWork({ mergeAfter: ['a', 42] })),
+    (err) => err instanceof WorkValidationError && /non-empty strings/.test(err.message),
+  );
+  assert.throws(
+    () => validateWork(baseWork({ mergeAfter: ['a', ''] })),
+    (err) => err instanceof WorkValidationError && /non-empty strings/.test(err.message),
+  );
+});
+
+test('validateWork rejects a work item that lists itself in its own mergeAfter', () => {
+  assert.throws(
+    () => validateWork(baseWork({ id: 'a', mergeAfter: ['a'] })),
+    (err) => err instanceof WorkValidationError && /own mergeAfter/.test(err.message),
+  );
+});
+
+test('validateWorkShape passes without checking mergeAfter existence', () => {
+  const work = baseWork({ id: 'b', mergeAfter: ['ghost'] });
+  assert.doesNotThrow(() => validateWorkShape(work));
+});
+
+test('validateMergeAfter rejects a target pointing at a non-existent id', () => {
+  const work = baseWork({ id: 'b', mergeAfter: ['ghost'] });
+  assert.throws(
+    () => validateMergeAfter(work, new Set(['a'])),
+    (err) => err instanceof WorkValidationError && /not a known id/.test(err.message),
+  );
+});
+
+test('validateMergeAfter accepts a target that exists in existingIds (Set or array)', () => {
+  const work = baseWork({ id: 'b', mergeAfter: ['a'] });
+  assert.doesNotThrow(() => validateMergeAfter(work, new Set(['a', 'b'])));
+  assert.doesNotThrow(() => validateMergeAfter(work, ['a', 'b']));
+});
+
+test('validateMergeAfter is a no-op when mergeAfter is absent', () => {
+  assert.doesNotThrow(() => validateMergeAfter(baseWork({}), new Set()));
+});
+
+test('validateWork runs full mergeAfter-existence check when existingIds is passed (unlike targets, which deliberately skips this)', () => {
+  assert.doesNotThrow(() => validateWork(baseWork({ id: 'b', mergeAfter: ['a'] }), new Set(['a', 'b'])));
+  assert.throws(
+    () => validateWork(baseWork({ id: 'b', mergeAfter: ['ghost'] }), new Set(['a', 'b'])),
+    WorkValidationError,
+  );
+});
+
+test('validateWork does not add mergeAfter to SCHEMA_VERSION or DEFAULTS (optional additive field, no schema bump)', () => {
+  assert.equal(SCHEMA_VERSION, 3);
+  assert.equal(Object.hasOwn(DEFAULTS, 'mergeAfter'), false);
 });
 
 test('validateWork accepts a work item missing tier (optional, defaulted by the caller per D7b)', () => {

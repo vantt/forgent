@@ -1406,6 +1406,66 @@ test('edit --docs-ref replaces an existing docsRef (latest-wins), exit 0', () =>
   assert.equal(stateView(cwd).work['edit-docs-ref-replace'].docsRef, 'docs/history/new-feature/');
 });
 
+// --- edit --merge-after (tsk-2u0, docs/history/
+//     tsk-3bn-merge-conductor-harness-v2/D4/D5) -----------------------------
+
+test('edit --merge-after sets mergeAfter on an item that had none, exit 0', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'merge-after-target');
+  addOk(cwd, 'merge-after-item');
+  const result = run(cwd, ['edit', 'merge-after-item', '--merge-after', 'merge-after-target']);
+  assert.equal(result.status, 0, result.stderr);
+  assert.deepEqual(stateView(cwd).work['merge-after-item'].mergeAfter, ['merge-after-target']);
+});
+
+test('edit --merge-after "" clears an existing mergeAfter, exit 0', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'merge-after-clear-target');
+  addOk(cwd, 'merge-after-clear-item');
+  run(cwd, ['edit', 'merge-after-clear-item', '--merge-after', 'merge-after-clear-target']);
+  const result = run(cwd, ['edit', 'merge-after-clear-item', '--merge-after', '']);
+  assert.equal(result.status, 0, result.stderr);
+  assert.deepEqual(stateView(cwd).work['merge-after-clear-item'].mergeAfter, []);
+});
+
+test('edit --merge-after rejects a target id that does not exist, exit 4, item unchanged', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'merge-after-ghost-item');
+  const result = run(cwd, ['edit', 'merge-after-ghost-item', '--merge-after', 'no-such-item']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /not a known id/);
+  assert.equal(stateView(cwd).work['merge-after-ghost-item'].mergeAfter, undefined);
+});
+
+test('edit --merge-after rejects an item listing itself, exit 4', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'merge-after-self-item');
+  const result = run(cwd, ['edit', 'merge-after-self-item', '--merge-after', 'merge-after-self-item']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /own mergeAfter/);
+});
+
+test('edit --merge-after rejects a mergeAfter that would close a cycle mixed with deps, exit 4', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'merge-after-cycle-a');
+  addOk(cwd, 'merge-after-cycle-b');
+  run(cwd, ['edit', 'merge-after-cycle-b', '--deps', 'merge-after-cycle-a']);
+  // a deps:[] currently; setting a.mergeAfter:[b] would close a -> b (waits-for) -> a (blocks).
+  const result = run(cwd, ['edit', 'merge-after-cycle-a', '--merge-after', 'merge-after-cycle-b']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /cycle/);
+  assert.equal(stateView(cwd).work['merge-after-cycle-a'].mergeAfter, undefined);
+});
+
+test('edit --merge-after does not require the deps field to have been touched (byte-identical to other list edits)', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'merge-after-independent-target');
+  addOk(cwd, 'merge-after-independent-item');
+  const result = run(cwd, ['edit', 'merge-after-independent-item', '--merge-after', 'merge-after-independent-target']);
+  assert.equal(result.status, 0, result.stderr);
+  assert.deepEqual(stateView(cwd).work['merge-after-independent-item'].deps, []);
+});
+
 // --- edit --description/--footprint: `add` already accepted both fields,
 // but EDITABLE_FIELDS never listed them, so a description/footprint typo'd
 // or left blank at add time -- or an item added before either field
@@ -6881,7 +6941,7 @@ test('merge list on an empty store: empty ready/waiting/conflicts, exit 0, no ev
   const before = eventLines(cwd).length;
   const result = run(cwd, ['merge', 'list']);
   assert.equal(result.status, 0);
-  assert.deepEqual(envelopeData(result.stdout), { ready: [], waiting: [], conflicts: [] });
+  assert.deepEqual(envelopeData(result.stdout), { ready: [], waiting: [], conflicts: [], mergeSets: [], blockedOnSync: [], mergeTier: {} });
   assert.equal(eventLines(cwd).length, before, 'merge list must not append any event');
 });
 
@@ -6906,7 +6966,7 @@ test('merge list: a proposed item whose dep is already done is ready', () => {
   assert.equal(run(cwd, ['add', 'leaf', '--title', 'Leaf', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--deps', 'dep']).status, 0);
   toProposed(cwd, 'leaf');
   const data = envelopeData(run(cwd, ['merge', 'list']).stdout);
-  assert.deepEqual(data, { ready: ['leaf'], waiting: [], conflicts: [] });
+  assert.deepEqual(data, { ready: ['leaf'], waiting: [], conflicts: [], mergeSets: [], blockedOnSync: [], mergeTier: { leaf: 'root-to-main' } });
 });
 
 test('merge list: a proposed item whose dep is NOT done waits, never ready', () => {
@@ -6916,7 +6976,7 @@ test('merge list: a proposed item whose dep is NOT done waits, never ready', () 
   assert.equal(run(cwd, ['add', 'leaf', '--title', 'Leaf', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--deps', 'dep']).status, 0);
   toProposed(cwd, 'leaf');
   const data = envelopeData(run(cwd, ['merge', 'list']).stdout);
-  assert.deepEqual(data, { ready: [], waiting: ['leaf'], conflicts: [] });
+  assert.deepEqual(data, { ready: [], waiting: ['leaf'], conflicts: [], mergeSets: [], blockedOnSync: [], mergeTier: { leaf: 'root-to-main' } });
 });
 
 test('merge list: two dep-clear proposed items sharing a footprint are excluded from ready and listed as conflicts', () => {

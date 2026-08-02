@@ -211,6 +211,27 @@ export function validateWorkShape(work) {
       throw new WorkValidationError(`work.deps entries must be non-empty strings, got: ${JSON.stringify(dep)}`);
     }
   }
+  // mergeAfter (D4/D5, docs/history/tsk-3bn-merge-conductor-harness-v2/):
+  // OPTIONAL and NOT in DEFAULTS (same lazy-additive shape as parent/stage
+  // above) — a weak, merge-order-only edge read ONLY by mergeReadiness's
+  // waiting gate, never by frontier.mjs. Shape mirrors `deps` (array of
+  // non-empty strings); self-reference check mirrors `parent`'s. Existence
+  // of referenced ids IS enforced (validateMergeAfter below, mirroring
+  // validateDeps) — unlike `parent`/`discoveredFrom`, which deliberately
+  // leave dangling ids unchecked.
+  if (work.mergeAfter !== undefined && work.mergeAfter !== null) {
+    if (!Array.isArray(work.mergeAfter)) {
+      throw new WorkValidationError(`work.mergeAfter must be an array of non-empty strings when present, got: ${JSON.stringify(work.mergeAfter)}`);
+    }
+    for (const target of work.mergeAfter) {
+      if (typeof target !== 'string' || !target) {
+        throw new WorkValidationError(`work.mergeAfter entries must be non-empty strings, got: ${JSON.stringify(target)}`);
+      }
+      if (target === work.id) {
+        throw new WorkValidationError(`work "${work.id}" cannot list itself in its own mergeAfter.`);
+      }
+    }
+  }
   requireNonEmptyString(work, 'risk');
   requireArray(work, 'refs');
   requireNonEmptyString(work, 'verify');
@@ -476,6 +497,25 @@ export function validateDeps(work, existingIds) {
 }
 
 /**
+ * Validate that every `mergeAfter` target of `work` points at an id present
+ * in `existingIds` — mirrors `validateDeps` exactly, for the same reason
+ * (D5, docs/history/tsk-3bn-merge-conductor-harness-v2/CONTEXT.md): a
+ * dangling merge-order target is a real, catchable mistake, unlike
+ * `parent`/`discoveredFrom`'s deliberately-unchecked dangling case. A
+ * no-op when `mergeAfter` is absent.
+ */
+export function validateMergeAfter(work, existingIds) {
+  if (!Array.isArray(work.mergeAfter)) return true;
+  const known = existingIds instanceof Set ? existingIds : new Set(existingIds ?? []);
+  for (const target of work.mergeAfter) {
+    if (!known.has(target)) {
+      throw new WorkValidationError(`work "${work.id}" has mergeAfter target "${target}", which is not a known id.`);
+    }
+  }
+  return true;
+}
+
+/**
  * Full validation entry point: shape first, then dep-existence when
  * `existingIds` is supplied (omit it to validate shape only, e.g. before the
  * store is known).
@@ -484,6 +524,7 @@ export function validateWork(work, existingIds) {
   validateWorkShape(work);
   if (existingIds !== undefined) {
     validateDeps(work, existingIds);
+    validateMergeAfter(work, existingIds);
   }
   return true;
 }
