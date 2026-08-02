@@ -22,6 +22,7 @@
 // verdict. The system is never allowed to treat an uncertain judgement as a
 // pass.
 
+import fs from 'node:fs';
 import path from 'node:path';
 import { modelForTier } from '../runner/dispatch.mjs';
 import { runJudgeExecutor, JUDGE_STRICT_JSON_SUFFIX, readScoutNotes } from './judge-executor.mjs';
@@ -110,10 +111,83 @@ function buildRelatedItemsBlock(work, view) {
     .join('\n');
 }
 
-function buildDiscoveryPrompt(work, view, priorScoutNotes) {
+// tsk-545 (dep of tsk-4rd): buildDiscoveryPrompt asks the model to "propose
+// a verify command that actually runs" but never gave it any cwd/repo-layout
+// context to know WHERE that command runs from — dogfood-proven failure
+// (decision 0018, tsk-1wd, 2026-07-28): a clear verdict's own proposed
+// `node --test test/expr/*.test.mjs` came back "no matches found" because
+// the real test lived under `dogfood-fixture/` (its own nested
+// `package.json`), and goal-check.mjs always spawns `item.verify` from the
+// worktree's repoRoot, never a guessed subdirectory. Mechanical (never
+// re-derived by the model, same idiom as `buildGraphContextBlock`) — reads
+// the real top-level directory listing and flags which of those directories
+// carry their OWN `package.json` (the concrete "needs a path prefix" signal)
+// so the model sees this fact instead of guessing it. Best-effort:
+// `repoRoot` is documented-optional the same way `view` already is
+// (`judgeDiscovery`'s old 2-arg unit-test callers never had one before
+// tsk-545 either) — a missing/unreadable root degrades to a placeholder,
+// never throws.
+// Bounded defensively, not just for the pathological test-tmpdir case (a
+// shared os.tmpdir() can accumulate hundreds of thousands of leftover
+// entries across a long session) — a real monorepo with many workspace
+// packages could hit the same failure mode: an unbounded join() here once
+// produced a prompt large enough to blow the OS argv length limit,
+// `spawnSync` failed outright, and `judgeDiscovery`'s own fail-safe (this
+// file's header) silently folded that into "unclear" — the worst possible
+// place for a silent size blowup to hide.
+const MAX_TOP_LEVEL_DIRS_SHOWN = 40;
+const MAX_NESTED_PACKAGES_SHOWN = 15;
+// Above this many top-level entries, treat the directory as anomalous
+// (almost certainly not a real repo root) and skip the per-entry
+// `existsSync` nested-package scan entirely, rather than pay its cost only
+// to truncate the result anyway.
+const TOP_LEVEL_ANOMALY_THRESHOLD = 500;
+
+function buildRepoLayoutBlock(repoRoot) {
+  if (typeof repoRoot !== 'string' || !repoRoot) {
+    return '(không có repoRoot — không đọc được cấu trúc thư mục repo)';
+  }
+  let entries;
+  try {
+    entries = fs.readdirSync(repoRoot, { withFileTypes: true });
+  } catch {
+    return '(lỗi đọc cấu trúc thư mục repo — bỏ qua)';
+  }
+  const topLevelDirs = entries
+    .filter((e) => e.isDirectory() && !['node_modules', '.git', '.fgos'].includes(e.name))
+    .map((e) => e.name)
+    .sort();
+
+  if (topLevelDirs.length > TOP_LEVEL_ANOMALY_THRESHOLD) {
+    return `(repoRoot có ${topLevelDirs.length} thư mục cấp 1 — bất thường cho một repo thật, bỏ qua block này thay vì liệt kê)`;
+  }
+
+  const nestedPackages = topLevelDirs.filter((name) => {
+    try {
+      return fs.existsSync(path.join(repoRoot, name, 'package.json'));
+    } catch {
+      return false;
+    }
+  });
+
+  const shownTopLevel = topLevelDirs.slice(0, MAX_TOP_LEVEL_DIRS_SHOWN);
+  const topLevelSuffix = topLevelDirs.length > shownTopLevel.length ? `, +${topLevelDirs.length - shownTopLevel.length} khác` : '';
+  const shownNested = nestedPackages.slice(0, MAX_NESTED_PACKAGES_SHOWN);
+  const nestedSuffix = nestedPackages.length > shownNested.length ? `, +${nestedPackages.length - shownNested.length} khác` : '';
+
+  return [
+    `Thư mục cấp 1 của repo (đây là cwd thật khi verify chạy — goal-check.mjs luôn spawn \`verify\` từ repoRoot, KHÔNG từ thư mục con nào): ${shownTopLevel.join(', ') || '(trống)'}${topLevelSuffix}.`,
+    shownNested.length
+      ? `Thư mục con có \`package.json\` RIÊNG (nested package — lệnh test/verify của phần này phải cd/prefix vào đúng thư mục, VD "cd ${shownNested[0]} && npm test", KHÔNG chạy được thẳng từ repoRoot): ${shownNested.join(', ')}${nestedSuffix}.`
+      : 'Không có thư mục con nào mang `package.json` riêng — mọi lệnh verify chạy thẳng từ repoRoot là an toàn.',
+  ].join('\n');
+}
+
+function buildDiscoveryPrompt(work, view, priorScoutNotes, repoRoot) {
   const refs = Array.isArray(work.refs) && work.refs.length ? work.refs.join(', ') : '(none)';
   const deps = Array.isArray(work.deps) && work.deps.length ? work.deps.join(', ') : '(none)';
   const relatedItems = buildRelatedItemsBlock(work, view);
+  const repoLayout = buildRepoLayoutBlock(repoRoot);
   const description =
     typeof work.description === 'string' && work.description.trim() ? work.description : '(không có)';
 
@@ -160,6 +234,9 @@ Deps: ${deps}
 
 # Ngữ cảnh đồ thị (cơ học, chỉ để tham khảo, không tự suy lại)
 ${graphContext}
+
+# Cấu trúc thư mục repo (cơ học, để đề xuất verify đúng path chạy-được)
+${repoLayout}
 
 # Mô tả đầy đủ (nguyên văn lúc submit)
 ${description}
@@ -222,7 +299,10 @@ thi công, verdict phải clear=true kèm một \`verify\` chạy được thậ
 
 # Câu hỏi
 Item này đã đủ rõ để thi công chưa? Nếu đủ, đề xuất một lệnh \`verify\` chạy
-được thật để chứng minh việc đã xong. Nếu chưa đủ — VÀ chỉ sau khi đã thử
+được thật để chứng minh việc đã xong — lệnh này LUÔN chạy từ repoRoot
+(xem "Cấu trúc thư mục repo" ở trên), KHÔNG BAO GIỜ từ một thư mục con giả
+định; nếu phần liên quan nằm trong thư mục có \`package.json\` riêng, lệnh
+phải tự cd/prefix vào đúng thư mục đó. Nếu chưa đủ — VÀ chỉ sau khi đã thử
 bước 4 ở trên — nêu MỘT câu hỏi cụ thể cần người trả lời để làm rõ, kèm tóm
 tắt ngắn những gì bạn đã thử tìm mà vẫn chưa đủ (để không ai phải scout lại
 từ đầu). Ngoài ra, ƯỚC LƯỢNG (không tính lại số \`blocks\` đã cho ở trên)
@@ -272,7 +352,7 @@ export function judgeDiscovery(work, cfg, view, scoutContext, fgosDir) {
     const tier = work?.tier ?? DEFAULTS.tier;
     const model = modelForTier(cfg, tier);
     const priorScoutNotes = scoutContext ? readScoutNotes(scoutContext.repoRoot, scoutContext.docsRef) : '';
-    const prompt = buildDiscoveryPrompt(work, view, priorScoutNotes);
+    const prompt = buildDiscoveryPrompt(work, view, priorScoutNotes, scoutContext?.repoRoot);
     const stricterPrompt = prompt + JUDGE_STRICT_JSON_SUFFIX;
 
     // tsk-4rd (route A): capture is now ALWAYS attempted when a

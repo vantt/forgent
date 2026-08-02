@@ -551,6 +551,68 @@ test('judgeDiscovery with a view but no graph edges degrades the graph-context s
   assert.match(verdict.verify, /chặn 0 việc khác còn mở/);
 });
 
+// --- tsk-545 (dep of tsk-4rd): repoRoot/repo-layout context, so the model
+// proposes a verify command that actually runs from goal-check.mjs's real
+// cwd (repoRoot) instead of guessing a nested path wrong (dogfood-proven
+// failure, decision 0018/tsk-1wd). Uses `tmpRepoAndStoreDir()`, not the
+// bare `tmpStoreDir()` most tests above use — `tmpStoreDir()`'s repoRoot
+// collapses to the shared `os.tmpdir()` itself (see that helper's own
+// comment), and reading a REAL system tmpdir's actual directory listing
+// here is exactly the scenario `buildRepoLayoutBlock`'s own bounding logic
+// exists to survive, not something a single test should depend on.
+
+test('resolveDiscovery embeds repoRoot\'s real top-level dirs and flags a nested package.json', () => {
+  const scriptPath = echoPromptExecutor(mkTempDir());
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpRepoAndStoreDir();
+  const repoRoot = path.dirname(storeDir);
+  fs.mkdirSync(path.join(repoRoot, 'src'));
+  fs.mkdirSync(path.join(repoRoot, 'nested-pkg'));
+  fs.writeFileSync(path.join(repoRoot, 'nested-pkg', 'package.json'), '{}');
+  addWork(storeDir, sampleWork());
+
+  const result = resolveDiscovery(storeDir, 'item-x', cfg);
+  assert.match(result.verdict.verify, /# Cấu trúc thư mục repo/);
+  assert.match(result.verdict.verify, /\bsrc\b/);
+  assert.match(result.verdict.verify, /package\.json` RIÊNG/);
+  assert.match(result.verdict.verify, /nested-pkg/);
+});
+
+test('resolveDiscovery states plainly there is no nested package.json when repoRoot has none', () => {
+  const scriptPath = echoPromptExecutor(mkTempDir());
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpRepoAndStoreDir();
+  addWork(storeDir, sampleWork());
+
+  const result = resolveDiscovery(storeDir, 'item-x', cfg);
+  assert.match(result.verdict.verify, /Không có thư mục con nào mang `package\.json` riêng/);
+});
+
+test('judgeDiscovery degrades the repo-layout section to a placeholder (never throws) when called with no repoRoot (old 2-arg callers)', () => {
+  const dir = mkTempDir();
+  const scriptPath = writeVerdictExecutor(dir, { clear: true, verify: 'ok' });
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+  let verdict;
+  assert.doesNotThrow(() => {
+    verdict = judgeDiscovery(sampleWork(), cfg);
+  });
+  assert.deepEqual(verdict, { clear: true, verify: 'ok' });
+});
+
+test('buildRepoLayoutBlock (via judgeDiscovery) treats an anomalously large repoRoot as anomalous and skips listing it, rather than blow up the prompt', () => {
+  const scriptPath = echoPromptExecutor(mkTempDir());
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+  const anomalousRoot = mkTempDir();
+  for (let i = 0; i < 501; i += 1) {
+    fs.mkdirSync(path.join(anomalousRoot, `d${i}`));
+  }
+  const work = sampleWork();
+  const verdict = judgeDiscovery(work, cfg, { work: { [work.id]: work } }, { repoRoot: anomalousRoot, docsRef: 'docs/history/no-such-item' });
+  assert.match(verdict.verify, /bất thường cho một repo thật/);
+});
+
 // --- tsk-4rd (route A, discover-research-recipe D2 "enrich"): deps' real
 // title/description, not just their id, are embedded in the prompt so the
 // judge can see "task liên đới đã làm/chưa làm" without a separate lookup.
