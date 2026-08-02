@@ -5075,6 +5075,89 @@ test('sync-root refuses from inside a linked worktree (must land on the real mai
   gitAtCwd(cwd, ['worktree', 'remove', '--force', wt]);
 });
 
+// --- close-out drift guard (tsk-62y, docs/history/
+//     tsk-3bn-merge-conductor-harness-v2/) ----------------------------------
+//
+// tsk-3bn's own origin incident: closing a milestone (a `targets`-bearing
+// item) while one of its targets' resolved root branch had drifted ahead of
+// main from a later leaf merge — nothing warned or blocked it. This guard
+// runs inside `approve`, before any git mutation, whenever the item being
+// approved carries a non-empty `targets` array.
+
+function makeMilestone(cwd, id, targets) {
+  const dir = path.join(cwd, '.fgos');
+  addWork(dir, { id, title: `Title ${id}`, kind: 'task', status: 'todo', deps: [], risk: 'low', refs: [], verify: 'true', targets });
+  run(cwd, ['move', id, '--to', 'doing']);
+  run(cwd, ['move', id, '--to', 'awaiting-approval']);
+  commitPending(cwd, `state: propose ${id}`);
+}
+
+test('approve of a milestone blocks when a targeted item\'s root has unsynced drift, exit 4, item stays awaiting-approval', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeDriftedRoot(cwd, 'closeout-root', { verify: 'true' });
+  const dir = path.join(cwd, '.fgos');
+  addWork(dir, { id: 'closeout-child', title: 'child', kind: 'task', status: 'todo', deps: [], risk: 'low', refs: [], verify: 'true', parent: 'closeout-root' });
+  commitPending(cwd, 'state: add closeout-child');
+
+  makeMilestone(cwd, 'closeout-milestone', ['closeout-child']);
+
+  const headBefore = gitHead(cwd);
+  const result = run(cwd, ['approve', 'closeout-milestone']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /unsynced drift/);
+  assert.match(result.stderr, /closeout-child/);
+  assert.match(result.stderr, /closeout-root/);
+  assert.match(result.stderr, /fgos sync-root/);
+  assert.equal(gitHead(cwd), headBefore, 'a blocked close-out attempts no merge');
+  assert.equal(stateView(cwd).work['closeout-milestone'].status, 'awaiting-approval');
+});
+
+test('approve of a milestone succeeds with --acknowledge-drift despite a targeted item\'s root having unsynced drift', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeDriftedRoot(cwd, 'closeout-ack-root', { verify: 'true' });
+  const dir = path.join(cwd, '.fgos');
+  addWork(dir, { id: 'closeout-ack-child', title: 'child', kind: 'task', status: 'todo', deps: [], risk: 'low', refs: [], verify: 'true', parent: 'closeout-ack-root' });
+  commitPending(cwd, 'state: add closeout-ack-child');
+
+  makeMilestone(cwd, 'closeout-ack-milestone', ['closeout-ack-child']);
+
+  const result = run(cwd, ['approve', 'closeout-ack-milestone', '--acknowledge-drift']);
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(stateView(cwd).work['closeout-ack-milestone'].status, 'delivered');
+});
+
+test('approve of a milestone with no drift on any target succeeds normally, unaffected by the guard', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  // A root with a real branch but zero drift (no leaf work landed on it
+  // beyond main's own tip).
+  const dir = path.join(cwd, '.fgos');
+  addWork(dir, { id: 'closeout-clean-root', title: 'root', kind: 'task', status: 'todo', deps: [], risk: 'low', refs: [], verify: 'true' });
+  commitPending(cwd, 'state: add closeout-clean-root');
+  gitAtCwd(cwd, ['branch', 'fgw/closeout-clean-root', 'main']);
+  addWork(dir, { id: 'closeout-clean-child', title: 'child', kind: 'task', status: 'todo', deps: [], risk: 'low', refs: [], verify: 'true', parent: 'closeout-clean-root' });
+  commitPending(cwd, 'state: add closeout-clean-child');
+
+  makeMilestone(cwd, 'closeout-clean-milestone', ['closeout-clean-child']);
+
+  const result = run(cwd, ['approve', 'closeout-clean-milestone']);
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(stateView(cwd).work['closeout-clean-milestone'].status, 'delivered');
+});
+
+test('approve of an ordinary item with no targets is completely unaffected by the close-out guard (regression)', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'closeout-no-targets-item', { verify: 'true' });
+  run(cwd, ['move', 'closeout-no-targets-item', '--to', 'doing']);
+  run(cwd, ['move', 'closeout-no-targets-item', '--to', 'awaiting-approval']);
+
+  const result = run(cwd, ['approve', 'closeout-no-targets-item']);
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(stateView(cwd).work['closeout-no-targets-item'].status, 'delivered');
+});
+
 test('reject on a nonexistent id is rejected as validation, exit 4', () => {
   const cwd = tmpCwd();
   const result = run(cwd, ['reject', 'ghost', '--reason', 'nope']);

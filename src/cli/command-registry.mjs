@@ -622,6 +622,7 @@ export const COMMAND_REGISTRY = [
         github: { type: 'boolean', description: 'Merge a prior review --github PR through GitHub instead of a local git merge.' },
         pr: { type: 'string', description: 'With --github: the PR number to merge.' },
         'acknowledge-iron-law': { type: 'boolean', description: 'Acknowledge the Iron Law gate for a self-modifying runner diff before merging.' },
+        'acknowledge-drift': { type: 'boolean', description: 'Acknowledge the close-out drift guard: close a milestone (targets-bearing item) anyway even though a targeted item\'s root branch has unsynced drift ahead of its own target.' },
         wait: { type: 'number', description: 'Retry-with-backoff on lock contention is on by default (bounded by the lock\'s own remaining TTL); pass a millisecond value to tighten that wait budget.' },
         'no-wait': { type: 'boolean', description: 'Disable the default retry-with-backoff and fail immediately on lock contention instead of waiting.' },
       },

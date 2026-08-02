@@ -38,6 +38,7 @@ import { frozenJudgeHits } from '../src/runner/frozen-judge.mjs';
 import { classifySource, reviewDiff, mergeRunnerItem, cleanupMergedBranch, changedFiles, isWorkingTreeClean as isMainTreeClean, isFgosOnlyStatusLine, buildOwnFileSet, detectTrunk, isMainWorktree } from '../src/runner/merge.mjs';
 import { createGitHubPR, mergeGitHubPR, viewGitHubPRStatus } from '../src/runner/github-adapter.mjs';
 import { classifyIronLaw } from '../src/evolve/iron-law.mjs';
+import { driftStatus } from '../src/state/drift-status.mjs';
 import { branchNameFor, branchExists, withMergeEphemeralWorktree, provisionDependencies } from '../src/runner/worktree.mjs';
 import { claimWork, ClaimError } from '../src/runner/claim-port.mjs';
 import { withLockRetry } from '../src/runner/lock-wait.mjs';
@@ -2101,6 +2102,41 @@ async function runVerb(verb, flags, positional, dir) {
           'validation',
           `approve: refusing to run from "${repoRoot}" — this is a git worktree, not the repository's main working tree, whether or not it was created through "fgos session start". Run approve from the main checkout.`,
         );
+      }
+
+      // Close-out drift guard (tsk-62y, docs/history/
+      // tsk-3bn-merge-conductor-harness-v2/): tsk-3bn's own origin incident
+      // was closing a milestone (a `targets`-bearing item) while ONE of its
+      // targets' resolved root branches had drifted ahead of main from a
+      // later leaf merge — nothing warned or blocked it. `targets` is the
+      // real, already-existing field a milestone uses ("a milestone's
+      // targets are ordinary work ids", work.mjs). Only runs when `targets`
+      // is a non-empty array — an ordinary (non-milestone) approve is
+      // completely unaffected. Refuses BEFORE any git mutation, same
+      // "acknowledge to override" shape as the Iron Law gate right below —
+      // `--acknowledge-drift` is a deliberate human override, not a bypass
+      // to route around silently.
+      if (Array.isArray(item.targets) && item.targets.length > 0) {
+        const drift = driftStatus(repoRoot, view);
+        const driftedTargets = [];
+        for (const targetId of item.targets) {
+          if (!view.work[targetId]) continue;
+          const targetRoot = resolveRoot(view, targetId);
+          const status = drift[targetRoot];
+          if (status?.needsSync) {
+            driftedTargets.push({ targetId, root: targetRoot, ...status });
+          }
+        }
+        if (driftedTargets.length > 0 && flags['acknowledge-drift'] !== true) {
+          const summary = driftedTargets
+            .map((d) => `${d.targetId} (root ${d.root}: ${d.branch} is ${d.aheadOfTarget} commit(s) ahead of ${d.target})`)
+            .join(', ');
+          throw new StoreError(
+            'validation',
+            `approve: "${id}" targets item(s) whose root branch has unsynced drift: ${summary}. `
+              + `Run "fgos sync-root <root-id>" first, or re-run with --acknowledge-drift to close anyway.`,
+          );
+        }
       }
 
       // Iron Law gate (D16/D17), hoisted ahead of the --github branch —
