@@ -630,6 +630,151 @@ test('resolveDecompose leaves footprint undefined when a child provides a malfor
   assert.equal(view.work[result.childIds[0]].footprint, undefined);
 });
 
+// --- tsk-5e97 D1 (docs/history/tsk-5e97-decompose-footprint-overlap-gate/
+// CONTEXT.md): footprint overlap among the TENTATIVE children of a
+// decompose verdict gates to awaiting-human, writing no children — same
+// shape as keywordRiskGate/blastRadiusGate above, never auto-adjusting. --
+
+test('resolveDecompose gates to awaiting-human when tentative children declare overlapping footprint, writing no children (tsk-5e97 D1)', () => {
+  const scriptDir = mkTempDir();
+  const scriptPath = writeVerdictExecutor(scriptDir, {
+    verdict: 'decompose',
+    reason: 'Two independent surfaces, no shared state',
+    children: [
+      { title: 'Build parser', verify: 'npm test -- parser', footprint: ['src/parser.mjs', 'src/shared.mjs'] },
+      { title: 'Build renderer', verify: 'npm test -- renderer', footprint: ['src/shared.mjs', 'src/renderer.mjs'] },
+    ],
+  });
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork());
+
+  const result = resolveDecompose(storeDir, 'item-x', cfg, 'runner');
+  assert.equal(result.outcome, 'need-human');
+
+  const view = listWork(storeDir);
+  assert.equal(view.work['item-x'].status, 'awaiting-human');
+  assert.equal(view.work['item-x'].stage, 'decompose');
+  assert.match(view.gates['item-x'].ask, /src\/shared\.mjs/);
+  assert.match(view.gates['item-x'].ask, /item-x-1/);
+  assert.match(view.gates['item-x'].ask, /item-x-2/);
+  const children = Object.values(view.work).filter((item) => item.parent === 'item-x');
+  assert.equal(children.length, 0);
+});
+
+test('resolveDecompose proceeds normally when tentative children declare disjoint (or absent) footprint', () => {
+  const scriptDir = mkTempDir();
+  const scriptPath = writeVerdictExecutor(scriptDir, {
+    verdict: 'decompose',
+    reason: 'Two independent surfaces, no shared state',
+    children: [
+      { title: 'Build parser', verify: 'npm test -- parser', footprint: ['src/parser.mjs'] },
+      { title: 'Build renderer', verify: 'npm test -- renderer' }, // no footprint declared
+    ],
+  });
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork());
+
+  const result = resolveDecompose(storeDir, 'item-x', cfg, 'runner');
+  assert.equal(result.outcome, 'decompose');
+  assert.equal(result.childIds.length, 2);
+  const view = listWork(storeDir);
+  assert.equal(view.work['item-x'].stage, 'executing');
+});
+
+test('resolveDecompose: the existing heavy-risk gate still preempts the footprint-overlap check (risksGate checked before the decompose branch)', () => {
+  const scriptDir = mkTempDir();
+  const scriptPath = writeVerdictExecutor(scriptDir, {
+    verdict: 'decompose',
+    reason: 'Two independent surfaces, no shared state',
+    children: [
+      { title: 'Build parser', verify: 'npm test -- parser', footprint: ['src/parser.mjs', 'src/shared.mjs'] },
+      { title: 'Build renderer', verify: 'npm test -- renderer', footprint: ['src/shared.mjs'] },
+    ],
+  });
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork({ risk: 'heavy' }));
+
+  const result = resolveDecompose(storeDir, 'item-x', cfg, 'runner');
+  assert.equal(result.outcome, 'need-human');
+  const view = listWork(storeDir);
+  assert.match(view.gates['item-x'].ask, /risk cao \(heavy\)/);
+  assert.doesNotMatch(view.gates['item-x'].ask, /Footprint trùng/);
+  const children = Object.values(view.work).filter((item) => item.parent === 'item-x');
+  assert.equal(children.length, 0);
+});
+
+test('resolveDecompose logs a decisionsById entry on a footprint-overlap need-human outcome, naming the conflict count', () => {
+  const scriptDir = mkTempDir();
+  const scriptPath = writeVerdictExecutor(scriptDir, {
+    verdict: 'decompose',
+    reason: 'Two independent surfaces, no shared state',
+    children: [
+      { title: 'Build parser', verify: 'npm test -- parser', footprint: ['src/parser.mjs', 'src/shared.mjs'] },
+      { title: 'Build renderer', verify: 'npm test -- renderer', footprint: ['src/shared.mjs'] },
+    ],
+  });
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork());
+
+  resolveDecompose(storeDir, 'item-x', cfg, 'runner');
+
+  const entries = listWork(storeDir).decisionsById['item-x'];
+  assert.equal(entries.length, 1);
+  assert.match(entries[0].text, /need-human/);
+  assert.match(entries[0].text, /1 footprint conflicts/);
+  assert.match(entries[0].rationale, /Footprint trùng giữa các việc con dự kiến/);
+});
+
+test('resolveDecompose self-resolves the footprint-overlap gate once the next judge call proposes non-overlapping children (no bypass constant needed, tsk-5e97 D1)', () => {
+  const overlappingDir = mkTempDir();
+  const overlappingScript = writeVerdictExecutor(overlappingDir, {
+    verdict: 'decompose',
+    reason: 'Two independent surfaces, no shared state',
+    children: [
+      { title: 'Build parser', verify: 'npm test -- parser', footprint: ['src/parser.mjs', 'src/shared.mjs'] },
+      { title: 'Build renderer', verify: 'npm test -- renderer', footprint: ['src/shared.mjs'] },
+    ],
+  });
+  const overlappingCfg = cfgFor([overlappingScript, '{prompt}']);
+
+  const resolvedDir = mkTempDir();
+  const resolvedScript = writeVerdictExecutor(resolvedDir, {
+    verdict: 'decompose',
+    reason: 'Re-sliced after human input — no shared file left',
+    children: [
+      { title: 'Build parser', verify: 'npm test -- parser', footprint: ['src/parser.mjs'] },
+      { title: 'Build renderer', verify: 'npm test -- renderer', footprint: ['src/renderer.mjs'] },
+    ],
+  });
+  const resolvedCfg = cfgFor([resolvedScript, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork());
+
+  const first = resolveDecompose(storeDir, 'item-x', overlappingCfg, 'human');
+  assert.equal(first.outcome, 'need-human');
+
+  moveWork(storeDir, { id: 'item-x', to: 'todo', expectedStatus: 'awaiting-human', answer: 'Đã re-slice, không còn trùng file.' });
+
+  const second = resolveDecompose(storeDir, 'item-x', resolvedCfg, 'human');
+  assert.equal(
+    second.outcome,
+    'decompose',
+    'the gate must pass once the fresh verdict proposes non-overlapping children — no bypass constant needed',
+  );
+  assert.equal(second.childIds.length, 2);
+
+  const view = listWork(storeDir);
+  assert.equal(view.work['item-x'].stage, 'executing');
+});
+
 test('resolveDecompose assigns positional child ids `${work.id}-<n>` for n=1..N across N siblings', () => {
   const scriptDir = mkTempDir();
   const scriptPath = writeVerdictExecutor(scriptDir, {
