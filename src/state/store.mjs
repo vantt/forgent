@@ -340,6 +340,34 @@ export function setFocus(dir, { id, role } = {}) {
 }
 
 /**
+ * RUL58 acceptance-evidence gate: throws if `work` has opted into
+ * `acceptance` clauses (per work.mjs's optional-additive shape) and any
+ * populated clause still lacks evidence. `acceptance` absent, null, or an
+ * empty array is a complete no-op (D4) — an item that never opted in is
+ * unaffected. Pure — no I/O, no event append.
+ *
+ * Extracted out of `moveWork`'s inline `to === 'delivered'` check (tsk-396
+ * D1) so `approve` (bin/fgos.mjs) can also call this directly, as a
+ * pre-flight check before any merge mutation — the merge-then-gate
+ * ordering gap tsk-396 exists to close. `moveWork` still calls this itself
+ * below, unchanged, as the backstop for the doors into `delivered` that
+ * don't go through that pre-flight (`return`'s `doing -> delivered`, the
+ * mechanical `blocked -> delivered` retry).
+ */
+export function assertAcceptanceEvidence(id, work) {
+  if (!Array.isArray(work.acceptance) || work.acceptance.length === 0) return;
+  for (const clause of work.acceptance) {
+    if (typeof clause?.text !== 'string' || !clause.text.trim()) continue;
+    if (typeof clause.evidence !== 'string' || !clause.evidence.trim()) {
+      throw new StoreError(
+        'precondition',
+        `work "${id}" cannot move to "delivered" — acceptance clause "${clause.text}" has no evidence yet; edit --acceptance must supply it before "delivered".`,
+      );
+    }
+  }
+}
+
+/**
  * Move a work item to a new status. Looks the item up fresh from the log,
  * delegates the precondition/CAS decision to fsm.mjs (pure — never writes),
  * and only then appends the event it returns.
@@ -502,23 +530,18 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, rol
   // (D1), mechanically checking only *presence* of evidence, never its
   // truth. Placed AFTER transitionWork's CAS + precondition checks so a
   // stale caller still gets 'conflict' first, and BEFORE the append below
-  // so a refused close persists nothing. `work.acceptance` absent, null,
-  // or an empty array is a complete no-op (D4) — an item that never opted
-  // in is unaffected. All three doors into `delivered` (`doing`,
-  // `awaiting-approval`, and the mechanical `blocked` retry) converge on
-  // this one `moveWork` call, so gating on `to==='delivered'` here covers
-  // all three — a dependent that opens on `delivered` (RUL12) is exactly
-  // as protected as it was when `done` was the trigger, never less.
-  if (to === 'delivered' && Array.isArray(work.acceptance) && work.acceptance.length > 0) {
-    for (const clause of work.acceptance) {
-      if (typeof clause?.text !== 'string' || !clause.text.trim()) continue;
-      if (typeof clause.evidence !== 'string' || !clause.evidence.trim()) {
-        throw new StoreError(
-          'precondition',
-          `work "${id}" cannot move to "delivered" — acceptance clause "${clause.text}" has no evidence yet; edit --acceptance must supply it before "delivered".`,
-        );
-      }
-    }
+  // so a refused close persists nothing. All three doors into `delivered`
+  // (`doing`, `awaiting-approval`, and the mechanical `blocked` retry)
+  // converge on this one `moveWork` call, so gating on `to==='delivered'`
+  // here covers all three — a dependent that opens on `delivered` (RUL12)
+  // is exactly as protected as it was when `done` was the trigger, never
+  // less. Extracted to `assertAcceptanceEvidence` (tsk-396 D1) so `approve`
+  // (bin/fgos.mjs) can also run it as a pre-flight check, before any merge
+  // mutation, instead of only catching it here after the merge has already
+  // landed — this call site is unchanged, still the backstop for the doors
+  // that don't go through that pre-flight.
+  if (to === 'delivered') {
+    assertAcceptanceEvidence(id, work);
   }
 
   // Câu-6 tự động (per Phase 3 S3-closeout (c), six-questions L5): BOTH doors
