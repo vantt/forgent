@@ -232,6 +232,41 @@ export function validateWorkShape(work) {
       }
     }
   }
+  // supersededBy / duplicates (tsk-2ie, docs/history/
+  // tsk-2ie-duplicate-superseded-guard/): two non-blocking, knowledge-only
+  // relations mirroring bd's own `supersedes`/`duplicates` dependency-type
+  // split (D1). `supersededBy` is directed and singular — the id of the ONE
+  // item that replaces this one — shape mirrors `parent` (self-reference
+  // check) but, like `mergeAfter`, has its target's EXISTENCE enforced
+  // (validateSupersededBy below) rather than left dangling like `parent`.
+  // `duplicates` is undirected and array-shaped, mirroring `mergeAfter`'s
+  // shape exactly (including existence enforcement, validateDuplicates
+  // below) — informational only (D4): read by nothing in mergeReadiness
+  // except via `supersededBy`. Neither participates in the unified
+  // blocking-cycle graph (dep-graph.mjs) or frontier.mjs start-eligibility
+  // — both OPTIONAL and NOT in DEFAULTS, same lazy-additive shape as
+  // mergeAfter/parent above.
+  if (work.supersededBy !== undefined && work.supersededBy !== null) {
+    if (typeof work.supersededBy !== 'string' || !work.supersededBy) {
+      throw new WorkValidationError(`work.supersededBy must be a non-empty string when present, got: ${JSON.stringify(work.supersededBy)}`);
+    }
+    if (work.supersededBy === work.id) {
+      throw new WorkValidationError(`work "${work.id}" cannot list itself as its own supersededBy.`);
+    }
+  }
+  if (work.duplicates !== undefined && work.duplicates !== null) {
+    if (!Array.isArray(work.duplicates)) {
+      throw new WorkValidationError(`work.duplicates must be an array of non-empty strings when present, got: ${JSON.stringify(work.duplicates)}`);
+    }
+    for (const dupId of work.duplicates) {
+      if (typeof dupId !== 'string' || !dupId) {
+        throw new WorkValidationError(`work.duplicates entries must be non-empty strings, got: ${JSON.stringify(dupId)}`);
+      }
+      if (dupId === work.id) {
+        throw new WorkValidationError(`work "${work.id}" cannot list itself in its own duplicates.`);
+      }
+    }
+  }
   requireNonEmptyString(work, 'risk');
   requireArray(work, 'refs');
   requireNonEmptyString(work, 'verify');
@@ -516,6 +551,39 @@ export function validateMergeAfter(work, existingIds) {
 }
 
 /**
+ * Validate that `work.supersededBy`, when present, points at an id present
+ * in `existingIds` — mirrors `validateMergeAfter` exactly (tsk-2ie D3): a
+ * dangling supersession target fails loud here rather than silently no-op'ing
+ * later inside `mergeReadiness`. A no-op when `supersededBy` is absent.
+ */
+export function validateSupersededBy(work, existingIds) {
+  if (typeof work.supersededBy !== 'string') return true;
+  const known = existingIds instanceof Set ? existingIds : new Set(existingIds ?? []);
+  if (!known.has(work.supersededBy)) {
+    throw new WorkValidationError(`work "${work.id}" has supersededBy target "${work.supersededBy}", which is not a known id.`);
+  }
+  return true;
+}
+
+/**
+ * Validate that every `duplicates` entry of `work` points at an id present
+ * in `existingIds` — mirrors `validateMergeAfter` exactly, applied to
+ * `duplicates` for the same loud-failure reasoning `validateSupersededBy`
+ * gives its sibling field (tsk-2ie CONTEXT.md assumptions). A no-op when
+ * `duplicates` is absent.
+ */
+export function validateDuplicates(work, existingIds) {
+  if (!Array.isArray(work.duplicates)) return true;
+  const known = existingIds instanceof Set ? existingIds : new Set(existingIds ?? []);
+  for (const dupId of work.duplicates) {
+    if (!known.has(dupId)) {
+      throw new WorkValidationError(`work "${work.id}" has duplicates target "${dupId}", which is not a known id.`);
+    }
+  }
+  return true;
+}
+
+/**
  * Full validation entry point: shape first, then dep-existence when
  * `existingIds` is supplied (omit it to validate shape only, e.g. before the
  * store is known).
@@ -525,6 +593,8 @@ export function validateWork(work, existingIds) {
   if (existingIds !== undefined) {
     validateDeps(work, existingIds);
     validateMergeAfter(work, existingIds);
+    validateSupersededBy(work, existingIds);
+    validateDuplicates(work, existingIds);
   }
   return true;
 }

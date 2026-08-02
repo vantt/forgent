@@ -36,7 +36,7 @@ import { resolveRoot } from '../runner/root-affinity.mjs';
  * don't know about it yet.
  *
  * Returns `{ ready, waiting, conflicts, mergeSets, blockedOnSync,
- * mergeTier }`:
+ * mergeTier, supersededOut }`:
  *   - `ready` — ids of `proposed` items whose `deps`/`mergeAfter` are all
  *     RESOLVED, whose resolved root has no unresolved sync drift, and
  *     which are not part of any footprint conflict, ordered by
@@ -79,6 +79,16 @@ import { resolveRoot } from '../runner/root-affinity.mjs';
  *     `mergeTier`, not the canonical reports' bare `tier` (D7): `work.tier`
  *     already exists as a different, unrelated field (the item's own
  *     cost/model-weight).
+ *   - `supersededOut` — ids of otherwise-`ready` candidates carrying a
+ *     `supersededBy` target that is RESOLVED, or itself present in this
+ *     same call's ready-set (tsk-2ie D2, docs/history/
+ *     tsk-2ie-duplicate-superseded-guard/ — a different D2 than mergeSets'
+ *     own above, distinct decision doc). Excluded from `ready`, never
+ *     placed in `waiting` (permanently superseded, not "eventually
+ *     mergeable once a dep resolves" — a different semantic). Always empty
+ *     for every item that never sets `supersededBy` — pure additive
+ *     exclusion, same backward-compatible shape `blockedOnSync`/`mergeSets`
+ *     already established.
  */
 export function mergeReadiness(view, opts = {}) {
   const work = view?.work ?? {};
@@ -127,6 +137,29 @@ export function mergeReadiness(view, opts = {}) {
   const readyIdSet = new Set(
     syncClear.map((item) => item.id).filter((id) => !conflictedIds.has(id)),
   );
+
+  // supersededOut (tsk-2ie D2, docs/history/tsk-2ie-duplicate-superseded-
+  // guard/): exclude any readyIdSet member whose supersededBy target is
+  // RESOLVED (RESOLVED_STATUSES, same gate deps/mergeAfter already reuse)
+  // OR itself present in this SAME readyIdSet snapshot (about to merge this
+  // same round) -- a single pass against the ORIGINAL readyIdSet, checked
+  // before any deletion, so a mutual pair (A supersededBy B, B supersededBy
+  // A) is excluded on both sides deterministically rather than depending on
+  // iteration order. `duplicates` is read by nothing here (D4 --
+  // informational only).
+  const supersededOutIds = [];
+  for (const id of readyIdSet) {
+    const target = work[id]?.supersededBy;
+    if (typeof target !== 'string') continue;
+    if (RESOLVED_STATUSES.has(work[target]?.status) || readyIdSet.has(target)) {
+      supersededOutIds.push(id);
+    }
+  }
+  for (const id of supersededOutIds) {
+    readyIdSet.delete(id);
+  }
+  const supersededOut = orderByRank(supersededOutIds);
+
   const ready = orderByRank([...readyIdSet]);
 
   const mergeSets = [];
@@ -175,5 +208,5 @@ export function mergeReadiness(view, opts = {}) {
     mergeTier[item.id] = item.parent ? 'leaf-to-root' : 'root-to-main';
   }
 
-  return { ready, waiting, conflicts, mergeSets, blockedOnSync, mergeTier };
+  return { ready, waiting, conflicts, mergeSets, blockedOnSync, mergeTier, supersededOut };
 }
