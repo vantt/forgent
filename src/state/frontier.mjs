@@ -111,7 +111,7 @@ export function isDepsAndLineageReady(view, id) {
   if (!item) return false;
   const childrenByParent = indexChildrenByParent(work);
   if (hasOpenDescendant(id, work, childrenByParent)) return false;
-  return item.deps.every((dep) => work[dep]?.status === 'done');
+  return item.deps.every((dep) => RESOLVED_STATUSES.has(work[dep]?.status));
 }
 
 // v2 comparator (D2/D6): priority ASC absent-last, then intent DESC
