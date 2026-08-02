@@ -82,3 +82,12 @@ tests fail identically with or without this fix):
 
 Neither touches `bin/fgos.mjs`, `src/runner/merge.mjs`, or
 `test/runner/merge.test.mjs`.
+
+## Update — both pre-existing failures resolved
+
+Commit `2552db9` (this branch) synced `.agents/skills/fgos-submit-assist/
+SKILL.md` from its `.claude/skills` canonical source, and added the
+missing `src/state/discover-pool.mjs` row to
+`docs/architecture-manifest.json`. Both fixes are unrelated to tsk-2eq's
+own lock-scope change — done only to unblock this item's own full-suite
+verify. Re-run after: `npm test` → 2153 tests, 2148 pass, 0 fail, 5 skipped.
