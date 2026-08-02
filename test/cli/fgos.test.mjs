@@ -5145,6 +5145,28 @@ test('approve --github without --pr is a validation error, item stays proposed, 
   assert.ok(!fs.existsSync(marker), 'no gh call is made when --pr is missing');
 });
 
+// tsk-396 D2: regression for the merge-before-gate ordering bug on the
+// --github transport specifically. Before this fix, mergeGitHubPR (a real,
+// server-side GitHub merge) ran BEFORE the acceptance-evidence gate — unlike
+// a local git merge, a GitHub-side merge can't be aborted, so this path
+// carried irreversible-merge risk the local paths don't. The fake gh here
+// would succeed if invoked; the test proves it is never invoked at all.
+test('approve --github --pr on an item with a missing-evidence acceptance clause is refused BEFORE the real GitHub merge: precondition, exit 2, mergeGitHubPR/gh is never called', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeRunnerProposedItem(cwd, 'gh-approve-cos-missing');
+  run(cwd, ['edit', 'gh-approve-cos-missing', '--acceptance', JSON.stringify([{ text: 'ship it' }])]);
+  commitPendingBeforeApprove(cwd, 'gh-approve-cos-missing');
+  const marker = path.join(cwd, 'gh-was-called');
+  const fake = writeMarkerFake(cwd, marker);
+
+  const result = run(cwd, ['approve', 'gh-approve-cos-missing', '--github', '--pr', '42'], { FGOS_GH_COMMAND: fake });
+  assert.equal(result.status, 2, `${result.stdout}${result.stderr}`);
+  assert.match(result.stderr, /ship it/);
+  assert.equal(stateView(cwd).work['gh-approve-cos-missing'].status, 'awaiting-approval');
+  assert.ok(!fs.existsSync(marker), 'the acceptance-evidence gate must reject before any gh CLI call, including the real merge');
+});
+
 test('approve --github with a dirty main tree is NOT blocked by the local dirty-tree gate and proceeds to the GitHub merge', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
@@ -6870,6 +6892,30 @@ test('approve on a proposed item with a missing-evidence acceptance clause is re
   assert.match(result.stderr, /ship it/);
   assert.equal(stateView(cwd).work['approve-cos-missing'].status, 'awaiting-approval');
   assert.equal(eventLines(cwd).length, before);
+});
+
+// tsk-396 D1: regression for the merge-before-gate ordering bug. Before this
+// fix, a runner-sourced item's real `git merge` (mergeRunnerItem) landed on
+// main BEFORE the acceptance-evidence gate ran (inside moveWork's own
+// `to === 'delivered'` check), so a refused gate here would still leave a
+// merge commit on main. assertAcceptanceEvidence now runs as a pre-flight,
+// before mergeRunnerItem is ever called — this test proves main's HEAD is
+// completely untouched by a refused approve, not just that approve reports
+// an error.
+test('approve on a runner-sourced item with a missing-evidence acceptance clause is refused BEFORE the real git merge: precondition, exit 2, main HEAD unchanged, item stays awaiting-approval', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeRunnerProposedItem(cwd, 'runner-cos-missing');
+  run(cwd, ['edit', 'runner-cos-missing', '--acceptance', JSON.stringify([{ text: 'ship it' }])]);
+  commitPendingBeforeApprove(cwd, 'runner-cos-missing');
+
+  const mainHeadBefore = gitAtCwd(cwd, ['rev-parse', 'main']).trim();
+  const result = run(cwd, ['approve', 'runner-cos-missing']);
+  assert.equal(result.status, 2, result.stderr);
+  assert.match(result.stderr, /ship it/);
+
+  assert.equal(gitAtCwd(cwd, ['rev-parse', 'main']).trim(), mainHeadBefore, 'main HEAD must be completely unchanged by a refused approve');
+  assert.equal(stateView(cwd).work['runner-cos-missing'].status, 'awaiting-approval');
 });
 
 test('graph verb on an empty store: zero components, still a valid envelope, exit 0', () => {

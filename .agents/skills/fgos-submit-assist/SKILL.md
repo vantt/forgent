@@ -20,6 +20,15 @@ load it directly when a person hands you an ask to file; it does not run as
 part of any other skill's flow and does not change how any other skill
 starts a session.
 
+Not the same door as `/fgOS:submit` (`plugins/fgOS/skills/submit/SKILL.md`)
+— that one deliberately stays mechanical (submit's own keyword-count
+fallback, no LLM reasoning) so `dogfood-fixture:submit`'s replay of a
+scenario's canonical text stays byte-identical run to run. Use `/fgOS:submit`
+directly for a quick, low-stakes filing where the mechanical default is
+fine; use this skill when the ask is substantial enough to warrant a
+considered `tier`/`kind`/`risk` call. Both end up calling the exact same
+`fgos submit` verb underneath — this skill just pre-fills its flags.
+
 ## 1. Read the ask
 
 Take the free-text description exactly as given. Don't paraphrase or trim it

@@ -588,6 +588,45 @@ test('mergeRunnerItem refuses to even attempt the merge when another identity al
   assert.equal(isWorkingTreeClean(repoRoot), true, 'tree must stay clean — refusing before the merge means nothing was ever staged');
 });
 
+// tsk-2eq: a leaf approve calls mergeRunnerItem with an ephemeral,
+// freshly-.fgos-stripped worktree as `repoRoot` (the git-op cwd) — before
+// this fix, the lock resolved against that same ephemeral path and so
+// never contended with a real concurrent leaf merge. The two tests below
+// simulate that shape with two separate directories: `repoRoot` (a real
+// git checkout, standing in for the ephemeral worktree) and `lockRoot` (a
+// plain directory, standing in for the real main checkout).
+test('mergeRunnerItem resolves the main-checkout lock against lockRoot, not repoRoot', async () => {
+  const repoRoot = initRepo();
+  makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
+  const lockRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-merge-test-lockroot-'));
+
+  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'true' }), { lockRoot });
+
+  assert.equal(result.outcome, 'merged');
+  assert.equal(fs.existsSync(path.join(lockRoot, '.fgos')), true, 'the lock directory must be created under lockRoot');
+  assert.equal(fs.existsSync(path.join(repoRoot, '.fgos')), false, 'repoRoot must never receive a lock directory when lockRoot is set explicitly');
+});
+
+test('mergeRunnerItem refuses when lockRoot (not repoRoot) already holds the main-checkout lock — proves a leaf-approve-shaped call now actually contends', async () => {
+  const repoRoot = initRepo();
+  makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
+  const lockRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-merge-test-lockroot-'));
+
+  const fgosDir = path.join(lockRoot, '.fgos');
+  const otherLock = acquireMainCheckoutLock(fgosDir, { identity: 'a-different-live-session' });
+  assert.equal(otherLock.status, ACQUIRED);
+
+  const headBefore = headOf(repoRoot);
+  await assert.rejects(
+    () => mergeRunnerItem(repoRoot, makeItem({ verify: 'true' }), { lockRoot }),
+    (err) => {
+      assert.equal(err.code, 'lock-held');
+      return true;
+    },
+  );
+  assert.equal(headOf(repoRoot), headBefore, 'HEAD must be unchanged — refused before the merge ever started');
+});
+
 test('mergeRunnerItem: an ambiguous (unparseable) lock file carries code "lock-ambiguous", distinct from "lock-held" -- a retry wrapper must never retry this one either', async () => {
   const repoRoot = initRepo();
   makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
@@ -694,6 +733,83 @@ test('abortMergeIfPossible still aborts a real in-progress merge when MERGE_HEAD
   assert.throws(() => git(repoRoot, ['rev-parse', '--verify', 'MERGE_HEAD']), 'MERGE_HEAD must be gone after the abort');
   assert.equal(headOf(repoRoot), headBefore, 'abort must not move HEAD');
   assert.equal(isWorkingTreeClean(repoRoot), true);
+});
+
+// tsk-15k: the false-done bug this item fixes — `isAlreadyMerged`'s bare
+// `is-ancestor` check is not proof the branch's content is really in HEAD's
+// tree. A merge landed with `-s ours` keeps the branch as a real parent
+// (so is-ancestor reports true) while discarding 100% of its content.
+// Before this fix, a weak/generic verify command (one not scoped to the
+// item's own artifact — a real risk this repo's own items can carry, see
+// docs/history/merge-verify-only-false-done/CONTEXT.md) let this slip
+// through as outcome "merged". This is the constructed repro from
+// plan.md's feasibility validation, turned into a permanent regression
+// test.
+
+test('mergeRunnerItem does not report "merged" when an already-ancestor branch had its content discarded by an earlier "git merge -s ours"', async () => {
+  const repoRoot = initRepo();
+  makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
+
+  // Simulate a prior merge that kept the branch as a parent (so is-ancestor
+  // is true) but discarded all of its content via the "ours" strategy —
+  // the exact shape that used to slip past isAlreadyMerged's bare check.
+  git(repoRoot, ['merge', '--no-ff', '-s', 'ours', '-q', '-m', 'merge but discard content (ours strategy)', 'fgw/demo-item']);
+
+  assert.equal(
+    fs.existsSync(path.join(repoRoot, 'produced.txt')),
+    false,
+    'sanity check: the -s ours merge must actually have discarded the content',
+  );
+
+  // A weak/generic verify command not scoped to the item's own artifact —
+  // the exact condition that used to let this slip through as "merged".
+  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'true' }));
+  assert.equal(result.outcome, 'verify-fail');
+  assert.equal(result.check.passed, false);
+  assert.match(result.check.output, /integrity check failed/);
+  assert.match(result.check.output, /produced\.txt/);
+});
+
+// tsk-107: branchContentMismatch used to compare the branch's own tree
+// against ref's CURRENT tree — so once a LATER, unrelated already-merged
+// branch also touched the same path, the branch's own tree would legitimately
+// differ from HEAD forever after, even though the branch's real content was
+// never discarded. This false-flagged a re-approve of an already-merged item
+// as "verify-fail-post-merge" (reproduced live on tsk-2eq right after tsk-15k
+// landed this check — see docs/history/ for that item). The fix compares
+// against the merge commit itself (firstMerge vs firstMerge^1), which is
+// immune to any later commits on the same path.
+
+test('mergeRunnerItem does not false-flag an already-merged branch just because a later unrelated already-merged branch also touched the same file', async () => {
+  const repoRoot = initRepo();
+  fs.writeFileSync(path.join(repoRoot, 'shared.txt'), 'line1\n');
+  git(repoRoot, ['add', 'shared.txt']);
+  git(repoRoot, ['commit', '-q', '-m', 'add shared.txt']);
+
+  makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'shared.txt', 'line1\ndemo added\n');
+  makeBranchWithCommit(repoRoot, 'fgw/other-item', 'shared.txt', 'other added\nline1\n');
+
+  // Land the unrelated branch first — a real, ordinary merge, no conflict
+  // (it edits the top of the file; demo-item edits the bottom).
+  git(repoRoot, ['merge', '--no-ff', '-q', '-m', 'merge other-item first', 'fgw/other-item']);
+
+  // First real merge of demo-item: a normal 3-way merge combining both
+  // edits — exercises the ordinary (not-yet-ancestor) path.
+  const firstResult = await mergeRunnerItem(repoRoot, makeItem({ verify: 'true' }));
+  assert.equal(firstResult.outcome, 'merged');
+  assert.equal(
+    fs.readFileSync(path.join(repoRoot, 'shared.txt'), 'utf8'),
+    'other added\nline1\ndemo added\n',
+  );
+
+  // Re-approving the now-already-merged demo-item is exactly the path that
+  // runs branchContentMismatch. shared.txt legitimately differs between
+  // demo-item's own branch tip ("line1\ndemo added\n") and current HEAD
+  // ("other added\nline1\ndemo added\n") — that must not be mistaken for
+  // discarded content.
+  const secondResult = await mergeRunnerItem(repoRoot, makeItem({ verify: 'true' }));
+  assert.equal(secondResult.outcome, 'merged');
+  assert.equal(secondResult.check.passed, true);
 });
 
 // --- mergeRunnerItem rejects a .fgos/ write on the branch (ADR0020) -------

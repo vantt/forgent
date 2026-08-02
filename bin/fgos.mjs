@@ -16,7 +16,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { initStore, addWork, moveWork, editWork, addDecision, addOutcome, addFriction, listWork, readyWork, isDepsAndLineageReady, graphMetrics, graphWhatIf, staleDoingAdvisory, footprintConflicts, readRawEvents, rebuild, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, registerTool, removeTool, StoreError, EXIT_CODES, categoryOf } from '../src/state/store.mjs';
+import { initStore, addWork, moveWork, editWork, addDecision, addOutcome, addFriction, listWork, readyWork, isDepsAndLineageReady, graphMetrics, graphWhatIf, staleDoingAdvisory, footprintConflicts, readRawEvents, rebuild, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, registerTool, removeTool, assertAcceptanceEvidence, StoreError, EXIT_CODES, categoryOf } from '../src/state/store.mjs';
 import { probeTool, readLocalStatus, writeLocalStatus, resolvedStatus, normalizeCapability } from '../src/state/tool-registry.mjs';
 import { repairTruncatedLastLine } from '../src/state/events.mjs';
 import { deriveTitle, classify, generateId } from '../src/intake/classify.mjs';
@@ -2120,6 +2120,12 @@ async function runVerb(verb, flags, positional, dir) {
           throw new StoreError('validation', `approve --github: "${id}" is a ${source}-sourced item — GitHub approval requires a runner-sourced item with a live fgw/${id} branch (no branch exists to attach a PR to for pull/legacy items).`);
         }
         const prNumber = requireField(flags.pr, 'approve --github requires --pr <n> (the GitHub PR number from a prior review --github)');
+        // Acceptance-evidence pre-flight (tsk-396 D2): checked BEFORE the
+        // real GitHub-side merge, not caught after the fact inside
+        // moveWork's own `to === 'delivered'` check — a GitHub merge can't
+        // be `git merge --abort`ed the way a local one can, so this matters
+        // even more here than on the local paths above.
+        assertAcceptanceEvidence(id, item);
         const result = await mergeGitHubPR(repoRoot, prNumber, ghCommandOpts());
         if (result.outcome === 'merged') {
           // Accepted rough edge (this slice): unlike the local merged path, no
@@ -2156,6 +2162,14 @@ async function runVerb(verb, flags, positional, dir) {
           throw new StoreError('validation', `approve: working tree at "${repoRoot}" is not clean — commit or stash pending changes before approving "${id}".`);
         }
 
+        // Acceptance-evidence pre-flight (tsk-396 D1): covers both merge
+        // paths below (leaf->root and root->main share this one branch
+        // point) — checked BEFORE mergeRunnerItem's real git merge, not
+        // caught after the fact inside moveWork's own `to === 'delivered'`
+        // check (store.mjs). A merge that's about to be refused here never
+        // touches the target branch.
+        assertAcceptanceEvidence(id, item);
+
         // D3 leaf-vs-root split: a leaf's resolved root is a DIFFERENT item
         // (resolveRoot walks item.parent up to the top); a root's resolved
         // root is itself.
@@ -2181,7 +2195,11 @@ async function runVerb(verb, flags, positional, dir) {
           // leave the ephemeral checkout clean via `git merge --abort`, so
           // no cleanupMergedBranch call is needed on those paths.
           return await withMergeEphemeralWorktree(repoRoot, rootId, async (ephemeral) => {
-            const result = await runMerge(() => mergeRunnerItem(ephemeral.path, item, { timeoutMs }));
+            // tsk-2eq: lockRoot pins the main-checkout lock to the real
+            // repo root — ephemeral.path stays the git-op cwd (unchanged)
+            // but is never the lock's own root, since it's a throwaway
+            // worktree with no writable .fgos/ (ADR0020).
+            const result = await runMerge(() => mergeRunnerItem(ephemeral.path, item, { timeoutMs, lockRoot: repoRoot }));
 
             if (result.outcome === 'conflict') {
               moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: 'merge-conflict', role: 'system' });
