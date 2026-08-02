@@ -120,7 +120,23 @@ never moves it.
 
    A question that fails any check is never asked — pin it as a labeled
    assumption instead, or hand it to `fgos-planning` if only the implementer
-   cares. After each answer, confirm the decision back and assign it a
+   cares.
+
+   **Ask as open conversational prose, not via a structured-choice tool
+   (e.g. `AskUserQuestion`).** These questions exist to discover product
+   decisions the session does not yet know — a tool that forces the answer
+   into 2-4 pre-set options can only ever surface what the session already
+   imagined, defeating that purpose (a person who wants to answer with a
+   framing the session never proposed has no box to put it in). "answerable"
+   above does not mean "multiple-choice" — "point at a reference" is
+   explicitly an open answer shape. Reach for a structured-choice tool only
+   when scout evidence has already narrowed the question to a short list of
+   concretely-named real alternatives (never options invented just to make
+   the question fit the tool) — the `## Gate` step's yes/no confirmation
+   below is exactly that case, since by then the decision is already locked
+   and the only remaining question is a closed approve/reject.
+
+   After each answer, confirm the decision back and assign it a
    stable ID: `D1`, `D2`, `D3`… Then run `fgos decision --text "<D-ID>:
    <one-line summary>" --rationale "see CONTEXT.md for the full scout
    evidence and reasoning"` so the decision also lands in the item's
