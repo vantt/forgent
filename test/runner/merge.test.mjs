@@ -655,6 +655,41 @@ test('mergeRunnerItem on an already-merged branch still re-runs verify and retur
   assert.equal(result.check.passed, false);
 });
 
+// tsk-15k: the false-done bug this item fixes — `isAlreadyMerged`'s bare
+// `is-ancestor` check is not proof the branch's content is really in HEAD's
+// tree. A merge landed with `-s ours` keeps the branch as a real parent
+// (so is-ancestor reports true) while discarding 100% of its content.
+// Before this fix, a weak/generic verify command (one not scoped to the
+// item's own artifact — a real risk this repo's own items can carry, see
+// docs/history/merge-verify-only-false-done/CONTEXT.md) let this slip
+// through as outcome "merged". This is the constructed repro from
+// plan.md's feasibility validation, turned into a permanent regression
+// test.
+
+test('mergeRunnerItem does not report "merged" when an already-ancestor branch had its content discarded by an earlier "git merge -s ours"', async () => {
+  const repoRoot = initRepo();
+  makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
+
+  // Simulate a prior merge that kept the branch as a parent (so is-ancestor
+  // is true) but discarded all of its content via the "ours" strategy —
+  // the exact shape that used to slip past isAlreadyMerged's bare check.
+  git(repoRoot, ['merge', '--no-ff', '-s', 'ours', '-q', '-m', 'merge but discard content (ours strategy)', 'fgw/demo-item']);
+
+  assert.equal(
+    fs.existsSync(path.join(repoRoot, 'produced.txt')),
+    false,
+    'sanity check: the -s ours merge must actually have discarded the content',
+  );
+
+  // A weak/generic verify command not scoped to the item's own artifact —
+  // the exact condition that used to let this slip through as "merged".
+  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'true' }));
+  assert.equal(result.outcome, 'verify-fail');
+  assert.equal(result.check.passed, false);
+  assert.match(result.check.output, /integrity check failed/);
+  assert.match(result.check.output, /produced\.txt/);
+});
+
 // --- mergeRunnerItem rejects a .fgos/ write on the branch (ADR0020) -------
 //
 // worktree.mjs's createWorktree no longer checks .fgos/ out into a worker's
