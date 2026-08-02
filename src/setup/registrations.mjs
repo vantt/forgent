@@ -32,6 +32,7 @@ import { mergeConfigDefaults } from './config-merge.mjs';
 import { mainCheckoutHookWired } from './git-hooks.mjs';
 import { DEFAULT_RUNNER_CONFIG } from '../runner/dispatch.mjs';
 import { listWork } from '../state/store.mjs';
+import { driftStatus } from '../state/drift-status.mjs';
 import { readLocalStatus, classifyRegistryPosture } from '../state/tool-registry.mjs';
 import { describeConfigAwareness } from '../config/global-config.mjs';
 import { sharedConfigFilePath, legacyRunnerConfigPath, readSharedConfig, writeSharedConfig } from '../config/shared-config-file.mjs';
@@ -380,6 +381,38 @@ registerCheck({
   id: 'tool-registry-configured',
   description: 'tool registry posture — inactive/degraded/full (tsk-1dj)',
   check: (cwd) => checkToolRegistryConfigured(cwd),
+});
+
+// tsk-5m7 (docs/history/tsk-3bn-merge-conductor-harness-v2/): a real
+// actionable problem, same class as the hook/config checks above — a root
+// branch that's drifted ahead of its target with nothing having synced it
+// is exactly the failure mode tsk-3bn's own origin incident reproduced.
+// `passed: false` (not just an informational message) so it surfaces the
+// same way a stale-config or unwired-hook check does.
+function checkRootDrift(cwd) {
+  const mainCheckout = resolveMainCheckout(cwd);
+  if (mainCheckout === null) {
+    return { passed: true, message: 'not inside a git checkout — nothing to check' };
+  }
+  const view = listWork(path.join(mainCheckout, '.fgos'));
+  const drift = driftStatus(mainCheckout, view);
+  const needsSync = Object.entries(drift).filter(([, status]) => status.needsSync);
+  if (needsSync.length === 0) {
+    return { passed: true, message: 'no root branch is drifted ahead of its target' };
+  }
+  const summary = needsSync
+    .map(([id, status]) => `${id} (${status.branch} is ${status.aheadOfTarget} commit(s) ahead of ${status.target})`)
+    .join(', ');
+  return {
+    passed: false,
+    message: `drifted root branch(es) need syncing: ${summary} — run fgos sync-root <root-id>`,
+  };
+}
+
+registerCheck({
+  id: 'root-drift',
+  description: 'every fgw/<root> branch is in sync with its real target — no unsynced drift left over from a leaf merge (tsk-3bn)',
+  check: (cwd) => checkRootDrift(cwd),
 });
 
 // docs/history/global-project-config-awareness/CONTEXT.md D1: reports which
