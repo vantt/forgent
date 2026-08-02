@@ -132,6 +132,19 @@ direction:"upstream"})` và `impact({target:"resolveDiscovery",
 direction:"upstream"})` — báo blast radius cho người trước khi sửa (posture
 full, §2).
 
+**Ràng buộc contract (tìm thấy ở fgos-validating, xác nhận qua
+`src/runner/loop.mjs:970-1000` + `bin/fgos.mjs`'s `decompose` verb, dòng
+871+):** `loop.mjs`'s 2 sweep không đọc giá trị trả về (fire-and-forget,
+chỉ log) — nhưng `bin/fgos.mjs`'s verb trả thẳng `resolveDecompose`'s
+`{outcome, ...}` ra JSON, và `cook`/`pick`'s SKILL.md (§`plugins/fgOS/
+skills/cook/SKILL.md`) switch cứng theo đúng tập giá trị hiện có
+(`pass-through`/`noop`/`already-decomposed`/`need-human`/`invalid`/
+`decompose`). Đường skip-and-advance mới của `resolveDecompose` BẮT BUỘC
+trả `outcome: 'pass-through'` (tái dùng giá trị đã có, đúng ngữ nghĩa —
+skip không sinh con) — KHÔNG được bịa giá trị mới (vd `'clear'`, theo kiểu
+`resolveDiscovery`'s skip path), vì `cook` (và driver Track D sau này)
+chưa biết xử lý giá trị lạ.
+
 **Verify:**
 ```
 node --test test/intake/discovery.test.mjs test/intake/decompose.test.mjs
