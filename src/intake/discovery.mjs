@@ -300,11 +300,17 @@ export function resolveDiscovery(dir, id, cfg, role) {
         'docsRef points at a non-empty CONTEXT.md (D2 trust signal, tsk-ozl) — skipping judgeDiscovery to avoid re-judging a decision already locked and approved',
     });
     addDiscovery(dir, { id, clear: true });
+    // Real verify (tsk-19j D1/D11, closes gap 2): `gates[id].contextApprove.
+    // verify` is the real command fgos-exploring's own Gate recorded for
+    // this item when it approved CONTEXT.md — preferred over the retired
+    // placeholder whenever a Track A approve record actually exists (an item
+    // that never went through that Gate, e.g. from before this item, keeps
+    // today's fallback unchanged).
     moveStage(dir, {
       id,
       to: 'decompose',
       expectedStage: 'clarify',
-      verify: FALLBACK_VERIFY,
+      verify: view.gates?.[id]?.contextApprove?.verify ?? FALLBACK_VERIFY,
       role,
     });
     return { outcome: 'clear', id, verdict: { clear: true, skipped: true } };
