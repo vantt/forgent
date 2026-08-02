@@ -13,6 +13,14 @@ incident into a full Layer-1 harness design. This item's scope is now
 but the entire "Harness v2" package the design-decisions report calls out
 as one coherent v1 shippable unit.
 
+**Supersedes `tsk-3hk` (closed `wontfix`).** `tsk-3hk` was filed this
+morning (2026-08-02) as "Merge Harness v2 (Layer 1)" holding exactly the
+merge-set-clustering + tier slice, after an earlier same-morning decision
+(03:43) had narrowed tsk-3bn back to gap B/C only specifically to avoid
+duplicating tsk-3hk. D1/D3 below reopen that narrowing — tsk-3bn absorbs
+tsk-3hk's scope back in, and tsk-3hk is closed as superseded rather than
+left open as a duplicate. See D3.
+
 In scope:
 - **Drift detection** (`driftStatus`, new, read-only, git-inspecting) —
   per-root-branch ahead/behind vs its real target (`main` or a deeper
@@ -49,6 +57,7 @@ Out of scope (explicitly deferred, not this item):
 |---|---|
 | D1 | tsk-3bn's scope is the **full** Harness v2 package (drift + sync-root + merge-set clustering + two-tier verify), not just the original gap B/C slice. Locked by the user 2026-08-02, confirming the design-decisions report's D2 ("full package, not smallest slice") applies to this item specifically, after confirming none of tsk-3bn's dependency chain (tsk-4voj, tsk-2eq, tsk-480, tsk-396, tsk-15k, tsk-66x, tsk-2vd — all delivered/done) implements any part of drift/sync-root/clustering/tier itself; they are Layer-2 correctness prerequisites only, verified by code grep (no `driftStatus`, `sync-root`, or clustering logic exists anywhere in `src/`/`bin/` today). |
 | D2 | Merge-set clustering ships v1 with the **permissive** escalation default: a merge set with a resolvable order (footprint overlap between two independently-ready items) auto-serializes — merge one, re-diff the other against the new tip, then merge — and escalates to a human only if that serialized re-check itself still conflicts. Matches research report §D.3 and §H.5 exactly (no deviation). Locked by the user 2026-08-02, resolving the design-decisions report's open question 3 (conservative-vs-permissive, given only 1 real incident to validate clustering against). |
+| D3 | Conflict discovered mid-planning: a prior decision on this item (2026-08-02T03:43, before this session) had narrowed tsk-3bn to gap B/C only, precisely to avoid duplicating `tsk-3hk`'s clustering+tier scope. D1 (above) unknowingly reversed that narrowing. Presented to the user as a real fork — revert D1, or keep D1 wide and fold `tsk-3hk` in — user chose to keep D1 wide. `tsk-3hk` closed `wontfix` as superseded, its decision log cross-referencing this one. D1 stands as tsk-3bn's final, current scope. |
 
 ## Pinned terms
 
@@ -96,6 +105,13 @@ redefined.)
   (now delivered → unblocked), `footprint: null`, `verify: "chưa xác định
   — P15 bổ sung"` (undetermined — left for planning, not a clarify-stage
   concern).
+- `fgos graph --what-if tsk-3bn --json` — completing tsk-3bn unblocks 3
+  items transitively, newly-readying `tsk-3hk` (its `deps` included
+  `tsk-3bn`) — this is what surfaced the D3 conflict: reading `tsk-3hk`'s
+  full description showed it explicitly deferring drift/sync-root to
+  "the decision on tsk-3bn," which turned out to predate and contradict
+  D1. `fgos show tsk-3bn --json`'s `decisions` array confirmed the
+  03:43 narrowing decision D1 had missed.
 
 ## Canonical references
 
