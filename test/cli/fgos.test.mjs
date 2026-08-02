@@ -4827,6 +4827,96 @@ test('approve of an ordinary runner item (diff touches no self-modifying module)
   assert.equal(stateView(cwd).work['iron-plain-item'].status, 'delivered');
 });
 
+// tsk-4voj-iron-law-leaf-scope CONTEXT.md D1: the Iron Law's own
+// changedFiles input now diffs a leaf against its resolved root's branch
+// (the same D3 leaf-vs-root split `approve`'s merge target and `review`'s
+// diff already use), not blind trunk. Before this fix, a leaf forked AFTER
+// a sibling already merged a gated-module change into the root inherited
+// that sibling's files as if they were its own -- live-reproduced on
+// tsk-52g-2. These two tests prove the false-positive is closed (below)
+// without under-scoping a leaf's own genuine hit (further below).
+
+test('approve of a leaf item forked AFTER a sibling already merged a gated-module change into the root does NOT trip Iron Law on the ancestor\'s file (tsk-4voj false-positive closed)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+
+  const rootId = 'iron-leaf-root';
+  const leafId = 'iron-leaf-child';
+  const dir = path.join(cwd, '.fgos');
+  addWork(dir, { id: rootId, title: `Title ${rootId}`, kind: 'task', status: 'todo', deps: [], risk: 'low', refs: [], verify: 'true' });
+  commitPending(cwd, `state: add ${rootId}`);
+  gitAtCwd(cwd, ['branch', `fgw/${rootId}`, 'main']);
+
+  // A sibling child's already-merged gated-module change, landed on the
+  // root's own integration branch BEFORE this leaf forks from it -- the
+  // exact tsk-52g-2 shape.
+  gitAtCwd(cwd, ['checkout', `fgw/${rootId}`]);
+  fs.mkdirSync(path.join(cwd, 'src/runner'), { recursive: true });
+  fs.writeFileSync(path.join(cwd, 'src/runner/sibling-produced.mjs'), 'export const sibling = true;\n');
+  gitAtCwd(cwd, ['add', '-A']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', 'sibling child merged into root (already has its own evidence elsewhere)']);
+  gitAtCwd(cwd, ['checkout', 'main']);
+
+  addWork(dir, {
+    id: leafId, title: `Title ${leafId}`, kind: 'task', status: 'todo', deps: [], risk: 'low', refs: [],
+    verify: 'test -f docs/leaf-note.txt', parent: rootId,
+  });
+  run(cwd, ['move', leafId, '--to', 'doing']);
+  commitPending(cwd, `state: claim ${leafId}`);
+
+  gitAtCwd(cwd, ['checkout', '-b', `fgw/${leafId}`, `fgw/${rootId}`]);
+  fs.mkdirSync(path.join(cwd, 'docs'), { recursive: true });
+  fs.writeFileSync(path.join(cwd, 'docs/leaf-note.txt'), 'ok\n');
+  gitAtCwd(cwd, ['add', '-A']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', `worker output for ${leafId}`]);
+  gitAtCwd(cwd, ['checkout', 'main']);
+
+  run(cwd, ['move', leafId, '--to', 'awaiting-approval']);
+  commitPendingBeforeApprove(cwd, leafId);
+
+  const result = run(cwd, ['approve', leafId]);
+  assert.equal(result.status, 0, `leaf's own diff never touches a gated module -- must approve without --acknowledge-iron-law: ${result.stdout}${result.stderr}`);
+  assert.doesNotMatch(result.stdout, /Iron Law/);
+  assert.equal(stateView(cwd).work[leafId].status, 'delivered');
+});
+
+test('approve of a leaf item whose OWN commit touches a gated module (src/runner/**) still REFUSES without --acknowledge-iron-law, even with leaf-scoped diff (tsk-4voj D1 does not under-scope)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+
+  const rootId = 'iron-leaf-genuine-root';
+  const leafId = 'iron-leaf-genuine-child';
+  const dir = path.join(cwd, '.fgos');
+  addWork(dir, { id: rootId, title: `Title ${rootId}`, kind: 'task', status: 'todo', deps: [], risk: 'low', refs: [], verify: 'true' });
+  commitPending(cwd, `state: add ${rootId}`);
+  gitAtCwd(cwd, ['branch', `fgw/${rootId}`, 'main']);
+
+  addWork(dir, {
+    id: leafId, title: `Title ${leafId}`, kind: 'task', status: 'todo', deps: [], risk: 'low', refs: [],
+    verify: 'test -f src/runner/iron-leaf-genuine-child-produced.mjs', parent: rootId,
+  });
+  run(cwd, ['move', leafId, '--to', 'doing']);
+  commitPending(cwd, `state: claim ${leafId}`);
+
+  gitAtCwd(cwd, ['checkout', '-b', `fgw/${leafId}`, `fgw/${rootId}`]);
+  fs.mkdirSync(path.join(cwd, 'src/runner'), { recursive: true });
+  fs.writeFileSync(path.join(cwd, 'src/runner/iron-leaf-genuine-child-produced.mjs'), 'export const producedByLeaf = true;\n');
+  gitAtCwd(cwd, ['add', '-A']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', `worker output for ${leafId}`]);
+  gitAtCwd(cwd, ['checkout', 'main']);
+
+  run(cwd, ['move', leafId, '--to', 'awaiting-approval']);
+  commitPendingBeforeApprove(cwd, leafId);
+
+  const headBefore = gitHead(cwd);
+  const result = run(cwd, ['approve', leafId]);
+  assert.equal(result.status, 4, `leaf's own commit genuinely touches a gated module -- must still refuse: ${result.stdout}${result.stderr}`);
+  assert.match(result.stderr, /Iron Law/);
+  assert.match(result.stderr, /src\/runner\/iron-leaf-genuine-child-produced\.mjs/, 'the refusal must name the leaf\'s own tripped module');
+  assert.equal(gitHead(cwd), headBefore, 'a refused approve attempts no merge');
+  assert.equal(stateView(cwd).work[leafId].status, 'awaiting-approval');
+});
+
 test('reject on a nonexistent id is rejected as validation, exit 4', () => {
   const cwd = tmpCwd();
   const result = run(cwd, ['reject', 'ghost', '--reason', 'nope']);
@@ -5053,6 +5143,28 @@ test('approve --github without --pr is a validation error, item stays proposed, 
   assert.match(result.stderr, /requires --pr/);
   assert.equal(stateView(cwd).work['gh-approve-nopr'].status, 'awaiting-approval');
   assert.ok(!fs.existsSync(marker), 'no gh call is made when --pr is missing');
+});
+
+// tsk-396 D2: regression for the merge-before-gate ordering bug on the
+// --github transport specifically. Before this fix, mergeGitHubPR (a real,
+// server-side GitHub merge) ran BEFORE the acceptance-evidence gate — unlike
+// a local git merge, a GitHub-side merge can't be aborted, so this path
+// carried irreversible-merge risk the local paths don't. The fake gh here
+// would succeed if invoked; the test proves it is never invoked at all.
+test('approve --github --pr on an item with a missing-evidence acceptance clause is refused BEFORE the real GitHub merge: precondition, exit 2, mergeGitHubPR/gh is never called', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeRunnerProposedItem(cwd, 'gh-approve-cos-missing');
+  run(cwd, ['edit', 'gh-approve-cos-missing', '--acceptance', JSON.stringify([{ text: 'ship it' }])]);
+  commitPendingBeforeApprove(cwd, 'gh-approve-cos-missing');
+  const marker = path.join(cwd, 'gh-was-called');
+  const fake = writeMarkerFake(cwd, marker);
+
+  const result = run(cwd, ['approve', 'gh-approve-cos-missing', '--github', '--pr', '42'], { FGOS_GH_COMMAND: fake });
+  assert.equal(result.status, 2, `${result.stdout}${result.stderr}`);
+  assert.match(result.stderr, /ship it/);
+  assert.equal(stateView(cwd).work['gh-approve-cos-missing'].status, 'awaiting-approval');
+  assert.ok(!fs.existsSync(marker), 'the acceptance-evidence gate must reject before any gh CLI call, including the real merge');
 });
 
 test('approve --github with a dirty main tree is NOT blocked by the local dirty-tree gate and proceeds to the GitHub merge', () => {
@@ -6780,6 +6892,30 @@ test('approve on a proposed item with a missing-evidence acceptance clause is re
   assert.match(result.stderr, /ship it/);
   assert.equal(stateView(cwd).work['approve-cos-missing'].status, 'awaiting-approval');
   assert.equal(eventLines(cwd).length, before);
+});
+
+// tsk-396 D1: regression for the merge-before-gate ordering bug. Before this
+// fix, a runner-sourced item's real `git merge` (mergeRunnerItem) landed on
+// main BEFORE the acceptance-evidence gate ran (inside moveWork's own
+// `to === 'delivered'` check), so a refused gate here would still leave a
+// merge commit on main. assertAcceptanceEvidence now runs as a pre-flight,
+// before mergeRunnerItem is ever called — this test proves main's HEAD is
+// completely untouched by a refused approve, not just that approve reports
+// an error.
+test('approve on a runner-sourced item with a missing-evidence acceptance clause is refused BEFORE the real git merge: precondition, exit 2, main HEAD unchanged, item stays awaiting-approval', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeRunnerProposedItem(cwd, 'runner-cos-missing');
+  run(cwd, ['edit', 'runner-cos-missing', '--acceptance', JSON.stringify([{ text: 'ship it' }])]);
+  commitPendingBeforeApprove(cwd, 'runner-cos-missing');
+
+  const mainHeadBefore = gitAtCwd(cwd, ['rev-parse', 'main']).trim();
+  const result = run(cwd, ['approve', 'runner-cos-missing']);
+  assert.equal(result.status, 2, result.stderr);
+  assert.match(result.stderr, /ship it/);
+
+  assert.equal(gitAtCwd(cwd, ['rev-parse', 'main']).trim(), mainHeadBefore, 'main HEAD must be completely unchanged by a refused approve');
+  assert.equal(stateView(cwd).work['runner-cos-missing'].status, 'awaiting-approval');
 });
 
 // --- tsk-480: approve's post-success moveWork guard ------------------------
