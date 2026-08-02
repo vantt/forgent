@@ -111,6 +111,13 @@ check from ever running that pass.
      normally, proving no bypass constant is needed (the "no bypass" design
      choice above, made empirical).
 
+## Proof surface
+
+Item `verify` (set at `fgos-validating`, was a placeholder before this):
+`node --test test/intake/decompose.test.mjs`. Confirmed real and runnable
+today — pre-implementation baseline: 59/59 passing. Post-implementation this
+same command must still pass, now including the 5 new tests listed above.
+
 ## Risk map
 
 | Component | How risky | Proof point |
