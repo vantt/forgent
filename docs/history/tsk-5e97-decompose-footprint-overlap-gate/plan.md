@@ -118,6 +118,20 @@ Item `verify` (set at `fgos-validating`, was a placeholder before this):
 today — pre-implementation baseline: 59/59 passing. Post-implementation this
 same command must still pass, now including the 5 new tests listed above.
 
+**Post-implementation verify drift (fgos-executing)**: the `fgos discover`
+call that moved this item from `clarify` to `decompose` (run at the top of
+`fgos-executing`, since the earlier `fgos-exploring` pass had locked
+`CONTEXT.md`/`plan.md` but never actually fired the stage-move verb)
+recorded its own model-guessed `verify: "npm test"` on the item, silently
+overwriting the narrower command set above. The first `fgos return` re-ran
+that broad command and failed on 2 pre-existing, unrelated tests (a manifest
+completeness check and a `.claude/skills`↔`.agents/skills` mirror-drift
+check — both fail identically on the unmodified branch tip, confirmed via
+`git stash`), moving the item to `blocked`. `node --test
+test/intake/decompose.test.mjs` (64/64, including the 5 new tests) was
+restored via `fgos edit --verify`, matching what this section had already
+locked — the drift was an unrelated engine overwrite, not a scope change.
+
 ## Risk map
 
 | Component | How risky | Proof point |
