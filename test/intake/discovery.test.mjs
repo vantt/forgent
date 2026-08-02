@@ -6,7 +6,7 @@ import path from 'node:path';
 import { judgeDiscovery, resolveDiscovery } from '../../src/intake/discovery.mjs';
 import { readScoutNotes } from '../../src/intake/judge-executor.mjs';
 import { computeImpact, computePriority } from '../../src/state/priority-formula.mjs';
-import { addWork, listWork, StoreError, categoryOf, putInAwaiting, answerAwaiting, moveWork } from '../../src/state/store.mjs';
+import { addWork, listWork, StoreError, categoryOf, putInAwaiting, answerAwaiting, moveWork, recordGateApprove } from '../../src/state/store.mjs';
 import { appendEvent, readEvents } from '../../src/state/events.mjs';
 
 // Fake executors only — every "command" spawned here is a node script this
@@ -551,6 +551,145 @@ test('judgeDiscovery with a view but no graph edges degrades the graph-context s
   assert.match(verdict.verify, /chặn 0 việc khác còn mở/);
 });
 
+// --- tsk-4rd (route A, discover-research-recipe D2 "enrich"): deps' real
+// title/description, not just their id, are embedded in the prompt so the
+// judge can see "task liên đới đã làm/chưa làm" without a separate lookup.
+
+test('judgeDiscovery with a view embeds each dep\'s real title and description, not just its id', () => {
+  const dir = mkTempDir();
+  const scriptPath = echoPromptExecutor(dir);
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+  const dep = sampleWork({
+    id: 'item-dep',
+    title: 'DEP-TITLE-MARKER',
+    status: 'done',
+    stage: 'executing',
+    description: 'DEP-DESCRIPTION-MARKER explaining what already happened.',
+  });
+  const work = sampleWork({ deps: ['item-dep'] });
+  const view = { work: { [work.id]: work, [dep.id]: dep } };
+  const verdict = judgeDiscovery(work, cfg, view);
+  assert.match(verdict.verify, /# Task liên đới/);
+  assert.match(verdict.verify, /DEP-TITLE-MARKER/);
+  assert.match(verdict.verify, /DEP-DESCRIPTION-MARKER explaining what already happened\./);
+  assert.match(verdict.verify, /status:done/);
+});
+
+test('judgeDiscovery reports a dep missing from the view instead of throwing or silently dropping it', () => {
+  const dir = mkTempDir();
+  const scriptPath = echoPromptExecutor(dir);
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+  const work = sampleWork({ deps: ['no-such-item'] });
+  const view = { work: { [work.id]: work } };
+  let verdict;
+  assert.doesNotThrow(() => {
+    verdict = judgeDiscovery(work, cfg, view);
+  });
+  assert.match(verdict.verify, /no-such-item: \(không tìm thấy trong store/);
+});
+
+test('judgeDiscovery with no deps states plainly that there are none, rather than an empty section', () => {
+  const dir = mkTempDir();
+  const scriptPath = echoPromptExecutor(dir);
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+  const work = sampleWork();
+  const verdict = judgeDiscovery(work, cfg, { work: { [work.id]: work } });
+  assert.match(verdict.verify, /item này không có dependency nào/);
+});
+
+// tsk-4rd (route A follow-up): the recipe's research step must actively
+// point at parallel Task dispatch for independent branches and split
+// internal-code (rg/Read/Grep) vs external-concept (WebSearch/WebFetch)
+// tool choice — granting the tools alone (allowedTools) is not the same as
+// instructing the model to actually use them that way.
+test('the judge prompt instructs parallel Task dispatch for independent research branches, not just tool availability', () => {
+  const dir = mkTempDir();
+  const scriptPath = echoPromptExecutor(dir);
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+  const verdict = judgeDiscovery(sampleWork(), cfg);
+  assert.match(verdict.verify, /SONG SONG/);
+  assert.match(verdict.verify, /WebSearch\/WebFetch/);
+});
+
+// --- tsk-4rd (route A, recipe step 1 "làm sạch yêu cầu"): optional
+// titleProposal/descriptionProposal ride on either outcome exactly like
+// impactScore, never gate clear/unclear, and are omitted whenever the model
+// doesn't supply a non-empty string for them.
+
+test('judgeDiscovery includes titleProposal/descriptionProposal on a clear verdict when the model supplies them', () => {
+  const dir = mkTempDir();
+  const scriptPath = writeVerdictExecutor(dir, {
+    clear: true,
+    verify: 'ok',
+    titleProposal: 'Cleaner title',
+    descriptionProposal: 'Cleaner description.',
+  });
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+  const verdict = judgeDiscovery(sampleWork(), cfg);
+  assert.deepEqual(verdict, {
+    clear: true,
+    verify: 'ok',
+    titleProposal: 'Cleaner title',
+    descriptionProposal: 'Cleaner description.',
+  });
+});
+
+test('judgeDiscovery includes titleProposal/descriptionProposal on an unclear verdict too (not gated on clear)', () => {
+  const dir = mkTempDir();
+  const scriptPath = writeVerdictExecutor(dir, {
+    clear: false,
+    question: 'Which file?',
+    titleProposal: 'Cleaner title',
+  });
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+  const verdict = judgeDiscovery(sampleWork(), cfg);
+  assert.deepEqual(verdict, { clear: false, question: 'Which file?', titleProposal: 'Cleaner title' });
+});
+
+test('judgeDiscovery omits titleProposal/descriptionProposal (never throws) when the model supplies a missing, blank, or non-string value', () => {
+  const cases = [
+    { label: 'missing', raw: { clear: true, verify: 'ok' } },
+    { label: 'blank', raw: { clear: true, verify: 'ok', titleProposal: '   ', descriptionProposal: '' } },
+    { label: 'number', raw: { clear: true, verify: 'ok', titleProposal: 42 } },
+    { label: 'null', raw: { clear: true, verify: 'ok', descriptionProposal: null } },
+  ];
+  for (const { label, raw } of cases) {
+    const dir = mkTempDir();
+    const scriptPath = writeVerdictExecutor(dir, raw);
+    const cfg = cfgFor([scriptPath, '{prompt}']);
+    let verdict;
+    assert.doesNotThrow(() => {
+      verdict = judgeDiscovery(sampleWork(), cfg);
+    }, `case: ${label}`);
+    assert.equal('titleProposal' in verdict, false, `case: ${label}`);
+    assert.equal('descriptionProposal' in verdict, false, `case: ${label}`);
+  }
+});
+
+test('resolveDiscovery persists titleProposal/descriptionProposal on the discovery record via the existing addDiscovery spread, without touching work.title/work.description', () => {
+  const scriptPath = writeVerdictExecutor(mkTempDir(), {
+    clear: false,
+    question: 'Which file?',
+    titleProposal: 'Cleaner title',
+    descriptionProposal: 'Cleaner description.',
+  });
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork());
+
+  const result = resolveDiscovery(storeDir, 'item-x', cfg);
+  assert.equal(result.verdict.titleProposal, 'Cleaner title');
+  assert.equal(result.verdict.descriptionProposal, 'Cleaner description.');
+
+  const view = listWork(storeDir);
+  const record = view.discovery['item-x'].at(-1);
+  assert.equal(record.titleProposal, 'Cleaner title');
+  assert.equal(record.descriptionProposal, 'Cleaner description.');
+  // Never auto-applied — a proposal is a read-only surface for a person to
+  // act on via `fgos edit`, not a silent overwrite of a user-authored field.
+  assert.equal(view.work['item-x'].title, sampleWork().title);
+});
+
 // --- work-item-priority-matrix D6/D7 (was STR8 D4's intent write): `intent`
 // is retired in place -- resolveDiscovery now computes+writes `priority` via
 // a second, try/catch-wrapped editWork call, right after addDiscovery,
@@ -712,6 +851,41 @@ test('resolveDiscovery still calls judgeDiscovery when docsRef is set but CONTEX
   assert.equal(readCount(counterPath), 1, 'no trust signal means judgeDiscovery must still run the model exactly once');
 });
 
+// --- real verify on the skip path (tsk-19j D1/D11, closes gap 2) ---------
+
+test('resolveDiscovery skip path uses gates[id].contextApprove.verify when a Track A approve record exists, instead of FALLBACK_VERIFY', () => {
+  const scriptDir = mkTempDir();
+  const { scriptPath, counterPath } = writeCountingRawStdoutExecutor(scriptDir, JSON.stringify({ clear: true, verify: 'should never run' }));
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  const docsRef = mkLockedContextFixture(storeDir);
+  addWork(storeDir, sampleWork({ docsRef }));
+  recordGateApprove(storeDir, { id: 'item-x', gate: 'contextApprove', actor: 'bypass', verify: 'node --test test/real-item-x.test.mjs' });
+
+  const result = resolveDiscovery(storeDir, 'item-x', cfg, 'session');
+  assert.equal(result.outcome, 'clear');
+  assert.equal(readCount(counterPath), 0);
+
+  const view = listWork(storeDir);
+  assert.equal(view.work['item-x'].verify, 'node --test test/real-item-x.test.mjs');
+});
+
+test('resolveDiscovery skip path falls back to FALLBACK_VERIFY when no contextApprove record exists (unchanged behavior)', () => {
+  const scriptDir = mkTempDir();
+  const { scriptPath } = writeCountingRawStdoutExecutor(scriptDir, JSON.stringify({ clear: true, verify: 'should never run' }));
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  const docsRef = mkLockedContextFixture(storeDir);
+  addWork(storeDir, sampleWork({ docsRef }));
+
+  resolveDiscovery(storeDir, 'item-x', cfg, 'session');
+
+  const view = listWork(storeDir);
+  assert.equal(view.work['item-x'].verify, 'chưa xác định — bổ sung thủ công');
+});
+
 test('resolveDiscovery still calls judgeDiscovery when docsRef points at an existing but empty CONTEXT.md (fail-open, unchanged behavior)', () => {
   const scriptDir = mkTempDir();
   const { scriptPath, counterPath } = writeCountingRawStdoutExecutor(scriptDir, JSON.stringify({ clear: true, verify: 'ok' }));
@@ -809,13 +983,16 @@ function ndjsonScoutTranscript(resultVerdict) {
   return `${events.map((e) => JSON.stringify(e)).join('\n')}\n`;
 }
 
-// Freshness (D "presence alone means fresh", judge-executor.mjs): a
-// pre-existing scout-notes.md under the item's docsRef must (a) show up in
-// the judge's prompt so it can reuse the prior evidence instead of
-// re-scouting, and (b) skip stream-json transcript capture entirely — there
-// is nothing new to persist, so the spawn stays exactly like a pre-tsk-g18
-// call.
-test('resolveDiscovery with an existing scout-notes.md embeds it in the prompt and skips stream-json capture', () => {
+// Freshness (tsk-4rd route A: capture is now ALWAYS attempted, never gated
+// on `!priorScoutNotes` — see judgeDiscovery's own comment for why a
+// capture-once-forever note was the direct cause of a stale item getting
+// the same "unclear" verdict round after round). A pre-existing
+// scout-notes.md under the item's docsRef must still (a) show up in the
+// judge's prompt as a starting point, AND (b) the spawn must still request
+// stream-json transcript capture — a fake executor that reports no tool
+// calls simply leaves the existing file untouched (nothing new to persist),
+// it does not skip the capture attempt itself.
+test('resolveDiscovery with an existing scout-notes.md embeds it in the prompt and still attempts stream-json capture', () => {
   const scriptDir = mkTempDir();
   const argvPath = path.join(scriptDir, 'argv.json');
   const scriptPath = writeArgvAndPromptRecordingExecutor(
@@ -838,7 +1015,13 @@ test('resolveDiscovery with an existing scout-notes.md embeds it in the prompt a
   const [prompt] = JSON.parse(fs.readFileSync(argvPath, 'utf8'));
   assert.match(prompt, /PRIOR-EVIDENCE-MARKER/);
   const argv = JSON.parse(fs.readFileSync(argvPath, 'utf8'));
-  assert.equal(argv.includes('--output-format'), false);
+  assert.equal(argv.includes('--output-format'), true);
+
+  // No new tool_use captured by this fake executor (it never emits an
+  // NDJSON transcript) — writeScoutNotes never fires, so the prior evidence
+  // is left exactly as it was, not blanked out.
+  const notes = readScoutNotes(path.dirname(storeDir), docsRef);
+  assert.match(notes, /PRIOR-EVIDENCE-MARKER/);
 });
 
 // No scout-notes.md yet: the judge call captures its own stream-json
@@ -865,4 +1048,52 @@ test('resolveDiscovery with no existing scout-notes.md captures the transcript a
   const notes = readScoutNotes(path.dirname(storeDir), docsRef);
   assert.match(notes, /rg produce-the-output/);
   assert.match(notes, /src\/output\.mjs:1:produce-the-output/);
+});
+
+// --- tsk-4rd (route A, discussion point 4 "đo trước khi ép"): mechanical
+// researchToolCallCount, measured (never enforced) per call, so real usage
+// against the recipe's own "~5 lượt" budget can be read back later.
+
+test('resolveDiscovery reports researchToolCallCount matching the number of scoutable tool calls actually made', () => {
+  const scriptDir = mkTempDir();
+  const scriptPath = path.join(scriptDir, 'stream-json-executor.mjs');
+  fs.writeFileSync(
+    scriptPath,
+    `process.stdout.write(${JSON.stringify(ndjsonScoutTranscript({ clear: true, verify: 'npm test -- scouted' }))}); process.exit(0);`,
+  );
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpRepoAndStoreDir();
+  addWork(storeDir, sampleWork({ docsRef: 'docs/history/research-count-item' }));
+
+  const result = resolveDiscovery(storeDir, 'item-x', cfg);
+  // ndjsonScoutTranscript's fixture makes exactly one Bash(rg:*) tool call.
+  assert.equal(result.verdict.researchToolCallCount, 1);
+
+  const view = listWork(storeDir);
+  assert.equal(view.discovery['item-x'].at(-1).researchToolCallCount, 1);
+});
+
+test('resolveDiscovery reports researchToolCallCount 0 (not omitted) when scouting was attempted but made no tool calls', () => {
+  const scriptDir = mkTempDir();
+  const scriptPath = writeArgvAndPromptRecordingExecutor(
+    scriptDir,
+    path.join(scriptDir, 'argv.json'),
+    JSON.stringify({ clear: true, verify: 'ok' }),
+  );
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpRepoAndStoreDir();
+  addWork(storeDir, sampleWork({ docsRef: 'docs/history/research-count-zero-item' }));
+
+  const result = resolveDiscovery(storeDir, 'item-x', cfg);
+  assert.equal(result.verdict.researchToolCallCount, 0);
+});
+
+test('judgeDiscovery omits researchToolCallCount entirely when called with no scoutContext (old 2-arg callers)', () => {
+  const dir = mkTempDir();
+  const scriptPath = writeVerdictExecutor(dir, { clear: true, verify: 'ok' });
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+  const verdict = judgeDiscovery(sampleWork(), cfg);
+  assert.equal('researchToolCallCount' in verdict, false);
 });

@@ -621,10 +621,61 @@ test('runJudgeExecutor with scout.capture:true parses the stream-json transcript
   assert.match(notes, /src\/a\.mjs:3:\/\/ TODO fix/);
 });
 
-// A tool_use that is not an `rg` call (e.g. `ls`) must never be captured —
-// only Bash(rg:*) is the scout signal this item cares about — and with no
-// captured entries, writeScoutNotes must not create a file at all.
-test('runJudgeExecutor with scout.capture:true captures only Bash(rg:*) calls, never other tool calls, and writes no file when none were rg', () => {
+// tsk-4rd (route A, discussion point 4): `scoutCaptureOut`, the optional
+// 9th out-param, lets a caller read back how many scoutable tool calls this
+// attempt made — the same `.entries` the throwaway internal `{}` always
+// held, just exposed instead of discarded. Return shape (bare verdict) is
+// unchanged either way.
+test('runJudgeExecutor populates a supplied scoutCaptureOut with the captured entries, without changing its own return shape', () => {
+  const dir = mkTempDir();
+  const repoRoot = mkTempDir();
+  const scriptPath = writeStreamJsonExecutor(dir, {
+    rgCommand: 'rg TODO src/',
+    rgOutput: 'src/a.mjs:3:// TODO fix',
+    resultVerdict: { clear: true, verify: 'npm test -- from scout' },
+  });
+  const cfg = cfgFor(scriptPath);
+  const scoutCaptureOut = {};
+
+  const verdict = runJudgeExecutor(
+    cfg,
+    'sonnet',
+    'prompt',
+    'stricter prompt',
+    { repoRoot, docsRef: 'docs/history/tsk-scout-out', capture: true },
+    undefined,
+    undefined,
+    scoutCaptureOut,
+  );
+
+  assert.deepEqual(verdict, { clear: true, verify: 'npm test -- from scout' });
+  assert.equal(scoutCaptureOut.entries.length, 1);
+  assert.equal(scoutCaptureOut.entries[0].command, 'rg TODO src/');
+});
+
+test('runJudgeExecutor omitting scoutCaptureOut stays byte-identical (every pre-tsk-4rd caller, incl. judgeDecompose)', () => {
+  const dir = mkTempDir();
+  const repoRoot = mkTempDir();
+  const scriptPath = writeStreamJsonExecutor(dir, {
+    resultVerdict: { clear: true, verify: 'npm test -- unaffected' },
+  });
+  const cfg = cfgFor(scriptPath);
+
+  const verdict = runJudgeExecutor(cfg, 'sonnet', 'prompt', 'stricter prompt', {
+    repoRoot,
+    docsRef: 'docs/history/tsk-scout-no-out',
+    capture: true,
+  });
+
+  assert.deepEqual(verdict, { clear: true, verify: 'npm test -- unaffected' });
+  assert.equal(fs.existsSync(path.join(repoRoot, 'docs/history/tsk-scout-no-out', 'scout-notes.md')), true);
+});
+
+// A Bash tool_use that is not an `rg` call (e.g. `ls`) must never be
+// captured — a non-rg Bash call is an action (or noise), never the scout
+// signal this item cares about — and with no captured entries,
+// writeScoutNotes must not create a file at all.
+test('runJudgeExecutor with scout.capture:true never captures a non-rg Bash call, and writes no file when none were captured', () => {
   const dir = mkTempDir();
   const repoRoot = mkTempDir();
   const scriptPath = writeStreamJsonExecutor(dir, {
@@ -643,6 +694,46 @@ test('runJudgeExecutor with scout.capture:true captures only Bash(rg:*) calls, n
   assert.deepEqual(verdict, { clear: false, question: 'from non-rg tool call' });
   assert.equal(readScoutNotes(repoRoot, 'docs/history/tsk-scout-y'), '');
   assert.equal(fs.existsSync(path.join(repoRoot, 'docs/history/tsk-scout-y', 'scout-notes.md')), false);
+});
+
+// tsk-4rd (route A): widened `--allowedTools` (Task/WebSearch/WebFetch/Read
+// alongside the original Bash(rg:*)) means a scout pass may now legitimately
+// use any of those instead of `rg` — this proves a non-Bash scoutable tool
+// (WebSearch here) is captured and persisted exactly like an rg call always
+// was, unconditionally (no command-text filter the way Bash gets one).
+test('runJudgeExecutor with scout.capture:true also captures a WebSearch tool_use (route A: widened allowedTools), not just Bash(rg:*)', () => {
+  const dir = mkTempDir();
+  const repoRoot = mkTempDir();
+  const events = [
+    { type: 'system', subtype: 'init' },
+    {
+      type: 'assistant',
+      message: {
+        role: 'assistant',
+        content: [{ type: 'tool_use', id: 'tool_1', name: 'WebSearch', input: { query: 'WEBSEARCH-QUERY-MARKER' } }],
+      },
+    },
+    {
+      type: 'user',
+      message: { role: 'user', content: [{ type: 'tool_result', tool_use_id: 'tool_1', content: 'WEBSEARCH-RESULT-MARKER' }] },
+    },
+    { type: 'result', subtype: 'success', result: JSON.stringify({ clear: true, verify: 'npm test -- from web scout' }) },
+  ];
+  const scriptPath = path.join(dir, 'stream-json-websearch-executor.mjs');
+  fs.writeFileSync(scriptPath, `process.stdout.write(${JSON.stringify(ndjson(events))}); process.exit(0);`);
+  const cfg = cfgFor(scriptPath);
+
+  const verdict = runJudgeExecutor(cfg, 'sonnet', 'prompt', 'stricter prompt', {
+    repoRoot,
+    docsRef: 'docs/history/tsk-scout-web',
+    capture: true,
+  });
+
+  assert.deepEqual(verdict, { clear: true, verify: 'npm test -- from web scout' });
+  const notes = readScoutNotes(repoRoot, 'docs/history/tsk-scout-web');
+  assert.match(notes, /WebSearch/);
+  assert.match(notes, /WEBSEARCH-QUERY-MARKER/);
+  assert.match(notes, /WEBSEARCH-RESULT-MARKER/);
 });
 
 // scout.capture:false (fresh notes already exist, per the caller's own

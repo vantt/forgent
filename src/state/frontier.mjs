@@ -75,7 +75,15 @@ import { getDomain, stageForStep } from './workflow-stage-graphs.mjs';
 // superset of v1, not a behavior change for existing data.
 export const FRONTIER_ORDER_VERSION = 2;
 
-export function frontier(view) {
+// `step` (tsk-19j D9, generalized for fgos-coding-driving's own loop):
+// which domain step counts as "ready to start" — defaults to `'Execute'`
+// (every pre-existing caller, unparameterized, gets byte-identical
+// behavior). A driver loop wanting the frontier for an earlier step (e.g.
+// `'Clarify'`/`'Divide'`, mirroring discover-loop/planning-loop's own
+// pools) passes it explicitly; `isDepsAndLineageReady` below already covers
+// the stage-independent half of readiness this parameterizes the stage half
+// of.
+export function frontier(view, { step = 'Execute' } = {}) {
   const work = view?.work ?? {};
   const childrenByParent = indexChildrenByParent(work);
   const ready = [];
@@ -87,7 +95,13 @@ export function frontier(view) {
     // 'coding' with a diagnostic warning, so a corrupt/rolled-back domain
     // value can never wedge the frontier derive itself.
     const domain = getDomain(item.domain);
-    const executeStage = stageForStep(domain, 'Execute');
+    const executeStage = stageForStep(domain, step);
+    // A domain that never maps `step` at all (e.g. `synthetic` has no
+    // Clarify/Divide, only Execute -> `assembling`) has NO item ready for
+    // it, full stop -- guarded separately from the `??` fallback below,
+    // which would otherwise wrongly admit an item with no `stage` field at
+    // all (undefined ?? undefined === undefined, a false tie).
+    if (executeStage === undefined) continue;
     if ((item.stage ?? executeStage) !== executeStage) continue;
     if (hasOpenDescendant(id, work, childrenByParent)) continue;
     const depsReady = item.deps.every((dep) => RESOLVED_STATUSES.has(work[dep]?.status));

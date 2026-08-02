@@ -30,7 +30,18 @@
     },
     "capacities": {
       "judge-discovery": {
-        "kind": "task"
+        "kind": "task",
+        "command": "claude",
+        "args": [
+          "-p",
+          "{prompt}",
+          "--model",
+          "{model}",
+          "--permission-mode",
+          "acceptEdits",
+          "--allowedTools",
+          "Task,WebSearch,WebFetch,Read,Bash(rg:*),Bash(git add:*),Bash(git commit:*)"
+        ]
       },
       "judge-decompose": {
         "kind": "task"

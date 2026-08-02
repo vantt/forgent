@@ -92,9 +92,39 @@ function writeScoutNotes(repoRoot, docsRef, entries) {
 // match one of these shapes, is skipped rather than thrown on — a
 // transcript format mismatch degrades to "no scout entries captured", never
 // a crash.
+// tsk-4rd (route A, discover-research-recipe): scout capture used to only
+// recognize `Bash(rg:*)` — the sole tool the judge executor was ever
+// granted. `executors.judge`/`capacities.judge-discovery` can now widen
+// `--allowedTools` to Read/Grep/Glob/WebSearch/WebFetch/Task, so a scout
+// pass may legitimately use any of those instead of `rg` — this set names
+// which tool_use blocks count as scout evidence worth persisting.
+// `Bash` stays filtered to `rg` only (a `git add`/`git commit` call is an
+// action, not evidence); every other name in the set is captured
+// unconditionally, since none of them are ever actions on this executor.
+const SCOUTABLE_NON_BASH_TOOL_NAMES = new Set(['Read', 'Grep', 'Glob', 'WebSearch', 'WebFetch', 'Task', 'Agent']);
+
+function isScoutableToolUse(block) {
+  if (block?.type !== 'tool_use') return false;
+  if (block.name === 'Bash') return typeof block.input?.command === 'string' && /^\s*rg\b/.test(block.input.command);
+  return SCOUTABLE_NON_BASH_TOOL_NAMES.has(block.name);
+}
+
+// One-line label for a captured tool_use, used as the entry's `command` in
+// scout-notes.md — a real shell command for Bash(rg:*) (unchanged from
+// before), or `<ToolName> <json input>` for every other scoutable tool, so
+// the persisted note stays readable without needing the raw transcript.
+function describeToolUse(block) {
+  if (block.name === 'Bash') return block.input.command;
+  try {
+    return `${block.name} ${JSON.stringify(block.input)}`;
+  } catch {
+    return block.name;
+  }
+}
+
 function extractScoutTranscript(stdout) {
   const entries = [];
-  const pendingRgCallById = new Map();
+  const pendingCallById = new Map();
   let finalResult;
 
   for (const line of stdout.split('\n')) {
@@ -110,19 +140,17 @@ function extractScoutTranscript(stdout) {
 
     if (event?.type === 'assistant' && Array.isArray(event.message?.content)) {
       for (const block of event.message.content) {
-        if (block?.type === 'tool_use' && block.name === 'Bash' && typeof block.input?.command === 'string') {
-          pendingRgCallById.set(block.id, block.input.command);
+        if (isScoutableToolUse(block)) {
+          pendingCallById.set(block.id, describeToolUse(block));
         }
       }
     } else if (event?.type === 'user' && Array.isArray(event.message?.content)) {
       for (const block of event.message.content) {
-        if (block?.type === 'tool_result' && pendingRgCallById.has(block.tool_use_id)) {
-          const command = pendingRgCallById.get(block.tool_use_id);
-          pendingRgCallById.delete(block.tool_use_id);
-          if (/^\s*rg\b/.test(command)) {
-            const output = typeof block.content === 'string' ? block.content : JSON.stringify(block.content ?? '');
-            entries.push({ command, output: output.slice(0, SCOUT_OUTPUT_MAX_CHARS) });
-          }
+        if (block?.type === 'tool_result' && pendingCallById.has(block.tool_use_id)) {
+          const command = pendingCallById.get(block.tool_use_id);
+          pendingCallById.delete(block.tool_use_id);
+          const output = typeof block.content === 'string' ? block.content : JSON.stringify(block.content ?? '');
+          entries.push({ command, output: output.slice(0, SCOUT_OUTPUT_MAX_CHARS) });
         }
       }
     } else if (event?.type === 'result' && typeof event.result === 'string') {
@@ -319,8 +347,21 @@ export function runRetryingExecutor(
  * `executors.judge` regardless, so this is a no-op until an operator
  * actually adds one.
  */
-export function runJudgeExecutor(cfg, model, prompt, stricterPrompt, scout, capacityId, fgosDir) {
-  const capture = scout?.capture ? {} : null;
+// tsk-4rd (route A, discussion point 4 "đo trước khi ép"): `scoutCaptureOut`
+// is an OPTIONAL trailing out-param (9th, additive — same threading
+// convention `capacityId`/`fgosDir` already used, see
+// docs/how-to/wire-a-headless-function-through-an-agent-executor-capacity.md
+// step 1) a caller can supply as `{}` to read `.entries` back after this
+// call returns, without this function's own return shape changing (still a
+// bare verdict — `judgeDecompose`/every test/`runWatch` reads that
+// unchanged). When given, it is used AS the mutable capture object instead
+// of a throwaway `{}`, so it still ends up with the same `.entries` the
+// throwaway would have had; omitted (every pre-existing caller) is
+// byte-identical. This exists so `judgeDiscovery` can measure how many
+// research tool calls a discover pass actually made — observability only,
+// no cap enforced here.
+export function runJudgeExecutor(cfg, model, prompt, stricterPrompt, scout, capacityId, fgosDir, scoutCaptureOut) {
+  const capture = scout?.capture ? (scoutCaptureOut ?? {}) : null;
 
   const verdict = runRetryingExecutor(cfg, model, prompt, stricterPrompt, {
     tier: 'judge',
