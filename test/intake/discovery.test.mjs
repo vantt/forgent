@@ -1000,3 +1000,51 @@ test('resolveDiscovery with no existing scout-notes.md captures the transcript a
   assert.match(notes, /rg produce-the-output/);
   assert.match(notes, /src\/output\.mjs:1:produce-the-output/);
 });
+
+// --- tsk-4rd (route A, discussion point 4 "đo trước khi ép"): mechanical
+// researchToolCallCount, measured (never enforced) per call, so real usage
+// against the recipe's own "~5 lượt" budget can be read back later.
+
+test('resolveDiscovery reports researchToolCallCount matching the number of scoutable tool calls actually made', () => {
+  const scriptDir = mkTempDir();
+  const scriptPath = path.join(scriptDir, 'stream-json-executor.mjs');
+  fs.writeFileSync(
+    scriptPath,
+    `process.stdout.write(${JSON.stringify(ndjsonScoutTranscript({ clear: true, verify: 'npm test -- scouted' }))}); process.exit(0);`,
+  );
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpRepoAndStoreDir();
+  addWork(storeDir, sampleWork({ docsRef: 'docs/history/research-count-item' }));
+
+  const result = resolveDiscovery(storeDir, 'item-x', cfg);
+  // ndjsonScoutTranscript's fixture makes exactly one Bash(rg:*) tool call.
+  assert.equal(result.verdict.researchToolCallCount, 1);
+
+  const view = listWork(storeDir);
+  assert.equal(view.discovery['item-x'].at(-1).researchToolCallCount, 1);
+});
+
+test('resolveDiscovery reports researchToolCallCount 0 (not omitted) when scouting was attempted but made no tool calls', () => {
+  const scriptDir = mkTempDir();
+  const scriptPath = writeArgvAndPromptRecordingExecutor(
+    scriptDir,
+    path.join(scriptDir, 'argv.json'),
+    JSON.stringify({ clear: true, verify: 'ok' }),
+  );
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpRepoAndStoreDir();
+  addWork(storeDir, sampleWork({ docsRef: 'docs/history/research-count-zero-item' }));
+
+  const result = resolveDiscovery(storeDir, 'item-x', cfg);
+  assert.equal(result.verdict.researchToolCallCount, 0);
+});
+
+test('judgeDiscovery omits researchToolCallCount entirely when called with no scoutContext (old 2-arg callers)', () => {
+  const dir = mkTempDir();
+  const scriptPath = writeVerdictExecutor(dir, { clear: true, verify: 'ok' });
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+  const verdict = judgeDiscovery(sampleWork(), cfg);
+  assert.equal('researchToolCallCount' in verdict, false);
+});

@@ -381,10 +381,37 @@ always-capture + WebSearch capture; 2 test cũ sửa lại cho khớp hành vi m
 (không còn "skip capture khi đã có note").
 
 **Mục 6 đã quyết trong lượt này:** #1 (chọn A) + #2 (fix scout-notes
-capture) + #3 (proposal-only, không auto-apply). Còn treo: #4 (ngân sách
-circuit-breaker cụ thể — recipe mới có nêu "~5 lượt" trong prompt nhưng
-CHƯA có cơ chế cứng chặn nếu model không tuân theo) và #5 (git add/commit
-trong allowedTools vẫn giữ nguyên, chưa quyết bỏ hay giữ).
+capture) + #3 (proposal-only, không auto-apply). Sau đó tiếp tục quyết
+thêm ở lượt kế:
+
+- **#5 — giữ nguyên** `git add`/`git commit` trong allowedTools của judge
+  (user: "Giữ git"). Không đổi gì thêm, quyền này tiếp tục vô chủ (chưa
+  code nào gọi git) — để dành, không xoá.
+- **#4 — đo trước khi ép** (user chọn hướng (2) trong 3 hướng đề xuất, "đo
+  thật rồi tính tiếp"). Đã triển khai: `runJudgeExecutor` thêm tham số
+  optional cuối cùng `scoutCaptureOut` (threading pattern y hệt
+  `capacityId`/`fgosDir` trước đó — additive, `judgeDecompose`/runWatch
+  không đổi gì, có test `omitting scoutCaptureOut stays byte-identical`
+  xác nhận). `judgeDiscovery` dùng nó để đếm số tool call scout thật
+  (`extractScoutTranscript`'s entries) mỗi lần gọi, đưa vào verdict qua
+  field mới `researchToolCallCount` — cơ chế y hệt `impactScore`
+  (mechanical, cưỡi trên `addDiscovery`'s spread có sẵn, không cửa ghi
+  mới, không ép/chặn gì, chỉ đo). Số 0 vẫn được ghi (không bị coi là
+  "không có"), vì "0 lượt" là dữ liệu có ý nghĩa (item rõ ngay không cần
+  research).
+
+  **Chưa làm:** tổng hợp/đọc lại số liệu này trên diện rộng (VD gom
+  `researchToolCallCount` qua nhiều item sau khi discover-loop chạy thật)
+  — cần chạy discover-loop thật trên backlog rồi mới có dữ liệu để tổng
+  hợp, việc này để sau khi có đủ mẫu thật.
+
+Test mới (route A + point 4): `runJudgeExecutor populates a supplied
+scoutCaptureOut...`, `...omitting scoutCaptureOut stays byte-identical...`,
+`resolveDiscovery reports researchToolCallCount matching...`,
+`...reports researchToolCallCount 0...`, `judgeDiscovery omits
+researchToolCallCount... (old 2-arg callers)`. `npm test` sau thay đổi
+point 4: 2308/2308 pass (2313 total, 5 skipped — pre-existing, unrelated),
+0 fail.
 
 **Cảnh báo GitNexus (`detect_changes`, theo MUST rule CLAUDE.md):**
 `risk_level: "critical"` — 18 execution flow bị đụng, vì

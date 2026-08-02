@@ -621,6 +621,56 @@ test('runJudgeExecutor with scout.capture:true parses the stream-json transcript
   assert.match(notes, /src\/a\.mjs:3:\/\/ TODO fix/);
 });
 
+// tsk-4rd (route A, discussion point 4): `scoutCaptureOut`, the optional
+// 9th out-param, lets a caller read back how many scoutable tool calls this
+// attempt made — the same `.entries` the throwaway internal `{}` always
+// held, just exposed instead of discarded. Return shape (bare verdict) is
+// unchanged either way.
+test('runJudgeExecutor populates a supplied scoutCaptureOut with the captured entries, without changing its own return shape', () => {
+  const dir = mkTempDir();
+  const repoRoot = mkTempDir();
+  const scriptPath = writeStreamJsonExecutor(dir, {
+    rgCommand: 'rg TODO src/',
+    rgOutput: 'src/a.mjs:3:// TODO fix',
+    resultVerdict: { clear: true, verify: 'npm test -- from scout' },
+  });
+  const cfg = cfgFor(scriptPath);
+  const scoutCaptureOut = {};
+
+  const verdict = runJudgeExecutor(
+    cfg,
+    'sonnet',
+    'prompt',
+    'stricter prompt',
+    { repoRoot, docsRef: 'docs/history/tsk-scout-out', capture: true },
+    undefined,
+    undefined,
+    scoutCaptureOut,
+  );
+
+  assert.deepEqual(verdict, { clear: true, verify: 'npm test -- from scout' });
+  assert.equal(scoutCaptureOut.entries.length, 1);
+  assert.equal(scoutCaptureOut.entries[0].command, 'rg TODO src/');
+});
+
+test('runJudgeExecutor omitting scoutCaptureOut stays byte-identical (every pre-tsk-4rd caller, incl. judgeDecompose)', () => {
+  const dir = mkTempDir();
+  const repoRoot = mkTempDir();
+  const scriptPath = writeStreamJsonExecutor(dir, {
+    resultVerdict: { clear: true, verify: 'npm test -- unaffected' },
+  });
+  const cfg = cfgFor(scriptPath);
+
+  const verdict = runJudgeExecutor(cfg, 'sonnet', 'prompt', 'stricter prompt', {
+    repoRoot,
+    docsRef: 'docs/history/tsk-scout-no-out',
+    capture: true,
+  });
+
+  assert.deepEqual(verdict, { clear: true, verify: 'npm test -- unaffected' });
+  assert.equal(fs.existsSync(path.join(repoRoot, 'docs/history/tsk-scout-no-out', 'scout-notes.md')), true);
+});
+
 // A Bash tool_use that is not an `rg` call (e.g. `ls`) must never be
 // captured — a non-rg Bash call is an action (or noise), never the scout
 // signal this item cares about — and with no captured entries,

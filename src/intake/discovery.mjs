@@ -278,7 +278,17 @@ export function judgeDiscovery(work, cfg, view, scoutContext, fgosDir) {
     // round's evidence, since `runJudgeExecutor` only writes when it
     // actually captured entries.
     const scout = scoutContext ? { repoRoot: scoutContext.repoRoot, docsRef: scoutContext.docsRef, capture: true } : undefined;
-    const verdict = runJudgeExecutor(cfg, model, prompt, stricterPrompt, scout, 'judge-discovery', fgosDir);
+    // tsk-4rd (route A, discussion point 4 "đo trước khi ép"): the recipe
+    // prompt (buildDiscoveryPrompt) NAMES a ~5-call research budget but
+    // nothing enforces it — before adding a hard cap (--max-turns or
+    // similar), measure real usage first. `scoutCaptureOut` is the mutable
+    // out-param `runJudgeExecutor` now optionally accepts (its own comment
+    // explains the threading) — after the call, `.entries.length` is
+    // exactly the count of scoutable tool calls (`extractScoutTranscript`'s
+    // widened set: Bash(rg:*)/Read/Grep/Glob/WebSearch/WebFetch/Task/Agent)
+    // this particular attempt made, whether or not it ended up unclear.
+    const scoutCaptureOut = scoutContext ? {} : undefined;
+    const verdict = runJudgeExecutor(cfg, model, prompt, stricterPrompt, scout, 'judge-discovery', fgosDir, scoutCaptureOut);
     if (!verdict || typeof verdict.clear !== 'boolean') {
       return { clear: false, question: DEFAULT_UNCLEAR_QUESTION };
     }
@@ -289,6 +299,13 @@ export function judgeDiscovery(work, cfg, view, scoutContext, fgosDir) {
     // discipline, same as `verify`/`question` above), never thrown, on
     // both return sites below.
     const impactScore = Number.isInteger(verdict.impactScore) ? verdict.impactScore : undefined;
+
+    // Mechanical (never model-supplied, unlike impactScore/titleProposal
+    // above) — rides on either outcome the same way regardless, purely for
+    // `addDiscovery`'s existing spread to persist per call so real usage
+    // across the backlog can be read back later (`view.discovery[id]`)
+    // before deciding whether discussion point 4's hard cap is even needed.
+    const researchToolCallCount = Array.isArray(scoutCaptureOut?.entries) ? scoutCaptureOut.entries.length : undefined;
 
     // tsk-4rd (route A, recipe step 1 "làm sạch yêu cầu"): PROPOSALS only —
     // rides on either outcome exactly like `impactScore`, never gates
@@ -322,6 +339,9 @@ export function judgeDiscovery(work, cfg, view, scoutContext, fgosDir) {
       if (descriptionProposal !== undefined) {
         out.descriptionProposal = descriptionProposal;
       }
+      if (researchToolCallCount !== undefined) {
+        out.researchToolCallCount = researchToolCallCount;
+      }
       return out;
     }
 
@@ -337,6 +357,9 @@ export function judgeDiscovery(work, cfg, view, scoutContext, fgosDir) {
     }
     if (descriptionProposal !== undefined) {
       out.descriptionProposal = descriptionProposal;
+    }
+    if (researchToolCallCount !== undefined) {
+      out.researchToolCallCount = researchToolCallCount;
     }
     return out;
   } catch {

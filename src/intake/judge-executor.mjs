@@ -347,8 +347,21 @@ export function runRetryingExecutor(
  * `executors.judge` regardless, so this is a no-op until an operator
  * actually adds one.
  */
-export function runJudgeExecutor(cfg, model, prompt, stricterPrompt, scout, capacityId, fgosDir) {
-  const capture = scout?.capture ? {} : null;
+// tsk-4rd (route A, discussion point 4 "đo trước khi ép"): `scoutCaptureOut`
+// is an OPTIONAL trailing out-param (9th, additive — same threading
+// convention `capacityId`/`fgosDir` already used, see
+// docs/how-to/wire-a-headless-function-through-an-agent-executor-capacity.md
+// step 1) a caller can supply as `{}` to read `.entries` back after this
+// call returns, without this function's own return shape changing (still a
+// bare verdict — `judgeDecompose`/every test/`runWatch` reads that
+// unchanged). When given, it is used AS the mutable capture object instead
+// of a throwaway `{}`, so it still ends up with the same `.entries` the
+// throwaway would have had; omitted (every pre-existing caller) is
+// byte-identical. This exists so `judgeDiscovery` can measure how many
+// research tool calls a discover pass actually made — observability only,
+// no cap enforced here.
+export function runJudgeExecutor(cfg, model, prompt, stricterPrompt, scout, capacityId, fgosDir, scoutCaptureOut) {
+  const capture = scout?.capture ? (scoutCaptureOut ?? {}) : null;
 
   const verdict = runRetryingExecutor(cfg, model, prompt, stricterPrompt, {
     tier: 'judge',
