@@ -89,3 +89,38 @@ test('withLockRetry: waitMs tightens the budget below remainingTtlMs', async () 
   assert.ok(elapsed < 3000, `waitMs must bound the retry loop well under remainingTtlMs (took ${elapsed}ms)`);
   assert.ok(calls >= 1);
 });
+
+// tsk-2rf D2: an explicit waitMs bigger than remainingTtlMs is now the true
+// ceiling -- the retry outlasts the snapshot instead of giving up at it.
+test('withLockRetry: explicit waitMs extends the wait PAST remainingTtlMs, succeeding once the thunk clears', async () => {
+  let calls = 0;
+  const result = await withLockRetry(() => {
+    calls += 1;
+    // remainingTtlMs (300ms) alone would give up well before the thunk
+    // clears on the 3rd call -- only an explicit waitMs bigger than that
+    // snapshot lets the retry survive long enough to succeed.
+    if (calls < 3) throw lockHeldError(300);
+    return 'acquired-past-snapshot';
+  }, { waitMs: 5000 });
+  assert.equal(result, 'acquired-past-snapshot');
+  assert.equal(calls, 3);
+});
+
+test('withLockRetry: explicit waitMs past remainingTtlMs still gives up once its own (larger) budget is spent', async () => {
+  let calls = 0;
+  const start = Date.now();
+  await assert.rejects(
+    () => withLockRetry(() => {
+      calls += 1;
+      throw lockHeldError(300); // remainingTtlMs snapshot, well under waitMs
+    }, { waitMs: 900 }),
+    (e) => {
+      assert.equal(e.code, 'lock-held');
+      assert.match(e.message, /waited \d+ms before giving up/);
+      return true;
+    },
+  );
+  const elapsed = Date.now() - start;
+  assert.ok(elapsed >= 900, `must have waited out the full explicit waitMs, past the remainingTtlMs snapshot (took ${elapsed}ms)`);
+  assert.ok(calls >= 2);
+});

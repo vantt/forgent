@@ -7953,6 +7953,16 @@ test('take --wait rejects a non-numeric or non-positive value the same way --tim
   assert.match(result.stderr, /--wait must be a positive number of milliseconds/);
 });
 
+test('take --wait rejects a value above the 900000ms (15 min) cap -- tsk-2rf D3', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  addOk(cwd, 'wait-over-cap-take');
+
+  const result = run(cwd, ['take', 'wait-over-cap-take', '--wait', '900001']);
+  assert.equal(result.status, 4, result.stderr);
+  assert.match(result.stderr, /--wait must be at most 900000ms \(15 min\)/);
+});
+
 test('pick --no-wait fails immediately on a live-held lock, same as take --no-wait', () => {
   const cwd = initGitCwd();
   run(cwd, ['init']);
