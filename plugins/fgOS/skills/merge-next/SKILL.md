@@ -44,11 +44,20 @@ CONTEXT.md` D6).
 3. **Report the result plainly**, reading the returned JSON envelope's
    `data` field:
    - `{picked: null, reason: "nothing ready to merge"}` — nothing was
-     ready; nothing happened.
+     ready and no `blockedOnSync` root existed either; nothing happened.
    - `{picked: <id>, approve: {...}}` — the merge was attempted through
      `approve`; relay whether it reached `done` or was parked `blocked`
      (verify failure or merge conflict), same as `/fgOS:approve` would
-     report for that id.
+     report for that id. A `syncRoot: {id, outcome: 'synced'}` field
+     alongside means this pick only became ready because an earlier
+     blockedOnSync root was auto-synced first (tsk-173) — mention that in
+     the report, it is not itself something to act on.
+   - `{picked: null, reason: "nothing ready to merge", syncRoot: {id,
+     outcome: 'synced'}}` (tsk-173) — a blockedOnSync root was auto-synced
+     into its target cleanly, but nothing became ready afterward (e.g. a
+     footprint conflict surfaced, or a different root is still drifted).
+     A real mutation happened (relay the synced root id), but nothing was
+     merged.
    - `{picked: <id>, blocked: "iron-law", message: "..."}` — the top pick
      trips the Iron Law gate (a self-modifying diff needing human-verified
      failing-test-first proof). Nothing was merged, the item stays
@@ -57,3 +66,13 @@ CONTEXT.md` D6).
      --acknowledge-iron-law` themselves after actually confirming
      failing-test-first proof; do not run that yourself on this skill's
      own authority.
+   - `{picked: <id>, blocked: "iron-law"|"merge-conflict"|"fgos-write-
+     rejected"|"verify-fail", syncRoot: {...}}` (tsk-173) — the top
+     blockedOnSync root's own `sync-root` attempt was blocked; `<id>` here
+     is the ROOT id (`resolveRoot` of the original blocked candidate), not
+     necessarily the item that reported blockedOnSync in `/fgOS:merge-
+     list`. Nothing was merged, the root branch is untouched. Same
+     never-auto-resolve rule as the plain Iron Law case above when the
+     reason is `iron-law`; for the other three reasons, relay the
+     `syncRoot` detail and that a person needs to look at the root
+     branch's drift before retrying.

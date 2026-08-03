@@ -1512,7 +1512,51 @@ async function runVerb(verb, flags, positional, dir) {
         // reports which item and why, merges nothing, and stops — it does
         // NOT fall through to the next-ranked item (that would silently
         // change merge order semantics `merge list` already promised).
-        const { ready } = mergeReadiness(mergeView, { drift });
+        const { ready, blockedOnSync } = mergeReadiness(mergeView, { drift });
+        // tsk-173 (docs/history/merge-next-auto-sync-root/CONTEXT.md D1/D2):
+        // before giving up, try the single top-ranked blockedOnSync root
+        // through `sync-root` — one mutation per call, same "no parallel
+        // merge mechanism" contract the approve path below already holds.
+        // `picked` is ALWAYS the resolved root id on a real attempt here,
+        // NEVER null: `picked: null` collides with merge-loop's own
+        // frontier-empty bullet (SKILL.md step 4), which would otherwise
+        // silently swallow a real merge-conflict/Iron-Law block as if
+        // nothing were wrong — the exact invisibility this item exists to
+        // fix, one level down (validated against the real skill file during
+        // fgos-validating).
+        if (ready.length === 0 && blockedOnSync.length > 0) {
+          const rootId = resolveRoot(mergeView, blockedOnSync[0]);
+          try {
+            const syncResult = await runVerb('sync-root', flags, [rootId], dir);
+            if (syncResult.outcome === 'synced') {
+              const freshView = listWork(dir);
+              const freshDrift = driftStatus(process.cwd(), freshView);
+              const { ready: readyAfterSync } = mergeReadiness(freshView, { drift: freshDrift });
+              if (readyAfterSync.length === 0) {
+                return { picked: null, reason: 'nothing ready to merge', syncRoot: { id: rootId, outcome: 'synced' } };
+              }
+              const syncedId = readyAfterSync[0];
+              try {
+                const approveResult = await runVerb('approve', flags, [syncedId], dir);
+                return { picked: syncedId, approve: approveResult, syncRoot: { id: rootId, outcome: 'synced' } };
+              } catch (err) {
+                if (err instanceof StoreError && err.message.includes('Iron Law')) {
+                  return { picked: syncedId, blocked: 'iron-law', message: err.message, syncRoot: { id: rootId, outcome: 'synced' } };
+                }
+                throw err;
+              }
+            }
+            // sync-root's own 'blocked' outcome (merge-conflict /
+            // fgos-write-rejected / verify-fail) — no retry, no fallback to
+            // a different blockedOnSync candidate (D2).
+            return { picked: rootId, blocked: syncResult.reason, syncRoot: syncResult };
+          } catch (err) {
+            if (err instanceof StoreError && err.message.includes('Iron Law')) {
+              return { picked: rootId, blocked: 'iron-law', message: err.message, syncRoot: { id: rootId } };
+            }
+            throw err;
+          }
+        }
         if (ready.length === 0) {
           return { picked: null, reason: 'nothing ready to merge' };
         }

@@ -208,5 +208,17 @@ export function mergeReadiness(view, opts = {}) {
     mergeTier[item.id] = item.parent ? 'leaf-to-root' : 'root-to-main';
   }
 
-  return { ready, waiting, conflicts, mergeSets, blockedOnSync, mergeTier, supersededOut };
+  return {
+    ready,
+    waiting,
+    conflicts,
+    mergeSets,
+    // tsk-173: rank-ordered same as ready/mergeSets/supersededOut above --
+    // merge next's auto-sync-root branch (bin/fgos.mjs) picks blockedOnSync[0]
+    // as "the top-ranked blocked root", a claim only meaningful once this
+    // bucket is ordered like every other one already is.
+    blockedOnSync: orderByRank(blockedOnSync),
+    mergeTier,
+    supersededOut,
+  };
 }
