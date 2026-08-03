@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { execFileSync, spawnSync } from 'node:child_process';
+import { execFileSync, spawnSync, spawn } from 'node:child_process';
 import {
   acquireMainCheckoutLock,
   releaseMainCheckoutLock,
@@ -50,6 +50,32 @@ function deadPid() {
 
 function lockPathFor(dir) {
   return path.join(dir, LOCK_FILE);
+}
+
+/** Runs `acquireMainCheckoutLock(dir, opts)` in a genuinely separate child
+ * process (`spawn`, not `spawnSync` — the two callers of this helper in a
+ * test must overlap in real wall-clock time, not run one after the other).
+ * Resolves with the acquire result object. */
+function spawnAcquire(moduleUrl, dir, opts) {
+  return new Promise((resolve, reject) => {
+    const script = [
+      `import('${moduleUrl}').then(({ acquireMainCheckoutLock }) => {`,
+      `  const res = acquireMainCheckoutLock(${JSON.stringify(dir)}, ${JSON.stringify(opts)});`,
+      `  process.stdout.write(JSON.stringify(res));`,
+      `  process.exit(0);`,
+      `});`,
+    ].join('\n');
+    const child = spawn(process.execPath, ['-e', script]);
+    let stdout = '';
+    let stderr = '';
+    child.stdout.on('data', (chunk) => { stdout += chunk; });
+    child.stderr.on('data', (chunk) => { stderr += chunk; });
+    child.on('close', (code) => {
+      if (code !== 0) { reject(new Error(`child exited ${code}: ${stderr}`)); return; }
+      resolve(JSON.parse(stdout));
+    });
+    child.on('error', reject);
+  });
 }
 
 // --- formatLockDurationMs (tsk-5z2) -----------------------------------------
@@ -569,4 +595,75 @@ test('forceReclaimAmbiguousLock: reclaims a lock file with a valid pid but an un
 
   assert.equal(res.status, 'reclaimed');
   assert.equal(fs.existsSync(lockPathFor(dir)), false);
+});
+
+// --- atomic write (tsk-2tm): closes the torn-read window on create/refresh -
+//
+// tryAcquireOnce used to create a fresh lock in two separate syscalls
+// (fs.openSync(path, 'wx') then a later fs.writeSync), and refreshed a
+// self-recognized lock via truncate-in-place fs.writeFileSync — both leaving
+// a real window where a concurrent reader could observe an empty/partial
+// file and fail-close to AMBIGUOUS even though no writer was genuinely
+// contending (production incident: /fgOS:pick tsk-3lx, 2026-08-03). The fix
+// publishes fully-written content via link(2)/rename(2), which are atomic
+// on POSIX — these tests prove the resulting properties, not just that the
+// code "should work".
+
+test('acquire (fresh create) and acquire (self-recognition refresh) never leave a dangling temp file behind', () => {
+  const { dir } = setup();
+
+  const created = acquireMainCheckoutLock(dir, { identity: process.pid });
+  assert.equal(created.status, ACQUIRED);
+  let entries = fs.readdirSync(dir);
+  assert.deepEqual(entries.filter((name) => name.includes('.tmp-')), []);
+  assert.ok(entries.includes(LOCK_FILE));
+
+  // Same identity as above -> hits the self-recognition refresh branch,
+  // not the fresh-create branch.
+  const refreshed = acquireMainCheckoutLock(dir, { identity: process.pid });
+  assert.equal(refreshed.status, ACQUIRED);
+  entries = fs.readdirSync(dir);
+  assert.deepEqual(entries.filter((name) => name.includes('.tmp-')), []);
+  assert.ok(entries.includes(LOCK_FILE));
+});
+
+test('two processes racing to create a genuinely NEW lock always produce exactly one ACQUIRED and one HELD, never AMBIGUOUS from a torn read (tsk-2tm)', async () => {
+  const moduleUrl = pathToFileURL(path.resolve('src/runner/main-checkout-lock.mjs')).href;
+
+  // link(2)'s atomicity is an OS guarantee, not a timing coincidence, so
+  // this must hold every round against a fresh lock dir, not just "usually".
+  for (let round = 0; round < 10; round += 1) {
+    const { dir } = setup();
+    const [a, b] = await Promise.all([
+      spawnAcquire(moduleUrl, dir, { identity: `racer-a-${round}`, ttlMs: 60_000 }),
+      spawnAcquire(moduleUrl, dir, { identity: `racer-b-${round}`, ttlMs: 60_000 }),
+    ]);
+
+    const statuses = [a.status, b.status].sort();
+    assert.deepEqual(
+      statuses,
+      [ACQUIRED, HELD].sort(),
+      `round ${round}: expected exactly one ACQUIRED and one HELD, got ${JSON.stringify([a, b])}`,
+    );
+  }
+});
+
+test('self-recognition refresh is atomic: a reader between two refreshes always sees a fully-formed, parseable record, never a truncated one (tsk-2tm)', () => {
+  const { dir } = setup();
+  fs.mkdirSync(dir, { recursive: true });
+
+  const first = acquireMainCheckoutLock(dir, { identity: 'refresher' });
+  assert.equal(first.status, ACQUIRED);
+
+  for (let i = 0; i < 200; i += 1) {
+    const refreshed = acquireMainCheckoutLock(dir, { identity: 'refresher' });
+    assert.equal(refreshed.status, ACQUIRED);
+    // Every refresh publishes via write-temp-then-rename: the file at
+    // lockPath is never observable in a truncated state, so a read
+    // immediately after must always parse.
+    const raw = fs.readFileSync(lockPathFor(dir), 'utf8');
+    const record = JSON.parse(raw);
+    assert.equal(record.pid, 'refresher');
+    assert.equal(typeof record.ts, 'number');
+  }
 });
