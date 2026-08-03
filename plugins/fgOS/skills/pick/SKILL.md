@@ -108,6 +108,16 @@ state or touches git worktrees directly — every write goes through the
    (e.g. the root decomposing into children mid-session) — that specific
    case no longer needs this fallback at all.
 
+   **Never bypass this step with a raw `git checkout <fgw/branch>` on the
+   main checkout** (tsk-4hk: `docs/journals/260803-1612-main-checkout-
+   direct-branch-checkout-tsk-4hk.md`) — the main checkout is the one
+   shared working tree every session's `fgos <verb>` call resolves against;
+   checking a work branch out there instead of into its own worktree mixes
+   that branch's tree with whatever else is in flight elsewhere in the
+   backlog. If `EnterWorktree` falls back per above, open a fresh session
+   at the printed path rather than hand-checking-out the branch in this
+   one.
+
 5. **Drive the claimed item via `fgos-coding-driving` (tsk-19j-4) — do not
    stop after the switch.** If step 4 actually switched the session into
    the worktree, immediately invoke the `fgos-coding-driving` skill for

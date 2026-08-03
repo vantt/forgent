@@ -47,6 +47,13 @@ never re-implements a dev-skill's substance inline; it invokes them.
   the Socratic/shaping/proving/driving substance — invoke them (Skill tool)
   for their real work; this skill only owns the id QUEUE the driver has no
   concept of.
+- **Never bypass the driver's own claim step with a raw `git checkout
+  <fgw/branch>` on the main checkout** (tsk-4hk: `docs/journals/260803-1612-
+  main-checkout-direct-branch-checkout-tsk-4hk.md`) — the main checkout is
+  the one shared working tree every session's `fgos <verb>` call resolves
+  against; checking a work branch out there instead of letting the driver's
+  claim step (`fgos pick <id>` + `EnterWorktree`) isolate it mixes that
+  branch's tree with whatever else is in flight elsewhere in the backlog.
 
 ## Steps
 
