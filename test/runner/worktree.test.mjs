@@ -152,6 +152,44 @@ test('createWorktree reclaims a branch registered as checked out at a path that 
   removeWorktree(repoRoot, second.path);
 });
 
+// --- zero-destroy relocation (tsk-3lx D2) ----------------------------------
+//
+// The incident this closes: `createWorktree`'s reuse path used to destroy
+// the orphaned checkout (`git worktree remove --force`) BEFORE attempting
+// `git worktree add` for the replacement — if that add then failed for any
+// reason (including a real, twice-reproduced `spawnSync git ENOENT`), the
+// destroyed checkout was gone with no automatic recovery, even though the
+// branch's commits always survived. `git worktree move` replaces that
+// destroy-then-create sequence with a single relocate — if it fails, the
+// original checkout is untouched. `git worktree lock` is the real,
+// deterministic way to make `git worktree move` itself fail without
+// mocking anything: git refuses to move (or force-remove) a locked
+// worktree.
+
+test('createWorktree preserves the orphaned checkout when relocation itself fails (zero-destroy)', () => {
+  const repoRoot = initTempRepo();
+  const worktreeDir = mkWorktreeDir();
+  const first = createWorktree(repoRoot, 'item-g', { worktreeDir });
+  commitOnWorktree(first.path, 'attempt-1.txt', 'orphaned attempt\n');
+  // no removeWorktree(first.path) -- same crash-orphan shape as the tests
+  // above, but this time the orphaned checkout is locked, so the reuse
+  // path's relocation attempt will itself fail.
+  execFileSync('git', ['worktree', 'lock', first.path], { cwd: repoRoot });
+
+  assert.throws(() => createWorktree(repoRoot, 'item-g', { worktreeDir }), WorktreeError);
+
+  // the pre-existing checkout must be exactly as it was: same path, same
+  // content, branch commit intact -- zero manual recovery needed for this
+  // failure class.
+  assert.equal(fs.existsSync(first.path), true);
+  assert.equal(fs.readFileSync(path.join(first.path, 'attempt-1.txt'), 'utf8'), 'orphaned attempt\n');
+  const log = execFileSync('git', ['log', '--oneline', 'fgw/item-g'], { cwd: repoRoot, encoding: 'utf8' });
+  assert.match(log, /worker: attempt-1\.txt/);
+
+  execFileSync('git', ['worktree', 'unlock', first.path], { cwd: repoRoot });
+  removeWorktree(repoRoot, first.path);
+});
+
 test('reclaimOrphanedCheckout is a no-op when the branch is not checked out anywhere', () => {
   const repoRoot = initTempRepo();
   const worktreeDir = mkWorktreeDir();
