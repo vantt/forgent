@@ -507,42 +507,76 @@ export function judgeDiscovery(work, cfg, view, scoutContext, fgosDir) {
  * the runner's clarify sweep passes `'runner'`, the sync `discover` verb
  * passes `'session'`. Optional; a clear verdict's `moveStage` only stamps it
  * on the settlement record when a caller actually supplies it.
+ *
+ * `callerVerdict` (tsk-27y D1/D2, optional, additive): `{clear: boolean,
+ * question?, verify?}` — when supplied (`fgos discover --verdict ...`),
+ * used INSTEAD of calling `judgeDiscovery`, checked before the
+ * `readLockedContext` trust-signal above (explicit beats heuristic — the
+ * whole point of this protocol: a live session that already reasoned about
+ * clarity, fgos-exploring, should never fall through to either a blind
+ * subprocess judge or a second heuristic guess). Omitted (every pre-tsk-27y
+ * caller, including the runner sweep at `loop.mjs`, which calls
+ * through argv-less, in-process) keeps this function byte-identical to
+ * before.
  */
-export function resolveDiscovery(dir, id, cfg, role) {
+export function resolveDiscovery(dir, id, cfg, role, callerVerdict) {
   const view = listWork(dir);
   const work = view.work[id];
   if (!work) {
     throw new StoreError('validation', `resolveDiscovery: work "${id}" not found.`);
   }
 
-  const repoRoot = path.dirname(dir);
-  const lockedContext = readLockedContext(repoRoot, work.docsRef);
-  if (lockedContext) {
+  let verdict;
+  if (callerVerdict) {
+    verdict = { clear: callerVerdict.clear === true };
+    if (verdict.clear) {
+      if (typeof callerVerdict.verify === 'string' && callerVerdict.verify.trim()) {
+        verdict.verify = callerVerdict.verify;
+      }
+    } else {
+      verdict.question =
+        typeof callerVerdict.question === 'string' && callerVerdict.question.trim()
+          ? callerVerdict.question
+          : DEFAULT_UNCLEAR_QUESTION;
+    }
     addDecision(dir, {
       id,
-      text: 'discovery skip: trusted committed CONTEXT.md, no model call',
+      text: `discovery caller-supplied: clear=${verdict.clear}`,
       source: 'resolveDiscovery',
       rationale:
-        'docsRef points at a non-empty CONTEXT.md (D2 trust signal, tsk-ozl) — skipping judgeDiscovery to avoid re-judging a decision already locked and approved',
+        'tsk-27y D2: caller-supplied verdict — session already reasoned live (fgos-exploring), skipping judgeDiscovery subprocess and the readLockedContext trust-signal check',
     });
-    addDiscovery(dir, { id, clear: true });
-    // Real verify (tsk-19j D1/D11, closes gap 2): `gates[id].contextApprove.
-    // verify` is the real command fgos-exploring's own Gate recorded for
-    // this item when it approved CONTEXT.md — preferred over the retired
-    // placeholder whenever a Track A approve record actually exists (an item
-    // that never went through that Gate, e.g. from before this item, keeps
-    // today's fallback unchanged).
-    moveStage(dir, {
-      id,
-      to: 'decompose',
-      expectedStage: 'clarify',
-      verify: view.gates?.[id]?.contextApprove?.verify ?? FALLBACK_VERIFY,
-      role,
-    });
-    return { outcome: 'clear', id, verdict: { clear: true, skipped: true } };
+  } else {
+    const repoRoot = path.dirname(dir);
+    const lockedContext = readLockedContext(repoRoot, work.docsRef);
+    if (lockedContext) {
+      addDecision(dir, {
+        id,
+        text: 'discovery skip: trusted committed CONTEXT.md, no model call',
+        source: 'resolveDiscovery',
+        rationale:
+          'docsRef points at a non-empty CONTEXT.md (D2 trust signal, tsk-ozl) — skipping judgeDiscovery to avoid re-judging a decision already locked and approved',
+      });
+      addDiscovery(dir, { id, clear: true });
+      // Real verify (tsk-19j D1/D11, closes gap 2): `gates[id].contextApprove.
+      // verify` is the real command fgos-exploring's own Gate recorded for
+      // this item when it approved CONTEXT.md — preferred over the retired
+      // placeholder whenever a Track A approve record actually exists (an item
+      // that never went through that Gate, e.g. from before this item, keeps
+      // today's fallback unchanged).
+      moveStage(dir, {
+        id,
+        to: 'decompose',
+        expectedStage: 'clarify',
+        verify: view.gates?.[id]?.contextApprove?.verify ?? FALLBACK_VERIFY,
+        role,
+      });
+      return { outcome: 'clear', id, verdict: { clear: true, skipped: true } };
+    }
+
+    verdict = judgeDiscovery(work, cfg, view, { repoRoot, docsRef: work.docsRef }, dir);
   }
 
-  const verdict = judgeDiscovery(work, cfg, view, { repoRoot, docsRef: work.docsRef }, dir);
   addDiscovery(dir, { id, ...verdict });
 
   // work-item-priority-matrix D6/D7 (was STR8 D4's intentScore -> work.intent):

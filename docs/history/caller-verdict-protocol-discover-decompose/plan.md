@@ -35,11 +35,12 @@ verdict straight into the same downstream write path (`addDiscovery`/
 decompose's mechanical safety gates (D3), which stay unconditional. New CLI
 flags on `bin/fgos.mjs`'s `discover`/`decompose` case blocks build that
 verdict object from argv and pass it through. `fgos-exploring`/
-`fgos-planning`'s own SKILL.md (and `.agents/` mirror) then call the new
+`fgos-validating`'s own SKILL.md (and `.agents/` mirror) then call the new
 flags once their own gate approves, closing the loop the item's original
 description named (`.claude/skills/fgos-exploring/SKILL.md` /
-`.agents/skills/fgos-exploring/SKILL.md`, same pair for `fgos-planning`) —
-this resolves CONTEXT.md's one outstanding question: the original
+`.agents/skills/fgos-exploring/SKILL.md`, same pair for `fgos-validating` —
+corrected from the description's own guess of `fgos-planning`, see Piece 7
+below) — this resolves CONTEXT.md's one outstanding question: the original
 submitted description already commits to this as in-scope footprint, so
 it is a Piece of this plan, not a fresh product decision requiring a
 hand-back to `fgos-exploring`.
@@ -74,7 +75,7 @@ hand-back to `fgos-exploring`.
 | D2 precedence (verdict flag before `readLockedContext`) | low, but behavior-changing for a caller that passes both | new test: item has both a committed CONTEXT.md AND a `--verdict` flag — verdict flag wins, no model call, `readLockedContext` path not taken |
 | D1 full decompose scope — reusing `normalizeChild` for caller-supplied children | medium — `normalizeChild` (`decompose.mjs:177-201`) is unexported but same-file, no new export needed; must reject a child missing `verify` exactly like a model-produced one | new test: caller-supplied child missing `verify` → `{kind: 'invalid'}`, same as today's model-verdict path |
 | D3 gates on caller-supplied children | low — gates are pre-existing, unconditional call, no new logic | new test: caller-supplied `decompose` verdict with two children sharing a footprint path still parks in `need-human` via the existing footprint-overlap gate |
-| Skill wiring (`fgos-exploring`/`fgos-planning` SKILL.md + `.agents/` mirror) | low — prose-only edit, `diff` must confirm mirror pairs stay byte-identical (precedent: `docs/history/fgos-planning-context-gap-handback/plan.md`) | `diff .claude/skills/fgos-exploring/SKILL.md .agents/skills/fgos-exploring/SKILL.md` (and the `fgos-planning` pair) both empty |
+| Skill wiring (`fgos-exploring`/`fgos-validating` SKILL.md + `.agents/` mirror — corrected from `fgos-planning`, see Piece 7 below) | low — prose-only edit, `diff` must confirm mirror pairs stay byte-identical (precedent: `docs/history/fgos-planning-context-gap-handback/plan.md`) | `diff .claude/skills/fgos-exploring/SKILL.md .agents/skills/fgos-exploring/SKILL.md` (and the `fgos-validating` pair) both empty |
 
 `impact-analysis: full` (GitNexus present, `CLAUDE.md`'s capability gate) —
 before editing `resolveDiscovery`/`resolveDecompose`/the `discover`/
@@ -108,9 +109,27 @@ ordering here is internal to this item only, not backlog-wide.
    cases per the risk map above.
 6. `test/cli/fgos.test.mjs` — CLI-level flag parsing/malformed-JSON test.
 7. `.claude/skills/fgos-exploring/SKILL.md` + `.agents/skills/fgos-exploring/
-   SKILL.md`, `.claude/skills/fgos-planning/SKILL.md` + `.agents/skills/
-   fgos-planning/SKILL.md` — call the new flags once their own gate
+   SKILL.md`, `.claude/skills/fgos-validating/SKILL.md` + `.agents/skills/
+   fgos-validating/SKILL.md` — call the new flags once their own gate
    approves; mirror pairs edited identically, `diff` confirms.
+
+   **Correction found during executing (tsk-27y, this item):** the file
+   list above originally named `fgos-planning/SKILL.md` as the second call
+   site (per the item's own original description, written before the
+   pipeline was traced start to finish). Tracing it live during this item's
+   own `executing` stage — including this session hitting the exact bug
+   this item fixes, when it forgot to fire `fgos discover` after
+   `fgos-exploring`'s gate and had to debug why the item was still stuck at
+   `clarify` — showed `fgos-planning` hands off to `fgos-validating` BEFORE
+   the `decompose`→`executing` edge fires (`fgos-validating/SKILL.md`'s own
+   existing hard rule: "Before this session ... calls `fgos decompose` ...").
+   `fgos-validating` is the actual last gate before that edge, so it is the
+   correct call site — `fgos-planning` never calls an engine verb at all
+   (its own hard rule: "Do not apply any stage move yourself"). This is a
+   file-target fix, not a scope change: the intent CONTEXT.md/plan.md
+   already locked (call the new flag once the decision is truly locked and
+   gate-approved) is unchanged; only which skill's gate that maps to was
+   wrong in the original guess.
 
 ## Concrete cases to prove against (validating)
 

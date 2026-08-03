@@ -1267,3 +1267,81 @@ test('judgeDiscovery omits researchToolCallCount entirely when called with no sc
   const verdict = judgeDiscovery(sampleWork(), cfg);
   assert.equal('researchToolCallCount' in verdict, false);
 });
+
+// --- caller-supplied verdict (tsk-27y D1/D2): resolveDiscovery skips
+// judgeDiscovery entirely when a caller (e.g. a live fgos-exploring session)
+// passes its own already-rendered verdict, checked BEFORE the readLockedContext
+// trust signal. -------------------------------------------------------------
+
+test('resolveDiscovery skips judgeDiscovery and advances to decompose on a caller-supplied clear verdict', () => {
+  const scriptDir = mkTempDir();
+  const { scriptPath, counterPath } = writeCountingRawStdoutExecutor(scriptDir, JSON.stringify({ clear: true, verify: 'should never run' }));
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork());
+
+  const result = resolveDiscovery(storeDir, 'item-x', cfg, 'session', { clear: true, verify: 'npm test -- caller' });
+  assert.equal(result.outcome, 'clear');
+  assert.equal(readCount(counterPath), 0, 'judgeDiscovery must never spawn the executor when a caller verdict is supplied');
+
+  const view = listWork(storeDir);
+  assert.equal(view.work['item-x'].stage, 'decompose');
+  assert.equal(view.work['item-x'].verify, 'npm test -- caller');
+  assert.equal(view.discovery['item-x'].at(-1).clear, true);
+  const decisions = view.decisionsById?.['item-x'] ?? [];
+  assert.ok(decisions.some((d) => d.text.startsWith('discovery caller-supplied:')), 'caller-supplied path must log a distinct audit-trail decision');
+});
+
+test('resolveDiscovery parks in awaiting-human on a caller-supplied unclear verdict, with the caller-supplied question', () => {
+  const scriptDir = mkTempDir();
+  const { scriptPath, counterPath } = writeCountingRawStdoutExecutor(scriptDir, JSON.stringify({ clear: true, verify: 'should never run' }));
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork());
+
+  const result = resolveDiscovery(storeDir, 'item-x', cfg, 'session', { clear: false, question: 'Which auth provider?' });
+  assert.equal(result.outcome, 'unclear');
+  assert.equal(readCount(counterPath), 0);
+
+  const view = listWork(storeDir);
+  assert.equal(view.work['item-x'].status, 'awaiting-human');
+  assert.equal(view.gates?.['item-x']?.ask, 'Which auth provider?');
+});
+
+test('resolveDiscovery caller-supplied verdict takes precedence over the readLockedContext trust signal (D2)', () => {
+  const scriptDir = mkTempDir();
+  const { scriptPath, counterPath } = writeCountingRawStdoutExecutor(scriptDir, JSON.stringify({ clear: true, verify: 'should never run' }));
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  const docsRef = mkLockedContextFixture(storeDir);
+  addWork(storeDir, sampleWork({ docsRef }));
+
+  const result = resolveDiscovery(storeDir, 'item-x', cfg, 'session', { clear: true, verify: 'npm test -- precedence' });
+  assert.equal(result.outcome, 'clear');
+  assert.equal(readCount(counterPath), 0);
+
+  const view = listWork(storeDir);
+  // The caller-supplied verify wins -- if readLockedContext's own skip path
+  // had fired instead, verify would be FALLBACK_VERIFY (no contextApprove
+  // record exists in this fixture), never this caller-supplied string.
+  assert.equal(view.work['item-x'].verify, 'npm test -- precedence');
+  const decisions = view.decisionsById?.['item-x'] ?? [];
+  assert.ok(decisions.some((d) => d.text.startsWith('discovery caller-supplied:')));
+  assert.ok(!decisions.some((d) => d.text.startsWith('discovery skip:')), 'the readLockedContext skip path must never fire when a caller verdict is present');
+});
+
+test('resolveDiscovery omitting callerVerdict entirely keeps prior behavior (byte-identical call site)', () => {
+  const scriptDir = mkTempDir();
+  const scriptPath = writeVerdictExecutor(scriptDir, { clear: true, verify: 'npm test -- unchanged' });
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork());
+
+  const result = resolveDiscovery(storeDir, 'item-x', cfg, 'session');
+  assert.equal(result.outcome, 'clear');
+  assert.equal(result.verdict.verify, 'npm test -- unchanged');
+});

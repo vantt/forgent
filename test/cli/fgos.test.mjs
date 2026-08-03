@@ -2923,6 +2923,142 @@ test('discover --config pointing at a missing path still throws RunnerConfigErro
   assert.equal(fs.existsSync(missingConfigPath), false, 'an explicit --config path must never be auto-written');
 });
 
+// --- caller-supplied verdict (tsk-27y D1/D2): `--verdict` on `discover`/
+// `decompose` lets a live caller skip the judge subprocess entirely for one
+// call. Each test below configures the runner's fake executor with the
+// OPPOSITE verdict from what `--verdict` supplies — proving the flag
+// actually bypassed the judge, not just that a real judge happened to agree.
+
+test('discover --verdict clear --verify moves the item to decompose with that exact verify, bypassing the configured (opposite) judge verdict', () => {
+  const cwd = tmpCwd();
+  writeRunnerConfig(cwd, { clear: false, question: 'SHOULD NEVER SURFACE' });
+  const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
+
+  const result = run(cwd, ['discover', id, '--verdict', 'clear', '--verify', 'npm test -- cli-caller']);
+  assert.equal(result.status, 0);
+  assert.equal(JSON.parse(result.stdout).data.outcome, 'clear');
+
+  const view = envelopeData(run(cwd, ['list']).stdout);
+  assert.equal(view.work[id].stage, 'decompose');
+  assert.equal(view.work[id].verify, 'npm test -- cli-caller');
+  assert.notEqual(view.work[id].status, 'awaiting-human');
+});
+
+test('discover --verdict unclear --question parks in awaiting-human with that exact question, bypassing the configured (opposite) judge verdict', () => {
+  const cwd = tmpCwd();
+  writeRunnerConfig(cwd, { clear: true, verify: 'SHOULD NEVER SURFACE' });
+  const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
+
+  const result = run(cwd, ['discover', id, '--verdict', 'unclear', '--question', 'Which provider?']);
+  assert.equal(result.status, 0);
+  assert.equal(JSON.parse(result.stdout).data.outcome, 'unclear');
+
+  const view = envelopeData(run(cwd, ['list']).stdout);
+  assert.equal(view.work[id].status, 'awaiting-human');
+  assert.equal(view.work[id].stage, 'clarify');
+  assert.equal(view.gates[id].ask, 'Which provider?');
+});
+
+test('discover --verdict clear with no --verify is rejected as validation, exit 4', () => {
+  const cwd = tmpCwd();
+  const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
+  const result = run(cwd, ['discover', id, '--verdict', 'clear']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /--verify/);
+});
+
+test('discover --verdict with an unrecognized value is rejected as validation, exit 4', () => {
+  const cwd = tmpCwd();
+  const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
+  const result = run(cwd, ['discover', id, '--verdict', 'maybe']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /"clear" or "unclear"/);
+});
+
+test('decompose --verdict pass-through moves the item to executing, bypassing the configured (opposite) judge verdict', () => {
+  const cwd = tmpCwd();
+  writeRunnerConfig(cwd, { clear: true, verify: 'npm test -- proven' });
+  const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
+  run(cwd, ['discover', id]);
+  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'decompose');
+
+  writeRunnerConfig(cwd, { verdict: 'decompose', reason: 'SHOULD NEVER SURFACE', children: [{ title: 'x', verify: 'npm test' }] });
+  const result = run(cwd, ['decompose', id, '--verdict', 'pass-through', '--reason', 'single-piece, no split needed']);
+  assert.equal(result.status, 0);
+  assert.equal(JSON.parse(result.stdout).data.outcome, 'pass-through');
+
+  const view = envelopeData(run(cwd, ['list']).stdout);
+  assert.equal(view.work[id].stage, 'executing');
+  assert.equal(Object.values(view.work).some((item) => item.parent === id), false);
+});
+
+test('decompose --verdict need-human --reason parks in awaiting-human with that exact reason, bypassing the configured (opposite) judge verdict', () => {
+  const cwd = tmpCwd();
+  writeRunnerConfig(cwd, { clear: true, verify: 'npm test -- proven' });
+  const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
+  run(cwd, ['discover', id]);
+
+  writeRunnerConfig(cwd, { verdict: 'pass-through' });
+  const result = run(cwd, ['decompose', id, '--verdict', 'need-human', '--reason', 'Which auth provider?']);
+  assert.equal(result.status, 0);
+  assert.equal(JSON.parse(result.stdout).data.outcome, 'need-human');
+
+  const view = envelopeData(run(cwd, ['list']).stdout);
+  assert.equal(view.work[id].status, 'awaiting-human');
+  assert.match(view.gates[id].ask, /Which auth provider\?/);
+});
+
+test('decompose --verdict decompose --children writes real children, bypassing the configured (opposite) judge verdict', () => {
+  const cwd = tmpCwd();
+  writeRunnerConfig(cwd, { clear: true, verify: 'npm test -- proven' });
+  const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
+  run(cwd, ['discover', id]);
+
+  writeRunnerConfig(cwd, { verdict: 'pass-through' });
+  const children = JSON.stringify([
+    { title: 'Build parser', verify: 'npm test -- parser' },
+    { title: 'Build renderer', verify: 'npm test -- renderer' },
+  ]);
+  const result = run(cwd, ['decompose', id, '--verdict', 'decompose', '--reason', 'two independent surfaces', '--children', children]);
+  assert.equal(result.status, 0);
+  assert.equal(JSON.parse(result.stdout).data.outcome, 'decompose');
+
+  const view = envelopeData(run(cwd, ['list']).stdout);
+  assert.equal(view.work[id].stage, 'executing');
+  assert.equal(view.work[`${id}-1`].title, 'Build parser');
+  assert.equal(view.work[`${id}-2`].title, 'Build renderer');
+});
+
+test('decompose --verdict decompose with malformed --children JSON is rejected as validation, exit 4', () => {
+  const cwd = tmpCwd();
+  const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
+  run(cwd, ['discover', id, '--verdict', 'clear', '--verify', 'npm test']);
+
+  const result = run(cwd, ['decompose', id, '--verdict', 'decompose', '--reason', 'x', '--children', '{not valid json']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /--children/);
+});
+
+test('decompose --verdict decompose with no --children at all is rejected as validation, exit 4', () => {
+  const cwd = tmpCwd();
+  const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
+  run(cwd, ['discover', id, '--verdict', 'clear', '--verify', 'npm test']);
+
+  const result = run(cwd, ['decompose', id, '--verdict', 'decompose', '--reason', 'x']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /--children/);
+});
+
+test('decompose --verdict with an unrecognized value is rejected as validation, exit 4', () => {
+  const cwd = tmpCwd();
+  const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
+  run(cwd, ['discover', id, '--verdict', 'clear', '--verify', 'npm test']);
+
+  const result = run(cwd, ['decompose', id, '--verdict', 'maybe']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /"pass-through", "need-human", or "decompose"/);
+});
+
 // --- settlement channel role attribution (phase-3-compound-learning-5,
 // S3-closeout) — real CLI call sites stamp `role` per vision §8: the
 // `move`/`answer` verbs are always a human at the keyboard; `discover` is
