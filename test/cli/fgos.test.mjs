@@ -7594,6 +7594,73 @@ test('merge next on a runner-sourced pick that trips the Iron Law: reports block
   assert.match(survivingBranches, /fgw\/iron-next-item/, 'the branch survives -- nothing was merged or cleaned up');
 });
 
+// --- tsk-173: merge next auto sync-root on blockedOnSync (docs/history/
+// merge-next-auto-sync-root/) -----------------------------------------------
+
+test('merge next with nothing ready and no blockedOnSync candidate: unchanged shape, no syncRoot key at all (zero behavior change, D1)', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0);
+  const result = run(cwd, ['merge', 'next']);
+  assert.equal(result.status, 0);
+  const data = envelopeData(result.stdout);
+  assert.deepEqual(data, { picked: null, reason: 'nothing ready to merge' });
+  assert.ok(!('syncRoot' in data), 'no blockedOnSync candidate exists -- the new branch must never fire');
+});
+
+test('merge next auto-syncs a blockedOnSync root before giving up: drift clears, the now-ready item merges to delivered (tsk-173 D1)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeDriftedRoot(cwd, 'auto-sync-happy', { verify: 'test -f auto-sync-happy-produced.txt' });
+  // driftStatus's own findRootIds only tracks ids that are some OTHER
+  // item's `parent` -- a childless root is invisible to it, so it would
+  // never show up in blockedOnSync at all without this.
+  assert.equal(run(cwd, ['add', 'auto-sync-happy-child', '--title', 'child', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--parent', 'auto-sync-happy']).status, 0);
+  assert.equal(run(cwd, ['move', 'auto-sync-happy', '--to', 'awaiting-approval']).status, 0);
+  commitPendingBeforeApprove(cwd, 'auto-sync-happy');
+
+  const result = run(cwd, ['merge', 'next']);
+  assert.equal(result.status, 0, `${result.stdout}${result.stderr}`);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.syncRoot.id, 'auto-sync-happy');
+  assert.equal(data.syncRoot.outcome, 'synced');
+  assert.equal(data.picked, 'auto-sync-happy', `expected the synced root to be picked next: ${JSON.stringify(data)}`);
+  assert.equal(data.approve.to, 'delivered', `expected the synced+ready item to reach delivered: ${JSON.stringify(data)}`);
+  assert.ok(fs.existsSync(path.join(cwd, 'auto-sync-happy-produced.txt')), 'sync-root\'s merge must land on main before approve re-verifies');
+  assert.equal(stateView(cwd).work['auto-sync-happy'].status, 'delivered');
+});
+
+test('merge next on a blockedOnSync root whose sync-root attempt hits a genuine conflict: picked is the root id (never null), blocked, main untouched (tsk-173 D1/D2)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeDriftedRoot(cwd, 'auto-sync-conflict', { verify: 'true' });
+  // Same collision shape as the direct sync-root conflict test above: an
+  // unrelated main commit on the exact path the root's own commit touches.
+  fs.writeFileSync(path.join(cwd, 'auto-sync-conflict-produced.txt'), 'conflicting main content\n');
+  gitAtCwd(cwd, ['add', 'auto-sync-conflict-produced.txt']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', 'unrelated main edit that collides']);
+  // See auto-sync-happy above: driftStatus only tracks ids that are some
+  // other item's `parent`.
+  assert.equal(run(cwd, ['add', 'auto-sync-conflict-child', '--title', 'child', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--parent', 'auto-sync-conflict']).status, 0);
+  assert.equal(run(cwd, ['move', 'auto-sync-conflict', '--to', 'awaiting-approval']).status, 0);
+  commitPendingBeforeApprove(cwd, 'auto-sync-conflict');
+
+  const headBefore = gitHead(cwd);
+  const result = run(cwd, ['merge', 'next']);
+  assert.equal(result.status, 0, `merge next itself must not exit non-zero on a blocked sync: ${result.stdout}${result.stderr}`);
+  const data = envelopeData(result.stdout);
+  // picked must be the resolved root id, NEVER null -- picked: null here
+  // would collide with merge-loop's own frontier-empty bullet and silently
+  // swallow this real conflict as if nothing were wrong (validated against
+  // plugins/fgOS/skills/merge-loop/SKILL.md during fgos-validating).
+  assert.equal(data.picked, 'auto-sync-conflict');
+  assert.equal(data.blocked, 'merge-conflict');
+  assert.equal(data.syncRoot.outcome, 'blocked');
+  assert.equal(data.syncRoot.reason, 'merge-conflict');
+
+  assert.equal(gitHead(cwd), headBefore, 'main must be byte-for-byte unchanged after an aborted auto-sync');
+  assert.equal(stateView(cwd).work['auto-sync-conflict'].status, 'awaiting-approval', 'a blocked sync must never touch the root item\'s own status');
+});
+
 // --- str73-done-flip-cos-check cell 1: --acceptance on add/submit/edit ----
 
 test('add --acceptance persists work.acceptance as the given array, validated through validateWork', () => {

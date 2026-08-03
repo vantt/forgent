@@ -217,6 +217,24 @@ test('mergeReadiness: blockedOnSync resolves through a nested root chain (grandp
   assert.deepEqual(result.blockedOnSync, ['leaf']);
 });
 
+test('mergeReadiness: blockedOnSync is rank-ordered same as ready (tsk-173), not raw candidate-iteration order', () => {
+  const view = {
+    work: {
+      plainRoot: item('plainRoot', 'doing'),
+      plainLeaf: item('plainLeaf', 'awaiting-approval', [], { parent: 'plainRoot' }),
+      mvpRoot: item('mvpRoot', 'doing'),
+      mvpLeaf: item('mvpLeaf', 'awaiting-approval', [], { parent: 'mvpRoot', goalTier: 'mvp' }),
+    },
+  };
+  // object insertion order alone would put plainLeaf before mvpLeaf; rank
+  // order (goalTier mvp beats ungrouped, same tie-break `ready` already
+  // uses) must put mvpLeaf first instead.
+  const result = mergeReadiness(view, {
+    drift: { plainRoot: { needsSync: true }, mvpRoot: { needsSync: true } },
+  });
+  assert.deepEqual(result.blockedOnSync, ['mvpLeaf', 'plainLeaf']);
+});
+
 // --- mergeSets: footprint-overlap (D2) --------------------------------------
 
 test('mergeReadiness: a footprint-overlap pair now surfaces as a mergeSets entry instead of vanishing silently, still excluded from ready', () => {

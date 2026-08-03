@@ -106,8 +106,13 @@ self-pace."
      plain `verify-fail`, `integration-drift`, or any other
      `approve`-reported block this skill never investigates — including a
      `verify-fail-post-merge` block on an `<id>` already self-resolve-
-     attempted this run) or `{picked: <id>, blocked: "iron-law", ...}` — a
-     blocked pick. Compare `<id>` against the id picked (and blocked) on
+     attempted this run), `{picked: <id>, blocked: "iron-law", ...}`, or
+     `{picked: <id>, blocked: <reason>, syncRoot: {...}}` with no `approve`
+     field (tsk-173: a blockedOnSync root's own `sync-root` attempt was
+     blocked — `<id>` here is the resolved root id, `<reason>` is
+     `"iron-law"`, `"merge-conflict"`, `"fgos-write-rejected"`, or
+     `"verify-fail"`) — all three shapes are **a blocked pick**, the same
+     bucket. Compare `<id>` against the id picked (and blocked) on
      the immediately preceding iteration:
      - **Different id, or this is the first blocked pick of the run** —
        normal. Continue to the next iteration, remembering this `<id>` as
