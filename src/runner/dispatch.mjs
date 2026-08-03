@@ -486,6 +486,12 @@ export const CLAUDE_CLI_COMMANDS = Object.freeze(['claude']);
  * cannot borrow that shared table without breaking Claude's own
  * tier-to-model resolution. This field lets `resolveCapacityCli`
  * (task-dispatch only, below) substitute a capacity-specific model instead.
+ *
+ * `agentType`, when present, must be a non-empty string (D1/D2, tsk-3sw):
+ * names a Claude Code agent definition (`.claude/agents/<name>.md`) a
+ * `kind:"task"` capacity with no own `command`/`args` resolves into a real
+ * `claude --agent <agentType>` invocation via, `buildAgentTypeExecutor`
+ * below.
  */
 function validateCapacityShape(capacity, label) {
   if (!capacity || typeof capacity !== 'object' || Array.isArray(capacity)) {
@@ -504,6 +510,9 @@ function validateCapacityShape(capacity, label) {
   }
   if (capacity.allowCrossProvider !== undefined && typeof capacity.allowCrossProvider !== 'boolean') {
     throw new RunnerConfigError(`runner config (${label}) "allowCrossProvider" must be a boolean when present.`);
+  }
+  if (capacity.agentType !== undefined && (typeof capacity.agentType !== 'string' || capacity.agentType.length === 0)) {
+    throw new RunnerConfigError(`runner config (${label}) "agentType" must be a non-empty string when present.`);
   }
 }
 
@@ -584,6 +593,12 @@ export function modelForTier(cfg, tier) {
  * `capacityId`/`tier` given at all keeps every pre-tsk-62v call site's
  * behavior identical.
  *
+ * A `capacities.<capacityId>` entry naming no `command`/`adapter` of its
+ * own but declaring `agentType` (D1/D2, tsk-3sw) resolves via
+ * `buildAgentTypeExecutor` instead of falling all the way through to
+ * `executors.<tier>`/global — still ahead of that fallback in the same
+ * precedence slot `command`/`adapter` already occupy.
+ *
  * For a `capacities.<capacityId>` entry declaring `kind: "cli"`, presence
  * is checked via the same in-process functions `fgos tool query` already
  * uses (`listWork`/`readLocalStatus`/`resolvedStatus`, D6) instead of
@@ -605,6 +620,33 @@ export function modelForTier(cfg, tier) {
  * case, and `provider` is a freely-overridable display alias, not the
  * command actually spawned.
  */
+/**
+ * Derive a real, spawnable executor block for a `kind:"task"` capacity that
+ * declares only `agentType` (no own `command`/`args`) — D1/D2, tsk-3sw,
+ * Claude-only for now (this item's own `CONTEXT.md`: multi-provider
+ * `agentType` support is `tsk-53h`'s separate follow-on, not built here).
+ * Reuses `baseExecutor`'s (the already-resolved `cfg.executor`, guaranteed
+ * `{command,args}`-shaped by `validateExecutorShape` at config-load time)
+ * own args template verbatim — never a hardcoded literal copy of
+ * `DEFAULT_RUNNER_CONFIG` — so a project's own `--allowedTools`/
+ * `--permission-mode` customization carries through to its agentType
+ * capacities too. Strips the `'--model','{model}'` pair (D2: the named
+ * agent definition's own pinned `model:` frontmatter wins, never overridden
+ * by the work item's `tier`) and appends `'--agent', agentType`.
+ */
+function buildAgentTypeExecutor(baseExecutor, agentType) {
+  const args = [];
+  for (let i = 0; i < baseExecutor.args.length; i++) {
+    if (baseExecutor.args[i] === '--model' && baseExecutor.args[i + 1] === '{model}') {
+      i++; // also skip the paired value token
+      continue;
+    }
+    args.push(baseExecutor.args[i]);
+  }
+  args.push('--agent', agentType);
+  return { command: baseExecutor.command, args };
+}
+
 function resolveExecutorConfig(cfg, tier, capacityId, fgosDir) {
   const capacity = capacityId && cfg && cfg.capacities && typeof cfg.capacities === 'object' ? cfg.capacities[capacityId] : undefined;
 
@@ -623,7 +665,12 @@ function resolveExecutorConfig(cfg, tier, capacityId, fgosDir) {
     }
   }
 
-  const byCapacity = capacity && (capacity.adapter || capacity.command) ? capacity : undefined;
+  const byCapacity =
+    capacity && (capacity.adapter || capacity.command)
+      ? capacity
+      : capacity && capacity.agentType && cfg && cfg.executor
+        ? buildAgentTypeExecutor(cfg.executor, capacity.agentType)
+        : undefined;
   const perTier = cfg && cfg.executors && typeof cfg.executors === 'object' ? cfg.executors[tier] : undefined;
   const executor = byCapacity ?? perTier ?? (cfg && cfg.executor);
   if (!executor || typeof executor.command !== 'string' || !Array.isArray(executor.args)) {
