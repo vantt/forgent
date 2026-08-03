@@ -47,89 +47,40 @@ risk around a title no one will be able to read later.
 
 ## 2. Classify tier, kind, and risk — via `submit-assist-classify` when available, otherwise yourself
 
-Before reasoning it out yourself, check two things in order — whether a
-`submit-assist-classify` capacity is configured at all, and only if it is,
-whether its registered backend is actually present on this machine. These
-are deliberately two separate checks, not one: "never configured" and
-"configured but the backend is missing" get different, distinguishable
-behavior below.
+Follow `../_shared/capacity-dispatch-fallback.md` (tsk-53h — this pattern's
+shared fragment, extracted from this exact step so a second skill can
+reuse it without copy-pasting it) with:
 
-```bash
-root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
-node -e "
-const cfg = JSON.parse(require('node:fs').readFileSync('$root/.fgos-runner.json', 'utf8'));
-console.log(cfg.capacities?.['submit-assist-classify'] ? 'configured' : 'not-configured');
-"
-```
+- `<CAPACITY_ID>` = `submit-assist-classify`
+- `<INLINE_FALLBACK_HEADING>` = "Classify it yourself" (below)
+- `<PROMPT_TEMPLATE>`:
 
-- **`not-configured`** — skip straight to "Classify it yourself" below,
-  with no note printed at all. This is the default/common path, and its
-  behavior and output are byte-identical to before this capacity
-  existed — nothing here changes for the common case.
-- **`configured`** — check presence next:
+  ```
+  Classify this backlog ask's tier (light/standard/heavy), kind (bug/feature/chore/task), and risk (low/medium/high), plus one line of reasoning. Respond with exactly this format, one field per line, nothing else:
+  tier: <value or "unsure">
+  kind: <value or "unsure">
+  risk: <value or "unsure">
+  reasoning: <one line>
 
-  ```bash
-  node "$root/bin/fgos.mjs" tool query --capability submit-assist-classify --status present --dir "$root"
+  Rubric:
+  - tier: light = small contained change (typo, one-line log, rename, doc fix). standard = default weight, real implementation within one area. heavy = multi-system/file, public contract or data-shape change, new architecture, or genuinely vague scope.
+  - kind: bug = something that used to/should work and doesn't (a real symptom, not just the word "fix"). feature = new capability from the user's point of view. chore = maintenance, no user-visible behavior change. task = the honest fallback when none of the above cleanly fits.
+  - risk: independent of tier — how bad and how reversible is being wrong? auth/payments/data-integrity/hard-to-undo = higher risk regardless of size.
+
+  Ask: "<the free-text ask, verbatim>"
   ```
 
-  - **Empty `providers` array (registered but not present, or never
-    registered despite being configured)** — print one visible line
-    (`submit-assist-classify is configured but its backend isn't
-    available on this machine — classifying it directly instead`), then
-    fall through to "Classify it yourself" below. The note is the only
-    difference from the `not-configured` case above; the classification
-    itself is identical.
-  - **One provider, `status: "present"`** — resolve the real command/args
-    and dispatch to it instead of reasoning inline:
-
-    1. Build the classification prompt (fixed template, so every dispatch
-       asks the exact same thing):
-
-       ```
-       Classify this backlog ask's tier (light/standard/heavy), kind (bug/feature/chore/task), and risk (low/medium/high), plus one line of reasoning. Respond with exactly this format, one field per line, nothing else:
-       tier: <value or "unsure">
-       kind: <value or "unsure">
-       risk: <value or "unsure">
-       reasoning: <one line>
-
-       Rubric:
-       - tier: light = small contained change (typo, one-line log, rename, doc fix). standard = default weight, real implementation within one area. heavy = multi-system/file, public contract or data-shape change, new architecture, or genuinely vague scope.
-       - kind: bug = something that used to/should work and doesn't (a real symptom, not just the word "fix"). feature = new capability from the user's point of view. chore = maintenance, no user-visible behavior change. task = the honest fallback when none of the above cleanly fits.
-       - risk: independent of tier — how bad and how reversible is being wrong? auth/payments/data-integrity/hard-to-undo = higher risk regardless of size.
-
-       Ask: "<the free-text ask, verbatim>"
-       ```
-
-    2. Resolve the real command/args, reusing `dispatch.mjs`'s own
-       `resolveExecutorConfig`/`resolveExecutorCommand` (tsk-62v) — never a
-       second argv-building implementation:
-
-       ```bash
-       node "$root/src/runner/dispatch.mjs" resolve submit-assist-classify --prompt "<the prompt built above>"
-       ```
-
-       This prints `{"command":...,"args":[...],"provider":...,"model":...}`
-       as JSON.
-
-    3. Print the announce line, then actually run the resolved
-       `command`/`args` via Bash (the JSON's `args` array is the real,
-       already-`{prompt}`-substituted argv — invoke it as-is, never
-       re-templated):
-
-       ```
-       submit-assist-classify - <provider> - <model>
-       ```
-
-    4. Read the response. If it cleanly gives a `tier`/`kind`/`risk` value
-       (matching the vocabularies above — `"unsure"` or an unrecognized
-       value means treat that one field as omitted, same as step 3's own
-       "leave it out" rule), use that suggestion in place of your own
-       reasoning and continue to step 3. If the response is missing,
-       unparseable, or doesn't map to a real value for *any* field
-       (malformed output) — fall back to "Classify it yourself" below for
-       this ask entirely, exactly as if the capacity were absent. Either
-       way the output is non-authoritative: a wrong external suggestion is
-       exactly as cheap to fix later via `fgos edit` as a wrong inline one.
+Reading the response (this skill's own field-level rule, since the shared
+fragment's Step D only covers the generic "malformed" case): if it cleanly
+gives a `tier`/`kind`/`risk` value matching the vocabularies above
+(`"unsure"` or an unrecognized value means treat that one field as
+omitted, same as "On confidence, per field" below), use that suggestion in
+place of your own reasoning and continue to step 3. Missing/unparseable/
+no-real-value for *any* field is the fragment's Step D malformed case —
+fall back to "Classify it yourself" below for this ask entirely, exactly
+as if the capacity were absent. Either way the output is
+non-authoritative: a wrong external suggestion is exactly as cheap to fix
+later via `fgos edit` as a wrong inline one.
 
 ### Classify it yourself
 

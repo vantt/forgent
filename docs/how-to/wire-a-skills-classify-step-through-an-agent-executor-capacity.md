@@ -72,30 +72,26 @@ nothing is configured.
    added in `tsk-5l2-1`). task-dispatch skills invoke this exact CLI, never a
    parallel prompt/argv builder of their own.
 
-4. **In the skill's own `SKILL.md`, branch on config THEN presence — two
-   separate checks, not one.** These need to be distinguishable because
-   they get different visible behavior:
-   - **Not configured at all** — skip straight to the existing inline
-     path, with *no* note printed. This is the byte-identical default.
-   - **Configured but the backend isn't present** — print one visible
-     line saying so, then fall through to the same inline path. The
-     note is the only difference from the case above.
-   - **Configured and present** — build a *fixed* prompt template (so
-     every dispatch asks the model the exact same thing, not a
-     paraphrase that drifts call to call), resolve the real
-     command/args via step 3's CLI, print the announce line
-     (`<capacityId> - <provider> - <model>`), then actually run it via
-     Bash.
-   - **Malformed/missing response from a present, dispatched backend**
-     (a third failure mode, distinct from "not present" — the backend
-     ran, but answered badly) — fall back to the same inline path once
-     more. Treat the external answer as non-authoritative either way: a
-     wrong guess from either path costs the same to fix later.
+4. **In the skill's own `SKILL.md`, point at the shared fragment instead
+   of inlining the branch logic.** `.claude/skills/_shared/capacity-
+   dispatch-fallback.md` (tsk-53h) already carries the four-way branch —
+   config check, presence check, configured-and-present dispatch, and the
+   malformed-response fallback — generalized from this exact wiring
+   (`submit-assist-classify`, the fragment's own real precedent). Reference
+   it by relative path from the consuming `SKILL.md`
+   (`../_shared/capacity-dispatch-fallback.md`) and fill in its three
+   parameters: `<CAPACITY_ID>` (this capacity's id), `<PROMPT_TEMPLATE>`
+   (this skill's own fixed prompt), and `<INLINE_FALLBACK_HEADING>` (this
+   skill's own "reason about it yourself" heading). Do not re-copy the
+   branch prose into the new skill's own file — that is exactly the drift
+   risk the shared fragment exists to remove.
 
-   Update **every** mirrored copy of the skill together
-   (`.claude/skills/<name>/SKILL.md` and `.agents/skills/<name>/SKILL.md`
-   — `test/skills/fgos-mirror.test.mjs` enforces byte-identical content
-   across both trees, and it fails loudly if only one side is edited).
+   Update **every** mirrored copy together
+   (`.claude/skills/<name>/SKILL.md` and `.agents/skills/<name>/SKILL.md`,
+   and `.claude/skills/_shared/`/`.agents/skills/_shared/` if the fragment
+   itself changes — `test/skills/fgos-mirror.test.mjs` enforces
+   byte-identical content across both trees for `fgos-*` skills and for
+   `_shared/`, and fails loudly if only one side is edited).
 
 5. **Verify the dispatch actually works, live, once.** Since a prose
    skill's own branching can never be executed by the test suite (no
@@ -131,6 +127,12 @@ acceptance proof instead of a weaker placeholder.
   `plan.md` — the locked decisions (D1-D8) this exact wiring followed,
   including the governance (D7) and malformed-output (D8) calls named in
   steps 1 and 4 above.
+- `.claude/skills/_shared/capacity-dispatch-fallback.md` — the shared
+  fragment step 4 now points at, generalized from this exact wiring
+  (`tsk-53h`).
+- `docs/history/agent-executor-generalized-capacity-helper/CONTEXT.md` /
+  `plan.md` — the locked decisions behind extracting step 4 into that
+  shared fragment.
 - `docs/how-to/diagnose-a-blocked-return-from-an-unrelated-verify-failure.md`
   — real gaps hit while returning the sibling items `tsk-5l2-1`/`tsk-5l2-2`
   that built the capacity mechanism this how-to wires a skill through.
