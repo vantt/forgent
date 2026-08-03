@@ -193,6 +193,18 @@ test('reclaimOrphanedCheckout refuses (throws, does not remove) a checkout with 
   removeWorktree(repoRoot, wt.path, { force: true });
 });
 
+test('reclaimOrphanedCheckout refuses (throws, does not remove) a checkout that resolves to repoRoot itself (tsk-k8u D1)', () => {
+  const repoRoot = initTempRepo();
+  // Check the branch out directly IN repoRoot's own working directory —
+  // `git worktree list --porcelain`'s first entry is always the main
+  // checkout, so this makes repoRoot itself the orphan path for the branch.
+  execFileSync('git', ['checkout', '-q', '-b', 'fgw/item-repo-root'], { cwd: repoRoot });
+
+  assert.throws(() => reclaimOrphanedCheckout(repoRoot, 'fgw/item-repo-root'), WorktreeError);
+  assert.equal(fs.existsSync(repoRoot), true, 'repoRoot itself must never be force-removed');
+  assert.equal(fs.existsSync(path.join(repoRoot, 'seed.txt')), true, 'repoRoot\'s own working tree must stay intact');
+});
+
 test('createWorktree does not leak its freshly-allocated directory when the reuse path is refused for a dirty checkout', () => {
   const repoRoot = initTempRepo();
   const worktreeDir = mkWorktreeDir();

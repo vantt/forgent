@@ -200,6 +200,20 @@ export function reclaimOrphanedCheckout(repoRoot, branch) {
   const orphanPath = findCheckoutPath(listing, branch);
   if (!orphanPath) return { reclaimed: false, path: null };
 
+  // REPO-ROOT GUARD (tsk-k8u D1): an orphan checkout that resolves to
+  // `repoRoot` itself would force-remove the main checkout's own working
+  // tree — never a genuine crash-orphan (a crash-orphan is always some
+  // OTHER checkout of the branch), and destructive in a way no caller here
+  // intends. Refuses the same way the dirty-checkout guard below does,
+  // rather than silently reclaiming the ground the caller itself may be
+  // standing on.
+  if (path.resolve(orphanPath) === path.resolve(repoRoot)) {
+    throw new WorktreeError(
+      `refusing to reclaim checkout of "${branch}" at "${orphanPath}" — it resolves to repoRoot itself, so reclaiming it would force-remove the main checkout's own working tree. This is never a genuine crash-orphan; check how "${branch}" ended up checked out at repoRoot before retrying.`,
+      { branch, orphanPath },
+    );
+  }
+
   if (fs.existsSync(orphanPath)) {
     if (isCheckoutDirty(repoRoot, orphanPath)) {
       throw new WorktreeError(
