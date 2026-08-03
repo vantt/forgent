@@ -3,11 +3,13 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { judgeDiscovery, resolveDiscovery } from '../../src/intake/discovery.mjs';
+import { execFileSync } from 'node:child_process';
+import { judgeDiscovery, resolveDiscovery, RETIRED_P14_PLACEHOLDER, FALLBACK_VERIFY } from '../../src/intake/discovery.mjs';
 import { readScoutNotes } from '../../src/intake/judge-executor.mjs';
 import { computeImpact, computePriority } from '../../src/state/priority-formula.mjs';
 import { addWork, listWork, StoreError, categoryOf, putInAwaiting, answerAwaiting, moveWork, recordGateApprove } from '../../src/state/store.mjs';
 import { appendEvent, readEvents } from '../../src/state/events.mjs';
+import { createWorktree } from '../../src/runner/worktree.mjs';
 import { judgeVerifySemanticCorrectness } from '../../src/intake/judge-executor.mjs';
 
 // Fake executors only — every "command" spawned here is a node script this
@@ -162,7 +164,13 @@ function sampleWork(overrides = {}) {
     deps: [],
     risk: 'low',
     refs: [],
-    verify: 'P15 will fill this in',
+    // tsk-1ni D2: the real submit-time sentinel (bin/fgos.mjs's own
+    // SUBMIT_VERIFY_SENTINEL carries this exact string), not an arbitrary
+    // fixture literal -- resolveDiscovery's new verify-overwrite guard
+    // treats any OTHER string as "already real" and protects it, so a
+    // fixture meant to represent "no real verify yet" must use one of the
+    // two actual placeholder shapes production code recognizes.
+    verify: RETIRED_P14_PLACEHOLDER,
     stage: 'clarify',
     ...overrides,
   };
@@ -542,8 +550,7 @@ test('resolveDiscovery on a clear verdict with no model-proposed verify falls ba
   resolveDiscovery(storeDir, 'item-x', cfg);
   const view = listWork(storeDir);
   assert.equal(view.work['item-x'].stage, 'decompose');
-  assert.notEqual(view.work['item-x'].verify, 'P15 will fill this in');
-  assert.notEqual(view.work['item-x'].verify, 'chưa xác định — P15 bổ sung');
+  assert.notEqual(view.work['item-x'].verify, RETIRED_P14_PLACEHOLDER);
   assert.equal(typeof view.work['item-x'].verify, 'string');
   assert.ok(view.work['item-x'].verify.length > 0);
 });
@@ -1381,6 +1388,153 @@ test('judgeDiscovery omits researchToolCallCount entirely when called with no sc
   const cfg = cfgFor([scriptPath, '{prompt}']);
   const verdict = judgeDiscovery(sampleWork(), cfg);
   assert.equal('researchToolCallCount' in verdict, false);
+});
+
+// --- resolveContentRoot end-to-end through resolveDiscovery (tsk-1ni D1):
+// mkLockedContextFixture above builds its content as a sibling of storeDir
+// (repoRoot == content-root by construction), so those existing tests
+// exercise resolveContentRoot's stateRoot-fallback branch incidentally,
+// same as decompose.test.mjs's mkPlanFixture tests. resolveContentRoot
+// itself (the shared helper, decompose.mjs) already has direct unit
+// coverage for all three branches from tsk-1ni-3 -- these two tests cover
+// resolveDiscovery's own end-to-end wiring to branches 1 and 2 specifically,
+// not resolveContentRoot's internals again. ---
+
+function initTempGitRepoWithStore() {
+  const repoRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-discovery-content-root-repo-'));
+  execFileSync('git', ['init', '-q'], { cwd: repoRoot });
+  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: repoRoot });
+  execFileSync('git', ['config', 'user.name', 'Test'], { cwd: repoRoot });
+  fs.writeFileSync(path.join(repoRoot, 'seed.txt'), 'seed\n');
+  execFileSync('git', ['add', 'seed.txt'], { cwd: repoRoot });
+  execFileSync('git', ['commit', '-q', '-m', 'init'], { cwd: repoRoot });
+  const storeDir = path.join(repoRoot, '.fgos');
+  fs.mkdirSync(storeDir, { recursive: true });
+  return { repoRoot, storeDir };
+}
+
+test('resolveDiscovery skip path finds CONTEXT.md via process.cwd() when the state root does not hold it (D1 branch 1, real end-to-end)', () => {
+  const scriptDir = mkTempDir();
+  const { scriptPath, counterPath } = writeCountingRawStdoutExecutor(scriptDir, JSON.stringify({ clear: true, verify: 'should never run' }));
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const { storeDir } = initTempGitRepoWithStore();
+
+  const contentDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-discovery-content-root-cwd-'));
+  const featureDir = path.join(contentDir, 'feature');
+  fs.mkdirSync(featureDir, { recursive: true });
+  fs.writeFileSync(path.join(featureDir, 'CONTEXT.md'), '# CONTEXT\n\nD1: locked.\n');
+
+  addWork(storeDir, sampleWork({ docsRef: 'feature' }));
+
+  const originalCwd = process.cwd();
+  process.chdir(contentDir);
+  let result;
+  try {
+    result = resolveDiscovery(storeDir, 'item-x', cfg, 'session');
+  } finally {
+    process.chdir(originalCwd);
+  }
+
+  assert.equal(result.outcome, 'clear');
+  assert.equal(result.verdict.skipped, true);
+  assert.equal(readCount(counterPath), 0, 'judgeDiscovery must never spawn when cwd already holds the locked CONTEXT.md');
+});
+
+test('resolveDiscovery skip path finds CONTEXT.md via a real registered worktree when cwd does not hold it (D1 branch 2, crash-recovery case)', () => {
+  const scriptDir = mkTempDir();
+  const { scriptPath, counterPath } = writeCountingRawStdoutExecutor(scriptDir, JSON.stringify({ clear: true, verify: 'should never run' }));
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const { repoRoot, storeDir } = initTempGitRepoWithStore();
+
+  const worktreeBase = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-discovery-content-root-wt-'));
+  const { path: worktreePath } = createWorktree(repoRoot, 'item-x', { worktreeDir: worktreeBase });
+  const featureDir = path.join(worktreePath, 'feature');
+  fs.mkdirSync(featureDir, { recursive: true });
+  fs.writeFileSync(path.join(featureDir, 'CONTEXT.md'), '# CONTEXT\n\nD1: locked.\n');
+  execFileSync('git', ['add', 'feature'], { cwd: worktreePath });
+  execFileSync('git', ['commit', '-q', '-m', 'context: item-x'], { cwd: worktreePath });
+
+  addWork(storeDir, sampleWork({ docsRef: 'feature' }));
+
+  const elsewhere = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-discovery-content-root-elsewhere-'));
+  const originalCwd = process.cwd();
+  process.chdir(elsewhere);
+  let result;
+  try {
+    result = resolveDiscovery(storeDir, 'item-x', cfg, 'session');
+  } finally {
+    process.chdir(originalCwd);
+  }
+
+  assert.equal(result.outcome, 'clear');
+  assert.equal(result.verdict.skipped, true);
+  assert.equal(readCount(counterPath), 0, 'judgeDiscovery must never spawn when a real registered worktree already holds the locked CONTEXT.md');
+});
+
+// --- D2 verify-overwrite guard (tsk-1ni): an already-real work.verify must
+// survive a clear verdict on EITHER path (skip-and-advance or real judge)
+// -- the placeholder-falls-through-to-FALLBACK_VERIFY/contextApprove.verify
+// direction is already covered above by the pre-existing tests (sampleWork
+// now defaults to the real production placeholder, RETIRED_P14_PLACEHOLDER,
+// so those tests already exercise the "not real yet" branch of the guard
+// unchanged). These two cover the new "already real" branch specifically. -
+
+test('resolveDiscovery skip path preserves an existing real work.verify instead of falling back to FALLBACK_VERIFY (D2)', () => {
+  const scriptDir = mkTempDir();
+  const { scriptPath, counterPath } = writeCountingRawStdoutExecutor(scriptDir, JSON.stringify({ clear: true, verify: 'should never run' }));
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  const docsRef = mkLockedContextFixture(storeDir);
+  addWork(storeDir, sampleWork({ docsRef, verify: 'node --test test/real-locked-item.test.mjs' }));
+  // no contextApprove gate record -- pre-D2, this would have fallen through
+  // to FALLBACK_VERIFY despite work.verify already being real.
+
+  const result = resolveDiscovery(storeDir, 'item-x', cfg, 'session');
+  assert.equal(result.outcome, 'clear');
+  assert.equal(readCount(counterPath), 0);
+
+  const view = listWork(storeDir);
+  assert.equal(view.work['item-x'].verify, 'node --test test/real-locked-item.test.mjs');
+});
+
+test('resolveDiscovery real-judge path preserves an existing real work.verify instead of overwriting it with the model\'s own guess (D2, tsk-5e97/tsk-3sw shape)', () => {
+  const scriptDir = mkTempDir();
+  const scriptPath = writeVerdictWithVerifyCheckExecutor(scriptDir, { clear: true, verify: 'npm test' });
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  // no docsRef/CONTEXT.md -- forces the real judgeDiscovery path, not skip.
+  addWork(storeDir, sampleWork({ verify: 'node --test test/intake/decompose.test.mjs' }));
+
+  const result = resolveDiscovery(storeDir, 'item-x', cfg, 'session');
+  assert.equal(result.outcome, 'clear');
+  assert.equal(result.verdict.verify, 'npm test', 'the model still proposed its own guess in the verdict record');
+
+  const view = listWork(storeDir);
+  assert.equal(
+    view.work['item-x'].verify,
+    'node --test test/intake/decompose.test.mjs',
+    'the already-locked real verify must survive, not the model\'s broader guess',
+  );
+});
+
+test('resolveDiscovery real-judge path still fills an empty/placeholder work.verify with the model\'s guess (unchanged behavior)', () => {
+  const scriptDir = mkTempDir();
+  const scriptPath = writeVerdictWithVerifyCheckExecutor(scriptDir, { clear: true, verify: 'npm test' });
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork({ verify: RETIRED_P14_PLACEHOLDER }));
+
+  const result = resolveDiscovery(storeDir, 'item-x', cfg, 'session');
+  assert.equal(result.outcome, 'clear');
+
+  const view = listWork(storeDir);
+  assert.equal(view.work['item-x'].verify, 'npm test');
+  assert.notEqual(view.work['item-x'].verify, FALLBACK_VERIFY);
 });
 
 // --- caller-supplied verdict (tsk-27y D1/D2): resolveDiscovery skips

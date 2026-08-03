@@ -3,10 +3,12 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { judgeDecompose, resolveDecompose } from '../../src/intake/decompose.mjs';
+import { execFileSync } from 'node:child_process';
+import { judgeDecompose, resolveDecompose, resolveContentRoot } from '../../src/intake/decompose.mjs';
 import { readScoutNotes } from '../../src/intake/judge-executor.mjs';
 import { computeImpact, computePriority, effortForMode } from '../../src/state/priority-formula.mjs';
 import { addWork, listWork, StoreError, categoryOf, moveWork, readRawEvents, recordGateApprove } from '../../src/state/store.mjs';
+import { createWorktree } from '../../src/runner/worktree.mjs';
 
 // Fake executors only — every "command" spawned here is a node script this
 // file writes to a mkdtemp directory at test time, mirroring
@@ -1621,6 +1623,154 @@ test('resolveDecompose real pass-through path (via judgeDecompose) still prefers
 
   const view = listWork(storeDir);
   assert.equal(view.work['item-x'].verify, 'node --test test/real-standard-item.test.mjs');
+});
+
+// --- resolveContentRoot (tsk-1ni D1): mkPlanFixture above builds its
+// content as a sibling of storeDir, so repoRoot == content-root by
+// construction -- exactly the coincidence discovery.test.mjs's own
+// mkLockedContextFixture comment already named as what let the real
+// repoRoot bug ship uncaught. Those existing tests above still pass
+// unchanged because that coincidence lands resolveContentRoot on its OWN
+// third (stateRoot) fallback branch when neither process.cwd() nor a real
+// registered worktree hold the content -- covered implicitly, not a gap.
+// These two tests cover the other two branches explicitly, with a REAL
+// git repo/worktree instead of a coincidental sibling directory. ---
+
+function initTempGitRepoWithStore() {
+  const repoRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-resolve-content-root-repo-'));
+  execFileSync('git', ['init', '-q'], { cwd: repoRoot });
+  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: repoRoot });
+  execFileSync('git', ['config', 'user.name', 'Test'], { cwd: repoRoot });
+  fs.writeFileSync(path.join(repoRoot, 'seed.txt'), 'seed\n');
+  execFileSync('git', ['add', 'seed.txt'], { cwd: repoRoot });
+  execFileSync('git', ['commit', '-q', '-m', 'init'], { cwd: repoRoot });
+  const storeDir = path.join(repoRoot, '.fgos');
+  fs.mkdirSync(storeDir, { recursive: true });
+  return { repoRoot, storeDir };
+}
+
+test('resolveContentRoot finds a real plan.md via process.cwd() when neither the state root nor any worktree hold it', () => {
+  const { storeDir } = initTempGitRepoWithStore();
+
+  const contentDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-resolve-content-root-cwd-'));
+  const featureDir = path.join(contentDir, 'feature');
+  fs.mkdirSync(featureDir, { recursive: true });
+  fs.writeFileSync(path.join(featureDir, 'plan.md'), 'mode = **tiny** (1 file, direct task).\n');
+
+  const originalCwd = process.cwd();
+  process.chdir(contentDir);
+  let resolved;
+  try {
+    resolved = resolveContentRoot(path.dirname(storeDir), 'item-x', 'feature');
+  } finally {
+    process.chdir(originalCwd);
+  }
+
+  assert.equal(resolved, contentDir);
+});
+
+test('resolveDecompose skips judgeDecompose when plan.md is only reachable via process.cwd() (D1 branch 1, real end-to-end)', () => {
+  const { storeDir } = initTempGitRepoWithStore();
+  const { scriptPath, counterPath } = writeCountingRawStdoutExecutor(
+    mkTempDir(),
+    JSON.stringify({ verdict: 'decompose', reason: 'should never run', children: [{ title: 'x', verify: 'npm test' }] }),
+  );
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const contentDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-resolve-content-root-cwd-e2e-'));
+  const featureDir = path.join(contentDir, 'feature');
+  fs.mkdirSync(featureDir, { recursive: true });
+  fs.writeFileSync(path.join(featureDir, 'plan.md'), 'mode = **tiny** (1 file, direct task).\n');
+
+  addWork(storeDir, sampleWork({ docsRef: 'feature' }));
+  recordGateApprove(storeDir, { id: 'item-x', gate: 'planApprove', actor: 'human', verify: 'npm test -- cwd-hit' });
+
+  const originalCwd = process.cwd();
+  process.chdir(contentDir);
+  let result;
+  try {
+    result = resolveDecompose(storeDir, 'item-x', cfg, 'session');
+  } finally {
+    process.chdir(originalCwd);
+  }
+
+  assert.equal(result.outcome, 'pass-through');
+  assert.equal(readCount(counterPath), 0, 'judgeDecompose must never spawn when cwd already holds the locked plan.md');
+});
+
+test('resolveContentRoot finds a real committed plan.md via git worktree list when cwd does not hold it (D1 branch 2, crash-recovery case)', () => {
+  const { repoRoot, storeDir } = initTempGitRepoWithStore();
+
+  const worktreeBase = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-resolve-content-root-wt-'));
+  const { path: worktreePath } = createWorktree(repoRoot, 'item-x', { worktreeDir: worktreeBase });
+  const featureDir = path.join(worktreePath, 'feature');
+  fs.mkdirSync(featureDir, { recursive: true });
+  fs.writeFileSync(path.join(featureDir, 'plan.md'), 'mode = **tiny** (1 file, direct task).\n');
+  execFileSync('git', ['add', 'feature'], { cwd: worktreePath });
+  execFileSync('git', ['commit', '-q', '-m', 'plan: item-x'], { cwd: worktreePath });
+
+  const elsewhere = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-resolve-content-root-elsewhere-'));
+  const originalCwd = process.cwd();
+  process.chdir(elsewhere);
+  let resolved;
+  try {
+    resolved = resolveContentRoot(repoRoot, 'item-x', 'feature');
+  } finally {
+    process.chdir(originalCwd);
+  }
+
+  assert.equal(resolved, worktreePath);
+});
+
+test('resolveDecompose skips judgeDecompose when plan.md is only reachable via a real registered worktree (D1 branch 2, real end-to-end)', () => {
+  const { repoRoot, storeDir } = initTempGitRepoWithStore();
+  const { scriptPath, counterPath } = writeCountingRawStdoutExecutor(
+    mkTempDir(),
+    JSON.stringify({ verdict: 'decompose', reason: 'should never run', children: [{ title: 'x', verify: 'npm test' }] }),
+  );
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const worktreeBase = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-resolve-content-root-wt-e2e-'));
+  const { path: worktreePath } = createWorktree(repoRoot, 'item-x', { worktreeDir: worktreeBase });
+  const featureDir = path.join(worktreePath, 'feature');
+  fs.mkdirSync(featureDir, { recursive: true });
+  fs.writeFileSync(path.join(featureDir, 'plan.md'), 'mode = **tiny** (1 file, direct task).\n');
+  execFileSync('git', ['add', 'feature'], { cwd: worktreePath });
+  execFileSync('git', ['commit', '-q', '-m', 'plan: item-x'], { cwd: worktreePath });
+
+  addWork(storeDir, sampleWork({ docsRef: 'feature' }));
+  recordGateApprove(storeDir, { id: 'item-x', gate: 'planApprove', actor: 'human', verify: 'npm test -- worktree-hit' });
+
+  const elsewhere = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-resolve-content-root-elsewhere-e2e-'));
+  const originalCwd = process.cwd();
+  process.chdir(elsewhere);
+  let result;
+  try {
+    result = resolveDecompose(storeDir, 'item-x', cfg, 'session');
+  } finally {
+    process.chdir(originalCwd);
+  }
+
+  assert.equal(result.outcome, 'pass-through');
+  assert.equal(readCount(counterPath), 0, 'judgeDecompose must never spawn when a real registered worktree already holds the locked plan.md');
+});
+
+test('resolveContentRoot falls back to stateRoot when neither cwd nor any registered worktree hold the content (D1 branch 3, unchanged behavior)', () => {
+  const { repoRoot, storeDir } = initTempGitRepoWithStore();
+  fs.mkdirSync(path.join(repoRoot, 'feature'), { recursive: true });
+  fs.writeFileSync(path.join(repoRoot, 'feature', 'plan.md'), 'mode = **tiny** (1 file, direct task).\n');
+
+  const elsewhere = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-resolve-content-root-fallback-'));
+  const originalCwd = process.cwd();
+  process.chdir(elsewhere);
+  let resolved;
+  try {
+    resolved = resolveContentRoot(repoRoot, 'item-x', 'feature');
+  } finally {
+    process.chdir(originalCwd);
+  }
+
+  assert.equal(resolved, repoRoot);
 });
 
 // --- caller-supplied verdict (tsk-27y D1/D2/D3): resolveDecompose skips

@@ -19,6 +19,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { execFileSync } from 'node:child_process';
 import { modelForTier } from '../runner/dispatch.mjs';
 import { loadTemplate } from '../runner/prompt-templates.mjs';
 import { runJudgeExecutor, JUDGE_STRICT_JSON_SUFFIX, judgeVerifySemanticCorrectness, readScoutNotes } from './judge-executor.mjs';
@@ -28,6 +29,7 @@ import { listWork, moveStage, moveWork, addWork, putInAwaiting, addDecision, edi
 import { rankImpact } from '../state/impact.mjs';
 import { computeImpact, computePriority, effortForMode, MODE_EFFORT } from '../state/priority-formula.mjs';
 import { footprintOverlapAmong } from '../state/graph-metrics.mjs';
+import { branchNameFor, findCheckoutPath } from '../runner/worktree.mjs';
 
 // Best-effort read of the locked-decisions artifacts fgos-exploring/
 // fgos-planning write under `work.docsRef` (docs/history/<feature>/). A
@@ -57,6 +59,51 @@ export function readLockedContext(repoRoot, docsRef) {
     }
   }
   return sections.join('\n\n');
+}
+
+// CONTENT-ROOT RESOLUTION (tsk-1ni D1): every caller of readLockedContext
+// used to pass `stateRoot` (`path.dirname(dir)`, always the main checkout
+// per ADR0020) as the content root too -- but fgos-exploring/fgos-planning
+// commit CONTEXT.md/plan.md to the item's OWN fgw/<id> branch/worktree,
+// never to main, so that always missed the real content in the standard
+// interactive workflow (the exact scenario the trust-signal shortcuts
+// above exist to serve). Tries, in order, first hit wins:
+// 1) `process.cwd()` -- the common case: an interactive session invokes
+//    `fgos discover`/`fgos decompose` from inside the worktree it just
+//    committed to (fgos-exploring's/fgos-planning's own hard rule: commit
+//    before calling either verb). Zero extra cost.
+// 2) the item's own fgw/<id> worktree via `git worktree list --porcelain`
+//    (`findCheckoutPath`, the exact parse `promote-preflight.mjs` already
+//    reuses for the same "is this branch checked out somewhere" question)
+//    -- covers the crashed-mid-session case tsk-ozl D3 named as the
+//    reason a sweep should trust a committed CONTEXT.md even with no live
+//    session attached: the worktree still exists on disk after the
+//    session that created it ends.
+// 3) `stateRoot` itself -- today's prior behavior, last resort: the
+//    item's branch already merged to main (content really does live at
+//    stateRoot now), or a genuinely untouched item with nothing to find
+//    either way (correctly fails open to a real judge call, unchanged).
+// Never throws: any git/fs failure at a candidate just falls through to
+// the next one, ending at the always-available stateRoot.
+export function resolveContentRoot(stateRoot, id, docsRef) {
+  const candidates = [process.cwd()];
+  try {
+    const listing = execFileSync('git', ['worktree', 'list', '--porcelain'], {
+      cwd: stateRoot,
+      encoding: 'utf8',
+      shell: false,
+    });
+    const worktreePath = findCheckoutPath(listing, branchNameFor(id));
+    if (worktreePath) candidates.push(worktreePath);
+  } catch {
+    // no git, or worktree list failed -- fall through to stateRoot
+  }
+  candidates.push(stateRoot);
+
+  for (const candidate of candidates) {
+    if (readLockedContext(candidate, docsRef)) return candidate;
+  }
+  return stateRoot;
 }
 
 const DEFAULT_NEED_HUMAN_REASON =
@@ -497,6 +544,7 @@ export function resolveDecompose(dir, id, cfg, role, callerVerdict) {
     return { outcome: 'already-decomposed', id };
   }
 
+  const stateRoot = path.dirname(dir);
   let verdict;
   if (callerVerdict) {
     // tsk-27y D2: caller-supplied verdict checked FIRST, before the plan.md
@@ -518,7 +566,13 @@ export function resolveDecompose(dir, id, cfg, role, callerVerdict) {
         'tsk-27y D2/D3: caller-supplied verdict — session already reasoned live (fgos-planning), skipping judgeDecompose subprocess; downstream gates (heavy-risk/blast-radius/footprint-overlap) still apply unconditionally, same as a model verdict',
     });
   } else {
-    const repoRoot = path.dirname(dir);
+    // repoRoot (tsk-1ni D1): resolved to the item's own worktree when one
+    // exists, never the raw state root -- see resolveContentRoot's own
+    // comment above. Reused below for BOTH readLockedContext's own read AND
+    // judgeDecompose's scoutContext (readScoutNotes/writeScoutNotes) -- same
+    // variable, same bug, same fix; scout-notes.md belongs under docsRef in
+    // the item's own worktree exactly like CONTEXT.md/plan.md do.
+    const repoRoot = resolveContentRoot(stateRoot, id, work.docsRef);
     const lockedContext = readLockedContext(repoRoot, work.docsRef);
 
     // DECOMPOSE-SIDE SKIP-AND-ADVANCE (tsk-19j D1/D3/D7, closes gap 3) —
