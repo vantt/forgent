@@ -1703,9 +1703,19 @@ async function runVerb(verb, flags, positional, dir) {
       // (`loop.mjs`) and must keep being able to. `blocked` + branch-exists
       // is likewise untouched — that is the branch-take path (`isBranchTake`),
       // a main-checkout claim that already records branch source correctly.
+      // repoRoot from --dir, never raw process.cwd() (tsk-k8u D2): a
+      // caller running this from inside a linked worktree (e.g. a session
+      // mid-clarify/decompose, per claim-lock §3b) always passes --dir at
+      // the stable main checkout — deriving repoRoot from it keeps every
+      // git op in this handler targeting that stable root instead of the
+      // caller's own possibly-transient cwd. Byte-identical to before when
+      // --dir is omitted (dataDir() resolves dir from process.cwd() too in
+      // that case).
+      const repoRoot = path.dirname(dir);
+
       const claiming = listWork(dir).work[id];
       const claimingBranch = branchNameFor(id);
-      if (claiming?.status === 'todo' && branchExists(process.cwd(), claimingBranch)) {
+      if (claiming?.status === 'todo' && branchExists(repoRoot, claimingBranch)) {
         throw new StoreError(
           'validation',
           `take: "${id}" already has its own branch ${claimingBranch}, so its work lives there, not on the main checkout — a take here would claim source:main and record a headAtTake that never advances, making a later "return" refuse. Use "fgos pick ${id}" to claim the branch and its worktree instead.`,
@@ -1719,7 +1729,7 @@ async function runVerb(verb, flags, positional, dir) {
         id,
         actor: role,
         isolate: false,
-        repoRoot: process.cwd(),
+        repoRoot,
       });
       try {
         return noWait ? doTake() : await withLockRetry(doTake, { waitMs });
@@ -1770,20 +1780,29 @@ async function runVerb(verb, flags, positional, dir) {
       // executing boundary, claim-lock §3b) reattaches to that same branch
       // tip via createWorktree's reuse path instead of forking a new one.
       const { noWait, waitMs } = parseWaitFlags(flags, 'pick');
-      // worktreeDir under .claude/worktrees/ (tsk-424 D1/D2): the harness's
-      // own EnterWorktree tool only allows a second-or-later in-session
-      // switch when the target sits there, e.g. a root item decomposing
-      // into a child mid-session. os.tmpdir()/fgos-worktrees (createWorktree's
-      // own default) fails that check past the first switch — pick is the
-      // only caller that needs the harness-chainable location; runner/
+      // repoRoot from --dir, never raw process.cwd() (tsk-k8u D1/D2): a
+      // claim-release + re-pick run from inside the very worktree being
+      // torn down (e.g. the claim-lock §3b reattach above) must never
+      // target git operations at that doomed cwd — deriving repoRoot from
+      // --dir keeps them at the stable main checkout instead. Same
+      // no-op-when---dir-is-omitted behavior as take's own fix above.
+      const repoRoot = path.dirname(dir);
+      // worktreeDir under repoRoot's .claude/worktrees/ (tsk-424 D1/D2,
+      // tsk-k8u D2: derived from the same fixed repoRoot, not
+      // process.cwd(), for the same reason): the harness's own
+      // EnterWorktree tool only allows a second-or-later in-session switch
+      // when the target sits there, e.g. a root item decomposing into a
+      // child mid-session. os.tmpdir()/fgos-worktrees (createWorktree's own
+      // default) fails that check past the first switch — pick is the only
+      // caller that needs the harness-chainable location; runner/
       // merge-ephemeral callers are untouched.
       const doPick = () => claimWork(dir, {
         id,
         actor: 'session',
         isolate: true,
         claimTrigger,
-        repoRoot: process.cwd(),
-        worktreeDir: path.join(process.cwd(), '.claude', 'worktrees'),
+        repoRoot,
+        worktreeDir: path.join(repoRoot, '.claude', 'worktrees'),
       });
       try {
         return noWait ? doPick() : await withLockRetry(doPick, { waitMs });

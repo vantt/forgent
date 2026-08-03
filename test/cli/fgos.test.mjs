@@ -3268,6 +3268,31 @@ test('take --id not found is rejected as validation, exit 4', () => {
   assert.equal(result.status, 4);
 });
 
+// tsk-k8u D1/D2 regression guard: take used to pass repoRoot: process.cwd()
+// to claimWork, independent of --dir -- a session running it (as instructed)
+// from inside a .fgos/-less linked worktree with --dir pointed at the real
+// root would record headAtTake against the WORKTREE's own HEAD instead of
+// the real root's. Same "pin repoRoot to --dir like every other verb"
+// pattern tsk-1wn already fixed for docs-index (see tmpLinkedWorktree above).
+test('take --id from --dir records headAtTake against the real root, not the worktree cwd (tsk-k8u D1/D2)', () => {
+  const { main, wt } = tmpLinkedWorktree();
+  addOk(main, 'pull-via-dir');
+  // Advance main's own HEAD past wt's fork point so headAtTake can actually
+  // discriminate "read from --dir's root" vs "read from the worktree cwd" —
+  // without this, both share the same commit and the assertion below would
+  // pass by coincidence even under the pre-fix process.cwd() bug.
+  commitFile(main, 'advance-main.txt');
+  const headBefore = gitHead(main);
+  assert.notEqual(headBefore, gitHead(wt), 'test setup must diverge main from wt before asserting');
+
+  const result = run(wt, ['take', '--id', 'pull-via-dir', '--dir', main]);
+  assert.equal(result.status, 0, `take --dir failed: ${result.stderr}`);
+
+  const view = stateView(main);
+  assert.equal(view.work['pull-via-dir'].status, 'doing');
+  assert.equal(view.work['pull-via-dir'].headAtTake, headBefore, 'take --dir must record HEAD from --dir\'s root, not the worktree cwd');
+});
+
 // --- pick: take + createWorktree combined (str83-fgos-slash-commands-4) ---
 
 test('pick with no --id claims the frontier head exactly like take does today, role fixed to "session", and stands up a real (non-detached) git branch/worktree for the claim', () => {
@@ -3313,6 +3338,69 @@ test('pick with no --id claims the frontier head exactly like take does today, r
   assert.doesNotThrow(() =>
     execFileSync('git', ['symbolic-ref', '-q', 'HEAD'], { cwd: data.worktree.path, stdio: 'ignore' }),
   );
+});
+
+// tsk-k8u D1/D2 regression guard: pick used to derive BOTH repoRoot and
+// worktreeDir from process.cwd(), independent of --dir -- a session
+// running it (as instructed) from inside a .fgos/-less linked worktree with
+// --dir pointed at the real root would stand up the new worktree under the
+// WORKTREE's own .claude/worktrees/ instead of the real root's (D2), and
+// (D1) risk targeting git ops at the worktree cwd for anything reclaimed.
+// Same "pin repoRoot to --dir" pattern tsk-1wn already fixed for docs-index.
+test('pick --id from --dir stands up the worktree under --dir\'s own .claude/worktrees/, not the invoking worktree cwd\'s (tsk-k8u D1/D2)', () => {
+  const { main, wt } = tmpLinkedWorktree();
+  addOk(main, 'pick-via-dir');
+
+  const result = run(wt, ['pick', '--id', 'pick-via-dir', '--dir', main]);
+  assert.equal(result.status, 0, `pick --dir failed: ${result.stderr}`);
+  const data = envelopeData(result.stdout);
+  assert.ok(fs.existsSync(data.worktree.path), 'pick --dir must leave a real worktree checkout on disk');
+  assert.ok(
+    data.worktree.path.startsWith(path.join(main, '.claude', 'worktrees') + path.sep),
+    `pick --dir worktree path "${data.worktree.path}" must live under --dir's own .claude/worktrees/, not the invoking cwd's`,
+  );
+  assert.ok(
+    !data.worktree.path.startsWith(wt),
+    'pick --dir must never place the new worktree under the invoking (worktree-resident) cwd',
+  );
+
+  const view = stateView(main);
+  assert.equal(view.work['pick-via-dir'].status, 'doing');
+});
+
+// tsk-k8u repro (2026-08-02, tsk-2ie): a claim-release + re-pick sequence
+// run FROM INSIDE the item's own already-existing worktree used to crash
+// with `spawnSync git ENOENT` -- worktreeDir was ALSO process.cwd()-based,
+// so the second pick's worktreeDir (the worktree's own path) didn't match
+// where the checkout was actually registered (under main's worktreeDir),
+// createClaimWorktree's reattach check failed, and it fell through to
+// createWorktree's reclaim path with repoRoot === the worktree about to be
+// force-removed. With repoRoot/worktreeDir both fixed to derive from --dir,
+// worktreeDir stays the SAME stable path across both pick calls, so
+// createClaimWorktree's reattach succeeds instead — same path, no removal,
+// no crash, an even safer outcome than reclaim-and-recreate would be.
+test('pick --id reattaches to its own already-existing worktree/branch when invoked FROM INSIDE that worktree via --dir, without crashing (tsk-k8u repro)', () => {
+  const main = initGitCwd();
+  run(main, ['init']);
+  addOk(main, 'reclaim-from-inside');
+
+  const firstPick = envelopeData(run(main, ['pick', '--id', 'reclaim-from-inside']).stdout);
+  const ownWorktree = firstPick.worktree.path;
+
+  // Simulate the claim-lock §3b release (item reached executing, claim
+  // released back to todo) while the branch/worktree still stand.
+  assert.equal(run(main, ['move', 'reclaim-from-inside', '--to', 'todo', '--expect', 'doing']).status, 0);
+
+  // Re-pick FROM INSIDE the item's own worktree, --dir pointed at main —
+  // repoRoot/worktreeDir must resolve to main (stable), never ownWorktree
+  // (which the pre-fix bug would have force-removed out from under this
+  // very call).
+  const result = run(ownWorktree, ['pick', '--id', 'reclaim-from-inside', '--dir', main]);
+  assert.equal(result.status, 0, `pick --dir from inside its own worktree failed: ${result.stderr}`);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.worktree.reused, true);
+  assert.equal(data.worktree.path, ownWorktree, 'a stable repoRoot/worktreeDir makes this a clean reattach to the SAME checkout, not a force-remove-and-recreate');
+  assert.ok(fs.existsSync(data.worktree.path));
 });
 
 test('pick --id claims that specific item, role fixed to "session" — pick has no --role flag at all, unlike take', () => {
