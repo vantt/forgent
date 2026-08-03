@@ -6,16 +6,23 @@
 
 import { createHash } from 'node:crypto';
 import { HEAVY_KEYWORDS } from './risk-keywords.mjs';
-
-// D4: cut the title at the first sentence/line boundary; fall back to a
-// truncated prefix when the text has no natural boundary within reach. Both
-// the cut rule and this length are this cell's discretion (CONTEXT.md).
-const TITLE_MAX_LENGTH = 60;
+// work.mjs is a pure, dependency-free module (it imports only the equally pure
+// workflow-stage-graphs.mjs), so taking the shared title bound from it keeps
+// this file's own "deterministic, synchronous transform" promise intact. The
+// same import direction decompose.mjs and discovery.mjs already use.
+import { truncateTitle } from '../state/work.mjs';
 
 /**
- * Derive a title from a free-text submission blob (D4). Never throws: any
+ * Derive a title from a free-text submission blob (D4): cut at the first
+ * sentence/line boundary, and bound whatever comes out. Never throws: any
  * non-string or blank input falls back to a fixed placeholder title so the
  * caller always gets a non-empty string (work.mjs requires non-empty title).
+ *
+ * Both exits are bounded, per work-item-title-contract D2. Only the no-boundary
+ * exit used to be — a first sentence that ran on for a whole paragraph came
+ * back whole, which is how 32 of 54 stored titles ended up past the bound. The
+ * store doors bound titles too, but this call still has to: its result feeds
+ * generateId before addWork ever sees it.
  */
 export function deriveTitle(text) {
   const safeText = typeof text === 'string' ? text.trim() : '';
@@ -24,15 +31,10 @@ export function deriveTitle(text) {
   const boundary = safeText.match(/[.!?](?:\s|$)|\n/);
   if (boundary && boundary.index > 0) {
     const candidate = safeText.slice(0, boundary.index).trim();
-    if (candidate) return candidate;
+    if (candidate) return truncateTitle(candidate);
   }
 
-  if (safeText.length <= TITLE_MAX_LENGTH) return safeText;
-
-  const truncated = safeText.slice(0, TITLE_MAX_LENGTH);
-  const lastSpace = truncated.lastIndexOf(' ');
-  const cut = lastSpace > 0 ? truncated.slice(0, lastSpace) : truncated;
-  return cut.trim();
+  return truncateTitle(safeText);
 }
 
 // D1/D5 keyword tables — mechanical, deterministic, always overridable by the

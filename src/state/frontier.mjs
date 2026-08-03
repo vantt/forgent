@@ -75,7 +75,15 @@ import { getDomain, stageForStep } from './workflow-stage-graphs.mjs';
 // superset of v1, not a behavior change for existing data.
 export const FRONTIER_ORDER_VERSION = 2;
 
-export function frontier(view) {
+// `step` (tsk-19j D9, generalized for fgos-coding-driving's own loop):
+// which domain step counts as "ready to start" — defaults to `'Execute'`
+// (every pre-existing caller, unparameterized, gets byte-identical
+// behavior). A driver loop wanting the frontier for an earlier step (e.g.
+// `'Clarify'`/`'Divide'`, mirroring discover-loop/planning-loop's own
+// pools) passes it explicitly; `isDepsAndLineageReady` below already covers
+// the stage-independent half of readiness this parameterizes the stage half
+// of.
+export function frontier(view, { step = 'Execute' } = {}) {
   const work = view?.work ?? {};
   const childrenByParent = indexChildrenByParent(work);
   const ready = [];
@@ -87,7 +95,13 @@ export function frontier(view) {
     // 'coding' with a diagnostic warning, so a corrupt/rolled-back domain
     // value can never wedge the frontier derive itself.
     const domain = getDomain(item.domain);
-    const executeStage = stageForStep(domain, 'Execute');
+    const executeStage = stageForStep(domain, step);
+    // A domain that never maps `step` at all (e.g. `synthetic` has no
+    // Clarify/Divide, only Execute -> `assembling`) has NO item ready for
+    // it, full stop -- guarded separately from the `??` fallback below,
+    // which would otherwise wrongly admit an item with no `stage` field at
+    // all (undefined ?? undefined === undefined, a false tie).
+    if (executeStage === undefined) continue;
     if ((item.stage ?? executeStage) !== executeStage) continue;
     if (hasOpenDescendant(id, work, childrenByParent)) continue;
     const depsReady = item.deps.every((dep) => RESOLVED_STATUSES.has(work[dep]?.status));
@@ -111,7 +125,7 @@ export function isDepsAndLineageReady(view, id) {
   if (!item) return false;
   const childrenByParent = indexChildrenByParent(work);
   if (hasOpenDescendant(id, work, childrenByParent)) return false;
-  return item.deps.every((dep) => work[dep]?.status === 'done');
+  return item.deps.every((dep) => RESOLVED_STATUSES.has(work[dep]?.status));
 }
 
 // v2 comparator (D2/D6): priority ASC absent-last, then intent DESC
@@ -147,17 +161,29 @@ function indexChildrenByParent(work) {
   return index;
 }
 
-// A status is RESOLVED when nothing further will ever happen to an item
-// holding it — the FSM's two terminal states (fsm.mjs: zero outgoing
-// edges from either): 'done' (actually built) and, per
+// A status is RESOLVED when nothing further will happen to an item that
+// could still change the CODE/graph state a dependent or lineage check
+// cares about — the FSM's two fully-terminal states (fsm.mjs: zero
+// outgoing edges from either), 'done' (actually built) and, per
 // fsm-wontfix-terminal-status D1/D4, 'wontfix' (deliberately closed
-// without being built, symmetric with 'done'). Exported so every other
-// consumer that needs "is this item resolved enough to stop counting it
-// as open" (deps-readiness in this module's own `depsReady`, plus
-// claim-port.mjs/impact.mjs/graph-metrics.mjs/entropy.mjs — see
-// wontfix-terminal-status-filter-consistency D1/D2/D3) shares this one
-// two-element set instead of six separate ad-hoc re-declarations.
-export const RESOLVED_STATUSES = new Set(['done', 'wontfix']);
+// without being built, symmetric with 'done') — PLUS, per work-item-
+// status-delivered-retrospective-cleanup D13, every status from
+// `delivered` onward (`delivered`/`retrospective`/`cleanup`): once code is
+// merged (`delivered`), retrospective synthesis and worktree cleanup are
+// administrative/learning steps that never change the code itself, so a
+// dependent has no reason to keep waiting on them (frontier.mjs's own
+// original D5 comment already defined 'done' for THIS purpose as "accepted
+// into the main tree" — `delivered` is the precise, earlier match for that
+// definition; the old 'done'-only set conflated "merged" with "fully
+// closed out"). `fgos rollup`'s progress-reporting count is a SEPARATE
+// module and intentionally does NOT share this set — it still counts
+// strict `done` only. Exported so every other consumer that needs "is this
+// item resolved enough to stop counting it as open" (deps-readiness in
+// this module's own `depsReady`, plus claim-port.mjs/impact.mjs/
+// graph-metrics.mjs/entropy.mjs/graph-harness.mjs — see
+// wontfix-terminal-status-filter-consistency D1/D2/D3) shares this one set
+// instead of separate ad-hoc re-declarations.
+export const RESOLVED_STATUSES = new Set(['delivered', 'retrospective', 'cleanup', 'done', 'wontfix']);
 
 // True when `id` has any descendant (direct child, or a descendant reachable
 // through further `parent` chains below a child) whose status is not yet

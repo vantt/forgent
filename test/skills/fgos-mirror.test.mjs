@@ -77,3 +77,30 @@ test('every mirrored file pair is byte-identical', () => {
     }
   }
 });
+
+// tsk-53h: `_shared/` holds skill-facing fragments referenced by path from
+// multiple `fgos-*` SKILL.md files (not itself `fgos-*`-prefixed, so the
+// scan above never reaches it) — same drift risk as any other mirrored
+// skill content, so it needs the same byte-identical enforcement.
+const CLAUDE_SHARED = path.join(CLAUDE_SKILLS_ROOT, '_shared');
+const AGENTS_SHARED = path.join(AGENTS_SKILLS_ROOT, '_shared');
+
+test('.claude/skills/_shared and .agents/skills/_shared mirror each other byte-identically', () => {
+  const claudeExists = fs.existsSync(CLAUDE_SHARED);
+  const agentsExists = fs.existsSync(AGENTS_SHARED);
+  assert.equal(agentsExists, claudeExists, '_shared must exist on both sides or neither');
+  if (!claudeExists) return;
+
+  const claudeFiles = listFilesRecursive(CLAUDE_SHARED);
+  const agentsFiles = listFilesRecursive(AGENTS_SHARED);
+  assert.deepEqual(agentsFiles, claudeFiles, '_shared: the two trees list different files — a mirror must not add or drop files on either side');
+
+  for (const relativePath of claudeFiles) {
+    const claudeBytes = fs.readFileSync(path.join(CLAUDE_SHARED, relativePath));
+    const agentsBytes = fs.readFileSync(path.join(AGENTS_SHARED, relativePath));
+    assert.ok(
+      claudeBytes.equals(agentsBytes),
+      `_shared/${relativePath} differs between .claude/skills and .agents/skills`,
+    );
+  }
+});

@@ -1,7 +1,8 @@
-import { test } from 'node:test';
+import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
+import os from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 import { buildEnduserIndex, findSourceCaptureId, findSourceCaptureIds, QUADRANT_META, QUADRANTS } from '../../src/report/enduser-index.mjs';
@@ -38,6 +39,37 @@ function hasRealCompoundHistory(outcomeId) {
     return false;
   }
 }
+
+// tsk-2ce: `runDocsIndex()` above deliberately writes the REAL tracked
+// MANIFEST_PATH (no proxy, see its own comment) -- run from a linked
+// worktree (no `.fgos/`, ADR0020) the outcomes view it folds is empty, so
+// every sourceCaptureId in the regenerated file comes back null and a
+// plain `npm test` leaves the tracked file dirty with degraded content.
+// Snapshotting the real content here and restoring it once the whole
+// suite finishes keeps every assertion below reading the real freshly
+// regenerated manifest during the run, while leaving no side effect on
+// disk afterward -- npm test verifies, it does not regenerate (that is
+// `fgos-indexing`'s own deliberate, separate action). Plain fs, no git,
+// mirrors this file's own tutorialsDir/hiddenDir rename-then-restore
+// precedent below.
+let manifestSnapshot;
+
+before(() => {
+  try {
+    manifestSnapshot = fs.readFileSync(MANIFEST_PATH, 'utf8');
+  } catch (err) {
+    if (err.code !== 'ENOENT') throw err;
+    manifestSnapshot = undefined;
+  }
+});
+
+after(() => {
+  if (manifestSnapshot === undefined) {
+    fs.rmSync(MANIFEST_PATH, { force: true });
+  } else {
+    fs.writeFileSync(MANIFEST_PATH, manifestSnapshot, 'utf8');
+  }
+});
 
 // --- pure buildEnduserIndex/findSourceCaptureId (per entropy.test.mjs's own
 // precedent: hand-built inputs, no fs, no real store) -----------------------
@@ -166,6 +198,13 @@ test('fgos docs-index tolerates a missing quadrant dir (tutorials has no alias) 
   const tutorialsDir = path.join(REPO_ROOT, 'docs', 'tutorials');
   const hiddenDir = path.join(REPO_ROOT, 'docs', '.tutorials-hidden-for-test');
   assert.ok(fs.existsSync(tutorialsDir), 'expected docs/tutorials to exist today so this test can hide it');
+  // tsk-f31: snapshot the manifest as it stood before this test's own
+  // docs-index call, so it can be restored verbatim afterward — not just
+  // the directory. Otherwise this test's own transient write (tutorials
+  // genuinely absent) becomes the "previous" state a LATER store-unreachable
+  // run reads back from, permanently losing a real sourceCaptureId that was
+  // never actually lost, only hidden mid-suite.
+  const manifestBefore = fs.existsSync(MANIFEST_PATH) ? fs.readFileSync(MANIFEST_PATH, 'utf8') : undefined;
   fs.renameSync(tutorialsDir, hiddenDir);
   try {
     const result = runDocsIndex();
@@ -175,8 +214,106 @@ test('fgos docs-index tolerates a missing quadrant dir (tutorials has no alias) 
       assert.notEqual(entry.quadrant, 'tutorials');
     }
   } finally {
+    if (manifestBefore !== undefined) fs.writeFileSync(MANIFEST_PATH, manifestBefore, 'utf8');
+    else fs.rmSync(MANIFEST_PATH, { force: true });
     fs.renameSync(hiddenDir, tutorialsDir);
   }
+});
+
+// --- tsk-f31: docs-index on an unreachable store (no --dir, no REPO_ROOT --
+// each test builds its own fully isolated tmpDir; dataDir()'s strict path
+// (bin/fgos.mjs) returns cwd as-is with no git command run at all, so a
+// plain, git-free temp dir works as both repoRoot and .fgos root) ----------
+
+function tmpFixtureCwd() {
+  return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-docs-index-fixture-'));
+}
+
+function runDocsIndexAt(cwd) {
+  return spawnSync(process.execPath, [FGOS, 'docs-index'], { cwd, encoding: 'utf8' });
+}
+
+test('fgos docs-index on an unreachable store preserves an existing prior sourceCaptureId instead of nulling it', () => {
+  const cwd = tmpFixtureCwd();
+  fs.mkdirSync(path.join(cwd, 'docs', 'how-to'), { recursive: true });
+  fs.writeFileSync(path.join(cwd, 'docs', 'how-to', 'hello.md'), '# Hello\n');
+  fs.mkdirSync(path.join(cwd, '.fgos'));
+  fs.writeFileSync(path.join(cwd, '.fgos', 'main-checkout.lock'), '');
+  fs.writeFileSync(
+    path.join(cwd, 'docs', 'enduser-docs-index.json'),
+    `${JSON.stringify(
+      [
+        {
+          quadrant: 'how-to',
+          purpose: QUADRANT_META['how-to'].purpose,
+          audience: QUADRANT_META['how-to'].audience,
+          docPath: 'docs/how-to/hello.md',
+          title: 'Hello',
+          sourceCaptureId: 'tsk-real-capture',
+        },
+      ],
+      null,
+      2,
+    )}\n`,
+  );
+
+  const result = runDocsIndexAt(cwd);
+  assert.equal(result.status, 0, result.stderr);
+  const manifest = JSON.parse(fs.readFileSync(path.join(cwd, 'docs', 'enduser-docs-index.json'), 'utf8'));
+  assert.equal(manifest[0].sourceCaptureId, 'tsk-real-capture', 'an unreachable store must not regress a real prior id to null');
+});
+
+test('fgos docs-index on an unreachable store with no prior manifest value stays null (nothing to preserve)', () => {
+  const cwd = tmpFixtureCwd();
+  fs.mkdirSync(path.join(cwd, 'docs', 'how-to'), { recursive: true });
+  fs.writeFileSync(path.join(cwd, 'docs', 'how-to', 'hello.md'), '# Hello\n');
+  fs.mkdirSync(path.join(cwd, '.fgos'));
+  fs.writeFileSync(path.join(cwd, '.fgos', 'main-checkout.lock'), '');
+  assert.ok(!fs.existsSync(path.join(cwd, 'docs', 'enduser-docs-index.json')), 'first-ever run: no prior manifest');
+
+  const result = runDocsIndexAt(cwd);
+  assert.equal(result.status, 0, result.stderr);
+  const manifest = JSON.parse(fs.readFileSync(path.join(cwd, 'docs', 'enduser-docs-index.json'), 'utf8'));
+  assert.equal(manifest[0].sourceCaptureId, null);
+});
+
+test('fgos docs-index run twice in a row against the same unreachable store converges (R7 survives tsk-f31): no second write', () => {
+  const cwd = tmpFixtureCwd();
+  fs.mkdirSync(path.join(cwd, 'docs', 'how-to'), { recursive: true });
+  fs.writeFileSync(path.join(cwd, 'docs', 'how-to', 'hello.md'), '# Hello\n');
+  fs.mkdirSync(path.join(cwd, '.fgos'));
+  fs.writeFileSync(path.join(cwd, '.fgos', 'main-checkout.lock'), '');
+  fs.writeFileSync(
+    path.join(cwd, 'docs', 'enduser-docs-index.json'),
+    `${JSON.stringify(
+      [
+        {
+          quadrant: 'how-to',
+          purpose: QUADRANT_META['how-to'].purpose,
+          audience: QUADRANT_META['how-to'].audience,
+          docPath: 'docs/how-to/hello.md',
+          title: 'Hello',
+          sourceCaptureId: 'tsk-real-capture',
+        },
+      ],
+      null,
+      2,
+    )}\n`,
+  );
+  const manifestPath = path.join(cwd, 'docs', 'enduser-docs-index.json');
+
+  const run1 = runDocsIndexAt(cwd);
+  assert.equal(run1.status, 0, run1.stderr);
+  const afterRun1 = fs.readFileSync(manifestPath, 'utf8');
+  const mtimeAfterRun1 = fs.statSync(manifestPath).mtimeMs;
+
+  const run2 = runDocsIndexAt(cwd);
+  assert.equal(run2.status, 0, run2.stderr);
+  const afterRun2 = fs.readFileSync(manifestPath, 'utf8');
+  const mtimeAfterRun2 = fs.statSync(manifestPath).mtimeMs;
+
+  assert.equal(afterRun2, afterRun1, 'two consecutive unreachable-store runs must converge to byte-identical content');
+  assert.equal(mtimeAfterRun2, mtimeAfterRun1, 'the second run must not rewrite the file (write-only-if-changed)');
 });
 
 test('fgos docs-index reads BOTH the docs/decisions/ alias and the primary docs/explanation/ dir into the explanation quadrant, tagged by quadrant name not source dir name', () => {

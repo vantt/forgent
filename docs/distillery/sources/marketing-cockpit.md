@@ -2,7 +2,7 @@
 name: marketing-cockpit
 type: git-repo
 url: https://github.com/vantt/marketing-cockpit
-local: upstreams/marketing-cockpit
+local: ~/projects/fgos/fgos-dev/repo
 last_analyzed_commit: 588d800
 last_analyzed_date: 2026-07-13
 domains_covered: [integration-contract, config-packaging, skills, orchestration, routing, workflow, quality-gates, testing-evals, hooks, context-memory, harness, planning, docs-style, tooling, repo-layout, safety, self-improvement, ux]

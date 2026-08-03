@@ -8,11 +8,12 @@
 //
 // "Impact" here is a blocking-fan-out proxy: an item that unblocks more
 // still-open work when it lands is more impactful to finish first. This is
-// deliberately NOT a priority/value field on the schema (that is P7's
-// scope — priority field for frontier ordering — and P8's intent-scoring,
-// both still proposed); it is a pure derive over the unified typed-edge
-// graph (dep-graph.mjs's `buildUnifiedEdges` — `deps` PLUS `parent`) the
-// schema already has, same spirit as frontier.mjs's parent-lineage derive.
+// deliberately NOT the same signal as work.priority (the human/agent-set
+// frontier field from str7-str8-priority-intent D1, surfaced on each row
+// read-only below); ranking here stays a pure derive over the unified
+// typed-edge graph (dep-graph.mjs's `buildUnifiedEdges` — `deps` PLUS
+// `parent`) the schema already has, same spirit as frontier.mjs's
+// parent-lineage derive.
 // Counting `deps` alone under-counted a root item's real impact: finishing
 // a root's last open child unblocks that root too (frontier.mjs's own
 // `hasOpenDescendant` gate), so a root with only children and no `deps`
@@ -55,6 +56,12 @@ function tierRank(goalTier) {
  * then ungrouped work), then blocks descending, then component size
  * descending (a bigger cluster is a higher-leverage pick at an equal blocks
  * count), ties broken by ascending id.
+ *
+ * Each row also carries `priority` (work.priority, read-only passthrough) —
+ * the human/agent-set frontier field, non-negative integer or `null` when
+ * absent. It never affects this function's own sort order (see the file
+ * header): a caller who wants priority-driven ordering re-sorts the
+ * returned rows itself.
  *
  * Each row also carries `blockedBy` (tsk-dus D1/D2) — the ids of OTHER
  * still-open items THIS item directly waits on: its own unmet `deps`
@@ -120,6 +127,7 @@ export function rankImpact(view, opts = {}) {
       blockedBy: blockedByOf.get(id),
       stage: item.stage ?? 'executing',
       goalTier: item.goalTier ?? null,
+      priority: item.priority ?? null,
       componentId,
       componentSize,
       isIsolated: componentSize === 1,
@@ -146,6 +154,7 @@ export function rankImpact(view, opts = {}) {
         blockedBy: [],
         stage: item.stage ?? 'executing',
         goalTier: item.goalTier ?? null,
+        priority: item.priority ?? null,
         componentId: null,
         componentSize: 0,
         isIsolated: true,

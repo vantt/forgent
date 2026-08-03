@@ -1,8 +1,23 @@
 # Research Report: Nâng cấp schema work-item (status branch, type hierarchy, nested domain fields, per-domain status flow)
 
-**Thời điểm nghiên cứu:** 2026-07-30 09:31 (Asia/Saigon), cập nhật 10:10, 10:35 (chốt kiến trúc round 4), 15:10 (milestone `tsk-3w3`)
+**Thời điểm nghiên cứu:** 2026-07-30 09:31 (Asia/Saigon), cập nhật 10:10, 10:35 (chốt kiến trúc round 4), 15:10 (milestone `tsk-3w3`), 2026-08-01 09:58 (round 11 — file `tsk-38t`, sửa lỗi `goalTier`), 14:47 (round 12 — re-audit `tsk-2rp`: phát hiện verb `catchup` bị bỏ sót, 9 call site không phải 8)
 
-**Task chính quản lý cụm này:** `tsk-3w3` (`goalTier: milestone`, `deps: [tsk-2rp, tsk-3p1]`) — coi là đạt khi `tsk-2rp` (Phase 1, `verifyKind`) và `tsk-3p1` (RUL12 marker) xong; Phase 2 (`statusCategory`/`kindCategory`/`domainFields` chính) chưa có task riêng, thêm vào `deps` của `tsk-3w3` sau khi file.
+**Task chính quản lý cụm này:** `tsk-3w3` (`deps: [tsk-2rp, tsk-3p1, tsk-38t]`) —
+coi là đạt khi cả 3 dep xong: `tsk-2rp` (Phase 1, `verifyKind`), `tsk-3p1`
+(RUL12 marker), `tsk-38t` (Phase 2, `statusCategory`/`kindCategory`/
+`domainFields` — filed round 11, xem "Thứ tự triển khai" dưới).
+
+**Sửa lỗi thật (round 11):** dòng này TỪNG ghi `tsk-3w3 (goalTier: milestone`
+— SAI, đã kiểm qua `fgos show tsk-3w3` thật: item KHÔNG mang `goalTier`.
+Nguyên nhân gốc, đáng ghi lại vì tự nó là 1 data-point cho câu hỏi #2 gốc
+("goalTier có generic/dùng đúng không"): `tsk-3w3` được tạo qua `fgos submit`
+(có `mode: sync`), nhưng verb `submit` KHÔNG expose `--goal-tier` (chỉ `add`
+có flag đó — `bin/fgos.mjs` case `'submit'`, so với case `'add'`). Cộng thêm
+`goalTier` bị loại khỏi `EDITABLE_FIELDS` (`store.mjs:186`, cố ý — "luôn set
+lúc `add`, không bao giờ retrofit") — nghĩa là **item này đã VĨNH VIỄN không
+gắn `goalTier` được nữa**, không có đường sửa. Đây là 1 khoảng hở thật giữa
+2 cửa vào work-item (`add` đầy field, `submit` thiếu vài field so với `add`)
+— đáng thêm vào câu hỏi mở.
 
 ## Mục tiêu report này
 
@@ -613,6 +628,28 @@ trong report này.
 **Đang handle:** `tsk-2rp` (stage `clarify`, tier `heavy`, risk `high`) —
 `refs` trỏ ngược report này + `src/runner/goal-check.mjs` + `bin/fgos.mjs`.
 
+**Re-audit (round 12, 2026-08-01) — con số "8 call site" (round 10) SAI, đúng
+là 9, và thiếu đúng verb nguy hiểm nhất:** đọc lại `bin/fgos.mjs` dòng
+2310-2484 phát hiện `case 'catchup':` (dòng 2340) — verb RIÊNG BIỆT đứng
+ngay sau `case 'reject':`, KHÔNG phải một nhánh của `reject` như lần audit
+trước lầm tưởng. `reject` (2310-2322) đúng là không gọi `runGoalCheck`;
+`catchup` thì gọi 2 lần (2416 nhánh "already-caught-up", 2475 nhánh
+"clean-merge"). Danh sách 9 call site chính xác: `return` branch-source
+(1770) + main-source (1828), `approve` (2288), `catchup` x2 (2416/2475),
+`merge.mjs` already-merged (702) + verify-before-commit (748), `loop.mjs`
+startupReap (361) + dispatchClaimedItem (694).
+
+`catchup` nguy hiểm hơn cả `return`'s vòng-tròn-tự-báo (round trước đã ghi):
+nó chạy với `role: 'runner'` (dòng 2422) — **không có người nào trong đường
+này để "gọi approve"** cả, khác `return` (ít nhất còn 1 claimant người/session
+thật đứng gọi). Định nghĩa `manual-confirm: pass = human đã gọi approve` gặp
+2 đường đều sai với `catchup`: áp cứng → item domain đó kẹt `blocked` vĩnh
+viễn mỗi lần catchup chạy (không ai thỏa điều kiện); mặc định luôn-pass →
+runner tự merge mà không ai xác nhận gì, phá đúng mục đích `manual-confirm`
+định bảo vệ. Chưa có lời giải — `catchup` cần 1 thiết kế RIÊNG, không dùng
+chung logic với `return`. Đã sửa vào acceptance clause 4 + clause 8 mới của
+`tsk-2rp` (13 clause, tăng từ 7 lần trước).
+
 ### 2. Context-discovery/decompose CỨNG vào tên stage của `coding` (đã tự nhận trong spec, đọc lúc grounding nhưng chưa mang vào bàn)
 
 `work-state.md`: *"`resolveDiscovery`/`resolveDecompose` là hai bộ máy phán
@@ -675,12 +712,51 @@ Chốt: `verifyKind` (mục "Chưa bàn tới" #1) và `statusCategory`/`kindCat
   riêng, nhỏ hơn, vì đụng invariant "one goal-check implementation, never
   two" (comment gốc `goal-check.mjs`) — nhưng KHÔNG phải supersede D1-D3.
 
+**Đào sâu (round 10) — phạm vi Phase 1 RỘNG HƠN mô tả ban đầu, ghi bằng
+4 acceptance clause trên `tsk-2rp`:** khảo sát test thật (`test/cli/fgos.test.mjs`,
+40+ test case về `return`) + 3 incident thật đã xảy ra
+(`docs/history/return-approve-scoped-clean-tree/CONTEXT.md` tsk-598,
+`docs/history/return-close-pre-done-work/CONTEXT.md` tsk-4on,
+`docs/history/fgos-auto-release-main-checkout-lock/CONTEXT.md` tsk-45z) cho
+thấy `return` KHÔNG CHỈ có 1 cổng (`verify`) mà có 3 cổng xếp chồng:
+
+1. **Clean-tree gate** — working tree phải sạch (trừ `.fgos/`), scoped đúng
+   file của item.
+2. **HEAD-advance gate** — HEAD/branch phải TIẾN so `headAtTake`/
+   `branchHeadAtTake` (chống-gian-lận). Có khe hẹp `--no-new-commits-ok`
+   (tsk-4on) cho ca việc thật đã xong TRƯỚC claim này.
+3. **Verify gate** — cái `verifyKind` đang nhắm sửa.
+
+Thiết kế ban đầu (`shell`/`manual-confirm`, chỉ đổi `runGoalCheck`) CHỈ đụng
+gate #3. Domain `manual-confirm` (không có commit git thật) sẽ LUÔN fail
+gate #2 (y hệt shape bug `tsk-4on`) và gate #1 có thể không áp dụng được —
+nếu không xử lý, `verifyKind` một mình không đủ cho domain đó chạy được.
+`approve` còn có gate RIÊNG (refuse nếu chạy từ worktree không qua `session
+start`) — chưa rõ domain `manual-confirm` có cần đường chạy khác không.
+Mọi gate đều DUPLICATE qua 2 đường tách biệt (main-source/branch-source,
+`test/cli/fgos.test.mjs` dòng 3416-3887 và 5556-5764) — sửa gì cũng x2 bề
+mặt.
+
+**Câu hỏi kiến trúc chưa quyết (để `fgos-exploring` đào, không tự chốt ở
+đây):** domain `manual-confirm` có nên đi qua `return` luôn hay không, hay
+bỏ qua `return` hoàn toàn — đi thẳng `doing→awaiting-approval` qua verb/
+đường riêng — thay vì nhét vào `return` rồi tắt từng gate một.
+
 **Phase 2 — `status`/`statusCategory` + `kind`/`kindCategory` (sau, không bị
-Phase 1 chặn):**
+Phase 1 chặn) — filed round 11 là `tsk-38t`:**
 
 - Domain sở hữu bảng transition riêng (đảo thật D1-D3, cần decision record
   mới) + `domainFields` (mục #3) — làm sau khi Phase 1 xong hoặc song song,
   miễn không tranh cùng file/subsystem với Phase 1.
+- `tsk-38t` mang 6 acceptance clause grounded (bảng transition per-domain
+  thay statusCategory để validate move, decision record supersede D1-D3,
+  danh sách 6 cơ chế domain-agnostic cần đổi, gộp chung vòng explore với
+  `tsk-3p1`, migration=0 cho `STATUSES` hiện có, backfill `statusCategory`
+  event cũ chưa chốt) — `refs` trỏ report này + `work-state.md` +
+  `0024` + `work.mjs`/`workflow-stage-graphs.mjs`/`fsm.mjs`/`store.mjs`/
+  `frontier.mjs` + `tsk-3p1`. Không set `deps: [tsk-3p1]` cố ý — 2 việc GỘP
+  CHUNG 1 vòng explore (xem dưới), không phải quan hệ block-trước-sau mà
+  `deps` diễn tả.
 
 **Việc liên quan phát hiện thêm (round 9) — `tsk-3p1`, GỘP vào trước khi code Phase 2:**
 
@@ -745,6 +821,16 @@ compound-learn xong", RUL50 gate cả 2 lối vào `done` bằng compound-learn)
     (compound-learn, bài học lúc đóng, outcome/friction, frontier, rollup,
     discovery-judge) — đã đủ chưa, hay còn chỗ khác trong code đang đọc
     literal `status` mà report này chưa quét hết?
+14. (round 11, phát hiện lúc file `tsk-38t`) `add` và `submit` KHÔNG cùng bề
+    mặt field — `submit` thiếu `--refs`/`--goal-tier`/`--parent`/
+    `--footprint` mà `add` có (`bin/fgos.mjs`, so 2 case). Vài field
+    (`goalTier`) còn bị loại khỏi `EDITABLE_FIELDS` nên item tạo qua `submit`
+    KHÔNG BAO GIỜ gắn được về sau — item CÓ THẬT đã dính lỗi này: `tsk-3w3`
+    (xem sửa lỗi round 11 ở đầu report). Có nên cho `submit` đủ field ngang
+    `add`, hay đây là khoảng cách CỐ Ý ("cửa công khai" `submit` tối giản
+    hơn `add` có chủ đích)? Ngoài phạm vi 4 đề xuất gốc nhưng cùng họ vấn đề
+    (field vắng mặt vĩnh viễn không sửa được) — nên hỏi riêng, không lẫn vào
+    quyết định status/kind.
 
 ## Nguồn
 

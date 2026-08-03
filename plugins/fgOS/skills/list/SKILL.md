@@ -2,7 +2,7 @@
 name: list
 description: >-
   Use when the user wants a table view of fgOS work items (id, status,
-  stage, goalTier, title) from inside a Claude Code session, invoked as
+  stage, goalTier, priority, title) from inside a Claude Code session, invoked as
   /fgOS:list. Defaults to open (not-done) items only; pass --all to include
   done items too. Reads the list through fgOS's own list verb; never writes
   anything. Examples: "/fgOS:list", "/fgOS:list --all", "show me all tasks".
@@ -50,7 +50,7 @@ never appends an event).
 
 3. **Report as a table and stop.** Render every item from `data.work` as a
    markdown table with exactly these columns, in this order: **id**,
-   **status**, **stage**, **goalTier**, **title**.
+   **status**, **stage**, **goalTier**, **priority**, **title**.
    - `stage` (`clarify` | `decompose` | `executing` | `compound-learn` per
      work.mjs's stage domain) is optional on the raw record — an item with
      no `stage` field defaults to `executing` (work-state Data Dictionary
@@ -58,6 +58,10 @@ never appends an event).
    - `goalTier` is optional (`mvp` | `milestone` per work.mjs's
      `GOAL_TIERS`) — an item with no declared tier is a plain work-item;
      render its cell as `-`, not blank or "undefined".
+   - `priority` is optional (`fgos edit --priority`, non-negative integer,
+     ascending — lower number = higher priority). An item with no explicit
+     priority renders its cell as `-`, not blank, `0`, or "undefined" —
+     never confuse absent with priority 0.
 
    Keep submission order (the order `data.work`'s keys already come in) —
    do not re-sort. If `data.work` is empty, say so plainly — an empty

@@ -196,19 +196,54 @@ test('e2e synthetic domain: add --domain synthetic (no --stage) dispatches throu
   assert.equal(list.work['synth-item'].status, 'awaiting-approval');
   assert.equal(list.work['coding-item'].status, 'awaiting-approval');
 
-  // Both reach `done` via the same normal human-close door — proving the
-  // synthetic domain rides the identical status FSM all the way to the end,
-  // exactly like coding (D3: a domain never touches the generic status FSM).
-  // The synthetic domain declares no Compound-learn stage, so it is exempt
-  // from the done-gate (D3) and closes directly. The coding item must first
-  // pass through its compound-learn stage — proving the gate is coding-only.
-  assert.equal(fgos(repoRoot, ['move', 'synth-item', '--to', 'done']).status, 0);
-  assert.equal(fgos(repoRoot, ['compound', 'coding-item']).status, 0);
-  assert.equal(fgos(repoRoot, ['move', 'coding-item', '--to', 'done']).status, 0);
+  // Both reach `done` via the identical sequential delivered->retrospective
+  // ->cleanup->done chain — proving the synthetic domain rides the same
+  // status FSM all the way to the end, exactly like coding (work-item-
+  // status-delivered-retrospective-cleanup D5: the chain is genuinely
+  // domain-agnostic, fsm.mjs never reads work.domain — no domain is exempt
+  // or special-cased at the FSM layer).
+  for (const id of ['synth-item', 'coding-item']) {
+    assert.equal(fgos(repoRoot, ['move', id, '--to', 'delivered']).status, 0);
+    assert.equal(fgos(repoRoot, ['move', id, '--to', 'retrospective']).status, 0);
+    assert.equal(fgos(repoRoot, ['move', id, '--to', 'cleanup']).status, 0);
+    assert.equal(fgos(repoRoot, ['move', id, '--to', 'done']).status, 0);
+  }
 
   const afterDone = stateView(repoRoot);
   assert.equal(afterDone.work['synth-item'].status, 'done');
   assert.equal(afterDone.work['coding-item'].status, 'done');
+});
+
+// work-item-status-delivered-retrospective-cleanup D5/D8: the cleanup
+// harness's merge-still-resolves check is skipped entirely for a domain
+// that declares worktreeBacked:false (workflow-stage-graphs.mjs) — a
+// synthetic item has no branch, no worktree, no headAtTake/headAtReturn
+// at all, so the REAL `fgos cleanup` verb (not just a bare `move`, which
+// never invokes the harness) must still close it to done without ever
+// attempting a git operation it has no commit to check.
+test("e2e synthetic domain: the real 'fgos cleanup' verb closes a synthetic item to done without attempting a merge-still-resolves check it has no commit for", () => {
+  const repoRoot = initTempRepo();
+  assert.equal(fgos(repoRoot, ['init']).status, 0);
+  fs.writeFileSync(
+    path.join(repoRoot, '.fgos', 'config.json'),
+    JSON.stringify({ cleanup: { ttlDays: 0 } }),
+  );
+
+  add(repoRoot, 'synth-cleanup-item', { domain: 'synthetic', verify: 'true' });
+  assert.equal(fgos(repoRoot, ['move', 'synth-cleanup-item', '--to', 'doing']).status, 0);
+  assert.equal(fgos(repoRoot, ['move', 'synth-cleanup-item', '--to', 'delivered']).status, 0);
+  assert.equal(fgos(repoRoot, ['move', 'synth-cleanup-item', '--to', 'retrospective']).status, 0);
+  assert.equal(
+    fgos(repoRoot, ['decision', '--text', 'synthetic retrospective note', '--rationale', 'proves real content exists', '--id', 'synth-cleanup-item']).status,
+    0,
+  );
+  assert.equal(fgos(repoRoot, ['move', 'synth-cleanup-item', '--to', 'cleanup']).status, 0);
+
+  const result = fgos(repoRoot, ['cleanup', 'synth-cleanup-item']);
+  assert.equal(result.status, 0, `cleanup failed: ${result.stderr}`);
+  const data = JSON.parse(result.stdout).data;
+  assert.equal(data.to, 'done', `expected done, got: ${JSON.stringify(data)}`);
+  assert.equal(stateView(repoRoot).work['synth-cleanup-item'].status, 'done');
 });
 
 test('e2e synthetic domain: submit --domain synthetic is deliberately NOT the entry door for this domain — this proof exercises add, not submit; a plain submit (no --domain) is completely unaffected, still landing in stage clarify, domain coding', () => {

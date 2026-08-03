@@ -32,14 +32,14 @@ import { rebuildView, viewRevision } from './replay.mjs';
 import { graphMetrics as computeGraphMetrics, whatIf as computeWhatIf, classifyStaleDoing, footprintOverlap, goalScopedCriticalPath, goalScopedGreedyTopUnblock } from './graph-metrics.mjs';
 import { transitionWork, FsmError } from './fsm.mjs';
 import { transitionStage } from './stage.mjs';
-import { getDomain, stageForStep } from './workflow-stage-graphs.mjs';
-import { validateWork, checkAcceptanceEvidenceTraceable, WorkValidationError, DEFAULTS, GOAL_TIERS } from './work.mjs';
+import { validateWork, checkAcceptanceEvidenceTraceable, WorkValidationError, DEFAULTS, GOAL_TIERS, truncateTitle } from './work.mjs';
 import { EventLogError } from './events.mjs';
+import { validateToolRegistration, ToolRegistryError } from './tool-registry.mjs';
 import { frontier, isDepsAndLineageReady as depsAndLineageReadyView } from './frontier.mjs';
 import { assertNoCycle, assertNoUnifiedCycle } from './dep-graph.mjs';
 import { resolveWriterIdentity } from '../runner/session-identity.mjs';
 
-export { FsmError, WorkValidationError, EventLogError };
+export { FsmError, WorkValidationError, EventLogError, ToolRegistryError };
 
 /** Error raised by this module. `category` is the CLI exit-code contract (R4). */
 export class StoreError extends Error {
@@ -151,7 +151,13 @@ export function addWork(dir, work) {
     // was in effect at write time. `??` only fills in when `tier` is missing
     // or nullish; an explicit (even invalid) value passes through unchanged
     // so validateWork below still rejects it as validation.
-    const item = { ...work, tier: work?.tier ?? DEFAULTS.tier };
+    //
+    // Per work-item-title-contract D2/D5, the title bound is applied HERE, on
+    // the same normalize step as tier and before validateWork — so the
+    // truncated title is what the appended event carries, and every caller
+    // reaching this door (submit and add in bin/fgos.mjs, decompose's children,
+    // the runner loop) obeys one rule without any of them repeating it.
+    const item = { ...work, tier: work?.tier ?? DEFAULTS.tier, title: truncateTitle(work?.title) };
     validateWork(item, Object.keys(before.work));
     // tsk-5q5-2 (D1/D3): narrow write-time check on any acceptance clause
     // supplying text+evidence together — see checkAcceptanceEvidenceTraceable's
@@ -187,7 +193,7 @@ export function addWork(dir, work) {
 // write path (identity is immutable; `status` is `move`'s; `stage` is
 // `moveStage`'s) and mixing them into `edit` would open a second door onto
 // the same field.
-const EDITABLE_FIELDS = new Set(['title', 'kind', 'risk', 'verify', 'tier', 'refs', 'deps', 'acceptance', 'priority', 'intent', 'docsRef']);
+const EDITABLE_FIELDS = new Set(['title', 'description', 'kind', 'risk', 'verify', 'tier', 'refs', 'deps', 'acceptance', 'priority', 'intent', 'docsRef', 'parent', 'urgent', 'impact', 'effort', 'footprint', 'mergeAfter', 'supersededBy', 'duplicates']);
 
 /**
  * Patch fields on an existing work item, through the SAME single write door
@@ -227,7 +233,18 @@ export function editWork(dir, { id, patch, role } = {}) {
       }
     }
 
-    const candidate = { ...work, ...patch };
+    // Per work-item-title-contract D2/D5, the same title bound addWork applies,
+    // applied to the PATCH rather than to the candidate: the event this door
+    // appends carries `patch` verbatim (see payload below), so bounding only
+    // the candidate would leave replay rebuilding the untruncated title and the
+    // view disagreeing with its own log. A patch that does not carry a title is
+    // passed through untouched, so an unrelated edit never silently reshapes a
+    // title that was already stored.
+    const normalizedPatch = typeof patch.title === 'string'
+      ? { ...patch, title: truncateTitle(patch.title) }
+      : patch;
+
+    const candidate = { ...work, ...normalizedPatch };
     validateWork(candidate, Object.keys(before.work));
     // tsk-5q5-2 (D1/D3): same narrow check addWork applies above — only
     // reachable here when `patch.acceptance` is present (EDITABLE_FIELDS),
@@ -239,14 +256,18 @@ export function editWork(dir, { id, patch, role } = {}) {
     // through, since validateDeps only checks existence, never acyclicity — and
     // it keeps the S1 "dependency cycle" message for that pure-deps case. Then
     // the UNIFIED check (S2a, record 0012) catches a cycle that a `parent` edge
-    // participates in: `parent` is NOT editable, so an edit closes such a cycle
-    // only by patching `deps` into a loop against a parent edge fixed at add
-    // time (a MIXED cycle the deps-only walk cannot see), reported as a "graph
-    // cycle". Same validation/exit-4 contract; no schema change (R11).
+    // participates in — now including a cycle closed by a `parent` patch
+    // itself (parent-flag-cli D1): `assertNoUnifiedCycle` revalidates the
+    // whole merged candidate unconditionally, so allowing `parent` into
+    // EDITABLE_FIELDS needed no new guard code, only the new allowed key.
+    // Both the deps-patch-against-a-fixed-parent-edge case (the original gap)
+    // and the parent-patch-itself case are caught by this one call, reported
+    // as a "graph cycle". Same validation/exit-4 contract; no schema change
+    // (R11).
     assertNoCycle(candidate, before.work);
     assertNoUnifiedCycle(candidate, before.work);
 
-    const payload = { id, patch };
+    const payload = { id, patch: normalizedPatch };
     if (role !== undefined) {
       payload.role = role;
     }
@@ -324,6 +345,34 @@ export function setFocus(dir, { id, role } = {}) {
   });
   const view = refreshView(dir);
   return { event, view };
+}
+
+/**
+ * RUL58 acceptance-evidence gate: throws if `work` has opted into
+ * `acceptance` clauses (per work.mjs's optional-additive shape) and any
+ * populated clause still lacks evidence. `acceptance` absent, null, or an
+ * empty array is a complete no-op (D4) — an item that never opted in is
+ * unaffected. Pure — no I/O, no event append.
+ *
+ * Extracted out of `moveWork`'s inline `to === 'delivered'` check (tsk-396
+ * D1) so `approve` (bin/fgos.mjs) can also call this directly, as a
+ * pre-flight check before any merge mutation — the merge-then-gate
+ * ordering gap tsk-396 exists to close. `moveWork` still calls this itself
+ * below, unchanged, as the backstop for the doors into `delivered` that
+ * don't go through that pre-flight (`return`'s `doing -> delivered`, the
+ * mechanical `blocked -> delivered` retry).
+ */
+export function assertAcceptanceEvidence(id, work) {
+  if (!Array.isArray(work.acceptance) || work.acceptance.length === 0) return;
+  for (const clause of work.acceptance) {
+    if (typeof clause?.text !== 'string' || !clause.text.trim()) continue;
+    if (typeof clause.evidence !== 'string' || !clause.evidence.trim()) {
+      throw new StoreError(
+        'precondition',
+        `work "${id}" cannot move to "delivered" — acceptance clause "${clause.text}" has no evidence yet; edit --acceptance must supply it before "delivered".`,
+      );
+    }
+  }
 }
 
 /**
@@ -473,55 +522,34 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, rol
   if (releaseTrigger !== undefined) {
     rawEvent.payload.releaseTrigger = releaseTrigger;
   }
-  // Compound-learn done-gate: a work item whose domain declares a
-  // Compound-learn stage can never reach `done` without first passing through
-  // that stage — the synthesis layer is FSM-enforced, never left to a reflex
-  // that can be silently lost. Placed AFTER transitionWork's CAS + precondition
-  // checks (line above) so a stale caller still gets 'conflict' first, and
-  // BEFORE the append below so a refused close persists nothing (the whole
-  // block runs under the held events.lock). Both doors into `done` — the
-  // awaiting-approval->done approval and the doing->done hand-move — converge on this
-  // one call, so gating here covers both. Domains that declare no
-  // Compound-learn stage (e.g. synthetic) are exempt: coding-only enforcement.
-  // The current stage is read lazily, exactly as stage.mjs does — a missing
-  // `stage` reads as the domain's Execute stage — so a coding item that never
-  // moved past execution is correctly refused.
-  if (to === 'done') {
-    const domain = getDomain(work.domain);
-    const compoundLearnStage = stageForStep(domain, 'Compound-learn');
-    if (compoundLearnStage !== undefined) {
-      const currentStage = work.stage ?? stageForStep(domain, 'Execute');
-      if (currentStage !== compoundLearnStage) {
-        throw new StoreError(
-          'precondition',
-          `work "${id}" cannot move to "done" from stage "${currentStage}" — it must pass through the "${compoundLearnStage}" stage first so the compound-learn synthesis is never silently skipped.`,
-        );
-      }
-    }
-  }
+  // Compound-learn done-gate RETIRED (work-item-status-delivered-
+  // retrospective-cleanup D1/D4/D11, supersedes RUL49/RUL50/RUL51): `done`
+  // is no longer reached directly from `doing`/`awaiting-approval` at all
+  // (those now target `delivered`), so a stage-based gate on `to==='done'`
+  // no longer makes sense here — the real "has retrospective/cleanup
+  // actually completed" check moves to a dedicated harness gating
+  // `cleanup -> done` (D8), not this inline block.
 
-  // Per-clause CoS done-gate (str73-done-flip-cos-check D2/D3): a work item
-  // that has opted into `acceptance` clauses (per work.mjs's optional-additive
-  // shape) can never reach `done` while any populated clause still lacks
-  // evidence — mirrors bee's own per-clause CoS discipline (D1), mechanically
-  // checking only *presence* of evidence, never its truth. Sibling to RUL50's
-  // Compound-learn block immediately above: same `to === 'done'` guard, same
-  // held `events.lock`, same `precondition` category, placed BEFORE the
-  // append so a refused close persists nothing. `work.acceptance` absent,
-  // null, or an empty array is a complete no-op (D4) — an item that never
-  // opted in is unaffected. Both doors into `done` (doing->done, awaiting-approval->
-  // done) converge on this one `moveWork` call, so gating here covers both,
-  // exactly like RUL50's own comment describes for itself.
-  if (to === 'done' && Array.isArray(work.acceptance) && work.acceptance.length > 0) {
-    for (const clause of work.acceptance) {
-      if (typeof clause?.text !== 'string' || !clause.text.trim()) continue;
-      if (typeof clause.evidence !== 'string' || !clause.evidence.trim()) {
-        throw new StoreError(
-          'precondition',
-          `work "${id}" cannot move to "done" — acceptance clause "${clause.text}" has no evidence yet; edit --acceptance must supply it before "done".`,
-        );
-      }
-    }
+  // Per-clause CoS done-gate (str73-done-flip-cos-check D2/D3, retargeted
+  // by work-item-status-delivered-retrospective-cleanup D3): a work item
+  // that has opted into `acceptance` clauses (per work.mjs's optional-
+  // additive shape) can never reach `delivered` while any populated clause
+  // still lacks evidence — mirrors bee's own per-clause CoS discipline
+  // (D1), mechanically checking only *presence* of evidence, never its
+  // truth. Placed AFTER transitionWork's CAS + precondition checks so a
+  // stale caller still gets 'conflict' first, and BEFORE the append below
+  // so a refused close persists nothing. All three doors into `delivered`
+  // (`doing`, `awaiting-approval`, and the mechanical `blocked` retry)
+  // converge on this one `moveWork` call, so gating on `to==='delivered'`
+  // here covers all three — a dependent that opens on `delivered` (RUL12)
+  // is exactly as protected as it was when `done` was the trigger, never
+  // less. Extracted to `assertAcceptanceEvidence` (tsk-396 D1) so `approve`
+  // (bin/fgos.mjs) can also run it as a pre-flight check, before any merge
+  // mutation, instead of only catching it here after the merge has already
+  // landed — this call site is unchanged, still the backstop for the doors
+  // that don't go through that pre-flight.
+  if (to === 'delivered') {
+    assertAcceptanceEvidence(id, work);
   }
 
   // Câu-6 tự động (per Phase 3 S3-closeout (c), six-questions L5): BOTH doors
@@ -655,6 +683,43 @@ export function addDiscovery(dir, payload) {
   return { event, view };
 }
 
+// Gate approve record shape (tsk-19j D1/D11): the 3 skill-embedded Gates
+// this schema covers — one per stage in the clarify->decompose sequence —
+// and the only 2 actors a real approve record can name (a person, or the
+// gate-bypass mechanism auto-approving on the person's behalf).
+const GATE_APPROVE_GATES = new Set(['contextApprove', 'planApprove', 'validateApprove']);
+const GATE_APPROVE_ACTORS = new Set(['human', 'bypass']);
+
+/**
+ * Log a structured gate-approve event (tsk-19j D1/D11) — an explicit,
+ * durable record that a skill-embedded Gate was approved, separate from the
+ * `awaiting-human` ask/answer mechanism (putInAwaiting/answerAwaiting
+ * above). No FSM/work validation beyond requiring `id`; each call is its own
+ * occurrence, folded by `gate` into `gates[id]` in replay.mjs (a later
+ * approve on the SAME gate overwrites that gate's own field, never the other
+ * two). Mirrors `addDiscovery`'s shape exactly: single write door,
+ * append-then-refresh tail, no CAS — an approve record never itself moves
+ * the item.
+ */
+export function recordGateApprove(dir, { id, gate, actor, verify } = {}) {
+  const { logPath } = paths(dir);
+  if (typeof id !== 'string' || !id.trim()) {
+    throw new StoreError('validation', 'gate-approve requires a non-empty "id".');
+  }
+  if (typeof gate !== 'string' || !GATE_APPROVE_GATES.has(gate)) {
+    throw new StoreError('validation', `gate-approve requires "gate" to be one of: ${[...GATE_APPROVE_GATES].join(', ')}.`);
+  }
+  if (typeof actor !== 'string' || !GATE_APPROVE_ACTORS.has(actor)) {
+    throw new StoreError('validation', `gate-approve requires "actor" to be one of: ${[...GATE_APPROVE_ACTORS].join(', ')}.`);
+  }
+  if (typeof verify !== 'string' || !verify.trim()) {
+    throw new StoreError('validation', 'gate-approve requires a non-empty "verify".');
+  }
+  const event = appendEvent(logPath, { type: 'work.gate-approve', payload: { id, gate, actor, verify } });
+  const view = refreshView(dir);
+  return { event, view };
+}
+
 /**
  * Log a decision event (no FSM/work validation — decisions are freeform).
  *
@@ -750,6 +815,47 @@ export function addFriction(dir, payload) {
   }
   assertValidDocType(payload);
   const event = appendEvent(logPath, { type: 'work.friction', payload });
+  const view = refreshView(dir);
+  return { event, view };
+}
+
+/**
+ * Register a new tool against the shared registry (tsk-1dj, tool-registry-
+ * capability port). Same existence-check-before-append discipline as
+ * `addWork`: `existingNames` is read fresh from the log inside the held
+ * lock, so two processes racing a `--name` never both succeed. Validation
+ * (kind enum, capability normalization, scan-target-required-for-mcp/skill)
+ * is `tool-registry.mjs`'s own pure concern — this door only decides where
+ * the event lands, mirroring how `addWork` defers shape validation to
+ * `work.mjs`.
+ */
+export function registerTool(dir, fields) {
+  const { logPath } = paths(dir);
+  const event = withEventsLock(logPath, () => {
+    const before = rebuildView(logPath);
+    const existingNames = Object.keys(before.tools ?? {});
+    const record = validateToolRegistration(fields, existingNames); // ToolRegistryError: validation
+    return appendEventLocked(logPath, { type: 'tool.register', payload: record });
+  });
+  const view = refreshView(dir);
+  return { event, view };
+}
+
+/**
+ * Remove a registered tool. Looks the record up fresh from the log inside
+ * the held lock (same shape as `registerTool` above) — removing a name that
+ * was never registered, or already removed, is refused as `validation`
+ * rather than silently no-op'd.
+ */
+export function removeTool(dir, { name } = {}) {
+  const { logPath } = paths(dir);
+  const event = withEventsLock(logPath, () => {
+    const before = rebuildView(logPath);
+    if (!before.tools?.[name]) {
+      throw new StoreError('validation', `tool "${name}" not found.`);
+    }
+    return appendEventLocked(logPath, { type: 'tool.remove', payload: { name } });
+  });
   const view = refreshView(dir);
   return { event, view };
 }

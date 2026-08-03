@@ -7,10 +7,16 @@
 //
 // "done" is terminal, no-exit: no entry in TRANSITIONS has `from: 'done'`,
 // so once a work item is done, every further transitionWork() call for it
-// throws 'precondition'. Per D5, `done` now has TWO entries (two doors in,
-// still zero doors out): `doing -> done` (an operator's direct hand-move)
-// and `awaiting-approval -> done` (approval/merge of a worker's proposal). Neither
-// is more canonical than the other — both are asserted by test.
+// throws 'precondition'. Per work-item-status-delivered-retrospective-
+// cleanup D1/D2 (superseding D5's original two-door shape), `done` now has
+// exactly ONE door in — `cleanup -> done` — reached only after a sequential
+// chain: `delivered` (code accepted into the main tree — the earlier,
+// narrower meaning `done` always informally carried for RUL12's
+// dependent-open) -> `retrospective` (batched learning synthesis,
+// formerly the `compound-learn` stage) -> `cleanup` (TTL-bounded
+// worktree-reclaim park). `doing -> done` and `awaiting-approval -> done`
+// no longer exist; they are replaced by `doing -> delivered` and
+// `awaiting-approval -> delivered`.
 //
 // fsm-wontfix-terminal-status D1/D2/D3/D4: `wontfix` is a SECOND terminal
 // state alongside `done` — for an item deliberately closed without being
@@ -61,27 +67,43 @@ export class FsmError extends Error {
 export { STATUSES };
 
 // The transition table itself: every legal (from -> to) edge. `blocked` has
-// three doors out — `todo` and `doing` per the plan, plus `proposed` per
-// fan-out-parallel D18 (see the doc comment above); `done` has two incoming
-// edges (from `doing` and, per D5, from `proposed`) and no outgoing edge
-// (terminal). `proposed` (per D5) is entered only from `doing` (a worker's
-// goal-check pass) or, per fan-out-parallel D18, from `blocked` (a
-// mechanical reconcile), and leaves to `done` (approved/merged), back to
-// `todo` (rejected, with a reason — see transitionWork below), or, per
-// pr-lifecycle D3, to `blocked` (an approved proposal whose merge conflicted
-// or whose verify came back red on main after merge — the item parks with a
-// reason rather than being silently returned to the queue or auto-rebased; a
-// human resolves it, same as any other `blocked` item, via the existing
-// `blocked -> todo`/`blocked -> doing`/`blocked -> awaiting-approval` doors below).
-// It is never a re-entry point for `doing` directly.
+// four doors out now — `todo` and `doing` per the plan, `awaiting-approval`
+// per fan-out-parallel D18 (see the doc comment above), and `delivered`
+// (work-item-status-delivered-retrospective-cleanup D2: a mechanical retry
+// door, mirroring `blocked -> awaiting-approval`'s own shape exactly — no
+// `reason`, not a rejection) for an item parked via `cleanup -> blocked`
+// that just needs its retrospective/cleanup retried, not real rework
+// (rework instead goes out through the existing `blocked -> todo`/
+// `blocked -> doing` doors). `awaiting-approval` (per D5) is entered only
+// from `doing` (a worker's goal-check pass) or, per fan-out-parallel D18,
+// from `blocked` (a mechanical reconcile), and leaves to `delivered`
+// (approved/merged — work-item-status-delivered-retrospective-cleanup D1,
+// superseding the old direct `-> done` edge), back to `todo` (rejected,
+// with a reason — see transitionWork below), or, per pr-lifecycle D3, to
+// `blocked` (an approved proposal whose merge conflicted or whose verify
+// came back red on main after merge — the item parks with a reason rather
+// than being silently returned to the queue or auto-rebased; a human
+// resolves it, same as any other `blocked` item, via the existing
+// `blocked -> todo`/`blocked -> doing`/`blocked -> awaiting-approval`/
+// `blocked -> delivered` doors below). It is never a re-entry point for
+// `doing` directly.
+//
+// `delivered -> retrospective -> cleanup -> done` (work-item-status-
+// delivered-retrospective-cleanup D1/D2/D10) is a strictly sequential
+// chain — no parallel branches, no skip edges. `cleanup -> blocked`
+// (D2/D8, `reason` required — mirrors `awaiting-approval -> blocked`'s own
+// shape exactly) is the one way out on a failed final harness check (e.g.
+// the merge no longer resolves on main, or retrospective never actually
+// produced real content); `blocked -> delivered` above is how a
+// mechanical retry re-enters this chain.
 const TRANSITIONS = Object.freeze([
   Object.freeze({ from: 'todo', to: 'doing' }),
-  Object.freeze({ from: 'doing', to: 'done' }),
   Object.freeze({ from: 'todo', to: 'blocked' }),
   Object.freeze({ from: 'doing', to: 'blocked' }),
   Object.freeze({ from: 'blocked', to: 'todo' }),
   Object.freeze({ from: 'blocked', to: 'doing' }),
   Object.freeze({ from: 'blocked', to: 'awaiting-approval' }),
+  Object.freeze({ from: 'blocked', to: 'delivered' }),
   Object.freeze({ from: 'doing', to: 'awaiting-approval' }),
   // Claim release (claim-lock §3b): the clarify/decompose -> executing
   // boundary hands a held pick claim back to `todo` the moment the item is
@@ -93,9 +115,25 @@ const TRANSITIONS = Object.freeze([
   // reject path) or resumed via `awaiting-human`; this is the third, direct
   // door a claim can leave `doing` through without settling the item.
   Object.freeze({ from: 'doing', to: 'todo' }),
-  Object.freeze({ from: 'awaiting-approval', to: 'done' }),
+  // work-item-status-delivered-retrospective-cleanup D1: `delivered`
+  // replaces `done` as the direct target of both close doors — RUL58's
+  // acceptance-evidence gate (store.mjs's moveWork) now runs on every
+  // entry into `delivered`, not `done`.
+  Object.freeze({ from: 'doing', to: 'delivered' }),
+  Object.freeze({ from: 'awaiting-approval', to: 'delivered' }),
   Object.freeze({ from: 'awaiting-approval', to: 'todo' }),
   Object.freeze({ from: 'awaiting-approval', to: 'blocked' }),
+  // work-item-status-delivered-retrospective-cleanup D1/D2/D10: the
+  // sequential post-delivery chain. `retrospective` is where the
+  // (formerly `compound-learn`-stage) batched learning synthesis runs;
+  // `cleanup` is the TTL-bounded worktree-reclaim park; `cleanup -> done`
+  // is `done`'s one remaining door in, gated by the harness in D8 (not
+  // this table). `cleanup -> blocked` (D8) is the one way out of the
+  // chain on a failed final check.
+  Object.freeze({ from: 'delivered', to: 'retrospective' }),
+  Object.freeze({ from: 'retrospective', to: 'cleanup' }),
+  Object.freeze({ from: 'cleanup', to: 'done' }),
+  Object.freeze({ from: 'cleanup', to: 'blocked' }),
   Object.freeze({ from: 'todo', to: 'awaiting-human' }),
   Object.freeze({ from: 'doing', to: 'awaiting-human' }),
   Object.freeze({ from: 'awaiting-human', to: 'todo' }),
@@ -132,11 +170,15 @@ const TRANSITIONS = Object.freeze([
  * carries a `reason` explaining why. Per pr-lifecycle D3, `awaiting-approval -> blocked`
  * (an approved proposal whose merge or post-merge verify failed) carries the
  * same `reason` requirement — the concrete failure, so a human resolving the
- * park knows what broke. `reason` is required for exactly these two edges —
- * a missing or blank `reason` is refused with category 'validation' (checked
- * only after the edge itself is confirmed legal, so an illegal edge still
- * reports 'precondition' first). For every other edge, `reason` is ignored
- * and never appears in the returned event's payload.
+ * park knows what broke. Per work-item-status-delivered-retrospective-
+ * cleanup D2/D8, `cleanup -> blocked` (the final harness check failed —
+ * merge no longer resolves on main, or retrospective never produced real
+ * content) carries the same requirement, same reasoning. `reason` is
+ * required for exactly these three edges — a missing or blank `reason` is
+ * refused with category 'validation' (checked only after the edge itself
+ * is confirmed legal, so an illegal edge still reports 'precondition'
+ * first). For every other edge, `reason` is ignored and never appears in
+ * the returned event's payload.
  *
  * Human-gate ask/answer (per async-human-gate D2/D5), mirroring the `reason`
  * mechanism above: entering `awaiting-human` (`todo -> awaiting-human` or
@@ -176,11 +218,15 @@ export function transitionWork({ work, to, expectedStatus, reason, ask, answer }
   }
 
   const payload = { id: work.id, from, to };
-  if ((from === 'awaiting-approval' && to === 'todo') || (from === 'awaiting-approval' && to === 'blocked')) {
+  const reasonRequired =
+    (from === 'awaiting-approval' && to === 'todo') ||
+    (from === 'awaiting-approval' && to === 'blocked') ||
+    (from === 'cleanup' && to === 'blocked');
+  if (reasonRequired) {
     if (typeof reason !== 'string' || !reason.trim()) {
       throw new FsmError(
         'validation',
-        `transitionWork: "reason" is required and must be a non-empty string when moving work "${work.id}" from proposed to "${to}".`,
+        `transitionWork: "reason" is required and must be a non-empty string when moving work "${work.id}" from "${from}" to "${to}".`,
       );
     }
     payload.reason = reason.trim();

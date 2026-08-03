@@ -91,6 +91,14 @@ stage values — the same way `fgos-routing` describes it.
    honors. A medium or high risk in the map needs a proof point at
    `fgos-validating`, not a guess here.
 
+   Before writing a proof point that would lean on blast-radius evidence,
+   run `CLAUDE.md`'s impact-analysis capability gate (`fgos tool query
+   --capability impact-analysis --status present`) instead of assuming
+   GitNexus is on this machine. Record the resulting posture
+   (`impact-analysis: inactive|degraded|full`) in `plan.md` next to that
+   proof point — inactive drops the requirement, degraded keeps it but
+   marks the evidence weak, full keeps it exactly as before.
+
 4. **Shape.** Write (or enrich) `plan.md` scaled to the mode: a direct note
    for `tiny`, one open question for `spike`, a short plan for `small`, a
    phased plan for `standard`, a fuller map for `high-risk`. Sketch the
@@ -119,6 +127,31 @@ stage values — the same way `fgos-routing` describes it.
    design or re-plan any of that — it only needs to name, for each piece it
    describes, the one command that proves it done.
 
+7. **Mid-planning `CONTEXT.md` gap.** If, at any step above, `CONTEXT.md`'s
+   locked decisions turn out to be silent on something this plan actually
+   needs, apply the same material/grounded/answerable filter
+   `fgos-exploring` already uses to its own candidate questions:
+   - **Not material** — the answer would not change scope, behavior, data
+     shape, or acceptance criteria; a genuine implementation-only detail
+     `CONTEXT.md` correctly left unaddressed. Pin it as a labeled
+     assumption in `plan.md`'s own Assumptions instead of asking anyone —
+     `fgos-validating`'s reality gate already checks every assumption the
+     plan depends on is either proven or flagged as unproven, so this needs
+     no new container.
+   - **Material** — the answer would change scope, behavior, data shape, or
+     acceptance criteria. Hand back to `fgos-exploring` directly, in this
+     same session: invoke its flow (Socratic lock, the same three-test
+     filter, appending a new D-ID decision to `CONTEXT.md`) while
+     `item.stage` stays `decompose` the entire time — there is no
+     `decompose -> clarify` edge in the FSM (`src/state/
+     workflow-stage-graphs.mjs`'s `DOMAINS.coding.transitions` carries no
+     backward edge), so never attempt to move the item's stage back. This
+     is the same no-stage-move shape `fgos-validating` already uses when it
+     hands an item back to this skill directly (both stay in `decompose`).
+     Never reopen or reinterpret a decision `CONTEXT.md` already locked —
+     this path exists only for a gap it never addressed, not a second
+     chance to override one it did.
+
 ## Gate
 
 Before asking, check whether this gate can auto-approve instead
@@ -144,16 +177,29 @@ Treat anything other than exactly `true` on stdout — `false`, empty output,
 a thrown error — as `false`: fail closed, never skip the question on a
 check that couldn't run cleanly.
 
+Either branch below also records a structured approve record (tsk-19j
+D1/D11) — separate from, and in addition to, `fgos decision`'s free-text
+audit line: `fgos gate-approve <item-id> --gate planApprove --actor
+<human|bypass> --verify "<the plan's own real verify for this item>"` — the
+real, runnable command `plan.md` itself already names for this item as a
+whole (when the shape does not split it) or for the item's own piece when
+it does; never a placeholder, per this skill's own "Proof surface" rule.
+
 - **`true`** — skip the question. Post the non-question line
   `auto-approved: plan.md (gate-bypass level <level>)`, log it
   (`fgos decision --text "auto-approved plan.md gate for <item-id> at
   level <level>" --rationale "gate-bypass level <level> permits
   auto-approval per docs/history/gate-bypass/CONTEXT.md D1-D5"`, D3's
-  audit trail), then continue straight to `fgos-validating`.
+  audit trail), record it (`fgos gate-approve <item-id> --gate planApprove
+  --actor bypass --verify "..."`, per above), then continue straight to
+  `fgos-validating`.
 - **`false`** — present the mode, the approach, and the shape in plain
   language — what gets built, why this size and not a bigger or smaller
   one, what it costs if the shape turns out wrong — with `plan.md` linked,
-  then ask exactly: "Work shape is ready. Approve before execution?"
+  then ask exactly: "Work shape is ready. Approve before execution?" Once
+  the person approves, record it (`fgos gate-approve <item-id> --gate
+  planApprove --actor human --verify "..."`, per above) before continuing
+  to `fgos-validating`.
   `plan.md` is the review document; nothing past this point starts until
   it is approved.
 
@@ -182,6 +228,12 @@ reality itself.
 - applying a stage move directly instead of leaving it to the engine
 - running `fgos-validating`'s reality check here to skip the gate
 - classifying the item's domain — not this skill's job
+- guessing a product assumption for a material `CONTEXT.md` gap instead of
+  handing back to `fgos-exploring`, or asking a question that fails the
+  material/grounded/answerable filter instead of pinning it as an
+  assumption
+- moving `item.stage` back to `clarify` for a mid-planning gap — no such
+  edge exists; hand back via direct invocation instead
 
 Violating the letter of the rules is violating the spirit of the rules.
 

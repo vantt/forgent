@@ -3,7 +3,7 @@ type: how-to
 title: How to fix a verify command that mixes prose with a real command
 tags: []
 timestamp: 2026-07-29T10:44:23.697Z
-source_capture_ids: [tsk-34y]
+source_capture_ids: [tsk-34y, tsk-45u]
 ---
 # How to fix a verify command that mixes prose with a real command
 
@@ -118,6 +118,62 @@ re-discover, because `judgeDecompose` derives the field again each time
 rather than reading back what a human already corrected. The same
 steps 3-4 above fixed it again, with no code change in between, confirming
 this is purely a recurring verify-field defect, not a regression.
+
+## A second shape: an apostrophe, and a command that proves nothing
+
+Item `tsk-45u` (making the herdr cockpit open agent panes in its project
+root) hit the same defect through a different door, and it is worth
+recognising both halves separately.
+
+**The syntax half.** This item's `verify` was auto-generated at the
+*clarify* pass, not the decompose one — its settlement record reads:
+
+> `{"kind":"clarify-pass","role":"session","ts":"2026-07-30T11:13:38.378Z","detail":"npm test — full suite green, plus new/updated test asserting that opening a task sets cwd to the herdr cockpit's project root (per locked decision in commit 85a2945)","id":"tsk-45u"}`
+> — real `fgos check tsk-45u` settlement entry
+
+There is no `(` problem here at all. The break is the apostrophe in
+`cockpit's`: the string is executed through `/bin/sh`, which reads that
+quote as opening a quoted section that never closes.
+
+> `{"id":"tsk-45u","from":"doing","to":"blocked","source":"branch","branch":"fgw/tsk-45u","aheadCount":5,"passed":false,"exitStatus":2,"output":"/bin/sh: 1: Syntax error: Unterminated quoted string\n"}`
+> — real `return` output for the first, failing attempt
+
+The friction it recorded is the identical shape step 1 above describes:
+
+> `"friction":{"count":1,"byLayer":{"verification":1},"recent":[{"id":"tsk-45u","disposition":"blocked","errorClass":"verify-miss","layer":"verification","attempts":1,"detail":"goal-check failed on branch \"fgw/tsk-45u\" (exit 2)","ts":"2026-07-30T11:30:57.063Z"}]}`
+> — real `fgos check tsk-45u` output
+
+So when you read `return`'s `output` at step 1, expect either wording:
+`Syntax error: "(" unexpected` **or** `Syntax error: Unterminated quoted
+string`. Both mean the same thing — prose stored where a command belongs.
+
+**The half that survives fixing the syntax.** Deleting the apostrophe
+would have made this item's `verify` run and pass while proving nothing.
+`npm test` in this repo is `node --test 'test/**/*.test.mjs'`
+(`package.json`), and `tsk-45u` changed only Rust sources under
+`herdr-plugin/`. A green `npm test` there is a check that never touches
+the changed code at all.
+
+So when you rewrite the field at step 3, do not just make it parse — check
+it actually exercises what changed. For this item the real command was the
+one every `herdr-plugin` item already uses:
+
+```
+fgos edit tsk-45u --verify 'cargo test --manifest-path herdr-plugin/Cargo.toml && cargo build --release --manifest-path herdr-plugin/Cargo.toml'
+```
+
+Then steps 4's `fgos move <id> --to doing` and `fgos return <id>` as
+written above, with no code change in between, produced
+`{"from":"doing","to":"awaiting-approval","passed":true}` — the engine
+re-running the corrected command itself, in its own clean checkout, on 33
+tests plus a release compile.
+
+**What this adds to "Why this exists".** The section above attributes the
+defect to `judgeDecompose`. This capture shows the clarify-stage judgment
+produces it too, so the exposure is not limited to one judge. It also
+shows the failure is not only syntactic: a model-authored `verify` can name
+the wrong test suite entirely for the change at hand, and no shell error
+will ever tell you that — only reading the command against the diff will.
 
 ## Related
 

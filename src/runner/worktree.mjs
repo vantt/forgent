@@ -79,6 +79,31 @@ export function branchNameFor(id) {
   return `fgw/${id}`;
 }
 
+/**
+ * Provision `worktreePath`'s own `node_modules` before anything runs
+ * `verify` against it (tsk-2vd D1/D2): a disposable worktree never inherits
+ * the host repo's `node_modules` — git only checks out tracked files.
+ * No-ops when `worktreePath/package.json` is absent or declares no
+ * `dependencies`/`devDependencies` at all (same skip precedent as
+ * `checkDependenciesInstalled`, `src/setup/registrations.mjs`) — keeps
+ * every existing zero-dependency caller (this repo's own history until
+ * `tsk-slq` added `yaml`) byte-identical, no install cost paid when
+ * nothing is declared. Runs `npm ci` when `worktreePath/package-lock.json`
+ * exists (reproducible, matches the lockfile exactly), else `npm install`
+ * (D2) — never a `node_modules` symlink from the host repo (D2's rejected
+ * alternative: risks masking a real dependency mismatch when the
+ * worktree's own `package.json` diverged from the host's installed set).
+ */
+export function provisionDependencies(worktreePath) {
+  const packageJsonPath = path.join(worktreePath, 'package.json');
+  if (!fs.existsSync(packageJsonPath)) return;
+  const pkg = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+  const hasDeps = Object.keys(pkg.dependencies ?? {}).length > 0 || Object.keys(pkg.devDependencies ?? {}).length > 0;
+  if (!hasDeps) return;
+  const hasLockfile = fs.existsSync(path.join(worktreePath, 'package-lock.json'));
+  execFileSync('npm', [hasLockfile ? 'ci' : 'install'], { cwd: worktreePath, stdio: 'ignore' });
+}
+
 function git(repoRoot, args) {
   return execFileSync('git', args, { cwd: repoRoot, encoding: 'utf8', shell: false });
 }
@@ -106,8 +131,13 @@ export function branchExists(repoRoot, branch) {
  * `null` if the branch is not checked out anywhere. Porcelain records are
  * blank-line-separated stanzas, each starting with a `worktree <path>`
  * line followed by a `branch refs/heads/<name>` line (or `detached`).
+ *
+ * Exported (tsk-3gx-1): `promote-preflight.mjs` reuses this exact parse to
+ * judge whether a member branch is currently checked out elsewhere before
+ * a retarget — same "one implementation of this check" discipline
+ * `branchExists` above already documents for its own callers.
  */
-function findCheckoutPath(porcelainOutput, branch) {
+export function findCheckoutPath(porcelainOutput, branch) {
   const ref = `refs/heads/${branch}`;
   let currentPath = null;
   for (const line of porcelainOutput.split('\n')) {
@@ -130,8 +160,12 @@ function findCheckoutPath(porcelainOutput, branch) {
  * look dirty regardless of real activity. Mirrors session.mjs's
  * `reclaimOrphanedSessions` (same `:!.fgos` pathspec exclusion). Fails
  * closed (dirty) on an unreadable status — never assume clean.
+ *
+ * Exported (tsk-3gx-1): `promote-preflight.mjs` reuses this exact
+ * fail-closed dirty check for its own "is this branch actively in use"
+ * judgment — never a second implementation of "is this checkout dirty".
  */
-function isCheckoutDirty(repoRoot, worktreePath) {
+export function isCheckoutDirty(repoRoot, worktreePath) {
   let status;
   try {
     status = git(repoRoot, ['-C', worktreePath, 'status', '--porcelain', '--', ':!.fgos']);
@@ -154,6 +188,15 @@ function isCheckoutDirty(repoRoot, worktreePath) {
  * to force-remove it instead of silently discarding the work. The caller
  * (createWorktree's reuse path) does not catch this — it propagates as a
  * hard failure rather than destroying the checkout.
+ *
+ * DESTROY-ON-PURPOSE (tsk-3lx): stays destroy-only, unlike its sibling
+ * `relocateOrphanedCheckout` below — `cleanupMergedBranch` (merge.mjs)
+ * calls this directly to dispose of a stray leftover checkout right
+ * before deleting `branch` itself, where there is no replacement checkout
+ * to relocate to. `createWorktree`'s own reuse path is what actually needs
+ * the checkout to keep living (just at a new path), which is exactly what
+ * makes that ONE call site the zero-destroy incident's origin — see
+ * `relocateOrphanedCheckout`.
  */
 export function reclaimOrphanedCheckout(repoRoot, branch) {
   let listing;
@@ -165,6 +208,20 @@ export function reclaimOrphanedCheckout(repoRoot, branch) {
 
   const orphanPath = findCheckoutPath(listing, branch);
   if (!orphanPath) return { reclaimed: false, path: null };
+
+  // REPO-ROOT GUARD (tsk-k8u D1): an orphan checkout that resolves to
+  // `repoRoot` itself would force-remove the main checkout's own working
+  // tree — never a genuine crash-orphan (a crash-orphan is always some
+  // OTHER checkout of the branch), and destructive in a way no caller here
+  // intends. Refuses the same way the dirty-checkout guard below does,
+  // rather than silently reclaiming the ground the caller itself may be
+  // standing on.
+  if (path.resolve(orphanPath) === path.resolve(repoRoot)) {
+    throw new WorktreeError(
+      `refusing to reclaim checkout of "${branch}" at "${orphanPath}" — it resolves to repoRoot itself, so reclaiming it would force-remove the main checkout's own working tree. This is never a genuine crash-orphan; check how "${branch}" ended up checked out at repoRoot before retrying.`,
+      { branch, orphanPath },
+    );
+  }
 
   if (fs.existsSync(orphanPath)) {
     if (isCheckoutDirty(repoRoot, orphanPath)) {
@@ -192,6 +249,88 @@ export function reclaimOrphanedCheckout(repoRoot, branch) {
     }
   }
   return { reclaimed: true, path: orphanPath };
+}
+
+/**
+ * Relocate `branch`'s existing clean checkout directly onto `targetPath`
+ * via `git worktree move`, instead of destroying it first (tsk-3lx D2,
+ * zero-destroy): if the move fails for any reason, the pre-existing
+ * checkout is left exactly where it was, still valid, still on `branch`.
+ * This is what `createWorktree`'s reuse path calls instead of
+ * `reclaimOrphanedCheckout` — the incident this closes (`spawnSync git
+ * ENOENT` mid-`git worktree add`, deleting the exact checkout a live
+ * session was sitting in) only ever happened on THIS path, where a
+ * replacement checkout was always the point; `reclaimOrphanedCheckout`
+ * itself stays destroy-only for its other caller, `cleanupMergedBranch`,
+ * which has no replacement to relocate to (see its own docstring).
+ *
+ * Returns `{ relocated: true, from, to }` when a live checkout was moved,
+ * `{ relocated: false }` when there was nothing to relocate — no existing
+ * checkout at all, or one whose directory is already gone (pruned instead,
+ * same as `reclaimOrphanedCheckout`'s own already-gone branch — nothing
+ * physical to lose there either way).
+ *
+ * Shares the DATA-LOSS GUARD above verbatim (tsk-1os, unchanged): a
+ * checkout with real uncommitted changes is refused, never moved.
+ *
+ * `targetPath` must not already exist on disk. `git worktree move` nests
+ * the source under an existing directory instead of placing it there —
+ * verified empirically against this repo's own git (2.34.1), recorded in
+ * `docs/history/pick-worktree-reclaim-zero-destroy/plan.md`'s "Validated
+ * at fgos-validating" section — so the caller's own `mkdtemp`'d empty
+ * placeholder directory must be removed immediately before this call, not
+ * reused as-is.
+ */
+function relocateOrphanedCheckout(repoRoot, branch, targetPath) {
+  let listing;
+  try {
+    listing = git(repoRoot, ['worktree', 'list', '--porcelain']);
+  } catch (err) {
+    throw new WorktreeError(`listing worktrees failed while reclaiming "${branch}": ${err.message}`, { branch });
+  }
+
+  const orphanPath = findCheckoutPath(listing, branch);
+  if (!orphanPath) return { relocated: false };
+
+  if (!fs.existsSync(orphanPath)) {
+    try {
+      git(repoRoot, ['worktree', 'prune']);
+    } catch (err) {
+      throw new WorktreeError(
+        `pruning stale worktree registration for "${branch}" (path already gone: "${orphanPath}") failed: ${err.message}`,
+        { branch, orphanPath },
+      );
+    }
+    return { relocated: false };
+  }
+
+  if (isCheckoutDirty(repoRoot, orphanPath)) {
+    throw new WorktreeError(
+      `refusing to reclaim checkout of "${branch}" at "${orphanPath}" — it has uncommitted changes, so it is not a genuine crash-orphan (a real one is clean, its commit already landed) and may be a live checkout still in use. Commit or discard the work there, or remove the worktree yourself, before retrying.`,
+      { branch, orphanPath },
+    );
+  }
+
+  try {
+    fs.rmdirSync(targetPath);
+  } catch (err) {
+    throw new WorktreeError(`preparing relocation target "${targetPath}" for "${branch}" failed: ${err.message}`, {
+      branch,
+      orphanPath,
+      targetPath,
+    });
+  }
+
+  try {
+    git(repoRoot, ['worktree', 'move', orphanPath, targetPath]);
+  } catch (err) {
+    throw new WorktreeError(
+      `relocating checkout of "${branch}" from "${orphanPath}" to "${targetPath}" failed: ${err.message}`,
+      { branch, orphanPath, targetPath },
+    );
+  }
+
+  return { relocated: true, from: orphanPath, to: targetPath };
 }
 
 /**
@@ -252,9 +391,10 @@ export function createWorktree(repoRoot, id, opts = {}) {
   const worktreePath = fs.mkdtempSync(path.join(baseDir, `${id}-`));
 
   const reused = branchExists(repoRoot, branch);
+  let relocated = false;
   if (reused) {
     try {
-      reclaimOrphanedCheckout(repoRoot, branch);
+      relocated = relocateOrphanedCheckout(repoRoot, branch, worktreePath).relocated;
     } catch (err) {
       try {
         fs.rmSync(worktreePath, { recursive: true, force: true });
@@ -265,25 +405,27 @@ export function createWorktree(repoRoot, id, opts = {}) {
       throw err;
     }
   }
-  try {
-    if (reused) {
-      git(repoRoot, ['worktree', 'add', worktreePath, branch]);
-    } else if (opts.baseRef) {
-      git(repoRoot, ['worktree', 'add', '-b', branch, worktreePath, opts.baseRef]);
-    } else {
-      git(repoRoot, ['worktree', 'add', '-b', branch, worktreePath]);
-    }
-  } catch (err) {
+  if (!relocated) {
     try {
-      fs.rmSync(worktreePath, { recursive: true, force: true });
-    } catch {
-      // best-effort cleanup of the empty dir mkdtemp created; the real
-      // failure below is what the caller needs to see.
+      if (reused) {
+        git(repoRoot, ['worktree', 'add', worktreePath, branch]);
+      } else if (opts.baseRef) {
+        git(repoRoot, ['worktree', 'add', '-b', branch, worktreePath, opts.baseRef]);
+      } else {
+        git(repoRoot, ['worktree', 'add', '-b', branch, worktreePath]);
+      }
+    } catch (err) {
+      try {
+        fs.rmSync(worktreePath, { recursive: true, force: true });
+      } catch {
+        // best-effort cleanup of the empty dir mkdtemp created; the real
+        // failure below is what the caller needs to see.
+      }
+      throw new WorktreeError(`git worktree add failed for branch "${branch}": ${err.message}`, {
+        branch,
+        worktreePath,
+      });
     }
-    throw new WorktreeError(`git worktree add failed for branch "${branch}": ${err.message}`, {
-      branch,
-      worktreePath,
-    });
   }
 
   try {
@@ -294,6 +436,17 @@ export function createWorktree(repoRoot, id, opts = {}) {
       worktreePath,
     });
   }
+
+  // A symlink to repoRoot's node_modules was considered and rejected here
+  // (tsk-2vd D2): instant and no network, but only ever matches whatever
+  // repoRoot itself has installed — a worktree whose own package.json
+  // declares a dependency repoRoot hasn't installed yet (exactly the
+  // scenario that exposed this whole gap: a branch merging in a new
+  // dependency before that merge lands on repoRoot's own default branch)
+  // would still hit ERR_MODULE_NOT_FOUND. provisionDependencies installs
+  // for THIS worktree's own declared dependencies instead, correct for
+  // that case at the cost of the install itself.
+  provisionDependencies(worktreePath);
 
   return { path: worktreePath, branch, reused };
 }
@@ -309,14 +462,80 @@ export function createWorktree(repoRoot, id, opts = {}) {
 // implementation.
 
 /**
+ * The checkout of `branch` a claim may reattach to instead of standing up a
+ * new one, or `null` when there is none to reattach to. Deliberately
+ * stricter than `findCheckoutPath` alone, on two counts:
+ *
+ * - the registration must still exist on disk. `git worktree list` reports
+ *   a path whose directory was deleted out from under it until someone
+ *   prunes, and handing that back would be a checkout that isn't there.
+ * - the checkout must live under `baseDir`, the directory THIS caller
+ *   allocates its own worktrees in. A runner dispatch worktree for the same
+ *   item lands elsewhere (the runner passes no `worktreeDir`, so its
+ *   checkouts go to the `os.tmpdir()` default while a `pick` claim uses
+ *   `.claude/worktrees`), and a live one means a worker is running in it
+ *   right now — reattaching a second claim into that directory would put two
+ *   workers in one checkout.
+ *
+ * Cleanliness is deliberately NOT a condition here: nothing is removed on
+ * this path, so `reclaimOrphanedCheckout`'s data-loss guard has nothing to
+ * protect against. A checkout with uncommitted work is precisely the session
+ * that most needs to resume where it left off.
+ */
+function reattachableCheckout(repoRoot, branch, baseDir) {
+  let listing;
+  try {
+    listing = git(repoRoot, ['worktree', 'list', '--porcelain']);
+  } catch {
+    return null;
+  }
+  const registered = findCheckoutPath(listing, branch);
+  if (!registered || !fs.existsSync(registered) || !fs.existsSync(baseDir)) return null;
+
+  let relative;
+  try {
+    // realpath both sides: `git worktree list` reports resolved paths, while
+    // a caller's baseDir can still carry a symlinked segment.
+    relative = path.relative(fs.realpathSync(baseDir), fs.realpathSync(registered));
+  } catch {
+    return null;
+  }
+  if (!relative || relative.startsWith('..') || path.isAbsolute(relative)) return null;
+  return registered;
+}
+
+/**
  * claim-isolate: the worktree returned here IS the work — it outlives this
  * call, and its owning claim (`claim-port.mjs`'s `claimWork`) tears it down
- * later at return/reject time, never inline here. Thin passthrough, kept so
- * a claim call site names its shape instead of calling the low-level
- * primitive directly (and so a future claim-isolate call site has one
- * documented place to land instead of a fourth ad hoc `createWorktree` call).
+ * later at return/reject time, never inline here.
+ *
+ * REATTACH (tsk-65n): a claim whose `fgw/<id>` checkout is still standing
+ * gets that same checkout back, untouched. The case is routine rather than
+ * exotic — an item's claim is released back to `todo` the moment it reaches
+ * stage `executing` (`decompose.mjs`'s `releaseClaimOnExecuting`), and the
+ * session that held it then claims it again to do the work, from inside the
+ * very worktree the claim stands up. Going through `createWorktree`'s reuse
+ * path there would reclaim that live checkout: force-removed when clean —
+ * pulling the directory out from under the running session — or a hard
+ * failure when dirty. Neither is what a re-claim means.
+ *
+ * This is why the reattach lives here and not in `createWorktree`: the reuse
+ * path is shared with the runner's own retry, which deliberately wants a
+ * FRESH directory on the reused branch so a retry never builds on a previous
+ * attempt's debris (see RETRY-WITHOUT-SELF-COLLISION in the module doc).
+ * Keeping the decision in this wrapper leaves that path, and the
+ * merge-ephemeral one, byte-for-byte unchanged.
  */
 export function createClaimWorktree(repoRoot, id, opts = {}) {
+  const branch = branchNameFor(id);
+  if (branchExists(repoRoot, branch)) {
+    const baseDir = opts.worktreeDir ?? path.join(os.tmpdir(), 'fgos-worktrees');
+    const existing = reattachableCheckout(repoRoot, branch, baseDir);
+    // `reused: true` is the same answer the add-on-an-existing-branch path
+    // already gives, and means the same thing to a caller: this claim did not
+    // fork a new branch.
+    if (existing) return { path: existing, branch, reused: true };
+  }
   return createWorktree(repoRoot, id, opts);
 }
 

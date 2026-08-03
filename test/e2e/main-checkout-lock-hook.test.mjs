@@ -85,6 +85,46 @@ function initTempRepoWithDetachedWorktree() {
   return worktreeRoot;
 }
 
+// tsk-4hkd -- a repo checked out directly onto a fgw/<id> branch, simulating
+// the exact mistake this hook's new guard exists to catch (checking out an
+// item branch on the main checkout instead of claiming through `fgos pick`).
+
+function initTempRepoWithHookOnBranch(branchName) {
+  const repoRoot = initTempRepoWithHook();
+  execFileSync('git', ['checkout', '-q', '-b', branchName], { cwd: repoRoot });
+  return repoRoot;
+}
+
+// tsk-4hkd -- a real, non-detached linked worktree checked out onto a
+// fgw/<id> branch: the LEGITIMATE shape (fgos pick's own worktree.mjs),
+// which the new guard must never refuse.
+
+function initTempRepoWithFgwWorktree(branchName) {
+  const mainRoot = mkTempDir('fgos-main-checkout-hook-e2e-fgw-main-');
+  execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: mainRoot });
+  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: mainRoot });
+  execFileSync('git', ['config', 'user.name', 'Test'], { cwd: mainRoot });
+  fs.writeFileSync(path.join(mainRoot, 'seed.txt'), 'seed\n');
+  execFileSync('git', ['add', 'seed.txt'], { cwd: mainRoot });
+  execFileSync('git', ['commit', '-q', '-m', 'root commit'], { cwd: mainRoot });
+
+  const worktreeParent = mkTempDir('fgos-main-checkout-hook-e2e-fgw-worktree-parent-');
+  const worktreeRoot = path.join(worktreeParent, 'worktree');
+  execFileSync('git', ['worktree', 'add', '-b', branchName, worktreeRoot], { cwd: mainRoot });
+
+  const hooksDir = path.join(worktreeRoot, '.githooks');
+  const runnerDir = path.join(worktreeRoot, 'src', 'runner');
+  fs.mkdirSync(hooksDir, { recursive: true });
+  fs.mkdirSync(runnerDir, { recursive: true });
+  fs.copyFileSync(REAL_HOOK, path.join(hooksDir, 'pre-commit'));
+  fs.copyFileSync(REAL_LOCK_MODULE, path.join(runnerDir, 'main-checkout-lock.mjs'));
+  fs.copyFileSync(REAL_IDENTITY_MODULE, path.join(runnerDir, 'session-identity.mjs'));
+  fs.chmodSync(path.join(hooksDir, 'pre-commit'), 0o755);
+  execFileSync('git', ['config', 'core.hooksPath', '.githooks'], { cwd: worktreeRoot });
+
+  return worktreeRoot;
+}
+
 let fileCounter = 0;
 
 /** Stages a new, always-unique file and runs `git commit` as a child
@@ -288,4 +328,33 @@ test('a commit still succeeds after the identity shape change, and the lock reco
   const second = commitAsSession(repoRoot, { BEE_SESSION_ID: 'session-shape' });
   assert.equal(second.status, 0, second.stderr);
   assert.equal(commitCount(repoRoot), before + 2);
+});
+
+// --- truth 8: main checkout on a fgw/* branch refuses commits (tsk-4hkd) --
+// The mistake this guard exists to catch: checking out an item branch
+// directly on the main checkout instead of claiming through `fgos pick`.
+
+test('a git commit on the main checkout is refused when checked out to a fgw/* branch', () => {
+  const repoRoot = initTempRepoWithHookOnBranch('fgw/tsk-example');
+  const before = commitCount(repoRoot);
+
+  const result = commitAsSession(repoRoot, { BEE_SESSION_ID: 'session-mistake' });
+
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /commit refused/);
+  assert.match(result.stderr, /fgw\/tsk-example/);
+  assert.equal(commitCount(repoRoot), before);
+});
+
+// --- truth 9: a linked worktree on a fgw/* branch is unaffected (tsk-4hkd) -
+// The legitimate shape (fgos pick's own worktree.mjs) must never be refused
+// by the new guard above -- only the MAIN checkout is disallowed a fgw/*
+// branch, never a linked worktree, which is supposed to live on one.
+
+test('a git commit inside a linked (non-detached) worktree on a fgw/* branch still succeeds', () => {
+  const worktreeRoot = initTempRepoWithFgwWorktree('fgw/tsk-example');
+
+  const result = commitAsSession(worktreeRoot, { BEE_SESSION_ID: 'session-worktree-fgw' });
+
+  assert.equal(result.status, 0, result.stderr);
 });

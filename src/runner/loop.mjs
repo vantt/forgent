@@ -64,7 +64,7 @@ import {
   categoryOf,
   EXIT_CODES,
 } from '../state/store.mjs';
-import { DEFAULTS } from '../state/work.mjs';
+import { DEFAULTS, truncateTitle } from '../state/work.mjs';
 import { getDomain, stageForStep } from '../state/workflow-stage-graphs.mjs';
 import { resolveAction, resolveStaleDoing } from './recovery.mjs';
 import {
@@ -76,6 +76,7 @@ import {
   BREAKER_MISSES,
 } from './anti-loop.mjs';
 import { spawnWorker, modelForTier } from './dispatch.mjs';
+import { appendEvent } from '../state/events.mjs';
 import { appendWorkerLog, appendWorkerLogChunk } from './worker-log.mjs';
 import { createDispatchWorktree, removeDispatchWorktree, listLeftovers, branchNameFor, createBranchRef } from './worktree.mjs';
 import { runGoalCheck } from './goal-check.mjs';
@@ -574,7 +575,12 @@ async function captureDiscoveredWork({ output, item, queue, dir, log }) {
     try {
       await queue.enqueue(async () => {
         const view = listWork(dir).work;
-        const normalizedTitle = block.title.trim().toLowerCase();
+        // Compare against the title the store will actually hold, not the raw
+        // block title: addWork bounds titles on the way in (work.mjs
+        // truncateTitle, work-item-title-contract D5), so a block whose title
+        // runs past the bound would never match its own stored record and
+        // every re-run would capture it again.
+        const normalizedTitle = truncateTitle(block.title).trim().toLowerCase();
         const alreadyCaptured = Object.values(view).some(
           (w) => w.discoveredFrom === item.id && w.title.trim().toLowerCase() === normalizedTitle,
         );
@@ -659,6 +665,9 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
       // rejected proposal. Read fresh: `item` predates this claim's moves.
       const feedbackView = listWork(dir);
       const worker = await spawnWorker(item, config, wt.path, {
+        // tsk-62v D6: lets a `kind: "cli"` capacity's presence be checked
+        // via `fgos tool query`'s own functions instead of re-probing PATH.
+        fgosDir: dir,
         feedback: {
           answer: feedbackView.gates?.[item.id]?.answer,
           reason: feedbackView.work?.[item.id]?.reason,
@@ -671,6 +680,22 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
       });
       lastWorkerOutput = worker.stdout ?? ''; // wgi-8: terminal-outcome discovery source (success/verify-miss)
       log(`fgos-runner: worker for "${item.id}" exited ${worker.status ?? `signal ${worker.signal}`} (tier ${worker.tier} -> ${worker.model})`);
+      // Capacity-aware dispatch announce/audit (D8, tsk-62v): one line to
+      // stderr/logs, plus one event appended to the existing `.fgos/
+      // events.jsonl` one-door-write log — reused, not a new file.
+      // `replay.mjs` ignores unknown event types by design (see its own
+      // doc comment), so this audit-only entry never participates in the
+      // FSM view. Queued through the same `queue.enqueue()` every other
+      // write at this call site already uses, closing the synthesis
+      // report's concurrent-session write-race concern (§3) for this
+      // append too.
+      log(`fgos-runner: ${worker.capacityId} — ${worker.provider} — ${worker.model}`);
+      await queue.enqueue(async () => {
+        appendEvent(path.join(dir, 'events.jsonl'), {
+          type: 'capacity.dispatch',
+          payload: { id: item.id, capacityId: worker.capacityId, provider: worker.provider, model: worker.model },
+        });
+      });
       // Persist the worker's own output for after-the-fact recovery (D1/D3/D4):
       // right after the spawn resolves, before goal-check — so success AND
       // verify-miss are both captured (goal-check runs next).

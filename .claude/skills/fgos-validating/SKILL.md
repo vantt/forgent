@@ -47,14 +47,28 @@ pass to keep the item moving.
 - End by presenting the gate below and handing off. A failed check returns
   the item to `fgos-planning` with the failing row named — it never
   continues past a failure by lowering the bar.
-- Before this session (or a later one) calls `fgos discover` — the call that
-  actually fires the `decompose`→`executing` edge and releases the claim
-  back to `todo` (claim-lock §3b) — confirm `CONTEXT.md`/`plan.md` are
-  already committed to the item's `fgw/<id>` branch. A `READY` verdict on an
+- Before this session (or a later one) calls `fgos decompose` (tsk-2b0 D1:
+  the `decompose`-stage sibling of `discover`, hard split, no fallback) —
+  the call that actually fires the `decompose`→`executing` edge and
+  releases the claim back to `todo` (claim-lock §3b) — confirm
+  `CONTEXT.md`/`plan.md` are already committed to the item's `fgw/<id>`
+  branch. A `READY` verdict on an
   uncommitted plan hands off to an edge whose own artifacts are invisible to
   whichever session re-claims the item next. Same one-artifact-per-stop
   discipline `fgos-executing`'s "one commit per item" rule already gives
   Execute.
+- This session IS that later session, right here (tsk-27y D1/D2, Native-First
+  Dispatch Doctrine Phase 2 — `docs/decisions/0026-...md`): once the Gate
+  below approves, fire `fgos decompose` yourself, passing the split decision
+  `plan.md`'s own step 5 already locked as an explicit `--verdict` — never
+  leave the transition to a LATER blind `fgos decompose` call (which would
+  spawn `judgeDecompose`'s subprocess judge to re-derive a split decision
+  this session, and `fgos-planning` before it, already made with real
+  evidence) or the fragile plan.md-tiny/small-mode-regex heuristic. Calling
+  `fgos decompose --verdict ...` is still calling the engine, exactly as the
+  hard rule above already requires — the CLI verb is the one sanctioned
+  entry point either way; only the judge subprocess underneath it is what
+  gets skipped.
 
 ## Flow
 
@@ -77,6 +91,13 @@ pass to keep the item moving.
    - **Proof surface** — does every piece in the plan already carry a real,
      runnable verify command (never a placeholder or a description standing
      in for one)?
+   - **Impact-analysis posture** — where the plan leans on blast-radius
+     evidence, does its recorded `impact-analysis: inactive|degraded|full`
+     posture (`fgos-planning`'s step 3) match what `CLAUDE.md`'s
+     impact-analysis capability gate actually reports right now
+     (`fgos tool query --capability impact-analysis --status present`)? A
+     stale or missing posture is a FAIL here, not a skip — never assume
+     GitNexus is present because the plan says so.
 
    A FAIL on any dimension stops here: return the item to `fgos-planning`
    with the failing dimension and the reason, named plainly. Never continue
@@ -88,7 +109,11 @@ pass to keep the item moving.
    command actually run with its real output, an existing test result, or an
    official version/doc confirmation — never "should work" or model
    knowledge alone. A row with no accepted evidence is an automatic **NOT
-   READY**, regardless of how reasonable the assumption sounds.
+   READY**, regardless of how reasonable the assumption sounds. A row
+   requiring blast-radius evidence is the one exception: an `inactive`
+   posture (checked above) satisfies the row by itself — no provider means
+   nothing to run — while `degraded` requires the gap named plainly in the
+   row's result, never silently dropped.
 
 4. **Decide**, using this vocabulary only:
    ```text
@@ -115,20 +140,46 @@ would cost to be wrong — with `plan.md` linked, then ask exactly: "Feasibility
 validated. Approve moving to executing?" A `NOT READY` verdict skips this
 question entirely; it returns to `fgos-planning` instead of asking anything.
 
-The verdict reached here does not, by itself, move the item anywhere. It
-only informs which of the item's own already-registered edges the session
-picks next once work resumes — the engine is still the only thing that
-validates and applies that move; this skill's decision is input to that
-choice, never a substitute for it.
+Once the person approves (`READY` or `READY WITH CONSTRAINTS`), record a
+structured approve record (tsk-19j D1/D11) — separate from, and in addition
+to, any `fgos decision` line this session already logged: `fgos gate-approve
+<item-id> --gate validateApprove --actor human --verify "<verify>"`. No
+auto-approve path exists for this Gate today (unlike fgos-exploring/
+fgos-planning's gate-bypass check above) — `actor` is always `human` here.
+`verify` reuses `gates[id].planApprove.verify` (`fgos list --id <item-id>
+--json`'s `data.gates[id].planApprove.verify`, read fresh) — this skill
+proves the plan's existing verify still holds against reality, it does not
+design a new one (per this skill's own "leave execution alone" rule).
+
+Immediately after that gate-approve record, fire the `decompose`→`executing`
+engine call itself (tsk-27y D1/D2, per the Hard rule above), reading the
+split decision straight from `plan.md`'s own step 5 (never re-derived here —
+`fgos-planning`'s job, already done and already cited):
+
+```bash
+root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
+# plan.md's step 5 said "one honest piece" -- no split:
+node "$root/bin/fgos.mjs" decompose "<item-id>" --verdict pass-through --reason "<why plan.md called this one piece>" --dir "$root"
+# plan.md's step 5 listed real child pieces instead -- each with the title
+# and verify command plan.md already recorded, formatted as the same JSON
+# shape judgeDecompose itself produces ({title, verify, kind?, risk?, refs?,
+# footprint?, deps?}):
+node "$root/bin/fgos.mjs" decompose "<item-id>" --verdict decompose --reason "<why plan.md called for a split>" --children '<JSON array from plan.md>' --dir "$root"
+```
+
+The verdict reached at the Gate above does not, by itself, move the item
+anywhere — it only informs which of the item's own already-registered edges
+this session picks next; the `fgos decompose` call above is what actually
+validates and applies that move, never a substitute for it.
 
 ## Handoff
 
-A `READY` or `READY WITH CONSTRAINTS` verdict, once approved at the gate,
-means the item is provably ready for its `decompose`→`executing` edge —
-loading `fgos-routing` next reads the item's stage and points at the right
-place (or straight at the existing mechanical build/verify/return path, if
-the edge already fired). A `NOT READY` verdict hands the item back to
-`fgos-planning` instead, with the matrix attached, never onward.
+A `READY` or `READY WITH CONSTRAINTS` verdict, once approved at the gate and
+the `fgos decompose` call above has fired, means the item has already taken
+its `decompose`→`executing` edge — loading `fgos-routing` next reads the
+item's stage (now `executing`) and points at the right place. A `NOT READY`
+verdict hands the item back to `fgos-planning` instead, with the matrix
+attached, never onward, and never fires the `fgos decompose` call.
 
 ## Red flags
 
@@ -138,8 +189,11 @@ the edge already fired). A `NOT READY` verdict hands the item back to
   this slice (cite D6)
 - re-planning or re-designing Execute's own verify instead of leaving it
   alone
-- applying the `decompose`→`executing` edge directly instead of leaving it
+- applying the `decompose`→`executing` edge directly (writing state through
+  anything other than the `fgos decompose` CLI call) instead of leaving it
   to the engine
+- inventing a `--children` entry plan.md never actually listed, or a title/
+  verify that drifts from what plan.md recorded
 - recording the verdict as a new field or stage instead of gate-question
   prose
 - softening a NOT READY into a pass because the item already spent time here

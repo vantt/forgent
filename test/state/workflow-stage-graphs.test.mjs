@@ -16,25 +16,23 @@ test('DOMAINS has exactly two entries: "coding" and "synthetic"', () => {
   assert.deepEqual(Object.keys(DOMAINS), ['coding', 'synthetic']);
 });
 
-test('DOMAINS.coding.stages is the pre-retrofit work.mjs STAGES value plus compound-learn appended', () => {
-  assert.deepEqual(DOMAINS.coding.stages, ['clarify', 'decompose', 'executing', 'compound-learn']);
+test('DOMAINS.coding.stages is the pre-retrofit work.mjs STAGES value — compound-learn retired (D11)', () => {
+  assert.deepEqual(DOMAINS.coding.stages, ['clarify', 'decompose', 'executing']);
 });
 
-test('DOMAINS.coding.transitions is the pre-retrofit stage.mjs STAGE_TRANSITIONS value plus the executing->compound-learn edge', () => {
+test('DOMAINS.coding.transitions is the pre-retrofit stage.mjs STAGE_TRANSITIONS value — the executing->compound-learn edge is retired (D11)', () => {
   assert.deepEqual(DOMAINS.coding.transitions, [
     { from: 'clarify', to: 'executing' },
     { from: 'clarify', to: 'decompose' },
     { from: 'decompose', to: 'executing' },
-    { from: 'executing', to: 'compound-learn' },
   ]);
 });
 
-test('DOMAINS.coding.stepMap maps every stage to a base-workflow step (vision §2 vocabulary), including compound-learn', () => {
+test('DOMAINS.coding.stepMap maps every stage to a base-workflow step (vision §2 vocabulary) — compound-learn retired (D11)', () => {
   assert.deepEqual(DOMAINS.coding.stepMap, {
     clarify: 'Clarify',
     decompose: 'Divide',
     executing: 'Execute',
-    'compound-learn': 'Compound-learn',
   });
 });
 
@@ -60,7 +58,9 @@ test('DOMAINS.coding.skillMap maps every stage, including executing, to its skil
   assert.equal(DOMAINS.coding.skillMap.clarify, 'fgos-exploring');
   assert.equal(DOMAINS.coding.skillMap.decompose, 'fgos-planning');
   assert.equal(DOMAINS.coding.skillMap.executing, 'fgos-executing');
-  assert.equal(DOMAINS.coding.skillMap['compound-learn'], 'fgos-compounding');
+  // fgos-compounding no longer has a stage entry (D11) — it triggers on
+  // status `retrospective` now, not a stage->skill lookup.
+  assert.equal('compound-learn' in DOMAINS.coding.skillMap, false);
 });
 
 test('DOMAINS.synthetic.skillMap.assembling is null (synthetic has never loaded a skill)', () => {
@@ -68,10 +68,22 @@ test('DOMAINS.synthetic.skillMap.assembling is null (synthetic has never loaded 
   assert.ok(Object.isFrozen(DOMAINS.synthetic.skillMap));
 });
 
+// --- worktreeBacked (work-item-status-delivered-retrospective-cleanup D5/D8) ---
+
+test('DOMAINS.coding.worktreeBacked is true (real git merges, cleanup-harness must verify them)', () => {
+  assert.equal(DOMAINS.coding.worktreeBacked, true);
+});
+
+test('DOMAINS.synthetic.worktreeBacked is false (no real worktree/merge ever happens for this domain)', () => {
+  assert.equal(DOMAINS.synthetic.worktreeBacked, false);
+});
+
 test('skillForStage resolves each of coding\'s mapped stages to its skill name', () => {
   assert.equal(skillForStage(DOMAINS.coding, 'clarify'), 'fgos-exploring');
   assert.equal(skillForStage(DOMAINS.coding, 'decompose'), 'fgos-planning');
-  assert.equal(skillForStage(DOMAINS.coding, 'compound-learn'), 'fgos-compounding');
+  // compound-learn is retired (D11) — no longer a stage, resolves to null
+  // like any other stage absent from skillMap.
+  assert.equal(skillForStage(DOMAINS.coding, 'compound-learn'), null);
 });
 
 test('skillForStage(DOMAINS.coding, "executing") resolves to fgos-executing', () => {
@@ -108,18 +120,16 @@ test('DOMAINS.synthetic is deeply frozen: the entry and its nested array/object 
 });
 
 test('adding "synthetic" leaves DOMAINS.coding unchanged', () => {
-  assert.deepEqual(DOMAINS.coding.stages, ['clarify', 'decompose', 'executing', 'compound-learn']);
+  assert.deepEqual(DOMAINS.coding.stages, ['clarify', 'decompose', 'executing']);
   assert.deepEqual(DOMAINS.coding.stepMap, {
     clarify: 'Clarify',
     decompose: 'Divide',
     executing: 'Execute',
-    'compound-learn': 'Compound-learn',
   });
   assert.deepEqual(DOMAINS.coding.transitions, [
     { from: 'clarify', to: 'executing' },
     { from: 'clarify', to: 'decompose' },
     { from: 'decompose', to: 'executing' },
-    { from: 'executing', to: 'compound-learn' },
   ]);
 });
 
@@ -185,15 +195,17 @@ test('getDomain resolves straight to the registry entry, folding an unrecognized
 
 // --- stageForStep ---
 
-test('stageForStep resolves each of coding\'s four steps to its stage name, including Compound-learn', () => {
+test('stageForStep resolves each of coding\'s three steps to its stage name', () => {
   assert.equal(stageForStep(DOMAINS.coding, 'Clarify'), 'clarify');
   assert.equal(stageForStep(DOMAINS.coding, 'Divide'), 'decompose');
   assert.equal(stageForStep(DOMAINS.coding, 'Execute'), 'executing');
-  assert.equal(stageForStep(DOMAINS.coding, 'Compound-learn'), 'compound-learn');
 });
 
-test('stageForStep returns undefined for a step the domain never declares (Init stays outside the stage dimension)', () => {
+test('stageForStep returns undefined for a step the domain never declares (Init and Compound-learn stay outside the stage dimension)', () => {
   assert.equal(stageForStep(DOMAINS.coding, 'Init'), undefined);
+  // Compound-learn is retired as a stage (D11) — the synthesis it used to
+  // gate is now the status `retrospective` instead.
+  assert.equal(stageForStep(DOMAINS.coding, 'Compound-learn'), undefined);
 });
 
 // --- rebuild-determinism (must_have): replaying an event log with zero

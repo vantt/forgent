@@ -229,7 +229,10 @@ function writeClearDiscoveryExecutor(scriptDir, { verify, produce = 'output.txt'
 import fs from 'node:fs';
 import { execFileSync } from 'node:child_process';
 const prompt = process.argv[2] ?? '';
-if (prompt.includes('# Context-discovery')) {
+if (prompt.includes('Kiểm tra độc lập một lệnh verify')) {
+  // tsk-5q5-1: judgeVerifySemanticCorrectness's own second-pass call.
+  process.stdout.write(JSON.stringify({ agrees: true }));
+} else if (prompt.includes('# Context-discovery')) {
   process.stdout.write(JSON.stringify({ clear: true, verify: ${JSON.stringify(verify)} }));
 } else if (prompt.includes('# Chia-việc (decompose)')) {
   process.stdout.write(JSON.stringify({ verdict: 'pass-through' }));
@@ -285,7 +288,10 @@ function writeDecomposeAwareExecutor(scriptDir, { discoveryVerify, decomposeVerd
 import fs from 'node:fs';
 import { execFileSync } from 'node:child_process';
 const prompt = process.argv[2] ?? '';
-if (prompt.includes('# Context-discovery')) {
+if (prompt.includes('Kiểm tra độc lập một lệnh verify')) {
+  // tsk-5q5-1: judgeVerifySemanticCorrectness's own second-pass call.
+  process.stdout.write(JSON.stringify({ agrees: true }));
+} else if (prompt.includes('# Context-discovery')) {
   process.stdout.write(JSON.stringify({ clear: true, verify: ${JSON.stringify(discoveryVerify)} }));
 } else if (prompt.includes('# Chia-việc (decompose)')) {
   process.stdout.write(JSON.stringify(${JSON.stringify(decomposeVerdict)}));
@@ -490,9 +496,12 @@ test('e2e stage-decompose (b) complex item: decompose sweep writes 2 children (r
   assert.equal(childA.status, 'awaiting-approval', 'childA (no deps) was the frontier head this same tick and got dispatched');
   assert.equal(childB.status, 'todo', 'childB is blocked on childA, which is only proposed (not done) yet');
 
-  // Accept childA into the tree (human close via the normal `done` door).
-  // A coding item must pass through the compound-learn stage before done (D3).
-  assert.equal(fgos(repoRoot, ['compound', childA.id]).status, 0);
+  // Accept childA into the tree (human close via the normal `done` door) —
+  // walk the sequential delivered->retrospective->cleanup->done chain
+  // (work-item-status-delivered-retrospective-cleanup D1/D2/D10).
+  assert.equal(fgos(repoRoot, ['move', childA.id, '--to', 'delivered']).status, 0);
+  assert.equal(fgos(repoRoot, ['move', childA.id, '--to', 'retrospective']).status, 0);
+  assert.equal(fgos(repoRoot, ['move', childA.id, '--to', 'cleanup']).status, 0);
   assert.equal(fgos(repoRoot, ['move', childA.id, '--to', 'done']).status, 0);
 
   // --once #2: childB's dep is now done — it becomes the frontier head.
@@ -502,8 +511,10 @@ test('e2e stage-decompose (b) complex item: decompose sweep writes 2 children (r
   assert.equal(view.work[childB.id].status, 'awaiting-approval');
   assert.equal(view.work[submitted.id].status, 'todo', 'the root is still blocked — childB is proposed, not done, yet');
 
-  // childB must also pass through compound-learn before done (D3).
-  assert.equal(fgos(repoRoot, ['compound', childB.id]).status, 0);
+  // childB walks the same sequential chain before done.
+  assert.equal(fgos(repoRoot, ['move', childB.id, '--to', 'delivered']).status, 0);
+  assert.equal(fgos(repoRoot, ['move', childB.id, '--to', 'retrospective']).status, 0);
+  assert.equal(fgos(repoRoot, ['move', childB.id, '--to', 'cleanup']).status, 0);
   assert.equal(fgos(repoRoot, ['move', childB.id, '--to', 'done']).status, 0);
 
   // --once #3: both children done -> the lineage filter drops -> the root is
@@ -585,19 +596,20 @@ test('e2e S2-pull: submit pass-throughs 2 stages via discover, a human takes the
   const submitted = submit(repoRoot, 'Rename a single config key, take by hand');
   assert.equal(submitted.stage, 'clarify');
 
-  // Pass-through both stages via the SYNC session-role `discover` verb
-  // (mirrors the existing "discover called a second time" CLI test) — this
-  // never touches the runner's own dispatch loop, so once the item reaches
-  // stage executing it is left sitting at status todo: the exact frontier
-  // head a human `take` picks up next, never auto-dispatched to a worker.
+  // Pass-through both stages via the SYNC session-role `discover`/`decompose`
+  // verbs (tsk-2b0 D1: hard split, no fallback — mirrors the equivalent CLI
+  // test) — this never touches the runner's own dispatch loop, so once the
+  // item reaches stage executing it is left sitting at status todo: the
+  // exact frontier head a human `take` picks up next, never auto-dispatched
+  // to a worker.
   const firstDiscover = fgos(repoRoot, ['discover', submitted.id]);
   assert.equal(firstDiscover.status, 0, `first discover failed: ${firstDiscover.stderr}`);
   assert.equal(stateView(repoRoot).work[submitted.id].stage, 'decompose');
 
-  const secondDiscover = fgos(repoRoot, ['discover', submitted.id]);
-  assert.equal(secondDiscover.status, 0, `second discover failed: ${secondDiscover.stderr}`);
+  const decomposed = fgos(repoRoot, ['decompose', submitted.id]);
+  assert.equal(decomposed.status, 0, `decompose failed: ${decomposed.stderr}`);
   let view = stateView(repoRoot);
-  assert.equal(view.work[submitted.id].stage, 'executing', 'clarify->decompose->executing chained via discover alone');
+  assert.equal(view.work[submitted.id].stage, 'executing', 'clarify->decompose->executing chained via discover then decompose');
   assert.equal(view.work[submitted.id].status, 'todo', 'pass-through never dispatches — a human takes it next');
   assert.equal(view.work[submitted.id].verify, 'test -f pull-done.txt && echo PULL_OK');
 
@@ -700,6 +712,7 @@ test('e2e full journey: item1 (no deps) -> awaiting-approval with a worker commi
       'work.add:item2:add',
       'work.move:item1:doing',
       'work.outcome:item1:predicted',
+      'capacity.dispatch:item1:add', // D8, tsk-62v: dispatch announce/audit entry
       'work.move:item1:awaiting-approval',
       'work.outcome:item1:actual',
     ],
@@ -793,6 +806,10 @@ test('e2e verify-red: a worker that commits the wrong thing fails goal-check on 
     'work.add:item-red',
     'work.move:doing',
     'work.outcome:predicted',
+    // D8, tsk-62v: one dispatch announce/audit entry per attempt — two
+    // retry attempts run before the item parks to blocked.
+    'capacity.dispatch:item-red',
+    'capacity.dispatch:item-red',
     'work.move:blocked',
     'work.outcome:actual',
     'work.friction:item-red',

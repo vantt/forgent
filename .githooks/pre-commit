@@ -13,6 +13,7 @@
 // temp repo, preserving the same relative nesting.
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { execFileSync } from 'node:child_process';
 import { acquireMainCheckoutLock, HELD, AMBIGUOUS, DEFAULT_TTL_MS } from '../src/runner/main-checkout-lock.mjs';
 import { resolveWriterIdentity } from '../src/runner/session-identity.mjs';
 
@@ -36,6 +37,26 @@ function refuse(message) {
   process.exit(1);
 }
 
+// tsk-4hkd -- the main checkout must never sit on a fgw/<id> branch itself;
+// that branch belongs in the item's own linked worktree (fgos pick), never
+// checked out directly here. git-dir vs git-common-dir tells apart the main
+// checkout (both equal) from a linked worktree (its own git-dir nests under
+// <main>/.git/worktrees/<name>, so they differ) -- a linked worktree is
+// SUPPOSED to live on a fgw/* branch and must stay unaffected by this guard.
+function currentFgwBranchIfMainCheckout(repoRoot) {
+  const gitDir = execFileSync('git', ['rev-parse', '--path-format=absolute', '--git-dir'], { cwd: repoRoot, encoding: 'utf8' }).trim();
+  const gitCommonDir = execFileSync('git', ['rev-parse', '--path-format=absolute', '--git-common-dir'], { cwd: repoRoot, encoding: 'utf8' }).trim();
+  if (gitDir !== gitCommonDir) return null;
+
+  let branch;
+  try {
+    branch = execFileSync('git', ['symbolic-ref', '--short', '-q', 'HEAD'], { cwd: repoRoot, encoding: 'utf8' }).trim();
+  } catch {
+    return null; // detached HEAD -- no branch to match, nothing to refuse
+  }
+  return /^fgw\//.test(branch) ? branch : null;
+}
+
 function main() {
   const repoRoot = path.resolve(__dirname, '..');
   const fgosDir = path.join(repoRoot, '.fgos');
@@ -52,6 +73,13 @@ function main() {
     refuse('commit refused: the main-checkout lock file could not be read -- refusing to commit, per fail-closed policy.');
     return;
   }
+
+  const fgwBranch = currentFgwBranchIfMainCheckout(repoRoot);
+  if (fgwBranch) {
+    refuse(`commit refused: main checkout is on branch ${fgwBranch} -- checkout back to the default branch and use "fgos pick <id>" for item work.`);
+    return;
+  }
+
   process.exit(0);
 }
 

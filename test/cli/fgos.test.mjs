@@ -488,10 +488,17 @@ test('session start inside a .fgos/-less linked worktree still succeeds (D10 sym
   assert.equal(result.status, 0, `session start unexpectedly refused: ${result.stderr}`);
 });
 
+// `setup` appends a source line to every rc file it detects under $HOME, so
+// this must run against a throwaway HOME: inheriting the real one made every
+// `npm test` run permanently append a line naming a temp worktree that the
+// test then deletes, leaving a dead `source` in the developer's own profile
+// that errors on every interactive shell open. `run`'s `extraEnv` already
+// merges over process.env, the same sandboxing test/setup/checks.test.mjs
+// does when it spawns `setup`.
 test('setup inside a .fgos/-less linked worktree still succeeds (setup never touches .fgos/, exempt from the guard)', () => {
   const { wt } = tmpLinkedWorktree();
   assert.ok(!fs.existsSync(path.join(wt, '.fgos')));
-  const result = run(wt, ['setup']);
+  const result = run(wt, ['setup'], { HOME: rawTmpCwd() });
   assert.equal(result.status, 0, `setup unexpectedly refused: ${result.stderr}`);
 });
 
@@ -713,6 +720,69 @@ test('edit omitting --refs/--deps leaves the field untouched; an explicit empty 
   assert.deepEqual(stateView(cwd).work['edit-refs'].refs, []);
 });
 
+// parent-flag-cli D1/D2: --parent on add/edit was a CLI gap — the field
+// existed and was validated (work.mjs) and cycle-guarded (store.mjs) since
+// record 0012, but no sanctioned CLI door could ever set it. `fgos-planning`
+// SKILL.md step 5 assumed this door already existed.
+
+test('add --parent sets lineage; omitting --parent leaves it unset', () => {
+  const cwd = tmpCwd();
+  assert.equal(addOk(cwd, 'parent-root').status, 0);
+
+  const withParent = run(cwd, ['add', 'parent-child', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--parent', 'parent-root']);
+  assert.equal(withParent.status, 0);
+  assert.equal(stateView(cwd).work['parent-child'].parent, 'parent-root');
+
+  assert.equal(addOk(cwd, 'parent-none').status, 0);
+  assert.equal(stateView(cwd).work['parent-none'].parent, undefined);
+});
+
+test('add --parent "" (bare, no value) is rejected as a valueless flag, same as add --discovered-from', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['add', 'parent-bad', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--parent']);
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /--parent requires a non-empty id/);
+});
+
+test('edit omitting --parent leaves it untouched; an explicit --parent sets it; --parent "" clears it', () => {
+  const cwd = tmpCwd();
+  assert.equal(addOk(cwd, 'parent-edit-root').status, 0);
+  assert.equal(addOk(cwd, 'parent-edit-child').status, 0);
+  assert.equal(stateView(cwd).work['parent-edit-child'].parent, undefined);
+
+  const untouched = run(cwd, ['edit', 'parent-edit-child', '--risk', 'high']);
+  assert.equal(untouched.status, 0);
+  assert.equal(stateView(cwd).work['parent-edit-child'].parent, undefined);
+
+  const setParent = run(cwd, ['edit', 'parent-edit-child', '--parent', 'parent-edit-root']);
+  assert.equal(setParent.status, 0);
+  assert.equal(stateView(cwd).work['parent-edit-child'].parent, 'parent-edit-root');
+
+  const cleared = run(cwd, ['edit', 'parent-edit-child', '--parent', '']);
+  assert.equal(cleared.status, 0);
+  assert.equal(stateView(cwd).work['parent-edit-child'].parent, null);
+});
+
+test('edit --parent (bare, no value) is rejected as a valueless flag, distinct from --parent ""', () => {
+  const cwd = tmpCwd();
+  assert.equal(addOk(cwd, 'parent-edit-bad').status, 0);
+  const result = run(cwd, ['edit', 'parent-edit-bad', '--parent']);
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /--parent requires a value; use --parent "" to clear it/);
+});
+
+test('edit --parent closing a cycle is rejected at the CLI, same "graph cycle" message as the store-layer test', () => {
+  const cwd = tmpCwd();
+  assert.equal(addOk(cwd, 'parent-cycle-a').status, 0);
+  const withParent = run(cwd, ['add', 'parent-cycle-b', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--parent', 'parent-cycle-a']);
+  assert.equal(withParent.status, 0);
+
+  const result = run(cwd, ['edit', 'parent-cycle-a', '--parent', 'parent-cycle-b']);
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /would close a graph cycle/);
+  assert.equal(stateView(cwd).work['parent-cycle-a'].parent, undefined, 'the rejected patch never landed');
+});
+
 test('editWork rejects a patch containing id/status/stage/domain as validation, before merge, no event written', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'edit-store-locked');
@@ -796,6 +866,58 @@ test('add with no --priority/--intent leaves both fields absent (undefined), not
   assert.equal(item.priority, undefined);
   assert.equal(item.intent, undefined);
 });
+
+// --- work-item-priority-matrix D2/D3/D5: --urgent (add + edit),
+// --impact/--effort (edit only) ---
+//
+// --urgent exists on BOTH `add` and `edit` (D2, human-entered at intake or
+// later); --impact/--effort exist ONLY on `edit` (D3/D5, computed fields --
+// no --impact/--effort equivalent on `add`'s parser wiring, same
+// established shape --priority/--intent already use above).
+
+test('add --urgent sets the item urgent field, exit 0', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['add', 'add-urgent', '--title', 'Add urgent', '--kind', 'task', '--risk', 'light', '--verify', 'npm test', '--urgent', 'high']);
+  assert.equal(result.status, 0);
+  assert.equal(stateView(cwd).work['add-urgent'].urgent, 'high');
+});
+
+test('add with no --urgent leaves the field absent (undefined), not a default of medium', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'add-no-urgent');
+  assert.equal(stateView(cwd).work['add-no-urgent'].urgent, undefined);
+});
+
+test('edit --urgent/--impact/--effort set the item fields to the given values, exit 0', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'edit-priority-matrix');
+  const result = run(cwd, ['edit', 'edit-priority-matrix', '--urgent', 'critical', '--impact', '12.5', '--effort', '3']);
+  assert.equal(result.status, 0);
+  const item = stateView(cwd).work['edit-priority-matrix'];
+  assert.equal(item.urgent, 'critical');
+  assert.equal(item.impact, 12.5);
+  assert.equal(item.effort, 3);
+});
+
+const EDIT_PRIORITY_MATRIX_BAD_FLAG_CASES = [
+  ['an out-of-domain --urgent', ['--urgent', 'extreme'], 'urgent'],
+  ['a negative --impact', ['--impact', '-1'], 'impact'],
+  ['a bare --impact (no following value)', ['--impact'], 'impact'],
+  ['a non-numeric --effort', ['--effort', 'notanumber'], 'effort'],
+  ['a bare --effort (no following value)', ['--effort'], 'effort'],
+];
+
+for (const [label, badFlagArgs, fieldName] of EDIT_PRIORITY_MATRIX_BAD_FLAG_CASES) {
+  test(`edit with ${label} is rejected as validation, exit 4, no event written, field left unset`, () => {
+    const cwd = tmpCwd();
+    addOk(cwd, 'edit-priority-matrix-bad-flag');
+    const before = eventLines(cwd).length;
+    const result = run(cwd, ['edit', 'edit-priority-matrix-bad-flag', ...badFlagArgs]);
+    assert.equal(result.status, 4);
+    assert.equal(eventLines(cwd).length, before);
+    assert.equal(stateView(cwd).work['edit-priority-matrix-bad-flag'][fieldName], undefined);
+  });
+}
 
 test('decision logs one event and appears in the view, exit 0', () => {
   const cwd = tmpCwd();
@@ -935,8 +1057,8 @@ test('repair refuses mid-file corruption via the real CLI (valid, corrupt, valid
 
 test('done is terminal via the real CLI: moving out of done is refused as precondition, exit 2, no event written', () => {
   const cwd = tmpCwd();
-  toCompoundLearn(cwd, 'terminal-item');
-  run(cwd, ['move', 'terminal-item', '--to', 'done']);
+  toProposed(cwd, 'terminal-item');
+  toDoneViaChain(cwd, 'terminal-item');
   const before = eventLines(cwd).length;
 
   const result = run(cwd, ['move', 'terminal-item', '--to', 'doing']);
@@ -1233,8 +1355,7 @@ test('goal focus is not auto-cleared when the focused item reaches status done',
   run(cwd, ['goal', 'set', 'goal-target-done']);
   run(cwd, ['move', 'goal-target-done', '--to', 'doing']);
   run(cwd, ['move', 'goal-target-done', '--to', 'awaiting-approval']);
-  run(cwd, ['compound', 'goal-target-done']);
-  const moveResult = run(cwd, ['move', 'goal-target-done', '--to', 'done']);
+  const moveResult = toDoneViaChain(cwd, 'goal-target-done');
   assert.equal(moveResult.status, 0);
   assert.equal(stateView(cwd).work['goal-target-done'].status, 'done');
 
@@ -1285,6 +1406,172 @@ test('edit --docs-ref replaces an existing docsRef (latest-wins), exit 0', () =>
   assert.equal(stateView(cwd).work['edit-docs-ref-replace'].docsRef, 'docs/history/new-feature/');
 });
 
+// --- edit --merge-after (tsk-2u0, docs/history/
+//     tsk-3bn-merge-conductor-harness-v2/D4/D5) -----------------------------
+
+test('edit --merge-after sets mergeAfter on an item that had none, exit 0', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'merge-after-target');
+  addOk(cwd, 'merge-after-item');
+  const result = run(cwd, ['edit', 'merge-after-item', '--merge-after', 'merge-after-target']);
+  assert.equal(result.status, 0, result.stderr);
+  assert.deepEqual(stateView(cwd).work['merge-after-item'].mergeAfter, ['merge-after-target']);
+});
+
+test('edit --merge-after "" clears an existing mergeAfter, exit 0', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'merge-after-clear-target');
+  addOk(cwd, 'merge-after-clear-item');
+  run(cwd, ['edit', 'merge-after-clear-item', '--merge-after', 'merge-after-clear-target']);
+  const result = run(cwd, ['edit', 'merge-after-clear-item', '--merge-after', '']);
+  assert.equal(result.status, 0, result.stderr);
+  assert.deepEqual(stateView(cwd).work['merge-after-clear-item'].mergeAfter, []);
+});
+
+test('edit --merge-after rejects a target id that does not exist, exit 4, item unchanged', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'merge-after-ghost-item');
+  const result = run(cwd, ['edit', 'merge-after-ghost-item', '--merge-after', 'no-such-item']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /not a known id/);
+  assert.equal(stateView(cwd).work['merge-after-ghost-item'].mergeAfter, undefined);
+});
+
+test('edit --merge-after rejects an item listing itself, exit 4', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'merge-after-self-item');
+  const result = run(cwd, ['edit', 'merge-after-self-item', '--merge-after', 'merge-after-self-item']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /own mergeAfter/);
+});
+
+test('edit --merge-after rejects a mergeAfter that would close a cycle mixed with deps, exit 4', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'merge-after-cycle-a');
+  addOk(cwd, 'merge-after-cycle-b');
+  run(cwd, ['edit', 'merge-after-cycle-b', '--deps', 'merge-after-cycle-a']);
+  // a deps:[] currently; setting a.mergeAfter:[b] would close a -> b (waits-for) -> a (blocks).
+  const result = run(cwd, ['edit', 'merge-after-cycle-a', '--merge-after', 'merge-after-cycle-b']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /cycle/);
+  assert.equal(stateView(cwd).work['merge-after-cycle-a'].mergeAfter, undefined);
+});
+
+test('edit --merge-after does not require the deps field to have been touched (byte-identical to other list edits)', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'merge-after-independent-target');
+  addOk(cwd, 'merge-after-independent-item');
+  const result = run(cwd, ['edit', 'merge-after-independent-item', '--merge-after', 'merge-after-independent-target']);
+  assert.equal(result.status, 0, result.stderr);
+  assert.deepEqual(stateView(cwd).work['merge-after-independent-item'].deps, []);
+});
+
+// --- edit --superseded-by / --duplicates (tsk-2ie, docs/history/
+//     tsk-2ie-duplicate-superseded-guard/ D1-D3) ---------------------------
+
+test('edit --superseded-by sets supersededBy on an item that had none, exit 0', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'superseded-by-target');
+  addOk(cwd, 'superseded-by-item');
+  const result = run(cwd, ['edit', 'superseded-by-item', '--superseded-by', 'superseded-by-target']);
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(stateView(cwd).work['superseded-by-item'].supersededBy, 'superseded-by-target');
+});
+
+test('edit --superseded-by "" clears an existing supersededBy, exit 0', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'superseded-by-clear-target');
+  addOk(cwd, 'superseded-by-clear-item');
+  run(cwd, ['edit', 'superseded-by-clear-item', '--superseded-by', 'superseded-by-clear-target']);
+  const result = run(cwd, ['edit', 'superseded-by-clear-item', '--superseded-by', '']);
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(stateView(cwd).work['superseded-by-clear-item'].supersededBy, null);
+});
+
+test('edit --superseded-by rejects a target id that does not exist, exit 4, item unchanged', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'superseded-by-ghost-item');
+  const result = run(cwd, ['edit', 'superseded-by-ghost-item', '--superseded-by', 'no-such-item']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /not a known id/);
+  assert.equal(stateView(cwd).work['superseded-by-ghost-item'].supersededBy, undefined);
+});
+
+test('edit --superseded-by rejects an item listing itself, exit 4', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'superseded-by-self-item');
+  const result = run(cwd, ['edit', 'superseded-by-self-item', '--superseded-by', 'superseded-by-self-item']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /own supersededBy/);
+});
+
+test('edit --superseded-by with no value is a validation error, exit 4', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'superseded-by-noval-item');
+  const result = run(cwd, ['edit', 'superseded-by-noval-item', '--superseded-by']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /--superseded-by requires a value/);
+});
+
+test('edit --duplicates sets duplicates on an item that had none, exit 0', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'duplicates-target');
+  addOk(cwd, 'duplicates-item');
+  const result = run(cwd, ['edit', 'duplicates-item', '--duplicates', 'duplicates-target']);
+  assert.equal(result.status, 0, result.stderr);
+  assert.deepEqual(stateView(cwd).work['duplicates-item'].duplicates, ['duplicates-target']);
+});
+
+test('edit --duplicates "" clears an existing duplicates, exit 0', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'duplicates-clear-target');
+  addOk(cwd, 'duplicates-clear-item');
+  run(cwd, ['edit', 'duplicates-clear-item', '--duplicates', 'duplicates-clear-target']);
+  const result = run(cwd, ['edit', 'duplicates-clear-item', '--duplicates', '']);
+  assert.equal(result.status, 0, result.stderr);
+  assert.deepEqual(stateView(cwd).work['duplicates-clear-item'].duplicates, []);
+});
+
+test('edit --duplicates rejects a target id that does not exist, exit 4, item unchanged', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'duplicates-ghost-item');
+  const result = run(cwd, ['edit', 'duplicates-ghost-item', '--duplicates', 'no-such-item']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /not a known id/);
+  assert.equal(stateView(cwd).work['duplicates-ghost-item'].duplicates, undefined);
+});
+
+test('edit --duplicates rejects an item listing itself, exit 4', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'duplicates-self-item');
+  const result = run(cwd, ['edit', 'duplicates-self-item', '--duplicates', 'duplicates-self-item']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /own duplicates/);
+});
+
+// --- edit --description/--footprint: `add` already accepted both fields,
+// but EDITABLE_FIELDS never listed them, so a description/footprint typo'd
+// or left blank at add time -- or an item added before either field
+// existed -- had no way to ever gain or correct one after creation. ---
+
+test('edit --description sets description on an item that had none, exit 0', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'edit-description-new');
+  assert.equal(stateView(cwd).work['edit-description-new'].description, undefined);
+  const result = run(cwd, ['edit', 'edit-description-new', '--description', 'the full story']);
+  assert.equal(result.status, 0);
+  assert.equal(stateView(cwd).work['edit-description-new'].description, 'the full story');
+});
+
+test('edit --footprint sets footprint on an item that had none, exit 0', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'edit-footprint-new');
+  assert.equal(stateView(cwd).work['edit-footprint-new'].footprint, undefined);
+  const result = run(cwd, ['edit', 'edit-footprint-new', '--footprint', 'src/a.mjs,src/b.mjs']);
+  assert.equal(result.status, 0);
+  assert.deepEqual(stateView(cwd).work['edit-footprint-new'].footprint, ['src/a.mjs', 'src/b.mjs']);
+});
+
 // --- D5 proposed: new edges + --reason on `move` (phase-2-routing-3) ---
 
 function toProposed(cwd, id) {
@@ -1293,13 +1580,15 @@ function toProposed(cwd, id) {
   return run(cwd, ['move', id, '--to', 'awaiting-approval']);
 }
 
-// A coding item must pass through the compound-learn stage before it can
-// close (D3). Mirrors toProposed one step further: it leaves the item at
-// status `proposed`, stage `compound-learn` — ready for `move --to done` /
-// `approve` to pass the done-gate.
-function toCompoundLearn(cwd, id) {
-  toProposed(cwd, id);
-  return run(cwd, ['compound', id]);
+// Walk awaiting-approval -> delivered -> retrospective -> cleanup -> done via
+// the real CLI (work-item-status-delivered-retrospective-cleanup D1/D2/D10)
+// — done's one remaining door in. Assumes `id` is already at status
+// awaiting-approval (e.g. via toProposed). Returns the final move's result.
+function toDoneViaChain(cwd, id) {
+  run(cwd, ['move', id, '--to', 'delivered']);
+  run(cwd, ['move', id, '--to', 'retrospective']);
+  run(cwd, ['move', id, '--to', 'cleanup']);
+  return run(cwd, ['move', id, '--to', 'done']);
 }
 
 test('move doing -> awaiting-approval applies via the real CLI, exit 0', () => {
@@ -1309,240 +1598,12 @@ test('move doing -> awaiting-approval applies via the real CLI, exit 0', () => {
   assert.equal(stateView(cwd).work['goal-checked'].status, 'awaiting-approval');
 });
 
-test('move awaiting-approval -> done (approval) applies via the real CLI, exit 0', () => {
+test('move awaiting-approval -> delivered (approval) applies via the real CLI, exit 0', () => {
   const cwd = tmpCwd();
-  toCompoundLearn(cwd, 'approved-item');
-  const result = run(cwd, ['move', 'approved-item', '--to', 'done']);
+  toProposed(cwd, 'approved-item');
+  const result = run(cwd, ['move', 'approved-item', '--to', 'delivered']);
   assert.equal(result.status, 0);
-  assert.equal(stateView(cwd).work['approved-item'].status, 'done');
-});
-
-// --- D2/D3 compound-learn: the deliberate `fgos compound` transition ---
-
-test('compound rejects a non-proposed item as validation, exit 4, no event written', () => {
-  const cwd = tmpCwd();
-  addOk(cwd, 'not-proposed-yet');
-  const before = eventLines(cwd).length;
-  const result = run(cwd, ['compound', 'not-proposed-yet']);
-  assert.equal(result.status, 4);
-  assert.equal(eventLines(cwd).length, before);
-  assert.equal(stateView(cwd).work['not-proposed-yet'].stage, undefined);
-});
-
-test('compound accepts a proposed coding item and moves its stage to compound-learn, exit 0', () => {
-  const cwd = tmpCwd();
-  toProposed(cwd, 'compound-ready');
-  const before = eventLines(cwd).length;
-  const result = run(cwd, ['compound', 'compound-ready']);
-  assert.equal(result.status, 0);
-  assert.equal(eventLines(cwd).length, before + 1);
-  assert.equal(stateView(cwd).work['compound-ready'].stage, 'compound-learn');
-  assert.equal(stateView(cwd).work['compound-ready'].status, 'awaiting-approval');
-  const data = envelopeData(result.stdout);
-  assert.equal(data.id, 'compound-ready');
-  assert.equal(data.from, 'executing');
-  assert.equal(data.to, 'compound-learn');
-});
-
-test('compound on a nonexistent id is rejected as validation (not-found), exit 4', () => {
-  const cwd = tmpCwd();
-  const result = run(cwd, ['compound', 'never-added-for-compound']);
-  assert.equal(result.status, 4);
-});
-
-test('compound called twice on the same item rejects the second, illegal stage move as precondition, exit 2, no second event written', () => {
-  const cwd = tmpCwd();
-  toProposed(cwd, 'compound-twice');
-  assert.equal(run(cwd, ['compound', 'compound-twice']).status, 0);
-  const before = eventLines(cwd).length;
-  const result = run(cwd, ['compound', 'compound-twice']);
-  assert.equal(result.status, 2);
-  assert.equal(eventLines(cwd).length, before);
-  assert.equal(stateView(cwd).work['compound-twice'].stage, 'compound-learn');
-});
-
-// --- compound-learn-enduser-docs slice 3: `--doc-type` CLI producer (CONTEXT
-// D4/D8) — the minimal producer surface the inducted `fgos-compounding`
-// skill uses to store its first real Diataxis classification. Additive-
-// optional (candidate design from plan.md's slice-3 "Open question for
-// validating"): reuses slice 2's `addOutcome`/`assertValidDocType`
-// validation wholesale, no duplicate enum check in the CLI layer.
-
-const DIATAXIS_QUADRANTS = ['tutorial', 'how-to', 'reference', 'explanation'];
-
-for (const docType of DIATAXIS_QUADRANTS) {
-  test(`compound --doc-type ${docType} stores the tag on the item's outcome and check surfaces it, exit 0`, () => {
-    const cwd = tmpCwd();
-    toProposed(cwd, `compound-doctype-${docType}`);
-    const result = run(cwd, ['compound', `compound-doctype-${docType}`, '--doc-type', docType]);
-    assert.equal(result.status, 0);
-    assert.equal(stateView(cwd).work[`compound-doctype-${docType}`].stage, 'compound-learn');
-
-    const checkResult = run(cwd, ['check', `compound-doctype-${docType}`]);
-    assert.equal(checkResult.status, 0);
-    const data = envelopeData(checkResult.stdout);
-    assert.equal(data.outcomes[0].id, `compound-doctype-${docType}`);
-    assert.equal(data.outcomes[0].docType, docType);
-  });
-}
-
-test('compound rejects a non-quadrant --doc-type as validation, exit 4, no event written at all (no dangling stage-move)', () => {
-  const cwd = tmpCwd();
-  toProposed(cwd, 'compound-bad-doctype');
-  const before = eventLines(cwd).length;
-  const result = run(cwd, ['compound', 'compound-bad-doctype', '--doc-type', 'banana']);
-  assert.equal(result.status, 4);
-  assert.equal(eventLines(cwd).length, before, 'a rejected --doc-type must not leave a moveStage event behind');
-  assert.equal(stateView(cwd).work['compound-bad-doctype'].stage, undefined);
-});
-
-test('compound with NO --doc-type is byte-identical to pre-slice-3: moveStage only, no outcome written, check output unchanged', () => {
-  const cwd = tmpCwd();
-  toProposed(cwd, 'compound-no-doctype');
-  const before = eventLines(cwd).length;
-  const result = run(cwd, ['compound', 'compound-no-doctype']);
-  assert.equal(result.status, 0);
-  assert.equal(eventLines(cwd).length, before + 1, 'only the moveStage event is written when --doc-type is absent');
-  assert.equal(stateView(cwd).work['compound-no-doctype'].stage, 'compound-learn');
-  assert.equal(stateView(cwd).outcomes?.['compound-no-doctype'], undefined, 'no outcome record exists when --doc-type is absent');
-
-  const checkResult = run(cwd, ['check', 'compound-no-doctype']);
-  assert.equal(checkResult.status, 0);
-  assert.deepEqual(envelopeData(checkResult.stdout).outcomes, [
-    { id: 'compound-no-doctype', predicted: null, actual: null, docType: null, docPath: null },
-  ]);
-});
-
-test('a compound --doc-type tag survives a rebuild of the view from the log alone', () => {
-  const cwd = tmpCwd();
-  toProposed(cwd, 'compound-doctype-rebuild');
-  assert.equal(run(cwd, ['compound', 'compound-doctype-rebuild', '--doc-type', 'reference']).status, 0);
-  const before = stateView(cwd);
-  assert.equal(before.outcomes['compound-doctype-rebuild'].docType, 'reference');
-
-  fs.rmSync(viewPath(cwd));
-  const result = run(cwd, ['rebuild']);
-  assert.equal(result.status, 0);
-  assert.deepEqual(stateView(cwd), before);
-});
-
-// --- compound-learn-enduser-docs slice 3 P1 fix: stage-aware, atomic
-// `compound --doc-type` (routed-flow case + no-dangling-outcome guarantee).
-// `fgos-routing` loads `fgos-compounding` only once an item has already
-// arrived at stage `compound-learn`, and that skill's own producer call is
-// `fgos compound <id> --doc-type <quadrant>` — so the CLI must tag an
-// already-compound-learn item without attempting (and failing) a second
-// stage move, and a rejected --doc-type must never leave a dangling write
-// behind on ANY source stage, not just the from-executing one already
-// covered above.
-
-test('compound --doc-type on an item already at stage compound-learn (the routed case) tags the capture without moving stage again, exit 0', () => {
-  const cwd = tmpCwd();
-  toCompoundLearn(cwd, 'compound-doctype-retag');
-  const before = eventLines(cwd).length;
-  const result = run(cwd, ['compound', 'compound-doctype-retag', '--doc-type', 'how-to']);
-  assert.equal(result.status, 0);
-  assert.equal(eventLines(cwd).length, before + 1, 'only the outcome event is written — no second stage-move event');
-  assert.equal(stateView(cwd).work['compound-doctype-retag'].stage, 'compound-learn');
-
-  const checkResult = run(cwd, ['check', 'compound-doctype-retag']);
-  assert.equal(checkResult.status, 0);
-  const data = envelopeData(checkResult.stdout);
-  assert.equal(data.outcomes[0].id, 'compound-doctype-retag');
-  assert.equal(data.outcomes[0].docType, 'how-to');
-});
-
-test('compound rejects a non-quadrant --doc-type on an item already at stage compound-learn, exit 4, zero events (no dangling outcome from the illegal-move path)', () => {
-  const cwd = tmpCwd();
-  toCompoundLearn(cwd, 'compound-doctype-retag-bad');
-  const before = eventLines(cwd).length;
-  const result = run(cwd, ['compound', 'compound-doctype-retag-bad', '--doc-type', 'banana']);
-  assert.equal(result.status, 4);
-  assert.equal(eventLines(cwd).length, before, 'a rejected --doc-type on an already-compound-learn item must write nothing at all');
-  assert.equal(stateView(cwd).work['compound-doctype-retag-bad'].stage, 'compound-learn');
-});
-
-// --- bước-3: `--doc-path` doc-capture linkage (CONTEXT D12/D15) -------------
-//
-// Additive alongside `--doc-type`: the end-user doc path the tagged capture
-// belongs to, so a later read-side index can back-link a real doc to its
-// source capture (D13, "no loss of detail"). Covers BOTH `addOutcome` write
-// sites in the `compound` case: the fresh moveStage path (this item starts at
-// `executing`, per the `toProposed` fixture) and the re-compound / tag-only
-// path (item already at stage `compound-learn`) — a doc-path given on the
-// re-compound path is silently dropped if only one site is wired.
-
-test('compound --doc-type <q> --doc-path <p> stores both and check surfaces the docPath round-trip (fresh moveStage path), exit 0', () => {
-  const cwd = tmpCwd();
-  toProposed(cwd, 'compound-docpath-roundtrip');
-  const result = run(cwd, [
-    'compound',
-    'compound-docpath-roundtrip',
-    '--doc-type',
-    'how-to',
-    '--doc-path',
-    'docs/how-to/example.md',
-  ]);
-  assert.equal(result.status, 0);
-  assert.equal(stateView(cwd).work['compound-docpath-roundtrip'].stage, 'compound-learn');
-
-  const checkResult = run(cwd, ['check', 'compound-docpath-roundtrip']);
-  assert.equal(checkResult.status, 0);
-  const data = envelopeData(checkResult.stdout);
-  assert.equal(data.outcomes[0].docType, 'how-to');
-  assert.equal(data.outcomes[0].docPath, 'docs/how-to/example.md');
-});
-
-test('compound --doc-type <q> with NO --doc-path leaves docPath null while docType still works, exit 0', () => {
-  const cwd = tmpCwd();
-  toProposed(cwd, 'compound-docpath-absent');
-  const result = run(cwd, ['compound', 'compound-docpath-absent', '--doc-type', 'reference']);
-  assert.equal(result.status, 0);
-
-  const checkResult = run(cwd, ['check', 'compound-docpath-absent']);
-  assert.equal(checkResult.status, 0);
-  const data = envelopeData(checkResult.stdout);
-  assert.equal(data.outcomes[0].docType, 'reference');
-  assert.equal(data.outcomes[0].docPath, null);
-});
-
-test('compound --doc-type <q> --doc-path <p> on an item already at stage compound-learn (the re-compound path) records docPath too, exit 0', () => {
-  const cwd = tmpCwd();
-  toCompoundLearn(cwd, 'compound-docpath-retag');
-  const before = eventLines(cwd).length;
-  const result = run(cwd, [
-    'compound',
-    'compound-docpath-retag',
-    '--doc-type',
-    'explanation',
-    '--doc-path',
-    'docs/explanation/example.md',
-  ]);
-  assert.equal(result.status, 0);
-  assert.equal(eventLines(cwd).length, before + 1, 'only the outcome event is written — no second stage-move event');
-  assert.equal(stateView(cwd).work['compound-docpath-retag'].stage, 'compound-learn');
-
-  const checkResult = run(cwd, ['check', 'compound-docpath-retag']);
-  assert.equal(checkResult.status, 0);
-  const data = envelopeData(checkResult.stdout);
-  assert.equal(data.outcomes[0].docType, 'explanation');
-  assert.equal(data.outcomes[0].docPath, 'docs/explanation/example.md');
-});
-
-test('a compound --doc-path tag survives a rebuild of the view from the log alone (rides the docType spread-fold, zero store.mjs change)', () => {
-  const cwd = tmpCwd();
-  toProposed(cwd, 'compound-docpath-rebuild');
-  assert.equal(
-    run(cwd, ['compound', 'compound-docpath-rebuild', '--doc-type', 'tutorial', '--doc-path', 'docs/tutorials/example.md']).status,
-    0,
-  );
-  const before = stateView(cwd);
-  assert.equal(before.outcomes['compound-docpath-rebuild'].docPath, 'docs/tutorials/example.md');
-
-  fs.rmSync(viewPath(cwd));
-  const result = run(cwd, ['rebuild']);
-  assert.equal(result.status, 0);
-  assert.deepEqual(stateView(cwd), before);
+  assert.equal(stateView(cwd).work['approved-item'].status, 'delivered');
 });
 
 test('move awaiting-approval -> todo (rejection) without --reason is refused as validation, exit 4, no event written', () => {
@@ -1643,8 +1704,8 @@ test('ready excludes a todo item whose dep sits at proposed (proposed is not don
 
 test('ready opens a todo item once its dep reaches done (approved, not merely proposed)', () => {
   const cwd = tmpCwd();
-  toCompoundLearn(cwd, 'dep-approved');
-  assert.equal(run(cwd, ['move', 'dep-approved', '--to', 'done']).status, 0);
+  toProposed(cwd, 'dep-approved');
+  assert.equal(toDoneViaChain(cwd, 'dep-approved').status, 0);
   assert.equal(
     run(cwd, ['add', 'unblocked-item', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--deps', 'dep-approved']).status,
     0,
@@ -2363,13 +2424,14 @@ test('check never mutates state: events.jsonl and state.json are byte-identical 
 
 test('doc-sources returns every capture linked to a docPath (multiplicity)', () => {
   const cwd = tmpCwd();
+  const dir = path.join(cwd, '.fgos');
   toProposed(cwd, 'doc-sources-a');
-  run(cwd, ['compound', 'doc-sources-a', '--doc-type', 'how-to', '--doc-path', 'docs/how-to/shared.md']);
+  addOutcome(dir, { id: 'doc-sources-a', docType: 'how-to', docPath: 'docs/how-to/shared.md' });
   toProposed(cwd, 'doc-sources-b');
-  run(cwd, ['compound', 'doc-sources-b', '--doc-type', 'how-to', '--doc-path', 'docs/how-to/shared.md']);
+  addOutcome(dir, { id: 'doc-sources-b', docType: 'how-to', docPath: 'docs/how-to/shared.md' });
   // A third item linked to a DIFFERENT docPath must never leak into the result.
   toProposed(cwd, 'doc-sources-other');
-  run(cwd, ['compound', 'doc-sources-other', '--doc-type', 'how-to', '--doc-path', 'docs/how-to/other.md']);
+  addOutcome(dir, { id: 'doc-sources-other', docType: 'how-to', docPath: 'docs/how-to/other.md' });
 
   const result = run(cwd, ['doc-sources', 'docs/how-to/shared.md']);
   assert.equal(result.status, 0);
@@ -2399,8 +2461,9 @@ test('doc-sources on a docPath with zero linked captures is SUCCESS (exit 0), re
 
 test('doc-sources never mutates state: events.jsonl and state.json are byte-identical before/after', () => {
   const cwd = tmpCwd();
+  const dir = path.join(cwd, '.fgos');
   toProposed(cwd, 'doc-sources-readonly');
-  run(cwd, ['compound', 'doc-sources-readonly', '--doc-type', 'how-to', '--doc-path', 'docs/how-to/readonly.md']);
+  addOutcome(dir, { id: 'doc-sources-readonly', docType: 'how-to', docPath: 'docs/how-to/readonly.md' });
 
   const logBefore = fs.readFileSync(logPath(cwd), 'utf8');
   const viewBefore = fs.readFileSync(viewPath(cwd), 'utf8');
@@ -2758,11 +2821,12 @@ test('discover on a clear verdict moves the submitted item to stage decompose wi
   assert.equal(item.verify, 'npm test -- proven');
 });
 
-// The sync path's second hop (stage-decompose D3 parity): calling `discover`
-// again on the same item, now sitting at stage `decompose`, dispatches to
-// `resolveDecompose` instead of `resolveDiscovery` — same verb, same role
-// attribution, the engine picked by the item's CURRENT stage.
-test("discover called a second time, once the item sits at stage decompose, dispatches to resolveDecompose and pass-throughs it on to executing (sync/async parity)", () => {
+// tsk-2b0 D1 (hard split, no fallback): `discover` and `decompose` are now
+// two separate verbs, each bound to exactly one stage. The old combined
+// "call discover twice" scenario is split below into its own `decompose`
+// calls plus two new wrong-stage-error tests proving the split actually
+// removed the old dynamic-dispatch fallback, not just renamed it.
+test("decompose on an item sitting at stage decompose dispatches to resolveDecompose and pass-throughs it on to executing (sync/async parity)", () => {
   const cwd = tmpCwd();
   writeRunnerConfig(cwd, { clear: true, verify: 'npm test -- proven' });
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
@@ -2774,19 +2838,51 @@ test("discover called a second time, once the item sits at stage decompose, disp
   // valid chia-việc verdict shape (no `verdict` key) — judgeDecompose's
   // fail-safe folds it to `invalid`, and resolveDecompose leaves the item
   // exactly where it was for the next sweep/call to retry (mẫu C9).
-  const invalidAttempt = run(cwd, ['discover', id]);
+  const invalidAttempt = run(cwd, ['decompose', id]);
   assert.equal(invalidAttempt.status, 0);
   assert.equal(JSON.parse(invalidAttempt.stdout).data.outcome, 'invalid');
   assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'decompose', 'invalid verdict leaves the item untouched, not silently advanced');
 
   // Rewrite the executor config with a real pass-through chia-việc verdict
-  // and call `discover` a third time — now it dispatches to resolveDecompose
-  // and carries the item the rest of the way.
+  // and call `decompose` again — now it carries the item the rest of the way.
   writeRunnerConfig(cwd, { verdict: 'pass-through' });
-  const passThrough = run(cwd, ['discover', id]);
+  const passThrough = run(cwd, ['decompose', id]);
   assert.equal(passThrough.status, 0);
   assert.equal(JSON.parse(passThrough.stdout).data.outcome, 'pass-through');
   assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'executing');
+});
+
+test('discover on a decompose-stage item errors instead of silently dispatching to resolveDecompose (tsk-2b0 D1: hard split, no fallback)', () => {
+  const cwd = tmpCwd();
+  writeRunnerConfig(cwd, { clear: true, verify: 'npm test -- proven' });
+  const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
+
+  run(cwd, ['discover', id]);
+  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'decompose');
+
+  const result = run(cwd, ['discover', id]);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /not "clarify"/);
+  assert.match(result.stderr, /fgos decompose/);
+  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'decompose', 'a rejected call must never mutate the item');
+});
+
+test('decompose on a clarify-stage item errors instead of silently dispatching to resolveDiscovery (tsk-2b0 D1: hard split, no fallback)', () => {
+  const cwd = tmpCwd();
+  const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
+  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'clarify');
+
+  const result = run(cwd, ['decompose', id]);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /not "decompose"/);
+  assert.match(result.stderr, /fgos discover/);
+  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'clarify', 'a rejected call must never mutate the item');
+});
+
+test('decompose with no id is rejected as validation, exit 4', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['decompose']);
+  assert.equal(result.status, 4);
 });
 
 test('discover on an unclear verdict parks the submitted item in awaiting-human with the question, still stage clarify', () => {
@@ -2817,9 +2913,9 @@ test('discover with no id is rejected as validation, exit 4', () => {
 // executor, D1) so judge-executor's spawnSync fails fast (spawn-fail) on the
 // nested judge call, never invoking a live agent; judgeDiscovery's fail-safe
 // (discovery.mjs) then parks the item as unclear, not a bare "success".
-test('discover on a fresh cwd with no .fgos-runner.json bootstraps the default config instead of crashing on ENOENT', () => {
+test('discover on a fresh cwd with no runner config bootstraps the default config into the shared file instead of crashing on ENOENT', () => {
   const cwd = tmpCwd();
-  const configPath = path.join(cwd, '.fgos-runner.json');
+  const configPath = path.join(cwd, '.fgos', 'config.json');
   assert.equal(fs.existsSync(configPath), false);
 
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing with no config yet']).stdout).data.id;
@@ -2828,7 +2924,7 @@ test('discover on a fresh cwd with no .fgos-runner.json bootstraps the default c
   assert.equal(result.status, 0, `expected no RunnerConfigError/ENOENT crash, got stderr: ${result.stderr}`);
   assert.equal(JSON.parse(result.stdout).data.outcome, 'unclear');
 
-  assert.equal(fs.existsSync(configPath), true, 'discover should have auto-written the default .fgos-runner.json');
+  assert.equal(fs.existsSync(configPath), true, 'discover should have auto-written the default runner section into .fgos/config.json');
 
   const view = envelopeData(run(cwd, ['list']).stdout);
   assert.equal(view.work[id].status, 'awaiting-human');
@@ -2844,6 +2940,157 @@ test('discover --config pointing at a missing path still throws RunnerConfigErro
   assert.equal(result.status, 4);
   assert.match(result.stderr, /cannot read runner config/);
   assert.equal(fs.existsSync(missingConfigPath), false, 'an explicit --config path must never be auto-written');
+});
+
+// --- caller-supplied verdict (tsk-27y D1/D2): `--verdict` on `discover`/
+// `decompose` lets a live caller skip the judge subprocess entirely for one
+// call. Each test below configures the runner's fake executor with the
+// OPPOSITE verdict from what `--verdict` supplies — proving the flag
+// actually bypassed the judge, not just that a real judge happened to agree.
+
+test('discover --verdict clear --verify moves the item to decompose with that exact verify, bypassing the configured (opposite) judge verdict', () => {
+  const cwd = tmpCwd();
+  writeRunnerConfig(cwd, { clear: false, question: 'SHOULD NEVER SURFACE' });
+  const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
+
+  const result = run(cwd, ['discover', id, '--verdict', 'clear', '--verify', 'npm test -- cli-caller']);
+  assert.equal(result.status, 0);
+  assert.equal(JSON.parse(result.stdout).data.outcome, 'clear');
+
+  const view = envelopeData(run(cwd, ['list']).stdout);
+  assert.equal(view.work[id].stage, 'decompose');
+  assert.equal(view.work[id].verify, 'npm test -- cli-caller');
+  assert.notEqual(view.work[id].status, 'awaiting-human');
+});
+
+test('discover --verdict unclear --question parks in awaiting-human with that exact question, bypassing the configured (opposite) judge verdict', () => {
+  const cwd = tmpCwd();
+  writeRunnerConfig(cwd, { clear: true, verify: 'SHOULD NEVER SURFACE' });
+  const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
+
+  const result = run(cwd, ['discover', id, '--verdict', 'unclear', '--question', 'Which provider?']);
+  assert.equal(result.status, 0);
+  assert.equal(JSON.parse(result.stdout).data.outcome, 'unclear');
+
+  const view = envelopeData(run(cwd, ['list']).stdout);
+  assert.equal(view.work[id].status, 'awaiting-human');
+  assert.equal(view.work[id].stage, 'clarify');
+  assert.equal(view.gates[id].ask, 'Which provider?');
+});
+
+test('discover --verdict clear with no --verify is rejected as validation, exit 4', () => {
+  const cwd = tmpCwd();
+  const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
+  const result = run(cwd, ['discover', id, '--verdict', 'clear']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /--verify/);
+});
+
+test('discover --verdict with an unrecognized value is rejected as validation, exit 4', () => {
+  const cwd = tmpCwd();
+  const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
+  const result = run(cwd, ['discover', id, '--verdict', 'maybe']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /"clear" or "unclear"/);
+});
+
+test('decompose --verdict pass-through moves the item to executing, bypassing the configured (opposite) judge verdict', () => {
+  const cwd = tmpCwd();
+  writeRunnerConfig(cwd, { clear: true, verify: 'npm test -- proven' });
+  const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
+  run(cwd, ['discover', id]);
+  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'decompose');
+
+  writeRunnerConfig(cwd, { verdict: 'decompose', reason: 'SHOULD NEVER SURFACE', children: [{ title: 'x', verify: 'npm test' }] });
+  const result = run(cwd, ['decompose', id, '--verdict', 'pass-through', '--reason', 'single-piece, no split needed']);
+  assert.equal(result.status, 0);
+  assert.equal(JSON.parse(result.stdout).data.outcome, 'pass-through');
+
+  const view = envelopeData(run(cwd, ['list']).stdout);
+  assert.equal(view.work[id].stage, 'executing');
+  assert.equal(Object.values(view.work).some((item) => item.parent === id), false);
+});
+
+test('decompose --verdict need-human --reason parks in awaiting-human with that exact reason, bypassing the configured (opposite) judge verdict', () => {
+  const cwd = tmpCwd();
+  writeRunnerConfig(cwd, { clear: true, verify: 'npm test -- proven' });
+  const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
+  run(cwd, ['discover', id]);
+
+  writeRunnerConfig(cwd, { verdict: 'pass-through' });
+  const result = run(cwd, ['decompose', id, '--verdict', 'need-human', '--reason', 'Which auth provider?']);
+  assert.equal(result.status, 0);
+  assert.equal(JSON.parse(result.stdout).data.outcome, 'need-human');
+
+  const view = envelopeData(run(cwd, ['list']).stdout);
+  assert.equal(view.work[id].status, 'awaiting-human');
+  assert.match(view.gates[id].ask, /Which auth provider\?/);
+});
+
+test('decompose --verdict decompose --children writes real children, bypassing the configured (opposite) judge verdict', () => {
+  const cwd = tmpCwd();
+  writeRunnerConfig(cwd, { clear: true, verify: 'npm test -- proven' });
+  const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
+  run(cwd, ['discover', id]);
+
+  writeRunnerConfig(cwd, { verdict: 'pass-through' });
+  const children = JSON.stringify([
+    { title: 'Build parser', verify: 'npm test -- parser' },
+    { title: 'Build renderer', verify: 'npm test -- renderer' },
+  ]);
+  const result = run(cwd, ['decompose', id, '--verdict', 'decompose', '--reason', 'two independent surfaces', '--children', children]);
+  assert.equal(result.status, 0);
+  assert.equal(JSON.parse(result.stdout).data.outcome, 'decompose');
+
+  const view = envelopeData(run(cwd, ['list']).stdout);
+  assert.equal(view.work[id].stage, 'executing');
+  assert.equal(view.work[`${id}-1`].title, 'Build parser');
+  assert.equal(view.work[`${id}-2`].title, 'Build renderer');
+});
+
+test('decompose --verdict decompose with malformed --children JSON is rejected as validation, exit 4', () => {
+  const cwd = tmpCwd();
+  // tsk-5q5-1: a clear caller-supplied verdict with a real `verify` still
+  // triggers judgeVerifySemanticCorrectness's own second-pass call, same as
+  // a model verdict (D3 — gates apply regardless of verdict origin) — this
+  // config answers that prompt, not the (bypassed) first-pass judgeDiscovery.
+  writeRunnerConfig(cwd, { clear: true, verify: 'npm test' });
+  const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
+  run(cwd, ['discover', id, '--verdict', 'clear', '--verify', 'npm test']);
+
+  const result = run(cwd, ['decompose', id, '--verdict', 'decompose', '--reason', 'x', '--children', '{not valid json']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /--children/);
+});
+
+test('decompose --verdict decompose with no --children at all is rejected as validation, exit 4', () => {
+  const cwd = tmpCwd();
+  // tsk-5q5-1: a clear caller-supplied verdict with a real `verify` still
+  // triggers judgeVerifySemanticCorrectness's own second-pass call, same as
+  // a model verdict (D3 — gates apply regardless of verdict origin) — this
+  // config answers that prompt, not the (bypassed) first-pass judgeDiscovery.
+  writeRunnerConfig(cwd, { clear: true, verify: 'npm test' });
+  const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
+  run(cwd, ['discover', id, '--verdict', 'clear', '--verify', 'npm test']);
+
+  const result = run(cwd, ['decompose', id, '--verdict', 'decompose', '--reason', 'x']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /--children/);
+});
+
+test('decompose --verdict with an unrecognized value is rejected as validation, exit 4', () => {
+  const cwd = tmpCwd();
+  // tsk-5q5-1: a clear caller-supplied verdict with a real `verify` still
+  // triggers judgeVerifySemanticCorrectness's own second-pass call, same as
+  // a model verdict (D3 — gates apply regardless of verdict origin) — this
+  // config answers that prompt, not the (bypassed) first-pass judgeDiscovery.
+  writeRunnerConfig(cwd, { clear: true, verify: 'npm test' });
+  const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
+  run(cwd, ['discover', id, '--verdict', 'clear', '--verify', 'npm test']);
+
+  const result = run(cwd, ['decompose', id, '--verdict', 'maybe']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /"pass-through", "need-human", or "decompose"/);
 });
 
 // --- settlement channel role attribution (phase-3-compound-learning-5,
@@ -2873,9 +3120,9 @@ test('answer via the real CLI stamps role "human" on the event payload and folds
 
 test('move to done via the real CLI stamps role "human" on the event payload and folds into a "close" settlement', () => {
   const cwd = tmpCwd();
-  toCompoundLearn(cwd, 'close-actor-item');
+  toProposed(cwd, 'close-actor-item');
 
-  const result = run(cwd, ['move', 'close-actor-item', '--to', 'done']);
+  const result = toDoneViaChain(cwd, 'close-actor-item');
   assert.equal(result.status, 0);
 
   const lines = eventLines(cwd);
@@ -2908,8 +3155,8 @@ test('discover (sync verb) on a clear verdict stamps role "session" on the work.
 
 test('check returns the settlement data — per-kind/role counts + recent records — when settlement data exists', () => {
   const cwd = tmpCwd();
-  toCompoundLearn(cwd, 'settle-item');
-  run(cwd, ['move', 'settle-item', '--to', 'done']);
+  toProposed(cwd, 'settle-item');
+  toDoneViaChain(cwd, 'settle-item');
 
   const result = run(cwd, ['check']);
   assert.equal(result.status, 0);
@@ -3075,8 +3322,11 @@ test('check returns the learning data — outcome/friction/settlement summary �
     detail: 'miss',
   });
 
-  // Pass through compound-learn before the doing->done close (D3).
-  moveStage(dir, { id: 'learning-item', to: 'compound-learn' });
+  // Walk the sequential chain to done's one remaining door in (work-item-
+  // status-delivered-retrospective-cleanup D1/D2/D10).
+  moveWork(dir, { id: 'learning-item', to: 'delivered', expectedStatus: 'doing' });
+  moveWork(dir, { id: 'learning-item', to: 'retrospective', expectedStatus: 'delivered' });
+  moveWork(dir, { id: 'learning-item', to: 'cleanup', expectedStatus: 'retrospective' });
   const result = run(cwd, ['move', 'learning-item', '--to', 'done']);
   assert.equal(result.status, 0);
 
@@ -3188,6 +3438,31 @@ test('take --id not found is rejected as validation, exit 4', () => {
   assert.equal(result.status, 4);
 });
 
+// tsk-k8u D1/D2 regression guard: take used to pass repoRoot: process.cwd()
+// to claimWork, independent of --dir -- a session running it (as instructed)
+// from inside a .fgos/-less linked worktree with --dir pointed at the real
+// root would record headAtTake against the WORKTREE's own HEAD instead of
+// the real root's. Same "pin repoRoot to --dir like every other verb"
+// pattern tsk-1wn already fixed for docs-index (see tmpLinkedWorktree above).
+test('take --id from --dir records headAtTake against the real root, not the worktree cwd (tsk-k8u D1/D2)', () => {
+  const { main, wt } = tmpLinkedWorktree();
+  addOk(main, 'pull-via-dir');
+  // Advance main's own HEAD past wt's fork point so headAtTake can actually
+  // discriminate "read from --dir's root" vs "read from the worktree cwd" —
+  // without this, both share the same commit and the assertion below would
+  // pass by coincidence even under the pre-fix process.cwd() bug.
+  commitFile(main, 'advance-main.txt');
+  const headBefore = gitHead(main);
+  assert.notEqual(headBefore, gitHead(wt), 'test setup must diverge main from wt before asserting');
+
+  const result = run(wt, ['take', '--id', 'pull-via-dir', '--dir', main]);
+  assert.equal(result.status, 0, `take --dir failed: ${result.stderr}`);
+
+  const view = stateView(main);
+  assert.equal(view.work['pull-via-dir'].status, 'doing');
+  assert.equal(view.work['pull-via-dir'].headAtTake, headBefore, 'take --dir must record HEAD from --dir\'s root, not the worktree cwd');
+});
+
 // --- pick: take + createWorktree combined (str83-fgos-slash-commands-4) ---
 
 test('pick with no --id claims the frontier head exactly like take does today, role fixed to "session", and stands up a real (non-detached) git branch/worktree for the claim', () => {
@@ -3235,6 +3510,69 @@ test('pick with no --id claims the frontier head exactly like take does today, r
   );
 });
 
+// tsk-k8u D1/D2 regression guard: pick used to derive BOTH repoRoot and
+// worktreeDir from process.cwd(), independent of --dir -- a session
+// running it (as instructed) from inside a .fgos/-less linked worktree with
+// --dir pointed at the real root would stand up the new worktree under the
+// WORKTREE's own .claude/worktrees/ instead of the real root's (D2), and
+// (D1) risk targeting git ops at the worktree cwd for anything reclaimed.
+// Same "pin repoRoot to --dir" pattern tsk-1wn already fixed for docs-index.
+test('pick --id from --dir stands up the worktree under --dir\'s own .claude/worktrees/, not the invoking worktree cwd\'s (tsk-k8u D1/D2)', () => {
+  const { main, wt } = tmpLinkedWorktree();
+  addOk(main, 'pick-via-dir');
+
+  const result = run(wt, ['pick', '--id', 'pick-via-dir', '--dir', main]);
+  assert.equal(result.status, 0, `pick --dir failed: ${result.stderr}`);
+  const data = envelopeData(result.stdout);
+  assert.ok(fs.existsSync(data.worktree.path), 'pick --dir must leave a real worktree checkout on disk');
+  assert.ok(
+    data.worktree.path.startsWith(path.join(main, '.claude', 'worktrees') + path.sep),
+    `pick --dir worktree path "${data.worktree.path}" must live under --dir's own .claude/worktrees/, not the invoking cwd's`,
+  );
+  assert.ok(
+    !data.worktree.path.startsWith(wt),
+    'pick --dir must never place the new worktree under the invoking (worktree-resident) cwd',
+  );
+
+  const view = stateView(main);
+  assert.equal(view.work['pick-via-dir'].status, 'doing');
+});
+
+// tsk-k8u repro (2026-08-02, tsk-2ie): a claim-release + re-pick sequence
+// run FROM INSIDE the item's own already-existing worktree used to crash
+// with `spawnSync git ENOENT` -- worktreeDir was ALSO process.cwd()-based,
+// so the second pick's worktreeDir (the worktree's own path) didn't match
+// where the checkout was actually registered (under main's worktreeDir),
+// createClaimWorktree's reattach check failed, and it fell through to
+// createWorktree's reclaim path with repoRoot === the worktree about to be
+// force-removed. With repoRoot/worktreeDir both fixed to derive from --dir,
+// worktreeDir stays the SAME stable path across both pick calls, so
+// createClaimWorktree's reattach succeeds instead — same path, no removal,
+// no crash, an even safer outcome than reclaim-and-recreate would be.
+test('pick --id reattaches to its own already-existing worktree/branch when invoked FROM INSIDE that worktree via --dir, without crashing (tsk-k8u repro)', () => {
+  const main = initGitCwd();
+  run(main, ['init']);
+  addOk(main, 'reclaim-from-inside');
+
+  const firstPick = envelopeData(run(main, ['pick', '--id', 'reclaim-from-inside']).stdout);
+  const ownWorktree = firstPick.worktree.path;
+
+  // Simulate the claim-lock §3b release (item reached executing, claim
+  // released back to todo) while the branch/worktree still stand.
+  assert.equal(run(main, ['move', 'reclaim-from-inside', '--to', 'todo', '--expect', 'doing']).status, 0);
+
+  // Re-pick FROM INSIDE the item's own worktree, --dir pointed at main —
+  // repoRoot/worktreeDir must resolve to main (stable), never ownWorktree
+  // (which the pre-fix bug would have force-removed out from under this
+  // very call).
+  const result = run(ownWorktree, ['pick', '--id', 'reclaim-from-inside', '--dir', main]);
+  assert.equal(result.status, 0, `pick --dir from inside its own worktree failed: ${result.stderr}`);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.worktree.reused, true);
+  assert.equal(data.worktree.path, ownWorktree, 'a stable repoRoot/worktreeDir makes this a clean reattach to the SAME checkout, not a force-remove-and-recreate');
+  assert.ok(fs.existsSync(data.worktree.path));
+});
+
 test('pick --id claims that specific item, role fixed to "session" — pick has no --role flag at all, unlike take', () => {
   const cwd = initGitCwd();
   run(cwd, ['init']);
@@ -3264,7 +3602,7 @@ test('pick --id on an item already claimed (doing) fails the same way take does 
   assert.equal(stateView(cwd).work['pick-double'].status, 'doing');
 });
 
-test('pick surfaces a real createWorktree failure as-is after the claim already succeeded — the claim is never silently rolled back or hidden', () => {
+test('pick surfaces a real createWorktree failure and reverts the claim it already made, instead of orphaning the item in doing (tsk-4m0 D1)', () => {
   const cwd = initGitCwd();
   run(cwd, ['init']);
   addOk(cwd, 'pick-wt-fail');
@@ -3280,11 +3618,14 @@ test('pick surfaces a real createWorktree failure as-is after the claim already 
   assert.notEqual(result.status, 0, 'pick must fail when createWorktree fails');
   assert.match(result.stderr, /git worktree add failed/);
 
-  // The claim itself is NOT rolled back: the item is left "doing" with no
-  // worktree, exactly as the cell's must_haves truth 5 requires.
+  // tsk-4m0: previously the claim was NOT rolled back here (this test used
+  // to assert status stayed "doing" with no worktree, per the original
+  // pick cell's must_haves truth 5) — reproduced live on tsk-f31 as an
+  // item permanently orphaned in doing with no automatic recovery
+  // (docs/history/pick-worktree-claim-race/CONTEXT.md). The claim now
+  // reverts back to todo so a failed pick looks like it never happened.
   const view = stateView(cwd);
-  assert.equal(view.work['pick-wt-fail'].status, 'doing');
-  assert.equal(view.work['pick-wt-fail'].claimRole, 'session');
+  assert.equal(view.work['pick-wt-fail'].status, 'todo');
 });
 
 // --- pick: claim-lock §3a/§3c/§7 (guard loosen, branch-reuse generalize, claimTrigger) ---
@@ -3978,6 +4319,16 @@ function gitAtCwd(cwd, args) {
   return execFileSync('git', args, { cwd, encoding: 'utf8' });
 }
 
+/** A tiny local package (tsk-2vd) — an absolute `file:` dependency resolves
+ * entirely offline, no registry/network hit, so the return-with-a-real-
+ * dependency test stays fast and deterministic. */
+function mkLocalDependency() {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-cli-test-localdep-'));
+  fs.writeFileSync(path.join(dir, 'package.json'), JSON.stringify({ name: 'fgos-test-localdep', version: '1.0.0' }));
+  fs.writeFileSync(path.join(dir, 'index.js'), 'module.exports = {};\n');
+  return dir;
+}
+
 // `.fgos/events.jsonl` is tracked-but-uncommitted the moment any fgos verb
 // appends to it (same convention `commitFile` above already relies on for
 // take/return) — approve's runner path refuses a dirty main tree, so every
@@ -3993,11 +4344,18 @@ function commitPending(cwd, message) {
 // and fold the resulting stage event into main's commit, so the tree stays
 // clean and `approve` can close it to done. Mirrors the state a real
 // compound-learn transition leaves behind for a git-backed proposed item.
-function compoundAndCommit(cwd, id) {
-  const result = run(cwd, ['compound', id]);
-  assert.equal(result.status, 0, `compound ${id} should succeed: ${result.stderr}`);
-  commitPending(cwd, `state: compound ${id}`);
-  return result;
+// Folds pending .fgos/ state (deps/claim/propose events) into a real git
+// commit before approve's own clean-tree gate — the compound-learn stage
+// (and its `compound` verb) is retired (work-item-status-delivered-
+// retrospective-cleanup D11), so this no longer advances any stage, only
+// commits. Some callers' setup (e.g. makeRunnerProposedItem) already
+// commits its own pending state, leaving nothing dirty here — `git commit`
+// with nothing staged exits nonzero, so skip when the tree is already
+// clean instead of always committing unconditionally.
+function commitPendingBeforeApprove(cwd, id) {
+  const status = execFileSync('git', ['status', '--porcelain'], { cwd, encoding: 'utf8' });
+  if (status.trim() === '') return;
+  commitPending(cwd, `state: propose ${id}`);
 }
 
 // Simulates what the real runner (loop.mjs/worktree.mjs) leaves behind for a
@@ -4431,16 +4789,19 @@ test('approve of a runner item (happy path): merges fgw/<id> into main, verifies
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   makeRunnerProposedItem(cwd, 'approve-runner-item', { verify: 'test -f approve-runner-item-produced.txt' });
-  compoundAndCommit(cwd, 'approve-runner-item');
+  commitPendingBeforeApprove(cwd, 'approve-runner-item');
 
   const result = run(cwd, ['approve', 'approve-runner-item']);
   assert.equal(result.status, 0, result.stderr);
-  assert.equal(envelopeData(result.stdout).to, 'done');
+  assert.equal(envelopeData(result.stdout).to, 'delivered');
 
   const view = stateView(cwd);
-  assert.equal(view.work['approve-runner-item'].status, 'done');
-  assert.equal(view.settlements['approve-runner-item'][0].kind, 'close');
-  assert.equal(view.settlements['approve-runner-item'][0].role, 'human');
+  assert.equal(view.work['approve-runner-item'].status, 'delivered');
+  // The 'close' settlement (RUL20) fires on the actual done-close only —
+  // now cleanup->done (work-item-status-delivered-retrospective-cleanup
+  // D1/D4), not on approve reaching delivered — so no settlement exists
+  // yet at this point in the sequence.
+  assert.equal(view.settlements?.['approve-runner-item'], undefined);
   assert.ok(fs.existsSync(path.join(cwd, 'approve-runner-item-produced.txt')), 'the merged file must be present on main');
 
   const branches = gitAtCwd(cwd, ['for-each-ref', '--format=%(refname:short)', 'refs/heads/fgw/']);
@@ -4451,7 +4812,7 @@ test('approve of a runner item succeeds when ONLY .fgos/ (the live event log) is
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   makeRunnerProposedItem(cwd, 'approve-fgos-only-dirty', { verify: 'test -f approve-fgos-only-dirty-produced.txt' });
-  compoundAndCommit(cwd, 'approve-fgos-only-dirty');
+  commitPendingBeforeApprove(cwd, 'approve-fgos-only-dirty');
 
   // Dirty ONLY `.fgos/events.jsonl` on main after the item is proposed —
   // an unrelated `add` appends an event and never touches any other file —
@@ -4467,14 +4828,14 @@ test('approve of a runner item succeeds when ONLY .fgos/ (the live event log) is
 
   const result = run(cwd, ['approve', 'approve-fgos-only-dirty']);
   assert.equal(result.status, 0, `approve should succeed with only .fgos/ dirty: ${result.stderr}`);
-  assert.equal(stateView(cwd).work['approve-fgos-only-dirty'].status, 'done');
+  assert.equal(stateView(cwd).work['approve-fgos-only-dirty'].status, 'delivered');
 });
 
 test('approve of a runner item succeeds when a dirty file on main is UNRELATED to the item (tsk-598 D1/D2) — own-file-set scoping, not a whole-tree gate', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   makeRunnerProposedItem(cwd, 'approve-unrelated-dirty', { verify: 'test -f approve-unrelated-dirty-produced.txt' });
-  compoundAndCommit(cwd, 'approve-unrelated-dirty');
+  commitPendingBeforeApprove(cwd, 'approve-unrelated-dirty');
 
   // A path the item's own branch-vs-trunk diff never touches — another
   // session's uncommitted work sitting on main, the exact repro shape
@@ -4484,7 +4845,7 @@ test('approve of a runner item succeeds when a dirty file on main is UNRELATED t
 
   const result = run(cwd, ['approve', 'approve-unrelated-dirty']);
   assert.equal(result.status, 0, `approve should succeed past an unrelated dirty file: ${result.stderr}`);
-  assert.equal(stateView(cwd).work['approve-unrelated-dirty'].status, 'done');
+  assert.equal(stateView(cwd).work['approve-unrelated-dirty'].status, 'delivered');
   assert.equal(fs.readFileSync(path.join(cwd, 'scratch.txt'), 'utf8'), 'unrelated uncommitted work\n', 'the unrelated dirty file must be left untouched, still uncommitted');
 });
 
@@ -4492,7 +4853,7 @@ test('approve of a runner item still refuses when the SAME path the item touched
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   makeRunnerProposedItem(cwd, 'approve-real-conflict', { verify: 'test -f approve-real-conflict-produced.txt' });
-  compoundAndCommit(cwd, 'approve-real-conflict');
+  commitPendingBeforeApprove(cwd, 'approve-real-conflict');
 
   // approve-real-conflict-produced.txt IS in this item's own branch-vs-trunk
   // diff (makeRunnerProposedItem committed it on fgw/approve-real-conflict);
@@ -4513,7 +4874,7 @@ test('approve of a runner item with a declared footprint still refuses on an unc
     verify: 'test -f approve-footprint-dirty-produced.txt',
     footprint: 'footprint-guarded.txt',
   });
-  compoundAndCommit(cwd, 'approve-footprint-dirty');
+  commitPendingBeforeApprove(cwd, 'approve-footprint-dirty');
 
   // footprint-guarded.txt was never committed to fgw/approve-footprint-dirty
   // (so it is absent from the item's own committed diff) — only DECLARED in
@@ -4532,7 +4893,7 @@ test('approve of a leaf item with a clean merge lands the work on fgw/<root> (no
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   makeRunnerProposedLeafItem(cwd, 'approve-leaf-root', 'approve-leaf-child', { verify: 'test -f approve-leaf-child-produced.txt' });
-  compoundAndCommit(cwd, 'approve-leaf-child');
+  commitPendingBeforeApprove(cwd, 'approve-leaf-child');
 
   const headBefore = gitHead(cwd);
   const result = run(cwd, ['approve', 'approve-leaf-child']);
@@ -4540,7 +4901,7 @@ test('approve of a leaf item with a clean merge lands the work on fgw/<root> (no
   const approveData = envelopeData(result.stdout);
   assert.equal(approveData.branch, 'fgw/approve-leaf-child');
   assert.equal(approveData.target, 'fgw/approve-leaf-root');
-  assert.equal(approveData.to, 'done');
+  assert.equal(approveData.to, 'delivered');
 
   // main must never be touched by a leaf approve.
   assert.equal(gitHead(cwd), headBefore, 'main HEAD must be unchanged by a leaf approve');
@@ -4551,7 +4912,7 @@ test('approve of a leaf item with a clean merge lands the work on fgw/<root> (no
   );
 
   const view = stateView(cwd);
-  assert.equal(view.work['approve-leaf-child'].status, 'done');
+  assert.equal(view.work['approve-leaf-child'].status, 'delivered');
 
   // fgw/<leaf> must be ACTUALLY deleted (git branch list), not just the
   // ephemeral worktree directory gone — the exact gap validating found.
@@ -4682,15 +5043,16 @@ test('approve of a pull-door item (no merge, code already on main): re-verifies 
   run(cwd, ['take', '--id', 'approve-pull-item']);
   commitFile(cwd, 'proof.txt');
   run(cwd, ['return', 'approve-pull-item']);
-  compoundAndCommit(cwd, 'approve-pull-item');
+  commitPendingBeforeApprove(cwd, 'approve-pull-item');
 
   const result = run(cwd, ['approve', 'approve-pull-item']);
   assert.equal(result.status, 0, result.stderr);
-  assert.equal(envelopeData(result.stdout).to, 'done');
+  assert.equal(envelopeData(result.stdout).to, 'delivered');
 
   const view = stateView(cwd);
-  assert.equal(view.work['approve-pull-item'].status, 'done');
-  assert.equal(view.settlements['approve-pull-item'][0].role, 'human');
+  assert.equal(view.work['approve-pull-item'].status, 'delivered');
+  // No 'close' settlement yet -- that fires at cleanup->done, not delivered.
+  assert.equal(view.settlements?.['approve-pull-item'], undefined);
 });
 
 test('approve of a legacy item with a failing verify: blocked (reason verify-fail), not merge-related, exit 0', () => {
@@ -4730,11 +5092,10 @@ test('approve of a legacy item with a passing verify closes it to done — legac
   addOk(cwd, 'approve-legacy-ok-item', { verify: 'true' });
   run(cwd, ['move', 'approve-legacy-ok-item', '--to', 'doing']);
   run(cwd, ['move', 'approve-legacy-ok-item', '--to', 'awaiting-approval']);
-  assert.equal(run(cwd, ['compound', 'approve-legacy-ok-item']).status, 0);
 
   const result = run(cwd, ['approve', 'approve-legacy-ok-item']);
   assert.equal(result.status, 0, result.stderr);
-  assert.equal(stateView(cwd).work['approve-legacy-ok-item'].status, 'done');
+  assert.equal(stateView(cwd).work['approve-legacy-ok-item'].status, 'delivered');
 });
 
 // tsk-3vo D5: same shared --timeout/--no-timeout resolution as `return`
@@ -4757,7 +5118,6 @@ test('approve twice: the second approve on an already-done item is rejected as p
   addOk(cwd, 'approve-twice-item', { verify: 'true' });
   run(cwd, ['move', 'approve-twice-item', '--to', 'doing']);
   run(cwd, ['move', 'approve-twice-item', '--to', 'awaiting-approval']);
-  assert.equal(run(cwd, ['compound', 'approve-twice-item']).status, 0);
   assert.equal(run(cwd, ['approve', 'approve-twice-item']).status, 0);
 
   const result = run(cwd, ['approve', 'approve-twice-item']);
@@ -4838,15 +5198,16 @@ test('approve of the same self-modifying diff PROCEEDS with --acknowledge-iron-l
   makeRunnerProposedItemTouching(cwd, 'iron-ack-item', 'src/runner/probe.mjs', {
     verify: 'test -f src/runner/probe.mjs',
   });
-  compoundAndCommit(cwd, 'iron-ack-item');
+  commitPendingBeforeApprove(cwd, 'iron-ack-item');
 
   const result = run(cwd, ['approve', 'iron-ack-item', '--acknowledge-iron-law']);
   assert.equal(result.status, 0, `approve with acknowledgment must succeed: ${result.stderr}`);
-  assert.equal(envelopeData(result.stdout).to, 'done');
+  assert.equal(envelopeData(result.stdout).to, 'delivered');
 
   const view = stateView(cwd);
-  assert.equal(view.work['iron-ack-item'].status, 'done');
-  assert.equal(view.settlements['iron-ack-item'][0].role, 'human');
+  assert.equal(view.work['iron-ack-item'].status, 'delivered');
+  // No 'close' settlement yet -- that fires at cleanup->done, not delivered.
+  assert.equal(view.settlements?.['iron-ack-item'], undefined);
   assert.ok(fs.existsSync(path.join(cwd, 'src/runner/probe.mjs')), 'the merged module file is present on main');
   const branches = gitAtCwd(cwd, ['for-each-ref', '--format=%(refname:short)', 'refs/heads/']);
   assert.doesNotMatch(branches, /fgw\/iron-ack-item/, 'the fully-merged branch is cleaned up');
@@ -4858,13 +5219,579 @@ test('approve of an ordinary runner item (diff touches no self-modifying module)
   makeRunnerProposedItemTouching(cwd, 'iron-plain-item', 'docs/notes.txt', {
     verify: 'test -f docs/notes.txt',
   });
-  compoundAndCommit(cwd, 'iron-plain-item');
+  commitPendingBeforeApprove(cwd, 'iron-plain-item');
 
   const result = run(cwd, ['approve', 'iron-plain-item']);
   assert.equal(result.status, 0, `an ordinary diff must approve without any acknowledgment: ${result.stderr}`);
-  assert.equal(envelopeData(result.stdout).to, 'done');
+  assert.equal(envelopeData(result.stdout).to, 'delivered');
   assert.doesNotMatch(result.stdout, /Iron Law/);
-  assert.equal(stateView(cwd).work['iron-plain-item'].status, 'done');
+  assert.equal(stateView(cwd).work['iron-plain-item'].status, 'delivered');
+});
+
+// tsk-4voj-iron-law-leaf-scope CONTEXT.md D1: the Iron Law's own
+// changedFiles input now diffs a leaf against its resolved root's branch
+// (the same D3 leaf-vs-root split `approve`'s merge target and `review`'s
+// diff already use), not blind trunk. Before this fix, a leaf forked AFTER
+// a sibling already merged a gated-module change into the root inherited
+// that sibling's files as if they were its own -- live-reproduced on
+// tsk-52g-2. These two tests prove the false-positive is closed (below)
+// without under-scoping a leaf's own genuine hit (further below).
+
+test('approve of a leaf item forked AFTER a sibling already merged a gated-module change into the root does NOT trip Iron Law on the ancestor\'s file (tsk-4voj false-positive closed)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+
+  const rootId = 'iron-leaf-root';
+  const leafId = 'iron-leaf-child';
+  const dir = path.join(cwd, '.fgos');
+  addWork(dir, { id: rootId, title: `Title ${rootId}`, kind: 'task', status: 'todo', deps: [], risk: 'low', refs: [], verify: 'true' });
+  commitPending(cwd, `state: add ${rootId}`);
+  gitAtCwd(cwd, ['branch', `fgw/${rootId}`, 'main']);
+
+  // A sibling child's already-merged gated-module change, landed on the
+  // root's own integration branch BEFORE this leaf forks from it -- the
+  // exact tsk-52g-2 shape.
+  gitAtCwd(cwd, ['checkout', `fgw/${rootId}`]);
+  fs.mkdirSync(path.join(cwd, 'src/runner'), { recursive: true });
+  fs.writeFileSync(path.join(cwd, 'src/runner/sibling-produced.mjs'), 'export const sibling = true;\n');
+  gitAtCwd(cwd, ['add', '-A']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', 'sibling child merged into root (already has its own evidence elsewhere)']);
+  gitAtCwd(cwd, ['checkout', 'main']);
+
+  addWork(dir, {
+    id: leafId, title: `Title ${leafId}`, kind: 'task', status: 'todo', deps: [], risk: 'low', refs: [],
+    verify: 'test -f docs/leaf-note.txt', parent: rootId,
+  });
+  run(cwd, ['move', leafId, '--to', 'doing']);
+  commitPending(cwd, `state: claim ${leafId}`);
+
+  gitAtCwd(cwd, ['checkout', '-b', `fgw/${leafId}`, `fgw/${rootId}`]);
+  fs.mkdirSync(path.join(cwd, 'docs'), { recursive: true });
+  fs.writeFileSync(path.join(cwd, 'docs/leaf-note.txt'), 'ok\n');
+  gitAtCwd(cwd, ['add', '-A']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', `worker output for ${leafId}`]);
+  gitAtCwd(cwd, ['checkout', 'main']);
+
+  run(cwd, ['move', leafId, '--to', 'awaiting-approval']);
+  commitPendingBeforeApprove(cwd, leafId);
+
+  const result = run(cwd, ['approve', leafId]);
+  assert.equal(result.status, 0, `leaf's own diff never touches a gated module -- must approve without --acknowledge-iron-law: ${result.stdout}${result.stderr}`);
+  assert.doesNotMatch(result.stdout, /Iron Law/);
+  assert.equal(stateView(cwd).work[leafId].status, 'delivered');
+});
+
+test('approve of a leaf item whose OWN commit touches a gated module (src/runner/**) still REFUSES without --acknowledge-iron-law, even with leaf-scoped diff (tsk-4voj D1 does not under-scope)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+
+  const rootId = 'iron-leaf-genuine-root';
+  const leafId = 'iron-leaf-genuine-child';
+  const dir = path.join(cwd, '.fgos');
+  addWork(dir, { id: rootId, title: `Title ${rootId}`, kind: 'task', status: 'todo', deps: [], risk: 'low', refs: [], verify: 'true' });
+  commitPending(cwd, `state: add ${rootId}`);
+  gitAtCwd(cwd, ['branch', `fgw/${rootId}`, 'main']);
+
+  addWork(dir, {
+    id: leafId, title: `Title ${leafId}`, kind: 'task', status: 'todo', deps: [], risk: 'low', refs: [],
+    verify: 'test -f src/runner/iron-leaf-genuine-child-produced.mjs', parent: rootId,
+  });
+  run(cwd, ['move', leafId, '--to', 'doing']);
+  commitPending(cwd, `state: claim ${leafId}`);
+
+  gitAtCwd(cwd, ['checkout', '-b', `fgw/${leafId}`, `fgw/${rootId}`]);
+  fs.mkdirSync(path.join(cwd, 'src/runner'), { recursive: true });
+  fs.writeFileSync(path.join(cwd, 'src/runner/iron-leaf-genuine-child-produced.mjs'), 'export const producedByLeaf = true;\n');
+  gitAtCwd(cwd, ['add', '-A']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', `worker output for ${leafId}`]);
+  gitAtCwd(cwd, ['checkout', 'main']);
+
+  run(cwd, ['move', leafId, '--to', 'awaiting-approval']);
+  commitPendingBeforeApprove(cwd, leafId);
+
+  const headBefore = gitHead(cwd);
+  const result = run(cwd, ['approve', leafId]);
+  assert.equal(result.status, 4, `leaf's own commit genuinely touches a gated module -- must still refuse: ${result.stdout}${result.stderr}`);
+  assert.match(result.stderr, /Iron Law/);
+  assert.match(result.stderr, /src\/runner\/iron-leaf-genuine-child-produced\.mjs/, 'the refusal must name the leaf\'s own tripped module');
+  assert.equal(gitHead(cwd), headBefore, 'a refused approve attempts no merge');
+  assert.equal(stateView(cwd).work[leafId].status, 'awaiting-approval');
+});
+
+// --- sync-root (tsk-50i, docs/history/tsk-3bn-merge-conductor-harness-v2/) -
+//
+// Merges fgw/<root-id>'s current tip into its real target (main, or
+// fgw/<parentId> for a nested root) WITHOUT changing the root item's own
+// status/stage — unlike approve, which always advances an item's FSM
+// status. Reuses mergeRunnerItem's exact lock/verify path (constraint #1
+// from fgos-validating's feasibility gate).
+
+// Simulates a root whose branch has already advanced past main (a leaf's
+// work already landed on fgw/<rootId>, e.g. via approve's own leaf-into-root
+// path) — the exact drift shape tsk-3bn's own origin incident reproduced.
+// The root item's own status stays 'doing' throughout (a root mid-flight,
+// not yet closed) — sync-root must never touch it.
+function makeDriftedRoot(cwd, rootId, opts = {}) {
+  const dir = path.join(cwd, '.fgos');
+  addWork(dir, { id: rootId, title: `Title ${rootId}`, kind: 'task', status: 'todo', deps: [], risk: 'low', refs: [], verify: opts.verify ?? 'true', ...(opts.parent ? { parent: opts.parent } : {}) });
+  commitPending(cwd, `state: add ${rootId}`);
+  run(cwd, ['move', rootId, '--to', 'doing']);
+  commitPending(cwd, `state: claim ${rootId}`);
+
+  gitAtCwd(cwd, ['checkout', '-b', `fgw/${rootId}`]);
+  fs.writeFileSync(path.join(cwd, `${rootId}-produced.txt`), 'ok\n');
+  gitAtCwd(cwd, ['add', `${rootId}-produced.txt`]);
+  gitAtCwd(cwd, ['commit', '-q', '-m', `leaf work merged into fgw/${rootId}`]);
+  gitAtCwd(cwd, ['checkout', 'main']);
+}
+
+test('sync-root on a nonexistent id is rejected as validation, exit 4', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  const result = run(cwd, ['sync-root', 'sync-root-ghost']);
+  assert.equal(result.status, 4);
+});
+
+test('sync-root on a root with no fgw/<id> branch is rejected as validation, exit 4', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  addOk(cwd, 'sync-root-no-branch', { verify: 'true' });
+  const result = run(cwd, ['sync-root', 'sync-root-no-branch']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /does not exist/);
+});
+
+test('sync-root happy path: merges fgw/<root> into main, root item status/stage UNCHANGED, fgw/<root> survives (not deleted)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeDriftedRoot(cwd, 'sync-root-happy', { verify: `test -f sync-root-happy-produced.txt` });
+  commitPendingBeforeApprove(cwd, 'sync-root-happy');
+
+  const result = run(cwd, ['sync-root', 'sync-root-happy']);
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.outcome, 'synced');
+  assert.equal(data.target, 'main');
+  assert.equal(data.branch, 'fgw/sync-root-happy');
+
+  assert.ok(fs.existsSync(path.join(cwd, 'sync-root-happy-produced.txt')), 'the synced content must land on main');
+
+  const view = stateView(cwd);
+  assert.equal(view.work['sync-root-happy'].status, 'doing', 'sync-root must never change the root item\'s own status');
+
+  const branches = gitAtCwd(cwd, ['for-each-ref', '--format=%(refname:short)', 'refs/heads/fgw/']);
+  assert.match(branches, /fgw\/sync-root-happy\b/, 'sync-root must NOT delete the root branch — it stays open for further leaf merges');
+});
+
+test('sync-root records a real decision on the root item', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeDriftedRoot(cwd, 'sync-root-decision', { verify: 'true' });
+  commitPendingBeforeApprove(cwd, 'sync-root-decision');
+
+  const result = run(cwd, ['sync-root', 'sync-root-decision']);
+  assert.equal(result.status, 0, result.stderr);
+
+  const lines = eventLines(cwd);
+  const decisionEvents = lines.map((l) => JSON.parse(l)).filter((e) => e.type === 'decision' && e.payload?.id === 'sync-root-decision');
+  assert.equal(decisionEvents.length, 1, 'sync-root must append exactly one real decision record');
+  assert.match(decisionEvents[0].payload.text, /sync-root-decision|fgw\/sync-root-decision/);
+});
+
+test('sync-root nested: a root with a parent merges into fgw/<parentId>, not main; main stays untouched; the child root\'s status stays unchanged', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  // grandroot (target for the nested sync) is itself a plain root with a
+  // real branch but no drift of its own.
+  const dir = path.join(cwd, '.fgos');
+  addWork(dir, { id: 'sync-root-grandparent', title: 'Title grandparent', kind: 'task', status: 'todo', deps: [], risk: 'low', refs: [], verify: 'true' });
+  commitPending(cwd, 'state: add grandparent');
+
+  // fgw/<grandparent> must be cut AFTER the child's own state events (add +
+  // claim, inside makeDriftedRoot) already landed on main — cutting it
+  // earlier leaves fgw/child's later commits carrying a legitimate .fgos/
+  // diff relative to fgw/grandparent (the child's add/claim events main
+  // gained afterward), which mergeRunnerItem's ADR0020 guard correctly
+  // refuses as fgos-write-rejected. Same ordering makeDriftedRoot's own
+  // `checkout -b fgw/<rootId>` already relies on for its OWN branch.
+  makeDriftedRoot(cwd, 'sync-root-nested-child', { parent: 'sync-root-grandparent', verify: `test -f sync-root-nested-child-produced.txt` });
+  gitAtCwd(cwd, ['branch', 'fgw/sync-root-grandparent', 'main']);
+  commitPendingBeforeApprove(cwd, 'sync-root-nested-child');
+
+  const headBefore = gitHead(cwd);
+  const result = run(cwd, ['sync-root', 'sync-root-nested-child']);
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.target, 'fgw/sync-root-grandparent');
+
+  assert.equal(gitHead(cwd), headBefore, 'main must be byte-for-byte unchanged by a nested sync-root');
+  assert.equal(
+    fs.existsSync(path.join(cwd, 'sync-root-nested-child-produced.txt')),
+    false,
+    'the nested child\'s content must not land on the human\'s own main checkout',
+  );
+  const producedOnParent = gitAtCwd(cwd, ['show', 'fgw/sync-root-grandparent:sync-root-nested-child-produced.txt']);
+  assert.match(producedOnParent, /ok/);
+
+  const view = stateView(cwd);
+  assert.equal(view.work['sync-root-nested-child'].status, 'doing');
+});
+
+test('sync-root aborts cleanly on a genuine conflict: main left byte-for-byte unchanged, root status untouched', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeDriftedRoot(cwd, 'sync-root-conflict', { verify: 'true' });
+  // Create a conflicting change on main AFTER the root branch forked, on
+  // the exact same path the root's own commit touches.
+  fs.writeFileSync(path.join(cwd, 'sync-root-conflict-produced.txt'), 'conflicting main content\n');
+  gitAtCwd(cwd, ['add', 'sync-root-conflict-produced.txt']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', 'unrelated main edit that collides']);
+  commitPendingBeforeApprove(cwd, 'sync-root-conflict');
+
+  const headBefore = gitHead(cwd);
+  const result = run(cwd, ['sync-root', 'sync-root-conflict']);
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.outcome, 'blocked');
+  assert.equal(data.reason, 'merge-conflict');
+
+  assert.equal(gitHead(cwd), headBefore, 'main must be byte-for-byte unchanged after an aborted sync-root');
+  assert.equal(stateView(cwd).work['sync-root-conflict'].status, 'doing', 'a blocked sync-root must never touch the root item\'s status');
+});
+
+test('sync-root refuses from inside a linked worktree (must land on the real main checkout)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeDriftedRoot(cwd, 'sync-root-worktree-guard', { verify: 'true' });
+  commitPendingBeforeApprove(cwd, 'sync-root-worktree-guard');
+
+  const wtParent = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-cli-sync-root-wt-'));
+  const wt = path.join(wtParent, 'wt');
+  gitAtCwd(cwd, ['worktree', 'add', '-q', '-b', 'sync-root-side-branch', wt]);
+
+  const result = spawnSync(process.execPath, [FGOS, 'sync-root', 'sync-root-worktree-guard'], { cwd: wt, encoding: 'utf8' });
+  assert.equal(result.status, 4, result.stderr);
+  assert.match(result.stderr, /main checkout/);
+
+  gitAtCwd(cwd, ['worktree', 'remove', '--force', wt]);
+});
+
+// --- promote-to-component (tsk-3gx-3, docs/history/promote-to-component/) -
+//
+// Takes N flat sibling item ids (D2: caller's own explicit list) and
+// converges them into one component: resolve/create a shared root (D1),
+// merge each member's own branch into it (never a rebase, reusing
+// mergeRunnerItem via tsk-3gx-2's engine), and set `parent` ONLY for a
+// member whose real merge truly succeeded (never on say-so).
+
+// Register a flat member's state (add + claim) WITHOUT cutting its branch
+// yet. Split from the branch-cut step below so a multi-member test can fold
+// every member's state onto ONE shared main commit before any branch
+// exists — cutting branches at different points in main's history would
+// leave their .fgos/events.jsonl content genuinely diverged (each branch
+// carrying a different subset of add/claim events), which mergeRunnerItem's
+// real ADR0020 guard correctly refuses as a staged .fgos/ change. A
+// single-member test can use makeFlatMember below instead, where this
+// distinction never matters.
+function registerFlatMember(cwd, id, opts = {}) {
+  const dir = path.join(cwd, '.fgos');
+  addWork(dir, { id, title: `Title ${id}`, kind: 'task', status: 'todo', deps: opts.deps ?? [], mergeAfter: opts.mergeAfter, risk: 'low', refs: [], verify: opts.verify ?? 'true' });
+  run(cwd, ['move', id, '--to', 'doing']);
+}
+
+// Cut `id`'s own `fgw/<id>` branch from whatever main currently is, with one
+// real commit. Callers with more than one member must commitPending() all
+// registerFlatMember() calls first, THEN cut every branch — see the comment
+// above.
+function cutMemberBranch(cwd, id) {
+  gitAtCwd(cwd, ['checkout', '-b', `fgw/${id}`]);
+  fs.writeFileSync(path.join(cwd, `${id}-produced.txt`), 'ok\n');
+  gitAtCwd(cwd, ['add', `${id}-produced.txt`]);
+  gitAtCwd(cwd, ['commit', '-q', '-m', `work for ${id}`]);
+  gitAtCwd(cwd, ['checkout', 'main']);
+}
+
+// A plain flat member: its own `fgw/<id>` branch exists with one real
+// commit, item status stays 'doing' (claimed, mid-flight — no parent set).
+// Safe for single-member setups; a multi-member test that needs the merged
+// branches to actually share history should use registerFlatMember +
+// cutMemberBranch directly instead (see their own comments above).
+function makeFlatMember(cwd, id, opts = {}) {
+  registerFlatMember(cwd, id, opts);
+  commitPending(cwd, `state: setup ${id}`);
+  cutMemberBranch(cwd, id);
+}
+
+test('promote-to-component requires at least 2 ids, exit 4', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeFlatMember(cwd, 'ptc-solo-a');
+
+  const result = run(cwd, ['promote-to-component', '--ids', 'ptc-solo-a', '--root-title', 'Component solo']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /at least 2/);
+});
+
+test('promote-to-component on a nonexistent member id is rejected as validation, exit 4', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeFlatMember(cwd, 'ptc-real-a');
+
+  const result = run(cwd, ['promote-to-component', '--ids', 'ptc-real-a,ptc-ghost', '--root-title', 'Component ghost']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /ptc-ghost.*not found/);
+});
+
+test('promote-to-component refuses a member that already has a parent, exit 4', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeFlatMember(cwd, 'ptc-sibling');
+  makeFlatMember(cwd, 'ptc-already-parented', { deps: ['ptc-sibling'] });
+  editWork(path.join(cwd, '.fgos'), { id: 'ptc-already-parented', patch: { parent: 'some-other-root' } });
+  commitPending(cwd, 'state: pre-parent ptc-already-parented');
+
+  const result = run(cwd, ['promote-to-component', '--ids', 'ptc-already-parented,ptc-sibling', '--root-title', 'Component reject']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /already has parent/);
+});
+
+test('promote-to-component refuses ids that are not connected via deps/mergeAfter, exit 4', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeFlatMember(cwd, 'ptc-disconnected-a');
+  makeFlatMember(cwd, 'ptc-disconnected-b');
+
+  const result = run(cwd, ['promote-to-component', '--ids', 'ptc-disconnected-a,ptc-disconnected-b', '--root-title', 'Component disconnected']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /not all connected/);
+});
+
+test('promote-to-component happy path (D1 new-item): creates a fresh root, merges both members into it, sets parent only after real success, records one decision', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  registerFlatMember(cwd, 'ptc-new-root-a');
+  registerFlatMember(cwd, 'ptc-new-root-b', { deps: ['ptc-new-root-a'] });
+  commitPending(cwd, 'state: setup ptc-new-root members');
+  cutMemberBranch(cwd, 'ptc-new-root-a');
+  cutMemberBranch(cwd, 'ptc-new-root-b');
+
+  const result = run(cwd, ['promote-to-component', '--ids', 'ptc-new-root-a,ptc-new-root-b', '--root-title', 'Component new root']);
+  assert.equal(result.status, 0, result.stderr);
+  const data = JSON.parse(result.stdout).data;
+  assert.equal(data.rootCreated, true);
+  assert.equal(data.results.find((r) => r.id === 'ptc-new-root-a').outcome, 'merged');
+  assert.equal(data.results.find((r) => r.id === 'ptc-new-root-b').outcome, 'merged');
+
+  const view = stateView(cwd);
+  assert.equal(view.work['ptc-new-root-a'].parent, data.rootId);
+  assert.equal(view.work['ptc-new-root-b'].parent, data.rootId);
+  assert.equal(view.work[data.rootId].status, 'todo', 'a freshly created root is not claimed by this action');
+
+  const rootFiles = gitAtCwd(cwd, ['ls-tree', '-r', '--name-only', `fgw/${data.rootId}`]);
+  assert.match(rootFiles, /ptc-new-root-a-produced\.txt/);
+  assert.match(rootFiles, /ptc-new-root-b-produced\.txt/);
+
+  const decisionEvents = eventLines(cwd).map((l) => JSON.parse(l)).filter((e) => e.type === 'decision' && e.payload?.id === data.rootId);
+  assert.equal(decisionEvents.length, 1, 'promote-to-component must append exactly one real decision record');
+  assert.match(decisionEvents[0].payload.text, /ptc-new-root-a/);
+  assert.match(decisionEvents[0].payload.text, /ptc-new-root-b/);
+});
+
+test('promote-to-component happy path (D1 reuse-member): promotes an existing member to root, root itself is skipped not merged', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  // Connectivity edge direction matters here: buildUnifiedAdjacency
+  // (src/state/dep-graph.mjs) adds parent -> child for a `parent` edge and
+  // id -> target for both `deps` and `mergeAfter` — the SAME direction.
+  // Promoting ptc-reuse-root to root sets ptc-reuse-other.parent =
+  // 'ptc-reuse-root' (edge root -> other); if the connectivity edge were
+  // ptc-reuse-other -> ptc-reuse-root (either field), that closes a real
+  // cycle (see the dedicated merged-parent-rejected test below). Declaring
+  // the edge on the ROOT side instead (root -> other) matches the parent
+  // edge's own direction, so no cycle — this is the genuine happy path.
+  registerFlatMember(cwd, 'ptc-reuse-other');
+  registerFlatMember(cwd, 'ptc-reuse-root', { mergeAfter: ['ptc-reuse-other'] });
+  commitPending(cwd, 'state: setup ptc-reuse members');
+  cutMemberBranch(cwd, 'ptc-reuse-root');
+  cutMemberBranch(cwd, 'ptc-reuse-other');
+
+  const result = run(cwd, ['promote-to-component', '--ids', 'ptc-reuse-root,ptc-reuse-other', '--root-id', 'ptc-reuse-root']);
+  assert.equal(result.status, 0, result.stderr);
+  const data = JSON.parse(result.stdout).data;
+  assert.equal(data.rootCreated, false);
+  assert.equal(data.rootId, 'ptc-reuse-root');
+  assert.equal(data.results.find((r) => r.id === 'ptc-reuse-root').outcome, 'skipped');
+  assert.equal(data.results.find((r) => r.id === 'ptc-reuse-other').outcome, 'merged');
+
+  const view = stateView(cwd);
+  assert.equal(view.work['ptc-reuse-other'].parent, 'ptc-reuse-root');
+  assert.equal(view.work['ptc-reuse-root'].parent, undefined, 'root never sets its own parent to itself');
+
+  const rootFiles = gitAtCwd(cwd, ['ls-tree', '-r', '--name-only', 'fgw/ptc-reuse-root']);
+  assert.match(rootFiles, /ptc-reuse-other-produced\.txt/);
+});
+
+test('promote-to-component reports merged-parent-rejected (never crashes) when the real git merge succeeds but setting parent would close a deps+parent cycle', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  registerFlatMember(cwd, 'ptc-cycle-root');
+  // deps (not mergeAfter) deliberately: ptc-cycle-other depends on the very
+  // item this test promotes to root, so setting ptc-cycle-other.parent =
+  // 'ptc-cycle-root' afterward closes a real deps+parent cycle
+  // (assertNoUnifiedCycle) — the exact failure mode the try/catch around
+  // editWork above exists for.
+  registerFlatMember(cwd, 'ptc-cycle-other', { deps: ['ptc-cycle-root'] });
+  commitPending(cwd, 'state: setup ptc-cycle members');
+  cutMemberBranch(cwd, 'ptc-cycle-root');
+  cutMemberBranch(cwd, 'ptc-cycle-other');
+
+  const result = run(cwd, ['promote-to-component', '--ids', 'ptc-cycle-root,ptc-cycle-other', '--root-id', 'ptc-cycle-root']);
+  assert.equal(result.status, 0, result.stderr);
+  const data = JSON.parse(result.stdout).data;
+  const otherResult = data.results.find((r) => r.id === 'ptc-cycle-other');
+  assert.equal(otherResult.outcome, 'merged-parent-rejected');
+  assert.match(otherResult.reason, /graph cycle/);
+
+  // The real git merge landed regardless of the state-layer rejection —
+  // this outcome exists precisely because git succeeded where state didn't.
+  const rootFiles = gitAtCwd(cwd, ['ls-tree', '-r', '--name-only', 'fgw/ptc-cycle-root']);
+  assert.match(rootFiles, /ptc-cycle-other-produced\.txt/);
+
+  const view = stateView(cwd);
+  assert.equal(view.work['ptc-cycle-other'].parent, undefined, 'a rejected parent-set never silently applies anyway');
+
+  const decisionEvents = eventLines(cwd).map((l) => JSON.parse(l)).filter((e) => e.type === 'decision' && e.payload?.id === data.rootId);
+  assert.equal(decisionEvents.length, 1, 'a per-member rejection still gets exactly one real decision record');
+  assert.match(decisionEvents[0].payload.text, /ptc-cycle-other/);
+});
+
+test('promote-to-component bails a conflicting member without setting its parent, still processes and merges the rest', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+
+  const dir = path.join(cwd, '.fgos');
+  addWork(dir, { id: 'ptc-conflict-b', title: 'Title conflict b', kind: 'task', status: 'todo', deps: [], risk: 'low', refs: [], verify: 'true' });
+  addWork(dir, { id: 'ptc-conflict-a', title: 'Title conflict a', kind: 'task', status: 'todo', deps: ['ptc-conflict-b'], risk: 'low', refs: [], verify: 'true' });
+  commitPending(cwd, 'state: add ptc-conflict members');
+  run(cwd, ['move', 'ptc-conflict-a', '--to', 'doing']);
+  run(cwd, ['move', 'ptc-conflict-b', '--to', 'doing']);
+  commitPending(cwd, 'state: claim ptc-conflict members');
+
+  // ptc-conflict-a edits seed.txt one way; the fresh root (branched from
+  // current main) will independently... actually the root is created AFTER
+  // this, from main's current tip, so give the root-to-be a conflicting
+  // edit by pre-seeding seed.txt differently on a throwaway commit on main
+  // first, then letting ptc-conflict-a diverge from an EARLIER point.
+  gitAtCwd(cwd, ['checkout', '-b', 'fgw/ptc-conflict-a']);
+  fs.writeFileSync(path.join(cwd, 'seed.txt'), 'edited by ptc-conflict-a\n');
+  gitAtCwd(cwd, ['add', 'seed.txt']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', 'ptc-conflict-a edits seed.txt']);
+  gitAtCwd(cwd, ['checkout', 'main']);
+  fs.writeFileSync(path.join(cwd, 'seed.txt'), 'edited by main after branch cut\n');
+  gitAtCwd(cwd, ['add', 'seed.txt']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', 'main also edits seed.txt']);
+
+  gitAtCwd(cwd, ['checkout', '-b', 'fgw/ptc-conflict-b']);
+  fs.writeFileSync(path.join(cwd, 'ptc-conflict-b-produced.txt'), 'ok\n');
+  gitAtCwd(cwd, ['add', 'ptc-conflict-b-produced.txt']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', 'work for ptc-conflict-b']);
+  gitAtCwd(cwd, ['checkout', 'main']);
+
+  const result = run(cwd, ['promote-to-component', '--ids', 'ptc-conflict-a,ptc-conflict-b', '--root-title', 'Component conflict']);
+  assert.equal(result.status, 0, result.stderr);
+  const data = JSON.parse(result.stdout).data;
+  const aResult = data.results.find((r) => r.id === 'ptc-conflict-a');
+  const bResult = data.results.find((r) => r.id === 'ptc-conflict-b');
+  assert.equal(aResult.outcome, 'bailed');
+  assert.equal(aResult.reason, 'merge-conflict');
+  assert.equal(bResult.outcome, 'merged');
+
+  const view = stateView(cwd);
+  assert.equal(view.work['ptc-conflict-a'].parent, undefined, 'a bailed member never gets parent set');
+  assert.equal(view.work['ptc-conflict-b'].parent, data.rootId);
+});
+
+// --- close-out drift guard (tsk-62y, docs/history/
+//     tsk-3bn-merge-conductor-harness-v2/) ----------------------------------
+//
+// tsk-3bn's own origin incident: closing a milestone (a `targets`-bearing
+// item) while one of its targets' resolved root branch had drifted ahead of
+// main from a later leaf merge — nothing warned or blocked it. This guard
+// runs inside `approve`, before any git mutation, whenever the item being
+// approved carries a non-empty `targets` array.
+
+function makeMilestone(cwd, id, targets) {
+  const dir = path.join(cwd, '.fgos');
+  addWork(dir, { id, title: `Title ${id}`, kind: 'task', status: 'todo', deps: [], risk: 'low', refs: [], verify: 'true', targets });
+  run(cwd, ['move', id, '--to', 'doing']);
+  run(cwd, ['move', id, '--to', 'awaiting-approval']);
+  commitPending(cwd, `state: propose ${id}`);
+}
+
+test('approve of a milestone blocks when a targeted item\'s root has unsynced drift, exit 4, item stays awaiting-approval', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeDriftedRoot(cwd, 'closeout-root', { verify: 'true' });
+  const dir = path.join(cwd, '.fgos');
+  addWork(dir, { id: 'closeout-child', title: 'child', kind: 'task', status: 'todo', deps: [], risk: 'low', refs: [], verify: 'true', parent: 'closeout-root' });
+  commitPending(cwd, 'state: add closeout-child');
+
+  makeMilestone(cwd, 'closeout-milestone', ['closeout-child']);
+
+  const headBefore = gitHead(cwd);
+  const result = run(cwd, ['approve', 'closeout-milestone']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /unsynced drift/);
+  assert.match(result.stderr, /closeout-child/);
+  assert.match(result.stderr, /closeout-root/);
+  assert.match(result.stderr, /fgos sync-root/);
+  assert.equal(gitHead(cwd), headBefore, 'a blocked close-out attempts no merge');
+  assert.equal(stateView(cwd).work['closeout-milestone'].status, 'awaiting-approval');
+});
+
+test('approve of a milestone succeeds with --acknowledge-drift despite a targeted item\'s root having unsynced drift', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeDriftedRoot(cwd, 'closeout-ack-root', { verify: 'true' });
+  const dir = path.join(cwd, '.fgos');
+  addWork(dir, { id: 'closeout-ack-child', title: 'child', kind: 'task', status: 'todo', deps: [], risk: 'low', refs: [], verify: 'true', parent: 'closeout-ack-root' });
+  commitPending(cwd, 'state: add closeout-ack-child');
+
+  makeMilestone(cwd, 'closeout-ack-milestone', ['closeout-ack-child']);
+
+  const result = run(cwd, ['approve', 'closeout-ack-milestone', '--acknowledge-drift']);
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(stateView(cwd).work['closeout-ack-milestone'].status, 'delivered');
+});
+
+test('approve of a milestone with no drift on any target succeeds normally, unaffected by the guard', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  // A root with a real branch but zero drift (no leaf work landed on it
+  // beyond main's own tip).
+  const dir = path.join(cwd, '.fgos');
+  addWork(dir, { id: 'closeout-clean-root', title: 'root', kind: 'task', status: 'todo', deps: [], risk: 'low', refs: [], verify: 'true' });
+  commitPending(cwd, 'state: add closeout-clean-root');
+  gitAtCwd(cwd, ['branch', 'fgw/closeout-clean-root', 'main']);
+  addWork(dir, { id: 'closeout-clean-child', title: 'child', kind: 'task', status: 'todo', deps: [], risk: 'low', refs: [], verify: 'true', parent: 'closeout-clean-root' });
+  commitPending(cwd, 'state: add closeout-clean-child');
+
+  makeMilestone(cwd, 'closeout-clean-milestone', ['closeout-clean-child']);
+
+  const result = run(cwd, ['approve', 'closeout-clean-milestone']);
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(stateView(cwd).work['closeout-clean-milestone'].status, 'delivered');
+});
+
+test('approve of an ordinary item with no targets is completely unaffected by the close-out guard (regression)', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'closeout-no-targets-item', { verify: 'true' });
+  run(cwd, ['move', 'closeout-no-targets-item', '--to', 'doing']);
+  run(cwd, ['move', 'closeout-no-targets-item', '--to', 'awaiting-approval']);
+
+  const result = run(cwd, ['approve', 'closeout-no-targets-item']);
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(stateView(cwd).work['closeout-no-targets-item'].status, 'delivered');
 });
 
 test('reject on a nonexistent id is rejected as validation, exit 4', () => {
@@ -4919,11 +5846,11 @@ test('reject moves awaiting-approval -> todo with the reason recorded, role huma
   assert.equal(lastEvent.payload.role, 'human');
 });
 
-test('the CLI usage message for an unknown verb lists review/approve/reject in the surface', () => {
+test('the CLI usage message for an unknown verb lists review/approve/sync-root/reject in the surface', () => {
   const cwd = tmpCwd();
   const result = run(cwd, ['bogus-verb']);
   assert.equal(result.status, 4);
-  assert.match(result.stderr, /review\|approve\|reject/);
+  assert.match(result.stderr, /review\|approve\|sync-root\|reject/);
 });
 
 // --- `review`/`approve` --github (github-adapter D1/D3/D5) -------------------
@@ -5095,11 +6022,33 @@ test('approve --github without --pr is a validation error, item stays proposed, 
   assert.ok(!fs.existsSync(marker), 'no gh call is made when --pr is missing');
 });
 
+// tsk-396 D2: regression for the merge-before-gate ordering bug on the
+// --github transport specifically. Before this fix, mergeGitHubPR (a real,
+// server-side GitHub merge) ran BEFORE the acceptance-evidence gate — unlike
+// a local git merge, a GitHub-side merge can't be aborted, so this path
+// carried irreversible-merge risk the local paths don't. The fake gh here
+// would succeed if invoked; the test proves it is never invoked at all.
+test('approve --github --pr on an item with a missing-evidence acceptance clause is refused BEFORE the real GitHub merge: precondition, exit 2, mergeGitHubPR/gh is never called', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeRunnerProposedItem(cwd, 'gh-approve-cos-missing');
+  run(cwd, ['edit', 'gh-approve-cos-missing', '--acceptance', JSON.stringify([{ text: 'ship it' }])]);
+  commitPendingBeforeApprove(cwd, 'gh-approve-cos-missing');
+  const marker = path.join(cwd, 'gh-was-called');
+  const fake = writeMarkerFake(cwd, marker);
+
+  const result = run(cwd, ['approve', 'gh-approve-cos-missing', '--github', '--pr', '42'], { FGOS_GH_COMMAND: fake });
+  assert.equal(result.status, 2, `${result.stdout}${result.stderr}`);
+  assert.match(result.stderr, /ship it/);
+  assert.equal(stateView(cwd).work['gh-approve-cos-missing'].status, 'awaiting-approval');
+  assert.ok(!fs.existsSync(marker), 'the acceptance-evidence gate must reject before any gh CLI call, including the real merge');
+});
+
 test('approve --github with a dirty main tree is NOT blocked by the local dirty-tree gate and proceeds to the GitHub merge', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   makeRunnerProposedItem(cwd, 'gh-approve-dirty');
-  compoundAndCommit(cwd, 'gh-approve-dirty');
+  commitPendingBeforeApprove(cwd, 'gh-approve-dirty');
   // An unrelated dirty file on main — a LOCAL approve would refuse this, but
   // a GitHub-side merge never touches the local tree, so it must not gate.
   fs.writeFileSync(path.join(cwd, 'unrelated-dirt.txt'), 'uncommitted\n');
@@ -5108,26 +6057,27 @@ test('approve --github with a dirty main tree is NOT blocked by the local dirty-
   const result = run(cwd, ['approve', 'gh-approve-dirty', '--github', '--pr', '5'], { FGOS_GH_COMMAND: fake });
   assert.equal(result.status, 0, `${result.stdout}${result.stderr}`);
   assert.doesNotMatch(result.stdout, /not clean/);
-  assert.equal(envelopeData(result.stdout).to, 'done');
-  assert.equal(stateView(cwd).work['gh-approve-dirty'].status, 'done');
+  assert.equal(envelopeData(result.stdout).to, 'delivered');
+  assert.equal(stateView(cwd).work['gh-approve-dirty'].status, 'delivered');
 });
 
-test('approve --github --pr on a fake gh merge success transitions the item awaiting-approval -> done with role human', () => {
+test('approve --github --pr on a fake gh merge success transitions the item awaiting-approval -> delivered with role human', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   makeRunnerProposedItem(cwd, 'gh-approve-merged');
-  compoundAndCommit(cwd, 'gh-approve-merged');
+  commitPendingBeforeApprove(cwd, 'gh-approve-merged');
   const fake = writeMergeSuccessFake(cwd);
 
   const result = run(cwd, ['approve', 'gh-approve-merged', '--github', '--pr', '42'], { FGOS_GH_COMMAND: fake });
   assert.equal(result.status, 0, `${result.stdout}${result.stderr}`);
   const mergedData = envelopeData(result.stdout);
   assert.equal(mergedData.prNumber, '42');
-  assert.equal(mergedData.to, 'done');
+  assert.equal(mergedData.to, 'delivered');
 
   const view = stateView(cwd);
-  assert.equal(view.work['gh-approve-merged'].status, 'done');
-  assert.equal(view.settlements['gh-approve-merged'][0].role, 'human');
+  assert.equal(view.work['gh-approve-merged'].status, 'delivered');
+  // No 'close' settlement yet -- that fires at cleanup->done, not delivered.
+  assert.equal(view.settlements?.['gh-approve-merged'], undefined);
 });
 
 test('approve --github --pr on a fake gh merge failure transitions awaiting-approval -> blocked and records friction with the classified reason, layer, and gh detail', () => {
@@ -5386,6 +6336,56 @@ test('catchup on an item whose target has a REAL same-line conflict leaves it bl
   assert.equal(gitAtCwd(cwd, ['rev-parse', 'fgw/catchup-conflict-item']).trim(), branchHeadBefore, "the item's own branch tip must be unchanged after an aborted catchup");
   assert.equal(gitAtCwd(cwd, ['worktree', 'list', '--porcelain']), worktreesBefore, 'the ephemeral catchup worktree is cleaned up even on abort — no leftover');
   assert.equal(stateView(cwd).work['catchup-conflict-item'].status, 'blocked');
+});
+
+// The branch already contains the target's tip, so catchup's own merge would
+// stage nothing and its `git commit` would die with "nothing to commit",
+// leaving the item blocked forever. Reproduced here the way it happens for
+// real: a person merges the target by hand (or a prior catch-up landed the
+// merge and died later), then calls catchup.
+function makeAlreadyCaughtUpItem(cwd, id, verify) {
+  makeBlockedRunnerItem(cwd, id, 'integration-drift', { verify });
+  gitAtCwd(cwd, ['checkout', '-q', `fgw/${id}`]);
+  gitAtCwd(cwd, ['merge', '--no-edit', '-q', 'main']);
+  gitAtCwd(cwd, ['checkout', '-q', 'main']);
+}
+
+test('catchup on a branch that already contains the target reports outcome "already-caught-up", still runs verify, and bounces blocked -> awaiting-approval without creating a commit', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeAlreadyCaughtUpItem(cwd, 'catchup-caught-up', 'test -f catchup-caught-up-produced.txt');
+
+  const mainHeadBefore = gitHead(cwd);
+  const branchHeadBefore = gitAtCwd(cwd, ['rev-parse', 'fgw/catchup-caught-up']).trim();
+  const worktreesBefore = gitAtCwd(cwd, ['worktree', 'list', '--porcelain']);
+
+  const result = run(cwd, ['catchup', 'catchup-caught-up']);
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.outcome, 'already-caught-up');
+  assert.equal(data.from, 'blocked');
+  assert.equal(data.to, 'awaiting-approval');
+
+  assert.equal(stateView(cwd).work['catchup-caught-up'].status, 'awaiting-approval');
+  assert.equal(gitAtCwd(cwd, ['rev-parse', 'fgw/catchup-caught-up']).trim(), branchHeadBefore, 'no commit is created when there was nothing to merge');
+  assert.equal(gitHead(cwd), mainHeadBefore, "catchup must never touch the human's own main checkout");
+  assert.equal(gitAtCwd(cwd, ['worktree', 'list', '--porcelain']), worktreesBefore, 'the ephemeral catchup worktree is cleaned up — no leftover');
+});
+
+test('catchup on an already-caught-up branch whose verify is RED stays blocked and reports verify-fail, without attempting a merge --abort that has no merge to abort', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeAlreadyCaughtUpItem(cwd, 'catchup-caught-up-red', 'test -f never-produced.txt');
+
+  const branchHeadBefore = gitAtCwd(cwd, ['rev-parse', 'fgw/catchup-caught-up-red']).trim();
+
+  const result = run(cwd, ['catchup', 'catchup-caught-up-red']);
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.outcome, 'verify-fail');
+
+  assert.equal(stateView(cwd).work['catchup-caught-up-red'].status, 'blocked');
+  assert.equal(gitAtCwd(cwd, ['rev-parse', 'fgw/catchup-caught-up-red']).trim(), branchHeadBefore);
 });
 
 test('catchup on an item blocked for an unrelated reason (e.g. anti-loop-max-visits) is rejected with a validation error naming the actual reason, before any git operation runs', () => {
@@ -5655,6 +6655,36 @@ test('return on a branch-source take: verify passes in a disposable detached wor
   assert.equal('headAtReturn' in view.work['branch-return-ok'], false, 'a branch return never records the main-based headAtReturn (D2 CẤM)');
   assert.equal(gitHead(cwd), mainHeadBefore, "return never advances or touches the human's own main checkout");
   assert.equal(gitAtCwd(cwd, ['worktree', 'list', '--porcelain']), worktreesBefore, 'the disposable detached verify worktree is cleaned up — no leftover');
+});
+
+test('return on a branch-source take whose branch declares a real npm dependency: verify passes because the disposable detached worktree gets its own node_modules provisioned first (tsk-2vd — reproduces the real failure that blocked tsk-32n\'s own return)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+
+  const localDep = mkLocalDependency();
+  fs.writeFileSync(
+    path.join(cwd, 'package.json'),
+    JSON.stringify({ name: 'x', version: '1.0.0', dependencies: { 'fgos-test-localdep': `file:${localDep}` } }),
+  );
+  gitAtCwd(cwd, ['add', 'package.json']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', 'declare a dependency']);
+
+  makeBlockedBranchItem(cwd, 'branch-return-deps', { verify: `node -e "require('fgos-test-localdep')"` });
+  assert.equal(run(cwd, ['take', '--id', 'branch-return-deps']).status, 0);
+  commitPending(cwd, 'state: take branch-return-deps');
+
+  gitAtCwd(cwd, ['checkout', 'fgw/branch-return-deps']);
+  fs.writeFileSync(path.join(cwd, 'proof.txt'), 'fixed by hand\n');
+  gitAtCwd(cwd, ['add', '-A']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', 'human fix']);
+  gitAtCwd(cwd, ['checkout', 'main']);
+
+  const result = run(cwd, ['return', 'branch-return-deps']);
+  assert.equal(result.status, 0, `return failed (before this item's fix, this failed with ERR_MODULE_NOT_FOUND exactly like tsk-32n's own return did): ${result.stderr}`);
+  assert.match(result.stdout, /awaiting-approval/);
+
+  const view = stateView(cwd);
+  assert.equal(view.work['branch-return-deps'].status, 'awaiting-approval');
 });
 
 test('return on a branch-source take never touches a live main-checkout.lock (tsk-45z D1 scope: only the main-source path releases early — worktree commits never contend for this shared lock)', () => {
@@ -6091,14 +7121,11 @@ test('approve from the main checkout is unaffected by the guard even while a ses
   const cwdR = initSessionSafeCwd();
   run(cwdR, ['init']);
   makeSessionSafeRunnerItem(cwdR, 'approve-main-runner', { verify: 'test -f approve-main-runner-produced.txt' });
-  // .fgos/ is git-ignored in a session-safe cwd (never committed), so advance
-  // the stage without folding it into a commit — plain compound, no commitPending.
-  assert.equal(run(cwdR, ['compound', 'approve-main-runner']).status, 0);
   const sessionR = createSession(cwdR, { sessionId: 'sess-active-runner' });
   try {
     const resR = run(cwdR, ['approve', 'approve-main-runner']);
     assert.equal(resR.status, 0, `runner approve from main must still succeed with a session active: ${resR.stderr}`);
-    assert.equal(stateView(cwdR).work['approve-main-runner'].status, 'done');
+    assert.equal(stateView(cwdR).work['approve-main-runner'].status, 'delivered');
   } finally {
     endSession(cwdR, sessionR.sessionId, { force: true });
   }
@@ -6110,13 +7137,11 @@ test('approve from the main checkout is unaffected by the guard even while a ses
   run(cwdP, ['take', '--id', 'approve-main-pull']);
   commitFile(cwdP, 'proof.txt');
   run(cwdP, ['return', 'approve-main-pull']);
-  // .fgos/ is git-ignored in a session-safe cwd — plain compound, no commit.
-  assert.equal(run(cwdP, ['compound', 'approve-main-pull']).status, 0);
   const sessionP = createSession(cwdP, { sessionId: 'sess-active-pull' });
   try {
     const resP = run(cwdP, ['approve', 'approve-main-pull']);
     assert.equal(resP.status, 0, `pull approve from main must still succeed with a session active: ${resP.stderr}`);
-    assert.equal(stateView(cwdP).work['approve-main-pull'].status, 'done');
+    assert.equal(stateView(cwdP).work['approve-main-pull'].status, 'delivered');
   } finally {
     endSession(cwdP, sessionP.sessionId, { force: true });
   }
@@ -6220,10 +7245,10 @@ test('approve from the main checkout is unaffected by the ad-hoc-worktree guard 
   const cwdR = initGitCwdMain();
   run(cwdR, ['init']);
   makeRunnerProposedItem(cwdR, 'approve-adhoc-main-runner', { verify: 'test -f approve-adhoc-main-runner-produced.txt' });
-  compoundAndCommit(cwdR, 'approve-adhoc-main-runner');
+  commitPendingBeforeApprove(cwdR, 'approve-adhoc-main-runner');
   const resR = run(cwdR, ['approve', 'approve-adhoc-main-runner']);
   assert.equal(resR.status, 0, `runner approve from main must still succeed: ${resR.stderr}`);
-  assert.equal(stateView(cwdR).work['approve-adhoc-main-runner'].status, 'done');
+  assert.equal(stateView(cwdR).work['approve-adhoc-main-runner'].status, 'delivered');
 
   const cwdP = initGitCwdMain();
   run(cwdP, ['init']);
@@ -6231,10 +7256,10 @@ test('approve from the main checkout is unaffected by the ad-hoc-worktree guard 
   run(cwdP, ['take', '--id', 'approve-adhoc-main-pull']);
   commitFile(cwdP, 'proof.txt');
   run(cwdP, ['return', 'approve-adhoc-main-pull']);
-  compoundAndCommit(cwdP, 'approve-adhoc-main-pull');
+  commitPendingBeforeApprove(cwdP, 'approve-adhoc-main-pull');
   const resP = run(cwdP, ['approve', 'approve-adhoc-main-pull']);
   assert.equal(resP.status, 0, `pull approve from main must still succeed: ${resP.stderr}`);
-  assert.equal(stateView(cwdP).work['approve-adhoc-main-pull'].status, 'done');
+  assert.equal(stateView(cwdP).work['approve-adhoc-main-pull'].status, 'delivered');
 });
 
 // --- approve --github + worktree guard (approve-worktree-guard-github-fix) -
@@ -6318,13 +7343,13 @@ test('approve --github --pr on the same self-modifying diff PROCEEDS with --ackn
   makeRunnerProposedItemTouching(cwd, 'gh-iron-ack-item', 'src/runner/probe.mjs', {
     verify: 'test -f src/runner/probe.mjs',
   });
-  compoundAndCommit(cwd, 'gh-iron-ack-item');
+  commitPendingBeforeApprove(cwd, 'gh-iron-ack-item');
   const fake = writeMergeSuccessFake(cwd);
 
   const result = run(cwd, ['approve', 'gh-iron-ack-item', '--github', '--acknowledge-iron-law', '--pr', '14'], { FGOS_GH_COMMAND: fake });
   assert.equal(result.status, 0, `approve --github with acknowledgment must succeed: ${result.stdout}${result.stderr}`);
-  assert.equal(envelopeData(result.stdout).to, 'done');
-  assert.equal(stateView(cwd).work['gh-iron-ack-item'].status, 'done');
+  assert.equal(envelopeData(result.stdout).to, 'delivered');
+  assert.equal(stateView(cwd).work['gh-iron-ack-item'].status, 'delivered');
 });
 
 // --- work-graph-intelligence S5: `fgos graph` read verb -------------------
@@ -6450,13 +7475,49 @@ test('merge list: unknown sub-verb is rejected as validation, exit 4', () => {
   assert.equal(result.status, 4);
 });
 
+// tsk-66x: `merge` is a `requiresExistingStore: true` verb (like `submit`/
+// `approve`) -- a missing `.fgos/` must refuse loudly, never fold silently
+// into an empty-but-valid-looking ready/waiting/conflicts result.
+test('merge list on a directory with no .fgos/ at all is refused, exit 4, writes nothing (no auto-vivify)', () => {
+  const cwd = rawTmpCwd();
+  assert.ok(!fs.existsSync(path.join(cwd, '.fgos')));
+  const result = run(cwd, ['merge', 'list']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /\.fgos\/ not found/);
+  assert.ok(!fs.existsSync(path.join(cwd, '.fgos')), 'the refused verb must not create .fgos/ as a side effect');
+});
+
+test('merge next on a directory with no .fgos/ at all is refused, exit 4, no merge attempted', () => {
+  const cwd = rawTmpCwd();
+  assert.ok(!fs.existsSync(path.join(cwd, '.fgos')));
+  const result = run(cwd, ['merge', 'next']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /\.fgos\/ not found/);
+  assert.ok(!fs.existsSync(path.join(cwd, '.fgos')), 'the refused verb must not create .fgos/ as a side effect');
+});
+
+test('merge next run from inside a linked worktree without --dir is refused, exit 4 -- never the old silent "nothing ready" false negative even though the real store has a ready item', () => {
+  const { main, wt } = tmpLinkedWorktree();
+  assert.equal(run(main, ['add', 'solo', '--title', 'Solo', '--kind', 'task', '--risk', 'low', '--verify', 'true']).status, 0);
+  assert.equal(run(main, ['move', 'solo', '--to', 'doing']).status, 0);
+  assert.equal(run(main, ['move', 'solo', '--to', 'awaiting-approval']).status, 0);
+  // Confirm the real store genuinely has a ready item, so a refusal below
+  // cannot be mistaken for a true "nothing ready" negative.
+  assert.deepEqual(envelopeData(run(main, ['merge', 'list']).stdout).ready, ['solo']);
+
+  const result = run(wt, ['merge', 'next']);
+  assert.equal(result.status, 4, `expected a refusal, not the old silent false negative: ${result.stdout}${result.stderr}`);
+  assert.match(result.stderr, /\.fgos\/ not found/);
+  assert.equal(stateView(main).work.solo.status, 'awaiting-approval', 'the ready item at the real store must be untouched');
+});
+
 test('merge list on an empty store: empty ready/waiting/conflicts, exit 0, no event appended', () => {
   const cwd = tmpCwd();
   assert.equal(run(cwd, ['init']).status, 0);
   const before = eventLines(cwd).length;
   const result = run(cwd, ['merge', 'list']);
   assert.equal(result.status, 0);
-  assert.deepEqual(envelopeData(result.stdout), { ready: [], waiting: [], conflicts: [] });
+  assert.deepEqual(envelopeData(result.stdout), { ready: [], waiting: [], conflicts: [], mergeSets: [], blockedOnSync: [], mergeTier: {}, supersededOut: [] });
   assert.equal(eventLines(cwd).length, before, 'merge list must not append any event');
 });
 
@@ -6470,13 +7531,18 @@ test('merge list: a proposed item whose dep is already done is ready', () => {
   assert.equal(run(cwd, ['add', 'dep', '--title', 'Dep', '--kind', 'task', '--risk', 'low', '--verify', 'true']).status, 0);
   assert.equal(run(cwd, ['move', 'dep', '--to', 'doing']).status, 0);
   assert.equal(run(cwd, ['move', 'dep', '--to', 'awaiting-approval']).status, 0);
-  assert.equal(run(cwd, ['compound', 'dep']).status, 0);
   const approveResult = envelopeData(run(cwd, ['approve', 'dep']).stdout);
-  assert.equal(approveResult.to, 'done', `expected dep to reach done, got: ${JSON.stringify(approveResult)}`);
+  assert.equal(approveResult.to, 'delivered', `expected dep to reach delivered, got: ${JSON.stringify(approveResult)}`);
+  // merge list still reads RESOLVED_STATUSES = {done, wontfix} at this point
+  // in the sequence (RUL12's own fix is a separate piece) -- walk the rest
+  // of the chain so the dep genuinely reaches done.
+  assert.equal(run(cwd, ['move', 'dep', '--to', 'retrospective']).status, 0);
+  assert.equal(run(cwd, ['move', 'dep', '--to', 'cleanup']).status, 0);
+  assert.equal(run(cwd, ['move', 'dep', '--to', 'done']).status, 0);
   assert.equal(run(cwd, ['add', 'leaf', '--title', 'Leaf', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--deps', 'dep']).status, 0);
   toProposed(cwd, 'leaf');
   const data = envelopeData(run(cwd, ['merge', 'list']).stdout);
-  assert.deepEqual(data, { ready: ['leaf'], waiting: [], conflicts: [] });
+  assert.deepEqual(data, { ready: ['leaf'], waiting: [], conflicts: [], mergeSets: [], blockedOnSync: [], mergeTier: { leaf: 'root-to-main' }, supersededOut: [] });
 });
 
 test('merge list: a proposed item whose dep is NOT done waits, never ready', () => {
@@ -6486,7 +7552,7 @@ test('merge list: a proposed item whose dep is NOT done waits, never ready', () 
   assert.equal(run(cwd, ['add', 'leaf', '--title', 'Leaf', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--deps', 'dep']).status, 0);
   toProposed(cwd, 'leaf');
   const data = envelopeData(run(cwd, ['merge', 'list']).stdout);
-  assert.deepEqual(data, { ready: [], waiting: ['leaf'], conflicts: [] });
+  assert.deepEqual(data, { ready: [], waiting: ['leaf'], conflicts: [], mergeSets: [], blockedOnSync: [], mergeTier: { leaf: 'root-to-main' }, supersededOut: [] });
 });
 
 test('merge list: two dep-clear proposed items sharing a footprint are excluded from ready and listed as conflicts', () => {
@@ -6520,14 +7586,13 @@ test('merge next merges the single ready item by recursing into approve, item re
   assert.equal(run(cwd, ['add', 'solo', '--title', 'Solo', '--kind', 'task', '--risk', 'low', '--verify', 'true']).status, 0);
   assert.equal(run(cwd, ['move', 'solo', '--to', 'doing']).status, 0);
   assert.equal(run(cwd, ['move', 'solo', '--to', 'awaiting-approval']).status, 0);
-  assert.equal(run(cwd, ['compound', 'solo']).status, 0);
 
   const result = run(cwd, ['merge', 'next']);
   assert.equal(result.status, 0, `${result.stdout}${result.stderr}`);
   const data = envelopeData(result.stdout);
   assert.equal(data.picked, 'solo');
-  assert.equal(data.approve.to, 'done', `expected the picked item to reach done: ${JSON.stringify(data)}`);
-  assert.equal(stateView(cwd).work.solo.status, 'done');
+  assert.equal(data.approve.to, 'delivered', `expected the picked item to reach delivered: ${JSON.stringify(data)}`);
+  assert.equal(stateView(cwd).work.solo.status, 'delivered');
 });
 
 test('merge next picks the higher-ranked (mvp goalTier) item first when two are ready', () => {
@@ -6537,7 +7602,6 @@ test('merge next picks the higher-ranked (mvp goalTier) item first when two are 
     assert.equal(run(cwd, ['add', id, '--title', id, '--kind', 'task', '--risk', 'low', '--verify', 'true', ...(id === 'important' ? ['--goal-tier', 'mvp'] : [])]).status, 0);
     assert.equal(run(cwd, ['move', id, '--to', 'doing']).status, 0);
     assert.equal(run(cwd, ['move', id, '--to', 'awaiting-approval']).status, 0);
-    assert.equal(run(cwd, ['compound', id]).status, 0);
   }
   const data = envelopeData(run(cwd, ['merge', 'next']).stdout);
   assert.equal(data.picked, 'important', 'the mvp-goalTier item outranks the plain one per rankImpact');
@@ -6718,22 +7782,22 @@ test('submit with a malformed --acceptance is rejected as validation, exit 4, no
 // `moveWork(..., to: 'done')` a direct `move` uses — `verify: 'true'` keeps
 // that check trivially green so the test isolates the acceptance gate.
 
-test('move --to done is refused when a populated acceptance clause has no evidence: precondition, exit 2, item stays proposed, no event written', () => {
+test('move --to delivered is refused when a populated acceptance clause has no evidence: precondition, exit 2, item stays proposed, no event written', () => {
   const cwd = tmpCwd();
-  toCompoundLearn(cwd, 'cli-cos-missing');
+  toProposed(cwd, 'cli-cos-missing');
   run(cwd, ['edit', 'cli-cos-missing', '--acceptance', JSON.stringify([{ text: 'ship it' }])]);
 
   const before = eventLines(cwd).length;
-  const result = run(cwd, ['move', 'cli-cos-missing', '--to', 'done']);
+  const result = run(cwd, ['move', 'cli-cos-missing', '--to', 'delivered']);
   assert.equal(result.status, 2);
   assert.match(result.stderr, /ship it/);
   assert.equal(stateView(cwd).work['cli-cos-missing'].status, 'awaiting-approval');
   assert.equal(eventLines(cwd).length, before);
 });
 
-test('move --to done succeeds when every acceptance clause has non-empty evidence, exactly as before this cell', () => {
+test('move --to delivered succeeds when every acceptance clause has non-empty evidence, exactly as before this cell', () => {
   const cwd = tmpCwd();
-  toCompoundLearn(cwd, 'cli-cos-evidenced');
+  toProposed(cwd, 'cli-cos-evidenced');
   // tsk-5q5-2: evidence must resolve to a real path under cwd -- assert the
   // edit itself succeeds too, so a future regression in the new write-time
   // gate can't silently no-op this edit and let the item coast through on
@@ -6742,38 +7806,38 @@ test('move --to done succeeds when every acceptance clause has non-empty evidenc
   const editResult = run(cwd, ['edit', 'cli-cos-evidenced', '--acceptance', JSON.stringify([{ text: 'ship it', evidence: '.fgos/events.jsonl' }])]);
   assert.equal(editResult.status, 0, 'edit --acceptance with real, traceable evidence must succeed');
 
-  const result = run(cwd, ['move', 'cli-cos-evidenced', '--to', 'done']);
+  const result = run(cwd, ['move', 'cli-cos-evidenced', '--to', 'delivered']);
   assert.equal(result.status, 0);
-  assert.equal(stateView(cwd).work['cli-cos-evidenced'].status, 'done');
+  assert.equal(stateView(cwd).work['cli-cos-evidenced'].status, 'delivered');
 });
 
-test('an item with acceptance absent, or an empty array, closes via move --to done completely unaffected (no-op)', () => {
+test('an item with acceptance absent, or an empty array, closes via move --to delivered completely unaffected (no-op)', () => {
   const cwd = tmpCwd();
-  toCompoundLearn(cwd, 'cli-cos-absent'); // no --acceptance ever set
-  assert.equal(run(cwd, ['move', 'cli-cos-absent', '--to', 'done']).status, 0);
-  assert.equal(stateView(cwd).work['cli-cos-absent'].status, 'done');
+  toProposed(cwd, 'cli-cos-absent'); // no --acceptance ever set
+  assert.equal(run(cwd, ['move', 'cli-cos-absent', '--to', 'delivered']).status, 0);
+  assert.equal(stateView(cwd).work['cli-cos-absent'].status, 'delivered');
 
   const cwd2 = tmpCwd();
-  toCompoundLearn(cwd2, 'cli-cos-empty');
+  toProposed(cwd2, 'cli-cos-empty');
   run(cwd2, ['edit', 'cli-cos-empty', '--acceptance', JSON.stringify([])]);
-  assert.equal(run(cwd2, ['move', 'cli-cos-empty', '--to', 'done']).status, 0);
-  assert.equal(stateView(cwd2).work['cli-cos-empty'].status, 'done');
+  assert.equal(run(cwd2, ['move', 'cli-cos-empty', '--to', 'delivered']).status, 0);
+  assert.equal(stateView(cwd2).work['cli-cos-empty'].status, 'delivered');
 });
 
-test('editing in the missing evidence after a refusal, then retrying move --to done, succeeds — no cached verdict', () => {
+test('editing in the missing evidence after a refusal, then retrying move --to delivered, succeeds — no cached verdict', () => {
   const cwd = tmpCwd();
-  toCompoundLearn(cwd, 'cli-cos-retry');
+  toProposed(cwd, 'cli-cos-retry');
   run(cwd, ['edit', 'cli-cos-retry', '--acceptance', JSON.stringify([{ text: 'ship it' }])]);
 
-  assert.equal(run(cwd, ['move', 'cli-cos-retry', '--to', 'done']).status, 2);
+  assert.equal(run(cwd, ['move', 'cli-cos-retry', '--to', 'delivered']).status, 2);
   assert.equal(stateView(cwd).work['cli-cos-retry'].status, 'awaiting-approval');
 
   // tsk-5q5-2: evidence must resolve to a real path under cwd.
   const retryEdit = run(cwd, ['edit', 'cli-cos-retry', '--acceptance', JSON.stringify([{ text: 'ship it', evidence: '.fgos/events.jsonl' }])]);
   assert.equal(retryEdit.status, 0, 'edit --acceptance with real, traceable evidence must succeed');
-  const result = run(cwd, ['move', 'cli-cos-retry', '--to', 'done']);
+  const result = run(cwd, ['move', 'cli-cos-retry', '--to', 'delivered']);
   assert.equal(result.status, 0, 'the retry must re-read the just-edited evidence, not a cached refusal');
-  assert.equal(stateView(cwd).work['cli-cos-retry'].status, 'done');
+  assert.equal(stateView(cwd).work['cli-cos-retry'].status, 'delivered');
 });
 
 test('approve on a proposed item with a missing-evidence acceptance clause is refused the same way as move --to done: precondition, exit 2, item stays proposed, no event written', () => {
@@ -6782,7 +7846,6 @@ test('approve on a proposed item with a missing-evidence acceptance clause is re
   run(cwd, ['edit', 'approve-cos-missing', '--acceptance', JSON.stringify([{ text: 'ship it' }])]);
   run(cwd, ['move', 'approve-cos-missing', '--to', 'doing']);
   run(cwd, ['move', 'approve-cos-missing', '--to', 'awaiting-approval']);
-  run(cwd, ['compound', 'approve-cos-missing']);
 
   const before = eventLines(cwd).length;
   const result = run(cwd, ['approve', 'approve-cos-missing']);
@@ -6790,6 +7853,95 @@ test('approve on a proposed item with a missing-evidence acceptance clause is re
   assert.match(result.stderr, /ship it/);
   assert.equal(stateView(cwd).work['approve-cos-missing'].status, 'awaiting-approval');
   assert.equal(eventLines(cwd).length, before);
+});
+
+// tsk-396 D1: regression for the merge-before-gate ordering bug. Before this
+// fix, a runner-sourced item's real `git merge` (mergeRunnerItem) landed on
+// main BEFORE the acceptance-evidence gate ran (inside moveWork's own
+// `to === 'delivered'` check), so a refused gate here would still leave a
+// merge commit on main. assertAcceptanceEvidence now runs as a pre-flight,
+// before mergeRunnerItem is ever called — this test proves main's HEAD is
+// completely untouched by a refused approve, not just that approve reports
+// an error.
+test('approve on a runner-sourced item with a missing-evidence acceptance clause is refused BEFORE the real git merge: precondition, exit 2, main HEAD unchanged, item stays awaiting-approval', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeRunnerProposedItem(cwd, 'runner-cos-missing');
+  run(cwd, ['edit', 'runner-cos-missing', '--acceptance', JSON.stringify([{ text: 'ship it' }])]);
+  commitPendingBeforeApprove(cwd, 'runner-cos-missing');
+
+  const mainHeadBefore = gitAtCwd(cwd, ['rev-parse', 'main']).trim();
+  const result = run(cwd, ['approve', 'runner-cos-missing']);
+  assert.equal(result.status, 2, result.stderr);
+  assert.match(result.stderr, /ship it/);
+
+  assert.equal(gitAtCwd(cwd, ['rev-parse', 'main']).trim(), mainHeadBefore, 'main HEAD must be completely unchanged by a refused approve');
+  assert.equal(stateView(cwd).work['runner-cos-missing'].status, 'awaiting-approval');
+});
+
+// --- tsk-480: approve's post-success moveWork guard ------------------------
+//
+// The bug: approve's own success paths call moveWork(...to:'delivered'...)
+// as their last step. Before this fix, a throw there (e.g. an
+// EventLogError('lock-timeout') from events.lock contention) propagated
+// uncaught even though the precondition it was recording (a real merge, or
+// a passed verify) had already happened — leaving the item stuck at
+// awaiting-approval with zero diagnostic trail. FGOS_TEST_FORCE_APPROVE_
+// LOCK_TIMEOUT (bin/fgos.mjs's moveDeliveredOrRecordFault) is a test-only
+// seam, same shape as FGOS_GH_COMMAND, that simulates exactly that failure
+// for one named item id without touching moveWork/store.mjs itself.
+
+test('approve (pull-door/verify-only): a simulated post-verify lock-timeout is caught, recorded, and left diagnosable instead of crashing uncaught', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'approve-lock-timeout', { verify: 'true' });
+  run(cwd, ['move', 'approve-lock-timeout', '--to', 'doing']);
+  run(cwd, ['move', 'approve-lock-timeout', '--to', 'awaiting-approval']);
+
+  const before = eventLines(cwd).length;
+  const result = run(cwd, ['approve', 'approve-lock-timeout'], { FGOS_TEST_FORCE_APPROVE_LOCK_TIMEOUT: 'approve-lock-timeout' });
+
+  // Caught, not an uncaught crash: exit 0, a well-formed envelope, not the
+  // generic "fgos: <message>" exit-1/exit-2 shape an unhandled throw would
+  // have produced.
+  assert.equal(result.status, 0, result.stderr);
+  const data = JSON.parse(result.stdout).data;
+  assert.equal(data.mode, 'verify-only');
+  assert.equal(data.to, 'awaiting-approval');
+  assert.equal(data.deliveryUnrecorded, true);
+  assert.match(data.error, /lock-timeout/);
+  assert.ok(data.diagnosticLog, 'envelope must point at a real diagnostic log path');
+
+  // Visible immediately to whoever is watching the terminal, not just to a
+  // later reader of the JSON envelope or the log file.
+  assert.match(result.stderr, /status write failed/);
+  assert.match(result.stderr, /diagnostic recorded/);
+
+  // The status write genuinely never happened — no new event, item stays
+  // exactly where it was, never silently promoted to "delivered".
+  assert.equal(stateView(cwd).work['approve-lock-timeout'].status, 'awaiting-approval');
+  assert.equal(eventLines(cwd).length, before);
+
+  // The diagnostic record is real and on disk, independent of events.jsonl.
+  const diagnosticLines = fs.readFileSync(data.diagnosticLog, 'utf8').trim().split('\n');
+  const record = JSON.parse(diagnosticLines.at(-1));
+  assert.equal(record.id, 'approve-lock-timeout');
+  assert.equal(record.phase, 'pull-door verify-only');
+  assert.match(record.detail, /lock-timeout/);
+});
+
+test('approve (pull-door/verify-only): with no simulated failure, the same item approves normally — the guard changes nothing on the happy path', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'approve-lock-timeout-control', { verify: 'true' });
+  run(cwd, ['move', 'approve-lock-timeout-control', '--to', 'doing']);
+  run(cwd, ['move', 'approve-lock-timeout-control', '--to', 'awaiting-approval']);
+
+  const result = run(cwd, ['approve', 'approve-lock-timeout-control']);
+  assert.equal(result.status, 0, result.stderr);
+  const data = JSON.parse(result.stdout).data;
+  assert.equal(data.to, 'delivered');
+  assert.equal(data.deliveryUnrecorded, undefined);
+  assert.equal(typeof data.seq, 'number');
+  assert.equal(stateView(cwd).work['approve-lock-timeout-control'].status, 'delivered');
 });
 
 test('graph verb on an empty store: zero components, still a valid envelope, exit 0', () => {
@@ -7019,6 +8171,16 @@ test('take --wait rejects a non-numeric or non-positive value the same way --tim
   assert.match(result.stderr, /--wait must be a positive number of milliseconds/);
 });
 
+test('take --wait rejects a value above the 900000ms (15 min) cap -- tsk-2rf D3', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  addOk(cwd, 'wait-over-cap-take');
+
+  const result = run(cwd, ['take', 'wait-over-cap-take', '--wait', '900001']);
+  assert.equal(result.status, 4, result.stderr);
+  assert.match(result.stderr, /--wait must be at most 900000ms \(15 min\)/);
+});
+
 test('pick --no-wait fails immediately on a live-held lock, same as take --no-wait', () => {
   const cwd = initGitCwd();
   run(cwd, ['init']);
@@ -7038,7 +8200,7 @@ test('approve --no-wait fails immediately on a live-held lock, main left untouch
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   makeRunnerProposedItem(cwd, 'wait-no-wait-approve', { verify: 'true' });
-  compoundAndCommit(cwd, 'wait-no-wait-approve');
+  commitPendingBeforeApprove(cwd, 'wait-no-wait-approve');
   writeLiveLock(cwd, 1000);
 
   const start = Date.now();
@@ -7058,7 +8220,7 @@ test('merge next --no-wait fails immediately on a live-held lock -- proves the f
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   makeRunnerProposedItem(cwd, 'wait-merge-next-no-wait', { verify: 'true' });
-  compoundAndCommit(cwd, 'wait-merge-next-no-wait');
+  commitPendingBeforeApprove(cwd, 'wait-merge-next-no-wait');
   writeLiveLock(cwd, 1000);
 
   const start = Date.now();
@@ -7084,4 +8246,296 @@ test('take/pick/approve are documented in the --help --json manifest with wait/n
     assert.ok(entry.parameters.properties.wait, `${name} manifest entry missing "wait" property`);
     assert.ok(entry.parameters.properties['no-wait'], `${name} manifest entry missing "no-wait" property`);
   }
+});
+
+// --- re-claiming an item whose branch and worktree are still standing
+// (tsk-65n) -----------------------------------------------------------------
+
+test('pick on an item whose fgw/<id> worktree is still live hands back that SAME worktree instead of removing it out from under the session working there', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  addOk(cwd, 'repick-live-item');
+
+  const firstPick = envelopeData(run(cwd, ['pick', '--id', 'repick-live-item']).stdout);
+  const worktreePath = firstPick.worktree.path;
+  fs.writeFileSync(path.join(worktreePath, 'CONTEXT.md'), '# decisions\n');
+  execFileSync('git', ['add', 'CONTEXT.md'], { cwd: worktreePath });
+  execFileSync('git', ['commit', '-m', 'lock decisions'], { cwd: worktreePath });
+  // A claim released at the clarify/decompose -> executing boundary, with the
+  // session still sitting in its worktree.
+  assert.equal(run(cwd, ['move', 'repick-live-item', '--to', 'todo', '--expect', 'doing']).status, 0);
+
+  const secondPick = envelopeData(run(cwd, ['pick', '--id', 'repick-live-item']).stdout);
+
+  assert.equal(secondPick.worktree.path, worktreePath, 'the live worktree is reattached, not replaced');
+  assert.equal(secondPick.worktree.reused, true);
+  assert.equal(fs.existsSync(worktreePath), true);
+  assert.equal(fs.existsSync(path.join(worktreePath, 'CONTEXT.md')), true, 'work committed before the release is still there');
+});
+
+test('pick reattaches even when the live worktree has uncommitted work, leaving that work untouched', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  addOk(cwd, 'repick-dirty-item');
+
+  const firstPick = envelopeData(run(cwd, ['pick', '--id', 'repick-dirty-item']).stdout);
+  const worktreePath = firstPick.worktree.path;
+  fs.writeFileSync(path.join(worktreePath, 'CONTEXT.md'), '# decisions\n');
+  execFileSync('git', ['add', 'CONTEXT.md'], { cwd: worktreePath });
+  execFileSync('git', ['commit', '-m', 'lock decisions'], { cwd: worktreePath });
+  fs.writeFileSync(path.join(worktreePath, 'draft.md'), 'half-written\n');
+  assert.equal(run(cwd, ['move', 'repick-dirty-item', '--to', 'todo', '--expect', 'doing']).status, 0);
+
+  const secondPick = envelopeData(run(cwd, ['pick', '--id', 'repick-dirty-item']).stdout);
+
+  assert.equal(secondPick.worktree.path, worktreePath);
+  assert.equal(fs.readFileSync(path.join(worktreePath, 'draft.md'), 'utf8'), 'half-written\n');
+});
+
+test('take refuses a todo item whose own fgw/<id> branch already exists, naming pick instead of silently claiming source:main', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  addOk(cwd, 'take-with-branch-item');
+
+  // the branch (and worktree) come into being via pick; the claim is then
+  // released, leaving a todo item whose work lives on the branch
+  envelopeData(run(cwd, ['pick', '--id', 'take-with-branch-item']).stdout);
+  assert.equal(run(cwd, ['move', 'take-with-branch-item', '--to', 'todo', '--expect', 'doing']).status, 0);
+
+  const taken = run(cwd, ['take', '--id', 'take-with-branch-item']);
+
+  assert.notEqual(taken.status, 0, 'a main-checkout take of branch-resident work is refused');
+  assert.match(taken.stderr, /already has its own branch fgw\/take-with-branch-item/);
+  assert.match(taken.stderr, /fgos pick take-with-branch-item/);
+  assert.equal(stateView(cwd).work['take-with-branch-item'].status, 'todo', 'the refusal is a clean no-op');
+});
+
+test('take still claims a todo item that has no fgw/<id> branch of its own', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  addOk(cwd, 'take-no-branch-item');
+
+  const taken = run(cwd, ['take', '--id', 'take-no-branch-item']);
+
+  assert.equal(taken.status, 0, `take failed: ${taken.stderr}`);
+  const data = envelopeData(taken.stdout);
+  assert.equal(data.source, 'main');
+  assert.equal(stateView(cwd).work['take-no-branch-item'].status, 'doing');
+});
+
+// --- retrospective / cleanup (work-item-status-delivered-retrospective- ---
+// --- cleanup D7/D8/D9) ------------------------------------------------
+
+function writeCleanupTtlConfig(cwd, ttlDays) {
+  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ cleanup: { ttlDays } }));
+}
+
+test('retrospective sweeps every delivered item to retrospective, in one pass, leaving non-delivered items untouched', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'retro-todo-item'); // stays todo
+  addOk(cwd, 'retro-delivered-a');
+  run(cwd, ['move', 'retro-delivered-a', '--to', 'doing']);
+  run(cwd, ['move', 'retro-delivered-a', '--to', 'delivered']);
+  addOk(cwd, 'retro-delivered-b');
+  run(cwd, ['move', 'retro-delivered-b', '--to', 'doing']);
+  run(cwd, ['move', 'retro-delivered-b', '--to', 'delivered']);
+
+  const result = run(cwd, ['retrospective']);
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.count, 2);
+  assert.deepEqual(data.swept.map((s) => s.id).sort(), ['retro-delivered-a', 'retro-delivered-b']);
+
+  const view = stateView(cwd);
+  assert.equal(view.work['retro-todo-item'].status, 'todo', 'a non-delivered item is never touched');
+  assert.equal(view.work['retro-delivered-a'].status, 'retrospective');
+  assert.equal(view.work['retro-delivered-b'].status, 'retrospective');
+});
+
+test('retrospective on a store with no delivered items is a clean no-op, exit 0, empty sweep', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'nothing-delivered');
+  const result = run(cwd, ['retrospective']);
+  assert.equal(result.status, 0);
+  assert.deepEqual(envelopeData(result.stdout), { swept: [], count: 0 });
+});
+
+test('cleanup on a nonexistent id is rejected as validation, exit 4', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['cleanup', 'ghost']);
+  assert.equal(result.status, 4);
+});
+
+test('cleanup on an item not at status cleanup is rejected as precondition, exit 2', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'cleanup-wrong-status');
+  const result = run(cwd, ['cleanup', 'cleanup-wrong-status']);
+  assert.equal(result.status, 2);
+});
+
+test('cleanup parks cleanup -> blocked, with every failing reason joined, when the TTL has not elapsed and no retrospective content exists', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'cleanup-not-ready');
+  run(cwd, ['move', 'cleanup-not-ready', '--to', 'doing']);
+  run(cwd, ['move', 'cleanup-not-ready', '--to', 'delivered']);
+  run(cwd, ['move', 'cleanup-not-ready', '--to', 'retrospective']);
+  run(cwd, ['move', 'cleanup-not-ready', '--to', 'cleanup']);
+  // Default TTL (7d, no config written) — freshly entered, not elapsed.
+
+  const result = run(cwd, ['cleanup', 'cleanup-not-ready']);
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.to, 'blocked');
+  assert.match(data.reason, /not ready yet/);
+  assert.match(data.reason, /no outcome or decision record/);
+
+  assert.equal(stateView(cwd).work['cleanup-not-ready'].status, 'blocked');
+});
+
+test('cleanup closes to done when TTL is configured to 0 and retrospective content + a resolving merge both exist', () => {
+  // KNOWN GAP, deliberately left in place this item (flagged for a
+  // dedicated follow-up, not silently dropped): approve's merge paths
+  // still call cleanupMergedBranch synchronously today, the exact eager
+  // deletion D7 exists to move later — so the branch is typically already
+  // gone by the time this verb runs. cleanup's own cleanupMergedBranch
+  // call is idempotent (branchExists guards it, and the function itself
+  // never throws on an already-gone branch, per merge.test.mjs) — this
+  // test asserts the STATUS transition works correctly regardless of
+  // which point actually performed the git-level deletion.
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  writeCleanupTtlConfig(cwd, 0);
+  makeRunnerProposedItem(cwd, 'cleanup-ready-item', { verify: 'test -f cleanup-ready-item-produced.txt' });
+  commitPendingBeforeApprove(cwd, 'cleanup-ready-item');
+
+  const approve = run(cwd, ['approve', 'cleanup-ready-item']);
+  assert.equal(approve.status, 0, `approve failed: ${approve.stderr}`);
+  assert.equal(stateView(cwd).work['cleanup-ready-item'].status, 'delivered');
+
+  run(cwd, ['move', 'cleanup-ready-item', '--to', 'retrospective']);
+  const dir = path.join(cwd, '.fgos');
+  addOutcome(dir, { id: 'cleanup-ready-item', docType: 'how-to', actual: { outcome: 'pass', passed: true, attempts: 1, errorClass: null, aheadCount: 0, visits: 1 } });
+  run(cwd, ['move', 'cleanup-ready-item', '--to', 'cleanup']);
+
+  const result = run(cwd, ['cleanup', 'cleanup-ready-item']);
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.to, 'done');
+
+  assert.equal(stateView(cwd).work['cleanup-ready-item'].status, 'done');
+  const branchAfter = gitAtCwd(cwd, ['for-each-ref', '--format=%(refname:short)', 'refs/heads/fgw/']);
+  assert.doesNotMatch(branchAfter, /fgw\/cleanup-ready-item/, 'the branch is gone by the time cleanup finishes, whichever step actually deleted it');
+});
+
+test('cleanup parks cleanup -> blocked when the recorded commit no longer resolves on main (force-pushed/rewritten away)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  writeCleanupTtlConfig(cwd, 0);
+  const dir = path.join(cwd, '.fgos');
+  addWork(dir, {
+    id: 'cleanup-bad-merge',
+    title: 'Bad merge',
+    kind: 'task',
+    status: 'cleanup',
+    deps: [],
+    risk: 'low',
+    refs: [],
+    verify: 'true',
+    headAtReturn: '0'.repeat(40), // a well-formed but nonexistent sha
+  });
+  addOutcome(dir, { id: 'cleanup-bad-merge', actual: { outcome: 'pass', passed: true, attempts: 1, errorClass: null, aheadCount: 0, visits: 1 } });
+
+  const result = run(cwd, ['cleanup', 'cleanup-bad-merge']);
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.to, 'blocked');
+  assert.match(data.reason, /no longer reachable/);
+});
+
+// --- `fgos compound` (tsk-3o3, restored from fcfbae5/tsk-1zi's removal,
+// adapted to gate on status `retrospective` instead of the retired
+// `compound-learn` stage move) ------------------------------------------
+
+test('compound on a nonexistent id is rejected as validation, exit 4', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['compound', 'ghost']);
+  assert.equal(result.status, 4);
+});
+
+test('compound on an item not at status retrospective is rejected as validation, exit 4, no events written', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'compound-wrong-status');
+  const before = eventLines(cwd).length;
+  const result = run(cwd, ['compound', 'compound-wrong-status', '--doc-type', 'how-to']);
+  assert.equal(result.status, 4);
+  assert.equal(eventLines(cwd).length, before, 'a rejected compound writes zero events');
+  assert.equal(stateView(cwd).work['compound-wrong-status'].status, 'todo');
+});
+
+test('compound with an invalid --doc-type is rejected as validation, exit 4, before any write', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'compound-bad-doctype');
+  run(cwd, ['move', 'compound-bad-doctype', '--to', 'doing']);
+  run(cwd, ['move', 'compound-bad-doctype', '--to', 'delivered']);
+  run(cwd, ['move', 'compound-bad-doctype', '--to', 'retrospective']);
+  const before = eventLines(cwd).length;
+
+  const result = run(cwd, ['compound', 'compound-bad-doctype', '--doc-type', 'not-a-real-quadrant']);
+  assert.equal(result.status, 4);
+  assert.equal(eventLines(cwd).length, before, 'a rejected --doc-type writes zero events');
+});
+
+test('compound with no --doc-type is a no-op: exit 0, docType null, no events written', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'compound-noop');
+  run(cwd, ['move', 'compound-noop', '--to', 'doing']);
+  run(cwd, ['move', 'compound-noop', '--to', 'delivered']);
+  run(cwd, ['move', 'compound-noop', '--to', 'retrospective']);
+  const before = eventLines(cwd).length;
+
+  const result = run(cwd, ['compound', 'compound-noop']);
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.deepEqual(data, { id: 'compound-noop', docType: null, docPath: null, status: 'retrospective' });
+  assert.equal(eventLines(cwd).length, before, 'an omitted --doc-type writes zero events');
+});
+
+test('compound with --doc-type tags the outcome, surfaced by `show`; item stays at status retrospective (no stage/status move)', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'compound-tag-only');
+  run(cwd, ['move', 'compound-tag-only', '--to', 'doing']);
+  run(cwd, ['move', 'compound-tag-only', '--to', 'delivered']);
+  run(cwd, ['move', 'compound-tag-only', '--to', 'retrospective']);
+
+  const result = run(cwd, ['compound', 'compound-tag-only', '--doc-type', 'how-to']);
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.docType, 'how-to');
+  assert.equal(data.docPath, null);
+
+  assert.equal(stateView(cwd).work['compound-tag-only'].status, 'retrospective', 'compound never moves status — that stays the retro-loop\'s own job');
+
+  const showResult = run(cwd, ['show', 'compound-tag-only']);
+  assert.equal(showResult.status, 0, showResult.stderr);
+  assert.equal(envelopeData(showResult.stdout).outcome.docType, 'how-to');
+});
+
+test('compound with --doc-type and --doc-path tags both, surfaced by `show`', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'compound-tag-path');
+  run(cwd, ['move', 'compound-tag-path', '--to', 'doing']);
+  run(cwd, ['move', 'compound-tag-path', '--to', 'delivered']);
+  run(cwd, ['move', 'compound-tag-path', '--to', 'retrospective']);
+
+  const result = run(cwd, ['compound', 'compound-tag-path', '--doc-type', 'explanation', '--doc-path', 'docs/explanation/example.md']);
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.docType, 'explanation');
+  assert.equal(data.docPath, 'docs/explanation/example.md');
+
+  const showResult = run(cwd, ['show', 'compound-tag-path']);
+  const outcome = envelopeData(showResult.stdout).outcome;
+  assert.equal(outcome.docType, 'explanation');
+  assert.equal(outcome.docPath, 'docs/explanation/example.md');
 });

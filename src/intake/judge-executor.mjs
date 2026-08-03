@@ -1,12 +1,20 @@
-// judge-executor.mjs — shared spawn+parse+retry-once helper for the intake
-// judge calls (str68 D1/D5). judgeDiscovery (discovery.mjs) and
-// judgeDecompose (decompose.mjs) both spawn the nested `claude -p` executor
-// via the identical resolveExecutorCommand -> spawnSync -> JSON.parse shape,
-// and both are exposed to the same nested-session prose-vs-JSON failure mode
-// (a process that exits 0 but returns prose instead of JSON). This helper
-// lives once, used by both.
+// judge-executor.mjs — shared spawn+parse+retry helper. judgeDiscovery
+// (discovery.mjs) and judgeDecompose (decompose.mjs) both spawn the nested
+// `claude -p` executor via the identical resolveExecutorCommand ->
+// spawnSync -> JSON.parse shape, and both are exposed to the same
+// nested-session prose-vs-JSON failure mode (a process that exits 0 but
+// returns prose instead of JSON). `runRetryingExecutor` is the
+// capacity-agnostic core of that pattern (bounded attempts, a
+// stricter-instruction suffix on retry, JSON-parse-or-retry, optional
+// escalation to a fallback tier) — any capacity dispatch can call it with
+// its own `tier`/`maxAttempts`, not just judge calls. `runJudgeExecutor` is
+// judge-executor's own thin wrapper over it, preserving its exact prior
+// behavior for its two existing callers, plus the judge-specific scout-notes
+// capture described below.
 
 import { spawnSync } from 'node:child_process';
+import fs from 'node:fs';
+import path from 'node:path';
 import { resolveExecutorCommand, modelForTier } from '../runner/dispatch.mjs';
 import { DEFAULTS } from '../state/work.mjs';
 
@@ -22,14 +30,179 @@ export const JUDGE_STRICT_JSON_SUFFIX =
 // single retry wasn't enough headroom.
 const MAX_JUDGE_ATTEMPTS = 3;
 
-function spawnAttempt(cfg, model, prompt) {
-  const { command, args } = resolveExecutorCommand(cfg, { prompt, model });
-  return spawnSync(command, args, {
+// tsk-g18 (Cách B, agent-executor-design report §9): judge's own scout
+// output (Bash(rg:*) results) never gets persisted anywhere today — every
+// judgeDiscovery/judgeDecompose call re-scouts from scratch even when a
+// prior call already ran the identical query on the same item. Fix is
+// PARENT-side transcript capture, never a Write grant on the judge process
+// itself (that was Cách A, rejected in the design doc — judge stays exactly
+// as read-only as before this item). `SCOUT_NOTES_FILENAME` mirrors
+// decompose.mjs's `readLockedContext` CONTEXT.md/plan.md convention: one
+// committed file under the item's own `docsRef` directory.
+const SCOUT_NOTES_FILENAME = 'scout-notes.md';
+
+// Ripgrep output can be large; capped per scout entry so scout-notes.md (and
+// the prompt section built from it) stays a bounded, cheap-to-re-read size
+// rather than growing unbounded across repeated captures.
+const SCOUT_OUTPUT_MAX_CHARS = 4000;
+
+/**
+ * Read this item's persisted scout notes, if any — the parent-captured
+ * Bash(rg:*) transcript from a prior judge call, written under
+ * `docs/history/<docsRef>/scout-notes.md`. Mirrors `readLockedContext`'s
+ * exact shape (decompose.mjs): best-effort `fs.readFileSync`, any read
+ * error (including ENOENT) folds to `''` — a missing/unreadable file is
+ * never an error, just "no notes yet". Presence alone means fresh, same
+ * trust-the-committed-artifact stance `readLockedContext` already takes for
+ * CONTEXT.md — no separate staleness/mtime check.
+ */
+export function readScoutNotes(repoRoot, docsRef) {
+  if (typeof docsRef !== 'string' || !docsRef.trim()) return '';
+  try {
+    return fs.readFileSync(path.join(repoRoot, docsRef, SCOUT_NOTES_FILENAME), 'utf8').trim();
+  } catch {
+    return '';
+  }
+}
+
+// Parent-side write (never the judge subprocess) — the one new filesystem
+// capability this item adds, deliberately scoped to code the judge cannot
+// influence beyond what commands it chose to run. Best-effort: a failed
+// write (e.g. an unwritable docsRef dir) must never break the judge call
+// that produced the entries.
+function writeScoutNotes(repoRoot, docsRef, entries) {
+  if (typeof docsRef !== 'string' || !docsRef.trim() || !entries.length) return;
+  try {
+    const dir = path.join(repoRoot, docsRef);
+    fs.mkdirSync(dir, { recursive: true });
+    const body = entries
+      .map((e, i) => `## Scout ${i + 1}\n\n**Command:** \`${e.command}\`\n\n\`\`\`\n${e.output}\n\`\`\``)
+      .join('\n\n');
+    fs.writeFileSync(path.join(dir, SCOUT_NOTES_FILENAME), `${body}\n`, 'utf8');
+  } catch {
+    // best-effort only, see comment above
+  }
+}
+
+// Parses a `claude -p --output-format stream-json` NDJSON transcript:
+// `assistant` events carry `tool_use` blocks (captures each `Bash` call
+// whose command starts with `rg`), the matching `user` event's
+// `tool_result` block carries that call's output, and the terminal `result`
+// event carries the judge's actual final answer (what plain-stdout capture
+// would have returned outright). Any line that isn't valid JSON, or doesn't
+// match one of these shapes, is skipped rather than thrown on — a
+// transcript format mismatch degrades to "no scout entries captured", never
+// a crash.
+// tsk-4rd (route A, discover-research-recipe): scout capture used to only
+// recognize `Bash(rg:*)` — the sole tool the judge executor was ever
+// granted. `executors.judge`/`capacities.judge-discovery` can now widen
+// `--allowedTools` to Read/Grep/Glob/WebSearch/WebFetch/Task, so a scout
+// pass may legitimately use any of those instead of `rg` — this set names
+// which tool_use blocks count as scout evidence worth persisting.
+// `Bash` stays filtered to `rg` only (a `git add`/`git commit` call is an
+// action, not evidence); every other name in the set is captured
+// unconditionally, since none of them are ever actions on this executor.
+const SCOUTABLE_NON_BASH_TOOL_NAMES = new Set(['Read', 'Grep', 'Glob', 'WebSearch', 'WebFetch', 'Task', 'Agent']);
+
+function isScoutableToolUse(block) {
+  if (block?.type !== 'tool_use') return false;
+  if (block.name === 'Bash') return typeof block.input?.command === 'string' && /^\s*rg\b/.test(block.input.command);
+  return SCOUTABLE_NON_BASH_TOOL_NAMES.has(block.name);
+}
+
+// One-line label for a captured tool_use, used as the entry's `command` in
+// scout-notes.md — a real shell command for Bash(rg:*) (unchanged from
+// before), or `<ToolName> <json input>` for every other scoutable tool, so
+// the persisted note stays readable without needing the raw transcript.
+function describeToolUse(block) {
+  if (block.name === 'Bash') return block.input.command;
+  try {
+    return `${block.name} ${JSON.stringify(block.input)}`;
+  } catch {
+    return block.name;
+  }
+}
+
+function extractScoutTranscript(stdout) {
+  const entries = [];
+  const pendingCallById = new Map();
+  let finalResult;
+
+  for (const line of stdout.split('\n')) {
+    const trimmed = line.trim();
+    if (!trimmed) continue;
+
+    let event;
+    try {
+      event = JSON.parse(trimmed);
+    } catch {
+      continue;
+    }
+
+    if (event?.type === 'assistant' && Array.isArray(event.message?.content)) {
+      for (const block of event.message.content) {
+        if (isScoutableToolUse(block)) {
+          pendingCallById.set(block.id, describeToolUse(block));
+        }
+      }
+    } else if (event?.type === 'user' && Array.isArray(event.message?.content)) {
+      for (const block of event.message.content) {
+        if (block?.type === 'tool_result' && pendingCallById.has(block.tool_use_id)) {
+          const command = pendingCallById.get(block.tool_use_id);
+          pendingCallById.delete(block.tool_use_id);
+          const output = typeof block.content === 'string' ? block.content : JSON.stringify(block.content ?? '');
+          entries.push({ command, output: output.slice(0, SCOUT_OUTPUT_MAX_CHARS) });
+        }
+      }
+    } else if (event?.type === 'result' && typeof event.result === 'string') {
+      finalResult = event.result;
+    }
+  }
+
+  return { entries, finalResult };
+}
+
+// `tier` reuses the existing generic `cfg.executors` string-keyed lookup
+// (`resolveExecutorConfig`, dispatch.mjs) as a synthetic role key — a repo
+// can grant a tier its own `executors.<tier>` block (e.g. `Bash(rg:*)` for
+// scout capability) without touching the worker's own
+// `cfg.executor`/`cfg.executors[<real tier>]` blocks. A tier absent from
+// `cfg.executors` falls back to `cfg.executor`.
+//
+// `scoutCapture` (tsk-g18, optional): non-null only when the caller wants
+// this attempt's transcript captured (no fresh scout-notes.md yet). Adds
+// `--output-format stream-json --verbose` to the resolved args, parses the
+// NDJSON transcript, stashes any captured `Bash(rg:*)` entries onto
+// `scoutCapture.entries` for the caller to persist, and replaces `stdout`
+// with the transcript's terminal `result` text (falling back to the raw
+// stdout when no `result` event was found) so every downstream consumer
+// (`parseVerdict`) keeps reading a single JSON-verdict string exactly as
+// before — `null`/omitted `scoutCapture` skips all of this, byte-identical
+// to pre-tsk-g18 behavior.
+//
+// `capacityId`/`fgosDir` (tsk-2yp, optional): threaded straight into
+// `resolveExecutorCommand`'s own capacity-aware precedence
+// (`capacities.<capacityId>` > `executors.<tier>` > `executor`, tsk-62v).
+// Both omitted (every pre-tsk-2yp caller) resolves exactly as before —
+// `capacityId` absent skips the capacity lookup entirely, `fgosDir` absent
+// skips the `kind: "cli"` presence check.
+function spawnAttempt(cfg, model, prompt, tier, scoutCapture, capacityId, fgosDir) {
+  const { command, args } = resolveExecutorCommand(cfg, { prompt, model, tier, capacityId, fgosDir });
+  const finalArgs = scoutCapture ? [...args, '--output-format', 'stream-json', '--verbose'] : args;
+  const result = spawnSync(command, finalArgs, {
     shell: false,
     timeout: cfg?.timeoutMs,
     encoding: 'utf8',
     maxBuffer: 10 * 1024 * 1024,
   });
+
+  if (!scoutCapture || result.error || result.status !== 0 || typeof result.stdout !== 'string') {
+    return result;
+  }
+
+  const { entries, finalResult } = extractScoutTranscript(result.stdout);
+  scoutCapture.entries = entries;
+  return typeof finalResult === 'string' ? { ...result, stdout: finalResult } : result;
 }
 
 // tsk-37v: the nested `claude -p` executor routinely wraps an otherwise-valid
@@ -59,22 +232,47 @@ function parseVerdict(stdout) {
   }
 }
 
-/**
- * Run a judge call attempt against `prompt`, retrying with `stricterPrompt`
- * on a parse-shaped failure only, up to `MAX_JUDGE_ATTEMPTS` total attempts
- * (str68 D2, raised to 3 by str68 nested-judge-fix). A non-parse failure —
- * spawn error, non-zero exit, or timeout — on ANY attempt returns `null`
- * immediately, never retries (str68 D2/D3, unchanged). Each attempt is
- * bounded by the same `cfg.timeoutMs` (str68 D4), not a shared/extended
- * budget. Returns the parsed-but-unvalidated verdict object on success, or
- * `null` once all attempts are exhausted — callers apply their own existing
- * field validation and fail-safe branching to whichever of these two
- * outcomes they get.
- */
-export function runJudgeExecutor(cfg, model, prompt, stricterPrompt) {
-  for (let attempt = 1; attempt <= MAX_JUDGE_ATTEMPTS; attempt += 1) {
-    const result = spawnAttempt(cfg, model, attempt === 1 ? prompt : stricterPrompt);
+// Run bounded attempts against `tier`'s resolved executor, retrying with
+// `stricterPrompt` on a parse-shaped failure only, up to `maxAttempts`
+// total attempts. A non-parse failure — spawn error, non-zero exit, or
+// timeout — on ANY attempt returns `null` immediately, never retries. Each
+// attempt is bounded by the same `cfg.timeoutMs`, not a shared/extended
+// budget. `scoutCapture`, when given, is threaded to every attempt exactly
+// like `spawnAttempt` itself expects — the same mutable object accumulates
+// whichever attempt's transcript entries last ran. Returns the
+// parsed-but-unvalidated verdict object on success, or `null` once all
+// attempts are exhausted (whether from exhausting parse-shaped retries, or
+// from an immediate non-parse failure on any single attempt) — the two
+// failure origins are indistinguishable on purpose for the RETURN VALUE, so
+// a caller wrapping this in escalation never needs a failure-type field to
+// decide whether to fall back. `capacityId`/`fgosDir` (tsk-2yp, optional) are
+// threaded to every attempt exactly like `scoutCapture` — same
+// mutable-object-style pass-through to `spawnAttempt`.
+//
+// `failDetail` (tsk-5d2, optional): the same mutable-object out-param
+// convention `scoutCapture` already uses — when given, stashes WHICH of the
+// two distinguishable null-causing branches fired plus its raw evidence,
+// for a caller to persist via `appendJudgeFailLog` (judge-fail-log.mjs).
+// This is purely additive debug reporting: it never changes which branch
+// runs or what this function returns. `reason: 'non-parse-exit'` (spawn
+// error/timeout/non-zero exit on the attempt that stopped the loop) or
+// `reason: 'parse-exhausted'` (every attempt produced unparsable stdout) —
+// the two return-`null` origins the caller-facing contract above
+// deliberately keeps indistinguishable in the RETURN VALUE stay fully
+// distinguishable here, in the out-param, for debugging.
+function runBoundedAttempts(cfg, model, prompt, stricterPrompt, tier, maxAttempts, scoutCapture, capacityId, fgosDir, failDetail) {
+  const parseAttempts = [];
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    const result = spawnAttempt(cfg, model, attempt === 1 ? prompt : stricterPrompt, tier, scoutCapture, capacityId, fgosDir);
     if (result.error || result.status !== 0) {
+      if (failDetail) {
+        failDetail.reason = 'non-parse-exit';
+        failDetail.attempt = attempt;
+        failDetail.status = result.status ?? null;
+        failDetail.signal = result.signal ?? null;
+        failDetail.error = result.error?.message;
+        failDetail.stderr = typeof result.stderr === 'string' ? result.stderr : undefined;
+      }
       return null;
     }
 
@@ -82,8 +280,13 @@ export function runJudgeExecutor(cfg, model, prompt, stricterPrompt) {
     if (verdict.parsed) {
       return verdict.verdict;
     }
+    parseAttempts.push({ attempt, stdout: typeof result.stdout === 'string' ? result.stdout : '' });
   }
 
+  if (failDetail) {
+    failDetail.reason = 'parse-exhausted';
+    failDetail.attempts = parseAttempts;
+  }
   return null;
 }
 
@@ -156,4 +359,148 @@ export function judgeVerifySemanticCorrectness(work, proposedVerify, cfg) {
   } catch {
     return { agrees: false, reason: DEFAULT_VERIFY_DISAGREE_REASON };
   }
+}
+
+/**
+ * Run `runBoundedAttempts` against `tier`, and — when the base attempts
+ * return `null` and the caller declared `escalateTier` — make exactly one
+ * further attempt against `escalateTier`'s resolved executor before giving
+ * up. The escalation attempt reuses `stricterPrompt` (already biased toward
+ * a clean-JSON response) and defaults to the same `model` unless
+ * `escalateModel` is given; it is single-shot, not its own bounded retry
+ * loop. Returns the parsed-but-unvalidated verdict object on success (from
+ * either the base attempts or the escalation attempt), or `null` once both
+ * are exhausted — callers still apply their own field validation.
+ *
+ * Capacity-agnostic: `tier`/`escalateTier` select which `cfg.executors.<id>`
+ * (or the global `cfg.executor`) attempts spawn through, so any capacity
+ * dispatch can call this directly with its own tier and attempt budget, and
+ * opt into escalation only by passing `escalateTier` — it is not hardcoded
+ * to judge calls, and a caller that never passes `escalateTier` sees no
+ * change in behavior. `scoutCapture` (optional, additive) is threaded
+ * through both the base attempts and the escalation attempt identically to
+ * `tier`/`model` — today only `runJudgeExecutor`'s own wrapper ever sets it,
+ * and it never also sets `escalateTier`, so the two features never actually
+ * interact in practice; threading it uniformly just avoids a second,
+ * escalation-only code path.
+ *
+ * `capacityId`/`fgosDir` (tsk-2yp, optional, additive): threaded through
+ * identically to `scoutCapture` — resolved on both the base attempts and the
+ * escalation attempt via `resolveExecutorCommand`'s own
+ * `capacities.<capacityId>` > `executors.<tier>` > `executor` precedence
+ * (tsk-62v). Note the same precedence applies on the escalation attempt too:
+ * a `capacityId` whose config entry declares its own `command`/`adapter`
+ * wins over `escalateTier` there as well, same as it wins over `tier` on the
+ * base attempts — today's only caller (`runJudgeExecutor`) never sets
+ * `escalateTier`, so this never actually happens in practice.
+ *
+ * `failDetail` (tsk-5d2, optional, additive): threaded to `runBoundedAttempts`
+ * identically to `scoutCapture`, and also populated on an escalation-attempt
+ * failure (unreachable today — no caller sets `escalateTier` — but kept
+ * symmetric so the out-param is never silently empty on a path that could
+ * theoretically null out).
+ */
+export function runRetryingExecutor(
+  cfg,
+  model,
+  prompt,
+  stricterPrompt,
+  { tier, maxAttempts, escalateTier, escalateModel, scoutCapture, capacityId, fgosDir, failDetail },
+) {
+  const verdict = runBoundedAttempts(cfg, model, prompt, stricterPrompt, tier, maxAttempts, scoutCapture, capacityId, fgosDir, failDetail);
+  if (verdict !== null) {
+    return verdict;
+  }
+
+  if (!escalateTier) {
+    return null;
+  }
+
+  const result = spawnAttempt(cfg, escalateModel ?? model, stricterPrompt, escalateTier, scoutCapture, capacityId, fgosDir);
+  if (result.error || result.status !== 0) {
+    if (failDetail) {
+      failDetail.reason = 'non-parse-exit';
+      failDetail.attempt = 'escalation';
+      failDetail.status = result.status ?? null;
+      failDetail.signal = result.signal ?? null;
+      failDetail.error = result.error?.message;
+      failDetail.stderr = typeof result.stderr === 'string' ? result.stderr : undefined;
+    }
+    return null;
+  }
+  const escalated = parseVerdict(result.stdout);
+  if (escalated.parsed) {
+    return escalated.verdict;
+  }
+  if (failDetail) {
+    failDetail.reason = 'parse-exhausted';
+    failDetail.attempts = [{ attempt: 'escalation', stdout: typeof result.stdout === 'string' ? result.stdout : '' }];
+  }
+  return null;
+}
+
+/**
+ * judge-executor's own call into `runRetryingExecutor` — `tier: 'judge'`,
+ * `maxAttempts: MAX_JUDGE_ATTEMPTS` (str68 D2, raised to 3 by str68
+ * nested-judge-fix's probabilistic-refusal headroom). Same exported name and
+ * signature judgeDiscovery/judgeDecompose already call; behavior is
+ * unchanged from before the tsk-418 extraction.
+ *
+ * `scout` (tsk-g18, optional, additive): `{ repoRoot, docsRef, capture }`.
+ * Omitted (every pre-tsk-g18 caller) keeps this function byte-identical to
+ * before. When supplied with `capture: true` (the caller found no existing
+ * scout-notes.md for this item), each attempt spawns with transcript
+ * capture on; on whichever attempt actually produces a parsed verdict, any
+ * captured `Bash(rg:*)` entries are persisted to
+ * `docs/history/<docsRef>/scout-notes.md`. `capture: false` (fresh notes
+ * already exist) spawns exactly like a pre-tsk-g18 call — no transcript
+ * capture, no write — since there is nothing new worth persisting.
+ *
+ * `capacityId`/`fgosDir` (tsk-2yp, optional, additive): lets a caller opt
+ * this call into capacity-aware dispatch (`capacities.<capacityId>` ahead of
+ * `executors.judge`, tsk-62v) instead of always resolving straight to
+ * `executors.judge` (Claude). `judgeDiscovery`/`judgeDecompose` pass
+ * `'judge-discovery'`/`'judge-decompose'`. Both omitted (every
+ * pre-tsk-2yp caller) resolves exactly as before — no `capacities` entry
+ * configured for those ids means `resolveExecutorConfig` falls through to
+ * `executors.judge` regardless, so this is a no-op until an operator
+ * actually adds one.
+ */
+// tsk-4rd (route A, discussion point 4 "đo trước khi ép"): `scoutCaptureOut`
+// is an OPTIONAL trailing out-param (9th, additive — same threading
+// convention `capacityId`/`fgosDir` already used, see
+// docs/how-to/wire-a-headless-function-through-an-agent-executor-capacity.md
+// step 1) a caller can supply as `{}` to read `.entries` back after this
+// call returns, without this function's own return shape changing (still a
+// bare verdict — `judgeDecompose`/every test/`runWatch` reads that
+// unchanged). When given, it is used AS the mutable capture object instead
+// of a throwaway `{}`, so it still ends up with the same `.entries` the
+// throwaway would have had; omitted (every pre-existing caller) is
+// byte-identical. This exists so `judgeDiscovery` can measure how many
+// research tool calls a discover pass actually made — observability only,
+// no cap enforced here.
+//
+// `failDetailOut` (tsk-5d2, optional, 10th trailing out-param, same
+// convention as `scoutCaptureOut`): a caller supplies `{}` to read back
+// which fail-safe branch fired (`.reason`) plus its raw evidence, after a
+// `null` return. Threaded straight to `runRetryingExecutor`'s own
+// `failDetail` option; omitted (every pre-tsk-5d2 caller) is
+// byte-identical.
+export function runJudgeExecutor(cfg, model, prompt, stricterPrompt, scout, capacityId, fgosDir, scoutCaptureOut, failDetailOut) {
+  const capture = scout?.capture ? (scoutCaptureOut ?? {}) : null;
+
+  const verdict = runRetryingExecutor(cfg, model, prompt, stricterPrompt, {
+    tier: 'judge',
+    maxAttempts: MAX_JUDGE_ATTEMPTS,
+    scoutCapture: capture,
+    capacityId,
+    fgosDir,
+    failDetail: failDetailOut,
+  });
+
+  if (verdict !== null && capture?.entries?.length) {
+    writeScoutNotes(scout.repoRoot, scout.docsRef, capture.entries);
+  }
+
+  return verdict;
 }

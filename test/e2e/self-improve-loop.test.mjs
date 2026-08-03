@@ -163,7 +163,10 @@ function writeClearDiscoveryExecutor(scriptDir, { verify, produce = 'output.txt'
 import fs from 'node:fs';
 import { execFileSync } from 'node:child_process';
 const prompt = process.argv[2] ?? '';
-if (prompt.includes('# Context-discovery')) {
+if (prompt.includes('Kiểm tra độc lập một lệnh verify')) {
+  // tsk-5q5-1: judgeVerifySemanticCorrectness's own second-pass call.
+  process.stdout.write(JSON.stringify({ agrees: true }));
+} else if (prompt.includes('# Context-discovery')) {
   process.stdout.write(JSON.stringify({ clear: true, verify: ${JSON.stringify(verify)} }));
 } else if (prompt.includes('# Chia-việc (decompose)')) {
   process.stdout.write(JSON.stringify({ verdict: 'pass-through' }));
@@ -278,13 +281,9 @@ test(
     assert.equal(reviewData.source, 'runner');
     assert.match(reviewData.diff, /fixed\.txt/);
 
-    // A coding item must pass through the compound-learn stage before it can
-    // close (D3) — take the deliberate transition while the item is proposed.
-    assert.equal(fgos(repoRoot, ['compound', submitted.id]).status, 0);
-
     // approve's runner path refuses a dirty main tree — fold the evolve/
-    // dispatch/compound log deltas into a real commit first (same convention
-    // every pr-gate.test.mjs runner scenario follows).
+    // dispatch log deltas into a real commit first (same convention every
+    // pr-gate.test.mjs runner scenario follows).
     commitPending(repoRoot, `state: propose ${submitted.id}`);
 
     // (7) `approve <id>` WITHOUT --acknowledge-iron-law: a REAL refusal
@@ -304,12 +303,20 @@ test(
     assert.equal(branchExists(repoRoot, `fgw/${submitted.id}`), true, 'the branch survives an Iron Law refusal');
 
     // (8) `approve <id> --acknowledge-iron-law` — the deliberate override
-    // succeeds: merges, verifies, awaiting-approval -> done, branch cleaned up.
+    // succeeds: merges, verifies, awaiting-approval -> delivered, branch
+    // cleaned up. done is now reached only via the sequential
+    // delivered->retrospective->cleanup->done chain (work-item-status-
+    // delivered-retrospective-cleanup D1/D2/D10).
     const approved = fgos(repoRoot, ['approve', submitted.id, '--acknowledge-iron-law']);
     assert.equal(approved.status, 0, `approve with acknowledgment must succeed: ${approved.stderr}`);
     const approvedData = envelopeData(approved.stdout);
-    assert.equal(approvedData.to, 'done');
+    assert.equal(approvedData.to, 'delivered');
     assert.match(approvedData.output, /FIX_OK/);
+    assert.equal(stateView(repoRoot).work[submitted.id].status, 'delivered');
+
+    assert.equal(fgos(repoRoot, ['move', submitted.id, '--to', 'retrospective']).status, 0);
+    assert.equal(fgos(repoRoot, ['move', submitted.id, '--to', 'cleanup']).status, 0);
+    assert.equal(fgos(repoRoot, ['move', submitted.id, '--to', 'done']).status, 0);
 
     const finalView = stateView(repoRoot);
     assert.equal(finalView.work[submitted.id].status, 'done');

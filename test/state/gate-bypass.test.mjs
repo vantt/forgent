@@ -21,6 +21,19 @@ function tmpDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-gate-bypass-'));
 }
 
+// The shared-config-file read path (docs/history/doctor-fix-gate-bypass/
+// CONTEXT.md D1/D3, tsk-2qz-2) needs `dir` nested under a real repo root
+// (`readGateBypassLevel`'s own `dir` param is the `.fgos` directory;
+// `readSharedConfig` internally resolves `path.dirname(dir)` as the repo
+// root) -- unlike the flat `tmpDir()` above, whose `path.dirname` would
+// otherwise land on the shared, uncontrolled `os.tmpdir()` itself.
+function tmpFgosDir() {
+  const repoRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-gate-bypass-repo-'));
+  const fgosDir = path.join(repoRoot, '.fgos');
+  fs.mkdirSync(fgosDir, { recursive: true });
+  return fgosDir;
+}
+
 const CLEAR_ARTIFACT = `# feature — plan
 
 ## Some section
@@ -81,6 +94,40 @@ test('readGateBypassLevel: valid level round-trips', () => {
   const dir = tmpDir();
   fs.writeFileSync(path.join(dir, 'gate-bypass.json'), JSON.stringify({ level: 'standard' }), 'utf8');
   assert.equal(readGateBypassLevel(dir), 'standard');
+});
+
+// ─── shared-config-file read path (D1/D3, tsk-2qz-2) ──────────────────────
+
+test('readGateBypassLevel: reads config.gateBypass.level from the shared config file when present and valid', () => {
+  const fgosDir = tmpFgosDir();
+  fs.writeFileSync(path.join(fgosDir, 'config.json'), JSON.stringify({ gateBypass: { level: 'heavy' } }), 'utf8');
+  assert.equal(readGateBypassLevel(fgosDir), 'heavy');
+});
+
+test('readGateBypassLevel: falls back to the legacy standalone file when the shared file exists but has no gateBypass key', () => {
+  const fgosDir = tmpFgosDir();
+  fs.writeFileSync(path.join(fgosDir, 'config.json'), JSON.stringify({ runner: { timeoutMs: 5000 } }), 'utf8');
+  fs.writeFileSync(path.join(fgosDir, 'gate-bypass.json'), JSON.stringify({ level: 'light' }), 'utf8');
+  assert.equal(readGateBypassLevel(fgosDir), 'light');
+});
+
+test('readGateBypassLevel: falls back to the legacy standalone file when the shared file has an unrecognized gateBypass.level', () => {
+  const fgosDir = tmpFgosDir();
+  fs.writeFileSync(path.join(fgosDir, 'config.json'), JSON.stringify({ gateBypass: { level: 'total' } }), 'utf8');
+  fs.writeFileSync(path.join(fgosDir, 'gate-bypass.json'), JSON.stringify({ level: 'standard' }), 'utf8');
+  assert.equal(readGateBypassLevel(fgosDir), 'standard');
+});
+
+test('readGateBypassLevel: fails closed to off when neither the shared file nor the legacy file has a valid level', () => {
+  const fgosDir = tmpFgosDir();
+  assert.equal(readGateBypassLevel(fgosDir), 'off');
+});
+
+test('readGateBypassLevel: never throws when the shared config file is malformed JSON, falls back to legacy', () => {
+  const fgosDir = tmpFgosDir();
+  fs.writeFileSync(path.join(fgosDir, 'config.json'), '{ not json', 'utf8');
+  fs.writeFileSync(path.join(fgosDir, 'gate-bypass.json'), JSON.stringify({ level: 'standard' }), 'utf8');
+  assert.equal(readGateBypassLevel(fgosDir), 'standard');
 });
 
 test('isTierCovered: off covers nothing', () => {

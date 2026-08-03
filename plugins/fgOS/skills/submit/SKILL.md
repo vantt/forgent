@@ -17,12 +17,33 @@ work item without leaving the session or hand-typing the CLI. Never writes
 `.fgos/` state directly — every write goes through the `submit` verb
 (one-door-write, CTR001).
 
+This skill's own classification of `kind`/`tier`/`risk` is whatever
+`submit`'s mechanical keyword-count fallback produces (never reasoned
+about here) — deliberately, so `dogfood-fixture:submit`'s replay of a
+scenario's canonical text through this exact skill stays byte-identical
+run to run. When the ask actually needs a considered `tier`/`kind`/`risk`
+(not a quick one-liner), use `fgos-submit-assist`
+(`.claude/skills/fgos-submit-assist/SKILL.md`) instead — it reasons about
+the text itself, prints its reasoning, then calls this same underlying
+`fgos submit` verb with `--tier`/`--kind`/`--risk` pre-filled. Either way
+a wrong guess is cheaply correctable later via `fgos edit <id>`.
+
 ## Steps
 
 1. **Read the free-text description.** The argument the user passed after
    `/fgOS:submit` is the work item's text: `$ARGUMENTS`. If it is empty,
    ask the user for the text before doing anything else — `fgos submit`
    requires non-empty text and will reject an empty call anyway.
+
+   `submit` derives the item's title mechanically from this text — the
+   first sentence or line, cut at whatever boundary comes first (never an
+   LLM call, never this skill's own judgment). A title that reads clearly
+   in a task list names the object being touched, the action being taken,
+   and the scope it's bounded to (đối tượng + hành động + phạm vi). Nothing
+   here rewrites the user's text to force that shape — but if you are the
+   one composing `$ARGUMENTS` from a looser request (rather than passing
+   the user's own words through untouched), lead with a sentence that
+   already carries all three, so the derived title does too.
 
 2. **Scan the current fgOS view for a dependency candidate.** Run:
 

@@ -22,10 +22,12 @@
 //
 // 'coding' reproduces work.mjs's pre-retrofit STAGES and stage.mjs's
 // pre-retrofit STAGE_TRANSITIONS byte-for-byte (base-workflow-model D2, zero
-// behavior change), plus one appended stage: 'compound-learn' now closes the
-// list, entered from 'executing' (compound-learn-enduser-docs D2 — Compound-
-// learn is a first-class, FSM-routable stage for coding; Init is the only
-// base-workflow step left outside the `stage` dimension).
+// behavior change). The 'compound-learn' stage (compound-learn-enduser-docs
+// D2) that used to close this list is RETIRED (work-item-status-delivered-
+// retrospective-cleanup D11, supersedes RUL49/RUL50/RUL51) — the synthesis
+// layer this stage used to gate is now the status `retrospective`'s job
+// (see fsm.mjs), not a stage. Init is the only base-workflow step left
+// outside the `stage` dimension.
 //
 // 'synthetic' (Slice 2, D1/D4) is an illustrative, disposable second domain
 // that exists only to prove a non-coding domain runs on the same base FSM —
@@ -43,29 +45,26 @@ export const DEFAULT_DOMAIN = 'coding';
 
 export const DOMAINS = Object.freeze({
   coding: Object.freeze({
-    // Pre-retrofit work.mjs STAGES value, plus 'compound-learn' appended
-    // (compound-learn-enduser-docs D2): a first-class stage between
-    // execution and close, so the synthesis layer is FSM-routable and never
-    // silently skipped.
-    stages: Object.freeze(['clarify', 'decompose', 'executing', 'compound-learn']),
+    // Pre-retrofit work.mjs STAGES value — 'compound-learn' retired (D11):
+    // the synthesis layer it used to gate is now the status `retrospective`
+    // (fsm.mjs), not a stage entry here.
+    stages: Object.freeze(['clarify', 'decompose', 'executing']),
     // Maps each of coding's stages to the base-workflow step it satisfies.
-    // Compound-learn now carries its own stage entry (compound-learn-
-    // enduser-docs D2, superseding the prior stance that it lived outside
-    // the `stage` dimension) — Init is the only base-workflow step that
-    // still happens outside `stage` (intake, before any stage exists).
+    // Init and Compound-learn are the two base-workflow steps that now
+    // happen outside `stage` entirely (intake before any stage exists;
+    // synthesis on the status axis, per D11).
     stepMap: Object.freeze({
       clarify: 'Clarify',
       decompose: 'Divide',
       executing: 'Execute',
-      'compound-learn': 'Compound-learn',
     }),
-    // Pre-retrofit stage.mjs STAGE_TRANSITIONS value, plus the new
-    // executing -> compound-learn edge (compound-learn-enduser-docs D2).
+    // Pre-retrofit stage.mjs STAGE_TRANSITIONS value — the
+    // executing -> compound-learn edge is retired along with the stage
+    // itself (D11).
     transitions: Object.freeze([
       Object.freeze({ from: 'clarify', to: 'executing' }),
       Object.freeze({ from: 'clarify', to: 'decompose' }),
       Object.freeze({ from: 'decompose', to: 'executing' }),
-      Object.freeze({ from: 'executing', to: 'compound-learn' }),
     ]),
     // Which fgOS skill a session should load for each stage (str89-fgos-
     // domain-skills D3/D4) — `null` means "no skill, mechanical" (today's
@@ -77,13 +76,21 @@ export const DOMAINS = Object.freeze({
     // `executing` now resolves to `fgos-executing` (str89-fgos-domain-skills
     // D4/D6) — hand-authored via `distill` from bee-executing's
     // implement->verify->cap discipline, translated into fgOS's own
-    // item/verify/`fgos return` vocabulary.
+    // item/verify/`fgos return` vocabulary. `fgos-compounding` no longer
+    // has a stage entry (D11) — it now triggers on status `retrospective`
+    // instead, driven by the retrospective loop, not this stage->skill map.
     skillMap: Object.freeze({
       clarify: 'fgos-exploring',
       decompose: 'fgos-planning',
       executing: 'fgos-executing',
-      'compound-learn': 'fgos-compounding',
     }),
+    // work-item-status-delivered-retrospective-cleanup D5/D8 (deferred
+    // item from CONTEXT.md): does this domain's items go through a real
+    // git worktree/merge, such that cleanup-harness.mjs's
+    // checkMergeStillResolves has a real commit to verify? coding items
+    // always carry a genuine headAtTake/headAtReturn/branchHeadAt* pair
+    // from a real merge or return.
+    worktreeBacked: true,
   }),
   synthetic: Object.freeze({
     stages: Object.freeze(['assembling']),
@@ -97,6 +104,12 @@ export const DOMAINS = Object.freeze({
     skillMap: Object.freeze({
       assembling: null,
     }),
+    // No real worktree or merge ever happens for this domain (file header:
+    // "illustrative, disposable... exists only to prove... runs on the
+    // same base FSM") — the cleanup harness must not hold it to a
+    // merge-still-resolves check it was never claiming in the first
+    // place.
+    worktreeBacked: false,
   }),
 });
 

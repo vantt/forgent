@@ -12,9 +12,10 @@ import { WorkValidationError } from '../../src/state/work.mjs';
 // Pure lib — every workMap here is a literal object keyed by id, same shape
 // as view.work (frontier.test.mjs's style); no fs, no mkdtemp, no `.fgos/`
 // writes anywhere in this file.
-function item(id, deps = [], parent = undefined) {
+function item(id, deps = [], parent = undefined, mergeAfter = undefined) {
   const built = { id, title: id, kind: 'task', status: 'todo', deps, risk: 'low', refs: [], verify: 'true' };
   if (parent !== undefined) built.parent = parent;
+  if (mergeAfter !== undefined) built.mergeAfter = mergeAfter;
   return built;
 }
 
@@ -192,6 +193,79 @@ test('findUnifiedCycle catches a MIXED cycle: A is parent of B (edge A->B), B.de
   const cycle = findUnifiedCycle(workMap);
   assert.ok(cycle, 'expected the unified graph to catch the mixed cycle');
   assert.equal(cycle[0], cycle[cycle.length - 1]);
+});
+
+// --- waits-for (mergeAfter, tsk-2u0) --------------------------------------
+
+test('buildUnifiedEdges includes a waits-for edge for mergeAfter, same direction as blocks', () => {
+  const workMap = { a: item('a', [], undefined, ['b']), b: item('b') };
+  assert.deepEqual(buildUnifiedEdges(workMap), [{ from: 'a', to: 'b', kind: 'waits-for' }]);
+});
+
+test('buildUnifiedEdges combines blocks + parent-child + waits-for for one item, in id order', () => {
+  const workMap = { a: item('a', ['b'], 'p', ['q']), b: item('b'), p: item('p'), q: item('q') };
+  assert.deepEqual(buildUnifiedEdges(workMap), [
+    { from: 'a', to: 'b', kind: 'blocks' },
+    { from: 'p', to: 'a', kind: 'parent-child' },
+    { from: 'a', to: 'q', kind: 'waits-for' },
+  ]);
+});
+
+test('findUnifiedCycle still catches a deps-only cycle when mergeAfter is absent (regression)', () => {
+  const workMap = { a: item('a', ['b']), b: item('b', ['a']) };
+  assert.ok(findUnifiedCycle(workMap), 'mergeAfter being new/absent must never mask a pre-existing deps cycle');
+});
+
+test('findUnifiedCycle catches a mergeAfter self-loop', () => {
+  const workMap = { a: item('a', [], undefined, ['a']) };
+  assert.deepEqual(findUnifiedCycle(workMap), ['a', 'a']);
+});
+
+test('findUnifiedCycle catches a pure mergeAfter A<->B cycle', () => {
+  const workMap = { a: item('a', [], undefined, ['b']), b: item('b', [], undefined, ['a']) };
+  const cycle = findUnifiedCycle(workMap);
+  assert.ok(cycle, 'expected a mergeAfter-only cycle to be found');
+  assert.equal(cycle[0], cycle[cycle.length - 1]);
+});
+
+test('findUnifiedCycle catches a MIXED deps+mergeAfter cycle (D5\'s named deadlock: A deps:[B], B mergeAfter:[A])', () => {
+  // A can't start until B resolved (deps); B can't merge until A resolved
+  // (mergeAfter) -- a real deadlock across the two different fields,
+  // undetectable by a deps-only or mergeAfter-only scan.
+  const workMap = { a: item('a', ['b']), b: item('b', [], undefined, ['a']) };
+  assert.equal(findDepCycle(workMap), null, 'sanity: deps-only graph sees no cycle here');
+  const cycle = findUnifiedCycle(workMap);
+  assert.ok(cycle, 'expected the unified graph to catch the mixed deps+mergeAfter cycle');
+  assert.equal(cycle[0], cycle[cycle.length - 1]);
+});
+
+test('findUnifiedCycle catches a MIXED parent-child+mergeAfter cycle', () => {
+  // p is parent of c (edge p -> c); c.mergeAfter:[p] (edge c -> p) closes it.
+  const workMap = { p: item('p'), c: item('c', [], 'p', ['p']) };
+  const cycle = findUnifiedCycle(workMap);
+  assert.ok(cycle, 'expected the unified graph to catch the mixed parent-child+mergeAfter cycle');
+  assert.equal(cycle[0], cycle[cycle.length - 1]);
+});
+
+test('findUnifiedCycle accepts a real mergeAfter edge that stays acyclic', () => {
+  const workMap = { a: item('a'), b: item('b', [], undefined, ['a']) };
+  assert.equal(findUnifiedCycle(workMap), null);
+});
+
+test('assertNoUnifiedCycle rejects a candidate mergeAfter self-loop', () => {
+  assert.throws(() => assertNoUnifiedCycle(item('a', [], undefined, ['a']), {}), WorkValidationError);
+});
+
+test('assertNoUnifiedCycle rejects a candidate that would close a MIXED deps+mergeAfter cycle', () => {
+  // b already declares mergeAfter:[a] (edge b -> a); admitting candidate "a"
+  // with deps:["b"] (edge a -> b) closes a -> b -> a across the two fields.
+  const workMap = { b: item('b', [], undefined, ['a']) };
+  assert.throws(() => assertNoUnifiedCycle(item('a', ['b']), workMap), WorkValidationError);
+});
+
+test('assertNoUnifiedCycle accepts a candidate whose mergeAfter target already exists and stays acyclic', () => {
+  const workMap = { a: item('a') };
+  assert.doesNotThrow(() => assertNoUnifiedCycle(item('b', [], undefined, ['a']), workMap));
 });
 
 test('findUnifiedCycle accepts a diamond (shared dep, no cycle)', () => {

@@ -46,6 +46,36 @@ export function hasSourceLine(rcFilePath, integrationScriptPath) {
   return sourceLinePattern(integrationScriptPath).test(content);
 }
 
+// Matches any fgOS integration `source` line regardless of which path it
+// names, so a dead one can be found without knowing where it came from.
+// Deliberately keyed on the script's own filename: lines the user wrote
+// themselves are none of fgOS's business, and are never reported.
+const ANY_SOURCE_LINE_PATTERN = /^\s*(?:source|\.)\s+["']?(\S*fgos-shell-integration\.sh)["']?\s*(?:#.*)?$/gm;
+
+/**
+ * Every fgOS integration `source` line in `rcFilePath` whose target no longer
+ * exists on disk. These accumulate because each removed worktree or temp
+ * checkout leaves its own line behind, and every one of them makes an
+ * interactive shell emit a `no such file or directory` error on open.
+ *
+ * Reporting only — nothing here edits the rc file. Deleting a line from a
+ * user's own shell profile stays a human act.
+ */
+export function deadSourceLines(rcFilePath) {
+  if (!fs.existsSync(rcFilePath)) {
+    return [];
+  }
+  const content = fs.readFileSync(rcFilePath, 'utf8');
+  const dead = [];
+  for (const match of content.matchAll(ANY_SOURCE_LINE_PATTERN)) {
+    const target = match[1].replace(/^["']|["']$/g, '');
+    if (!fs.existsSync(target)) {
+      dead.push(target);
+    }
+  }
+  return dead;
+}
+
 export function insertSourceLine(rcFilePath, integrationScriptPath) {
   if (!fs.existsSync(rcFilePath)) {
     throw new Error(`refusing to create rc file that does not already exist: ${rcFilePath}`);

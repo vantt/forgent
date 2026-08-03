@@ -7,10 +7,10 @@ use crossterm::terminal::{
     disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen,
 };
 use ratatui::backend::CrosstermBackend;
-use ratatui::layout::{Constraint, Direction, Layout};
+use ratatui::layout::{Constraint, Direction, Layout, Rect};
 use ratatui::style::{Color, Modifier, Style};
-use ratatui::text::Span;
-use ratatui::widgets::{Block, Borders, Paragraph, Row, Table, TableState};
+use ratatui::text::{Line, Span};
+use ratatui::widgets::{Block, Borders, Clear, Paragraph, Row, Table, TableState};
 use ratatui::{Frame, Terminal};
 
 use crate::app::{App, InProcessTask, Panel};
@@ -137,7 +137,7 @@ pub fn draw(frame: &mut Frame, app: &mut App) {
                     unfocused_border_style
                 })
                 .title(Span::styled(
-                    "Work items (by impact) — ↑/↓ select, Enter to pick",
+                    "Work items (by impact) — ↑/↓ select, Enter for details",
                     Style::default().add_modifier(Modifier::BOLD),
                 )),
         )
@@ -186,9 +186,77 @@ pub fn draw(frame: &mut Frame, app: &mut App) {
     } else if let Some(status) = &app.pick_status {
         Paragraph::new(status.as_str()).style(Style::default().fg(Color::Green))
     } else {
-        Paragraph::new("↑/↓ select · Enter: pick · q/Esc: quit")
+        Paragraph::new("↑/↓ select · Enter: details · q/Esc: quit")
     };
     frame.render_widget(status, rows[1]);
+
+    if app.detail_modal_open {
+        if let Some(item) = app.selected_work_item() {
+            draw_detail_modal(frame, item);
+        }
+    }
+}
+
+/// A blocking dialog for the selected work item — opened by Enter on the
+/// "Work items" panel instead of picking directly. Its only action today
+/// is the Pick button, which runs the same `/fgOS:pick` flow Enter used to
+/// trigger immediately.
+fn draw_detail_modal(frame: &mut Frame, item: &crate::app::WorkItem) {
+    let area = centered_rect(60, 40, frame.area());
+    frame.render_widget(Clear, area);
+
+    let sections = Layout::default()
+        .direction(Direction::Vertical)
+        .constraints([Constraint::Min(0), Constraint::Length(3)])
+        .split(area);
+
+    let detail = Paragraph::new(vec![
+        Line::from(format!("ID: {}", item.id)),
+        Line::from(format!("Title: {}", item.title)),
+        Line::from(format!("Goal tier: {}", item.goal_tier)),
+    ])
+    .block(
+        Block::default()
+            .borders(Borders::ALL)
+            .title(Span::styled(
+                "Task detail",
+                Style::default().add_modifier(Modifier::BOLD),
+            )),
+    );
+    frame.render_widget(detail, sections[0]);
+
+    let buttons = Paragraph::new(Line::from(Span::styled(
+        " Pick ",
+        Style::default().add_modifier(Modifier::REVERSED),
+    )))
+    .block(
+        Block::default()
+            .borders(Borders::ALL)
+            .title("Enter: pick · Esc: close"),
+    );
+    frame.render_widget(buttons, sections[1]);
+}
+
+/// Carves an `area`-relative popup rect out of `area`'s center —
+/// `percent_x`/`percent_y` of `area`'s width/height.
+fn centered_rect(percent_x: u16, percent_y: u16, area: Rect) -> Rect {
+    let vertical = Layout::default()
+        .direction(Direction::Vertical)
+        .constraints([
+            Constraint::Percentage((100 - percent_y) / 2),
+            Constraint::Percentage(percent_y),
+            Constraint::Percentage((100 - percent_y) / 2),
+        ])
+        .split(area);
+
+    Layout::default()
+        .direction(Direction::Horizontal)
+        .constraints([
+            Constraint::Percentage((100 - percent_x) / 2),
+            Constraint::Percentage(percent_x),
+            Constraint::Percentage((100 - percent_x) / 2),
+        ])
+        .split(vertical[1])[1]
 }
 
 #[cfg(test)]

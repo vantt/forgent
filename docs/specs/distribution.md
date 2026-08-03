@@ -43,7 +43,8 @@ of it).
 | 4 | CLI entry points | The commands exposed once installed | `fgos` → runs `bin/fgos.mjs`; `fgos-runner` → runs `bin/fgos-runner.mjs` (the autonomous-loop runner, see spec Runner) | yes | — |
 | 5 | Dev checkout shell helper | An opt-in file, sourced from a contributor's own shell profile, exposing the same two CLI entry points from inside a checkout of the source repository — no install, no package fetch | one file, both commands | no (contributor's own choice) | not sourced automatically anywhere |
 | 6 | Local config staleness | Whether the local config file already has every setting the current default schema defines | up to date / missing one or more default settings | yes (computed, not stored) | — |
-| 7 | Doctor check | One named diagnostic `fgos doctor` reports on | `node-and-git` (Node/git present), `shell-integration-sourced` (helper wired into every shell profile the caller has), `config-not-stale` (local config has every current default setting) | yes | — |
+| 7 | Doctor check | One named diagnostic `fgos doctor` reports on | not a fixed list — an extensible registry (`src/setup/registrations.mjs`'s `registerCheck`); any module can add its own check independently of registering a config-default or a fix (tsk-2cs D2). Today's registered checks: `node-version-and-git`, `shell-integration-sourced`, `config-not-stale`, `main-checkout-hook-wired`, `tool-registry-configured`, `config-awareness`, `dependencies-installed`, `gate-bypass-configured` — this list grows without a spec update whenever a module registers a new one | yes | — |
+| 7b | Doctor fix | One named repair `fgos doctor --fix` can run before re-reporting checks | not a fixed list — an extensible registry (`registerFix`), independent of `registerCheck`/`registerConfigDefault` (tsk-2cs D2). Today's registered fix: `gate-bypass-configured` (tsk-2qz, the registry's first entry to register all three capabilities at once) | yes | — |
 | 8 | Output rendering mode | How `fgos setup`/`fgos doctor` present their result | enveloped JSON (every other verb's shape, unchanged) / colored plain text (`--pretty`) | yes | enveloped JSON |
 
 ## Behaviors & Operations
@@ -197,19 +198,30 @@ of it).
   caller already customized, at any nesting depth; array-valued settings
   are never partially merged, only added wholesale when entirely missing
   (per D3).
-- **RUL9.** `fgos doctor`'s checks never write anything, under any
-  circumstance, including when a check would otherwise need to create a
-  file to check it — a missing config file is reported as missing, never
-  created as a side effect of checking (per D2).
+- **RUL9.** `fgos doctor`'s default (no `--fix`) path never writes
+  anything, under any circumstance, including when a check would
+  otherwise need to create a file to check it — a missing config file is
+  reported as missing, never created as a side effect of checking (per
+  D2). `--fix` is the deliberate exception: it runs every registered fix
+  (Data Dictionary #7b) before re-reporting checks — reversed from the
+  original no-exceptions wording per `tsk-2qz` D2, which reverses this
+  rule and RUL11 together (`docs/history/doctor-fix-gate-bypass/
+  CONTEXT.md`).
 - **RUL10.** `fgos setup` never asks for confirmation before writing to a
   shell profile or the config file — it acts and then reports exactly what
   it changed (per D6). Every other verb, and both of these two without
   `--pretty`, still produce the same enveloped-JSON result shape as before
   this feature — `--pretty` only changes how that same result is displayed,
   never what it contains (per D7).
-- **RUL11.** `fgos doctor --fix` (automatic repair) does not exist yet — v1
-  is report-only by design (per D8), not an oversight; this stays a
-  Deferred Idea, not an Open Gap, until a future round decides it.
+- **RUL11.** `fgos doctor --fix` exists and is real: it runs every fix
+  registered via `registerFix` (Data Dictionary #7b) against the current
+  cwd before re-reporting checks, then returns the same checks shape as
+  the no-flag path plus a `fixed` array. The fix list is a registry, not
+  a fixed set — a module can register a new one the same way a check or
+  config-default is registered, independent of either (tsk-2cs D2). This
+  supersedes the original v1 "does not exist yet, Deferred Idea" wording
+  (per D8) — `tsk-2qz` D2 reverses that decision deliberately, per
+  `docs/distribution-vision.md` §3's trụ cột 3.
 
 ## Edge Cases Settled
 
@@ -239,7 +251,9 @@ of it).
 ## Open Gaps
 
 (none — coverage is full for the mechanisms this feature adds. `fgos doctor
---fix` is a deliberate Deferred Idea (RUL11/D8), not a gap.)
+--fix` now exists for real, per RUL11 above — its own further extension
+(which checks eventually get a registered fix) is ordinary registry growth,
+tracked per-module, not a gap in this spec.)
 
 ## Visuals
 

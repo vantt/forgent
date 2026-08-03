@@ -66,10 +66,13 @@ test('e2e: npm pack -> npm install -g -> fgos init from a fresh external cwd', (
   try {
     // (1) npm pack into the scratch dir — never a bare `npm pack` in repo/,
     // which would drop an untracked .tgz into the tracked repo root.
+    // Windows resolves 'npm' to npm.cmd, which the OS loader can't exec
+    // directly -- shell:true is required there, same as the fgos/init
+    // shims below (tsk-49r D5).
     const packOut = execFileSync(
       'npm',
       ['pack', '--json', '--pack-destination', packDir],
-      { cwd: REPO_ROOT, encoding: 'utf8' },
+      { cwd: REPO_ROOT, encoding: 'utf8', shell: process.platform === 'win32' },
     );
     const packInfo = JSON.parse(packOut);
     const tarballName = packInfo[0].filename; // never hardcode forgent-0.1.0.tgz
@@ -80,13 +83,20 @@ test('e2e: npm pack -> npm install -g -> fgos init from a fresh external cwd', (
     const install = spawnSync(
       'npm',
       ['install', '-g', tarballPath, '--prefix', installPrefix],
-      { cwd: packDir, encoding: 'utf8' },
+      { cwd: packDir, encoding: 'utf8', shell: process.platform === 'win32' },
     );
     assert.equal(install.status, 0, `npm install -g failed: ${install.stderr}`);
 
     // (3) content-scoping: the installed package tree excludes .fgos/,
     // .fgos-runner.json, and test/ (the `files` allowlist actually took effect).
-    const installedPkgDir = path.join(installPrefix, 'lib', 'node_modules', 'forgent');
+    // Windows global installs place the package straight under
+    // <prefix>/node_modules (no `lib` folder) and drop executable shims
+    // (.cmd/extensionless/.ps1) directly in <prefix>/, never a `bin/`
+    // subfolder -- confirmed via npm's own docs (tsk-49r D5). macOS follows
+    // the same layout as Linux, so only win32 needs its own branch here.
+    const installedPkgDir = process.platform === 'win32'
+      ? path.join(installPrefix, 'node_modules', 'forgent')
+      : path.join(installPrefix, 'lib', 'node_modules', 'forgent');
     assert.ok(fs.existsSync(installedPkgDir), `installed package dir not found at ${installedPkgDir}`);
     assert.equal(fs.existsSync(path.join(installedPkgDir, '.fgos')), false, '.fgos/ must not ship in the installed package');
     assert.equal(fs.existsSync(path.join(installedPkgDir, '.fgos-runner.json')), false, '.fgos-runner.json must not ship');
@@ -95,15 +105,31 @@ test('e2e: npm pack -> npm install -g -> fgos init from a fresh external cwd', (
     // (4) invoke the installed binary's `init` verb from a SEPARATE fresh
     // external tmp cwd (not the repo, not the install prefix, not the pack
     // scratch dir) and assert cwd-based dataDir behavior (D3, unchanged from P10).
-    const fgosBin = path.join(installPrefix, 'bin', 'fgos');
+    const fgosBin = process.platform === 'win32'
+      ? path.join(installPrefix, 'fgos.cmd')
+      : path.join(installPrefix, 'bin', 'fgos');
     assert.ok(fs.existsSync(fgosBin), `installed fgos binary not found at ${fgosBin}`);
 
-    const fgosRunnerBin = path.join(installPrefix, 'bin', 'fgos-runner');
+    const fgosRunnerBin = process.platform === 'win32'
+      ? path.join(installPrefix, 'fgos-runner.cmd')
+      : path.join(installPrefix, 'bin', 'fgos-runner');
     assert.ok(fs.existsSync(fgosRunnerBin), `installed fgos-runner binary not found at ${fgosRunnerBin}`);
-    const fgosRunnerMode = fs.statSync(fgosRunnerBin).mode;
-    assert.ok(fgosRunnerMode & fs.constants.S_IXUSR, 'installed fgos-runner binary must be executable');
+    // The exec bit is a POSIX-only concept -- Windows .cmd shims have no
+    // equivalent permission bit, so existence above is already the real
+    // proof there; only assert executability where the bit exists.
+    if (process.platform !== 'win32') {
+      const fgosRunnerMode = fs.statSync(fgosRunnerBin).mode;
+      assert.ok(fgosRunnerMode & fs.constants.S_IXUSR, 'installed fgos-runner binary must be executable');
+    }
 
-    const init = spawnSync(fgosBin, ['init'], { cwd: externalCwd, encoding: 'utf8' });
+    // Windows can't exec a .cmd shim directly through the OS loader --
+    // shell:true is required there (Node child_process gotcha); posix
+    // binaries need no shell.
+    const init = spawnSync(fgosBin, ['init'], {
+      cwd: externalCwd,
+      encoding: 'utf8',
+      shell: process.platform === 'win32',
+    });
     assert.equal(init.status, 0, `fgos init failed: ${init.stderr}`);
 
     const externalFgosDir = path.join(externalCwd, '.fgos');

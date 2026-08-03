@@ -11,13 +11,18 @@ description: >-
 # fgos-exploring
 
 Turns a fuzzy request into locked decisions written down in
-`docs/history/<feature>/CONTEXT.md`. This skill runs while a claimed item's
-`stage` is `clarify` — it finds the flowers; it does not build the comb.
+`docs/history/<feature>/CONTEXT.md`. This skill normally runs while a
+claimed item's `stage` is `clarify` — it finds the flowers; it does not
+build the comb. It can also be invoked directly by `fgos-planning`,
+mid-`decompose`, when that skill finds `CONTEXT.md` silent on something
+material to the plan (`fgos-planning/SKILL.md`'s own hand-back step);
+`item.stage` stays `decompose` the entire time in that case — this skill
+never moves it.
 
 ## Hard rules
 
 - Every bare `fgos <verb>` this skill calls (`add`, `ask`, `answer`,
-  `decision`, `discover`) is `requiresExistingStore: true` — resolve the
+  `decision`, `discover`, `tool`) is `requiresExistingStore: true` — resolve the
   main checkout root the same way the gate check below already does
   (`git rev-parse --path-format=absolute --git-common-dir | xargs
   dirname`) and pass `--dir "$root"` on every one of them. This session's
@@ -71,6 +76,30 @@ Turns a fuzzy request into locked decisions written down in
    rg -- "$keyword" src bin test docs dogfood-fixture --glob "*.{mjs,cjs,md}" | head -20
    ```
 
+   Also query `CLAUDE.md`'s impact-analysis capability gate — the same
+   check `fgos-planning`/`fgos-validating`/`fgos-executing` already run
+   (`fgos tool query --capability impact-analysis --status present`) —
+   rather than assuming GitNexus is on this machine, since this is the only
+   clarify-stage session with real tool access (`judgeDiscovery` itself has
+   none: `src/runner/dispatch.mjs:207-220`'s `--allowedTools` permits only
+   `git add`/`git commit`). The `tool` sub-verb `query` is also
+   `requiresExistingStore: true` (`src/cli/command-registry.mjs:750`), so
+   run it with `--dir` explicitly the same as every other bare verb this
+   skill calls:
+
+   ```bash
+   root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
+   node "$root/bin/fgos.mjs" tool query --capability impact-analysis --status present --dir "$root"
+   ```
+
+   Fold the result into `CLAUDE.md`'s three-way framing
+   (`impact-analysis: inactive|degraded|full`) and record that line in
+   `CONTEXT.md` in step 3, next to the other scout evidence. This is
+   informational only — `fgos-exploring` edits no code and produces no
+   proof points, so the posture never gates or reshapes which candidate
+   decisions get asked here; it exists so a later reader of this item's
+   `CONTEXT.md` sees the posture without re-deriving it.
+
    Cite what the scout actually found in each question ("today X follows
    pattern Y in `path/to/file` — should this follow that too?"). Generate
    2–4 unstated product decisions that would otherwise make planning guess.
@@ -91,7 +120,23 @@ Turns a fuzzy request into locked decisions written down in
 
    A question that fails any check is never asked — pin it as a labeled
    assumption instead, or hand it to `fgos-planning` if only the implementer
-   cares. After each answer, confirm the decision back and assign it a
+   cares.
+
+   **Ask as open conversational prose, not via a structured-choice tool
+   (e.g. `AskUserQuestion`).** These questions exist to discover product
+   decisions the session does not yet know — a tool that forces the answer
+   into 2-4 pre-set options can only ever surface what the session already
+   imagined, defeating that purpose (a person who wants to answer with a
+   framing the session never proposed has no box to put it in). "answerable"
+   above does not mean "multiple-choice" — "point at a reference" is
+   explicitly an open answer shape. Reach for a structured-choice tool only
+   when scout evidence has already narrowed the question to a short list of
+   concretely-named real alternatives (never options invented just to make
+   the question fit the tool) — the `## Gate` step's yes/no confirmation
+   below is exactly that case, since by then the decision is already locked
+   and the only remaining question is a closed approve/reject.
+
+   After each answer, confirm the decision back and assign it a
    stable ID: `D1`, `D2`, `D3`… Then run `fgos decision --text "<D-ID>:
    <one-line summary>" --rationale "see CONTEXT.md for the full scout
    evidence and reasoning"` so the decision also lands in the item's
@@ -171,17 +216,44 @@ Treat anything other than exactly `true` on stdout — `false`, empty output,
 a thrown error — as `false`: fail closed, never skip the question on a
 check that couldn't run cleanly.
 
+Either branch below also records a structured approve record (tsk-19j
+D1/D11) — separate from, and in addition to, `fgos decision`'s free-text
+audit line: `fgos gate-approve <item-id> --gate contextApprove --actor
+<human|bypass> --verify "<item's current verify field>"` (`fgos list --id
+<item-id> --json`'s `data.work[id].verify`, read fresh right before this
+call — fgos-exploring does not design a new verify command, per this
+skill's own "do not research implementation" rule; it only snapshots
+whatever verify the item already carries into the structured record).
+
+Immediately after that gate-approve record, in BOTH branches, this session
+fires the clarify→decompose engine transition itself — this session is
+already the live soul that just did the real Socratic reasoning, so it
+passes that verdict directly instead of leaving the transition to a LATER
+blind `fgos discover` call or the fragile `readLockedContext` file-read
+trust signal (tsk-27y D1/D2, Native-First Dispatch Doctrine Phase 2 —
+`docs/decisions/0026-...md`):
+
+```bash
+node "$root/bin/fgos.mjs" discover "<item-id>" --verdict clear --verify "<the same verify value just recorded via gate-approve>" --dir "$root"
+```
+
 - **`true`** — skip the question. Post the non-question line
   `auto-approved: CONTEXT.md (gate-bypass level <level>)`, log it
   (`fgos decision --text "auto-approved CONTEXT.md gate for <item-id> at
   level <level>" --rationale "gate-bypass level <level> permits
   auto-approval per docs/history/gate-bypass/CONTEXT.md D1-D5"`, D3's
-  audit trail), then continue straight to `fgos-planning`.
+  audit trail), record it (`fgos gate-approve <item-id> --gate
+  contextApprove --actor bypass --verify "..."`, per above), fire the
+  `fgos discover --verdict clear` call above, then continue straight to
+  `fgos-planning`.
 - **`false`** — surface the locked decisions in plain language — what was
   decided, why it can be trusted, what it costs if wrong — with CONTEXT.md
   linked, then ask exactly: "Decisions locked. Approve CONTEXT.md before
   planning?" CONTEXT.md is the source of truth for every downstream step;
-  its decision IDs are stable and cited, never silently reinterpreted.
+  its decision IDs are stable and cited, never silently reinterpreted. Once
+  the person approves, record it (`fgos gate-approve <item-id> --gate
+  contextApprove --actor human --verify "..."`, per above), fire the `fgos
+  discover --verdict clear` call above, then continue to `fgos-planning`.
 
 ## Red flags
 

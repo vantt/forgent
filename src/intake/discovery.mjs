@@ -22,12 +22,17 @@
 // verdict. The system is never allowed to treat an uncertain judgement as a
 // pass.
 
+import fs from 'node:fs';
+import path from 'node:path';
 import { modelForTier } from '../runner/dispatch.mjs';
-import { runJudgeExecutor, JUDGE_STRICT_JSON_SUFFIX, judgeVerifySemanticCorrectness } from './judge-executor.mjs';
+import { runJudgeExecutor, JUDGE_STRICT_JSON_SUFFIX, judgeVerifySemanticCorrectness, readScoutNotes } from './judge-executor.mjs';
+import { appendJudgeFailLog } from './judge-fail-log.mjs';
+import { readLockedContext } from './decompose.mjs';
 import { DEFAULTS } from '../state/work.mjs';
-import { listWork, moveStage, addDiscovery, putInAwaiting, editWork, StoreError } from '../state/store.mjs';
+import { listWork, moveStage, addDiscovery, addDecision, putInAwaiting, editWork, StoreError } from '../state/store.mjs';
 import { graphMetrics } from '../state/graph-metrics.mjs';
 import { rankImpact } from '../state/impact.mjs';
+import { computeImpact, computePriority } from '../state/priority-formula.mjs';
 
 const DEFAULT_UNCLEAR_QUESTION =
   'Không phán được rõ ràng — cần người xác nhận thủ công.';
@@ -56,11 +61,18 @@ export const FALLBACK_VERIFY = 'chưa xác định — bổ sung thủ công';
 // over the same view the judge already has. Only called when `view` is
 // truthy (see the call site's guard) since graphMetrics(view) hashes the view
 // internally and throws on undefined.
+// work-item-priority-matrix D3: pulled out of buildGraphContextBlock so
+// resolveDiscovery can read the same real number the prompt's prose cites,
+// instead of re-deriving it or trusting the model to echo it back.
+function blocksForItem(work, view) {
+  const ranked = rankImpact(view);
+  const entry = ranked.find((r) => r.id === work.id);
+  return entry ? entry.blocks : 0;
+}
+
 function buildGraphContextBlock(work, view) {
   const metrics = graphMetrics(view);
-  const ranked = rankImpact(view);
-  const impactEntry = ranked.find((r) => r.id === work.id);
-  const blocks = impactEntry ? impactEntry.blocks : 0;
+  const blocks = blocksForItem(work, view);
   const isStaleBlocked = metrics.staleBlocked.some((entry) => entry.id === work.id);
   const component = metrics.components.find((c) => c.items.includes(work.id));
   const componentSize = component ? component.size : 1;
@@ -74,9 +86,109 @@ function buildGraphContextBlock(work, view) {
   ].join('\n');
 }
 
-function buildDiscoveryPrompt(work, view) {
+// tsk-4rd (route A, discover-research-recipe D2 "enrich"): `deps` are real
+// work-item ids (dep-graph invariant, RUL — never free text like `refs`),
+// so their actual title/description can be looked up in `view.work` and
+// shown in full — không chỉ liệt kê id — cho model hiểu "task liên đới đã
+// làm/chưa làm" thay vì suy đoán từ 1 chuỗi id. `refs` stays a raw list
+// (file paths/doc links, not guaranteed work-item ids — no safe lookup).
+// Truncated per entry so a heavy fan-in item's dep list stays bounded.
+const RELATED_ITEM_DESCRIPTION_MAX_CHARS = 300;
+
+function buildRelatedItemsBlock(work, view) {
+  const depIds = Array.isArray(work.deps) ? work.deps : [];
+  if (!depIds.length) return '(item này không có dependency nào)';
+  if (!view?.work) return '(không có view — không tra được nội dung dependency)';
+
+  return depIds
+    .map((id) => {
+      const dep = view.work[id];
+      if (!dep) return `- ${id}: (không tìm thấy trong store — có thể đã bị xoá/đổi id)`;
+      const desc = typeof dep.description === 'string' && dep.description.trim() ? dep.description.trim() : '(không có mô tả)';
+      const snippet =
+        desc.length > RELATED_ITEM_DESCRIPTION_MAX_CHARS ? `${desc.slice(0, RELATED_ITEM_DESCRIPTION_MAX_CHARS)}…` : desc;
+      return `- ${id} [status:${dep.status} stage:${dep.stage ?? '-'}] "${dep.title}"\n  ${snippet}`;
+    })
+    .join('\n');
+}
+
+// tsk-545 (dep of tsk-4rd): buildDiscoveryPrompt asks the model to "propose
+// a verify command that actually runs" but never gave it any cwd/repo-layout
+// context to know WHERE that command runs from — dogfood-proven failure
+// (decision 0018, tsk-1wd, 2026-07-28): a clear verdict's own proposed
+// `node --test test/expr/*.test.mjs` came back "no matches found" because
+// the real test lived under `dogfood-fixture/` (its own nested
+// `package.json`), and goal-check.mjs always spawns `item.verify` from the
+// worktree's repoRoot, never a guessed subdirectory. Mechanical (never
+// re-derived by the model, same idiom as `buildGraphContextBlock`) — reads
+// the real top-level directory listing and flags which of those directories
+// carry their OWN `package.json` (the concrete "needs a path prefix" signal)
+// so the model sees this fact instead of guessing it. Best-effort:
+// `repoRoot` is documented-optional the same way `view` already is
+// (`judgeDiscovery`'s old 2-arg unit-test callers never had one before
+// tsk-545 either) — a missing/unreadable root degrades to a placeholder,
+// never throws.
+// Bounded defensively, not just for the pathological test-tmpdir case (a
+// shared os.tmpdir() can accumulate hundreds of thousands of leftover
+// entries across a long session) — a real monorepo with many workspace
+// packages could hit the same failure mode: an unbounded join() here once
+// produced a prompt large enough to blow the OS argv length limit,
+// `spawnSync` failed outright, and `judgeDiscovery`'s own fail-safe (this
+// file's header) silently folded that into "unclear" — the worst possible
+// place for a silent size blowup to hide.
+const MAX_TOP_LEVEL_DIRS_SHOWN = 40;
+const MAX_NESTED_PACKAGES_SHOWN = 15;
+// Above this many top-level entries, treat the directory as anomalous
+// (almost certainly not a real repo root) and skip the per-entry
+// `existsSync` nested-package scan entirely, rather than pay its cost only
+// to truncate the result anyway.
+const TOP_LEVEL_ANOMALY_THRESHOLD = 500;
+
+function buildRepoLayoutBlock(repoRoot) {
+  if (typeof repoRoot !== 'string' || !repoRoot) {
+    return '(không có repoRoot — không đọc được cấu trúc thư mục repo)';
+  }
+  let entries;
+  try {
+    entries = fs.readdirSync(repoRoot, { withFileTypes: true });
+  } catch {
+    return '(lỗi đọc cấu trúc thư mục repo — bỏ qua)';
+  }
+  const topLevelDirs = entries
+    .filter((e) => e.isDirectory() && !['node_modules', '.git', '.fgos'].includes(e.name))
+    .map((e) => e.name)
+    .sort();
+
+  if (topLevelDirs.length > TOP_LEVEL_ANOMALY_THRESHOLD) {
+    return `(repoRoot có ${topLevelDirs.length} thư mục cấp 1 — bất thường cho một repo thật, bỏ qua block này thay vì liệt kê)`;
+  }
+
+  const nestedPackages = topLevelDirs.filter((name) => {
+    try {
+      return fs.existsSync(path.join(repoRoot, name, 'package.json'));
+    } catch {
+      return false;
+    }
+  });
+
+  const shownTopLevel = topLevelDirs.slice(0, MAX_TOP_LEVEL_DIRS_SHOWN);
+  const topLevelSuffix = topLevelDirs.length > shownTopLevel.length ? `, +${topLevelDirs.length - shownTopLevel.length} khác` : '';
+  const shownNested = nestedPackages.slice(0, MAX_NESTED_PACKAGES_SHOWN);
+  const nestedSuffix = nestedPackages.length > shownNested.length ? `, +${nestedPackages.length - shownNested.length} khác` : '';
+
+  return [
+    `Thư mục cấp 1 của repo (đây là cwd thật khi verify chạy — goal-check.mjs luôn spawn \`verify\` từ repoRoot, KHÔNG từ thư mục con nào): ${shownTopLevel.join(', ') || '(trống)'}${topLevelSuffix}.`,
+    shownNested.length
+      ? `Thư mục con có \`package.json\` RIÊNG (nested package — lệnh test/verify của phần này phải cd/prefix vào đúng thư mục, VD "cd ${shownNested[0]} && npm test", KHÔNG chạy được thẳng từ repoRoot): ${shownNested.join(', ')}${nestedSuffix}.`
+      : 'Không có thư mục con nào mang `package.json` riêng — mọi lệnh verify chạy thẳng từ repoRoot là an toàn.',
+  ].join('\n');
+}
+
+function buildDiscoveryPrompt(work, view, priorScoutNotes, repoRoot) {
   const refs = Array.isArray(work.refs) && work.refs.length ? work.refs.join(', ') : '(none)';
   const deps = Array.isArray(work.deps) && work.deps.length ? work.deps.join(', ') : '(none)';
+  const relatedItems = buildRelatedItemsBlock(work, view);
+  const repoLayout = buildRepoLayoutBlock(repoRoot);
   const description =
     typeof work.description === 'string' && work.description.trim() ? work.description : '(không có)';
 
@@ -102,8 +214,9 @@ function buildDiscoveryPrompt(work, view) {
         .join('\n')
     : '(chưa phán lần nào)';
 
-  // STR8 (D4): mechanical graph/impact context for the judge's intentScore —
-  // read-only, never re-derived by the model. `view` is documented-optional
+  // work-item-priority-matrix D3 (was STR8 D4's intentScore): mechanical
+  // graph/impact context for the judge's impactScore — read-only, never
+  // re-derived by the model. `view` is documented-optional
   // above (P30 backward-compat, old 2-arg callers pass none); graphMetrics
   // throws on an undefined view (it hashes the view internally), so this
   // follows the exact same guard-on-`view`-truthiness idiom `qa`/`history`
@@ -123,30 +236,85 @@ Deps: ${deps}
 # Ngữ cảnh đồ thị (cơ học, chỉ để tham khảo, không tự suy lại)
 ${graphContext}
 
+# Cấu trúc thư mục repo (cơ học, để đề xuất verify đúng path chạy-được)
+${repoLayout}
+
 # Mô tả đầy đủ (nguyên văn lúc submit)
 ${description}
+
+# Task liên đới (nội dung thật của từng dependency, không chỉ id)
+${relatedItems}
 
 # Hỏi-đáp với người
 ${qa}
 
 # Các lần phán trước
 ${history}
+${
+  priorScoutNotes
+    ? `\n# Kết quả scout đã lưu (từ lần phán trước — dùng làm nền, có thể bổ sung thêm nếu bạn thấy chưa đủ)\n${priorScoutNotes}\n`
+    : ''
+}
+# Cách làm việc (theo thứ tự)
 
-Câu trả lời của người ở trên là QUYẾT ĐỊNH CUỐI CÙNG — KHÔNG hỏi lại một chủ đề
-đã được trả lời. Nếu câu trả lời đã đủ để thi công, verdict phải clear=true kèm
-một \`verify\` chạy được thật.
+1. **Làm sạch yêu cầu.** Đọc "Mô tả đầy đủ" ở trên, tự phát biểu lại trong
+   đầu cho hoàn chỉnh (đối tượng + hành động + phạm vi). Chỉ viết ra ở
+   \`titleProposal\`/\`descriptionProposal\` bên dưới nếu bản gốc thật sự
+   thiếu/mơ hồ và bản bạn viết lại RÕ RÀNG tốt hơn — không đổi chỉ để đổi.
+
+2. **Đọc "Task liên đới" ở trên.** Đây là nội dung thật (không chỉ id) của
+   từng dependency — dùng để hiểu phần nào của scope đã có người làm/quyết
+   định rồi, phần nào chưa.
+
+3. **Tự đánh giá.** Với dữ liệu đã có (mô tả + task liên đới + hỏi-đáp +
+   lịch sử phán trước + scout notes nếu có), item đã đủ rõ để thi công
+   chưa?
+
+4. **Nếu CHƯA đủ rõ và bạn có công cụ** — TỰ ĐI TÌM THÊM bằng chứng trước
+   khi kết luận unclear, chọn công cụ theo loại câu hỏi:
+   - Câu hỏi riêng của repo này (code hiện có làm gì, pattern nào đang
+     dùng, ai gọi ai) → \`Bash rg\`/Read/Grep/Glob, quét trực tiếp trong repo.
+   - Câu hỏi khái niệm/cơ chế/giải pháp kỹ thuật chung (không riêng gì repo
+     này — VD một thuật toán, một API bên ngoài, cách làm phổ biến cho một
+     vấn đề) → WebSearch/WebFetch, tra cứu ngoài thay vì đoán.
+   - Câu hỏi có NHIỀU nhánh độc lập (VD vừa cần hiểu code hiện có, vừa cần
+     tra khái niệm ngoài, hoặc 2+ phần code không liên quan nhau) → giao
+     việc qua Task cho nhiều subagent chạy SONG SONG thay vì tự làm tuần
+     tự từng phần — mỗi subagent nhận đúng một nhánh, gom kết quả lại rồi
+     mới phán. Nhánh đơn, phụ thuộc lẫn nhau (bước sau cần kết quả bước
+     trước) thì làm tuần tự bình thường, không ép song song.
+   Ngân sách: khoảng 5 lượt gọi công cụ nghiên cứu cho 1 lần phán (một lượt
+   Task giao song song tính là 1 lượt ở tầng này, dù bên trong nó có thể tự
+   gọi thêm) — ưu tiên chất lượng bằng chứng hơn số lượt gọi. CHỈ kết luận
+   unclear SAU KHI đã thử tìm thêm, không phải ngay khi thấy thiếu thông
+   tin.
+
+5. **Không có tool nào khả dụng** — bỏ qua bước 4, phán trên dữ liệu đã có,
+   không tự bịa bằng chứng, không giả vờ đã scout. Không có kết quả tìm
+   kiếm cũng là bằng chứng hợp lệ (nghĩa là chưa có gì liên quan) — không
+   phải lý do để bỏ qua bước 4.
+
+Câu trả lời của người ở trên (mục "Hỏi-đáp với người") là QUYẾT ĐỊNH CUỐI
+CÙNG — KHÔNG hỏi lại một chủ đề đã được trả lời. Nếu câu trả lời đã đủ để
+thi công, verdict phải clear=true kèm một \`verify\` chạy được thật.
 
 # Câu hỏi
 Item này đã đủ rõ để thi công chưa? Nếu đủ, đề xuất một lệnh \`verify\` chạy
-được thật để chứng minh việc đã xong. Nếu chưa đủ, nêu MỘT câu hỏi cụ thể cần
-người trả lời để làm rõ. Ngoài ra, dựa trên ngữ cảnh đồ thị ở trên, ước lượng
-mức độ khẩn cấp của item này bằng một số nguyên intentScore từ 0 đến 100
-(0 = không gấp, 100 = cực gấp/nên làm ngay) — trường này TÙY CHỌN, không ảnh
-hưởng đến quyết định clear/unclear.
+được thật để chứng minh việc đã xong — lệnh này LUÔN chạy từ repoRoot
+(xem "Cấu trúc thư mục repo" ở trên), KHÔNG BAO GIỜ từ một thư mục con giả
+định; nếu phần liên quan nằm trong thư mục có \`package.json\` riêng, lệnh
+phải tự cd/prefix vào đúng thư mục đó. Nếu chưa đủ — VÀ chỉ sau khi đã thử
+bước 4 ở trên — nêu MỘT câu hỏi cụ thể cần người trả lời để làm rõ, kèm tóm
+tắt ngắn những gì bạn đã thử tìm mà vẫn chưa đủ (để không ai phải scout lại
+từ đầu). Ngoài ra, ƯỚC LƯỢNG (không tính lại số \`blocks\` đã cho ở trên)
+mức độ item này LIÊN QUAN tới feature/release khác — có giải quyết/mở khoá
+được gì ngoài phạm vi hẹp của chính nó không — bằng một số nguyên
+impactScore từ 0 đến 100 (0 = biệt lập, 100 = ảnh hưởng rất rộng); trường
+này TÙY CHỌN, không ảnh hưởng đến quyết định clear/unclear.
 
 # Định dạng trả lời
 Trả lời DUY NHẤT bằng một dòng JSON, không kèm chữ nào khác:
-{"clear": boolean, "question": string (chỉ khi clear=false), "verify": string (chỉ khi clear=true), "intentScore": number nguyên từ 0 đến 100 (tùy chọn)}
+{"clear": boolean, "question": string (chỉ khi clear=false), "verify": string (chỉ khi clear=true), "impactScore": number nguyên từ 0 đến 100 (tùy chọn), "titleProposal": string (tùy chọn, chỉ khi bản gốc thật sự cần sửa), "descriptionProposal": string (tùy chọn, chỉ khi bản gốc thật sự cần sửa)}
 `;
 }
 
@@ -164,24 +332,99 @@ Trả lời DUY NHẤT bằng một dòng JSON, không kèm chữ nào khác:
  * prompt can carry description/ask-answer/prior-verdict context. Omitting it
  * (old 2-arg calls) still works: `buildDiscoveryPrompt` degrades every added
  * section to a placeholder instead of throwing.
+ *
+ * `scoutContext` (tsk-g18, optional, additive): `{ repoRoot, docsRef }` —
+ * when supplied, this call reads any already-persisted scout notes
+ * (`readScoutNotes`) for the prompt and, when none exist yet, captures this
+ * call's own `Bash(rg:*)` transcript and persists it (Cách B — the judge
+ * process itself never gains a Write grant; the parent, this function via
+ * `runJudgeExecutor`, does the writing). Omitted (every pre-tsk-g18 caller,
+ * including every existing test) keeps this function byte-identical.
+ *
+ * `fgosDir` (tsk-2yp, optional, additive): passed straight through to
+ * `runJudgeExecutor` alongside the hardcoded `'judge-discovery'` capacity id
+ * — lets an operator route this call through `capacities.judge-discovery`
+ * (tsk-62v precedence) instead of always `executors.judge`. Omitted (every
+ * pre-tsk-2yp caller) keeps this function byte-identical: no configured
+ * capacity means resolution falls through to `executors.judge` regardless.
  */
-export function judgeDiscovery(work, cfg, view) {
+export function judgeDiscovery(work, cfg, view, scoutContext, fgosDir) {
   try {
     const tier = work?.tier ?? DEFAULTS.tier;
     const model = modelForTier(cfg, tier);
-    const prompt = buildDiscoveryPrompt(work, view);
+    const priorScoutNotes = scoutContext ? readScoutNotes(scoutContext.repoRoot, scoutContext.docsRef) : '';
+    const prompt = buildDiscoveryPrompt(work, view, priorScoutNotes, scoutContext?.repoRoot);
     const stricterPrompt = prompt + JUDGE_STRICT_JSON_SUFFIX;
 
-    const verdict = runJudgeExecutor(cfg, model, prompt, stricterPrompt);
+    // tsk-4rd (route A): capture is now ALWAYS attempted when a
+    // scoutContext is given, never gated on `!priorScoutNotes`. Before this,
+    // a thin first-round scout note got reused forever — every later
+    // discover call on the same item saw the exact same (possibly
+    // insufficient) evidence, which is the direct cause of a stale item
+    // getting the same "unclear" verdict round after round (dogfood
+    // observed: 15-round discover-loop run, 0 cleared, 4 parked). Each
+    // call's own transcript now overwrites scout-notes.md with THIS round's
+    // fresh evidence (`writeScoutNotes` already overwrites wholesale) — a
+    // round that finds nothing new just leaves the file as the prior
+    // round's evidence, since `runJudgeExecutor` only writes when it
+    // actually captured entries.
+    const scout = scoutContext ? { repoRoot: scoutContext.repoRoot, docsRef: scoutContext.docsRef, capture: true } : undefined;
+    // tsk-4rd (route A, discussion point 4 "đo trước khi ép"): the recipe
+    // prompt (buildDiscoveryPrompt) NAMES a ~5-call research budget but
+    // nothing enforces it — before adding a hard cap (--max-turns or
+    // similar), measure real usage first. `scoutCaptureOut` is the mutable
+    // out-param `runJudgeExecutor` now optionally accepts (its own comment
+    // explains the threading) — after the call, `.entries.length` is
+    // exactly the count of scoutable tool calls (`extractScoutTranscript`'s
+    // widened set: Bash(rg:*)/Read/Grep/Glob/WebSearch/WebFetch/Task/Agent)
+    // this particular attempt made, whether or not it ended up unclear.
+    const scoutCaptureOut = scoutContext ? {} : undefined;
+    const failDetailOut = {};
+    const verdict = runJudgeExecutor(cfg, model, prompt, stricterPrompt, scout, 'judge-discovery', fgosDir, scoutCaptureOut, failDetailOut);
     if (!verdict || typeof verdict.clear !== 'boolean') {
+      // tsk-5d2 D1-D3: debug-only, never load-bearing on the fallback
+      // returned below. `verdict === null` means judge-executor already
+      // knows which of its two branches fired (`failDetailOut.reason`);
+      // a non-null-but-wrong-shape verdict is this function's OWN
+      // fail-safe branch (B3), logged with the parsed object itself.
+      if (verdict === null) {
+        appendJudgeFailLog(fgosDir, work?.id, failDetailOut);
+      } else {
+        appendJudgeFailLog(fgosDir, work?.id, { reason: 'shape-invalid', verdict: JSON.stringify(verdict) });
+      }
       return { clear: false, question: DEFAULT_UNCLEAR_QUESTION };
     }
 
-    // STR8 (D4): intentScore rides on EITHER outcome — it never gates or
-    // changes the clear/unclear decision. An invalid/missing value is
-    // silently omitted (fail-safe discipline, same as `verify`/`question`
-    // above), never thrown, on both return sites below.
-    const intentScore = Number.isInteger(verdict.intentScore) ? verdict.intentScore : undefined;
+    // work-item-priority-matrix D3 (was STR8 D4's intentScore): rides on
+    // EITHER outcome — it never gates or changes the clear/unclear
+    // decision. An invalid/missing value is silently omitted (fail-safe
+    // discipline, same as `verify`/`question` above), never thrown, on
+    // both return sites below.
+    const impactScore = Number.isInteger(verdict.impactScore) ? verdict.impactScore : undefined;
+
+    // Mechanical (never model-supplied, unlike impactScore/titleProposal
+    // above) — rides on either outcome the same way regardless, purely for
+    // `addDiscovery`'s existing spread to persist per call so real usage
+    // across the backlog can be read back later (`view.discovery[id]`)
+    // before deciding whether discussion point 4's hard cap is even needed.
+    const researchToolCallCount = Array.isArray(scoutCaptureOut?.entries) ? scoutCaptureOut.entries.length : undefined;
+
+    // tsk-4rd (route A, recipe step 1 "làm sạch yêu cầu"): PROPOSALS only —
+    // rides on either outcome exactly like `impactScore`, never gates
+    // clear/unclear, and is never applied to `work.title`/`work.description`
+    // by this function. Auto-overwriting a user-authored field is a product
+    // decision this item didn't make (review-audit-self-decision: don't
+    // silently undo a user decision) — `resolveDiscovery`'s existing
+    // `addDiscovery(dir, { id, ...verdict })` spread already persists
+    // whichever of these two fields are present, visible via
+    // `view.discovery[id]`/`fgos show <id>`, for a person to read and apply
+    // by hand (`fgos edit <id> --title/--description`) — no separate write.
+    const titleProposal =
+      typeof verdict.titleProposal === 'string' && verdict.titleProposal.trim() ? verdict.titleProposal.trim() : undefined;
+    const descriptionProposal =
+      typeof verdict.descriptionProposal === 'string' && verdict.descriptionProposal.trim()
+        ? verdict.descriptionProposal.trim()
+        : undefined;
 
     if (!verdict.clear) {
       const question =
@@ -189,8 +432,17 @@ export function judgeDiscovery(work, cfg, view) {
           ? verdict.question
           : DEFAULT_UNCLEAR_QUESTION;
       const out = { clear: false, question };
-      if (intentScore !== undefined) {
-        out.intentScore = intentScore;
+      if (impactScore !== undefined) {
+        out.impactScore = impactScore;
+      }
+      if (titleProposal !== undefined) {
+        out.titleProposal = titleProposal;
+      }
+      if (descriptionProposal !== undefined) {
+        out.descriptionProposal = descriptionProposal;
+      }
+      if (researchToolCallCount !== undefined) {
+        out.researchToolCallCount = researchToolCallCount;
       }
       return out;
     }
@@ -199,11 +451,23 @@ export function judgeDiscovery(work, cfg, view) {
     if (typeof verdict.verify === 'string' && verdict.verify.trim()) {
       out.verify = verdict.verify;
     }
-    if (intentScore !== undefined) {
-      out.intentScore = intentScore;
+    if (impactScore !== undefined) {
+      out.impactScore = impactScore;
+    }
+    if (titleProposal !== undefined) {
+      out.titleProposal = titleProposal;
+    }
+    if (descriptionProposal !== undefined) {
+      out.descriptionProposal = descriptionProposal;
+    }
+    if (researchToolCallCount !== undefined) {
+      out.researchToolCallCount = researchToolCallCount;
     }
     return out;
-  } catch {
+  } catch (err) {
+    // tsk-5d2 D1-D3: same debug-only, non-load-bearing logging — the
+    // returned fallback below is unchanged from before this item.
+    appendJudgeFailLog(fgosDir, work?.id, { reason: 'outer-exception', message: err?.message, stack: err?.stack });
     return { clear: false, question: DEFAULT_UNCLEAR_QUESTION };
   }
 }
@@ -213,6 +477,22 @@ export function judgeDiscovery(work, cfg, view) {
  * resolve the verdict — the ONE function both the sync `discover` verb and
  * the async runner sweep call (D5/D13), so the clarify-loop logic never
  * duplicates.
+ *
+ * TRUST SIGNAL (tsk-ozl D1-D3): before judging blind, check whether the
+ * item already carries a committed, non-empty CONTEXT.md under its
+ * `docsRef` (`readLockedContext`, shared with decompose.mjs's own
+ * locked-context read). When it does, decisions are already locked and
+ * approved — re-judging via the model can only re-derive a possibly
+ * contradicting verdict, including re-asking a question the human just
+ * answered by writing CONTEXT.md in the first place (confirmed live,
+ * tsk-ozl 2026-07-31: exactly this happened). Skip the model call, log a
+ * `discovery skip:` decision for the audit trail (mirrors
+ * `logDecomposeVerdict`'s pattern in decompose.mjs), and advance the item
+ * directly — same content-based signal for BOTH the sync `session` caller
+ * and the runner's RUL19 sweep (`role: 'runner'`), never a role branch: a
+ * sweep that finds a real committed CONTEXT.md on an untouched item trusts
+ * it too, which also covers the crashed-mid-explore-session case RUL19
+ * exists to catch.
  *
  * Per D3/D6: the discovery record is written for BOTH outcomes (clear and
  * unclear), never only the failure path. A clear verdict moves the item to
@@ -227,31 +507,100 @@ export function judgeDiscovery(work, cfg, view) {
  * the runner's clarify sweep passes `'runner'`, the sync `discover` verb
  * passes `'session'`. Optional; a clear verdict's `moveStage` only stamps it
  * on the settlement record when a caller actually supplies it.
+ *
+ * `callerVerdict` (tsk-27y D1/D2, optional, additive): `{clear: boolean,
+ * question?, verify?}` — when supplied (`fgos discover --verdict ...`),
+ * used INSTEAD of calling `judgeDiscovery`, checked before the
+ * `readLockedContext` trust-signal above (explicit beats heuristic — the
+ * whole point of this protocol: a live session that already reasoned about
+ * clarity, fgos-exploring, should never fall through to either a blind
+ * subprocess judge or a second heuristic guess). Omitted (every pre-tsk-27y
+ * caller, including the runner sweep at `loop.mjs`, which calls
+ * through argv-less, in-process) keeps this function byte-identical to
+ * before.
  */
-export function resolveDiscovery(dir, id, cfg, role) {
+export function resolveDiscovery(dir, id, cfg, role, callerVerdict) {
   const view = listWork(dir);
   const work = view.work[id];
   if (!work) {
     throw new StoreError('validation', `resolveDiscovery: work "${id}" not found.`);
   }
 
-  const verdict = judgeDiscovery(work, cfg, view);
+  let verdict;
+  if (callerVerdict) {
+    verdict = { clear: callerVerdict.clear === true };
+    if (verdict.clear) {
+      if (typeof callerVerdict.verify === 'string' && callerVerdict.verify.trim()) {
+        verdict.verify = callerVerdict.verify;
+      }
+    } else {
+      verdict.question =
+        typeof callerVerdict.question === 'string' && callerVerdict.question.trim()
+          ? callerVerdict.question
+          : DEFAULT_UNCLEAR_QUESTION;
+    }
+    addDecision(dir, {
+      id,
+      text: `discovery caller-supplied: clear=${verdict.clear}`,
+      source: 'resolveDiscovery',
+      rationale:
+        'tsk-27y D2: caller-supplied verdict — session already reasoned live (fgos-exploring), skipping judgeDiscovery subprocess and the readLockedContext trust-signal check',
+    });
+  } else {
+    const repoRoot = path.dirname(dir);
+    const lockedContext = readLockedContext(repoRoot, work.docsRef);
+    if (lockedContext) {
+      addDecision(dir, {
+        id,
+        text: 'discovery skip: trusted committed CONTEXT.md, no model call',
+        source: 'resolveDiscovery',
+        rationale:
+          'docsRef points at a non-empty CONTEXT.md (D2 trust signal, tsk-ozl) — skipping judgeDiscovery to avoid re-judging a decision already locked and approved',
+      });
+      addDiscovery(dir, { id, clear: true });
+      // Real verify (tsk-19j D1/D11, closes gap 2): `gates[id].contextApprove.
+      // verify` is the real command fgos-exploring's own Gate recorded for
+      // this item when it approved CONTEXT.md — preferred over the retired
+      // placeholder whenever a Track A approve record actually exists (an item
+      // that never went through that Gate, e.g. from before this item, keeps
+      // today's fallback unchanged).
+      moveStage(dir, {
+        id,
+        to: 'decompose',
+        expectedStage: 'clarify',
+        verify: view.gates?.[id]?.contextApprove?.verify ?? FALLBACK_VERIFY,
+        role,
+      });
+      return { outcome: 'clear', id, verdict: { clear: true, skipped: true } };
+    }
+
+    verdict = judgeDiscovery(work, cfg, view, { repoRoot, docsRef: work.docsRef }, dir);
+  }
+
   addDiscovery(dir, { id, ...verdict });
 
-  // STR8 (D4): a SECOND standard-door write, never merged into moveStage's or
-  // putInAwaiting's payload below — intent is scored on EITHER outcome (an
-  // unclear verdict still gets scored if the judge produced one; the item
-  // just doesn't advance stage). Wrapped in its own try/catch so a write-door
-  // rejection (e.g. a legacy item shape editWork's validateWork rejects)
-  // never aborts the clarify/unclear resolution that follows — same
-  // file-level fail-safe discipline this module's header states for
+  // work-item-priority-matrix D6/D7 (was STR8 D4's intentScore -> work.intent):
+  // a SECOND standard-door write, never merged into moveStage's or
+  // putInAwaiting's payload below — scored on EITHER outcome (an unclear
+  // verdict still gets scored if the judge produced one; the item just
+  // doesn't advance stage). D7: `intent` is retired IN PLACE — this is the
+  // rough clarify-stage pass computing `priority` instead (effort is not
+  // yet known here, so it defaults to EFFORT_FLOOR inside computePriority;
+  // `decompose`'s refined pass recomputes once effort/blast-radius are
+  // known, per plan.md Phase B). Wrapped in its own try/catch so a
+  // write-door rejection (e.g. a legacy item shape editWork's validateWork
+  // rejects) never aborts the clarify/unclear resolution that follows —
+  // same file-level fail-safe discipline this module's header states for
   // judgeDiscovery itself.
-  if (Number.isInteger(verdict.intentScore)) {
-    try {
-      editWork(dir, { id, patch: { intent: verdict.intentScore }, role });
-    } catch {
-      // Swallowed intentionally — see comment above.
-    }
+  try {
+    const impact = computeImpact({
+      blocks: blocksForItem(work, view),
+      semanticRelatedness: Number.isInteger(verdict.impactScore) ? verdict.impactScore : 0,
+    });
+    const priority = computePriority({ impact, urgent: work.urgent, risk: work.risk });
+    editWork(dir, { id, patch: { priority }, role });
+  } catch {
+    // Swallowed intentionally — see comment above.
   }
 
   if (verdict.clear) {
@@ -287,9 +636,23 @@ export function resolveDiscovery(dir, id, cfg, role) {
     return { outcome: 'clear', id, verdict };
   }
 
+  // tsk-wcl: `putInAwaiting` always attempts a real `awaiting-human` status
+  // transition (moveWork), and fsm.mjs has no self-transition edge for it —
+  // calling it on an item that is ALREADY `awaiting-human` (re-running
+  // `fgos discover <id>` directly on a still-parked item, bypassing the
+  // pool picker that normally never re-selects a parked item) throws
+  // StoreError and the whole call dies, losing this round's verdict
+  // entirely. `addDiscovery` above already recorded the fresh verdict
+  // unconditionally — only the redundant re-park is guarded here, so a
+  // second consecutive unclear call on an already-parked item still
+  // succeeds (with the item staying parked, its discovery history gaining
+  // the new entry) instead of throwing.
+  //
   // statusAtAsk (claim-lock §5.1): `work.status` read at function entry,
   // before this park — `doing` when a pick claim is held through clarify,
   // `todo` otherwise. answerAwaiting resumes to this same status later.
-  putInAwaiting(dir, { id, ask: verdict.question, statusAtAsk: work.status });
+  if (work.status !== 'awaiting-human') {
+    putInAwaiting(dir, { id, ask: verdict.question, statusAtAsk: work.status });
+  }
   return { outcome: 'unclear', id, verdict };
 }

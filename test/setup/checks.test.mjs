@@ -11,8 +11,11 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync, spawnSync } from 'node:child_process';
 
-import { DOCTOR_CHECKS, integrationScriptPath, mainCheckoutHookWired } from '../../src/setup/checks.mjs';
+import { DOCTOR_CHECKS, FIX_REGISTRATIONS, integrationScriptPath, mainCheckoutHookWired, resolveMainCheckout } from '../../src/setup/checks.mjs';
 import { DEFAULT_RUNNER_CONFIG } from '../../src/runner/dispatch.mjs';
+import { DEFAULT_LEVEL } from '../../src/state/gate-bypass.mjs';
+import { DEFAULT_CLEANUP_TTL_DAYS } from '../../src/setup/registrations.mjs';
+import { initStore, addWork } from '../../src/state/store.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FGOS = path.resolve(__dirname, '../../bin/fgos.mjs');
@@ -27,13 +30,87 @@ function checkById(id) {
   return entry;
 }
 
+function fixById(id) {
+  const entry = FIX_REGISTRATIONS.find((f) => f.id === id);
+  assert.ok(entry, `FIX_REGISTRATIONS is missing "${id}"`);
+  return entry;
+}
+
 // ─── Unit tests: DOCTOR_CHECKS ─────────────────────────────────────────────
 
-test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-checkout-hook-wired', () => {
+test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-checkout-hook-wired, tool-registry-configured, config-awareness, dependencies-installed, gate-bypass-configured, and root-drift', () => {
   assert.deepEqual(
     DOCTOR_CHECKS.map((c) => c.id).sort(),
-    ['config-not-stale', 'main-checkout-hook-wired', 'node-version-and-git', 'shell-integration-sourced'].sort(),
+    ['config-not-stale', 'main-checkout-hook-wired', 'node-version-and-git', 'shell-integration-sourced', 'tool-registry-configured', 'config-awareness', 'dependencies-installed', 'gate-bypass-configured', 'root-drift'].sort(),
   );
+});
+
+test('root-drift passes when no fgw/<root> branch is ahead of its target', () => {
+  const dir = initRepo('checks-root-drift-clean-');
+  execFileSync('git', ['checkout', '-q', '-b', 'fgw/root'], { cwd: dir });
+  execFileSync('git', ['checkout', '-q', 'main'], { cwd: dir });
+  const fgosDir = path.join(dir, '.fgos');
+  initStore(fgosDir);
+  addWork(fgosDir, { id: 'root', title: 'root', kind: 'feature', risk: 'light', verify: 'true', status: 'todo', deps: [], refs: [] });
+  addWork(fgosDir, { id: 'leaf', title: 'leaf', kind: 'feature', risk: 'light', verify: 'true', status: 'todo', deps: [], refs: [], parent: 'root' });
+
+  const { passed, message } = checkById('root-drift').check(dir);
+  assert.equal(passed, true);
+  assert.match(message, /no root branch is drifted/);
+  fs.rmSync(dir, { recursive: true, force: true });
+});
+
+test('root-drift fails and names the drifted root when fgw/<root> is ahead of main', () => {
+  const dir = initRepo('checks-root-drift-dirty-');
+  execFileSync('git', ['checkout', '-q', '-b', 'fgw/root'], { cwd: dir });
+  fs.writeFileSync(path.join(dir, 'child-work.txt'), 'merged leaf work\n');
+  execFileSync('git', ['add', 'child-work.txt'], { cwd: dir });
+  execFileSync('git', ['commit', '-qm', 'leaf merged into root'], { cwd: dir });
+  execFileSync('git', ['checkout', '-q', 'main'], { cwd: dir });
+  const fgosDir = path.join(dir, '.fgos');
+  initStore(fgosDir);
+  addWork(fgosDir, { id: 'root', title: 'root', kind: 'feature', risk: 'light', verify: 'true', status: 'todo', deps: [], refs: [] });
+  addWork(fgosDir, { id: 'leaf', title: 'leaf', kind: 'feature', risk: 'light', verify: 'true', status: 'todo', deps: [], refs: [], parent: 'root' });
+
+  const { passed, message } = checkById('root-drift').check(dir);
+  assert.equal(passed, false);
+  assert.match(message, /root/);
+  assert.match(message, /fgos sync-root/);
+  fs.rmSync(dir, { recursive: true, force: true });
+});
+
+test('dependencies-installed passes when package.json has no dependencies field (pre-tsk-slq behavior)', () => {
+  const tmp = mkTemp('fgos-deps-check-');
+  fs.writeFileSync(path.join(tmp, 'package.json'), JSON.stringify({ name: 'x' }));
+  const { passed, message } = checkById('dependencies-installed').check(tmp);
+  assert.equal(passed, true);
+  assert.match(message, /no runtime dependencies declared/);
+  fs.rmSync(tmp, { recursive: true, force: true });
+});
+
+test('dependencies-installed fails when a declared dependency is missing from node_modules', () => {
+  const tmp = mkTemp('fgos-deps-check-');
+  fs.writeFileSync(path.join(tmp, 'package.json'), JSON.stringify({ name: 'x', dependencies: { yaml: '^2.9.0' } }));
+  const { passed, message } = checkById('dependencies-installed').check(tmp);
+  assert.equal(passed, false);
+  assert.match(message, /missing from node_modules: yaml/);
+  fs.rmSync(tmp, { recursive: true, force: true });
+});
+
+test('dependencies-installed passes when every declared dependency is present in node_modules', () => {
+  const tmp = mkTemp('fgos-deps-check-');
+  fs.writeFileSync(path.join(tmp, 'package.json'), JSON.stringify({ name: 'x', dependencies: { yaml: '^2.9.0' } }));
+  fs.mkdirSync(path.join(tmp, 'node_modules', 'yaml'), { recursive: true });
+  const { passed, message } = checkById('dependencies-installed').check(tmp);
+  assert.equal(passed, true);
+  assert.match(message, /1 dependency installed/);
+  fs.rmSync(tmp, { recursive: true, force: true });
+});
+
+test('tool-registry-configured always passes — inactive is a clean skip, never a failure', () => {
+  const { passed, message } = checkById('tool-registry-configured').check(process.cwd());
+  assert.equal(passed, true);
+  assert.equal(typeof message, 'string');
 });
 
 test('node-version-and-git passes under the current process (real Node, real git)', () => {
@@ -95,10 +172,31 @@ test('config-not-stale reports failed/not-configured, without creating .fgos-run
 });
 
 test('config-not-stale passes when the existing config already has every default key', () => {
+  // Written as the SHARED file directly, not the legacy .fgos-runner.json:
+  // a legacy file structurally can never carry a `gateBypass` key (D1/D3,
+  // tsk-2qz-2), so it can no longer satisfy "every default key" once
+  // gateBypass is a registered default alongside runner.
   const cwd = mkTemp('doctor-config-full-');
-  fs.writeFileSync(path.join(cwd, '.fgos-runner.json'), JSON.stringify(DEFAULT_RUNNER_CONFIG));
+  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+  fs.writeFileSync(
+    path.join(cwd, '.fgos', 'config.json'),
+    JSON.stringify({
+      runner: DEFAULT_RUNNER_CONFIG,
+      gateBypass: { level: 'off' },
+      cleanup: { ttlDays: DEFAULT_CLEANUP_TTL_DAYS },
+    }),
+  );
   const { passed } = checkById('config-not-stale').check(cwd);
   assert.equal(passed, true);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+test('config-not-stale fails when the legacy-only .fgos-runner.json is complete but the shared file has no gateBypass key', () => {
+  const cwd = mkTemp('doctor-config-legacy-only-');
+  fs.writeFileSync(path.join(cwd, '.fgos-runner.json'), JSON.stringify(DEFAULT_RUNNER_CONFIG));
+  const { passed, message } = checkById('config-not-stale').check(cwd);
+  assert.equal(passed, false);
+  assert.match(message, /gateBypass/);
   fs.rmSync(cwd, { recursive: true, force: true });
 });
 
@@ -108,6 +206,173 @@ test('config-not-stale fails when the existing config is missing a default key',
   const { passed, message } = checkById('config-not-stale').check(cwd);
   assert.equal(passed, false);
   assert.match(message, /stale config/);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+// ─── gate-bypass-configured (docs/history/doctor-fix-gate-bypass/CONTEXT.md
+// D1/D3, tsk-2qz-2): the registry's first entry to register all three
+// capabilities (check + configDefault + fix). check/fix here are both
+// keyed to "is config.gateBypass.level present and a recognized LEVEL",
+// deliberately distinct from config-not-stale's generic "key present at
+// all" scan above (a malformed-but-present level is never "missing").
+
+test('gate-bypass-configured check fails when the shared file has no gateBypass key at all', () => {
+  const cwd = mkTemp('doctor-gatebypass-absent-');
+  const { passed, message } = checkById('gate-bypass-configured').check(cwd);
+  assert.equal(passed, false);
+  assert.match(message, /missing or not a recognized level/);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+test('gate-bypass-configured check fails when gateBypass.level is present but not a recognized level', () => {
+  const cwd = mkTemp('doctor-gatebypass-bad-');
+  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ gateBypass: { level: 'total' } }));
+  const { passed, message } = checkById('gate-bypass-configured').check(cwd);
+  assert.equal(passed, false);
+  assert.match(message, /missing or not a recognized level/);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+test('gate-bypass-configured check passes when gateBypass.level is a recognized level', () => {
+  const cwd = mkTemp('doctor-gatebypass-ok-');
+  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ gateBypass: { level: 'standard' } }));
+  const { passed, message } = checkById('gate-bypass-configured').check(cwd);
+  assert.equal(passed, true);
+  assert.match(message, /"standard"/);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+test('gate-bypass-configured fix writes a default level when the shared file has no gateBypass key, preserving other keys', () => {
+  const cwd = mkTemp('doctor-gatebypass-fix-absent-');
+  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ runner: { timeoutMs: 5000 } }));
+  const { changed, message } = fixById('gate-bypass-configured').fix(cwd);
+  assert.equal(changed, true);
+  assert.match(message, new RegExp(`"${DEFAULT_LEVEL}"`));
+  const written = JSON.parse(fs.readFileSync(path.join(cwd, '.fgos', 'config.json'), 'utf8'));
+  assert.deepEqual(written.gateBypass, { level: DEFAULT_LEVEL });
+  assert.deepEqual(written.runner, { timeoutMs: 5000 });
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+test('gate-bypass-configured fix repairs a malformed level back to the default', () => {
+  const cwd = mkTemp('doctor-gatebypass-fix-bad-');
+  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ gateBypass: { level: 'total' } }));
+  const { changed } = fixById('gate-bypass-configured').fix(cwd);
+  assert.equal(changed, true);
+  const written = JSON.parse(fs.readFileSync(path.join(cwd, '.fgos', 'config.json'), 'utf8'));
+  assert.equal(written.gateBypass.level, DEFAULT_LEVEL);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+test('gate-bypass-configured fix is idempotent: reports unchanged and never rewrites when level is already valid', () => {
+  const cwd = mkTemp('doctor-gatebypass-fix-noop-');
+  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+  const sharedPath = path.join(cwd, '.fgos', 'config.json');
+  fs.writeFileSync(sharedPath, JSON.stringify({ gateBypass: { level: 'heavy' } }));
+  const before = fs.statSync(sharedPath).mtimeMs;
+  const { changed, message } = fixById('gate-bypass-configured').fix(cwd);
+  assert.equal(changed, false);
+  assert.match(message, /already "heavy"/);
+  assert.equal(fs.statSync(sharedPath).mtimeMs, before);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+test('fgos doctor --fix (CLI e2e) actually bootstraps gateBypass.level via the real fix', () => {
+  const cwd = mkTemp('doctor-cli-fix-gatebypass-');
+  execFileSync('git', ['init', '-q'], { cwd, encoding: 'utf8' });
+  const result = spawnSync(process.execPath, [FGOS, 'doctor', '--fix'], { cwd, encoding: 'utf8' });
+  assert.equal(result.status, 0, `fgos doctor --fix failed: ${result.stderr}`);
+  const { data } = JSON.parse(result.stdout);
+  const fixedEntry = data.fixed.find((f) => f.id === 'gate-bypass-configured');
+  assert.ok(fixedEntry, 'doctor --fix did not report the gate-bypass-configured fix');
+  assert.equal(fixedEntry.changed, true);
+  const written = JSON.parse(fs.readFileSync(path.join(cwd, '.fgos', 'config.json'), 'utf8'));
+  assert.equal(written.gateBypass.level, DEFAULT_LEVEL);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+// ─── config-awareness (docs/history/global-project-config-awareness/ ──────
+// CONTEXT.md D1): always passes (informational, read-only, same contract as
+// tool-registry-configured) -- only the message and `active` distinguish
+// which level is in play. Every case overrides HOME (same pattern the
+// shell-integration-sourced tests above already use) so this never touches
+// the real ~/.fgos/config.json; project config is checked at the temp cwd's
+// own .fgos-runner.json, matching describeConfigAwareness's real defaults.
+
+function withHome(homeDir, fn) {
+  const prevHome = process.env.HOME;
+  process.env.HOME = homeDir;
+  try {
+    return fn();
+  } finally {
+    process.env.HOME = prevHome;
+  }
+}
+
+test('config-awareness is registered on DOCTOR_CHECKS and always passes', () => {
+  const { passed, message } = checkById('config-awareness').check(process.cwd());
+  assert.equal(passed, true);
+  assert.equal(typeof message, 'string');
+});
+
+test('config-awareness reports "none" when neither project nor global config exists', () => {
+  const homeDir = mkTemp('doctor-awareness-none-home-');
+  const cwd = mkTemp('doctor-awareness-none-cwd-');
+  withHome(homeDir, () => {
+    const { passed, message } = checkById('config-awareness').check(cwd);
+    assert.equal(passed, true);
+    assert.match(message, /no config at either level/);
+  });
+  fs.rmSync(homeDir, { recursive: true, force: true });
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+test('config-awareness reports project active with global not present, when only project config exists', () => {
+  const homeDir = mkTemp('doctor-awareness-project-only-home-');
+  const cwd = mkTemp('doctor-awareness-project-only-cwd-');
+  fs.writeFileSync(path.join(cwd, '.fgos-runner.json'), '{}');
+  withHome(homeDir, () => {
+    const { passed, message } = checkById('config-awareness').check(cwd);
+    assert.equal(passed, true);
+    assert.match(message, /active: project/);
+    assert.match(message, /global config not present/);
+  });
+  fs.rmSync(homeDir, { recursive: true, force: true });
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+test('config-awareness reports project active with global also present, when both exist', () => {
+  const homeDir = mkTemp('doctor-awareness-both-home-');
+  fs.mkdirSync(path.join(homeDir, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(homeDir, '.fgos', 'config.json'), '{}');
+  const cwd = mkTemp('doctor-awareness-both-cwd-');
+  fs.writeFileSync(path.join(cwd, '.fgos-runner.json'), '{}');
+  withHome(homeDir, () => {
+    const { passed, message } = checkById('config-awareness').check(cwd);
+    assert.equal(passed, true);
+    assert.match(message, /active: project/);
+    assert.match(message, /global config also present/);
+  });
+  fs.rmSync(homeDir, { recursive: true, force: true });
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+test('config-awareness falls back to global active with project not present, when only global config exists', () => {
+  const homeDir = mkTemp('doctor-awareness-global-only-home-');
+  fs.mkdirSync(path.join(homeDir, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(homeDir, '.fgos', 'config.json'), '{}');
+  const cwd = mkTemp('doctor-awareness-global-only-cwd-');
+  withHome(homeDir, () => {
+    const { passed, message } = checkById('config-awareness').check(cwd);
+    assert.equal(passed, true);
+    assert.match(message, /active: global/);
+    assert.match(message, /project config not present/);
+  });
+  fs.rmSync(homeDir, { recursive: true, force: true });
   fs.rmSync(cwd, { recursive: true, force: true });
 });
 
@@ -245,22 +510,214 @@ test('fgos setup --pretty prints colored ANSI text describing what it did, not J
   assert.equal(result.status, 0, result.stderr);
   assert.ok(result.stdout.includes('\x1b['), 'expected ANSI escape codes in --pretty output');
   assert.throws(() => JSON.parse(result.stdout), 'expected --pretty output to NOT be valid JSON');
-  assert.ok(result.stdout.includes('.fgos-runner.json'), 'expected --pretty output to describe the config file it touched');
+  assert.ok(result.stdout.includes('.fgos/config.json'), 'expected --pretty output to describe the config file it touched');
   fs.rmSync(cwd, { recursive: true, force: true });
   fs.rmSync(homeDir, { recursive: true, force: true });
 });
 
-test('fgos doctor against a fresh cwd with no .fgos-runner.json never creates that file (read-only proof)', () => {
+test('fgos doctor against a fresh cwd with no runner config never creates the shared config file (read-only proof)', () => {
   const cwd = mkTemp('doctor-cli-readonly-');
   const homeDir = mkTemp('doctor-cli-readonly-home-');
-  const configPath = path.join(cwd, '.fgos-runner.json');
+  const configPath = path.join(cwd, '.fgos', 'config.json');
   assert.equal(fs.existsSync(configPath), false);
   const result = spawnSync(process.execPath, [FGOS, 'doctor'], { cwd, encoding: 'utf8', env: { ...process.env, HOME: homeDir } });
   assert.equal(result.status, 0, result.stderr);
-  assert.equal(fs.existsSync(configPath), false, 'fgos doctor must never create .fgos-runner.json');
+  assert.equal(fs.existsSync(configPath), false, 'fgos doctor must never create .fgos/config.json');
   const envelope = JSON.parse(result.stdout);
   const configCheck = envelope.data.checks.find((c) => c.id === 'config-not-stale');
   assert.equal(configCheck.passed, false);
   fs.rmSync(cwd, { recursive: true, force: true });
   fs.rmSync(homeDir, { recursive: true, force: true });
+});
+
+// ─── D2/D3: the shell-integration path is canonicalized to the main checkout ─
+
+function initRepo(prefix) {
+  const dir = mkTemp(prefix);
+  execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: dir });
+  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: dir });
+  execFileSync('git', ['config', 'user.name', 'Test'], { cwd: dir });
+  fs.writeFileSync(path.join(dir, 'seed.txt'), 'seed\n');
+  execFileSync('git', ['add', 'seed.txt'], { cwd: dir });
+  execFileSync('git', ['commit', '-qm', 'seed'], { cwd: dir });
+  return dir;
+}
+
+test('resolveMainCheckout from inside a linked worktree resolves the main checkout, not the worktree', () => {
+  const main = initRepo('checks-main-');
+  const wt = path.join(mkTemp('checks-wt-parent-'), 'wt');
+  execFileSync('git', ['worktree', 'add', '-q', '-b', 'side', wt], { cwd: main });
+
+  // The distinction the dead-source-line bug turned on: --show-toplevel would
+  // report the worktree itself here, which is why each worktree used to earn
+  // its own shell-profile line.
+  assert.equal(
+    fs.realpathSync(execFileSync('git', ['rev-parse', '--show-toplevel'], { cwd: wt, encoding: 'utf8' }).trim()),
+    fs.realpathSync(wt),
+  );
+  assert.equal(fs.realpathSync(resolveMainCheckout(wt)), fs.realpathSync(main));
+
+  execFileSync('git', ['worktree', 'remove', '--force', wt], { cwd: main });
+  fs.rmSync(main, { recursive: true, force: true });
+});
+
+test('resolveMainCheckout returns null outside a git checkout entirely', () => {
+  const plain = mkTemp('checks-plain-');
+  assert.equal(resolveMainCheckout(plain), null);
+  fs.rmSync(plain, { recursive: true, force: true });
+});
+
+test('integrationScriptPath returns a path that actually exists on disk', () => {
+  const resolved = integrationScriptPath();
+  assert.notEqual(resolved, null, 'this test runs from a git checkout, so a path must resolve');
+  assert.equal(fs.existsSync(resolved), true, `${resolved} does not exist`);
+});
+
+test('integrationScriptPath names the main checkout even when this copy runs from a linked worktree', () => {
+  // Proves the fix at the level the bug lived at: the path handed to a shell
+  // profile must outlive the worktree the command happened to run from.
+  const resolved = integrationScriptPath();
+  const owningCheckout = resolveMainCheckout(path.dirname(resolved));
+  assert.equal(fs.realpathSync(path.join(owningCheckout, 'scripts')), fs.realpathSync(path.dirname(resolved)));
+});
+
+// ─── D1/D5: dead source lines are reported as a failed check ────────────────
+
+test('shell-integration-sourced fails on a dead fgos source line even when the live line is present', () => {
+  const homeDir = mkTemp('doctor-shell-dead-');
+  const gone = path.join(homeDir, 'removed-worktree', 'scripts', 'fgos-shell-integration.sh');
+  fs.writeFileSync(
+    path.join(homeDir, '.bashrc'),
+    `source "${integrationScriptPath()}"\nsource "${gone}"\n`,
+  );
+  const prevHome = process.env.HOME;
+  process.env.HOME = homeDir;
+  try {
+    const { passed, message } = checkById('shell-integration-sourced').check(process.cwd());
+    assert.equal(passed, false);
+    assert.ok(message.includes(gone), `message did not name the dead path: ${message}`);
+    assert.ok(message.includes('1 dead'), `message did not count the dead lines: ${message}`);
+  } finally {
+    process.env.HOME = prevHome;
+    fs.rmSync(homeDir, { recursive: true, force: true });
+  }
+});
+
+test('shell-integration-sourced counts dead lines per rc file across both bash and zsh', () => {
+  const homeDir = mkTemp('doctor-shell-dead-both-');
+  const live = `source "${integrationScriptPath()}"\n`;
+  const gone = path.join(homeDir, 'gone', 'scripts', 'fgos-shell-integration.sh');
+  fs.writeFileSync(path.join(homeDir, '.bashrc'), `${live}source "${gone}"\n`);
+  fs.writeFileSync(path.join(homeDir, '.zshrc'), `${live}source "${gone}"\nsource "${gone}"\n`);
+  const prevHome = process.env.HOME;
+  process.env.HOME = homeDir;
+  try {
+    const { passed, message } = checkById('shell-integration-sourced').check(process.cwd());
+    assert.equal(passed, false);
+    assert.ok(message.includes('3 dead'), `expected 3 dead across both files: ${message}`);
+    assert.ok(message.includes(`${path.join(homeDir, '.bashrc')} (1)`), message);
+    assert.ok(message.includes(`${path.join(homeDir, '.zshrc')} (2)`), message);
+  } finally {
+    process.env.HOME = prevHome;
+    fs.rmSync(homeDir, { recursive: true, force: true });
+  }
+});
+
+test('shell-integration-sourced still passes when every rc file has only the live line', () => {
+  const homeDir = mkTemp('doctor-shell-clean-');
+  fs.writeFileSync(path.join(homeDir, '.bashrc'), `source "${integrationScriptPath()}"\n`);
+  const prevHome = process.env.HOME;
+  process.env.HOME = homeDir;
+  try {
+    const { passed } = checkById('shell-integration-sourced').check(process.cwd());
+    assert.equal(passed, true);
+  } finally {
+    process.env.HOME = prevHome;
+    fs.rmSync(homeDir, { recursive: true, force: true });
+  }
+});
+
+test('setup from a copy of fgos that is not in a git checkout declines the rc write and says why', () => {
+  // The `/tmp/tmp.XXXXXXXX` shape observed in the wild: an unpacked copy with
+  // no `.git` of its own. Its path is ephemeral, so writing it into a shell
+  // profile leaves a `source` line that outlives the directory.
+  const copyRoot = mkTemp('checks-nongit-copy-');
+  const repoRoot = path.resolve(__dirname, '../..');
+  for (const entry of ['bin', 'src', 'scripts', 'package.json']) {
+    fs.cpSync(path.join(repoRoot, entry), path.join(copyRoot, entry), { recursive: true });
+  }
+  assert.equal(fs.existsSync(path.join(copyRoot, '.git')), false);
+
+  const homeDir = mkTemp('checks-nongit-home-');
+  const rcFile = path.join(homeDir, '.bashrc');
+  fs.writeFileSync(rcFile, 'echo hi\n');
+
+  const result = spawnSync(process.execPath, [path.join(copyRoot, 'bin', 'fgos.mjs'), 'setup'], {
+    cwd: copyRoot,
+    encoding: 'utf8',
+    env: { ...process.env, HOME: homeDir },
+  });
+
+  assert.equal(result.status, 0, `setup failed: ${result.stderr}`);
+  const { data } = JSON.parse(result.stdout);
+  assert.deepEqual(data.rcFilesInserted, []);
+  assert.deepEqual(data.rcFilesAlreadyConfigured, []);
+  assert.ok(
+    /not inside a git checkout/.test(data.rcWriteDeclinedReason ?? ''),
+    `expected a stated reason, got: ${JSON.stringify(data.rcWriteDeclinedReason)}`,
+  );
+  // The whole point: nothing was appended to the profile.
+  assert.equal(fs.readFileSync(rcFile, 'utf8'), 'echo hi\n');
+  // Setup's other work still happened.
+  assert.equal(fs.existsSync(path.join(copyRoot, '.fgos', 'config.json')), true);
+
+  fs.rmSync(copyRoot, { recursive: true, force: true });
+  fs.rmSync(homeDir, { recursive: true, force: true });
+});
+
+test('setup from a real checkout still writes the rc line and reports no declined reason', () => {
+  const homeDir = mkTemp('checks-git-home-');
+  fs.writeFileSync(path.join(homeDir, '.bashrc'), 'echo hi\n');
+  const cwd = initRepo('checks-git-cwd-');
+
+  const result = spawnSync(process.execPath, [FGOS, 'setup'], {
+    cwd,
+    encoding: 'utf8',
+    env: { ...process.env, HOME: homeDir },
+  });
+
+  assert.equal(result.status, 0, `setup failed: ${result.stderr}`);
+  const { data } = JSON.parse(result.stdout);
+  assert.equal(data.rcWriteDeclinedReason, undefined);
+  assert.deepEqual(data.rcFilesInserted, [path.join(homeDir, '.bashrc')]);
+  assert.ok(fs.readFileSync(path.join(homeDir, '.bashrc'), 'utf8').includes('fgos-shell-integration.sh'));
+
+  fs.rmSync(cwd, { recursive: true, force: true });
+  fs.rmSync(homeDir, { recursive: true, force: true });
+});
+
+test('shell-integration-sourced samples dead paths instead of printing all of them', () => {
+  // Real profiles accumulate these into the hundreds; a check message that
+  // names every one scrolls the rest of the doctor report off the screen.
+  const homeDir = mkTemp('doctor-shell-dead-many-');
+  const dead = Array.from({ length: 12 }, (_, i) =>
+    path.join(homeDir, `gone-${i}`, 'scripts', 'fgos-shell-integration.sh'),
+  );
+  fs.writeFileSync(
+    path.join(homeDir, '.bashrc'),
+    `source "${integrationScriptPath()}"\n${dead.map((d) => `source "${d}"`).join('\n')}\n`,
+  );
+  const prevHome = process.env.HOME;
+  process.env.HOME = homeDir;
+  try {
+    const { passed, message } = checkById('shell-integration-sourced').check(process.cwd());
+    assert.equal(passed, false);
+    assert.ok(message.includes('12 dead'), `expected the full count: ${message}`);
+    assert.ok(message.includes('(+9 more path(s))'), `expected the remainder note: ${message}`);
+    const named = dead.filter((d) => message.includes(d));
+    assert.equal(named.length, 3, `expected exactly 3 sampled paths, got ${named.length}`);
+  } finally {
+    process.env.HOME = prevHome;
+    fs.rmSync(homeDir, { recursive: true, force: true });
+  }
 });

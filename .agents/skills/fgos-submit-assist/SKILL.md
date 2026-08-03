@@ -20,13 +20,69 @@ load it directly when a person hands you an ask to file; it does not run as
 part of any other skill's flow and does not change how any other skill
 starts a session.
 
+Not the same door as `/fgOS:submit` (`plugins/fgOS/skills/submit/SKILL.md`)
+— that one deliberately stays mechanical (submit's own keyword-count
+fallback, no LLM reasoning) so `dogfood-fixture:submit`'s replay of a
+scenario's canonical text stays byte-identical run to run. Use `/fgOS:submit`
+directly for a quick, low-stakes filing where the mechanical default is
+fine; use this skill when the ask is substantial enough to warrant a
+considered `tier`/`kind`/`risk` call. Both end up calling the exact same
+`fgos submit` verb underneath — this skill just pre-fills its flags.
+
 ## 1. Read the ask
 
 Take the free-text description exactly as given. Don't paraphrase or trim it
 before classifying — the full text is the signal, and `submit` itself derives
-the item's title from it.
+the item's title from it: mechanically, from the first sentence or line, cut
+at whatever boundary comes first — never this skill's judgment and never an
+LLM call. A title that reads clearly in a task list names the object being
+touched, the action being taken, and the scope it's bounded to (đối tượng +
+hành động + phạm vi); a first sentence that's just a curt fragment ("task 1",
+"fix it") produces a title just as curt, since no cut rule can invent
+content the text never gave it. Nothing here rewrites the ask to force that
+shape — this step passes the text through untouched — but if the ask itself
+is genuinely too thin to name what's being touched, that's worth surfacing to
+whoever is filing it before submitting, not silently classifying tier/kind/
+risk around a title no one will be able to read later.
 
-## 2. Classify tier, kind, and risk yourself
+## 2. Classify tier, kind, and risk — via `submit-assist-classify` when available, otherwise yourself
+
+Follow `../_shared/capacity-dispatch-fallback.md` (tsk-53h — this pattern's
+shared fragment, extracted from this exact step so a second skill can
+reuse it without copy-pasting it) with:
+
+- `<CAPACITY_ID>` = `submit-assist-classify`
+- `<INLINE_FALLBACK_HEADING>` = "Classify it yourself" (below)
+- `<PROMPT_TEMPLATE>`:
+
+  ```
+  Classify this backlog ask's tier (light/standard/heavy), kind (bug/feature/chore/task), and risk (low/medium/high), plus one line of reasoning. Respond with exactly this format, one field per line, nothing else:
+  tier: <value or "unsure">
+  kind: <value or "unsure">
+  risk: <value or "unsure">
+  reasoning: <one line>
+
+  Rubric:
+  - tier: light = small contained change (typo, one-line log, rename, doc fix). standard = default weight, real implementation within one area. heavy = multi-system/file, public contract or data-shape change, new architecture, or genuinely vague scope.
+  - kind: bug = something that used to/should work and doesn't (a real symptom, not just the word "fix"). feature = new capability from the user's point of view. chore = maintenance, no user-visible behavior change. task = the honest fallback when none of the above cleanly fits.
+  - risk: independent of tier — how bad and how reversible is being wrong? auth/payments/data-integrity/hard-to-undo = higher risk regardless of size.
+
+  Ask: "<the free-text ask, verbatim>"
+  ```
+
+Reading the response (this skill's own field-level rule, since the shared
+fragment's Step D only covers the generic "malformed" case): if it cleanly
+gives a `tier`/`kind`/`risk` value matching the vocabularies above
+(`"unsure"` or an unrecognized value means treat that one field as
+omitted, same as "On confidence, per field" below), use that suggestion in
+place of your own reasoning and continue to step 3. Missing/unparseable/
+no-real-value for *any* field is the fragment's Step D malformed case —
+fall back to "Classify it yourself" below for this ask entirely, exactly
+as if the capacity were absent. Either way the output is
+non-authoritative: a wrong external suggestion is exactly as cheap to fix
+later via `fgos edit` as a wrong inline one.
+
+### Classify it yourself
 
 You are the classifier here — there is no subprocess or external model call
 to make, no command to shell out to for this step. Reason about the text the

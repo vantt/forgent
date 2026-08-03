@@ -1,0 +1,138 @@
+// cleanup-harness.mjs — the dedicated skill/harness gating cleanup->done
+// (work-item-status-delivered-retrospective-cleanup D8), never folded into
+// return/compound. PURE reads only (this module never writes an event or
+// touches git state) except the one real subprocess call in
+// checkMergeStillResolves, which is read-only (`git merge-base
+// --is-ancestor`, no mutation).
+//
+// Three independent checks, combined by assessCleanupReadiness:
+//   (1) TTL elapsed since the item actually entered `cleanup` (D7) — the
+//       clock anchors to the specific retrospective->cleanup event
+//       timestamp, mirroring graph-metrics.mjs's classifyStaleDoing
+//       precedent (age = now - a specific transition's ts), never "latest
+//       event of any kind for this id" (an unrelated decision/friction
+//       logged while parked would otherwise silently reset the clock).
+//   (2) retrospective actually produced real content (D4/D8) — a crashed
+//       or partial retrospective run could transition delivered->
+//       retrospective->cleanup without ever writing real output, so this
+//       is a content-level check (an outcome or decision record exists
+//       for the item), not a status-level one.
+//   (3) the merge still resolves on main (D8) — domain-conditional (D5):
+//       only checked when the domain is worktree-backed (the coding
+//       domain's headAtTake/headAtReturn tracking assumes a real git
+//       merge happened; synthetic has neither a worktree nor a merge to
+//       verify, per its own file header in workflow-stage-graphs.mjs).
+//       LIMITATION, documented plainly rather than overclaimed: this
+//       checks ANCESTRY (`git merge-base --is-ancestor`), which catches a
+//       force-push/history-rewrite that dropped the commit, but does NOT
+//       catch a plain `git revert` — a revert adds a new commit undoing
+//       the change without removing the original from history, so the
+//       original commit stays a provable ancestor of HEAD even after
+//       being reverted. Detecting "was the CONTENT undone" generically
+//       would need a real diff-against-tree check, out of scope here
+//       (YAGNI — no evidence yet that revert-after-merge is the common
+//       case this needs to catch; force-push/rebase-away is the case
+//       RUL30's headAtTake/headAtReturn tracking already exists to guard
+//       against).
+
+import { execFileSync } from 'node:child_process';
+
+function git(repoRoot, args) {
+  return execFileSync('git', args, {
+    cwd: repoRoot,
+    encoding: 'utf8',
+    shell: false,
+    stdio: ['ignore', 'pipe', 'pipe'],
+  }).trim();
+}
+
+/**
+ * Does the commit this item's merge/return landed still resolve as an
+ * ancestor of `repoRoot`'s current HEAD? Prefers `branchHeadAtReturn`
+ * (branch-source items), then `headAtReturn` (pull-door items), falling
+ * back to the `*AtTake` pair only if return-time tracking is absent
+ * (an item that was never returned through the normal path). No recorded
+ * commit at all is treated as "nothing to verify" (ok: true) rather than a
+ * failure — an item this module has no git provenance for was never
+ * claiming a git-verifiable merge in the first place.
+ */
+export function checkMergeStillResolves(repoRoot, work) {
+  const sha = work?.branchHeadAtReturn ?? work?.headAtReturn ?? work?.branchHeadAtTake ?? work?.headAtTake;
+  if (!sha) {
+    return { ok: true, detail: 'no recorded commit to verify — nothing to check' };
+  }
+  try {
+    git(repoRoot, ['merge-base', '--is-ancestor', sha, 'HEAD']);
+    return { ok: true, detail: `commit ${sha} is still an ancestor of HEAD` };
+  } catch {
+    return {
+      ok: false,
+      detail: `commit ${sha} is no longer reachable from HEAD — the merge may have been force-pushed away or history rewritten`,
+    };
+  }
+}
+
+/** Did retrospective actually produce real content for `id` — an outcome
+ * record (predicted or actual) or at least one decision — rather than just
+ * a status flip with nothing behind it? */
+export function checkRetrospectiveContent(view, id) {
+  const outcome = view?.outcomes?.[id];
+  const hasOutcome = Boolean(outcome?.actual || outcome?.predicted);
+  const hasDecision = (view?.decisionsById?.[id]?.length ?? 0) > 0;
+  if (hasOutcome || hasDecision) {
+    return { ok: true, detail: 'retrospective content found (an outcome or decision record exists)' };
+  }
+  return {
+    ok: false,
+    detail: 'no outcome or decision record found for this item — retrospective may not have actually run',
+  };
+}
+
+/**
+ * Has enough time elapsed since `id` actually entered `cleanup`? Reads
+ * `rawEvents` (readRawEvents(dir)'s own shape) for the SPECIFIC latest
+ * `work.move` event with `payload.to === 'cleanup'` for this id — never
+ * "latest event of any kind", per this module's own header comment.
+ */
+export function checkCleanupTTLElapsed(rawEvents, id, { ttlDays, now = Date.now() } = {}) {
+  const entries = (rawEvents ?? []).filter(
+    (e) => e.type === 'work.move' && e.payload?.id === id && e.payload?.to === 'cleanup',
+  );
+  const entered = entries.at(-1);
+  if (!entered) {
+    return { ok: false, detail: 'item never actually entered cleanup — no retrospective->cleanup event found in the log' };
+  }
+  const ageMs = now - new Date(entered.ts).getTime();
+  const ttlMs = ttlDays * 24 * 60 * 60 * 1000;
+  const ageDays = Math.floor(ageMs / 86400000);
+  if (ageMs >= ttlMs) {
+    return { ok: true, detail: `${ageDays}d elapsed since entering cleanup (TTL ${ttlDays}d)` };
+  }
+  return { ok: false, detail: `only ${ageDays}d elapsed since entering cleanup, TTL is ${ttlDays}d — not ready yet` };
+}
+
+/**
+ * Combine all three checks into one verdict. `worktreeBacked` (per-domain,
+ * D5) gates whether checkMergeStillResolves runs at all — a domain with no
+ * real git worktree/merge concept (synthetic) is not held to a check that
+ * assumes one. Returns `{ ready, reasons }` — `reasons` is empty exactly
+ * when `ready` is true, and otherwise lists every failing check's detail
+ * (never just the first), so a `cleanup -> blocked` park carries a
+ * complete `reason`.
+ */
+export function assessCleanupReadiness({ view, rawEvents, id, repoRoot, worktreeBacked, ttlDays, now }) {
+  const reasons = [];
+
+  const ttl = checkCleanupTTLElapsed(rawEvents, id, { ttlDays, now });
+  if (!ttl.ok) reasons.push(ttl.detail);
+
+  const content = checkRetrospectiveContent(view, id);
+  if (!content.ok) reasons.push(content.detail);
+
+  if (worktreeBacked) {
+    const merge = checkMergeStillResolves(repoRoot, view?.work?.[id]);
+    if (!merge.ok) reasons.push(merge.detail);
+  }
+
+  return { ready: reasons.length === 0, reasons };
+}

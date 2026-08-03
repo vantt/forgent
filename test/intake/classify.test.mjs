@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { deriveTitle, classify, generateId } from '../../src/intake/classify.mjs';
+import { MAX_TITLE_LENGTH } from '../../src/state/work.mjs';
 
 // Mirrors work.mjs's (unexported) ID_PATTERN: kebab-case, letter-start.
 const ID_PATTERN = /^[a-z][a-z0-9]*(-[a-z0-9]+)*$/;
@@ -20,8 +21,29 @@ test('deriveTitle returns short text unchanged when no boundary exists', () => {
 test('deriveTitle truncates long text with no natural boundary at a word edge', () => {
   const longText = 'word '.repeat(30).trim();
   const title = deriveTitle(longText);
-  assert.ok(title.length <= 60);
+  assert.ok(title.length <= MAX_TITLE_LENGTH);
   assert.equal(longText.startsWith(title), true);
+  assert.equal(title.endsWith(' '), false);
+});
+
+test('deriveTitle bounds a first sentence that runs past the title bound', () => {
+  // The boundary branch used to return the matched sentence whole, however
+  // long it was — the case that put most stored titles past the bound.
+  const runOn = `${'word '.repeat(40).trim()}. A second sentence.`;
+  const title = deriveTitle(runOn);
+  assert.ok(title.length <= MAX_TITLE_LENGTH);
+  assert.equal(runOn.startsWith(title), true);
+});
+
+test('deriveTitle leaves a sentence already within the bound untouched', () => {
+  assert.equal(deriveTitle('Login is broken. Users cannot sign in.'), 'Login is broken');
+});
+
+test('deriveTitle cuts a single unbroken token at a hard edge', () => {
+  // No space to cut at, so the word-edge rule has nothing to find and the
+  // hard cut has to carry it — otherwise this exits past the bound.
+  const title = deriveTitle('x'.repeat(MAX_TITLE_LENGTH + 40));
+  assert.equal(title.length, MAX_TITLE_LENGTH);
 });
 
 test('deriveTitle does not cut early on a dotted filename opening the text', () => {

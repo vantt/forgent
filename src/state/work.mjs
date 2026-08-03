@@ -32,20 +32,66 @@ const ID_PATTERN = /^[a-z][a-z0-9]*(-[a-z0-9]+)*$/;
 // calls validateWorkShape, so existing longer ids keep replaying untouched.
 const MAX_ID_LENGTH = 30;
 
+// Per work-item-title-contract D2/D5: a title is bounded at write time, and
+// the bound TRUNCATES rather than rejects — an over-length title arriving from
+// a script or an agent must not break the call that carried it. 100 sits above
+// every title a human writes by hand and below the run-on blobs a whole
+// submitted paragraph produced (32 of 54 stored titles were past it when this
+// was measured); see CONTEXT.md for the distribution.
+//
+// The bound is applied at the store's own normalize points (addWork/editWork
+// in store.mjs), which every write door passes through, and reused by
+// deriveTitle so a submitted title is already within bounds by the time
+// generateId hashes it. Deliberately NOT enforced in validateWorkShape: that
+// function only ever throws or returns, so a bound placed there could only
+// reject — the one behavior this contract rules out.
+export const MAX_TITLE_LENGTH = 100;
+
+/**
+ * Bound a title to MAX_TITLE_LENGTH, cutting at a word edge when one exists
+ * within the bound and falling back to a hard cut when a single token runs
+ * past it. Anything already short enough — and any non-string, which
+ * validateWorkShape is still the one to reject — is returned untouched, so
+ * this is safe to apply ahead of validation on every path.
+ */
+export function truncateTitle(title) {
+  if (typeof title !== 'string' || title.length <= MAX_TITLE_LENGTH) return title;
+  const cut = title.slice(0, MAX_TITLE_LENGTH);
+  const lastSpace = cut.lastIndexOf(' ');
+  return (lastSpace > 0 ? cut.slice(0, lastSpace) : cut).trim();
+}
+
 /**
  * The full status domain for `work` (per D4's single flat FSM, extended by
- * D5 with `proposed`: a goal-check pass sitting on a branch, awaiting
- * approval/merge before it becomes `done`; extended by async-human-gate D1/D3
- * with `awaiting-human`: a single generic human-gate state, separate from
+ * D5 with `proposed`/`awaiting-approval`: a goal-check pass sitting on a
+ * branch, awaiting approval/merge; extended by async-human-gate D1/D3 with
+ * `awaiting-human`: a single generic human-gate state, separate from
  * `blocked`, that a work item parks in while waiting for a person to answer
  * a question; extended by fsm-wontfix-terminal-status D1/D2 with `wontfix`:
  * a second terminal state alongside `done`, for an item deliberately closed
  * without being built (superseded, duplicate, admin decision) rather than
- * completed — see fsm.mjs for its transition edges). Owned here (schema
- * owns domain) — fsm.mjs imports and re-exports this rather than defining
- * its own copy, so there is exactly one list of legal statuses.
+ * completed. Extended by work-item-status-delivered-retrospective-cleanup
+ * D1/D2 with `delivered`/`retrospective`/`cleanup`, inserted between
+ * `awaiting-approval` and `done`: `delivered` means "code accepted into the
+ * main tree" (the sole trigger for RUL12 dependent-open); `retrospective`
+ * is the batched learning-synthesis step (formerly the `compound-learn`
+ * stage, now retired); `cleanup` is a TTL-bounded worktree-reclaim park —
+ * see fsm.mjs for the full transition edges). Owned here (schema owns
+ * domain) — fsm.mjs imports and re-exports this rather than defining its
+ * own copy, so there is exactly one list of legal statuses.
  */
-export const STATUSES = Object.freeze(['todo', 'doing', 'blocked', 'awaiting-approval', 'done', 'awaiting-human', 'wontfix']);
+export const STATUSES = Object.freeze([
+  'todo',
+  'doing',
+  'blocked',
+  'awaiting-approval',
+  'delivered',
+  'retrospective',
+  'cleanup',
+  'done',
+  'awaiting-human',
+  'wontfix',
+]);
 
 /**
  * Tier domain for `work.tier` (per D6) — the cost/cognitive weight a work
@@ -57,6 +103,14 @@ export const STATUSES = Object.freeze(['todo', 'doing', 'blocked', 'awaiting-app
  * a work item is allowed to *say*. Do not let the two drift apart.
  */
 export const TIERS = Object.freeze(['light', 'standard', 'heavy']);
+
+/**
+ * Urgency domain for `work.urgent` (per work-item-priority-matrix D2) —
+ * human-entered, optional. Absent reads as `medium` at the consuming
+ * formula, never stored as a default here (same absent-stays-absent shape
+ * as tier/domain above).
+ */
+export const URGENCY_LEVELS = Object.freeze(['low', 'medium', 'high', 'critical']);
 
 /**
  * Goal-tier domain for `work.goalTier` (per str67-goal-directed-planning D1)
@@ -159,6 +213,62 @@ export function validateWorkShape(work) {
       throw new WorkValidationError(`work.deps entries must be non-empty strings, got: ${JSON.stringify(dep)}`);
     }
   }
+  // mergeAfter (D4/D5, docs/history/tsk-3bn-merge-conductor-harness-v2/):
+  // OPTIONAL and NOT in DEFAULTS (same lazy-additive shape as parent/stage
+  // above) — a weak, merge-order-only edge read ONLY by mergeReadiness's
+  // waiting gate, never by frontier.mjs. Shape mirrors `deps` (array of
+  // non-empty strings); self-reference check mirrors `parent`'s. Existence
+  // of referenced ids IS enforced (validateMergeAfter below, mirroring
+  // validateDeps) — unlike `parent`/`discoveredFrom`, which deliberately
+  // leave dangling ids unchecked.
+  if (work.mergeAfter !== undefined && work.mergeAfter !== null) {
+    if (!Array.isArray(work.mergeAfter)) {
+      throw new WorkValidationError(`work.mergeAfter must be an array of non-empty strings when present, got: ${JSON.stringify(work.mergeAfter)}`);
+    }
+    for (const target of work.mergeAfter) {
+      if (typeof target !== 'string' || !target) {
+        throw new WorkValidationError(`work.mergeAfter entries must be non-empty strings, got: ${JSON.stringify(target)}`);
+      }
+      if (target === work.id) {
+        throw new WorkValidationError(`work "${work.id}" cannot list itself in its own mergeAfter.`);
+      }
+    }
+  }
+  // supersededBy / duplicates (tsk-2ie, docs/history/
+  // tsk-2ie-duplicate-superseded-guard/): two non-blocking, knowledge-only
+  // relations mirroring bd's own `supersedes`/`duplicates` dependency-type
+  // split (D1). `supersededBy` is directed and singular — the id of the ONE
+  // item that replaces this one — shape mirrors `parent` (self-reference
+  // check) but, like `mergeAfter`, has its target's EXISTENCE enforced
+  // (validateSupersededBy below) rather than left dangling like `parent`.
+  // `duplicates` is undirected and array-shaped, mirroring `mergeAfter`'s
+  // shape exactly (including existence enforcement, validateDuplicates
+  // below) — informational only (D4): read by nothing in mergeReadiness
+  // except via `supersededBy`. Neither participates in the unified
+  // blocking-cycle graph (dep-graph.mjs) or frontier.mjs start-eligibility
+  // — both OPTIONAL and NOT in DEFAULTS, same lazy-additive shape as
+  // mergeAfter/parent above.
+  if (work.supersededBy !== undefined && work.supersededBy !== null) {
+    if (typeof work.supersededBy !== 'string' || !work.supersededBy) {
+      throw new WorkValidationError(`work.supersededBy must be a non-empty string when present, got: ${JSON.stringify(work.supersededBy)}`);
+    }
+    if (work.supersededBy === work.id) {
+      throw new WorkValidationError(`work "${work.id}" cannot list itself as its own supersededBy.`);
+    }
+  }
+  if (work.duplicates !== undefined && work.duplicates !== null) {
+    if (!Array.isArray(work.duplicates)) {
+      throw new WorkValidationError(`work.duplicates must be an array of non-empty strings when present, got: ${JSON.stringify(work.duplicates)}`);
+    }
+    for (const dupId of work.duplicates) {
+      if (typeof dupId !== 'string' || !dupId) {
+        throw new WorkValidationError(`work.duplicates entries must be non-empty strings, got: ${JSON.stringify(dupId)}`);
+      }
+      if (dupId === work.id) {
+        throw new WorkValidationError(`work "${work.id}" cannot list itself in its own duplicates.`);
+      }
+    }
+  }
   requireNonEmptyString(work, 'risk');
   requireArray(work, 'refs');
   requireNonEmptyString(work, 'verify');
@@ -195,6 +305,34 @@ export function validateWorkShape(work) {
   if (work.intent !== undefined && !Number.isInteger(work.intent)) {
     throw new WorkValidationError(
       `work.intent must be an integer when present, got: ${JSON.stringify(work.intent)}`,
+    );
+  }
+  // Urgent (per work-item-priority-matrix D2): OPTIONAL additive string,
+  // human-entered via `fgos add/edit --urgent`. Same optional-additive
+  // shape as tier/domain above; absent stays absent (the "medium" default
+  // is applied by the priority formula that reads it, never stored here).
+  if (work.urgent !== undefined && !URGENCY_LEVELS.includes(work.urgent)) {
+    throw new WorkValidationError(
+      `work.urgent must be one of ${JSON.stringify(URGENCY_LEVELS)} when present, got: ${JSON.stringify(work.urgent)}`,
+    );
+  }
+  // Impact (per work-item-priority-matrix D3): OPTIONAL additive number,
+  // computed (blocking fan-out + semantic scan, refined with a de-risk
+  // bonus at decompose per D8) — never human-entered directly. Same
+  // non-negative-number shape priority/intent already use; absent stays
+  // absent.
+  if (work.impact !== undefined && !(typeof work.impact === 'number' && Number.isFinite(work.impact) && work.impact >= 0)) {
+    throw new WorkValidationError(
+      `work.impact must be a non-negative number when present, got: ${JSON.stringify(work.impact)}`,
+    );
+  }
+  // Effort (per work-item-priority-matrix D5): OPTIONAL additive number,
+  // computed at decompose from fgos-planning's own mode/flag-count — never
+  // human-entered directly. Same non-negative-number shape as impact;
+  // absent stays absent.
+  if (work.effort !== undefined && !(typeof work.effort === 'number' && Number.isFinite(work.effort) && work.effort >= 0)) {
+    throw new WorkValidationError(
+      `work.effort must be a non-negative number when present, got: ${JSON.stringify(work.effort)}`,
     );
   }
   if (work.stage !== undefined) {
@@ -396,6 +534,58 @@ export function validateDeps(work, existingIds) {
 }
 
 /**
+ * Validate that every `mergeAfter` target of `work` points at an id present
+ * in `existingIds` — mirrors `validateDeps` exactly, for the same reason
+ * (D5, docs/history/tsk-3bn-merge-conductor-harness-v2/CONTEXT.md): a
+ * dangling merge-order target is a real, catchable mistake, unlike
+ * `parent`/`discoveredFrom`'s deliberately-unchecked dangling case. A
+ * no-op when `mergeAfter` is absent.
+ */
+export function validateMergeAfter(work, existingIds) {
+  if (!Array.isArray(work.mergeAfter)) return true;
+  const known = existingIds instanceof Set ? existingIds : new Set(existingIds ?? []);
+  for (const target of work.mergeAfter) {
+    if (!known.has(target)) {
+      throw new WorkValidationError(`work "${work.id}" has mergeAfter target "${target}", which is not a known id.`);
+    }
+  }
+  return true;
+}
+
+/**
+ * Validate that `work.supersededBy`, when present, points at an id present
+ * in `existingIds` — mirrors `validateMergeAfter` exactly (tsk-2ie D3): a
+ * dangling supersession target fails loud here rather than silently no-op'ing
+ * later inside `mergeReadiness`. A no-op when `supersededBy` is absent.
+ */
+export function validateSupersededBy(work, existingIds) {
+  if (typeof work.supersededBy !== 'string') return true;
+  const known = existingIds instanceof Set ? existingIds : new Set(existingIds ?? []);
+  if (!known.has(work.supersededBy)) {
+    throw new WorkValidationError(`work "${work.id}" has supersededBy target "${work.supersededBy}", which is not a known id.`);
+  }
+  return true;
+}
+
+/**
+ * Validate that every `duplicates` entry of `work` points at an id present
+ * in `existingIds` — mirrors `validateMergeAfter` exactly, applied to
+ * `duplicates` for the same loud-failure reasoning `validateSupersededBy`
+ * gives its sibling field (tsk-2ie CONTEXT.md assumptions). A no-op when
+ * `duplicates` is absent.
+ */
+export function validateDuplicates(work, existingIds) {
+  if (!Array.isArray(work.duplicates)) return true;
+  const known = existingIds instanceof Set ? existingIds : new Set(existingIds ?? []);
+  for (const dupId of work.duplicates) {
+    if (!known.has(dupId)) {
+      throw new WorkValidationError(`work "${work.id}" has duplicates target "${dupId}", which is not a known id.`);
+    }
+  }
+  return true;
+}
+
+/**
  * Full validation entry point: shape first, then dep-existence when
  * `existingIds` is supplied (omit it to validate shape only, e.g. before the
  * store is known).
@@ -404,6 +594,9 @@ export function validateWork(work, existingIds) {
   validateWorkShape(work);
   if (existingIds !== undefined) {
     validateDeps(work, existingIds);
+    validateMergeAfter(work, existingIds);
+    validateSupersededBy(work, existingIds);
+    validateDuplicates(work, existingIds);
   }
   return true;
 }

@@ -7,6 +7,7 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 import { initStore, addWork, moveWork, listWork, readRawEvents, readyWork } from '../../src/state/store.mjs';
 import { appendEvent } from '../../src/state/events.mjs';
+import { MAX_TITLE_LENGTH } from '../../src/state/work.mjs';
 import { createWorktree, removeWorktree, createBranchRef, branchNameFor } from '../../src/runner/worktree.mjs';
 import { runOnce, runWatch, resolveRepoRoot } from '../../src/runner/loop.mjs';
 import { createMissBreaker } from '../../src/runner/anti-loop.mjs';
@@ -284,12 +285,12 @@ test('runOnce full circle: todo -> doing -> worker commit -> goal-check pass -> 
   // worktree torn down, branch survives (D4 proposal artifact)
   assert.deepEqual(fs.readdirSync(worktreeDir), []);
   // one door: the log carries exactly the runner's writes — the worker
-  // never touched .fgos/ (add + claim + predicted + propose + actual,
-  // nothing else)
+  // never touched .fgos/ (add + claim + predicted + capacity-dispatch
+  // audit (D8, tsk-62v) + propose + actual, nothing else)
   const events = readRawEvents(dir);
   assert.deepEqual(
     events.map((e) => (e.type === 'work.outcome' ? `work.outcome:${e.payload.predicted ? 'predicted' : 'actual'}` : `${e.type}:${e.payload.to ?? 'add'}`)),
-    ['work.add:add', 'work.move:doing', 'work.outcome:predicted', 'work.move:awaiting-approval', 'work.outcome:actual'],
+    ['work.add:add', 'work.move:doing', 'work.outcome:predicted', 'capacity.dispatch:add', 'work.move:awaiting-approval', 'work.outcome:actual'],
   );
   // predicted is written right at claim time, before dispatch ever runs
   const predictedEvent = events.find((e) => e.type === 'work.outcome' && e.payload.predicted);
@@ -300,6 +301,33 @@ test('runOnce full circle: todo -> doing -> worker commit -> goal-check pass -> 
   assert.equal(actualEvent.payload.actual.outcome, 'awaiting-approval');
   assert.equal(actualEvent.payload.actual.passed, true);
   assert.equal(actualEvent.payload.actual.aheadCount, 1);
+});
+
+// --- capacity-aware dispatch announce/audit (D8, tsk-62v) ---------------
+
+test('runOnce logs the "<capacityId> — <provider> — <model>" announce line and appends a matching capacity.dispatch audit event', async () => {
+  const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
+  seedItem(dir, { id: 'item-announce' });
+  const config = configFor(writeCommittingExecutor(scriptDir, counterFile));
+  const logs = [];
+
+  await runOnce({ repoRoot, config, worktreeDir, log: (msg) => logs.push(msg) });
+
+  assert.ok(
+    logs.includes(`fgos-runner: fgos-executing — ${process.execPath} — sonnet`),
+    `expected an announce line in: ${JSON.stringify(logs)}`,
+  );
+  const events = readRawEvents(dir);
+  const auditEvent = events.find((e) => e.type === 'capacity.dispatch');
+  assert.ok(auditEvent, 'expected a capacity.dispatch event in the log');
+  assert.deepEqual(auditEvent.payload, {
+    id: 'item-announce',
+    capacityId: 'fgos-executing',
+    provider: process.execPath,
+    model: 'sonnet',
+  });
+  // the audit entry is unknown to the FSM view — never breaks replay/state.json
+  assert.equal(listWork(dir).work['item-announce'].status, 'awaiting-approval');
 });
 
 // --- settlement role attribution (phase-3-compound-learning-5,
@@ -338,7 +366,11 @@ function writeClearDiscoveryExecutor(scriptDir, counterFile, { verify, produce =
 import fs from 'node:fs';
 import { execFileSync } from 'node:child_process';
 const prompt = process.argv[2] ?? '';
-if (prompt.includes('# Context-discovery')) {
+if (prompt.includes('Kiểm tra độc lập một lệnh verify')) {
+  // tsk-5q5-1: judgeVerifySemanticCorrectness's own second-pass call —
+  // answered separately so it never falls through to the worker branch below.
+  process.stdout.write(JSON.stringify({ agrees: true }));
+} else if (prompt.includes('# Context-discovery')) {
   process.stdout.write(JSON.stringify({ clear: true, verify: ${JSON.stringify(verify)} }));
 } else if (prompt.includes('# Chia-việc (decompose)')) {
   process.stdout.write(JSON.stringify({ verdict: 'pass-through' }));
@@ -1283,7 +1315,7 @@ test('S10: two genuinely distinct blocks in one output still both create items (
 
 // --- S11 review-fix: sanitize discovery-block title before logging (1 P3 finding) ---
 
-test('S11: a discovery block title with embedded newlines cannot forge extra log lines (sanitized in the idempotent-skip log), and a very long title is clamped in the log but the stored item keeps the full original title', async () => {
+test('S11: a discovery block title with embedded newlines cannot forge extra log lines (sanitized in the idempotent-skip log), and a very long title is clamped in the log and bounded in the stored item', async () => {
   const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
   seedItem(dir, { id: 'item-newline-title' });
   const craftedTitle = `${'A'.repeat(200)}\nfgos-runner: FORGED — fake halt event`;
@@ -1299,7 +1331,14 @@ test('S11: a discovery block title with embedded newlines cannot forge extra log
   assert.equal(result.dispatched[0].outcome, 'awaiting-approval');
   const discovered = Object.values(listWork(dir).work).filter((w) => w.discoveredFrom === 'item-newline-title');
   assert.equal(discovered.length, 1, 'the second, identical block is recognized as already-captured');
-  assert.equal(discovered[0].title, craftedTitle, 'the stored item keeps the full, untouched title');
+  // The store bounds every title it accepts (work-item-title-contract D5), so
+  // the stored record holds the bounded prefix rather than the whole crafted
+  // string. The bound lands before the crafted newline, which means the forged
+  // suffix cannot reach the stored title either — the same property this test
+  // already asserts for the log line.
+  assert.equal(discovered[0].title, 'A'.repeat(MAX_TITLE_LENGTH), 'the stored title is bounded at the write door');
+  assert.ok(!discovered[0].title.includes('FORGED'), 'the bounded title never reaches the forged suffix');
+  assert.equal(discovered[0].title.split('\n').length, 1, 'the stored title carries no embedded newline');
 
   const skipLines = lines.filter((line) => line.includes('already captured'));
   assert.equal(skipLines.length, 1, 'exactly one skip log line, not forged into extra lines');

@@ -16,11 +16,12 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { initStore, addWork, moveWork, moveStage, editWork, addDecision, addOutcome, addFriction, listWork, readyWork, isDepsAndLineageReady, graphMetrics, graphWhatIf, staleDoingAdvisory, footprintConflicts, readRawEvents, rebuild, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, StoreError, EXIT_CODES, categoryOf, assertValidDocType } from '../src/state/store.mjs';
-import { repairTruncatedLastLine } from '../src/state/events.mjs';
+import { initStore, addWork, moveWork, editWork, addDecision, addOutcome, addFriction, listWork, readyWork, isDepsAndLineageReady, graphMetrics, graphWhatIf, staleDoingAdvisory, footprintConflicts, readRawEvents, rebuild, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, registerTool, removeTool, assertAcceptanceEvidence, assertValidDocType, recordGateApprove, StoreError, EXIT_CODES, categoryOf } from '../src/state/store.mjs';
+import { probeTool, readLocalStatus, writeLocalStatus, resolvedStatus, normalizeCapability } from '../src/state/tool-registry.mjs';
+import { repairTruncatedLastLine, EventLogError } from '../src/state/events.mjs';
 import { deriveTitle, classify, generateId } from '../src/intake/classify.mjs';
 import { wrapEnvelope } from '../src/state/envelope.mjs';
-import { loadRunnerConfig, ensureRunnerConfig, DEFAULT_RUNNER_CONFIG } from '../src/runner/dispatch.mjs';
+import { loadRunnerConfig, ensureRunnerConfigForDir } from '../src/runner/dispatch.mjs';
 import { readGateBypassLevel } from '../src/state/gate-bypass.mjs';
 import { resolveFgosDir, fgosDirFromRoot } from '../src/runner/paths.mjs';
 import { resolveDiscovery } from '../src/intake/discovery.mjs';
@@ -37,7 +38,9 @@ import { frozenJudgeHits } from '../src/runner/frozen-judge.mjs';
 import { classifySource, reviewDiff, mergeRunnerItem, cleanupMergedBranch, changedFiles, isWorkingTreeClean as isMainTreeClean, isFgosOnlyStatusLine, buildOwnFileSet, detectTrunk, isMainWorktree } from '../src/runner/merge.mjs';
 import { createGitHubPR, mergeGitHubPR, viewGitHubPRStatus } from '../src/runner/github-adapter.mjs';
 import { classifyIronLaw } from '../src/evolve/iron-law.mjs';
-import { branchNameFor, branchExists, withMergeEphemeralWorktree } from '../src/runner/worktree.mjs';
+import { driftStatus } from '../src/state/drift-status.mjs';
+import { branchNameFor, branchExists, withMergeEphemeralWorktree, provisionDependencies } from '../src/runner/worktree.mjs';
+import { resolveIntegrationBranch, retargetMember } from '../src/runner/promote-engine.mjs';
 import { claimWork, ClaimError } from '../src/runner/claim-port.mjs';
 import { withLockRetry } from '../src/runner/lock-wait.mjs';
 import {
@@ -59,11 +62,15 @@ import { DEFAULTS } from '../src/state/work.mjs';
 import { getDomain, stageForStep } from '../src/state/workflow-stage-graphs.mjs';
 import { writeCoexistenceManifest } from '../src/install/coexist.mjs';
 import { MANIFEST_SCHEMA_VERSION, COMMAND_REGISTRY } from '../src/cli/command-registry.mjs';
+import { recordInvocationFault } from '../src/cli/invocation-fault-log.mjs';
+import { recordApprovePostSuccessFault } from '../src/cli/approve-fault-log.mjs';
 import { computeAwaitingContext } from '../src/state/awaiting-context.mjs';
-import { DOCTOR_CHECKS, integrationScriptPath } from '../src/setup/checks.mjs';
-import { installGitHooks } from '../src/setup/git-hooks.mjs';
-import { detectRcFiles, insertSourceLine } from '../src/setup/shell-rc.mjs';
-import { mergeConfigDefaults } from '../src/setup/config-merge.mjs';
+import { DOCTOR_CHECKS, integrationScriptPath, ensureSharedConfigDefaults, runFixes } from '../src/setup/checks.mjs';
+import { sharedConfigFilePath, readSharedConfig } from '../src/config/shared-config-file.mjs';
+import { assessCleanupReadiness } from '../src/state/cleanup-harness.mjs';
+import { DEFAULT_CLEANUP_TTL_DAYS } from '../src/setup/registrations.mjs';
+import { installGitHooks, uninstallGitHooks } from '../src/setup/git-hooks.mjs';
+import { detectRcFiles, insertSourceLine, hasSourceLine } from '../src/setup/shell-rc.mjs';
 import { formatCheck, bold } from '../src/setup/ansi.mjs';
 
 // D5: `verify` is a required non-empty field on every work item, but a
@@ -196,11 +203,18 @@ function optionalField(value, message) {
 }
 
 // tsk-6c2 D3: retry-with-backoff on main-checkout-lock contention is
-// default ON for take/pick/approve -- no flag needed. `--wait <ms>` tightens
-// the wait budget (never extends past the lock's own remainingTtlMs,
-// withLockRetry's job); bare `--wait` (no value) is a harmless no-op alias
-// for the default. `--no-wait` is the opt-out, restoring today's exact
-// immediate-fail-on-HELD behavior.
+// default ON for take/pick/approve -- no flag needed. Bare `--wait` (no
+// value) is a harmless no-op alias for the default. `--no-wait` is the
+// opt-out, restoring today's exact immediate-fail-on-HELD behavior.
+//
+// tsk-2rf D2/D3: an *explicit* `--wait <ms>` is now the true wall-clock
+// ceiling for the retry (`withLockRetry`, `src/runner/lock-wait.mjs`) --
+// no longer capped by the lock's own remainingTtlMs -- so a caller who
+// knows the holder is a legitimate long-running session can outlast it.
+// MAX_WAIT_MS bounds that ceiling: a mistyped value must not hang a CLI
+// call near-indefinitely against a holder that never actually releases.
+const MAX_WAIT_MS = 15 * 60 * 1000; // 900000ms, tsk-2rf D3
+
 function parseWaitFlags(flags, verbName) {
   const noWait = Boolean(flags['no-wait']);
   let waitMs;
@@ -208,6 +222,9 @@ function parseWaitFlags(flags, verbName) {
     waitMs = Number(flags.wait);
     if (!Number.isFinite(waitMs) || waitMs <= 0) {
       throw new StoreError('validation', `${verbName} --wait must be a positive number of milliseconds (got "${flags.wait}").`);
+    }
+    if (waitMs > MAX_WAIT_MS) {
+      throw new StoreError('validation', `${verbName} --wait must be at most ${MAX_WAIT_MS}ms (15 min) (got "${flags.wait}").`);
     }
   }
   return { noWait, waitMs };
@@ -239,7 +256,7 @@ function resolveVerifyTimeoutMs(verb, flags, repoRoot) {
     }
     return timeoutMs;
   }
-  return ensureRunnerConfig(path.join(repoRoot, '.fgos-runner.json')).timeoutMs;
+  return ensureRunnerConfigForDir(repoRoot).timeoutMs;
 }
 
 // Minimal argv parser: `--flag value` or bare `--flag` (boolean), plus
@@ -292,6 +309,61 @@ function parseAcceptanceFlag(value, message) {
   } catch (err) {
     throw new StoreError('validation', `${message} (invalid JSON: ${err.message})`);
   }
+}
+
+// tsk-27y D1/D2: `--verdict` on `discover` lets a live session that already
+// reasoned about clarity (fgos-exploring) pass its own verdict directly,
+// skipping resolveDiscovery's judgeDiscovery subprocess call for this one
+// invocation. Omitting `--verdict` entirely leaves `callerVerdict`
+// undefined -- byte-identical to before this item. `--verify`/`--question`
+// are REQUIRED (not falling back to judgeDiscovery's own
+// FALLBACK_VERIFY/DEFAULT_UNCLEAR_QUESTION silent defaults) -- an explicit
+// caller-supplied protocol should never silently substitute a placeholder
+// for what the caller was supposed to already know.
+function parseDiscoverCallerVerdict(flags) {
+  if (flags.verdict === undefined) return undefined;
+  if (flags.verdict === 'clear') {
+    return { clear: true, verify: requireField(flags.verify, 'discover --verdict clear requires --verify "<cmd>"') };
+  }
+  if (flags.verdict === 'unclear') {
+    return { clear: false, question: requireField(flags.question, 'discover --verdict unclear requires --question "<text>"') };
+  }
+  throw new StoreError('validation', `discover --verdict must be "clear" or "unclear" (got "${flags.verdict}").`);
+}
+
+// tsk-27y D1/D2: `--verdict` on `decompose`, same shape one stage over --
+// lets a live session that already reasoned about split-work
+// (fgos-planning) pass its own verdict directly, skipping resolveDecompose's
+// judgeDecompose subprocess call for this one invocation. Omitting
+// `--verdict` entirely leaves `callerVerdict` undefined -- byte-identical to
+// before this item. `--children` reuses parseAcceptanceFlag (same
+// JSON-encoded-array shape `submit --acceptance` already established) --
+// each element matches judgeDecompose's own child shape (title/verify
+// required; kind/risk/refs/footprint/deps optional), validated downstream
+// by the same `normalizeChild` a model-produced verdict goes through
+// (`resolveCallerDecomposeVerdict`, decompose.mjs).
+function parseDecomposeCallerVerdict(flags) {
+  if (flags.verdict === undefined) return undefined;
+  if (flags.verdict === 'pass-through') {
+    return { verdict: 'pass-through', reason: optionalField(flags.reason, 'decompose --verdict pass-through --reason requires a non-empty value when passed') };
+  }
+  if (flags.verdict === 'need-human') {
+    return { verdict: 'need-human', reason: requireField(flags.reason, 'decompose --verdict need-human requires --reason "<text>"') };
+  }
+  if (flags.verdict === 'decompose') {
+    const childrenMessage =
+      'decompose --verdict decompose requires --children, a JSON-encoded array of child objects ({title, verify, kind?, risk?, refs?, footprint?, deps?})';
+    const children = parseAcceptanceFlag(flags.children, childrenMessage);
+    if (children === undefined) {
+      throw new StoreError('validation', childrenMessage);
+    }
+    return {
+      verdict: 'decompose',
+      reason: requireField(flags.reason, 'decompose --verdict decompose requires --reason "<text>"'),
+      children,
+    };
+  }
+  throw new StoreError('validation', `decompose --verdict must be "pass-through", "need-human", or "decompose" (got "${flags.verdict}").`);
 }
 
 // Pagination opt-in (str46-io-contract D5/D35): `ready`/`triage`/`evolve`
@@ -468,7 +540,7 @@ function assertNoPriorBlockedOutcome(view, id) {
 
 function collectMissingOutcomeNag(view, id) {
   const outcomes = view.outcomes ?? {};
-  const FINAL_STATUSES = new Set(['awaiting-approval', 'blocked', 'done']);
+  const FINAL_STATUSES = new Set(['awaiting-approval', 'blocked', 'delivered', 'retrospective', 'cleanup', 'done']);
   const missing = Object.values(view.work ?? {})
     .filter((w) => (!id || w.id === id) && FINAL_STATUSES.has(w.status) && !outcomes[w.id]?.actual)
     .map((w) => w.id);
@@ -772,6 +844,13 @@ async function runVerb(verb, flags, positional, dir) {
         // the referenced id is deliberately never enforced here (work-graph-
         // intelligence-6, mirrors `parent`'s norm).
         discoveredFrom: optionalField(flags['discovered-from'], 'add --discovered-from requires a non-empty id; omit it to leave unset.'),
+        // parent-flag-cli D1/D2: --parent is an optional scalar lineage flag,
+        // same omitted-leaves-undefined shape as --discovered-from above
+        // (whose own comment already calls out mirroring `parent`'s norm).
+        // Existence of the referenced id is deliberately never enforced here
+        // — work.mjs's shape validation (non-empty, non-self-referencing) is
+        // the only guard, same as discoveredFrom.
+        parent: optionalField(flags.parent, 'add --parent requires a non-empty id; omit --parent entirely to leave unset.'),
         // Per work-graph-intelligence S9: --footprint is an optional list of
         // the file paths this item is expected to touch (feeds the
         // footprint-intersection advisory). Set ONLY when the flag is present
@@ -809,6 +888,11 @@ async function runVerb(verb, flags, positional, dir) {
         // empty `--targets ''` (or a bare `--targets` with no value)
         // parses to [] explicitly, same as --footprint.
         targets: flags.targets === undefined ? undefined : parseListFlag(flags.targets),
+        // Per work-item-priority-matrix D2: --urgent is optional, human-
+        // entered, same omitted-leaves-undefined shape as --tier/--domain
+        // above. work.mjs's validateWorkShape is the single source for the
+        // URGENCY_LEVELS domain and rejects an out-of-domain value.
+        urgent: optionalField(flags.urgent, "add --urgent requires a value ('low'/'medium'/'high'/'critical'); omit --urgent entirely to leave unset."),
       };
       const { event } = addWork(dir, work);
       return { id: event.payload.id, seq: event.seq };
@@ -856,29 +940,49 @@ async function runVerb(verb, flags, positional, dir) {
       return submitWork(dir, text, opts);
     }
 
-    // The sync branch's entry point into context-discovery/chia-việc (per
-    // D5/stage-decompose D3): a live session runs the SAME engine the async
-    // runner sweep calls for whichever stage the item is currently sitting
-    // at — `resolveDiscovery` for `clarify`, `resolveDecompose` for
-    // `decompose` (D3's sync/async parity: identical trace either way, only
-    // the role differs). A clear discovery verdict moves the item to
-    // `decompose` (carrying a real verify, D10); chia-việc then either
-    // passes it through to `executing`, splits it into children, or parks it
-    // in `awaiting-human` (D3). The runner config (executor + tier models)
-    // is loaded the same way bin/fgos-runner.mjs loads it.
+    // The sync branch's entry point into context-discovery (tsk-2b0 D1: hard
+    // split, no fallback — this verb only ever wraps `resolveDiscovery`/
+    // `judgeDiscovery`, for an item at stage `clarify`). A live session runs
+    // the SAME engine the async runner sweep calls (RUL19). A clear verdict
+    // moves the item to `decompose` (carrying a real verify, D10); the
+    // sibling `decompose` verb below is what carries it the rest of the way.
+    // The runner config (executor + tier models) is loaded the same way
+    // bin/fgos-runner.mjs loads it.
     case 'discover': {
       const id = requireField(positional[0] ?? flags.id, 'discover requires an id: fgos discover <id> [--config <path>]');
+      const stage = listWork(dir).work[id]?.stage;
+      if (stage !== 'clarify') {
+        throw new StoreError('validation', `discover: work "${id}" is at stage "${stage}", not "clarify" -- use "fgos decompose ${id}" instead.`);
+      }
       // An explicit --config path stays a loud, unmodified failure on ENOENT
       // (loadRunnerConfig); only the default, unflagged path bootstraps a
-      // missing config (D1/D3, ensureRunnerConfig).
+      // missing config (D1/D3, ensureRunnerConfigForDir — tsk-5vf D1/D2).
       const cfg = flags.config
         ? loadRunnerConfig(flags.config)
-        : ensureRunnerConfig(path.join(process.cwd(), '.fgos-runner.json'));
+        : ensureRunnerConfigForDir(process.cwd());
+      const callerVerdict = parseDiscoverCallerVerdict(flags);
+      return resolveDiscovery(dir, id, cfg, 'session', callerVerdict);
+    }
+
+    // The sync branch's entry point into chia-việc/split-work judgment
+    // (tsk-2b0 D1: hard split, no fallback — this verb only ever wraps
+    // `resolveDecompose`/`judgeDecompose`, for an item at stage
+    // `decompose`). A live session runs the SAME engine the async runner
+    // sweep calls (D3's sync/async parity: identical trace either way, only
+    // the role differs). `resolveDecompose` either passes the item through
+    // to `executing`, splits it into children, or parks it in
+    // `awaiting-human` (D3).
+    case 'decompose': {
+      const id = requireField(positional[0] ?? flags.id, 'decompose requires an id: fgos decompose <id> [--config <path>]');
       const stage = listWork(dir).work[id]?.stage;
-      const result = stage === 'decompose'
-        ? resolveDecompose(dir, id, cfg, 'session')
-        : resolveDiscovery(dir, id, cfg, 'session');
-      return result;
+      if (stage !== 'decompose') {
+        throw new StoreError('validation', `decompose: work "${id}" is at stage "${stage}", not "decompose" -- use "fgos discover ${id}" instead.`);
+      }
+      const cfg = flags.config
+        ? loadRunnerConfig(flags.config)
+        : ensureRunnerConfigForDir(process.cwd());
+      const callerVerdict = parseDecomposeCallerVerdict(flags);
+      return resolveDecompose(dir, id, cfg, 'session', callerVerdict);
     }
 
     case 'move': {
@@ -895,74 +999,126 @@ async function runVerb(verb, flags, positional, dir) {
       return { id, from: event.payload.from, to: event.payload.to, seq: event.seq };
     }
 
-    // The deliberate entry into Compound-learn (per compound-learn-enduser-docs
-    // D2/D3): unlike `move`, this is not a generic status/stage door — it is
-    // the one act that makes the synthesis stage non-vacuous (an auto-advance
-    // on return/approve would let the stage transit with nothing synthesised,
-    // exactly what D3 forbids). Requires `status === 'awaiting-approval'` (work
-    // returned, verify green) so the item is at a settled checkpoint before it
-    // moves into compound-learn; persists via store.mjs's moveStage (not the
-    // pure stage.mjs transitionStage) so the move is actually written to the
-    // log, mirroring moveWork's own persisting-wrapper shape above.
+    // work-item-status-delivered-retrospective-cleanup D9: the mechanical
+    // half of retrospective — a batch sweep, run once per invocation,
+    // moving every `delivered` item to `retrospective` (marking it picked
+    // up for the batch synthesis pass). Never runs inline in
+    // return/approve, per the same D9 decision. The actual synthesis
+    // (settlement/decision/enduser-docs, formerly `fgos-compounding`'s
+    // stage-triggered job) is a session's own separate work while an item
+    // sits at `retrospective`; this verb only performs the mechanical
+    // claim-like transition, exactly once per swept item, never the
+    // synthesis itself. Moving on to `cleanup` afterward is the plain
+    // generic `fgos move <id> --to cleanup` — no dedicated verb needed,
+    // since `cleanup`'s own harness (below) re-verifies real content
+    // exists before it will ever reach `done`.
+    case 'retrospective': {
+      const view = listWork(dir);
+      const swept = [];
+      for (const item of Object.values(view.work)) {
+        if (item.status !== 'delivered') continue;
+        const { event } = moveWork(dir, { id: item.id, to: 'retrospective', expectedStatus: 'delivered', role: 'system' });
+        swept.push({ id: item.id, seq: event.seq });
+      }
+      return { swept, count: swept.length };
+    }
+
+    // work-item-status-delivered-retrospective-cleanup D8: the dedicated
+    // harness gating `cleanup -> done`, never folded into return/compound.
+    // Checks (cleanup-harness.mjs's assessCleanupReadiness): (1) the
+    // global TTL (D7) has elapsed since the item actually entered
+    // `cleanup`; (2) retrospective produced real content; (3) — only for a
+    // worktree-backed domain (D5) — the merge still resolves on main. All
+    // ready: performs the actual branch/worktree cleanup (cleanupMergedBranch,
+    // idempotent if a synchronous cleanup already ran elsewhere) and closes
+    // to `done`. Any check failing: parks `cleanup -> blocked` with every
+    // failing reason joined into one `reason` string (fsm.mjs requires
+    // this edge to carry one, mirroring `awaiting-approval -> blocked`).
+    case 'cleanup': {
+      const id = requireField(positional[0] ?? flags.id, 'cleanup requires an id: fgos cleanup <id>');
+      const view = listWork(dir);
+      const item = view.work[id];
+      if (!item) {
+        throw new StoreError('validation', `cleanup: work "${id}" not found.`);
+      }
+      if (item.status !== 'cleanup') {
+        throw new StoreError('precondition', `cleanup: work "${id}" is "${item.status}", not "cleanup" — nothing to finish.`);
+      }
+
+      const domain = getDomain(item.domain);
+      const rawEvents = readRawEvents(dir);
+      const repoRoot = process.cwd();
+      const sharedConfig = readSharedConfig(repoRoot);
+      const ttlDays = sharedConfig?.cleanup?.ttlDays ?? DEFAULT_CLEANUP_TTL_DAYS;
+
+      const assessment = assessCleanupReadiness({
+        view,
+        rawEvents,
+        id,
+        repoRoot,
+        worktreeBacked: domain.worktreeBacked ?? false,
+        ttlDays,
+      });
+
+      if (!assessment.ready) {
+        const reason = assessment.reasons.join('; ');
+        const { event } = moveWork(dir, { id, to: 'blocked', expectedStatus: 'cleanup', reason, role: 'system' });
+        return { id, to: 'blocked', reason, seq: event.seq };
+      }
+
+      let cleanupWarnings = [];
+      if (domain.worktreeBacked) {
+        const branch = branchNameFor(id);
+        if (branchExists(repoRoot, branch)) {
+          const result = cleanupMergedBranch(repoRoot, branch);
+          cleanupWarnings = result.warnings;
+        }
+      }
+      const { event } = moveWork(dir, { id, to: 'done', expectedStatus: 'cleanup', role: 'human' });
+      return { id, to: 'done', seq: event.seq, cleanupWarnings };
+    }
+
+    // Restored (tsk-3o3, git-recovered from fcfbae5/tsk-1zi which removed
+    // it along with the retired `compound-learn` stage): the producer
+    // surface `fgos-compounding` uses to store its Diataxis classification
+    // on a `retrospective`-status item's outcome. Unlike the removed
+    // version, this never moves stage — there is no `compound-learn` stage
+    // left to move into (D11); the only precondition is the item actually
+    // sitting at status `retrospective`, the status-based trigger that
+    // superseded the retired stage move (tsk-1zi).
     //
-    // `--doc-type <quadrant>` (slice 3, CONTEXT D4/D8) is the minimal producer
-    // surface the inducted `fgos-compounding` skill uses to store its Diataxis
-    // classification: when given, it is PRE-VALIDATED via store.mjs's exported
+    // `--doc-type <quadrant>` is pre-validated via store.mjs's exported
     // `assertValidDocType` (the single `DIATAXIS_DOC_TYPES` set, not
     // re-implemented here) BEFORE any write — a non-quadrant value is
-    // rejected with zero events, on every stage. Real guarantee, not
-    // "reject clean, no partial write" in general: once validation passes,
-    // this case is STAGE-AWARE (P1 fix, slice-3 review). An item already at
-    // stage `compound-learn` is the routed case (`fgos-compounding` runs
-    // only once an item has already arrived there) — the docType is tagged
-    // via `addOutcome` WITHOUT a stage move, because `moveStage` has no
-    // compound-learn -> compound-learn edge and would throw; writing the
-    // outcome first and then hitting that throw is exactly the dangling-
-    // outcome bug this fix closes. Every other source stage keeps the
-    // original order — `moveStage` first, `addOutcome` second — so an
-    // illegal source stage throws before any outcome is written. Omitted
-    // entirely, `compound` stays byte-identical to pre-slice-3: `moveStage`
-    // only, no outcome written, still rejecting an already-compound-learn
-    // re-compound.
+    // rejected with zero events. Omitted entirely, `compound` writes
+    // nothing and returns a `docType: null` no-op (there is no stage move
+    // left for a bare call to perform).
     //
-    // `--doc-path <path>` (bước-3, CONTEXT D12/D15) is an additive linkage
-    // field alongside `--doc-type`: it records which real end-user doc the
-    // tagged capture belongs to, so a later read-side index can back-link a
-    // doc to its source capture with no loss of detail (D13). Omitted
-    // entirely, or omitted while `--doc-type` is given, `compound` is
-    // byte-identical to pre-docPath behavior.
+    // `--doc-path <path>` is an additive linkage field alongside
+    // `--doc-type`: it records which real end-user doc the tagged capture
+    // belongs to, so a later read-side index can back-link a doc to its
+    // source capture with no loss of detail. Only meaningful alongside
+    // `--doc-type` — same optional-shape idiom, only a bare/empty value is
+    // refused.
     case 'compound': {
       const id = requireField(positional[0] ?? flags.id, 'compound requires an id: fgos compound <id>');
       const item = listWork(dir).work[id];
       if (!item) {
         throw new StoreError('validation', `compound: work "${id}" not found.`);
       }
-      if (item.status !== 'awaiting-approval') {
-        throw new StoreError('validation', `compound: work "${id}" is "${item.status}", not "awaiting-approval" — cannot move into compound-learn.`);
+      if (item.status !== 'retrospective') {
+        throw new StoreError('validation', `compound: work "${id}" is "${item.status}", not "retrospective" — nothing to tag.`);
       }
       const docType = optionalField(flags['doc-type'], 'compound --doc-type requires a non-empty value: tutorial | how-to | reference | explanation.');
       if (docType !== undefined) {
         assertValidDocType({ docType });
       }
-      // `--doc-path <path>` (bước-3, CONTEXT D12/D15) is the additive
-      // doc-capture linkage: the end-user doc path the `docType`-tagged
-      // outcome was written for, so the deferred index/manifest can back-
-      // link a real doc to the capture it came from. Same optional-shape
-      // idiom as `docType` above (only a bare/empty value is refused); rides
-      // the same addOutcome payload spread with zero store.mjs change (D6's
-      // additive pattern). Only meaningful alongside `--doc-type` — it never
-      // gates whether an outcome is written on its own, matching the
-      // pre-existing docType-gated write below.
       const docPath = optionalField(flags['doc-path'], 'compound --doc-path requires a non-empty value.');
-      if (docType !== undefined && item.stage === 'compound-learn') {
-        const { event } = addOutcome(dir, { id, docType, ...(docPath !== undefined ? { docPath } : {}) });
-        return { id, docType, docPath: docPath ?? null, stage: item.stage, seq: event.seq };
+      if (docType === undefined) {
+        return { id, docType: null, docPath: null, status: item.status };
       }
-      const { event } = moveStage(dir, { id, to: 'compound-learn', role: 'human' });
-      if (docType !== undefined) {
-        addOutcome(dir, { id, docType, ...(docPath !== undefined ? { docPath } : {}) });
-      }
-      return { id, from: event.payload.from, to: event.payload.to, seq: event.seq };
+      const { event } = addOutcome(dir, { id, docType, ...(docPath !== undefined ? { docPath } : {}) });
+      return { id, docType, docPath: docPath ?? null, status: item.status, seq: event.seq };
     }
 
     // Patches fields on an existing item (P23, D2-D5) — the "always
@@ -975,12 +1131,12 @@ async function runVerb(verb, flags, positional, dir) {
     case 'edit': {
       const id = requireField(positional[0] ?? flags.id, 'edit requires an id: fgos edit <id> --<field> <value> [...]');
       const patch = {};
-      for (const field of ['title', 'kind', 'risk', 'verify', 'tier']) {
+      for (const field of ['title', 'description', 'kind', 'risk', 'verify', 'tier', 'urgent']) {
         if (flags[field] !== undefined) {
           patch[field] = flags[field];
         }
       }
-      for (const field of ['refs', 'deps']) {
+      for (const field of ['refs', 'deps', 'footprint']) {
         if (flags[field] !== undefined) {
           patch[field] = parseListFlag(flags[field]);
         }
@@ -1001,6 +1157,48 @@ async function runVerb(verb, flags, positional, dir) {
       // cannot join the simple same-name loop above.
       if (flags['docs-ref'] !== undefined) {
         patch.docsRef = optionalField(flags['docs-ref'], 'edit --docs-ref requires a non-empty path.');
+      }
+      // --merge-after (tsk-2u0, docs/history/tsk-3bn-merge-conductor-harness-v2/
+      // D4/D5): same latest-wins comma-separated shape as --refs/--deps
+      // above, kebab flag vs camelCase field so it cannot join that simple
+      // same-name loop either (same reason --docs-ref needs its own
+      // handling, right above). Existence/self-reference/cycle validation
+      // all happen at the write door (work.mjs's validateWork, dep-graph.mjs's
+      // assertNoUnifiedCycle) — this is pure flag plumbing, no new checks.
+      if (flags['merge-after'] !== undefined) {
+        patch.mergeAfter = parseListFlag(flags['merge-after']);
+      }
+      // --superseded-by / --duplicates (tsk-2ie, docs/history/
+      // tsk-2ie-duplicate-superseded-guard/ D1): same plumbing-only shape as
+      // --merge-after/--parent above, no new checks here -- existence/
+      // self-reference validation happens at the write door
+      // (work.mjs's validateSupersededBy/validateDuplicates via validateWork).
+      // --superseded-by is a scalar (mirrors --parent's clear-with-empty-
+      // string semantics, D3's directed-singular shape); --duplicates is a
+      // comma-separated list (mirrors --merge-after's array shape).
+      if (flags['superseded-by'] !== undefined) {
+        if (flags['superseded-by'] === true) {
+          throw new StoreError('validation', '--superseded-by requires a value; use --superseded-by "" to clear it.');
+        }
+        patch.supersededBy = flags['superseded-by'] === '' ? null : flags['superseded-by'];
+      }
+      if (flags.duplicates !== undefined) {
+        patch.duplicates = parseListFlag(flags.duplicates);
+      }
+      // parent-flag-cli D2: --parent "" CLEARS the field (un-parents the
+      // item), matching --refs ''/--deps '' above — but `parent` is a scalar,
+      // not a list, so the clear sentinel is `null` (the value work.mjs:255
+      // already treats as absent), not `[]`. Cannot reuse optionalField
+      // here (add's --parent does): optionalField's requireField rejects ''
+      // outright, which is correct for add (nothing to clear at creation)
+      // but wrong for edit's clear semantics. A bare --parent with no value
+      // (flags.parent === true) is the same valueless-flag error priority/
+      // intent guard against below, not a value to fold in.
+      if (flags.parent !== undefined) {
+        if (flags.parent === true) {
+          throw new StoreError('validation', '--parent requires a value; use --parent "" to clear it.');
+        }
+        patch.parent = flags.parent === '' ? null : flags.parent;
       }
       // Priority/intent (per str7-str8-priority-intent D1/D3/D6): both are
       // numeric fields, unlike the string flags in the loop above, so each
@@ -1036,10 +1234,29 @@ async function runVerb(verb, flags, positional, dir) {
         }
         patch.intent = intent;
       }
+      // Impact/effort (per work-item-priority-matrix D3/D5): both computed,
+      // non-negative NUMBERS (not integer-only like priority/intent, since
+      // they can carry a fractional composite score) -- same valueless-flag
+      // guard as priority/intent above.
+      for (const field of ['impact', 'effort']) {
+        if (flags[field] !== undefined) {
+          if (flags[field] === true) {
+            throw new StoreError('validation', `--${field} requires a numeric value.`);
+          }
+          const value = Number(flags[field]);
+          if (!Number.isFinite(value) || value < 0) {
+            throw new StoreError(
+              'validation',
+              `--${field} must be a non-negative number, got: ${JSON.stringify(flags[field])}`,
+            );
+          }
+          patch[field] = value;
+        }
+      }
       if (Object.keys(patch).length === 0) {
         throw new StoreError(
           'validation',
-          'edit requires at least one field to change: --title/--kind/--risk/--verify/--tier/--refs/--deps/--acceptance/--priority/--intent/--docs-ref.',
+          'edit requires at least one field to change: --title/--description/--kind/--risk/--verify/--tier/--refs/--deps/--footprint/--acceptance/--priority/--intent/--docs-ref/--parent/--urgent/--impact/--effort/--merge-after/--superseded-by/--duplicates.',
         );
       }
       const { event } = editWork(dir, { id, patch, role: 'human' });
@@ -1107,6 +1324,15 @@ async function runVerb(verb, flags, positional, dir) {
       const id = optionalField(flags.id, 'decision --id requires a non-empty value (omit --id entirely to skip per-item scoping)');
       const { event } = addDecision(dir, { text, rationale, alternatives, source, id });
       return { seq: event.seq };
+    }
+
+    case 'gate-approve': {
+      const id = requireField(positional[0] ?? flags.id, 'gate-approve requires an id: fgos gate-approve <id> --gate <name> --actor <human|bypass> --verify "..."');
+      const gate = requireField(flags.gate, 'gate-approve requires --gate <contextApprove|planApprove|validateApprove>');
+      const actor = requireField(flags.actor, 'gate-approve requires --actor <human|bypass>');
+      const verify = requireField(flags.verify, 'gate-approve requires --verify "..."');
+      const { event } = recordGateApprove(dir, { id, gate, actor, verify });
+      return { id, gate, actor, seq: event.seq };
     }
 
     case 'list': {
@@ -1259,8 +1485,17 @@ async function runVerb(verb, flags, positional, dir) {
     // reimplements the ranking here.
     case 'merge': {
       const sub = requireField(positional[0], 'merge requires a sub-verb: fgos merge <list|next>');
+      // driftStatus (tsk-2u0) is computed here, once, and handed into the
+      // pure mergeReadiness as opts.drift — mergeReadiness itself never
+      // shells git (stays pure), this verb wrapper does the one real,
+      // read-only git read that populates blockedOnSync. Best-effort: a
+      // repo-less/detached cwd still returns a usable ranking (driftStatus
+      // just reports no roots), same "read never throws on a legacy
+      // shape" posture `review`'s own diff already has.
+      const mergeView = listWork(dir);
+      const drift = driftStatus(process.cwd(), mergeView);
       if (sub === 'list') {
-        return mergeReadiness(listWork(dir));
+        return mergeReadiness(mergeView, { drift });
       }
       if (sub === 'next') {
         // Picks the single top-ranked ready item and merges it by recursing
@@ -1277,7 +1512,7 @@ async function runVerb(verb, flags, positional, dir) {
         // reports which item and why, merges nothing, and stops — it does
         // NOT fall through to the next-ranked item (that would silently
         // change merge order semantics `merge list` already promised).
-        const { ready } = mergeReadiness(listWork(dir));
+        const { ready } = mergeReadiness(mergeView, { drift });
         if (ready.length === 0) {
           return { picked: null, reason: 'nothing ready to merge' };
         }
@@ -1402,16 +1637,38 @@ async function runVerb(verb, flags, positional, dir) {
       // prerequisite for the write-only-if-changed guard below to ever
       // actually skip a write).
       docEntries.sort((a, b) => (a.quadrant === b.quadrant ? (a.docPath < b.docPath ? -1 : 1) : (a.quadrant < b.quadrant ? -1 : 1)));
-      const view = listWork(dir);
-      const entries = buildEnduserIndex(docEntries, view.outcomes ?? {});
       const manifestPath = path.join(repoRoot, 'docs', 'enduser-docs-index.json');
-      const nextContent = `${JSON.stringify(entries, null, 2)}\n`;
       let previousContent;
       try {
         previousContent = fs.readFileSync(manifestPath, 'utf8');
       } catch (err) {
         if (err.code !== 'ENOENT') throw err;
       }
+      // tsk-f31: sourceCaptureId can be unresolvable this run not because
+      // the doc genuinely lacks a capture, but because the store itself is
+      // unreachable (a worktree's .fgos/ carries no events.jsonl -- ADR0020).
+      // Detected on the log file itself, not the .fgos/ directory: the
+      // directory can exist (e.g. holding only main-checkout.lock) while
+      // events.jsonl is absent -- readEvents' own ENOENT check
+      // (src/state/events.mjs) is the real signal listWork keys off, not a
+      // directory-level proxy for it. When unreachable, preserve a docPath's
+      // existing on-disk value instead of regressing it to null; a
+      // genuinely reachable store is the only thing allowed to overwrite a
+      // prior value with null.
+      const storeReachable = fs.existsSync(path.join(dir, 'events.jsonl'));
+      const previousById = new Map();
+      if (previousContent) {
+        for (const e of JSON.parse(previousContent)) previousById.set(e.docPath, e.sourceCaptureId);
+      }
+      const view = listWork(dir);
+      const rawEntries = buildEnduserIndex(docEntries, view.outcomes ?? {});
+      const entries = rawEntries.map((e) => {
+        if (!storeReachable && e.sourceCaptureId === null && previousById.get(e.docPath)) {
+          return { ...e, sourceCaptureId: previousById.get(e.docPath) };
+        }
+        return e;
+      });
+      const nextContent = `${JSON.stringify(entries, null, 2)}\n`;
       if (previousContent !== nextContent) {
         fs.mkdirSync(path.dirname(manifestPath), { recursive: true });
         fs.writeFileSync(manifestPath, nextContent, 'utf8');
@@ -1499,6 +1756,39 @@ async function runVerb(verb, flags, positional, dir) {
         }
       }
 
+      // A `todo` item whose own `fgw/<id>` branch already stands is never an
+      // honest main-checkout take (tsk-65n). `claimWork` with isolate:false
+      // records `source: main` + `headAtTake` — so `return` would later
+      // measure progress against the main checkout's HEAD, which the work
+      // never advances, because the work is on the branch. The claim
+      // succeeds and the lie only surfaces much later, as a `return` that
+      // refuses for no visible reason. Refuse here instead, naming the door
+      // that claims the branch.
+      //
+      // Deliberately at this verb layer and NOT inside `claimWork`: the
+      // runner claims through that same function with isolate:false
+      // (`loop.mjs`) and must keep being able to. `blocked` + branch-exists
+      // is likewise untouched — that is the branch-take path (`isBranchTake`),
+      // a main-checkout claim that already records branch source correctly.
+      // repoRoot from --dir, never raw process.cwd() (tsk-k8u D2): a
+      // caller running this from inside a linked worktree (e.g. a session
+      // mid-clarify/decompose, per claim-lock §3b) always passes --dir at
+      // the stable main checkout — deriving repoRoot from it keeps every
+      // git op in this handler targeting that stable root instead of the
+      // caller's own possibly-transient cwd. Byte-identical to before when
+      // --dir is omitted (dataDir() resolves dir from process.cwd() too in
+      // that case).
+      const repoRoot = path.dirname(dir);
+
+      const claiming = listWork(dir).work[id];
+      const claimingBranch = branchNameFor(id);
+      if (claiming?.status === 'todo' && branchExists(repoRoot, claimingBranch)) {
+        throw new StoreError(
+          'validation',
+          `take: "${id}" already has its own branch ${claimingBranch}, so its work lives there, not on the main checkout — a take here would claim source:main and record a headAtTake that never advances, making a later "return" refuse. Use "fgos pick ${id}" to claim the branch and its worktree instead.`,
+        );
+      }
+
       // Delegate to claim-port.mjs — single choke-point for all claim flows
       // (tsk-53f D1). take uses isolate:false (no worktree creation).
       const { noWait, waitMs } = parseWaitFlags(flags, 'take');
@@ -1506,7 +1796,7 @@ async function runVerb(verb, flags, positional, dir) {
         id,
         actor: role,
         isolate: false,
-        repoRoot: process.cwd(),
+        repoRoot,
       });
       try {
         return noWait ? doTake() : await withLockRetry(doTake, { waitMs });
@@ -1557,20 +1847,29 @@ async function runVerb(verb, flags, positional, dir) {
       // executing boundary, claim-lock §3b) reattaches to that same branch
       // tip via createWorktree's reuse path instead of forking a new one.
       const { noWait, waitMs } = parseWaitFlags(flags, 'pick');
-      // worktreeDir under .claude/worktrees/ (tsk-424 D1/D2): the harness's
-      // own EnterWorktree tool only allows a second-or-later in-session
-      // switch when the target sits there, e.g. a root item decomposing
-      // into a child mid-session. os.tmpdir()/fgos-worktrees (createWorktree's
-      // own default) fails that check past the first switch — pick is the
-      // only caller that needs the harness-chainable location; runner/
+      // repoRoot from --dir, never raw process.cwd() (tsk-k8u D1/D2): a
+      // claim-release + re-pick run from inside the very worktree being
+      // torn down (e.g. the claim-lock §3b reattach above) must never
+      // target git operations at that doomed cwd — deriving repoRoot from
+      // --dir keeps them at the stable main checkout instead. Same
+      // no-op-when---dir-is-omitted behavior as take's own fix above.
+      const repoRoot = path.dirname(dir);
+      // worktreeDir under repoRoot's .claude/worktrees/ (tsk-424 D1/D2,
+      // tsk-k8u D2: derived from the same fixed repoRoot, not
+      // process.cwd(), for the same reason): the harness's own
+      // EnterWorktree tool only allows a second-or-later in-session switch
+      // when the target sits there, e.g. a root item decomposing into a
+      // child mid-session. os.tmpdir()/fgos-worktrees (createWorktree's own
+      // default) fails that check past the first switch — pick is the only
+      // caller that needs the harness-chainable location; runner/
       // merge-ephemeral callers are untouched.
       const doPick = () => claimWork(dir, {
         id,
         actor: 'session',
         isolate: true,
         claimTrigger,
-        repoRoot: process.cwd(),
-        worktreeDir: path.join(process.cwd(), '.claude', 'worktrees'),
+        repoRoot,
+        worktreeDir: path.join(repoRoot, '.claude', 'worktrees'),
       });
       try {
         return noWait ? doPick() : await withLockRetry(doPick, { waitMs });
@@ -1656,6 +1955,21 @@ async function runVerb(verb, flags, positional, dir) {
         let check;
         try {
           gitAt(repoRoot, ['worktree', 'add', '--detach', tmpWorktree, branchHead]);
+          // tsk-5l2-1 finding (real, kept as evidence): tmpWorktree lives
+          // under os.tmpdir(), outside the repo tree — Node's ESM loader
+          // never consults NODE_PATH, so a bare-specifier import (e.g.
+          // "yaml") can only resolve via a real node_modules directory
+          // reachable by walking up from tmpWorktree itself. A symlink
+          // pointed at the nearest real install was considered here too
+          // (tsk-5l2-1) and rejected for the same reason tsk-2vd D2
+          // already rejected it for createWorktree: it only reflects
+          // whatever the symlink source already has installed, never the
+          // checked-out branch's own declared dependencies — exactly the
+          // scenario (a branch merging in a new dependency before that
+          // merge lands on the source's own default branch) that exposed
+          // this whole gap. provisionDependencies installs for THIS
+          // worktree's own package.json instead.
+          provisionDependencies(tmpWorktree);
           check = await runGoalCheck(item, tmpWorktree, timeoutMs);
         } finally {
           try {
@@ -1839,6 +2153,54 @@ async function runVerb(verb, flags, positional, dir) {
       return { id, mode: 'local', source, warnings, diff, trace: collectReviewTrace(view, id) };
     }
 
+    // tsk-480: approve's own success paths (merge landed, or verify-only
+    // passed) call `moveWork(...to:'delivered'...)` as their very last
+    // step. That write can throw on `events.lock` contention even though
+    // the precondition it's recording already succeeded permanently —
+    // without a guard, the exception would propagate uncaught, and (per
+    // `invocation-fault-log.mjs`'s own documented scope) a fault raised
+    // this deep inside a verb's handler is deliberately never recorded by
+    // that mechanism either, so nothing at all would be left to explain
+    // why a real merge landed while the item stayed `awaiting-approval`
+    // forever (CONTEXT.md D1). This wraps exactly that one call: on
+    // success, returns the real event; on failure, records a diagnostic
+    // through `approve-fault-log.mjs` (D2 — no shared lock with
+    // `events.jsonl`) and returns `event: null` instead of throwing, so
+    // every call site can still finish its own cleanup and return a
+    // truthful envelope.
+    function moveDeliveredOrRecordFault(dir, id, phase) {
+      try {
+        // Test-only failure seam (tsk-480 D3), same shape as
+        // FGOS_GH_COMMAND (bin/fgos.mjs ghCommandOpts): an env var read
+        // only here, scoped to the exact item id so it can never affect
+        // any other item in the same process, inert unless a test
+        // explicitly sets it. Production code never sets this variable.
+        if (process.env.FGOS_TEST_FORCE_APPROVE_LOCK_TIMEOUT === id) {
+          throw new EventLogError('lock-timeout', `approve: simulated lock-timeout for "${id}" (FGOS_TEST_FORCE_APPROVE_LOCK_TIMEOUT)`);
+        }
+        const { event } = moveWork(dir, { id, to: 'delivered', expectedStatus: 'awaiting-approval', role: 'human' });
+        return { event, error: null, diagnosticLog: null };
+      } catch (err) {
+        // Only an EventLogError (the write itself failing — e.g.
+        // 'lock-timeout', src/state/events.mjs) is the class of failure
+        // this guard exists for. A StoreError from transitionWork's own
+        // precondition/CAS check (e.g. a missing-evidence acceptance
+        // clause) is a legitimate refusal that must keep propagating
+        // exactly as before — swallowing it here would silently accept an
+        // item transitionWork correctly refused.
+        if (!(err instanceof EventLogError)) {
+          throw err;
+        }
+        const diagnosticLog = recordApprovePostSuccessFault(dir, { id, phase, detail: err.message });
+        process.stderr.write(
+          `fgos: warning: "${id}" ${phase} succeeded but its status write failed (${err.message}); `
+            + `item status remains "awaiting-approval" pending manual reconciliation; `
+            + `diagnostic recorded to ${diagnosticLog ?? '(unrecorded — see this stderr line)'}.\n`,
+        );
+        return { event: null, error: err, diagnosticLog };
+      }
+    }
+
     // Cổng duyệt — approve (pr-lifecycle D3/D4): merges a runner item's
     // branch into main (spike-proven mechanics: --no-commit --no-ff, verify
     // on the staged tree, commit only on green — merge.mjs's mergeRunnerItem)
@@ -1917,6 +2279,41 @@ async function runVerb(verb, flags, positional, dir) {
         );
       }
 
+      // Close-out drift guard (tsk-62y, docs/history/
+      // tsk-3bn-merge-conductor-harness-v2/): tsk-3bn's own origin incident
+      // was closing a milestone (a `targets`-bearing item) while ONE of its
+      // targets' resolved root branches had drifted ahead of main from a
+      // later leaf merge — nothing warned or blocked it. `targets` is the
+      // real, already-existing field a milestone uses ("a milestone's
+      // targets are ordinary work ids", work.mjs). Only runs when `targets`
+      // is a non-empty array — an ordinary (non-milestone) approve is
+      // completely unaffected. Refuses BEFORE any git mutation, same
+      // "acknowledge to override" shape as the Iron Law gate right below —
+      // `--acknowledge-drift` is a deliberate human override, not a bypass
+      // to route around silently.
+      if (Array.isArray(item.targets) && item.targets.length > 0) {
+        const drift = driftStatus(repoRoot, view);
+        const driftedTargets = [];
+        for (const targetId of item.targets) {
+          if (!view.work[targetId]) continue;
+          const targetRoot = resolveRoot(view, targetId);
+          const status = drift[targetRoot];
+          if (status?.needsSync) {
+            driftedTargets.push({ targetId, root: targetRoot, ...status });
+          }
+        }
+        if (driftedTargets.length > 0 && flags['acknowledge-drift'] !== true) {
+          const summary = driftedTargets
+            .map((d) => `${d.targetId} (root ${d.root}: ${d.branch} is ${d.aheadOfTarget} commit(s) ahead of ${d.target})`)
+            .join(', ');
+          throw new StoreError(
+            'validation',
+            `approve: "${id}" targets item(s) whose root branch has unsynced drift: ${summary}. `
+              + `Run "fgos sync-root <root-id>" first, or re-run with --acknowledge-drift to close anyway.`,
+          );
+        }
+      }
+
       // Iron Law gate (D16/D17), hoisted ahead of the --github branch —
       // review-20260718-self-improve-loop finding f01: this check previously
       // lived only inside the local-merge branch further below, so `approve
@@ -1925,18 +2322,28 @@ async function runVerb(verb, flags, positional, dir) {
       // gate, contradicting D16's "one common point for every runner-sourced
       // proposal, not just the local path". One check point now guards BOTH
       // merge transports identically, before either can run. changedFiles
-      // diffs the item's own branch against the default trunk, so a leaf
-      // over-reports its file set (superset of its real leaf-vs-root diff) —
-      // the fail-safe direction, accepted as-is (unchanged from before this
-      // hoist). Refuses BEFORE any git mutation or GitHub call: the item
-      // stays `proposed`, nothing is touched, neither transport is reached.
-      // Hoisted alongside the Iron Law gate (tsk-598 D1/D2): the local-merge
-      // branch's own clean-tree check, further below, reuses this exact
-      // array as its ownFileSet source instead of recomputing the same
-      // branch-vs-trunk diff a second time.
+      // diffs the item's own branch against its resolved root's branch (the
+      // same D3 leaf-vs-root split already used for the human-viewable diff,
+      // the GitHub PR base, the real merge target, and `catchup`'s target —
+      // never blind trunk for a leaf) so the file set reflects the item's
+      // own real diff, not every ancestor commit's files too
+      // (tsk-4voj-iron-law-leaf-scope CONTEXT.md D1; previously a leaf
+      // over-reported its file set, which is why this comment used to call
+      // that the "fail-safe direction, accepted as-is" — superseded, see
+      // CONTEXT.md D1). Refuses BEFORE any git mutation or GitHub call: the
+      // item stays `proposed`, nothing is touched, neither transport is
+      // reached. Hoisted alongside the Iron Law gate (tsk-598 D1/D2): the
+      // local-merge branch's own clean-tree check, further below, reuses
+      // this exact array as its ownFileSet source instead of recomputing
+      // the same diff a second time.
       let runnerOwnDiff;
       if (source === 'runner') {
-        runnerOwnDiff = changedFiles(repoRoot, item);
+        const rootIdForIronLaw = resolveRoot(view, id);
+        runnerOwnDiff = changedFiles(
+          repoRoot,
+          item,
+          rootIdForIronLaw !== id ? { trunk: branchNameFor(rootIdForIronLaw) } : {},
+        );
         const ironLaw = classifyIronLaw({ filesChanged: runnerOwnDiff, description: item.description });
         // review-20260718-self-improve-loop finding f02: only the bare flag
         // (parsed as boolean `true`, no following value) counts as
@@ -1973,14 +2380,20 @@ async function runVerb(verb, flags, positional, dir) {
           throw new StoreError('validation', `approve --github: "${id}" is a ${source}-sourced item — GitHub approval requires a runner-sourced item with a live fgw/${id} branch (no branch exists to attach a PR to for pull/legacy items).`);
         }
         const prNumber = requireField(flags.pr, 'approve --github requires --pr <n> (the GitHub PR number from a prior review --github)');
+        // Acceptance-evidence pre-flight (tsk-396 D2): checked BEFORE the
+        // real GitHub-side merge, not caught after the fact inside
+        // moveWork's own `to === 'delivered'` check — a GitHub merge can't
+        // be `git merge --abort`ed the way a local one can, so this matters
+        // even more here than on the local paths above.
+        assertAcceptanceEvidence(id, item);
         const result = await mergeGitHubPR(repoRoot, prNumber, ghCommandOpts());
         if (result.outcome === 'merged') {
           // Accepted rough edge (this slice): unlike the local merged path, no
           // cleanupMergedBranch runs — the local fgw/<id> branch and its pushed
           // origin copy are both left in place after a server-side merge (no
           // local cleanup mechanism exists for a branch merged on GitHub).
-          const { event } = moveWork(dir, { id, to: 'done', expectedStatus: 'awaiting-approval', role: 'human' });
-          return { id, mode: 'github', to: 'done', prNumber, seq: event.seq };
+          const { event } = moveWork(dir, { id, to: 'delivered', expectedStatus: 'awaiting-approval', role: 'human' });
+          return { id, mode: 'github', to: 'delivered', prNumber, seq: event.seq };
         }
         // blocked — mirrors the local merge-conflict/verify-fail-post-merge
         // shape: park awaiting-approval -> blocked with the classifyGhFailure reason,
@@ -2009,6 +2422,14 @@ async function runVerb(verb, flags, positional, dir) {
           throw new StoreError('validation', `approve: working tree at "${repoRoot}" is not clean — commit or stash pending changes before approving "${id}".`);
         }
 
+        // Acceptance-evidence pre-flight (tsk-396 D1): covers both merge
+        // paths below (leaf->root and root->main share this one branch
+        // point) — checked BEFORE mergeRunnerItem's real git merge, not
+        // caught after the fact inside moveWork's own `to === 'delivered'`
+        // check (store.mjs). A merge that's about to be refused here never
+        // touches the target branch.
+        assertAcceptanceEvidence(id, item);
+
         // D3 leaf-vs-root split: a leaf's resolved root is a DIFFERENT item
         // (resolveRoot walks item.parent up to the top); a root's resolved
         // root is itself.
@@ -2034,7 +2455,11 @@ async function runVerb(verb, flags, positional, dir) {
           // leave the ephemeral checkout clean via `git merge --abort`, so
           // no cleanupMergedBranch call is needed on those paths.
           return await withMergeEphemeralWorktree(repoRoot, rootId, async (ephemeral) => {
-            const result = await runMerge(() => mergeRunnerItem(ephemeral.path, item, { timeoutMs }));
+            // tsk-2eq: lockRoot pins the main-checkout lock to the real
+            // repo root — ephemeral.path stays the git-op cwd (unchanged)
+            // but is never the lock's own root, since it's a throwaway
+            // worktree with no writable .fgos/ (ADR0020).
+            const result = await runMerge(() => mergeRunnerItem(ephemeral.path, item, { timeoutMs, lockRoot: repoRoot }));
 
             if (result.outcome === 'conflict') {
               moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: 'merge-conflict', role: 'system' });
@@ -2047,6 +2472,25 @@ async function runVerb(verb, flags, positional, dir) {
                 detail: `git merge --no-commit --no-ff ${result.branch} into ${rootBranch} conflicted; merge aborted, ${rootBranch} unchanged`,
               });
               return { id, mode: 'merge', to: 'blocked', reason: 'merge-conflict', target: rootBranch };
+            }
+
+            if (result.outcome === 'merge-failed-unclassified') {
+              // tsk-18a D1: git merge --no-commit --no-ff failed but never
+              // created MERGE_HEAD -- not a real textual conflict, so this
+              // gets its own reason instead of being folded into
+              // 'merge-conflict'. Real stderr/exit-code carried through so
+              // this is actually diagnosable, unlike the static
+              // 'merge-conflict' detail string.
+              moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: 'merge-failed-unclassified', role: 'system' });
+              addFriction(dir, {
+                id,
+                disposition: 'blocked',
+                errorClass: 'merge-failed-unclassified',
+                layer: 'state',
+                attempts: 1,
+                detail: `git merge --no-commit --no-ff ${result.branch} into ${rootBranch} failed without a real conflict (exit ${result.error.status}): ${result.error.stderr || result.error.message}; merge aborted, ${rootBranch} unchanged`,
+              });
+              return { id, mode: 'merge', to: 'blocked', reason: 'merge-failed-unclassified', target: rootBranch, error: result.error };
             }
 
             if (result.outcome === 'fgos-write-rejected') {
@@ -2083,15 +2527,34 @@ async function runVerb(verb, flags, positional, dir) {
             // the branch is merged INTO; running it from repoRoot/main
             // would have git silently refuse the delete (swallowed as a
             // warning), leaking the leaf's branch forever.
-            const { event } = moveWork(dir, { id, to: 'done', expectedStatus: 'awaiting-approval', role: 'human' });
+            // tsk-480: the merge above is already real and permanent —
+            // cleanup must run either way, so it is no longer gated on the
+            // status write succeeding (previously: an unguarded moveWork
+            // throw here would skip cleanup too, leaking the leaf branch
+            // on top of the unrecorded status).
+            const moveResult = moveDeliveredOrRecordFault(dir, id, 'leaf-into-root merge');
             const cleanup = cleanupMergedBranch(ephemeral.path, result.branch);
+            if (!moveResult.event) {
+              return {
+                id,
+                mode: 'merge',
+                to: 'awaiting-approval',
+                deliveryUnrecorded: true,
+                target: rootBranch,
+                branch: result.branch,
+                output: result.check.output,
+                cleanupWarnings: cleanup.warnings,
+                error: moveResult.error.message,
+                diagnosticLog: moveResult.diagnosticLog,
+              };
+            }
             return {
               id,
               mode: 'merge',
-              to: 'done',
+              to: 'delivered',
               target: rootBranch,
               branch: result.branch,
-              seq: event.seq,
+              seq: moveResult.event.seq,
               output: result.check.output,
               cleanupWarnings: cleanup.warnings,
             };
@@ -2127,6 +2590,27 @@ async function runVerb(verb, flags, positional, dir) {
           return { id, mode: 'merge', to: 'blocked', reason, target: 'main' };
         }
 
+        if (result.outcome === 'merge-failed-unclassified') {
+          // tsk-18a D1: same non-genuine-conflict class as the leaf→root
+          // call site above — never folded into 'merge-conflict'/
+          // 'integration-drift', regardless of hadChildren, since neither
+          // reason is accurate for a failure that never staged a real
+          // conflict in the first place.
+          const detail = hadChildren
+            ? `cross-root integration attempt at main@${currentHead(repoRoot)}; git merge --no-commit --no-ff ${result.branch} failed without a real conflict (exit ${result.error.status}): ${result.error.stderr || result.error.message}; merge aborted, main unchanged`
+            : `git merge --no-commit --no-ff ${result.branch} failed without a real conflict (exit ${result.error.status}): ${result.error.stderr || result.error.message}; merge aborted, main unchanged`;
+          moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: 'merge-failed-unclassified', role: 'system' });
+          addFriction(dir, {
+            id,
+            disposition: 'blocked',
+            errorClass: 'merge-failed-unclassified',
+            layer: 'state',
+            attempts: 1,
+            detail,
+          });
+          return { id, mode: 'merge', to: 'blocked', reason: 'merge-failed-unclassified', target: 'main', error: result.error };
+        }
+
         if (result.outcome === 'fgos-write-rejected') {
           moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: 'fgos-write-rejected', role: 'system' });
           addFriction(dir, {
@@ -2157,15 +2641,31 @@ async function runVerb(verb, flags, positional, dir) {
           return { id, mode: 'merge', to: 'blocked', reason, target: 'main', exitStatus: result.check.status, output: result.check.output };
         }
 
-        const { event } = moveWork(dir, { id, to: 'done', expectedStatus: 'awaiting-approval', role: 'human' });
+        // tsk-480: same cleanup-runs-either-way fix as the leaf-merge path
+        // above — the merge into main is already real and permanent.
+        const moveResult = moveDeliveredOrRecordFault(dir, id, 'root-into-main merge');
         const cleanup = cleanupMergedBranch(repoRoot, result.branch);
+        if (!moveResult.event) {
+          return {
+            id,
+            mode: 'merge',
+            to: 'awaiting-approval',
+            deliveryUnrecorded: true,
+            target: 'main',
+            branch: result.branch,
+            output: result.check.output,
+            cleanupWarnings: cleanup.warnings,
+            error: moveResult.error.message,
+            diagnosticLog: moveResult.diagnosticLog,
+          };
+        }
         return {
           id,
           mode: 'merge',
-          to: 'done',
+          to: 'delivered',
           target: 'main',
           branch: result.branch,
-          seq: event.seq,
+          seq: moveResult.event.seq,
           output: result.check.output,
           cleanupWarnings: cleanup.warnings,
         };
@@ -2187,8 +2687,257 @@ async function runVerb(verb, flags, positional, dir) {
         });
         return { id, mode: 'verify-only', to: 'blocked', reason: 'verify-fail', exitStatus: check.status, output: check.output };
       }
-      const { event } = moveWork(dir, { id, to: 'done', expectedStatus: 'awaiting-approval', role: 'human' });
-      return { id, mode: 'verify-only', to: 'done', seq: event.seq, output: check.output };
+      // tsk-480: no real merge lands on this path (code is already on
+      // main), so a moveWork failure here only desyncs status rather than
+      // hiding a permanent mutation — still guarded for consistency with
+      // the two merge paths above (CONTEXT.md D1: all three success
+      // paths share the same silent-throw shape).
+      const moveResult = moveDeliveredOrRecordFault(dir, id, 'pull-door verify-only');
+      if (!moveResult.event) {
+        return {
+          id,
+          mode: 'verify-only',
+          to: 'awaiting-approval',
+          deliveryUnrecorded: true,
+          output: check.output,
+          error: moveResult.error.message,
+          diagnosticLog: moveResult.diagnosticLog,
+        };
+      }
+      return { id, mode: 'verify-only', to: 'delivered', seq: moveResult.event.seq, output: check.output };
+    }
+
+    // sync-root (tsk-50i, docs/history/tsk-3bn-merge-conductor-harness-v2/):
+    // merges fgw/<root-id>'s current tip into its real target — `main`, or
+    // fgw/<parentId> for a nested root — WITHOUT touching the root item's
+    // own status/stage (CONTEXT.md's locked contract: this replaces the
+    // ad-hoc `git merge` tsk-3bn's own origin incident required by hand).
+    // Reuses `mergeRunnerItem`'s exact lock/verify path (constraint #1,
+    // fgos-validating's gate) — never a second bespoke merge mechanism.
+    // Unlike `approve`'s root-into-main path, this never deletes fgw/<id>
+    // afterward: the root stays open for further leaf merges.
+    case 'sync-root': {
+      const id = requireField(positional[0] ?? flags.id, 'sync-root requires a root-id: fgos sync-root <root-id>');
+      const view = listWork(dir);
+      const item = view.work[id];
+      if (!item) {
+        throw new StoreError('validation', `sync-root: work "${id}" not found.`);
+      }
+
+      const repoRoot = process.cwd();
+      if (!isMainWorktree(repoRoot)) {
+        throw new StoreError(
+          'validation',
+          `sync-root: refusing to run from "${repoRoot}" — sync-root must land on the main checkout, which a linked worktree structurally is not.`,
+        );
+      }
+
+      const branch = branchNameFor(id);
+      if (!branchExists(repoRoot, branch)) {
+        throw new StoreError('validation', `sync-root: branch "${branch}" does not exist — nothing to sync.`);
+      }
+      const targetBranch = item.parent ? branchNameFor(item.parent) : detectTrunk(repoRoot);
+      if (item.parent && !branchExists(repoRoot, targetBranch)) {
+        throw new StoreError('validation', `sync-root: target branch "${targetBranch}" (from "${id}"'s parent "${item.parent}") does not exist.`);
+      }
+
+      // Iron Law gate — same evidence, same acknowledgment flag, same
+      // "refuse before any git mutation" discipline `approve` already
+      // applies to a runner-sourced item (source is 'runner' here by
+      // construction: branchExists(branch) just confirmed it above).
+      const runnerOwnDiff = changedFiles(repoRoot, item, item.parent ? { trunk: targetBranch } : {});
+      const ironLaw = classifyIronLaw({ filesChanged: runnerOwnDiff, description: item.description });
+      if (ironLaw.required && flags['acknowledge-iron-law'] !== true) {
+        throw new StoreError(
+          'validation',
+          `sync-root: "${id}" trips the Iron Law — a failing test must precede this self-modifying diff before it can land. `
+            + `Matched flags: [${ironLaw.matchedFlags.join(', ') || 'none'}]; matched modules: [${ironLaw.matchedModules.join(', ') || 'none'}]. `
+            + `Re-run with --acknowledge-iron-law to confirm failing-test-first proof and proceed.`,
+        );
+      }
+
+      const timeoutMs = resolveVerifyTimeoutMs('sync-root', flags, process.cwd());
+      const { noWait, waitMs } = parseWaitFlags(flags, 'sync-root');
+      const runMerge = (mergeFn) => (noWait ? mergeFn() : withLockRetry(mergeFn, { waitMs }));
+
+      const runAndReport = async (mergeRoot, lockRoot) => {
+        const result = await runMerge(() => mergeRunnerItem(mergeRoot, item, lockRoot ? { timeoutMs, lockRoot } : { timeoutMs }));
+
+        if (result.outcome === 'conflict') {
+          addFriction(dir, {
+            id,
+            disposition: 'blocked',
+            errorClass: 'merge-conflict',
+            layer: 'state',
+            attempts: 1,
+            detail: `sync-root: git merge --no-commit --no-ff ${branch} into ${targetBranch} conflicted; merge aborted, ${targetBranch} unchanged`,
+          });
+          return { id, mode: 'sync-root', outcome: 'blocked', reason: 'merge-conflict', target: targetBranch, branch };
+        }
+        if (result.outcome === 'fgos-write-rejected') {
+          addFriction(dir, {
+            id,
+            disposition: 'blocked',
+            errorClass: 'fgos-write-blocked',
+            layer: 'state',
+            attempts: 1,
+            detail: `sync-root: ${branch} staged a change under .fgos/ (${result.paths.join(', ')}); merge aborted, ${targetBranch} unchanged — ADR0020`,
+          });
+          return { id, mode: 'sync-root', outcome: 'blocked', reason: 'fgos-write-rejected', target: targetBranch, branch, paths: result.paths };
+        }
+        if (result.outcome === 'verify-fail') {
+          addFriction(dir, {
+            id,
+            disposition: 'blocked',
+            errorClass: 'verify-miss',
+            layer: 'verification',
+            attempts: 1,
+            detail: `sync-root: goal-check failed on staged merge of ${branch} into ${targetBranch} (exit ${result.check.status}); merge aborted, ${targetBranch} unchanged`,
+          });
+          return { id, mode: 'sync-root', outcome: 'blocked', reason: 'verify-fail', target: targetBranch, branch, exitStatus: result.check.status, output: result.check.output };
+        }
+
+        // Success — status/stage of `id` is deliberately UNTOUCHED (the
+        // locked contract). Only a real decision record marks this sync
+        // happened, same append door `fgos decision` itself uses.
+        const { event } = addDecision(dir, {
+          text: `sync-root: merged ${branch} into ${targetBranch} at ${currentHead(mergeRoot)}`,
+          rationale: `fgos sync-root ${id} — closes the drift window this item's own design exists to prevent`,
+          id,
+        });
+        return { id, mode: 'sync-root', outcome: 'synced', target: targetBranch, branch, seq: event.seq, output: result.check.output };
+      };
+
+      if (item.parent) {
+        return await withMergeEphemeralWorktree(repoRoot, item.parent, async (ephemeral) => runAndReport(ephemeral.path, repoRoot));
+      }
+      return await runAndReport(repoRoot);
+    }
+
+    // tsk-3gx-3: Layer 2 action — takes N flat sibling item ids (D2: caller's
+    // own explicit list, this verb only light-validates, never infers
+    // grouping), resolves/creates the shared root (D1), retargets each
+    // member via tsk-3gx-2's engine (gated per member by tsk-3gx-1's
+    // read-only preflight), and ONLY when a member's own real git merge
+    // truly succeeds does it set that member's `parent` — never on say-so,
+    // matching the item's own framing ("CHỈ khi git thành công thật mới set
+    // field parent"). Records one real decision summarizing every member's
+    // outcome.
+    case 'promote-to-component': {
+      const ids = parseListFlag(flags.ids ?? positional.join(','));
+      if (!Array.isArray(ids) || ids.length < 2) {
+        throw new StoreError('validation', 'promote-to-component requires --ids (or positional args) listing at least 2 member item ids.');
+      }
+
+      const repoRoot = process.cwd();
+      if (!isMainWorktree(repoRoot)) {
+        throw new StoreError(
+          'validation',
+          `promote-to-component: refusing to run from "${repoRoot}" — this must run from the main checkout, which a linked worktree structurally is not.`,
+        );
+      }
+
+      const view = listWork(dir);
+      for (const id of ids) {
+        const member = view.work[id];
+        if (!member) {
+          throw new StoreError('validation', `promote-to-component: work "${id}" not found.`);
+        }
+        if (member.parent) {
+          throw new StoreError('validation', `promote-to-component: "${id}" already has parent "${member.parent}" — only flat items (no parent yet) can be promoted.`);
+        }
+      }
+      // D2 light validation: the given ids must form one connected set via
+      // deps/mergeAfter (undirected) — never re-deriving WHICH items belong
+      // together (that judgment stays outside this action), only confirming
+      // the caller's own claim is at least internally consistent.
+      const idSet = new Set(ids);
+      const adjacency = new Map(ids.map((id) => [id, new Set()]));
+      for (const id of ids) {
+        const member = view.work[id];
+        for (const other of [...(member.deps ?? []), ...(member.mergeAfter ?? [])]) {
+          if (idSet.has(other)) {
+            adjacency.get(id).add(other);
+            adjacency.get(other).add(id);
+          }
+        }
+      }
+      const visited = new Set([ids[0]]);
+      const queue = [ids[0]];
+      while (queue.length > 0) {
+        const current = queue.pop();
+        for (const neighbor of adjacency.get(current)) {
+          if (!visited.has(neighbor)) {
+            visited.add(neighbor);
+            queue.push(neighbor);
+          }
+        }
+      }
+      if (visited.size !== ids.length) {
+        throw new StoreError(
+          'validation',
+          `promote-to-component: ids [${ids.join(', ')}] are not all connected via deps/mergeAfter — not one component.`,
+        );
+      }
+
+      // D1: reuse an existing member as root (caller-designated via
+      // --root-id), or create a fresh milestone-style root item (requires
+      // --root-title) — both allowed, caller's choice.
+      let rootId = flags['root-id'];
+      let rootCreated = false;
+      if (rootId !== undefined) {
+        if (!view.work[rootId]) {
+          throw new StoreError('validation', `promote-to-component: --root-id "${rootId}" not found.`);
+        }
+      } else {
+        const rootTitle = requireField(flags['root-title'], 'promote-to-component requires --root-id (an existing member to promote) or --root-title (to create a fresh root item).');
+        rootId = generateId(rootTitle, Object.keys(view.work));
+        // A freshly created root is a pure milestone-style grouping item
+        // (tsk-5t3a precedent, no code of its own) — 'low'/'true' mirror
+        // that precedent's own minimal, trivially-true shape.
+        addWork(dir, { id: rootId, title: rootTitle, kind: 'feature', status: 'todo', deps: [], refs: [], risk: 'low', verify: 'true' });
+        rootCreated = true;
+      }
+
+      resolveIntegrationBranch(repoRoot, rootId);
+
+      const timeoutMs = flags.timeout !== undefined ? Number(flags.timeout) : undefined;
+      const results = [];
+      for (const id of ids) {
+        if (id === rootId) {
+          results.push({ id, outcome: 'skipped', reason: 'is-root' });
+          continue;
+        }
+        const member = view.work[id];
+        const outcome = await retargetMember(repoRoot, member, rootId, timeoutMs ? { timeoutMs } : {});
+        if (outcome.outcome === 'merged') {
+          // The real git merge already landed at this point — a rejection
+          // here (e.g. a deps+parent graph cycle assertNoUnifiedCycle
+          // catches) means the bookkeeping half of "CHỈ khi git thành công
+          // thật mới set field parent" failed even though the git half
+          // truly succeeded. Report that distinctly rather than either
+          // claiming a clean 'merged' or letting the exception abort every
+          // remaining member's own processing.
+          try {
+            editWork(dir, { id, patch: { parent: rootId } });
+            results.push(outcome);
+          } catch (err) {
+            results.push({ id, outcome: 'merged-parent-rejected', reason: err.message });
+          }
+        } else {
+          results.push(outcome);
+        }
+      }
+
+      const merged = results.filter((r) => r.outcome === 'merged').map((r) => r.id);
+      const notMerged = results.filter((r) => r.outcome !== 'merged' && r.outcome !== 'skipped');
+      const { event } = addDecision(dir, {
+        text: `promote-to-component: root "${rootId}"${rootCreated ? ' (newly created)' : ' (existing member promoted)'} — merged [${merged.join(', ') || 'none'}]${notMerged.length > 0 ? `, not merged: ${notMerged.map((r) => `${r.id} (${r.reason})`).join(', ')}` : ''}`,
+        rationale: 'fgos promote-to-component — converges flat siblings into one component before merging to main, per docs/history/promote-to-component/CONTEXT.md',
+        id: rootId,
+      });
+
+      return { rootId, rootCreated, results, seq: event.seq };
     }
 
     // Cổng duyệt — reject (pr-lifecycle D4): awaiting-approval -> todo, reason
@@ -2242,12 +2991,17 @@ async function runVerb(verb, flags, positional, dir) {
       // Only a merge-related park is something this mechanism can address —
       // any other blocked reason (e.g. anti-loop-max-visits,
       // runner-crash-reclaim) needs a human's real take/return rework
-      // instead, never an automated catch-up.
-      const CATCHUP_REASONS = new Set(['merge-conflict', 'verify-fail-post-merge', 'integration-drift']);
+      // instead, never an automated catch-up. tsk-18a D1: a
+      // 'merge-failed-unclassified' park is actually the BEST fit for
+      // catchup among these four — the failure wasn't a real conflict, so
+      // simply re-attempting the merge (which is exactly what catchup
+      // does) may just succeed once whatever transient condition caused it
+      // has passed.
+      const CATCHUP_REASONS = new Set(['merge-conflict', 'verify-fail-post-merge', 'integration-drift', 'merge-failed-unclassified']);
       if (!CATCHUP_REASONS.has(item.reason)) {
         throw new StoreError(
           'validation',
-          `catchup: work "${id}" is blocked for reason "${item.reason ?? '(none)'}" — catchup only resolves a merge-related park (merge-conflict/verify-fail-post-merge/integration-drift); use take/return for a manual rework instead.`,
+          `catchup: work "${id}" is blocked for reason "${item.reason ?? '(none)'}" — catchup only resolves a merge-related park (merge-conflict/verify-fail-post-merge/integration-drift/merge-failed-unclassified); use take/return for a manual rework instead.`,
         );
       }
 
@@ -2277,6 +3031,50 @@ async function runVerb(verb, flags, positional, dir) {
       // ephemeral). Removed on every exit path via withMergeEphemeralWorktree's
       // own finally (worktree.mjs).
       return await withMergeEphemeralWorktree(repoRoot, id, async (ephemeral) => {
+        // The branch can already contain the target's tip (a person merged it
+        // by hand, or a prior catch-up landed the merge and died later). The
+        // merge below is then a genuine no-op that stages nothing, so the
+        // `git commit` at the end of this function fails with "nothing to
+        // commit" and the item is stuck blocked forever — no retry can change
+        // the condition. Checked up front rather than inferred from that
+        // commit failure: the failure wording is locale/git-version
+        // dependent, `is-ancestor` is not. `HEAD` here is the item's own
+        // branch (withMergeEphemeralWorktree checks it out).
+        let alreadyCaughtUp = false;
+        try {
+          execFileSync('git', ['merge-base', '--is-ancestor', target, 'HEAD'], { cwd: ephemeral.path, encoding: 'utf8', shell: false });
+          alreadyCaughtUp = true;
+        } catch (ancestorErr) {
+          // Exit 1 is the documented "not an ancestor" answer, not a failure;
+          // anything else (a bad ref, a broken repo) is a real error.
+          if (ancestorErr.status !== 1) {
+            throw ancestorErr;
+          }
+        }
+
+        if (alreadyCaughtUp) {
+          // Nothing to merge or commit, but the status move still has to rest
+          // on a freshly-executed check: "caught up" says nothing about
+          // whether this item deserves to leave `blocked`.
+          const caughtUpCheck = await runGoalCheck(item, ephemeral.path, timeoutMs);
+          if (!caughtUpCheck.passed) {
+            // No `git merge --abort` on this path — no merge was started, and
+            // aborting without MERGE_HEAD fails outright.
+            return { id, outcome: 'verify-fail', target, branch: ownBranch, exitStatus: caughtUpCheck.status, output: caughtUpCheck.output };
+          }
+          const { event } = moveWork(dir, { id, to: 'awaiting-approval', expectedStatus: 'blocked', role: 'runner' });
+          return {
+            id,
+            outcome: 'already-caught-up',
+            from: 'blocked',
+            to: 'awaiting-approval',
+            target,
+            branch: ownBranch,
+            seq: event.seq,
+            output: caughtUpCheck.output,
+          };
+        }
+
         let conflicted = false;
         try {
           execFileSync('git', ['merge', '--no-commit', '--no-ff', target], { cwd: ephemeral.path, encoding: 'utf8', shell: false });
@@ -2467,32 +3265,111 @@ async function runVerb(verb, flags, positional, dir) {
       throw new StoreError('validation', `unknown goal sub-verb "${sub}". Usage: fgos goal <set|show> ...`);
     }
 
+    // Two-way tool registry (tsk-1dj, ported from repository-harness's
+    // tool-registry-capability per docs/distillery/deep-dives/
+    // tool-registry.md): `register`/`remove` are TEAM decisions through the
+    // shared event log (store.mjs's registerTool/removeTool, same
+    // single-write-door discipline as every other mutating verb); `check`
+    // writes ONLY the local, gitignored status overlay
+    // (tool-registry.mjs's readLocalStatus/writeLocalStatus) — never an
+    // event, per CONTEXT.md's pinned "registered vs present" term, and it
+    // always succeeds even when every probed tool comes back missing
+    // (absent capability is a fact to report, never a CLI error); `query`
+    // merges the two (registry + local overlay) at read time.
+    case 'tool': {
+      const sub = requireField(positional[0], 'tool requires a sub-verb: fgos tool <register|check|query|remove> ...');
+      if (sub === 'register') {
+        const fields = {
+          name: requireField(flags.name, 'tool register requires --name.'),
+          kind: requireField(flags.kind, 'tool register requires --kind (cli/binary/mcp/skill/http).'),
+          capability: requireField(flags.capability, 'tool register requires --capability.'),
+          command: requireField(flags.command, 'tool register requires --command.'),
+          scanTarget: optionalField(flags.scan, 'tool register --scan requires a non-empty path.'),
+          responsibility: optionalField(flags.responsibility, 'tool register --responsibility requires a non-empty value.'),
+          description: optionalField(flags.description, 'tool register --description requires a non-empty value.'),
+        };
+        const { view } = registerTool(dir, fields);
+        return { name: fields.name, tool: view.tools[fields.name] };
+      }
+      if (sub === 'check') {
+        const view = listWork(dir);
+        const tools = view.tools ?? {};
+        const name = optionalField(flags.name, 'tool check --name requires a non-empty value.');
+        if (name !== undefined && !tools[name]) {
+          throw new StoreError('validation', `tool "${name}" not found.`);
+        }
+        const targets = name !== undefined ? [name] : Object.keys(tools);
+        const localStatus = readLocalStatus(dir);
+        const repoRoot = path.dirname(dir);
+        const results = {};
+        for (const toolName of targets) {
+          const status = await probeTool(tools[toolName], repoRoot);
+          const checkedAt = new Date().toISOString();
+          localStatus[toolName] = { status, checkedAt };
+          results[toolName] = { status, checkedAt };
+        }
+        writeLocalStatus(dir, localStatus);
+        return { checked: results };
+      }
+      if (sub === 'query') {
+        const view = listWork(dir);
+        const tools = view.tools ?? {};
+        const localStatus = readLocalStatus(dir);
+        const capabilityFlag = optionalField(flags.capability, 'tool query --capability requires a non-empty value.');
+        const normalizedCapability = capabilityFlag !== undefined ? normalizeCapability(capabilityFlag) : undefined;
+        const statusFlag = optionalField(flags.status, 'tool query --status requires a non-empty value.');
+        const providers = Object.values(tools)
+          .filter((tool) => normalizedCapability === undefined || tool.capability === normalizedCapability)
+          .map((tool) => ({ ...tool, status: resolvedStatus(tool.name, localStatus) }))
+          .filter((tool) => statusFlag === undefined || tool.status === statusFlag);
+        return { providers };
+      }
+      if (sub === 'remove') {
+        const name = requireField(positional[1] ?? flags.name, 'tool remove requires --name (or a positional name).');
+        removeTool(dir, { name });
+        return { name, removed: true };
+      }
+      throw new StoreError('validation', `unknown tool sub-verb "${sub}". Usage: fgos tool <register|check|query|remove> ...`);
+    }
+
     // Do-and-announce shell-integration + config bootstrap (str87-fgos-setup-doctor
-    // D6): inserts the shell-integration source line into every DETECTED rc
-    // file (bash/zsh, D4) — never creates a new rc file (shell-rc.mjs's own
-    // refusal) — then ensures `.fgos-runner.json` exists / has every current
-    // default key via dispatch.mjs's `ensureRunnerConfig` (the one write path
-    // allowed here; `doctor`, unlike `setup`, never calls it). The addedKeys
-    // report is computed read-only (mergeConfigDefaults) BEFORE the real
-    // write, purely so the returned data can describe what changed.
+    // D6, retargeted per tsk-2ta D1 amended / tsk-5vf D2/D4): inserts the
+    // shell-integration source line into every DETECTED rc file (bash/zsh,
+    // D4) — never creates a new rc file (shell-rc.mjs's own refusal) — then
+    // ensures the shared config file (`.fgos/config.json`) exists and has
+    // every current default key from EVERY registered `registerConfigDefault`
+    // entry, via `ensureSharedConfigDefaults` (the one write path allowed
+    // here; `doctor`, unlike `setup`, never calls it). This is also the verb
+    // that performs the actual move off the legacy `.fgos-runner.json`
+    // (tsk-5vf D2) — `ensureSharedConfigDefaults` reads it as a fallback via
+    // `readSharedConfig` and writes the assembled result to the NEW location,
+    // never deleting the old file.
     case 'setup': {
       const repoRoot = process.cwd();
       const scriptPath = integrationScriptPath();
       const rcFiles = detectRcFiles(os.homedir());
       const rcFilesInserted = [];
       const rcFilesAlreadyConfigured = [];
-      for (const rcFile of rcFiles) {
-        if (insertSourceLine(rcFile, scriptPath)) {
-          rcFilesInserted.push(rcFile);
-        } else {
-          rcFilesAlreadyConfigured.push(rcFile);
+      // A null scriptPath means this copy of fgos has no location stable enough
+      // to name in a shell profile — it is not inside a git checkout, so it is
+      // ephemeral by nature. Writing its path would leave a `source` line that
+      // outlives the directory it points at and errors on every shell open.
+      // Everything else setup does still runs; only the rc write is declined.
+      const rcWriteDeclinedReason = scriptPath === null
+        ? 'this copy of fgos is not inside a git checkout, so it has no stable path to source — source scripts/fgos-shell-integration.sh by hand from a permanent checkout'
+        : null;
+      if (scriptPath !== null) {
+        for (const rcFile of rcFiles) {
+          if (insertSourceLine(rcFile, scriptPath)) {
+            rcFilesInserted.push(rcFile);
+          } else {
+            rcFilesAlreadyConfigured.push(rcFile);
+          }
         }
       }
-      const configPath = path.join(repoRoot, '.fgos-runner.json');
+      const configPath = sharedConfigFilePath(repoRoot);
       const configExisted = fs.existsSync(configPath);
-      const priorConfig = configExisted ? JSON.parse(fs.readFileSync(configPath, 'utf8')) : {};
-      const { addedKeys } = mergeConfigDefaults(priorConfig, DEFAULT_RUNNER_CONFIG);
-      ensureRunnerConfig(configPath);
+      const { addedKeys } = ensureSharedConfigDefaults(repoRoot);
       // str65-6/str88: wires core.hooksPath the same way `npm run setup:hooks`
       // does — a second, non-npm-lifecycle-dependent activation path for the
       // main-checkout lock hook, since pnpm 10+ blocks `prepare` for a
@@ -2504,6 +3381,7 @@ async function runVerb(verb, flags, positional, dir) {
       return {
         rcFilesInserted,
         rcFilesAlreadyConfigured,
+        ...(rcWriteDeclinedReason !== null && { rcWriteDeclinedReason }),
         configPath,
         configCreated: !configExisted,
         configAddedKeys: configExisted ? addedKeys : [],
@@ -2512,15 +3390,97 @@ async function runVerb(verb, flags, positional, dir) {
       };
     }
 
-    // Read-only diagnostic (D2): runs every DOCTOR_CHECKS entry against the
-    // current cwd. Never writes anything — no rc file insertion, no config
-    // write — matching this verb's `access: 'read'` declaration.
+    // Reverses `setup`'s own wiring (tsk-4iv-1, docs/history/fgos-uninstall/
+    // CONTEXT.md D2-D4). Requires `--yes` (D3): with no flag, refuses before
+    // touching anything — destructive, unlike `setup`/`doctor`, which never
+    // ask. Two side effects, both mirroring `setup`'s own fill-only rules in
+    // the opposite direction:
+    //   - git hooks (D2): `uninstallGitHooks` unwires `core.hooksPath` and
+    //     deletes `.githooks/pre-commit` (+ the dir, if left empty) ONLY when
+    //     hooksPath is still exactly `.githooks` — a custom value the caller
+    //     repointed is left untouched, same as `installGitHooks` leaves one
+    //     alone when installing.
+    //   - shell-rc (D4): never edits an rc file — reuses `hasSourceLine`
+    //     read-only, the same primitive `deadSourceLines`/`doctor` already
+    //     use, to report which rc file(s) still carry the fgOS source line so
+    //     the caller can remove it by hand (docs/history/
+    //     shell-rc-dead-source-lines/CONTEXT.md D1: "deletion stays a human
+    //     act" — this item does not carve out an exception to that).
+    // Never touches `.fgos/` data or `.fgos/config.json` (pinned constraint,
+    // CONTEXT.md) — structurally true: this case never imports or calls any
+    // config-writing function (`ensureSharedConfigDefaults`/`writeSharedConfig`).
+    //
+    // Package removal (D1, tsk-4iv-2 SPIKE): opt-in via `--remove-package`,
+    // additive on top of tsk-4iv-1's already-shipped, already-documented
+    // default behavior (`--yes` alone stays wiring-only, byte-identical to
+    // before this flag existed — preserves that contract rather than
+    // silently widening it). Scoped narrowly per the spike's own locked
+    // scope: npm global installs only, Linux/macOS only — shells out to
+    // `npm uninstall -g forgent`, the officially-supported removal path,
+    // rather than hand-rolling file deletion. Runs LAST, after the
+    // confirmation gate and wiring reversal above, since removing the
+    // package first would strand the process mid-run before it could
+    // finish undoing its own wiring (plan.md's own ordering rationale).
+    // Never throws on failure — a failed removal is exactly the outcome
+    // this spike exists to measure, not a bug to crash on.
+    case 'uninstall': {
+      if (!flags.yes) {
+        throw new StoreError(
+          'validation',
+          'fgos uninstall requires --yes to confirm — it unwires git hooks (core.hooksPath/.githooks) and reports (never deletes) the shell-rc source line. Rerun with --yes once ready.',
+        );
+      }
+      const repoRoot = process.cwd();
+      const scriptPath = integrationScriptPath();
+      const shellRcSourceLinesFound = scriptPath === null
+        ? []
+        : detectRcFiles(os.homedir())
+          .filter((rcFile) => hasSourceLine(rcFile, scriptPath))
+          .map((rcFile) => ({ rcFile, sourceLine: `source "${scriptPath}"` }));
+      const { unwired: hooksUnwired, skippedExisting: hooksSkippedExisting } = uninstallGitHooks(repoRoot);
+      let packageRemoval = { attempted: false, outcome: null };
+      if (flags['remove-package']) {
+        try {
+          const output = execFileSync('npm', ['uninstall', '-g', 'forgent'], { encoding: 'utf8' });
+          packageRemoval = { attempted: true, outcome: 'removed', output };
+        } catch (err) {
+          packageRemoval = {
+            attempted: true,
+            outcome: 'failed',
+            error: err.message,
+            stderr: typeof err.stderr === 'string' ? err.stderr : (err.stderr?.toString() ?? null),
+          };
+        }
+      }
+      return {
+        shellRcSourceLinesFound,
+        packageRemoval,
+        shellRcRemovalInstructions: shellRcSourceLinesFound.length > 0
+          ? 'fgOS never edits your shell profile — remove the line(s) above by hand.'
+          : null,
+        hooksUnwired,
+        hooksSkippedExisting,
+      };
+    }
+
+    // Diagnostic by default (D2, docs/specs/distribution.md RUL9): runs every
+    // DOCTOR_CHECKS entry against the current cwd, writing nothing — no rc
+    // file insertion, no config write — unless `--fix` is given.
+    //
+    // `--fix` (docs/history/doctor-fix-gate-bypass/CONTEXT.md D2, deliberate
+    // reversal of RUL9/RUL11 per distribution-vision.md §3): runs every
+    // registered `fix` (`runFixes`, `src/setup/registrations.mjs`) BEFORE
+    // re-running the checks, so the returned `checks` array reflects
+    // post-fix state — the same "report what changed" shape
+    // `ensureRunnerConfig`/`ensureSharedConfigDefaults` already use. Without
+    // `--fix`, behavior is byte-identical to before this flag existed.
     case 'doctor': {
+      const fixed = flags.fix ? runFixes(process.cwd()) : undefined;
       const checks = DOCTOR_CHECKS.map(({ id, description, check }) => {
         const { passed, message } = check(process.cwd());
         return { id, description, passed, message };
       });
-      return { checks };
+      return fixed === undefined ? { checks } : { fixed, checks };
     }
 
     // Safely clears .fgos/main-checkout.lock (tsk-3h4). Never force-deletes:
@@ -2564,7 +3524,7 @@ async function runVerb(verb, flags, positional, dir) {
     }
 
     default:
-      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <init|add|submit|discover|move|edit|ask|answer|decision|list|ready|rebuild|repair|check|rollup|take|return|review|approve|reject|catchup|evolve|triage|session|goal|setup|doctor|unlock|lock-status> ...`);
+      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <init|add|submit|discover|decompose|move|retrospective|cleanup|compound|edit|ask|answer|decision|list|ready|rebuild|repair|check|rollup|take|return|review|approve|sync-root|reject|catchup|evolve|triage|session|goal|tool|setup|doctor|unlock|lock-status> ...`);
   }
 }
 
@@ -2662,6 +3622,11 @@ function renderPretty(verb, data) {
   const lines = [];
   if (verb === 'doctor') {
     lines.push(bold('fgos doctor'));
+    if (data.fixed) {
+      for (const f of data.fixed) {
+        lines.push(formatCheck(f.changed, `fix: ${f.id}`, f.message));
+      }
+    }
     for (const c of data.checks) {
       lines.push(formatCheck(c.passed, c.description, c.message));
     }
@@ -2673,11 +3638,14 @@ function renderPretty(verb, data) {
     for (const rc of data.rcFilesAlreadyConfigured) {
       lines.push(formatCheck(true, `already sourced`, rc));
     }
+    if (data.rcWriteDeclinedReason) {
+      lines.push(formatCheck(false, 'skipped shell-profile line', data.rcWriteDeclinedReason));
+    }
     lines.push(
       formatCheck(
         true,
         data.configCreated
-          ? 'created .fgos-runner.json with current defaults'
+          ? 'created .fgos/config.json with current defaults'
           : data.configAddedKeys.length > 0
             ? `added missing config keys: ${data.configAddedKeys.join(', ')}`
             : 'config already up to date',
@@ -2714,15 +3682,26 @@ async function main() {
     return;
   }
 
-  const { flags, positional } = parseArgs(rest);
-
-  if (flags.help && !flags.json && handleVerbHelp(verb)) {
-    process.exitCode = 0;
-    return;
-  }
-
+  // tsk-5z0: which pre-handler fault the code is currently exposed to, so the
+  // catch below can tell a malformed CALL apart from a verb's own refusal
+  // without reading `err.message` (that would couple this to ~73 hand-written
+  // strings and misclassify the moment one is reworded). Each assignment
+  // names what the very next statement can throw; `null` means "past the
+  // pre-handler region — whatever fails now is the verb answering correctly".
+  // `parseArgs` sits inside the try for exactly this reason: outside it, an
+  // arg-parse fault never reached this catch at all and could not be recorded.
+  let faultClass = 'arg-parse';
+  let dir;
   try {
-    const dir = dataDir(flags.dir);
+    const { flags, positional } = parseArgs(rest);
+
+    if (flags.help && !flags.json && handleVerbHelp(verb)) {
+      process.exitCode = 0;
+      return;
+    }
+
+    faultClass = 'dir-invalid';
+    dir = dataDir(flags.dir);
     // tsk-4fu-2: a verb registered `requiresExistingStore: true`
     // (command-registry.mjs) reads/writes through this `dir` — refuse
     // before ever reaching its handler when `.fgos/` isn't there yet,
@@ -2733,12 +3712,14 @@ async function main() {
     // check: refuse when `cwd` is a linked worktree, the one remaining
     // path that could recreate a live `.fgos/` there and defeat ADR0020.
     const entry = COMMAND_REGISTRY.find((e) => e.name === verb);
+    faultClass = 'store-missing';
     if (entry?.requiresExistingStore && !fs.existsSync(dir)) {
       throw new StoreError(
         'validation',
         `.fgos/ not found at "${dir}" -- run "fgos init" here first, or check you are not inside a linked worktree (worktrees never carry .fgos/, per ADR0020: docs/decisions/0020-chan-fgos-khoi-worktree-worker.md).`,
       );
     }
+    faultClass = 'init-in-worktree';
     if (verb === 'init' && !isMainWorktree(process.cwd())) {
       throw new StoreError(
         'validation',
@@ -2760,6 +3741,14 @@ async function main() {
         `fgos: warning: .fgos/ not found at "${dir}" -- this view may be empty because the real store lives elsewhere (worktrees never carry .fgos/, per ADR0020); pass --dir <mainRoot> to read it.\n`,
       );
     }
+    // Past this line the verb's own handler runs, and its refusals ("work X
+    // not found", an Iron Law trip, a held lock) are correct answers rather
+    // than misuse — so nothing there is recorded. The one exception is an
+    // unknown verb: its error is thrown deep inside `runVerb`, where position
+    // alone would file it as an ordinary refusal, but the registry lookup
+    // above already answers it without new machinery. The error itself still
+    // comes from `runVerb` unchanged.
+    faultClass = entry ? null : 'unknown-verb';
     const data = await runVerb(verb, flags, positional, dir);
     if (flags.pretty && (verb === 'setup' || verb === 'doctor')) {
       process.stdout.write(renderPretty(verb, data));
@@ -2768,7 +3757,23 @@ async function main() {
     }
     process.exitCode = 0;
   } catch (err) {
+    // tsk-5z0: record before reporting, and only say the record exists when
+    // one actually landed — `recordInvocationFault` returns null when the
+    // fault is a verb's own refusal, when there is no store to write to, or
+    // when the write itself failed. It never throws, so the two statements
+    // below stay exactly what they were.
+    const recorded = recordInvocationFault({
+      fgosDir: dir,
+      cwd: process.cwd(),
+      verb,
+      faultClass,
+      message: err.message,
+      argv: process.argv.slice(2),
+    });
     process.stderr.write(`fgos: ${err.message}\n`);
+    if (recorded) {
+      process.stderr.write(`fgos: invocation fault recorded to ${recorded}\n`);
+    }
     process.exitCode = EXIT_CODES[categoryOf(err)] ?? 1;
   }
 }

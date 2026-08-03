@@ -146,3 +146,52 @@ test('take with no --id still only opens the frontier head — the relaxation ap
   const result = run(cwd, ['take']);
   assert.notEqual(result.status, 0, 'the frontier is empty — a clarify-stage item must not be silently auto-taken');
 });
+
+// tsk-3yh: isDepsAndLineageReady (frontier.mjs) used to check a dep's
+// status with the literal `=== 'done'` instead of RESOLVED_STATUSES, the
+// same set `frontier()` right next to it in the same file already uses.
+// A dep sitting at `delivered`/`wontfix`/etc (resolved, but never literally
+// `done`) wrongly blocked `take --id` on its dependent. These two cases
+// lock the fix in both directions: every RESOLVED_STATUSES member unblocks
+// the claim, matching frontier()'s own behavior exactly.
+test('take --id claims an item whose dep is status:delivered — RESOLVED_STATUSES parity with frontier(), not a literal done check', () => {
+  const cwd = initGitCwd();
+  const dir = path.join(cwd, '.fgos');
+  addWork(dir, { id: 'delivered-dep', title: 'Dep already merged, not yet done', kind: 'task', status: 'delivered', deps: [], risk: 'low', refs: [], verify: 'true' });
+  addWork(dir, {
+    id: 'dependent-on-delivered',
+    title: 'Item blocked only by a resolved-but-not-done dep',
+    kind: 'task',
+    status: 'todo',
+    stage: 'clarify',
+    deps: ['delivered-dep'],
+    risk: 'low',
+    refs: [],
+    verify: 'true',
+  });
+
+  const result = run(cwd, ['take', '--id', 'dependent-on-delivered']);
+  assert.equal(result.status, 0, `take failed: ${result.stderr}`);
+  assert.equal(stateView(cwd).work['dependent-on-delivered'].status, 'doing');
+});
+
+test('take --id claims an item whose dep is status:wontfix — RESOLVED_STATUSES parity, not a single delivered-only special case', () => {
+  const cwd = initGitCwd();
+  const dir = path.join(cwd, '.fgos');
+  addWork(dir, { id: 'wontfix-dep', title: 'Dep deliberately closed without being built', kind: 'task', status: 'wontfix', deps: [], risk: 'low', refs: [], verify: 'true' });
+  addWork(dir, {
+    id: 'dependent-on-wontfix',
+    title: 'Item blocked only by a wontfix dep',
+    kind: 'task',
+    status: 'todo',
+    stage: 'clarify',
+    deps: ['wontfix-dep'],
+    risk: 'low',
+    refs: [],
+    verify: 'true',
+  });
+
+  const result = run(cwd, ['take', '--id', 'dependent-on-wontfix']);
+  assert.equal(result.status, 0, `take failed: ${result.stderr}`);
+  assert.equal(stateView(cwd).work['dependent-on-wontfix'].status, 'doing');
+});

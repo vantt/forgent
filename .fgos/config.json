@@ -1,0 +1,71 @@
+{
+  "runner": {
+    "executor": {
+      "command": "claude",
+      "args": [
+        "-p",
+        "{prompt}",
+        "--model",
+        "{model}",
+        "--permission-mode",
+        "acceptEdits",
+        "--allowedTools",
+        "Bash(git add:*),Bash(git commit:*)"
+      ]
+    },
+    "executors": {
+      "judge": {
+        "command": "claude",
+        "args": [
+          "-p",
+          "{prompt}",
+          "--model",
+          "{model}",
+          "--permission-mode",
+          "acceptEdits",
+          "--allowedTools",
+          "Task,WebSearch,WebFetch,Read,Bash(rg:*),Bash(git add:*),Bash(git commit:*)"
+        ]
+      }
+    },
+    "capacities": {
+      "judge-discovery": {
+        "kind": "task",
+        "command": "claude",
+        "args": [
+          "-p",
+          "{prompt}",
+          "--model",
+          "{model}",
+          "--permission-mode",
+          "acceptEdits",
+          "--allowedTools",
+          "Task,WebSearch,WebFetch,Read,Bash(rg:*),Bash(git add:*),Bash(git commit:*)"
+        ]
+      },
+      "judge-decompose": {
+        "kind": "task"
+      },
+      "submit-assist-classify": {
+        "kind": "cli",
+        "adapter": "cli-spawn",
+        "command": "agy",
+        "provider": "agy",
+        "args": ["-p", "{prompt}", "--model", "{model}"],
+        "tier": "light",
+        "model": "Gemini 3.5 Flash (Medium)",
+        "allowCrossProvider": true
+      }
+    },
+    "models": {
+      "light": "haiku",
+      "standard": "sonnet",
+      "heavy": "opus"
+    },
+    "timeoutMs": 900000,
+    "parallel": {
+      "maxRoots": 4,
+      "maxLeavesPerRoot": 4
+    }
+  }
+}

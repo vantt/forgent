@@ -3,16 +3,21 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { addWork, moveWork, moveStage, StoreError, FsmError } from '../../src/state/store.mjs';
+import { addWork, moveWork, FsmError } from '../../src/state/store.mjs';
 
-// The FSM done-gate (D3): a work item whose domain declares a Compound-learn
-// stage can never reach status `done` without first passing through that
-// stage — the synthesis layer is enforced, never left to a reflex that can be
-// silently lost. Enforcement lives in store.mjs's moveWork (the single product
-// door into `done`), AFTER transitionWork's CAS/precondition checks and BEFORE
-// the close side-effect, so error ordering (conflict before precondition) is
-// preserved and nothing persists on a refusal. Domains without a Compound-learn
-// stage (synthetic) are exempt — coding-only.
+// The OLD stage-based "compound-learn done-gate" (RUL50) is RETIRED by
+// work-item-status-delivered-retrospective-cleanup D1/D4/D11 — done is no
+// longer reached directly from doing/awaiting-approval at all (see
+// fsm.test.mjs's full edge-table sweep for that), so a gate keyed on
+// `to==='done'` checking the OLD compound-learn *stage* no longer applies.
+// This file now covers what replaces it: the sequential
+// delivered->retrospective->cleanup->done status chain, and composeLearning
+// (RUL21, "câu-6 tự động") still firing correctly on done's one remaining
+// door in (cleanup->done). The cleanup->done harness itself (verifying
+// merge-on-main + real retrospective content, D8) is a separate module,
+// not yet built at this point in the sequence — these tests exercise only
+// the FSM/store layer's own shape, unconditionally allowing cleanup->done
+// once the chain is walked.
 
 function tmpDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-done-gate-'));
@@ -45,66 +50,64 @@ function addSynthetic(dir, id) {
   });
 }
 
-test('a coding item at stage executing is refused awaiting-approval->done — it must pass through compound-learn first', () => {
-  const dir = tmpDir();
-  addCoding(dir, 'gate-proposed');
-  moveWork(dir, { id: 'gate-proposed', to: 'doing', expectedStatus: 'todo' });
-  moveWork(dir, { id: 'gate-proposed', to: 'awaiting-approval', expectedStatus: 'doing' });
+// Walk doing -> delivered -> retrospective -> cleanup -> done for `id`,
+// returning the final { event, view }.
+function walkToDone(dir, id) {
+  moveWork(dir, { id, to: 'doing', expectedStatus: 'todo' });
+  moveWork(dir, { id, to: 'delivered', expectedStatus: 'doing' });
+  moveWork(dir, { id, to: 'retrospective', expectedStatus: 'delivered' });
+  moveWork(dir, { id, to: 'cleanup', expectedStatus: 'retrospective' });
+  return moveWork(dir, { id, to: 'done', expectedStatus: 'cleanup', role: 'human' });
+}
 
-  assert.throws(
-    () => moveWork(dir, { id: 'gate-proposed', to: 'done', expectedStatus: 'awaiting-approval' }),
-    (err) => err instanceof StoreError && err.category === 'precondition' && /compound-learn/.test(err.message),
-  );
-  // Nothing persisted: the item is still proposed after the refusal.
-  const { view } = moveWork(dir, { id: 'gate-proposed', to: 'todo', expectedStatus: 'awaiting-approval', reason: 'reopen' });
-  assert.equal(view.work['gate-proposed'].status, 'todo');
-});
-
-test('a coding item at stage executing is refused the doing->done shortcut too (both doors are gated)', () => {
-  const dir = tmpDir();
-  addCoding(dir, 'gate-doing');
-  moveWork(dir, { id: 'gate-doing', to: 'doing', expectedStatus: 'todo' });
-
-  assert.throws(
-    () => moveWork(dir, { id: 'gate-doing', to: 'done', expectedStatus: 'doing' }),
-    (err) => err instanceof StoreError && err.category === 'precondition',
-  );
-});
-
-test('a coding item at stage compound-learn is allowed to reach done, and the close composes a learning record', () => {
+test('a coding item walks the full delivered->retrospective->cleanup->done chain and reaches done', () => {
   const dir = tmpDir();
   addCoding(dir, 'gate-allowed');
-  moveWork(dir, { id: 'gate-allowed', to: 'doing', expectedStatus: 'todo' });
-  moveWork(dir, { id: 'gate-allowed', to: 'awaiting-approval', expectedStatus: 'doing' });
-  moveStage(dir, { id: 'gate-allowed', to: 'compound-learn' });
-
-  const { event, view } = moveWork(dir, { id: 'gate-allowed', to: 'done', expectedStatus: 'awaiting-approval', role: 'human' });
+  const { view } = walkToDone(dir, 'gate-allowed');
   assert.equal(view.work['gate-allowed'].status, 'done');
-  // composeLearning preserved: the close event still carries the learning field.
-  assert.ok(event.payload.learning, 'the close event carries the composed learning record');
-  assert.ok(view.learnings?.['gate-allowed'], 'a learning record was folded for the closed item');
 });
 
-test('a synthetic-domain item (no Compound-learn stage) reaches done unchanged — the gate is coding-only', () => {
+test("composeLearning (RUL21) still fires on done's one remaining door in (cleanup->done)", () => {
+  const dir = tmpDir();
+  addCoding(dir, 'gate-learning');
+  const { event, view } = walkToDone(dir, 'gate-learning');
+  assert.ok(event.payload.learning, 'the close event still carries the composed learning record');
+  assert.ok(view.learnings?.['gate-learning'], 'a learning record was folded for the closed item');
+});
+
+test('done is unreachable by skipping any step of the chain (doing->done, delivered->done are all gone)', () => {
+  const dir = tmpDir();
+  addCoding(dir, 'gate-no-skip');
+  moveWork(dir, { id: 'gate-no-skip', to: 'doing', expectedStatus: 'todo' });
+  assert.throws(
+    () => moveWork(dir, { id: 'gate-no-skip', to: 'done', expectedStatus: 'doing' }),
+    (err) => err instanceof FsmError && err.category === 'precondition',
+  );
+  moveWork(dir, { id: 'gate-no-skip', to: 'delivered', expectedStatus: 'doing' });
+  assert.throws(
+    () => moveWork(dir, { id: 'gate-no-skip', to: 'done', expectedStatus: 'delivered' }),
+    (err) => err instanceof FsmError && err.category === 'precondition',
+  );
+});
+
+test('a synthetic-domain item (no compound-learn stage, no worktree) walks the SAME status chain, domain-agnostic per D5', () => {
   const dir = tmpDir();
   addSynthetic(dir, 'exempt-item');
-  moveWork(dir, { id: 'exempt-item', to: 'doing', expectedStatus: 'todo' });
-
-  const { view } = moveWork(dir, { id: 'exempt-item', to: 'done', expectedStatus: 'doing', role: 'human' });
+  const { view } = walkToDone(dir, 'exempt-item');
   assert.equal(view.work['exempt-item'].status, 'done');
 });
 
-test('a stale expectedStatus on a not-yet-compound coding item still yields conflict, not precondition — CAS ordering is preserved', () => {
+test('a stale expectedStatus mid-chain still yields conflict, not precondition — CAS ordering is preserved', () => {
   const dir = tmpDir();
   addCoding(dir, 'cas-order');
   moveWork(dir, { id: 'cas-order', to: 'doing', expectedStatus: 'todo' });
-  moveWork(dir, { id: 'cas-order', to: 'awaiting-approval', expectedStatus: 'doing' });
+  moveWork(dir, { id: 'cas-order', to: 'delivered', expectedStatus: 'doing' });
 
-  // The item is proposed at stage executing — the done-gate WOULD refuse it as
-  // precondition, but a stale --expect must be caught FIRST as a conflict,
-  // proving the gate sits after transitionWork's CAS check.
+  // The item is already at delivered — a stale --expect targeting doing
+  // must be caught FIRST as a conflict, before the (also-illegal) edge
+  // lookup for delivered->done gets a chance to report precondition.
   assert.throws(
-    () => moveWork(dir, { id: 'cas-order', to: 'done', expectedStatus: 'todo' }),
+    () => moveWork(dir, { id: 'cas-order', to: 'done', expectedStatus: 'doing' }),
     (err) => err instanceof FsmError && err.category === 'conflict',
   );
 });

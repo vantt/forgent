@@ -8,11 +8,15 @@ import {
   validateWorkShape,
   validateDeps,
   checkAcceptanceEvidenceTraceable,
+  validateMergeAfter,
+  validateSupersededBy,
+  validateDuplicates,
   WorkValidationError,
   STATUSES,
   TIERS,
   STAGES,
   GOAL_TIERS,
+  URGENCY_LEVELS,
   DEFAULTS,
   SCHEMA_VERSION,
 } from '../../src/state/work.mjs';
@@ -206,6 +210,178 @@ test('validateWork runs full dep-existence check when existingIds is passed', ()
   );
 });
 
+// --- mergeAfter (D4/D5, docs/history/tsk-3bn-merge-conductor-harness-v2/) --
+
+test('validateWork accepts a work item missing mergeAfter (optional, no default, stays absent)', () => {
+  assert.doesNotThrow(() => validateWork(baseWork({})));
+});
+
+test('validateWork treats mergeAfter: null the same as absent', () => {
+  assert.doesNotThrow(() => validateWork(baseWork({ mergeAfter: null })));
+});
+
+test('validateWork rejects a mergeAfter that is not an array', () => {
+  assert.throws(() => validateWork(baseWork({ mergeAfter: 'a,b' })), WorkValidationError);
+});
+
+test('validateWork rejects a mergeAfter entry that is a non-string or empty string', () => {
+  assert.throws(
+    () => validateWork(baseWork({ mergeAfter: ['a', 42] })),
+    (err) => err instanceof WorkValidationError && /non-empty strings/.test(err.message),
+  );
+  assert.throws(
+    () => validateWork(baseWork({ mergeAfter: ['a', ''] })),
+    (err) => err instanceof WorkValidationError && /non-empty strings/.test(err.message),
+  );
+});
+
+test('validateWork rejects a work item that lists itself in its own mergeAfter', () => {
+  assert.throws(
+    () => validateWork(baseWork({ id: 'a', mergeAfter: ['a'] })),
+    (err) => err instanceof WorkValidationError && /own mergeAfter/.test(err.message),
+  );
+});
+
+test('validateWorkShape passes without checking mergeAfter existence', () => {
+  const work = baseWork({ id: 'b', mergeAfter: ['ghost'] });
+  assert.doesNotThrow(() => validateWorkShape(work));
+});
+
+test('validateMergeAfter rejects a target pointing at a non-existent id', () => {
+  const work = baseWork({ id: 'b', mergeAfter: ['ghost'] });
+  assert.throws(
+    () => validateMergeAfter(work, new Set(['a'])),
+    (err) => err instanceof WorkValidationError && /not a known id/.test(err.message),
+  );
+});
+
+test('validateMergeAfter accepts a target that exists in existingIds (Set or array)', () => {
+  const work = baseWork({ id: 'b', mergeAfter: ['a'] });
+  assert.doesNotThrow(() => validateMergeAfter(work, new Set(['a', 'b'])));
+  assert.doesNotThrow(() => validateMergeAfter(work, ['a', 'b']));
+});
+
+test('validateMergeAfter is a no-op when mergeAfter is absent', () => {
+  assert.doesNotThrow(() => validateMergeAfter(baseWork({}), new Set()));
+});
+
+test('validateWork runs full mergeAfter-existence check when existingIds is passed (unlike targets, which deliberately skips this)', () => {
+  assert.doesNotThrow(() => validateWork(baseWork({ id: 'b', mergeAfter: ['a'] }), new Set(['a', 'b'])));
+  assert.throws(
+    () => validateWork(baseWork({ id: 'b', mergeAfter: ['ghost'] }), new Set(['a', 'b'])),
+    WorkValidationError,
+  );
+});
+
+test('validateWork does not add mergeAfter to SCHEMA_VERSION or DEFAULTS (optional additive field, no schema bump)', () => {
+  assert.equal(SCHEMA_VERSION, 3);
+  assert.equal(Object.hasOwn(DEFAULTS, 'mergeAfter'), false);
+});
+
+// --- supersededBy / duplicates (tsk-2ie D1-D3, docs/history/
+// tsk-2ie-duplicate-superseded-guard/) --------------------------------------
+
+test('validateWork accepts a work item missing supersededBy/duplicates (optional, no default, stays absent)', () => {
+  assert.doesNotThrow(() => validateWork(baseWork({})));
+});
+
+test('validateWork treats supersededBy: null and duplicates: null the same as absent', () => {
+  assert.doesNotThrow(() => validateWork(baseWork({ supersededBy: null, duplicates: null })));
+});
+
+test('validateWork rejects a supersededBy that is not a non-empty string', () => {
+  assert.throws(() => validateWork(baseWork({ supersededBy: 42 })), WorkValidationError);
+  assert.throws(() => validateWork(baseWork({ supersededBy: '' })), WorkValidationError);
+});
+
+test('validateWork rejects a work item that lists itself as its own supersededBy', () => {
+  assert.throws(
+    () => validateWork(baseWork({ id: 'a', supersededBy: 'a' })),
+    (err) => err instanceof WorkValidationError && /own supersededBy/.test(err.message),
+  );
+});
+
+test('validateWork rejects a duplicates that is not an array', () => {
+  assert.throws(() => validateWork(baseWork({ duplicates: 'a,b' })), WorkValidationError);
+});
+
+test('validateWork rejects a duplicates entry that is a non-string or empty string', () => {
+  assert.throws(
+    () => validateWork(baseWork({ duplicates: ['a', 42] })),
+    (err) => err instanceof WorkValidationError && /non-empty strings/.test(err.message),
+  );
+  assert.throws(
+    () => validateWork(baseWork({ duplicates: ['a', ''] })),
+    (err) => err instanceof WorkValidationError && /non-empty strings/.test(err.message),
+  );
+});
+
+test('validateWork rejects a work item that lists itself in its own duplicates', () => {
+  assert.throws(
+    () => validateWork(baseWork({ id: 'a', duplicates: ['a'] })),
+    (err) => err instanceof WorkValidationError && /own duplicates/.test(err.message),
+  );
+});
+
+test('validateWorkShape passes without checking supersededBy/duplicates existence', () => {
+  const work = baseWork({ id: 'b', supersededBy: 'ghost', duplicates: ['ghost2'] });
+  assert.doesNotThrow(() => validateWorkShape(work));
+});
+
+test('validateSupersededBy rejects a target pointing at a non-existent id', () => {
+  const work = baseWork({ id: 'b', supersededBy: 'ghost' });
+  assert.throws(
+    () => validateSupersededBy(work, new Set(['a'])),
+    (err) => err instanceof WorkValidationError && /not a known id/.test(err.message),
+  );
+});
+
+test('validateSupersededBy accepts a target that exists in existingIds (Set or array)', () => {
+  const work = baseWork({ id: 'b', supersededBy: 'a' });
+  assert.doesNotThrow(() => validateSupersededBy(work, new Set(['a', 'b'])));
+  assert.doesNotThrow(() => validateSupersededBy(work, ['a', 'b']));
+});
+
+test('validateSupersededBy is a no-op when supersededBy is absent', () => {
+  assert.doesNotThrow(() => validateSupersededBy(baseWork({}), new Set()));
+});
+
+test('validateDuplicates rejects a target pointing at a non-existent id', () => {
+  const work = baseWork({ id: 'b', duplicates: ['ghost'] });
+  assert.throws(
+    () => validateDuplicates(work, new Set(['a'])),
+    (err) => err instanceof WorkValidationError && /not a known id/.test(err.message),
+  );
+});
+
+test('validateDuplicates accepts targets that exist in existingIds (Set or array)', () => {
+  const work = baseWork({ id: 'b', duplicates: ['a'] });
+  assert.doesNotThrow(() => validateDuplicates(work, new Set(['a', 'b'])));
+  assert.doesNotThrow(() => validateDuplicates(work, ['a', 'b']));
+});
+
+test('validateDuplicates is a no-op when duplicates is absent', () => {
+  assert.doesNotThrow(() => validateDuplicates(baseWork({}), new Set()));
+});
+
+test('validateWork runs full supersededBy/duplicates-existence check when existingIds is passed', () => {
+  assert.doesNotThrow(() => validateWork(baseWork({ id: 'b', supersededBy: 'a', duplicates: ['a'] }), new Set(['a', 'b'])));
+  assert.throws(
+    () => validateWork(baseWork({ id: 'b', supersededBy: 'ghost' }), new Set(['a', 'b'])),
+    WorkValidationError,
+  );
+  assert.throws(
+    () => validateWork(baseWork({ id: 'b', duplicates: ['ghost'] }), new Set(['a', 'b'])),
+    WorkValidationError,
+  );
+});
+
+test('validateWork does not add supersededBy/duplicates to SCHEMA_VERSION or DEFAULTS (optional additive fields, no schema bump)', () => {
+  assert.equal(SCHEMA_VERSION, 3);
+  assert.equal(Object.hasOwn(DEFAULTS, 'supersededBy'), false);
+  assert.equal(Object.hasOwn(DEFAULTS, 'duplicates'), false);
+});
+
 test('validateWork accepts a work item missing tier (optional, defaulted by the caller per D7b)', () => {
   const work = baseWork();
   assert.equal(work.tier, undefined);
@@ -230,8 +406,8 @@ test('DEFAULTS.tier is itself a member of TIERS, and SCHEMA_VERSION is a positiv
   assert.ok(Number.isInteger(SCHEMA_VERSION) && SCHEMA_VERSION > 0);
 });
 
-test('STAGES includes "decompose" between clarify and executing, and "compound-learn" appended after executing', () => {
-  assert.deepEqual(STAGES, ['clarify', 'decompose', 'executing', 'compound-learn']);
+test('STAGES includes "decompose" between clarify and executing — compound-learn is retired (D11)', () => {
+  assert.deepEqual(STAGES, ['clarify', 'decompose', 'executing']);
 });
 
 test('validateWork accepts every stage in STAGES', () => {
@@ -476,6 +652,61 @@ test('validateWork does not add priority or intent to SCHEMA_VERSION or DEFAULTS
   assert.equal(SCHEMA_VERSION, 3);
   assert.equal(Object.hasOwn(DEFAULTS, 'priority'), false);
   assert.equal(Object.hasOwn(DEFAULTS, 'intent'), false);
+});
+
+// --- `urgent`/`impact`/`effort` fields (per work-item-priority-matrix
+// D2/D3/D5): optional additive fields feeding the calculated `priority`,
+// no schema bump. Same optional-additive validation shape as
+// priority/intent above.
+
+test('validateWork accepts a work item missing urgent, impact, or effort (optional, no default, stays absent)', () => {
+  const work = baseWork();
+  assert.equal(work.urgent, undefined);
+  assert.equal(work.impact, undefined);
+  assert.equal(work.effort, undefined);
+  assert.doesNotThrow(() => validateWork(work));
+});
+
+test('validateWork accepts urgent as any URGENCY_LEVELS value', () => {
+  for (const urgent of URGENCY_LEVELS) {
+    assert.doesNotThrow(() => validateWork(baseWork({ urgent })));
+  }
+});
+
+test('validateWork rejects an out-of-domain urgent value', () => {
+  for (const urgent of ['URGENT', 'extreme', '', 1, true]) {
+    assert.throws(
+      () => validateWork(baseWork({ urgent })),
+      (err) => err instanceof WorkValidationError && /urgent/.test(err.message),
+    );
+  }
+});
+
+test('validateWork accepts impact/effort as 0 or any non-negative number, including fractional', () => {
+  for (const value of [0, 1, 42.5, 1000]) {
+    assert.doesNotThrow(() => validateWork(baseWork({ impact: value })));
+    assert.doesNotThrow(() => validateWork(baseWork({ effort: value })));
+  }
+});
+
+test('validateWork rejects a negative or non-numeric impact/effort', () => {
+  for (const value of [-1, -0.5, 'high', true, NaN, Infinity]) {
+    assert.throws(
+      () => validateWork(baseWork({ impact: value })),
+      (err) => err instanceof WorkValidationError && /impact/.test(err.message),
+    );
+    assert.throws(
+      () => validateWork(baseWork({ effort: value })),
+      (err) => err instanceof WorkValidationError && /effort/.test(err.message),
+    );
+  }
+});
+
+test('validateWork does not add urgent/impact/effort to SCHEMA_VERSION or DEFAULTS (optional additive fields, no schema bump)', () => {
+  assert.equal(SCHEMA_VERSION, 3);
+  assert.equal(Object.hasOwn(DEFAULTS, 'urgent'), false);
+  assert.equal(Object.hasOwn(DEFAULTS, 'impact'), false);
+  assert.equal(Object.hasOwn(DEFAULTS, 'effort'), false);
 });
 
 // --- `goalTier`/`targets` fields (per str67-goal-directed-planning D1/D2):
