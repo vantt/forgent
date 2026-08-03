@@ -1094,6 +1094,103 @@ test('resolveExecutorCommand skips the fgos-tool-query presence check entirely w
   );
 });
 
+// --- capacities.<id>.agentType (D1/D2, tsk-3sw): kind:"task" capacity with
+// no own command/args resolves via a synthesized executor, Claude-only ---
+
+function agentTypeCfg() {
+  return {
+    executor: {
+      command: 'claude',
+      args: ['-p', '{prompt}', '--model', '{model}', '--permission-mode', 'acceptEdits', '--allowedTools', 'Bash(git add:*),Bash(git commit:*)'],
+    },
+    capacities: { 'my-agent-capacity': { kind: 'task', agentType: 'code-simplifier' } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  };
+}
+
+test('resolveExecutorCommand resolves a kind:"task" capacity naming only agentType into the global executor\'s own command, args minus --model, plus --agent <agentType>', () => {
+  const cfg = agentTypeCfg();
+  const resolved = resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', capacityId: 'my-agent-capacity' });
+  assert.equal(resolved.command, 'claude');
+  assert.deepEqual(resolved.args, [
+    '-p', 'p', '--permission-mode', 'acceptEdits', '--allowedTools', 'Bash(git add:*),Bash(git commit:*)', '--agent', 'code-simplifier',
+  ]);
+  assert.ok(!resolved.args.includes('--model'));
+});
+
+test('resolveExecutorCommand resolves an agentType capacity identically whether fgosDir is given (cli-dispatch/spawnWorker-style) or omitted (task-dispatch/resolveCapacityCli-style)', () => {
+  const cfg = agentTypeCfg();
+  const dir = mkTempDir();
+  initStore(dir);
+  const withFgosDir = resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', capacityId: 'my-agent-capacity', fgosDir: dir });
+  const withoutFgosDir = resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', capacityId: 'my-agent-capacity' });
+  assert.deepEqual(withFgosDir, withoutFgosDir);
+});
+
+test('resolveExecutorCommand still prefers a capacity\'s own command/args over agentType when both are declared (judge-discovery\'s real shape) — agentType is never consulted', () => {
+  const cfg = {
+    executor: { command: 'claude', args: ['-p', '{prompt}', '--model', '{model}'] },
+    capacities: {
+      'judge-discovery': {
+        kind: 'task',
+        agentType: 'should-never-be-used',
+        command: 'claude',
+        args: ['-p', '{prompt}', '--model', '{model}', '--allowedTools', 'Task,Bash(rg:*)'],
+      },
+    },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  };
+  const resolved = resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', capacityId: 'judge-discovery' });
+  assert.deepEqual(resolved.args, ['-p', 'p', '--model', 'sonnet', '--allowedTools', 'Task,Bash(rg:*)']);
+  assert.ok(!resolved.args.includes('--agent'));
+});
+
+test('resolveExecutorCommand falls through to executors.<tier>/global (unaffected) for a capacity with neither command/args nor agentType', () => {
+  const cfg = {
+    executor: { command: '/global/executor', args: ['{prompt}'] },
+    capacities: { 'fgos-executing': { kind: 'task', tier: 'standard' } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  };
+  const resolved = resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', capacityId: 'fgos-executing' });
+  assert.equal(resolved.command, '/global/executor');
+});
+
+// --- capacities.<id>.agentType static shape (D1/D2, tsk-3sw), mirrors the
+// existing "model" field validation pattern ---------------------------
+
+test('loadRunnerConfig accepts a "capacities.<id>" entry with a non-empty agentType', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'agent-type.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      capacities: { 'my-agent-capacity': { kind: 'task', agentType: 'code-simplifier' } },
+      models: { standard: 'sonnet' },
+      timeoutMs: 1000,
+    }),
+  );
+  assert.doesNotThrow(() => loadRunnerConfig(configPath));
+});
+
+test('loadRunnerConfig rejects a "capacities.<id>" entry whose agentType is not a non-empty string', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'bad-agent-type.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      capacities: { 'my-agent-capacity': { kind: 'task', agentType: '' } },
+      models: { standard: 'sonnet' },
+      timeoutMs: 1000,
+    }),
+  );
+  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
+});
+
 // --- spawnWorker: fake executor, tier->model, cwd, timeout, spawn-fail --
 
 test('spawnWorker resolves tier -> model, runs in cwd, and passes the prompt via argv', async () => {

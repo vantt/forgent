@@ -48,6 +48,20 @@ default, checked against the capacity's final resolved command (not its
 declared `kind`, not the spoofable `provider` alias) — see
 `docs/reference/capacity-cross-provider-governance.md`.
 
+## Naming a Claude Code agent instead of a raw command (`tsk-3sw`)
+
+A `kind:"task"` capacity can now declare only `agentType` (a
+`.claude/agents/<name>.md` agent definition name) instead of its own
+`command`/`args` — `resolveExecutorConfig` synthesizes a real `claude
+--agent <agentType>` invocation from the resolved global `executor`'s own
+args template (never a hardcoded literal), stripping the `--model`
+placeholder so the named agent definition's own pinned model wins over the
+work item's `tier`. Claude-only for now (`judge-discovery`'s own
+`command`/`args`-declaring shape is unaffected and still takes precedence
+whenever a capacity names both); multi-provider `agentType` support
+(`agy`/Codex each have a structurally different agent-dispatch shape of
+their own) is `tsk-53h`'s separate, later scope.
+
 ## A real process gap this cluster's own closure surfaced
 
 Closing this root out required resyncing `main` with `fgw/tsk-64p` a
