@@ -203,11 +203,18 @@ function optionalField(value, message) {
 }
 
 // tsk-6c2 D3: retry-with-backoff on main-checkout-lock contention is
-// default ON for take/pick/approve -- no flag needed. `--wait <ms>` tightens
-// the wait budget (never extends past the lock's own remainingTtlMs,
-// withLockRetry's job); bare `--wait` (no value) is a harmless no-op alias
-// for the default. `--no-wait` is the opt-out, restoring today's exact
-// immediate-fail-on-HELD behavior.
+// default ON for take/pick/approve -- no flag needed. Bare `--wait` (no
+// value) is a harmless no-op alias for the default. `--no-wait` is the
+// opt-out, restoring today's exact immediate-fail-on-HELD behavior.
+//
+// tsk-2rf D2/D3: an *explicit* `--wait <ms>` is now the true wall-clock
+// ceiling for the retry (`withLockRetry`, `src/runner/lock-wait.mjs`) --
+// no longer capped by the lock's own remainingTtlMs -- so a caller who
+// knows the holder is a legitimate long-running session can outlast it.
+// MAX_WAIT_MS bounds that ceiling: a mistyped value must not hang a CLI
+// call near-indefinitely against a holder that never actually releases.
+const MAX_WAIT_MS = 15 * 60 * 1000; // 900000ms, tsk-2rf D3
+
 function parseWaitFlags(flags, verbName) {
   const noWait = Boolean(flags['no-wait']);
   let waitMs;
@@ -215,6 +222,9 @@ function parseWaitFlags(flags, verbName) {
     waitMs = Number(flags.wait);
     if (!Number.isFinite(waitMs) || waitMs <= 0) {
       throw new StoreError('validation', `${verbName} --wait must be a positive number of milliseconds (got "${flags.wait}").`);
+    }
+    if (waitMs > MAX_WAIT_MS) {
+      throw new StoreError('validation', `${verbName} --wait must be at most ${MAX_WAIT_MS}ms (15 min) (got "${flags.wait}").`);
     }
   }
   return { noWait, waitMs };
