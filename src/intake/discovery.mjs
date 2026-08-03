@@ -27,7 +27,7 @@ import path from 'node:path';
 import { modelForTier } from '../runner/dispatch.mjs';
 import { runJudgeExecutor, JUDGE_STRICT_JSON_SUFFIX, readScoutNotes } from './judge-executor.mjs';
 import { appendJudgeFailLog } from './judge-fail-log.mjs';
-import { readLockedContext } from './decompose.mjs';
+import { readLockedContext, resolveContentRoot } from './decompose.mjs';
 import { DEFAULTS } from '../state/work.mjs';
 import { listWork, moveStage, addDiscovery, addDecision, putInAwaiting, editWork, StoreError } from '../state/store.mjs';
 import { graphMetrics } from '../state/graph-metrics.mjs';
@@ -48,6 +48,23 @@ const DEFAULT_UNCLEAR_QUESTION =
 // `clarify`, so context-discovery later replaces this sentinel with the real
 // verify, exactly as a submitted item does. Shared, never a duplicated literal.
 export const FALLBACK_VERIFY = 'chưa xác định — bổ sung thủ công';
+
+// Retired P14 sentinel (D10's comment above) — named here so the D2 guard
+// below can compare against it without a bare magic-string literal. Still
+// live in production today: `bin/fgos.mjs`'s own SUBMIT_VERIFY_SENTINEL
+// (a separate local const, CLI layer never imported from here) carries
+// this exact same string as every freshly-submitted item's starting
+// verify. Exported (tsk-1ni D2) so a test fixture representing a
+// not-yet-clarified item can reference the real sentinel instead of an
+// unrelated placeholder literal of its own.
+export const RETIRED_P14_PLACEHOLDER = 'chưa xác định — P15 bổ sung';
+
+// tsk-1ni D2: an existing work.verify counts as "real" -- worth protecting
+// from judgeDiscovery's own guess -- when it is set and is neither of the
+// two known placeholder shapes a verify field can carry pre-clarify.
+function hasRealVerify(verify) {
+  return typeof verify === 'string' && verify.trim() && verify !== FALLBACK_VERIFY && verify !== RETIRED_P14_PLACEHOLDER;
+}
 
 /**
  * `view` is OPTIONAL (per discovery-context P30's backward-compat seam):
@@ -515,7 +532,13 @@ export function resolveDiscovery(dir, id, cfg, role) {
     throw new StoreError('validation', `resolveDiscovery: work "${id}" not found.`);
   }
 
-  const repoRoot = path.dirname(dir);
+  // repoRoot (tsk-1ni D1): resolved to the item's own worktree when one
+  // exists, never the raw state root -- see resolveContentRoot's own
+  // comment in decompose.mjs. Reused below for BOTH readLockedContext's
+  // own read AND judgeDiscovery's scoutContext (readScoutNotes/
+  // writeScoutNotes) -- same variable, same bug, same fix.
+  const stateRoot = path.dirname(dir);
+  const repoRoot = resolveContentRoot(stateRoot, id, work.docsRef);
   const lockedContext = readLockedContext(repoRoot, work.docsRef);
   if (lockedContext) {
     addDecision(dir, {
@@ -531,12 +554,15 @@ export function resolveDiscovery(dir, id, cfg, role) {
     // this item when it approved CONTEXT.md — preferred over the retired
     // placeholder whenever a Track A approve record actually exists (an item
     // that never went through that Gate, e.g. from before this item, keeps
-    // today's fallback unchanged).
+    // today's fallback unchanged). tsk-1ni D2: work.verify wins over both
+    // when it is already real -- same guard, same rationale, as the
+    // real-judge branch below (plan.md: "both call moveStage with a
+    // verify value today, both get the guard").
     moveStage(dir, {
       id,
       to: 'decompose',
       expectedStage: 'clarify',
-      verify: view.gates?.[id]?.contextApprove?.verify ?? FALLBACK_VERIFY,
+      verify: hasRealVerify(work.verify) ? work.verify : (view.gates?.[id]?.contextApprove?.verify ?? FALLBACK_VERIFY),
       role,
     });
     return { outcome: 'clear', id, verdict: { clear: true, skipped: true } };
@@ -570,11 +596,18 @@ export function resolveDiscovery(dir, id, cfg, role) {
   }
 
   if (verdict.clear) {
+    // tsk-1ni D2: never let judgeDiscovery's own guess overwrite a verify
+    // a prior stage already locked (e.g. fgos-validating's planApprove,
+    // reached because this item's stage never got moved off clarify before
+    // later stages ran) -- only the model's guess fills an empty/placeholder
+    // field, same "locked beats fresh guess" trust the D1 skip-and-advance
+    // path above already gives a committed CONTEXT.md.
+    const verify = hasRealVerify(work.verify) ? work.verify : (verdict.verify ?? FALLBACK_VERIFY);
     moveStage(dir, {
       id,
       to: 'decompose',
       expectedStage: 'clarify',
-      verify: verdict.verify ?? FALLBACK_VERIFY,
+      verify,
       role,
     });
     return { outcome: 'clear', id, verdict };
