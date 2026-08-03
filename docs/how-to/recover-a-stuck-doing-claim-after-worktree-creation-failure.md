@@ -21,13 +21,27 @@ carrying that fix, a worktree-creation failure normally surfaces as a
 clean, retryable error and the item is **not** left stuck. Just retry
 `fgos pick <id>`.
 
-This doc is for the residual cases the revert can't cover on its own:
+Since `tsk-3lx`, the specific trigger both real examples below hit —
+`git worktree add` destroying the pre-existing orphaned checkout before
+failing to create its replacement — is closed structurally on a reused
+branch: `createWorktree`'s reuse path now relocates that checkout directly
+(`git worktree move`) instead of destroying it first, so a failure there
+(including the exact `spawnSync git ENOENT` both examples hit) leaves the
+original checkout untouched — no manual recovery needed for that specific
+class at all, not even a retry.
+
+This doc is for the residual cases neither fix covers:
 
 - the revert's own `moveWork` call needs a working `.fgos/` writer and a
   working `git` — if whatever broke `createClaimWorktree` (e.g. the git
   binary itself becoming unreachable) also breaks the revert call, the
   item is still left in `doing`;
-- a checkout predating `tsk-4m0` doesn't have the revert at all.
+- a genuinely fresh branch (never reused, no pre-existing checkout to
+  relocate) still goes through a plain `git worktree add -b` — nothing to
+  destroy there, but a failure still means the claim needs the same
+  `todo`-retry (now automatic, per `tsk-4m0`) and there is no worktree yet
+  to fall back into;
+- a checkout predating both fixes doesn't have either of them at all.
 
 ## Steps
 
@@ -107,6 +121,11 @@ in under a minute, no data lost.
 
 ## Related
 
+- `docs/history/pick-worktree-reclaim-zero-destroy/CONTEXT.md`,
+  `docs/history/pick-worktree-reclaim-zero-destroy/plan.md` (`tsk-3lx`) —
+  the fix that closes the specific `spawnSync git ENOENT`-during-reclaim
+  trigger both real examples below hit, by relocating (`git worktree
+  move`) instead of destroying the orphaned checkout on a reused branch.
 - `docs/history/pick-worktree-claim-race/CONTEXT.md`,
   `docs/history/pick-worktree-claim-race/plan.md` — the locked decisions
   and shape behind the `tsk-4m0` fix this doc is the residual-case

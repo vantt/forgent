@@ -188,6 +188,15 @@ export function isCheckoutDirty(repoRoot, worktreePath) {
  * to force-remove it instead of silently discarding the work. The caller
  * (createWorktree's reuse path) does not catch this — it propagates as a
  * hard failure rather than destroying the checkout.
+ *
+ * DESTROY-ON-PURPOSE (tsk-3lx): stays destroy-only, unlike its sibling
+ * `relocateOrphanedCheckout` below — `cleanupMergedBranch` (merge.mjs)
+ * calls this directly to dispose of a stray leftover checkout right
+ * before deleting `branch` itself, where there is no replacement checkout
+ * to relocate to. `createWorktree`'s own reuse path is what actually needs
+ * the checkout to keep living (just at a new path), which is exactly what
+ * makes that ONE call site the zero-destroy incident's origin — see
+ * `relocateOrphanedCheckout`.
  */
 export function reclaimOrphanedCheckout(repoRoot, branch) {
   let listing;
@@ -226,6 +235,88 @@ export function reclaimOrphanedCheckout(repoRoot, branch) {
     }
   }
   return { reclaimed: true, path: orphanPath };
+}
+
+/**
+ * Relocate `branch`'s existing clean checkout directly onto `targetPath`
+ * via `git worktree move`, instead of destroying it first (tsk-3lx D2,
+ * zero-destroy): if the move fails for any reason, the pre-existing
+ * checkout is left exactly where it was, still valid, still on `branch`.
+ * This is what `createWorktree`'s reuse path calls instead of
+ * `reclaimOrphanedCheckout` — the incident this closes (`spawnSync git
+ * ENOENT` mid-`git worktree add`, deleting the exact checkout a live
+ * session was sitting in) only ever happened on THIS path, where a
+ * replacement checkout was always the point; `reclaimOrphanedCheckout`
+ * itself stays destroy-only for its other caller, `cleanupMergedBranch`,
+ * which has no replacement to relocate to (see its own docstring).
+ *
+ * Returns `{ relocated: true, from, to }` when a live checkout was moved,
+ * `{ relocated: false }` when there was nothing to relocate — no existing
+ * checkout at all, or one whose directory is already gone (pruned instead,
+ * same as `reclaimOrphanedCheckout`'s own already-gone branch — nothing
+ * physical to lose there either way).
+ *
+ * Shares the DATA-LOSS GUARD above verbatim (tsk-1os, unchanged): a
+ * checkout with real uncommitted changes is refused, never moved.
+ *
+ * `targetPath` must not already exist on disk. `git worktree move` nests
+ * the source under an existing directory instead of placing it there —
+ * verified empirically against this repo's own git (2.34.1), recorded in
+ * `docs/history/pick-worktree-reclaim-zero-destroy/plan.md`'s "Validated
+ * at fgos-validating" section — so the caller's own `mkdtemp`'d empty
+ * placeholder directory must be removed immediately before this call, not
+ * reused as-is.
+ */
+function relocateOrphanedCheckout(repoRoot, branch, targetPath) {
+  let listing;
+  try {
+    listing = git(repoRoot, ['worktree', 'list', '--porcelain']);
+  } catch (err) {
+    throw new WorktreeError(`listing worktrees failed while reclaiming "${branch}": ${err.message}`, { branch });
+  }
+
+  const orphanPath = findCheckoutPath(listing, branch);
+  if (!orphanPath) return { relocated: false };
+
+  if (!fs.existsSync(orphanPath)) {
+    try {
+      git(repoRoot, ['worktree', 'prune']);
+    } catch (err) {
+      throw new WorktreeError(
+        `pruning stale worktree registration for "${branch}" (path already gone: "${orphanPath}") failed: ${err.message}`,
+        { branch, orphanPath },
+      );
+    }
+    return { relocated: false };
+  }
+
+  if (isCheckoutDirty(repoRoot, orphanPath)) {
+    throw new WorktreeError(
+      `refusing to reclaim checkout of "${branch}" at "${orphanPath}" — it has uncommitted changes, so it is not a genuine crash-orphan (a real one is clean, its commit already landed) and may be a live checkout still in use. Commit or discard the work there, or remove the worktree yourself, before retrying.`,
+      { branch, orphanPath },
+    );
+  }
+
+  try {
+    fs.rmdirSync(targetPath);
+  } catch (err) {
+    throw new WorktreeError(`preparing relocation target "${targetPath}" for "${branch}" failed: ${err.message}`, {
+      branch,
+      orphanPath,
+      targetPath,
+    });
+  }
+
+  try {
+    git(repoRoot, ['worktree', 'move', orphanPath, targetPath]);
+  } catch (err) {
+    throw new WorktreeError(
+      `relocating checkout of "${branch}" from "${orphanPath}" to "${targetPath}" failed: ${err.message}`,
+      { branch, orphanPath, targetPath },
+    );
+  }
+
+  return { relocated: true, from: orphanPath, to: targetPath };
 }
 
 /**
@@ -286,9 +377,10 @@ export function createWorktree(repoRoot, id, opts = {}) {
   const worktreePath = fs.mkdtempSync(path.join(baseDir, `${id}-`));
 
   const reused = branchExists(repoRoot, branch);
+  let relocated = false;
   if (reused) {
     try {
-      reclaimOrphanedCheckout(repoRoot, branch);
+      relocated = relocateOrphanedCheckout(repoRoot, branch, worktreePath).relocated;
     } catch (err) {
       try {
         fs.rmSync(worktreePath, { recursive: true, force: true });
@@ -299,25 +391,27 @@ export function createWorktree(repoRoot, id, opts = {}) {
       throw err;
     }
   }
-  try {
-    if (reused) {
-      git(repoRoot, ['worktree', 'add', worktreePath, branch]);
-    } else if (opts.baseRef) {
-      git(repoRoot, ['worktree', 'add', '-b', branch, worktreePath, opts.baseRef]);
-    } else {
-      git(repoRoot, ['worktree', 'add', '-b', branch, worktreePath]);
-    }
-  } catch (err) {
+  if (!relocated) {
     try {
-      fs.rmSync(worktreePath, { recursive: true, force: true });
-    } catch {
-      // best-effort cleanup of the empty dir mkdtemp created; the real
-      // failure below is what the caller needs to see.
+      if (reused) {
+        git(repoRoot, ['worktree', 'add', worktreePath, branch]);
+      } else if (opts.baseRef) {
+        git(repoRoot, ['worktree', 'add', '-b', branch, worktreePath, opts.baseRef]);
+      } else {
+        git(repoRoot, ['worktree', 'add', '-b', branch, worktreePath]);
+      }
+    } catch (err) {
+      try {
+        fs.rmSync(worktreePath, { recursive: true, force: true });
+      } catch {
+        // best-effort cleanup of the empty dir mkdtemp created; the real
+        // failure below is what the caller needs to see.
+      }
+      throw new WorktreeError(`git worktree add failed for branch "${branch}": ${err.message}`, {
+        branch,
+        worktreePath,
+      });
     }
-    throw new WorktreeError(`git worktree add failed for branch "${branch}": ${err.message}`, {
-      branch,
-      worktreePath,
-    });
   }
 
   try {

@@ -170,10 +170,23 @@ describes actually exists.
 ## Verify command
 
 ```
-node --test test/runner/worktree.test.mjs test/runner/worktree-callsite-wrapper.test.mjs test/runner/claim-port.test.mjs test/runner/merge.test.mjs test/runner/loop.test.mjs test/cli/fgos.test.mjs
+node --test test/runner/worktree.test.mjs test/runner/worktree-callsite-wrapper.test.mjs test/runner/claim-port.test.mjs test/runner/merge.test.mjs test/runner/loop.test.mjs test/runner/promote-engine.test.mjs test/cli/fgos.test.mjs
 ```
+
+`test/runner/promote-engine.test.mjs` added post-`fgos-validating`
+(`fgos-executing` impact-analysis pass, GitNexus full posture):
+`reclaimOrphanedCheckout` impact query (upstream, CRITICAL risk, 9
+symbols) surfaced a THIRD real call site beyond `CONTEXT.md`'s D3 —
+`cleanupMergedBranch` (`src/runner/merge.mjs:931`) calls it directly, not
+only through `createWorktree` — plus a depth-3 caller,
+`retargetMember` (`src/runner/promote-engine.mjs`), with its own
+dedicated test file not previously in this verify command. The other
+depth-2/3 callers (`createClaimWorktree`, `withMergeEphemeralWorktree`,
+`createDispatchWorktree`, `claimWork`, `startupReap`,
+`dispatchClaimedItem`) are already covered by the six files already
+listed (`claim-port.test.mjs`, `merge.test.mjs`, `loop.test.mjs`).
 
 Real progress at `return` time: the new failure-injection test (D2's
 proof) passes, the two updated orphan-reclaim tests pass, every other
-test across the six files above stays green unmodified, and the how-to
+test across all seven files above stays green unmodified, and the how-to
 doc reflects the new, narrower residual scope.
