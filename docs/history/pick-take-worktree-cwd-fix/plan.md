@@ -106,6 +106,16 @@ the risk-map row below, carried to `fgos-validating`.
   CONTEXT.md's own deferred-questions section); `fgos-validating`'s
   reality gate checks this assumption is proven, not asked about here.
 
+## Proof surface
+
+One command proves this item done: `npm test` (`node --test
+'test/**/*.test.mjs'`, per `package.json`'s `test` script) — covers the
+full state + cli + runner + e2e suite named in AGENTS.md's own DoD,
+including every file in the risk map above plus the new CLI-level
+regression test this item adds. No narrower command honestly covers both
+the shared `worktree.mjs` primitive and the `bin/fgos.mjs` handlers at
+once.
+
 ## Split
 
 None — one honest piece of work, no children created.
