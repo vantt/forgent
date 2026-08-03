@@ -118,6 +118,17 @@ state or touches git worktrees directly — every write goes through the
    at the printed path rather than hand-checking-out the branch in this
    one.
 
+   **Never run a raw `git reset --hard` on the main checkout without a
+   full `git status` first** (tsk-3au:
+   `docs/history/main-checkout-destructive-git-safety-net/CONTEXT.md`) — a
+   session that checks only the files it meant to touch, not the whole
+   tree, can silently discard another in-flight session's uncommitted work
+   with no stash/reflog/blob to recover it (the main checkout is shared
+   across every session's `fgos <verb>` call, same as the branch-checkout
+   danger above). Use `fgos main-checkout-reset --sha <sha> [--confirm]`
+   instead — it shows the full whole-repo status and refuses without
+   `--confirm` when the tree is dirty.
+
 5. **Drive the claimed item via `fgos-coding-driving` (tsk-19j-4) — do not
    stop after the switch.** If step 4 actually switched the session into
    the worktree, immediately invoke the `fgos-coding-driving` skill for

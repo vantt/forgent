@@ -75,6 +75,16 @@ on open work, claims one item through the pull door, then points to
 `fgos-exploring`, `fgos-planning`, or `fgos-validating` based on where that
 item's `stage` puts it.
 
+**Never run a raw `git reset --hard` on the main checkout without a full
+`git status` first** (tsk-3au: `docs/history/main-checkout-destructive-
+git-safety-net/CONTEXT.md`) — the main checkout is the one shared working
+tree every session's `fgos <verb>` call resolves against; checking only the
+files you meant to touch instead of the whole tree can silently discard
+another in-flight session's uncommitted work, with no stash/reflog/blob to
+recover it. Use `fgos main-checkout-reset --sha <sha> [--confirm]` instead
+— it prints the full whole-repo status and refuses without `--confirm`
+when the tree is dirty.
+
 <!-- gitnexus:start -->
 # GitNexus — Code Intelligence
 
