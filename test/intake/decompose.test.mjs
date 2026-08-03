@@ -1526,3 +1526,165 @@ test('resolveDecompose real pass-through path (via judgeDecompose) still prefers
   const view = listWork(storeDir);
   assert.equal(view.work['item-x'].verify, 'node --test test/real-standard-item.test.mjs');
 });
+
+// --- caller-supplied verdict (tsk-27y D1/D2/D3): resolveDecompose skips
+// judgeDecompose entirely when a caller (e.g. a live fgos-planning session)
+// passes its own already-rendered verdict, checked BEFORE the plan.md
+// tiny/small mode skip-and-advance heuristic. Downstream safety gates
+// (heavy-risk/blast-radius/footprint-overlap) still apply unconditionally. -
+
+test('resolveDecompose skips judgeDecompose and advances to executing on a caller-supplied pass-through verdict', () => {
+  const dir = mkTempDir();
+  const { scriptPath, counterPath } = writeCountingRawStdoutExecutor(dir, JSON.stringify({ verdict: 'decompose', reason: 'should never run', children: [{ title: 'x', verify: 'npm test' }] }));
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork());
+
+  const result = resolveDecompose(storeDir, 'item-x', cfg, 'session', { verdict: 'pass-through', reason: 'single-piece, no split needed' });
+  assert.equal(result.outcome, 'pass-through');
+  assert.equal(readCount(counterPath), 0, 'judgeDecompose must never spawn the executor when a caller verdict is supplied');
+
+  const view = listWork(storeDir);
+  assert.equal(view.work['item-x'].stage, 'executing');
+  const decisions = view.decisionsById?.['item-x'] ?? [];
+  assert.ok(decisions.some((d) => d.text.startsWith('decompose caller-supplied:')), 'caller-supplied path must log a distinct audit-trail decision');
+});
+
+test('resolveDecompose parks in awaiting-human on a caller-supplied need-human verdict, with the caller-supplied reason', () => {
+  const dir = mkTempDir();
+  const { scriptPath, counterPath } = writeCountingRawStdoutExecutor(dir, JSON.stringify({ verdict: 'pass-through' }));
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork());
+
+  const result = resolveDecompose(storeDir, 'item-x', cfg, 'session', { verdict: 'need-human', reason: 'Which auth provider should the split assume?' });
+  assert.equal(result.outcome, 'need-human');
+  assert.equal(readCount(counterPath), 0);
+
+  const view = listWork(storeDir);
+  assert.equal(view.work['item-x'].status, 'awaiting-human');
+  assert.match(view.gates['item-x'].ask, /Which auth provider should the split assume\?/);
+});
+
+test('resolveDecompose writes real children on a caller-supplied decompose verdict, same shape a model verdict produces', () => {
+  const dir = mkTempDir();
+  const { scriptPath, counterPath } = writeCountingRawStdoutExecutor(dir, JSON.stringify({ verdict: 'pass-through', reason: 'should never run' }));
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork());
+
+  const result = resolveDecompose(storeDir, 'item-x', cfg, 'session', {
+    verdict: 'decompose',
+    reason: 'Two independent surfaces, no shared state',
+    children: [
+      { title: 'Build parser', verify: 'npm test -- parser' },
+      { title: 'Build renderer', verify: 'npm test -- renderer' },
+    ],
+  });
+  assert.equal(result.outcome, 'decompose');
+  assert.equal(readCount(counterPath), 0);
+  assert.deepEqual(result.childIds, ['item-x-1', 'item-x-2']);
+
+  const view = listWork(storeDir);
+  assert.equal(view.work['item-x'].stage, 'executing');
+  assert.equal(view.work['item-x-1'].title, 'Build parser');
+  assert.equal(view.work['item-x-1'].verify, 'npm test -- parser');
+  assert.equal(view.work['item-x-1'].parent, 'item-x');
+  assert.equal(view.work['item-x-2'].title, 'Build renderer');
+});
+
+test('resolveDecompose rejects a caller-supplied decompose verdict with a child missing verify, same fail-safe a model verdict gets', () => {
+  const dir = mkTempDir();
+  const { scriptPath, counterPath } = writeCountingRawStdoutExecutor(dir, JSON.stringify({ verdict: 'pass-through' }));
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork());
+
+  const result = resolveDecompose(storeDir, 'item-x', cfg, 'session', {
+    verdict: 'decompose',
+    reason: 'Two independent surfaces',
+    children: [{ title: 'Build parser' }], // no verify
+  });
+  assert.equal(result.outcome, 'invalid');
+  assert.equal(readCount(counterPath), 0);
+
+  const view = listWork(storeDir);
+  assert.equal(view.work['item-x'].stage, 'decompose', 'item left exactly where it was, same as a model-verdict invalid outcome');
+  assert.equal(Object.values(view.work).some((item) => item.parent === 'item-x'), false);
+});
+
+test('resolveDecompose still gates a caller-supplied decompose verdict to awaiting-human on overlapping footprint (D3 — gates apply regardless of verdict origin)', () => {
+  const dir = mkTempDir();
+  const { scriptPath, counterPath } = writeCountingRawStdoutExecutor(dir, JSON.stringify({ verdict: 'pass-through' }));
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork());
+
+  const result = resolveDecompose(storeDir, 'item-x', cfg, 'session', {
+    verdict: 'decompose',
+    reason: 'Two independent surfaces, no shared state',
+    children: [
+      { title: 'Build parser', verify: 'npm test -- parser', footprint: ['src/parser.mjs', 'src/shared.mjs'] },
+      { title: 'Build renderer', verify: 'npm test -- renderer', footprint: ['src/shared.mjs', 'src/renderer.mjs'] },
+    ],
+  });
+  assert.equal(result.outcome, 'need-human');
+  assert.equal(readCount(counterPath), 0);
+
+  const view = listWork(storeDir);
+  assert.match(view.gates['item-x'].ask, /src\/shared\.mjs/);
+  const children = Object.values(view.work).filter((item) => item.parent === 'item-x');
+  assert.equal(children.length, 0);
+});
+
+test('resolveDecompose still routes a caller-supplied verdict through the heavy-risk gate (D3 — gates apply regardless of verdict origin)', () => {
+  const dir = mkTempDir();
+  const { scriptPath, counterPath } = writeCountingRawStdoutExecutor(dir, JSON.stringify({ verdict: 'pass-through' }));
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork({ risk: 'heavy' }));
+
+  const result = resolveDecompose(storeDir, 'item-x', cfg, 'session', { verdict: 'pass-through', reason: 'single-piece' });
+  assert.equal(result.outcome, 'need-human');
+  assert.equal(readCount(counterPath), 0);
+
+  const view = listWork(storeDir);
+  assert.match(view.gates['item-x'].ask, /risk cao \(heavy\)/);
+});
+
+test('resolveDecompose caller-supplied verdict takes precedence over the plan.md tiny/small mode skip-and-advance heuristic (D2)', () => {
+  const dir = mkTempDir();
+  const { scriptPath, counterPath } = writeCountingRawStdoutExecutor(dir, JSON.stringify({ verdict: 'decompose', reason: 'should never run', children: [{ title: 'x', verify: 'npm test' }] }));
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  const docsRef = mkPlanFixture(storeDir, '# plan\n\nmode = **tiny** (1 file, direct task).\n');
+  addWork(storeDir, sampleWork({ docsRef }));
+
+  const result = resolveDecompose(storeDir, 'item-x', cfg, 'session', { verdict: 'pass-through', reason: 'caller already decided' });
+  assert.equal(result.outcome, 'pass-through');
+  assert.equal(readCount(counterPath), 0);
+
+  const view = listWork(storeDir);
+  const decisions = view.decisionsById?.['item-x'] ?? [];
+  assert.ok(decisions.some((d) => d.text.startsWith('decompose caller-supplied:')));
+  assert.ok(!decisions.some((d) => d.text.startsWith('decompose skip:')), 'the plan.md mode skip-and-advance path must never fire when a caller verdict is present');
+});
+
+test('resolveDecompose omitting callerVerdict entirely keeps prior behavior (byte-identical call site)', () => {
+  const dir = mkTempDir();
+  const scriptPath = writeVerdictExecutor(dir, { verdict: 'pass-through', reason: 'real judgment ran' });
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork());
+
+  const result = resolveDecompose(storeDir, 'item-x', cfg, 'session');
+  assert.equal(result.outcome, 'pass-through');
+});
