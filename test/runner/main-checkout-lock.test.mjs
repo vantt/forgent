@@ -627,6 +627,86 @@ test('acquire (fresh create) and acquire (self-recognition refresh) never leave 
   assert.ok(entries.includes(LOCK_FILE));
 });
 
+test('deterministic: the create path never makes lockPath observable via fs.openSync(path, "wx") before its content is fully written (tsk-2tm)', () => {
+  // A real concurrent-process race window is nanosecond-scale and not
+  // reliably reproducible by timing alone (see the multi-process test
+  // below, which cannot fail this way against the pre-fix code either --
+  // OS scheduling luck, not a real proof). This test instead structurally
+  // detects the exact vulnerable pattern the bug report named: creating
+  // the lock file via fs.openSync(lockPath, 'wx') and populating it
+  // afterward. The pre-fix implementation calls fs.openSync(lockPath,
+  // 'wx') directly -- at that instant a concurrent reader sees an empty
+  // file. The fix (writeAtomicCreate) never opens lockPath directly for
+  // create; it publishes fully-written content via fs.linkSync instead, so
+  // this interception never fires.
+  const { dir } = setup();
+  fs.mkdirSync(dir, { recursive: true });
+  const target = lockPathFor(dir);
+
+  const originalOpenSync = fs.openSync;
+  let observedTornRead; // undefined = fs.openSync(target, 'wx') never called
+  fs.openSync = (...args) => {
+    const [p, flags] = args;
+    const fd = originalOpenSync(...args);
+    if (p === target && flags === 'wx') {
+      try {
+        observedTornRead = fs.readFileSync(target, 'utf8');
+      } catch {
+        observedTornRead = '<unreadable>';
+      }
+    }
+    return fd;
+  };
+
+  try {
+    const res = acquireMainCheckoutLock(dir, { identity: process.pid });
+    assert.equal(res.status, ACQUIRED);
+  } finally {
+    fs.openSync = originalOpenSync;
+  }
+
+  assert.equal(
+    observedTornRead,
+    undefined,
+    `the create path must never call fs.openSync(lockPath, 'wx') directly -- doing so is exactly the two-step create/write pattern that leaves lockPath observable with incomplete content ("${observedTornRead}") before the record is fully written`,
+  );
+});
+
+test('deterministic: the self-recognition refresh path never truncates lockPath in place via a direct fs.writeFileSync(lockPath, ...) (tsk-2tm)', () => {
+  // Mirrors the create-path test above for the refresh branch (line 165's
+  // pre-fix fs.writeFileSync(lockPath, content), a truncate-in-place write
+  // that leaves the file briefly empty). The fix (writeAtomicReplace)
+  // writes to a temp file and fs.renameSync's it onto lockPath instead, so
+  // fs.writeFileSync is never called with lockPath itself as the target.
+  const { dir } = setup();
+  fs.mkdirSync(dir, { recursive: true });
+  const target = lockPathFor(dir);
+
+  const first = acquireMainCheckoutLock(dir, { identity: 'refresher' });
+  assert.equal(first.status, ACQUIRED);
+
+  const originalWriteFileSync = fs.writeFileSync;
+  let observedDirectWrite = false;
+  fs.writeFileSync = (...args) => {
+    const [p] = args;
+    if (p === target) observedDirectWrite = true;
+    return originalWriteFileSync(...args);
+  };
+
+  try {
+    const refreshed = acquireMainCheckoutLock(dir, { identity: 'refresher' });
+    assert.equal(refreshed.status, ACQUIRED);
+  } finally {
+    fs.writeFileSync = originalWriteFileSync;
+  }
+
+  assert.equal(
+    observedDirectWrite,
+    false,
+    'the refresh path must never call fs.writeFileSync directly on the lock path -- that truncates in place, leaving the file observably empty/partial mid-write',
+  );
+});
+
 test('two processes racing to create a genuinely NEW lock always produce exactly one ACQUIRED and one HELD, never AMBIGUOUS from a torn read (tsk-2tm)', async () => {
   const moduleUrl = pathToFileURL(path.resolve('src/runner/main-checkout-lock.mjs')).href;
 
