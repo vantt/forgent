@@ -24,7 +24,7 @@
           "--permission-mode",
           "acceptEdits",
           "--allowedTools",
-          "Bash(rg:*),Bash(git add:*),Bash(git commit:*)"
+          "Task,WebSearch,WebFetch,Read,Bash(rg:*),Bash(git add:*),Bash(git commit:*)"
         ]
       }
     },

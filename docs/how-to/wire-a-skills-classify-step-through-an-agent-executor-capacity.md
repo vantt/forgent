@@ -16,19 +16,20 @@ nothing is configured.
 
 ## Before you start
 
-- This assumes `.fgos-runner.json`'s `capacities` schema and
-  `dispatch.mjs`'s `resolveExecutorConfig`/`resolveExecutorCommand`
-  already exist (`tsk-62v`) — this how-to is about wiring a *consumer*
-  skill through an existing capacity, not building the capacity mechanism
-  itself.
-- The skill being wired must be a **domain-2** dispatch (an in-session
-  skill that shells out via Bash), not the headless runner's own domain-1
-  dispatch (`spawnWorker`) — those already get capacity-aware resolution
-  automatically.
+- This assumes `.fgos/config.json`'s `runner.capacities` schema (legacy
+  `.fgos-runner.json` still read as a fallback for a project that hasn't
+  run `fgos setup` since the move, `tsk-5vf` D2) and `dispatch.mjs`'s
+  `resolveExecutorConfig`/`resolveExecutorCommand` already exist
+  (`tsk-62v`) — this how-to is about wiring a *consumer* skill through an
+  existing capacity, not building the capacity mechanism itself.
+- The skill being wired must be a **task-dispatch** consumer (an in-session
+  skill that shells out via Bash), not the headless runner's own
+  cli-dispatch (`spawnWorker`) — those already get capacity-aware
+  resolution automatically.
 
 ## Steps
 
-1. **Add the capacity to `.fgos-runner.json`** — `kind: "cli"`,
+1. **Add the capacity to `.fgos/config.json`'s `runner.capacities`** — `kind: "cli"`,
    `adapter: "cli-spawn"`, a real installed command (probed on the
    machine at build time, never hardcoded from a design doc's example),
    and a `tier` that resolves to *some* model via the existing `models`
@@ -58,17 +59,17 @@ nothing is configured.
    fgos tool check
    ```
 
-   (`--name` must equal the capacity's own id in `.fgos-runner.json` —
+   (`--name` must equal the capacity's own id in the config —
    `resolveExecutorConfig`'s presence check looks up
    `tools[capacityId]` by that exact key.)
 
 3. **Give the skill a way to resolve the real command/args without a
    second argv-building implementation.** If `dispatch.mjs` has no CLI
    entry point yet, add a thin one that calls the same
-   `resolveExecutorConfig`/`resolveExecutorCommand` domain-1 already
+   `resolveExecutorConfig`/`resolveExecutorCommand` cli-dispatch already
    uses, printing `{command,args,provider,model}` as JSON (real example:
    `node src/runner/dispatch.mjs resolve <capacityId> --prompt <text>`,
-   added in `tsk-5l2-1`). Domain-2 skills invoke this exact CLI, never a
+   added in `tsk-5l2-1`). task-dispatch skills invoke this exact CLI, never a
    parallel prompt/argv builder of their own.
 
 4. **In the skill's own `SKILL.md`, branch on config THEN presence — two

@@ -9,17 +9,19 @@ source_capture_ids: [tsk-2yp]
 # How to wire a headless function through an agent-executor capacity
 
 Use this when a plain function — not a prose skill, not `spawnWorker`'s own
-domain-1 dispatch — already spawns a subprocess directly (e.g. via
+cli-dispatch — already spawns a subprocess directly (e.g. via
 `spawnSync`/`resolveExecutorCommand`) with a hardcoded `tier`, and you want
 to give it an *optional* path to resolve through `capacities.<id>` instead
-(`.fgos-runner.json`'s `capacities.<id>` > `executors.<tier>` > `executor`
-precedence, `tsk-62v`), while keeping today's behavior byte-identical when
-nothing is configured.
+(`.fgos/config.json`'s `runner.capacities.<id>` > `executors.<tier>` >
+`executor` precedence, `tsk-62v`; legacy `.fgos-runner.json` still read as
+a fallback for a project that hasn't run `fgos setup` since the move,
+`tsk-5vf` D2), while keeping today's behavior byte-identical when nothing
+is configured.
 
 This is distinct from
 `docs/how-to/wire-a-skills-classify-step-through-an-agent-executor-capacity.md`,
-which covers a **domain-2** consumer (an in-session skill that shells out
-via Bash to a resolve CLI). A headless function already imports and calls
+which covers a **task-dispatch** consumer (an in-session skill that shells
+out via Bash to a resolve CLI). A headless function already imports and calls
 `resolveExecutorCommand` (or a wrapper over it) directly — no CLI
 resolve step, no skill-side branching.
 
@@ -58,7 +60,7 @@ mechanism:
 
 2. **Pass `fgosDir` too when the caller already has the `.fgos/` dir in
    scope** — it costs nothing extra and buys the same `kind: "cli"`
-   presence check `spawnWorker` (domain 1) already gets: a misconfigured
+   presence check `spawnWorker` (cli-dispatch) already gets: a misconfigured
    capacity fails with a named `RunnerConfigError`
    (`capacity "<id>" declares kind "cli" but is not registered — run "fgos
    tool register ..."`) instead of a bare subprocess ENOENT. In tsk-2yp,
@@ -75,16 +77,16 @@ mechanism:
    `'judge-decompose'`. Neither exposes the id as something a further-out
    caller chooses.
 
-4. **Do not add `.fgos-runner.json` capacity entries as part of this
-   change**, unless an operator is actually ready to route to a real
+4. **Do not add `capacities` entries to `.fgos/config.json` as part of
+   this change**, unless an operator is actually ready to route to a real
    alternate backend right now. Every field involved
    (`capacities.<capacityId>`) is optional — omitting it entirely falls
    through to `executors.<tier>` (or the global `executor`), so the wiring
-   itself ships with zero behavior change. `tsk-2yp` shipped no
-   `.fgos-runner.json` changes at all.
+   itself ships with zero behavior change. `tsk-2yp` shipped no config
+   changes at all.
 
 5. **Test the precedence and propagation directly against the function**,
-   not against a skill's prose (unlike the domain-2 how-to, a headless
+   not against a skill's prose (unlike the task-dispatch how-to, a headless
    function's runtime behavior IS unit-testable normally). Real shape,
    `test/intake/judge-executor.test.mjs`:
    - a `cfg.capacities.<id>` entry with its own `command`/`args` resolves
@@ -112,7 +114,7 @@ back green on the first attempt (`attempts: 1`, `errorClass: null`).
 - `docs/explanation/agent-executor-capacity-aware-dispatch.md` — why the
   capacity mechanism exists and what each cluster item proved.
 - `docs/how-to/wire-a-skills-classify-step-through-an-agent-executor-capacity.md`
-  — the domain-2 (skill) counterpart to this how-to.
+  — the task-dispatch (skill) counterpart to this how-to.
 - `docs/history/agent-executor-judge-capacity-dispatch/CONTEXT.md` — the
   locked decisions (capacity ids, `fgosDir` scope, no-config-change
   default) this item followed.

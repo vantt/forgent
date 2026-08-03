@@ -1484,7 +1484,7 @@ test('resolveExecutorCommand throws for a non-Claude "cli" capacity even when fg
   );
 });
 
-// --- tsk-5l2-1: `resolveCapacityCli` — domain-2's "resolve <capacityId>"
+// --- tsk-5l2-1: `resolveCapacityCli` — task-dispatch's "resolve <capacityId>"
 // helper, reusing resolveExecutorConfig/resolveExecutorCommand/
 // modelForTier verbatim (design doc §4.2). `repoRoot` is passed explicitly
 // in every test here to skip the git-based lookup, the same way every

@@ -485,7 +485,7 @@ export const CLAUDE_CLI_COMMANDS = Object.freeze(['claude']);
  * `agy`'s Gemini model strings vs. Claude's `haiku`/`sonnet`/`opus`)
  * cannot borrow that shared table without breaking Claude's own
  * tier-to-model resolution. This field lets `resolveCapacityCli`
- * (domain-2 only, below) substitute a capacity-specific model instead.
+ * (task-dispatch only, below) substitute a capacity-specific model instead.
  */
 function validateCapacityShape(capacity, label) {
   if (!capacity || typeof capacity !== 'object' || Array.isArray(capacity)) {
@@ -926,9 +926,9 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
 
 /**
  * `resolve <capacityId>` CLI subcommand (tsk-5l2-1, design doc §4.2): lets
- * domain 2 (an in-session skill shelling out via Bash, e.g.
+ * task-dispatch (an in-session skill shelling out via Bash, e.g.
  * `fgos-submit-assist`) resolve a capacity's real command/args/provider/
- * model the exact same way domain-1's `spawnWorker` does — reusing
+ * model the exact same way cli-dispatch's `spawnWorker` does — reusing
  * `resolveExecutorConfig`/`resolveExecutorCommand` verbatim, no second
  * argv-building implementation. Model resolution is the one deliberate
  * divergence from `spawnWorker` (tsk-2yp follow-up): a capacity's own
@@ -939,7 +939,7 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
  * model}` as JSON to stdout on success; a `RunnerConfigError` (unknown
  * capacity, not registered, not present, malformed config) prints its
  * message to stderr and exits non-zero — the same errors
- * `resolveExecutorConfig` already raises for domain 1, not a new error
+ * `resolveExecutorConfig` already raises for cli-dispatch, not a new error
  * vocabulary invented for this entry point.
  *
  * `repoRoot`, when given, skips the git-based `resolveRepoRoot` lookup
