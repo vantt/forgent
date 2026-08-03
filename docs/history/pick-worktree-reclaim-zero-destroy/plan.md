@@ -123,6 +123,41 @@ One phase, no split — see below. Concrete cases to prove at
   destroyed — existing `isCheckoutDirty` guard/test stays as the proof,
   unmodified.
 
+## Validated at fgos-validating
+
+Empirically confirmed against this repo's real `git` (2.34.1, `git worktree
+move <worktree> <new-path>` is a real, documented subcommand):
+
+- `git worktree move` to a target path that does **not yet exist** places
+  the checkout's contents directly at that path (verified: `.git` file and
+  a tracked file both land exactly at `<target>/`, branch/HEAD unchanged) —
+  this is the mechanism's core, confirmed working.
+- `git worktree move` to a target path that **already exists as a
+  directory — even an empty one** — does NOT place contents there
+  directly; it nests the source's basename underneath instead
+  (`<target>/<basename-of-source>/...`), the same as ordinary `mv`
+  semantics into an existing directory. Verified both for a non-empty and
+  a genuinely empty pre-existing target.
+- **Constraint this adds to the implementation** (`src/runner/worktree.mjs`
+  step 1 above): the reclaim-via-move path must NOT reuse `createWorktree`'s
+  existing `worktreePath = fs.mkdtempSync(...)` (line 286) as the move's
+  destination while that directory still exists — `mkdtempSync` always
+  creates the directory, so passing it straight to `git worktree move`
+  would trigger the nesting behavior above, landing the checkout one level
+  too deep and breaking every downstream `path.join(worktreePath, ...)`
+  call (`.fgos` removal, `provisionDependencies`, the `{ path: worktreePath
+  }` returned to the caller). The move-path must compute a fresh,
+  not-yet-created path (e.g. `mkdtempSync` immediately followed by
+  `fs.rmdirSync` on the empty dir right before the move call, so the path
+  exists as a name but not as a directory at move-time) instead of reusing
+  the directory as-is.
+- `git worktree move` without `-f`/`--force` already refuses to move a
+  dirty or locked worktree by design (confirmed via `git worktree move -h`)
+  — this is compatible with, but does not replace, the existing
+  `isCheckoutDirty` guard (D4, unchanged): the implementation should never
+  pass `--force`, so a dirty checkout is refused by git itself as a second
+  independent check, not just by `isCheckoutDirty`.
+
 ## Split decision
 
 **No split.** One honest ordering-mechanism fix in one function, its
