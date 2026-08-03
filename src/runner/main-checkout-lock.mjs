@@ -124,6 +124,42 @@ function parseLockContent(raw) {
   return { pid, ts };
 }
 
+/** Publishes `content` under `lockPath` as a brand-new file, atomically and
+ * exclusively (tsk-2tm): a reader must never observe an empty/partial file
+ * between creation and content becoming visible. `open(wx)` followed by a
+ * separate `write()` leaves exactly that window. Writes to a uniquely-named
+ * temp file first (already holding the full content), then `link(2)`s it
+ * onto `lockPath` — `link` is atomic and, like `open(wx)`, fails EEXIST if
+ * the target already exists, so two racing callers still produce exactly
+ * one ACQUIRED (never both). Throws EEXIST (mirroring `open(lockPath,
+ * 'wx')`'s own contract) when `lockPath` already exists. */
+function writeAtomicCreate(lockPath, content) {
+  const tmpPath = `${lockPath}.tmp-${process.pid}-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  fs.writeFileSync(tmpPath, content);
+  try {
+    fs.linkSync(tmpPath, lockPath);
+  } finally {
+    try {
+      fs.unlinkSync(tmpPath);
+    } catch (err) {
+      if (err.code !== 'ENOENT') throw err;
+    }
+  }
+}
+
+/** Publishes `content` under `lockPath`, atomically replacing whatever is
+ * there (tsk-2tm): no exclusivity needed (only a recognized owner refreshing
+ * its own lock reaches this), but a reader must still never observe a
+ * truncated intermediate state. Writes to a uniquely-named temp file, then
+ * `rename(2)`s it onto `lockPath` — an atomic replace on POSIX, so a
+ * concurrent reader sees either the old or the fully-written new content,
+ * never a partial one. */
+function writeAtomicReplace(lockPath, content) {
+  const tmpPath = `${lockPath}.tmp-${process.pid}-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  fs.writeFileSync(tmpPath, content);
+  fs.renameSync(tmpPath, lockPath);
+}
+
 /**
  * One attempt at the wx-atomic-create lock, mirroring the three sibling
  * locks' single-attempt primitive for the create/EEXIST/liveness/reclaim
@@ -134,12 +170,7 @@ function parseLockContent(raw) {
  */
 function tryAcquireOnce(lockPath, identity, now, ttlMs) {
   try {
-    const fd = fs.openSync(lockPath, 'wx');
-    try {
-      fs.writeSync(fd, JSON.stringify({ pid: identity, ts: now }));
-    } finally {
-      fs.closeSync(fd);
-    }
+    writeAtomicCreate(lockPath, JSON.stringify({ pid: identity, ts: now }));
     return { status: ACQUIRED };
   } catch (err) {
     if (err.code !== 'EEXIST') throw err;
@@ -162,7 +193,7 @@ function tryAcquireOnce(lockPath, identity, now, ttlMs) {
   // regardless of ttlMs or liveness — this is the same writer continuing
   // its own session, never a competing holder.
   if (record.pid === identity) {
-    fs.writeFileSync(lockPath, JSON.stringify({ pid: identity, ts: now }));
+    writeAtomicReplace(lockPath, JSON.stringify({ pid: identity, ts: now }));
     return { status: ACQUIRED };
   }
 

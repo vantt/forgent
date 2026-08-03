@@ -225,22 +225,35 @@ call — fgos-exploring does not design a new verify command, per this
 skill's own "do not research implementation" rule; it only snapshots
 whatever verify the item already carries into the structured record).
 
+Immediately after that gate-approve record, in BOTH branches, this session
+fires the clarify→decompose engine transition itself — this session is
+already the live soul that just did the real Socratic reasoning, so it
+passes that verdict directly instead of leaving the transition to a LATER
+blind `fgos discover` call or the fragile `readLockedContext` file-read
+trust signal (tsk-27y D1/D2, Native-First Dispatch Doctrine Phase 2 —
+`docs/decisions/0026-...md`):
+
+```bash
+node "$root/bin/fgos.mjs" discover "<item-id>" --verdict clear --verify "<the same verify value just recorded via gate-approve>" --dir "$root"
+```
+
 - **`true`** — skip the question. Post the non-question line
   `auto-approved: CONTEXT.md (gate-bypass level <level>)`, log it
   (`fgos decision --text "auto-approved CONTEXT.md gate for <item-id> at
   level <level>" --rationale "gate-bypass level <level> permits
   auto-approval per docs/history/gate-bypass/CONTEXT.md D1-D5"`, D3's
   audit trail), record it (`fgos gate-approve <item-id> --gate
-  contextApprove --actor bypass --verify "..."`, per above), then continue
-  straight to `fgos-planning`.
+  contextApprove --actor bypass --verify "..."`, per above), fire the
+  `fgos discover --verdict clear` call above, then continue straight to
+  `fgos-planning`.
 - **`false`** — surface the locked decisions in plain language — what was
   decided, why it can be trusted, what it costs if wrong — with CONTEXT.md
   linked, then ask exactly: "Decisions locked. Approve CONTEXT.md before
   planning?" CONTEXT.md is the source of truth for every downstream step;
   its decision IDs are stable and cited, never silently reinterpreted. Once
   the person approves, record it (`fgos gate-approve <item-id> --gate
-  contextApprove --actor human --verify "..."`, per above) before
-  continuing to `fgos-planning`.
+  contextApprove --actor human --verify "..."`, per above), fire the `fgos
+  discover --verdict clear` call above, then continue to `fgos-planning`.
 
 ## Red flags
 

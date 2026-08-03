@@ -22,7 +22,7 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { modelForTier } from '../runner/dispatch.mjs';
 import { loadTemplate } from '../runner/prompt-templates.mjs';
-import { runJudgeExecutor, JUDGE_STRICT_JSON_SUFFIX, readScoutNotes } from './judge-executor.mjs';
+import { runJudgeExecutor, JUDGE_STRICT_JSON_SUFFIX, judgeVerifySemanticCorrectness, readScoutNotes } from './judge-executor.mjs';
 import { appendJudgeFailLog } from './judge-fail-log.mjs';
 import { DEFAULTS } from '../state/work.mjs';
 import { listWork, moveStage, moveWork, addWork, putInAwaiting, addDecision, editWork, StoreError } from '../state/store.mjs';
@@ -131,6 +131,12 @@ const DEFAULT_INVALID_RATIONALE = 'Model/parse thất bại — không phán đ�
 // but didn't answer -- distinct from decompose's reason, which is required
 // (D3) and never falls back.
 const DEFAULT_PASS_THROUGH_RATIONALE = 'Không có lý do cụ thể từ model — pass-through mặc định.';
+// tsk-27y D1/D3: same shape as DEFAULT_INVALID_RATIONALE above, but for a
+// caller-supplied verdict (fgos decompose --verdict ...) that fails the
+// same child-validation `buildDecomposeChildrenVerdict` applies to a model
+// verdict -- never blamed on "the model", since no model call happened.
+const DEFAULT_CALLER_INVALID_RATIONALE =
+  'Caller-supplied verdict không hợp lệ (thiếu reason, hoặc 1 child thiếu verify).';
 
 // tsk-6b6 D1: log every judgeDecompose verdict branch via the shipped
 // addDecision (tsk-63c, store.mjs) -- `outcome` is what resolveDecompose
@@ -247,6 +253,73 @@ function normalizeChild(child) {
   };
 }
 
+// tsk-27y D1: the 'decompose' verdict-shape resolution both judgeDecompose's
+// own model-output branch AND a caller-supplied `--verdict decompose` share
+// — same normalizeChild rejection rule (no child missing `verify`) and same
+// "0 children collapses to pass-through" rule, regardless of whether
+// `rawChildren` came from the model or from a live session's own reasoning
+// (`fgos decompose --children`).
+function buildDecomposeChildrenVerdict(rawReason, rawChildren) {
+  const reason = typeof rawReason === 'string' && rawReason.trim() ? rawReason : undefined;
+
+  if (!Array.isArray(rawChildren) || rawChildren.length === 0) {
+    const out = { kind: 'pass-through' };
+    if (reason) out.reason = reason;
+    return out;
+  }
+
+  // tsk-6b6 D3: a decompose verdict with no real top-level reason (the
+  // why-split summary) is invalid -- same rule as a child missing verify
+  // below, never a placeholder or a silently-accepted blank.
+  if (!reason) {
+    return { kind: 'invalid' };
+  }
+
+  const normalized = rawChildren.map(normalizeChild);
+  if (normalized.some((child) => child === null)) {
+    return { kind: 'invalid' };
+  }
+
+  const children = normalized.map((child, index) => {
+    const deps = child.rawDeps.filter((d) => Number.isInteger(d) && d >= 0 && d < index);
+    const { rawDeps, ...rest } = child;
+    return { ...rest, deps };
+  });
+  return { kind: 'decompose', reason, children };
+}
+
+// tsk-27y D1/D2: resolves a caller-supplied verdict (`fgos decompose
+// --verdict ...`) into the exact same `{kind, reason?, children?}` shape
+// judgeDecompose's own post-model dispatch returns — mirrors that dispatch
+// (pass-through/need-human/decompose) minus the subprocess call, mode, and
+// blastRadius (no `--mode`/`--blast-radius` flag exists; those two fields
+// ride on a model verdict only, same optional/non-gating discipline as
+// everywhere else in this file). `raw` is the CLI's already-argv-validated
+// object (`bin/fgos.mjs`'s `parseDecomposeCallerVerdict`) — this function
+// only re-validates the parts that matter to write correctness (reason,
+// children shape), same as judgeDecompose does for model output.
+export function resolveCallerDecomposeVerdict(raw) {
+  if (!raw || typeof raw !== 'object') return { kind: 'invalid' };
+
+  if (raw.verdict === 'pass-through') {
+    const reason = typeof raw.reason === 'string' && raw.reason.trim() ? raw.reason : undefined;
+    const out = { kind: 'pass-through' };
+    if (reason) out.reason = reason;
+    return out;
+  }
+
+  if (raw.verdict === 'need-human') {
+    const reason = typeof raw.reason === 'string' && raw.reason.trim() ? raw.reason : DEFAULT_NEED_HUMAN_REASON;
+    return { kind: 'need-human', reason };
+  }
+
+  if (raw.verdict === 'decompose') {
+    return buildDecomposeChildrenVerdict(raw.reason, raw.children);
+  }
+
+  return { kind: 'invalid' };
+}
+
 /**
  * Judge whether `work` (a stage-`decompose` item) should pass through
  * unsplit, split into children, or park for human review, by calling the
@@ -340,33 +413,11 @@ export function judgeDecompose(work, cfg, lockedContext, view, scoutContext, fgo
     }
 
     if (verdict.verdict === 'decompose') {
-      if (!Array.isArray(verdict.children) || verdict.children.length === 0) {
-        const reason = typeof verdict.reason === 'string' && verdict.reason.trim() ? verdict.reason : undefined;
-        const out = { kind: 'pass-through' };
-        if (reason) out.reason = reason;
-        if (mode) out.mode = mode;
-        if (blastRadius !== undefined) out.blastRadius = blastRadius;
-        return out;
-      }
-
-      // tsk-6b6 D3: a decompose verdict with no real top-level reason (the
-      // why-split summary) is invalid -- same rule as a child missing
-      // verify below, never a placeholder or a silently-accepted blank.
-      if (typeof verdict.reason !== 'string' || !verdict.reason.trim()) {
-        return { kind: 'invalid' };
-      }
-
-      const normalized = verdict.children.map(normalizeChild);
-      if (normalized.some((child) => child === null)) {
-        return { kind: 'invalid' };
-      }
-
-      const children = normalized.map((child, index) => {
-        const deps = child.rawDeps.filter((d) => Number.isInteger(d) && d >= 0 && d < index);
-        const { rawDeps, ...rest } = child;
-        return { ...rest, deps };
-      });
-      const out = { kind: 'decompose', reason: verdict.reason, children };
+      // tsk-27y D1: shares buildDecomposeChildrenVerdict with the
+      // caller-supplied verdict path (resolveCallerDecomposeVerdict) — same
+      // reason/child validation for model output and caller input alike.
+      const out = buildDecomposeChildrenVerdict(verdict.reason, verdict.children);
+      if (out.kind === 'invalid') return out;
       if (mode) out.mode = mode;
       if (blastRadius !== undefined) out.blastRadius = blastRadius;
       return out;
@@ -422,8 +473,19 @@ function formatFootprintOverlapReason(conflicts) {
  * (fail-safe, item left untouched), `'need-human'` (parked in awaiting-human
  * with the proposal, nothing written to the queue yet), `'pass-through'`, or
  * `'decompose'` (children written, root moved to executing).
+ *
+ * `callerVerdict` (tsk-27y D1/D2, optional, additive): `{verdict:
+ * 'pass-through'|'need-human'|'decompose', reason?, children?}` — when
+ * supplied (`fgos decompose --verdict ...`), resolved via
+ * `resolveCallerDecomposeVerdict` INSTEAD of calling `judgeDecompose`,
+ * checked before the plan.md tiny/small mode skip-and-advance heuristic.
+ * Every downstream gate (heavy-risk, blast-radius, footprint-overlap) still
+ * applies unconditionally (D3) — only the model/subprocess call itself is
+ * skipped. Omitted (every pre-tsk-27y caller, including the runner sweep at
+ * `loop.mjs`, which calls through argv-less, in-process) keeps this
+ * function byte-identical to before.
  */
-export function resolveDecompose(dir, id, cfg, role) {
+export function resolveDecompose(dir, id, cfg, role, callerVerdict) {
   const view = listWork(dir);
   const work = view.work[id];
   if (!work) {
@@ -482,52 +544,74 @@ export function resolveDecompose(dir, id, cfg, role) {
     return { outcome: 'already-decomposed', id };
   }
 
-  // repoRoot (tsk-1ni D1): resolved to the item's own worktree when one
-  // exists, never the raw state root -- see resolveContentRoot's own
-  // comment above. Reused below for BOTH readLockedContext's own read AND
-  // judgeDecompose's scoutContext (readScoutNotes/writeScoutNotes) -- same
-  // variable, same bug, same fix; scout-notes.md belongs under docsRef in
-  // the item's own worktree exactly like CONTEXT.md/plan.md do.
   const stateRoot = path.dirname(dir);
-  const repoRoot = resolveContentRoot(stateRoot, id, work.docsRef);
-  const lockedContext = readLockedContext(repoRoot, work.docsRef);
-
-  // DECOMPOSE-SIDE SKIP-AND-ADVANCE (tsk-19j D1/D3/D7, closes gap 3) —
-  // deliberately narrower than a literal port of resolveDiscovery's own
-  // trust signal: unlike a clarify-pass, a decompose verdict can WRITE REAL
-  // CHILDREN (addWork below) — skipping judgeDecompose blind would also
-  // skip the one thing that turns plan.md's documented split into real work
-  // items, which is never safe to assume away (this root's own tsk-19j
-  // needed exactly that real LLM call to produce its 3 children). The only
-  // case where skipping is provably safe is when fgos-planning's own mode
-  // gate (SKILL.md step 2) already guarantees no split is possible: `tiny`/
-  // `small` mode is single-piece by definition (0-1 risk flags). Detected by
-  // reading plan.md's own recorded mode line (fgos-planning always writes
-  // one, per its own step 2 "Record the count, the flags, and the chosen
-  // mode in plan.md itself") — any other mode, or no match at all, falls
-  // through to the real judgeDecompose call below unchanged (fail-safe: an
-  // uncertain read must never skip a real judgment, same discipline
-  // discovery.mjs's own header states for judgeDiscovery).
-  const passThroughModeMatch = /\bmode\s*[:=]\s*\*{0,2}(tiny|small)\b/i.exec(lockedContext);
-  if (lockedContext && passThroughModeMatch) {
-    const mode = passThroughModeMatch[1].toLowerCase();
+  let verdict;
+  if (callerVerdict) {
+    // tsk-27y D2: caller-supplied verdict checked FIRST, before the plan.md
+    // tiny/small mode skip-and-advance heuristic below (and before ever
+    // reading `lockedContext`/`repoRoot` for that heuristic at all) —
+    // explicit beats heuristic. This is the whole point of the protocol: a
+    // live session that already reasoned about split-work (fgos-planning)
+    // should never fall through to a blind judgeDecompose subprocess call.
+    verdict = resolveCallerDecomposeVerdict(callerVerdict);
+    if (verdict.kind === 'invalid') {
+      logDecomposeVerdict(dir, id, 'invalid', DEFAULT_CALLER_INVALID_RATIONALE);
+      return { outcome: 'invalid', id };
+    }
     addDecision(dir, {
       id,
-      text: `decompose skip: plan.md declares mode "${mode}" (tiny/small are single-piece by fgos-planning's own mode gate), no model call`,
+      text: `decompose caller-supplied: ${verdict.kind}`,
       source: 'resolveDecompose',
       rationale:
-        'tsk-19j D7 trust signal: plan.md already committed to no split, so judgeDecompose has nothing to judge — skipping avoids a pointless model round-trip, never a real child-generation decision',
+        'tsk-27y D2/D3: caller-supplied verdict — session already reasoned live (fgos-planning), skipping judgeDecompose subprocess; downstream gates (heavy-risk/blast-radius/footprint-overlap) still apply unconditionally, same as a model verdict',
     });
-    moveStage(dir, { id, to: 'executing', expectedStage: 'decompose', verify: planApproveVerify, role });
-    releaseClaimOnExecuting();
-    return { outcome: 'pass-through', id };
-  }
+  } else {
+    // repoRoot (tsk-1ni D1): resolved to the item's own worktree when one
+    // exists, never the raw state root -- see resolveContentRoot's own
+    // comment above. Reused below for BOTH readLockedContext's own read AND
+    // judgeDecompose's scoutContext (readScoutNotes/writeScoutNotes) -- same
+    // variable, same bug, same fix; scout-notes.md belongs under docsRef in
+    // the item's own worktree exactly like CONTEXT.md/plan.md do.
+    const repoRoot = resolveContentRoot(stateRoot, id, work.docsRef);
+    const lockedContext = readLockedContext(repoRoot, work.docsRef);
 
-  const verdict = judgeDecompose(work, cfg, lockedContext, view, { repoRoot, docsRef: work.docsRef }, dir);
+    // DECOMPOSE-SIDE SKIP-AND-ADVANCE (tsk-19j D1/D3/D7, closes gap 3) —
+    // deliberately narrower than a literal port of resolveDiscovery's own
+    // trust signal: unlike a clarify-pass, a decompose verdict can WRITE REAL
+    // CHILDREN (addWork below) — skipping judgeDecompose blind would also
+    // skip the one thing that turns plan.md's documented split into real work
+    // items, which is never safe to assume away (this root's own tsk-19j
+    // needed exactly that real LLM call to produce its 3 children). The only
+    // case where skipping is provably safe is when fgos-planning's own mode
+    // gate (SKILL.md step 2) already guarantees no split is possible: `tiny`/
+    // `small` mode is single-piece by definition (0-1 risk flags). Detected by
+    // reading plan.md's own recorded mode line (fgos-planning always writes
+    // one, per its own step 2 "Record the count, the flags, and the chosen
+    // mode in plan.md itself") — any other mode, or no match at all, falls
+    // through to the real judgeDecompose call below unchanged (fail-safe: an
+    // uncertain read must never skip a real judgment, same discipline
+    // discovery.mjs's own header states for judgeDiscovery).
+    const passThroughModeMatch = /\bmode\s*[:=]\s*\*{0,2}(tiny|small)\b/i.exec(lockedContext);
+    if (lockedContext && passThroughModeMatch) {
+      const mode = passThroughModeMatch[1].toLowerCase();
+      addDecision(dir, {
+        id,
+        text: `decompose skip: plan.md declares mode "${mode}" (tiny/small are single-piece by fgos-planning's own mode gate), no model call`,
+        source: 'resolveDecompose',
+        rationale:
+          'tsk-19j D7 trust signal: plan.md already committed to no split, so judgeDecompose has nothing to judge — skipping avoids a pointless model round-trip, never a real child-generation decision',
+      });
+      moveStage(dir, { id, to: 'executing', expectedStage: 'decompose', verify: planApproveVerify, role });
+      releaseClaimOnExecuting();
+      return { outcome: 'pass-through', id };
+    }
 
-  if (verdict.kind === 'invalid') {
-    logDecomposeVerdict(dir, id, 'invalid', DEFAULT_INVALID_RATIONALE);
-    return { outcome: 'invalid', id };
+    verdict = judgeDecompose(work, cfg, lockedContext, view, { repoRoot, docsRef: work.docsRef }, dir);
+
+    if (verdict.kind === 'invalid') {
+      logDecomposeVerdict(dir, id, 'invalid', DEFAULT_INVALID_RATIONALE);
+      return { outcome: 'invalid', id };
+    }
   }
 
   // work-item-priority-matrix D6/D8: the REFINED pass -- unlike discovery.mjs's
@@ -601,6 +685,30 @@ export function resolveDecompose(dir, id, cfg, role) {
     moveStage(dir, { id, to: 'executing', expectedStage: 'decompose', verify: planApproveVerify, role });
     releaseClaimOnExecuting();
     return { outcome: 'pass-through', id };
+  }
+
+  // tsk-5q5-1 (D2/D4): each child's model-proposed `verify` only ever got
+  // checked as non-empty (normalizeChild above) before this fix — never
+  // whether it actually proves that child's own claim. One independent
+  // second-pass check per child, BEFORE any child is written: a disagreement
+  // on any one of them parks the WHOLE decompose verdict as need-human
+  // (never a partial write) — same fail-safe stance the heavy-risk gate
+  // above already applies to this same edge.
+  const disputedChild = verdict.children
+    .map((child, index) => ({
+      index,
+      child,
+      secondPass: judgeVerifySemanticCorrectness({ title: child.title, tier: work.tier }, child.verify, cfg),
+    }))
+    .find((entry) => !entry.secondPass.agrees);
+
+  if (disputedChild) {
+    const reason =
+      `Việc con #${disputedChild.index + 1} ("${disputedChild.child.title}") có verify bị nghi ngờ ở vòng ` +
+      `kiểm tra thứ hai: ${disputedChild.secondPass.reason}`;
+    logDecomposeVerdict(dir, id, 'need-human', reason);
+    putInAwaiting(dir, { id, ask: formatProposalAsk(verdict, reason), statusAtAsk: work.status });
+    return { outcome: 'need-human', id, verdict };
   }
 
   // verdict.kind === 'decompose': child ids are positional — `${work.id}-<n>`,

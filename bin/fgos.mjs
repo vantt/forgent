@@ -203,11 +203,18 @@ function optionalField(value, message) {
 }
 
 // tsk-6c2 D3: retry-with-backoff on main-checkout-lock contention is
-// default ON for take/pick/approve -- no flag needed. `--wait <ms>` tightens
-// the wait budget (never extends past the lock's own remainingTtlMs,
-// withLockRetry's job); bare `--wait` (no value) is a harmless no-op alias
-// for the default. `--no-wait` is the opt-out, restoring today's exact
-// immediate-fail-on-HELD behavior.
+// default ON for take/pick/approve -- no flag needed. Bare `--wait` (no
+// value) is a harmless no-op alias for the default. `--no-wait` is the
+// opt-out, restoring today's exact immediate-fail-on-HELD behavior.
+//
+// tsk-2rf D2/D3: an *explicit* `--wait <ms>` is now the true wall-clock
+// ceiling for the retry (`withLockRetry`, `src/runner/lock-wait.mjs`) --
+// no longer capped by the lock's own remainingTtlMs -- so a caller who
+// knows the holder is a legitimate long-running session can outlast it.
+// MAX_WAIT_MS bounds that ceiling: a mistyped value must not hang a CLI
+// call near-indefinitely against a holder that never actually releases.
+const MAX_WAIT_MS = 15 * 60 * 1000; // 900000ms, tsk-2rf D3
+
 function parseWaitFlags(flags, verbName) {
   const noWait = Boolean(flags['no-wait']);
   let waitMs;
@@ -215,6 +222,9 @@ function parseWaitFlags(flags, verbName) {
     waitMs = Number(flags.wait);
     if (!Number.isFinite(waitMs) || waitMs <= 0) {
       throw new StoreError('validation', `${verbName} --wait must be a positive number of milliseconds (got "${flags.wait}").`);
+    }
+    if (waitMs > MAX_WAIT_MS) {
+      throw new StoreError('validation', `${verbName} --wait must be at most ${MAX_WAIT_MS}ms (15 min) (got "${flags.wait}").`);
     }
   }
   return { noWait, waitMs };
@@ -299,6 +309,61 @@ function parseAcceptanceFlag(value, message) {
   } catch (err) {
     throw new StoreError('validation', `${message} (invalid JSON: ${err.message})`);
   }
+}
+
+// tsk-27y D1/D2: `--verdict` on `discover` lets a live session that already
+// reasoned about clarity (fgos-exploring) pass its own verdict directly,
+// skipping resolveDiscovery's judgeDiscovery subprocess call for this one
+// invocation. Omitting `--verdict` entirely leaves `callerVerdict`
+// undefined -- byte-identical to before this item. `--verify`/`--question`
+// are REQUIRED (not falling back to judgeDiscovery's own
+// FALLBACK_VERIFY/DEFAULT_UNCLEAR_QUESTION silent defaults) -- an explicit
+// caller-supplied protocol should never silently substitute a placeholder
+// for what the caller was supposed to already know.
+function parseDiscoverCallerVerdict(flags) {
+  if (flags.verdict === undefined) return undefined;
+  if (flags.verdict === 'clear') {
+    return { clear: true, verify: requireField(flags.verify, 'discover --verdict clear requires --verify "<cmd>"') };
+  }
+  if (flags.verdict === 'unclear') {
+    return { clear: false, question: requireField(flags.question, 'discover --verdict unclear requires --question "<text>"') };
+  }
+  throw new StoreError('validation', `discover --verdict must be "clear" or "unclear" (got "${flags.verdict}").`);
+}
+
+// tsk-27y D1/D2: `--verdict` on `decompose`, same shape one stage over --
+// lets a live session that already reasoned about split-work
+// (fgos-planning) pass its own verdict directly, skipping resolveDecompose's
+// judgeDecompose subprocess call for this one invocation. Omitting
+// `--verdict` entirely leaves `callerVerdict` undefined -- byte-identical to
+// before this item. `--children` reuses parseAcceptanceFlag (same
+// JSON-encoded-array shape `submit --acceptance` already established) --
+// each element matches judgeDecompose's own child shape (title/verify
+// required; kind/risk/refs/footprint/deps optional), validated downstream
+// by the same `normalizeChild` a model-produced verdict goes through
+// (`resolveCallerDecomposeVerdict`, decompose.mjs).
+function parseDecomposeCallerVerdict(flags) {
+  if (flags.verdict === undefined) return undefined;
+  if (flags.verdict === 'pass-through') {
+    return { verdict: 'pass-through', reason: optionalField(flags.reason, 'decompose --verdict pass-through --reason requires a non-empty value when passed') };
+  }
+  if (flags.verdict === 'need-human') {
+    return { verdict: 'need-human', reason: requireField(flags.reason, 'decompose --verdict need-human requires --reason "<text>"') };
+  }
+  if (flags.verdict === 'decompose') {
+    const childrenMessage =
+      'decompose --verdict decompose requires --children, a JSON-encoded array of child objects ({title, verify, kind?, risk?, refs?, footprint?, deps?})';
+    const children = parseAcceptanceFlag(flags.children, childrenMessage);
+    if (children === undefined) {
+      throw new StoreError('validation', childrenMessage);
+    }
+    return {
+      verdict: 'decompose',
+      reason: requireField(flags.reason, 'decompose --verdict decompose requires --reason "<text>"'),
+      children,
+    };
+  }
+  throw new StoreError('validation', `decompose --verdict must be "pass-through", "need-human", or "decompose" (got "${flags.verdict}").`);
 }
 
 // Pagination opt-in (str46-io-contract D5/D35): `ready`/`triage`/`evolve`
@@ -895,7 +960,8 @@ async function runVerb(verb, flags, positional, dir) {
       const cfg = flags.config
         ? loadRunnerConfig(flags.config)
         : ensureRunnerConfigForDir(process.cwd());
-      return resolveDiscovery(dir, id, cfg, 'session');
+      const callerVerdict = parseDiscoverCallerVerdict(flags);
+      return resolveDiscovery(dir, id, cfg, 'session', callerVerdict);
     }
 
     // The sync branch's entry point into chia-việc/split-work judgment
@@ -915,7 +981,8 @@ async function runVerb(verb, flags, positional, dir) {
       const cfg = flags.config
         ? loadRunnerConfig(flags.config)
         : ensureRunnerConfigForDir(process.cwd());
-      return resolveDecompose(dir, id, cfg, 'session');
+      const callerVerdict = parseDecomposeCallerVerdict(flags);
+      return resolveDecompose(dir, id, cfg, 'session', callerVerdict);
     }
 
     case 'move': {

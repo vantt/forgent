@@ -25,7 +25,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { modelForTier } from '../runner/dispatch.mjs';
-import { runJudgeExecutor, JUDGE_STRICT_JSON_SUFFIX, readScoutNotes } from './judge-executor.mjs';
+import { runJudgeExecutor, JUDGE_STRICT_JSON_SUFFIX, judgeVerifySemanticCorrectness, readScoutNotes } from './judge-executor.mjs';
 import { appendJudgeFailLog } from './judge-fail-log.mjs';
 import { readLockedContext, resolveContentRoot } from './decompose.mjs';
 import { DEFAULTS } from '../state/work.mjs';
@@ -524,51 +524,85 @@ export function judgeDiscovery(work, cfg, view, scoutContext, fgosDir) {
  * the runner's clarify sweep passes `'runner'`, the sync `discover` verb
  * passes `'session'`. Optional; a clear verdict's `moveStage` only stamps it
  * on the settlement record when a caller actually supplies it.
+ *
+ * `callerVerdict` (tsk-27y D1/D2, optional, additive): `{clear: boolean,
+ * question?, verify?}` — when supplied (`fgos discover --verdict ...`),
+ * used INSTEAD of calling `judgeDiscovery`, checked before the
+ * `readLockedContext` trust-signal above (explicit beats heuristic — the
+ * whole point of this protocol: a live session that already reasoned about
+ * clarity, fgos-exploring, should never fall through to either a blind
+ * subprocess judge or a second heuristic guess). Omitted (every pre-tsk-27y
+ * caller, including the runner sweep at `loop.mjs`, which calls
+ * through argv-less, in-process) keeps this function byte-identical to
+ * before.
  */
-export function resolveDiscovery(dir, id, cfg, role) {
+export function resolveDiscovery(dir, id, cfg, role, callerVerdict) {
   const view = listWork(dir);
   const work = view.work[id];
   if (!work) {
     throw new StoreError('validation', `resolveDiscovery: work "${id}" not found.`);
   }
 
-  // repoRoot (tsk-1ni D1): resolved to the item's own worktree when one
-  // exists, never the raw state root -- see resolveContentRoot's own
-  // comment in decompose.mjs. Reused below for BOTH readLockedContext's
-  // own read AND judgeDiscovery's scoutContext (readScoutNotes/
-  // writeScoutNotes) -- same variable, same bug, same fix.
-  const stateRoot = path.dirname(dir);
-  const repoRoot = resolveContentRoot(stateRoot, id, work.docsRef);
-  const lockedContext = readLockedContext(repoRoot, work.docsRef);
-  if (lockedContext) {
+  let verdict;
+  if (callerVerdict) {
+    verdict = { clear: callerVerdict.clear === true };
+    if (verdict.clear) {
+      if (typeof callerVerdict.verify === 'string' && callerVerdict.verify.trim()) {
+        verdict.verify = callerVerdict.verify;
+      }
+    } else {
+      verdict.question =
+        typeof callerVerdict.question === 'string' && callerVerdict.question.trim()
+          ? callerVerdict.question
+          : DEFAULT_UNCLEAR_QUESTION;
+    }
     addDecision(dir, {
       id,
-      text: 'discovery skip: trusted committed CONTEXT.md, no model call',
+      text: `discovery caller-supplied: clear=${verdict.clear}`,
       source: 'resolveDiscovery',
       rationale:
-        'docsRef points at a non-empty CONTEXT.md (D2 trust signal, tsk-ozl) — skipping judgeDiscovery to avoid re-judging a decision already locked and approved',
+        'tsk-27y D2: caller-supplied verdict — session already reasoned live (fgos-exploring), skipping judgeDiscovery subprocess and the readLockedContext trust-signal check',
     });
-    addDiscovery(dir, { id, clear: true });
-    // Real verify (tsk-19j D1/D11, closes gap 2): `gates[id].contextApprove.
-    // verify` is the real command fgos-exploring's own Gate recorded for
-    // this item when it approved CONTEXT.md — preferred over the retired
-    // placeholder whenever a Track A approve record actually exists (an item
-    // that never went through that Gate, e.g. from before this item, keeps
-    // today's fallback unchanged). tsk-1ni D2: work.verify wins over both
-    // when it is already real -- same guard, same rationale, as the
-    // real-judge branch below (plan.md: "both call moveStage with a
-    // verify value today, both get the guard").
-    moveStage(dir, {
-      id,
-      to: 'decompose',
-      expectedStage: 'clarify',
-      verify: hasRealVerify(work.verify) ? work.verify : (view.gates?.[id]?.contextApprove?.verify ?? FALLBACK_VERIFY),
-      role,
-    });
-    return { outcome: 'clear', id, verdict: { clear: true, skipped: true } };
+  } else {
+    // repoRoot (tsk-1ni D1): resolved to the item's own worktree when one
+    // exists, never the raw state root -- see resolveContentRoot's own
+    // comment in decompose.mjs. Reused below for BOTH readLockedContext's
+    // own read AND judgeDiscovery's scoutContext (readScoutNotes/
+    // writeScoutNotes) -- same variable, same bug, same fix.
+    const stateRoot = path.dirname(dir);
+    const repoRoot = resolveContentRoot(stateRoot, id, work.docsRef);
+    const lockedContext = readLockedContext(repoRoot, work.docsRef);
+    if (lockedContext) {
+      addDecision(dir, {
+        id,
+        text: 'discovery skip: trusted committed CONTEXT.md, no model call',
+        source: 'resolveDiscovery',
+        rationale:
+          'docsRef points at a non-empty CONTEXT.md (D2 trust signal, tsk-ozl) — skipping judgeDiscovery to avoid re-judging a decision already locked and approved',
+      });
+      addDiscovery(dir, { id, clear: true });
+      // Real verify (tsk-19j D1/D11, closes gap 2): `gates[id].contextApprove.
+      // verify` is the real command fgos-exploring's own Gate recorded for
+      // this item when it approved CONTEXT.md — preferred over the retired
+      // placeholder whenever a Track A approve record actually exists (an item
+      // that never went through that Gate, e.g. from before this item, keeps
+      // today's fallback unchanged). tsk-1ni D2: work.verify wins over both
+      // when it is already real -- same guard, same rationale, as the
+      // real-judge branch below (plan.md: "both call moveStage with a
+      // verify value today, both get the guard").
+      moveStage(dir, {
+        id,
+        to: 'decompose',
+        expectedStage: 'clarify',
+        verify: hasRealVerify(work.verify) ? work.verify : (view.gates?.[id]?.contextApprove?.verify ?? FALLBACK_VERIFY),
+        role,
+      });
+      return { outcome: 'clear', id, verdict: { clear: true, skipped: true } };
+    }
+
+    verdict = judgeDiscovery(work, cfg, view, { repoRoot, docsRef: work.docsRef }, dir);
   }
 
-  const verdict = judgeDiscovery(work, cfg, view, { repoRoot, docsRef: work.docsRef }, dir);
   addDiscovery(dir, { id, ...verdict });
 
   // work-item-priority-matrix D6/D7 (was STR8 D4's intentScore -> work.intent):
@@ -596,6 +630,28 @@ export function resolveDiscovery(dir, id, cfg, role) {
   }
 
   if (verdict.clear) {
+    // tsk-5q5-1 (D2/D4): a model-proposed `verify` never rode into the
+    // item's record unchecked before — only "is it a non-empty string"
+    // (D10's own FALLBACK_VERIFY case has nothing to check, since it's a
+    // fixed system string, not a model claim). A second, independent judge
+    // call checks whether the proposal actually proves THIS item's claim,
+    // not just that it's syntactically a command. Disagreement parks the
+    // item exactly like an unclear first-pass verdict does — an uncertain
+    // judgement is never treated as a pass (discovery.mjs's own D4 above).
+    if (typeof verdict.verify === 'string' && verdict.verify.trim()) {
+      const secondPass = judgeVerifySemanticCorrectness(work, verdict.verify, cfg);
+      if (!secondPass.agrees) {
+        const ask =
+          `Đề xuất verify bị nghi ngờ (chưa ghi vào clarify->decompose, cần xác nhận) — ` +
+          `vòng 1 đề xuất: ${verdict.verify}\n` +
+          `vòng 2 (kiểm tra độc lập) không đồng ý: ${secondPass.reason}`;
+        // statusAtAsk (claim-lock §5.1): same rule as the unclear branch
+        // below — read at function entry, before this park.
+        putInAwaiting(dir, { id, ask, statusAtAsk: work.status });
+        return { outcome: 'verify-disputed', id, verdict, secondPass };
+      }
+    }
+
     // tsk-1ni D2: never let judgeDiscovery's own guess overwrite a verify
     // a prior stage already locked (e.g. fgos-validating's planApprove,
     // reached because this item's stage never got moved off clarify before
@@ -603,6 +659,7 @@ export function resolveDiscovery(dir, id, cfg, role) {
     // field, same "locked beats fresh guess" trust the D1 skip-and-advance
     // path above already gives a committed CONTEXT.md.
     const verify = hasRealVerify(work.verify) ? work.verify : (verdict.verify ?? FALLBACK_VERIFY);
+
     moveStage(dir, {
       id,
       to: 'decompose',

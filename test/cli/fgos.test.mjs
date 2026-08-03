@@ -2577,9 +2577,28 @@ test('submit with no text at all is rejected as validation, exit 4, no event wri
 // (D5/D8/D10). A scripted verdict-executor (a node script this test writes)
 // stands in for the real model — no agent CLI is ever invoked.
 
+// tsk-5q5-1: a clear verdict carrying a real `verify` now triggers ONE more
+// call to the same configured executor — judgeVerifySemanticCorrectness's
+// own second-pass prompt (judge-executor.mjs). The prompt text is
+// substituted into argv (resolveExecutorCommand), so this script sniffs
+// argv[2] for the marker unique to that second prompt and answers it with
+// agreement, separately from the first-pass verdict — one script covers
+// both calls, mirroring test/intake/discovery.test.mjs's
+// writeVerdictWithVerifyCheckExecutor.
 function writeRunnerConfig(cwd, verdict) {
   const scriptPath = path.join(cwd, 'verdict-executor.mjs');
-  fs.writeFileSync(scriptPath, `process.stdout.write(${JSON.stringify(JSON.stringify(verdict))}); process.exit(0);`);
+  fs.writeFileSync(
+    scriptPath,
+    `
+    const prompt = process.argv[2] ?? '';
+    if (prompt.includes('Kiểm tra độc lập một lệnh verify')) {
+      process.stdout.write(${JSON.stringify(JSON.stringify({ agrees: true }))});
+    } else {
+      process.stdout.write(${JSON.stringify(JSON.stringify(verdict))});
+    }
+    process.exit(0);
+    `,
+  );
   const cfg = {
     executor: { command: process.execPath, args: [scriptPath, '{prompt}'] },
     models: { light: 'haiku', standard: 'sonnet', heavy: 'opus' },
@@ -2921,6 +2940,157 @@ test('discover --config pointing at a missing path still throws RunnerConfigErro
   assert.equal(result.status, 4);
   assert.match(result.stderr, /cannot read runner config/);
   assert.equal(fs.existsSync(missingConfigPath), false, 'an explicit --config path must never be auto-written');
+});
+
+// --- caller-supplied verdict (tsk-27y D1/D2): `--verdict` on `discover`/
+// `decompose` lets a live caller skip the judge subprocess entirely for one
+// call. Each test below configures the runner's fake executor with the
+// OPPOSITE verdict from what `--verdict` supplies — proving the flag
+// actually bypassed the judge, not just that a real judge happened to agree.
+
+test('discover --verdict clear --verify moves the item to decompose with that exact verify, bypassing the configured (opposite) judge verdict', () => {
+  const cwd = tmpCwd();
+  writeRunnerConfig(cwd, { clear: false, question: 'SHOULD NEVER SURFACE' });
+  const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
+
+  const result = run(cwd, ['discover', id, '--verdict', 'clear', '--verify', 'npm test -- cli-caller']);
+  assert.equal(result.status, 0);
+  assert.equal(JSON.parse(result.stdout).data.outcome, 'clear');
+
+  const view = envelopeData(run(cwd, ['list']).stdout);
+  assert.equal(view.work[id].stage, 'decompose');
+  assert.equal(view.work[id].verify, 'npm test -- cli-caller');
+  assert.notEqual(view.work[id].status, 'awaiting-human');
+});
+
+test('discover --verdict unclear --question parks in awaiting-human with that exact question, bypassing the configured (opposite) judge verdict', () => {
+  const cwd = tmpCwd();
+  writeRunnerConfig(cwd, { clear: true, verify: 'SHOULD NEVER SURFACE' });
+  const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
+
+  const result = run(cwd, ['discover', id, '--verdict', 'unclear', '--question', 'Which provider?']);
+  assert.equal(result.status, 0);
+  assert.equal(JSON.parse(result.stdout).data.outcome, 'unclear');
+
+  const view = envelopeData(run(cwd, ['list']).stdout);
+  assert.equal(view.work[id].status, 'awaiting-human');
+  assert.equal(view.work[id].stage, 'clarify');
+  assert.equal(view.gates[id].ask, 'Which provider?');
+});
+
+test('discover --verdict clear with no --verify is rejected as validation, exit 4', () => {
+  const cwd = tmpCwd();
+  const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
+  const result = run(cwd, ['discover', id, '--verdict', 'clear']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /--verify/);
+});
+
+test('discover --verdict with an unrecognized value is rejected as validation, exit 4', () => {
+  const cwd = tmpCwd();
+  const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
+  const result = run(cwd, ['discover', id, '--verdict', 'maybe']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /"clear" or "unclear"/);
+});
+
+test('decompose --verdict pass-through moves the item to executing, bypassing the configured (opposite) judge verdict', () => {
+  const cwd = tmpCwd();
+  writeRunnerConfig(cwd, { clear: true, verify: 'npm test -- proven' });
+  const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
+  run(cwd, ['discover', id]);
+  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'decompose');
+
+  writeRunnerConfig(cwd, { verdict: 'decompose', reason: 'SHOULD NEVER SURFACE', children: [{ title: 'x', verify: 'npm test' }] });
+  const result = run(cwd, ['decompose', id, '--verdict', 'pass-through', '--reason', 'single-piece, no split needed']);
+  assert.equal(result.status, 0);
+  assert.equal(JSON.parse(result.stdout).data.outcome, 'pass-through');
+
+  const view = envelopeData(run(cwd, ['list']).stdout);
+  assert.equal(view.work[id].stage, 'executing');
+  assert.equal(Object.values(view.work).some((item) => item.parent === id), false);
+});
+
+test('decompose --verdict need-human --reason parks in awaiting-human with that exact reason, bypassing the configured (opposite) judge verdict', () => {
+  const cwd = tmpCwd();
+  writeRunnerConfig(cwd, { clear: true, verify: 'npm test -- proven' });
+  const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
+  run(cwd, ['discover', id]);
+
+  writeRunnerConfig(cwd, { verdict: 'pass-through' });
+  const result = run(cwd, ['decompose', id, '--verdict', 'need-human', '--reason', 'Which auth provider?']);
+  assert.equal(result.status, 0);
+  assert.equal(JSON.parse(result.stdout).data.outcome, 'need-human');
+
+  const view = envelopeData(run(cwd, ['list']).stdout);
+  assert.equal(view.work[id].status, 'awaiting-human');
+  assert.match(view.gates[id].ask, /Which auth provider\?/);
+});
+
+test('decompose --verdict decompose --children writes real children, bypassing the configured (opposite) judge verdict', () => {
+  const cwd = tmpCwd();
+  writeRunnerConfig(cwd, { clear: true, verify: 'npm test -- proven' });
+  const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
+  run(cwd, ['discover', id]);
+
+  writeRunnerConfig(cwd, { verdict: 'pass-through' });
+  const children = JSON.stringify([
+    { title: 'Build parser', verify: 'npm test -- parser' },
+    { title: 'Build renderer', verify: 'npm test -- renderer' },
+  ]);
+  const result = run(cwd, ['decompose', id, '--verdict', 'decompose', '--reason', 'two independent surfaces', '--children', children]);
+  assert.equal(result.status, 0);
+  assert.equal(JSON.parse(result.stdout).data.outcome, 'decompose');
+
+  const view = envelopeData(run(cwd, ['list']).stdout);
+  assert.equal(view.work[id].stage, 'executing');
+  assert.equal(view.work[`${id}-1`].title, 'Build parser');
+  assert.equal(view.work[`${id}-2`].title, 'Build renderer');
+});
+
+test('decompose --verdict decompose with malformed --children JSON is rejected as validation, exit 4', () => {
+  const cwd = tmpCwd();
+  // tsk-5q5-1: a clear caller-supplied verdict with a real `verify` still
+  // triggers judgeVerifySemanticCorrectness's own second-pass call, same as
+  // a model verdict (D3 — gates apply regardless of verdict origin) — this
+  // config answers that prompt, not the (bypassed) first-pass judgeDiscovery.
+  writeRunnerConfig(cwd, { clear: true, verify: 'npm test' });
+  const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
+  run(cwd, ['discover', id, '--verdict', 'clear', '--verify', 'npm test']);
+
+  const result = run(cwd, ['decompose', id, '--verdict', 'decompose', '--reason', 'x', '--children', '{not valid json']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /--children/);
+});
+
+test('decompose --verdict decompose with no --children at all is rejected as validation, exit 4', () => {
+  const cwd = tmpCwd();
+  // tsk-5q5-1: a clear caller-supplied verdict with a real `verify` still
+  // triggers judgeVerifySemanticCorrectness's own second-pass call, same as
+  // a model verdict (D3 — gates apply regardless of verdict origin) — this
+  // config answers that prompt, not the (bypassed) first-pass judgeDiscovery.
+  writeRunnerConfig(cwd, { clear: true, verify: 'npm test' });
+  const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
+  run(cwd, ['discover', id, '--verdict', 'clear', '--verify', 'npm test']);
+
+  const result = run(cwd, ['decompose', id, '--verdict', 'decompose', '--reason', 'x']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /--children/);
+});
+
+test('decompose --verdict with an unrecognized value is rejected as validation, exit 4', () => {
+  const cwd = tmpCwd();
+  // tsk-5q5-1: a clear caller-supplied verdict with a real `verify` still
+  // triggers judgeVerifySemanticCorrectness's own second-pass call, same as
+  // a model verdict (D3 — gates apply regardless of verdict origin) — this
+  // config answers that prompt, not the (bypassed) first-pass judgeDiscovery.
+  writeRunnerConfig(cwd, { clear: true, verify: 'npm test' });
+  const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
+  run(cwd, ['discover', id, '--verdict', 'clear', '--verify', 'npm test']);
+
+  const result = run(cwd, ['decompose', id, '--verdict', 'maybe']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /"pass-through", "need-human", or "decompose"/);
 });
 
 // --- settlement channel role attribution (phase-3-compound-learning-5,
@@ -7462,10 +7632,50 @@ test('merge next on a runner-sourced pick that trips the Iron Law: reports block
 
 test('add --acceptance persists work.acceptance as the given array, validated through validateWork', () => {
   const cwd = tmpCwd();
-  const clauses = [{ text: 'CLI exits 0 on success' }, { text: 'field round-trips', evidence: 'test/x.mjs:1' }];
+  // tsk-5q5-2: evidence must resolve to a real path under cwd (the new
+  // write-time traceability gate) -- tmpCwd() only guarantees `.fgos/`
+  // files exist, so this points there rather than a fictional source path.
+  const clauses = [{ text: 'CLI exits 0 on success' }, { text: 'field round-trips', evidence: '.fgos/events.jsonl' }];
   const result = run(cwd, ['add', 'with-acceptance', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--acceptance', JSON.stringify(clauses)]);
   assert.equal(result.status, 0);
   assert.deepEqual(stateView(cwd).work['with-acceptance'].acceptance, clauses);
+});
+
+// tsk-5q5-2 (D1/D3, docs/history/judge-verdict-evidence-discipline/): the new
+// narrow write-time evidence-traceability gate, end to end through the CLI.
+
+test('add --acceptance is refused when a clause supplies text+evidence together but evidence cites no real path', () => {
+  const cwd = tmpCwd();
+  const clauses = [{ text: 'root cause confirmed', evidence: 'trust me, this is definitely correct' }];
+  const result = run(cwd, ['add', 'untraceable', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--acceptance', JSON.stringify(clauses)]);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /evidence/);
+  assert.equal(stateView(cwd).work['untraceable'], undefined, 'nothing is written on a rejected acceptance clause');
+});
+
+test('add --acceptance succeeds when a text+evidence clause cites a real path that exists under cwd', () => {
+  const cwd = tmpCwd();
+  const clauses = [{ text: 'root cause confirmed', evidence: '.fgos/events.jsonl documents the real event log' }];
+  const result = run(cwd, ['add', 'traceable', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--acceptance', JSON.stringify(clauses)]);
+  assert.equal(result.status, 0);
+  assert.deepEqual(stateView(cwd).work['traceable'].acceptance, clauses);
+});
+
+test('add --acceptance with a text-only clause (no evidence yet) is completely unaffected by the traceability gate', () => {
+  const cwd = tmpCwd();
+  const clauses = [{ text: 'ship it' }];
+  const result = run(cwd, ['add', 'text-only', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--acceptance', JSON.stringify(clauses)]);
+  assert.equal(result.status, 0);
+  assert.deepEqual(stateView(cwd).work['text-only'].acceptance, clauses);
+});
+
+test('edit --acceptance is refused when a clause supplies text+evidence together but evidence cites no real path', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'edit-untraceable');
+  const result = run(cwd, ['edit', 'edit-untraceable', '--acceptance', JSON.stringify([{ text: 'root cause confirmed', evidence: 'nothing checkable here' }])]);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /evidence/);
+  assert.equal(stateView(cwd).work['edit-untraceable'].acceptance, undefined, 'the rejected patch never applies');
 });
 
 test('submit --acceptance persists work.acceptance as the given array (opts -> submitWork work object)', () => {
@@ -7588,7 +7798,13 @@ test('move --to delivered is refused when a populated acceptance clause has no e
 test('move --to delivered succeeds when every acceptance clause has non-empty evidence, exactly as before this cell', () => {
   const cwd = tmpCwd();
   toProposed(cwd, 'cli-cos-evidenced');
-  run(cwd, ['edit', 'cli-cos-evidenced', '--acceptance', JSON.stringify([{ text: 'ship it', evidence: 'test/cli/fgos.test.mjs:1' }])]);
+  // tsk-5q5-2: evidence must resolve to a real path under cwd -- assert the
+  // edit itself succeeds too, so a future regression in the new write-time
+  // gate can't silently no-op this edit and let the item coast through on
+  // an acceptance field that was never actually set (RUL58's own
+  // absent-is-unaffected rule would otherwise mask exactly that).
+  const editResult = run(cwd, ['edit', 'cli-cos-evidenced', '--acceptance', JSON.stringify([{ text: 'ship it', evidence: '.fgos/events.jsonl' }])]);
+  assert.equal(editResult.status, 0, 'edit --acceptance with real, traceable evidence must succeed');
 
   const result = run(cwd, ['move', 'cli-cos-evidenced', '--to', 'delivered']);
   assert.equal(result.status, 0);
@@ -7616,7 +7832,9 @@ test('editing in the missing evidence after a refusal, then retrying move --to d
   assert.equal(run(cwd, ['move', 'cli-cos-retry', '--to', 'delivered']).status, 2);
   assert.equal(stateView(cwd).work['cli-cos-retry'].status, 'awaiting-approval');
 
-  run(cwd, ['edit', 'cli-cos-retry', '--acceptance', JSON.stringify([{ text: 'ship it', evidence: 'test/cli/fgos.test.mjs:1' }])]);
+  // tsk-5q5-2: evidence must resolve to a real path under cwd.
+  const retryEdit = run(cwd, ['edit', 'cli-cos-retry', '--acceptance', JSON.stringify([{ text: 'ship it', evidence: '.fgos/events.jsonl' }])]);
+  assert.equal(retryEdit.status, 0, 'edit --acceptance with real, traceable evidence must succeed');
   const result = run(cwd, ['move', 'cli-cos-retry', '--to', 'delivered']);
   assert.equal(result.status, 0, 'the retry must re-read the just-edited evidence, not a cached refusal');
   assert.equal(stateView(cwd).work['cli-cos-retry'].status, 'delivered');
@@ -7951,6 +8169,16 @@ test('take --wait rejects a non-numeric or non-positive value the same way --tim
   const result = run(cwd, ['take', 'wait-bad-value-take', '--wait', 'nope']);
   assert.equal(result.status, 4, result.stderr);
   assert.match(result.stderr, /--wait must be a positive number of milliseconds/);
+});
+
+test('take --wait rejects a value above the 900000ms (15 min) cap -- tsk-2rf D3', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  addOk(cwd, 'wait-over-cap-take');
+
+  const result = run(cwd, ['take', 'wait-over-cap-take', '--wait', '900001']);
+  assert.equal(result.status, 4, result.stderr);
+  assert.match(result.stderr, /--wait must be at most 900000ms \(15 min\)/);
 });
 
 test('pick --no-wait fails immediately on a live-held lock, same as take --no-wait', () => {

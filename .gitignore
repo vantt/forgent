@@ -47,11 +47,13 @@ output.txt
 /.claude/skills/*
 !/.claude/skills/fgos-*/
 !/.claude/skills/distill/
+!/.claude/skills/_shared/
 /.agents/*
 !/.agents/skills/
 /.agents/skills/*
 !/.agents/skills/fgos-*/
 !/.agents/skills/distill/
+!/.agents/skills/_shared/
 /.codex/
 /upstreams/
 

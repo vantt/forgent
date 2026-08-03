@@ -620,10 +620,15 @@ test('moveWork refuses a doing->delivered close when a populated acceptance clau
 
 test('moveWork allows a doing->delivered close when every acceptance clause has non-empty evidence, exactly as before this cell', () => {
   const dir = tmpDir();
+  // tsk-5q5-2: evidence must resolve to a real path under repoRoot
+  // (path.dirname(dir) here) -- write a real file up front since addWork's
+  // own evidence check runs before it ever appends anything to dir itself.
+  fs.writeFileSync(path.join(dir, 'evidence.txt'), 'x');
+  const realEvidence = `${path.basename(dir)}/evidence.txt`;
   addSampleWork(dir, 'cos-all-evidenced', {
     acceptance: [
-      { text: 'field round-trips', evidence: 'test/state/work.test.mjs:1' },
-      { text: 'CLI exits 0', evidence: 'test/cli/fgos.test.mjs:1' },
+      { text: 'field round-trips', evidence: realEvidence },
+      { text: 'CLI exits 0', evidence: realEvidence },
     ],
   });
   moveWork(dir, { id: 'cos-all-evidenced', to: 'doing', expectedStatus: 'todo' });
@@ -657,7 +662,8 @@ test('moveWork re-reads fresh state on retry: editing in the missing evidence af
   );
   assert.equal(listWork(dir).work['cos-retry'].status, 'doing');
 
-  editWork(dir, { id: 'cos-retry', patch: { acceptance: [{ text: 'field round-trips', evidence: 'test/state/work.test.mjs:1' }] } });
+  // tsk-5q5-2: evidence must resolve to a real path under repoRoot.
+  editWork(dir, { id: 'cos-retry', patch: { acceptance: [{ text: 'field round-trips', evidence: `${path.basename(dir)}/events.jsonl:1` }] } });
 
   const { view } = moveWork(dir, { id: 'cos-retry', to: 'delivered', expectedStatus: 'doing', role: 'human' });
   assert.equal(view.work['cos-retry'].status, 'delivered', 'the retry must re-read the just-edited evidence, not a cached refusal');
