@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { judgeDiscovery, resolveDiscovery } from '../../src/intake/discovery.mjs';
+import { judgeDiscovery, resolveDiscovery, RETIRED_P14_PLACEHOLDER } from '../../src/intake/discovery.mjs';
 import { readScoutNotes } from '../../src/intake/judge-executor.mjs';
 import { computeImpact, computePriority } from '../../src/state/priority-formula.mjs';
 import { addWork, listWork, StoreError, categoryOf, putInAwaiting, answerAwaiting, moveWork, recordGateApprove } from '../../src/state/store.mjs';
@@ -126,7 +126,13 @@ function sampleWork(overrides = {}) {
     deps: [],
     risk: 'low',
     refs: [],
-    verify: 'P15 will fill this in',
+    // tsk-1ni D2: the real submit-time sentinel (bin/fgos.mjs's own
+    // SUBMIT_VERIFY_SENTINEL carries this exact string), not an arbitrary
+    // fixture literal -- resolveDiscovery's new verify-overwrite guard
+    // treats any OTHER string as "already real" and protects it, so a
+    // fixture meant to represent "no real verify yet" must use one of the
+    // two actual placeholder shapes production code recognizes.
+    verify: RETIRED_P14_PLACEHOLDER,
     stage: 'clarify',
     ...overrides,
   };
@@ -443,8 +449,7 @@ test('resolveDiscovery on a clear verdict with no model-proposed verify falls ba
   resolveDiscovery(storeDir, 'item-x', cfg);
   const view = listWork(storeDir);
   assert.equal(view.work['item-x'].stage, 'decompose');
-  assert.notEqual(view.work['item-x'].verify, 'P15 will fill this in');
-  assert.notEqual(view.work['item-x'].verify, 'chưa xác định — P15 bổ sung');
+  assert.notEqual(view.work['item-x'].verify, RETIRED_P14_PLACEHOLDER);
   assert.equal(typeof view.work['item-x'].verify, 'string');
   assert.ok(view.work['item-x'].verify.length > 0);
 });
