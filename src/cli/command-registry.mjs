@@ -1020,4 +1020,23 @@ export const COMMAND_REGISTRY = [
     paginated: false,
     deprecated: null,
   },
+  {
+    name: 'main-checkout-reset',
+    invoke: 'fgos main-checkout-reset',
+    description: 'The safe path for a destructive `git reset --hard` on the main checkout (tsk-3au). Refuses when the whole-repo tree is dirty unless --confirm is passed after reviewing the full git status printed in the refusal — closes the failure mode where a session checked only its own files and reset away another in-flight session\'s uncommitted work.',
+    parameters: {
+      type: 'object',
+      properties: {
+        sha: { type: 'string', description: 'The commit sha to reset the main checkout to.' },
+        confirm: { type: 'boolean', description: 'Required when the main checkout has uncommitted changes; confirms the caller has reviewed the full git status shown on refusal.' },
+      },
+      required: ['sha'],
+    },
+    examples: ['fgos main-checkout-reset --sha 3a7eb10', 'fgos main-checkout-reset --sha 3a7eb10 --confirm'],
+    touchesState: false,
+    requiresExistingStore: false,
+    externalEffect: true,
+    paginated: false,
+    deprecated: null,
+  },
 ];

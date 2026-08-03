@@ -25,6 +25,7 @@
     "src/runner/frozen-judge.mjs": "domain",
     "src/runner/merge.mjs": "infra",
     "src/runner/main-checkout-lock.mjs": "infra",
+    "src/runner/main-checkout-reset-guard.mjs": "infra",
     "src/runner/github-adapter.mjs": "infra",
     "src/state/drift-status.mjs": "infra",
     "src/state/store.mjs": "infra",

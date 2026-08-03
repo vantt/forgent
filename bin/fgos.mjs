@@ -37,6 +37,7 @@ import { runGoalCheck } from '../src/runner/goal-check.mjs';
 import { frozenJudgeHits } from '../src/runner/frozen-judge.mjs';
 import { classifySource, reviewDiff, mergeRunnerItem, cleanupMergedBranch, changedFiles, isWorkingTreeClean as isMainTreeClean, isFgosOnlyStatusLine, buildOwnFileSet, detectTrunk, isMainWorktree } from '../src/runner/merge.mjs';
 import { createGitHubPR, mergeGitHubPR, viewGitHubPRStatus } from '../src/runner/github-adapter.mjs';
+import { assertSafeMainCheckoutReset } from '../src/runner/main-checkout-reset-guard.mjs';
 import { classifyIronLaw } from '../src/evolve/iron-law.mjs';
 import { driftStatus } from '../src/state/drift-status.mjs';
 import { branchNameFor, branchExists, withMergeEphemeralWorktree, provisionDependencies } from '../src/runner/worktree.mjs';
@@ -3567,8 +3568,34 @@ async function runVerb(verb, flags, positional, dir) {
       };
     }
 
+    // tsk-3au: the safe path for a destructive `git reset --hard` on the
+    // main checkout — refuses when the whole-repo tree is dirty (reusing
+    // `isMainTreeClean`, the same whole-repo check `approve` already uses,
+    // never a fresh git-status reimplementation) unless the caller passes
+    // `--confirm` after seeing the full status this case prints into the
+    // error. `repoRoot` is derived from `dir` (never `process.cwd()`) so
+    // this verb behaves identically whether invoked from the main checkout
+    // or, per this item's own theme, from a worktree's cwd with `--dir`.
+    case 'main-checkout-reset': {
+      const sha = requireField(flags.sha, 'main-checkout-reset requires --sha <sha>: fgos main-checkout-reset --sha <sha> [--confirm]');
+      const repoRoot = path.dirname(dir);
+      const confirmed = Boolean(flags.confirm);
+      const dirty = !isMainTreeClean(repoRoot);
+      try {
+        assertSafeMainCheckoutReset({ dirty, confirmed });
+      } catch (err) {
+        const statusOutput = gitAt(repoRoot, ['status', '--porcelain']).trim();
+        throw new StoreError(
+          'validation',
+          `main-checkout-reset: ${err.message}\n\nFull git status (main checkout, whole repo):\n${statusOutput || '(empty)'}`,
+        );
+      }
+      gitAt(repoRoot, ['reset', '--hard', sha]);
+      return { sha, wasDirty: dirty, confirmed };
+    }
+
     default:
-      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <init|add|submit|discover|decompose|move|retrospective|cleanup|compound|edit|ask|answer|decision|list|ready|rebuild|repair|check|rollup|take|return|review|approve|sync-root|reject|catchup|evolve|triage|session|goal|tool|setup|doctor|unlock|lock-status> ...`);
+      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <init|add|submit|discover|decompose|move|retrospective|cleanup|compound|edit|ask|answer|decision|list|ready|rebuild|repair|check|rollup|take|return|review|approve|sync-root|reject|catchup|evolve|triage|session|goal|tool|setup|doctor|unlock|lock-status|main-checkout-reset> ...`);
   }
 }
 
