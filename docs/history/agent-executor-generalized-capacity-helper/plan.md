@@ -95,7 +95,7 @@ via the mirror machinery.
 | Component | Risk | Proof point (for `fgos-validating`) |
 |---|---|---|
 | New `_shared/capacity-dispatch-fallback.md` mirror pair | low | `test/skills/fgos-mirror.test.mjs` (extended) passes — byte-identical, same file set |
-| `fgos-submit-assist/SKILL.md` rewrite (both mirrors) | low-medium | Same mirror test, plus a real manual run of the "configured and present" path (mirrors the precedent item's own step 5 acceptance proof: resolve `submit-assist-classify`, invoke the resolved command with a real prompt, confirm a sane parseable response) — must still work identically after the rewrite, not just look unchanged |
+| `fgos-submit-assist/SKILL.md` rewrite (both mirrors) | low-medium | Same mirror test, plus a real manual run of the "configured and present" path (mirrors the precedent item's own step 5 acceptance proof: resolve `submit-assist-classify`, invoke the resolved command with a real prompt, confirm a sane parseable response) — must still work identically after the rewrite, not just look unchanged. **Run this from the main checkout, not this item's own worktree** — see Assumptions below for why. |
 | Existing behavior regression (fgos-submit-assist silently changes meaning) | low | Read the rewritten `SKILL.md` side-by-side with today's inline prose before committing — no test exercises a skill's runtime prose, so this read *is* the proof, same ceiling the precedent doc already names |
 
 No auth/data/external-system/cross-platform component — the risk map is
@@ -127,6 +127,28 @@ doc update last (it only needs to point at what already exists by then).
   `fgos-submit-assist` — the shared fragment is written generic enough for
   a hypothetical second consumer (per D2's own stated goal) but this plan
   does not invent or wire a second skill, since none was named in scope.
+- **The manual live-dispatch acceptance step (risk-map row 2, mirrored from
+  the precedent how-to's own step 5) must be run with cwd = the main
+  checkout, never from inside this item's own `fgw/tsk-53h` worktree.**
+  Confirmed live: `node src/runner/dispatch.mjs resolve submit-assist-
+  classify --prompt "test prompt"` succeeds from the main checkout
+  (`{"command":"agy","args":[...],"provider":"agy","model":"Gemini 3.5
+  Flash (Medium)"}`) but fails with `capacity "submit-assist-classify"
+  declares kind "cli" but is not registered` when run from inside the
+  worktree — misleading, since the capacity genuinely is registered
+  (`fgos tool query` confirms `status: present`) in the main checkout's
+  `.fgos/`. Root cause: `resolveCapacityCli`'s `resolveRepoRoot`
+  (`src/runner/paths.mjs:25`, non-strict git mode) resolves via `git
+  rev-parse --show-toplevel`, which returns the linked worktree's own
+  path — not the main checkout, unlike every other `fgos` verb's
+  `--git-common-dir`-based resolution — and `dispatch.mjs`'s `resolve` CLI
+  subcommand exposes no `--repoRoot`/`--dir` flag to override it. This is
+  a pre-existing gap in the reused dispatch mechanism (`tsk-62v`/`tsk-5l2-
+  1`'s own scope), out of this item's declared feature boundary to fix
+  (`CONTEXT.md`: "This item does not build a new dispatch mechanism --
+  `tsk-62v` already built that") — pinned here only so `fgos-executing`'s
+  own manual verify pass doesn't misdiagnose this known gap as evidence
+  the rewrite itself is broken.
 
 ## Proof surface (for `fgos-executing`/`fgos-validating`)
 
