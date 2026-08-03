@@ -259,6 +259,78 @@ test('judgeDiscovery fails safe when the work item\'s tier has no configured mod
   assert.equal(verdict.clear, false);
 });
 
+// --- tsk-5d2: judge fail-safe debug log — each distinct branch tagged, ----
+// the returned fallback verdict never changes (fail-safe contract is the
+// same one the tests above already prove; these add the log-side proof).
+
+function readJudgeFailLog(fgosDir, id) {
+  return fs.readFileSync(path.join(fgosDir, 'logs', `${id}-judge-fail.log`), 'utf8');
+}
+
+test('judgeDiscovery fail-safe (outer-exception): logs reason:outer-exception with the real error message, verdict unchanged', () => {
+  const dir = mkTempDir();
+  const fgosDir = path.join(mkTempDir(), '.fgos');
+  const scriptPath = writeVerdictExecutor(dir, { clear: true, verify: 'ok' });
+  const cfg = { executor: { command: process.execPath, args: [scriptPath, '{prompt}'] }, models: {}, timeoutMs: 5000 };
+  const verdict = judgeDiscovery(sampleWork({ id: 'item-outer-exc', tier: 'standard' }), cfg, undefined, undefined, fgosDir);
+  assert.equal(verdict.clear, false);
+  assert.equal(typeof verdict.question, 'string');
+  const log = readJudgeFailLog(fgosDir, 'item-outer-exc');
+  assert.match(log, /reason outer-exception/);
+  assert.match(log, /message: /);
+});
+
+test('judgeDiscovery fail-safe (non-parse-exit): logs reason:non-parse-exit with the real exit status, verdict unchanged', () => {
+  const dir = mkTempDir();
+  const fgosDir = path.join(mkTempDir(), '.fgos');
+  const { scriptPath } = writeCountingFailingExecutor(dir, 7);
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+  const verdict = judgeDiscovery(sampleWork({ id: 'item-non-parse-exit' }), cfg, undefined, undefined, fgosDir);
+  assert.equal(verdict.clear, false);
+  const log = readJudgeFailLog(fgosDir, 'item-non-parse-exit');
+  assert.match(log, /reason non-parse-exit/);
+  assert.match(log, /exit status: 7/);
+  assert.match(log, /attempt: 1/);
+});
+
+test('judgeDiscovery fail-safe (parse-exhausted): logs reason:parse-exhausted with all 3 attempts\' raw stdout, verdict unchanged', () => {
+  const dir = mkTempDir();
+  const fgosDir = path.join(mkTempDir(), '.fgos');
+  const { scriptPath, counterPath } = writeCountingRawStdoutExecutor(dir, 'not json at all');
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+  const verdict = judgeDiscovery(sampleWork({ id: 'item-parse-exhausted' }), cfg, undefined, undefined, fgosDir);
+  assert.equal(verdict.clear, false);
+  assert.equal(readCount(counterPath), 3);
+  const log = readJudgeFailLog(fgosDir, 'item-parse-exhausted');
+  assert.match(log, /reason parse-exhausted/);
+  assert.match(log, /ATTEMPT 1 STDOUT/);
+  assert.match(log, /ATTEMPT 3 STDOUT/);
+  assert.equal((log.match(/not json at all/g) || []).length, 3);
+});
+
+test('judgeDiscovery fail-safe (shape-invalid): logs reason:shape-invalid with the parsed verdict object, verdict unchanged', () => {
+  const dir = mkTempDir();
+  const fgosDir = path.join(mkTempDir(), '.fgos');
+  const scriptPath = writeVerdictExecutor(dir, { clear: 'yes' });
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+  const verdict = judgeDiscovery(sampleWork({ id: 'item-shape-invalid' }), cfg, undefined, undefined, fgosDir);
+  assert.equal(verdict.clear, false);
+  const log = readJudgeFailLog(fgosDir, 'item-shape-invalid');
+  assert.match(log, /reason shape-invalid/);
+  assert.match(log, /"clear":"yes"/);
+});
+
+test('judgeDiscovery fail-safe with fgosDir omitted writes no log and never throws (byte-identical to every pre-tsk-5d2 caller)', () => {
+  const dir = mkTempDir();
+  const { scriptPath } = writeCountingFailingExecutor(dir, 7);
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+  let verdict;
+  assert.doesNotThrow(() => {
+    verdict = judgeDiscovery(sampleWork({ id: 'item-no-fgosdir' }), cfg);
+  });
+  assert.equal(verdict.clear, false);
+});
+
 // --- discovery-context (P30): description + ask/answer + prior-verdict -----
 // context threaded into the prompt via the optional `view` param -----------
 

@@ -315,6 +315,47 @@ test('runJudgeExecutor fails safe (no retry) when the first attempt hangs past c
   assert.equal(verdict, null);
 });
 
+// tsk-5d2 (D1-D3): `failDetailOut`, the optional 9th out-param, lets a
+// caller read back WHICH of the two null-causing branches fired plus its
+// raw evidence — the two origins the RETURN VALUE deliberately keeps
+// indistinguishable (`null` either way) stay fully distinguishable here.
+test('runJudgeExecutor populates failDetailOut with reason:non-parse-exit and the real exit status on an immediate non-zero exit', () => {
+  const dir = mkTempDir();
+  const { scriptPath } = writeFailingExecutor(dir, 7);
+  const cfg = cfgFor(scriptPath);
+  const failDetailOut = {};
+  const verdict = runJudgeExecutor(cfg, 'sonnet', 'prompt', 'stricter prompt', undefined, undefined, undefined, undefined, failDetailOut);
+  assert.equal(verdict, null);
+  assert.equal(failDetailOut.reason, 'non-parse-exit');
+  assert.equal(failDetailOut.attempt, 1);
+  assert.equal(failDetailOut.status, 7);
+});
+
+test('runJudgeExecutor populates failDetailOut with reason:parse-exhausted and every attempt\'s raw stdout when all 3 attempts are unparsable', () => {
+  const dir = mkTempDir();
+  const { scriptPath } = writeRawStdoutExecutor(dir, 'not json at all');
+  const cfg = cfgFor(scriptPath);
+  const failDetailOut = {};
+  const verdict = runJudgeExecutor(cfg, 'sonnet', 'prompt', 'stricter prompt', undefined, undefined, undefined, undefined, failDetailOut);
+  assert.equal(verdict, null);
+  assert.equal(failDetailOut.reason, 'parse-exhausted');
+  assert.equal(failDetailOut.attempts.length, 3);
+  assert.deepEqual(
+    failDetailOut.attempts.map((a) => a.attempt),
+    [1, 2, 3],
+  );
+  assert.ok(failDetailOut.attempts.every((a) => a.stdout === 'not json at all'));
+});
+
+test('runJudgeExecutor omitting failDetailOut stays byte-identical (every pre-tsk-5d2 caller)', () => {
+  const dir = mkTempDir();
+  const { scriptPath, counterPath } = writeFailingExecutor(dir, 7);
+  const cfg = cfgFor(scriptPath);
+  const verdict = runJudgeExecutor(cfg, 'sonnet', 'prompt', 'stricter prompt');
+  assert.equal(verdict, null);
+  assert.equal(readCount(counterPath), 1);
+});
+
 // tsk-62d D2: spawnAttempt passes `tier: 'judge'` to resolveExecutorCommand
 // (dispatch.mjs's existing generic tier-keyed executors lookup, reused as a
 // synthetic role key) — an `executors.judge` override must win over the

@@ -57,6 +57,7 @@
     "src/intake/discovery.mjs": "use-case",
     "src/intake/decompose.mjs": "use-case",
     "src/intake/judge-executor.mjs": "infra",
+    "src/intake/judge-fail-log.mjs": "infra",
     "src/cli/command-registry.mjs": "kernel",
     "src/cli/invocation-fault-log.mjs": "infra",
     "src/cli/approve-fault-log.mjs": "infra",

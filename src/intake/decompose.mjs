@@ -22,6 +22,7 @@ import path from 'node:path';
 import { modelForTier } from '../runner/dispatch.mjs';
 import { loadTemplate } from '../runner/prompt-templates.mjs';
 import { runJudgeExecutor, JUDGE_STRICT_JSON_SUFFIX, readScoutNotes } from './judge-executor.mjs';
+import { appendJudgeFailLog } from './judge-fail-log.mjs';
 import { DEFAULTS } from '../state/work.mjs';
 import { listWork, moveStage, moveWork, addWork, putInAwaiting, addDecision, editWork, StoreError } from '../state/store.mjs';
 import { rankImpact } from '../state/impact.mjs';
@@ -239,8 +240,24 @@ export function judgeDecompose(work, cfg, lockedContext, view, scoutContext, fgo
     const scout = scoutContext
       ? { repoRoot: scoutContext.repoRoot, docsRef: scoutContext.docsRef, capture: !priorScoutNotes }
       : undefined;
-    const verdict = runJudgeExecutor(cfg, model, prompt, stricterPrompt, scout, 'judge-decompose', fgosDir);
+    const failDetailOut = {};
+    const verdict = runJudgeExecutor(cfg, model, prompt, stricterPrompt, scout, 'judge-decompose', fgosDir, undefined, failDetailOut);
     if (!verdict || typeof verdict.verdict !== 'string') {
+      // tsk-5d2 D1-D3: debug-only, never load-bearing on the `{kind:
+      // 'invalid'}` returned below — same shared fail-safe entry check
+      // discovery.mjs's judgeDiscovery has (D2). `verdict === null` means
+      // judge-executor already knows which of its two branches fired
+      // (`failDetailOut.reason`); a non-null-but-wrong-shape verdict is
+      // this function's OWN fail-safe branch (B3), logged with the parsed
+      // object itself. `judgeDecompose`'s own deeper content-validation
+      // `{kind: 'invalid'}` returns below (missing reason / invalid child /
+      // unrecognized verdict string) are a different, already-shaped-JSON
+      // concern — out of scope here (plan.md's own pinned assumption).
+      if (verdict === null) {
+        appendJudgeFailLog(fgosDir, work?.id, failDetailOut);
+      } else {
+        appendJudgeFailLog(fgosDir, work?.id, { reason: 'shape-invalid', verdict: JSON.stringify(verdict) });
+      }
       return { kind: 'invalid' };
     }
 
@@ -309,7 +326,10 @@ export function judgeDecompose(work, cfg, lockedContext, view, scoutContext, fgo
     }
 
     return { kind: 'invalid' };
-  } catch {
+  } catch (err) {
+    // tsk-5d2 D1-D3: same debug-only, non-load-bearing logging — the
+    // returned fallback below is unchanged from before this item.
+    appendJudgeFailLog(fgosDir, work?.id, { reason: 'outer-exception', message: err?.message, stack: err?.stack });
     return { kind: 'invalid' };
   }
 }
