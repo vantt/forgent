@@ -914,7 +914,7 @@ export const COMMAND_REGISTRY = [
         scan: { type: 'string', description: '"register" only: path to scan for presence, required for kind mcp/skill (never on PATH).' },
         responsibility: { type: 'string', description: '"register" only, optional: free-text responsibility label.' },
         description: { type: 'string', description: '"register" only, optional: free-text description.' },
-        status: { type: 'string', description: '"query" only, optional filter: one of present/missing/unknown.' },
+        status: { type: 'string', description: '"query" only, optional filter: one of present/missing/unknown/stale ("stale" is mcp/skill-only: the tool is installed but its own on-disk metadata records a commit behind the repo\'s current HEAD, tsk-j7y).' },
       },
       positional: ['sub', 'name'],
       required: ['sub'],

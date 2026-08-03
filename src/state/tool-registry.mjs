@@ -20,6 +20,7 @@
 import fs from 'node:fs';
 import net from 'node:net';
 import path from 'node:path';
+import { execFileSync } from 'node:child_process';
 
 /** Error raised by this module. `category` is the CLI exit-code contract (R4). */
 export class ToolRegistryError extends Error {
@@ -172,13 +173,44 @@ function probeHttp(command, timeoutMs = HTTP_PROBE_TIMEOUT_MS) {
   });
 }
 
+// tsk-j7y D2: `scanTarget` existing on disk only ever proved the tool was
+// installed, never that its index reflects the current repo — the exact
+// gap that let GitNexus's impact() give false blast-radius evidence during
+// tsk-480 while `fgos tool query` still reported "present". GitNexus's own
+// `meta.json` (written inside its scanTarget) already records the commit
+// it last indexed, so comparing that against the repo's real HEAD costs
+// nothing new to read. Missing/malformed meta.json, no `lastCommit`, or a
+// failing `git rev-parse` (repoRoot not a git repo, or no commits yet) all
+// degrade to "not stale" — same never-throws, never-a-false-positive
+// contract `probeTool` already carries for the rest of this function.
+function isIndexStale(scanPath, repoRoot) {
+  let lastCommit;
+  try {
+    const meta = JSON.parse(fs.readFileSync(path.join(scanPath, 'meta.json'), 'utf8'));
+    lastCommit = typeof meta.lastCommit === 'string' ? meta.lastCommit : undefined;
+  } catch {
+    return false;
+  }
+  if (!lastCommit) return false;
+  let head;
+  try {
+    head = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: repoRoot, encoding: 'utf8' }).trim();
+  } catch {
+    return false;
+  }
+  return head !== lastCommit;
+}
+
 /**
  * Probe one registered tool's presence on this machine, per its `kind`
  * (deep-dive §Cơ chế): `cli`/`binary` resolve on `PATH`; `mcp`/`skill` check
- * `scanTarget` exists on disk (resolved against `repoRoot`); `http` does a
- * short TCP connect probe. Never throws for an absent tool — absence is a
- * fact to report (`'missing'`), never a CLI error (the core "absent
- * capability = clean skip, never a failure" contract this whole item ports).
+ * `scanTarget` exists on disk (resolved against `repoRoot`), and — tsk-j7y
+ * D2 — resolve `'stale'` instead of `'present'` when the tool's own
+ * `meta.json` records a `lastCommit` behind the repo's current `HEAD`;
+ * `http` does a short TCP connect probe. Never throws for an absent tool —
+ * absence is a fact to report (`'missing'`), never a CLI error (the core
+ * "absent capability = clean skip, never a failure" contract this whole
+ * item ports).
  */
 export async function probeTool(tool, repoRoot) {
   if (tool.kind === 'cli' || tool.kind === 'binary') {
@@ -186,7 +218,9 @@ export async function probeTool(tool, repoRoot) {
   }
   if (tool.kind === 'mcp' || tool.kind === 'skill') {
     if (!tool.scanTarget) return 'unknown';
-    return fs.existsSync(path.resolve(repoRoot, tool.scanTarget)) ? 'present' : 'missing';
+    const scanPath = path.resolve(repoRoot, tool.scanTarget);
+    if (!fs.existsSync(scanPath)) return 'missing';
+    return isIndexStale(scanPath, repoRoot) ? 'stale' : 'present';
   }
   if (tool.kind === 'http') {
     return probeHttp(tool.command);

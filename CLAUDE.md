@@ -20,11 +20,17 @@ fgos tool query --capability impact-analysis --status present
 - **0 providers registered** — Inactive: skip impact-analysis evidence in
   verify/test scope; note `impact-analysis: inactive` in the plan/verify
   note. Not a gap.
-- **Registered but not `present`** — Degraded: run every other required
-  check, mark that proof weak, and name the gap plainly (e.g. "GitNexus
-  registered but not present on this machine — blast radius not
-  confirmed").
-- **`present`** — Full: the MUST rules below apply exactly as written.
+- **Registered but not `present`, or `present` but flagged `stale`** —
+  Degraded: run every other required check, mark that proof weak, and name
+  the gap plainly (e.g. "GitNexus registered but not present on this
+  machine — blast radius not confirmed", or "GitNexus present but its
+  index is behind the current HEAD — blast radius may be stale"). A
+  `present` status only means the tool is installed, never that its index
+  is fresh or intact (tsk-j7y) — a suspicious zero-result or "not found"
+  answer from an impact-analysis tool is worth a quick grep/rg cross-check
+  before being trusted, regardless of what `fgos tool query` reports.
+- **`present`, freshly checked** — Full: the MUST rules below apply exactly
+  as written.
 
 This gate is prose the agent reads, never compiled logic — GitNexus is
 the first registered provider for `impact-analysis`, not the only one

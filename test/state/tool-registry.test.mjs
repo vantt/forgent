@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import net from 'node:net';
+import { execSync } from 'node:child_process';
 import {
   ToolRegistryError,
   KINDS,
@@ -113,6 +114,28 @@ test('probeTool on kind mcp/skill resolves by scanning scanTarget on disk, relat
 test('probeTool on kind mcp/skill with no scanTarget resolves "unknown"', async () => {
   const status = await probeTool({ kind: 'mcp' }, process.cwd());
   assert.equal(status, 'unknown');
+});
+
+test('probeTool on kind mcp/skill resolves "stale" when scanTarget/meta.json lastCommit is behind repoRoot\'s current git HEAD, "present" when it matches (tsk-j7y)', async () => {
+  const repoRoot = tmpDir();
+  execSync('git init -q', { cwd: repoRoot });
+  execSync('git config user.email test@test.local', { cwd: repoRoot });
+  execSync('git config user.name test', { cwd: repoRoot });
+  fs.writeFileSync(path.join(repoRoot, 'a.txt'), 'a');
+  execSync('git add a.txt && git commit -q -m first', { cwd: repoRoot });
+  const firstCommit = execSync('git rev-parse HEAD', { cwd: repoRoot }).toString().trim();
+
+  fs.mkdirSync(path.join(repoRoot, '.gitnexus'));
+  fs.writeFileSync(path.join(repoRoot, '.gitnexus', 'meta.json'), JSON.stringify({ lastCommit: firstCommit }));
+
+  const fresh = await probeTool({ kind: 'mcp', scanTarget: '.gitnexus' }, repoRoot);
+  assert.equal(fresh, 'present');
+
+  fs.writeFileSync(path.join(repoRoot, 'b.txt'), 'b');
+  execSync('git add b.txt && git commit -q -m second', { cwd: repoRoot });
+
+  const stale = await probeTool({ kind: 'mcp', scanTarget: '.gitnexus' }, repoRoot);
+  assert.equal(stale, 'stale');
 });
 
 test('probeTool on kind http resolves "present" when something is listening, "missing" otherwise', async () => {
