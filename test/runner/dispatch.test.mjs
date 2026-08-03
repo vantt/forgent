@@ -1307,7 +1307,7 @@ test('decideCapacityCli rejects with a usage RunnerConfigError when capacityId i
   await assert.rejects(() => decideCapacityCli('', { repoRoot: mkTempDir() }), RunnerConfigError);
 });
 
-test('decideCapacityCli resolves "native" for a kind:"task" capacity when hasLiveTaskAccess is passed true', async () => {
+test('decideCapacityCli resolves "native" for a kind:"task" capacity when hasLiveTaskAccess is passed true, alongside its agentType', async () => {
   const root = mkTempDir();
   writeRunnerConfigFixture(root, {
     executor: { command: 'claude', args: ['{prompt}'] },
@@ -1316,10 +1316,10 @@ test('decideCapacityCli resolves "native" for a kind:"task" capacity when hasLiv
     timeoutMs: 5000,
   });
   const decided = await decideCapacityCli('judge-discovery', { repoRoot: root, hasLiveTaskAccess: true });
-  assert.deepEqual(decided, { mechanism: 'native' });
+  assert.deepEqual(decided, { mechanism: 'native', agentType: 'judge' });
 });
 
-test('decideCapacityCli resolves "cli-spawn" for the same kind:"task" capacity when hasLiveTaskAccess is omitted (safe default)', async () => {
+test('decideCapacityCli resolves "cli-spawn" for the same kind:"task" capacity when hasLiveTaskAccess is omitted (safe default), still reporting its agentType', async () => {
   const root = mkTempDir();
   writeRunnerConfigFixture(root, {
     executor: { command: 'claude', args: ['{prompt}'] },
@@ -1328,7 +1328,20 @@ test('decideCapacityCli resolves "cli-spawn" for the same kind:"task" capacity w
     timeoutMs: 5000,
   });
   const decided = await decideCapacityCli('judge-discovery', { repoRoot: root });
+  assert.deepEqual(decided, { mechanism: 'cli-spawn', agentType: 'judge' });
+});
+
+test('decideCapacityCli omits agentType entirely for a kind:"cli" capacity that declares none (tsk-3ik-3)', async () => {
+  const root = mkTempDir();
+  writeRunnerConfigFixture(root, {
+    executor: { command: 'claude', args: ['{prompt}'] },
+    capacities: { 'submit-assist-classify': { kind: 'cli', command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
+    models: { light: 'flash-3.5' },
+    timeoutMs: 5000,
+  });
+  const decided = await decideCapacityCli('submit-assist-classify', { repoRoot: root, hasLiveTaskAccess: true });
   assert.deepEqual(decided, { mechanism: 'cli-spawn' });
+  assert.ok(!('agentType' in decided));
 });
 
 test('the "decide" CLI entry point (node src/runner/dispatch.mjs decide <capacityId>) prints {mechanism} JSON to stdout for a real invocation against this repo\'s own .fgos/config.json', () => {

@@ -1094,6 +1094,15 @@ export async function resolveCapacityCli(capacityId, { prompt = '', cwd = proces
  * `--has-live-task-access` is the caller's own self-declaration (never
  * probed or inferred here — same contract `decideDispatchMechanism` itself
  * documents) that this session already has live Agent/Task tool access.
+ *
+ * `agentType` (tsk-3ik-3, additive): included in the result, alongside
+ * `mechanism`, whenever the capacity declares one — a `mechanism: "native"`
+ * result is otherwise useless to a consumer skill's own Agent/Task tool
+ * call, which needs a concrete `subagent_type` to invoke, not just "go
+ * native" with no target. Omitted (`undefined`, dropped by `JSON.stringify`)
+ * for a capacity with no `agentType`, e.g. every `kind: "cli"` capacity —
+ * `mechanism` for those always resolves `"cli-spawn"` anyway (rule 1/3), so
+ * no consumer ever needs `agentType` in that case.
  */
 export async function decideCapacityCli(capacityId, { cwd = process.cwd(), repoRoot, hasLiveTaskAccess = false } = {}) {
   if (!capacityId) {
@@ -1101,7 +1110,9 @@ export async function decideCapacityCli(capacityId, { cwd = process.cwd(), repoR
   }
   const root = repoRoot ?? resolveRepoRoot(cwd);
   const cfg = ensureRunnerConfigForDir(root);
-  return { mechanism: decideCapacityDispatchMechanism(cfg, capacityId, { hasLiveTaskAccess }) };
+  const mechanism = decideCapacityDispatchMechanism(cfg, capacityId, { hasLiveTaskAccess });
+  const agentType = cfg.capacities?.[capacityId]?.agentType;
+  return typeof agentType === 'string' && agentType ? { mechanism, agentType } : { mechanism };
 }
 
 // CLI entry point — only runs when this file is executed directly (`node
