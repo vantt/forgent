@@ -108,13 +108,19 @@ the risk-map row below, carried to `fgos-validating`.
 
 ## Proof surface
 
-One command proves this item done: `npm test` (`node --test
-'test/**/*.test.mjs'`, per `package.json`'s `test` script) — covers the
-full state + cli + runner + e2e suite named in AGENTS.md's own DoD,
-including every file in the risk map above plus the new CLI-level
-regression test this item adds. No narrower command honestly covers both
-the shared `worktree.mjs` primitive and the `bin/fgos.mjs` handlers at
-once.
+`npm test` (`node --test 'test/**/*.test.mjs'`, per `package.json`'s `test`
+script) is the full-suite bar named in AGENTS.md's own DoD and was this
+plan's own recorded proof point through the planning/validating gates.
+
+The item's own `verify` field, set by `fgos discover`'s real judgment call
+(the trust-signal shortcut didn't apply — `readLockedContext` reads
+`repoRoot`'s own working tree, which only has `CONTEXT.md`/`plan.md` once
+committed there, not merely committed to `fgw/<id>` in a separate
+worktree): `node --test test/cli/take-pick-claim-eligibility.test.mjs
+test/runner/claim-port.test.mjs test/runner/worktree.test.mjs` — a real,
+narrower, existence-confirmed file set covering exactly the risk-map rows
+above. This is what `fgos return`'s goal-check actually runs; the full
+`npm test` run stays the broader CI-level bar for this change.
 
 ## Split
 
