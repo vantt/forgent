@@ -21,7 +21,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { modelForTier } from '../runner/dispatch.mjs';
 import { loadTemplate } from '../runner/prompt-templates.mjs';
-import { runJudgeExecutor, JUDGE_STRICT_JSON_SUFFIX, readScoutNotes } from './judge-executor.mjs';
+import { runJudgeExecutor, JUDGE_STRICT_JSON_SUFFIX, judgeVerifySemanticCorrectness, readScoutNotes } from './judge-executor.mjs';
 import { appendJudgeFailLog } from './judge-fail-log.mjs';
 import { DEFAULTS } from '../state/work.mjs';
 import { listWork, moveStage, moveWork, addWork, putInAwaiting, addDecision, editWork, StoreError } from '../state/store.mjs';
@@ -631,6 +631,30 @@ export function resolveDecompose(dir, id, cfg, role, callerVerdict) {
     moveStage(dir, { id, to: 'executing', expectedStage: 'decompose', verify: planApproveVerify, role });
     releaseClaimOnExecuting();
     return { outcome: 'pass-through', id };
+  }
+
+  // tsk-5q5-1 (D2/D4): each child's model-proposed `verify` only ever got
+  // checked as non-empty (normalizeChild above) before this fix — never
+  // whether it actually proves that child's own claim. One independent
+  // second-pass check per child, BEFORE any child is written: a disagreement
+  // on any one of them parks the WHOLE decompose verdict as need-human
+  // (never a partial write) — same fail-safe stance the heavy-risk gate
+  // above already applies to this same edge.
+  const disputedChild = verdict.children
+    .map((child, index) => ({
+      index,
+      child,
+      secondPass: judgeVerifySemanticCorrectness({ title: child.title, tier: work.tier }, child.verify, cfg),
+    }))
+    .find((entry) => !entry.secondPass.agrees);
+
+  if (disputedChild) {
+    const reason =
+      `Việc con #${disputedChild.index + 1} ("${disputedChild.child.title}") có verify bị nghi ngờ ở vòng ` +
+      `kiểm tra thứ hai: ${disputedChild.secondPass.reason}`;
+    logDecomposeVerdict(dir, id, 'need-human', reason);
+    putInAwaiting(dir, { id, ask: formatProposalAsk(verdict, reason), statusAtAsk: work.status });
+    return { outcome: 'need-human', id, verdict };
   }
 
   // verdict.kind === 'decompose': child ids are positional — `${work.id}-<n>`,

@@ -229,7 +229,10 @@ function writeClearDiscoveryExecutor(scriptDir, { verify, produce = 'output.txt'
 import fs from 'node:fs';
 import { execFileSync } from 'node:child_process';
 const prompt = process.argv[2] ?? '';
-if (prompt.includes('# Context-discovery')) {
+if (prompt.includes('Kiểm tra độc lập một lệnh verify')) {
+  // tsk-5q5-1: judgeVerifySemanticCorrectness's own second-pass call.
+  process.stdout.write(JSON.stringify({ agrees: true }));
+} else if (prompt.includes('# Context-discovery')) {
   process.stdout.write(JSON.stringify({ clear: true, verify: ${JSON.stringify(verify)} }));
 } else if (prompt.includes('# Chia-việc (decompose)')) {
   process.stdout.write(JSON.stringify({ verdict: 'pass-through' }));
@@ -285,7 +288,10 @@ function writeDecomposeAwareExecutor(scriptDir, { discoveryVerify, decomposeVerd
 import fs from 'node:fs';
 import { execFileSync } from 'node:child_process';
 const prompt = process.argv[2] ?? '';
-if (prompt.includes('# Context-discovery')) {
+if (prompt.includes('Kiểm tra độc lập một lệnh verify')) {
+  // tsk-5q5-1: judgeVerifySemanticCorrectness's own second-pass call.
+  process.stdout.write(JSON.stringify({ agrees: true }));
+} else if (prompt.includes('# Context-discovery')) {
   process.stdout.write(JSON.stringify({ clear: true, verify: ${JSON.stringify(discoveryVerify)} }));
 } else if (prompt.includes('# Chia-việc (decompose)')) {
   process.stdout.write(JSON.stringify(${JSON.stringify(decomposeVerdict)}));

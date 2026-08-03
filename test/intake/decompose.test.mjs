@@ -22,6 +22,30 @@ function writeVerdictExecutor(dir, verdict) {
   return scriptPath;
 }
 
+// tsk-5q5-1: a 'decompose' verdict now triggers ONE more call to the same
+// configured executor PER CHILD — judgeVerifySemanticCorrectness's own
+// second-pass prompt (judge-executor.mjs), checked before any child is
+// written. The prompt text is substituted into argv (resolveExecutorCommand),
+// so this fake sniffs argv[2] for a marker unique to that second prompt and
+// answers it separately from the first-pass verdict — one script covers
+// every call `resolveDecompose` makes for a given test.
+function writeVerdictWithVerifyCheckExecutor(dir, verdict, agrees = true, reason = 'test-forced-disagree') {
+  const scriptPath = path.join(dir, 'verdict-with-verify-check-executor.mjs');
+  fs.writeFileSync(
+    scriptPath,
+    `
+    const prompt = process.argv[2] ?? '';
+    if (prompt.includes('Kiểm tra độc lập một lệnh verify')) {
+      process.stdout.write(${JSON.stringify(JSON.stringify({ agrees, reason }))});
+    } else {
+      process.stdout.write(${JSON.stringify(JSON.stringify(verdict))});
+    }
+    process.exit(0);
+    `,
+  );
+  return scriptPath;
+}
+
 function writeRawStdoutExecutor(dir, rawStdout) {
   const scriptPath = path.join(dir, 'raw-executor.mjs');
   fs.writeFileSync(scriptPath, `process.stdout.write(${JSON.stringify(rawStdout)}); process.exit(0);`);
@@ -38,6 +62,14 @@ function readCount(counterPath) {
   return fs.existsSync(counterPath) ? parseInt(fs.readFileSync(counterPath, 'utf8'), 10) : 0;
 }
 
+// tsk-5q5-1: a child carrying a real `verify` now triggers a second,
+// independent call to this same configured executor per child
+// (judgeVerifySemanticCorrectness's own verify-check prompt). This fake
+// answers that second prompt with `{agrees: true}` WITHOUT touching the
+// counter, so every existing counting assertion here keeps counting only
+// the first-pass (judgeDecompose-shaped) calls it was written to count —
+// same sniff-the-prompt technique writeVerdictWithVerifyCheckExecutor
+// already uses.
 function writeCountingRawStdoutExecutor(dir, rawStdout) {
   const scriptPath = path.join(dir, 'counting-raw-executor.mjs');
   const counterPath = path.join(dir, 'counting-raw-count.txt');
@@ -46,6 +78,11 @@ function writeCountingRawStdoutExecutor(dir, rawStdout) {
     scriptPath,
     `
     import fs from 'node:fs';
+    const prompt = process.argv[2] ?? '';
+    if (prompt.includes('Kiểm tra độc lập một lệnh verify')) {
+      process.stdout.write(${JSON.stringify(JSON.stringify({ agrees: true }))});
+      process.exit(0);
+    }
     const counterPath = ${JSON.stringify(counterPath)};
     fs.writeFileSync(counterPath, String(parseInt(fs.readFileSync(counterPath, 'utf8'), 10) + 1));
     process.stdout.write(${JSON.stringify(rawStdout)});
@@ -604,7 +641,7 @@ test('resolveDecompose on a pass-through verdict is a no-op release for an item 
 
 test('resolveDecompose on a decompose verdict writes every child with parent/deps/verify and moves the root to executing', () => {
   const scriptDir = mkTempDir();
-  const scriptPath = writeVerdictExecutor(scriptDir, {
+  const scriptPath = writeVerdictWithVerifyCheckExecutor(scriptDir, {
     verdict: 'decompose',
     reason: 'Two independent surfaces, no shared state',
     children: [
@@ -643,7 +680,7 @@ test('resolveDecompose on a decompose verdict writes every child with parent/dep
 
 test('resolveDecompose on a decompose verdict releases a held claim (doing -> todo) once the root reaches executing (claim-lock §3b)', () => {
   const scriptDir = mkTempDir();
-  const scriptPath = writeVerdictExecutor(scriptDir, {
+  const scriptPath = writeVerdictWithVerifyCheckExecutor(scriptDir, {
     verdict: 'decompose',
     reason: 'Two independent surfaces, no shared state',
     children: [{ title: 'Build parser', verify: 'npm test -- parser' }],
@@ -661,7 +698,7 @@ test('resolveDecompose on a decompose verdict releases a held claim (doing -> to
 
 test('resolveDecompose writes footprint on a child exactly when the verdict provided one, undefined otherwise', () => {
   const scriptDir = mkTempDir();
-  const scriptPath = writeVerdictExecutor(scriptDir, {
+  const scriptPath = writeVerdictWithVerifyCheckExecutor(scriptDir, {
     verdict: 'decompose',
     reason: 'Two independent surfaces, no shared state',
     children: [
@@ -685,7 +722,7 @@ test('resolveDecompose writes footprint on a child exactly when the verdict prov
 
 test('resolveDecompose leaves footprint undefined when a child provides a malformed (non-array) footprint, without invalidating the verdict', () => {
   const scriptDir = mkTempDir();
-  const scriptPath = writeVerdictExecutor(scriptDir, {
+  const scriptPath = writeVerdictWithVerifyCheckExecutor(scriptDir, {
     verdict: 'decompose',
     reason: 'Two independent surfaces, no shared state',
     children: [{ title: 'Build parser', verify: 'npm test -- parser', footprint: 'not-an-array' }],
@@ -709,7 +746,7 @@ test('resolveDecompose leaves footprint undefined when a child provides a malfor
 
 test('resolveDecompose gates to awaiting-human when tentative children declare overlapping footprint, writing no children (tsk-5e97 D1)', () => {
   const scriptDir = mkTempDir();
-  const scriptPath = writeVerdictExecutor(scriptDir, {
+  const scriptPath = writeVerdictWithVerifyCheckExecutor(scriptDir, {
     verdict: 'decompose',
     reason: 'Two independent surfaces, no shared state',
     children: [
@@ -737,7 +774,7 @@ test('resolveDecompose gates to awaiting-human when tentative children declare o
 
 test('resolveDecompose proceeds normally when tentative children declare disjoint (or absent) footprint', () => {
   const scriptDir = mkTempDir();
-  const scriptPath = writeVerdictExecutor(scriptDir, {
+  const scriptPath = writeVerdictWithVerifyCheckExecutor(scriptDir, {
     verdict: 'decompose',
     reason: 'Two independent surfaces, no shared state',
     children: [
@@ -783,7 +820,7 @@ test('resolveDecompose: the existing heavy-risk gate still preempts the footprin
 
 test('resolveDecompose logs a decisionsById entry on a footprint-overlap need-human outcome, naming the conflict count', () => {
   const scriptDir = mkTempDir();
-  const scriptPath = writeVerdictExecutor(scriptDir, {
+  const scriptPath = writeVerdictWithVerifyCheckExecutor(scriptDir, {
     verdict: 'decompose',
     reason: 'Two independent surfaces, no shared state',
     children: [
@@ -806,7 +843,7 @@ test('resolveDecompose logs a decisionsById entry on a footprint-overlap need-hu
 
 test('resolveDecompose self-resolves the footprint-overlap gate once the next judge call proposes non-overlapping children (no bypass constant needed, tsk-5e97 D1)', () => {
   const overlappingDir = mkTempDir();
-  const overlappingScript = writeVerdictExecutor(overlappingDir, {
+  const overlappingScript = writeVerdictWithVerifyCheckExecutor(overlappingDir, {
     verdict: 'decompose',
     reason: 'Two independent surfaces, no shared state',
     children: [
@@ -817,7 +854,7 @@ test('resolveDecompose self-resolves the footprint-overlap gate once the next ju
   const overlappingCfg = cfgFor([overlappingScript, '{prompt}']);
 
   const resolvedDir = mkTempDir();
-  const resolvedScript = writeVerdictExecutor(resolvedDir, {
+  const resolvedScript = writeVerdictWithVerifyCheckExecutor(resolvedDir, {
     verdict: 'decompose',
     reason: 'Re-sliced after human input — no shared file left',
     children: [
@@ -849,7 +886,7 @@ test('resolveDecompose self-resolves the footprint-overlap gate once the next ju
 
 test('resolveDecompose assigns positional child ids `${work.id}-<n>` for n=1..N across N siblings', () => {
   const scriptDir = mkTempDir();
-  const scriptPath = writeVerdictExecutor(scriptDir, {
+  const scriptPath = writeVerdictWithVerifyCheckExecutor(scriptDir, {
     verdict: 'decompose',
     reason: 'Two independent surfaces, no shared state',
     children: [
@@ -870,7 +907,7 @@ test('resolveDecompose assigns positional child ids `${work.id}-<n>` for n=1..N 
 
 test('resolveDecompose on a grandchild decompose produces `<root>-<m>-<n>` ids with no special-case code', () => {
   const scriptDir = mkTempDir();
-  const scriptPath = writeVerdictExecutor(scriptDir, {
+  const scriptPath = writeVerdictWithVerifyCheckExecutor(scriptDir, {
     verdict: 'decompose',
     reason: 'Two independent surfaces, no shared state',
     children: [{ title: 'Build sub-parser', verify: 'npm test -- sub-parser' }],
@@ -1213,6 +1250,65 @@ test('resolveDecompose leaves the item untouched (invalid) when a child is missi
   assert.equal(children.length, 0);
 });
 
+// tsk-5q5-1 (D2/D4, docs/history/judge-verdict-evidence-discipline/): each
+// child's model-proposed `verify` now gets an independent second-pass check
+// too, before ANY child is written.
+
+test('resolveDecompose parks as need-human (no children written) when the second-pass check disagrees with ANY child\'s verify', () => {
+  const scriptDir = mkTempDir();
+  const scriptPath = writeVerdictWithVerifyCheckExecutor(
+    scriptDir,
+    {
+      verdict: 'decompose',
+      reason: 'Two independent surfaces, no shared state',
+      children: [
+        { title: 'Build parser', verify: 'npm test -- parser' },
+        { title: 'Build renderer', verify: 'Skill("fgOS:ready") loads without error' },
+      ],
+    },
+    false,
+    'lệnh này không kiểm chứng đúng claim của việc con',
+  );
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork());
+
+  const result = resolveDecompose(storeDir, 'item-x', cfg, 'runner');
+  assert.equal(result.outcome, 'need-human');
+
+  const view = listWork(storeDir);
+  // No partial write -- neither child exists, root stays at decompose.
+  assert.equal(view.work['item-x'].stage, 'decompose');
+  const children = Object.values(view.work).filter((item) => item.parent === 'item-x');
+  assert.equal(children.length, 0);
+  assert.match(view.gates['item-x'].ask, /lệnh này không kiểm chứng đúng claim của việc con/);
+});
+
+test('resolveDecompose still writes every child when the second-pass check agrees with all of them', () => {
+  const scriptDir = mkTempDir();
+  const scriptPath = writeVerdictWithVerifyCheckExecutor(
+    scriptDir,
+    {
+      verdict: 'decompose',
+      reason: 'Two independent surfaces, no shared state',
+      children: [
+        { title: 'Build parser', verify: 'npm test -- parser' },
+        { title: 'Build renderer', verify: 'npm test -- renderer' },
+      ],
+    },
+    true,
+  );
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork());
+
+  const result = resolveDecompose(storeDir, 'item-x', cfg, 'runner');
+  assert.equal(result.outcome, 'decompose');
+  assert.equal(result.childIds.length, 2);
+});
+
 test('resolveDecompose is a no-op on an item already past stage decompose (idempotent, CAS-backed)', () => {
   const scriptDir = mkTempDir();
   const scriptPath = writeVerdictExecutor(scriptDir, { verdict: 'pass-through' }); // never consulted
@@ -1308,7 +1404,7 @@ test('resolveDecompose logs a fixed fallback rationale on a pass-through verdict
 
 test('resolveDecompose logs a decisionsById entry on a decompose verdict, including the child count', () => {
   const scriptDir = mkTempDir();
-  const scriptPath = writeVerdictExecutor(scriptDir, {
+  const scriptPath = writeVerdictWithVerifyCheckExecutor(scriptDir, {
     verdict: 'decompose',
     reason: 'Two independent surfaces, no shared state',
     children: [

@@ -32,7 +32,7 @@ import { rebuildView, viewRevision } from './replay.mjs';
 import { graphMetrics as computeGraphMetrics, whatIf as computeWhatIf, classifyStaleDoing, footprintOverlap, goalScopedCriticalPath, goalScopedGreedyTopUnblock } from './graph-metrics.mjs';
 import { transitionWork, FsmError } from './fsm.mjs';
 import { transitionStage } from './stage.mjs';
-import { validateWork, WorkValidationError, DEFAULTS, GOAL_TIERS, truncateTitle } from './work.mjs';
+import { validateWork, checkAcceptanceEvidenceTraceable, WorkValidationError, DEFAULTS, GOAL_TIERS, truncateTitle } from './work.mjs';
 import { EventLogError } from './events.mjs';
 import { validateToolRegistration, ToolRegistryError } from './tool-registry.mjs';
 import { frontier, isDepsAndLineageReady as depsAndLineageReadyView } from './frontier.mjs';
@@ -159,6 +159,10 @@ export function addWork(dir, work) {
     // the runner loop) obeys one rule without any of them repeating it.
     const item = { ...work, tier: work?.tier ?? DEFAULTS.tier, title: truncateTitle(work?.title) };
     validateWork(item, Object.keys(before.work));
+    // tsk-5q5-2 (D1/D3): narrow write-time check on any acceptance clause
+    // supplying text+evidence together — see checkAcceptanceEvidenceTraceable's
+    // own doc comment (work.mjs) for what this does and does not prove.
+    checkAcceptanceEvidenceTraceable(item, path.dirname(dir));
     // work-graph-intelligence S1 (D f176c18a): the acyclic invariant on `deps`
     // is enforced at this SAME write door, right after shape/existence
     // validation — never a second validation path. assertNoCycle throws
@@ -242,6 +246,10 @@ export function editWork(dir, { id, patch, role } = {}) {
 
     const candidate = { ...work, ...normalizedPatch };
     validateWork(candidate, Object.keys(before.work));
+    // tsk-5q5-2 (D1/D3): same narrow check addWork applies above — only
+    // reachable here when `patch.acceptance` is present (EDITABLE_FIELDS),
+    // so an edit touching any other field never pays this check.
+    checkAcceptanceEvidenceTraceable(candidate, path.dirname(dir));
     // Same guard pair as addWork above. deps-only first (work-graph-intelligence
     // S1) — this is the gap that used to close silently: a patch introducing an
     // A<->B cycle through `deps` (an EDITABLE_FIELDS entry) went straight
