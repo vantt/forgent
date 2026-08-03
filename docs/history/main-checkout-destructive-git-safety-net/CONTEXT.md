@@ -110,6 +110,26 @@ code) and is tracked separately as `tsk-8v1`.
 - `tsk-8v1` — the split-out follow-up item for the EnterWorktree/path-drift
   half (D1).
 
+## Gate note
+
+`fgos discover`'s `--verdict clear --verify` path gained a mid-session,
+concurrently-merged secondPass semantic-correctness judge (`tsk-5q5-1`,
+merged into main by another process while this item was mid-clarify) that
+rejects a non-executable or claim-irrelevant `verify` string — the
+long-standing repo convention of leaving `verify` as the P15 placeholder at
+clarify time (seen in many older `CONTEXT.md`s) no longer clears this gate.
+User's explicit call (asked live, since this is an engine-behavior
+conflict no clarify-stage judgment call can resolve alone): write a minimal
+RED acceptance test now rather than defer further. `test/runner/main-checkout-reset-guard.test.mjs`
+was added — 3 assertions against a not-yet-existing
+`src/runner/main-checkout-reset-guard.mjs#assertSafeMainCheckoutReset`
+(refuse when dirty+unconfirmed, allow once confirmed, allow outright when
+clean) — confirmed genuinely RED (`ERR_MODULE_NOT_FOUND`) before commit.
+The module path and function name are a placeholder, not a locked design —
+planning may rename freely, but must keep these three observable behaviors
+as tsk-3au's acceptance bar unless it deliberately edits this test with its
+own recorded rationale.
+
 ## Outstanding questions deferred to planning
 
 - Exact shape of the code-level guard (D2(2)): a new `fgos`-CLI verb
