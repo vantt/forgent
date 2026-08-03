@@ -492,6 +492,14 @@ export const CLAUDE_CLI_COMMANDS = Object.freeze(['claude']);
  * `kind:"task"` capacity with no own `command`/`args` resolves into a real
  * `claude --agent <agentType>` invocation via, `buildAgentTypeExecutor`
  * below.
+ *
+ * `forceCliSpawn`, when present, must be a boolean (tsk-3ik-1, Native-First
+ * Dispatch Doctrine rule 4, `docs/decisions/0026-...md`): the valid
+ * "config forces cli/spawn anyway" exception (isolation, a separate
+ * process/worktree/cwd) for a `kind:"task"` capacity that would otherwise be
+ * native-eligible — read by `decideDispatchMechanism`/
+ * `decideCapacityDispatchMechanism` below, never by `resolveExecutorConfig`
+ * itself (which stays cli/spawn-only and unaware this field exists).
  */
 function validateCapacityShape(capacity, label) {
   if (!capacity || typeof capacity !== 'object' || Array.isArray(capacity)) {
@@ -513,6 +521,9 @@ function validateCapacityShape(capacity, label) {
   }
   if (capacity.agentType !== undefined && (typeof capacity.agentType !== 'string' || capacity.agentType.length === 0)) {
     throw new RunnerConfigError(`runner config (${label}) "agentType" must be a non-empty string when present.`);
+  }
+  if (capacity.forceCliSpawn !== undefined && typeof capacity.forceCliSpawn !== 'boolean') {
+    throw new RunnerConfigError(`runner config (${label}) "forceCliSpawn" must be a boolean when present.`);
   }
 }
 
@@ -684,6 +695,61 @@ function resolveExecutorConfig(cfg, tier, capacityId, fgosDir) {
   }
 
   return executor;
+}
+
+/**
+ * Native-First Dispatch Doctrine rules 1/2/4 (`docs/decisions/0026-vision-
+ * orchestrator-roottask-capacity-native-vs-cli-spawn.md`), as one pure
+ * decision — tsk-3ik-1, Phase 4's own shared helper. Deliberately generic
+ * over BOTH dispatch targets the doctrine names (a `capacities.<id>`
+ * capacity, or a live session's own direct subTask/Task-tool call) — this
+ * function never reads `cfg`/config itself, only the three booleans any
+ * caller for either target shape can derive on its own:
+ *
+ * - `hasNativeMechanism` — does this target have a real native-dispatch
+ *   mechanism at all (a capacity declaring `kind:"task"`; a subTask the
+ *   caller could invoke via its own Agent/Task tool)? Rule 1: a mechanical
+ *   target with no such mechanism always cli/spawns, unconditionally.
+ * - `hasLiveTaskAccess` — does the CALLING session already have live
+ *   Agent/Task tool access right now? Never inferred here (no environment
+ *   probing, no heuristic) — the caller self-declares this, the same
+ *   "the skill already self-knows its own tool manifest" pattern
+ *   `tsk-3sw`'s own design already named.
+ * - `forceCliSpawn` — rule 4's valid config-forces-cli/spawn exception
+ *   (isolation: a separate process/worktree/cwd needed for its own sake) —
+ *   wins over native even when both above are true.
+ *
+ * Rule 3 (cross-provider) is never this function's own concern: a caller
+ * only reaches this decision once it already knows the target is
+ * same-provider — a cross-provider target always cli/spawns via the
+ * existing `allowCrossProvider` governance (`resolveExecutorConfig` above),
+ * with no native-vs-cli/spawn choice left to make.
+ */
+export function decideDispatchMechanism({ hasNativeMechanism, hasLiveTaskAccess, forceCliSpawn } = {}) {
+  if (!hasNativeMechanism) return 'cli-spawn';
+  if (forceCliSpawn) return 'cli-spawn';
+  return hasLiveTaskAccess ? 'native' : 'cli-spawn';
+}
+
+/**
+ * `capacities.<id>`-specific convenience over `decideDispatchMechanism`
+ * above (tsk-3ik-1): derives `hasNativeMechanism` (`capacity.kind ===
+ * "task"`) and `forceCliSpawn` (`capacity.forceCliSpawn`) straight from the
+ * same `cfg.capacities[capacityId]` lookup `resolveExecutorConfig` already
+ * does, without calling or mutating that function — this stays a read-only
+ * sibling, never a second entry into the CRITICAL-blast-radius resolve path
+ * (confirmed via `impact({target: "resolveExecutorConfig", direction:
+ * "upstream"})`: 8 upstream symbols, 7 execution flows). `hasLiveTaskAccess`
+ * is never derived here either — same caller-self-declares contract as
+ * `decideDispatchMechanism` itself.
+ */
+export function decideCapacityDispatchMechanism(cfg, capacityId, { hasLiveTaskAccess = false } = {}) {
+  const capacity = capacityId && cfg && cfg.capacities && typeof cfg.capacities === 'object' ? cfg.capacities[capacityId] : undefined;
+  return decideDispatchMechanism({
+    hasNativeMechanism: Boolean(capacity && capacity.kind === 'task'),
+    hasLiveTaskAccess,
+    forceCliSpawn: Boolean(capacity && capacity.forceCliSpawn === true),
+  });
 }
 
 /**
@@ -1014,15 +1080,36 @@ export async function resolveCapacityCli(capacityId, { prompt = '', cwd = proces
   return { command, args, provider, model };
 }
 
+/**
+ * `decide <capacityId>` CLI subcommand (tsk-3ik-1): lets a task-dispatch
+ * consumer skill ask, before choosing whether to `exec` the `resolve`d
+ * command or call its own Task tool natively, which mechanism
+ * `decideCapacityDispatchMechanism` picks for this capacity right now.
+ * Prints `{"mechanism": "native"|"cli-spawn"}` as JSON to stdout — same
+ * additive-sibling relationship to `resolveCapacityCli` above as
+ * `decideCapacityDispatchMechanism` has to `resolveExecutorConfig`: reads
+ * the same committed runner config, calls nothing that also feeds
+ * `resolve`'s own resolution path.
+ *
+ * `--has-live-task-access` is the caller's own self-declaration (never
+ * probed or inferred here — same contract `decideDispatchMechanism` itself
+ * documents) that this session already has live Agent/Task tool access.
+ */
+export async function decideCapacityCli(capacityId, { cwd = process.cwd(), repoRoot, hasLiveTaskAccess = false } = {}) {
+  if (!capacityId) {
+    throw new RunnerConfigError('usage: node src/runner/dispatch.mjs decide <capacityId> [--has-live-task-access]');
+  }
+  const root = repoRoot ?? resolveRepoRoot(cwd);
+  const cfg = ensureRunnerConfigForDir(root);
+  return { mechanism: decideCapacityDispatchMechanism(cfg, capacityId, { hasLiveTaskAccess }) };
+}
+
 // CLI entry point — only runs when this file is executed directly (`node
 // src/runner/dispatch.mjs ...`), never on import (every existing caller
 // imports named exports, none execute this module as a script).
 if (import.meta.url === `file://${process.argv[1]}`) {
   const [subcommand, capacityId, ...rest] = process.argv.slice(2);
-  if (subcommand !== 'resolve') {
-    process.stderr.write(`unknown subcommand ${JSON.stringify(subcommand)}. Usage: node src/runner/dispatch.mjs resolve <capacityId> [--prompt <text>]\n`);
-    process.exitCode = 1;
-  } else {
+  if (subcommand === 'resolve') {
     let prompt = '';
     const promptFlagIndex = rest.indexOf('--prompt');
     if (promptFlagIndex !== -1) prompt = rest[promptFlagIndex + 1] ?? '';
@@ -1035,5 +1122,21 @@ if (import.meta.url === `file://${process.argv[1]}`) {
         process.exitCode = 1;
       },
     );
+  } else if (subcommand === 'decide') {
+    const hasLiveTaskAccess = rest.includes('--has-live-task-access');
+    decideCapacityCli(capacityId, { hasLiveTaskAccess }).then(
+      (decided) => {
+        process.stdout.write(`${JSON.stringify(decided)}\n`);
+      },
+      (err) => {
+        process.stderr.write(`${err.message}\n`);
+        process.exitCode = 1;
+      },
+    );
+  } else {
+    process.stderr.write(
+      `unknown subcommand ${JSON.stringify(subcommand)}. Usage: node src/runner/dispatch.mjs resolve <capacityId> [--prompt <text>] | decide <capacityId> [--has-live-task-access]\n`,
+    );
+    process.exitCode = 1;
   }
 }
