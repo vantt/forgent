@@ -85,6 +85,40 @@ exchange; its only trace is whatever prose a session chooses to write into
 STR70b, STR71) targets this case — they are all scoped to the async
 `awaiting-human` gate, not to synchronous in-session dialogue.
 
+### Status (re-checked 2026-08-02, tsk-42i): still open, one narrow slice now covered
+
+Tracked as fgOS work item `tsk-42i`. Confirmed still unaddressed in general:
+`fgos-planning-context-gap-handback` (done) now gives `fgos-planning` a
+documented path to invoke `fgos-exploring`'s Socratic-lock flow directly,
+mid-session, when it finds `CONTEXT.md` silent on something material —
+that exchange gets appended as a new D-ID decision. This closes exactly
+**one** case (planning discovers a gap) — the general case (any
+synchronous back-and-forth during `clarify`/`decompose`) is unchanged: no
+capture, no home for the raw exchange.
+
+The real fix shares its blocking question with STR70b's Q1 (same doc gate,
+different scope: STR70b is gate-`ask`/`answer` raw backstop; this is
+general in-session dialogue). Three homes for raw material, same as
+STR70b's own analysis: O1 (core log) is impossible — append-only, no
+redact/prune (L3). O2 (a secondary store inside core) is blocked by L1
+(all durable data must be a log or state — raw fits neither) until L1 is
+reopened. **O3 (a daemon-consumer, per decision `0014`)** is the
+architecturally correct home and violates no locked law, but the layer
+does not exist yet — it needs STR46's own foundation (`p-09351985`, "core
+verb-logic as a linkable lib," itself still `proposed`) plus STR48
+(attention/push channel) built first. That is a real subsystem, not a
+quick add — building it just for this capture would be scope far beyond
+what this gap alone justifies.
+
+**Reactivation trigger (shared with STR70b, not invented new):** re-open
+this once real evidence justifies committing to O2 or O3 — the same
+measurement STR70b is already waiting on (how often the distilled/summary
+record turns out to be insufficient and the raw exchange was needed).
+Once that measurement lands and O2/O3 is actually chosen and built, extend
+whatever raw-store it produces to also cover general synchronous
+`clarify`/`decompose` dialogue, not just the gate-`ask`/`answer` case —
+same home, wider capture scope, one build.
+
 ## Update: the `decompose` gap above is now closed (tsk-6b6)
 
 The gap named two sections up — `judgeDecompose`'s `pass-through` and
