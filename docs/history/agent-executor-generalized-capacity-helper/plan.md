@@ -130,10 +130,15 @@ doc update last (it only needs to point at what already exists by then).
 
 ## Proof surface (for `fgos-executing`/`fgos-validating`)
 
-Real verify command for this item as a whole:
+Real verify command for this item as a whole (not `npm test --
+test/skills/fgos-mirror.test.mjs` — `package.json`'s `test` script
+hardcodes `node --test 'test/**/*.test.mjs'`, so appending a path via `--`
+does not scope it; `node --test` receives both paths and runs the entire
+suite. Confirmed live: `node --test test/skills/fgos-mirror.test.mjs`
+passes today, 3/3, 40ms — the baseline pre-change):
 
 ```
-npm test -- test/skills/fgos-mirror.test.mjs
+node --test test/skills/fgos-mirror.test.mjs
 ```
 
 plus the one manual live-dispatch check named in the risk map above
