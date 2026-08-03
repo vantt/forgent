@@ -59,12 +59,48 @@ node "$root/bin/fgos.mjs" tool query --capability <CAPACITY_ID> --status present
   `<INLINE_FALLBACK_HEADING>`. The note is the only difference from the
   `not-configured` case above; the reasoning itself is identical.
 - **One provider, `status: "present"`** — dispatch instead of reasoning
-  inline (Step C).
+  inline (Step B.5, then Step C).
 
-## Step C — configured-and-present dispatch
+## Step B.5 — native-vs-cli/spawn decision (tsk-3ik-3, Native-First Dispatch
+Doctrine, `docs/decisions/0026-vision-orchestrator-roottask-capacity-native-
+vs-cli-spawn.md`)
+
+Configured+present no longer means "always exec a subprocess" — check which
+dispatch mechanism actually applies before building anything. First decide,
+on your own (never inferred from environment or config — the same "the
+skill already self-knows its own tool manifest" pattern this whole
+optimization relies on): do you, the assistant reading this fragment right
+now, already have the Agent/Task tool available in your current tool
+manifest? Then ask:
+
+```bash
+root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
+node "$root/src/runner/dispatch.mjs" decide <CAPACITY_ID> --has-live-task-access
+```
+
+(Omit `--has-live-task-access` entirely if you decided above that you do
+NOT currently have live Agent/Task tool access — never pass the flag on a
+guess.) Prints `{"mechanism": "native"|"cli-spawn"[, "agentType": "<name>"]}`.
+
+- **`mechanism: "cli-spawn"`** — proceed to Step C exactly as before.
+  This is every `kind:"cli"` capacity (e.g. `submit-assist-classify`, this
+  pattern's one real live consumer today — cross-provider, always
+  cli/spawn), every `kind:"task"` capacity when you lack live Task access,
+  and any capacity whose config forces cli/spawn (`forceCliSpawn`).
+- **`mechanism: "native"`** — skip Step C's `exec` entirely. Call your own
+  Agent/Task tool directly instead: `subagent_type` is this same JSON's
+  `agentType`, the prompt is `<PROMPT_TEMPLATE>` (the exact same prompt
+  Step C would have built — never a different or re-worded one). Read the
+  response the same way Step C's own consumer reads a dispatched answer —
+  Step D's malformed-response fallback applies identically regardless of
+  which mechanism produced the response.
+
+## Step C — configured-and-present dispatch (cli-spawn mechanism)
 
 1. Build the prompt from `<PROMPT_TEMPLATE>` (fixed, so every dispatch
-   asks the exact same thing).
+   asks the exact same thing) — the identical prompt Step B.5's native
+   branch would also have used, built once regardless of which mechanism
+   Step B.5 picked.
 
 2. Resolve the real command/args, reusing `dispatch.mjs`'s own
    `resolveExecutorConfig`/`resolveExecutorCommand` (`tsk-62v`) — never a
@@ -105,4 +141,10 @@ reasoning would have been.
   the reference for config-entry/registration steps (1–3 there), which
   this fragment does not repeat.
 - `fgos-submit-assist/SKILL.md` — the real, live consumer of this fragment
-  (`<CAPACITY_ID>` = `submit-assist-classify`).
+  (`<CAPACITY_ID>` = `submit-assist-classify`, always `cli-spawn` — no
+  live `kind:"task"` consumer exists yet to exercise Step B.5's `native`
+  branch end-to-end; that branch is proven by `src/runner/dispatch.mjs`'s
+  own unit tests instead, per `docs/history/tsk-3ik-3/iron-law-evidence.md`
+  if applicable).
+- `docs/decisions/0026-vision-orchestrator-roottask-capacity-native-vs-cli-spawn.md`
+  — Native-First Dispatch Doctrine, Step B.5's own governing rules 1/2/4.
