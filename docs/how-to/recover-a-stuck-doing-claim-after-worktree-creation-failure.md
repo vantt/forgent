@@ -3,7 +3,7 @@ type: how-to
 title: How to recover a stuck `doing` claim after a worktree-creation failure
 tags: [worktree, claim]
 timestamp: 2026-07-31T05:50:00.000Z
-source_capture_ids: [tsk-4m0]
+source_capture_ids: [tsk-4m0, tsk-3lx, tsk-k8u]
 ---
 # How to recover a stuck `doing` claim after a worktree-creation failure
 
@@ -29,6 +29,24 @@ branch: `createWorktree`'s reuse path now relocates that checkout directly
 (including the exact `spawnSync git ENOENT` both examples hit) leaves the
 original checkout untouched — no manual recovery needed for that specific
 class at all, not even a retry.
+
+Since `tsk-k8u`, a second, related root cause behind the same `spawnSync
+git ENOENT` symptom is also closed: `bin/fgos.mjs`'s `pick`/`take`
+handlers used to pass `repoRoot: process.cwd()` into `claimWork` instead
+of deriving it from the already-resolved `--dir`. A claim-release +
+re-pick sequence run from *inside* the very worktree being torn down had
+`repoRoot` (and `pick`'s `worktreeDir` default) equal to that doomed cwd
+— so once `reclaimOrphanedCheckout` removed it, every subsequent git
+spawn in the same call chain (including the re-add) had a nonexistent
+`cwd`, ENOENT regardless of `tsk-3lx`'s zero-destroy fix. Both handlers
+now derive `repoRoot = path.dirname(dir)` instead — always the stable
+main checkout `--dir` names, never the caller's own possibly-transient
+shell cwd (byte-identical to before when `--dir` is omitted, since
+`dataDir()` resolves `dir` from `process.cwd()` too in that case). As
+defense-in-depth on top of that, `reclaimOrphanedCheckout` now also
+refuses outright — rather than force-removing — when `orphanPath`
+resolves to `repoRoot` itself, closing the case structurally even if a
+future caller reintroduces a doomed-cwd bug some other way.
 
 This doc is for the residual cases neither fix covers:
 
@@ -126,6 +144,11 @@ in under a minute, no data lost.
   the fix that closes the specific `spawnSync git ENOENT`-during-reclaim
   trigger both real examples below hit, by relocating (`git worktree
   move`) instead of destroying the orphaned checkout on a reused branch.
+- `docs/history/pick-take-worktree-cwd-fix/CONTEXT.md` (`tsk-k8u`) — the
+  companion fix for the same ENOENT symptom's other root cause: `pick`/
+  `take` deriving `repoRoot` from `--dir` instead of `process.cwd()`, plus
+  a refuse-when-`orphanPath`-equals-`repoRoot` guard in
+  `reclaimOrphanedCheckout` as defense-in-depth.
 - `docs/history/pick-worktree-claim-race/CONTEXT.md`,
   `docs/history/pick-worktree-claim-race/plan.md` — the locked decisions
   and shape behind the `tsk-4m0` fix this doc is the residual-case

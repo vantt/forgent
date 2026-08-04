@@ -79,10 +79,13 @@ never moves it.
    Also query `CLAUDE.md`'s impact-analysis capability gate — the same
    check `fgos-planning`/`fgos-validating`/`fgos-executing` already run
    (`fgos tool query --capability impact-analysis --status present`) —
-   rather than assuming GitNexus is on this machine, since this is the only
-   clarify-stage session with real tool access (`judgeDiscovery` itself has
-   none: `src/runner/dispatch.mjs:207-220`'s `--allowedTools` permits only
-   `git add`/`git commit`). The `tool` sub-verb `query` is also
+   rather than assuming GitNexus is on this machine — `judgeDiscovery`'s own
+   `capacities.judge-discovery` config (`.fgos/config.json`, tsk-4rd upgrade)
+   now grants it `Task,WebSearch,WebFetch,Read,Bash(rg:*)` too, wider than
+   `src/runner/dispatch.mjs`'s bare `git add`/`git commit` default, but that
+   grant belongs to a separate subprocess call with its own posture read —
+   this session's own gate query here never inherits it, so check fresh
+   regardless. The `tool` sub-verb `query` is also
    `requiresExistingStore: true` (`src/cli/command-registry.mjs:750`), so
    run it with `--dir` explicitly the same as every other bare verb this
    skill calls:

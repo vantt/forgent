@@ -82,3 +82,52 @@ narrower write-time gate on session-authored `work.acceptance` clauses
 `tsk-5q5-2`. Whether this second-pass pattern should extend to
 `judgeDecompose`'s own top-level `reason` field or other model-proposed
 prose is explicitly out of scope here.
+
+## Why the parent item (`tsk-5q5`) locked scope before design
+
+Two separate writers could let a wrong claim ride into an item's record
+unchallenged, both surfaced by `tsk-d3c`'s own history: (1)
+`judgeDiscovery`/`judgeDecompose` trusting a model-proposed `verify`
+string once merely non-empty (the failure this doc covers), and (2)
+session-authored `work.acceptance` clauses with no judge involved at all
+(`tsk-5q5-2`'s scope). The parent item's own job was to lock *both* into
+one scope before either child was designed:
+
+> Scope covers **both** failure modes above: judgeDiscovery/judgeDecompose's
+> `verify` generation (a real code path in `discovery.mjs`/`decompose.mjs`)
+> AND session-authored `acceptance`-clause drift (no machine generation
+> exists today — this half is a discipline/gate addition on top of the
+> existing hand-authored write path, not a fix to an existing judge).
+
+It also locked that a caught disagreement must park on a person rather
+than auto-resolve either way — the same `putInAwaiting` behavior this doc
+already describes above:
+
+> When the second-pass semantic check disagrees with judgeDiscovery/
+> judgeDecompose's own clear verdict, the item parks in `awaiting-human`
+> via the existing `putInAwaiting` fail-safe door (the same one an unclear
+> verdict already uses), surfacing both verdicts to the person — it never
+> silently overrides one judgment with the other, and never auto-retries
+> as the primary response to a disagreement.
+
+### Second repro: unquoted prose breaks the shell, not just names the wrong target
+
+A second, independent repro (folded in from a duplicate item, `tsk-65n`,
+closed as wontfix once its evidence was captured here) showed the same
+failure shape from a different angle — not a wrong target, but broken
+shell syntax from explanatory prose the judge appended to the command:
+
+> judgeDiscovery emitted verify "... && echo PASS || echo FAIL — check ...
+> (blocked+take path, not direct take/pick) ..." — the unquoted
+> explanatory prose after 'echo FAIL' carries parentheses, so /bin/sh
+> aborts with 'Syntax error: "(" unexpected' (exit 2) before running
+> anything. Same shape as this item's own `Skill("fgOS:ready")` repro: the
+> judge appends a human sentence to a shell command. The item became
+> unreturnable (`fgos return` parks it blocked regardless of the work)
+> until a human ran `fgos edit --verify`.
+
+This confirmed the second-pass check needed to catch more than one
+failure shape — not just "names the wrong target" but "isn't valid shell
+at all because of appended prose" — both fall under the same
+semantic-correctness judgment pass described above, rather than needing
+two separate mechanisms.

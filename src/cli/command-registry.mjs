@@ -934,7 +934,7 @@ export const COMMAND_REGISTRY = [
   {
     name: 'setup',
     invoke: 'fgos setup',
-    description: 'Insert the fgos shell-integration source line into detected shell rc file(s) (bash/zsh), ensure .fgos-runner.json exists and has every current default key, and wire core.hooksPath to .githooks (the str65 main-checkout lock hook) — do-and-announce, never asks first.',
+    description: 'Insert the fgos shell-integration source line into detected shell rc file(s) (bash/zsh), ensure the shared config file (.fgos/config.json, migrating a legacy .fgos-runner.json when present) has every current default key via the extensible registry, and wire core.hooksPath to .githooks (the str65 main-checkout lock hook) — do-and-announce, never asks first.',
     parameters: {
       type: 'object',
       properties: {
