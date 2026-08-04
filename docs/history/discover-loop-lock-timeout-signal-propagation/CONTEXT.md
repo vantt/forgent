@@ -27,7 +27,7 @@ policy itself (`.fgos/events.lock`'s 2s/10ms retry in `events.mjs`, RUL10)
 |----|----------|
 | D1 | Propagation scope is **`lock-timeout` only** — the one category that ever stopped the whole loop. `session-fail`/`merge-fail`/CAS-`validation` conflicts keep being handled per-item ("skipped"), unchanged. An adjacent idea — the underlying `.fgos/events.lock` retry policy being a fixed 2s/10ms regardless of what kind of work is holding it, versus an adaptive timeout or a liveness probe ("is the holder still alive?") instead of a fixed timeout — is a different layer (the lock's own policy in `events.mjs`, not the propagation-through-skill-layers problem this item scopes) and is **deferred to tsk-r87** (`discoveredFrom: tsk-1c6`). |
 | D2 | Fix lives at the **root**: `fgos-coding-driving`'s own stop-report contract gains the structured lock-timeout signal, not a narrow patch scoped only to `discover-next`'s own dispatch handling. This means the change is visible to every caller of `fgos-coding-driving` (`/fgOS:cook`, `/fgOS:pick`, any future sweep), not just `discover-next` — intentional, since `fgos-coding-driving` is the shared orchestration point and there are separate ongoing discussions about upgrading the routing mechanism it sits under. |
-| D3 | Verify approach is a **mechanical consistency check**, not a runtime/dogfood-fixture test: grep for one literal category token (e.g. `lock-timeout`) appearing consistently across every touched `SKILL.md` (`fgos-coding-driving`, `fgos-exploring`, `fgos-planning`, `discover-next`, `discover-loop`), proving no layer paraphrases the signal away into generic "blocked" prose. A dogfood-fixture scenario that actually holds `.fgos/events.lock` to force a real lock-timeout was considered and rejected as disproportionate cost (timing-based, standard tier) — these skills are prose-driven with no existing runtime test surface (confirmed: no `discover-loop`/`discover-next` test files exist today). |
+| D3 | **Reversed.** Originally locked as a mechanical grep-consistency check (see history below); tried 5 times against the engine's `judgeVerifySemanticCorrectness` second-pass gate on `fgos discover --verdict clear --verify`, disputed all 5 — consistent reasoning: the claim is a **runtime behavior of SKILL.md prose** (whether an LLM, following the updated instructions, actually relays the `lock-timeout` category through multiple skill-invocation hops), and no static grep or manual-review checklist can prove that — only text presence, never behavior. **tsk-4l9** (same `discoveredFrom: tsk-31l` sibling) already names this exact missing infrastructure ("a harness that spawns a session/subprocess running the skill against a fixed test item and asserts the resulting output/state") as its own scope. Building an ad-hoc version of that harness inside tsk-1c6 would duplicate tsk-4l9's job. **tsk-1c6 now carries `tsk-4l9` as a real `deps` entry** (not just provenance) — this item waits at `clarify` until tsk-4l9 lands a real verify harness for SKILL.md-prose behavior, then writes `verify` against it. Superseded history: mechanical-only was tried first (grep for `lock-timeout` token across the 5 touched files, considered lighter than a hand-rolled dogfood-fixture scenario) — abandoned only after 5 concrete second-pass rejections proved it structurally cannot satisfy this claim, not from a prose-wording issue. |
 
 ## Pinned terms
 
@@ -78,6 +78,14 @@ policy itself (`.fgos/events.lock`'s 2s/10ms retry in `events.mjs`, RUL10)
   lock-timeout apart from any other block.
 - `src/state/events.mjs`, `src/state/store.mjs` — the categorized-error
   source of truth this item's signal must trace back to accurately.
+
+## Real dependency
+
+- **`deps: [tsk-4l9]`** — tsk-1c6 is blocked from the frontier until tsk-4l9
+  ("Xây runtime verify harness cho hành vi dispatch của skill prose")
+  delivers a real verify harness for SKILL.md-prose runtime behavior. This
+  is a genuine blocking dependency, not provenance — tsk-1c6's own `verify`
+  field cannot be written correctly without it (see D3 above).
 
 ## Outstanding questions deferred to planning
 
