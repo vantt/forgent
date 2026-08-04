@@ -116,7 +116,7 @@ test('renderTemplate(worker-prompt-skill-pointer.txt, ...) golden output — no-
     refs: 'src/widget.mjs, docs/specs/widget.md',
     verify: 'npm test',
     domain: 'coding',
-    skillPath: '.claude/skills/fgos-executing/SKILL.md',
+    skillPath: '.claude/skills/fgos-code-implement/SKILL.md',
   });
 
   const golden = `# Goal
@@ -124,7 +124,7 @@ Add the widget (kind: behavior_change)
 
 # Agent skill
 You are a fgOS agent for domain coding at the executing stage. Before doing
-anything else, read .claude/skills/fgos-executing/SKILL.md in your own checkout — it is the same skill
+anything else, read .claude/skills/fgos-code-implement/SKILL.md in your own checkout — it is the same skill
 an interactive fgOS session loads for this exact domain and stage, and it
 governs how this work item must be done.
 

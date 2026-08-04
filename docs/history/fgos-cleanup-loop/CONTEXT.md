@@ -101,7 +101,7 @@ hasn't elapsed.
 - Impact-analysis capability gate (per `CLAUDE.md`): `fgos tool query
   --capability impact-analysis --status present` returned GitNexus
   `present` → posture is **full**. Informational only at this stage —
-  this skill edits no code — binding on `fgos-executing` once this item
+  this skill edits no code — binding on `fgos-code-implement` once this item
   reaches that stage.
 
 ## Deferred to planning (implementer concerns, not locked here)

@@ -130,5 +130,5 @@ npm test && npm run cli -- list | head -10
 ## Câu hỏi còn mở (kế thừa từ CONTEXT.md, chưa cần chặn kế hoạch)
 
 - ~~Đường dẫn thật của kho `fgos-test-drive`~~ — đã xác nhận: `/home/vantt/projects/fgos-test-drive/.fgos` (giải quyết tại `fgos-validating`).
-- Có cần 1 test migration riêng (giống `test/state/backward-compat.test.mjs`) khoá hành vi replay sau rewrite hay không — quyết định cụ thể để `fgos-executing` cân nhắc.
+- Có cần 1 test migration riêng (giống `test/state/backward-compat.test.mjs`) khoá hành vi replay sau rewrite hay không — quyết định cụ thể để `fgos-code-implement` cân nhắc.
 - ~~Cách nối Pha B vào main-checkout-lock của Pha A~~ — không cần nữa: đo lại (`fgos-validating`, vòng 2) xác nhận rủi ro khe hở THẤP và tự-chữa-lành, không cần cơ chế khoá.

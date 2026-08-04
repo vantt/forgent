@@ -2,7 +2,7 @@
 
 `classifyIronLaw({ filesChanged, description })` result, computed against
 this item's real diff at `fgw/tsk-j7y` and its own event-log description
-(command run from the main checkout, per fgos-executing's own step 4):
+(command run from the main checkout, per fgos-code-implement's own step 4):
 
 ```json
 {"required":true,"matchedFlags":["delete"],"matchedModules":[]}

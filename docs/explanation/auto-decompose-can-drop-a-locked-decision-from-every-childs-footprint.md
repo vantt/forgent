@@ -27,7 +27,7 @@ children point back to.
 
 Fixing it here — inside `tsk-2ta-4`, whose own `footprint` names only
 `CONTEXT.md` — would have been scope creep into architecture no child was
-built for the same way `fgos-executing`'s own rules already warn against
+built for the same way `fgos-code-implement`'s own rules already warn against
 ("the fix would require redesigning scope... beyond what the item
 describes → stop"). The honest move was the one taken: name the gap
 plainly in the synthesized `CONTEXT.md`, cite exactly which decision

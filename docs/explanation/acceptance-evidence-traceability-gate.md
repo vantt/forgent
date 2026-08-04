@@ -4,7 +4,7 @@
 
 No judge function generates or touches `work.acceptance` — whichever
 session is drafting it (during `fgos-exploring`/`fgos-planning`/
-`fgos-executing`) writes it by hand, and nothing checked whether a supplied
+`fgos-code-implement`) writes it by hand, and nothing checked whether a supplied
 `evidence` string was actually true or traceable to anything real.
 
 Confirmed failure: `tsk-d3c`'s own `acceptance` array asserted a root cause

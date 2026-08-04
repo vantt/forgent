@@ -72,7 +72,7 @@ Sequence within the single piece, per this repo's Iron Law
 2. Apply the 1-line fix in `frontier.mjs`.
 3. Re-run the full file and confirm all cases (old + new) pass.
 4. Capture the failing-then-passing evidence the same way `tsk-2j9`'s
-   history does, per whatever `fgos-executing` requires at that stage.
+   history does, per whatever `fgos-code-implement` requires at that stage.
 
 ## Risk map
 
@@ -98,8 +98,8 @@ coverage, in the same existing files. No child items created.
 
 - The item's own `verify` field (currently the placeholder
   `"chưa xác định — P15 bổ sung"`) will be set by whoever runs
-  `fgos-executing` to something runnable against the touched test file,
+  `fgos-code-implement` to something runnable against the touched test file,
   e.g. `node --test test/cli/take-pick-claim-eligibility.test.mjs` — not
   decided here since `fgos-planning` doesn't own the item's verify field
-  directly; `fgos-executing`/`fgos-validating` set it when the plan's
+  directly; `fgos-code-implement`/`fgos-validating` set it when the plan's
   proof points are turned into a real command.

@@ -35,7 +35,7 @@ contract-compatibility proof this item actually needs.
 
 `fgos tool query --capability impact-analysis --status present` returned
 the `gitnexus` provider as `present` → **full**. Per `CLAUDE.md`'s gate,
-`fgos-executing` MUST run `impact({target: "isAlreadyMerged",
+`fgos-code-implement` MUST run `impact({target: "isAlreadyMerged",
 direction: "upstream"})` and `impact({target: "mergeRunnerItemLocked",
 direction: "upstream"})` before editing either function, and report the
 blast radius before proceeding.

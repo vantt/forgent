@@ -79,7 +79,7 @@ ordering constraint from other work):
 
 `impact-analysis: full` (GitNexus registered and `present` — `fgos tool
 query --capability impact-analysis --status present`, confirmed during
-`fgos-exploring`). Per `CLAUDE.md`'s MUST rule, `fgos-executing` runs
+`fgos-exploring`). Per `CLAUDE.md`'s MUST rule, `fgos-code-implement` runs
 `impact({target: "moveWork", direction: "upstream"})` and
 `impact({target: "mergeRunnerItem", direction: "upstream"})` before
 editing either symbol, and reports blast radius before proceeding — not

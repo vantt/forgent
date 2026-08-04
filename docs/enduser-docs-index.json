@@ -1051,8 +1051,8 @@
     "quadrant": "how-to",
     "purpose": "Show the steps to accomplish one specific, already-understood goal.",
     "audience": "A user who already knows the system and wants a concrete recipe.",
-    "docPath": "docs/how-to/smoke-test-fgos-executing-with-a-trivial-item.md",
-    "title": "How to smoke-test fgos-executing with a trivial verify=true item",
+    "docPath": "docs/how-to/smoke-test-fgos-code-implement-with-a-trivial-item.md",
+    "title": "How to smoke-test fgos-code-implement with a trivial verify=true item",
     "sourceCaptureId": "str89-case-study-executing"
   },
   {

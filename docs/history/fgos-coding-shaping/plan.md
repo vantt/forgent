@@ -91,7 +91,7 @@ against.
 ## Assumptions
 
 - The exact prose/wording inside each new `SKILL.md` (beyond the D-ID
-  contracts above) is `fgos-executing`'s own call at build time — this
+  contracts above) is `fgos-code-implement`'s own call at build time — this
   plan fixes the contract each file must satisfy, not its literal text.
 
 ## Proof (leave execution alone, step 6)

@@ -11,7 +11,7 @@ behavior, weak proof around the area, multi-domain):
 | Flag | Applies? | Why |
 |---|---|---|
 | audit/security (hard-gate) | **yes** | This change modifies the anti-cheat gate that protects `return`'s core contract — "prove real work happened between claim and return." Loosening it, even in a narrowly-gated way (D2), is exactly the class of change `claim-reclaim-branchhead-reset`'s own D2 revision treated as high-stakes. |
-| public contracts | yes | `fgos return` is a documented CLI verb (`docs/specs/runner.md`, `docs/specs/work-state.md`) with real callers depending on its exact exit behavior — `fgos-executing`, the runner's own return path, and scripted flows. A new flag/verb must not change existing `return`'s behavior for callers that don't opt in. |
+| public contracts | yes | `fgos return` is a documented CLI verb (`docs/specs/runner.md`, `docs/specs/work-state.md`) with real callers depending on its exact exit behavior — `fgos-code-implement`, the runner's own return path, and scripted flows. A new flag/verb must not change existing `return`'s behavior for callers that don't opt in. |
 | existing covered behavior | yes | `return`'s branch-source and main-source paths already carry substantial coverage (`test/cli/fgos.test.mjs`, `test/state/store.test.mjs`, `test/state/replay.test.mjs`, `test/e2e/pr-gate.test.mjs`). New logic must not regress any of it. |
 | auth / authorization | no | No user-auth surface touched. |
 | data model | no | No new field or event kind (per D1's own "no invented schema" framing) — reuses `outcomes[id].actual`, existing `status` transitions. |

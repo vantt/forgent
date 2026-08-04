@@ -52,7 +52,7 @@ never moves it.
   back to `todo` once the item reaches `executing` (claim-lock §3b); an
   uncommitted `CONTEXT.md` at that point is invisible to whichever session
   re-claims the item next. Same one-artifact-per-stop discipline
-  `fgos-executing`'s "one commit per item" rule already gives Execute.
+  `fgos-code-implement`'s "one commit per item" rule already gives Execute.
 
 ## Flow
 
@@ -77,7 +77,7 @@ never moves it.
    ```
 
    Also query `CLAUDE.md`'s impact-analysis capability gate — the same
-   check `fgos-planning`/`fgos-validating`/`fgos-executing` already run
+   check `fgos-planning`/`fgos-validating`/`fgos-code-implement` already run
    (`fgos tool query --capability impact-analysis --status present`) —
    rather than assuming GitNexus is on this machine — `judgeDiscovery`'s own
    `capacities.judge-discovery` config (`.fgos/config.json`, tsk-4rd upgrade)

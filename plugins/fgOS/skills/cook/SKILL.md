@@ -116,7 +116,7 @@ never re-implements a dev-skill's substance inline; it invokes them.
    implementation work at `stage: executing`: the driver's own claim-timing
    rule claims the id and enters its worktree at exactly the point this
    step used to do it by hand (`fgos pick <id>` then `EnterWorktree`), then
-   invokes `fgos-executing`, which implements, verifies, and calls
+   invokes `fgos-code-implement`, which implements, verifies, and calls
    `fgos return <id>` itself — never taking anyone's word for real progress,
    the same "measures real progress itself" contract this step always
    relied on.

@@ -86,7 +86,7 @@ and reordering cleanup to wait on the full approve operation's success
 
 `rg -n 'live session|isLiveSessionWorktree' -i src/runner/worktree.mjs && node --test test/runner/worktree.test.mjs`
 — fails today (the guard does not exist yet), passes once `fgos-planning`/
-`fgos-executing` lands D1/D2's fix plus its regression test. Named after
+`fgos-code-implement` lands D1/D2's fix plus its regression test. Named after
 D1's pinned term "live session worktree"; the exact symbol name is
 `fgos-planning`'s call, not locked here.
 

@@ -99,7 +99,7 @@ asserted to generalize automatically to a domain that does not exist yet.
   `/fgOS:cook`'s existing hard rule "never claims before stage executing"
   into this skill, since it is now the one thing that decides when a
   stage-skill is about to run): immediately before invoking the skill this
-  loop resolved for stage `executing` (`fgos-executing` in the `coding`
+  loop resolved for stage `executing` (`fgos-code-implement` in the `coding`
   domain's registry today), check the item's live `status` from the SAME
   fresh read this iteration already did. If it is already `doing` (the
   caller — e.g. `/fgOS:pick`'s own step 2 — already claimed it, or a prior
@@ -122,7 +122,7 @@ asserted to generalize automatically to a domain that does not exist yet.
     then hand the session into the returned `data.worktree.path` the same
     way `/fgOS:pick`'s own step 4 does (`EnterWorktree`, falling back to
     printing the path and stopping if it is unavailable/refuses — never
-    fail or retry past that fallback) — only THEN invoke `fgos-executing`.
+    fail or retry past that fallback) — only THEN invoke `fgos-code-implement`.
 
   - `worktreeBacked === false` — claim without a worktree, the same
     stage-agnostic claim `fgos-routing` and 2 other skills already use

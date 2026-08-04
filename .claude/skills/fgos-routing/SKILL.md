@@ -38,7 +38,7 @@ session's cwd is a linked worktree, which never carries its own `.fgos/`
 by design (ADR0020: `docs/decisions/0020-chan-fgos-khoi-worktree-worker.md`).
 Resolve the main checkout root once and pass it explicitly on every such
 call — never a bare `fgos <verb>` when this session might already be
-inside a worktree (e.g. mid-`fgos-executing`, or a `pick`'d session
+inside a worktree (e.g. mid-`fgos-code-implement`, or a `pick`'d session
 running `fgos-routing` again):
 
 ```bash
@@ -103,7 +103,7 @@ call, not a different table:
 | `clarify` | the request is still fuzzy — gray areas, missing acceptance criteria, an ambiguous ask | `fgos-exploring` |
 | `decompose` — shaping | scope is settled; the work now needs shaping and, where it doesn't fit in one pass, splitting into child items | `fgos-planning` (the registry's entry-point default for `decompose`) |
 | `decompose` — proving | shape and children (if any) exist; what's left is proving the plan against reality before the item is allowed to move to `executing` | `fgos-validating` — this branch is this skill's own session-side judgment layered on top of the registry's single `decompose` default, never a second registry entry |
-| `executing` | the item has already cleared clarification and shaping (or never needed either), and is ready for direct implementation | `fgos-executing` (str89-fgos-domain-skills D4/D6 — the build/verify/return path, hand-authored from bee-executing's implement→verify→cap discipline) |
+| `executing` | the item has already cleared clarification and shaping (or never needed either), and is ready for direct implementation | `fgos-code-implement` (str89-fgos-domain-skills D4/D6 — the build/verify/return path, hand-authored from bee-executing's implement→verify→cap discipline) |
 
 `compound-learn` is retired as a stage (work-item-status-delivered-
 retrospective-cleanup D11, supersedes RUL49/RUL50/RUL51) — the synthesis

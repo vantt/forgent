@@ -127,7 +127,7 @@ own shape-invalid check, and judge-executor's reported branch).
 - `runJudgeExecutor`'s own signature grows by exactly one optional trailing
   out-param (`failDetailOut`); the actual mechanics of whether it also
   needs `id` threaded in, or the caller writes using its own already-held
-  `work.id`, is an implementation choice for `fgos-executing`, not a locked
+  `work.id`, is an implementation choice for `fgos-code-implement`, not a locked
   product decision — CONTEXT.md's D1-D3 already fix the observable
   contract (location, scope, per-branch tagging), not this internal
   threading detail.
@@ -152,7 +152,7 @@ own shape-invalid check, and judge-executor's reported branch).
   confirmed to exist; `test/intake/decompose.test.mjs` is this same
   cluster's third file for `judgeDecompose`), plus the new fail-safe-branch
   tests this item adds to them. `fgos edit tsk-5d2 --verify "..."` applies
-  this before `fgos-executing` runs.
+  this before `fgos-code-implement` runs.
 
 ## Proof points (carried to `fgos-validating`)
 

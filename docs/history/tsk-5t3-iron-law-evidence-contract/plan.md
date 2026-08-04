@@ -12,7 +12,7 @@ timestamp: 2026-07-30T10:11:42.000Z
 | Flag | Applies? | Why |
 |------|----------|-----|
 | audit/security | **yes** | The item feeds evidence directly into the Iron Law gate's human decision (RUL34) — a hard-gate flag by the mode rule's own definition, even though D4 keeps this item from touching the gate's enforcement code itself. |
-| existing covered behavior | **yes** | `.claude/skills/fgos-executing/` must stay a byte-identical mirror of `.agents/skills/fgos-executing/`, enforced today by `test/skills/fgos-mirror.test.mjs` (docs/history/gate-bypass/plan.md already hit and documented this same requirement). `plugins/fgOS/skills/merge-loop/SKILL.md` also carries an existing grep-based verify contract from `tsk-1sm` (requires `iron-law`, `picked.*null`, `clean`, `/loop`, `/fgOS:merge-next` to all still appear) that this edit must not break. |
+| existing covered behavior | **yes** | `.claude/skills/fgos-code-implement/` must stay a byte-identical mirror of `.agents/skills/fgos-code-implement/`, enforced today by `test/skills/fgos-mirror.test.mjs` (docs/history/gate-bypass/plan.md already hit and documented this same requirement). `plugins/fgOS/skills/merge-loop/SKILL.md` also carries an existing grep-based verify contract from `tsk-1sm` (requires `iron-law`, `picked.*null`, `clean`, `/loop`, `/fgOS:merge-next` to all still appear) that this edit must not break. |
 | weak proof around the area | **yes** | The merge/Iron-Law area has a real incident history in this repo (`tsk-3mv`, `tsk-598`, `tsk-3yl`, `gate-bypass`, and this session's own live main-checkout-lock collision) — proof here needs to be concrete, not assumed. |
 
 One hard-gate flag (audit/security) alone forces high-risk per the mode
@@ -33,8 +33,8 @@ Two components, each a prose edit to an existing skill file — no new `.mjs`
 code, no new CLI flag, no schema change (per `CONTEXT.md` D2-D4, which
 already ruled out `.fgos/`-based and `docType`/`docPath`-based storage).
 
-**1. Producer — `.claude/skills/fgos-executing/SKILL.md`** (mirrored
-byte-identical into `.agents/skills/fgos-executing/SKILL.md` in the same
+**1. Producer — `.claude/skills/fgos-code-implement/SKILL.md`** (mirrored
+byte-identical into `.agents/skills/fgos-code-implement/SKILL.md` in the same
 commit, per the mirror test above): add a step, run right before the
 session calls `fgos return`, that:
 - computes the item's final diff the same way `approve` itself will
@@ -98,9 +98,9 @@ doesn't already cover. One item, two ordered steps within it.
 
 ```bash
 node --test test/skills/fgos-mirror.test.mjs \
-  && diff .claude/skills/fgos-executing/SKILL.md .agents/skills/fgos-executing/SKILL.md \
-  && grep -qi "iron-law-evidence.md" .claude/skills/fgos-executing/SKILL.md \
-  && grep -qi "classifyIronLaw" .claude/skills/fgos-executing/SKILL.md \
+  && diff .claude/skills/fgos-code-implement/SKILL.md .agents/skills/fgos-code-implement/SKILL.md \
+  && grep -qi "iron-law-evidence.md" .claude/skills/fgos-code-implement/SKILL.md \
+  && grep -qi "classifyIronLaw" .claude/skills/fgos-code-implement/SKILL.md \
   && grep -qi "iron-law-evidence.md" plugins/fgOS/skills/merge-loop/SKILL.md \
   && grep -qi "acknowledge-iron-law" plugins/fgOS/skills/merge-loop/SKILL.md \
   && grep -qi "picked.*null" plugins/fgOS/skills/merge-loop/SKILL.md \

@@ -2,7 +2,7 @@
 
 Item: `tsk-17w`. Source description (raw, untrusted per RUL45): "fgos-exploring
 (stage clarify) has no impact-analysis capability-gate, unlike
-fgos-planning/fgos-validating/fgos-executing (all wired by tsk-1e4, merged
+fgos-planning/fgos-validating/fgos-code-implement (all wired by tsk-1e4, merged
 2026-07-31: fgos-planning/SKILL.md:95-98, fgos-validating/SKILL.md:81-86,
 CLAUDE.md:10-33 all query `fgos tool query --capability impact-analysis
 --status present`). Since judgeDiscovery itself has zero tool access
@@ -23,7 +23,7 @@ Extend `.claude/skills/fgos-exploring/SKILL.md` step 1 ("Scope the gray
 areas") so its scout pass also queries the impact-analysis capability gate
 and records the resulting posture in `CONTEXT.md` — closing the one
 clarify-stage gap left after tsk-1e4 wired `fgos-planning`,
-`fgos-validating`, `fgos-executing`, and `CLAUDE.md` itself. Exactly one
+`fgos-validating`, `fgos-code-implement`, and `CLAUDE.md` itself. Exactly one
 file changes: `.claude/skills/fgos-exploring/SKILL.md`. No other skill
 file, no runtime code, no CLI surface changes.
 
@@ -33,7 +33,7 @@ file, no runtime code, no CLI surface changes.
 |----|----------|
 | D1 | The new capability query runs unconditionally on every clarify pass, with no domain-conditional branching. Grounded: `src/state/workflow-stage-graphs.mjs:88-100` registers exactly one other domain, `synthetic`, and it declares a single stage (`assembling` → `Execute`) with no `clarify` entry at all (`skillMap: { assembling: null }`) — `fgos-exploring` is today only ever reachable through the `coding` domain's `clarify` stage, so a domain gate would be dead code (YAGNI). |
 | D2 | The query call must pass `--dir "$root"` explicitly: `fgos tool`'s `query` sub-verb is `requiresExistingStore: true` (`src/cli/command-registry.mjs:750`), and this session's own cwd is a linked worktree — running the bare form here (`node bin/fgos.mjs tool query --capability impact-analysis --status present`, no `--dir`) was tested directly and failed exit 4: `.fgos/ not found ... check you are not inside a linked worktree (worktrees never carry .fgos/, per ADR0020)`. Add `tool` to fgos-exploring's own existing hard-rule bare-verb list (currently `add, ask, answer, decision, discover`) alongside this new call, and write the new step's example with `--dir "$root"` included — never the bare form. |
-| D3 | The resulting posture (`impact-analysis: inactive\|degraded\|full`) is recorded as a persisted line inside `CONTEXT.md` itself (this skill's own step 3 "Write the decision doc"), mirroring the exact recording shape `fgos-planning` already uses in `plan.md` (tsk-1e4's pattern: `fgos-planning/SKILL.md:97-98`) rather than a transient session-only status line. This is documentation only — `fgos-exploring` edits no code, produces no proof points, and the hard rule already forbids it from doing implementation-level reasoning, so the posture never gates or reshapes which candidate product decisions get asked at this stage. It is recorded purely so a later reader of this item's `CONTEXT.md` (a person, or `fgos-planning`'s own Orient step) sees the posture without re-deriving it — `fgos-planning`/`fgos-validating`/`fgos-executing` keep independently re-querying the live gate themselves exactly as tsk-1e4 already established; this item does not change that. |
+| D3 | The resulting posture (`impact-analysis: inactive\|degraded\|full`) is recorded as a persisted line inside `CONTEXT.md` itself (this skill's own step 3 "Write the decision doc"), mirroring the exact recording shape `fgos-planning` already uses in `plan.md` (tsk-1e4's pattern: `fgos-planning/SKILL.md:97-98`) rather than a transient session-only status line. This is documentation only — `fgos-exploring` edits no code, produces no proof points, and the hard rule already forbids it from doing implementation-level reasoning, so the posture never gates or reshapes which candidate product decisions get asked at this stage. It is recorded purely so a later reader of this item's `CONTEXT.md` (a person, or `fgos-planning`'s own Orient step) sees the posture without re-deriving it — `fgos-planning`/`fgos-validating`/`fgos-code-implement` keep independently re-querying the live gate themselves exactly as tsk-1e4 already established; this item does not change that. |
 
 ## Pinned assumptions (implementer-level)
 
@@ -48,7 +48,7 @@ file, no runtime code, no CLI surface changes.
 
 ## Scout evidence cited
 
-- `.claude/skills/fgos-executing/SKILL.md:64-71` — the executing-stage gate
+- `.claude/skills/fgos-code-implement/SKILL.md:64-71` — the executing-stage gate
   check pattern (posture drives whether the MUST-run-impact rule is
   Full/Degraded/Inactive).
 - `.claude/skills/fgos-planning/SKILL.md:94-100` — the planning-stage
@@ -78,7 +78,7 @@ file, no runtime code, no CLI surface changes.
 ## Deferred / explicitly out of scope
 
 - `fgos-planning/SKILL.md:95-96`, `fgos-validating/SKILL.md:83-84`, and
-  `fgos-executing/SKILL.md:67` each show their own `fgos tool query
+  `fgos-code-implement/SKILL.md:67` each show their own `fgos tool query
   --capability impact-analysis --status present` example without `--dir`,
   the identical gap D2 fixes here. They are state-touching bare verb calls
   subject to the same ADR0020 worktree failure. Fixing them is adjacent

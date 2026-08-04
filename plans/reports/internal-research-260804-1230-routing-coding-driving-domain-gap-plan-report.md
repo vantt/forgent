@@ -322,7 +322,7 @@ flowchart TB
     EXPLORE["fgos-exploring — clarify"]
     PLAN["fgos-planning — decompose / shaping"]
     VALIDATE["fgos-validating — decompose / proving"]
-    EXEC["fgos-executing — executing"]
+    EXEC["fgos-code-implement — executing"]
   end
 
   HUMAN(["a person opening a session"]) --> ROUTING
@@ -397,7 +397,7 @@ sequenceDiagram
   participant Explore as fgos-exploring
   participant Plan as fgos-planning
   participant Valid as fgos-validating
-  participant Exec as fgos-executing
+  participant Exec as fgos-code-implement
   participant Engine as engine verbs
 
   Cook->>Drive: drive(id, ceiling = none)

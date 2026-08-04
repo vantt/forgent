@@ -94,7 +94,7 @@ visibility (`view.decisions`).
   provider, `gitnexus`, `status: "present"` — AGENTS.md's impact-analysis
   gate reads **full**: `impact()` MUST be run (and its risk level reported)
   before editing `judge-executor.mjs`'s exported functions or their two
-  call sites, once this item reaches `fgos-executing`.
+  call sites, once this item reaches `fgos-code-implement`.
 - `git merge-base --is-ancestor 1f1788a main` (false) and
   `git branch --all --contains 1f1788a` (`fgw/tsk-5l2`, `fgw/tsk-g18`) — the
   base-branch integration gap and its existing in-repo precedent (D4).

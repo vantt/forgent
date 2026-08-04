@@ -85,7 +85,7 @@ separate filing, not fixed here.
 - `impact-analysis: full` — GitNexus registered and `present`
   (`fgos tool query --capability impact-analysis --status present`), so the
   CLAUDE.md impact-analysis gate applies at its normal strength once
-  implementation starts (`fgos-planning`/`fgos-executing`'s concern, not
+  implementation starts (`fgos-planning`/`fgos-code-implement`'s concern, not
   this skill's).
 
 ## Canonical references
