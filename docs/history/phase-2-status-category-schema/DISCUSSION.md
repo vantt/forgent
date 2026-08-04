@@ -50,9 +50,10 @@ lần chốt này) và `domainFields` nested per-domain (optional-additive).
 | 7 | `DOMAINS` registry runtime-addable hay code-only (acceptance clause 7) | **CHƯA RÕ, có thể ngoài phạm vi** | Câu hỏi kiến trúc riêng, không chặn việc thêm `statusLabels`/`statusCategory` vào registry hiện có (dù registry runtime hay code-only, format thêm field giống nhau). Đề xuất: KHÔNG quyết trong vòng discuss này trừ khi anh muốn gộp — nó không chặn Phase 2. |
 | 8 | Backfill vs lazy-default cho event cũ thiếu `statusCategory` (acceptance clause 6, câu hỏi mở #10 report) | **RÕ (D4)** | Backfill qua migration script, theo khuôn 2 tiền lệ có sẵn — không lazy-default (rủi ro L3 thật, xem D4). |
 | 9 | Test chứng minh thiết kế (acceptance clause 9) — domain giả lập thứ 2 có `statusLabels` riêng, chạy qua take/return/compound | **RÕ là cần, CHƯA có kế hoạch cụ thể** | `test/e2e/synthetic-domain.test.mjs` đã tồn tại làm tiền lệ hình dạng, nhưng domain `synthetic` hôm nay KHÔNG có transition nào cả (`transitions: []`) — không đủ để chứng minh domain-transition-riêng hoạt động đúng. Cần domain giả lập MỚI có bảng transition thật khác coding. |
-| 10 | Per-domain skill cho status `retrospective`/`cleanup` (phát sinh từ D1) | **CHƯA RÕ, gap thật** | Grep xác nhận `fgos-compounding` được gọi CỨNG cho mọi item tới `retrospective` (`retro-pool.mjs`, `bin/fgos.mjs:1012/1088`) — không tham số hoá theo domain. D1 giả định "khác nhau ở skill nào chạy retrospective/cleanup", nhưng cơ chế chọn skill đó theo domain CHƯA TỒN TẠI — cần thêm 1 map kiểu `skillMap` (đã có cho `stage`) nhưng cho status `retrospective`/`cleanup`, hoặc quyết định khác. Phạm vi việc này (bổ sung field mới trong `DOMAINS[domain]`) là 1 phần thật của Phase 2 nếu D1 đứng vững. |
+| 10 | Per-domain skill cho status `retrospective`/`cleanup` (phát sinh từ D1) | **RÕ (D5)** | Chỉ `retrospective` cần — tái dùng `skillMap` có sẵn, thêm key `'retrospective'`. `cleanup` không có khái niệm skill (pure harness, đọc code thật xác nhận), khác biệt per-domain đã có qua `worktreeBacked`. Sửa lại đúng phạm vi D1 (D1 nói cả 2 status đều cần skill — thực ra chỉ 1). |
 | 11 | Phạm vi chính xác "đoạn trước delivered" — `wontfix`/`blocked`/`awaiting-human` có nằm trong phần domain tự khai hay cũng cố định như đuôi | **RÕ (D2 + vòng 3 xác nhận)** | `blocked`/`awaiting-human`/`todo`/`doing`/`awaiting-approval` — domain sở hữu (per D1, xác nhận vòng 3: "trước deliver là chắc chắn khác nhau"). `wontfix` — domain sở hữu label (D2), map cố định category `canceled`. Toàn bộ 6 status đoạn đầu giờ đã xếp loại xong. |
 | 12 | Bảng map 6 status đoạn đầu → statusCategory (câu hỏi gốc ở gate, thu hẹp lại) | **RÕ (D3)** | Toàn bộ 6 status đoạn đầu đã map xong: `todo→todo`, `doing/blocked/awaiting-human→in-progress`, `awaiting-approval→review`, `wontfix→canceled` (D2). Đây chính là câu hỏi gốc treo ở gate của item — coi như đã trả lời đầy đủ, khác với đề xuất gốc ở chỗ phạm vi hẹp hơn 10 status (chỉ 6, nhờ D1 loại 4 status đuôi ra khỏi nhu cầu category). |
+| 13 | `domainFields` (nested per-domain field) — nằm trong tiêu đề gốc của `tsk-38t` nhưng chưa hề bàn tới trong 11 vòng đầu (chỉ bàn status/statusCategory) | **RÕ (D6, distill)** | Chốt nguyên theo thiết kế report gốc mục 3 — không sửa. Đối chiếu code thật xác nhận `domainFields`/`fieldSchema` chưa tồn tại, thiết kế report vẫn khớp 100% pattern hiện có (`EDITABLE_FIELDS`, `validateWorkShape`, tiền lệ `mergeAfter`), không như phần status đã bị code thật vượt qua. |
 
 ## 4. Quyết định đã chốt
 
@@ -62,6 +63,8 @@ lần chốt này) và `domainFields` nested per-domain (optional-additive).
 | D2 | `wontfix` ở lại đoạn ĐẦU (domain-owned label — coding giữ nguyên chữ `wontfix`, 0 migration) nhưng LUÔN map cố định vào `statusCategory: 'canceled'` — áp đúng cơ chế label/category đã có cho cả đoạn đầu, không phải luật riêng cho `wontfix`. Domain khác có thể tự đặt label khác (`declined`/`out-of-scope`) cùng map vào `canceled`. | ✅ `tsk-38t` seq 5585 |
 | D3 | Bảng map 5 status đoạn đầu còn lại → `statusCategory`: `todo→todo`, `doing→in-progress`, `blocked→in-progress`, `awaiting-human→in-progress`, `awaiting-approval→review`. Căn cứ tiền lệ đã ghi thành luật: `docs/history/status-proposed-rename/CONTEXT.md` D3 — "1 status cấp cao mới CHỈ khi có hiệu ứng cấu trúc riêng trên frontier/dependency graph; nếu không, gộp vào `awaiting-human`, phân biệt mịn hơn nằm ở field `reason`/`ask`/`answer`, không phải enum mới." `doing`/`blocked`/`awaiting-human` có hiệu ứng cấu trúc GIỐNG HỆT nhau trên `frontier.mjs` hôm nay (không cái nào trong `ready`-filter, không cái nào trong `RESOLVED_STATUSES`) → đúng luật này, gộp `in-progress`. Category `backlog`/`completed` tạm không status nào map (dự phòng, đúng khung Linear-style). | ✅ `tsk-38t` seq 5586 |
 | D4 | Backfill `statusCategory` cho event cũ qua 1 migration script (KHÔNG lazy-default derive-on-read), theo đúng khuôn 2 tiền lệ đã có (`migrate-status-proposed-to-awaiting-approval.mjs`, `migrate-actor-to-role.mjs`) — backup + dry-run report + khoá `withEventsLock` + phạm vi đúng 3 kho (live store, `dogfood-fixture/.fgos`, `fgos-test-drive/.fgos`). Áp bảng map D2/D3 cho ~1500+ `work.move` event sang 6 status đoạn đầu. Lý do: L3 (luật khoá) đòi hỏi replay-from-zero xác định tuyệt đối; lazy-default rủi ro thật vì `DOMAINS[domain].statusLabels` vẫn là code sửa được — sửa sau này sẽ làm 2 lần replay ra 2 kết quả khác nhau cho cùng 1 event cũ, vi phạm L3 rule 2. | ✅ `tsk-38t` seq 5589 |
+| D5 | Cơ chế skill-per-domain chỉ cần cho `retrospective` — tái dùng field `skillMap` đã có trong `DOMAINS[domain]` (không thêm field mới), thêm key `'retrospective'` (mặc định `fgos-compounding` cho coding, 0 regression); `fgOS:retro-next` đổi từ gọi cứng sang tra `getDomain(item.domain).skillMap['retrospective']`. `cleanup` GIỮ NGUYÊN pure-harness, không cần skill nào — khác biệt per-domain đã đủ qua field `worktreeBacked` có sẵn. | ✅ `tsk-38t` seq 5595 |
+| D6 | `domainFields` chốt NGUYÊN theo thiết kế report gốc (mục 3), không sửa: field optional `domainFields: { [domainName]: {...} }` trên work item, optional-additive (RUL11); ghi qua 2 cửa sẵn có (`add` payload, `edit` thêm vào `EDITABLE_FIELDS`); patch **ghi đè toàn object** mỗi lần (latest-wins, không deep-merge); chỉ namespace khớp `work.domain` hiện tại được đọc/validate; validate qua optional `fieldSchema` khai trong `DOMAINS[domain]` (giống `skillMap`); fold qua spread-fold sẵn có. (Distill từ report — xem §5.) | ✅ `tsk-38t` seq 5602 |
 
 ## 5. Q&A log
 
@@ -132,6 +135,25 @@ lần chốt này) và `domainFields` nested per-domain (optional-additive).
   Đề xuất backfill (không lazy-default, vì lazy-default rủi ro vi phạm L3
   nếu `DOMAINS[coding].statusLabels` bị sửa sau này). **Trả lời:** "chấp
   nhận." — xác nhận không đổi qua 2 vòng → chốt **D4**.
+- **2026-08-04 (vòng 11, hỏi + chốt D5):** Bàn §3 #10. Scout:
+  `fgos-routing/SKILL.md` dòng 109-111 tự xác nhận `retrospective` KHÔNG đi
+  qua `skillMap`/`skillForStage` domain-aware có sẵn, bị bắc cầu riêng
+  cứng; đọc code thật `fgos cleanup` xác nhận nó KHÔNG gọi skill nào cả
+  (pure harness) — sửa lại giả định D1 (D1 nói cả 2 status cần skill, thực
+  ra chỉ `retrospective`). Đề xuất: tái dùng `skillMap` thêm key
+  `retrospective`; `cleanup` giữ nguyên harness. **Trả lời:** "ok" — xác
+  nhận không đổi qua 2 vòng → chốt **D5**.
+- **2026-08-04 (vòng 12, distill domainFields → D6):** Anh hỏi
+  `fgOS:coding-shape-distill` có dùng vào đâu không. Nhận ra khoảng hở:
+  `domainFields` nằm trong tiêu đề gốc `tsk-38t` nhưng 11 vòng đầu chưa hề
+  bàn tới. Chọn hướng (a) — gọi hình thức `fgOS:coding-shape-distill`,
+  trích nguồn `plans/reports/research-260730-0931-...-report.md` mục 3
+  "Nested domain fields", nạp vào ĐÚNG file này (không tạo file mới, đúng
+  luật D3). Đối chiếu code thật (`store.mjs` `EDITABLE_FIELDS`, `work.mjs`
+  `validateWorkShape`) xác nhận domainFields/fieldSchema chưa tồn tại,
+  thiết kế report chưa bị vượt qua (khác hẳn phần status). Trình bày thiết
+  kế trích ra, hỏi xác nhận. **Trả lời:** "chốt nguyên theo report gốc" —
+  chốt **D6**.
 
 ## 6. Thiết kế đã chốt {#design}
 
@@ -221,11 +243,117 @@ status-proposed-to-awaiting-approval.mjs`) ghi cứng `statusCategory` vào
 `DOMAINS[coding].statusLabels` vẫn là code sửa được, derive-on-read sẽ vỡ
 L3 (replay-from-zero xác định) nếu bảng đó bị sửa sau này.
 
-**Còn treo, chưa đủ để viết task cụ thể (§7):** thiết kế cơ chế
-skill-per-domain cho retrospective/cleanup (§3 #10) — cần ít nhất 1 vòng
-nữa trước khi §7 tách được task đầy đủ. Bảng map status→category (§3 #12)
-và backfill (§3 #8) đã xong (D2/D3/D4).
+**Skill-per-domain cho `retrospective` (D5):** thêm key `'retrospective'`
+vào `skillMap` đã có trong `DOMAINS[domain]` (`workflow-stage-graphs.mjs`),
+mặc định `fgos-compounding` cho coding — 0 regression. `fgOS:retro-next`
+đổi tra cứu từ gọi cứng sang `getDomain(item.domain).skillMap['retrospective']`.
+`cleanup` không đổi gì — pure harness, khác biệt per-domain đã đủ qua
+`worktreeBacked`.
+
+**`domainFields` (D6, distill từ report, độc lập kỹ thuật với status/category):**
+field optional `domainFields: { [domainName]: {...} }` trên work item —
+ghi qua 2 cửa sẵn có (`add`/`edit`, thêm vào `EDITABLE_FIELDS`), ghi đè
+toàn object mỗi lần (không deep-merge), validate qua optional `fieldSchema`
+khai trong `DOMAINS[domain]`, chỉ namespace khớp `work.domain` hiện tại
+được đọc. Không đụng FSM/status/category — độc lập hoàn toàn với D1-D5, có
+thể code song song, không tranh file (`store.mjs`'s `EDITABLE_FIELDS` +
+`work.mjs`'s `validateWorkShape`, khác vùng với `status-fsm.mjs`/
+`frontier.mjs` mà D1-D5 chạm).
+
+**Còn treo, ngoài phạm vi quyết định thiết kế (việc thật thi hành, không
+chặn §7):** doc `triage-table-columns.md` lệch code (§3 #6, độc lập, không
+phụ thuộc quyết định nào ở đây); kế hoạch test domain giả lập thứ 2 chứng
+minh thiết kế (§3 #9, cần cho "done" nhưng là việc lập kế hoạch, không
+phải quyết định thiết kế); `DOMAINS` registry runtime-addable (§3 #7,
+tường minh ngoài phạm vi, không chặn). Toàn bộ 5 quyết định thiết kế
+(D1-D5) đã đủ chín để tách task cụ thể ở §7.
 
 ## 7. Danh mục hạng mục / task {#tasks}
 
-*(chưa tách — thiết kế chưa đủ cụ thể để chia task)*
+### Decision record supersede D1-D3 {#task-supersede-decision-record}
+**Mục tiêu:** viết decision record mới, đúng khuôn `0024` supersede `0006`,
+supersede thật `base-workflow-model` D1-D3 ("domain không bao giờ chi phối
+bảng chuyển-status") — TRƯỚC khi code, liệt kê đủ mọi consumer `fsm.mjs`/
+`status-fsm.mjs`/`STATUSES` hôm nay. Trích §6: domain sở hữu bảng
+transition riêng CHỈ cho nhóm đầu (6 status), không phải toàn bộ 10.
+**D-ID áp dụng:** D1. **Quan hệ:** tiền đề bắt buộc trước mọi task khác —
+không task nào dưới đây nên code trước khi decision record này tồn tại.
+**Verify nháp:** decision record tồn tại ở `docs/decisions/`, liệt đủ danh
+sách consumer (audit thật, không suy đoán).
+
+### Schema: statusCategory + registry {#task-schema-status-category}
+**Mục tiêu:** thêm `STATUS_CATEGORIES` (`work.mjs`), thêm `statusLabels`
+cho domain `coding` trong `DOMAINS` registry (`workflow-stage-graphs.mjs`)
+theo đúng bảng D2/D3, đóng băng `statusCategory` lúc ghi event
+(`work.add`/`work.move` trong `store.mjs`) — không derive-on-read.
+**D-ID áp dụng:** D2, D3. **Quan hệ:** phụ thuộc task supersede-decision-
+record; là nền cho task consumer-migration và backfill. **Verify nháp:**
+test mới xác nhận `work.move` ghi đúng `statusCategory` theo bảng, item cũ
+(chưa backfill) đọc `statusCategory: undefined` không throw.
+
+### Backfill statusCategory cho event cũ {#task-backfill-status-category}
+**Mục tiêu:** viết migration script mới, khuôn `migrate-status-proposed-
+to-awaiting-approval.mjs`, backfill ~1500+ `work.move` event cũ theo bảng
+D2/D3, chạy đủ 3 kho (live, `dogfood-fixture/.fgos`, `fgos-test-drive/.fgos`),
+có `--backup` + dry-run report. **D-ID áp dụng:** D4. **Quan hệ:** phụ
+thuộc task schema (cần bảng map đã code xong để backfill đúng). **Verify
+nháp:** dry-run report khớp số event, chạy thật trên bản backup trước, đối
+chiếu `git diff` chỉ thêm field `statusCategory`, không đổi giá trị khác.
+
+### Consumer migration sang statusCategory {#task-consumer-migration}
+**Mục tiêu:** audit đủ + đổi mọi cơ chế domain-agnostic thật đọc literal
+status sang đọc category — tối thiểu: `frontier.mjs`'s `ready` filter
+(`status==='todo'` → category), `RESOLVED_STATUSES` (hỗn hợp literal 4 tên
+đuôi + `category==='canceled'`, xem §6), rollup, outcome/friction,
+discovery-judge. **D-ID áp dụng:** D1, D2, D3 (định hình category nào map
+vào đâu). **Quan hệ:** phụ thuộc task schema; song song được với task
+backfill (không tranh file, `frontier.mjs`/`store.mjs` khác nhau). **Verify
+nháp:** test full-suite hiện có xanh (0 regression coding), test mới cho
+từng consumer với item domain giả lập có label khác coding.
+
+### skillMap['retrospective'] per-domain {#task-skillmap-retrospective}
+**Mục tiêu:** thêm key `'retrospective'` vào `skillMap` của `DOMAINS[coding]`
+(mặc định `fgos-compounding`), đổi `fgOS:retro-next` từ gọi cứng sang tra
+`getDomain(item.domain).skillMap['retrospective']`. **D-ID áp dụng:** D5.
+**Quan hệ:** độc lập kỹ thuật với các task trên (đụng
+`workflow-stage-graphs.mjs` + skill file `fgOS:retro-next`, không tranh
+file với schema/backfill/consumer-migration) — làm trước/sau/song song
+đều được. **Verify nháp:** domain giả lập thứ 2 (xem task test dưới) với
+`skillMap.retrospective` khác `fgos-compounding` — `fgOS:retro-next` load
+đúng skill đó, không phải `fgos-compounding`.
+
+### domainFields nested per-domain {#task-domain-fields}
+**Mục tiêu:** thêm field optional `domainFields` — schema (`work.mjs`'s
+`validateWorkShape`, validate namespace khớp domain qua optional
+`fieldSchema` khai trong `DOMAINS[domain]`), ghi (`work.add` payload +
+thêm `domainFields` vào `EDITABLE_FIELDS` trong `store.mjs`), fold (qua
+spread sẵn có, không sửa gì thêm). **D-ID áp dụng:** D6. **Quan hệ:** độc
+lập hoàn toàn với mọi task status/category ở trên (khác vùng file, không
+đụng FSM) — làm trước/sau/song song đều được, kể cả trước khi decision
+record supersede D1-D3 tồn tại (D6 không đụng base-workflow-model D1-D3).
+**Verify nháp:** test mới — `work.add`/`work.edit` với `domainFields` hợp
+lệ/không hợp lệ theo `fieldSchema` của 1 domain giả lập; item cũ không có
+`domainFields` replay y hệt (0 byte thay đổi).
+
+### Test domain giả lập thứ 2 chứng minh thiết kế {#task-second-domain-test}
+**Mục tiêu:** domain giả lập MỚI (khác `synthetic`/`triage` hôm nay — cần
+bảng transition status THẬT khác coding, `statusLabels` riêng,
+`skillMap.retrospective` riêng, và nay cộng thêm `fieldSchema` riêng cho
+`domainFields`), chạy qua `take`/`return`/`compound`/`retrospective`/
+`cleanup` — chứng minh domain-owned status/category/skill/field hoạt động
+đúng, không chỉ khai báo suông (đúng tinh thần
+`test/e2e/synthetic-domain.test.mjs` nhưng domain hiện có không đủ, xem §3
+#9). **D-ID áp dụng:** D1-D6 (test toàn bộ thiết kế). **Quan hệ:** phụ
+thuộc TẤT CẢ task trên (chỉ chạy được sau khi schema/consumer-migration/
+skillMap/domainFields đã code xong) — task cuối cùng trước khi coi Phase 2
+là done. **Verify nháp:** `npm test` xanh với fixture domain mới, assertion
+domain đó đi qua đúng bảng transition/category/skill/field riêng của nó,
+KHÔNG lẫn sang bảng của coding.
+
+### Doc gap: triage-table-columns.md {#task-triage-doc-gap}
+**Mục tiêu:** cập nhật `docs/reference/triage-table-columns.md` — đang liệt
+7 status cũ, lệch 10 status thật hôm nay (độc lập với category, gap có
+thật từ trước Phase 2). **D-ID áp dụng:** không (fact-gap, không phải
+quyết định thiết kế). **Quan hệ:** độc lập hoàn toàn — làm bất kỳ lúc nào,
+không chặn/bị chặn bởi task nào khác. **Verify nháp:** doc liệt đủ 10
+status, khớp `STATUSES` trong `work.mjs`.
