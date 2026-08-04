@@ -72,7 +72,7 @@ function applyEvent(view, event) {
       // own claim shape.
       // Guarded on `from !== 'awaiting-human'` (claim-lock §5.1): a resume out
       // of the human gate can now legally land on `doing` (the new
-      // awaiting-human -> doing edge, fsm.mjs), but that is a RESUME of an
+      // awaiting-human -> doing edge, status-fsm.mjs), but that is a RESUME of an
       // existing claim, never a fresh one. In practice only `claimRole` is
       // at real risk (answerAwaiting's caller, bin/fgos.mjs's `answer` verb,
       // forwards `role: 'human'` but never headAtTake/branchHeadAtTake/
@@ -231,7 +231,7 @@ function applyEvent(view, event) {
       // `done`-closing work.move carries an additive `learning` object
       // composed by store.mjs (never here — replay only folds, per D3).
       // Mirrors frictions/discovery's fold rule: APPENDED per id, never
-      // merged/replaced. `done` is terminal (fsm.mjs — no outgoing edge) so
+      // merged/replaced. `done` is terminal (status-fsm.mjs — no outgoing edge) so
       // in practice at most one learning record ever accumulates per id, but
       // the append shape stays consistent with the other occurrence-style
       // channels. `learnings` is a LAZY key exactly like

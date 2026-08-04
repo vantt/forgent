@@ -3,8 +3,8 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { transitionStage } from '../../src/state/stage.mjs';
-import { FsmError } from '../../src/state/fsm.mjs';
+import { transitionStage } from '../../src/state/stage-fsm.mjs';
+import { FsmError } from '../../src/state/status-fsm.mjs';
 import { addWork, moveStage, addDiscovery, listWork, categoryOf, readRawEvents } from '../../src/state/store.mjs';
 
 function work(stage, overrides = {}) {

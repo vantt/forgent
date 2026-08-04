@@ -6213,7 +6213,7 @@ test('review --github --pr reports a gh status-check failure as plain output wit
 
 // Builds on makeRunnerProposedItem: proposes a ROOT/standalone runner item,
 // then parks it blocked with `reason` via the real awaiting-approval -> blocked edge
-// (fsm.mjs's own reason requirement on that edge, same as the existing
+// (status-fsm.mjs's own reason requirement on that edge, same as the existing
 // 'approve of a runner item that conflicts' test above) so item.reason is
 // genuine, not synthesized.
 function makeBlockedRunnerItem(cwd, id, reason, extra = {}) {
@@ -6501,7 +6501,7 @@ test('init runs a second time (idempotent) and rewrites coexistence.json with th
 // `blocked` item that already carries a live `fgw/<id>` branch (parked by
 // the runner after too many visits, or a rejected proposal whose branch
 // survives): `take` claims it via the existing blocked -> doing edge
-// (fsm.mjs:69), discriminated by `branchHeadAtTake` — the BRANCH's own HEAD,
+// (status-fsm.mjs:69), discriminated by `branchHeadAtTake` — the BRANCH's own HEAD,
 // never the main-based `headAtTake`; `return` verifies on the branch itself,
 // in a disposable DETACHED worktree, and never inspects or touches the
 // human's own main checkout (D2: "tree người là việc của người"). ----------

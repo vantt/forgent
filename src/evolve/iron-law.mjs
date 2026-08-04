@@ -23,17 +23,18 @@ const MODULE_RULES = [
   { kind: 'prefix', value: 'src/evolve/' },
   { kind: 'equals', value: 'bin/fgos.mjs' },
   { kind: 'equals', value: 'src/state/store.mjs' },
-  { kind: 'equals', value: 'src/state/fsm.mjs' },
+  { kind: 'equals', value: 'src/state/status-fsm.mjs' },
   // Iron Law's own risk vocabulary (review-20260717-self-improve-base-workflow
   // finding f1): without these two, a diff that narrows HEAVY_KEYWORDS or
   // reweights classify.mjs's tiering silently gets required:false — the gate
   // has no coverage of the files that define what it's supposed to flag.
   { kind: 'equals', value: 'src/intake/risk-keywords.mjs' },
   { kind: 'equals', value: 'src/intake/classify.mjs' },
-  // review-20260718-self-improve-loop finding f03: domains.mjs defines each
-  // domain's legal FSM stage-transition table, the same capability fsm.mjs
-  // already covers above — missing it let a diff widen a domain's legal
-  // transitions (e.g. skip a stage) with required:false.
+  // review-20260718-self-improve-loop finding f03: workflow-stage-graphs.mjs
+  // defines each domain's legal FSM stage-transition table, the same
+  // capability status-fsm.mjs already covers above — missing it let a diff
+  // widen a domain's legal transitions (e.g. skip a stage) with
+  // required:false.
   { kind: 'equals', value: 'src/state/workflow-stage-graphs.mjs' },
 ];
 

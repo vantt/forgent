@@ -20,7 +20,7 @@ test('DOMAINS.coding.stages is the pre-retrofit work.mjs STAGES value — compou
   assert.deepEqual(DOMAINS.coding.stages, ['clarify', 'decompose', 'executing']);
 });
 
-test('DOMAINS.coding.transitions is the pre-retrofit stage.mjs STAGE_TRANSITIONS value — the executing->compound-learn edge is retired (D11)', () => {
+test('DOMAINS.coding.transitions is the pre-retrofit stage-fsm.mjs STAGE_TRANSITIONS value — the executing->compound-learn edge is retired (D11)', () => {
   assert.deepEqual(DOMAINS.coding.transitions, [
     { from: 'clarify', to: 'executing' },
     { from: 'clarify', to: 'decompose' },

@@ -579,7 +579,7 @@ test('resolveDiscovery on an unclear verdict writes the discovery record and par
 // already-parked item) on an item that is ALREADY `awaiting-human` used to
 // throw when the verdict came back unclear again, because `putInAwaiting`
 // always attempts a real `awaiting-human` -> `awaiting-human` status
-// transition and fsm.mjs has no self-transition edge for it. A second
+// transition and status-fsm.mjs has no self-transition edge for it. A second
 // consecutive unclear call must now succeed: item stays parked, discovery
 // history gains the new entry, no throw.
 test('resolveDiscovery on a SECOND consecutive unclear verdict for an already-awaiting-human item does not throw, and still records the new verdict', () => {

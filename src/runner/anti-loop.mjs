@@ -42,7 +42,7 @@ export const MAX_VISITS = 3;
  * `work.add` and any later `work.stage` moves) — the two fields
  * frontier.mjs's own eligibility check reads, nothing else. A missing stage
  * reads as the domain's Execute stage (D8 lazy default), same as
- * frontier.mjs and stage.mjs.
+ * frontier.mjs and stage-fsm.mjs.
  */
 function countableDoingMoveIndexes(events, id) {
   const indexes = new Set();
@@ -114,10 +114,10 @@ export function visitCount(events, id) {
  * Trigger-set is CLOSED (D1c) and keyed on `role === 'human'` plus payload
  * shape — never on a `from` field:
  *   - `payload.answer !== undefined` — the item left `awaiting-human` via a
- *     human's answer (`answerAwaiting`, fsm.mjs's `awaiting-human -> todo`
+ *     human's answer (`answerAwaiting`, status-fsm.mjs's `awaiting-human -> todo`
  *     edge; the only edge `answer` appears on).
  *   - `payload.reason !== undefined` — a human's reject/park-with-reason
- *     (fsm.mjs's `awaiting-approval -> todo`/`awaiting-approval -> blocked` edges; the runner's
+ *     (status-fsm.mjs's `awaiting-approval -> todo`/`awaiting-approval -> blocked` edges; the runner's
  *     own reason-carrying parks, e.g. `anti-loop-max-visits`/`breaker-tripped`,
  *     stamp `role: 'runner'`, and `return`/`approve`'s own internal park edges
  *     stamp `role: 'system'` (D30) — neither ever matches here).

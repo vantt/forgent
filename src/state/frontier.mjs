@@ -3,7 +3,7 @@
 // reads the `view` object it is handed (built by replay.mjs's `foldEvents`
 // / `rebuildView`, or a literal view in tests) and returns a derived array.
 // It never mutates `view` and never writes an event (the one exception is a
-// diagnostic `console.warn` via domains.mjs on a genuinely unrecognized
+// diagnostic `console.warn` via workflow-stage-graphs.mjs on a genuinely unrecognized
 // `item.domain` value — never a throw, see base-workflow-model D2/D3).
 import { getDomain, stageForStep } from './workflow-stage-graphs.mjs';
 //
@@ -18,7 +18,7 @@ import { getDomain, stageForStep } from './workflow-stage-graphs.mjs';
 // domain — per stage-clarify D1: an item still at stage `clarify` is not
 // yet "ready to start" no matter its status — `fgos ready` would otherwise
 // lie about items that have not passed context-discovery; domain-aware per
-// base-workflow-model D2/D3, domains.mjs) AND no open descendant (per
+// base-workflow-model D2/D3, workflow-stage-graphs.mjs) AND no open descendant (per
 // stage-decompose D4/D5: an item that was decomposed stays
 // anchored — excluded from the frontier — for as long as any item reachable
 // through the `parent` chain below it is not yet 'done'; this is a lineage
@@ -91,7 +91,7 @@ export function frontier(view, { step = 'Execute' } = {}) {
     const item = work[id];
     if (item.status !== 'todo') continue;
     // Domain-aware per base-workflow-model D2/D3: an unrecognized
-    // item.domain never throws here (domains.mjs's fail-safe) — it folds to
+    // item.domain never throws here (workflow-stage-graphs.mjs's fail-safe) — it folds to
     // 'coding' with a diagnostic warning, so a corrupt/rolled-back domain
     // value can never wedge the frontier derive itself.
     const domain = getDomain(item.domain);
@@ -115,7 +115,7 @@ export function frontier(view, { step = 'Execute' } = {}) {
 // the same deps-done + no-open-descendant clauses `frontier` enforces,
 // minus its stage clause — for a caller that intentionally wants to claim
 // an item still at `clarify`/`decompose` (status and stage are independent
-// axes, fsm.mjs; the same stance `pick`'s explicit-`--id` branch already
+// axes, status-fsm.mjs; the same stance `pick`'s explicit-`--id` branch already
 // takes) while still refusing a genuinely-blocked item (unmet dep, or
 // anchored by an open decomposed child) — those two reasons stay real
 // "not dispatchable" regardless of stage.
@@ -163,7 +163,7 @@ function indexChildrenByParent(work) {
 
 // A status is RESOLVED when nothing further will happen to an item that
 // could still change the CODE/graph state a dependent or lineage check
-// cares about — the FSM's two fully-terminal states (fsm.mjs: zero
+// cares about — the FSM's two fully-terminal states (status-fsm.mjs: zero
 // outgoing edges from either), 'done' (actually built) and, per
 // fsm-wontfix-terminal-status D1/D4, 'wontfix' (deliberately closed
 // without being built, symmetric with 'done') — PLUS, per work-item-

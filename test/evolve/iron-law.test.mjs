@@ -31,7 +31,7 @@ const MODULE_TRIP_CASES = [
   'src/evolve/iron-law.mjs',   // prefix src/evolve/
   'bin/fgos.mjs',              // equals (whole entry file stands in for the evolve verb)
   'src/state/store.mjs',       // equals (D14)
-  'src/state/fsm.mjs',         // equals (D14)
+  'src/state/status-fsm.mjs',  // equals (D14)
   'src/intake/risk-keywords.mjs', // equals (review-20260717-self-improve-base-workflow f1)
   'src/intake/classify.mjs',      // equals (review-20260717-self-improve-base-workflow f1)
   'src/state/workflow-stage-graphs.mjs',        // equals (review-20260718-self-improve-loop f03)
@@ -84,9 +84,9 @@ test('classifyIronLaw trips required for every self-modifying module path via fi
 });
 
 test('classifyIronLaw lists every matching filesChanged entry in matchedModules', () => {
-  const files = ['src/runner/loop.mjs', 'README.md', 'src/state/fsm.mjs'];
+  const files = ['src/runner/loop.mjs', 'README.md', 'src/state/status-fsm.mjs'];
   const result = classifyIronLaw({ filesChanged: files, description: undefined });
-  assert.deepEqual(result.matchedModules, ['src/runner/loop.mjs', 'src/state/fsm.mjs']);
+  assert.deepEqual(result.matchedModules, ['src/runner/loop.mjs', 'src/state/status-fsm.mjs']);
   assert.equal(result.required, true);
 });
 

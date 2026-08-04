@@ -964,7 +964,7 @@ export async function runOnce(options = {}) {
       // "at the Clarify step" / "at the Divide step" — 'clarify'/'decompose'
       // for the 'coding' domain, byte-for-byte the literal checks this sweep
       // used before the retrofit. An unrecognized item.domain never throws
-      // here (domains.mjs's fail-safe) — it folds to 'coding' with a
+      // here (workflow-stage-graphs.mjs's fail-safe) — it folds to 'coding' with a
       // diagnostic log line instead, so a corrupt/rolled-back domain value
       // can never wedge the sweep.
       for (const item of Object.values(listWork(dir).work)) {
