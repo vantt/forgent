@@ -26,11 +26,11 @@ import { readGateBypassLevel } from '../src/state/gate-bypass.mjs';
 import { resolveFgosDir, fgosDirFromRoot } from '../src/runner/paths.mjs';
 import { resolveDiscovery } from '../src/intake/discovery.mjs';
 import { resolveDecompose } from '../src/intake/decompose.mjs';
-import { computeEntropy, computeCounts } from '../src/report/entropy.mjs';
+import { computeEntropy, computeCounts, FINAL_STATUSES } from '../src/report/entropy.mjs';
 import { buildEnduserIndex, QUADRANTS, QUADRANT_DIR_ALIASES, findSourceCaptureIds } from '../src/report/enduser-index.mjs';
 import { rankCandidates } from '../src/evolve/candidates.mjs';
 import { rankImpact } from '../src/state/impact.mjs';
-import { RESOLVED_STATUSES } from '../src/state/frontier.mjs';
+import { isResolvedStatus } from '../src/state/frontier.mjs';
 import { mergeReadiness } from '../src/state/graph-harness.mjs';
 import { paginate } from '../src/state/cursor.mjs';
 import { runGoalCheck } from '../src/runner/goal-check.mjs';
@@ -541,7 +541,11 @@ function assertNoPriorBlockedOutcome(view, id) {
 
 function collectMissingOutcomeNag(view, id) {
   const outcomes = view.outcomes ?? {};
-  const FINAL_STATUSES = new Set(['awaiting-approval', 'blocked', 'delivered', 'retrospective', 'cleanup', 'done']);
+  // FINAL_STATUSES: shared with entropy.mjs (decision record 0027's audit
+  // §2 flagged this file's copy and entropy.mjs's copy as drifted-apart
+  // duplicates — see entropy.mjs's own doc comment on the export for the
+  // reconciled reasoning). Imported, not redeclared, so the two files can
+  // never drift apart again.
   const missing = Object.values(view.work ?? {})
     .filter((w) => (!id || w.id === id) && FINAL_STATUSES.has(w.status) && !outcomes[w.id]?.actual)
     .map((w) => w.id);
@@ -1359,6 +1363,20 @@ async function runVerb(verb, flags, positional, dir) {
     }
 
     case 'list': {
+      // External consumer note (decision record 0027's audit §5, tsk-38t-4):
+      // `herdr-plugin/src/fgos.rs` (a separate Rust crate outside this Node
+      // project's own build/test surface — its own Cargo.toml, not an npm
+      // workspace member) parses THIS verb's `--all --json` stdout and
+      // filters on literal `item.status == "doing" || item.status ==
+      // "awaiting-approval"` to build its "in-process" pane. It reads
+      // `status` directly, not `statusCategory` — today harmless (`coding`
+      // is the only domain that ever writes those two literal strings), but
+      // a future domain that relabels its own doing/awaiting-approval-
+      // equivalent statuses would silently break this Rust consumer unless
+      // it is updated separately (it cannot be fixed from this file; a JSON
+      // shape change here is a public contract this external process reads).
+      // Left untouched by tsk-38t-4 on purpose — Rust code outside this
+      // repo's own Node test/build surface is out of that item's scope.
       const rawView = listWork(dir);
       // Single-item lookup (tsk-42m D1/D2): `--id` bypasses the open-only
       // default and `--all` entirely -- naming a specific id already
@@ -1388,7 +1406,7 @@ async function runVerb(verb, flags, positional, dir) {
       const showAll = Boolean(flags.all);
       const view = showAll
         ? rawView
-        : { ...rawView, work: Object.fromEntries(Object.entries(rawView.work).filter(([, item]) => !RESOLVED_STATUSES.has(item.status))) };
+        : { ...rawView, work: Object.fromEntries(Object.entries(rawView.work).filter(([, item]) => !isResolvedStatus(item))) };
       // Parent-anchored context (str61 D1/D2/D3): additive-only key,
       // computed fresh from `view` on every read (D1 — never a persisted
       // "session"), never touching store.listWork itself. Only

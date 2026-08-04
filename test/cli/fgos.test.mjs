@@ -2248,6 +2248,25 @@ test('check nags items sitting in a final status without their actual half (port
   assert.deepEqual(missingOutcomeNag, { count: 1, ids: ['nag-item'] });
 });
 
+// tsk-38t-4 (decision record 0027's audit §2): bin/fgos.mjs's FINAL_STATUSES
+// used to be a locally-declared Set here, separate from and inconsistent
+// with entropy.mjs's own local copy. It now imports the single shared
+// export from entropy.mjs instead — this test locks that a tail-segment
+// status (delivered, reached via the mechanical move chain, not the normal
+// doing->awaiting-approval addOutcome stamp) still nags, unchanged by the
+// refactor from a local Set to a shared import.
+test('check still nags an item sitting at "delivered" (a tail-segment status) without its actual half, after the FINAL_STATUSES local-Set-to-shared-import refactor', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'nag-item-delivered');
+  toProposed(cwd, 'nag-item-delivered');
+  run(cwd, ['move', 'nag-item-delivered', '--to', 'delivered']);
+
+  const result = run(cwd, ['check']);
+  assert.equal(result.status, 0);
+  const { missingOutcomeNag } = envelopeData(result.stdout);
+  assert.deepEqual(missingOutcomeNag, { count: 1, ids: ['nag-item-delivered'] });
+});
+
 test('check output on a log with no friction and no final-status gaps is unchanged — no friction data, no nag', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'clean-item');

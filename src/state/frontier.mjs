@@ -89,7 +89,7 @@ export function frontier(view, { step = 'Execute' } = {}) {
   const ready = [];
   for (const id of Object.keys(work)) {
     const item = work[id];
-    if (item.status !== 'todo') continue;
+    if (!isTodoStatus(item)) continue;
     // Domain-aware per base-workflow-model D2/D3: an unrecognized
     // item.domain never throws here (workflow-stage-graphs.mjs's fail-safe) — it folds to
     // 'coding' with a diagnostic warning, so a corrupt/rolled-back domain
@@ -104,11 +104,28 @@ export function frontier(view, { step = 'Execute' } = {}) {
     if (executeStage === undefined) continue;
     if ((item.stage ?? executeStage) !== executeStage) continue;
     if (hasOpenDescendant(id, work, childrenByParent)) continue;
-    const depsReady = item.deps.every((dep) => RESOLVED_STATUSES.has(work[dep]?.status));
+    const depsReady = item.deps.every((dep) => isResolvedStatus(work[dep]));
     if (depsReady) ready.push(item);
   }
   ready.sort(compareReadyOrder);
   return ready;
+}
+
+// True when `item` is at the front-segment "not yet started" bucket (per
+// decision record 0027, D2/D3: statusCategory 'todo') — used by the `ready`
+// filter above so a domain that relabels its "not started" status away from
+// the literal string 'todo' is still picked up correctly (frontier.mjs:92
+// row of 0027's own audit table). Reads `item.statusCategory` when present;
+// falls back to the literal `item.status === 'todo'` comparison when it is
+// NOT present (an item written before tsk-38t-2 stamped this field at all,
+// or an item whose domain declares no `statusLabels` at all, e.g.
+// `synthetic`/`triage` today) — this is a fallback to the pre-existing
+// field, never a derive-on-read of the category table itself (which
+// platform-foundations.md's L3 forbids, see STATUS_CATEGORIES's own doc
+// comment in work.mjs), so it stays safe under replay-from-zero.
+function isTodoStatus(item) {
+  if (item.statusCategory !== undefined) return item.statusCategory === 'todo';
+  return item.status === 'todo';
 }
 
 // Stage-independent readiness (choke-point-take-vs-pick-claim-eligibility):
@@ -125,7 +142,7 @@ export function isDepsAndLineageReady(view, id) {
   if (!item) return false;
   const childrenByParent = indexChildrenByParent(work);
   if (hasOpenDescendant(id, work, childrenByParent)) return false;
-  return item.deps.every((dep) => RESOLVED_STATUSES.has(work[dep]?.status));
+  return item.deps.every((dep) => isResolvedStatus(work[dep]));
 }
 
 // v2 comparator (D2/D6): priority ASC absent-last, then intent DESC
@@ -161,29 +178,55 @@ function indexChildrenByParent(work) {
   return index;
 }
 
-// A status is RESOLVED when nothing further will happen to an item that
-// could still change the CODE/graph state a dependent or lineage check
-// cares about — the FSM's two fully-terminal states (status-fsm.mjs: zero
-// outgoing edges from either), 'done' (actually built) and, per
-// fsm-wontfix-terminal-status D1/D4, 'wontfix' (deliberately closed
-// without being built, symmetric with 'done') — PLUS, per work-item-
-// status-delivered-retrospective-cleanup D13, every status from
-// `delivered` onward (`delivered`/`retrospective`/`cleanup`): once code is
-// merged (`delivered`), retrospective synthesis and worktree cleanup are
-// administrative/learning steps that never change the code itself, so a
-// dependent has no reason to keep waiting on them (frontier.mjs's own
-// original D5 comment already defined 'done' for THIS purpose as "accepted
-// into the main tree" — `delivered` is the precise, earlier match for that
-// definition; the old 'done'-only set conflated "merged" with "fully
-// closed out"). `fgos rollup`'s progress-reporting count is a SEPARATE
-// module and intentionally does NOT share this set — it still counts
-// strict `done` only. Exported so every other consumer that needs "is this
-// item resolved enough to stop counting it as open" (deps-readiness in
-// this module's own `depsReady`, plus claim-port.mjs/impact.mjs/
-// graph-metrics.mjs/entropy.mjs/graph-harness.mjs — see
-// wontfix-terminal-status-filter-consistency D1/D2/D3) shares this one set
-// instead of separate ad-hoc re-declarations.
-export const RESOLVED_STATUSES = new Set(['delivered', 'retrospective', 'cleanup', 'done', 'wontfix']);
+// An item is RESOLVED when nothing further will happen to it that could
+// still change the CODE/graph state a dependent or lineage check cares
+// about. Per decision record 0027 (D1/D2, `docs/decisions/0027-domain-so-
+// huu-status-doan-truoc-delivered-supersede-base-workflow-model-d1-d3.md`)
+// this is now a HYBRID read, not a flat literal Set, because the 10
+// statuses split into two groups with different rules (0027's own audit,
+// §"Hệ quả 1 chi tiết", `docs/history/phase-2-status-category-schema/
+// DISCUSSION.md` §6):
+//   - the FOUR tail-segment statuses (`delivered`/`retrospective`/
+//     `cleanup`/`done`) never get relabeled by any domain (D1) — literal
+//     status is sufficient for them forever, checked first below;
+//   - `wontfix` is a front-segment, domain-OWNED label that always maps to
+//     `statusCategory: 'canceled'` (D2) — a domain that relabels it (e.g.
+//     `declined`) must still be recognized as resolved, which a literal
+//     `'wontfix'` string match could never do. Reading `item.statusCategory
+//     === 'canceled'` instead is the whole point of this migration
+//     (tsk-38t-4): every domain-agnostic consumer that used to `.has()` a
+//     flat Set now calls `isResolvedStatus(item)` (the WHOLE item, not just
+//     a status string — reading category needs the item) instead.
+// `item.statusCategory` is frozen at write time only (store.mjs's
+// addWork/moveWork) and NEVER derived on read (platform-foundations.md's L3
+// — see STATUS_CATEGORIES's own doc comment, work.mjs) — an item written
+// before tsk-38t-2 landed this field, or whose domain declares no
+// `statusLabels` at all (`synthetic`/`triage` today), carries no
+// `statusCategory`. For those, this falls back to the literal `'wontfix'`
+// string — the ONLY front-segment status this set has ever recognized —
+// so pre-migration data keeps replaying exactly as before (never a
+// derive-on-read of the category table itself, only a fallback to the
+// pre-existing `status` field, the same lazy-default shape every other
+// optional-additive field in this codebase already uses).
+//
+// `fgos rollup`'s progress-reporting count is a SEPARATE mechanism and
+// intentionally does NOT share this function — it still counts strict
+// `done` only. Exported so every other consumer that needs "is this item
+// resolved enough to stop counting it as open" (deps-readiness in this
+// module's own `depsReady`/`isDepsAndLineageReady`, plus claim-port.mjs/
+// impact.mjs/graph-metrics.mjs/entropy.mjs/graph-harness.mjs/
+// drift-status.mjs — see wontfix-terminal-status-filter-consistency D1/D2/D3
+// and 0027's own audit §2) shares this one function instead of separate
+// ad-hoc re-declarations.
+const TAIL_RESOLVED_STATUSES = new Set(['delivered', 'retrospective', 'cleanup', 'done']);
+const LEGACY_CANCELED_STATUS = 'wontfix';
+
+export function isResolvedStatus(item) {
+  if (!item) return false;
+  if (TAIL_RESOLVED_STATUSES.has(item.status)) return true;
+  if (item.statusCategory !== undefined) return item.statusCategory === 'canceled';
+  return item.status === LEGACY_CANCELED_STATUS;
+}
 
 // True when `id` has any descendant (direct child, or a descendant reachable
 // through further `parent` chains below a child) whose status is not yet
@@ -199,7 +242,7 @@ function hasOpenDescendant(id, work, childrenByParent, seen = new Set()) {
     seen.add(childId);
     const child = work[childId];
     if (!child) continue;
-    if (!RESOLVED_STATUSES.has(child.status)) return true;
+    if (!isResolvedStatus(child)) return true;
     if (hasOpenDescendant(childId, work, childrenByParent, seen)) return true;
   }
   return false;
