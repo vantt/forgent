@@ -84,10 +84,34 @@ export const DOMAINS = Object.freeze({
     // item/verify/`fgos return` vocabulary. `fgos-compounding` no longer
     // has a stage entry (D11) — it now triggers on status `retrospective`
     // instead, driven by the retrospective loop, not this stage->skill map.
+    //
+    // `retrospective` (decision record 0027, D5 — `docs/history/phase-2-
+    // status-category-schema/DISCUSSION.md`'s §"skillMap['retrospective']
+    // per-domain" task and its D5 log entry, vòng 11): the same `skillMap`
+    // field reused for a fourth key, this one a `status` name rather than a
+    // `stage` name — the two vocabularies never collide (`retrospective` is
+    // not, and will never be, one of coding's three stage names), and
+    // `skillForStage`/`statusCategoryFor`'s own precedent already treats
+    // "which lookup table a key belongs to" as the caller's concern, not
+    // this object's. D5 rejected adding a second field (e.g. a standalone
+    // `retrospectiveSkill`) specifically because `skillMap` already exists
+    // for exactly this "stage/status -> skill" shape — a second field would
+    // just be the same lookup duplicated. `fgos-compounding` here is the
+    // current, correct, zero-regression default (coding's synthesis skill
+    // does not change): `fgOS:retro-next` used to call `fgos-compounding`
+    // unconditionally; per D5 it now resolves this key
+    // (`getDomain(item.domain).skillMap.retrospective`) instead, falling
+    // back to `fgos-compounding` when a domain declares none, mirroring
+    // `skillForStage`'s own null-safe shape. `cleanup` gets no entry here
+    // at all (D5, confirmed by reading `fgos cleanup`'s real implementation
+    // in `bin/fgos.mjs`/`cleanup-harness.mjs`): it is pure harness, no skill
+    // ever loads for it, and its own per-domain difference is already fully
+    // carried by the existing `worktreeBacked` field below.
     skillMap: Object.freeze({
       clarify: 'fgos-exploring',
       decompose: 'fgos-planning',
       executing: 'fgos-code-implement',
+      retrospective: 'fgos-compounding',
     }),
     // work-item-status-delivered-retrospective-cleanup D5/D8 (deferred
     // item from CONTEXT.md): does this domain's items go through a real
