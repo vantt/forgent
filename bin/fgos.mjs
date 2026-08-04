@@ -3710,7 +3710,7 @@ function renderPretty(verb, data) {
     lines.push(bold('fgos doctor'));
     if (data.fixed) {
       for (const f of data.fixed) {
-        lines.push(formatCheck(f.changed, `fix: ${f.id}`, f.message));
+        lines.push(formatCheck(true, `fix: ${f.id}`, f.message));
       }
     }
     for (const c of data.checks) {
