@@ -201,3 +201,48 @@ test('classify newly tiers every keyword in the newly-added set as heavy (intend
     assert.equal(result.risk, 'heavy', `"${keyword}" should risk heavy`);
   }
 });
+
+// --- word-boundary matching (tsk-2as D1): a keyword must not match as a
+// substring inside a longer, unrelated word, for BOTH classifyIronLaw and
+// classify — both share the same matchesKeyword helper (risk-keywords.mjs).
+
+test('classifyIronLaw does not match "auth" as a substring inside "authoring"', () => {
+  const result = classifyIronLaw({
+    filesChanged: [],
+    description: 'does NOT duplicate fgos-exploring authoring logic',
+  });
+  assert.equal(result.required, false);
+  assert.deepEqual(result.matchedFlags, []);
+});
+
+test('classifyIronLaw still matches "auth" as a standalone word', () => {
+  const result = classifyIronLaw({ filesChanged: [], description: 'fix the auth flow' });
+  assert.equal(result.required, true);
+  assert.ok(result.matchedFlags.includes('auth'));
+});
+
+test('classify does not tier "authoring" text as heavy via the "auth" substring', () => {
+  const result = classify('does NOT duplicate fgos-exploring authoring logic');
+  assert.equal(result.tier, 'standard');
+  assert.equal(result.risk, 'standard');
+});
+
+test('classify still tiers a standalone "auth" mention as heavy', () => {
+  const result = classify('fix the auth flow');
+  assert.equal(result.tier, 'heavy');
+  assert.equal(result.risk, 'heavy');
+});
+
+test('classify still tiers a real Vietnamese diacritic keyword as heavy (word-boundary regression)', () => {
+  const result = classify('phát hiện sự cố bảo mật nghiêm trọng');
+  assert.equal(result.tier, 'heavy');
+  assert.equal(result.risk, 'heavy');
+});
+
+test('classify does not match a Vietnamese diacritic keyword lacking a real word boundary', () => {
+  // The 'bảo mật' phrase glued directly onto surrounding letters, with no
+  // boundary character before 'b' or after 't' -- must not match, the same
+  // way 'auth' must not match inside 'authoring'.
+  const result = classify('xbảo mậty là một chuỗi test không liên quan');
+  assert.equal(result.tier, 'standard');
+});
