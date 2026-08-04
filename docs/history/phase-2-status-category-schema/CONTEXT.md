@@ -75,8 +75,18 @@ Toàn bộ 6 D-ID đã ghi qua `fgos decision --id tsk-38t` (seq 5571, 5585,
 - **Shaping quyết định:** `tsk-38t` có nên split thành các item con khớp 8
   task ở DISCUSSION.md §7 hay giữ 1 item chạy tuần tự — đây là phán đoán
   của `fgos-planning`, không phải của skill này.
-- **`verify` command cho item** — hiện `"chưa xác định — P15 bổ sung"`,
-  chưa xác định. Thuộc phạm vi implementer.
+- **`verify` command cho item** — CHƯA xác định được, và đã thử 4 lần qua
+  `fgos discover --verdict clear` (2026-08-04), cả 4 đều bị second-pass
+  judge bác vì lý do đúng: không lệnh shell 1 dòng nào chứng minh được các
+  bất biến hành vi thật của Phase 2 (statusCategory đóng băng lúc ghi
+  event chứ không derive-on-read, bảng transition status riêng per-domain,
+  domainFields validate qua fieldSchema, decision record supersede 0006)
+  khi CHƯA có test thật. Đây đúng là giới hạn cấu trúc của việc gọi
+  `discover` cho 1 item pre-decompose, phức tạp — thuộc đúng phạm vi
+  `fgos-planning` (viết test plan thật theo §7 DISCUSSION.md, mỗi task có
+  verify riêng), không phải việc đoán thêm ở `fgos-exploring`. `verify`
+  field của item cha hiện để tạm `npm test` (rào hồi quy tối thiểu),
+  `fgos-planning` cần thay bằng verify thật khi tách task/child item.
 - **§3 #6 (doc `triage-table-columns.md` lệch code)** và **§3 #7 (`DOMAINS`
   registry runtime-addable)** — cả 2 độc lập, không chặn, để `fgos-planning`
   quyết có gộp vào cùng đợt hay tách riêng.
