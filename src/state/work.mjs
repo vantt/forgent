@@ -94,6 +94,46 @@ export const STATUSES = Object.freeze([
 ]);
 
 /**
+ * The fixed `statusCategory` domain (per decision record 0027, D2/D3 —
+ * `docs/decisions/0027-domain-so-huu-status-doan-truoc-delivered-supersede-
+ * base-workflow-model-d1-d3.md`; pinned terms in `docs/history/phase-2-
+ * status-category-schema/CONTEXT.md`) — a lossy compression of the six
+ * front-segment statuses (`todo`/`doing`/`blocked`/`awaiting-human`/
+ * `awaiting-approval`/`wontfix`; see `DOMAINS[domain].statusLabels`,
+ * `workflow-stage-graphs.mjs`) that lets every domain-agnostic mechanism of
+ * fgOS (frontier's `ready` filter, rollup, outcome/friction,
+ * discovery-judge — none of them migrated yet, that is tsk-38t-4's own
+ * scope) read "which bucket is this item in" without learning a domain's
+ * own status vocabulary. Frozen onto the event payload at write time
+ * (`store.mjs`'s `addWork`/`moveWork`), NEVER derived on read: `docs/
+ * platform-foundations.md`'s L3 replay-from-zero law requires that
+ * replaying the same log twice always yields the same view, and a value
+ * computed at read time from `DOMAINS[domain].statusLabels` (itself
+ * ordinary, editable code) could replay differently after that table
+ * changes — an outcome L3 forbids.
+ *
+ * The full six-value set is declared upfront, Linear-style, even though
+ * `backlog` and `completed` have no status mapped into either of them
+ * today — 0027's own reasoning is to match Linear's pattern of a closed
+ * category set defined up front, not "add a category only once a status
+ * needs it" (which would make the set an implementation detail of whichever
+ * domain happens to exist today, rather than a stable contract other
+ * domains and domain-agnostic readers can rely on). The four tail-segment
+ * statuses (`delivered`/`retrospective`/`cleanup`/`done`) never map into
+ * any of these six — D1 holds literal status is sufficient for them
+ * forever — so a move into one of those four carries no `statusCategory`
+ * at all, rather than being forced into `completed` or any other value.
+ */
+export const STATUS_CATEGORIES = Object.freeze([
+  'backlog',
+  'todo',
+  'in-progress',
+  'review',
+  'completed',
+  'canceled',
+]);
+
+/**
  * Tier domain for `work.tier` (per D6) — the cost/cognitive weight a work
  * item self-declares; the runner (Epic 3) maps tier -> model via a config
  * table at dispatch time. PROVISIONAL: this is the minimal placeholder set
