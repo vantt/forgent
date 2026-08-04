@@ -30,6 +30,7 @@ import { appendJudgeFailLog } from './judge-fail-log.mjs';
 import { readLockedContext, resolveContentRoot } from './decompose.mjs';
 import { DEFAULTS } from '../state/work.mjs';
 import { listWork, moveStage, addDiscovery, addDecision, putInAwaiting, editWork, StoreError } from '../state/store.mjs';
+import { getDomain, stageForStep } from '../state/workflow-stage-graphs.mjs';
 import { graphMetrics } from '../state/graph-metrics.mjs';
 import { rankImpact } from '../state/impact.mjs';
 import { computeImpact, computePriority } from '../state/priority-formula.mjs';
@@ -592,8 +593,8 @@ export function resolveDiscovery(dir, id, cfg, role, callerVerdict) {
       // verify value today, both get the guard").
       moveStage(dir, {
         id,
-        to: 'decompose',
-        expectedStage: 'clarify',
+        to: stageForStep(getDomain(work.domain), 'Divide'),
+        expectedStage: stageForStep(getDomain(work.domain), 'Clarify'),
         verify: hasRealVerify(work.verify) ? work.verify : (view.gates?.[id]?.contextApprove?.verify ?? FALLBACK_VERIFY),
         role,
       });
@@ -662,8 +663,8 @@ export function resolveDiscovery(dir, id, cfg, role, callerVerdict) {
 
     moveStage(dir, {
       id,
-      to: 'decompose',
-      expectedStage: 'clarify',
+      to: stageForStep(getDomain(work.domain), 'Divide'),
+      expectedStage: stageForStep(getDomain(work.domain), 'Clarify'),
       verify,
       role,
     });

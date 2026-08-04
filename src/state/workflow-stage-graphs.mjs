@@ -32,12 +32,15 @@
 // 'synthetic' (Slice 2, D1/D4) is an illustrative, disposable second domain
 // that exists only to prove a non-coding domain runs on the same base FSM —
 // it declares exactly one stage, mapped only to 'Execute'. It deliberately
-// maps no stage to 'Clarify'/'Divide': discovery.mjs/decompose.mjs are
-// hardcoded to coding's literal stage names and were never retrofitted
-// (approach.md's Boundary correction) — a domain reaching a Clarify/Divide-
-// mapped stage would get its stage silently overwritten with a coding
-// literal outside its own stages list. Keeping 'synthetic' single-stage/
-// Execute-only sidesteps that gap entirely rather than papering over it.
+// maps no stage to 'Clarify'/'Divide': synthetic has no test coverage for
+// that path (tsk-3xo) and staying single-stage/Execute-only keeps it that
+// way on purpose, rather than being forced to exercise it. discovery.mjs/
+// decompose.mjs now resolve the stage name for any domain via
+// stageForStep(getDomain(work.domain), step) (tsk-3xo) — a domain reaching
+// a Clarify/Divide-mapped stage is handled correctly, not silently
+// overwritten; before tsk-3xo, the hardcoded coding literals underneath
+// would throw a loud FsmError on a stage-name mismatch (stage.mjs's
+// transitionStage), never a silent overwrite.
 
 /** The domain every item without an explicit `domain` field belongs to —
  * matches today's implicit, exclusively-coding behavior (D2). */
@@ -109,6 +112,37 @@ export const DOMAINS = Object.freeze({
     // same base FSM") — the cleanup harness must not hold it to a
     // merge-still-resolves check it was never claiming in the first
     // place.
+    worktreeBacked: false,
+  }),
+  // 'triage' (tsk-3xo) is a second illustrative, disposable domain, same
+  // spirit as 'synthetic' above — it exists only as a regression fixture
+  // proving a non-coding domain can cross Clarify/Divide-mapped stages
+  // under non-coding-literal stage names (the exact gap tsk-3xo fixed:
+  // discovery.mjs/decompose.mjs's moveStage calls and bin/fgos.mjs's CLI
+  // gates used to hardcode 'clarify'/'decompose'/'executing' literally).
+  // Mirrors coding's 3-step shape (Clarify -> Divide -> Execute) with
+  // different literal names so a regression back to a hardcoded coding
+  // literal fails loudly instead of silently passing.
+  triage: Object.freeze({
+    stages: Object.freeze(['triage', 'shaping', 'assembling']),
+    stepMap: Object.freeze({
+      triage: 'Clarify',
+      shaping: 'Divide',
+      assembling: 'Execute',
+    }),
+    transitions: Object.freeze([
+      Object.freeze({ from: 'triage', to: 'assembling' }),
+      Object.freeze({ from: 'triage', to: 'shaping' }),
+      Object.freeze({ from: 'shaping', to: 'assembling' }),
+    ]),
+    // No skill ever loads for this fixture domain, same reasoning as
+    // 'synthetic' above.
+    skillMap: Object.freeze({
+      triage: null,
+      shaping: null,
+      assembling: null,
+    }),
+    // Disposable, no real worktree/merge — same reasoning as 'synthetic'.
     worktreeBacked: false,
   }),
 });

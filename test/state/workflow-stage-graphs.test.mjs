@@ -12,8 +12,25 @@ test('DEFAULT_DOMAIN is "coding"', () => {
   assert.equal(DEFAULT_DOMAIN, 'coding');
 });
 
-test('DOMAINS has exactly two entries: "coding" and "synthetic"', () => {
-  assert.deepEqual(Object.keys(DOMAINS), ['coding', 'synthetic']);
+test('DOMAINS has exactly three entries: "coding", "synthetic", and "triage"', () => {
+  assert.deepEqual(Object.keys(DOMAINS), ['coding', 'synthetic', 'triage']);
+});
+
+test('DOMAINS.triage (tsk-3xo regression fixture) maps Clarify/Divide/Execute under non-coding-literal stage names', () => {
+  assert.deepEqual(DOMAINS.triage.stages, ['triage', 'shaping', 'assembling']);
+  assert.deepEqual(DOMAINS.triage.stepMap, {
+    triage: 'Clarify',
+    shaping: 'Divide',
+    assembling: 'Execute',
+  });
+  assert.deepEqual(DOMAINS.triage.transitions, [
+    { from: 'triage', to: 'assembling' },
+    { from: 'triage', to: 'shaping' },
+    { from: 'shaping', to: 'assembling' },
+  ]);
+  assert.equal(stageForStep(DOMAINS.triage, 'Clarify'), 'triage');
+  assert.equal(stageForStep(DOMAINS.triage, 'Divide'), 'shaping');
+  assert.equal(stageForStep(DOMAINS.triage, 'Execute'), 'assembling');
 });
 
 test('DOMAINS.coding.stages is the pre-retrofit work.mjs STAGES value — compound-learn retired (D11)', () => {
