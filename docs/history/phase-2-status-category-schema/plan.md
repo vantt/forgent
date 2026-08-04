@@ -76,23 +76,23 @@ since these children don't exist yet to compare):**
 
 Eight pieces — one honest piece each does not cover this item (the
 `weak proof` flag alone means each needs its own real verify, not one
-combined one). Each carries `parent: tsk-38t`.
+combined one). Created (2026-08-04), each `parent: tsk-38t`:
 
-1. **Decision record: supersede base-workflow-model D1-D3**
+1. **`tsk-38t-1`** — Decision record: supersede base-workflow-model D1-D3
    verify: `grep -lq "2ae492d8" docs/decisions/*.md 2>/dev/null`
-2. **Schema: statusCategory + domain registry (D2/D3)**
+2. **`tsk-38t-2`** (deps: `tsk-38t-1`) — Schema: statusCategory + domain registry (D2/D3)
    verify: `node -e "import('./src/state/work.mjs').then(m=>process.exit(m.STATUS_CATEGORIES?0:1))"`
-3. **Backfill statusCategory for historical events (D4)**
-   verify: `node -e "const l=require('fs').readFileSync('.fgos/events.jsonl','utf8').trim().split('\n').map(JSON.parse);const f=['todo','doing','blocked','awaiting-human','awaiting-approval','wontfix'];const m=l.filter(e=>e.type==='work.move'&&f.includes(e.payload?.to));process.exit(m.length&&m.every(e=>e.payload.statusCategory)?0:1)"`
-4. **Consumer migration to statusCategory** (frontier ready-filter, `RESOLVED_STATUSES` hybrid, rollup, outcome/friction, discovery-judge)
+3. **`tsk-38t-3`** (deps: `tsk-38t-2`) — Backfill statusCategory for historical events (D4)
+   verify: checks every historical front-segment `work.move` event carries `statusCategory`
+4. **`tsk-38t-4`** (deps: `tsk-38t-2`) — Consumer migration to statusCategory (frontier ready-filter, `RESOLVED_STATUSES` hybrid, rollup, outcome/friction, discovery-judge)
    verify: `npm test`
-5. **skillMap['retrospective'] per-domain (D5)**
+5. **`tsk-38t-5`** (deps: `tsk-38t-1`) — skillMap['retrospective'] per-domain (D5)
    verify: `node -e "import('./src/state/workflow-stage-graphs.mjs').then(g=>process.exit(g.DOMAINS.coding.skillMap.retrospective?0:1))"`
-6. **domainFields nested per-domain (D6)**
+6. **`tsk-38t-6`** (deps: `tsk-38t-1`) — domainFields nested per-domain (D6)
    verify: `grep -q "'domainFields'" src/state/store.mjs`
-7. **Test domain giả lập thứ 2 chứng minh thiết kế**
-   verify: `node -e "import('./src/state/workflow-stage-graphs.mjs').then(g=>{const d=Object.keys(g.DOMAINS).filter(k=>!['coding','synthetic','triage'].includes(k));process.exit(d.length&&g.DOMAINS[d[0]].transitions.length?0:1)})" && npm test`
-8. **Doc gap: triage-table-columns.md**
+7. **`tsk-38t-7`** (deps: `tsk-38t-2`,`tsk-38t-3`,`tsk-38t-4`,`tsk-38t-5`,`tsk-38t-6`) — Test domain giả lập thứ 2 chứng minh thiết kế
+   verify: confirms a real non-fixture domain with actual transitions exists, plus `npm test`
+8. **`tsk-38t-8`** (no deps) — Doc gap: triage-table-columns.md
    verify: `grep -q "delivered" docs/reference/triage-table-columns.md`
 
 ## Assumptions (unproven, flagged for `fgos-validating`)
