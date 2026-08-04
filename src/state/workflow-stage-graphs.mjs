@@ -1,15 +1,15 @@
-// domains.mjs — domain registry (per base-workflow-model D1-D3): a domain
+// workflow-stage-graphs.mjs — domain registry (per base-workflow-model D1-D3): a domain
 // declares (a) its ordered macro-stage list, (b) which base-workflow step
 // (Init/Clarify/Divide/Execute/Compound-learn, work-item-lifecycle-vision.md
 // §2) each of its stages satisfies, and (c) the legal {from,to} stage-move
-// edges for that domain — the same shape stage.mjs's own (pre-retrofit,
+// edges for that domain — the same shape stage-fsm.mjs's own (pre-retrofit,
 // coding-only) STAGE_TRANSITIONS carried, one level up.
 //
 // LAYER: kernel, same as work.mjs. work.mjs's validateWork must look up this
 // registry (D3, item 4), and work.mjs is already the kernel layer — putting
 // this module any shallower (e.g. "domain") would make work.mjs's import of
 // it an upward import, which test/architecture.test.mjs's one-way-down check
-// forbids. Every other consumer (frontier.mjs, loop.mjs, stage.mjs — all
+// forbids. Every other consumer (frontier.mjs, loop.mjs, stage-fsm.mjs — all
 // "domain" layer, shallower than kernel) importing a kernel-layer module is
 // the same direction they already use for work.mjs itself, so this is not a
 // new import shape, only a new file.
@@ -20,13 +20,13 @@
 // throw, so every hot-path consumer (frontier.mjs, loop.mjs) can call it
 // unconditionally.
 //
-// 'coding' reproduces work.mjs's pre-retrofit STAGES and stage.mjs's
+// 'coding' reproduces work.mjs's pre-retrofit STAGES and stage-fsm.mjs's
 // pre-retrofit STAGE_TRANSITIONS byte-for-byte (base-workflow-model D2, zero
 // behavior change). The 'compound-learn' stage (compound-learn-enduser-docs
 // D2) that used to close this list is RETIRED (work-item-status-delivered-
 // retrospective-cleanup D11, supersedes RUL49/RUL50/RUL51) — the synthesis
 // layer this stage used to gate is now the status `retrospective`'s job
-// (see fsm.mjs), not a stage. Init is the only base-workflow step left
+// (see status-fsm.mjs), not a stage. Init is the only base-workflow step left
 // outside the `stage` dimension.
 //
 // 'synthetic' (Slice 2, D1/D4) is an illustrative, disposable second domain
@@ -52,7 +52,7 @@ export const DOMAINS = Object.freeze({
   coding: Object.freeze({
     // Pre-retrofit work.mjs STAGES value — 'compound-learn' retired (D11):
     // the synthesis layer it used to gate is now the status `retrospective`
-    // (fsm.mjs), not a stage entry here.
+    // (status-fsm.mjs), not a stage entry here.
     stages: Object.freeze(['clarify', 'decompose', 'executing']),
     // Maps each of coding's stages to the base-workflow step it satisfies.
     // Init and Compound-learn are the two base-workflow steps that now
@@ -63,7 +63,7 @@ export const DOMAINS = Object.freeze({
       decompose: 'Divide',
       executing: 'Execute',
     }),
-    // Pre-retrofit stage.mjs STAGE_TRANSITIONS value — the
+    // Pre-retrofit stage-fsm.mjs STAGE_TRANSITIONS value — the
     // executing -> compound-learn edge is retired along with the stage
     // itself (D11).
     transitions: Object.freeze([
@@ -158,7 +158,7 @@ export const DOMAINS = Object.freeze({
  * folds to `DEFAULT_DOMAIN`, but never silently: it reports itself via
  * `onUnrecognized` when supplied, otherwise a single `console.warn` line.
  * This function never throws, by design — callers in a hot dispatch loop
- * (frontier.mjs, loop.mjs) and a precondition check (stage.mjs) all rely on
+ * (frontier.mjs, loop.mjs) and a precondition check (stage-fsm.mjs) all rely on
  * that.
  */
 export function resolveDomainName(name, { onUnrecognized } = {}) {

@@ -483,7 +483,7 @@ test('foldEvents does not fold claimRole/headAtTake on a non-doing move even whe
 });
 
 // claim-lock §5.1/§7: a resume out of awaiting-human onto `doing` (the new
-// fsm.mjs edge) is NOT a fresh claim — it must never clobber the
+// status-fsm.mjs edge) is NOT a fresh claim — it must never clobber the
 // claimRole/headAtTake/branchHeadAtTake/claimTrigger the ORIGINAL pick/take
 // already folded, no matter what `role` the answer itself carries.
 test('foldEvents does not re-fold claimRole/headAtTake/claimTrigger on an awaiting-human -> doing resume (answer never overwrites the original claim)', () => {

@@ -211,6 +211,14 @@
     "quadrant": "explanation",
     "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
     "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/decisions/0026-vision-orchestrator-roottask-capacity-native-vs-cli-spawn.md",
+    "title": "0026 — Native-First Dispatch Doctrine: orchestrator/rootTask/capacity",
+    "sourceCaptureId": null
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/explanation/acceptance-evidence-traceability-gate.md",
     "title": "Why `work.acceptance` gets a narrow write-time evidence-traceability check",
     "sourceCaptureId": "tsk-5q5-2"
@@ -251,9 +259,33 @@
     "quadrant": "explanation",
     "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
     "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/context-md-enforcement-scope.md",
+    "title": "Why CONTEXT.md enforcement is scoped to (b) OR (c), and why it's hard",
+    "sourceCaptureId": "tsk-47e"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/explanation/decisions-locked-with-a-person-still-need-restating-to-the-machine-judge.md",
     "title": "Why decisions already locked and approved by a person still had to be restated to the engine's own clarify judge",
     "sourceCaptureId": "tsk-52g"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/direct-branch-checkout-on-main-checkout-instead-of-worktree.md",
+    "title": "Why a work branch must never be `git checkout`'d directly on the main checkout",
+    "sourceCaptureId": "tsk-4hk"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/discovery-decompose-reporoot-verify-overwrite.md",
+    "title": "Why `fgos discover` could overwrite an already-locked `verify` command",
+    "sourceCaptureId": "tsk-1ni"
   },
   {
     "quadrant": "explanation",
@@ -315,9 +347,33 @@
     "quadrant": "explanation",
     "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
     "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/fgos-retro-loop-and-the-restored-compound-verb.md",
+    "title": "Why `/fgOS:retro-loop` restores the `compound` verb instead of inventing a new one",
+    "sourceCaptureId": "tsk-3o3"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/explanation/fgos-return-executes-verify-as-a-literal-shell-command.md",
     "title": "Explanation: `fgos return` runs `verify` as a literal shell command — a placeholder string is not special-cased",
     "sourceCaptureId": "tsk-iun"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/fgos-self-uninstall-package-removal-spike.md",
+    "title": "Can fgOS reliably remove its own installed package?",
+    "sourceCaptureId": "tsk-4iv-2"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/fgos-uninstall-feature-overview.md",
+    "title": "Why `fgos uninstall` shipped as two pieces",
+    "sourceCaptureId": "tsk-4iv"
   },
   {
     "quadrant": "explanation",
@@ -389,7 +445,7 @@
     "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/explanation/judge-verdict-second-pass-semantic-check.md",
     "title": "Why judgeDiscovery/judgeDecompose run a second, independent judge pass on `verify`",
-    "sourceCaptureId": "tsk-5q5-1"
+    "sourceCaptureId": "tsk-5q5"
   },
   {
     "quadrant": "explanation",
@@ -422,6 +478,14 @@
     "docPath": "docs/explanation/main-checkout-lock-release-on-exit-opt-in.md",
     "title": "Why `acquireMainCheckoutLock`'s release-on-exit is opt-in, never the default",
     "sourceCaptureId": "tsk-45z"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/main-checkout-lock-toctou-race.md",
+    "title": "Why `.fgos/main-checkout.lock` could report AMBIGUOUS with no real contention",
+    "sourceCaptureId": "tsk-2tm"
   },
   {
     "quadrant": "explanation",
@@ -683,6 +747,14 @@
     "quadrant": "how-to",
     "purpose": "Show the steps to accomplish one specific, already-understood goal.",
     "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/branch-fgos-coding-driving-claim-step-by-domain-worktreebacked.md",
+    "title": "How to branch fgos-coding-driving's claim step by a domain's worktreeBacked flag",
+    "sourceCaptureId": "tsk-5y5"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
     "docPath": "docs/how-to/check-rollup-progress.md",
     "title": "How to check a root item's progress with `fgos rollup`",
     "sourceCaptureId": "doc-fgos-rollup-howto"
@@ -726,6 +798,14 @@
     "docPath": "docs/how-to/close-out-a-work-item-already-done-before-claim.md",
     "title": "How to close out a work item whose real work was already done before this claim",
     "sourceCaptureId": "tsk-4on"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/configure-a-capacity-to-dispatch-via-a-named-agent.md",
+    "title": "How to configure a capacity to dispatch via a named agent instead of a raw command",
+    "sourceCaptureId": "tsk-3sw"
   },
   {
     "quadrant": "how-to",
@@ -851,6 +931,22 @@
     "quadrant": "how-to",
     "purpose": "Show the steps to accomplish one specific, already-understood goal.",
     "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/make-discover-decompose-domain-aware-via-stageforstep.md",
+    "title": "Make a hardcoded stage check domain-aware via `stageForStep`",
+    "sourceCaptureId": "tsk-3xo"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/pass-a-caller-supplied-verdict-to-discover-or-decompose.md",
+    "title": "How to pass a caller-supplied verdict to `fgos discover`/`fgos decompose`",
+    "sourceCaptureId": "tsk-27y"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
     "docPath": "docs/how-to/poll-fgos-cli-data-from-a-rust-plugin.md",
     "title": "Poll fgOS CLI data from a Rust plugin",
     "sourceCaptureId": "tsk-19y-2"
@@ -907,9 +1003,25 @@
     "quadrant": "how-to",
     "purpose": "Show the steps to accomplish one specific, already-understood goal.",
     "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/reuse-the-shared-capacity-dispatch-fallback-fragment.md",
+    "title": "How to reuse the shared capacity-dispatch-fallback fragment in a new skill",
+    "sourceCaptureId": "tsk-53h"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
     "docPath": "docs/how-to/run-a-state-verb-from-inside-a-worktree.md",
     "title": "How to run a state-writing `fgos` verb from inside a picked worktree",
     "sourceCaptureId": "tsk-56t"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/safely-reset-the-main-checkout.md",
+    "title": "How to safely `git reset --hard` the main checkout",
+    "sourceCaptureId": "tsk-3au"
   },
   {
     "quadrant": "how-to",
@@ -955,6 +1067,14 @@
     "quadrant": "how-to",
     "purpose": "Show the steps to accomplish one specific, already-understood goal.",
     "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/uninstall-fgos-wiring.md",
+    "title": "Reverse `fgos setup`'s wiring with `fgos uninstall`",
+    "sourceCaptureId": "tsk-4iv-1"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
     "docPath": "docs/how-to/verify-herdr-cockpit-reuses-existing-tab-instead-of-losing-one.md",
     "title": "How to verify herdr cockpit reuses its existing tab instead of overwriting yours",
     "sourceCaptureId": "tsk-3i3"
@@ -963,9 +1083,25 @@
     "quadrant": "how-to",
     "purpose": "Show the steps to accomplish one specific, already-understood goal.",
     "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/wait-out-an-active-main-checkout-lock-holder.md",
+    "title": "How to wait out a genuinely active main-checkout lock holder",
+    "sourceCaptureId": "tsk-2rf"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
     "docPath": "docs/how-to/wire-a-headless-function-through-an-agent-executor-capacity.md",
     "title": "How to wire a headless function through an agent-executor capacity",
     "sourceCaptureId": "tsk-2yp"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/wire-a-skill-through-the-native-vs-cli-spawn-dispatch-decision.md",
+    "title": "How to wire a skill's dispatch of a capacity or subTask through the native-vs-cli/spawn decision",
+    "sourceCaptureId": "tsk-3ik"
   },
   {
     "quadrant": "how-to",
@@ -1014,6 +1150,14 @@
     "docPath": "docs/reference/gate-bypass-config.md",
     "title": "Gate-bypass config",
     "sourceCaptureId": "tsk-6bx-1"
+  },
+  {
+    "quadrant": "reference",
+    "purpose": "Describe the machinery accurately and completely for lookup.",
+    "audience": "A user who needs precise facts about a specific field/command/API.",
+    "docPath": "docs/reference/judge-fail-safe-debug-log-fields.md",
+    "title": "judge fail-safe debug log",
+    "sourceCaptureId": "tsk-5d2"
   },
   {
     "quadrant": "reference",

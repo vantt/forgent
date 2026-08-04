@@ -4,8 +4,8 @@
 // PURE: no fs import, no disk writes of any kind. This module only decides
 // whether a transition is legal and, if so, RETURNS the validated event for
 // the caller to append — disk writes belong to the store
-// (porting-store.mjs), never here. Mirrors fsm.mjs's separation of concerns,
-// but this is a SIBLING module: it shares zero lines with fsm.mjs/work.mjs
+// (porting-store.mjs), never here. Mirrors status-fsm.mjs's separation of concerns,
+// but this is a SIBLING module: it shares zero lines with status-fsm.mjs/work.mjs
 // and does not import from them (D5 — porting is its own domain, not a
 // generalization of the work-item FSM).
 //
@@ -14,7 +14,7 @@
 // modeled here.
 //
 // Terminal states (ported, adapted, rejected) are single-door-in, zero-door-
-// out, same discipline as fsm.mjs's `done`: no entry in TRANSITIONS has
+// out, same discipline as status-fsm.mjs's `done`: no entry in TRANSITIONS has
 // `from` equal to any of them. No reopen/un-reject edge exists (out of scope
 // per D3 — Agent's Discretion did not extend the CoS to a resurrection path).
 

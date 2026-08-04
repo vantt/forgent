@@ -2,7 +2,7 @@
 //
 // This is the sole module that resolves `.fgos/` paths; byte-level append is
 // delegated to events.mjs. Every other module here is a pure lib that takes
-// an explicit path (events.mjs) or no path at all (fsm.mjs, replay.mjs,
+// an explicit path (events.mjs) or no path at all (status-fsm.mjs, replay.mjs,
 // work.mjs) — this module is what wires "some directory" to the two files
 // that live in it: `events.jsonl` (truth, per D3) and `state.json` (view,
 // per D4).
@@ -17,7 +17,7 @@
 // contract (R4): EXIT_CODES + categoryOf are the one source for
 // category -> exit code, and the four error classes raised anywhere in the
 // state layer are re-exported from here so bin/fgos.mjs never needs to
-// import fsm.mjs/work.mjs/events.mjs directly.
+// import status-fsm.mjs/work.mjs/events.mjs directly.
 //
 // SIBLING FACADE (D3, worker-dispatch-log): `.fgos/logs/` is written by a
 // separate narrow facade, worker-log.mjs — NOT this door. This module's
@@ -30,8 +30,8 @@ import path from 'node:path';
 import { appendEvent, readEvents, withEventsLock, appendEventLocked } from './events.mjs';
 import { rebuildView, viewRevision } from './replay.mjs';
 import { graphMetrics as computeGraphMetrics, whatIf as computeWhatIf, classifyStaleDoing, footprintOverlap, goalScopedCriticalPath, goalScopedGreedyTopUnblock } from './graph-metrics.mjs';
-import { transitionWork, FsmError } from './fsm.mjs';
-import { transitionStage } from './stage.mjs';
+import { transitionWork, FsmError } from './status-fsm.mjs';
+import { transitionStage } from './stage-fsm.mjs';
 import { validateWork, checkAcceptanceEvidenceTraceable, WorkValidationError, DEFAULTS, GOAL_TIERS, truncateTitle } from './work.mjs';
 import { EventLogError } from './events.mjs';
 import { validateToolRegistration, ToolRegistryError } from './tool-registry.mjs';
@@ -377,7 +377,7 @@ export function assertAcceptanceEvidence(id, work) {
 
 /**
  * Move a work item to a new status. Looks the item up fresh from the log,
- * delegates the precondition/CAS decision to fsm.mjs (pure — never writes),
+ * delegates the precondition/CAS decision to status-fsm.mjs (pure — never writes),
  * and only then appends the event it returns.
  *
  * The lookup, the CAS decision, and the append are one held `events.lock`
@@ -399,14 +399,14 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, rol
 
   // `reason`/`ask`/`answer` are each only meaningful on their own edge
   // (per D5 for `reason`; async-human-gate D2/D5 for `ask`/`answer`);
-  // fsm.mjs enforces those requirements and ignores whichever of the three
+  // status-fsm.mjs enforces those requirements and ignores whichever of the three
   // doesn't apply to the edge being taken — this facade never branches on
   // `to` itself, it just forwards what the caller gave it.
   const rawEvent = transitionWork({ work, to, expectedStatus, reason, ask, answer }); // FsmError: precondition | conflict
   // Settlement role attribution (per Phase 3 S3-closeout, vision §8):
   // stamped onto the payload AFTER the pure transition already returned it —
   // passing `role` INTO transitionWork would be silently dropped, since
-  // fsm.mjs rebuilds `payload` itself from only the fields it knows about.
+  // status-fsm.mjs rebuilds `payload` itself from only the fields it knows about.
   // Additive + optional: a caller that never supplies `role` gets the
   // exact payload shape transitionWork already produced, byte-for-byte.
   if (role !== undefined) {
@@ -419,7 +419,7 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, rol
   rawEvent.payload.writer = resolveWriterIdentity(dir);
   // Pull-door claim marker (stage-decompose S2-pull D1): the host repo's HEAD
   // at claim time, additive on the SAME `to === 'doing'` move `take` writes —
-  // never a separate event (single write door, D3). Ignored by fsm.mjs (pure,
+  // never a separate event (single write door, D3). Ignored by status-fsm.mjs (pure,
   // only knows the fields it destructures itself) exactly like `role` above,
   // so this is stamped post-transition the same way.
   if (headAtTake !== undefined) {
@@ -432,7 +432,7 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, rol
   // `headAtTake`, this gives the review gate an honest `headAtTake ->
   // headAtReturn` diff range for a pull-door proposal, without depending on
   // a live branch the way a runner proposal's `fgw/<id>` diff does. Ignored
-  // by fsm.mjs (pure, only knows the fields it destructures itself) exactly
+  // by status-fsm.mjs (pure, only knows the fields it destructures itself) exactly
   // like `headAtTake`/`role` above, so this is stamped post-transition the
   // same way.
   if (headAtReturn !== undefined) {
@@ -455,7 +455,7 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, rol
   // dispatched this claim (e.g. `'herdr'`) — audit-only, never a safety
   // mechanism (claimRole/loop.mjs's reclaim-guard are unaffected). Stamped
   // post-transition on the SAME `to === 'doing'` move `pick` writes, exactly
-  // like headAtTake above; ignored by fsm.mjs, which never destructures it.
+  // like headAtTake above; ignored by status-fsm.mjs, which never destructures it.
   if (claimTrigger !== undefined) {
     rawEvent.payload.claimTrigger = claimTrigger;
   }
@@ -463,7 +463,7 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, rol
   // additive stamp pattern as headAtTake/headAtReturn above — a snapshot of
   // the item's parent `{id, title, status}` taken at the moment this
   // `to === 'awaiting-human'` move parks it, so a later read can tell what
-  // changed on the parent since. Ignored by fsm.mjs (pure, only knows the
+  // changed on the parent since. Ignored by status-fsm.mjs (pure, only knows the
   // fields it destructures itself) exactly like headAtTake/role above, so
   // this is stamped post-transition the same way. Never set on any other
   // edge — putInAwaiting is the only caller that ever passes it.
@@ -588,7 +588,7 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, rol
 /**
  * Park a work item into `awaiting-human`, carrying the question it is
  * waiting on (per D2/D5). Thin wrapper over `moveWork` — same
- * append-then-refresh tail, same CAS/validation errors — fsm.mjs requires a
+ * append-then-refresh tail, same CAS/validation errors — status-fsm.mjs requires a
  * non-empty `ask` on this edge.
  *
  * tsk-19zm D2: `rationale`/`alternatives`/`source` here are the AGENT's
@@ -615,7 +615,7 @@ export function putInAwaiting(dir, { id, ask, expectedStatus, parentSnapshotAtAs
 /**
  * Resume a work item out of `awaiting-human`, carrying the answer it was
  * waiting on (per D2/D5). Thin wrapper over `moveWork` — same
- * append-then-refresh tail, same CAS/validation errors — fsm.mjs requires a
+ * append-then-refresh tail, same CAS/validation errors — status-fsm.mjs requires a
  * non-empty `answer` on this edge.
  *
  * Resume target (claim-lock §5.1): reads the gate's own `statusAtAsk`
@@ -633,7 +633,7 @@ export function answerAwaiting(dir, { id, answer, expectedStatus, role, rational
 /**
  * Move a work item to a new stage (per stage-clarify D1/D10/D12). Mirrors
  * `moveWork` exactly, one dimension up: looks the item up fresh from the
- * log, delegates the precondition/CAS decision to stage.mjs (pure — never
+ * log, delegates the precondition/CAS decision to stage-fsm.mjs (pure — never
  * writes), and only then appends the event it returns.
  *
  * Same held-lock critical section as moveWork above — the lookup, the
@@ -650,7 +650,7 @@ export function moveStage(dir, { id, to, expectedStage, verify, role } = {}) {
     }
 
     const rawEvent = transitionStage({ work, to, expectedStage, verify }); // FsmError: precondition | conflict
-    // Same post-transition role stamp as moveWork above — stage.mjs is pure
+    // Same post-transition role stamp as moveWork above — stage-fsm.mjs is pure
     // and only ever returns the fields it knows about.
     if (role !== undefined) {
       rawEvent.payload.role = role;

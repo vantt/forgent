@@ -1,4 +1,4 @@
-// fsm.mjs — transition table with precondition + CAS (per D3/D4).
+// status-fsm.mjs — transition table with precondition + CAS (per D3/D4).
 //
 // PURE: no fs import, no disk writes of any kind. This module only decides
 // whether a transition is legal and, if so, RETURNS the validated event for

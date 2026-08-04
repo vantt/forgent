@@ -200,7 +200,7 @@ test('e2e synthetic domain: add --domain synthetic (no --stage) dispatches throu
   // ->cleanup->done chain — proving the synthetic domain rides the same
   // status FSM all the way to the end, exactly like coding (work-item-
   // status-delivered-retrospective-cleanup D5: the chain is genuinely
-  // domain-agnostic, fsm.mjs never reads work.domain — no domain is exempt
+  // domain-agnostic, status-fsm.mjs never reads work.domain — no domain is exempt
   // or special-cased at the FSM layer).
   for (const id of ['synth-item', 'coding-item']) {
     assert.equal(fgos(repoRoot, ['move', id, '--to', 'delivered']).status, 0);
@@ -272,7 +272,7 @@ test('frontier: domain-aware stage resolution actually discriminates — two ite
   // its "reached proposed" assertion is trivially true for any domain, per
   // the header comment), this pins both items to the exact same explicit
   // `stage: 'assembling'` value and varies only `domain`. `assembling` is
-  // synthetic's own Execute-mapped stage (domains.mjs); it is not one of
+  // synthetic's own Execute-mapped stage (workflow-stage-graphs.mjs); it is not one of
   // coding's stages at all (coding's Execute stage is `executing`). A
   // broken synthetic-to-stage mapping — or a frontier that ignored domain
   // entirely — would make both items ready, or neither; this test fails

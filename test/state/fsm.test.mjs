@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { transitionWork, FsmError, STATUSES } from '../../src/state/fsm.mjs';
+import { transitionWork, FsmError, STATUSES } from '../../src/state/status-fsm.mjs';
 
 function work(status, overrides = {}) {
   return { id: 'w1', status, ...overrides };

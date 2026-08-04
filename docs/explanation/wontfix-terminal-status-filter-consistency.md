@@ -105,7 +105,7 @@ grounded in what the check actually protects:
   `status === 'todo'` items — terminal statuses are naturally excluded
   from a sweep that only acts on open work; there was nothing to fix.
 - `decompose.mjs`'s `work.stage ?? 'executing'` fallback is a
-  pre-existing, already-documented limitation (noted in `domains.mjs`'s
+  pre-existing, already-documented limitation (noted in `workflow-stage-graphs.mjs`'s
   comment on the `synthetic` domain), not a hidden bug this sweep
   uncovered.
 

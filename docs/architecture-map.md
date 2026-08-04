@@ -307,7 +307,7 @@ máy bắt được lỗi đếm tay này.)
 | `src/state/store.mjs` — facade một cửa ghi | Infra | store | tool | CTR002 |
 | `src/runner/recovery.mjs` — ma trận crash-recovery | Domain | — | control | — (nội bộ) |
 | `src/runner/anti-loop.mjs` — chặn lặp vô hạn | Domain | — | governance | — (nội bộ) |
-| `src/state/fsm.mjs` — luật transition | Domain | — | memory | CTR002 |
+| `src/state/status-fsm.mjs` — luật transition | Domain | — | memory | CTR002 |
 | `src/state/frontier.mjs` — truy vấn ready | Domain | state (derived) | control | — (nội bộ) |
 | `src/state/replay.mjs` — fold/rebuild view | Domain | state | memory | CTR002 |
 | `src/state/dep-graph.mjs` — kiểm tra chu trình trên đồ thị hợp nhất blocks+parent-child (supersede record ADR0012; trước v0.3 chỉ xét `deps`) | Domain | — | governance | — (nội bộ) |

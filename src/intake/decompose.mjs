@@ -536,7 +536,7 @@ export function resolveDecompose(dir, id, cfg, role, callerVerdict) {
   // — read once, reused by every moveStage call below that advances this item
   // to `executing`, so none of them silently carry FALLBACK_VERIFY or leave
   // `verify` untouched (transitionStage only overwrites it when passed a
-  // value — stage.mjs:59-64). Falls back to the item's own current `verify`
+  // value — stage-fsm.mjs:60-65). Falls back to the item's own current `verify`
   // when no approve record exists yet (an item that never went through
   // Track A's Gates, e.g. from before this item, is unaffected).
   const planApproveVerify = view.gates?.[id]?.planApprove?.verify ?? work.verify;

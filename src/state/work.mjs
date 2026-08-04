@@ -76,8 +76,8 @@ export function truncateTitle(title) {
  * main tree" (the sole trigger for RUL12 dependent-open); `retrospective`
  * is the batched learning-synthesis step (formerly the `compound-learn`
  * stage, now retired); `cleanup` is a TTL-bounded worktree-reclaim park —
- * see fsm.mjs for the full transition edges). Owned here (schema owns
- * domain) — fsm.mjs imports and re-exports this rather than defining its
+ * see status-fsm.mjs for the full transition edges). Owned here (schema owns
+ * domain) — status-fsm.mjs imports and re-exports this rather than defining its
  * own copy, so there is exactly one list of legal statuses.
  */
 export const STATUSES = Object.freeze([
@@ -125,7 +125,7 @@ export const GOAL_TIERS = Object.freeze(['mvp', 'milestone']);
  * Stage domain for `work.stage` (per stage-clarify D1/D2/D8, extended by
  * stage-decompose D2) — the macro-level lifecycle stage of a work item
  * (clarify -> decompose -> executing), orthogonal to the FSM's micro-level
- * `status` (fsm.mjs's TRANSITIONS is unchanged by this field). `stage` is
+ * `status` (status-fsm.mjs's TRANSITIONS is unchanged by this field). `stage` is
  * OPTIONAL and NOT in DEFAULTS (D8): a missing `stage` reads as `executing`
  * lazily wherever it is consumed (frontier.mjs, store.mjs), never injected
  * onto the record itself — this keeps every existing add/submit/legacy path
@@ -144,7 +144,7 @@ export const STAGES = DOMAINS[DEFAULT_DOMAIN].stages;
  * `src/state/workflow-stage-graphs.mjs`) govern this item's `stage` value. OPTIONAL and
  * NOT in DEFAULTS — same D8 lazy-default shape as `stage` itself: a missing
  * `domain` reads as `'coding'` lazily wherever it is consumed (frontier.mjs,
- * loop.mjs, stage.mjs, and this module's own `validateWork`), never injected
+ * loop.mjs, stage-fsm.mjs, and this module's own `validateWork`), never injected
  * onto the record — every existing (100% coding) item needs zero migration.
  */
 

@@ -672,7 +672,7 @@ export function resolveDiscovery(dir, id, cfg, role, callerVerdict) {
   }
 
   // tsk-wcl: `putInAwaiting` always attempts a real `awaiting-human` status
-  // transition (moveWork), and fsm.mjs has no self-transition edge for it —
+  // transition (moveWork), and status-fsm.mjs has no self-transition edge for it —
   // calling it on an item that is ALREADY `awaiting-human` (re-running
   // `fgos discover <id>` directly on a still-parked item, bypassing the
   // pool picker that normally never re-selects a parked item) throws

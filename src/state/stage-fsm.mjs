@@ -1,18 +1,19 @@
-// stage.mjs — stage transition table with precondition + CAS (per
-// stage-clarify D1/D3/D8/D10/D12). Mirrors fsm.mjs's transitionWork exactly,
-// one level up: `stage` is the macro lifecycle dimension (clarify ->
-// executing -> ...), `status` (fsm.mjs) stays the micro dimension untouched.
+// stage-fsm.mjs — stage transition table with precondition + CAS (per
+// stage-clarify D1/D3/D8/D10/D12). Mirrors status-fsm.mjs's transitionWork
+// exactly, one level up: `stage` is the macro lifecycle dimension (clarify ->
+// executing -> ...), `status` (status-fsm.mjs) stays the micro dimension
+// untouched.
 //
 // PURE: no fs import, no disk writes. This module only decides whether a
 // stage transition is legal and, if so, RETURNS the validated event for the
 // store to append — disk writes belong to store.mjs, never here. The one
 // side effect it can perform is a diagnostic `console.warn` (via
-// domains.mjs's fail-safe) on a genuinely unrecognized `work.domain` value —
+// workflow-stage-graphs.mjs's fail-safe) on a genuinely unrecognized `work.domain` value —
 // never a throw (base-workflow-model D2/D3).
 //
 // Three edges exist today for the 'coding' domain (base-workflow-model D2
 // retrofit — byte-for-byte the same table this file used to own directly,
-// now sourced from domains.mjs's registry): `clarify -> executing` (D12),
+// now sourced from workflow-stage-graphs.mjs's registry): `clarify -> executing` (D12),
 // plus `clarify -> decompose` and `decompose -> executing` (stage-decompose
 // D2/D4/D5) for the chia-việc stage that now sits between clarify and
 // executing. stage-decompose cell 3 retargeted the discovery engine
@@ -23,11 +24,11 @@
 // reserved scope. A dormant legal edge is harmless; deleting it is a
 // follow-up for whichever cell next touches this file's test scope.
 
-import { FsmError } from './fsm.mjs';
+import { FsmError } from './status-fsm.mjs';
 import { DEFAULT_DOMAIN, getDomain, stageForStep } from './workflow-stage-graphs.mjs';
 
 // Re-exported for consumers that want the stage error type under this
-// module's own name, mirroring fsm.mjs's re-export of STATUSES from work.mjs.
+// module's own name, mirroring status-fsm.mjs's re-export of STATUSES from work.mjs.
 export { FsmError };
 
 /**
@@ -44,12 +45,12 @@ export { FsmError };
  * absent -> DEFAULT_DOMAIN, same shape as `stage` itself) selects which
  * registry entry's transition edges apply. An unrecognized `work.domain`
  * value never throws here — it folds to DEFAULT_DOMAIN with a diagnostic
- * warning (domains.mjs's resolveDomainName); only `to` and `work` shape
+ * warning (workflow-stage-graphs.mjs's resolveDomainName); only `to` and `work` shape
  * validation below can throw a precondition error.
  *
  * CAS: when `expectedStage` is supplied and does not match the item's
  * (lazily-read) current stage, refuse with category 'conflict' — checked
- * before the transition-table lookup, same order as fsm.mjs's
+ * before the transition-table lookup, same order as status-fsm.mjs's
  * transitionWork.
  *
  * Precondition: the (from, to) pair must exist in the domain's transition
