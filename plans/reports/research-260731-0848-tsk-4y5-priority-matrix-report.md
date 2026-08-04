@@ -227,7 +227,7 @@ bỏ qua decompose).
 | 1 | `clarify` | `discover` | Cơ học (`judgeDiscovery`, `claude -p` 1 lệnh, **zero scout hôm nay**) | Verdict `{clear, question?, verify?, intentScore?}` | clear → `decompose`/`executing`; unclear → `awaiting-human` |
 | 1b | `clarify`, `awaiting-human` | `ask` / `answer` | Skill `fgos-exploring` (phiên đầy đủ, CÓ tool — chỗ scout thật hôm nay xảy ra) | Lọc câu hỏi qua 3 phép thử (chất-liệu/có-căn-cứ/trả-lời-được) trước khi hỏi | Người trả lời → `todo` → `discover` lại |
 | 2 | `decompose` | `discover` (cùng verb, giờ chạy `judgeDecompose`) | Cơ học + cổng `risk: heavy` bắt buộc người xác nhận | Verdict `pass-through`/`decompose` (sinh children, mỗi đứa lại vào `clarify` riêng)/`need-human` | Skill `fgos-planning` (chia-việc, nửa đầu) + `fgos-validating` (thẩm-định, nửa cuối, KHÔNG bao giờ tự nhận đã qua) |
-| 3 | `executing` | (runner tự dispatch, hoặc phiên `pick`-thủ-công) | Skill `fgos-executing` | Vòng cài-đặt→kiểm-chứng→`return` | `return` chạy `verify` thật (không tin exit code worker) → `awaiting-approval` (xanh) hoặc `blocked` (đỏ) |
+| 3 | `executing` | (runner tự dispatch, hoặc phiên `pick`-thủ-công) | Skill `fgos-code-implement` | Vòng cài-đặt→kiểm-chứng→`return` | `return` chạy `verify` thật (không tin exit code worker) → `awaiting-approval` (xanh) hoặc `blocked` (đỏ) |
 | 4 | `awaiting-approval` | `review`, `approve`/`reject` | Người/agent + khoá main-checkout (RUL49/50) | Xem diff/PR, merge | approve → cạnh `executing→compound-learn` bật; reject → quay lại, không tự động |
 | 5 | `compound-learn` | `compound` | Skill `fgos-compounding` | Tổng hợp tín hiệu thật thành doc Diataxis có trích dẫn bằng chứng | → `done`; kéo theo `fgos-indexing` refresh `docs/enduser-docs-index.json` |
 | 6 | `done` | — | — | Trạng thái cuối | — |
@@ -314,7 +314,7 @@ Trước round này, nhiều kết luận dựa vào mô tả gián tiếp (doc 
   luận từ việc code không gọi grep.**
 - **`fgos-routing/SKILL.md`** — khớp 100% với "Precedence: the engine's
   verb always wins" đã trích trước đó.
-- **`fgos-executing/SKILL.md`** — khớp mô tả cũ (cài-đặt→verify→return),
+- **`fgos-code-implement/SKILL.md`** — khớp mô tả cũ (cài-đặt→verify→return),
   cộng thêm 2 phát hiện mới liên quan trực tiếp chủ đề gốc:
   - `fgos tool query --capability impact-analysis --status present` —
     cơ chế CAPABILITY-CHECK đã build sẵn (Full/Degraded/Inactive), dùng ở
@@ -406,10 +406,10 @@ Grep lại NGAY tại thời điểm ghi report này, xác nhận THẬT:
 - `CLAUDE.md:10-33` — thêm prose capability-gate đứng trước block
   GitNexus cũ.
 
-`tsk-1e4`'s `refs`: `fgos-planning`, `fgos-validating`, `fgos-executing`,
+`tsk-1e4`'s `refs`: `fgos-planning`, `fgos-validating`, `fgos-code-implement`,
 `CLAUDE.md` — **KHÔNG có `fgos-exploring`**. Vậy:
 - `decompose` (`fgos-planning`+`fgos-validating`) VÀ `executing`
-  (`fgos-executing`) — capability-gate `impact-analysis` đã chạy THẬT, có
+  (`fgos-code-implement`) — capability-gate `impact-analysis` đã chạy THẬT, có
   mẫu prose cụ thể để copy nguyên xi.
 - `clarify` (`fgos-exploring`) — VẪN CHƯA có capability-gate này. Xác
   nhận lại đúng hướng ưu tiên round 4-8 (scout ở clarify là gap ưu tiên

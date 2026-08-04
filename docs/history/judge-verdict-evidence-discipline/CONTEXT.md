@@ -20,7 +20,7 @@ item's record unchallenged, both surfaced by `tsk-d3c`'s own history:
 2. **Session-authored `acceptance` clauses (`work.acceptance`, written via
    `fgos add`/`edit --acceptance`, `src/state/work.mjs:288`)** — no judge
    function generates or touches this field at all; whichever session is
-   drafting it (during `fgos-exploring`/`fgos-planning`/`fgos-executing`)
+   drafting it (during `fgos-exploring`/`fgos-planning`/`fgos-code-implement`)
    writes it by hand. Confirmed failure: `tsk-d3c`'s own `acceptance`
    array asserted a root cause ("needs-plugin-registration") *and* an
    evidence citation for it at the same time, both wrong — later

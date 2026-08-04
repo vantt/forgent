@@ -314,7 +314,7 @@ test('runOnce logs the "<capacityId> — <provider> — <model>" announce line a
   await runOnce({ repoRoot, config, worktreeDir, log: (msg) => logs.push(msg) });
 
   assert.ok(
-    logs.includes(`fgos-runner: fgos-executing — ${process.execPath} — sonnet`),
+    logs.includes(`fgos-runner: fgos-code-implement — ${process.execPath} — sonnet`),
     `expected an announce line in: ${JSON.stringify(logs)}`,
   );
   const events = readRawEvents(dir);
@@ -322,7 +322,7 @@ test('runOnce logs the "<capacityId> — <provider> — <model>" announce line a
   assert.ok(auditEvent, 'expected a capacity.dispatch event in the log');
   assert.deepEqual(auditEvent.payload, {
     id: 'item-announce',
-    capacityId: 'fgos-executing',
+    capacityId: 'fgos-code-implement',
     provider: process.execPath,
     model: 'sonnet',
   });

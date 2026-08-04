@@ -39,7 +39,7 @@ mechanism) — out of scope.
   regex/Unicode-boundary implementation (plain ASCII `\b`, which does not
   reliably bound Vietnamese diacritic letters, vs. a Unicode-aware
   alternative) is an implementation choice for `fgos-planning`/
-  `fgos-executing`, not locked here — several `HEAVY_KEYWORDS`/
+  `fgos-code-implement`, not locked here — several `HEAVY_KEYWORDS`/
   `LIGHT_KEYWORDS`/`KIND_KEYWORDS` entries are Vietnamese
   ("bảo mật", "thanh toán", "đổi tên"...).
 
@@ -75,7 +75,7 @@ mechanism) — out of scope.
   `fgos tool query --capability impact-analysis --status present` →
   GitNexus registered, `status: present`. Posture: **full** — informational
   only; this item edits existing functions (`classifyIronLaw`,
-  `countMatches`), so `fgos-planning`/`fgos-executing` may lean on this for
+  `countMatches`), so `fgos-planning`/`fgos-code-implement` may lean on this for
   a blast-radius proof point if the risk map calls for one.
 - Prior `judgeDiscovery` verdicts for `tsk-2as`: none (fresh item).
 

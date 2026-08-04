@@ -1031,7 +1031,7 @@ Not applicable — không có màn hình.
 - `.claude/skills/fgos-exploring/SKILL.md` + `.agents/` mirror — skill `làm-rõ` (stage `clarify`)
 - `.claude/skills/fgos-planning/SKILL.md` + `.agents/` mirror — skill `chia-việc` (nửa đầu stage `decompose`)
 - `.claude/skills/fgos-validating/SKILL.md` + `.agents/` mirror — skill `thẩm-định` (nửa cuối stage `decompose`, gác cạnh `decompose→executing`)
-- `.claude/skills/fgos-executing/SKILL.md` + `.agents/` mirror — skill `thi-công` (stage `executing`, domain `coding` — str89-fgos-domain-skills)
+- `.claude/skills/fgos-code-implement/SKILL.md` + `.agents/` mirror — skill `thi-công` (stage `executing`, domain `coding` — str89-fgos-domain-skills)
 - `src/state/workflow-stage-graphs.mjs` field `skillMap` mỗi domain + hàm `skillForStage(domain, stage)` (str89-fgos-domain-skills) — sổ đăng ký domain nay còn khai skill ứng với mỗi stage, xem spec Work-State "Mô hình domain"
 - `src/state/work.mjs` field `docsRef` (optional, xem spec Work-State Data Dictionary #23) — con trỏ tới `docs/history/<feature>/` của tính năng đã tạo ra item, dùng bởi lớp hướng dẫn để tìm CONTEXT.md/plan.md liên quan khi cần
 - `docs/history/p50-workflow-induct/reports/p50-workflow-induct-6.md` — bằng chứng vận hành thật đầy đủ của case-study (lịch sử verb từng lệnh, kèm phát hiện lồng-phiên ở Open Gaps)

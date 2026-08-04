@@ -15,7 +15,7 @@ Flags counted:
 - **public contracts — yes.** `resolveDiscovery`/`resolveDecompose` back
   the `fgos discover`/`fgos decompose` CLI verbs, consumed by every
   coding-domain skill (`fgos-exploring`, `fgos-planning`, `fgos-validating`,
-  `fgos-executing`) and the runner's RUL19 sweep — a behavior change here is
+  `fgos-code-implement`) and the runner's RUL19 sweep — a behavior change here is
   visible to all of them.
 - cross-platform — no
 - **existing covered behavior — yes.** `test/intake/discovery.test.mjs`
@@ -40,7 +40,7 @@ by dependency between the two fixes themselves, not by `fgos graph`.
 Impact-analysis posture: **full** (`fgos tool query --capability
 impact-analysis --status present` returned `gitnexus`/`present`, checked
 during `fgos-exploring`). GitNexus impact analysis is run before editing
-`resolveDiscovery`/`resolveDecompose` at `fgos-executing`, per `CLAUDE.md`'s
+`resolveDiscovery`/`resolveDecompose` at `fgos-code-implement`, per `CLAUDE.md`'s
 own MUST rule — not skipped or degraded here.
 
 ## Approach

@@ -20,7 +20,7 @@ flowchart TB
   Explore["fgos-exploring\nstage: clarify"]
   Plan["fgos-planning\nstage: decompose · shape"]
   Validate["fgos-validating\nstage: decompose · prove"]
-  Execute["fgos-executing\nstage: executing"]
+  Execute["fgos-code-implement\nstage: executing"]
   Events[("`.fgos/events.jsonl`\nnguồn sự thật, committed")]
   View[("`.fgos/state.json`\nview dựng lại, gitignored")]
   CtxDoc["docs/history/&lt;feature&gt;/CONTEXT.md"]
@@ -61,7 +61,7 @@ stateDiagram-v2
   state "clarify\n(fgos-exploring)" as Clarify
   state "awaiting-human\n(chờ người)" as Awaiting
   state "decompose\n(fgos-planning → fgos-validating)" as Decompose
-  state "executing\n(fgos-executing)" as Executing
+  state "executing\n(fgos-code-implement)" as Executing
   state "proposed — cook DỪNG Ở ĐÂY" as Proposed
   state "blocked" as Blocked
 
@@ -125,7 +125,7 @@ sequenceDiagram
       Cook->>CLI: pick &lt;id&gt;
       CLI-->>Cook: worktree path
       Cook->>WT: EnterWorktree
-      Cook->>Dev: invoke fgos-executing (implement + verify)
+      Cook->>Dev: invoke fgos-code-implement (implement + verify)
       Dev->>WT: commit
       Cook->>CLI: return &lt;id&gt;
       CLI-->>Cook: proposed (hoặc blocked)
@@ -143,7 +143,7 @@ sequenceDiagram
 | clarify | `fgos-exploring` | `decision --text`, rồi `discover <id> --json` | "Decisions locked. Approve CONTEXT.md before planning?" | `docs/history/<feature>/CONTEXT.md` |
 | decompose · shape | `fgos-planning` | (không ghi CLI; đọc `fgos graph --json`) | "Work shape is ready. Approve before execution?" | `docs/history/<feature>/plan.md` |
 | decompose · prove | `fgos-validating` | `discover <id> --json` (sau gate) | "Feasibility validated. Approve moving to executing?" | ma trận khả thi trong `plan.md`; outcome `pass-through`/`decompose`/`need-human` |
-| executing | `fgos-executing` | `pick <id>` → (verify command của item) → `return <id>` | không có — headless, chỉ park qua `ask` nếu thật sự mơ hồ | worktree `fgw/<id>`, commit, item → `proposed`/`blocked` |
+| executing | `fgos-code-implement` | `pick <id>` → (verify command của item) → `return <id>` | không có — headless, chỉ park qua `ask` nếu thật sự mơ hồ | worktree `fgw/<id>`, commit, item → `proposed`/`blocked` |
 
 4 gate thật, không tự trả lời: CONTEXT.md (exploring) → plan.md (planning)
 → feasibility (validating) → report cuối chỉ ra review/approve là việc
@@ -181,7 +181,7 @@ Một cỗ máy khác, cho một chế độ chạy khác:
 | `docs/history/<feature>/CONTEXT.md` | quyết định khoá D1/D2/… do fgos-exploring viết, nguồn thật cho mọi bước sau |
 | `docs/history/<feature>/plan.md` | mode + approach + shape (fgos-planning), cộng ma trận khả thi (fgos-validating) trên cùng file |
 | item con mới | nếu discover trả outcome `decompose` — mỗi con mang `parent` trỏ về gốc, đẩy lên đầu hàng đợi trước gốc |
-| `fgw/<id>` | git worktree cách ly, dựng bởi `fgos pick`, nơi fgos-executing implement thật |
+| `fgw/<id>` | git worktree cách ly, dựng bởi `fgos pick`, nơi fgos-code-implement implement thật |
 | commit(s) | một commit mỗi item, id trong message — bằng chứng traceability thay cho cell-trace file |
 | `proposed` | trạng thái cuối của mọi id gốc + con khi hàng đợi rỗng — **cook dừng ở đây**, không bao giờ gọi review/approve/reject |
 

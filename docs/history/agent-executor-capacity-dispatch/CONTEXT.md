@@ -65,7 +65,7 @@ below for machine-readable visibility (`view.decisions`).
 
 - **capacityId** — for this item's own scope (domain 1, `executing` stage),
   always `skillForStage(getDomain(work.domain), 'executing')` — e.g.
-  `"fgos-executing"` for the default `coding` domain today. The design
+  `"fgos-code-implement"` for the default `coding` domain today. The design
   doc's more general "skill name or `domain:stage`" identity (design §3)
   exists for the config schema broadly; tsk-62v's own resolve call site
   only ever needs this one instantiation of it.
@@ -81,7 +81,7 @@ below for machine-readable visibility (`view.decisions`).
 - `src/state/tool-registry.mjs:34` (`KINDS`), `:112` (`commandExistsOnPath`)
   — read this session.
 - `src/state/workflow-stage-graphs.mjs:143-145` (`skillForStage`), `:44-101`
-  (`DOMAINS.coding.skillMap`, `executing` → `fgos-executing`) — read this
+  (`DOMAINS.coding.skillMap`, `executing` → `fgos-code-implement`) — read this
   session; confirms D3's identity is already a real, existing call, not a
   hypothetical.
 - `src/state/store.mjs:1-24` — `.fgos/events.jsonl` is normally the
@@ -103,7 +103,7 @@ below for machine-readable visibility (`view.decisions`).
   gate reads **full**: `impact()` MUST be run (and its risk level reported)
   before editing any of `resolveExecutorConfig`, `resolveExecutorCommand`,
   `spawnWorker`, `buildPrompt`, `commandExistsOnPath`, `detectAssistantCli`
-  once this item reaches `fgos-executing`.
+  once this item reaches `fgos-code-implement`.
 
 ## Deferred to planning
 

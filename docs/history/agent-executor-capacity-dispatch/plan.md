@@ -30,7 +30,7 @@ breaks the one dispatch path the runner already depends on in production.
 provider, `gitnexus`, `status: present` → **impact-analysis: full**. Per
 AGENTS.md's gate, every proof point below that touches a named symbol
 requires `impact({target, direction: "upstream"})` on that symbol before
-editing it, at `fgos-executing` time — not before (this skill does not edit
+editing it, at `fgos-code-implement` time — not before (this skill does not edit
 code). Symbols this plan touches: `resolveExecutorConfig`,
 `resolveExecutorCommand`, `spawnWorker`, `buildPrompt`,
 `validateRunnerConfigShape`, `commandExistsOnPath`, `detectAssistantCli`.
@@ -174,7 +174,7 @@ own material/grounded/answerable filter)
   kind `fgos tool` has no reason to know").
 - The dedup in D5 keeps `tool-registry.mjs` as the owner (it already
   exports `KINDS`, the more natural home) and has `dispatch.mjs` import
-  from it — but this is genuinely free to flip during `fgos-executing` if
+  from it — but this is genuinely free to flip during `fgos-code-implement` if
   a cleaner shape turns up; D5 itself says ownership is not a design
   decision.
 

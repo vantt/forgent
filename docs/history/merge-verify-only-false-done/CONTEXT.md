@@ -68,7 +68,7 @@ which is separate, not-yet-built work.
 - Impact-analysis capability: **full** — GitNexus registered and
   `present` (`fgos tool query --capability impact-analysis --status
   present` returned the `gitnexus` provider). `fgos-planning`/
-  `fgos-validating`/`fgos-executing` should run real impact analysis on
+  `fgos-validating`/`fgos-code-implement` should run real impact analysis on
   `mergeRunnerItemLocked`/`isAlreadyMerged` before editing, per the
   project's impact-analysis gate.
 

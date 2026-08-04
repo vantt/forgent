@@ -45,7 +45,7 @@ design docs. The only real choices left for this plan were D7/D8
 `fgos tool query --capability impact-analysis --status present` → one
 provider, `gitnexus`, `status: "present"` → **full**. Every proof point
 below that touches `resolveExecutorConfig`/`resolveExecutorCommand`/
-`spawnWorker` needs `impact()` run against it at `fgos-executing`, blast
+`spawnWorker` needs `impact()` run against it at `fgos-code-implement`, blast
 radius reported, before editing (AGENTS.md gate, unchanged from
 `CONTEXT.md`'s own note).
 
@@ -105,13 +105,13 @@ fragments.
 
 Verify command: `npm test` (matches the engine's own `discover` verdict:
 `{"clear": true, "verify": "npm test", "impactScore": 68}`). No re-plan of
-Execute/verify mechanics needed — `fgos-executing`'s existing goal-check and
+Execute/verify mechanics needed — `fgos-code-implement`'s existing goal-check and
 `return`'s re-verify already cover it.
 
 ## Assumptions
 
 - The exact real CLI command for step 4 (D2) is picked at
-  `fgos-executing` time, not here — confirmed available today: `agy`,
+  `fgos-code-implement` time, not here — confirmed available today: `agy`,
   `codex`; confirmed absent: `gemini`. Not material to this plan's shape,
   since the mechanism is generic over whichever one gets registered.
 - "Malformed output" (D8) is left at the definition already pinned in

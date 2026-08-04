@@ -20,7 +20,7 @@ flowchart TD
     F -->|"decompose"| G["children created<br/>(deps-linked OR parent-linked,<br/>--parent now real, tsk-1xx)"]
     F -->|"need-human / risk:heavy / blast-radius-over-threshold"| D2["awaiting-human<br/>fgos-planning + fgos-validating"]
     D2 -->|"answered / plan approved"| F
-    H --> I["fgos-executing<br/>implement -> verify -> return"]
+    H --> I["fgos-code-implement<br/>implement -> verify -> return"]
     G --> I
     I -->|"verify green"| J["awaiting-approval"]
     I -->|"verify red"| K["blocked"]
@@ -57,7 +57,7 @@ had this exact detail confirmed by a live run before now.
    actually be executed as written today.
 2. ~~**`clarify` has no capability-gate for `impact-analysis`.**~~ **RESOLVED
    (`tsk-17w`, merged).** `fgos-exploring/SKILL.md` now queries it too,
-   matching `fgos-planning`/`fgos-validating`/`fgos-executing`.
+   matching `fgos-planning`/`fgos-validating`/`fgos-code-implement`.
 3. **NEW — `priority` has no "don't clobber an explicit human value"
    guard.** Verified by direct read: `resolveDiscovery`
    (`src/intake/discovery.mjs:309-310`) and `resolveDecompose`

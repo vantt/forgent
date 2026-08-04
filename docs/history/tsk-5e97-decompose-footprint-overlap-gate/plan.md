@@ -118,9 +118,9 @@ Item `verify` (set at `fgos-validating`, was a placeholder before this):
 today — pre-implementation baseline: 59/59 passing. Post-implementation this
 same command must still pass, now including the 5 new tests listed above.
 
-**Post-implementation verify drift (fgos-executing)**: the `fgos discover`
+**Post-implementation verify drift (fgos-code-implement)**: the `fgos discover`
 call that moved this item from `clarify` to `decompose` (run at the top of
-`fgos-executing`, since the earlier `fgos-exploring` pass had locked
+`fgos-code-implement`, since the earlier `fgos-exploring` pass had locked
 `CONTEXT.md`/`plan.md` but never actually fired the stage-move verb)
 recorded its own model-guessed `verify: "npm test"` on the item, silently
 overwriting the narrower command set above. The first `fgos return` re-ran

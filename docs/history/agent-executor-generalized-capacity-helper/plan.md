@@ -28,7 +28,7 @@ shape.
 
 `impact-analysis` posture (`fgos tool query --capability impact-analysis
 --status present`): **full** — GitNexus registered and present on this
-machine. `fgos-executing` should run `impact` on any exported symbol this
+machine. `fgos-code-implement` should run `impact` on any exported symbol this
 item touches (none currently planned — see below) before editing it.
 
 ## Decision split (per CONTEXT.md's own deferred question)
@@ -146,11 +146,11 @@ doc update last (it only needs to point at what already exists by then).
   a pre-existing gap in the reused dispatch mechanism (`tsk-62v`/`tsk-5l2-
   1`'s own scope), out of this item's declared feature boundary to fix
   (`CONTEXT.md`: "This item does not build a new dispatch mechanism --
-  `tsk-62v` already built that") — pinned here only so `fgos-executing`'s
+  `tsk-62v` already built that") — pinned here only so `fgos-code-implement`'s
   own manual verify pass doesn't misdiagnose this known gap as evidence
   the rewrite itself is broken.
 
-## Proof surface (for `fgos-executing`/`fgos-validating`)
+## Proof surface (for `fgos-code-implement`/`fgos-validating`)
 
 Real verify command for this item as a whole (not `npm test --
 test/skills/fgos-mirror.test.mjs` — `package.json`'s `test` script

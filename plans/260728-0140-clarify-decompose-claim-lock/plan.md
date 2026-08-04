@@ -124,11 +124,11 @@ branch cũ; còn lại → LUÔN `createWorktree` mới. Đổi điều kiện g
   commit `CONTEXT.md`/`plan.md` lên branch TRƯỚC KHI gọi `fgos discover` (điểm
   kích hoạt release ở §3b) — nếu không, khúc B gắn vào worktree không có gì đã
   lưu. Thêm vào `fgos-exploring`/`fgos-planning`/`fgos-validating`'s hard rules,
-  cùng khuôn "one commit per item" `fgos-executing` đã có.
+  cùng khuôn "one commit per item" `fgos-code-implement` đã có.
 - **Ranh giới** = đúng lúc `fgos discover` đẩy stage sang `executing` + tự
   release (§3b). Item về `status:'todo'`, `stage:'executing'`, branch
   `fgw/<id>` đã có sẵn plan.
-- **Khúc B — fgos-executing.** `pick <id>` lại (§3a+3c gắn đúng worktree cũ),
+- **Khúc B — fgos-code-implement.** `pick <id>` lại (§3a+3c gắn đúng worktree cũ),
   implement, verify, `fgos return`.
 
 ### 3e. Đóng phiên giữa 2 khúc — TUỲ CHỌN, quyết định NGOÀI cơ chế (chốt)
@@ -197,7 +197,7 @@ ATTENDED-VỚI-ĐỘ-TRỄ, không phải unattended.
   cùng backlog là tình huống đua THẬT, hàng ngày, không phải edge case hiếm.
 - Nếu SAU NÀY herdr chạy pane thật sự không ai theo dõi (vd ban đêm) — không
   được tự gõ `cook`/mở `fgos-exploring` trực tiếp (treo vĩnh viễn ở gate, 3
-  skill này không có "Headless" section như `fgos-executing`); phải đổi sang
+  skill này không có "Headless" section như `fgos-code-implement`); phải đổi sang
   `fgos discover <id> --json` (headless-safe, đúng cái runner sweep đã làm).
 
 ## 7. Addendum — `claimTrigger` (tách khỏi `claimActor`)

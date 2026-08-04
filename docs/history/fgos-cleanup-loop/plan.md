@@ -60,7 +60,7 @@ Impact-analysis capability gate (`CLAUDE.md`): `fgos tool query
 posture **full** (same read `fgos-exploring` already recorded in
 CONTEXT.md). Binding below: the new module is additive-only (no existing
 symbol is edited), so no upstream-impact run is owed before adding it;
-`fgos-executing` still owes a real `impact()` call before touching anything
+`fgos-code-implement` still owes a real `impact()` call before touching anything
 inside `cleanup-harness.mjs` or `bin/fgos.mjs`'s `case 'cleanup'` should
 either turn out to need a change during build (not expected — see Scope
 boundary in CONTEXT.md — but the gate stays live regardless of plan intent).
