@@ -85,6 +85,29 @@ test('DOMAINS.synthetic.skillMap.assembling is null (synthetic has never loaded 
   assert.ok(Object.isFrozen(DOMAINS.synthetic.skillMap));
 });
 
+// --- skillMap.retrospective (decision record 0027, D5) — a `status` key
+// reused on the same `skillMap` field the three `stage` keys above already
+// use, resolving which skill fgOS's retrospective loop (/fgOS:retro-next)
+// should run for a domain's status:retrospective items. ---
+
+test("DOMAINS.coding.skillMap.retrospective is 'fgos-compounding' (0027 D5 — zero regression, coding's synthesis skill does not change)", () => {
+  assert.equal(DOMAINS.coding.skillMap.retrospective, 'fgos-compounding');
+});
+
+test('skillForStage(DOMAINS.coding, "retrospective") resolves fgos-compounding — skillForStage is a generic skillMap[key] lookup, not scoped to `stage` names by implementation, only by its usual callers', () => {
+  // skillForStage's body (`(domain.skillMap && domain.skillMap[stage]) ??
+  // null`) never inspects whether `stage` is actually one of
+  // DOMAINS.coding.stages — it is safe and correct to reuse it here for
+  // the status key `retrospective` exactly as /fgOS:retro-next's own
+  // SKILL.md now does, rather than writing a second, redundant accessor.
+  assert.equal(skillForStage(DOMAINS.coding, 'retrospective'), 'fgos-compounding');
+});
+
+test('skillForStage falls back to null for "retrospective" on a domain that declares no skillMap.retrospective entry (synthetic, triage) — the caller-side ?? \'fgos-compounding\' fallback documented in retro-next/SKILL.md step 4 covers this case', () => {
+  assert.equal(skillForStage(DOMAINS.synthetic, 'retrospective'), null);
+  assert.equal(skillForStage(DOMAINS.triage, 'retrospective'), null);
+});
+
 // --- worktreeBacked (work-item-status-delivered-retrospective-cleanup D5/D8) ---
 
 test('DOMAINS.coding.worktreeBacked is true (real git merges, cleanup-harness must verify them)', () => {
