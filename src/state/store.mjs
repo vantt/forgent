@@ -32,7 +32,7 @@ import { rebuildView, viewRevision } from './replay.mjs';
 import { graphMetrics as computeGraphMetrics, whatIf as computeWhatIf, classifyStaleDoing, footprintOverlap, goalScopedCriticalPath, goalScopedGreedyTopUnblock } from './graph-metrics.mjs';
 import { transitionWork, FsmError } from './status-fsm.mjs';
 import { transitionStage } from './stage-fsm.mjs';
-import { validateWork, checkAcceptanceEvidenceTraceable, WorkValidationError, DEFAULTS, GOAL_TIERS, truncateTitle } from './work.mjs';
+import { validateWork, validateDomainFields, checkAcceptanceEvidenceTraceable, WorkValidationError, DEFAULTS, GOAL_TIERS, truncateTitle } from './work.mjs';
 import { getDomain, statusCategoryFor } from './workflow-stage-graphs.mjs';
 import { EventLogError } from './events.mjs';
 import { validateToolRegistration, ToolRegistryError } from './tool-registry.mjs';
@@ -160,6 +160,13 @@ export function addWork(dir, work) {
     // the runner loop) obeys one rule without any of them repeating it.
     const item = { ...work, tier: work?.tier ?? DEFAULTS.tier, title: truncateTitle(work?.title) };
     validateWork(item, Object.keys(before.work));
+    // domainFields fieldSchema (decision record 0027, D6): a separate,
+    // narrower check than validateWork's own domainFields shape rule above
+    // (work.mjs) — validates ONLY the namespace matching item's own domain
+    // against that domain's declared fieldSchema, if any. Run right after
+    // validateWork (which already confirmed item.domain is a real DOMAINS
+    // key or absent) so getDomain's lookup below can never miss.
+    validateDomainFields(item, getDomain(item.domain));
     // statusCategory (decision record 0027, D2/D3): computed AFTER
     // validateWork above confirms `item.domain` is either absent or a real
     // DOMAINS key — deliberately not folded into the tier/title normalize
@@ -218,7 +225,7 @@ export function addWork(dir, work) {
 // write path (identity is immutable; `status` is `move`'s; `stage` is
 // `moveStage`'s) and mixing them into `edit` would open a second door onto
 // the same field.
-const EDITABLE_FIELDS = new Set(['title', 'description', 'kind', 'risk', 'verify', 'tier', 'refs', 'deps', 'acceptance', 'priority', 'intent', 'docsRef', 'parent', 'urgent', 'impact', 'effort', 'footprint', 'mergeAfter', 'supersededBy', 'duplicates']);
+const EDITABLE_FIELDS = new Set(['title', 'description', 'kind', 'risk', 'verify', 'tier', 'refs', 'deps', 'acceptance', 'priority', 'intent', 'docsRef', 'parent', 'urgent', 'impact', 'effort', 'footprint', 'mergeAfter', 'supersededBy', 'duplicates', 'domainFields']);
 
 /**
  * Patch fields on an existing work item, through the SAME single write door
@@ -271,6 +278,11 @@ export function editWork(dir, { id, patch, role } = {}) {
 
     const candidate = { ...work, ...normalizedPatch };
     validateWork(candidate, Object.keys(before.work));
+    // domainFields fieldSchema (decision record 0027, D6): same narrower
+    // per-domain check addWork runs above — only reachable here when
+    // patch.domainFields is present (EDITABLE_FIELDS), so an edit touching
+    // any other field never pays this check.
+    validateDomainFields(candidate, getDomain(candidate.domain));
     // tsk-5q5-2 (D1/D3): same narrow check addWork applies above — only
     // reachable here when `patch.acceptance` is present (EDITABLE_FIELDS),
     // so an edit touching any other field never pays this check.

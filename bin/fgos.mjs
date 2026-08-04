@@ -894,6 +894,16 @@ async function runVerb(verb, flags, positional, dir) {
         // above. work.mjs's validateWorkShape is the single source for the
         // URGENCY_LEVELS domain and rejects an out-of-domain value.
         urgent: optionalField(flags.urgent, "add --urgent requires a value ('low'/'medium'/'high'/'critical'); omit --urgent entirely to leave unset."),
+        // Per decision record 0027 D6 (docs/history/phase-2-status-category-
+        // schema/DISCUSSION.md §task-domain-fields): --domain-fields is an
+        // optional JSON-encoded object ({ [domainName]: {...} }) — same
+        // omitted-leaves-undefined shape as --acceptance above, reusing
+        // parseAcceptanceFlag's generic "parse JSON or reject" behavior
+        // (it never actually assumed an array — only the caller's own
+        // message text names one). work.mjs's validateWorkShape/
+        // validateDomainFields are the single source for the shape/
+        // fieldSchema rules; a malformed JSON value is rejected here first.
+        domainFields: parseAcceptanceFlag(flags['domain-fields'], 'add --domain-fields requires a JSON-encoded object ({ [domainName]: {...} }).'),
       };
       const { event } = addWork(dir, work);
       return { id: event.payload.id, seq: event.seq };
@@ -1154,6 +1164,14 @@ async function runVerb(verb, flags, positional, dir) {
       if (flags.acceptance !== undefined) {
         patch.acceptance = parseAcceptanceFlag(flags.acceptance, 'edit --acceptance requires a JSON-encoded array of {text, evidence} clauses.');
       }
+      // --domain-fields (decision record 0027 D6): same latest-wins
+      // whole-object-overwrite semantics as --acceptance/--refs above (never
+      // a deep merge of nested keys — same convention refs/deps/acceptance
+      // already use), JSON-encoded like --acceptance since a domain's own
+      // field values are arbitrary, not comma-safe.
+      if (flags['domain-fields'] !== undefined) {
+        patch.domainFields = parseAcceptanceFlag(flags['domain-fields'], 'edit --domain-fields requires a JSON-encoded object ({ [domainName]: {...} }).');
+      }
       // --docs-ref: same optional non-empty-path field `add` already exposes
       // (bin/fgos.mjs's `add` case), now also patchable after creation --
       // an item created via `submit` without --docs-ref (or one whose
@@ -1261,7 +1279,7 @@ async function runVerb(verb, flags, positional, dir) {
       if (Object.keys(patch).length === 0) {
         throw new StoreError(
           'validation',
-          'edit requires at least one field to change: --title/--description/--kind/--risk/--verify/--tier/--refs/--deps/--footprint/--acceptance/--priority/--intent/--docs-ref/--parent/--urgent/--impact/--effort/--merge-after/--superseded-by/--duplicates.',
+          'edit requires at least one field to change: --title/--description/--kind/--risk/--verify/--tier/--refs/--deps/--footprint/--acceptance/--priority/--intent/--docs-ref/--parent/--urgent/--impact/--effort/--merge-after/--superseded-by/--duplicates/--domain-fields.',
         );
       }
       const { event } = editWork(dir, { id, patch, role: 'human' });
