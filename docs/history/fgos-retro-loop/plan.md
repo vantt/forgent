@@ -151,7 +151,7 @@ GitNexus present, posture **full**. Step 0 above edits `runVerb`, the
 existing dispatch function in `bin/fgos.mjs` that every verb's `case`
 lives inside — an existing symbol, not a new file. Per `CLAUDE.md`'s MUST
 rule, `impact({target: "runVerb", direction: "upstream"})` runs before
-that edit, at `fgos-executing` time, and its blast radius gets reported
+that edit, at `fgos-code-implement` time, and its blast radius gets reported
 before proceeding; a HIGH/CRITICAL verdict there is a stop, not a note.
 `src/cli/command-registry.mjs`'s `COMMAND_REGISTRY` array (also edited by
 step 0) is data, not a function — `impact()` on it, if the tool accepts a

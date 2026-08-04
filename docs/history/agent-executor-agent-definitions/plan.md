@@ -1,6 +1,6 @@
 # Plan: platform-agnostic canonical root for forgent's own agent definitions (tsk-slq)
 
-Status: built (D5 relocated the canonical root mid-`executing`, D6 registered the new dependency + fixed `verify`; see Revision notes below). Final paths: `agents/fgos-placeholder.yaml`, `scripts/project-agents.mjs` (not `project-agent-definitions.mjs` as first drafted — renamed to match the engine's own `judgeDiscovery`-generated `verify` command literally, per fgos-executing's "run the verify command exactly as recorded" rule). Final `verify`: `npm install && npm test && node scripts/project-agents.mjs && git diff --exit-code -- .claude/agents/`.
+Status: built (D5 relocated the canonical root mid-`executing`, D6 registered the new dependency + fixed `verify`; see Revision notes below). Final paths: `agents/fgos-placeholder.yaml`, `scripts/project-agents.mjs` (not `project-agent-definitions.mjs` as first drafted — renamed to match the engine's own `judgeDiscovery`-generated `verify` command literally, per fgos-code-implement's "run the verify command exactly as recorded" rule). Final `verify`: `npm install && npm test && node scripts/project-agents.mjs && git diff --exit-code -- .claude/agents/`.
 Decisions: `docs/history/agent-executor-agent-definitions/CONTEXT.md` (D1, D2, D3, D4, D5, D6).
 
 ## Revision note 3 (post-executing, D6)
@@ -16,7 +16,7 @@ disposable detached-worktree goal-check never runs `npm install`, so
 ## Revision note 2 (post-executing)
 
 D5 moved the canonical root from `.fgos/agents/<name>.yaml` to
-`agents/<name>.yaml` — discovered live during `fgos-executing`, not
+`agents/<name>.yaml` — discovered live during `fgos-code-implement`, not
 predicted here: `.fgos/` is structurally reserved for runner state
 (`src/runner/worktree.mjs` wipes it on every worktree checkout,
 `src/runner/merge.mjs` rejects any merge touching it). Every `.fgos/agents/`

@@ -91,7 +91,7 @@ an item that isn't at stage `decompose`.
    (`fgos-coding-driving`'s own red-flag rule against a caller inventing a
    stage-to-skill mapping). The ceiling stops the loop the instant the
    item's stage reaches `executing` — it never lets the loop drift onward
-   into `fgos-executing` (a real build) in the same call
+   into `fgos-code-implement` (a real build) in the same call
    (`docs/history/discover-decompose-skill-wrapper-verdict-routing/
    CONTEXT.md` D1, D6). A real split (a `decompose` verdict with real
    children) instead anchors the item by its own open children before the

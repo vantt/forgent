@@ -1,7 +1,7 @@
 # Iron Law evidence: tsk-2ie
 
 Classification (`classifyIronLaw({ filesChanged, description })`, run at
-`fgos-executing` time against the item's own diff, the same function/module
+`fgos-code-implement` time against the item's own diff, the same function/module
 list `approve`'s real gate uses — `src/evolve/iron-law.mjs`):
 
 ```json

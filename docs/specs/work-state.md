@@ -423,7 +423,7 @@ skill/stage hard-code cố định. Với `coding` hôm nay: `clarify` →
 shaping/proving giữa `fgos-planning`/`fgos-validating` (STR93, đổi tên từ
 early/late — cùng một xét-đoán, không đổi cạnh chuyển-stage) vẫn là xét-đoán
 phía phiên của entry skill, không phải một mục sổ đăng ký thứ hai — xem spec
-Runner), `executing` → `fgos-executing` (str89-fgos-domain-skills D4/D6 —
+Runner), `executing` → `fgos-code-implement` (str89-fgos-domain-skills D4/D6 —
 trước đây `null`, không skill nào), `compound-learn` → `fgos-compounding`.
 `synthetic` (minh họa, dùng-một-lần) không ánh xạ skill nào cho stage
 `assembling` duy nhất của nó — giữ nguyên hành vi "không skill" từ trước

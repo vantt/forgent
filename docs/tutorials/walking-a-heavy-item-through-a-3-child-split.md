@@ -164,7 +164,7 @@ way a `pick`ked item's would be.
 would always be empty. This is not a hypothetical: it happened, live, in
 this exact run. The fix was small and squarely in scope (update the
 stale assumption, the same way a prior change had already done for the
-`explanation` quadrant) — a real example of fgos-executing's own rule:
+`explanation` quadrant) — a real example of fgos-code-implement's own rule:
 when reality disagrees with what an item's tests assumed, fix it and say
 so, don't redesign around it.
 

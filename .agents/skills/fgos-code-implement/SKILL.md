@@ -1,5 +1,5 @@
 ---
-name: fgos-executing
+name: fgos-code-implement
 description: >-
   Implement, verify, and hand back exactly one claimed coding-domain item at
   stage `executing`. Use once an item has already cleared `clarify` and
@@ -9,7 +9,7 @@ description: >-
   now".
 ---
 
-# fgos-executing
+# fgos-code-implement
 
 Runs while a claimed item's `stage` reads `executing` — the direct
 implementation step between shaping and synthesis. This skill turns a

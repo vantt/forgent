@@ -47,7 +47,7 @@ helper makes the 4-site version no more code than a 2-site inline version.
 `fgos tool query --capability impact-analysis --status present` →
 1 provider (`gitnexus`), status `present` → posture is **full**
 (`CLAUDE.md`'s three-way gate). Per that gate, before editing
-`mergeRunnerItemLocked` at `fgos-executing` time: run
+`mergeRunnerItemLocked` at `fgos-code-implement` time: run
 `impact({target: "mergeRunnerItemLocked", direction: "upstream"})` and
 report blast radius; run `detect_changes()` before committing.
 
@@ -104,6 +104,6 @@ tests, all in the same 2 files. Proceeds as itself, no child items.
 `npm test` (full suite, per `AGENTS.md`'s DoD question 5) — the item's own
 `verify` field is currently `"chưa xác định — P15 bổ sung"` (undetermined);
 this plan proposes `npm test -- test/runner/merge.test.mjs` as the
-item-scoped verify command for `fgos-executing`'s narrowest-useful-test
+item-scoped verify command for `fgos-code-implement`'s narrowest-useful-test
 step, broadened to full `npm test` before `fgos return` per the repo's own
 quality-gate convention.

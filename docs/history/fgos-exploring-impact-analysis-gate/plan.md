@@ -79,4 +79,4 @@ Single task, no split:
 
 Per the locked decision that Execute and its verify already have a working
 mechanical path, this plan does not redesign that — it names the one task
-and its one verify command above; `fgos-executing` runs it.
+and its one verify command above; `fgos-code-implement` runs it.

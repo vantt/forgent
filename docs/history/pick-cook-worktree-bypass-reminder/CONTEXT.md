@@ -70,7 +70,7 @@ branches (already resolved before this item was even submitted).
 
 - Exact wording and placement of the reminder note inside each `SKILL.md`
   (which section, how prominent) is an implementation choice for
-  `fgos-planning`/`fgos-executing`, not locked here.
+  `fgos-planning`/`fgos-code-implement`, not locked here.
 - Exact journal entry filename (`docs/journals/<timestamp>-<slug>-tsk-4hk.md`)
   and full prose are also left to planning/executing — only its required
   content (D1, D3) is locked.

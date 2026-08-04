@@ -90,15 +90,15 @@ grep -rlq --include='*.md' 'fgw/retro-loop-docs-260802' docs/ && grep -rlq --inc
 ```
 
 This is the one command that proves the item done — `fgos-validating`
-checks it holds up against reality; `fgos-executing` runs it to gate
+checks it holds up against reality; `fgos-code-implement` runs it to gate
 `fgos return`.
 
 # Assumptions
 
 - The reminder note's exact wording/placement inside each `SKILL.md` is
-  left to `fgos-executing` (flagged as an implementation-only detail in
+  left to `fgos-code-implement` (flagged as an implementation-only detail in
   `CONTEXT.md`'s own "Outstanding questions deferred to planning" — not
   material to scope, behavior, or acceptance criteria, since **D2** already
   locks *that* a note goes in both files, just not its prose).
 - The journal entry's exact filename and full prose are likewise left to
-  `fgos-executing`; only its required content (**D1**, **D3**) is locked.
+  `fgos-code-implement`; only its required content (**D1**, **D3**) is locked.

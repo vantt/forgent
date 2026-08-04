@@ -116,5 +116,5 @@ into can already lean on D1b's diagnosis step) before it lands.
 
 Per the locked decision that Execute/verify already has a working
 mechanical path, this plan names one real verify command per piece and
-stops there — it does not redesign how `fgos-executing`/`return`/`approve`
+stops there — it does not redesign how `fgos-code-implement`/`return`/`approve`
 run.

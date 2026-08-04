@@ -1,7 +1,7 @@
 # Why workflow prose gates on a capability query, not a hardcoded tool name
 
 `tsk-1e4` rewrote `CLAUDE.md` and the `fgos-planning`/`fgos-validating`/
-`fgos-executing` skill prose so that "should I demand GitNexus impact
+`fgos-code-implement` skill prose so that "should I demand GitNexus impact
 analysis here?" is answered by querying the `impact-analysis` capability
 (`tsk-1dj`'s tool registry) instead of assuming GitNexus is on this
 machine. Sibling item `tsk-1e4` was explicitly carved out of `tsk-1dj`'s
@@ -37,7 +37,7 @@ Each skill consults the gate at a different moment in the item lifecycle,
 so each needed the degrade-ladder wired into what that moment already
 does:
 
-**`fgos-executing`** — at the point it already reads a symbol's file
+**`fgos-code-implement`** — at the point it already reads a symbol's file
 before editing it:
 
 > Before editing a symbol, apply `CLAUDE.md`'s impact-analysis capability
@@ -88,13 +88,13 @@ without it, the registry existing was inert.
 
 ## The fourth skill: `fgos-exploring` (`tsk-17w`)
 
-`tsk-1e4` covered `fgos-planning`/`fgos-validating`/`fgos-executing`, but
+`tsk-1e4` covered `fgos-planning`/`fgos-validating`/`fgos-code-implement`, but
 left the earliest lifecycle stage — `fgos-exploring`, stage `clarify` —
 without the same gate. `tsk-17w` closed that gap, adding the query to
 `fgos-exploring`'s own scout step:
 
 > Also query `CLAUDE.md`'s impact-analysis capability gate — the same
-> check `fgos-planning`/`fgos-validating`/`fgos-executing` already run
+> check `fgos-planning`/`fgos-validating`/`fgos-code-implement` already run
 > (`fgos tool query --capability impact-analysis --status present`) —
 > rather than assuming GitNexus is on this machine, since this is the only
 > clarify-stage session with real tool access (`judgeDiscovery` itself has
@@ -113,7 +113,7 @@ other three skills:
 > `CONTEXT.md` sees the posture without re-deriving it.
 
 With this item, all four lifecycle skills (`fgos-exploring`,
-`fgos-planning`, `fgos-validating`, `fgos-executing`) plus `CLAUDE.md`
+`fgos-planning`, `fgos-validating`, `fgos-code-implement`) plus `CLAUDE.md`
 consult the same capability query — the injection `tsk-1dj`'s own D3 first
 flagged as still-needed is now complete across the full item lifecycle.
 

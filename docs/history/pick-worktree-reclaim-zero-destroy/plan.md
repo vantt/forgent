@@ -174,7 +174,7 @@ node --test test/runner/worktree.test.mjs test/runner/worktree-callsite-wrapper.
 ```
 
 `test/runner/promote-engine.test.mjs` added post-`fgos-validating`
-(`fgos-executing` impact-analysis pass, GitNexus full posture):
+(`fgos-code-implement` impact-analysis pass, GitNexus full posture):
 `reclaimOrphanedCheckout` impact query (upstream, CRITICAL risk, 9
 symbols) surfaced a THIRD real call site beyond `CONTEXT.md`'s D3 —
 `cleanupMergedBranch` (`src/runner/merge.mjs:931`) calls it directly, not

@@ -55,7 +55,7 @@ pass to keep the item moving.
   branch. A `READY` verdict on an
   uncommitted plan hands off to an edge whose own artifacts are invisible to
   whichever session re-claims the item next. Same one-artifact-per-stop
-  discipline `fgos-executing`'s "one commit per item" rule already gives
+  discipline `fgos-code-implement`'s "one commit per item" rule already gives
   Execute.
 - This session IS that later session, right here (tsk-27y D1/D2, Native-First
   Dispatch Doctrine Phase 2 — `docs/decisions/0026-...md`): once the Gate

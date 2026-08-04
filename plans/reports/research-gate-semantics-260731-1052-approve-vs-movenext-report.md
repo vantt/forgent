@@ -387,7 +387,7 @@ nguồn đầy đủ, đã gắn `docsRef` lên item).
   `fgos-planning` cần xác nhận 2 nhánh không lẫn nhau.
 - **Q-verb-call-sites:** 5 chỗ gọi cần sửa đồng bộ theo D4 — 4 stage-skill
   (`fgos-exploring`/`planning`/`validating`/`executing`) + `/fgOS:cook` bước
-  2. `fgos-validating`/`fgos-executing` chưa được scout trong research này —
+  2. `fgos-validating`/`fgos-code-implement` chưa được scout trong research này —
   cần đọc trước khi shape plan.
 
 ## Unresolved Questions (round 1-3, giữ nguyên để đối chiếu)

@@ -8,7 +8,7 @@ by reading the real `discover`/`decompose` implementation). Verified
 
 **Per-item stopping point (by design, matches `tsk-3go`'s own scope):**
 the loop only ever calls the MECHANICAL `discover`/`decompose` verbs — it
-never continues into `fgos-executing`. So for any one item, this loop's
+never continues into `fgos-code-implement`. So for any one item, this loop's
 involvement ends the moment that item reaches ONE of:
 - `stage: executing` (verdict was `clear`/`pass-through`/`decompose` —
   success, move to the next item in frontier, never chase it into

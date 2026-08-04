@@ -83,7 +83,7 @@ correctness — rejected per KISS.
 
 Single item, no split (`fgos graph tsk-3t4 --json`: standalone component,
 nothing unblocked by it, nothing it depends on). Proceeds as itself through
-`fgos-executing`.
+`fgos-code-implement`.
 
 Concrete cases to prove, standard-mode depth:
 

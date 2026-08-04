@@ -4,7 +4,7 @@
 
 `tsk-d3c`. Any session that claims an fgOS item and calls `Skill()` to
 route through `fgos-routing`, `fgos-exploring`, `fgos-planning`,
-`fgos-validating`, `fgos-executing`, `fgos-compounding`,
+`fgos-validating`, `fgos-code-implement`, `fgos-compounding`,
 `fgos-indexing`, `fgos-submit-assist`, or `fgos-unlock` — the 9 dotdir
 skills at `.claude/skills/fgos/<name>/SKILL.md` (`fgos-unlock` is
 missing from this item's own original acceptance text, which counted

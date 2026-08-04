@@ -74,7 +74,7 @@ test('DOMAINS.coding.skillMap has an entry for every stage in DOMAINS.coding.sta
 test('DOMAINS.coding.skillMap maps every stage, including executing, to its skill', () => {
   assert.equal(DOMAINS.coding.skillMap.clarify, 'fgos-exploring');
   assert.equal(DOMAINS.coding.skillMap.decompose, 'fgos-planning');
-  assert.equal(DOMAINS.coding.skillMap.executing, 'fgos-executing');
+  assert.equal(DOMAINS.coding.skillMap.executing, 'fgos-code-implement');
   // fgos-compounding no longer has a stage entry (D11) — it triggers on
   // status `retrospective` now, not a stage->skill lookup.
   assert.equal('compound-learn' in DOMAINS.coding.skillMap, false);
@@ -103,8 +103,8 @@ test('skillForStage resolves each of coding\'s mapped stages to its skill name',
   assert.equal(skillForStage(DOMAINS.coding, 'compound-learn'), null);
 });
 
-test('skillForStage(DOMAINS.coding, "executing") resolves to fgos-executing', () => {
-  assert.equal(skillForStage(DOMAINS.coding, 'executing'), 'fgos-executing');
+test('skillForStage(DOMAINS.coding, "executing") resolves to fgos-code-implement', () => {
+  assert.equal(skillForStage(DOMAINS.coding, 'executing'), 'fgos-code-implement');
 });
 
 test('skillForStage never throws for a stage absent from a domain\'s skillMap, returning null', () => {

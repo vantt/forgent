@@ -22,7 +22,7 @@ flowchart TD
     R -->|"stage: clarify"| EX["fgos-exploring"]
     R -->|"stage: decompose (shaping)"| PL["fgos-planning"]
     R -->|"stage: decompose (proving)"| VA["fgos-validating"]
-    R -->|"stage: executing"| EC["fgos-executing"]
+    R -->|"stage: executing"| EC["fgos-code-implement"]
 
     EX -->|"fgos discover --verdict clear\n(caller-supplied, tsk-27y)"| PL
     EX -.->|"unclear"| AH["awaiting-human\n(fgos ask / fgos answer)"]
@@ -52,12 +52,12 @@ flowchart TD
 |---|---|---|---|---|
 | Claim | `/fgOS:pick` → `fgos pick` CLI | Mechanical (Node CLI, one-door-write) | id (optional, mặc định frontier head) | `status: doing`, worktree `.claude/worktrees/<id>-*` đứng lên, branch `fgw/<id>` |
 | Điều phối | `fgos-coding-driving` | Mechanical loop — đọc `stage`, gọi `fgos-routing`'s registry, KHÔNG tự suy ra mapping | item id | không tự ghi state — chỉ load đúng skill và lặp tới ceiling |
-| Route | `fgos-routing` | Mechanical lookup: `skillForStage(getDomain(domain), stage)` từ `src/state/workflow-stage-graphs.mjs` | `stage`, `domain` | tên skill (`fgos-exploring`/`fgos-planning`/`fgos-validating`/`fgos-executing`) |
+| Route | `fgos-routing` | Mechanical lookup: `skillForStage(getDomain(domain), stage)` từ `src/state/workflow-stage-graphs.mjs` | `stage`, `domain` | tên skill (`fgos-exploring`/`fgos-planning`/`fgos-validating`/`fgos-code-implement`) |
 | `clarify` | `fgos-exploring` | **Native LLM trước** — session tự đọc description/refs/deps, tự scout (`rg`, capability-gate), tự Socratic; chỉ SAU đó gọi `fgos discover --verdict clear --verify "<...>"` — bypass hẳn `judgeDiscovery` subprocess | title/description/refs/deps, capability-gate impact-analysis | `docs/history/<feature>/CONTEXT.md` (D-ID, bằng chứng scout), gate `contextApprove` (human), `stage: clarify→decompose` |
 | `decompose` — shaping | `fgos-planning` | Native LLM — mode gate (10 cờ), risk map, chọn approach, viết plan.md | CONTEXT.md, item's tier/risk | `docs/history/<feature>/plan.md`, gate `planApprove` (human), verify command thật gắn vào item |
 | `decompose` — proving | `fgos-validating` | Native LLM — feasibility matrix, mỗi dòng cần bằng chứng thật (file đọc, lệnh chạy, test có sẵn), KHÔNG chấp nhận "should work" | plan.md, CONTEXT.md, capability-gate | Gate `validateApprove` (human) + verdict READY/NOT READY; nếu READY, **tự gọi** `fgos decompose --verdict pass-through\|decompose --children '<...>'` — bypass hẳn `judgeDecompose` subprocess (tsk-27y D1/D2), `stage: decompose→executing` |
-| `executing` | `fgos-executing` | Native LLM implement thật; verify **chạy thật** (không nhận lời khẳng định) | docsRef (CONTEXT.md/plan.md nếu có), item's `verify` command | code diff thật, `iron-law-evidence.md` nếu `classifyIronLaw` yêu cầu, 1 commit/item |
-| Return | `fgos return <id>` (gọi từ trong `fgos-executing`) | Mechanical — tự chạy lại `verify`, check working-tree sạch + commit history tiến | commit(s), verify command | `status: awaiting-approval` (verify pass) hoặc `status: blocked` (verify fail) |
+| `executing` | `fgos-code-implement` | Native LLM implement thật; verify **chạy thật** (không nhận lời khẳng định) | docsRef (CONTEXT.md/plan.md nếu có), item's `verify` command | code diff thật, `iron-law-evidence.md` nếu `classifyIronLaw` yêu cầu, 1 commit/item |
+| Return | `fgos return <id>` (gọi từ trong `fgos-code-implement`) | Mechanical — tự chạy lại `verify`, check working-tree sạch + commit history tiến | commit(s), verify command | `status: awaiting-approval` (verify pass) hoặc `status: blocked` (verify fail) |
 | Merge | `/fgOS:merge-next` → `fgos merge next` → `approve` | Mechanical — CTR005/Iron Law gate, re-verify, ranking (dependency-wait, no footprint conflict, `rankImpact`) | ranking từ `fgos merge list` | `status: delivered` (merge sạch) hoặc giữ `awaiting-approval`/`blocked` (iron-law/conflict/verify-fail) |
 | Retrospective | `fgos-compounding` (qua `/fgOS:retro-next`) | Native LLM — phân loại Diataxis, viết end-user doc từ tín hiệu thật đã capture | item's discovery/decisions/gates/outcome/friction đã ghi suốt vòng đời | end-user doc (`docType`/`docPath`), `status: retrospective→cleanup` |
 | Cleanup | `/fgOS:cleanup-next` | Mechanical, TTL-bounded | — | giải phóng worktree, `status: cleanup→done` (1 cửa duy nhất) |
@@ -110,7 +110,7 @@ flowchart LR
         SK1["fgos-exploring"]
         SK2["fgos-planning<br/>(decompose - shaping)"]
         SK3["fgos-validating<br/>(decompose - proving)"]
-        SK4["fgos-executing"]
+        SK4["fgos-code-implement"]
     end
 
     subgraph L4["Tầng 4 - MECHANISM (ai thật sự trả lời verb)"]
@@ -212,19 +212,19 @@ stateDiagram-v2
 | `.fgos/state.json` | dựng lại từ events.jsonl | Không — gitignored, view |
 | `docs/history/<feature>/CONTEXT.md` | `fgos-exploring` | Có, trên branch `fgw/<id>` trước khi gọi `fgos discover` |
 | `docs/history/<feature>/plan.md` | `fgos-planning`, có thể sửa bởi `fgos-validating` (NOT READY loop) | Có, trước khi `fgos-validating` gọi `fgos decompose` |
-| `docs/history/<id>/iron-law-evidence.md` | `fgos-executing`, chỉ khi `classifyIronLaw` trả `required:true` | Có, cùng commit implementation |
-| commit(s) trên `fgw/<id>` | `fgos-executing` (1 commit/item, id trong message) | Có |
+| `docs/history/<id>/iron-law-evidence.md` | `fgos-code-implement`, chỉ khi `classifyIronLaw` trả `required:true` | Có, cùng commit implementation |
+| commit(s) trên `fgw/<id>` | `fgos-code-implement` (1 commit/item, id trong message) | Có |
 | end-user doc (Diataxis) | `fgos-compounding` tại status `retrospective` | Có |
 
 ## Unresolved questions
 
 - `fgos-routing/SKILL.md`'s bảng route ghi `executing` load skill `null`
   ("today", tức "chưa có skill") nhưng code thật
-  (`src/state/workflow-stage-graphs.mjs`) đã có `executing: 'fgos-executing'`
+  (`src/state/workflow-stage-graphs.mjs`) đã có `executing: 'fgos-code-implement'`
   từ `str89-fgos-domain-skills D4/D6` — SKILL.md đang lệch so với code, có
-  thể chỉ chưa update sau khi `fgos-executing` được thêm. Không tự sửa doc
+  thể chỉ chưa update sau khi `fgos-code-implement` được thêm. Không tự sửa doc
   ở đây vì ngoài phạm vi câu hỏi gốc.
 - Chưa xác nhận trực tiếp `approve`/CTR005/Iron Law gate implementation
   (`src/runner/merge.mjs`, `src/evolve/iron-law.mjs`) — chỉ dựa vào mô tả
-  trong `merge-next/SKILL.md` và `fgos-executing/SKILL.md`'s iron-law-evidence
+  trong `merge-next/SKILL.md` và `fgos-code-implement/SKILL.md`'s iron-law-evidence
   bước, chưa đọc trực tiếp 2 file nguồn đó trong phiên này.

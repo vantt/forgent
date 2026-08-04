@@ -78,7 +78,7 @@ see the "Distill mode" section below for how the second one differs.
   ```
 - Commit `DISCUSSION.md` to the item's `fgw/<id>` branch at the end of
   every round that changed it — the same one-artifact-per-stop discipline
-  `fgos-exploring`/`fgos-planning`/`fgos-executing` already follow, so a
+  `fgos-exploring`/`fgos-planning`/`fgos-code-implement` already follow, so a
   session resuming this discussion days later on a fresh claim sees the
   real, current file.
 
@@ -218,7 +218,7 @@ rule for its `brainstorming` skill. The only door out of here is into
 - inventing an index file for a parent's future children
 - setting `refs` to the whole `DISCUSSION.md` instead of a task's own
   anchor
-- jumping straight to implementation, or to `fgos-executing`, instead of
+- jumping straight to implementation, or to `fgos-code-implement`, instead of
   the native-first `fgos-exploring`/`fgos-planning` handoff
 
 Violating the letter of the rules is violating the spirit of the rules.

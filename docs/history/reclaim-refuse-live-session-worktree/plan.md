@@ -56,7 +56,7 @@ here" path without mutating the real global `process.cwd()`.
 
 Error message includes the phrase **"the calling session's own live
 checkout"** — deliberate, concrete wording chosen now (not left to
-`fgos-executing` to improvise) so `CONTEXT.md`'s own verify command
+`fgos-code-implement` to improvise) so `CONTEXT.md`'s own verify command
 (`rg -n 'live session|isLiveSessionWorktree' -i ...`) has something real to
 match once this lands.
 
@@ -103,7 +103,7 @@ radius is genuinely this narrow: one function, one direct caller.
 --json` shows this item in its own isolated component — nothing else in
 the graph blocks or is blocked by it).
 
-## Proof surface (for `fgos-validating` / `fgos-executing`)
+## Proof surface (for `fgos-validating` / `fgos-code-implement`)
 
 | Risk | How risky | Proof point |
 |---|---|---|

@@ -1,7 +1,7 @@
 # tsk-3xo — Iron Law evidence
 
 `classifyIronLaw` on this item's real diff (commit `8b6741f`, computed via
-`changedFiles`/`classifyIronLaw` per `fgos-executing`'s own step 4):
+`changedFiles`/`classifyIronLaw` per `fgos-code-implement`'s own step 4):
 
 ```json
 {

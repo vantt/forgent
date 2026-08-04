@@ -72,7 +72,7 @@ item — noted, not omitted.
 
 **Impact-analysis posture:** `fgos tool query --capability impact-analysis
 --status present` re-run fresh this stage → `gitnexus` present. Per
-`CLAUDE.md`'s gate: **full** — `fgos-executing` MUST run `impact()` on each
+`CLAUDE.md`'s gate: **full** — `fgos-code-implement` MUST run `impact()` on each
 of the 7 call sites' enclosing functions (at minimum: the `discover` and
 `decompose` CLI verb handlers in `bin/fgos.mjs`, and whichever named
 functions in `discovery.mjs`/`decompose.mjs` own the 6 `moveStage` calls)
@@ -126,5 +126,5 @@ proceeds as itself, parented under `tsk-3w3` (CONTEXT.md D2), no children.
 - The `synthetic` domain fixture (or a disposable second domain) can be
   extended with a `Clarify`-mapped stage without breaking
   `test/e2e/synthetic-domain.test.mjs`'s own existing assertions — not
-  verified yet; `fgos-validating` should confirm before `fgos-executing`
+  verified yet; `fgos-validating` should confirm before `fgos-code-implement`
   commits to that specific fixture shape.

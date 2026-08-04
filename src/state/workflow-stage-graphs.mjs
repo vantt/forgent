@@ -78,7 +78,7 @@ export const DOMAINS = Object.freeze({
     // judgment (unaffected by this field) still decides to load
     // `fgos-validating` instead once shape/children already exist — that
     // judgment is session-side prose, not data, so it has no entry here.
-    // `executing` now resolves to `fgos-executing` (str89-fgos-domain-skills
+    // `executing` now resolves to `fgos-code-implement` (str89-fgos-domain-skills
     // D4/D6) — hand-authored via `distill` from bee-executing's
     // implement->verify->cap discipline, translated into fgOS's own
     // item/verify/`fgos return` vocabulary. `fgos-compounding` no longer
@@ -87,7 +87,7 @@ export const DOMAINS = Object.freeze({
     skillMap: Object.freeze({
       clarify: 'fgos-exploring',
       decompose: 'fgos-planning',
-      executing: 'fgos-executing',
+      executing: 'fgos-code-implement',
     }),
     // work-item-status-delivered-retrospective-cleanup D5/D8 (deferred
     // item from CONTEXT.md): does this domain's items go through a real

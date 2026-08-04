@@ -78,7 +78,7 @@ The actual boundary check needs a Unicode-aware definition of "word
 character" (e.g. a Unicode property escape `\p{L}`/`\p{N}` with the `u`
 flag, or an explicit check of the character before/after the match
 against a wider letter/digit/underscore class) — left as the concrete
-implementation choice for `fgos-executing`, constrained by the proof
+implementation choice for `fgos-code-implement`, constrained by the proof
 below.
 
 Risk map:
@@ -132,7 +132,7 @@ No split. One honestly-sized piece — confirmed by the mode-gate count
 
 - The exact Unicode-boundary regex construction (which property escapes,
   whether to precompile per-keyword or build one alternation pattern) is
-  `fgos-executing`'s own call — this plan fixes the *behavior* contract
+  `fgos-code-implement`'s own call — this plan fixes the *behavior* contract
   (standalone keyword matches, substring-inside-another-word does not,
   Vietnamese diacritics handled correctly), not the literal regex.
 

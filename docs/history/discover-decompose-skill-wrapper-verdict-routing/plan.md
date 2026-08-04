@@ -118,7 +118,7 @@ npm test \
 
 Sanity-checked against the pre-fix tree (this session): exits non-zero
 (fails), confirming it is a real, non-vacuous check. **Corrected during
-`fgos-executing` (this session):** the first draft's `take`/`--json --dir`
+`fgos-code-implement` (this session):** the first draft's `take`/`--json --dir`
 substrings were imprecise — `fgos take` never appears literally (the real
 invocation is `bin/fgos.mjs take`), and a bare `--json --dir` also matched
 the new claim-step's own legitimate `fgos list --id ... --json --dir`
@@ -138,7 +138,7 @@ not a silent data-loss risk, so it did not block returning this item.
 ## Assumptions
 
 - The exact wording of the new step-2/step-4 prose in each `SKILL.md` is
-  an implementation detail for `fgos-executing` to write, not pinned here
+  an implementation detail for `fgos-code-implement` to write, not pinned here
   — only the shape (claim-if-needed, dispatch via `fgos-coding-driving`,
   which ceiling) is locked (D1, D2, D6). Not material: wording doesn't
   change scope/behavior as long as the shape holds.
