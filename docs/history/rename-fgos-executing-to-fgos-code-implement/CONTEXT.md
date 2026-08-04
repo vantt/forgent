@@ -111,8 +111,14 @@ missing `.fgos/events.jsonl.backup-*` exclusion, and the content-only
 grep's blindness to a leftover directory/file still literally *named*
 `fgos-executing` — all folded into the verify command below).
 
+A third verify-disputed round caught one more gap: `rg` skips hidden
+directories by default, so the content grep never scanned
+`.claude/skills/**` or `.agents/skills/**` at all — exactly where scope
+items 1 and 4 (the skill dir rename, the six cross-referencing SKILL.md
+files) live. Fixed with `--hidden`.
+
 Final verify command:
 
 ```
-npm test && ! rg -l "fgos-executing" --glob "!node_modules" --glob "!.git" --glob "!.claude/worktrees/**" --glob "!.fgos/state.json" --glob "!.fgos/events.jsonl*" --glob "!docs/history/rename-fgos-executing-to-fgos-code-implement/**" . && ! git ls-files | grep "fgos-executing" | grep -v "^docs/history/rename-fgos-executing-to-fgos-code-implement/"
+npm test && ! rg -l --hidden "fgos-executing" --glob "!node_modules" --glob "!.git" --glob "!.claude/worktrees/**" --glob "!.fgos/state.json" --glob "!.fgos/events.jsonl*" --glob "!docs/history/rename-fgos-executing-to-fgos-code-implement/**" . && ! git ls-files | grep "fgos-executing" | grep -v "^docs/history/rename-fgos-executing-to-fgos-code-implement/"
 ```
