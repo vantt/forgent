@@ -3,7 +3,7 @@ type: how-to
 title: How to wire a skill's dispatch of a capacity or subTask through the native-vs-cli/spawn decision
 tags: []
 timestamp: 2026-08-03T14:00:00.000Z
-source_capture_ids: [tsk-3ik-4]
+source_capture_ids: [tsk-3ik, tsk-3ik-4]
 ---
 
 # How to wire a skill's dispatch of a capacity or subTask through the native-vs-cli/spawn decision
@@ -90,6 +90,42 @@ that invocation. That mechanism is a different, already-built path — not
 `fgos-validating`'s own `SKILL.md` Gate sections. Do not try to route
 `judgeDiscovery`/`judgeDecompose` through `decide` — there is nothing for
 it to decide in that code path.
+
+## Why this covers direct Task-tool calls too, not just `capacities.<id>`
+
+Before any of the wiring above was built, the parent item (`tsk-3ik`)
+locked why the scope had to be broad rather than narrowed to
+capacity-shaped helpers:
+
+> Scope is **broad**, not narrowed to capacity-shaped helpers: the shared
+> decision protocol must govern BOTH `capacities.<id>` config-driven
+> dispatch AND any skill's direct Agent/Task-tool subTask calls, not just
+> the former. Reason (user, verbatim intent): doing this lets fgOS
+> flexibly use many different models across ALL its tools, not just the
+> fgOS-specific capacity mechanism — the payoff is model flexibility for
+> every dispatch path, not just the narrow judge/classify helpers.
+
+At the time this was locked, scouting fgOS's own skill catalog
+(`.claude/skills/`, `plugins/fgOS/skills/`) found **zero** existing
+direct Task/Agent-tool call sites (`rg "Task\(|Agent\(|subagent_type"`)
+— so the "direct-call" half of this doctrine has no existing code to
+retrofit. It establishes the mandatory-consult convention any *future*
+direct-dispatch skill must follow (this how-to's own subTask-shaped
+section above), not a rewrite of dozens of existing files:
+
+> Full scope is "wire everything": every real existing `capacities.<id>`
+> consumer, AND every direct Task/Agent-tool call site in fgOS's own
+> skill catalog, migrates onto the shared decision protocol... The
+> `capacities.<id>` half has three real, already-wired consumers to
+> migrate.
+
+This item also built the **first real native-Task-dispatch branch**
+itself — the doctrine's own phase table had implied the pattern would
+already be "proven on two separate real cases" (`tsk-27y`'s engine-verb
+case, `tsk-53h`'s skill-facing-helper case) before this phase started,
+but scouting `tsk-53h`'s actual landed diff showed it only ever extracted
+`fgos-submit-assist`'s pre-existing cli/spawn wiring — it never built a
+native branch. This item is where that proof actually happens.
 
 ## Related
 

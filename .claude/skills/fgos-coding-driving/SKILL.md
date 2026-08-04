@@ -105,18 +105,37 @@ asserted to generalize automatically to a domain that does not exist yet.
   caller — e.g. `/fgOS:pick`'s own step 2 — already claimed it, or a prior
   iteration of THIS loop already did), skip claiming and proceed straight
   to invoking the skill; the session is assumed to already be inside the
-  claimed worktree in that case. Otherwise, claim it now exactly the way
-  `/fgOS:pick`'s own step 2 does:
+  claimed worktree in that case (or, for a `worktreeBacked:false` domain,
+  already at the main checkout — see below). Otherwise, read
+  `domain.worktreeBacked` (`getDomain(domain).worktreeBacked`, the same
+  registry lookup this skill already uses for `skillForStage`, no new
+  field) and claim accordingly:
 
-  ```bash
-  root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
-  node "$root/bin/fgos.mjs" pick "<id>" --dir "$root"
-  ```
+  - `worktreeBacked === true` (today: `coding`) — claim exactly the way
+    `/fgOS:pick`'s own step 2 does:
 
-  then hand the session into the returned `data.worktree.path` the same
-  way `/fgOS:pick`'s own step 4 does (`EnterWorktree`, falling back to
-  printing the path and stopping if it is unavailable/refuses — never
-  fail or retry past that fallback) — only THEN invoke `fgos-executing`.
+    ```bash
+    root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
+    node "$root/bin/fgos.mjs" pick "<id>" --dir "$root"
+    ```
+
+    then hand the session into the returned `data.worktree.path` the same
+    way `/fgOS:pick`'s own step 4 does (`EnterWorktree`, falling back to
+    printing the path and stopping if it is unavailable/refuses — never
+    fail or retry past that fallback) — only THEN invoke `fgos-executing`.
+
+  - `worktreeBacked === false` — claim without a worktree, the same
+    stage-agnostic claim `fgos-routing` and 2 other skills already use
+    (`claimWork`'s `isolate:false` path, `claim-port.mjs:88`; `take --id`
+    already claims an item at any stage, `bin/fgos.mjs`'s `take` case):
+
+    ```bash
+    root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
+    node "$root/bin/fgos.mjs" take --role session --id "<id>" --dir "$root"
+    ```
+
+    never call `EnterWorktree` for this branch — invoke the
+    `executing`-stage skill directly at the current (main-checkout) cwd.
 - Every bare `fgos <verb>` this skill calls directly (`list`, to re-read
   state each iteration) is `requiresExistingStore: true` — resolve the main
   checkout root the same way every other stage-skill does and pass it
@@ -192,8 +211,12 @@ loop:
     caller's own next step (e.g. `fgos return`) already covers it.
 
   if skill resolves to the domain's `executing`-stage skill AND status != 'doing':
-    claim `id` (`fgos pick`) and enter its worktree BEFORE invoking — see
-    the claim hard rule above.
+    if domain.worktreeBacked:
+      claim `id` (`fgos pick`) and enter its worktree BEFORE invoking
+    else:
+      claim `id` (`fgos take --role session`), no worktree, invoke at the
+      main checkout
+    — see the claim hard rule above.
 
   invoke `skill` (it runs its own Socratic/shape/implement pass, hits its
   own gate, and — once satisfied — calls the engine verb that actually
@@ -249,6 +272,11 @@ for how each one actually calls this skill today).
   status already reads `doing`
 - asserting this loop generalizes to a domain other than `coding` without
   new evidence for that domain (D10)
+- reading the claim step's `worktreeBacked` branch as if it were itself
+  new cross-domain evidence — it only reads a per-domain field the
+  registry already carries for every domain (`coding` and `synthetic`
+  alike), it does not assert this loop has been exercised against a
+  second domain; D10 still holds
 
 Violating the letter of the rules is violating the spirit of the rules.
 

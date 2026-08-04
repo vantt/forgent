@@ -33,14 +33,16 @@
 // that exists only to prove a non-coding domain runs on the same base FSM —
 // it declares exactly one stage, mapped only to 'Execute'. It deliberately
 // maps no stage to 'Clarify'/'Divide': synthetic has no test coverage for
-// that path (tsk-3xo) and staying single-stage/Execute-only keeps it that
-// way on purpose, rather than being forced to exercise it. discovery.mjs/
+// that path and staying single-stage/Execute-only keeps it that way on
+// purpose, rather than being forced to exercise it. discovery.mjs/
 // decompose.mjs now resolve the stage name for any domain via
 // stageForStep(getDomain(work.domain), step) (tsk-3xo) — a domain reaching
 // a Clarify/Divide-mapped stage is handled correctly, not silently
 // overwritten; before tsk-3xo, the hardcoded coding literals underneath
 // would throw a loud FsmError on a stage-name mismatch (stage.mjs's
-// transitionStage), never a silent overwrite.
+// transitionStage), never a silent overwrite. Keeping 'synthetic'
+// single-stage/Execute-only sidesteps that gap entirely rather than
+// papering over it.
 
 /** The domain every item without an explicit `domain` field belongs to —
  * matches today's implicit, exclusively-coding behavior (D2). */
