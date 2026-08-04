@@ -2196,8 +2196,12 @@ async function runVerb(verb, flags, positional, dir) {
       // main; a root (resolved root is itself) keeps the default
       // (main) trunk — byte-for-byte unchanged.
       const rootId = resolveRoot(view, id);
-      const { source, diff, warnings } = rootId !== id
-        ? reviewDiff(process.cwd(), item, { trunk: branchNameFor(rootId) })
+      const rootBranchForReview = rootId !== id ? branchNameFor(rootId) : null;
+      // Same milestone-root-without-a-branch fallback as the Iron Law
+      // check above: no `fgw/<root>` ref to diff against means the trunk
+      // stays the repo trunk, not a crash on an unknown revision.
+      const { source, diff, warnings } = rootBranchForReview && branchExists(process.cwd(), rootBranchForReview)
+        ? reviewDiff(process.cwd(), item, { trunk: rootBranchForReview })
         : reviewDiff(process.cwd(), item);
       return { id, mode: 'local', source, warnings, diff, trace: collectReviewTrace(view, id) };
     }
@@ -2388,10 +2392,17 @@ async function runVerb(verb, flags, positional, dir) {
       let runnerOwnDiff;
       if (source === 'runner') {
         const rootIdForIronLaw = resolveRoot(view, id);
+        const rootBranchForIronLaw = rootIdForIronLaw !== id ? branchNameFor(rootIdForIronLaw) : null;
+        // A resolved root without its own branch (e.g. a milestone root
+        // still at stage `clarify`/`todo`, never itself taken/executed)
+        // has no `fgw/<root>` ref to diff against — fall back to the
+        // repo trunk instead of crashing on an unknown revision.
         runnerOwnDiff = changedFiles(
           repoRoot,
           item,
-          rootIdForIronLaw !== id ? { trunk: branchNameFor(rootIdForIronLaw) } : {},
+          rootBranchForIronLaw && branchExists(repoRoot, rootBranchForIronLaw)
+            ? { trunk: rootBranchForIronLaw }
+            : {},
         );
         const ironLaw = classifyIronLaw({ filesChanged: runnerOwnDiff, description: item.description });
         // review-20260718-self-improve-loop finding f02: only the bare flag
