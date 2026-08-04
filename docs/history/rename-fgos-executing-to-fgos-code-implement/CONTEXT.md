@@ -124,8 +124,15 @@ them would have passed the same command clean. Added `test -f`/`grep -q`
 assertions for the three renamed deliverables (skill dir frontmatter x2,
 the D2 doc file, the D3 capacityId line).
 
+A fifth round, caught by `fgos return`'s own re-verify (not a second-pass
+judge dispute this time — the real thing): `fgos-executing`'s own Iron Law
+evidence doc (`docs/history/tsk-f38/iron-law-evidence.md`, written during
+Execute per that skill's rule 4) legitimately quotes the old literal string
+in its failing-test-first transcript — same class of exception as D4, one
+directory over. Added to the exclusion list.
+
 Final verify command:
 
 ```
-npm test && test -f .claude/skills/fgos-code-implement/SKILL.md && test -f .agents/skills/fgos-code-implement/SKILL.md && grep -q "^name: fgos-code-implement$" .claude/skills/fgos-code-implement/SKILL.md && grep -q "^name: fgos-code-implement$" .agents/skills/fgos-code-implement/SKILL.md && test -f docs/how-to/smoke-test-fgos-code-implement-with-a-trivial-item.md && grep -q "executing: .fgos-code-implement." src/state/workflow-stage-graphs.mjs && ! rg -l --hidden "fgos-executing" --glob "!node_modules" --glob "!.git" --glob "!.claude/worktrees/**" --glob "!.fgos/state.json" --glob "!.fgos/events.jsonl*" --glob "!docs/history/rename-fgos-executing-to-fgos-code-implement/**" . && ! git ls-files | grep "fgos-executing" | grep -v "^docs/history/rename-fgos-executing-to-fgos-code-implement/"
+npm test && test -f .claude/skills/fgos-code-implement/SKILL.md && test -f .agents/skills/fgos-code-implement/SKILL.md && grep -q "^name: fgos-code-implement$" .claude/skills/fgos-code-implement/SKILL.md && grep -q "^name: fgos-code-implement$" .agents/skills/fgos-code-implement/SKILL.md && test -f docs/how-to/smoke-test-fgos-code-implement-with-a-trivial-item.md && grep -q "executing: .fgos-code-implement." src/state/workflow-stage-graphs.mjs && ! rg -l --hidden "fgos-executing" --glob "!node_modules" --glob "!.git" --glob "!.claude/worktrees/**" --glob "!.fgos/state.json" --glob "!.fgos/events.jsonl*" --glob "!docs/history/rename-fgos-executing-to-fgos-code-implement/**" --glob "!docs/history/tsk-f38/**" . && ! git ls-files | grep "fgos-executing" | grep -v "^docs/history/rename-fgos-executing-to-fgos-code-implement/" | grep -v "^docs/history/tsk-f38/"
 ```
