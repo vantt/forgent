@@ -91,6 +91,26 @@ reuses that single value unconditionally at every `moveStage`-to-
 `decompose.mjs` already does correctly what `discovery.mjs`'s fix needed
 to match.
 
+## Fix status
+
+D1's `decompose.mjs` half is implemented (`tsk-1ni-1`): a new
+`resolveContentRoot` helper tries `process.cwd()`, then `git worktree list`
+for `fgw/<id>`, then falls back to the state root — resolving the real
+content root instead of the buggy `path.dirname(dir)` derivation above.
+Real commit (`5d9b50c`, `src/intake/decompose.mjs`, +55/-1 lines):
+
+> resolveContentRoot tries process.cwd(), then git worktree list for
+> fgw/<id>, then falls back to stateRoot. Fixes readLockedContext's
+> trust-signal check AND the scoutContext repoRoot feeding
+> readScoutNotes/writeScoutNotes -- same variable, same bug, same fix.
+
+`discovery.mjs`'s own D1 half (wiring the same helper into
+`resolveDiscovery`) plus D2's verify-overwrite guard are separate sibling
+items (`tsk-1ni-2`); the two test-fixture items (`tsk-1ni-3`,
+`tsk-1ni-4`) update `decompose.test.mjs`/`discovery.test.mjs` to stop
+constructing `repoRoot == content-root` by fixture design (the reason,
+above, the bug went uncaught).
+
 ## Locked decisions
 
 | ID | Decision |
