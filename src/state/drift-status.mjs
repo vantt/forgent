@@ -13,7 +13,7 @@
 // concurrency (tsk-3wq).
 import { execFileSync } from 'node:child_process';
 import { detectTrunk } from '../runner/merge.mjs';
-import { RESOLVED_STATUSES } from './frontier.mjs';
+import { isResolvedStatus } from './frontier.mjs';
 
 function git(repoRoot, args) {
   return execFileSync('git', args, { cwd: repoRoot, encoding: 'utf8', shell: false, stdio: ['ignore', 'pipe', 'pipe'] });
@@ -90,7 +90,7 @@ export function driftStatus(repoRoot, view) {
       aheadOfTarget,
       behindTarget,
       lastSyncedTip,
-      needsSync: aheadOfTarget > 0 && !RESOLVED_STATUSES.has(rootItem?.status),
+      needsSync: aheadOfTarget > 0 && !isResolvedStatus(rootItem),
     };
   }
 
