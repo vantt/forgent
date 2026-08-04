@@ -217,24 +217,27 @@ real functional payoff), Finding 2 whenever the fix-now-vs-defer call is made
 
 **Recommendation: 2 items, not 1, not 3, neither folded into `tsk-38t`.**
 
-- **Item A — filed as `tsk-3xo`** ("Domain khác (không phải coding) không thể
-  vượt qua stage Clarify/Divide"). Bundles Finding 1's real fix + its new
-  test + Finding 3's doc correction (same file/comment neighborhood, no extra
-  cost to include). Should be a **child item under `tsk-3w3`**, explicitly *not* depending on
-  `tsk-38t` — different axis (stage/domain-routing vs. status/statusCategory),
-  no shared files, and `tsk-38t` is currently parked `awaiting-human` on an
-  unrelated product question (10-status→6-category mapping); bundling would
-  stall Item A behind an unrelated decision.
-- **Item B — filed as `tsk-5y5`** ("fgos-coding-driving claim step luôn gọi
-  fgos pick..."). Fix-now was chosen. Root cause sharpened past the original
-  framing: `claimWork` (`src/runner/claim-port.mjs:88`) already exposes
-  `isolate` (`true` = `pick`/worktree, `false` = `take`/no worktree, stage-
-  agnostic — `take` already claims executing-stage items too, per
-  `bin/fgos.mjs:1787`). `fgos-routing` and 2 other skills already call
-  `fgos take` successfully — the fix is a prose-only branch in
-  `fgos-coding-driving/SKILL.md` (+ `.agents/` mirror) choosing `pick` vs
-  `take` by `domain.worktreeBacked`, no `bin/fgos.mjs` change needed. Not
-  dependent on `tsk-3xo` — disjoint files.
+- **Item A — filed as `tsk-3xo`, DONE.** Bundled Finding 1's real fix + its
+  new test + Finding 3's doc correction. Implemented, verified (`npm test`
+  full suite green, 2459/2464, 5 unrelated skips; new
+  `test/e2e/domain-aware-stage-literals.test.mjs` 2/2 pass), merged to main,
+  retrospective-synthesized into
+  `docs/how-to/make-discover-decompose-domain-aware-via-stageforstep.md`,
+  linked as a **child of `tsk-3w3`** (`parent: tsk-3w3`), status `cleanup`
+  (parked briefly at `blocked` — reason "only 0d elapsed since entering
+  cleanup, TTL is 7d" — mechanical TTL park, not a problem; resolves itself
+  once the 7-day window elapses and `fgos cleanup` re-runs).
+- **Item B — filed as `tsk-5y5`, DONE.** Fix-now was chosen (open question 1
+  below, now resolved). Root cause sharpened past the original framing:
+  `claimWork` (`src/runner/claim-port.mjs:88`) already exposes `isolate`
+  (`true` = `pick`/worktree, `false` = `take`/no worktree, stage-agnostic —
+  `take` already claims executing-stage items too, per `bin/fgos.mjs:1787`).
+  Implemented as a prose-only branch in `fgos-coding-driving/SKILL.md` (+
+  `.agents/` mirror) choosing `pick` vs `take` by `domain.worktreeBacked`, no
+  `bin/fgos.mjs` change — matched the plan exactly. Merged, retrospective-
+  synthesized into `docs/how-to/branch-fgos-coding-driving-claim-step-by-
+  domain-worktreebacked.md`, linked as a **child of `tsk-3w3`**, status
+  `cleanup`.
 
 **Relative to `tsk-31l`** (unify `/fgOS:discover`/`decompose`/`discover-next`
 dispatch through `fgos-routing`/`fgos-coding-driving`): confirmed independent
@@ -256,20 +259,44 @@ this gets filed: **Item A is a prerequisite-quality fix that makes #7's
 eventual feature safe to ship** — without it, even a hardcoded-source second
 domain crashes the runner the moment it reaches Clarify/Divide.
 
-## 6. Open questions (need a person)
+## 6. Open questions — resolved / still open
 
-1. Finding 2 — fix now or defer?
-2. Finding 3 — close as a doc-only correction, or still want defense-in-depth
-   (louder warn, or a periodic consistency check) for the future
-   domain-removed-from-registry scenario, even though it's not a live gap
-   today?
-3. Adjacent gap (decompose children / discovered-from items never inherit
-   `work.domain`) — log as a 4th finding/decision on `tsk-3w3` now, or leave
-   for whoever picks up Item A to notice fresh?
-4. `fgos tool query --capability impact-analysis` errored in this session
-   ("command not found") — confirm GitNexus's actual presence/freshness
-   before Item A moves to implementation; the manual grep/read pass used here
-   is not a substitute for a live `impact()` run at edit time.
+1. **Finding 2 — fix now or defer? RESOLVED: fix now.** Done as `tsk-5y5`,
+   merged.
+2. **Finding 3 — doc-only, or defense-in-depth too? RESOLVED: doc-only.**
+   Closed as a comment/decision-text correction in
+   `src/state/workflow-stage-graphs.mjs` — no code change, no test. No
+   defense-in-depth was added; if the domain-removed-from-registry scenario
+   becomes real, revisit then.
+3. **Adjacent gap (decompose children / discovered-from items never inherit
+   `work.domain`) — logged as Finding 4 on `tsk-3w3`, still no item filed.**
+   `decompose.mjs`'s child `addWork` and `loop.mjs`'s discovered-from items
+   still lazy-default every child to `coding` regardless of the parent's
+   real domain — confirmed still true post-`tsk-3xo` merge (Item A's scope
+   was the 4 hardcoded-literal call sites only, never this path). Recorded
+   on `tsk-3w3` so it survives even though no domain 2 exists yet to trip
+   over it (YAGNI — no item filed until one does).
+4. **GitNexus impact-analysis check — RESOLVED retroactively.** GitNexus is
+   now confirmed `present` (`fgos tool query --capability impact-analysis`),
+   unlike the "command not found" state during planning. A retroactive
+   `impact(stageForStep, upstream, depth 2)` on the now-merged code found 12
+   impacted symbols, `risk: CRITICAL` — expected for a hub function
+   (`resolveDiscovery`/`resolveDecompose`/`frontier`/`anti-loop`/`loop.mjs`
+   all call through it), not a sign of a missed regression: `tsk-3xo` never
+   changed `stageForStep`'s own signature or behavior, only added correctly-
+   formed call sites in 3 files that already depended on it. The full suite
+   (2459/2464 green) plus the new e2e fixture already provided evidence
+   proportionate to that fan-out; the retroactive check confirms the risk
+   level, finds nothing new. Logged as a decision on `tsk-3w3`; closed.
+
+New, not in the original 4: **`tsk-3p1`** (one of `tsk-3w3`'s three deps,
+alongside `tsk-2rp`/`tsk-38t`) closed **`wontfix`** since this report was
+first written — stuck on its own unresolved RUL12 semantics question
+(OR-additive vs. replace-`done`), never a person's answer. `wontfix` still
+counts as a *resolved* dependency (`RESOLVED_STATUSES`,
+`src/state/frontier.mjs:186`), so it doesn't block `tsk-3w3` — but
+`tsk-2rp` and `tsk-38t` are both still `awaiting-human` on their own
+unrelated product questions, so `tsk-3w3` remains blocked regardless.
 
 ## 7. Diagrams
 
@@ -410,37 +437,37 @@ The shaping→proving split inside `decompose` is a direct hand-off between
 two stage skills, not a second pass through the registry — the registry maps
 `decompose` to `fgos-planning` only, as the entry-point default.
 
-### 7.5 Where the four findings sit
+### 7.5 Where the four findings sit — updated post-implementation
+
+Original coloring (red/amber = open) is stale as of `tsk-3xo`/`tsk-5y5`
+merging — updated to reflect what's actually fixed vs. still open today.
 
 ```mermaid
 flowchart LR
   classDef bug fill:#b3261e,stroke:#7a1913,color:#fff
-  classDef judgment fill:#b3691e,stroke:#7a4a13,color:#fff
   classDef fixed fill:#1e6b3a,stroke:#144d29,color:#fff
 
-  CLI["bin/fgos.mjs<br/>discover / decompose CLI gate<br/>lines 955, 979<br/>hardcodes stage !== 'clarify' / 'decompose'"]:::bug
-  DISC["discovery.mjs<br/>moveStage literals ×2<br/>lines 593-599, 663-669"]:::bug
-  DEC["decompose.mjs<br/>moveStage literals ×4<br/>lines 542, 604, 685, 759"]:::bug
-  CHILD["decompose.mjs addWork<br/>children never inherit parent's domain<br/>lines 741-756 — adjacent gap, not yet filed"]:::bug
-  CLAIMSTEP["fgos-coding-driving claim step<br/>ignores domain.worktreeBacked<br/>hardcodes fgos pick + worktree"]:::judgment
-  RESOLVE["resolveDomainName<br/>fallback to 'coding' on bad domain string"]:::fixed
+  CLI["bin/fgos.mjs<br/>discover / decompose CLI gate<br/>lines 955, 979<br/>FIXED — tsk-3xo, stageForStep substitution"]:::fixed
+  DISC["discovery.mjs<br/>moveStage literals ×2<br/>FIXED — tsk-3xo"]:::fixed
+  DEC["decompose.mjs<br/>moveStage literals ×4<br/>FIXED — tsk-3xo"]:::fixed
+  CHILD["decompose.mjs addWork<br/>children never inherit parent's domain<br/>STILL OPEN — Finding 4, logged on tsk-3w3, no item filed"]:::bug
+  CLAIMSTEP["fgos-coding-driving claim step<br/>domain.worktreeBacked branch<br/>FIXED — tsk-5y5, pick vs take"]:::fixed
+  RESOLVE["resolveDomainName<br/>fallback to 'coding' on bad domain string<br/>NEVER A LIVE GAP — doc corrected"]:::fixed
 
   CLI --- DISC --- DEC --- CHILD
 ```
 
-**Red — real bug, Item A.** Domain 2's item can't cross Clarify/Divide at
-all: sync CLI rejects it outright, the runner sweep halts the *whole tick*
-(not just that item) when the engine's own `moveStage` throws on the
-mismatched literal.
+**Green — fixed, merged, retro-synthesized:** `tsk-3xo` (CLI gate + both
+`moveStage` files, verified `npm test` full suite + new e2e fixture,
+retroactive GitNexus `impact()` confirms only expected hub fan-out, no new
+gap), `tsk-5y5` (claim step now branches on `domain.worktreeBacked`), and
+the `resolveDomainName` doc correction (never a live gap — `validateWork`
+already rejected a bad domain at every write door).
 
-**Amber — judgment call, Item B.** Cheap fix, but the skill's own D9/D10
-scope-lock argues for waiting on real domain-2 evidence before generalizing
-this claim step.
-
-**Green — already fixed at the write door.** `validateWork` already rejects
-a bad `domain` on every write (`add`/`submit`/`edit`); the no-throw read-time
-fallback is a deliberately locked hot-path contract. Only the doc comment and
-the `tsk-3w3` decision text describing it as "silent" need correcting.
+**Red — still open, no item filed yet:** Finding 4, decompose/discovered-
+from children never inheriting `work.domain`. Deliberately left unfiled
+(YAGNI — no real domain 2 exists yet to trip over it); logged as a decision
+on `tsk-3w3` so it isn't lost.
 
 ## 8. Would fgos-routing rename to fgos-domain-routing today?
 
