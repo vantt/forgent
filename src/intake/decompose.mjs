@@ -26,6 +26,7 @@ import { runJudgeExecutor, JUDGE_STRICT_JSON_SUFFIX, judgeVerifySemanticCorrectn
 import { appendJudgeFailLog } from './judge-fail-log.mjs';
 import { DEFAULTS } from '../state/work.mjs';
 import { listWork, moveStage, moveWork, addWork, putInAwaiting, addDecision, editWork, StoreError } from '../state/store.mjs';
+import { getDomain, stageForStep } from '../state/workflow-stage-graphs.mjs';
 import { rankImpact } from '../state/impact.mjs';
 import { computeImpact, computePriority, effortForMode, MODE_EFFORT } from '../state/priority-formula.mjs';
 import { footprintOverlapAmong } from '../state/graph-metrics.mjs';
@@ -517,8 +518,9 @@ export function resolveDecompose(dir, id, cfg, role, callerVerdict) {
   // calls below would otherwise throw a conflict for the exact same case,
   // so this check backs it up ahead of time rather than making every caller
   // catch that error.
-  const currentStage = work.stage ?? 'executing';
-  if (currentStage !== 'decompose') {
+  const domain = getDomain(work.domain);
+  const currentStage = work.stage ?? stageForStep(domain, 'Execute');
+  if (currentStage !== stageForStep(domain, 'Divide')) {
     return { outcome: 'noop', id };
   }
 
@@ -539,7 +541,7 @@ export function resolveDecompose(dir, id, cfg, role, callerVerdict) {
   // Track A's Gates, e.g. from before this item, is unaffected).
   const planApproveVerify = view.gates?.[id]?.planApprove?.verify ?? work.verify;
   if (hasChildren) {
-    moveStage(dir, { id, to: 'executing', expectedStage: 'decompose', verify: planApproveVerify, role });
+    moveStage(dir, { id, to: stageForStep(domain, 'Execute'), expectedStage: stageForStep(domain, 'Divide'), verify: planApproveVerify, role });
     releaseClaimOnExecuting();
     return { outcome: 'already-decomposed', id };
   }
@@ -601,7 +603,7 @@ export function resolveDecompose(dir, id, cfg, role, callerVerdict) {
         rationale:
           'tsk-19j D7 trust signal: plan.md already committed to no split, so judgeDecompose has nothing to judge — skipping avoids a pointless model round-trip, never a real child-generation decision',
       });
-      moveStage(dir, { id, to: 'executing', expectedStage: 'decompose', verify: planApproveVerify, role });
+      moveStage(dir, { id, to: stageForStep(domain, 'Execute'), expectedStage: stageForStep(domain, 'Divide'), verify: planApproveVerify, role });
       releaseClaimOnExecuting();
       return { outcome: 'pass-through', id };
     }
@@ -682,7 +684,7 @@ export function resolveDecompose(dir, id, cfg, role, callerVerdict) {
 
   if (verdict.kind === 'pass-through') {
     logDecomposeVerdict(dir, id, 'pass-through', verdict.reason ?? DEFAULT_PASS_THROUGH_RATIONALE);
-    moveStage(dir, { id, to: 'executing', expectedStage: 'decompose', verify: planApproveVerify, role });
+    moveStage(dir, { id, to: stageForStep(domain, 'Execute'), expectedStage: stageForStep(domain, 'Divide'), verify: planApproveVerify, role });
     releaseClaimOnExecuting();
     return { outcome: 'pass-through', id };
   }
@@ -756,7 +758,7 @@ export function resolveDecompose(dir, id, cfg, role, callerVerdict) {
   });
 
   logDecomposeVerdict(dir, id, 'decompose', verdict.reason, `${childIds.length} children`);
-  moveStage(dir, { id, to: 'executing', expectedStage: 'decompose', verify: planApproveVerify, role });
+  moveStage(dir, { id, to: stageForStep(domain, 'Execute'), expectedStage: stageForStep(domain, 'Divide'), verify: planApproveVerify, role });
   releaseClaimOnExecuting();
   return { outcome: 'decompose', id, childIds };
 }

@@ -951,9 +951,11 @@ async function runVerb(verb, flags, positional, dir) {
     // bin/fgos-runner.mjs loads it.
     case 'discover': {
       const id = requireField(positional[0] ?? flags.id, 'discover requires an id: fgos discover <id> [--config <path>]');
-      const stage = listWork(dir).work[id]?.stage;
-      if (stage !== 'clarify') {
-        throw new StoreError('validation', `discover: work "${id}" is at stage "${stage}", not "clarify" -- use "fgos decompose ${id}" instead.`);
+      const work = listWork(dir).work[id];
+      const stage = work?.stage;
+      const clarifyStage = stageForStep(getDomain(work?.domain, { onUnrecognized: () => {} }), 'Clarify');
+      if (stage !== clarifyStage) {
+        throw new StoreError('validation', `discover: work "${id}" is at stage "${stage}", not "${clarifyStage}" -- use "fgos decompose ${id}" instead.`);
       }
       // An explicit --config path stays a loud, unmodified failure on ENOENT
       // (loadRunnerConfig); only the default, unflagged path bootstraps a
@@ -975,9 +977,11 @@ async function runVerb(verb, flags, positional, dir) {
     // `awaiting-human` (D3).
     case 'decompose': {
       const id = requireField(positional[0] ?? flags.id, 'decompose requires an id: fgos decompose <id> [--config <path>]');
-      const stage = listWork(dir).work[id]?.stage;
-      if (stage !== 'decompose') {
-        throw new StoreError('validation', `decompose: work "${id}" is at stage "${stage}", not "decompose" -- use "fgos discover ${id}" instead.`);
+      const work = listWork(dir).work[id];
+      const stage = work?.stage;
+      const decomposeStage = stageForStep(getDomain(work?.domain, { onUnrecognized: () => {} }), 'Divide');
+      if (stage !== decomposeStage) {
+        throw new StoreError('validation', `decompose: work "${id}" is at stage "${stage}", not "${decomposeStage}" -- use "fgos discover ${id}" instead.`);
       }
       const cfg = flags.config
         ? loadRunnerConfig(flags.config)
