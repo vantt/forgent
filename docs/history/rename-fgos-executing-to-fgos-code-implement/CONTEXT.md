@@ -117,8 +117,15 @@ directories by default, so the content grep never scanned
 items 1 and 4 (the skill dir rename, the six cross-referencing SKILL.md
 files) live. Fixed with `--hidden`.
 
+A fourth verify-disputed round caught the verify command only asserting
+the NEGATIVE (old string gone) and never the POSITIVE (new deliverables
+actually exist) — deleting the skill dirs outright instead of renaming
+them would have passed the same command clean. Added `test -f`/`grep -q`
+assertions for the three renamed deliverables (skill dir frontmatter x2,
+the D2 doc file, the D3 capacityId line).
+
 Final verify command:
 
 ```
-npm test && ! rg -l --hidden "fgos-executing" --glob "!node_modules" --glob "!.git" --glob "!.claude/worktrees/**" --glob "!.fgos/state.json" --glob "!.fgos/events.jsonl*" --glob "!docs/history/rename-fgos-executing-to-fgos-code-implement/**" . && ! git ls-files | grep "fgos-executing" | grep -v "^docs/history/rename-fgos-executing-to-fgos-code-implement/"
+npm test && test -f .claude/skills/fgos-code-implement/SKILL.md && test -f .agents/skills/fgos-code-implement/SKILL.md && grep -q "^name: fgos-code-implement$" .claude/skills/fgos-code-implement/SKILL.md && grep -q "^name: fgos-code-implement$" .agents/skills/fgos-code-implement/SKILL.md && test -f docs/how-to/smoke-test-fgos-code-implement-with-a-trivial-item.md && grep -q "executing: .fgos-code-implement." src/state/workflow-stage-graphs.mjs && ! rg -l --hidden "fgos-executing" --glob "!node_modules" --glob "!.git" --glob "!.claude/worktrees/**" --glob "!.fgos/state.json" --glob "!.fgos/events.jsonl*" --glob "!docs/history/rename-fgos-executing-to-fgos-code-implement/**" . && ! git ls-files | grep "fgos-executing" | grep -v "^docs/history/rename-fgos-executing-to-fgos-code-implement/"
 ```
