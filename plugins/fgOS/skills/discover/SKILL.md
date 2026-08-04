@@ -1,23 +1,30 @@
 ---
 name: discover
 description: >-
-  Use when the user wants to run context-discovery for one fgOS work item
-  stuck at stage clarify, from inside a Claude Code session, invoked as
-  /fgOS:discover <id>. Calls a real model judgment through fgOS's own
-  discover verb (one-door-write) — never writes .fgos/ state directly. For
+  Use when the user wants to advance one fgOS work item past stage clarify,
+  from inside a Claude Code session, invoked as /fgOS:discover <id>. Claims
+  the item if needed, then dispatches it through fgos-coding-driving so the
+  live session does its own real Socratic reasoning (fgos-exploring) and
+  supplies the discover verb's verdict itself (one-door-write) — never
+  writes .fgos/ state directly, and never re-derives a judgment blind. For
   an item at stage decompose, use /fgOS:decompose instead. Examples:
   "/fgOS:discover build-cli", "/fgOS:discover tsk-3wd".
 ---
 
 # fgOS discover
 
-Wraps `fgos discover` so a person working inside Claude Code can advance a
-work item past `clarify` without hand-typing the CLI. This is a real
-judgment call, not a mechanical read: it invokes a live model against the
-item's full context (title/description/refs/deps/prior gate answers) and
-appends a discovery record, then either advances the item's `stage` to
-`decompose` or parks it in `awaiting-human` with a question. One-door-
-write, CTR001 — never writes `.fgos/` state directly.
+Claims a work item (if not already claimed) and dispatches it through
+`fgos-coding-driving` so a person working inside Claude Code can advance it
+past `clarify` without hand-typing the CLI. This is a real judgment call,
+not a mechanical read: the live session itself reads the item's full
+context (title/description/refs/deps/prior gate answers), reasons about it
+(`fgos-exploring`'s own Socratic flow), and supplies that verdict to the
+`discover` engine verb directly — instead of leaving the judgment to a
+later, context-blind subprocess call. Either way the item's `stage`
+advances to `decompose` or parks in `awaiting-human` with a question.
+One-door-write, CTR001 — never writes `.fgos/` state directly
+(`docs/history/discover-decompose-skill-wrapper-verdict-routing/
+CONTEXT.md` D1).
 
 tsk-2b0 D1 (hard split, no fallback): `discover` only ever runs
 context-discovery for a `clarify`-stage item now — it no longer also
@@ -39,39 +46,68 @@ for that; `discover` errors if called on an item that isn't at stage
    fgos discover <id>
    ```
 
-2. **Run context-discovery.** Run:
+2. **Claim if not already claimed.** Resolve the main checkout root (every
+   verb below is `requiresExistingStore: true`, same as every other fgOS
+   skill):
+
+   ```bash
+   root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
+   ```
+
+   Read the item's live status:
 
    ```
-   node ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs discover $ARGUMENTS --json --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
+   node ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs list --id $ARGUMENTS --json --dir "$root"
    ```
 
-   Always use the literal `${CLAUDE_PROJECT_DIR}` substitution shown above,
-   never a relative path — an installed plugin's files run from a copied
-   cache location, not from this repo checkout, so a relative path would
-   resolve to the wrong place or fail outright.
+   If `data.work["$ARGUMENTS"].status` already reads `doing`, skip straight
+   to step 3 — the caller (or an earlier iteration of this same command)
+   already holds the claim. Otherwise claim it, the same way `/fgOS:pick`'s
+   own step 2 does:
 
-   `--dir` (tsk-56t): the session may already be inside the claimed item's
-   worktree (`/fgOS:pick` switches into it), which never carries its own
-   `.fgos/` by design (ADR0020) — `${CLAUDE_PROJECT_DIR}` still resolves
-   to the main checkout even from inside that worktree (it survives an
-   `EnterWorktree` switch), so passing it as `--dir` here points this
-   write at the one real store explicitly, instead of the CLI resolving
-   `.fgos/` under the worktree's own (missing) cwd.
+   ```
+   node ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs take $ARGUMENTS --role session --dir "$root"
+   ```
 
-   If the command fails (e.g. the id doesn't exist, or the item is not at
-   stage `clarify` — the CLI now errors and names `decompose` instead),
-   show the real error to the user and stop — do not retry with a guessed
-   id and do not fall back to a hand-written state change.
+   If the item already carries its own branch (`fgw/<id>` from an earlier
+   claim), `take` refuses and names `pick` instead — fall back to:
 
-3. **Report the result**, reading the JSON output's `data` field
-   (`data.outcome` is `clear` or `unclear`):
+   ```
+   node ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs pick $ARGUMENTS --dir "$root"
+   ```
 
-   - `clear` — item advanced `clarify → decompose`; relay
-     `data.verdict.verify`, the real verify command now attached. Tell the
-     user `/fgOS:decompose <id>` is the next step for this item.
-   - `unclear` — item parked in `awaiting-human`; relay
-     `data.verdict.question` and tell the user to resolve it via
-     `/fgOS:answer <id> <answer text>`.
+   Any other failure (the id doesn't exist, lock contention) shows the
+   real error to the user and stops — do not retry with a guessed id and
+   do not fall back to a hand-written state change.
 
-   If the item is now unclear, say so plainly rather than treating it as a
-   failure — this is a valid, expected outcome of this verb, not an error.
+3. **Dispatch through `fgos-coding-driving`.** Invoke the
+   `fgos-coding-driving` skill for `$ARGUMENTS` with `ceiling:
+   stage:decompose`. Never invoke `fgos-exploring` (or any other
+   stage-skill) by name directly here — the driver resolves which skill a
+   `clarify`-stage item maps to through its own registry lookup, the one
+   place that mapping is allowed to live (`fgos-coding-driving`'s own
+   red-flag rule against a caller inventing a stage-to-skill mapping). The
+   ceiling stops the loop the instant the item's stage reaches
+   `decompose` — it never lets the loop drift onward into `fgos-planning`
+   in the same call
+   (`docs/history/discover-decompose-skill-wrapper-verdict-routing/
+   CONTEXT.md` D1, D6). The live session doing the real Socratic reasoning
+   inside `fgos-exploring` is what supplies the `discover` engine verb its
+   `--verdict` directly — no context-blind subprocess judge runs for this
+   call.
+
+4. **Report whatever `fgos-coding-driving` reported.** Relay its stop
+   reason exactly; do not add a separate report of your own beyond it:
+
+   - **reached ceiling at stage `decompose`** — the item cleared `clarify`
+     with a real verify command now attached. Tell the user
+     `/fgOS:decompose <id>` is the next step for this item.
+   - **`awaiting-human`** — relay the parked question exactly and tell the
+     user to resolve it via `/fgOS:answer <id> <answer text>`.
+   - **`blocked`** — relay the block exactly; never guess an answer or
+     retry blind on this skill's own authority.
+   - **no-progress** — relay it plainly; this is a real stop that needs a
+     person's look, not a silent retry.
+
+   A parked or blocked outcome is a valid, expected result of this
+   command, not a failure — say so plainly rather than treating it as one.
