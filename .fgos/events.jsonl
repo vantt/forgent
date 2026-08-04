@@ -5527,3 +5527,4 @@
 {"seq":5527,"ts":"2026-08-04T09:37:56.273Z","type":"work.move","payload":{"id":"tsk-5y5","from":"retrospective","to":"cleanup","role":"human","writer":{"id":"2346faba-1afb-4d41-bc0b-c6c56ce7398e","source":"env"}},"v":3}
 {"seq":5528,"ts":"2026-08-04T09:38:02.244Z","type":"work.edit","payload":{"id":"tsk-3xo","patch":{"parent":"tsk-3w3"},"role":"human","writer":{"id":"2346faba-1afb-4d41-bc0b-c6c56ce7398e","source":"env"}},"v":3}
 {"seq":5529,"ts":"2026-08-04T09:38:02.368Z","type":"work.edit","payload":{"id":"tsk-5y5","patch":{"parent":"tsk-3w3"},"role":"human","writer":{"id":"2346faba-1afb-4d41-bc0b-c6c56ce7398e","source":"env"}},"v":3}
+{"seq":5530,"ts":"2026-08-04T09:40:31.695Z","type":"work.move","payload":{"id":"tsk-3id","from":"awaiting-approval","to":"delivered","role":"human","writer":{"id":"eb306a3e-784f-4608-a96e-6d49ee7f5400","source":"env"}},"v":3}
