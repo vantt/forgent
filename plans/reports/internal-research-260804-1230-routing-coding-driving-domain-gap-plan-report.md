@@ -169,19 +169,24 @@ no-throw fallback is a deliberately locked, already-tested (`must_have`)
 hot-path contract for `frontier.mjs`/`loop.mjs`/`stage.mjs` readers — a
 mistyped domain is already rejected loudly at the door today.
 
-**Action: documentation correction only**, not a code fix. Two places
-currently claim "silently overwritten" incorrectly and should be corrected:
+**Action taken: documentation correction only, done.** Two places claimed
+"silently overwritten" incorrectly; both corrected:
 
-- `domains.mjs` lines 36-40 (the `synthetic` domain's own doc comment)
-- The decision text already logged on `tsk-3w3`
-  ("domain khác sẽ bị ghi đè stage âm thầm, không lỗi")
+- `domains.mjs` lines 32-40 (the `synthetic` domain's own doc comment) —
+  rewritten to state the real behavior (throws `FsmError`, halts the runner
+  tick — Finding 1 / `tsk-3xo`), not a silent overwrite.
+- The decision log on `tsk-3w3` (append-only — the original wrong sentence
+  in decision 0 can't be edited in place) — a new decision appended
+  explicitly correcting both wrong claims from decision 0: the "silent
+  stage overwrite" framing and the `resolveDomainName` "never errors"
+  framing.
 
 Correct statement: the write door already rejects a bad domain; the only
 remaining theoretical risk is a domain *removed* from `DOMAINS` in a future
 release while old events still reference it — where folding to `coding` is
 arguably correct graceful degradation, not a bug.
 
-Risk: zero — comment/decision-text only.
+Risk: zero — comment/decision-text only, no code path or test changed.
 
 ### Adjacent gap found, not part of the original 3 — flagging only
 
@@ -220,9 +225,16 @@ real functional payoff), Finding 2 whenever the fix-now-vs-defer call is made
   no shared files, and `tsk-38t` is currently parked `awaiting-human` on an
   unrelated product question (10-status→6-category mapping); bundling would
   stall Item A behind an unrelated decision.
-- **Item B** — Finding 2. Not filed yet; file only after the fix-now-vs-defer
-  call is made. If fix-now, small enough to fold into Item A's same
-  commit/PR, or stand alone — stakes are low either way.
+- **Item B — filed as `tsk-5y5`** ("fgos-coding-driving claim step luôn gọi
+  fgos pick..."). Fix-now was chosen. Root cause sharpened past the original
+  framing: `claimWork` (`src/runner/claim-port.mjs:88`) already exposes
+  `isolate` (`true` = `pick`/worktree, `false` = `take`/no worktree, stage-
+  agnostic — `take` already claims executing-stage items too, per
+  `bin/fgos.mjs:1787`). `fgos-routing` and 2 other skills already call
+  `fgos take` successfully — the fix is a prose-only branch in
+  `fgos-coding-driving/SKILL.md` (+ `.agents/` mirror) choosing `pick` vs
+  `take` by `domain.worktreeBacked`, no `bin/fgos.mjs` change needed. Not
+  dependent on `tsk-3xo` — disjoint files.
 
 **Relative to `tsk-31l`** (unify `/fgOS:discover`/`decompose`/`discover-next`
 dispatch through `fgos-routing`/`fgos-coding-driving`): confirmed independent

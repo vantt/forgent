@@ -35,9 +35,14 @@
 // maps no stage to 'Clarify'/'Divide': discovery.mjs/decompose.mjs are
 // hardcoded to coding's literal stage names and were never retrofitted
 // (approach.md's Boundary correction) — a domain reaching a Clarify/Divide-
-// mapped stage would get its stage silently overwritten with a coding
-// literal outside its own stages list. Keeping 'synthetic' single-stage/
-// Execute-only sidesteps that gap entirely rather than papering over it.
+// mapped stage does NOT get its stage silently overwritten; stage.mjs's
+// transitionStage is domain-aware and throws FsmError on the resulting
+// unrecognized (from,to) pair (a loud crash, not silent corruption), which
+// the runner sweep's outer catch then turns into a `halted` outcome for the
+// WHOLE tick, not just the offending item (tracked as tsk-3xo, filed off
+// plans/reports/internal-research-260804-1230-routing-coding-driving-domain-
+// gap-plan-report.md). Keeping 'synthetic' single-stage/Execute-only
+// sidesteps that gap entirely rather than papering over it.
 
 /** The domain every item without an explicit `domain` field belongs to —
  * matches today's implicit, exclusively-coding behavior (D2). */
