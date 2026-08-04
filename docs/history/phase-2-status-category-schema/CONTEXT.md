@@ -85,3 +85,20 @@ Toàn bộ 6 D-ID đã ghi qua `fgos decision --id tsk-38t` (seq 5571, 5585,
   `wontfix`) hoặc cần viết lại khớp D1-D6 (clause 1 giả định 6 category cố
   định cho MỌI status, D1 đã thu hẹp). `fgos-planning` nên viết lại
   acceptance dựa trên D1-D6, không dùng nguyên bản cũ.
+- **Rủi ro footprint trùng với `tsk-f38` (ghi nhận lúc approve gate,
+  2026-08-04, người dùng báo trực tiếp):** `tsk-f38` đang ở `executing`,
+  sẽ đổi tên skill `fgos-executing` → `fgos-code-implement`. Tên
+  `fgos-executing` hiện là 1 GIÁ TRỊ literal trong `skillMap` của
+  `DOMAINS.coding` (`workflow-stage-graphs.mjs`: `executing:
+  'fgos-executing'`) — CÙNG FILE mà task `skillMap['retrospective']` (D5,
+  `#task-skillmap-retrospective`) và task schema (D2/D3,
+  `#task-schema-status-category`) của `tsk-38t` cũng sẽ sửa. Rủi ro: 2
+  việc sửa cùng vùng `DOMAINS.coding` trong `workflow-stage-graphs.mjs`
+  song song, không phải conflict logic (khác key: `executing` vs
+  `retrospective`/`statusLabels`) nhưng CÙNG FILE — `fgos-planning` nên
+  kiểm `fgos conflicts` trước khi bắt đầu code, và **đợi `tsk-f38` merge
+  xong rồi validate lại 1 lần** (đúng yêu cầu người dùng) xem đổi tên skill
+  có ảnh hưởng gì tới `#task-skillmap-retrospective` hay không (khả năng
+  thấp — D5 chỉ thêm KEY mới `'retrospective'`, không sửa key `'executing'`
+  đã có — nhưng cần xác nhận thật bằng diff sau khi `tsk-f38` xong, không
+  suy đoán).
