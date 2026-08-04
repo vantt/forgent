@@ -215,6 +215,95 @@ export const DOMAINS = Object.freeze({
     // Disposable, no real worktree/merge — same reasoning as 'synthetic'.
     worktreeBacked: false,
   }),
+  // 'fixture-marketing' (tsk-38t-7, the capstone proof for decision record
+  // 0027/tsk-38t's whole Phase 2 multi-domain schema — docs/history/phase-2-
+  // status-category-schema/DISCUSSION.md §"Test domain giả lập thứ 2 chứng
+  // minh thiết kế") is a clearly-fixture SECOND production-shaped domain,
+  // disposable like 'synthetic'/'triage' but built to cover the one gap
+  // those two never close: neither ever declares a `statusLabels` or
+  // `skillMap.retrospective` entry, so nothing before this item ever
+  // exercised 0027's D2/D3/D5 machinery end to end for a domain other than
+  // 'coding'. Reuses coding's exact stages/stepMap/transitions shape
+  // verbatim (this domain's own job is to prove status/category/skill/field
+  // generalize, not to add new stage-machinery coverage — that's already
+  // 'synthetic'/'triage''s job) — this also keeps `transitions` non-empty,
+  // unlike 'synthetic''s deliberately-empty array (see that entry's own
+  // block comment above), which the item's own recorded verify command
+  // depends on.
+  'fixture-marketing': Object.freeze({
+    stages: Object.freeze(['clarify', 'decompose', 'executing']),
+    stepMap: Object.freeze({
+      clarify: 'Clarify',
+      decompose: 'Divide',
+      executing: 'Execute',
+    }),
+    transitions: Object.freeze([
+      Object.freeze({ from: 'clarify', to: 'executing' }),
+      Object.freeze({ from: 'clarify', to: 'decompose' }),
+      Object.freeze({ from: 'decompose', to: 'executing' }),
+    ]),
+    // No stage skill ever loads for this fixture domain (same reasoning as
+    // 'synthetic'/'triage' above) — only `retrospective` (a STATUS key
+    // reusing this same field, 0027 D5) gets a real, distinct value below.
+    // 'fgos-fixture-retro' is deliberately NOT a real skill file anywhere
+    // in `.claude/skills/` (per this item's own constraint: no CLI flags,
+    // skill files, or production docs for this fixture) — its only job is
+    // to be a value that is NOT 'fgos-compounding', proving
+    // `getDomain('fixture-marketing').skillMap.retrospective` reads THIS
+    // domain's own table rather than silently falling back to coding's.
+    skillMap: Object.freeze({
+      clarify: null,
+      decompose: null,
+      executing: null,
+      retrospective: 'fgos-fixture-retro',
+    }),
+    // No real worktree/merge for this domain — same reasoning as
+    // 'synthetic'/'triage' above; keeps this item's own `fgos cleanup`
+    // e2e proof from needing a real branch/merge to verify.
+    worktreeBacked: false,
+    // statusLabels (0027 D2/D3, mirrors DOMAINS.coding.statusLabels's own
+    // doc comment above): the field this whole item exists to exercise for
+    // a domain other than coding. Judgment call, documented per this item's
+    // own instructions — the canceled-equivalent slot is deliberately NOT
+    // `wontfix` here, unlike coding: `wontfix` is kept (still a legal FSM
+    // edge, still mapped to `canceled`, so it stays inert-but-correct), but
+    // `blocked` ALSO maps to `canceled` in this domain — this fixture's own
+    // business framing is that a `blocked` item here represents a
+    // stakeholder's outright decline (closed, not a temporary park), unlike
+    // coding's `blocked` (active, retryable, maps to `in-progress`). This
+    // is the strongest real proof available within today's constraints:
+    // status-fsm.mjs's TRANSITIONS is ONE shared flat table for every domain
+    // (0027's own "Quyết định" section, reconfirmed by reading status-fsm.mjs
+    // and work.mjs's STATUSES directly — both are closed to the same 10
+    // literal names, so no domain can introduce a genuinely new status
+    // literal like a hypothetical "declined"; only D1-D3's original
+    // "domain sở hữu TOÀN BỘ bảng transition" framing, explicitly REJECTED
+    // in DISCUSSION.md §1/§6, would have allowed that). Mapping a DIFFERENT
+    // literal (`blocked`, not `wontfix`) into `canceled` is the real,
+    // store-backed way to prove `isResolvedStatus` (frontier.mjs) reads
+    // `item.statusCategory` generically rather than a hardcoded `'wontfix'`
+    // string comparison — a regression that hardcoded the literal instead
+    // would make this domain's `blocked` items wrongly stay "unresolved"
+    // forever, exactly the bug this table exists to catch. `doing`/
+    // `awaiting-human` keep coding's own `in-progress` grouping (same
+    // structural-effect-on-frontier reasoning DISCUSSION.md §6 gives for
+    // coding); `awaiting-approval`/`todo` are unchanged too — only the
+    // canceled slot needed to differ to prove the point D2 exists for.
+    statusLabels: Object.freeze({
+      todo: 'todo',
+      doing: 'in-progress',
+      blocked: 'canceled',
+      'awaiting-human': 'in-progress',
+      'awaiting-approval': 'review',
+      wontfix: 'canceled',
+    }),
+    // fieldSchema (0027 D6): small, deliberately toy schema so this item's
+    // e2e test can prove BOTH an accepted and a rejected `domainFields`
+    // shape through the real store (validateDomainFields, work.mjs) for a
+    // domain other than the throwaway test-only object
+    // test/state/domain-fields.test.mjs already used for the same purpose.
+    fieldSchema: Object.freeze({ campaign: 'string', budget: 'number' }),
+  }),
 });
 
 /**
