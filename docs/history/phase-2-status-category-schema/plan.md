@@ -101,13 +101,14 @@ combined one). Each carries `parent: tsk-38t`.
   — verify checks for the source content-hash `2ae492d8` (already cited
   in `work-state.md`/`frontier.mjs` comments as base-workflow-model's own
   ID), not a guessed filename.
-- `tsk-f38`'s in-flight rename of skill `fgos-executing` →
-  `fgos-code-implement` (flagged in `CONTEXT.md`) touches the SAME
-  `DOMAINS.coding.skillMap` object piece 5 edits — not a logic conflict
-  (different keys: `executing` vs `retrospective`), but a same-file
-  footprint overlap `fgos-validating`/whoever executes piece 5 should
-  check with `fgos conflicts` before starting, and re-confirm once
-  `tsk-f38` merges (session is watching this via a scheduled check).
+- **RESOLVED (2026-08-04):** `tsk-f38`'s rename of skill `fgos-executing` →
+  `fgos-code-implement` merged to `main` (588bfb2). Confirmed for real
+  (not assumed): the rename only changes the VALUE of the existing
+  `executing` key in `DOMAINS.coding.skillMap`
+  (`workflow-stage-graphs.mjs:90`) — no structural change, no key overlap
+  with piece 5's planned `retrospective` key addition. `fgw/tsk-38t`
+  merged `main` cleanly (no conflicts) to pick this up. No longer a live
+  risk.
 - Acceptance criteria on the parent `tsk-38t` (9 clauses, pre-dates D1-D6)
   needs rewriting to match — clause 5 (combine explore with `tsk-3p1`) is
   stale (`tsk-3p1` is `wontfix`); clause 1 assumes the OLD 10-status
