@@ -12,7 +12,7 @@
 // the log itself; the store facade hands it the view).
 
 import { buildUnifiedEdges } from './dep-graph.mjs';
-import { FRONTIER_ORDER_VERSION, frontier, RESOLVED_STATUSES } from './frontier.mjs';
+import { FRONTIER_ORDER_VERSION, frontier, isResolvedStatus } from './frontier.mjs';
 import { viewRevision } from './replay.mjs';
 
 /**
@@ -295,7 +295,7 @@ export function staleBlocked(view) {
     const item = work[id];
     if (item.status !== 'todo' && item.status !== 'blocked') continue;
     const deps = Array.isArray(item.deps) ? item.deps : [];
-    const blockedBy = deps.filter((dep) => !RESOLVED_STATUSES.has(work[dep]?.status));
+    const blockedBy = deps.filter((dep) => !isResolvedStatus(work[dep]));
     if (blockedBy.length > 0) {
       result.push({ id, status: item.status, blockedBy });
     }
@@ -355,7 +355,7 @@ function computeGreedyTopUnblock(candidates, notDone, deps, k) {
 export function greedyTopUnblock(view, k = 10) {
   const work = view?.work ?? {};
   const deps = knownUnifiedDeps(work);
-  const notDone = new Set(Object.keys(work).filter((id) => !RESOLVED_STATUSES.has(work[id].status)));
+  const notDone = new Set(Object.keys(work).filter((id) => !isResolvedStatus(work[id])));
   return computeGreedyTopUnblock([...notDone], notDone, deps, k); // declaration order
 }
 
@@ -375,7 +375,7 @@ export function goalScopedGreedyTopUnblock(view, focusId, k = 10) {
   const scope = goalScopedSet(view, focusId);
   if (scope.size === 0) return [];
   const deps = knownUnifiedDeps(work);
-  const notDone = new Set(Object.keys(work).filter((id) => scope.has(id) && !RESOLVED_STATUSES.has(work[id].status)));
+  const notDone = new Set(Object.keys(work).filter((id) => scope.has(id) && !isResolvedStatus(work[id])));
   return computeGreedyTopUnblock([...notDone], notDone, deps, k); // declaration order, scope-filtered
 }
 
@@ -398,12 +398,12 @@ export function whatIf(view, id) {
   }
   const deps = knownUnifiedDeps(work);
   const rev = reverseDeps(deps);
-  const notDone = new Set(Object.keys(work).filter((x) => !RESOLVED_STATUSES.has(work[x].status)));
+  const notDone = new Set(Object.keys(work).filter((x) => !isResolvedStatus(work[x])));
   const downstream = transitiveDownstream(id, rev, notDone);
   const newlyReady = (rev.get(id) ?? []).filter((depId) => {
     const item = work[depId];
     if (item.status !== 'todo') return false;
-    return (Array.isArray(item.deps) ? item.deps : []).every((d) => d === id || RESOLVED_STATUSES.has(work[d]?.status));
+    return (Array.isArray(item.deps) ? item.deps : []).every((d) => d === id || isResolvedStatus(work[d]));
   });
   return { id, exists: true, unblocksTransitive: downstream.size, newlyReady };
 }

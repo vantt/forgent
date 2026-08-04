@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { computeEntropy, computeCounts } from '../../src/report/entropy.mjs';
+import { computeEntropy, computeCounts, FINAL_STATUSES } from '../../src/report/entropy.mjs';
 
 // computeEntropy/computeCounts are pure over a hand-built view (per this
 // cell's must_haves: no fs, no side effects) — every test below constructs
@@ -86,6 +86,19 @@ for (const status of ['todo', 'doing', 'blocked', 'awaiting-human']) {
   });
 }
 
+// tsk-38t-4 (decision record 0027, D2): countStageClarify now reads
+// isResolvedStatus(item), a hybrid of literal tail-status + statusCategory
+// === 'canceled', instead of a flat RESOLVED_STATUSES.has(item.status) Set
+// -- this is the whole point of the migration: a domain that relabels its
+// wontfix-equivalent status away from the literal string 'wontfix' must
+// still be recognized as resolved, via the frozen-at-write-time
+// statusCategory field, not a literal string match.
+test("computeEntropy does not flag a stage:clarify item with a DIFFERENT domain's canceled-equivalent label + statusCategory 'canceled' (proves category-based recognition, not a literal 'wontfix' match)", () => {
+  const view = { work: { a: { id: 'a', status: 'declined', statusCategory: 'canceled', stage: 'clarify' } } };
+  const { parts } = computeEntropy(view);
+  assert.equal(parts.find((p) => p.label === 'stage-clarify').count, 0);
+});
+
 test('computeEntropy weighs a friction record with no later settlement on the same id at ×2', () => {
   const view = {
     work: { a: { id: 'a', status: 'todo' } },
@@ -133,6 +146,36 @@ test('computeEntropy sums multiple contributing signals across different items i
   };
   assert.equal(computeEntropy(view).score, 5 + 2 + 3);
 });
+
+// tsk-38t-4 (decision record 0027's audit §2): FINAL_STATUSES used to be a
+// local Set in this file that OMITTED the four tail-segment statuses
+// (delivered/retrospective/cleanup), even though this file's own
+// countMissingActual doc comment claims to mirror bin/fgos.mjs's
+// formatMissingOutcomeNag rule -- which already included them. That drift
+// was a real bug (0027's audit): an item that reached e.g. 'delivered' via
+// the sync-root/catchup mechanical reconcile path (never going through the
+// normal doing -> awaiting-approval addOutcome stamp) could sit there
+// forever with a missing actual half and never get flagged by entropy,
+// even though the CLI's own outcome-backfill nag already caught it. These
+// tests lock the widened (bug-fixed), now-shared set.
+test('FINAL_STATUSES (shared with bin/fgos.mjs) includes every tail-segment status, not just the front-segment pair', () => {
+  assert.deepEqual(
+    [...FINAL_STATUSES].sort(),
+    ['awaiting-approval', 'blocked', 'cleanup', 'delivered', 'done', 'retrospective'].sort(),
+  );
+});
+
+for (const status of ['delivered', 'retrospective', 'cleanup']) {
+  test(`computeEntropy now flags a "${status}" item missing its actual half at ×5 (bug fix: entropy.mjs's own FINAL_STATUSES used to omit the tail segment)`, () => {
+    const view = {
+      work: { a: { id: 'a', status } },
+      outcomes: { a: { predicted: { tier: 'standard' } } }, // no actual half yet
+    };
+    const { score, parts } = computeEntropy(view);
+    assert.equal(score, 5);
+    assert.equal(parts.find((p) => p.label === 'missing-actual').count, 1);
+  });
+}
 
 test('computeCounts on an empty view returns all-zero counts', () => {
   assert.deepEqual(computeCounts({ work: {}, decisions: [] }), { outcomes: 0, frictions: 0, settlements: 0 });
