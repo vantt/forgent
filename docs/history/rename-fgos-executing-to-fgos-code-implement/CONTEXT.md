@@ -97,3 +97,22 @@ file edits safely (skill dir rename first vs. code first, GitNexus
 `impact()`/`rename()` usage per AGENTS.md's Never-Do rule against raw
 find-and-replace on tracked symbols, and how to batch the docs/history +
 plans/reports rewrite without missing files).
+
+## Addendum: D4 — this doc's own directory is a verify exception
+
+| ID | Decision |
+|----|----------|
+| D4 | `docs/history/rename-fgos-executing-to-fgos-code-implement/` (this directory, including this file) is excluded from the "zero leftover `fgos-executing` reference" verify check — both the content grep and the tracked-path check. This is the decision record ABOUT the rename itself; by definition it must keep naming the old skill to document what changed FROM and TO. Requiring it to scrub its own subject would make the verify command permanently unsatisfiable. This is a structural exception like the governed state files (D1's addendum), not a narrowing of D1's product-docs scope — every other `docs/history/*` file still gets the full rename. |
+
+Surfaced by the second-pass verify judge during clarify (two prior
+`verify-disputed` rounds also caught real gaps: a broken
+`--exclude-dir` basename-only match against `.claude/worktrees/**`, a
+missing `.fgos/events.jsonl.backup-*` exclusion, and the content-only
+grep's blindness to a leftover directory/file still literally *named*
+`fgos-executing` — all folded into the verify command below).
+
+Final verify command:
+
+```
+npm test && ! rg -l "fgos-executing" --glob "!node_modules" --glob "!.git" --glob "!.claude/worktrees/**" --glob "!.fgos/state.json" --glob "!.fgos/events.jsonl*" --glob "!docs/history/rename-fgos-executing-to-fgos-code-implement/**" . && ! git ls-files | grep "fgos-executing" | grep -v "^docs/history/rename-fgos-executing-to-fgos-code-implement/"
+```
