@@ -12,8 +12,8 @@ test('DEFAULT_DOMAIN is "coding"', () => {
   assert.equal(DEFAULT_DOMAIN, 'coding');
 });
 
-test('DOMAINS has exactly three entries: "coding", "synthetic", and "triage"', () => {
-  assert.deepEqual(Object.keys(DOMAINS), ['coding', 'synthetic', 'triage']);
+test('DOMAINS has exactly four entries: "coding", "synthetic", "triage", and "fixture-marketing" (tsk-38t-7 capstone fixture)', () => {
+  assert.deepEqual(Object.keys(DOMAINS), ['coding', 'synthetic', 'triage', 'fixture-marketing']);
 });
 
 test('DOMAINS.triage (tsk-3xo regression fixture) maps Clarify/Divide/Execute under non-coding-literal stage names', () => {
