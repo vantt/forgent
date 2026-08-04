@@ -66,8 +66,15 @@ untouched — no partial write, safe to retry with the right verb.
    (judgment came back unusable, item left untouched — retry later).
 
 4. **Inside a Claude Code session**, `/fgOS:discover <id>` and
-   `/fgOS:decompose <id>` wrap these two verbs directly — same stage rule,
-   same errors surfaced verbatim.
+   `/fgOS:decompose <id>` claim the item if needed, then dispatch it
+   through `fgos-coding-driving` (`ceiling: stage:decompose` /
+   `ceiling: stage:executing` respectively) instead of calling either verb
+   directly — the live session does the real Socratic/shaping reasoning
+   itself and supplies the verdict via `--verdict`, rather than leaving it
+   to `judgeDiscovery`/`judgeDecompose`'s context-blind subprocess judge
+   (`docs/history/discover-decompose-skill-wrapper-verdict-routing/
+   CONTEXT.md`). The same stage rule and errors still apply underneath —
+   only the path that reaches the verb changed.
 
 ## If you were relying on the old "call discover twice" pattern
 

@@ -103,26 +103,37 @@ sequenced internally.
 ```
 npm test \
 && grep -Eq "fgos-coding-driving|fgos-exploring" plugins/fgOS/skills/discover/SKILL.md \
-&& grep -q "fgos take" plugins/fgOS/skills/discover/SKILL.md \
+&& grep -q "fgos.mjs take" plugins/fgOS/skills/discover/SKILL.md \
 && grep -q "stage:decompose" plugins/fgOS/skills/discover/SKILL.md \
 && grep -Eq "fgos-coding-driving|fgos-planning" plugins/fgOS/skills/decompose/SKILL.md \
-&& grep -q "fgos take" plugins/fgOS/skills/decompose/SKILL.md \
+&& grep -q "fgos.mjs take" plugins/fgOS/skills/decompose/SKILL.md \
 && grep -q "stage:executing" plugins/fgOS/skills/decompose/SKILL.md \
 && grep -q "fgos-coding-driving" plugins/fgOS/skills/discover-next/SKILL.md \
 && grep -q "stage:decompose" plugins/fgOS/skills/discover-next/SKILL.md \
 && grep -q "stage:executing" plugins/fgOS/skills/discover-next/SKILL.md \
-&& ! grep -q -- "--json --dir" plugins/fgOS/skills/discover/SKILL.md \
-&& ! grep -q -- "--json --dir" plugins/fgOS/skills/decompose/SKILL.md \
+&& ! grep -q "discover \$ARGUMENTS --json --dir" plugins/fgOS/skills/discover/SKILL.md \
+&& ! grep -q "decompose \$ARGUMENTS --json --dir" plugins/fgOS/skills/decompose/SKILL.md \
 && ! grep -q "wrap these two verbs directly" docs/how-to/advance-a-clarify-or-decompose-stage-item-with-discover-decompose.md
 ```
 
 Sanity-checked against the pre-fix tree (this session): exits non-zero
-(fails), confirming it is a real, non-vacuous check. This is the
+(fails), confirming it is a real, non-vacuous check. **Corrected during
+`fgos-executing` (this session):** the first draft's `take`/`--json --dir`
+substrings were imprecise — `fgos take` never appears literally (the real
+invocation is `bin/fgos.mjs take`), and a bare `--json --dir` also matched
+the new claim-step's own legitimate `fgos list --id ... --json --dir`
+status check, not just the old blind verb-call pattern. Both checks are
+now scoped to the exact strings that actually appear. This is the
 structural ceiling this item's `verify` can honestly reach — it proves the
 4 files were edited to the shape D1-D6 describe; it does not and cannot
 prove an LLM will follow that prose correctly at runtime. That gap is
 real, out of this item's scope, and tracked separately as `tsk-4l9`
-(discoveredFrom tsk-31l).
+(discoveredFrom tsk-31l). A second gap, discovered only during
+implementation — `/fgOS:discover-loop` losing its distinct lock-timeout
+whole-loop stop signal once `discover-next` dispatches through a skill
+instead of a bare CLI subprocess — is tracked separately as `tsk-1c6`
+(discoveredFrom tsk-31l); bounded by `discover-loop`'s own iteration cap,
+not a silent data-loss risk, so it did not block returning this item.
 
 ## Assumptions
 
