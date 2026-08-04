@@ -10,7 +10,7 @@
 // recorded residual limitation, not a silent bug.
 
 import path from 'node:path';
-import { HEAVY_KEYWORDS } from '../intake/risk-keywords.mjs';
+import { HEAVY_KEYWORDS, matchesKeyword } from '../intake/risk-keywords.mjs';
 
 // D10+D14 self-modifying-capable module list. Each rule tests a filesChanged
 // entry literally: 'prefix' matches any path starting with the value; 'equals'
@@ -51,10 +51,10 @@ function matchesModuleRule(filePath, rule) {
  *   strings, normalized (path.posix.normalize) before matching so './x' and 'x'
  *   match identically. Throws if not an array or any entry is not a string.
  * @param {string} [input.description] - optional free text; matched
- *   case-insensitively against every HEAVY_KEYWORDS entry when non-empty. An
- *   absent/empty description yields no flags but never counts as "safe" —
- *   required is still computed from matchedModules. Throws if present but not a
- *   string.
+ *   word-boundary-aware and case-insensitively (tsk-2as D1, matchesKeyword)
+ *   against every HEAVY_KEYWORDS entry when non-empty. An absent/empty
+ *   description yields no flags but never counts as "safe" — required is
+ *   still computed from matchedModules. Throws if present but not a string.
  * @returns {{required: boolean, matchedFlags: string[], matchedModules: string[]}}
  */
 export function classifyIronLaw({ filesChanged, description } = {}) {
@@ -82,9 +82,8 @@ export function classifyIronLaw({ filesChanged, description } = {}) {
 
   const matchedFlags = [];
   if (typeof description === 'string' && description.length > 0) {
-    const lowerDescription = description.toLowerCase();
     for (const keyword of HEAVY_KEYWORDS) {
-      if (lowerDescription.includes(keyword.toLowerCase())) {
+      if (matchesKeyword(description, keyword)) {
         matchedFlags.push(keyword);
       }
     }
