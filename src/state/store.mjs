@@ -33,6 +33,7 @@ import { graphMetrics as computeGraphMetrics, whatIf as computeWhatIf, classifyS
 import { transitionWork, FsmError } from './status-fsm.mjs';
 import { transitionStage } from './stage-fsm.mjs';
 import { validateWork, checkAcceptanceEvidenceTraceable, WorkValidationError, DEFAULTS, GOAL_TIERS, truncateTitle } from './work.mjs';
+import { getDomain, statusCategoryFor } from './workflow-stage-graphs.mjs';
 import { EventLogError } from './events.mjs';
 import { validateToolRegistration, ToolRegistryError } from './tool-registry.mjs';
 import { frontier, isDepsAndLineageReady as depsAndLineageReadyView } from './frontier.mjs';
@@ -159,6 +160,30 @@ export function addWork(dir, work) {
     // the runner loop) obeys one rule without any of them repeating it.
     const item = { ...work, tier: work?.tier ?? DEFAULTS.tier, title: truncateTitle(work?.title) };
     validateWork(item, Object.keys(before.work));
+    // statusCategory (decision record 0027, D2/D3): computed AFTER
+    // validateWork above confirms `item.domain` is either absent or a real
+    // DOMAINS key — deliberately not folded into the tier/title normalize
+    // step above it, because `getDomain` falls back to DEFAULT_DOMAIN with
+    // a `console.warn` for a genuinely unrecognized domain (workflow-stage-
+    // graphs.mjs's `resolveDomainName`), and an invalid `item.domain` must
+    // still fail validation with exactly the same single stderr line as
+    // before this cell existed (test/cli/fgos.test.mjs's `submit --domain
+    // <bad>` stderr-parity assertion) — never a stray "folding to coding"
+    // warning for an item that is about to be rejected anyway. So the very
+    // first event a work item ever gets already carries its frozen
+    // category, with no from-scratch window a derive-on-read model would
+    // leave open (see STATUS_CATEGORIES's own doc comment, work.mjs, for
+    // the L3 replay-from-zero reasoning this avoids), but only once the
+    // item is known-valid. `statusCategoryFor` returns `undefined` (never
+    // stamped, per the same "don't invent one" rule moveWork below
+    // follows) unless `item.status` — almost always the caller's default
+    // `todo`, but a caller-declared `status` on `add` is legal and honored
+    // here too — falls in the six front-segment statuses `item`'s own
+    // domain declares a `statusLabels` entry for.
+    const addCategory = statusCategoryFor(getDomain(item.domain), item.status);
+    if (addCategory !== undefined) {
+      item.statusCategory = addCategory;
+    }
     // tsk-5q5-2 (D1/D3): narrow write-time check on any acceptance clause
     // supplying text+evidence together — see checkAcceptanceEvidenceTraceable's
     // own doc comment (work.mjs) for what this does and does not prove.
@@ -411,6 +436,25 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, rol
   // exact payload shape transitionWork already produced, byte-for-byte.
   if (role !== undefined) {
     rawEvent.payload.role = role;
+  }
+  // statusCategory (decision record 0027, D2/D3): stamped AFTER the pure
+  // transition already returned it, same post-transition pattern as `role`
+  // immediately above and `writer` immediately below — status-fsm.mjs never
+  // sees or validates this field (it stays domain-agnostic-consumer-only,
+  // never a move-legality input; see DOMAINS.coding.statusLabels's own
+  // comment on why category-level validation would be wrong). Computed
+  // from `work`'s OWN domain (never a global table), so a future
+  // second production domain with a different statusLabels map gets its
+  // own categories automatically, no branch here. Present only for the six
+  // front-segment statuses `to`'s domain actually declares a `statusLabels`
+  // entry for; the four tail-segment statuses (`delivered`/`retrospective`/
+  // `cleanup`/`done`) have none there by design (D1), so `category` is
+  // `undefined` and nothing is stamped — never invented, and never
+  // recomputed later at replay time (replay.mjs's work.move case only
+  // folds whatever this event actually carries).
+  const category = statusCategoryFor(getDomain(work.domain), to);
+  if (category !== undefined) {
+    rawEvent.payload.statusCategory = category;
   }
   // Writer provenance (D8/D15/D17/D18, str46-io-contract) -- same
   // post-transition stamp as role/headAtTake above, but unconditional:

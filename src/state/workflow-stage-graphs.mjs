@@ -96,6 +96,50 @@ export const DOMAINS = Object.freeze({
     // always carry a genuine headAtTake/headAtReturn/branchHeadAt* pair
     // from a real merge or return.
     worktreeBacked: true,
+    // statusLabels (decision record 0027, D2/D3 — supersedes base-workflow-
+    // model D1-D3's "domain never touches the status/transition table", but
+    // ONLY for the six statuses below; status-fsm.mjs's TRANSITIONS is the
+    // one FSM every domain still shares, unchanged by this map). Maps each
+    // of coding's six front-segment statuses (the ones BEFORE `delivered`
+    // — see status-fsm.mjs's own header comment for the full chain) to a
+    // `statusCategory` (work.mjs's STATUS_CATEGORIES) — a lossy compression
+    // domain-agnostic readers (frontier's `ready` filter, rollup, outcome/
+    // friction, discovery-judge — not migrated yet, tsk-38t-4) can read
+    // without learning coding's own status vocabulary. Coding is not
+    // RENAMING any status here (0027 D1: domain gets the RIGHT to relabel,
+    // never the obligation — coding keeps all six literal names byte for
+    // byte, zero migration); this table exists purely to declare the
+    // category each keeps mapping to. `doing`/`blocked`/`awaiting-human`
+    // collapse to one shared `in-progress` category rather than three
+    // separate ones — precedent: `docs/history/status-proposed-rename/
+    // CONTEXT.md` D3 ("a new top-level status only when it has a distinct
+    // structural effect on the frontier/dependency graph; otherwise merge,
+    // and let `reason`/`ask`/`answer` carry the finer distinction") — none
+    // of the three appears in frontier.mjs's `ready` filter or
+    // `RESOLVED_STATUSES` today, so none earns a category of its own.
+    // `wontfix` keeps its own literal name (coding's synonym for
+    // cancel/decline/out-of-scope) but always maps to `canceled` — the
+    // category a domain that chose a different word (`declined`,
+    // `out-of-scope`) would map to as well (D2). The FOUR tail-segment
+    // statuses (`delivered`/`retrospective`/`cleanup`/`done`) deliberately
+    // have NO entry here at all — not even a `null` placeholder — mirroring
+    // `skillMap`'s own precedent for "this key legitimately does not apply"
+    // (`skillForStage` already treats an absent key and an explicit `null`
+    // identically): D1 fixes those four as a shared, unrelabelable chain
+    // every domain uses verbatim, so they need no per-domain category —
+    // literal status stays sufficient for them forever. Frozen onto the
+    // event payload at write time by store.mjs's addWork/moveWork, never
+    // derived on read (see STATUS_CATEGORIES's own doc comment, work.mjs,
+    // for the L3 replay-from-zero reasoning) — this table is read exactly
+    // once per write, through `statusCategoryFor` below, never at replay.
+    statusLabels: Object.freeze({
+      todo: 'todo',
+      doing: 'in-progress',
+      blocked: 'in-progress',
+      'awaiting-human': 'in-progress',
+      'awaiting-approval': 'review',
+      wontfix: 'canceled',
+    }),
   }),
   synthetic: Object.freeze({
     stages: Object.freeze(['assembling']),
@@ -191,4 +235,19 @@ export function stageForStep(domain, step) {
  * stage is absent from the domain's `skillMap` entirely. Never throws. */
 export function skillForStage(domain, stage) {
   return (domain.skillMap && domain.skillMap[stage]) ?? null;
+}
+
+/** The `statusCategory` (work.mjs's STATUS_CATEGORIES) `status` maps to
+ * within `domain`'s own `statusLabels` table (decision record 0027, D2/D3)
+ * — `undefined`, deliberately NOT `null`, both when the domain declares no
+ * `statusLabels` at all (every domain but `coding` today — `synthetic`/
+ * `triage` never move status through a domain-owned table) and when
+ * `status` is absent from a declared `statusLabels` entirely (coding's own
+ * four tail-segment statuses, which carry no entry there by design — see
+ * `DOMAINS.coding.statusLabels`'s own comment). `undefined` here is the
+ * caller's (`store.mjs`) signal to stamp nothing onto the event payload,
+ * mirroring `skillForStage`'s `null`-for-absent shape one level down: never
+ * throws, safe to call unconditionally. */
+export function statusCategoryFor(domain, status) {
+  return domain?.statusLabels?.[status];
 }
