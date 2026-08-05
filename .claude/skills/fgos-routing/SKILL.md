@@ -29,6 +29,32 @@ Before touching anything, read the shape of the work:
 
 Both are read-only. Nothing here writes state.
 
+### Mode gate (mechanical, not vibes) — decide the lane before loading a heavy skill
+
+For any claimed item at stage `decompose`, decide its lane HERE, before
+routing it to `fgos-planning` below (tsk-5ay D1: triage-before-load, moved
+from inside `fgos-planning` itself — a `tiny` item used to pay the cost of
+loading that skill's full flow just to learn it was `tiny`). Count how
+many of these actually apply to the item: auth, authorization, data
+model, audit/security, external systems, public contracts, cross-platform,
+existing covered behavior, weak proof around the area, multi-domain.
+
+- 0–1 flags → **tiny** (a couple of files, one direct task) or **small**
+  (a few files, no gray areas).
+- 2–3 flags, or story-sized behavior → **standard**.
+- 4+ flags, or any hard-gate flag (auth, data loss, audit/security,
+  external provider, removing a validation) → **high-risk**.
+- One yes/no question decides whether the plan is even real → **spike**,
+  regardless of flag count.
+
+This is the same lane vocabulary (tiny/small/standard/high-risk/spike)
+`fgos-planning`'s own `plan.md` has always recorded — only the deciding
+moved here; the recording still happens in `plan.md` itself, written by
+`fgos-planning`'s own Bootstrap step from this lane, carried forward as
+prose (never a new field on the item, never a value `stage` takes). Hand
+the lane, the flag count, and which flags applied to `fgos-planning`
+directly when routing a `decompose`-stage item there.
+
 ## Running a state-writing verb from this session
 
 Every bare `fgos <verb>` below (`take`, `return`, and the `ask`/`answer`
