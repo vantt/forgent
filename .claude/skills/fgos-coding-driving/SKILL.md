@@ -48,15 +48,31 @@ asserted to generalize automatically to a domain that does not exist yet.
   (tsk-19j §3's own verified boundary — this is what lets a `ceiling:
   stage:decompose` loop stop with the item freshly landed AT `decompose`,
   never one stage further, having invoked `fgos-planning` first by mistake).
-- `status: awaiting-human` always stops the loop immediately, before any
+- The three person/system-shaped stops below are resolved through
+  `parkReasonForStatus(domain, status)` (`src/state/workflow-stage-graphs.mjs`,
+  tsk-3w3 follow-up), never a direct `status === 'awaiting-human'`-style
+  literal comparison — same "resolve through the registry, don't hardcode"
+  discipline `stageForStep`/`skillForStage` already use. `parkReason` is a
+  narrower table than `statusLabels`/`statusCategory`: `blocked` and
+  `awaiting-human` share one `statusCategory` (`in-progress`) but need
+  OPPOSITE handling here, which is exactly why this reads `parkReason`, not
+  `statusCategory` — reading the coarser table would erase the distinction
+  this loop needs. Today only `coding` declares real `parkReason` entries
+  (no other domain has ever been driven through this loop — D9/D10), so in
+  practice this still resolves to the same three literals below; the
+  indirection exists so a future domain could relabel them without silently
+  breaking this loop's own semantics.
+- `parkReasonForStatus(domain, status) == 'human-question'` (today: `status
+  == 'awaiting-human'`) always stops the loop immediately, before any
   ceiling check — the same "an item is only legitimately blocked on a
   person while sitting in `awaiting-human`" contract `fgos-routing`'s own
   gate section describes. Return the question to whoever called this skill;
   never guess an answer to keep looping.
-- `status: blocked` also always stops the loop immediately — a failed
-  verify or a rejected merge is a real stop, never something to loop past
-  silently.
-- **`status: awaiting-approval` also always stops the loop immediately**
+- `parkReasonForStatus(domain, status) == 'system-error'` (today: `status
+  == 'blocked'`) also always stops the loop immediately — a failed verify
+  or a rejected merge is a real stop, never something to loop past silently.
+- **`parkReasonForStatus(domain, status) == 'natural-finish'` (today:
+  `status == 'awaiting-approval'`) also always stops the loop immediately**
   (tsk-19j-4 — the safety gap an "unlimited" ceiling would otherwise hit on
   its very first real run): this is `fgos return`'s own natural finish
   line for the `executing`-stage skill, and there is no next stage-skill
@@ -176,14 +192,15 @@ asserted to generalize automatically to a domain that does not exist yet.
 loop:
   read id's current {stage, status, domain} FRESH via `fgos list --id <id> --json`
   iterationStartStage, iterationStartStatus = stage, status   # for the no-progress check below
+  domain = getDomain(item.domain)   # resolve early — parkReasonForStatus below needs the object, not the name
 
-  if status == 'awaiting-human':
+  if parkReasonForStatus(domain, status) == 'human-question':
     stop. Report the parked question back to the caller. Never answer it here.
 
-  if status == 'blocked':
+  if parkReasonForStatus(domain, status) == 'system-error':
     stop. Report the block back to the caller. Never retry blind.
 
-  if status == 'awaiting-approval':
+  if parkReasonForStatus(domain, status) == 'natural-finish':
     stop. Report "returned, awaiting-approval" back to the caller. There is
     no next stage-skill past this point in this loop's reach.
 
@@ -194,7 +211,6 @@ loop:
     stop. Report every id in openChildren back to the caller. Do not
     invoke anything this turn — this item is anchored, not actionable.
 
-  domain = getDomain(item.domain)   # registry lookup, never guessed
   if ceiling is 'stage:<name>':
     if domain.stages.indexOf(stage ?? <domain's own Execute-mapped stage>) >= domain.stages.indexOf(name):
       stop. Report "reached ceiling at stage <stage>". Do not invoke anything this turn.
@@ -254,12 +270,15 @@ for how each one actually calls this skill today).
 
 - resolving a stage's skill from anything other than the live
   `getDomain`/`skillForStage` registry lookup
+- comparing `status` against a literal (`status === 'blocked'`, etc.)
+  instead of resolving through `parkReasonForStatus(domain, status)`
 - applying a stage or status move directly instead of leaving it to the
   invoked stage-skill's own engine-verb call
 - checking the ceiling after invoking the current stage's skill instead of
   before
-- continuing to loop past `status: awaiting-human`, `status: blocked`, or
-  `status: awaiting-approval`
+- continuing to loop past `parkReasonForStatus == 'human-question'`,
+  `'system-error'`, or `'natural-finish'` (today's `awaiting-human`,
+  `blocked`, `awaiting-approval`)
 - treating `status:<name>` as a ranked comparison instead of an exact match
 - reusing a stage/status snapshot from a prior loop turn instead of
   re-reading fresh
@@ -272,10 +291,10 @@ for how each one actually calls this skill today).
   status already reads `doing`
 - asserting this loop generalizes to a domain other than `coding` without
   new evidence for that domain (D10)
-- reading the claim step's `worktreeBacked` branch as if it were itself
-  new cross-domain evidence — it only reads a per-domain field the
-  registry already carries for every domain (`coding` and `synthetic`
-  alike), it does not assert this loop has been exercised against a
+- reading the claim step's `worktreeBacked` branch, or the stop-condition
+  checks' `parkReasonForStatus` resolution, as if either were itself new
+  cross-domain evidence — both only read a per-domain field the registry
+  already carries; neither asserts this loop has been exercised against a
   second domain; D10 still holds
 
 Violating the letter of the rules is violating the spirit of the rules.

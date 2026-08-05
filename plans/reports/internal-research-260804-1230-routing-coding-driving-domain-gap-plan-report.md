@@ -289,14 +289,14 @@ domain crashes the runner the moment it reaches Clarify/Divide.
    proportionate to that fan-out; the retroactive check confirms the risk
    level, finds nothing new. Logged as a decision on `tsk-3w3`; closed.
 
-New, not in the original 4: **`tsk-3p1`** (one of `tsk-3w3`'s three deps,
-alongside `tsk-2rp`/`tsk-38t`) closed **`wontfix`** since this report was
-first written — stuck on its own unresolved RUL12 semantics question
-(OR-additive vs. replace-`done`), never a person's answer. `wontfix` still
-counts as a *resolved* dependency (`RESOLVED_STATUSES`,
-`src/state/frontier.mjs:186`), so it doesn't block `tsk-3w3` — but
-`tsk-2rp` and `tsk-38t` are both still `awaiting-human` on their own
-unrelated product questions, so `tsk-3w3` remains blocked regardless.
+Updates since this report was first written, on `tsk-3w3`'s three deps:
+**`tsk-3p1`** closed **`wontfix`** (stuck on its own unresolved RUL12
+semantics question, never answered) — `wontfix` still counts as *resolved*
+(`RESOLVED_STATUSES`, `src/state/frontier.mjs:186`), so it doesn't block.
+**`tsk-38t`** is now **`delivered`** (split into 8 children, all delivered,
+parent verify green) — also resolved. Only **`tsk-2rp`** (`verifyKind`
+for `manual-confirm` goal-check timing) is still `awaiting-human` — the
+one thing left blocking `tsk-3w3`.
 
 ## 7. Diagrams
 
@@ -519,8 +519,8 @@ than assert it.
 
 - `tsk-3w3` — multi-domain-readiness milestone; carries the (now partially
   outdated) decision log from the first pressure-test pass.
-- `tsk-38t` — Phase 2 status/statusCategory split; parked `awaiting-human`;
-  orthogonal axis, not a dependency of Item A.
+- `tsk-38t` — Phase 2 status/statusCategory split; now `delivered`;
+  orthogonal axis, was never a dependency of Item A.
 - `tsk-31l` — discover/decompose/discover-next dispatch unification; confirmed
   independent, no file overlap.
 - `plans/reports/research-260730-0931-work-item-schema-multi-domain-upgrade-report.md`

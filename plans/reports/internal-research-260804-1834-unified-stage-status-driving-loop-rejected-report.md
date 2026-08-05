@@ -125,7 +125,8 @@ không mâu thuẫn với kết luận "bác bỏ", chỉ thêm ngữ cảnh cò
 
 ### 8.1 — `tsk-38t` sắp làm trục `status` cũng thành domain-owned, giống trục `stage` hôm nay
 
-`tsk-38t` (dep của `tsk-3w3`, đang `awaiting-human`) mô tả nguyên văn:
+`tsk-38t` (dep của `tsk-3w3`) — **giờ đã `delivered`** (8 con `tsk-38t-1..8`,
+cả 8 delivered, verify cha xanh) — mô tả nguyên văn lúc còn `awaiting-human`:
 
 > "Đây là supersede THẬT base-workflow-model D1-D3 (domain giờ sở hữu bảng
 > transition status của chính nó, không còn 1 bảng fsm.mjs chung cho mọi
@@ -133,15 +134,26 @@ không mâu thuẫn với kết luận "bác bỏ", chỉ thêm ngữ cảnh cò
 
 Nghĩa là sau `tsk-38t`, CẢ `stage` VÀ `status` đều domain-owned — đúng cấu
 trúc "2 tầng foundation/domain" người dùng đang hình dung, không chỉ là ẩn
-dụ. Nhưng `tsk-38t`'s acceptance criteria tự trả lời luôn tầng foundation
-được thấy trục nào: tối thiểu 6 cơ chế domain-agnostic (kể cả
-`frontier.mjs`, `compound`, rollup...) phải đọc `statusCategory` (6 giá trị
-cố định, thô) thay vì `status` chi tiết. `fgos-coding-driving`'s stop-
-condition check hôm nay đang đọc literal `status` — đúng loại cơ chế
-domain-agnostic `tsk-38t` nhắm tới, chỉ chưa được liệt vào danh sách vì viết
-trước khi `tsk-38t` tồn tại. Khi `tsk-38t` triển khai, migrate luôn stop-
-condition check này sang `statusCategory` — không đổi kết luận "bác bỏ 1
-loop thống nhất" ở trên, chỉ đổi TÊN trục thô đang được gate.
+dụ.
+
+**Sửa lại kết luận ban đầu ở đây — SAI, đã kiểm bằng mapping thật vừa chốt
+(settlement của `tsk-38t`):**
+
+> "domain-specific chỉ áp cho 6 status đoạn đầu (map category: todo→todo,
+> doing/blocked/awaiting-human→in-progress, awaiting-approval→review,
+> wontfix→canceled); 4 status đuôi (delivered/retrospective/cleanup/done) cố
+> định dùng chung mọi domain, không cần category."
+
+`blocked` và `awaiting-human` — 2 status `fgos-coding-driving`'s stop-
+condition PHẢI phân biệt (1 là lỗi hệ thống, 1 là câu hỏi người, báo khác
+nhau về caller) — **cùng rơi vào category `in-progress`**. Migrate check này
+sang `statusCategory` như đề xuất ban đầu sẽ **xoá mất đúng phân biệt loop
+cần**, không phải nâng cấp. Vì `coding` giữ nguyên 100% label cũ (`tsk-38t`
+D2: "0 rename"), `fgos-coding-driving` **không cần đổi gì**, kể cả sau khi
+`tsk-38t` đã triển khai xong. Chỉ thành vấn đề thật nếu sau này có domain 2
+vừa (a) được generalize loop chạy qua, vừa (b) tự đặt label khác cho nhóm 6
+status đầu — lúc đó category thô không đủ, cần thêm 1 cơ chế khác (chưa
+thiết kế) để phân biệt tinh, không phải chỉ đổi tên trục đang gate.
 
 ### 8.2 — Tín hiệu thứ 3 ngoài stage/status: artifact existence
 

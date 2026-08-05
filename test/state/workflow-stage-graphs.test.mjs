@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { DOMAINS, DEFAULT_DOMAIN, resolveDomainName, getDomain, stageForStep, skillForStage } from '../../src/state/workflow-stage-graphs.mjs';
+import { DOMAINS, DEFAULT_DOMAIN, resolveDomainName, getDomain, stageForStep, skillForStage, parkReasonForStatus } from '../../src/state/workflow-stage-graphs.mjs';
 import { rebuildView } from '../../src/state/replay.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -116,6 +116,32 @@ test('DOMAINS.coding.worktreeBacked is true (real git merges, cleanup-harness mu
 
 test('DOMAINS.synthetic.worktreeBacked is false (no real worktree/merge ever happens for this domain)', () => {
   assert.equal(DOMAINS.synthetic.worktreeBacked, false);
+});
+
+// --- parkReason / parkReasonForStatus (tsk-3w3 follow-up: fgos-coding-driving's
+// stop-condition checks resolved through the registry instead of a literal
+// status comparison, same "resolve don't hardcode" shape as stageForStep) ---
+
+test('parkReasonForStatus resolves each of coding\'s three park statuses to its own reason', () => {
+  assert.equal(parkReasonForStatus(DOMAINS.coding, 'blocked'), 'system-error');
+  assert.equal(parkReasonForStatus(DOMAINS.coding, 'awaiting-human'), 'human-question');
+  assert.equal(parkReasonForStatus(DOMAINS.coding, 'awaiting-approval'), 'natural-finish');
+});
+
+test('parkReasonForStatus is undefined for a coding status that is not a park state', () => {
+  assert.equal(parkReasonForStatus(DOMAINS.coding, 'todo'), undefined);
+  assert.equal(parkReasonForStatus(DOMAINS.coding, 'doing'), undefined);
+  assert.equal(parkReasonForStatus(DOMAINS.coding, 'delivered'), undefined);
+});
+
+test('parkReasonForStatus is undefined for a domain that declares no parkReason table at all (synthetic, triage — never driven through fgos-coding-driving for real)', () => {
+  assert.equal(parkReasonForStatus(DOMAINS.synthetic, 'blocked'), undefined);
+  assert.equal(parkReasonForStatus(DOMAINS.triage, 'awaiting-human'), undefined);
+});
+
+test('parkReasonForStatus never throws on a null/undefined domain', () => {
+  assert.equal(parkReasonForStatus(undefined, 'blocked'), undefined);
+  assert.equal(parkReasonForStatus(null, 'blocked'), undefined);
 });
 
 test('skillForStage resolves each of coding\'s mapped stages to its skill name', () => {

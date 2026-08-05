@@ -164,6 +164,36 @@ export const DOMAINS = Object.freeze({
       'awaiting-approval': 'review',
       wontfix: 'canceled',
     }),
+    // parkReason (tsk-3w3 follow-up, logged decision): a SECOND, narrower
+    // per-domain map alongside `statusLabels` — not a replacement for it.
+    // `statusLabels`/`statusCategoryFor` answer "how far along is this item"
+    // for frontier/rollup/compound-learn (5-value lifecycle axis); this
+    // answers a different question a domain-agnostic DRIVING LOOP needs —
+    // "why did the loop stop, and what should it tell its caller" — for
+    // exactly the three statuses `fgos-coding-driving`'s own stop-condition
+    // checks distinguish. `blocked` and `awaiting-human` collapse to the
+    // SAME `statusLabels` category (`in-progress`) but need OPPOSITE
+    // handling (a system-detected failure vs. a person-posed question,
+    // reported differently to the caller) — reading `statusCategory` here
+    // would erase exactly the distinction the loop needs, which is why this
+    // is its own map, not a reuse of `statusLabels`. Coding keeps its own
+    // literal status names unchanged (zero behavior change, same shape as
+    // `stageForStep`'s tsk-3xo substitution) — this only gives
+    // `fgos-coding-driving` a resolved lookup to call instead of a
+    // hardcoded `status === 'blocked'` comparison, so a future domain could
+    // in principle relabel these three without silently breaking the loop's
+    // own stop-condition semantics. Only `coding` gets a real entry today:
+    // no other domain in this registry has ever been driven through
+    // `fgos-coding-driving` for real (D9/D10 — never generalized ahead of
+    // evidence), so declaring values for `synthetic`/`triage`/
+    // `fixture-marketing` here would be exactly the "declared but never
+    // exercised" gap this file's own header already warns against for
+    // `synthetic`'s Clarify/Divide mapping.
+    parkReason: Object.freeze({
+      blocked: 'system-error',
+      'awaiting-human': 'human-question',
+      'awaiting-approval': 'natural-finish',
+    }),
   }),
   synthetic: Object.freeze({
     stages: Object.freeze(['assembling']),
@@ -363,4 +393,19 @@ export function skillForStage(domain, stage) {
  * throws, safe to call unconditionally. */
 export function statusCategoryFor(domain, status) {
   return domain?.statusLabels?.[status];
+}
+
+/** Which stop-reason (if any) `status` represents within `domain`'s own
+ * `parkReason` table (tsk-3w3 follow-up) — `'system-error'`,
+ * `'human-question'`, `'natural-finish'`, or `undefined` when `status`
+ * isn't a park state for this domain (no entry declared at all, same as
+ * `statusCategoryFor`'s shape one field over). A domain-agnostic driving
+ * loop reads this instead of comparing `status` against a coding literal,
+ * so it can tell "stopped because a person needs to answer" apart from
+ * "stopped because something broke" even though both currently share the
+ * same `statusCategory` (`in-progress`) — `parkReason` and `statusLabels`
+ * answer different questions and are never meant to collapse into one
+ * table. Never throws, safe to call unconditionally. */
+export function parkReasonForStatus(domain, status) {
+  return domain?.parkReason?.[status];
 }
