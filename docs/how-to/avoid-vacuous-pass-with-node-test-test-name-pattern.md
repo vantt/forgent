@@ -83,6 +83,32 @@ hit this exact trap while shaping its own item verify:
   (the reconstructed red/green proof required by the Iron Law gate at
   `approve`).
 
+## Multi-file-glob variant
+
+The trap gets worse when the same `--test-name-pattern` call runs against
+a multi-file glob (e.g. `test/e2e/*.test.mjs`) instead of one file: every
+file in the glob that the pattern matches nothing in still counts as its
+own synthetic wrapper pass, so the vacuous count scales with the number of
+files, not just the number of tests. A check comparing aggregate counts
+(`pass -ge N` for some `N` picked because it's ">= the number of real
+tests expected") is exactly as vacuous here as the single-file case, just
+harder to notice — a healthy-looking `pass 12` can mean "0 of my 2 target
+tests ran, but 12 other files in the glob still counted as file-wrapper
+passes."
+
+`tsk-4sz` (domain-aware `decompose`/`discovered-from` `addWork`
+inheritance) hit this variant: its merged `verify` field judged success by
+`[ "$pass" -ge 2 ]` against `test/e2e/*.test.mjs` (12 files) — if the two
+locked test names it targets were ever renamed or deleted, all 12 files
+would still each report one wrapper pass, satisfying `pass -ge 2` with
+zero real coverage of either target test. Fixed the same way as the
+single-file case — grep each test's own checkmark line and description
+substring, combined with a real fail-count check, never an aggregate
+comparison — confirmed by running the corrected command against a
+deliberately-renamed pattern (reproducing the vacuous-pass scenario) and
+confirming it correctly fails. Full evidence:
+`docs/history/tsk-5mc-verify-vacuous-pass-multiglob/CONTEXT.md`.
+
 ## Related
 
 - `docs/history/tsk-5t3-iron-law-evidence-contract/CONTEXT.md` — the
