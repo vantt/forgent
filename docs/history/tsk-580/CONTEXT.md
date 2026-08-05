@@ -56,10 +56,22 @@ KHÔNG sinh command — tránh vacuous truth của jq `all()` trên mảng rỗn
 - `bin/fgos.mjs` — `collectRollupData`: cách enumerate children qua
   `w.parent === id`, comment tại đó xác nhận decompose chỉ 1 tầng (YAGNI,
   không đệ quy) — giữ nguyên giới hạn này cho flag mới, không mở rộng.
-- `src/runner/paths.mjs` — `resolveRepoRoot(cwd, {strict})`: đã có sẵn,
-  CHƯA được import vào `bin/fgos.mjs` — cần import thêm để tự điền
-  `--dir <repo-root>` tuyệt đối vào command sinh ra (loại bẫy "quên --dir"
-  2 how-to doc từng gặp thật).
+- **[Sửa lại — phát hiện lúc `fgos discover` dispute]** `src/runner/paths.mjs`
+  — `resolveRepoRoot(cwd, {strict})` KHÔNG dùng được cho việc này:
+  dùng `git rev-parse --show-toplevel` (paths.mjs:30), trả về root của
+  chính WORKTREE hiện tại khi gọi từ trong worktree — SAI mục đích, vì
+  worktree không bao giờ mang `.fgos/` riêng (ADR0020). Phải dùng đúng
+  pattern `git rev-parse --path-format=absolute --git-common-dir` rồi lấy
+  `path.dirname(...)` — đúng pattern mọi skill markdown đã dùng
+  (`git rev-parse --path-format=absolute --git-common-dir | xargs
+  dirname`), và đã có tiền lệ thật trong code (không export sẵn, nhưng có
+  ví dụ inline): `src/cli/invocation-fault-log.mjs:47-59`
+  (`mainCheckoutFgosDir`, dùng đúng 2 bước này rồi join thêm `.fgos`),
+  `src/runner/merge.mjs:230`, `src/setup/registrations.mjs:189` — cả 3 chỗ
+  đều tự inline execFileSync riêng, không có helper export sẵn cho "repo
+  root" trần (chỉ có cho `.fgos` dir cụ thể) — theo đúng convention hiện
+  tại (3 chỗ đã trùng lặp pattern này mà chưa gộp), flag mới nên inline
+  tương tự, không cần export helper mới (giữ scope, YAGNI).
 - `src/state/frontier.mjs` — `isResolvedStatus`/`TAIL_RESOLVED_STATUSES`:
   đã import sẵn vào `bin/fgos.mjs`, tái dùng được luôn cho check D3 thay vì
   khai báo mảng riêng.
