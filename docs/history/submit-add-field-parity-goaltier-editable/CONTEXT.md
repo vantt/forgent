@@ -23,7 +23,7 @@ and the `submit`/`add` verbs are domain-agnostic in `store.mjs`/`bin/fgos.mjs`.
 | ID | Decision |
 |----|----------|
 | D1 | `submit` gains full field parity with `add` for `--refs/--parent/--footprint/--goal-tier/--targets/--urgent`. This field group has no documented design rationale for being submit-exclusive (unlike goalTier's originally-intended add-time-only design, see D2) — the gap closes rather than staying intentional. |
-| D2 | `goalTier` is added to `EDITABLE_FIELDS` (`store.mjs`) so `fgos edit` can set/correct it after item creation, regardless of which door (`submit` or `add`) created the item. This directly fixes the tsk-3w3 incident (item created via `submit`, needed `goalTier: milestone`, had no path to add it) and is independent of D1 — even with D1 shipped, an item created without `--goal-tier` at intake time would otherwise stay permanently unable to become a goal. |
+| D2 | `goalTier` is added to `EDITABLE_FIELDS` (`store.mjs`) so `fgos edit` can set/correct it after item creation, regardless of which door (`submit` or `add`) created the item. This directly fixes the tsk-3w3 incident (item created via `submit`, needed `goalTier: milestone`, had no path to add it) and is independent of D1 — even with D1 shipped, an item created without `--goal-tier` at intake time would otherwise stay permanently unable to become a goal. **Scope note (found while writing this item's own functional verify, `verify.sh`):** `EDITABLE_FIELDS` alone is not sufficient — `bin/fgos.mjs`'s `edit` case (~lines 1150-1290) plumbs flags into the patch object via a hardcoded field list (`title/description/kind/risk/verify/tier/urgent` + `refs/deps/footprint` + a few one-off kebab-case flags like `docs-ref/merge-after/superseded-by/parent`) and has **no `--goal-tier` entry**. D2 therefore requires BOTH: (a) `goalTier` added to `store.mjs`'s `EDITABLE_FIELDS`, and (b) `bin/fgos.mjs`'s `edit` case parses `--goal-tier` into `patch.goalTier`. Missing either half leaves `fgos edit <id> --goal-tier ...` a no-op ("edit requires at least one field to change") even though the Set-level guard would report success. |
 
 Both decisions are user-confirmed (2026-08-05, this session) and logged via
 `fgos decision --id tsk-5fs` (seq 5886, 5887).
@@ -89,13 +89,34 @@ Both decisions are user-confirmed (2026-08-05, this session) and logged via
 GitNexus as `present` — impact-analysis: full for this item's planning/
 implementation stages.
 
+## Verify
+
+`docs/history/submit-add-field-parity-goaltier-editable/verify.sh` — a
+self-contained functional check, real CLI end to end in an isolated temp
+git repo/store (no source-text grepping, which a second-pass review during
+this item's own clarify stage proved unreliable: flag names appear in
+comments/error strings independent of whether the parser actually wires
+them). Confirmed to run and fail at the expected point (`D1 FAIL: submit
+field refs got [] want ["a","b"]`) against the pre-implementation
+codebase. Checks, in order:
+
+1. `fgos submit ... --refs a,b --parent zzz --footprint x.js,y.js
+   --goal-tier milestone --targets t1,t2 --urgent high` produces a work
+   item whose `refs`/`parent`/`footprint`/`goalTier`/`targets`/`urgent`
+   fields match exactly what was passed (D1).
+2. `fgos edit <id> --goal-tier mvp` on that same item actually changes
+   `goalTier` to `mvp` when read back (D2, both halves — `EDITABLE_FIELDS`
+   and the `edit` case's flag parsing, per the scope note above).
+
+Item's `verify` field is set to `bash
+docs/history/submit-add-field-parity-goaltier-editable/verify.sh`.
+
 ## Outstanding — deferred to planning
 
 - Exact flag names/parsing for the new `submit` flags (mirror `add`'s
   `--refs`/`--parent`/`--footprint`/`--goal-tier`/`--targets`/`--urgent`
   verbatim, or adapt) — implementation detail, not a product decision.
-- Whether adding `goalTier` to `EDITABLE_FIELDS` needs any additional
-  guard in `store.mjs`'s edit path beyond the existing `GOAL_TIERS`
-  validation `work.mjs`'s `validateWorkShape` already runs on every
-  write (create and edit alike) — implementation detail for planning to
-  verify against the real edit code path.
+- Whether `edit`'s hardcoded field-parsing list (see D2 scope note above)
+  should gain a `--goal-tier` entry following the exact same pattern as
+  its existing `urgent`/`tier` handling, or something else — mechanical
+  implementation detail for planning to confirm against the real code.
