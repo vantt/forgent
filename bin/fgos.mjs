@@ -3522,6 +3522,14 @@ async function runVerb(verb, flags, positional, dir) {
       // Fill-only like the two side effects above: a pre-existing custom
       // core.hooksPath is left untouched, never silently repointed.
       const { wired: hooksWired, skippedExisting: hooksSkippedExisting } = installGitHooks(repoRoot);
+      // tsk-5hi: setup now also runs every registered fix — the same
+      // runFixes() `doctor --fix` already calls (RUL9/RUL11) — instead of
+      // leaving a person to separately discover and run `doctor --fix` to
+      // reach the state a plain `setup` should already leave a project in.
+      // Unconditional, no confirmation, per RUL10's existing act-then-report
+      // contract for this verb; every registered fix is already required
+      // idempotent/fail-soft, so running the full list here is safe.
+      const fixed = runFixes(repoRoot);
       return {
         rcFilesInserted,
         rcFilesAlreadyConfigured,
@@ -3531,6 +3539,7 @@ async function runVerb(verb, flags, positional, dir) {
         configAddedKeys: configExisted ? addedKeys : [],
         hooksWired,
         hooksSkippedExisting,
+        fixed,
       };
     }
 
