@@ -1335,6 +1335,86 @@ test('add with a bare --targets (no value) also parses to [], exit 0', () => {
   assert.deepEqual(stateView(cwd).work['bare-targets-item'].targets, []);
 });
 
+// --- tsk-580: `edit --verify-from-children`/`--verify-from-targets` ---
+// docs/history/tsk-580/CONTEXT.md (D1-D3) + plan.md's feasibility matrix:
+// auto-generate the item's own `verify` as a resolved-status jq check
+// against its direct children (`parent`-tree) or its `targets`
+// (goalTier), instead of the two close-out how-to docs' hand-written jq.
+
+// A real git worktree wrapping a real fgOS store at the main checkout --
+// proves the `--dir` baked into a generated command resolves to the MAIN
+// checkout even when `fgos edit` itself runs from inside a linked
+// worktree, the exact scenario `resolveRepoRoot`'s `git rev-parse
+// --show-toplevel` gets wrong (it would return the worktree's own path
+// instead) -- see CONTEXT.md's corrected scout note.
+function initGitCwdWithWorktree() {
+  const cwd = initGitCwd();
+  const worktreePath = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-wt-'));
+  fs.rmSync(worktreePath, { recursive: true, force: true });
+  execFileSync('git', ['worktree', 'add', '-b', `wt-${path.basename(worktreePath)}`, worktreePath], { cwd });
+  return { cwd, worktreePath };
+}
+
+test('edit --verify-from-children generates a jq command listing all direct children ids with the resolved-set check and an absolute --dir, exit 0', () => {
+  const { cwd, worktreePath } = initGitCwdWithWorktree();
+  assert.equal(run(cwd, ['add', 'parent-x', '--title', 'Parent', '--kind', 'task', '--risk', 'low', '--verify', 'x']).status, 0);
+  assert.equal(run(cwd, ['add', 'child-1', '--title', 'Child 1', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--parent', 'parent-x']).status, 0);
+  assert.equal(run(cwd, ['add', 'child-2', '--title', 'Child 2', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--parent', 'parent-x']).status, 0);
+  // child-1 already resolved (delivered, not yet cleanup/done) -- the
+  // resolved-set default (D3) must still count it, unlike a strict-done check.
+  assert.equal(run(cwd, ['move', 'child-1', '--to', 'doing']).status, 0);
+  assert.equal(run(cwd, ['move', 'child-1', '--to', 'delivered']).status, 0);
+
+  // Run the edit itself with process cwd INSIDE the linked worktree, while
+  // --dir still points at the main checkout's real fgOS store -- the exact
+  // split real usage has (implementation happens inside a worktree, but
+  // .fgos/ only ever lives at the main checkout, ADR0020).
+  const result = run(worktreePath, ['edit', 'parent-x', '--verify-from-children', '--dir', cwd]);
+  assert.equal(result.status, 0);
+  const verify = stateView(cwd).work['parent-x'].verify;
+  assert.match(verify, /child-1/);
+  assert.match(verify, /child-2/);
+  assert.match(verify, /delivered/);
+  assert.match(verify, /retrospective/);
+  assert.match(verify, /cleanup/);
+  assert.match(verify, /"done"/);
+  assert.ok(verify.includes(`--dir ${cwd}`), `expected --dir "${cwd}" (main checkout, not the worktree) in: ${verify}`);
+  assert.ok(!verify.includes(worktreePath), `verify must not bake in the worktree's own path: ${verify}`);
+});
+
+test('edit --verify-from-targets generates a jq command listing all target ids with the resolved-set check and an absolute --dir, exit 0', () => {
+  const { cwd, worktreePath } = initGitCwdWithWorktree();
+  assert.equal(run(cwd, ['add', 'target-1', '--title', 'Target 1', '--kind', 'task', '--risk', 'low', '--verify', 'x']).status, 0);
+  assert.equal(run(cwd, ['add', 'mvp-x', '--title', 'MVP', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--goal-tier', 'mvp', '--targets', 'target-1']).status, 0);
+
+  const result = run(worktreePath, ['edit', 'mvp-x', '--verify-from-targets', '--dir', cwd]);
+  assert.equal(result.status, 0);
+  const verify = stateView(cwd).work['mvp-x'].verify;
+  assert.match(verify, /target-1/);
+  assert.match(verify, /delivered/);
+  assert.ok(verify.includes(`--dir ${cwd}`), `expected --dir "${cwd}" (main checkout, not the worktree) in: ${verify}`);
+});
+
+test('edit --verify-from-children with no children found throws a validation error instead of writing a vacuous verify, exit 4', () => {
+  const cwd = tmpCwd();
+  assert.equal(addOk(cwd, 'lonely-parent').status, 0);
+  const before = stateView(cwd).work['lonely-parent'].verify;
+  const result = run(cwd, ['edit', 'lonely-parent', '--verify-from-children']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /no children|no item has parent/i);
+  assert.equal(stateView(cwd).work['lonely-parent'].verify, before, 'a failed guard must never write patch.verify');
+});
+
+test('edit --verify-from-targets with empty targets throws a validation error instead of writing a vacuous verify, exit 4', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['add', 'targetless-mvp', '--title', 'MVP', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--goal-tier', 'mvp']).status, 0);
+  const before = stateView(cwd).work['targetless-mvp'].verify;
+  const result = run(cwd, ['edit', 'targetless-mvp', '--verify-from-targets']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /no targets/i);
+  assert.equal(stateView(cwd).work['targetless-mvp'].verify, before, 'a failed guard must never write patch.verify');
+});
+
 // --- str67-goal-directed-planning D3/D4/D6/D7: `fgos goal set|show` CLI verb ---
 
 function addGoalItem(cwd, id, goalTier = 'mvp') {

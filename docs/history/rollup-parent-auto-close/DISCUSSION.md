@@ -45,7 +45,7 @@ delivered khi con/target resolved), thay vì cứ mỗi milestone lại tay sử
 | 8 | "Con chưa cleanup thì cha không thể claim" | **Sai — đã verify code** | `TAIL_RESOLVED_STATUSES = {delivered, retrospective, cleanup, done}` (frontier.mjs:221); `isResolvedStatus` true ngay khi con = `delivered` (frontier.mjs:224-229); `hasOpenDescendant` (frontier.mjs:237-249) chỉ block khi con CHƯA vào tập này. `pick --id <id>` (bin/fgos.mjs:1962-1975) thậm chí không re-check lineage gì cả — đi thẳng `claimWork` (claim-port.mjs:88-278), chỉ CAS `expectedStatus`. `take --id` (bin/fgos.mjs:1888) có check `isDepsAndLineageReady` nhưng chỉ áp dụng khi `status==='todo'`. TTL 7 ngày (`DEFAULT_CLEANUP_TTL_DAYS`, cleanup-harness.mjs:131-146) chỉ gate con tự đi `cleanup→done`, không liên quan gì việc cha claim được hay không — đây là nguồn gây lẫn lộn thật |
 | 9 | `edit` verb parse pattern: hand-rolled `parseArgs` (bin/fgos.mjs:266-285), field cùng tên qua loop chung (:1194-1198), field kebab→camel qua block riêng (:1226-1249) | Rõ | 1 flag boolean mới `--verify-from-targets`/`--verify-from-children` đi theo đúng pattern block riêng, tính `patch.verify` trước khi gọi `editWork` (:1341) |
 | 10 | Enumerate con: `parent`-tree quét toàn bộ `w.parent === id` (collectRollupData, :671-686, không đệ quy — decompose chỉ 1 tầng theo comment :665-670); `targets`-tree đọc thẳng `item.targets` array (:2435-2438), không cần quét | Rõ | 2 cơ chế khác nhau thật — xác nhận cần 2 flag riêng như đã chọn, không gộp 1 |
-| 11 | `resolveRepoRoot(cwd, {strict})` (src/runner/paths.mjs:25-52) đã có sẵn nhưng CHƯA import vào bin/fgos.mjs verb handler nào — cần import mới để tự điền `--dir <repo-root>` tuyệt đối vào command sinh ra | Rõ | Loại bỏ hẳn bẫy "thiếu --dir" của 2 how-to doc — done, không phải tự tay nhớ nữa |
+| 11 | Sửa lại: `resolveRepoRoot` (paths.mjs:25-52, `--show-toplevel`) SAI cho việc này — trả về root worktree, không phải main checkout. Đúng: `git rev-parse --path-format=absolute --git-common-dir` + `dirname` (tiền lệ inline: invocation-fault-log.mjs:47-59, merge.mjs:230, registrations.mjs:189) | Rõ (đã sửa) | Phát hiện lúc `fgos discover` verify-disputed round 3 cho tsk-580 — loại bẫy "--dir trỏ sai" |
 | 12 | `--verify` ở `edit` KHÔNG có validate shape (chỉ `requireNonEmptyString`, work.mjs:314) — prose vẫn ghi được, chỉ fail lúc `return` thật sự spawn (goal-check.mjs:20-92) | Rõ | Không phải lo chỗ này — nhưng helper mới generate command PHẢI tự guard: nếu list con/target rỗng, `jq ... | all(...)` trên mảng rỗng trả `true` (vacuous truth) → verify luôn pass sai — phải throw lỗi rõ ràng nếu không tìm thấy con/target nào, không sinh command rỗng |
 
 ## 4. Quyết định đã chốt
@@ -140,9 +140,18 @@ hiện có trong `bin/fgos.mjs` (`--docs-ref`, `--goal-tier`, ... :1226-1249):
 - `--verify-from-targets` — cho goalTier milestone/MVP. Đọc thẳng
   `item.targets` array (bin/fgos.mjs:2435-2438 pattern), không cần quét.
 
-Cả 2 sinh cùng 1 dạng command, tự điền `--dir <repo-root>` tuyệt đối qua
-`resolveRepoRoot` (src/runner/paths.mjs:25-52 — import mới vào
-`bin/fgos.mjs`, loại hẳn bẫy "quên `--dir`" 2 how-to doc từng gặp):
+Cả 2 sinh cùng 1 dạng command, tự điền `--dir <repo-root>` tuyệt đối.
+
+**[Sửa lại 2026-08-05, phát hiện lúc `fgos discover` dispute round 3]**:
+KHÔNG dùng `resolveRepoRoot` (src/runner/paths.mjs:25-52) — hàm đó dùng
+`git rev-parse --show-toplevel`, trả về root của chính WORKTREE hiện tại
+khi gọi từ trong worktree, SAI mục đích (worktree không mang `.fgos/`
+riêng, ADR0020). Phải dùng đúng pattern `git rev-parse --path-format=
+absolute --git-common-dir` rồi lấy `path.dirname(...)` — cùng pattern mọi
+skill markdown dùng, tiền lệ code thật (chưa export sẵn, chỉ inline):
+`src/cli/invocation-fault-log.mjs:47-59`, `src/runner/merge.mjs:230`,
+`src/setup/registrations.mjs:189` — flag mới nên inline tương tự (loại hẳn
+bẫy "quên `--dir`"/"--dir sai" 2 how-to doc từng gặp):
 
 ```
 node <repo-root>/bin/fgos.mjs list --json --all --dir <repo-root> \
@@ -179,7 +188,7 @@ flowchart TD
     B1 --> C{Danh sách rỗng?}
     B2 --> C
     C -->|Có| C1["throw lỗi rõ ràng<br/>KHÔNG sinh command"]
-    C -->|Không| D["resolveRepoRoot()<br/>điền --dir tuyệt đối"]
+    C -->|Không| D["git-common-dir → dirname()<br/>điền --dir tuyệt đối (KHÔNG resolveRepoRoot)"]
     D --> E["build jq command<br/>resolved-set check (D3)"]
     E --> F["patch.verify = command<br/>editWork() ghi đè"]
 ```
@@ -191,7 +200,8 @@ flowchart TD
 - **Mục tiêu:** implement 2 flag mới trong `edit` case của `bin/fgos.mjs`
   theo đúng thiết kế §6 — 1 mảnh việc duy nhất, không cần tách nhỏ hơn.
 - **Excerpt §6 áp dụng:** toàn bộ nội dung §6 ở trên (enumerate, guard,
-  resolveRepoRoot, resolved-set default, không đổi FSM).
+  git-common-dir root resolution — KHÔNG resolveRepoRoot, resolved-set
+  default, không đổi FSM).
 - **D-ID áp dụng:** D1, D2, D3.
 - **Quan hệ sibling:** không có — single-piece design, 1 task duy nhất.
 - **Draft verify:**

@@ -1332,10 +1332,64 @@ async function runVerb(verb, flags, positional, dir) {
           patch[field] = value;
         }
       }
+      // --verify-from-children / --verify-from-targets (tsk-580 D1-D3,
+      // docs/history/tsk-580/CONTEXT.md): auto-generate the item's own
+      // `verify` as a resolved-status check against its direct children
+      // (decomposed root, `parent`-tree, same enumeration as
+      // `collectRollupData` above) or its `targets` (goalTier
+      // milestone/MVP) -- replaces hand-writing the jq command the two
+      // close-out how-to docs used to require by hand, and both traps
+      // those docs document (missing --dir, and a resolver that returns
+      // the wrong root -- see below).
+      if (flags['verify-from-children'] === true || flags['verify-from-targets'] === true) {
+        if (flags['verify-from-children'] === true && flags['verify-from-targets'] === true) {
+          throw new StoreError('validation', 'edit: --verify-from-children and --verify-from-targets are mutually exclusive -- pick one.');
+        }
+        const fromChildren = flags['verify-from-children'] === true;
+        const view = listWork(dir);
+        const item = view.work[id];
+        if (!item) {
+          throw new StoreError('validation', `edit: work "${id}" not found.`);
+        }
+        const ids = fromChildren
+          ? Object.values(view.work).filter((w) => w.parent === id).map((w) => w.id)
+          : (Array.isArray(item.targets) ? item.targets : []);
+        if (ids.length === 0) {
+          const flagName = fromChildren ? '--verify-from-children' : '--verify-from-targets';
+          const emptyReason = fromChildren ? `no item has parent === "${id}"` : `"${id}" has no targets`;
+          throw new StoreError(
+            'validation',
+            `edit ${flagName}: ${emptyReason} -- refusing to write a verify that would vacuously pass (jq's "all()" on an empty list is always true).`,
+          );
+        }
+        // Main-checkout root, NOT resolveRepoRoot (src/runner/paths.mjs) --
+        // that resolver shells `git rev-parse --show-toplevel`, which
+        // returns the WORKTREE's own root when called from inside one,
+        // never the main checkout where `.fgos/` actually lives (ADR0020).
+        // Same git-common-dir + dirname pattern as
+        // src/cli/invocation-fault-log.mjs / src/runner/merge.mjs /
+        // src/setup/registrations.mjs already use for exactly this reason.
+        let repoRoot;
+        try {
+          const gitCommonDir = execFileSync(
+            'git',
+            ['rev-parse', '--path-format=absolute', '--git-common-dir'],
+            { cwd: process.cwd(), encoding: 'utf8', shell: false, stdio: ['ignore', 'pipe', 'ignore'] },
+          ).trim();
+          repoRoot = path.dirname(gitCommonDir);
+        } catch (err) {
+          throw new StoreError('validation', `edit --verify-from-${fromChildren ? 'children' : 'targets'}: could not resolve the repo root via git (${err.message}).`);
+        }
+        const idList = ids.map((childId) => JSON.stringify(childId)).join(',');
+        patch.verify =
+          `node ${repoRoot}/bin/fgos.mjs list --json --all --dir ${repoRoot} | ` +
+          `jq -e '.data.work as $w | [${idList}] | map($w[.].status) | ` +
+          `all(["delivered","retrospective","cleanup","done"] | index(.) != null)' > /dev/null`;
+      }
       if (Object.keys(patch).length === 0) {
         throw new StoreError(
           'validation',
-          'edit requires at least one field to change: --title/--description/--kind/--risk/--verify/--tier/--refs/--deps/--footprint/--acceptance/--priority/--intent/--docs-ref/--parent/--urgent/--impact/--effort/--merge-after/--superseded-by/--duplicates/--domain-fields.',
+          'edit requires at least one field to change: --title/--description/--kind/--risk/--verify/--tier/--refs/--deps/--footprint/--acceptance/--priority/--intent/--docs-ref/--parent/--urgent/--impact/--effort/--merge-after/--superseded-by/--duplicates/--domain-fields/--verify-from-children/--verify-from-targets.',
         );
       }
       const { event } = editWork(dir, { id, patch, role: 'human' });
