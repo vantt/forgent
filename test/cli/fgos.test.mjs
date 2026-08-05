@@ -1355,6 +1355,22 @@ function initGitCwdWithWorktree() {
   return { cwd, worktreePath };
 }
 
+// tsk-1ia: the `--verify-from-*` generated command bakes in `node
+// <repo-root>/bin/fgos.mjs` (same assumption the pre-existing close-out
+// how-to docs' own hand-written examples already make) -- true for this
+// repo's own dogfooded checkout, but not for a throwaway git repo created
+// only as a disposable fgOS data store. Symlinking `bin`/`src` from the
+// REAL repo this test file itself lives in lets a generated verify
+// command actually be executed end-to-end against a throwaway fixture,
+// without that unrelated, pre-existing repo-root/bin-path assumption
+// (out of scope for this item -- tracked separately under distribution-
+// vision.md's "aware 3 context" milestone) getting in the way.
+const REAL_REPO_ROOT = path.resolve(__dirname, '../..');
+function linkFgosBinInto(cwd) {
+  fs.symlinkSync(path.join(REAL_REPO_ROOT, 'bin'), path.join(cwd, 'bin'), 'dir');
+  fs.symlinkSync(path.join(REAL_REPO_ROOT, 'src'), path.join(cwd, 'src'), 'dir');
+}
+
 test('edit --verify-from-children generates a jq command listing all direct children ids with the resolved-set check and an absolute --dir, exit 0', () => {
   const { cwd, worktreePath } = initGitCwdWithWorktree();
   assert.equal(run(cwd, ['add', 'parent-x', '--title', 'Parent', '--kind', 'task', '--risk', 'low', '--verify', 'x']).status, 0);
@@ -1393,6 +1409,50 @@ test('edit --verify-from-targets generates a jq command listing all target ids w
   assert.match(verify, /target-1/);
   assert.match(verify, /delivered/);
   assert.ok(verify.includes(`--dir ${cwd}`), `expected --dir "${cwd}" (main checkout, not the worktree) in: ${verify}`);
+});
+
+// tsk-1ia: the two tests above only assert the generated command's STRING
+// content (contains the right ids/keywords) -- they never actually RAN the
+// jq expression, which is exactly how tsk-580's own real bug (`all([...] |
+// index(.) != null)` always evaluating true, since `.` inside `index(.)`
+// rebinds to the literal array, not the per-element status) rode into
+// `main` unnoticed. These two tests close that gap by spawning the
+// generated `verify` command for real against a genuinely-resolved and a
+// genuinely-unresolved fixture, and asserting the real exit code.
+test("edit --verify-from-children's generated jq expression correctly returns true when all children are resolved (actually running it, not just checking its text)", () => {
+  const { cwd, worktreePath } = initGitCwdWithWorktree();
+  assert.equal(run(cwd, ['add', 'parent-all-resolved', '--title', 'Parent', '--kind', 'task', '--risk', 'low', '--verify', 'x']).status, 0);
+  assert.equal(run(cwd, ['add', 'child-r1', '--title', 'Child 1', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--parent', 'parent-all-resolved']).status, 0);
+  assert.equal(run(cwd, ['add', 'child-r2', '--title', 'Child 2', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--parent', 'parent-all-resolved']).status, 0);
+  // child-r1 delivered, child-r2 cleanup -- both resolved-set, neither strict-done.
+  assert.equal(run(cwd, ['move', 'child-r1', '--to', 'doing']).status, 0);
+  assert.equal(run(cwd, ['move', 'child-r1', '--to', 'delivered']).status, 0);
+  assert.equal(run(cwd, ['move', 'child-r2', '--to', 'doing']).status, 0);
+  assert.equal(run(cwd, ['move', 'child-r2', '--to', 'delivered']).status, 0);
+  assert.equal(run(cwd, ['move', 'child-r2', '--to', 'retrospective']).status, 0);
+  assert.equal(run(cwd, ['move', 'child-r2', '--to', 'cleanup']).status, 0);
+  linkFgosBinInto(cwd);
+
+  assert.equal(run(worktreePath, ['edit', 'parent-all-resolved', '--verify-from-children', '--dir', cwd]).status, 0);
+  const verify = stateView(cwd).work['parent-all-resolved'].verify;
+  const executed = spawnSync(verify, { cwd, shell: true, encoding: 'utf8' });
+  assert.equal(executed.status, 0, `expected the generated verify to PASS when every child is resolved; got status ${executed.status}, stderr: ${executed.stderr}`);
+});
+
+test("edit --verify-from-children's generated jq expression correctly returns false when not all children are resolved (actually running it, not just checking its text)", () => {
+  const { cwd, worktreePath } = initGitCwdWithWorktree();
+  assert.equal(run(cwd, ['add', 'parent-partial', '--title', 'Parent', '--kind', 'task', '--risk', 'low', '--verify', 'x']).status, 0);
+  assert.equal(run(cwd, ['add', 'child-p1', '--title', 'Child 1', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--parent', 'parent-partial']).status, 0);
+  assert.equal(run(cwd, ['add', 'child-p2', '--title', 'Child 2', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--parent', 'parent-partial']).status, 0);
+  // child-p1 resolved (delivered); child-p2 stays at todo -- NOT resolved.
+  assert.equal(run(cwd, ['move', 'child-p1', '--to', 'doing']).status, 0);
+  assert.equal(run(cwd, ['move', 'child-p1', '--to', 'delivered']).status, 0);
+  linkFgosBinInto(cwd);
+
+  assert.equal(run(worktreePath, ['edit', 'parent-partial', '--verify-from-children', '--dir', cwd]).status, 0);
+  const verify = stateView(cwd).work['parent-partial'].verify;
+  const executed = spawnSync(verify, { cwd, shell: true, encoding: 'utf8' });
+  assert.notEqual(executed.status, 0, 'expected the generated verify to FAIL when a child is still todo (not resolved) -- a status 0 here reproduces tsk-580\'s own vacuous-pass bug');
 });
 
 test('edit --verify-from-children with no children found throws a validation error instead of writing a vacuous verify, exit 4', () => {
