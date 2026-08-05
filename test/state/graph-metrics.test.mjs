@@ -643,6 +643,54 @@ test('detectCycles: a dep pointing at an id with no matching work item is skippe
   assert.deepEqual(detectCycles(view), []);
 });
 
+// --- tsk-3u2 (post-tsk-3c7 independent review): detectCycles widened from
+// deps-only to the UNIFIED graph (deps + parent + mergeAfter) -- it used
+// to be blind to exactly the kind of deadlock findUnifiedCycle already
+// caught: a parent anchored by its own open child (frontier.mjs's
+// hasOpenDescendant) whose deps/mergeAfter loops back to that same parent,
+// a permanent stall no amount of waiting resolves. -------------------------
+
+test('detectCycles: a parent anchored by a child whose OWN deps points back at the parent is now caught (mixed parent-child + blocks cycle)', () => {
+  const view = {
+    work: {
+      p: item('p'),
+      c: item('c', { parent: 'p', deps: ['p'] }),
+    },
+  };
+  const cycles = detectCycles(view);
+  assert.equal(cycles.length, 1);
+  assert.deepEqual(new Set(cycles[0]), new Set(['p', 'c']));
+});
+
+test('detectCycles: a mergeAfter cycle (a deps on b, b mergeAfter a) is now caught (mixed blocks + waits-for cycle)', () => {
+  const view = {
+    work: {
+      a: item('a', { deps: ['b'] }),
+      b: item('b', { mergeAfter: ['a'] }),
+    },
+  };
+  const cycles = detectCycles(view);
+  assert.equal(cycles.length, 1);
+  assert.deepEqual(new Set(cycles[0]), new Set(['a', 'b']));
+});
+
+test('detectCycles: a pure parent-child cycle (A parent B, B parent A -- never reachable via real fgos add, still checked) is caught', () => {
+  const view = {
+    work: {
+      a: item('a', { parent: 'b' }),
+      b: item('b', { parent: 'a' }),
+    },
+  };
+  const cycles = detectCycles(view);
+  assert.equal(cycles.length, 1);
+  assert.deepEqual(new Set(cycles[0]), new Set(['a', 'b']));
+});
+
+test('detectCycles: a parent id with no matching work item is dropped (dangling parent), same as a dangling dep, never a phantom node', () => {
+  const view = { work: { c: item('c', { parent: 'missing-parent' }) } };
+  assert.deepEqual(detectCycles(view), []);
+});
+
 // --- tsk-3c7: computed-parallel-wave-schedule -------------------------------
 
 test('computeSchedule: two ready items with disjoint footprints land in the same wave', () => {

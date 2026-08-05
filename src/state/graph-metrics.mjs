@@ -606,18 +606,29 @@ export function footprintOverlap(view) {
 
 /**
  * DEP-GRAPH CYCLE DETECTION (tsk-3c7, D1/D2 of docs/history/parallel-
- * decomposition-footprint-avoidance/CONTEXT.md): Tarjan's strongly-
- * connected-components algorithm over every item's `deps` edges,
- * regardless of `status` — a cycle is a graph-integrity defect no matter
- * which items in it happen to be done/blocked/todo right now. A self-dep
- * (`item.deps` containing its own id) is reported as its own one-element
- * cycle. A dep id with no matching work item is skipped (dangling-dep
- * detection is a different concern, not this function's). Returns an
- * array of cycles, each an array of the ids forming that cycle — empty
- * when the graph is acyclic. PURE: reads only `view.work`.
+ * decomposition-footprint-avoidance/CONTEXT.md; tsk-3u2 widened it to the
+ * UNIFIED graph after independent review found the original `deps`-only
+ * version blind to a real deadlock: a parent anchored by an open child
+ * whose own `deps`/`mergeAfter` points back at the parent — a permanent
+ * stall `findUnifiedCycle` in dep-graph.mjs already catches, this
+ * function did not): Tarjan's strongly-connected-components algorithm
+ * over `knownUnifiedDeps`'s adjacency (`deps` + `parent` + `mergeAfter`,
+ * the SAME unified graph `connectedComponents`/`criticalPath` above
+ * already walk), regardless of `status` — a cycle is a graph-integrity
+ * defect no matter which items in it happen to be done/blocked/todo right
+ * now. A self-edge (an item depending on, parented by, or merge-ordered
+ * after itself) is reported as its own one-element cycle. An edge with
+ * either endpoint not a known work item is dropped by `knownUnifiedDeps`
+ * itself (dangling-reference detection is a different concern, not this
+ * function's). Returns an array of cycles, each an array of the ids
+ * forming that cycle — empty when the graph is acyclic. Unlike
+ * `findUnifiedCycle` (which stops at the FIRST cycle found), this returns
+ * EVERY cycle — `computedSchedule` (store.mjs) needs the full set, not
+ * just proof that one exists. PURE: reads only `view.work`.
  */
 export function detectCycles(view) {
   const work = view?.work ?? {};
+  const adjacency = knownUnifiedDeps(work);
   let index = 0;
   const stack = [];
   const indices = new Map();
@@ -632,18 +643,16 @@ export function detectCycles(view) {
     stack.push(id);
     onStack.add(id);
 
-    const deps = Array.isArray(work[id]?.deps) ? work[id].deps : [];
-    for (const dep of deps) {
-      if (dep === id) {
+    for (const target of adjacency.get(id) ?? []) {
+      if (target === id) {
         cycles.push([id]);
         continue;
       }
-      if (!work[dep]) continue; // dangling dep -- not this function's concern
-      if (!indices.has(dep)) {
-        strongconnect(dep);
-        lowlink.set(id, Math.min(lowlink.get(id), lowlink.get(dep)));
-      } else if (onStack.has(dep)) {
-        lowlink.set(id, Math.min(lowlink.get(id), indices.get(dep)));
+      if (!indices.has(target)) {
+        strongconnect(target);
+        lowlink.set(id, Math.min(lowlink.get(id), lowlink.get(target)));
+      } else if (onStack.has(target)) {
+        lowlink.set(id, Math.min(lowlink.get(id), indices.get(target)));
       }
     }
 
@@ -659,7 +668,7 @@ export function detectCycles(view) {
     }
   }
 
-  for (const id of Object.keys(work)) {
+  for (const id of adjacency.keys()) {
     if (!indices.has(id)) strongconnect(id);
   }
   return cycles;
