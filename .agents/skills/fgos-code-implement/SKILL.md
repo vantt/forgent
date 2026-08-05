@@ -33,6 +33,22 @@ re-shapes the work; that already happened at `clarify`/`decompose`.
 
   (tsk-56t D1 — the same `root` resolution `fgos-exploring`'s and
   `fgos-planning`'s own gate-bypass checks already rely on).
+- Do your own Implement work directly — reading files, writing the real
+  change, running the Iron Law classify yourself — never delegate it to
+  the Agent/Task tool as an ad hoc sub-dispatch. This session is already a
+  live, same-provider soul (Native-First Dispatch Doctrine rule 2,
+  `docs/decisions/0026-vision-orchestrator-roottask-capacity-native-vs-
+  cli-spawn.md`): spawning a nested Task subagent to implement work you
+  already have full context for (the locked decisions, the plan, the
+  item's own verify) is the same "soul re-deriving what a live soul
+  already knows" waste `tsk-1ni` found in `judgeDiscovery`'s blind
+  cli-spawn — pure overhead, not a transparency question (a Task/Agent
+  call is collapsed by default in the transcript, not hidden, unlike a
+  genuinely opaque headless `claude -p` subprocess). If a step genuinely
+  needs a different backend (cheaper model, cross-provider such as
+  Codex/agy, resource isolation) for a narrow helper task, route it
+  explicitly through the capacity-dispatch mechanism instead — see
+  `../_shared/capacity-dispatch-fallback.md`.
 - Implement real behavior. No stubs, TODO-only placeholders, dead code, or
   pseudo-implementations offered as if they were done.
 - Match existing patterns in the touched files and the decisions already

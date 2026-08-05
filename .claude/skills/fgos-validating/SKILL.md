@@ -37,6 +37,25 @@ pass to keep the item moving.
   scaled-up ceremony of a multi-pass review is explicitly out of scope for
   this induction's first slice (cite D6); a later slice may widen it, not
   this one.
+- Do your own reality-gate/feasibility-matrix judgment directly — reading
+  the real files, running the real commands, citing the real evidence
+  yourself — never delegate it to the Agent/Task tool as an ad hoc
+  sub-dispatch. This is a narrower, distinct concern from the "no second
+  reader/review pass" rule above (D6: no scaled-up multi-pass review
+  ceremony) — this rule is about who does the ONE pass's own work, not how
+  many passes there are. This session is already a live, same-provider
+  soul (Native-First Dispatch Doctrine rule 2,
+  `docs/decisions/0026-vision-orchestrator-roottask-capacity-native-vs-
+  cli-spawn.md`): spawning a nested Task subagent for evidence-gathering
+  you already have full context for is the same "soul re-deriving what a
+  live soul already knows" waste `tsk-1ni` found in `judgeDiscovery`'s
+  blind cli-spawn — pure overhead, not a transparency question (a
+  Task/Agent call is collapsed by default in the transcript, not hidden,
+  unlike a genuinely opaque headless `claude -p` subprocess). If a step
+  genuinely needs a different backend (cheaper model, cross-provider such
+  as Codex/agy, resource isolation) for a narrow helper task, route it
+  explicitly through the capacity-dispatch mechanism instead — see
+  `../_shared/capacity-dispatch-fallback.md`.
 - Do not apply the `decompose`→`executing` edge yourself, and do not invent a
   new edge, stage, or field to record the verdict. The verdict is prose
   input to which already-registered edge gets picked next; the engine is
