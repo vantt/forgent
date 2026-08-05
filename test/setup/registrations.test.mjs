@@ -12,6 +12,17 @@ import path from 'node:path';
 import { DOCTOR_CHECKS, CONFIG_DEFAULT_REGISTRATIONS, FIX_REGISTRATIONS, registerCheck, registerConfigDefault, registerFix, runFixes, ensureSharedConfigDefaults } from '../../src/setup/checks.mjs';
 import { DEFAULT_RUNNER_CONFIG } from '../../src/runner/dispatch.mjs';
 
+// tsk-4xg: runFixes() below invokes every registered fix, including the
+// real `claude-plugin-marketplace` one, which shells out to a real,
+// mutating external CLI (`claude plugin marketplace add`/`install`) when
+// the `claude` binary is present. FGOS_CLAUDE_COMMAND (registrations.mjs's
+// own test-only seam, mirroring bin/fgos.mjs's FGOS_GH_COMMAND for `gh`)
+// points it at a path that never exists for this whole test file's process,
+// so it always sees "claude CLI not found" and no-ops that fix, never
+// touching this machine's real Claude Code config as a side effect of
+// running the test suite.
+process.env.FGOS_CLAUDE_COMMAND = '/nonexistent/fgos-test-claude-binary';
+
 function mkTempDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-registrations-test-'));
 }

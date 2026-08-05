@@ -20,6 +20,16 @@ import { initStore, addWork } from '../../src/state/store.mjs';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FGOS = path.resolve(__dirname, '../../bin/fgos.mjs');
 
+// tsk-4xg: `doctor --fix` now runs the real `claude-plugin-marketplace` fix
+// too, which shells out to a real, mutating external CLI (`claude plugin
+// marketplace add`/`install`) when the `claude` binary is present --
+// FGOS_CLAUDE_COMMAND (registrations.mjs's own test-only seam, mirroring
+// bin/fgos.mjs's FGOS_GH_COMMAND for `gh`) points it at a path that never
+// exists, so every `doctor --fix` spawned below sees "claude CLI not
+// found" and no-ops that fix, never touching this machine's real Claude
+// Code config as a side effect of running the test suite.
+const NO_CLAUDE_ENV = { ...process.env, FGOS_CLAUDE_COMMAND: '/nonexistent/fgos-test-claude-binary' };
+
 function mkTemp(prefix) {
   return fs.mkdtempSync(path.join(os.tmpdir(), prefix));
 }
@@ -38,10 +48,21 @@ function fixById(id) {
 
 // ─── Unit tests: DOCTOR_CHECKS ─────────────────────────────────────────────
 
-test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-checkout-hook-wired, tool-registry-configured, config-awareness, dependencies-installed, gate-bypass-configured, and root-drift', () => {
+test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-checkout-hook-wired, tool-registry-configured, config-awareness, dependencies-installed, gate-bypass-configured, root-drift, and claude-plugin-marketplace', () => {
   assert.deepEqual(
     DOCTOR_CHECKS.map((c) => c.id).sort(),
-    ['config-not-stale', 'main-checkout-hook-wired', 'node-version-and-git', 'shell-integration-sourced', 'tool-registry-configured', 'config-awareness', 'dependencies-installed', 'gate-bypass-configured', 'root-drift'].sort(),
+    [
+      'config-not-stale',
+      'main-checkout-hook-wired',
+      'node-version-and-git',
+      'shell-integration-sourced',
+      'tool-registry-configured',
+      'config-awareness',
+      'dependencies-installed',
+      'gate-bypass-configured',
+      'root-drift',
+      'claude-plugin-marketplace',
+    ].sort(),
   );
 });
 
@@ -284,7 +305,7 @@ test('gate-bypass-configured fix is idempotent: reports unchanged and never rewr
 test('fgos doctor --fix (CLI e2e) actually bootstraps gateBypass.level via the real fix', () => {
   const cwd = mkTemp('doctor-cli-fix-gatebypass-');
   execFileSync('git', ['init', '-q'], { cwd, encoding: 'utf8' });
-  const result = spawnSync(process.execPath, [FGOS, 'doctor', '--fix'], { cwd, encoding: 'utf8' });
+  const result = spawnSync(process.execPath, [FGOS, 'doctor', '--fix'], { cwd, encoding: 'utf8', env: NO_CLAUDE_ENV });
   assert.equal(result.status, 0, `fgos doctor --fix failed: ${result.stderr}`);
   const { data } = JSON.parse(result.stdout);
   const fixedEntry = data.fixed.find((f) => f.id === 'gate-bypass-configured');
@@ -304,10 +325,10 @@ test('fgos doctor --fix (CLI e2e) actually bootstraps gateBypass.level via the r
 test('fgos doctor --fix --pretty (CLI e2e) renders a fix line green even when the fix found nothing to change', () => {
   const cwd = mkTemp('doctor-cli-fix-pretty-noop-');
   execFileSync('git', ['init', '-q'], { cwd, encoding: 'utf8' });
-  const first = spawnSync(process.execPath, [FGOS, 'doctor', '--fix'], { cwd, encoding: 'utf8' });
+  const first = spawnSync(process.execPath, [FGOS, 'doctor', '--fix'], { cwd, encoding: 'utf8', env: NO_CLAUDE_ENV });
   assert.equal(first.status, 0, `fgos doctor --fix failed: ${first.stderr}`);
 
-  const second = spawnSync(process.execPath, [FGOS, 'doctor', '--fix', '--pretty'], { cwd, encoding: 'utf8' });
+  const second = spawnSync(process.execPath, [FGOS, 'doctor', '--fix', '--pretty'], { cwd, encoding: 'utf8', env: NO_CLAUDE_ENV });
   assert.equal(second.status, 0, `fgos doctor --fix --pretty failed: ${second.stderr}`);
   const lines = second.stdout.split('\n');
   const fixLine = lines.find((l) => l.includes('fix: gate-bypass-configured'));

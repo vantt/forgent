@@ -63,7 +63,22 @@ test('e2e: fresh external project reaches expected fgos doctor state after init 
     // repo at all". Test scaffolding only, never a product-code change.
     execFileSync('git', ['init', '-q'], { cwd: externalCwd, encoding: 'utf8', shell: isWin });
 
-    const run = (args) => spawnSync(fgosBin, args, { cwd: externalCwd, encoding: 'utf8', shell: isWin });
+    // tsk-4xg: `doctor`/`doctor --fix` now also run the real
+    // `claude-plugin-marketplace` check/fix, which shells out to a real,
+    // mutating external CLI (`claude plugin marketplace add`/`install`)
+    // when the `claude` binary is present. FGOS_CLAUDE_COMMAND
+    // (registrations.mjs's own test-only seam, mirroring bin/fgos.mjs's
+    // FGOS_GH_COMMAND for `gh`) points it at a path that never exists, so
+    // this e2e run sees "claude CLI not found" and no-ops that fix, never
+    // touching this machine's real Claude Code config as a side effect of
+    // running the test suite.
+    const run = (args) =>
+      spawnSync(fgosBin, args, {
+        cwd: externalCwd,
+        encoding: 'utf8',
+        shell: isWin,
+        env: { ...process.env, FGOS_CLAUDE_COMMAND: '/nonexistent/fgos-test-claude-binary' },
+      });
 
     const init = run(['init']);
     assert.equal(init.status, 0, `fgos init failed: ${init.stderr}`);
