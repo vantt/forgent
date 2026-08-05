@@ -16,7 +16,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { initStore, addWork, moveWork, editWork, addDecision, addOutcome, addFriction, listWork, readyWork, isDepsAndLineageReady, graphMetrics, graphWhatIf, staleDoingAdvisory, footprintConflicts, readRawEvents, rebuild, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, registerTool, removeTool, assertAcceptanceEvidence, assertValidDocType, recordGateApprove, StoreError, EXIT_CODES, categoryOf } from '../src/state/store.mjs';
+import { initStore, addWork, moveWork, editWork, addDecision, addOutcome, addFriction, listWork, readyWork, isDepsAndLineageReady, graphMetrics, graphWhatIf, staleDoingAdvisory, stalePostDeliveryAdvisory, footprintConflicts, readRawEvents, rebuild, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, registerTool, removeTool, assertAcceptanceEvidence, assertValidDocType, recordGateApprove, StoreError, EXIT_CODES, categoryOf } from '../src/state/store.mjs';
 import { probeTool, readLocalStatus, writeLocalStatus, resolvedStatus, normalizeCapability } from '../src/state/tool-registry.mjs';
 import { repairTruncatedLastLine, EventLogError } from '../src/state/events.mjs';
 import { deriveTitle, classify, generateId } from '../src/intake/classify.mjs';
@@ -1630,7 +1630,17 @@ async function runVerb(verb, flags, positional, dir) {
     }
 
     case 'stale': {
-      return staleDoingAdvisory(dir);
+      // tsk-1bl (CONTEXT.md D4/D7): `postDelivery` is additive alongside the
+      // existing `stale`/`thresholds` fields `staleDoingAdvisory` already
+      // returns — same one-verb surface, no new CLI command, per this
+      // item's own scope note. ttlDays resolution mirrors `case 'cleanup'`
+      // above exactly (shared-config value, never guessed).
+      const doing = staleDoingAdvisory(dir);
+      const repoRoot = process.cwd();
+      const sharedConfig = readSharedConfig(repoRoot);
+      const ttlDays = sharedConfig?.cleanup?.ttlDays ?? DEFAULT_CLEANUP_TTL_DAYS;
+      const postDelivery = stalePostDeliveryAdvisory(dir, { ttlDays });
+      return { ...doing, postDelivery };
     }
 
     // Request-class per D1 (same contract as `ready`/`graph`/`stale`): a pure

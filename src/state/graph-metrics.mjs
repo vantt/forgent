@@ -493,6 +493,70 @@ export function classifyStaleDoing(entries, { now = Date.now(), thresholds = STA
   return { now, thresholds, stale };
 }
 
+// Advisory thresholds for the post-delivery observability gap (S10, tsk-1bl
+// CONTEXT.md D4/D7): `delivered` and `retrospective` both get a flat 3-day
+// grace; `cleanup` gets no fixed default here since its real TTL is a
+// per-repo shared-config value the caller must supply (`ttlDays`, same
+// requirement `checkCleanupTTLElapsed`/`pickNextCleanupItem` already have,
+// cleanup-harness.mjs/cleanup-pool.mjs) — this default only covers the two
+// flat-3-day statuses.
+export const STALE_POST_DELIVERY_DEFAULTS = Object.freeze({
+  deliveredMs: 3 * 24 * 60 * 60 * 1000, // 3 days
+  retrospectiveMs: 3 * 24 * 60 * 60 * 1000, // 3 days (D7 — same as delivered)
+  cleanupGraceMs: 3 * 24 * 60 * 60 * 1000, // grace ADDED ON TOP of ttlDays, never counted alone
+});
+
+// The item's own SPECIFIC entry event into `status`, never "the latest event
+// of any kind" — same precedent `checkCleanupTTLElapsed` (cleanup-harness.mjs)
+// and `latestRetrospectiveEntry` (retro-pool.mjs) already use. Returns
+// `undefined` when the item never actually entered that status.
+function latestEntryInto(rawEvents, id, status) {
+  const entries = (rawEvents ?? []).filter(
+    (e) => e.type === 'work.move' && e.payload?.id === id && e.payload?.to === status,
+  );
+  return entries.at(-1);
+}
+
+/**
+ * EVIDENCE-CLASSIFIER ADVISORY (S10, mirrors S8's classifyStaleDoing shape):
+ * classify items stuck in the post-merge chain (`delivered`/`retrospective`/
+ * `cleanup`) as stale and SUGGEST — never act, never invoke a verb, never
+ * transition anything. `delivered`/`retrospective` are stale past a flat 3
+ * days from their own entry-into-status event; `cleanup` is stale past
+ * `ttlDays + cleanupGraceMs` from its own entry-into-cleanup event (the
+ * grace is ADDED ON TOP of the real TTL — D4 — so an item still legitimately
+ * waiting on TTL is never flagged). An item with no locatable entry event
+ * for its current status is skipped (never a NaN age, same discipline
+ * `classifyStaleDoing` already gives a missing `claimedAt`). PURE when `now`
+ * is passed; reads only `view.work` + `rawEvents`, never `work.domain`
+ * (domain-agnostic, CONTEXT.md D5).
+ */
+export function classifyStalePostDelivery(view, rawEvents, { now = Date.now(), thresholds = STALE_POST_DELIVERY_DEFAULTS, ttlDays } = {}) {
+  const work = view?.work ?? {};
+  const stale = [];
+  for (const id of Object.keys(work)) {
+    const status = work[id]?.status;
+    if (status !== 'delivered' && status !== 'retrospective' && status !== 'cleanup') continue;
+
+    const entered = latestEntryInto(rawEvents, id, status);
+    if (!entered) continue; // no locatable entry event -> cannot age
+
+    const enteredAt = new Date(entered.ts).getTime();
+    const ageMs = now - enteredAt;
+    const thresholdMs = status === 'cleanup'
+      ? (ttlDays * 24 * 60 * 60 * 1000) + thresholds.cleanupGraceMs
+      : (status === 'delivered' ? thresholds.deliveredMs : thresholds.retrospectiveMs);
+    if (ageMs <= thresholdMs) continue; // fresh enough for this status
+
+    const ageDays = Math.floor(ageMs / 86400000);
+    const suggestion = status === 'cleanup'
+      ? `sat in cleanup ~${ageDays}d (TTL+grace ${Math.floor(thresholdMs / 86400000)}d elapsed) — check whether /fgOS:cleanup-loop has run recently. This advisory never cleans up.`
+      : `sat in ${status} ~${ageDays}d with no retro sweep run — check whether /fgOS:retro-loop has run recently. This advisory never advances status.`;
+    stale.push({ id, status, ageMs, thresholdMs, suggestion });
+  }
+  return { now, thresholds, stale };
+}
+
 // The options a footprint conflict can be resolved by — surfaced as data, never
 // applied. `sequence` = add a dependency so the two run in order not in
 // parallel; `hoist` = extract the shared file's work into a prerequisite both

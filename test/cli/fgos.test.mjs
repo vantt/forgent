@@ -7572,6 +7572,36 @@ test('stale verb on a store with nothing in doing: empty advisory, exit 0', () =
   assert.deepEqual(data.stale, []);
 });
 
+// --- work-graph-intelligence S10 (tsk-1bl, CONTEXT.md D4/D7): `fgos stale`'s
+// `postDelivery` field, additive alongside the existing `stale`/`thresholds`
+// this verb already returns -- same one-verb surface, no new CLI command.
+
+test('stale verb: postDelivery is additive — existing stale/thresholds shape is unchanged, postDelivery.stale is a sibling field', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0);
+  assert.equal(addOk(cwd, 'a').status, 0);
+  assert.equal(run(cwd, ['move', 'a', '--to', 'doing', '--expect', 'todo']).status, 0);
+
+  const data = envelopeData(run(cwd, ['stale']).stdout);
+  assert.deepEqual(data.stale, [], 'existing doing-advisory shape untouched');
+  assert.equal(data.thresholds.agentMs, 15 * 60 * 1000, 'existing doing-advisory thresholds untouched');
+  assert.deepEqual(data.postDelivery.stale, [], 'no delivered/retrospective/cleanup items yet');
+  assert.ok(Number.isFinite(data.postDelivery.thresholds.deliveredMs));
+});
+
+test('stale verb: a just-delivered item is NOT flagged in postDelivery (well within the 3d threshold)', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0);
+  addOk(cwd, 'just-delivered');
+  run(cwd, ['move', 'just-delivered', '--to', 'doing']);
+  run(cwd, ['move', 'just-delivered', '--to', 'delivered']);
+
+  const before = eventLines(cwd).length;
+  const data = envelopeData(run(cwd, ['stale']).stdout);
+  assert.deepEqual(data.postDelivery.stale, []);
+  assert.equal(eventLines(cwd).length, before, 'stale must not append any event');
+});
+
 // --- work-graph-intelligence S9: footprint field + `fgos conflicts` -------
 
 test('add --footprint persists the list; omitting the flag leaves footprint absent', () => {

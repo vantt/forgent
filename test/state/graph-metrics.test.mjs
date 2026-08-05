@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { connectedComponents, criticalPath, staleBlocked, greedyTopUnblock, goalScopedSet, goalScopedCriticalPath, goalScopedGreedyTopUnblock, whatIf, metricsFrame, graphMetrics, classifyStaleDoing, STALE_DOING_DEFAULTS, footprintOverlap } from '../../src/state/graph-metrics.mjs';
+import { connectedComponents, criticalPath, staleBlocked, greedyTopUnblock, goalScopedSet, goalScopedCriticalPath, goalScopedGreedyTopUnblock, whatIf, metricsFrame, graphMetrics, classifyStaleDoing, STALE_DOING_DEFAULTS, classifyStalePostDelivery, STALE_POST_DELIVERY_DEFAULTS, footprintOverlap } from '../../src/state/graph-metrics.mjs';
 
 // Pure lib — every view here is a literal (foldEvents style), no fs, no
 // `.fgos/` writes. connectedComponents groups work items linked by ANY unified
@@ -474,6 +474,95 @@ test('classifyStaleDoing: defaults are agent 15m / human 24h and are overridable
     { now: NOW, thresholds: { agentMs: 1000, humanMs: 1000 } }, // 5s > 1s -> stale
   );
   assert.deepEqual(stale.map((s) => s.id), ['x']);
+});
+
+// --- S10: evidence-classifier advisory for stale post-delivery items -------
+
+const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000;
+const TTL_DAYS = 7;
+
+function moveEntry(id, to, ts) {
+  return { type: 'work.move', payload: { id, to }, ts };
+}
+
+test('classifyStalePostDelivery: an item just past 3d in delivered is stale; at/under 3d is fresh', () => {
+  const view = {
+    work: {
+      stale: item('stale', { status: 'delivered' }),
+      fresh: item('fresh', { status: 'delivered' }),
+    },
+  };
+  const rawEvents = [
+    moveEntry('stale', 'delivered', new Date(NOW - THREE_DAYS_MS - 1000).toISOString()),
+    moveEntry('fresh', 'delivered', new Date(NOW - THREE_DAYS_MS).toISOString()),
+  ];
+  const { stale } = classifyStalePostDelivery(view, rawEvents, { now: NOW, ttlDays: TTL_DAYS });
+  assert.deepEqual(stale.map((s) => s.id), ['stale']);
+  assert.equal(stale[0].status, 'delivered');
+});
+
+test('classifyStalePostDelivery: retrospective uses the same flat 3d threshold as delivered (D7)', () => {
+  const view = { work: { r: item('r', { status: 'retrospective' }) } };
+  const rawEvents = [moveEntry('r', 'retrospective', new Date(NOW - THREE_DAYS_MS - 1000).toISOString())];
+  const { stale } = classifyStalePostDelivery(view, rawEvents, { now: NOW, ttlDays: TTL_DAYS });
+  assert.deepEqual(stale.map((s) => s.id), ['r']);
+  assert.equal(STALE_POST_DELIVERY_DEFAULTS.retrospectiveMs, STALE_POST_DELIVERY_DEFAULTS.deliveredMs);
+});
+
+test('classifyStalePostDelivery: cleanup is stale only past ttlDays+grace, never from cleanup-entry alone (D4)', () => {
+  const view = { work: { c: item('c', { status: 'cleanup' }) } };
+  const withinTtl = [moveEntry('c', 'cleanup', new Date(NOW - 2 * 24 * 60 * 60 * 1000).toISOString())]; // 2d < 7d TTL
+  assert.deepEqual(classifyStalePostDelivery(view, withinTtl, { now: NOW, ttlDays: TTL_DAYS }).stale, []);
+
+  const pastTtlWithinGrace = [moveEntry('c', 'cleanup', new Date(NOW - (TTL_DAYS + 1) * 24 * 60 * 60 * 1000).toISOString())]; // 8d > 7d TTL but < 7+3 grace
+  assert.deepEqual(classifyStalePostDelivery(view, pastTtlWithinGrace, { now: NOW, ttlDays: TTL_DAYS }).stale, []);
+
+  const pastTtlAndGrace = [moveEntry('c', 'cleanup', new Date(NOW - (TTL_DAYS * 24 * 60 * 60 * 1000) - THREE_DAYS_MS - 1000).toISOString())]; // past 7d TTL + 3d grace
+  const { stale } = classifyStalePostDelivery(view, pastTtlAndGrace, { now: NOW, ttlDays: TTL_DAYS });
+  assert.deepEqual(stale.map((s) => s.id), ['c']);
+});
+
+test('classifyStalePostDelivery: an item with no locatable entry event is skipped (never a NaN age)', () => {
+  const view = { work: { x: item('x', { status: 'delivered' }) } };
+  const { stale } = classifyStalePostDelivery(view, [], { now: NOW, ttlDays: TTL_DAYS });
+  assert.deepEqual(stale, []);
+});
+
+test('classifyStalePostDelivery: only delivered/retrospective/cleanup are ever classified — other statuses are ignored', () => {
+  const view = {
+    work: {
+      doing: item('doing', { status: 'doing' }),
+      todo: item('todo', { status: 'todo' }),
+      done: item('done', { status: 'done' }),
+    },
+  };
+  const rawEvents = [
+    moveEntry('doing', 'doing', new Date(NOW - 100 * THREE_DAYS_MS).toISOString()),
+    moveEntry('done', 'done', new Date(NOW - 100 * THREE_DAYS_MS).toISOString()),
+  ];
+  const { stale } = classifyStalePostDelivery(view, rawEvents, { now: NOW, ttlDays: TTL_DAYS });
+  assert.deepEqual(stale, []);
+});
+
+test('classifyStalePostDelivery: pure — same inputs, same output regardless of call order', () => {
+  const view = { work: { a: item('a', { status: 'delivered' }) } };
+  const rawEvents = [moveEntry('a', 'delivered', new Date(NOW - THREE_DAYS_MS - 1000).toISOString())];
+  const first = classifyStalePostDelivery(view, rawEvents, { now: NOW, ttlDays: TTL_DAYS });
+  const second = classifyStalePostDelivery(view, rawEvents, { now: NOW, ttlDays: TTL_DAYS });
+  assert.deepEqual(first, second);
+});
+
+test('classifyStalePostDelivery: age is anchored on the SPECIFIC entry-into-status event, not the latest event of any kind', () => {
+  const view = { work: { a: item('a', { status: 'delivered' }) } };
+  // an OLDER unrelated event (e.g. a much earlier awaiting-approval->delivered
+  // that got reverted then re-entered) must never be picked over the latest
+  // real entry into `delivered` -- .at(-1) picks the latest matching entry.
+  const rawEvents = [
+    moveEntry('a', 'delivered', new Date(NOW - 100 * THREE_DAYS_MS).toISOString()),
+    moveEntry('a', 'delivered', new Date(NOW - 1000).toISOString()), // most recent real entry: fresh
+  ];
+  const { stale } = classifyStalePostDelivery(view, rawEvents, { now: NOW, ttlDays: TTL_DAYS });
+  assert.deepEqual(stale, []);
 });
 
 // --- S9: footprint-intersection advisory -----------------------------------

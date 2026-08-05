@@ -29,7 +29,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { appendEvent, readEvents, withEventsLock, appendEventLocked } from './events.mjs';
 import { rebuildView, viewRevision } from './replay.mjs';
-import { graphMetrics as computeGraphMetrics, whatIf as computeWhatIf, classifyStaleDoing, footprintOverlap, goalScopedCriticalPath, goalScopedGreedyTopUnblock } from './graph-metrics.mjs';
+import { graphMetrics as computeGraphMetrics, whatIf as computeWhatIf, classifyStaleDoing, classifyStalePostDelivery, footprintOverlap, goalScopedCriticalPath, goalScopedGreedyTopUnblock } from './graph-metrics.mjs';
 import { transitionWork, FsmError } from './status-fsm.mjs';
 import { transitionStage } from './stage-fsm.mjs';
 import { validateWork, validateDomainFields, checkAcceptanceEvidenceTraceable, WorkValidationError, DEFAULTS, GOAL_TIERS, truncateTitle } from './work.mjs';
@@ -1035,6 +1035,26 @@ export function staleDoingAdvisory(dir, opts = {}) {
     entries.push({ id, claimRole: view.work[id].claimRole, claimedAt: claimedAt.get(id) });
   }
   return classifyStaleDoing(entries, opts);
+}
+
+/**
+ * Read-only (work-graph-intelligence S10, tsk-1bl CONTEXT.md D4/D7): the
+ * post-delivery staleness advisory — closes the observability gap
+ * `staleDoingAdvisory` above leaves for `delivered`/`retrospective`/
+ * `cleanup`. Rebuilds the view and raw event log the same way
+ * `staleDoingAdvisory` does, then hands both straight to the pure
+ * classifier (which reads its own entry-into-status events directly, no
+ * intermediate `entries` extraction needed here since `classifyStalePost
+ * Delivery` takes `rawEvents` itself). `opts.ttlDays` must be supplied by
+ * the caller — same requirement `checkCleanupTTLElapsed`/
+ * `pickNextCleanupItem` already have, since the real TTL is a per-repo
+ * shared-config value this read-only facade never guesses.
+ */
+export function stalePostDeliveryAdvisory(dir, opts = {}) {
+  const { logPath } = paths(dir);
+  const view = rebuildView(logPath);
+  const rawEvents = readEvents(logPath);
+  return classifyStalePostDelivery(view, rawEvents, opts);
 }
 
 /**
