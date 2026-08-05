@@ -126,14 +126,20 @@ this proof gets executed and judged, not here.
   evidence>` via the same `fgos decision --id tsk-25g` call. Either branch
   satisfies this item's own verify (`grep -q "D1-resolved:"`).
 
-**Impact-analysis posture:** `impact-analysis: full` (GitNexus present,
-freshly checked this session — see CONTEXT.md's own scout evidence
-section). `judgeVerifySemanticCorrectness` blast radius already confirmed
-`HIGH` / 3 affected symbols (`resolveDiscovery`, `resolveDecompose`,
-`runWatch`) — re-run `impact` on `judgeVerifySemanticCorrectness` and
-`buildVerifyCheckPrompt` again at execution time (per CLAUDE.md's MUST
-rule) before editing either, since this plan itself may shift line numbers
-cited above once Phase 1 lands first.
+**Impact-analysis posture:** `impact-analysis: degraded` (revised at
+`fgos-validating` — GitNexus registered and `status: "present"`
+[`fgos tool query`], but its index was flagged stale mid-session, last
+indexed at commit `251d0b5`, behind this item's own two doc-only commits
+on `fgw/tsk-25g`; CONTEXT.md's original scout call recorded `full` when it
+ran, before that drift). The gap: the `HIGH` risk / 3-caller result
+(`resolveDiscovery`, `resolveDecompose`, `runWatch`) is not re-confirmed
+against the current index state. Treated as still usable, not discarded,
+because it was cross-checked against a direct `grep` at the time (matched
+exactly, not a suspicious zero-result) — but re-run `impact` on
+`judgeVerifySemanticCorrectness` and `buildVerifyCheckPrompt` again at
+execution time regardless (per CLAUDE.md's MUST rule), since this plan
+itself may shift line numbers cited above once Phase 1 lands first, and a
+fresh index is cheap insurance either way.
 
 ## Risk map
 
