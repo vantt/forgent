@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { spawnSync } from 'node:child_process';
+import { spawnSync, execFileSync } from 'node:child_process';
 import {
   buildPrompt,
   loadRunnerConfig,
@@ -34,6 +34,24 @@ import { writeLocalStatus, findExecutableOnPath } from '../../src/state/tool-reg
 
 function mkTempDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-dispatch-test-'));
+}
+
+/** tsk-2ig: a real, minimal git repo (not just a bare tmpdir) — `fgosDir`
+ * returned is `<repoRoot>/.fgos`, matching `paths.mjs`'s real
+ * `fgosDirFromRoot` shape, so `captureDispatchAttestation`'s
+ * `path.dirname(fgosDir)` resolves to a real repo root with a real HEAD. */
+function mkTempGitRepo() {
+  const repoRoot = mkTempDir();
+  execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: repoRoot });
+  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: repoRoot });
+  execFileSync('git', ['config', 'user.name', 'Test'], { cwd: repoRoot });
+  fs.writeFileSync(path.join(repoRoot, 'seed.txt'), 'seed\n');
+  execFileSync('git', ['add', 'seed.txt'], { cwd: repoRoot });
+  execFileSync('git', ['commit', '-q', '-m', 'seed'], { cwd: repoRoot });
+  const headCommit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: repoRoot, encoding: 'utf8' }).trim();
+  const fgosDir = path.join(repoRoot, '.fgos');
+  fs.mkdirSync(fgosDir);
+  return { repoRoot, fgosDir, headCommit };
 }
 
 /** Write a fake executor node script that dumps its argv + cwd as JSON to
@@ -932,6 +950,32 @@ test('modelForTier throws a validation error for an unknown tier', () => {
   });
 });
 
+// --- tsk-2ig: worktree-dispatch attestation (baseCommit/headRef) ---------
+
+test('resolveExecutorCommand captures a real baseCommit/headRef when fgosDir points at a real repo', () => {
+  const cfg = baseConfig(['-p', '{prompt}']);
+  const { repoRoot, fgosDir, headCommit } = mkTempGitRepo();
+  const resolved = resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', fgosDir });
+  assert.equal(resolved.baseCommit, headCommit);
+  assert.equal(resolved.headRef, 'main');
+  fs.rmSync(repoRoot, { recursive: true, force: true });
+});
+
+test('resolveExecutorCommand: baseCommit/headRef are both null when fgosDir is omitted (no attempt made)', () => {
+  const cfg = baseConfig(['-p', '{prompt}']);
+  const resolved = resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet' });
+  assert.equal(resolved.baseCommit, null);
+  assert.equal(resolved.headRef, null);
+});
+
+test('resolveExecutorCommand: baseCommit/headRef fail closed to null (never throw) when fgosDir does not point at a git repo', () => {
+  const cfg = baseConfig(['-p', '{prompt}']);
+  const dir = mkTempDir(); // plain tmpdir, no .git anywhere in its ancestry assumed by the read
+  const resolved = resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', fgosDir: dir });
+  assert.equal(resolved.baseCommit, null);
+  assert.equal(resolved.headRef, null);
+});
+
 // --- resolveExecutorCommand: per-element argv substitution, never shell -
 
 test('resolveExecutorCommand substitutes {prompt} and {model} per array element', () => {
@@ -1128,7 +1172,14 @@ test('resolveExecutorCommand resolves an agentType capacity identically whether 
   initStore(dir);
   const withFgosDir = resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', capacityId: 'my-agent-capacity', fgosDir: dir });
   const withoutFgosDir = resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', capacityId: 'my-agent-capacity' });
-  assert.deepEqual(withFgosDir, withoutFgosDir);
+  // command/args/adapter/provider (the actual agentType-resolution shape this
+  // test is about) stay identical regardless of fgosDir. baseCommit/headRef
+  // (tsk-2ig attestation) are deliberately excluded here: they are ONLY
+  // attempted when fgosDir is given (mkTempDir() is not a git repo, so both
+  // happen to read back null today, but that is not this test's concern).
+  const { baseCommit: _bc1, headRef: _hr1, ...withFgosDirShape } = withFgosDir;
+  const { baseCommit: _bc2, headRef: _hr2, ...withoutFgosDirShape } = withoutFgosDir;
+  assert.deepEqual(withFgosDirShape, withoutFgosDirShape);
 });
 
 test('resolveExecutorCommand still prefers a capacity\'s own command/args over agentType when both are declared (judge-discovery\'s real shape) — agentType is never consulted', () => {
