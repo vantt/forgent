@@ -11,11 +11,21 @@ mỗi cái đã có `fgos decision --id tsk-66o` riêng, xem §4). Gap "bỏ só
 (khác D4 đang nói — D4 chính là quyết định TÁCH gap đó ra) đã filed thành
 `tsk-1gr`, sibling độc lập, không phải con của tsk-66o. **Còn mở duy
 nhất: D3** — mức độ rộng/hẹp của `worktree-dispatch-attestation` (3 lựa
-chọn ở §3), chưa được chốt vì phiên chuyển sang distill hội thoại này
-trước khi user trả lời. CONTEXT.md của tsk-66o CHƯA viết (bước 3 của
-`fgos-exploring` chưa chạy) — bước kế tiếp sau khi D3 chốt là quay lại
-`fgos-exploring` để viết CONTEXT.md + gate, theo đúng terminal handoff của
-skill này.
+chọn ở §3), vẫn CHƯA được chốt qua 2 round. `refs` của cả `tsk-66o`
+(→ `#design`) và `tsk-1gr` (→ `#task-tsk-1gr-completeness-gap`) đã set và
+commit/push lên `origin/main` (round 1 xong `2bc193d`, refs xong
+`f2604ef`) dù discussion CHƯA hội tụ — user chốt set sớm để không mất dấu,
+lệch với thứ tự mặc định của terminal-handoff (vốn chỉ set `refs` sau khi
+hội tụ) nhưng là quyết định tường minh của user, không phải lỗi quy trình.
+CONTEXT.md của tsk-66o CHƯA viết (bước 3 của `fgos-exploring` chưa chạy)
+— bước kế tiếp sau khi D3 chốt là quay lại `fgos-exploring` để viết
+CONTEXT.md + gate.
+
+**Round 2:** không có quyết định mới, chỉ đồng bộ lại thực tế — main
+checkout dùng chung có phiên khác (cùng user) mid-merge (`2bc193d`) rồi
+commit tiếp một lần nữa (`8c1dab1`) trong lúc tôi cố commit refs của
+tsk-66o/tsk-1gr; không mất dữ liệu, chỉ delay vài lần retry cho tới khi
+lọt qua (`f2604ef`, của tôi). D3 vẫn treo y nguyên.
 
 ## 2. Mục tiêu & đề bài
 
@@ -72,6 +82,18 @@ timestamp không thêm tín hiệu gì). D3 chưa có D-ID vì chưa chốt — 
   chưa), §4 (D1/D2/D4 đã log thật, không re-log), §6 (tổng hợp mới), §7
   (3 task: 2 candidate + tsk-1gr liên hệ). Không có trao đổi sống mới nào
   trong lượt distill này — D3 còn mở, chờ round tiếp theo.
+- **2026-08-05 (round 2)** — Extraction từ `docs/history/parallel-
+  decomposition-footprint-avoidance/session-source-round2.md`. Không có
+  quyết định mới (D3 vẫn mở, không có D-ID nào thêm ở §4). Nội dung round
+  này thuần cơ học: user hỏi tsk-66o có `refs` trỏ vào discussion chưa
+  (chưa, vì chưa hội tụ) → user chốt set sớm dù chưa hội tụ (lệch tường
+  minh với thứ tự mặc định của terminal-handoff) → set `refs` cho cả
+  `tsk-66o` và `tsk-1gr` → gặp git contention thật trên main checkout
+  dùng chung (phiên khác cùng user mid-merge + commit chồng lên, 3 lần
+  bị chặn/refused trước khi lọt qua) → commit `f2604ef` + push thành
+  công lên `origin/main`. Chỉ cập nhật §1/§5 — không đụng §3/§4/§6/§7 vì
+  không có thay đổi hình dạng thiết kế nào (đúng hard rule "§6 chỉ
+  regenerate khi shape đổi").
 
 ## 6. Thiết kế đã chốt {#design}
 
