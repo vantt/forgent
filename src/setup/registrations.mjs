@@ -560,3 +560,144 @@ registerFix({
   id: 'gate-bypass-configured',
   fix: (cwd) => fixGateBypassConfigured(cwd),
 });
+
+// tsk-4xg (docs/history/tsk-4xg-plugin-marketplace-doctor-check/): a new
+// project set up via `fgos setup` never got the fgOS Claude Code plugin
+// (`.claude-plugin/marketplace.json`, `plugins/fgOS`) registered or
+// installed, so it had no `/fgOS:*` skills available -- and `doctor` never
+// flagged the gap. Same registerCheck/registerFix registry every other
+// doctor check/fix already uses (tsk-2cs) -- a new consumer, no new
+// plumbing.
+//
+// D3 (CONTEXT.md): the fix always adds the marketplace by its GitHub
+// source (`vantt/forgent`), never a local path -- `package.json`'s own
+// `"files"` list does not ship `plugins/`/`.claude-plugin/`, so a local
+// path would only ever work from a dev-checkout of this repo, never for
+// the actual npm-global-install target audience. The CHECK, in contrast,
+// accepts a marketplace entry under this name regardless of its source
+// (github, directory, or otherwise) -- a dev-checkout's own directory-
+// sourced entry (this exact repo's own self-hosting case, per
+// docs/distribution-vision.md's "context 3") is just as valid a pass as a
+// github-sourced one; only the FIX, which only ever runs on a genuinely
+// missing entry, needs to pick one source to add.
+const CLAUDE_PLUGIN_MARKETPLACE_NAME = 'fgos-plugins';
+const CLAUDE_PLUGIN_MARKETPLACE_GITHUB_SOURCE = 'vantt/forgent';
+const CLAUDE_PLUGIN_ID_PREFIX = 'fgOS@';
+
+// The `claude` binary this check/fix shells out to. Tests substitute a fake
+// executable through FGOS_CLAUDE_COMMAND -- same test-only seam
+// bin/fgos.mjs's own ghCommandOpts() already gives FGOS_GH_COMMAND for the
+// `gh` binary -- so this fix (the first one to reach outside `.fgos/`/the
+// repo into a real, mutating external CLI) never actually runs
+// `claude plugin marketplace add`/`install` for real against a test's own
+// machine. Production leaves it unset and the real `claude` on PATH is used.
+function claudeCommand() {
+  return process.env.FGOS_CLAUDE_COMMAND || 'claude';
+}
+
+function claudeBinaryAvailable() {
+  try {
+    execFileSync(claudeCommand(), ['--version'], { encoding: 'utf8' });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+// Both `claude plugin marketplace list --json` and `claude plugin list
+// --json` exit 0 with a JSON array on success (confirmed by running them
+// directly, not assumed from --help alone) -- a non-zero exit or unparsable
+// stdout folds to `null` here, the same fail-closed shape this file's other
+// checks already use for a subprocess that could not be trusted.
+function claudePluginJson(args) {
+  try {
+    const stdout = execFileSync(claudeCommand(), args, { encoding: 'utf8' });
+    const parsed = JSON.parse(stdout);
+    return Array.isArray(parsed) ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+function fgosPluginEnabled(plugins) {
+  return plugins.some((p) => typeof p?.id === 'string' && p.id.startsWith(CLAUDE_PLUGIN_ID_PREFIX) && p.enabled === true);
+}
+
+function checkClaudePluginMarketplace() {
+  if (!claudeBinaryAvailable()) {
+    return {
+      passed: true,
+      message: 'claude CLI not found on PATH — nothing to check (Claude Code plugin surface not applicable here)',
+    };
+  }
+  const marketplaces = claudePluginJson(['plugin', 'marketplace', 'list', '--json']);
+  if (marketplaces === null) {
+    return { passed: false, message: '"claude plugin marketplace list --json" failed to run or parse — run fgos doctor --fix' };
+  }
+  if (!marketplaces.some((m) => m?.name === CLAUDE_PLUGIN_MARKETPLACE_NAME)) {
+    return {
+      passed: false,
+      message: `Claude Code marketplace "${CLAUDE_PLUGIN_MARKETPLACE_NAME}" not configured — run fgos doctor --fix`,
+    };
+  }
+  const plugins = claudePluginJson(['plugin', 'list', '--json']);
+  if (plugins === null) {
+    return { passed: false, message: '"claude plugin list --json" failed to run or parse — run fgos doctor --fix' };
+  }
+  if (!fgosPluginEnabled(plugins)) {
+    return { passed: false, message: 'fgOS Claude Code plugin not installed/enabled — run fgos doctor --fix' };
+  }
+  return {
+    passed: true,
+    message: `Claude Code marketplace "${CLAUDE_PLUGIN_MARKETPLACE_NAME}" configured, fgOS plugin enabled`,
+  };
+}
+
+// Idempotent, same "only write when something was actually missing"
+// discipline fixGateBypassConfigured above already uses.
+function fixClaudePluginMarketplace() {
+  if (!claudeBinaryAvailable()) {
+    return { changed: false, message: 'claude CLI not found on PATH — nothing to fix' };
+  }
+  const messages = [];
+  let changed = false;
+
+  const marketplaces = claudePluginJson(['plugin', 'marketplace', 'list', '--json']) ?? [];
+  if (!marketplaces.some((m) => m?.name === CLAUDE_PLUGIN_MARKETPLACE_NAME)) {
+    try {
+      execFileSync(claudeCommand(), ['plugin', 'marketplace', 'add', CLAUDE_PLUGIN_MARKETPLACE_GITHUB_SOURCE], { encoding: 'utf8' });
+    } catch (err) {
+      return { changed, message: `"claude plugin marketplace add ${CLAUDE_PLUGIN_MARKETPLACE_GITHUB_SOURCE}" failed: ${err.message}` };
+    }
+    changed = true;
+    messages.push(`added marketplace "${CLAUDE_PLUGIN_MARKETPLACE_NAME}" from ${CLAUDE_PLUGIN_MARKETPLACE_GITHUB_SOURCE}`);
+  }
+
+  const plugins = claudePluginJson(['plugin', 'list', '--json']) ?? [];
+  if (!fgosPluginEnabled(plugins)) {
+    const pluginRef = `fgOS@${CLAUDE_PLUGIN_MARKETPLACE_NAME}`;
+    try {
+      execFileSync(claudeCommand(), ['plugin', 'install', pluginRef], { encoding: 'utf8' });
+    } catch (err) {
+      return { changed, message: `"claude plugin install ${pluginRef}" failed: ${err.message}` };
+    }
+    changed = true;
+    messages.push('installed and enabled fgOS plugin');
+  }
+
+  if (!changed) {
+    return { changed: false, message: `marketplace "${CLAUDE_PLUGIN_MARKETPLACE_NAME}" and fgOS plugin already configured` };
+  }
+  return { changed: true, message: messages.join('; ') };
+}
+
+registerCheck({
+  id: 'claude-plugin-marketplace',
+  description: 'fgOS Claude Code plugin marketplace is registered and the fgOS plugin is installed/enabled',
+  check: (cwd) => checkClaudePluginMarketplace(cwd),
+});
+
+registerFix({
+  id: 'claude-plugin-marketplace',
+  fix: (cwd) => fixClaudePluginMarketplace(cwd),
+});
