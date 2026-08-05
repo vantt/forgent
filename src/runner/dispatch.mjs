@@ -35,7 +35,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { spawn } from 'node:child_process';
+import { spawn, execFileSync } from 'node:child_process';
 import { DEFAULTS } from '../state/work.mjs';
 import { DOMAINS, resolveDomainName, skillForStage } from '../state/workflow-stage-graphs.mjs';
 import { selectTemplate, renderTemplate, hashTemplate } from './prompt-templates.mjs';
@@ -766,7 +766,41 @@ export function decideCapacityDispatchMechanism(cfg, capacityId, { hasLiveTaskAc
  * executor block's own `provider` display alias when present, else
  * `command` itself.
  */
+/**
+ * Worktree-dispatch attestation (tsk-2ig, D1/D3 of docs/history/parallel-
+ * decomposition-footprint-avoidance/CONTEXT.md — mức 1, advisory-only):
+ * chụp `baseCommit`/`headRef` của repo tại `fgosDir`'s root NGAY TRƯỚC khi
+ * dispatch — captured by the orchestrator itself, never trusted from
+ * whatever the dispatched executor later reports. Fail-safe: a git read
+ * that cannot resolve (detached checkout weirdness, no `.git`, etc.) never
+ * throws and never blocks dispatch — this is advisory metadata, not a
+ * precondition (same "advisory, không tự fail" stance `frozen-judge.mjs`
+ * already states for its own checks). Returns `{baseCommit, headRef}`,
+ * either field `null` when it could not be read.
+ */
+function captureDispatchAttestation(fgosDir) {
+  if (!fgosDir) return { baseCommit: null, headRef: null };
+  const repoRoot = path.dirname(fgosDir);
+  const readGit = (args) => {
+    try {
+      return execFileSync('git', args, { cwd: repoRoot, encoding: 'utf8', shell: false, stdio: ['ignore', 'pipe', 'pipe'] }).trim();
+    } catch {
+      return null;
+    }
+  };
+  return {
+    baseCommit: readGit(['rev-parse', 'HEAD']),
+    headRef: readGit(['symbolic-ref', '--short', '-q', 'HEAD']), // null on detached HEAD, never a throw
+  };
+}
+
 export function resolveExecutorCommand(cfg, { prompt, model, tier, capacityId, fgosDir } = {}) {
+  // Captured BEFORE resolveExecutorConfig, not after (D3) — cheap and
+  // unconditional so the same call site works regardless of whether the
+  // resolved executor turns out to be same-provider or cross-provider;
+  // resolveExecutorConfig below is still the sole authority on which
+  // executor actually gets used.
+  const attestation = captureDispatchAttestation(fgosDir);
   const executor = resolveExecutorConfig(cfg, tier, capacityId, fgosDir);
   const adapter = executor.adapter ?? DEFAULT_ADAPTER;
   if (!(adapter in EXECUTOR_ADAPTERS)) {
@@ -780,7 +814,14 @@ export function resolveExecutorCommand(cfg, { prompt, model, tier, capacityId, f
     }
     return arg.split('{prompt}').join(prompt).split('{model}').join(model);
   });
-  return { command: executor.command, args, adapter, provider: executor.provider ?? executor.command };
+  return {
+    command: executor.command,
+    args,
+    adapter,
+    provider: executor.provider ?? executor.command,
+    baseCommit: attestation.baseCommit,
+    headRef: attestation.headRef,
+  };
 }
 
 /**

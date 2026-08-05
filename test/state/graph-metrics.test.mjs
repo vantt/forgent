@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { connectedComponents, criticalPath, staleBlocked, greedyTopUnblock, goalScopedSet, goalScopedCriticalPath, goalScopedGreedyTopUnblock, whatIf, metricsFrame, graphMetrics, classifyStaleDoing, STALE_DOING_DEFAULTS, classifyStalePostDelivery, STALE_POST_DELIVERY_DEFAULTS, footprintOverlap } from '../../src/state/graph-metrics.mjs';
+import { connectedComponents, criticalPath, staleBlocked, greedyTopUnblock, goalScopedSet, goalScopedCriticalPath, goalScopedGreedyTopUnblock, whatIf, metricsFrame, graphMetrics, classifyStaleDoing, STALE_DOING_DEFAULTS, classifyStalePostDelivery, STALE_POST_DELIVERY_DEFAULTS, footprintOverlap, detectCycles, computeSchedule } from '../../src/state/graph-metrics.mjs';
 
 // Pure lib — every view here is a literal (foldEvents style), no fs, no
 // `.fgos/` writes. connectedComponents groups work items linked by ANY unified
@@ -612,4 +612,76 @@ test('footprintOverlap is deterministic across ready items: pairs follow FIFO or
   const out = footprintOverlap(view);
   assert.deepEqual(out.map((c) => [c.a, c.b]), [['first', 'second'], ['first', 'third'], ['second', 'third']]);
   assert.deepEqual(out[0].shared, ['b.mjs', 'a.mjs']); // first item's footprint order
+});
+
+// --- tsk-3c7: dep-graph cycle detection -------------------------------------
+
+test('detectCycles: an acyclic deps graph has zero cycles', () => {
+  const view = { work: { a: item('a'), b: item('b', { deps: ['a'] }), c: item('c', { deps: ['b'] }) } };
+  assert.deepEqual(detectCycles(view), []);
+});
+
+test('detectCycles: a self-dep is reported as its own one-element cycle', () => {
+  const view = { work: { a: item('a', { deps: ['a'] }) } };
+  assert.deepEqual(detectCycles(view), [['a']]);
+});
+
+test('detectCycles: a real 2-item cycle (a depends on b, b depends on a) is found regardless of status', () => {
+  const view = {
+    work: {
+      a: item('a', { status: 'done', deps: ['b'] }),
+      b: item('b', { status: 'blocked', deps: ['a'] }),
+    },
+  };
+  const cycles = detectCycles(view);
+  assert.equal(cycles.length, 1);
+  assert.deepEqual(new Set(cycles[0]), new Set(['a', 'b']));
+});
+
+test('detectCycles: a dep pointing at an id with no matching work item is skipped, not a cycle', () => {
+  const view = { work: { a: item('a', { deps: ['missing'] }) } };
+  assert.deepEqual(detectCycles(view), []);
+});
+
+// --- tsk-3c7: computed-parallel-wave-schedule -------------------------------
+
+test('computeSchedule: two ready items with disjoint footprints land in the same wave', () => {
+  const view = {
+    work: {
+      a: item('a', { footprint: ['src/x.mjs'] }),
+      b: item('b', { footprint: ['src/y.mjs'] }),
+    },
+  };
+  assert.deepEqual(computeSchedule(view), { waves: [['a', 'b']] });
+});
+
+test('computeSchedule: two ready items sharing a footprint path are DEFERRED to separate waves, never refused', () => {
+  const view = {
+    work: {
+      a: item('a', { footprint: ['src/x.mjs'] }),
+      b: item('b', { footprint: ['src/x.mjs'] }),
+    },
+  };
+  assert.deepEqual(computeSchedule(view), { waves: [['a'], ['b']] });
+});
+
+test('computeSchedule: an item with no declared footprint never conflicts, packs into the earliest wave', () => {
+  const view = {
+    work: {
+      a: item('a', { footprint: ['src/x.mjs'] }),
+      b: item('b', { footprint: ['src/x.mjs'] }),
+      c: item('c'), // no footprint
+    },
+  };
+  assert.deepEqual(computeSchedule(view), { waves: [['a', 'c'], ['b']] });
+});
+
+test('computeSchedule: a non-ready item (unmet dep) never appears in any wave', () => {
+  const view = {
+    work: {
+      a: item('a'),
+      b: item('b', { deps: ['a'] }), // blocked on a -> not in frontier
+    },
+  };
+  assert.deepEqual(computeSchedule(view), { waves: [['a']] });
 });

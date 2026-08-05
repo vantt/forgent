@@ -67,3 +67,40 @@ export function frozenJudgeHits(changedFiles, footprint = []) {
   }
   return hits;
 }
+
+/**
+ * Footprint-diff advisory (tsk-2ig, D3/D5 of docs/history/parallel-
+ * decomposition-footprint-avoidance/CONTEXT.md — mức 1, advisory-only):
+ * broadened sibling of `frozenJudgeHits` that flags ANY changed file
+ * outside the item's declared `footprint`, not just the
+ * `FROZEN_JUDGE_PATTERNS` subset — this is a SEPARATE function, never a
+ * modification of `frozenJudgeHits` (D5: the existing narrow check's
+ * behavior stays byte-for-byte unchanged).
+ *
+ * D5's exemption: an item with NO declared footprint (absent or empty
+ * array) is exempt entirely — returns `[]` regardless of the diff.
+ * Flagging every file in that case would be 100% of the diff, which is
+ * not a signal (no declared baseline to diverge FROM), only guaranteed
+ * noise — the opposite of `frozenJudgeHits`'s own fallback (which, for
+ * the narrower judge-pattern set only, treats an absent footprint as
+ * "check everything" since that subset is rare enough in a typical diff
+ * to stay a real signal there).
+ *
+ * @param {string[]} changedFiles - actual files changed by this return/approve
+ * @param {string[]} footprint - the item's declared footprint (may be absent)
+ * @returns {{file:string}[]} hits — empty means every changed file is
+ *   inside the declared footprint (or footprint was never declared, D5).
+ */
+export function footprintDiffHits(changedFiles, footprint = []) {
+  const declaredList = Array.isArray(footprint) ? footprint : [];
+  if (declaredList.length === 0) return []; // D5: absent footprint = exempt
+  const declared = new Set(declaredList.map(normalizePath));
+  const hits = [];
+  for (const raw of Array.isArray(changedFiles) ? changedFiles : []) {
+    const file = normalizePath(raw);
+    if (!file) continue;
+    if (declared.has(file)) continue;
+    hits.push({ file });
+  }
+  return hits;
+}
