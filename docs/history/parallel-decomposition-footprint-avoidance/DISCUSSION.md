@@ -67,10 +67,18 @@ kém tin hơn subagent cùng nhà) mà không phá vỡ những gì đã hội t
 | D4 | Gap "bỏ sót" (decompose không phủ hết quyết định đã khoá vào footprint con) để NGOÀI scope tsk-66o, khác bản chất với chồng-lấn — filed thành `tsk-1gr` độc lập (không dep logic, chỉ liên hệ text) | User chốt: "file luôn thành task riêng đi, gap bỏ sót phải cover luôn". Đã log `fgos decision --id tsk-66o` (seq 6181), và `tsk-1gr` đã submit thật |
 | D3 | `worktree-dispatch-attestation` chọn **MỨC 1 — advisory-only**: chụp `baseCommit`/`headRef` quanh `resolveExecutorConfig` trước dispatch + mở rộng `frozen-judge.mjs` gác diff-toàn-phần ngoài footprint (không chỉ test/CI/lockfile), CHỈ gắn cờ, không chặn merge. Mức 2 (hard-refusal) và mức 3 (cô lập OS, `tsk-49o`) hoãn lại | Code lỗi thật đã bị `merge.mjs`'s staged verify-gate chặn sẵn (không đổi) — rủi ro D3 xử lý là diff lệch phạm vi nhưng verify xanh (lớp STR63/frozen-judge), advisory nhất quán tiền lệ đã có, rẻ (F2), không risk chặn nhầm. Nâng mức sau nếu có incident thật. Đã log `fgos decision --id tsk-66o` (seq 6501), và ghi chú cross-reference vào `tsk-49o` (seq 6500) |
 
-D1/D2/D3/D4 đều đã có `fgos decision --id tsk-66o` thật, xem `view.decisions` —
+| D5 | Check diff-toàn-phần MỚI (D3 mức 1) MIỄN kiểm khi item không khai footprint — không gắn cờ gì. Guard này CHỈ áp cho check mới, giữ nguyên 100% hành vi cũ của check judge-pattern hẹp (STR63, đã ship) | Ship Faster (0025, đã làm rõ scope 2026-08-05: tốc độ ship của PROJECT DÙNG fgOS, không phải tốc độ tự thân fgOS build). Gắn cờ 100% file khi vắng baseline không phải tín hiệu, chỉ là noise. `merge.mjs`'s verify-gate đã lo phần code-vỡ-thật, không phụ thuộc D5. Item không khai footprint chưa từng có kỳ vọng review hẹp nên không mất an toàn gì đã có. Đã log `fgos decision --id tsk-66o` (seq 6505) |
+
+D1-D5 đều đã có `fgos decision --id tsk-66o` thật, xem `view.decisions` —
 KHÔNG re-log lại ở đây để tránh trùng lặp (cùng D-ID, cùng nội dung, hai
 timestamp không thêm tín hiệu gì). **Không còn điểm mở nào ở §3 — discussion
 đã hội tụ.**
+
+**Lưu ý phạm vi (nguồn: `docs/decisions/0025` §Làm rõ, 2026-08-05):**
+D5 suýt bị quyết định sai vì đọc nhầm "Ship Faster" thành tốc độ tự thân
+fgOS build. Đã sửa tại nguồn (`docs/decisions/0025.md` + pointer
+`AGENTS.md`) — Ship Faster đo tốc độ ship của PROJECT ĐANG DÙNG fgOS,
+không phải tốc độ fgOS tự triển khai tính năng.
 
 ## 5. Q&A log
 
@@ -185,18 +193,20 @@ flowchart TD
   khai (không chỉ nhóm file test/CI/lockfile/manifest hiện có).
 - **Trích §6:** mục "2" ở §6.
 - **D-ID áp dụng:** D1 (là 1 trong 2 children), D3 (mức 1 — advisory-only,
-  chốt). Task này sẵn sàng cho `fgos-planning`.
+  chốt), D5 (miễn kiểm khi vắng footprint, chỉ áp cho check mới). Task
+  này sẵn sàng cho `fgos-planning`.
 - **Quan hệ sibling:** độc lập file với
   `computed-parallel-wave-schedule` (§ trên). Liên hệ (không phải dep
   logic) với `tsk-49o` — mức 2/3 hoãn, `tsk-49o` đã nhận ghi chú
   cross-reference (seq 6500) cho lúc nó triển khai riêng.
-- **Draft verify:** advisory-only — test khẳng định (a) `resolveExecutorConfig`
-  ghi lại đúng `baseCommit`/`headRef` trước khi spawn agy/opencode, và
-  (b) `frozen-judge.mjs` trả về hit cho MỌI file ngoài footprint khai
-  (không chỉ pattern test/CI/lockfile cũ) mà KHÔNG chặn gì (không throw,
-  không đổi outcome merge) — regression test riêng khẳng định nhóm
-  pattern cũ (`FROZEN_JUDGE_PATTERNS`) vẫn hoạt động y hệt, chỉ mở rộng
-  thêm, không thay thế.
+- **Draft verify:** advisory-only — test khẳng định (a)
+  `resolveExecutorConfig` ghi lại đúng `baseCommit`/`headRef` trước khi
+  spawn agy/opencode; (b) khi CÓ khai footprint, `frozen-judge.mjs` trả về
+  hit cho MỌI file ngoài footprint (không chỉ pattern test/CI/lockfile
+  cũ) mà KHÔNG chặn gì; (c) khi KHÔNG khai footprint, check mới trả về
+  RỖNG (D5 — miễn hoàn toàn), trong khi check judge-pattern cũ
+  (`FROZEN_JUDGE_PATTERNS`) vẫn hoạt động y hệt trước giờ (regression
+  test riêng, không đổi hành vi STR63 đã ship).
 
 ### `{#task-tsk-1gr-completeness-gap}` (sibling, không phải con)
 
