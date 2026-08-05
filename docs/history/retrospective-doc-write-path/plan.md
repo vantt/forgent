@@ -75,7 +75,7 @@ Alternatives rejected — recorded so they are not re-proposed:
 | `fgos compound`'s new refusal | **high** | test that it refuses an absent path, refuses a path present-but-uncommitted (untracked *and* staged-only), and accepts only a path committed at the main checkout's HEAD — verify clause (1) |
 | `fgos-compounding` step 3 ↔ 4 inversion | **medium** | test that a synthesis run whose cwd is inside a linked worktree lands its document at the main checkout — verify clause (2) |
 | Existing `compound` callers and tests | **medium** | full `npm test` green; blast radius over `compound` cross-checked with `rg` (GitNexus degraded, see above) |
-| Regrown document fidelity | low | verify clause (3): the file exists with content sourced from `tsk-5z2`'s own captures, quoted not paraphrased |
+| Regrown document fidelity | low | verify clause (3): the file exists with content sourced from `tsk-5z2`'s own decision record and the shipped `lock-status` behaviour, quoted not paraphrased |
 
 ### Files likely touched
 
@@ -108,10 +108,18 @@ steps 3 and 4 in both skill copies, and give the write step the same root
 resolution step 3 already carries. Cross-check `compound`'s callers with
 `rg` before editing, per the degraded impact-analysis posture.
 
-**Phase 3 — regrow the lost document.** `fgos doc-sources
-docs/how-to/check-main-checkout-lock-status-before-retrying.md` to gather
-`tsk-5z2`'s captures, write the how-to from them, commit at the main
-checkout — which is also the first real exercise of D1's own rule.
+**Phase 3 — regrow the lost document.** Source it from `tsk-5z2`'s own
+decision record, `docs/history/lock-status-visibility/` (`CONTEXT.md`
+7.3K, `plan.md` 4.9K, both present on main), plus the shipped behaviour of
+`fgos lock-status`. Write the how-to from that material, quoted not
+paraphrased, and commit it at the main checkout — which is also the first
+real exercise of D1's own rule.
+
+`fgos doc-sources` is deliberately **not** the source here. It was run
+against this path and returns capture metadata only
+(`predicted`/`actual`/`docType`/`docPath`, `count: 1`, no prose), so
+nothing can be regrown from it. `CONTEXT.md`'s D2 records the same
+correction.
 
 Also in scope, one line: correct the stale `docPath` for
 `str89-case-study-executing` to
@@ -149,7 +157,8 @@ shape, or acceptance criteria (`fgos-planning`'s own material test):
 - "Committed" means present in the main checkout's `HEAD` tree, not merely
   staged. This is the reading the approved verify states explicitly.
 - The regrown document's Diataxis quadrant stays `how-to`, as the existing
-  `docPath` and its recorded `docType` already declare.
+  `docPath` and its recorded `docType` already declare — confirmed by
+  running `fgos doc-sources` against the path (`docType: "how-to"`).
 
 ## Proof surface
 
@@ -162,5 +171,6 @@ npm test green (full suite) + new test proving all three locked decisions:
 (2) D1 write location -- a synthesis run invoked with cwd inside a linked
     worktree lands its document at the main checkout, not the worktree;
 (3) D2 regrow -- docs/how-to/check-main-checkout-lock-status-before-retrying.md
-    exists on disk with content sourced from tsk-5z2's own captures.
+    exists on disk with content sourced from tsk-5z2's own decision record
+    (docs/history/lock-status-visibility/) and the shipped lock-status behaviour.
 ```

@@ -43,7 +43,7 @@ Deferred).
 | ID | Decision |
 |----|----------|
 | D1 | A retrospective document is always **written and committed at the main checkout**, regardless of where the session invoking synthesis is standing. The document-writing step resolves the main checkout root the same way `fgos-compounding` step 3 already resolves it for the `.fgos/` store (`git rev-parse --path-format=absolute --git-common-dir \| xargs dirname`). This removes the asymmetry, not the ability to run synthesis from a worktree: a session inside a worktree still synthesizes its own item, its document simply lands where every other document lands. No new lifecycle edge, no locked law reopened. |
-| D2 | The one unrecoverable document, `docs/how-to/check-main-checkout-lock-status-before-retrying.md` (`tsk-5z2`), is **regrown inside this item** from the original captures, which are intact in the event log and reachable via `fgos doc-sources`. Not split into a separate item, and its `docPath` is not cleared. |
+| D2 | The one unrecoverable document, `docs/how-to/check-main-checkout-lock-status-before-retrying.md` (`tsk-5z2`), is **regrown inside this item**. Not split into a separate item, and its `docPath` is not cleared. Its source is `tsk-5z2`'s own decision record (`docs/history/lock-status-visibility/` — `CONTEXT.md` and `plan.md`, both present on main) together with the shipped behaviour of `fgos lock-status`. **Not** `fgos doc-sources`: that verb was run against this path and returns capture metadata only (`predicted`/`actual`/`docType`/`docPath`), no prose — an earlier draft of this decision named it as the source and was wrong. |
 | D3 | **Write first, tag second, and fail closed at the tag.** The document is written and committed at the main checkout *before* `fgos compound` records its tag, and `compound` refuses a `--doc-path` whose file is not present at the main checkout. This inverts `fgos-compounding`'s current step 3 → step 4 order, under which the tag necessarily precedes the file it names and therefore can never be validated. The invariant "a tag exists ⟹ its document exists on main" becomes impossible to violate rather than detected later. |
 
 ## Why the alternatives were rejected
@@ -115,6 +115,13 @@ content is still in hand.
   (12), `52e84193` (8) — plus one path stale from a rename (`8eba4a40`)
   and one present in no commit at all (`tsk-5z2`). 34 were restored in
   commit `d955217`; the `tsk-5z2` document is what D2 regrows.
+- `fgos doc-sources docs/how-to/check-main-checkout-lock-status-before-retrying.md`
+  — run 2026-08-05, returns `count: 1` with a single capture carrying
+  `predicted`/`actual`/`docType`/`docPath` and no prose. Establishes that
+  captures are metadata, not written material: a document cannot be
+  regrown from them alone. `tsk-5z2`'s own `docsRef`,
+  `docs/history/lock-status-visibility/` (`CONTEXT.md` 7.3K, `plan.md`
+  4.9K), is present on main and is the real source.
 - **Impact-analysis capability gate** (per `CLAUDE.md`): `fgos tool query
   --capability impact-analysis --status present` returns GitNexus
   `present`, but the index is at `251d0b5`, behind current HEAD —
