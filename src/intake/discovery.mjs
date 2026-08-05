@@ -659,6 +659,22 @@ export function resolveDiscovery(dir, id, cfg, role, callerVerdict) {
         // docs/explanation/judge-verdict-second-pass-semantic-check.md
         // already states for this exact two-judge-disagreement path.
         if (callerVerdict?.force === true) {
+          // tsk-nfa D1: --force overrides the verify dispute only, never a
+          // park state. An item already `awaiting-human` here means a PRIOR
+          // discover call parked it (this dispute, or an unclear verdict) --
+          // continuing on to moveStage below would advance stage while
+          // status stays parked, and fgos return's `status !== 'doing'`
+          // guard (bin/fgos.mjs) then refuses with no obvious way out.
+          // Refuse here instead, pointing at the real resume path: status
+          // changes stay exclusively behind the ask/answer door
+          // (putInAwaiting/answerAwaiting, src/state/store.mjs), never a
+          // synthetic answer manufactured by --force itself.
+          if (work.status === 'awaiting-human') {
+            throw new StoreError(
+              'validation',
+              `discover --force: work "${id}" is already "awaiting-human" -- run "fgos answer ${id} --text ..." to resume it before retrying --force.`,
+            );
+          }
           addDecision(dir, {
             id,
             text: `discover --force overrode a disputed verify: "${verdict.verify}"`,
