@@ -457,6 +457,65 @@ function formatFootprintOverlapReason(conflicts) {
   return `Footprint trùng giữa các việc con dự kiến:\n${lines.join('\n')}`;
 }
 
+// A token shaped like a real repo file path: has a "/" (directory-shaped)
+// OR ends with a familiar code/config/doc extension. Loose on purpose (D2:
+// mechanical, no judge call) -- fs.existsSync below is what actually
+// filters out prose that merely looks path-shaped.
+const PATH_TOKEN_PATTERN = /[A-Za-z0-9_.-]*\/[A-Za-z0-9_./-]+|\b[A-Za-z0-9_-]+\.(?:mjs|cjs|js|ts|tsx|jsx|json|md|ya?ml|toml|py|go|rs|rb)\b/g;
+
+/**
+ * COMPLETENESS ADVISORY (tsk-1gr, D1/D2 of docs/history/decompose-locked-
+ * decision-footprint-coverage/CONTEXT.md): a locked decision naming a
+ * real, existing file that NO tentative child's footprint covers --
+ * advisory-only, NEVER blocks (D1 -- unlike `footprintOverlapAmong`'s
+ * collision gate above, which is a different failure mode: this is about
+ * a decision nobody claimed responsibility for, not two children fighting
+ * over the same file). D2: purely mechanical, no LLM/judge call --
+ * extracts path-shaped tokens from CONTEXT.md's own "## Locked decisions"
+ * section (readLockedContext's concatenated text), keeps only the ones
+ * `fs.existsSync` confirms are real files in `repoRoot`, then flags any
+ * such path that no child's declared `footprint` contains. A decision
+ * whose text names no real path is exempt automatically -- nothing to
+ * check (D2's own "vắng path thì miễn tự động").
+ *
+ * @param {string} contextText - readLockedContext's own concatenated output
+ * @param {{footprint?: string[]}[]} children - tentative children (verdict.children shape)
+ * @param {string} repoRoot - resolved against fs.existsSync
+ * @returns {string[]} real paths named in locked decisions that no child's footprint touches
+ */
+export function findUncoveredLockedDecisions(contextText, children, repoRoot) {
+  if (typeof contextText !== 'string' || !contextText.trim()) return [];
+  const section = /##\s*Locked decisions([\s\S]*?)(?:\n##\s|$)/i.exec(contextText);
+  const decisionsText = section ? section[1] : '';
+  if (!decisionsText.trim()) return [];
+
+  const candidatePaths = new Set();
+  let match;
+  PATH_TOKEN_PATTERN.lastIndex = 0;
+  while ((match = PATH_TOKEN_PATTERN.exec(decisionsText)) !== null) {
+    candidatePaths.add(match[0].replace(/^`|`$/g, ''));
+  }
+  if (candidatePaths.size === 0) return [];
+
+  const realPaths = [...candidatePaths].filter((p) => {
+    try {
+      return fs.existsSync(path.join(repoRoot, p));
+    } catch {
+      return false;
+    }
+  });
+  if (realPaths.length === 0) return [];
+
+  const covered = new Set();
+  for (const child of Array.isArray(children) ? children : []) {
+    for (const f of Array.isArray(child?.footprint) ? child.footprint : []) {
+      covered.add(f);
+    }
+  }
+
+  return realPaths.filter((p) => !covered.has(p));
+}
+
 /**
  * Read `id` from the store at `dir`, judge it via `judgeDecompose`, and
  * resolve the verdict — the ONE function both the sync decompose-equivalent
@@ -738,6 +797,25 @@ export function resolveDecompose(dir, id, cfg, role, callerVerdict) {
     logDecomposeVerdict(dir, id, 'need-human', reason, `${footprintConflicts.length} footprint conflicts`);
     putInAwaiting(dir, { id, ask: formatProposalAsk(verdict, reason), statusAtAsk: work.status });
     return { outcome: 'need-human', id, verdict };
+  }
+
+  // tsk-1gr D1/D2: completeness advisory -- computed fresh here regardless
+  // of which branch produced `verdict` (caller-supplied never reads
+  // lockedContext/repoRoot at all, per the tsk-27y branch above; this check
+  // needs it either way, per D1's "unconditional, same as footprintOverlap").
+  // ADVISORY ONLY: never parks, never blocks -- a hit is logged as its own
+  // decision alongside the real decompose write below, not instead of it.
+  const coverageRepoRoot = resolveContentRoot(stateRoot, id, work.docsRef);
+  const coverageContext = readLockedContext(coverageRepoRoot, work.docsRef);
+  const uncoveredDecisions = findUncoveredLockedDecisions(coverageContext, verdict.children, coverageRepoRoot);
+  if (uncoveredDecisions.length > 0) {
+    addDecision(dir, {
+      id,
+      text: `decompose completeness advisory: ${uncoveredDecisions.length} path(s) named in a locked decision have no child footprint covering them: ${uncoveredDecisions.join(', ')}`,
+      source: 'resolveDecompose',
+      rationale:
+        'tsk-1gr D1/D2: mechanical path-token check over CONTEXT.md\'s Locked decisions section -- advisory only, never blocks; see docs/explanation/auto-decompose-can-drop-a-locked-decision-from-every-childs-footprint.md for the failure mode this catches',
+    });
   }
 
   verdict.children.forEach((child, index) => {
