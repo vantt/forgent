@@ -70,14 +70,79 @@ Case cụ thể cần test (phù hợp mode `small`, không cần ma trận đ�
    loại lo ngại `judgeVerifySemanticCorrectness` đã nêu lúc `fgos-exploring`
    (xem CONTEXT.md, dispute round 2-3 + `--force` override).
 
-## Verify cho tsk-580 (đã đặt ở `fgos-exploring`, không đổi ở đây)
+## Verify cho tsk-580 — sửa lại tại `fgos-validating` (bug thật vừa phát hiện)
+
+Verify chốt ở `fgos-exploring` (`grep "^# pass [1-9]"`) SAI trên thực tế —
+`node --test` với Node v24.18.0 dùng reporter mặc định in `ℹ pass N` (không
+có tiền tố `#`), và quan trọng hơn: **`--test-name-pattern` không match
+test nào vẫn báo `tests 1 / pass 1`** — Node đếm chính file đó như 1 "test"
+bọc ngoài, không phải test con thật. Đã tự tay chạy cả 2 case để chứng
+minh (không phải suy đoán):
+
+- Pattern `"verify-from"` (chưa có test nào match thật) → `tests 1, pass 1,
+  fail 0` — dòng "✔" duy nhất là path của FILE, không phải tên test nào.
+- Pattern `"edit --priority"` (test thật đang tồn tại) → cũng `tests 1,
+  pass 1` — dòng "✔" lần này là đúng tên test thật.
+
+Hai case cho cùng số đếm — nghĩa là đếm pass/fail không phân biệt được
+"có test thật match" với "không test nào match". Đây chính xác là loại lo
+ngại `judgeVerifySemanticCorrectness` nêu ở dispute round 2-3 (`fgos-
+exploring`, xem CONTEXT.md) — hoá ra đúng, dù lúc đó lý do nó đưa ra
+("chưa xác minh test coverage") không diễn đạt được kỹ thuật chính xác
+bằng thực nghiệm này.
+
+**Verify đã sửa** — chỉ pass khi có dòng "✔" (bất kể ký tự chính xác nào,
+`^. .*` bắt cả unicode) chứa ĐÚNG 1 trong 4 tên test case dưới, VÀ fail
+count = 0:
 
 ```
-out=$(node --test --test-name-pattern="verify-from" test/cli/fgos.test.mjs 2>&1); echo "$out" | grep -qE "^# pass [1-9]" && ! echo "$out" | grep -qE "^# fail [1-9]"
+out=$(node --test --test-name-pattern="verify-from" test/cli/fgos.test.mjs 2>&1); fail=$(echo "$out" | grep -oE "^. fail [0-9]+" | grep -oE "[0-9]+$"); test "$fail" = "0" && echo "$out" | grep -qE "^. .*verify-from-children generates" && echo "$out" | grep -qE "^. .*verify-from-targets generates" && echo "$out" | grep -qE "^. .*verify-from-children with no children" && echo "$out" | grep -qE "^. .*verify-from-targets with empty targets"
 ```
 
-Mọi test case (1)-(4) ở trên phải đặt tên chứa substring `verify-from` để
-lệnh trên bắt trúng — đây là ràng buộc thật, không phải gợi ý.
+Đã tự chạy tay lệnh này ngay bây giờ (trước khi implement) — **exit 1**
+(đúng như kỳ vọng, vì 4 test case chưa tồn tại) — chứng minh không còn
+vacuous-pass. Bốn test case (1)-(4) ở phần Shape PHẢI đặt tên chứa đúng 4
+substring sau (ràng buộc thật, không phải gợi ý):
+
+1. `...verify-from-children generates...`
+2. `...verify-from-targets generates...`
+3. `...verify-from-children with no children...`
+4. `...verify-from-targets with empty targets...`
+
+## Reality gate (fgos-validating)
+
+- **Mode fit — PASS**: mode `small` (1 flag đếm được: public contracts) khớp
+  quy mô thật (1 file chính + test + 2 doc tham chiếu cập nhật), không thấy
+  over/under-build.
+- **Repo fit — PASS**: mọi file/hàm/pattern plan dựa vào đã đọc trực tiếp và
+  tồn tại đúng như mô tả — `bin/fgos.mjs` case `edit` (1191-1343+),
+  `collectRollupData` (671-686), import `isResolvedStatus`, `test/cli/
+  fgos.test.mjs` có sẵn test suite cho `edit`.
+- **Assumptions — PASS**: 2 assumption trong plan.md (không export helper
+  mới; message lỗi guard không cần format cố định) đều thấp rủi ro, có tiền
+  lệ code thật hỗ trợ.
+- **Smaller path — PASS (không có path nhỏ hơn)**: đã là 1 flag đơn giản
+  nhất có thể theo pattern sẵn có, không thấy cách rút gọn thêm mà không mất
+  behavior.
+- **Proof surface — PASS (sau khi sửa)**: verify ban đầu ở `fgos-exploring`
+  có bug thật (vacuous-pass + sai reporter format) — đã tự chạy tay phát
+  hiện và sửa ngay tại bước này (xem phần "Verify cho tsk-580" ở trên và
+  matrix bên dưới). Verify mới đã tự chứng minh KHÔNG vacuous (exit 1 trên
+  state hiện tại, đúng kỳ vọng).
+- **Impact-analysis posture — PASS**: `degraded` (present, index stale) —
+  khớp đúng những gì plan.md đã ghi ở bước `fgos-planning`, chạy lại xác
+  nhận không đổi; không proof point nào ở trên dựa vào GitNexus nên gap này
+  không chặn gì.
+
+## Feasibility matrix (fgos-validating)
+
+| Assumption | Rủi ro | Proof yêu cầu | Evidence tìm được | Kết quả |
+|---|---|---|---|---|
+| Root resolution: `resolveRepoRoot` sai (show-toplevel = worktree), phải dùng git-common-dir | Trung bình | Chạy thật cả 2 lệnh git từ bên trong worktree này, so sánh kết quả | Đã chạy: `git rev-parse --show-toplevel` → `.../worktrees/tsk-580-23JPo5` (SAI); `git rev-parse --path-format=absolute --git-common-dir` + dirname → `/home/vantt/projects/forgentX` (ĐÚNG, main checkout thật) | **PASS** — divergence thật, không phải suy đoán |
+| Verify command tsk-580 không vacuous-pass | Cao (phát hiện thêm ở bước này, plan.md ban đầu không lường tới) | Chạy thật verify command trên state hiện tại (chưa implement) | Đã chạy: version cũ (`grep "^# pass"`) sai reporter format + vacuous trên 0-match (thực nghiệm: pattern match 0 test thật vẫn ra `tests 1/pass 1` giống hệt pattern match 1 test thật) → đã sửa sang check `^✔.*<tên test cụ thể>` cho từng 1-trong-4 case, chạy lại: **exit 1** (đúng, vì test chưa viết) | **PASS** (sau khi sửa) |
+| `isResolvedStatus` đã import sẵn trong bin/fgos.mjs | Thấp | Đọc trực tiếp file | Xác nhận qua grep: `import { isResolvedStatus } from '../src/state/frontier.mjs'` có trong danh sách import đầu file | PASS |
+| `collectRollupData` pattern enumerate children đúng như mô tả | Thấp | Đọc trực tiếp hàm | Đã Read `bin/fgos.mjs:671-686` nguyên văn | PASS |
+| Impact-analysis posture = degraded, không cần block | Thấp | `fgos tool query --capability impact-analysis --status present` | Chạy lại: GitNexus `present`, hook báo index stale — khớp đúng "degraded" đã ghi ở plan.md, không dựa vào GitNexus cho proof point nào ở trên | PASS |
 
 ## Assumptions
 
@@ -90,3 +155,9 @@ lệnh trên bắt trúng — đây là ràng buộc thật, không phải gợi
 - Câu message lỗi guard (danh sách rỗng) không cần format cụ thể đã chốt —
   chỉ cần rõ ràng, non-zero exit, tương tự các lỗi validation khác trong
   file (`StoreError('validation', ...)`).
+
+## Verdict (fgos-validating)
+
+**READY** — mọi dimension của reality gate PASS (bug thật ở proof surface
+đã được phát hiện VÀ sửa ngay tại bước này, không phải note-và-bỏ-qua). Đủ
+điều kiện qua edge `decompose` → `executing`.
