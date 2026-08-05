@@ -73,12 +73,20 @@ the verb itself.
 | `blocked` branch's existing reason-join behavior | low — must stay byte-compatible with `test/cli/fgos.test.mjs:8463-8480` | that existing test, unmodified, still green |
 | `cleanup-pool.mjs` comment | none — comment-only | `test/state/cleanup-pool.test.mjs` still green |
 
-Impact-analysis capability gate (`fgos tool query --capability
-impact-analysis --status present`, re-checked during clarify): GitNexus
-registered and `present` → **impact-analysis: full**. `impact` runs on
-`assessCleanupReadiness` and the `cleanup` case block before either is
-edited, per the repo's capability gate — required, not optional, for
-this plan's medium-risk rows above.
+Impact-analysis capability gate, re-checked at `fgos-validating` (not just
+`fgos tool query --status present`, which only proves the tool is
+installed): GitNexus's own index reports `lastCommit: 251d0b5` while this
+branch's HEAD is `5d5b5cc` — the index is behind, so posture is
+**impact-analysis: degraded**, not `full` as first recorded during
+clarify (correction). `impact({target: "assessCleanupReadiness",
+direction: "upstream"})` on the stale index returned `impactedCount: 0`
+— a suspicious zero given `bin/fgos.mjs` imports and calls it directly.
+Cross-checked with `rg -n "assessCleanupReadiness" bin src`: exactly one
+real caller, `bin/fgos.mjs:1073` inside `case 'cleanup':` — matching this
+plan's own risk map exactly, no wider blast radius than already assumed.
+The gap is real (stale index undercounts) but does not change this plan's
+scope: the grep cross-check is the accepted evidence for this item's
+medium-risk rows, not the tool's own (stale) answer.
 
 ## Split decision
 
