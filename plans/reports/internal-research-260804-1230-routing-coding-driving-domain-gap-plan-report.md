@@ -268,14 +268,21 @@ domain crashes the runner the moment it reaches Clarify/Divide.
    `src/state/workflow-stage-graphs.mjs` — no code change, no test. No
    defense-in-depth was added; if the domain-removed-from-registry scenario
    becomes real, revisit then.
-3. **Adjacent gap (decompose children / discovered-from items never inherit
-   `work.domain`) — logged as Finding 4 on `tsk-3w3`, still no item filed.**
-   `decompose.mjs`'s child `addWork` and `loop.mjs`'s discovered-from items
-   still lazy-default every child to `coding` regardless of the parent's
-   real domain — confirmed still true post-`tsk-3xo` merge (Item A's scope
-   was the 4 hardcoded-literal call sites only, never this path). Recorded
-   on `tsk-3w3` so it survives even though no domain 2 exists yet to trip
-   over it (YAGNI — no item filed until one does).
+3. **Adjacent gap — expanded and filed as `tsk-4sz`.** Confirmed still true
+   post-`tsk-3xo` merge (Item A's scope was the 4 hardcoded-literal
+   `moveStage` call sites only, never `addWork`). Turns out to be bigger
+   than originally logged: `decompose.mjs`'s child `addWork` (744-756) and
+   `loop.mjs`'s discovered-from `addWork` (593-604) don't just skip
+   `domain` — both ALSO hardcode `stage: 'executing'`/`'clarify'` literally,
+   the same pattern Finding 1 fixed, in the same two call sites. Evidence
+   it's being actively avoided, not just untested:
+   `test/e2e/domain-aware-stage-literals.test.mjs` deliberately uses verdict
+   `pass-through` ("single fixture item, no split needed") specifically to
+   dodge exercising the child-creation path for domain `triage`. The
+   original YAGNI-defer rationale ("no domain 2 exists yet to trip over it")
+   is weaker now — `tsk-48i`/`tsk-1hb` shipped real infrastructure
+   (`parkReasonForStatus`) on top of the multi-domain registry, proving
+   real development is already happening there.
 4. **GitNexus impact-analysis check — RESOLVED retroactively.** GitNexus is
    now confirmed `present` (`fgos tool query --capability impact-analysis`),
    unlike the "command not found" state during planning. A retroactive
@@ -450,7 +457,7 @@ flowchart LR
   CLI["bin/fgos.mjs<br/>discover / decompose CLI gate<br/>lines 955, 979<br/>FIXED — tsk-3xo, stageForStep substitution"]:::fixed
   DISC["discovery.mjs<br/>moveStage literals ×2<br/>FIXED — tsk-3xo"]:::fixed
   DEC["decompose.mjs<br/>moveStage literals ×4<br/>FIXED — tsk-3xo"]:::fixed
-  CHILD["decompose.mjs addWork<br/>children never inherit parent's domain<br/>STILL OPEN — Finding 4, logged on tsk-3w3, no item filed"]:::bug
+  CHILD["decompose.mjs/loop.mjs addWork<br/>no domain inherited + stage literal hardcoded<br/>STILL OPEN — filed as tsk-4sz"]:::bug
   CLAIMSTEP["fgos-coding-driving claim step<br/>domain.worktreeBacked branch<br/>FIXED — tsk-5y5, pick vs take"]:::fixed
   RESOLVE["resolveDomainName<br/>fallback to 'coding' on bad domain string<br/>NEVER A LIVE GAP — doc corrected"]:::fixed
 
@@ -464,10 +471,10 @@ gap), `tsk-5y5` (claim step now branches on `domain.worktreeBacked`), and
 the `resolveDomainName` doc correction (never a live gap — `validateWork`
 already rejected a bad domain at every write door).
 
-**Red — still open, no item filed yet:** Finding 4, decompose/discovered-
-from children never inheriting `work.domain`. Deliberately left unfiled
-(YAGNI — no real domain 2 exists yet to trip over it); logged as a decision
-on `tsk-3w3` so it isn't lost.
+**Red — still open, filed as `tsk-4sz`:** decompose/discovered-from
+children neither inherit `work.domain` nor resolve their own `stage`
+through `stageForStep` — same hardcode-literal shape Finding 1 fixed, in
+`addWork`'s call sites instead of `moveStage`'s.
 
 ## 8. Would fgos-routing rename to fgos-domain-routing today?
 

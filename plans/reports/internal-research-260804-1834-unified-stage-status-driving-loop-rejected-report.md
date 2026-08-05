@@ -170,12 +170,21 @@ từ đầu: không gian dispatch thật có ít nhất 3 chiều, không phải
 
 ## Unresolved questions
 
-- Ngưỡng stale riêng cho status `retrospective` (D4, mục 5) chưa chốt — để
-  `tsk-1bl`'s implementer tự đề xuất/hỏi lại.
-- Chu kỳ poll của `tsk-2xt`'s herdr-side detection loop, và cách herdr đọc
-  danh sách pane đang chạy để làm guard chống chồng lệnh — chưa khảo sát
-  trong phiên này, để implementer đọc source Rust/herdr CLI lúc build.
+- ~~Ngưỡng stale riêng cho status `retrospective` chưa chốt~~ — **đã chốt
+  sau khi báo cáo này viết**: 3 ngày, giống hệt `delivered` (người dùng xác
+  nhận trực tiếp). Cập nhật thẳng vào `tsk-1bl`'s description, không cần
+  hỏi lại lúc implement.
+- ~~Chu kỳ poll của `tsk-2xt`'s herdr-side detection loop, cách herdr đọc
+  pane list~~ — **đã trả lời bằng bằng chứng code thật**: `POLL_INTERVAL =
+  5s` có sẵn (`herdr-plugin/src/main.rs:15`), `herdr pane list` trả về
+  `title`/`terminal_title` (`upstreams/herdr/src/cli/pane.rs:52`,
+  `api/schema/panes.rs:355,410-414`) — dùng thẳng, không cần state riêng.
+  Cập nhật thẳng vào `tsk-2xt`'s description.
 - Transcript đầy đủ của 2 vòng advisor review không được lưu thành artifact
   riêng — mọi trích dẫn file:line trong báo cáo này đã verify trực tiếp
   lúc review, nhưng câu trả lời gốc (dài hơn) không còn truy xuất lại được
-  ngoài báo cáo này.
+  ngoài báo cáo này. (Còn thật, không sửa được — chỉ ghi nhận.)
+- Phát sinh thêm ngoài phạm vi ban đầu, đã xử lý: `tsk-5lp` — ghi nhận gap
+  "tín hiệu dispatch thứ 3" (mục 8.2) thành 1 known-limitation tracked
+  item riêng, trỏ `refs` về
+  `internal-research-260804-1230-routing-coding-driving-domain-gap-plan-report.md`.
