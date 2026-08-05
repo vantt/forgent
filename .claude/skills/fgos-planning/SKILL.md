@@ -87,13 +87,32 @@ stage values — the same way `fgos-routing` describes it.
    this item (tiny/small/standard/high-risk/spike, plus the flag count and
    which flags applied) — carried into this session as prose, never
    re-derived here (tsk-5ay D1: the mechanical flag-count itself moved to
-   `fgos-routing`, ahead of this skill being loaded at all, so a `tiny`
-   item never pays the cost of loading this file's full flow just to learn
-   it's `tiny`). Record that same count, those same flags, and the lane
+   `fgos-routing`, ahead of this skill being loaded at all — knowing the
+   lane before opening this file, not skipping this file for a `tiny`
+   item; see `fgos-routing`'s own Mode-gate section for why this stays
+   knowing-before-load, tsk-da1). Record that same count, those same
+   flags, and the lane
    into `plan.md` itself, exactly as `plan.md` has always recorded it.
    Above `small`, say plainly why a smaller lane would not honestly cover
    the item. This is prose in `plan.md` — never a new field on the item,
    never a value `stage` takes.
+
+   **Direct-entry fallback (tsk-da1, found by independent review):**
+   `fgos-exploring` and `fgos-validating` can both hand off straight into
+   this skill without going through `fgos-routing` first (their own
+   Handoff sections say "directly, or via `fgos-routing`"), which means a
+   lane is not guaranteed to already be sitting in this session's context.
+   If no lane was actually handed off — check honestly before assuming
+   one exists — count the flags yourself, right here, using the exact
+   same rule `fgos-routing`'s own Orient step documents: auth,
+   authorization, data model, audit/security, external systems, public
+   contracts, cross-platform, existing covered behavior, weak proof
+   around the area, multi-domain; 0–1 flags → tiny/small, 2–3 → standard,
+   4+ or any hard-gate flag → high-risk, one yes/no question → spike.
+   This is not the "never re-derive" red flag below firing — that rule
+   guards against overriding a lane `fgos-routing` already decided; this
+   is the one case where nobody decided one yet, and this skill is
+   genuinely the first to see the item.
 
 2. **Approach.** Write the chosen path and the alternatives rejected along
    the way, a risk map (component / how risky / what would prove it), the
@@ -139,8 +158,15 @@ stage values — the same way `fgos-routing` describes it.
    catch a real collision between sibling pieces before either one starts):
 
    ```bash
-   fgos add "Build parser" --parent <id> --footprint "src/parser.mjs,test/parser.test.mjs" --dir "$root"
+   fgos add --title "Build parser" --kind task --risk light --verify "npm test -- parser" --parent <id> --footprint "src/parser.mjs,test/parser.test.mjs" --dir "$root"
    ```
+
+   (no positional argument here — `fgos add`'s positional/`--id` is the
+   item's own id, not its title; omitting `--id` entirely auto-generates
+   a collision-free one from `--title`, the normal path for a split
+   child. tsk-da1: an earlier version of this example passed the title
+   positionally, which `fgos add` rejects outright — kebab-case-id
+   validation fails on a plain sentence.)
 
    If one piece is honestly enough, there is no split, and the item
    proceeds as itself.
@@ -251,8 +277,9 @@ reality itself.
 
 ## Red flags
 
-- a lane used without confirming it actually came from `fgos-routing`'s
-  own Orient step, or re-derived here instead of read from the hand-off
+- re-deriving a lane `fgos-routing`'s Orient step already handed off,
+  instead of reading it — the direct-entry fallback above only applies
+  when honestly nothing was handed off at all
 - a claim in the Gate presentation that cannot be traced back to a
   specific passage of `plan.md`/`CONTEXT.md`, asserted instead of raised
   as an Open Question
