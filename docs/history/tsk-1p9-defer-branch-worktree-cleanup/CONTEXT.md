@@ -76,8 +76,29 @@ both the branch and any live checkout of it, the moment a merge lands.
   teardown"). This is the runner's OWN worktree, a separate checkout from
   a `fgos pick` session worktree (`source: 'branch', role: 'session'` —
   the shape both `tsk-4jf` and this item itself were claimed under). No
-  overlap, nothing to change there — this item's scope stays entirely
-  inside `bin/fgos.mjs`'s two `approve`-path call sites.
+  overlap, nothing to change there.
+- **Mid-planning discovery (material, surfaced back from `fgos-planning`,
+  user confirmed expanding scope rather than filing separately): the
+  EXISTING `cleanup` verb's own `cleanupMergedBranch(repoRoot, branch)`
+  call (`bin/fgos.mjs:1092`, already shipped by the sibling item
+  `tsk-4jf`) is git-context-WRONG for a LEAF item.** `repoRoot` is always
+  the main checkout, HEAD always `main`. A leaf's branch is merged into
+  its ROOT's branch (`fgw/<rootId>`), not into `main` — the root itself
+  may still be sitting unmerged for days. Empirically verified in a
+  disposable repo (this session, not inferred): `git merge-base
+  --is-ancestor <leaf-sha> HEAD` and `git branch -d <leaf-branch>` BOTH
+  fail from a checkout on `main` even though the leaf is genuinely, fully
+  merged into its still-open root branch — `checkMergeStillResolves`
+  would falsely report the merge as "no longer reachable" (indistinguishable
+  from an actual force-push loss) and park `cleanup -> blocked` forever,
+  and even if that check were skipped, `git branch -d` would silently
+  fail (swallowed as a harmless-looking warning) and leak the leaf branch
+  forever — the exact failure this item exists to fix, just relocated to
+  a different call site. Two more empirical confirmations (same session):
+  `git merge-base --is-ancestor <sha> <ref-name>` succeeds against a
+  named ref with NO checkout required (so the fix needs no ephemeral
+  worktree gymnastics), and `git branch -D` (force) succeeds unconditionally
+  regardless of current HEAD, given the branch exists.
 - **Disk-cost tradeoff is already a locked, accepted decision from the
   parent feature, not reopened here**: after this fix, a merged item's
   worktree (and branch) will persist on disk through the whole `cleanup`
@@ -105,6 +126,8 @@ both the branch and any live checkout of it, the moment a merge lands.
 | D4 | `tsk-480`'s "cleanup runs either way" decision is not reopened — its principle (don't skip cleanup because a later step failed) transfers to the `cleanup` verb becoming the sole call site, per the scout evidence above. |
 | D5 | `loop.mjs`'s propose-time `removeWorktree` (async runner dispatch) is out of scope — confirmed a separate lifecycle with no branch-deletion behavior and no overlap with this item's two call sites. |
 | D6 | The worktree/branch disk-cost tradeoff of the TTL park window is accepted as-is, per the parent feature's own D7 — not reopened, not a new scope point for this item to mitigate. |
+| D7 | `checkMergeStillResolves` (`src/state/cleanup-harness.mjs`) gains root-aware ref resolution: given `view`/`id`, resolve `rootId = resolveRoot(view, id)` (`src/runner/root-affinity.mjs`, already exported, pure). When `rootId !== id` (a leaf), check ancestry against the ref name `` `fgw/${rootId}` `` instead of literal `HEAD` — no checkout needed. When `rootId === id` (root/standalone), behavior is UNCHANGED (checks against `HEAD`, i.e. `repoRoot`'s current branch — correct once the root itself is merged into main). |
+| D8 | `cleanupMergedBranch`'s (`src/runner/merge.mjs`) branch-delete step changes from `git branch -d` to `git branch -D` (force): by the time the `cleanup` verb reaches this step, D8's own (now root-aware, D7) `checkMergeStillResolves` has already independently verified the branch's commit is a real ancestor of the correct target — `-d`'s local safety net is now both redundant and, for a leaf, actively wrong (it checks the current checkout's HEAD, never the root branch). Scope for this item now includes `src/state/cleanup-harness.mjs` and `src/runner/merge.mjs`, in addition to the two `approve`-path removals. |
 
 ## Pinned terms
 
@@ -112,18 +135,31 @@ both the branch and any live checkout of it, the moment a merge lands.
   `case 'approve'` (leaf-into-root at line ~2632, root-into-main at line
   ~2743) — never `approve`'s other outcomes (`conflict`, `verify-fail`,
   `fgos-write-rejected`), which already never called `cleanupMergedBranch`.
+- **root-aware ref**: the ref a leaf item's branch is checked for
+  ancestry/deleted against — `fgw/<rootId>` (D7), never `main`/`HEAD`,
+  since a leaf's root may still be unmerged when the leaf's own `cleanup`
+  runs.
 
-## Test plan (already specified in the item, restated for traceability)
+## Test plan (already specified in the item, restated for traceability, plus D7/D8's own coverage)
 
 - An e2e test taking one item through `delivered -> retrospective ->
   cleanup -> done`, asserting the branch AND worktree checkout both still
   exist at the moment `status` reads `cleanup`, and only disappear once
   `status` reaches `done`.
-- `test/runner/merge.test.mjs` and `test/runner/worktree.test.mjs` stay
-  green throughout.
+- A unit test for `checkMergeStillResolves` covering the leaf case
+  specifically: a commit merged into a root branch that is NOT itself
+  merged into `HEAD` must resolve `ok: true` when checked against the
+  correct root ref (D7), where checking against literal `HEAD` would
+  incorrectly resolve `ok: false`.
+- A test proving `cleanup` actually deletes a leaf's branch end-to-end
+  (root branch present but unmerged into main) — the concrete regression
+  this item exists to close.
+- `test/runner/merge.test.mjs`, `test/runner/worktree.test.mjs`, and
+  `test/state/cleanup-harness.test.mjs` stay green throughout.
 
 ## Outstanding / deferred
 
 - None — every gray area the item itself flagged as unresolved (the
-  loop.mjs propose-time question, the root-vs-leaf question) is resolved
+  loop.mjs propose-time question, the root-vs-leaf question), plus the
+  mid-planning git-context discovery (D7/D8), is resolved
   above with direct evidence, not deferred.
