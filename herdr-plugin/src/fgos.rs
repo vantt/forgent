@@ -37,6 +37,10 @@ struct WorkItemRaw {
     title: String,
     status: String,
     stage: String,
+    #[serde(rename = "parkReason")]
+    park_reason: Option<String>,
+    #[serde(rename = "statusCategory")]
+    status_category: Option<String>,
 }
 
 /// tsk-4vo D2: Tier A (`awaiting-approval`, closest to done) sorts first;
@@ -97,17 +101,28 @@ pub fn parse_triage(json: &str) -> Result<Vec<TriageRow>, serde_json::Error> {
     Ok(envelope.data)
 }
 
-/// Parse `fgos list --all --json`'s stdout, keeping `status: doing` and
-/// `status: awaiting-approval` items (tsk-4vo D1's expanded "in-process"
-/// definition), sorted by D2's tier (id ascending breaks ties within a
-/// tier, for determinism).
+/// Parse `fgos list --all --json`'s stdout, keeping items whose `parkReason`
+/// is absent (actively worked, the `doing`-equivalent case) or
+/// `"natural-finish"` (the `awaiting-approval`-equivalent case) AND whose
+/// `statusCategory` is `"in-progress"` or `"review"` (tsk-1hb D2/D4,
+/// replacing tsk-4vo D1's literal-status membership: no parallel
+/// status-literal fallback is kept). The `statusCategory` half excludes
+/// `todo`/`wontfix`/`done`/`delivered`/`retrospective`/`cleanup` -- every
+/// status besides `doing`/`blocked`/`awaiting-human`/`awaiting-approval`
+/// also has no `parkReason`, so `parkReason` alone can't tell them apart
+/// (D4). Sorted by D2's tier (id ascending breaks ties within a tier, for
+/// determinism); `status`/`stage` stay available on `DoingRow` for
+/// display/sort, just no longer used for pane membership.
 pub fn parse_doing(json: &str) -> Result<Vec<DoingRow>, serde_json::Error> {
     let envelope: ListEnvelope = serde_json::from_str(json)?;
     let mut rows: Vec<DoingRow> = envelope
         .data
         .work
         .into_iter()
-        .filter(|(_, item)| item.status == "doing" || item.status == "awaiting-approval")
+        .filter(|(_, item)| {
+            matches!(item.park_reason.as_deref(), None | Some("natural-finish"))
+                && matches!(item.status_category.as_deref(), Some("in-progress") | Some("review"))
+        })
         .map(|(id, item)| DoingRow {
             id,
             title: item.title,
@@ -242,7 +257,8 @@ mod tests {
                 "tsk-19y-2": {
                     "title": "Wire real fgOS data into the dashboard",
                     "status": "doing",
-                    "stage": "executing"
+                    "stage": "executing",
+                    "statusCategory": "in-progress"
                 },
                 "tsk-done-item": {
                     "title": "Already finished",
@@ -252,7 +268,8 @@ mod tests {
                 "choke-point-createworktree-callsite-wrapper": {
                     "title": "Choke-point: createWorktree's 6 call sites",
                     "status": "doing",
-                    "stage": "executing"
+                    "stage": "executing",
+                    "statusCategory": "in-progress"
                 }
             }
         }
@@ -270,27 +287,34 @@ mod tests {
                 "tsk-clarify": {
                     "title": "Still fuzzy",
                     "status": "doing",
-                    "stage": "clarify"
+                    "stage": "clarify",
+                    "statusCategory": "in-progress"
                 },
                 "tsk-approval": {
                     "title": "Awaiting approval",
                     "status": "awaiting-approval",
-                    "stage": "executing"
+                    "stage": "executing",
+                    "statusCategory": "review",
+                    "parkReason": "natural-finish"
                 },
                 "tsk-executing": {
                     "title": "Building",
                     "status": "doing",
-                    "stage": "executing"
+                    "stage": "executing",
+                    "statusCategory": "in-progress"
                 },
                 "tsk-decompose": {
                     "title": "Shaping",
                     "status": "doing",
-                    "stage": "decompose"
+                    "stage": "decompose",
+                    "statusCategory": "in-progress"
                 },
                 "tsk-blocked": {
                     "title": "Not in-process",
                     "status": "blocked",
-                    "stage": "executing"
+                    "stage": "executing",
+                    "statusCategory": "in-progress",
+                    "parkReason": "system-error"
                 }
             }
         }
@@ -331,8 +355,9 @@ mod tests {
         let rows = parse_doing(TIER_SORT_FIXTURE).expect("fixture should parse");
         let ids: Vec<&str> = rows.iter().map(|r| r.id.as_str()).collect();
         // D2: awaiting-approval first, then doing sub-sorted executing ->
-        // decompose -> clarify. "blocked" status never appears (D1's
-        // expanded set is still only doing/awaiting-approval).
+        // decompose -> clarify. "blocked" status never appears (D4's
+        // combined parkReason+statusCategory predicate excludes it via
+        // parkReason == "system-error").
         assert_eq!(
             ids,
             vec!["tsk-approval", "tsk-executing", "tsk-decompose", "tsk-clarify"]
@@ -340,13 +365,18 @@ mod tests {
         assert!(rows.iter().all(|r| r.id != "tsk-blocked"));
     }
 
-    /// tsk-4ot D3 (docs/history/herdr-plugin-doing-status-literal-match/
-    /// CONTEXT.md): pins `parse_doing`'s literal-status membership so a
-    /// future edit that naively swaps to `statusCategory`-based filtering
-    /// fails here first. `blocked`/`awaiting-human` deliberately share the
+    /// tsk-1hb D2/D4 (docs/history/herdr-plugin-parkreason-pane-filter/
+    /// CONTEXT.md), superseding tsk-4ot's own `parse_doing_pins_literal_
+    /// status_membership`: pins `parse_doing`'s `parkReason`+`statusCategory`
+    /// combined membership. `blocked`/`awaiting-human` deliberately share the
     /// coding domain's `"in-progress"` `statusCategory` with `doing`
     /// (`DOMAINS.coding.statusLabels`, `src/state/workflow-stage-graphs.mjs`)
-    /// — a category-only filter would wrongly include them.
+    /// — this is exactly why `statusCategory` alone is insufficient and
+    /// `parkReason` (`"system-error"`/`"human-question"`) is still needed to
+    /// split them out; `tsk-todo` (no `statusCategory` entry) pins the D4
+    /// half of the fix (a `parkReason`-only filter would wrongly include it,
+    /// same failure shape as `tsk-done-item` in `parse_doing_excludes_done_
+    /// items` above).
     const STATUS_MEMBERSHIP_FIXTURE: &str = r#"{
         "contract": "fgos.v1",
         "generated_at": "2026-07-29T15:41:13.319Z",
@@ -356,34 +386,42 @@ mod tests {
                 "tsk-doing": {
                     "title": "Actively worked",
                     "status": "doing",
-                    "stage": "executing"
+                    "stage": "executing",
+                    "statusCategory": "in-progress"
                 },
                 "tsk-awaiting-approval": {
                     "title": "Ready for review",
                     "status": "awaiting-approval",
-                    "stage": "executing"
+                    "stage": "executing",
+                    "statusCategory": "review",
+                    "parkReason": "natural-finish"
                 },
                 "tsk-blocked": {
                     "title": "Parked, not actively worked",
                     "status": "blocked",
-                    "stage": "executing"
+                    "stage": "executing",
+                    "statusCategory": "in-progress",
+                    "parkReason": "system-error"
                 },
                 "tsk-awaiting-human": {
                     "title": "Parked on a question",
                     "status": "awaiting-human",
-                    "stage": "clarify"
+                    "stage": "clarify",
+                    "statusCategory": "in-progress",
+                    "parkReason": "human-question"
                 },
                 "tsk-todo": {
                     "title": "Not started",
                     "status": "todo",
-                    "stage": "clarify"
+                    "stage": "clarify",
+                    "statusCategory": "todo"
                 }
             }
         }
     }"#;
 
     #[test]
-    fn parse_doing_pins_literal_status_membership() {
+    fn parse_doing_filters_by_park_reason_and_status_category() {
         let rows = parse_doing(STATUS_MEMBERSHIP_FIXTURE).expect("fixture should parse");
         let ids: Vec<&str> = rows.iter().map(|r| r.id.as_str()).collect();
         assert_eq!(ids.len(), 2, "only doing/awaiting-approval belong in the in-process pane");
