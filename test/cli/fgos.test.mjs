@@ -518,6 +518,28 @@ test('setup inside a .fgos/-less linked worktree still succeeds (setup never tou
   assert.equal(result.status, 0, `setup unexpectedly refused: ${result.stderr}`);
 });
 
+// tsk-5hi: setup now also runs every registered fix (`runFixes()`, the same
+// call `doctor --fix` already makes) instead of leaving a person to
+// separately discover and run `doctor --fix`. FGOS_CLAUDE_COMMAND points at
+// a nonexistent binary — same seam test/setup/plugin-marketplace-doctor-
+// check.test.mjs already proves for the identical fix function — so this
+// never shells out to a real `claude` CLI.
+test('setup runs every registered fix and reports them under "fixed", never touching a real claude binary', () => {
+  const cwd = rawTmpCwd();
+  const result = run(cwd, ['setup'], {
+    HOME: rawTmpCwd(),
+    FGOS_CLAUDE_COMMAND: '/nonexistent/fgos-test-claude-binary',
+  });
+  assert.equal(result.status, 0, `setup unexpectedly failed: ${result.stderr}`);
+  const data = envelopeData(result.stdout);
+  assert.ok(Array.isArray(data.fixed), 'setup result missing a "fixed" array');
+  const byId = Object.fromEntries(data.fixed.map((entry) => [entry.id, entry]));
+  assert.ok('gate-bypass-configured' in byId, 'setup did not run the gate-bypass-configured fix');
+  assert.ok('claude-plugin-marketplace' in byId, 'setup did not run the claude-plugin-marketplace fix');
+  assert.equal(byId['claude-plugin-marketplace'].changed, false);
+  assert.match(byId['claude-plugin-marketplace'].message, /not found on PATH/);
+});
+
 test('add creates exactly one work.add event and the view reflects the new item, exit 0', () => {
   const cwd = tmpCwd();
   const before = eventLines(cwd).length;

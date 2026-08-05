@@ -222,6 +222,13 @@ of it).
   supersedes the original v1 "does not exist yet, Deferred Idea" wording
   (per D8) — `tsk-2qz` D2 reverses that decision deliberately, per
   `docs/distribution-vision.md` §3's trụ cột 3.
+- **RUL12.** `fgos setup` also runs every registered fix (the same
+  `runFixes()` `doctor --fix` calls per RUL11), unconditionally and with no
+  confirmation — consistent with RUL10's own act-then-report contract for
+  this verb, not an exception to it. `setup`'s result gains a `fixed` array,
+  the same per-entry `{id, changed, message}` shape RUL11 already describes
+  for `doctor --fix`'s own (per `tsk-5hi` D1,
+  `docs/history/setup-runs-registered-fixes/CONTEXT.md`).
 
 ## Edge Cases Settled
 
