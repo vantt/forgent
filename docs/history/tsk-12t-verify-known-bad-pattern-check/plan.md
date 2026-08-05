@@ -23,12 +23,23 @@ Add the mechanical known-bad-pattern check as the first thing
 does, before it builds the prompt or spawns the LLM (D1, D4). On a match it
 returns the same `{agrees: false, reason}` shape the function already
 returns for an LLM disagreement, but with a mechanical marker (D3) — e.g.
-`{agrees: false, reason: "...", mechanical: true}` — so `resolveDiscovery`
-(`src/intake/discovery.mjs:653`) and `resolveDecompose`
-(`src/intake/decompose.mjs:703`) can each add one guard clause: when
-`secondPass.mechanical === true`, refuse `--force` regardless of
-`callerVerdict?.force` (D6), instead of falling through to their existing
-force-override branch.
+`{agrees: false, reason: "...", mechanical: true}`.
+
+**Reality check (fgos-validating, corrected from an earlier draft of this
+plan):** only `resolveDiscovery` (`src/intake/discovery.mjs:653`) actually
+needs a new guard clause — its `callerVerdict?.force === true` branch
+(`discovery.mjs:661`) is the only existing `--force` override path this
+change must narrow: when `secondPass.mechanical === true`, refuse the
+override regardless of `callerVerdict?.force` (D6), instead of falling
+through to that branch. `resolveDecompose`'s own `judgeVerifySemanticCorrectness`
+call (`src/intake/decompose.mjs:703`, per child) has **no** `--force`
+override path today — reading `decompose.mjs:684-711` confirms a disputed
+child's `secondPass.agrees === false` always parks the whole decompose
+verdict as `need-human` unconditionally, with no force branch to guard.
+D6 is therefore already satisfied there for free, with zero code change —
+the choke-point placement (D1) means `resolveDecompose` automatically
+inherits the mechanical, non-forceable rejection the moment
+`judgeVerifySemanticCorrectness` itself returns it.
 
 Alternatives rejected: duplicating the regex check inside each of the two
 call sites (rejected — the choke-point pattern this repo already documents,
@@ -44,7 +55,7 @@ free).
 | Component | Risk | Proof point (fgos-validating) |
 |---|---|---|
 | `judgeVerifySemanticCorrectness` regex (D2) | medium — false positive on a legitimate non-`node --test` TAP verify, or false negative missing a real variant of the trap | unit test with a known-bad `node --test --test-name-pattern` verify string (must trip) AND a control TAP-consuming verify string that does NOT reference `node --test` (must NOT trip) |
-| `resolveDiscovery`/`resolveDecompose` `--force` guard (D6) | medium — the two call sites drift out of sync (one honors the mechanical marker, the other forgets) | unit test per call site asserting `--force`/`child.force` cannot move an item/child past a mechanical-marked rejection |
+| `resolveDiscovery` `--force` guard (D6) | medium — `discovery.mjs`'s existing `callerVerdict?.force === true` branch could still fall through for a mechanical-marked rejection if the new guard is misplaced | unit test asserting `--force` cannot move an item past a mechanical-marked rejection at `resolveDiscovery` specifically (`resolveDecompose` needs no equivalent test for D6 — it has no force path to guard, confirmed by reading `decompose.mjs:684-711`) |
 | Short-circuit (D4) | low — a spy/mock on `runJudgeExecutor` confirms it is never invoked when the mechanical check trips | unit test asserting the LLM spawn path is not reached |
 
 **Impact-analysis capability gate**: `full` — GitNexus present, checked
@@ -60,23 +71,39 @@ rely on that confirmed blast radius rather than a guess.
    `judgeVerifySemanticCorrectness`, before `buildVerifyCheckPrompt`/
    `runJudgeExecutor`.
 2. `src/intake/discovery.mjs` — add the mechanical-marker guard before the
-   existing `callerVerdict?.force === true` branch in `resolveDiscovery`.
-3. `src/intake/decompose.mjs` — the same guard at `resolveDecompose`'s own
-   `judgeVerifySemanticCorrectness` call site (line 703).
-4. `test/intake/judge-executor.test.mjs` — the 3 named tests this item's
+   existing `callerVerdict?.force === true` branch in `resolveDiscovery`
+   (`discovery.mjs:661`). `decompose.mjs` needs no change (see the
+   corrected Approach section above) — `resolveDecompose` already parks any
+   `secondPass` disagreement unconditionally, mechanical or not.
+3. `test/intake/judge-verify-second-pass-stability.test.mjs` — **corrected
+   from an earlier draft that named `test/intake/judge-executor.test.mjs`**;
+   reading the repo confirms `judgeVerifySemanticCorrectness` itself has no
+   direct unit tests in `judge-executor.test.mjs` at all — its own direct
+   tests live in `judge-verify-second-pass-stability.test.mjs` (fake-executor
+   convention, `cfgFor`/`writeCapturingExecutor` already there) and its
+   `resolveDiscovery` integration tests live in the same file (`addWork`/
+   `answerAwaiting`/`listWork` against a temp store, e.g. the existing
+   `resolveDiscovery threads the prior dispute's ask text...` test). This
+   one file already has both pieces of infrastructure this item's 3 tests
+   need — no new test-support code required. The 3 named tests this item's
    own locked verify already requires:
    - `rejects known-bad node --test reporter pattern before calling the LLM`
-   - `does not call the LLM judge when the mechanical pattern trips`
-   - `does not allow --force to bypass a mechanical pattern rejection`
-     (this third one belongs at the call-site level — `discovery.test.mjs`/
-     `decompose.test.mjs` — if `judge-executor.test.mjs` cannot exercise
-     `--force` handling in isolation; whichever file it lands in, the test
-     description string must stay byte-identical to what the locked verify
-     already greps for).
+     — unit-level, calls `judgeVerifySemanticCorrectness` directly with a
+     verify string matching D2's pattern; asserts `agrees === false`.
+   - `does not call the LLM judge when the mechanical pattern trips` —
+     same call, but asserts the fake executor's own capture/counter file
+     was never written (mirrors `writeCapturingExecutor`'s existing
+     capture-file-presence idiom already used in this file).
+   - `does not allow --force to bypass a mechanical pattern rejection` —
+     integration-level, calls `resolveDiscovery` with a `callerVerdict`
+     carrying both a D2-matching `verify` and `force: true`; asserts the
+     outcome is still `verify-disputed`, never `clear`.
 
-No split: one cohesive change to one shared function plus its two existing
-callers. Not big enough, and not gray enough, to justify separate child
-items (mode: small, per the gate above).
+No split: one cohesive change to one shared function plus its one call site
+that actually needs a change. Not big enough, and not gray enough, to
+justify separate child items (mode: small, per the gate above) — smaller
+than the original draft even at "small," since reality-checking removed a
+whole file (`decompose.mjs`) from scope.
 
 ## Shape
 
