@@ -9,12 +9,12 @@ timestamp: 2026-08-05T10:38:00.000Z
 
 ## 1. Trạng thái hiện tại
 
-Round 1, vừa mở discussion. Đã scout xong 4 nguồn thật (bin/fgos.mjs,
-status-fsm.mjs, frontier.mjs, 2 how-to doc + audit decision trong
-tsk-4bc/tsk-2jc). Chưa có D-ID nào chốt. Câu hỏi mở đang chờ trả lời: mục
-tiêu thật của anh là (a) tự động chuyển status cha, hay (b) giảm ma sát
-thao tác tay lặp lại ở bước viết `verify` command cho từng goalTier item?
-Hai mục tiêu này dẫn tới thiết kế rất khác nhau — xem §3.
+Round 2. Anh chọn hướng (b): giữ cha tự claim/return/approve, chỉ giảm ma
+sát viết tay `verify`. Anh cũng nêu 1 tiền đề: "con chưa cleanup thì cha
+không thể claim" — đã verify code thật, tiền đề này **sai**: cha claim
+được ngay khi con đạt `delivered` (không cần chờ `cleanup`/`done`). Xem §3
+dòng 8 và §5 round 2 cho chi tiết + trích dẫn. Câu hỏi mở tiếp theo: helper
+giảm ma sát nên có hình dạng gì cụ thể — xem cuối §5.
 
 ## 2. Mục tiêu & đề bài
 
@@ -40,6 +40,7 @@ delivered khi con/target resolved), thay vì cứ mỗi milestone lại tay sử
 | 5 | Ma sát thật đang lặp lại là gì: (a) mỗi goalTier item tự tay viết 1 câu jq verify riêng (rủi ro: prose không chạy được, thiếu `--dir`, trap `--no-new-commits-ok` không cứu được lần retry) — hay (b) muốn cha THẬT SỰ tự chuyển status không cần claim/return/approve gì cả? | **Chưa rõ — câu hỏi đang chờ anh** | Hai hướng dẫn tới thiết kế khác hẳn nhau, xem §6 draft |
 | 6 | Nếu chọn tự động chuyển status: có nên bypass `assertAcceptanceEvidence`/claim-verify-return-approve cycle của chính cha không? Vision doc rationale (giữ chỗ cho CONTEXT.md tổng hợp thật) có còn cần thiết nếu tự động hoá? | Chưa rõ | Phụ thuộc câu trả lời #5 |
 | 7 | Phạm vi: sửa chung cho cả `parent` (decompose) lẫn `targets` (goalTier), hay chỉ 1 trong 2 trước? | Chưa rõ | Cả 2 how-to doc hiện có cấu trúc song song, có thể dùng chung 1 helper |
+| 8 | "Con chưa cleanup thì cha không thể claim" | **Sai — đã verify code** | `TAIL_RESOLVED_STATUSES = {delivered, retrospective, cleanup, done}` (frontier.mjs:221); `isResolvedStatus` true ngay khi con = `delivered` (frontier.mjs:224-229); `hasOpenDescendant` (frontier.mjs:237-249) chỉ block khi con CHƯA vào tập này. `pick --id <id>` (bin/fgos.mjs:1962-1975) thậm chí không re-check lineage gì cả — đi thẳng `claimWork` (claim-port.mjs:88-278), chỉ CAS `expectedStatus`. `take --id` (bin/fgos.mjs:1888) có check `isDepsAndLineageReady` nhưng chỉ áp dụng khi `status==='todo'`. TTL 7 ngày (`DEFAULT_CLEANUP_TTL_DAYS`, cleanup-harness.mjs:131-146) chỉ gate con tự đi `cleanup→done`, không liên quan gì việc cha claim được hay không — đây là nguồn gây lẫn lộn thật |
 
 ## 4. Quyết định đã chốt
 
@@ -60,6 +61,30 @@ delivered khi con/target resolved), thay vì cứ mỗi milestone lại tay sử
   template sẵn, để không phải tự viết jq mỗi milestone, không đổi gì về việc
   cha vẫn phải tự claim/return/approve)? Câu trả lời quyết định toàn bộ
   hướng thiết kế ở §6.
+
+- **2026-08-05T10:45 (round 2):** Anh chọn hướng (b) — giảm ma sát, giữ cha
+  tự claim/return/approve. Anh nêu thêm: "con chưa cleanup thì cha không
+  claim được" là nguồn gây "cứ lẫn lộn", muốn 1 cách hợp lệ để đóng cha khi
+  hết việc thật. Verify code (Agent Explore, xem §3 dòng 8): tiền đề này SAI
+  — cha claim được ngay khi con `delivered`, không cần chờ `cleanup`/TTL 7
+  ngày. `pick --id` thậm chí không check lineage. Vậy KHÔNG có code-gate
+  nào cần sửa để "cho phép claim" — cái thật sự thiếu là (1) tài liệu/nhận
+  thức đúng (anh tưởng phải chờ cleanup, không cần), và (2) helper sinh sẵn
+  `verify` command đúng cú pháp (tránh 3 bẫy đã biết: prose không chạy
+  được, thiếu `--dir` tuyệt đối, `--no-new-commits-ok` không cứu được lần
+  retry sau khi đã blocked 1 lần).
+
+  Câu hỏi tiếp: helper này nên là gì cụ thể — 3 lựa chọn nháp, anh chọn hoặc
+  đề xuất khác:
+  - (A) verb mới `fgos rollup --gen-verify <id>` — đọc `parent`/`targets`
+    của item, in ra câu jq-check chuẩn (kèm `--dir` tuyệt đối), anh tự
+    `fgos edit --verify` dán vào — không tự ghi, không tự claim/return gì.
+  - (B) gộp thẳng vào `fgos edit <id> --verify-from-children` /
+    `--verify-from-targets` — 1 flag tự tính rồi ghi luôn field `verify`,
+    đỡ 1 bước copy-paste so với (A).
+  - (C) không thêm code mới — chỉ viết rõ hơn 2 how-to doc hiện có (đặc
+    biệt sửa lại phần khiến anh hiểu nhầm "chờ cleanup"), coi ma sát này
+    chấp nhận được vì tần suất thấp (milestone/MVP không nhiều).
 
 ## 6. Thiết kế đã chốt
 
