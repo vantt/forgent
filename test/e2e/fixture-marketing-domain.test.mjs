@@ -278,6 +278,16 @@ test('e2e: a fixture-marketing item runs the real take -> return -> delivered ->
   // compound verb: tags the retrospective-status item with a Diataxis doc
   // type — exercised for real, per this item's own instruction to run
   // through take/return/compound/retrospective/cleanup.
+  //
+  // retrospective-doc-write-path D3: compound now refuses a --doc-path
+  // whose file is not committed at the main checkout's HEAD, so the
+  // document has to actually exist and be committed here first — the same
+  // write-before-tag order fgos-compounding's own SKILL.md now documents.
+  fs.mkdirSync(path.join(repoRoot, 'docs', 'how-to'), { recursive: true });
+  fs.writeFileSync(path.join(repoRoot, 'docs', 'how-to', 'fixture-marketing-example.md'), '# Fixture marketing example\n');
+  execFileSync('git', ['add', 'docs/how-to/fixture-marketing-example.md'], { cwd: repoRoot });
+  execFileSync('git', ['commit', '-q', '-m', 'docs: fixture-marketing example'], { cwd: repoRoot });
+
   const compounded = ok(fgos(repoRoot, [
     'compound', 'fx-life',
     '--doc-type', 'how-to',
