@@ -37,16 +37,16 @@ never moves it.
   cli-spawn.md`): spawning a nested Task subagent for work you can already
   do yourself is the same "soul re-deriving what a live soul already
   knows" waste `tsk-1ni` found in `judgeDiscovery`'s blind cli-spawn, just
-  manifesting as an in-session Task call instead of a subprocess one. It
-  also defeats this skill's own transparency point
-  (`docs/explanation/why-discover-was-rewritten-as-a-clean-enrich-self-
-  research-recipe.md`'s Route B): a backgrounded Task/Agent call streams
-  no live tool trace back to the person watching this session, unlike a
-  direct Bash/Grep/WebSearch call. If a step genuinely needs a different
-  backend (cheaper model, cross-provider such as Codex/agy, resource
-  isolation) for a narrow helper task, route it explicitly through the
-  capacity-dispatch mechanism instead of an ad hoc Task call — see
-  `../_shared/capacity-dispatch-fallback.md`.
+  manifesting as an in-session Task call instead of a subprocess one — the
+  work was already yours to do, so doing it again one layer down through
+  a spawned subagent is pure overhead, not a transparency question (a
+  Task/Agent call is collapsed by default in the transcript, not hidden —
+  a person can still expand it to inspect the subagent's own trace, unlike
+  a genuinely opaque headless `claude -p` subprocess). If a step
+  genuinely needs a different backend (cheaper model, cross-provider such
+  as Codex/agy, resource isolation) for a narrow helper task, route it
+  explicitly through the capacity-dispatch mechanism instead of an ad hoc
+  Task call — see `../_shared/capacity-dispatch-fallback.md`.
 - Do not research implementation, propose architecture, or write code. If a
   candidate question only matters to whoever builds the thing, it belongs to
   `fgos-planning`, not here.
