@@ -601,7 +601,8 @@ async function captureDiscoveredWork({ output, item, queue, dir, log }) {
           refs: [],
           verify: FALLBACK_VERIFY,
           tier: derived.tier,
-          stage: 'clarify',
+          stage: stageForStep(getDomain(item.domain), 'Clarify'),
+          domain: item.domain,
           discoveredFrom: item.id,
         });
         log(`fgos-runner: discovered work "${id}" from "${item.id}" (runner-created, stage clarify)`);

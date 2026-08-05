@@ -751,9 +751,10 @@ export function resolveDecompose(dir, id, cfg, role, callerVerdict) {
       refs: child.refs,
       footprint: child.footprint,
       verify: child.verify,
-      stage: 'executing',
+      stage: stageForStep(domain, 'Execute'),
       parent: id,
       tier: work.tier,
+      domain: work.domain,
     });
   });
 
