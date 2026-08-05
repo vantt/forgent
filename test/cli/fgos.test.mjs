@@ -196,6 +196,22 @@ test('the same state verb with no --dir, from the same .fgos/-less worktree cwd,
   assert.ok(!fs.existsSync(path.join(wt, '.fgos')));
 });
 
+// tsk-3u2 (post-tsk-3c7 independent review): `schedule` was missing from
+// STORE_MISSING_WARNING_VERBS, so from a linked worktree with no `.fgos/`
+// it silently returned an empty-looking {waves:[],cycles:[]} instead of
+// this warning -- indistinguishable from "graph is genuinely clean" for
+// the exact context an agent normally runs it from.
+test('schedule from a .fgos/-less linked worktree with no --dir warns on stderr, same as conflicts (tsk-3u2 regression guard)', () => {
+  const { wt } = tmpLinkedWorktree();
+  const scheduleResult = run(wt, ['schedule']);
+  assert.equal(scheduleResult.status, 0, 'schedule is requiresExistingStore:false -- it warns, never refuses');
+  assert.match(scheduleResult.stderr, /\.fgos\/ not found/);
+  assert.deepEqual(envelopeData(scheduleResult.stdout), { waves: [], cycles: [] });
+
+  const conflictsResult = run(wt, ['conflicts']);
+  assert.match(conflictsResult.stderr, /\.fgos\/ not found/, 'schedule must warn under the exact same condition its sibling conflicts already does');
+});
+
 test('--dir with no value (a bare trailing flag) is a clean validation error, exit 4, not a crash', () => {
   const { wt } = tmpLinkedWorktree();
   const result = run(wt, ['submit', 'title', '--dir']);

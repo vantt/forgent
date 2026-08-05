@@ -3950,11 +3950,15 @@ function renderPretty(verb, data) {
   return `${lines.join('\n')}\n`;
 }
 
-// tsk-56t D2: the exact 8 read verbs the decision names — not every
+// tsk-56t D2: the read verbs the decision names — not every
 // `requiresExistingStore: false` verb (that set also includes `session`/
 // `setup`/`doctor`, which never touch `.fgos/` at all, and `init`, which
-// gets its own opposite linked-worktree refusal above).
-const STORE_MISSING_WARNING_VERBS = new Set(['list', 'ready', 'graph', 'stale', 'check', 'rollup', 'show', 'conflicts', 'triage']);
+// gets its own opposite linked-worktree refusal above). `schedule` added
+// by tsk-3u2 (post-tsk-3c7 independent review): it reads the exact same
+// store state `conflicts` does, but was missing here — from a linked
+// worktree with no `.fgos/`, it silently returned `{waves:[],cycles:[]}`
+// (indistinguishable from "graph clean") instead of this warning.
+const STORE_MISSING_WARNING_VERBS = new Set(['list', 'ready', 'graph', 'stale', 'check', 'rollup', 'show', 'conflicts', 'triage', 'schedule']);
 
 async function main() {
   const [, , verb, ...rest] = process.argv;
@@ -4009,7 +4013,7 @@ async function main() {
         `"fgos init" refused inside a linked worktree ("${process.cwd()}") -- worktrees never carry .fgos/ by design (ADR0020); run "fgos init" from the main checkout instead.`,
       );
     }
-    // tsk-56t D2: these 8 read verbs are `requiresExistingStore: false` by
+    // tsk-56t D2: these read verbs are `requiresExistingStore: false` by
     // design (a fresh non-worktree dir with no store yet is a legitimate
     // "not evaluated" case, not an error) — but that same tolerance means a
     // worktree-resident session that forgets `--dir` sees a silent, real-
