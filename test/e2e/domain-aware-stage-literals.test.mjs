@@ -206,6 +206,131 @@ test('sync CLI: fgos discover / fgos decompose cross a "triage" fixture-domain i
   assert.equal(afterDecompose.stage, 'assembling', 'decompose moved the item to triage\'s OWN Execute-mapped stage ("assembling"), not the coding literal "executing"');
 });
 
+// tsk-4sz: decompose.mjs's child addWork and loop.mjs's discovered-from
+// addWork both hardcoded a literal stage AND never threaded the parent
+// item's own `domain` through, so a split/discovered child of a non-coding
+// domain item landed with domain defaulting to 'coding' AND a stage literal
+// that may not even be a real stage name in the item's OWN domain (a double
+// failure the two tests above never exercised: both use `--verdict
+// pass-through`/a single fixture item, so decompose.mjs's own child-`addWork`
+// branch and loop.mjs's own discovered-from `addWork` branch never actually
+// ran). These two tests exercise those exact branches for real.
+
+test('domain-aware decompose child addWork inherits parent domain+stage', () => {
+  const repoRoot = initTempRepo();
+  const scriptDir = mkTempDir('fgos-domain-stage-literals-e2e-exec-');
+
+  assert.equal(fgos(repoRoot, ['init']).status, 0);
+  writeRunnerConfig(
+    repoRoot,
+    writeClearDiscoveryExecutor(scriptDir, { verify: 'test -f triage-output.txt && echo TRIAGE_OK' }),
+  );
+
+  const submitted = submit(repoRoot, 'Cross-domain regression fixture item for decompose split', { domain: 'triage' });
+  assert.equal(submitted.domain, 'triage');
+
+  const discoverResult = fgos(repoRoot, [
+    'discover', submitted.id,
+    '--verdict', 'clear',
+    '--verify', 'test -f triage-output.txt && echo TRIAGE_OK',
+  ]);
+  assert.equal(discoverResult.status, 0, `fgos discover failed: ${discoverResult.stderr}`);
+  assert.equal(stateView(repoRoot).work[submitted.id].stage, 'shaping');
+
+  // A REAL split (--verdict decompose, not pass-through) so decompose.mjs's
+  // own child-addWork branch (the exact code this item fixes) actually runs.
+  const decomposeResult = fgos(repoRoot, [
+    'decompose', submitted.id,
+    '--verdict', 'decompose',
+    '--reason', 'tsk-4sz regression: prove split children inherit the parent triage domain + stage, not coding literals',
+    '--children', JSON.stringify([
+      { title: 'Triage child piece one', verify: 'test -f triage-child-1.txt && echo OK', deps: [] },
+    ]),
+  ]);
+  assert.equal(decomposeResult.status, 0, `fgos decompose failed: ${decomposeResult.stderr}`);
+  assert.equal(envelopeData(decomposeResult.stdout).outcome, 'decompose');
+
+  const after = stateView(repoRoot).work;
+  const child = after[`${submitted.id}-1`];
+  assert.ok(child, 'child item was created');
+  assert.equal(child.domain, 'triage', "child inherits the PARENT's domain, not the coding default");
+  assert.equal(
+    child.stage,
+    'assembling',
+    'child lands on triage\'s OWN Execute-mapped stage ("assembling"), not the coding literal "executing"',
+  );
+  assert.equal(child.parent, submitted.id);
+});
+
+/** Same three-way prompt split as writeClearDiscoveryExecutor, but the
+ * worker-dispatch branch ALSO emits a fenced fgos-discovered block to its
+ * own stdout (the worker->runner discovery-report channel, wgi-8) so
+ * captureDiscoveredWork's own addWork call — the exact branch this item
+ * fixes — actually runs. Fence markers are built via String.fromCharCode
+ * rather than literal backticks, purely to avoid escaping a nested
+ * triple-backtick fence inside this generator's own outer template
+ * literal. */
+function writeDiscoveringWorkerExecutor(scriptDir, { verify, produce, discoveredTitle }) {
+  const scriptPath = path.join(scriptDir, 'discovering-worker-executor.mjs');
+  fs.writeFileSync(
+    scriptPath,
+    `
+import fs from 'node:fs';
+import { execFileSync } from 'node:child_process';
+const prompt = process.argv[2] ?? '';
+const fence = String.fromCharCode(96, 96, 96);
+if (prompt.includes('Kiểm tra độc lập một lệnh verify')) {
+  process.stdout.write(JSON.stringify({ agrees: true }));
+} else if (prompt.includes('# Context-discovery')) {
+  process.stdout.write(JSON.stringify({ clear: true, verify: ${JSON.stringify(verify)} }));
+} else if (prompt.includes('# Chia-việc (decompose)')) {
+  process.stdout.write(JSON.stringify({ verdict: 'pass-through' }));
+} else {
+  const match = prompt.match(/test -f (\\S+)/);
+  const file = match ? match[1] : ${JSON.stringify(produce)};
+  fs.writeFileSync(file, 'produced by worker\\n');
+  execFileSync('git', ['add', file]);
+  execFileSync('git', ['commit', '-q', '-m', 'worker: ' + file]);
+  process.stdout.write('\\n' + fence + 'fgos-discovered\\n' + JSON.stringify({ title: ${JSON.stringify(discoveredTitle)} }) + '\\n' + fence + '\\n');
+}
+`,
+  );
+  return scriptPath;
+}
+
+test('domain-aware discovered-from addWork inherits parent domain+stage', () => {
+  const repoRoot = initTempRepo();
+  const scriptDir = mkTempDir('fgos-domain-stage-literals-e2e-exec-');
+
+  assert.equal(fgos(repoRoot, ['init']).status, 0);
+  writeRunnerConfig(
+    repoRoot,
+    writeDiscoveringWorkerExecutor(scriptDir, {
+      verify: 'test -f triage-output.txt && echo TRIAGE_OK',
+      produce: 'triage-output.txt',
+      discoveredTitle: 'Follow-up spotted while working the triage fixture item',
+    }),
+  );
+
+  const triageItem = submit(repoRoot, 'Cross-domain regression fixture item for discovered-from', { domain: 'triage' });
+  assert.equal(triageItem.domain, 'triage');
+
+  const first = runner(repoRoot, ['--once']);
+  assert.equal(first.status, 0, `--once failed: ${first.stderr}`);
+
+  const after = stateView(repoRoot).work;
+  assert.equal(after[triageItem.id].status, 'awaiting-approval', 'the triage item was actually dispatched by the real runner');
+
+  const discovered = Object.values(after).find((w) => w.discoveredFrom === triageItem.id);
+  assert.ok(discovered, 'runner captured the fgos-discovered block into a new work item');
+  assert.equal(discovered.domain, 'triage', "discovered-from item inherits the PARENT's domain, not the coding default");
+  assert.equal(
+    discovered.stage,
+    'triage',
+    'discovered-from item lands on triage\'s OWN Clarify-mapped stage ("triage"), not the coding literal "clarify"',
+  );
+});
+
 test('runner sweep: a "triage" fixture-domain item at its own Clarify-mapped stage no longer halts the whole tick — an unrelated coding item in the same sweep still dispatches', () => {
   const repoRoot = initTempRepo();
   const scriptDir = mkTempDir('fgos-domain-stage-literals-e2e-exec-');
