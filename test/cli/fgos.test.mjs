@@ -8717,12 +8717,22 @@ test('compound with --doc-type tags the outcome, surfaced by `show`; item stays 
   assert.equal(envelopeData(showResult.stdout).outcome.docType, 'how-to');
 });
 
-test('compound with --doc-type and --doc-path tags both, surfaced by `show`', () => {
-  const cwd = tmpCwd();
+// retrospective-doc-write-path D3: `--doc-path` is only ever accepted for a
+// document already committed at the main checkout's HEAD — the invariant
+// that makes "a tag exists but its document never landed" (34 real
+// documents, 2026-08-05) impossible to reproduce rather than detected
+// later. These four tests are git-backed (`initGitCwdMain()`), unlike the
+// rest of this suite's `compound` tests, because the check itself is
+// git-based and has nothing to observe in a non-git `tmpCwd()`.
+
+test('compound with --doc-type and --doc-path tags both when the file is committed at HEAD, surfaced by `show`', () => {
+  const cwd = initGitCwdMain();
   addOk(cwd, 'compound-tag-path');
   run(cwd, ['move', 'compound-tag-path', '--to', 'doing']);
   run(cwd, ['move', 'compound-tag-path', '--to', 'delivered']);
   run(cwd, ['move', 'compound-tag-path', '--to', 'retrospective']);
+  fs.mkdirSync(path.join(cwd, 'docs', 'explanation'), { recursive: true });
+  commitFile(cwd, path.join('docs', 'explanation', 'example.md'), '# Example\n');
 
   const result = run(cwd, ['compound', 'compound-tag-path', '--doc-type', 'explanation', '--doc-path', 'docs/explanation/example.md']);
   assert.equal(result.status, 0, result.stderr);
@@ -8734,4 +8744,51 @@ test('compound with --doc-type and --doc-path tags both, surfaced by `show`', ()
   const outcome = envelopeData(showResult.stdout).outcome;
   assert.equal(outcome.docType, 'explanation');
   assert.equal(outcome.docPath, 'docs/explanation/example.md');
+});
+
+test('compound --doc-path is rejected as validation, exit 4, when the file does not exist at all', () => {
+  const cwd = initGitCwdMain();
+  addOk(cwd, 'compound-doc-absent');
+  run(cwd, ['move', 'compound-doc-absent', '--to', 'doing']);
+  run(cwd, ['move', 'compound-doc-absent', '--to', 'delivered']);
+  run(cwd, ['move', 'compound-doc-absent', '--to', 'retrospective']);
+  const before = eventLines(cwd).length;
+
+  const result = run(cwd, ['compound', 'compound-doc-absent', '--doc-type', 'how-to', '--doc-path', 'docs/how-to/never-written.md']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /not committed at the main checkout's HEAD/);
+  assert.equal(eventLines(cwd).length, before, 'a rejected --doc-path writes zero events — no tag for a document that was never written');
+});
+
+test('compound --doc-path is rejected as validation, exit 4, when the file exists but is untracked', () => {
+  const cwd = initGitCwdMain();
+  addOk(cwd, 'compound-doc-untracked');
+  run(cwd, ['move', 'compound-doc-untracked', '--to', 'doing']);
+  run(cwd, ['move', 'compound-doc-untracked', '--to', 'delivered']);
+  run(cwd, ['move', 'compound-doc-untracked', '--to', 'retrospective']);
+  fs.mkdirSync(path.join(cwd, 'docs', 'how-to'), { recursive: true });
+  fs.writeFileSync(path.join(cwd, 'docs', 'how-to', 'untracked.md'), '# Untracked\n');
+  const before = eventLines(cwd).length;
+
+  const result = run(cwd, ['compound', 'compound-doc-untracked', '--doc-type', 'how-to', '--doc-path', 'docs/how-to/untracked.md']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /not committed at the main checkout's HEAD/);
+  assert.equal(eventLines(cwd).length, before, 'present-but-untracked must reject exactly like absent — this is the exact gap that let 34 real documents go missing');
+});
+
+test('compound --doc-path is rejected as validation, exit 4, when the file exists and is staged but not committed', () => {
+  const cwd = initGitCwdMain();
+  addOk(cwd, 'compound-doc-staged');
+  run(cwd, ['move', 'compound-doc-staged', '--to', 'doing']);
+  run(cwd, ['move', 'compound-doc-staged', '--to', 'delivered']);
+  run(cwd, ['move', 'compound-doc-staged', '--to', 'retrospective']);
+  fs.mkdirSync(path.join(cwd, 'docs', 'how-to'), { recursive: true });
+  fs.writeFileSync(path.join(cwd, 'docs', 'how-to', 'staged-only.md'), '# Staged only\n');
+  execFileSync('git', ['add', 'docs/how-to/staged-only.md'], { cwd });
+  const before = eventLines(cwd).length;
+
+  const result = run(cwd, ['compound', 'compound-doc-staged', '--doc-type', 'how-to', '--doc-path', 'docs/how-to/staged-only.md']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /not committed at the main checkout's HEAD/);
+  assert.equal(eventLines(cwd).length, before, 'staged-but-uncommitted must reject exactly like absent — an index entry is not HEAD');
 });
