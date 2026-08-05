@@ -29,6 +29,22 @@ stage values — the same way `fgos-routing` describes it.
   which never carries its own `.fgos/` by design (ADR0020) — the verb
   refuses (exit 4) rather than silently diverge if `--dir` is omitted
   there (tsk-56t D1).
+- Do your own Approach/Shape reasoning directly — reading `CONTEXT.md`/
+  precedent docs, running `fgos graph --json`/`--what-if`, writing the mode
+  gate, risk map, and shape yourself — never delegate it to the Agent/Task
+  tool as an ad hoc sub-dispatch. This session is already a live,
+  same-provider soul (Native-First Dispatch Doctrine rule 2,
+  `docs/decisions/0026-vision-orchestrator-roottask-capacity-native-vs-
+  cli-spawn.md`): spawning a nested Task subagent for the mode/approach/
+  shape judgment this skill exists to do is the same "soul re-deriving
+  what a live soul already knows" waste `tsk-1ni` found in
+  `judgeDiscovery`'s blind cli-spawn — pure overhead, not a transparency
+  question (a Task/Agent call is collapsed by default in the transcript,
+  not hidden, unlike a genuinely opaque headless `claude -p` subprocess).
+  If a step genuinely needs a different backend (cheaper model,
+  cross-provider such as Codex/agy, resource isolation) for a narrow
+  helper task, route it explicitly through the capacity-dispatch
+  mechanism instead — see `../_shared/capacity-dispatch-fallback.md`.
 - Do not reopen or reinterpret a decision already locked in `CONTEXT.md`.
   Cite its D-ID; never override it here.
 - Do not perform the reality/feasibility check on the plan produced here —
