@@ -1087,6 +1087,51 @@ test('startup reap: empty fgw/ orphan branches are pruned, branches carrying com
   assert.equal(branchExists(repoRoot, 'fgw/keeper-y'), true);
 });
 
+// tsk-577: a zero-ahead root branch must NOT be pruned while it still has a
+// descendant that isn't done/wontfix yet — that descendant's own
+// checkMergeStillResolves check (cleanup-harness.mjs) still needs this ref
+// alive. Confirmed root cause of a real 14-item false-positive block.
+test('startup reap: a zero-ahead root branch with an open (non-done/wontfix) leaf descendant is kept, not pruned (tsk-577)', async () => {
+  const { repoRoot, dir, worktreeDir } = setup();
+  // root-a: same shape as the existing orphan case (zero commits ahead) —
+  // the only difference is it now has a leaf still relying on it.
+  const rootBranch = createWorktree(repoRoot, 'root-a', { worktreeDir });
+  removeWorktree(repoRoot, rootBranch.path);
+  seedItem(dir, { id: 'root-a', status: 'cleanup' });
+  seedItem(dir, { id: 'leaf-b', parent: 'root-a', status: 'cleanup' });
+
+  const config = {
+    executor: { command: '/no/such/executor-binary-xyz', args: ['{prompt}'] },
+    models: { standard: 'sonnet' },
+    timeoutMs: 30000,
+  };
+
+  const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
+
+  assert.deepEqual(result.reap.pruned, [], 'root-a must not be pruned — leaf-b still needs it');
+  assert.deepEqual(result.reap.kept, [{ branch: 'fgw/root-a', aheadCount: 0, reason: 'descendant-still-needed' }]);
+  assert.equal(branchExists(repoRoot, 'fgw/root-a'), true, 'the ref must survive this pass');
+});
+
+test('startup reap: a zero-ahead root branch whose only descendant is already done/wontfix is still pruned normally (tsk-577 regression guard)', async () => {
+  const { repoRoot, dir, worktreeDir } = setup();
+  const rootBranch = createWorktree(repoRoot, 'root-c', { worktreeDir });
+  removeWorktree(repoRoot, rootBranch.path);
+  seedItem(dir, { id: 'root-c', status: 'cleanup' });
+  seedItem(dir, { id: 'leaf-d', parent: 'root-c', status: 'done' });
+
+  const config = {
+    executor: { command: '/no/such/executor-binary-xyz', args: ['{prompt}'] },
+    models: { standard: 'sonnet' },
+    timeoutMs: 30000,
+  };
+
+  const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
+
+  assert.deepEqual(result.reap.pruned, ['fgw/root-c'], 'a fully-resolved descendant must not block the existing prune behavior');
+  assert.equal(branchExists(repoRoot, 'fgw/root-c'), false);
+});
+
 // --- CAS conflict on the runner's own write -> clean halt, exit 3 ---------
 
 test('state-conflict: a racing write under the runner\'s claim makes its own CAS fail -> cleanup, clean halt, exit 3', async () => {
