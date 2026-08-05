@@ -8,12 +8,20 @@ theo dõi tay không để miss.
 
 ## Trạng thái (cập nhật 2026-08-05)
 
-- [ ] **tsk-66o** (priority 10000, doing/decompose) — computed-parallel-wave-schedule + worktree-dispatch-attestation. `fgos-exploring` xong (D1-D6), verify khoá. Kế tiếp: `fgos-planning`.
+- [x] **tsk-66o** (todo/executing, neo bởi 2 con mở) — `fgos-planning`+`fgos-validating` xong, READY, decompose thành `tsk-3c7` (computed-parallel-wave-schedule) + `tsk-2ig` (worktree-dispatch-attestation). Xong bước của root — 2 con sẽ tự đi qua clarify/decompose/executing riêng khi tới lượt.
 - [ ] **tsk-1gr** (priority 5000, todo/clarify) — decompose có thể bỏ sót 1 quyết định khỏi mọi footprint con.
 - [ ] **tsk-3uz** (priority 5000, todo/clarify) — `fgos-planning`'s split step không set `--footprint` cho con qua `--parent` (STR92).
 - [ ] **tsk-5ay** (priority 3000, todo/decompose) — so sánh quy trình fgOS vs /ck:plan+/ck:cook + re-distill bee thật; nhà cho 2 quyết định đã bàn (mode-gate → `fgos-routing`; kỷ luật truy-nguồn vào Gate của `fgos-planning`) — chưa claim, chưa log decision.
 
+Con mới sinh ra từ `tsk-66o` (parent: tsk-66o, chưa nằm trong 4 task gốc nhưng giờ là việc thật cần theo dõi):
+- [ ] **tsk-3c7** — computed-parallel-wave-schedule (clarify/decompose, tuỳ pool). Verify: `node --test test/state/graph-metrics.test.mjs`.
+- [ ] **tsk-2ig** — worktree-dispatch-attestation mức 1 (clarify/decompose, tuỳ pool). Verify: `node --test test/runner/dispatch.test.mjs test/runner/frozen-judge.test.mjs`.
+
 Liên hệ (không phải việc mới, chỉ nhận ghi chú): `tsk-49o` — mức 3 attestation, dep `tsk-62v`, đã có cross-reference từ `tsk-66o`.
+
+## Bài học vận hành (2026-08-05)
+
+Main checkout dùng chung có RẤT nhiều phiên hoạt động song song (`git worktree list` lúc đó: 20+ worktree khác đang sống). `plan.md` + 2 con + 1 gate-approve bị MẤT THẬT một lần (chưa commit kịp thì bị merge của phiên khác cuốn mất) — không phải giả thuyết, đã xảy ra và phải làm lại. Từ lúc đó chuyển sang `fgos session start --item <id>` + `EnterWorktree path:<worktreePath>` (mục A, `docs/how-to-parallel-lanes.md` ở xưởng `forgent`) — cô lập cây code, `.fgos/` vẫn dùng chung qua symlink (bảo vệ bởi lock riêng, không phụ thuộc git). Từ đó không mất gì thêm. Bài học cho các round sau: **luôn `session start` trước khi viết file trong `docs/history/`, đừng đợi tới khi bị mất mới chuyển.**
 
 ## Thứ tự dự định
 
