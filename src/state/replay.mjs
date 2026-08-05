@@ -45,7 +45,7 @@ function applyEvent(view, event) {
       break;
     }
     case 'work.move': {
-      const { id, from, to, ask, answer, role, learning, headAtTake, headAtReturn, branchHeadAtTake, branchHeadAtReturn, reason, parentSnapshotAtAsk, claimTrigger, statusAtAsk, writer, statusCategory, rationale, alternatives, source, askRationale, askAlternatives, askSource } = event.payload ?? {};
+      const { id, from, to, ask, answer, role, learning, headAtTake, headAtReturn, branchHeadAtTake, branchHeadAtReturn, reason, parentSnapshotAtAsk, claimTrigger, statusAtAsk, writer, statusCategory, parkReason, rationale, alternatives, source, askRationale, askAlternatives, askSource } = event.payload ?? {};
       const item = view.work[id];
       if (item) {
         item.status = to;
@@ -81,6 +81,16 @@ function applyEvent(view, event) {
       // anything, is tsk-38t-4's decision to make.
       if (item && statusCategory !== undefined) {
         item.statusCategory = statusCategory;
+      }
+      // parkReason (tsk-48i D1): same fold shape as statusCategory
+      // immediately above -- purely additive read of whatever store.mjs's
+      // moveWork actually stamped on THIS event, never invented/recomputed
+      // here. Absent on every event before this cell existed and on every
+      // move into a status with no parkReason entry (D1's own guard), same
+      // conservative "leave whatever it last was" behavior statusCategory
+      // already established.
+      if (item && parkReason !== undefined) {
+        item.parkReason = parkReason;
       }
       // Claim attribution (stage-decompose S2-pull D1/cell action (4)):
       // fold the claiming `role` onto the item itself as `claimRole` —

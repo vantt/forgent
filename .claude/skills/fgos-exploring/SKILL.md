@@ -29,6 +29,24 @@ never moves it.
   cwd may already be a linked worktree, which never carries its own
   `.fgos/` by design (ADR0020) — the verb refuses (exit 4) rather than
   silently diverge if `--dir` is omitted there (tsk-56t D1).
+- Do your own scout/reasoning steps directly — Bash/Grep/`rg`/Read/
+  WebSearch calls you make yourself — never delegate them to the Agent/
+  Task tool as an ad hoc sub-dispatch. This session is already a live,
+  same-provider soul (Native-First Dispatch Doctrine rule 2,
+  `docs/decisions/0026-vision-orchestrator-roottask-capacity-native-vs-
+  cli-spawn.md`): spawning a nested Task subagent for work you can already
+  do yourself is the same "soul re-deriving what a live soul already
+  knows" waste `tsk-1ni` found in `judgeDiscovery`'s blind cli-spawn, just
+  manifesting as an in-session Task call instead of a subprocess one — the
+  work was already yours to do, so doing it again one layer down through
+  a spawned subagent is pure overhead, not a transparency question (a
+  Task/Agent call is collapsed by default in the transcript, not hidden —
+  a person can still expand it to inspect the subagent's own trace, unlike
+  a genuinely opaque headless `claude -p` subprocess). If a step
+  genuinely needs a different backend (cheaper model, cross-provider such
+  as Codex/agy, resource isolation) for a narrow helper task, route it
+  explicitly through the capacity-dispatch mechanism instead of an ad hoc
+  Task call — see `../_shared/capacity-dispatch-fallback.md`.
 - Do not research implementation, propose architecture, or write code. If a
   candidate question only matters to whoever builds the thing, it belongs to
   `fgos-planning`, not here.

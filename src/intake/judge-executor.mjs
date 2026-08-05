@@ -302,8 +302,15 @@ function runBoundedAttempts(cfg, model, prompt, stricterPrompt, tier, maxAttempt
 const DEFAULT_VERIFY_DISAGREE_REASON =
   'Không phán được rõ ràng ở vòng kiểm tra thứ hai — cần người xác nhận.';
 
-function buildVerifyCheckPrompt(title, description, proposedVerify) {
+function buildVerifyCheckPrompt(title, description, proposedVerify, priorRejection) {
   const desc = typeof description === 'string' && description.trim() ? description : '(không có)';
+  const priorSection =
+    typeof priorRejection === 'string' && priorRejection.trim()
+      ? `\n# Vòng trước đã từ chối một đề xuất verify khác cho CHÍNH item này\n${priorRejection.trim()}\n\nĐề xuất mới dưới đây được viết để sửa đúng theo lý do từ chối ở trên. Đừng` +
+        ` tự mâu thuẫn với chính lý do vòng trước của bạn: nếu đề xuất mới đã sửa` +
+        ` đúng điểm bị chê, hãy đồng ý; chỉ từ chối tiếp nếu có lý do CỤ THỂ KHÁC,` +
+        ` không lặp lại hoặc đảo ngược tiêu chí đã nêu ở vòng trước.\n`
+      : '';
   return `# Kiểm tra độc lập một lệnh verify đã được đề xuất
 
 Một vòng phán KHÁC vừa đề xuất lệnh verify dưới đây để chứng minh việc sau
@@ -313,7 +320,7 @@ chỉ là một lệnh chạy được bất kỳ.
 
 Title: ${title}
 Mô tả: ${desc}
-
+${priorSection}
 # Lệnh verify được đề xuất
 ${proposedVerify}
 
@@ -337,11 +344,11 @@ Trả lời DUY NHẤT bằng một dòng JSON, không kèm chữ nào khác:
  * matching this codebase's existing fail-safe stance (an uncertain judgement
  * is never treated as a pass, discovery.mjs's own D4).
  */
-export function judgeVerifySemanticCorrectness(work, proposedVerify, cfg) {
+export function judgeVerifySemanticCorrectness(work, proposedVerify, cfg, priorRejection) {
   try {
     const tier = work?.tier ?? DEFAULTS.tier;
     const model = modelForTier(cfg, tier);
-    const prompt = buildVerifyCheckPrompt(work?.title, work?.description, proposedVerify);
+    const prompt = buildVerifyCheckPrompt(work?.title, work?.description, proposedVerify, priorRejection);
     const stricterPrompt = prompt + JUDGE_STRICT_JSON_SUFFIX;
 
     const verdict = runJudgeExecutor(cfg, model, prompt, stricterPrompt);
