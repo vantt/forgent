@@ -33,7 +33,7 @@ import { graphMetrics as computeGraphMetrics, whatIf as computeWhatIf, classifyS
 import { transitionWork, FsmError } from './status-fsm.mjs';
 import { transitionStage } from './stage-fsm.mjs';
 import { validateWork, validateDomainFields, checkAcceptanceEvidenceTraceable, WorkValidationError, DEFAULTS, GOAL_TIERS, truncateTitle } from './work.mjs';
-import { getDomain, statusCategoryFor } from './workflow-stage-graphs.mjs';
+import { getDomain, statusCategoryFor, parkReasonForStatus } from './workflow-stage-graphs.mjs';
 import { EventLogError } from './events.mjs';
 import { validateToolRegistration, ToolRegistryError } from './tool-registry.mjs';
 import { frontier, isDepsAndLineageReady as depsAndLineageReadyView } from './frontier.mjs';
@@ -190,6 +190,16 @@ export function addWork(dir, work) {
     const addCategory = statusCategoryFor(getDomain(item.domain), item.status);
     if (addCategory !== undefined) {
       item.statusCategory = addCategory;
+    }
+    // tsk-48i D1: same write-time-stamp shape as statusCategory above, for
+    // the domain-owned parkReason table (parkReasonForStatus,
+    // workflow-stage-graphs.mjs) -- lets a domain-agnostic reader (e.g.
+    // herdr-plugin) tell "actively worked" apart from "parked on a person"
+    // or "parked on a system error" without learning the domain's own
+    // literal status strings.
+    const addParkReason = parkReasonForStatus(getDomain(item.domain), item.status);
+    if (addParkReason !== undefined) {
+      item.parkReason = addParkReason;
     }
     // tsk-5q5-2 (D1/D3): narrow write-time check on any acceptance clause
     // supplying text+evidence together — see checkAcceptanceEvidenceTraceable's
@@ -467,6 +477,13 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, rol
   const category = statusCategoryFor(getDomain(work.domain), to);
   if (category !== undefined) {
     rawEvent.payload.statusCategory = category;
+  }
+  // tsk-48i D1: same write-time-stamp shape as statusCategory above, for
+  // the domain-owned parkReason table (parkReasonForStatus,
+  // workflow-stage-graphs.mjs).
+  const parkReason = parkReasonForStatus(getDomain(work.domain), to);
+  if (parkReason !== undefined) {
+    rawEvent.payload.parkReason = parkReason;
   }
   // Writer provenance (D8/D15/D17/D18, str46-io-contract) -- same
   // post-transition stamp as role/headAtTake above, but unconditional:
