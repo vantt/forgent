@@ -603,3 +603,123 @@ export function footprintOverlapAmong(candidates) {
 export function footprintOverlap(view) {
   return footprintOverlapAmong(frontier(view));
 }
+
+/**
+ * DEP-GRAPH CYCLE DETECTION (tsk-3c7, D1/D2 of docs/history/parallel-
+ * decomposition-footprint-avoidance/CONTEXT.md): Tarjan's strongly-
+ * connected-components algorithm over every item's `deps` edges,
+ * regardless of `status` — a cycle is a graph-integrity defect no matter
+ * which items in it happen to be done/blocked/todo right now. A self-dep
+ * (`item.deps` containing its own id) is reported as its own one-element
+ * cycle. A dep id with no matching work item is skipped (dangling-dep
+ * detection is a different concern, not this function's). Returns an
+ * array of cycles, each an array of the ids forming that cycle — empty
+ * when the graph is acyclic. PURE: reads only `view.work`.
+ */
+export function detectCycles(view) {
+  const work = view?.work ?? {};
+  let index = 0;
+  const stack = [];
+  const indices = new Map();
+  const lowlink = new Map();
+  const onStack = new Set();
+  const cycles = [];
+
+  function strongconnect(id) {
+    indices.set(id, index);
+    lowlink.set(id, index);
+    index += 1;
+    stack.push(id);
+    onStack.add(id);
+
+    const deps = Array.isArray(work[id]?.deps) ? work[id].deps : [];
+    for (const dep of deps) {
+      if (dep === id) {
+        cycles.push([id]);
+        continue;
+      }
+      if (!work[dep]) continue; // dangling dep -- not this function's concern
+      if (!indices.has(dep)) {
+        strongconnect(dep);
+        lowlink.set(id, Math.min(lowlink.get(id), lowlink.get(dep)));
+      } else if (onStack.has(dep)) {
+        lowlink.set(id, Math.min(lowlink.get(id), indices.get(dep)));
+      }
+    }
+
+    if (lowlink.get(id) === indices.get(id)) {
+      const scc = [];
+      let w;
+      do {
+        w = stack.pop();
+        onStack.delete(w);
+        scc.push(w);
+      } while (w !== id);
+      if (scc.length > 1) cycles.push(scc);
+    }
+  }
+
+  for (const id of Object.keys(work)) {
+    if (!indices.has(id)) strongconnect(id);
+  }
+  return cycles;
+}
+
+/**
+ * COMPUTED-PARALLEL-WAVE-SCHEDULE (tsk-3c7, D1/D2 of docs/history/
+ * parallel-decomposition-footprint-avoidance/CONTEXT.md): dispatch-time
+ * query answering "which frontier items can run in parallel right now,
+ * and which must wait for a footprint-conflicting sibling to finish
+ * first" — a DIFFERENT question from `footprintOverlap`'s pairwise
+ * advisory (which only flags conflicting pairs, never orders them) and
+ * from `graph-harness.mjs`'s `mergeReadiness` (which orders `proposed`
+ * items for MERGE, a different lifecycle point — D2 deliberately does not
+ * reuse that connected-component logic here: dispatch needs a COUNT of
+ * how many can start now, merge only needs a relative ORDER).
+ *
+ * Kahn-style greedy layering over `frontier(view)` (already in its own
+ * priority/intent/FIFO order, `frontier.mjs`'s `FRONTIER_ORDER_VERSION`):
+ * walk the frontier in that order, packing each item into the earliest
+ * wave that has no footprint conflict with what is already placed in it
+ * (`footprintOverlapAmong`, reused unchanged). A conflicting item is
+ * DEFERRED to a later wave, never refused — mirrors `footprintOverlapAmong`'s
+ * own "advisory, never blocking" stance. An item with no declared
+ * footprint never conflicts with anything (same semantics
+ * `footprintOverlapAmong` already gives it), so it packs into the
+ * earliest wave with room. Returns `{ waves }` — `waves` is an array of
+ * arrays of item ids, in frontier order within each wave; `waves[0]` is
+ * everything dispatchable in parallel right now. PURE: reads only
+ * `view.work` via `frontier`/`footprintOverlapAmong`.
+ */
+export function computeSchedule(view) {
+  const candidates = frontier(view);
+  const conflicts = footprintOverlapAmong(candidates);
+  const conflictsOf = new Map();
+  for (const { a, b } of conflicts) {
+    if (!conflictsOf.has(a)) conflictsOf.set(a, new Set());
+    if (!conflictsOf.has(b)) conflictsOf.set(b, new Set());
+    conflictsOf.get(a).add(b);
+    conflictsOf.get(b).add(a);
+  }
+
+  const waves = [];
+  let remaining = candidates;
+  while (remaining.length > 0) {
+    const wave = [];
+    const waveIds = new Set();
+    const deferred = [];
+    for (const item of remaining) {
+      const itemConflicts = conflictsOf.get(item.id);
+      const conflictsWithWave = itemConflicts ? [...itemConflicts].some((id) => waveIds.has(id)) : false;
+      if (conflictsWithWave) {
+        deferred.push(item);
+      } else {
+        wave.push(item.id);
+        waveIds.add(item.id);
+      }
+    }
+    waves.push(wave);
+    remaining = deferred;
+  }
+  return { waves };
+}

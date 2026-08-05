@@ -29,7 +29,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { appendEvent, readEvents, withEventsLock, appendEventLocked } from './events.mjs';
 import { rebuildView, viewRevision } from './replay.mjs';
-import { graphMetrics as computeGraphMetrics, whatIf as computeWhatIf, classifyStaleDoing, classifyStalePostDelivery, footprintOverlap, goalScopedCriticalPath, goalScopedGreedyTopUnblock } from './graph-metrics.mjs';
+import { graphMetrics as computeGraphMetrics, whatIf as computeWhatIf, classifyStaleDoing, classifyStalePostDelivery, footprintOverlap, goalScopedCriticalPath, goalScopedGreedyTopUnblock, computeSchedule, detectCycles } from './graph-metrics.mjs';
 import { transitionWork, FsmError } from './status-fsm.mjs';
 import { transitionStage } from './stage-fsm.mjs';
 import { validateWork, validateDomainFields, checkAcceptanceEvidenceTraceable, WorkValidationError, DEFAULTS, GOAL_TIERS, truncateTitle } from './work.mjs';
@@ -1066,6 +1066,21 @@ export function stalePostDeliveryAdvisory(dir, opts = {}) {
 export function footprintConflicts(dir) {
   const { logPath } = paths(dir);
   return footprintOverlap(rebuildView(logPath));
+}
+
+/**
+ * Read-only (tsk-3c7): computed-parallel-wave-schedule — which frontier
+ * items can dispatch in parallel right now, packed into waves by
+ * declared-footprint conflict, plus a dep-graph cycle check over the
+ * whole work map (never just the frontier — a cycle anywhere is a
+ * graph-integrity defect regardless of which items in it are ready).
+ * Same read-facade shape as `footprintConflicts`; the Domain core
+ * (`graph-metrics.mjs`) computes both, this just rebuilds the view.
+ */
+export function computedSchedule(dir) {
+  const { logPath } = paths(dir);
+  const view = rebuildView(logPath);
+  return { ...computeSchedule(view), cycles: detectCycles(view) };
 }
 
 /**
