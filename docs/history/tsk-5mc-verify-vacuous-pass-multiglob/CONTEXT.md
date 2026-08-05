@@ -67,6 +67,42 @@ New verify text (D3) against the current, real, passing test file
 (unmodified `test/e2e/domain-aware-stage-literals.test.mjs`): `fail=0`,
 both per-test checkmark greps match → **exit 0** (correctly passes).
 
+## tsk-5mc's own `verify` command (locked, two dispute rounds)
+
+`judgeDiscovery`'s second-pass semantic check disputed two earlier drafts
+of this item's own `verify`:
+
+- Round 1 (`out=... chưa xác định — P15 bổ sung`, a placeholder): rejected
+  for not proving anything.
+- Round 2 (grep the STORED `tsk-4sz` verify TEXT for the per-test-checkmark
+  pattern fragments, no execution): rejected — "never runs the test suite
+  or confirms the fixed verify logic works correctly."
+
+Round 3, locked, both structurally confirms the fix shape AND actually
+executes the real command:
+
+```
+root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname); v=$(node bin/fgos.mjs list --id tsk-4sz --json --dir "$root" | node -e "let s='';process.stdin.on('data',d=>s+=d);process.stdin.on('end',()=>{console.log(JSON.parse(s).data.work['tsk-4sz'].verify)})"); echo "$v" | grep -qE '^\. \.\*domain-aware decompose child addWork' && echo "$v" | grep -qE '^\. \.\*domain-aware discovered-from addWork' && (cd "$root" && bash -c "$v") && grep -q "## Multi-file-glob variant" "$root/docs/how-to/avoid-vacuous-pass-with-node-test-test-name-pattern.md"
+```
+
+(The two `grep -qE` patterns above are written with `\^\.` in the actual
+shell string — a literal `^. ` substring inside `tsk-4sz`'s own verify
+field, escaped for the outer grep — the fenced block here shows it
+unescaped once for readability.)
+
+Dry-run proof against the real repo, before either real edit lands:
+
+- **RED (both edits absent, current state)**: exit 1.
+- **Dry-run GREEN (temporarily patched `tsk-4sz.verify` to the D3 fixed
+  text via `fgos edit`, doc section still absent)**: the structural +
+  execute portion passed; only the doc-section grep still failed (expected
+  — the doc section genuinely does not exist yet). `tsk-4sz.verify` was
+  reverted to its original text immediately after this check, before any
+  other write.
+- Once both real edits land (fixed `tsk-4sz.verify` + the doc section),
+  all four checks pass — the doc-section grep is a trivial substring match
+  once the section is written, not separately dry-run tested.
+
 ## Outstanding questions deferred to planning
 
 None — scope, fix text, and doc placement are fully locked above; the
