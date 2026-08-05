@@ -1401,10 +1401,21 @@ async function runVerb(verb, flags, positional, dir) {
           throw new StoreError('validation', `edit --verify-from-${fromChildren ? 'children' : 'targets'}: could not resolve the repo root via git (${err.message}).`);
         }
         const idList = ids.map((childId) => JSON.stringify(childId)).join(',');
+        // tsk-1ia: `all(["delivered",...] | index(.) != null)` is broken --
+        // the `.` inside `index(.)` rebinds to the literal array itself
+        // (the `|` right before it), never to the per-element status
+        // `all()` is iterating, so this always evaluates true regardless of
+        // the real statuses (confirmed: `echo '["todo","doing"]' | jq
+        // 'all(["delivered","retrospective","cleanup","done"] | index(.)
+        // != null)'` -> true). Binding the element to a named variable
+        // first (`. as $s`) before piping into the literal array avoids
+        // the rebind -- the same pattern tsk-2jc's own real, hand-authored
+        // verify already used (`.data.work[id].status as $s | [...] |
+        // index($s) != null`).
         patch.verify =
           `node ${repoRoot}/bin/fgos.mjs list --json --all --dir ${repoRoot} | ` +
           `jq -e '.data.work as $w | [${idList}] | map($w[.].status) | ` +
-          `all(["delivered","retrospective","cleanup","done"] | index(.) != null)' > /dev/null`;
+          `all(. as $s | ["delivered","retrospective","cleanup","done"] | index($s) != null)' > /dev/null`;
       }
       if (Object.keys(patch).length === 0) {
         throw new StoreError(
