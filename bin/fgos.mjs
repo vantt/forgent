@@ -324,7 +324,16 @@ function parseAcceptanceFlag(value, message) {
 function parseDiscoverCallerVerdict(flags) {
   if (flags.verdict === undefined) return undefined;
   if (flags.verdict === 'clear') {
-    return { clear: true, verify: requireField(flags.verify, 'discover --verdict clear requires --verify "<cmd>"') };
+    const verdict = { clear: true, verify: requireField(flags.verify, 'discover --verdict clear requires --verify "<cmd>"') };
+    // tsk-5cf D1b: --force only ever means something on the clear branch --
+    // a caller-supplied verdict of "unclear" never reaches the second-pass
+    // verify judge at all (resolveDiscovery only calls it when
+    // verdict.clear is true), so --force is silently a no-op there rather
+    // than an error -- matches this parser's own "never guess, never
+    // silently misapply" stance for every other flag here by simply not
+    // reading it on that branch.
+    if (flags.force) verdict.force = true;
+    return verdict;
   }
   if (flags.verdict === 'unclear') {
     return { clear: false, question: requireField(flags.question, 'discover --verdict unclear requires --question "<text>"') };

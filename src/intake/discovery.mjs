@@ -640,16 +640,41 @@ export function resolveDiscovery(dir, id, cfg, role, callerVerdict) {
     // item exactly like an unclear first-pass verdict does — an uncertain
     // judgement is never treated as a pass (discovery.mjs's own D4 above).
     if (typeof verdict.verify === 'string' && verdict.verify.trim()) {
-      const secondPass = judgeVerifySemanticCorrectness(work, verdict.verify, cfg);
+      // tsk-5cf D1a: thread the immediately-prior round's own disagreement
+      // text back into this round's prompt, the same "give the judge its
+      // own prior context" shape buildDiscoveryPrompt already uses for
+      // view.discovery[id] (line ~223 above) -- gates[id].ask is a single
+      // most-recent-value slot (replay.mjs's ask/answer fold: only a FRESH
+      // ask overwrites it, an answer never clears it), so this is always
+      // exactly the last round's own reason, never a stale one from a much
+      // earlier dispute this round already moved past.
+      const priorRejection = view?.gates?.[id]?.ask;
+      const secondPass = judgeVerifySemanticCorrectness(work, verdict.verify, cfg, priorRejection);
       if (!secondPass.agrees) {
-        const ask =
-          `Đề xuất verify bị nghi ngờ (chưa ghi vào clarify->decompose, cần xác nhận) — ` +
-          `vòng 1 đề xuất: ${verdict.verify}\n` +
-          `vòng 2 (kiểm tra độc lập) không đồng ý: ${secondPass.reason}`;
-        // statusAtAsk (claim-lock §5.1): same rule as the unclear branch
-        // below — read at function entry, before this park.
-        putInAwaiting(dir, { id, ask, statusAtAsk: work.status });
-        return { outcome: 'verify-disputed', id, verdict, secondPass };
+        // tsk-5cf D1b: a caller that already reasoned live through this
+        // exact disagreement (e.g. a session that judged the second pass's
+        // objections themselves inconsistent across rounds) can force past
+        // it explicitly -- never silent: always logged with the disagreement
+        // reason it overrode, per the "never silently overridden" stance
+        // docs/explanation/judge-verdict-second-pass-semantic-check.md
+        // already states for this exact two-judge-disagreement path.
+        if (callerVerdict?.force === true) {
+          addDecision(dir, {
+            id,
+            text: `discover --force overrode a disputed verify: "${verdict.verify}"`,
+            source: 'resolveDiscovery',
+            rationale: `second pass disagreed: ${secondPass.reason}`,
+          });
+        } else {
+          const ask =
+            `Đề xuất verify bị nghi ngờ (chưa ghi vào clarify->decompose, cần xác nhận) — ` +
+            `vòng 1 đề xuất: ${verdict.verify}\n` +
+            `vòng 2 (kiểm tra độc lập) không đồng ý: ${secondPass.reason}`;
+          // statusAtAsk (claim-lock §5.1): same rule as the unclear branch
+          // below — read at function entry, before this park.
+          putInAwaiting(dir, { id, ask, statusAtAsk: work.status });
+          return { outcome: 'verify-disputed', id, verdict, secondPass };
+        }
       }
     }
 
