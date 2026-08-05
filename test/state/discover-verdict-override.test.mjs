@@ -113,3 +113,34 @@ test('discover --verdict unclear --force is a silent no-op for --force (force on
   assert.equal(view.work[id].status, 'awaiting-human');
   assert.equal(view.gates[id].ask, 'Which provider?');
 });
+
+// tsk-nfa D1: a --force call on an item a PRIOR discover call already
+// parked (awaiting-human) must refuse instead of silently advancing stage
+// while status stays parked -- the exact repro (tsk-4y2) that left an item
+// stuck at stage executing + status awaiting-human, unreturnable via
+// `fgos return` until a human ran `fgos answer` by hand.
+test('discover --verdict clear --force refuses when the item is already awaiting-human, instead of moving stage past a still-parked status', () => {
+  const cwd = tmpCwd();
+  writeDisagreeingRunnerConfig(cwd, 'too generic, just word presence');
+  const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
+
+  // Round 1 (no --force): parks the item, exactly like the regression test above.
+  const round1 = run(cwd, ['discover', id, '--verdict', 'clear', '--verify', 'npm test -- disputed']);
+  assert.equal(round1.status, 0);
+  assert.equal(envelopeData(round1.stdout).outcome, 'verify-disputed');
+
+  let view = envelopeData(run(cwd, ['list']).stdout);
+  assert.equal(view.work[id].status, 'awaiting-human');
+  assert.equal(view.work[id].stage, 'clarify');
+
+  // Round 2, same command plus --force, run directly on the still-parked item.
+  const round2 = run(cwd, ['discover', id, '--verdict', 'clear', '--verify', 'npm test -- disputed', '--force']);
+  assert.notEqual(round2.status, 0);
+  assert.match(round2.stderr, /already "awaiting-human"/);
+  assert.match(round2.stderr, new RegExp(`fgos answer ${id}`));
+
+  // Refused before touching state: stage/status stay exactly where round 1 left them.
+  view = envelopeData(run(cwd, ['list']).stdout);
+  assert.equal(view.work[id].status, 'awaiting-human');
+  assert.equal(view.work[id].stage, 'clarify');
+});
