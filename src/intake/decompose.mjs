@@ -696,11 +696,20 @@ export function resolveDecompose(dir, id, cfg, role, callerVerdict) {
   // on any one of them parks the WHOLE decompose verdict as need-human
   // (never a partial write) — same fail-safe stance the heavy-risk gate
   // above already applies to this same edge.
+  //
+  // tsk-25g D2: thread the immediately-prior round's own disagreement text
+  // back into this round's prompt, the same shape discovery.mjs's own D1a
+  // fix already gives resolveDiscovery (discovery.mjs:643-651) — non-empty
+  // only on a RETRY call after a human resumes an `awaiting-human` decompose
+  // dispute via `fgos answer` (the whole decompose verdict parks together,
+  // so one shared `priorRejection` applies to every child's re-check, not
+  // a per-child slot).
+  const priorRejection = view?.gates?.[id]?.ask;
   const disputedChild = verdict.children
     .map((child, index) => ({
       index,
       child,
-      secondPass: judgeVerifySemanticCorrectness({ title: child.title, tier: work.tier }, child.verify, cfg),
+      secondPass: judgeVerifySemanticCorrectness({ title: child.title, tier: work.tier }, child.verify, cfg, priorRejection),
     }))
     .find((entry) => !entry.secondPass.agrees);
 
@@ -708,9 +717,33 @@ export function resolveDecompose(dir, id, cfg, role, callerVerdict) {
     const reason =
       `Việc con #${disputedChild.index + 1} ("${disputedChild.child.title}") có verify bị nghi ngờ ở vòng ` +
       `kiểm tra thứ hai: ${disputedChild.secondPass.reason}`;
-    logDecomposeVerdict(dir, id, 'need-human', reason);
-    putInAwaiting(dir, { id, ask: formatProposalAsk(verdict, reason), statusAtAsk: work.status });
-    return { outcome: 'need-human', id, verdict };
+
+    // tsk-25g D2: --force mirrors discover's own override (tsk-5cf D1b,
+    // discovery.mjs:669-691) -- proceeds past a disputed child's
+    // second-pass verdict instead of parking, EXCEPT when the disagreement
+    // is mechanical (tsk-12t D6, a syntactic fact not a judgement call) or
+    // the item is already parked `awaiting-human` from a PRIOR discover/
+    // decompose call (continuing would advance stage while status stays
+    // parked -- same refusal shape discovery.mjs already applies).
+    if (callerVerdict?.force === true && disputedChild.secondPass.mechanical !== true) {
+      if (work.status === 'awaiting-human') {
+        throw new StoreError(
+          'validation',
+          `decompose --force: work "${id}" is already "awaiting-human" -- run "fgos answer ${id} --text ..." to resume it before retrying --force.`,
+        );
+      }
+      addDecision(dir, {
+        id,
+        text: `decompose --force overrode a disputed child verify: "${disputedChild.child.verify}"`,
+        source: 'resolveDecompose',
+        rationale: `second pass disagreed on child #${disputedChild.index + 1}: ${disputedChild.secondPass.reason}`,
+      });
+      // fall through -- proceed to write children below, same as no dispute
+    } else {
+      logDecomposeVerdict(dir, id, 'need-human', reason);
+      putInAwaiting(dir, { id, ask: formatProposalAsk(verdict, reason), statusAtAsk: work.status });
+      return { outcome: 'need-human', id, verdict };
+    }
   }
 
   // verdict.kind === 'decompose': child ids are positional — `${work.id}-<n>`,

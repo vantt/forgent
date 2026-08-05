@@ -367,11 +367,18 @@ function parseDecomposeCallerVerdict(flags) {
     if (children === undefined) {
       throw new StoreError('validation', childrenMessage);
     }
-    return {
+    const verdict = {
       verdict: 'decompose',
       reason: requireField(flags.reason, 'decompose --verdict decompose requires --reason "<text>"'),
       children,
     };
+    // tsk-25g D2: mirrors discover's --force (tsk-5cf D1b) -- only ever
+    // means something on the per-child second-pass verify dispute path
+    // (resolveDecompose's disputedChild branch), silently a no-op on
+    // pass-through/need-human the same way discover's --force is a
+    // no-op on the unclear branch.
+    if (flags.force) verdict.force = true;
+    return verdict;
   }
   throw new StoreError('validation', `decompose --verdict must be "pass-through", "need-human", or "decompose" (got "${flags.verdict}").`);
 }

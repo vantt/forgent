@@ -163,6 +163,7 @@ export const COMMAND_REGISTRY = [
         verdict: { type: 'string', description: 'Optional caller-supplied verdict: "pass-through", "need-human", or "decompose". Omit to run the normal judgeDecompose subprocess judge (or the plan.md tiny/small mode skip-and-advance heuristic, if applicable).' },
         reason: { type: 'string', description: 'Required with --verdict need-human or --verdict decompose (optional with pass-through): why this call is verdicting the way it is.' },
         children: { type: 'string', description: 'Required with --verdict decompose: JSON-encoded array of child objects ({title, verify, kind?, risk?, refs?, footprint?, deps?}), same shape judgeDecompose itself produces.', multiValueFormat: 'json-array' },
+        force: { type: 'boolean', description: 'Only meaningful with --verdict decompose: proceed past a disputed second-pass verify judge on a child, instead of parking the whole decompose verdict in awaiting-human. Always logged as a decision naming the disagreement it overrode -- never a silent bypass. Mirrors discover --force (tsk-5cf D1b).' },
       },
       positional: ['id'],
       required: ['id'],

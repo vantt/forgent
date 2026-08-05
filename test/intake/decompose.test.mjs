@@ -1311,6 +1311,134 @@ test('resolveDecompose still writes every child when the second-pass check agree
   assert.equal(result.childIds.length, 2);
 });
 
+// tsk-25g D2: resolveDecompose's per-child second-pass check now threads
+// priorRejection + accepts --force, matching resolveDiscovery's own D1a/D1b
+// (discovery.mjs). Same sniff-the-prompt fake as writeVerdictWithVerifyCheckExecutor,
+// but reports whether the SECOND-pass prompt it received contains the
+// priorRejection section's own marker string ("Vòng trước đã từ chối",
+// judge-executor.mjs's buildVerifyCheckPrompt) via a plain, non-recursive
+// SAW_PRIOR_CONTEXT/NO_PRIOR_CONTEXT reason — never the raw prompt itself,
+// which would (and, in an earlier draft, did) get quoted verbatim into the
+// NEXT round's gate context and self-contaminate that round's own
+// first-pass sniff.
+function writeVerdictDetectingPriorContextExecutor(dir, verdict) {
+  const scriptPath = path.join(dir, 'verdict-detecting-prior-context-executor.mjs');
+  fs.writeFileSync(
+    scriptPath,
+    `
+    const prompt = process.argv[2] ?? '';
+    if (prompt.includes('Kiểm tra độc lập một lệnh verify')) {
+      const sawPrior = prompt.includes('Vòng trước đã từ chối');
+      process.stdout.write(JSON.stringify({ agrees: false, reason: sawPrior ? 'SAW_PRIOR_CONTEXT' : 'NO_PRIOR_CONTEXT' }));
+    } else {
+      process.stdout.write(${JSON.stringify(JSON.stringify(verdict))});
+    }
+    process.exit(0);
+    `,
+  );
+  return scriptPath;
+}
+
+test('resolveDecompose threads the prior round\'s own disagreement text into the NEXT per-child verify-check prompt (tsk-25g D2, mirrors discovery.mjs D1a)', () => {
+  const scriptDir = mkTempDir();
+  const decomposeVerdict = {
+    verdict: 'decompose',
+    reason: 'Two independent surfaces, no shared state',
+    children: [{ title: 'Build parser', verify: 'npm test -- parser' }],
+  };
+  const scriptPath = writeVerdictDetectingPriorContextExecutor(scriptDir, decomposeVerdict);
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork());
+
+  const first = resolveDecompose(storeDir, 'item-x', cfg, 'runner');
+  assert.equal(first.outcome, 'need-human');
+  // First round: no prior dispute yet, so no priorRejection context exists.
+  assert.match(listWork(storeDir).gates['item-x'].ask, /NO_PRIOR_CONTEXT/);
+
+  // Resume, exactly like the existing end-to-end need-human test does.
+  moveWork(storeDir, { id: 'item-x', to: 'todo', expectedStatus: 'awaiting-human', answer: 'Retry.' });
+
+  const second = resolveDecompose(storeDir, 'item-x', cfg, 'runner');
+  assert.equal(second.outcome, 'need-human');
+  // Second round's own verify-check prompt must now contain round 1's
+  // rejection text (threaded as priorRejection) — confirms it actually
+  // rode into the prompt, not just into an unused local variable.
+  assert.match(listWork(storeDir).gates['item-x'].ask, /SAW_PRIOR_CONTEXT/);
+});
+
+// --force always arrives together with a caller-SUPPLIED verdict
+// (resolveCallerDecomposeVerdict bypasses judgeDecompose's own subprocess
+// entirely, mirroring discover --verdict clear --force) -- so these tests
+// pass a full `{verdict: 'decompose', reason, children, force: true}`
+// callerVerdict, same shape bin/fgos.mjs's parseDecomposeCallerVerdict
+// produces. The fake executor here only ever needs to answer the SECOND
+// (verify-check) prompt, since the first pass is skipped.
+
+test('resolveDecompose --force overrides a disputed (non-mechanical) child verify, logs the override, and writes every child (tsk-25g D2)', () => {
+  const scriptDir = mkTempDir();
+  const scriptPath = writeVerdictWithVerifyCheckExecutor(scriptDir, {}, false, 'lệnh này không kiểm chứng đúng claim của việc con');
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork());
+
+  const result = resolveDecompose(storeDir, 'item-x', cfg, 'runner', {
+    verdict: 'decompose',
+    reason: 'Two independent surfaces, no shared state',
+    children: [{ title: 'Build parser', verify: 'npm test -- parser' }],
+    force: true,
+  });
+  assert.equal(result.outcome, 'decompose');
+  assert.equal(result.childIds.length, 1);
+
+  const overrideLog = (listWork(storeDir).decisions ?? []).find((d) => d.id === 'item-x' && /--force overrode/.test(d.text));
+  assert.ok(overrideLog, 'expected a decision log entry naming the overridden disagreement');
+});
+
+test('resolveDecompose --force refuses when the item is already awaiting-human (points at fgos answer instead)', () => {
+  const scriptDir = mkTempDir();
+  const scriptPath = writeVerdictWithVerifyCheckExecutor(scriptDir, {}, false, 'lệnh này không kiểm chứng đúng claim của việc con');
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork({ status: 'awaiting-human' }));
+
+  assert.throws(
+    () =>
+      resolveDecompose(storeDir, 'item-x', cfg, 'runner', {
+        verdict: 'decompose',
+        reason: 'Two independent surfaces, no shared state',
+        children: [{ title: 'Build parser', verify: 'npm test -- parser' }],
+        force: true,
+      }),
+    /already "awaiting-human"/,
+  );
+});
+
+test('resolveDecompose --force never overrides a MECHANICAL disagreement (tsk-12t D6) -- still parks', () => {
+  const scriptDir = mkTempDir();
+  // Never actually spawned -- matchesKnownBadVerifyPattern trips before any
+  // executor call, so this script only needs to exist for cfg's shape.
+  const scriptPath = writeVerdictExecutor(scriptDir, {});
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork());
+
+  const result = resolveDecompose(storeDir, 'item-x', cfg, 'runner', {
+    verdict: 'decompose',
+    reason: 'Two independent surfaces, no shared state',
+    // Trips matchesKnownBadVerifyPattern (judge-executor.mjs) mechanically
+    // -- mechanical:true, exempt from --force by design (tsk-12t D6).
+    children: [{ title: 'Build parser', verify: 'node --test --test-name-pattern="x" test/foo.test.mjs | grep "^# pass"' }],
+    force: true,
+  });
+  assert.equal(result.outcome, 'need-human');
+  assert.equal(Object.values(listWork(storeDir).work).filter((item) => item.parent === 'item-x').length, 0);
+});
+
 test('resolveDecompose is a no-op on an item already past stage decompose (idempotent, CAS-backed)', () => {
   const scriptDir = mkTempDir();
   const scriptPath = writeVerdictExecutor(scriptDir, { verdict: 'pass-through' }); // never consulted
