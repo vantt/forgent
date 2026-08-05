@@ -21,12 +21,14 @@ sản phẩm nào bị bỏ sót trước khi qua `fgos-planning`.
 
 | ID | Decision |
 |----|----------|
-| D1 | `repoRoot` trong `.githooks/pre-commit` luôn resolve về main checkout, bất kể worktree nào gọi `git commit` — vì `core.hooksPath` (relative) nằm trong `.git/config` dùng chung mọi worktree, git resolve nó theo main working tree. Verify thật: `git config --get core.hooksPath` chạy từ main checkout và từ `.claude/worktrees/tsk-1p9-rF2BQk` ra CÙNG 1 đường tuyệt đối. |
+| D1 | *(Sửa bởi D7 — xem dưới)* `repoRoot` trong `.githooks/pre-commit` luôn resolve về main checkout, bất kể worktree nào gọi `git commit`. Giải thích cơ chế ban đầu ("relative hooksPath resolve theo main working tree") SAI — verify thật của KẾT QUẢ (`git config --get core.hooksPath` ra cùng 1 đường tuyệt đối từ mọi worktree) vẫn đúng, chỉ nguyên nhân sai. |
 | D2 | Áp `main-checkout.lock` lên worktree git commit là gap thiết kế, không phải quyết định cân nhắc. 3 bằng chứng: decision `0021` chỉ bàn race trên main's index file, không hề nhắc worktree; mỗi linked worktree có index file riêng nên hazard đó không áp dụng cơ học; guard 2 cùng file (`currentFgwBranchIfMainCheckout`) đã phân biệt worktree/main mà guard 1 (`acquireMainCheckoutLock`) thì không. |
 | D3 | `tsk-45y` (đã đóng wontfix) không giải bài này — khác lớp (fgOS state-write qua `events.lock` vs git-commit hook qua `main-checkout.lock`), và scout evidence của tsk-45y chưa từng grep `.githooks/` — blind spot thật trong bằng chứng đóng của chính nó. |
 | D4 | Hướng fix: thêm check `gitDir !== gitCommonDir` (mirror `currentFgwBranchIfMainCheckout`'s logic sẵn có) ngay trước dòng gọi `acquireMainCheckoutLock` trong hook's `main()` — skip lock check khi chạy từ linked worktree. Không sửa primitive `acquireMainCheckoutLock` chính nó. |
 | D5 | Re-scout xác nhận (`fgos-exploring`, phiên này): `acquireMainCheckoutLock` chỉ có 3 call site thật trong `src`/`bin` — `claimWork` (claim-port.mjs), `mergeRunnerItem` (merge.mjs), và `fgos unlock` verb (bin/fgos.mjs:3591, diagnostic, luôn chạy tường minh chống main). Không call site nào khác ngoài `.githooks/pre-commit` bị ảnh hưởng bởi ordinary worktree git commit — D4's fix chỉ cần đổi đúng 1 chỗ. |
-| D6 | GitNexus's own call-graph (`impact`/graph query) cũng KHÔNG liệt kê `.githooks/pre-commit` là caller của `acquireMainCheckoutLock` — chỉ thấy `claimWork`/`mergeRunnerItem`/`merge.test.mjs`. Corroborate thêm cho D3's luận điểm blind-spot (không chỉ manual grep bỏ sót, tool-based graph cũng bỏ sót nơi này) — không dùng để phủ nhận D1 (đã verify trực tiếp bằng đọc file + lệnh git thật), chỉ ghi nhận tool posture. |
+| D6 | GitNexus's own call-graph (`impact`/graph query) cũng KHÔNG liệt kê `.githooks/pre-commit` là caller của `acquireMainCheckoutLock` — chỉ thấy `claimWork`/`mergeRunnerItem`/`merge.test.mjs`. Corroborate thêm cho D3's luận điểm blind-spot (không chỉ manual grep bỏ sót, tool-based graph cũng bỏ sót nơi này). |
+| D7 | **Sửa D1**: `core.hooksPath` trên checkout thật này bị set thành 1 đường TUYỆT ĐỐI (`git config --get --show-origin` xác nhận origin là repo config file dùng chung, giá trị là đường tuyệt đối tới main checkout's `.githooks`), KHÔNG phải relative `.githooks` mà `installGitHooks`/toàn bộ test suite (`test/scripts/install-git-hooks.test.mjs`, `test/setup/checks.test.mjs`, `test/e2e/main-checkout-lock-hook.test.mjs`) đều ghi/kỳ vọng. Thực nghiệm cô lập (2 script trong `scratchpad/`) chứng minh: khi hooksPath THẬT SỰ relative, 1 hook thật KHÔNG chạy khi commit từ linked worktree (resolve theo worktree's own top-level, nơi hook không tồn tại) — phủ nhận thẳng D1's giả thuyết gốc. `installGitHooks` là fill-only, và decision `0021` tự ghi nhận (dòng "Dogfood thật") checkout này CÒN relative `.githooks` lúc 2026-07-28 (doctor xanh) — nên giá trị tuyệt đối phải được ghi đè SAU thời điểm đó, bởi thứ gì đó ngoài `installGitHooks`. Nguyên nhân cụ thể chưa xác định — ngoài phạm vi tsk-sir. D4 (hướng fix) không đổi: nó nhắm hành vi hook một khi đã chạy, độc lập với cơ chế đưa nó tới đó. |
+| D8 | Phát hiện phụ, ngoài scope tsk-sir: `mainCheckoutHookWired`/`installGitHooks` (`src/setup/git-hooks.mjs:46,62`) so khớp CHUỖI CHÍNH XÁC với `.githooks` — 1 giá trị tuyệt đối-nhưng-tương-đương đọc thành "chưa wired". Xác nhận sống: `node bin/fgos.mjs doctor` trên chính checkout này, ngay trong phiên này, báo `main-checkout-hook-wired` **failed** ("core.hooksPath not wired... commits here are NOT guarded") — dù hook rõ ràng đang chặn commit (2 lần thật trong phiên này, bao gồm cả lúc commit `DISCUSSION.md`). False negative thật trên chính safety check của `fgos doctor`, tương phản trực tiếp với decision `0021`'s dogfood note ("doctor báo xanh" lúc 2026-07-28) — đáng 1 work item riêng, không sửa trong tsk-sir. |
 
 ## Pinned terms
 
@@ -37,6 +39,19 @@ sản phẩm nào bị bỏ sót trước khi qua `fgos-planning`.
 
 - `git config --get core.hooksPath` chạy từ main checkout VÀ từ
   `.claude/worktrees/tsk-1p9-rF2BQk` (2026-08-05) — cùng 1 đường tuyệt đối.
+- `git config --get --show-origin core.hooksPath` (main checkout, phiên
+  này) — origin là repo config file dùng chung, giá trị là đường tuyệt
+  đối `/home/vantt/projects/forgentX/.githooks`, không phải relative.
+- Thực nghiệm cô lập (repo scratch tạm, 2 script, phiên này): set
+  `core.hooksPath` relative trên main, tạo linked worktree, xác nhận qua
+  1 hook echo thật rằng nó KHÔNG chạy khi commit từ worktree (chỉ chạy
+  khi commit từ main) — phủ nhận giả thuyết relative-resolve-về-main ban
+  đầu (D1 → D7).
+- `node bin/fgos.mjs doctor --dir <repo>` (phiên này) — `main-checkout-hook-wired`
+  báo `failed`, dù hook thật đang chặn commit ngay trong phiên này (D8).
+- `docs/decisions/0021-...md` dòng "Dogfood thật" — xác nhận checkout này
+  còn relative `.githooks` và doctor xanh lúc 2026-07-28, tương phản trực
+  tiếp với trạng thái quan sát được hôm nay (D7/D8).
 - `rg -- "acquireMainCheckoutLock" src bin test docs dogfood-fixture` (phiên
   này) — 140 match/39 file, thực chất chỉ 3 call site sản xuất
   (claim-port.mjs, merge.mjs, bin/fgos.mjs:3591 `unlock`), còn lại là
