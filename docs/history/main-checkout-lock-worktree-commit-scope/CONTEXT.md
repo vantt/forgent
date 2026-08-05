@@ -28,6 +28,7 @@ sản phẩm nào bị bỏ sót trước khi qua `fgos-planning`.
 | D5 | Re-scout xác nhận (`fgos-exploring`, phiên này): `acquireMainCheckoutLock` chỉ có 3 call site thật trong `src`/`bin` — `claimWork` (claim-port.mjs), `mergeRunnerItem` (merge.mjs), và `fgos unlock` verb (bin/fgos.mjs:3591, diagnostic, luôn chạy tường minh chống main). Không call site nào khác ngoài `.githooks/pre-commit` bị ảnh hưởng bởi ordinary worktree git commit — D4's fix chỉ cần đổi đúng 1 chỗ. |
 | D6 | GitNexus's own call-graph (`impact`/graph query) cũng KHÔNG liệt kê `.githooks/pre-commit` là caller của `acquireMainCheckoutLock` — chỉ thấy `claimWork`/`mergeRunnerItem`/`merge.test.mjs`. Corroborate thêm cho D3's luận điểm blind-spot (không chỉ manual grep bỏ sót, tool-based graph cũng bỏ sót nơi này). |
 | D7 | **Sửa D1**: `core.hooksPath` trên checkout thật này bị set thành 1 đường TUYỆT ĐỐI (`git config --get --show-origin` xác nhận origin là repo config file dùng chung, giá trị là đường tuyệt đối tới main checkout's `.githooks`), KHÔNG phải relative `.githooks` mà `installGitHooks`/toàn bộ test suite (`test/scripts/install-git-hooks.test.mjs`, `test/setup/checks.test.mjs`, `test/e2e/main-checkout-lock-hook.test.mjs`) đều ghi/kỳ vọng. Thực nghiệm cô lập (2 script trong `scratchpad/`) chứng minh: khi hooksPath THẬT SỰ relative, 1 hook thật KHÔNG chạy khi commit từ linked worktree (resolve theo worktree's own top-level, nơi hook không tồn tại) — phủ nhận thẳng D1's giả thuyết gốc. `installGitHooks` là fill-only, và decision `0021` tự ghi nhận (dòng "Dogfood thật") checkout này CÒN relative `.githooks` lúc 2026-07-28 (doctor xanh) — nên giá trị tuyệt đối phải được ghi đè SAU thời điểm đó, bởi thứ gì đó ngoài `installGitHooks`. Nguyên nhân cụ thể chưa xác định — ngoài phạm vi tsk-sir. D4 (hướng fix) không đổi: nó nhắm hành vi hook một khi đã chạy, độc lập với cơ chế đưa nó tới đó. |
+| D9 | Dưới cấu hình `core.hooksPath` RELATIVE mà code thật sự có ý định (`.githooks`, không phải absolute như D7 phát hiện trên checkout này), 1 commit trong linked worktree KHÔNG chạy hook CHÚT NÀO — cả 2 guard đều không fire (cùng thực nghiệm cô lập của D7). `fgos pick`'s worktree creation (`src/runner/worktree.mjs`) không hề đụng `core.hooksPath` (grep xác nhận 0 hit trên `worktree.mjs`/`claim-port.mjs`/`session.mjs`). Nghĩa là bug quan sát được của tsk-sir CHỈ xảy ra trên checkout nào bị trôi hooksPath thành absolute (như checkout này, D7) — dưới cấu hình đúng-ý-định, bug này không thể xảy ra về mặt cơ học, nhưng cũng không có lock nào bảo vệ worktree commit cả — ổn theo D2 (worktree commit vốn không cần bảo vệ đó, index riêng). D4's fix vẫn đúng và là defense-in-depth: làm hành vi hook đúng bất kể checkout đang ở shape hooksPath nào, thay vì dựa vào việc relative-path tình cờ loại trừ worktree. |
 | D8 | Phát hiện phụ, ngoài scope tsk-sir: `mainCheckoutHookWired`/`installGitHooks` (`src/setup/git-hooks.mjs:46,62`) so khớp CHUỖI CHÍNH XÁC với `.githooks` — 1 giá trị tuyệt đối-nhưng-tương-đương đọc thành "chưa wired". Xác nhận sống: `node bin/fgos.mjs doctor` trên chính checkout này, ngay trong phiên này, báo `main-checkout-hook-wired` **failed** ("core.hooksPath not wired... commits here are NOT guarded") — dù hook rõ ràng đang chặn commit (2 lần thật trong phiên này, bao gồm cả lúc commit `DISCUSSION.md`). False negative thật trên chính safety check của `fgos doctor`, tương phản trực tiếp với decision `0021`'s dogfood note ("doctor báo xanh" lúc 2026-07-28) — đáng 1 work item riêng, không sửa trong tsk-sir. |
 
 ## Pinned terms
@@ -64,6 +65,8 @@ sản phẩm nào bị bỏ sót trước khi qua `fgos-planning`.
   D1/D2 (đã verify độc lập bằng đọc code + lệnh thật).
 - `fgos list --id tsk-sir --json`: `discovery` rỗng — chưa có
   `judgeDiscovery` verdict trước đó, item này lần đầu qua `fgos-exploring`.
+- `rg -- "hooksPath" src/runner/worktree.mjs src/runner/claim-port.mjs src/runner/session.mjs` (D9) — 0 hit, `fgos pick` không đụng `core.hooksPath` khi tạo worktree.
+- `node --test test/e2e/main-checkout-lock-hook-worktree-commit.test.mjs` (viết + chạy trong phiên này) — FAIL hôm nay đúng như bug mô tả, dùng làm `verify` field của item; đã pass `judgeVerifySemanticCorrectness` sau 5 vòng do 4 lần trước không phải lệnh chạy được/không cover đúng claim.
 - Report gốc: `plans/reports/internal-design-260805-1327-tsk-sir-worktree-commit-lock-scope-report.md`.
 - `DISCUSSION.md` cùng thư mục — nguồn distill của CONTEXT.md này.
 
@@ -74,7 +77,8 @@ sản phẩm nào bị bỏ sót trước khi qua `fgos-planning`.
 - `src/runner/claim-port.mjs` (`claimWork`), `src/runner/merge.mjs` (`mergeRunnerItem`)
 - `docs/decisions/0021-wire-main-checkout-hook-qua-doctor-setup.md`
 - `docs/history/tsk-45y-worktree-fgos-lock-decouple-stale-premise/CONTEXT.md`
-- `test/e2e/main-checkout-lock-hook.test.mjs` (test shape để mirror khi viết fix's regression test)
+- `test/e2e/main-checkout-lock-hook.test.mjs` (fixture cũ, per-root hooksPath — không share lock thật giữa main/worktree, xem D9)
+- `test/e2e/main-checkout-lock-hook-worktree-commit.test.mjs` (test mới của item này — repro thật, dùng làm `verify`)
 - `docs/history/main-checkout-lock-worktree-commit-scope/DISCUSSION.md`
 
 ## Outstanding questions deferred to planning
