@@ -86,7 +86,7 @@ deep-dive's proposed fix follows the harness/symphony shape: fgOS
 consults a `impact-analysis` **capability**, never the literal string
 "GitNexus," so a second provider could register later without any of the
 three consuming skills (`fgos-planning`, `fgos-validating`,
-`fgos-executing`) needing to change:
+`fgos-code-implement`) needing to change:
 
 > fgos-planning/validating tham chiếu **capability** `impact-analysis`,
 > KHÔNG BAO GIỜ tham chiếu tên "GitNexus" trực tiếp trong logic gate —

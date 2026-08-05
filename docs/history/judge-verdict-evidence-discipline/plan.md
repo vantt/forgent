@@ -147,15 +147,15 @@ gap this plan needs to close.
 (`decompose.mjs:144-168`) and `resolveDecompose`'s `addWork` call
 (`decompose.mjs:380-395`) only carry `title`/`verify`/`kind`/`risk`/`refs`/
 `footprint`/`deps`/`parent`/`tier` onto a new child — no `description`, no
-`docsRef`. `fgos-executing`'s own Orient step only reads a `docsRef` "if
-present" (`.claude/skills/fgos-executing/SKILL.md:57-59`), and absent one,
+`docsRef`. `fgos-code-implement`'s own Orient step only reads a `docsRef` "if
+present" (`.claude/skills/fgos-code-implement/SKILL.md:57-59`), and absent one,
 treats the bare title as the whole spec. Without a fix, `tsk-5q5-1`/
 `tsk-5q5-2` would be born with only their one-line titles, orphaned from
 every risk-map row, file list, and concrete case in this plan. Mitigation:
 immediately after `fgos discover tsk-5q5` creates the children, run
 `fgos edit --id tsk-5q5-1 --docs-ref docs/history/judge-verdict-evidence-discipline/`
 and the same for `tsk-5q5-2` — both children point at the same shared
-`CONTEXT.md`/`plan.md` (one plan covers both tracks), so `fgos-executing`'s
+`CONTEXT.md`/`plan.md` (one plan covers both tracks), so `fgos-code-implement`'s
 Orient step picks up this plan's Track A/Track B detail instead of working
 from title alone. This is a real, available `edit` call (confirmed generic,
 not root-only, at `bin/fgos.mjs`'s `edit` verb) — the next session handling
@@ -166,5 +166,5 @@ executed.
 
 Both children's `verify` above is the one proof command each needs; how
 Execute actually runs and re-verifies them is the existing mechanical
-build/verify/return path (`fgos-executing`) — this plan does not re-design
+build/verify/return path (`fgos-code-implement`) — this plan does not re-design
 that.

@@ -36,7 +36,7 @@ flowchart TD
     F -->|"decompose"| G["children created<br/>(deps-linked, stage: executing directly)"]
     F -->|"need-human / risk:heavy / blast-radius"| D2["awaiting-human<br/>fgos-planning + fgos-validating<br/>(plan.md / CONTEXT.md, graph --what-if,<br/>capability-gate impact-analysis)"]
     D2 -->|"answered / plan approved"| F
-    H --> I["fgos-executing<br/>implement -> verify -> return"]
+    H --> I["fgos-code-implement<br/>implement -> verify -> return"]
     G --> I
     I -->|"verify green"| J["awaiting-approval"]
     I -->|"verify red"| K["blocked"]
@@ -58,7 +58,7 @@ flowchart TD
 | `decompose` (`judgeDecompose`, **separate verb from `discover` now**, `tsk-2b0`) | Mechanical, same zero-tool-access executor | Verdict pass-through / decompose (auto children) / need-human | `docsRef` → `CONTEXT.md`/`plan.md` (post `tsk-1wd` fix — used to run blind, now grounded); also reads `plan.md`'s recorded mode + any real blast-radius figure (`tsk-4y5` D5/D8) | pass-through → `executing`; decompose → children (`parent`-linked when `fgos-planning` created them — `--parent` is a real CLI flag now, `tsk-1xx` — or `deps`-linked when the judge auto-splits, `stage: executing` directly since D2 already forces each a real `verify`); need-human/`risk:heavy`/**blast-radius-over-threshold** → `awaiting-human`; **refined `priority`** recomputed on every non-invalid outcome (real `effort` from `plan.md`'s mode, real blast-radius when present) |
 | `fgos-planning` (session, first half of `decompose`) | Skill session, real tool access | Mode-size the item (mechanical flag count), write approach + risk map, decide split if any, **query `impact-analysis` capability** (`fgos tool query --capability impact-analysis --status present`, wired by `tsk-1e4`) | `CONTEXT.md`, `fgos graph --json`/`--what-if` | `plan.md` (mode, approach, risk map, capability posture) |
 | `fgos-validating` (session, second half of `decompose`) | Skill session, real tool access | Prove `plan.md` against real evidence, re-check `impact-analysis` posture live (never trust plan.md's stale note) | `plan.md`, live `fgos tool query` | READY / READY WITH CONSTRAINTS / NOT READY (hands back to `fgos-planning` on fail) |
-| `fgos-executing` (stage `executing`) | Skill session (or runner auto-dispatch) | Implement, run item's own `verify`, check Iron Law evidence need, **query `impact-analysis` capability** before editing a symbol | `plan.md`/`CONTEXT.md` (when present), item's `verify` | Real diff, one commit; `fgos return` |
+| `fgos-code-implement` (stage `executing`) | Skill session (or runner auto-dispatch) | Implement, run item's own `verify`, check Iron Law evidence need, **query `impact-analysis` capability** before editing a symbol | `plan.md`/`CONTEXT.md` (when present), item's `verify` | Real diff, one commit; `fgos return` |
 | `return` | Mechanical | Re-verify (never trusts caller), check clean tree + advanced commit history | Worktree diff | `awaiting-approval` (verify green) or `blocked` (verify red) |
 | `review`/`approve`/`reject` | Human/agent + main-checkout lock | Gate the diff before merge | `awaiting-approval` item | Merge (approve) opens `executing→compound-learn` edge; reject sends back, never automatic |
 | `fgos-compounding` (`compound-learn`) | Skill session | Classify capture into one Diataxis quadrant, write/grow the end-user doc | `fgos check <id>` outcome/friction capture | Tagged capture (`docType`/`docPath`), doc under `docs/<quadrant>/` |
@@ -94,7 +94,7 @@ at `decompose` (planning+validating) and `executing` — **not yet at
 2. ~~**`clarify` has no capability-gate for `impact-analysis`.**~~
    **RESOLVED (`tsk-17w`, merged 2026-07-31.)** `fgos-exploring/SKILL.md`
    now queries it too, matching `fgos-planning`/`fgos-validating`/
-   `fgos-executing`.
+   `fgos-code-implement`.
 3. **`priority` has no guard against a human's explicit `edit --priority`
    being silently overwritten by the next automated `discover`/`decompose`
    pass** (`tsk-4y5`, found in post-merge review; filed as `tsk-sq9`,
@@ -115,7 +115,7 @@ at `decompose` (planning+validating) and `executing` — **not yet at
 `.claude/skills/fgos-exploring/SKILL.md`,
 `.claude/skills/fgos-planning/SKILL.md`,
 `.claude/skills/fgos-validating/SKILL.md`,
-`.claude/skills/fgos-executing/SKILL.md`,
+`.claude/skills/fgos-code-implement/SKILL.md`,
 `.claude/skills/fgos-compounding/SKILL.md`, `docs/specs/runner.md`,
 `docs/specs/work-state.md`, `docs/backlog.md` (STR7/STR8/STR14/STR40/
 STR67/STR68/STR92/STR93, `tsk-1wd`, `tsk-1e4`).

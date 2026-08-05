@@ -45,7 +45,7 @@ function applyEvent(view, event) {
       break;
     }
     case 'work.move': {
-      const { id, from, to, ask, answer, role, learning, headAtTake, headAtReturn, branchHeadAtTake, branchHeadAtReturn, reason, parentSnapshotAtAsk, claimTrigger, statusAtAsk, writer, rationale, alternatives, source, askRationale, askAlternatives, askSource } = event.payload ?? {};
+      const { id, from, to, ask, answer, role, learning, headAtTake, headAtReturn, branchHeadAtTake, branchHeadAtReturn, reason, parentSnapshotAtAsk, claimTrigger, statusAtAsk, writer, statusCategory, parkReason, rationale, alternatives, source, askRationale, askAlternatives, askSource } = event.payload ?? {};
       const item = view.work[id];
       if (item) {
         item.status = to;
@@ -57,6 +57,40 @@ function applyEvent(view, event) {
       // writer, mirroring reason/headAtTake above (backward-compat).
       if (item && writer !== undefined) {
         item.writer = writer;
+      }
+      // statusCategory (decision record 0027, D2/D3): folds onto the item
+      // unconditionally, latest-write-wins, mirroring `writer` immediately
+      // above -- this cell only makes the field exist and get written/
+      // folded correctly (consumer migration is tsk-38t-4's own scope, so
+      // nothing reads `item.statusCategory` yet). Purely additive read of
+      // whatever store.mjs's moveWork actually stamped on THIS event --
+      // never invented or recomputed here (that would be derive-on-read,
+      // which platform-foundations.md's L3 forbids; see STATUS_CATEGORIES's
+      // own doc comment, work.mjs). Absent on every event before this cell
+      // existed AND on every move into one of the four tail-segment
+      // statuses (delivered/retrospective/cleanup/done, D1) -- on both, per
+      // RUL11 optional-additive discipline (same convention `reason` above
+      // already follows), the fold simply leaves whatever `item.
+      // statusCategory` last was; it never actively clears a stale value on
+      // a tail-segment move. That is a deliberate, conservative choice, not
+      // an oversight: nothing reads this field yet, so a momentarily-stale
+      // category sitting on a `delivered` item is inert, and clearing it
+      // would be exactly the kind of behavior-shaping guess this cell's
+      // task explicitly rules out (only the schema/write-time concern is in
+      // scope here) -- what a tail-segment item's category should read, if
+      // anything, is tsk-38t-4's decision to make.
+      if (item && statusCategory !== undefined) {
+        item.statusCategory = statusCategory;
+      }
+      // parkReason (tsk-48i D1): same fold shape as statusCategory
+      // immediately above -- purely additive read of whatever store.mjs's
+      // moveWork actually stamped on THIS event, never invented/recomputed
+      // here. Absent on every event before this cell existed and on every
+      // move into a status with no parkReason entry (D1's own guard), same
+      // conservative "leave whatever it last was" behavior statusCategory
+      // already established.
+      if (item && parkReason !== undefined) {
+        item.parkReason = parkReason;
       }
       // Claim attribution (stage-decompose S2-pull D1/cell action (4)):
       // fold the claiming `role` onto the item itself as `claimRole` —

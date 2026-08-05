@@ -69,7 +69,7 @@ fires on `commit`) — not a viable mechanism, would require shimming the
 
 Impact-analysis posture: `fgos tool query --capability impact-analysis
 --status present` returned `gitnexus` present via MCP at clarify time —
-posture is **full**. `fgos-executing` must run `impact({target:
+posture is **full**. `fgos-code-implement` must run `impact({target:
 "run", direction: "upstream"})` (or the enclosing dispatch function) on
 `bin/fgos.mjs` before editing it, per `CLAUDE.md`'s mandatory gate — this
 plan does not substitute for that live check, only flags where it applies.

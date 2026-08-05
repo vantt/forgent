@@ -52,7 +52,7 @@ window that produces a *false* AMBIGUOUS on a torn read closes.
   covered by `standard` (D5, `docs/history/gate-bypass/CONTEXT.md`).
 - `fgos tool query --capability impact-analysis --status present` — GitNexus
   registered and `present`: impact-analysis posture is **full**. `fgos-planning`/
-  `fgos-validating`/`fgos-executing` must run `impact()` on
+  `fgos-validating`/`fgos-code-implement` must run `impact()` on
   `tryAcquireOnce`/`acquireMainCheckoutLock` before editing, per `CLAUDE.md`'s
   gate.
 

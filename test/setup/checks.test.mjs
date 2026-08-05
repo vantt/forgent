@@ -295,6 +295,29 @@ test('fgos doctor --fix (CLI e2e) actually bootstraps gateBypass.level via the r
   fs.rmSync(cwd, { recursive: true, force: true });
 });
 
+// docs/history/doctor-fix-pretty-status-line/CONTEXT.md D1: a registered
+// fix's own contract (register-a-fixable-doctor-check-in-fgos.md step 2)
+// has no failing outcome -- `changed: false` means "already correct", not
+// "broken". `renderPretty`'s doctor `fixed` lines must render green
+// regardless of `changed`, never key that color off `changed` the way a
+// `checks` line keys it off `passed`.
+test('fgos doctor --fix --pretty (CLI e2e) renders a fix line green even when the fix found nothing to change', () => {
+  const cwd = mkTemp('doctor-cli-fix-pretty-noop-');
+  execFileSync('git', ['init', '-q'], { cwd, encoding: 'utf8' });
+  const first = spawnSync(process.execPath, [FGOS, 'doctor', '--fix'], { cwd, encoding: 'utf8' });
+  assert.equal(first.status, 0, `fgos doctor --fix failed: ${first.stderr}`);
+
+  const second = spawnSync(process.execPath, [FGOS, 'doctor', '--fix', '--pretty'], { cwd, encoding: 'utf8' });
+  assert.equal(second.status, 0, `fgos doctor --fix --pretty failed: ${second.stderr}`);
+  const lines = second.stdout.split('\n');
+  const fixLine = lines.find((l) => l.includes('fix: gate-bypass-configured'));
+  assert.ok(fixLine, 'expected a "fix: gate-bypass-configured" line in --pretty output');
+  assert.match(fixLine, /already "/, 'expected the second run to be the already-correct no-op case');
+  assert.ok(fixLine.includes('\x1b[32m'), `expected a green mark on an already-correct fix line, got: ${fixLine}`);
+  assert.ok(!fixLine.includes('\x1b[31m'), `expected no red mark on an already-correct fix line, got: ${fixLine}`);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
 // ─── config-awareness (docs/history/global-project-config-awareness/ ──────
 // CONTEXT.md D1): always passes (informational, read-only, same contract as
 // tool-registry-configured) -- only the message and `active` distinguish

@@ -5,11 +5,11 @@ was submitted, clarified, decomposed (pass-through), then claimed via
 `node bin/fgos.mjs pick tsk-1op` -- the exact CLI /fgOS:pick shells to
 (STR90). Per STR90, an interactive session loads fgos-routing right after
 claim, which resolves this item's skill via skillForStage(DOMAINS.coding,
-'executing') -> fgos-executing.
+'executing') -> fgos-code-implement.
 
 The same item's real fields, run through buildPrompt (the headless
 fgos-runner path, STR91), render a # Agent skill section naming the
-identical path: .claude/skills/fgos/fgos-executing/SKILL.md.
+identical path: .claude/skills/fgos/fgos-code-implement/SKILL.md.
 
 Both paths -- one interactive claim, one headless render -- resolve to the
 same file for the same real item. This is the item's own trivial

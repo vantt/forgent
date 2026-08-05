@@ -30,7 +30,7 @@ investigative work, not a one-line change.
 `fgos tool query --capability impact-analysis --status present` →
 `gitnexus` present — **full** posture; MUST rules apply at execute time.
 
-Checked now (informational, re-run for real at `fgos-executing` per
+Checked now (informational, re-run for real at `fgos-code-implement` per
 `CLAUDE.md`'s own gate — the index may drift between now and then):
 - `mergeRunnerItemLocked` upstream impact: **LOW risk**, exactly one
   caller (`mergeRunnerItem`, same file) — the classification change stays

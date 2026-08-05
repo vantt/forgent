@@ -31,10 +31,10 @@ control on an already-covered, already-shared resolver function.
 provider, `gitnexus`, `status: "present"` → **full** per `CLAUDE.md`'s
 capability gate. `impact({target: "resolveExecutorConfig", direction:
 "upstream"})` MUST run (and its risk level reported) before
-`fgos-executing` edits `resolveExecutorConfig`/`validateCapacityShape`.
+`fgos-code-implement` edits `resolveExecutorConfig`/`validateCapacityShape`.
 Note: GitNexus's own index was stale twice this session (last indexed
 `1ac5a85`, then `6a7d210`, both predating this session's `fgw/tsk-64p`
-merge) — `fgos-executing` must re-run `gitnexus analyze` before trusting
+merge) — `fgos-code-implement` must re-run `gitnexus analyze` before trusting
 impact output for the post-merge code, not just run `impact()` against a
 stale graph.
 

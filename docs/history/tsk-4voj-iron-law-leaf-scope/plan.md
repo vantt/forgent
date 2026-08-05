@@ -64,7 +64,7 @@ present) — but `list_repos` shows this repo's index is **168 commits
 behind HEAD** as of this planning pass, so any `impact()` blast-radius
 read taken right now would be unreliable evidence, not a real proof
 point. Recorded here as `impact-analysis: full-but-stale`; execution
-(`fgos-executing`) must run `gitnexus analyze` before calling `impact()`
+(`fgos-code-implement`) must run `gitnexus analyze` before calling `impact()`
 on `changedFiles`/the Iron Law block, per `AGENTS.md`'s own "Index stale?"
 guidance — this plan does not claim a blast-radius proof point it doesn't
 actually have yet.

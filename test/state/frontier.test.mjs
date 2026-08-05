@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { frontier, FRONTIER_ORDER_VERSION } from '../../src/state/frontier.mjs';
+import { frontier, FRONTIER_ORDER_VERSION, isResolvedStatus } from '../../src/state/frontier.mjs';
 
 // Pure lib — every view here is a literal or built via foldEvents in
 // replay.test.mjs's style; no fs, no mkdtemp, no `.fgos/` writes anywhere in
@@ -429,5 +429,90 @@ test('frontier(view, {step}) for a step the item\'s domain never maps excludes e
   assert.deepEqual(frontier(view, { step: 'Divide' }), []);
   // Execute (the mapped step) still works unchanged.
   assert.deepEqual(frontier(view).map((i) => i.id), ['synthetic']);
+});
+
+// --- tsk-38t-4 (decision record 0027, D1/D2/D3): isResolvedStatus ---------
+// RESOLVED_STATUSES (a flat literal Set) is replaced by isResolvedStatus(item)
+// -- a hybrid read: literal for the four tail-segment statuses (never
+// relabeled by any domain, D1), statusCategory === 'canceled' for whatever
+// wontfix-equivalent label a domain uses (D2). These tests lock both halves,
+// the legacy-data fallback (an item written before this field existed), and
+// prove zero regression for every existing coding-domain scenario.
+
+test('isResolvedStatus: undefined/missing item is never resolved (matches RESOLVED_STATUSES.has(undefined) === false)', () => {
+  assert.equal(isResolvedStatus(undefined), false);
+});
+
+for (const status of ['delivered', 'retrospective', 'cleanup', 'done']) {
+  test(`isResolvedStatus: a tail-segment status "${status}" is always resolved, literal, with or without statusCategory (D1: never relabeled)`, () => {
+    assert.equal(isResolvedStatus({ status }), true);
+    // A tail-segment item's statusCategory is stale/absent per replay.mjs's
+    // own fold rule (it is never actively cleared on a move into the tail) —
+    // the literal check must win regardless of whatever category value (or
+    // lack of one) happens to be sitting on the item.
+    assert.equal(isResolvedStatus({ status, statusCategory: 'review' }), true);
+    assert.equal(isResolvedStatus({ status, statusCategory: undefined }), true);
+  });
+}
+
+for (const status of ['todo', 'doing', 'blocked', 'awaiting-human', 'awaiting-approval']) {
+  test(`isResolvedStatus: a front-segment non-canceled status "${status}" with no statusCategory is NOT resolved (legacy-data fallback does not over-broaden)`, () => {
+    assert.equal(isResolvedStatus({ status }), false);
+  });
+}
+
+test("isResolvedStatus: literal 'wontfix' with NO statusCategory is resolved (legacy fallback -- an item written before tsk-38t-2 stamped this field, same as RESOLVED_STATUSES.has('wontfix') === true before this migration)", () => {
+  assert.equal(isResolvedStatus({ status: 'wontfix' }), true);
+});
+
+test("isResolvedStatus: literal 'wontfix' WITH statusCategory 'canceled' (the real coding-domain write path, post tsk-38t-2) is resolved", () => {
+  assert.equal(isResolvedStatus({ status: 'wontfix', statusCategory: 'canceled' }), true);
+});
+
+test("isResolvedStatus: statusCategory present but NOT 'canceled' overrides a literal 'wontfix'-shaped status that isn't actually wontfix -- category wins once it exists", () => {
+  assert.equal(isResolvedStatus({ status: 'blocked', statusCategory: 'in-progress' }), false);
+});
+
+// This is the whole point of the migration (per the item's own acceptance):
+// a SECOND domain with a DIFFERENT label for its "canceled"-equivalent
+// status must be recognized as resolved via statusCategory, NOT via a
+// literal 'wontfix' string match.
+test("isResolvedStatus: a DIFFERENT domain's canceled-equivalent label ('declined') with statusCategory 'canceled' is resolved -- category-based recognition, not a literal 'wontfix' match", () => {
+  assert.equal(isResolvedStatus({ status: 'declined', statusCategory: 'canceled' }), true);
+});
+
+test("isResolvedStatus: the same 'declined' label WITHOUT statusCategory 'canceled' is NOT resolved (proves the previous test passed because of the category, not because 'declined' is special-cased anywhere)", () => {
+  assert.equal(isResolvedStatus({ status: 'declined' }), false);
+  assert.equal(isResolvedStatus({ status: 'declined', statusCategory: 'in-progress' }), false);
+});
+
+// --- dep-resolution end-to-end with a cross-domain canceled label ---------
+
+test("frontier: a dep at a DIFFERENT domain's canceled-equivalent status + statusCategory 'canceled' unblocks its dependent, exactly like a coding 'wontfix' dep does", () => {
+  const view = {
+    work: {
+      base: { ...item('base', 'declined'), statusCategory: 'canceled' },
+      dependent: item('dependent', 'todo', ['base']),
+    },
+  };
+  assert.deepEqual(frontier(view).map((i) => i.id), ['dependent']);
+});
+
+// --- ready-filter statusCategory hybrid (frontier.mjs:92's own audit row) -
+
+test("frontier: an item at statusCategory 'todo' with a DIFFERENT literal status label is still picked up as ready (the ready filter reads category, not the literal string 'todo')", () => {
+  const view = { work: { a: { ...item('a', 'not-started'), statusCategory: 'todo' } } };
+  assert.deepEqual(frontier(view).map((i) => i.id), ['a']);
+});
+
+test("frontier: an item with literal status 'todo' but statusCategory explicitly set to something else is NOT ready (statusCategory, once present, wins over the literal status string)", () => {
+  const view = { work: { a: { ...item('a', 'todo'), statusCategory: 'in-progress' } } };
+  assert.deepEqual(frontier(view), []);
+});
+
+test('frontier: an item with literal status "todo" and NO statusCategory at all (legacy/pre-tsk-38t-2 data) is still ready -- zero regression for every pre-migration item', () => {
+  const view = { work: { a: item('a', 'todo') } };
+  assert.equal('statusCategory' in view.work.a, false);
+  assert.deepEqual(frontier(view).map((i) => i.id), ['a']);
 });
 

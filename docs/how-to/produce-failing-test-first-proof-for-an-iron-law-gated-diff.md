@@ -54,7 +54,7 @@ own committed `docs/history/tsk-62v/iron-law-evidence.md`.
 
 6. Write all of the above into `docs/history/<id>/iron-law-evidence.md`
    and commit it in the same commit as the implementation
-   (`fgos-executing`'s "one commit per item" rule) — before `fgos return`.
+   (`fgos-code-implement`'s "one commit per item" rule) — before `fgos return`.
 
 ## Why the stash-and-restore shape, not two separate branches or commits
 

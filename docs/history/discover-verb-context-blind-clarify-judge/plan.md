@@ -132,5 +132,5 @@ and `npm test <path>` does not scope the suite: the `test` script hardcodes
 running it during `fgos-validating` (ran the full 1919-test, 111.8s suite
 instead of the intended file). `node --test <path>` directly is the real
 scoped command — confirmed: 36 tests, ~1s, all passing today as the
-pre-change baseline. `fgos-executing` should use the corrected command
+pre-change baseline. `fgos-code-implement` should use the corrected command
 above.)

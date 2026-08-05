@@ -23,7 +23,7 @@ area with real regression exposure (`mergeReadiness`) — not **small**.
 ## Impact-analysis posture
 
 `impact-analysis: full` (GitNexus present, confirmed via `fgos tool query
---capability impact-analysis --status present`). `fgos-executing` must run
+--capability impact-analysis --status present`). `fgos-code-implement` must run
 `impact()` on `mergeReadiness`, `validateWorkShape`, and `editWork` before
 editing any of them (CLAUDE.md gate) and report the blast radius before
 proceeding.
@@ -53,7 +53,7 @@ reference to this precedent.
    ```
    Scoped to exactly the four touched-behavior test files (narrowest
    useful test first, per dev rules) rather than the full `npm test`
-   suite — `fgos-executing`/`return` can still broaden to the full suite
+   suite — `fgos-code-implement`/`return` can still broaden to the full suite
    if a shared contract turns out touched.
 1. **`src/state/work.mjs`** — `validateWorkShape`: add a `supersededBy`
    block (optional non-empty string, self-reference rejected — mirrors

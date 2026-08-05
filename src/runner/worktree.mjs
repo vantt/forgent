@@ -198,7 +198,7 @@ export function isCheckoutDirty(repoRoot, worktreePath) {
  * makes that ONE call site the zero-destroy incident's origin — see
  * `relocateOrphanedCheckout`.
  */
-export function reclaimOrphanedCheckout(repoRoot, branch) {
+export function reclaimOrphanedCheckout(repoRoot, branch, { callerCwd = process.cwd() } = {}) {
   let listing;
   try {
     listing = git(repoRoot, ['worktree', 'list', '--porcelain']);
@@ -219,6 +219,34 @@ export function reclaimOrphanedCheckout(repoRoot, branch) {
   if (path.resolve(orphanPath) === path.resolve(repoRoot)) {
     throw new WorktreeError(
       `refusing to reclaim checkout of "${branch}" at "${orphanPath}" — it resolves to repoRoot itself, so reclaiming it would force-remove the main checkout's own working tree. This is never a genuine crash-orphan; check how "${branch}" ended up checked out at repoRoot before retrying.`,
+      { branch, orphanPath },
+    );
+  }
+
+  // LIVE SESSION GUARD (tsk-1tm): an orphan checkout that is the CALLING
+  // session's own live worktree — or a worktree the session's cwd is
+  // currently nested inside — is never a genuine crash-orphan either,
+  // regardless of how clean its git status looks. `fgos`'s own shell
+  // wrapper (`scripts/fgos-shell-integration.sh`) never `cd`s before
+  // invoking `node bin/fgos.mjs`, and this codebase never calls
+  // `process.chdir()`, so `process.cwd()` at the moment `approve` runs is
+  // always the real, live cwd of whatever session/shell invoked it —
+  // including a session standing inside a claimed item's own worktree via
+  // the documented tsk-424 chained-`EnterWorktree` pattern (root worktree
+  // -> `EnterWorktree` into a child item's worktree). Approving a leaf and
+  // then its root from inside that chain each reclaim a DIFFERENT
+  // worktree the session is/was still standing in — this guard catches
+  // both, one call at a time, with no cross-call state needed. `callerCwd`
+  // is injectable (tests only; production always uses the real
+  // `process.cwd()`).
+  const resolvedOrphanPath = path.resolve(orphanPath);
+  const resolvedCallerCwd = path.resolve(callerCwd);
+  if (
+    resolvedOrphanPath === resolvedCallerCwd ||
+    resolvedCallerCwd.startsWith(resolvedOrphanPath + path.sep)
+  ) {
+    throw new WorktreeError(
+      `refusing to reclaim checkout of "${branch}" at "${orphanPath}" — it is the calling session's own live checkout (cwd "${callerCwd}"), so it is not a genuine crash-orphan (a real one belongs to no live session) and force-removing it would destroy the session's own working directory mid-operation. Finish or exit that session's work there before retrying.`,
       { branch, orphanPath },
     );
   }

@@ -19,7 +19,7 @@ test -f .claude/skills/fgos/fgos-terminal/SKILL.md && grep -q fgOS:terminal .cla
 `clarify-pass`, even after the field was corrected). Both paths are wrong:
 `.claude/skills/fgos/` only ever holds the core workflow skills
 (`fgos-routing`, `fgos-exploring`, `fgos-planning`, `fgos-validating`,
-`fgos-executing`, `fgos-compounding`, `fgos-submit-assist`, `fgos-unlock`,
+`fgos-code-implement`, `fgos-compounding`, `fgos-submit-assist`, `fgos-unlock`,
 `fgos-indexing`) — never a per-verb slash-command skill. The real
 `/fgOS:pick` skill lives at `plugins/fgOS/skills/pick/SKILL.md`, confirmed
 directly (`test -d .claude/skills/fgos/fgos-pick` → missing;

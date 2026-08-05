@@ -376,6 +376,22 @@ test('list --all restores the wontfix item alongside the open one', () => {
   assert.ok(work['closed-item']);
 });
 
+// tsk-48i D1: parkReason (parkReasonForStatus, workflow-stage-graphs.mjs)
+// stamped at write time, mirroring statusCategory's own precedent -- lets
+// a domain-agnostic consumer of `list --json` (e.g. herdr-plugin) tell a
+// park state apart from active work without reading coding's own literal
+// status strings.
+test('list --json exposes parkReason on a blocked item, and omits it on a doing item', () => {
+  const cwd = tmpCwd();
+  const dir = path.join(cwd, '.fgos');
+  addWork(dir, { id: 'parked-item', title: 'Parked Item', kind: 'task', status: 'blocked', deps: [], risk: 'low', refs: [], verify: 'npm test' });
+  addWork(dir, { id: 'active-item', title: 'Active Item', kind: 'task', status: 'doing', deps: [], risk: 'low', refs: [], verify: 'npm test' });
+
+  const work = envelopeData(run(cwd, ['list', '--all', '--json']).stdout).work;
+  assert.equal(work['parked-item'].parkReason, 'system-error');
+  assert.equal(work['active-item'].parkReason, undefined);
+});
+
 test('list --id returns only that item, ignoring the open-only default and --all entirely (tsk-42m D2)', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'open-item', { title: 'Open Item' });
@@ -2246,6 +2262,25 @@ test('check nags items sitting in a final status without their actual half (port
   assert.equal(result.status, 0);
   const { missingOutcomeNag } = envelopeData(result.stdout);
   assert.deepEqual(missingOutcomeNag, { count: 1, ids: ['nag-item'] });
+});
+
+// tsk-38t-4 (decision record 0027's audit §2): bin/fgos.mjs's FINAL_STATUSES
+// used to be a locally-declared Set here, separate from and inconsistent
+// with entropy.mjs's own local copy. It now imports the single shared
+// export from entropy.mjs instead — this test locks that a tail-segment
+// status (delivered, reached via the mechanical move chain, not the normal
+// doing->awaiting-approval addOutcome stamp) still nags, unchanged by the
+// refactor from a local Set to a shared import.
+test('check still nags an item sitting at "delivered" (a tail-segment status) without its actual half, after the FINAL_STATUSES local-Set-to-shared-import refactor', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'nag-item-delivered');
+  toProposed(cwd, 'nag-item-delivered');
+  run(cwd, ['move', 'nag-item-delivered', '--to', 'delivered']);
+
+  const result = run(cwd, ['check']);
+  assert.equal(result.status, 0);
+  const { missingOutcomeNag } = envelopeData(result.stdout);
+  assert.deepEqual(missingOutcomeNag, { count: 1, ids: ['nag-item-delivered'] });
 });
 
 test('check output on a log with no friction and no final-status gaps is unchanged — no friction data, no nag', () => {

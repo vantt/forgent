@@ -89,7 +89,7 @@ proof points above are carried as real regression tests, not left as guesses.
   during acquire, or by asserting the implementation never opens the target
   path before content is fully written (whichever proves the property without
   a flaky timing-dependent test — implementer's call at `fgos-validating`/
-  `fgos-executing`, this plan only requires the property be proven); (b) a
+  `fgos-code-implement`, this plan only requires the property be proven); (b) a
   test proving two racing fresh-creates still yield exactly one ACQUIRED;
   (c) a test proving the self-recognition refresh path also never exposes
   partial content.
@@ -119,7 +119,7 @@ confirms `tsk-2tm` is a size-1 component with nothing depending on it.
 
 - The exact shape of the new regression test(s) proving "no torn read" (timing
   simulation vs. structural assertion) is an implementation detail left to
-  `fgos-executing` — not material to scope/behavior/acceptance criteria,
+  `fgos-code-implement` — not material to scope/behavior/acceptance criteria,
   only to how the proof is constructed. `fgos-validating`'s reality gate
   checks this assumption is either resolved or flagged unproven before
   `executing` starts.

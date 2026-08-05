@@ -69,7 +69,7 @@ Out of scope for this item: any change to `fgos-exploring`,
   `fgos-planning`'s job, not asserted here.
 - Exact file paths/contents for `fgos-coding-shaping/SKILL.md` and the two
   command wrapper files — implementation detail, `fgos-planning`'s
-  Approach step and `fgos-executing`'s own pass, not this skill's.
+  Approach step and `fgos-code-implement`'s own pass, not this skill's.
 
 ## Canonical references
 

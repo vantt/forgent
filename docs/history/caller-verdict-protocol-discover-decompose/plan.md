@@ -79,7 +79,7 @@ hand-back to `fgos-exploring`.
 
 `impact-analysis: full` (GitNexus present, `CLAUDE.md`'s capability gate) —
 before editing `resolveDiscovery`/`resolveDecompose`/the `discover`/
-`decompose` CLI case blocks at `fgos-executing`, run real `impact()` calls
+`decompose` CLI case blocks at `fgos-code-implement`, run real `impact()` calls
 on those symbols and report blast radius, per `CLAUDE.md`'s MUST rule; this
 plan does not fabricate a blast-radius number here since none of the risk
 items above depend on one (no `blastRadiusGate` threshold concern — this

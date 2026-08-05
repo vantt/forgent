@@ -29,6 +29,24 @@ never moves it.
   cwd may already be a linked worktree, which never carries its own
   `.fgos/` by design (ADR0020) — the verb refuses (exit 4) rather than
   silently diverge if `--dir` is omitted there (tsk-56t D1).
+- Do your own scout/reasoning steps directly — Bash/Grep/`rg`/Read/
+  WebSearch calls you make yourself — never delegate them to the Agent/
+  Task tool as an ad hoc sub-dispatch. This session is already a live,
+  same-provider soul (Native-First Dispatch Doctrine rule 2,
+  `docs/decisions/0026-vision-orchestrator-roottask-capacity-native-vs-
+  cli-spawn.md`): spawning a nested Task subagent for work you can already
+  do yourself is the same "soul re-deriving what a live soul already
+  knows" waste `tsk-1ni` found in `judgeDiscovery`'s blind cli-spawn, just
+  manifesting as an in-session Task call instead of a subprocess one. It
+  also defeats this skill's own transparency point
+  (`docs/explanation/why-discover-was-rewritten-as-a-clean-enrich-self-
+  research-recipe.md`'s Route B): a backgrounded Task/Agent call streams
+  no live tool trace back to the person watching this session, unlike a
+  direct Bash/Grep/WebSearch call. If a step genuinely needs a different
+  backend (cheaper model, cross-provider such as Codex/agy, resource
+  isolation) for a narrow helper task, route it explicitly through the
+  capacity-dispatch mechanism instead of an ad hoc Task call — see
+  `../_shared/capacity-dispatch-fallback.md`.
 - Do not research implementation, propose architecture, or write code. If a
   candidate question only matters to whoever builds the thing, it belongs to
   `fgos-planning`, not here.
@@ -52,7 +70,7 @@ never moves it.
   back to `todo` once the item reaches `executing` (claim-lock §3b); an
   uncommitted `CONTEXT.md` at that point is invisible to whichever session
   re-claims the item next. Same one-artifact-per-stop discipline
-  `fgos-executing`'s "one commit per item" rule already gives Execute.
+  `fgos-code-implement`'s "one commit per item" rule already gives Execute.
 
 ## Flow
 
@@ -77,7 +95,7 @@ never moves it.
    ```
 
    Also query `CLAUDE.md`'s impact-analysis capability gate — the same
-   check `fgos-planning`/`fgos-validating`/`fgos-executing` already run
+   check `fgos-planning`/`fgos-validating`/`fgos-code-implement` already run
    (`fgos tool query --capability impact-analysis --status present`) —
    rather than assuming GitNexus is on this machine — `judgeDiscovery`'s own
    `capacities.judge-discovery` config (`.fgos/config.json`, tsk-4rd upgrade)
