@@ -78,30 +78,39 @@ of this item's own `verify`:
   pattern fragments, no execution): rejected — "never runs the test suite
   or confirms the fixed verify logic works correctly."
 
-Round 3, locked, both structurally confirms the fix shape AND actually
-executes the real command:
+Round 3 (grep-presence structural check + `bash -c "$v"` execution, no
+independent RED reproduction): rejected — "doesn't inspect output to
+confirm checkmark lines are actually being extracted and matched from
+individual test results. A verify command that echoes the expected
+pattern before falling back to aggregate pass-counting would still pass
+all checks."
+
+Round 4, locked: executes `tsk-4sz`'s real stored `verify` for real
+(GREEN case), then independently reproduces the vacuous-pass trap itself
+— reruns `test/e2e/*.test.mjs` with the two locked test names renamed in
+the `--test-name-pattern` argument (so the pattern matches zero real
+tests, the exact trap shape), and asserts the SAME checkmark-anchored grep
+used by the doc's recommended fix shape finds no match in that renamed
+run's output — proving per-test-checkmark discrimination genuinely works
+for these two tests, not merely that `v`'s source text contains the right
+substrings:
 
 ```
-root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname); v=$(node bin/fgos.mjs list --id tsk-4sz --json --dir "$root" | node -e "let s='';process.stdin.on('data',d=>s+=d);process.stdin.on('end',()=>{console.log(JSON.parse(s).data.work['tsk-4sz'].verify)})"); echo "$v" | grep -qE '^\. \.\*domain-aware decompose child addWork' && echo "$v" | grep -qE '^\. \.\*domain-aware discovered-from addWork' && (cd "$root" && bash -c "$v") && grep -q "## Multi-file-glob variant" "$root/docs/how-to/avoid-vacuous-pass-with-node-test-test-name-pattern.md"
+root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname); v=$(node bin/fgos.mjs list --id tsk-4sz --json --dir "$root" | node -e "let s='';process.stdin.on('data',d=>s+=d);process.stdin.on('end',()=>{console.log(JSON.parse(s).data.work['tsk-4sz'].verify)})"); cd "$root" && bash -c "$v" && redout=$(node --test --test-name-pattern="domain-aware (RENAMED-decompose child addWork|RENAMED-discovered-from addWork) inherits parent domain" test/e2e/*.test.mjs 2>&1) && ! (echo "$redout" | grep -qE "^. .*domain-aware decompose child addWork inherits parent domain\+stage" || echo "$redout" | grep -qE "^. .*domain-aware discovered-from addWork inherits parent domain\+stage") && grep -q "## Multi-file-glob variant" "$root/docs/how-to/avoid-vacuous-pass-with-node-test-test-name-pattern.md"
 ```
-
-(The two `grep -qE` patterns above are written with `\^\.` in the actual
-shell string — a literal `^. ` substring inside `tsk-4sz`'s own verify
-field, escaped for the outer grep — the fenced block here shows it
-unescaped once for readability.)
 
 Dry-run proof against the real repo, before either real edit lands:
 
 - **RED (both edits absent, current state)**: exit 1.
 - **Dry-run GREEN (temporarily patched `tsk-4sz.verify` to the D3 fixed
-  text via `fgos edit`, doc section still absent)**: the structural +
-  execute portion passed; only the doc-section grep still failed (expected
-  — the doc section genuinely does not exist yet). `tsk-4sz.verify` was
-  reverted to its original text immediately after this check, before any
-  other write.
+  text via `fgos edit`)**: real-run of `v` exits 0; the independent
+  renamed-pattern reproduction correctly found no checkmark match
+  (`RED-PROBE-GOOD`). `tsk-4sz.verify` was reverted to its original text
+  immediately after this check, both times it was dry-run patched
+  (rounds 3 and 4), before any other write.
 - Once both real edits land (fixed `tsk-4sz.verify` + the doc section),
-  all four checks pass — the doc-section grep is a trivial substring match
-  once the section is written, not separately dry-run tested.
+  the final doc-section grep also passes — a trivial substring match once
+  the section is written, not separately dry-run tested.
 
 ## Outstanding questions deferred to planning
 
