@@ -709,7 +709,11 @@ function submitWork(dir, text, opts = {}) {
     // hardcoded deps: [].
     deps: opts.deps ?? [],
     risk,
-    refs: [],
+    // Per tsk-5fs D1: refs now threads from opts the same way deps does,
+    // immediately above (opts.refs defaults to [] via parseListFlag's own
+    // undefined-input shape, so an omitted --refs flag stays byte-identical
+    // to the prior hardcoded refs: []).
+    refs: opts.refs ?? [],
     verify: SUBMIT_VERIFY_SENTINEL,
     tier,
     mode: opts.async ? 'async' : 'sync',
@@ -726,6 +730,14 @@ function submitWork(dir, text, opts = {}) {
     acceptance: opts.acceptance,
     // --docs-ref threaded from opts the same way, immediately above.
     docsRef: opts.docsRef,
+    // Per tsk-5fs D1: same field-parity flags `add`'s own work object
+    // already carries — present-or-absent shape (never default-to-[]),
+    // matching `add`'s own footprint/goalTier/targets precedent exactly.
+    parent: opts.parent,
+    footprint: opts.footprint,
+    goalTier: opts.goalTier,
+    targets: opts.targets,
+    urgent: opts.urgent,
     // Per D8: every item entering through the public door starts at its
     // domain's Clarify-mapped stage — context-discovery must pass before
     // it can be worked. Generalized from the hardcoded 'clarify' (D8) to
@@ -951,6 +963,16 @@ async function runVerb(verb, flags, positional, dir) {
         // this at all, so an item created through the public door could
         // never gain a docsRef except via a later `edit --docs-ref`.
         docsRef: optionalField(flags['docs-ref'], 'submit --docs-ref requires a non-empty path; omit --docs-ref entirely to leave unset.'),
+        // Per tsk-5fs D1: submit gains the same field-parity flags `add`
+        // already exposes (bin/fgos.mjs's `add` case) — same shapes, same
+        // validation delegated to work.mjs's validateWorkShape, no rule
+        // duplicated here.
+        refs: parseListFlag(flags.refs),
+        parent: optionalField(flags.parent, 'submit --parent requires a non-empty id; omit --parent entirely to leave unset.'),
+        footprint: flags.footprint === undefined ? undefined : parseListFlag(flags.footprint),
+        goalTier: optionalField(flags['goal-tier'], "submit --goal-tier requires a value ('mvp' or 'milestone'); omit --goal-tier entirely to leave unset."),
+        targets: flags.targets === undefined ? undefined : parseListFlag(flags.targets),
+        urgent: optionalField(flags.urgent, "submit --urgent requires a value ('low'/'medium'/'high'/'critical'); omit --urgent entirely to leave unset."),
       };
       return submitWork(dir, text, opts);
     }
@@ -1184,6 +1206,17 @@ async function runVerb(verb, flags, positional, dir) {
       // cannot join the simple same-name loop above.
       if (flags['docs-ref'] !== undefined) {
         patch.docsRef = optionalField(flags['docs-ref'], 'edit --docs-ref requires a non-empty path.');
+      }
+      // --goal-tier (tsk-5fs D2): goalTier was excluded from EDITABLE_FIELDS
+      // entirely -- an item created without it (e.g. via `submit`, which had
+      // no --goal-tier flag either) could never become a goal later. Same
+      // kebab-case/camelCase mismatch as --docs-ref above, so it needs its
+      // own one-off block rather than joining the simple same-name loop.
+      // work.mjs's validateWorkShape is the single source for the
+      // GOAL_TIERS domain check -- editWork's own validateWork call already
+      // re-validates the merged candidate, so no new guard is needed here.
+      if (flags['goal-tier'] !== undefined) {
+        patch.goalTier = optionalField(flags['goal-tier'], "edit --goal-tier requires a value ('mvp' or 'milestone').");
       }
       // --merge-after (tsk-2u0, docs/history/tsk-3bn-merge-conductor-harness-v2/
       // D4/D5): same latest-wins comma-separated shape as --refs/--deps
