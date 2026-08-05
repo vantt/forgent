@@ -339,4 +339,58 @@ mod tests {
         );
         assert!(rows.iter().all(|r| r.id != "tsk-blocked"));
     }
+
+    /// tsk-4ot D3 (docs/history/herdr-plugin-doing-status-literal-match/
+    /// CONTEXT.md): pins `parse_doing`'s literal-status membership so a
+    /// future edit that naively swaps to `statusCategory`-based filtering
+    /// fails here first. `blocked`/`awaiting-human` deliberately share the
+    /// coding domain's `"in-progress"` `statusCategory` with `doing`
+    /// (`DOMAINS.coding.statusLabels`, `src/state/workflow-stage-graphs.mjs`)
+    /// — a category-only filter would wrongly include them.
+    const STATUS_MEMBERSHIP_FIXTURE: &str = r#"{
+        "contract": "fgos.v1",
+        "generated_at": "2026-07-29T15:41:13.319Z",
+        "data_hash": "abc",
+        "data": {
+            "work": {
+                "tsk-doing": {
+                    "title": "Actively worked",
+                    "status": "doing",
+                    "stage": "executing"
+                },
+                "tsk-awaiting-approval": {
+                    "title": "Ready for review",
+                    "status": "awaiting-approval",
+                    "stage": "executing"
+                },
+                "tsk-blocked": {
+                    "title": "Parked, not actively worked",
+                    "status": "blocked",
+                    "stage": "executing"
+                },
+                "tsk-awaiting-human": {
+                    "title": "Parked on a question",
+                    "status": "awaiting-human",
+                    "stage": "clarify"
+                },
+                "tsk-todo": {
+                    "title": "Not started",
+                    "status": "todo",
+                    "stage": "clarify"
+                }
+            }
+        }
+    }"#;
+
+    #[test]
+    fn parse_doing_pins_literal_status_membership() {
+        let rows = parse_doing(STATUS_MEMBERSHIP_FIXTURE).expect("fixture should parse");
+        let ids: Vec<&str> = rows.iter().map(|r| r.id.as_str()).collect();
+        assert_eq!(ids.len(), 2, "only doing/awaiting-approval belong in the in-process pane");
+        assert!(ids.contains(&"tsk-doing"));
+        assert!(ids.contains(&"tsk-awaiting-approval"));
+        assert!(!ids.contains(&"tsk-blocked"));
+        assert!(!ids.contains(&"tsk-awaiting-human"));
+        assert!(!ids.contains(&"tsk-todo"));
+    }
 }
