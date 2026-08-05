@@ -1,5 +1,7 @@
 # Batch checklist — footprint/parallel-decomposition + fgos-planning restructure
 
+**Trạng thái: 4/4 xong** (tất cả `doing`→`decompose`/`executing`, sẵn sàng `fgos-code-implement` khi tới lượt claim thật).
+
 Không phải `deps` thật (5 item độc lập, không block nhau — gắn deps giả
 sẽ đảo quyết định đã chốt trong `DISCUSSION.md`). Không dùng `parent`
 (anti-pattern đã bị hệ thống tự flag, `tsk-4jj`). Đây chỉ là checklist +
@@ -11,7 +13,7 @@ theo dõi tay không để miss.
 - [x] **tsk-66o** (todo/executing, neo bởi 2 con mở) — `fgos-planning`+`fgos-validating` xong, READY, decompose thành `tsk-3c7` (computed-parallel-wave-schedule) + `tsk-2ig` (worktree-dispatch-attestation). Xong bước của root — 2 con sẽ tự đi qua clarify/decompose/executing riêng khi tới lượt.
 - [x] **tsk-1gr** (todo/executing) — `fgos-exploring`+`fgos-planning`+`fgos-validating` xong (D1 advisory-only, D2 luật thuần cơ học). Pass-through, không chia con. Sẵn sàng `fgos-code-implement` khi tới lượt.
 - [x] **tsk-3uz** (todo/executing) — `fgos-exploring`+`fgos-planning`+`fgos-validating` xong (D1 thuần skill-prose, D2 optional hệ thống/bắt buộc-trong-thực-hành). Pass-through. Sẵn sàng `fgos-code-implement`.
-- [ ] **tsk-5ay** (priority 3000, todo/decompose) — so sánh quy trình fgOS vs /ck:plan+/ck:cook + re-distill bee thật; nhà cho 2 quyết định đã bàn (mode-gate → `fgos-routing`; kỷ luật truy-nguồn vào Gate của `fgos-planning`) — chưa claim, chưa log decision.
+- [x] **tsk-5ay** (todo/executing) — thu hẹp thành 2 fix cụ thể (CONTEXT.md D1/D2), `fgos-exploring`+`fgos-planning`+`fgos-validating` xong. Pass-through, 2 phase nội bộ. Sẵn sàng `fgos-code-implement`. Phần audit gốc (so sánh toàn bộ 4 skill vs /ck:plan+/ck:cook) deferred, không thuộc scope 2 fix này.
 
 Con mới sinh ra từ `tsk-66o` (parent: tsk-66o, chưa nằm trong 4 task gốc nhưng giờ là việc thật cần theo dõi):
 - [ ] **tsk-3c7** — computed-parallel-wave-schedule (clarify/decompose, tuỳ pool). Verify: `node --test test/state/graph-metrics.test.mjs`.
