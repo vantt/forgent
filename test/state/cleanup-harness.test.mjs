@@ -159,8 +159,13 @@ test('checkCleanupTTLElapsed: uses the LATEST cleanup entry if an item somehow r
 });
 
 // --- assessCleanupReadiness (combined) -----------------------------------
+//
+// tsk-4jf: TTL (D7, a park precondition) and the two D8 gate checks are
+// kept in separate arrays (`notReadyYet` vs `failed`) rather than one flat
+// `reasons` list — covering all 4 combinations of {TTL elapsed/not} x
+// {D8 checks pass/fail}.
 
-test('assessCleanupReadiness: ready:true with empty reasons when all checks pass', () => {
+test('assessCleanupReadiness: TTL elapsed + D8 checks pass -> ready:true, both arrays empty', () => {
   const repoRoot = initRepo();
   const sha = commitFile(repoRoot, 'ok.txt');
   const now = Date.now();
@@ -171,17 +176,51 @@ test('assessCleanupReadiness: ready:true with empty reasons when all checks pass
   };
   const result = assessCleanupReadiness({ view, rawEvents, id: 'good-item', repoRoot, worktreeBacked: true, ttlDays: 7, now });
   assert.equal(result.ready, true);
-  assert.deepEqual(result.reasons, []);
+  assert.deepEqual(result.notReadyYet, []);
+  assert.deepEqual(result.failed, []);
 });
 
-test('assessCleanupReadiness: ready:false lists EVERY failing check, not just the first', () => {
+test('assessCleanupReadiness: TTL elapsed + D8 checks fail -> ready:false, failure lands in `failed`, not `notReadyYet`', () => {
+  const repoRoot = initRepo();
+  const sha = commitFile(repoRoot, 'ok.txt');
+  const now = Date.now();
+  const rawEvents = [{ type: 'work.move', payload: { id: 'no-content-item', to: 'cleanup' }, ts: new Date(now - 8 * 86400000).toISOString() }];
+  const view = {
+    work: { 'no-content-item': { branchHeadAtReturn: sha } },
+    outcomes: {}, // no retrospective content -> content check fails
+  };
+  const result = assessCleanupReadiness({ view, rawEvents, id: 'no-content-item', repoRoot, worktreeBacked: true, ttlDays: 7, now });
+  assert.equal(result.ready, false);
+  assert.deepEqual(result.notReadyYet, []);
+  assert.equal(result.failed.length, 1);
+  assert.match(result.failed[0], /no outcome or decision record/);
+});
+
+test('assessCleanupReadiness: TTL not elapsed + D8 checks pass -> ready:false, but ONLY notReadyYet is non-empty', () => {
+  const repoRoot = initRepo();
+  const sha = commitFile(repoRoot, 'ok.txt');
+  const now = Date.now();
+  const rawEvents = [{ type: 'work.move', payload: { id: 'fresh-item', to: 'cleanup' }, ts: new Date(now - 2 * 86400000).toISOString() }];
+  const view = {
+    work: { 'fresh-item': { branchHeadAtReturn: sha } },
+    outcomes: { 'fresh-item': { actual: { outcome: 'pass' } } },
+  };
+  const result = assessCleanupReadiness({ view, rawEvents, id: 'fresh-item', repoRoot, worktreeBacked: true, ttlDays: 7, now });
+  assert.equal(result.ready, false);
+  assert.equal(result.notReadyYet.length, 1);
+  assert.match(result.notReadyYet[0], /not ready yet/);
+  assert.deepEqual(result.failed, [], 'TTL-not-elapsed alone must never land in `failed`');
+});
+
+test('assessCleanupReadiness: TTL not elapsed + D8 checks fail -> ready:false, BOTH arrays non-empty', () => {
   const repoRoot = initRepo();
   const now = Date.now();
-  const rawEvents = []; // never entered cleanup -> TTL check fails
+  const rawEvents = []; // never entered cleanup -> TTL check fails (notReadyYet)
   const view = { work: { 'bad-item': {} }, outcomes: {} }; // no content -> content check fails
   const result = assessCleanupReadiness({ view, rawEvents, id: 'bad-item', repoRoot, worktreeBacked: true, ttlDays: 7, now });
   assert.equal(result.ready, false);
-  assert.equal(result.reasons.length, 2, 'both the TTL and content failures must be listed');
+  assert.equal(result.notReadyYet.length, 1, 'TTL failure must be listed in notReadyYet');
+  assert.equal(result.failed.length, 1, 'content failure must be listed in failed');
 });
 
 test('assessCleanupReadiness: skips the merge-resolves check entirely when worktreeBacked is false (synthetic domain, D5)', () => {

@@ -112,27 +112,34 @@ export function checkCleanupTTLElapsed(rawEvents, id, { ttlDays, now = Date.now(
 }
 
 /**
- * Combine all three checks into one verdict. `worktreeBacked` (per-domain,
- * D5) gates whether checkMergeStillResolves runs at all — a domain with no
- * real git worktree/merge concept (synthetic) is not held to a check that
- * assumes one. Returns `{ ready, reasons }` — `reasons` is empty exactly
- * when `ready` is true, and otherwise lists every failing check's detail
- * (never just the first), so a `cleanup -> blocked` park carries a
- * complete `reason`.
+ * Combine all three checks into one verdict, keeping the TTL park
+ * precondition (D7) distinct from the two real D8 gate checks — TTL not
+ * elapsed is never itself a `cleanup -> blocked` reason (tsk-4jf,
+ * restore-to-decision: D7 and D8 are joined by AND, not folded into one
+ * flat check). `worktreeBacked` (per-domain, D5) gates whether
+ * checkMergeStillResolves runs at all — a domain with no real git
+ * worktree/merge concept (synthetic) is not held to a check that assumes
+ * one. Returns `{ ready, notReadyYet, failed }`: `ready` is true exactly
+ * when both arrays are empty; `notReadyYet` holds the TTL-not-elapsed
+ * detail (a park precondition, caller stays a no-op on this alone);
+ * `failed` holds every D8 gate-check failure detail (never just the
+ * first), so a `cleanup -> blocked` park still carries a complete
+ * `reason` when `failed` is non-empty.
  */
 export function assessCleanupReadiness({ view, rawEvents, id, repoRoot, worktreeBacked, ttlDays, now }) {
-  const reasons = [];
+  const notReadyYet = [];
+  const failed = [];
 
   const ttl = checkCleanupTTLElapsed(rawEvents, id, { ttlDays, now });
-  if (!ttl.ok) reasons.push(ttl.detail);
+  if (!ttl.ok) notReadyYet.push(ttl.detail);
 
   const content = checkRetrospectiveContent(view, id);
-  if (!content.ok) reasons.push(content.detail);
+  if (!content.ok) failed.push(content.detail);
 
   if (worktreeBacked) {
     const merge = checkMergeStillResolves(repoRoot, view?.work?.[id]);
-    if (!merge.ok) reasons.push(merge.detail);
+    if (!merge.ok) failed.push(merge.detail);
   }
 
-  return { ready: reasons.length === 0, reasons };
+  return { ready: notReadyYet.length === 0 && failed.length === 0, notReadyYet, failed };
 }
