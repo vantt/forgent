@@ -165,3 +165,57 @@ test('resolveDiscovery threads the prior dispute\'s ask text into the next round
   const round2Prompt = fs.readFileSync(capturePath, 'utf8');
   assert.match(round2Prompt, /round-1 disagreement: too generic/);
 });
+
+// tsk-12t D1/D2/D4/D6: judgeVerifySemanticCorrectness's own mechanical
+// pre-check for the documented node --test / --test-name-pattern
+// reporter-format trap (docs/how-to/avoid-vacuous-pass-with-node-test-
+// test-name-pattern.md) -- Node's default reporter never prints a
+// TAP-style `# pass`/`# fail` line, so a verify grepping for that shape
+// can never correctly detect pass/fail regardless of what the tested code
+// does. A known-bad verify string built the same way the how-to doc's own
+// "First attempt" real example was: `node --test --test-name-pattern=...`
+// combined with a `grep -qE "^# pass ..."` check.
+const KNOWN_BAD_VERIFY =
+  'node --test --test-name-pattern="verify-from" file.test.mjs 2>&1 | grep -qE "^# pass [1-9]"';
+
+test('rejects known-bad node --test reporter pattern before calling the LLM', () => {
+  // No real executor is ever configured -- D4's short-circuit means
+  // judgeVerifySemanticCorrectness must return before touching `cfg` at
+  // all, so an intentionally-unusable cfg (`command: '/nonexistent'`)
+  // still proves the mechanical rejection rather than accidentally
+  // exercising a real spawn attempt.
+  const cfg = { executor: { command: '/nonexistent-binary', args: [] }, models: { standard: 'sonnet' }, timeoutMs: 5000 };
+
+  const result = judgeVerifySemanticCorrectness({ title: 'x', tier: 'standard' }, KNOWN_BAD_VERIFY, cfg);
+
+  assert.equal(result.agrees, false);
+  assert.equal(result.mechanical, true);
+  assert.match(result.reason, /node --test/);
+  assert.match(result.reason, /avoid-vacuous-pass-with-node-test-test-name-pattern\.md/);
+});
+
+test('does not call the LLM judge when the mechanical pattern trips', () => {
+  const dir = mkTempDir();
+  const { scriptPath, capturePath } = writeCapturingExecutor(dir, { agrees: true });
+  const cfg = cfgFor(scriptPath);
+
+  const result = judgeVerifySemanticCorrectness({ title: 'x', tier: 'standard' }, KNOWN_BAD_VERIFY, cfg);
+
+  assert.equal(result.agrees, false);
+  assert.ok(!fs.existsSync(capturePath), 'the configured executor was spawned -- the mechanical check did not short-circuit before the LLM call');
+});
+
+test('does not allow --force to bypass a mechanical pattern rejection', () => {
+  const dir = mkTempDir();
+  const { scriptPath } = writeCapturingExecutor(dir, { agrees: true });
+  const cfg = cfgFor(scriptPath);
+
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork());
+
+  const result = resolveDiscovery(storeDir, 'item-x', cfg, undefined, { clear: true, verify: KNOWN_BAD_VERIFY, force: true });
+
+  assert.equal(result.outcome, 'verify-disputed');
+  assert.equal(result.secondPass.mechanical, true);
+  assert.equal(listWork(storeDir).work['item-x'].status, 'awaiting-human');
+});

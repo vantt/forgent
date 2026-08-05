@@ -658,7 +658,15 @@ export function resolveDiscovery(dir, id, cfg, role, callerVerdict) {
         // reason it overrode, per the "never silently overridden" stance
         // docs/explanation/judge-verdict-second-pass-semantic-check.md
         // already states for this exact two-judge-disagreement path.
-        if (callerVerdict?.force === true) {
+        //
+        // tsk-12t D6: EXCEPT when `secondPass.mechanical` is true -- that
+        // disagreement is a syntactic fact (the known-bad node --test
+        // reporter-format trap, judge-executor.mjs's own
+        // matchesKnownBadVerifyPattern), not a judgement call `--force`
+        // exists to override. Falls through to the park branch below
+        // unconditionally in that case, same as `force` had never been
+        // passed.
+        if (callerVerdict?.force === true && secondPass.mechanical !== true) {
           // tsk-nfa D1: --force overrides the verify dispute only, never a
           // park state. An item already `awaiting-human` here means a PRIOR
           // discover call parked it (this dispute, or an unclear verdict) --
