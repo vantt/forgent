@@ -33,8 +33,18 @@ Both are read-only. Nothing here writes state.
 
 For any claimed item at stage `decompose`, decide its lane HERE, before
 routing it to `fgos-planning` below (tsk-5ay D1: triage-before-load, moved
-from inside `fgos-planning` itself — a `tiny` item used to pay the cost of
-loading that skill's full flow just to learn it was `tiny`). Count how
+from inside `fgos-planning` itself). This is knowing-before-load, not
+skip-load — read the table below plainly: every `decompose`-shaping item
+still gets routed to `fgos-planning` regardless of lane, so this alone
+does not save that skill's own load cost (tsk-da1, found by independent
+review — tsk-5ay's own original rationale overstated this; recorded
+honestly here rather than silently fixed). What it DOES buy: the lane is
+known before `fgos-planning` is even opened, so a stranger picking this
+item up cold — or this session itself, mid-Orient — already knows how
+much ceremony to expect, instead of learning it only after reading
+through that skill's own flow. A genuine skip-load optimization (e.g.
+routing a `tiny`/`small` item straight to a lighter path) would need an
+actual routing-table change, which this decision does not make. Count how
 many of these actually apply to the item: auth, authorization, data
 model, audit/security, external systems, public contracts, cross-platform,
 existing covered behavior, weak proof around the area, multi-domain.

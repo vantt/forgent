@@ -79,7 +79,7 @@ pass to keep the item moving.
 - This session IS that later session, right here (tsk-27y D1/D2, Native-First
   Dispatch Doctrine Phase 2 — `docs/decisions/0026-...md`): once the Gate
   below approves, fire `fgos decompose` yourself, passing the split decision
-  `plan.md`'s own step 5 already locked as an explicit `--verdict` — never
+  `plan.md`'s own step 4 already locked as an explicit `--verdict` — never
   leave the transition to a LATER blind `fgos decompose` call (which would
   spawn `judgeDecompose`'s subprocess judge to re-derive a split decision
   this session, and `fgos-planning` before it, already made with real
@@ -112,7 +112,7 @@ pass to keep the item moving.
      in for one)?
    - **Impact-analysis posture** — where the plan leans on blast-radius
      evidence, does its recorded `impact-analysis: inactive|degraded|full`
-     posture (`fgos-planning`'s step 3) match what `CLAUDE.md`'s
+     posture (`fgos-planning`'s step 2) match what `CLAUDE.md`'s
      impact-analysis capability gate actually reports right now
      (`fgos tool query --capability impact-analysis --status present`)? A
      stale or missing posture is a FAIL here, not a skip — never assume
@@ -172,14 +172,14 @@ design a new one (per this skill's own "leave execution alone" rule).
 
 Immediately after that gate-approve record, fire the `decompose`→`executing`
 engine call itself (tsk-27y D1/D2, per the Hard rule above), reading the
-split decision straight from `plan.md`'s own step 5 (never re-derived here —
+split decision straight from `plan.md`'s own step 4 (never re-derived here —
 `fgos-planning`'s job, already done and already cited):
 
 ```bash
 root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
-# plan.md's step 5 said "one honest piece" -- no split:
+# plan.md's step 4 said "one honest piece" -- no split:
 node "$root/bin/fgos.mjs" decompose "<item-id>" --verdict pass-through --reason "<why plan.md called this one piece>" --dir "$root"
-# plan.md's step 5 listed real child pieces instead -- each with the title
+# plan.md's step 4 listed real child pieces instead -- each with the title
 # and verify command plan.md already recorded, formatted as the same JSON
 # shape judgeDecompose itself produces ({title, verify, kind?, risk?, refs?,
 # footprint?, deps?}):
