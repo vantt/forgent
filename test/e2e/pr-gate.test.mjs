@@ -215,11 +215,12 @@ test('e2e pr-gate (a) runner item full loop: add -> runner dispatch -> awaiting-
   // retrospective-cleanup D1/D2/D10) to reach done's one remaining door in.
   // tsk-1p9: branch/worktree teardown now lives ONLY in the real `cleanup`
   // verb (D2), so this must actually call it (gated by TTL=0 here) instead
-  // of a bare `move --to done` — the claim-time `predicted` outcome record
-  // (claim-port.mjs/loop.mjs, auto-written for every dispatched item)
-  // already satisfies D8's retrospective-content check.
+  // of a bare `move --to done`. tsk-558: D8's retrospective-content check
+  // no longer accepts the claim-time `predicted` field alone — a decision
+  // record (the D3 alternate pass) satisfies it here instead.
   assert.equal(fgos(repoRoot, ['move', 'pr-a-item', '--to', 'retrospective']).status, 0);
   assert.equal(fgos(repoRoot, ['move', 'pr-a-item', '--to', 'cleanup']).status, 0);
+  assert.equal(fgos(repoRoot, ['decision', '--id', 'pr-a-item', '--text', 'retrospective done', '--rationale', 'test fixture']).status, 0);
   fs.mkdirSync(path.join(repoRoot, '.fgos'), { recursive: true });
   fs.writeFileSync(path.join(repoRoot, '.fgos', 'config.json'), JSON.stringify({ cleanup: { ttlDays: 0 } }));
   const cleanupResult = fgos(repoRoot, ['cleanup', 'pr-a-item']);
@@ -458,9 +459,11 @@ test('e2e pr-gate (e) branch-source item full loop: park (blocked + live branch)
   assert.equal(stateView(repoRoot).work['pr-e-item'].status, 'delivered');
 
   // tsk-1p9: real `cleanup` verb, not a bare `move --to done` — teardown
-  // now lives only there (D2), gated by TTL=0 here.
+  // now lives only there (D2), gated by TTL=0 here. tsk-558: a decision
+  // record satisfies D8's content check (the D3 alternate pass).
   assert.equal(fgos(repoRoot, ['move', 'pr-e-item', '--to', 'retrospective']).status, 0);
   assert.equal(fgos(repoRoot, ['move', 'pr-e-item', '--to', 'cleanup']).status, 0);
+  assert.equal(fgos(repoRoot, ['decision', '--id', 'pr-e-item', '--text', 'retrospective done', '--rationale', 'test fixture']).status, 0);
   fs.mkdirSync(path.join(repoRoot, '.fgos'), { recursive: true });
   fs.writeFileSync(path.join(repoRoot, '.fgos', 'config.json'), JSON.stringify({ cleanup: { ttlDays: 0 } }));
   const cleanupEResult = fgos(repoRoot, ['cleanup', 'pr-e-item']);

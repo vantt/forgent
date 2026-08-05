@@ -8477,7 +8477,7 @@ test('cleanup parks cleanup -> blocked, with every failing reason joined, when t
   const data = envelopeData(result.stdout);
   assert.equal(data.to, 'blocked');
   assert.match(data.reason, /not ready yet/);
-  assert.match(data.reason, /no outcome or decision record/);
+  assert.match(data.reason, /no outcome docType\/docPath or decision record/);
 
   assert.equal(stateView(cwd).work['cleanup-not-ready'].status, 'blocked');
 });
@@ -8489,7 +8489,9 @@ test('cleanup is a no-op — writes zero work.move events and stays at cleanup �
   run(cwd, ['move', 'cleanup-ttl-only', '--to', 'delivered']);
   run(cwd, ['move', 'cleanup-ttl-only', '--to', 'retrospective']);
   const dir = path.join(cwd, '.fgos');
-  addOutcome(dir, { id: 'cleanup-ttl-only', docType: 'how-to', actual: { outcome: 'pass', passed: true, attempts: 1, errorClass: null, aheadCount: 0, visits: 1 } });
+  fs.mkdirSync(path.join(cwd, 'docs', 'how-to'), { recursive: true });
+  fs.writeFileSync(path.join(cwd, 'docs', 'how-to', 'cleanup-ttl-only.md'), '# doc\n');
+  addOutcome(dir, { id: 'cleanup-ttl-only', docType: 'how-to', docPath: 'docs/how-to/cleanup-ttl-only.md' });
   run(cwd, ['move', 'cleanup-ttl-only', '--to', 'cleanup']);
   // Default TTL (7d, no config written) — freshly entered, not elapsed.
   // No branchHeadAtReturn recorded -> checkMergeStillResolves passes
@@ -8525,7 +8527,9 @@ test('cleanup closes to done when TTL is configured to 0 and retrospective conte
 
   run(cwd, ['move', 'cleanup-ready-item', '--to', 'retrospective']);
   const dir = path.join(cwd, '.fgos');
-  addOutcome(dir, { id: 'cleanup-ready-item', docType: 'how-to', actual: { outcome: 'pass', passed: true, attempts: 1, errorClass: null, aheadCount: 0, visits: 1 } });
+  fs.mkdirSync(path.join(cwd, 'docs', 'how-to'), { recursive: true });
+  fs.writeFileSync(path.join(cwd, 'docs', 'how-to', 'cleanup-ready-item.md'), '# doc\n');
+  addOutcome(dir, { id: 'cleanup-ready-item', docType: 'how-to', docPath: 'docs/how-to/cleanup-ready-item.md' });
   run(cwd, ['move', 'cleanup-ready-item', '--to', 'cleanup']);
 
   const result = run(cwd, ['cleanup', 'cleanup-ready-item']);
@@ -8564,7 +8568,9 @@ test('cleanup of a LEAF item deletes its own branch even though the ROOT branch 
 
   run(cwd, ['move', 'leaf-cleanup-child', '--to', 'retrospective']);
   const dir = path.join(cwd, '.fgos');
-  addOutcome(dir, { id: 'leaf-cleanup-child', docType: 'how-to', actual: { outcome: 'pass', passed: true, attempts: 1, errorClass: null, aheadCount: 0, visits: 1 } });
+  fs.mkdirSync(path.join(cwd, 'docs', 'how-to'), { recursive: true });
+  fs.writeFileSync(path.join(cwd, 'docs', 'how-to', 'leaf-cleanup-child.md'), '# doc\n');
+  addOutcome(dir, { id: 'leaf-cleanup-child', docType: 'how-to', docPath: 'docs/how-to/leaf-cleanup-child.md' });
   run(cwd, ['move', 'leaf-cleanup-child', '--to', 'cleanup']);
 
   const result = run(cwd, ['cleanup', 'leaf-cleanup-child']);
@@ -8594,7 +8600,9 @@ test('cleanup parks cleanup -> blocked when the recorded commit no longer resolv
     verify: 'true',
     headAtReturn: '0'.repeat(40), // a well-formed but nonexistent sha
   });
-  addOutcome(dir, { id: 'cleanup-bad-merge', actual: { outcome: 'pass', passed: true, attempts: 1, errorClass: null, aheadCount: 0, visits: 1 } });
+  fs.mkdirSync(path.join(cwd, 'docs', 'how-to'), { recursive: true });
+  fs.writeFileSync(path.join(cwd, 'docs', 'how-to', 'cleanup-bad-merge.md'), '# doc\n');
+  addOutcome(dir, { id: 'cleanup-bad-merge', docType: 'how-to', docPath: 'docs/how-to/cleanup-bad-merge.md' });
 
   const result = run(cwd, ['cleanup', 'cleanup-bad-merge']);
   assert.equal(result.status, 0, result.stderr);

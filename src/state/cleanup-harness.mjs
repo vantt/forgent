@@ -36,6 +36,8 @@
 //       against).
 
 import { execFileSync } from 'node:child_process';
+import fs from 'node:fs';
+import path from 'node:path';
 import { resolveRoot } from '../runner/root-affinity.mjs';
 
 function git(repoRoot, args) {
@@ -87,19 +89,36 @@ export function checkMergeStillResolves(repoRoot, work, { view, id } = {}) {
   }
 }
 
-/** Did retrospective actually produce real content for `id` — an outcome
- * record (predicted or actual) or at least one decision — rather than just
- * a status flip with nothing behind it? */
-export function checkRetrospectiveContent(view, id) {
+/**
+ * Did retrospective actually produce real content for `id` — a real
+ * end-user document (D8: `outcome.docType` + `outcome.docPath`, the file
+ * itself confirmed present on disk under `repoRoot`) or at least one
+ * decision record — rather than just a status flip, or a claim-lifecycle
+ * artifact (`outcome.actual`/`outcome.predicted`, written at claim/return
+ * time, unrelated to whether retrospective itself ever ran) (tsk-558,
+ * restore-to-decision: D8 names `docType` specifically, and a recorded
+ * `docPath` alone is not accepted as evidence — a prior incident
+ * (retro-loop doc orphaning) proved a path can be recorded while the file
+ * never lands in the working tree).
+ */
+export function checkRetrospectiveContent(view, id, repoRoot) {
   const outcome = view?.outcomes?.[id];
-  const hasOutcome = Boolean(outcome?.actual || outcome?.predicted);
   const hasDecision = (view?.decisionsById?.[id]?.length ?? 0) > 0;
-  if (hasOutcome || hasDecision) {
-    return { ok: true, detail: 'retrospective content found (an outcome or decision record exists)' };
+  if (hasDecision) {
+    return { ok: true, detail: 'retrospective content found (a decision record exists)' };
+  }
+  if (outcome?.docType && outcome?.docPath) {
+    if (fs.existsSync(path.join(repoRoot, outcome.docPath))) {
+      return { ok: true, detail: `retrospective content found (docType "${outcome.docType}" at ${outcome.docPath}, file confirmed present)` };
+    }
+    return {
+      ok: false,
+      detail: `outcome records docType "${outcome.docType}" at ${outcome.docPath}, but the file does not exist on disk — retrospective's own document is missing`,
+    };
   }
   return {
     ok: false,
-    detail: 'no outcome or decision record found for this item — retrospective may not have actually run',
+    detail: 'no outcome docType/docPath or decision record found for this item — retrospective may not have actually run',
   };
 }
 
@@ -148,7 +167,7 @@ export function assessCleanupReadiness({ view, rawEvents, id, repoRoot, worktree
   const ttl = checkCleanupTTLElapsed(rawEvents, id, { ttlDays, now });
   if (!ttl.ok) notReadyYet.push(ttl.detail);
 
-  const content = checkRetrospectiveContent(view, id);
+  const content = checkRetrospectiveContent(view, id, repoRoot);
   if (!content.ok) failed.push(content.detail);
 
   if (worktreeBacked) {
