@@ -143,6 +143,50 @@ check, same discipline as rounds 3-4):
 - Full combined command against the current, unmodified (RED) repo state
   (neither edit landed): **exit 1**.
 
+Round 5 (execution-only, no structural check) was itself disputed —
+contradicting round 4's own ask: "Sed substitution is fragile... Better
+approach: grep verify command itself... to directly confirm
+checkmark-line extraction implementation, not infer it from
+RENAMED-pattern behavior." This is the documented `judgeVerifySemanticCorrectness`
+instability (`docs/history/tsk-5cf-judge-verify-second-pass-instability/
+CONTEXT.md`: "round 6 rejected a direct keyword grep... round 8 explicitly
+demanded that same direct-grep approach back" on a separate item,
+reproduced here a second time on this item's own rounds 3-5).
+
+Round 6, locked: keeps every check from round 5 (verbatim `v` passes,
+pattern-renamed `vred` fails, doc section present) and adds back the kind
+of structural check round 3 first tried — `v`'s own source text must
+contain a checkmark-anchored grep for both locked test descriptions AND
+must NOT contain the old aggregate `"$pass" -ge` marker — combining every
+requirement raised across rounds 3-5 rather than picking one lens over
+another:
+
+```
+root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname); v=$(node bin/fgos.mjs list --id tsk-4sz --json --dir "$root" | node -e "let s='';process.stdin.on('data',d=>s+=d);process.stdin.on('end',()=>{console.log(JSON.parse(s).data.work['tsk-4sz'].verify)})"); cd "$root" && echo "$v" | grep -qF '. .*domain-aware decompose child addWork inherits parent domain' && echo "$v" | grep -qF '. .*domain-aware discovered-from addWork inherits parent domain' && ! echo "$v" | grep -qF '"$pass" -ge' && bash -c "$v" && vred=$(printf '%s' "$v" | sed 's/--test-name-pattern="domain-aware (decompose child addWork|discovered-from addWork) inherits parent domain"/--test-name-pattern="domain-aware (RENAMED-decompose child addWork|RENAMED-discovered-from addWork) inherits parent domain"/') && [ "$vred" != "$v" ] && ! bash -c "$vred" && grep -q "## Multi-file-glob variant" "$root/docs/how-to/avoid-vacuous-pass-with-node-test-test-name-pattern.md"
+```
+
+Dry-run proof (same discipline: `tsk-4sz.verify` temporarily patched to
+the D3 fixed text, checked, reverted immediately after):
+
+- Structural checks (`grep -qF` presence of both checkmark-anchored
+  description substrings, absence of the old `"$pass" -ge` marker):
+  **all pass**.
+- `bash -c "$v"` (verbatim): **exit 0**.
+- `vred` (pattern-renamed): **exit 1** (correctly fails).
+- Doc-section grep (doc not yet written at dry-run time): correctly
+  **fails** — matches expectation, not a defect.
+- Full combined command against the current, unmodified (RED) repo state:
+  **exit 1**.
+
+If a further round disputes this with criteria that again contradicts an
+earlier round's own stated ask, that is itself further evidence for
+`tsk-5cf` (a second reproduction on the same item, past the "3-4 rounds
+normal" precedent) — not a sign this item's own fix or verify design is
+wrong. Decision, confirmed with the person mid-session: try at most one
+more round beyond this; if still disputed, stop and hand the disagreement
+back rather than iterate indefinitely (no CLI override exists yet per
+`tsk-5cf`).
+
 ## Outstanding questions deferred to planning
 
 None — scope, fix text, and doc placement are fully locked above; the
