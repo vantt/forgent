@@ -14,11 +14,19 @@ lập. `refs` của cả `tsk-66o` (→ `#design`) và `tsk-1gr` (→
 ghi chú cross-reference vào `tsk-49o` (mức 3 hoãn của D3, không tự đủ
 nếu sau này chọn — vẫn cần phần base/identity-check của D3 đi kèm).
 
-CONTEXT.md của tsk-66o **CHƯA viết** (bước 3 của `fgos-exploring` chưa
-chạy) — bước kế tiếp, đúng terminal-handoff của `fgos-coding-shaping`, là
-quay lại `fgos-exploring` cho tsk-66o (giờ hầu như không còn câu hỏi mới
-vì `refs` đã resolve hết material/grounded/answerable), rồi
-`fgos-planning`.
+**`fgos-exploring` đã xong.** `CONTEXT.md` viết (D1-D6), gate approved
+(human), title/description sửa khớp scope thật. Gặp friction thật ở bước
+cuối (`fgos discover`'s semantic-verify judge, `judgeVerifySemanticCorrectness`)
+— 8 vòng bị dispute vì item còn ở stage `decompose` sắp tới, chưa có code,
+mà judge cứ đòi verify vừa cụ thể-tới-mức-đặt-tên-hàm vừa PASS ngay hôm
+nay (catch-22 thật cho mọi root behavior_change chưa xây — friction đã
+ghi qua `fgos decision --id tsk-66o`, seq 6564; `tsk-3w3` dính đúng gap
+này, kẹt sẵn ở `clarify`, không phải riêng tsk-66o). Qua bằng `--force`
+(cơ chế chính thức, luôn log công khai, không âm thầm) với verify cụ thể
+nhất đã đề xuất — 3 file + 3 tên hàm mới (`computeSchedule`/`detectCycles`,
+`baseCommit` capture, `footprintDiffHits`) khớp D2/D3 đã khoá hướng, cộng
+chạy 3 test file thật liên quan. `tsk-66o` giờ ở `doing`/stage `decompose`
+— sẵn sàng cho `fgos-planning`.
 
 **Round 2 (lịch sử, không còn ảnh hưởng D nào):** main checkout dùng
 chung có phiên khác (cùng user) mid-merge (`2bc193d`) rồi commit tiếp
