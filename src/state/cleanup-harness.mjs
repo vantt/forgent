@@ -36,6 +36,9 @@
 //       against).
 
 import { execFileSync } from 'node:child_process';
+import fs from 'node:fs';
+import path from 'node:path';
+import { resolveRoot } from '../runner/root-affinity.mjs';
 
 function git(repoRoot, args) {
   return execFileSync('git', args, {
@@ -48,43 +51,74 @@ function git(repoRoot, args) {
 
 /**
  * Does the commit this item's merge/return landed still resolve as an
- * ancestor of `repoRoot`'s current HEAD? Prefers `branchHeadAtReturn`
+ * ancestor of the correct target ref? Prefers `branchHeadAtReturn`
  * (branch-source items), then `headAtReturn` (pull-door items), falling
  * back to the `*AtTake` pair only if return-time tracking is absent
  * (an item that was never returned through the normal path). No recorded
  * commit at all is treated as "nothing to verify" (ok: true) rather than a
  * failure — an item this module has no git provenance for was never
  * claiming a git-verifiable merge in the first place.
+ *
+ * ROOT-AWARE REF (tsk-1p9): a LEAF item's branch is merged into its ROOT's
+ * branch (`fgw/<rootId>`), never directly into `main` — the root may still
+ * be sitting unmerged for days after the leaf itself is `delivered`.
+ * Checking a leaf's commit against literal `HEAD` (always `main` from
+ * `repoRoot`, the main checkout) would falsely report a healthy, genuinely
+ * merged leaf as "no longer reachable" — indistinguishable from an actual
+ * force-push loss. When `view`/`id` are supplied and `resolveRoot(view,
+ * id)` differs from `id` (a leaf), the target ref becomes `fgw/<rootId>`
+ * instead — a named ref, no checkout required. A root/standalone item
+ * (`view`/`id` omitted, or `resolveRoot` returns `id` itself) keeps
+ * checking against `HEAD`, unchanged.
  */
-export function checkMergeStillResolves(repoRoot, work) {
+export function checkMergeStillResolves(repoRoot, work, { view, id } = {}) {
   const sha = work?.branchHeadAtReturn ?? work?.headAtReturn ?? work?.branchHeadAtTake ?? work?.headAtTake;
   if (!sha) {
     return { ok: true, detail: 'no recorded commit to verify — nothing to check' };
   }
+  const rootId = view && id ? resolveRoot(view, id) : id;
+  const targetRef = rootId && rootId !== id ? `fgw/${rootId}` : 'HEAD';
   try {
-    git(repoRoot, ['merge-base', '--is-ancestor', sha, 'HEAD']);
-    return { ok: true, detail: `commit ${sha} is still an ancestor of HEAD` };
+    git(repoRoot, ['merge-base', '--is-ancestor', sha, targetRef]);
+    return { ok: true, detail: `commit ${sha} is still an ancestor of ${targetRef}` };
   } catch {
     return {
       ok: false,
-      detail: `commit ${sha} is no longer reachable from HEAD — the merge may have been force-pushed away or history rewritten`,
+      detail: `commit ${sha} is no longer reachable from ${targetRef} — the merge may have been force-pushed away or history rewritten`,
     };
   }
 }
 
-/** Did retrospective actually produce real content for `id` — an outcome
- * record (predicted or actual) or at least one decision — rather than just
- * a status flip with nothing behind it? */
-export function checkRetrospectiveContent(view, id) {
+/**
+ * Did retrospective actually produce real content for `id` — a real
+ * end-user document (D8: `outcome.docType` + `outcome.docPath`, the file
+ * itself confirmed present on disk under `repoRoot`) or at least one
+ * decision record — rather than just a status flip, or a claim-lifecycle
+ * artifact (`outcome.actual`/`outcome.predicted`, written at claim/return
+ * time, unrelated to whether retrospective itself ever ran) (tsk-558,
+ * restore-to-decision: D8 names `docType` specifically, and a recorded
+ * `docPath` alone is not accepted as evidence — a prior incident
+ * (retro-loop doc orphaning) proved a path can be recorded while the file
+ * never lands in the working tree).
+ */
+export function checkRetrospectiveContent(view, id, repoRoot) {
   const outcome = view?.outcomes?.[id];
-  const hasOutcome = Boolean(outcome?.actual || outcome?.predicted);
   const hasDecision = (view?.decisionsById?.[id]?.length ?? 0) > 0;
-  if (hasOutcome || hasDecision) {
-    return { ok: true, detail: 'retrospective content found (an outcome or decision record exists)' };
+  if (hasDecision) {
+    return { ok: true, detail: 'retrospective content found (a decision record exists)' };
+  }
+  if (outcome?.docType && outcome?.docPath) {
+    if (fs.existsSync(path.join(repoRoot, outcome.docPath))) {
+      return { ok: true, detail: `retrospective content found (docType "${outcome.docType}" at ${outcome.docPath}, file confirmed present)` };
+    }
+    return {
+      ok: false,
+      detail: `outcome records docType "${outcome.docType}" at ${outcome.docPath}, but the file does not exist on disk — retrospective's own document is missing`,
+    };
   }
   return {
     ok: false,
-    detail: 'no outcome or decision record found for this item — retrospective may not have actually run',
+    detail: 'no outcome docType/docPath or decision record found for this item — retrospective may not have actually run',
   };
 }
 
@@ -112,27 +146,34 @@ export function checkCleanupTTLElapsed(rawEvents, id, { ttlDays, now = Date.now(
 }
 
 /**
- * Combine all three checks into one verdict. `worktreeBacked` (per-domain,
- * D5) gates whether checkMergeStillResolves runs at all — a domain with no
- * real git worktree/merge concept (synthetic) is not held to a check that
- * assumes one. Returns `{ ready, reasons }` — `reasons` is empty exactly
- * when `ready` is true, and otherwise lists every failing check's detail
- * (never just the first), so a `cleanup -> blocked` park carries a
- * complete `reason`.
+ * Combine all three checks into one verdict, keeping the TTL park
+ * precondition (D7) distinct from the two real D8 gate checks — TTL not
+ * elapsed is never itself a `cleanup -> blocked` reason (tsk-4jf,
+ * restore-to-decision: D7 and D8 are joined by AND, not folded into one
+ * flat check). `worktreeBacked` (per-domain, D5) gates whether
+ * checkMergeStillResolves runs at all — a domain with no real git
+ * worktree/merge concept (synthetic) is not held to a check that assumes
+ * one. Returns `{ ready, notReadyYet, failed }`: `ready` is true exactly
+ * when both arrays are empty; `notReadyYet` holds the TTL-not-elapsed
+ * detail (a park precondition, caller stays a no-op on this alone);
+ * `failed` holds every D8 gate-check failure detail (never just the
+ * first), so a `cleanup -> blocked` park still carries a complete
+ * `reason` when `failed` is non-empty.
  */
 export function assessCleanupReadiness({ view, rawEvents, id, repoRoot, worktreeBacked, ttlDays, now }) {
-  const reasons = [];
+  const notReadyYet = [];
+  const failed = [];
 
   const ttl = checkCleanupTTLElapsed(rawEvents, id, { ttlDays, now });
-  if (!ttl.ok) reasons.push(ttl.detail);
+  if (!ttl.ok) notReadyYet.push(ttl.detail);
 
-  const content = checkRetrospectiveContent(view, id);
-  if (!content.ok) reasons.push(content.detail);
+  const content = checkRetrospectiveContent(view, id, repoRoot);
+  if (!content.ok) failed.push(content.detail);
 
   if (worktreeBacked) {
-    const merge = checkMergeStillResolves(repoRoot, view?.work?.[id]);
-    if (!merge.ok) reasons.push(merge.detail);
+    const merge = checkMergeStillResolves(repoRoot, view?.work?.[id], { view, id });
+    if (!merge.ok) failed.push(merge.detail);
   }
 
-  return { ready: reasons.length === 0, reasons };
+  return { ready: notReadyYet.length === 0 && failed.length === 0, notReadyYet, failed };
 }

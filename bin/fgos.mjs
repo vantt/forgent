@@ -1042,17 +1042,23 @@ async function runVerb(verb, flags, positional, dir) {
       return { swept, count: swept.length };
     }
 
-    // work-item-status-delivered-retrospective-cleanup D8: the dedicated
-    // harness gating `cleanup -> done`, never folded into return/compound.
-    // Checks (cleanup-harness.mjs's assessCleanupReadiness): (1) the
-    // global TTL (D7) has elapsed since the item actually entered
-    // `cleanup`; (2) retrospective produced real content; (3) — only for a
-    // worktree-backed domain (D5) — the merge still resolves on main. All
-    // ready: performs the actual branch/worktree cleanup (cleanupMergedBranch,
-    // idempotent if a synchronous cleanup already ran elsewhere) and closes
-    // to `done`. Any check failing: parks `cleanup -> blocked` with every
-    // failing reason joined into one `reason` string (fsm.mjs requires
-    // this edge to carry one, mirroring `awaiting-approval -> blocked`).
+    // work-item-status-delivered-retrospective-cleanup D8, tsk-4jf
+    // restore-to-decision: the dedicated harness gating `cleanup -> done`,
+    // never folded into return/compound. Checks (cleanup-harness.mjs's
+    // assessCleanupReadiness): the global TTL (D7) is a park PRECONDITION,
+    // never itself a `blocked` reason — only the two real D8 gate checks
+    // (retrospective produced real content; for a worktree-backed domain
+    // (D5), the merge still resolves on main) can park `cleanup ->
+    // blocked`. `failed` non-empty: parks `cleanup -> blocked` with every
+    // failing D8 reason joined into one `reason` string (fsm.mjs requires
+    // this edge to carry one, mirroring `awaiting-approval -> blocked`) —
+    // TTL's own detail is included too when it's ALSO not-elapsed, so a
+    // reader still sees the full picture. `failed` empty but
+    // `notReadyYet` non-empty: a no-op — TTL alone is never a park
+    // reason, so the item stays at `cleanup` with no `moveWork` call, no
+    // new event. All ready: performs the actual branch/worktree cleanup
+    // (cleanupMergedBranch, idempotent if a synchronous cleanup already
+    // ran elsewhere) and closes to `done`.
     case 'cleanup': {
       const id = requireField(positional[0] ?? flags.id, 'cleanup requires an id: fgos cleanup <id>');
       const view = listWork(dir);
@@ -1079,10 +1085,14 @@ async function runVerb(verb, flags, positional, dir) {
         ttlDays,
       });
 
-      if (!assessment.ready) {
-        const reason = assessment.reasons.join('; ');
+      if (assessment.failed.length > 0) {
+        const reason = [...assessment.notReadyYet, ...assessment.failed].join('; ');
         const { event } = moveWork(dir, { id, to: 'blocked', expectedStatus: 'cleanup', reason, role: 'system' });
         return { id, to: 'blocked', reason, seq: event.seq };
+      }
+
+      if (assessment.notReadyYet.length > 0) {
+        return { id, to: 'cleanup', noop: true, reasons: assessment.notReadyYet };
       }
 
       let cleanupWarnings = [];
@@ -2615,21 +2625,20 @@ async function runVerb(verb, flags, positional, dir) {
               return { id, mode: 'merge', to: 'blocked', reason: 'verify-fail-post-merge', target: rootBranch, exitStatus: result.check.status, output: result.check.output };
             }
 
-            // Merged: land the leaf's work on its root's branch, THEN
-            // delete the leaf's own branch — in that exact order.
-            // cleanupMergedBranch must run from the ephemeral worktree
-            // (checked out on rootBranch, where the leaf is actually
-            // merged) — `git branch -d` only succeeds against the checkout
-            // the branch is merged INTO; running it from repoRoot/main
-            // would have git silently refuse the delete (swallowed as a
-            // warning), leaking the leaf's branch forever.
+            // Merged: land the leaf's work on its root's branch. The
+            // leaf's own branch (and any stray worktree checkout of it) is
+            // NO LONGER torn down here (tsk-1p9, restore-to-decision, D1):
+            // teardown is deferred to the `cleanup` verb, gated by D7's TTL
+            // and D8's harness (which now resolves the correct root-aware
+            // git context for a leaf branch, tsk-1p9 D7/D8 — the exact
+            // constraint that used to force this call to run from the
+            // ephemeral worktree right here no longer applies, since the
+            // deferred call resolves its own correct ref).
             // tsk-480: the merge above is already real and permanent —
-            // cleanup must run either way, so it is no longer gated on the
-            // status write succeeding (previously: an unguarded moveWork
-            // throw here would skip cleanup too, leaking the leaf branch
-            // on top of the unrecorded status).
+            // status recording is best-effort from here regardless of
+            // outcome (previously: also gated cleanup on this write
+            // succeeding; cleanup no longer happens on this path at all).
             const moveResult = moveDeliveredOrRecordFault(dir, id, 'leaf-into-root merge');
-            const cleanup = cleanupMergedBranch(ephemeral.path, result.branch);
             if (!moveResult.event) {
               return {
                 id,
@@ -2639,7 +2648,6 @@ async function runVerb(verb, flags, positional, dir) {
                 target: rootBranch,
                 branch: result.branch,
                 output: result.check.output,
-                cleanupWarnings: cleanup.warnings,
                 error: moveResult.error.message,
                 diagnosticLog: moveResult.diagnosticLog,
               };
@@ -2652,7 +2660,6 @@ async function runVerb(verb, flags, positional, dir) {
               branch: result.branch,
               seq: moveResult.event.seq,
               output: result.check.output,
-              cleanupWarnings: cleanup.warnings,
             };
           });
         }
@@ -2737,10 +2744,11 @@ async function runVerb(verb, flags, positional, dir) {
           return { id, mode: 'merge', to: 'blocked', reason, target: 'main', exitStatus: result.check.status, output: result.check.output };
         }
 
-        // tsk-480: same cleanup-runs-either-way fix as the leaf-merge path
-        // above — the merge into main is already real and permanent.
+        // tsk-480: cleanup used to run either way relative to this write
+        // (already real and permanent) — now moot on this path, since
+        // cleanup no longer happens here at all (tsk-1p9 D1: deferred to
+        // the `cleanup` verb, gated by D7's TTL and D8's harness).
         const moveResult = moveDeliveredOrRecordFault(dir, id, 'root-into-main merge');
-        const cleanup = cleanupMergedBranch(repoRoot, result.branch);
         if (!moveResult.event) {
           return {
             id,
@@ -2750,7 +2758,6 @@ async function runVerb(verb, flags, positional, dir) {
             target: 'main',
             branch: result.branch,
             output: result.check.output,
-            cleanupWarnings: cleanup.warnings,
             error: moveResult.error.message,
             diagnosticLog: moveResult.diagnosticLog,
           };
@@ -2763,7 +2770,6 @@ async function runVerb(verb, flags, positional, dir) {
           branch: result.branch,
           seq: moveResult.event.seq,
           output: result.check.output,
-          cleanupWarnings: cleanup.warnings,
         };
       }
 

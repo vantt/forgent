@@ -1,13 +1,14 @@
 // cleanup-pool.mjs (tsk-dvc) — picks the next single item for a
 // cleanup-loop iteration to run `fgos cleanup` on. PURE: no fs, no
 // `.fgos/` read, same discipline as discover-pool.mjs/frontier.mjs/
-// impact.mjs. Exists specifically so cleanup-loop never calls `fgos
-// cleanup <id>` on an item whose TTL hasn't elapsed yet — `assess
-// CleanupReadiness` (cleanup-harness.mjs) treats "TTL not elapsed" as a
-// failing check exactly like any other, and `bin/fgos.mjs`'s `case
-// 'cleanup'` parks ANY failing check straight to `cleanup -> blocked`
-// (docs/history/fgos-cleanup-loop/CONTEXT.md D1, "Why a naive loop
-// doesn't work").
+// impact.mjs. This TTL pre-filter is a SCHEDULING OPTIMIZATION, not a
+// correctness guard (tsk-4jf, restore-to-decision): `bin/fgos.mjs`'s
+// `case 'cleanup'` is itself now a safe no-op when TTL alone hasn't
+// elapsed (`assessCleanupReadiness`'s `notReadyYet` never parks
+// `blocked` on its own), so calling `fgos cleanup <id>` on a
+// TTL-not-elapsed item is harmless either way — this filter exists only
+// to skip a verb call already known in advance to be a no-op, saving the
+// wasted round trip, not to prevent a bad outcome.
 import { checkCleanupTTLElapsed } from './cleanup-harness.mjs';
 
 function isCandidate(item) {
@@ -15,11 +16,10 @@ function isCandidate(item) {
 }
 
 // The specific latest `retrospective -> cleanup` transition event for
-// `id` — the exact same event `checkCleanupTTLElapsed` reads
-// (cleanup-harness.mjs is out of scope to edit per CONTEXT.md's own
-// feature boundary, so this mirrors its filter rather than importing a
-// timestamp it doesn't export). Returns `undefined` when the item never
-// actually entered `cleanup`.
+// `id` — the exact same event `checkCleanupTTLElapsed` reads. Mirrors
+// that function's own filter rather than importing a timestamp it
+// doesn't export. Returns `undefined` when the item never actually
+// entered `cleanup`.
 function latestCleanupEntry(rawEvents, id) {
   const entries = (rawEvents ?? []).filter(
     (e) => e.type === 'work.move' && e.payload?.id === id && e.payload?.to === 'cleanup',

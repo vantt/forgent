@@ -917,13 +917,25 @@ async function mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs }) {
 }
 
 /**
- * Best-effort cleanup after a successful merge (per D5, additive to
- * worktree.mjs's own lifecycle): the worktree checkout for a runner item is
+ * Best-effort cleanup, called from the `cleanup` verb once D7's TTL has
+ * elapsed AND D8's harness (assessCleanupReadiness, including the
+ * root-aware `checkMergeStillResolves`, tsk-1p9) has already passed — not
+ * at merge time (tsk-1p9, restore-to-decision: `approve`'s own merge paths
+ * no longer call this). The worktree checkout for a runner item is
  * normally already torn down by the runner at propose-time (loop.mjs's
  * finally), so this only reclaims a stray leftover checkout if one somehow
  * still exists, then deletes the now-fully-merged branch. Never throws — a
  * cleanup failure must never mask the merge/done result that already
  * happened; failures are returned as warnings for the caller to surface.
+ *
+ * FORCE DELETE (tsk-1p9 D8): `git branch -D`, not `-d`. By the time this
+ * runs, D8's harness has ALREADY independently verified the branch's
+ * commit resolves against the correct target (the root's branch for a
+ * leaf, `HEAD` for a root/standalone item) — `-d`'s own local safety net
+ * would check merge-into-CURRENT-HEAD instead, which is actively wrong for
+ * a leaf branch (merged into its still-unmerged root branch, never into
+ * `main` directly): `-d` would refuse and silently leak the branch behind
+ * a harmless-looking warning, the exact bug this item exists to close.
  */
 export function cleanupMergedBranch(repoRoot, branch) {
   const warnings = [];
@@ -933,7 +945,7 @@ export function cleanupMergedBranch(repoRoot, branch) {
     warnings.push(`worktree cleanup failed for "${branch}": ${err.message}`);
   }
   try {
-    git(repoRoot, ['branch', '-d', branch]);
+    git(repoRoot, ['branch', '-D', branch]);
   } catch (err) {
     warnings.push(`branch delete failed for "${branch}" (left in place, harmless): ${err.message}`);
   }

@@ -75,35 +75,80 @@ test('checkMergeStillResolves: ok (nothing to check) when no commit field is rec
   assert.match(result.detail, /nothing to check/);
 });
 
+// tsk-1p9 (D7): root-aware ref resolution — a leaf's branch is merged into
+// its ROOT's branch, never directly into `main`/HEAD, so checking against
+// literal HEAD (the old, pre-tsk-1p9 behavior) falsely reports a healthy
+// merge as unreachable. This is the exact bug tsk-1p9 exists to close.
+test('checkMergeStillResolves: a leaf merged into its (still-unmerged-to-main) root branch resolves ok:true against the root ref', () => {
+  const repoRoot = initRepo();
+  execFileSync('git', ['checkout', '-qb', 'fgw/leaf-root'], { cwd: repoRoot });
+  commitFile(repoRoot, 'root.txt');
+  execFileSync('git', ['checkout', '-qb', 'fgw/leaf-child'], { cwd: repoRoot });
+  const leafSha = commitFile(repoRoot, 'leaf.txt');
+  execFileSync('git', ['checkout', '-q', 'fgw/leaf-root'], { cwd: repoRoot });
+  execFileSync('git', ['merge', '--no-ff', '-q', '-m', 'merge leaf', 'fgw/leaf-child'], { cwd: repoRoot });
+  execFileSync('git', ['checkout', '-q', 'main'], { cwd: repoRoot });
+
+  const view = { work: { 'leaf-child': { parent: 'leaf-root' }, 'leaf-root': {} } };
+
+  const rootAware = checkMergeStillResolves(repoRoot, { branchHeadAtReturn: leafSha }, { view, id: 'leaf-child' });
+  assert.equal(rootAware.ok, true, 'checking against the root ref must find the leaf genuinely merged');
+  assert.match(rootAware.detail, /fgw\/leaf-root/);
+
+  // Proves the regression this item closes: checking against literal HEAD
+  // (main, never touched by the leaf's own merge) falsely fails.
+  const headOnly = checkMergeStillResolves(repoRoot, { branchHeadAtReturn: leafSha });
+  assert.equal(headOnly.ok, false, 'checking against HEAD alone must NOT see the leaf as merged — main never received it');
+});
+
 // --- checkRetrospectiveContent -----------------------------------------
+// tsk-558: reads outcome.docType/docPath (D8's own named fields) instead
+// of outcome.actual/predicted (claim-lifecycle artifacts, unrelated to
+// whether retrospective itself ran), and confirms the docPath file
+// actually exists on disk before passing.
 
 test('checkRetrospectiveContent: not ok when no outcome or decision record exists for the item', () => {
-  const result = checkRetrospectiveContent({}, 'no-content-item');
+  const repoRoot = initRepo();
+  const result = checkRetrospectiveContent({}, 'no-content-item', repoRoot);
   assert.equal(result.ok, false);
-  assert.match(result.detail, /no outcome or decision record/);
+  assert.match(result.detail, /no outcome docType\/docPath or decision record/);
 });
 
-test('checkRetrospectiveContent: ok when an outcome record (actual) exists', () => {
-  const view = { outcomes: { 'has-outcome': { actual: { outcome: 'pass' } } } };
-  const result = checkRetrospectiveContent(view, 'has-outcome');
-  assert.equal(result.ok, true);
+test('checkRetrospectiveContent: NOT ok when the item has a claim-lifecycle predicted/actual outcome but no real doc (tsk-558 false-pass regression)', () => {
+  const repoRoot = initRepo();
+  const view = { outcomes: { 'predicted-no-doc': { predicted: { tier: 'standard' } }, }, };
+  const result = checkRetrospectiveContent(view, 'predicted-no-doc', repoRoot);
+  assert.equal(result.ok, false, 'predicted/actual alone must never satisfy D8 — that was the false-pass bug');
 });
 
-test('checkRetrospectiveContent: ok when an outcome record (predicted only) exists', () => {
-  const view = { outcomes: { 'has-predicted': { predicted: { tier: 'standard' } } } };
-  const result = checkRetrospectiveContent(view, 'has-predicted');
-  assert.equal(result.ok, true);
+test('checkRetrospectiveContent: ok when docType/docPath are recorded AND the file actually exists on disk, with no predicted/actual at all (tsk-558 false-fail regression)', () => {
+  const repoRoot = initRepo();
+  fs.mkdirSync(path.join(repoRoot, 'docs', 'how-to'), { recursive: true });
+  fs.writeFileSync(path.join(repoRoot, 'docs', 'how-to', 'real-doc.md'), '# real doc\n');
+  const view = { outcomes: { 'has-real-doc': { docType: 'how-to', docPath: 'docs/how-to/real-doc.md' } } };
+  const result = checkRetrospectiveContent(view, 'has-real-doc', repoRoot);
+  assert.equal(result.ok, true, 'a real doc must pass even with no predicted/actual field — that was the false-fail bug');
 });
 
-test('checkRetrospectiveContent: ok when at least one decision record exists, even with no outcome', () => {
+test('checkRetrospectiveContent: NOT ok when docPath is recorded but the file does not exist on disk (the orphaned-doc incident)', () => {
+  const repoRoot = initRepo();
+  const view = { outcomes: { 'orphaned-doc': { docType: 'how-to', docPath: 'docs/how-to/never-written.md' } } };
+  const result = checkRetrospectiveContent(view, 'orphaned-doc', repoRoot);
+  assert.equal(result.ok, false, 'a recorded path with no real file must never pass — the exact orphaning failure this item closes');
+  assert.match(result.detail, /does not exist on disk/);
+});
+
+test('checkRetrospectiveContent: ok when at least one decision record exists, even with no outcome at all', () => {
+  const repoRoot = initRepo();
   const view = { decisionsById: { 'has-decision': [{ text: 'x', rationale: 'y' }] } };
-  const result = checkRetrospectiveContent(view, 'has-decision');
+  const result = checkRetrospectiveContent(view, 'has-decision', repoRoot);
   assert.equal(result.ok, true);
 });
 
 test('checkRetrospectiveContent: not ok when decisionsById exists for the id but is an empty array', () => {
+  const repoRoot = initRepo();
   const view = { decisionsById: { 'empty-decisions': [] } };
-  const result = checkRetrospectiveContent(view, 'empty-decisions');
+  const result = checkRetrospectiveContent(view, 'empty-decisions', repoRoot);
   assert.equal(result.ok, false);
 });
 
@@ -159,29 +204,68 @@ test('checkCleanupTTLElapsed: uses the LATEST cleanup entry if an item somehow r
 });
 
 // --- assessCleanupReadiness (combined) -----------------------------------
+//
+// tsk-4jf: TTL (D7, a park precondition) and the two D8 gate checks are
+// kept in separate arrays (`notReadyYet` vs `failed`) rather than one flat
+// `reasons` list — covering all 4 combinations of {TTL elapsed/not} x
+// {D8 checks pass/fail}.
 
-test('assessCleanupReadiness: ready:true with empty reasons when all checks pass', () => {
+test('assessCleanupReadiness: TTL elapsed + D8 checks pass -> ready:true, both arrays empty', () => {
   const repoRoot = initRepo();
   const sha = commitFile(repoRoot, 'ok.txt');
   const now = Date.now();
   const rawEvents = [{ type: 'work.move', payload: { id: 'good-item', to: 'cleanup' }, ts: new Date(now - 8 * 86400000).toISOString() }];
   const view = {
     work: { 'good-item': { branchHeadAtReturn: sha } },
-    outcomes: { 'good-item': { actual: { outcome: 'pass' } } },
+    decisionsById: { 'good-item': [{ text: 'x', rationale: 'y' }] },
   };
   const result = assessCleanupReadiness({ view, rawEvents, id: 'good-item', repoRoot, worktreeBacked: true, ttlDays: 7, now });
   assert.equal(result.ready, true);
-  assert.deepEqual(result.reasons, []);
+  assert.deepEqual(result.notReadyYet, []);
+  assert.deepEqual(result.failed, []);
 });
 
-test('assessCleanupReadiness: ready:false lists EVERY failing check, not just the first', () => {
+test('assessCleanupReadiness: TTL elapsed + D8 checks fail -> ready:false, failure lands in `failed`, not `notReadyYet`', () => {
+  const repoRoot = initRepo();
+  const sha = commitFile(repoRoot, 'ok.txt');
+  const now = Date.now();
+  const rawEvents = [{ type: 'work.move', payload: { id: 'no-content-item', to: 'cleanup' }, ts: new Date(now - 8 * 86400000).toISOString() }];
+  const view = {
+    work: { 'no-content-item': { branchHeadAtReturn: sha } },
+    outcomes: {}, // no retrospective content -> content check fails
+  };
+  const result = assessCleanupReadiness({ view, rawEvents, id: 'no-content-item', repoRoot, worktreeBacked: true, ttlDays: 7, now });
+  assert.equal(result.ready, false);
+  assert.deepEqual(result.notReadyYet, []);
+  assert.equal(result.failed.length, 1);
+  assert.match(result.failed[0], /no outcome docType\/docPath or decision record/);
+});
+
+test('assessCleanupReadiness: TTL not elapsed + D8 checks pass -> ready:false, but ONLY notReadyYet is non-empty', () => {
+  const repoRoot = initRepo();
+  const sha = commitFile(repoRoot, 'ok.txt');
+  const now = Date.now();
+  const rawEvents = [{ type: 'work.move', payload: { id: 'fresh-item', to: 'cleanup' }, ts: new Date(now - 2 * 86400000).toISOString() }];
+  const view = {
+    work: { 'fresh-item': { branchHeadAtReturn: sha } },
+    decisionsById: { 'fresh-item': [{ text: 'x', rationale: 'y' }] },
+  };
+  const result = assessCleanupReadiness({ view, rawEvents, id: 'fresh-item', repoRoot, worktreeBacked: true, ttlDays: 7, now });
+  assert.equal(result.ready, false);
+  assert.equal(result.notReadyYet.length, 1);
+  assert.match(result.notReadyYet[0], /not ready yet/);
+  assert.deepEqual(result.failed, [], 'TTL-not-elapsed alone must never land in `failed`');
+});
+
+test('assessCleanupReadiness: TTL not elapsed + D8 checks fail -> ready:false, BOTH arrays non-empty', () => {
   const repoRoot = initRepo();
   const now = Date.now();
-  const rawEvents = []; // never entered cleanup -> TTL check fails
+  const rawEvents = []; // never entered cleanup -> TTL check fails (notReadyYet)
   const view = { work: { 'bad-item': {} }, outcomes: {} }; // no content -> content check fails
   const result = assessCleanupReadiness({ view, rawEvents, id: 'bad-item', repoRoot, worktreeBacked: true, ttlDays: 7, now });
   assert.equal(result.ready, false);
-  assert.equal(result.reasons.length, 2, 'both the TTL and content failures must be listed');
+  assert.equal(result.notReadyYet.length, 1, 'TTL failure must be listed in notReadyYet');
+  assert.equal(result.failed.length, 1, 'content failure must be listed in failed');
 });
 
 test('assessCleanupReadiness: skips the merge-resolves check entirely when worktreeBacked is false (synthetic domain, D5)', () => {
@@ -189,7 +273,7 @@ test('assessCleanupReadiness: skips the merge-resolves check entirely when workt
   const rawEvents = [{ type: 'work.move', payload: { id: 'synth-item', to: 'cleanup' }, ts: new Date(now - 8 * 86400000).toISOString() }];
   const view = {
     work: { 'synth-item': { branchHeadAtReturn: 'not-a-real-sha-would-fail-if-checked' } },
-    outcomes: { 'synth-item': { actual: { outcome: 'pass' } } },
+    decisionsById: { 'synth-item': [{ text: 'x', rationale: 'y' }] },
   };
   // No repoRoot passed at all -- if the merge check ran, it would throw on a missing cwd.
   const result = assessCleanupReadiness({ view, rawEvents, id: 'synth-item', repoRoot: undefined, worktreeBacked: false, ttlDays: 7, now });
