@@ -461,7 +461,12 @@ function formatFootprintOverlapReason(conflicts) {
 // OR ends with a familiar code/config/doc extension. Loose on purpose (D2:
 // mechanical, no judge call) -- fs.existsSync below is what actually
 // filters out prose that merely looks path-shaped.
-const PATH_TOKEN_PATTERN = /[A-Za-z0-9_.-]*\/[A-Za-z0-9_./-]+|\b[A-Za-z0-9_-]+\.(?:mjs|cjs|js|ts|tsx|jsx|json|md|ya?ml|toml|py|go|rs|rb)\b/g;
+// tsk-gio fix: optional leading "." before the boundary so a root
+// dotfile (".fgos-runner.json") keeps its dot instead of tokenizing as
+// "fgos-runner.json" -- fs.existsSync below then checks the WRONG path
+// and silently exempts a real, existing dotfile (found by independent
+// review: this is exactly the tsk-2ta case this feature exists for).
+const PATH_TOKEN_PATTERN = /[A-Za-z0-9_.-]*\/[A-Za-z0-9_./-]+|\.?\b[A-Za-z0-9_-]+\.(?:mjs|cjs|js|ts|tsx|jsx|json|md|ya?ml|toml|py|go|rs|rb)\b/g;
 
 /**
  * COMPLETENESS ADVISORY (tsk-1gr, D1/D2 of docs/history/decompose-locked-
@@ -513,7 +518,22 @@ export function findUncoveredLockedDecisions(contextText, children, repoRoot) {
     }
   }
 
-  return realPaths.filter((p) => !covered.has(p));
+  // tsk-gio fix: a directory-shaped footprint entry (e.g. "src/",
+  // "docs/decisions") covers every path underneath it, not only an exact
+  // string match -- real footprints in this repo are routinely
+  // directory-shaped (found by independent review), so exact-match-only
+  // coverage produced false "uncovered" advisories on decisions that
+  // WERE covered. Purely mechanical (D2): no fs.statSync directory check,
+  // just a "/" boundary after stripping a trailing slash.
+  const isCoveredByDirectory = (p) => {
+    for (const f of covered) {
+      const dir = f.replace(/\/+$/, '');
+      if (dir && p.startsWith(`${dir}/`)) return true;
+    }
+    return false;
+  };
+
+  return realPaths.filter((p) => !covered.has(p) && !isCoveredByDirectory(p));
 }
 
 /**
@@ -805,17 +825,28 @@ export function resolveDecompose(dir, id, cfg, role, callerVerdict) {
   // needs it either way, per D1's "unconditional, same as footprintOverlap").
   // ADVISORY ONLY: never parks, never blocks -- a hit is logged as its own
   // decision alongside the real decompose write below, not instead of it.
-  const coverageRepoRoot = resolveContentRoot(stateRoot, id, work.docsRef);
-  const coverageContext = readLockedContext(coverageRepoRoot, work.docsRef);
-  const uncoveredDecisions = findUncoveredLockedDecisions(coverageContext, verdict.children, coverageRepoRoot);
-  if (uncoveredDecisions.length > 0) {
-    addDecision(dir, {
-      id,
-      text: `decompose completeness advisory: ${uncoveredDecisions.length} path(s) named in a locked decision have no child footprint covering them: ${uncoveredDecisions.join(', ')}`,
-      source: 'resolveDecompose',
-      rationale:
-        'tsk-1gr D1/D2: mechanical path-token check over CONTEXT.md\'s Locked decisions section -- advisory only, never blocks; see docs/explanation/auto-decompose-can-drop-a-locked-decision-from-every-childs-footprint.md for the failure mode this catches',
-    });
+  // tsk-gio fix: wrapped in the same fail-safe try/catch discipline the
+  // priority-refinement advisory above already uses (:685-699) -- an
+  // unwrapped addDecision (store-lock contention, a corrupted item shape)
+  // used to be able to throw and abort the decompose write below,
+  // directly contradicting "never blocks" (found by independent review).
+  try {
+    const coverageRepoRoot = resolveContentRoot(stateRoot, id, work.docsRef);
+    const coverageContext = readLockedContext(coverageRepoRoot, work.docsRef);
+    const uncoveredDecisions = findUncoveredLockedDecisions(coverageContext, verdict.children, coverageRepoRoot);
+    if (uncoveredDecisions.length > 0) {
+      addDecision(dir, {
+        id,
+        text: `decompose completeness advisory: ${uncoveredDecisions.length} path(s) named in a locked decision have no child footprint covering them: ${uncoveredDecisions.join(', ')}`,
+        source: 'resolveDecompose',
+        rationale:
+          'tsk-1gr D1/D2: mechanical path-token check over CONTEXT.md\'s Locked decisions section -- advisory only, never blocks; see docs/explanation/auto-decompose-can-drop-a-locked-decision-from-every-childs-footprint.md for the failure mode this catches',
+      });
+    }
+  } catch {
+    // Swallowed intentionally, same fail-safe discipline as :685-699 --
+    // a failure computing or logging this advisory must never abort the
+    // decompose write below.
   }
 
   verdict.children.forEach((child, index) => {

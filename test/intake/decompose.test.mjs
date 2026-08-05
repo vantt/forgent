@@ -1963,6 +1963,43 @@ test('findUncoveredLockedDecisions: a path-shaped token that names no real file 
   assert.deepEqual(findUncoveredLockedDecisions(contextText, [], repoRoot), []);
 });
 
+// --- tsk-gio fixes (independent review, post-tsk-1gr): dotfile tokens,
+// directory-shaped footprint coverage, advisory fail-safe. ---
+
+test('findUncoveredLockedDecisions: a root dotfile keeps its leading dot and is checked at the real path (tsk-gio regression, the tsk-2ta case)', () => {
+  const repoRoot = mkTempDir();
+  fs.writeFileSync(path.join(repoRoot, '.fgos-runner.json'), '{}\n');
+  const contextText = '## Locked decisions\n\nD1 amended: move `.fgos-runner.json` to `.fgos/config.json`.\n';
+  const uncovered = findUncoveredLockedDecisions(contextText, [{ footprint: ['src/other.mjs'] }], repoRoot);
+  assert.deepEqual(uncovered, ['.fgos-runner.json']);
+});
+
+test('findUncoveredLockedDecisions: a dotfile IS covered when a child footprint declares it with its leading dot', () => {
+  const repoRoot = mkTempDir();
+  fs.writeFileSync(path.join(repoRoot, '.fgos-runner.json'), '{}\n');
+  const contextText = '## Locked decisions\n\nD1: move `.fgos-runner.json`.\n';
+  const uncovered = findUncoveredLockedDecisions(contextText, [{ footprint: ['.fgos-runner.json'] }], repoRoot);
+  assert.deepEqual(uncovered, []);
+});
+
+test('findUncoveredLockedDecisions: a directory-shaped footprint entry covers every real path underneath it (tsk-gio fix)', () => {
+  const repoRoot = mkTempDir();
+  fs.mkdirSync(path.join(repoRoot, 'src', 'intake'), { recursive: true });
+  fs.writeFileSync(path.join(repoRoot, 'src', 'intake', 'decompose.mjs'), '// fixture\n');
+  const contextText = '## Locked decisions\n\nD1: touches `src/intake/decompose.mjs`.\n';
+  const uncovered = findUncoveredLockedDecisions(contextText, [{ footprint: ['src/'] }], repoRoot);
+  assert.deepEqual(uncovered, [], 'a "src/" footprint entry must cover a path nested inside it');
+});
+
+test('findUncoveredLockedDecisions: directory-shaped coverage requires a real "/" boundary, never a bare prefix match', () => {
+  const repoRoot = mkTempDir();
+  fs.mkdirSync(path.join(repoRoot, 'src-extra'), { recursive: true });
+  fs.writeFileSync(path.join(repoRoot, 'src-extra', 'file.mjs'), '// fixture\n');
+  const contextText = '## Locked decisions\n\nD1: touches `src-extra/file.mjs`.\n';
+  const uncovered = findUncoveredLockedDecisions(contextText, [{ footprint: ['src'] }], repoRoot);
+  assert.deepEqual(uncovered, ['src-extra/file.mjs'], '"src" must never prefix-match "src-extra/..." without a "/" boundary');
+});
+
 test('resolveDecompose caller-supplied decompose verdict: an uncovered locked-decision path logs an advisory decision but still writes children (D1 — never blocks)', () => {
   const dir = mkTempDir();
   const { scriptPath, counterPath } = writeCountingRawStdoutExecutor(dir, JSON.stringify({ verdict: 'pass-through', reason: 'should never run' }));
