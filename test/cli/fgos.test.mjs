@@ -8479,6 +8479,30 @@ test('cleanup parks cleanup -> blocked, with every failing reason joined, when t
   assert.equal(stateView(cwd).work['cleanup-not-ready'].status, 'blocked');
 });
 
+test('cleanup is a no-op — writes zero work.move events and stays at cleanup — when only TTL has not elapsed and the D8 checks pass', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'cleanup-ttl-only');
+  run(cwd, ['move', 'cleanup-ttl-only', '--to', 'doing']);
+  run(cwd, ['move', 'cleanup-ttl-only', '--to', 'delivered']);
+  run(cwd, ['move', 'cleanup-ttl-only', '--to', 'retrospective']);
+  const dir = path.join(cwd, '.fgos');
+  addOutcome(dir, { id: 'cleanup-ttl-only', docType: 'how-to', actual: { outcome: 'pass', passed: true, attempts: 1, errorClass: null, aheadCount: 0, visits: 1 } });
+  run(cwd, ['move', 'cleanup-ttl-only', '--to', 'cleanup']);
+  // Default TTL (7d, no config written) — freshly entered, not elapsed.
+  // No branchHeadAtReturn recorded -> checkMergeStillResolves passes
+  // trivially ("nothing to check"), so the only failing check is TTL.
+
+  const before = eventLines(cwd).length;
+  const result = run(cwd, ['cleanup', 'cleanup-ttl-only']);
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.to, 'cleanup');
+  assert.equal(data.noop, true);
+
+  assert.equal(eventLines(cwd).length, before, 'TTL-not-elapsed alone must write zero events');
+  assert.equal(stateView(cwd).work['cleanup-ttl-only'].status, 'cleanup', 'item must stay at cleanup, not move to blocked');
+});
+
 test('cleanup closes to done when TTL is configured to 0 and retrospective content + a resolving merge both exist', () => {
   // KNOWN GAP, deliberately left in place this item (flagged for a
   // dedicated follow-up, not silently dropped): approve's merge paths

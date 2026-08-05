@@ -1042,17 +1042,23 @@ async function runVerb(verb, flags, positional, dir) {
       return { swept, count: swept.length };
     }
 
-    // work-item-status-delivered-retrospective-cleanup D8: the dedicated
-    // harness gating `cleanup -> done`, never folded into return/compound.
-    // Checks (cleanup-harness.mjs's assessCleanupReadiness): (1) the
-    // global TTL (D7) has elapsed since the item actually entered
-    // `cleanup`; (2) retrospective produced real content; (3) — only for a
-    // worktree-backed domain (D5) — the merge still resolves on main. All
-    // ready: performs the actual branch/worktree cleanup (cleanupMergedBranch,
-    // idempotent if a synchronous cleanup already ran elsewhere) and closes
-    // to `done`. Any check failing: parks `cleanup -> blocked` with every
-    // failing reason joined into one `reason` string (fsm.mjs requires
-    // this edge to carry one, mirroring `awaiting-approval -> blocked`).
+    // work-item-status-delivered-retrospective-cleanup D8, tsk-4jf
+    // restore-to-decision: the dedicated harness gating `cleanup -> done`,
+    // never folded into return/compound. Checks (cleanup-harness.mjs's
+    // assessCleanupReadiness): the global TTL (D7) is a park PRECONDITION,
+    // never itself a `blocked` reason — only the two real D8 gate checks
+    // (retrospective produced real content; for a worktree-backed domain
+    // (D5), the merge still resolves on main) can park `cleanup ->
+    // blocked`. `failed` non-empty: parks `cleanup -> blocked` with every
+    // failing D8 reason joined into one `reason` string (fsm.mjs requires
+    // this edge to carry one, mirroring `awaiting-approval -> blocked`) —
+    // TTL's own detail is included too when it's ALSO not-elapsed, so a
+    // reader still sees the full picture. `failed` empty but
+    // `notReadyYet` non-empty: a no-op — TTL alone is never a park
+    // reason, so the item stays at `cleanup` with no `moveWork` call, no
+    // new event. All ready: performs the actual branch/worktree cleanup
+    // (cleanupMergedBranch, idempotent if a synchronous cleanup already
+    // ran elsewhere) and closes to `done`.
     case 'cleanup': {
       const id = requireField(positional[0] ?? flags.id, 'cleanup requires an id: fgos cleanup <id>');
       const view = listWork(dir);
@@ -1079,10 +1085,14 @@ async function runVerb(verb, flags, positional, dir) {
         ttlDays,
       });
 
-      if (!assessment.ready) {
-        const reason = assessment.reasons.join('; ');
+      if (assessment.failed.length > 0) {
+        const reason = [...assessment.notReadyYet, ...assessment.failed].join('; ');
         const { event } = moveWork(dir, { id, to: 'blocked', expectedStatus: 'cleanup', reason, role: 'system' });
         return { id, to: 'blocked', reason, seq: event.seq };
+      }
+
+      if (assessment.notReadyYet.length > 0) {
+        return { id, to: 'cleanup', noop: true, reasons: assessment.notReadyYet };
       }
 
       let cleanupWarnings = [];
