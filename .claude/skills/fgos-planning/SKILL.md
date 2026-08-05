@@ -134,8 +134,19 @@ stage values — the same way `fgos-routing` describes it.
    a description standing in for a command. Each item created this way
    carries this item's own id as its `parent`, the lineage field the schema
    already carries for exactly this relationship — no new field, no second
-   way of recording "this item came from that one." If one piece is
-   honestly enough, there is no split, and the item proceeds as itself.
+   way of recording "this item came from that one." Always pass
+   `--footprint` on that same `fgos add --parent` call, taken straight from
+   the file list this step's own Approach/Shape already wrote down for that
+   piece — the files are already known at this point, so there is no
+   reason to leave it blank (this is what lets `footprintOverlapAmong`
+   catch a real collision between sibling pieces before either one starts):
+
+   ```bash
+   fgos add "Build parser" --parent <id> --footprint "src/parser.mjs,test/parser.test.mjs" --dir "$root"
+   ```
+
+   If one piece is honestly enough, there is no split, and the item
+   proceeds as itself.
 
 6. **Leave execution alone.** Per the locked decision that Execute and its
    verify already have a working mechanical path (the goal-check the engine
