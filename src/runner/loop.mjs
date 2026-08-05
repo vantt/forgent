@@ -727,7 +727,21 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
       await queue.enqueue(async () => {
         appendEvent(path.join(dir, 'events.jsonl'), {
           type: 'capacity.dispatch',
-          payload: { id: item.id, capacityId: worker.capacityId, provider: worker.provider, model: worker.model },
+          // baseCommit/headRef (tsk-4hl, D1/D3 of docs/history/parallel-
+          // decomposition-footprint-avoidance/CONTEXT.md — mức 1): the
+          // dispatch-time attestation captured inside spawnWorker, now
+          // actually persisted (independent review after tsk-2ig merged
+          // found it captured then discarded) -- same audit-only,
+          // ignored-by-replay.mjs event this call site already uses for
+          // capacityId/provider/model, no new event type invented.
+          payload: {
+            id: item.id,
+            capacityId: worker.capacityId,
+            provider: worker.provider,
+            model: worker.model,
+            baseCommit: worker.baseCommit,
+            headRef: worker.headRef,
+          },
         });
       });
       // Persist the worker's own output for after-the-fact recovery (D1/D3/D4):

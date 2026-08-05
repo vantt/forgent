@@ -4124,6 +4124,68 @@ test('return: a changed sensitive file DECLARED in the item\'s footprint is not 
   assert.deepEqual(data.frozenJudgeHits, []);
 });
 
+// --- tsk-4hl (post-tsk-2ig independent review): footprintDiffHits wired
+// into `return` next to frozenJudgeHits -- broader (any changed file
+// outside footprint, not just the narrow sensitive-pattern set) and
+// exempt when no footprint is declared at all (D5). ---
+
+test('return: a changed file outside the item\'s footprint surfaces a footprintDiffHits advisory even when it matches no frozenJudgeHits pattern, never blocks (tsk-4hl)', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  assert.equal(run(cwd, ['add', 'pull-return-footprint-diff', '--title', 'X', '--kind', 'task', '--risk', 'low', '--verify', 'test -f proof.txt', '--footprint', 'proof.txt']).status, 0);
+  assert.equal(run(cwd, ['take', '--id', 'pull-return-footprint-diff']).status, 0);
+  commitFile(cwd, 'proof.txt');
+  commitFile(cwd, 'random-outside.txt', 'not sensitive\n');
+
+  const result = run(cwd, ['return', 'pull-return-footprint-diff']);
+  assert.equal(result.status, 0, `return failed: ${result.stderr}`);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.passed, true, 'the footprint-diff advisory never fails the return itself');
+  assert.deepEqual(data.frozenJudgeHits, [], 'random-outside.txt matches no sensitive pattern, so the narrow frozenJudgeHits stays clean');
+  // Not a strict deepEqual on the whole array: `git add -A` also sweeps in
+  // whatever real .fgos/* deltas `take` itself produced since the last
+  // commit (events.jsonl, coexistence.json) -- genuinely outside the
+  // declared footprint too, so footprintDiffHits is CORRECT to flag them;
+  // this test only asserts the one file it actually cares about is there.
+  assert.ok(data.footprintDiffHits.some((hit) => hit.file === 'random-outside.txt'));
+});
+
+test('return: footprintDiffHits is empty when the item declares NO footprint at all (D5 absent-footprint exemption, same as footprintDiffHits\' own unit tests)', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  addOk(cwd, 'pull-return-no-footprint', { verify: 'test -f proof.txt' });
+  assert.equal(run(cwd, ['take', '--id', 'pull-return-no-footprint']).status, 0);
+  commitFile(cwd, 'proof.txt');
+  commitFile(cwd, 'anything.txt', 'x\n');
+
+  const result = run(cwd, ['return', 'pull-return-no-footprint']);
+  assert.equal(result.status, 0, `return failed: ${result.stderr}`);
+  assert.deepEqual(envelopeData(result.stdout).footprintDiffHits, []);
+});
+
+test('return: the item\'s own docs/history/<id>/iron-law-evidence.md is exempt from footprintDiffHits (tsk-4hl self-exempt, avoids self-flagging every Iron-Law-gated item)', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  const id = 'pull-return-evidence-exempt';
+  assert.equal(run(cwd, ['add', id, '--title', 'X', '--kind', 'task', '--risk', 'low', '--verify', 'test -f proof.txt', '--footprint', 'proof.txt']).status, 0);
+  assert.equal(run(cwd, ['take', '--id', id]).status, 0);
+  commitFile(cwd, 'proof.txt');
+  fs.mkdirSync(path.join(cwd, 'docs', 'history', id), { recursive: true });
+  commitFile(cwd, `docs/history/${id}/iron-law-evidence.md`, '# evidence\n');
+  commitFile(cwd, 'random-outside.txt', 'not sensitive\n');
+
+  const result = run(cwd, ['return', id]);
+  assert.equal(result.status, 0, `return failed: ${result.stderr}`);
+  const data = envelopeData(result.stdout);
+  // See the sibling test above for why this isn't a strict deepEqual --
+  // real .fgos/* deltas from `take` legitimately show up here too.
+  assert.ok(
+    !data.footprintDiffHits.some((hit) => hit.file === `docs/history/${id}/iron-law-evidence.md`),
+    'the evidence doc must never appear in footprintDiffHits',
+  );
+  assert.ok(data.footprintDiffHits.some((hit) => hit.file === 'random-outside.txt'), 'random-outside.txt must still be flagged');
+});
+
 test('return refuses a dirty working tree (uncommitted changes) as validation, exit 4, item stays doing', () => {
   const cwd = initGitCwd();
   run(cwd, ['init']);

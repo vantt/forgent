@@ -976,6 +976,41 @@ test('resolveExecutorCommand: baseCommit/headRef fail closed to null (never thro
   assert.equal(resolved.headRef, null);
 });
 
+// --- tsk-4hl (post-tsk-2ig independent review): attestRoot overrides
+// fgosDir's own root -- a worker dispatches inside its OWN worktree
+// (loop.mjs's wt.path), a different checkout than fgosDir's root (always
+// the main checkout, ADR0020). Two unrelated real repos here (different
+// HEAD commits, different branch names) makes "which root actually got
+// read" unambiguous. ---
+
+test('resolveExecutorCommand: attestRoot, when given, is read INSTEAD of fgosDir\'s own root (tsk-4hl fix)', () => {
+  const cfg = baseConfig(['-p', '{prompt}']);
+  const mainRepo = mkTempGitRepo(); // fgosDir points here
+  const workerRepo = mkTempGitRepo(); // attestRoot points here -- a different repo entirely
+  // mkTempGitRepo's single seed commit is fully deterministic (same tree,
+  // message, author, second-precision timestamp) -- two independently
+  // created repos can legitimately hash to the SAME commit. One extra
+  // commit here makes workerRepo's HEAD genuinely distinct, so this test
+  // proves attestRoot was actually read, not a coincidental hash collision.
+  fs.writeFileSync(path.join(workerRepo.repoRoot, 'second.txt'), 'second\n');
+  execFileSync('git', ['add', 'second.txt'], { cwd: workerRepo.repoRoot });
+  execFileSync('git', ['commit', '-q', '-m', 'second'], { cwd: workerRepo.repoRoot });
+  workerRepo.headCommit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: workerRepo.repoRoot, encoding: 'utf8' }).trim();
+  const resolved = resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', fgosDir: mainRepo.fgosDir, attestRoot: workerRepo.repoRoot });
+  assert.equal(resolved.baseCommit, workerRepo.headCommit, 'must attest the attestRoot repo, never fgosDir\'s own root');
+  assert.notEqual(resolved.baseCommit, mainRepo.headCommit);
+  fs.rmSync(mainRepo.repoRoot, { recursive: true, force: true });
+  fs.rmSync(workerRepo.repoRoot, { recursive: true, force: true });
+});
+
+test('resolveExecutorCommand: attestRoot works even when fgosDir is omitted entirely', () => {
+  const cfg = baseConfig(['-p', '{prompt}']);
+  const { repoRoot, headCommit } = mkTempGitRepo();
+  const resolved = resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', attestRoot: repoRoot });
+  assert.equal(resolved.baseCommit, headCommit);
+  fs.rmSync(repoRoot, { recursive: true, force: true });
+});
+
 // --- resolveExecutorCommand: per-element argv substitution, never shell -
 
 test('resolveExecutorCommand substitutes {prompt} and {model} per array element', () => {
@@ -1513,6 +1548,29 @@ test('spawnWorker result carries capacityId and provider alongside every existin
   assert.equal(result.model, 'sonnet');
   assert.equal(typeof result.templateName, 'string');
   assert.equal(typeof result.templateHash, 'string');
+});
+
+test('spawnWorker attests its OWN cwd (the dispatch worktree), never opts.fgosDir\'s root (tsk-4hl fix)', async () => {
+  const dir = mkTempDir();
+  const scriptPath = writeEchoExecutor(dir);
+  const cfg = baseConfig([scriptPath, '{prompt}']);
+  const mainRepo = mkTempGitRepo(); // opts.fgosDir points here
+  const workerRepo = mkTempGitRepo(); // cwd points here -- the "dispatch worktree"
+  // see the resolveExecutorCommand attestRoot test above for why this
+  // extra commit matters: two independently created mkTempGitRepo()
+  // fixtures can legitimately hash to the same HEAD commit.
+  fs.writeFileSync(path.join(workerRepo.repoRoot, 'second.txt'), 'second\n');
+  execFileSync('git', ['add', 'second.txt'], { cwd: workerRepo.repoRoot });
+  execFileSync('git', ['commit', '-q', '-m', 'second'], { cwd: workerRepo.repoRoot });
+  workerRepo.headCommit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: workerRepo.repoRoot, encoding: 'utf8' }).trim();
+
+  const result = await spawnWorker(sampleWork(), cfg, workerRepo.repoRoot, { fgosDir: mainRepo.fgosDir });
+
+  assert.equal(result.baseCommit, workerRepo.headCommit, 'must attest the cwd it actually ran in, never opts.fgosDir\'s own root');
+  assert.notEqual(result.baseCommit, mainRepo.headCommit);
+  assert.equal(result.headRef, 'main');
+  fs.rmSync(mainRepo.repoRoot, { recursive: true, force: true });
+  fs.rmSync(workerRepo.repoRoot, { recursive: true, force: true });
 });
 
 test('spawnWorker threads opts.fgosDir into a kind:"cli" capacity\'s presence check end-to-end, resolving through fgos tool query', async () => {
