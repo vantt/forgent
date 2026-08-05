@@ -10,7 +10,7 @@ theo dõi tay không để miss.
 
 - [x] **tsk-66o** (todo/executing, neo bởi 2 con mở) — `fgos-planning`+`fgos-validating` xong, READY, decompose thành `tsk-3c7` (computed-parallel-wave-schedule) + `tsk-2ig` (worktree-dispatch-attestation). Xong bước của root — 2 con sẽ tự đi qua clarify/decompose/executing riêng khi tới lượt.
 - [x] **tsk-1gr** (todo/executing) — `fgos-exploring`+`fgos-planning`+`fgos-validating` xong (D1 advisory-only, D2 luật thuần cơ học). Pass-through, không chia con. Sẵn sàng `fgos-code-implement` khi tới lượt.
-- [ ] **tsk-3uz** (priority 5000, todo/clarify) — `fgos-planning`'s split step không set `--footprint` cho con qua `--parent` (STR92).
+- [x] **tsk-3uz** (todo/executing) — `fgos-exploring`+`fgos-planning`+`fgos-validating` xong (D1 thuần skill-prose, D2 optional hệ thống/bắt buộc-trong-thực-hành). Pass-through. Sẵn sàng `fgos-code-implement`.
 - [ ] **tsk-5ay** (priority 3000, todo/decompose) — so sánh quy trình fgOS vs /ck:plan+/ck:cook + re-distill bee thật; nhà cho 2 quyết định đã bàn (mode-gate → `fgos-routing`; kỷ luật truy-nguồn vào Gate của `fgos-planning`) — chưa claim, chưa log decision.
 
 Con mới sinh ra từ `tsk-66o` (parent: tsk-66o, chưa nằm trong 4 task gốc nhưng giờ là việc thật cần theo dõi):
