@@ -471,6 +471,18 @@ export const COMMAND_REGISTRY = [
     deprecated: null,
   },
   {
+    name: 'schedule',
+    invoke: 'fgos schedule',
+    description: 'Read-only computed-parallel-wave-schedule (tsk-3c7): which frontier items can dispatch in parallel right now, packed into waves by declared-footprint conflict (a conflicting item is deferred to a later wave, never refused — same advisory stance `fgos conflicts` already has), plus `cycles` — a dep-graph cycle check over the whole work map regardless of status. Derived-never-stored, same discipline `fgos graph`/`fgos conflicts` already use.',
+    parameters: { type: 'object', properties: {}, required: [] },
+    examples: ['fgos schedule'],
+    touchesState: false,
+    requiresExistingStore: false,
+    externalEffect: false,
+    paginated: false,
+    deprecated: null,
+  },
+  {
     name: 'merge',
     invoke: 'fgos merge',
     description: '"list" (read-only) returns which awaiting-approval items are ready to merge now (every dep already done, no footprint conflict) ordered by rankImpact, which are still waiting on an unmerged dep, and which are footprint-conflicted pairs (same shape as fgos conflicts). "next" merges the single top-ranked ready item by recursing into the same approve logic (never a parallel merge path) -- if that item trips the Iron Law gate it reports which item and why and merges nothing, it never auto-acknowledges or falls through to the next-ranked item.',
