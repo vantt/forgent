@@ -91,3 +91,30 @@ cả chiều pass lẫn chiều fail trước khi ghi lên item:
 Verify chạy trong worktree rời do `fgos return` dựng, và worktree đó không bao
 giờ mang `.fgos/` riêng (ADR0020) — nên lệnh `fgos` bên trong `verify` bắt
 buộc mang `--dir` tuyệt đối, đúng cảnh báo của how-to.
+
+**D3 — Data Dictionary #7/#7b là hợp đồng, không phải ảnh chụp.**
+
+Lần `approve` đầu tiên merge xong rồi fail ở verify hậu-merge
+(`verify-fail-post-merge`, exit 1, merge đã được roll back). Nguyên nhân thật:
+`tsk-4xg` (merge `9040c24`, commit `f52d200`) đăng ký check **và** fix thứ
+`claude-plugin-marketplace`, nhưng không cập nhật spec — #7 thiếu check thứ 10,
+#7b thiếu fix thứ 2 và còn viết "Today's registered fix" số ít. Mệnh đề 4 của
+verify bắt đúng drift này ngay lần chạy thật đầu tiên, đúng loại drift mà
+`75e3965` trước đó phải vá bằng audit tay.
+
+Nhưng #7 khi đó tự nói "this list grows without a spec update whenever a module
+registers a new one" — tức spec tự cho phép danh sách cũ đi. Câu đó mâu thuẫn
+trực tiếp với mệnh đề 4. Hai điều không thể cùng đúng.
+
+Người chọn: danh sách là **hợp đồng**. Bỏ câu cho phép trôi, thay bằng nghĩa vụ
+tường minh ở cả #7 và #7b — registry vẫn mở, nhưng hàng này luôn kể đủ, và
+module nào thêm check/fix thì sửa hàng này trong cùng thay đổi đó. Đánh đổi đã
+biết và chấp nhận: từ nay module thêm check mới mà quên spec sẽ làm
+`return`/`approve` đỏ. Đó chính là điều muốn có — trước đây drift chỉ lộ khi có
+người audit tay.
+
+**D4 — verify thêm mệnh đề 5 cho `registerFix`.**
+
+Mệnh đề 4 chỉ soi `registerCheck` nên bắt được #7 mà không thấy #7b cũng lệch.
+Thêm mệnh đề 5 đối chiếu mọi id `registerFix` với spec, cùng dạng vòng lặp.
+Sau D3 thì hai mệnh đề này là cách spec tự giữ đúng hợp đồng nó vừa nhận.
