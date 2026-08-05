@@ -187,6 +187,29 @@ more round beyond this; if still disputed, stop and hand the disagreement
 back rather than iterate indefinitely (no CLI override exists yet per
 `tsk-5cf`).
 
+Round 6 was itself disputed (round 7 overall): "Sed pattern still
+fragile... could falsely fail due to format mismatch... new proposal adds
+grep checks but keeps the fragile sed pattern unchanged." This is a
+legitimate maintainability point in isolation (if `tsk-4sz.verify`'s exact
+text ever changes, the `sed` substitution silently no-ops and `[ "$vred" !=
+"$v" ]` correctly catches that and fails closed — not a false pass, but a
+false NEGATIVE on an otherwise-correct fix) — but round 6 already added
+the exact structural safeguard round 5's own objection asked for, and this
+round moves the goalpost again rather than accepting the addition. Per the
+locked limit above (one more round past round 5, i.e. round 6, already
+spent), this item stops here and hands back to a person rather than
+attempting round 8 — this is now a second live reproduction of `tsk-5cf`
+on the same item (7 total dispute rounds, matching `tsk-4xg`'s 10-round
+precedent in shape, not merely count).
+
+**Status at hand-back**: the actual fix (both `tsk-4sz.verify`'s corrected
+text and the doc's new section) is fully designed and empirically
+RED/GREEN-proven across 6 verify drafts above — the blocker is
+`judgeVerifySemanticCorrectness`'s own instability accepting this item's
+`clarify`→`decompose` transition, not any remaining gap in the fix
+itself. tsk-5mc is parked `awaiting-human` (stage `clarify`, this round's
+question already recorded via `fgos discover`'s own park).
+
 ## Outstanding questions deferred to planning
 
 None — scope, fix text, and doc placement are fully locked above; the
