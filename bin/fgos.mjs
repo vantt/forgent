@@ -34,7 +34,7 @@ import { isResolvedStatus } from '../src/state/frontier.mjs';
 import { mergeReadiness } from '../src/state/graph-harness.mjs';
 import { paginate } from '../src/state/cursor.mjs';
 import { runGoalCheck } from '../src/runner/goal-check.mjs';
-import { frozenJudgeHits } from '../src/runner/frozen-judge.mjs';
+import { frozenJudgeHits, footprintDiffHits, normalizePath } from '../src/runner/frozen-judge.mjs';
 import { classifySource, reviewDiff, mergeRunnerItem, cleanupMergedBranch, changedFiles, isWorkingTreeClean as isMainTreeClean, isFgosOnlyStatusLine, buildOwnFileSet, detectTrunk, isMainWorktree } from '../src/runner/merge.mjs';
 import { createGitHubPR, mergeGitHubPR, viewGitHubPRStatus } from '../src/runner/github-adapter.mjs';
 import { assertSafeMainCheckoutReset } from '../src/runner/main-checkout-reset-guard.mjs';
@@ -145,6 +145,23 @@ function changedFilesSince(cwd, from, to) {
   return gitAt(cwd, ['diff', '--name-only', from, to])
     .split('\n')
     .filter((line) => line.trim() !== '');
+}
+
+// tsk-4hl: an item's own docs/history/<id>/iron-law-evidence.md is a
+// mandatory workflow artifact this repo's own convention writes for every
+// Iron-Law-required item (docs/history/tsk-5t3-iron-law-evidence-contract/
+// CONTEXT.md) -- an item's declared footprint almost never lists it
+// (footprint names the CODE the item touches, not its own evidence doc),
+// so footprintDiffHits would otherwise flag it on every single Iron-Law-
+// gated item that declares a footprint at all: 100% guaranteed noise,
+// found by independent review after tsk-2ig merged. Narrow and mechanical
+// on purpose -- only this exact path, never a whole docs/history/<id>/
+// exemption (CONTEXT.md/plan.md land on earlier decompose-stage commits,
+// already baked into headAtTake/branchHeadAtTake by the time `return`'s
+// own diff is computed, so they never actually appear here).
+function excludeIronLawEvidence(files, id) {
+  const evidencePath = `docs/history/${id}/iron-law-evidence.md`;
+  return files.filter((f) => normalizePath(f) !== evidencePath);
 }
 
 // LOCAL copy of session.mjs's private realpathOr (session.mjs is never edited,
@@ -2224,10 +2241,16 @@ async function runVerb(verb, flags, positional, dir) {
 
         if (check.passed) {
           // STR63: advisory only (per cos) — a hit never blocks this return.
-          const frozenJudge = frozenJudgeHits(changedFilesSince(repoRoot, item.branchHeadAtTake, branchHead), item.footprint);
+          const changed = changedFilesSince(repoRoot, item.branchHeadAtTake, branchHead);
+          const frozenJudge = frozenJudgeHits(changed, item.footprint);
+          // tsk-4hl: same advisory stance, broadened diff (D5's
+          // absent-footprint exemption still applies inside footprintDiffHits
+          // itself) — excludeIronLawEvidence strips this item's own mandatory
+          // evidence doc before checking, see that helper's own comment.
+          const footprintDiff = footprintDiffHits(excludeIronLawEvidence(changed, id), item.footprint);
           const { event } = moveWork(dir, { id, to: 'awaiting-approval', expectedStatus: 'doing', branchHeadAtReturn: branchHead });
           addOutcome(dir, { id, actual: { outcome: 'awaiting-approval', passed: true, attempts: 1, errorClass: null, aheadCount: branchAheadCount } });
-          return { id, from: 'doing', to: 'awaiting-approval', source: 'branch', branch, aheadCount: branchAheadCount, passed: true, seq: event.seq, output: check.output, frozenJudgeHits: frozenJudge };
+          return { id, from: 'doing', to: 'awaiting-approval', source: 'branch', branch, aheadCount: branchAheadCount, passed: true, seq: event.seq, output: check.output, frozenJudgeHits: frozenJudge, footprintDiffHits: footprintDiff };
         }
 
         moveWork(dir, { id, to: 'blocked', expectedStatus: 'doing', reason: 'verify-fail', role: 'system' });
@@ -2273,6 +2296,8 @@ async function runVerb(verb, flags, positional, dir) {
       if (check.passed) {
         // STR63: advisory only (per cos) — a hit never blocks this return.
         const frozenJudge = frozenJudgeHits(ownDiff, item.footprint);
+        // tsk-4hl: see excludeIronLawEvidence's own comment above.
+        const footprintDiff = footprintDiffHits(excludeIronLawEvidence(ownDiff, id), item.footprint);
         const { event } = moveWork(dir, { id, to: 'awaiting-approval', expectedStatus: 'doing', headAtReturn: head });
         addOutcome(dir, { id, actual: { outcome: 'awaiting-approval', passed: true, attempts: 1, errorClass: null, aheadCount } });
         // tsk-45z D1/D2: this session's own commits (landed straight on the
@@ -2285,7 +2310,7 @@ async function runVerb(verb, flags, positional, dir) {
         // Identity-checked (never a blind unlink, D2): only removes the
         // lock if it is still recorded under this session's own identity.
         releaseMainCheckoutLockIfOwn(dir, resolveWriterIdentity(dir).id);
-        return { id, from: 'doing', to: 'awaiting-approval', source: 'main', aheadCount, passed: true, seq: event.seq, output: check.output, frozenJudgeHits: frozenJudge };
+        return { id, from: 'doing', to: 'awaiting-approval', source: 'main', aheadCount, passed: true, seq: event.seq, output: check.output, frozenJudgeHits: frozenJudge, footprintDiffHits: footprintDiff };
       }
 
       moveWork(dir, { id, to: 'blocked', expectedStatus: 'doing', reason: 'verify-fail', role: 'system' });
