@@ -38,6 +38,7 @@
 import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
+import { resolveRoot } from '../runner/root-affinity.mjs';
 
 function git(repoRoot, args) {
   return execFileSync('git', args, {
@@ -50,26 +51,40 @@ function git(repoRoot, args) {
 
 /**
  * Does the commit this item's merge/return landed still resolve as an
- * ancestor of `repoRoot`'s current HEAD? Prefers `branchHeadAtReturn`
+ * ancestor of the correct target ref? Prefers `branchHeadAtReturn`
  * (branch-source items), then `headAtReturn` (pull-door items), falling
  * back to the `*AtTake` pair only if return-time tracking is absent
  * (an item that was never returned through the normal path). No recorded
  * commit at all is treated as "nothing to verify" (ok: true) rather than a
  * failure — an item this module has no git provenance for was never
  * claiming a git-verifiable merge in the first place.
+ *
+ * ROOT-AWARE REF (tsk-1p9): a LEAF item's branch is merged into its ROOT's
+ * branch (`fgw/<rootId>`), never directly into `main` — the root may still
+ * be sitting unmerged for days after the leaf itself is `delivered`.
+ * Checking a leaf's commit against literal `HEAD` (always `main` from
+ * `repoRoot`, the main checkout) would falsely report a healthy, genuinely
+ * merged leaf as "no longer reachable" — indistinguishable from an actual
+ * force-push loss. When `view`/`id` are supplied and `resolveRoot(view,
+ * id)` differs from `id` (a leaf), the target ref becomes `fgw/<rootId>`
+ * instead — a named ref, no checkout required. A root/standalone item
+ * (`view`/`id` omitted, or `resolveRoot` returns `id` itself) keeps
+ * checking against `HEAD`, unchanged.
  */
-export function checkMergeStillResolves(repoRoot, work) {
+export function checkMergeStillResolves(repoRoot, work, { view, id } = {}) {
   const sha = work?.branchHeadAtReturn ?? work?.headAtReturn ?? work?.branchHeadAtTake ?? work?.headAtTake;
   if (!sha) {
     return { ok: true, detail: 'no recorded commit to verify — nothing to check' };
   }
+  const rootId = view && id ? resolveRoot(view, id) : id;
+  const targetRef = rootId && rootId !== id ? `fgw/${rootId}` : 'HEAD';
   try {
-    git(repoRoot, ['merge-base', '--is-ancestor', sha, 'HEAD']);
-    return { ok: true, detail: `commit ${sha} is still an ancestor of HEAD` };
+    git(repoRoot, ['merge-base', '--is-ancestor', sha, targetRef]);
+    return { ok: true, detail: `commit ${sha} is still an ancestor of ${targetRef}` };
   } catch {
     return {
       ok: false,
-      detail: `commit ${sha} is no longer reachable from HEAD — the merge may have been force-pushed away or history rewritten`,
+      detail: `commit ${sha} is no longer reachable from ${targetRef} — the merge may have been force-pushed away or history rewritten`,
     };
   }
 }
@@ -156,7 +171,7 @@ export function assessCleanupReadiness({ view, rawEvents, id, repoRoot, worktree
   if (!content.ok) failed.push(content.detail);
 
   if (worktreeBacked) {
-    const merge = checkMergeStillResolves(repoRoot, view?.work?.[id]);
+    const merge = checkMergeStillResolves(repoRoot, view?.work?.[id], { view, id });
     if (!merge.ok) failed.push(merge.detail);
   }
 

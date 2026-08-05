@@ -314,9 +314,17 @@ test(
     assert.match(approvedData.output, /FIX_OK/);
     assert.equal(stateView(repoRoot).work[submitted.id].status, 'delivered');
 
+    // tsk-1p9: real `cleanup` verb, not a bare `move --to done` — teardown
+    // now lives only there (D2), gated by TTL=0 here. tsk-558: a decision
+    // record satisfies D8's content check (the D3 alternate pass).
     assert.equal(fgos(repoRoot, ['move', submitted.id, '--to', 'retrospective']).status, 0);
     assert.equal(fgos(repoRoot, ['move', submitted.id, '--to', 'cleanup']).status, 0);
-    assert.equal(fgos(repoRoot, ['move', submitted.id, '--to', 'done']).status, 0);
+    assert.equal(fgos(repoRoot, ['decision', '--id', submitted.id, '--text', 'retrospective done', '--rationale', 'test fixture']).status, 0);
+    fs.mkdirSync(path.join(repoRoot, '.fgos'), { recursive: true });
+    fs.writeFileSync(path.join(repoRoot, '.fgos', 'config.json'), JSON.stringify({ cleanup: { ttlDays: 0 } }));
+    const cleanupResult = fgos(repoRoot, ['cleanup', submitted.id]);
+    assert.equal(cleanupResult.status, 0, `cleanup failed: ${cleanupResult.stderr}`);
+    assert.equal(envelopeData(cleanupResult.stdout).to, 'done', `cleanup did not close to done: ${cleanupResult.stdout}`);
 
     const finalView = stateView(repoRoot);
     assert.equal(finalView.work[submitted.id].status, 'done');
@@ -328,7 +336,7 @@ test(
     const closeSettlement = finalView.settlements[submitted.id].at(-1);
     assert.equal(closeSettlement.kind, 'close');
     assert.equal(closeSettlement.role, 'human');
-    assert.equal(branchExists(repoRoot, `fgw/${submitted.id}`), false, 'the fully-merged branch is cleaned up');
+    assert.equal(branchExists(repoRoot, `fgw/${submitted.id}`), false, 'the fully-merged branch is cleaned up by the cleanup verb (tsk-1p9)');
     assert.equal(worktreeCount(repoRoot), 1, 'no leaked worktree after cleanup');
     assert.ok(fs.existsSync(path.join(repoRoot, 'fixed.txt')), 'the merged file is present on main');
   },

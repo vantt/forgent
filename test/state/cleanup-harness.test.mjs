@@ -75,6 +75,32 @@ test('checkMergeStillResolves: ok (nothing to check) when no commit field is rec
   assert.match(result.detail, /nothing to check/);
 });
 
+// tsk-1p9 (D7): root-aware ref resolution — a leaf's branch is merged into
+// its ROOT's branch, never directly into `main`/HEAD, so checking against
+// literal HEAD (the old, pre-tsk-1p9 behavior) falsely reports a healthy
+// merge as unreachable. This is the exact bug tsk-1p9 exists to close.
+test('checkMergeStillResolves: a leaf merged into its (still-unmerged-to-main) root branch resolves ok:true against the root ref', () => {
+  const repoRoot = initRepo();
+  execFileSync('git', ['checkout', '-qb', 'fgw/leaf-root'], { cwd: repoRoot });
+  commitFile(repoRoot, 'root.txt');
+  execFileSync('git', ['checkout', '-qb', 'fgw/leaf-child'], { cwd: repoRoot });
+  const leafSha = commitFile(repoRoot, 'leaf.txt');
+  execFileSync('git', ['checkout', '-q', 'fgw/leaf-root'], { cwd: repoRoot });
+  execFileSync('git', ['merge', '--no-ff', '-q', '-m', 'merge leaf', 'fgw/leaf-child'], { cwd: repoRoot });
+  execFileSync('git', ['checkout', '-q', 'main'], { cwd: repoRoot });
+
+  const view = { work: { 'leaf-child': { parent: 'leaf-root' }, 'leaf-root': {} } };
+
+  const rootAware = checkMergeStillResolves(repoRoot, { branchHeadAtReturn: leafSha }, { view, id: 'leaf-child' });
+  assert.equal(rootAware.ok, true, 'checking against the root ref must find the leaf genuinely merged');
+  assert.match(rootAware.detail, /fgw\/leaf-root/);
+
+  // Proves the regression this item closes: checking against literal HEAD
+  // (main, never touched by the leaf's own merge) falsely fails.
+  const headOnly = checkMergeStillResolves(repoRoot, { branchHeadAtReturn: leafSha });
+  assert.equal(headOnly.ok, false, 'checking against HEAD alone must NOT see the leaf as merged — main never received it');
+});
+
 // --- checkRetrospectiveContent -----------------------------------------
 // tsk-558: reads outcome.docType/docPath (D8's own named fields) instead
 // of outcome.actual/predicted (claim-lifecycle artifacts, unrelated to
