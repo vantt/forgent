@@ -376,6 +376,22 @@ test('list --all restores the wontfix item alongside the open one', () => {
   assert.ok(work['closed-item']);
 });
 
+// tsk-48i D1: parkReason (parkReasonForStatus, workflow-stage-graphs.mjs)
+// stamped at write time, mirroring statusCategory's own precedent -- lets
+// a domain-agnostic consumer of `list --json` (e.g. herdr-plugin) tell a
+// park state apart from active work without reading coding's own literal
+// status strings.
+test('list --json exposes parkReason on a blocked item, and omits it on a doing item', () => {
+  const cwd = tmpCwd();
+  const dir = path.join(cwd, '.fgos');
+  addWork(dir, { id: 'parked-item', title: 'Parked Item', kind: 'task', status: 'blocked', deps: [], risk: 'low', refs: [], verify: 'npm test' });
+  addWork(dir, { id: 'active-item', title: 'Active Item', kind: 'task', status: 'doing', deps: [], risk: 'low', refs: [], verify: 'npm test' });
+
+  const work = envelopeData(run(cwd, ['list', '--all', '--json']).stdout).work;
+  assert.equal(work['parked-item'].parkReason, 'system-error');
+  assert.equal(work['active-item'].parkReason, undefined);
+});
+
 test('list --id returns only that item, ignoring the open-only default and --all entirely (tsk-42m D2)', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'open-item', { title: 'Open Item' });
