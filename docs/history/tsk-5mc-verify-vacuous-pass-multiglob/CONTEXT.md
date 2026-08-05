@@ -112,6 +112,37 @@ Dry-run proof against the real repo, before either real edit lands:
   the final doc-section grep also passes — a trivial substring match once
   the section is written, not separately dry-run tested.
 
+Round 4 (independently reconstructed grep probe, not running `v` itself
+under the renamed condition): rejected — "chứng minh lệnh verify extract
+checkmark lines từ output... không chứng minh lệnh verify gốc (từ item
+tsk-4sz) được FIX" (does not prove the ORIGINAL verify command itself was
+fixed, only that a separately-built probe using the same grep style
+works).
+
+Round 5, locked: runs `tsk-4sz`'s own real `verify` string TWICE — once
+verbatim (must pass) and once with ONLY the `--test-name-pattern`
+argument's two test names renamed via a scoped `sed` substitution, every
+other character (including `v`'s own two checkmark-anchored grep checks)
+left untouched (must fail). This is literally `v`'s own logic executing
+under both conditions, not a reconstruction:
+
+```
+root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname); v=$(node bin/fgos.mjs list --id tsk-4sz --json --dir "$root" | node -e "let s='';process.stdin.on('data',d=>s+=d);process.stdin.on('end',()=>{console.log(JSON.parse(s).data.work['tsk-4sz'].verify)})"); cd "$root" && bash -c "$v" && vred=$(printf '%s' "$v" | sed 's/--test-name-pattern="domain-aware (decompose child addWork|discovered-from addWork) inherits parent domain"/--test-name-pattern="domain-aware (RENAMED-decompose child addWork|RENAMED-discovered-from addWork) inherits parent domain"/') && [ "$vred" != "$v" ] && ! bash -c "$vred" && grep -q "## Multi-file-glob variant" "$root/docs/how-to/avoid-vacuous-pass-with-node-test-test-name-pattern.md"
+```
+
+Dry-run proof against the real repo (`tsk-4sz.verify` temporarily patched
+to the D3 fixed text via `fgos edit`, then reverted immediately after each
+check, same discipline as rounds 3-4):
+
+- `bash -c "$v"` (verbatim, real test names): **exit 0**.
+- `vred` (only the two test names renamed inside `--test-name-pattern`,
+  `v`'s own grep checks untouched): differs from `v`
+  (`[ "$vred" != "$v" ]` guards against a silent no-op substitution) and
+  **exit 1** — `v`'s own logic, run for real, correctly detects the
+  vacuous-pass trap.
+- Full combined command against the current, unmodified (RED) repo state
+  (neither edit landed): **exit 1**.
+
 ## Outstanding questions deferred to planning
 
 None — scope, fix text, and doc placement are fully locked above; the
