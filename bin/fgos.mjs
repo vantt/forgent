@@ -1177,6 +1177,26 @@ async function runVerb(verb, flags, positional, dir) {
       if (docType === undefined) {
         return { id, docType: null, docPath: null, status: item.status };
       }
+      // retrospective-doc-write-path D3: a tag is only ever recorded for a
+      // document already COMMITTED at the main checkout's HEAD — never one
+      // merely present on disk (untracked or staged-only). `dir` is always
+      // `<repoRoot>/.fgos` (fgosDirFromRoot), so its parent recovers the
+      // real root regardless of whether this session's cwd is a linked
+      // worktree. `git cat-file -e HEAD:<path>` succeeds only when the path
+      // resolves inside the HEAD commit's own tree — an untracked or
+      // staged-only file has no entry there and correctly fails this,
+      // unlike a plain `fs.existsSync` which cannot tell the two apart.
+      // This is the invariant D3 makes impossible to violate rather than
+      // detected later: the exact gap that let 34 documents go missing
+      // while their tags still claimed they existed.
+      if (docPath !== undefined) {
+        const repoRoot = path.dirname(dir);
+        try {
+          execFileSync('git', ['cat-file', '-e', `HEAD:${docPath}`], { cwd: repoRoot, encoding: 'utf8', shell: false, stdio: ['ignore', 'ignore', 'pipe'] });
+        } catch {
+          throw new StoreError('validation', `compound: --doc-path "${docPath}" is not committed at the main checkout's HEAD ("${repoRoot}") — write and commit the document there before tagging it.`);
+        }
+      }
       const { event } = addOutcome(dir, { id, docType, ...(docPath !== undefined ? { docPath } : {}) });
       return { id, docType, docPath: docPath ?? null, status: item.status, seq: event.seq };
     }
