@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { judgeDecompose, resolveDecompose, resolveContentRoot } from '../../src/intake/decompose.mjs';
+import { judgeDecompose, resolveDecompose, resolveContentRoot, findUncoveredLockedDecisions } from '../../src/intake/decompose.mjs';
 import { readScoutNotes } from '../../src/intake/judge-executor.mjs';
 import { computeImpact, computePriority, effortForMode } from '../../src/state/priority-formula.mjs';
 import { addWork, listWork, StoreError, categoryOf, moveWork, readRawEvents, recordGateApprove } from '../../src/state/store.mjs';
@@ -1921,6 +1921,142 @@ test('resolveDecompose caller-supplied verdict takes precedence over the plan.md
   const decisions = view.decisionsById?.['item-x'] ?? [];
   assert.ok(decisions.some((d) => d.text.startsWith('decompose caller-supplied:')));
   assert.ok(!decisions.some((d) => d.text.startsWith('decompose skip:')), 'the plan.md mode skip-and-advance path must never fire when a caller verdict is present');
+});
+
+// --- tsk-1gr D1/D2 (docs/history/decompose-locked-decision-footprint-
+// coverage/CONTEXT.md): findUncoveredLockedDecisions -- mechanical
+// path-token check over CONTEXT.md's own "## Locked decisions" section,
+// advisory only, never blocks. ---
+
+function mkContextFixture(storeDir, contextContent) {
+  const repoRoot = path.dirname(storeDir);
+  const featureDir = fs.mkdtempSync(path.join(repoRoot, 'fgos-ctx-'));
+  fs.writeFileSync(path.join(featureDir, 'CONTEXT.md'), contextContent);
+  return { docsRef: path.basename(featureDir), featureDir };
+}
+
+test('findUncoveredLockedDecisions: a real path named in Locked decisions with no covering child footprint is uncovered', () => {
+  const repoRoot = mkTempDir();
+  fs.writeFileSync(path.join(repoRoot, 'important.mjs'), '// fixture\n');
+  const contextText = '## Locked decisions\n\nD1: results must be written to `important.mjs`.\n';
+  const uncovered = findUncoveredLockedDecisions(contextText, [{ footprint: ['src/other.mjs'] }], repoRoot);
+  assert.deepEqual(uncovered, ['important.mjs']);
+});
+
+test('findUncoveredLockedDecisions: a path a child footprint already covers is not reported', () => {
+  const repoRoot = mkTempDir();
+  fs.writeFileSync(path.join(repoRoot, 'important.mjs'), '// fixture\n');
+  const contextText = '## Locked decisions\n\nD1: results must be written to `important.mjs`.\n';
+  const uncovered = findUncoveredLockedDecisions(contextText, [{ footprint: ['important.mjs'] }], repoRoot);
+  assert.deepEqual(uncovered, []);
+});
+
+test('findUncoveredLockedDecisions: no "## Locked decisions" section at all yields no findings', () => {
+  const repoRoot = mkTempDir();
+  const contextText = '## plan.md\n\nmode = tiny, no locked-decisions heading here.\n';
+  assert.deepEqual(findUncoveredLockedDecisions(contextText, [], repoRoot), []);
+});
+
+test('findUncoveredLockedDecisions: a path-shaped token that names no real file is exempt (prose, not a real file)', () => {
+  const repoRoot = mkTempDir();
+  const contextText = '## Locked decisions\n\nD1: this reads like a/path but names nothing real.\n';
+  assert.deepEqual(findUncoveredLockedDecisions(contextText, [], repoRoot), []);
+});
+
+test('resolveDecompose caller-supplied decompose verdict: an uncovered locked-decision path logs an advisory decision but still writes children (D1 — never blocks)', () => {
+  const dir = mkTempDir();
+  const { scriptPath, counterPath } = writeCountingRawStdoutExecutor(dir, JSON.stringify({ verdict: 'pass-through', reason: 'should never run' }));
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  // Named uniquely off docsRef itself (a fresh mkdtemp basename) so the
+  // fixture file, living directly under the shared os.tmpdir() repo root,
+  // never collides with another test's own fixture of the same shape.
+  const { docsRef } = mkContextFixture(storeDir, '## Locked decisions\n\nD1: placeholder — filled below.\n');
+  const fixtureRelPath = `${docsRef}.mjs`;
+  fs.writeFileSync(path.join(path.dirname(storeDir), fixtureRelPath), '// fixture\n');
+  fs.writeFileSync(
+    path.join(path.dirname(storeDir), docsRef, 'CONTEXT.md'),
+    `## Locked decisions\n\nD1: canonical output lives at \`${fixtureRelPath}\`.\n`,
+  );
+  addWork(storeDir, sampleWork({ docsRef }));
+
+  const result = resolveDecompose(storeDir, 'item-x', cfg, 'session', {
+    verdict: 'decompose',
+    reason: 'Two independent surfaces, no shared state',
+    children: [
+      { title: 'Build parser', verify: 'npm test -- parser', footprint: ['src/parser.mjs'] },
+      { title: 'Build renderer', verify: 'npm test -- renderer', footprint: ['src/renderer.mjs'] },
+    ],
+  });
+  assert.equal(result.outcome, 'decompose', 'the advisory must never block the real decompose write');
+  assert.equal(readCount(counterPath), 0);
+
+  const view = listWork(storeDir);
+  assert.equal(Object.values(view.work).filter((item) => item.parent === 'item-x').length, 2, 'children are still written despite the coverage gap');
+  const decisions = view.decisionsById?.['item-x'] ?? [];
+  assert.ok(
+    decisions.some((d) => d.text.includes('completeness advisory') && d.text.includes(fixtureRelPath)),
+    'the coverage gap must be logged as its own decision',
+  );
+});
+
+test('resolveDecompose caller-supplied decompose verdict: a child footprint that covers the locked-decision path logs no advisory', () => {
+  const dir = mkTempDir();
+  const { scriptPath, counterPath } = writeCountingRawStdoutExecutor(dir, JSON.stringify({ verdict: 'pass-through', reason: 'should never run' }));
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  const { docsRef } = mkContextFixture(storeDir, '## Locked decisions\n\nD1: placeholder — filled below.\n');
+  const fixtureRelPath = `${docsRef}.mjs`;
+  fs.writeFileSync(path.join(path.dirname(storeDir), fixtureRelPath), '// fixture\n');
+  fs.writeFileSync(
+    path.join(path.dirname(storeDir), docsRef, 'CONTEXT.md'),
+    `## Locked decisions\n\nD1: canonical output lives at \`${fixtureRelPath}\`.\n`,
+  );
+  addWork(storeDir, sampleWork({ docsRef }));
+
+  const result = resolveDecompose(storeDir, 'item-x', cfg, 'session', {
+    verdict: 'decompose',
+    reason: 'Two independent surfaces, no shared state',
+    children: [{ title: 'Build parser', verify: 'npm test -- parser', footprint: [fixtureRelPath] }],
+  });
+  assert.equal(result.outcome, 'decompose');
+  assert.equal(readCount(counterPath), 0);
+
+  const view = listWork(storeDir);
+  const decisions = view.decisionsById?.['item-x'] ?? [];
+  assert.ok(!decisions.some((d) => d.text.includes('completeness advisory')), 'a covered path must never be reported');
+});
+
+test('resolveDecompose auto-judged (model) decompose verdict also runs the completeness advisory (tsk-1gr fix: not caller-verdict-only)', () => {
+  const dir = mkTempDir();
+  const scriptPath = writeVerdictWithVerifyCheckExecutor(dir, {
+    verdict: 'decompose',
+    reason: 'Two independent surfaces, no shared state',
+    children: [{ title: 'Build parser', verify: 'npm test -- parser', footprint: ['src/parser.mjs'] }],
+  });
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  const { docsRef } = mkContextFixture(storeDir, '## Locked decisions\n\nD1: placeholder — filled below.\n');
+  const fixtureRelPath = `${docsRef}.mjs`;
+  fs.writeFileSync(path.join(path.dirname(storeDir), fixtureRelPath), '// fixture\n');
+  fs.writeFileSync(
+    path.join(path.dirname(storeDir), docsRef, 'CONTEXT.md'),
+    `## Locked decisions\n\nD1: canonical output lives at \`${fixtureRelPath}\`.\n`,
+  );
+  addWork(storeDir, sampleWork({ docsRef }));
+
+  const result = resolveDecompose(storeDir, 'item-x', cfg, 'runner');
+  assert.equal(result.outcome, 'decompose');
+
+  const view = listWork(storeDir);
+  const decisions = view.decisionsById?.['item-x'] ?? [];
+  assert.ok(
+    decisions.some((d) => d.text.includes('completeness advisory') && d.text.includes(fixtureRelPath)),
+    'the completeness check must fire on the model-judged path too, not only callerVerdict',
+  );
 });
 
 test('resolveDecompose omitting callerVerdict entirely keeps prior behavior (byte-identical call site)', () => {
