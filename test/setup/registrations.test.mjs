@@ -23,6 +23,32 @@ import { DEFAULT_RUNNER_CONFIG } from '../../src/runner/dispatch.mjs';
 // running the test suite.
 process.env.FGOS_CLAUDE_COMMAND = '/nonexistent/fgos-test-claude-binary';
 
+// Snapshot the real registry HERE, at module scope, before any test below
+// registers a throwaway entry into these same live shared arrays. The spec
+// rows the last two tests in this file compare against name only the real
+// entries, so reading DOCTOR_CHECKS/FIX_REGISTRATIONS from inside a test
+// would pick up throwaways and fail for the wrong reason.
+const REGISTERED_CHECK_IDS = DOCTOR_CHECKS.map((c) => c.id);
+const REGISTERED_FIX_IDS = FIX_REGISTRATIONS.map((f) => f.id);
+
+const SPEC_PATH = new URL('../../docs/specs/distribution.md', import.meta.url);
+
+/**
+ * The ids a Data Dictionary row enumerates after its "Today's registered
+ * ..." marker — the backticked tokens up to the end of that sentence, so
+ * the row's surrounding prose (which backticks `registerCheck`, module
+ * paths, and command names too) is never mistaken for an entry.
+ */
+function specEnumeratedIds(marker) {
+  const spec = fs.readFileSync(SPEC_PATH, 'utf8');
+  const start = spec.indexOf(marker);
+  assert.notEqual(start, -1, `docs/specs/distribution.md no longer contains the marker "${marker}"`);
+  const rest = spec.slice(start + marker.length);
+  const end = rest.indexOf('. ');
+  assert.notEqual(end, -1, `the "${marker}" enumeration is not terminated by a sentence break`);
+  return [...rest.slice(0, end).matchAll(/`([^`]+)`/g)].map((m) => m[1]);
+}
+
 function mkTempDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-registrations-test-'));
 }
@@ -167,4 +193,27 @@ test('ensureSharedConfigDefaults migrates a legacy .fgos-runner.json into the ru
   assert.deepEqual(config.runner.parallel, DEFAULT_RUNNER_CONFIG.parallel);
   assert.equal(fs.existsSync(path.join(dir, '.fgos-runner.json')), true, 'the legacy file is never deleted');
   assert.equal(fs.existsSync(path.join(dir, '.fgos', 'config.json')), true, 'the real move actually happened');
+});
+
+// ─── spec/registry agreement. Data Dictionary #7 and #7b used to say the
+// list "grows without a spec update whenever a module registers a new one",
+// which let it rot: a module registered `claude-plugin-marketplace` as both
+// a check and a fix without touching the spec, and nothing noticed until a
+// person audited by hand. Those rows now carry the opposite obligation —
+// they name every registered entry, and a module adding one updates the row
+// in the same change. These two tests are what makes that obligation real
+// instead of a sentence nobody enforces.
+
+test('Data Dictionary #7 names exactly the registered doctor checks — no missing entry, no stale one', () => {
+  assert.deepEqual(
+    specEnumeratedIds("Today's registered checks: ").slice().sort(),
+    REGISTERED_CHECK_IDS.slice().sort(),
+  );
+});
+
+test('Data Dictionary #7b names exactly the registered doctor fixes — no missing entry, no stale one', () => {
+  assert.deepEqual(
+    specEnumeratedIds("Today's registered fixes: ").slice().sort(),
+    REGISTERED_FIX_IDS.slice().sort(),
+  );
 });
