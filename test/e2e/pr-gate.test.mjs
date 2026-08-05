@@ -213,9 +213,18 @@ test('e2e pr-gate (a) runner item full loop: add -> runner dispatch -> awaiting-
 
   // Walk the rest of the sequential chain (work-item-status-delivered-
   // retrospective-cleanup D1/D2/D10) to reach done's one remaining door in.
+  // tsk-1p9: branch/worktree teardown now lives ONLY in the real `cleanup`
+  // verb (D2), so this must actually call it (gated by TTL=0 here) instead
+  // of a bare `move --to done` — the claim-time `predicted` outcome record
+  // (claim-port.mjs/loop.mjs, auto-written for every dispatched item)
+  // already satisfies D8's retrospective-content check.
   assert.equal(fgos(repoRoot, ['move', 'pr-a-item', '--to', 'retrospective']).status, 0);
   assert.equal(fgos(repoRoot, ['move', 'pr-a-item', '--to', 'cleanup']).status, 0);
-  assert.equal(fgos(repoRoot, ['move', 'pr-a-item', '--to', 'done']).status, 0);
+  fs.mkdirSync(path.join(repoRoot, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(repoRoot, '.fgos', 'config.json'), JSON.stringify({ cleanup: { ttlDays: 0 } }));
+  const cleanupResult = fgos(repoRoot, ['cleanup', 'pr-a-item']);
+  assert.equal(cleanupResult.status, 0, `cleanup failed: ${cleanupResult.stderr}`);
+  assert.equal(envelopeData(cleanupResult.stdout).to, 'done', `cleanup did not close to done: ${cleanupResult.stdout}`);
 
   const view = stateView(repoRoot);
   assert.equal(view.work['pr-a-item'].status, 'done');
@@ -224,7 +233,7 @@ test('e2e pr-gate (a) runner item full loop: add -> runner dispatch -> awaiting-
   assert.equal(view.settlements['pr-a-item'][0].kind, 'close');
   assert.equal(view.settlements['pr-a-item'][0].role, 'human', 'D3: the approver is the settlement role, merge is only the mechanical consequence');
   assert.ok(view.learnings['pr-a-item'][0], 'câu-6 learning record must be present on the close edge');
-  assert.equal(branchExists(repoRoot, 'fgw/pr-a-item'), false, 'the fully-merged branch is cleaned up');
+  assert.equal(branchExists(repoRoot, 'fgw/pr-a-item'), false, 'the fully-merged branch is cleaned up by the cleanup verb (tsk-1p9)');
   assert.equal(worktreeCount(repoRoot), 1, 'no leaked worktree after cleanup');
 
   assert.ok(fs.existsSync(path.join(repoRoot, 'pr-a-produced.txt')), 'the merged file is present on main');
@@ -448,14 +457,20 @@ test('e2e pr-gate (e) branch-source item full loop: park (blocked + live branch)
   assert.match(approveEData.output, /PR_E_OK/);
   assert.equal(stateView(repoRoot).work['pr-e-item'].status, 'delivered');
 
+  // tsk-1p9: real `cleanup` verb, not a bare `move --to done` — teardown
+  // now lives only there (D2), gated by TTL=0 here.
   assert.equal(fgos(repoRoot, ['move', 'pr-e-item', '--to', 'retrospective']).status, 0);
   assert.equal(fgos(repoRoot, ['move', 'pr-e-item', '--to', 'cleanup']).status, 0);
-  assert.equal(fgos(repoRoot, ['move', 'pr-e-item', '--to', 'done']).status, 0);
+  fs.mkdirSync(path.join(repoRoot, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(repoRoot, '.fgos', 'config.json'), JSON.stringify({ cleanup: { ttlDays: 0 } }));
+  const cleanupEResult = fgos(repoRoot, ['cleanup', 'pr-e-item']);
+  assert.equal(cleanupEResult.status, 0, `cleanup failed: ${cleanupEResult.stderr}`);
+  assert.equal(envelopeData(cleanupEResult.stdout).to, 'done', `cleanup did not close to done: ${cleanupEResult.stdout}`);
 
   const view2 = stateView(repoRoot);
   assert.equal(view2.work['pr-e-item'].status, 'done');
   assert.equal(view2.settlements['pr-e-item'][0].role, 'human');
-  assert.equal(branchExists(repoRoot, 'fgw/pr-e-item'), false, 'the fully-merged branch is cleaned up');
+  assert.equal(branchExists(repoRoot, 'fgw/pr-e-item'), false, 'the fully-merged branch is cleaned up by the cleanup verb (tsk-1p9)');
   assert.equal(worktreeCount(repoRoot), 1, 'no leaked worktree after cleanup');
   assert.ok(fs.existsSync(path.join(repoRoot, 'pr-e-proof.txt')), 'the merged file is present on main');
 });

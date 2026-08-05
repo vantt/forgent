@@ -4804,7 +4804,7 @@ test('approve on a non-proposed item is rejected as precondition, exit 2', () =>
   assert.equal(result.status, 2);
 });
 
-test('approve of a runner item (happy path): merges fgw/<id> into main, verifies, awaiting-approval -> done with role human, and cleans up the branch', () => {
+test('approve of a runner item (happy path): merges fgw/<id> into main, verifies, awaiting-approval -> delivered with role human, and the branch SURVIVES (tsk-1p9: cleanup deferred to the cleanup verb)', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   makeRunnerProposedItem(cwd, 'approve-runner-item', { verify: 'test -f approve-runner-item-produced.txt' });
@@ -4813,6 +4813,7 @@ test('approve of a runner item (happy path): merges fgw/<id> into main, verifies
   const result = run(cwd, ['approve', 'approve-runner-item']);
   assert.equal(result.status, 0, result.stderr);
   assert.equal(envelopeData(result.stdout).to, 'delivered');
+  assert.equal('cleanupWarnings' in envelopeData(result.stdout), false, 'approve no longer performs branch/worktree cleanup itself (tsk-1p9 D1)');
 
   const view = stateView(cwd);
   assert.equal(view.work['approve-runner-item'].status, 'delivered');
@@ -4824,7 +4825,7 @@ test('approve of a runner item (happy path): merges fgw/<id> into main, verifies
   assert.ok(fs.existsSync(path.join(cwd, 'approve-runner-item-produced.txt')), 'the merged file must be present on main');
 
   const branches = gitAtCwd(cwd, ['for-each-ref', '--format=%(refname:short)', 'refs/heads/fgw/']);
-  assert.doesNotMatch(branches, /fgw\/approve-runner-item/, 'the fully-merged branch is cleaned up');
+  assert.match(branches, /fgw\/approve-runner-item/, 'the merged branch must survive approve — deleted later by the cleanup verb, not here');
 });
 
 test('approve of a runner item succeeds when ONLY .fgos/ (the live event log) is dirty on main — no more manual events.jsonl commit before every approve', () => {
@@ -4908,7 +4909,7 @@ test('approve of a runner item with a declared footprint still refuses on an unc
   assert.equal(stateView(cwd).work['approve-footprint-dirty'].status, 'awaiting-approval');
 });
 
-test('approve of a leaf item with a clean merge lands the work on fgw/<root> (not main) via an ephemeral worktree, leaf -> done, fgw/<leaf> is actually deleted, fgw/<root> survives', () => {
+test('approve of a leaf item with a clean merge lands the work on fgw/<root> (not main) via an ephemeral worktree, leaf -> delivered, fgw/<leaf> SURVIVES the approve (tsk-1p9: teardown deferred to the cleanup verb), fgw/<root> survives', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   makeRunnerProposedLeafItem(cwd, 'approve-leaf-root', 'approve-leaf-child', { verify: 'test -f approve-leaf-child-produced.txt' });
@@ -4921,6 +4922,7 @@ test('approve of a leaf item with a clean merge lands the work on fgw/<root> (no
   assert.equal(approveData.branch, 'fgw/approve-leaf-child');
   assert.equal(approveData.target, 'fgw/approve-leaf-root');
   assert.equal(approveData.to, 'delivered');
+  assert.equal('cleanupWarnings' in approveData, false, 'approve no longer performs branch/worktree cleanup itself (tsk-1p9 D1)');
 
   // main must never be touched by a leaf approve.
   assert.equal(gitHead(cwd), headBefore, 'main HEAD must be unchanged by a leaf approve');
@@ -4933,10 +4935,11 @@ test('approve of a leaf item with a clean merge lands the work on fgw/<root> (no
   const view = stateView(cwd);
   assert.equal(view.work['approve-leaf-child'].status, 'delivered');
 
-  // fgw/<leaf> must be ACTUALLY deleted (git branch list), not just the
-  // ephemeral worktree directory gone — the exact gap validating found.
+  // fgw/<leaf> must SURVIVE right after approve (tsk-1p9, restore-to-decision:
+  // teardown is deferred to the `cleanup` verb, gated by D7's TTL and D8's
+  // harness — no longer synchronous with merge).
   const branches = gitAtCwd(cwd, ['for-each-ref', '--format=%(refname:short)', 'refs/heads/fgw/']);
-  assert.doesNotMatch(branches, /fgw\/approve-leaf-child\b/, 'the leaf\'s own branch must be deleted after merging into its root');
+  assert.match(branches, /fgw\/approve-leaf-child\b/, 'the leaf\'s own branch must survive approve — deleted later by the cleanup verb, not here');
   assert.match(branches, /fgw\/approve-leaf-root\b/, 'the root\'s own integration branch must survive');
 
   // the merged content must actually be present on fgw/<root>'s tip.
@@ -5211,7 +5214,7 @@ test('approve --acknowledge-iron-law false (a value form, not the bare flag) sti
   assert.equal(gitHead(cwd), headBefore);
 });
 
-test('approve of the same self-modifying diff PROCEEDS with --acknowledge-iron-law: merges, verifies, awaiting-approval -> done, branch cleaned up', () => {
+test('approve of the same self-modifying diff PROCEEDS with --acknowledge-iron-law: merges, verifies, awaiting-approval -> delivered, branch SURVIVES (tsk-1p9: cleanup deferred to the cleanup verb)', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   makeRunnerProposedItemTouching(cwd, 'iron-ack-item', 'src/runner/probe.mjs', {
@@ -5229,7 +5232,7 @@ test('approve of the same self-modifying diff PROCEEDS with --acknowledge-iron-l
   assert.equal(view.settlements?.['iron-ack-item'], undefined);
   assert.ok(fs.existsSync(path.join(cwd, 'src/runner/probe.mjs')), 'the merged module file is present on main');
   const branches = gitAtCwd(cwd, ['for-each-ref', '--format=%(refname:short)', 'refs/heads/']);
-  assert.doesNotMatch(branches, /fgw\/iron-ack-item/, 'the fully-merged branch is cleaned up');
+  assert.match(branches, /fgw\/iron-ack-item/, 'the merged branch must survive approve — deleted later by the cleanup verb, not here');
 });
 
 test('approve of an ordinary runner item (diff touches no self-modifying module) is UNAFFECTED — proceeds to done with no --acknowledge-iron-law flag (backward compatibility)', () => {
@@ -8504,15 +8507,12 @@ test('cleanup is a no-op — writes zero work.move events and stays at cleanup �
 });
 
 test('cleanup closes to done when TTL is configured to 0 and retrospective content + a resolving merge both exist', () => {
-  // KNOWN GAP, deliberately left in place this item (flagged for a
-  // dedicated follow-up, not silently dropped): approve's merge paths
-  // still call cleanupMergedBranch synchronously today, the exact eager
-  // deletion D7 exists to move later — so the branch is typically already
-  // gone by the time this verb runs. cleanup's own cleanupMergedBranch
-  // call is idempotent (branchExists guards it, and the function itself
-  // never throws on an already-gone branch, per merge.test.mjs) — this
-  // test asserts the STATUS transition works correctly regardless of
-  // which point actually performed the git-level deletion.
+  // tsk-1p9: approve no longer calls cleanupMergedBranch at all — the
+  // branch survives all the way from `delivered` through `cleanup`, and
+  // this verb is now the ONLY thing that ever deletes it. `cleanupMergedBranch`
+  // stays idempotent (branchExists guards it, never throws on an
+  // already-gone branch, per merge.test.mjs) as a defensive property, not
+  // because this path actually races another deletion anymore.
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   writeCleanupTtlConfig(cwd, 0);
@@ -8536,6 +8536,46 @@ test('cleanup closes to done when TTL is configured to 0 and retrospective conte
   assert.equal(stateView(cwd).work['cleanup-ready-item'].status, 'done');
   const branchAfter = gitAtCwd(cwd, ['for-each-ref', '--format=%(refname:short)', 'refs/heads/fgw/']);
   assert.doesNotMatch(branchAfter, /fgw\/cleanup-ready-item/, 'the branch is gone by the time cleanup finishes, whichever step actually deleted it');
+});
+
+// tsk-1p9 (D7/D8): the regression this item exists to close — a LEAF
+// item's own branch, merged into its root's branch (never main), must
+// still be deleted correctly by cleanup even while the root itself
+// remains unmerged. Pre-tsk-1p9, checkMergeStillResolves checked ancestry
+// against literal HEAD (always main from repoRoot), which would falsely
+// fail for every leaf; this test proves the root-aware fix (D7) plus the
+// verb's own force-delete (D8) actually get the leaf's branch gone.
+test('cleanup of a LEAF item deletes its own branch even though the ROOT branch is still unmerged into main (tsk-1p9 D7/D8)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  writeCleanupTtlConfig(cwd, 0);
+  makeRunnerProposedLeafItem(cwd, 'leaf-cleanup-root', 'leaf-cleanup-child', { verify: 'test -f leaf-cleanup-child-produced.txt' });
+  commitPendingBeforeApprove(cwd, 'leaf-cleanup-child');
+
+  const approve = run(cwd, ['approve', 'leaf-cleanup-child']);
+  assert.equal(approve.status, 0, `approve failed: ${approve.stderr}`);
+  assert.equal(stateView(cwd).work['leaf-cleanup-child'].status, 'delivered');
+
+  // The leaf's branch survives approve (tsk-1p9 D1) — confirms the fixture
+  // actually exercises the deferred-cleanup path this test is proving.
+  const branchAfterApprove = gitAtCwd(cwd, ['for-each-ref', '--format=%(refname:short)', 'refs/heads/fgw/']);
+  assert.match(branchAfterApprove, /fgw\/leaf-cleanup-child\b/, 'the leaf branch must still exist right after approve');
+  assert.match(branchAfterApprove, /fgw\/leaf-cleanup-root\b/, 'the root branch must still exist — never merged to main by this test');
+
+  run(cwd, ['move', 'leaf-cleanup-child', '--to', 'retrospective']);
+  const dir = path.join(cwd, '.fgos');
+  addOutcome(dir, { id: 'leaf-cleanup-child', docType: 'how-to', actual: { outcome: 'pass', passed: true, attempts: 1, errorClass: null, aheadCount: 0, visits: 1 } });
+  run(cwd, ['move', 'leaf-cleanup-child', '--to', 'cleanup']);
+
+  const result = run(cwd, ['cleanup', 'leaf-cleanup-child']);
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.to, 'done', `cleanup must close the leaf to done, not park it blocked: ${JSON.stringify(data)}`);
+
+  assert.equal(stateView(cwd).work['leaf-cleanup-child'].status, 'done');
+  const branchAfterCleanup = gitAtCwd(cwd, ['for-each-ref', '--format=%(refname:short)', 'refs/heads/fgw/']);
+  assert.doesNotMatch(branchAfterCleanup, /fgw\/leaf-cleanup-child\b/, 'the leaf branch must actually be deleted by cleanup');
+  assert.match(branchAfterCleanup, /fgw\/leaf-cleanup-root\b/, 'the still-open root branch must be untouched');
 });
 
 test('cleanup parks cleanup -> blocked when the recorded commit no longer resolves on main (force-pushed/rewritten away)', () => {
