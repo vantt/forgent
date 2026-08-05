@@ -101,6 +101,52 @@ test('checkMergeStillResolves: a leaf merged into its (still-unmerged-to-main) r
   assert.equal(headOnly.ok, false, 'checking against HEAD alone must NOT see the leaf as merged — main never received it');
 });
 
+// tsk-577: startupReap's zero-ahead prune (loop.mjs) can delete a root's
+// own `fgw/<rootId>` branch while a leaf child is still sitting in
+// `cleanup`, still needing that ref for its own check -- confirmed root
+// cause of a real 14-item false-positive block. Reproduces the exact
+// scenario: root merged into main for real (never squashed -- that is what
+// makes the branch eligible for zero-ahead prune in the first place), root
+// branch then deleted, leaf's own recorded sha must still resolve via the
+// HEAD fallback.
+test('checkMergeStillResolves: a leaf resolves ok:true via HEAD fallback when its root branch was already pruned (tsk-577)', () => {
+  const repoRoot = initRepo();
+  execFileSync('git', ['checkout', '-qb', 'fgw/root-x'], { cwd: repoRoot });
+  commitFile(repoRoot, 'root.txt');
+  execFileSync('git', ['checkout', '-qb', 'fgw/leaf-y'], { cwd: repoRoot });
+  const leafSha = commitFile(repoRoot, 'leaf.txt');
+  execFileSync('git', ['checkout', '-q', 'fgw/root-x'], { cwd: repoRoot });
+  execFileSync('git', ['merge', '--no-ff', '-q', '-m', 'merge leaf', 'fgw/leaf-y'], { cwd: repoRoot });
+  execFileSync('git', ['checkout', '-q', 'main'], { cwd: repoRoot });
+  // Root merges into main for real (preserves ancestry) -- the only way a
+  // branch ever reaches aheadCount === 0 and becomes prune-eligible.
+  execFileSync('git', ['merge', '--no-ff', '-q', '-m', 'merge root', 'fgw/root-x'], { cwd: repoRoot });
+  // Simulate startupReap's zero-ahead prune deleting the now-fully-merged
+  // root branch while the leaf is still sitting in cleanup.
+  execFileSync('git', ['branch', '-D', 'fgw/root-x'], { cwd: repoRoot });
+
+  const view = { work: { 'leaf-y': { parent: 'root-x' }, 'root-x': {} } };
+  const result = checkMergeStillResolves(repoRoot, { branchHeadAtReturn: leafSha }, { view, id: 'leaf-y' });
+  assert.equal(result.ok, true, 'a pruned-but-safe root branch must fall back to HEAD, not fail closed');
+  assert.match(result.detail, /no longer exists \(pruned\)/);
+  assert.match(result.detail, /fell back to HEAD/);
+});
+
+test('checkMergeStillResolves: still ok:false when the root branch is missing AND the content genuinely never reached HEAD (tsk-577 regression guard)', () => {
+  const repoRoot = initRepo();
+  execFileSync('git', ['checkout', '-qb', 'fgw/root-z'], { cwd: repoRoot });
+  const rootSha = commitFile(repoRoot, 'root-only.txt');
+  execFileSync('git', ['checkout', '-q', 'main'], { cwd: repoRoot });
+  // Root branch deleted WITHOUT ever merging into main -- content never
+  // landed. The fallback must still fail closed here, never mask a real loss.
+  execFileSync('git', ['branch', '-D', 'fgw/root-z'], { cwd: repoRoot });
+
+  const view = { work: { 'leaf-w': { parent: 'root-z' }, 'root-z': {} } };
+  const result = checkMergeStillResolves(repoRoot, { branchHeadAtReturn: rootSha }, { view, id: 'leaf-w' });
+  assert.equal(result.ok, false, 'the fallback must not paper over content that never actually reached HEAD');
+  assert.match(result.detail, /not an ancestor of HEAD either/);
+});
+
 // --- checkRetrospectiveContent -----------------------------------------
 // tsk-558: reads outcome.docType/docPath (D8's own named fields) instead
 // of outcome.actual/predicted (claim-lifecycle artifacts, unrelated to

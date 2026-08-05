@@ -70,6 +70,22 @@ function git(repoRoot, args) {
  * instead — a named ref, no checkout required. A root/standalone item
  * (`view`/`id` omitted, or `resolveRoot` returns `id` itself) keeps
  * checking against `HEAD`, unchanged.
+ *
+ * MISSING-REF FALLBACK (tsk-577): a leaf's own root branch can be pruned
+ * (startupReap's zero-ahead prune, loop.mjs) while the leaf is still
+ * sitting in `cleanup`, waiting on its own gate. `git merge-base
+ * --is-ancestor` against a deleted ref throws "unknown revision" the same
+ * way it throws for a genuinely unreachable commit -- indistinguishable
+ * without checking ref existence first. But a `fgw/<id>` branch, in this
+ * codebase, is ONLY ever force-deleted in two guarded places: loop.mjs's
+ * zero-ahead prune (which by definition means the branch tip was already a
+ * real ancestor of `main` -- a squash merge would leave the original
+ * commits permanently "ahead", never pruned), and merge.mjs's
+ * cleanupMergedBranch (which deletes an item's own branch only AFTER that
+ * item's own checkMergeStillResolves already passed). So a missing NAMED
+ * ref is always safe to re-check against `HEAD` directly instead of
+ * failing closed -- `HEAD` itself is never pruned, so this fallback only
+ * ever applies to the leaf case (targetRef !== 'HEAD').
  */
 export function checkMergeStillResolves(repoRoot, work, { view, id } = {}) {
   const sha = work?.branchHeadAtReturn ?? work?.headAtReturn ?? work?.branchHeadAtTake ?? work?.headAtTake;
@@ -77,14 +93,38 @@ export function checkMergeStillResolves(repoRoot, work, { view, id } = {}) {
     return { ok: true, detail: 'no recorded commit to verify — nothing to check' };
   }
   const rootId = view && id ? resolveRoot(view, id) : id;
-  const targetRef = rootId && rootId !== id ? `fgw/${rootId}` : 'HEAD';
+  const namedRef = rootId && rootId !== id ? `fgw/${rootId}` : null;
+
+  if (namedRef && !refExists(repoRoot, namedRef)) {
+    return checkAncestry(repoRoot, sha, 'HEAD', `${namedRef} no longer exists (pruned)`);
+  }
+  return checkAncestry(repoRoot, sha, namedRef ?? 'HEAD');
+}
+
+function refExists(repoRoot, ref) {
+  try {
+    git(repoRoot, ['rev-parse', '--verify', '--quiet', ref]);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function checkAncestry(repoRoot, sha, targetRef, fallbackNote) {
   try {
     git(repoRoot, ['merge-base', '--is-ancestor', sha, targetRef]);
-    return { ok: true, detail: `commit ${sha} is still an ancestor of ${targetRef}` };
+    return {
+      ok: true,
+      detail: fallbackNote
+        ? `${fallbackNote} — fell back to HEAD, commit ${sha} is still an ancestor of HEAD`
+        : `commit ${sha} is still an ancestor of ${targetRef}`,
+    };
   } catch {
     return {
       ok: false,
-      detail: `commit ${sha} is no longer reachable from ${targetRef} — the merge may have been force-pushed away or history rewritten`,
+      detail: fallbackNote
+        ? `${fallbackNote} — fell back to HEAD, but commit ${sha} is not an ancestor of HEAD either — the merge may have been force-pushed away or history rewritten`
+        : `commit ${sha} is no longer reachable from ${targetRef} — the merge may have been force-pushed away or history rewritten`,
     };
   }
 }
