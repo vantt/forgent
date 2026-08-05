@@ -162,14 +162,37 @@ fresh index is cheap insurance either way.
   events already in the log on next replay, same as every other
   `view.*` derived field.
 
-## Outstanding for `fgos-validating`
+## Validated at `fgos-validating`
 
-- Prove Phase 2's empirical re-test actually holds or actually still
-  contradicts — this plan designed the mechanism and the test shape, not
-  the result.
-- Confirm no other code path reads `view.gates[id].ask` assuming it is the
-  ONLY history available (a caller that should have read `askHistory` once
-  it exists, but wasn't updated) — the audit above found the two
-  `resolveDiscovery`/`resolveDecompose` call sites; a broader grep for
-  `.gates[` `.ask` across `src/` at execution time is cheap insurance
-  before trusting Phase 2 is complete.
+- **`askHistory` additive safety (was: "confirm no other code path reads
+  `.ask` assuming it is the only history"):** RESOLVED. Grepped every
+  `.ask` reader in `src/`/`bin/`: `discovery.mjs:220` (first-pass judge's
+  own "most recent question" display), `decompose.mjs:170` (same
+  display), `decompose.mjs:659`/`:667` (risk/blast-radius bypass-reason
+  string match against the single most-recent `.ask`), `awaiting-context.mjs:74`
+  (surfaces `.ask` into a context object). None assume `.ask` is the ONLY
+  history — all four read the single-slot value for purposes unrelated to
+  verify-dispute history, and none break if an ADDITIVE `askHistory` key
+  coexists alongside `.ask`'s unchanged overwrite semantics. Confirmed
+  safe.
+- **Phase 2's empirical re-test (D1's actual bet): ATTEMPTED, INCONCLUSIVE.**
+  Ran a real 4-round probe through the actual `fgos discover` pathway on a
+  throwaway item (`tsk-2wp`, now `wontfix`): round A got a real objection,
+  round B got a second real objection on a different axis, then joined
+  A+B context was manually injected (simulating the not-yet-built
+  `askHistory` mechanism) before round C. Round C's objection was a
+  legitimate repeat of round B's flaw (the proposed verify was genuinely
+  still broken), not a contradiction — across all 3 disputed rounds the
+  judge was **consistent**, never reversing an earlier round's own stated
+  criteria. This means the specific failure mode D1 targets (a later round
+  contradicting an earlier round's own ask, as `tsk-4xg`/`tsk-5mc` both
+  hit) could NOT be forced to reproduce synthetically in this session —
+  it is inherently a rare, non-deterministic LLM failure mode observed on
+  real work items, not one reliably triggerable on demand against a
+  vacuous throwaway item with no real underlying claim to verify. Neither
+  confirms nor refutes whether full-history threading would have stopped
+  a REAL contradiction, had one occurred. This is a genuinely open
+  question, carried forward as-is (see Feasibility Matrix below and the
+  Gate section) — not something further planning-stage work can close
+  without actually building Phase 2's code and hitting a real live
+  dispute.
