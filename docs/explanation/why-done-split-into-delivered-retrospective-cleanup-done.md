@@ -170,6 +170,66 @@ skills this synthesis document was produced through
 (`docs/explanation/fgos-retro-loop-and-the-restored-compound-verb.md`,
 `tsk-3o3`).
 
+## The implementation drifted from D7/D8 in two places — a real, evidenced bug, not a design flaw
+
+`tsk-1q1` found and confirmed, against real event-log data rather than
+assumption, that the shipped `cleanup` implementation diverged from what
+D7/D8 above actually locked — a restore-to-decision item, not a redesign.
+
+**Drift 1 — the TTL got folded into D8's harness checks, when D7 placed it
+outside them.** D7's own wording is explicit that the two are joined by
+*AND*, not merged into one check list: "run only after TTL elapses AND the
+`cleanup->done` harness (D8) passes." D8 locks exactly two checks —
+code still genuinely merged on `main`, and retrospective actually produced
+real content — neither of which is the TTL. The shipped code
+(`assessCleanupReadiness`, `src/state/cleanup-harness.mjs`) folded all
+three conditions into one `reasons` array, so any TTL-not-yet-elapsed item
+parks `cleanup -> blocked` exactly like a genuine D8 check failure would.
+Real evidence from `.fgos/events.jsonl`: six `cleanup -> blocked` events in
+the entire log, six-for-six caused by the TTL condition, zero caused by an
+actual D8 check failing — and every one of the six is still sitting
+`blocked` today, none ever recovered. This is precisely the "silent stuck
+state" D8's own text says must never happen. The mechanical consequence
+compounds the damage: `blocked` isn't in the resolved-tail set (D13
+above), so an item whose code is genuinely merged on `main` gets pulled
+backward from resolved to unresolved the moment this mispark happens —
+`statusCategory` flips back to `in-progress`, dependents that assumed the
+code was safely in stop being told the truth, and `cleanup-pool.mjs`'s own
+picker only ever looks for `status: cleanup`, so a misparked item is never
+picked up again by anything.
+
+**Drift 2 — the very thing `cleanup`'s delay exists to protect was already
+being torn down early.** The pinned meaning of `cleanup` above is explicit:
+delay is deliberate, "so a post-merge incident can still reuse the
+worktree." In the real shipped code, `cleanupMergedBranch` deletes the
+git branch at merge time, not at cleanup time, and the worktree checkout
+itself is normally already torn down even earlier, by the runner at
+propose-time. Measured directly against the live store: 0 of 55 items
+currently sitting at status `cleanup` still have a worktree; 1 of 55 still
+has a branch — and that one branch belongs to the sole item that would
+fail D8's own merge-check anyway. For the one domain actually running
+production work today (`coding`), the `cleanup` stage's whole reason for
+existing — protecting a reusable worktree during the delay — was running
+on nothing to protect.
+
+Both drifts were confirmed, not assumed, against real data before being
+treated as bugs — the discipline `docs/decisions/0025`'s Ship Faster
+priority and this repo's own review norms both require: quoting the
+locked decision's exact wording, then counting real events in the log
+rather than trusting that shipped code matches what was designed. A third
+option — adding a new `blocked -> cleanup` recovery edge for the six stuck
+items — was considered and rejected: under the design as actually locked,
+`cleanup -> blocked` should only ever fire on a genuine D8 failure, which
+either needs rework (`-> todo`/`doing`) or abandonment (`-> wontfix`) —
+there is no legitimate "wrongly parked" case for a correctly-implemented
+harness to produce, so a recovery edge would just be papering over Drift
+1 instead of fixing it. Once Drift 1 is fixed, the six items stuck today
+recover through the ordinary mechanical `blocked -> delivered` retry edge
+D2 already provides for exactly this shape of problem — no new edge
+needed. The fix itself split into two dependent child items: separate the
+TTL check out of D8's harness first, then move the worktree/branch
+teardown timing back to actually happening at `cleanup`.
+
 ## The chain's real blind spot: nothing detects an item forgotten mid-chain, because nothing needs to
 
 Every downstream mechanism this split touches was deliberately made to
