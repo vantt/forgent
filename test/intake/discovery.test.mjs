@@ -1614,3 +1614,56 @@ test('resolveDiscovery omitting callerVerdict entirely keeps prior behavior (byt
   assert.equal(result.outcome, 'clear');
   assert.equal(result.verdict.verify, 'npm test -- unchanged');
 });
+
+// tsk-60r D1: the plain (non-`--force`) agree-path -- reached when a
+// caller-supplied clear verdict's verify is either absent or accepted by
+// the second-pass judge -- must refuse instead of silently advancing
+// `stage` while `status` stays parked at `awaiting-human` from an EARLIER
+// round's verify dispute in the same clarify pass. Distinct from the
+// existing `--force` guard (test/state/discover-verdict-override.test.mjs,
+// tsk-nfa D1): this path never sets `--force` and never disagrees on the
+// second pass -- it is the case tsk-nfa's own CONTEXT.md explicitly left
+// uncovered.
+
+test('resolveDiscovery refuses a caller-supplied clear verdict when work.status is already awaiting-human from an earlier park (tsk-60r D1)', () => {
+  const scriptDir = mkTempDir();
+  const { scriptPath } = writeCountingRawStdoutExecutor(scriptDir, JSON.stringify({ clear: true, verify: 'should never run' }));
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork());
+  // Simulates an earlier round's verify-dispute park -- same shape
+  // resolveDiscovery's own dispute branch produces (putInAwaiting with
+  // statusAtAsk), without needing a full first discover round.
+  putInAwaiting(storeDir, { id: 'item-x', ask: 'Đề xuất verify bị nghi ngờ...', statusAtAsk: 'todo' });
+
+  assert.throws(
+    () => resolveDiscovery(storeDir, 'item-x', cfg, 'session', { clear: true, verify: 'npm test -- corrected' }),
+    (err) => {
+      assert.ok(err instanceof StoreError);
+      assert.match(err.message, /already "awaiting-human"/);
+      assert.match(err.message, /fgos answer item-x/);
+      return true;
+    },
+  );
+
+  const view = listWork(storeDir);
+  assert.equal(view.work['item-x'].status, 'awaiting-human', 'refused before touching status');
+  assert.equal(view.work['item-x'].stage, 'clarify', 'refused before touching stage');
+});
+
+test('resolveDiscovery still advances normally on a caller-supplied clear verdict when work.status is not awaiting-human (tsk-60r D1, unchanged behavior)', () => {
+  const scriptDir = mkTempDir();
+  const { scriptPath } = writeCountingRawStdoutExecutor(scriptDir, JSON.stringify({ clear: true, verify: 'should never run' }));
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork());
+
+  const result = resolveDiscovery(storeDir, 'item-x', cfg, 'session', { clear: true, verify: 'npm test -- caller' });
+  assert.equal(result.outcome, 'clear');
+
+  const view = listWork(storeDir);
+  assert.equal(view.work['item-x'].stage, 'decompose');
+  assert.notEqual(view.work['item-x'].status, 'awaiting-human');
+});
