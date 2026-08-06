@@ -91,6 +91,28 @@ slip back into the broken count while the backfill runs).
    the same split tsk-4zg's own item took between its code (none — pure
    state item) and its event-log writes.
 
+5. **Update the 3 live in-repo examples that would break under D1
+   (`fgos-validating` finding, mid-planning).** Real evidence: these
+   `fgos add --title ...` examples are executable prose a session
+   literally copies and runs — none currently pass `--description`, so
+   D1's required flag would break every one of them:
+   - `.claude/skills/fgos-exploring/SKILL.md:212` (docsRef-creation
+     example)
+   - `.claude/skills/fgos-planning/SKILL.md:193` (split-child creation
+     example — this very skill's own canonical `fgos add --parent`
+     command)
+   - `docs/how-to/set-or-clear-a-work-items-parent-lineage-via-cli.md:24`
+
+   Each gets a real `--description "..."` value added to its example
+   command (matching that example's own `--title`, since these are
+   documentation prose, not live data — a description repeating the
+   title in a doc example is not the same duplication concern D2 avoided
+   for real LLM-authored content). `docs/history/*/plan.md` entries that
+   already ran the OLD example (e.g. `docs/history/parallel-dispatch-
+   demo-format-utils/plan.md`) are historical records, not live
+   workflow — explicitly excluded, matching D3's own "fix going forward,
+   backfill separately" shape.
+
 **Rejected alternative:** a schema-level `validateWorkShape` requirement
 for `description` — rejected per point 1 above, real evidence of two
 legitimate optional-description callers that would break.
@@ -112,21 +134,22 @@ rests on the write-before-backfill dependency above, not graph priority.
 | Decompose-child `description = title` | LOW — mechanical call-site addition, same shape as tsk-3xd's own `action: child.action` line it sits beside | Unit test mirroring tsk-3xd's own `resolveDecompose writes action on every child` test: a decompose child's `description` equals its `title` after `resolveDecompose`. |
 | Discovered-work fallback (`block.description \|\| block.title`) | MEDIUM — touches a real runtime path (`loop.mjs`'s discovered-work capture), and must not regress the common case where a worker DOES supply a real description | Two tests: worker supplies `description` → item carries the worker's own text unchanged (regression guard); worker omits it → item carries `title` instead of `undefined`. |
 | Backfill (112 items, `description = title` via `edit`) | MEDIUM — writes to all 112 items in one pass; a bug corrupts a large slice of the live backlog in one run, same class of risk tsk-4zg's own risk map named for its re-derive pass | `fgos-validating`: confirm the backfill goes through the `edit` door (event-log append, `rebuild()` recovery intact) and dry-run the diff (list of ids + old/new description) before writing, same "dry-run first" discipline tsk-4zg's own plan.md used for its re-derive phase. |
+| 3 live in-repo doc examples missing `--description` (piece 5) | LOW — pure prose edits, no runtime behavior, no test coverage exists or is needed for doc text | Direct read of each file post-edit: the example command now includes a real `--description` value. |
 
 ## Assumptions (unproven, flagged for fgos-validating)
 
-- No existing script or CI job outside this repo invokes `fgos add`
-  without `--description` — genuinely unverifiable from inside this repo
-  alone (an external caller could exist). `fgos-validating`'s reality
-  check should at minimum confirm no IN-REPO caller (this repo's own
-  scripts, dogfood-fixture scenarios, other skills) relies on the old
-  optional shape.
+- ~~No existing script or CI job outside this repo invokes `fgos add`
+  without `--description`~~ — **checked mid-planning, real evidence
+  found**: 3 in-repo files DID rely on the old optional shape (piece 5
+  above, added as a direct result). Whether any caller OUTSIDE this repo
+  exists remains genuinely unverifiable from inside it — flagged as the
+  one residual unproven piece of this assumption for `fgos-validating`.
 - `block.title` is always a reasonable stand-in for `description` when a
   worker omits the latter — same reasoning D2 already accepted for
   decompose children (mirrors that precedent rather than re-deriving it).
 
 ## Split decision
 
-No split. Four small, causally-ordered pieces (three write-path fixes,
-one backfill) in one coherent item — matches `CONTEXT.md`'s own scope
-boundary. Proceeds as itself.
+No split. Five small, causally-ordered pieces (three write-path fixes,
+one backfill, one doc-example fixup found mid-planning) in one coherent
+item — matches `CONTEXT.md`'s own scope boundary. Proceeds as itself.
