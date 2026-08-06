@@ -432,6 +432,39 @@ gọi được**, một bên **không nhìn thấy**. Ghi vào `tsk-3cb` làm b�
 thay vì mở item mới — cùng gốc, cùng chỗ sửa. Kèm một cảnh báo khi chốt hướng:
 phương án (c) "chỉ sửa cửa vào" **không** xử được cơ chế 2.
 
+### 2026-08-06 — vòng 8c (song song được tới đâu, và đóng phiên)
+
+**Người dùng:** ba nhánh có chạy song song được không? — rồi: pick ở chat khác
+có ổn không, đóng phiên này được chưa?
+
+**Tính từ footprint thật, không đoán.** Chồng chéo **liên-nhánh**:
+`tsk-2sl` ↔ `tsk-621` (`fgos-planning/SKILL.md` + mirror + mirror-test) và
+`tsk-2sl` ↔ `tsk-3cb` (`fgos-validating/SKILL.md` + mirror + mirror-test). Nên
+đáp án không phải "ba nhánh song song" mà là **một luồng prose-skill tuần tự +
+hai luồng code song song**: `tsk-2k1`/`tsk-503` (chạm `dispatch.mjs`,
+`gate-bypass.mjs`) chạy song song với N3 được vì không đụng `bin/fgos.mjs`.
+
+**Chỗ mù đáng ghi:** `tsk-535` khai footprint **rỗng** ⇒ theo `work-state.md`
+(~1023) *"item không khai footprint không bao giờ xung đột"*, nó im lặng đi qua
+— trong khi nội dung của nó (thêm `--description` cho `fgos add`) chắc chắn đụng
+`bin/fgos.mjs` mà cả ba item N3 đều khai. **N2 và N3 đang chồng thật mà máy
+không thấy.** Đây đúng câu hỏi mở deep-dive từng đặt ("vắng khai = miễn kiểm, có
+nên giữ không?") — giờ nó cắn thật, trên chính bộ item này. Không sửa được từ
+phiên này vì `tsk-535` đang do phiên khác giữ claim.
+
+**Đã sửa hai thiếu sót của chính bộ này:** `tsk-2sl` bổ sung
+`test/skills/fgos-mirror.test.mjs` vào footprint (nó sửa 5 file skill + mirror
+nên test parity chắc chắn dính), và `tsk-621` xâu `mergeAfter tsk-2sl` ⇒ chuỗi
+đầy đủ `tsk-2sl → tsk-621 → {tsk-4zj, tsk-3cb}`. `tsk-3cb` không cần cạnh trực
+tiếp tới `tsk-2sl` vì đã có thứ tự bắc cầu qua `tsk-621`.
+
+**Đóng phiên an toàn, đã kiểm:** `claim-port.mjs:135-139` cho thấy leaf fork từ
+nhánh root khi nhánh đó tồn tại ⇒ ba con pick ở phiên khác sẽ fork từ
+`fgw/tsk-2t6` và **thấy được file này**, `refs` anchor resolve thật. Mọi quyết
+định đã nằm trong `.fgos` events và trong description từng item, không kẹt trong
+hội thoại. Lưu ý duy nhất: fork chụp **tip lúc claim** — commit thêm vào nhánh
+này sau đó sẽ không có trong worktree của chúng.
+
 ## 6. Thiết kế đã chốt {#design}
 
 _(Regenerate ở vòng 5 theo D5 — bản vòng 4 tả một nhị phân phẳng
