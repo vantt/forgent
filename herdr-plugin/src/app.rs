@@ -18,6 +18,28 @@ pub struct AfterDeliverTask {
     pub status: String,
 }
 
+/// tsk-40t D5: a plain, ratatui-free rectangle (mirrors `ratatui::layout::
+/// Rect`'s 4 fields) — the render adapter (`ui.rs`) writes this every
+/// frame the detail modal renders, from its own `ratatui::layout::Rect`,
+/// so `poll_event` (also `ui.rs`, domain-state-aware since tsk-64z) can
+/// hit-test a mouse click against it without a `ratatui` type ever
+/// crossing into `App` itself (D2's existing "no ratatui type in the
+/// domain" boundary, preserved here rather than relaxed).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ButtonRect {
+    pub x: u16,
+    pub y: u16,
+    pub width: u16,
+    pub height: u16,
+}
+
+impl ButtonRect {
+    pub fn contains(&self, col: u16, row: u16) -> bool {
+        col >= self.x && col < self.x + self.width && row >= self.y && row < self.y + self.height
+    }
+}
+
+#[derive(Clone)]
 pub struct WorkItem {
     pub id: String,
     pub title: String,
@@ -148,6 +170,13 @@ pub struct App {
     /// tsk-417 D3: MERGE LIST box source — a direct field mapping of
     /// `fgos merge list --json`, never re-derived.
     pub merge_list: MergeListSummary,
+    /// tsk-40t D5: the detail modal's Pick button's on-screen rectangle,
+    /// written by `ui.rs`'s `draw_detail_modal` every frame the modal
+    /// renders — `None` whenever the modal isn't open (nothing to
+    /// hit-test against).
+    pub pick_button_rect: Option<ButtonRect>,
+    /// tsk-40t D5: same idea as `pick_button_rect`, for Discover.
+    pub discover_button_rect: Option<ButtonRect>,
 }
 
 impl App {
@@ -167,6 +196,8 @@ impl App {
             need_answer: Vec::new(),
             after_deliver: Vec::new(),
             merge_list: MergeListSummary::default(),
+            pick_button_rect: None,
+            discover_button_rect: None,
         }
     }
 
@@ -416,6 +447,8 @@ impl App {
                 waiting: Vec::new(),
                 blocked_on_sync: Vec::new(),
             },
+            pick_button_rect: None,
+            discover_button_rect: None,
         }
     }
 

@@ -1,7 +1,10 @@
 use std::io;
 use std::time::Duration;
 
-use crossterm::event::{self, Event, KeyCode, KeyEventKind, KeyModifiers};
+use crossterm::event::{
+    self, DisableMouseCapture, EnableMouseCapture, Event, KeyCode, KeyEventKind, KeyModifiers,
+    MouseEventKind,
+};
 use crossterm::execute;
 use crossterm::terminal::{
     disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen,
@@ -57,7 +60,10 @@ impl RatatuiTerminalUi {
     pub fn init() -> io::Result<Self> {
         enable_raw_mode()?;
         let mut stdout = io::stdout();
-        execute!(stdout, EnterAlternateScreen)?;
+        // tsk-40t D5: real mouse capture — without this, the terminal
+        // handles clicks itself (text selection) and crossterm never sees
+        // an `Event::Mouse` at all.
+        execute!(stdout, EnterAlternateScreen, EnableMouseCapture)?;
         let backend = CrosstermBackend::new(stdout);
         let terminal = Terminal::new(backend)?;
         Ok(Self { terminal })
@@ -65,7 +71,11 @@ impl RatatuiTerminalUi {
 
     pub fn teardown(mut self) -> io::Result<()> {
         disable_raw_mode()?;
-        execute!(self.terminal.backend_mut(), LeaveAlternateScreen)?;
+        execute!(
+            self.terminal.backend_mut(),
+            DisableMouseCapture,
+            LeaveAlternateScreen
+        )?;
         self.terminal.show_cursor()
     }
 }
@@ -88,7 +98,38 @@ impl TerminalUiPort for RatatuiTerminalUi {
         if !event::poll(timeout)? {
             return Ok(None);
         }
-        let Event::Key(key) = event::read()? else {
+        let event = event::read()?;
+
+        // tsk-40t D5: a left-click hit-tests against the detail modal's
+        // button `Rect`s (`app.pick_button_rect`/`discover_button_rect`,
+        // written every frame `draw_detail_modal` renders) and, on a hit,
+        // fires the SAME domain event the matching key already does
+        // (`UiEvent::Pick`/`Discover`) — no separate "mouse click"
+        // variant, so `main.rs`'s handlers stay the one place either
+        // input method's effect is decided. Only meaningful while the
+        // modal is open; a click anywhere else (or with no button
+        // `Rect` recorded) is inert.
+        if let Event::Mouse(mouse) = event {
+            if mouse.kind == MouseEventKind::Down(crossterm::event::MouseButton::Left)
+                && app.detail_modal_open
+            {
+                if app
+                    .pick_button_rect
+                    .is_some_and(|rect| rect.contains(mouse.column, mouse.row))
+                {
+                    return Ok(Some(UiEvent::Pick));
+                }
+                if app
+                    .discover_button_rect
+                    .is_some_and(|rect| rect.contains(mouse.column, mouse.row))
+                {
+                    return Ok(Some(UiEvent::Discover));
+                }
+            }
+            return Ok(None);
+        }
+
+        let Event::Key(key) = event else {
             return Ok(None);
         };
         if key.kind != KeyEventKind::Press {
@@ -309,8 +350,12 @@ pub fn draw(frame: &mut Frame, app: &mut App) {
     frame.render_widget(status, rows[1]);
 
     if app.detail_modal_open {
-        if let Some(item) = app.selected_work_item() {
-            draw_detail_modal(frame, item);
+        // tsk-40t D5: clone the selected item BEFORE the mutable borrow
+        // `draw_detail_modal` needs (to write the button `Rect`s) — ends
+        // the immutable `selected_work_item()` borrow first, same
+        // shape any other "read then mutate" split in this file uses.
+        if let Some(item) = app.selected_work_item().cloned() {
+            draw_detail_modal(frame, app, &item);
         }
     }
 }
@@ -427,7 +472,7 @@ fn draw_after_deliver_box(frame: &mut Frame, app: &App, area: Rect) {
 /// (tsk-1e3 D4): Pick (Enter, unconditional) and Discover (`d`, disabled/
 /// dimmed — never hidden, so the layout never shifts — when the item's
 /// `stage != "clarify"`, since `/fgOS:discover` only applies there).
-fn draw_detail_modal(frame: &mut Frame, item: &crate::app::WorkItem) {
+fn draw_detail_modal(frame: &mut Frame, app: &mut App, item: &crate::app::WorkItem) {
     let area = centered_rect(60, 40, frame.area());
     frame.render_widget(Clear, area);
 
@@ -464,6 +509,15 @@ fn draw_detail_modal(frame: &mut Frame, item: &crate::app::WorkItem) {
     )))
     .block(Block::default().borders(Borders::ALL).title("Enter: pick"));
     frame.render_widget(pick_button, button_cells[0]);
+    // tsk-40t D5: recorded AFTER rendering so it reflects this frame's
+    // real on-screen position — `poll_event` (ui.rs) reads it back next
+    // event, hit-testing a mouse click against it.
+    app.pick_button_rect = Some(crate::app::ButtonRect {
+        x: button_cells[0].x,
+        y: button_cells[0].y,
+        width: button_cells[0].width,
+        height: button_cells[0].height,
+    });
 
     // tsk-jo1 D1 palette (ANSI-16): dim/gray (`Color::DarkGray`) when
     // disabled, same `Reversed` treatment as Pick when enabled — color
@@ -480,6 +534,12 @@ fn draw_detail_modal(frame: &mut Frame, item: &crate::app::WorkItem) {
                 .title(if discover_enabled { "d: discover" } else { "d: discover (stage != clarify)" }),
         );
     frame.render_widget(discover_button, button_cells[1]);
+    app.discover_button_rect = Some(crate::app::ButtonRect {
+        x: button_cells[1].x,
+        y: button_cells[1].y,
+        width: button_cells[1].width,
+        height: button_cells[1].height,
+    });
 }
 
 /// Carves an `area`-relative popup rect out of `area`'s center —
@@ -561,10 +621,11 @@ mod tests {
             blocks: 0,
             priority: None,
         };
+        let mut app = App::empty();
         let backend = TestBackend::new(80, 24);
         let mut terminal = Terminal::new(backend).expect("terminal init");
         terminal
-            .draw(|frame| draw_detail_modal(frame, &item))
+            .draw(|frame| draw_detail_modal(frame, &mut app, &item))
             .expect("draw should not panic");
         terminal.backend().buffer().clone()
     }

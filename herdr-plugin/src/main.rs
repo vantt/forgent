@@ -421,6 +421,122 @@ mod tests {
         }
     }
 
+    /// tsk-40t D5: simulates a mouse click at a fixed `(click_col,
+    /// click_row)` by checking it against `app.pick_button_rect`/
+    /// `discover_button_rect` the SAME way the real `RatatuiTerminalUi::
+    /// poll_event`'s `Event::Mouse` branch does (`ui.rs`) — the fake
+    /// bypasses real crossterm event parsing (same "fake TerminalUi tests
+    /// the domain-event contract, not raw terminal I/O" pattern every
+    /// other key binding in this file already uses), but exercises the
+    /// REAL `ButtonRect::contains` hit-test math against REAL app state.
+    struct ClickAtFixedCoordsThenQuit {
+        calls: Cell<u32>,
+        click_col: u16,
+        click_row: u16,
+    }
+
+    impl TerminalUi for ClickAtFixedCoordsThenQuit {
+        fn draw(&mut self, _app: &mut App) -> io::Result<()> {
+            Ok(())
+        }
+
+        fn poll_event(&mut self, app: &App, _timeout: Duration) -> io::Result<Option<UiEvent>> {
+            let n = self.calls.get();
+            self.calls.set(n + 1);
+            if n == 0 {
+                let hit = app
+                    .pick_button_rect
+                    .is_some_and(|rect| rect.contains(self.click_col, self.click_row));
+                return Ok(if hit { Some(UiEvent::Pick) } else { None });
+            }
+            Ok(Some(UiEvent::Quit))
+        }
+    }
+
+    #[test]
+    fn mouse_click_inside_pick_button_rect_fires_pick() {
+        let mut app = App::empty();
+        app.work_items = vec![herdr_fgos::app::WorkItem {
+            id: "tsk-a".into(),
+            title: "A".into(),
+            goal_tier: "mvp".into(),
+            stage: "executing".into(),
+            status: "todo".into(),
+            blocked_by: Vec::new(),
+            blocks: 0,
+            priority: None,
+        }];
+        app.select_next();
+        // Modal already open (as if a prior Enter opened it) with a
+        // recorded Pick button Rect, exactly what a real `draw()` call
+        // would have left behind.
+        app.detail_modal_open = true;
+        app.pick_button_rect = Some(herdr_fgos::app::ButtonRect {
+            x: 10,
+            y: 5,
+            width: 10,
+            height: 3,
+        });
+
+        let mut ui = ClickAtFixedCoordsThenQuit {
+            calls: Cell::new(0),
+            click_col: 12, // inside x: 10..20
+            click_row: 6,  // inside y: 5..8
+        };
+        let pane_orchestrator = RecordingPickOrchestrator {
+            picked: std::cell::RefCell::new(Vec::new()),
+            discovered: std::cell::RefCell::new(Vec::new()),
+        };
+
+        run(&mut ui, &mut app, None, None, &pane_orchestrator, Duration::ZERO)
+            .expect("run should exit cleanly on Quit");
+
+        assert_eq!(*pane_orchestrator.picked.borrow(), vec!["tsk-a".to_string()]);
+    }
+
+    #[test]
+    fn mouse_click_outside_pick_button_rect_fires_nothing() {
+        let mut app = App::empty();
+        app.work_items = vec![herdr_fgos::app::WorkItem {
+            id: "tsk-a".into(),
+            title: "A".into(),
+            goal_tier: "mvp".into(),
+            stage: "executing".into(),
+            status: "todo".into(),
+            blocked_by: Vec::new(),
+            blocks: 0,
+            priority: None,
+        }];
+        app.select_next();
+        app.detail_modal_open = true;
+        app.pick_button_rect = Some(herdr_fgos::app::ButtonRect {
+            x: 10,
+            y: 5,
+            width: 10,
+            height: 3,
+        });
+
+        let mut ui = ClickAtFixedCoordsThenQuit {
+            calls: Cell::new(0),
+            click_col: 50, // well outside the rect
+            click_row: 20,
+        };
+        let pane_orchestrator = RecordingPickOrchestrator {
+            picked: std::cell::RefCell::new(Vec::new()),
+            discovered: std::cell::RefCell::new(Vec::new()),
+        };
+
+        run(&mut ui, &mut app, None, None, &pane_orchestrator, Duration::ZERO)
+            .expect("run should exit cleanly on Quit");
+
+        // A miss (n=0) returns `Ok(None)` -- no event at all this tick,
+        // so nothing fires. The subsequent `Quit`s (n>=1) are what
+        // actually close the modal then exit, same pre-existing
+        // Quit-closes-modal-first behavior every other test in this file
+        // already relies on -- not something the miss itself caused.
+        assert!(pane_orchestrator.picked.borrow().is_empty(), "a miss must fire nothing");
+    }
+
     /// Returns, in order: `NextTab`, `NextTab`, `Quit` — cycles the Work
     /// Items tab twice (tsk-64z D1).
     struct NextTabTwiceThenQuit {
