@@ -215,6 +215,77 @@ suggestion is exactly as cheap to fix later as a wrong inline one — never
 treat a dispatched answer as more trustworthy than the skill's own
 reasoning would have been.
 
+## Provider/tier judgment for an ad-hoc dispatch (D5/D7/D10/D12)
+
+`docs/history/two-layer-dispatch/DISCUSSION.md` D12: this is an optional,
+per-dispatch REFINEMENT on top of everything above — it never adds a
+second dispatch mechanism, and it never requires splitting `work.tier`
+into a separate field (D12 picked the smaller path over a field split:
+`work.tier` keeps carrying both its existing meanings unchanged; this
+section only adds an override at dispatch TIME, resolved through the
+`--model`/`--tier` flags `dispatch.mjs resolve` already accepts,
+tsk-2k1/D10). Skip this section entirely for a registered `<CAPACITY_ID>`
+dispatch with no reason to deviate from its own declared tier/model —
+nothing here changes that path.
+
+When a consuming skill's own reasoning session has a real reason to pick a
+different tier (and, optionally, a non-default provider) for one specific
+dispatch, judge it INLINE, as the session's own reasoning — never via a
+second subprocess judge call spawned just to answer this. That would be
+the exact same "soul re-deriving what a live soul already knows" waste
+`docs/decisions/0026-vision-orchestrator-roottask-capacity-native-vs-cli-
+spawn.md`'s own "Lớp còn thiếu" section already names for
+`judgeDiscovery`/`judgeDecompose` — spawning one here would repeat that
+mistake one layer further down the stack. The evidence to reason FROM,
+when dispatching an ad-hoc packet (see the section above), is the
+packet's own six required fields — reuse bee's three-tier rubric
+(light/standard/heavy) against the packet's `goal`/`expected shape`/
+`return contract`, the same rubric a work item's own `tier` is judged
+against at intake, just applied per-dispatch instead of once.
+
+This judgment produces ONLY `provider`/`tier` — never a mechanism.
+Mechanism stays entirely `dispatch.mjs decide`'s own call, resolved
+through the Native-First Dispatch Doctrine's rules 1–4 exactly as Step
+B.5 above already does; a judged `provider` that resolves to a
+non-Claude command still has to clear the same `allowCrossProvider` gate
+`resolveExecutorConfig` already enforces
+(`src/runner/dispatch.mjs:691-693`) — nothing here bypasses it.
+
+Fail-safe is the INVERSE of the six-field packet's own (there, a missing
+required field means "do not dispatch, fall back to
+`<INLINE_FALLBACK_HEADING>` — Step D above): here, failing to reach a
+confident tier/provider judgment means dispatch ANYWAY, with the
+capacity's own declared default (`capacity.tier`/`capacity.model`, or the
+computed `modelForTier` fallback) — an unresolved judgment is never a
+reason to block a dispatch that would otherwise proceed.
+
+Record whichever tier/model actually gets used — judged or defaulted —
+through the one existing writer of `.fgos/logs/`, `appendWorkerLog`
+(`src/runner/worker-log.mjs`); never a new log file or module for this:
+
+```bash
+root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
+node --input-type=module -e "
+import { appendWorkerLog } from '$root/src/runner/worker-log.mjs';
+appendWorkerLog('$root', '<scope>', {
+  tier: '<judged-or-default-tier>',
+  model: '<judged-or-default-model>',
+  message: 'ad-hoc dispatch <packet id>: <goal>',
+});
+"
+```
+
+`<scope>` is the packet id's own `<scope>` segment (the part before the
+`#` in `<scope>#p<n>`) — in the common case, the work item currently
+claimed, so this entry lands in `.fgos/logs/<scope>.log`, the exact same
+file that item's own regular dispatch entries already write to. That is
+deliberate: it is what lets a later read of one file answer "what did
+this item's own ad-hoc sub-dispatches choose", and it is exactly the data
+a future downgrade-feedback-loop pass over `.fgos/logs/` needs to measure
+how often the expensive tier was actually scarce. Log every judged-or-
+defaulted choice, not only the cases where a downgrade happened — a
+scarcity signal needs the full denominator, not just the misses.
+
 ## Precedent
 
 - `docs/how-to/wire-a-skills-classify-step-through-an-agent-executor-capacity.md`
