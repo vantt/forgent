@@ -43,11 +43,14 @@ migrating the 65 items' `stage`/`id` (rewrites historical `done`/
 | Regression on the 65-item unblock itself | Low, directly provable | New/updated test: patch an unrelated field (e.g. `description`) on a fixture item with `stage: compound-learn` or an over-length `id`, assert it now succeeds |
 | Blast radius of touching `editWork` | Low — confirmed by both `mcp__gitnexus__impact(editWork, upstream)` (LOW risk, 3 upstream symbols: `resolveDecompose`, `resolveDiscovery`, `runOnce`) and a manual grep cross-check (GitNexus index is stale — last indexed `251d0b5` per this session's own tool-use hook — so the automated result was cross-checked per `CLAUDE.md`'s gate note). Grep found 4 real call sites total: `src/intake/discovery.mjs:628`, `src/intake/decompose.mjs:816` (both priority-only patches, matching GitNexus's 2 direct hits), plus `bin/fgos.mjs:1486` (the `fgos edit` CLI door — the actual path that hit this bug) and `bin/fgos.mjs:3260` (a `parent`-only patch during decompose splitting) — GitNexus's stale index missed both `bin/fgos.mjs` call sites | None of the 4 call sites patch `id`/`stage`, so none are affected beyond gaining the fix; `fgos-validating` should re-run this same grep to catch any new call site added since this plan was written |
 
-`impact-analysis: full` (`gitnexus`, status `present`) per `CLAUDE.md`'s
-gate, but this session treated the "present" status as weak evidence per
-the gate's own "present only means installed, never fresh" clause — the
-index is confirmed stale (`251d0b5`), so the callgraph result above was
-corroborated with a direct grep rather than trusted alone.
+`impact-analysis: degraded` — `gitnexus` reports status `present`, but the
+index is confirmed stale (`251d0b5`, this session's own tool-use hooks),
+which `CLAUDE.md`'s gate names explicitly as the degraded case ("present
+but flagged stale"). Per that gate's own instruction, the callgraph result
+above was cross-checked with a direct grep rather than trusted alone —
+the grep found 2 real call sites (`bin/fgos.mjs:1486`, `bin/fgos.mjs:3260`)
+the stale index missed entirely, confirming the degradation was real, not
+theoretical.
 
 ## Shape
 
