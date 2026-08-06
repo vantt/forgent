@@ -3,7 +3,13 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { runJudgeExecutor, runRetryingExecutor, readScoutNotes } from '../../src/intake/judge-executor.mjs';
+import {
+  runJudgeExecutor,
+  runRetryingExecutor,
+  readScoutNotes,
+  resolveJudgeTimeoutMs,
+  DEFAULT_JUDGE_TIMEOUT_MS,
+} from '../../src/intake/judge-executor.mjs';
 import { RunnerConfigError } from '../../src/runner/dispatch.mjs';
 import { initStore, registerTool } from '../../src/state/store.mjs';
 import { writeLocalStatus } from '../../src/state/tool-registry.mjs';
@@ -816,4 +822,48 @@ test('runJudgeExecutor with scout omitted spawns without the stream-json flags (
   assert.deepEqual(verdict, { clear: true, verify: 'npm test -- no scout arg' });
   const argv = JSON.parse(fs.readFileSync(argvPath, 'utf8'));
   assert.equal(argv.includes('--output-format'), false);
+});
+
+// tsk-wo5: resolveJudgeTimeoutMs's own capping logic, tested directly and
+// instantly (no spawn) — the three inputs that actually matter to it.
+test('resolveJudgeTimeoutMs caps a large global cfg.timeoutMs down to DEFAULT_JUDGE_TIMEOUT_MS when no judge-specific override is set', () => {
+  assert.equal(resolveJudgeTimeoutMs({ timeoutMs: 900000 }), DEFAULT_JUDGE_TIMEOUT_MS);
+});
+
+test('resolveJudgeTimeoutMs respects an explicit cfg.timeoutMs already shorter than DEFAULT_JUDGE_TIMEOUT_MS', () => {
+  assert.equal(resolveJudgeTimeoutMs({ timeoutMs: 200 }), 200);
+});
+
+test('resolveJudgeTimeoutMs respects cfg.judgeTimeoutMs, itself still capped at DEFAULT_JUDGE_TIMEOUT_MS', () => {
+  assert.equal(resolveJudgeTimeoutMs({ timeoutMs: 900000, judgeTimeoutMs: 30000 }), 30000);
+  assert.equal(resolveJudgeTimeoutMs({ timeoutMs: 900000, judgeTimeoutMs: 999999 }), DEFAULT_JUDGE_TIMEOUT_MS);
+});
+
+// tsk-wo5 D4 (docs/history/tsk-wo5-judge-graceful-timeout-signal/CONTEXT.md):
+// the pinned end-to-end proof. Before this item, `spawnAttempt` bounded
+// every judge attempt by the raw global `cfg.timeoutMs` — a caller relying
+// only on that global default (900000ms, dispatch.mjs) had no bound short
+// enough to protect it from an external caller's own much shorter
+// wall-clock budget (the ~120s ceiling tsk-wo5's own repro cited). Setting
+// `cfg.judgeTimeoutMs` well under both the hang script's own 30000ms
+// busy-wait AND the plain `cfg.timeoutMs` this test's own `cfgFor` sets
+// (5000ms) proves the judge-specific bound — not either of those two — is
+// what actually governs `spawnSync`'s own `timeout` option now.
+test('runJudgeExecutor does not block past the caller bounded window without emitting a signal when the judge executor is slow', () => {
+  const dir = mkTempDir();
+  const scriptPath = writeHangingExecutor(dir);
+  const cfg = cfgFor(scriptPath, { judgeTimeoutMs: 300 });
+
+  const startedAt = Date.now();
+  const verdict = runJudgeExecutor(cfg, 'sonnet', 'prompt', 'stricter prompt');
+  const elapsedMs = Date.now() - startedAt;
+
+  // The existing clean fail-safe fires (a real signal every caller already
+  // folds into a defined unclear/disagree outcome) instead of the call
+  // hanging silently past the bounded window.
+  assert.equal(verdict, null);
+  // Well under the hang script's 30000ms busy-wait and DEFAULT_JUDGE_
+  // TIMEOUT_MS's 90000ms -- proves the call returned within the bounded
+  // window instead of blocking past it.
+  assert.ok(elapsedMs < 5000, `expected runJudgeExecutor to return within the bounded window, took ${elapsedMs}ms`);
 });
