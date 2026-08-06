@@ -82,6 +82,19 @@ landed on that branch, a timing miss rather than anything wrong with the
 underlying mechanism; the milestone passed on the next check once both
 targets were really `done`.
 
+## Second milestone closure (`tsk-45a`)
+
+`tsk-45a` tracks the follow-on milestone — "capacity-executor safe for
+real cross-provider use" — with `targets: [tsk-49o, tsk-32n, tsk-418]`,
+verified by `tsk-32n` + `tsk-418` both showing `status: done` (`tsk-49o`
+carries no captured outcome of its own — closed without one, not part of
+this verify command). `tsk-32n` is the `allowCrossProvider` governance
+field documented at `docs/reference/capacity-cross-provider-governance.md`
+(see "The gap the design left open" above); `tsk-418` generalized the
+judge-retry helper for any capacity dispatch
+(`docs/how-to/generalize-a-judge-retry-helper-for-any-capacity-dispatch.md`).
+No friction recorded against this milestone's own closure.
+
 ## Full design record
 
 `plans/reports/distill-consult-260731-1733-agent-executor-backend-
