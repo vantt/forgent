@@ -640,15 +640,30 @@ export function resolveDiscovery(dir, id, cfg, role, callerVerdict) {
     // item exactly like an unclear first-pass verdict does — an uncertain
     // judgement is never treated as a pass (discovery.mjs's own D4 above).
     if (typeof verdict.verify === 'string' && verdict.verify.trim()) {
-      // tsk-5cf D1a: thread the immediately-prior round's own disagreement
-      // text back into this round's prompt, the same "give the judge its
-      // own prior context" shape buildDiscoveryPrompt already uses for
-      // view.discovery[id] (line ~223 above) -- gates[id].ask is a single
-      // most-recent-value slot (replay.mjs's ask/answer fold: only a FRESH
-      // ask overwrites it, an answer never clears it), so this is always
-      // exactly the last round's own reason, never a stale one from a much
-      // earlier dispute this round already moved past.
-      const priorRejection = view?.gates?.[id]?.ask;
+      // tsk-25g D1: thread the FULL verify-dispute history back into this
+      // round's prompt -- was tsk-5cf D1a's single most-recent-round-only
+      // slot (gates[id].ask), which a live reproduction (tsk-5mc, 7 dispute
+      // rounds, docs/history/tsk-25g-judge-verify-stabilization-audit/
+      // CONTEXT.md) showed still let the judge contradict an EARLIER
+      // round's own stated criteria once that round fell out of the
+      // single-slot window. `gates[id].askHistory` (replay.mjs's ask fold,
+      // additive alongside the unchanged single-slot `ask`) accumulates
+      // every `ask` for this item; filtered here to just this item's own
+      // verify-dispute asks (the distinctive "Đề xuất verify bị nghi ngờ"
+      // marker `formatVerifyDisputeAsk`-shaped text below always carries),
+      // never an unrelated clarify/decompose-stage ask that happens to
+      // share this item's id. Joined, labeled per round, into one string --
+      // `buildVerifyCheckPrompt` (judge-executor.mjs) still takes a single
+      // `priorRejection` string; only what THIS caller builds it from
+      // widened, not that function's own signature.
+      const VERIFY_DISPUTE_ASK_MARKER = 'Đề xuất verify bị nghi ngờ';
+      const verifyDisputeHistory = (view?.gates?.[id]?.askHistory ?? []).filter(
+        (entry) => typeof entry === 'string' && entry.includes(VERIFY_DISPUTE_ASK_MARKER),
+      );
+      const priorRejection =
+        verifyDisputeHistory.length > 0
+          ? verifyDisputeHistory.map((entry, index) => `Vòng ${index + 1}:\n${entry}`).join('\n\n')
+          : undefined;
       const secondPass = judgeVerifySemanticCorrectness(work, verdict.verify, cfg, priorRejection);
       if (!secondPass.agrees) {
         // tsk-5cf D1b: a caller that already reasoned live through this

@@ -200,6 +200,18 @@ function applyEvent(view, event) {
         view.gates[id] = {
           ...view.gates[id],
           ...(ask ? { ask } : {}),
+          // askHistory (tsk-25g D1): ADDITIVE to the single-slot `ask`
+          // overwrite above, never a replacement for it -- every OTHER
+          // `.ask` reader (discovery.mjs's/decompose.mjs's own "most recent
+          // question" prompt text, decompose.mjs's risk/blast-radius
+          // bypass-reason match) keeps reading the single-slot value
+          // unchanged. Appends only on a FRESH `ask` (an `answer`-only
+          // event never adds an entry), same guard `ask ? {ask} : {}` above
+          // already uses -- accumulates the full round-to-round rejection
+          // history for judgeVerifySemanticCorrectness's own priorRejection
+          // threading (discovery.mjs/decompose.mjs) to draw on, instead of
+          // only the immediately-prior round.
+          ...(ask ? { askHistory: [...(view.gates[id]?.askHistory ?? []), ask] } : {}),
           ...(answer ? { answer } : {}),
           ...(parentSnapshotAtAsk !== undefined ? { parentSnapshotAtAsk } : {}),
           ...(statusAtAsk !== undefined ? { statusAtAsk } : {}),
