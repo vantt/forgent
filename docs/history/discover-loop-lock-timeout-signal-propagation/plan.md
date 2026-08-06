@@ -159,8 +159,12 @@ commit `5c738bd` on `fgw/tsk-4l9`): `npm test` + POSITIVE + NEGATIVE.
   squarely a layer that observes this failure. Its file pair is in scope
   (verified byte-identical with `diff -q`).
 - **The `.agents` copies stay byte-identical to their `.claude`
-  counterparts.** Verified true today for all three pairs; the plan assumes
-  no mechanism auto-generates one from the other (none was found).
+  counterparts.** **Proven, not assumed** — `test/skills/fgos-mirror.test.mjs`
+  asserts that the two roots declare the same `fgos-*` skill names, the same
+  relative file paths, and byte-identical content for every pair (plus
+  `_shared`). It runs under `npm test`, which the verify already invokes, so
+  a one-sided edit fails the item's own verify. No generator produces one
+  side from the other; the mirror is enforced by test, not by codegen.
 
 ## Dependency
 
