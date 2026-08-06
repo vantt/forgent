@@ -2,7 +2,8 @@
 topic: parallel-decomposition-and-merge
 date: 2026-08-05
 based_on: [bee@1.18.3, beegog@05a131f, symphony@2f0b257, repository-harness@9cc306d, beads@777d24b87, beads-viewer-rust@7f96da4]
-entries: [bee:cell-schema, bee:worktree-protected-attestation, bee:goal-check-every-done-yourself, bee:fleet-dispatch-and-merge-loop, bee:unattended-agent-accepted-risk-posture, beegog:cell-task-unit, beegog:orchestrator-assigns-workers, beegog:independent-feature-worktrees, beegog:computed-parallel-schedule, beegog:worktree-merge-staged-verify-gate, beegog:frozen-judge-file-scope, beegog:cross-session-atomic-claims, symphony:isolated-run-contract, repository-harness:orchestration-protocol-v1, beads:multiagent-routing-and-slots, beads-viewer-rust:mcp-agent-mail-coordination]
+entries: [bee:cell-schema, bee:worktree-protected-attestation, bee:goal-check-every-done-yourself, bee:fleet-dispatch-and-merge-loop, bee:unattended-agent-accepted-risk-posture, bee:fan-out-cost-tiering-rubric, bee:three-tier-model-rubric-with-pinned-agent-types, beegog:cell-task-unit, beegog:orchestrator-assigns-workers, beegog:independent-feature-worktrees, beegog:computed-parallel-schedule, beegog:worktree-merge-staged-verify-gate, beegog:frozen-judge-file-scope, beegog:cross-session-atomic-claims, symphony:isolated-run-contract, repository-harness:orchestration-protocol-v1, beads:multiagent-routing-and-slots, beads-viewer-rust:mcp-agent-mail-coordination]
+updated: 2026-08-06
 ---
 
 # Deep-dive: chia task con song song + tránh xung đột footprint + hợp nhất cha/con
@@ -67,3 +68,37 @@ Xem hàng mới trong `porting-log.md`:
 - ~~forgentX hiện gọi agy/opencode theo cơ chế nào cụ thể?~~ **Đã trả lời (2026-08-05, user chỉ ra đã chốt sẵn):** decision `0026` (Native-First Dispatch Doctrine) chốt agy/opencode LUÔN là cross-provider so với rootTask Claude → luôn `cli/spawn` (quy tắc 3, không ngoại lệ hôm nay), qua đúng MỘT adapter chuẩn hoá (`resolveExecutorConfig`, config `capacities.<id>` với `kind:"cli"`, `command`, `args`) — cơ chế spawn cụ thể bên trong adapter không quan trọng với deep-dive này (đúng như user chỉ ra), vì `worktree-dispatch-attestation` chỉ cần MỘT điểm chèn (trước/sau lời gọi `resolveExecutorConfig`), không cần biết adapter spawn bằng cách nào. Governance prompt-content riêng (`capacities.<id>.allowCrossProvider`, `docs/reference/capacity-cross-provider-governance.md`) đã xử lý câu hỏi "được phép gửi prompt ra ngoài Claude không" — TÁCH biệt với câu hỏi footprint/attestation ở đây (một bên gác NỘI DUNG gửi đi, một bên gác KẾT QUẢ nhận về so với footprint khai). Một prior-art consult trước đó (`plans/reports/distill-consult-260731-1733-agent-executor-backend-dispatch-report.md`, 2026-07-31) đã độc lập trỏ tới đúng `symphony:isolated-run-contract` cho bài toán backend-dispatch nói chung — deep-dive này (2026-08-05) hội tụ ĐỘC LẬP lần thứ hai vào cùng entry cho riêng bài toán footprint/merge, củng cố thêm cho hàng `orchestration-protocol-v1` trong porting-log (E3, hội tụ ≥2 lần = tín hiệu mạnh nhất theo rubric).
 - `footprint` hiện là optional và "item không khai footprint không bao giờ xung đột" (silent pass) — mở rộng frozen-judge diff-toàn-phần có nên áp dụng khi KHÔNG có footprint khai (tức "mọi file worker chạm đều lạ") hay giữ nguyên "vắng khai = miễn kiểm"? Đây là quyết định phạm vi, để human chốt khi triage candidate `worktree-dispatch-attestation`.
 - Wave-schedule (mục 3) có giá trị thật hay chỉ là "derived query đẹp" nếu hiện tại forgentX chưa từng chạy >1 agy/opencode song song thật? Cùng câu hỏi YAGNI mà `worktree-merge-semantic-gate` từng bị gắn nhầm — tránh lặp lỗi đó lần này bằng cách hỏi thẳng: có đang/sắp chạy đa executor song song không?
+
+## Cập nhật 2026-08-06 — trục bị bỏ sót: bee có HAI LỚP dispatch, và fgOS đã hội tụ từ trước
+
+**Bản 2026-08-05 ở trên so sai trục.** Nó đặt câu hỏi "worker là subagent Claude cùng nhà hay tiến trình ngoài?" rồi kết luận forgentX thuộc nhánh symphony/bee-herding, không phải nhánh cell-swarm. Kết luận đó không sai, nhưng nó bỏ qua một trục KHÁC quan trọng hơn cho bài toán chia việc: **bee không có một mô hình worker duy nhất — bee tách hai LỚP dispatch theo hệ quả của việc con lên cây git**, và ranh giới đó không liên quan gì tới việc worker chạy trong hay ngoài phiên.
+
+**Lớp 1 — cell (ghi file).** Có id, claim, reservation, `verify` chạy được, cap, một commit/cell (`bee:cell-schema`). Toàn bộ máy chống xung đột (`cells schedule` xếp sóng Kahn, reservations, frozen-judge, goal-check re-run verify) chỉ tồn tại vì lớp này ĐỂ LẠI thứ phải hoà nhập.
+
+**Lớp 2 — I/O worker (chỉ đọc, trả digest).** `upstreams/bee/AGENTS.md` rule 12: *"Fan out the gathering; keep the deciding... mechanical gather/render/mine steps dispatch down-tier as I/O workers that return digests"* (`bee:fan-out-cost-tiering-rubric`). Nhánh cli gather nói thẳng hình dạng: *"no reservation, no cap, no `result.json` — stdout **is** the digest"* (`bee-swarming/references/swarming-reference.md`). Không id, không state, không verify. Và rule 12 khoá thêm chiều ngược lại: decide-altitude — gates, synthesis, state writes, đối thoại với người — KHÔNG BAO GIỜ delegate.
+
+Ranh giới bee vạch, phát biểu gọn: **dispatch nào GHI file/mutate git thì phải có danh tính; dispatch nào chỉ ĐỌC-tổng-hợp-trả-về thì không cần gì cả.**
+
+Kèm theo, một chi tiết bản trước cũng bỏ sót: **cell KHÔNG phải backlog item.** bee giữ hai sổ tách rời — `.bee/cells/<feature>-<n>.json` (ephemeral, feature-scoped, chết khi feature đóng, `state worker prune` dọn transients) vs `.bee/backlog.jsonl` PBI events (`AGENTS.md`). Với lane `tiny`/`small`, bee bỏ hẳn `plan.md` và **cell CHÍNH LÀ micro-plan** (`bee-planning/SKILL.md`). Tức bee đã có sẵn đường "chia việc mà không sinh đơn vị quản lý" — thứ mà đọc bee qua trục cũ sẽ không thấy.
+
+### fgOS đã hội tụ độc lập vào đúng ranh giới này, từ trước
+
+`docs/decisions/0026` (Native-First Dispatch Doctrine) dựng sẵn cùng một nhị phân bằng vocabulary riêng, không mượn bee:
+
+- **rootTask** — đệ quy/fractal; **subTask** *"KHÔNG phải 1 phạm trù riêng, ĐÚNG bản chất chỉ là 1 rootTask khác, được kích hoạt đệ quy"*.
+- **capacity** — *"1 đơn vị functional/helper hẹp (judge-discovery, submit-assist-classify) — không tự mang vòng đời 1 rootTask đầy đủ"*.
+- Và chốt: hai cái **không gộp khái niệm**, chỉ gộp **cơ chế dispatch** (4 quy tắc native-vs-cli/spawn).
+
+`capacity` ≡ lớp 2 của bee; `rootTask` ≡ lớp 1. Máy phía fgOS cũng đã chạy: `.claude/skills/_shared/capacity-dispatch-fallback.md` (kiểm config → kiểm backend present → `dispatch.mjs decide` native-vs-cli → prompt → luôn có đường lui inline), với bốn trong năm pha triển khai của 0026 đã merge. Đây là **lần hội tụ độc lập thứ ba** trong cùng deep-dive này (hai lần trước: `worktree-merge-staged-verify-gate` và `orchestration-protocol-v1`) — theo rubric, hội tụ ≥2 lần là tín hiệu mạnh nhất.
+
+### Ba chỗ hở còn lại, sau khi trừ phần đã có
+
+1. **Gói mệnh lệnh của capacity phải ĐĂNG KÝ TRƯỚC.** Mỗi capacity đòi một khoá `capacities.<id>` trong config cộng một `<PROMPT_TEMPLATE>` **cố định** nhúng trong skill — lý do ghi rõ trong fragment: *"so every dispatch asks the exact same thing, never a paraphrase that drifts call to call"*. Chia việc uyển chuyển cần cha soạn gói **lúc chạy**. Đây là đánh đổi thật (mất bảo đảm chống-trôi), không phải thiếu sót.
+2. **Danh sách lý do hợp lệ để dispatch không có "chạy song song".** Bốn skill (`fgos-exploring`, `fgos-planning`, `fgos-validating`, `fgos-code-implement`) chép gần y hệt ba lý do: *cheaper model, cross-provider, resource isolation*. Thiếu đúng lý do tốc độ, trong một sản phẩm đặt Ship Faster ở ưu tiên #1. Đáng chú ý: lệnh cấm ad-hoc dispatch nằm trong SKILL, không nằm trong 0026 — 0026 chỉ từng phát biểu *native hay cli*, chưa bao giờ *dispatch hay làm tại chỗ*. Sửa được mà không đụng luật khoá.
+3. **Model tier suy ra từ `work.tier`, mà `work.tier` là tier CEREMONY.** `src/runner/dispatch.mjs:1053-1054`: `const tier = work.tier ?? DEFAULTS.tier; const model = modelForTier(cfg, tier)`. Cùng một field (`light`/`standard`/`heavy`) vừa quyết định bao nhiêu nghi thức quy trình (`gate-bypass.mjs`'s `isTierCovered` đọc chính nó) vừa quyết định model nào chạy. bee tách hẳn hai thứ: `lane` là nghi thức, còn model tier được **phán tại lúc dispatch** bởi orchestrator, và *"never fixed at planning — a planning `tier` is at most an overridable hint"* (`bee:three-tier-model-rubric-with-pinned-agent-types`, decision 0016), có ghi lại lựa chọn để đo độ khan hiếm của tier đắt. fgOS hôm nay không có bước phán này ở đâu cả.
+
+Chỗ hở 3 khớp với 1: một gói soạn động không có `capacities.<id>` nào để giữ model/provider, nên **nếu không có phán đoán tier per-dispatch thì gói động buộc phải rơi về một backend mặc định** — mất đúng nửa giá trị ("dispatch xuống đúng smart-tier, đúng provider").
+
+Rủi ro kèm theo, phải xử khi port: cổng `allowCrossProvider` hiện gác theo capacity id (`dispatch.mjs:691-693` — từ chối khi một capacity `kind:"cli"` resolve ra lệnh không-phải-Claude mà chưa bật cờ). Gói soạn động mang nội dung khác nhau mỗi lần ⇒ cổng phải chuyển thành gác **per-dispatch**, không còn per-capacity.
+
+Thảo luận thiết kế đang chạy trên chính ba chỗ hở này: `docs/history/two-layer-dispatch/DISCUSSION.md` (item `tsk-2t6`), với D2 (thêm lý do song-song-hoá), D3 (capacity ad-hoc prompt động), D4 (gác lớp helper-mà-ghi-file).

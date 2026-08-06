@@ -76,6 +76,12 @@ buộc phải giữ lại (id, footprint, verify, merge) khi việc con thực s
 | 24 | Có thêm song-song-hoá thành lý do hợp lệ không? | **Chốt — D2 (có)** | `AGENTS.md` để Ship Faster ở ưu tiên #1 mà danh sách hiện tại loại trừ đúng lý do tốc độ |
 | 25 | Prompt động hay nhân bản capacity id? | **Chốt — D3 (prompt động)** | Chấp nhận mất bảo đảm chống-drift của fixed template, đổi lấy chia việc uyển chuyển |
 | 26 | B2 có va vào luật khoá không? | **Rõ — có, và đã gác (D4)** | 0026 chốt nhị phân rootTask/capacity. B2 là helper **CÓ ghi file** ⇒ loại thứ ba; muốn có phải mở rộng `capacity` cho ghi file hoặc supersede phần "subTask ≡ rootTask" của 0026 |
+| 27 | Mô hình L1 (cái được dispatch) / L2 (cơ chế kích hoạt) có đúng không? | **Rõ — đúng, và 0026 đã tách sẵn** | 0026 dòng 76-86: *"subTask và capacity KHÔNG gộp thành 1 khái niệm... Cái GIỐNG NHAU, và là điều đáng nói, là **CƠ CHẾ DISPATCH/ORCHESTRATE**... áp dụng Y HỆT cho cả 2"*. Đúng lát cắt L1/L2 |
+| 28 | (A) capacity và (C) gói tự do có phải hai loại khác **bản chất** không? | **Đề xuất chỉnh, chờ xác nhận** | Không — chúng khác **nguồn gói mệnh lệnh**, không khác bản chất. Hai trục vuông góc: *có mang vòng đời không* (0026's nhị phân) và *gói đăng ký trước hay soạn lúc chạy*. B nằm ở "có vòng đời + soạn động"; A ở "không vòng đời + đăng ký trước"; C ở "không vòng đời + soạn động". Ô thứ tư (có vòng đời + đăng ký trước) trống có lý: việc mang vòng đời là việc riêng từng lần, không thể có prompt cố định |
+| 29 | Gọi L2 là gì? | **Rõ — đừng gọi "orchestrator"** | 0026 dòng 34-56 đã gán "orchestrator" cho vai trò **quyết định kích hoạt rootTask nào** (người mở session, `/fgOS:pick`, `fgos-runner`, herdr) — tầng CAO hơn, không phải transport. Thuật ngữ sẵn có cho L2 là **"cơ chế dispatch"** (native vs cli/spawn, 4 quy tắc); **"executor"** để dành cho backend đích mà `resolveExecutorConfig` trả về |
+| 30 | Soul ở L1 có đang chọn được provider/tier không? | **Rõ — KHÔNG, và đây là chỗ hở thật** | `src/runner/dispatch.mjs:1053-1054`: `const tier = work.tier ?? DEFAULTS.tier; const model = modelForTier(cfg, tier)`. `work.tier` là tier **ceremony** (`light/standard/heavy`) — cùng field `gate-bypass.mjs`'s `isTierCovered` đọc để quyết bao nhiêu nghi thức. Một field hai việc. bee tách hẳn: `lane` là nghi thức, model tier **phán tại lúc dispatch**, *"never fixed at planning — a planning tier is at most an overridable hint"* (decision 0016) |
+| 31 | Quan hệ L1 → L2 | **Rõ — L1 chọn AI, L2 SUY RA CÁCH** | 0026 quy tắc 3: khác provider ⇒ bắt buộc cli/spawn, không ngoại lệ. Nên soul L1 không chọn cơ chế một cách độc lập — nó chọn provider + tier, còn cơ chế rơi ra từ quy tắc 1-4. Phát biểu đúng: **L1 chọn cái gì + ai; L2 suy ra bằng cách nào** |
+| 32 | Gói soạn động ảnh hưởng governance ra sao? | **Rõ — cổng phải chuyển tầng** | `dispatch.mjs:691-693` chặn khi một capacity `kind:"cli"` resolve ra lệnh không-phải-Claude mà chưa bật `allowCrossProvider` — gác theo **capacity id**. Gói soạn động mang nội dung khác nhau mỗi lần ⇒ cổng phải thành **per-dispatch**. Phải vào plan của D3 |
 
 ## 4. Quyết định đã chốt
 
@@ -209,6 +215,37 @@ B2. ⇒ mint **D2/D3/D4** ở §4.
 regenerate toàn phần vì khung "B1 cần xây" của vòng 1 đã sai sự thật; §7 viết
 lại theo hình dạng mới.
 
+### 2026-08-06 — vòng 5
+
+**Người dùng đưa khung refined:** dispatch có hai tầng. **L1 — task dispatch**,
+hiện có ba thứ: (A) capacity, (B) task hành chính có id và quy trình, (C) task
+tự do với mô tả mệnh lệnh bất kỳ. **L2** — cơ chế kích hoạt (agent native,
+spawn...), lớp đã dày công xây. Và: soul ở L1 cần thông minh hơn để chọn (hoặc
+fix qua config) provider và smart tier.
+
+**Trả lời:** khung đúng, khớp thẳng 0026 (§3 hàng 27) — và liên quan trực tiếp,
+vì nó là mảnh còn thiếu của chính D2/D3 vừa chốt. Ba điểm bổ sung sau khi scout:
+
+1. **(A) và (C) không khác bản chất** (§3 hàng 28) — chúng khác *nguồn gói mệnh
+   lệnh*. Hai trục vuông góc, ba ô có nghĩa, ô thứ tư trống có lý do. Đây là đề
+   xuất chỉnh, chờ người xác nhận trước khi mint D-ID.
+2. **Đừng gọi L2 là "orchestrator"** (§3 hàng 29) — 0026 đã gán từ đó cho vai
+   trò cao hơn (quyết định kích hoạt rootTask nào). Dùng "cơ chế dispatch";
+   "executor" để dành cho backend đích.
+3. **"Soul L1 chọn provider + tier" là chỗ hở thật, có bằng chứng** (§3 hàng
+   30-31): hôm nay model suy thẳng từ `work.tier`, mà `work.tier` là tier
+   ceremony — một field làm hai việc. Và quan hệ đúng giữa hai tầng là **L1
+   chọn cái gì + ai; L2 suy ra bằng cách nào** (0026 quy tắc 3 ép cross-provider
+   luôn cli/spawn).
+
+Kèm một rủi ro mới lộ ra (§3 hàng 32): cổng `allowCrossProvider` hiện gác theo
+capacity id; gói soạn động buộc cổng phải chuyển thành gác per-dispatch.
+
+**Kết quả vòng 5:** viết delta distillery (deep-dive
+`parallel-decomposition-and-merge.md` + hàng porting-log mới
+`dispatch-tier-judged-at-dispatch`), trong đó chỗ hở tier là phát hiện mới của
+vòng này. Chưa mint D-ID cho khung L1/L2 — chờ người xác nhận điểm chỉnh (1).
+
 ## 6. Thiết kế đã chốt {#design}
 
 _(Regenerate toàn phần ở vòng 4, thay bản phác thảo vòng 1. Bản cũ mô tả B1/B2
@@ -326,16 +363,17 @@ provider · cách ly tài nguyên · **chạy song song cho nhanh**.
   isolated-run-contract, chưa tách trục *ghi-file-cần-id vs chỉ-đọc-không-cần*,
   và chưa ghi nhận cell ≠ backlog item), kèm một hàng `porting-log.md` tương
   ứng.
-- **Bổ sung sau vòng 4:** ghi luôn phát hiện quan trọng hơn — fgOS đã hội tụ
-  độc lập với bee ở chính ranh giới này từ trước, qua `docs/decisions/0026`
-  (rootTask đệ quy vs capacity không-vòng-đời). Deep-dive hiện chưa nối hai
-  nguồn đó với nhau.
+- **Trạng thái: ĐÃ LÀM (vòng 5).** Deep-dive có section mới *"Cập nhật
+  2026-08-06 — trục bị bỏ sót"*; `porting-log.md` có hàng mới
+  `dispatch-tier-judged-at-dispatch` (candidate, R3 E2 F2); frontmatter
+  deep-dive thêm hai entry nguồn (`bee:fan-out-cost-tiering-rubric`,
+  `bee:three-tier-model-rubric-with-pinned-agent-types`) + `updated: 2026-08-06`.
 - **Trích §6:** *"Điểm khởi đầu đúng không phải 'fgOS cần lớp dispatch thứ
   hai' — fgOS đã có nó, và nó tên là `capacity`."*
 - **D-ID áp dụng:** chưa có.
-- **Quan hệ:** thuần tài liệu, không phụ thuộc hai hạng mục trên; nằm cùng
-  branch `fgw/tsk-2t6` theo quyết định của người dùng ở §5 vòng 1.
-- **Verify nháp:** `grep -q "hai lớp dispatch" docs/distillery/deep-dives/parallel-decomposition-and-merge.md`
+- **Quan hệ:** thuần tài liệu; nằm cùng branch `fgw/tsk-2t6` theo quyết định
+  của người dùng ở §5 vòng 1.
+- **Verify:** `grep -q "HAI LỚP dispatch" docs/distillery/deep-dives/parallel-decomposition-and-merge.md && grep -q "dispatch-tier-judged-at-dispatch" docs/distillery/porting-log.md`
 
 ## Outstanding questions
 
