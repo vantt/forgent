@@ -58,10 +58,10 @@ never moves it.
   Task/Agent call is collapsed by default in the transcript, not hidden —
   a person can still expand it to inspect the subagent's own trace, unlike
   a genuinely opaque headless `claude -p` subprocess). If a step
-  genuinely needs a different backend (cheaper model, cross-provider such
-  as Codex/agy, resource isolation) for a narrow helper task, route it
+  genuinely needs a different backend for a narrow helper task, route it
   explicitly through the capacity-dispatch mechanism instead of an ad hoc
-  Task call — see `../_shared/capacity-dispatch-fallback.md`.
+  Task call — see `../_shared/capacity-dispatch-fallback.md` for its own
+  list of valid reasons.
 - Do not research implementation, propose architecture, or write code. If a
   candidate question only matters to whoever builds the thing, it belongs to
   `fgos-planning`, not here.

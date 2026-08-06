@@ -68,10 +68,10 @@ pass to keep the item moving.
   blind cli-spawn — pure overhead, not a transparency question (a
   Task/Agent call is collapsed by default in the transcript, not hidden,
   unlike a genuinely opaque headless `claude -p` subprocess). If a step
-  genuinely needs a different backend (cheaper model, cross-provider such
-  as Codex/agy, resource isolation) for a narrow helper task, route it
+  genuinely needs a different backend for a narrow helper task, route it
   explicitly through the capacity-dispatch mechanism instead — see
-  `../_shared/capacity-dispatch-fallback.md`.
+  `../_shared/capacity-dispatch-fallback.md` for its own list of valid
+  reasons.
 - Do not apply the `decompose`→`executing` edge yourself, and do not invent a
   new edge, stage, or field to record the verdict. The verdict is prose
   input to which already-registered edge gets picked next; the engine is
