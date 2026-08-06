@@ -1,110 +1,126 @@
 # tsk-1u7 — plan
 
+**Supersedes the prior revision of this file** (small mode, exclude-the-test
+approach) — that revision was built on D1/D2, which `CONTEXT.md` D3/D4 now
+reverse: `fgos-validating` found `session.mjs`'s lock still carries a real,
+precedent-confirmed race. This plan implements the fix instead.
+
 ## Mode gate
 
-Flags checked against the item: auth (no), authorization (no), data model
-(no), audit/security (no), external systems (no), public contracts (no —
-`sessions.json`/`sessions.lock` are internal runner state, not a public
-contract), cross-platform (no), existing covered behavior (**yes** —
-touches `test/runner/session.test.mjs`, part of the existing suite),
-weak proof around the area (**yes** — the area is intermittently flaky by
-definition, so any change here is proven only probabilistically, not
-deterministically). 2 flags.
+Flags: auth (no), authorization (no), data model (no), audit/security (no),
+external systems (no), public contracts (no), cross-platform (no),
+**existing covered behavior (yes** — `tryAcquireOnce`/`acquireSessionsLock`
+is the lock every `createSession` call funnels through; `session.test.mjs`'s
+existing suite already exercises it**)**, **weak proof around the area
+(yes** — concurrency correctness is inherently hard to prove with
+certainty; that is exactly what made D1's first-pass conclusion wrong**)**,
+multi-domain (no). 2 flags.
 
-Chosen mode: **small**. A couple of files, no gray areas left — D1/D2
-already closed every product decision in `CONTEXT.md`; what remains is
-mechanical.
+Chosen mode: **standard**. Unlike the prior (now-superseded) "small" pick,
+this change touches production concurrency-control code with a real
+regression risk to every session-lifecycle call — the table's own 2-flag
+threshold applies honestly here, not overcounted.
 
-`fgos graph --json`: tsk-1u7 is its own size-1 connected component (no
-other item depends on it or blocks it) — no critical-path/topUnblock
-ordering question applies to a single-item, single-file change.
+Not **spike**: `tsk-3ld` chose spike because its single yes/no question
+(does a real race exist?) was still open and needed fresh ablation evidence
+to answer. That question is already answered for `tsk-1u7` by direct
+precedent — same vulnerable code shape, same root cause, already proven and
+fixed in the sibling `events.mjs` lock (`CONTEXT.md` D3). What's left is
+implementing the known fix and proving it holds for `session.mjs`
+specifically, which is standard implementation-plus-proof work, not an
+open question.
 
-Impact-analysis capability: GitNexus registered and `present` →
-`impact-analysis: full`. Not exercised further — this item touches only
-`test/runner/session.test.mjs` (test-only, no production call sites to
-trace blast radius for).
+`fgos graph --id tsk-1u7 --json`: still its own size-1 component — no
+cross-item ordering applies.
+
+Impact-analysis: GitNexus `present` → `impact-analysis: full`. Not
+exercised further — the change is scoped to one internal module
+(`session.mjs`) with a known, already-enumerated caller surface
+(`createSession`, `endSession`, `listSessions`, `reclaimOrphanedSessions`,
+all in the same file) rather than needing a blast-radius trace across the
+wider codebase.
 
 ## Approach
 
-Per D1, the investigation conclusion is already reached and documented in
-`CONTEXT.md`: `sessions.lock`'s design (wx-atomic create, PID-liveness
-stale-check with re-verify before reclaim, `session.mjs:131-392`)
-structurally prevents a lost-update race on `sessions.json`. No code fix
-to `session.mjs` is being made by this item — there is no confirmed bug to
-fix, only a documented, plausible-but-unconfirmed lock-contention-timeout
-hypothesis (`CONTEXT.md`'s "Deferred to planning" section).
+Port `events.mjs`'s already-proven fix (`events.mjs:205-243`,
+`tryAcquireEventsLockOnce`) into `session.mjs`'s `tryAcquireOnce`
+(`session.mjs:131-185`), mirroring it exactly:
 
-Sizing the evidence bar for that hypothesis against this item's `light`
-tier (the specific question `CONTEXT.md` deferred here): a deliberate
-CPU-throttled repro to force-reproduce the timeout would cost real
-investigation time for a `light`-tier item whose only mandated deliverable
-is D2 (get the flake out of default CI signal). The lock-contention
-hypothesis is already recorded with its supporting evidence in
-`CONTEXT.md` — sufficient for a future higher-tier item to pick up if the
-flake recurs after D2 or new evidence emerges. This item does not chase a
-synthetic repro.
-
-**What this item actually builds**: apply D2 — exclude
-`test/runner/session.test.mjs`'s "concurrent createSession from real
-separate OS processes never loses a registry entry" test from the default
-`npm test` full-suite run, using Node's built-in `--test-skip-pattern` or
-an inline `{ skip: '...' }` test option (whichever keeps the test runnable
-on demand, never deleted), with a comment linking `tsk-1u7` and this
-plan's own reasoning — the same shape `tsk-3ld` used for
-`test/state/events.test.mjs`.
+- Replace the fast-path create (`fs.openSync(lockPath, 'wx')` +
+  `fs.writeSync(fd, String(pid))`, `session.mjs:139-141`) with: write the
+  pid to a per-attempt temp file (`fs.writeFileSync`), then
+  `fs.linkSync(tmpPath, lockPath)`. `link()` only ever exposes the
+  destination fully-written or not-yet-existing — the file-exists-but-empty
+  window closes structurally, the same reasoning `events.mjs:222-224`
+  already documents.
+- Clean up the temp file in a `finally` (mirroring `events.mjs:236-241`),
+  regardless of whether the link succeeded (already linked, source no
+  longer needed) or hit `EEXIST` (link failed, orphaned temp file).
+- Everything past the create attempt (`EEXIST` handling, PID-liveness
+  check, stale re-read-before-unlink) is untouched — `CONTEXT.md`'s
+  original scout already confirmed that part is sound (D1's evidence there
+  still holds; only the fast-path create was ever wrong).
 
 Risk map:
 
 | Component | Risk | Proof point |
 |---|---|---|
-| `test/runner/session.test.mjs`'s skip annotation | low — mechanical, isolated to one test file | `node --test test/runner/session.test.mjs` still runs the test directly (skip must be default-suite-only, not permanent); `npm test` (default glob) no longer includes it in its pass/fail signal |
-| No regression to the other 5 tests in the same file | low | full file run, all other tests still assert as before |
-
-No medium/high-risk entries — nothing here touches production code paths.
+| `session.mjs`'s `tryAcquireOnce` fast-path create | Medium — every `createSession`/`endSession`/`listSessions`/`reclaimOrphanedSessions` call funnels through this lock; a botched port could deadlock (never releasing) or leave orphaned temp files | Ablation mirroring `tsk-3ld`'s own methodology (`plan.md` "The question" section): stash the fix, run `session.test.mjs`'s concurrent test at raised concurrency (`N ≥ 20`, mirroring `tsk-3ld`'s own headroom target) — expect reliably RED; restore the fix, run 5 times at the same `N` — expect reliably GREEN. Run at `fgos-validating`. |
+| `session.test.mjs`'s other 5 tests in the same file (nesting guard, refuse-to-nest, lock-reclaim, etc.) | Low — none touch the fast-path create directly | Full file run after the fix, confirm no regression |
 
 ## Files touched
 
-- `test/runner/session.test.mjs` — add a default-suite skip/exclude
-  annotation to the one flaky test, with a comment citing `tsk-1u7`.
+- `src/runner/session.mjs` — rewrite `tryAcquireOnce`'s create branch
+  (`session.mjs:137-145`) to the `linkSync` technique.
+- `test/runner/session.test.mjs` — raise the concurrent-createSession
+  test's process count from 5 toward `tsk-3ld`'s own `N ≥ 20` headroom
+  target, as permanent regression coverage at the scale that actually
+  catches this (mirrors `tsk-3ld`'s `N_PROC` 6→20 bump, `CONTEXT.md` D4).
+  Exact `N` decided at execution time, informed by the ablation's own
+  result (lowest `N` that reliably reproduces unpatched, same sizing logic
+  `tsk-3ld` used).
 
-## Shape (small)
+## Shape (standard)
 
-One direct task, no split:
+One phase, one item, no split — the fix is a single localized function
+rewrite plus a test-parameter bump, both in the same feature area
+`CONTEXT.md` already scoped:
 
-1. Read the exact test block (`session.test.mjs:207-240`) and Node's
-   `node:test` skip mechanics (`{ skip: <reason> }` on the `test()` call,
-   or an env-gated conditional skip) — pick whichever lets the test still
-   run explicitly (`node --test test/runner/session.test.mjs` with an
-   override, e.g. `RUN_FLAKY=1`) while `npm test`'s default glob excludes
-   it.
-2. Apply the skip with a comment: cites `tsk-1u7`, states the reason
-   (full-suite load-contention flake, not a confirmed data-loss bug — see
-   `docs/history/tsk-1u7-session-lock-contention-flake/CONTEXT.md`), and
-   states how to force-run it (`RUN_FLAKY=1 node --test
-   test/runner/session.test.mjs` or equivalent).
-3. Run the item's verify command in full to confirm both halves hold:
-   `node --test test/runner/session.test.mjs && for i in 1 2 3; do npm
-   test; done`.
+1. Rewrite `tryAcquireOnce`'s create branch per the Approach above.
+2. Run the ablation (risk-map proof point) to confirm the fix actually
+   closes the window at the concurrency level that reproduces it —
+   deferred to `fgos-validating`, not guessed here.
+3. Once the ablation confirms, raise the test's process count to the
+   value the ablation showed is needed, as permanent coverage.
+4. Run the full verify command.
 
-No split — this is one honest piece of work.
+Concrete cases already covered by `session.test.mjs`'s existing suite and
+worth re-confirming, not re-designing: nesting guard (refuses starting a
+session inside an existing session worktree), stale-lock reclaim
+(dead-pid), lock exclusion between a live and a stale holder — none of
+these change shape from this fix, only the create branch does.
 
 ## Proof surface
 
-Verify (already locked at `discover`, unchanged here):
+Verify (unchanged from what `discover` locked — still accurate, no code
+identity changed in the command itself):
 ```
 node --test test/runner/session.test.mjs && for i in 1 2 3; do npm test; done
 ```
-Proves: (a) the test file itself still runs and its concurrent-createSession
-case still passes when invoked directly/forced, and (b) the default
-`npm test` full-suite glob passes cleanly 3 times in a row post-exclusion —
-direct evidence D2 landed and the flake no longer contributes to default
-CI noise.
+Proves: the file's own tests (including the now-higher-concurrency
+regression case) pass directly, and the default full-suite glob passes
+cleanly 3 times in a row — both the fix and its test coverage hold.
 
 ## Assumptions
 
-- Node's `node:test` runner in this repo's version supports a per-test
-  `skip` option or an equivalent conditional-skip pattern compatible with
-  the glob `test/**/*.test.mjs` used by `npm test` (`package.json:23`).
-  Not material to `CONTEXT.md`'s decisions — an implementation detail of
-  D2's mechanism, left to whoever executes this plan to confirm against
-  the actual Node version in use.
+- `fs.linkSync` behaves identically across the OSes this repo's CI/dev
+  runs on (Linux — confirmed, this is the same primitive `events.mjs`
+  already relies on in this same repo, no new platform surface). Not
+  material — an already-proven primitive, not a new one.
+- The concurrency level needed to reliably reproduce `session.mjs`'s
+  version of this race may differ from `events.mjs`'s `N=20` (different
+  lock hold duration — `session.mjs`'s critical section includes a real
+  `git worktree add`, much slower than `events.mjs`'s single
+  read-parse-append). Flagged here as unproven; the ablation at
+  `fgos-validating` is exactly what determines the real number, not a
+  guess pinned in this plan.
