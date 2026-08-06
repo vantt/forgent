@@ -8,7 +8,7 @@ computed-parallel-wave-schedule + worktree-dispatch-attestation, đã merge main
 
 ## 1. Trạng thái hiện tại
 
-Vòng 6 (2026-08-06). Đã đọc kỹ upstream bee và scout xong phía fgOS. Hai câu
+Vòng 7 (2026-08-06). Đã đọc kỹ upstream bee và scout xong phía fgOS. Hai câu
 hỏi mở đầu của người dùng đã có câu trả lời bằng bằng chứng source (§3, hàng
 "rõ"). Phát hiện quan trọng nhất: **bee không có một mô hình cell duy nhất — bee
 tách sẵn HAI lớp dispatch**, và ranh giới bee vạch là *"dispatch nào GHI file thì
@@ -36,6 +36,12 @@ lượng nghi thức quy trình (§3 hàng 30). Delta distillery đã viết xon
 **D7** (ba item + `mergeAfter` chain), **D8** (không thêm `selfSufficient`),
 **D9** (trigger hai điều kiện cho D4), **D10** (cam kết lớp chọn provider/tier +
 chừa hai ô ngay). §3 hàng 12-15 đã cập nhật tại chỗ từ "chưa rõ" sang chốt.
+
+**Vòng 7** tách ba hạng mục §7 thành item thật (`tsk-2sl` → `tsk-2k1` →
+`tsk-503`, xâu `mergeAfter` theo D7) và chốt hai điểm thi hành còn lại: **D11**
+(hình dạng `<scope>`, cấm file đếm) và **D12** (helper là fragment prose, không
+subprocess). Cả hai đã gộp thẳng vào description hai item liên quan để chúng tự
+đứng được.
 
 **Nợ vòng 3 khép lại theo cách khác:** `tsk-3xd` đã merge **kèm** câu sai trong
 description ("`tsk-535` hết lý do tồn tại và có thể superseded") — không sửa
@@ -118,6 +124,8 @@ gọi `fgos decision --id tsk-2t6` thật.)_
 | **D8** | **Không** thêm field `selfSufficient`; cần biết thì tính **dẫn xuất** (có prose mệnh lệnh + `verify` chạy được + `footprint` ⇒ dispatch-ready) | Mọi tín hiệu gate hiện nay đều cơ học và **không do agent tự khai** (`hasOpenItems`, `isTierCovered`, `HEAVY_KEYWORDS`). Một cờ tự khai là chỗ **duy nhất** agent tự phong, mà người viết cờ chính là agent muốn qua cổng. Dẫn xuất đúng thói quen derived-never-stored sẵn có | Vòng 6 (người xác nhận). `fgos decision` seq 8093 |
 | **D9** | D4 chỉ xét lại khi **đủ hai điều kiện AND**: (a) `tsk-3xd` đã merge — **ĐÃ THỎA 2026-08-06**; (b) ≥2 ca thật, ghi bằng capture/friction, cha cần con GHI file mà việc đó không đáng thành work item | "Xem lại sau" quá mơ hồ, dễ thành zombie. Thiếu (b) thì D4 giữ nguyên vô thời hạn — YAGNI có răng, đo bằng ca thật chứ không phải cảm giác | Vòng 6 (người xác nhận). `fgos decision` seq 8094 |
 | **D10** | Lớp chọn provider/smart-tier là việc **PHẢI làm** (hoãn, không bỏ). Ràng buộc áp dụng **NGAY**: gói động chừa sẵn hai ô `provider`/`tier` (rỗng = để hệ tự quyết), và `resolve` nhận override từ caller | `dispatch.mjs:1139-1141` đã đọc `capacity?.tier`/`capacity?.model` và truyền xuống `resolveExecutorCommand(cfg, {prompt, model, tier, ...})` — plumbing xuyên suốt đã có. Thiếu đúng một thứ: CLI `resolve` chỉ nhận `<capacityId>` + `--prompt`. Không chừa ô ngay thì mọi dispatch đóng đinh vào `capacity.model ?? modelForTier(cfg, work.tier)` = **luôn rơi về default backend**, và sửa sau phải đụng lại mọi call site. Chừa bây giờ gần như miễn phí | Vòng 6 (người xác nhận). `fgos decision` seq 8095 |
+| **D11** | `<scope>` = id item đang claim; không có thì `s<8 ký tự đầu writerId>` từ `resolveWriterIdentity`. Ghi kèm `scopeSource`. Counter `n` giữ **trong bộ nhớ**, **không** file state | Không phát minh token mới: `src/runner/session-identity.mjs:129` đã có thang bốn nấc `registry`/`env`/`pid`/`unresolved`, không throw không treo. Prefix `s` để scope không mở đầu bằng chữ số khi nguồn là pid. Ghi `scopeSource` vì scope nguồn `pid` **không ổn định** giữa tiến trình còn `registry` thì ổn định — dùng lại đúng hình dạng `writer:{id,source}` work item đã mang. **Cấm xây file đếm**: file đếm là state, và nó mở lại D4 bằng cửa sau | Vòng 7 (người xác nhận). `fgos decision` seq 8121 |
+| **D12** | Logic chọn provider/tier là **fragment prose dùng chung** mà skill soạn gói include trước khi dùng — **không** subprocess judge; chỉ trả `provider`+`tier`; fail-safe **ngược** với D6; phải ghi lại lựa chọn | Precedent: `_shared/capacity-dispatch-fallback.md` chính là mẫu fragment-trỏ-tới-và-điền-tham-số. Prose vì 0026 §"Lớp còn thiếu" chỉ đích danh `judgeDiscovery`/`judgeDecompose` cli-spawn một `claude -p` **mù** trong khi caller đã là soul sống có context tốt hơn (bug `tsk-1ni`) — helper phán tier bằng subprocess lặp đúng sai lầm đó thấp hơn một tầng. Bằng chứng để phán chính là sáu ô của gói; rubric ba bậc của bee đọc đúng ba tín hiệu đó. Không trả cơ chế: `dispatch.mjs decide` vẫn suy theo quy tắc 1-4 — một lớp quyết định, không phải hai. Fail-safe ngược: thiếu ô ⇒ **không** dispatch (rủi ro đúng/sai); không phán được tier ⇒ **vẫn** dispatch với mặc định (rủi ro chi phí). Ghi lựa chọn để có vòng phản hồi hạ bậc khi bậc đắt khan hiếm | Vòng 7 (người xác nhận). `fgos decision` seq 8122 |
 
 ## 5. Q&A log
 
@@ -334,7 +342,25 @@ cả bản `.claude/` lẫn `.agents/`), và gợi ý đúng ba lựa chọn `se
 `re-slice` — `mergeAfter` chính là `sequence`. Advisory hoạt động đúng như thiết
 kế trên chính ca thật đầu tiên nó gặp.
 
-**(2) và (3):** tư vấn đã trình bày, chờ chốt — xem §Outstanding questions.
+**(2) `<scope>` ⇒ D11.** Không phát minh token mới — `resolveWriterIdentity`
+(`src/runner/session-identity.mjs:129`) đã có sẵn thang bốn nấc và không bao giờ
+throw. Ba tinh chỉnh kèm: ghi `scopeSource` (nguồn `pid` không ổn định giữa tiến
+trình, nguồn `registry` thì ổn), counter `n` **trong bộ nhớ** — **cấm file
+đếm**, vì file đếm là state và nó mở lại D4 bằng cửa sau — và cắt ngắn `s` + 8
+ký tự cho đọc được trong log.
+
+**(3) Helper ⇒ D12.** Hướng người dùng đề xuất (include fragment vào trước khi
+dùng, để nó có mặt trong lúc soạn và nắm được cốt lõi của gói) đúng, và có lý do
+kỹ thuật cứng chứ không chỉ tiện: một helper phán tier bằng **subprocess** sẽ
+lặp lại đúng bug `tsk-1ni` mà 0026 §"Lớp còn thiếu" chỉ đích danh — soul mù
+re-derive thứ soul sống đã biết. Bốn bổ sung: bằng chứng để phán chính là sáu ô
+của gói (dùng lại rubric ba bậc của bee, không nghĩ rubric mới); helper chỉ trả
+`provider`+`tier`, **không** trả cơ chế; fail-safe **ngược** với D6; và phải ghi
+lại lựa chọn để có vòng phản hồi hạ bậc khi bậc đắt khan hiếm.
+
+**Kết quả vòng 7:** ba item thật (`tsk-2sl`/`tsk-2k1`/`tsk-503`) + hai decision
+(seq 8121/8122). D11 đã gộp vào description của `tsk-2k1`, D12 vào `tsk-503` —
+để hai item đó tự đứng được mà không cần đọc lại file này.
 
 ## 6. Thiết kế đã chốt {#design}
 
@@ -582,15 +608,18 @@ không merge. Ô "có vòng đời nhưng bỏ hành chính" vẫn gác nguyên.
 
 ## Outstanding questions
 
-Bốn câu mở của vòng 5 đã đóng ở vòng 6 (D6/D6b, D7, D8, D9, D10). Còn lại:
+Mọi câu mở của vòng 5 và vòng 6 đã đóng (D6-D12). Ba việc còn lại đều là thi
+hành, không phải thiết kế:
 
-- Ba hạng mục ở §7 đã sẵn sàng handoff sang `fgos-exploring`/`fgos-planning`
-  chưa, hay chờ tách thành item thật trước (`fgos add --parent tsk-2t6` với
-  `--footprint` + `mergeAfter` theo D7)?
-- `<scope>` của id gói khi phiên **không** claim item nào — token phiên lấy từ
-  đâu để vẫn truy vết được? (D6b chỉ chốt hình dạng, chưa chốt nguồn token.)
-- Logic chọn provider/tier (D10 vế i) đặt ở đâu: trong skill soạn gói, hay một
-  helper dùng chung cạnh `dispatch.mjs decide`? 0026 §"Việc chưa quyết" đã đặt
-  đúng câu này cho lớp native-vs-cli và chưa ai trả lời.
+- **Handoff.** `tsk-2sl`/`tsk-2k1`/`tsk-503` đã tồn tại và mang description
+  action-prose; bước còn lại là `fgos edit <id> --refs "docs/history/
+  two-layer-dispatch/DISCUSSION.md#task-<slug>"` rồi gọi `fgos-exploring` →
+  `fgos-planning` cho từng cái (terminal handoff của skill này).
+- **Chỗ ghi lựa chọn tier** (D12 vế e) — `appendWorkerLog` keyed theo `workId`
+  mà gói không phải work item. Cố ý để `tsk-503` quyết ở planning, không chốt
+  sẵn ở đây.
+- **`tsk-2t6` tự nó** vẫn ở `doing`/`clarify`. Sau handoff, nó là item cha chờ
+  ba con xong (`dep-graph.mjs:156`: cạnh `parent-child` hướng parent→child ⇒
+  cha đợi con).
 </content>
 </invoke>
