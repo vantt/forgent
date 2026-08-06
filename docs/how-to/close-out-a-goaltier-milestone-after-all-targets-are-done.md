@@ -13,6 +13,19 @@ are all `status: "done"`, but the milestone item itself still sits at
 `fgos rollup` does not read the `targets` field at all, so a goalTier item
 never closes itself just because its targets finished.
 
+## If the milestone was created via `fgos submit` instead of `fgos add`
+
+Before `tsk-5fs`, `goalTier` could only ever be set at creation time via
+`fgos add --goal-tier ...` — `fgos submit` (the public intake door)
+exposed no `--goal-tier` flag at all, and `goalTier` was deliberately
+excluded from `store.mjs`'s `EDITABLE_FIELDS`, so an item submitted
+without one was **permanently** unable to become a milestone/MVP. This
+actually happened (`tsk-3w3`, created via `submit`, needed `goalTier:
+milestone`, had no path to add it). `fgos submit` now exposes the same
+`--goal-tier` flag `add` always had, and `goalTier` is now in
+`EDITABLE_FIELDS` — `fgos edit <id> --goal-tier milestone` (or `mvp`) can
+retrofit it onto an existing item, submitted or added, at any time.
+
 ## Before you start
 
 - This is a **different** relationship from a decomposed root item's
