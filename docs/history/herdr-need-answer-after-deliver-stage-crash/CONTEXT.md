@@ -65,11 +65,31 @@ port method, any TUI layout change. No new feature — bug fix only.
   execution should run `impact` on `WorkItemRaw`/`refresh_from_fgos`
   before editing per the repo gate.
 
+## Verify
+
+`verify` locked as:
+
+```
+cargo test --manifest-path herdr-plugin/Cargo.toml need_answer_survives_missing_stage && cargo test --manifest-path herdr-plugin/Cargo.toml last_error_first_error_wins && cargo build --release --manifest-path herdr-plugin/Cargo.toml
+```
+
+Names two new regression tests this fix must add to
+`herdr-plugin/src/fgos.rs`'s existing `mod tests` (alongside its own
+`parse_need_answer`/`parse_after_deliver` fixture tests at lines 640/681)
+and `app.rs`'s test module respectively — a generic `cargo test` run
+(the repo's own prior convention for this crate, e.g. `"cargo test
+--manifest-path herdr-plugin/Cargo.toml && cargo build --release
+--manifest-path herdr-plugin/Cargo.toml"` used elsewhere) does not
+distinguish fixed from unfixed here, since neither bug currently has a
+regression test — the existing suite passes identically before and after
+the fix. Test bodies (fixture shape, assertions) are `fgos-planning`'s
+call, not designed here — this only fixes their names as the proof
+target, following this crate's own existing verify convention of naming a
+specific test filter (e.g. `"cargo test --manifest-path herdr-plugin/
+Cargo.toml pane_focus"`).
+
 ## Outstanding questions deferred to planning
 
-- Whether the fix needs a new regression test fixture reproducing a
-  stage-less item (mirroring `tsk-mvp-test-1`'s real shape: `status:
-  wontfix`, no `stage` field) in `herdr-plugin/src/fgos.rs`'s existing
-  test module, and what the item's own `verify` command should be
-  (currently unset: `"chưa xác định — P15 bổ sung"`). Implementation
+- Exact fixture shape and assertions for `need_answer_survives_missing_stage`
+  and `last_error_first_error_wins` (see Verify above). Implementation
   concern — left to `fgos-planning`.
