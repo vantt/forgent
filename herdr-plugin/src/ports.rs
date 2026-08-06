@@ -3,7 +3,7 @@ use std::io;
 use std::time::Duration;
 
 use crate::app::App;
-use crate::fgos::{DoingRow, FgosError, TriageRow};
+use crate::fgos::{AfterDeliverRow, DoingRow, FgosError, MergeListSummary, NeedAnswerRow, TriageRow};
 use crate::pane_scan::{PaneIdentity, PaneScanError};
 
 /// (a) fgOS data source seam (tsk-3t9 D1) — the domain asks for rows
@@ -11,6 +11,12 @@ use crate::pane_scan::{PaneIdentity, PaneScanError};
 pub trait WorkItemSource {
     fn fetch_triage(&self) -> Result<Vec<TriageRow>, FgosError>;
     fn fetch_doing(&self) -> Result<Vec<DoingRow>, FgosError>;
+    /// tsk-417 D3: NEED ANSWER box source.
+    fn fetch_need_answer(&self) -> Result<Vec<NeedAnswerRow>, FgosError>;
+    /// tsk-417 D3: AFTER DELIVER box source.
+    fn fetch_after_deliver(&self) -> Result<Vec<AfterDeliverRow>, FgosError>;
+    /// tsk-417 D3: MERGE LIST box source.
+    fn fetch_merge_list(&self) -> Result<MergeListSummary, FgosError>;
 }
 
 /// Pane-tracking seam (tsk-4zo D1): scans the dashboard's own herdr
