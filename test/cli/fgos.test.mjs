@@ -3368,8 +3368,8 @@ test('decompose --verdict decompose --children writes real children, bypassing t
 
   writeRunnerConfig(cwd, { verdict: 'pass-through' });
   const children = JSON.stringify([
-    { title: 'Build parser', verify: 'npm test -- parser' },
-    { title: 'Build renderer', verify: 'npm test -- renderer' },
+    { title: 'Build parser', verify: 'npm test -- parser', action: 'tsk-3xd fixture: implement the parser.' },
+    { title: 'Build renderer', verify: 'npm test -- renderer', action: 'tsk-3xd fixture: implement the renderer.' },
   ]);
   const result = run(cwd, ['decompose', id, '--verdict', 'decompose', '--reason', 'two independent surfaces', '--children', children]);
   assert.equal(result.status, 0);

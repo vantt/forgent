@@ -198,6 +198,38 @@ test('buildPrompt degrades to "(không có)" when the work item has no descripti
   assert.match(prompt, /# Description\n\(không có\)/);
 });
 
+// tsk-3xd D1/D3 (docs/history/tsk-3xd-decompose-child-directive-prose/
+// CONTEXT.md): `action`/`readFirst` render into a new "# Directive" section
+// -- `action` from the item's own new field, `readFirst` derived from the
+// existing `footprint` field (not a stored field of its own, D1).
+
+test('buildPrompt includes a "# Directive" section naming action and files to read first', () => {
+  const prompt = buildPrompt(sampleWork());
+  assert.match(prompt, /# Directive/);
+  assert.match(prompt, /# Files to read first/);
+});
+
+test('buildPrompt embeds work.action verbatim under the Directive section', () => {
+  const action = 'D1: implement the parser per the locked format.';
+  const prompt = buildPrompt(sampleWork({ action }));
+  assert.match(prompt, /# Directive\nD1: implement the parser per the locked format\./);
+});
+
+test('buildPrompt degrades action to "(không có)" when the work item has no action', () => {
+  const prompt = buildPrompt(sampleWork());
+  assert.match(prompt, /# Directive\n\(không có\)/);
+});
+
+test('buildPrompt renders readFirst from the item\'s own footprint, joined, under "Files to read first"', () => {
+  const prompt = buildPrompt(sampleWork({ footprint: ['src/parser.mjs', 'test/parser.test.mjs'] }));
+  assert.match(prompt, /# Files to read first\nsrc\/parser\.mjs, test\/parser\.test\.mjs/);
+});
+
+test('buildPrompt degrades readFirst to "(không có)" when the work item has no footprint', () => {
+  const prompt = buildPrompt(sampleWork());
+  assert.match(prompt, /# Files to read first\n\(không có\)/);
+});
+
 test('buildPrompt with no feedback stays byte-identical to the pre-feedback shape (no Human feedback section)', () => {
   assert.equal(buildPrompt(sampleWork()), buildPrompt(sampleWork(), undefined));
   assert.doesNotMatch(buildPrompt(sampleWork(), {}), /# Human feedback/);

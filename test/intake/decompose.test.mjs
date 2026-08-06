@@ -229,8 +229,8 @@ test('judgeDecompose returns decompose with normalized children including resolv
     verdict: 'decompose',
     reason: 'Two independent surfaces, no shared state',
     children: [
-      { title: 'Build parser', verify: 'npm test -- parser' },
-      { title: 'Build renderer', verify: 'npm test -- renderer', deps: [0] },
+      { title: 'Build parser', verify: 'npm test -- parser', action: 'tsk-3xd fixture: implement the described change for this test.' },
+      { title: 'Build renderer', verify: 'npm test -- renderer', action: 'tsk-3xd fixture: implement the described change for this test.', deps: [0] },
     ],
   });
   const cfg = cfgFor([scriptPath, '{prompt}']);
@@ -248,8 +248,8 @@ test('judgeDecompose drops a forward/self dep index instead of invalidating the 
     verdict: 'decompose',
     reason: 'Two independent surfaces, no shared state',
     children: [
-      { title: 'Build parser', verify: 'npm test -- parser', deps: [1] }, // forward ref, dropped
-      { title: 'Build renderer', verify: 'npm test -- renderer', deps: [1] }, // self ref, dropped
+      { title: 'Build parser', verify: 'npm test -- parser', action: 'tsk-3xd fixture: implement the described change for this test.', deps: [1] }, // forward ref, dropped
+      { title: 'Build renderer', verify: 'npm test -- renderer', action: 'tsk-3xd fixture: implement the described change for this test.', deps: [1] }, // self ref, dropped
     ],
   });
   const cfg = cfgFor([scriptPath, '{prompt}']);
@@ -272,7 +272,7 @@ test('judgeDecompose returns invalid when any child is missing a real verify (no
   const scriptPath = writeVerdictExecutor(dir, {
     verdict: 'decompose',
     children: [
-      { title: 'Build parser', verify: 'npm test -- parser' },
+      { title: 'Build parser', verify: 'npm test -- parser', action: 'tsk-3xd fixture: implement the described change for this test.' },
       { title: 'Build renderer' }, // missing verify
     ],
   });
@@ -285,18 +285,86 @@ test('judgeDecompose returns invalid when a child verify is a blank/whitespace-o
   const dir = mkTempDir();
   const scriptPath = writeVerdictExecutor(dir, {
     verdict: 'decompose',
-    children: [{ title: 'Build parser', verify: '   ' }],
+    children: [{ title: 'Build parser', verify: '   ', action: 'tsk-3xd fixture: implement the described change for this test.' }],
   });
   const cfg = cfgFor([scriptPath, '{prompt}']);
   const verdict = judgeDecompose(sampleWork(), cfg);
   assert.deepEqual(verdict, { kind: 'invalid' });
 });
 
+// tsk-3xd D2 (docs/history/tsk-3xd-decompose-child-directive-prose/
+// CONTEXT.md): action is now BẮT BUỘC, same "no placeholder invalidates
+// the whole verdict" discipline verify already has above.
+
+test('judgeDecompose returns invalid when any child is missing action (tsk-3xd D2, mirrors the missing-verify rule)', () => {
+  const dir = mkTempDir();
+  const scriptPath = writeVerdictExecutor(dir, {
+    verdict: 'decompose',
+    reason: 'Two independent surfaces, no shared state',
+    children: [
+      { title: 'Build parser', verify: 'npm test -- parser', action: 'D1: implement per parent.' },
+      { title: 'Build renderer', verify: 'npm test -- renderer' }, // missing action
+    ],
+  });
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+  const verdict = judgeDecompose(sampleWork(), cfg, '## Locked decisions\n\nD1: placeholder.\n');
+  assert.deepEqual(verdict, { kind: 'invalid' });
+});
+
+test('judgeDecompose returns invalid when a child action is a blank/whitespace-only string', () => {
+  const dir = mkTempDir();
+  const scriptPath = writeVerdictExecutor(dir, {
+    verdict: 'decompose',
+    reason: 'Two independent surfaces, no shared state',
+    children: [{ title: 'Build parser', verify: 'npm test -- parser', action: '   ' }],
+  });
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+  const verdict = judgeDecompose(sampleWork(), cfg, '## Locked decisions\n\nD1: placeholder.\n');
+  assert.deepEqual(verdict, { kind: 'invalid' });
+});
+
+test('judgeDecompose returns invalid when a child action cites a D-ID that was never locked in the parent CONTEXT.md (tsk-3xd D2)', () => {
+  const dir = mkTempDir();
+  const scriptPath = writeVerdictExecutor(dir, {
+    verdict: 'decompose',
+    reason: 'Two independent surfaces, no shared state',
+    children: [{ title: 'Build parser', verify: 'npm test -- parser', action: 'D9: a decision that was never locked.' }],
+  });
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+  const verdict = judgeDecompose(sampleWork(), cfg, '## Locked decisions\n\nD1: placeholder.\nD2: another one.\n');
+  assert.deepEqual(verdict, { kind: 'invalid' });
+});
+
+test('judgeDecompose accepts a child action citing a real D-ID from the parent CONTEXT.md (tsk-3xd D2)', () => {
+  const dir = mkTempDir();
+  const scriptPath = writeVerdictExecutor(dir, {
+    verdict: 'decompose',
+    reason: 'Two independent surfaces, no shared state',
+    children: [{ title: 'Build parser', verify: 'npm test -- parser', action: 'D1: implement the parser per the locked format.' }],
+  });
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+  const verdict = judgeDecompose(sampleWork(), cfg, '## Locked decisions\n\nD1: placeholder.\n');
+  assert.equal(verdict.kind, 'decompose');
+  assert.equal(verdict.children[0].action, 'D1: implement the parser per the locked format.');
+});
+
+test('judgeDecompose accepts any non-empty action when the parent CONTEXT.md has no "## Locked decisions" section at all (tsk-3xd D2 graceful degrade, mirrors findUncoveredLockedDecisions\'s own precedent)', () => {
+  const dir = mkTempDir();
+  const scriptPath = writeVerdictExecutor(dir, {
+    verdict: 'decompose',
+    reason: 'Two independent surfaces, no shared state',
+    children: [{ title: 'Build parser', verify: 'npm test -- parser', action: 'Implement it — no locked decisions exist to cite.' }],
+  });
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+  const verdict = judgeDecompose(sampleWork(), cfg); // no lockedContext at all
+  assert.equal(verdict.kind, 'decompose');
+});
+
 test('judgeDecompose returns invalid when a decompose verdict has no top-level reason (tsk-6b6 D3)', () => {
   const dir = mkTempDir();
   const scriptPath = writeVerdictExecutor(dir, {
     verdict: 'decompose',
-    children: [{ title: 'Build parser', verify: 'npm test -- parser' }],
+    children: [{ title: 'Build parser', verify: 'npm test -- parser', action: 'tsk-3xd fixture: implement the described change for this test.' }],
   });
   const cfg = cfgFor([scriptPath, '{prompt}']);
   const verdict = judgeDecompose(sampleWork(), cfg);
@@ -308,7 +376,7 @@ test('judgeDecompose returns invalid when a decompose verdict has a blank/whites
   const scriptPath = writeVerdictExecutor(dir, {
     verdict: 'decompose',
     reason: '   ',
-    children: [{ title: 'Build parser', verify: 'npm test -- parser' }],
+    children: [{ title: 'Build parser', verify: 'npm test -- parser', action: 'tsk-3xd fixture: implement the described change for this test.' }],
   });
   const cfg = cfgFor([scriptPath, '{prompt}']);
   const verdict = judgeDecompose(sampleWork(), cfg);
@@ -647,8 +715,8 @@ test('resolveDecompose on a decompose verdict writes every child with parent/dep
     verdict: 'decompose',
     reason: 'Two independent surfaces, no shared state',
     children: [
-      { title: 'Build parser', verify: 'npm test -- parser' },
-      { title: 'Build renderer', verify: 'npm test -- renderer', deps: [0] },
+      { title: 'Build parser', verify: 'npm test -- parser', action: 'tsk-3xd fixture: implement the described change for this test.' },
+      { title: 'Build renderer', verify: 'npm test -- renderer', action: 'tsk-3xd fixture: implement the described change for this test.', deps: [0] },
     ],
   });
   const cfg = cfgFor([scriptPath, '{prompt}']);
@@ -685,7 +753,7 @@ test('resolveDecompose on a decompose verdict releases a held claim (doing -> to
   const scriptPath = writeVerdictWithVerifyCheckExecutor(scriptDir, {
     verdict: 'decompose',
     reason: 'Two independent surfaces, no shared state',
-    children: [{ title: 'Build parser', verify: 'npm test -- parser' }],
+    children: [{ title: 'Build parser', verify: 'npm test -- parser', action: 'tsk-3xd fixture: implement the described change for this test.' }],
   });
   const cfg = cfgFor([scriptPath, '{prompt}']);
 
@@ -704,8 +772,8 @@ test('resolveDecompose writes footprint on a child exactly when the verdict prov
     verdict: 'decompose',
     reason: 'Two independent surfaces, no shared state',
     children: [
-      { title: 'Build parser', verify: 'npm test -- parser', footprint: ['src/parser.mjs', 'test/parser.test.mjs'] },
-      { title: 'Build renderer', verify: 'npm test -- renderer' },
+      { title: 'Build parser', verify: 'npm test -- parser', action: 'tsk-3xd fixture: implement the described change for this test.', footprint: ['src/parser.mjs', 'test/parser.test.mjs'] },
+      { title: 'Build renderer', verify: 'npm test -- renderer', action: 'tsk-3xd fixture: implement the described change for this test.' },
     ],
   });
   const cfg = cfgFor([scriptPath, '{prompt}']);
@@ -722,12 +790,41 @@ test('resolveDecompose writes footprint on a child exactly when the verdict prov
   assert.equal(view.work[secondId].footprint, undefined);
 });
 
+// tsk-3xd D1/D3 (tầng 3 fix, docs/history/tsk-3xd-decompose-child-directive-
+// prose/CONTEXT.md): action must survive from the verdict all the way into
+// the written child work item, same integration shape the footprint test
+// immediately above already proves for footprint.
+test('resolveDecompose writes action on every child exactly as the verdict provided it (tsk-3xd D1/D3)', () => {
+  const scriptDir = mkTempDir();
+  const scriptPath = writeVerdictWithVerifyCheckExecutor(scriptDir, {
+    verdict: 'decompose',
+    reason: 'Two independent surfaces, no shared state',
+    children: [
+      { title: 'Build parser', verify: 'npm test -- parser', action: 'D1: implement the parser per the locked format.' },
+      { title: 'Build renderer', verify: 'npm test -- renderer', action: 'D1: implement the renderer per the locked format.' },
+    ],
+  });
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  const { docsRef } = mkContextFixture(storeDir, '## Locked decisions\n\nD1: placeholder — filled below.\n');
+  addWork(storeDir, sampleWork({ docsRef }));
+
+  const result = resolveDecompose(storeDir, 'item-x', cfg, 'runner');
+  assert.equal(result.outcome, 'decompose');
+
+  const view = listWork(storeDir);
+  const [firstId, secondId] = result.childIds;
+  assert.equal(view.work[firstId].action, 'D1: implement the parser per the locked format.');
+  assert.equal(view.work[secondId].action, 'D1: implement the renderer per the locked format.');
+});
+
 test('resolveDecompose leaves footprint undefined when a child provides a malformed (non-array) footprint, without invalidating the verdict', () => {
   const scriptDir = mkTempDir();
   const scriptPath = writeVerdictWithVerifyCheckExecutor(scriptDir, {
     verdict: 'decompose',
     reason: 'Two independent surfaces, no shared state',
-    children: [{ title: 'Build parser', verify: 'npm test -- parser', footprint: 'not-an-array' }],
+    children: [{ title: 'Build parser', verify: 'npm test -- parser', action: 'tsk-3xd fixture: implement the described change for this test.', footprint: 'not-an-array' }],
   });
   const cfg = cfgFor([scriptPath, '{prompt}']);
 
@@ -752,8 +849,8 @@ test('resolveDecompose gates to awaiting-human when tentative children declare o
     verdict: 'decompose',
     reason: 'Two independent surfaces, no shared state',
     children: [
-      { title: 'Build parser', verify: 'npm test -- parser', footprint: ['src/parser.mjs', 'src/shared.mjs'] },
-      { title: 'Build renderer', verify: 'npm test -- renderer', footprint: ['src/shared.mjs', 'src/renderer.mjs'] },
+      { title: 'Build parser', verify: 'npm test -- parser', action: 'tsk-3xd fixture: implement the described change for this test.', footprint: ['src/parser.mjs', 'src/shared.mjs'] },
+      { title: 'Build renderer', verify: 'npm test -- renderer', action: 'tsk-3xd fixture: implement the described change for this test.', footprint: ['src/shared.mjs', 'src/renderer.mjs'] },
     ],
   });
   const cfg = cfgFor([scriptPath, '{prompt}']);
@@ -780,8 +877,8 @@ test('resolveDecompose proceeds normally when tentative children declare disjoin
     verdict: 'decompose',
     reason: 'Two independent surfaces, no shared state',
     children: [
-      { title: 'Build parser', verify: 'npm test -- parser', footprint: ['src/parser.mjs'] },
-      { title: 'Build renderer', verify: 'npm test -- renderer' }, // no footprint declared
+      { title: 'Build parser', verify: 'npm test -- parser', action: 'tsk-3xd fixture: implement the described change for this test.', footprint: ['src/parser.mjs'] },
+      { title: 'Build renderer', verify: 'npm test -- renderer', action: 'tsk-3xd fixture: implement the described change for this test.' }, // no footprint declared
     ],
   });
   const cfg = cfgFor([scriptPath, '{prompt}']);
@@ -802,8 +899,8 @@ test('resolveDecompose: the existing heavy-risk gate still preempts the footprin
     verdict: 'decompose',
     reason: 'Two independent surfaces, no shared state',
     children: [
-      { title: 'Build parser', verify: 'npm test -- parser', footprint: ['src/parser.mjs', 'src/shared.mjs'] },
-      { title: 'Build renderer', verify: 'npm test -- renderer', footprint: ['src/shared.mjs'] },
+      { title: 'Build parser', verify: 'npm test -- parser', action: 'tsk-3xd fixture: implement the described change for this test.', footprint: ['src/parser.mjs', 'src/shared.mjs'] },
+      { title: 'Build renderer', verify: 'npm test -- renderer', action: 'tsk-3xd fixture: implement the described change for this test.', footprint: ['src/shared.mjs'] },
     ],
   });
   const cfg = cfgFor([scriptPath, '{prompt}']);
@@ -826,8 +923,8 @@ test('resolveDecompose logs a decisionsById entry on a footprint-overlap need-hu
     verdict: 'decompose',
     reason: 'Two independent surfaces, no shared state',
     children: [
-      { title: 'Build parser', verify: 'npm test -- parser', footprint: ['src/parser.mjs', 'src/shared.mjs'] },
-      { title: 'Build renderer', verify: 'npm test -- renderer', footprint: ['src/shared.mjs'] },
+      { title: 'Build parser', verify: 'npm test -- parser', action: 'tsk-3xd fixture: implement the described change for this test.', footprint: ['src/parser.mjs', 'src/shared.mjs'] },
+      { title: 'Build renderer', verify: 'npm test -- renderer', action: 'tsk-3xd fixture: implement the described change for this test.', footprint: ['src/shared.mjs'] },
     ],
   });
   const cfg = cfgFor([scriptPath, '{prompt}']);
@@ -849,8 +946,8 @@ test('resolveDecompose self-resolves the footprint-overlap gate once the next ju
     verdict: 'decompose',
     reason: 'Two independent surfaces, no shared state',
     children: [
-      { title: 'Build parser', verify: 'npm test -- parser', footprint: ['src/parser.mjs', 'src/shared.mjs'] },
-      { title: 'Build renderer', verify: 'npm test -- renderer', footprint: ['src/shared.mjs'] },
+      { title: 'Build parser', verify: 'npm test -- parser', action: 'tsk-3xd fixture: implement the described change for this test.', footprint: ['src/parser.mjs', 'src/shared.mjs'] },
+      { title: 'Build renderer', verify: 'npm test -- renderer', action: 'tsk-3xd fixture: implement the described change for this test.', footprint: ['src/shared.mjs'] },
     ],
   });
   const overlappingCfg = cfgFor([overlappingScript, '{prompt}']);
@@ -860,8 +957,8 @@ test('resolveDecompose self-resolves the footprint-overlap gate once the next ju
     verdict: 'decompose',
     reason: 'Re-sliced after human input — no shared file left',
     children: [
-      { title: 'Build parser', verify: 'npm test -- parser', footprint: ['src/parser.mjs'] },
-      { title: 'Build renderer', verify: 'npm test -- renderer', footprint: ['src/renderer.mjs'] },
+      { title: 'Build parser', verify: 'npm test -- parser', action: 'tsk-3xd fixture: implement the described change for this test.', footprint: ['src/parser.mjs'] },
+      { title: 'Build renderer', verify: 'npm test -- renderer', action: 'tsk-3xd fixture: implement the described change for this test.', footprint: ['src/renderer.mjs'] },
     ],
   });
   const resolvedCfg = cfgFor([resolvedScript, '{prompt}']);
@@ -892,9 +989,9 @@ test('resolveDecompose assigns positional child ids `${work.id}-<n>` for n=1..N 
     verdict: 'decompose',
     reason: 'Two independent surfaces, no shared state',
     children: [
-      { title: 'Build parser', verify: 'npm test -- parser' },
-      { title: 'Build renderer', verify: 'npm test -- renderer' },
-      { title: 'Build linker', verify: 'npm test -- linker' },
+      { title: 'Build parser', verify: 'npm test -- parser', action: 'tsk-3xd fixture: implement the described change for this test.' },
+      { title: 'Build renderer', verify: 'npm test -- renderer', action: 'tsk-3xd fixture: implement the described change for this test.' },
+      { title: 'Build linker', verify: 'npm test -- linker', action: 'tsk-3xd fixture: implement the described change for this test.' },
     ],
   });
   const cfg = cfgFor([scriptPath, '{prompt}']);
@@ -912,7 +1009,7 @@ test('resolveDecompose on a grandchild decompose produces `<root>-<m>-<n>` ids w
   const scriptPath = writeVerdictWithVerifyCheckExecutor(scriptDir, {
     verdict: 'decompose',
     reason: 'Two independent surfaces, no shared state',
-    children: [{ title: 'Build sub-parser', verify: 'npm test -- sub-parser' }],
+    children: [{ title: 'Build sub-parser', verify: 'npm test -- sub-parser', action: 'tsk-3xd fixture: implement the described change for this test.' }],
   });
   const cfg = cfgFor([scriptPath, '{prompt}']);
 
@@ -1038,7 +1135,7 @@ test('resolveDecompose routes a risk-heavy root through the human gate even on a
   const scriptPath = writeVerdictExecutor(scriptDir, {
     verdict: 'decompose',
     reason: 'Two independent surfaces, no shared state',
-    children: [{ title: 'Build parser', verify: 'npm test -- parser' }],
+    children: [{ title: 'Build parser', verify: 'npm test -- parser', action: 'tsk-3xd fixture: implement the described change for this test.' }],
   });
   const cfg = cfgFor([scriptPath, '{prompt}']);
 
@@ -1234,7 +1331,7 @@ test('resolveDecompose leaves the item untouched (invalid) when a child is missi
   const scriptPath = writeVerdictExecutor(scriptDir, {
     verdict: 'decompose',
     children: [
-      { title: 'Build parser', verify: 'npm test -- parser' },
+      { title: 'Build parser', verify: 'npm test -- parser', action: 'tsk-3xd fixture: implement the described change for this test.' },
       { title: 'Build renderer' },
     ],
   });
@@ -1264,8 +1361,8 @@ test('resolveDecompose parks as need-human (no children written) when the second
       verdict: 'decompose',
       reason: 'Two independent surfaces, no shared state',
       children: [
-        { title: 'Build parser', verify: 'npm test -- parser' },
-        { title: 'Build renderer', verify: 'Skill("fgOS:ready") loads without error' },
+        { title: 'Build parser', verify: 'npm test -- parser', action: 'tsk-3xd fixture: implement the described change for this test.' },
+        { title: 'Build renderer', verify: 'Skill("fgOS:ready") loads without error', action: 'tsk-3xd fixture: implement the described change for this test.' },
       ],
     },
     false,
@@ -1295,8 +1392,8 @@ test('resolveDecompose still writes every child when the second-pass check agree
       verdict: 'decompose',
       reason: 'Two independent surfaces, no shared state',
       children: [
-        { title: 'Build parser', verify: 'npm test -- parser' },
-        { title: 'Build renderer', verify: 'npm test -- renderer' },
+        { title: 'Build parser', verify: 'npm test -- parser', action: 'tsk-3xd fixture: implement the described change for this test.' },
+        { title: 'Build renderer', verify: 'npm test -- renderer', action: 'tsk-3xd fixture: implement the described change for this test.' },
       ],
     },
     true,
@@ -1344,7 +1441,7 @@ test('resolveDecompose threads the prior round\'s own disagreement text into the
   const decomposeVerdict = {
     verdict: 'decompose',
     reason: 'Two independent surfaces, no shared state',
-    children: [{ title: 'Build parser', verify: 'npm test -- parser' }],
+    children: [{ title: 'Build parser', verify: 'npm test -- parser', action: 'tsk-3xd fixture: implement the described change for this test.' }],
   };
   const scriptPath = writeVerdictDetectingPriorContextExecutor(scriptDir, decomposeVerdict);
   const cfg = cfgFor([scriptPath, '{prompt}']);
@@ -1387,7 +1484,7 @@ test('resolveDecompose --force overrides a disputed (non-mechanical) child verif
   const result = resolveDecompose(storeDir, 'item-x', cfg, 'runner', {
     verdict: 'decompose',
     reason: 'Two independent surfaces, no shared state',
-    children: [{ title: 'Build parser', verify: 'npm test -- parser' }],
+    children: [{ title: 'Build parser', verify: 'npm test -- parser', action: 'tsk-3xd fixture: implement the described change for this test.' }],
     force: true,
   });
   assert.equal(result.outcome, 'decompose');
@@ -1410,7 +1507,7 @@ test('resolveDecompose --force refuses when the item is already awaiting-human (
       resolveDecompose(storeDir, 'item-x', cfg, 'runner', {
         verdict: 'decompose',
         reason: 'Two independent surfaces, no shared state',
-        children: [{ title: 'Build parser', verify: 'npm test -- parser' }],
+        children: [{ title: 'Build parser', verify: 'npm test -- parser', action: 'tsk-3xd fixture: implement the described change for this test.' }],
         force: true,
       }),
     /already "awaiting-human"/,
@@ -1432,7 +1529,7 @@ test('resolveDecompose --force never overrides a MECHANICAL disagreement (tsk-12
     reason: 'Two independent surfaces, no shared state',
     // Trips matchesKnownBadVerifyPattern (judge-executor.mjs) mechanically
     // -- mechanical:true, exempt from --force by design (tsk-12t D6).
-    children: [{ title: 'Build parser', verify: 'node --test --test-name-pattern="x" test/foo.test.mjs | grep "^# pass"' }],
+    children: [{ title: 'Build parser', verify: 'node --test --test-name-pattern="x" test/foo.test.mjs | grep "^# pass"', action: 'tsk-3xd fixture: implement the described change for this test.' }],
     force: true,
   });
   assert.equal(result.outcome, 'need-human');
@@ -1538,8 +1635,8 @@ test('resolveDecompose logs a decisionsById entry on a decompose verdict, includ
     verdict: 'decompose',
     reason: 'Two independent surfaces, no shared state',
     children: [
-      { title: 'Build parser', verify: 'npm test -- parser' },
-      { title: 'Build renderer', verify: 'npm test -- renderer' },
+      { title: 'Build parser', verify: 'npm test -- parser', action: 'tsk-3xd fixture: implement the described change for this test.' },
+      { title: 'Build renderer', verify: 'npm test -- renderer', action: 'tsk-3xd fixture: implement the described change for this test.' },
     ],
   });
   const cfg = cfgFor([scriptPath, '{prompt}']);
@@ -1670,7 +1767,7 @@ function mkPlanFixture(storeDir, planContent) {
 
 test('resolveDecompose skips judgeDecompose and advances straight to executing when plan.md declares mode "tiny"', () => {
   const dir = mkTempDir();
-  const { scriptPath, counterPath } = writeCountingRawStdoutExecutor(dir, JSON.stringify({ verdict: 'decompose', reason: 'should never run', children: [{ title: 'x', verify: 'npm test' }] }));
+  const { scriptPath, counterPath } = writeCountingRawStdoutExecutor(dir, JSON.stringify({ verdict: 'decompose', reason: 'should never run', children: [{ title: 'x', verify: 'npm test', action: 'tsk-3xd fixture: implement the described change for this test.' }] }));
   const cfg = cfgFor([scriptPath, '{prompt}']);
 
   const storeDir = tmpStoreDir();
@@ -1801,7 +1898,7 @@ test('resolveDecompose skips judgeDecompose when plan.md is only reachable via p
   const { storeDir } = initTempGitRepoWithStore();
   const { scriptPath, counterPath } = writeCountingRawStdoutExecutor(
     mkTempDir(),
-    JSON.stringify({ verdict: 'decompose', reason: 'should never run', children: [{ title: 'x', verify: 'npm test' }] }),
+    JSON.stringify({ verdict: 'decompose', reason: 'should never run', children: [{ title: 'x', verify: 'npm test', action: 'tsk-3xd fixture: implement the described change for this test.' }] }),
   );
   const cfg = cfgFor([scriptPath, '{prompt}']);
 
@@ -1854,7 +1951,7 @@ test('resolveDecompose skips judgeDecompose when plan.md is only reachable via a
   const { repoRoot, storeDir } = initTempGitRepoWithStore();
   const { scriptPath, counterPath } = writeCountingRawStdoutExecutor(
     mkTempDir(),
-    JSON.stringify({ verdict: 'decompose', reason: 'should never run', children: [{ title: 'x', verify: 'npm test' }] }),
+    JSON.stringify({ verdict: 'decompose', reason: 'should never run', children: [{ title: 'x', verify: 'npm test', action: 'tsk-3xd fixture: implement the described change for this test.' }] }),
   );
   const cfg = cfgFor([scriptPath, '{prompt}']);
 
@@ -1909,7 +2006,7 @@ test('resolveContentRoot falls back to stateRoot when neither cwd nor any regist
 
 test('resolveDecompose skips judgeDecompose and advances to executing on a caller-supplied pass-through verdict', () => {
   const dir = mkTempDir();
-  const { scriptPath, counterPath } = writeCountingRawStdoutExecutor(dir, JSON.stringify({ verdict: 'decompose', reason: 'should never run', children: [{ title: 'x', verify: 'npm test' }] }));
+  const { scriptPath, counterPath } = writeCountingRawStdoutExecutor(dir, JSON.stringify({ verdict: 'decompose', reason: 'should never run', children: [{ title: 'x', verify: 'npm test', action: 'tsk-3xd fixture: implement the described change for this test.' }] }));
   const cfg = cfgFor([scriptPath, '{prompt}']);
 
   const storeDir = tmpStoreDir();
@@ -1954,8 +2051,8 @@ test('resolveDecompose writes real children on a caller-supplied decompose verdi
     verdict: 'decompose',
     reason: 'Two independent surfaces, no shared state',
     children: [
-      { title: 'Build parser', verify: 'npm test -- parser' },
-      { title: 'Build renderer', verify: 'npm test -- renderer' },
+      { title: 'Build parser', verify: 'npm test -- parser', action: 'tsk-3xd fixture: implement the described change for this test.' },
+      { title: 'Build renderer', verify: 'npm test -- renderer', action: 'tsk-3xd fixture: implement the described change for this test.' },
     ],
   });
   assert.equal(result.outcome, 'decompose');
@@ -2003,8 +2100,8 @@ test('resolveDecompose still gates a caller-supplied decompose verdict to awaiti
     verdict: 'decompose',
     reason: 'Two independent surfaces, no shared state',
     children: [
-      { title: 'Build parser', verify: 'npm test -- parser', footprint: ['src/parser.mjs', 'src/shared.mjs'] },
-      { title: 'Build renderer', verify: 'npm test -- renderer', footprint: ['src/shared.mjs', 'src/renderer.mjs'] },
+      { title: 'Build parser', verify: 'npm test -- parser', action: 'tsk-3xd fixture: implement the described change for this test.', footprint: ['src/parser.mjs', 'src/shared.mjs'] },
+      { title: 'Build renderer', verify: 'npm test -- renderer', action: 'tsk-3xd fixture: implement the described change for this test.', footprint: ['src/shared.mjs', 'src/renderer.mjs'] },
     ],
   });
   assert.equal(result.outcome, 'need-human');
@@ -2034,7 +2131,7 @@ test('resolveDecompose still routes a caller-supplied verdict through the heavy-
 
 test('resolveDecompose caller-supplied verdict takes precedence over the plan.md tiny/small mode skip-and-advance heuristic (D2)', () => {
   const dir = mkTempDir();
-  const { scriptPath, counterPath } = writeCountingRawStdoutExecutor(dir, JSON.stringify({ verdict: 'decompose', reason: 'should never run', children: [{ title: 'x', verify: 'npm test' }] }));
+  const { scriptPath, counterPath } = writeCountingRawStdoutExecutor(dir, JSON.stringify({ verdict: 'decompose', reason: 'should never run', children: [{ title: 'x', verify: 'npm test', action: 'tsk-3xd fixture: implement the described change for this test.' }] }));
   const cfg = cfgFor([scriptPath, '{prompt}']);
 
   const storeDir = tmpStoreDir();
@@ -2197,8 +2294,8 @@ test('resolveDecompose caller-supplied decompose verdict: an uncovered locked-de
     verdict: 'decompose',
     reason: 'Two independent surfaces, no shared state',
     children: [
-      { title: 'Build parser', verify: 'npm test -- parser', footprint: ['src/parser.mjs'] },
-      { title: 'Build renderer', verify: 'npm test -- renderer', footprint: ['src/renderer.mjs'] },
+      { title: 'Build parser', verify: 'npm test -- parser', action: 'D1: canonical output per parent CONTEXT.md.', footprint: ['src/parser.mjs'] },
+      { title: 'Build renderer', verify: 'npm test -- renderer', action: 'D1: canonical output per parent CONTEXT.md.', footprint: ['src/renderer.mjs'] },
     ],
   });
   assert.equal(result.outcome, 'decompose', 'the advisory must never block the real decompose write');
@@ -2231,7 +2328,7 @@ test('resolveDecompose caller-supplied decompose verdict: a child footprint that
   const result = resolveDecompose(storeDir, 'item-x', cfg, 'session', {
     verdict: 'decompose',
     reason: 'Two independent surfaces, no shared state',
-    children: [{ title: 'Build parser', verify: 'npm test -- parser', footprint: [fixtureRelPath] }],
+    children: [{ title: 'Build parser', verify: 'npm test -- parser', action: 'D1: canonical output per parent CONTEXT.md.', footprint: [fixtureRelPath] }],
   });
   assert.equal(result.outcome, 'decompose');
   assert.equal(readCount(counterPath), 0);
@@ -2246,7 +2343,7 @@ test('resolveDecompose auto-judged (model) decompose verdict also runs the compl
   const scriptPath = writeVerdictWithVerifyCheckExecutor(dir, {
     verdict: 'decompose',
     reason: 'Two independent surfaces, no shared state',
-    children: [{ title: 'Build parser', verify: 'npm test -- parser', footprint: ['src/parser.mjs'] }],
+    children: [{ title: 'Build parser', verify: 'npm test -- parser', action: 'D1: canonical output per parent CONTEXT.md.', footprint: ['src/parser.mjs'] }],
   });
   const cfg = cfgFor([scriptPath, '{prompt}']);
 
