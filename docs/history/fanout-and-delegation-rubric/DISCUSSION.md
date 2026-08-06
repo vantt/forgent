@@ -36,16 +36,18 @@ clear), không với tới native dispatch, và một bộ spawn thứ hai kém 
 sụp: runner **đã** tự `spawnWorker` cho thi công (`loop.mjs:707`).
 
 **Đã có item: `tsk-5kn`** (tier `heavy`, risk `heavy`, `docsRef` trỏ vào thư
-mục này). **6 D-ID đã mint thật** qua `fgos decision --id tsk-5kn` — xem §4.
+mục này). **8 D-ID đã mint thật** qua `fgos decision --id tsk-5kn` — xem §4.
+Không còn điểm nào trong diện chờ.
 
-**Vòng 6** chốt A2+B1 (research là lời gọi trong-stage, và là một stage
-dispatch được của item đã có — không đẻ work item riêng) và thu hẹp trigger
-research giữa chừng exploring: không phải "có thông tin mới" mà **"người
-đưa vào một tên riêng agent chưa giải được"**, kèm chốt chặn cơ học (tên có
-trong repo không — không có thì tra, đừng nhớ lại).
+**§6 đã viết đầy đủ** (tổng hợp thiết kế + sơ đồ Mermaid), **§7 đã chia
+5 hạng mục** với anchor riêng, D-ID áp dụng, quan hệ phụ thuộc và verify
+nháp. `#task-skill` và `#task-stage` chạy song song được; ba hạng mục còn
+lại chờ `#task-skill`.
 
-**Còn mở, đủ để viết §6 sau khi hai điểm diện-chờ ở §4 giữ thêm một vòng:**
-§6 (tổng hợp thiết kế + sơ đồ) và §7 (chia hạng mục) chưa viết.
+**Discussion coi như đã hội tụ.** Bước tiếp theo là handoff: gắn `refs` của
+`tsk-5kn` (hoặc từng item con sau khi split) vào đúng anchor `{#task-...}`,
+rồi claim item và chạy `fgos-exploring` → `fgos-planning` ngay trong session
+có đầy đủ ngữ cảnh này.
 
 Đề bài ban đầu đặt ra là "ô L1-whether còn trống, cần lấp bằng rubric của
 bee". Vòng 1 lật tiền đề đó: **ô không trống — nó đã chứa một chữ "không",
@@ -138,14 +140,8 @@ thật qua `fgos decision --id tsk-5kn`.
 | **D5** | **Bản đúc kết research ở file riêng `docs/history/<feature>/RESEARCH.md`, TÍCH LUỸ theo vòng.** Không trộn vào `CONTEXT.md` — research là *phán đoán máy, có thể sai/lỗi thời*, `CONTEXT.md` là *cam kết đã chốt với người*. Phải bắt cả WebSearch/WebFetch, không chỉ `rg` | người dùng chọn vòng 5, giữ vòng 6 |
 | **D6** | **Ca "không có soul khả dụng" KHÔNG tồn tại** ⇒ judge-trong-verb hết lý do tồn tại. Runner đã `spawnWorker` cho thi công (`loop.mjs:707`), và worker spawn là agent loop thật (nesting rule `0026`) | nêu vòng 5, giữ vòng 6 |
 
-**Chưa đủ điều kiện mint (mới giữ 1 vòng, chờ vòng 7):**
-- **A2 + B1** — research gọi giữa chừng exploring là **lời gọi trong-stage**
-  (không quay ngược stage), và research là **một stage dispatch được của
-  item đã có**, không phải work item riêng (§3 hàng 27, 34). Người dùng
-  chọn vòng 6. Hai vế củng cố nhau: nếu research là *năng lực* thì nó không
-  cần vòng đời riêng — và tránh được ô mà D4 của `two-layer-dispatch` đã
-  gác ("không có phạm trù thứ ba giữa rootTask và capacity").
-- **Trigger research giữa chừng exploring** (§3 hàng 35) — nêu vòng 6.
+| **D7** | **Research giữa chừng exploring là lời gọi TRONG-STAGE** (không quay ngược stage); và **research là một stage dispatch được của item đã có**, không phải work item riêng. Hai vế củng cố nhau: research là *năng lực* thì không cần vòng đời riêng — tránh luôn ô mà D4 của `two-layer-dispatch` đã gác | người dùng chọn vòng 6, giữ vòng 7 |
+| **D8** | **Trigger research bỏ hẳn câu hỏi "agent có biết cái này không"** — chỉ hỏi *research bằng ĐƯỜNG NÀO*. Mặc định LUÔN research khi có tên riêng chưa giải; tên **có** trong repo ⇒ đọc tại chỗ (`rg`/Read/Grep), **không có** ⇒ tra ngoài (WebSearch/WebFetch). Lý do bỏ self-test: LLM nghe tên lạ thì bịa, nên trigger dựa vào tự đánh giá không bắn đúng lúc cần nhất | nêu vòng 6, người dùng chốt vòng 7 |
 
 ## 5. Q&A log
 
@@ -784,9 +780,219 @@ chuyển từ prompt-trong-spawn sang skill research. Và ăn khớp với D5: t
 
 ## 6. Thiết kế đã chốt {#design}
 
-*(Chưa có — thiết kế chưa đủ hình dạng để tổng hợp. Sẽ regenerate toàn bộ
-khi có D-ID đầu tiên làm đổi hình dạng.)*
+*(Regenerate toàn bộ ở vòng 7. Viết cho người đọc không có lịch sử chat.)*
+
+### Vấn đề
+
+fgOS coi câu hỏi *"item này đã đủ rõ để thi công chưa?"* như một **thuộc
+tính tính được tại lúc ghi** — giống checksum — thay vì như **một việc** có
+chi phí, bằng chứng và sản phẩm đáng giữ. Cú phân loại nhầm đó nằm ở
+`resolveDiscovery`: verb cần một giá trị verdict để ghi, nên nó tự đẻ ra
+verdict; mà hàm Node không nghĩ được nên phải `spawnSync` một `claude -p`.
+
+Bốn hệ quả đo được: ~704 dòng máy móc retry/timeout/fail-safe bọc quanh một
+cú gọi LLM bất định nằm trong đường ghi state; `scout-notes.md` bị ghi đè
+mỗi vòng khiến vòng lặp mất trí nhớ (dogfood: **15 vòng, 0 item clear**);
+native dispatch bất khả về cấu trúc vì judge nằm dưới ranh giới tiến trình;
+và một bộ spawn thứ hai kém hơn cái `src/runner/dispatch.mjs` đã có.
+
+### Thiết kế
+
+**Tách hai stage** (D3). `discovery` là pha **máy làm một mình**: đọc mô tả,
+quét hệ sinh thái repo, tra cứu bên ngoài, rồi tự kết luận rõ/chưa rõ. Chỉ
+khi kết luận *chưa rõ* thì item mới park đợi người và mở sang `exploring` —
+pha **máy + người** cùng trao đổi. Nhìn `stage` là biết đang ở pha nào.
+
+**Một skill tái dùng, không phải một pha cố định** (D4). `fgos-researching`
+nhận *(mô tả + những gì đã biết tới giờ)* và trả *(lời giải cụ thể + verdict
+rõ/chưa rõ)*. Nó **không được biết mình bị gọi từ stage nào** — vì nó được
+gọi từ stage `discovery`, từ **giữa chừng** `exploring`, và sau này từ
+`planning`/`validating`.
+
+**Verb là cửa ghi sổ thuần** (D1). Luật one-door-write chỉ đòi mọi *ghi*
+state đi qua CLI; nó không đòi verb phải *tạo ra* giá trị được ghi. Skill
+sản xuất verdict, verb chỉ nhận và ghi: `fgos discover <id> --verdict ...`.
+Đường này đã tồn tại (`bin/fgos.mjs:1085`, `tsk-27y`) — việc còn lại là đảo
+nó thành mặc định.
+
+**Judge-trong-verb bị gỡ, không phải giữ làm fallback** (D6). Biện hộ duy
+nhất của nó là "runner headless không có soul", nhưng runner **đã** tự
+`spawnWorker` dựng worktree và spawn `claude` worker đầy đủ cho thi công
+(`src/runner/loop.mjs:707`) — và theo nesting rule của quyết định `0026`,
+một `claude` được spawn **chính là một Claude Code agent loop thật**, có
+tool, fan-out được. Nên hoặc có session sống, hoặc runner tự spawn một cái.
+**Không tồn tại ca thứ ba** buộc một tiến trình vô hồn tự tính verdict.
+
+**Research chạy trong một soul, và soul đó luôn có tool.** Đó là điều làm
+transparent dispatch tự nhiên hoạt động: skill nằm **phía trên** ranh giới
+tiến trình nên `dispatch.mjs decide` mới có gì để quyết — session sống thì
+native Task, không có session thì runner spawn worker. `claude -p` không
+biến mất, nó về đúng vai quy tắc 3/4 của `0026`: đường lui khi thật sự
+không có soul tại chỗ.
+
+**Fan-out có nhà** (D2). Skill research là **gather-altitude** — nó chưa
+biết đáp án, và nó chỉ cần kết luận chứ không cần byte thô — nên fan-out
+song song là chế độ mặc định của nó khi câu hỏi có nhiều nhánh độc lập.
+Luật cấm delegation ở `fgos-exploring` (`tsk-29i`) **giữ nguyên, không
+sửa**: nó cấm *"ad hoc sub-dispatch"* và tự chỉ đường *"route it explicitly
+through the capacity-dispatch mechanism"* — một skill có tên, gọi qua cơ chế
+capacity, chính là đường đó. `fgos-exploring` là decide-altitude và ở lại
+decide-altitude.
+
+**Sản phẩm research được giữ lại** (D5). `docs/history/<feature>/RESEARCH.md`,
+**tích luỹ theo vòng** chứ không ghi đè, và bắt cả WebSearch/WebFetch chứ
+không chỉ `rg`. Nó tách khỏi `CONTEXT.md` vì hai độ tin cậy khác hẳn nhau:
+research là *phán đoán máy, có thể sai và lỗi thời*; `CONTEXT.md` là *cam
+kết đã chốt cùng người*. Ghi đè chính là nguyên nhân của con số 15 vòng/0
+clear — một vòng lặp mất trí nhớ không hội tụ được, nó chỉ tung lại xúc xắc.
+
+**Quay lại research giữa chừng đối thoại** (D7, D8). Phần lớn thứ người nói
+là *câu trả lời* — chúng **đóng** unclear, không mở. Tín hiệu cần research
+là khi người **ném vào một tên riêng** (library, công nghệ, concept) chưa
+được giải. Lúc đó **không hỏi "agent có biết cái này không"** — đó đúng chỗ
+LLM dở nhất, nghe tên lạ là mô tả tự tin từ trí nhớ mờ. Thay bằng luật cơ
+học hai nhánh, **mặc định luôn có research, chỉ khác công cụ**: tên **có**
+trong repo/docs ⇒ đọc tại chỗ; **không có** ⇒ tra ngoài. Và đó là **lời gọi
+trong-stage**, không phải quay ngược stage (D7) — `stage` vẫn là `exploring`,
+skill research chỉ là năng lực được gọi.
+
+**Đối xứng với thứ fgOS đã làm được:**
+
+| Stage | Worker chạy skill gì | Sản phẩm | Ghi qua verb |
+|---|---|---|---|
+| `executing` | skill thi công | code + verify xanh | `fgos return` |
+| `discovery` | **skill research** | `RESEARCH.md` + verdict | `fgos discover --verdict` |
+
+Cùng một con đường, khác skill.
+
+```mermaid
+flowchart TD
+    A["item: mô tả thô<br/>stage = discovery"] --> B{"soul nào chạy?"}
+    B -->|"session sống"| C
+    B -->|"runner tự spawn worker"| C
+
+    C["skill fgos-researching<br/>(stage-agnostic)"] --> D["tên CÓ trong repo?<br/>có → rg/Read/Grep<br/>không → WebSearch/WebFetch<br/>nhiều nhánh → fan-out song song"]
+    D --> R[("RESEARCH.md<br/>TÍCH LUỸ, không ghi đè")]
+    D --> E{"rõ chưa?"}
+
+    E -->|"rõ"| F["fgos discover --verdict clear<br/>VERB CHỈ GHI, KHÔNG PHÁN"]
+    E -->|"chưa rõ"| G["park, đợi người"]
+
+    G --> H["stage = exploring<br/>máy + người trao đổi"]
+    H --> I{"người ném vào<br/>tên chưa giải được?"}
+    I -->|"có"| C
+    I -->|"không (chỉ là câu trả lời)"| H
+    H --> J["CONTEXT.md<br/>quyết định đã khoá cùng người"]
+
+    F --> K["stage kế tiếp"]
+    J --> K
+
+    style C fill:#2d6a4f,color:#fff
+    style F fill:#1d3557,color:#fff
+    style R fill:#6a4c93,color:#fff
+```
+
+Mũi tên `I → C` là chỗ D7 nói: **lời gọi trong-stage**, `stage` không đổi,
+chỉ là skill được gọi lại rồi trả về đúng chỗ cũ.
 
 ## 7. Danh mục hạng mục / task {#tasks}
 
-*(Chưa có — §6 chưa thành hình.)*
+Năm hạng mục. `#task-skill` và `#task-stage` không đụng nhau nên **chạy song
+song được**; ba cái còn lại chờ `#task-skill`.
+
+### `fgos-researching` skill {#task-skill}
+
+**Mục tiêu.** Dựng skill research stage-agnostic: nhận *(mô tả + đã biết gì)*,
+trả *(lời giải + verdict)*, ghi `RESEARCH.md` tích luỹ. Bao gồm luật chọn
+đường của D8 (trong repo ⇒ đọc tại chỗ; ngoài repo ⇒ tra ngoài; nhiều nhánh
+độc lập ⇒ fan-out song song) và hợp đồng `RESEARCH.md` của D5 (tích luỹ,
+mỗi vòng một mục có ngày, bắt cả WebSearch/WebFetch).
+
+**Trích §6.** *"`fgos-researching` nhận (mô tả + những gì đã biết tới giờ) và
+trả (lời giải cụ thể + verdict rõ/chưa rõ). Nó không được biết mình bị gọi
+từ stage nào."*
+
+**D-ID áp dụng.** D4, D5, D8. Fan-out hợp lệ qua D2 (dispatch có hợp đồng,
+không phải ad-hoc) và lý do 4 của `two-layer-dispatch` D2 (chạy song song
+cho nhanh).
+
+**Quan hệ.** Nền của mọi hạng mục còn lại. Không phụ thuộc cái nào.
+
+**Verify nháp.** `npm test` + kiểm prose: skill file tồn tại, có mục luật
+chọn đường hai nhánh, có hợp đồng `RESEARCH.md` tích luỹ, và **không** chứa
+câu hỏi tự-đánh-giá kiểu "bạn có biết X không" (negative check của D8).
+
+### stage `discovery` {#task-stage}
+
+**Mục tiêu.** Thêm `discovery` vào stage machine và tách `clarify` hiện tại
+thành `discovery` → (park nếu chưa rõ) → `exploring`. Gồm cạnh hợp lệ,
+migration cho item đang ở `clarify`, và cập nhật mọi chỗ đọc `stage`.
+
+**Trích §6.** *"`discovery` là pha máy làm một mình... Chỉ khi kết luận chưa
+rõ thì item mới park đợi người và mở sang `exploring`."*
+
+**D-ID áp dụng.** D3, và D7 (research giữa chừng exploring **không** sinh
+stage move — quan trọng cho việc thiết kế cạnh).
+
+**Quan hệ.** Song song được với `#task-skill`. `#task-runner` chờ cả hai.
+
+**Verify nháp.** `npm test` + test stage machine: cạnh `discovery`→`exploring`
+và `discovery`→(stage kế) hợp lệ; item cũ ở `clarify` migrate đúng; gọi
+research từ `exploring` **không** đổi `stage`.
+
+### verb về cửa ghi sổ thuần {#task-verb}
+
+**Mục tiêu.** Đảo mặc định của `resolveDiscovery`: caller-verdict thành
+đường chính, gỡ `judgeDiscovery` khỏi verb, gỡ phần lớn
+`src/intake/judge-executor.mjs` + `judge-fail-log.mjs` cùng cơ chế cạo
+transcript ghi `scout-notes.md` (bị `RESEARCH.md` thay).
+
+**Trích §6.** *"Luật one-door-write chỉ đòi mọi ghi state đi qua CLI; nó
+không đòi verb phải tạo ra giá trị được ghi."*
+
+**D-ID áp dụng.** D1, D6.
+
+**Quan hệ.** Chờ `#task-skill` (gỡ judge trước khi có thứ sản xuất verdict
+là để lại một lỗ hổng). Nhánh trust-signal `readLockedContext` (`tsk-ozl`)
+giữ nguyên.
+
+**Verify nháp.** `npm test` + `fgos discover <id>` không có `--verdict`
+phải **từ chối rõ ràng** thay vì âm thầm spawn; `judge-executor.mjs` không
+còn được `discovery.mjs` import.
+
+### exploring gọi lại research {#task-exploring}
+
+**Mục tiêu.** Nối luật D7/D8 vào `fgos-exploring`: nhận diện lúc người ném
+vào một tên riêng chưa giải được, gọi `fgos-researching` **trong-stage**,
+nhận kết quả rồi quay lại đối thoại. Không đụng luật `tsk-29i` (D2) — đây
+là dispatch có hợp đồng, không phải ad-hoc.
+
+**Trích §6.** *"Tín hiệu cần research là khi người ném vào một tên riêng
+chưa được giải... đó là lời gọi trong-stage, không phải quay ngược stage."*
+
+**D-ID áp dụng.** D7, D8, D2.
+
+**Quan hệ.** Chờ `#task-skill`. Độc lập với `#task-verb`.
+
+**Verify nháp.** `npm test` + kiểm prose `fgos-exploring/SKILL.md`: có luật
+gọi lại research với hai nhánh công cụ; **không** có câu tự-đánh-giá kiểu
+"nếu bạn không biết X"; luật cấm ad-hoc delegation của `tsk-29i` còn nguyên
+văn (negative check của D2).
+
+### runner dispatch research worker {#task-runner}
+
+**Mục tiêu.** Cho `fgos-runner` giao stage `discovery` cho worker chạy skill
+research qua chính `spawnWorker`/`createWorktree` nó đã dùng cho `executing`,
+rồi gọi verb với verdict — thay cho lời gọi `resolveDiscovery` không
+caller-verdict ở `src/runner/loop.mjs:1031`.
+
+**Trích §6.** *"hoặc có session sống, hoặc runner tự spawn một cái. Không
+tồn tại ca thứ ba buộc một tiến trình vô hồn tự tính verdict."*
+
+**D-ID áp dụng.** D6, D1.
+
+**Quan hệ.** Chờ `#task-skill` **và** `#task-stage`.
+
+**Verify nháp.** `npm test` + test runner: một vòng quét trên item ở
+`discovery` sinh ra một lần dispatch worker (không phải một lần gọi
+`judgeDiscovery`), và verdict về qua đường caller-supplied.
