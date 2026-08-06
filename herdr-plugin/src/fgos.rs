@@ -58,7 +58,13 @@ pub struct DoingRow {
 struct WorkItemRaw {
     title: String,
     status: String,
-    stage: String,
+    /// tsk-1pg D1: real state can carry no `stage` at all (an item with no
+    /// `stage` field, e.g. `status: wontfix`) — `Option` so one such item
+    /// in the map doesn't fail `serde_json::from_str::<ListEnvelope>` for
+    /// every other item alongside it. Defaulted to `"executing"` at each
+    /// read site, matching the JS engine's own `item.stage ?? 'executing'`
+    /// convention (`src/state/frontier.mjs`, `src/intake/decompose.mjs`).
+    stage: Option<String>,
     #[serde(rename = "parkReason")]
     park_reason: Option<String>,
     #[serde(rename = "statusCategory")]
@@ -204,7 +210,7 @@ pub fn parse_doing(json: &str) -> Result<Vec<DoingRow>, serde_json::Error> {
             id,
             title: item.title,
             status: item.status,
-            stage: item.stage,
+            stage: item.stage.unwrap_or_else(|| "executing".to_string()),
         })
         .collect();
     rows.sort_by(|a, b| {
@@ -641,6 +647,63 @@ mod tests {
         let ids: Vec<&str> = rows.iter().map(|r| r.id.as_str()).collect();
         assert_eq!(ids, vec!["tsk-awaiting-human", "tsk-blocked"]);
         assert!(rows.iter().all(|r| r.status == "blocked" || r.status == "awaiting-human"));
+    }
+
+    /// tsk-1pg D1: real shape from `.fgos/` — `tsk-mvp-test-1` (`status:
+    /// wontfix`) carries no `stage` field at all. Mixed alongside a real
+    /// NEED ANSWER row (`tsk-awaiting-human`) and a real AFTER DELIVER row
+    /// (`tsk-cleanup`) so a passing parse proves the stage-less item no
+    /// longer fails `serde_json::from_str::<ListEnvelope>` for the whole
+    /// map, not just that an empty map happens to parse.
+    const MISSING_STAGE_FIXTURE: &str = r#"{
+        "contract": "fgos.v1",
+        "generated_at": "2026-08-06T05:28:45.827Z",
+        "data_hash": "abc",
+        "data": {
+            "work": {
+                "tsk-mvp-test-1": {
+                    "title": "MVP goalTier test item",
+                    "status": "wontfix"
+                },
+                "tsk-awaiting-human": {
+                    "title": "Parked on a question",
+                    "status": "awaiting-human",
+                    "stage": "clarify",
+                    "statusCategory": "in-progress",
+                    "parkReason": "human-question"
+                },
+                "tsk-cleanup": {
+                    "title": "TTL-bounded worktree park",
+                    "status": "cleanup",
+                    "stage": "executing"
+                },
+                "tsk-no-stage-doing": {
+                    "title": "Actively worked, no stage field either",
+                    "status": "doing",
+                    "statusCategory": "in-progress"
+                }
+            }
+        }
+    }"#;
+
+    #[test]
+    fn need_answer_survives_missing_stage() {
+        let need_answer =
+            parse_need_answer(MISSING_STAGE_FIXTURE).expect("stage-less item must not fail the whole map's parse");
+        let ids: Vec<&str> = need_answer.iter().map(|r| r.id.as_str()).collect();
+        assert_eq!(ids, vec!["tsk-awaiting-human"]);
+
+        let after_deliver = parse_after_deliver(MISSING_STAGE_FIXTURE)
+            .expect("stage-less item must not fail the whole map's parse");
+        let ids: Vec<&str> = after_deliver.iter().map(|r| r.id.as_str()).collect();
+        assert_eq!(ids, vec!["tsk-cleanup"]);
+
+        // D1: a stage-less `doing` row defaults to "executing", matching
+        // the JS engine's own `item.stage ?? 'executing'` convention.
+        let doing =
+            parse_doing(MISSING_STAGE_FIXTURE).expect("stage-less item must not fail the whole map's parse");
+        let row = doing.iter().find(|r| r.id == "tsk-no-stage-doing").expect("row present");
+        assert_eq!(row.stage, "executing");
     }
 
     const AFTER_DELIVER_FIXTURE: &str = r#"{
