@@ -100,7 +100,8 @@ buộc phải giữ lại (id, footprint, verify, merge) khi việc con thực s
 | 27 | Mô hình L1 (cái được dispatch) / L2 (cơ chế kích hoạt) có đúng không? | **Rõ — đúng, và 0026 đã tách sẵn** | 0026 dòng 76-86: *"subTask và capacity KHÔNG gộp thành 1 khái niệm... Cái GIỐNG NHAU, và là điều đáng nói, là **CƠ CHẾ DISPATCH/ORCHESTRATE**... áp dụng Y HỆT cho cả 2"*. Đúng lát cắt L1/L2 |
 | 28 | (A) capacity và (C) gói tự do có phải hai loại khác **bản chất** không? | **Chốt — D5** | Không — chúng khác **nguồn gói mệnh lệnh**, không khác bản chất. Hai trục vuông góc: *có mang vòng đời không* (0026's nhị phân) và *gói đăng ký trước hay soạn lúc chạy*. B nằm ở "có vòng đời + soạn động"; A ở "không vòng đời + đăng ký trước"; C ở "không vòng đời + soạn động". Ô thứ tư (có vòng đời + đăng ký trước) trống có lý: việc mang vòng đời là việc riêng từng lần, không thể có prompt cố định |
 | 29 | Gọi L2 là gì? | **Rõ — đừng gọi "orchestrator"** | 0026 dòng 34-56 đã gán "orchestrator" cho vai trò **quyết định kích hoạt rootTask nào** (người mở session, `/fgOS:pick`, `fgos-runner`, herdr) — tầng CAO hơn, không phải transport. Thuật ngữ sẵn có cho L2 là **"cơ chế dispatch"** (native vs cli/spawn, 4 quy tắc); **"executor"** để dành cho backend đích mà `resolveExecutorConfig` trả về |
-| 30 | Soul ở L1 có đang chọn được provider/tier không? | **Rõ — KHÔNG, và đây là chỗ hở thật** | `src/runner/dispatch.mjs:1053-1054`: `const tier = work.tier ?? DEFAULTS.tier; const model = modelForTier(cfg, tier)`. `work.tier` là tier **ceremony** (`light/standard/heavy`) — cùng field `gate-bypass.mjs`'s `isTierCovered` đọc để quyết bao nhiêu nghi thức. Một field hai việc. bee tách hẳn: `lane` là nghi thức, model tier **phán tại lúc dispatch**, *"never fixed at planning — a planning tier is at most an overridable hint"* (decision 0016) |
+| 30 | Soul ở L1 có đang chọn được provider/tier không? | **Rõ — KHÔNG, và đây là chỗ hở thật** | `src/runner/dispatch.mjs:1053-1054`: `const tier = work.tier ?? DEFAULTS.tier; const model = modelForTier(cfg, tier)`. Một field mang hai nghĩa: `gate-bypass.mjs`'s `isTierCovered` cũng đọc chính nó để quyết bao nhiêu nghi thức. Không có bước phán tier per-dispatch ở đâu cả. bee tách hẳn: `lane` là nghi thức, model tier **phán tại lúc dispatch**, *"never fixed at planning — a planning tier is at most an overridable hint"* (decision 0016) |
+| 30b | Trong hai nghĩa đó, nghĩa nào là kẻ đến sau? | **Rõ — GATE-BYPASS, không phải dispatch** (đính chính vòng 8) | `src/state/work.mjs:136-144` khai `work.tier` là *"the cost/cognitive weight a work item self-declares; the runner (Epic 3) maps tier -> model via a config table at dispatch time"*, đánh dấu **PROVISIONAL** kèm cảnh báo *"Do not let the two drift apart"*. Tức tier→model là mục đích **gốc** và `dispatch.mjs:1053-1054` làm **đúng** schema; `isTierCovered` mới là bên mượn field. Đảo chiều sửa của `tsk-503`: bên cần field riêng nhiều khả năng là gate-bypass |
 | 31 | Quan hệ L1 → L2 | **Rõ — L1 chọn AI, L2 SUY RA CÁCH** | 0026 quy tắc 3: khác provider ⇒ bắt buộc cli/spawn, không ngoại lệ. Nên soul L1 không chọn cơ chế một cách độc lập — nó chọn provider + tier, còn cơ chế rơi ra từ quy tắc 1-4. Phát biểu đúng: **L1 chọn cái gì + ai; L2 suy ra bằng cách nào** |
 | 32 | Gói soạn động ảnh hưởng governance ra sao? | **Rõ — cổng phải chuyển tầng** | `dispatch.mjs:691-693` chặn khi một capacity `kind:"cli"` resolve ra lệnh không-phải-Claude mà chưa bật `allowCrossProvider` — gác theo **capacity id**. Gói soạn động mang nội dung khác nhau mỗi lần ⇒ cổng phải thành **per-dispatch**. Phải vào plan của D3 |
 
@@ -362,6 +363,49 @@ lại lựa chọn để có vòng phản hồi hạ bậc khi bậc đắt khan
 (seq 8121/8122). D11 đã gộp vào description của `tsk-2k1`, D12 vào `tsk-503` —
 để hai item đó tự đứng được mà không cần đọc lại file này.
 
+### 2026-08-06 — vòng 8 (handoff)
+
+**Người dùng:** làm handoff luôn. Sau khi thấy vướng: (A) cho `tsk-2sl`, (C) cho
+`tsk-2k1`/`tsk-503`; và submit cải tiến cấu trúc/quy trình vì *"đây là vấn đề
+nặng cho development-ux"*.
+
+**Handoff làm được một nửa.** `refs` đã trỏ anchor cho cả ba item (seq
+8128-8130). Nửa còn lại vướng cấu trúc, không phải thao tác: ba con tạo bằng
+`fgos add` nằm ở `stage: executing` và **không có đường về `clarify`** —
+`bin/fgos.mjs:805-822` cho thấy chỉ `submit` stamp stage entry (`add` *"deliberately
+omits this (lazy default, D8)"*), `work.mjs:169` quy định stage vắng đọc là
+`executing`, `workflow-stage-graphs.mjs:69-73` chỉ có ba cạnh **tiến**, và
+`stage` không nằm trong `EDITABLE_FIELDS`. Nặng hơn: `fgos-planning/SKILL.md`
+step 4 **dạy** tách con bằng đúng `fgos add --parent` ⇒ mọi con do planning tách
+ra đều mất reality check. Đã submit **`tsk-621`** (bug/standard).
+
+**(C) chạy thật, và nó cứu được một tiền đề sai.** Checklist MODE FIT / REPO FIT
+/ ASSUMPTIONS / SMALLER PATH / PROOF SURFACE chạy tay cho `tsk-2k1` và `tsk-503`,
+ghi vào description hai item. Kết quả đáng giá nhất: **`tsk-503` đang đứng trên
+tiền đề ngược chiều** — xem §3 hàng 30b. `work.mjs:136-144` khai `work.tier` là
+*"the cost/cognitive weight... the runner maps tier -> model via a config table
+at dispatch time"*, PROVISIONAL, kèm cảnh báo *"Do not let the two drift apart"*.
+Tức tier→model là nghĩa **gốc**, `dispatch.mjs` làm **đúng** schema, và
+`isTierCovered` mới là bên mượn field. Chiều tách phải đảo lại. Đã sửa ở bốn
+chỗ: description `tsk-503`, §3 hàng 30/30b, §6, `porting-log.md`, deep-dive.
+
+Reality check còn đẻ ra một **SMALLER PATH đáng cân nhắc nghiêm túc** cho
+`tsk-503`: chỉ cho phép override tier/provider per-dispatch, **không** tách
+field — né toàn bộ ~10 điểm đọc `work.tier` (đã liệt kê đích danh trong
+description) mà vẫn đủ cho D10.
+
+**Baseline proof:** `node --test test/runner/dispatch.test.mjs` xanh 133/133,
+`test/state/gate-bypass.test.mjs` xanh 25/25 (2026-08-06).
+
+**Hai cải tiến dev-ux đã submit:**
+- **`tsk-4zj`** (feature/light) — read surface không bao giờ nói stage **hiệu
+  dụng**; một quyết định lớn ("item này sẽ không đi qua reality check") được
+  truyền đạt bằng **sự vắng mặt của một field**, tức không truyền đạt gì.
+- **`tsk-3cb`** (bug/standard) — reality check khoá vào **stage** thay vì vào
+  **rủi ro**; item risk standard vào nhầm làn thì không còn cách nào được kiểm.
+  Chi phí thật đã đo được: chính lần chạy tay ngoài mọi cơ chế mới bắt được
+  tiền đề sai ở trên.
+
 ## 6. Thiết kế đã chốt {#design}
 
 _(Regenerate ở vòng 5 theo D5 — bản vòng 4 tả một nhị phân phẳng
@@ -427,9 +471,12 @@ làm tại chỗ*.
 
 Chỗ hở thứ ba lộ ra ở vòng 5, và nó khoá chặt với gói động: **hôm nay không ai
 phán tier lúc dispatch.** `src/runner/dispatch.mjs:1053-1054` suy model thẳng từ
-`work.tier`, mà `work.tier` (`light`/`standard`/`heavy`) là tier **ceremony** —
-đúng field `gate-bypass.mjs`'s `isTierCovered` đọc để quyết bao nhiêu nghi thức
-quy trình. Một field làm hai việc: bao nhiêu quy trình, VÀ model nào chạy. bee
+`work.tier`, và `gate-bypass.mjs`'s `isTierCovered` cũng đọc chính field đó để
+quyết bao nhiêu nghi thức quy trình — một field mang hai nghĩa. Vòng 8 đính chính
+chiều: `work.mjs:136-144` khai `work.tier` là *"the cost/cognitive weight a work
+item self-declares; the runner maps tier -> model via a config table at dispatch
+time"*, PROVISIONAL, kèm cảnh báo *"Do not let the two drift apart"* — nên
+tier→model là nghĩa **gốc**, còn nghi-thức mới là nghĩa mượn về sau. bee
 tách hẳn — `lane` là nghi thức, còn model tier được phán tại lúc dispatch bởi
 chính bên điều phối, *"never fixed at planning — a planning tier is at most an
 overridable hint"*. Vì sao điều này khoá với D3: một gói soạn động **không có
