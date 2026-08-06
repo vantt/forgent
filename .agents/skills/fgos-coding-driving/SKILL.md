@@ -164,6 +164,28 @@ asserted to generalize automatically to a domain that does not exist yet.
 - Re-read the item's stage/status FRESH at the top of every iteration —
   never reuse a snapshot from a prior loop turn, since the whole point of
   looping is that the loaded skill just changed that state.
+- **Relay a known error category verbatim, never paraphrased into a generic
+  "blocked"** (tsk-1c6 D2/D4). When an invoked stage-skill hands back a
+  failure whose underlying `fgos <verb>` call carried a known error category
+  — or when one of THIS skill's own verb calls (`fgos list`, `fgos pick`)
+  hits one — the stop this skill reports must carry that category as its own
+  line, in exactly this shape:
+
+  ```text
+  stop-reason: lock-timeout
+  ```
+
+  `lock-timeout` is the category that matters (tsk-1c6 D1): it is
+  `EventLogError('lock-timeout')` / exit code `7`, and it means
+  `.fgos/events.jsonl`'s lock — shared by every item — is stuck, so a caller
+  looping over items should stop the whole run rather than skip one item.
+  Other categories (`session-fail`, `merge-fail`, CAS `validation`) stay
+  per-item and need no such line.
+
+  Before tsk-31l, callers read this off a raw CLI subprocess's exit code.
+  Dispatching through this skill removed that channel, so this line IS the
+  channel now. Never summarize it away, never soften it to "blocked", and
+  never emit the line for a failure that was not actually a lock-timeout.
 
 ## Input
 
@@ -303,3 +325,10 @@ Ceiling reached, `awaiting-approval` reached, an anchor by open children,
 a no-progress read, or a person-shaped stop. Report which one to the
 caller — this skill's own job ends there; it never decides what happens
 next on its own authority.
+
+When the stop came from a failure carrying a known error category, the
+report also carries that category's own line verbatim — today
+`stop-reason: lock-timeout` is the one category that qualifies (see the
+Hard rules above). A caller looping over items reads that line to tell
+"stop the whole run, the shared lock is stuck" apart from "skip this one
+item".

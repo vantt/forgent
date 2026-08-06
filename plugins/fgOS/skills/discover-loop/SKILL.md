@@ -75,6 +75,14 @@ interval... omit the interval to let the model self-pace."
      condition: `.fgos/events.jsonl`'s lock is shared by every item, so
      continuing would very likely hit the same stuck lock on the next
      pick too. Report which iteration it happened on.
+
+     `/fgOS:discover-next` reports this outcome when the driver's own
+     stop-report carried the line `stop-reason: lock-timeout` verbatim
+     (`fgos-coding-driving`'s relay rule, tsk-1c6 D2/D4). That line is the
+     signal — before tsk-31l it was a raw subprocess's exit code `7`, and
+     tsk-1c6 restored the distinction after skill-dispatch removed the
+     exit code. A `skipped` outcome above never carries it; do not treat a
+     generic failure as this condition.
    - **iteration counter reaches the cap** — stop the loop. This is a
      safety valve, not a discovered problem — say so plainly in the
      summary (step 5), distinct from the other stop reasons.

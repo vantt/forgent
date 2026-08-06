@@ -92,27 +92,24 @@ CONTEXT.md` D2).
    - **`awaiting-human`** — relay the parked question/proposal exactly;
      this is normal, not a problem — a person resolves it via `/fgOS:answer
      <id> <answer text>` before the item can be picked again.
-   - **`blocked`** — a genuine stop; the driven skill's own engine-verb
-     call hit a real failure underneath (e.g. a lock-timeout or CAS
-     conflict on `.fgos/events.jsonl`). Report it plainly.
+   - **`lock-timeout`** — the driver's stop-report carries the line
+     `stop-reason: lock-timeout` verbatim (`fgos-coding-driving`'s own
+     relay rule, tsk-1c6 D2/D4). Classify this on its own, never as a
+     plain `blocked`: it means `.fgos/events.jsonl`'s lock — shared by
+     every item — is stuck, so the *whole* run should stop rather than
+     this one item being skipped. Report it as `lock-timeout` to
+     `/fgOS:discover-loop`, whose step 4 stop rule keys on exactly that.
 
-     **Known gap, not fixed by this item:** before this change, a raw CLI
-     subprocess call surfaced a distinct process exit code (`7` for
-     `lock-timeout`), which `/fgOS:discover-loop` step 4 uses today to
-     stop the *whole* loop immediately (a stuck lock is shared by every
-     item, so continuing would likely hit it again). Dispatching through
-     `fgos-coding-driving` instead of a bare CLI call means there is no
-     process exit code to inspect any more — a lock-timeout several layers
-     inside `fgos-exploring`/`fgos-planning` surfaces here only as a
-     generic failure, indistinguishable from any other one-off block.
-     `/fgOS:discover-loop` cannot reliably tell "stop everything, the lock
-     is stuck" apart from "skip this one item" any more. The blast radius
-     is bounded — `/fgOS:discover-loop`'s own iteration cap (default 15)
-     still ends the run eventually instead of looping forever — but the
-     "stop early and say why" optimization is genuinely lost, not
-     preserved. Report every `blocked` outcome as scoped to this one item
-     (matching what this skill can actually still tell), never claim it is
-     equivalent to the old lock-timeout signal.
+     Read the category off that line, not off a process exit code. Before
+     tsk-31l a raw CLI subprocess surfaced exit code `7` here; dispatching
+     through `fgos-coding-driving` removed that channel, and tsk-1c6
+     replaced it with the relayed line. Absence of the line means the
+     failure was not a lock-timeout — never infer one from a generic
+     failure.
+   - **`blocked`** — a genuine stop that carried no known error category
+     (e.g. a CAS conflict on `.fgos/events.jsonl`). Report it plainly, and
+     as scoped to this one item — never claim it is equivalent to the
+     `lock-timeout` signal above.
    - **no-progress** — relay it plainly; needs a person's look (mirrors
      the old `invalid`/CAS-conflict outcomes: the item was left untouched,
      fail-safe).
