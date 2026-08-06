@@ -86,6 +86,16 @@ function git(repoRoot, args) {
  * ref is always safe to re-check against `HEAD` directly instead of
  * failing closed -- `HEAD` itself is never pruned, so this fallback only
  * ever applies to the leaf case (targetRef !== 'HEAD').
+ *
+ * DIAGNOSTIC HINT (tsk-3ft): when `targetRef` DOES exist but the sha still
+ * isn't its ancestor, ancestry alone cannot tell a genuine force-push loss
+ * apart from a branch manually reset to unrelated divergent history --
+ * `git merge-base --is-ancestor` fails identically either way (this stays
+ * an intentional limitation, matching the revert-detection gap documented
+ * above; tsk-3ft's own investigation deliberately rejected building
+ * detection or auto-recovery for this). The `ok:false` detail just points
+ * at `git reflog show <targetRef>` as the next diagnostic step -- the
+ * exact tool that resolved tsk-47e's case in that investigation.
  */
 export function checkMergeStillResolves(repoRoot, work, { view, id } = {}) {
   const sha = work?.branchHeadAtReturn ?? work?.headAtReturn ?? work?.branchHeadAtTake ?? work?.headAtTake;
@@ -124,7 +134,8 @@ function checkAncestry(repoRoot, sha, targetRef, fallbackNote) {
       ok: false,
       detail: fallbackNote
         ? `${fallbackNote} — fell back to HEAD, but commit ${sha} is not an ancestor of HEAD either — the merge may have been force-pushed away or history rewritten`
-        : `commit ${sha} is no longer reachable from ${targetRef} — the merge may have been force-pushed away or history rewritten`,
+        : `commit ${sha} is no longer reachable from ${targetRef} — the merge may have been force-pushed away or history rewritten. ` +
+          `${targetRef} still exists — if this is unexpected, run "git reflog show ${targetRef}" to check for a manual reset that discarded this commit (tsk-3ft)`,
     };
   }
 }
