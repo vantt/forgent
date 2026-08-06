@@ -219,3 +219,44 @@ test('does not allow --force to bypass a mechanical pattern rejection', () => {
   assert.equal(result.secondPass.mechanical, true);
   assert.equal(listWork(storeDir).work['item-x'].status, 'awaiting-human');
 });
+
+// tsk-5ld: the two --force branches (discovery.mjs:684-706) with no test
+// exercising them at all -- succeeding on a genuine (non-mechanical)
+// disagreement, and refusing when the item is already parked. Both mirror
+// tsk-25g's own decompose.test.mjs coverage for resolveDecompose's parallel
+// --force logic (commit cd0cc56, merged to main).
+
+test('resolveDiscovery --force overrides a disputed (non-mechanical) verify, logs the override, and advances to decompose (tsk-5ld)', () => {
+  const dir = mkTempDir();
+  // Disagrees on the second pass (a real judgement call, not the mechanical
+  // known-bad-pattern short-circuit) -- the branch --force is meant to
+  // override.
+  const { scriptPath } = writeCapturingExecutor(dir, { agrees: false, reason: 'lệnh này không kiểm chứng đúng claim' });
+  const cfg = cfgFor(scriptPath);
+
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork());
+
+  const result = resolveDiscovery(storeDir, 'item-x', cfg, undefined, { clear: true, verify: 'npm test -- reporting', force: true });
+
+  assert.equal(result.outcome, 'clear');
+  const view = listWork(storeDir);
+  assert.equal(view.work['item-x'].stage, 'decompose');
+  const overrideLog = (view.decisions ?? []).find((d) => d.id === 'item-x' && /--force overrode a disputed verify/.test(d.text));
+  assert.ok(overrideLog, 'expected a decision log entry naming the overridden disagreement');
+  assert.match(overrideLog.rationale, /lệnh này không kiểm chứng đúng claim/);
+});
+
+test('resolveDiscovery --force refuses when the item is already awaiting-human (points at fgos answer instead) (tsk-5ld)', () => {
+  const dir = mkTempDir();
+  const { scriptPath } = writeCapturingExecutor(dir, { agrees: false, reason: 'lệnh này không kiểm chứng đúng claim' });
+  const cfg = cfgFor(scriptPath);
+
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork({ status: 'awaiting-human' }));
+
+  assert.throws(
+    () => resolveDiscovery(storeDir, 'item-x', cfg, undefined, { clear: true, verify: 'npm test -- reporting', force: true }),
+    /already "awaiting-human"/,
+  );
+});
