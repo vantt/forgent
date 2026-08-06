@@ -214,6 +214,23 @@ per the audit) inherit the fix automatically since they only call
 check themselves. Landed `awaiting-approval`, first attempt, ahead by 1
 commit, no friction recorded.
 
+## The `skillMap.retrospective` key (D5) is what `/fgOS:retro-next` reads today
+
+`tsk-38t-5` added the `retrospective` key to each domain's `skillMap` in
+`src/state/workflow-stage-graphs.mjs` — the concrete mechanism D5 promised
+above ("Khác biệt per-domain ở bước `retrospective` nằm ở SKILL nào chạy").
+This is not a hypothetical: `/fgOS:retro-next`'s own step 4 (the skill that
+produced this very document) resolves which synthesis skill to run for a
+given item by reading exactly this key —
+`skillForStage(getDomain(item.domain), 'retrospective') ?? 'fgos-compounding'`
+— with the `?? 'fgos-compounding'` fallback matching `skillForStage`'s own
+null-safe shape one level up. For `coding` today this always resolves back
+to `fgos-compounding` itself, zero behavior change from before the lookup
+existed — the field's purpose is to give a second domain somewhere to
+plug in a different synthesis skill without `retro-next` needing an
+if/else keyed on domain name. Landed `awaiting-approval`, first attempt,
+ahead by 2 commits, no friction recorded.
+
 ---
 
 **Source:** `docs/history/phase-2-status-category-schema/CONTEXT.md` and
