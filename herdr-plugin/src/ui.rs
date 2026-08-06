@@ -16,7 +16,7 @@ use ratatui::text::{Line, Span};
 use ratatui::widgets::{Block, Borders, Clear, Paragraph, Row, Table, TableState, Tabs};
 use ratatui::{Frame, Terminal};
 
-use crate::app::{App, InProcessTask, Panel, Tab};
+use crate::app::{App, InProcessTask, Panel, WorkTab};
 use crate::ports::{TerminalUi as TerminalUiPort, UiEvent};
 
 /// tsk-jo1 D1 palette (ANSI-16): the Work Items panel's optional Status
@@ -32,7 +32,19 @@ fn status_color(status: &str) -> Option<Color> {
     }
 }
 
-const TAB_ORDER: [Tab; 4] = [Tab::Todo, Tab::Doing, Tab::Review, Tab::Done];
+const TAB_ORDER: [WorkTab; 4] = [WorkTab::Todo, WorkTab::Doing, WorkTab::Review, WorkTab::Done];
+
+/// tsk-1eu D1 / tsk-3wl D1: the same focused-vs-unfocused border style
+/// `draw()` already applies to the WorkItems/InProcess boxes, shared here
+/// so the 3 view-only boxes (NeedAnswer/MergeList/AfterDeliver, tsk-3wl
+/// D1) highlight identically when they gain focus.
+fn box_border_style(app: &App, panel: Panel) -> Style {
+    if app.focused_panel == panel {
+        Style::default().fg(Color::Cyan).add_modifier(Modifier::BOLD)
+    } else {
+        Style::default()
+    }
+}
 
 /// tsk-4zo D2: an orphaned task (no matching herdr pane found by the most
 /// recent scan) gets an explicit `[pane missing]` badge in its Title cell
@@ -157,6 +169,7 @@ impl TerminalUiPort for RatatuiTerminalUi {
             KeyCode::Up | KeyCode::Char('k') => Some(UiEvent::Up),
             KeyCode::Enter => Some(UiEvent::Pick),
             KeyCode::Tab => Some(UiEvent::SwitchPanel),
+            KeyCode::BackTab => Some(UiEvent::SwitchPanelPrev),
             KeyCode::Char('d') => Some(UiEvent::Discover),
             KeyCode::Char(']') => Some(UiEvent::NextTab),
             KeyCode::Char('[') => Some(UiEvent::PrevTab),
@@ -315,7 +328,7 @@ pub fn draw(frame: &mut Frame, app: &mut App) {
                     unfocused_border_style
                 })
                 .title(Span::styled(
-                    "In process — Tab to focus, Enter to jump",
+                    "In process — Enter to jump",
                     Style::default().add_modifier(Modifier::BOLD),
                 )),
         )
@@ -345,7 +358,12 @@ pub fn draw(frame: &mut Frame, app: &mut App) {
         ))
         .style(Style::default().fg(Color::Yellow))
     } else {
-        Paragraph::new("↑/↓ select · Enter: details · [/]: tabs · /: filter · q/Esc: quit")
+        // tsk-3wl D1: Tab/Shift+Tab now cycle all 5 boxes (was WorkItems/
+        // InProcess-only) — the footer names every keybinding in play so
+        // this doesn't have to be discovered by trial and error.
+        Paragraph::new(
+            "Tab/Shift+Tab: cycle boxes · ↑/↓ select/scroll · Enter: details · [/]: tabs · /: filter · q/Esc: quit",
+        )
     };
     frame.render_widget(status, rows[1]);
 
@@ -383,13 +401,19 @@ fn draw_need_answer_box(frame: &mut Frame, app: &App, area: Rect) {
     let body = if rows.is_empty() {
         Paragraph::new("(empty)")
     } else {
-        Paragraph::new(rows)
+        // tsk-3wl D1: no row-select for this box — Up/Down scroll instead.
+        Paragraph::new(rows).scroll((app.need_answer_scroll, 0))
     };
     frame.render_widget(
-        body.block(Block::default().borders(Borders::ALL).title(Span::styled(
-            format!("NEED ANSWER ({})", app.need_answer.len()),
-            Style::default().add_modifier(Modifier::BOLD),
-        ))),
+        body.block(
+            Block::default()
+                .borders(Borders::ALL)
+                .border_style(box_border_style(app, Panel::NeedAnswer))
+                .title(Span::styled(
+                    format!("NEED ANSWER ({})", app.need_answer.len()),
+                    Style::default().add_modifier(Modifier::BOLD),
+                )),
+        ),
         area,
     );
 }
@@ -422,14 +446,19 @@ fn draw_merge_list_box(frame: &mut Frame, app: &App, area: Rect) {
     let body = if rows.is_empty() {
         Paragraph::new("(empty)")
     } else {
-        Paragraph::new(rows)
+        Paragraph::new(rows).scroll((app.merge_list_scroll, 0))
     };
     let count = app.merge_list.ready.len() + app.merge_list.waiting.len() + app.merge_list.blocked_on_sync.len();
     frame.render_widget(
-        body.block(Block::default().borders(Borders::ALL).title(Span::styled(
-            format!("MERGE LIST ({count})"),
-            Style::default().add_modifier(Modifier::BOLD),
-        ))),
+        body.block(
+            Block::default()
+                .borders(Borders::ALL)
+                .border_style(box_border_style(app, Panel::MergeList))
+                .title(Span::styled(
+                    format!("MERGE LIST ({count})"),
+                    Style::default().add_modifier(Modifier::BOLD),
+                )),
+        ),
         area,
     );
 }
@@ -456,13 +485,18 @@ fn draw_after_deliver_box(frame: &mut Frame, app: &App, area: Rect) {
     let body = if rows.is_empty() {
         Paragraph::new("(empty)")
     } else {
-        Paragraph::new(rows)
+        Paragraph::new(rows).scroll((app.after_deliver_scroll, 0))
     };
     frame.render_widget(
-        body.block(Block::default().borders(Borders::ALL).title(Span::styled(
-            format!("AFTER DELIVER ({})", app.after_deliver.len()),
-            Style::default().add_modifier(Modifier::BOLD),
-        ))),
+        body.block(
+            Block::default()
+                .borders(Borders::ALL)
+                .border_style(box_border_style(app, Panel::AfterDeliver))
+                .title(Span::styled(
+                    format!("AFTER DELIVER ({})", app.after_deliver.len()),
+                    Style::default().add_modifier(Modifier::BOLD),
+                )),
+        ),
         area,
     );
 }
