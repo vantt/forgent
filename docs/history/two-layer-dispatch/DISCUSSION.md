@@ -406,6 +406,32 @@ description) mà vẫn đủ cho D10.
   Chi phí thật đã đo được: chính lần chạy tay ngoài mọi cơ chế mới bắt được
   tiền đề sai ở trên.
 
+### 2026-08-06 — vòng 8b (kiểm kê + bằng chứng thứ hai)
+
+**Người dùng:** nguyên bộ sẽ là những task nào? — rồi: bổ sung cho chi tiết.
+
+**Kiểm kê từ store (không kể từ trí nhớ): chín item, ba nhánh.** Nhánh thiết kế
+(`tsk-2t6` + `tsk-2sl`/`tsk-2k1`/`tsk-503`); nhánh thân-mệnh-lệnh (`tsk-3xd`
+delivered, `tsk-535` đã tiến sang `decompose` — có người đang làm); nhánh dev-ux
+sinh ra từ chính lần handoff (`tsk-621`, `tsk-4zj`, `tsk-3cb`).
+
+**Bổ sung `footprint` + thứ tự cho nhánh dev-ux:** `fgos submit` không nhận
+`--footprint` nên ba item đó vào backlog trần. Đã khai đủ và xâu
+`tsk-4zj`/`tsk-3cb` `mergeAfter tsk-621` — sửa cửa vào trước thì hai cái sau hẹp
+lại; làm ngược thì có thể xây visibility cho một hành vi sắp bị thay.
+
+**Bằng chứng thứ hai cho `tsk-3cb`, phát hiện ngay khi kiểm lại.** Khai footprint
+xong, `fgos conflicts` **vẫn không thấy** ba item đó — nó chỉ ghép cặp trong
+frontier, mà `src/state/frontier.mjs:16-27` ghi rõ *"an item still at stage
+`clarify` is not [ready]"*. Nghĩa là **advisory xung đột footprint mù với mọi
+item còn trong làn shaping**: footprint khai lúc đó không mua được gì cho tới khi
+item tới `executing` — đúng lúc đã muộn, vì shaping mới là lúc còn re-slice được.
+
+Cùng gốc với cơ chế 1 (reality check không gọi được), khác mặt: một bên **không
+gọi được**, một bên **không nhìn thấy**. Ghi vào `tsk-3cb` làm bằng chứng thứ hai
+thay vì mở item mới — cùng gốc, cùng chỗ sửa. Kèm một cảnh báo khi chốt hướng:
+phương án (c) "chỉ sửa cửa vào" **không** xử được cơ chế 2.
+
 ## 6. Thiết kế đã chốt {#design}
 
 _(Regenerate ở vòng 5 theo D5 — bản vòng 4 tả một nhị phân phẳng
