@@ -29,6 +29,22 @@ stage values — the same way `fgos-routing` describes it.
   which never carries its own `.fgos/` by design (ADR0020) — the verb
   refuses (exit 4) rather than silently diverge if `--dir` is omitted
   there (tsk-56t D1).
+- When one of this skill's `fgos <verb>` calls (`decision`, `gate-approve`,
+  `add`) fails with a known error category, relay that category verbatim in
+  the hand-back — never fold it into a generic "blocked" (tsk-1c6 D2/D4).
+  Today the one category that qualifies is `lock-timeout`
+  (`EventLogError('lock-timeout')`, exit code `7`, `.fgos/events.jsonl`'s
+  shared lock), reported as its own line:
+
+  ```text
+  stop-reason: lock-timeout
+  ```
+
+  `fgos-coding-driving` carries that line up to whichever loop is driving
+  this item, which stops the whole run on it rather than skipping one item.
+  Since tsk-31l this skill runs in-session rather than as a CLI subprocess,
+  so there is no exit code for the caller to read — this line is the only
+  channel left.
 - Do your own Approach/Shape reasoning directly — reading `CONTEXT.md`/
   precedent docs, running `fgos graph --json`/`--what-if`, writing the risk
   map and shape yourself (the lane itself is decided earlier, by
