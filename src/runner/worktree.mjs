@@ -392,6 +392,42 @@ export function createBranchRef(repoRoot, id, opts = {}) {
 }
 
 /**
+ * `.fgos/` strip (ADR0020) + dependency provisioning, shared by every
+ * function in this module that stands up a fresh checkout — `createWorktree`
+ * and `createDetachedMergeWorktree` below.
+ */
+function finishWorktreeSetup(worktreePath, branch) {
+  // `.fgos/` (ADR0020): since `.fgos/` is git-tracked in this repo, a bare
+  // checkout would carry a snapshot frozen at fork time — stale the moment
+  // main gets another uncommitted event, and a live escape hatch into the
+  // shared store if it were symlinked instead (rejected, ADR0020). The
+  // worker running in this worktree has no legitimate reason to read or
+  // write `.fgos/` at all (`0005`: the runner is the sole writer, always
+  // against `repoRoot`), so any checked-out copy is removed outright — not
+  // shared, not synced. `mergeRunnerItem` (merge.mjs) is the trusted-side
+  // backstop if a worker commits a fresh `.fgos/` of its own anyway.
+  try {
+    fs.rmSync(path.join(worktreePath, '.fgos'), { recursive: true, force: true });
+  } catch (err) {
+    throw new WorktreeError(`removing checked-out .fgos in worktree "${worktreePath}" failed: ${err.message}`, {
+      branch,
+      worktreePath,
+    });
+  }
+
+  // A symlink to repoRoot's node_modules was considered and rejected here
+  // (tsk-2vd D2): instant and no network, but only ever matches whatever
+  // repoRoot itself has installed — a worktree whose own package.json
+  // declares a dependency repoRoot hasn't installed yet (exactly the
+  // scenario that exposed this whole gap: a branch merging in a new
+  // dependency before that merge lands on repoRoot's own default branch)
+  // would still hit ERR_MODULE_NOT_FOUND. provisionDependencies installs
+  // for THIS worktree's own declared dependencies instead, correct for
+  // that case at the cost of the install itself.
+  provisionDependencies(worktreePath);
+}
+
+/**
  * Create (or reuse, see module doc) an isolated worktree for work item `id`
  * inside `repoRoot`. Always allocates a fresh temp directory for the
  * checkout via `mkdtemp` (default base: `os.tmpdir()/fgos-worktrees`,
@@ -456,25 +492,7 @@ export function createWorktree(repoRoot, id, opts = {}) {
     }
   }
 
-  try {
-    fs.rmSync(path.join(worktreePath, '.fgos'), { recursive: true, force: true });
-  } catch (err) {
-    throw new WorktreeError(`removing checked-out .fgos in worktree "${worktreePath}" failed: ${err.message}`, {
-      branch,
-      worktreePath,
-    });
-  }
-
-  // A symlink to repoRoot's node_modules was considered and rejected here
-  // (tsk-2vd D2): instant and no network, but only ever matches whatever
-  // repoRoot itself has installed — a worktree whose own package.json
-  // declares a dependency repoRoot hasn't installed yet (exactly the
-  // scenario that exposed this whole gap: a branch merging in a new
-  // dependency before that merge lands on repoRoot's own default branch)
-  // would still hit ERR_MODULE_NOT_FOUND. provisionDependencies installs
-  // for THIS worktree's own declared dependencies instead, correct for
-  // that case at the cost of the install itself.
-  provisionDependencies(worktreePath);
+  finishWorktreeSetup(worktreePath, branch);
 
   return { path: worktreePath, branch, reused };
 }
@@ -575,10 +593,65 @@ export function createClaimWorktree(repoRoot, id, opts = {}) {
  * `fn` settles, whether it returns or throws. Replaces the identical
  * try/finally both call sites used to write out by hand.
  */
-export async function withMergeEphemeralWorktree(repoRoot, id, fn) {
-  const worktree = createWorktree(repoRoot, id, {});
+/**
+ * The checkout `withMergeEphemeralWorktree` uses for `branch` — detached at
+ * `branch`'s current tip COMMIT, never the branch ref itself. Git only
+ * refuses a second checkout of the same BRANCH; a detached checkout of the
+ * same commit is unrestricted, so this never inspects, moves, or removes
+ * any existing checkout of `branch` — including one a person is
+ * deliberately keeping open (`ExitWorktree` "keep"), clean or dirty, live
+ * session or not (docs/history/merge-worktree-reclaim-clobbers-kept-
+ * checkout/CONTEXT.md D1). This sidesteps the conflict entirely rather than
+ * detecting and refusing it — `createWorktree`'s own reuse/relocate path
+ * above stays exactly as-is for its other callers (`pick`/`take`
+ * reclaiming a session's own abandoned checkout, a genuinely different,
+ * intentional use case CONTEXT.md D1 explicitly leaves untouched).
+ */
+function createDetachedMergeWorktree(repoRoot, branch) {
+  if (!branchExists(repoRoot, branch)) {
+    throw new WorktreeError(`cannot create ephemeral merge checkout — branch "${branch}" does not exist.`, { branch });
+  }
+  const startCommit = git(repoRoot, ['rev-parse', branch]).trim();
+  const baseDir = path.join(os.tmpdir(), 'fgos-worktrees');
+  fs.mkdirSync(baseDir, { recursive: true });
+  const worktreePath = fs.mkdtempSync(path.join(baseDir, `${branch.replace(/\//g, '-')}-merge-`));
+
   try {
-    return await fn(worktree);
+    git(repoRoot, ['worktree', 'add', '--detach', worktreePath, startCommit]);
+  } catch (err) {
+    try {
+      fs.rmSync(worktreePath, { recursive: true, force: true });
+    } catch {
+      // best-effort cleanup of the empty dir mkdtemp created; the real
+      // failure below is what the caller needs to see.
+    }
+    throw new WorktreeError(`git worktree add --detach failed for "${branch}" at ${startCommit}: ${err.message}`, {
+      branch,
+      worktreePath,
+    });
+  }
+
+  finishWorktreeSetup(worktreePath, branch);
+
+  return { path: worktreePath, branch, startCommit };
+}
+
+export async function withMergeEphemeralWorktree(repoRoot, id, fn) {
+  const branch = branchNameFor(id);
+  const worktree = createDetachedMergeWorktree(repoRoot, branch);
+  try {
+    const result = await fn(worktree);
+    // fn committed on top of startCommit (a successful merge) -- land it on
+    // the real branch via a plain ref update, which needs no exclusive
+    // checkout, instead of the ephemeral checkout ever having BEEN the real
+    // branch. fn that only read/verified without committing (conflict,
+    // verify-fail, already-caught-up) leaves HEAD at startCommit, so no
+    // ref move happens -- the real branch is untouched, same as today.
+    const endCommit = git(worktree.path, ['rev-parse', 'HEAD']).trim();
+    if (endCommit !== worktree.startCommit) {
+      git(repoRoot, ['branch', '-f', branch, endCommit]);
+    }
+    return result;
   } finally {
     removeWorktree(repoRoot, worktree.path, { force: true });
   }

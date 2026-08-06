@@ -47,7 +47,8 @@ function add(cwd, id, extra = {}) {
     '--kind', extra.kind ?? 'task',
     '--risk', extra.risk ?? 'low',
     '--verify', extra.verify ?? 'true',
-    '--description', extra.description ?? `Description ${id}`,
+    // tsk-535: --description is required at add's CLI layer.
+    '--description', extra.description ?? `Title ${id}`,
   ]);
   assert.equal(result.status, 0, `fgos add ${id} failed: ${result.stderr}`);
   return result;

@@ -64,7 +64,14 @@ function add(cwd, id, extra = {}) {
     '--kind', extra.kind ?? 'task',
     '--risk', extra.risk ?? 'low',
     '--verify', extra.verify ?? 'test -f output.txt',
-    '--description', extra.description ?? `Description ${id}`,
+    // tsk-535: --description is required at add's CLI layer.
+    '--description', extra.description ?? `Title ${id}`,
+    // add-stage-default-gap D1/D2: add now defaults to stage 'clarify'
+    // instead of the old implicit 'executing' -- this file's whole point
+    // is exercising the runner's dispatch loop, which only ever picks up
+    // executing-stage items, so default this helper's --stage to
+    // 'executing' the same way test/cli/fgos.test.mjs's own addOk does.
+    '--stage', extra.stage ?? 'executing',
   ];
   const result = fgos(cwd, ['add', id, ...flags]);
   assert.equal(result.status, 0, `fgos add ${id} failed: ${result.stderr}`);

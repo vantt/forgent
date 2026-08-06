@@ -76,3 +76,36 @@ belongs in the skill or prompt that composer actually reads before acting
 — and belongs in whichever of those paths the real data shows is
 producing the content in question, not the path that merely looks like
 the natural home for it.
+
+## The `description` gap this contract's own migration deliberately avoided walking into
+
+The title-derive-from-description migration this family of decisions
+describes (`tsk-4zg`, `docs/history/work-item-title-contract/CONTEXT.md`
+D4) had a landmine it stepped around rather than triggered: `deriveTitle`
+on empty input returns the placeholder `'Untitled submission'` — so
+re-deriving a title from a *missing* `description` would have destroyed
+whatever real title an item already had. `tsk-4zg` measured this before
+running: 53 of 187 items had no `description` at all, and it deliberately
+skipped exactly those 53 rather than re-deriving over them, filing the gap
+as its own explicit follow-up (`tsk-535`).
+
+That follow-up confirmed the danger was real but not yet triggered — no
+title was ever actually lost — while also confirming the gap kept
+growing as the store scaled: by the time `tsk-535` measured again, the
+same defect (three separate write paths — `fgos add` with no
+`--description` flag, decompose-child creation, and the runner's
+discovered-work channel — all could produce an item with no
+`description`) had grown from 53/187 to 112/398 items. `tsk-535` closed
+all three write paths (required `--description` on `add`, no silent
+default; decompose children get `description = title` per its own D2,
+deliberately not the newer `action` directive-prose field tsk-3xd added,
+since duplicating that would add no new meaning; the runner's
+discovered-work path falls back to `title` the same way) and backfilled
+every already-broken item through the same `edit` verb `tsk-4zg`'s own
+re-derive pass had already used — no new mechanism, the existing
+one-door-write applied per item.
+
+The generalizable point: a defensive skip in one item (`tsk-4zg`'s
+"don't re-derive over nothing") is a mitigation, not a fix — the write
+paths that keep producing the gap it skipped around still needed their
+own item to actually close.

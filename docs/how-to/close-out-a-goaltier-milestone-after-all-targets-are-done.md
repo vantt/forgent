@@ -13,6 +13,19 @@ are all `status: "done"`, but the milestone item itself still sits at
 `fgos rollup` does not read the `targets` field at all, so a goalTier item
 never closes itself just because its targets finished.
 
+## If the milestone was created via `fgos submit` instead of `fgos add`
+
+Before `tsk-5fs`, `goalTier` could only ever be set at creation time via
+`fgos add --goal-tier ...` — `fgos submit` (the public intake door)
+exposed no `--goal-tier` flag at all, and `goalTier` was deliberately
+excluded from `store.mjs`'s `EDITABLE_FIELDS`, so an item submitted
+without one was **permanently** unable to become a milestone/MVP. This
+actually happened (`tsk-3w3`, created via `submit`, needed `goalTier:
+milestone`, had no path to add it). `fgos submit` now exposes the same
+`--goal-tier` flag `add` always had, and `goalTier` is now in
+`EDITABLE_FIELDS` — `fgos edit <id> --goal-tier milestone` (or `mvp`) can
+retrofit it onto an existing item, submitted or added, at any time.
+
 ## Before you start
 
 - This is a **different** relationship from a decomposed root item's
@@ -119,6 +132,67 @@ never closes itself just because its targets finished.
   `docs/history/tsk-u9k/CONTEXT.md` closure note (this file's own sibling)
   and committing it, then `fgos return tsk-u9k` (no flag) succeeded with
   `aheadCount: 1`.
+
+## Real-world lesson: a target sitting in `cleanup` has already delivered — don't wait out its TTL
+
+`tsk-2jc` (milestone, single target `tsk-1qm`, closing when
+`docs/specs/distribution.md` matches reality after a `doctor --fix`
+feature landed) hit a version of this pattern the original how-to above
+doesn't cover: the target wasn't `done` yet, but not because anything was
+unfinished — it was sitting in `cleanup`, waiting out the mechanical
+7-day TTL sweep (`DEFAULT_CLEANUP_TTL_DAYS`, `src/setup/
+registrations.mjs:545`) before `/fgOS:cleanup-next` would eventually flip
+it to `done`. The milestone's stored verify (prose: "Done when tsk-1qm
+reaches done") took that literally and blocked the goal-check.
+
+The resolution, once surfaced to a person:
+
+> "D1 — nới điều kiện done từ 'tsk-1qm = done' sang 'tsk-1qm đã resolved'...
+> Lý do nới là hợp lệ ở đây: điều kiện thực chất của milestone là *nội
+> dung spec khớp thực tại*, còn `tsk-1qm = done` chỉ là cách viết tắt cho
+> 'target đã giao xong'. Trạng thái `cleanup` đã chứng minh target giao
+> xong rồi (nó đã qua `delivered` và `retrospective`); phần còn lại thuần
+> là bookkeeping TTL."
+
+The rewritten verify accepted any of the four resolved tail statuses —
+`delivered`, `retrospective`, `cleanup`, `done` — but **not** `wontfix`,
+since that means the target was cancelled, not delivered. The general
+rule: if a milestone's real condition is "the target's work landed," a
+verify pinned to the literal terminal status `done` is checking a proxy,
+not the real condition — and the proxy lags the real condition by up to
+the cleanup TTL for no reason. Check the tail-status *category* the
+target has reached, not the single final label.
+
+## Real-world lesson: a milestone verify that only reads status is vacuous — check the content it claims
+
+Reading only `tsk-1qm`'s status would prove the target's work happened,
+but nothing about *what* it delivered — meaningless for a milestone whose
+actual claim is "the spec text matches reality now." `tsk-2jc`'s verify
+added content assertions (RUL11 wording, two `not a fixed list` markers,
+and a loop confirming every `registerCheck`/`registerFix` id in
+`src/setup/registrations.mjs` is actually named in the spec) so the
+milestone proves its own real claim, not just a tracker read.
+
+That last pair of assertions caught something real on the very first
+`approve` attempt: a `verify-fail-post-merge` (merge landed, post-merge
+verify failed, merge rolled back cleanly — see the diagnose how-to under
+Related). A different item had registered a new check/fix pair after this
+milestone's spec text was written, without updating the spec — exactly
+the kind of registry-vs-spec drift the content assertions exist to catch.
+Worse, the spec's own Data Dictionary entry explicitly permitted this:
+
+> "#7 khi đó tự nói 'this list grows without a spec update whenever a
+> module registers a new one' — tức spec tự cho phép danh sách cũ đi. Câu
+> đó mâu thuẫn trực tiếp với mệnh đề 4."
+
+The spec's own drift-tolerant wording contradicted the verify's drift-
+intolerant assertion — both couldn't be true. The resolution: the spec's
+registry list is a **contract**, not a snapshot — the permissive sentence
+was removed and replaced with an explicit obligation that any module
+adding a check/fix updates this list in the same change. The accepted
+trade-off: a future module that adds a check but forgets the spec now
+fails `return`/`approve` loudly, instead of the drift only surfacing when
+someone happens to audit by hand.
 
 ## Why this doesn't happen automatically
 

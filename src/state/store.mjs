@@ -287,16 +287,33 @@ export function editWork(dir, { id, patch, role } = {}) {
       : patch;
 
     const candidate = { ...work, ...normalizedPatch };
-    validateWork(candidate, Object.keys(before.work));
+    // tsk-1ne D1/D2: re-validate only the fields this patch actually
+    // touches, not the whole merged candidate — a legacy item can carry a
+    // field that predates a since-tightened rule (e.g. a `stage` value no
+    // longer in the enum, an over-length `id`) and was never rejected by
+    // this door before this check existed; re-validating it on every
+    // UNRELATED edit blocked that item from being edited AT ALL. `id`/
+    // `stage`/`status`/`domain` can never be in `patch` in the first place
+    // (rejected by the EDITABLE_FIELDS loop above), so this only ever
+    // grandfathers a field the patch could never have touched anyway —
+    // never a field the patch is actually trying to change.
+    const touchedFields = new Set(Object.keys(patch));
+    validateWork(candidate, Object.keys(before.work), touchedFields);
     // domainFields fieldSchema (decision record 0027, D6): same narrower
-    // per-domain check addWork runs above — only reachable here when
-    // patch.domainFields is present (EDITABLE_FIELDS), so an edit touching
-    // any other field never pays this check.
-    validateDomainFields(candidate, getDomain(candidate.domain));
-    // tsk-5q5-2 (D1/D3): same narrow check addWork applies above — only
-    // reachable here when `patch.acceptance` is present (EDITABLE_FIELDS),
-    // so an edit touching any other field never pays this check.
-    checkAcceptanceEvidenceTraceable(candidate, path.dirname(dir));
+    // per-domain check addWork runs above — only actually reachable when
+    // `patch.domainFields` is present, same tsk-1ne scoping as validateWork
+    // above (no domain declares a fieldSchema today, so this is dormant
+    // either way — gated for the same general reason, not observed impact).
+    if (touchedFields.has('domainFields')) {
+      validateDomainFields(candidate, getDomain(candidate.domain));
+    }
+    // tsk-5q5-2 (D1/D3): same narrow check addWork applies above — gated to
+    // only run when `patch.acceptance` is present (tsk-1ne D1/D2): an item
+    // with a pre-existing non-traceable `acceptance` clause would otherwise
+    // block every unrelated edit the same way the stage/id bug did.
+    if (touchedFields.has('acceptance')) {
+      checkAcceptanceEvidenceTraceable(candidate, path.dirname(dir));
+    }
     // Same guard pair as addWork above. deps-only first (work-graph-intelligence
     // S1) — this is the gap that used to close silently: a patch introducing an
     // A<->B cycle through `deps` (an EDITABLE_FIELDS entry) went straight

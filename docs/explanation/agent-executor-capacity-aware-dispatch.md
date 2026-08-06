@@ -71,6 +71,30 @@ afterward. See `docs/how-to/close-out-a-decomposed-root-item-after-all-
 children-are-done.md`'s own documented trap for the full story; the fix
 is a repeatable one (re-run the sync merge), not a one-time patch.
 
+## Milestone closure (`tsk-5hh`)
+
+`tsk-5hh` is the milestone item tracking `tsk-slq` + `tsk-5l2` (two of the
+four pieces above) as its `targets`, verified by both showing
+`status: done`. It closed with one real friction: a `goal-check` failure
+on branch `fgw/tsk-5hh` (exit 2, `errorClass: verify-miss`) — the
+milestone's own verify command re-ran before both targets had actually
+landed on that branch, a timing miss rather than anything wrong with the
+underlying mechanism; the milestone passed on the next check once both
+targets were really `done`.
+
+## Second milestone closure (`tsk-45a`)
+
+`tsk-45a` tracks the follow-on milestone — "capacity-executor safe for
+real cross-provider use" — with `targets: [tsk-49o, tsk-32n, tsk-418]`,
+verified by `tsk-32n` + `tsk-418` both showing `status: done` (`tsk-49o`
+carries no captured outcome of its own — closed without one, not part of
+this verify command). `tsk-32n` is the `allowCrossProvider` governance
+field documented at `docs/reference/capacity-cross-provider-governance.md`
+(see "The gap the design left open" above); `tsk-418` generalized the
+judge-retry helper for any capacity dispatch
+(`docs/how-to/generalize-a-judge-retry-helper-for-any-capacity-dispatch.md`).
+No friction recorded against this milestone's own closure.
+
 ## Full design record
 
 `plans/reports/distill-consult-260731-1733-agent-executor-backend-
