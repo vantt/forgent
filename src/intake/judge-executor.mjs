@@ -30,6 +30,44 @@ export const JUDGE_STRICT_JSON_SUFFIX =
 // single retry wasn't enough headroom.
 const MAX_JUDGE_ATTEMPTS = 3;
 
+// tsk-wo5: every judge attempt previously spawned with `cfg.timeoutMs`
+// unmodified — the runner's own global default (900000ms, dispatch.mjs),
+// meant for the main worker process, not a bounded judge call. A caller
+// with its own much shorter wall-clock budget (an interactive session's
+// own ~120s default tool-call timeout, the exact ceiling tsk-wo5's own
+// repro cited) could get killed by THAT external timeout instead of ever
+// seeing this codebase's own already-existing clean fail-safe (a timeout
+// kill fails the attempt immediately, no retry — runBoundedAttempts below
+// — and every caller already folds a null verdict into a defined
+// unclear/disagree outcome) — silence, not signal. 90000ms sits
+// comfortably under that ~120s ceiling while staying generous relative to
+// a normal judge call's actual latency, so the bound fires (and hands back
+// the existing clean fail-safe) before an external caller's own timeout
+// would silently kill the whole process instead.
+export const DEFAULT_JUDGE_TIMEOUT_MS = 90000;
+
+// Judge calls are bounded by the SMALLEST of: an explicit top-level
+// `cfg.judgeTimeoutMs` override, the global `cfg.timeoutMs`, and
+// DEFAULT_JUDGE_TIMEOUT_MS itself — never a plain override that could only
+// ever loosen the bound. `judgeTimeoutMs` is its own top-level field, never
+// nested under `cfg.executors.judge` — `resolveExecutorConfig`
+// (dispatch.mjs) already treats `cfg.executors[tier]`'s mere PRESENCE as a
+// full executor override (falling through the `byCapacity ?? perTier ??
+// cfg.executor` chain), requiring `command`/`args` whenever set; a
+// timeoutMs-only object there would fail that shape validation outright,
+// not just get ignored. This is what keeps an existing caller-supplied
+// `cfg.timeoutMs` shorter than the built-in default (e.g. a test forcing a
+// fast, deterministic timeout) fully respected, while a caller that never
+// thought about judge calls at all (the pre-tsk-wo5 default: only the
+// global 900000ms) gets capped down to the built-in bound instead of
+// inheriting that unbounded value.
+export function resolveJudgeTimeoutMs(cfg) {
+  const candidates = [cfg?.judgeTimeoutMs, cfg?.timeoutMs, DEFAULT_JUDGE_TIMEOUT_MS].filter(
+    (value) => typeof value === 'number' && Number.isFinite(value) && value > 0,
+  );
+  return Math.min(...candidates);
+}
+
 // tsk-g18 (Cách B, agent-executor-design report §9): judge's own scout
 // output (Bash(rg:*) results) never gets persisted anywhere today — every
 // judgeDiscovery/judgeDecompose call re-scouts from scratch even when a
@@ -537,8 +575,14 @@ export function runRetryingExecutor(
 // byte-identical.
 export function runJudgeExecutor(cfg, model, prompt, stricterPrompt, scout, capacityId, fgosDir, scoutCaptureOut, failDetailOut) {
   const capture = scout?.capture ? (scoutCaptureOut ?? {}) : null;
+  // tsk-wo5: every attempt below spawns bounded by this judge-specific
+  // timeout (DEFAULT_JUDGE_TIMEOUT_MS/resolveJudgeTimeoutMs above), never
+  // the raw global `cfg.timeoutMs` — only `timeoutMs` is overridden, every
+  // other field (executor/executors/capacities/models) passes through
+  // unchanged.
+  const judgeCfg = { ...cfg, timeoutMs: resolveJudgeTimeoutMs(cfg) };
 
-  const verdict = runRetryingExecutor(cfg, model, prompt, stricterPrompt, {
+  const verdict = runRetryingExecutor(judgeCfg, model, prompt, stricterPrompt, {
     tier: 'judge',
     maxAttempts: MAX_JUDGE_ATTEMPTS,
     scoutCapture: capture,
