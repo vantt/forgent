@@ -65,8 +65,8 @@ Risk map:
 
 | Component | Risk | Proof point |
 |---|---|---|
-| `session.mjs`'s `tryAcquireOnce` fast-path create | Medium — every `createSession`/`endSession`/`listSessions`/`reclaimOrphanedSessions` call funnels through this lock; a botched port could deadlock (never releasing) or leave orphaned temp files | Ablation mirroring `tsk-3ld`'s own methodology (`plan.md` "The question" section): stash the fix, run `session.test.mjs`'s concurrent test at raised concurrency (`N ≥ 20`, mirroring `tsk-3ld`'s own headroom target) — expect reliably RED; restore the fix, run 5 times at the same `N` — expect reliably GREEN. Run at `fgos-validating`. |
-| `session.test.mjs`'s other 5 tests in the same file (nesting guard, refuse-to-nest, lock-reclaim, etc.) | Low — none touch the fast-path create directly | Full file run after the fix, confirm no regression |
+| `session.mjs`'s `tryAcquireOnce` fast-path create | Medium — every `createSession`/`endSession`/`listSessions`/`reclaimOrphanedSessions` call funnels through this lock; a botched port could deadlock (never releasing) or leave orphaned temp files | **DONE at `fgos-validating`, real evidence**: `N=20` with no synchronization barrier reproduced 0/10 unpatched (the plan's original assumption — wrong, named below). Adding a shared `startAt` barrier (mirroring `events.test.mjs`'s own technique — a plain `Promise.all` spreads real spawn/import jitter too wide to hit the microsecond create-vs-write window) and raising to `N=50`: unpatched reproduced 8/30 (~27%, matching `tsk-3ld`'s own ~30%) — including one direct hit, `sessions.json ... is corrupt (not valid JSON): Unexpected end of JSON input`, the exact concurrent-writer signature the hypothesis predicted. Patched: 0/30 at the same `N=50`+barrier. Fix applied (`session.mjs:131-166`, ported `events.mjs`'s `linkSync` technique). |
+| `session.test.mjs`'s other 5 tests in the same file (nesting guard, refuse-to-nest, lock-reclaim, etc.) | Low — none touch the fast-path create directly | **DONE**: full file run after the fix — 15/15 pass, no regression. |
 
 ## Files touched
 
@@ -117,10 +117,12 @@ cleanly 3 times in a row — both the fix and its test coverage hold.
   runs on (Linux — confirmed, this is the same primitive `events.mjs`
   already relies on in this same repo, no new platform surface). Not
   material — an already-proven primitive, not a new one.
-- The concurrency level needed to reliably reproduce `session.mjs`'s
-  version of this race may differ from `events.mjs`'s `N=20` (different
-  lock hold duration — `session.mjs`'s critical section includes a real
-  `git worktree add`, much slower than `events.mjs`'s single
-  read-parse-append). Flagged here as unproven; the ablation at
-  `fgos-validating` is exactly what determines the real number, not a
-  guess pinned in this plan.
+- ~~The concurrency level needed to reliably reproduce `session.mjs`'s
+  version of this race may differ from `events.mjs`'s `N=20`~~ — **proven
+  wrong, corrected at `fgos-validating`**: the deciding factor was not `N`
+  alone but the missing synchronization barrier (`session.test.mjs`'s
+  original `Promise.all` never guaranteed simultaneity the way
+  `events.test.mjs`'s `Atomics.wait` barrier does). `N=50` + a shared
+  `startAt` barrier reproduces reliably (~27%/run); `N=20` with no barrier
+  did not reproduce in 10 tries. Final test shape: `N=50` with the barrier,
+  committed as permanent regression coverage.
