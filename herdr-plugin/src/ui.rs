@@ -10,11 +10,26 @@ use ratatui::backend::CrosstermBackend;
 use ratatui::layout::{Constraint, Direction, Layout, Rect};
 use ratatui::style::{Color, Modifier, Style};
 use ratatui::text::{Line, Span};
-use ratatui::widgets::{Block, Borders, Clear, Paragraph, Row, Table, TableState};
+use ratatui::widgets::{Block, Borders, Clear, Paragraph, Row, Table, TableState, Tabs};
 use ratatui::{Frame, Terminal};
 
-use crate::app::{App, InProcessTask, Panel};
+use crate::app::{App, InProcessTask, Panel, Tab};
 use crate::ports::{TerminalUi as TerminalUiPort, UiEvent};
+
+/// tsk-jo1 D1 palette (ANSI-16): the Work Items panel's optional Status
+/// column color-code — `None` renders with the table's default style.
+fn status_color(status: &str) -> Option<Color> {
+    match status {
+        "doing" => Some(Color::Yellow),
+        "blocked" => Some(Color::Red),
+        "awaiting-human" => Some(Color::Magenta),
+        "awaiting-approval" => Some(Color::Green),
+        "delivered" | "retrospective" | "cleanup" | "done" | "wontfix" => Some(Color::DarkGray),
+        _ => None,
+    }
+}
+
+const TAB_ORDER: [Tab; 4] = [Tab::Todo, Tab::Doing, Tab::Review, Tab::Done];
 
 /// tsk-4zo D2: an orphaned task (no matching herdr pane found by the most
 /// recent scan) gets an explicit `[pane missing]` badge in its Title cell
@@ -63,8 +78,13 @@ impl TerminalUiPort for RatatuiTerminalUi {
 
     /// Translates a raw crossterm key event into the domain-level
     /// `UiEvent` the event loop (`main.rs`) actually matches on — no
-    /// `crossterm` type crosses this port's boundary.
-    fn poll_event(&mut self, timeout: Duration) -> io::Result<Option<UiEvent>> {
+    /// `crossterm` type crosses this port's boundary. tsk-64z D8: while
+    /// `app.filter_input_active`, every printable key routes to the
+    /// filter-input events instead of its normal binding (checked FIRST,
+    /// before any of the normal single-key matches below) — this is the
+    /// one place a raw keypress means something different depending on
+    /// domain state.
+    fn poll_event(&mut self, app: &App, timeout: Duration) -> io::Result<Option<UiEvent>> {
         if !event::poll(timeout)? {
             return Ok(None);
         }
@@ -76,14 +96,30 @@ impl TerminalUiPort for RatatuiTerminalUi {
         }
         let is_ctrl_c =
             key.code == KeyCode::Char('c') && key.modifiers.contains(KeyModifiers::CONTROL);
+        if is_ctrl_c {
+            return Ok(Some(UiEvent::Quit));
+        }
+
+        if app.filter_input_active {
+            return Ok(match key.code {
+                KeyCode::Esc => Some(UiEvent::FilterCancel),
+                KeyCode::Enter => Some(UiEvent::FilterSubmit),
+                KeyCode::Backspace => Some(UiEvent::FilterBackspace),
+                KeyCode::Char(c) => Some(UiEvent::FilterChar(c)),
+                _ => None,
+            });
+        }
+
         Ok(match key.code {
             KeyCode::Char('q') | KeyCode::Esc => Some(UiEvent::Quit),
-            _ if is_ctrl_c => Some(UiEvent::Quit),
             KeyCode::Down | KeyCode::Char('j') => Some(UiEvent::Down),
             KeyCode::Up | KeyCode::Char('k') => Some(UiEvent::Up),
             KeyCode::Enter => Some(UiEvent::Pick),
             KeyCode::Tab => Some(UiEvent::SwitchPanel),
             KeyCode::Char('d') => Some(UiEvent::Discover),
+            KeyCode::Char(']') => Some(UiEvent::NextTab),
+            KeyCode::Char('[') => Some(UiEvent::PrevTab),
+            KeyCode::Char('/') => Some(UiEvent::ActivateFilter),
             _ => None,
         })
     }
@@ -111,11 +147,59 @@ pub fn draw(frame: &mut Frame, app: &mut App) {
     // replaces.
     let header_style = Style::default().add_modifier(Modifier::BOLD);
 
-    let work_items_header = Row::new(["Tier", "ID", "Title"]).style(header_style);
-    let work_items_rows: Vec<Row> = app
-        .work_items
+    // tsk-64z D1: the tab strip is a nested vertical split inside the left
+    // column only — it never touches the right-side In-process panel's own
+    // area (`columns[1]`, untouched below).
+    let work_items_area = Layout::default()
+        .direction(Direction::Vertical)
+        .constraints([Constraint::Length(3), Constraint::Min(0)])
+        .split(columns[0]);
+
+    let selected_tab_index = TAB_ORDER.iter().position(|t| *t == app.active_tab).unwrap_or(0);
+    let tabs = Tabs::new(TAB_ORDER.iter().map(|t| t.label()).collect::<Vec<_>>())
+        .select(selected_tab_index)
+        .highlight_style(Style::default().add_modifier(Modifier::REVERSED))
+        .block(
+            Block::default()
+                .borders(Borders::ALL)
+                .border_style(if app.focused_panel == Panel::WorkItems {
+                    focused_border_style
+                } else {
+                    unfocused_border_style
+                })
+                .title("[ prev · ] next"),
+        );
+    frame.render_widget(tabs, work_items_area[0]);
+
+    let work_items_header =
+        Row::new(["ID", "Tier", "Pri", "Status", "Blocked By", "Blocks", "Title"]).style(header_style);
+    let visible_work_items = app.visible_work_items();
+    let work_items_rows: Vec<Row> = visible_work_items
         .iter()
-        .map(|item| Row::new([item.goal_tier.clone(), item.id.clone(), item.title.clone()]))
+        .map(|item| {
+            let priority = item
+                .priority
+                .map(|p| p.to_string())
+                .unwrap_or_else(|| "-".into());
+            let blocked_by = if item.blocked_by.is_empty() {
+                "-".to_string()
+            } else {
+                item.blocked_by.join(",")
+            };
+            let row_style = status_color(&item.status)
+                .map(|color| Style::default().fg(color))
+                .unwrap_or_default();
+            Row::new([
+                item.id.clone(),
+                item.goal_tier.clone(),
+                priority,
+                item.status.clone(),
+                blocked_by,
+                item.blocks.to_string(),
+                item.title.clone(),
+            ])
+            .style(row_style)
+        })
         .collect();
     let mut work_items_state = TableState::default();
     work_items_state.select(app.selected);
@@ -123,8 +207,12 @@ pub fn draw(frame: &mut Frame, app: &mut App) {
         Table::new(
             work_items_rows,
             [
-                Constraint::Length(10),
+                Constraint::Length(12),
+                Constraint::Length(6),
+                Constraint::Length(5),
                 Constraint::Length(16),
+                Constraint::Length(14),
+                Constraint::Length(6),
                 Constraint::Fill(1),
             ],
         )
@@ -138,12 +226,12 @@ pub fn draw(frame: &mut Frame, app: &mut App) {
                     unfocused_border_style
                 })
                 .title(Span::styled(
-                    "Work items (by impact) — ↑/↓ select, Enter for details",
+                    "Work items — ↑/↓ select, Enter for details",
                     Style::default().add_modifier(Modifier::BOLD),
                 )),
         )
         .row_highlight_style(Style::default().add_modifier(Modifier::REVERSED)),
-        columns[0],
+        work_items_area[1],
         &mut work_items_state,
     );
 
@@ -182,12 +270,24 @@ pub fn draw(frame: &mut Frame, app: &mut App) {
         &mut in_process_state,
     );
 
-    let status = if let Some(err) = &app.last_error {
+    // tsk-64z D8: while typing, the filter input takes over the bottom
+    // bar entirely (never a permanent fixture — bung 1 dòng đè status bar
+    // only while active, per the locked TUI-convention decision).
+    let status = if app.filter_input_active {
+        Paragraph::new(format!("/{}", app.filter_query))
+            .style(Style::default().fg(Color::Yellow).add_modifier(Modifier::BOLD))
+    } else if let Some(err) = &app.last_error {
         Paragraph::new(format!("fgos poll error: {err}")).style(Style::default().fg(Color::Red))
     } else if let Some(status) = &app.pick_status {
         Paragraph::new(status.as_str()).style(Style::default().fg(Color::Green))
+    } else if !app.filter_query.is_empty() {
+        Paragraph::new(format!(
+            "filter: \"{}\" (/ to edit, clear via Esc while editing) · ↑/↓ select · Enter: details · q/Esc: quit",
+            app.filter_query
+        ))
+        .style(Style::default().fg(Color::Yellow))
     } else {
-        Paragraph::new("↑/↓ select · Enter: details · q/Esc: quit")
+        Paragraph::new("↑/↓ select · Enter: details · [/]: tabs · /: filter · q/Esc: quit")
     };
     frame.render_widget(status, rows[1]);
 
@@ -283,9 +383,27 @@ fn centered_rect(percent_x: u16, percent_y: u16, area: Rect) -> Rect {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::app::WorkItem;
+    use crate::app::{App, WorkItem};
     use crate::pane_scan::PaneIdentity;
     use ratatui::backend::TestBackend;
+
+    /// tsk-64z D1: all 4 tab labels render, regardless of which is
+    /// currently selected — proves the `Tabs` widget renders the full set,
+    /// not just the active one.
+    #[test]
+    fn work_items_panel_renders_four_tabs_todo_doing_review_done() {
+        let mut app = App::mock();
+        let backend = TestBackend::new(120, 30);
+        let mut terminal = Terminal::new(backend).expect("terminal init");
+        terminal
+            .draw(|frame| draw(frame, &mut app))
+            .expect("draw should not panic");
+        let buffer = terminal.backend().buffer();
+        let content: String = buffer.content().iter().map(|cell| cell.symbol()).collect();
+        for label in ["TODO", "DOING", "REVIEW", "DONE"] {
+            assert!(content.contains(label), "missing tab label {label}: {content}");
+        }
+    }
 
     fn render_modal_buffer(stage: &str) -> ratatui::buffer::Buffer {
         let item = WorkItem {
@@ -293,6 +411,10 @@ mod tests {
             title: "A".into(),
             goal_tier: "mvp".into(),
             stage: stage.into(),
+            status: "doing".into(),
+            blocked_by: Vec::new(),
+            blocks: 0,
+            priority: None,
         };
         let backend = TestBackend::new(80, 24);
         let mut terminal = Terminal::new(backend).expect("terminal init");
