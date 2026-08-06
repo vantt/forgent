@@ -223,34 +223,56 @@ function requireArray(work, field) {
  * that deps is an array of non-empty strings with no self-reference. Does
  * NOT check that deps point at ids that actually exist — that is
  * `validateDeps`, which needs the rest of the store to answer.
+ *
+ * `touchedFields` (optional, tsk-1ne D1/D2): a Set of top-level field names
+ * to check — every other field is grandfathered, its already-stored value
+ * left unvalidated regardless of whether it would pass today's rules.
+ * Omitted (the default, `addWork`'s own call) means "check everything,"
+ * byte-for-byte the original behavior. `editWork` (store.mjs) is the one
+ * caller that ever passes a real Set: an edit patch can only ever contain
+ * `EDITABLE_FIELDS` keys (id/status/stage/domain are never among them, so
+ * their checks below can never fire for an edit either way), and
+ * re-rejecting an UNCHANGED field's pre-existing value on every edit — the
+ * bug this parameter fixes — blocked 65/112 items from being edited at all
+ * for legacy shape that predates a since-tightened rule (stage enum,
+ * id-length cap). This never widens what a NEW value in the patch must
+ * satisfy — every check below still runs in full for any field actually
+ * present in `touchedFields`.
  */
-export function validateWorkShape(work) {
+export function validateWorkShape(work, touchedFields) {
   if (!work || typeof work !== 'object' || Array.isArray(work)) {
     throw new WorkValidationError('work item must be an object.');
   }
+  const touched = (field) => !touchedFields || touchedFields.has(field);
 
-  if (typeof work.id !== 'string' || !ID_PATTERN.test(work.id)) {
-    throw new WorkValidationError(
-      `work.id must be a stable kebab-case identifier (e.g. "add-login-form"), got: ${JSON.stringify(work.id)}`,
-    );
+  if (touched('id')) {
+    if (typeof work.id !== 'string' || !ID_PATTERN.test(work.id)) {
+      throw new WorkValidationError(
+        `work.id must be a stable kebab-case identifier (e.g. "add-login-form"), got: ${JSON.stringify(work.id)}`,
+      );
+    }
+    if (work.id.length > MAX_ID_LENGTH) {
+      throw new WorkValidationError(
+        `work.id must be at most ${MAX_ID_LENGTH} characters (got ${work.id.length}): ${JSON.stringify(work.id)} — pick a short descriptive id, not a slugified title.`,
+      );
+    }
   }
-  if (work.id.length > MAX_ID_LENGTH) {
-    throw new WorkValidationError(
-      `work.id must be at most ${MAX_ID_LENGTH} characters (got ${work.id.length}): ${JSON.stringify(work.id)} — pick a short descriptive id, not a slugified title.`,
-    );
+  if (touched('title')) requireNonEmptyString(work, 'title');
+  if (touched('kind')) requireNonEmptyString(work, 'kind');
+  if (touched('status')) {
+    requireNonEmptyString(work, 'status');
+    if (!STATUSES.includes(work.status)) {
+      throw new WorkValidationError(
+        `work.status must be one of ${JSON.stringify(STATUSES)}, got: ${JSON.stringify(work.status)}`,
+      );
+    }
   }
-  requireNonEmptyString(work, 'title');
-  requireNonEmptyString(work, 'kind');
-  requireNonEmptyString(work, 'status');
-  if (!STATUSES.includes(work.status)) {
-    throw new WorkValidationError(
-      `work.status must be one of ${JSON.stringify(STATUSES)}, got: ${JSON.stringify(work.status)}`,
-    );
-  }
-  requireArray(work, 'deps');
-  for (const dep of work.deps) {
-    if (typeof dep !== 'string' || !dep) {
-      throw new WorkValidationError(`work.deps entries must be non-empty strings, got: ${JSON.stringify(dep)}`);
+  if (touched('deps')) {
+    requireArray(work, 'deps');
+    for (const dep of work.deps) {
+      if (typeof dep !== 'string' || !dep) {
+        throw new WorkValidationError(`work.deps entries must be non-empty strings, got: ${JSON.stringify(dep)}`);
+      }
     }
   }
   // mergeAfter (D4/D5, docs/history/tsk-3bn-merge-conductor-harness-v2/):
@@ -261,7 +283,7 @@ export function validateWorkShape(work) {
   // of referenced ids IS enforced (validateMergeAfter below, mirroring
   // validateDeps) — unlike `parent`/`discoveredFrom`, which deliberately
   // leave dangling ids unchecked.
-  if (work.mergeAfter !== undefined && work.mergeAfter !== null) {
+  if (touched('mergeAfter') && work.mergeAfter !== undefined && work.mergeAfter !== null) {
     if (!Array.isArray(work.mergeAfter)) {
       throw new WorkValidationError(`work.mergeAfter must be an array of non-empty strings when present, got: ${JSON.stringify(work.mergeAfter)}`);
     }
@@ -288,7 +310,7 @@ export function validateWorkShape(work) {
   // blocking-cycle graph (dep-graph.mjs) or frontier.mjs start-eligibility
   // — both OPTIONAL and NOT in DEFAULTS, same lazy-additive shape as
   // mergeAfter/parent above.
-  if (work.supersededBy !== undefined && work.supersededBy !== null) {
+  if (touched('supersededBy') && work.supersededBy !== undefined && work.supersededBy !== null) {
     if (typeof work.supersededBy !== 'string' || !work.supersededBy) {
       throw new WorkValidationError(`work.supersededBy must be a non-empty string when present, got: ${JSON.stringify(work.supersededBy)}`);
     }
@@ -296,7 +318,7 @@ export function validateWorkShape(work) {
       throw new WorkValidationError(`work "${work.id}" cannot list itself as its own supersededBy.`);
     }
   }
-  if (work.duplicates !== undefined && work.duplicates !== null) {
+  if (touched('duplicates') && work.duplicates !== undefined && work.duplicates !== null) {
     if (!Array.isArray(work.duplicates)) {
       throw new WorkValidationError(`work.duplicates must be an array of non-empty strings when present, got: ${JSON.stringify(work.duplicates)}`);
     }
@@ -309,18 +331,18 @@ export function validateWorkShape(work) {
       }
     }
   }
-  requireNonEmptyString(work, 'risk');
-  requireArray(work, 'refs');
-  requireNonEmptyString(work, 'verify');
-  if (work.learn !== undefined && work.learn !== null && typeof work.learn !== 'string') {
+  if (touched('risk')) requireNonEmptyString(work, 'risk');
+  if (touched('refs')) requireArray(work, 'refs');
+  if (touched('verify')) requireNonEmptyString(work, 'verify');
+  if (touched('learn') && work.learn !== undefined && work.learn !== null && typeof work.learn !== 'string') {
     throw new WorkValidationError('work.learn must be a string when present (it is optional).');
   }
-  if (work.tier !== undefined && !TIERS.includes(work.tier)) {
+  if (touched('tier') && work.tier !== undefined && !TIERS.includes(work.tier)) {
     throw new WorkValidationError(
       `work.tier must be one of ${JSON.stringify(TIERS)} when present, got: ${JSON.stringify(work.tier)}`,
     );
   }
-  if (work.domain !== undefined && !Object.hasOwn(DOMAINS, work.domain)) {
+  if (touched('domain') && work.domain !== undefined && !Object.hasOwn(DOMAINS, work.domain)) {
     throw new WorkValidationError(
       `work.domain must be one of ${JSON.stringify(Object.keys(DOMAINS))} when present, got: ${JSON.stringify(work.domain)}`,
     );
@@ -332,7 +354,7 @@ export function validateWorkShape(work) {
   // so the frontier comparator never has to special-case a sign. NOT in
   // DEFAULTS (D1): absent stays absent, sorts after every item that has an
   // explicit priority.
-  if (work.priority !== undefined && !(Number.isInteger(work.priority) && work.priority >= 0)) {
+  if (touched('priority') && work.priority !== undefined && !(Number.isInteger(work.priority) && work.priority >= 0)) {
     throw new WorkValidationError(
       `work.priority must be a non-negative integer when present, got: ${JSON.stringify(work.priority)}`,
     );
@@ -342,7 +364,7 @@ export function validateWorkShape(work) {
   // absent-last (D6) — no sign/bound constraint is locked (the concrete
   // scale is Slice 2's discretion), so only integer-ness is checked here.
   // NOT in DEFAULTS: absent stays absent.
-  if (work.intent !== undefined && !Number.isInteger(work.intent)) {
+  if (touched('intent') && work.intent !== undefined && !Number.isInteger(work.intent)) {
     throw new WorkValidationError(
       `work.intent must be an integer when present, got: ${JSON.stringify(work.intent)}`,
     );
@@ -351,7 +373,7 @@ export function validateWorkShape(work) {
   // human-entered via `fgos add/edit --urgent`. Same optional-additive
   // shape as tier/domain above; absent stays absent (the "medium" default
   // is applied by the priority formula that reads it, never stored here).
-  if (work.urgent !== undefined && !URGENCY_LEVELS.includes(work.urgent)) {
+  if (touched('urgent') && work.urgent !== undefined && !URGENCY_LEVELS.includes(work.urgent)) {
     throw new WorkValidationError(
       `work.urgent must be one of ${JSON.stringify(URGENCY_LEVELS)} when present, got: ${JSON.stringify(work.urgent)}`,
     );
@@ -361,7 +383,7 @@ export function validateWorkShape(work) {
   // bonus at decompose per D8) — never human-entered directly. Same
   // non-negative-number shape priority/intent already use; absent stays
   // absent.
-  if (work.impact !== undefined && !(typeof work.impact === 'number' && Number.isFinite(work.impact) && work.impact >= 0)) {
+  if (touched('impact') && work.impact !== undefined && !(typeof work.impact === 'number' && Number.isFinite(work.impact) && work.impact >= 0)) {
     throw new WorkValidationError(
       `work.impact must be a non-negative number when present, got: ${JSON.stringify(work.impact)}`,
     );
@@ -370,12 +392,12 @@ export function validateWorkShape(work) {
   // computed at decompose from fgos-planning's own mode/flag-count — never
   // human-entered directly. Same non-negative-number shape as impact;
   // absent stays absent.
-  if (work.effort !== undefined && !(typeof work.effort === 'number' && Number.isFinite(work.effort) && work.effort >= 0)) {
+  if (touched('effort') && work.effort !== undefined && !(typeof work.effort === 'number' && Number.isFinite(work.effort) && work.effort >= 0)) {
     throw new WorkValidationError(
       `work.effort must be a non-negative number when present, got: ${JSON.stringify(work.effort)}`,
     );
   }
-  if (work.stage !== undefined) {
+  if (touched('stage') && work.stage !== undefined) {
     // Domain-aware per base-workflow-model D2/D3: look up the item's own
     // domain's stage list instead of the flat STAGES constant, so a future
     // Slice-2 domain's own stage names validate too. work.domain was already
@@ -403,7 +425,7 @@ export function validateWorkShape(work) {
   // schema change, SCHEMA_VERSION unchanged. OPTIONAL and NOT in DEFAULTS,
   // same additive shape as `stage` — absent on every item that predates this
   // field or was never decomposed.
-  if (work.parent !== undefined && work.parent !== null) {
+  if (touched('parent') && work.parent !== undefined && work.parent !== null) {
     if (typeof work.parent !== 'string' || !work.parent.trim()) {
       throw new WorkValidationError(
         `work.parent must be a non-empty string when present, got: ${JSON.stringify(work.parent)}`,
@@ -425,7 +447,7 @@ export function validateWorkShape(work) {
   // provenance id degrades gracefully rather than blocking the add. It is
   // non-blocking by design: dep-graph.mjs's buildUnifiedEdges reads only
   // `deps`/`parent`, so `discoveredFrom` never enters the cycle-check.
-  if (work.discoveredFrom !== undefined && work.discoveredFrom !== null) {
+  if (touched('discoveredFrom') && work.discoveredFrom !== undefined && work.discoveredFrom !== null) {
     if (typeof work.discoveredFrom !== 'string' || !work.discoveredFrom.trim()) {
       throw new WorkValidationError(
         `work.discoveredFrom must be a non-empty string when present, got: ${JSON.stringify(work.discoveredFrom)}`,
@@ -444,7 +466,7 @@ export function validateWorkShape(work) {
   // SCHEMA_VERSION 2 (folds via the work.add spread) and is NON-BLOCKING: it
   // feeds only the footprint-intersection advisory, never the cycle-check or
   // the frontier.
-  if (work.footprint !== undefined && work.footprint !== null) {
+  if (touched('footprint') && work.footprint !== undefined && work.footprint !== null) {
     if (!Array.isArray(work.footprint)) {
       throw new WorkValidationError(
         `work.footprint must be an array of non-empty strings when present, got: ${JSON.stringify(work.footprint)}`,
@@ -465,7 +487,7 @@ export function validateWorkShape(work) {
   // to an empty array — absence stays absence (per D4), matching
   // `docsRef`/`footprint`'s own convention. This cell only adds the shape
   // check; the done-gate enforcement of these clauses is a separate cell.
-  if (work.acceptance !== undefined && work.acceptance !== null) {
+  if (touched('acceptance') && work.acceptance !== undefined && work.acceptance !== null) {
     if (!Array.isArray(work.acceptance)) {
       throw new WorkValidationError(
         `work.acceptance must be an array of {text, evidence} clauses when present, got: ${JSON.stringify(work.acceptance)}`,
@@ -491,7 +513,7 @@ export function validateWorkShape(work) {
   // classification. `submit` sets it; `add` never does — this validator
   // only enforces shape when the field is actually present, same
   // optional-additive rule as `parent` above (null treated as absent).
-  if (work.description !== undefined && work.description !== null) {
+  if (touched('description') && work.description !== undefined && work.description !== null) {
     if (typeof work.description !== 'string' || !work.description.trim()) {
       throw new WorkValidationError('work.description must be a non-empty string when present.');
     }
@@ -508,7 +530,7 @@ export function validateWorkShape(work) {
   // existence-on-disk check at this write door -- a docsRef pointing at a
   // not-yet-created or since-moved path degrades gracefully, the same norm
   // `parent`/`discoveredFrom` already apply to a dangling id.
-  if (work.docsRef !== undefined && work.docsRef !== null) {
+  if (touched('docsRef') && work.docsRef !== undefined && work.docsRef !== null) {
     if (typeof work.docsRef !== 'string' || !work.docsRef.trim()) {
       throw new WorkValidationError('work.docsRef must be a non-empty string when present.');
     }
@@ -524,7 +546,7 @@ export function validateWorkShape(work) {
   // shape-checked only when present, null treated as absent. Rides
   // SCHEMA_VERSION 3 unchanged, same precedent every prior additive field
   // (footprint, domain, docsRef) already established.
-  if (work.action !== undefined && work.action !== null) {
+  if (touched('action') && work.action !== undefined && work.action !== null) {
     if (typeof work.action !== 'string' || !work.action.trim()) {
       throw new WorkValidationError('work.action must be a non-empty string when present.');
     }
@@ -536,7 +558,7 @@ export function validateWorkShape(work) {
   // DEFAULTS entry, no item migration. A goal item is always created fresh
   // with goalTier set at add time (see store.mjs's EDITABLE_FIELDS, which
   // excludes it) -- never retrofitted onto an existing item.
-  if (work.goalTier !== undefined && !GOAL_TIERS.includes(work.goalTier)) {
+  if (touched('goalTier') && work.goalTier !== undefined && !GOAL_TIERS.includes(work.goalTier)) {
     throw new WorkValidationError(
       `work.goalTier must be one of ${JSON.stringify(GOAL_TIERS)} when present, got: ${JSON.stringify(work.goalTier)}`,
     );
@@ -551,7 +573,7 @@ export function validateWorkShape(work) {
   // validateDeps, which never checks targets -- targets may point at
   // not-yet-created ids). null is treated the same as absent, same as
   // parent/discoveredFrom.
-  if (work.targets !== undefined && work.targets !== null) {
+  if (touched('targets') && work.targets !== undefined && work.targets !== null) {
     if (!Array.isArray(work.targets)) {
       throw new WorkValidationError(
         `work.targets must be an array of non-empty strings when present, got: ${JSON.stringify(work.targets)}`,
@@ -582,7 +604,7 @@ export function validateWorkShape(work) {
   // concern handled by `validateDomainFields` below — mirroring how this
   // function checks `work.stage` is one of `DOMAINS[domain].stages` above
   // without opening a per-stage schema engine of its own.
-  if (work.domainFields !== undefined && work.domainFields !== null) {
+  if (touched('domainFields') && work.domainFields !== undefined && work.domainFields !== null) {
     if (typeof work.domainFields !== 'object' || Array.isArray(work.domainFields)) {
       throw new WorkValidationError(
         `work.domainFields must be a plain object ({ [domainName]: {...} }) when present, got: ${JSON.stringify(work.domainFields)}`,
@@ -597,7 +619,10 @@ export function validateWorkShape(work) {
     }
   }
 
-  if (work.deps.includes(work.id)) {
+  // Self-dep check reads both `deps` and `id`, but `id` never changes via a
+  // patch (never in EDITABLE_FIELDS, store.mjs) — gating on `deps` alone is
+  // complete: a self-reference can only be newly introduced by a `deps` edit.
+  if (touched('deps') && work.deps.includes(work.id)) {
     throw new WorkValidationError(`work "${work.id}" cannot list itself as a dep.`);
   }
 
@@ -718,14 +743,24 @@ export function validateDuplicates(work, existingIds) {
  * Full validation entry point: shape first, then dep-existence when
  * `existingIds` is supplied (omit it to validate shape only, e.g. before the
  * store is known).
+ *
+ * `touchedFields` (optional, tsk-1ne D1/D2): forwarded to `validateWorkShape`
+ * as-is, and used here to gate the four existence-checks the same way —
+ * each already reads exactly one field (`deps`/`mergeAfter`/`supersededBy`/
+ * `duplicates`), so skipping one when its field is absent from
+ * `touchedFields` never widens what a NEW value in that field must satisfy,
+ * only stops re-checking a field the caller's patch never touched. Omitted
+ * (the default, `addWork`'s own call) means every check still runs, exactly
+ * as before this parameter existed.
  */
-export function validateWork(work, existingIds) {
-  validateWorkShape(work);
+export function validateWork(work, existingIds, touchedFields) {
+  validateWorkShape(work, touchedFields);
+  const touched = (field) => !touchedFields || touchedFields.has(field);
   if (existingIds !== undefined) {
-    validateDeps(work, existingIds);
-    validateMergeAfter(work, existingIds);
-    validateSupersededBy(work, existingIds);
-    validateDuplicates(work, existingIds);
+    if (touched('deps')) validateDeps(work, existingIds);
+    if (touched('mergeAfter')) validateMergeAfter(work, existingIds);
+    if (touched('supersededBy')) validateSupersededBy(work, existingIds);
+    if (touched('duplicates')) validateDuplicates(work, existingIds);
   }
   return true;
 }

@@ -18,6 +18,7 @@ import path from 'node:path';
 import { fork } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { addWork, editWork, moveWork, moveStage, addOutcome, addFriction, recordGateApprove, listWork, readRawEvents, setFocus, StoreError } from '../../src/state/store.mjs';
+import { appendEvent } from '../../src/state/events.mjs';
 import { REGISTRY, ENV, PID, UNRESOLVED } from "../../src/runner/session-identity.mjs";
 import { MAX_TITLE_LENGTH } from '../../src/state/work.mjs';
 
@@ -845,4 +846,89 @@ test('recordGateApprove rejects a missing id, an unrecognized gate, an unrecogni
     () => recordGateApprove(dir, { id: 'gate-approve-bad', gate: 'contextApprove', actor: 'human', verify: '  ' }),
     StoreError,
   );
+});
+
+// tsk-1ne D1/D2: editWork used to re-validate the WHOLE merged candidate on
+// every patch, not just the fields the patch touched — so an item carrying
+// a field that predates a since-tightened rule (a `stage` value no longer
+// in the enum, an over-length `id`, a non-traceable `acceptance` clause)
+// could never be edited again for ANY field, including ones that had
+// nothing to do with the stale field. These items are constructed via a
+// raw `work.add` event (bypassing `addWork`'s own validation, which would
+// otherwise reject them outright) — this is exactly how such an item
+// actually reaches the store: written before the rule that now rejects it
+// existed, or before this schema/log started validating at all (replay
+// itself never calls validateWorkShape, per work.mjs's own doc comment).
+function addLegacyWork(dir, id, overrides = {}) {
+  const logPath = path.join(dir, 'events.jsonl');
+  appendEvent(logPath, {
+    type: 'work.add',
+    payload: {
+      id,
+      title: `Title ${id}`,
+      kind: 'task',
+      status: 'todo',
+      deps: [],
+      risk: 'low',
+      refs: [],
+      verify: 'npm test',
+      tier: 'standard',
+      ...overrides,
+    },
+  });
+}
+
+test('editWork succeeds patching an unrelated field on an item whose stage predates the current enum (grandfathered, not re-validated)', () => {
+  const dir = tmpDir();
+  addLegacyWork(dir, 'legacy-stage', { stage: 'compound-learn' });
+
+  editWork(dir, { id: 'legacy-stage', patch: { description: 'unrelated edit' } });
+
+  const after = listWork(dir).work['legacy-stage'];
+  assert.equal(after.description, 'unrelated edit');
+  assert.equal(after.stage, 'compound-learn'); // grandfathered, not silently "fixed"
+});
+
+test('editWork succeeds patching an unrelated field on an item whose id exceeds the current 30-char length cap (grandfathered)', () => {
+  const dir = tmpDir();
+  const longId = 'a-legacy-id-far-past-the-thirty-char-cap';
+  assert.ok(longId.length > 30);
+  addLegacyWork(dir, longId);
+
+  editWork(dir, { id: longId, patch: { description: 'unrelated edit' } });
+
+  assert.equal(listWork(dir).work[longId].description, 'unrelated edit');
+});
+
+test('editWork succeeds patching an unrelated field on an item whose stored acceptance clause has non-traceable evidence (grandfathered)', () => {
+  const dir = tmpDir();
+  addLegacyWork(dir, 'legacy-acceptance', {
+    acceptance: [{ text: 'field round-trips', evidence: 'no/such/path.mjs' }],
+  });
+
+  editWork(dir, { id: 'legacy-acceptance', patch: { description: 'unrelated edit' } });
+
+  assert.equal(listWork(dir).work['legacy-acceptance'].description, 'unrelated edit');
+});
+
+test('editWork still fully validates a field the patch DOES touch, even on an item with other legacy-invalid fields', () => {
+  const dir = tmpDir();
+  addLegacyWork(dir, 'legacy-deps-relational', { stage: 'compound-learn', deps: [] });
+
+  assert.throws(
+    () => editWork(dir, { id: 'legacy-deps-relational', patch: { deps: ['does-not-exist'] } }),
+    /depends on unknown id/,
+  );
+});
+
+test('editWork still refuses a patch containing "id"/"status"/"stage"/"domain" — the fix never widens EDITABLE_FIELDS', () => {
+  const dir = tmpDir();
+  addSampleWork(dir, 'immutable-fields');
+
+  for (const key of ['id', 'status', 'stage', 'domain']) {
+    assert.throws(
+      () => editWork(dir, { id: 'immutable-fields', patch: { [key]: 'whatever' } }),
+      StoreError,
+    );
+  }
 });
