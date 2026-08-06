@@ -1191,7 +1191,7 @@ test('resolveDiscovery calls judgeDiscovery as before when the item has no docsR
   assert.equal(readCount(counterPath), 1);
 });
 
-test('resolveDiscovery still completes clear/unclear resolution when editWork throws for a corrupted item shape (fail-safe)', () => {
+test('resolveDiscovery still updates priority on a legacy-invalid item shape — editWork\'s scoped validation (tsk-1ne) grandfathers the untouched field instead of blocking the patch', () => {
   const scriptDir = mkTempDir();
   const scriptPath = writeVerdictWithVerifyCheckExecutor(scriptDir, {
     clear: true,
@@ -1203,16 +1203,24 @@ test('resolveDiscovery still completes clear/unclear resolution when editWork th
   const storeDir = tmpStoreDir();
   const logPath = path.join(storeDir, 'events.jsonl');
   // Bypass the normal addWork write door to plant a corrupted item shape
-  // (empty `risk`) — replay never validates on fold, so it reads back fine,
-  // but editWork's validateWork rejects it when merging the priority patch.
-  // This proves resolveDiscovery's try/catch around editWork never aborts
-  // the moveStage/putInAwaiting resolution that follows.
+  // (empty `risk`) — replay never validates on fold, so it reads back fine.
+  // Before tsk-1ne, editWork's validateWork re-checked the WHOLE merged
+  // candidate on every patch, so this legacy-invalid `risk` blocked even an
+  // unrelated `priority` patch — resolveDiscovery's try/catch around
+  // editWork (discovery.mjs ~618-631) existed specifically to survive that
+  // rejection without aborting the clear/unclear resolution that follows.
+  // tsk-1ne (`src/state/store.mjs` `editWork`, D1/D2) scoped that
+  // re-validation to only the fields a patch actually touches — `risk` is
+  // never in this patch (`{priority}` only), so it is now grandfathered
+  // and no longer rejected. This asserts the NEW behavior directly: the
+  // patch succeeds and `priority` lands on the item, rather than asserting
+  // the old rejection the try/catch used to guard against.
   appendEvent(logPath, { type: 'work.add', payload: { ...sampleWork(), risk: '' } });
 
   assert.doesNotThrow(() => resolveDiscovery(storeDir, 'item-x', cfg));
   const view = listWork(storeDir);
   assert.equal(view.work['item-x'].stage, 'decompose');
-  assert.equal(view.work['item-x'].priority, undefined);
+  assert.equal(typeof view.work['item-x'].priority, 'number');
 });
 
 // --- tsk-g18: resolveDiscovery threads scout-notes.md through judgeDiscovery
