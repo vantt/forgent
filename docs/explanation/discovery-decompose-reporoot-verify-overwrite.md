@@ -111,6 +111,27 @@ items (`tsk-1ni-2`); the two test-fixture items (`tsk-1ni-3`,
 constructing `repoRoot == content-root` by fixture design (the reason,
 above, the bug went uncaught).
 
+`discovery.mjs`'s own D1+D2 half is implemented (`tsk-1ni-2`, commit
+`f3556bf`): `resolveDiscovery` now computes `repoRoot =
+resolveContentRoot(stateRoot, id, work.docsRef)` instead of the bare
+`path.dirname(dir)`, reused for both `readLockedContext`'s own read and
+`judgeDiscovery`'s `scoutContext` (`readScoutNotes`/`writeScoutNotes` —
+"same variable, same bug, same fix" as the commit message puts it). D2's
+guard is a new `hasRealVerify(verify)` helper — true when `verify` is a
+non-empty string that is neither `FALLBACK_VERIFY` nor the newly-exported
+`RETIRED_P14_PLACEHOLDER` sentinel — applied at **both** the
+skip-and-advance `moveStage` call (locked `CONTEXT.md` found) and the
+real-judge clear-verdict `moveStage` call: whichever path fires,
+`work.verify` wins over the fresh guess whenever it already counts as
+real.
+
+> commit message: "D1: wire resolveContentRoot (decompose.mjs) into
+> resolveDiscovery's readLockedContext call and judgeDiscovery's
+> scoutContext -- same fix shape as resolveDecompose. D2: never let
+> judgeDiscovery's own verdict.verify overwrite an existing non-empty,
+> non-placeholder work.verify -- applies to both the skip-and-advance
+> path and the real-judge path, per plan.md."
+
 ## Locked decisions
 
 | ID | Decision |
