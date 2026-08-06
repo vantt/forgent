@@ -6,7 +6,7 @@ computed-parallel-wave-schedule + worktree-dispatch-attestation, đã merge main
 
 ## 1. Trạng thái hiện tại
 
-Vòng 4 (2026-08-06). Đã đọc kỹ upstream bee và scout xong phía fgOS. Hai câu
+Vòng 5 (2026-08-06). Đã đọc kỹ upstream bee và scout xong phía fgOS. Hai câu
 hỏi mở đầu của người dùng đã có câu trả lời bằng bằng chứng source (§3, hàng
 "rõ"). Phát hiện quan trọng nhất: **bee không có một mô hình cell duy nhất — bee
 tách sẵn HAI lớp dispatch**, và ranh giới bee vạch là *"dispatch nào GHI file thì
@@ -23,6 +23,12 @@ trước thay vì soạn động, và danh sách lý do hợp lệ để dispatc
 song hoá (hàng 22-23). Người dùng chốt cả ba ⇒ **D2** (thêm lý do thứ tư),
 **D3** (capacity ad-hoc prompt động), **D4** (gác lớp helper-ghi-file). §6 đã
 regenerate toàn phần, §7 viết lại theo hình dạng mới.
+
+**Vòng 5** thêm khung refined của người dùng: dispatch tả bằng **hai tầng**
+L1/L2, và trong L1 dùng **hai trục vuông góc** thay vì liệt kê loại rời rạc ⇒
+**D5**. Cùng vòng, lộ ra chỗ hở thứ ba khoá chặt với D3: không ai phán model
+tier lúc dispatch, vì model suy thẳng từ `work.tier` — mà field đó nghĩa là
+lượng nghi thức quy trình (§3 hàng 30). Delta distillery đã viết xong.
 
 Còn nợ từ vòng 3: sửa câu sai trong description của `tsk-3xd` (đã giao cho phiên
 đang giữ claim item đó). Còn mở: xem §Outstanding questions.
@@ -77,7 +83,7 @@ buộc phải giữ lại (id, footprint, verify, merge) khi việc con thực s
 | 25 | Prompt động hay nhân bản capacity id? | **Chốt — D3 (prompt động)** | Chấp nhận mất bảo đảm chống-drift của fixed template, đổi lấy chia việc uyển chuyển |
 | 26 | B2 có va vào luật khoá không? | **Rõ — có, và đã gác (D4)** | 0026 chốt nhị phân rootTask/capacity. B2 là helper **CÓ ghi file** ⇒ loại thứ ba; muốn có phải mở rộng `capacity` cho ghi file hoặc supersede phần "subTask ≡ rootTask" của 0026 |
 | 27 | Mô hình L1 (cái được dispatch) / L2 (cơ chế kích hoạt) có đúng không? | **Rõ — đúng, và 0026 đã tách sẵn** | 0026 dòng 76-86: *"subTask và capacity KHÔNG gộp thành 1 khái niệm... Cái GIỐNG NHAU, và là điều đáng nói, là **CƠ CHẾ DISPATCH/ORCHESTRATE**... áp dụng Y HỆT cho cả 2"*. Đúng lát cắt L1/L2 |
-| 28 | (A) capacity và (C) gói tự do có phải hai loại khác **bản chất** không? | **Đề xuất chỉnh, chờ xác nhận** | Không — chúng khác **nguồn gói mệnh lệnh**, không khác bản chất. Hai trục vuông góc: *có mang vòng đời không* (0026's nhị phân) và *gói đăng ký trước hay soạn lúc chạy*. B nằm ở "có vòng đời + soạn động"; A ở "không vòng đời + đăng ký trước"; C ở "không vòng đời + soạn động". Ô thứ tư (có vòng đời + đăng ký trước) trống có lý: việc mang vòng đời là việc riêng từng lần, không thể có prompt cố định |
+| 28 | (A) capacity và (C) gói tự do có phải hai loại khác **bản chất** không? | **Chốt — D5** | Không — chúng khác **nguồn gói mệnh lệnh**, không khác bản chất. Hai trục vuông góc: *có mang vòng đời không* (0026's nhị phân) và *gói đăng ký trước hay soạn lúc chạy*. B nằm ở "có vòng đời + soạn động"; A ở "không vòng đời + đăng ký trước"; C ở "không vòng đời + soạn động". Ô thứ tư (có vòng đời + đăng ký trước) trống có lý: việc mang vòng đời là việc riêng từng lần, không thể có prompt cố định |
 | 29 | Gọi L2 là gì? | **Rõ — đừng gọi "orchestrator"** | 0026 dòng 34-56 đã gán "orchestrator" cho vai trò **quyết định kích hoạt rootTask nào** (người mở session, `/fgOS:pick`, `fgos-runner`, herdr) — tầng CAO hơn, không phải transport. Thuật ngữ sẵn có cho L2 là **"cơ chế dispatch"** (native vs cli/spawn, 4 quy tắc); **"executor"** để dành cho backend đích mà `resolveExecutorConfig` trả về |
 | 30 | Soul ở L1 có đang chọn được provider/tier không? | **Rõ — KHÔNG, và đây là chỗ hở thật** | `src/runner/dispatch.mjs:1053-1054`: `const tier = work.tier ?? DEFAULTS.tier; const model = modelForTier(cfg, tier)`. `work.tier` là tier **ceremony** (`light/standard/heavy`) — cùng field `gate-bypass.mjs`'s `isTierCovered` đọc để quyết bao nhiêu nghi thức. Một field hai việc. bee tách hẳn: `lane` là nghi thức, model tier **phán tại lúc dispatch**, *"never fixed at planning — a planning tier is at most an overridable hint"* (decision 0016) |
 | 31 | Quan hệ L1 → L2 | **Rõ — L1 chọn AI, L2 SUY RA CÁCH** | 0026 quy tắc 3: khác provider ⇒ bắt buộc cli/spawn, không ngoại lệ. Nên soul L1 không chọn cơ chế một cách độc lập — nó chọn provider + tier, còn cơ chế rơi ra từ quy tắc 1-4. Phát biểu đúng: **L1 chọn cái gì + ai; L2 suy ra bằng cách nào** |
@@ -96,6 +102,7 @@ gọi `fgos decision --id tsk-2t6` thật.)_
 | **D2** | Thêm **song-song-hoá / rút-ngắn-thời-gian** thành lý do hợp lệ **thứ tư** để dispatch một bước ra khỏi session thay vì làm inline | Ba lý do hiện tại nằm trong skill, không nằm trong 0026 — 0026 chỉ phát biểu về native-vs-cli, chưa bao giờ về dispatch-vs-inline (§3 hàng 23) ⇒ sửa skill không đụng luật khoá. `AGENTS.md` để Ship Faster ở ưu tiên #1 mà danh sách hiện tại loại trừ đúng lý do tốc độ | Vòng 4 (người xác nhận). `fgos decision` seq 7948 |
 | **D3** | Mở lớp **capacity ad-hoc nhận prompt động** do cha soạn lúc chạy, thay vì chỉ `<PROMPT_TEMPLATE>` cố định đăng ký trước | Cách chia việc cần cha soạn gói mệnh lệnh mỗi lần một nội dung. Chấp nhận đánh đổi: mất bảo đảm chống-drift mà fixed template sinh ra để giữ | Vòng 4 (người xác nhận). `fgos decision` seq 7949 |
 | **D4** | **Gác B2** (exec packet ghi file, id ephemeral) — không mở loại thứ ba giữa rootTask và capacity | 0026 chốt nhị phân; B2 là helper CÓ ghi file ⇒ phải mở rộng `capacity` cho ghi file hoặc supersede 0026, cả hai đụng luật khoá. Xét lại sau khi `tsk-3xd` xong: nếu con work-item thật đã mang được `action` prose thì B2 có thể thừa | Vòng 4 (người xác nhận). `fgos decision` seq 7950 |
+| **D5** | Dispatch tả bằng **hai tầng L1/L2**, và trong L1 dùng **hai trục vuông góc** thay vì ba loại rời rạc. Kèm: (a) **không** gọi L2 là "orchestrator"; (b) **L1 chọn cái gì + ai, L2 suy ra bằng cách nào** | Trục (i) *có mang vòng đời không* là nhị phân sẵn có của 0026; trục (ii) *gói đăng ký trước hay soạn lúc chạy* là phần khung refined thêm vào. Ba ô có nghĩa, ô thứ tư trống **có lý do** — việc mang vòng đời là việc riêng từng lần nên không thể có prompt cố định. (a): 0026 dòng 34-56 đã gán "orchestrator" cho vai trò quyết định kích hoạt rootTask nào, cao hơn transport. (b): quy tắc 3 ép cross-provider luôn cli/spawn ⇒ cơ chế không phải lựa chọn độc lập của soul | Vòng 5 (người xác nhận). `fgos decision` seq 8020 |
 
 ## 5. Q&A log
 
@@ -244,13 +251,46 @@ capacity id; gói soạn động buộc cổng phải chuyển thành gác per-d
 **Kết quả vòng 5:** viết delta distillery (deep-dive
 `parallel-decomposition-and-merge.md` + hàng porting-log mới
 `dispatch-tier-judged-at-dispatch`), trong đó chỗ hở tier là phát hiện mới của
-vòng này. Chưa mint D-ID cho khung L1/L2 — chờ người xác nhận điểm chỉnh (1).
+vòng này. Người dùng xác nhận điểm chỉnh (1) ⇒ mint **D5**; §6 regenerate lần
+hai (nhị phân phẳng → hai trục, diagram vẽ lại theo L1/L2); §7 thêm hạng mục
+`#task-tier-judged-at-dispatch`.
 
 ## 6. Thiết kế đã chốt {#design}
 
-_(Regenerate toàn phần ở vòng 4, thay bản phác thảo vòng 1. Bản cũ mô tả B1/B2
-như hai thứ cần xây mới — sai sự thật: B1 đã tồn tại dưới tên `capacity`.
-Chống lưng: D1-D4 ở §4, và §3 hàng 20-26.)_
+_(Regenerate toàn phần ở vòng 5 theo D5 — bản vòng 4 tả một nhị phân phẳng
+rootTask/capacity, nay thay bằng hai trục vuông góc. Chống lưng: D1-D5 ở §4,
+§3 hàng 20-32.)_
+
+### Khung: hai tầng, và trong tầng trên là hai trục
+
+Dispatch tả bằng **hai tầng**. **L1 — cái được dispatch**: gói việc và người
+nhận. **L2 — cơ chế kích hoạt**: native hay cli/spawn, và backend nào thật sự
+chạy. `docs/decisions/0026` đã tách sẵn đúng lát cắt này khi nói subTask và
+capacity *"KHÔNG gộp thành 1 khái niệm"* nhưng **cơ chế dispatch** thì *"áp
+dụng Y HỆT cho cả 2"*.
+
+Trong L1, đừng liệt kê ba loại rời rạc — tả bằng **hai trục vuông góc**:
+
+| | gói **đăng ký trước** | gói **soạn lúc chạy** |
+|---|---|---|
+| **không mang vòng đời** | **capacity** (`judge-discovery`, `submit-assist-classify`) | **gói tự do** (D3 mở) |
+| **có mang vòng đời** | *(trống — xem dưới)* | **work item** (rootTask con) |
+
+Ô thứ tư trống **có lý do, không phải thiếu sót**: việc mang vòng đời là việc
+riêng của từng lần chạy, nên gói mệnh lệnh của nó không thể là một template cố
+định đăng ký sẵn. Ba ô, không phải bốn — dấu hiệu khung này khép kín chứ không
+phải cắt tuỳ tiện.
+
+Hai tầng nối nhau theo đúng một chiều: **L1 chọn *cái gì* và *ai* (provider,
+tier); L2 suy ra *bằng cách nào*.** Soul không chọn cơ chế một cách độc lập —
+0026 quy tắc 3 ép cross-provider luôn cli/spawn, không ngoại lệ, nên khi L1 đã
+chọn provider thì cơ chế rơi ra từ quy tắc 1-4. Và **không gọi L2 là
+"orchestrator"**: 0026 đã gán từ đó cho vai trò cao hơn hẳn — bên quyết định
+kích hoạt rootTask nào (người mở session, `/fgOS:pick`, `fgos-runner`, herdr).
+Thuật ngữ đúng cho L2 là *cơ chế dispatch*; *executor* để dành cho backend đích
+mà `resolveExecutorConfig` trả về.
+
+### Đã có gì, thiếu gì
 
 Điểm khởi đầu đúng không phải "fgOS cần lớp dispatch thứ hai" — **fgOS đã có
 nó**, và nó tên là `capacity`. `docs/decisions/0026` chốt sẵn một nhị phân:
@@ -277,26 +317,46 @@ người dùng, trong một sản phẩm đặt Ship Faster ở ưu tiên số m
 0026 chỉ từng phát biểu *native hay cli*, chưa bao giờ phát biểu *dispatch hay
 làm tại chỗ*.
 
-Còn lớp thứ ba — helper mà **ghi file** — thì gác (D4). Nó không phải ý tồi, nó
-là thứ va thẳng vào nhị phân của 0026: hễ cần reserve, attest, commit và merge
-thì đã là vòng đời, mà vòng đời là thứ định nghĩa rootTask. Muốn có nó phải
-hoặc nới `capacity` cho phép ghi file, hoặc supersede phần "subTask ≡ rootTask"
-— cả hai đều là sửa luật khoá, quá đắt cho một nhu cầu chưa được chứng minh.
-Và có một lý do thực tế hơn để chờ: hôm nay ngay cả work item con thật cũng
-đang bị dispatch với phần mệnh lệnh rỗng (`tsk-3xd`). Vá xong lỗ đó rồi mới
-biết lớp thứ ba có còn lý do tồn tại hay không.
+Chỗ hở thứ ba lộ ra ở vòng 5, và nó khoá chặt với gói động: **hôm nay không ai
+phán tier lúc dispatch.** `src/runner/dispatch.mjs:1053-1054` suy model thẳng từ
+`work.tier`, mà `work.tier` (`light`/`standard`/`heavy`) là tier **ceremony** —
+đúng field `gate-bypass.mjs`'s `isTierCovered` đọc để quyết bao nhiêu nghi thức
+quy trình. Một field làm hai việc: bao nhiêu quy trình, VÀ model nào chạy. bee
+tách hẳn — `lane` là nghi thức, còn model tier được phán tại lúc dispatch bởi
+chính bên điều phối, *"never fixed at planning — a planning tier is at most an
+overridable hint"*. Vì sao điều này khoá với D3: một gói soạn động **không có
+`capacities.<id>` nào để giữ model/provider**, nên thiếu bước phán per-dispatch
+thì nó buộc rơi về một backend mặc định — mất đúng nửa lý do mở nó.
+
+Còn ô "có vòng đời nhưng bỏ phần hành chính" — helper mà **ghi file** — thì gác
+(D4). Nó không phải ý tồi; nó là thứ đòi ngồi ở hàng có-vòng-đời trong khi tước
+đi chính vòng đời: hễ cần reserve, attest, commit và merge thì đã là vòng đời,
+mà vòng đời là thứ định nghĩa rootTask. Muốn có phải nới `capacity` cho phép ghi
+file, hoặc supersede phần "subTask ≡ rootTask" — cả hai đều là sửa luật khoá,
+quá đắt cho một nhu cầu chưa được chứng minh. Và có lý do thực tế hơn để chờ:
+hôm nay ngay cả work item con thật cũng đang bị dispatch với phần mệnh lệnh rỗng
+(`tsk-3xd`). Vá xong lỗ đó rồi mới biết ô này có còn lý do tồn tại hay không.
 
 ```mermaid
 flowchart TD
-    P[rootTask - session sống, giữ quyền quyết định]
-    P -->|helper hẹp, không vòng đời| C[capacity]
-    P -->|việc mang vòng đời đầy đủ| W[rootTask con = work item]
-    C --> C1[đã có: capacity đăng ký trước<br/>config + prompt cố định]
-    C --> C2[D3 mở thêm: capacity ad-hoc<br/>prompt động do cha soạn]
-    C1 -->|digest| P
-    C2 -->|digest| P
-    W -->|commit trên nhánh riêng| M[merge con vào nhánh cha, rồi cha vào main]
-    P -.->|D4 gác: helper mà ghi file<br/>va vào nhị phân của 0026| X[loại thứ ba - chưa mở]
+    subgraph L1["L1 — cái được dispatch (soul chọn: gói nào, provider nào, tier nào)"]
+        A["capacity<br/>không vòng đời + đăng ký trước<br/>ĐÃ CÓ"]
+        C["gói tự do<br/>không vòng đời + soạn lúc chạy<br/>D3 MỞ"]
+        B["work item<br/>có vòng đời + soạn lúc chạy<br/>ĐÃ CÓ"]
+        X["ô có-vòng-đời + đăng ký trước<br/>TRỐNG CÓ LÝ DO"]
+    end
+    subgraph L2["L2 — cơ chế dispatch (suy ra từ quy tắc 1-4 của 0026)"]
+        N["native dispatch<br/>cùng provider, có cơ chế in-process"]
+        S["cli/spawn dispatch<br/>khác provider, hoặc config ép"]
+    end
+    A --> L2
+    C --> L2
+    B --> L2
+    N --> E["executor = backend thật sự chạy"]
+    S --> E
+    A -.->|digest| P["rootTask cha"]
+    C -.->|digest| P
+    B -.->|commit trên nhánh riêng| M["merge con vào nhánh cha, rồi cha vào main"]
 ```
 
 Bốn lý do hợp lệ để đẩy một bước ra khỏi session, sau D2: model rẻ hơn · khác
@@ -345,7 +405,28 @@ provider · cách ly tài nguyên · **chạy song song cho nhanh**.
 - **Verify nháp:** chưa xác định — phụ thuộc hình dạng gói tối thiểu chốt ở
   planning.
 
-### (Gác) Lớp thứ ba: helper mà ghi file {#task-exec-packet}
+### Phán tier tại lúc dispatch, tách khỏi tier ceremony {#task-tier-judged-at-dispatch}
+
+- **Mục tiêu:** để soul ở L1 chọn được model tier (và provider) **cho từng lần
+  dispatch**, thay vì suy mechanically từ `work.tier` — và tách nghĩa một field
+  đang bị hai hệ đọc theo hai nghĩa khác nhau.
+- **Bằng chứng chỗ hở:** `src/runner/dispatch.mjs:1053-1054`
+  (`modelForTier(cfg, work.tier)`), trong khi `src/state/gate-bypass.mjs`'s
+  `isTierCovered` đọc **cùng** `work.tier` như lượng nghi thức quy trình.
+  Upstream tách hẳn hai thứ (`bee:three-tier-model-rubric-with-pinned-agent-types`,
+  decision 0016) và còn ghi lại lựa chọn để đo độ khan hiếm tier đắt.
+- **Trích §6:** *"một gói soạn động không có `capacities.<id>` nào để giữ
+  model/provider, nên thiếu bước phán per-dispatch thì nó buộc rơi về một
+  backend mặc định — mất đúng nửa lý do mở nó."*
+- **D-ID áp dụng:** D5 (L1 chọn cái gì + ai).
+- **Quan hệ:** khoá chặt với `#task-adhoc-capacity` — gói động mà không có bước
+  phán này thì mất nửa giá trị. Đã ghi làm candidate upstream:
+  `dispatch-tier-judged-at-dispatch` trong `docs/distillery/porting-log.md`.
+- **Rủi ro phải xử trong plan:** `work.tier` đang được nhiều nơi đọc; tách nghĩa
+  là thay đổi lan rộng, không phải thêm field rồi thôi.
+- **Verify nháp:** chưa xác định — phụ thuộc cách tách chốt ở planning.
+
+### (Gác) Ô có-vòng-đời-nhưng-bỏ-hành-chính: helper mà ghi file {#task-exec-packet}
 
 - **Trạng thái:** **gác theo D4**, không phải bác.
 - **Lý do gác:** va vào nhị phân của `docs/decisions/0026` — hễ cần reserve /
