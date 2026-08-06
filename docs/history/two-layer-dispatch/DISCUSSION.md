@@ -1,12 +1,14 @@
 # DISCUSSION — Hai lớp dispatch cho fgOS
 
-Item: `tsk-2t6`. Liên quan: `tsk-3xd` (bug thân-mệnh-lệnh rỗng ở decompose),
-`tsk-535` (thiếu `description` nhìn từ góc mất dữ liệu), `tsk-66o` (đợt
+Item: `tsk-2t6`. Liên quan: `tsk-3xd` (bug thân-mệnh-lệnh rỗng ở decompose —
+**đã merge main, `status: delivered` tính đến 2026-08-06**), `tsk-535` (thiếu
+`description` nhìn từ góc mất dữ liệu — **đang làm, `doing/clarify`**,
+`mergeAfter: ["tsk-3xd"]` theo D1), `tsk-66o` (đợt
 computed-parallel-wave-schedule + worktree-dispatch-attestation, đã merge main).
 
 ## 1. Trạng thái hiện tại
 
-Vòng 5 (2026-08-06). Đã đọc kỹ upstream bee và scout xong phía fgOS. Hai câu
+Vòng 6 (2026-08-06). Đã đọc kỹ upstream bee và scout xong phía fgOS. Hai câu
 hỏi mở đầu của người dùng đã có câu trả lời bằng bằng chứng source (§3, hàng
 "rõ"). Phát hiện quan trọng nhất: **bee không có một mô hình cell duy nhất — bee
 tách sẵn HAI lớp dispatch**, và ranh giới bee vạch là *"dispatch nào GHI file thì
@@ -30,8 +32,15 @@ L1/L2, và trong L1 dùng **hai trục vuông góc** thay vì liệt kê loại 
 tier lúc dispatch, vì model suy thẳng từ `work.tier` — mà field đó nghĩa là
 lượng nghi thức quy trình (§3 hàng 30). Delta distillery đã viết xong.
 
-Còn nợ từ vòng 3: sửa câu sai trong description của `tsk-3xd` (đã giao cho phiên
-đang giữ claim item đó). Còn mở: xem §Outstanding questions.
+**Vòng 6 đóng cả bốn câu mở** ⇒ **D6/D6b** (sáu ô bắt buộc + hình dạng id gói),
+**D7** (ba item + `mergeAfter` chain), **D8** (không thêm `selfSufficient`),
+**D9** (trigger hai điều kiện cho D4), **D10** (cam kết lớp chọn provider/tier +
+chừa hai ô ngay). §3 hàng 12-15 đã cập nhật tại chỗ từ "chưa rõ" sang chốt.
+
+**Nợ vòng 3 khép lại theo cách khác:** `tsk-3xd` đã merge **kèm** câu sai trong
+description ("`tsk-535` hết lý do tồn tại và có thể superseded") — không sửa
+được nữa vì item đã đóng. Đính chính sống ở đây: §3 hàng 18 và §5 vòng 3. Ai đọc
+`tsk-3xd` sau này phải đọc kèm hàng 18.
 
 ## 2. Mục tiêu & đề bài
 
@@ -66,10 +75,10 @@ buộc phải giữ lại (id, footprint, verify, merge) khi việc con thực s
 | 10 | Con auto-decompose có đủ chi tiết để chạy không? | **Rõ — KHÔNG, và lỗ nằm ở BA tầng** | Tầng 1: prompt hỏi LLM không xin prose (`decompose.mjs:227`, schema chỉ `{title, verify, kind...}`). Tầng 2: `normalizeChild` (`decompose.mjs:231-255`) chỉ giữ `title, verify, kind, risk, refs, footprint, rawDeps` — model có trả prose cũng bị vứt. Tầng 3: `addWork` (`decompose.mjs:929-944`) không truyền `description`, trong khi `src/runner/prompt-templates/worker-prompt-{default,skill-pointer}.txt` nội suy `{description}`. Đã tách ra item riêng `tsk-3xd` |
 | 10b | Lỗ này có phải do chất lượng LLM judge không? | **Rõ — không, là lỗ hợp đồng** | `buildDecomposeChildrenVerdict` dùng CHUNG `normalizeChild` cho cả đường `fgos decompose --children` (tsk-27y D1, native-first, session sống tự lý luận cách chia) ⇒ kể cả session có đủ context tự viết cách chia cũng không có đường truyền thân mệnh lệnh xuống con |
 | 11 | Orchestrator tự pick con thì merge có tuần tự qua cha? | **Rõ — có** | `src/runner/worktree.mjs:30` leaf fork từ tip nhánh root (D3 "leaf fork-from-tip-of-parent"); `src/runner/merge.mjs:600` target là `main` cho root→main, `fgw/<root>` cho leaf→parent; `src/state/dep-graph.mjs:156` cạnh `parent-child` hướng parent→child ⇒ cha đợi con. Git log thực tế: `da2d382 Merge branch 'fgw/tsk-40t' into fgw/tsk-1d5` |
-| 12 | Làm B1 trước rồi đánh giá lại, hay mở luôn B2? | **Chưa rõ** | B1 không cần hạ tầng mới, chỉ cần skill dạy cách đóng gói. B2 là mở sổ ephemeral thứ hai trong state — quyết định kiến trúc thật |
-| 13 | Nếu làm B2: id ephemeral hình dạng nào | **Chưa rõ** | Ví dụ `tsk-66o#c1` — phạm vi cha, không vào `list/ready/triage`, không stage, không retro, chết khi cha `done`. Chưa quyết chỗ lưu (file riêng như `.bee/cells/` hay nhánh phụ trong events log) |
-| 14 | Có thêm field per-item `selfSufficient` không | **Chưa rõ** | Nghiêng về KHÔNG: thêm cờ tự-khai là mời agent tự phong "tôi đủ trọn vẹn", đúng thứ `gate-bypass.mjs` cố tình tránh bằng cách chỉ đọc dấu hiệu cơ học. Chưa qua vòng thứ hai |
-| 15 | Vá `tsk-3xd` xong thì B2 còn cần không | **Chưa rõ** | Nếu con auto-decompose mang được `action` prose + `read_first` thật, "task con hoàn chỉnh" (cách chia thứ nhất) có thể đã đủ, B2 thành thừa |
+| 12 | Làm B1 trước rồi đánh giá lại, hay mở luôn B2? | **Chốt — D3 + D4** | Câu hỏi tự tan sau vòng 4: B1 đã tồn tại (là `capacity`), nên việc thật là mở gói động (D3); còn B2 gác (D4). Không còn là lựa chọn thứ tự nữa |
+| 13 | Nếu làm B2: id ephemeral hình dạng nào | **Gác theo D4** — nhưng đừng lẫn với D6b | D6b đã định id dạng `<scope>#p<n>` cho **gói động**, và đó là id **tham chiếu** (khớp digest với gói khi chạy song song), KHÔNG phải id vòng đời. Id vòng-đời-rút-gọn mà B2 cần (claim/reserve/cap/merge, chỗ lưu sổ) vẫn chưa quyết và vẫn gác |
+| 14 | Có thêm field per-item `selfSufficient` không | **Chốt — D8 (không)** | Cờ tự-khai sẽ là chỗ duy nhất agent tự phong, mà người viết cờ chính là agent muốn qua cổng. Thay bằng tín hiệu dẫn xuất: prose mệnh lệnh + `verify` chạy được + `footprint` |
+| 15 | Vá `tsk-3xd` xong thì B2 còn cần không | **Chốt cách trả lời — D9** | Không trả lời bằng phán đoán mà bằng trigger hai điều kiện AND: (a) `tsk-3xd` merge — **đã thỏa 2026-08-06** (`status: delivered`); (b) ≥2 ca thật ghi bằng capture/friction. Thiếu (b) thì B2 giữ gác vô thời hạn |
 | 16 | Nguy cơ mất dữ liệu của `tsk-535` đã sống chưa? | **Rõ — chưa, còn tiềm ẩn** | `deriveTitle` chỉ được gọi ở đúng một chỗ: `bin/fgos.mjs:748` (đường `submit`). Không có migration/verb re-derive nào trong source; `docs/history/work-item-title-contract/CONTEXT.md` để nguyên *"Whether D4's re-derive ships as a one-shot script or a CLI verb"* ở mục Deferred to planning ⇒ chỉ nổ khi ai đó ship D4 |
 | 17 | `fgos add` có `--description` không? | **Rõ — không** | `bin/fgos.mjs` chỉ set `description` ở `:764` (nhánh `submit`); `--description` chỉ tồn tại cho `edit` và `tool register`. Xác nhận nửa thứ hai của `tsk-535` là thật |
 | 18 | `tsk-3xd` có làm `tsk-535` thành thừa không? | **Rõ — KHÔNG** (đính chính lời nói ở vòng 2) | `tsk-3xd` chỉ vá tiến-về-trước: không đụng 53 item đã hỏng, không đụng đường `fgos add`. Nói `tsk-535` "có thể superseded" là sai |
@@ -103,6 +112,12 @@ gọi `fgos decision --id tsk-2t6` thật.)_
 | **D3** | Mở lớp **capacity ad-hoc nhận prompt động** do cha soạn lúc chạy, thay vì chỉ `<PROMPT_TEMPLATE>` cố định đăng ký trước | Cách chia việc cần cha soạn gói mệnh lệnh mỗi lần một nội dung. Chấp nhận đánh đổi: mất bảo đảm chống-drift mà fixed template sinh ra để giữ | Vòng 4 (người xác nhận). `fgos decision` seq 7949 |
 | **D4** | **Gác B2** (exec packet ghi file, id ephemeral) — không mở loại thứ ba giữa rootTask và capacity | 0026 chốt nhị phân; B2 là helper CÓ ghi file ⇒ phải mở rộng `capacity` cho ghi file hoặc supersede 0026, cả hai đụng luật khoá. Xét lại sau khi `tsk-3xd` xong: nếu con work-item thật đã mang được `action` prose thì B2 có thể thừa | Vòng 4 (người xác nhận). `fgos decision` seq 7950 |
 | **D5** | Dispatch tả bằng **hai tầng L1/L2**, và trong L1 dùng **hai trục vuông góc** thay vì ba loại rời rạc. Kèm: (a) **không** gọi L2 là "orchestrator"; (b) **L1 chọn cái gì + ai, L2 suy ra bằng cách nào** | Trục (i) *có mang vòng đời không* là nhị phân sẵn có của 0026; trục (ii) *gói đăng ký trước hay soạn lúc chạy* là phần khung refined thêm vào. Ba ô có nghĩa, ô thứ tư trống **có lý do** — việc mang vòng đời là việc riêng từng lần nên không thể có prompt cố định. (a): 0026 dòng 34-56 đã gán "orchestrator" cho vai trò quyết định kích hoạt rootTask nào, cao hơn transport. (b): quy tắc 3 ép cross-provider luôn cli/spawn ⇒ cơ chế không phải lựa chọn độc lập của soul | Vòng 5 (người xác nhận). `fgos decision` seq 8020 |
+| **D6** | Gói động phải đủ **SÁU ô bắt buộc**: id gói · mục tiêu một câu · đầu vào phải đọc (đường dẫn cụ thể) · ranh giới (không được chạm/ghi gì) · hình dạng kết quả mong đợi · hợp đồng trả về. Thiếu ô nào ⇒ skill **từ chối dispatch và làm inline** | Fixed template bảo đảm *"cùng một câu hỏi mỗi lần"*; gói động không giữ được nên thay bằng **"cùng một KHUNG câu hỏi"**. Năm ô nội dung là lõi chung của ba nguồn độc lập (`worker-prompt-default.txt` của fgOS, worker prompt template của bee, `RUN_CONTRACT.json` của symphony). Ô id cần vì D2 mở dispatch song song — nhiều gói bay cùng lúc thì cha phải khớp được digest với gói. Fail-safe tái dùng Step D đã có | Vòng 6 (người xác nhận). `fgos decision` seq 8090 |
+| **D6b** | Id gói dạng **`<scope>#p<n>`** — scope là id item đang claim (hoặc token phiên khi không có), `n` tăng dần theo scope | Ký tự `#` làm id **không bao giờ** hợp lệ với `work.mjs:24` `ID_PATTERN` (`/^[a-z][a-z0-9]*(-[a-z0-9]+)*$/`) ⇒ một gói không thể bị nhầm thành work item, không `fgos add`/`pick` được — bảo đảm bằng **cấu trúc**, không bằng quy ước. **Đây là id THAM CHIẾU, không phải id VÒNG ĐỜI**: không claim, không reserve, không cap, không merge — D4 không bị mở lại | Vòng 6 (người xác nhận). `fgos decision` seq 8091 |
+| **D7** | Ba hạng mục sống tách **ba item riêng**, xâu bằng `mergeAfter`: `parallelism-reason` → `adhoc-capacity` → `tier-judged-at-dispatch` | Cả ba sửa `_shared/capacity-dispatch-fallback.md` ⇒ chồng footprint. Gộp thì một item mang ba loại proof không liên quan — đúng thứ `fgos-planning` gọi SPLIT RECOMMENDED. `mergeAfter` chỉ xếp thứ tự lúc merge nên vẫn clarify/plan song song. `parallelism-reason` đi đầu vì chỉ là prose, merge sớm thì hai cái sau rebase sạch | Vòng 6 (người xác nhận). `fgos decision` seq 8092 |
+| **D8** | **Không** thêm field `selfSufficient`; cần biết thì tính **dẫn xuất** (có prose mệnh lệnh + `verify` chạy được + `footprint` ⇒ dispatch-ready) | Mọi tín hiệu gate hiện nay đều cơ học và **không do agent tự khai** (`hasOpenItems`, `isTierCovered`, `HEAVY_KEYWORDS`). Một cờ tự khai là chỗ **duy nhất** agent tự phong, mà người viết cờ chính là agent muốn qua cổng. Dẫn xuất đúng thói quen derived-never-stored sẵn có | Vòng 6 (người xác nhận). `fgos decision` seq 8093 |
+| **D9** | D4 chỉ xét lại khi **đủ hai điều kiện AND**: (a) `tsk-3xd` đã merge — **ĐÃ THỎA 2026-08-06**; (b) ≥2 ca thật, ghi bằng capture/friction, cha cần con GHI file mà việc đó không đáng thành work item | "Xem lại sau" quá mơ hồ, dễ thành zombie. Thiếu (b) thì D4 giữ nguyên vô thời hạn — YAGNI có răng, đo bằng ca thật chứ không phải cảm giác | Vòng 6 (người xác nhận). `fgos decision` seq 8094 |
+| **D10** | Lớp chọn provider/smart-tier là việc **PHẢI làm** (hoãn, không bỏ). Ràng buộc áp dụng **NGAY**: gói động chừa sẵn hai ô `provider`/`tier` (rỗng = để hệ tự quyết), và `resolve` nhận override từ caller | `dispatch.mjs:1139-1141` đã đọc `capacity?.tier`/`capacity?.model` và truyền xuống `resolveExecutorCommand(cfg, {prompt, model, tier, ...})` — plumbing xuyên suốt đã có. Thiếu đúng một thứ: CLI `resolve` chỉ nhận `<capacityId>` + `--prompt`. Không chừa ô ngay thì mọi dispatch đóng đinh vào `capacity.model ?? modelForTier(cfg, work.tier)` = **luôn rơi về default backend**, và sửa sau phải đụng lại mọi call site. Chừa bây giờ gần như miễn phí | Vòng 6 (người xác nhận). `fgos decision` seq 8095 |
 
 ## 5. Q&A log
 
@@ -255,11 +270,56 @@ vòng này. Người dùng xác nhận điểm chỉnh (1) ⇒ mint **D5**; §6 
 hai (nhị phân phẳng → hai trục, diagram vẽ lại theo L1/L2); §7 thêm hạng mục
 `#task-tier-judged-at-dispatch`.
 
+### 2026-08-06 — vòng 6
+
+**Người dùng:** giải thích chi tiết từng câu hỏi mở để thảo luận và chốt luôn.
+Kèm một ràng buộc đứng riêng: *"vẫn muốn giữ một cơ hội tạo ra logic, glue,
+config giúp soul chọn được provider/smart-tier mà không bị luôn fallback về
+default-backend — không cần giải quyết liền nhưng chắc chắn phải giải quyết."*
+
+**Bốn câu, phân tích rồi chốt:**
+
+1. *Hình dạng gói tối thiểu* — cái mất khi bỏ fixed template là bảo đảm "cùng
+   một câu hỏi mỗi lần"; thay bằng "cùng một KHUNG câu hỏi". Năm ô nội dung là
+   lõi chung của ba nguồn độc lập. ⇒ **D6**.
+2. *Ba hạng mục chồng footprint* — gộp thì được một item mang ba loại proof
+   không liên quan. ⇒ **D7**, ba item + `mergeAfter` chain.
+3. *`selfSufficient`* — mọi tín hiệu gate hiện nay đều cơ học, không do agent
+   tự khai; thêm cờ tự khai là mở đúng chỗ `gate-bypass.mjs` cố tránh. ⇒ **D8**,
+   không thêm, dùng dẫn xuất.
+4. *Điều kiện xét lại D4* — "xem lại sau" dễ thành zombie. ⇒ **D9**, trigger hai
+   điều kiện AND, đo bằng ca thật.
+
+**Ràng buộc của người dùng ⇒ D10, và nó rẻ hơn tưởng.** Scout ra plumbing đã có
+gần hết: `dispatch.mjs:1139-1141` đọc `capacity?.tier`/`capacity?.model` rồi
+truyền xuống `resolveExecutorCommand(cfg, {prompt, model, tier, capacityId,
+fgosDir})`. Thiếu đúng một thứ: CLI `resolve` chỉ nhận `<capacityId>` +
+`--prompt`, không có đường cho caller truyền model/tier của riêng lần dispatch.
+Hệ quả nếu không chừa ô ngay: gói động đóng đinh vào
+`capacity.model ?? modelForTier(cfg, work.tier)` — **luôn rơi về default
+backend**, đúng thứ cần tránh, và sửa sau phải đụng lại mọi call site.
+
+**Người dùng bổ sung:** D6 cần thêm **ID để dễ tham chiếu** ⇒ **D6b**. Chốt
+dạng `<scope>#p<n>`; `#` làm id không bao giờ hợp lệ với `work.mjs:24`
+`ID_PATTERN` nên một gói **không thể** bị nhầm thành work item — bảo đảm bằng
+cấu trúc, không bằng quy ước. Ghi rõ trong D6b: đây là id **tham chiếu**, không
+phải id **vòng đời** ⇒ D4 không bị mở lại.
+
+**Cập nhật trạng thái từ người dùng, đã kiểm lại store:** `tsk-3xd` =
+`delivered` (đã merge main), `tsk-535` = `doing/clarify` với
+`mergeAfter: ["tsk-3xd"]`. D1 đã diễn ra đúng thứ tự, và điều kiện (a) của D9
+**đã thỏa**.
+
+**Kết quả vòng 6:** sáu `fgos decision --id tsk-2t6` (seq 8090-8095); §3 hàng
+12-15 cập nhật tại chỗ; §7 viết lại theo D7/D10; §Outstanding questions rút gọn
+còn phần thật sự chưa quyết.
+
 ## 6. Thiết kế đã chốt {#design}
 
-_(Regenerate toàn phần ở vòng 5 theo D5 — bản vòng 4 tả một nhị phân phẳng
-rootTask/capacity, nay thay bằng hai trục vuông góc. Chống lưng: D1-D5 ở §4,
-§3 hàng 20-32.)_
+_(Regenerate ở vòng 5 theo D5 — bản vòng 4 tả một nhị phân phẳng
+rootTask/capacity, nay thay bằng hai trục vuông góc. Vòng 6 bổ sung mục "Hình
+dạng gói động" bên dưới theo D6/D6b/D10; phần khung không đổi. Chống lưng:
+D1-D10 ở §4, §3 hàng 20-32.)_
 
 ### Khung: hai tầng, và trong tầng trên là hai trục
 
@@ -362,6 +422,34 @@ flowchart TD
 Bốn lý do hợp lệ để đẩy một bước ra khỏi session, sau D2: model rẻ hơn · khác
 provider · cách ly tài nguyên · **chạy song song cho nhanh**.
 
+### Hình dạng gói động (D6 / D6b / D10)
+
+Bỏ template cố định là bỏ một bảo đảm thật, nên phải có cái thay thế trung
+thực. Cái mất là *"cùng một câu hỏi mỗi lần"*; cái thay là **"cùng một khung câu
+hỏi"** — sáu ô bắt buộc, thiếu ô nào thì skill **không dispatch**, nó làm inline,
+tái dùng đúng đường lui vốn có chứ không phát minh cơ chế mới:
+
+| Ô | Nội dung | Vì sao bắt buộc |
+|---|---|---|
+| `id` | `<scope>#p<n>` | D2 mở dispatch song song ⇒ nhiều gói bay cùng lúc, cha phải khớp digest với gói. `#` khiến id không bao giờ hợp lệ với `work.mjs:24` `ID_PATTERN` ⇒ **không thể** nhầm thành work item |
+| `mục tiêu` | một câu | thứ duy nhất worker không suy ra được từ file |
+| `đầu vào` | đường dẫn cụ thể phải đọc | *"read these; nothing else will be provided"* — không phải "tìm quanh repo" |
+| `ranh giới` | không được chạm/ghi gì | tương đương `forbidden_paths` của symphony |
+| `kết quả mong đợi` | hình dạng digest | không có nó thì worker tự chọn định dạng, cha phải đoán |
+| `hợp đồng trả về` | một định dạng duy nhất | tương đương status-token của bee: *"exiting is not signaling"* |
+
+Cộng **hai ô tuỳ chọn để trống được**: `provider` và `tier`. Chúng chưa có logic
+chọn đứng sau — đó là việc của `#task-tier-judged-at-dispatch`, hoãn nhưng không
+bỏ. Chừa ô ngay bây giờ là ràng buộc thiết kế của D10: plumbing đã nhận
+`model`/`tier` xuyên suốt tới `resolveExecutorCommand`, chỉ CLI `resolve` là chưa
+có đường truyền; gói động ra đời mà thiếu hai ô đó sẽ đóng đinh mọi dispatch vào
+`capacity.model ?? modelForTier(cfg, work.tier)` — luôn rơi về default backend,
+và sửa sau phải đụng lại mọi call site đã viết.
+
+Một chỗ dễ lẫn, ghi rõ để khỏi tưởng D4 bị mở lại: `id` ở đây là id **tham
+chiếu**, không phải id **vòng đời**. Nó không claim, không reserve, không cap,
+không merge. Ô "có vòng đời nhưng bỏ hành chính" vẫn gác nguyên.
+
 ## 7. Danh mục hạng mục / task {#tasks}
 
 ### Lý do thứ tư: song song hoá {#task-parallelism-reason}
@@ -377,10 +465,12 @@ provider · cách ly tài nguyên · **chạy song song cho nhanh**.
 - **Trích §6:** *"bốn skill hiện liệt kê ba lý do hợp lệ... và không có 'để
   chạy song song cho nhanh', đúng lý do quan trọng nhất của người dùng, trong
   một sản phẩm đặt Ship Faster ở ưu tiên số một."*
-- **D-ID áp dụng:** D2.
-- **Quan hệ:** độc lập với `#task-adhoc-capacity` về file, nhưng vô nghĩa nếu
-  đứng một mình — có lý do hợp lệ mà không có cơ chế gói động thì vẫn chỉ
-  dispatch được các capacity đăng ký sẵn.
+- **D-ID áp dụng:** D2, D7.
+- **Quan hệ (D7):** **đi đầu chuỗi** — `mergeAfter` chain là
+  `parallelism-reason` → `adhoc-capacity` → `tier-judged-at-dispatch`. Đi đầu vì
+  chỉ là prose; merge sớm thì hai cái sau rebase sạch. Vô nghĩa nếu đứng một
+  mình: có lý do hợp lệ mà không có cơ chế gói động thì vẫn chỉ dispatch được
+  các capacity đăng ký sẵn.
 - **Không đụng:** `docs/decisions/0026` — sửa đây không phải sửa luật khoá
   (§3 hàng 23).
 - **Verify nháp:** `grep -rc "song song" .claude/skills/_shared/capacity-dispatch-fallback.md`
@@ -395,15 +485,17 @@ provider · cách ly tài nguyên · **chạy song song cho nhanh**.
   inline), không mở đường dispatch thứ hai.
 - **Trích §6:** *"cha soạn gói mệnh lệnh lúc chạy, mỗi lần một nội dung khác
   nhau, tuỳ việc nó vừa quyết định tách ra."*
-- **D-ID áp dụng:** D3.
-- **Rủi ro đã biết, phải xử trong plan:** mất bảo đảm chống-trôi mà fixed
-  template sinh ra để giữ (`_shared/capacity-dispatch-fallback.md` nói thẳng
-  lý do template cố định tồn tại). Cần một hình dạng gói tối thiểu bắt buộc để
-  thay thế, không phải free-text hoàn toàn.
-- **Quan hệ:** cùng chạm `_shared/capacity-dispatch-fallback.md` với
-  `#task-parallelism-reason` ⇒ footprint chồng, phải xếp tuần tự hoặc gộp.
-- **Verify nháp:** chưa xác định — phụ thuộc hình dạng gói tối thiểu chốt ở
-  planning.
+- **D-ID áp dụng:** D3, D6, D6b, D7, D10.
+- **Hình dạng gói đã chốt (D6/D6b):** sáu ô bắt buộc — `id` (`<scope>#p<n>`),
+  mục tiêu, đầu vào phải đọc, ranh giới, kết quả mong đợi, hợp đồng trả về —
+  cộng hai ô để-trống-được `provider`/`tier` (D10). Thiếu ô ⇒ không dispatch,
+  làm inline. Bảng đầy đủ ở §6 mục *Hình dạng gói động*.
+- **Rủi ro đã biết, ĐÃ có cách xử:** mất bảo đảm chống-trôi của fixed template;
+  thay bằng khung sáu ô ở trên, không phải free-text hoàn toàn.
+- **Quan hệ (D7):** **giữa chuỗi** — sau `#task-parallelism-reason`, trước
+  `#task-tier-judged-at-dispatch`.
+- **Verify nháp:** một test khẳng định gói thiếu bất kỳ ô nào trong sáu ô thì
+  đường dispatch từ chối và rơi về nhánh inline.
 
 ### Phán tier tại lúc dispatch, tách khỏi tier ceremony {#task-tier-judged-at-dispatch}
 
@@ -418,9 +510,12 @@ provider · cách ly tài nguyên · **chạy song song cho nhanh**.
 - **Trích §6:** *"một gói soạn động không có `capacities.<id>` nào để giữ
   model/provider, nên thiếu bước phán per-dispatch thì nó buộc rơi về một
   backend mặc định — mất đúng nửa lý do mở nó."*
-- **D-ID áp dụng:** D5 (L1 chọn cái gì + ai).
-- **Quan hệ:** khoá chặt với `#task-adhoc-capacity` — gói động mà không có bước
-  phán này thì mất nửa giá trị. Đã ghi làm candidate upstream:
+- **D-ID áp dụng:** D5, D7, **D10** (cam kết: hoãn nhưng KHÔNG bỏ, và không gác
+  chung với D4).
+- **Quan hệ (D7):** **cuối chuỗi**. Khoá chặt với `#task-adhoc-capacity` — gói
+  động không có `capacities.<id>` để giữ model/provider, nên thiếu bước phán này
+  thì nó rơi về default backend. Hai ô `provider`/`tier` của D10 là chỗ hạng mục
+  này sẽ ghi vào khi nó tới. Đã ghi làm candidate upstream:
   `dispatch-tier-judged-at-dispatch` trong `docs/distillery/porting-log.md`.
 - **Rủi ro phải xử trong plan:** `work.tier` đang được nhiều nơi đọc; tách nghĩa
   là thay đổi lan rộng, không phải thêm field rồi thôi.
@@ -433,9 +528,10 @@ provider · cách ly tài nguyên · **chạy song song cho nhanh**.
   attest / commit / merge thì đã là vòng đời, mà vòng đời định nghĩa rootTask.
   Mở nó phải nới `capacity` cho ghi file hoặc supersede phần "subTask ≡
   rootTask", cả hai là sửa luật khoá.
-- **Điều kiện xét lại:** sau khi `tsk-3xd` xong. Nếu work item con thật đã mang
-  được `action` prose, lớp này có thể không còn lý do tồn tại.
-- **D-ID áp dụng:** D4.
+- **Điều kiện xét lại (D9), hai điều kiện AND:** (a) `tsk-3xd` đã merge —
+  **ĐÃ THỎA 2026-08-06**; (b) ≥2 ca thật, ghi bằng capture/friction, cha cần con
+  GHI file mà việc đó không đáng thành work item. Thiếu (b) ⇒ gác vô thời hạn.
+- **D-ID áp dụng:** D4, D9.
 
 ### Delta distillery: trục hai-lớp-dispatch {#task-distillery-delta}
 
@@ -458,14 +554,15 @@ provider · cách ly tài nguyên · **chạy song song cho nhanh**.
 
 ## Outstanding questions
 
-- Hình dạng gói tối thiểu cho capacity ad-hoc (D3) là gì — cần bắt buộc những
-  trường nào để không rơi về free-text và mất luôn bảo đảm chống-trôi?
-- Có thêm field per-item `selfSufficient` không, hay giữ nguyên triết lý phán
-  trên artifact qua `hasOpenItems`? (§3 hàng 14 — chưa bàn tới)
-- Vá `tsk-3xd` xong thì lớp thứ ba còn cần không? (§3 hàng 15, điều kiện xét
-  lại của D4)
-- Hai hạng mục `#task-parallelism-reason` và `#task-adhoc-capacity` chồng
-  footprint ở `_shared/capacity-dispatch-fallback.md` — tách hai item xếp tuần
-  tự, hay gộp làm một?
+Bốn câu mở của vòng 5 đã đóng ở vòng 6 (D6/D6b, D7, D8, D9, D10). Còn lại:
+
+- Ba hạng mục ở §7 đã sẵn sàng handoff sang `fgos-exploring`/`fgos-planning`
+  chưa, hay chờ tách thành item thật trước (`fgos add --parent tsk-2t6` với
+  `--footprint` + `mergeAfter` theo D7)?
+- `<scope>` của id gói khi phiên **không** claim item nào — token phiên lấy từ
+  đâu để vẫn truy vết được? (D6b chỉ chốt hình dạng, chưa chốt nguồn token.)
+- Logic chọn provider/tier (D10 vế i) đặt ở đâu: trong skill soạn gói, hay một
+  helper dùng chung cạnh `dispatch.mjs decide`? 0026 §"Việc chưa quyết" đã đặt
+  đúng câu này cho lớp native-vs-cli và chưa ai trả lời.
 </content>
 </invoke>
