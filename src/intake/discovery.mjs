@@ -615,10 +615,14 @@ export function resolveDiscovery(dir, id, cfg, role, callerVerdict) {
   // yet known here, so it defaults to EFFORT_FLOOR inside computePriority;
   // `decompose`'s refined pass recomputes once effort/blast-radius are
   // known, per plan.md Phase B). Wrapped in its own try/catch so a
-  // write-door rejection (e.g. a legacy item shape editWork's validateWork
-  // rejects) never aborts the clarify/unclear resolution that follows —
-  // same file-level fail-safe discipline this module's header states for
-  // judgeDiscovery itself.
+  // write-door rejection never aborts the clarify/unclear resolution that
+  // follows — same file-level fail-safe discipline this module's header
+  // states for judgeDiscovery itself. tsk-1ne (`store.mjs`'s `editWork`)
+  // scoped validation to only the fields a patch actually touches, so a
+  // legacy-invalid field elsewhere on the item (e.g. an out-of-enum
+  // `risk`) no longer rejects this `{priority}`-only patch — this
+  // try/catch now guards a narrower, still-real surface (a transient
+  // store/lock error) rather than that specific legacy-shape rejection.
   try {
     const impact = computeImpact({
       blocks: blocksForItem(work, view),

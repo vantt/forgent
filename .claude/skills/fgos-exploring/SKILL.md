@@ -109,6 +109,15 @@ never moves it.
    rg -- "$keyword" src bin test docs dogfood-fixture --glob "*.{mjs,cjs,md}" | head -20
    ```
 
+   If the item touches a skill-prose path (`.claude/skills/**/SKILL.md`,
+   `.agents/skills/**/SKILL.md`, `plugins/fgOS/skills/**/SKILL.md`), read
+   `docs/how-to/write-verify-for-a-skill-prose-change.md` before proposing
+   or approving this item's `verify` field — it documents the correct
+   `npm test && POSITIVE && NEGATIVE` shape and the standing rebuttal for
+   when the second-pass judge (`judgeVerifySemanticCorrectness`) demands
+   proof of prose comprehension, a demand the doc says verify must never
+   be asked to satisfy.
+
    Also query `CLAUDE.md`'s impact-analysis capability gate — the same
    check `fgos-planning`/`fgos-validating`/`fgos-code-implement` already run
    (`fgos tool query --capability impact-analysis --status present`) —
