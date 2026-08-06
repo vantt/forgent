@@ -99,8 +99,9 @@ pass to keep the item moving.
 
 2. **Reality gate.** Score each of these PASS or FAIL, each with a concrete
    citation (a file path, a command's real output, an existing test):
-   - **Mode fit** — does the plan's chosen size (from `fgos-planning`'s flag
-     count) actually match what the item needs, not over- or under-built?
+   - **Mode fit** — does the plan's chosen size (from `fgos-routing`'s flag
+     count, tsk-5ay D1) actually match what the item needs, not over- or
+     under-built?
    - **Repo fit** — does every file, function, and pattern the plan leans on
      actually exist, at the path and shape the plan claims?
    - **Assumptions** — is every assumption the plan depends on either proven

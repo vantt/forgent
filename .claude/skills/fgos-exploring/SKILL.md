@@ -193,13 +193,22 @@ never moves it.
    one at creation time —
 
    ```bash
-   fgos add "<title>" --docs-ref "docs/history/<feature>/"
+   fgos add --title "<title>" --kind <kind> --risk <risk> --verify "<real, runnable command>" --docs-ref "docs/history/<feature>/" --dir "$root"
    ```
 
-   — this is the item's existing pointer field, not a new one; the doc
-   itself is what's git-versioned, the field only points at its directory.
-   An item created earlier without `docsRef` is unaffected — the field is
-   optional, and this skill does not need every item to already carry it.
+   (no positional argument — `fgos add`'s positional/`--id` is the item's
+   own id, not its title; omitting `--id` entirely auto-generates a
+   collision-free one from `--title`. tsk-59a: an earlier version of this
+   example passed the title positionally and omitted the other required
+   fields, which `fgos add` rejects outright — same class of bug found
+   and fixed in `fgos-planning`'s own split-step example, never grepped
+   for elsewhere until now.)
+
+   — `--docs-ref` is the item's existing pointer field, not a new one; the
+   doc itself is what's git-versioned, the field only points at its
+   directory. An item created earlier without `docsRef` is unaffected —
+   the field is optional, and this skill does not need every item to
+   already carry it.
 
 4. **Hand off.** Locking decisions here never decides the item's next edge.
    Once CONTEXT.md is written and approved, it is the session's own
