@@ -35,15 +35,17 @@ clear), không với tới native dispatch, và một bộ spawn thứ hai kém 
 `dispatch.mjs` đã có. Lý do biện hộ cuối cùng ("runner không có soul") cũng
 sụp: runner **đã** tự `spawnWorker` cho thi công (`loop.mjs:707`).
 
-**Trạng thái mint D-ID:** điểm *"verb = cửa ghi thuần, skill = bên sản xuất
-verdict"* đã giữ nguyên qua vòng 4b **và** vòng 5 (vòng 5 củng cố chứ không
-sửa) ⇒ **đủ điều kiện mint**. Nhưng `fgos decision --id <item-id>` cần một
-item, mà discussion này chưa gắn item nào (§3 hàng 15) — **đây giờ là thứ
-chặn, không còn là câu hỏi phụ**.
+**Đã có item: `tsk-5kn`** (tier `heavy`, risk `heavy`, `docsRef` trỏ vào thư
+mục này). **6 D-ID đã mint thật** qua `fgos decision --id tsk-5kn` — xem §4.
 
-**Còn mở:** research gọi giữa chừng exploring có phải chuyển stage không
-(hàng 27); research là work item riêng hay một stage dispatch được của item
-đã có (hàng 34).
+**Vòng 6** chốt A2+B1 (research là lời gọi trong-stage, và là một stage
+dispatch được của item đã có — không đẻ work item riêng) và thu hẹp trigger
+research giữa chừng exploring: không phải "có thông tin mới" mà **"người
+đưa vào một tên riêng agent chưa giải được"**, kèm chốt chặn cơ học (tên có
+trong repo không — không có thì tra, đừng nhớ lại).
+
+**Còn mở, đủ để viết §6 sau khi hai điểm diện-chờ ở §4 giữ thêm một vòng:**
+§6 (tổng hợp thiết kế + sơ đồ) và §7 (chia hạng mục) chưa viết.
 
 Đề bài ban đầu đặt ra là "ô L1-whether còn trống, cần lấp bằng rubric của
 bee". Vòng 1 lật tiền đề đó: **ô không trống — nó đã chứa một chữ "không",
@@ -111,7 +113,8 @@ doctrine tương đương nhiều tháng) nhưng không được import mù: bee
 | 31 | **Sai lầm gốc: phân loại nhầm.** "Item đã rõ chưa?" bị coi là *thuộc tính tính được tại lúc ghi*, trong khi nó là *một VIỆC*. Bốn triệu chứng (612 dòng máy móc · mất trí nhớ ⇒ không hội tụ · không với tới native · bộ spawn thứ hai) đều chảy từ đây | **Rõ** | §5 vòng 5 |
 | 32 | **Ca "không có soul khả dụng" KHÔNG tồn tại** — runner đã tự `spawnWorker` cho thi công (`loop.mjs:707`), và worker spawn là agent loop thật (0026 nesting rule) ⇒ judge-trong-verb hết lý do tồn tại | **Rõ** | §5 vòng 5 |
 | 33 | **Đối xứng có sẵn**: `executing` giao worker chạy skill thi công → `fgos return`; `discovery` giao worker chạy skill research → `fgos discover --verdict`. Cùng đường, khác skill | **Gần rõ (vòng 5)** | §5 vòng 5 |
-| 34 | Nếu research là *việc*, nó là **work item riêng** hay **một stage của item đã có, dispatch tới worker như `executing`**? (vòng 5 nghiêng vế sau, chưa xác nhận) | **Chưa rõ** | §5 vòng 5 |
+| 34 | Nếu research là *việc*, nó là **work item riêng** hay **một stage của item đã có, dispatch tới worker như `executing`**? | **Gần rõ (vòng 6)** — người dùng chọn **B1: stage dispatch được của item đã có**. Chờ 1 vòng nữa | §5 vòng 6 |
+| 35 | **Trigger research giữa chừng exploring**: KHÔNG phải "có thông tin mới" — phần lớn input của người *làm rõ hơn*. Trigger là **người đưa vào một tên riêng (library/công nghệ/concept) mà agent không giải được**. Chốt chặn cơ học đề xuất: tên đó có trong repo/docs không? Không có ⇒ tra, đừng nhớ lại (vì self-test "tôi có biết không" là chỗ LLM dở nhất — sẽ bịa) | **Chưa rõ — nêu vòng 6** | §5 vòng 6 |
 | 27 | Research gọi lại từ **giữa chừng** exploring: có phải một lần chuyển stage không, hay là lời gọi trong-stage? (đụng stage machine) | **Chưa rõ** | §5 vòng 4 |
 | 28 | Verb đứng đó là **đúng cho phần GHI** (luật one-door-write). Sai là ở chỗ gộp "verb phải GHI verdict" với "verb phải TẠO RA verdict" — `claude -p` là hệ quả bắt buộc của cú gộp, không phải lựa chọn | **Rõ** | §5 vòng 4b |
 | 29 | Judge-trong-verb có đúng **một** caller chính đáng: `loop.mjs:1031` (runner headless, không soul). Nhưng runner **chưa từng chạy** (0 `capacity.dispatch`) ⇒ đường fallback đang phục vụ đường chạy-hằng-ngày. Nguyên nhân cấu trúc của 15 vòng/0 clear | **Rõ** | `src/runner/loop.mjs:1031` vs `bin/fgos.mjs:1085`; §5 vòng 4b |
@@ -132,11 +135,17 @@ thật qua `fgos decision --id tsk-5kn`.
 | **D3** | **Tách stage**: `discovery` (máy một mình) tách khỏi `exploring` (máy + người) — Hình 1. Hôm nay `clarify` gộp cả hai, và pha máy-một-mình chỉ tồn tại dưới dạng prompt bên trong spawn | người dùng chọn vòng 4, giữ vòng 5 |
 | **D4** | **Research là SKILL tái dùng, stage-agnostic** — không phải một pha cố định. Stage và skill là hai trục vuông góc, cần cả hai. Skill nhận *(mô tả + những gì đã biết)*, trả *(lời giải cụ thể + verdict)*, không được biết mình bị gọi từ stage nào | nêu vòng 4, giữ vòng 5 |
 
-**Chưa đủ điều kiện mint (mới giữ 1 vòng, chờ vòng 6):**
-- Ca "không có soul khả dụng" không tồn tại ⇒ judge-trong-verb hết lý do
-  tồn tại (§3 hàng 32) — nêu vòng 5.
-- `RESEARCH.md` file riêng, tích luỹ theo vòng (§3 hàng 26) — người dùng
-  chọn (a) ở vòng 5.
+| **D5** | **Bản đúc kết research ở file riêng `docs/history/<feature>/RESEARCH.md`, TÍCH LUỸ theo vòng.** Không trộn vào `CONTEXT.md` — research là *phán đoán máy, có thể sai/lỗi thời*, `CONTEXT.md` là *cam kết đã chốt với người*. Phải bắt cả WebSearch/WebFetch, không chỉ `rg` | người dùng chọn vòng 5, giữ vòng 6 |
+| **D6** | **Ca "không có soul khả dụng" KHÔNG tồn tại** ⇒ judge-trong-verb hết lý do tồn tại. Runner đã `spawnWorker` cho thi công (`loop.mjs:707`), và worker spawn là agent loop thật (nesting rule `0026`) | nêu vòng 5, giữ vòng 6 |
+
+**Chưa đủ điều kiện mint (mới giữ 1 vòng, chờ vòng 7):**
+- **A2 + B1** — research gọi giữa chừng exploring là **lời gọi trong-stage**
+  (không quay ngược stage), và research là **một stage dispatch được của
+  item đã có**, không phải work item riêng (§3 hàng 27, 34). Người dùng
+  chọn vòng 6. Hai vế củng cố nhau: nếu research là *năng lực* thì nó không
+  cần vòng đời riêng — và tránh được ô mà D4 của `two-layer-dispatch` đã
+  gác ("không có phạm trù thứ ba giữa rootTask và capacity").
+- **Trigger research giữa chừng exploring** (§3 hàng 35) — nêu vòng 6.
 
 ## 5. Q&A log
 
@@ -726,6 +735,52 @@ cho worker:
 
 Cùng một con đường, khác skill. Discovery không đi đường đó **không vì lý do
 kỹ thuật** — mà vì bị xếp nhầm loại từ đầu.
+
+### 2026-08-06 — Vòng 6: A2+B1, và trigger research được thu hẹp
+
+**Người dùng chọn A2 + B1** (§4 diện chờ): research giữa chừng exploring là
+**lời gọi trong-stage**, không quay ngược stage; và research là **một stage
+dispatch được của item đã có**, không phải work item riêng.
+
+**Và thu hẹp trigger** — *"không phải bất kỳ thông tin mới nào của human
+cũng khiến unclear vì phần lớn thông tin cung cấp thêm sẽ làm rõ hơn chứ ít
+khi khiến unclear. nhưng vd chúng ta đang bàn về một vấn đề, tự nhiên human
+nhớ tới tên/concept về một công nghệ hoặc library có thể giải quyết bài
+toán, khi đó agent cần đi tìm hiểu về concept đó."*
+
+**Hai loại đầu vào từ người, ngược chiều nhau:**
+
+| Loại | Ví dụ | Tác dụng |
+|---|---|---|
+| **Trả lời** | "dùng OAuth" | **đóng** một unclear — không bao giờ kích hoạt research |
+| **Ném vào một cái tên** | "hay là dùng Temporal cho chỗ này?" | không trả lời gì; **mở rộng sân** — có thể kích hoạt research |
+
+⇒ Trigger: **người đưa vào một tên riêng (library/công nghệ/concept/pattern)
+mà agent không giải thích và áp dụng được một cách trung thực từ thứ nó
+đang có.** Không phải "có thông tin mới" — mà "có một cái tên chưa giải
+được". Và chỉ khi agent thật sự không nắm (người nói "dùng JSON" ⇒ không
+research).
+
+**Chỗ yếu của trigger, và chốt chặn đề xuất:** self-test *"tôi có biết cái
+này không"* là chỗ LLM dở nhất — nghe "Temporal" thì tự tin mô tả một thư
+viện nhớ mang máng, hoặc bịa hẳn. Trigger dựa vào tự đánh giá sẽ **bỏ sót
+đúng ca nguy hiểm nhất**. Đề xuất thay bằng kiểm cơ học:
+
+> Tên riêng người vừa nêu **có trong repo/docs không**? Không có ⇒ nó là
+> thứ **bên ngoài** ⇒ **tra, đừng nhớ lại**.
+
+Kiểm bằng một cú `rg`, không cần agent tự thú nhận dốt.
+
+**Giá trị thật của trigger này không phải "agent thông minh hơn" mà "agent
+thôi bịa".** Hôm nay không có bước research, agent nghe một tên lạ chỉ có
+hai đường: hỏi lại một câu ngu, hoặc chém. Trigger mở đường thứ ba.
+
+**Điểm hội tụ:** rubric chọn công cụ **đã có sẵn** trong prompt judge hiện
+tại — *"Câu hỏi riêng của repo này → `Bash rg`/Read/Grep/Glob"* vs *"Câu hỏi
+khái niệm/cơ chế/giải pháp kỹ thuật chung (VD một thuật toán, **một API bên
+ngoài**) → **WebSearch/WebFetch**"*. Vế thứ hai chính là ca này. Chỉ cần
+chuyển từ prompt-trong-spawn sang skill research. Và ăn khớp với D5: tra
+"Temporal" một lần, ghi vào `RESEARCH.md`, item khác đụng lại thì đã có.
 
 ## 6. Thiết kế đã chốt {#design}
 
