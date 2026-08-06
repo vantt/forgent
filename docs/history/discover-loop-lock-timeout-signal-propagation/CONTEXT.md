@@ -94,14 +94,20 @@ npm test \
   && grep -q 'stop-reason: lock-timeout' .agents/skills/fgos-exploring/SKILL.md \
   && grep -q 'stop-reason: lock-timeout' .claude/skills/fgos-planning/SKILL.md \
   && grep -q 'stop-reason: lock-timeout' .agents/skills/fgos-planning/SKILL.md \
+  && grep -q 'stop-reason: lock-timeout' .claude/skills/fgos-validating/SKILL.md \
+  && grep -q 'stop-reason: lock-timeout' .agents/skills/fgos-validating/SKILL.md \
   && grep -q 'stop-reason: lock-timeout' plugins/fgOS/skills/discover-next/SKILL.md \
   && grep -q 'stop-reason: lock-timeout' plugins/fgOS/skills/discover-loop/SKILL.md \
   && ! grep -q 'Known gap, not fixed by this item' plugins/fgOS/skills/discover-next/SKILL.md
 ```
 
-POSITIVE: D4's locked token present in all eight touched files (all eight
+POSITIVE: D4's locked token present in all ten touched files (all ten
 confirmed to exist on this branch). NEGATIVE: the superseded paragraph at
 `plugins/fgOS/skills/discover-next/SKILL.md:99` is gone.
+
+File count corrected from eight to ten during `fgos-validating`'s reality
+gate: `fgos-validating` itself fires `fgos decompose` (its own Gate
+section) and so is in scope. See `plan.md`'s verb-inventory table.
 
 What this deliberately does **not** prove: that an LLM reading the updated
 prose actually relays the token across skill-invocation hops at runtime.
