@@ -186,6 +186,18 @@ assertion — the behavioral proof was left to the later consumer-migration
 and fixture-domain child tasks. Landed clean: `awaiting-approval`, first
 attempt, ahead by 1 commit, no friction recorded.
 
+## The backfill migration (D4) needed two retries before it verified clean
+
+`tsk-38t-3` wrote `scripts/backfill-status-category.mjs`, the real migration
+script for the ~1500+ pre-existing `work.move` events described above under
+"Frozen at write time, never derived on read." Its own capture recorded two
+`verify-miss` frictions in a row (`goal-check failed on branch
+"fgw/tsk-38t-3" (exit 1)`) before it finally verified clean — consistent
+with D4's own bar being real replay-from-zero correctness (`test -f
+scripts/backfill-status-category.mjs && node --test
+test/scripts/backfill-status-category.test.mjs`), not a superficial
+presence check. Landed `awaiting-approval`, ahead by 1 commit.
+
 ---
 
 **Source:** `docs/history/phase-2-status-category-schema/CONTEXT.md` and
