@@ -556,6 +556,47 @@ test('list --id on an unknown id is rejected as validation (not-found), exit 4 (
   assert.match(result.stderr, /list: work "no-such-item" not found/);
 });
 
+test('list --id scopes every id-keyed view section to just the requested item, excluding another item\'s data (tsk-2u9 D1/D2)', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'item-a', { title: 'Item A' });
+  addOk(cwd, 'item-b', { title: 'Item B' });
+
+  // Populate decisions (flat array, id-scoped) + decisionsById (dict) for BOTH items.
+  assert.equal(run(cwd, ['decision', '--id', 'item-a', '--text', 'decision about A', '--rationale', 'because A']).status, 0);
+  assert.equal(run(cwd, ['decision', '--id', 'item-b', '--text', 'decision about B', '--rationale', 'because B']).status, 0);
+  // A decision with no --id at all (a global decision, not tied to one item) --
+  // must never surface under either item's scoped result.
+  assert.equal(run(cwd, ['decision', '--text', 'global decision, no item', '--rationale', 'because global']).status, 0);
+
+  // Populate gates for BOTH items (ask/answer round trip).
+  assert.equal(run(cwd, ['ask', 'item-a', '--text', 'question about A']).status, 0);
+  assert.equal(run(cwd, ['answer', 'item-a', '--text', 'answer about A']).status, 0);
+  assert.equal(run(cwd, ['ask', 'item-b', '--text', 'question about B']).status, 0);
+  assert.equal(run(cwd, ['answer', 'item-b', '--text', 'answer about B']).status, 0);
+
+  const data = envelopeData(run(cwd, ['list', '--id', 'item-a', '--json']).stdout);
+
+  assert.deepEqual(Object.keys(data.work), ['item-a']);
+
+  assert.ok(Array.isArray(data.decisions), 'decisions stays an array (flat-log shape unchanged)');
+  assert.ok(data.decisions.some((d) => d.text === 'decision about A'), 'item-a\'s own decision must be present');
+  assert.ok(!data.decisions.some((d) => d.text === 'decision about B'), 'item-b\'s decision must be excluded');
+  assert.ok(!data.decisions.some((d) => d.text === 'global decision, no item'), 'a decision with no id must be excluded');
+
+  assert.deepEqual(Object.keys(data.decisionsById ?? {}), ['item-a']);
+  assert.deepEqual(Object.keys(data.gates ?? {}), ['item-a']);
+  assert.equal(data.gates['item-a'].ask, 'question about A');
+});
+
+test('list --id leaves the tools registry untouched -- it is keyed by tool name, not by item id (tsk-2u9 D2)', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'item-a', { title: 'Item A' });
+  assert.equal(run(cwd, ['tool', 'register', '--name', 'gitnexus', '--kind', 'mcp', '--capability', 'impact-analysis', '--command', 'mcp:gitnexus', '--scan', '.gitnexus']).status, 0);
+
+  const data = envelopeData(run(cwd, ['list', '--id', 'item-a', '--json']).stdout);
+  assert.deepEqual(Object.keys(data.tools ?? {}), ['gitnexus']);
+});
+
 test('list default keeps an awaiting-human item visible (D2: excludes only the two terminal statuses done/wontfix, per wontfix-terminal-status-filter-consistency D2 -- never a broader ad-hoc closed/parked set like awaiting-human)', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'parked-item', { title: 'Parked Item' });
