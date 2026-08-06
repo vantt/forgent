@@ -514,7 +514,13 @@ export function findUncoveredLockedDecisions(contextText, children, repoRoot) {
   const covered = new Set();
   for (const child of Array.isArray(children) ? children : []) {
     for (const f of Array.isArray(child?.footprint) ? child.footprint : []) {
-      covered.add(f);
+      // tsk-297 fix: a non-string footprint entry used to reach
+      // isCoveredByDirectory's f.replace(...) below and throw -- silently,
+      // since that call now sits inside resolveDecompose's own catch{}
+      // (tsk-gio). Filtering here keeps `covered` a plain Set<string>,
+      // which both isCoveredByDirectory and isDirectoryContainingCoverage
+      // below assume without needing their own per-entry type guard.
+      if (typeof f === 'string') covered.add(f);
     }
   }
 
@@ -533,7 +539,28 @@ export function findUncoveredLockedDecisions(contextText, children, repoRoot) {
     return false;
   };
 
-  return realPaths.filter((p) => !covered.has(p) && !isCoveredByDirectory(p));
+  // tsk-297 fix: the MIRROR case tsk-gio's directory fix left open --
+  // fs.existsSync (above) is true for directories too, so a locked
+  // decision naming an enclosing directory (e.g. "src/intake/") is a
+  // real candidate path. A child declaring a FILE inside that directory
+  // (e.g. "src/intake/decompose.mjs") clearly does touch it, but exact-
+  // match/isCoveredByDirectory above only ever check the decision path
+  // as a potential PREFIX of a footprint entry, never the reverse. Found
+  // by independent review: 20+ real CONTEXT.md decisions name a
+  // directory this way. Same purely-mechanical "/" boundary, just the
+  // other direction.
+  const isDirectoryContainingCoverage = (p) => {
+    const dir = p.replace(/\/+$/, '');
+    if (!dir) return false;
+    for (const f of covered) {
+      if (f.startsWith(`${dir}/`)) return true;
+    }
+    return false;
+  };
+
+  return realPaths.filter(
+    (p) => !covered.has(p) && !isCoveredByDirectory(p) && !isDirectoryContainingCoverage(p),
+  );
 }
 
 /**
