@@ -17,10 +17,23 @@ layout-and-action-queues/CONTEXT.md`) — `fgos-routing`'s own gate treats
 "story-sized behavior" as an independent trigger for **standard**, same as
 2-3 flags.
 
-Impact-analysis posture (`fgos tool query --capability impact-analysis
---status present`, checked during clarify): **full** — GitNexus present.
-Each child below should run `impact()` on the symbols it edits before
-editing, per this repo's own `AGENTS.md` GitNexus gate.
+Impact-analysis posture: **degraded**, corrected during `fgos-validating`
+(the `full` recorded during clarify only checked `fgos tool query
+--capability impact-analysis --status present`, which reports
+`status: "present"` with no freshness signal). Running `node
+.gitnexus/run.cjs analyze` from the main checkout during validating failed
+with a real error: `COPY failed for File: Runtime exception: FTS index
+'file_fts' is inconsistent: document for node offset 1069 is missing
+during delete. Drop and recreate the FTS index.` — the index is not
+merely stale, it is currently broken and cannot self-heal via a normal
+`analyze` run. None of the 4 children's own proof surfaces (grep + `cargo
+test`, all self-contained) depend on GitNexus output, so this does not
+block any feasibility-matrix row. It DOES mean: when a child later reaches
+`executing` and the per-symbol `impact()` MUST-run gate applies
+(`AGENTS.md`), treat its result as weak evidence per the degraded branch of
+`CLAUDE.md`'s capability gate, and cross-check with a plain `rg`/`grep` for
+the symbol's real call sites before trusting a suspiciously clean/empty
+`impact()` result.
 
 ## Approach
 
