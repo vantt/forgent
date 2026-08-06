@@ -201,6 +201,8 @@ node "$root/bin/fgos.mjs" decompose "<item-id>" --verdict pass-through --reason 
 # shape judgeDecompose itself produces ({title, verify, kind?, risk?, refs?,
 # footprint?, deps?}):
 node "$root/bin/fgos.mjs" decompose "<item-id>" --verdict decompose --reason "<why plan.md called for a split>" --children '<JSON array from plan.md>' --dir "$root"
+# plan.md's step 4's listed child pieces were already created as real work items during fgos-planning's own step 4 (`fgos add --parent --footprint`), not a fresh `--children` blob still to be materialized -- cite them by id, never `--verdict decompose --children` here: that write is unconditional (decompose.mjs's addWork loop, ~929-945) and would create duplicate positional-id children while orphaning the real ones:
+node "$root/bin/fgos.mjs" decompose "<item-id>" --verdict pass-through --reason "<cite the existing child ids plan.md's step 4 already created via fgos add --parent>" --dir "$root"
 ```
 
 The verdict reached at the Gate above does not, by itself, move the item
