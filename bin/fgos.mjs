@@ -896,6 +896,13 @@ async function runVerb(verb, flags, positional, dir) {
         risk: flags.risk,
         refs: parseListFlag(flags.refs),
         verify: flags.verify,
+        // tsk-535 D1: REQUIRED at this CLI handler layer only -- never
+        // added to work.mjs's validateWorkShape, since two other
+        // legitimate addWork callers (loop.mjs's discovered-work, and
+        // this same file's promote-to-component fresh-root creation)
+        // deliberately omit description by design and would break under a
+        // schema-wide requirement (plan.md's own rejected-alternative).
+        description: requireField(flags.description, 'add requires --description (the item\'s own full-text intake description)'),
         learn: typeof flags.learn === 'string' ? flags.learn : undefined,
         // Per D6: --tier is optional; a bare/empty flag is refused the same
         // as any other malformed value (requireField's rule), while simply

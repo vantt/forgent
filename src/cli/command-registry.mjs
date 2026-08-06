@@ -63,7 +63,7 @@ export const COMMAND_REGISTRY = [
   {
     name: 'add',
     invoke: 'fgos add',
-    description: 'Add a work item directly with explicit fields (title/kind/risk/verify required). Omit id to auto-generate a collision-free "tsk-<hash>" id from title, same generator submit uses.',
+    description: 'Add a work item directly with explicit fields (title/kind/risk/verify/description required). Omit id to auto-generate a collision-free "tsk-<hash>" id from title, same generator submit uses.',
     parameters: {
       type: 'object',
       properties: {
@@ -72,6 +72,14 @@ export const COMMAND_REGISTRY = [
         kind: { type: 'string', description: 'Work item kind.' },
         risk: { type: 'string', description: 'Work item risk level.' },
         verify: { type: 'string', description: 'Verification command or plan for this item.' },
+        // tsk-535 D1: REQUIRED, unlike `submit` (which always derives one
+        // from the submitted text) -- `add` was the one write path that
+        // could land an item with no description at all (measured: 20 of
+        // 112 currently-broken items). No default fallback (e.g. silently
+        // reusing --title): a required flag forces the caller to supply
+        // real content instead of perpetuating the same content-free
+        // duplication D2 explicitly avoids for decompose children.
+        description: { type: 'string', description: 'Full-text intake description for this item (required).' },
         deps: { type: 'string', description: 'Comma-separated list of dependency ids.', multiValueFormat: 'csv' },
         refs: { type: 'string', description: 'Comma-separated list of reference ids/links.', multiValueFormat: 'csv' },
         learn: { type: 'string', description: 'Optional learning note.' },
@@ -87,11 +95,11 @@ export const COMMAND_REGISTRY = [
         urgent: { type: 'string', description: 'Optional urgency level: one of low/medium/high/critical, human-entered. Omit to leave unset — the priority formula reads an absent value as medium, never stored as a default here.' },
       },
       positional: ['id'],
-      required: ['title', 'kind', 'risk', 'verify'],
+      required: ['title', 'kind', 'risk', 'verify', 'description'],
     },
     examples: [
-      'fgos add build-cli --title "Build CLI" --kind feature --risk medium --verify "npm test"',
-      'fgos add --title "Build CLI" --kind feature --risk medium --verify "npm test"',
+      'fgos add build-cli --title "Build CLI" --kind feature --risk medium --verify "npm test" --description "Build the CLI entry point per the locked shape"',
+      'fgos add --title "Build CLI" --kind feature --risk medium --verify "npm test" --description "Build the CLI entry point per the locked shape"',
     ],
     touchesState: true,
     requiresExistingStore: true,

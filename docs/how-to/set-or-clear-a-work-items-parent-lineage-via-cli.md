@@ -21,7 +21,7 @@ it directly.
 ## Setting it
 
 ```
-fgos add --title "..." --parent <id> ...
+fgos add --title "..." --description "..." --parent <id> ...
 ```
 
 or on an existing item:
