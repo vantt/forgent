@@ -271,6 +271,47 @@ zero-dependency child task rather than being folded into the schema or
 consumer-migration work. Landed `awaiting-approval`, first attempt, ahead
 by 1 commit, no friction recorded.
 
+## The `herdr-plugin` gap the audit flagged, resolved by pinning the current behavior rather than migrating it
+
+`tsk-4ot`, a later independent bug item (not one of `tsk-38t`'s own eight
+children, but a direct follow-on from the consumer-migration backlog item
+`docs/decisions/0027`'s audit named), decided what to do about
+`herdr-plugin/src/fgos.rs` — the Rust process, outside the Node runtime
+entirely, that filters `fgos list --all --json` on literal
+`status == "doing" || status == "awaiting-approval"` to build its
+in-process pane. The tempting "fix" would be to swap that literal match for
+`statusCategory` to match the rest of the migrated consumers — but this
+item's own scout evidence proves that would be a regression, not a fix:
+`doing`, `blocked`, and `awaiting-human` all collapse into the same
+`in-progress` category (confirmed live: `tsk-64s` at `doing`, `tsk-42i` at
+`blocked`, `tsk-5ui` at `awaiting-human` all report `statusCategory:
+in-progress`), so a category-based filter would wrongly start showing
+blocked and awaiting-human items as "in process."
+
+> "D3: ... no Rust-only code change can remove the literal-status
+> dependency without regressing pane membership... Resolution: keep the
+> literal `status == "doing" || status == "awaiting-approval"` match — it
+> is provably correct today, since `coding` is the only domain and decision
+> record 0027 D1 gives domains the *right*, never the *obligation*, to
+> relabel their six front-segment statuses. Add a regression test in
+> `fgos.rs` that pins this exact literal-match behavior, so the crate's own
+> test suite fails loudly if a future change swaps to a bare
+> `statusCategory` filter (the naive, incorrect 'fix')."
+
+The lesson generalizes beyond this one crate: `statusCategory` is a
+lossy compression by design (see "Frozen at write time" above) — collapsing
+three distinct front-segment statuses into one category was an accepted,
+deliberate trade-off for the domain-agnostic mechanisms that only need the
+coarse bucket, not a promise that category alone is always sufficient. A
+consumer that genuinely needs to distinguish `doing` from `blocked` from
+`awaiting-human` — this pane, and `fgos-coding-driving`'s own stop-condition
+check per the deferred `parkReasonForStatus` proposal — has to keep reading
+literal `status`, category migration or not. Landed `awaiting-approval`,
+first attempt, ahead by 2 commits — settlement history shows a real risk
+classification back-and-forth (heavy at intake vs. tiny after scoping to a
+single Rust test file), resolved by a human confirming the narrower tiny
+scope across two separate rounds.
+
 ---
 
 **Source:** `docs/history/phase-2-status-category-schema/CONTEXT.md` and
