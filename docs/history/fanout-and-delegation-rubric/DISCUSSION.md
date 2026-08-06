@@ -49,6 +49,13 @@ lại chờ `#task-skill`.
 rồi claim item và chạy `fgos-exploring` → `fgos-planning` ngay trong session
 có đầy đủ ngữ cảnh này.
 
+**⚠ Ranh giới phạm vi — đọc trước khi tưởng discussion này giải hết fan-out.**
+Có **hai** bài toán fan-out (§3 hàng 36). `tsk-5kn` chỉ giải **fan-out A**
+(gather — trong một item, research bắn nhánh song song). **Fan-out B**
+(execution — sau decompose bung N children chạy đồng thời), tức chính câu
+hỏi mở màn session này, **nằm ở item riêng `tsk-umc`**, không phụ thuộc
+`tsk-5kn`, làm song song được.
+
 Đề bài ban đầu đặt ra là "ô L1-whether còn trống, cần lấp bằng rubric của
 bee". Vòng 1 lật tiền đề đó: **ô không trống — nó đã chứa một chữ "không",
 được audit có chủ đích vào 4 stage skill qua `tsk-29i`**
@@ -116,6 +123,11 @@ doctrine tương đương nhiều tháng) nhưng không được import mù: bee
 | 32 | **Ca "không có soul khả dụng" KHÔNG tồn tại** — runner đã tự `spawnWorker` cho thi công (`loop.mjs:707`), và worker spawn là agent loop thật (0026 nesting rule) ⇒ judge-trong-verb hết lý do tồn tại | **Rõ** | §5 vòng 5 |
 | 33 | **Đối xứng có sẵn**: `executing` giao worker chạy skill thi công → `fgos return`; `discovery` giao worker chạy skill research → `fgos discover --verdict`. Cùng đường, khác skill | **Gần rõ (vòng 5)** | §5 vòng 5 |
 | 34 | Nếu research là *việc*, nó là **work item riêng** hay **một stage của item đã có, dispatch tới worker như `executing`**? | **Gần rõ (vòng 6)** — người dùng chọn **B1: stage dispatch được của item đã có**. Chờ 1 vòng nữa | §5 vòng 6 |
+| 36 | **CÓ HAI BÀI TOÁN FAN-OUT, KHÁC HẲN NHAU — `tsk-5kn` chỉ giải một.** (A) *gather fan-out*: trong MỘT item, research chẻ câu hỏi thành nhánh độc lập, bắn subagent song song, gom digest — I/O worker, không vòng đời ⇒ giải ở `#task-skill`. (B) *execution fan-out*: sau decompose ra N children, dispatch N worker đồng thời, mỗi worker claim + thi công một child — execution worker, vòng đời đầy đủ, worktree/claim/verify/merge ⇒ **`tsk-5kn` KHÔNG giải; cần item riêng** | **Rõ — nêu vòng 7** | §5 vòng 7 |
+| 37 | Fan-out B **không bị gì chặn, chỉ là chưa ai xây**: children của decompose là rootTask thật ⇒ dispatch N cái = kích hoạt N rootTask đúng định nghĩa `0026`; demo `tsk-1sj`→`tsk-30z`/`tsk-50ic` đã chạy thật (~184s overlap) nhưng bằng tay; `computeSchedule`/`selectWave` đã có nhưng chỉ `fgos-runner` tiêu thụ mà runner chưa từng chạy; mọi loop skill hiện tại đều tuần tự | **Rõ** | §5 vòng 7 |
+| 36b | Fan-out B đã có item riêng: **`tsk-umc`** (tier `heavy`, risk `heavy`, kind `feature`, `docsRef` trỏ về thư mục này). Không phụ thuộc `tsk-5kn`, làm song song được | **Rõ** | submit vòng 7 |
+| 38 | Câu thiết kế thật của fan-out B, chưa trả lời: **ai claim?** bee bắt orchestrator claim TRƯỚC rồi mới spawn (*"workers never self-select"*); demo fgOS để mỗi child session tự claim với id do cha chỉ định. Khác nhau ở chỗ đặt lock và cách xử lý khi worker chết giữa chừng | **Chưa rõ** | §5 vòng 7 |
+| 39 | **Dung nạp 3 lớp dispatch của bee vào lưới L1 của fgOS: cú merge nhỏ hơn nó trông.** bee's *execution worker* ≡ fgOS's *work item* (D4 định nghĩa vòng đời chính là "cần reserve, attest, commit và merge" = đúng thẩm quyền — cùng trục, khác tên). bee's *I/O worker* ↔ fgOS chẻ tiếp thành *capacity* / *gói tự do* (trục "đăng ký trước", bee không có, và fgOS có lý do thật: D6 bảo đảm "cùng một câu hỏi mỗi lần"). Thứ fgOS **thật sự thiếu** là ô **review-class** — dispatch chỉ-đọc soi lại đầu ra của chính mình (`judgeVerifySemanticCorrectness` đúng loại này nhưng chưa có tên). **Ô đó không liên quan gì tới fan-out** | **Rõ — nêu vòng 7** | §5 vòng 7 |
 | 35 | **Trigger research giữa chừng exploring**: KHÔNG phải "có thông tin mới" — phần lớn input của người *làm rõ hơn*. Trigger là **người đưa vào một tên riêng (library/công nghệ/concept) mà agent không giải được**. Chốt chặn cơ học đề xuất: tên đó có trong repo/docs không? Không có ⇒ tra, đừng nhớ lại (vì self-test "tôi có biết không" là chỗ LLM dở nhất — sẽ bịa) | **Chưa rõ — nêu vòng 6** | §5 vòng 6 |
 | 27 | Research gọi lại từ **giữa chừng** exploring: có phải một lần chuyển stage không, hay là lời gọi trong-stage? (đụng stage machine) | **Chưa rõ** | §5 vòng 4 |
 | 28 | Verb đứng đó là **đúng cho phần GHI** (luật one-door-write). Sai là ở chỗ gộp "verb phải GHI verdict" với "verb phải TẠO RA verdict" — `claude -p` là hệ quả bắt buộc của cú gộp, không phải lựa chọn | **Rõ** | §5 vòng 4b |
@@ -777,6 +789,43 @@ khái niệm/cơ chế/giải pháp kỹ thuật chung (VD một thuật toán, 
 ngoài**) → **WebSearch/WebFetch**"*. Vế thứ hai chính là ca này. Chỉ cần
 chuyển từ prompt-trong-spawn sang skill research. Và ăn khớp với D5: tra
 "Temporal" một lần, ghi vào `RESEARCH.md`, item khác đụng lại thì đã có.
+
+### 2026-08-07 — Vòng 7: ranh giới phạm vi — `tsk-5kn` chỉ giải một nửa bài toán fan-out
+
+**Người dùng hỏi thẳng:** *"rốt cuộc thì bài toán fanout sẽ được giải chổ
+nào?"* — cùng lúc muốn dung nạp các lớp dispatch của bee vào khái niệm
+dispatch type của fgOS.
+
+**Trả lời thẳng: bài toán fan-out ban đầu CHƯA được `tsk-5kn` giải.**
+
+| | **Fan-out A — gather** | **Fan-out B — execution** |
+|---|---|---|
+| Là gì | Trong **một** item, research chẻ câu hỏi thành nhánh độc lập, bắn subagent song song, gom digest | Sau decompose ra **N children**, dispatch N worker chạy đồng thời, mỗi worker claim + thi công một child |
+| Lớp dispatch (bee) | **I/O worker** — không vòng đời, không state, trả digest | **execution worker** — vòng đời đầy đủ, worktree, claim, verify, merge |
+| Giải ở đâu | `tsk-5kn` → `#task-skill` | **Chưa có item nào** |
+
+Câu hỏi mở màn cả session này — *"sau decompose thì execute có kích hoạt
+song song theo cơ chế cell giống bee được không"* — là **fan-out B**. Bảy
+vòng vừa rồi giải **fan-out A**. Không phí: dọc đường đào ra một lỗi sâu hơn
+và đáng sửa hơn (phân loại nhầm việc thành phép tính, 15 vòng/0 clear).
+Nhưng thứ hỏi đầu tiên **vẫn còn nguyên**.
+
+**Fan-out B không bị gì chặn — chỉ chưa ai xây** (§3 hàng 37). Thiếu đúng
+một skill: sau khi decompose ra N children không đụng footprint, tự bắn N
+Agent, mỗi con chạy `/fgOS:pick <child>` + thi công, rồi gom về. Kèm một câu
+thiết kế thật chưa trả lời: **ai claim** — orchestrator claim trước rồi mới
+spawn (cách bee), hay mỗi child session tự claim với id do cha chỉ định
+(cách demo `tsk-1sj` đã làm)? Khác nhau ở chỗ đặt lock và cách xử lý khi
+worker chết giữa chừng (§3 hàng 38).
+
+**Về dung nạp 3 lớp dispatch của bee** (§3 hàng 39): cú merge nhỏ hơn nó
+trông. Trục thẩm quyền của bee **fgOS đã có**, chỉ gọi tên khác ("có vòng
+đời" — D4 định nghĩa nó chính là *"cần reserve, attest, commit và merge"*).
+Trục "đăng ký trước" của fgOS là thứ **bee không có**, và nó có lý do thật
+(D6: bảo đảm *"cùng một câu hỏi mỗi lần"*). Thứ fgOS **thật sự thiếu** là ô
+**review-class** — dispatch chỉ-đọc soi lại đầu ra của chính mình. Nhưng ô
+đó **không liên quan gì tới fan-out**, nên nó là việc riêng, không thuộc
+`tsk-5kn` lẫn item fan-out B.
 
 ## 6. Thiết kế đã chốt {#design}
 
