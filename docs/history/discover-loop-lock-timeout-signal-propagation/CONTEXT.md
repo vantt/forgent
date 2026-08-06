@@ -27,13 +27,18 @@ policy itself (`.fgos/events.lock`'s 2s/10ms retry in `events.mjs`, RUL10)
 |----|----------|
 | D1 | Propagation scope is **`lock-timeout` only** — the one category that ever stopped the whole loop. `session-fail`/`merge-fail`/CAS-`validation` conflicts keep being handled per-item ("skipped"), unchanged. An adjacent idea — the underlying `.fgos/events.lock` retry policy being a fixed 2s/10ms regardless of what kind of work is holding it, versus an adaptive timeout or a liveness probe ("is the holder still alive?") instead of a fixed timeout — is a different layer (the lock's own policy in `events.mjs`, not the propagation-through-skill-layers problem this item scopes) and is **deferred to tsk-r87** (`discoveredFrom: tsk-1c6`). |
 | D2 | Fix lives at the **root**: `fgos-coding-driving`'s own stop-report contract gains the structured lock-timeout signal, not a narrow patch scoped only to `discover-next`'s own dispatch handling. This means the change is visible to every caller of `fgos-coding-driving` (`/fgOS:cook`, `/fgOS:pick`, any future sweep), not just `discover-next` — intentional, since `fgos-coding-driving` is the shared orchestration point and there are separate ongoing discussions about upgrading the routing mechanism it sits under. |
-| D3 | **Reversed.** Originally locked as a mechanical grep-consistency check (see history below); tried 5 times against the engine's `judgeVerifySemanticCorrectness` second-pass gate on `fgos discover --verdict clear --verify`, disputed all 5 — consistent reasoning: the claim is a **runtime behavior of SKILL.md prose** (whether an LLM, following the updated instructions, actually relays the `lock-timeout` category through multiple skill-invocation hops), and no static grep or manual-review checklist can prove that — only text presence, never behavior. **tsk-4l9** (same `discoveredFrom: tsk-31l` sibling) already names this exact missing infrastructure ("a harness that spawns a session/subprocess running the skill against a fixed test item and asserts the resulting output/state") as its own scope. Building an ad-hoc version of that harness inside tsk-1c6 would duplicate tsk-4l9's job. **tsk-1c6 now carries `tsk-4l9` as a real `deps` entry** (not just provenance) — this item waits at `clarify` until tsk-4l9 lands a real verify harness for SKILL.md-prose behavior, then writes `verify` against it. Superseded history: mechanical-only was tried first (grep for `lock-timeout` token across the 5 touched files, considered lighter than a hand-rolled dogfood-fixture scenario) — abandoned only after 5 concrete second-pass rejections proved it structurally cannot satisfy this claim, not from a prose-wording issue. |
+| D3 | **Reversed twice; final form here.** Originally locked as a mechanical grep-consistency check, disputed 5 times by the engine's `judgeVerifySemanticCorrectness` second pass on `fgos discover --verdict clear --verify` — consistently, and correctly: the claim is a **runtime behavior of SKILL.md prose**, and no static grep proves that. It was then re-locked as "wait for tsk-4l9's verify harness". **That premise no longer holds:** tsk-4l9 investigated and concluded a harness is YAGNI — the spawn-a-real-session mechanism already exists as `docs/how-to/smoke-test-fgos-code-implement-with-a-trivial-item.md`, and what was actually missing was a written standard. tsk-4l9's real deliverable is `docs/how-to/write-verify-for-a-skill-prose-change.md` (commit `5c738bd` on `fgw/tsk-4l9`), which rules: a skill-prose item's `verify` is `npm test && <POSITIVE> && <NEGATIVE>`, and proving runtime behavior is **not** the `verify` field's job — that belongs to the smoke-test how-to plus event-log observation. tsk-1c6 adopts that standard. The five disputes are not overturned; they are answered — no shell command can carry that claim, so `verify` stops being asked to. |
+| D4 | The stop-report's lock-timeout signal is identified by the literal token **`stop-reason: lock-timeout`**. This is a locked contract string, not an implementation detail: whoever implements D2 must emit exactly this token, and `fgos-exploring`/`fgos-planning` must relay exactly this token when their own engine-verb call fails that way. Locking it here is what makes D3's POSITIVE assertion a real check rather than a guess at unwritten wording — the failure mode the second pass caught on tsk-1tm (`rg` for a guessed identifier name that a correct fix might never use). How the token is threaded through each layer stays with `fgos-planning`. |
 
 ## Pinned terms
 
 - **"lock-timeout"** — the literal category string this item's fix must
   keep visible end-to-end. Maps to `EventLogError('lock-timeout')` in
   `src/state/events.mjs`, exit code `7` in `src/state/store.mjs:70`.
+- **`stop-reason: lock-timeout`** — the literal token a stop-report must
+  carry (D4). Pinned as a contract so it can be asserted; distinct from the
+  bare category string `lock-timeout`, which already appears in
+  `discover-loop/SKILL.md` today and therefore proves nothing on its own.
 - **"propagation" (this item's scope)** — making a category that is only
   ever directly observed by the acting session at the point a bash call
   fails (e.g. inside `fgos-exploring`'s gate step running `fgos discover`)
@@ -79,13 +84,39 @@ policy itself (`.fgos/events.lock`'s 2s/10ms retry in `events.mjs`, RUL10)
 - `src/state/events.mjs`, `src/state/store.mjs` — the categorized-error
   source of truth this item's signal must trace back to accurately.
 
+## Verify (per tsk-4l9's standard)
+
+```
+npm test \
+  && grep -q 'stop-reason: lock-timeout' .claude/skills/fgos-coding-driving/SKILL.md \
+  && grep -q 'stop-reason: lock-timeout' .agents/skills/fgos-coding-driving/SKILL.md \
+  && grep -q 'stop-reason: lock-timeout' .claude/skills/fgos-exploring/SKILL.md \
+  && grep -q 'stop-reason: lock-timeout' .agents/skills/fgos-exploring/SKILL.md \
+  && grep -q 'stop-reason: lock-timeout' .claude/skills/fgos-planning/SKILL.md \
+  && grep -q 'stop-reason: lock-timeout' .agents/skills/fgos-planning/SKILL.md \
+  && grep -q 'stop-reason: lock-timeout' plugins/fgOS/skills/discover-next/SKILL.md \
+  && grep -q 'stop-reason: lock-timeout' plugins/fgOS/skills/discover-loop/SKILL.md \
+  && ! grep -q 'Known gap, not fixed by this item' plugins/fgOS/skills/discover-next/SKILL.md
+```
+
+POSITIVE: D4's locked token present in all eight touched files (all eight
+confirmed to exist on this branch). NEGATIVE: the superseded paragraph at
+`plugins/fgOS/skills/discover-next/SKILL.md:99` is gone.
+
+What this deliberately does **not** prove: that an LLM reading the updated
+prose actually relays the token across skill-invocation hops at runtime.
+Per tsk-4l9's standard that proof is owned by
+`docs/how-to/smoke-test-fgos-code-implement-with-a-trivial-item.md` plus
+event-log observation, not by this field.
+
 ## Real dependency
 
-- **`deps: [tsk-4l9]`** — tsk-1c6 is blocked from the frontier until tsk-4l9
-  ("Xây runtime verify harness cho hành vi dispatch của skill prose")
-  delivers a real verify harness for SKILL.md-prose runtime behavior. This
-  is a genuine blocking dependency, not provenance — tsk-1c6's own `verify`
-  field cannot be written correctly without it (see D3 above).
+- **`deps: [tsk-4l9]`** — kept, with its reason updated. tsk-1c6's verify
+  runs regardless of tsk-4l9, but the *justification* for that verify's
+  shape lives in `docs/how-to/write-verify-for-a-skill-prose-change.md`.
+  Merging tsk-1c6 first would leave a reviewer unable to look up the
+  standard it follows. tsk-4l9 has already committed that deliverable and
+  sits at `decompose`, so the ordering cost is small.
 
 ## Outstanding questions deferred to planning
 
