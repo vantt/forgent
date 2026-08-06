@@ -1942,6 +1942,39 @@ test('resolveCapacityCli resolves a kind:"cli" capacity through its own tier and
   assert.deepEqual(resolved, { command: 'agy', args: ['classify this'], provider: 'agy', model: 'flash-3.5' });
 });
 
+test('resolveCapacityCli honors a caller-supplied model override over both the capacity\'s own model and modelForTier (tsk-2k1, D10)', async () => {
+  const root = mkTempDir();
+  const fgosDir = path.join(root, '.fgos');
+  initStore(fgosDir);
+  registerTool(fgosDir, { name: 'submit-assist-classify', kind: 'cli', capability: 'submit-assist-classify', command: 'agy' });
+  writeLocalStatus(fgosDir, { 'submit-assist-classify': { status: 'present', checkedAt: new Date().toISOString() } });
+  writeRunnerConfigFixture(root, {
+    executor: { command: '/global/executor', args: ['{prompt}'] },
+    capacities: { 'submit-assist-classify': { kind: 'cli', command: 'agy', provider: 'agy', args: ['{model}:{prompt}'], tier: 'light', model: 'flash-3.5', allowCrossProvider: true } },
+    models: { light: 'flash-3.5', standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+  const resolved = await resolveCapacityCli('submit-assist-classify', { prompt: 'classify this', repoRoot: root, model: 'opus' });
+  assert.deepEqual(resolved, { command: 'agy', args: ['opus:classify this'], provider: 'agy', model: 'opus' });
+});
+
+test('resolveCapacityCli honors a caller-supplied tier override, feeding it into modelForTier when no model is also supplied (tsk-2k1, D10)', async () => {
+  const root = mkTempDir();
+  initStore(path.join(root, '.fgos'));
+  writeRunnerConfigFixture(root, {
+    executor: { command: '/global/executor', args: ['{model}:{prompt}'] },
+    models: { light: 'flash-3.5', standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+  // 'light', deliberately NOT `DEFAULTS.tier` ('standard', work.mjs) — a
+  // tier equal to the default would pass even with no override plumbing
+  // at all (the pre-existing `capacity?.tier ?? DEFAULTS.tier` fallback
+  // already lands on 'standard' with no capacity match), so it would not
+  // actually prove the override path works.
+  const resolved = await resolveCapacityCli('no-such-capacity', { prompt: 'x', repoRoot: root, tier: 'light' });
+  assert.deepEqual(resolved, { command: '/global/executor', args: ['flash-3.5:x'], provider: '/global/executor', model: 'flash-3.5' });
+});
+
 test('resolveCapacityCli propagates resolveExecutorConfig\'s own RunnerConfigError for a kind:"cli" capacity that is not registered', async () => {
   const root = mkTempDir();
   initStore(path.join(root, '.fgos'));
@@ -1965,6 +1998,38 @@ test('the "resolve" CLI entry point (node src/runner/dispatch.mjs resolve <capac
   assert.ok(Array.isArray(parsed.args));
   assert.ok(typeof parsed.provider === 'string');
   assert.ok(typeof parsed.model === 'string');
+});
+
+test('the "resolve" CLI entry point honors --model, overriding the computed default (tsk-2k1, D10)', () => {
+  const dispatchPath = path.resolve('src/runner/dispatch.mjs');
+  const result = spawnSync(
+    process.execPath,
+    [dispatchPath, 'resolve', 'no-such-capacity-configured', '--prompt', 'hello', '--model', 'a-specific-override-model'],
+    { encoding: 'utf8' },
+  );
+  assert.equal(result.status, 0, result.stderr);
+  const parsed = JSON.parse(result.stdout);
+  assert.equal(parsed.model, 'a-specific-override-model');
+});
+
+test('the "resolve" CLI entry point honors --tier, changing which configured model resolves (tsk-2k1, D10)', () => {
+  const dispatchPath = path.resolve('src/runner/dispatch.mjs');
+  // This checkout's own committed runner config (legacy `.fgos-runner.json`
+  // — the file `ensureRunnerConfigForDir` actually reads here: a worktree
+  // never carries its own `.fgos/config.json`, ADR0020) is the same file
+  // the spawned CLI process below will resolve against, so read the
+  // expected model from it directly rather than hardcoding a value that
+  // would silently drift from the real config.
+  const cfg = JSON.parse(fs.readFileSync(path.resolve('.fgos-runner.json'), 'utf8'));
+  const lightModel = cfg.models.light;
+  const result = spawnSync(
+    process.execPath,
+    [dispatchPath, 'resolve', 'no-such-capacity-configured', '--prompt', 'hello', '--tier', 'light'],
+    { encoding: 'utf8' },
+  );
+  assert.equal(result.status, 0, result.stderr);
+  const parsed = JSON.parse(result.stdout);
+  assert.equal(parsed.model, lightModel);
 });
 
 test('the "resolve" CLI entry point exits non-zero with a usage message when capacityId is omitted', () => {

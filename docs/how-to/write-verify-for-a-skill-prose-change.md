@@ -118,3 +118,16 @@ người, thuộc **review lúc merge** và bước reality check của
 Khi vòng kiểm tra thứ hai (`judgeVerifySemanticCorrectness`) đòi một trong
 số đó, đây là câu trả lời để trích dẫn. Khi nó chỉ ra một trong năm cái bẫy
 ở trên, nó đúng — sửa verify, đừng bỏ qua.
+
+## Bằng chứng thật: verify sau cùng đã pass
+
+Capture thật của `tsk-f38` (nguồn của năm cái bẫy ở trên):
+
+- Friction ghi nhận một lần `blocked`, layer `verification`, errorClass
+  `verify-miss`: `"goal-check failed on branch \"fgw/tsk-f38\" (exit 1)"`
+  — đây là một trong các vòng dispute trước khi năm cái bẫy được vá hết.
+- Sau khi verify được sửa đủ cả năm cái bẫy, outcome thật:
+  `"outcome": "awaiting-approval", "passed": true, "attempts": 1`.
+  Verify cuối cùng pass ngay lần chạy đầu — bằng chứng cụ thể rằng vá đủ
+  năm cái bẫy (không phải bốn, không phải ba) mới đủ để verify một rename
+  ~200 file xanh thật, không phải xanh giả do thiếu quét.

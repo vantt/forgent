@@ -1000,6 +1000,11 @@ export function resolveDecompose(dir, id, cfg, role, callerVerdict) {
       // judge-scout verdict (tầng 1) through normalizeChild (tầng 2) to the
       // actual work-item record, instead of being silently dropped here.
       action: child.action,
+      // tsk-535 D2: description = the child's own title -- not action
+      // (would just duplicate that field's content with no added
+      // meaning). Closes the decompose-child half of the description gap
+      // this item exists to fix.
+      description: child.title,
       stage: stageForStep(domain, 'Execute'),
       parent: id,
       tier: work.tier,

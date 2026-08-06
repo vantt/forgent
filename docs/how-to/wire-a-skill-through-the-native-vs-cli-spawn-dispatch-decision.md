@@ -22,6 +22,18 @@ spawn.md`) instead of hardcoding one mechanism.
   subcommand already exist (`tsk-3ik-1`) — this how-to is about wiring a
   *consumer* through the decision, not building the decision mechanism
   itself.
+
+  `tsk-3ik-1` (commit `8ef69b8`) built exactly that: `decideDispatchMechanism`
+  is pure and generic over capacity/subTask targets, implementing Native-First
+  Dispatch Doctrine rules 1/2/4; `decideCapacityDispatchMechanism` is the
+  `capacities.<id>`-specific convenience wrapper the `decide` CLI subcommand
+  above calls. A new optional `capacities.<id>.forceCliSpawn` boolean field
+  implements rule 4's config-forces-cli/spawn exception. The build
+  deliberately never touched `resolveExecutorConfig`'s own body — impact
+  analysis confirmed CRITICAL blast radius (8 upstream symbols, 7 execution
+  flows) on that function, so the new functions were built as standalone
+  read-only siblings instead, verified by 126/126 green including every
+  pre-existing `resolveCapacityCli` exact-shape test untouched.
 - Read `docs/decisions/0026-...md`'s four rules first. This how-to only
   covers the mechanical wiring; it does not re-explain why native is
   preferred over cli/spawn when both are available.

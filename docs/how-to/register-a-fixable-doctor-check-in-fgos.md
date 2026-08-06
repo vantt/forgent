@@ -155,6 +155,32 @@ function like `readGateBypassLevel` may have every existing caller already
 passing the `.fgos` directory itself. Check your own function's existing
 call sites before assuming which one you're given.
 
+## Real-world lesson: `changed: false` is a success state, not a failure — the renderer has to agree
+
+`docs/history/doctor-fix-pretty-status-line/CONTEXT.md` (`tsk-45g`) records
+a real bug where `bin/fgos.mjs`'s `--pretty` renderer violated the exact
+contract this doc documents above (Step 2): a registered fix's `{changed,
+message}` return has no third, failing state — `changed: false` means "the
+check was already correct, nothing to do," not an error. The renderer's
+`doctor` branch fed `f.changed` straight into `formatCheck`, which renders
+`false` as a red `✗` — so a fully healthy `gateBypass.level` state printed
+as a failure line just because the fix found nothing to repair:
+
+> "D1: `renderPretty`'s doctor `fixed` loop... must stop using `f.changed`
+> as the `formatCheck` pass/fail boolean... `changed: false` therefore
+> means 'already correct,' a success state, not a failure — yet
+> `formatCheck(f.changed, ...)` renders it as a red `✗`... Fix lines must
+> render `✓` (green) unconditionally — a registered fix per its own
+> documented contract either writes the corrected value or reports it was
+> already correct; there is no third, failing outcome in the `{changed,
+> message}` shape."
+
+If you're registering a fix and see its line render red on a healthy
+system, this is the class of bug to check for — the renderer, not your
+fix's own logic, may be reading the wrong field. The `message` string is
+where "changed" vs. "already fine" belongs; the color no longer needs to
+(and must not) also encode that distinction.
+
 ## Real-world lesson: a shared config file can land without your module's key
 
 `docs/history/doctor-fix-gate-bypass/CONTEXT.md` D4 records a real,

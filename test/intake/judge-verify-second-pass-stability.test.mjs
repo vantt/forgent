@@ -94,6 +94,26 @@ test('judgeVerifySemanticCorrectness with a blank/whitespace priorRejection omit
   assert.ok(!capturedPrompt.includes('Vòng trước đã từ chối'));
 });
 
+// tsk-3jy: buildVerifyCheckPrompt gave the judge model no idea this
+// evaluation happens BEFORE any code implementing the item exists --
+// producing a category error (demanding "git diff showing actual code
+// changes" for a verify command proposed at clarify/decompose, pre-code).
+// This proves the fix: the prompt now states the pre-implementation
+// context explicitly and requires a concrete NEW missing check on
+// disagreement, never a reworded repeat of a prior round's own reason.
+test('buildVerifyCheckPrompt states the verify is proposed before code exists and requires a new concrete gap on disagreement', () => {
+  const dir = mkTempDir();
+  const { scriptPath, capturePath } = writeCapturingExecutor(dir, { agrees: true });
+  const cfg = cfgFor(scriptPath);
+
+  judgeVerifySemanticCorrectness({ title: 'x', description: 'y', tier: 'standard' }, 'npm test', cfg);
+
+  const capturedPrompt = fs.readFileSync(capturePath, 'utf8');
+  assert.ok(capturedPrompt.includes('TRƯỚC KHI'));
+  assert.ok(capturedPrompt.includes('KHÔNG được đòi hỏi bằng chứng'));
+  assert.ok(capturedPrompt.includes('CỤ THỂ') && capturedPrompt.includes('MỚI'));
+});
+
 // Integration-level: resolveDiscovery's own second-pass call site now reads
 // view.gates[id].ask (the exact text a real dispute round parks on) and
 // threads it forward automatically -- proving the wiring, not just the

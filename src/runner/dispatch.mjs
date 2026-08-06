@@ -1135,10 +1135,26 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
  * entirely (tests pass a plain `mkdtemp` fixture dir here, the same way
  * every other test in `dispatch.test.mjs` points `fgosDir`/config paths at
  * a temp dir rather than a real git checkout).
+ *
+ * `model`/`tier` (tsk-2k1, D10): an ad-hoc-packet caller's own optional
+ * `provider`/`tier` fields, when supplied, win over the capacity's own
+ * declared `tier`/`model` and the computed `modelForTier` default — same
+ * precedence a capacity's own `model` already had over `modelForTier`
+ * (the divergence this doc comment already names above), extended one
+ * level further out to the caller. Omitted (every pre-tsk-2k1 call site,
+ * and every registered-`<CAPACITY_ID>` dispatch that never names an
+ * override) leaves resolution byte-identical to before this parameter
+ * existed. This is plumbing only — which tier/model a caller SHOULD pick
+ * is `tsk-503`'s own judgment, not decided here.
  */
-export async function resolveCapacityCli(capacityId, { prompt = '', cwd = process.cwd(), repoRoot } = {}) {
+export async function resolveCapacityCli(
+  capacityId,
+  { prompt = '', cwd = process.cwd(), repoRoot, model: modelOverride, tier: tierOverride } = {},
+) {
   if (!capacityId) {
-    throw new RunnerConfigError('usage: node src/runner/dispatch.mjs resolve <capacityId> [--prompt <text>]');
+    throw new RunnerConfigError(
+      'usage: node src/runner/dispatch.mjs resolve <capacityId> [--prompt <text>] [--model <name>] [--tier <name>]',
+    );
   }
   const root = repoRoot ?? resolveRepoRoot(cwd);
   const fgosDir = fgosDirFromRoot(root);
@@ -1150,8 +1166,8 @@ export async function resolveCapacityCli(capacityId, { prompt = '', cwd = proces
   // callers.
   const cfg = ensureRunnerConfigForDir(root);
   const capacity = cfg.capacities?.[capacityId];
-  const tier = capacity?.tier ?? DEFAULTS.tier;
-  const model = capacity?.model ?? modelForTier(cfg, tier);
+  const tier = tierOverride ?? capacity?.tier ?? DEFAULTS.tier;
+  const model = modelOverride ?? capacity?.model ?? modelForTier(cfg, tier);
   const { command, args, provider } = resolveExecutorCommand(cfg, { prompt, model, tier, capacityId, fgosDir });
   return { command, args, provider, model };
 }
@@ -1200,7 +1216,13 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     let prompt = '';
     const promptFlagIndex = rest.indexOf('--prompt');
     if (promptFlagIndex !== -1) prompt = rest[promptFlagIndex + 1] ?? '';
-    resolveCapacityCli(capacityId, { prompt }).then(
+    let model;
+    const modelFlagIndex = rest.indexOf('--model');
+    if (modelFlagIndex !== -1) model = rest[modelFlagIndex + 1];
+    let tier;
+    const tierFlagIndex = rest.indexOf('--tier');
+    if (tierFlagIndex !== -1) tier = rest[tierFlagIndex + 1];
+    resolveCapacityCli(capacityId, { prompt, model, tier }).then(
       (resolved) => {
         process.stdout.write(`${JSON.stringify(resolved)}\n`);
       },
@@ -1222,7 +1244,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     );
   } else {
     process.stderr.write(
-      `unknown subcommand ${JSON.stringify(subcommand)}. Usage: node src/runner/dispatch.mjs resolve <capacityId> [--prompt <text>] | decide <capacityId> [--has-live-task-access]\n`,
+      `unknown subcommand ${JSON.stringify(subcommand)}. Usage: node src/runner/dispatch.mjs resolve <capacityId> [--prompt <text>] [--model <name>] [--tier <name>] | decide <capacityId> [--has-live-task-access]\n`,
     );
     process.exitCode = 1;
   }

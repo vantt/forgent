@@ -102,7 +102,7 @@ function addOk(cwd, id, extra = {}) {
   if (extra.footprint !== undefined) {
     flags.push('--footprint', extra.footprint);
   }
-  return run(cwd, ['add', id, ...flags]);
+  return run(cwd, ['add', id, ...flags, '--description', 'tsk-535 fixture description.']);
 }
 
 // Git-backed cwd (stage-decompose S2-pull): `take`/`return` operate on the
@@ -457,7 +457,7 @@ test('ready (array-shaped, unpaginated) from the same linked worktree cwd: exit 
 
 test('list with --dir pointed at the real store from the same worktree cwd: no warning, real data', () => {
   const { main, wt } = tmpLinkedWorktree();
-  run(main, ['add', 'seen-via-dir', '--title', 'Seen via --dir', '--kind', 'task', '--risk', 'low', '--verify', 'npm test']);
+  run(main, ['add', 'seen-via-dir', '--title', 'Seen via --dir', '--kind', 'task', '--risk', 'low', '--verify', 'npm test', '--description', 'tsk-535 fixture description.']);
   const result = run(wt, ['list', '--dir', main]);
   assert.equal(result.status, 0);
   assert.ok(envelopeData(result.stdout).work['seen-via-dir']);
@@ -564,6 +564,47 @@ test('list --id on an unknown id is rejected as validation (not-found), exit 4 (
   const result = run(cwd, ['list', '--id', 'no-such-item']);
   assert.equal(result.status, 4);
   assert.match(result.stderr, /list: work "no-such-item" not found/);
+});
+
+test('list --id scopes every id-keyed view section to just the requested item, excluding another item\'s data (tsk-2u9 D1/D2)', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'item-a', { title: 'Item A' });
+  addOk(cwd, 'item-b', { title: 'Item B' });
+
+  // Populate decisions (flat array, id-scoped) + decisionsById (dict) for BOTH items.
+  assert.equal(run(cwd, ['decision', '--id', 'item-a', '--text', 'decision about A', '--rationale', 'because A']).status, 0);
+  assert.equal(run(cwd, ['decision', '--id', 'item-b', '--text', 'decision about B', '--rationale', 'because B']).status, 0);
+  // A decision with no --id at all (a global decision, not tied to one item) --
+  // must never surface under either item's scoped result.
+  assert.equal(run(cwd, ['decision', '--text', 'global decision, no item', '--rationale', 'because global']).status, 0);
+
+  // Populate gates for BOTH items (ask/answer round trip).
+  assert.equal(run(cwd, ['ask', 'item-a', '--text', 'question about A']).status, 0);
+  assert.equal(run(cwd, ['answer', 'item-a', '--text', 'answer about A']).status, 0);
+  assert.equal(run(cwd, ['ask', 'item-b', '--text', 'question about B']).status, 0);
+  assert.equal(run(cwd, ['answer', 'item-b', '--text', 'answer about B']).status, 0);
+
+  const data = envelopeData(run(cwd, ['list', '--id', 'item-a', '--json']).stdout);
+
+  assert.deepEqual(Object.keys(data.work), ['item-a']);
+
+  assert.ok(Array.isArray(data.decisions), 'decisions stays an array (flat-log shape unchanged)');
+  assert.ok(data.decisions.some((d) => d.text === 'decision about A'), 'item-a\'s own decision must be present');
+  assert.ok(!data.decisions.some((d) => d.text === 'decision about B'), 'item-b\'s decision must be excluded');
+  assert.ok(!data.decisions.some((d) => d.text === 'global decision, no item'), 'a decision with no id must be excluded');
+
+  assert.deepEqual(Object.keys(data.decisionsById ?? {}), ['item-a']);
+  assert.deepEqual(Object.keys(data.gates ?? {}), ['item-a']);
+  assert.equal(data.gates['item-a'].ask, 'question about A');
+});
+
+test('list --id leaves the tools registry untouched -- it is keyed by tool name, not by item id (tsk-2u9 D2)', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'item-a', { title: 'Item A' });
+  assert.equal(run(cwd, ['tool', 'register', '--name', 'gitnexus', '--kind', 'mcp', '--capability', 'impact-analysis', '--command', 'mcp:gitnexus', '--scan', '.gitnexus']).status, 0);
+
+  const data = envelopeData(run(cwd, ['list', '--id', 'item-a', '--json']).stdout);
+  assert.deepEqual(Object.keys(data.tools ?? {}), ['gitnexus']);
 });
 
 test('list default keeps an awaiting-human item visible (D2: excludes only the two terminal statuses done/wontfix, per wontfix-terminal-status-filter-consistency D2 -- never a broader ad-hoc closed/parked set like awaiting-human)', () => {
@@ -702,9 +743,31 @@ test('add creates exactly one work.add event and the view reflects the new item,
 
 test('add with a missing required field (--verify) is rejected as validation, exit 4, no event written', () => {
   const cwd = tmpCwd();
-  const result = run(cwd, ['add', 'no-verify', '--title', 'X', '--kind', 'task', '--risk', 'low']);
+  const result = run(cwd, ['add', 'no-verify', '--title', 'X', '--kind', 'task', '--risk', 'low', '--description', 'tsk-535 fixture description.']);
   assert.equal(result.status, 4);
   assert.equal(eventLines(cwd).length, 0);
+});
+
+// tsk-535 D1: --description is now required on add, same discipline as
+// --title/--kind/--risk/--verify above -- no default fallback (e.g.
+// silently reusing --title), per plan.md's rejected-alternative.
+test('add with a missing required field (--description) is rejected as validation, exit 4, no event written', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['add', 'no-description', '--title', 'X', '--kind', 'task', '--risk', 'low', '--verify', 'x']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /--description/);
+  assert.equal(eventLines(cwd).length, 0);
+});
+
+test('add --description persists the given description on the new item, exit 0', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, [
+    'add', 'with-description',
+    '--title', 'X', '--kind', 'task', '--risk', 'low', '--verify', 'x',
+    '--description', 'The full story behind this item.',
+  ]);
+  assert.equal(result.status, 0);
+  assert.equal(stateView(cwd).work['with-description'].description, 'The full story behind this item.');
 });
 
 test('add with an invalid (non kebab-case) id is rejected as validation, exit 4', () => {
@@ -725,7 +788,7 @@ test('add with a duplicate id is rejected as validation, exit 4, no extra event 
 
 test('add with an unknown dep id is rejected as validation, exit 4', () => {
   const cwd = tmpCwd();
-  const result = run(cwd, ['add', 'has-bad-dep', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--deps', 'ghost-dep']);
+  const result = run(cwd, ['add', 'has-bad-dep', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--deps', 'ghost-dep', '--description', 'tsk-535 fixture description.']);
   assert.equal(result.status, 4);
 });
 
@@ -892,7 +955,7 @@ test('a pre-existing event log with no work.edit events replays byte-identical',
 
 test('edit omitting --refs/--deps leaves the field untouched; an explicit empty value clears it', () => {
   const cwd = tmpCwd();
-  const result = run(cwd, ['add', 'edit-refs', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--refs', 'a,b']);
+  const result = run(cwd, ['add', 'edit-refs', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--refs', 'a,b', '--description', 'tsk-535 fixture description.']);
   assert.equal(result.status, 0);
 
   const untouched = run(cwd, ['edit', 'edit-refs', '--risk', 'high']);
@@ -913,7 +976,7 @@ test('add --parent sets lineage; omitting --parent leaves it unset', () => {
   const cwd = tmpCwd();
   assert.equal(addOk(cwd, 'parent-root').status, 0);
 
-  const withParent = run(cwd, ['add', 'parent-child', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--parent', 'parent-root']);
+  const withParent = run(cwd, ['add', 'parent-child', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--parent', 'parent-root', '--description', 'tsk-535 fixture description.']);
   assert.equal(withParent.status, 0);
   assert.equal(stateView(cwd).work['parent-child'].parent, 'parent-root');
 
@@ -923,7 +986,7 @@ test('add --parent sets lineage; omitting --parent leaves it unset', () => {
 
 test('add --parent "" (bare, no value) is rejected as a valueless flag, same as add --discovered-from', () => {
   const cwd = tmpCwd();
-  const result = run(cwd, ['add', 'parent-bad', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--parent']);
+  const result = run(cwd, ['add', 'parent-bad', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--parent', '--description', 'tsk-535 fixture description.']);
   assert.notEqual(result.status, 0);
   assert.match(result.stderr, /--parent requires a non-empty id/);
 });
@@ -958,7 +1021,7 @@ test('edit --parent (bare, no value) is rejected as a valueless flag, distinct f
 test('edit --parent closing a cycle is rejected at the CLI, same "graph cycle" message as the store-layer test', () => {
   const cwd = tmpCwd();
   assert.equal(addOk(cwd, 'parent-cycle-a').status, 0);
-  const withParent = run(cwd, ['add', 'parent-cycle-b', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--parent', 'parent-cycle-a']);
+  const withParent = run(cwd, ['add', 'parent-cycle-b', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--parent', 'parent-cycle-a', '--description', 'tsk-535 fixture description.']);
   assert.equal(withParent.status, 0);
 
   const result = run(cwd, ['edit', 'parent-cycle-a', '--parent', 'parent-cycle-b']);
@@ -1061,7 +1124,7 @@ test('add with no --priority/--intent leaves both fields absent (undefined), not
 
 test('add --urgent sets the item urgent field, exit 0', () => {
   const cwd = tmpCwd();
-  const result = run(cwd, ['add', 'add-urgent', '--title', 'Add urgent', '--kind', 'task', '--risk', 'light', '--verify', 'npm test', '--urgent', 'high']);
+  const result = run(cwd, ['add', 'add-urgent', '--title', 'Add urgent', '--kind', 'task', '--risk', 'light', '--verify', 'npm test', '--urgent', 'high', '--description', 'tsk-535 fixture description.']);
   assert.equal(result.status, 0);
   assert.equal(stateView(cwd).work['add-urgent'].urgent, 'high');
 });
@@ -1257,7 +1320,7 @@ test('a mutation (add) attempted on an already-corrupt log is refused as corrupt
   fs.appendFileSync(logPath(cwd), 'not valid json\n', 'utf8');
   const before = eventLines(cwd).length;
 
-  const result = run(cwd, ['add', 'after-corruption', '--title', 'X', '--kind', 'task', '--risk', 'low', '--verify', 'x']);
+  const result = run(cwd, ['add', 'after-corruption', '--title', 'X', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--description', 'tsk-535 fixture description.']);
   assert.equal(result.status, 5);
   assert.equal(eventLines(cwd).length, before);
 });
@@ -1276,7 +1339,7 @@ test('a mutation (move) attempted on an already-corrupt log is refused as corrup
 test('a dependency cycle is impossible to construct: add requires deps to already exist, so both sides of an attempted cycle are rejected as validation, exit 4', () => {
   const cwd = tmpCwd();
   // "a" depends on "b", but "b" does not exist yet — validation, exit 4.
-  const firstAttempt = run(cwd, ['add', 'a', '--title', 'A', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--deps', 'b']);
+  const firstAttempt = run(cwd, ['add', 'a', '--title', 'A', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--deps', 'b', '--description', 'tsk-535 fixture description.']);
   assert.equal(firstAttempt.status, 4);
   assert.equal(eventLines(cwd).length, 0);
 
@@ -1284,7 +1347,7 @@ test('a dependency cycle is impossible to construct: add requires deps to alread
   // before writing anything) — so this is also validation, exit 4. There is
   // no sequence of `add` calls that can ever produce a cycle, because a dep
   // must reference an id that already exists at add-time.
-  const secondAttempt = run(cwd, ['add', 'b', '--title', 'B', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--deps', 'a']);
+  const secondAttempt = run(cwd, ['add', 'b', '--title', 'B', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--deps', 'a', '--description', 'tsk-535 fixture description.']);
   assert.equal(secondAttempt.status, 4);
   assert.equal(eventLines(cwd).length, 0);
 });
@@ -1310,13 +1373,13 @@ test('an unknown verb is rejected as validation, exit 4', () => {
 
 test('add with no flags at all is rejected as validation (missing --title), exit 4', () => {
   const cwd = tmpCwd();
-  const result = run(cwd, ['add']);
+  const result = run(cwd, ['add', '--description', 'tsk-535 fixture description.']);
   assert.equal(result.status, 4);
 });
 
 test('add omitting --id auto-generates a collision-free tsk-<hash> id from --title, exit 0', () => {
   const cwd = tmpCwd();
-  const result = run(cwd, ['add', '--title', 'Auto id from title', '--kind', 'task', '--risk', 'low', '--verify', 'x']);
+  const result = run(cwd, ['add', '--title', 'Auto id from title', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--description', 'tsk-535 fixture description.']);
   assert.equal(result.status, 0);
   const generatedId = envelopeData(result.stdout).id;
   assert.match(generatedId, /^tsk-[0-9a-z]{3,8}$/, `generated id "${generatedId}" should match generateId's tsk-<hash> shape`);
@@ -1325,7 +1388,7 @@ test('add omitting --id auto-generates a collision-free tsk-<hash> id from --tit
 
 test('add with --title but no --id is rejected the same as a fully bare call (missing --title still checked first)', () => {
   const cwd = tmpCwd();
-  const result = run(cwd, ['add', '--kind', 'task', '--risk', 'low', '--verify', 'x']);
+  const result = run(cwd, ['add', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--description', 'tsk-535 fixture description.']);
   assert.equal(result.status, 4);
 });
 
@@ -1333,7 +1396,7 @@ test('add with --title but no --id is rejected the same as a fully bare call (mi
 
 test('add with --tier records the given tier explicitly in the view, exit 0', () => {
   const cwd = tmpCwd();
-  const result = run(cwd, ['add', 'heavy-item', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--tier', 'heavy']);
+  const result = run(cwd, ['add', 'heavy-item', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--tier', 'heavy', '--description', 'tsk-535 fixture description.']);
   assert.equal(result.status, 0);
   assert.equal(stateView(cwd).work['heavy-item'].tier, 'heavy');
 });
@@ -1378,7 +1441,7 @@ for (const [label, badFlagArgs] of ADD_BAD_FLAG_CASES) {
   test(`add with ${label} is rejected as validation, exit 4, no event written`, () => {
     const cwd = tmpCwd();
     const before = eventLines(cwd).length;
-    const result = run(cwd, ['add', 'bad-flag-item', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', ...badFlagArgs]);
+    const result = run(cwd, ['add', 'bad-flag-item', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', ...badFlagArgs, '--description', 'tsk-535 fixture description.']);
     assert.equal(result.status, 4);
     assert.equal(eventLines(cwd).length, before);
   });
@@ -1398,7 +1461,7 @@ test('add --domain synthetic persists work.domain and stamps stage "assembling" 
   const result = run(cwd, [
     'add', 'synthetic-item',
     '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x',
-    '--domain', 'synthetic',
+    '--domain', 'synthetic', '--description', 'tsk-535 fixture description.',
   ]);
   assert.equal(result.status, 0);
   const item = stateView(cwd).work['synthetic-item'];
@@ -1412,7 +1475,7 @@ test('add --domain coding is explicit and behaves identically to omitting --doma
   const result = run(cwd, [
     'add', 'explicit-coding-item',
     '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x',
-    '--domain', 'coding',
+    '--domain', 'coding', '--description', 'tsk-535 fixture description.',
   ]);
   assert.equal(result.status, 0);
   assert.equal(stateView(cwd).work['explicit-coding-item'].domain, 'coding');
@@ -1426,7 +1489,7 @@ test('add without --stage or --domain now defaults to stage "clarify" (was impli
   // Raw run(), not addOk() -- addOk defaults its own --stage to 'executing'
   // for its many other callers' sake (see its own comment); this test is
   // specifically about the CLI's bare, flagless default.
-  const result = run(cwd, ['add', 'default-stage-item', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x']);
+  const result = run(cwd, ['add', 'default-stage-item', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--description', 'tsk-535 fixture description.']);
   assert.equal(result.status, 0);
   assert.equal(stateView(cwd).work['default-stage-item'].stage, 'clarify');
   assert.deepEqual(envelopeData(run(cwd, ['ready']).stdout).map((w) => w.id), [], 'a stage-clarify item has no dependencies and no unfinished descendants, but is not stage-executing, so it must not appear in the frontier');
@@ -1434,14 +1497,14 @@ test('add without --stage or --domain now defaults to stage "clarify" (was impli
 
 test('add --stage decompose explicitly persists that stage, exit 0', () => {
   const cwd = tmpCwd();
-  const result = run(cwd, ['add', 'stage-flag-decompose', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--stage', 'decompose']);
+  const result = run(cwd, ['add', 'stage-flag-decompose', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--stage', 'decompose', '--description', 'tsk-535 fixture description.']);
   assert.equal(result.status, 0);
   assert.equal(stateView(cwd).work['stage-flag-decompose'].stage, 'decompose');
 });
 
 test('add --stage executing explicitly persists that stage and IS frontier-ready (opts back into pre-fix behavior), exit 0', () => {
   const cwd = tmpCwd();
-  const result = run(cwd, ['add', 'stage-flag-executing', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--stage', 'executing']);
+  const result = run(cwd, ['add', 'stage-flag-executing', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--stage', 'executing', '--description', 'tsk-535 fixture description.']);
   assert.equal(result.status, 0);
   assert.equal(stateView(cwd).work['stage-flag-executing'].stage, 'executing');
   assert.deepEqual(envelopeData(run(cwd, ['ready']).stdout).map((w) => w.id), ['stage-flag-executing']);
@@ -1462,7 +1525,7 @@ test('add --discovered-from persists discoveredFrom on the new item, exit 0', ()
   const result = run(cwd, [
     'add', 'discovered-item',
     '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x',
-    '--discovered-from', 'origin-item',
+    '--discovered-from', 'origin-item', '--description', 'tsk-535 fixture description.',
   ]);
   assert.equal(result.status, 0);
   assert.equal(stateView(cwd).work['discovered-item'].discoveredFrom, 'origin-item');
@@ -1483,7 +1546,7 @@ test('add --goal-tier mvp --targets a,b persists both fields, exit 0', () => {
   const result = run(cwd, [
     'add', 'goal-item',
     '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x',
-    '--goal-tier', 'mvp', '--targets', 'a,b',
+    '--goal-tier', 'mvp', '--targets', 'a,b', '--description', 'tsk-535 fixture description.',
   ]);
   assert.equal(result.status, 0);
   const item = stateView(cwd).work['goal-item'];
@@ -1493,14 +1556,14 @@ test('add --goal-tier mvp --targets a,b persists both fields, exit 0', () => {
 
 test('add --targets "" parses to [] explicitly, exit 0', () => {
   const cwd = tmpCwd();
-  const result = run(cwd, ['add', 'empty-targets-item', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--targets', '']);
+  const result = run(cwd, ['add', 'empty-targets-item', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--targets', '', '--description', 'tsk-535 fixture description.']);
   assert.equal(result.status, 0);
   assert.deepEqual(stateView(cwd).work['empty-targets-item'].targets, []);
 });
 
 test('add with a bare --targets (no value) also parses to [], exit 0', () => {
   const cwd = tmpCwd();
-  const result = run(cwd, ['add', 'bare-targets-item', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--targets']);
+  const result = run(cwd, ['add', 'bare-targets-item', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--targets', '--description', 'tsk-535 fixture description.']);
   assert.equal(result.status, 0);
   assert.deepEqual(stateView(cwd).work['bare-targets-item'].targets, []);
 });
@@ -1543,9 +1606,9 @@ function linkFgosBinInto(cwd) {
 
 test('edit --verify-from-children generates a jq command listing all direct children ids with the resolved-set check and an absolute --dir, exit 0', () => {
   const { cwd, worktreePath } = initGitCwdWithWorktree();
-  assert.equal(run(cwd, ['add', 'parent-x', '--title', 'Parent', '--kind', 'task', '--risk', 'low', '--verify', 'x']).status, 0);
-  assert.equal(run(cwd, ['add', 'child-1', '--title', 'Child 1', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--parent', 'parent-x']).status, 0);
-  assert.equal(run(cwd, ['add', 'child-2', '--title', 'Child 2', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--parent', 'parent-x']).status, 0);
+  assert.equal(run(cwd, ['add', 'parent-x', '--title', 'Parent', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--description', 'tsk-535 fixture description.']).status, 0);
+  assert.equal(run(cwd, ['add', 'child-1', '--title', 'Child 1', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--parent', 'parent-x', '--description', 'tsk-535 fixture description.']).status, 0);
+  assert.equal(run(cwd, ['add', 'child-2', '--title', 'Child 2', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--parent', 'parent-x', '--description', 'tsk-535 fixture description.']).status, 0);
   // child-1 already resolved (delivered, not yet cleanup/done) -- the
   // resolved-set default (D3) must still count it, unlike a strict-done check.
   assert.equal(run(cwd, ['move', 'child-1', '--to', 'doing']).status, 0);
@@ -1570,8 +1633,8 @@ test('edit --verify-from-children generates a jq command listing all direct chil
 
 test('edit --verify-from-targets generates a jq command listing all target ids with the resolved-set check and an absolute --dir, exit 0', () => {
   const { cwd, worktreePath } = initGitCwdWithWorktree();
-  assert.equal(run(cwd, ['add', 'target-1', '--title', 'Target 1', '--kind', 'task', '--risk', 'low', '--verify', 'x']).status, 0);
-  assert.equal(run(cwd, ['add', 'mvp-x', '--title', 'MVP', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--goal-tier', 'mvp', '--targets', 'target-1']).status, 0);
+  assert.equal(run(cwd, ['add', 'target-1', '--title', 'Target 1', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--description', 'tsk-535 fixture description.']).status, 0);
+  assert.equal(run(cwd, ['add', 'mvp-x', '--title', 'MVP', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--goal-tier', 'mvp', '--targets', 'target-1', '--description', 'tsk-535 fixture description.']).status, 0);
 
   const result = run(worktreePath, ['edit', 'mvp-x', '--verify-from-targets', '--dir', cwd]);
   assert.equal(result.status, 0);
@@ -1591,9 +1654,9 @@ test('edit --verify-from-targets generates a jq command listing all target ids w
 // genuinely-unresolved fixture, and asserting the real exit code.
 test("edit --verify-from-children's generated jq expression correctly returns true when all children are resolved (actually running it, not just checking its text)", () => {
   const { cwd, worktreePath } = initGitCwdWithWorktree();
-  assert.equal(run(cwd, ['add', 'parent-all-resolved', '--title', 'Parent', '--kind', 'task', '--risk', 'low', '--verify', 'x']).status, 0);
-  assert.equal(run(cwd, ['add', 'child-r1', '--title', 'Child 1', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--parent', 'parent-all-resolved']).status, 0);
-  assert.equal(run(cwd, ['add', 'child-r2', '--title', 'Child 2', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--parent', 'parent-all-resolved']).status, 0);
+  assert.equal(run(cwd, ['add', 'parent-all-resolved', '--title', 'Parent', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--description', 'tsk-535 fixture description.']).status, 0);
+  assert.equal(run(cwd, ['add', 'child-r1', '--title', 'Child 1', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--parent', 'parent-all-resolved', '--description', 'tsk-535 fixture description.']).status, 0);
+  assert.equal(run(cwd, ['add', 'child-r2', '--title', 'Child 2', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--parent', 'parent-all-resolved', '--description', 'tsk-535 fixture description.']).status, 0);
   // child-r1 delivered, child-r2 cleanup -- both resolved-set, neither strict-done.
   assert.equal(run(cwd, ['move', 'child-r1', '--to', 'doing']).status, 0);
   assert.equal(run(cwd, ['move', 'child-r1', '--to', 'delivered']).status, 0);
@@ -1611,9 +1674,9 @@ test("edit --verify-from-children's generated jq expression correctly returns tr
 
 test("edit --verify-from-children's generated jq expression correctly returns false when not all children are resolved (actually running it, not just checking its text)", () => {
   const { cwd, worktreePath } = initGitCwdWithWorktree();
-  assert.equal(run(cwd, ['add', 'parent-partial', '--title', 'Parent', '--kind', 'task', '--risk', 'low', '--verify', 'x']).status, 0);
-  assert.equal(run(cwd, ['add', 'child-p1', '--title', 'Child 1', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--parent', 'parent-partial']).status, 0);
-  assert.equal(run(cwd, ['add', 'child-p2', '--title', 'Child 2', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--parent', 'parent-partial']).status, 0);
+  assert.equal(run(cwd, ['add', 'parent-partial', '--title', 'Parent', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--description', 'tsk-535 fixture description.']).status, 0);
+  assert.equal(run(cwd, ['add', 'child-p1', '--title', 'Child 1', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--parent', 'parent-partial', '--description', 'tsk-535 fixture description.']).status, 0);
+  assert.equal(run(cwd, ['add', 'child-p2', '--title', 'Child 2', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--parent', 'parent-partial', '--description', 'tsk-535 fixture description.']).status, 0);
   // child-p1 resolved (delivered); child-p2 stays at todo -- NOT resolved.
   assert.equal(run(cwd, ['move', 'child-p1', '--to', 'doing']).status, 0);
   assert.equal(run(cwd, ['move', 'child-p1', '--to', 'delivered']).status, 0);
@@ -1637,7 +1700,7 @@ test('edit --verify-from-children with no children found throws a validation err
 
 test('edit --verify-from-targets with empty targets throws a validation error instead of writing a vacuous verify, exit 4', () => {
   const cwd = tmpCwd();
-  assert.equal(run(cwd, ['add', 'targetless-mvp', '--title', 'MVP', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--goal-tier', 'mvp']).status, 0);
+  assert.equal(run(cwd, ['add', 'targetless-mvp', '--title', 'MVP', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--goal-tier', 'mvp', '--description', 'tsk-535 fixture description.']).status, 0);
   const before = stateView(cwd).work['targetless-mvp'].verify;
   const result = run(cwd, ['edit', 'targetless-mvp', '--verify-from-targets']);
   assert.equal(result.status, 4);
@@ -1648,7 +1711,7 @@ test('edit --verify-from-targets with empty targets throws a validation error in
 // --- str67-goal-directed-planning D3/D4/D6/D7: `fgos goal set|show` CLI verb ---
 
 function addGoalItem(cwd, id, goalTier = 'mvp') {
-  return run(cwd, ['add', id, '--title', `Title ${id}`, '--kind', 'task', '--risk', 'low', '--verify', 'npm test', '--goal-tier', goalTier]);
+  return run(cwd, ['add', id, '--title', `Title ${id}`, '--kind', 'task', '--risk', 'low', '--verify', 'npm test', '--goal-tier', goalTier, '--description', 'tsk-535 fixture description.']);
 }
 
 test('goal set on a real goal item succeeds, exit 0, and a following goal show reflects it', () => {
@@ -1725,7 +1788,7 @@ test('add --docs-ref persists docsRef and round-trips unchanged through fgos lis
   const result = run(cwd, [
     'add', 'docs-ref-item',
     '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x',
-    '--docs-ref', 'docs/history/p50-workflow-induct/',
+    '--docs-ref', 'docs/history/p50-workflow-induct/', '--description', 'tsk-535 fixture description.',
   ]);
   assert.equal(result.status, 0);
   assert.equal(stateView(cwd).work['docs-ref-item'].docsRef, 'docs/history/p50-workflow-induct/');
@@ -1748,7 +1811,7 @@ test('edit --docs-ref sets docsRef on an item that had none, exit 0', () => {
 
 test('edit --docs-ref replaces an existing docsRef (latest-wins), exit 0', () => {
   const cwd = tmpCwd();
-  run(cwd, ['add', 'edit-docs-ref-replace', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--docs-ref', 'docs/history/old-feature/']);
+  run(cwd, ['add', 'edit-docs-ref-replace', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--docs-ref', 'docs/history/old-feature/', '--description', 'tsk-535 fixture description.']);
   const result = run(cwd, ['edit', 'edit-docs-ref-replace', '--docs-ref', 'docs/history/new-feature/']);
   assert.equal(result.status, 0);
   assert.equal(stateView(cwd).work['edit-docs-ref-replace'].docsRef, 'docs/history/new-feature/');
@@ -1902,13 +1965,17 @@ test('edit --duplicates rejects an item listing itself, exit 4', () => {
 // or left blank at add time -- or an item added before either field
 // existed -- had no way to ever gain or correct one after creation. ---
 
-test('edit --description sets description on an item that had none, exit 0', () => {
+// tsk-535 D1: `add` now always sets description (required flag), so an
+// item created via `addOk` can no longer "have none" -- reframed to prove
+// `edit --description` still overwrites an existing one, the same
+// capability this test always covered.
+test('edit --description overwrites an existing description, exit 0', () => {
   const cwd = tmpCwd();
-  addOk(cwd, 'edit-description-new');
-  assert.equal(stateView(cwd).work['edit-description-new'].description, undefined);
-  const result = run(cwd, ['edit', 'edit-description-new', '--description', 'the full story']);
+  addOk(cwd, 'edit-description-existing');
+  assert.equal(stateView(cwd).work['edit-description-existing'].description, 'tsk-535 fixture description.');
+  const result = run(cwd, ['edit', 'edit-description-existing', '--description', 'the full story']);
   assert.equal(result.status, 0);
-  assert.equal(stateView(cwd).work['edit-description-new'].description, 'the full story');
+  assert.equal(stateView(cwd).work['edit-description-existing'].description, 'the full story');
 });
 
 test('edit --footprint sets footprint on an item that had none, exit 0', () => {
@@ -2042,7 +2109,7 @@ test('ready prints the frontier as parseable, machine-readable envelope data, ex
 test('ready excludes a todo item whose dep sits at proposed (proposed is not done): dep at proposed does NOT open dependent work', () => {
   const cwd = tmpCwd();
   toProposed(cwd, 'dep-in-proposed');
-  const result = run(cwd, ['add', 'blocked-on-proposed', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--deps', 'dep-in-proposed']);
+  const result = run(cwd, ['add', 'blocked-on-proposed', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--deps', 'dep-in-proposed', '--description', 'tsk-535 fixture description.']);
   assert.equal(result.status, 0);
 
   const ready = envelopeData(run(cwd, ['ready']).stdout);
@@ -2055,7 +2122,7 @@ test('ready opens a todo item once its dep reaches done (approved, not merely pr
   toProposed(cwd, 'dep-approved');
   assert.equal(toDoneViaChain(cwd, 'dep-approved').status, 0);
   assert.equal(
-    run(cwd, ['add', 'unblocked-item', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--deps', 'dep-approved', '--stage', 'executing']).status,
+    run(cwd, ['add', 'unblocked-item', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--deps', 'dep-approved', '--stage', 'executing', '--description', 'tsk-535 fixture description.']).status,
     0,
   );
 
@@ -2467,8 +2534,8 @@ test('triage on an empty backlog returns an empty ranked list, exit 0', () => {
 test('triage ranks a base item above the items that depend on it', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'base');
-  run(cwd, ['add', 'dep1', '--title', 'Dep1', '--kind', 'task', '--risk', 'low', '--verify', 'npm test', '--deps', 'base']);
-  run(cwd, ['add', 'dep2', '--title', 'Dep2', '--kind', 'task', '--risk', 'low', '--verify', 'npm test', '--deps', 'base']);
+  run(cwd, ['add', 'dep1', '--title', 'Dep1', '--kind', 'task', '--risk', 'low', '--verify', 'npm test', '--deps', 'base', '--description', 'tsk-535 fixture description.']);
+  run(cwd, ['add', 'dep2', '--title', 'Dep2', '--kind', 'task', '--risk', 'low', '--verify', 'npm test', '--deps', 'base', '--description', 'tsk-535 fixture description.']);
 
   const result = run(cwd, ['triage']);
   assert.equal(result.status, 0);
@@ -2528,7 +2595,7 @@ test('triage never mutates state: no event is appended', () => {
 test('triage rows carry stage, goalTier, and component membership; declared goals sort ahead of ungrouped work', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'plain');
-  run(cwd, ['add', 'goal-item', '--title', 'Goal Item', '--kind', 'task', '--risk', 'low', '--verify', 'npm test', '--goal-tier', 'mvp']);
+  run(cwd, ['add', 'goal-item', '--title', 'Goal Item', '--kind', 'task', '--risk', 'low', '--verify', 'npm test', '--goal-tier', 'mvp', '--description', 'tsk-535 fixture description.']);
 
   const result = run(cwd, ['triage']);
   assert.equal(result.status, 0);
@@ -2987,7 +3054,7 @@ test('add stamps stage "clarify" by default (D1/D2, add-stage-default-gap) — p
   // Raw run(), not addOk() -- addOk defaults its own --stage to 'executing'
   // for its many other callers' sake (see its own comment); this test is
   // specifically about the CLI's bare, flagless default.
-  run(cwd, ['add', 'plain-add', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x']);
+  run(cwd, ['add', 'plain-add', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--description', 'tsk-535 fixture description.']);
   const item = envelopeData(run(cwd, ['list']).stdout).work['plain-add'];
   assert.equal(item.stage, 'clarify');
 });
@@ -3781,7 +3848,7 @@ test('take --id on a todo item outside the frontier (dep not done) is rejected a
   const cwd = initGitCwd();
   run(cwd, ['init']);
   addOk(cwd, 'pull-dep-source');
-  run(cwd, ['add', 'pull-dep-blocked', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'npm test', '--deps', 'pull-dep-source']);
+  run(cwd, ['add', 'pull-dep-blocked', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'npm test', '--deps', 'pull-dep-source', '--description', 'tsk-535 fixture description.']);
   const before = eventLines(cwd).length;
 
   const result = run(cwd, ['take', '--id', 'pull-dep-blocked']);
@@ -4269,7 +4336,7 @@ test('return: a changed sensitive file outside the item\'s footprint surfaces a 
 test('return: a changed sensitive file DECLARED in the item\'s footprint is not a hit', () => {
   const cwd = initGitCwd();
   run(cwd, ['init']);
-  assert.equal(run(cwd, ['add', 'pull-return-judge-declared', '--title', 'X', '--kind', 'task', '--risk', 'low', '--verify', 'test -f proof.txt', '--footprint', 'package.json']).status, 0);
+  assert.equal(run(cwd, ['add', 'pull-return-judge-declared', '--title', 'X', '--kind', 'task', '--risk', 'low', '--verify', 'test -f proof.txt', '--footprint', 'package.json', '--description', 'tsk-535 fixture description.']).status, 0);
   assert.equal(run(cwd, ['take', '--id', 'pull-return-judge-declared']).status, 0);
   commitFile(cwd, 'proof.txt');
   commitFile(cwd, 'package.json', '{}\n');
@@ -4289,7 +4356,7 @@ test('return: a changed sensitive file DECLARED in the item\'s footprint is not 
 test('return: a changed file outside the item\'s footprint surfaces a footprintDiffHits advisory even when it matches no frozenJudgeHits pattern, never blocks (tsk-4hl)', () => {
   const cwd = initGitCwd();
   run(cwd, ['init']);
-  assert.equal(run(cwd, ['add', 'pull-return-footprint-diff', '--title', 'X', '--kind', 'task', '--risk', 'low', '--verify', 'test -f proof.txt', '--footprint', 'proof.txt']).status, 0);
+  assert.equal(run(cwd, ['add', 'pull-return-footprint-diff', '--title', 'X', '--kind', 'task', '--risk', 'low', '--verify', 'test -f proof.txt', '--footprint', 'proof.txt', '--description', 'tsk-535 fixture description.']).status, 0);
   assert.equal(run(cwd, ['take', '--id', 'pull-return-footprint-diff']).status, 0);
   commitFile(cwd, 'proof.txt');
   commitFile(cwd, 'random-outside.txt', 'not sensitive\n');
@@ -4334,7 +4401,7 @@ test('return: a .fgos/* change bundled into the item\'s own commit (git add -A s
   execFileSync('git', ['add', '-A'], { cwd });
   execFileSync('git', ['commit', '-q', '-m', 'bootstrap .fgos/'], { cwd });
   const id = 'pull-return-fgos-exempt';
-  assert.equal(run(cwd, ['add', id, '--title', 'X', '--kind', 'task', '--risk', 'low', '--verify', 'test -f proof.txt', '--footprint', 'proof.txt']).status, 0);
+  assert.equal(run(cwd, ['add', id, '--title', 'X', '--kind', 'task', '--risk', 'low', '--verify', 'test -f proof.txt', '--footprint', 'proof.txt', '--description', 'tsk-535 fixture description.']).status, 0);
   assert.equal(run(cwd, ['take', '--id', id]).status, 0);
   // commitFile's git add -A sweeps in whatever .fgos/* delta `take` itself
   // produced since the last commit, alongside proof.txt -- the exact real
@@ -4365,7 +4432,7 @@ test('return: a .fgos/gate-bypass.json change bundled into the item\'s own commi
   const cwd = initGitCwd();
   run(cwd, ['init']);
   const id = 'pull-return-gb-not-exempt';
-  assert.equal(run(cwd, ['add', id, '--title', 'X', '--kind', 'task', '--risk', 'low', '--verify', 'test -f proof.txt', '--footprint', 'proof.txt']).status, 0);
+  assert.equal(run(cwd, ['add', id, '--title', 'X', '--kind', 'task', '--risk', 'low', '--verify', 'test -f proof.txt', '--footprint', 'proof.txt', '--description', 'tsk-535 fixture description.']).status, 0);
   assert.equal(run(cwd, ['take', '--id', id]).status, 0);
   // Simulates an item that quietly edits the safety-policy file outside its
   // declared footprint (proof.txt) -- fs.writeFileSync + take's own
@@ -4389,7 +4456,7 @@ test('return: the item\'s own docs/history/<id>/iron-law-evidence.md is exempt f
   const cwd = initGitCwd();
   run(cwd, ['init']);
   const id = 'pull-return-evidence-exempt';
-  assert.equal(run(cwd, ['add', id, '--title', 'X', '--kind', 'task', '--risk', 'low', '--verify', 'test -f proof.txt', '--footprint', 'proof.txt']).status, 0);
+  assert.equal(run(cwd, ['add', id, '--title', 'X', '--kind', 'task', '--risk', 'low', '--verify', 'test -f proof.txt', '--footprint', 'proof.txt', '--description', 'tsk-535 fixture description.']).status, 0);
   assert.equal(run(cwd, ['take', '--id', id]).status, 0);
   commitFile(cwd, 'proof.txt');
   fs.mkdirSync(path.join(cwd, 'docs', 'history', id), { recursive: true });
@@ -7858,7 +7925,7 @@ test('graph verb: reports connected components (independent parallel tracks) in 
   const cwd = tmpCwd();
   assert.equal(run(cwd, ['init']).status, 0);
   assert.equal(addOk(cwd, 'a').status, 0);
-  assert.equal(run(cwd, ['add', 'b', '--title', 'B', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--deps', 'a']).status, 0);
+  assert.equal(run(cwd, ['add', 'b', '--title', 'B', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--deps', 'a', '--description', 'tsk-535 fixture description.']).status, 0);
   assert.equal(addOk(cwd, 'c').status, 0); // isolated -> its own track
 
   const before = eventLines(cwd).length;
@@ -7888,7 +7955,7 @@ test('graph --what-if <id>: reports what completing that item unblocks, in a fgo
   const cwd = tmpCwd();
   assert.equal(run(cwd, ['init']).status, 0);
   assert.equal(addOk(cwd, 'a').status, 0);
-  assert.equal(run(cwd, ['add', 'b', '--title', 'B', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--deps', 'a']).status, 0);
+  assert.equal(run(cwd, ['add', 'b', '--title', 'B', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--deps', 'a', '--description', 'tsk-535 fixture description.']).status, 0);
 
   const before = eventLines(cwd).length;
   const result = run(cwd, ['graph', '--what-if', 'a']);
@@ -7967,7 +8034,7 @@ test('stale verb: a just-delivered item is NOT flagged in postDelivery (well wit
 test('add --footprint persists the list; omitting the flag leaves footprint absent', () => {
   const cwd = tmpCwd();
   assert.equal(run(cwd, ['init']).status, 0);
-  assert.equal(run(cwd, ['add', 'withfp', '--title', 'X', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--footprint', 'src/a.mjs,src/b.mjs']).status, 0);
+  assert.equal(run(cwd, ['add', 'withfp', '--title', 'X', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--footprint', 'src/a.mjs,src/b.mjs', '--description', 'tsk-535 fixture description.']).status, 0);
   assert.equal(addOk(cwd, 'nofp').status, 0);
   const view = stateView(cwd);
   assert.deepEqual(view.work.withfp.footprint, ['src/a.mjs', 'src/b.mjs']);
@@ -7977,9 +8044,9 @@ test('add --footprint persists the list; omitting the flag leaves footprint abse
 test('conflicts verb: two ready items sharing a footprint path are flagged with shared + suggestions, pure read', () => {
   const cwd = tmpCwd();
   assert.equal(run(cwd, ['init']).status, 0);
-  assert.equal(run(cwd, ['add', 'a', '--title', 'A', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--footprint', 'src/x.mjs,src/y.mjs', '--stage', 'executing']).status, 0);
-  assert.equal(run(cwd, ['add', 'b', '--title', 'B', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--footprint', 'src/y.mjs,src/z.mjs', '--stage', 'executing']).status, 0);
-  assert.equal(run(cwd, ['add', 'c', '--title', 'C', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--footprint', 'src/w.mjs', '--stage', 'executing']).status, 0);
+  assert.equal(run(cwd, ['add', 'a', '--title', 'A', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--footprint', 'src/x.mjs,src/y.mjs', '--stage', 'executing', '--description', 'tsk-535 fixture description.']).status, 0);
+  assert.equal(run(cwd, ['add', 'b', '--title', 'B', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--footprint', 'src/y.mjs,src/z.mjs', '--stage', 'executing', '--description', 'tsk-535 fixture description.']).status, 0);
+  assert.equal(run(cwd, ['add', 'c', '--title', 'C', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--footprint', 'src/w.mjs', '--stage', 'executing', '--description', 'tsk-535 fixture description.']).status, 0);
 
   const before = eventLines(cwd).length;
   const result = run(cwd, ['conflicts']);
@@ -8028,7 +8095,7 @@ test('merge next on a directory with no .fgos/ at all is refused, exit 4, no mer
 
 test('merge next run from inside a linked worktree without --dir is refused, exit 4 -- never the old silent "nothing ready" false negative even though the real store has a ready item', () => {
   const { main, wt } = tmpLinkedWorktree();
-  assert.equal(run(main, ['add', 'solo', '--title', 'Solo', '--kind', 'task', '--risk', 'low', '--verify', 'true']).status, 0);
+  assert.equal(run(main, ['add', 'solo', '--title', 'Solo', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--description', 'tsk-535 fixture description.']).status, 0);
   assert.equal(run(main, ['move', 'solo', '--to', 'doing']).status, 0);
   assert.equal(run(main, ['move', 'solo', '--to', 'awaiting-approval']).status, 0);
   // Confirm the real store genuinely has a ready item, so a refusal below
@@ -8058,7 +8125,7 @@ test('merge list: a proposed item whose dep is already done is ready', () => {
   // trivially-passing command: addOk's default ('npm test') has no
   // package.json to run against in this bare sandbox, so approve would
   // park it 'blocked' instead of 'done' — a false negative for this test.
-  assert.equal(run(cwd, ['add', 'dep', '--title', 'Dep', '--kind', 'task', '--risk', 'low', '--verify', 'true']).status, 0);
+  assert.equal(run(cwd, ['add', 'dep', '--title', 'Dep', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--description', 'tsk-535 fixture description.']).status, 0);
   assert.equal(run(cwd, ['move', 'dep', '--to', 'doing']).status, 0);
   assert.equal(run(cwd, ['move', 'dep', '--to', 'awaiting-approval']).status, 0);
   const approveResult = envelopeData(run(cwd, ['approve', 'dep']).stdout);
@@ -8069,7 +8136,7 @@ test('merge list: a proposed item whose dep is already done is ready', () => {
   assert.equal(run(cwd, ['move', 'dep', '--to', 'retrospective']).status, 0);
   assert.equal(run(cwd, ['move', 'dep', '--to', 'cleanup']).status, 0);
   assert.equal(run(cwd, ['move', 'dep', '--to', 'done']).status, 0);
-  assert.equal(run(cwd, ['add', 'leaf', '--title', 'Leaf', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--deps', 'dep']).status, 0);
+  assert.equal(run(cwd, ['add', 'leaf', '--title', 'Leaf', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--deps', 'dep', '--description', 'tsk-535 fixture description.']).status, 0);
   toProposed(cwd, 'leaf');
   const data = envelopeData(run(cwd, ['merge', 'list']).stdout);
   assert.deepEqual(data, { ready: ['leaf'], waiting: [], conflicts: [], mergeSets: [], blockedOnSync: [], mergeTier: { leaf: 'root-to-main' }, supersededOut: [] });
@@ -8079,7 +8146,7 @@ test('merge list: a proposed item whose dep is NOT done waits, never ready', () 
   const cwd = tmpCwd();
   assert.equal(run(cwd, ['init']).status, 0);
   assert.equal(addOk(cwd, 'dep').status, 0); // stays todo
-  assert.equal(run(cwd, ['add', 'leaf', '--title', 'Leaf', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--deps', 'dep']).status, 0);
+  assert.equal(run(cwd, ['add', 'leaf', '--title', 'Leaf', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--deps', 'dep', '--description', 'tsk-535 fixture description.']).status, 0);
   toProposed(cwd, 'leaf');
   const data = envelopeData(run(cwd, ['merge', 'list']).stdout);
   assert.deepEqual(data, { ready: [], waiting: ['leaf'], conflicts: [], mergeSets: [], blockedOnSync: [], mergeTier: { leaf: 'root-to-main' }, supersededOut: [] });
@@ -8088,8 +8155,8 @@ test('merge list: a proposed item whose dep is NOT done waits, never ready', () 
 test('merge list: two dep-clear proposed items sharing a footprint are excluded from ready and listed as conflicts', () => {
   const cwd = tmpCwd();
   assert.equal(run(cwd, ['init']).status, 0);
-  assert.equal(run(cwd, ['add', 'a', '--title', 'A', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--footprint', 'src/x.mjs']).status, 0);
-  assert.equal(run(cwd, ['add', 'b', '--title', 'B', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--footprint', 'src/x.mjs']).status, 0);
+  assert.equal(run(cwd, ['add', 'a', '--title', 'A', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--footprint', 'src/x.mjs', '--description', 'tsk-535 fixture description.']).status, 0);
+  assert.equal(run(cwd, ['add', 'b', '--title', 'B', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--footprint', 'src/x.mjs', '--description', 'tsk-535 fixture description.']).status, 0);
   toProposed(cwd, 'a');
   toProposed(cwd, 'b');
   const data = envelopeData(run(cwd, ['merge', 'list']).stdout);
@@ -8113,7 +8180,7 @@ test('merge next merges the single ready item by recursing into approve, item re
   // Explicit --verify true (not addOk's 'npm test' default) -- same
   // sandbox pitfall documented in docs/how-to/add-a-read-only-fgos-verb-
   // and-plugin-skill.md.
-  assert.equal(run(cwd, ['add', 'solo', '--title', 'Solo', '--kind', 'task', '--risk', 'low', '--verify', 'true']).status, 0);
+  assert.equal(run(cwd, ['add', 'solo', '--title', 'Solo', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--description', 'tsk-535 fixture description.']).status, 0);
   assert.equal(run(cwd, ['move', 'solo', '--to', 'doing']).status, 0);
   assert.equal(run(cwd, ['move', 'solo', '--to', 'awaiting-approval']).status, 0);
 
@@ -8129,7 +8196,7 @@ test('merge next picks the higher-ranked (mvp goalTier) item first when two are 
   const cwd = tmpCwd();
   assert.equal(run(cwd, ['init']).status, 0);
   for (const id of ['plain', 'important']) {
-    assert.equal(run(cwd, ['add', id, '--title', id, '--kind', 'task', '--risk', 'low', '--verify', 'true', ...(id === 'important' ? ['--goal-tier', 'mvp'] : [])]).status, 0);
+    assert.equal(run(cwd, ['add', id, '--title', id, '--kind', 'task', '--risk', 'low', '--verify', 'true', '--description', 'tsk-535 fixture description.', ...(id === 'important' ? ['--goal-tier', 'mvp'] : [])]).status, 0);
     assert.equal(run(cwd, ['move', id, '--to', 'doing']).status, 0);
     assert.equal(run(cwd, ['move', id, '--to', 'awaiting-approval']).status, 0);
   }
@@ -8178,7 +8245,7 @@ test('merge next auto-syncs a blockedOnSync root before giving up: drift clears,
   // driftStatus's own findRootIds only tracks ids that are some OTHER
   // item's `parent` -- a childless root is invisible to it, so it would
   // never show up in blockedOnSync at all without this.
-  assert.equal(run(cwd, ['add', 'auto-sync-happy-child', '--title', 'child', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--parent', 'auto-sync-happy']).status, 0);
+  assert.equal(run(cwd, ['add', 'auto-sync-happy-child', '--title', 'child', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--parent', 'auto-sync-happy', '--description', 'tsk-535 fixture description.']).status, 0);
   assert.equal(run(cwd, ['move', 'auto-sync-happy', '--to', 'awaiting-approval']).status, 0);
   commitPendingBeforeApprove(cwd, 'auto-sync-happy');
 
@@ -8204,7 +8271,7 @@ test('merge next on a blockedOnSync root whose sync-root attempt hits a genuine 
   gitAtCwd(cwd, ['commit', '-q', '-m', 'unrelated main edit that collides']);
   // See auto-sync-happy above: driftStatus only tracks ids that are some
   // other item's `parent`.
-  assert.equal(run(cwd, ['add', 'auto-sync-conflict-child', '--title', 'child', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--parent', 'auto-sync-conflict']).status, 0);
+  assert.equal(run(cwd, ['add', 'auto-sync-conflict-child', '--title', 'child', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--parent', 'auto-sync-conflict', '--description', 'tsk-535 fixture description.']).status, 0);
   assert.equal(run(cwd, ['move', 'auto-sync-conflict', '--to', 'awaiting-approval']).status, 0);
   commitPendingBeforeApprove(cwd, 'auto-sync-conflict');
 
@@ -8233,7 +8300,7 @@ test('add --acceptance persists work.acceptance as the given array, validated th
   // write-time traceability gate) -- tmpCwd() only guarantees `.fgos/`
   // files exist, so this points there rather than a fictional source path.
   const clauses = [{ text: 'CLI exits 0 on success' }, { text: 'field round-trips', evidence: '.fgos/events.jsonl' }];
-  const result = run(cwd, ['add', 'with-acceptance', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--acceptance', JSON.stringify(clauses)]);
+  const result = run(cwd, ['add', 'with-acceptance', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--acceptance', JSON.stringify(clauses), '--description', 'tsk-535 fixture description.']);
   assert.equal(result.status, 0);
   assert.deepEqual(stateView(cwd).work['with-acceptance'].acceptance, clauses);
 });
@@ -8244,7 +8311,7 @@ test('add --acceptance persists work.acceptance as the given array, validated th
 test('add --acceptance is refused when a clause supplies text+evidence together but evidence cites no real path', () => {
   const cwd = tmpCwd();
   const clauses = [{ text: 'root cause confirmed', evidence: 'trust me, this is definitely correct' }];
-  const result = run(cwd, ['add', 'untraceable', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--acceptance', JSON.stringify(clauses)]);
+  const result = run(cwd, ['add', 'untraceable', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--acceptance', JSON.stringify(clauses), '--description', 'tsk-535 fixture description.']);
   assert.equal(result.status, 4);
   assert.match(result.stderr, /evidence/);
   assert.equal(stateView(cwd).work['untraceable'], undefined, 'nothing is written on a rejected acceptance clause');
@@ -8253,7 +8320,7 @@ test('add --acceptance is refused when a clause supplies text+evidence together 
 test('add --acceptance succeeds when a text+evidence clause cites a real path that exists under cwd', () => {
   const cwd = tmpCwd();
   const clauses = [{ text: 'root cause confirmed', evidence: '.fgos/events.jsonl documents the real event log' }];
-  const result = run(cwd, ['add', 'traceable', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--acceptance', JSON.stringify(clauses)]);
+  const result = run(cwd, ['add', 'traceable', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--acceptance', JSON.stringify(clauses), '--description', 'tsk-535 fixture description.']);
   assert.equal(result.status, 0);
   assert.deepEqual(stateView(cwd).work['traceable'].acceptance, clauses);
 });
@@ -8261,7 +8328,7 @@ test('add --acceptance succeeds when a text+evidence clause cites a real path th
 test('add --acceptance with a text-only clause (no evidence yet) is completely unaffected by the traceability gate', () => {
   const cwd = tmpCwd();
   const clauses = [{ text: 'ship it' }];
-  const result = run(cwd, ['add', 'text-only', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--acceptance', JSON.stringify(clauses)]);
+  const result = run(cwd, ['add', 'text-only', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--acceptance', JSON.stringify(clauses), '--description', 'tsk-535 fixture description.']);
   assert.equal(result.status, 0);
   assert.deepEqual(stateView(cwd).work['text-only'].acceptance, clauses);
 });
@@ -8296,7 +8363,7 @@ test('edit --acceptance persists work.acceptance as the given array', () => {
 test('edit --acceptance replaces the whole array (latest-wins), same semantics as --refs/--deps', () => {
   const cwd = tmpCwd();
   const first = [{ text: 'first clause' }, { text: 'second clause' }];
-  const result = run(cwd, ['add', 'edit-acceptance-replace', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--acceptance', JSON.stringify(first)]);
+  const result = run(cwd, ['add', 'edit-acceptance-replace', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--acceptance', JSON.stringify(first), '--description', 'tsk-535 fixture description.']);
   assert.equal(result.status, 0);
   assert.deepEqual(stateView(cwd).work['edit-acceptance-replace'].acceptance, first);
 
@@ -8320,19 +8387,19 @@ test('add with a malformed --acceptance is rejected as validation, exit 4, no ev
   const cwd = tmpCwd();
   const before = eventLines(cwd).length;
 
-  const invalidJson = run(cwd, ['add', 'bad-json', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--acceptance', 'not json']);
+  const invalidJson = run(cwd, ['add', 'bad-json', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--acceptance', 'not json', '--description', 'tsk-535 fixture description.']);
   assert.equal(invalidJson.status, 4);
 
-  const notArray = run(cwd, ['add', 'bad-shape', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--acceptance', JSON.stringify({ text: 'x' })]);
+  const notArray = run(cwd, ['add', 'bad-shape', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--acceptance', JSON.stringify({ text: 'x' }), '--description', 'tsk-535 fixture description.']);
   assert.equal(notArray.status, 4);
 
-  const missingText = run(cwd, ['add', 'bad-entry', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--acceptance', JSON.stringify([{ evidence: 'e' }])]);
+  const missingText = run(cwd, ['add', 'bad-entry', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--acceptance', JSON.stringify([{ evidence: 'e' }, '--description', 'tsk-535 fixture description.'])]);
   assert.equal(missingText.status, 4);
 
-  const emptyText = run(cwd, ['add', 'bad-empty-text', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--acceptance', JSON.stringify([{ text: '' }])]);
+  const emptyText = run(cwd, ['add', 'bad-empty-text', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--acceptance', JSON.stringify([{ text: '' }, '--description', 'tsk-535 fixture description.'])]);
   assert.equal(emptyText.status, 4);
 
-  const bareFlag = run(cwd, ['add', 'bad-bare-flag', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--acceptance']);
+  const bareFlag = run(cwd, ['add', 'bad-bare-flag', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--acceptance', '--description', 'tsk-535 fixture description.']);
   assert.equal(bareFlag.status, 4);
 
   assert.equal(eventLines(cwd).length, before, 'no malformed --acceptance attempt should append any event');

@@ -717,6 +717,24 @@ export function resolveDiscovery(dir, id, cfg, role, callerVerdict) {
       }
     }
 
+    // tsk-60r D1: the plain agree-path (no dispute above, or a dispute the
+    // second pass accepted) reaches here regardless of whether this SAME
+    // clarify pass already parked the item in `awaiting-human` via an
+    // earlier round's verify dispute (`putInAwaiting` above). `moveStage`
+    // below only moves `stage` -- it never touches `status` -- so without
+    // this guard the item would end up with `stage` advanced but `status`
+    // still `awaiting-human`, and `fgos return` later refuses on that
+    // stale park. Refuse here instead, same shape and wording as the
+    // `--force` branch's own guard above: status transitions stay
+    // exclusively behind the ask/answer door, never silently left
+    // inconsistent by this call.
+    if (work.status === 'awaiting-human') {
+      throw new StoreError(
+        'validation',
+        `discover: work "${id}" is already "awaiting-human" -- run "fgos answer ${id} --text ..." to resume it before retrying discover.`,
+      );
+    }
+
     // tsk-1ni D2: never let judgeDiscovery's own guess overwrite a verify
     // a prior stage already locked (e.g. fgos-validating's planApprove,
     // reached because this item's stage never got moved off clarify before

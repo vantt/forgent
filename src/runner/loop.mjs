@@ -626,7 +626,13 @@ async function captureDiscoveredWork({ output, item, queue, dir, log }) {
         addWork(dir, {
           id,
           title: block.title,
-          description: block.description,
+          // tsk-535 D4: block.description is optional per the
+          // fgos-discovered report schema -- prefer the worker's own real
+          // description when it supplied one (unchanged behavior for the
+          // common case), fall back to title only when it didn't, closing
+          // the third write path this item's own scout found mid-planning.
+          description:
+            typeof block.description === 'string' && block.description.trim() ? block.description : block.title,
           kind: block.kind ?? derived.kind,
           status: 'todo',
           deps: [],

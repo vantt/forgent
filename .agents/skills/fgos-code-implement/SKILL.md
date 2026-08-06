@@ -45,10 +45,10 @@ re-shapes the work; that already happened at `clarify`/`decompose`.
   cli-spawn — pure overhead, not a transparency question (a Task/Agent
   call is collapsed by default in the transcript, not hidden, unlike a
   genuinely opaque headless `claude -p` subprocess). If a step genuinely
-  needs a different backend (cheaper model, cross-provider such as
-  Codex/agy, resource isolation) for a narrow helper task, route it
-  explicitly through the capacity-dispatch mechanism instead — see
-  `../_shared/capacity-dispatch-fallback.md`.
+  needs a different backend for a narrow helper task, route it explicitly
+  through the capacity-dispatch mechanism instead — see
+  `../_shared/capacity-dispatch-fallback.md` for its own list of valid
+  reasons.
 - Implement real behavior. No stubs, TODO-only placeholders, dead code, or
   pseudo-implementations offered as if they were done.
 - Match existing patterns in the touched files and the decisions already

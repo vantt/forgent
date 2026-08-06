@@ -348,6 +348,19 @@ ${priorSection}
 # Lệnh verify được đề xuất
 ${proposedVerify}
 
+# Bối cảnh: lệnh này được đề xuất TRƯỚC KHI code tồn tại
+Lệnh verify trên được đề xuất ở giai đoạn shaping (clarify hoặc decompose)
+— TRƯỚC KHI bất kỳ dòng code nào cho việc này được viết. Chỉ chấm hai
+thứ: (1) cú pháp — lệnh có chạy được thật không, và (2) mục tiêu — lệnh
+có nhắm đúng thứ item mô tả không. KHÔNG được đòi hỏi bằng chứng chỉ có
+thể tồn tại SAU KHI code đã viết xong (ví dụ: đòi xem git diff, đòi biết
+code đã đổi chưa, đòi chạy thử code hiện chưa tồn tại) — đó là một câu
+hỏi sai chỗ ở giai đoạn này, không phải một lý do từ chối hợp lệ.
+
+Nếu không đồng ý, lý do phải nêu một tiêu chí CỤ THỂ và MỚI — không được
+lặp lại hoặc diễn đạt lại dưới hình thức khác một lý do đã nêu ở vòng
+trước (nếu có).
+
 # Câu hỏi
 Lệnh verify trên có kiểm chứng ĐÚNG claim của item này không — cả về cú
 pháp (chạy được thật) LẪN mục tiêu (nhắm đúng thứ item mô tả, không phải

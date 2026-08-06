@@ -819,6 +819,33 @@ test('resolveDecompose writes action on every child exactly as the verdict provi
   assert.equal(view.work[secondId].action, 'D1: implement the renderer per the locked format.');
 });
 
+// tsk-535 D2: description = the child's own title, not action -- closes
+// the decompose-child half of the description gap.
+test('resolveDecompose writes description on every child, equal to its own title (tsk-535 D2)', () => {
+  const scriptDir = mkTempDir();
+  const scriptPath = writeVerdictWithVerifyCheckExecutor(scriptDir, {
+    verdict: 'decompose',
+    reason: 'Two independent surfaces, no shared state',
+    children: [
+      { title: 'Build parser', verify: 'npm test -- parser', action: 'D1: implement the parser per the locked format.' },
+      { title: 'Build renderer', verify: 'npm test -- renderer', action: 'D1: implement the renderer per the locked format.' },
+    ],
+  });
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  const { docsRef } = mkContextFixture(storeDir, '## Locked decisions\n\nD1: placeholder — filled below.\n');
+  addWork(storeDir, sampleWork({ docsRef }));
+
+  const result = resolveDecompose(storeDir, 'item-x', cfg, 'runner');
+  assert.equal(result.outcome, 'decompose');
+
+  const view = listWork(storeDir);
+  const [firstId, secondId] = result.childIds;
+  assert.equal(view.work[firstId].description, 'Build parser');
+  assert.equal(view.work[secondId].description, 'Build renderer');
+});
+
 test('resolveDecompose leaves footprint undefined when a child provides a malformed (non-array) footprint, without invalidating the verdict', () => {
   const scriptDir = mkTempDir();
   const scriptPath = writeVerdictWithVerifyCheckExecutor(scriptDir, {
