@@ -6,11 +6,14 @@ computed-parallel-wave-schedule + worktree-dispatch-attestation, đã merge main
 
 ## 1. Trạng thái hiện tại
 
-Vòng 1 (2026-08-06). Đã đọc kỹ upstream bee và scout xong phía fgOS. Hai câu
+Vòng 2 (2026-08-06). Đã đọc kỹ upstream bee và scout xong phía fgOS. Hai câu
 hỏi mở đầu của người dùng đã có câu trả lời bằng bằng chứng source (§3, hàng
 "rõ"). Phát hiện quan trọng nhất: **bee không có một mô hình cell duy nhất — bee
 tách sẵn HAI lớp dispatch**, và ranh giới bee vạch là *"dispatch nào GHI file thì
 phải có id, dispatch nào chỉ ĐỌC-tổng-hợp thì không cần gì cả"*.
+
+Vòng 2 làm sâu thêm hàng 10 của §3 (lỗ ba tầng, và nó là lỗ hợp đồng chứ không
+phải lỗi chất lượng model) và đẩy phần đó về `tsk-3xd` để `clarify` chốt.
 
 Chưa có D-ID nào được mint: mọi điểm mới đứng qua đúng một vòng, chưa đủ điều
 kiện ổn định (quy tắc D4 của `fgos-coding-shaping`). Còn mở: chọn B1 trước hay
@@ -47,7 +50,8 @@ buộc phải giữ lại (id, footprint, verify, merge) khi việc con thực s
 | 7 | Bee không tin worker | **Rõ** | `bee-swarming/SKILL.md:114-118`: orchestrator tự chạy lại verify + `cells judge`; worker chỉ trả đúng 1 token `[DONE]/[BLOCKED]/[HANDOFF]/[NOOP]` (`swarming-reference.md:246`) |
 | 8 | fgOS có field per-item nào khẳng định "task con trọn vẹn, tự chạy hết stage" không? | **Rõ — KHÔNG có** | `src/state/store.mjs:238` `EDITABLE_FIELDS` 22 field, không có cờ nào dạng đó. Cái gần nhất là cấu hình toàn repo: `src/state/gate-bypass.mjs` — `level × tier` (`isTierCovered`) + kiểm cơ học trên ARTIFACT (`hasOpenItems`: `TODO/FIXME`, `## Outstanding questions` phải là "None") + sàn `HEAVY_KEYWORDS` luôn ghi đè |
 | 9 | Con auto-decompose có bị GATE không? | **Rõ — không bị** | `src/intake/decompose.mjs:940` đóng dấu thẳng `stage: stageForStep(domain,'Execute')` — con bỏ qua clarify + decompose, không chạm gate của exploring/planning/validating |
-| 10 | Con auto-decompose có đủ chi tiết để chạy không? | **Rõ — KHÔNG** | Cùng khối `decompose.mjs:929-944` chỉ truyền `title, kind, deps, risk, refs, footprint, verify, stage, parent, tier, domain` — không `description`, không trường mệnh lệnh nào. Nhưng `src/runner/prompt-templates/worker-prompt-{default,skill-pointer}.txt` nội suy `{description}` ⇒ executor ngoài nhận prompt rỗng phần chỉ dẫn. Đã tách ra item riêng `tsk-3xd` |
+| 10 | Con auto-decompose có đủ chi tiết để chạy không? | **Rõ — KHÔNG, và lỗ nằm ở BA tầng** | Tầng 1: prompt hỏi LLM không xin prose (`decompose.mjs:227`, schema chỉ `{title, verify, kind...}`). Tầng 2: `normalizeChild` (`decompose.mjs:231-255`) chỉ giữ `title, verify, kind, risk, refs, footprint, rawDeps` — model có trả prose cũng bị vứt. Tầng 3: `addWork` (`decompose.mjs:929-944`) không truyền `description`, trong khi `src/runner/prompt-templates/worker-prompt-{default,skill-pointer}.txt` nội suy `{description}`. Đã tách ra item riêng `tsk-3xd` |
+| 10b | Lỗ này có phải do chất lượng LLM judge không? | **Rõ — không, là lỗ hợp đồng** | `buildDecomposeChildrenVerdict` dùng CHUNG `normalizeChild` cho cả đường `fgos decompose --children` (tsk-27y D1, native-first, session sống tự lý luận cách chia) ⇒ kể cả session có đủ context tự viết cách chia cũng không có đường truyền thân mệnh lệnh xuống con |
 | 11 | Orchestrator tự pick con thì merge có tuần tự qua cha? | **Rõ — có** | `src/runner/worktree.mjs:30` leaf fork từ tip nhánh root (D3 "leaf fork-from-tip-of-parent"); `src/runner/merge.mjs:600` target là `main` cho root→main, `fgw/<root>` cho leaf→parent; `src/state/dep-graph.mjs:156` cạnh `parent-child` hướng parent→child ⇒ cha đợi con. Git log thực tế: `da2d382 Merge branch 'fgw/tsk-40t' into fgw/tsk-1d5` |
 | 12 | Làm B1 trước rồi đánh giá lại, hay mở luôn B2? | **Chưa rõ** | B1 không cần hạ tầng mới, chỉ cần skill dạy cách đóng gói. B2 là mở sổ ephemeral thứ hai trong state — quyết định kiến trúc thật |
 | 13 | Nếu làm B2: id ephemeral hình dạng nào | **Chưa rõ** | Ví dụ `tsk-66o#c1` — phạm vi cha, không vào `list/ready/triage`, không stage, không retro, chết khi cha `done`. Chưa quyết chỗ lưu (file riêng như `.bee/cells/` hay nhánh phụ trong events log) |
@@ -103,6 +107,27 @@ của (b).
 
 **Kết quả vòng 1:** `tsk-3xd` (bug, todo/clarify, không deps) cho (a);
 `tsk-2t6` (feature, tier light) cho (b)+(c); file này nằm trên `fgw/tsk-2t6`.
+
+### 2026-08-06 — vòng 2
+
+**Người dùng:** `tsk-3xd` có cần discuss gì nữa không hay đầy đủ rồi?
+
+**Trả lời (sau khi scout `decompose.mjs` sâu hơn):** chưa đủ, nhưng phần thiếu
+đúng việc của `clarify`, không phải của discussion này. Hai thứ scout mới ra và
+đáng vá thẳng vào item: lỗ có **ba tầng** chứ không phải một (§3 hàng 10), và
+đường `fgos decompose --children` dùng chung `normalizeChild` nên đây là **lỗ
+hợp đồng, không phải lỗi chất lượng model** (§3 hàng 10b). Bốn quyết định còn
+mở của item đó (dùng `description` hay thêm field riêng; prose lấy từ verdict
+hay từ `plan.md`/`CONTEXT.md` của cha; có phủ đường `fgos add --parent` thủ công
+không; thứ tự với `tsk-535`) để `clarify` chốt.
+
+**Quyết định về `tsk-535`:** không đặt dep cứng. Hai chiều đều an toàn —
+`tsk-535` xong trước thì `tsk-3xd` ghi đè `description=title` bằng prose thật;
+`tsk-3xd` xong trước thì `tsk-535` hết lý do tồn tại và có thể superseded. Dep
+cứng chỉ làm chậm một trong hai.
+
+**Kết quả vòng 2:** `fgos edit tsk-3xd --description` đã bổ sung ba tầng, đường
+`--children`, bốn câu hỏi mở, và ghi chú không-dep-cứng vào item.
 
 ## 6. Thiết kế đã chốt {#design}
 
