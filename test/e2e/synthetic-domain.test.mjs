@@ -66,6 +66,7 @@ function add(cwd, id, extra = {}) {
     '--kind', extra.kind ?? 'task',
     '--risk', extra.risk ?? 'low',
     '--verify', extra.verify ?? 'test -f output.txt',
+    '--description', extra.description ?? `Description ${id}`,
   ];
   if (extra.domain) flags.push('--domain', extra.domain);
   const result = fgos(cwd, ['add', id, ...flags]);

@@ -82,6 +82,7 @@ function add(cwd, id, extra = {}) {
     '--kind', extra.kind ?? 'task',
     '--risk', extra.risk ?? 'low',
     '--verify', extra.verify ?? 'true',
+    '--description', extra.description ?? `Description ${id}`,
   ];
   if (extra.domain) flags.push('--domain', extra.domain);
   if (extra.deps) flags.push('--deps', extra.deps.join(','));

@@ -64,6 +64,7 @@ function add(cwd, id, extra = {}) {
     '--kind', extra.kind ?? 'task',
     '--risk', extra.risk ?? 'low',
     '--verify', extra.verify ?? 'test -f output.txt',
+    '--description', extra.description ?? `Description ${id}`,
   ];
   const result = fgos(cwd, ['add', id, ...flags]);
   assert.equal(result.status, 0, `fgos add ${id} failed: ${result.stderr}`);

@@ -190,7 +190,7 @@ stage values — the same way `fgos-routing` describes it.
 
    ```bash
    root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
-   fgos add --title "Build parser" --kind task --risk light --verify "npm test -- parser" --parent <id> --footprint "src/parser.mjs,test/parser.test.mjs" --dir "$root"
+   fgos add --title "Build parser" --kind task --risk light --verify "npm test -- parser" --description "Build parser" --parent <id> --footprint "src/parser.mjs,test/parser.test.mjs" --dir "$root"
    ```
 
    (no positional argument here — `fgos add`'s positional/`--id` is the
@@ -211,6 +211,15 @@ stage values — the same way `fgos-routing` describes it.
    runs, and `return`'s own re-verify of real progress), this skill does not
    design or re-plan any of that — it only needs to name, for each piece it
    describes, the one command that proves it done.
+
+   If a piece touches a skill-prose path (`.claude/skills/**/SKILL.md`,
+   `.agents/skills/**/SKILL.md`, `plugins/fgOS/skills/**/SKILL.md`), read
+   `docs/how-to/write-verify-for-a-skill-prose-change.md` before naming
+   its verify command — it documents the correct `npm test && POSITIVE &&
+   NEGATIVE` shape and the standing rebuttal for when the second-pass
+   judge (`judgeVerifySemanticCorrectness`) demands proof of prose
+   comprehension, a demand the doc says verify must never be asked to
+   satisfy.
 
 6. **Mid-planning `CONTEXT.md` gap.** If, at any step above, `CONTEXT.md`'s
    locked decisions turn out to be silent on something this plan actually

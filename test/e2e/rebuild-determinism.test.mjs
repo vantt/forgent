@@ -50,6 +50,7 @@ function add(cwd, id, extra = {}) {
     '--kind', extra.kind ?? 'task',
     '--risk', extra.risk ?? 'low',
     '--verify', extra.verify ?? 'npm test',
+    '--description', extra.description ?? `Description ${id}`,
   ];
   if (extra.deps && extra.deps.length) flags.push('--deps', extra.deps.join(','));
   return run(cwd, ['add', id, ...flags]);
