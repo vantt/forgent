@@ -212,6 +212,40 @@ test('schedule from a .fgos/-less linked worktree with no --dir warns on stderr,
   assert.match(conflictsResult.stderr, /\.fgos\/ not found/, 'schedule must warn under the exact same condition its sibling conflicts already does');
 });
 
+// tsk-3g5 (post-tsk-3u2 independent review): the same STORE_MISSING_
+// WARNING_VERBS gap found and fixed for `schedule`, found again in 3 more
+// requiresExistingStore:false verbs. `gate-bypass` is the sharpest
+// instance: unwarned, it reports a CONFIDENTLY WRONG safety-policy level
+// (the empty-store default "off") instead of an honestly-empty result --
+// the exact opposite of "looks safer than reality" a caller checking
+// bypass posture needs to be warned about.
+test('gate-bypass from a .fgos/-less linked worktree with no --dir warns on stderr and reports the empty-store default, never the real main-checkout level', () => {
+  const { main, wt } = tmpLinkedWorktree();
+  const mainResult = run(main, ['gate-bypass']);
+  assert.equal(mainResult.status, 0);
+
+  const wtResult = run(wt, ['gate-bypass']);
+  assert.equal(wtResult.status, 0, 'gate-bypass is requiresExistingStore:false -- it warns, never refuses');
+  assert.match(wtResult.stderr, /\.fgos\/ not found/);
+  assert.equal(envelopeData(wtResult.stdout).level, 'off', 'the .fgos/-less empty-store default, never silently trusted as the real policy');
+});
+
+test('doc-sources from a .fgos/-less linked worktree with no --dir warns on stderr instead of a silent count: 0', () => {
+  const { wt } = tmpLinkedWorktree();
+  const result = run(wt, ['doc-sources', 'docs/some-doc.md']);
+  assert.equal(result.status, 0, 'doc-sources is requiresExistingStore:false -- it warns, never refuses');
+  assert.match(result.stderr, /\.fgos\/ not found/);
+  assert.deepEqual(envelopeData(result.stdout), { docPath: 'docs/some-doc.md', count: 0, captures: [] });
+});
+
+test('lock-status from a .fgos/-less linked worktree with no --dir warns on stderr instead of a silent "free"', () => {
+  const { wt } = tmpLinkedWorktree();
+  const result = run(wt, ['lock-status']);
+  assert.equal(result.status, 0, 'lock-status is requiresExistingStore:false -- it warns, never refuses');
+  assert.match(result.stderr, /\.fgos\/ not found/);
+  assert.equal(envelopeData(result.stdout).outcome, 'free', 'the structurally-forced empty-store answer, never silently trusted as a real lock read');
+});
+
 test('--dir with no value (a bare trailing flag) is a clean validation error, exit 4, not a crash', () => {
   const { wt } = tmpLinkedWorktree();
   const result = run(wt, ['submit', 'title', '--dir']);

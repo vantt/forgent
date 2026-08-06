@@ -4009,7 +4009,23 @@ function renderPretty(verb, data) {
 // store state `conflicts` does, but was missing here — from a linked
 // worktree with no `.fgos/`, it silently returned `{waves:[],cycles:[]}`
 // (indistinguishable from "graph clean") instead of this warning.
-const STORE_MISSING_WARNING_VERBS = new Set(['list', 'ready', 'graph', 'stale', 'check', 'rollup', 'show', 'conflicts', 'triage', 'schedule']);
+//
+// `gate-bypass`/`doc-sources`/`lock-status` added by tsk-3g5 (post-tsk-3u2
+// independent review, same audit gap this set has already been widened
+// twice for): all three are `requiresExistingStore: false` and share the
+// identical bug class. `gate-bypass` is the sharpest instance —
+// unwarned, it reports a CONFIDENTLY WRONG safety-policy level from a
+// worktree (verified: `"off"` from a `.fgos/`-less worktree vs the real
+// main checkout's `"standard"`) rather than an honestly-empty result, the
+// opposite direction of "looks safer than reality" a caller checking
+// bypass posture needs to be warned about. `doc-sources` silently returns
+// `count: 0` (indistinguishable from "no captures exist"); `lock-status`
+// is structurally forced to report the lock as `free` with no store to
+// read a real lock state from.
+const STORE_MISSING_WARNING_VERBS = new Set([
+  'list', 'ready', 'graph', 'stale', 'check', 'rollup', 'show', 'conflicts', 'triage', 'schedule',
+  'gate-bypass', 'doc-sources', 'lock-status',
+]);
 
 async function main() {
   const [, , verb, ...rest] = process.argv;
