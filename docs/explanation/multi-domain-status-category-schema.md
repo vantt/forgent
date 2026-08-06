@@ -198,6 +198,22 @@ scripts/backfill-status-category.mjs && node --test
 test/scripts/backfill-status-category.test.mjs`), not a superficial
 presence check. Landed `awaiting-approval`, ahead by 1 commit.
 
+## Consumer migration closed the `RESOLVED_STATUSES` gap the audit flagged
+
+`tsk-38t-4` migrated `src/state/frontier.mjs`'s `RESOLVED_STATUSES` set —
+the single spot `docs/decisions/0027`'s own audit flagged as riskiest,
+because it mixed the four fixed tail statuses with `wontfix` (a
+front-segment, domain-owned label that only happens to always map to
+`canceled`) in one hand-written `Set`. Scoped to `frontier.mjs` itself
+(the footprint this child task declared), verified with the plain
+regression bar (`npm test`) rather than a narrower behavioral assertion —
+downstream consumers of `RESOLVED_STATUSES` (`graph-metrics.mjs`,
+`graph-harness.mjs`, `drift-status.mjs`, `impact.mjs`, `claim-port.mjs`,
+per the audit) inherit the fix automatically since they only call
+`.has()` on the same set rather than re-implementing the literal-string
+check themselves. Landed `awaiting-approval`, first attempt, ahead by 1
+commit, no friction recorded.
+
 ---
 
 **Source:** `docs/history/phase-2-status-category-schema/CONTEXT.md` and
