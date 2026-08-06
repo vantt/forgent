@@ -5,6 +5,9 @@ pub struct WorkItem {
     pub id: String,
     pub title: String,
     pub goal_tier: String,
+    /// tsk-1e3 D4: gates the detail modal's Discover button — enabled only
+    /// at `"clarify"`.
+    pub stage: String,
 }
 
 /// Which list currently has keyboard focus (tsk-1eu D1) — `Up`/`Down`/
@@ -179,16 +182,19 @@ impl App {
                     id: "tsk-19y-1".into(),
                     title: "Herdr plugin scaffold + mock/static dashboard TUI".into(),
                     goal_tier: "mvp".into(),
+                    stage: "clarify".into(),
                 },
                 WorkItem {
                     id: "tsk-19y-2".into(),
                     title: "Wire real fgOS data into the dashboard".into(),
                     goal_tier: "mvp".into(),
+                    stage: "decompose".into(),
                 },
                 WorkItem {
                     id: "tsk-19y-3".into(),
                     title: "Pick orchestration action".into(),
                     goal_tier: "milestone".into(),
+                    stage: "executing".into(),
                 },
             ],
             in_process: vec![InProcessTask {
@@ -221,6 +227,7 @@ impl App {
                         id: row.id,
                         title: row.title,
                         goal_tier: row.goal_tier.unwrap_or_else(|| "none".into()),
+                        stage: row.stage,
                     })
                     .collect();
                 self.last_error = None;

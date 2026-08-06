@@ -83,6 +83,7 @@ impl TerminalUiPort for RatatuiTerminalUi {
             KeyCode::Up | KeyCode::Char('k') => Some(UiEvent::Up),
             KeyCode::Enter => Some(UiEvent::Pick),
             KeyCode::Tab => Some(UiEvent::SwitchPanel),
+            KeyCode::Char('d') => Some(UiEvent::Discover),
             _ => None,
         })
     }
@@ -198,9 +199,10 @@ pub fn draw(frame: &mut Frame, app: &mut App) {
 }
 
 /// A blocking dialog for the selected work item — opened by Enter on the
-/// "Work items" panel instead of picking directly. Its only action today
-/// is the Pick button, which runs the same `/fgOS:pick` flow Enter used to
-/// trigger immediately.
+/// "Work items" panel instead of picking directly. Two fixed actions
+/// (tsk-1e3 D4): Pick (Enter, unconditional) and Discover (`d`, disabled/
+/// dimmed — never hidden, so the layout never shifts — when the item's
+/// `stage != "clarify"`, since `/fgOS:discover` only applies there).
 fn draw_detail_modal(frame: &mut Frame, item: &crate::app::WorkItem) {
     let area = centered_rect(60, 40, frame.area());
     frame.render_widget(Clear, area);
@@ -214,6 +216,7 @@ fn draw_detail_modal(frame: &mut Frame, item: &crate::app::WorkItem) {
         Line::from(format!("ID: {}", item.id)),
         Line::from(format!("Title: {}", item.title)),
         Line::from(format!("Goal tier: {}", item.goal_tier)),
+        Line::from(format!("Stage: {}", item.stage)),
     ])
     .block(
         Block::default()
@@ -225,16 +228,34 @@ fn draw_detail_modal(frame: &mut Frame, item: &crate::app::WorkItem) {
     );
     frame.render_widget(detail, sections[0]);
 
-    let buttons = Paragraph::new(Line::from(Span::styled(
+    let discover_enabled = item.stage == "clarify";
+    let button_cells = Layout::default()
+        .direction(Direction::Horizontal)
+        .constraints([Constraint::Percentage(50), Constraint::Percentage(50)])
+        .split(sections[1]);
+
+    let pick_button = Paragraph::new(Line::from(Span::styled(
         " Pick ",
         Style::default().add_modifier(Modifier::REVERSED),
     )))
-    .block(
-        Block::default()
-            .borders(Borders::ALL)
-            .title("Enter: pick · Esc: close"),
-    );
-    frame.render_widget(buttons, sections[1]);
+    .block(Block::default().borders(Borders::ALL).title("Enter: pick"));
+    frame.render_widget(pick_button, button_cells[0]);
+
+    // tsk-jo1 D1 palette (ANSI-16): dim/gray (`Color::DarkGray`) when
+    // disabled, same `Reversed` treatment as Pick when enabled — color
+    // changes, layout never does.
+    let discover_style = if discover_enabled {
+        Style::default().add_modifier(Modifier::REVERSED)
+    } else {
+        Style::default().fg(Color::DarkGray)
+    };
+    let discover_button = Paragraph::new(Line::from(Span::styled(" Discover ", discover_style)))
+        .block(
+            Block::default()
+                .borders(Borders::ALL)
+                .title(if discover_enabled { "d: discover" } else { "d: discover (stage != clarify)" }),
+        );
+    frame.render_widget(discover_button, button_cells[1]);
 }
 
 /// Carves an `area`-relative popup rect out of `area`'s center —
@@ -262,7 +283,64 @@ fn centered_rect(percent_x: u16, percent_y: u16, area: Rect) -> Rect {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::app::WorkItem;
     use crate::pane_scan::PaneIdentity;
+    use ratatui::backend::TestBackend;
+
+    fn render_modal_buffer(stage: &str) -> ratatui::buffer::Buffer {
+        let item = WorkItem {
+            id: "tsk-a".into(),
+            title: "A".into(),
+            goal_tier: "mvp".into(),
+            stage: stage.into(),
+        };
+        let backend = TestBackend::new(80, 24);
+        let mut terminal = Terminal::new(backend).expect("terminal init");
+        terminal
+            .draw(|frame| draw_detail_modal(frame, &item))
+            .expect("draw should not panic");
+        terminal.backend().buffer().clone()
+    }
+
+    /// tsk-1e3 D4: both buttons always render, regardless of stage — only
+    /// Discover's color changes (see
+    /// `discover_button_disabled_when_stage_not_clarify` below).
+    #[test]
+    fn detail_modal_renders_pick_and_discover_buttons() {
+        let buffer = render_modal_buffer("clarify");
+        let content: String = buffer.content().iter().map(|cell| cell.symbol()).collect();
+        assert!(content.contains("Pick"), "modal must render a Pick button: {content}");
+        assert!(
+            content.contains("Discover"),
+            "modal must render a Discover button: {content}"
+        );
+    }
+
+    /// tsk-1e3 D4 / tsk-jo1 D1: Discover renders `Color::DarkGray` (never
+    /// hidden, never a layout shift) when the item's stage isn't
+    /// `clarify`.
+    #[test]
+    fn discover_button_disabled_when_stage_not_clarify() {
+        let buffer = render_modal_buffer("executing");
+        let discover_is_dimmed = buffer
+            .content()
+            .iter()
+            .any(|cell| cell.symbol() == "D" && cell.fg == Color::DarkGray);
+        assert!(
+            discover_is_dimmed,
+            "Discover button must render Color::DarkGray when stage != clarify"
+        );
+
+        let buffer = render_modal_buffer("clarify");
+        let discover_is_dimmed_when_enabled = buffer
+            .content()
+            .iter()
+            .any(|cell| cell.symbol() == "D" && cell.fg == Color::DarkGray);
+        assert!(
+            !discover_is_dimmed_when_enabled,
+            "Discover button must not render dimmed when stage == clarify"
+        );
+    }
 
     #[test]
     fn dashboard_table_orphan_task_gets_pane_missing_badge_in_title_cell() {
