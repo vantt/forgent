@@ -131,3 +131,26 @@ Capture thật của `tsk-f38` (nguồn của năm cái bẫy ở trên):
   Verify cuối cùng pass ngay lần chạy đầu — bằng chứng cụ thể rằng vá đủ
   năm cái bẫy (không phải bốn, không phải ba) mới đủ để verify một rename
   ~200 file xanh thật, không phải xanh giả do thiếu quét.
+
+## Tài liệu này tự minh hoạ đúng luật nó viết ra
+
+Chính item viết tài liệu này (`tsk-4l9`) cũng phải sửa verify của mình hai
+vòng trước khi chốt — hai lỗi thật, không phải giả định:
+
+1. **Grep từ đơn quá yếu** (đúng cái bẫy #5 ở trên): bản đầu chỉ
+   `grep -q 'positive'`/`grep -q 'negative'`, khớp được ở bất kỳ ngữ cảnh
+   nào. Sửa bằng cách ghim cụm đặc trưng dài (vd `'deliverable mới thật sự
+   tồn tại'`, `'pattern cũ đã biến mất'`).
+2. **Thiếu vế chặn phạm vi**: verify ban đầu không assert rằng item này
+   (một item viết prose) không đụng tới `src/`. Sửa bằng thêm
+   `! git diff --name-only main...HEAD | grep -q '^src/'`.
+
+Vòng dispute thứ ba của chính item này còn đòi verify chứng minh "guidance
+would actually work if followed" — đúng ca `content coherence` ở mục
+"Ranh giới" phía trên. Trả lời (trích dẫn thật, không phải suy diễn):
+
+> "Second-pass vòng 2 đòi thứ shell không chứng minh được ('guidance would
+> actually work if followed', 'content coherence'). Đúng ca D3 của
+> CONTEXT.md: chất lượng nội dung thuộc review lúc merge + fgos-validating,
+> không thuộc verify field. Verify giữ nguyên..., chuyển sang đường
+> lockedContext vì CONTEXT.md đã khoá/duyệt/commit."
