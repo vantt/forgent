@@ -164,6 +164,25 @@ function excludeIronLawEvidence(files, id) {
   return files.filter((f) => normalizePath(f) !== evidencePath);
 }
 
+// tsk-x5r: `.fgos/` is fgOS's own live event-sourced store, mutated by the
+// very take/return/approve lifecycle operations this advisory guards --
+// `isWorkingTreeClean` already exempts it for exactly this reason
+// (`isFgosOnlyStatusLine`, src/runner/merge.mjs: "never signals an
+// actually-dirty code tree"). `footprintDiffHits` missed the same
+// exemption: on the main-source `return` path, a `.fgos/` change from ANY
+// concurrent session's own take/return/approve landing on the shared main
+// checkout during this item's own doing window shows up in `ownDiff` --
+// this repo git-tracks `.fgos/` -- and got flagged on every footprint-
+// declaring item that (correctly) never lists its own store's paths in
+// its footprint (87 of 371 real items declare a footprint; only 7 list
+// any `.fgos/` path). Found by independent review after tsk-4hl merged.
+function excludeFgosPaths(files) {
+  return files.filter((f) => {
+    const p = normalizePath(f);
+    return p !== '.fgos' && !p.startsWith('.fgos/');
+  });
+}
+
 // LOCAL copy of session.mjs's private realpathOr (session.mjs is never edited,
 // nothing is exported from it for this). A bare fs.realpathSync would throw the
 // moment any ONE registered session's worktree directory is gone from disk (a
@@ -2254,7 +2273,7 @@ async function runVerb(verb, flags, positional, dir) {
           // absent-footprint exemption still applies inside footprintDiffHits
           // itself) — excludeIronLawEvidence strips this item's own mandatory
           // evidence doc before checking, see that helper's own comment.
-          const footprintDiff = footprintDiffHits(excludeIronLawEvidence(changed, id), item.footprint);
+          const footprintDiff = footprintDiffHits(excludeFgosPaths(excludeIronLawEvidence(changed, id)), item.footprint);
           const { event } = moveWork(dir, { id, to: 'awaiting-approval', expectedStatus: 'doing', branchHeadAtReturn: branchHead });
           addOutcome(dir, { id, actual: { outcome: 'awaiting-approval', passed: true, attempts: 1, errorClass: null, aheadCount: branchAheadCount } });
           return { id, from: 'doing', to: 'awaiting-approval', source: 'branch', branch, aheadCount: branchAheadCount, passed: true, seq: event.seq, output: check.output, frozenJudgeHits: frozenJudge, footprintDiffHits: footprintDiff };
@@ -2304,7 +2323,7 @@ async function runVerb(verb, flags, positional, dir) {
         // STR63: advisory only (per cos) — a hit never blocks this return.
         const frozenJudge = frozenJudgeHits(ownDiff, item.footprint);
         // tsk-4hl: see excludeIronLawEvidence's own comment above.
-        const footprintDiff = footprintDiffHits(excludeIronLawEvidence(ownDiff, id), item.footprint);
+        const footprintDiff = footprintDiffHits(excludeFgosPaths(excludeIronLawEvidence(ownDiff, id)), item.footprint);
         const { event } = moveWork(dir, { id, to: 'awaiting-approval', expectedStatus: 'doing', headAtReturn: head });
         addOutcome(dir, { id, actual: { outcome: 'awaiting-approval', passed: true, attempts: 1, errorClass: null, aheadCount } });
         // tsk-45z D1/D2: this session's own commits (landed straight on the
