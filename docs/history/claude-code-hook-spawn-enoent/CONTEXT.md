@@ -21,6 +21,7 @@ repo — nothing more. No forgentX source changes.
 | ID | Decision |
 |----|----------|
 | D1 | Scope is a `docs/how-to/` runbook only (symptom recognition + workaround guidance). No forgentX source change. Not closed as wontfix — the doc itself is the deliverable. |
+| D2 | Runbook file path is `docs/how-to/recognize-a-claude-code-hook-spawn-enoent-failure.md`. Picked to give `discover`'s verify field a concrete, runnable command (`test -f <path>`) instead of the placeholder `chưa xác định`, which `discover --verdict clear` rejected as `verify-disputed`. |
 
 ## Pinned terms
 
@@ -77,10 +78,8 @@ repo — nothing more. No forgentX source changes.
 
 ## Outstanding questions deferred to planning
 
-- Exact runbook file name/path under `docs/how-to/` and its precise
-  content structure — implementation detail, left to `fgos-planning`/
+- The runbook's precise content structure (headings, exact workaround
+  steps) — implementation detail, left to `fgos-planning`/
   `fgos-code-implement` to follow the existing sibling-doc convention
   already scouted above (e.g.
   `docs/how-to/recover-a-stuck-doing-claim-after-worktree-creation-failure.md`).
-- The item's `verify` field is still `chưa xác định — P15 bổ sung`;
-  designing a real verify command is planning's job, not this skill's.
