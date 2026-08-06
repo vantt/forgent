@@ -91,28 +91,43 @@ stage values — the same way `fgos-routing` describes it.
    lane before opening this file, not skipping this file for a `tiny`
    item; see `fgos-routing`'s own Mode-gate section for why this stays
    knowing-before-load, tsk-da1). Record that same count, those same
-   flags, and the lane
-   into `plan.md` itself, exactly as `plan.md` has always recorded it.
-   Above `small`, say plainly why a smaller lane would not honestly cover
-   the item. This is prose in `plan.md` — never a new field on the item,
-   never a value `stage` takes.
+   flags, and the lane into `plan.md` itself using the literal `Mode:
+   <lane>` label (e.g. `Mode: tiny` or `mode = **standard**`) `plan.md`
+   has always used — never rename this recorded label to `Lane:`, even
+   though this skill's own prose calls the concept "lane" now: decompose
+   stage's own skip-and-advance short-circuit
+   (`src/intake/decompose.mjs`'s `passThroughModeMatch` regex) parses
+   this exact literal token from `plan.md` to skip a real model call on a
+   `tiny`/`small` item, and has no idea the concept was ever renamed
+   (tsk-59a, found by independent review: the mode→lane rename broke this
+   real coupling — 25 of this repo's own `plan.md` files match the old
+   `Mode:` token, and a lane recorded as `Lane:` silently falls through
+   to a real, unnecessary model call). Above `small`, say plainly why a
+   smaller lane would not honestly cover the item. This is prose in
+   `plan.md` — never a new field on the item, never a value `stage`
+   takes.
 
    **Direct-entry fallback (tsk-da1, found by independent review):**
    `fgos-exploring` and `fgos-validating` can both hand off straight into
    this skill without going through `fgos-routing` first (their own
    Handoff sections say "directly, or via `fgos-routing`"), which means a
    lane is not guaranteed to already be sitting in this session's context.
-   If no lane was actually handed off — check honestly before assuming
-   one exists — count the flags yourself, right here, using the exact
-   same rule `fgos-routing`'s own Orient step documents: auth,
-   authorization, data model, audit/security, external systems, public
-   contracts, cross-platform, existing covered behavior, weak proof
-   around the area, multi-domain; 0–1 flags → tiny/small, 2–3 → standard,
-   4+ or any hard-gate flag → high-risk, one yes/no question → spike.
-   This is not the "never re-derive" red flag below firing — that rule
-   guards against overriding a lane `fgos-routing` already decided; this
-   is the one case where nobody decided one yet, and this skill is
-   genuinely the first to see the item.
+   Check, in order: (1) does `plan.md` already record a `Mode:` line from
+   an earlier round (a hand-back from `fgos-validating`, or this same
+   item re-entering after a mid-planning `CONTEXT.md` gap) — if so, that
+   recorded lane IS the answer, read it, never re-derive past it; (2) did
+   this session's own Orient step actually hand off a lane in prose — if
+   so, use it, same as always. Only when NEITHER of those holds — nobody
+   has ever decided a lane for this item — read and apply
+   `fgos-routing`'s own Mode-gate subsection directly (tsk-59a, found by
+   independent review: an earlier version of this fallback restated the
+   flag-count thresholds inline and silently dropped the hard-gate flag
+   enumeration and the tiny/small tie-breaker in the retelling — point at
+   the source instead of copying it, so there is exactly one place this
+   rule is written down). This is not the "never re-derive" red flag
+   below firing — that rule guards against overriding a lane already
+   decided by either check above; this is the one case where nobody
+   decided one yet, and this skill is genuinely the first to see the item.
 
 2. **Approach.** Write the chosen path and the alternatives rejected along
    the way, a risk map (component / how risky / what would prove it), the
@@ -158,6 +173,7 @@ stage values — the same way `fgos-routing` describes it.
    catch a real collision between sibling pieces before either one starts):
 
    ```bash
+   root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
    fgos add --title "Build parser" --kind task --risk light --verify "npm test -- parser" --parent <id> --footprint "src/parser.mjs,test/parser.test.mjs" --dir "$root"
    ```
 
@@ -166,7 +182,10 @@ stage values — the same way `fgos-routing` describes it.
    a collision-free one from `--title`, the normal path for a split
    child. tsk-da1: an earlier version of this example passed the title
    positionally, which `fgos add` rejects outright — kebab-case-id
-   validation fails on a plain sentence.)
+   validation fails on a plain sentence. tsk-59a: that same version also
+   used `--dir "$root"` without `$root` ever being assigned in this
+   block — copy-paste this example as shown, it is not enough to copy
+   only the `fgos add` line by itself.)
 
    If one piece is honestly enough, there is no split, and the item
    proceeds as itself.
