@@ -259,6 +259,18 @@ testing any of them in isolation. Landed `awaiting-approval`, first
 attempt, ahead by 1 commit, no friction recorded — the last of `tsk-38t`'s
 eight child tasks to close.
 
+## The stale triage-table doc gap (`tsk-38t-8`) — independent of the category decision
+
+`tsk-38t-8` fixed `docs/reference/triage-table-columns.md`, which
+`docs/decisions/0027`'s audit flagged as listing only 7 of the 10 real
+statuses (missing `delivered`/`retrospective`/`cleanup`). This gap was
+explicitly independent of how the category design landed — it existed
+before this feature and would have needed fixing regardless of which way
+the front/tail segment boundary was drawn, so it shipped as its own
+zero-dependency child task rather than being folded into the schema or
+consumer-migration work. Landed `awaiting-approval`, first attempt, ahead
+by 1 commit, no friction recorded.
+
 ---
 
 **Source:** `docs/history/phase-2-status-category-schema/CONTEXT.md` and
