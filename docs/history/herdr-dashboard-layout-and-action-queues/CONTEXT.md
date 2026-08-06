@@ -113,3 +113,35 @@ and implementation should run real `impact()` calls before editing
 
 No outstanding questions blocked on a person — every material gray area
 surfaced during clarify was answered in-session.
+
+## tsk-jo1 — palette research (child of tsk-1d5, own clarify pass)
+
+`tsk-jo1` locks the deferred color-table item above (root `CONTEXT.md`'s
+own "Deferred to planning" section: "not a formally Socratic-locked
+decision") into a real, cited palette before `tsk-64z`/`tsk-417` consume
+it. Its own decision uses a separate `tsk-jo1 D1` label — do not confuse
+with root `tsk-1d5`'s `D1`–`D9` above, a different item's own decision log.
+
+| ID | Decision |
+|---|---|
+| tsk-jo1 D1 | Palette uses ANSI-16 named `ratatui::style::Color` variants only (`Cyan`/`Red`/`Green`/`Yellow`/`Magenta`/`DarkGray`/etc.) — no `Color::Rgb` truecolor. |
+
+**Scout evidence:** `herdr-plugin/src/ui.rs:104,155,185,187` — every
+existing color use in this codebase is a named ANSI variant
+(`Color::Cyan`, `Color::Yellow`, `Color::Red`, `Color::Green`), never
+`Color::Rgb`. No truecolor precedent to extend.
+
+**Rationale:** portability — `Color::Rgb` truecolor is not guaranteed to
+render correctly over every path this plugin runs on, including
+`herdr --remote`'s SSH thin-client path (`docs/distillery/deep-dives/
+how-to-use-herdr.md` §A3) where the terminal doing the actual rendering
+may be further from the process than a direct local session. ANSI-16
+degrades safely everywhere; truecolor does not.
+
+**Impact-analysis posture:** degraded (same finding as root `tsk-1d5`'s
+plan.md — GitNexus present but its `.gitnexus` index errors on `analyze`
+with a corrupted FTS index). Not load-bearing here: this item edits no
+code, only `palette.md`.
+
+No outstanding questions for `tsk-jo1` — the only material gray area
+(ANSI-16 vs RGB) was answered in-session.
