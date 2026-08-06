@@ -147,6 +147,21 @@ test('checkMergeStillResolves: still ok:false when the root branch is missing AN
   assert.match(result.detail, /not an ancestor of HEAD either/);
 });
 
+// tsk-3ft: ancestry alone cannot tell a genuine force-push loss apart from
+// a branch manually reset to unrelated divergent history -- confirmed via
+// tsk-47e's real fgw/tsk-47e reflog. The ref/branch still exists here
+// (unlike tsk-577's pruned-ref case above); this only adds a diagnostic
+// hint pointing at `git reflog show`, never a different ok verdict.
+test('checkMergeStillResolves: ok:false detail hints at "git reflog show" when the ref exists but the sha is not its ancestor (tsk-3ft)', () => {
+  const repoRoot = initRepo();
+  const sha = commitFile(repoRoot, 'to-be-erased.txt');
+  execFileSync('git', ['reset', '--hard', 'HEAD~1'], { cwd: repoRoot });
+  const result = checkMergeStillResolves(repoRoot, { branchHeadAtReturn: sha });
+  assert.equal(result.ok, false);
+  assert.match(result.detail, /no longer reachable/);
+  assert.match(result.detail, /git reflog show HEAD/);
+});
+
 // --- checkRetrospectiveContent -----------------------------------------
 // tsk-558: reads outcome.docType/docPath (D8's own named fields) instead
 // of outcome.actual/predicted (claim-lifecycle artifacts, unrelated to
