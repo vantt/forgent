@@ -14,6 +14,11 @@ pub struct TriageRow {
     pub title: String,
     #[serde(rename = "goalTier")]
     pub goal_tier: Option<String>,
+    /// tsk-1e3 D4: the detail modal's Discover button is only enabled at
+    /// `"clarify"` — carried through from `rankImpact`'s own `stage` field
+    /// (`src/state/impact.mjs`, defaults to `"executing"` when the item
+    /// carries none), never re-derived here.
+    pub stage: String,
 }
 
 #[derive(Debug, Deserialize)]
