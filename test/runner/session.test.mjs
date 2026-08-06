@@ -208,9 +208,22 @@ test('concurrent createSession from real separate OS processes never loses a reg
   const repoRoot = initTempRepo();
   const sessionsDir = mkSessionsDir();
   try {
-    const ids = ['p0', 'p1', 'p2', 'p3', 'p4'];
+    // N=50 with a shared start barrier (tsk-1u7): a plain "launch all at
+    // once" Promise.all spreads real child-process spawn/import startup
+    // jitter wide enough that the lock's actual create-vs-write race window
+    // (microseconds) rarely overlaps -- spike-confirmed empirically: N=20
+    // with no barrier reproduced 0/10, N=50 WITH a shared `startAt` barrier
+    // (mirroring events.test.mjs's own technique) reproduced 8/30 (~27%,
+    // matching tsk-3ld's own ~30% rate for the sibling lock) before the
+    // tsk-1u7 fix, 0/30 after. See
+    // docs/history/tsk-1u7-session-lock-contention-flake/plan.md.
+    const ids = Array.from({ length: 50 }, (_, i) => `p${i}`);
+    const startAt = Date.now() + 300;
     const childScript = `
       const { pathToFileURL } = require('node:url');
+      const startAt = Number(process.argv[5]);
+      const waitMs = startAt - Date.now();
+      if (waitMs > 0) Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, waitMs);
       import(pathToFileURL(process.argv[1]).href)
         .then((m) => { m.createSession(process.argv[2], { sessionId: process.argv[3], sessionsDir: process.argv[4] }); process.exit(0); })
         .catch((e) => { console.error(e && e.stack || String(e)); process.exit(1); });
@@ -219,7 +232,7 @@ test('concurrent createSession from real separate OS processes never loses a reg
       return new Promise((resolve, reject) => {
         const child = spawn(
           process.execPath,
-          ['-e', childScript, SESSION_MOD_PATH, repoRoot, id, sessionsDir],
+          ['-e', childScript, SESSION_MOD_PATH, repoRoot, id, sessionsDir, String(startAt)],
           { stdio: ['ignore', 'ignore', 'pipe'] },
         );
         let stderr = '';
@@ -231,8 +244,8 @@ test('concurrent createSession from real separate OS processes never loses a reg
       });
     }
 
-    // launch all children at once so their read-modify-write of sessions.json
-    // genuinely races across processes
+    // all children wait on the shared startAt barrier above, then stampede
+    // the lock together
     await Promise.all(ids.map(forkCreate));
 
     const registry = readRegistry(repoRoot);
