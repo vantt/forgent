@@ -172,6 +172,20 @@ consumer-migration) proceed without re-discovering the same file list.
 Landed clean: `awaiting-approval`, first attempt, ahead by 1 commit, no
 friction recorded.
 
+## The schema field itself landed as its own narrow child task
+
+`tsk-38t-2` shipped the `STATUS_CATEGORIES`/`statusCategory` schema field
+and domain registry changes (D2/D3) described above as source code, kept
+deliberately separate from the decision record (`tsk-38t-1`) and the
+backfill migration (a later child) — each landed independently so the
+schema's existence, its documentation, and its historical backfill could
+each be verified on their own terms rather than as one large, harder-to-
+review change. Its own verify was narrow by design: a presence check that
+`src/state/work.mjs` exports `STATUS_CATEGORIES` at all, not a behavioral
+assertion — the behavioral proof was left to the later consumer-migration
+and fixture-domain child tasks. Landed clean: `awaiting-approval`, first
+attempt, ahead by 1 commit, no friction recorded.
+
 ---
 
 **Source:** `docs/history/phase-2-status-category-schema/CONTEXT.md` and
