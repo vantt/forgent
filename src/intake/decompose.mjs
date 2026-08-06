@@ -208,10 +208,15 @@ con độc lập, dependency rõ?
   động + phạm vi — cái gì bị đụng tới, làm gì với nó, giới hạn ở đâu; không
   được là một mệnh đề cụt thiếu chủ ngữ hay tân ngữ), "verify" (một lệnh
   chạy được THẬT để chứng minh việc con đã xong — không được bỏ trống,
-  không được là một câu mô tả suông), và tùy chọn "kind", "risk", "refs",
-  "footprint" (danh sách đường dẫn file việc con này dự kiến đụng tới, nếu
-  biết), "deps" ("deps" là mảng chỉ số 0-based trỏ vào các việc con KHÁC
-  đứng TRƯỚC nó trong danh sách mà nó phụ thuộc).
+  không được là một câu mô tả suông), "action" (mệnh lệnh thực thi đầy đủ
+  cho executor của việc con này — PHẢI TRÍCH DẪN ít nhất một D-ID thật từ
+  mục "Quyết định đã khoá" ở trên nếu mục đó có bảng "Locked decisions", vd
+  "D1: ..."; không được bỏ trống, không được là title chép lại nguyên văn),
+  và tùy chọn "kind", "risk", "refs", "footprint" (danh sách đường dẫn file
+  việc con này dự kiến đụng tới, nếu biết — đây cũng là danh sách file
+  executor của việc con nên đọc trước khi làm), "deps" ("deps" là mảng chỉ
+  số 0-based trỏ vào các việc con KHÁC đứng TRƯỚC nó trong danh sách mà nó
+  phụ thuộc).
 - Mơ hồ, không phán chắc được: trả "verdict": "need-human" kèm "reason".
 
 Ngoài ra, đọc phần "Quyết định đã khoá" ở trên (nếu có nhắc mode
@@ -224,11 +229,37 @@ trường này — KHÔNG được tự bịa số.
 
 # Định dạng trả lời
 Trả lời DUY NHẤT bằng một dòng JSON, không kèm chữ nào khác:
-{"verdict": "pass-through" | "decompose" | "need-human", "reason": string (bắt buộc khi need-human hoặc decompose; tùy chọn khi pass-through), "children": [{"title": string, "verify": string, "kind": string, "risk": string, "refs": string[], "footprint": string[], "deps": number[]}] (chỉ khi decompose), "mode": "tiny" | "small" | "standard" | "high-risk" | "spike" (tùy chọn, đọc lại từ plan.md nếu có), "blastRadius": number không âm (tùy chọn, đọc lại từ plan.md nếu có con số thật)}
+{"verdict": "pass-through" | "decompose" | "need-human", "reason": string (bắt buộc khi need-human hoặc decompose; tùy chọn khi pass-through), "children": [{"title": string, "verify": string, "action": string, "kind": string, "risk": string, "refs": string[], "footprint": string[], "deps": number[]}] (chỉ khi decompose), "mode": "tiny" | "small" | "standard" | "high-risk" | "spike" (tùy chọn, đọc lại từ plan.md nếu có), "blastRadius": number không âm (tùy chọn, đọc lại từ plan.md nếu có con số thật)}
 `;
 }
 
-function normalizeChild(child) {
+// tsk-3xd D2 (docs/history/tsk-3xd-decompose-child-directive-prose/
+// CONTEXT.md): a D-ID token as it appears in a "## Locked decisions" table
+// row (e.g. "D1", "D2"). Deliberately the same section-scoping approach
+// findUncoveredLockedDecisions below already uses (PATH_TOKEN_PATTERN over
+// the same "## Locked decisions" slice) — a D-ID mentioned only in prose
+// OUTSIDE that table is not a real citation.
+const D_ID_PATTERN = /\bD\d+\b/g;
+
+function extractLockedDecisionIds(contextText) {
+  if (typeof contextText !== 'string' || !contextText.trim()) return new Set();
+  const section = /##\s*Locked decisions([\s\S]*?)(?:\n##\s|$)/i.exec(contextText);
+  const decisionsText = section ? section[1] : '';
+  if (!decisionsText.trim()) return new Set();
+  const ids = new Set();
+  let match;
+  D_ID_PATTERN.lastIndex = 0;
+  while ((match = D_ID_PATTERN.exec(decisionsText)) !== null) {
+    ids.add(match[0]);
+  }
+  return ids;
+}
+
+// `lockedDecisionIds` (tsk-3xd D2, optional — every pre-tsk-3xd caller that
+// passes none keeps the old `action`-free shape, since the check below is
+// skipped whenever the set is empty): the real D-IDs found in the parent's
+// own CONTEXT.md, via extractLockedDecisionIds above.
+function normalizeChild(child, lockedDecisionIds) {
   if (!child || typeof child !== 'object' || Array.isArray(child)) return null;
   if (typeof child.title !== 'string' || !child.title.trim()) return null;
   // D2: a child with no real, runnable verify makes the WHOLE verdict
@@ -237,9 +268,29 @@ function normalizeChild(child) {
   // matrix last row).
   if (typeof child.verify !== 'string' || !child.verify.trim()) return null;
 
+  // tsk-3xd D2: action is now BẮT BUỘC, same "no placeholder invalidates
+  // the whole verdict" discipline verify already has above — an executor
+  // dispatched blind to what it must do and which decision it must obey is
+  // exactly the three-layer bug this item exists to fix (CONTEXT.md's
+  // "Tầng 1/2/3"). Must cite at least one real D-ID from the parent's own
+  // "## Locked decisions" table; a citation to a nonexistent D-ID (typo,
+  // hallucination) is rejected the same as no citation at all. Exempted
+  // when the parent carries NO locked decisions at all (empty/missing
+  // CONTEXT.md) — same graceful-degrade precedent
+  // findUncoveredLockedDecisions already sets for that case — so an item
+  // that never went through fgos-exploring does not hard-break decompose
+  // entirely; it only requires a non-empty action, not a citation with
+  // nothing real to cite.
+  if (typeof child.action !== 'string' || !child.action.trim()) return null;
+  if (lockedDecisionIds instanceof Set && lockedDecisionIds.size > 0) {
+    const cited = child.action.match(D_ID_PATTERN) ?? [];
+    if (!cited.some((id) => lockedDecisionIds.has(id))) return null;
+  }
+
   return {
     title: child.title,
     verify: child.verify,
+    action: child.action,
     kind: typeof child.kind === 'string' && child.kind.trim() ? child.kind : undefined,
     risk: typeof child.risk === 'string' && child.risk.trim() ? child.risk : undefined,
     refs: Array.isArray(child.refs) ? child.refs.filter((r) => typeof r === 'string') : [],
@@ -260,7 +311,11 @@ function normalizeChild(child) {
 // "0 children collapses to pass-through" rule, regardless of whether
 // `rawChildren` came from the model or from a live session's own reasoning
 // (`fgos decompose --children`).
-function buildDecomposeChildrenVerdict(rawReason, rawChildren) {
+//
+// `lockedContext` (tsk-3xd D2, optional — omitted keeps the old shape byte-
+// identical): the parent's own CONTEXT.md/plan.md text, threaded down to
+// normalizeChild's D-ID-citation check via extractLockedDecisionIds.
+function buildDecomposeChildrenVerdict(rawReason, rawChildren, lockedContext) {
   const reason = typeof rawReason === 'string' && rawReason.trim() ? rawReason : undefined;
 
   if (!Array.isArray(rawChildren) || rawChildren.length === 0) {
@@ -276,7 +331,8 @@ function buildDecomposeChildrenVerdict(rawReason, rawChildren) {
     return { kind: 'invalid' };
   }
 
-  const normalized = rawChildren.map(normalizeChild);
+  const lockedDecisionIds = extractLockedDecisionIds(lockedContext);
+  const normalized = rawChildren.map((child) => normalizeChild(child, lockedDecisionIds));
   if (normalized.some((child) => child === null)) {
     return { kind: 'invalid' };
   }
@@ -299,7 +355,7 @@ function buildDecomposeChildrenVerdict(rawReason, rawChildren) {
 // object (`bin/fgos.mjs`'s `parseDecomposeCallerVerdict`) — this function
 // only re-validates the parts that matter to write correctness (reason,
 // children shape), same as judgeDecompose does for model output.
-export function resolveCallerDecomposeVerdict(raw) {
+export function resolveCallerDecomposeVerdict(raw, lockedContext) {
   if (!raw || typeof raw !== 'object') return { kind: 'invalid' };
 
   if (raw.verdict === 'pass-through') {
@@ -315,7 +371,7 @@ export function resolveCallerDecomposeVerdict(raw) {
   }
 
   if (raw.verdict === 'decompose') {
-    return buildDecomposeChildrenVerdict(raw.reason, raw.children);
+    return buildDecomposeChildrenVerdict(raw.reason, raw.children, lockedContext);
   }
 
   return { kind: 'invalid' };
@@ -417,7 +473,7 @@ export function judgeDecompose(work, cfg, lockedContext, view, scoutContext, fgo
       // tsk-27y D1: shares buildDecomposeChildrenVerdict with the
       // caller-supplied verdict path (resolveCallerDecomposeVerdict) — same
       // reason/child validation for model output and caller input alike.
-      const out = buildDecomposeChildrenVerdict(verdict.reason, verdict.children);
+      const out = buildDecomposeChildrenVerdict(verdict.reason, verdict.children, lockedContext);
       if (out.kind === 'invalid') return out;
       if (mode) out.mode = mode;
       if (blastRadius !== undefined) out.blastRadius = blastRadius;
@@ -670,15 +726,26 @@ export function resolveDecompose(dir, id, cfg, role, callerVerdict) {
   }
 
   const stateRoot = path.dirname(dir);
+  // repoRoot (tsk-1ni D1): resolved to the item's own worktree when one
+  // exists, never the raw state root -- see resolveContentRoot's own
+  // comment above. Reused below for readLockedContext's own read,
+  // judgeDecompose's scoutContext (readScoutNotes/writeScoutNotes), AND
+  // (tsk-3xd D2) the caller-supplied path's own D-ID-citation check --
+  // hoisted above the callerVerdict/model branch so both share the SAME
+  // read instead of the caller-supplied branch never seeing locked
+  // decisions at all (an earlier version of this function only read it
+  // inside the model-judged branch below).
+  const repoRoot = resolveContentRoot(stateRoot, id, work.docsRef);
+  const lockedContext = readLockedContext(repoRoot, work.docsRef);
+
   let verdict;
   if (callerVerdict) {
     // tsk-27y D2: caller-supplied verdict checked FIRST, before the plan.md
-    // tiny/small mode skip-and-advance heuristic below (and before ever
-    // reading `lockedContext`/`repoRoot` for that heuristic at all) —
-    // explicit beats heuristic. This is the whole point of the protocol: a
-    // live session that already reasoned about split-work (fgos-planning)
-    // should never fall through to a blind judgeDecompose subprocess call.
-    verdict = resolveCallerDecomposeVerdict(callerVerdict);
+    // tiny/small mode skip-and-advance heuristic below — explicit beats
+    // heuristic. This is the whole point of the protocol: a live session
+    // that already reasoned about split-work (fgos-planning) should never
+    // fall through to a blind judgeDecompose subprocess call.
+    verdict = resolveCallerDecomposeVerdict(callerVerdict, lockedContext);
     if (verdict.kind === 'invalid') {
       logDecomposeVerdict(dir, id, 'invalid', DEFAULT_CALLER_INVALID_RATIONALE);
       return { outcome: 'invalid', id };
@@ -691,15 +758,6 @@ export function resolveDecompose(dir, id, cfg, role, callerVerdict) {
         'tsk-27y D2/D3: caller-supplied verdict — session already reasoned live (fgos-planning), skipping judgeDecompose subprocess; downstream gates (heavy-risk/blast-radius/footprint-overlap) still apply unconditionally, same as a model verdict',
     });
   } else {
-    // repoRoot (tsk-1ni D1): resolved to the item's own worktree when one
-    // exists, never the raw state root -- see resolveContentRoot's own
-    // comment above. Reused below for BOTH readLockedContext's own read AND
-    // judgeDecompose's scoutContext (readScoutNotes/writeScoutNotes) -- same
-    // variable, same bug, same fix; scout-notes.md belongs under docsRef in
-    // the item's own worktree exactly like CONTEXT.md/plan.md do.
-    const repoRoot = resolveContentRoot(stateRoot, id, work.docsRef);
-    const lockedContext = readLockedContext(repoRoot, work.docsRef);
-
     // DECOMPOSE-SIDE SKIP-AND-ADVANCE (tsk-19j D1/D3/D7, closes gap 3) —
     // deliberately narrower than a literal port of resolveDiscovery's own
     // trust signal: unlike a clarify-pass, a decompose verdict can WRITE REAL
@@ -937,6 +995,16 @@ export function resolveDecompose(dir, id, cfg, role, callerVerdict) {
       refs: child.refs,
       footprint: child.footprint,
       verify: child.verify,
+      // tsk-3xd D1/D3 (tầng 3 fix): the third and final layer this item's
+      // three-layer bug named -- action now survives all the way from the
+      // judge-scout verdict (tầng 1) through normalizeChild (tầng 2) to the
+      // actual work-item record, instead of being silently dropped here.
+      action: child.action,
+      // tsk-535 D2: description = the child's own title -- not action
+      // (would just duplicate that field's content with no added
+      // meaning). Closes the decompose-child half of the description gap
+      // this item exists to fix.
+      description: child.title,
       stage: stageForStep(domain, 'Execute'),
       parent: id,
       tier: work.tier,

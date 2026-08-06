@@ -244,7 +244,12 @@ test('domain-aware decompose child addWork inherits parent domain+stage', () => 
     '--verdict', 'decompose',
     '--reason', 'tsk-4sz regression: prove split children inherit the parent triage domain + stage, not coding literals',
     '--children', JSON.stringify([
-      { title: 'Triage child piece one', verify: 'test -f triage-child-1.txt && echo OK', deps: [] },
+      {
+        title: 'Triage child piece one',
+        verify: 'test -f triage-child-1.txt && echo OK',
+        action: 'tsk-3xd fixture: triage the child piece.',
+        deps: [],
+      },
     ]),
   ]);
   assert.equal(decomposeResult.status, 0, `fgos decompose failed: ${decomposeResult.stderr}`);

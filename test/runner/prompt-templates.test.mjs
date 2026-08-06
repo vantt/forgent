@@ -31,9 +31,18 @@ test('selectTemplate still resolves a real registered non-coding domain ("synthe
 
 // --- loadTemplate / renderTemplate: golden-file render --------------------
 
-test('loadTemplate reads worker-prompt-default.txt from TEMPLATE_DIR and it contains the six named placeholders', () => {
+test('loadTemplate reads worker-prompt-default.txt from TEMPLATE_DIR and it contains the eight named placeholders', () => {
   const raw = loadTemplate('worker-prompt-default.txt');
-  for (const placeholder of ['{title}', '{kind}', '{description}', '{feedbackSection}', '{refs}', '{verify}']) {
+  for (const placeholder of [
+    '{title}',
+    '{kind}',
+    '{description}',
+    '{feedbackSection}',
+    '{action}',
+    '{readFirst}',
+    '{refs}',
+    '{verify}',
+  ]) {
     assert.ok(raw.includes(placeholder), `expected template to include ${placeholder}`);
   }
   assert.ok(TEMPLATE_DIR.endsWith('prompt-templates'));
@@ -45,6 +54,8 @@ test('renderTemplate(worker-prompt-default.txt, ...) golden output — no-feedba
     kind: 'behavior_change',
     description: '(không có)',
     feedbackSection: '',
+    action: '(không có)',
+    readFirst: '(không có)',
     refs: 'src/widget.mjs, docs/specs/widget.md',
     verify: 'npm test',
   });
@@ -53,6 +64,12 @@ test('renderTemplate(worker-prompt-default.txt, ...) golden output — no-feedba
 Add the widget (kind: behavior_change)
 
 # Description
+(không có)
+
+# Directive
+(không có)
+
+# Files to read first
 (không có)
 
 # Worktree boundary
@@ -113,6 +130,8 @@ test('renderTemplate(worker-prompt-skill-pointer.txt, ...) golden output — no-
     kind: 'behavior_change',
     description: '(không có)',
     feedbackSection: '',
+    action: '(không có)',
+    readFirst: '(không có)',
     refs: 'src/widget.mjs, docs/specs/widget.md',
     verify: 'npm test',
     domain: 'coding',
@@ -129,6 +148,12 @@ an interactive fgOS session loads for this exact domain and stage, and it
 governs how this work item must be done.
 
 # Description
+(không có)
+
+# Directive
+(không có)
+
+# Files to read first
 (không có)
 
 # Worktree boundary

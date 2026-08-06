@@ -1282,6 +1282,28 @@ test('wgi-8: a worker fgos-discovered block makes the RUNNER create a new item s
   assert.equal(view.work['item-happy'].status, 'awaiting-approval');
 });
 
+// tsk-535 D4: block.description is optional per the fgos-discovered report
+// schema -- a worker that omits it must not leave the created item with no
+// description at all (the third write path this item's own scout found).
+test('tsk-535 D4: a fgos-discovered block with no description falls back to the block\'s own title, not undefined', async () => {
+  const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
+  seedItem(dir, { id: 'item-happy' });
+  const body = JSON.stringify({
+    title: 'Wire retry metrics into the dashboard',
+    kind: 'feature',
+    risk: 'standard',
+  });
+  const config = configFor(writeDiscoveringExecutor(scriptDir, counterFile, [body]));
+
+  const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
+
+  assert.equal(result.dispatched[0].outcome, 'awaiting-approval');
+  const view = listWork(dir);
+  const discovered = Object.values(view.work).filter((w) => w.discoveredFrom === 'item-happy');
+  assert.equal(discovered.length, 1);
+  assert.equal(discovered[0].description, 'Wire retry metrics into the dashboard');
+});
+
 test('wgi-8: a malformed fgos-discovered block is skipped (fail-safe) — the dispatch still proposes and no item is created', async () => {
   const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
   seedItem(dir, { id: 'item-happy' });

@@ -23,6 +23,20 @@ parameters where the consuming skill's own reasoning step lives:
   for "reason about it yourself" (real example: "Classify it yourself"),
   the path every branch below falls through to.
 
+## Valid reasons to dispatch instead of doing it inline
+
+Four, no more (`docs/history/two-layer-dispatch/DISCUSSION.md` D2, single
+source — no consuming skill restates this list, it points here instead):
+a cheaper model, a different provider (e.g. Codex/agy), resource
+isolation, or running the step in parallel with other work to shorten
+wall-clock time (chạy song song cho nhanh — Ship Faster is priority #1,
+`AGENTS.md`; the original three-reason list predated that priority order
+and silently excluded the one reason that serves it). Anything else stays
+inline — the live session already has full context for it, and
+dispatching it anyway is the same "soul re-deriving what a live soul
+already knows" waste `tsk-1ni` found in `judgeDiscovery`'s blind
+cli-spawn.
+
 ## Step A — config check
 
 Before reasoning it out yourself, check two things in order — whether
@@ -95,12 +109,72 @@ guess.) Prints `{"mechanism": "native"|"cli-spawn"[, "agentType": "<name>"]}`.
   Step D's malformed-response fallback applies identically regardless of
   which mechanism produced the response.
 
+## Ad-hoc capacity: a runtime-composed packet instead of `<PROMPT_TEMPLATE>`
+
+`docs/history/two-layer-dispatch/DISCUSSION.md` D3/D6/D6b/D10: a capacity
+whose consuming skill has no single fixed question to ask — the parent
+composes a different command each time, depending on what it just decided
+to split off — cannot fill in a registered `<PROMPT_TEMPLATE>` at all.
+This is not a second dispatch mechanism: it still goes through Steps A/B/
+B.5 unchanged (config check, presence check, native-vs-cli decision), it
+only replaces where Step C.1's prompt text comes from.
+
+What is lost by dropping the fixed template is a real guarantee — "the
+exact same question every call" — so the replacement has to be an honest
+one, not free text: **the same KIND of question every call**, via six
+required fields. Missing any one of them means the packet is malformed —
+fall through to `<INLINE_FALLBACK_HEADING>` exactly as Step D already does
+for any other malformed response, never dispatch a partial packet:
+
+| Field | Shape | Why required |
+|---|---|---|
+| `id` | `<scope>#p<n>` | Reference id (see below) so a parent can match a returned digest back to the packet that asked for it when several are in flight at once — never a lifecycle id: no claim, no reserve, no cap, no merge (D4 stays exactly as gated as it always was). The `#` makes this id permanently invalid against `work.mjs`'s `ID_PATTERN` (`src/state/work.mjs:24`) — structurally, not by convention, so a packet id can never be mistaken for a real work item. |
+| goal | one sentence | The one thing a worker cannot infer from the files it's handed |
+| inputs | concrete paths to read | "read exactly these; nothing else will be provided" — never "look around the repo" |
+| boundary | what must not be touched/written | Equivalent to symphony's `forbidden_paths` |
+| expected shape | what the returned digest should look like | Without it the worker picks its own format and the parent has to guess |
+| return contract | one fixed reply format | Equivalent to bee's status-token discipline: "exiting is not signaling" |
+
+Plus two fields that may be left blank (D10): `provider` and `tier`. No
+selection logic sits behind either yet — deciding them is a separate,
+later concern — but the slots exist now on purpose: `resolveExecutorCommand`
+already threads `model`/`tier` end-to-end (`src/runner/dispatch.mjs`), and
+leaving them out at this layer would nail every ad-hoc dispatch to
+`capacity.model ?? modelForTier(cfg, work.tier)` — always the default
+backend — forcing every call site written against this shape to be
+revisited later just to add them.
+
+`<scope>` inside `id` (D11): the id of the work item currently claimed, or
+— when there is none — `s` followed by the first 8 characters of
+`resolveWriterIdentity`'s own id (`src/runner/session-identity.mjs:129`,
+its existing four-tier registry/env/pid/unresolved fallback; never a new
+identity source). The `s` prefix only matters for the pid-sourced case:
+it keeps a scope from starting with a digit, since a pid alone is not
+even a stable identity across process restarts. Record which tier
+produced it as `scopeSource`, the same `{id, source}` shape a work item's
+own `writer` field already carries — a pid-sourced scope is not stable
+across processes the way a registry-sourced one is, and a reader of the
+packet needs to know which kind it is looking at.
+
+`<n>` inside `id`: a counter kept in the composing session's own memory,
+restarting at 1 on every fresh session — harmless, since the packet itself
+is ephemeral and was never meant to survive a restart. **Never back this
+counter with a file.** A counter file is state, and state is exactly the
+back door D4's "no lifecycle id for this shape" decision was drawn to
+close.
+
+Once the six-field packet is built (or the fallback triggered on a missing
+field), continue at Step C.1 below, substituting the packet for
+`<PROMPT_TEMPLATE>` — every later step is unchanged.
+
 ## Step C — configured-and-present dispatch (cli-spawn mechanism)
 
 1. Build the prompt from `<PROMPT_TEMPLATE>` (fixed, so every dispatch
    asks the exact same thing) — the identical prompt Step B.5's native
    branch would also have used, built once regardless of which mechanism
-   Step B.5 picked.
+   Step B.5 picked. For an ad-hoc capacity, this is the six-field packet
+   from the section above instead — same "build once, use for whichever
+   mechanism Step B.5 picked" rule, just a different source for the text.
 
 2. Resolve the real command/args, reusing `dispatch.mjs`'s own
    `resolveExecutorConfig`/`resolveExecutorCommand` (`tsk-62v`) — never a
@@ -111,7 +185,14 @@ guess.) Prints `{"mechanism": "native"|"cli-spawn"[, "agentType": "<name>"]}`.
    ```
 
    This prints `{"command":...,"args":[...],"provider":...,"model":...}`
-   as JSON.
+   as JSON. When the packet's own optional `tier`/`model` fields were
+   filled in (the ad-hoc section above), pass them through as `--tier
+   <tier>`/`--model <model>` on this same call (`tsk-2k1`, D10) — either
+   flag, when given, wins over the capacity's own declared tier/model and
+   the computed default; omitted (every registered-`<CAPACITY_ID>` call
+   that names neither) resolves exactly as before this plumbing existed.
+   Which tier/model a packet SHOULD choose is not decided here —
+   `#task-tier-judged-at-dispatch` — this is only the pass-through.
 
 3. Print the announce line, then actually run the resolved
    `command`/`args` via Bash (the JSON's `args` array is the real,
@@ -133,6 +214,77 @@ absent. Either way the output is non-authoritative: a wrong external
 suggestion is exactly as cheap to fix later as a wrong inline one — never
 treat a dispatched answer as more trustworthy than the skill's own
 reasoning would have been.
+
+## Provider/tier judgment for an ad-hoc dispatch (D5/D7/D10/D12)
+
+`docs/history/two-layer-dispatch/DISCUSSION.md` D12: this is an optional,
+per-dispatch REFINEMENT on top of everything above — it never adds a
+second dispatch mechanism, and it never requires splitting `work.tier`
+into a separate field (D12 picked the smaller path over a field split:
+`work.tier` keeps carrying both its existing meanings unchanged; this
+section only adds an override at dispatch TIME, resolved through the
+`--model`/`--tier` flags `dispatch.mjs resolve` already accepts,
+tsk-2k1/D10). Skip this section entirely for a registered `<CAPACITY_ID>`
+dispatch with no reason to deviate from its own declared tier/model —
+nothing here changes that path.
+
+When a consuming skill's own reasoning session has a real reason to pick a
+different tier (and, optionally, a non-default provider) for one specific
+dispatch, judge it INLINE, as the session's own reasoning — never via a
+second subprocess judge call spawned just to answer this. That would be
+the exact same "soul re-deriving what a live soul already knows" waste
+`docs/decisions/0026-vision-orchestrator-roottask-capacity-native-vs-cli-
+spawn.md`'s own "Lớp còn thiếu" section already names for
+`judgeDiscovery`/`judgeDecompose` — spawning one here would repeat that
+mistake one layer further down the stack. The evidence to reason FROM,
+when dispatching an ad-hoc packet (see the section above), is the
+packet's own six required fields — reuse bee's three-tier rubric
+(light/standard/heavy) against the packet's `goal`/`expected shape`/
+`return contract`, the same rubric a work item's own `tier` is judged
+against at intake, just applied per-dispatch instead of once.
+
+This judgment produces ONLY `provider`/`tier` — never a mechanism.
+Mechanism stays entirely `dispatch.mjs decide`'s own call, resolved
+through the Native-First Dispatch Doctrine's rules 1–4 exactly as Step
+B.5 above already does; a judged `provider` that resolves to a
+non-Claude command still has to clear the same `allowCrossProvider` gate
+`resolveExecutorConfig` already enforces
+(`src/runner/dispatch.mjs:691-693`) — nothing here bypasses it.
+
+Fail-safe is the INVERSE of the six-field packet's own (there, a missing
+required field means "do not dispatch, fall back to
+`<INLINE_FALLBACK_HEADING>` — Step D above): here, failing to reach a
+confident tier/provider judgment means dispatch ANYWAY, with the
+capacity's own declared default (`capacity.tier`/`capacity.model`, or the
+computed `modelForTier` fallback) — an unresolved judgment is never a
+reason to block a dispatch that would otherwise proceed.
+
+Record whichever tier/model actually gets used — judged or defaulted —
+through the one existing writer of `.fgos/logs/`, `appendWorkerLog`
+(`src/runner/worker-log.mjs`); never a new log file or module for this:
+
+```bash
+root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
+node --input-type=module -e "
+import { appendWorkerLog } from '$root/src/runner/worker-log.mjs';
+appendWorkerLog('$root', '<scope>', {
+  tier: '<judged-or-default-tier>',
+  model: '<judged-or-default-model>',
+  message: 'ad-hoc dispatch <packet id>: <goal>',
+});
+"
+```
+
+`<scope>` is the packet id's own `<scope>` segment (the part before the
+`#` in `<scope>#p<n>`) — in the common case, the work item currently
+claimed, so this entry lands in `.fgos/logs/<scope>.log`, the exact same
+file that item's own regular dispatch entries already write to. That is
+deliberate: it is what lets a later read of one file answer "what did
+this item's own ad-hoc sub-dispatches choose", and it is exactly the data
+a future downgrade-feedback-loop pass over `.fgos/logs/` needs to measure
+how often the expensive tier was actually scarce. Log every judged-or-
+defaulted choice, not only the cases where a downgrade happened — a
+scarcity signal needs the full denominator, not just the misses.
 
 ## Precedent
 
