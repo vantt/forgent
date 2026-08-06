@@ -190,7 +190,7 @@ stage values — the same way `fgos-routing` describes it.
 
    ```bash
    root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
-   fgos add --title "Build parser" --kind task --risk light --verify "npm test -- parser" --parent <id> --footprint "src/parser.mjs,test/parser.test.mjs" --dir "$root"
+   fgos add --title "Build parser" --kind task --risk light --verify "npm test -- parser" --description "Build parser" --parent <id> --footprint "src/parser.mjs,test/parser.test.mjs" --dir "$root"
    ```
 
    (no positional argument here — `fgos add`'s positional/`--id` is the
