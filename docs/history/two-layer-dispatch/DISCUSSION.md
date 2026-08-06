@@ -6,14 +6,19 @@ computed-parallel-wave-schedule + worktree-dispatch-attestation, đã merge main
 
 ## 1. Trạng thái hiện tại
 
-Vòng 2 (2026-08-06). Đã đọc kỹ upstream bee và scout xong phía fgOS. Hai câu
+Vòng 3 (2026-08-06). Đã đọc kỹ upstream bee và scout xong phía fgOS. Hai câu
 hỏi mở đầu của người dùng đã có câu trả lời bằng bằng chứng source (§3, hàng
 "rõ"). Phát hiện quan trọng nhất: **bee không có một mô hình cell duy nhất — bee
 tách sẵn HAI lớp dispatch**, và ranh giới bee vạch là *"dispatch nào GHI file thì
 phải có id, dispatch nào chỉ ĐỌC-tổng-hợp thì không cần gì cả"*.
 
 Vòng 2 làm sâu thêm hàng 10 của §3 (lỗ ba tầng, và nó là lỗ hợp đồng chứ không
-phải lỗi chất lượng model) và đẩy phần đó về `tsk-3xd` để `clarify` chốt.
+phải lỗi chất lượng model) và đẩy phần đó về `tsk-3xd` để `clarify` chốt. Vòng 3
+xử thứ tự `tsk-3xd` vs `tsk-535` (§3 hàng 16-19) và **đính chính một lời sai của
+vòng 2** — `tsk-3xd` không làm `tsk-535` thành thừa.
+
+Hai việc đang chờ người xác nhận: đặt `mergeAfter` cho `tsk-535`, và sửa câu sai
+còn nằm trong description của `tsk-3xd`.
 
 Chưa có D-ID nào được mint: mọi điểm mới đứng qua đúng một vòng, chưa đủ điều
 kiện ổn định (quy tắc D4 của `fgos-coding-shaping`). Còn mở: chọn B1 trước hay
@@ -57,6 +62,10 @@ buộc phải giữ lại (id, footprint, verify, merge) khi việc con thực s
 | 13 | Nếu làm B2: id ephemeral hình dạng nào | **Chưa rõ** | Ví dụ `tsk-66o#c1` — phạm vi cha, không vào `list/ready/triage`, không stage, không retro, chết khi cha `done`. Chưa quyết chỗ lưu (file riêng như `.bee/cells/` hay nhánh phụ trong events log) |
 | 14 | Có thêm field per-item `selfSufficient` không | **Chưa rõ** | Nghiêng về KHÔNG: thêm cờ tự-khai là mời agent tự phong "tôi đủ trọn vẹn", đúng thứ `gate-bypass.mjs` cố tình tránh bằng cách chỉ đọc dấu hiệu cơ học. Chưa qua vòng thứ hai |
 | 15 | Vá `tsk-3xd` xong thì B2 còn cần không | **Chưa rõ** | Nếu con auto-decompose mang được `action` prose + `read_first` thật, "task con hoàn chỉnh" (cách chia thứ nhất) có thể đã đủ, B2 thành thừa |
+| 16 | Nguy cơ mất dữ liệu của `tsk-535` đã sống chưa? | **Rõ — chưa, còn tiềm ẩn** | `deriveTitle` chỉ được gọi ở đúng một chỗ: `bin/fgos.mjs:748` (đường `submit`). Không có migration/verb re-derive nào trong source; `docs/history/work-item-title-contract/CONTEXT.md` để nguyên *"Whether D4's re-derive ships as a one-shot script or a CLI verb"* ở mục Deferred to planning ⇒ chỉ nổ khi ai đó ship D4 |
+| 17 | `fgos add` có `--description` không? | **Rõ — không** | `bin/fgos.mjs` chỉ set `description` ở `:764` (nhánh `submit`); `--description` chỉ tồn tại cho `edit` và `tool register`. Xác nhận nửa thứ hai của `tsk-535` là thật |
+| 18 | `tsk-3xd` có làm `tsk-535` thành thừa không? | **Rõ — KHÔNG** (đính chính lời nói ở vòng 2) | `tsk-3xd` chỉ vá tiến-về-trước: không đụng 53 item đã hỏng, không đụng đường `fgos add`. Nói `tsk-535` "có thể superseded" là sai |
+| 19 | Thứ tự `tsk-3xd` vs `tsk-535` | **Khuyến nghị đã nêu, chờ người xác nhận** | `tsk-3xd` trước: nó vá 40/53 item (đường decompose) bằng prose thật, làm `tsk-535` teo lại còn `fgos add --description` + backfill. Làm ngược thì công vứt đi VÀ `description=title` che mất triệu chứng (nhìn như đã có description, với executor vẫn rỗng nghĩa). Ràng buộc cứng thật sự: cả hai xong trước khi D4 re-derive ship — item ship D4 chưa tồn tại |
 
 ## 4. Quyết định đã chốt
 
@@ -128,6 +137,32 @@ cứng chỉ làm chậm một trong hai.
 
 **Kết quả vòng 2:** `fgos edit tsk-3xd --description` đã bổ sung ba tầng, đường
 `--children`, bốn câu hỏi mở, và ghi chú không-dep-cứng vào item.
+
+### 2026-08-06 — vòng 3
+
+**Người dùng:** `tsk-535` nên làm trước hay sau `tsk-3xd`?
+
+**Trả lời (sau khi scout `deriveTitle`, `bin/fgos.mjs` nhánh `add`, và
+`docs/history/work-item-title-contract/CONTEXT.md`):** `tsk-3xd` trước — §3 hàng
+16-19. Ba điểm scout mới: nguy cơ mất dữ liệu của `tsk-535` chưa sống (chưa có
+đường re-derive nào trong source, D4 còn nằm ở Deferred to planning); `fgos add`
+đúng là không có `--description`; và **đính chính**: `tsk-3xd` KHÔNG làm
+`tsk-535` thành thừa — lời ở vòng 2 ("`tsk-535` hết lý do tồn tại và có thể
+superseded") là sai, vì `tsk-3xd` chỉ vá tiến-về-trước, không đụng 53 item đã
+hỏng và không đụng đường `fgos add`.
+
+Lý do quan trọng nhất cho thứ tự này không phải tốc độ mà là **che triệu
+chứng**: nếu `tsk-535` land trước với `description = title`, 40 item con sẽ
+"nhìn như đã có description" trong khi với executor vẫn là prompt rỗng nghĩa —
+`tsk-3xd` chưa xong mà không ai thấy.
+
+**Đề xuất chưa được xác nhận:** ghi thứ tự bằng `fgos edit tsk-535 --merge-after
+tsk-3xd` thay vì dep cứng — `mergeAfter` (`src/state/work.mjs:256-273`) chỉ xếp
+thứ tự lúc merge, không chặn clarify/planning, nên hai item vẫn chạy song song.
+
+**Còn nợ:** description của `tsk-3xd` đang mang câu sai từ vòng 2 ("`tsk-535`
+hết lý do tồn tại và có thể superseded"). Phải sửa trước khi item đó vào
+`clarify`, nếu không nó sẽ dẫn hướng sai ngay từ câu hỏi đầu tiên.
 
 ## 6. Thiết kế đã chốt {#design}
 
