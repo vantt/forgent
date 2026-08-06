@@ -76,7 +76,7 @@ gọi `fgos decision --id tsk-2t6` thật.)_
 
 | D-ID | Nội dung | Lý do | Vòng chốt |
 |---|---|---|---|
-| — | — | — | — |
+| **D1** | `tsk-3xd` làm **trước** `tsk-535`; ghi thứ tự bằng `mergeAfter`, không dep cứng | `tsk-3xd` vá 40/53 item thiếu description (đường decompose) bằng prose thật ⇒ `tsk-535` teo lại còn `fgos add --description` + backfill. Làm ngược thì `description=title` **che mất triệu chứng**: 40 item con nhìn như đã có description nhưng với executor vẫn rỗng nghĩa. `mergeAfter` (`src/state/work.mjs:256-273`) chỉ xếp thứ tự lúc merge ⇒ hai item vẫn chạy song song | Vòng 3 (người xác nhận trực tiếp). Đã thi hành: `fgos edit tsk-535 --merge-after tsk-3xd`, và `fgos decision --id tsk-2t6` seq 7857 |
 
 ## 5. Q&A log
 
@@ -163,6 +163,12 @@ thứ tự lúc merge, không chặn clarify/planning, nên hai item vẫn chạ
 **Còn nợ:** description của `tsk-3xd` đang mang câu sai từ vòng 2 ("`tsk-535`
 hết lý do tồn tại và có thể superseded"). Phải sửa trước khi item đó vào
 `clarify`, nếu không nó sẽ dẫn hướng sai ngay từ câu hỏi đầu tiên.
+
+**Kết quả vòng 3:** người xác nhận thứ tự ⇒ mint **D1** ở §4, thi hành
+`fgos edit tsk-535 --merge-after tsk-3xd` và `fgos decision --id tsk-2t6`
+(seq 7857). Phần sửa description của `tsk-3xd` chuyển cho phiên đang giữ claim
+item đó (item đã được pick ở phiên khác) — phiên này chỉ soạn đoạn thay thế,
+không ghi chéo sang item của phiên khác.
 
 ## 6. Thiết kế đã chốt {#design}
 
