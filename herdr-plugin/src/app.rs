@@ -460,6 +460,13 @@ impl App {
     /// failure is surfaced via `last_error` — a transient CLI hiccup must
     /// never blank an already-populated dashboard.
     pub fn refresh_from_fgos(&mut self, source: &dyn WorkItemSource) {
+        // tsk-1pg D2: track whether one of the 5 sources below already
+        // recorded an error THIS cycle. Once one has, no later branch --
+        // success or failure -- overwrites `last_error`: the first error
+        // in call order (triage -> doing -> need_answer -> after_deliver
+        // -> merge_list) wins and stays on screen for the whole cycle.
+        let mut error_recorded_this_cycle = false;
+
         match source.fetch_triage() {
             Ok(rows) => {
                 let mut items: Vec<WorkItem> = rows
@@ -482,10 +489,17 @@ impl App {
                 // even for a source that doesn't).
                 items.sort_by_key(|item| item.priority.unwrap_or(i64::MAX));
                 self.work_items = items;
-                self.last_error = None;
+                if !error_recorded_this_cycle {
+                    self.last_error = None;
+                }
                 self.clamp_selection();
             }
-            Err(err) => self.last_error = Some(err.to_string()),
+            Err(err) => {
+                if !error_recorded_this_cycle {
+                    self.last_error = Some(err.to_string());
+                    error_recorded_this_cycle = true;
+                }
+            }
         }
 
         match source.fetch_doing() {
@@ -498,10 +512,17 @@ impl App {
                         pane: None,
                     })
                     .collect();
-                self.last_error = None;
+                if !error_recorded_this_cycle {
+                    self.last_error = None;
+                }
                 self.clamp_in_process_selection();
             }
-            Err(err) => self.last_error = Some(err.to_string()),
+            Err(err) => {
+                if !error_recorded_this_cycle {
+                    self.last_error = Some(err.to_string());
+                    error_recorded_this_cycle = true;
+                }
+            }
         }
 
         match source.fetch_need_answer() {
@@ -514,9 +535,16 @@ impl App {
                         status: row.status,
                     })
                     .collect();
-                self.last_error = None;
+                if !error_recorded_this_cycle {
+                    self.last_error = None;
+                }
             }
-            Err(err) => self.last_error = Some(err.to_string()),
+            Err(err) => {
+                if !error_recorded_this_cycle {
+                    self.last_error = Some(err.to_string());
+                    error_recorded_this_cycle = true;
+                }
+            }
         }
 
         match source.fetch_after_deliver() {
@@ -529,17 +557,34 @@ impl App {
                         status: row.status,
                     })
                     .collect();
-                self.last_error = None;
+                if !error_recorded_this_cycle {
+                    self.last_error = None;
+                }
             }
-            Err(err) => self.last_error = Some(err.to_string()),
+            Err(err) => {
+                if !error_recorded_this_cycle {
+                    self.last_error = Some(err.to_string());
+                    error_recorded_this_cycle = true;
+                }
+            }
         }
 
+        // merge_list is the last source this cycle -- no branch below reads
+        // `error_recorded_this_cycle` again, so its own `Err` arm doesn't
+        // need to flip the flag, but it still must not overwrite an error
+        // an earlier source already recorded this cycle.
         match source.fetch_merge_list() {
             Ok(summary) => {
                 self.merge_list = summary;
-                self.last_error = None;
+                if !error_recorded_this_cycle {
+                    self.last_error = None;
+                }
             }
-            Err(err) => self.last_error = Some(err.to_string()),
+            Err(err) => {
+                if !error_recorded_this_cycle {
+                    self.last_error = Some(err.to_string());
+                }
+            }
         }
     }
 
@@ -594,6 +639,93 @@ mod tests {
         fn fetch_merge_list(&self) -> Result<MergeListSummary, FgosError> {
             Ok(MergeListSummary::default())
         }
+    }
+
+    /// tsk-1pg D2: lets a test fail any subset of `refresh_from_fgos`'s 5
+    /// sources independently, in call order (triage, doing, need_answer,
+    /// after_deliver, merge_list), to prove which error wins when more
+    /// than one fails in the same cycle.
+    struct OrderedFailureSource {
+        fail_triage: bool,
+        fail_doing: bool,
+        fail_need_answer: bool,
+        fail_after_deliver: bool,
+        fail_merge_list: bool,
+    }
+
+    impl WorkItemSource for OrderedFailureSource {
+        fn fetch_triage(&self) -> Result<Vec<TriageRow>, FgosError> {
+            if self.fail_triage {
+                Err(FgosError::ExitStatus("triage failed".into()))
+            } else {
+                Ok(Vec::new())
+            }
+        }
+
+        fn fetch_doing(&self) -> Result<Vec<DoingRow>, FgosError> {
+            if self.fail_doing {
+                Err(FgosError::ExitStatus("doing failed".into()))
+            } else {
+                Ok(Vec::new())
+            }
+        }
+
+        fn fetch_need_answer(&self) -> Result<Vec<crate::fgos::NeedAnswerRow>, FgosError> {
+            if self.fail_need_answer {
+                Err(FgosError::ExitStatus("need_answer failed".into()))
+            } else {
+                Ok(Vec::new())
+            }
+        }
+
+        fn fetch_after_deliver(&self) -> Result<Vec<crate::fgos::AfterDeliverRow>, FgosError> {
+            if self.fail_after_deliver {
+                Err(FgosError::ExitStatus("after_deliver failed".into()))
+            } else {
+                Ok(Vec::new())
+            }
+        }
+
+        fn fetch_merge_list(&self) -> Result<MergeListSummary, FgosError> {
+            if self.fail_merge_list {
+                Err(FgosError::ExitStatus("merge_list failed".into()))
+            } else {
+                Ok(MergeListSummary::default())
+            }
+        }
+    }
+
+    #[test]
+    fn last_error_first_error_wins() {
+        // doing (2nd) fails; need_answer/after_deliver/merge_list (3rd-5th,
+        // all after it) succeed -- a later success in the same cycle must
+        // never clear the error already recorded.
+        let source = OrderedFailureSource {
+            fail_triage: false,
+            fail_doing: true,
+            fail_need_answer: false,
+            fail_after_deliver: false,
+            fail_merge_list: false,
+        };
+        let mut app = App::empty();
+        app.refresh_from_fgos(&source);
+        let err = app.last_error.expect("an error should be recorded");
+        assert!(err.contains("doing failed"), "a later success must not clear the earlier error, got: {err}");
+
+        // triage (1st) AND merge_list (5th, last) both fail -- the first
+        // error in call order wins; a later failure in the same cycle must
+        // not replace it either.
+        let source = OrderedFailureSource {
+            fail_triage: true,
+            fail_doing: false,
+            fail_need_answer: false,
+            fail_after_deliver: false,
+            fail_merge_list: true,
+        };
+        let mut app = App::empty();
+        app.refresh_from_fgos(&source);
+        let err = app.last_error.expect("an error should be recorded");
+        assert!(err.contains("triage failed"), "the first error in call order must win, got: {err}");
     }
 
     fn triage_row(id: &str, status: &str, priority: Option<i64>) -> TriageRow {
