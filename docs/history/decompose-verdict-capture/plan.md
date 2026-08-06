@@ -103,7 +103,7 @@ one file, one internal dependency chain (prompt/parsing before wiring).
 - Re-entrant `already-decomposed` path (`decompose.mjs:287-292`) — leaning
   toward: no new record here, since children already carry their own trace
   and this path is purely a crash-recovery no-op, not a fresh judgment —
-  flagged for `fgos-executing` to confirm against the item's own verify
+  flagged for `fgos-code-implement` to confirm against the item's own verify
   wording ("cả 4 nhánh").
 
 ## No split

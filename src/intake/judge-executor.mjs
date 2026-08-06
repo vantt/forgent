@@ -302,8 +302,39 @@ function runBoundedAttempts(cfg, model, prompt, stricterPrompt, tier, maxAttempt
 const DEFAULT_VERIFY_DISAGREE_REASON =
   'Không phán được rõ ràng ở vòng kiểm tra thứ hai — cần người xác nhận.';
 
-function buildVerifyCheckPrompt(title, description, proposedVerify) {
+// tsk-12t D1/D2/D4: mechanical pre-check for the documented `node --test`/
+// `--test-name-pattern` reporter-format trap
+// (docs/how-to/avoid-vacuous-pass-with-node-test-test-name-pattern.md) --
+// Node's default reporter never prints a TAP-style `# pass`/`# fail` line,
+// so a verify grepping for that shape can never correctly detect pass/fail
+// regardless of what the tested code does. Runs BEFORE the LLM spawn below
+// (D4 — cheaper than relying on a second-pass LLM judge to catch a known
+// syntactic anti-pattern every round) and is gated on BOTH the
+// wrong-reporter grep shape AND a reference to `node --test`/
+// `--test-name-pattern` (D2) — scoped to the how-to doc's own documented
+// trap, not a bare ban on any TAP-style text (a legitimate verify for a
+// different TAP-consuming tool must not false-positive here).
+const KNOWN_BAD_VERIFY_PATTERN_DOC = 'docs/how-to/avoid-vacuous-pass-with-node-test-test-name-pattern.md';
+const NODE_TEST_REFERENCE_RE = /node\s+--test\b|--test-name-pattern\b/;
+const WRONG_REPORTER_GREP_RE = /\^#\s*(pass|fail)\b/;
+
+function matchesKnownBadVerifyPattern(proposedVerify) {
+  return (
+    typeof proposedVerify === 'string' &&
+    NODE_TEST_REFERENCE_RE.test(proposedVerify) &&
+    WRONG_REPORTER_GREP_RE.test(proposedVerify)
+  );
+}
+
+function buildVerifyCheckPrompt(title, description, proposedVerify, priorRejection) {
   const desc = typeof description === 'string' && description.trim() ? description : '(không có)';
+  const priorSection =
+    typeof priorRejection === 'string' && priorRejection.trim()
+      ? `\n# Vòng trước đã từ chối một đề xuất verify khác cho CHÍNH item này\n${priorRejection.trim()}\n\nĐề xuất mới dưới đây được viết để sửa đúng theo lý do từ chối ở trên. Đừng` +
+        ` tự mâu thuẫn với chính lý do vòng trước của bạn: nếu đề xuất mới đã sửa` +
+        ` đúng điểm bị chê, hãy đồng ý; chỉ từ chối tiếp nếu có lý do CỤ THỂ KHÁC,` +
+        ` không lặp lại hoặc đảo ngược tiêu chí đã nêu ở vòng trước.\n`
+      : '';
   return `# Kiểm tra độc lập một lệnh verify đã được đề xuất
 
 Một vòng phán KHÁC vừa đề xuất lệnh verify dưới đây để chứng minh việc sau
@@ -313,7 +344,7 @@ chỉ là một lệnh chạy được bất kỳ.
 
 Title: ${title}
 Mô tả: ${desc}
-
+${priorSection}
 # Lệnh verify được đề xuất
 ${proposedVerify}
 
@@ -331,17 +362,35 @@ Trả lời DUY NHẤT bằng một dòng JSON, không kèm chữ nào khác:
 /**
  * Second-pass semantic-correctness check on a model-proposed `verify`
  * string, independent of whichever judge call proposed it. Always returns
- * `{agrees: boolean, reason?: string}` and never throws: ANY failure — spawn
- * error, timeout, non-zero exit, unparsable stdout, or a missing/non-boolean
- * `agrees` field — folds to `{agrees: false, reason: DEFAULT_VERIFY_DISAGREE_REASON}`,
- * matching this codebase's existing fail-safe stance (an uncertain judgement
- * is never treated as a pass, discovery.mjs's own D4).
+ * `{agrees: boolean, reason?: string, mechanical?: true}` and never throws:
+ * ANY failure — spawn error, timeout, non-zero exit, unparsable stdout, or a
+ * missing/non-boolean `agrees` field — folds to `{agrees: false, reason:
+ * DEFAULT_VERIFY_DISAGREE_REASON}`, matching this codebase's existing
+ * fail-safe stance (an uncertain judgement is never treated as a pass,
+ * discovery.mjs's own D4).
+ *
+ * tsk-12t D1/D3: a disagreement sourced from `matchesKnownBadVerifyPattern`
+ * above (not the LLM) carries `mechanical: true` — a syntactic fact, not a
+ * judgement call — so callers can tell it apart from an LLM-sourced
+ * disagreement and refuse to let `--force` override it (D6).
  */
-export function judgeVerifySemanticCorrectness(work, proposedVerify, cfg) {
+export function judgeVerifySemanticCorrectness(work, proposedVerify, cfg, priorRejection) {
+  if (matchesKnownBadVerifyPattern(proposedVerify)) {
+    return {
+      agrees: false,
+      mechanical: true,
+      reason:
+        `Verify dùng "node --test"/"--test-name-pattern" nhưng grep theo dòng TAP kiểu ` +
+        `"^# pass"/"^# fail" — reporter mặc định của Node KHÔNG BAO GIỜ in dòng này ` +
+        `(xem ${KNOWN_BAD_VERIFY_PATTERN_DOC}). Sửa lại theo cách doc đó hướng dẫn: grep ` +
+        `dòng checkmark kèm mô tả test cụ thể, không dựa vào số đếm pass/fail gộp.`,
+    };
+  }
+
   try {
     const tier = work?.tier ?? DEFAULTS.tier;
     const model = modelForTier(cfg, tier);
-    const prompt = buildVerifyCheckPrompt(work?.title, work?.description, proposedVerify);
+    const prompt = buildVerifyCheckPrompt(work?.title, work?.description, proposedVerify, priorRejection);
     const stricterPrompt = prompt + JUDGE_STRICT_JSON_SUFFIX;
 
     const verdict = runJudgeExecutor(cfg, model, prompt, stricterPrompt);

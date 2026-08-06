@@ -7,7 +7,7 @@ từ vựng này trong dữ liệu máy đọc (`work.status` và `outcome.actua
 disposition), cộng migration ghi-đè-tại-chỗ cho log lịch sử đã commit dưới
 miễn trừ pre-release 0019. KHÔNG bao gồm: thêm tầng chú giải hiển thị riêng
 (bị loại theo D6), viết migration script thật (thuộc `fgos-planning`/
-`fgos-executing`), sửa `test/fixtures/phase1-events.jsonl`.
+`fgos-code-implement`), sửa `test/fixtures/phase1-events.jsonl`.
 
 ## Bối cảnh ban đầu
 

@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { DOMAINS, DEFAULT_DOMAIN, resolveDomainName, getDomain, stageForStep, skillForStage } from '../../src/state/workflow-stage-graphs.mjs';
+import { DOMAINS, DEFAULT_DOMAIN, resolveDomainName, getDomain, stageForStep, skillForStage, parkReasonForStatus } from '../../src/state/workflow-stage-graphs.mjs';
 import { rebuildView } from '../../src/state/replay.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -12,15 +12,32 @@ test('DEFAULT_DOMAIN is "coding"', () => {
   assert.equal(DEFAULT_DOMAIN, 'coding');
 });
 
-test('DOMAINS has exactly two entries: "coding" and "synthetic"', () => {
-  assert.deepEqual(Object.keys(DOMAINS), ['coding', 'synthetic']);
+test('DOMAINS has exactly four entries: "coding", "synthetic", "triage", and "fixture-marketing" (tsk-38t-7 capstone fixture)', () => {
+  assert.deepEqual(Object.keys(DOMAINS), ['coding', 'synthetic', 'triage', 'fixture-marketing']);
+});
+
+test('DOMAINS.triage (tsk-3xo regression fixture) maps Clarify/Divide/Execute under non-coding-literal stage names', () => {
+  assert.deepEqual(DOMAINS.triage.stages, ['triage', 'shaping', 'assembling']);
+  assert.deepEqual(DOMAINS.triage.stepMap, {
+    triage: 'Clarify',
+    shaping: 'Divide',
+    assembling: 'Execute',
+  });
+  assert.deepEqual(DOMAINS.triage.transitions, [
+    { from: 'triage', to: 'assembling' },
+    { from: 'triage', to: 'shaping' },
+    { from: 'shaping', to: 'assembling' },
+  ]);
+  assert.equal(stageForStep(DOMAINS.triage, 'Clarify'), 'triage');
+  assert.equal(stageForStep(DOMAINS.triage, 'Divide'), 'shaping');
+  assert.equal(stageForStep(DOMAINS.triage, 'Execute'), 'assembling');
 });
 
 test('DOMAINS.coding.stages is the pre-retrofit work.mjs STAGES value — compound-learn retired (D11)', () => {
   assert.deepEqual(DOMAINS.coding.stages, ['clarify', 'decompose', 'executing']);
 });
 
-test('DOMAINS.coding.transitions is the pre-retrofit stage.mjs STAGE_TRANSITIONS value — the executing->compound-learn edge is retired (D11)', () => {
+test('DOMAINS.coding.transitions is the pre-retrofit stage-fsm.mjs STAGE_TRANSITIONS value — the executing->compound-learn edge is retired (D11)', () => {
   assert.deepEqual(DOMAINS.coding.transitions, [
     { from: 'clarify', to: 'executing' },
     { from: 'clarify', to: 'decompose' },
@@ -57,7 +74,7 @@ test('DOMAINS.coding.skillMap has an entry for every stage in DOMAINS.coding.sta
 test('DOMAINS.coding.skillMap maps every stage, including executing, to its skill', () => {
   assert.equal(DOMAINS.coding.skillMap.clarify, 'fgos-exploring');
   assert.equal(DOMAINS.coding.skillMap.decompose, 'fgos-planning');
-  assert.equal(DOMAINS.coding.skillMap.executing, 'fgos-executing');
+  assert.equal(DOMAINS.coding.skillMap.executing, 'fgos-code-implement');
   // fgos-compounding no longer has a stage entry (D11) — it triggers on
   // status `retrospective` now, not a stage->skill lookup.
   assert.equal('compound-learn' in DOMAINS.coding.skillMap, false);
@@ -66,6 +83,29 @@ test('DOMAINS.coding.skillMap maps every stage, including executing, to its skil
 test('DOMAINS.synthetic.skillMap.assembling is null (synthetic has never loaded a skill)', () => {
   assert.equal(DOMAINS.synthetic.skillMap.assembling, null);
   assert.ok(Object.isFrozen(DOMAINS.synthetic.skillMap));
+});
+
+// --- skillMap.retrospective (decision record 0027, D5) — a `status` key
+// reused on the same `skillMap` field the three `stage` keys above already
+// use, resolving which skill fgOS's retrospective loop (/fgOS:retro-next)
+// should run for a domain's status:retrospective items. ---
+
+test("DOMAINS.coding.skillMap.retrospective is 'fgos-compounding' (0027 D5 — zero regression, coding's synthesis skill does not change)", () => {
+  assert.equal(DOMAINS.coding.skillMap.retrospective, 'fgos-compounding');
+});
+
+test('skillForStage(DOMAINS.coding, "retrospective") resolves fgos-compounding — skillForStage is a generic skillMap[key] lookup, not scoped to `stage` names by implementation, only by its usual callers', () => {
+  // skillForStage's body (`(domain.skillMap && domain.skillMap[stage]) ??
+  // null`) never inspects whether `stage` is actually one of
+  // DOMAINS.coding.stages — it is safe and correct to reuse it here for
+  // the status key `retrospective` exactly as /fgOS:retro-next's own
+  // SKILL.md now does, rather than writing a second, redundant accessor.
+  assert.equal(skillForStage(DOMAINS.coding, 'retrospective'), 'fgos-compounding');
+});
+
+test('skillForStage falls back to null for "retrospective" on a domain that declares no skillMap.retrospective entry (synthetic, triage) — the caller-side ?? \'fgos-compounding\' fallback documented in retro-next/SKILL.md step 4 covers this case', () => {
+  assert.equal(skillForStage(DOMAINS.synthetic, 'retrospective'), null);
+  assert.equal(skillForStage(DOMAINS.triage, 'retrospective'), null);
 });
 
 // --- worktreeBacked (work-item-status-delivered-retrospective-cleanup D5/D8) ---
@@ -78,6 +118,32 @@ test('DOMAINS.synthetic.worktreeBacked is false (no real worktree/merge ever hap
   assert.equal(DOMAINS.synthetic.worktreeBacked, false);
 });
 
+// --- parkReason / parkReasonForStatus (tsk-3w3 follow-up: fgos-coding-driving's
+// stop-condition checks resolved through the registry instead of a literal
+// status comparison, same "resolve don't hardcode" shape as stageForStep) ---
+
+test('parkReasonForStatus resolves each of coding\'s three park statuses to its own reason', () => {
+  assert.equal(parkReasonForStatus(DOMAINS.coding, 'blocked'), 'system-error');
+  assert.equal(parkReasonForStatus(DOMAINS.coding, 'awaiting-human'), 'human-question');
+  assert.equal(parkReasonForStatus(DOMAINS.coding, 'awaiting-approval'), 'natural-finish');
+});
+
+test('parkReasonForStatus is undefined for a coding status that is not a park state', () => {
+  assert.equal(parkReasonForStatus(DOMAINS.coding, 'todo'), undefined);
+  assert.equal(parkReasonForStatus(DOMAINS.coding, 'doing'), undefined);
+  assert.equal(parkReasonForStatus(DOMAINS.coding, 'delivered'), undefined);
+});
+
+test('parkReasonForStatus is undefined for a domain that declares no parkReason table at all (synthetic, triage — never driven through fgos-coding-driving for real)', () => {
+  assert.equal(parkReasonForStatus(DOMAINS.synthetic, 'blocked'), undefined);
+  assert.equal(parkReasonForStatus(DOMAINS.triage, 'awaiting-human'), undefined);
+});
+
+test('parkReasonForStatus never throws on a null/undefined domain', () => {
+  assert.equal(parkReasonForStatus(undefined, 'blocked'), undefined);
+  assert.equal(parkReasonForStatus(null, 'blocked'), undefined);
+});
+
 test('skillForStage resolves each of coding\'s mapped stages to its skill name', () => {
   assert.equal(skillForStage(DOMAINS.coding, 'clarify'), 'fgos-exploring');
   assert.equal(skillForStage(DOMAINS.coding, 'decompose'), 'fgos-planning');
@@ -86,8 +152,8 @@ test('skillForStage resolves each of coding\'s mapped stages to its skill name',
   assert.equal(skillForStage(DOMAINS.coding, 'compound-learn'), null);
 });
 
-test('skillForStage(DOMAINS.coding, "executing") resolves to fgos-executing', () => {
-  assert.equal(skillForStage(DOMAINS.coding, 'executing'), 'fgos-executing');
+test('skillForStage(DOMAINS.coding, "executing") resolves to fgos-code-implement', () => {
+  assert.equal(skillForStage(DOMAINS.coding, 'executing'), 'fgos-code-implement');
 });
 
 test('skillForStage never throws for a stage absent from a domain\'s skillMap, returning null', () => {

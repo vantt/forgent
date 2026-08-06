@@ -35,11 +35,14 @@ test('putInAwaiting then rebuild -> status awaiting-human + gates[id].ask', () =
 
   const { view } = putInAwaiting(dir, { id: 'item-x', ask: 'OAuth or password?', expectedStatus: 'todo' });
   assert.equal(view.work['item-x'].status, 'awaiting-human');
-  assert.deepEqual(view.gates['item-x'], { ask: 'OAuth or password?' });
+  // askHistory (tsk-25g D1): additive alongside `ask`'s own unchanged
+  // single-slot overwrite — see replay.test.mjs for the dedicated
+  // accumulation coverage.
+  assert.deepEqual(view.gates['item-x'], { ask: 'OAuth or password?', askHistory: ['OAuth or password?'] });
 
   const rebuilt = listWork(dir);
   assert.equal(rebuilt.work['item-x'].status, 'awaiting-human');
-  assert.deepEqual(rebuilt.gates['item-x'], { ask: 'OAuth or password?' });
+  assert.deepEqual(rebuilt.gates['item-x'], { ask: 'OAuth or password?', askHistory: ['OAuth or password?'] });
 });
 
 test('answerAwaiting then rebuild -> status todo + gates[id]={ask,answer}', () => {
@@ -49,11 +52,11 @@ test('answerAwaiting then rebuild -> status todo + gates[id]={ask,answer}', () =
 
   const { view } = answerAwaiting(dir, { id: 'item-x', answer: 'OAuth', expectedStatus: 'awaiting-human' });
   assert.equal(view.work['item-x'].status, 'todo');
-  assert.deepEqual(view.gates['item-x'], { ask: 'OAuth or password?', answer: 'OAuth' });
+  assert.deepEqual(view.gates['item-x'], { ask: 'OAuth or password?', answer: 'OAuth', askHistory: ['OAuth or password?'] });
 
   const rebuilt = listWork(dir);
   assert.equal(rebuilt.work['item-x'].status, 'todo');
-  assert.deepEqual(rebuilt.gates['item-x'], { ask: 'OAuth or password?', answer: 'OAuth' });
+  assert.deepEqual(rebuilt.gates['item-x'], { ask: 'OAuth or password?', answer: 'OAuth', askHistory: ['OAuth or password?'] });
 });
 
 test('putInAwaiting with a stale expectedStatus -> conflict, no event appended', () => {
@@ -102,10 +105,10 @@ test('putInAwaiting with a parentSnapshotAtAsk -> gates[id].parentSnapshotAtAsk 
     expectedStatus: 'todo',
     parentSnapshotAtAsk: snapshot,
   });
-  assert.deepEqual(view.gates['item-x'], { ask: 'OAuth or password?', parentSnapshotAtAsk: snapshot });
+  assert.deepEqual(view.gates['item-x'], { ask: 'OAuth or password?', parentSnapshotAtAsk: snapshot, askHistory: ['OAuth or password?'] });
 
   const rebuilt = listWork(dir);
-  assert.deepEqual(rebuilt.gates['item-x'], { ask: 'OAuth or password?', parentSnapshotAtAsk: snapshot });
+  assert.deepEqual(rebuilt.gates['item-x'], { ask: 'OAuth or password?', parentSnapshotAtAsk: snapshot, askHistory: ['OAuth or password?'] });
 });
 
 test('putInAwaiting with no parentSnapshotAtAsk -> no such key on gates[id] at all', () => {
@@ -113,7 +116,7 @@ test('putInAwaiting with no parentSnapshotAtAsk -> no such key on gates[id] at a
   addSampleWork(dir);
 
   const { view } = putInAwaiting(dir, { id: 'item-x', ask: 'OAuth or password?', expectedStatus: 'todo' });
-  assert.deepEqual(view.gates['item-x'], { ask: 'OAuth or password?' });
+  assert.deepEqual(view.gates['item-x'], { ask: 'OAuth or password?', askHistory: ['OAuth or password?'] });
   assert.ok(!('parentSnapshotAtAsk' in view.gates['item-x']));
 
   const rebuilt = listWork(dir);
@@ -165,10 +168,10 @@ test('putInAwaiting with a statusAtAsk -> gates[id].statusAtAsk on rebuild', () 
     expectedStatus: 'doing',
     statusAtAsk: 'doing',
   });
-  assert.deepEqual(view.gates['item-x'], { ask: 'OAuth or password?', statusAtAsk: 'doing' });
+  assert.deepEqual(view.gates['item-x'], { ask: 'OAuth or password?', statusAtAsk: 'doing', askHistory: ['OAuth or password?'] });
 
   const rebuilt = listWork(dir);
-  assert.deepEqual(rebuilt.gates['item-x'], { ask: 'OAuth or password?', statusAtAsk: 'doing' });
+  assert.deepEqual(rebuilt.gates['item-x'], { ask: 'OAuth or password?', statusAtAsk: 'doing', askHistory: ['OAuth or password?'] });
 });
 
 test('putInAwaiting with no statusAtAsk -> no such key on gates[id] at all', () => {

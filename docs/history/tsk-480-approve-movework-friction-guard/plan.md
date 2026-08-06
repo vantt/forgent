@@ -32,7 +32,7 @@ no split-ordering question to resolve against other work.
 Impact-analysis posture (`fgos tool query --capability impact-analysis
 --status present`): gitnexus **present** → **full**. Recorded here per
 CLAUDE.md's gate; no code is edited by this skill, so it does not change
-this plan's proof points, but `fgos-executing` must run real `impact()`
+this plan's proof points, but `fgos-code-implement` must run real `impact()`
 calls on `moveWork`/`addFriction`/the new fallback helper before editing
 them, per the repo's Always-Do rule.
 
@@ -80,7 +80,7 @@ them, per the repo's Always-Do rule.
   full 2s wait on top makes a CLI command hang for up to 4s on the
   contended case D2 is explicitly about (sustained contention), for a
   fallback that must work regardless of the retry outcome anyway. Not
-  ruled out entirely — `fgos-executing` may add one bounded, cheap retry
+  ruled out entirely — `fgos-code-implement` may add one bounded, cheap retry
   if profiling during implementation shows it meaningfully reduces
   fallback-path frequency — but the design does not depend on it.
 - **A second locked file for the fallback record**: rejected — reusing
@@ -119,7 +119,7 @@ them, per the repo's Always-Do rule.
 ## Order
 
 No cross-item ordering constraint (`fgos graph` confirms tsk-480 is an
-isolated component). Internal order for `fgos-executing`:
+isolated component). Internal order for `fgos-code-implement`:
 
 1. Fallback diagnostic write path (D2) — needed by every guarded call
    site, build once.

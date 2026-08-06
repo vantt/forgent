@@ -19,7 +19,7 @@
 //     than re-implemented.
 import { rankImpact } from './impact.mjs';
 import { footprintOverlapAmong } from './graph-metrics.mjs';
-import { RESOLVED_STATUSES } from './frontier.mjs';
+import { isResolvedStatus } from './frontier.mjs';
 import { resolveRoot } from '../runner/root-affinity.mjs';
 
 /**
@@ -100,12 +100,12 @@ export function mergeReadiness(view, opts = {}) {
   for (const item of proposed) {
     const deps = Array.isArray(item.deps) ? item.deps : [];
     // work-item-status-delivered-retrospective-cleanup D13: shares
-    // frontier.mjs's RESOLVED_STATUSES instead of a literal 'done' check —
-    // a dep merged (delivered) but not yet fully closed out (retrospective/
-    // cleanup) no longer holds up merge-ordering.
-    const depsClear = deps.every((dep) => RESOLVED_STATUSES.has(work[dep]?.status));
+    // frontier.mjs's isResolvedStatus (per decision record 0027) instead of
+    // a literal 'done' check — a dep merged (delivered) but not yet fully
+    // closed out (retrospective/cleanup) no longer holds up merge-ordering.
+    const depsClear = deps.every((dep) => isResolvedStatus(work[dep]));
     const mergeAfter = Array.isArray(item.mergeAfter) ? item.mergeAfter : [];
-    const mergeAfterClear = mergeAfter.every((target) => RESOLVED_STATUSES.has(work[target]?.status));
+    const mergeAfterClear = mergeAfter.every((target) => isResolvedStatus(work[target]));
     if (depsClear && mergeAfterClear) {
       candidates.push(item);
     } else {
@@ -140,7 +140,7 @@ export function mergeReadiness(view, opts = {}) {
 
   // supersededOut (tsk-2ie D2, docs/history/tsk-2ie-duplicate-superseded-
   // guard/): exclude any readyIdSet member whose supersededBy target is
-  // RESOLVED (RESOLVED_STATUSES, same gate deps/mergeAfter already reuse)
+  // RESOLVED (isResolvedStatus, same gate deps/mergeAfter already reuse)
   // OR itself present in this SAME readyIdSet snapshot (about to merge this
   // same round) -- a single pass against the ORIGINAL readyIdSet, checked
   // before any deletion, so a mutual pair (A supersededBy B, B supersededBy
@@ -151,7 +151,7 @@ export function mergeReadiness(view, opts = {}) {
   for (const id of readyIdSet) {
     const target = work[id]?.supersededBy;
     if (typeof target !== 'string') continue;
-    if (RESOLVED_STATUSES.has(work[target]?.status) || readyIdSet.has(target)) {
+    if (isResolvedStatus(work[target]) || readyIdSet.has(target)) {
       supersededOutIds.push(id);
     }
   }

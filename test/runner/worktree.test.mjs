@@ -275,6 +275,48 @@ test('reclaimOrphanedCheckout still reclaims normally when the only "change" is 
   assert.equal(fs.existsSync(wt.path), false);
 });
 
+test('reclaimOrphanedCheckout refuses (throws, does not remove) a checkout that is the calling session\'s own live cwd (tsk-1tm, exact-match)', () => {
+  const repoRoot = initTempRepo();
+  const worktreeDir = mkWorktreeDir();
+  const wt = createWorktree(repoRoot, 'item-j', { worktreeDir });
+  commitOnWorktree(wt.path, 'attempt.txt', 'real work\n');
+  // clean, committed checkout -- would pass the dirty-checkout guard, but
+  // the calling session is standing exactly here (tsk-424 chained
+  // EnterWorktree pattern: approving this item from inside its own
+  // worktree).
+
+  assert.throws(() => reclaimOrphanedCheckout(repoRoot, 'fgw/item-j', { callerCwd: wt.path }), WorktreeError);
+  assert.equal(fs.existsSync(wt.path), true);
+
+  removeWorktree(repoRoot, wt.path);
+});
+
+test('reclaimOrphanedCheckout refuses (throws, does not remove) a checkout whose live session cwd is nested under it (tsk-1tm, defense-in-depth)', () => {
+  const repoRoot = initTempRepo();
+  const worktreeDir = mkWorktreeDir();
+  const wt = createWorktree(repoRoot, 'item-k', { worktreeDir });
+  commitOnWorktree(wt.path, 'attempt.txt', 'real work\n');
+  const nestedCwd = path.join(wt.path, 'nested', 'deeper');
+  fs.mkdirSync(nestedCwd, { recursive: true });
+
+  assert.throws(() => reclaimOrphanedCheckout(repoRoot, 'fgw/item-k', { callerCwd: nestedCwd }), WorktreeError);
+  assert.equal(fs.existsSync(wt.path), true);
+
+  removeWorktree(repoRoot, wt.path);
+});
+
+test('reclaimOrphanedCheckout still reclaims normally when callerCwd is unrelated to the checkout (regression)', () => {
+  const repoRoot = initTempRepo();
+  const worktreeDir = mkWorktreeDir();
+  const wt = createWorktree(repoRoot, 'item-l', { worktreeDir });
+  commitOnWorktree(wt.path, 'attempt.txt', 'real work\n');
+
+  const result = reclaimOrphanedCheckout(repoRoot, 'fgw/item-l', { callerCwd: repoRoot });
+
+  assert.equal(result.reclaimed, true);
+  assert.equal(fs.existsSync(wt.path), false);
+});
+
 test('listLeftovers reports aheadCount 0 for a branch with no commits beyond base (orphan)', () => {
   const repoRoot = initTempRepo();
   const worktreeDir = mkWorktreeDir();

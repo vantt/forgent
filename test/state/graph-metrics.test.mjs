@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { connectedComponents, criticalPath, staleBlocked, greedyTopUnblock, goalScopedSet, goalScopedCriticalPath, goalScopedGreedyTopUnblock, whatIf, metricsFrame, graphMetrics, classifyStaleDoing, STALE_DOING_DEFAULTS, footprintOverlap } from '../../src/state/graph-metrics.mjs';
+import { connectedComponents, criticalPath, staleBlocked, greedyTopUnblock, goalScopedSet, goalScopedCriticalPath, goalScopedGreedyTopUnblock, whatIf, metricsFrame, graphMetrics, classifyStaleDoing, STALE_DOING_DEFAULTS, classifyStalePostDelivery, STALE_POST_DELIVERY_DEFAULTS, footprintOverlap, detectCycles, computeSchedule } from '../../src/state/graph-metrics.mjs';
 
 // Pure lib — every view here is a literal (foldEvents style), no fs, no
 // `.fgos/` writes. connectedComponents groups work items linked by ANY unified
@@ -476,6 +476,95 @@ test('classifyStaleDoing: defaults are agent 15m / human 24h and are overridable
   assert.deepEqual(stale.map((s) => s.id), ['x']);
 });
 
+// --- S10: evidence-classifier advisory for stale post-delivery items -------
+
+const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000;
+const TTL_DAYS = 7;
+
+function moveEntry(id, to, ts) {
+  return { type: 'work.move', payload: { id, to }, ts };
+}
+
+test('classifyStalePostDelivery: an item just past 3d in delivered is stale; at/under 3d is fresh', () => {
+  const view = {
+    work: {
+      stale: item('stale', { status: 'delivered' }),
+      fresh: item('fresh', { status: 'delivered' }),
+    },
+  };
+  const rawEvents = [
+    moveEntry('stale', 'delivered', new Date(NOW - THREE_DAYS_MS - 1000).toISOString()),
+    moveEntry('fresh', 'delivered', new Date(NOW - THREE_DAYS_MS).toISOString()),
+  ];
+  const { stale } = classifyStalePostDelivery(view, rawEvents, { now: NOW, ttlDays: TTL_DAYS });
+  assert.deepEqual(stale.map((s) => s.id), ['stale']);
+  assert.equal(stale[0].status, 'delivered');
+});
+
+test('classifyStalePostDelivery: retrospective uses the same flat 3d threshold as delivered (D7)', () => {
+  const view = { work: { r: item('r', { status: 'retrospective' }) } };
+  const rawEvents = [moveEntry('r', 'retrospective', new Date(NOW - THREE_DAYS_MS - 1000).toISOString())];
+  const { stale } = classifyStalePostDelivery(view, rawEvents, { now: NOW, ttlDays: TTL_DAYS });
+  assert.deepEqual(stale.map((s) => s.id), ['r']);
+  assert.equal(STALE_POST_DELIVERY_DEFAULTS.retrospectiveMs, STALE_POST_DELIVERY_DEFAULTS.deliveredMs);
+});
+
+test('classifyStalePostDelivery: cleanup is stale only past ttlDays+grace, never from cleanup-entry alone (D4)', () => {
+  const view = { work: { c: item('c', { status: 'cleanup' }) } };
+  const withinTtl = [moveEntry('c', 'cleanup', new Date(NOW - 2 * 24 * 60 * 60 * 1000).toISOString())]; // 2d < 7d TTL
+  assert.deepEqual(classifyStalePostDelivery(view, withinTtl, { now: NOW, ttlDays: TTL_DAYS }).stale, []);
+
+  const pastTtlWithinGrace = [moveEntry('c', 'cleanup', new Date(NOW - (TTL_DAYS + 1) * 24 * 60 * 60 * 1000).toISOString())]; // 8d > 7d TTL but < 7+3 grace
+  assert.deepEqual(classifyStalePostDelivery(view, pastTtlWithinGrace, { now: NOW, ttlDays: TTL_DAYS }).stale, []);
+
+  const pastTtlAndGrace = [moveEntry('c', 'cleanup', new Date(NOW - (TTL_DAYS * 24 * 60 * 60 * 1000) - THREE_DAYS_MS - 1000).toISOString())]; // past 7d TTL + 3d grace
+  const { stale } = classifyStalePostDelivery(view, pastTtlAndGrace, { now: NOW, ttlDays: TTL_DAYS });
+  assert.deepEqual(stale.map((s) => s.id), ['c']);
+});
+
+test('classifyStalePostDelivery: an item with no locatable entry event is skipped (never a NaN age)', () => {
+  const view = { work: { x: item('x', { status: 'delivered' }) } };
+  const { stale } = classifyStalePostDelivery(view, [], { now: NOW, ttlDays: TTL_DAYS });
+  assert.deepEqual(stale, []);
+});
+
+test('classifyStalePostDelivery: only delivered/retrospective/cleanup are ever classified — other statuses are ignored', () => {
+  const view = {
+    work: {
+      doing: item('doing', { status: 'doing' }),
+      todo: item('todo', { status: 'todo' }),
+      done: item('done', { status: 'done' }),
+    },
+  };
+  const rawEvents = [
+    moveEntry('doing', 'doing', new Date(NOW - 100 * THREE_DAYS_MS).toISOString()),
+    moveEntry('done', 'done', new Date(NOW - 100 * THREE_DAYS_MS).toISOString()),
+  ];
+  const { stale } = classifyStalePostDelivery(view, rawEvents, { now: NOW, ttlDays: TTL_DAYS });
+  assert.deepEqual(stale, []);
+});
+
+test('classifyStalePostDelivery: pure — same inputs, same output regardless of call order', () => {
+  const view = { work: { a: item('a', { status: 'delivered' }) } };
+  const rawEvents = [moveEntry('a', 'delivered', new Date(NOW - THREE_DAYS_MS - 1000).toISOString())];
+  const first = classifyStalePostDelivery(view, rawEvents, { now: NOW, ttlDays: TTL_DAYS });
+  const second = classifyStalePostDelivery(view, rawEvents, { now: NOW, ttlDays: TTL_DAYS });
+  assert.deepEqual(first, second);
+});
+
+test('classifyStalePostDelivery: age is anchored on the SPECIFIC entry-into-status event, not the latest event of any kind', () => {
+  const view = { work: { a: item('a', { status: 'delivered' }) } };
+  // an OLDER unrelated event (e.g. a much earlier awaiting-approval->delivered
+  // that got reverted then re-entered) must never be picked over the latest
+  // real entry into `delivered` -- .at(-1) picks the latest matching entry.
+  const rawEvents = [
+    moveEntry('a', 'delivered', new Date(NOW - 100 * THREE_DAYS_MS).toISOString()),
+    moveEntry('a', 'delivered', new Date(NOW - 1000).toISOString()), // most recent real entry: fresh
+  ];
+  const { stale } = classifyStalePostDelivery(view, rawEvents, { now: NOW, ttlDays: TTL_DAYS });
+  assert.deepEqual(stale, []);
+});
+
 // --- S9: footprint-intersection advisory -----------------------------------
 
 test('footprintOverlap: two READY items sharing a file path are flagged with the shared paths + resolution options', () => {
@@ -523,4 +612,124 @@ test('footprintOverlap is deterministic across ready items: pairs follow FIFO or
   const out = footprintOverlap(view);
   assert.deepEqual(out.map((c) => [c.a, c.b]), [['first', 'second'], ['first', 'third'], ['second', 'third']]);
   assert.deepEqual(out[0].shared, ['b.mjs', 'a.mjs']); // first item's footprint order
+});
+
+// --- tsk-3c7: dep-graph cycle detection -------------------------------------
+
+test('detectCycles: an acyclic deps graph has zero cycles', () => {
+  const view = { work: { a: item('a'), b: item('b', { deps: ['a'] }), c: item('c', { deps: ['b'] }) } };
+  assert.deepEqual(detectCycles(view), []);
+});
+
+test('detectCycles: a self-dep is reported as its own one-element cycle', () => {
+  const view = { work: { a: item('a', { deps: ['a'] }) } };
+  assert.deepEqual(detectCycles(view), [['a']]);
+});
+
+test('detectCycles: a real 2-item cycle (a depends on b, b depends on a) is found regardless of status', () => {
+  const view = {
+    work: {
+      a: item('a', { status: 'done', deps: ['b'] }),
+      b: item('b', { status: 'blocked', deps: ['a'] }),
+    },
+  };
+  const cycles = detectCycles(view);
+  assert.equal(cycles.length, 1);
+  assert.deepEqual(new Set(cycles[0]), new Set(['a', 'b']));
+});
+
+test('detectCycles: a dep pointing at an id with no matching work item is skipped, not a cycle', () => {
+  const view = { work: { a: item('a', { deps: ['missing'] }) } };
+  assert.deepEqual(detectCycles(view), []);
+});
+
+// --- tsk-3u2 (post-tsk-3c7 independent review): detectCycles widened from
+// deps-only to the UNIFIED graph (deps + parent + mergeAfter) -- it used
+// to be blind to exactly the kind of deadlock findUnifiedCycle already
+// caught: a parent anchored by its own open child (frontier.mjs's
+// hasOpenDescendant) whose deps/mergeAfter loops back to that same parent,
+// a permanent stall no amount of waiting resolves. -------------------------
+
+test('detectCycles: a parent anchored by a child whose OWN deps points back at the parent is now caught (mixed parent-child + blocks cycle)', () => {
+  const view = {
+    work: {
+      p: item('p'),
+      c: item('c', { parent: 'p', deps: ['p'] }),
+    },
+  };
+  const cycles = detectCycles(view);
+  assert.equal(cycles.length, 1);
+  assert.deepEqual(new Set(cycles[0]), new Set(['p', 'c']));
+});
+
+test('detectCycles: a mergeAfter cycle (a deps on b, b mergeAfter a) is now caught (mixed blocks + waits-for cycle)', () => {
+  const view = {
+    work: {
+      a: item('a', { deps: ['b'] }),
+      b: item('b', { mergeAfter: ['a'] }),
+    },
+  };
+  const cycles = detectCycles(view);
+  assert.equal(cycles.length, 1);
+  assert.deepEqual(new Set(cycles[0]), new Set(['a', 'b']));
+});
+
+test('detectCycles: a pure parent-child cycle (A parent B, B parent A -- never reachable via real fgos add, still checked) is caught', () => {
+  const view = {
+    work: {
+      a: item('a', { parent: 'b' }),
+      b: item('b', { parent: 'a' }),
+    },
+  };
+  const cycles = detectCycles(view);
+  assert.equal(cycles.length, 1);
+  assert.deepEqual(new Set(cycles[0]), new Set(['a', 'b']));
+});
+
+test('detectCycles: a parent id with no matching work item is dropped (dangling parent), same as a dangling dep, never a phantom node', () => {
+  const view = { work: { c: item('c', { parent: 'missing-parent' }) } };
+  assert.deepEqual(detectCycles(view), []);
+});
+
+// --- tsk-3c7: computed-parallel-wave-schedule -------------------------------
+
+test('computeSchedule: two ready items with disjoint footprints land in the same wave', () => {
+  const view = {
+    work: {
+      a: item('a', { footprint: ['src/x.mjs'] }),
+      b: item('b', { footprint: ['src/y.mjs'] }),
+    },
+  };
+  assert.deepEqual(computeSchedule(view), { waves: [['a', 'b']] });
+});
+
+test('computeSchedule: two ready items sharing a footprint path are DEFERRED to separate waves, never refused', () => {
+  const view = {
+    work: {
+      a: item('a', { footprint: ['src/x.mjs'] }),
+      b: item('b', { footprint: ['src/x.mjs'] }),
+    },
+  };
+  assert.deepEqual(computeSchedule(view), { waves: [['a'], ['b']] });
+});
+
+test('computeSchedule: an item with no declared footprint never conflicts, packs into the earliest wave', () => {
+  const view = {
+    work: {
+      a: item('a', { footprint: ['src/x.mjs'] }),
+      b: item('b', { footprint: ['src/x.mjs'] }),
+      c: item('c'), // no footprint
+    },
+  };
+  assert.deepEqual(computeSchedule(view), { waves: [['a', 'c'], ['b']] });
+});
+
+test('computeSchedule: a non-ready item (unmet dep) never appears in any wave', () => {
+  const view = {
+    work: {
+      a: item('a'),
+      b: item('b', { deps: ['a'] }), // blocked on a -> not in frontier
+    },
+  };
+  assert.deepEqual(computeSchedule(view), { waves: [['a']] });
 });

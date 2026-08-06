@@ -29,6 +29,24 @@ stage values — the same way `fgos-routing` describes it.
   which never carries its own `.fgos/` by design (ADR0020) — the verb
   refuses (exit 4) rather than silently diverge if `--dir` is omitted
   there (tsk-56t D1).
+- Do your own Approach/Shape reasoning directly — reading `CONTEXT.md`/
+  precedent docs, running `fgos graph --json`/`--what-if`, writing the risk
+  map and shape yourself (the lane itself is decided earlier, by
+  `fgos-routing`'s own Orient step, before this skill is even loaded —
+  tsk-5ay D1: triage-before-load) — never delegate it to the Agent/Task
+  tool as an ad hoc sub-dispatch. This session is already a live,
+  same-provider soul (Native-First Dispatch Doctrine rule 2,
+  `docs/decisions/0026-vision-orchestrator-roottask-capacity-native-vs-
+  cli-spawn.md`): spawning a nested Task subagent for the mode/approach/
+  shape judgment this skill exists to do is the same "soul re-deriving
+  what a live soul already knows" waste `tsk-1ni` found in
+  `judgeDiscovery`'s blind cli-spawn — pure overhead, not a transparency
+  question (a Task/Agent call is collapsed by default in the transcript,
+  not hidden, unlike a genuinely opaque headless `claude -p` subprocess).
+  If a step genuinely needs a different backend (cheaper model,
+  cross-provider such as Codex/agy, resource isolation) for a narrow
+  helper task, route it explicitly through the capacity-dispatch
+  mechanism instead — see `../_shared/capacity-dispatch-fallback.md`.
 - Do not reopen or reinterpret a decision already locked in `CONTEXT.md`.
   Cite its D-ID; never override it here.
 - Do not perform the reality/feasibility check on the plan produced here —
@@ -54,7 +72,7 @@ stage values — the same way `fgos-routing` describes it.
   discover` — that call is what releases the claim back to `todo` once the
   item reaches `executing` (claim-lock §3b); an uncommitted `plan.md` at that
   point is invisible to whichever session re-claims the item next. Same
-  one-artifact-per-stop discipline `fgos-executing`'s "one commit per item"
+  one-artifact-per-stop discipline `fgos-code-implement`'s "one commit per item"
   rule already gives Execute.
 
 ## Flow
@@ -65,24 +83,53 @@ stage values — the same way `fgos-routing` describes it.
    assume. If a critical-patterns or prior-learnings doc exists for this
    product area, read it too; a precedent already solved beats research.
 
-2. **Mode gate (mechanical, not vibes).** Count how many of these actually
-   apply to the item: auth, authorization, data model, audit/security,
-   external systems, public contracts, cross-platform, existing covered
-   behavior, weak proof around the area, multi-domain.
-   - 0–1 flags → **tiny** (a couple of files, one direct task) or **small**
-     (a few files, no gray areas).
-   - 2–3 flags, or story-sized behavior → **standard**.
-   - 4+ flags, or any hard-gate flag (auth, data loss, audit/security,
-     external provider, removing a validation) → **high-risk**.
-   - One yes/no question decides whether the plan is even real →
-     **spike**, regardless of flag count.
+   Also read the lane `fgos-routing`'s own Orient step already decided for
+   this item (tiny/small/standard/high-risk/spike, plus the flag count and
+   which flags applied) — carried into this session as prose, never
+   re-derived here (tsk-5ay D1: the mechanical flag-count itself moved to
+   `fgos-routing`, ahead of this skill being loaded at all — knowing the
+   lane before opening this file, not skipping this file for a `tiny`
+   item; see `fgos-routing`'s own Mode-gate section for why this stays
+   knowing-before-load, tsk-da1). Record that same count, those same
+   flags, and the lane into `plan.md` itself using the literal `Mode:
+   <lane>` label (e.g. `Mode: tiny` or `mode = **standard**`) `plan.md`
+   has always used — never rename this recorded label to `Lane:`, even
+   though this skill's own prose calls the concept "lane" now: decompose
+   stage's own skip-and-advance short-circuit
+   (`src/intake/decompose.mjs`'s `passThroughModeMatch` regex) parses
+   this exact literal token from `plan.md` to skip a real model call on a
+   `tiny`/`small` item, and has no idea the concept was ever renamed
+   (tsk-59a, found by independent review: the mode→lane rename broke this
+   real coupling — 25 of this repo's own `plan.md` files match the old
+   `Mode:` token, and a lane recorded as `Lane:` silently falls through
+   to a real, unnecessary model call). Above `small`, say plainly why a
+   smaller lane would not honestly cover the item. This is prose in
+   `plan.md` — never a new field on the item, never a value `stage`
+   takes.
 
-   Record the count, the flags, and the chosen mode in `plan.md` itself.
-   Above `small`, say plainly why a smaller mode would not honestly cover
-   the item. This decision is prose in `plan.md` — never a new field on the
-   item, never a value `stage` takes.
+   **Direct-entry fallback (tsk-da1, found by independent review):**
+   `fgos-exploring` and `fgos-validating` can both hand off straight into
+   this skill without going through `fgos-routing` first (their own
+   Handoff sections say "directly, or via `fgos-routing`"), which means a
+   lane is not guaranteed to already be sitting in this session's context.
+   Check, in order: (1) does `plan.md` already record a `Mode:` line from
+   an earlier round (a hand-back from `fgos-validating`, or this same
+   item re-entering after a mid-planning `CONTEXT.md` gap) — if so, that
+   recorded lane IS the answer, read it, never re-derive past it; (2) did
+   this session's own Orient step actually hand off a lane in prose — if
+   so, use it, same as always. Only when NEITHER of those holds — nobody
+   has ever decided a lane for this item — read and apply
+   `fgos-routing`'s own Mode-gate subsection directly (tsk-59a, found by
+   independent review: an earlier version of this fallback restated the
+   flag-count thresholds inline and silently dropped the hard-gate flag
+   enumeration and the tiny/small tie-breaker in the retelling — point at
+   the source instead of copying it, so there is exactly one place this
+   rule is written down). This is not the "never re-derive" red flag
+   below firing — that rule guards against overriding a lane already
+   decided by either check above; this is the one case where nobody
+   decided one yet, and this skill is genuinely the first to see the item.
 
-3. **Approach.** Write the chosen path and the alternatives rejected along
+2. **Approach.** Write the chosen path and the alternatives rejected along
    the way, a risk map (component / how risky / what would prove it), the
    files likely touched, and the order they need to happen in. Before fixing
    that order, run `fgos graph --json` and read its `criticalPath` and
@@ -99,7 +146,7 @@ stage values — the same way `fgos-routing` describes it.
    proof point — inactive drops the requirement, degraded keeps it but
    marks the evidence weak, full keeps it exactly as before.
 
-4. **Shape.** Write (or enrich) `plan.md` scaled to the mode: a direct note
+3. **Shape.** Write (or enrich) `plan.md` scaled to the mode: a direct note
    for `tiny`, one open question for `spike`, a short plan for `small`, a
    phased plan for `standard`, a fuller map for `high-risk`. Sketch the
    concrete cases worth proving against — empty/boundary input, existing
@@ -107,7 +154,7 @@ stage values — the same way `fgos-routing` describes it.
    a depth matching the mode; a `tiny` item does not need the same sketch a
    `high-risk` one does.
 
-5. **Decide the split, if any.** Some items are one honest piece of work;
+4. **Decide the split, if any.** Some items are one honest piece of work;
    others need to become several independently workable ones first. When
    more than one candidate piece could go first, run
    `fgos graph --what-if <id> --json` per candidate and compare the
@@ -118,16 +165,38 @@ stage values — the same way `fgos-routing` describes it.
    a description standing in for a command. Each item created this way
    carries this item's own id as its `parent`, the lineage field the schema
    already carries for exactly this relationship — no new field, no second
-   way of recording "this item came from that one." If one piece is
-   honestly enough, there is no split, and the item proceeds as itself.
+   way of recording "this item came from that one." Always pass
+   `--footprint` on that same `fgos add --parent` call, taken straight from
+   the file list this step's own Approach/Shape already wrote down for that
+   piece — the files are already known at this point, so there is no
+   reason to leave it blank (this is what lets `footprintOverlapAmong`
+   catch a real collision between sibling pieces before either one starts):
 
-6. **Leave execution alone.** Per the locked decision that Execute and its
+   ```bash
+   root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
+   fgos add --title "Build parser" --kind task --risk light --verify "npm test -- parser" --parent <id> --footprint "src/parser.mjs,test/parser.test.mjs" --dir "$root"
+   ```
+
+   (no positional argument here — `fgos add`'s positional/`--id` is the
+   item's own id, not its title; omitting `--id` entirely auto-generates
+   a collision-free one from `--title`, the normal path for a split
+   child. tsk-da1: an earlier version of this example passed the title
+   positionally, which `fgos add` rejects outright — kebab-case-id
+   validation fails on a plain sentence. tsk-59a: that same version also
+   used `--dir "$root"` without `$root` ever being assigned in this
+   block — copy-paste this example as shown, it is not enough to copy
+   only the `fgos add` line by itself.)
+
+   If one piece is honestly enough, there is no split, and the item
+   proceeds as itself.
+
+5. **Leave execution alone.** Per the locked decision that Execute and its
    verify already have a working mechanical path (the goal-check the engine
    runs, and `return`'s own re-verify of real progress), this skill does not
    design or re-plan any of that — it only needs to name, for each piece it
    describes, the one command that proves it done.
 
-7. **Mid-planning `CONTEXT.md` gap.** If, at any step above, `CONTEXT.md`'s
+6. **Mid-planning `CONTEXT.md` gap.** If, at any step above, `CONTEXT.md`'s
    locked decisions turn out to be silent on something this plan actually
    needs, apply the same material/grounded/answerable filter
    `fgos-exploring` already uses to its own candidate questions:
@@ -153,6 +222,13 @@ stage values — the same way `fgos-routing` describes it.
      chance to override one it did.
 
 ## Gate
+
+Every sentence in this gate's presentation must trace back to a specific
+passage of `plan.md` or `CONTEXT.md` — a claim that cannot be traced
+becomes an Open Question instead of being asserted (tsk-5ay D2, borrowed
+from bee-briefing's own traceability discipline: `plan.md` is already the
+review document here, this only adds the discipline of citing it
+honestly rather than restating from memory).
 
 Before asking, check whether this gate can auto-approve instead
 (`docs/history/gate-bypass/CONTEXT.md` D1-D5 — never the `awaiting-human`
@@ -203,11 +279,12 @@ it does; never a placeholder, per this skill's own "Proof surface" rule.
   `plan.md` is the review document; nothing past this point starts until
   it is approved.
 
-The mode decision reached in step 2 does not, by itself, move the item
-anywhere. It only informs which of the item's own already-registered edges
-the session picks next once work resumes — the engine is still the only
-thing that validates and applies that move; this skill's decision is input
-to that choice, never a substitute for it.
+The lane `fgos-routing` decided before this skill was even loaded — and
+this skill's own Bootstrap step recorded into `plan.md` — does not, by
+itself, move the item anywhere. It only informs which of the item's own
+already-registered edges the session picks next once work resumes — the
+engine is still the only thing that validates and applies that move; the
+lane is input to that choice, never a substitute for it.
 
 ## Handoff
 
@@ -219,7 +296,12 @@ reality itself.
 
 ## Red flags
 
-- a mode picked without counting the flags, or vibed instead of counted
+- re-deriving a lane `fgos-routing`'s Orient step already handed off,
+  instead of reading it — the direct-entry fallback above only applies
+  when honestly nothing was handed off at all
+- a claim in the Gate presentation that cannot be traced back to a
+  specific passage of `plan.md`/`CONTEXT.md`, asserted instead of raised
+  as an Open Question
 - reopening a decision `CONTEXT.md` already locked, instead of citing it
 - a risk-map entry with no proof point carried to `fgos-validating`
 - a child item listed with no real verify command, or a vague one

@@ -31,7 +31,7 @@ const MODULE_TRIP_CASES = [
   'src/evolve/iron-law.mjs',   // prefix src/evolve/
   'bin/fgos.mjs',              // equals (whole entry file stands in for the evolve verb)
   'src/state/store.mjs',       // equals (D14)
-  'src/state/fsm.mjs',         // equals (D14)
+  'src/state/status-fsm.mjs',  // equals (D14)
   'src/intake/risk-keywords.mjs', // equals (review-20260717-self-improve-base-workflow f1)
   'src/intake/classify.mjs',      // equals (review-20260717-self-improve-base-workflow f1)
   'src/state/workflow-stage-graphs.mjs',        // equals (review-20260718-self-improve-loop f03)
@@ -84,9 +84,9 @@ test('classifyIronLaw trips required for every self-modifying module path via fi
 });
 
 test('classifyIronLaw lists every matching filesChanged entry in matchedModules', () => {
-  const files = ['src/runner/loop.mjs', 'README.md', 'src/state/fsm.mjs'];
+  const files = ['src/runner/loop.mjs', 'README.md', 'src/state/status-fsm.mjs'];
   const result = classifyIronLaw({ filesChanged: files, description: undefined });
-  assert.deepEqual(result.matchedModules, ['src/runner/loop.mjs', 'src/state/fsm.mjs']);
+  assert.deepEqual(result.matchedModules, ['src/runner/loop.mjs', 'src/state/status-fsm.mjs']);
   assert.equal(result.required, true);
 });
 
@@ -200,4 +200,49 @@ test('classify newly tiers every keyword in the newly-added set as heavy (intend
     assert.equal(result.tier, 'heavy', `"${keyword}" should tier heavy`);
     assert.equal(result.risk, 'heavy', `"${keyword}" should risk heavy`);
   }
+});
+
+// --- word-boundary matching (tsk-2as D1): a keyword must not match as a
+// substring inside a longer, unrelated word, for BOTH classifyIronLaw and
+// classify — both share the same matchesKeyword helper (risk-keywords.mjs).
+
+test('classifyIronLaw does not match "auth" as a substring inside "authoring"', () => {
+  const result = classifyIronLaw({
+    filesChanged: [],
+    description: 'does NOT duplicate fgos-exploring authoring logic',
+  });
+  assert.equal(result.required, false);
+  assert.deepEqual(result.matchedFlags, []);
+});
+
+test('classifyIronLaw still matches "auth" as a standalone word', () => {
+  const result = classifyIronLaw({ filesChanged: [], description: 'fix the auth flow' });
+  assert.equal(result.required, true);
+  assert.ok(result.matchedFlags.includes('auth'));
+});
+
+test('classify does not tier "authoring" text as heavy via the "auth" substring', () => {
+  const result = classify('does NOT duplicate fgos-exploring authoring logic');
+  assert.equal(result.tier, 'standard');
+  assert.equal(result.risk, 'standard');
+});
+
+test('classify still tiers a standalone "auth" mention as heavy', () => {
+  const result = classify('fix the auth flow');
+  assert.equal(result.tier, 'heavy');
+  assert.equal(result.risk, 'heavy');
+});
+
+test('classify still tiers a real Vietnamese diacritic keyword as heavy (word-boundary regression)', () => {
+  const result = classify('phát hiện sự cố bảo mật nghiêm trọng');
+  assert.equal(result.tier, 'heavy');
+  assert.equal(result.risk, 'heavy');
+});
+
+test('classify does not match a Vietnamese diacritic keyword lacking a real word boundary', () => {
+  // The 'bảo mật' phrase glued directly onto surrounding letters, with no
+  // boundary character before 'b' or after 't' -- must not match, the same
+  // way 'auth' must not match inside 'authoring'.
+  const result = classify('xbảo mậty là một chuỗi test không liên quan');
+  assert.equal(result.tier, 'standard');
 });

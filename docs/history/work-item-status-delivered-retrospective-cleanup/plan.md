@@ -48,7 +48,7 @@ reading `work.status`.
 **Impact-analysis posture**: `full` (GitNexus `present`, checked via
 `fgos tool query --capability impact-analysis --status present`). Every
 proof point below that claims a blast radius is backed by a real `impact()`
-call at `fgos-executing` time, not a guess.
+call at `fgos-code-implement` time, not a guess.
 
 ### Risk map
 
@@ -161,5 +161,5 @@ of 1-4 to exist to regression-test against.
 - The consumer audit `CONTEXT.md` flags as deferred (CLI display/triage-
   table columns, discovery-judge, beyond the 6 already named in D13) is
   assumed complete once piece 3's listed test files are green — if
-  `fgos-validating` or `fgos-executing`'s own `impact()` call surfaces a
+  `fgos-validating` or `fgos-code-implement`'s own `impact()` call surfaces a
   7th consumer, it folds into piece 3, not a new piece.

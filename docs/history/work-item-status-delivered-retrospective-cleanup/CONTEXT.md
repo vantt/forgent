@@ -127,7 +127,7 @@ axis: label vs statusCategory, untouched by this item).
 --capability impact-analysis --status present` returned GitNexus
 `present`. Informational only here — this skill edits no code, so the
 gate's MUST-run-impact-before-editing rules don't apply to this stop; they
-bind whoever implements D1-D16 in `fgos-executing`.
+bind whoever implements D1-D16 in `fgos-code-implement`.
 
 ## Outstanding, explicitly deferred
 

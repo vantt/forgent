@@ -29,6 +29,42 @@ Before touching anything, read the shape of the work:
 
 Both are read-only. Nothing here writes state.
 
+### Mode gate (mechanical, not vibes) — decide the lane before loading a heavy skill
+
+For any claimed item at stage `decompose`, decide its lane HERE, before
+routing it to `fgos-planning` below (tsk-5ay D1: triage-before-load, moved
+from inside `fgos-planning` itself). This is knowing-before-load, not
+skip-load — read the table below plainly: every `decompose`-shaping item
+still gets routed to `fgos-planning` regardless of lane, so this alone
+does not save that skill's own load cost (tsk-da1, found by independent
+review — tsk-5ay's own original rationale overstated this; recorded
+honestly here rather than silently fixed). What it DOES buy: the lane is
+known before `fgos-planning` is even opened, so a stranger picking this
+item up cold — or this session itself, mid-Orient — already knows how
+much ceremony to expect, instead of learning it only after reading
+through that skill's own flow. A genuine skip-load optimization (e.g.
+routing a `tiny`/`small` item straight to a lighter path) would need an
+actual routing-table change, which this decision does not make. Count how
+many of these actually apply to the item: auth, authorization, data
+model, audit/security, external systems, public contracts, cross-platform,
+existing covered behavior, weak proof around the area, multi-domain.
+
+- 0–1 flags → **tiny** (a couple of files, one direct task) or **small**
+  (a few files, no gray areas).
+- 2–3 flags, or story-sized behavior → **standard**.
+- 4+ flags, or any hard-gate flag (auth, data loss, audit/security,
+  external provider, removing a validation) → **high-risk**.
+- One yes/no question decides whether the plan is even real → **spike**,
+  regardless of flag count.
+
+This is the same lane vocabulary (tiny/small/standard/high-risk/spike)
+`fgos-planning`'s own `plan.md` has always recorded — only the deciding
+moved here; the recording still happens in `plan.md` itself, written by
+`fgos-planning`'s own Bootstrap step from this lane, carried forward as
+prose (never a new field on the item, never a value `stage` takes). Hand
+the lane, the flag count, and which flags applied to `fgos-planning`
+directly when routing a `decompose`-stage item there.
+
 ## Running a state-writing verb from this session
 
 Every bare `fgos <verb>` below (`take`, `return`, and the `ask`/`answer`
@@ -38,7 +74,7 @@ session's cwd is a linked worktree, which never carries its own `.fgos/`
 by design (ADR0020: `docs/decisions/0020-chan-fgos-khoi-worktree-worker.md`).
 Resolve the main checkout root once and pass it explicitly on every such
 call — never a bare `fgos <verb>` when this session might already be
-inside a worktree (e.g. mid-`fgos-executing`, or a `pick`'d session
+inside a worktree (e.g. mid-`fgos-code-implement`, or a `pick`'d session
 running `fgos-routing` again):
 
 ```bash
@@ -103,7 +139,7 @@ call, not a different table:
 | `clarify` | the request is still fuzzy — gray areas, missing acceptance criteria, an ambiguous ask | `fgos-exploring` |
 | `decompose` — shaping | scope is settled; the work now needs shaping and, where it doesn't fit in one pass, splitting into child items | `fgos-planning` (the registry's entry-point default for `decompose`) |
 | `decompose` — proving | shape and children (if any) exist; what's left is proving the plan against reality before the item is allowed to move to `executing` | `fgos-validating` — this branch is this skill's own session-side judgment layered on top of the registry's single `decompose` default, never a second registry entry |
-| `executing` | the item has already cleared clarification and shaping (or never needed either), and is ready for direct implementation | `null` today (the already-mechanical build/verify/return path) — a domain that registers a skill here loads it instead |
+| `executing` | the item has already cleared clarification and shaping (or never needed either), and is ready for direct implementation | `fgos-code-implement` (str89-fgos-domain-skills D4/D6 — the build/verify/return path, hand-authored from bee-executing's implement→verify→cap discipline) |
 
 `compound-learn` is retired as a stage (work-item-status-delivered-
 retrospective-cleanup D11, supersedes RUL49/RUL50/RUL51) — the synthesis

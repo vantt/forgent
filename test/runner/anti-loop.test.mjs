@@ -140,7 +140,7 @@ test('visitsSinceLastHumanEvent also excludes clarify/decompose-phase claims fro
 // (loop.mjs's hasExceededMaxVisits call sites), not the shipped lifetime
 // metric. `humanMove` mints the two CLOSED trigger shapes (D1c): an `answer`
 // leaving awaiting-human, or a `reason`-carrying move — both require
-// `role: 'human'`, matching fsm.mjs's transitionWork (answer only appears
+// `role: 'human'`, matching status-fsm.mjs's transitionWork (answer only appears
 // on `awaiting-human -> todo`; reason only on `awaiting-approval -> todo`/`blocked`).
 
 function humanMove(id, to, seq, extra = {}) {

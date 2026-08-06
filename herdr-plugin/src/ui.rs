@@ -1,7 +1,10 @@
 use std::io;
 use std::time::Duration;
 
-use crossterm::event::{self, Event, KeyCode, KeyEventKind, KeyModifiers};
+use crossterm::event::{
+    self, DisableMouseCapture, EnableMouseCapture, Event, KeyCode, KeyEventKind, KeyModifiers,
+    MouseEventKind,
+};
 use crossterm::execute;
 use crossterm::terminal::{
     disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen,
@@ -10,11 +13,26 @@ use ratatui::backend::CrosstermBackend;
 use ratatui::layout::{Constraint, Direction, Layout, Rect};
 use ratatui::style::{Color, Modifier, Style};
 use ratatui::text::{Line, Span};
-use ratatui::widgets::{Block, Borders, Clear, Paragraph, Row, Table, TableState};
+use ratatui::widgets::{Block, Borders, Clear, Paragraph, Row, Table, TableState, Tabs};
 use ratatui::{Frame, Terminal};
 
-use crate::app::{App, InProcessTask, Panel};
+use crate::app::{App, InProcessTask, Panel, Tab};
 use crate::ports::{TerminalUi as TerminalUiPort, UiEvent};
+
+/// tsk-jo1 D1 palette (ANSI-16): the Work Items panel's optional Status
+/// column color-code — `None` renders with the table's default style.
+fn status_color(status: &str) -> Option<Color> {
+    match status {
+        "doing" => Some(Color::Yellow),
+        "blocked" => Some(Color::Red),
+        "awaiting-human" => Some(Color::Magenta),
+        "awaiting-approval" => Some(Color::Green),
+        "delivered" | "retrospective" | "cleanup" | "done" | "wontfix" => Some(Color::DarkGray),
+        _ => None,
+    }
+}
+
+const TAB_ORDER: [Tab; 4] = [Tab::Todo, Tab::Doing, Tab::Review, Tab::Done];
 
 /// tsk-4zo D2: an orphaned task (no matching herdr pane found by the most
 /// recent scan) gets an explicit `[pane missing]` badge in its Title cell
@@ -42,7 +60,10 @@ impl RatatuiTerminalUi {
     pub fn init() -> io::Result<Self> {
         enable_raw_mode()?;
         let mut stdout = io::stdout();
-        execute!(stdout, EnterAlternateScreen)?;
+        // tsk-40t D5: real mouse capture — without this, the terminal
+        // handles clicks itself (text selection) and crossterm never sees
+        // an `Event::Mouse` at all.
+        execute!(stdout, EnterAlternateScreen, EnableMouseCapture)?;
         let backend = CrosstermBackend::new(stdout);
         let terminal = Terminal::new(backend)?;
         Ok(Self { terminal })
@@ -50,7 +71,11 @@ impl RatatuiTerminalUi {
 
     pub fn teardown(mut self) -> io::Result<()> {
         disable_raw_mode()?;
-        execute!(self.terminal.backend_mut(), LeaveAlternateScreen)?;
+        execute!(
+            self.terminal.backend_mut(),
+            DisableMouseCapture,
+            LeaveAlternateScreen
+        )?;
         self.terminal.show_cursor()
     }
 }
@@ -63,12 +88,48 @@ impl TerminalUiPort for RatatuiTerminalUi {
 
     /// Translates a raw crossterm key event into the domain-level
     /// `UiEvent` the event loop (`main.rs`) actually matches on — no
-    /// `crossterm` type crosses this port's boundary.
-    fn poll_event(&mut self, timeout: Duration) -> io::Result<Option<UiEvent>> {
+    /// `crossterm` type crosses this port's boundary. tsk-64z D8: while
+    /// `app.filter_input_active`, every printable key routes to the
+    /// filter-input events instead of its normal binding (checked FIRST,
+    /// before any of the normal single-key matches below) — this is the
+    /// one place a raw keypress means something different depending on
+    /// domain state.
+    fn poll_event(&mut self, app: &App, timeout: Duration) -> io::Result<Option<UiEvent>> {
         if !event::poll(timeout)? {
             return Ok(None);
         }
-        let Event::Key(key) = event::read()? else {
+        let event = event::read()?;
+
+        // tsk-40t D5: a left-click hit-tests against the detail modal's
+        // button `Rect`s (`app.pick_button_rect`/`discover_button_rect`,
+        // written every frame `draw_detail_modal` renders) and, on a hit,
+        // fires the SAME domain event the matching key already does
+        // (`UiEvent::Pick`/`Discover`) — no separate "mouse click"
+        // variant, so `main.rs`'s handlers stay the one place either
+        // input method's effect is decided. Only meaningful while the
+        // modal is open; a click anywhere else (or with no button
+        // `Rect` recorded) is inert.
+        if let Event::Mouse(mouse) = event {
+            if mouse.kind == MouseEventKind::Down(crossterm::event::MouseButton::Left)
+                && app.detail_modal_open
+            {
+                if app
+                    .pick_button_rect
+                    .is_some_and(|rect| rect.contains(mouse.column, mouse.row))
+                {
+                    return Ok(Some(UiEvent::Pick));
+                }
+                if app
+                    .discover_button_rect
+                    .is_some_and(|rect| rect.contains(mouse.column, mouse.row))
+                {
+                    return Ok(Some(UiEvent::Discover));
+                }
+            }
+            return Ok(None);
+        }
+
+        let Event::Key(key) = event else {
             return Ok(None);
         };
         if key.kind != KeyEventKind::Press {
@@ -76,13 +137,30 @@ impl TerminalUiPort for RatatuiTerminalUi {
         }
         let is_ctrl_c =
             key.code == KeyCode::Char('c') && key.modifiers.contains(KeyModifiers::CONTROL);
+        if is_ctrl_c {
+            return Ok(Some(UiEvent::Quit));
+        }
+
+        if app.filter_input_active {
+            return Ok(match key.code {
+                KeyCode::Esc => Some(UiEvent::FilterCancel),
+                KeyCode::Enter => Some(UiEvent::FilterSubmit),
+                KeyCode::Backspace => Some(UiEvent::FilterBackspace),
+                KeyCode::Char(c) => Some(UiEvent::FilterChar(c)),
+                _ => None,
+            });
+        }
+
         Ok(match key.code {
             KeyCode::Char('q') | KeyCode::Esc => Some(UiEvent::Quit),
-            _ if is_ctrl_c => Some(UiEvent::Quit),
             KeyCode::Down | KeyCode::Char('j') => Some(UiEvent::Down),
             KeyCode::Up | KeyCode::Char('k') => Some(UiEvent::Up),
             KeyCode::Enter => Some(UiEvent::Pick),
             KeyCode::Tab => Some(UiEvent::SwitchPanel),
+            KeyCode::Char('d') => Some(UiEvent::Discover),
+            KeyCode::Char(']') => Some(UiEvent::NextTab),
+            KeyCode::Char('[') => Some(UiEvent::PrevTab),
+            KeyCode::Char('/') => Some(UiEvent::ActivateFilter),
             _ => None,
         })
     }
@@ -110,11 +188,59 @@ pub fn draw(frame: &mut Frame, app: &mut App) {
     // replaces.
     let header_style = Style::default().add_modifier(Modifier::BOLD);
 
-    let work_items_header = Row::new(["Tier", "ID", "Title"]).style(header_style);
-    let work_items_rows: Vec<Row> = app
-        .work_items
+    // tsk-64z D1: the tab strip is a nested vertical split inside the left
+    // column only — it never touches the right-side In-process panel's own
+    // area (`columns[1]`, untouched below).
+    let work_items_area = Layout::default()
+        .direction(Direction::Vertical)
+        .constraints([Constraint::Length(3), Constraint::Min(0)])
+        .split(columns[0]);
+
+    let selected_tab_index = TAB_ORDER.iter().position(|t| *t == app.active_tab).unwrap_or(0);
+    let tabs = Tabs::new(TAB_ORDER.iter().map(|t| t.label()).collect::<Vec<_>>())
+        .select(selected_tab_index)
+        .highlight_style(Style::default().add_modifier(Modifier::REVERSED))
+        .block(
+            Block::default()
+                .borders(Borders::ALL)
+                .border_style(if app.focused_panel == Panel::WorkItems {
+                    focused_border_style
+                } else {
+                    unfocused_border_style
+                })
+                .title("[ prev · ] next"),
+        );
+    frame.render_widget(tabs, work_items_area[0]);
+
+    let work_items_header =
+        Row::new(["ID", "Tier", "Pri", "Status", "Blocked By", "Blocks", "Title"]).style(header_style);
+    let visible_work_items = app.visible_work_items();
+    let work_items_rows: Vec<Row> = visible_work_items
         .iter()
-        .map(|item| Row::new([item.goal_tier.clone(), item.id.clone(), item.title.clone()]))
+        .map(|item| {
+            let priority = item
+                .priority
+                .map(|p| p.to_string())
+                .unwrap_or_else(|| "-".into());
+            let blocked_by = if item.blocked_by.is_empty() {
+                "-".to_string()
+            } else {
+                item.blocked_by.join(",")
+            };
+            let row_style = status_color(&item.status)
+                .map(|color| Style::default().fg(color))
+                .unwrap_or_default();
+            Row::new([
+                item.id.clone(),
+                item.goal_tier.clone(),
+                priority,
+                item.status.clone(),
+                blocked_by,
+                item.blocks.to_string(),
+                item.title.clone(),
+            ])
+            .style(row_style)
+        })
         .collect();
     let mut work_items_state = TableState::default();
     work_items_state.select(app.selected);
@@ -122,8 +248,12 @@ pub fn draw(frame: &mut Frame, app: &mut App) {
         Table::new(
             work_items_rows,
             [
-                Constraint::Length(10),
+                Constraint::Length(12),
+                Constraint::Length(6),
+                Constraint::Length(5),
                 Constraint::Length(16),
+                Constraint::Length(14),
+                Constraint::Length(6),
                 Constraint::Fill(1),
             ],
         )
@@ -137,14 +267,27 @@ pub fn draw(frame: &mut Frame, app: &mut App) {
                     unfocused_border_style
                 })
                 .title(Span::styled(
-                    "Work items (by impact) — ↑/↓ select, Enter for details",
+                    "Work items — ↑/↓ select, Enter for details",
                     Style::default().add_modifier(Modifier::BOLD),
                 )),
         )
         .row_highlight_style(Style::default().add_modifier(Modifier::REVERSED)),
-        columns[0],
+        work_items_area[1],
         &mut work_items_state,
     );
+
+    // tsk-417 D3: the right column stacks the existing In-process panel
+    // above 3 NEW, separate action-queue boxes — never merged into one
+    // table (D3's own "3 box riêng biệt không merge" instruction).
+    let right_column = Layout::default()
+        .direction(Direction::Vertical)
+        .constraints([
+            Constraint::Percentage(30),
+            Constraint::Percentage(24),
+            Constraint::Percentage(23),
+            Constraint::Percentage(23),
+        ])
+        .split(columns[1]);
 
     let in_process_header = Row::new(["ID", "Title"]).style(header_style);
     let in_process_rows: Vec<Row> = app
@@ -177,31 +320,159 @@ pub fn draw(frame: &mut Frame, app: &mut App) {
                 )),
         )
         .row_highlight_style(Style::default().add_modifier(Modifier::REVERSED)),
-        columns[1],
+        right_column[0],
         &mut in_process_state,
     );
 
-    let status = if let Some(err) = &app.last_error {
+    draw_need_answer_box(frame, app, right_column[1]);
+    draw_merge_list_box(frame, app, right_column[2]);
+    draw_after_deliver_box(frame, app, right_column[3]);
+
+    // tsk-64z D8: while typing, the filter input takes over the bottom
+    // bar entirely (never a permanent fixture — bung 1 dòng đè status bar
+    // only while active, per the locked TUI-convention decision).
+    let status = if app.filter_input_active {
+        Paragraph::new(format!("/{}", app.filter_query))
+            .style(Style::default().fg(Color::Yellow).add_modifier(Modifier::BOLD))
+    } else if let Some(err) = &app.last_error {
         Paragraph::new(format!("fgos poll error: {err}")).style(Style::default().fg(Color::Red))
     } else if let Some(status) = &app.pick_status {
         Paragraph::new(status.as_str()).style(Style::default().fg(Color::Green))
+    } else if !app.filter_query.is_empty() {
+        Paragraph::new(format!(
+            "filter: \"{}\" (/ to edit, clear via Esc while editing) · ↑/↓ select · Enter: details · q/Esc: quit",
+            app.filter_query
+        ))
+        .style(Style::default().fg(Color::Yellow))
     } else {
-        Paragraph::new("↑/↓ select · Enter: details · q/Esc: quit")
+        Paragraph::new("↑/↓ select · Enter: details · [/]: tabs · /: filter · q/Esc: quit")
     };
     frame.render_widget(status, rows[1]);
 
     if app.detail_modal_open {
-        if let Some(item) = app.selected_work_item() {
-            draw_detail_modal(frame, item);
+        // tsk-40t D5: clone the selected item BEFORE the mutable borrow
+        // `draw_detail_modal` needs (to write the button `Rect`s) — ends
+        // the immutable `selected_work_item()` borrow first, same
+        // shape any other "read then mutate" split in this file uses.
+        if let Some(item) = app.selected_work_item().cloned() {
+            draw_detail_modal(frame, app, &item);
         }
     }
 }
 
+/// tsk-417 D3 / tsk-jo1 D1: NEED ANSWER box — `status: blocked` gets
+/// `[ERR]` red, `status: awaiting-human` gets `[ASK]` magenta, same box,
+/// distinct per-row tag (D3 locks the shared box; the palette locks the
+/// two sub-tags).
+fn draw_need_answer_box(frame: &mut Frame, app: &App, area: Rect) {
+    let rows: Vec<Line> = app
+        .need_answer
+        .iter()
+        .map(|task| {
+            let (tag, color) = if task.status == "blocked" {
+                ("[ERR]", Color::Red)
+            } else {
+                ("[ASK]", Color::Magenta)
+            };
+            Line::from(vec![
+                Span::styled(tag, Style::default().fg(color)),
+                Span::raw(format!(" {}  {}", task.id, task.title)),
+            ])
+        })
+        .collect();
+    let body = if rows.is_empty() {
+        Paragraph::new("(empty)")
+    } else {
+        Paragraph::new(rows)
+    };
+    frame.render_widget(
+        body.block(Block::default().borders(Borders::ALL).title(Span::styled(
+            format!("NEED ANSWER ({})", app.need_answer.len()),
+            Style::default().add_modifier(Modifier::BOLD),
+        ))),
+        area,
+    );
+}
+
+/// tsk-417 D3: MERGE LIST box — a direct mapping of `fgos merge list
+/// --json`'s own `ready`/`waiting`/`blockedOnSync` id lists (never a
+/// separately-invented filter). `[MRG]` green for `ready` (the only
+/// bucket that's actually mergeable right now); `waiting`/`blockedOnSync`
+/// render plain, dimmed, to stay visually subordinate to `ready`.
+fn draw_merge_list_box(frame: &mut Frame, app: &App, area: Rect) {
+    let mut rows: Vec<Line> = Vec::new();
+    for id in &app.merge_list.ready {
+        rows.push(Line::from(vec![
+            Span::styled("[MRG]", Style::default().fg(Color::Green)),
+            Span::raw(format!(" {id}")),
+        ]));
+    }
+    for id in &app.merge_list.waiting {
+        rows.push(Line::from(Span::styled(
+            format!("[wait] {id}"),
+            Style::default().fg(Color::DarkGray),
+        )));
+    }
+    for id in &app.merge_list.blocked_on_sync {
+        rows.push(Line::from(Span::styled(
+            format!("[sync] {id}"),
+            Style::default().fg(Color::DarkGray),
+        )));
+    }
+    let body = if rows.is_empty() {
+        Paragraph::new("(empty)")
+    } else {
+        Paragraph::new(rows)
+    };
+    let count = app.merge_list.ready.len() + app.merge_list.waiting.len() + app.merge_list.blocked_on_sync.len();
+    frame.render_widget(
+        body.block(Block::default().borders(Borders::ALL).title(Span::styled(
+            format!("MERGE LIST ({count})"),
+            Style::default().add_modifier(Modifier::BOLD),
+        ))),
+        area,
+    );
+}
+
+/// tsk-417 D3 / tsk-jo1 D1: AFTER DELIVER box — `status: retrospective`
+/// gets `[RTR]` cyan, `status: cleanup` gets `[POL]` dim/gray (lowest
+/// priority, AGENTS.md "Polish Sau DoD" tier 3).
+fn draw_after_deliver_box(frame: &mut Frame, app: &App, area: Rect) {
+    let rows: Vec<Line> = app
+        .after_deliver
+        .iter()
+        .map(|task| {
+            let (tag, color) = if task.status == "retrospective" {
+                ("[RTR]", Color::Cyan)
+            } else {
+                ("[POL]", Color::DarkGray)
+            };
+            Line::from(vec![
+                Span::styled(tag, Style::default().fg(color)),
+                Span::raw(format!(" {}  {}", task.id, task.title)),
+            ])
+        })
+        .collect();
+    let body = if rows.is_empty() {
+        Paragraph::new("(empty)")
+    } else {
+        Paragraph::new(rows)
+    };
+    frame.render_widget(
+        body.block(Block::default().borders(Borders::ALL).title(Span::styled(
+            format!("AFTER DELIVER ({})", app.after_deliver.len()),
+            Style::default().add_modifier(Modifier::BOLD),
+        ))),
+        area,
+    );
+}
+
 /// A blocking dialog for the selected work item — opened by Enter on the
-/// "Work items" panel instead of picking directly. Its only action today
-/// is the Pick button, which runs the same `/fgOS:pick` flow Enter used to
-/// trigger immediately.
-fn draw_detail_modal(frame: &mut Frame, item: &crate::app::WorkItem) {
+/// "Work items" panel instead of picking directly. Two fixed actions
+/// (tsk-1e3 D4): Pick (Enter, unconditional) and Discover (`d`, disabled/
+/// dimmed — never hidden, so the layout never shifts — when the item's
+/// `stage != "clarify"`, since `/fgOS:discover` only applies there).
+fn draw_detail_modal(frame: &mut Frame, app: &mut App, item: &crate::app::WorkItem) {
     let area = centered_rect(60, 40, frame.area());
     frame.render_widget(Clear, area);
 
@@ -214,6 +485,7 @@ fn draw_detail_modal(frame: &mut Frame, item: &crate::app::WorkItem) {
         Line::from(format!("ID: {}", item.id)),
         Line::from(format!("Title: {}", item.title)),
         Line::from(format!("Goal tier: {}", item.goal_tier)),
+        Line::from(format!("Stage: {}", item.stage)),
     ])
     .block(
         Block::default()
@@ -225,16 +497,49 @@ fn draw_detail_modal(frame: &mut Frame, item: &crate::app::WorkItem) {
     );
     frame.render_widget(detail, sections[0]);
 
-    let buttons = Paragraph::new(Line::from(Span::styled(
+    let discover_enabled = item.stage == "clarify";
+    let button_cells = Layout::default()
+        .direction(Direction::Horizontal)
+        .constraints([Constraint::Percentage(50), Constraint::Percentage(50)])
+        .split(sections[1]);
+
+    let pick_button = Paragraph::new(Line::from(Span::styled(
         " Pick ",
         Style::default().add_modifier(Modifier::REVERSED),
     )))
-    .block(
-        Block::default()
-            .borders(Borders::ALL)
-            .title("Enter: pick · Esc: close"),
-    );
-    frame.render_widget(buttons, sections[1]);
+    .block(Block::default().borders(Borders::ALL).title("Enter: pick"));
+    frame.render_widget(pick_button, button_cells[0]);
+    // tsk-40t D5: recorded AFTER rendering so it reflects this frame's
+    // real on-screen position — `poll_event` (ui.rs) reads it back next
+    // event, hit-testing a mouse click against it.
+    app.pick_button_rect = Some(crate::app::ButtonRect {
+        x: button_cells[0].x,
+        y: button_cells[0].y,
+        width: button_cells[0].width,
+        height: button_cells[0].height,
+    });
+
+    // tsk-jo1 D1 palette (ANSI-16): dim/gray (`Color::DarkGray`) when
+    // disabled, same `Reversed` treatment as Pick when enabled — color
+    // changes, layout never does.
+    let discover_style = if discover_enabled {
+        Style::default().add_modifier(Modifier::REVERSED)
+    } else {
+        Style::default().fg(Color::DarkGray)
+    };
+    let discover_button = Paragraph::new(Line::from(Span::styled(" Discover ", discover_style)))
+        .block(
+            Block::default()
+                .borders(Borders::ALL)
+                .title(if discover_enabled { "d: discover" } else { "d: discover (stage != clarify)" }),
+        );
+    frame.render_widget(discover_button, button_cells[1]);
+    app.discover_button_rect = Some(crate::app::ButtonRect {
+        x: button_cells[1].x,
+        y: button_cells[1].y,
+        width: button_cells[1].width,
+        height: button_cells[1].height,
+    });
 }
 
 /// Carves an `area`-relative popup rect out of `area`'s center —
@@ -262,7 +567,108 @@ fn centered_rect(percent_x: u16, percent_y: u16, area: Rect) -> Rect {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::app::{App, WorkItem};
     use crate::pane_scan::PaneIdentity;
+    use ratatui::backend::TestBackend;
+
+    /// tsk-64z D1: all 4 tab labels render, regardless of which is
+    /// currently selected — proves the `Tabs` widget renders the full set,
+    /// not just the active one.
+    #[test]
+    fn work_items_panel_renders_four_tabs_todo_doing_review_done() {
+        let mut app = App::mock();
+        let backend = TestBackend::new(120, 30);
+        let mut terminal = Terminal::new(backend).expect("terminal init");
+        terminal
+            .draw(|frame| draw(frame, &mut app))
+            .expect("draw should not panic");
+        let buffer = terminal.backend().buffer();
+        let content: String = buffer.content().iter().map(|cell| cell.symbol()).collect();
+        for label in ["TODO", "DOING", "REVIEW", "DONE"] {
+            assert!(content.contains(label), "missing tab label {label}: {content}");
+        }
+    }
+
+    /// tsk-417 D3: NEED ANSWER, MERGE LIST, AFTER DELIVER render as 3
+    /// separate bordered boxes (their titles all appear, distinctly, in
+    /// the rendered buffer) — never merged into one table.
+    #[test]
+    fn process_status_renders_three_separate_boxes() {
+        let mut app = App::mock();
+        let backend = TestBackend::new(140, 40);
+        let mut terminal = Terminal::new(backend).expect("terminal init");
+        terminal
+            .draw(|frame| draw(frame, &mut app))
+            .expect("draw should not panic");
+        let buffer = terminal.backend().buffer();
+        let content: String = buffer.content().iter().map(|cell| cell.symbol()).collect();
+        for title in ["NEED ANSWER", "MERGE LIST", "AFTER DELIVER"] {
+            assert!(content.contains(title), "missing box title {title}: {content}");
+        }
+        assert!(content.contains("[ERR]"), "mock has a blocked row: {content}");
+        assert!(content.contains("[MRG]"), "mock has a ready-to-merge row: {content}");
+        assert!(content.contains("[RTR]"), "mock has a retrospective row: {content}");
+    }
+
+    fn render_modal_buffer(stage: &str) -> ratatui::buffer::Buffer {
+        let item = WorkItem {
+            id: "tsk-a".into(),
+            title: "A".into(),
+            goal_tier: "mvp".into(),
+            stage: stage.into(),
+            status: "doing".into(),
+            blocked_by: Vec::new(),
+            blocks: 0,
+            priority: None,
+        };
+        let mut app = App::empty();
+        let backend = TestBackend::new(80, 24);
+        let mut terminal = Terminal::new(backend).expect("terminal init");
+        terminal
+            .draw(|frame| draw_detail_modal(frame, &mut app, &item))
+            .expect("draw should not panic");
+        terminal.backend().buffer().clone()
+    }
+
+    /// tsk-1e3 D4: both buttons always render, regardless of stage — only
+    /// Discover's color changes (see
+    /// `discover_button_disabled_when_stage_not_clarify` below).
+    #[test]
+    fn detail_modal_renders_pick_and_discover_buttons() {
+        let buffer = render_modal_buffer("clarify");
+        let content: String = buffer.content().iter().map(|cell| cell.symbol()).collect();
+        assert!(content.contains("Pick"), "modal must render a Pick button: {content}");
+        assert!(
+            content.contains("Discover"),
+            "modal must render a Discover button: {content}"
+        );
+    }
+
+    /// tsk-1e3 D4 / tsk-jo1 D1: Discover renders `Color::DarkGray` (never
+    /// hidden, never a layout shift) when the item's stage isn't
+    /// `clarify`.
+    #[test]
+    fn discover_button_disabled_when_stage_not_clarify() {
+        let buffer = render_modal_buffer("executing");
+        let discover_is_dimmed = buffer
+            .content()
+            .iter()
+            .any(|cell| cell.symbol() == "D" && cell.fg == Color::DarkGray);
+        assert!(
+            discover_is_dimmed,
+            "Discover button must render Color::DarkGray when stage != clarify"
+        );
+
+        let buffer = render_modal_buffer("clarify");
+        let discover_is_dimmed_when_enabled = buffer
+            .content()
+            .iter()
+            .any(|cell| cell.symbol() == "D" && cell.fg == Color::DarkGray);
+        assert!(
+            !discover_is_dimmed_when_enabled,
+            "Discover button must not render dimmed when stage == clarify"
+        );
+    }
 
     #[test]
     fn dashboard_table_orphan_task_gets_pane_missing_badge_in_title_cell() {

@@ -314,18 +314,29 @@ test('runOnce logs the "<capacityId> — <provider> — <model>" announce line a
   await runOnce({ repoRoot, config, worktreeDir, log: (msg) => logs.push(msg) });
 
   assert.ok(
-    logs.includes(`fgos-runner: fgos-executing — ${process.execPath} — sonnet`),
+    logs.includes(`fgos-runner: fgos-code-implement — ${process.execPath} — sonnet`),
     `expected an announce line in: ${JSON.stringify(logs)}`,
   );
   const events = readRawEvents(dir);
   const auditEvent = events.find((e) => e.type === 'capacity.dispatch');
   assert.ok(auditEvent, 'expected a capacity.dispatch event in the log');
-  assert.deepEqual(auditEvent.payload, {
+  // baseCommit/headRef (tsk-4hl): asserted by shape, not exact value -- both
+  // are real per-run git reads (a fresh worktree's own HEAD/branch), so a
+  // literal SHA/branch string would be non-deterministic across runs. This
+  // still pins the property that actually matters: a real 40-hex commit and
+  // the item's own dispatch branch, proving attestRoot: cwd reached the
+  // production spawnWorker path end-to-end, not just the dispatch.mjs unit
+  // tests (found missing by independent review after tsk-4hl merged --
+  // this whole test file was outside that item's own verify scope).
+  const { baseCommit, headRef, ...rest } = auditEvent.payload;
+  assert.deepEqual(rest, {
     id: 'item-announce',
-    capacityId: 'fgos-executing',
+    capacityId: 'fgos-code-implement',
     provider: process.execPath,
     model: 'sonnet',
   });
+  assert.match(baseCommit, /^[0-9a-f]{40}$/, 'baseCommit must be a real commit sha, not null/undefined');
+  assert.equal(headRef, 'fgw/item-announce', 'headRef must be this item\'s own dispatch branch, not the main checkout\'s');
   // the audit entry is unknown to the FSM view — never breaks replay/state.json
   assert.equal(listWork(dir).work['item-announce'].status, 'awaiting-approval');
 });
@@ -1085,6 +1096,51 @@ test('startup reap: empty fgw/ orphan branches are pruned, branches carrying com
   assert.deepEqual(result.reap.kept, [{ branch: 'fgw/keeper-y', aheadCount: 1 }]);
   assert.equal(branchExists(repoRoot, 'fgw/orphan-x'), false);
   assert.equal(branchExists(repoRoot, 'fgw/keeper-y'), true);
+});
+
+// tsk-577: a zero-ahead root branch must NOT be pruned while it still has a
+// descendant that isn't done/wontfix yet — that descendant's own
+// checkMergeStillResolves check (cleanup-harness.mjs) still needs this ref
+// alive. Confirmed root cause of a real 14-item false-positive block.
+test('startup reap: a zero-ahead root branch with an open (non-done/wontfix) leaf descendant is kept, not pruned (tsk-577)', async () => {
+  const { repoRoot, dir, worktreeDir } = setup();
+  // root-a: same shape as the existing orphan case (zero commits ahead) —
+  // the only difference is it now has a leaf still relying on it.
+  const rootBranch = createWorktree(repoRoot, 'root-a', { worktreeDir });
+  removeWorktree(repoRoot, rootBranch.path);
+  seedItem(dir, { id: 'root-a', status: 'cleanup' });
+  seedItem(dir, { id: 'leaf-b', parent: 'root-a', status: 'cleanup' });
+
+  const config = {
+    executor: { command: '/no/such/executor-binary-xyz', args: ['{prompt}'] },
+    models: { standard: 'sonnet' },
+    timeoutMs: 30000,
+  };
+
+  const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
+
+  assert.deepEqual(result.reap.pruned, [], 'root-a must not be pruned — leaf-b still needs it');
+  assert.deepEqual(result.reap.kept, [{ branch: 'fgw/root-a', aheadCount: 0, reason: 'descendant-still-needed' }]);
+  assert.equal(branchExists(repoRoot, 'fgw/root-a'), true, 'the ref must survive this pass');
+});
+
+test('startup reap: a zero-ahead root branch whose only descendant is already done/wontfix is still pruned normally (tsk-577 regression guard)', async () => {
+  const { repoRoot, dir, worktreeDir } = setup();
+  const rootBranch = createWorktree(repoRoot, 'root-c', { worktreeDir });
+  removeWorktree(repoRoot, rootBranch.path);
+  seedItem(dir, { id: 'root-c', status: 'cleanup' });
+  seedItem(dir, { id: 'leaf-d', parent: 'root-c', status: 'done' });
+
+  const config = {
+    executor: { command: '/no/such/executor-binary-xyz', args: ['{prompt}'] },
+    models: { standard: 'sonnet' },
+    timeoutMs: 30000,
+  };
+
+  const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
+
+  assert.deepEqual(result.reap.pruned, ['fgw/root-c'], 'a fully-resolved descendant must not block the existing prune behavior');
+  assert.equal(branchExists(repoRoot, 'fgw/root-c'), false);
 });
 
 // --- CAS conflict on the runner's own write -> clean halt, exit 3 ---------

@@ -1,7 +1,7 @@
 # Why workflow prose gates on a capability query, not a hardcoded tool name
 
 `tsk-1e4` rewrote `CLAUDE.md` and the `fgos-planning`/`fgos-validating`/
-`fgos-executing` skill prose so that "should I demand GitNexus impact
+`fgos-code-implement` skill prose so that "should I demand GitNexus impact
 analysis here?" is answered by querying the `impact-analysis` capability
 (`tsk-1dj`'s tool registry) instead of assuming GitNexus is on this
 machine. Sibling item `tsk-1e4` was explicitly carved out of `tsk-1dj`'s
@@ -37,7 +37,7 @@ Each skill consults the gate at a different moment in the item lifecycle,
 so each needed the degrade-ladder wired into what that moment already
 does:
 
-**`fgos-executing`** — at the point it already reads a symbol's file
+**`fgos-code-implement`** — at the point it already reads a symbol's file
 before editing it:
 
 > Before editing a symbol, apply `CLAUDE.md`'s impact-analysis capability
@@ -88,13 +88,13 @@ without it, the registry existing was inert.
 
 ## The fourth skill: `fgos-exploring` (`tsk-17w`)
 
-`tsk-1e4` covered `fgos-planning`/`fgos-validating`/`fgos-executing`, but
+`tsk-1e4` covered `fgos-planning`/`fgos-validating`/`fgos-code-implement`, but
 left the earliest lifecycle stage — `fgos-exploring`, stage `clarify` —
 without the same gate. `tsk-17w` closed that gap, adding the query to
 `fgos-exploring`'s own scout step:
 
 > Also query `CLAUDE.md`'s impact-analysis capability gate — the same
-> check `fgos-planning`/`fgos-validating`/`fgos-executing` already run
+> check `fgos-planning`/`fgos-validating`/`fgos-code-implement` already run
 > (`fgos tool query --capability impact-analysis --status present`) —
 > rather than assuming GitNexus is on this machine, since this is the only
 > clarify-stage session with real tool access (`judgeDiscovery` itself has
@@ -113,6 +113,61 @@ other three skills:
 > `CONTEXT.md` sees the posture without re-deriving it.
 
 With this item, all four lifecycle skills (`fgos-exploring`,
-`fgos-planning`, `fgos-validating`, `fgos-executing`) plus `CLAUDE.md`
+`fgos-planning`, `fgos-validating`, `fgos-code-implement`) plus `CLAUDE.md`
 consult the same capability query — the injection `tsk-1dj`'s own D3 first
 flagged as still-needed is now complete across the full item lifecycle.
+
+## `present` doesn't mean fresh or intact (`tsk-j7y`)
+
+During `tsk-480`, GitNexus's `impact()` MCP tool gave false-negative and
+false-not-found blast-radius evidence while `fgos tool query
+--capability impact-analysis --status present` reported the capability
+as fully healthy:
+
+> `impact({target:"appendWorkerLog", direction:"upstream"})` reported
+> `impactedCount:0` even though `src/runner/loop.mjs:702` and `:761`
+> really do call it (confirmed by direct grep);
+> `impact({target:"runVerb", direction:"upstream"})` returned "Target
+> 'runVerb' not found" even though `async function runVerb(...)` is a
+> real top-level exported-from-module function in `bin/fgos.mjs` that
+> dispatches every CLI verb.
+
+The gap: `probeTool`'s presence check for an `mcp`/`skill` capability was
+directory-existence only (`fs.existsSync` on the tool's `scanTarget`) —
+it said nothing about whether the index behind that tool actually
+reflects the repo's current state.
+
+**Fix**: GitNexus's own `.gitnexus/meta.json` already carries a
+`lastCommit` field recording which commit the index reflects. `probeTool`
+now compares that against the repo's current `git rev-parse HEAD` and
+resolves the tool's status to `'stale'` instead of `'present'` when they
+diverge — folded into the existing **degraded** bucket of the three-way
+framing above, not a fourth word (at least 12 files under
+`docs/history/**` already cited the three-way framing verbatim; widening
+"degraded" to also mean "present but stale" was a one-line prose change
+there, versus review everywhere the framing is copied).
+
+`CLAUDE.md`'s gate prose now reads:
+
+> Registered but not `present`, or `present` but flagged `stale` —
+> Degraded: run every other required check, mark that proof weak, and
+> name the gap plainly (e.g. "GitNexus registered but not present on this
+> machine — blast radius not confirmed", or "GitNexus present but its
+> index is behind the current HEAD — blast radius may be stale"). A
+> `present` status only means the tool is installed, never that its
+> index is fresh or intact — a suspicious zero-result or "not found"
+> answer from an impact-analysis tool is worth a quick grep/rg
+> cross-check before being trusted, regardless of what `fgos tool query`
+> reports.
+
+**What's still a residual gap, deliberately not built here**: FTS/graph
+**corruption** (the deeper failure `tsk-480` actually hit — a crash on
+reindex, `"FTS index 'file_fts' is inconsistent"`) has no cheap on-disk
+pre-flight signal; `meta.json`'s own `capabilities.fts.status` still read
+`"available"` even after the live index was later found corrupted.
+Detecting corruption for real requires actually running `analyze`, too
+expensive to run as part of every presence probe (YAGNI) — `analyze`'s
+own error already names its fix (drop/recreate `file_fts`) when it does
+surface. Staleness (index behind HEAD) and corruption (index broken
+regardless of freshness) are deliberately distinct terms — the fix here
+only covers the former.

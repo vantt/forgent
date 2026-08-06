@@ -18,6 +18,8 @@ Forgent (fgOS) is the platform layer for building and running agent applications
 2. **DoD** — reproducibly verifiable result + evidence-linked documentation.
 3. **Polish Sau DoD** — hoàn thiện sau ngưỡng, không mở scope.
 
+Tốc độ ở mục 1 là tốc độ ship của **project đang DÙNG fgOS** (fgOS không loại trừ khi tự dogfood) — không phải tốc độ tự thân team fgOS build một tính năng của chính fgOS. Đừng chọn phương án rẻ để fgOS tự triển khai nếu nó làm project dùng fgOS chậm hơn.
+
 Thứ tự cố định — bậc dưới không ghi đè bậc trên. Chi tiết: docs/decisions/0025.
 
 ## Before touching code
@@ -88,7 +90,7 @@ when the tree is dirty.
 <!-- gitnexus:start -->
 # GitNexus — Code Intelligence
 
-This project is indexed by GitNexus as **forgent** (7951 symbols, 12257 relationships, 300 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
+This project is indexed by GitNexus as **forgent** (8409 symbols, 12768 relationships, 300 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
 
 > Index stale? Run `node .gitnexus/run.cjs analyze` from the project root — it auto-selects an available runner. No `.gitnexus/run.cjs` yet? `npx gitnexus analyze` (npm 11 crash → `npm i -g gitnexus`; #1939).
 

@@ -15,12 +15,31 @@ ranked row as a markdown table with exactly these columns, in this order:
 | Column | Source field | Meaning |
 |---|---|---|
 | `id` | `id` | the work item's id |
-| `status` | `status` | raw status (`todo` \| `doing` \| `blocked` \| `awaiting-human` \| `awaiting-approval` \| `done`), rendered as-is |
+| `status` | `status` | raw status (`todo` \| `doing` \| `blocked` \| `awaiting-approval` \| `delivered` \| `retrospective` \| `cleanup` \| `done` \| `awaiting-human` \| `wontfix`), rendered as-is |
 | `stage` | `stage` | `clarify` \| `decompose` \| `executing` \| `compound-learn` (defaults to `executing` when absent) |
 | `blocked-by` | `blockedBy` | ids of OTHER still-open items this row directly waits on — comma-joined list, `-` when empty |
 | `blocks` | `blocks` | count of OTHER still-open items that directly wait on this one |
 | `tier` | `goalTier` | `mvp` \| `milestone` \| `-` when the item declares no tier |
 | `title` | `title` | the item's title |
+
+`status` is the full domain from `STATUSES` in `src/state/work.mjs` (see
+`src/state/status-fsm.mjs` for the transition table between them):
+
+- `todo` — not yet started, ready to be picked up.
+- `doing` — claimed and actively being worked.
+- `blocked` — parked, waiting on another item's dependency.
+- `awaiting-approval` — a goal-check pass sitting on a branch, waiting on
+  approval/merge.
+- `delivered` — code accepted into the main tree (the sole trigger for
+  RUL12's dependent-open).
+- `retrospective` — the batched learning-synthesis step (formerly the
+  `compound-learn` stage).
+- `cleanup` — a TTL-bounded park while its worktree is reclaimed.
+- `done` — terminal: actually completed.
+- `awaiting-human` — parked waiting for a person to answer a question.
+- `wontfix` — terminal: deliberately closed without being built
+  (superseded, duplicate, admin decision), as opposed to `done`'s
+  "actually completed".
 
 `blocked-by` and `blocks` are two directions over the same unified graph
 (`buildUnifiedEdges` in `src/state/dep-graph.mjs`: `deps` entries plus, for

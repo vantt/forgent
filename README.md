@@ -31,6 +31,52 @@ resolve the right `bin/*.mjs` automatically from any cwd inside the repo:
 source /path/to/forgent/scripts/fgos-shell-integration.sh
 ```
 
+### Setup
+
+`fgos setup` wires the shell-integration source line into every shell
+profile you actually have (bash and/or zsh) and brings your local
+`.fgos/config.json` up to date with the current default keys, without
+ever touching a setting you already customized. It always does the work
+and reports exactly what changed — running it again with nothing new to
+do says so plainly instead of repeating itself.
+
+```bash
+fgos setup
+fgos setup --pretty   # colored plain text instead of JSON
+```
+
+### Doctor
+
+`fgos doctor` is a read-only diagnostic: Node/git availability, whether
+the shell-integration line is sourced, and whether your config file is
+missing any current default key. It never writes anything on its own.
+
+```bash
+fgos doctor
+fgos doctor --fix     # runs every registered fix, then re-reports checks
+```
+
+### Config
+
+Setup and doctor share one local file, `.fgos/config.json`. `fgos setup`
+fills in any default key missing from it; `fgos doctor` reports when it's
+stale relative to the current defaults but never edits it itself.
+Settings you've already customized are never overwritten, at any nesting
+depth.
+
+### Uninstall
+
+`fgos uninstall` reverses `fgos setup`'s own wiring — unwiring the git
+hooks path and reporting (never deleting) any shell-rc source line it
+finds, since removing that line stays a manual, human step. It never
+touches `.fgos/` data or config. Requires `--yes`; refuses with no side
+effects otherwise.
+
+```bash
+fgos uninstall --yes
+fgos uninstall --yes --remove-package   # also runs: npm uninstall -g forgent
+```
+
 ### Contributing
 
 After cloning, run `npm run setup:hooks` once to wire up the pre-commit

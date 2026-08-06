@@ -2,10 +2,10 @@
 name: stale
 description: >-
   Use when the user wants to see which fgOS work items look stuck in
-  `doing` from inside a Claude Code session, invoked as /fgOS:stale. Reads
-  the stale-doing advisory through fgOS's own stale verb; never writes
-  anything and never reclaims a claim. Examples: "/fgOS:stale", "what's
-  stuck?".
+  `doing`, or forgotten in `delivered`/`retrospective`/`cleanup` after
+  merge, from inside a Claude Code session, invoked as /fgOS:stale. Reads
+  both advisories through fgOS's own stale verb; never writes anything and
+  never reclaims a claim. Examples: "/fgOS:stale", "what's stuck?".
 ---
 
 # fgOS stale
@@ -35,12 +35,18 @@ CTR001; a pure read never appends an event and never reclaims anything).
    retry with a guessed argument and do not fall back to a hand-written
    read.
 
-   On success, read the command's JSON output's `data` field — the list of
-   items currently in `doing` that the advisory flagged, each with its
-   classification (e.g. flagged by owner type/claim age).
+   On success, read the command's JSON output's `data` field. `data.stale`
+   is the list of items currently in `doing` that the advisory flagged,
+   each with its classification (e.g. flagged by owner type/claim age).
+   `data.postDelivery.stale` (tsk-1bl) is a second, separate list — items
+   sitting unprocessed in `delivered`/`retrospective`/`cleanup` past their
+   own status's staleness threshold, the same read-only classification
+   shape, never a reclaim.
 
-3. **Report and stop.** Relay the stale-item list back to the user plainly.
-   This is advisory only — do not reclaim, move, or otherwise act on any
-   item; that stays a human or the runner's reap, never this wrapper. If
-   the list is empty, say so — an empty list is a valid, non-error result,
+3. **Report and stop.** Relay both stale-item lists back to the user
+   plainly, named separately (`doing` vs post-delivery). This is advisory
+   only — do not reclaim, move, or otherwise act on any item; that stays a
+   human, the runner's reap, or `/fgOS:retro-loop`/`/fgOS:cleanup-loop`,
+   never this wrapper. If a list is empty, say so — an empty list is a
+   valid, non-error result,
    not a failure.

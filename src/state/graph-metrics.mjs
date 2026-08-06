@@ -12,7 +12,7 @@
 // the log itself; the store facade hands it the view).
 
 import { buildUnifiedEdges } from './dep-graph.mjs';
-import { FRONTIER_ORDER_VERSION, frontier, RESOLVED_STATUSES } from './frontier.mjs';
+import { FRONTIER_ORDER_VERSION, frontier, isResolvedStatus } from './frontier.mjs';
 import { viewRevision } from './replay.mjs';
 
 /**
@@ -295,7 +295,7 @@ export function staleBlocked(view) {
     const item = work[id];
     if (item.status !== 'todo' && item.status !== 'blocked') continue;
     const deps = Array.isArray(item.deps) ? item.deps : [];
-    const blockedBy = deps.filter((dep) => !RESOLVED_STATUSES.has(work[dep]?.status));
+    const blockedBy = deps.filter((dep) => !isResolvedStatus(work[dep]));
     if (blockedBy.length > 0) {
       result.push({ id, status: item.status, blockedBy });
     }
@@ -355,7 +355,7 @@ function computeGreedyTopUnblock(candidates, notDone, deps, k) {
 export function greedyTopUnblock(view, k = 10) {
   const work = view?.work ?? {};
   const deps = knownUnifiedDeps(work);
-  const notDone = new Set(Object.keys(work).filter((id) => !RESOLVED_STATUSES.has(work[id].status)));
+  const notDone = new Set(Object.keys(work).filter((id) => !isResolvedStatus(work[id])));
   return computeGreedyTopUnblock([...notDone], notDone, deps, k); // declaration order
 }
 
@@ -375,7 +375,7 @@ export function goalScopedGreedyTopUnblock(view, focusId, k = 10) {
   const scope = goalScopedSet(view, focusId);
   if (scope.size === 0) return [];
   const deps = knownUnifiedDeps(work);
-  const notDone = new Set(Object.keys(work).filter((id) => scope.has(id) && !RESOLVED_STATUSES.has(work[id].status)));
+  const notDone = new Set(Object.keys(work).filter((id) => scope.has(id) && !isResolvedStatus(work[id])));
   return computeGreedyTopUnblock([...notDone], notDone, deps, k); // declaration order, scope-filtered
 }
 
@@ -398,12 +398,12 @@ export function whatIf(view, id) {
   }
   const deps = knownUnifiedDeps(work);
   const rev = reverseDeps(deps);
-  const notDone = new Set(Object.keys(work).filter((x) => !RESOLVED_STATUSES.has(work[x].status)));
+  const notDone = new Set(Object.keys(work).filter((x) => !isResolvedStatus(work[x])));
   const downstream = transitiveDownstream(id, rev, notDone);
   const newlyReady = (rev.get(id) ?? []).filter((depId) => {
     const item = work[depId];
     if (item.status !== 'todo') return false;
-    return (Array.isArray(item.deps) ? item.deps : []).every((d) => d === id || RESOLVED_STATUSES.has(work[d]?.status));
+    return (Array.isArray(item.deps) ? item.deps : []).every((d) => d === id || isResolvedStatus(work[d]));
   });
   return { id, exists: true, unblocksTransitive: downstream.size, newlyReady };
 }
@@ -493,6 +493,70 @@ export function classifyStaleDoing(entries, { now = Date.now(), thresholds = STA
   return { now, thresholds, stale };
 }
 
+// Advisory thresholds for the post-delivery observability gap (S10, tsk-1bl
+// CONTEXT.md D4/D7): `delivered` and `retrospective` both get a flat 3-day
+// grace; `cleanup` gets no fixed default here since its real TTL is a
+// per-repo shared-config value the caller must supply (`ttlDays`, same
+// requirement `checkCleanupTTLElapsed`/`pickNextCleanupItem` already have,
+// cleanup-harness.mjs/cleanup-pool.mjs) — this default only covers the two
+// flat-3-day statuses.
+export const STALE_POST_DELIVERY_DEFAULTS = Object.freeze({
+  deliveredMs: 3 * 24 * 60 * 60 * 1000, // 3 days
+  retrospectiveMs: 3 * 24 * 60 * 60 * 1000, // 3 days (D7 — same as delivered)
+  cleanupGraceMs: 3 * 24 * 60 * 60 * 1000, // grace ADDED ON TOP of ttlDays, never counted alone
+});
+
+// The item's own SPECIFIC entry event into `status`, never "the latest event
+// of any kind" — same precedent `checkCleanupTTLElapsed` (cleanup-harness.mjs)
+// and `latestRetrospectiveEntry` (retro-pool.mjs) already use. Returns
+// `undefined` when the item never actually entered that status.
+function latestEntryInto(rawEvents, id, status) {
+  const entries = (rawEvents ?? []).filter(
+    (e) => e.type === 'work.move' && e.payload?.id === id && e.payload?.to === status,
+  );
+  return entries.at(-1);
+}
+
+/**
+ * EVIDENCE-CLASSIFIER ADVISORY (S10, mirrors S8's classifyStaleDoing shape):
+ * classify items stuck in the post-merge chain (`delivered`/`retrospective`/
+ * `cleanup`) as stale and SUGGEST — never act, never invoke a verb, never
+ * transition anything. `delivered`/`retrospective` are stale past a flat 3
+ * days from their own entry-into-status event; `cleanup` is stale past
+ * `ttlDays + cleanupGraceMs` from its own entry-into-cleanup event (the
+ * grace is ADDED ON TOP of the real TTL — D4 — so an item still legitimately
+ * waiting on TTL is never flagged). An item with no locatable entry event
+ * for its current status is skipped (never a NaN age, same discipline
+ * `classifyStaleDoing` already gives a missing `claimedAt`). PURE when `now`
+ * is passed; reads only `view.work` + `rawEvents`, never `work.domain`
+ * (domain-agnostic, CONTEXT.md D5).
+ */
+export function classifyStalePostDelivery(view, rawEvents, { now = Date.now(), thresholds = STALE_POST_DELIVERY_DEFAULTS, ttlDays } = {}) {
+  const work = view?.work ?? {};
+  const stale = [];
+  for (const id of Object.keys(work)) {
+    const status = work[id]?.status;
+    if (status !== 'delivered' && status !== 'retrospective' && status !== 'cleanup') continue;
+
+    const entered = latestEntryInto(rawEvents, id, status);
+    if (!entered) continue; // no locatable entry event -> cannot age
+
+    const enteredAt = new Date(entered.ts).getTime();
+    const ageMs = now - enteredAt;
+    const thresholdMs = status === 'cleanup'
+      ? (ttlDays * 24 * 60 * 60 * 1000) + thresholds.cleanupGraceMs
+      : (status === 'delivered' ? thresholds.deliveredMs : thresholds.retrospectiveMs);
+    if (ageMs <= thresholdMs) continue; // fresh enough for this status
+
+    const ageDays = Math.floor(ageMs / 86400000);
+    const suggestion = status === 'cleanup'
+      ? `sat in cleanup ~${ageDays}d (TTL+grace ${Math.floor(thresholdMs / 86400000)}d elapsed) — check whether /fgOS:cleanup-loop has run recently. This advisory never cleans up.`
+      : `sat in ${status} ~${ageDays}d with no retro sweep run — check whether /fgOS:retro-loop has run recently. This advisory never advances status.`;
+    stale.push({ id, status, ageMs, thresholdMs, suggestion });
+  }
+  return { now, thresholds, stale };
+}
+
 // The options a footprint conflict can be resolved by — surfaced as data, never
 // applied. `sequence` = add a dependency so the two run in order not in
 // parallel; `hoist` = extract the shared file's work into a prerequisite both
@@ -538,4 +602,133 @@ export function footprintOverlapAmong(candidates) {
  */
 export function footprintOverlap(view) {
   return footprintOverlapAmong(frontier(view));
+}
+
+/**
+ * DEP-GRAPH CYCLE DETECTION (tsk-3c7, D1/D2 of docs/history/parallel-
+ * decomposition-footprint-avoidance/CONTEXT.md; tsk-3u2 widened it to the
+ * UNIFIED graph after independent review found the original `deps`-only
+ * version blind to a real deadlock: a parent anchored by an open child
+ * whose own `deps`/`mergeAfter` points back at the parent — a permanent
+ * stall `findUnifiedCycle` in dep-graph.mjs already catches, this
+ * function did not): Tarjan's strongly-connected-components algorithm
+ * over `knownUnifiedDeps`'s adjacency (`deps` + `parent` + `mergeAfter`,
+ * the SAME unified graph `connectedComponents`/`criticalPath` above
+ * already walk), regardless of `status` — a cycle is a graph-integrity
+ * defect no matter which items in it happen to be done/blocked/todo right
+ * now. A self-edge (an item depending on, parented by, or merge-ordered
+ * after itself) is reported as its own one-element cycle. An edge with
+ * either endpoint not a known work item is dropped by `knownUnifiedDeps`
+ * itself (dangling-reference detection is a different concern, not this
+ * function's). Returns an array of cycles, each an array of the ids
+ * forming that cycle — empty when the graph is acyclic. Unlike
+ * `findUnifiedCycle` (which stops at the FIRST cycle found), this returns
+ * EVERY cycle — `computedSchedule` (store.mjs) needs the full set, not
+ * just proof that one exists. PURE: reads only `view.work`.
+ */
+export function detectCycles(view) {
+  const work = view?.work ?? {};
+  const adjacency = knownUnifiedDeps(work);
+  let index = 0;
+  const stack = [];
+  const indices = new Map();
+  const lowlink = new Map();
+  const onStack = new Set();
+  const cycles = [];
+
+  function strongconnect(id) {
+    indices.set(id, index);
+    lowlink.set(id, index);
+    index += 1;
+    stack.push(id);
+    onStack.add(id);
+
+    for (const target of adjacency.get(id) ?? []) {
+      if (target === id) {
+        cycles.push([id]);
+        continue;
+      }
+      if (!indices.has(target)) {
+        strongconnect(target);
+        lowlink.set(id, Math.min(lowlink.get(id), lowlink.get(target)));
+      } else if (onStack.has(target)) {
+        lowlink.set(id, Math.min(lowlink.get(id), indices.get(target)));
+      }
+    }
+
+    if (lowlink.get(id) === indices.get(id)) {
+      const scc = [];
+      let w;
+      do {
+        w = stack.pop();
+        onStack.delete(w);
+        scc.push(w);
+      } while (w !== id);
+      if (scc.length > 1) cycles.push(scc);
+    }
+  }
+
+  for (const id of adjacency.keys()) {
+    if (!indices.has(id)) strongconnect(id);
+  }
+  return cycles;
+}
+
+/**
+ * COMPUTED-PARALLEL-WAVE-SCHEDULE (tsk-3c7, D1/D2 of docs/history/
+ * parallel-decomposition-footprint-avoidance/CONTEXT.md): dispatch-time
+ * query answering "which frontier items can run in parallel right now,
+ * and which must wait for a footprint-conflicting sibling to finish
+ * first" — a DIFFERENT question from `footprintOverlap`'s pairwise
+ * advisory (which only flags conflicting pairs, never orders them) and
+ * from `graph-harness.mjs`'s `mergeReadiness` (which orders `proposed`
+ * items for MERGE, a different lifecycle point — D2 deliberately does not
+ * reuse that connected-component logic here: dispatch needs a COUNT of
+ * how many can start now, merge only needs a relative ORDER).
+ *
+ * Kahn-style greedy layering over `frontier(view)` (already in its own
+ * priority/intent/FIFO order, `frontier.mjs`'s `FRONTIER_ORDER_VERSION`):
+ * walk the frontier in that order, packing each item into the earliest
+ * wave that has no footprint conflict with what is already placed in it
+ * (`footprintOverlapAmong`, reused unchanged). A conflicting item is
+ * DEFERRED to a later wave, never refused — mirrors `footprintOverlapAmong`'s
+ * own "advisory, never blocking" stance. An item with no declared
+ * footprint never conflicts with anything (same semantics
+ * `footprintOverlapAmong` already gives it), so it packs into the
+ * earliest wave with room. Returns `{ waves }` — `waves` is an array of
+ * arrays of item ids, in frontier order within each wave; `waves[0]` is
+ * everything dispatchable in parallel right now. PURE: reads only
+ * `view.work` via `frontier`/`footprintOverlapAmong`.
+ */
+export function computeSchedule(view) {
+  const candidates = frontier(view);
+  const conflicts = footprintOverlapAmong(candidates);
+  const conflictsOf = new Map();
+  for (const { a, b } of conflicts) {
+    if (!conflictsOf.has(a)) conflictsOf.set(a, new Set());
+    if (!conflictsOf.has(b)) conflictsOf.set(b, new Set());
+    conflictsOf.get(a).add(b);
+    conflictsOf.get(b).add(a);
+  }
+
+  const waves = [];
+  let remaining = candidates;
+  while (remaining.length > 0) {
+    const wave = [];
+    const waveIds = new Set();
+    const deferred = [];
+    for (const item of remaining) {
+      const itemConflicts = conflictsOf.get(item.id);
+      const conflictsWithWave = itemConflicts ? [...itemConflicts].some((id) => waveIds.has(id)) : false;
+      if (conflictsWithWave) {
+        deferred.push(item);
+      } else {
+        wave.push(item.id);
+        waveIds.add(item.id);
+      }
+    }
+    waves.push(wave);
+    remaining = deferred;
+  }
+  return { waves };
 }

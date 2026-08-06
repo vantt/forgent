@@ -5,7 +5,7 @@
 // CLI verb's job, not this module's.
 
 import { createHash } from 'node:crypto';
-import { HEAVY_KEYWORDS } from './risk-keywords.mjs';
+import { HEAVY_KEYWORDS, matchesKeyword } from './risk-keywords.mjs';
 // work.mjs is a pure, dependency-free module (it imports only the equally pure
 // workflow-stage-graphs.mjs), so taking the shared title bound from it keeps
 // this file's own "deterministic, synchronous transform" promise intact. The
@@ -54,10 +54,13 @@ const KIND_KEYWORDS = {
   docs: ['docs', 'documentation', 'tài liệu', 'readme'],
 };
 
-function countMatches(lowerText, keywords) {
+// Word-boundary-aware (tsk-2as D1) -- text is passed through unmodified;
+// matchesKeyword does its own case-insensitive, Unicode-aware boundary
+// check, so this no longer needs a pre-lowercased string.
+function countMatches(text, keywords) {
   let count = 0;
   for (const keyword of keywords) {
-    if (lowerText.includes(keyword.toLowerCase())) count += 1;
+    if (matchesKeyword(text, keyword)) count += 1;
   }
   return count;
 }
@@ -69,18 +72,18 @@ function countMatches(lowerText, keywords) {
  * kind: 'task', with risk mirroring the tier signal.
  */
 export function classify(text) {
-  const lowerText = (typeof text === 'string' ? text : '').toLowerCase();
+  const safeText = typeof text === 'string' ? text : '';
 
   let tier = 'standard';
-  if (countMatches(lowerText, HEAVY_KEYWORDS) > 0) {
+  if (countMatches(safeText, HEAVY_KEYWORDS) > 0) {
     tier = 'heavy';
-  } else if (countMatches(lowerText, LIGHT_KEYWORDS) > 0) {
+  } else if (countMatches(safeText, LIGHT_KEYWORDS) > 0) {
     tier = 'light';
   }
 
   let kind = 'task';
   for (const [candidateKind, keywords] of Object.entries(KIND_KEYWORDS)) {
-    if (countMatches(lowerText, keywords) > 0) {
+    if (countMatches(safeText, keywords) > 0) {
       kind = candidateKind;
       break;
     }

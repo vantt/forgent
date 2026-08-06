@@ -30,6 +30,7 @@ import { appendJudgeFailLog } from './judge-fail-log.mjs';
 import { readLockedContext, resolveContentRoot } from './decompose.mjs';
 import { DEFAULTS } from '../state/work.mjs';
 import { listWork, moveStage, addDiscovery, addDecision, putInAwaiting, editWork, StoreError } from '../state/store.mjs';
+import { getDomain, stageForStep } from '../state/workflow-stage-graphs.mjs';
 import { graphMetrics } from '../state/graph-metrics.mjs';
 import { rankImpact } from '../state/impact.mjs';
 import { computeImpact, computePriority } from '../state/priority-formula.mjs';
@@ -592,8 +593,8 @@ export function resolveDiscovery(dir, id, cfg, role, callerVerdict) {
       // verify value today, both get the guard").
       moveStage(dir, {
         id,
-        to: 'decompose',
-        expectedStage: 'clarify',
+        to: stageForStep(getDomain(work.domain), 'Divide'),
+        expectedStage: stageForStep(getDomain(work.domain), 'Clarify'),
         verify: hasRealVerify(work.verify) ? work.verify : (view.gates?.[id]?.contextApprove?.verify ?? FALLBACK_VERIFY),
         role,
       });
@@ -639,16 +640,80 @@ export function resolveDiscovery(dir, id, cfg, role, callerVerdict) {
     // item exactly like an unclear first-pass verdict does — an uncertain
     // judgement is never treated as a pass (discovery.mjs's own D4 above).
     if (typeof verdict.verify === 'string' && verdict.verify.trim()) {
-      const secondPass = judgeVerifySemanticCorrectness(work, verdict.verify, cfg);
+      // tsk-25g D1: thread the FULL verify-dispute history back into this
+      // round's prompt -- was tsk-5cf D1a's single most-recent-round-only
+      // slot (gates[id].ask), which a live reproduction (tsk-5mc, 7 dispute
+      // rounds, docs/history/tsk-25g-judge-verify-stabilization-audit/
+      // CONTEXT.md) showed still let the judge contradict an EARLIER
+      // round's own stated criteria once that round fell out of the
+      // single-slot window. `gates[id].askHistory` (replay.mjs's ask fold,
+      // additive alongside the unchanged single-slot `ask`) accumulates
+      // every `ask` for this item; filtered here to just this item's own
+      // verify-dispute asks (the distinctive "Đề xuất verify bị nghi ngờ"
+      // marker `formatVerifyDisputeAsk`-shaped text below always carries),
+      // never an unrelated clarify/decompose-stage ask that happens to
+      // share this item's id. Joined, labeled per round, into one string --
+      // `buildVerifyCheckPrompt` (judge-executor.mjs) still takes a single
+      // `priorRejection` string; only what THIS caller builds it from
+      // widened, not that function's own signature.
+      const VERIFY_DISPUTE_ASK_MARKER = 'Đề xuất verify bị nghi ngờ';
+      const verifyDisputeHistory = (view?.gates?.[id]?.askHistory ?? []).filter(
+        (entry) => typeof entry === 'string' && entry.includes(VERIFY_DISPUTE_ASK_MARKER),
+      );
+      const priorRejection =
+        verifyDisputeHistory.length > 0
+          ? verifyDisputeHistory.map((entry, index) => `Vòng ${index + 1}:\n${entry}`).join('\n\n')
+          : undefined;
+      const secondPass = judgeVerifySemanticCorrectness(work, verdict.verify, cfg, priorRejection);
       if (!secondPass.agrees) {
-        const ask =
-          `Đề xuất verify bị nghi ngờ (chưa ghi vào clarify->decompose, cần xác nhận) — ` +
-          `vòng 1 đề xuất: ${verdict.verify}\n` +
-          `vòng 2 (kiểm tra độc lập) không đồng ý: ${secondPass.reason}`;
-        // statusAtAsk (claim-lock §5.1): same rule as the unclear branch
-        // below — read at function entry, before this park.
-        putInAwaiting(dir, { id, ask, statusAtAsk: work.status });
-        return { outcome: 'verify-disputed', id, verdict, secondPass };
+        // tsk-5cf D1b: a caller that already reasoned live through this
+        // exact disagreement (e.g. a session that judged the second pass's
+        // objections themselves inconsistent across rounds) can force past
+        // it explicitly -- never silent: always logged with the disagreement
+        // reason it overrode, per the "never silently overridden" stance
+        // docs/explanation/judge-verdict-second-pass-semantic-check.md
+        // already states for this exact two-judge-disagreement path.
+        //
+        // tsk-12t D6: EXCEPT when `secondPass.mechanical` is true -- that
+        // disagreement is a syntactic fact (the known-bad node --test
+        // reporter-format trap, judge-executor.mjs's own
+        // matchesKnownBadVerifyPattern), not a judgement call `--force`
+        // exists to override. Falls through to the park branch below
+        // unconditionally in that case, same as `force` had never been
+        // passed.
+        if (callerVerdict?.force === true && secondPass.mechanical !== true) {
+          // tsk-nfa D1: --force overrides the verify dispute only, never a
+          // park state. An item already `awaiting-human` here means a PRIOR
+          // discover call parked it (this dispute, or an unclear verdict) --
+          // continuing on to moveStage below would advance stage while
+          // status stays parked, and fgos return's `status !== 'doing'`
+          // guard (bin/fgos.mjs) then refuses with no obvious way out.
+          // Refuse here instead, pointing at the real resume path: status
+          // changes stay exclusively behind the ask/answer door
+          // (putInAwaiting/answerAwaiting, src/state/store.mjs), never a
+          // synthetic answer manufactured by --force itself.
+          if (work.status === 'awaiting-human') {
+            throw new StoreError(
+              'validation',
+              `discover --force: work "${id}" is already "awaiting-human" -- run "fgos answer ${id} --text ..." to resume it before retrying --force.`,
+            );
+          }
+          addDecision(dir, {
+            id,
+            text: `discover --force overrode a disputed verify: "${verdict.verify}"`,
+            source: 'resolveDiscovery',
+            rationale: `second pass disagreed: ${secondPass.reason}`,
+          });
+        } else {
+          const ask =
+            `Đề xuất verify bị nghi ngờ (chưa ghi vào clarify->decompose, cần xác nhận) — ` +
+            `vòng 1 đề xuất: ${verdict.verify}\n` +
+            `vòng 2 (kiểm tra độc lập) không đồng ý: ${secondPass.reason}`;
+          // statusAtAsk (claim-lock §5.1): same rule as the unclear branch
+          // below — read at function entry, before this park.
+          putInAwaiting(dir, { id, ask, statusAtAsk: work.status });
+          return { outcome: 'verify-disputed', id, verdict, secondPass };
+        }
       }
     }
 
@@ -662,8 +727,8 @@ export function resolveDiscovery(dir, id, cfg, role, callerVerdict) {
 
     moveStage(dir, {
       id,
-      to: 'decompose',
-      expectedStage: 'clarify',
+      to: stageForStep(getDomain(work.domain), 'Divide'),
+      expectedStage: stageForStep(getDomain(work.domain), 'Clarify'),
       verify,
       role,
     });
@@ -671,7 +736,7 @@ export function resolveDiscovery(dir, id, cfg, role, callerVerdict) {
   }
 
   // tsk-wcl: `putInAwaiting` always attempts a real `awaiting-human` status
-  // transition (moveWork), and fsm.mjs has no self-transition edge for it —
+  // transition (moveWork), and status-fsm.mjs has no self-transition edge for it —
   // calling it on an item that is ALREADY `awaiting-human` (re-running
   // `fgos discover <id>` directly on a still-parked item, bypassing the
   // pool picker that normally never re-selects a parked item) throws

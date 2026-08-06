@@ -69,37 +69,42 @@ evidence-quoted end-user document.
    This is a judgment call grounded in the capture's real content, never a
    coin flip or a default choice.
 
-3. **Store the tag.** Run `fgos compound <id> --doc-type <quadrant>
-   --doc-path docs/<quadrant>/<file>.md` with the quadrant chosen above and
-   the same path the document lands at in step 4. This is the one producer
-   surface this step is allowed to use — it stores the Diataxis tag and the
-   doc-path linkage on the item's capture in one call. `compound` requires
-   the item to be at status `retrospective` (it never moves status or
-   stage itself — that stays `/fgOS:retro-next`'s own job, once this
-   skill's steps confirm complete). Absent this call, the item's capture
-   stays untagged and unlinked, and synthesis is unfinished.
+3. **Gather every linked capture, then grow or create the document — at
+   the main checkout, committed.** (retrospective-doc-write-path D1/D3:
+   this order — write and commit first, tag second — replaced an earlier
+   write-after-tag order that let a tag be recorded for a document that
+   was never actually committed; 34 real documents were lost this way
+   before D1/D3 locked the inversion.)
 
-   `compound` is `requiresExistingStore: true` — this session is often
-   still inside the item's worktree right after its own `return`, which
-   never carries its own `.fgos/` by design (ADR0020). Resolve the main
-   checkout root and pass it explicitly rather than running bare
-   (tsk-56t D1):
+   This step, `fgos doc-sources`, and step 4's `fgos compound` are all
+   `requiresExistingStore: true` — this session is often still inside the
+   item's worktree right after its own `return`, which never carries its
+   own `.fgos/` by design (ADR0020). Resolve the main checkout root once
+   and reuse it for every command below (tsk-56t D1):
 
    ```bash
    root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
-   node "$root/bin/fgos.mjs" compound <id> --doc-type <quadrant> --doc-path docs/<quadrant>/<file>.md --dir "$root"
    ```
 
-4. **Gather every linked capture, then grow or create the document.**
-   Before writing, run `fgos doc-sources <docPath>` (the same path just
-   passed to `--doc-path` in step 3) to gather *every* capture already
-   linked to this doc's path — not just the one just tagged. This is the
-   no-loss gather: reconstructing or extending a doc from only the newest
-   capture would silently drop what earlier captures said.
-   - **Detect grow-vs-create by file existence on disk** — no extra flag,
-     no capture-record marker. If `docs/<quadrant>/<file>.md` (the exact
-     path just passed to `--doc-path`) does not yet exist, **create** it
-     fresh from the gathered capture(s), quoted, never paraphrased.
+   Decide the target path from the quadrant chosen in step 2:
+   `docs/<quadrant>/<file>.md` — this is the same path step 4 tags next.
+   Before writing, gather *every* capture already linked to that path —
+   not just this item's own:
+
+   ```bash
+   node "$root/bin/fgos.mjs" doc-sources docs/<quadrant>/<file>.md --dir "$root"
+   ```
+
+   This will not include this item's own capture — step 4 has not tagged
+   it yet, which is the entire point of the new order — but this session
+   already has that capture in hand from step 1. `doc-sources` here only
+   supplies *other* items' prior captures already linked to the same
+   path, for the no-loss gather below.
+   - **Detect grow-vs-create by file existence at `$root`** — no extra
+     flag, no capture-record marker. If `$root/docs/<quadrant>/<file>.md`
+     does not yet exist, **create** it fresh from the gathered
+     capture(s) plus this item's own (from step 1), quoted, never
+     paraphrased.
    - If the file already exists, **grow** it: accumulate the newly
      gathered capture(s) into the existing living prose as additive
      sections — append what is new, and do not delete, shorten, or
@@ -113,11 +118,40 @@ evidence-quoted end-user document.
    second organizing dimension (e.g. by audience or product area) inside
    it.
 
+   Commit the write at `$root` before continuing to step 4 — an
+   uncommitted document is indistinguishable from a missing one to step
+   4's own check:
+
+   ```bash
+   git -C "$root" add "docs/<quadrant>/<file>.md"
+   git -C "$root" commit -m "docs(<id>): retrospective synthesis"
+   ```
+
+4. **Store the tag.** Run `fgos compound <id> --doc-type <quadrant>
+   --doc-path docs/<quadrant>/<file>.md` with the quadrant chosen in step 2
+   and the same path just committed in step 3. This is the one producer
+   surface this step is allowed to use — it stores the Diataxis tag and the
+   doc-path linkage on the item's capture in one call. `compound` requires
+   the item to be at status `retrospective` (it never moves status or
+   stage itself — that stays `/fgOS:retro-next`'s own job, once this
+   skill's steps confirm complete). Absent this call, the item's capture
+   stays untagged and unlinked, and synthesis is unfinished.
+
+   `compound` also now refuses (retrospective-doc-write-path D3) when
+   `--doc-path` does not resolve inside `$root`'s own committed `HEAD` —
+   run it from the same `$root` step 3 already resolved:
+
+   ```bash
+   node "$root/bin/fgos.mjs" compound <id> --doc-type <quadrant> --doc-path docs/<quadrant>/<file>.md --dir "$root"
+   ```
+
 5. **Confirm the close.** Run `fgos check <id>` again and confirm the
    `docType` field now shows the quadrant just stored, and that the
-   document from step 4 exists on disk. A tag with no matching document, or
-   a document with no matching tag, is unfinished — return to whichever
-   half is missing before treating this step as done.
+   document from step 3 exists on disk at `$root`. Step 4's own D3 check
+   already makes "a tag with no matching document" impossible; this
+   confirmation is a final read-back, not the thing standing between the
+   two — treat a mismatch here as this step's own tooling failing to read
+   what it just wrote, not as the invariant having failed.
 
 ## Next
 

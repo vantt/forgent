@@ -2,7 +2,7 @@
 //
 // This is the sole module that resolves `.fgos/` paths; byte-level append is
 // delegated to events.mjs. Every other module here is a pure lib that takes
-// an explicit path (events.mjs) or no path at all (fsm.mjs, replay.mjs,
+// an explicit path (events.mjs) or no path at all (status-fsm.mjs, replay.mjs,
 // work.mjs) — this module is what wires "some directory" to the two files
 // that live in it: `events.jsonl` (truth, per D3) and `state.json` (view,
 // per D4).
@@ -17,7 +17,7 @@
 // contract (R4): EXIT_CODES + categoryOf are the one source for
 // category -> exit code, and the four error classes raised anywhere in the
 // state layer are re-exported from here so bin/fgos.mjs never needs to
-// import fsm.mjs/work.mjs/events.mjs directly.
+// import status-fsm.mjs/work.mjs/events.mjs directly.
 //
 // SIBLING FACADE (D3, worker-dispatch-log): `.fgos/logs/` is written by a
 // separate narrow facade, worker-log.mjs — NOT this door. This module's
@@ -29,10 +29,11 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { appendEvent, readEvents, withEventsLock, appendEventLocked } from './events.mjs';
 import { rebuildView, viewRevision } from './replay.mjs';
-import { graphMetrics as computeGraphMetrics, whatIf as computeWhatIf, classifyStaleDoing, footprintOverlap, goalScopedCriticalPath, goalScopedGreedyTopUnblock } from './graph-metrics.mjs';
-import { transitionWork, FsmError } from './fsm.mjs';
-import { transitionStage } from './stage.mjs';
-import { validateWork, checkAcceptanceEvidenceTraceable, WorkValidationError, DEFAULTS, GOAL_TIERS, truncateTitle } from './work.mjs';
+import { graphMetrics as computeGraphMetrics, whatIf as computeWhatIf, classifyStaleDoing, classifyStalePostDelivery, footprintOverlap, goalScopedCriticalPath, goalScopedGreedyTopUnblock, computeSchedule, detectCycles } from './graph-metrics.mjs';
+import { transitionWork, FsmError } from './status-fsm.mjs';
+import { transitionStage } from './stage-fsm.mjs';
+import { validateWork, validateDomainFields, checkAcceptanceEvidenceTraceable, WorkValidationError, DEFAULTS, GOAL_TIERS, truncateTitle } from './work.mjs';
+import { getDomain, statusCategoryFor, parkReasonForStatus } from './workflow-stage-graphs.mjs';
 import { EventLogError } from './events.mjs';
 import { validateToolRegistration, ToolRegistryError } from './tool-registry.mjs';
 import { frontier, isDepsAndLineageReady as depsAndLineageReadyView } from './frontier.mjs';
@@ -159,6 +160,47 @@ export function addWork(dir, work) {
     // the runner loop) obeys one rule without any of them repeating it.
     const item = { ...work, tier: work?.tier ?? DEFAULTS.tier, title: truncateTitle(work?.title) };
     validateWork(item, Object.keys(before.work));
+    // domainFields fieldSchema (decision record 0027, D6): a separate,
+    // narrower check than validateWork's own domainFields shape rule above
+    // (work.mjs) — validates ONLY the namespace matching item's own domain
+    // against that domain's declared fieldSchema, if any. Run right after
+    // validateWork (which already confirmed item.domain is a real DOMAINS
+    // key or absent) so getDomain's lookup below can never miss.
+    validateDomainFields(item, getDomain(item.domain));
+    // statusCategory (decision record 0027, D2/D3): computed AFTER
+    // validateWork above confirms `item.domain` is either absent or a real
+    // DOMAINS key — deliberately not folded into the tier/title normalize
+    // step above it, because `getDomain` falls back to DEFAULT_DOMAIN with
+    // a `console.warn` for a genuinely unrecognized domain (workflow-stage-
+    // graphs.mjs's `resolveDomainName`), and an invalid `item.domain` must
+    // still fail validation with exactly the same single stderr line as
+    // before this cell existed (test/cli/fgos.test.mjs's `submit --domain
+    // <bad>` stderr-parity assertion) — never a stray "folding to coding"
+    // warning for an item that is about to be rejected anyway. So the very
+    // first event a work item ever gets already carries its frozen
+    // category, with no from-scratch window a derive-on-read model would
+    // leave open (see STATUS_CATEGORIES's own doc comment, work.mjs, for
+    // the L3 replay-from-zero reasoning this avoids), but only once the
+    // item is known-valid. `statusCategoryFor` returns `undefined` (never
+    // stamped, per the same "don't invent one" rule moveWork below
+    // follows) unless `item.status` — almost always the caller's default
+    // `todo`, but a caller-declared `status` on `add` is legal and honored
+    // here too — falls in the six front-segment statuses `item`'s own
+    // domain declares a `statusLabels` entry for.
+    const addCategory = statusCategoryFor(getDomain(item.domain), item.status);
+    if (addCategory !== undefined) {
+      item.statusCategory = addCategory;
+    }
+    // tsk-48i D1: same write-time-stamp shape as statusCategory above, for
+    // the domain-owned parkReason table (parkReasonForStatus,
+    // workflow-stage-graphs.mjs) -- lets a domain-agnostic reader (e.g.
+    // herdr-plugin) tell "actively worked" apart from "parked on a person"
+    // or "parked on a system error" without learning the domain's own
+    // literal status strings.
+    const addParkReason = parkReasonForStatus(getDomain(item.domain), item.status);
+    if (addParkReason !== undefined) {
+      item.parkReason = addParkReason;
+    }
     // tsk-5q5-2 (D1/D3): narrow write-time check on any acceptance clause
     // supplying text+evidence together — see checkAcceptanceEvidenceTraceable's
     // own doc comment (work.mjs) for what this does and does not prove.
@@ -193,7 +235,7 @@ export function addWork(dir, work) {
 // write path (identity is immutable; `status` is `move`'s; `stage` is
 // `moveStage`'s) and mixing them into `edit` would open a second door onto
 // the same field.
-const EDITABLE_FIELDS = new Set(['title', 'description', 'kind', 'risk', 'verify', 'tier', 'refs', 'deps', 'acceptance', 'priority', 'intent', 'docsRef', 'parent', 'urgent', 'impact', 'effort', 'footprint', 'mergeAfter', 'supersededBy', 'duplicates']);
+const EDITABLE_FIELDS = new Set(['title', 'description', 'kind', 'risk', 'verify', 'tier', 'refs', 'deps', 'acceptance', 'priority', 'intent', 'docsRef', 'parent', 'urgent', 'impact', 'effort', 'footprint', 'mergeAfter', 'supersededBy', 'duplicates', 'domainFields', 'goalTier']);
 
 /**
  * Patch fields on an existing work item, through the SAME single write door
@@ -246,6 +288,11 @@ export function editWork(dir, { id, patch, role } = {}) {
 
     const candidate = { ...work, ...normalizedPatch };
     validateWork(candidate, Object.keys(before.work));
+    // domainFields fieldSchema (decision record 0027, D6): same narrower
+    // per-domain check addWork runs above — only reachable here when
+    // patch.domainFields is present (EDITABLE_FIELDS), so an edit touching
+    // any other field never pays this check.
+    validateDomainFields(candidate, getDomain(candidate.domain));
     // tsk-5q5-2 (D1/D3): same narrow check addWork applies above — only
     // reachable here when `patch.acceptance` is present (EDITABLE_FIELDS),
     // so an edit touching any other field never pays this check.
@@ -377,7 +424,7 @@ export function assertAcceptanceEvidence(id, work) {
 
 /**
  * Move a work item to a new status. Looks the item up fresh from the log,
- * delegates the precondition/CAS decision to fsm.mjs (pure — never writes),
+ * delegates the precondition/CAS decision to status-fsm.mjs (pure — never writes),
  * and only then appends the event it returns.
  *
  * The lookup, the CAS decision, and the append are one held `events.lock`
@@ -399,18 +446,44 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, rol
 
   // `reason`/`ask`/`answer` are each only meaningful on their own edge
   // (per D5 for `reason`; async-human-gate D2/D5 for `ask`/`answer`);
-  // fsm.mjs enforces those requirements and ignores whichever of the three
+  // status-fsm.mjs enforces those requirements and ignores whichever of the three
   // doesn't apply to the edge being taken — this facade never branches on
   // `to` itself, it just forwards what the caller gave it.
   const rawEvent = transitionWork({ work, to, expectedStatus, reason, ask, answer }); // FsmError: precondition | conflict
   // Settlement role attribution (per Phase 3 S3-closeout, vision §8):
   // stamped onto the payload AFTER the pure transition already returned it —
   // passing `role` INTO transitionWork would be silently dropped, since
-  // fsm.mjs rebuilds `payload` itself from only the fields it knows about.
+  // status-fsm.mjs rebuilds `payload` itself from only the fields it knows about.
   // Additive + optional: a caller that never supplies `role` gets the
   // exact payload shape transitionWork already produced, byte-for-byte.
   if (role !== undefined) {
     rawEvent.payload.role = role;
+  }
+  // statusCategory (decision record 0027, D2/D3): stamped AFTER the pure
+  // transition already returned it, same post-transition pattern as `role`
+  // immediately above and `writer` immediately below — status-fsm.mjs never
+  // sees or validates this field (it stays domain-agnostic-consumer-only,
+  // never a move-legality input; see DOMAINS.coding.statusLabels's own
+  // comment on why category-level validation would be wrong). Computed
+  // from `work`'s OWN domain (never a global table), so a future
+  // second production domain with a different statusLabels map gets its
+  // own categories automatically, no branch here. Present only for the six
+  // front-segment statuses `to`'s domain actually declares a `statusLabels`
+  // entry for; the four tail-segment statuses (`delivered`/`retrospective`/
+  // `cleanup`/`done`) have none there by design (D1), so `category` is
+  // `undefined` and nothing is stamped — never invented, and never
+  // recomputed later at replay time (replay.mjs's work.move case only
+  // folds whatever this event actually carries).
+  const category = statusCategoryFor(getDomain(work.domain), to);
+  if (category !== undefined) {
+    rawEvent.payload.statusCategory = category;
+  }
+  // tsk-48i D1: same write-time-stamp shape as statusCategory above, for
+  // the domain-owned parkReason table (parkReasonForStatus,
+  // workflow-stage-graphs.mjs).
+  const parkReason = parkReasonForStatus(getDomain(work.domain), to);
+  if (parkReason !== undefined) {
+    rawEvent.payload.parkReason = parkReason;
   }
   // Writer provenance (D8/D15/D17/D18, str46-io-contract) -- same
   // post-transition stamp as role/headAtTake above, but unconditional:
@@ -419,7 +492,7 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, rol
   rawEvent.payload.writer = resolveWriterIdentity(dir);
   // Pull-door claim marker (stage-decompose S2-pull D1): the host repo's HEAD
   // at claim time, additive on the SAME `to === 'doing'` move `take` writes —
-  // never a separate event (single write door, D3). Ignored by fsm.mjs (pure,
+  // never a separate event (single write door, D3). Ignored by status-fsm.mjs (pure,
   // only knows the fields it destructures itself) exactly like `role` above,
   // so this is stamped post-transition the same way.
   if (headAtTake !== undefined) {
@@ -432,7 +505,7 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, rol
   // `headAtTake`, this gives the review gate an honest `headAtTake ->
   // headAtReturn` diff range for a pull-door proposal, without depending on
   // a live branch the way a runner proposal's `fgw/<id>` diff does. Ignored
-  // by fsm.mjs (pure, only knows the fields it destructures itself) exactly
+  // by status-fsm.mjs (pure, only knows the fields it destructures itself) exactly
   // like `headAtTake`/`role` above, so this is stamped post-transition the
   // same way.
   if (headAtReturn !== undefined) {
@@ -455,7 +528,7 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, rol
   // dispatched this claim (e.g. `'herdr'`) — audit-only, never a safety
   // mechanism (claimRole/loop.mjs's reclaim-guard are unaffected). Stamped
   // post-transition on the SAME `to === 'doing'` move `pick` writes, exactly
-  // like headAtTake above; ignored by fsm.mjs, which never destructures it.
+  // like headAtTake above; ignored by status-fsm.mjs, which never destructures it.
   if (claimTrigger !== undefined) {
     rawEvent.payload.claimTrigger = claimTrigger;
   }
@@ -463,7 +536,7 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, rol
   // additive stamp pattern as headAtTake/headAtReturn above — a snapshot of
   // the item's parent `{id, title, status}` taken at the moment this
   // `to === 'awaiting-human'` move parks it, so a later read can tell what
-  // changed on the parent since. Ignored by fsm.mjs (pure, only knows the
+  // changed on the parent since. Ignored by status-fsm.mjs (pure, only knows the
   // fields it destructures itself) exactly like headAtTake/role above, so
   // this is stamped post-transition the same way. Never set on any other
   // edge — putInAwaiting is the only caller that ever passes it.
@@ -588,7 +661,7 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, rol
 /**
  * Park a work item into `awaiting-human`, carrying the question it is
  * waiting on (per D2/D5). Thin wrapper over `moveWork` — same
- * append-then-refresh tail, same CAS/validation errors — fsm.mjs requires a
+ * append-then-refresh tail, same CAS/validation errors — status-fsm.mjs requires a
  * non-empty `ask` on this edge.
  *
  * tsk-19zm D2: `rationale`/`alternatives`/`source` here are the AGENT's
@@ -615,7 +688,7 @@ export function putInAwaiting(dir, { id, ask, expectedStatus, parentSnapshotAtAs
 /**
  * Resume a work item out of `awaiting-human`, carrying the answer it was
  * waiting on (per D2/D5). Thin wrapper over `moveWork` — same
- * append-then-refresh tail, same CAS/validation errors — fsm.mjs requires a
+ * append-then-refresh tail, same CAS/validation errors — status-fsm.mjs requires a
  * non-empty `answer` on this edge.
  *
  * Resume target (claim-lock §5.1): reads the gate's own `statusAtAsk`
@@ -633,7 +706,7 @@ export function answerAwaiting(dir, { id, answer, expectedStatus, role, rational
 /**
  * Move a work item to a new stage (per stage-clarify D1/D10/D12). Mirrors
  * `moveWork` exactly, one dimension up: looks the item up fresh from the
- * log, delegates the precondition/CAS decision to stage.mjs (pure — never
+ * log, delegates the precondition/CAS decision to stage-fsm.mjs (pure — never
  * writes), and only then appends the event it returns.
  *
  * Same held-lock critical section as moveWork above — the lookup, the
@@ -650,7 +723,7 @@ export function moveStage(dir, { id, to, expectedStage, verify, role } = {}) {
     }
 
     const rawEvent = transitionStage({ work, to, expectedStage, verify }); // FsmError: precondition | conflict
-    // Same post-transition role stamp as moveWork above — stage.mjs is pure
+    // Same post-transition role stamp as moveWork above — stage-fsm.mjs is pure
     // and only ever returns the fields it knows about.
     if (role !== undefined) {
       rawEvent.payload.role = role;
@@ -965,6 +1038,26 @@ export function staleDoingAdvisory(dir, opts = {}) {
 }
 
 /**
+ * Read-only (work-graph-intelligence S10, tsk-1bl CONTEXT.md D4/D7): the
+ * post-delivery staleness advisory — closes the observability gap
+ * `staleDoingAdvisory` above leaves for `delivered`/`retrospective`/
+ * `cleanup`. Rebuilds the view and raw event log the same way
+ * `staleDoingAdvisory` does, then hands both straight to the pure
+ * classifier (which reads its own entry-into-status events directly, no
+ * intermediate `entries` extraction needed here since `classifyStalePost
+ * Delivery` takes `rawEvents` itself). `opts.ttlDays` must be supplied by
+ * the caller — same requirement `checkCleanupTTLElapsed`/
+ * `pickNextCleanupItem` already have, since the real TTL is a per-repo
+ * shared-config value this read-only facade never guesses.
+ */
+export function stalePostDeliveryAdvisory(dir, opts = {}) {
+  const { logPath } = paths(dir);
+  const view = rebuildView(logPath);
+  const rawEvents = readEvents(logPath);
+  return classifyStalePostDelivery(view, rawEvents, opts);
+}
+
+/**
  * Read-only (work-graph-intelligence S9): the footprint-intersection advisory —
  * pairs of ready items whose declared file footprints overlap, so a parallel
  * dispatch would risk a file conflict. Same read-facade shape as graphMetrics;
@@ -973,6 +1066,21 @@ export function staleDoingAdvisory(dir, opts = {}) {
 export function footprintConflicts(dir) {
   const { logPath } = paths(dir);
   return footprintOverlap(rebuildView(logPath));
+}
+
+/**
+ * Read-only (tsk-3c7): computed-parallel-wave-schedule — which frontier
+ * items can dispatch in parallel right now, packed into waves by
+ * declared-footprint conflict, plus a dep-graph cycle check over the
+ * whole work map (never just the frontier — a cycle anywhere is a
+ * graph-integrity defect regardless of which items in it are ready).
+ * Same read-facade shape as `footprintConflicts`; the Domain core
+ * (`graph-metrics.mjs`) computes both, this just rebuilds the view.
+ */
+export function computedSchedule(dir) {
+  const { logPath } = paths(dir);
+  const view = rebuildView(logPath);
+  return { ...computeSchedule(view), cycles: detectCycles(view) };
 }
 
 /**

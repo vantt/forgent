@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { judgeDecompose, resolveDecompose, resolveContentRoot } from '../../src/intake/decompose.mjs';
+import { judgeDecompose, resolveDecompose, resolveContentRoot, findUncoveredLockedDecisions } from '../../src/intake/decompose.mjs';
 import { readScoutNotes } from '../../src/intake/judge-executor.mjs';
 import { computeImpact, computePriority, effortForMode } from '../../src/state/priority-formula.mjs';
 import { addWork, listWork, StoreError, categoryOf, moveWork, readRawEvents, recordGateApprove } from '../../src/state/store.mjs';
@@ -1311,6 +1311,134 @@ test('resolveDecompose still writes every child when the second-pass check agree
   assert.equal(result.childIds.length, 2);
 });
 
+// tsk-25g D2: resolveDecompose's per-child second-pass check now threads
+// priorRejection + accepts --force, matching resolveDiscovery's own D1a/D1b
+// (discovery.mjs). Same sniff-the-prompt fake as writeVerdictWithVerifyCheckExecutor,
+// but reports whether the SECOND-pass prompt it received contains the
+// priorRejection section's own marker string ("Vòng trước đã từ chối",
+// judge-executor.mjs's buildVerifyCheckPrompt) via a plain, non-recursive
+// SAW_PRIOR_CONTEXT/NO_PRIOR_CONTEXT reason — never the raw prompt itself,
+// which would (and, in an earlier draft, did) get quoted verbatim into the
+// NEXT round's gate context and self-contaminate that round's own
+// first-pass sniff.
+function writeVerdictDetectingPriorContextExecutor(dir, verdict) {
+  const scriptPath = path.join(dir, 'verdict-detecting-prior-context-executor.mjs');
+  fs.writeFileSync(
+    scriptPath,
+    `
+    const prompt = process.argv[2] ?? '';
+    if (prompt.includes('Kiểm tra độc lập một lệnh verify')) {
+      const sawPrior = prompt.includes('Vòng trước đã từ chối');
+      process.stdout.write(JSON.stringify({ agrees: false, reason: sawPrior ? 'SAW_PRIOR_CONTEXT' : 'NO_PRIOR_CONTEXT' }));
+    } else {
+      process.stdout.write(${JSON.stringify(JSON.stringify(verdict))});
+    }
+    process.exit(0);
+    `,
+  );
+  return scriptPath;
+}
+
+test('resolveDecompose threads the prior round\'s own disagreement text into the NEXT per-child verify-check prompt (tsk-25g D2, mirrors discovery.mjs D1a)', () => {
+  const scriptDir = mkTempDir();
+  const decomposeVerdict = {
+    verdict: 'decompose',
+    reason: 'Two independent surfaces, no shared state',
+    children: [{ title: 'Build parser', verify: 'npm test -- parser' }],
+  };
+  const scriptPath = writeVerdictDetectingPriorContextExecutor(scriptDir, decomposeVerdict);
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork());
+
+  const first = resolveDecompose(storeDir, 'item-x', cfg, 'runner');
+  assert.equal(first.outcome, 'need-human');
+  // First round: no prior dispute yet, so no priorRejection context exists.
+  assert.match(listWork(storeDir).gates['item-x'].ask, /NO_PRIOR_CONTEXT/);
+
+  // Resume, exactly like the existing end-to-end need-human test does.
+  moveWork(storeDir, { id: 'item-x', to: 'todo', expectedStatus: 'awaiting-human', answer: 'Retry.' });
+
+  const second = resolveDecompose(storeDir, 'item-x', cfg, 'runner');
+  assert.equal(second.outcome, 'need-human');
+  // Second round's own verify-check prompt must now contain round 1's
+  // rejection text (threaded as priorRejection) — confirms it actually
+  // rode into the prompt, not just into an unused local variable.
+  assert.match(listWork(storeDir).gates['item-x'].ask, /SAW_PRIOR_CONTEXT/);
+});
+
+// --force always arrives together with a caller-SUPPLIED verdict
+// (resolveCallerDecomposeVerdict bypasses judgeDecompose's own subprocess
+// entirely, mirroring discover --verdict clear --force) -- so these tests
+// pass a full `{verdict: 'decompose', reason, children, force: true}`
+// callerVerdict, same shape bin/fgos.mjs's parseDecomposeCallerVerdict
+// produces. The fake executor here only ever needs to answer the SECOND
+// (verify-check) prompt, since the first pass is skipped.
+
+test('resolveDecompose --force overrides a disputed (non-mechanical) child verify, logs the override, and writes every child (tsk-25g D2)', () => {
+  const scriptDir = mkTempDir();
+  const scriptPath = writeVerdictWithVerifyCheckExecutor(scriptDir, {}, false, 'lệnh này không kiểm chứng đúng claim của việc con');
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork());
+
+  const result = resolveDecompose(storeDir, 'item-x', cfg, 'runner', {
+    verdict: 'decompose',
+    reason: 'Two independent surfaces, no shared state',
+    children: [{ title: 'Build parser', verify: 'npm test -- parser' }],
+    force: true,
+  });
+  assert.equal(result.outcome, 'decompose');
+  assert.equal(result.childIds.length, 1);
+
+  const overrideLog = (listWork(storeDir).decisions ?? []).find((d) => d.id === 'item-x' && /--force overrode/.test(d.text));
+  assert.ok(overrideLog, 'expected a decision log entry naming the overridden disagreement');
+});
+
+test('resolveDecompose --force refuses when the item is already awaiting-human (points at fgos answer instead)', () => {
+  const scriptDir = mkTempDir();
+  const scriptPath = writeVerdictWithVerifyCheckExecutor(scriptDir, {}, false, 'lệnh này không kiểm chứng đúng claim của việc con');
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork({ status: 'awaiting-human' }));
+
+  assert.throws(
+    () =>
+      resolveDecompose(storeDir, 'item-x', cfg, 'runner', {
+        verdict: 'decompose',
+        reason: 'Two independent surfaces, no shared state',
+        children: [{ title: 'Build parser', verify: 'npm test -- parser' }],
+        force: true,
+      }),
+    /already "awaiting-human"/,
+  );
+});
+
+test('resolveDecompose --force never overrides a MECHANICAL disagreement (tsk-12t D6) -- still parks', () => {
+  const scriptDir = mkTempDir();
+  // Never actually spawned -- matchesKnownBadVerifyPattern trips before any
+  // executor call, so this script only needs to exist for cfg's shape.
+  const scriptPath = writeVerdictExecutor(scriptDir, {});
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork());
+
+  const result = resolveDecompose(storeDir, 'item-x', cfg, 'runner', {
+    verdict: 'decompose',
+    reason: 'Two independent surfaces, no shared state',
+    // Trips matchesKnownBadVerifyPattern (judge-executor.mjs) mechanically
+    // -- mechanical:true, exempt from --force by design (tsk-12t D6).
+    children: [{ title: 'Build parser', verify: 'node --test --test-name-pattern="x" test/foo.test.mjs | grep "^# pass"' }],
+    force: true,
+  });
+  assert.equal(result.outcome, 'need-human');
+  assert.equal(Object.values(listWork(storeDir).work).filter((item) => item.parent === 'item-x').length, 0);
+});
+
 test('resolveDecompose is a no-op on an item already past stage decompose (idempotent, CAS-backed)', () => {
   const scriptDir = mkTempDir();
   const scriptPath = writeVerdictExecutor(scriptDir, { verdict: 'pass-through' }); // never consulted
@@ -1921,6 +2049,226 @@ test('resolveDecompose caller-supplied verdict takes precedence over the plan.md
   const decisions = view.decisionsById?.['item-x'] ?? [];
   assert.ok(decisions.some((d) => d.text.startsWith('decompose caller-supplied:')));
   assert.ok(!decisions.some((d) => d.text.startsWith('decompose skip:')), 'the plan.md mode skip-and-advance path must never fire when a caller verdict is present');
+});
+
+// --- tsk-1gr D1/D2 (docs/history/decompose-locked-decision-footprint-
+// coverage/CONTEXT.md): findUncoveredLockedDecisions -- mechanical
+// path-token check over CONTEXT.md's own "## Locked decisions" section,
+// advisory only, never blocks. ---
+
+function mkContextFixture(storeDir, contextContent) {
+  const repoRoot = path.dirname(storeDir);
+  const featureDir = fs.mkdtempSync(path.join(repoRoot, 'fgos-ctx-'));
+  fs.writeFileSync(path.join(featureDir, 'CONTEXT.md'), contextContent);
+  return { docsRef: path.basename(featureDir), featureDir };
+}
+
+test('findUncoveredLockedDecisions: a real path named in Locked decisions with no covering child footprint is uncovered', () => {
+  const repoRoot = mkTempDir();
+  fs.writeFileSync(path.join(repoRoot, 'important.mjs'), '// fixture\n');
+  const contextText = '## Locked decisions\n\nD1: results must be written to `important.mjs`.\n';
+  const uncovered = findUncoveredLockedDecisions(contextText, [{ footprint: ['src/other.mjs'] }], repoRoot);
+  assert.deepEqual(uncovered, ['important.mjs']);
+});
+
+test('findUncoveredLockedDecisions: a path a child footprint already covers is not reported', () => {
+  const repoRoot = mkTempDir();
+  fs.writeFileSync(path.join(repoRoot, 'important.mjs'), '// fixture\n');
+  const contextText = '## Locked decisions\n\nD1: results must be written to `important.mjs`.\n';
+  const uncovered = findUncoveredLockedDecisions(contextText, [{ footprint: ['important.mjs'] }], repoRoot);
+  assert.deepEqual(uncovered, []);
+});
+
+test('findUncoveredLockedDecisions: no "## Locked decisions" section at all yields no findings', () => {
+  const repoRoot = mkTempDir();
+  const contextText = '## plan.md\n\nmode = tiny, no locked-decisions heading here.\n';
+  assert.deepEqual(findUncoveredLockedDecisions(contextText, [], repoRoot), []);
+});
+
+test('findUncoveredLockedDecisions: a path-shaped token that names no real file is exempt (prose, not a real file)', () => {
+  const repoRoot = mkTempDir();
+  const contextText = '## Locked decisions\n\nD1: this reads like a/path but names nothing real.\n';
+  assert.deepEqual(findUncoveredLockedDecisions(contextText, [], repoRoot), []);
+});
+
+// --- tsk-gio fixes (independent review, post-tsk-1gr): dotfile tokens,
+// directory-shaped footprint coverage, advisory fail-safe. ---
+
+test('findUncoveredLockedDecisions: a root dotfile keeps its leading dot and is checked at the real path (tsk-gio regression, the tsk-2ta case)', () => {
+  const repoRoot = mkTempDir();
+  fs.writeFileSync(path.join(repoRoot, '.fgos-runner.json'), '{}\n');
+  const contextText = '## Locked decisions\n\nD1 amended: move `.fgos-runner.json` to `.fgos/config.json`.\n';
+  const uncovered = findUncoveredLockedDecisions(contextText, [{ footprint: ['src/other.mjs'] }], repoRoot);
+  assert.deepEqual(uncovered, ['.fgos-runner.json']);
+});
+
+test('findUncoveredLockedDecisions: a dotfile IS covered when a child footprint declares it with its leading dot', () => {
+  const repoRoot = mkTempDir();
+  fs.writeFileSync(path.join(repoRoot, '.fgos-runner.json'), '{}\n');
+  const contextText = '## Locked decisions\n\nD1: move `.fgos-runner.json`.\n';
+  const uncovered = findUncoveredLockedDecisions(contextText, [{ footprint: ['.fgos-runner.json'] }], repoRoot);
+  assert.deepEqual(uncovered, []);
+});
+
+test('findUncoveredLockedDecisions: a directory-shaped footprint entry covers every real path underneath it (tsk-gio fix)', () => {
+  const repoRoot = mkTempDir();
+  fs.mkdirSync(path.join(repoRoot, 'src', 'intake'), { recursive: true });
+  fs.writeFileSync(path.join(repoRoot, 'src', 'intake', 'decompose.mjs'), '// fixture\n');
+  const contextText = '## Locked decisions\n\nD1: touches `src/intake/decompose.mjs`.\n';
+  const uncovered = findUncoveredLockedDecisions(contextText, [{ footprint: ['src/'] }], repoRoot);
+  assert.deepEqual(uncovered, [], 'a "src/" footprint entry must cover a path nested inside it');
+});
+
+test('findUncoveredLockedDecisions: directory-shaped coverage requires a real "/" boundary, never a bare prefix match', () => {
+  const repoRoot = mkTempDir();
+  fs.mkdirSync(path.join(repoRoot, 'src-extra'), { recursive: true });
+  fs.writeFileSync(path.join(repoRoot, 'src-extra', 'file.mjs'), '// fixture\n');
+  const contextText = '## Locked decisions\n\nD1: touches `src-extra/file.mjs`.\n';
+  const uncovered = findUncoveredLockedDecisions(contextText, [{ footprint: ['src'] }], repoRoot);
+  assert.deepEqual(uncovered, ['src-extra/file.mjs'], '"src" must never prefix-match "src-extra/..." without a "/" boundary');
+});
+
+// --- tsk-297 (post-tsk-gio independent review): a non-string footprint
+// entry must never crash, and directory-shaped DECISION paths must be
+// covered by a file-shaped child footprint nested inside them (the
+// mirror of tsk-gio's own footprint-side directory fix). ---
+
+test('findUncoveredLockedDecisions: a non-string footprint entry (e.g. null) is skipped, never thrown on', () => {
+  const repoRoot = mkTempDir();
+  fs.writeFileSync(path.join(repoRoot, 'important.mjs'), '// fixture\n');
+  const contextText = '## Locked decisions\n\nD1: touches `important.mjs`.\n';
+  // tsk-5iv D6 (round-3 review, HIGH): the original fixture paired the
+  // `null` entry with an exact-match string entry for the SAME decision
+  // path ('important.mjs' alongside a decision naming 'important.mjs'), so
+  // `covered.has(p)` short-circuited before `isCoveredByDirectory`/
+  // `isDirectoryContainingCoverage` -- the actual `null.replace()` crash
+  // site -- was ever reached; the test passed identically with or without
+  // the crash guard. 'other.mjs' names a DIFFERENT file, so nothing
+  // exact-matches 'important.mjs' and the directory-coverage helpers (the
+  // only place a raw footprint entry gets `.replace()`-d) genuinely run
+  // against the `null` entry.
+  assert.doesNotThrow(() => {
+    const uncovered = findUncoveredLockedDecisions(contextText, [{ footprint: [null, 'other.mjs'] }], repoRoot);
+    assert.deepEqual(uncovered, ['important.mjs'], 'neither the ignored null nor the unrelated other.mjs covers this decision');
+  });
+});
+
+test('findUncoveredLockedDecisions: a locked decision naming a DIRECTORY is covered by a child footprint naming a file inside it (mirror of the footprint-side directory fix)', () => {
+  const repoRoot = mkTempDir();
+  fs.mkdirSync(path.join(repoRoot, 'src', 'intake'), { recursive: true });
+  fs.writeFileSync(path.join(repoRoot, 'src', 'intake', 'decompose.mjs'), '// fixture\n');
+  const contextText = '## Locked decisions\n\nD1: touches `src/intake/`.\n';
+  const uncovered = findUncoveredLockedDecisions(contextText, [{ footprint: ['src/intake/decompose.mjs'] }], repoRoot);
+  assert.deepEqual(uncovered, [], 'a decision naming the enclosing directory must be covered by a file footprint nested inside it');
+});
+
+test('findUncoveredLockedDecisions: directory-decision coverage also requires a real "/" boundary, never a bare prefix match', () => {
+  const repoRoot = mkTempDir();
+  // PATH_TOKEN_PATTERN needs 2+ segments to capture a trailing-slash
+  // directory at all (a bare single-segment "src/" never tokenizes --
+  // pre-existing regex shape, unrelated to this fix), so both sides of
+  // this boundary case use 2-segment paths.
+  fs.mkdirSync(path.join(repoRoot, 'abc', 'xyz'), { recursive: true });
+  fs.writeFileSync(path.join(repoRoot, 'abc', 'xyz', 'file.mjs'), '// fixture\n');
+  const contextText = '## Locked decisions\n\nD1: touches `abc/xyz/`.\n';
+  const uncovered = findUncoveredLockedDecisions(contextText, [{ footprint: ['abc/xyz-extra/file.mjs'] }], repoRoot);
+  assert.deepEqual(uncovered, ['abc/xyz/'], '"abc/xyz-extra/file.mjs" must never boundary-match "abc/xyz/" as if it were nested inside it');
+});
+
+test('resolveDecompose caller-supplied decompose verdict: an uncovered locked-decision path logs an advisory decision but still writes children (D1 — never blocks)', () => {
+  const dir = mkTempDir();
+  const { scriptPath, counterPath } = writeCountingRawStdoutExecutor(dir, JSON.stringify({ verdict: 'pass-through', reason: 'should never run' }));
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  // Named uniquely off docsRef itself (a fresh mkdtemp basename) so the
+  // fixture file, living directly under the shared os.tmpdir() repo root,
+  // never collides with another test's own fixture of the same shape.
+  const { docsRef } = mkContextFixture(storeDir, '## Locked decisions\n\nD1: placeholder — filled below.\n');
+  const fixtureRelPath = `${docsRef}.mjs`;
+  fs.writeFileSync(path.join(path.dirname(storeDir), fixtureRelPath), '// fixture\n');
+  fs.writeFileSync(
+    path.join(path.dirname(storeDir), docsRef, 'CONTEXT.md'),
+    `## Locked decisions\n\nD1: canonical output lives at \`${fixtureRelPath}\`.\n`,
+  );
+  addWork(storeDir, sampleWork({ docsRef }));
+
+  const result = resolveDecompose(storeDir, 'item-x', cfg, 'session', {
+    verdict: 'decompose',
+    reason: 'Two independent surfaces, no shared state',
+    children: [
+      { title: 'Build parser', verify: 'npm test -- parser', footprint: ['src/parser.mjs'] },
+      { title: 'Build renderer', verify: 'npm test -- renderer', footprint: ['src/renderer.mjs'] },
+    ],
+  });
+  assert.equal(result.outcome, 'decompose', 'the advisory must never block the real decompose write');
+  assert.equal(readCount(counterPath), 0);
+
+  const view = listWork(storeDir);
+  assert.equal(Object.values(view.work).filter((item) => item.parent === 'item-x').length, 2, 'children are still written despite the coverage gap');
+  const decisions = view.decisionsById?.['item-x'] ?? [];
+  assert.ok(
+    decisions.some((d) => d.text.includes('completeness advisory') && d.text.includes(fixtureRelPath)),
+    'the coverage gap must be logged as its own decision',
+  );
+});
+
+test('resolveDecompose caller-supplied decompose verdict: a child footprint that covers the locked-decision path logs no advisory', () => {
+  const dir = mkTempDir();
+  const { scriptPath, counterPath } = writeCountingRawStdoutExecutor(dir, JSON.stringify({ verdict: 'pass-through', reason: 'should never run' }));
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  const { docsRef } = mkContextFixture(storeDir, '## Locked decisions\n\nD1: placeholder — filled below.\n');
+  const fixtureRelPath = `${docsRef}.mjs`;
+  fs.writeFileSync(path.join(path.dirname(storeDir), fixtureRelPath), '// fixture\n');
+  fs.writeFileSync(
+    path.join(path.dirname(storeDir), docsRef, 'CONTEXT.md'),
+    `## Locked decisions\n\nD1: canonical output lives at \`${fixtureRelPath}\`.\n`,
+  );
+  addWork(storeDir, sampleWork({ docsRef }));
+
+  const result = resolveDecompose(storeDir, 'item-x', cfg, 'session', {
+    verdict: 'decompose',
+    reason: 'Two independent surfaces, no shared state',
+    children: [{ title: 'Build parser', verify: 'npm test -- parser', footprint: [fixtureRelPath] }],
+  });
+  assert.equal(result.outcome, 'decompose');
+  assert.equal(readCount(counterPath), 0);
+
+  const view = listWork(storeDir);
+  const decisions = view.decisionsById?.['item-x'] ?? [];
+  assert.ok(!decisions.some((d) => d.text.includes('completeness advisory')), 'a covered path must never be reported');
+});
+
+test('resolveDecompose auto-judged (model) decompose verdict also runs the completeness advisory (tsk-1gr fix: not caller-verdict-only)', () => {
+  const dir = mkTempDir();
+  const scriptPath = writeVerdictWithVerifyCheckExecutor(dir, {
+    verdict: 'decompose',
+    reason: 'Two independent surfaces, no shared state',
+    children: [{ title: 'Build parser', verify: 'npm test -- parser', footprint: ['src/parser.mjs'] }],
+  });
+  const cfg = cfgFor([scriptPath, '{prompt}']);
+
+  const storeDir = tmpStoreDir();
+  const { docsRef } = mkContextFixture(storeDir, '## Locked decisions\n\nD1: placeholder — filled below.\n');
+  const fixtureRelPath = `${docsRef}.mjs`;
+  fs.writeFileSync(path.join(path.dirname(storeDir), fixtureRelPath), '// fixture\n');
+  fs.writeFileSync(
+    path.join(path.dirname(storeDir), docsRef, 'CONTEXT.md'),
+    `## Locked decisions\n\nD1: canonical output lives at \`${fixtureRelPath}\`.\n`,
+  );
+  addWork(storeDir, sampleWork({ docsRef }));
+
+  const result = resolveDecompose(storeDir, 'item-x', cfg, 'runner');
+  assert.equal(result.outcome, 'decompose');
+
+  const view = listWork(storeDir);
+  const decisions = view.decisionsById?.['item-x'] ?? [];
+  assert.ok(
+    decisions.some((d) => d.text.includes('completeness advisory') && d.text.includes(fixtureRelPath)),
+    'the completeness check must fire on the model-judged path too, not only callerVerdict',
+  );
 });
 
 test('resolveDecompose omitting callerVerdict entirely keeps prior behavior (byte-identical call site)', () => {

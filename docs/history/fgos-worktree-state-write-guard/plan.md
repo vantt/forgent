@@ -13,7 +13,7 @@ Flags counted: **3** — standard.
   First verified by a narrow grep (12 files: `plugins/fgOS/skills/
   {ask,answer,return,discover,move,cook}` and `.claude/skills/fgos/
   {fgos-routing,fgos-exploring,fgos-planning,fgos-validating,
-  fgos-executing,fgos-submit-assist}`), then widened during Phase 3's own
+  fgos-code-implement,fgos-submit-assist}`), then widened during Phase 3's own
   implementation to a full sweep against every `requiresExistingStore:
   true` verb name, not just the 7 originally searched for — found 5 more:
   `plugins/fgOS/skills/{submit,pick,goal,unlock}` and `.claude/skills/fgos/
@@ -130,7 +130,7 @@ escape hatch a caller must opt into, never a silent change to what a bare
      the repo root. Reuse it verbatim as `--dir`'s value; no new
      subprocess, no new mechanism.
    - `.claude/skills/fgos/{fgos-routing,fgos-exploring,fgos-planning,
-     fgos-executing,fgos-submit-assist,fgos-unlock,fgos-compounding}/
+     fgos-code-implement,fgos-submit-assist,fgos-unlock,fgos-compounding}/
      SKILL.md` (7 files — `fgos-validating` dropped, it never calls a
      state verb itself; `fgos-unlock`/`fgos-compounding` found during the
      same sweep) never use `${CLAUDE_PROJECT_DIR}` today (some are loaded

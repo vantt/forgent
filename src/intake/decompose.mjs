@@ -26,6 +26,7 @@ import { runJudgeExecutor, JUDGE_STRICT_JSON_SUFFIX, judgeVerifySemanticCorrectn
 import { appendJudgeFailLog } from './judge-fail-log.mjs';
 import { DEFAULTS } from '../state/work.mjs';
 import { listWork, moveStage, moveWork, addWork, putInAwaiting, addDecision, editWork, StoreError } from '../state/store.mjs';
+import { getDomain, stageForStep } from '../state/workflow-stage-graphs.mjs';
 import { rankImpact } from '../state/impact.mjs';
 import { computeImpact, computePriority, effortForMode, MODE_EFFORT } from '../state/priority-formula.mjs';
 import { footprintOverlapAmong } from '../state/graph-metrics.mjs';
@@ -456,6 +457,129 @@ function formatFootprintOverlapReason(conflicts) {
   return `Footprint trùng giữa các việc con dự kiến:\n${lines.join('\n')}`;
 }
 
+// A token shaped like a real repo file path: has a "/" (directory-shaped)
+// OR ends with a familiar code/config/doc extension. Loose on purpose (D2:
+// mechanical, no judge call) -- fs.existsSync below is what actually
+// filters out prose that merely looks path-shaped.
+// tsk-gio fix: optional leading "." before the boundary so a root
+// dotfile (".fgos-runner.json") keeps its dot instead of tokenizing as
+// "fgos-runner.json" -- fs.existsSync below then checks the WRONG path
+// and silently exempts a real, existing dotfile (found by independent
+// review: this is exactly the tsk-2ta case this feature exists for).
+const PATH_TOKEN_PATTERN = /[A-Za-z0-9_.-]*\/[A-Za-z0-9_./-]+|\.?\b[A-Za-z0-9_-]+\.(?:mjs|cjs|js|ts|tsx|jsx|json|md|ya?ml|toml|py|go|rs|rb)\b/g;
+
+/**
+ * COMPLETENESS ADVISORY (tsk-1gr, D1/D2 of docs/history/decompose-locked-
+ * decision-footprint-coverage/CONTEXT.md): a locked decision naming a
+ * real, existing file that NO tentative child's footprint covers --
+ * advisory-only, NEVER blocks (D1 -- unlike `footprintOverlapAmong`'s
+ * collision gate above, which is a different failure mode: this is about
+ * a decision nobody claimed responsibility for, not two children fighting
+ * over the same file). D2: purely mechanical, no LLM/judge call --
+ * extracts path-shaped tokens from CONTEXT.md's own "## Locked decisions"
+ * section (readLockedContext's concatenated text), keeps only the ones
+ * `fs.existsSync` confirms are real files in `repoRoot`, then flags any
+ * such path that no child's declared `footprint` contains. A decision
+ * whose text names no real path is exempt automatically -- nothing to
+ * check (D2's own "vắng path thì miễn tự động").
+ *
+ * @param {string} contextText - readLockedContext's own concatenated output
+ * @param {{footprint?: string[]}[]} children - tentative children (verdict.children shape)
+ * @param {string} repoRoot - resolved against fs.existsSync
+ * @returns {string[]} real paths named in locked decisions that no child's footprint touches
+ */
+export function findUncoveredLockedDecisions(contextText, children, repoRoot) {
+  if (typeof contextText !== 'string' || !contextText.trim()) return [];
+  const section = /##\s*Locked decisions([\s\S]*?)(?:\n##\s|$)/i.exec(contextText);
+  const decisionsText = section ? section[1] : '';
+  if (!decisionsText.trim()) return [];
+
+  const candidatePaths = new Set();
+  let match;
+  PATH_TOKEN_PATTERN.lastIndex = 0;
+  while ((match = PATH_TOKEN_PATTERN.exec(decisionsText)) !== null) {
+    candidatePaths.add(match[0].replace(/^`|`$/g, ''));
+  }
+  if (candidatePaths.size === 0) return [];
+
+  const realPaths = [...candidatePaths].filter((p) => {
+    try {
+      return fs.existsSync(path.join(repoRoot, p));
+    } catch {
+      return false;
+    }
+  });
+  if (realPaths.length === 0) return [];
+
+  const covered = new Set();
+  for (const child of Array.isArray(children) ? children : []) {
+    for (const f of Array.isArray(child?.footprint) ? child.footprint : []) {
+      // tsk-297 fix: a non-string footprint entry used to reach
+      // isCoveredByDirectory's f.replace(...) below and throw -- silently,
+      // since that call now sits inside resolveDecompose's own catch{}
+      // (tsk-gio). Filtering here keeps `covered` a plain Set<string>,
+      // which both isCoveredByDirectory and isDirectoryContainingCoverage
+      // below assume without needing their own per-entry type guard.
+      if (typeof f === 'string') covered.add(f);
+    }
+  }
+
+  // tsk-gio fix: a directory-shaped footprint entry (e.g. "src/",
+  // "docs/decisions") covers every path underneath it, not only an exact
+  // string match -- real footprints in this repo are routinely
+  // directory-shaped (found by independent review), so exact-match-only
+  // coverage produced false "uncovered" advisories on decisions that
+  // WERE covered. Purely mechanical (D2): no fs.statSync directory check,
+  // just a "/" boundary after stripping a trailing slash.
+  const isCoveredByDirectory = (p) => {
+    for (const f of covered) {
+      const dir = f.replace(/\/+$/, '');
+      if (dir && p.startsWith(`${dir}/`)) return true;
+    }
+    return false;
+  };
+
+  // tsk-297 fix: the MIRROR case tsk-gio's directory fix left open --
+  // fs.existsSync (above) is true for directories too, so a locked
+  // decision naming an enclosing directory (e.g. "src/intake/") is a
+  // real candidate path. A child declaring a FILE inside that directory
+  // (e.g. "src/intake/decompose.mjs") clearly does touch it, but exact-
+  // match/isCoveredByDirectory above only ever check the decision path
+  // as a potential PREFIX of a footprint entry, never the reverse. Found
+  // by independent review: 20+ real CONTEXT.md decisions name a
+  // directory this way. Same purely-mechanical "/" boundary, just the
+  // other direction.
+  //
+  // tsk-5iv D5 (round-3 review, MEDIUM, intentional trade-off -- NOT
+  // tightened): this means ANY single footprint entry nested under a
+  // directory-shaped decision counts as full coverage of that decision,
+  // not just an entry naming the directory itself or a path at/above it.
+  // Requiring the stricter form was considered and rejected: it would
+  // make a real, legitimate child that touches exactly one file inside a
+  // directory-shaped decision incorrectly fail coverage -- a false
+  // positive on the advisory this exists to keep quiet on real matches.
+  // The blast radius of the looser form stays bounded by
+  // PATH_TOKEN_PATTERN's 2+-segment requirement (a bare top-level
+  // directory like "src/" alone never tokenizes as a decision path at
+  // all), and this whole check is advisory-only -- it never blocks a
+  // decompose, only logs an advisory decision (see resolveDecompose's
+  // caller). Never blocks == the class of unnecessary rework a false
+  // positive would cause is why looser was chosen here, while
+  // isCoveredByDirectory above stays the direction it already was.
+  const isDirectoryContainingCoverage = (p) => {
+    const dir = p.replace(/\/+$/, '');
+    if (!dir) return false;
+    for (const f of covered) {
+      if (f.startsWith(`${dir}/`)) return true;
+    }
+    return false;
+  };
+
+  return realPaths.filter(
+    (p) => !covered.has(p) && !isCoveredByDirectory(p) && !isDirectoryContainingCoverage(p),
+  );
+}
+
 /**
  * Read `id` from the store at `dir`, judge it via `judgeDecompose`, and
  * resolve the verdict — the ONE function both the sync decompose-equivalent
@@ -517,8 +641,9 @@ export function resolveDecompose(dir, id, cfg, role, callerVerdict) {
   // calls below would otherwise throw a conflict for the exact same case,
   // so this check backs it up ahead of time rather than making every caller
   // catch that error.
-  const currentStage = work.stage ?? 'executing';
-  if (currentStage !== 'decompose') {
+  const domain = getDomain(work.domain);
+  const currentStage = work.stage ?? stageForStep(domain, 'Execute');
+  if (currentStage !== stageForStep(domain, 'Divide')) {
     return { outcome: 'noop', id };
   }
 
@@ -534,12 +659,12 @@ export function resolveDecompose(dir, id, cfg, role, callerVerdict) {
   // — read once, reused by every moveStage call below that advances this item
   // to `executing`, so none of them silently carry FALLBACK_VERIFY or leave
   // `verify` untouched (transitionStage only overwrites it when passed a
-  // value — stage.mjs:59-64). Falls back to the item's own current `verify`
+  // value — stage-fsm.mjs:60-65). Falls back to the item's own current `verify`
   // when no approve record exists yet (an item that never went through
   // Track A's Gates, e.g. from before this item, is unaffected).
   const planApproveVerify = view.gates?.[id]?.planApprove?.verify ?? work.verify;
   if (hasChildren) {
-    moveStage(dir, { id, to: 'executing', expectedStage: 'decompose', verify: planApproveVerify, role });
+    moveStage(dir, { id, to: stageForStep(domain, 'Execute'), expectedStage: stageForStep(domain, 'Divide'), verify: planApproveVerify, role });
     releaseClaimOnExecuting();
     return { outcome: 'already-decomposed', id };
   }
@@ -601,7 +726,7 @@ export function resolveDecompose(dir, id, cfg, role, callerVerdict) {
         rationale:
           'tsk-19j D7 trust signal: plan.md already committed to no split, so judgeDecompose has nothing to judge — skipping avoids a pointless model round-trip, never a real child-generation decision',
       });
-      moveStage(dir, { id, to: 'executing', expectedStage: 'decompose', verify: planApproveVerify, role });
+      moveStage(dir, { id, to: stageForStep(domain, 'Execute'), expectedStage: stageForStep(domain, 'Divide'), verify: planApproveVerify, role });
       releaseClaimOnExecuting();
       return { outcome: 'pass-through', id };
     }
@@ -682,7 +807,7 @@ export function resolveDecompose(dir, id, cfg, role, callerVerdict) {
 
   if (verdict.kind === 'pass-through') {
     logDecomposeVerdict(dir, id, 'pass-through', verdict.reason ?? DEFAULT_PASS_THROUGH_RATIONALE);
-    moveStage(dir, { id, to: 'executing', expectedStage: 'decompose', verify: planApproveVerify, role });
+    moveStage(dir, { id, to: stageForStep(domain, 'Execute'), expectedStage: stageForStep(domain, 'Divide'), verify: planApproveVerify, role });
     releaseClaimOnExecuting();
     return { outcome: 'pass-through', id };
   }
@@ -694,11 +819,20 @@ export function resolveDecompose(dir, id, cfg, role, callerVerdict) {
   // on any one of them parks the WHOLE decompose verdict as need-human
   // (never a partial write) — same fail-safe stance the heavy-risk gate
   // above already applies to this same edge.
+  //
+  // tsk-25g D2: thread the immediately-prior round's own disagreement text
+  // back into this round's prompt, the same shape discovery.mjs's own D1a
+  // fix already gives resolveDiscovery (discovery.mjs:643-651) — non-empty
+  // only on a RETRY call after a human resumes an `awaiting-human` decompose
+  // dispute via `fgos answer` (the whole decompose verdict parks together,
+  // so one shared `priorRejection` applies to every child's re-check, not
+  // a per-child slot).
+  const priorRejection = view?.gates?.[id]?.ask;
   const disputedChild = verdict.children
     .map((child, index) => ({
       index,
       child,
-      secondPass: judgeVerifySemanticCorrectness({ title: child.title, tier: work.tier }, child.verify, cfg),
+      secondPass: judgeVerifySemanticCorrectness({ title: child.title, tier: work.tier }, child.verify, cfg, priorRejection),
     }))
     .find((entry) => !entry.secondPass.agrees);
 
@@ -706,9 +840,33 @@ export function resolveDecompose(dir, id, cfg, role, callerVerdict) {
     const reason =
       `Việc con #${disputedChild.index + 1} ("${disputedChild.child.title}") có verify bị nghi ngờ ở vòng ` +
       `kiểm tra thứ hai: ${disputedChild.secondPass.reason}`;
-    logDecomposeVerdict(dir, id, 'need-human', reason);
-    putInAwaiting(dir, { id, ask: formatProposalAsk(verdict, reason), statusAtAsk: work.status });
-    return { outcome: 'need-human', id, verdict };
+
+    // tsk-25g D2: --force mirrors discover's own override (tsk-5cf D1b,
+    // discovery.mjs:669-691) -- proceeds past a disputed child's
+    // second-pass verdict instead of parking, EXCEPT when the disagreement
+    // is mechanical (tsk-12t D6, a syntactic fact not a judgement call) or
+    // the item is already parked `awaiting-human` from a PRIOR discover/
+    // decompose call (continuing would advance stage while status stays
+    // parked -- same refusal shape discovery.mjs already applies).
+    if (callerVerdict?.force === true && disputedChild.secondPass.mechanical !== true) {
+      if (work.status === 'awaiting-human') {
+        throw new StoreError(
+          'validation',
+          `decompose --force: work "${id}" is already "awaiting-human" -- run "fgos answer ${id} --text ..." to resume it before retrying --force.`,
+        );
+      }
+      addDecision(dir, {
+        id,
+        text: `decompose --force overrode a disputed child verify: "${disputedChild.child.verify}"`,
+        source: 'resolveDecompose',
+        rationale: `second pass disagreed on child #${disputedChild.index + 1}: ${disputedChild.secondPass.reason}`,
+      });
+      // fall through -- proceed to write children below, same as no dispute
+    } else {
+      logDecomposeVerdict(dir, id, 'need-human', reason);
+      putInAwaiting(dir, { id, ask: formatProposalAsk(verdict, reason), statusAtAsk: work.status });
+      return { outcome: 'need-human', id, verdict };
+    }
   }
 
   // verdict.kind === 'decompose': child ids are positional — `${work.id}-<n>`,
@@ -738,6 +896,36 @@ export function resolveDecompose(dir, id, cfg, role, callerVerdict) {
     return { outcome: 'need-human', id, verdict };
   }
 
+  // tsk-1gr D1/D2: completeness advisory -- computed fresh here regardless
+  // of which branch produced `verdict` (caller-supplied never reads
+  // lockedContext/repoRoot at all, per the tsk-27y branch above; this check
+  // needs it either way, per D1's "unconditional, same as footprintOverlap").
+  // ADVISORY ONLY: never parks, never blocks -- a hit is logged as its own
+  // decision alongside the real decompose write below, not instead of it.
+  // tsk-gio fix: wrapped in the same fail-safe try/catch discipline the
+  // priority-refinement advisory above already uses (:685-699) -- an
+  // unwrapped addDecision (store-lock contention, a corrupted item shape)
+  // used to be able to throw and abort the decompose write below,
+  // directly contradicting "never blocks" (found by independent review).
+  try {
+    const coverageRepoRoot = resolveContentRoot(stateRoot, id, work.docsRef);
+    const coverageContext = readLockedContext(coverageRepoRoot, work.docsRef);
+    const uncoveredDecisions = findUncoveredLockedDecisions(coverageContext, verdict.children, coverageRepoRoot);
+    if (uncoveredDecisions.length > 0) {
+      addDecision(dir, {
+        id,
+        text: `decompose completeness advisory: ${uncoveredDecisions.length} path(s) named in a locked decision have no child footprint covering them: ${uncoveredDecisions.join(', ')}`,
+        source: 'resolveDecompose',
+        rationale:
+          'tsk-1gr D1/D2: mechanical path-token check over CONTEXT.md\'s Locked decisions section -- advisory only, never blocks; see docs/explanation/auto-decompose-can-drop-a-locked-decision-from-every-childs-footprint.md for the failure mode this catches',
+      });
+    }
+  } catch {
+    // Swallowed intentionally, same fail-safe discipline as :685-699 --
+    // a failure computing or logging this advisory must never abort the
+    // decompose write below.
+  }
+
   verdict.children.forEach((child, index) => {
     addWork(dir, {
       id: childIds[index],
@@ -749,14 +937,15 @@ export function resolveDecompose(dir, id, cfg, role, callerVerdict) {
       refs: child.refs,
       footprint: child.footprint,
       verify: child.verify,
-      stage: 'executing',
+      stage: stageForStep(domain, 'Execute'),
       parent: id,
       tier: work.tier,
+      domain: work.domain,
     });
   });
 
   logDecomposeVerdict(dir, id, 'decompose', verdict.reason, `${childIds.length} children`);
-  moveStage(dir, { id, to: 'executing', expectedStage: 'decompose', verify: planApproveVerify, role });
+  moveStage(dir, { id, to: stageForStep(domain, 'Execute'), expectedStage: stageForStep(domain, 'Divide'), verify: planApproveVerify, role });
   releaseClaimOnExecuting();
   return { outcome: 'decompose', id, childIds };
 }

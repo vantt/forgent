@@ -32,7 +32,7 @@ who can act on it.
 provider, `gitnexus`, `status: "present"` → **full** per `CLAUDE.md`'s
 capability gate. `impact({target: "createWorktree", direction: "upstream"})`
 and the same for `return`'s implementation in `bin/fgos.mjs` MUST run (and
-risk level reported) before `fgos-executing` edits either — `createWorktree`
+risk level reported) before `fgos-code-implement` edits either — `createWorktree`
 in particular is called from `claim-port.mjs`, i.e. every leaf/root claim in
 the system, so a wide blast radius is expected and must be confirmed, not
 assumed away by this plan.

@@ -76,8 +76,8 @@ export function truncateTitle(title) {
  * main tree" (the sole trigger for RUL12 dependent-open); `retrospective`
  * is the batched learning-synthesis step (formerly the `compound-learn`
  * stage, now retired); `cleanup` is a TTL-bounded worktree-reclaim park —
- * see fsm.mjs for the full transition edges). Owned here (schema owns
- * domain) — fsm.mjs imports and re-exports this rather than defining its
+ * see status-fsm.mjs for the full transition edges). Owned here (schema owns
+ * domain) — status-fsm.mjs imports and re-exports this rather than defining its
  * own copy, so there is exactly one list of legal statuses.
  */
 export const STATUSES = Object.freeze([
@@ -91,6 +91,46 @@ export const STATUSES = Object.freeze([
   'done',
   'awaiting-human',
   'wontfix',
+]);
+
+/**
+ * The fixed `statusCategory` domain (per decision record 0027, D2/D3 —
+ * `docs/decisions/0027-domain-so-huu-status-doan-truoc-delivered-supersede-
+ * base-workflow-model-d1-d3.md`; pinned terms in `docs/history/phase-2-
+ * status-category-schema/CONTEXT.md`) — a lossy compression of the six
+ * front-segment statuses (`todo`/`doing`/`blocked`/`awaiting-human`/
+ * `awaiting-approval`/`wontfix`; see `DOMAINS[domain].statusLabels`,
+ * `workflow-stage-graphs.mjs`) that lets every domain-agnostic mechanism of
+ * fgOS (frontier's `ready` filter, rollup, outcome/friction,
+ * discovery-judge — none of them migrated yet, that is tsk-38t-4's own
+ * scope) read "which bucket is this item in" without learning a domain's
+ * own status vocabulary. Frozen onto the event payload at write time
+ * (`store.mjs`'s `addWork`/`moveWork`), NEVER derived on read: `docs/
+ * platform-foundations.md`'s L3 replay-from-zero law requires that
+ * replaying the same log twice always yields the same view, and a value
+ * computed at read time from `DOMAINS[domain].statusLabels` (itself
+ * ordinary, editable code) could replay differently after that table
+ * changes — an outcome L3 forbids.
+ *
+ * The full six-value set is declared upfront, Linear-style, even though
+ * `backlog` and `completed` have no status mapped into either of them
+ * today — 0027's own reasoning is to match Linear's pattern of a closed
+ * category set defined up front, not "add a category only once a status
+ * needs it" (which would make the set an implementation detail of whichever
+ * domain happens to exist today, rather than a stable contract other
+ * domains and domain-agnostic readers can rely on). The four tail-segment
+ * statuses (`delivered`/`retrospective`/`cleanup`/`done`) never map into
+ * any of these six — D1 holds literal status is sufficient for them
+ * forever — so a move into one of those four carries no `statusCategory`
+ * at all, rather than being forced into `completed` or any other value.
+ */
+export const STATUS_CATEGORIES = Object.freeze([
+  'backlog',
+  'todo',
+  'in-progress',
+  'review',
+  'completed',
+  'canceled',
 ]);
 
 /**
@@ -125,7 +165,7 @@ export const GOAL_TIERS = Object.freeze(['mvp', 'milestone']);
  * Stage domain for `work.stage` (per stage-clarify D1/D2/D8, extended by
  * stage-decompose D2) — the macro-level lifecycle stage of a work item
  * (clarify -> decompose -> executing), orthogonal to the FSM's micro-level
- * `status` (fsm.mjs's TRANSITIONS is unchanged by this field). `stage` is
+ * `status` (status-fsm.mjs's TRANSITIONS is unchanged by this field). `stage` is
  * OPTIONAL and NOT in DEFAULTS (D8): a missing `stage` reads as `executing`
  * lazily wherever it is consumed (frontier.mjs, store.mjs), never injected
  * onto the record itself — this keeps every existing add/submit/legacy path
@@ -144,7 +184,7 @@ export const STAGES = DOMAINS[DEFAULT_DOMAIN].stages;
  * `src/state/workflow-stage-graphs.mjs`) govern this item's `stage` value. OPTIONAL and
  * NOT in DEFAULTS — same D8 lazy-default shape as `stage` itself: a missing
  * `domain` reads as `'coding'` lazily wherever it is consumed (frontier.mjs,
- * loop.mjs, stage.mjs, and this module's own `validateWork`), never injected
+ * loop.mjs, stage-fsm.mjs, and this module's own `validateWork`), never injected
  * onto the record — every existing (100% coding) item needs zero migration.
  */
 
@@ -511,10 +551,83 @@ export function validateWorkShape(work) {
     }
   }
 
+  // domainFields (per decision record 0027, D6 — "Ngoài phạm vi supersede
+  // D1-D3"; full design in docs/history/phase-2-status-category-schema/
+  // DISCUSSION.md §task-domain-fields): OPTIONAL additive nested object
+  // carrying per-domain data alongside the domain-agnostic fields above —
+  // shape `{ [domainName]: {...} }`. Same optional-additive convention as
+  // acceptance/footprint above: shape-checked only when present, null
+  // treated as absent (RUL11 zero-migration — absent on every item that
+  // predates this field, replays byte-for-byte unchanged). Only the SHAPE
+  // is checked here — a plain object whose own values are themselves plain
+  // objects (arrays, primitives, and null values for a domain key are all
+  // rejected). Whether `work.domainFields[work.domain]` actually matches
+  // the fieldSchema that domain declared (if any) is a SEPARATE, narrower
+  // concern handled by `validateDomainFields` below — mirroring how this
+  // function checks `work.stage` is one of `DOMAINS[domain].stages` above
+  // without opening a per-stage schema engine of its own.
+  if (work.domainFields !== undefined && work.domainFields !== null) {
+    if (typeof work.domainFields !== 'object' || Array.isArray(work.domainFields)) {
+      throw new WorkValidationError(
+        `work.domainFields must be a plain object ({ [domainName]: {...} }) when present, got: ${JSON.stringify(work.domainFields)}`,
+      );
+    }
+    for (const [domainName, fields] of Object.entries(work.domainFields)) {
+      if (!fields || typeof fields !== 'object' || Array.isArray(fields)) {
+        throw new WorkValidationError(
+          `work.domainFields.${domainName} must be a plain object when present, got: ${JSON.stringify(fields)}`,
+        );
+      }
+    }
+  }
+
   if (work.deps.includes(work.id)) {
     throw new WorkValidationError(`work "${work.id}" cannot list itself as a dep.`);
   }
 
+  return true;
+}
+
+/**
+ * Validate `work.domainFields[work.domain]` against the item's OWN domain's
+ * declared `fieldSchema` (per decision record 0027, D6) — kept deliberately
+ * separate from `validateWorkShape` above, which only confirms
+ * `domainFields` as a whole is well-formed, never that any particular
+ * namespace matches its owning domain's rules (that split is the task's own
+ * point 1 vs point 3). A domain that declares no `fieldSchema` — every real
+ * domain today; `coding` has no need for one, this is purely infrastructure
+ * for a FUTURE domain — makes this a no-op, safe to call unconditionally.
+ *
+ * `fieldSchema` is kept deliberately SIMPLE, per D6's own bound (this item
+ * is infrastructure, not a schema DSL): a flat map of
+ * `{ [key]: 'string' | 'number' | 'boolean' }` primitive-type declarations,
+ * checked only for keys that are actually PRESENT in the item's own
+ * namespace — a fieldSchema declares what a key must be *if given*, not
+ * that it is required (D6 does not ask for required-field enforcement, and
+ * inventing one here would be scope creep past what was locked).
+ *
+ * Only the namespace matching `work`'s OWN `work.domain` (or `DEFAULT_DOMAIN`
+ * when `work.domain` is absent, mirroring every other domain-aware lookup in
+ * this file) is ever read or validated — any OTHER domain's namespace
+ * present in `work.domainFields` is left untouched, never stripped or
+ * rejected, per the DISCUSSION.md design ("other domains' namespaces, if
+ * present, are left alone").
+ */
+export function validateDomainFields(work, domain) {
+  const fieldSchema = domain?.fieldSchema;
+  if (!fieldSchema || typeof fieldSchema !== 'object') return true;
+  const ownDomain = work.domain ?? DEFAULT_DOMAIN;
+  const ownFields = work.domainFields?.[ownDomain];
+  if (ownFields === undefined) return true;
+  for (const [key, type] of Object.entries(fieldSchema)) {
+    if (!Object.hasOwn(ownFields, key)) continue;
+    const value = ownFields[key];
+    if (typeof value !== type) {
+      throw new WorkValidationError(
+        `work.domainFields.${ownDomain}.${key} must be of type "${type}" per its domain's fieldSchema, got: ${JSON.stringify(value)}`,
+      );
+    }
+  }
   return true;
 }
 

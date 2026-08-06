@@ -21,7 +21,7 @@
 // work.
 import { buildUnifiedEdges } from './dep-graph.mjs';
 import { connectedComponents } from './graph-metrics.mjs';
-import { RESOLVED_STATUSES } from './frontier.mjs';
+import { isResolvedStatus } from './frontier.mjs';
 
 // Tier ordering used to sort mvp/milestone goals ahead of ungrouped work —
 // lower sorts first. An absent goalTier (plain work item, the common case)
@@ -87,7 +87,7 @@ function tierRank(goalTier) {
  */
 export function rankImpact(view, opts = {}) {
   const work = view?.work ?? {};
-  const openIds = Object.keys(work).filter((id) => !RESOLVED_STATUSES.has(work[id].status));
+  const openIds = Object.keys(work).filter((id) => !isResolvedStatus(work[id]));
   const openSet = new Set(openIds);
 
   const blockCounts = new Map(openIds.map((id) => [id, 0]));
@@ -143,7 +143,7 @@ export function rankImpact(view, opts = {}) {
   if (!opts.includeDone) return ranked;
 
   const doneRows = Object.keys(work)
-    .filter((id) => RESOLVED_STATUSES.has(work[id].status))
+    .filter((id) => isResolvedStatus(work[id]))
     .map((id) => {
       const item = work[id];
       return {

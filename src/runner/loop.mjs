@@ -309,6 +309,29 @@ function tailLines(text, n = 10) {
 }
 
 /**
+ * True when `id` has any descendant (direct child, or a descendant reached
+ * through further `parent` chains below a child) whose `status` is NOT yet
+ * `done` or `wontfix` (tsk-577). Deliberately a BROADER "still needed" set
+ * than `frontier.mjs`'s own `isResolvedStatus`/`hasOpenDescendant` (which
+ * treats `delivered`/`retrospective`/`cleanup` as resolved, for dispatch
+ * purposes): a leaf sitting in exactly `cleanup` still needs its root's
+ * `fgw/<rootId>` branch alive for its own `checkMergeStillResolves` call
+ * (`assessCleanupReadiness`, `cleanup-harness.mjs`) — reusing the shared
+ * dispatch-anchor definition here would NOT catch the scenario that caused
+ * the real 14-item false-positive block this guards against. Do not
+ * consolidate this with `hasOpenDescendant` — the two intentionally answer
+ * different questions.
+ */
+function hasStillNeededDescendant(id, work) {
+  for (const [childId, child] of Object.entries(work)) {
+    if (child?.parent !== id) continue;
+    if (child.status !== 'done' && child.status !== 'wontfix') return true;
+    if (hasStillNeededDescendant(childId, work)) return true;
+  }
+  return false;
+}
+
+/**
  * STARTUP REAP (reliability panel a/e/f): run BEFORE the frontier is even
  * computed, so `--once` is idempotent after a crash.
  *
@@ -320,7 +343,9 @@ function tailLines(text, n = 10) {
  *    The verify for the completed case runs in a throwaway worktree of the
  *    item's own branch, torn down in a finally.
  * 2. Orphan pruning: `fgw/*` branches with zero commits beyond their
- *    merge-base with HEAD are worktree debris, deleted outright; branches
+ *    merge-base with HEAD are worktree debris, deleted outright UNLESS a
+ *    descendant still needs the ref (`hasStillNeededDescendant`, tsk-577) —
+ *    that branch is kept and reconsidered on a later pass instead; branches
  *    carrying real commits are proposals — always kept and reported, never
  *    auto-deleted (per D4).
  *
@@ -388,6 +413,14 @@ export async function startupReap({ repoRoot, dir, worktreeDir, verifyTimeoutMs,
   const pruned = [];
   const kept = [];
   for (const { branch, aheadCount } of listLeftovers(repoRoot)) {
+    const branchId = branch.startsWith('fgw/') ? branch.slice('fgw/'.length) : branch;
+    if (aheadCount === 0 && hasStillNeededDescendant(branchId, view.work)) {
+      log(
+        `fgos-runner: keeping ${branch} (0 commits ahead, but a descendant still needs this ref — not yet done/wontfix)`,
+      );
+      kept.push({ branch, aheadCount, reason: 'descendant-still-needed' });
+      continue;
+    }
     if (aheadCount === 0) {
       if (!dryRun) {
         git(repoRoot, ['branch', '-D', branch]);
@@ -601,7 +634,8 @@ async function captureDiscoveredWork({ output, item, queue, dir, log }) {
           refs: [],
           verify: FALLBACK_VERIFY,
           tier: derived.tier,
-          stage: 'clarify',
+          stage: stageForStep(getDomain(item.domain), 'Clarify'),
+          domain: item.domain,
           discoveredFrom: item.id,
         });
         log(`fgos-runner: discovered work "${id}" from "${item.id}" (runner-created, stage clarify)`);
@@ -693,7 +727,21 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
       await queue.enqueue(async () => {
         appendEvent(path.join(dir, 'events.jsonl'), {
           type: 'capacity.dispatch',
-          payload: { id: item.id, capacityId: worker.capacityId, provider: worker.provider, model: worker.model },
+          // baseCommit/headRef (tsk-4hl, D1/D3 of docs/history/parallel-
+          // decomposition-footprint-avoidance/CONTEXT.md — mức 1): the
+          // dispatch-time attestation captured inside spawnWorker, now
+          // actually persisted (independent review after tsk-2ig merged
+          // found it captured then discarded) -- same audit-only,
+          // ignored-by-replay.mjs event this call site already uses for
+          // capacityId/provider/model, no new event type invented.
+          payload: {
+            id: item.id,
+            capacityId: worker.capacityId,
+            provider: worker.provider,
+            model: worker.model,
+            baseCommit: worker.baseCommit,
+            headRef: worker.headRef,
+          },
         });
       });
       // Persist the worker's own output for after-the-fact recovery (D1/D3/D4):
@@ -964,7 +1012,7 @@ export async function runOnce(options = {}) {
       // "at the Clarify step" / "at the Divide step" — 'clarify'/'decompose'
       // for the 'coding' domain, byte-for-byte the literal checks this sweep
       // used before the retrofit. An unrecognized item.domain never throws
-      // here (domains.mjs's fail-safe) — it folds to 'coding' with a
+      // here (workflow-stage-graphs.mjs's fail-safe) — it folds to 'coding' with a
       // diagnostic log line instead, so a corrupt/rolled-back domain value
       // can never wedge the sweep.
       for (const item of Object.values(listWork(dir).work)) {

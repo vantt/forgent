@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { spawnSync } from 'node:child_process';
+import { spawnSync, execFileSync } from 'node:child_process';
 import {
   buildPrompt,
   loadRunnerConfig,
@@ -34,6 +34,24 @@ import { writeLocalStatus, findExecutableOnPath } from '../../src/state/tool-reg
 
 function mkTempDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-dispatch-test-'));
+}
+
+/** tsk-2ig: a real, minimal git repo (not just a bare tmpdir) — `fgosDir`
+ * returned is `<repoRoot>/.fgos`, matching `paths.mjs`'s real
+ * `fgosDirFromRoot` shape, so `captureDispatchAttestation`'s
+ * `path.dirname(fgosDir)` resolves to a real repo root with a real HEAD. */
+function mkTempGitRepo() {
+  const repoRoot = mkTempDir();
+  execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: repoRoot });
+  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: repoRoot });
+  execFileSync('git', ['config', 'user.name', 'Test'], { cwd: repoRoot });
+  fs.writeFileSync(path.join(repoRoot, 'seed.txt'), 'seed\n');
+  execFileSync('git', ['add', 'seed.txt'], { cwd: repoRoot });
+  execFileSync('git', ['commit', '-q', '-m', 'seed'], { cwd: repoRoot });
+  const headCommit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: repoRoot, encoding: 'utf8' }).trim();
+  const fgosDir = path.join(repoRoot, '.fgos');
+  fs.mkdirSync(fgosDir);
+  return { repoRoot, fgosDir, headCommit };
 }
 
 /** Write a fake executor node script that dumps its argv + cwd as JSON to
@@ -153,10 +171,10 @@ test('buildPrompt includes all five framing sections', () => {
   assert.match(prompt, /# Constraints/);
 });
 
-test('buildPrompt for a coding-domain (or no-domain) work item also contains a new "# Agent skill" section naming the fgos-executing SKILL.md', () => {
+test('buildPrompt for a coding-domain (or no-domain) work item also contains a new "# Agent skill" section naming the fgos-code-implement SKILL.md', () => {
   const prompt = buildPrompt(sampleWork());
   assert.match(prompt, /# Agent skill/);
-  assert.ok(prompt.includes('.claude/skills/fgos-executing/SKILL.md'));
+  assert.ok(prompt.includes('.claude/skills/fgos-code-implement/SKILL.md'));
 });
 
 test('buildPrompt describes the fgos-discovered report-not-write channel while keeping the never-call-fgos constraint (wgi-8)', () => {
@@ -401,13 +419,13 @@ test('loadRunnerConfig accepts a well-formed "capacities" entry carrying its own
     configPath,
     JSON.stringify({
       executor: { command: 'claude', args: ['{prompt}'] },
-      capacities: { 'fgos-executing': { kind: 'cli', command: 'agy', args: ['{prompt}'] } },
+      capacities: { 'fgos-code-implement': { kind: 'cli', command: 'agy', args: ['{prompt}'] } },
       models: { standard: 'sonnet' },
       timeoutMs: 1000,
     }),
   );
   const cfg = loadRunnerConfig(configPath);
-  assert.equal(cfg.capacities['fgos-executing'].command, 'agy');
+  assert.equal(cfg.capacities['fgos-code-implement'].command, 'agy');
 });
 
 test('loadRunnerConfig accepts a "capacities" entry naming only "kind" (metadata-only, falls through for its executor)', () => {
@@ -477,7 +495,7 @@ test('loadRunnerConfig rejects a "capacities.<id>" entry declaring "command" wit
     configPath,
     JSON.stringify({
       executor: { command: 'claude', args: ['{prompt}'] },
-      capacities: { 'fgos-executing': { kind: 'cli', command: 'agy' } },
+      capacities: { 'fgos-code-implement': { kind: 'cli', command: 'agy' } },
       models: {},
       timeoutMs: 1000,
     }),
@@ -494,7 +512,7 @@ test('loadRunnerConfig accepts a "capacities.<id>" entry with allowCrossProvider
     configPath,
     JSON.stringify({
       executor: { command: 'claude', args: ['{prompt}'] },
-      capacities: { 'fgos-executing': { kind: 'cli', command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
+      capacities: { 'fgos-code-implement': { kind: 'cli', command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
       models: { standard: 'sonnet' },
       timeoutMs: 1000,
     }),
@@ -509,7 +527,7 @@ test('loadRunnerConfig rejects a "capacities.<id>" entry whose allowCrossProvide
     configPath,
     JSON.stringify({
       executor: { command: 'claude', args: ['{prompt}'] },
-      capacities: { 'fgos-executing': { kind: 'cli', command: 'agy', args: ['{prompt}'], allowCrossProvider: 'yes' } },
+      capacities: { 'fgos-code-implement': { kind: 'cli', command: 'agy', args: ['{prompt}'], allowCrossProvider: 'yes' } },
       models: { standard: 'sonnet' },
       timeoutMs: 1000,
     }),
@@ -932,6 +950,67 @@ test('modelForTier throws a validation error for an unknown tier', () => {
   });
 });
 
+// --- tsk-2ig: worktree-dispatch attestation (baseCommit/headRef) ---------
+
+test('resolveExecutorCommand captures a real baseCommit/headRef when fgosDir points at a real repo', () => {
+  const cfg = baseConfig(['-p', '{prompt}']);
+  const { repoRoot, fgosDir, headCommit } = mkTempGitRepo();
+  const resolved = resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', fgosDir });
+  assert.equal(resolved.baseCommit, headCommit);
+  assert.equal(resolved.headRef, 'main');
+  fs.rmSync(repoRoot, { recursive: true, force: true });
+});
+
+test('resolveExecutorCommand: baseCommit/headRef are both null when fgosDir is omitted (no attempt made)', () => {
+  const cfg = baseConfig(['-p', '{prompt}']);
+  const resolved = resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet' });
+  assert.equal(resolved.baseCommit, null);
+  assert.equal(resolved.headRef, null);
+});
+
+test('resolveExecutorCommand: baseCommit/headRef fail closed to null (never throw) when fgosDir does not point at a git repo', () => {
+  const cfg = baseConfig(['-p', '{prompt}']);
+  const dir = mkTempDir(); // plain tmpdir, no .git anywhere in its ancestry assumed by the read
+  const resolved = resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', fgosDir: dir });
+  assert.equal(resolved.baseCommit, null);
+  assert.equal(resolved.headRef, null);
+});
+
+// --- tsk-4hl (post-tsk-2ig independent review): attestRoot overrides
+// fgosDir's own root -- a worker dispatches inside its OWN worktree
+// (loop.mjs's wt.path), a different checkout than fgosDir's root (always
+// the main checkout, ADR0020). Two unrelated real repos here (different
+// HEAD commits, different branch names) makes "which root actually got
+// read" unambiguous. ---
+
+test('resolveExecutorCommand: attestRoot, when given, is read INSTEAD of fgosDir\'s own root (tsk-4hl fix)', () => {
+  const cfg = baseConfig(['-p', '{prompt}']);
+  const mainRepo = mkTempGitRepo(); // fgosDir points here
+  const workerRepo = mkTempGitRepo(); // attestRoot points here -- a different repo entirely
+  // mkTempGitRepo's single seed commit is fully deterministic (same tree,
+  // message, author, second-precision timestamp) -- two independently
+  // created repos can legitimately hash to the SAME commit. One extra
+  // commit here makes workerRepo's HEAD genuinely distinct, so this test
+  // proves attestRoot was actually read, not a coincidental hash collision.
+  fs.writeFileSync(path.join(workerRepo.repoRoot, 'second.txt'), 'second\n');
+  execFileSync('git', ['add', 'second.txt'], { cwd: workerRepo.repoRoot });
+  execFileSync('git', ['commit', '-q', '-m', 'second'], { cwd: workerRepo.repoRoot });
+  workerRepo.headCommit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: workerRepo.repoRoot, encoding: 'utf8' }).trim();
+  const resolved = resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', fgosDir: mainRepo.fgosDir, attestRoot: workerRepo.repoRoot });
+  assert.equal(resolved.baseCommit, workerRepo.headCommit, 'must attest the attestRoot repo, never fgosDir\'s own root');
+  assert.notEqual(resolved.baseCommit, mainRepo.headCommit);
+  fs.rmSync(mainRepo.repoRoot, { recursive: true, force: true });
+  fs.rmSync(workerRepo.repoRoot, { recursive: true, force: true });
+});
+
+test('resolveExecutorCommand: attestRoot works even when fgosDir is omitted entirely', () => {
+  const cfg = baseConfig(['-p', '{prompt}']);
+  const { repoRoot, headCommit } = mkTempGitRepo();
+  const resolved = resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', attestRoot: repoRoot });
+  assert.equal(resolved.baseCommit, headCommit);
+  fs.rmSync(repoRoot, { recursive: true, force: true });
+});
+
 // --- resolveExecutorCommand: per-element argv substitution, never shell -
 
 test('resolveExecutorCommand substitutes {prompt} and {model} per array element', () => {
@@ -990,11 +1069,11 @@ test('resolveExecutorCommand honors a capacities.<capacityId> override ahead of 
   const cfg = {
     executor: { command: '/global/executor', args: ['{prompt}'] },
     executors: { heavy: { command: '/heavy/executor', args: ['{prompt}'] } },
-    capacities: { 'fgos-executing': { kind: 'cli', command: '/capacity/executor', args: ['{prompt}'], allowCrossProvider: true } },
+    capacities: { 'fgos-code-implement': { kind: 'cli', command: '/capacity/executor', args: ['{prompt}'], allowCrossProvider: true } },
     models: { heavy: 'opus' },
     timeoutMs: 5000,
   };
-  const byCapacity = resolveExecutorCommand(cfg, { prompt: 'p', model: 'opus', tier: 'heavy', capacityId: 'fgos-executing' });
+  const byCapacity = resolveExecutorCommand(cfg, { prompt: 'p', model: 'opus', tier: 'heavy', capacityId: 'fgos-code-implement' });
   assert.equal(byCapacity.command, '/capacity/executor');
   // no capacityId at all -> falls back to today's tier/global precedence, unaffected
   const byTierOnly = resolveExecutorCommand(cfg, { prompt: 'p', model: 'opus', tier: 'heavy' });
@@ -1005,11 +1084,11 @@ test('resolveExecutorCommand falls back to executors.<tier> when the capacities 
   const cfg = {
     executor: { command: '/global/executor', args: ['{prompt}'] },
     executors: { heavy: { command: '/heavy/executor', args: ['{prompt}'] } },
-    capacities: { 'fgos-executing': { kind: 'task', target: 'general-purpose', tier: 'heavy' } },
+    capacities: { 'fgos-code-implement': { kind: 'task', target: 'general-purpose', tier: 'heavy' } },
     models: { heavy: 'opus' },
     timeoutMs: 5000,
   };
-  const resolved = resolveExecutorCommand(cfg, { prompt: 'p', model: 'opus', tier: 'heavy', capacityId: 'fgos-executing' });
+  const resolved = resolveExecutorCommand(cfg, { prompt: 'p', model: 'opus', tier: 'heavy', capacityId: 'fgos-code-implement' });
   assert.equal(resolved.command, '/heavy/executor');
 });
 
@@ -1020,7 +1099,7 @@ test('resolveExecutorCommand with a capacities block present but no matching cap
     models: { standard: 'sonnet' },
     timeoutMs: 5000,
   };
-  const resolved = resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', capacityId: 'fgos-executing' });
+  const resolved = resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', capacityId: 'fgos-code-implement' });
   assert.equal(resolved.command, '/global/executor');
 });
 
@@ -1042,12 +1121,12 @@ test('resolveExecutorCommand throws a RunnerConfigError when a kind:"cli" capaci
   initStore(dir);
   const cfg = {
     executor: { command: '/global/executor', args: ['{prompt}'] },
-    capacities: { 'fgos-executing': { kind: 'cli', target: 'agy' } },
+    capacities: { 'fgos-code-implement': { kind: 'cli', target: 'agy' } },
     models: { standard: 'sonnet' },
     timeoutMs: 5000,
   };
   assert.throws(
-    () => resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', capacityId: 'fgos-executing', fgosDir: dir }),
+    () => resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', capacityId: 'fgos-code-implement', fgosDir: dir }),
     RunnerConfigError,
   );
 });
@@ -1055,16 +1134,16 @@ test('resolveExecutorCommand throws a RunnerConfigError when a kind:"cli" capaci
 test('resolveExecutorCommand throws a RunnerConfigError when a kind:"cli" capacity is registered but not present on this machine', () => {
   const dir = mkTempDir();
   initStore(dir);
-  registerTool(dir, { name: 'fgos-executing', kind: 'cli', capability: 'coding', command: 'agy-definitely-not-on-path-xyz' });
-  writeLocalStatus(dir, { 'fgos-executing': { status: 'missing', checkedAt: new Date().toISOString() } });
+  registerTool(dir, { name: 'fgos-code-implement', kind: 'cli', capability: 'coding', command: 'agy-definitely-not-on-path-xyz' });
+  writeLocalStatus(dir, { 'fgos-code-implement': { status: 'missing', checkedAt: new Date().toISOString() } });
   const cfg = {
     executor: { command: '/global/executor', args: ['{prompt}'] },
-    capacities: { 'fgos-executing': { kind: 'cli', target: 'agy-definitely-not-on-path-xyz' } },
+    capacities: { 'fgos-code-implement': { kind: 'cli', target: 'agy-definitely-not-on-path-xyz' } },
     models: { standard: 'sonnet' },
     timeoutMs: 5000,
   };
   assert.throws(
-    () => resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', capacityId: 'fgos-executing', fgosDir: dir }),
+    () => resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', capacityId: 'fgos-code-implement', fgosDir: dir }),
     RunnerConfigError,
   );
 });
@@ -1072,28 +1151,28 @@ test('resolveExecutorCommand throws a RunnerConfigError when a kind:"cli" capaci
 test('resolveExecutorCommand resolves a kind:"cli" capacity through fgos-tool-query presence, falling through to executors.<tier> for the command, when registered and present', () => {
   const dir = mkTempDir();
   initStore(dir);
-  registerTool(dir, { name: 'fgos-executing', kind: 'cli', capability: 'coding', command: 'agy' });
-  writeLocalStatus(dir, { 'fgos-executing': { status: 'present', checkedAt: new Date().toISOString() } });
+  registerTool(dir, { name: 'fgos-code-implement', kind: 'cli', capability: 'coding', command: 'agy' });
+  writeLocalStatus(dir, { 'fgos-code-implement': { status: 'present', checkedAt: new Date().toISOString() } });
   const cfg = {
     executor: { command: '/global/executor', args: ['{prompt}'] },
     executors: { standard: { command: '/standard/executor', args: ['{prompt}'] } },
-    capacities: { 'fgos-executing': { kind: 'cli', target: 'agy', tier: 'standard', allowCrossProvider: true } },
+    capacities: { 'fgos-code-implement': { kind: 'cli', target: 'agy', tier: 'standard', allowCrossProvider: true } },
     models: { standard: 'sonnet' },
     timeoutMs: 5000,
   };
-  const resolved = resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', capacityId: 'fgos-executing', fgosDir: dir });
+  const resolved = resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', capacityId: 'fgos-code-implement', fgosDir: dir });
   assert.equal(resolved.command, '/standard/executor');
 });
 
 test('resolveExecutorCommand skips the fgos-tool-query presence check entirely when fgosDir is omitted, even with a kind:"cli" capacity present', () => {
   const cfg = {
     executor: { command: '/global/executor', args: ['{prompt}'] },
-    capacities: { 'fgos-executing': { kind: 'cli', target: 'agy-not-registered-anywhere', allowCrossProvider: true } },
+    capacities: { 'fgos-code-implement': { kind: 'cli', target: 'agy-not-registered-anywhere', allowCrossProvider: true } },
     models: { standard: 'sonnet' },
     timeoutMs: 5000,
   };
   assert.doesNotThrow(() =>
-    resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', capacityId: 'fgos-executing' }),
+    resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', capacityId: 'fgos-code-implement' }),
   );
 });
 
@@ -1128,7 +1207,14 @@ test('resolveExecutorCommand resolves an agentType capacity identically whether 
   initStore(dir);
   const withFgosDir = resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', capacityId: 'my-agent-capacity', fgosDir: dir });
   const withoutFgosDir = resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', capacityId: 'my-agent-capacity' });
-  assert.deepEqual(withFgosDir, withoutFgosDir);
+  // command/args/adapter/provider (the actual agentType-resolution shape this
+  // test is about) stay identical regardless of fgosDir. baseCommit/headRef
+  // (tsk-2ig attestation) are deliberately excluded here: they are ONLY
+  // attempted when fgosDir is given (mkTempDir() is not a git repo, so both
+  // happen to read back null today, but that is not this test's concern).
+  const { baseCommit: _bc1, headRef: _hr1, ...withFgosDirShape } = withFgosDir;
+  const { baseCommit: _bc2, headRef: _hr2, ...withoutFgosDirShape } = withoutFgosDir;
+  assert.deepEqual(withFgosDirShape, withoutFgosDirShape);
 });
 
 test('resolveExecutorCommand still prefers a capacity\'s own command/args over agentType when both are declared (judge-discovery\'s real shape) — agentType is never consulted', () => {
@@ -1153,11 +1239,11 @@ test('resolveExecutorCommand still prefers a capacity\'s own command/args over a
 test('resolveExecutorCommand falls through to executors.<tier>/global (unaffected) for a capacity with neither command/args nor agentType', () => {
   const cfg = {
     executor: { command: '/global/executor', args: ['{prompt}'] },
-    capacities: { 'fgos-executing': { kind: 'task', tier: 'standard' } },
+    capacities: { 'fgos-code-implement': { kind: 'task', tier: 'standard' } },
     models: { standard: 'sonnet' },
     timeoutMs: 5000,
   };
-  const resolved = resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', capacityId: 'fgos-executing' });
+  const resolved = resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', capacityId: 'fgos-code-implement' });
   assert.equal(resolved.command, '/global/executor');
 });
 
@@ -1455,7 +1541,7 @@ test('spawnWorker result carries capacityId and provider alongside every existin
 
   const result = await spawnWorker(sampleWork(), cfg, mkTempDir());
 
-  assert.equal(result.capacityId, 'fgos-executing');
+  assert.equal(result.capacityId, 'fgos-code-implement');
   assert.equal(result.provider, process.execPath);
   // every pre-tsk-62v field still present, unchanged
   assert.equal(result.tier, 'standard');
@@ -1464,26 +1550,49 @@ test('spawnWorker result carries capacityId and provider alongside every existin
   assert.equal(typeof result.templateHash, 'string');
 });
 
+test('spawnWorker attests its OWN cwd (the dispatch worktree), never opts.fgosDir\'s root (tsk-4hl fix)', async () => {
+  const dir = mkTempDir();
+  const scriptPath = writeEchoExecutor(dir);
+  const cfg = baseConfig([scriptPath, '{prompt}']);
+  const mainRepo = mkTempGitRepo(); // opts.fgosDir points here
+  const workerRepo = mkTempGitRepo(); // cwd points here -- the "dispatch worktree"
+  // see the resolveExecutorCommand attestRoot test above for why this
+  // extra commit matters: two independently created mkTempGitRepo()
+  // fixtures can legitimately hash to the same HEAD commit.
+  fs.writeFileSync(path.join(workerRepo.repoRoot, 'second.txt'), 'second\n');
+  execFileSync('git', ['add', 'second.txt'], { cwd: workerRepo.repoRoot });
+  execFileSync('git', ['commit', '-q', '-m', 'second'], { cwd: workerRepo.repoRoot });
+  workerRepo.headCommit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: workerRepo.repoRoot, encoding: 'utf8' }).trim();
+
+  const result = await spawnWorker(sampleWork(), cfg, workerRepo.repoRoot, { fgosDir: mainRepo.fgosDir });
+
+  assert.equal(result.baseCommit, workerRepo.headCommit, 'must attest the cwd it actually ran in, never opts.fgosDir\'s own root');
+  assert.notEqual(result.baseCommit, mainRepo.headCommit);
+  assert.equal(result.headRef, 'main');
+  fs.rmSync(mainRepo.repoRoot, { recursive: true, force: true });
+  fs.rmSync(workerRepo.repoRoot, { recursive: true, force: true });
+});
+
 test('spawnWorker threads opts.fgosDir into a kind:"cli" capacity\'s presence check end-to-end, resolving through fgos tool query', async () => {
   const dir = mkTempDir();
   const fgosDir = mkTempDir();
   initStore(fgosDir);
-  registerTool(fgosDir, { name: 'fgos-executing', kind: 'cli', capability: 'coding', command: 'agy' });
-  writeLocalStatus(fgosDir, { 'fgos-executing': { status: 'present', checkedAt: new Date().toISOString() } });
+  registerTool(fgosDir, { name: 'fgos-code-implement', kind: 'cli', capability: 'coding', command: 'agy' });
+  writeLocalStatus(fgosDir, { 'fgos-code-implement': { status: 'present', checkedAt: new Date().toISOString() } });
   const scriptPath = writeEchoExecutor(dir);
   const cfg = {
     executor: { command: process.execPath, args: [scriptPath, '{prompt}'] },
-    capacities: { 'fgos-executing': { kind: 'cli', tier: 'standard', allowCrossProvider: true } },
+    capacities: { 'fgos-code-implement': { kind: 'cli', tier: 'standard', allowCrossProvider: true } },
     models: { standard: 'sonnet' },
     timeoutMs: 5000,
   };
 
   const result = await spawnWorker(sampleWork(), cfg, mkTempDir(), { fgosDir });
-  assert.equal(result.capacityId, 'fgos-executing');
+  assert.equal(result.capacityId, 'fgos-code-implement');
 
   const cfgUnregistered = {
     executor: { command: process.execPath, args: [scriptPath, '{prompt}'] },
-    capacities: { 'fgos-executing': { kind: 'cli', target: 'not-registered' } },
+    capacities: { 'fgos-code-implement': { kind: 'cli', target: 'not-registered' } },
     models: { standard: 'sonnet' },
     timeoutMs: 5000,
   };
@@ -1672,12 +1781,12 @@ test('spawnWorker surfaces a non-zero exit status without throwing (goal-check i
 test('resolveExecutorCommand throws when a kind:"cli" capacity resolves to a non-Claude command with no allowCrossProvider', () => {
   const cfg = {
     executor: { command: 'claude', args: ['{prompt}'] },
-    capacities: { 'fgos-executing': { kind: 'cli', command: 'agy', args: ['{prompt}'] } },
+    capacities: { 'fgos-code-implement': { kind: 'cli', command: 'agy', args: ['{prompt}'] } },
     models: { standard: 'sonnet' },
     timeoutMs: 5000,
   };
   assert.throws(
-    () => resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', capacityId: 'fgos-executing' }),
+    () => resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', capacityId: 'fgos-code-implement' }),
     RunnerConfigError,
   );
 });
@@ -1685,11 +1794,11 @@ test('resolveExecutorCommand throws when a kind:"cli" capacity resolves to a non
 test('resolveExecutorCommand dispatches normally when the same non-Claude capacity sets allowCrossProvider: true', () => {
   const cfg = {
     executor: { command: 'claude', args: ['{prompt}'] },
-    capacities: { 'fgos-executing': { kind: 'cli', command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
+    capacities: { 'fgos-code-implement': { kind: 'cli', command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
     models: { standard: 'sonnet' },
     timeoutMs: 5000,
   };
-  const resolved = resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', capacityId: 'fgos-executing' });
+  const resolved = resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', capacityId: 'fgos-code-implement' });
   assert.equal(resolved.command, 'agy');
 });
 
@@ -1699,22 +1808,22 @@ test('resolveExecutorCommand never requires allowCrossProvider for a kind:"cli" 
   // allowCrossProvider when the final resolved command is Claude's own.
   const cfg = {
     executor: { command: 'claude', args: ['{prompt}'] },
-    capacities: { 'fgos-executing': { kind: 'cli' } },
+    capacities: { 'fgos-code-implement': { kind: 'cli' } },
     models: { standard: 'sonnet' },
     timeoutMs: 5000,
   };
-  const resolved = resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', capacityId: 'fgos-executing' });
+  const resolved = resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', capacityId: 'fgos-code-implement' });
   assert.equal(resolved.command, 'claude');
 });
 
 test('resolveExecutorCommand never requires allowCrossProvider for a kind:"cli" capacity that resolves to Claude\'s own CLI', () => {
   const cfg = {
     executor: { command: 'claude', args: ['{prompt}'] },
-    capacities: { 'fgos-executing': { kind: 'cli', command: 'claude', args: ['{prompt}'] } },
+    capacities: { 'fgos-code-implement': { kind: 'cli', command: 'claude', args: ['{prompt}'] } },
     models: { standard: 'sonnet' },
     timeoutMs: 5000,
   };
-  const resolved = resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', capacityId: 'fgos-executing' });
+  const resolved = resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', capacityId: 'fgos-code-implement' });
   assert.equal(resolved.command, 'claude');
 });
 
@@ -1743,17 +1852,17 @@ test('resolveExecutorCommand with no capacities block at all never triggers cros
 test('resolveExecutorCommand throws for a non-Claude "cli" capacity even when fgosDir is given and the D6 registration/presence check already passed', () => {
   const dir = mkTempDir();
   initStore(dir);
-  registerTool(dir, { name: 'fgos-executing', kind: 'cli', capability: 'coding', command: 'agy' });
-  writeLocalStatus(dir, { 'fgos-executing': { status: 'present', checkedAt: new Date().toISOString() } });
+  registerTool(dir, { name: 'fgos-code-implement', kind: 'cli', capability: 'coding', command: 'agy' });
+  writeLocalStatus(dir, { 'fgos-code-implement': { status: 'present', checkedAt: new Date().toISOString() } });
   const cfg = {
     executor: { command: 'claude', args: ['{prompt}'] },
-    capacities: { 'fgos-executing': { kind: 'cli', command: 'agy', args: ['{prompt}'] } },
+    capacities: { 'fgos-code-implement': { kind: 'cli', command: 'agy', args: ['{prompt}'] } },
     models: { standard: 'sonnet' },
     timeoutMs: 5000,
   };
   assert.throws(
     () =>
-      resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', capacityId: 'fgos-executing', fgosDir: dir }),
+      resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', capacityId: 'fgos-code-implement', fgosDir: dir }),
     RunnerConfigError,
   );
 });

@@ -212,8 +212,26 @@ test('foldEvents folds an ask-then-answer work.move pair into one gates[id]={ask
     },
   ];
   const view = foldEvents(events);
-  assert.deepEqual(view.gates.a, { ask: 'OAuth or password?', answer: 'OAuth' });
+  // askHistory (tsk-25g D1): additive alongside `ask`'s own unchanged
+  // single-slot overwrite -- see the dedicated accumulation test below.
+  assert.deepEqual(view.gates.a, { ask: 'OAuth or password?', answer: 'OAuth', askHistory: ['OAuth or password?'] });
   assert.equal(view.work.a.status, 'todo');
+});
+
+test('foldEvents accumulates every fresh ask into gates[id].askHistory, while gates[id].ask keeps overwriting as before (tsk-25g D1)', () => {
+  const events = [
+    { seq: 1, ts: '2026-07-15T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo' } },
+    { seq: 2, ts: '2026-07-15T00:00:01.000Z', type: 'work.move', payload: { id: 'a', from: 'todo', to: 'awaiting-human', ask: 'Round 1 rejection' } },
+    { seq: 3, ts: '2026-07-15T00:00:02.000Z', type: 'work.move', payload: { id: 'a', from: 'awaiting-human', to: 'todo', answer: 'Retry 1' } },
+    { seq: 4, ts: '2026-07-15T00:00:03.000Z', type: 'work.move', payload: { id: 'a', from: 'todo', to: 'awaiting-human', ask: 'Round 2 rejection' } },
+    { seq: 5, ts: '2026-07-15T00:00:04.000Z', type: 'work.move', payload: { id: 'a', from: 'awaiting-human', to: 'todo', answer: 'Retry 2' } },
+    { seq: 6, ts: '2026-07-15T00:00:05.000Z', type: 'work.move', payload: { id: 'a', from: 'todo', to: 'awaiting-human', ask: 'Round 3 rejection' } },
+  ];
+  const view = foldEvents(events);
+  // ask itself: still the single most-recent value, unchanged behavior.
+  assert.equal(view.gates.a.ask, 'Round 3 rejection');
+  // askHistory: every fresh ask accumulated in order, answers never add.
+  assert.deepEqual(view.gates.a.askHistory, ['Round 1 rejection', 'Round 2 rejection', 'Round 3 rejection']);
 });
 
 test('foldEvents on a log with no gate (ask/answer) events yields a view with no "gates" key', () => {
@@ -483,7 +501,7 @@ test('foldEvents does not fold claimRole/headAtTake on a non-doing move even whe
 });
 
 // claim-lock §5.1/§7: a resume out of awaiting-human onto `doing` (the new
-// fsm.mjs edge) is NOT a fresh claim — it must never clobber the
+// status-fsm.mjs edge) is NOT a fresh claim — it must never clobber the
 // claimRole/headAtTake/branchHeadAtTake/claimTrigger the ORIGINAL pick/take
 // already folded, no matter what `role` the answer itself carries.
 test('foldEvents does not re-fold claimRole/headAtTake/claimTrigger on an awaiting-human -> doing resume (answer never overwrites the original claim)', () => {

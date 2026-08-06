@@ -29,6 +29,24 @@ never moves it.
   cwd may already be a linked worktree, which never carries its own
   `.fgos/` by design (ADR0020) — the verb refuses (exit 4) rather than
   silently diverge if `--dir` is omitted there (tsk-56t D1).
+- Do your own scout/reasoning steps directly — Bash/Grep/`rg`/Read/
+  WebSearch calls you make yourself — never delegate them to the Agent/
+  Task tool as an ad hoc sub-dispatch. This session is already a live,
+  same-provider soul (Native-First Dispatch Doctrine rule 2,
+  `docs/decisions/0026-vision-orchestrator-roottask-capacity-native-vs-
+  cli-spawn.md`): spawning a nested Task subagent for work you can already
+  do yourself is the same "soul re-deriving what a live soul already
+  knows" waste `tsk-1ni` found in `judgeDiscovery`'s blind cli-spawn, just
+  manifesting as an in-session Task call instead of a subprocess one — the
+  work was already yours to do, so doing it again one layer down through
+  a spawned subagent is pure overhead, not a transparency question (a
+  Task/Agent call is collapsed by default in the transcript, not hidden —
+  a person can still expand it to inspect the subagent's own trace, unlike
+  a genuinely opaque headless `claude -p` subprocess). If a step
+  genuinely needs a different backend (cheaper model, cross-provider such
+  as Codex/agy, resource isolation) for a narrow helper task, route it
+  explicitly through the capacity-dispatch mechanism instead of an ad hoc
+  Task call — see `../_shared/capacity-dispatch-fallback.md`.
 - Do not research implementation, propose architecture, or write code. If a
   candidate question only matters to whoever builds the thing, it belongs to
   `fgos-planning`, not here.
@@ -52,7 +70,7 @@ never moves it.
   back to `todo` once the item reaches `executing` (claim-lock §3b); an
   uncommitted `CONTEXT.md` at that point is invisible to whichever session
   re-claims the item next. Same one-artifact-per-stop discipline
-  `fgos-executing`'s "one commit per item" rule already gives Execute.
+  `fgos-code-implement`'s "one commit per item" rule already gives Execute.
 
 ## Flow
 
@@ -77,12 +95,15 @@ never moves it.
    ```
 
    Also query `CLAUDE.md`'s impact-analysis capability gate — the same
-   check `fgos-planning`/`fgos-validating`/`fgos-executing` already run
+   check `fgos-planning`/`fgos-validating`/`fgos-code-implement` already run
    (`fgos tool query --capability impact-analysis --status present`) —
-   rather than assuming GitNexus is on this machine, since this is the only
-   clarify-stage session with real tool access (`judgeDiscovery` itself has
-   none: `src/runner/dispatch.mjs:207-220`'s `--allowedTools` permits only
-   `git add`/`git commit`). The `tool` sub-verb `query` is also
+   rather than assuming GitNexus is on this machine — `judgeDiscovery`'s own
+   `capacities.judge-discovery` config (`.fgos/config.json`, tsk-4rd upgrade)
+   now grants it `Task,WebSearch,WebFetch,Read,Bash(rg:*)` too, wider than
+   `src/runner/dispatch.mjs`'s bare `git add`/`git commit` default, but that
+   grant belongs to a separate subprocess call with its own posture read —
+   this session's own gate query here never inherits it, so check fresh
+   regardless. The `tool` sub-verb `query` is also
    `requiresExistingStore: true` (`src/cli/command-registry.mjs:750`), so
    run it with `--dir` explicitly the same as every other bare verb this
    skill calls:
@@ -172,13 +193,23 @@ never moves it.
    one at creation time —
 
    ```bash
-   fgos add "<title>" --docs-ref "docs/history/<feature>/"
+   root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
+   fgos add --title "<title>" --kind <kind> --risk <risk> --verify "<real, runnable command>" --docs-ref "docs/history/<feature>/" --dir "$root"
    ```
 
-   — this is the item's existing pointer field, not a new one; the doc
-   itself is what's git-versioned, the field only points at its directory.
-   An item created earlier without `docsRef` is unaffected — the field is
-   optional, and this skill does not need every item to already carry it.
+   (no positional argument — `fgos add`'s positional/`--id` is the item's
+   own id, not its title; omitting `--id` entirely auto-generates a
+   collision-free one from `--title`. tsk-59a: an earlier version of this
+   example passed the title positionally and omitted the other required
+   fields, which `fgos add` rejects outright — same class of bug found
+   and fixed in `fgos-planning`'s own split-step example, never grepped
+   for elsewhere until now.)
+
+   — `--docs-ref` is the item's existing pointer field, not a new one; the
+   doc itself is what's git-versioned, the field only points at its
+   directory. An item created earlier without `docsRef` is unaffected —
+   the field is optional, and this skill does not need every item to
+   already carry it.
 
 4. **Hand off.** Locking decisions here never decides the item's next edge.
    Once CONTEXT.md is written and approved, it is the session's own

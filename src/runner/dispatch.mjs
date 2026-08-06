@@ -35,7 +35,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { spawn } from 'node:child_process';
+import { spawn, execFileSync } from 'node:child_process';
 import { DEFAULTS } from '../state/work.mjs';
 import { DOMAINS, resolveDomainName, skillForStage } from '../state/workflow-stage-graphs.mjs';
 import { selectTemplate, renderTemplate, hashTemplate } from './prompt-templates.mjs';
@@ -766,7 +766,58 @@ export function decideCapacityDispatchMechanism(cfg, capacityId, { hasLiveTaskAc
  * executor block's own `provider` display alias when present, else
  * `command` itself.
  */
-export function resolveExecutorCommand(cfg, { prompt, model, tier, capacityId, fgosDir } = {}) {
+/**
+ * Worktree-dispatch attestation (tsk-2ig, D1/D3 of docs/history/parallel-
+ * decomposition-footprint-avoidance/CONTEXT.md — mức 1, advisory-only):
+ * chụp `baseCommit`/`headRef` NGAY TRƯỚC khi dispatch — captured by the
+ * orchestrator itself, never trusted from whatever the dispatched executor
+ * later reports.
+ *
+ * `attestRoot`, when given, is read instead of `fgosDir`'s own root
+ * (tsk-4hl fix, independent review after tsk-2ig merged): a worker
+ * dispatched via `spawnWorker` runs inside its OWN dispatch worktree
+ * (`fgw/<id>`, `loop.mjs`'s `wt.path`), a DIFFERENT checkout than
+ * `fgosDir`'s root (always the main checkout, ADR0020 — worktrees never
+ * carry their own `.fgos/`). Reading `fgosDir`'s root unconditionally used
+ * to attest the main checkout's HEAD regardless of which branch the
+ * worker actually dispatched on — correct only for a first-attempt ROOT
+ * item (whose dispatch branch happens to fork from main's then-current
+ * tip), wrong for a leaf (forks from `fgw/<rootId>`, not main) or a retry
+ * (the branch already carries the prior attempt's own commits).
+ * `spawnWorker` passes its own worktree `cwd` as `attestRoot`;
+ * `resolveCapacityCli` (task-dispatch, no worktree involved — genuinely
+ * runs against `fgosDir`'s own root) omits it, unchanged.
+ *
+ * Fail-safe either way: a git read that cannot resolve (detached checkout
+ * weirdness, no `.git`, etc.) never throws and never blocks dispatch —
+ * this is advisory metadata, not a precondition (same "advisory, không tự
+ * fail" stance `frozen-judge.mjs` already states for its own checks).
+ * Returns `{baseCommit, headRef}`, either field `null` when it could not
+ * be read.
+ */
+function captureDispatchAttestation(fgosDir, attestRoot) {
+  const repoRoot = attestRoot ?? (fgosDir ? path.dirname(fgosDir) : null);
+  if (!repoRoot) return { baseCommit: null, headRef: null };
+  const readGit = (args) => {
+    try {
+      return execFileSync('git', args, { cwd: repoRoot, encoding: 'utf8', shell: false, stdio: ['ignore', 'pipe', 'pipe'] }).trim();
+    } catch {
+      return null;
+    }
+  };
+  return {
+    baseCommit: readGit(['rev-parse', 'HEAD']),
+    headRef: readGit(['symbolic-ref', '--short', '-q', 'HEAD']), // null on detached HEAD, never a throw
+  };
+}
+
+export function resolveExecutorCommand(cfg, { prompt, model, tier, capacityId, fgosDir, attestRoot } = {}) {
+  // Captured BEFORE resolveExecutorConfig, not after (D3) — cheap and
+  // unconditional so the same call site works regardless of whether the
+  // resolved executor turns out to be same-provider or cross-provider;
+  // resolveExecutorConfig below is still the sole authority on which
+  // executor actually gets used.
+  const attestation = captureDispatchAttestation(fgosDir, attestRoot);
   const executor = resolveExecutorConfig(cfg, tier, capacityId, fgosDir);
   const adapter = executor.adapter ?? DEFAULT_ADAPTER;
   if (!(adapter in EXECUTOR_ADAPTERS)) {
@@ -780,7 +831,14 @@ export function resolveExecutorCommand(cfg, { prompt, model, tier, capacityId, f
     }
     return arg.split('{prompt}').join(prompt).split('{model}').join(model);
   });
-  return { command: executor.command, args, adapter, provider: executor.provider ?? executor.command };
+  return {
+    command: executor.command,
+    args,
+    adapter,
+    provider: executor.provider ?? executor.command,
+    baseCommit: attestation.baseCommit,
+    headRef: attestation.headRef,
+  };
 }
 
 /**
@@ -996,12 +1054,16 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
   const model = modelForTier(cfg, tier);
   const prompt = buildPrompt(work, opts.feedback);
   const capacityId = capacityIdForWork(work);
-  const { command, args, adapter, provider } = resolveExecutorCommand(cfg, {
+  const { command, args, adapter, provider, baseCommit, headRef } = resolveExecutorCommand(cfg, {
     prompt,
     model,
     tier,
     capacityId,
     fgosDir: opts.fgosDir,
+    // tsk-4hl: attest THIS worker's own dispatch worktree, never fgosDir's
+    // root (always the main checkout) — see captureDispatchAttestation's
+    // own docstring for why those two roots diverge on a leaf or a retry.
+    attestRoot: cwd,
   });
   const adapterFn = EXECUTOR_ADAPTERS[adapter];
   if (!adapterFn) {
@@ -1024,9 +1086,10 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
     tier,
     model,
   }).then(
-    // capacityId/provider (D7, tsk-62v): additive only — every field this
-    // function already returned stays exactly where it was.
-    (result) => ({ ...result, templateName, templateHash, capacityId, provider }),
+    // capacityId/provider (D7, tsk-62v)/baseCommit/headRef (tsk-4hl):
+    // additive only — every field this function already returned stays
+    // exactly where it was.
+    (result) => ({ ...result, templateName, templateHash, capacityId, provider, baseCommit, headRef }),
     (err) => {
       if (err instanceof DispatchError) {
         err.templateName = templateName;

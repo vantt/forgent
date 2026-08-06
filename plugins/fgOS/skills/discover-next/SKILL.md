@@ -73,7 +73,7 @@ CONTEXT.md` D2).
    (`docs/history/discover-decompose-skill-wrapper-verdict-routing/
    CONTEXT.md` D2, D6): without it, a `decompose`-stage pick that resolves
    `pass-through` would let the driving loop cascade straight into
-   `fgos-executing` — silently starting a real build from what this
+   `fgos-code-implement` — silently starting a real build from what this
    command is meant to be a single judgment step.
 
 5. **Report whatever `fgos-coding-driving` reported.** Relay its stop

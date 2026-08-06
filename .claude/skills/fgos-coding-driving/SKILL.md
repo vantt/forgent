@@ -48,15 +48,31 @@ asserted to generalize automatically to a domain that does not exist yet.
   (tsk-19j §3's own verified boundary — this is what lets a `ceiling:
   stage:decompose` loop stop with the item freshly landed AT `decompose`,
   never one stage further, having invoked `fgos-planning` first by mistake).
-- `status: awaiting-human` always stops the loop immediately, before any
+- The three person/system-shaped stops below are resolved through
+  `parkReasonForStatus(domain, status)` (`src/state/workflow-stage-graphs.mjs`,
+  tsk-3w3 follow-up), never a direct `status === 'awaiting-human'`-style
+  literal comparison — same "resolve through the registry, don't hardcode"
+  discipline `stageForStep`/`skillForStage` already use. `parkReason` is a
+  narrower table than `statusLabels`/`statusCategory`: `blocked` and
+  `awaiting-human` share one `statusCategory` (`in-progress`) but need
+  OPPOSITE handling here, which is exactly why this reads `parkReason`, not
+  `statusCategory` — reading the coarser table would erase the distinction
+  this loop needs. Today only `coding` declares real `parkReason` entries
+  (no other domain has ever been driven through this loop — D9/D10), so in
+  practice this still resolves to the same three literals below; the
+  indirection exists so a future domain could relabel them without silently
+  breaking this loop's own semantics.
+- `parkReasonForStatus(domain, status) == 'human-question'` (today: `status
+  == 'awaiting-human'`) always stops the loop immediately, before any
   ceiling check — the same "an item is only legitimately blocked on a
   person while sitting in `awaiting-human`" contract `fgos-routing`'s own
   gate section describes. Return the question to whoever called this skill;
   never guess an answer to keep looping.
-- `status: blocked` also always stops the loop immediately — a failed
-  verify or a rejected merge is a real stop, never something to loop past
-  silently.
-- **`status: awaiting-approval` also always stops the loop immediately**
+- `parkReasonForStatus(domain, status) == 'system-error'` (today: `status
+  == 'blocked'`) also always stops the loop immediately — a failed verify
+  or a rejected merge is a real stop, never something to loop past silently.
+- **`parkReasonForStatus(domain, status) == 'natural-finish'` (today:
+  `status == 'awaiting-approval'`) also always stops the loop immediately**
   (tsk-19j-4 — the safety gap an "unlimited" ceiling would otherwise hit on
   its very first real run): this is `fgos return`'s own natural finish
   line for the `executing`-stage skill, and there is no next stage-skill
@@ -99,24 +115,43 @@ asserted to generalize automatically to a domain that does not exist yet.
   `/fgOS:cook`'s existing hard rule "never claims before stage executing"
   into this skill, since it is now the one thing that decides when a
   stage-skill is about to run): immediately before invoking the skill this
-  loop resolved for stage `executing` (`fgos-executing` in the `coding`
+  loop resolved for stage `executing` (`fgos-code-implement` in the `coding`
   domain's registry today), check the item's live `status` from the SAME
   fresh read this iteration already did. If it is already `doing` (the
   caller — e.g. `/fgOS:pick`'s own step 2 — already claimed it, or a prior
   iteration of THIS loop already did), skip claiming and proceed straight
   to invoking the skill; the session is assumed to already be inside the
-  claimed worktree in that case. Otherwise, claim it now exactly the way
-  `/fgOS:pick`'s own step 2 does:
+  claimed worktree in that case (or, for a `worktreeBacked:false` domain,
+  already at the main checkout — see below). Otherwise, read
+  `domain.worktreeBacked` (`getDomain(domain).worktreeBacked`, the same
+  registry lookup this skill already uses for `skillForStage`, no new
+  field) and claim accordingly:
 
-  ```bash
-  root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
-  node "$root/bin/fgos.mjs" pick "<id>" --dir "$root"
-  ```
+  - `worktreeBacked === true` (today: `coding`) — claim exactly the way
+    `/fgOS:pick`'s own step 2 does:
 
-  then hand the session into the returned `data.worktree.path` the same
-  way `/fgOS:pick`'s own step 4 does (`EnterWorktree`, falling back to
-  printing the path and stopping if it is unavailable/refuses — never
-  fail or retry past that fallback) — only THEN invoke `fgos-executing`.
+    ```bash
+    root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
+    node "$root/bin/fgos.mjs" pick "<id>" --dir "$root"
+    ```
+
+    then hand the session into the returned `data.worktree.path` the same
+    way `/fgOS:pick`'s own step 4 does (`EnterWorktree`, falling back to
+    printing the path and stopping if it is unavailable/refuses — never
+    fail or retry past that fallback) — only THEN invoke `fgos-code-implement`.
+
+  - `worktreeBacked === false` — claim without a worktree, the same
+    stage-agnostic claim `fgos-routing` and 2 other skills already use
+    (`claimWork`'s `isolate:false` path, `claim-port.mjs:88`; `take --id`
+    already claims an item at any stage, `bin/fgos.mjs`'s `take` case):
+
+    ```bash
+    root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
+    node "$root/bin/fgos.mjs" take --role session --id "<id>" --dir "$root"
+    ```
+
+    never call `EnterWorktree` for this branch — invoke the
+    `executing`-stage skill directly at the current (main-checkout) cwd.
 - Every bare `fgos <verb>` this skill calls directly (`list`, to re-read
   state each iteration) is `requiresExistingStore: true` — resolve the main
   checkout root the same way every other stage-skill does and pass it
@@ -157,14 +192,15 @@ asserted to generalize automatically to a domain that does not exist yet.
 loop:
   read id's current {stage, status, domain} FRESH via `fgos list --id <id> --json`
   iterationStartStage, iterationStartStatus = stage, status   # for the no-progress check below
+  domain = getDomain(item.domain)   # resolve early — parkReasonForStatus below needs the object, not the name
 
-  if status == 'awaiting-human':
+  if parkReasonForStatus(domain, status) == 'human-question':
     stop. Report the parked question back to the caller. Never answer it here.
 
-  if status == 'blocked':
+  if parkReasonForStatus(domain, status) == 'system-error':
     stop. Report the block back to the caller. Never retry blind.
 
-  if status == 'awaiting-approval':
+  if parkReasonForStatus(domain, status) == 'natural-finish':
     stop. Report "returned, awaiting-approval" back to the caller. There is
     no next stage-skill past this point in this loop's reach.
 
@@ -175,7 +211,6 @@ loop:
     stop. Report every id in openChildren back to the caller. Do not
     invoke anything this turn — this item is anchored, not actionable.
 
-  domain = getDomain(item.domain)   # registry lookup, never guessed
   if ceiling is 'stage:<name>':
     if domain.stages.indexOf(stage ?? <domain's own Execute-mapped stage>) >= domain.stages.indexOf(name):
       stop. Report "reached ceiling at stage <stage>". Do not invoke anything this turn.
@@ -192,8 +227,12 @@ loop:
     caller's own next step (e.g. `fgos return`) already covers it.
 
   if skill resolves to the domain's `executing`-stage skill AND status != 'doing':
-    claim `id` (`fgos pick`) and enter its worktree BEFORE invoking — see
-    the claim hard rule above.
+    if domain.worktreeBacked:
+      claim `id` (`fgos pick`) and enter its worktree BEFORE invoking
+    else:
+      claim `id` (`fgos take --role session`), no worktree, invoke at the
+      main checkout
+    — see the claim hard rule above.
 
   invoke `skill` (it runs its own Socratic/shape/implement pass, hits its
   own gate, and — once satisfied — calls the engine verb that actually
@@ -231,12 +270,15 @@ for how each one actually calls this skill today).
 
 - resolving a stage's skill from anything other than the live
   `getDomain`/`skillForStage` registry lookup
+- comparing `status` against a literal (`status === 'blocked'`, etc.)
+  instead of resolving through `parkReasonForStatus(domain, status)`
 - applying a stage or status move directly instead of leaving it to the
   invoked stage-skill's own engine-verb call
 - checking the ceiling after invoking the current stage's skill instead of
   before
-- continuing to loop past `status: awaiting-human`, `status: blocked`, or
-  `status: awaiting-approval`
+- continuing to loop past `parkReasonForStatus == 'human-question'`,
+  `'system-error'`, or `'natural-finish'` (today's `awaiting-human`,
+  `blocked`, `awaiting-approval`)
 - treating `status:<name>` as a ranked comparison instead of an exact match
 - reusing a stage/status snapshot from a prior loop turn instead of
   re-reading fresh
@@ -249,6 +291,11 @@ for how each one actually calls this skill today).
   status already reads `doing`
 - asserting this loop generalizes to a domain other than `coding` without
   new evidence for that domain (D10)
+- reading the claim step's `worktreeBacked` branch, or the stop-condition
+  checks' `parkReasonForStatus` resolution, as if either were itself new
+  cross-domain evidence — both only read a per-domain field the registry
+  already carries; neither asserts this loop has been exercised against a
+  second domain; D10 still holds
 
 Violating the letter of the rules is violating the spirit of the rules.
 

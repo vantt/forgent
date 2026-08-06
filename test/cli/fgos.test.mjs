@@ -196,6 +196,142 @@ test('the same state verb with no --dir, from the same .fgos/-less worktree cwd,
   assert.ok(!fs.existsSync(path.join(wt, '.fgos')));
 });
 
+// tsk-3u2 (post-tsk-3c7 independent review): `schedule` was missing from
+// STORE_MISSING_WARNING_VERBS, so from a linked worktree with no `.fgos/`
+// it silently returned an empty-looking {waves:[],cycles:[]} instead of
+// this warning -- indistinguishable from "graph is genuinely clean" for
+// the exact context an agent normally runs it from.
+test('schedule from a .fgos/-less linked worktree with no --dir warns on stderr, same as conflicts (tsk-3u2 regression guard)', () => {
+  const { wt } = tmpLinkedWorktree();
+  const scheduleResult = run(wt, ['schedule']);
+  assert.equal(scheduleResult.status, 0, 'schedule is requiresExistingStore:false -- it warns, never refuses');
+  assert.match(scheduleResult.stderr, /\.fgos\/ not found/);
+  assert.deepEqual(envelopeData(scheduleResult.stdout), { waves: [], cycles: [] });
+
+  const conflictsResult = run(wt, ['conflicts']);
+  assert.match(conflictsResult.stderr, /\.fgos\/ not found/, 'schedule must warn under the exact same condition its sibling conflicts already does');
+});
+
+// tsk-3g5 (post-tsk-3u2 independent review): the same STORE_MISSING_
+// WARNING_VERBS gap found and fixed for `schedule`, found again in 3 more
+// requiresExistingStore:false verbs. `gate-bypass` is the sharpest
+// instance: unwarned, it reports a CONFIDENTLY WRONG safety-policy level
+// (the empty-store default "off") instead of an honestly-empty result --
+// the exact opposite of "looks safer than reality" a caller checking
+// bypass posture needs to be warned about.
+test('gate-bypass from a .fgos/-less linked worktree with no --dir warns on stderr and reports the empty-store default, never the real main-checkout level', () => {
+  const { main, wt } = tmpLinkedWorktree();
+  const mainResult = run(main, ['gate-bypass']);
+  assert.equal(mainResult.status, 0);
+
+  const wtResult = run(wt, ['gate-bypass']);
+  assert.equal(wtResult.status, 0, 'gate-bypass is requiresExistingStore:false -- it warns, never refuses');
+  assert.match(wtResult.stderr, /\.fgos\/ not found/);
+  assert.equal(envelopeData(wtResult.stdout).level, 'off', 'the .fgos/-less empty-store default, never silently trusted as the real policy');
+});
+
+test('doc-sources from a .fgos/-less linked worktree with no --dir warns on stderr instead of a silent count: 0', () => {
+  const { wt } = tmpLinkedWorktree();
+  const result = run(wt, ['doc-sources', 'docs/some-doc.md']);
+  assert.equal(result.status, 0, 'doc-sources is requiresExistingStore:false -- it warns, never refuses');
+  assert.match(result.stderr, /\.fgos\/ not found/);
+  assert.deepEqual(envelopeData(result.stdout), { docPath: 'docs/some-doc.md', count: 0, captures: [] });
+});
+
+test('lock-status from a .fgos/-less linked worktree with no --dir warns on stderr instead of a silent "free"', () => {
+  const { wt } = tmpLinkedWorktree();
+  const result = run(wt, ['lock-status']);
+  assert.equal(result.status, 0, 'lock-status is requiresExistingStore:false -- it warns, never refuses');
+  assert.match(result.stderr, /\.fgos\/ not found/);
+  assert.equal(envelopeData(result.stdout).outcome, 'free', 'the structurally-forced empty-store answer, never silently trusted as a real lock read');
+});
+
+// tsk-5iv D3 (round-3 review, MEDIUM): same STORE_MISSING_WARNING_VERBS gap
+// again, found in `evolve` -- `rankCandidates` over an empty-store view
+// silently returns `[]` instead of the real candidate list.
+test('evolve from a .fgos/-less linked worktree with no --dir warns on stderr instead of a silent []', () => {
+  const { wt } = tmpLinkedWorktree();
+  const result = run(wt, ['evolve']);
+  assert.equal(result.status, 0, 'evolve is requiresExistingStore:false -- it warns, never refuses');
+  assert.match(result.stderr, /\.fgos\/ not found/);
+  assert.deepEqual(envelopeData(result.stdout), [], 'the empty-store rankCandidates result, never silently trusted as "no real candidates exist"');
+});
+
+// tsk-5iv D3: docs-index was investigated for the same fix and found NOT
+// to belong in STORE_MISSING_WARNING_VERBS -- its docPath/title entries
+// come from a real docs/ scan under repoRoot, correct regardless of
+// .fgos/ presence, so a "may be empty" warning would be actively
+// misleading. Pins that this stays true: same docs/ content, same
+// worktree-vs-main answer.
+test('docs-index from a .fgos/-less linked worktree with no --dir gives the SAME real answer as from the main checkout, no warning (D3: correctly excluded)', () => {
+  const { main, wt } = tmpLinkedWorktree();
+  fs.mkdirSync(path.join(main, 'docs', 'how-to'), { recursive: true });
+  fs.writeFileSync(path.join(main, 'docs', 'how-to', 'example.md'), '# Example\n\nbody\n');
+  execFileSync('git', ['add', '-A'], { cwd: main });
+  execFileSync('git', ['commit', '-q', '-m', 'add doc'], { cwd: main });
+
+  const mainResult = run(main, ['docs-index']);
+  assert.equal(mainResult.status, 0);
+  assert.equal(mainResult.stderr, '', 'main checkout run must never warn');
+
+  const wtResult = run(wt, ['docs-index']);
+  assert.equal(wtResult.status, 0, 'docs-index is requiresExistingStore:false -- it never refuses');
+  assert.equal(wtResult.stderr, '', 'docs-index must never warn -- unlike gate-bypass/evolve, its answer is not distorted by a missing .fgos/');
+  assert.equal(
+    envelopeData(wtResult.stdout).length,
+    envelopeData(mainResult.stdout).length,
+    'the worktree and the main checkout must see the exact same doc count -- docs-index reads docs/ from disk, not from the store',
+  );
+});
+
+// tsk-5iv D1 (round-3 review, HIGH): main-checkout-reset's repoRoot =
+// path.dirname(dir), and dir defaults to a cwd-strict resolution (never
+// git-resolved) -- called with no --dir from a linked worktree, repoRoot
+// silently resolved to the WORKTREE, not the main checkout, while this
+// verb's own error text still said "main checkout, whole repo" and (with
+// --confirm) would run `git reset --hard` against that wrong tree.
+test('main-checkout-reset from a linked worktree with no --dir refuses before touching git (D1)', () => {
+  const { main, wt } = tmpLinkedWorktree();
+  const headBefore = gitHead(main);
+  const wtHeadBefore = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: wt, encoding: 'utf8' }).trim();
+
+  const result = run(wt, ['main-checkout-reset', '--sha', headBefore]);
+  assert.equal(result.status, 4, 'must be a clean validation refusal, never a crash or a silent reset');
+  assert.match(result.stderr, /main-checkout-reset: refusing to run without --dir/);
+  assert.match(result.stderr, /--dir <mainRoot>/);
+
+  assert.equal(gitHead(main), headBefore, 'the main checkout must be untouched');
+  assert.equal(
+    execFileSync('git', ['rev-parse', 'HEAD'], { cwd: wt, encoding: 'utf8' }).trim(),
+    wtHeadBefore,
+    'the worktree itself must also be untouched -- this is a refusal, not a redirected reset',
+  );
+});
+
+test('main-checkout-reset from a linked worktree WITH --dir <mainRoot> targets the real main checkout, exactly as if run from there directly', () => {
+  const { main, wt } = tmpLinkedWorktree();
+  commitFile(main, 'second.txt');
+  const targetSha = gitHead(main);
+  commitFile(main, 'third.txt');
+  assert.notEqual(gitHead(main), targetSha);
+
+  const result = run(wt, ['main-checkout-reset', '--sha', targetSha, '--dir', main]);
+  assert.equal(result.status, 0, `main-checkout-reset --dir unexpectedly failed: ${result.stderr}`);
+  assert.equal(gitHead(main), targetSha, 'the real main checkout must land on the requested sha');
+});
+
+test('main-checkout-reset from the main checkout itself, no --dir, still works exactly as before (no regression on the common case)', () => {
+  const cwd = initGitCwd();
+  commitFile(cwd, 'second.txt');
+  const targetSha = gitHead(cwd);
+  commitFile(cwd, 'third.txt');
+  assert.notEqual(gitHead(cwd), targetSha);
+
+  const result = run(cwd, ['main-checkout-reset', '--sha', targetSha]);
+  assert.equal(result.status, 0, `main-checkout-reset from the main checkout unexpectedly failed: ${result.stderr}`);
+  assert.equal(gitHead(cwd), targetSha);
+});
+
 test('--dir with no value (a bare trailing flag) is a clean validation error, exit 4, not a crash', () => {
   const { wt } = tmpLinkedWorktree();
   const result = run(wt, ['submit', 'title', '--dir']);
@@ -376,6 +512,22 @@ test('list --all restores the wontfix item alongside the open one', () => {
   assert.ok(work['closed-item']);
 });
 
+// tsk-48i D1: parkReason (parkReasonForStatus, workflow-stage-graphs.mjs)
+// stamped at write time, mirroring statusCategory's own precedent -- lets
+// a domain-agnostic consumer of `list --json` (e.g. herdr-plugin) tell a
+// park state apart from active work without reading coding's own literal
+// status strings.
+test('list --json exposes parkReason on a blocked item, and omits it on a doing item', () => {
+  const cwd = tmpCwd();
+  const dir = path.join(cwd, '.fgos');
+  addWork(dir, { id: 'parked-item', title: 'Parked Item', kind: 'task', status: 'blocked', deps: [], risk: 'low', refs: [], verify: 'npm test' });
+  addWork(dir, { id: 'active-item', title: 'Active Item', kind: 'task', status: 'doing', deps: [], risk: 'low', refs: [], verify: 'npm test' });
+
+  const work = envelopeData(run(cwd, ['list', '--all', '--json']).stdout).work;
+  assert.equal(work['parked-item'].parkReason, 'system-error');
+  assert.equal(work['active-item'].parkReason, undefined);
+});
+
 test('list --id returns only that item, ignoring the open-only default and --all entirely (tsk-42m D2)', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'open-item', { title: 'Open Item' });
@@ -500,6 +652,28 @@ test('setup inside a .fgos/-less linked worktree still succeeds (setup never tou
   assert.ok(!fs.existsSync(path.join(wt, '.fgos')));
   const result = run(wt, ['setup'], { HOME: rawTmpCwd() });
   assert.equal(result.status, 0, `setup unexpectedly refused: ${result.stderr}`);
+});
+
+// tsk-5hi: setup now also runs every registered fix (`runFixes()`, the same
+// call `doctor --fix` already makes) instead of leaving a person to
+// separately discover and run `doctor --fix`. FGOS_CLAUDE_COMMAND points at
+// a nonexistent binary — same seam test/setup/plugin-marketplace-doctor-
+// check.test.mjs already proves for the identical fix function — so this
+// never shells out to a real `claude` CLI.
+test('setup runs every registered fix and reports them under "fixed", never touching a real claude binary', () => {
+  const cwd = rawTmpCwd();
+  const result = run(cwd, ['setup'], {
+    HOME: rawTmpCwd(),
+    FGOS_CLAUDE_COMMAND: '/nonexistent/fgos-test-claude-binary',
+  });
+  assert.equal(result.status, 0, `setup unexpectedly failed: ${result.stderr}`);
+  const data = envelopeData(result.stdout);
+  assert.ok(Array.isArray(data.fixed), 'setup result missing a "fixed" array');
+  const byId = Object.fromEntries(data.fixed.map((entry) => [entry.id, entry]));
+  assert.ok('gate-bypass-configured' in byId, 'setup did not run the gate-bypass-configured fix');
+  assert.ok('claude-plugin-marketplace' in byId, 'setup did not run the claude-plugin-marketplace fix');
+  assert.equal(byId['claude-plugin-marketplace'].changed, false);
+  assert.match(byId['claude-plugin-marketplace'].message, /not found on PATH/);
 });
 
 test('add creates exactly one work.add event and the view reflects the new item, exit 0', () => {
@@ -1295,6 +1469,146 @@ test('add with a bare --targets (no value) also parses to [], exit 0', () => {
   const result = run(cwd, ['add', 'bare-targets-item', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--targets']);
   assert.equal(result.status, 0);
   assert.deepEqual(stateView(cwd).work['bare-targets-item'].targets, []);
+});
+
+// --- tsk-580: `edit --verify-from-children`/`--verify-from-targets` ---
+// docs/history/tsk-580/CONTEXT.md (D1-D3) + plan.md's feasibility matrix:
+// auto-generate the item's own `verify` as a resolved-status jq check
+// against its direct children (`parent`-tree) or its `targets`
+// (goalTier), instead of the two close-out how-to docs' hand-written jq.
+
+// A real git worktree wrapping a real fgOS store at the main checkout --
+// proves the `--dir` baked into a generated command resolves to the MAIN
+// checkout even when `fgos edit` itself runs from inside a linked
+// worktree, the exact scenario `resolveRepoRoot`'s `git rev-parse
+// --show-toplevel` gets wrong (it would return the worktree's own path
+// instead) -- see CONTEXT.md's corrected scout note.
+function initGitCwdWithWorktree() {
+  const cwd = initGitCwd();
+  const worktreePath = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-wt-'));
+  fs.rmSync(worktreePath, { recursive: true, force: true });
+  execFileSync('git', ['worktree', 'add', '-b', `wt-${path.basename(worktreePath)}`, worktreePath], { cwd });
+  return { cwd, worktreePath };
+}
+
+// tsk-1ia: the `--verify-from-*` generated command bakes in `node
+// <repo-root>/bin/fgos.mjs` (same assumption the pre-existing close-out
+// how-to docs' own hand-written examples already make) -- true for this
+// repo's own dogfooded checkout, but not for a throwaway git repo created
+// only as a disposable fgOS data store. Symlinking `bin`/`src` from the
+// REAL repo this test file itself lives in lets a generated verify
+// command actually be executed end-to-end against a throwaway fixture,
+// without that unrelated, pre-existing repo-root/bin-path assumption
+// (out of scope for this item -- tracked separately under distribution-
+// vision.md's "aware 3 context" milestone) getting in the way.
+const REAL_REPO_ROOT = path.resolve(__dirname, '../..');
+function linkFgosBinInto(cwd) {
+  fs.symlinkSync(path.join(REAL_REPO_ROOT, 'bin'), path.join(cwd, 'bin'), 'dir');
+  fs.symlinkSync(path.join(REAL_REPO_ROOT, 'src'), path.join(cwd, 'src'), 'dir');
+}
+
+test('edit --verify-from-children generates a jq command listing all direct children ids with the resolved-set check and an absolute --dir, exit 0', () => {
+  const { cwd, worktreePath } = initGitCwdWithWorktree();
+  assert.equal(run(cwd, ['add', 'parent-x', '--title', 'Parent', '--kind', 'task', '--risk', 'low', '--verify', 'x']).status, 0);
+  assert.equal(run(cwd, ['add', 'child-1', '--title', 'Child 1', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--parent', 'parent-x']).status, 0);
+  assert.equal(run(cwd, ['add', 'child-2', '--title', 'Child 2', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--parent', 'parent-x']).status, 0);
+  // child-1 already resolved (delivered, not yet cleanup/done) -- the
+  // resolved-set default (D3) must still count it, unlike a strict-done check.
+  assert.equal(run(cwd, ['move', 'child-1', '--to', 'doing']).status, 0);
+  assert.equal(run(cwd, ['move', 'child-1', '--to', 'delivered']).status, 0);
+
+  // Run the edit itself with process cwd INSIDE the linked worktree, while
+  // --dir still points at the main checkout's real fgOS store -- the exact
+  // split real usage has (implementation happens inside a worktree, but
+  // .fgos/ only ever lives at the main checkout, ADR0020).
+  const result = run(worktreePath, ['edit', 'parent-x', '--verify-from-children', '--dir', cwd]);
+  assert.equal(result.status, 0);
+  const verify = stateView(cwd).work['parent-x'].verify;
+  assert.match(verify, /child-1/);
+  assert.match(verify, /child-2/);
+  assert.match(verify, /delivered/);
+  assert.match(verify, /retrospective/);
+  assert.match(verify, /cleanup/);
+  assert.match(verify, /"done"/);
+  assert.ok(verify.includes(`--dir ${cwd}`), `expected --dir "${cwd}" (main checkout, not the worktree) in: ${verify}`);
+  assert.ok(!verify.includes(worktreePath), `verify must not bake in the worktree's own path: ${verify}`);
+});
+
+test('edit --verify-from-targets generates a jq command listing all target ids with the resolved-set check and an absolute --dir, exit 0', () => {
+  const { cwd, worktreePath } = initGitCwdWithWorktree();
+  assert.equal(run(cwd, ['add', 'target-1', '--title', 'Target 1', '--kind', 'task', '--risk', 'low', '--verify', 'x']).status, 0);
+  assert.equal(run(cwd, ['add', 'mvp-x', '--title', 'MVP', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--goal-tier', 'mvp', '--targets', 'target-1']).status, 0);
+
+  const result = run(worktreePath, ['edit', 'mvp-x', '--verify-from-targets', '--dir', cwd]);
+  assert.equal(result.status, 0);
+  const verify = stateView(cwd).work['mvp-x'].verify;
+  assert.match(verify, /target-1/);
+  assert.match(verify, /delivered/);
+  assert.ok(verify.includes(`--dir ${cwd}`), `expected --dir "${cwd}" (main checkout, not the worktree) in: ${verify}`);
+});
+
+// tsk-1ia: the two tests above only assert the generated command's STRING
+// content (contains the right ids/keywords) -- they never actually RAN the
+// jq expression, which is exactly how tsk-580's own real bug (`all([...] |
+// index(.) != null)` always evaluating true, since `.` inside `index(.)`
+// rebinds to the literal array, not the per-element status) rode into
+// `main` unnoticed. These two tests close that gap by spawning the
+// generated `verify` command for real against a genuinely-resolved and a
+// genuinely-unresolved fixture, and asserting the real exit code.
+test("edit --verify-from-children's generated jq expression correctly returns true when all children are resolved (actually running it, not just checking its text)", () => {
+  const { cwd, worktreePath } = initGitCwdWithWorktree();
+  assert.equal(run(cwd, ['add', 'parent-all-resolved', '--title', 'Parent', '--kind', 'task', '--risk', 'low', '--verify', 'x']).status, 0);
+  assert.equal(run(cwd, ['add', 'child-r1', '--title', 'Child 1', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--parent', 'parent-all-resolved']).status, 0);
+  assert.equal(run(cwd, ['add', 'child-r2', '--title', 'Child 2', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--parent', 'parent-all-resolved']).status, 0);
+  // child-r1 delivered, child-r2 cleanup -- both resolved-set, neither strict-done.
+  assert.equal(run(cwd, ['move', 'child-r1', '--to', 'doing']).status, 0);
+  assert.equal(run(cwd, ['move', 'child-r1', '--to', 'delivered']).status, 0);
+  assert.equal(run(cwd, ['move', 'child-r2', '--to', 'doing']).status, 0);
+  assert.equal(run(cwd, ['move', 'child-r2', '--to', 'delivered']).status, 0);
+  assert.equal(run(cwd, ['move', 'child-r2', '--to', 'retrospective']).status, 0);
+  assert.equal(run(cwd, ['move', 'child-r2', '--to', 'cleanup']).status, 0);
+  linkFgosBinInto(cwd);
+
+  assert.equal(run(worktreePath, ['edit', 'parent-all-resolved', '--verify-from-children', '--dir', cwd]).status, 0);
+  const verify = stateView(cwd).work['parent-all-resolved'].verify;
+  const executed = spawnSync(verify, { cwd, shell: true, encoding: 'utf8' });
+  assert.equal(executed.status, 0, `expected the generated verify to PASS when every child is resolved; got status ${executed.status}, stderr: ${executed.stderr}`);
+});
+
+test("edit --verify-from-children's generated jq expression correctly returns false when not all children are resolved (actually running it, not just checking its text)", () => {
+  const { cwd, worktreePath } = initGitCwdWithWorktree();
+  assert.equal(run(cwd, ['add', 'parent-partial', '--title', 'Parent', '--kind', 'task', '--risk', 'low', '--verify', 'x']).status, 0);
+  assert.equal(run(cwd, ['add', 'child-p1', '--title', 'Child 1', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--parent', 'parent-partial']).status, 0);
+  assert.equal(run(cwd, ['add', 'child-p2', '--title', 'Child 2', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--parent', 'parent-partial']).status, 0);
+  // child-p1 resolved (delivered); child-p2 stays at todo -- NOT resolved.
+  assert.equal(run(cwd, ['move', 'child-p1', '--to', 'doing']).status, 0);
+  assert.equal(run(cwd, ['move', 'child-p1', '--to', 'delivered']).status, 0);
+  linkFgosBinInto(cwd);
+
+  assert.equal(run(worktreePath, ['edit', 'parent-partial', '--verify-from-children', '--dir', cwd]).status, 0);
+  const verify = stateView(cwd).work['parent-partial'].verify;
+  const executed = spawnSync(verify, { cwd, shell: true, encoding: 'utf8' });
+  assert.notEqual(executed.status, 0, 'expected the generated verify to FAIL when a child is still todo (not resolved) -- a status 0 here reproduces tsk-580\'s own vacuous-pass bug');
+});
+
+test('edit --verify-from-children with no children found throws a validation error instead of writing a vacuous verify, exit 4', () => {
+  const cwd = tmpCwd();
+  assert.equal(addOk(cwd, 'lonely-parent').status, 0);
+  const before = stateView(cwd).work['lonely-parent'].verify;
+  const result = run(cwd, ['edit', 'lonely-parent', '--verify-from-children']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /no children|no item has parent/i);
+  assert.equal(stateView(cwd).work['lonely-parent'].verify, before, 'a failed guard must never write patch.verify');
+});
+
+test('edit --verify-from-targets with empty targets throws a validation error instead of writing a vacuous verify, exit 4', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['add', 'targetless-mvp', '--title', 'MVP', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--goal-tier', 'mvp']).status, 0);
+  const before = stateView(cwd).work['targetless-mvp'].verify;
+  const result = run(cwd, ['edit', 'targetless-mvp', '--verify-from-targets']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /no targets/i);
+  assert.equal(stateView(cwd).work['targetless-mvp'].verify, before, 'a failed guard must never write patch.verify');
 });
 
 // --- str67-goal-directed-planning D3/D4/D6/D7: `fgos goal set|show` CLI verb ---
@@ -2246,6 +2560,25 @@ test('check nags items sitting in a final status without their actual half (port
   assert.equal(result.status, 0);
   const { missingOutcomeNag } = envelopeData(result.stdout);
   assert.deepEqual(missingOutcomeNag, { count: 1, ids: ['nag-item'] });
+});
+
+// tsk-38t-4 (decision record 0027's audit §2): bin/fgos.mjs's FINAL_STATUSES
+// used to be a locally-declared Set here, separate from and inconsistent
+// with entropy.mjs's own local copy. It now imports the single shared
+// export from entropy.mjs instead — this test locks that a tail-segment
+// status (delivered, reached via the mechanical move chain, not the normal
+// doing->awaiting-approval addOutcome stamp) still nags, unchanged by the
+// refactor from a local Set to a shared import.
+test('check still nags an item sitting at "delivered" (a tail-segment status) without its actual half, after the FINAL_STATUSES local-Set-to-shared-import refactor', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'nag-item-delivered');
+  toProposed(cwd, 'nag-item-delivered');
+  run(cwd, ['move', 'nag-item-delivered', '--to', 'delivered']);
+
+  const result = run(cwd, ['check']);
+  assert.equal(result.status, 0);
+  const { missingOutcomeNag } = envelopeData(result.stdout);
+  assert.deepEqual(missingOutcomeNag, { count: 1, ids: ['nag-item-delivered'] });
 });
 
 test('check output on a log with no friction and no final-status gaps is unchanged — no friction data, no nag', () => {
@@ -3911,6 +4244,133 @@ test('return: a changed sensitive file DECLARED in the item\'s footprint is not 
   assert.deepEqual(data.frozenJudgeHits, []);
 });
 
+// --- tsk-4hl (post-tsk-2ig independent review): footprintDiffHits wired
+// into `return` next to frozenJudgeHits -- broader (any changed file
+// outside footprint, not just the narrow sensitive-pattern set) and
+// exempt when no footprint is declared at all (D5). ---
+
+test('return: a changed file outside the item\'s footprint surfaces a footprintDiffHits advisory even when it matches no frozenJudgeHits pattern, never blocks (tsk-4hl)', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  assert.equal(run(cwd, ['add', 'pull-return-footprint-diff', '--title', 'X', '--kind', 'task', '--risk', 'low', '--verify', 'test -f proof.txt', '--footprint', 'proof.txt']).status, 0);
+  assert.equal(run(cwd, ['take', '--id', 'pull-return-footprint-diff']).status, 0);
+  commitFile(cwd, 'proof.txt');
+  commitFile(cwd, 'random-outside.txt', 'not sensitive\n');
+
+  const result = run(cwd, ['return', 'pull-return-footprint-diff']);
+  assert.equal(result.status, 0, `return failed: ${result.stderr}`);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.passed, true, 'the footprint-diff advisory never fails the return itself');
+  assert.deepEqual(data.frozenJudgeHits, [], 'random-outside.txt matches no sensitive pattern, so the narrow frozenJudgeHits stays clean');
+  // Not a strict deepEqual on the whole array: `git add -A` also sweeps in
+  // whatever real .fgos/* deltas `take` itself produced since the last
+  // commit (events.jsonl, coexistence.json) -- genuinely outside the
+  // declared footprint too, so footprintDiffHits is CORRECT to flag them;
+  // this test only asserts the one file it actually cares about is there.
+  assert.ok(data.footprintDiffHits.some((hit) => hit.file === 'random-outside.txt'));
+});
+
+test('return: footprintDiffHits is empty when the item declares NO footprint at all (D5 absent-footprint exemption, same as footprintDiffHits\' own unit tests)', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  addOk(cwd, 'pull-return-no-footprint', { verify: 'test -f proof.txt' });
+  assert.equal(run(cwd, ['take', '--id', 'pull-return-no-footprint']).status, 0);
+  commitFile(cwd, 'proof.txt');
+  commitFile(cwd, 'anything.txt', 'x\n');
+
+  const result = run(cwd, ['return', 'pull-return-no-footprint']);
+  assert.equal(result.status, 0, `return failed: ${result.stderr}`);
+  assert.deepEqual(envelopeData(result.stdout).footprintDiffHits, []);
+});
+
+test('return: a .fgos/* change bundled into the item\'s own commit (git add -A sweeping in take\'s own event-log write) is exempt from footprintDiffHits (tsk-x5r self-exempt)', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  // tsk-5iv D2: commit the store's own bootstrap files (config.json,
+  // coexistence.json, etc) BEFORE take/add -- matching the real main
+  // checkout's topology, where these were committed long ago and only
+  // events.jsonl changes on every take/return cycle. Without this, the
+  // fixture's very first `git add -A` below would ALSO be the first time
+  // config.json/coexistence.json are tracked at all, which is a one-time
+  // bootstrap artifact this test is not about (D2 narrowed the exemption
+  // to noise-only paths; those two are no longer exempt on purpose).
+  execFileSync('git', ['add', '-A'], { cwd });
+  execFileSync('git', ['commit', '-q', '-m', 'bootstrap .fgos/'], { cwd });
+  const id = 'pull-return-fgos-exempt';
+  assert.equal(run(cwd, ['add', id, '--title', 'X', '--kind', 'task', '--risk', 'low', '--verify', 'test -f proof.txt', '--footprint', 'proof.txt']).status, 0);
+  assert.equal(run(cwd, ['take', '--id', id]).status, 0);
+  // commitFile's git add -A sweeps in whatever .fgos/* delta `take` itself
+  // produced since the last commit, alongside proof.txt -- the exact real
+  // shape an ordinary `git commit -am` after `fgos take` produces, and
+  // exactly what a concurrent session's own take/return/approve on the
+  // shared main checkout can ALSO bundle into this item's own ownDiff
+  // range (found by independent review after tsk-4hl merged). With the
+  // bootstrap commit above, this delta is now genuinely just
+  // events.jsonl's own append (take's real behavior), not a first-time
+  // commit of the whole store.
+  commitFile(cwd, 'proof.txt');
+
+  const result = run(cwd, ['return', id]);
+  assert.equal(result.status, 0, `return failed: ${result.stderr}`);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.passed, true);
+  assert.deepEqual(data.footprintDiffHits, [], 'a .fgos/* change bundled into the item\'s own commit must never be flagged');
+});
+
+// tsk-5iv D2 (round-3 review, MEDIUM): the original tsk-x5r exemption was a
+// blanket `.fgos/**` match, which also swallowed hand-edited policy files
+// (.fgos/config.json, .fgos/gate-bypass.json) that real items DO
+// deliberately edit as their own work product -- an item that changes
+// gate-bypass.json OUTSIDE its declared footprint must still surface in
+// footprintDiffHits; only the append-only lifecycle noise (events.jsonl,
+// entropy-history.jsonl) stays exempt.
+test('return: a .fgos/gate-bypass.json change bundled into the item\'s own commit DOES surface in footprintDiffHits, unlike events.jsonl (tsk-5iv D2: exemption narrowed to noise only)', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  const id = 'pull-return-gb-not-exempt';
+  assert.equal(run(cwd, ['add', id, '--title', 'X', '--kind', 'task', '--risk', 'low', '--verify', 'test -f proof.txt', '--footprint', 'proof.txt']).status, 0);
+  assert.equal(run(cwd, ['take', '--id', id]).status, 0);
+  // Simulates an item that quietly edits the safety-policy file outside its
+  // declared footprint (proof.txt) -- fs.writeFileSync + take's own
+  // events.jsonl delta both land in the same commit via commitFile's git
+  // add -A, mirroring how a real gate-approve/policy edit would ride
+  // alongside an item's own work.
+  fs.writeFileSync(path.join(cwd, '.fgos', 'gate-bypass.json'), JSON.stringify({ level: 'off' }));
+  commitFile(cwd, 'proof.txt');
+
+  const result = run(cwd, ['return', id]);
+  assert.equal(result.status, 0, `return failed: ${result.stderr}`);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.passed, true, 'the footprint-diff advisory never fails the return itself');
+  assert.ok(
+    data.footprintDiffHits.some((hit) => hit.file === '.fgos/gate-bypass.json'),
+    'a policy-file change outside the declared footprint must surface, not be silently swallowed by the noise exemption',
+  );
+});
+
+test('return: the item\'s own docs/history/<id>/iron-law-evidence.md is exempt from footprintDiffHits (tsk-4hl self-exempt, avoids self-flagging every Iron-Law-gated item)', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  const id = 'pull-return-evidence-exempt';
+  assert.equal(run(cwd, ['add', id, '--title', 'X', '--kind', 'task', '--risk', 'low', '--verify', 'test -f proof.txt', '--footprint', 'proof.txt']).status, 0);
+  assert.equal(run(cwd, ['take', '--id', id]).status, 0);
+  commitFile(cwd, 'proof.txt');
+  fs.mkdirSync(path.join(cwd, 'docs', 'history', id), { recursive: true });
+  commitFile(cwd, `docs/history/${id}/iron-law-evidence.md`, '# evidence\n');
+  commitFile(cwd, 'random-outside.txt', 'not sensitive\n');
+
+  const result = run(cwd, ['return', id]);
+  assert.equal(result.status, 0, `return failed: ${result.stderr}`);
+  const data = envelopeData(result.stdout);
+  // See the sibling test above for why this isn't a strict deepEqual --
+  // real .fgos/* deltas from `take` legitimately show up here too.
+  assert.ok(
+    !data.footprintDiffHits.some((hit) => hit.file === `docs/history/${id}/iron-law-evidence.md`),
+    'the evidence doc must never appear in footprintDiffHits',
+  );
+  assert.ok(data.footprintDiffHits.some((hit) => hit.file === 'random-outside.txt'), 'random-outside.txt must still be flagged');
+});
+
 test('return refuses a dirty working tree (uncommitted changes) as validation, exit 4, item stays doing', () => {
   const cwd = initGitCwd();
   run(cwd, ['init']);
@@ -4785,7 +5245,7 @@ test('approve on a non-proposed item is rejected as precondition, exit 2', () =>
   assert.equal(result.status, 2);
 });
 
-test('approve of a runner item (happy path): merges fgw/<id> into main, verifies, awaiting-approval -> done with role human, and cleans up the branch', () => {
+test('approve of a runner item (happy path): merges fgw/<id> into main, verifies, awaiting-approval -> delivered with role human, and the branch SURVIVES (tsk-1p9: cleanup deferred to the cleanup verb)', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   makeRunnerProposedItem(cwd, 'approve-runner-item', { verify: 'test -f approve-runner-item-produced.txt' });
@@ -4794,6 +5254,7 @@ test('approve of a runner item (happy path): merges fgw/<id> into main, verifies
   const result = run(cwd, ['approve', 'approve-runner-item']);
   assert.equal(result.status, 0, result.stderr);
   assert.equal(envelopeData(result.stdout).to, 'delivered');
+  assert.equal('cleanupWarnings' in envelopeData(result.stdout), false, 'approve no longer performs branch/worktree cleanup itself (tsk-1p9 D1)');
 
   const view = stateView(cwd);
   assert.equal(view.work['approve-runner-item'].status, 'delivered');
@@ -4805,7 +5266,7 @@ test('approve of a runner item (happy path): merges fgw/<id> into main, verifies
   assert.ok(fs.existsSync(path.join(cwd, 'approve-runner-item-produced.txt')), 'the merged file must be present on main');
 
   const branches = gitAtCwd(cwd, ['for-each-ref', '--format=%(refname:short)', 'refs/heads/fgw/']);
-  assert.doesNotMatch(branches, /fgw\/approve-runner-item/, 'the fully-merged branch is cleaned up');
+  assert.match(branches, /fgw\/approve-runner-item/, 'the merged branch must survive approve — deleted later by the cleanup verb, not here');
 });
 
 test('approve of a runner item succeeds when ONLY .fgos/ (the live event log) is dirty on main — no more manual events.jsonl commit before every approve', () => {
@@ -4889,7 +5350,7 @@ test('approve of a runner item with a declared footprint still refuses on an unc
   assert.equal(stateView(cwd).work['approve-footprint-dirty'].status, 'awaiting-approval');
 });
 
-test('approve of a leaf item with a clean merge lands the work on fgw/<root> (not main) via an ephemeral worktree, leaf -> done, fgw/<leaf> is actually deleted, fgw/<root> survives', () => {
+test('approve of a leaf item with a clean merge lands the work on fgw/<root> (not main) via an ephemeral worktree, leaf -> delivered, fgw/<leaf> SURVIVES the approve (tsk-1p9: teardown deferred to the cleanup verb), fgw/<root> survives', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   makeRunnerProposedLeafItem(cwd, 'approve-leaf-root', 'approve-leaf-child', { verify: 'test -f approve-leaf-child-produced.txt' });
@@ -4902,6 +5363,7 @@ test('approve of a leaf item with a clean merge lands the work on fgw/<root> (no
   assert.equal(approveData.branch, 'fgw/approve-leaf-child');
   assert.equal(approveData.target, 'fgw/approve-leaf-root');
   assert.equal(approveData.to, 'delivered');
+  assert.equal('cleanupWarnings' in approveData, false, 'approve no longer performs branch/worktree cleanup itself (tsk-1p9 D1)');
 
   // main must never be touched by a leaf approve.
   assert.equal(gitHead(cwd), headBefore, 'main HEAD must be unchanged by a leaf approve');
@@ -4914,10 +5376,11 @@ test('approve of a leaf item with a clean merge lands the work on fgw/<root> (no
   const view = stateView(cwd);
   assert.equal(view.work['approve-leaf-child'].status, 'delivered');
 
-  // fgw/<leaf> must be ACTUALLY deleted (git branch list), not just the
-  // ephemeral worktree directory gone — the exact gap validating found.
+  // fgw/<leaf> must SURVIVE right after approve (tsk-1p9, restore-to-decision:
+  // teardown is deferred to the `cleanup` verb, gated by D7's TTL and D8's
+  // harness — no longer synchronous with merge).
   const branches = gitAtCwd(cwd, ['for-each-ref', '--format=%(refname:short)', 'refs/heads/fgw/']);
-  assert.doesNotMatch(branches, /fgw\/approve-leaf-child\b/, 'the leaf\'s own branch must be deleted after merging into its root');
+  assert.match(branches, /fgw\/approve-leaf-child\b/, 'the leaf\'s own branch must survive approve — deleted later by the cleanup verb, not here');
   assert.match(branches, /fgw\/approve-leaf-root\b/, 'the root\'s own integration branch must survive');
 
   // the merged content must actually be present on fgw/<root>'s tip.
@@ -5192,7 +5655,7 @@ test('approve --acknowledge-iron-law false (a value form, not the bare flag) sti
   assert.equal(gitHead(cwd), headBefore);
 });
 
-test('approve of the same self-modifying diff PROCEEDS with --acknowledge-iron-law: merges, verifies, awaiting-approval -> done, branch cleaned up', () => {
+test('approve of the same self-modifying diff PROCEEDS with --acknowledge-iron-law: merges, verifies, awaiting-approval -> delivered, branch SURVIVES (tsk-1p9: cleanup deferred to the cleanup verb)', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   makeRunnerProposedItemTouching(cwd, 'iron-ack-item', 'src/runner/probe.mjs', {
@@ -5210,7 +5673,7 @@ test('approve of the same self-modifying diff PROCEEDS with --acknowledge-iron-l
   assert.equal(view.settlements?.['iron-ack-item'], undefined);
   assert.ok(fs.existsSync(path.join(cwd, 'src/runner/probe.mjs')), 'the merged module file is present on main');
   const branches = gitAtCwd(cwd, ['for-each-ref', '--format=%(refname:short)', 'refs/heads/']);
-  assert.doesNotMatch(branches, /fgw\/iron-ack-item/, 'the fully-merged branch is cleaned up');
+  assert.match(branches, /fgw\/iron-ack-item/, 'the merged branch must survive approve — deleted later by the cleanup verb, not here');
 });
 
 test('approve of an ordinary runner item (diff touches no self-modifying module) is UNAFFECTED — proceeds to done with no --acknowledge-iron-law flag (backward compatibility)', () => {
@@ -6213,7 +6676,7 @@ test('review --github --pr reports a gh status-check failure as plain output wit
 
 // Builds on makeRunnerProposedItem: proposes a ROOT/standalone runner item,
 // then parks it blocked with `reason` via the real awaiting-approval -> blocked edge
-// (fsm.mjs's own reason requirement on that edge, same as the existing
+// (status-fsm.mjs's own reason requirement on that edge, same as the existing
 // 'approve of a runner item that conflicts' test above) so item.reason is
 // genuine, not synthesized.
 function makeBlockedRunnerItem(cwd, id, reason, extra = {}) {
@@ -6501,7 +6964,7 @@ test('init runs a second time (idempotent) and rewrites coexistence.json with th
 // `blocked` item that already carries a live `fgw/<id>` branch (parked by
 // the runner after too many visits, or a rejected proposal whose branch
 // survives): `take` claims it via the existing blocked -> doing edge
-// (fsm.mjs:69), discriminated by `branchHeadAtTake` — the BRANCH's own HEAD,
+// (status-fsm.mjs:69), discriminated by `branchHeadAtTake` — the BRANCH's own HEAD,
 // never the main-based `headAtTake`; `return` verifies on the branch itself,
 // in a disposable DETACHED worktree, and never inspects or touches the
 // human's own main checkout (D2: "tree người là việc của người"). ----------
@@ -7430,6 +7893,36 @@ test('stale verb on a store with nothing in doing: empty advisory, exit 0', () =
   assert.equal(addOk(cwd, 'a').status, 0); // stays todo, never claimed
   const data = envelopeData(run(cwd, ['stale']).stdout);
   assert.deepEqual(data.stale, []);
+});
+
+// --- work-graph-intelligence S10 (tsk-1bl, CONTEXT.md D4/D7): `fgos stale`'s
+// `postDelivery` field, additive alongside the existing `stale`/`thresholds`
+// this verb already returns -- same one-verb surface, no new CLI command.
+
+test('stale verb: postDelivery is additive — existing stale/thresholds shape is unchanged, postDelivery.stale is a sibling field', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0);
+  assert.equal(addOk(cwd, 'a').status, 0);
+  assert.equal(run(cwd, ['move', 'a', '--to', 'doing', '--expect', 'todo']).status, 0);
+
+  const data = envelopeData(run(cwd, ['stale']).stdout);
+  assert.deepEqual(data.stale, [], 'existing doing-advisory shape untouched');
+  assert.equal(data.thresholds.agentMs, 15 * 60 * 1000, 'existing doing-advisory thresholds untouched');
+  assert.deepEqual(data.postDelivery.stale, [], 'no delivered/retrospective/cleanup items yet');
+  assert.ok(Number.isFinite(data.postDelivery.thresholds.deliveredMs));
+});
+
+test('stale verb: a just-delivered item is NOT flagged in postDelivery (well within the 3d threshold)', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0);
+  addOk(cwd, 'just-delivered');
+  run(cwd, ['move', 'just-delivered', '--to', 'doing']);
+  run(cwd, ['move', 'just-delivered', '--to', 'delivered']);
+
+  const before = eventLines(cwd).length;
+  const data = envelopeData(run(cwd, ['stale']).stdout);
+  assert.deepEqual(data.postDelivery.stale, []);
+  assert.equal(eventLines(cwd).length, before, 'stale must not append any event');
 });
 
 // --- work-graph-intelligence S9: footprint field + `fgos conflicts` -------
@@ -8455,21 +8948,44 @@ test('cleanup parks cleanup -> blocked, with every failing reason joined, when t
   const data = envelopeData(result.stdout);
   assert.equal(data.to, 'blocked');
   assert.match(data.reason, /not ready yet/);
-  assert.match(data.reason, /no outcome or decision record/);
+  assert.match(data.reason, /no outcome docType\/docPath or decision record/);
 
   assert.equal(stateView(cwd).work['cleanup-not-ready'].status, 'blocked');
 });
 
+test('cleanup is a no-op — writes zero work.move events and stays at cleanup — when only TTL has not elapsed and the D8 checks pass', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'cleanup-ttl-only');
+  run(cwd, ['move', 'cleanup-ttl-only', '--to', 'doing']);
+  run(cwd, ['move', 'cleanup-ttl-only', '--to', 'delivered']);
+  run(cwd, ['move', 'cleanup-ttl-only', '--to', 'retrospective']);
+  const dir = path.join(cwd, '.fgos');
+  fs.mkdirSync(path.join(cwd, 'docs', 'how-to'), { recursive: true });
+  fs.writeFileSync(path.join(cwd, 'docs', 'how-to', 'cleanup-ttl-only.md'), '# doc\n');
+  addOutcome(dir, { id: 'cleanup-ttl-only', docType: 'how-to', docPath: 'docs/how-to/cleanup-ttl-only.md' });
+  run(cwd, ['move', 'cleanup-ttl-only', '--to', 'cleanup']);
+  // Default TTL (7d, no config written) — freshly entered, not elapsed.
+  // No branchHeadAtReturn recorded -> checkMergeStillResolves passes
+  // trivially ("nothing to check"), so the only failing check is TTL.
+
+  const before = eventLines(cwd).length;
+  const result = run(cwd, ['cleanup', 'cleanup-ttl-only']);
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.to, 'cleanup');
+  assert.equal(data.noop, true);
+
+  assert.equal(eventLines(cwd).length, before, 'TTL-not-elapsed alone must write zero events');
+  assert.equal(stateView(cwd).work['cleanup-ttl-only'].status, 'cleanup', 'item must stay at cleanup, not move to blocked');
+});
+
 test('cleanup closes to done when TTL is configured to 0 and retrospective content + a resolving merge both exist', () => {
-  // KNOWN GAP, deliberately left in place this item (flagged for a
-  // dedicated follow-up, not silently dropped): approve's merge paths
-  // still call cleanupMergedBranch synchronously today, the exact eager
-  // deletion D7 exists to move later — so the branch is typically already
-  // gone by the time this verb runs. cleanup's own cleanupMergedBranch
-  // call is idempotent (branchExists guards it, and the function itself
-  // never throws on an already-gone branch, per merge.test.mjs) — this
-  // test asserts the STATUS transition works correctly regardless of
-  // which point actually performed the git-level deletion.
+  // tsk-1p9: approve no longer calls cleanupMergedBranch at all — the
+  // branch survives all the way from `delivered` through `cleanup`, and
+  // this verb is now the ONLY thing that ever deletes it. `cleanupMergedBranch`
+  // stays idempotent (branchExists guards it, never throws on an
+  // already-gone branch, per merge.test.mjs) as a defensive property, not
+  // because this path actually races another deletion anymore.
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   writeCleanupTtlConfig(cwd, 0);
@@ -8482,7 +8998,9 @@ test('cleanup closes to done when TTL is configured to 0 and retrospective conte
 
   run(cwd, ['move', 'cleanup-ready-item', '--to', 'retrospective']);
   const dir = path.join(cwd, '.fgos');
-  addOutcome(dir, { id: 'cleanup-ready-item', docType: 'how-to', actual: { outcome: 'pass', passed: true, attempts: 1, errorClass: null, aheadCount: 0, visits: 1 } });
+  fs.mkdirSync(path.join(cwd, 'docs', 'how-to'), { recursive: true });
+  fs.writeFileSync(path.join(cwd, 'docs', 'how-to', 'cleanup-ready-item.md'), '# doc\n');
+  addOutcome(dir, { id: 'cleanup-ready-item', docType: 'how-to', docPath: 'docs/how-to/cleanup-ready-item.md' });
   run(cwd, ['move', 'cleanup-ready-item', '--to', 'cleanup']);
 
   const result = run(cwd, ['cleanup', 'cleanup-ready-item']);
@@ -8493,6 +9011,48 @@ test('cleanup closes to done when TTL is configured to 0 and retrospective conte
   assert.equal(stateView(cwd).work['cleanup-ready-item'].status, 'done');
   const branchAfter = gitAtCwd(cwd, ['for-each-ref', '--format=%(refname:short)', 'refs/heads/fgw/']);
   assert.doesNotMatch(branchAfter, /fgw\/cleanup-ready-item/, 'the branch is gone by the time cleanup finishes, whichever step actually deleted it');
+});
+
+// tsk-1p9 (D7/D8): the regression this item exists to close — a LEAF
+// item's own branch, merged into its root's branch (never main), must
+// still be deleted correctly by cleanup even while the root itself
+// remains unmerged. Pre-tsk-1p9, checkMergeStillResolves checked ancestry
+// against literal HEAD (always main from repoRoot), which would falsely
+// fail for every leaf; this test proves the root-aware fix (D7) plus the
+// verb's own force-delete (D8) actually get the leaf's branch gone.
+test('cleanup of a LEAF item deletes its own branch even though the ROOT branch is still unmerged into main (tsk-1p9 D7/D8)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  writeCleanupTtlConfig(cwd, 0);
+  makeRunnerProposedLeafItem(cwd, 'leaf-cleanup-root', 'leaf-cleanup-child', { verify: 'test -f leaf-cleanup-child-produced.txt' });
+  commitPendingBeforeApprove(cwd, 'leaf-cleanup-child');
+
+  const approve = run(cwd, ['approve', 'leaf-cleanup-child']);
+  assert.equal(approve.status, 0, `approve failed: ${approve.stderr}`);
+  assert.equal(stateView(cwd).work['leaf-cleanup-child'].status, 'delivered');
+
+  // The leaf's branch survives approve (tsk-1p9 D1) — confirms the fixture
+  // actually exercises the deferred-cleanup path this test is proving.
+  const branchAfterApprove = gitAtCwd(cwd, ['for-each-ref', '--format=%(refname:short)', 'refs/heads/fgw/']);
+  assert.match(branchAfterApprove, /fgw\/leaf-cleanup-child\b/, 'the leaf branch must still exist right after approve');
+  assert.match(branchAfterApprove, /fgw\/leaf-cleanup-root\b/, 'the root branch must still exist — never merged to main by this test');
+
+  run(cwd, ['move', 'leaf-cleanup-child', '--to', 'retrospective']);
+  const dir = path.join(cwd, '.fgos');
+  fs.mkdirSync(path.join(cwd, 'docs', 'how-to'), { recursive: true });
+  fs.writeFileSync(path.join(cwd, 'docs', 'how-to', 'leaf-cleanup-child.md'), '# doc\n');
+  addOutcome(dir, { id: 'leaf-cleanup-child', docType: 'how-to', docPath: 'docs/how-to/leaf-cleanup-child.md' });
+  run(cwd, ['move', 'leaf-cleanup-child', '--to', 'cleanup']);
+
+  const result = run(cwd, ['cleanup', 'leaf-cleanup-child']);
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.to, 'done', `cleanup must close the leaf to done, not park it blocked: ${JSON.stringify(data)}`);
+
+  assert.equal(stateView(cwd).work['leaf-cleanup-child'].status, 'done');
+  const branchAfterCleanup = gitAtCwd(cwd, ['for-each-ref', '--format=%(refname:short)', 'refs/heads/fgw/']);
+  assert.doesNotMatch(branchAfterCleanup, /fgw\/leaf-cleanup-child\b/, 'the leaf branch must actually be deleted by cleanup');
+  assert.match(branchAfterCleanup, /fgw\/leaf-cleanup-root\b/, 'the still-open root branch must be untouched');
 });
 
 test('cleanup parks cleanup -> blocked when the recorded commit no longer resolves on main (force-pushed/rewritten away)', () => {
@@ -8511,7 +9071,9 @@ test('cleanup parks cleanup -> blocked when the recorded commit no longer resolv
     verify: 'true',
     headAtReturn: '0'.repeat(40), // a well-formed but nonexistent sha
   });
-  addOutcome(dir, { id: 'cleanup-bad-merge', actual: { outcome: 'pass', passed: true, attempts: 1, errorClass: null, aheadCount: 0, visits: 1 } });
+  fs.mkdirSync(path.join(cwd, 'docs', 'how-to'), { recursive: true });
+  fs.writeFileSync(path.join(cwd, 'docs', 'how-to', 'cleanup-bad-merge.md'), '# doc\n');
+  addOutcome(dir, { id: 'cleanup-bad-merge', docType: 'how-to', docPath: 'docs/how-to/cleanup-bad-merge.md' });
 
   const result = run(cwd, ['cleanup', 'cleanup-bad-merge']);
   assert.equal(result.status, 0, result.stderr);
@@ -8588,12 +9150,22 @@ test('compound with --doc-type tags the outcome, surfaced by `show`; item stays 
   assert.equal(envelopeData(showResult.stdout).outcome.docType, 'how-to');
 });
 
-test('compound with --doc-type and --doc-path tags both, surfaced by `show`', () => {
-  const cwd = tmpCwd();
+// retrospective-doc-write-path D3: `--doc-path` is only ever accepted for a
+// document already committed at the main checkout's HEAD — the invariant
+// that makes "a tag exists but its document never landed" (34 real
+// documents, 2026-08-05) impossible to reproduce rather than detected
+// later. These four tests are git-backed (`initGitCwdMain()`), unlike the
+// rest of this suite's `compound` tests, because the check itself is
+// git-based and has nothing to observe in a non-git `tmpCwd()`.
+
+test('compound with --doc-type and --doc-path tags both when the file is committed at HEAD, surfaced by `show`', () => {
+  const cwd = initGitCwdMain();
   addOk(cwd, 'compound-tag-path');
   run(cwd, ['move', 'compound-tag-path', '--to', 'doing']);
   run(cwd, ['move', 'compound-tag-path', '--to', 'delivered']);
   run(cwd, ['move', 'compound-tag-path', '--to', 'retrospective']);
+  fs.mkdirSync(path.join(cwd, 'docs', 'explanation'), { recursive: true });
+  commitFile(cwd, path.join('docs', 'explanation', 'example.md'), '# Example\n');
 
   const result = run(cwd, ['compound', 'compound-tag-path', '--doc-type', 'explanation', '--doc-path', 'docs/explanation/example.md']);
   assert.equal(result.status, 0, result.stderr);
@@ -8605,4 +9177,51 @@ test('compound with --doc-type and --doc-path tags both, surfaced by `show`', ()
   const outcome = envelopeData(showResult.stdout).outcome;
   assert.equal(outcome.docType, 'explanation');
   assert.equal(outcome.docPath, 'docs/explanation/example.md');
+});
+
+test('compound --doc-path is rejected as validation, exit 4, when the file does not exist at all', () => {
+  const cwd = initGitCwdMain();
+  addOk(cwd, 'compound-doc-absent');
+  run(cwd, ['move', 'compound-doc-absent', '--to', 'doing']);
+  run(cwd, ['move', 'compound-doc-absent', '--to', 'delivered']);
+  run(cwd, ['move', 'compound-doc-absent', '--to', 'retrospective']);
+  const before = eventLines(cwd).length;
+
+  const result = run(cwd, ['compound', 'compound-doc-absent', '--doc-type', 'how-to', '--doc-path', 'docs/how-to/never-written.md']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /not committed at the main checkout's HEAD/);
+  assert.equal(eventLines(cwd).length, before, 'a rejected --doc-path writes zero events — no tag for a document that was never written');
+});
+
+test('compound --doc-path is rejected as validation, exit 4, when the file exists but is untracked', () => {
+  const cwd = initGitCwdMain();
+  addOk(cwd, 'compound-doc-untracked');
+  run(cwd, ['move', 'compound-doc-untracked', '--to', 'doing']);
+  run(cwd, ['move', 'compound-doc-untracked', '--to', 'delivered']);
+  run(cwd, ['move', 'compound-doc-untracked', '--to', 'retrospective']);
+  fs.mkdirSync(path.join(cwd, 'docs', 'how-to'), { recursive: true });
+  fs.writeFileSync(path.join(cwd, 'docs', 'how-to', 'untracked.md'), '# Untracked\n');
+  const before = eventLines(cwd).length;
+
+  const result = run(cwd, ['compound', 'compound-doc-untracked', '--doc-type', 'how-to', '--doc-path', 'docs/how-to/untracked.md']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /not committed at the main checkout's HEAD/);
+  assert.equal(eventLines(cwd).length, before, 'present-but-untracked must reject exactly like absent — this is the exact gap that let 34 real documents go missing');
+});
+
+test('compound --doc-path is rejected as validation, exit 4, when the file exists and is staged but not committed', () => {
+  const cwd = initGitCwdMain();
+  addOk(cwd, 'compound-doc-staged');
+  run(cwd, ['move', 'compound-doc-staged', '--to', 'doing']);
+  run(cwd, ['move', 'compound-doc-staged', '--to', 'delivered']);
+  run(cwd, ['move', 'compound-doc-staged', '--to', 'retrospective']);
+  fs.mkdirSync(path.join(cwd, 'docs', 'how-to'), { recursive: true });
+  fs.writeFileSync(path.join(cwd, 'docs', 'how-to', 'staged-only.md'), '# Staged only\n');
+  execFileSync('git', ['add', 'docs/how-to/staged-only.md'], { cwd });
+  const before = eventLines(cwd).length;
+
+  const result = run(cwd, ['compound', 'compound-doc-staged', '--doc-type', 'how-to', '--doc-path', 'docs/how-to/staged-only.md']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /not committed at the main checkout's HEAD/);
+  assert.equal(eventLines(cwd).length, before, 'staged-but-uncommitted must reject exactly like absent — an index entry is not HEAD');
 });

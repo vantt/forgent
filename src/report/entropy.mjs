@@ -12,9 +12,40 @@
 // CLI-layer concern (bin/fgos.mjs's `check` verb) — this module never
 // resolves a data dir and never writes.
 
-import { RESOLVED_STATUSES } from '../state/frontier.mjs';
+import { isResolvedStatus } from '../state/frontier.mjs';
 
-const FINAL_STATUSES = new Set(['awaiting-approval', 'blocked', 'done']);
+// FINAL_STATUSES: statuses at which a goal-check attempt has already run (or
+// been bypassed by a mechanical reconcile — bin/fgos.mjs's sync-root/catchup
+// paths, §3 of decision record 0027's audit) such that `outcomes[id].actual`
+// SHOULD already be recorded. This is a THIRD concept, distinct from both
+// `statusCategory` (frontier's `ready` filter) and `isResolvedStatus`
+// (frontier.mjs's dep-resolution/lineage check): `blocked` belongs here
+// (a failed goal-check attempt) but NOT in frontier's `ready`/`isResolvedStatus`
+// checks, even though `blocked` shares the same `statusCategory: 'in-progress'`
+// as plain `doing`/`awaiting-human` (0027's own DISCUSSION.md §6: category is a
+// lossy compression, and this is exactly a case that needs the finer, literal
+// distinction — "cơ chế nào cần mịn hơn vẫn đọc status literal", same stance
+// retro-pool.mjs's `isRetrospectiveReady` already takes). Reading category
+// here could never tell "blocked because a goal-check just failed" apart from
+// "doing"/"awaiting-human", so this stays a literal-status set, not a
+// category-based one.
+//
+// Before this cell, `entropy.mjs` and `bin/fgos.mjs` each hand-rolled their
+// OWN local `FINAL_STATUSES` and had silently drifted apart (0027's audit,
+// §2): this file's version omitted the four tail-segment statuses
+// (`delivered`/`retrospective`/`cleanup`/`done`) entirely, even though this
+// file's own `countMissingActual` doc comment claims to mirror
+// `bin/fgos.mjs`'s `formatMissingOutcomeNag` rule — which already included
+// them. `bin/fgos.mjs`'s superset is the correct, complete one (an item can
+// reach `delivered` via the sync-root/catchup mechanical reconcile path
+// without ever going through the normal `doing -> awaiting-approval` outcome
+// stamp — CONTEXT §3 of 0027's audit — so it still needs to be flagged
+// missing-actual even after it moves past `awaiting-approval`/`blocked`).
+// Reconciled here as the single shared export; `bin/fgos.mjs` now imports
+// this instead of declaring its own copy. Widening entropy.mjs's set only
+// ADDS coverage (a strict superset of what it flagged before), never removes
+// a case it used to catch — the safe direction for a bug fix.
+export const FINAL_STATUSES = new Set(['awaiting-approval', 'blocked', 'delivered', 'retrospective', 'cleanup', 'done']);
 
 // Weights modeled on the consult report's sample scheme (L107 — cited, not
 // reused verbatim: that scheme scored distillery's unsealed/backfill/broken
@@ -93,7 +124,7 @@ function countAwaitingHuman(view) {
 // field is a historical artifact, not a live entropy signal.
 function countStageClarify(view) {
   return Object.values(view.work ?? {}).filter(
-    (w) => w.stage === 'clarify' && !RESOLVED_STATUSES.has(w.status),
+    (w) => w.stage === 'clarify' && !isResolvedStatus(w),
   ).length;
 }
 

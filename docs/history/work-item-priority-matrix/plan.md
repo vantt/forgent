@@ -46,7 +46,7 @@ for exactly this case, which is worse than not splitting.
 
 **Decision:** `tsk-4y5` proceeds as one item, high-risk mode, with an
 internal phased approach (three phases, one commit per phase, single
-`fgos return` at the end per `fgos-executing`'s existing "one commit per
+`fgos return` at the end per `fgos-code-implement`'s existing "one commit per
 item" habit interpreted as "one commit per phase, one return for the
 whole item" — no schema/verb change needed to allow this). Re-visit
 splitting into real children once `tsk-1xx` ships.
@@ -124,6 +124,6 @@ never removes it).
 ## Execution notes
 
 Leaving Execute/verify alone per this skill's own rule — each phase above
-names one real, runnable command as its proof point; `fgos-executing`
+names one real, runnable command as its proof point; `fgos-code-implement`
 runs them, `fgos return` re-verifies, same mechanical path as any other
 item.

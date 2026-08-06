@@ -6,21 +6,23 @@ description: >-
   delivered item to retrospective (fgos retrospective — cheap, mechanical,
   idempotent), then picks via pickNextRetrospectiveItem
   (src/state/retro-pool.mjs, FIFO by delivered->retrospective entry time),
-  runs fgos-compounding's synthesis on it (settlement/decision/
-  enduser-docs), and on success moves it to cleanup. Example:
-  "/fgOS:retro-next", "synthesize the next retrospective item".
+  resolves the item's own domain's synthesis skill (decision record 0027
+  D5 — fgos-compounding for coding today, never hardcoded) and runs it
+  (settlement/decision/enduser-docs), and on success moves it to cleanup.
+  Example: "/fgOS:retro-next", "synthesize the next retrospective item".
 ---
 
 # fgOS retro-next
 
 Wraps the `fgos retrospective` sweep, `pickNextRetrospectiveItem`
-(`src/state/retro-pool.mjs`), the `fgos-compounding` skill, and
-`fgos move <id> --to cleanup` so a person (or a `/fgOS:retro-loop`
+(`src/state/retro-pool.mjs`), the item's own domain-resolved synthesis
+skill (decision record 0027 D5 — `fgos-compounding` for `coding` today),
+and `fgos move <id> --to cleanup` so a person (or a `/fgOS:retro-loop`
 iteration) can process the single next `status:retrospective` item
 end to end without hand-typing each step or re-deriving the pick order
-every time. Never writes `.fgos/` state directly beyond what
-`fgos-compounding` itself already does through its own producer surface
-(`fgos compound`), and never re-implements `fgos-compounding`'s synthesis
+every time. Never writes `.fgos/` state directly beyond what the
+resolved synthesis skill itself already does through its own producer
+surface (`fgos compound`), and never re-implements that skill's synthesis
 — this skill only sequences the existing pieces
 (`docs/history/fgos-retro-loop/CONTEXT.md`'s own scope boundary).
 
@@ -69,18 +71,43 @@ every time. Never writes `.fgos/` state directly beyond what
    empty — nothing to synthesize" and stop. This is `/fgOS:retro-loop`'s
    own pool-empty stop signal; nothing else to do here.
 
-4. **Run the synthesis.** Otherwise the output is `{"id": "<id>"}`. Invoke
-   the `fgos-compounding` skill directly (in this same session, not a
-   fresh dispatch) with `<id>` as its argument — its own flow gathers the
-   real capture (`fgos check <id>`), classifies the Diataxis quadrant,
-   stores the tag via `fgos compound <id> --doc-type <quadrant> --doc-path
-   <path>`, and grows-or-creates the end-user document. Trust its own
+4. **Resolve the item's synthesis skill, then run it.** Otherwise the
+   output is `{"id": "<id>"}`. Read the item's own `domain` field (`fgos
+   list --id <id> --json`, or the `view.work[id].domain` the pick step
+   already had in hand) and resolve which skill runs synthesis for it —
+   never assume `fgos-compounding` unconditionally (decision record 0027
+   D5: `retrospective` is a per-domain skillMap entry now, same lookup
+   `fgos-routing`'s own `skillForStage` uses for `stage`, just keyed by
+   the status `retrospective` instead of a stage name):
+
+   ```bash
+   node -e "
+   import('./src/state/workflow-stage-graphs.mjs').then(({ getDomain, skillForStage }) => {
+     console.log(skillForStage(getDomain(process.argv[1]), 'retrospective') ?? 'fgos-compounding');
+   });
+   " -- "$domain"
+   ```
+
+   substituting `<id>`'s own `domain` value (absent/unrecognized folds to
+   `coding` automatically, `getDomain`'s own fail-safe). The explicit
+   `?? 'fgos-compounding'` fallback mirrors `skillForStage`'s null-safe
+   shape one level up: a domain that declares no `retrospective` entry at
+   all still gets a real skill to run, never a missing-skill dead end.
+   For `coding` today this always resolves to `fgos-compounding` — zero
+   behavior change from before this lookup existed.
+
+   Then invoke the resolved skill directly (in this same session, not a
+   fresh dispatch) with `<id>` as its argument — `fgos-compounding`'s own
+   flow (the resolution for every domain today) gathers the real capture
+   (`fgos check <id>`), classifies the Diataxis quadrant, stores the tag
+   via `fgos compound <id> --doc-type <quadrant> --doc-path <path>`, and
+   grows-or-creates the end-user document. Trust the resolved skill's own
    hard rules and red flags exactly as written there — this skill never
    second-guesses the classification or the document it produces.
 
-5. **On synthesis success, move to cleanup.** Once `fgos-compounding`
-   confirms the tag is stored and the document exists (its own step 5),
-   run:
+5. **On synthesis success, move to cleanup.** Once the resolved skill
+   confirms the tag is stored and the document exists (`fgos-compounding`'s
+   own step 5, for the resolution every domain uses today), run:
 
    ```
    node ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs move <id> --to cleanup --dir "$root"
@@ -104,15 +131,15 @@ every time. Never writes `.fgos/` state directly beyond what
    - **exit `3`** (`'conflict'`, a per-item CAS race) or any other
      non-zero exit — scoped to this one item. Report it as skipped; this
      never means a different item is at risk.
-   - **`fgos-compounding` itself fails to complete** (step 4 gets stuck,
-     the tag or the document ends up missing per its own step 5
-     confirmation) — this is a real-session failure, not a clean
-     `cleanup`-harness "blocked" verdict the way `fgos cleanup <id>`
-     produces one. Report the item skipped with the concrete reason
-     `fgos-compounding` surfaced; never run `move --to cleanup` on an item
-     whose synthesis did not actually confirm complete, and never treat
-     this as a loop-stopping condition on its own (only lock-timeout does
-     that).
+   - **the resolved synthesis skill itself fails to complete**
+     (`fgos-compounding` for `coding` today — step 4 gets stuck, the tag or
+     the document ends up missing per its own step 5 confirmation) — this
+     is a real-session failure, not a clean `cleanup`-harness "blocked"
+     verdict the way `fgos cleanup <id>` produces one. Report the item
+     skipped with the concrete reason the resolved skill surfaced; never
+     run `move --to cleanup` on an item whose synthesis did not actually
+     confirm complete, and never treat this as a loop-stopping condition
+     on its own (only lock-timeout does that).
 
 7. **Optional: rename the herdr pane.** Before step 4, if the `id` is
    already known, calling `/fgOS:terminal <id>` for observability is a
