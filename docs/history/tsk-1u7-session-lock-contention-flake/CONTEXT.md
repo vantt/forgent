@@ -14,8 +14,10 @@ implementing that change; that is `fgos-planning`/`fgos-executing`'s job.
 
 | ID | Decision |
 |----|----------|
-| D1 | Investigation target reframed from "find a lost-update race in `sessions.json`'s read-modify-write" to "confirm the lock design prevents lost-update by construction, and diagnose whether `sessions.lock`'s coarse scope (it spans the slow `git worktree add --detach` call, not just the JSON read/write) plus its 10s `acquireSessionsLock` timeout is the real flake trigger under full-suite load". |
-| D2 | Interim: exclude/tag `test/runner/session.test.mjs`'s concurrent-createSession test out of the default `npm test` full-suite run, mirroring the precedent `tsk-3ld` set for `test/state/events.test.mjs`. Never delete the test. Record the reason in the test file (comment or skip annotation) and link `tsk-1u7`, so a future reader does not mistake it for abandoned coverage. |
+| D1 | **SUPERSEDED by D3** — was: "confirm the lock design prevents lost-update by construction, and diagnose whether `sessions.lock`'s coarse scope... plus its 10s timeout is the real flake trigger". Wrong: see D3. |
+| D2 | **SUPERSEDED by D4** — was: "exclude/tag the test out of the default `npm test` run, mirroring `tsk-3ld`'s precedent". Wrong: `tsk-3ld` never excluded a test; see D4. |
+| D3 | D1 reversed (new evidence, surfaced at `fgos-validating`). `session.mjs`'s `tryAcquireOnce` (`session.mjs:137-145`) still carries the exact pre-fix vulnerable pattern `events.mjs` had: `fs.openSync(lockPath, 'wx')` then a separate `fs.writeSync` — a TOCTOU window where the lock file exists but is empty, so a competing process reading it mid-write sees unparseable (NaN) content, misreads it as a dead/garbage holder, and unlinks a lock a live process still holds. This is the SAME bug `tsk-3ld` already found and fixed in `events.mjs` (commit `962eb6b`, `fs.linkSync`-based atomic create — `events.mjs:214-225`), reproduced there at ~30% failure rate at 20 concurrent processes (`docs/history/events-lock-concurrency-race/plan.md`). `session.test.mjs`'s own test only spawns 5 processes — below that reproduction threshold — which exactly matches the "isolated pass, full-suite flake" signature this item started from. Real, confirmed-by-precedent bug — not test oversensitivity, not lock-contention-timeout. |
+| D4 | D2 reversed. No longer exclude the test. Instead: port `events.mjs`'s `tryAcquireEventsLockOnce`'s `linkSync`-based atomic-create fix to `session.mjs`'s `tryAcquireOnce` (write pid to a per-attempt temp file, `fs.linkSync` onto `lockPath`, instead of `openSync('wx')` + `writeSync`). Mirror `tsk-3ld`'s actual remedy shape: keep the test in the default suite; consider raising its process count as permanent regression coverage at the scale that actually catches this (`tsk-3ld` bumped `N_PROC` 6→20 for the same reason). |
 
 ## Pinned terms
 
@@ -26,8 +28,11 @@ implementing that change; that is `fgos-planning`/`fgos-executing`'s job.
   within the deadline — a loud, non-silent failure mode.
 - **"flake trigger" (this item's scope)** — the mechanism that makes the
   test intermittently fail under full-suite load but not in isolation.
-  Confirmed NOT a data-loss bug per the scout below; the working hypothesis
-  is lock-contention timeout, still unconfirmed by a reproducing load test.
+  **Revised (D3)**: IS a real lost-update-shaped race — see D3. The
+  original clarify pass checked the stale-pid-reclaim re-verify (sound) but
+  missed the earlier create-vs-write window in `tryAcquireOnce`'s fast
+  path (`session.mjs:139-141`) — the exact spot `events.mjs`'s own fix
+  targets.
 
 ## Scout evidence
 
@@ -48,8 +53,22 @@ implementing that change; that is `fgos-planning`/`fgos-executing`'s job.
   a stale (dead-PID) lock is re-read immediately before unlink to close
   the TOCTOU window the function's own comment calls out. This matches the
   design `loop.mjs`'s `acquireRunnerLock` already uses elsewhere in this
-  repo. No structural gap found that would let two processes both win the
-  lock or write concurrently.
+  repo. **Revised (D3)**: this bullet only checked the stale-reclaim
+  branch's own TOCTOU guard (sound). It missed a DIFFERENT, earlier window:
+  the fast-path create at `session.mjs:139-141` does `fs.openSync(lockPath,
+  'wx')` then a separate `fs.writeSync` — the file exists-but-empty gap a
+  concurrent reader can catch mid-write. See D3/D4.
+- `src/state/events.mjs:205-243` (`tryAcquireEventsLockOnce`) and
+  `docs/history/events-lock-concurrency-race/plan.md` — `tsk-3ld`'s actual
+  outcome (read fresh at `fgos-validating`, not assumed): a **real** race
+  in this exact create-vs-write shape, reproduced at ~30% failure rate at
+  20 concurrent processes, fixed by writing the pid to a per-attempt temp
+  file then `fs.linkSync`-ing it onto `lockPath` (atomic — `link()` only
+  ever exposes the destination fully-written or not-yet-existing).
+  `events.mjs:29-33`'s own comment names `session.mjs`'s
+  `acquireSessionsLock` as one of two untouched siblings sharing the
+  pre-fix pattern — confirmed still true by direct read of
+  `session.mjs:137-145`.
 - `acquireSessionsLock`'s default `timeoutMs` is 10000 (line 191, `retryMs`
   20ms busy-wait via `sleepSync`). Because the lock scope includes the slow
   `git worktree add`, 5 concurrent callers serialize entirely through one
@@ -75,22 +94,23 @@ implementing that change; that is `fgos-planning`/`fgos-executing`'s job.
 - `test/runner/session.test.mjs:207-240`
 - `src/runner/session.mjs:131-392` (`tryAcquireOnce`, `acquireSessionsLock`,
   `readRegistry`, `writeRegistry`, `createSession`)
-- `tsk-3ld` — sibling flaky-test item for `test/state/events.test.mjs`,
-  the precedent D2 follows
+- `tsk-3ld` / `docs/history/events-lock-concurrency-race/` — sibling item,
+  real precedent for both the bug shape (D3) and the fix technique (D4)
+- `src/state/events.mjs:205-243` (`tryAcquireEventsLockOnce`) — the fix to
+  port
 - `docs/how-to/diagnose-a-blocked-return-from-an-unrelated-verify-failure.md`
 
 ## Deferred to planning
 
-- Whether the eventual fix (if the lock-scope/timeout hypothesis holds) is:
-  narrowing the lock's critical section (do `git worktree add` outside the
-  lock, re-validate before the final registry write), raising
-  `timeoutMs`, or accepting the current serialized behavior as correct and
-  only fixing the test's load-sensitivity. This is an implementation
-  choice, not a product decision — left to `fgos-planning`.
-- What evidence bar confirms the lock-contention-timeout hypothesis (e.g.
-  a deliberately CPU-throttled repro) versus leaving it as a documented,
-  plausible-but-unconfirmed explanation. Left to planning/validating to
-  size against this item's `light` tier.
-- The exact mechanism for excluding the test from the default suite (skip
-  annotation vs. separate `npm test` include-list) — implementation detail
-  for whoever executes D2.
+- The exact diff shape for porting `events.mjs`'s `linkSync` technique into
+  `session.mjs`'s `tryAcquireOnce` (temp-file naming, cleanup on the
+  link-failure path) — implementation detail, left to `fgos-planning`.
+- Whether `session.test.mjs`'s concurrent-createSession test should have
+  its process count raised (mirroring `tsk-3ld`'s `N_PROC` 6→20 bump) as
+  permanent regression coverage, and by how much — sizing left to
+  `fgos-planning` against this item's `light` tier.
+- Whether `loop.mjs`'s `acquireRunnerLock` (the third sibling
+  `events.mjs:29-33` names as sharing the original pattern) also needs
+  this fix is explicitly OUT OF SCOPE for this item — `tsk-1u7`'s
+  boundary is `session.mjs` only; a separate item should cover
+  `loop.mjs` if warranted.
