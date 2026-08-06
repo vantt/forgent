@@ -19,6 +19,23 @@ pub struct TriageRow {
     /// (`src/state/impact.mjs`, defaults to `"executing"` when the item
     /// carries none), never re-derived here.
     pub stage: String,
+    /// tsk-64z D1: the Work Items panel's Status column and tab filter
+    /// (TODO/DOING/REVIEW/DONE) both key off this raw literal
+    /// (`docs/reference/triage-table-columns.md`'s own "rendered as-is").
+    pub status: String,
+    /// tsk-64z D1: "Blocked By" column — ids of OTHER still-open items
+    /// this row directly waits on (`rankImpact`'s own `blockedBy`,
+    /// `src/state/impact.mjs`). Comma-joined at render time, never here.
+    #[serde(rename = "blockedBy")]
+    pub blocked_by: Vec<String>,
+    /// tsk-64z D1: "Blocks" column — count of OTHER still-open items that
+    /// directly wait on this one.
+    pub blocks: u32,
+    /// tsk-64z D2: sort key, ASCENDING (smaller number = higher priority —
+    /// `src/state/priority-formula.mjs`'s inverted scale). `None` when the
+    /// item never had `computePriority` run on it yet (e.g. still at
+    /// `todo`, pre-`discover`).
+    pub priority: Option<i64>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -96,14 +113,21 @@ impl From<io::Error> for FgosError {
     }
 }
 
-/// Parse `fgos triage --json`'s stdout, preserving the CLI's own row order
-/// — already the impact-first sort tsk-4vo asks for (see
-/// `parse_triage_preserves_rank_impact_order` below); no change needed
-/// here for that part of the item, only `parse_doing`'s sort (D1/D2).
-/// (the D5 `rankImpact` order) without re-sorting it here.
+/// Parse `fgos triage --json`'s stdout. tsk-64z D2: re-sorts by `priority`
+/// ASCENDING (`priority-formula.mjs`'s inverted scale — smaller number =
+/// higher priority), overriding `rankImpact`'s own default tier/blocks/
+/// component order (the order tsk-4vo originally asked to preserve
+/// byte-for-byte — see `parse_triage_preserves_rank_impact_order`, still
+/// pinned for the CLI's own `--all`-less order, just no longer what this
+/// function returns). An absent `priority` (`None` — an item that never
+/// had `computePriority` run, e.g. still at `todo`) sorts LAST, same
+/// absent-sorts-last convention `docs/reference/triage-table-columns.md`
+/// already documents for `goalTier`.
 pub fn parse_triage(json: &str) -> Result<Vec<TriageRow>, serde_json::Error> {
     let envelope: TriageEnvelope = serde_json::from_str(json)?;
-    Ok(envelope.data)
+    let mut rows = envelope.data;
+    rows.sort_by_key(|row| row.priority.unwrap_or(i64::MAX));
+    Ok(rows)
 }
 
 /// Parse `fgos list --all --json`'s stdout, keeping items whose `parkReason`
@@ -222,8 +246,10 @@ mod tests {
                 "title": "MVP goalTier test item",
                 "status": "wontfix",
                 "blocks": 0,
+                "blockedBy": [],
                 "stage": "executing",
                 "goalTier": "mvp",
+                "priority": 300,
                 "componentId": 4,
                 "componentSize": 1,
                 "isIsolated": true
@@ -233,8 +259,10 @@ mod tests {
                 "title": "Wire real fgOS data into the dashboard",
                 "status": "doing",
                 "blocks": 2,
+                "blockedBy": ["tsk-mvp-test-1"],
                 "stage": "executing",
                 "goalTier": null,
+                "priority": 100,
                 "componentId": 27,
                 "componentSize": 3,
                 "isIsolated": false
@@ -244,11 +272,26 @@ mod tests {
                 "title": "Choke-point: createWorktree's 6 call sites",
                 "status": "doing",
                 "blocks": 1,
+                "blockedBy": [],
                 "stage": "executing",
                 "goalTier": null,
+                "priority": 200,
                 "componentId": 31,
                 "componentSize": 4,
                 "isIsolated": false
+            },
+            {
+                "id": "tsk-no-priority-yet",
+                "title": "Never discovered, no priority computed yet",
+                "status": "todo",
+                "blocks": 0,
+                "blockedBy": [],
+                "stage": "clarify",
+                "goalTier": null,
+                "priority": null,
+                "componentId": 5,
+                "componentSize": 1,
+                "isIsolated": true
             }
         ]
     }"#;
@@ -325,23 +368,43 @@ mod tests {
         }
     }"#;
 
+    /// tsk-64z D2: priority ASCENDING drives the order, overriding
+    /// `rankImpact`'s own given order — the fixture's raw array order is
+    /// deliberately `[mvp-test-1 (300), 19y-2 (100), choke-point (200),
+    /// no-priority (null)]`, none of which is priority-ascending, so a
+    /// passing assertion here proves a real re-sort happened, not a
+    /// coincidental preserve. `None` priority (never `computePriority`'d)
+    /// sorts last.
     #[test]
-    fn parse_triage_preserves_rank_impact_order() {
+    fn parse_triage_sorts_by_priority_ascending_overriding_rank_impact_order() {
         let rows = parse_triage(TRIAGE_FIXTURE).expect("fixture should parse");
         let ids: Vec<&str> = rows.iter().map(|r| r.id.as_str()).collect();
-        // Byte-for-byte match against D5's rankImpact order: goalTier tier
-        // first (mvp before none), then this fixture's own given order for
-        // the rest — parsing must never re-sort what the CLI already sorted.
         assert_eq!(
             ids,
             vec![
-                "tsk-mvp-test-1",
                 "tsk-19y-2",
                 "choke-point-createworktree-callsite-wrapper",
+                "tsk-mvp-test-1",
+                "tsk-no-priority-yet",
             ]
         );
-        assert_eq!(rows[0].goal_tier.as_deref(), Some("mvp"));
-        assert_eq!(rows[1].goal_tier, None);
+        assert_eq!(rows[0].priority, Some(100));
+        assert_eq!(rows.last().unwrap().priority, None);
+    }
+
+    /// tsk-64z D1: `status`/`blockedBy`/`blocks`/`stage` all parse through
+    /// unchanged from `rankImpact`'s own field names — grounds the Work
+    /// Items panel's Status/BlockedBy/Blocks columns in real parsed data.
+    #[test]
+    fn triage_row_carries_status_stage_blocked_by_blocks_priority() {
+        let rows = parse_triage(TRIAGE_FIXTURE).expect("fixture should parse");
+        let by_id = |id: &str| rows.iter().find(|r| r.id == id).expect("row present");
+        let wired = by_id("tsk-19y-2");
+        assert_eq!(wired.status, "doing");
+        assert_eq!(wired.stage, "executing");
+        assert_eq!(wired.blocked_by, vec!["tsk-mvp-test-1".to_string()]);
+        assert_eq!(wired.blocks, 2);
+        assert_eq!(wired.priority, Some(100));
     }
 
     #[test]
