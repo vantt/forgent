@@ -25,6 +25,7 @@ checked). Resolved only via `fgos discover --force` (tsk-5cf D1b path).
 | D-ID | Decision |
 |------|----------|
 | D1 | Park tsk-rlv until tsk-3jy resolves. Both items point at the same function (`buildVerifyCheckPrompt`, `judge-executor.mjs:329`) — tsk-3jy is currently claimed by a different live session (`writer.id: 7ec38246-a1fd-4413-9b8f-8819d92f638a`), still at stage `clarify`, not yet locked. Proceeding independently risks a merge conflict or duplicate/conflicting fix to the same function. User confirmed this over proceeding independently and accepting the collision risk. |
+| D2 | Scope narrows, after resume, to: link `docs/how-to/write-verify-for-a-skill-prose-change.md` (tsk-4l9, already merged before tsk-1x7/tsk-rlv existed) from `fgos-exploring`'s and/or `fgos-planning`'s `SKILL.md`, so a session writing `verify` for an item touching `.claude/skills/**/SKILL.md` / `.agents/skills/**/SKILL.md` / `plugins/fgOS/skills/**/SKILL.md` is pointed at the `npm test && <POSITIVE> && <NEGATIVE>` standard — and the doc's own pre-written rebuttal for a comprehension-style second-pass objection — before writing a verify command that gets disputed. No change to `judge-executor.mjs`/`discovery.mjs`/`decompose.mjs`. User confirmed this over closing tsk-rlv outright or still modifying judge code. |
 
 ## Scout evidence
 
@@ -63,13 +64,41 @@ checked). Resolved only via `fgos discover --force` (tsk-5cf D1b path).
 
 - `src/intake/judge-executor.mjs`
 - `src/intake/discovery.mjs`
-- tsk-3jy (dependency, currently claimed by another session)
+- `docs/how-to/write-verify-for-a-skill-prose-change.md` (tsk-4l9)
+- tsk-3jy (dependency, delivered — `45b21f6e0150727dfc903a81dee59d2469a949f9`, merged into main as `426cebe`)
+
+## Resolution (post-park)
+
+tsk-3jy delivered while tsk-rlv was parked (D1). Its landed fix
+(`src/intake/judge-executor.mjs`, `buildVerifyCheckPrompt`) adds two
+things to the second-pass judge's prompt: (1) explicit pre-implementation
+stage context, and (2) a requirement that a disagreement name a CONCRETE
+NEW criterion, never repeat a prior round's complaint reworded (tsk-3jy's
+own D2). This is a general anti-repeat mechanism — it reduces, but does
+not structurally eliminate, the risk of a doc-only item cycling through
+many differently-worded-but-still-unfalsifiable comprehension objections.
+
+Separately, re-scouting this session found
+`docs/how-to/write-verify-for-a-skill-prose-change.md` (tsk-4l9, delivered
+before tsk-1x7/tsk-rlv existed) already documents: the correct verify shape
+for a skill-prose item is `npm test && <POSITIVE> && <NEGATIVE>` (never a
+bare grep chain), and — critically — the doc explicitly states verify must
+never be asked to prove "prose có mạch lạc không" / "LLM diễn giải đúng ý
+lúc chạy không", naming that doc as "the answer to cite" when the
+second-pass judge demands exactly that. tsk-1x7's own verify (2 grep
+checks, no `npm test`, not POSITIVE/NEGATIVE shaped) did not follow this
+existing standard — part of why it kept getting disputed was a real,
+self-inflicted verify-shape gap, not solely judge overreach.
+
+D2 (above) locks the real remaining gap: neither `fgos-exploring` nor
+`fgos-planning`'s own `SKILL.md` points a session at this how-to doc when
+an item touches a skill-prose file, so the standard existed but was never
+surfaced at the point a session actually writes the verify command.
 
 ## Outstanding questions deferred to planning
 
-None yet — this item is parked (D1) before reaching `fgos-planning`.
-Whoever resumes this item next should re-read tsk-3jy's own resolution
-first: if tsk-3jy's landed fix already adds stage/kind context to the
-judge prompt, tsk-rlv's own remaining scope may shrink to just adding a
-doc-only regression case, or may already be fully covered and close as a
-duplicate.
+None — D2 fully scopes the remaining work: add one pointer line to
+`docs/how-to/write-verify-for-a-skill-prose-change.md` in
+`fgos-exploring`'s and/or `fgos-planning`'s `SKILL.md`, conditioned on the
+item touching a skill-prose path. `fgos-planning` still owns exactly where
+in each file's flow the pointer belongs and its precise wording.
