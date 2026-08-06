@@ -243,6 +243,22 @@ behavioral suite, since nothing in the coding domain reads or writes
 `domainFields` yet. Landed `awaiting-approval`, first attempt, ahead by 2
 commits, no friction recorded.
 
+## The fixture domain proving the design (`tsk-38t-7`), last child to land
+
+`tsk-38t-7` is the task that actually registered the disposable fixture
+domain mentioned above under "What this design deliberately did not
+solve" — its own verify imports `DOMAINS` and asserts at least one
+registered domain key beyond `coding`/`synthetic`/`triage` exists with a
+non-empty `transitions` list, plus a matching
+`test/e2e/synthetic-domain.test.mjs` suite, before falling back to the
+plain `npm test` regression bar. Depended on all five other child tasks
+(`tsk-38t-2` through `tsk-38t-6`) landing first, since it exercises the
+schema field, the backfill, the consumer migration, the `skillMap` key,
+and `domainFields` together through one real second domain rather than
+testing any of them in isolation. Landed `awaiting-approval`, first
+attempt, ahead by 1 commit, no friction recorded — the last of `tsk-38t`'s
+eight child tasks to close.
+
 ---
 
 **Source:** `docs/history/phase-2-status-category-schema/CONTEXT.md` and
