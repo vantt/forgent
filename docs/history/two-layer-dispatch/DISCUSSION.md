@@ -6,24 +6,26 @@ computed-parallel-wave-schedule + worktree-dispatch-attestation, đã merge main
 
 ## 1. Trạng thái hiện tại
 
-Vòng 3 (2026-08-06). Đã đọc kỹ upstream bee và scout xong phía fgOS. Hai câu
+Vòng 4 (2026-08-06). Đã đọc kỹ upstream bee và scout xong phía fgOS. Hai câu
 hỏi mở đầu của người dùng đã có câu trả lời bằng bằng chứng source (§3, hàng
 "rõ"). Phát hiện quan trọng nhất: **bee không có một mô hình cell duy nhất — bee
 tách sẵn HAI lớp dispatch**, và ranh giới bee vạch là *"dispatch nào GHI file thì
 phải có id, dispatch nào chỉ ĐỌC-tổng-hợp thì không cần gì cả"*.
 
-Vòng 2 làm sâu thêm hàng 10 của §3 (lỗ ba tầng, và nó là lỗ hợp đồng chứ không
-phải lỗi chất lượng model) và đẩy phần đó về `tsk-3xd` để `clarify` chốt. Vòng 3
-xử thứ tự `tsk-3xd` vs `tsk-535` (§3 hàng 16-19) và **đính chính một lời sai của
-vòng 2** — `tsk-3xd` không làm `tsk-535` thành thừa.
+Vòng 2 làm sâu hàng 10 của §3 (lỗ ba tầng, là lỗ hợp đồng chứ không phải lỗi
+chất lượng model) và đẩy phần đó về `tsk-3xd`. Vòng 3 xử thứ tự `tsk-3xd` vs
+`tsk-535` (§3 hàng 16-19, mint **D1**) và đính chính một lời sai của vòng 2.
 
-Hai việc đang chờ người xác nhận: đặt `mergeAfter` cho `tsk-535`, và sửa câu sai
-còn nằm trong description của `tsk-3xd`.
+**Vòng 4 đảo ngược khung của vòng 1:** B1 không phải thứ cần xây — nó là
+`capacity`, khái niệm đã khoá ở `docs/decisions/0026`, và máy đã chạy tới Pha 4
+(§3 hàng 20-21). Thiếu thật sự là hai chốt hình dạng: gói mệnh lệnh phải đăng ký
+trước thay vì soạn động, và danh sách lý do hợp lệ để dispatch không có song
+song hoá (hàng 22-23). Người dùng chốt cả ba ⇒ **D2** (thêm lý do thứ tư),
+**D3** (capacity ad-hoc prompt động), **D4** (gác lớp helper-ghi-file). §6 đã
+regenerate toàn phần, §7 viết lại theo hình dạng mới.
 
-Chưa có D-ID nào được mint: mọi điểm mới đứng qua đúng một vòng, chưa đủ điều
-kiện ổn định (quy tắc D4 của `fgos-coding-shaping`). Còn mở: chọn B1 trước hay
-mở luôn cả B2; hình dạng id ephemeral của B2; có thêm field per-item
-`selfSufficient` không.
+Còn nợ từ vòng 3: sửa câu sai trong description của `tsk-3xd` (đã giao cho phiên
+đang giữ claim item đó). Còn mở: xem §Outstanding questions.
 
 ## 2. Mục tiêu & đề bài
 
@@ -65,7 +67,15 @@ buộc phải giữ lại (id, footprint, verify, merge) khi việc con thực s
 | 16 | Nguy cơ mất dữ liệu của `tsk-535` đã sống chưa? | **Rõ — chưa, còn tiềm ẩn** | `deriveTitle` chỉ được gọi ở đúng một chỗ: `bin/fgos.mjs:748` (đường `submit`). Không có migration/verb re-derive nào trong source; `docs/history/work-item-title-contract/CONTEXT.md` để nguyên *"Whether D4's re-derive ships as a one-shot script or a CLI verb"* ở mục Deferred to planning ⇒ chỉ nổ khi ai đó ship D4 |
 | 17 | `fgos add` có `--description` không? | **Rõ — không** | `bin/fgos.mjs` chỉ set `description` ở `:764` (nhánh `submit`); `--description` chỉ tồn tại cho `edit` và `tool register`. Xác nhận nửa thứ hai của `tsk-535` là thật |
 | 18 | `tsk-3xd` có làm `tsk-535` thành thừa không? | **Rõ — KHÔNG** (đính chính lời nói ở vòng 2) | `tsk-3xd` chỉ vá tiến-về-trước: không đụng 53 item đã hỏng, không đụng đường `fgos add`. Nói `tsk-535` "có thể superseded" là sai |
-| 19 | Thứ tự `tsk-3xd` vs `tsk-535` | **Khuyến nghị đã nêu, chờ người xác nhận** | `tsk-3xd` trước: nó vá 40/53 item (đường decompose) bằng prose thật, làm `tsk-535` teo lại còn `fgos add --description` + backfill. Làm ngược thì công vứt đi VÀ `description=title` che mất triệu chứng (nhìn như đã có description, với executor vẫn rỗng nghĩa). Ràng buộc cứng thật sự: cả hai xong trước khi D4 re-derive ship — item ship D4 chưa tồn tại |
+| 19 | Thứ tự `tsk-3xd` vs `tsk-535` | **Chốt — D1** | `tsk-3xd` trước: nó vá 40/53 item (đường decompose) bằng prose thật, làm `tsk-535` teo lại còn `fgos add --description` + backfill. Làm ngược thì công vứt đi VÀ `description=title` che mất triệu chứng (nhìn như đã có description, với executor vẫn rỗng nghĩa). Ràng buộc cứng thật sự: cả hai xong trước khi D4 re-derive ship — item ship D4 chưa tồn tại |
+| 20 | B1 có phải khái niệm mới không? | **Rõ — KHÔNG, nó là `capacity` đã khoá** | `docs/decisions/0026` dòng 67-74: **subTask** *"đúng bản chất chỉ là 1 rootTask khác, được kích hoạt đệ quy"*; **capacity** *"1 đơn vị functional/helper hẹp... không tự mang vòng đời 1 rootTask đầy đủ"*. Dòng 76-86 chốt hai cái **không gộp khái niệm**, chỉ gộp **cơ chế dispatch** (4 quy tắc, dòng 88-115). Trùng khít ranh giới bee ở hàng 2 |
+| 21 | Máy của capacity đã chạy chưa? | **Rõ — đã xong tới Pha 4** | `.claude/skills/_shared/capacity-dispatch-fallback.md` (config check → presence check → native-vs-cli → prompt → fallback inline). Pha 1-4 của 0026 đều ở `cleanup`: `tsk-1ni`, `tsk-27y`, `tsk-53h`, `tsk-3ik`. Chỉ Pha 5 (`tsk-6db`, native detection cho agy) còn `todo`, deferred YAGNI |
+| 22 | Hình dạng capacity có khớp cách chia việc người dùng cần không? | **Rõ — KHÔNG, lệch hai chốt** | Chốt 1: capacity là điểm dispatch **đăng ký trước** — đòi `capacities.<id>` trong config + `<PROMPT_TEMPLATE>` **cố định** hardcode trong skill (*"so every dispatch asks the exact same thing, never a paraphrase that drifts call to call"*). Chốt 2: danh sách lý do hợp lệ để dispatch chỉ có ba — *cheaper model, cross-provider, resource isolation* — **không có song song hoá** |
+| 23 | Lệnh cấm ad-hoc Task dispatch nằm ở đâu? | **Rõ — ở skill, không ở 0026** | `fgos-exploring/SKILL.md:32-49` và bản sao ở `fgos-planning:46`, `fgos-validating:55`, `fgos-code-implement:48`. 0026 §Ranh giới quan sát được chỉ tách hai lý do của **native-vs-cli** (tránh soul mù re-derive; quan sát được) — chưa bao giờ phát biểu về **dispatch-vs-inline**. Sửa danh sách trong skill không đụng luật khoá |
+| 23b | Danh sách ba lý do bị chép ở 4 skill | **Rõ — vấn đề DRY kèm theo** | Bốn bản sao gần như y hệt (`grep "cheaper model"`). Sửa D2 nên chuyển danh sách về `_shared/` rồi trỏ tới, không sửa bốn chỗ song song |
+| 24 | Có thêm song-song-hoá thành lý do hợp lệ không? | **Chốt — D2 (có)** | `AGENTS.md` để Ship Faster ở ưu tiên #1 mà danh sách hiện tại loại trừ đúng lý do tốc độ |
+| 25 | Prompt động hay nhân bản capacity id? | **Chốt — D3 (prompt động)** | Chấp nhận mất bảo đảm chống-drift của fixed template, đổi lấy chia việc uyển chuyển |
+| 26 | B2 có va vào luật khoá không? | **Rõ — có, và đã gác (D4)** | 0026 chốt nhị phân rootTask/capacity. B2 là helper **CÓ ghi file** ⇒ loại thứ ba; muốn có phải mở rộng `capacity` cho ghi file hoặc supersede phần "subTask ≡ rootTask" của 0026 |
 
 ## 4. Quyết định đã chốt
 
@@ -77,6 +87,9 @@ gọi `fgos decision --id tsk-2t6` thật.)_
 | D-ID | Nội dung | Lý do | Vòng chốt |
 |---|---|---|---|
 | **D1** | `tsk-3xd` làm **trước** `tsk-535`; ghi thứ tự bằng `mergeAfter`, không dep cứng | `tsk-3xd` vá 40/53 item thiếu description (đường decompose) bằng prose thật ⇒ `tsk-535` teo lại còn `fgos add --description` + backfill. Làm ngược thì `description=title` **che mất triệu chứng**: 40 item con nhìn như đã có description nhưng với executor vẫn rỗng nghĩa. `mergeAfter` (`src/state/work.mjs:256-273`) chỉ xếp thứ tự lúc merge ⇒ hai item vẫn chạy song song | Vòng 3 (người xác nhận trực tiếp). Đã thi hành: `fgos edit tsk-535 --merge-after tsk-3xd`, và `fgos decision --id tsk-2t6` seq 7857 |
+| **D2** | Thêm **song-song-hoá / rút-ngắn-thời-gian** thành lý do hợp lệ **thứ tư** để dispatch một bước ra khỏi session thay vì làm inline | Ba lý do hiện tại nằm trong skill, không nằm trong 0026 — 0026 chỉ phát biểu về native-vs-cli, chưa bao giờ về dispatch-vs-inline (§3 hàng 23) ⇒ sửa skill không đụng luật khoá. `AGENTS.md` để Ship Faster ở ưu tiên #1 mà danh sách hiện tại loại trừ đúng lý do tốc độ | Vòng 4 (người xác nhận). `fgos decision` seq 7948 |
+| **D3** | Mở lớp **capacity ad-hoc nhận prompt động** do cha soạn lúc chạy, thay vì chỉ `<PROMPT_TEMPLATE>` cố định đăng ký trước | Cách chia việc cần cha soạn gói mệnh lệnh mỗi lần một nội dung. Chấp nhận đánh đổi: mất bảo đảm chống-drift mà fixed template sinh ra để giữ | Vòng 4 (người xác nhận). `fgos decision` seq 7949 |
+| **D4** | **Gác B2** (exec packet ghi file, id ephemeral) — không mở loại thứ ba giữa rootTask và capacity | 0026 chốt nhị phân; B2 là helper CÓ ghi file ⇒ phải mở rộng `capacity` cho ghi file hoặc supersede 0026, cả hai đụng luật khoá. Xét lại sau khi `tsk-3xd` xong: nếu con work-item thật đã mang được `action` prose thì B2 có thể thừa | Vòng 4 (người xác nhận). `fgos decision` seq 7950 |
 
 ## 5. Q&A log
 
@@ -170,79 +183,141 @@ hết lý do tồn tại và có thể superseded"). Phải sửa trước khi i
 item đó (item đã được pick ở phiên khác) — phiên này chỉ soạn đoạn thay thế,
 không ghi chéo sang item của phiên khác.
 
+### 2026-08-06 — vòng 4
+
+**Người dùng:** bàn tiếp.
+
+**Scout (trước khi hỏi bất cứ điều gì mới):** đọc `fgos-exploring/SKILL.md`,
+`.claude/skills/_shared/capacity-dispatch-fallback.md`,
+`docs/decisions/0026`, `src/runner/dispatch.mjs`, và trạng thái 6 item của kế
+hoạch 5 pha trong 0026. Kết quả đảo ngược khung của vòng 1: **B1 không phải thứ
+cần xây — nó là `capacity`, khái niệm đã khoá ở 0026, và máy đã chạy tới Pha 4**
+(§3 hàng 20-21). Cái thật sự thiếu là hai chốt hình dạng (§3 hàng 22-23), cộng
+một vấn đề DRY kèm theo (hàng 23b: danh sách ba lý do bị chép ở 4 skill).
+
+**Đính chính phương pháp:** lần scout đầu em gọi `fgos list --json` từ trong
+worktree mà quên `--dir`, nó trả "not found" cho **mọi** id (worktree không mang
+`.fgos/`, ADR0020) — suýt kết luận sai rằng cả 6 item của kế hoạch 5 pha đã
+done+cleanup. Kiểm lại với `--dir` mới ra đúng: Pha 1-4 ở `cleanup`, Pha 5
+(`tsk-6db`) vẫn `todo`. Đúng cái bẫy `CLAUDE.md` cảnh báo — một kết quả zero
+đáng ngờ phải cross-check trước khi tin.
+
+**Người dùng chốt ba điểm:** (1) thêm song song hoá; (2) prompt động; (3) gác
+B2. ⇒ mint **D2/D3/D4** ở §4.
+
+**Kết quả vòng 4:** ba `fgos decision --id tsk-2t6` (seq 7948/7949/7950); §6
+regenerate toàn phần vì khung "B1 cần xây" của vòng 1 đã sai sự thật; §7 viết
+lại theo hình dạng mới.
+
 ## 6. Thiết kế đã chốt {#design}
 
-_(Trạng thái: bản phác thảo vòng 1, chưa có D-ID nào chống lưng. Regenerate
-toàn phần khi có quyết định làm đổi hình dạng.)_
+_(Regenerate toàn phần ở vòng 4, thay bản phác thảo vòng 1. Bản cũ mô tả B1/B2
+như hai thứ cần xây mới — sai sự thật: B1 đã tồn tại dưới tên `capacity`.
+Chống lưng: D1-D4 ở §4, và §3 hàng 20-26.)_
 
-Ý tưởng trung tâm: fgOS phân biệt dispatch theo **hệ quả của nó lên cây git**,
-không theo việc nó "lớn hay nhỏ". Một dispatch chỉ đọc và trả về chữ thì không
-để lại gì cần hoà nhập, nên không cần danh tính, không cần state, không cần
-verify — nó chỉ cần một gói mệnh lệnh đầy đủ và một digest trả về. Một dispatch
-ghi file thì để lại commit phải merge, nên bắt buộc phải có danh tính để giữ
-chỗ (reserve), để chứng thực điểm xuất phát (attestation), để gắn commit và để
-merge đúng nhánh cha. Đây chính là ranh giới bee đã vạch, và nó giải thích vì
-sao bee vừa có cell có id vừa có I/O worker không id mà không mâu thuẫn.
+Điểm khởi đầu đúng không phải "fgOS cần lớp dispatch thứ hai" — **fgOS đã có
+nó**, và nó tên là `capacity`. `docs/decisions/0026` chốt sẵn một nhị phân:
+**rootTask** (đệ quy — thứ mà "subTask" chỉ là tên gọi tương đối của nó) mang
+vòng đời đầy đủ; **capacity** là helper functional hẹp, cố ý *không* mang vòng
+đời nào. Đúng hai lớp bee tách, chỉ khác tên. Máy cũng chạy rồi: bốn trong năm
+pha triển khai của 0026 đã merge, và `_shared/capacity-dispatch-fallback.md` là
+hợp đồng sống của lớp helper — kiểm config, kiểm backend có mặt, tự quyết
+native-hay-cli, gửi prompt, và luôn có đường lui về "tự làm inline" khi bất cứ
+bước nào hụt.
 
-**B1 — gather packet (không id, không state).** Cha đóng gói toàn bộ mệnh lệnh
-(mục tiêu, đường dẫn phải đọc, ràng buộc, hình dạng digest mong đợi), dispatch
-xuống đúng tier/provider, con trả digest về cha. Không claim, không reserve,
-không cap, không file kết quả bắt buộc — stdout/final message chính là digest.
-Dùng cho: `discover` (scout, research web, fetch, tổng hợp), reality-check của
-`validating`, mọi bước gather/render/mine cơ học. Không cần bất kỳ thay đổi
-nào trong `.fgos/` — chỉ cần skill dạy cách đóng gói và cách nhận digest.
+Cái thật sự lệch không nằm ở khái niệm mà ở **hình dạng của gói mệnh lệnh** và
+ở **danh sách lý do được phép dispatch**. Capacity hôm nay là một điểm dispatch
+*đăng ký trước*: mỗi cái đòi một khoá trong config và một prompt **cố định**
+nhúng trong skill, cốt để mọi lần gọi hỏi đúng một câu và không trôi nghĩa. Cách
+chia việc mà thảo luận này theo đuổi cần điều ngược lại — cha soạn gói mệnh lệnh
+*lúc chạy*, mỗi lần một nội dung khác nhau, tuỳ việc nó vừa quyết định tách ra.
+D3 chọn mở lớp ad-hoc đó và trả giá bằng chính bảo đảm chống-trôi mà fixed
+template sinh ra để giữ. Song song, bốn skill hiện liệt kê ba lý do hợp lệ để
+một bước được đẩy ra ngoài — model rẻ hơn, khác provider, cách ly tài nguyên —
+và **không** có "để chạy song song cho nhanh", đúng lý do quan trọng nhất của
+người dùng, trong một sản phẩm đặt Ship Faster ở ưu tiên số một. D2 thêm nó vào.
+Điểm mấu chốt khiến D2 rẻ: lệnh cấm đó sống trong skill, không trong 0026 —
+0026 chỉ từng phát biểu *native hay cli*, chưa bao giờ phát biểu *dispatch hay
+làm tại chỗ*.
 
-**B2 — exec packet (id ephemeral, phạm vi cha).** Dùng khi con GHI code. Giữ
-lại đúng những thứ phục vụ hoà nhập: một id phạm vi cha (dạng `<parent>#cN`),
-`footprint`, `verify` chạy được, và merge về `fgw/<parent>`. Bỏ đi toàn bộ phần
-hành chính: không `stage` FSM, không pull door `/fgOS:pick`, không status pool,
-không retro, không cleanup; chết khi cha `done`. Đây là port thẳng mô hình cell
-của bee sang fgOS, kèm sổ ephemeral thứ hai — và đó là lý do B2 đắt hơn B1 rất
-nhiều.
-
-**Điều kiện tiên quyết cho cả hai:** thân mệnh lệnh phải thực sự được truyền
-xuống. Hiện `decompose.mjs:940` không truyền `description`, nên ngay cả cách
-chia thứ nhất (work item đầy đủ) cũng đang dispatch con với prompt rỗng phần
-chỉ dẫn. Vá xong (`tsk-3xd`) mới đánh giá được B2 có còn cần hay không.
+Còn lớp thứ ba — helper mà **ghi file** — thì gác (D4). Nó không phải ý tồi, nó
+là thứ va thẳng vào nhị phân của 0026: hễ cần reserve, attest, commit và merge
+thì đã là vòng đời, mà vòng đời là thứ định nghĩa rootTask. Muốn có nó phải
+hoặc nới `capacity` cho phép ghi file, hoặc supersede phần "subTask ≡ rootTask"
+— cả hai đều là sửa luật khoá, quá đắt cho một nhu cầu chưa được chứng minh.
+Và có một lý do thực tế hơn để chờ: hôm nay ngay cả work item con thật cũng
+đang bị dispatch với phần mệnh lệnh rỗng (`tsk-3xd`). Vá xong lỗ đó rồi mới
+biết lớp thứ ba có còn lý do tồn tại hay không.
 
 ```mermaid
 flowchart TD
-    P[Task cha - session giữ quyền quyết định] -->|chỉ đọc, trả digest| B1[B1 gather packet<br/>không id, không state<br/>không reserve/cap/merge]
-    P -->|ghi code| B2[B2 exec packet<br/>id ephemeral parent-scoped<br/>footprint + verify]
-    P -->|việc cần quản lý hành chính| W[Work item thật<br/>stage FSM + pull door<br/>status pool + retro + cleanup]
-    B1 -->|digest| P
-    B2 -->|commit trên fgw/parent| M1[merge leaf to parent]
-    W -->|commit trên fgw/id| M2[merge leaf to parent rồi root to main]
-    M1 --> P
-    M2 --> MAIN[main]
+    P[rootTask - session sống, giữ quyền quyết định]
+    P -->|helper hẹp, không vòng đời| C[capacity]
+    P -->|việc mang vòng đời đầy đủ| W[rootTask con = work item]
+    C --> C1[đã có: capacity đăng ký trước<br/>config + prompt cố định]
+    C --> C2[D3 mở thêm: capacity ad-hoc<br/>prompt động do cha soạn]
+    C1 -->|digest| P
+    C2 -->|digest| P
+    W -->|commit trên nhánh riêng| M[merge con vào nhánh cha, rồi cha vào main]
+    P -.->|D4 gác: helper mà ghi file<br/>va vào nhị phân của 0026| X[loại thứ ba - chưa mở]
 ```
+
+Bốn lý do hợp lệ để đẩy một bước ra khỏi session, sau D2: model rẻ hơn · khác
+provider · cách ly tài nguyên · **chạy song song cho nhanh**.
 
 ## 7. Danh mục hạng mục / task {#tasks}
 
-### B1 — gather packet: hợp đồng đóng gói + digest {#task-gather-packet}
+### Lý do thứ tư: song song hoá {#task-parallelism-reason}
 
-- **Mục tiêu:** cho phép mọi skill fgOS (đầu tiên là `fgos-exploring`, sau đó
-  `fgos-validating`) tách một bước gather thuần-đọc thành dispatch riêng, đúng
-  tier/provider, không sinh state.
-- **Trích §6:** *"Một dispatch chỉ đọc và trả về chữ thì không để lại gì cần
-  hoà nhập, nên không cần danh tính, không cần state, không cần verify."*
-- **D-ID áp dụng:** chưa có.
-- **Quan hệ:** độc lập với `#task-exec-packet`; nếu B1 đủ dùng thì B2 có thể
-  không bao giờ cần tới.
-- **Verify nháp:** `node --test test/skills/gather-packet.test.mjs` (chưa tồn
-  tại — hợp đồng đóng gói phải được định nghĩa trước).
+- **Mục tiêu:** thêm "chạy song song / rút ngắn thời gian" vào danh sách lý do
+  hợp lệ để một bước được dispatch thay vì làm inline, và **gộp danh sách về
+  một chỗ** thay vì bốn bản sao.
+- **File đã biết:** `.claude/skills/fgos-exploring/SKILL.md:32-49`,
+  `fgos-planning/SKILL.md:46`, `fgos-validating/SKILL.md:55`,
+  `fgos-code-implement/SKILL.md:48` (bốn bản sao gần y hệt — §3 hàng 23b), đích
+  gộp là `.claude/skills/_shared/capacity-dispatch-fallback.md`. Cả `.agents/`
+  mirror cũng phải theo.
+- **Trích §6:** *"bốn skill hiện liệt kê ba lý do hợp lệ... và không có 'để
+  chạy song song cho nhanh', đúng lý do quan trọng nhất của người dùng, trong
+  một sản phẩm đặt Ship Faster ở ưu tiên số một."*
+- **D-ID áp dụng:** D2.
+- **Quan hệ:** độc lập với `#task-adhoc-capacity` về file, nhưng vô nghĩa nếu
+  đứng một mình — có lý do hợp lệ mà không có cơ chế gói động thì vẫn chỉ
+  dispatch được các capacity đăng ký sẵn.
+- **Không đụng:** `docs/decisions/0026` — sửa đây không phải sửa luật khoá
+  (§3 hàng 23).
+- **Verify nháp:** `grep -rc "song song" .claude/skills/_shared/capacity-dispatch-fallback.md`
+  cộng một test đọc-file khẳng định bốn `SKILL.md` không còn giữ bản sao riêng.
 
-### B2 — exec packet: id ephemeral phạm vi cha {#task-exec-packet}
+### Capacity ad-hoc: prompt động do cha soạn {#task-adhoc-capacity}
 
-- **Mục tiêu:** sổ ephemeral thứ hai cho việc con GHI code: id phạm vi cha,
-  `footprint`, `verify`, merge về `fgw/<parent>`; không stage/pull-door/pool/
-  retro/cleanup.
-- **Trích §6:** *"Giữ lại đúng những thứ phục vụ hoà nhập... Bỏ đi toàn bộ
-  phần hành chính."*
-- **D-ID áp dụng:** chưa có.
-- **Quan hệ:** phụ thuộc kết quả của `tsk-3xd` — nếu con work-item thật đã
-  mang được `action` prose thì hạng mục này có thể bị bác vì YAGNI.
-- **Verify nháp:** chưa xác định — phụ thuộc chỗ lưu sổ (§3 hàng 13).
+- **Mục tiêu:** cho phép một lớp capacity nhận gói mệnh lệnh soạn lúc chạy
+  (mục tiêu, đường dẫn phải đọc, ràng buộc, hình dạng digest mong đợi) thay vì
+  chỉ `<PROMPT_TEMPLATE>` cố định đăng ký trước — vẫn đi qua đúng máy đã có
+  (kiểm config → kiểm present → `dispatch.mjs decide` native-vs-cli → fallback
+  inline), không mở đường dispatch thứ hai.
+- **Trích §6:** *"cha soạn gói mệnh lệnh lúc chạy, mỗi lần một nội dung khác
+  nhau, tuỳ việc nó vừa quyết định tách ra."*
+- **D-ID áp dụng:** D3.
+- **Rủi ro đã biết, phải xử trong plan:** mất bảo đảm chống-trôi mà fixed
+  template sinh ra để giữ (`_shared/capacity-dispatch-fallback.md` nói thẳng
+  lý do template cố định tồn tại). Cần một hình dạng gói tối thiểu bắt buộc để
+  thay thế, không phải free-text hoàn toàn.
+- **Quan hệ:** cùng chạm `_shared/capacity-dispatch-fallback.md` với
+  `#task-parallelism-reason` ⇒ footprint chồng, phải xếp tuần tự hoặc gộp.
+- **Verify nháp:** chưa xác định — phụ thuộc hình dạng gói tối thiểu chốt ở
+  planning.
+
+### (Gác) Lớp thứ ba: helper mà ghi file {#task-exec-packet}
+
+- **Trạng thái:** **gác theo D4**, không phải bác.
+- **Lý do gác:** va vào nhị phân của `docs/decisions/0026` — hễ cần reserve /
+  attest / commit / merge thì đã là vòng đời, mà vòng đời định nghĩa rootTask.
+  Mở nó phải nới `capacity` cho ghi file hoặc supersede phần "subTask ≡
+  rootTask", cả hai là sửa luật khoá.
+- **Điều kiện xét lại:** sau khi `tsk-3xd` xong. Nếu work item con thật đã mang
+  được `action` prose, lớp này có thể không còn lý do tồn tại.
+- **D-ID áp dụng:** D4.
 
 ### Delta distillery: trục hai-lớp-dispatch {#task-distillery-delta}
 
@@ -251,19 +326,27 @@ flowchart TD
   isolated-run-contract, chưa tách trục *ghi-file-cần-id vs chỉ-đọc-không-cần*,
   và chưa ghi nhận cell ≠ backlog item), kèm một hàng `porting-log.md` tương
   ứng.
-- **Trích §6:** *"Đây chính là ranh giới bee đã vạch, và nó giải thích vì sao
-  bee vừa có cell có id vừa có I/O worker không id mà không mâu thuẫn."*
+- **Bổ sung sau vòng 4:** ghi luôn phát hiện quan trọng hơn — fgOS đã hội tụ
+  độc lập với bee ở chính ranh giới này từ trước, qua `docs/decisions/0026`
+  (rootTask đệ quy vs capacity không-vòng-đời). Deep-dive hiện chưa nối hai
+  nguồn đó với nhau.
+- **Trích §6:** *"Điểm khởi đầu đúng không phải 'fgOS cần lớp dispatch thứ
+  hai' — fgOS đã có nó, và nó tên là `capacity`."*
 - **D-ID áp dụng:** chưa có.
-- **Quan hệ:** thuần tài liệu, không phụ thuộc B1/B2; nằm cùng branch
-  `fgw/tsk-2t6` theo quyết định của người dùng ở §5 vòng 1.
+- **Quan hệ:** thuần tài liệu, không phụ thuộc hai hạng mục trên; nằm cùng
+  branch `fgw/tsk-2t6` theo quyết định của người dùng ở §5 vòng 1.
 - **Verify nháp:** `grep -q "hai lớp dispatch" docs/distillery/deep-dives/parallel-decomposition-and-merge.md`
 
 ## Outstanding questions
 
-- Làm B1 trước rồi đánh giá lại, hay mở luôn cả B2? (§3 hàng 12)
-- Nếu làm B2: id ephemeral lưu ở đâu, hình dạng nào? (§3 hàng 13)
+- Hình dạng gói tối thiểu cho capacity ad-hoc (D3) là gì — cần bắt buộc những
+  trường nào để không rơi về free-text và mất luôn bảo đảm chống-trôi?
 - Có thêm field per-item `selfSufficient` không, hay giữ nguyên triết lý phán
-  trên artifact qua `hasOpenItems`? (§3 hàng 14)
-- Vá `tsk-3xd` xong thì B2 còn cần không? (§3 hàng 15)
+  trên artifact qua `hasOpenItems`? (§3 hàng 14 — chưa bàn tới)
+- Vá `tsk-3xd` xong thì lớp thứ ba còn cần không? (§3 hàng 15, điều kiện xét
+  lại của D4)
+- Hai hạng mục `#task-parallelism-reason` và `#task-adhoc-capacity` chồng
+  footprint ở `_shared/capacity-dispatch-fallback.md` — tách hai item xếp tuần
+  tự, hay gộp làm một?
 </content>
 </invoke>
