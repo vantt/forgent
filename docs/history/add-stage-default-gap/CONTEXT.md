@@ -39,6 +39,8 @@ Does NOT design the implementation (flag shape, backfill mechanism, exact
 | D1 | Fix scope is broad: every `fgos add` caller must get real stage handling, not narrowly `fgos-planning`'s split-child pattern. |
 | D2 | Mechanism combines both: add an explicit `--stage` flag for caller override, AND change `add`'s lazy default from implicit `executing` to `clarify` (mirrors `submit`'s existing D8 default contract). |
 | D3 | The 26 items already stuck at implicit-`executing` get a one-time data fix, never a new permanent back-edge in `workflow-stage-graphs.mjs`'s `coding.transitions` table. |
+| D4 | Of the 26, only items whose `status` is still `todo`/`doing`/`awaiting-approval` are actually in scope for D3's one-time fix (`tsk-503`, `tsk-2k1`, `tsk-2sl` as of 2026-08-06). The other 23 are `delivered`/`cleanup`/`retrospective` — already built, approved, and past `executing` in the status lifecycle; correcting their historical `stage` field has no practical effect (nothing will ever re-route them through `fgos-routing` again) and is out of scope. |
+| D5 | Narrows D4 further: only `tsk-503` (`todo`, not yet dispatched) gets the one-time supersede+re-add fix. `tsk-2k1` (`doing`) and `tsk-2sl` (`awaiting-approval`) are left alone — same reasoning D3 already used to reject a back-edge: touching an item that is mid-build or already past `executing` (real code/commits, or already sitting for merge review) risks more than a stale `stage` field is worth, and correcting it now has no practical forward effect for either. |
 
 ## Pinned terms
 
@@ -47,7 +49,10 @@ Does NOT design the implementation (flag shape, backfill mechanism, exact
   **26 items** — `tsk-3b3`, `tsk-5m7`, `tsk-50i`, `tsk-62y`, `tsk-2u0`,
   `tsk-19j-4`, `tsk-38t-1`..`tsk-38t-8`, `tsk-3c7`, `tsk-2ig`, `tsk-64z`,
   `tsk-417`, `tsk-1e3`, `tsk-40t`, `tsk-jo1`, `tsk-30z`, `tsk-50ic`,
-  `tsk-2sl`, `tsk-2k1`, `tsk-503`.
+  `tsk-2sl`, `tsk-2k1`, `tsk-503`. Status breakdown (D4): `delivered`
+  10, `cleanup` 5, `retrospective` 8, `awaiting-approval` 1 (`tsk-2sl`),
+  `doing` 1 (`tsk-2k1`), `todo` 1 (`tsk-503`) — only the last 3 are in
+  D3's actual fix scope.
 
 ## Scout evidence / paths
 
