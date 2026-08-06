@@ -24,6 +24,9 @@ pub trait PaneRegistry {
 /// independently of the render seam below.
 pub trait PaneOrchestrator {
     fn open_pick_pane(&self, id: &str) -> io::Result<()>;
+    /// Opens a new agent pane running `/fgOS:discover <id>` (tsk-1e3 D4) —
+    /// same shape as `open_pick_pane`, different slash command.
+    fn open_discover_pane(&self, id: &str) -> io::Result<()>;
     /// Switches herdr's focus directly to an already-running pane
     /// (tsk-1eu D2), never opening a new one.
     fn focus_pane(&self, pane_id: &str) -> io::Result<()>;
@@ -42,6 +45,11 @@ pub enum UiEvent {
     Pick,
     /// Tab — switches which panel has keyboard focus (tsk-1eu D1).
     SwitchPanel,
+    /// `d` while the detail modal is open — fires the Discover button
+    /// (tsk-1e3 D4). Inert everywhere else; inert even in the modal when
+    /// the selected item's `stage != "clarify"` (checked by the caller,
+    /// this event only carries the keypress itself).
+    Discover,
     Quit,
 }
 
