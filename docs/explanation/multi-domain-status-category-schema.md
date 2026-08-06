@@ -259,6 +259,57 @@ testing any of them in isolation. Landed `awaiting-approval`, first
 attempt, ahead by 1 commit, no friction recorded — the last of `tsk-38t`'s
 eight child tasks to close.
 
+## The `herdr-plugin` literal-status dependency, later actually removed — once new evidence existed
+
+`tsk-4ot`'s own conclusion above was correct *at the time it was made* —
+no field existed that could separate `doing` from `blocked`/
+`awaiting-human` without the literal status strings, so keeping the
+literal match and pinning it with a regression test was the right call
+then. `tsk-48i` reversed that decision later, but only because the
+premise it rested on had genuinely changed: `parkReasonForStatus`
+(`src/state/workflow-stage-graphs.mjs:409`, built by a separate item,
+`tsk-3w3`) landed on `main` in the meantime — a domain-owned table that
+makes exactly the distinction that was missing before. `tsk-48i`'s own
+scope note names this explicitly as a reversal-on-new-evidence, not a
+second-guess:
+
+> "tsk-4ot (delivered) scoped a prior attempt at this same risk to
+> Rust-only and concluded no safe fix was possible then, because no field
+> existed that could distinguish `doing` from `blocked`/`awaiting-human`
+> without the literal strings... Since then, `parkReasonForStatus`...
+> landed on `main` — a domain-owned table that makes exactly this
+> distinction. This item exposes that table through the public JSON
+> contract and switches `fgos.rs` to consume it, finally removing the
+> literal-status dependency tsk-4ot could only document and pin."
+
+The new field, `parkReason`, is stamped at write time exactly like
+`statusCategory` already is (`addWork`/`moveWork`) — reusing the existing
+domain-agnostic table byte for byte rather than inventing a herdr-specific
+derived field, the same DRY precedent `statusCategory` itself set. It
+takes one of three values (`"system-error"` for `blocked`,
+`"human-question"` for `awaiting-human`, `"natural-finish"` for
+`awaiting-approval`) or is absent for every other status, including
+`doing` itself.
+
+A first implementation pass of the new Rust-side filter (`parkReason`
+absent or `"natural-finish"`) regressed a different existing test
+(`parse_doing_excludes_done_items`), because `parkReason` is *also* absent
+for `todo`/`done`/`wontfix`/`delivered`/`retrospective`/`cleanup` — not
+just `doing` — since `parkReasonForStatus`'s table only declares entries
+for the three park states. The fix combined `parkReason` with
+`statusCategory` (both already-public, write-time-stamped fields) rather
+than re-introducing any literal `status` check, verified case by case
+against every one of the ten statuses to reproduce the pre-change
+membership byte-for-byte. The item's own verify-writing process needed
+five rounds of correction to land on a grep that actually proved this (a
+free-word match colliding with the unrelated function name
+`parkReasonForStatus`; a wrong test-file target testing only internal
+store state instead of the public CLI JSON surface; a binary path
+resolving against the main checkout instead of the branch's own code) —
+the same category of trap `docs/how-to/write-verify-for-a-skill-prose-
+change.md` catalogs for skill-prose verify, showing up here for a Rust
+consumer's verify instead.
+
 ## The stale triage-table doc gap (`tsk-38t-8`) — independent of the category decision
 
 `tsk-38t-8` fixed `docs/reference/triage-table-columns.md`, which
