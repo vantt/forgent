@@ -23,6 +23,20 @@ parameters where the consuming skill's own reasoning step lives:
   for "reason about it yourself" (real example: "Classify it yourself"),
   the path every branch below falls through to.
 
+## Valid reasons to dispatch instead of doing it inline
+
+Four, no more (`docs/history/two-layer-dispatch/DISCUSSION.md` D2, single
+source — no consuming skill restates this list, it points here instead):
+a cheaper model, a different provider (e.g. Codex/agy), resource
+isolation, or running the step in parallel with other work to shorten
+wall-clock time (chạy song song cho nhanh — Ship Faster is priority #1,
+`AGENTS.md`; the original three-reason list predated that priority order
+and silently excluded the one reason that serves it). Anything else stays
+inline — the live session already has full context for it, and
+dispatching it anyway is the same "soul re-deriving what a live soul
+already knows" waste `tsk-1ni` found in `judgeDiscovery`'s blind
+cli-spawn.
+
 ## Step A — config check
 
 Before reasoning it out yourself, check two things in order — whether
