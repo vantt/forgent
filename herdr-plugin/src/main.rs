@@ -268,6 +268,18 @@ mod tests {
         fn fetch_doing(&self) -> Result<Vec<DoingRow>, FgosError> {
             Ok(Vec::new())
         }
+
+        fn fetch_need_answer(&self) -> Result<Vec<herdr_fgos::fgos::NeedAnswerRow>, FgosError> {
+            Ok(Vec::new())
+        }
+
+        fn fetch_after_deliver(&self) -> Result<Vec<herdr_fgos::fgos::AfterDeliverRow>, FgosError> {
+            Ok(Vec::new())
+        }
+
+        fn fetch_merge_list(&self) -> Result<herdr_fgos::fgos::MergeListSummary, FgosError> {
+            Ok(herdr_fgos::fgos::MergeListSummary::default())
+        }
     }
 
     struct CountingRegistry {

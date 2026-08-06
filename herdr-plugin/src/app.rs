@@ -1,5 +1,22 @@
+use crate::fgos::MergeListSummary;
 use crate::pane_scan::PaneIdentity;
 use crate::ports::{PaneRegistry, WorkItemSource};
+
+/// tsk-417 D3: NEED ANSWER box row — `status` is `"blocked"` (ERR tag) or
+/// `"awaiting-human"` (ASK tag), one box, distinct sub-tag per row.
+pub struct NeedAnswerTask {
+    pub id: String,
+    pub title: String,
+    pub status: String,
+}
+
+/// tsk-417 D3: AFTER DELIVER box row — `status` is `"retrospective"` (RTR
+/// tag) or `"cleanup"` (POL tag).
+pub struct AfterDeliverTask {
+    pub id: String,
+    pub title: String,
+    pub status: String,
+}
 
 pub struct WorkItem {
     pub id: String,
@@ -124,6 +141,13 @@ pub struct App {
     /// match against id/title). Empty string = no filter applied,
     /// regardless of `filter_input_active`.
     pub filter_query: String,
+    /// tsk-417 D3: NEED ANSWER box rows.
+    pub need_answer: Vec<NeedAnswerTask>,
+    /// tsk-417 D3: AFTER DELIVER box rows.
+    pub after_deliver: Vec<AfterDeliverTask>,
+    /// tsk-417 D3: MERGE LIST box source — a direct field mapping of
+    /// `fgos merge list --json`, never re-derived.
+    pub merge_list: MergeListSummary,
 }
 
 impl App {
@@ -140,6 +164,9 @@ impl App {
             active_tab: Tab::Todo,
             filter_input_active: false,
             filter_query: String::new(),
+            need_answer: Vec::new(),
+            after_deliver: Vec::new(),
+            merge_list: MergeListSummary::default(),
         }
     }
 
@@ -374,6 +401,21 @@ impl App {
             active_tab: Tab::Todo,
             filter_input_active: false,
             filter_query: String::new(),
+            need_answer: vec![NeedAnswerTask {
+                id: "tsk-mock-blocked".into(),
+                title: "Mock blocked item".into(),
+                status: "blocked".into(),
+            }],
+            after_deliver: vec![AfterDeliverTask {
+                id: "tsk-mock-retro".into(),
+                title: "Mock retrospective item".into(),
+                status: "retrospective".into(),
+            }],
+            merge_list: MergeListSummary {
+                ready: vec!["tsk-mock-ready".into()],
+                waiting: Vec::new(),
+                blocked_on_sync: Vec::new(),
+            },
         }
     }
 
@@ -428,6 +470,44 @@ impl App {
             }
             Err(err) => self.last_error = Some(err.to_string()),
         }
+
+        match source.fetch_need_answer() {
+            Ok(rows) => {
+                self.need_answer = rows
+                    .into_iter()
+                    .map(|row| NeedAnswerTask {
+                        id: row.id,
+                        title: row.title,
+                        status: row.status,
+                    })
+                    .collect();
+                self.last_error = None;
+            }
+            Err(err) => self.last_error = Some(err.to_string()),
+        }
+
+        match source.fetch_after_deliver() {
+            Ok(rows) => {
+                self.after_deliver = rows
+                    .into_iter()
+                    .map(|row| AfterDeliverTask {
+                        id: row.id,
+                        title: row.title,
+                        status: row.status,
+                    })
+                    .collect();
+                self.last_error = None;
+            }
+            Err(err) => self.last_error = Some(err.to_string()),
+        }
+
+        match source.fetch_merge_list() {
+            Ok(summary) => {
+                self.merge_list = summary;
+                self.last_error = None;
+            }
+            Err(err) => self.last_error = Some(err.to_string()),
+        }
     }
 
     /// Map each `in_process` task to its herdr pane identity (tsk-4zo D1),
@@ -468,6 +548,18 @@ mod tests {
 
         fn fetch_doing(&self) -> Result<Vec<DoingRow>, FgosError> {
             Ok(Vec::new())
+        }
+
+        fn fetch_need_answer(&self) -> Result<Vec<crate::fgos::NeedAnswerRow>, FgosError> {
+            Ok(Vec::new())
+        }
+
+        fn fetch_after_deliver(&self) -> Result<Vec<crate::fgos::AfterDeliverRow>, FgosError> {
+            Ok(Vec::new())
+        }
+
+        fn fetch_merge_list(&self) -> Result<MergeListSummary, FgosError> {
+            Ok(MergeListSummary::default())
         }
     }
 
