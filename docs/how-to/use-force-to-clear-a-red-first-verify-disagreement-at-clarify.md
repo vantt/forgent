@@ -76,6 +76,27 @@ explicit decision naming what was overridden, so the audit trail still
 shows a real judge disagreement was consciously resolved, not silently
 skipped.
 
+## A second real reason to force: the judge is asking for planning's job, not exploring's
+
+`tsk-535` (a bug fix, not a decomposition root) hit a related but distinct
+version of this same override. The second-pass judge wanted the verify to
+concretely check that `description` ends up non-empty — a fair ask in
+principle — but writing the concrete test assertions for that belongs to
+`fgos-planning`, not `fgos-exploring`:
+
+> "Verify chưa xác định phải kiểm được description non-empty, đúng như
+> second-pass nói. Nhưng viết test cụ thể là việc của `fgos-planning`,
+> không phải `fgos-exploring` (SKILL.md: 'do not research implementation').
+> Force qua, xem quyết định log."
+
+`fgos-exploring`'s own `SKILL.md` draws this boundary directly: locking
+product decisions is exploring's job; researching and writing the
+implementation-level specifics (including exact test shape) is planning's.
+When a second-pass dispute is correct about *what* the verify should
+eventually check but is really asking clarify to do planning's job early,
+`--force` past it — logged — is the right move, same mechanism as the
+red-first case above, different underlying reason.
+
 ## Related
 
 - `docs/history/parallel-decomposition-footprint-avoidance/CONTEXT.md`
