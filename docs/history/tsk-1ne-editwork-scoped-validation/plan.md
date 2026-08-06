@@ -39,7 +39,7 @@ migrating the 65 items' `stage`/`id` (rewrites historical `done`/
 | Component | How risky | What proves it |
 |---|---|---|
 | `editWork`'s scoped re-validation | Low in isolation (CONTEXT.md D2: `id`/`stage` are not in `EDITABLE_FIELDS`, so no patch could ever have exercised the removed re-checks on those two fields) | `fgos-validating`: confirm `EDITABLE_FIELDS` still excludes `id`/`stage`/`status`/`domain` today (the whole safety argument depends on this staying true) |
-| Other validators inside `validateWork` (`validateDeps`, `validateMergeAfter`, `validateSupersededBy`, `validateDuplicates`, `validateDomainFields`) | Medium — these are relational (a patched `deps` array must still resolve against the WHOLE current id set, not just the patch), so "scope to patched fields" must mean "still fully validate any check a patched field participates in," not "skip validation entirely for untouched fields when a relational rule reads them" | `fgos-validating`: walk each validator in `validateWork`'s call chain and confirm the new scoping logic still runs it whenever ANY field it reads is in `patch` |
+| Other validators inside `editWork`'s chain (`validateDeps`, `validateMergeAfter`, `validateSupersededBy`, `validateDuplicates`, `validateDomainFields`, `checkAcceptanceEvidenceTraceable`) | Medium — but de-risked by validating (below): every one of these six is already single-field-scoped in its own right (`validateDeps` only reads `work.deps`, `validateMergeAfter` only `work.mergeAfter`, `validateSupersededBy` only `work.supersededBy`, `validateDuplicates` only `work.duplicates`, `validateDomainFields` only `work.domainFields[ownDomain]`, `checkAcceptanceEvidenceTraceable` only `work.acceptance`, confirmed by direct read of `src/state/work.mjs:655-715,632-648,763-788`) — none reads a SECOND field to decide whether a first field is valid, so "run a validator only when its own field is present in `patch`" is a complete, non-leaky rule; no relational cross-field case exists to miss | `fgos-validating` (this pass): confirmed by reading each validator's body — see cell to the left |
 | Regression on the 65-item unblock itself | Low, directly provable | New/updated test: patch an unrelated field (e.g. `description`) on a fixture item with `stage: compound-learn` or an over-length `id`, assert it now succeeds |
 | Blast radius of touching `editWork` | Low — confirmed by both `mcp__gitnexus__impact(editWork, upstream)` (LOW risk, 3 upstream symbols: `resolveDecompose`, `resolveDiscovery`, `runOnce`) and a manual grep cross-check (GitNexus index is stale — last indexed `251d0b5` per this session's own tool-use hook — so the automated result was cross-checked per `CLAUDE.md`'s gate note). Grep found 4 real call sites total: `src/intake/discovery.mjs:628`, `src/intake/decompose.mjs:816` (both priority-only patches, matching GitNexus's 2 direct hits), plus `bin/fgos.mjs:1486` (the `fgos edit` CLI door — the actual path that hit this bug) and `bin/fgos.mjs:3260` (a `parent`-only patch during decompose splitting) — GitNexus's stale index missed both `bin/fgos.mjs` call sites | None of the 4 call sites patch `id`/`stage`, so none are affected beyond gaining the fix; `fgos-validating` should re-run this same grep to catch any new call site added since this plan was written |
 
@@ -75,6 +75,15 @@ validation-removal flag:
    by this fix, runs before the merge/validate step this fix touches).
 5. Normal patch on an already-fully-valid item (the common case, ~47/112
    items) → unchanged behavior, still fully validated.
+6. Patch an unrelated field on an item whose stored `acceptance` clause
+   already has non-traceable evidence (`checkAcceptanceEvidenceTraceable`,
+   `src/state/work.mjs:763-788`, called unconditionally in `editWork` at
+   `store.mjs:299` today regardless of whether `patch.acceptance` is
+   present — the same unconditional-whole-object-recheck pattern as the
+   stage/id bug, found by this validating pass reading the full call
+   chain, not limited to the two fields `tsk-535`'s original error scan
+   happened to hit) → succeeds; patching `acceptance` itself on such an
+   item still re-runs the check in full.
 
 Proof command for the item as a whole:
 
