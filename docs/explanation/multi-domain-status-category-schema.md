@@ -137,8 +137,45 @@ a heavy-tier item whose own top-level `verify` was deliberately left as a
 minimum regression bar (`npm test`) until the child tasks could each carry
 their own narrower, real verify command.
 
+## The decision record itself narrowed the scope it formalizes
+
+`tsk-38t-1`, the child task that wrote the actual decision record
+(`docs/decisions/0027-...md`) superseding `base-workflow-model` D1-D3, is a
+deliberate act of narrowing, not a direct transcription of the source
+research. The record's own "Bối cảnh" section says so explicitly:
+
+> "Bản thân report nguồn (`plans/reports/research-260730-0931-work-item-
+> schema-multi-domain-upgrade-report.md`, round 4) ban đầu kết luận
+> **"domain sở hữu TOÀN BỘ bảng transition"** — một khung rộng hơn record
+> này thật sự chốt. Khung đó đã bị xét lại và THU HẸP trong phiên
+> `fgos-exploring` cho `tsk-38t`... §1 tự ghi nhận 'Đây là thu hẹp thật so
+> với kết luận round-4 của report gốc... thu hẹp lại đúng phạm vi domain
+> thật sự cần tự khai (đoạn đầu vòng đời)'."
+
+In other words: the research phase's own broadest conclusion — a domain
+owning the *entire* status transition table — never shipped. What shipped
+is the narrower front-segment-only split this document describes above.
+The decision record exists specifically so that gap between "what the
+research concluded" and "what was actually locked" has one canonical place
+to point at, separate from the DISCUSSION.md transcript it was distilled
+from.
+
+`tsk-38t-1` also produced a full consumer audit (`docs/decisions/0027`'s
+own "Audit" section) enumerating every real reader of `STATUSES`/
+`TRANSITIONS`/`RESOLVED_STATUSES` across `src/state/`, `src/runner/`,
+`bin/fgos.mjs`, and even one consumer outside the Node runtime entirely
+(`herdr-plugin/src/fgos.rs`, a Rust process parsing `fgos list --json`
+stdout) — flagging each as needing to move to `statusCategory` or staying
+literal-forever per the front/tail boundary. That audit is what let the
+later child tasks (`statusCategory` schema, backfill migration,
+consumer-migration) proceed without re-discovering the same file list.
+Landed clean: `awaiting-approval`, first attempt, ahead by 1 commit, no
+friction recorded.
+
 ---
 
 **Source:** `docs/history/phase-2-status-category-schema/CONTEXT.md` and
 `DISCUSSION.md` (tsk-38t, D1-D6, settled 2026-08-04 via a 12-round
-`fgos-coding-shaping` session); work-item capture via `fgos check tsk-38t`.
+`fgos-coding-shaping` session); work-item capture via `fgos check tsk-38t`
+and `fgos check tsk-38t-1`; `docs/decisions/0027-domain-so-huu-status-
+doan-truoc-delivered-supersede-base-workflow-model-d1-d3.md`.
