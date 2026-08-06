@@ -12,6 +12,24 @@ e.g. the footprint tests at :701-741). No hard-gate flag (not auth, not
 data loss, not audit/security, not an external provider, not removing a
 validation) and fewer than 4 flags → standard, not high-risk.
 
+## Proof surface (whole item)
+
+`node --test test/intake/decompose.test.mjs` — real, runnable, verified
+passing today (107/107, ~3.2s) as this plan was written. NOT `npm test --
+test/intake/decompose.test.mjs`: `npm test` is `node --test 'test/**/*.test.mjs'`
+(package.json:23) and `npm run`'s `--` args are appended after the script's
+own glob argument, not substituted for it — so that form still runs the
+WHOLE suite (confirmed: it produced an unrelated coverage-manifest
+`deepStrictEqual` diff over the full `src/` file list, not a
+`decompose.test.mjs`-scoped result). `node --test <path>` bypasses the
+glob and genuinely scopes to this one file. Scoped so it is not the
+generic whole-suite `npm test` the clarify-stage second-pass judge
+correctly flagged as too broad to prove this item's own claim. Execution
+adds the new `test()` blocks named in the risk map below into this same
+file; this same command then exercises them — no new command needed once
+they exist. Supersedes the item's clarify-stage placeholder verify (`npm
+test`), recorded via `fgos edit --verify` before the `planApprove` gate.
+
 ## Impact-analysis posture
 
 `fgos tool query --capability impact-analysis --status present` → GitNexus
