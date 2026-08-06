@@ -90,6 +90,54 @@ struct ListData {
     work: std::collections::BTreeMap<String, WorkItemRaw>,
 }
 
+/// tsk-417 D3: NEED ANSWER box row — `status` is `"blocked"` (ERR,
+/// `parkReason: system-error`) or `"awaiting-human"` (ASK, `parkReason:
+/// human-question`), one box, distinct sub-tag per `status`.
+#[derive(Debug, Clone, Deserialize, PartialEq)]
+pub struct NeedAnswerRow {
+    pub id: String,
+    pub title: String,
+    pub status: String,
+}
+
+/// tsk-417 D3: AFTER DELIVER box row — `status` is `"retrospective"` (RTR)
+/// or `"cleanup"` (POL), one box, distinct sub-tag per `status`. Neither
+/// status carries a `statusCategory` (the tail chain's own documented
+/// gap, `workflow-stage-graphs.mjs`), so this filters on the literal
+/// `status` string, same as `NeedAnswerRow` above.
+#[derive(Debug, Clone, Deserialize, PartialEq)]
+pub struct AfterDeliverRow {
+    pub id: String,
+    pub title: String,
+    pub status: String,
+}
+
+/// tsk-417 D3: MERGE LIST box source — mirrors `fgos merge list --json`'s
+/// own `ready`/`waiting`/`blockedOnSync` id lists directly (D3: "map
+/// thẳng fgos merge list --json, không filter tự chế"). `conflicts`/
+/// `mergeSets`/`mergeTier`/`supersededOut` are real fields on that same
+/// response this box doesn't need — `serde` silently ignores them (no
+/// `deny_unknown_fields`), so this struct only names what it uses.
+#[derive(Debug, Clone, Default, PartialEq)]
+pub struct MergeListSummary {
+    pub ready: Vec<String>,
+    pub waiting: Vec<String>,
+    pub blocked_on_sync: Vec<String>,
+}
+
+#[derive(Debug, Deserialize)]
+struct MergeListEnvelope {
+    data: MergeListData,
+}
+
+#[derive(Debug, Deserialize)]
+struct MergeListData {
+    ready: Vec<String>,
+    waiting: Vec<String>,
+    #[serde(rename = "blockedOnSync")]
+    blocked_on_sync: Vec<String>,
+}
+
 #[derive(Debug)]
 pub enum FgosError {
     Io(io::Error),
@@ -167,6 +215,58 @@ pub fn parse_doing(json: &str) -> Result<Vec<DoingRow>, serde_json::Error> {
     Ok(rows)
 }
 
+/// tsk-417 D3: parse `fgos list --all --json`'s stdout, keeping items
+/// whose `status` is `"blocked"` or `"awaiting-human"` — the NEED ANSWER
+/// box's own bucket, real `status`/`parkReason` literals (`workflow-
+/// stage-graphs.mjs`), never a second copy of `parse_doing`'s exclusion
+/// logic.
+pub fn parse_need_answer(json: &str) -> Result<Vec<NeedAnswerRow>, serde_json::Error> {
+    let envelope: ListEnvelope = serde_json::from_str(json)?;
+    let mut rows: Vec<NeedAnswerRow> = envelope
+        .data
+        .work
+        .into_iter()
+        .filter(|(_, item)| matches!(item.status.as_str(), "blocked" | "awaiting-human"))
+        .map(|(id, item)| NeedAnswerRow {
+            id,
+            title: item.title,
+            status: item.status,
+        })
+        .collect();
+    rows.sort_by(|a, b| a.id.cmp(&b.id));
+    Ok(rows)
+}
+
+/// tsk-417 D3: same shape as `parse_need_answer`, filtered to AFTER
+/// DELIVER's own bucket — `"retrospective"` or `"cleanup"`.
+pub fn parse_after_deliver(json: &str) -> Result<Vec<AfterDeliverRow>, serde_json::Error> {
+    let envelope: ListEnvelope = serde_json::from_str(json)?;
+    let mut rows: Vec<AfterDeliverRow> = envelope
+        .data
+        .work
+        .into_iter()
+        .filter(|(_, item)| matches!(item.status.as_str(), "retrospective" | "cleanup"))
+        .map(|(id, item)| AfterDeliverRow {
+            id,
+            title: item.title,
+            status: item.status,
+        })
+        .collect();
+    rows.sort_by(|a, b| a.id.cmp(&b.id));
+    Ok(rows)
+}
+
+/// tsk-417 D3: parse `fgos merge list --json`'s stdout — a direct field
+/// mapping, never a re-derived filter (D3's own "map thẳng" instruction).
+pub fn parse_merge_list(json: &str) -> Result<MergeListSummary, serde_json::Error> {
+    let envelope: MergeListEnvelope = serde_json::from_str(json)?;
+    Ok(MergeListSummary {
+        ready: envelope.data.ready,
+        waiting: envelope.data.waiting,
+        blocked_on_sync: envelope.data.blocked_on_sync,
+    })
+}
+
 /// Resolve the main fgOS checkout root (never a linked worktree's own
 /// checkout — ADR0020) via `git rev-parse --git-common-dir`, the same
 /// resolution every fgOS skill in this repo uses.
@@ -215,6 +315,26 @@ pub fn fetch_doing(root: &Path) -> Result<Vec<DoingRow>, FgosError> {
     parse_doing(&stdout).map_err(FgosError::Parse)
 }
 
+/// tsk-417 D3: NEED ANSWER box's data source — `fgos list --all --json`,
+/// same subprocess shape as `fetch_doing`, filtered by `parse_need_answer`.
+pub fn fetch_need_answer(root: &Path) -> Result<Vec<NeedAnswerRow>, FgosError> {
+    let stdout = run_fgos(root, &["list", "--all", "--json"])?;
+    parse_need_answer(&stdout).map_err(FgosError::Parse)
+}
+
+/// tsk-417 D3: AFTER DELIVER box's data source.
+pub fn fetch_after_deliver(root: &Path) -> Result<Vec<AfterDeliverRow>, FgosError> {
+    let stdout = run_fgos(root, &["list", "--all", "--json"])?;
+    parse_after_deliver(&stdout).map_err(FgosError::Parse)
+}
+
+/// tsk-417 D3: MERGE LIST box's data source — `fgos merge list --json`,
+/// a distinct CLI verb from every other fetch function here.
+pub fn fetch_merge_list(root: &Path) -> Result<MergeListSummary, FgosError> {
+    let stdout = run_fgos(root, &["merge", "list", "--json"])?;
+    parse_merge_list(&stdout).map_err(FgosError::Parse)
+}
+
 /// The `WorkItemSource` adapter (tsk-3t9 D1): the concrete fgOS-CLI
 /// implementation of the port `app.rs`'s domain depends on. Holds `root`
 /// so the composition root (`main.rs`) resolves it once, not per call.
@@ -229,6 +349,18 @@ impl WorkItemSource for FgosCliSource {
 
     fn fetch_doing(&self) -> Result<Vec<DoingRow>, FgosError> {
         fetch_doing(&self.root)
+    }
+
+    fn fetch_need_answer(&self) -> Result<Vec<NeedAnswerRow>, FgosError> {
+        fetch_need_answer(&self.root)
+    }
+
+    fn fetch_after_deliver(&self) -> Result<Vec<AfterDeliverRow>, FgosError> {
+        fetch_after_deliver(&self.root)
+    }
+
+    fn fetch_merge_list(&self) -> Result<MergeListSummary, FgosError> {
+        fetch_merge_list(&self.root)
     }
 }
 
@@ -498,5 +630,92 @@ mod tests {
         assert!(!ids.contains(&"tsk-blocked"));
         assert!(!ids.contains(&"tsk-awaiting-human"));
         assert!(!ids.contains(&"tsk-todo"));
+    }
+
+    /// tsk-417 D3: NEED ANSWER = `blocked` + `awaiting-human`, nothing
+    /// else — reuses `STATUS_MEMBERSHIP_FIXTURE` (already has both, plus
+    /// `doing`/`awaiting-approval`/`todo` as real negative cases).
+    #[test]
+    fn fetch_need_answer_includes_blocked_and_awaiting_human() {
+        let rows = parse_need_answer(STATUS_MEMBERSHIP_FIXTURE).expect("fixture should parse");
+        let ids: Vec<&str> = rows.iter().map(|r| r.id.as_str()).collect();
+        assert_eq!(ids, vec!["tsk-awaiting-human", "tsk-blocked"]);
+        assert!(rows.iter().all(|r| r.status == "blocked" || r.status == "awaiting-human"));
+    }
+
+    const AFTER_DELIVER_FIXTURE: &str = r#"{
+        "contract": "fgos.v1",
+        "generated_at": "2026-07-29T15:41:13.319Z",
+        "data_hash": "abc",
+        "data": {
+            "work": {
+                "tsk-retro": {
+                    "title": "Batched learning-synthesis",
+                    "status": "retrospective",
+                    "stage": "executing"
+                },
+                "tsk-cleanup": {
+                    "title": "TTL-bounded worktree park",
+                    "status": "cleanup",
+                    "stage": "executing"
+                },
+                "tsk-delivered": {
+                    "title": "Merged, not yet retrospective",
+                    "status": "delivered",
+                    "stage": "executing"
+                },
+                "tsk-done": {
+                    "title": "Fully closed out",
+                    "status": "done",
+                    "stage": "executing"
+                }
+            }
+        }
+    }"#;
+
+    /// tsk-417 D3: AFTER DELIVER = `retrospective` + `cleanup` only —
+    /// `delivered` (not yet retrospective) and `done` (already fully
+    /// closed) are real negative cases, not this box's job.
+    #[test]
+    fn fetch_after_deliver_includes_retrospective_and_cleanup() {
+        let rows = parse_after_deliver(AFTER_DELIVER_FIXTURE).expect("fixture should parse");
+        let ids: Vec<&str> = rows.iter().map(|r| r.id.as_str()).collect();
+        assert_eq!(ids, vec!["tsk-cleanup", "tsk-retro"]);
+        assert!(rows.iter().all(|r| r.status == "retrospective" || r.status == "cleanup"));
+    }
+
+    /// tsk-417 D3: real `fgos merge list --json` response shape, captured
+    /// live this session (the same call used to check tsk-48i/tsk-1hb
+    /// mergeability) — `conflicts`/`mergeSets`/`mergeTier`/`supersededOut`
+    /// are real fields on the response this fixture includes but
+    /// `MergeListSummary` doesn't parse, proving the "map thẳng, không
+    /// filter tự chế" field selection is deliberate, not an oversight.
+    const MERGE_LIST_FIXTURE: &str = r#"{
+        "contract": "fgos.v1",
+        "generated_at": "2026-08-06T01:38:50.426Z",
+        "data_hash": "fe7572c554271846ce3926e9358e91ef0370431fc1ac1c14ff256911a8345828",
+        "data": {
+            "ready": ["tsk-2ig", "tsk-3c7"],
+            "waiting": ["tsk-blocked-dep"],
+            "conflicts": [],
+            "mergeSets": [
+                {
+                    "items": ["tsk-2ig", "tsk-3c7"],
+                    "order": ["tsk-2ig", "tsk-3c7"],
+                    "reason": "shared-root"
+                }
+            ],
+            "blockedOnSync": ["tsk-stale-root"],
+            "mergeTier": {"tsk-3c7": "leaf-to-root", "tsk-2ig": "leaf-to-root"},
+            "supersededOut": []
+        }
+    }"#;
+
+    #[test]
+    fn fetch_merge_list_mirrors_fgos_merge_list_json() {
+        let summary = parse_merge_list(MERGE_LIST_FIXTURE).expect("fixture should parse");
+        assert_eq!(summary.ready, vec!["tsk-2ig".to_string(), "tsk-3c7".to_string()]);
+        assert_eq!(summary.waiting, vec!["tsk-blocked-dep".to_string()]);
+        assert_eq!(summary.blocked_on_sync, vec!["tsk-stale-root".to_string()]);
     }
 }

@@ -235,6 +235,19 @@ pub fn draw(frame: &mut Frame, app: &mut App) {
         &mut work_items_state,
     );
 
+    // tsk-417 D3: the right column stacks the existing In-process panel
+    // above 3 NEW, separate action-queue boxes — never merged into one
+    // table (D3's own "3 box riêng biệt không merge" instruction).
+    let right_column = Layout::default()
+        .direction(Direction::Vertical)
+        .constraints([
+            Constraint::Percentage(30),
+            Constraint::Percentage(24),
+            Constraint::Percentage(23),
+            Constraint::Percentage(23),
+        ])
+        .split(columns[1]);
+
     let in_process_header = Row::new(["ID", "Title"]).style(header_style);
     let in_process_rows: Vec<Row> = app
         .in_process
@@ -266,9 +279,13 @@ pub fn draw(frame: &mut Frame, app: &mut App) {
                 )),
         )
         .row_highlight_style(Style::default().add_modifier(Modifier::REVERSED)),
-        columns[1],
+        right_column[0],
         &mut in_process_state,
     );
+
+    draw_need_answer_box(frame, app, right_column[1]);
+    draw_merge_list_box(frame, app, right_column[2]);
+    draw_after_deliver_box(frame, app, right_column[3]);
 
     // tsk-64z D8: while typing, the filter input takes over the bottom
     // bar entirely (never a permanent fixture — bung 1 dòng đè status bar
@@ -296,6 +313,113 @@ pub fn draw(frame: &mut Frame, app: &mut App) {
             draw_detail_modal(frame, item);
         }
     }
+}
+
+/// tsk-417 D3 / tsk-jo1 D1: NEED ANSWER box — `status: blocked` gets
+/// `[ERR]` red, `status: awaiting-human` gets `[ASK]` magenta, same box,
+/// distinct per-row tag (D3 locks the shared box; the palette locks the
+/// two sub-tags).
+fn draw_need_answer_box(frame: &mut Frame, app: &App, area: Rect) {
+    let rows: Vec<Line> = app
+        .need_answer
+        .iter()
+        .map(|task| {
+            let (tag, color) = if task.status == "blocked" {
+                ("[ERR]", Color::Red)
+            } else {
+                ("[ASK]", Color::Magenta)
+            };
+            Line::from(vec![
+                Span::styled(tag, Style::default().fg(color)),
+                Span::raw(format!(" {}  {}", task.id, task.title)),
+            ])
+        })
+        .collect();
+    let body = if rows.is_empty() {
+        Paragraph::new("(empty)")
+    } else {
+        Paragraph::new(rows)
+    };
+    frame.render_widget(
+        body.block(Block::default().borders(Borders::ALL).title(Span::styled(
+            format!("NEED ANSWER ({})", app.need_answer.len()),
+            Style::default().add_modifier(Modifier::BOLD),
+        ))),
+        area,
+    );
+}
+
+/// tsk-417 D3: MERGE LIST box — a direct mapping of `fgos merge list
+/// --json`'s own `ready`/`waiting`/`blockedOnSync` id lists (never a
+/// separately-invented filter). `[MRG]` green for `ready` (the only
+/// bucket that's actually mergeable right now); `waiting`/`blockedOnSync`
+/// render plain, dimmed, to stay visually subordinate to `ready`.
+fn draw_merge_list_box(frame: &mut Frame, app: &App, area: Rect) {
+    let mut rows: Vec<Line> = Vec::new();
+    for id in &app.merge_list.ready {
+        rows.push(Line::from(vec![
+            Span::styled("[MRG]", Style::default().fg(Color::Green)),
+            Span::raw(format!(" {id}")),
+        ]));
+    }
+    for id in &app.merge_list.waiting {
+        rows.push(Line::from(Span::styled(
+            format!("[wait] {id}"),
+            Style::default().fg(Color::DarkGray),
+        )));
+    }
+    for id in &app.merge_list.blocked_on_sync {
+        rows.push(Line::from(Span::styled(
+            format!("[sync] {id}"),
+            Style::default().fg(Color::DarkGray),
+        )));
+    }
+    let body = if rows.is_empty() {
+        Paragraph::new("(empty)")
+    } else {
+        Paragraph::new(rows)
+    };
+    let count = app.merge_list.ready.len() + app.merge_list.waiting.len() + app.merge_list.blocked_on_sync.len();
+    frame.render_widget(
+        body.block(Block::default().borders(Borders::ALL).title(Span::styled(
+            format!("MERGE LIST ({count})"),
+            Style::default().add_modifier(Modifier::BOLD),
+        ))),
+        area,
+    );
+}
+
+/// tsk-417 D3 / tsk-jo1 D1: AFTER DELIVER box — `status: retrospective`
+/// gets `[RTR]` cyan, `status: cleanup` gets `[POL]` dim/gray (lowest
+/// priority, AGENTS.md "Polish Sau DoD" tier 3).
+fn draw_after_deliver_box(frame: &mut Frame, app: &App, area: Rect) {
+    let rows: Vec<Line> = app
+        .after_deliver
+        .iter()
+        .map(|task| {
+            let (tag, color) = if task.status == "retrospective" {
+                ("[RTR]", Color::Cyan)
+            } else {
+                ("[POL]", Color::DarkGray)
+            };
+            Line::from(vec![
+                Span::styled(tag, Style::default().fg(color)),
+                Span::raw(format!(" {}  {}", task.id, task.title)),
+            ])
+        })
+        .collect();
+    let body = if rows.is_empty() {
+        Paragraph::new("(empty)")
+    } else {
+        Paragraph::new(rows)
+    };
+    frame.render_widget(
+        body.block(Block::default().borders(Borders::ALL).title(Span::styled(
+            format!("AFTER DELIVER ({})", app.after_deliver.len()),
+            Style::default().add_modifier(Modifier::BOLD),
+        ))),
+        area,
+    );
 }
 
 /// A blocking dialog for the selected work item — opened by Enter on the
@@ -403,6 +527,27 @@ mod tests {
         for label in ["TODO", "DOING", "REVIEW", "DONE"] {
             assert!(content.contains(label), "missing tab label {label}: {content}");
         }
+    }
+
+    /// tsk-417 D3: NEED ANSWER, MERGE LIST, AFTER DELIVER render as 3
+    /// separate bordered boxes (their titles all appear, distinctly, in
+    /// the rendered buffer) — never merged into one table.
+    #[test]
+    fn process_status_renders_three_separate_boxes() {
+        let mut app = App::mock();
+        let backend = TestBackend::new(140, 40);
+        let mut terminal = Terminal::new(backend).expect("terminal init");
+        terminal
+            .draw(|frame| draw(frame, &mut app))
+            .expect("draw should not panic");
+        let buffer = terminal.backend().buffer();
+        let content: String = buffer.content().iter().map(|cell| cell.symbol()).collect();
+        for title in ["NEED ANSWER", "MERGE LIST", "AFTER DELIVER"] {
+            assert!(content.contains(title), "missing box title {title}: {content}");
+        }
+        assert!(content.contains("[ERR]"), "mock has a blocked row: {content}");
+        assert!(content.contains("[MRG]"), "mock has a ready-to-merge row: {content}");
+        assert!(content.contains("[RTR]"), "mock has a retrospective row: {content}");
     }
 
     fn render_modal_buffer(stage: &str) -> ratatui::buffer::Buffer {
