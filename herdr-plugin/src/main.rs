@@ -121,12 +121,23 @@ fn run(
                         app.switch_panel();
                     }
                 }
+                UiEvent::SwitchPanelPrev => {
+                    if !app.detail_modal_open {
+                        app.pick_status = None;
+                        app.switch_panel_prev();
+                    }
+                }
                 UiEvent::Down => {
                     if !app.detail_modal_open {
                         app.pick_status = None;
                         match app.focused_panel {
                             Panel::WorkItems => app.select_next(),
                             Panel::InProcess => app.select_next_in_process(),
+                            // tsk-3wl D1: view-only boxes scroll instead of
+                            // selecting a row.
+                            Panel::NeedAnswer => app.scroll_need_answer_down(),
+                            Panel::MergeList => app.scroll_merge_list_down(),
+                            Panel::AfterDeliver => app.scroll_after_deliver_down(),
                         }
                     }
                 }
@@ -136,6 +147,9 @@ fn run(
                         match app.focused_panel {
                             Panel::WorkItems => app.select_previous(),
                             Panel::InProcess => app.select_previous_in_process(),
+                            Panel::NeedAnswer => app.scroll_need_answer_up(),
+                            Panel::MergeList => app.scroll_merge_list_up(),
+                            Panel::AfterDeliver => app.scroll_after_deliver_up(),
                         }
                     }
                 }
@@ -176,6 +190,10 @@ fn run(
                                     None => "no pane to jump to".to_string(),
                                 });
                             }
+                            // tsk-3wl D1: NeedAnswer/MergeList/AfterDeliver
+                            // are view-only — Enter is inert while one of
+                            // them has focus.
+                            Panel::NeedAnswer | Panel::MergeList | Panel::AfterDeliver => {}
                         }
                     }
                 }
@@ -562,7 +580,7 @@ mod tests {
     fn next_tab_event_cycles_the_active_tab() {
         let mut ui = NextTabTwiceThenQuit { calls: Cell::new(0) };
         let mut app = App::empty();
-        assert_eq!(app.active_tab, herdr_fgos::app::Tab::Todo);
+        assert_eq!(app.active_tab, herdr_fgos::app::WorkTab::Todo);
         let pane_orchestrator = NoopPaneOrchestrator;
 
         run(&mut ui, &mut app, None, None, &pane_orchestrator, Duration::ZERO)
@@ -570,7 +588,7 @@ mod tests {
 
         assert_eq!(
             app.active_tab,
-            herdr_fgos::app::Tab::Review,
+            herdr_fgos::app::WorkTab::Review,
             "TODO -> DOING -> REVIEW after two NextTab events"
         );
     }
