@@ -21,6 +21,22 @@ since this is genuinely two independent pieces of work, not one.
 
 ## Approach
 
+Repo-fit check on file placement (`ls src/ test/`): both directories are
+organized strictly by domain subsystem today — `cli/config/evolve/
+install/intake/report/runner/setup/state` under `src/`, the same set plus
+`e2e/fixtures/scripts/skills/` under `test/` — no `util/` bucket exists in
+either, and no loose single-purpose helper file sits at either directory's
+top level (`find src -maxdepth 1 -name "*.mjs"` returns nothing). Neither
+`format-duration` nor `format-bytes` belongs to any of the 9 existing
+domains — they are cross-cutting pure functions, not `cli`/`state`/`runner`
+logic. Forcing either into an existing domain dir would misfile it (a
+future reader looking for byte-formatting inside `src/runner/` would not
+find it, and a reader inside `src/util/` would not expect runner logic).
+This plan therefore deliberately introduces `src/util/` and `test/util/`
+as the repo's first cross-cutting pure-utility location — a real,
+named structural decision (not a silently-assumed precedent), justified
+by the absence of any existing domain fit for either function.
+
 `fgos graph --json`: `tsk-1sj` does not appear in `topUnblock` (nothing
 else in the backlog depends on it) and contributes nothing to
 `criticalPath` — it is a leaf, standalone demo item, not on any existing
