@@ -132,6 +132,16 @@ real.
 > non-placeholder work.verify -- applies to both the skip-and-advance
 > path and the real-judge path, per plan.md."
 
+The proof-surface items closed the "existing test suite never caught it"
+gap named above. `tsk-1ni-3` (commit `39858ab`) added real
+`decompose.test.mjs` coverage for `resolveContentRoot`'s three branches
+against `resolveDecompose`: existing `mkPlanFixture` tests keep passing
+unchanged (`stateRoot == content-root` by construction, exercising branch
+3 — the fallback — incidentally), plus new tests using a real git
+repo/worktree to exercise branch 1 (`process.cwd()`) and branch 2 (`git
+worktree list` for `fgw/<id>`) explicitly, so the fixture no longer
+coincidentally hides the bug the way `mkLockedContextFixture` did.
+
 ## Locked decisions
 
 | ID | Decision |
