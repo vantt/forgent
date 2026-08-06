@@ -607,6 +607,44 @@ test('validateWork does not add docsRef to SCHEMA_VERSION or DEFAULTS (optional 
   assert.equal(Object.hasOwn(DEFAULTS, 'docsRef'), false);
 });
 
+// --- `action` (tsk-3xd D1, docs/history/tsk-3xd-decompose-child-directive-
+// prose/CONTEXT.md): optional additive directive-prose field, same
+// optional-additive validation shape as description/docsRef above.
+
+test('validateWork accepts a work item missing action (optional, additive back-compat)', () => {
+  const work = baseWork();
+  assert.equal(work.action, undefined);
+  assert.doesNotThrow(() => validateWork(work));
+});
+
+test('validateWork accepts action as a non-empty string', () => {
+  assert.doesNotThrow(() => validateWork(baseWork({ action: 'D1: implement the parser per the locked decision.' })));
+});
+
+test('validateWork treats action: null the same as absent', () => {
+  assert.doesNotThrow(() => validateWork(baseWork({ action: null })));
+});
+
+test('validateWork rejects a non-string, non-empty action', () => {
+  assert.throws(
+    () => validateWork(baseWork({ action: 42 })),
+    (err) => err instanceof WorkValidationError && /action/.test(err.message),
+  );
+  assert.throws(
+    () => validateWork(baseWork({ action: '' })),
+    (err) => err instanceof WorkValidationError && /action/.test(err.message),
+  );
+  assert.throws(
+    () => validateWork(baseWork({ action: '   ' })),
+    (err) => err instanceof WorkValidationError && /action/.test(err.message),
+  );
+});
+
+test('validateWork does not add action to SCHEMA_VERSION or DEFAULTS (optional lazy field, no schema bump)', () => {
+  assert.equal(SCHEMA_VERSION, 3);
+  assert.equal(Object.hasOwn(DEFAULTS, 'action'), false);
+});
+
 // --- `priority`/`intent` fields (per str7-str8-priority-intent D1/D6):
 // optional additive integers, absent-last, no schema bump. Same
 // optional-additive validation shape as tier/domain/docsRef above.

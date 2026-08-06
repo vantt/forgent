@@ -514,6 +514,22 @@ export function validateWorkShape(work) {
     }
   }
 
+  // Directive prose for a decompose-generated child (tsk-3xd D1/D2,
+  // docs/history/tsk-3xd-decompose-child-directive-prose/CONTEXT.md):
+  // OPTIONAL additive field carrying the concrete action a worker must take
+  // and the locked decision it satisfies. `title` alone is a short label
+  // ("đối tượng + hành động + phạm vi"); `action` is the longer-form
+  // why/what a blind executor needs, mirroring bee's own cell.action. Same
+  // optional-additive validation as `description`/`docsRef` above:
+  // shape-checked only when present, null treated as absent. Rides
+  // SCHEMA_VERSION 3 unchanged, same precedent every prior additive field
+  // (footprint, domain, docsRef) already established.
+  if (work.action !== undefined && work.action !== null) {
+    if (typeof work.action !== 'string' || !work.action.trim()) {
+      throw new WorkValidationError('work.action must be a non-empty string when present.');
+    }
+  }
+
   // Goal tier (per str67-goal-directed-planning D1): OPTIONAL additive field
   // marking a work item as a declared goal -- 'mvp' or 'milestone'. Same
   // lazy-additive shape as tier/domain above: absent means "not a goal", no

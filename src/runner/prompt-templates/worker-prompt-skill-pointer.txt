@@ -10,6 +10,12 @@ governs how this work item must be done.
 # Description
 {description}
 {feedbackSection}
+# Directive
+{action}
+
+# Files to read first
+{readFirst}
+
 # Worktree boundary
 You are running on an isolated git worktree, checked out on its own branch for
 this work item only. Stay inside this checkout — never touch the main

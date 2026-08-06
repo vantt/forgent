@@ -117,6 +117,17 @@ export function buildPrompt(work, feedback) {
   }
   const description = work.description ?? '(không có)';
 
+  // Directive prose (tsk-3xd D1/D3, docs/history/tsk-3xd-decompose-child-
+  // directive-prose/CONTEXT.md): `action` is the item's own new optional
+  // field (tầng 3 fix — decompose.mjs's addWork now passes it through for a
+  // decompose-generated child). `readFirst` is NOT a stored field (D1: "no
+  // new mechanism") — it is derived here, at render time, straight from the
+  // item's existing `footprint` (work-graph-intelligence S9), same
+  // "(không có)" absent-placeholder convention as `description` above.
+  const action = typeof work.action === 'string' && work.action.trim() ? work.action : '(không có)';
+  const readFirst =
+    Array.isArray(work.footprint) && work.footprint.length ? work.footprint.join(', ') : '(không có)';
+
   // Skill-pointer vars (str91-runner-skill-convergence D6/D7): resolved once
   // here via the SAME domain registry `fgos-routing`/STR89 already use, never
   // a hardcoded literal — `resolveDomainName` folds an absent/unrecognized
@@ -134,6 +145,8 @@ export function buildPrompt(work, feedback) {
     kind: work.kind,
     description,
     feedbackSection,
+    action,
+    readFirst,
     refs,
     verify: work.verify,
     domain: domainName,
