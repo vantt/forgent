@@ -62,8 +62,15 @@ write-needs-id-vs-read-only axis, and cell ≠ backlog item), plus a
 `fgw/tsk-2t6` before this clarify pass, verified:
 
 ```
-grep -q "HAI LỚP dispatch" docs/distillery/deep-dives/parallel-decomposition-and-merge.md && grep -q "dispatch-tier-judged-at-dispatch" docs/distillery/porting-log.md
+grep -q "Lớp 1 — cell (ghi file)" docs/distillery/deep-dives/parallel-decomposition-and-merge.md && grep -q "Lớp 2 — I/O worker" docs/distillery/deep-dives/parallel-decomposition-and-merge.md && grep -q "GHI file/mutate git thì phải có danh tính" docs/distillery/deep-dives/parallel-decomposition-and-merge.md && grep -q "cell KHÔNG phải backlog item" docs/distillery/deep-dives/parallel-decomposition-and-merge.md && grep -q "bee:fan-out-cost-tiering-rubric" docs/distillery/porting-log.md && grep -q "R3 E2 F2" docs/distillery/porting-log.md
 ```
+
+(Strengthened from an earlier heading-only grep, per `judgeDiscovery`'s
+own second-pass dispute during this item's `fgos discover` call: a
+shallow keyword check would pass even if the actual gather/exec boundary
+explanation were missing. This version checks for the real substance —
+the write-needs-identity rule, the cell≠backlog-item distinction, and the
+porting-log row's real citations/score tags — not just a heading string.)
 
 ## Pinned terms
 
