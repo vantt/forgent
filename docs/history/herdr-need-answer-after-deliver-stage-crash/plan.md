@@ -14,6 +14,38 @@ identically before and after either fix, per the discover verify dispute
 this item already hit). No hard-gate flag (no auth/data-loss/audit/
 external-provider/validation-removal). 2 flags → standard.
 
+## Validating round 1 — Proof surface FAIL, verify revised
+
+`fgos-validating`'s reality gate FAILed the Proof surface dimension on the
+verify this plan originally reused from `discover` (`"cargo test
+--manifest-path herdr-plugin/Cargo.toml need_answer_survives_missing_stage
+&& cargo test --manifest-path herdr-plugin/Cargo.toml
+last_error_first_error_wins && cargo build --release --manifest-path
+herdr-plugin/Cargo.toml"`). Evidence, gathered live in this session: this
+crate aliases `cargo test` to nextest — a filter matching zero tests
+prints `cargo test: 0 passed, N filtered out (K suites, ...)` and exits
+**0**, not a failure (empirically run against `herdr-plugin` at commit
+`5220434`, before either test exists: `0 passed, 62 filtered out`, exit
+0). The trailing `&& cargo build --release` also always succeeds
+regardless of the bug. So the original verify would report done even if
+the implementer forgot to add either named test — it never actually
+discriminated fixed vs unfixed.
+
+Fixed verify: pipe each named test's run through `grep -q "1 passed"` so
+the command only succeeds if that exact test both ran and passed —
+following this repo's own existing grep-based verify convention (e.g.
+`"grep 'isolate: true' bin/fgos.mjs && echo 'PASS: ...'"` elsewhere in
+this backlog). Empirically confirmed both directions in this session: the
+same zero-tests-added state now fails (`grep -q "1 passed"` finds no
+match in `"0 passed, ..."` → exit 1), and a real single passing test
+matches correctly (ran `pane_focus_argv_targets_the_given_pane_id`,
+got `cargo test: 1 passed, 61 filtered out` → `grep -q "1 passed"`
+succeeds).
+
+```
+cargo test --manifest-path herdr-plugin/Cargo.toml need_answer_survives_missing_stage 2>&1 | grep -q "1 passed" && cargo test --manifest-path herdr-plugin/Cargo.toml last_error_first_error_wins 2>&1 | grep -q "1 passed" && cargo build --release --manifest-path herdr-plugin/Cargo.toml
+```
+
 ## Approach
 
 Two independent bugs, same feature boundary (see `CONTEXT.md`), fixed

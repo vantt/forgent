@@ -88,6 +88,12 @@ target, following this crate's own existing verify convention of naming a
 specific test filter (e.g. `"cargo test --manifest-path herdr-plugin/
 Cargo.toml pane_focus"`).
 
+**Update (fgos-validating round 1):** the command above was found to not
+discriminate fixed vs unfixed (a zero-match `cargo test <filter>` exits 0
+under this crate's nextest alias) — see `plan.md`'s "Validating round 1"
+section for the evidence and the corrected, `grep`-gated verify actually
+locked on the item now.
+
 ## Outstanding questions deferred to planning
 
 - Exact fixture shape and assertions for `need_answer_survives_missing_stage`
