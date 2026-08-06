@@ -170,6 +170,20 @@ skills this synthesis document was produced through
 (`docs/explanation/fgos-retro-loop-and-the-restored-compound-verb.md`,
 `tsk-3o3`).
 
+## The domain-agnostic guarantee (D5) got its own regression-proving child task
+
+`tsk-3b3`, a child of `tsk-1ca` scoped to verification only, confirmed D5's
+domain-agnostic claim held in the real, built code — that
+`delivered`/`retrospective`/`cleanup`/`done` behave identically for the
+throwaway `synthetic` domain (single stage, zero worktree, zero
+stage-transitions) as they do for `coding`, with domain-awareness living
+only in the harness/skill layer rather than the FSM table itself. Verified
+with the plain full regression suite (`npm test`) rather than a narrower
+targeted check, matching the task's own scope — proving nothing broke
+across the whole implementation, not proving one isolated behavior.
+Landed `awaiting-approval`, first attempt, ahead by 1 commit, no friction
+recorded.
+
 ---
 
 **Source:** `docs/history/work-item-status-delivered-retrospective-cleanup/CONTEXT.md`
