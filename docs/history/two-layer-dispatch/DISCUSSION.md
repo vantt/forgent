@@ -314,6 +314,28 @@ phải id **vòng đời** ⇒ D4 không bị mở lại.
 12-15 cập nhật tại chỗ; §7 viết lại theo D7/D10; §Outstanding questions rút gọn
 còn phần thật sự chưa quyết.
 
+### 2026-08-06 — vòng 7
+
+**Người dùng:** (1) tách thành item thật; (2) `<scope>` cần tư vấn thêm; (3)
+logic chọn provider/tier nên là **một helper mà skill soạn gói include vào
+trước khi dùng**, để lúc cần thì nó đã có mặt trong lúc tính toán và nắm được
+cốt lõi của gói đang soạn.
+
+**(1) Đã tạo ba item thật**, `parent: tsk-2t6`, có `footprint`, xâu `mergeAfter`
+theo D7: `tsk-2sl` (task/light, prose) → `tsk-2k1` (feature/standard, gói động +
+hai ô chừa) → `tsk-503` (feature/standard, phán tier). Mỗi item được `fgos edit
+--description` ngay sau `fgos add` — vì `fgos add` **không có** cờ
+`--description` (đúng nửa còn lại của `tsk-535`), nên đây là workaround có ý
+thức, không phải quên.
+
+**Dogfood ngoài dự kiến:** `fgos conflicts` bắt đúng cặp chồng footprint đã dự
+đoán ở §3 (`tsk-2sl`/`tsk-2k1` chia nhau `_shared/capacity-dispatch-fallback.md`
+cả bản `.claude/` lẫn `.agents/`), và gợi ý đúng ba lựa chọn `sequence`/`hoist`/
+`re-slice` — `mergeAfter` chính là `sequence`. Advisory hoạt động đúng như thiết
+kế trên chính ca thật đầu tiên nó gặp.
+
+**(2) và (3):** tư vấn đã trình bày, chờ chốt — xem §Outstanding questions.
+
 ## 6. Thiết kế đã chốt {#design}
 
 _(Regenerate ở vòng 5 theo D5 — bản vòng 4 tả một nhị phân phẳng
@@ -454,6 +476,8 @@ không merge. Ô "có vòng đời nhưng bỏ hành chính" vẫn gác nguyên.
 
 ### Lý do thứ tư: song song hoá {#task-parallelism-reason}
 
+**Item thật: `tsk-2sl`** (task/light, `parent: tsk-2t6`, đầu chuỗi `mergeAfter`).
+
 - **Mục tiêu:** thêm "chạy song song / rút ngắn thời gian" vào danh sách lý do
   hợp lệ để một bước được dispatch thay vì làm inline, và **gộp danh sách về
   một chỗ** thay vì bốn bản sao.
@@ -478,6 +502,8 @@ không merge. Ô "có vòng đời nhưng bỏ hành chính" vẫn gác nguyên.
 
 ### Capacity ad-hoc: prompt động do cha soạn {#task-adhoc-capacity}
 
+**Item thật: `tsk-2k1`** (feature/standard, `parent: tsk-2t6`, `mergeAfter: [tsk-2sl]`).
+
 - **Mục tiêu:** cho phép một lớp capacity nhận gói mệnh lệnh soạn lúc chạy
   (mục tiêu, đường dẫn phải đọc, ràng buộc, hình dạng digest mong đợi) thay vì
   chỉ `<PROMPT_TEMPLATE>` cố định đăng ký trước — vẫn đi qua đúng máy đã có
@@ -498,6 +524,8 @@ không merge. Ô "có vòng đời nhưng bỏ hành chính" vẫn gác nguyên.
   đường dispatch từ chối và rơi về nhánh inline.
 
 ### Phán tier tại lúc dispatch, tách khỏi tier ceremony {#task-tier-judged-at-dispatch}
+
+**Item thật: `tsk-503`** (feature/standard, `parent: tsk-2t6`, `mergeAfter: [tsk-2k1]`).
 
 - **Mục tiêu:** để soul ở L1 chọn được model tier (và provider) **cho từng lần
   dispatch**, thay vì suy mechanically từ `work.tier` — và tách nghĩa một field
