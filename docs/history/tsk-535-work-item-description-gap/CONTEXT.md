@@ -2,11 +2,14 @@
 
 ## Feature boundary
 
-Two write paths let a work item land with `description` completely
-missing: `fgos add` (no `--description` flag exists) and decompose-child
+Three write paths let a work item land with `description` completely
+missing: `fgos add` (no `--description` flag exists), decompose-child
 creation (`normalizeChild`/`addWork` in `src/intake/decompose.mjs` never
-sets it). This item fixes both write paths AND backfills the items already
-broken by them.
+sets it), and the runner's discovered-work channel (`src/runner/
+loop.mjs:626`, `block.description` is optional per the worker-prompt-
+template's `fgos-discovered` schema — found mid-planning, D4). This item
+fixes all three write paths AND backfills the items already broken by
+them.
 
 ## Scout evidence
 
@@ -49,6 +52,7 @@ broken by them.
 | D1 | `fgos add` gets a REQUIRED `--description` flag — no default fallback (e.g. no silent `description = title`). Forces a caller to supply real content rather than perpetuating the same content-free duplication D2 explicitly avoids for the LLM path. |
 | D2 | Decompose-child `description` = the child's own `title` (not `action`). Copying `action` (tsk-3xd's new directive-prose field) into `description` would just duplicate content with no added meaning — `action` is worker-facing prose, `description` is the item's own record of what it is. `title` = `description` is simple, mechanical, matches this item's own original proposal, and gives a future title re-derive (tsk-4zg's own pattern) a real, non-empty source. |
 | D3 | Backfill is IN SCOPE. The 112 currently-broken items get `description = title` via `fgos edit --description`, the same one-door-write (`edit` verb, event-log append) tsk-4zg's own closure (commit `5679d82`) already used for its 110-item re-derive pass — no new mechanism, just applying `edit` per item. |
+| D4 | Scope covers a third write path, found mid-planning: `src/runner/loop.mjs:626`'s discovered-work `addWork` call (`fgos-discovered` report channel), where `block.description` is optional per the worker-prompt-template schema. Fixing only `add` + decompose-child would leave this path able to reintroduce the same defect going forward. Fallback to `title` when a worker's discovery block omits `description`, same D2 pattern. |
 
 ## Pinned terms
 
@@ -65,6 +69,8 @@ broken by them.
   (`edit` already has `--description`, `add` does not).
 - `src/intake/decompose.mjs` — `normalizeChild`/`addWork`, the decompose
   write path this item's other half fixes.
+- `src/runner/loop.mjs:626` — the discovered-work `addWork` call, D4's
+  third write path.
 - `docs/history/tsk-3xd-decompose-child-directive-prose/CONTEXT.md` — D1
   (why `action` is a separate field from `description`), D3 (scope
   boundary between the two items), D4 (ordering: tsk-3xd before tsk-535).
