@@ -231,6 +231,18 @@ plug in a different synthesis skill without `retro-next` needing an
 if/else keyed on domain name. Landed `awaiting-approval`, first attempt,
 ahead by 2 commits, no friction recorded.
 
+## `domainFields` (D6) landed as a thin, narrowly-verified addition
+
+`tsk-38t-6` added the `domainFields` field itself to `src/state/store.mjs`
+and `src/state/work.mjs`, matching the whole-object-overwrite,
+optional-`fieldSchema`-validated shape D6 describes above. Its own verify
+was a single presence grep (`grep -q "'domainFields'" src/state/store.mjs`)
+— proportionate to the task's own footprint (two files, one new optional
+field with no existing consumer yet to break) rather than a full
+behavioral suite, since nothing in the coding domain reads or writes
+`domainFields` yet. Landed `awaiting-approval`, first attempt, ahead by 2
+commits, no friction recorded.
+
 ---
 
 **Source:** `docs/history/phase-2-status-category-schema/CONTEXT.md` and
