@@ -97,6 +97,53 @@ even though the older shape reads as "atomic" at a glance — the atomicity
 of the *create* was never the missing piece; the gap was between create and
 content being fully present.
 
+## The same empty-file TOCTOU window, confirmed in `session.mjs`'s sibling lock too
+
+`events.mjs:29-33`'s own comment (added when the `linkSync`-based fix
+above landed) named `session.mjs`'s `acquireSessionsLock` as one of two
+untouched siblings still carrying the vulnerable `openSync('wx')` +
+separate `writeSync` pattern. A later flake investigation (`tsk-1u7`,
+`test/runner/session.test.mjs:207`'s "concurrent createSession from real
+separate OS processes never loses a registry entry" failing once during a
+2427-test full-suite run, but passing 15/15 in isolation — the same
+signature `tsk-3ld` originally diagnosed) confirmed that comment was still
+literally true by direct read: `session.mjs:137-145`'s `tryAcquireOnce`
+still does the create-then-separate-write two-syscall sequence, unfixed.
+
+The investigation itself is worth noting for how it corrected course
+mid-stream: its first-pass conclusion (confirm the lock design is sound by
+construction; the flake trigger is the lock's 10-second acquire timeout
+under full-suite CPU/disk contention, not a real race) was reversed once
+`fgos-validating`'s reality check re-read the code and found it had only
+checked the *stale-holder-reclaim* branch's TOCTOU guard (which is sound)
+and missed the *earlier*, different window — the fast-path create itself.
+Once found, the match to the already-fixed `events.mjs` bug was exact:
+
+> "D3... `session.mjs`'s `tryAcquireOnce`... still carries the exact
+> pre-fix vulnerable pattern `events.mjs` had... This is the SAME bug
+> `tsk-3ld` already found and fixed in `events.mjs`... `session.test.mjs`'s
+> own test only spawns 5 processes — below that reproduction threshold —
+> which exactly matches the 'isolated pass, full-suite flake' signature
+> this item started from. Real, confirmed-by-precedent bug — not test
+> oversensitivity, not lock-contention-timeout."
+
+The fix locked (implementation left to planning/executing, out of this
+investigation's own scope): port `events.mjs`'s write-then-`linkSync`
+technique into `session.mjs`'s `tryAcquireOnce` unchanged — same
+mechanism as the "write-then-link pattern" described above — rather than
+excluding the flaky test from the default suite (an earlier, since-
+reversed draft decision). `loop.mjs`'s `acquireRunnerLock`, the *third*
+sibling `events.mjs:29-33` names as sharing the original pattern, was
+explicitly left out of this item's scope — confirmed still open, a
+separate item's job if the same class of bug is ever suspected there too.
+
+The general lesson this confirms a second time: a comment naming "sibling
+call sites that still need this fix" is a live TODO list, not historical
+trivia — it named exactly where the next real bug in this lineage was
+eventually found, in the same shape, under the same load-dependent
+reproduction signature (low concurrency hides it; a full-suite's real
+contention surfaces it).
+
 ## Deleting a worktree's tracked copy closes a stale-read hazard, but opens a new-write one
 
 ADR0020 closed the hazard this doc's first section describes — a session
