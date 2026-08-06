@@ -57,6 +57,12 @@ function add(cwd, id, extra = {}) {
     '--kind', extra.kind ?? 'task',
     '--risk', extra.risk ?? 'low',
     '--verify', extra.verify ?? 'test -f output.txt',
+    // add-stage-default-gap D1/D2: add now defaults to stage 'clarify'
+    // instead of the old implicit 'executing' -- this file's whole point
+    // is exercising the runner's dispatch loop, which only ever picks up
+    // executing-stage items, so default this helper's --stage to
+    // 'executing' the same way test/cli/fgos.test.mjs's own addOk does.
+    '--stage', extra.stage ?? 'executing',
   ];
   if (extra.deps && extra.deps.length) flags.push('--deps', extra.deps.join(','));
   const result = fgos(cwd, ['add', id, ...flags]);

@@ -85,7 +85,17 @@ function stateView(cwd) {
 }
 
 function addOk(cwd, id, extra = {}) {
-  const flags = ['--title', extra.title ?? `Title ${id}`, '--kind', extra.kind ?? 'task', '--risk', extra.risk ?? 'low', '--verify', extra.verify ?? 'npm test'];
+  // add-stage-default-gap D1/D2: add now stamps stage 'clarify' by default
+  // (same door submit has always had), instead of the old implicit
+  // 'executing'. Every pre-existing call site of this helper (ready/take/
+  // pick/conflicts/triage/ask-answer tests, none of which are testing add's
+  // own stage semantics) relied on that old implicit default to get an
+  // immediately frontier-ready item — default this helper's own --stage to
+  // 'executing' so those call sites stay byte-identical without touching
+  // each one; a caller testing add's own stage behavior passes extra.stage
+  // (or bypasses this helper entirely, same as the dedicated --stage tests
+  // near "add stamps stage" above do).
+  const flags = ['--title', extra.title ?? `Title ${id}`, '--kind', extra.kind ?? 'task', '--risk', extra.risk ?? 'low', '--verify', extra.verify ?? 'npm test', '--stage', extra.stage ?? 'executing'];
   // --footprint stays omitted unless a caller actually passes one (tsk-598
   // own-file-set tests): matches the CLI's own present-or-absent optional
   // shape, so every existing call site (no extra.footprint) is unaffected.
@@ -1355,6 +1365,8 @@ const ADD_BAD_FLAG_CASES = [
   ['a bare --tier (no value)', ['--tier']],
   ['an unrecognized --domain value', ['--domain', 'bogus']],
   ['a bare --domain (no value)', ['--domain']],
+  ['a --stage outside the domain\'s own stage enum', ['--stage', 'assembling']],
+  ['a bare --stage (no value)', ['--stage']],
   ['an empty --discovered-from ""', ['--discovered-from', '']],
   ['a bare --discovered-from (no value)', ['--discovered-from']],
   ['a --goal-tier outside its own domain', ['--goal-tier', 'bogus']],
@@ -1381,7 +1393,7 @@ test('add without --domain leaves domain unset — the view still reads "coding"
   assert.equal(stateView(cwd).work['default-domain-item'].domain, undefined);
 });
 
-test('add --domain synthetic persists work.domain and the item\'s default stage resolves to "assembling" (no --stage flag needed), exit 0', () => {
+test('add --domain synthetic persists work.domain and stamps stage "assembling" (no --stage flag needed), exit 0', () => {
   const cwd = tmpCwd();
   const result = run(cwd, [
     'add', 'synthetic-item',
@@ -1391,8 +1403,8 @@ test('add --domain synthetic persists work.domain and the item\'s default stage 
   assert.equal(result.status, 0);
   const item = stateView(cwd).work['synthetic-item'];
   assert.equal(item.domain, 'synthetic');
-  assert.equal(item.stage, undefined, 'add still omits stage explicitly — the lazy per-domain default resolves it, not new fgos.mjs code');
-  assert.deepEqual(envelopeData(run(cwd, ['ready']).stdout).map((w) => w.id), ['synthetic-item'], 'the item resolves to its domain\'s one Execute-mapped stage ("assembling") through the existing lazy default, so it is already frontier-ready');
+  assert.equal(item.stage, 'assembling', 'per D1/D2 (add-stage-default-gap): add now stamps an entry stage explicitly; synthetic has no Clarify-mapped stage, so the same fallback that used to run lazily at read-time (domain.stages[0]) now runs at add-time instead, same resulting value');
+  assert.deepEqual(envelopeData(run(cwd, ['ready']).stdout).map((w) => w.id), ['synthetic-item'], 'the item is stamped straight at its domain\'s one Execute-mapped stage ("assembling"), so it is already frontier-ready');
 });
 
 test('add --domain coding is explicit and behaves identically to omitting --domain, exit 0', () => {
@@ -1406,11 +1418,33 @@ test('add --domain coding is explicit and behaves identically to omitting --doma
   assert.equal(stateView(cwd).work['explicit-coding-item'].domain, 'coding');
 });
 
-test('add never gained a --stage flag: passing --stage is simply ignored (not a recognized flag on this verb)', () => {
+// --- add-stage-default-gap D1/D2: add stamps an entry stage (--stage, and a
+// clarify default when omitted), same door submit has always had ---
+
+test('add without --stage or --domain now defaults to stage "clarify" (was implicit "executing"), and is NOT frontier-ready, exit 0', () => {
   const cwd = tmpCwd();
-  const result = run(cwd, ['add', 'stage-flag-ignored', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--stage', 'assembling']);
+  // Raw run(), not addOk() -- addOk defaults its own --stage to 'executing'
+  // for its many other callers' sake (see its own comment); this test is
+  // specifically about the CLI's bare, flagless default.
+  const result = run(cwd, ['add', 'default-stage-item', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x']);
   assert.equal(result.status, 0);
-  assert.equal(stateView(cwd).work['stage-flag-ignored'].stage, undefined);
+  assert.equal(stateView(cwd).work['default-stage-item'].stage, 'clarify');
+  assert.deepEqual(envelopeData(run(cwd, ['ready']).stdout).map((w) => w.id), [], 'a stage-clarify item has no dependencies and no unfinished descendants, but is not stage-executing, so it must not appear in the frontier');
+});
+
+test('add --stage decompose explicitly persists that stage, exit 0', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['add', 'stage-flag-decompose', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--stage', 'decompose']);
+  assert.equal(result.status, 0);
+  assert.equal(stateView(cwd).work['stage-flag-decompose'].stage, 'decompose');
+});
+
+test('add --stage executing explicitly persists that stage and IS frontier-ready (opts back into pre-fix behavior), exit 0', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['add', 'stage-flag-executing', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--stage', 'executing']);
+  assert.equal(result.status, 0);
+  assert.equal(stateView(cwd).work['stage-flag-executing'].stage, 'executing');
+  assert.deepEqual(envelopeData(run(cwd, ['ready']).stdout).map((w) => w.id), ['stage-flag-executing']);
 });
 
 // --- work-graph-intelligence S2b: --discovered-from on `add` (producer A) ---
@@ -2021,7 +2055,7 @@ test('ready opens a todo item once its dep reaches done (approved, not merely pr
   toProposed(cwd, 'dep-approved');
   assert.equal(toDoneViaChain(cwd, 'dep-approved').status, 0);
   assert.equal(
-    run(cwd, ['add', 'unblocked-item', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--deps', 'dep-approved']).status,
+    run(cwd, ['add', 'unblocked-item', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x', '--deps', 'dep-approved', '--stage', 'executing']).status,
     0,
   );
 
@@ -2948,11 +2982,14 @@ test("submit tags the new item with stage:'clarify', visible via list", () => {
   assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'clarify');
 });
 
-test('add leaves stage unset — the item reads as executing via the lazy default', () => {
+test('add stamps stage "clarify" by default (D1/D2, add-stage-default-gap) — parity with submit, no longer the old implicit "executing"', () => {
   const cwd = tmpCwd();
-  addOk(cwd, 'plain-add');
+  // Raw run(), not addOk() -- addOk defaults its own --stage to 'executing'
+  // for its many other callers' sake (see its own comment); this test is
+  // specifically about the CLI's bare, flagless default.
+  run(cwd, ['add', 'plain-add', '--title', 'T', '--kind', 'task', '--risk', 'low', '--verify', 'x']);
   const item = envelopeData(run(cwd, ['list']).stdout).work['plain-add'];
-  assert.equal(item.stage, undefined);
+  assert.equal(item.stage, 'clarify');
 });
 
 // --- base-workflow-model S2: --domain on `submit` (D1-D4, E3) ---
@@ -7940,9 +7977,9 @@ test('add --footprint persists the list; omitting the flag leaves footprint abse
 test('conflicts verb: two ready items sharing a footprint path are flagged with shared + suggestions, pure read', () => {
   const cwd = tmpCwd();
   assert.equal(run(cwd, ['init']).status, 0);
-  assert.equal(run(cwd, ['add', 'a', '--title', 'A', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--footprint', 'src/x.mjs,src/y.mjs']).status, 0);
-  assert.equal(run(cwd, ['add', 'b', '--title', 'B', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--footprint', 'src/y.mjs,src/z.mjs']).status, 0);
-  assert.equal(run(cwd, ['add', 'c', '--title', 'C', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--footprint', 'src/w.mjs']).status, 0);
+  assert.equal(run(cwd, ['add', 'a', '--title', 'A', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--footprint', 'src/x.mjs,src/y.mjs', '--stage', 'executing']).status, 0);
+  assert.equal(run(cwd, ['add', 'b', '--title', 'B', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--footprint', 'src/y.mjs,src/z.mjs', '--stage', 'executing']).status, 0);
+  assert.equal(run(cwd, ['add', 'c', '--title', 'C', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--footprint', 'src/w.mjs', '--stage', 'executing']).status, 0);
 
   const before = eventLines(cwd).length;
   const result = run(cwd, ['conflicts']);

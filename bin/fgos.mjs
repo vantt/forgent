@@ -912,9 +912,22 @@ async function runVerb(verb, flags, positional, dir) {
         // through unrejected here — work.mjs's validateWorkShape is the single
         // source for the DOMAINS registry and rejects it as validation, so
         // that rule is never duplicated here (same discipline as --tier/TIERS).
-        // No --stage flag: omitting stage already resolves per-domain via the
-        // existing lazy default (item.stage ?? domain's Execute-mapped stage).
         domain: optionalField(flags.domain, 'add --domain requires a domain name (e.g. coding/synthetic); omit --domain entirely to use the default.'),
+        // Per D1/D2 (docs/history/add-stage-default-gap/CONTEXT.md): add now
+        // stamps an entry stage the same way submit always has (line ~822
+        // above) instead of leaving stage undefined -- explicit --stage
+        // overrides; omitting it defaults to the domain's Clarify-mapped
+        // stage (byte-identical 'clarify' for the default/omitted coding
+        // case). Same silenced onUnrecognized as submit's own call: an
+        // out-of-registry --domain is about to be rejected by addWork's
+        // validateWork below anyway, so this must not fire a spurious
+        // "folding to coding" warning first. An out-of-enum --stage value
+        // is rejected downstream by store.mjs's validateWorkShape (the
+        // single source for the STAGES domain), same "don't duplicate the
+        // validation source" discipline --domain/--tier already follow.
+        stage: optionalField(flags.stage, 'add --stage requires a stage value (e.g. clarify/decompose/executing); omit --stage entirely to use the default.')
+          ?? stageForStep(getDomain(flags.domain, { onUnrecognized: () => {} }), 'Clarify')
+          ?? getDomain(flags.domain, { onUnrecognized: () => {} }).stages[0],
         // Per work-graph-intelligence S2b (producer A): --discovered-from is
         // an explicit, optional scalar provenance flag — same omitted-leaves-
         // undefined shape as --domain/--tier above. work.mjs's

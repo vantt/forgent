@@ -41,6 +41,7 @@ Does NOT design the implementation (flag shape, backfill mechanism, exact
 | D3 | The 26 items already stuck at implicit-`executing` get a one-time data fix, never a new permanent back-edge in `workflow-stage-graphs.mjs`'s `coding.transitions` table. |
 | D4 | Of the 26, only items whose `status` is still `todo`/`doing`/`awaiting-approval` are actually in scope for D3's one-time fix (`tsk-503`, `tsk-2k1`, `tsk-2sl` as of 2026-08-06). The other 23 are `delivered`/`cleanup`/`retrospective` — already built, approved, and past `executing` in the status lifecycle; correcting their historical `stage` field has no practical effect (nothing will ever re-route them through `fgos-routing` again) and is out of scope. |
 | D5 | Narrows D4 further: only `tsk-503` (`todo`, not yet dispatched) gets the one-time supersede+re-add fix. `tsk-2k1` (`doing`) and `tsk-2sl` (`awaiting-approval`) are left alone — same reasoning D3 already used to reject a back-edge: touching an item that is mid-build or already past `executing` (real code/commits, or already sitting for merge review) risks more than a stale `stage` field is worth, and correcting it now has no practical forward effect for either. |
+| D6 | Phase 2 turned out moot at execution time: `tsk-503` self-resolved to `delivered` (via a concurrent session in this shared backlog) before this item's own execution reached it — same bucket as the other 23 D4 already ruled out of scope. No supersede/re-add performed. |
 
 ## Pinned terms
 
