@@ -77,6 +77,63 @@ parked item on a later iteration, unlike `merge-loop`'s own "blocked"
 case, where the blocked item's status never changes and it can be
 re-selected on the next pass.
 
+## The lock-timeout signal broke silently when discover-next stopped being a CLI subprocess, then was restored end-to-end
+
+The stop rule above (`lock-timeout` — exit code `7` — stops the whole
+loop) assumed `discover-next` calls `fgos discover`/`fgos decompose` as a
+raw CLI subprocess, whose real exit code it can read directly. `tsk-31l`
+later switched `discover-next` to dispatch through the `fgos-coding-driving`
+skill instead (which invokes `fgos-exploring`/`fgos-planning` in-session,
+never as a subprocess) — and that switch silently broke the signal this
+doc's own stop-rule section depends on. A `lock-timeout` several skill
+layers down now looked identical to any other one-off `blocked` outcome:
+`discover-next` had no exit code left to read, so it could no longer tell
+"stop the whole loop, this is systemic" apart from "skip this one item and
+continue."
+
+`tsk-1c6` (discovered while implementing `tsk-31l` itself, filed as an
+explicit out-of-scope gap rather than silently patched inline) restored
+the signal by threading a literal, locked token —
+**`stop-reason: lock-timeout`** — through every layer between where a
+`fgos discover`/`fgos decompose` call can actually fail and where
+`discover-next`/`discover-loop` classify the result:
+
+> "D2: Fix lives at the root: `fgos-coding-driving`'s own stop-report
+> contract gains the structured lock-timeout signal, not a narrow patch
+> scoped only to `discover-next`'s own dispatch handling... visible to
+> every caller of `fgos-coding-driving` (`/fgOS:cook`, `/fgOS:pick`, any
+> future sweep), not just `discover-next`."
+>
+> "D4: The stop-report's lock-timeout signal is identified by the literal
+> token `stop-reason: lock-timeout`. This is a locked contract string, not
+> an implementation detail: whoever implements D2 must emit exactly this
+> token, and `fgos-exploring`/`fgos-planning` must relay exactly this
+> token when their own engine-verb call fails that way."
+
+Ten `SKILL.md` files ended up needing the token (both `.claude/skills/`
+and `.agents/skills/` mirrors of `fgos-coding-driving`/`fgos-exploring`/
+`fgos-planning`/`fgos-validating`, plus `discover-next`/`discover-loop`
+themselves) — `fgos-validating` was added mid-implementation once
+`fgos-planning`'s reality gate noticed it also fires `fgos decompose`
+internally (its own Gate section), which the original eight-file count had
+missed.
+
+The verify for this fix is itself a case study in a boundary this same
+retro-loop's own synthesis skill enforces elsewhere
+(`docs/how-to/write-verify-for-a-skill-prose-change.md`): a shell command
+can assert the literal token is *present* in the prose (and that a
+superseded "Known gap" paragraph is *gone*), but cannot prove an LLM
+actually relays that token across a live skill-invocation hop at runtime —
+that proof is explicitly left to `docs/how-to/
+smoke-test-fgos-code-implement-with-a-trivial-item.md` plus real
+event-log observation, not to this field. `tsk-1c6`'s own verify went
+through three locked-then-reversed forms before landing there (a
+mechanical grep, disputed five times as unable to prove a runtime claim;
+then "wait for a not-yet-built verification harness"; then, once that
+harness turned out to be YAGNI, `tsk-4l9`'s actual written standard) — the
+five disputes were never overturned, they were answered by narrowing what
+`verify` was being asked to prove in the first place.
+
 ## The loop never auto-chains past discover/decompose
 
 Verified: `bin/fgos.mjs`'s `discover`/`decompose` CLI cases
