@@ -170,6 +170,76 @@ skills this synthesis document was produced through
 (`docs/explanation/fgos-retro-loop-and-the-restored-compound-verb.md`,
 `tsk-3o3`).
 
+## The chain's real blind spot: nothing detects an item forgotten mid-chain, because nothing needs to
+
+Every downstream mechanism this split touches was deliberately made to
+stop caring about an item the moment it reaches `delivered` — that's the
+entire point (see "Two places the same underlying set had to expand"
+above: `RESOLVED_STATUSES` opens dependents immediately, never waiting for
+`retrospective`/`cleanup` to finish). The dependent-opens-early design
+being correct has a side effect nobody had designed for: since nothing
+downstream needs an item to leave `delivered`/`retrospective`/`cleanup`
+promptly, nothing was watching whether it actually did. `/fgOS:retro-loop`
+and `/fgOS:cleanup-loop` run entirely by hand — this repo has no
+cron/scheduler at all (confirmed: no crontab file, no scheduler wiring in
+`package.json`) — so an item that reaches `delivered` and then nobody
+happens to run a sweep on just sits there, invisible to every existing
+advisory surface: `classifyStaleDoing` only covers `status:doing`,
+`staleBlocked` only covers `todo`/`blocked`, and `frontier()` never even
+looks at `delivered`/`retrospective`/`cleanup` items at all (by D15's own
+design, above).
+
+`tsk-1bl` closed that blind spot with a new pure classifier,
+`classifyStalePostDelivery` (`src/state/graph-metrics.mjs`), mirroring
+`classifyStaleDoing`'s exact shape — read-only, no transitions, anchored
+to the *specific* transition event that entered each status rather than
+"whatever event happened most recently" (the same discipline D7 already
+locked for `cleanup`'s own TTL clock, reused here rather than re-derived).
+The three thresholds, confirmed directly by the person rather than
+proposed by the session:
+
+1. **`delivered`**: stale after 3 days sitting there un-swept, anchored to
+   the specific `doing->delivered`/`awaiting-approval->delivered`/
+   `blocked->delivered` event.
+2. **`cleanup`**: stale after `ttlDays + 3` days — the TTL grace period
+   added on top, so an item still legitimately waiting out its own TTL is
+   never falsely flagged; only genuinely forgotten-past-TTL items are.
+3. **`retrospective`**: stale after 3 days, same threshold as `delivered`,
+   anchored to the `delivered->retrospective` sweep event.
+
+This is a **detection**-only tool, explicitly not a trigger: "not a single
+thing here auto-advances anything" — the thresholds exist so a person (or
+a future sweep) can *see* what's been forgotten, matching the fact that
+nothing in this repo auto-runs `/fgOS:retro-loop`/`/fgOS:cleanup-loop`
+today.
+
+## A tempting simplification — merging the two loops — was explicitly rejected, twice
+
+Before landing on the detection-only classifier, the item's own
+investigation considered folding `fgos-coding-driving`'s execution loop
+together with `retro-next`/`cleanup-next` into one unified sweep. Two
+separate advisor-review rounds rejected that, each with concrete evidence
+rather than a general preference:
+
+> "Đã xác nhận điều phối 2 trục (stage/status) qua shared-state là ĐÚNG
+> THIẾT KẾ, không phải lỗ hổng... Vì vậy không có ai downstream chờ cho
+> chuỗi status cả — 2 loop (fgos-coding-driving vs retro-next/cleanup-next)
+> KHÔNG được gộp (đã thử và bị từ chối bằng 5 bằng chứng cụ thể)."
+
+The five concrete blockers: the `awaiting-approval` boundary can't be
+crossed by a unified loop without breaking the approval gate; there's no
+existing handler that drives straight from a `status` value to a `stage`
+value; `fgos retrospective` sweeps the *entire* repo in one call, not one
+item at a time, which a unified per-item loop can't reproduce without
+reversing D9 with no new evidence to justify it; the `cleanup` TTL is not
+a no-op to skip past — treating it as one would wrongly park items
+`blocked`; and worktree/cwd context doesn't cross the merge boundary
+cleanly. Each blocker traces to a design choice already locked earlier in
+this same document (D9's batch-loop separation, D7's TTL, D3/D4's early
+dependent-open) — the rejection wasn't a new judgment call, it was
+confirming those earlier locks still held under a proposal that would have
+undone them.
+
 ## The domain-agnostic guarantee (D5) got its own regression-proving child task
 
 `tsk-3b3`, a child of `tsk-1ca` scoped to verification only, confirmed D5's
