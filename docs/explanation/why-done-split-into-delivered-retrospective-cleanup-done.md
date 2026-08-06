@@ -253,6 +253,21 @@ this: a true/false condition that matters for correctness belongs inside
 the one write door every caller shares, never bolted onto just one
 caller's own approach path.
 
+Drift 2's own fix (`tsk-1p9`, the second child, deliberately ordered
+*after* `tsk-4jf`) removes `cleanupMergedBranch`'s call from the merge path
+entirely (`src/runner/merge.mjs`, invoked today at merge time via
+`bin/fgos.mjs`) and leaves branch/worktree teardown to the `cleanup` verb
+itself, once its harness actually passes — matching D7's wording exactly
+instead of approximately. The dependency direction is load-bearing, not
+incidental: both fixes touch the same `cleanup` case in `bin/fgos.mjs`
+(overlapping footprint), and as long as Drift 1 remains unfixed, the TTL
+condition parks nearly every item `blocked` before the verb ever reaches
+its own teardown logic — making Drift 2's own change nearly impossible to
+verify in isolation while Drift 1 still stands. Fixing the two drifts in
+this order (decouple TTL first, then move teardown timing) is what makes
+each one independently testable, rather than a preference for smaller
+diffs.
+
 ## The chain's real blind spot: nothing detects an item forgotten mid-chain, because nothing needs to
 
 Every downstream mechanism this split touches was deliberately made to
