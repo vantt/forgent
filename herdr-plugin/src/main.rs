@@ -104,7 +104,7 @@ fn run(
     loop {
         ui.draw(app)?;
 
-        if let Some(event) = ui.poll_event(Duration::from_millis(250))? {
+        if let Some(event) = ui.poll_event(app, Duration::from_millis(250))? {
             match event {
                 // Esc/q double as "close the modal" while it's open — only
                 // closes the whole dashboard once no modal is in the way.
@@ -179,6 +179,56 @@ fn run(
                         }
                     }
                 }
+                // tsk-1e3 D4: only meaningful while the detail modal is
+                // open, and only fires when the selected item's stage is
+                // `clarify` — otherwise inert (the disabled/dimmed button
+                // gives no keyboard action to fire, D4's own "disable,
+                // never hide" shape carried through to the event loop).
+                UiEvent::Discover => {
+                    if app.detail_modal_open {
+                        let is_clarify = app
+                            .selected_work_item()
+                            .is_some_and(|item| item.stage == "clarify");
+                        if is_clarify {
+                            app.pick_status = Some(match app.selected_id() {
+                                Some(id) => match pane_orchestrator.open_discover_pane(id) {
+                                    Ok(()) => format!("opened pane for /fgOS:discover {id}"),
+                                    Err(err) => format!("discover failed for {id}: {err}"),
+                                },
+                                None => "no row selected".to_string(),
+                            });
+                            app.detail_modal_open = false;
+                        }
+                    }
+                }
+                // tsk-64z D1: tab-cycling is inert with the modal open,
+                // same discipline every other Work-Items-panel action
+                // already follows.
+                UiEvent::NextTab => {
+                    if !app.detail_modal_open {
+                        app.pick_status = None;
+                        app.next_tab();
+                    }
+                }
+                UiEvent::PrevTab => {
+                    if !app.detail_modal_open {
+                        app.pick_status = None;
+                        app.prev_tab();
+                    }
+                }
+                // tsk-64z D8: `/` only ever reaches this arm outside filter
+                // -input mode (poll_event only emits `ActivateFilter` when
+                // `app.filter_input_active` is already false) — inert with
+                // the modal open, same as every other Work-Items action.
+                UiEvent::ActivateFilter => {
+                    if !app.detail_modal_open {
+                        app.activate_filter();
+                    }
+                }
+                UiEvent::FilterChar(c) => app.filter_push_char(c),
+                UiEvent::FilterBackspace => app.filter_backspace(),
+                UiEvent::FilterSubmit => app.filter_submit(),
+                UiEvent::FilterCancel => app.filter_cancel(),
             }
         }
 
@@ -238,6 +288,10 @@ mod tests {
             Ok(())
         }
 
+        fn open_discover_pane(&self, _id: &str) -> io::Result<()> {
+            Ok(())
+        }
+
         fn focus_pane(&self, _pane_id: &str) -> io::Result<()> {
             Ok(())
         }
@@ -254,22 +308,32 @@ mod tests {
             Ok(())
         }
 
+        fn open_discover_pane(&self, _id: &str) -> io::Result<()> {
+            Ok(())
+        }
+
         fn focus_pane(&self, pane_id: &str) -> io::Result<()> {
             self.focused.borrow_mut().push(pane_id.to_string());
             Ok(())
         }
     }
 
-    /// Records every work-item id it was asked to open a pick pane for, so
-    /// a test can assert the Pick button only fires once, on the second
-    /// Enter.
+    /// Records every work-item id it was asked to open a pick or discover
+    /// pane for, so a test can assert each button fires exactly once, on
+    /// the second Enter/`d` respectively (tsk-1e3).
     struct RecordingPickOrchestrator {
         picked: std::cell::RefCell<Vec<String>>,
+        discovered: std::cell::RefCell<Vec<String>>,
     }
 
     impl PaneOrchestrator for RecordingPickOrchestrator {
         fn open_pick_pane(&self, id: &str) -> io::Result<()> {
             self.picked.borrow_mut().push(id.to_string());
+            Ok(())
+        }
+
+        fn open_discover_pane(&self, id: &str) -> io::Result<()> {
+            self.discovered.borrow_mut().push(id.to_string());
             Ok(())
         }
 
@@ -289,7 +353,7 @@ mod tests {
             Ok(())
         }
 
-        fn poll_event(&mut self, _timeout: Duration) -> io::Result<Option<UiEvent>> {
+        fn poll_event(&mut self, _app: &App, _timeout: Duration) -> io::Result<Option<UiEvent>> {
             let n = self.calls.get();
             self.calls.set(n + 1);
             Ok(match n {
@@ -297,6 +361,165 @@ mod tests {
                 _ => Some(UiEvent::Quit),
             })
         }
+    }
+
+    /// Returns, in order: `Pick`, `Discover`, `Quit` — opens the detail
+    /// modal, then fires its Discover button (tsk-1e3 D4).
+    struct DiscoverTwiceThenQuit {
+        calls: Cell<u32>,
+    }
+
+    impl TerminalUi for DiscoverTwiceThenQuit {
+        fn draw(&mut self, _app: &mut App) -> io::Result<()> {
+            Ok(())
+        }
+
+        fn poll_event(&mut self, _app: &App, _timeout: Duration) -> io::Result<Option<UiEvent>> {
+            let n = self.calls.get();
+            self.calls.set(n + 1);
+            Ok(match n {
+                0 => Some(UiEvent::Pick),
+                1 => Some(UiEvent::Discover),
+                _ => Some(UiEvent::Quit),
+            })
+        }
+    }
+
+    /// Returns, in order: `Pick`, `Discover`, `Quit`, `Quit` — opens the
+    /// detail modal, presses `d` (inert when the selected item isn't at
+    /// `clarify` — the modal stays open), then Esc/q twice to close and
+    /// exit.
+    struct DiscoverThenQuit {
+        calls: Cell<u32>,
+    }
+
+    impl TerminalUi for DiscoverThenQuit {
+        fn draw(&mut self, _app: &mut App) -> io::Result<()> {
+            Ok(())
+        }
+
+        fn poll_event(&mut self, _app: &App, _timeout: Duration) -> io::Result<Option<UiEvent>> {
+            let n = self.calls.get();
+            self.calls.set(n + 1);
+            Ok(match n {
+                0 => Some(UiEvent::Pick),
+                1 => Some(UiEvent::Discover),
+                _ => Some(UiEvent::Quit),
+            })
+        }
+    }
+
+    /// Returns, in order: `NextTab`, `NextTab`, `Quit` — cycles the Work
+    /// Items tab twice (tsk-64z D1).
+    struct NextTabTwiceThenQuit {
+        calls: Cell<u32>,
+    }
+
+    impl TerminalUi for NextTabTwiceThenQuit {
+        fn draw(&mut self, _app: &mut App) -> io::Result<()> {
+            Ok(())
+        }
+
+        fn poll_event(&mut self, _app: &App, _timeout: Duration) -> io::Result<Option<UiEvent>> {
+            let n = self.calls.get();
+            self.calls.set(n + 1);
+            Ok(match n {
+                0 | 1 => Some(UiEvent::NextTab),
+                _ => Some(UiEvent::Quit),
+            })
+        }
+    }
+
+    #[test]
+    fn next_tab_event_cycles_the_active_tab() {
+        let mut ui = NextTabTwiceThenQuit { calls: Cell::new(0) };
+        let mut app = App::empty();
+        assert_eq!(app.active_tab, herdr_fgos::app::Tab::Todo);
+        let pane_orchestrator = NoopPaneOrchestrator;
+
+        run(&mut ui, &mut app, None, None, &pane_orchestrator, Duration::ZERO)
+            .expect("run should exit cleanly on Quit");
+
+        assert_eq!(
+            app.active_tab,
+            herdr_fgos::app::Tab::Review,
+            "TODO -> DOING -> REVIEW after two NextTab events"
+        );
+    }
+
+    /// Returns, in order: `ActivateFilter`, `FilterChar('a')`,
+    /// `FilterChar('b')`, `FilterSubmit`, `Quit` — types "ab" into the
+    /// filter then applies it (tsk-64z D8).
+    struct TypeFilterThenSubmitThenQuit {
+        calls: Cell<u32>,
+    }
+
+    impl TerminalUi for TypeFilterThenSubmitThenQuit {
+        fn draw(&mut self, _app: &mut App) -> io::Result<()> {
+            Ok(())
+        }
+
+        fn poll_event(&mut self, _app: &App, _timeout: Duration) -> io::Result<Option<UiEvent>> {
+            let n = self.calls.get();
+            self.calls.set(n + 1);
+            Ok(match n {
+                0 => Some(UiEvent::ActivateFilter),
+                1 => Some(UiEvent::FilterChar('a')),
+                2 => Some(UiEvent::FilterChar('b')),
+                3 => Some(UiEvent::FilterSubmit),
+                _ => Some(UiEvent::Quit),
+            })
+        }
+    }
+
+    #[test]
+    fn filter_char_events_build_the_query_and_submit_applies_it() {
+        let mut ui = TypeFilterThenSubmitThenQuit { calls: Cell::new(0) };
+        let mut app = App::empty();
+        let pane_orchestrator = NoopPaneOrchestrator;
+
+        run(&mut ui, &mut app, None, None, &pane_orchestrator, Duration::ZERO)
+            .expect("run should exit cleanly on Quit");
+
+        assert_eq!(app.filter_query, "ab");
+        assert!(!app.filter_input_active, "FilterSubmit leaves input mode");
+    }
+
+    /// Returns, in order: `ActivateFilter`, `FilterChar('a')`,
+    /// `FilterCancel`, `Quit` — types then cancels (tsk-64z D8: Esc clears
+    /// the query, unlike `FilterSubmit`).
+    struct TypeFilterThenCancelThenQuit {
+        calls: Cell<u32>,
+    }
+
+    impl TerminalUi for TypeFilterThenCancelThenQuit {
+        fn draw(&mut self, _app: &mut App) -> io::Result<()> {
+            Ok(())
+        }
+
+        fn poll_event(&mut self, _app: &App, _timeout: Duration) -> io::Result<Option<UiEvent>> {
+            let n = self.calls.get();
+            self.calls.set(n + 1);
+            Ok(match n {
+                0 => Some(UiEvent::ActivateFilter),
+                1 => Some(UiEvent::FilterChar('a')),
+                2 => Some(UiEvent::FilterCancel),
+                _ => Some(UiEvent::Quit),
+            })
+        }
+    }
+
+    #[test]
+    fn filter_cancel_event_clears_the_query() {
+        let mut ui = TypeFilterThenCancelThenQuit { calls: Cell::new(0) };
+        let mut app = App::empty();
+        let pane_orchestrator = NoopPaneOrchestrator;
+
+        run(&mut ui, &mut app, None, None, &pane_orchestrator, Duration::ZERO)
+            .expect("run should exit cleanly on Quit");
+
+        assert_eq!(app.filter_query, "");
+        assert!(!app.filter_input_active);
     }
 
     /// Returns, in order: `Pick`, `Quit`, `Quit` — opens the detail modal,
@@ -315,7 +538,7 @@ mod tests {
             Ok(())
         }
 
-        fn poll_event(&mut self, _timeout: Duration) -> io::Result<Option<UiEvent>> {
+        fn poll_event(&mut self, _app: &App, _timeout: Duration) -> io::Result<Option<UiEvent>> {
             let n = self.calls.get();
             self.calls.set(n + 1);
             Ok(match n {
@@ -337,7 +560,7 @@ mod tests {
             Ok(())
         }
 
-        fn poll_event(&mut self, _timeout: Duration) -> io::Result<Option<UiEvent>> {
+        fn poll_event(&mut self, _app: &App, _timeout: Duration) -> io::Result<Option<UiEvent>> {
             let n = self.calls.get();
             self.calls.set(n + 1);
             Ok(match n {
@@ -360,7 +583,7 @@ mod tests {
             Ok(())
         }
 
-        fn poll_event(&mut self, _timeout: Duration) -> io::Result<Option<UiEvent>> {
+        fn poll_event(&mut self, _app: &App, _timeout: Duration) -> io::Result<Option<UiEvent>> {
             let n = self.calls.get();
             self.calls.set(n + 1);
             Ok(if n == 0 { None } else { Some(UiEvent::Quit) })
@@ -420,10 +643,16 @@ mod tests {
             id: "tsk-a".into(),
             title: "A".into(),
             goal_tier: "mvp".into(),
+            stage: "executing".into(),
+            status: "todo".into(),
+            blocked_by: Vec::new(),
+            blocks: 0,
+            priority: None,
         }];
         app.select_next();
         let pane_orchestrator = RecordingPickOrchestrator {
             picked: std::cell::RefCell::new(Vec::new()),
+            discovered: std::cell::RefCell::new(Vec::new()),
         };
 
         run(&mut ui, &mut app, None, None, &pane_orchestrator, Duration::ZERO)
@@ -432,6 +661,72 @@ mod tests {
         assert_eq!(*pane_orchestrator.picked.borrow(), vec!["tsk-a".to_string()]);
         assert!(!app.detail_modal_open);
         assert_eq!(app.pick_status.as_deref(), Some("opened pane for /fgOS:pick tsk-a"));
+    }
+
+    /// tsk-1e3 D4: Discover only fires while the modal is open AND the
+    /// selected item's stage is `clarify` — mirrors the Pick test above
+    /// (`PickTwiceThenQuit`/`work_item_enter_opens_detail_modal_and_pick_
+    /// only_fires_on_second_enter`), driving `d` instead of `Enter` twice.
+    #[test]
+    fn discover_button_fires_pane_open_when_item_is_at_clarify_stage() {
+        let mut ui = DiscoverTwiceThenQuit { calls: Cell::new(0) };
+        let mut app = App::empty();
+        app.work_items = vec![herdr_fgos::app::WorkItem {
+            id: "tsk-a".into(),
+            title: "A".into(),
+            goal_tier: "mvp".into(),
+            stage: "clarify".into(),
+            status: "todo".into(),
+            blocked_by: Vec::new(),
+            blocks: 0,
+            priority: None,
+        }];
+        app.select_next();
+        let pane_orchestrator = RecordingPickOrchestrator {
+            picked: std::cell::RefCell::new(Vec::new()),
+            discovered: std::cell::RefCell::new(Vec::new()),
+        };
+
+        run(&mut ui, &mut app, None, None, &pane_orchestrator, Duration::ZERO)
+            .expect("run should exit cleanly on Quit");
+
+        assert_eq!(*pane_orchestrator.discovered.borrow(), vec!["tsk-a".to_string()]);
+        assert!(pane_orchestrator.picked.borrow().is_empty());
+        assert!(!app.detail_modal_open);
+        assert_eq!(
+            app.pick_status.as_deref(),
+            Some("opened pane for /fgOS:discover tsk-a")
+        );
+    }
+
+    /// tsk-1e3 D4: `d` is inert when the selected item's stage isn't
+    /// `clarify` — the modal stays open, nothing is opened, no status is
+    /// set (the disabled button gives no keyboard action to fire).
+    #[test]
+    fn discover_button_is_inert_when_item_is_not_at_clarify_stage() {
+        let mut ui = DiscoverThenQuit { calls: Cell::new(0) };
+        let mut app = App::empty();
+        app.work_items = vec![herdr_fgos::app::WorkItem {
+            id: "tsk-a".into(),
+            title: "A".into(),
+            goal_tier: "mvp".into(),
+            stage: "executing".into(),
+            status: "todo".into(),
+            blocked_by: Vec::new(),
+            blocks: 0,
+            priority: None,
+        }];
+        app.select_next();
+        let pane_orchestrator = RecordingPickOrchestrator {
+            picked: std::cell::RefCell::new(Vec::new()),
+            discovered: std::cell::RefCell::new(Vec::new()),
+        };
+
+        run(&mut ui, &mut app, None, None, &pane_orchestrator, Duration::ZERO)
+            .expect("run should exit cleanly on Quit");
+
+        assert!(pane_orchestrator.discovered.borrow().is_empty());
+        assert!(app.pick_status.is_none());
     }
 
     #[test]
@@ -445,6 +740,11 @@ mod tests {
             id: "tsk-a".into(),
             title: "A".into(),
             goal_tier: "mvp".into(),
+            stage: "executing".into(),
+            status: "todo".into(),
+            blocked_by: Vec::new(),
+            blocks: 0,
+            priority: None,
         }];
         app.select_next();
         let pane_orchestrator = NoopPaneOrchestrator;

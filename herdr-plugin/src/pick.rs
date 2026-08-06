@@ -11,6 +11,11 @@ use crate::ports::PaneOrchestrator;
 /// decision-maker).
 const PICK_SLASH_COMMAND: &str = "/fgOS:pick";
 
+/// tsk-1e3 D4: same door-opening discipline as `PICK_SLASH_COMMAND` above —
+/// the Discover button never calls `fgos discover` itself, only opens a
+/// pane that types the slash command a person would type by hand.
+const DISCOVER_SLASH_COMMAND: &str = "/fgOS:discover";
+
 #[derive(Debug, PartialEq)]
 pub struct InvalidId(pub String);
 
@@ -65,21 +70,42 @@ pub fn skip_permissions_enabled() -> bool {
 }
 
 /// argv for launching `claude` in the newly opened pane with
+/// `<slash_command> <id>` piped in as the initial prompt — the automated
+/// equivalent of a person typing the slash command by hand. Generalized
+/// over which slash command (tsk-1e3 D4: `run_argv`/`discover_run_argv`
+/// below are thin wrappers over this, so both stay covered by the same
+/// id-validation and skip-permissions logic instead of duplicating it).
+fn run_argv_for_command(
+    pane_id: &str,
+    slash_command: &str,
+    id: &str,
+    skip_permissions: bool,
+) -> Result<Vec<String>, InvalidId> {
+    if !is_valid_id(id) {
+        return Err(InvalidId(id.to_string()));
+    }
+    let command = if skip_permissions {
+        format!("claude --dangerously-skip-permissions '{slash_command} {id}'")
+    } else {
+        format!("claude '{slash_command} {id}'")
+    };
+    Ok(vec!["pane".into(), "run".into(), pane_id.into(), command])
+}
+
+/// argv for launching `claude` in the newly opened pane with
 /// `/fgOS:pick <id>` piped in as the initial prompt — the automated
 /// equivalent of a person typing the slash command by hand.
 /// `skip_permissions` is threaded in explicitly (never read from env
 /// inside this pure function) so it stays deterministically testable —
 /// D1's actual env resolution lives in `skip_permissions_enabled` above.
 pub fn run_argv(pane_id: &str, id: &str, skip_permissions: bool) -> Result<Vec<String>, InvalidId> {
-    if !is_valid_id(id) {
-        return Err(InvalidId(id.to_string()));
-    }
-    let command = if skip_permissions {
-        format!("claude --dangerously-skip-permissions '{PICK_SLASH_COMMAND} {id}'")
-    } else {
-        format!("claude '{PICK_SLASH_COMMAND} {id}'")
-    };
-    Ok(vec!["pane".into(), "run".into(), pane_id.into(), command])
+    run_argv_for_command(pane_id, PICK_SLASH_COMMAND, id, skip_permissions)
+}
+
+/// argv for launching `claude` with `/fgOS:discover <id>` (tsk-1e3 D4) —
+/// same shape as `run_argv`, different slash command.
+pub fn discover_run_argv(pane_id: &str, id: &str, skip_permissions: bool) -> Result<Vec<String>, InvalidId> {
+    run_argv_for_command(pane_id, DISCOVER_SLASH_COMMAND, id, skip_permissions)
 }
 
 /// Resolve the herdr binary the same way the plugin docs recommend:
@@ -116,6 +142,23 @@ pub fn open_pick_pane(
     let run_args = run_argv(&pane_id, id, skip_permissions_enabled()).map_err(io::Error::other)?;
     // Fire-and-forget: the dashboard never waits on the launched claude
     // session's own lifetime, only on herdr accepting the typed command.
+    Command::new(herdr_bin).args(run_args).spawn()?;
+    Ok(())
+}
+
+/// Same shape as `open_pick_pane` above, launching `/fgOS:discover <id>`
+/// instead (tsk-1e3 D4).
+pub fn open_discover_pane(
+    herdr_bin: &str,
+    workspace_id: &str,
+    id: &str,
+    project_root: &Path,
+) -> io::Result<()> {
+    let pane_id = layout::place_new_agent_pane(herdr_bin, workspace_id, project_root)
+        .map_err(io::Error::other)?;
+
+    let run_args =
+        discover_run_argv(&pane_id, id, skip_permissions_enabled()).map_err(io::Error::other)?;
     Command::new(herdr_bin).args(run_args).spawn()?;
     Ok(())
 }
@@ -169,6 +212,15 @@ impl PaneOrchestrator for HerdrPaneAdapter {
         open_pick_pane(&self.herdr_bin, &self.workspace_id, id, project_root)
     }
 
+    fn open_discover_pane(&self, id: &str) -> io::Result<()> {
+        let Some(project_root) = &self.project_root else {
+            return Err(io::Error::other(
+                "project root unresolved — refusing to launch an agent outside a project",
+            ));
+        };
+        open_discover_pane(&self.herdr_bin, &self.workspace_id, id, project_root)
+    }
+
     fn focus_pane(&self, pane_id: &str) -> io::Result<()> {
         focus_pane(&self.herdr_bin, pane_id)
     }
@@ -194,6 +246,24 @@ mod tests {
     #[test]
     fn launch_is_refused_when_the_project_root_is_unresolved() {
         let err = adapter_without_a_project_root_refuses_to_launch()
+            .expect_err("a rootless dashboard must never open an agent pane");
+        assert!(
+            err.to_string().contains("project root unresolved"),
+            "the refusal must say why: {err}"
+        );
+    }
+
+    /// tsk-1e3 D4: same refusal, same reason, for the Discover pane —
+    /// mirrors `launch_is_refused_when_the_project_root_is_unresolved`.
+    #[test]
+    fn discover_launch_is_refused_when_the_project_root_is_unresolved() {
+        let adapter = HerdrPaneAdapter {
+            herdr_bin: "/nonexistent/herdr".into(),
+            workspace_id: "wS".into(),
+            project_root: None,
+        };
+        let err = adapter
+            .open_discover_pane("tsk-1e3")
             .expect_err("a rootless dashboard must never open an agent pane");
         assert!(
             err.to_string().contains("project root unresolved"),
@@ -251,6 +321,26 @@ mod tests {
         assert!(skip_permissions_enabled(), "any other value stays enabled");
 
         std::env::remove_var("FGOS_HERDR_SKIP_PERMISSIONS");
+    }
+
+    #[test]
+    fn discover_run_argv_includes_skip_permissions_by_default() {
+        let argv = discover_run_argv("wS:p16", "tsk-19y-3", true).expect("valid id");
+        assert_eq!(
+            argv,
+            vec![
+                "pane",
+                "run",
+                "wS:p16",
+                "claude --dangerously-skip-permissions '/fgOS:discover tsk-19y-3'",
+            ]
+        );
+    }
+
+    #[test]
+    fn discover_run_argv_rejects_ids_fgos_itself_would_reject() {
+        assert!(discover_run_argv("p", "", true).is_err());
+        assert!(discover_run_argv("p", "tsk-19y-3", true).is_ok());
     }
 
     #[test]
