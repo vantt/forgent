@@ -1587,7 +1587,29 @@ async function runVerb(verb, flags, positional, dir) {
         if (!item) {
           throw new StoreError('validation', `list: work "${id}" not found.`);
         }
-        const singleView = { ...rawView, work: { [id]: item } };
+        // tsk-2u9 D1/D2: scope every OTHER id-keyed view section to this
+        // item too, not just `work` -- `rawView` otherwise leaks the
+        // entire backlog's decisions/discovery/gates/settlements/outcomes/
+        // frictions/learnings/decisionsById through a single-item request
+        // (confirmed live: 2.2MB for one item). `decisions` is a flat
+        // append-only array (some entries carry no `id` at all -- a
+        // global decision, correctly excluded here) rather than a dict,
+        // so it gets its own filter instead of the `{[id]: v[id]}` shape
+        // the rest share. `tools` is deliberately left untouched -- it is
+        // keyed by tool NAME (e.g. "gitnexus"), never by work item id.
+        const scopedById = (section) => (section?.[id] !== undefined ? { [id]: section[id] } : {});
+        const singleView = {
+          ...rawView,
+          work: { [id]: item },
+          decisions: (rawView.decisions ?? []).filter((d) => d.id === id),
+          discovery: scopedById(rawView.discovery),
+          gates: scopedById(rawView.gates),
+          settlements: scopedById(rawView.settlements),
+          outcomes: scopedById(rawView.outcomes),
+          frictions: scopedById(rawView.frictions),
+          learnings: scopedById(rawView.learnings),
+          decisionsById: scopedById(rawView.decisionsById),
+        };
         if (item.status === 'awaiting-human') {
           const ctx = computeAwaitingContext(singleView, id);
           if (ctx) return { ...singleView, awaitingContext: { [id]: ctx } };
