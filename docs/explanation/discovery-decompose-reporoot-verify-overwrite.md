@@ -142,6 +142,18 @@ repo/worktree to exercise branch 1 (`process.cwd()`) and branch 2 (`git
 worktree list` for `fgw/<id>`) explicitly, so the fixture no longer
 coincidentally hides the bug the way `mkLockedContextFixture` did.
 
+`tsk-1ni-4` (commit `adda649`) did the same for `discovery.test.mjs`:
+two real-git end-to-end tests through `resolveDiscovery`'s skip path
+(`process.cwd()` hit, and a real registered `fgw/<id>` worktree hit — the
+crash-recovery case), since `resolveContentRoot`'s own internals were
+already covered directly by `tsk-1ni-3`'s `decompose.test.mjs` tests; plus
+D2 coverage — three tests for the new "already real" branch of the
+verify-overwrite guard on both the skip-and-advance and real-judge paths,
+and one confirming the placeholder-fills-in-guess direction stays
+unchanged. All four sibling items (`tsk-1ni-1` through `tsk-1ni-4`) are
+now closed — the D1/D2 fix and its proof surface are both real and
+merged, not just planned.
+
 ## Locked decisions
 
 | ID | Decision |
