@@ -176,11 +176,21 @@ function excludeIronLawEvidence(files, id) {
 // declaring item that (correctly) never lists its own store's paths in
 // its footprint (87 of 371 real items declare a footprint; only 7 list
 // any `.fgos/` path). Found by independent review after tsk-4hl merged.
+//
+// tsk-5iv D2 (round-3 review, MEDIUM): the original exemption was a blanket
+// `.fgos/**` match, which also swallowed hand-edited policy files
+// (`.fgos/config.json`, `.fgos/gate-bypass.json`, `.fgos/coexistence.json`)
+// that real items DO deliberately edit as their own work product (`git log
+// -- .fgos/config.json` carries real feature commits) -- an item whose
+// declared footprint excludes `.fgos/` but that quietly edits
+// `gate-bypass.json` produced zero `footprintDiffHits`, the opposite of
+// this advisory's purpose. Narrowed to only the append-only lifecycle
+// streams the concurrent-session noise above actually comes from --
+// `events.jsonl` (plus its own timestamped backups) and
+// `entropy-history.jsonl` -- never a policy or generated file.
+const FGOS_NOISE_ONLY_PATHS = /^\.fgos\/(events\.jsonl(\.backup-.*)?|entropy-history\.jsonl)$/;
 function excludeFgosPaths(files) {
-  return files.filter((f) => {
-    const p = normalizePath(f);
-    return p !== '.fgos' && !p.startsWith('.fgos/');
-  });
+  return files.filter((f) => !FGOS_NOISE_ONLY_PATHS.test(normalizePath(f)));
 }
 
 // LOCAL copy of session.mjs's private realpathOr (session.mjs is never edited,
@@ -3839,9 +3849,30 @@ async function runVerb(verb, flags, positional, dir) {
     // error. `repoRoot` is derived from `dir` (never `process.cwd()`) so
     // this verb behaves identically whether invoked from the main checkout
     // or, per this item's own theme, from a worktree's cwd with `--dir`.
+    //
+    // tsk-5iv D1 (round-3 review, HIGH): `repoRoot = path.dirname(dir)` and
+    // `dir` defaults to `dataDir(undefined)` -- cwd-strict, never
+    // git-resolved (paths.mjs's own `strict: true` contract). Called with
+    // no `--dir` from inside a linked worktree, `repoRoot` silently
+    // resolves to the WORKTREE, not the main checkout, while this verb's
+    // own error text below still prints "main checkout, whole repo" and
+    // (with --confirm) runs `git reset --hard` against that wrong tree --
+    // the exact destructive-reset-on-the-wrong-tree failure mode AGENTS.md
+    // tells every session to use THIS verb instead of raw `git reset
+    // --hard` to avoid. Refuse outright rather than silently proceed,
+    // matching the same `isMainWorktree` guard other verbs in this file
+    // already use (e.g. the `init`/`approve --github` cases above).
     case 'main-checkout-reset': {
       const sha = requireField(flags.sha, 'main-checkout-reset requires --sha <sha>: fgos main-checkout-reset --sha <sha> [--confirm]');
       const repoRoot = path.dirname(dir);
+      if (flags.dir === undefined && !isMainWorktree(repoRoot)) {
+        throw new StoreError(
+          'validation',
+          'main-checkout-reset: refusing to run without --dir <mainRoot> -- cwd is a linked worktree, and without --dir this verb would silently ' +
+            'target it (git reset --hard) instead of the main checkout. Pass --dir <mainRoot> explicitly, e.g. ' +
+            '`fgos main-checkout-reset --sha <sha> --dir "$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)"`.',
+        );
+      }
       const confirmed = Boolean(flags.confirm);
       const dirty = !isMainTreeClean(repoRoot);
       try {
@@ -4022,9 +4053,32 @@ function renderPretty(verb, data) {
 // `count: 0` (indistinguishable from "no captures exist"); `lock-status`
 // is structurally forced to report the lock as `free` with no store to
 // read a real lock state from.
+// `evolve` added by tsk-5iv D3 (round-3 review, MEDIUM): same bug class
+// again -- `requiresExistingStore: false`, silently returns `[]` (an
+// empty-store `rankCandidates` result) from a `.fgos/`-less worktree
+// instead of its real candidate list. This is the fourth time this set
+// has been widened for the identical gap (tsk-3u2, tsk-3g5, now this).
+//
+// `docs-index` was investigated for the same fix (CONTEXT.md D3 originally
+// named it too) and found NOT to belong here: verified by reading its own
+// handler (the `docs-index` case above) -- its `docPath`/`title` entries
+// come from a real `fs.readdirSync` scan of `docs/` under `repoRoot`
+// (`path.dirname(dir)`), which is correct and complete regardless of
+// whether `.fgos/` exists, and its `sourceCaptureId` bookkeeping already
+// has its own dedicated degrade-safe guard (`storeReachable`, tsk-f31,
+// just above: preserves a doc's prior `sourceCaptureId` instead of
+// regressing it to null when the store is unreachable). Adding this
+// verb's generic "this view may be empty" warning would be actively
+// MISLEADING here -- its view is never empty or wrong from a worktree --
+// so it stays out, correcting CONTEXT.md D3's original premise for this
+// one verb with real evidence found during implementation.
+//
+// `main-checkout-reset` is deliberately NOT added here either: it is
+// destructive, not merely read-stale, and tsk-5iv D1 above gives it its
+// own hard refusal instead of a soft warning.
 const STORE_MISSING_WARNING_VERBS = new Set([
   'list', 'ready', 'graph', 'stale', 'check', 'rollup', 'show', 'conflicts', 'triage', 'schedule',
-  'gate-bypass', 'doc-sources', 'lock-status',
+  'gate-bypass', 'doc-sources', 'lock-status', 'evolve',
 ]);
 
 async function main() {

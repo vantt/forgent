@@ -246,6 +246,92 @@ test('lock-status from a .fgos/-less linked worktree with no --dir warns on stde
   assert.equal(envelopeData(result.stdout).outcome, 'free', 'the structurally-forced empty-store answer, never silently trusted as a real lock read');
 });
 
+// tsk-5iv D3 (round-3 review, MEDIUM): same STORE_MISSING_WARNING_VERBS gap
+// again, found in `evolve` -- `rankCandidates` over an empty-store view
+// silently returns `[]` instead of the real candidate list.
+test('evolve from a .fgos/-less linked worktree with no --dir warns on stderr instead of a silent []', () => {
+  const { wt } = tmpLinkedWorktree();
+  const result = run(wt, ['evolve']);
+  assert.equal(result.status, 0, 'evolve is requiresExistingStore:false -- it warns, never refuses');
+  assert.match(result.stderr, /\.fgos\/ not found/);
+  assert.deepEqual(envelopeData(result.stdout), [], 'the empty-store rankCandidates result, never silently trusted as "no real candidates exist"');
+});
+
+// tsk-5iv D3: docs-index was investigated for the same fix and found NOT
+// to belong in STORE_MISSING_WARNING_VERBS -- its docPath/title entries
+// come from a real docs/ scan under repoRoot, correct regardless of
+// .fgos/ presence, so a "may be empty" warning would be actively
+// misleading. Pins that this stays true: same docs/ content, same
+// worktree-vs-main answer.
+test('docs-index from a .fgos/-less linked worktree with no --dir gives the SAME real answer as from the main checkout, no warning (D3: correctly excluded)', () => {
+  const { main, wt } = tmpLinkedWorktree();
+  fs.mkdirSync(path.join(main, 'docs', 'how-to'), { recursive: true });
+  fs.writeFileSync(path.join(main, 'docs', 'how-to', 'example.md'), '# Example\n\nbody\n');
+  execFileSync('git', ['add', '-A'], { cwd: main });
+  execFileSync('git', ['commit', '-q', '-m', 'add doc'], { cwd: main });
+
+  const mainResult = run(main, ['docs-index']);
+  assert.equal(mainResult.status, 0);
+  assert.equal(mainResult.stderr, '', 'main checkout run must never warn');
+
+  const wtResult = run(wt, ['docs-index']);
+  assert.equal(wtResult.status, 0, 'docs-index is requiresExistingStore:false -- it never refuses');
+  assert.equal(wtResult.stderr, '', 'docs-index must never warn -- unlike gate-bypass/evolve, its answer is not distorted by a missing .fgos/');
+  assert.equal(
+    envelopeData(wtResult.stdout).length,
+    envelopeData(mainResult.stdout).length,
+    'the worktree and the main checkout must see the exact same doc count -- docs-index reads docs/ from disk, not from the store',
+  );
+});
+
+// tsk-5iv D1 (round-3 review, HIGH): main-checkout-reset's repoRoot =
+// path.dirname(dir), and dir defaults to a cwd-strict resolution (never
+// git-resolved) -- called with no --dir from a linked worktree, repoRoot
+// silently resolved to the WORKTREE, not the main checkout, while this
+// verb's own error text still said "main checkout, whole repo" and (with
+// --confirm) would run `git reset --hard` against that wrong tree.
+test('main-checkout-reset from a linked worktree with no --dir refuses before touching git (D1)', () => {
+  const { main, wt } = tmpLinkedWorktree();
+  const headBefore = gitHead(main);
+  const wtHeadBefore = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: wt, encoding: 'utf8' }).trim();
+
+  const result = run(wt, ['main-checkout-reset', '--sha', headBefore]);
+  assert.equal(result.status, 4, 'must be a clean validation refusal, never a crash or a silent reset');
+  assert.match(result.stderr, /main-checkout-reset: refusing to run without --dir/);
+  assert.match(result.stderr, /--dir <mainRoot>/);
+
+  assert.equal(gitHead(main), headBefore, 'the main checkout must be untouched');
+  assert.equal(
+    execFileSync('git', ['rev-parse', 'HEAD'], { cwd: wt, encoding: 'utf8' }).trim(),
+    wtHeadBefore,
+    'the worktree itself must also be untouched -- this is a refusal, not a redirected reset',
+  );
+});
+
+test('main-checkout-reset from a linked worktree WITH --dir <mainRoot> targets the real main checkout, exactly as if run from there directly', () => {
+  const { main, wt } = tmpLinkedWorktree();
+  commitFile(main, 'second.txt');
+  const targetSha = gitHead(main);
+  commitFile(main, 'third.txt');
+  assert.notEqual(gitHead(main), targetSha);
+
+  const result = run(wt, ['main-checkout-reset', '--sha', targetSha, '--dir', main]);
+  assert.equal(result.status, 0, `main-checkout-reset --dir unexpectedly failed: ${result.stderr}`);
+  assert.equal(gitHead(main), targetSha, 'the real main checkout must land on the requested sha');
+});
+
+test('main-checkout-reset from the main checkout itself, no --dir, still works exactly as before (no regression on the common case)', () => {
+  const cwd = initGitCwd();
+  commitFile(cwd, 'second.txt');
+  const targetSha = gitHead(cwd);
+  commitFile(cwd, 'third.txt');
+  assert.notEqual(gitHead(cwd), targetSha);
+
+  const result = run(cwd, ['main-checkout-reset', '--sha', targetSha]);
+  assert.equal(result.status, 0, `main-checkout-reset from the main checkout unexpectedly failed: ${result.stderr}`);
+  assert.equal(gitHead(cwd), targetSha);
+});
+
 test('--dir with no value (a bare trailing flag) is a clean validation error, exit 4, not a crash', () => {
   const { wt } = tmpLinkedWorktree();
   const result = run(wt, ['submit', 'title', '--dir']);
@@ -4200,6 +4286,16 @@ test('return: footprintDiffHits is empty when the item declares NO footprint at 
 test('return: a .fgos/* change bundled into the item\'s own commit (git add -A sweeping in take\'s own event-log write) is exempt from footprintDiffHits (tsk-x5r self-exempt)', () => {
   const cwd = initGitCwd();
   run(cwd, ['init']);
+  // tsk-5iv D2: commit the store's own bootstrap files (config.json,
+  // coexistence.json, etc) BEFORE take/add -- matching the real main
+  // checkout's topology, where these were committed long ago and only
+  // events.jsonl changes on every take/return cycle. Without this, the
+  // fixture's very first `git add -A` below would ALSO be the first time
+  // config.json/coexistence.json are tracked at all, which is a one-time
+  // bootstrap artifact this test is not about (D2 narrowed the exemption
+  // to noise-only paths; those two are no longer exempt on purpose).
+  execFileSync('git', ['add', '-A'], { cwd });
+  execFileSync('git', ['commit', '-q', '-m', 'bootstrap .fgos/'], { cwd });
   const id = 'pull-return-fgos-exempt';
   assert.equal(run(cwd, ['add', id, '--title', 'X', '--kind', 'task', '--risk', 'low', '--verify', 'test -f proof.txt', '--footprint', 'proof.txt']).status, 0);
   assert.equal(run(cwd, ['take', '--id', id]).status, 0);
@@ -4208,7 +4304,10 @@ test('return: a .fgos/* change bundled into the item\'s own commit (git add -A s
   // shape an ordinary `git commit -am` after `fgos take` produces, and
   // exactly what a concurrent session's own take/return/approve on the
   // shared main checkout can ALSO bundle into this item's own ownDiff
-  // range (found by independent review after tsk-4hl merged).
+  // range (found by independent review after tsk-4hl merged). With the
+  // bootstrap commit above, this delta is now genuinely just
+  // events.jsonl's own append (take's real behavior), not a first-time
+  // commit of the whole store.
   commitFile(cwd, 'proof.txt');
 
   const result = run(cwd, ['return', id]);
@@ -4216,6 +4315,37 @@ test('return: a .fgos/* change bundled into the item\'s own commit (git add -A s
   const data = envelopeData(result.stdout);
   assert.equal(data.passed, true);
   assert.deepEqual(data.footprintDiffHits, [], 'a .fgos/* change bundled into the item\'s own commit must never be flagged');
+});
+
+// tsk-5iv D2 (round-3 review, MEDIUM): the original tsk-x5r exemption was a
+// blanket `.fgos/**` match, which also swallowed hand-edited policy files
+// (.fgos/config.json, .fgos/gate-bypass.json) that real items DO
+// deliberately edit as their own work product -- an item that changes
+// gate-bypass.json OUTSIDE its declared footprint must still surface in
+// footprintDiffHits; only the append-only lifecycle noise (events.jsonl,
+// entropy-history.jsonl) stays exempt.
+test('return: a .fgos/gate-bypass.json change bundled into the item\'s own commit DOES surface in footprintDiffHits, unlike events.jsonl (tsk-5iv D2: exemption narrowed to noise only)', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  const id = 'pull-return-gb-not-exempt';
+  assert.equal(run(cwd, ['add', id, '--title', 'X', '--kind', 'task', '--risk', 'low', '--verify', 'test -f proof.txt', '--footprint', 'proof.txt']).status, 0);
+  assert.equal(run(cwd, ['take', '--id', id]).status, 0);
+  // Simulates an item that quietly edits the safety-policy file outside its
+  // declared footprint (proof.txt) -- fs.writeFileSync + take's own
+  // events.jsonl delta both land in the same commit via commitFile's git
+  // add -A, mirroring how a real gate-approve/policy edit would ride
+  // alongside an item's own work.
+  fs.writeFileSync(path.join(cwd, '.fgos', 'gate-bypass.json'), JSON.stringify({ level: 'off' }));
+  commitFile(cwd, 'proof.txt');
+
+  const result = run(cwd, ['return', id]);
+  assert.equal(result.status, 0, `return failed: ${result.stderr}`);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.passed, true, 'the footprint-diff advisory never fails the return itself');
+  assert.ok(
+    data.footprintDiffHits.some((hit) => hit.file === '.fgos/gate-bypass.json'),
+    'a policy-file change outside the declared footprint must surface, not be silently swallowed by the noise exemption',
+  );
 });
 
 test('return: the item\'s own docs/history/<id>/iron-law-evidence.md is exempt from footprintDiffHits (tsk-4hl self-exempt, avoids self-flagging every Iron-Law-gated item)', () => {

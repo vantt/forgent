@@ -549,6 +549,23 @@ export function findUncoveredLockedDecisions(contextText, children, repoRoot) {
   // by independent review: 20+ real CONTEXT.md decisions name a
   // directory this way. Same purely-mechanical "/" boundary, just the
   // other direction.
+  //
+  // tsk-5iv D5 (round-3 review, MEDIUM, intentional trade-off -- NOT
+  // tightened): this means ANY single footprint entry nested under a
+  // directory-shaped decision counts as full coverage of that decision,
+  // not just an entry naming the directory itself or a path at/above it.
+  // Requiring the stricter form was considered and rejected: it would
+  // make a real, legitimate child that touches exactly one file inside a
+  // directory-shaped decision incorrectly fail coverage -- a false
+  // positive on the advisory this exists to keep quiet on real matches.
+  // The blast radius of the looser form stays bounded by
+  // PATH_TOKEN_PATTERN's 2+-segment requirement (a bare top-level
+  // directory like "src/" alone never tokenizes as a decision path at
+  // all), and this whole check is advisory-only -- it never blocks a
+  // decompose, only logs an advisory decision (see resolveDecompose's
+  // caller). Never blocks == the class of unnecessary rework a false
+  // positive would cause is why looser was chosen here, while
+  // isCoveredByDirectory above stays the direction it already was.
   const isDirectoryContainingCoverage = (p) => {
     const dir = p.replace(/\/+$/, '');
     if (!dir) return false;
