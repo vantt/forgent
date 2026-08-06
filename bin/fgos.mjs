@@ -2782,13 +2782,18 @@ async function runVerb(verb, flags, positional, dir) {
           // Ephemeral worktree checked out on fgw/<rootId> (guaranteed to
           // exist by the time a leaf reaches "awaiting-approval" — dispatch-side
           // wiring, cell fan-out-parallel-9) — never the human's own main
-          // checkout. ASSUMPTION (acknowledged, not fixed in this cell):
-          // this races a concurrent approval of a sibling leaf of the same
-          // root, or the runner's own dispatch of that root, since
-          // createWorktree's branch-reuse path force-reclaims any existing
-          // checkout of fgw/<rootId>; low-likelihood under single-operator
-          // P6, D16's per-root merge-mutex lives in the runner's
-          // write-queue, not this human-driven CLI verb.
+          // checkout. This still races a concurrent approval of a sibling
+          // leaf of the same root, or the runner's own dispatch of that
+          // root — D16's per-root merge-mutex lives in the runner's
+          // write-queue, not this human-driven CLI verb, so nothing here
+          // prevents two such merges from overlapping. What changed
+          // (tsk-46a, docs/history/merge-ephemeral-branch-force-race/
+          // CONTEXT.md): withMergeEphemeralWorktree's own CAS guard now
+          // catches the overlap at the ref-move step and makes the losing
+          // side fail loudly instead of silently overwriting the winner's
+          // commit — the race can still happen, but it is no longer a
+          // silent data-loss risk; the losing `approve` call just needs a
+          // retry against the new tip.
           //
           // withMergeEphemeralWorktree's own finally (worktree.mjs) removes
           // the checkout on every exit path below (conflict, verify-fail,
