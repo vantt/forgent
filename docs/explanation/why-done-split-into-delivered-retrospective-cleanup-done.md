@@ -230,6 +230,29 @@ needed. The fix itself split into two dependent child items: separate the
 TTL check out of D8's harness first, then move the worktree/branch
 teardown timing back to actually happening at `cleanup`.
 
+Drift 1's own fix (`tsk-4jf`, the first of the two dependent children)
+lives at the verb, not the caller — deliberately. `cleanup-pool.mjs`'s own
+picker had already tried filtering TTL-not-elapsed items out at the
+*caller* (`tsk-dvc`), but that attempt demonstrably failed in practice:
+three of the six real misparks happened *after* that caller-side guard
+had already shipped, arriving through a different call path the guard
+didn't cover. `assessCleanupReadiness` (`src/state/cleanup-harness.mjs`)
+now returns two separate groups instead of one flat `reasons` array —
+`notReadyYet` (TTL not yet elapsed — a genuine no-op, never a park) and
+`failed` (an actual D8 check failing — still parks `cleanup -> blocked`,
+unchanged). The `cleanup` verb case in `bin/fgos.mjs` only parks on
+`failed` being non-empty; a `notReadyYet`-only result leaves the item
+sitting quietly at `cleanup`, no `moveWork` call at all. `cleanup-pool.mjs`'s
+own TTL pre-filter stays in place afterward — it's no longer load-bearing
+for correctness (the verb itself is now safe to call early), but it's
+still a real scheduling optimization, avoiding calling a verb already
+known to no-op — and the code comments were updated to say so explicitly,
+so a future reader doesn't mistake the leftover filter for the guard it
+used to be. The one-door-write principle (CTR001) generalizes cleanly from
+this: a true/false condition that matters for correctness belongs inside
+the one write door every caller shares, never bolted onto just one
+caller's own approach path.
+
 ## The chain's real blind spot: nothing detects an item forgotten mid-chain, because nothing needs to
 
 Every downstream mechanism this split touches was deliberately made to
