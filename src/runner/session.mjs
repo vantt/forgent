@@ -128,23 +128,45 @@ function restoreTrackedFgos(worktreePath) {
   }
 }
 
-/** One attempt at the wx-atomic-create lock, mirroring loop.mjs's
- * `acquireRunnerLock` exactly. Returns whether the lock was taken, and — on a
+let lockTmpCounter = 0;
+
+/** One attempt at the link-atomic-create lock, mirroring loop.mjs's
+ * `acquireRunnerLock` shape. Returns whether the lock was taken, and — on a
  * live holder — its pid. NEVER creates the lock in the same attempt that
  * deleted a stale one (that delete-then-create was the TOCTOU loop.mjs's doc
  * comment calls out); a reclaim yields and the next attempt does the bare
- * create. */
+ * create.
+ *
+ * Creation writes the pid to a per-attempt temp file THEN `fs.linkSync`s it
+ * onto `lockPath` (tsk-1u7, porting the fix `events.mjs`'s
+ * `tryAcquireEventsLockOnce` already proved at tsk-3ld): the earlier
+ * `fs.openSync(lockPath, 'wx')` + separate `fs.writeSync` created a window
+ * where the lock file existed but was still empty, so a competing process
+ * reading it mid-write saw unparseable (NaN) content, fell through to the
+ * "dead/garbage holder" branch, and unlinked a lock a live process
+ * legitimately held — letting two processes both believe they held it
+ * (reproduced directly in this module: ~27% of runs at 50 concurrent
+ * processes with a synchronized start barrier, see
+ * `docs/history/tsk-1u7-session-lock-contention-flake/plan.md`). `link()`
+ * only ever exposes `lockPath` fully-written or not-yet-existing — never
+ * partially written — so that window is closed structurally, not papered
+ * over with a retry. */
 function tryAcquireOnce(lockPath, pid) {
+  const dir = path.dirname(lockPath);
+  lockTmpCounter += 1;
+  const tmpPath = path.join(dir, `.sessions.lock.tmp-${pid}-${Date.now()}-${lockTmpCounter}`);
+  fs.writeFileSync(tmpPath, String(pid), 'utf8');
   try {
-    const fd = fs.openSync(lockPath, 'wx');
-    try {
-      fs.writeSync(fd, String(pid));
-    } finally {
-      fs.closeSync(fd);
-    }
+    fs.linkSync(tmpPath, lockPath);
     return { acquired: true };
   } catch (err) {
     if (err.code !== 'EEXIST') throw err;
+  } finally {
+    try {
+      fs.unlinkSync(tmpPath);
+    } catch (err) {
+      if (err.code !== 'ENOENT') throw err;
+    }
   }
 
   let raw;
