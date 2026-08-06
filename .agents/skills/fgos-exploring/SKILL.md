@@ -193,6 +193,7 @@ never moves it.
    one at creation time —
 
    ```bash
+   root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
    fgos add --title "<title>" --kind <kind> --risk <risk> --verify "<real, runnable command>" --docs-ref "docs/history/<feature>/" --dir "$root"
    ```
 

@@ -2137,9 +2137,19 @@ test('findUncoveredLockedDecisions: a non-string footprint entry (e.g. null) is 
   const repoRoot = mkTempDir();
   fs.writeFileSync(path.join(repoRoot, 'important.mjs'), '// fixture\n');
   const contextText = '## Locked decisions\n\nD1: touches `important.mjs`.\n';
+  // tsk-5iv D6 (round-3 review, HIGH): the original fixture paired the
+  // `null` entry with an exact-match string entry for the SAME decision
+  // path ('important.mjs' alongside a decision naming 'important.mjs'), so
+  // `covered.has(p)` short-circuited before `isCoveredByDirectory`/
+  // `isDirectoryContainingCoverage` -- the actual `null.replace()` crash
+  // site -- was ever reached; the test passed identically with or without
+  // the crash guard. 'other.mjs' names a DIFFERENT file, so nothing
+  // exact-matches 'important.mjs' and the directory-coverage helpers (the
+  // only place a raw footprint entry gets `.replace()`-d) genuinely run
+  // against the `null` entry.
   assert.doesNotThrow(() => {
-    const uncovered = findUncoveredLockedDecisions(contextText, [{ footprint: [null, 'important.mjs'] }], repoRoot);
-    assert.deepEqual(uncovered, [], 'the real string entry must still cover the decision, alongside the ignored null');
+    const uncovered = findUncoveredLockedDecisions(contextText, [{ footprint: [null, 'other.mjs'] }], repoRoot);
+    assert.deepEqual(uncovered, ['important.mjs'], 'neither the ignored null nor the unrelated other.mjs covers this decision');
   });
 });
 
