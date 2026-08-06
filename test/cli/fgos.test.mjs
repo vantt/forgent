@@ -4163,6 +4163,27 @@ test('return: footprintDiffHits is empty when the item declares NO footprint at 
   assert.deepEqual(envelopeData(result.stdout).footprintDiffHits, []);
 });
 
+test('return: a .fgos/* change bundled into the item\'s own commit (git add -A sweeping in take\'s own event-log write) is exempt from footprintDiffHits (tsk-x5r self-exempt)', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  const id = 'pull-return-fgos-exempt';
+  assert.equal(run(cwd, ['add', id, '--title', 'X', '--kind', 'task', '--risk', 'low', '--verify', 'test -f proof.txt', '--footprint', 'proof.txt']).status, 0);
+  assert.equal(run(cwd, ['take', '--id', id]).status, 0);
+  // commitFile's git add -A sweeps in whatever .fgos/* delta `take` itself
+  // produced since the last commit, alongside proof.txt -- the exact real
+  // shape an ordinary `git commit -am` after `fgos take` produces, and
+  // exactly what a concurrent session's own take/return/approve on the
+  // shared main checkout can ALSO bundle into this item's own ownDiff
+  // range (found by independent review after tsk-4hl merged).
+  commitFile(cwd, 'proof.txt');
+
+  const result = run(cwd, ['return', id]);
+  assert.equal(result.status, 0, `return failed: ${result.stderr}`);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.passed, true);
+  assert.deepEqual(data.footprintDiffHits, [], 'a .fgos/* change bundled into the item\'s own commit must never be flagged');
+});
+
 test('return: the item\'s own docs/history/<id>/iron-law-evidence.md is exempt from footprintDiffHits (tsk-4hl self-exempt, avoids self-flagging every Iron-Law-gated item)', () => {
   const cwd = initGitCwd();
   run(cwd, ['init']);

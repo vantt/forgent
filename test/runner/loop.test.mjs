@@ -320,12 +320,23 @@ test('runOnce logs the "<capacityId> — <provider> — <model>" announce line a
   const events = readRawEvents(dir);
   const auditEvent = events.find((e) => e.type === 'capacity.dispatch');
   assert.ok(auditEvent, 'expected a capacity.dispatch event in the log');
-  assert.deepEqual(auditEvent.payload, {
+  // baseCommit/headRef (tsk-4hl): asserted by shape, not exact value -- both
+  // are real per-run git reads (a fresh worktree's own HEAD/branch), so a
+  // literal SHA/branch string would be non-deterministic across runs. This
+  // still pins the property that actually matters: a real 40-hex commit and
+  // the item's own dispatch branch, proving attestRoot: cwd reached the
+  // production spawnWorker path end-to-end, not just the dispatch.mjs unit
+  // tests (found missing by independent review after tsk-4hl merged --
+  // this whole test file was outside that item's own verify scope).
+  const { baseCommit, headRef, ...rest } = auditEvent.payload;
+  assert.deepEqual(rest, {
     id: 'item-announce',
     capacityId: 'fgos-code-implement',
     provider: process.execPath,
     model: 'sonnet',
   });
+  assert.match(baseCommit, /^[0-9a-f]{40}$/, 'baseCommit must be a real commit sha, not null/undefined');
+  assert.equal(headRef, 'fgw/item-announce', 'headRef must be this item\'s own dispatch branch, not the main checkout\'s');
   // the audit entry is unknown to the FSM view — never breaks replay/state.json
   assert.equal(listWork(dir).work['item-announce'].status, 'awaiting-approval');
 });
