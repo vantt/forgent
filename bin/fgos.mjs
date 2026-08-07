@@ -1784,8 +1784,12 @@ async function runVerb(verb, flags, positional, dir) {
     // touches state.json, never creates `.fgos/` if it's missing. Goes
     // through store.readyWork only; this file never imports frontier.mjs
     // directly (per this cell's key_links).
+    // `--step` (tsk-4so, docs/history/execution-fanout/CONTEXT-tsk-4so.md):
+    // which domain step's frontier to read (`Clarify`/`Divide`/`Execute`);
+    // omitted, readyWork's own default (`Execute`) applies, byte-identical
+    // to every pre-existing caller.
     case 'ready': {
-      return paginateVerbResult(readyWork(dir), flags, 'ready-v1', 'ready');
+      return paginateVerbResult(readyWork(dir, flags.step ? { step: flags.step } : undefined), flags, 'ready-v1', 'ready');
     }
 
     // Request-class per D1 (same contract as `ready`/`list`): a pure read —

@@ -2217,6 +2217,33 @@ test('ready on a corrupt log is refused as corrupt-log, exit 5', () => {
   assert.equal(result.status, 5);
 });
 
+// --- tsk-4so D1: `ready --step` wiring (docs/history/execution-fanout/
+// CONTEXT-tsk-4so.md) -- the flag existed in `frontier.mjs` since tsk-19j
+// D9 but was silently swallowed by the CLI/store layer until now ---------
+
+test('ready --step Clarify returns only clarify-stage items, not the default Execute frontier', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'atclarify', { stage: 'clarify' });
+  addOk(cwd, 'atexecuting', { stage: 'executing' });
+
+  const clarify = envelopeData(run(cwd, ['ready', '--step', 'Clarify']).stdout);
+  assert.deepEqual(clarify.map((i) => i.id), ['atclarify']);
+
+  const divide = envelopeData(run(cwd, ['ready', '--step', 'Divide']).stdout);
+  assert.deepEqual(divide, []);
+});
+
+test('ready with no --step defaults to Execute, byte-identical to before --step wiring existed', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'atclarify', { stage: 'clarify' });
+  addOk(cwd, 'atexecuting', { stage: 'executing' });
+
+  const bare = envelopeData(run(cwd, ['ready']).stdout);
+  const explicitExecute = envelopeData(run(cwd, ['ready', '--step', 'Execute']).stdout);
+  assert.deepEqual(bare.map((i) => i.id), ['atexecuting']);
+  assert.deepEqual(bare, explicitExecute);
+});
+
 test('GOLDEN request-class: running ready twice never appends to events.jsonl, and the view file is untouched too', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'golden-a');
@@ -8233,6 +8260,29 @@ test('conflicts verb on a store with no overlaps: empty list, exit 0', () => {
   assert.equal(run(cwd, ['init']).status, 0);
   assert.equal(addOk(cwd, 'a').status, 0); // no footprint
   assert.deepEqual(envelopeData(run(cwd, ['conflicts']).stdout), []);
+});
+
+// --- tsk-4so D1: conflicts must catch overlap ACROSS steps, not just within
+// Execute (docs/history/execution-fanout/CONTEXT-tsk-4so.md) -------------
+
+test('conflicts verb: items at DIFFERENT stages sharing a footprint are flagged (the real gap: a single-step frontier never saw this)', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0);
+  assert.equal(run(cwd, ['add', 'atdecompose', '--title', 'A', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--footprint', 'bin/fgos.mjs', '--stage', 'decompose', '--description', 'tsk-4so fixture description.']).status, 0);
+  assert.equal(run(cwd, ['add', 'atexecuting', '--title', 'B', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--footprint', 'bin/fgos.mjs', '--stage', 'executing', '--description', 'tsk-4so fixture description.']).status, 0);
+
+  const data = envelopeData(run(cwd, ['conflicts']).stdout);
+  assert.deepEqual(data, [{ a: 'atdecompose', b: 'atexecuting', shared: ['bin/fgos.mjs'], suggestions: ['sequence', 'hoist', 're-slice'] }]);
+});
+
+test('conflicts verb: a clarify-stage item and an executing-stage item sharing a footprint are also flagged', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0);
+  assert.equal(run(cwd, ['add', 'atclarify', '--title', 'A', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--footprint', 'src/shared.mjs', '--stage', 'clarify', '--description', 'tsk-4so fixture description.']).status, 0);
+  assert.equal(run(cwd, ['add', 'atexecuting', '--title', 'B', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--footprint', 'src/shared.mjs', '--stage', 'executing', '--description', 'tsk-4so fixture description.']).status, 0);
+
+  const data = envelopeData(run(cwd, ['conflicts']).stdout);
+  assert.deepEqual(data, [{ a: 'atclarify', b: 'atexecuting', shared: ['src/shared.mjs'], suggestions: ['sequence', 'hoist', 're-slice'] }]);
 });
 
 // --- tsk-4j9-3: `fgos merge list` (merge-readiness ranking) ---------------

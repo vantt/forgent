@@ -29,14 +29,14 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { appendEvent, readEvents, withEventsLock, appendEventLocked } from './events.mjs';
 import { rebuildView, viewRevision } from './replay.mjs';
-import { graphMetrics as computeGraphMetrics, whatIf as computeWhatIf, classifyStaleDoing, classifyStalePostDelivery, footprintOverlap, goalScopedCriticalPath, goalScopedGreedyTopUnblock, computeSchedule, detectCycles } from './graph-metrics.mjs';
+import { graphMetrics as computeGraphMetrics, whatIf as computeWhatIf, classifyStaleDoing, classifyStalePostDelivery, footprintOverlapAmong, goalScopedCriticalPath, goalScopedGreedyTopUnblock, computeSchedule, detectCycles } from './graph-metrics.mjs';
 import { transitionWork, FsmError } from './status-fsm.mjs';
 import { transitionStage } from './stage-fsm.mjs';
 import { validateWork, validateDomainFields, checkAcceptanceEvidenceTraceable, WorkValidationError, DEFAULTS, GOAL_TIERS, truncateTitle } from './work.mjs';
 import { getDomain, statusCategoryFor, parkReasonForStatus } from './workflow-stage-graphs.mjs';
 import { EventLogError } from './events.mjs';
 import { validateToolRegistration, ToolRegistryError } from './tool-registry.mjs';
-import { frontier, isDepsAndLineageReady as depsAndLineageReadyView } from './frontier.mjs';
+import { frontier, frontierAcrossSteps, isDepsAndLineageReady as depsAndLineageReadyView } from './frontier.mjs';
 import { assertNoCycle, assertNoUnifiedCycle } from './dep-graph.mjs';
 import { resolveWriterIdentity } from '../runner/session-identity.mjs';
 
@@ -965,10 +965,14 @@ export function listWork(dir) {
  * so `frontier` on it returns `[]` — never an error, exit 0, exactly like
  * `listWork` on an uninitialized dir. A corrupt log throws the same
  * `EventLogError('corrupt-log')` `rebuildView`/`listWork` already throw.
+ * `step` (tsk-4so, optional): which domain step counts as "ready to start"
+ * — passed straight through to `frontier`'s own `step` option
+ * (`'Clarify'`/`'Divide'`/`'Execute'`); omitted, `frontier`'s own default
+ * (`'Execute'`) applies, byte-identical to every pre-existing caller.
  */
-export function readyWork(dir) {
+export function readyWork(dir, { step } = {}) {
   const { logPath } = paths(dir);
-  return frontier(rebuildView(logPath));
+  return frontier(rebuildView(logPath), step ? { step } : undefined);
 }
 
 /**
@@ -1079,10 +1083,19 @@ export function stalePostDeliveryAdvisory(dir, opts = {}) {
  * pairs of ready items whose declared file footprints overlap, so a parallel
  * dispatch would risk a file conflict. Same read-facade shape as graphMetrics;
  * the Domain core finds the overlaps and suggests resolutions.
+ * Candidates come from `frontierAcrossSteps` (tsk-4so D1, docs/history/
+ * execution-fanout/CONTEXT-tsk-4so.md), not the single-step `frontier` —
+ * two items at DIFFERENT steps (e.g. one at `decompose`, one at
+ * `executing`) sharing a footprint is a real risk this advisory must catch,
+ * not just two items both currently at `executing`. `footprintOverlap`
+ * (the Execute-only single-step wrapper other decision docs already cite
+ * by name as its contract) is intentionally left untouched — this reuses
+ * the underlying `footprintOverlapAmong` pairwise comparison directly
+ * instead.
  */
 export function footprintConflicts(dir) {
   const { logPath } = paths(dir);
-  return footprintOverlap(rebuildView(logPath));
+  return footprintOverlapAmong(frontierAcrossSteps(rebuildView(logPath)));
 }
 
 /**
