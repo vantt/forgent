@@ -209,6 +209,27 @@ Confirmed shipped as real code: a real `cargo test --manifest-path
 herdr-plugin/Cargo.toml focus_cycle` test plus a real `cargo build
 --release`.
 
+## Implementation (`tsk-bvh`): mouse click-to-focus/click-to-select across all 5 boxes
+
+Extends mouse handling beyond the detail modal (the original scope from
+`tsk-1d5`'s own D5): every box's `Rect` gets recorded on each `draw()`
+frame, the same pattern already used for the Pick/Discover button
+`Rect`s. Clicking inside a box's `Rect` sets it as the focused panel;
+clicking a row inside Work Items or In Process additionally hit-tests
+the Y coordinate to set the row selection. The other 3 boxes stay
+focus-only on click too (D1, consistent with keyboard focus above) — no
+click-to-select-a-row action on `NEED ANSWER`/`MERGE LIST`/
+`AFTER DELIVER`.
+
+Depended on `tsk-3wl` (the keyboard-focus widening above): mouse
+click-to-focus needs the same 5-box identity concept `tsk-3wl` already
+established for `Tab`/`Shift+Tab` cycling, so mouse handling could reuse
+it rather than defining its own separate notion of "which box is this."
+
+Confirmed shipped as real code: a real `cargo test --manifest-path
+herdr-plugin/Cargo.toml mouse_click_to_focus` test plus a real `cargo
+build --release`.
+
 ## Left deliberately open (implementer's call, not locked here)
 
 - Column width/truncation strategy for the 7-column Work Items table on
