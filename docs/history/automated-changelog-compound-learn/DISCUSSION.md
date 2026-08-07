@@ -2,14 +2,14 @@
 
 ## 1. Trạng thái hiện tại
 
-Vòng 2. Vòng 1 nêu 4 câu hỏi (A-D). Vòng 2: A/B/C đã có câu trả lời đầu
-tiên (root / (a) mở rộng fgos-compounding / đồng ý Unreleased) — CHƯA
-mint D-ID (mới 1 vòng, theo luật "không chốt từ 1 câu trả lời"), chờ xác
-nhận lại vòng sau. D chưa trả lời được (câu hỏi chưa đủ cụ thể) — đã viết
-lại kèm ví dụ cụ thể ở §3. Phát sinh thêm 1 điểm lớn chưa có trong phạm vi
-ban đầu: tầm nhìn chiến lược của chủ sản phẩm cho compound-learn (điểm E,
-§3) — cần quyết định RIÊNG xem có nằm trong scope `tsk-12m` hay chỉ là bối
-cảnh định hướng cho các item sau này.
+Vòng 3. A/B/C giữ nguyên qua vòng 2→3 không đổi — đã mint D-ID
+(D-tsk12m-A/B/C, §4), ghi qua `fgos decision --id tsk-12m` thật. D: chủ
+sản phẩm chốt D2 (session tự phán đoán, cùng kỷ luật chọn quadrant) ngay
+vòng 3 — mới chạm lần đầu, CHƯA mint (chờ giữ nguyên qua vòng 4). Điểm E
+(tầm nhìn đa-audience) tách ra thành discussion RIÊNG theo yêu cầu chủ sản
+phẩm — xem `docs/history/compound-learn-artifact-registry/DISCUSSION.md`
+(mở 2026-08-07). `tsk-12m` tạm dừng ở đây chờ discussion registry hội tụ,
+vì D-tsk12m-B đã ghi rõ phụ thuộc vào hình dạng registry đó.
 
 ## 2. Mục tiêu & đề bài
 
@@ -35,15 +35,19 @@ thuộc phạm vi thảo luận này.
 | 1 | Không nhét vào `DIATAXIS_DOC_TYPES`/`QUADRANT_META` | RÕ | Hard rule của `fgos-compounding` SKILL.md xác nhận trực tiếp: "Do not invent a fifth Diataxis quadrant or blend two" |
 | 2 | Ghi nội dung trước, tag sau, chỉ tag khi đã commit ở HEAD | RÕ | `compound` verb's D3 check (`git cat-file -e HEAD:<path>`) — bất kỳ đường ghi mới nào cũng phải theo đúng thứ tự này |
 | 3 | Model "grow vs create" (additive, không xoá/rút gọn) | RÕ, tái dùng được | Khớp tự nhiên bản chất changelog — mỗi entry cộng dồn |
-| A | Vị trí file `CHANGELOG.md` | TRẢ LỜI V2 (chưa D-ID) | Chốt: repo root (`CHANGELOG.md`), đúng chuẩn ngành. Hệ quả kỹ thuật: `fgos-compounding` SKILL.md hard rule hiện ghi thẳng "Do not write the end-user document anywhere outside `docs/<quadrant>/`" — chọn root nghĩa là phải SỬA CÂU CHỮ hard rule đó (thêm exemption tường minh cho changelog), không phải chỉ viết code né luật — nếu không sửa, changelog tự động sẽ vi phạm chính luật do chính skill này đặt ra |
-| B | Điểm quyết "có đáng ghi changelog không" nằm ở đâu | TRẢ LỜI V2 (chưa D-ID) | Chốt hướng (a): mở rộng `fgos-compounding`. Xem thêm điểm E — nếu tầm nhìn multi-audience là thật, (a) nên được thiết kế thành **registry mở-rộng-được** (tiền lệ `registerCheck`/`registerFix`/`registerConfigDefault` trong `src/setup/registrations.mjs`, đã chứng minh hoạt động cho doctor/setup) thay vì if/else cứng riêng cho changelog — để audience thứ 3 (marketing-storytelling) sau này cắm vào cùng chỗ, không phải sửa lại logic lõi lần nữa |
-| C | Version heading cho entry mới | TRẢ LỜI V2 (chưa D-ID) | Đồng ý: ghi vào `## Unreleased`, cắt-release (bump version + đổi heading) là bước thủ công riêng, ngoài phạm vi `tsk-12m` |
-| D | "User-visible" định nghĩa bằng gì (viết lại rõ hơn) | CHƯA RÕ | Ví dụ cụ thể: thêm 1 flag mới cho `fgos doctor` → user thấy, đáng 1 dòng changelog. Đổi tên biến nội bộ trong `src/state/store.mjs` không đổi hành vi ra ngoài → không đáng. Ai/cái gì vẽ ranh giới này cho TỪNG item cụ thể? 2 lựa chọn: **D1** máy tự đoán bằng heuristic file-touched (rẻ nhưng sai nhiều — sửa nội bộ trong `bin/fgos.mjs` vẫn đụng đúng "file CLI" dù không đổi hành vi ra ngoài); **D2** session tự phán đoán có bằng chứng ngay lúc retrospective, cùng kỷ luật với chọn quadrant hiện tại (không mặc định, không coin-flip) — nếu vậy D gần như là hệ quả tự nhiên của B(a), không phải câu hỏi tách rời. Anh nghiêng D1 hay D2? |
-| E | Tầm nhìn compound-learn đa-audience (marketing-storytelling, chất liệu kể chuyện) | MỚI, CHƯA RÕ PHẠM VI | Chủ sản phẩm (2026-08-07): compound-learn là chiến lược quan trọng — về sau muốn nhiều LOẠI tài liệu hơn, phục vụ nhiều audience hơn, kể cả nội dung marketing-storytelling cho người dùng fgOS để phát triển sản phẩm; hệ thống nên ghi nhận chi tiết/chất liệu và tự phát hiện ý tưởng kể chuyện. Đây RÕ RÀNG lớn hơn phạm vi changelog của `tsk-12m`. Câu hỏi cần quyết: `tsk-12m` có tự xây luôn phần MÓNG tổng quát (registry đa-audience, xem gợi ý ở dòng B) hay chỉ xây changelog thật gọn, để móng tổng quát thành item riêng sau (đúng YAGNI — hiện mới có 1 use case thật là changelog, audience thứ 2 (marketing) chưa có yêu cầu cụ thể nào để thiết kế theo)? Khuyến nghị của em: làm changelog trước theo interface hẹp nhưng KHÔNG khoá cứng (đặt tên/state theo hướng registry ngay cả khi chỉ có 1 entry), không xây registry đầy đủ ngay — nhưng đây là khuyến nghị, chưa phải quyết định |
+| A | Vị trí file `CHANGELOG.md` | **D-tsk12m-A** | Chốt: repo root. `fgos-compounding` SKILL.md cần sửa câu chữ hard rule (exemption cho changelog) khi vào giai đoạn planning |
+| B | Điểm quyết "có đáng ghi changelog không" nằm ở đâu | **D-tsk12m-B** | Mở rộng `fgos-compounding`, hình dạng registry mở-rộng-được (tiền lệ `registerCheck`/`registerFix`). Phạm vi/thiết kế registry cụ thể → tách sang `docs/history/compound-learn-artifact-registry/DISCUSSION.md` |
+| C | Version heading cho entry mới | **D-tsk12m-C** | `## Unreleased`, cắt-release là bước thủ công riêng, ngoài phạm vi `tsk-12m` |
+| D | "User-visible" định nghĩa bằng gì | TRẢ LỜI V3 (chưa D-ID, chờ vòng 4) | Chốt D2: session tự phán đoán có bằng chứng ngay lúc retrospective, cùng kỷ luật chọn quadrant (không mặc định, không coin-flip) — hệ quả tự nhiên của D-tsk12m-B |
+| E | Tầm nhìn compound-learn đa-audience | TÁCH RA | Chuyển sang discussion riêng `docs/history/compound-learn-artifact-registry/DISCUSSION.md` (yêu cầu chủ sản phẩm, 2026-08-07 vòng 3) — không còn theo dõi ở đây |
 
 ## 4. Quyết định đã chốt
 
-(chưa có mục nào — chưa điểm nào giữ ổn định qua >1 vòng)
+| D-ID | Tóm tắt | Ghi chú |
+|---|---|---|
+| D-tsk12m-A | `CHANGELOG.md` ở repo root, chuẩn ngành Keep a Changelog | Cần sửa hard rule `fgos-compounding` SKILL.md lúc planning |
+| D-tsk12m-B | Changelog-worthy quyết ngay trong `fgos-compounding`, hình dạng registry mở-rộng-được | Tiền lệ `registerCheck`/`registerFix`/`registerConfigDefault`, `src/setup/registrations.mjs:64/85/110`. Phạm vi registry → discussion riêng |
+| D-tsk12m-C | Entry mới vào `## Unreleased`, cắt-release thủ công riêng | Ngoài phạm vi `tsk-12m` |
 
 ## 5. Q&A log
 
@@ -66,6 +70,13 @@ thuộc phạm vi thảo luận này.
   thật (`registerCheck`/`registerConfigDefault`/`registerFix`,
   `src/setup/registrations.mjs` dòng 64/85/110) — dùng làm căn cứ cho đề
   xuất ở dòng B/E, không phải ý tưởng suông.
+- **2026-08-07 (vòng 3)** — A/B/C giữ nguyên, mint D-tsk12m-A/B/C thật qua
+  `fgos decision --id tsk-12m` (seq 9005-9007). Chốt D=D2. Chủ sản phẩm
+  yêu cầu tách điểm E ra thảo luận riêng ("chuyển sang coding-shape để
+  bàn") — mở `docs/history/compound-learn-artifact-registry/
+  DISCUSSION.md` làm feature riêng, không viết chung file này (D3 rule:
+  một feature một file). `tsk-12m` tạm dừng chờ discussion đó hội tụ vì
+  D-tsk12m-B phụ thuộc hình dạng registry.
 
 ## 6. Thiết kế đã chốt {#design}
 
