@@ -774,6 +774,26 @@ export async function withMergeEphemeralWorktree(repoRoot, id, fn) {
     // ref move happens -- the real branch is untouched, same as today.
     const endCommit = git(worktree.path, ['rev-parse', 'HEAD']).trim();
     if (endCommit !== worktree.startCommit) {
+      // CAS GUARD (tsk-46a, docs/history/merge-ephemeral-branch-force-race/
+      // CONTEXT.md D1): `startCommit` was captured back in
+      // createDetachedMergeWorktree, before `fn` ran and before any lock was
+      // held over THIS step -- a second concurrent call for the same `id`
+      // (e.g. two leaf approves into the same fgw/<rootId>) can land its own
+      // `branch -f` in between, moving `branch` out from under this call
+      // without this call ever knowing. Re-reading the branch's live tip
+      // right here and refusing to move it unless it still matches
+      // `startCommit` is what closes that window -- unconditionally
+      // force-moving (the old behavior) would silently discard whichever
+      // commit landed first, with no error and no conflict. D2: fail loudly
+      // here, never retry automatically -- the caller (merge-loop, or a
+      // person re-running `fgos approve`) owns retrying against the new tip.
+      const liveTip = git(repoRoot, ['rev-parse', branch]).trim();
+      if (liveTip !== worktree.startCommit) {
+        throw new WorktreeError(
+          `refusing to force-move "${branch}" to ${endCommit} -- its tip changed from ${worktree.startCommit} to ${liveTip} since this merge started (a concurrent merge into the same branch already landed). Retry against the new tip instead of overwriting it.`,
+          { branch, expectedTip: worktree.startCommit, actualTip: liveTip, endCommit },
+        );
+      }
       git(repoRoot, ['branch', '-f', branch, endCommit]);
     }
     return result;

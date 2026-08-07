@@ -2916,19 +2916,23 @@ async function runVerb(verb, flags, positional, dir) {
           // CONTEXT.md D1 — this replaces an earlier version of this
           // comment that attributed the race below to createWorktree's
           // branch-reuse path force-reclaiming any existing checkout of
-          // fgw/<rootId>; that mechanism no longer runs here). ASSUMPTION
-          // (acknowledged, not fixed in this cell): the ref update itself
-          // still races a concurrent approval of a sibling leaf of the same
-          // root, or the runner's own dispatch of that root — two
-          // concurrent merges both reading the same start tip and
-          // force-moving the branch to their own end commit would silently
-          // lose whichever one loses the race; low-likelihood under
-          // single-operator P6, D16's per-root merge-mutex lives in the
-          // runner's write-queue, not this human-driven CLI verb. A
-          // long-lived claim worktree checked out on fgw/<rootId> falling
-          // behind this same ref update is a separate, guarded concern —
-          // see resyncClaimWorktree (worktree.mjs), which runs when that
-          // worktree is next reattached to.
+          // fgw/<rootId>; that mechanism no longer runs here). This still
+          // races a concurrent approval of a sibling leaf of the same
+          // root, or the runner's own dispatch of that root — D16's
+          // per-root merge-mutex lives in the runner's write-queue, not
+          // this human-driven CLI verb, so nothing here prevents two such
+          // merges from overlapping. What changed (tsk-46a, docs/history/
+          // merge-ephemeral-branch-force-race/CONTEXT.md):
+          // withMergeEphemeralWorktree's own CAS guard now catches the
+          // overlap at the ref-move step and makes the losing side fail
+          // loudly instead of silently overwriting the winner's commit —
+          // the race can still happen, but it is no longer a silent
+          // data-loss risk; the losing `approve` call just needs a retry
+          // against the new tip. A long-lived claim worktree checked out
+          // on fgw/<rootId> falling behind this same ref update is a
+          // separate, guarded concern — see resyncClaimWorktree
+          // (worktree.mjs), which runs when that worktree is next
+          // reattached to.
           //
           // withMergeEphemeralWorktree's own finally (worktree.mjs) removes
           // the checkout on every exit path below (conflict, verify-fail,

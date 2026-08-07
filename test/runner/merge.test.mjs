@@ -17,7 +17,7 @@ import {
   classifyDecisionIndexCollision,
   abortMergeIfPossible,
 } from '../../src/runner/merge.mjs';
-import { branchNameFor } from '../../src/runner/worktree.mjs';
+import { branchNameFor, withMergeEphemeralWorktree } from '../../src/runner/worktree.mjs';
 import { acquireMainCheckoutLock, ACQUIRED } from '../../src/runner/main-checkout-lock.mjs';
 
 // Every test here creates its own disposable git repo (mirrors
@@ -881,6 +881,75 @@ test('mergeRunnerItem merges normally when the branch touches ordinary files alo
   const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'test -f produced.txt' }));
   assert.equal(result.outcome, 'merged');
   assert.ok(fs.existsSync(path.join(repoRoot, 'produced.txt')));
+});
+
+// --- withMergeEphemeralWorktree's CAS guard (tsk-46a) ---------------------
+// Reproduces the race deterministically, without real concurrency: git only
+// refuses a second checkout of the same BRANCH -- a detached checkout of the
+// same COMMIT is unrestricted (worktree.mjs's own module doc on
+// createDetachedMergeWorktree) -- so nesting one withMergeEphemeralWorktree
+// call inside another's `fn`, both against the same root branch, gives two
+// independent ephemeral checkouts starting from the SAME tip, exactly like
+// two sessions approving different leaves of the same root near-
+// simultaneously. The inner call (session B) runs to completion first and
+// lands its own branch -f; the outer call (session A) only resumes and
+// attempts its own branch -f afterward, using its now-stale startCommit --
+// the same interleaving the item's own description verified experimentally.
+
+test('withMergeEphemeralWorktree refuses to force-move the branch when it moved since this call started (concurrent merge already landed) -- the losing commit is never silently discarded', async () => {
+  const repoRoot = initRepo();
+  git(repoRoot, ['branch', 'fgw/root-item']);
+
+  let bCommit;
+  await assert.rejects(
+    withMergeEphemeralWorktree(repoRoot, 'root-item', async (ephemeralA) => {
+      fs.writeFileSync(path.join(ephemeralA.path, 'from-a.txt'), 'a\n');
+      git(ephemeralA.path, ['add', 'from-a.txt']);
+      git(ephemeralA.path, ['commit', '-q', '-m', 'session A commit']);
+
+      // Session B interleaves here, starting from the same tip A started
+      // from (the branch has not moved yet), and lands completely before A
+      // resumes.
+      await withMergeEphemeralWorktree(repoRoot, 'root-item', async (ephemeralB) => {
+        fs.writeFileSync(path.join(ephemeralB.path, 'from-b.txt'), 'b\n');
+        git(ephemeralB.path, ['add', 'from-b.txt']);
+        git(ephemeralB.path, ['commit', '-q', '-m', 'session B commit']);
+      });
+      bCommit = git(repoRoot, ['rev-parse', 'fgw/root-item']).trim();
+
+      // fnA returns here; the outer call now tries to force-move
+      // fgw/root-item to A's own end commit, built on the now-stale
+      // startCommit -- this must be refused, not silently overwrite B.
+    }),
+    (err) => {
+      assert.match(err.message, /refusing to force-move "fgw\/root-item"/);
+      assert.equal(err.errorClass, 'worktree-fail');
+      assert.equal(err.category, 'worktree-fail');
+      return true;
+    },
+  );
+
+  assert.equal(
+    git(repoRoot, ['rev-parse', 'fgw/root-item']).trim(),
+    bCommit,
+    "session B's commit must still be the branch tip -- A's rejected force-move must not have touched it",
+  );
+});
+
+test('withMergeEphemeralWorktree still force-moves normally when nothing else touched the branch in the meantime', async () => {
+  const repoRoot = initRepo();
+  git(repoRoot, ['branch', 'fgw/root-item']);
+
+  const result = await withMergeEphemeralWorktree(repoRoot, 'root-item', async (ephemeral) => {
+    fs.writeFileSync(path.join(ephemeral.path, 'solo.txt'), 'solo\n');
+    git(ephemeral.path, ['add', 'solo.txt']);
+    git(ephemeral.path, ['commit', '-q', '-m', 'solo commit']);
+    return 'ok';
+  });
+
+  assert.equal(result, 'ok');
+  const tipFile = git(repoRoot, ['show', 'fgw/root-item:solo.txt']).trim();
+  assert.equal(tipFile, 'solo');
 });
 
 // --- cleanupMergedBranch -------------------------------------------------
