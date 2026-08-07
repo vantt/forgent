@@ -5,6 +5,27 @@
 
 ## 1. Trạng thái hiện tại
 
+**Vòng 9 (2026-08-07) — D4 chốt, và một phương án thứ ba cho câu "ai
+claim".** Người dùng đồng ý case 2 dùng `goalTier`+`targets` ⇒ mint **D4**
+(seq 8919). Hai câu còn lại người dùng xin tư vấn.
+
+**Ai claim — nhị phân A/B là giả.** Bóc `claimWork` ra thì ở *cả hai*
+phương án nó đều chạy vào cùng một store trên main checkout; khác biệt chỉ
+là **tiến trình nào gọi**. Và cha cần ba thứ, chỉ **một** đòi gọi claim:
+chọn wave (hàm thuần) · biết con nào claim được (hàm thuần) · **merge**
+(buộc main checkout). ⇒ **Phương án C**: cha tiền-kiểm bằng hàm thuần đã
+có, con chạy `/fgOS:pick` nguyên vẹn, cha merge. C giữ đúng thứ A mua được
+mà không trả khoản giá nào ở hàng 71. Kèm hai đính chính vòng 7: hình dạng
+sập **không bên nào thắng sạch**, và tiền lệ runner **yếu hơn** tôi trình
+bày (runner chọn A vì nó là bộ lập lịch có kế toán năng lực, không vì A an
+toàn hơn).
+
+**Gom kết quả về** — hệ quả chưa ai nói của D2: `approve` buộc chạy trên
+main checkout ⇒ **con không tự approve được** ⇒ "gom" chính là **cha
+approve từng lá**, không phải giao thức truyền tin. Khuyến nghị: **đọc
+state, đừng nghe kể** (Agent trả về = tín hiệu, state = nội dung), và thứ
+tự approve **dùng lại ranking của verb `merge`** thay vì tự chế.
+
 **Vòng 8 (2026-08-07) — ba D-ID đầu tiên đã chốt, và case 2 hoá ra đã có
 nhà sẵn.** Người dùng chốt: con là work item thật (**D1**), autonomy giữ
 nguyên khuyến nghị vòng 7 (**D2**), bài messy giải bằng cần gạt view
@@ -315,6 +336,7 @@ Item mang việc này: **`tsk-umc`**. Mỗi D-ID dưới đây đã được ghi
 |---|---|---|
 | **D1** | **Fan-out B giữ con là work item thật** — không mở ô exec-packet/B2 mà `D4` của `two-layer-dispatch` đang gác. Chi phí một con (5-6 chuyển trạng thái · trung vị 2 lượt người · 7 ngày `cleanup` · 20MB worktree) là **chính sách hậu kỳ**, chỉnh được bằng config; phần *bản chất* (claim/verify/merge) chỉ tốn 0.18s + 20MB lúc chạy. Bỏ vòng đời để né hậu kỳ là trả giá sai chỗ | nêu vòng 3, đứng qua 4/5/6/7, người dùng chốt vòng 8. `fgos decision` seq **8896** |
 | **D2** | **Tự động approve LÁ; giữ cổng ROOT bắt buộc và có người; giữ nguyên ngoại lệ risk-keyword của `gateBypass` D4.** `return` vẫn chạy verify và block khi đỏ ⇒ bỏ approve lá là bỏ một *lượt review*, không bỏ *bằng chứng*. Lá merge vào `fgw/<root>`, không chạm main; cổng root vẫn còn, muộn hơn và bao quát hơn ⇒ cổng lá là **cổng trùng hạ một tầng**. Giá thật là **độ mịn review**, không phải an toàn | nêu vòng 7, người dùng giữ nguyên vòng 8. `fgos decision` seq **8897** |
+| **D4** | **Case 2 (cụm component/epic, con merge riêng) dùng `goalTier` + `targets` đã có sẵn** — không đẻ cạnh mới, không tách lineage khỏi merge-topology. `targets` **không đi qua `resolveRoot`** ⇒ mỗi target giữ root riêng ⇒ merge độc lập lên main. "Fix B" đề xuất vòng 5 là **thừa**. Lỗ hổng còn lại thu về đúng một chỗ: `fgos rollup` chỉ hiểu `parent` | nêu vòng 8, người dùng đồng ý vòng 9. `fgos decision` seq **8919** |
 | **D3** | **Bài messy task-list giải bằng CẦN GẠT VIEW (list/view loại con khỏi danh sách), không bằng đổi mô hình — và là ITEM RIÊNG, không thuộc `tsk-umc`.** Con chiếm 59/237 = 25% danh sách mở; `fgos list` chỉ có đúng hai chế độ, không lọc status, không gộp con dưới cha. Rút hàng đợi không cứu được: 0/99 item `cleanup` đã hết TTL 7 ngày | nêu vòng 3, giữ qua 4/5, người dùng chốt và làm sắc vòng 8. `fgos decision` seq **8898** |
 
 ## 5. Q&A log
@@ -1194,6 +1216,130 @@ chi tiết cho item đó: **loại con thì phải thay bằng chỉ báo ở d�
    cha đợi rồi đọc lại state, hay cần giao thức báo cáo riêng? (ai claim
    đang ở câu 1 trên; bộ chọn wave đã rõ: `computeSchedule` ∩ tập ứng
    viên, bỏ `selectWave`.)
+
+### 2026-08-07 — Vòng 9: brainstorm sâu hai câu cuối, và một phương án thứ ba
+
+**Người dùng:** (1) khó chọn "ai claim", xin brainstorm sâu + tư vấn. (2)
+case 2 dùng `targets` — **đồng ý** ⇒ mint **D4**. (3) xin tư vấn về "gom
+kết quả về".
+
+#### (1) Bóc "claim" ra xem nó thật sự làm gì
+
+`claim-port.mjs` `claimWork` làm sáu việc: lấy `main-checkout.lock` · kiểm
+`deps-not-merged` (chỉ lá, chỉ khi isolate) · `moveWork` sang `doing` ·
+dựng worktree/nhánh · `addOutcome` predicted · nhả lock.
+
+**Điểm mấu chốt: ở CẢ HAI phương án, `claimWork` đều chạy vào cùng một
+store trên main checkout.** Khác biệt duy nhất là **tiến trình nào gọi
+nó**. Nên đừng hỏi "ai sở hữu việc claim" — hỏi "**gọi từ đâu thì hỏng ít
+hơn**".
+
+**Bất đối xứng thật số 1 — B đặt một lỗi vào chỗ không sửa được.**
+Ở B, con spawn ra rồi mới gọi claim. Claim có thể trượt vì
+`deps-not-merged`, vì lock, vì item đã bị ai claim. Khi đó **con cầm một
+lỗi nó không có thẩm quyền sửa** — chỉ báo về rồi chết, phí một lượt spawn.
+Ở A cha không bao giờ bắn ra một con không claim được.
+
+**Bất đối xứng thật số 2 — hình dạng sập, kể cho công bằng.**
+
+| | A (cha claim) | B (con claim) |
+|---|---|---|
+| thoát êm (người đóng, lỗi có bắt) | cha **nhả được** cả cụm — một tiến trình, một chỗ dọn | không ai nhả được, mỗi con độc lập |
+| sập cứng (crash) | **N item kẹt** cùng lúc | **1 item kẹt** |
+
+A tốt hơn khi hỏng êm, tệ hơn khi hỏng cứng. B đều đều tầm tầm. **Không
+bên nào thắng sạch** — vòng 7 tôi nhấn A quá tay ở đây.
+
+**Và một chỗ tôi trích runner sai trọng số ở vòng 7.** Runner dùng A
+(`claimAndDispatch`) — nhưng **không phải vì A an toàn hơn**. Runner là
+một **bộ lập lịch** có kế toán năng lực (`maxRoots`/`maxLeavesPerRoot`,
+ownership store, breaker); nó *phải* biết cái gì đang bay trước khi bắn
+thêm. Một fan-out tương tác **không có kế toán năng lực** — nó là một loạt
+bắn một lần. Nên tiền lệ runner **yếu hơn** tôi trình bày vòng 7.
+
+#### Phương án C — lai: cha tiền-kiểm, con claim
+
+Nhị phân A/B là giả. Bóc ra thì cha cần **ba** thứ, và chỉ **một** trong
+đó đòi gọi `claimWork`:
+
+| Cha cần | Đòi gọi claim không? |
+|---|---|
+| chọn wave (`computeSchedule` ∩ tập ứng viên) | không — hàm thuần |
+| biết con nào **claim được** trước khi bắn | không — đọc `frontier`/`isResolvedStatus`, thuần |
+| **merge từng lá xong** | có, nhưng là `approve`, và **buộc** chạy trên main checkout |
+
+⇒ **Cha tiền-kiểm bằng hàm thuần đã có, rồi để con chạy `/fgOS:pick <id>`
+nguyên vẹn.**
+
+| | A | B | **C** |
+|---|---|---|---|
+| cửa vào mới cho con | **cần** | không | **không** |
+| spawn phí vì claim trượt | không | **có, thường xuyên** | **hiếm** (chỉ khi đua) |
+| sập cứng | N kẹt | 1 kẹt | **1 kẹt** |
+| số đường claim tồn tại | **2** | 1 | **1** |
+| đã chạy thật chưa | runner (khác mô hình worker) | **demo `tsk-1sj`** | dùng lại đúng đường demo |
+
+C giữ đúng thứ A mua được (không bắn con không claim được) mà **không trả
+một xu nào** trong bốn khoản giá ở hàng 71.
+
+**Hướng fail-safe của C đúng chiều fgOS đang quen**: tiền-kiểm **lạc
+quan, advisory**; `claimWork` mới là **thẩm quyền**. Đúng khuôn
+`footprintOverlapAmong` (*"advisory, never blocking"*) và thói quen
+derived-never-stored.
+
+> **Khuyến nghị: phương án C.** Và nó **không hề mâu thuẫn với trực giác
+> "cha là chủ"** của anh: cha vẫn chọn wave, vẫn tiền-kiểm, vẫn bắn, vẫn
+> đợi, vẫn **merge** — chỉ là nó không cần tự gọi cái syscall claim để làm
+> chủ. Quyền làm chủ nằm ở **merge** (ràng buộc main-checkout, vòng 7),
+> không nằm ở claim.
+
+#### (3) "Gom kết quả về" — tư vấn
+
+**Trước hết, một hệ quả của D2 chưa ai nói ra**: D2 tự động approve lá,
+nhưng `approve` **buộc chạy trên main checkout** ⇒ **con không tự approve
+được**. Nên "gom kết quả về" **không phải** chuyện báo cáo — nó chính là
+**cha approve từng lá xong**. Việc gom bị ràng buộc kỹ thuật ép thành một
+vòng merge, không phải một giao thức truyền tin.
+
+**Có cần giao thức báo cáo riêng không? Không.** Ba lý do:
+
+1. **Tín hiệu hoàn thành đã miễn phí** — Agent trả về *là* tín hiệu. Không
+   cần token, không cần polling.
+2. **Nội dung đã miễn phí và đáng tin hơn** — state đã mang sự thật đã
+   commit: `awaiting-approval` (verify xanh) hay `blocked` + `reason`
+   (verify đỏ). `fgos return` chỉ đưa được sang `awaiting-approval` **sau
+   khi verify xanh**.
+3. **Lời tự thuật của con là thứ fgOS vốn đã không tin.** `D8` của
+   two-layer-dispatch: *"một cờ tự khai là chỗ DUY NHẤT agent tự phong, mà
+   người viết cờ chính là agent muốn qua cổng."* Một Agent có thể trả về
+   "xong rồi" mà chẳng làm gì; state thì không nói dối được.
+
+> **Đọc state, đừng nghe kể.** Agent trả về = tín hiệu; state = nội dung.
+> Không đẻ giao thức.
+
+**Nhưng thứ tự approve thì đừng tự chế.** Cha nhận N lá xong, approve theo
+thứ tự nào? Đừng theo thứ tự về đích — `mergeAfter` là ràng buộc thật, và
+**fgOS đã có sẵn bộ xếp hạng**: verb `merge` (thứ mà `/fgOS:merge-list` và
+`/fgOS:merge-next` đọc) đã tính "cái nào sẵn sàng merge, dep-wait sạch,
+không đụng footprint, xếp theo tác động".
+
+⇒ **Bước gom của cha = `fgos merge` ranking + approve, tức đúng
+`/fgOS:merge-next` thu hẹp vào phạm vi wave.** Dùng lại, không viết logic
+thứ tự mới.
+
+**Và lá `blocked` là điểm dừng thật, không tự thử lại.** Đúng luật
+`fgos-coding-driving` đã đặt (*một block là thứ không bao giờ được đi vòng
+qua trong im lặng*). D2 tự động hoá **review**, không tự động hoá **chữa
+lỗi**. Verify đỏ ⇒ báo người.
+
+**Câu hỏi vòng 9:**
+
+1. Chốt **phương án C** chứ (cha tiền-kiểm + con `/fgOS:pick`, cha merge)?
+   Chốt thì mint D5.
+2. Chốt "gom = đọc state + approve theo ranking của verb `merge`, không
+   giao thức báo cáo" chứ? Chốt thì mint D6.
+3. Chốt xong hai câu này là §6 dựng được và §7 chia hạng mục — hết vòng
+   thảo luận, sang `fgos-exploring`/`fgos-planning`.
 
 ## 6. Thiết kế đã chốt {#design}
 
