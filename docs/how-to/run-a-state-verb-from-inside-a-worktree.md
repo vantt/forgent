@@ -185,6 +185,29 @@ answer" — omission from that set is not a neutral default, since some
 verbs' own empty/off/free-looking defaults are indistinguishable from a
 genuine, confidently wrong answer.
 
+## A fifth round: `evolve` and `docs-index` still missing, and a proposed structural fix
+
+A round-3 independent review (`tsk-5iv`), after `tsk-3g5` merged, found
+`STORE_MISSING_WARNING_VERBS` still missing two more verbs — `evolve`
+and `docs-index` — both `requiresExistingStore: false`, both silently
+returning an empty/stale result from a `.fgos/`-less worktree with zero
+stderr warning. Verified concretely: `fgos evolve` returned `[]` from a
+worktree versus 26 real candidates from main, no warning either way —
+the identical silent-empty-result failure class the fourth case above
+already described for `doc-sources`. Fixed by adding both to the set.
+
+**This is the third separate round widening the same hand-maintained
+`Set`** (`tsk-3u2`, `tsk-3g5`, now this one) — the review noted, without
+committing to it as in-scope here, that deriving the set automatically
+from the command registry's own `requiresExistingStore: false` flag
+(minus an explicit opt-out list for verbs that legitimately create or
+manage the store themselves — `init`/`setup`/`uninstall`/`doctor`/
+`session`) would close this whole class of gap structurally instead of
+requiring a fourth, fifth, or sixth manual widening whenever a new verb
+is added. Left as a documented option for a future item, not implemented
+here — the immediate real gap (two more silently-wrong-answer verbs) was
+fixed directly instead.
+
 ## Related
 
 - `docs/decisions/0020-chan-fgos-khoi-worktree-worker.md` — why a linked
@@ -203,3 +226,7 @@ genuine, confidently wrong answer.
 - `docs/how-to/compute-a-parallel-dispatch-wave-schedule.md` — the
   `fgos schedule` instance of the `STORE_MISSING_WARNING_VERBS` gap that
   the fourth case above generalizes from.
+- `docs/how-to/safely-reset-the-main-checkout.md` — a related but
+  distinct failure shape found in the same `tsk-5iv` review round: a
+  worktree-resolution bug where the resolved root was silently *wrong*
+  (not just an empty warning-worthy result).

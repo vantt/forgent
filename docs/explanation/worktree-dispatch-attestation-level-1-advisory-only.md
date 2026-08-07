@@ -128,6 +128,33 @@ Both fixed and verified with real commands
 (`node --test test/runner/loop.test.mjs test/runner/frozen-judge.test.mjs`
 and `node --test test/cli/fgos.test.mjs`), not just code review.
 
+## Third follow-up (`tsk-5iv`): the `.fgos/` exemption above was too broad, and hid real edits
+
+A round-3 independent review found that `excludeFgosPaths`
+(`bin/fgos.mjs`, added by the second follow-up above) had over-corrected:
+it blanket-exempted **all** of `.fgos/**` from `footprintDiffHits`,
+including hand-edited policy files — `.fgos/gate-bypass.json`,
+`.fgos/config.json` — that real items genuinely DO edit as deliberate
+work product, not just incidental concurrent-session noise. Verified via
+`git log`: `.fgos/config.json` has real feature commits touching it
+directly. An item whose declared footprint excludes `.fgos/` but that
+quietly edits `gate-bypass.json` now produced zero `footprintDiffHits`
+— the exact opposite of the safety this advisory check exists to
+provide, reintroduced by the fix that was meant to remove a false
+positive.
+
+**The fix narrows the exemption** to only the genuinely append-only
+lifecycle streams — `events.jsonl`, `state.json`,
+`entropy-history.jsonl`, `sessions.json`, `invocation-faults.jsonl`,
+`main-checkout.lock`, and `*.backup-*` files — never
+`config.json`/`gate-bypass.json`/`coexistence.json`, which stay subject
+to `footprintDiffHits` like any other file a session might edit outside
+its declared footprint. The distinction that matters: concurrent-session
+noise on the lifecycle streams is expected and should stay exempt (the
+original reason the exemption existed at all); a deliberate edit to a
+policy file is exactly the kind of out-of-footprint change this check
+should still catch.
+
 ## Why level 1, and why advisory rather than a gate
 
 Real breakage is already caught by `merge.mjs`'s existing staged

@@ -150,3 +150,45 @@ Verified with a real command
 (`node --test test/intake/decompose.test.mjs`), not just code review.
 Source: `tsk-297`, filed as an independent code-review finding after
 `tsk-gio` merged — `fgos show tsk-297` has the full record.
+
+## Third round of follow-up fixes (`tsk-5iv`): a phantom test, and a documented trade-off
+
+An independent round-3 review (4 parallel agents, real-command verified,
+not just re-reading commit messages) found two more issues in the same
+`findUncoveredLockedDecisions` mechanism, one of them in the previous
+round's own regression test:
+
+- **The `tsk-297` crash-guard test was a phantom — it passed even
+  without the fix it claimed to prove.** The test fixture was
+  `footprint: [null, 'important.mjs']` checked against decision path
+  `'important.mjs'` — an *exact* match, so `covered.has(p)` short-
+  circuited true before `isCoveredByDirectory` (the actual `null
+  .replace()` crash site) was ever reached. Verified concretely: running
+  the test file against the pre-fix source (`9174313~1`) still passed
+  the crash-guard test — only the separate directory-mirror test went
+  red. Fixed by changing the fixture to a shape with no exact-match
+  coverage (`footprint: [null, 'other.mjs']` against decision
+  `'important.mjs'`), so the test now actually reaches
+  `isCoveredByDirectory` and genuinely fails on unfixed code. The
+  lesson: a regression test naming the right bug isn't proof by itself —
+  confirming it actually fails against the pre-fix source is the only
+  way to know the fixture reaches the crash site at all.
+- **Directory coverage's own semantics were flagged as a real, if
+  bounded, signal reduction — not fixed, deliberately.**
+  `isCoveredByDirectory` (added by `tsk-297`) treats a locked decision
+  naming a directory (e.g. `src/runner/`) as fully covered the moment
+  *any single* child footprint entry names *one* file anywhere inside
+  that directory — even if that one file has nothing to do with what the
+  decision actually locked. `PATH_TOKEN_PATTERN` requiring 2+ path
+  segments bounds the blast radius somewhat (a bare top-level directory
+  can't trigger this), but a multi-segment directory like
+  `docs/decisions/` or `src/runner/` remains fully capturable by one
+  unrelated file. Reviewers flagged this as advisory-only (never
+  blocking) and judged it not worth a behavior change without deeper
+  analysis of false-positive risk on the real corpus — this one-file-
+  covers-directory semantics stays as an intentional, explicitly
+  documented trade-off rather than an unreviewed default.
+
+Verified with real commands, not just code review. Source: `tsk-5iv`
+(`docs/history/round3-review-fixes-2026-08-06/`), an independent
+round-3 review after `tsk-297`/`tsk-x5r`/`tsk-3g5`/`tsk-59a` all merged.

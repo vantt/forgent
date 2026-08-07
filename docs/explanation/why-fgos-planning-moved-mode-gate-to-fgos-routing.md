@@ -191,8 +191,27 @@ match rate, not just re-reading the regex.
 
 ---
 
+## Third follow-up (`tsk-5iv`): the same undefined-`$root` bug, in the sibling `fgos-exploring` skill
+
+A round-3 independent review found the exact same undefined-`$root`
+defect gap 5 above described fixing in `fgos-planning/SKILL.md` also
+existed, untouched, in `fgos-exploring/SKILL.md`'s own `fgos add`
+example — the same commit (`d3ae2cb`, `tsk-59a`) that fixed
+`fgos-planning`'s copy had never checked whether the identical example
+was duplicated in the sibling skill. Verified directly: the only real
+`root=` assignments in the file sat at unrelated lines 112/231, nowhere
+near the broken example. Fixed with the identical assignment line
+(`root=$(git rev-parse --path-format=absolute --git-common-dir | xargs
+dirname)`) placed before the example, applied to both dual-root copies
+(`.claude/skills/` and `.agents/skills/`), keeping them byte-identical
+per this repo's convention.
+
+---
+
 **Source:** `docs/history/fgos-planning-mode-gate-and-gate-traceability/CONTEXT.md`
 (tsk-5ay, D1-D2); work-item capture via `fgos check tsk-5ay`. Follow-up
 fixes: `tsk-da1` (`fgos check tsk-da1`), filed as an independent code
 review after `tsk-3uz`/`tsk-5ay` merged; `tsk-59a` (`fgos check tsk-59a`),
-a second independent review round after `tsk-da1` merged.
+a second independent review round after `tsk-da1` merged; `tsk-5iv`
+(`docs/history/round3-review-fixes-2026-08-06/`), a round-3 independent
+review after `tsk-59a` merged.
