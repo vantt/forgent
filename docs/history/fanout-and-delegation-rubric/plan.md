@@ -118,41 +118,43 @@ Verify skill-prose phải ghim **cụm đủ dài** (bẫy #5 trong how-to). Pla
 
 ## Split — 6 item con
 
-Mỗi mảnh dưới đây tạo bằng `fgos add --parent tsk-5kn --footprint ... --stage decompose`.
+Tạo thật lúc `fgos-validating` (bị bỏ sót lúc planning — sửa tại chỗ):
+`tsk-2t9`(P1) `tsk-v4b`(P2) `tsk-1x3`(P3) `tsk-1w7`(P4) `tsk-5mj`(P5)
+`tsk-puz`(P6), mỗi cái `--parent tsk-5kn --stage decompose`.
 
-### P1 — skill `fgos-researching`
+### P1 — `tsk-2t9` — skill `fgos-researching`
 
 - **Verify**: `npm test && test -f .claude/skills/fgos-researching/SKILL.md && grep -q "^name: fgos-researching$" .claude/skills/fgos-researching/SKILL.md && rg -q --hidden "docs/history/<feature>/RESEARCH.md" .claude/skills/fgos-researching/SKILL.md && rg -q --hidden "WebSearch/WebFetch" .claude/skills/fgos-researching/SKILL.md && ! rg -q --hidden "có biết cái này không" .claude/skills/fgos-researching/SKILL.md`
 - **Footprint**: `.claude/skills/fgos-researching/SKILL.md`
 - **D-ID**: D4, D5, D8, D2
 
-### P2 — skill `fgos-clarifying`
+### P2 — `tsk-v4b` — skill `fgos-clarifying`
 
 - **Verify**: `npm test && test -f .claude/skills/fgos-clarifying/SKILL.md && grep -q "^name: fgos-clarifying$" .claude/skills/fgos-clarifying/SKILL.md && rg -q --hidden "chỉ hỏi khi không hiểu" .claude/skills/fgos-clarifying/SKILL.md && rg -q --hidden "áp thẳng rồi báo lại một dòng" .claude/skills/fgos-clarifying/SKILL.md`
 - **Footprint**: `.claude/skills/fgos-clarifying/SKILL.md`
 - **D-ID**: D13, D14
 
-### P3 — verb về cửa ghi thuần, gỡ judge cả ba consumer
+### P3 — `tsk-1x3` — verb về cửa ghi thuần, gỡ judge cả ba consumer
 
 - **Verify**: `npm test && ! rg -q "runJudgeExecutor" src/intake/discovery.mjs src/intake/decompose.mjs && ! test -f src/intake/judge-executor.mjs`
-- **Footprint**: `src/intake/discovery.mjs,src/intake/decompose.mjs,src/intake/judge-executor.mjs,src/intake/judge-fail-log.mjs,test/intake/judge-executor.test.mjs`
+- **Footprint**: `src/intake/discovery.mjs,src/intake/decompose.mjs,src/intake/judge-executor.mjs,src/intake/judge-fail-log.mjs,test/intake/judge-executor.test.mjs,test/intake/judge-verify-second-pass-stability.test.mjs,test/intake/discovery.test.mjs,test/intake/decompose.test.mjs` (mở rộng lúc `fgos-validating`: `rg` tìm ra 3 test file import `readScoutNotes`/`judgeVerifySemanticCorrectness` từ `judge-executor.mjs` mà bản đầu bỏ sót — `npm test` sẽ vỡ ngay nếu không sửa cùng lúc)
 - **D-ID**: D1, D6, D9
 
-### P4 — stage machine: thêm `discovery` + `exploring`
+### P4 — `tsk-1w7` — stage machine: thêm `discovery` + `exploring`
 
 - **Verify**: `npm test && rg -q "([\[,]|^) *[\x22\x27]discovery[\x22\x27]" src/state/workflow-stage-graphs.mjs && rg -q "([\[,]|^) *[\x22\x27]exploring[\x22\x27]" src/state/workflow-stage-graphs.mjs`
 - **Footprint**: `src/state/workflow-stage-graphs.mjs,src/state/discover-pool.mjs,test/state/workflow-stage-graphs.test.mjs`
 - **D-ID**: D3, D10, D11
 - **Chờ**: P1, P2
 
-### P5 — runner giao stage `discovery` cho worker chạy skill research
+### P5 — `tsk-5mj` — runner giao stage `discovery` cho worker chạy skill research
 
 - **Verify**: `npm test && ! rg -q "resolveDiscovery" src/runner/loop.mjs`
 - **Footprint**: `src/runner/loop.mjs,test/e2e/runner-loop.test.mjs`
 - **D-ID**: D6, D1
 - **Chờ**: P1, P4
 
-### P6 — migration 57 item đang ở `clarify`
+### P6 — `tsk-puz` — migration 57 item đang ở `clarify`
 
 - **Verify**: `npm test`
 - **Footprint**: `scripts/migrate-clarify-split.mjs,test/state/migrate-clarify-split.test.mjs`
@@ -176,6 +178,36 @@ Mỗi mảnh dưới đây tạo bằng `fgos add --parent tsk-5kn --footprint .
 4. **Migration chạy một lần, idempotent**, không phải lười (lazy). Chọn vậy
    để `stage` đọc lên luôn đúng ngay, không phụ thuộc item có được chạm hay
    chưa.
+
+## Reality gate (`fgos-validating`)
+
+| Chiều | Kết quả | Bằng chứng |
+|---|---|---|
+| Mode fit | PASS | Hard-gate "removing a validation" ⇒ high-risk đúng, không phụ thuộc số đếm cờ |
+| Repo fit | PASS (sau sửa) | 9/9 file plan dựa vào có thật (`test -f`); P3 thiếu 3 test consumer thật, đã sửa footprint tại chỗ (xem P3) |
+| Assumptions | PASS với ghi chú | Giả định 2 (xoá được `judge-executor.mjs`) xác nhận đúng cho `src/` (chỉ `decompose.mjs`/`discovery.mjs` import), nhưng rộng hơn cho `test/` — đã sửa |
+| Smaller path | PASS | Không tìm ra đường nhỏ hơn 6 mảnh mà vẫn giữ được wave 1 song song thật |
+| Proof surface | PASS | Cả 6 item con đều có verify chạy được thật, không placeholder |
+| Impact-analysis posture | **degraded, không phải `full`** | GitNexus `status: present` nhưng index sau HEAD 474 commit (`251d0b5`). Cross-check bằng `rg` thay thế: `getDomain`/`skillForStage` có 9 consumer thật, nhưng chỉ `frontier.mjs`/`stage-fsm.mjs` đọc `domain.stages` tổng quát (không hardcode tên) — không consumer nào vỡ khi THÊM stage. `judgeVerifySemanticCorrectness`: GitNexus báo đúng dù stale (`resolveDecompose`/`resolveDiscovery`), cross-check `rg` xác nhận không sai lệch |
+
+**Feasibility matrix** (rủi ro medium+ trong risk map của plan):
+
+| Giả định | Rủi ro | Bằng chứng | Kết quả |
+|---|---|---|---|
+| Gỡ `judgeVerifySemanticCorrectness` an toàn nếu chuyển thành lời gọi từ soul | cao | Nó bắt 2 lỗi thật trong chính vòng `clarify` của item này (placeholder verify, regex false-negative) — plan chọn CHUYỂN không XOÁ, đúng giả định 3 của `CONTEXT.md` | Chấp nhận — quyết định đã có lý do, không phải đoán |
+| Thêm 2 stage không vỡ consumer hiện có | cao | Cross-check `rg` trên (xem hàng impact-analysis) | Xác nhận PASS |
+| `judge-executor.mjs` xoá được hoàn toàn | trung bình | `rg` xác nhận không consumer `src/` ngoài `intake/`; 3 test file cần sửa cùng lúc, đã thêm vào footprint P3 | PASS sau sửa |
+| Migration idempotent | trung bình | Chưa viết code — không có gì để kiểm bây giờ, để nguyên là giả định chưa chứng minh cho `fgos-code-implement` của P6 tự chứng minh qua `npm test` | Chưa chứng minh — chấp nhận được, vì P6 không nằm trên wave 1/2 |
+
+## Verdict
+
+**READY WITH CONSTRAINTS.**
+
+Constraint duy nhất: posture impact-analysis là `degraded` không phải
+`full` — mọi proof point dựa vào GitNexus trong risk map của plan gốc phải
+đọc là "cross-checked bằng `rg`", không phải "xác nhận bằng code-graph". Đã
+làm cho hai điểm rủi ro cao nhất (P4, P3) ngay tại đây; không điểm nào còn
+lại trong risk map cần thêm cross-check trước khi build.
 
 ## Câu mở
 
