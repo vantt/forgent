@@ -69,7 +69,7 @@ import { computeAwaitingContext } from '../src/state/awaiting-context.mjs';
 import { DOCTOR_CHECKS, integrationScriptPath, ensureSharedConfigDefaults, runFixes } from '../src/setup/checks.mjs';
 import { sharedConfigFilePath, readSharedConfig } from '../src/config/shared-config-file.mjs';
 import { assessCleanupReadiness } from '../src/state/cleanup-harness.mjs';
-import { DEFAULT_CLEANUP_TTL_DAYS } from '../src/setup/registrations.mjs';
+import { DEFAULT_CLEANUP_TTL_DAYS, DEFAULT_CLEANUP_LEAF_TTL_DAYS } from '../src/setup/registrations.mjs';
 import { installGitHooks, uninstallGitHooks } from '../src/setup/git-hooks.mjs';
 import { detectRcFiles, insertSourceLine, hasSourceLine } from '../src/setup/shell-rc.mjs';
 import { formatCheck, bold } from '../src/setup/ansi.mjs';
@@ -1179,6 +1179,9 @@ async function runVerb(verb, flags, positional, dir) {
       const repoRoot = process.cwd();
       const sharedConfig = readSharedConfig(repoRoot);
       const ttlDays = sharedConfig?.cleanup?.ttlDays ?? DEFAULT_CLEANUP_TTL_DAYS;
+      // tsk-59x D1: a leaf gets this shorter/zero TTL instead of ttlDays --
+      // resolved per-item inside assessCleanupReadiness (resolveTtlDaysForItem).
+      const leafTtlDays = sharedConfig?.cleanup?.leafTtlDays ?? DEFAULT_CLEANUP_LEAF_TTL_DAYS;
 
       const assessment = assessCleanupReadiness({
         view,
@@ -1187,6 +1190,7 @@ async function runVerb(verb, flags, positional, dir) {
         repoRoot,
         worktreeBacked: domain.worktreeBacked ?? false,
         ttlDays,
+        leafTtlDays,
       });
 
       if (assessment.failed.length > 0) {

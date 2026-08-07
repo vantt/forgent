@@ -14,7 +14,7 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { DOCTOR_CHECKS, FIX_REGISTRATIONS, integrationScriptPath, mainCheckoutHookWired, resolveMainCheckout } from '../../src/setup/checks.mjs';
 import { DEFAULT_RUNNER_CONFIG } from '../../src/runner/dispatch.mjs';
 import { DEFAULT_LEVEL } from '../../src/state/gate-bypass.mjs';
-import { DEFAULT_CLEANUP_TTL_DAYS } from '../../src/setup/registrations.mjs';
+import { DEFAULT_CLEANUP_TTL_DAYS, DEFAULT_CLEANUP_LEAF_TTL_DAYS } from '../../src/setup/registrations.mjs';
 import { initStore, addWork } from '../../src/state/store.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -204,7 +204,7 @@ test('config-not-stale passes when the existing config already has every default
     JSON.stringify({
       runner: DEFAULT_RUNNER_CONFIG,
       gateBypass: { level: 'off' },
-      cleanup: { ttlDays: DEFAULT_CLEANUP_TTL_DAYS },
+      cleanup: { ttlDays: DEFAULT_CLEANUP_TTL_DAYS, leafTtlDays: DEFAULT_CLEANUP_LEAF_TTL_DAYS },
     }),
   );
   const { passed } = checkById('config-not-stale').check(cwd);
