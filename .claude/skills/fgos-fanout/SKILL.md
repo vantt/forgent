@@ -65,6 +65,22 @@ own judgment.
   packing already batches by footprint; this skill additionally never lets
   a single wave exceed 5 members — split a larger wave into batches of 5
   before dispatching it.
+- **Announce every dispatch before firing it.** Print one line per
+  candidate, same shape `_shared/capacity-dispatch-fallback.md`'s Step
+  B.5/C.3 already use for observability parity across every dispatch path
+  in the repo:
+
+  ```
+  <id> - native - <subagent_type> - <model>
+  ```
+
+  where `<subagent_type>` is whichever Agent type this dispatch actually
+  uses to run `/fgOS:pick <id>` and `<model>` is whichever model that
+  Agent call resolves to (its own pinned `model:`, an explicit override,
+  or the current session's own model when neither applies) — this skill
+  never pins a fixed subagent_type/model itself, so the announce line
+  reports whatever the caller actually chose for that dispatch, not a
+  hardcoded value.
 - **Gather by reading STATE, never by trusting an Agent's own report (D6).**
   After a batch of Agents settles (all of it — wait for every dispatched
   Agent in the batch before reading state, the same `Promise.allSettled`-
@@ -119,6 +135,8 @@ loop:
     (frontier membership + isResolvedStatus on deps)
 
   for each batch of up to 5 ids from `ready` (D7):
+    for each id in the batch: print its announce line
+      (`<id> - native - <subagent_type> - <model>`)
     dispatch one Agent per id, single message, running in parallel
       (the environment's own "send independent Agent calls together"
       guidance) — each Agent's job is exactly `/fgOS:pick <id>` through
@@ -164,6 +182,7 @@ separate, later concern (D8) — this skill is invocable on its own with just
   own root
 - auto-approving a leaf whose title/description trips the risk-keyword
   floor instead of reporting it for a person
+- firing an Agent without printing its announce line first
 - inventing an approval order instead of the `merge` verb's own ranking
 - writing cancellation logic for a blocked leaf's dependents — the
   `deps-not-merged` guard already covers it

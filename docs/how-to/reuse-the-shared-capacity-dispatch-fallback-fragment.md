@@ -61,13 +61,14 @@ changed. That's why the branch logic now lives in one shared file instead.
      now (never inferred from environment or config), then run
      `node dispatch.mjs decide <CAPACITY_ID> [--has-live-task-access]`.
      `mechanism: "cli-spawn"` proceeds to Step C. `mechanism: "native"`
-     skips Step C entirely — call your own Agent/Task tool directly with
-     `subagent_type` = the JSON's `agentType` and the same
-     `<PROMPT_TEMPLATE>` prompt Step C would have built.
+     skips Step C entirely — print the announce line
+     `<CAPACITY_ID> - native - <agentType> - <model>`, then call your own
+     Agent/Task tool directly with `subagent_type` = the JSON's `agentType`
+     and the same `<PROMPT_TEMPLATE>` prompt Step C would have built.
    - **Step C (cli-spawn dispatch)** — resolves real command/args via
      `dispatch.mjs`'s own `resolveExecutorConfig` (never a second
      argv-building implementation), prints the announce line
-     `<CAPACITY_ID> - <provider> - <model>`, then runs it.
+     `<CAPACITY_ID> - cli-spawn - <provider> - <model>`, then runs it.
    - **Step D (malformed-response fallback)** — a missing/unparseable/
      unusable response falls back to your inline-fallback heading exactly
      as if the capacity were absent; never treat a dispatched answer as

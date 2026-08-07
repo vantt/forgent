@@ -99,6 +99,7 @@ import { setTimeout as delay } from 'node:timers/promises';
 // actionable default: re-read what the task asked for).
 const FRICTION_LAYER = Object.freeze({
   'verify-miss': 'verification',
+  'verify-timeout': 'verification',
   'worker-spawn-fail': 'environment',
   'worker-timeout': 'environment',
   'worktree-fail': 'environment',
@@ -380,12 +381,19 @@ export async function startupReap({ repoRoot, dir, worktreeDir, verifyTimeoutMs,
     }
 
     let verifyPassed = false;
+    let verifyTimedOut = false;
     let worktreeFailed = false;
     if (hasCommit) {
       let wt = null;
       try {
         wt = createDispatchWorktree(repoRoot, id, { worktreeDir });
-        verifyPassed = (await runGoalCheck(item, wt.path, verifyTimeoutMs)).passed;
+        // tsk-53o: read `timedOut` alongside `passed` — a timeout still
+        // reclaims to 'blocked' the same as any other non-pass (unchanged
+        // FSM behavior, resolveStaleDoing's own contract), but the log line
+        // below must say so rather than implying a real verify failure.
+        const goalCheck = await runGoalCheck(item, wt.path, verifyTimeoutMs);
+        verifyPassed = goalCheck.passed;
+        verifyTimedOut = goalCheck.timedOut;
       } catch (err) {
         // A worktree-fail here (e.g. this branch is irreconcilably checked
         // out somewhere even after the reclaim in worktree.mjs) must never
@@ -407,7 +415,8 @@ export async function startupReap({ repoRoot, dir, worktreeDir, verifyTimeoutMs,
       ? { to: 'blocked', reason: 'runner-crash-reclaim' }
       : resolveStaleDoing({ hasCommit, verifyPassed });
     moveWork(dir, { id, to: resolution.to, expectedStatus: 'doing', reason: resolution.reason, role: 'runner' });
-    log(`fgos-runner: reaped stale doing "${id}" -> ${resolution.to}${resolution.reason ? ` (${resolution.reason})` : ''}`);
+    const timeoutNote = verifyTimedOut ? ' (goal-check timed out, not a real verify failure)' : '';
+    log(`fgos-runner: reaped stale doing "${id}" -> ${resolution.to}${resolution.reason ? ` (${resolution.reason})` : ''}${timeoutNote}`);
     resolutions.push({ id, to: resolution.to, reason: resolution.reason ?? null });
   }
 
@@ -793,12 +802,17 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
         return { outcome: 'awaiting-approval', id: item.id, branch: wt.branch, attempts: attempt, exitCode: 0 };
       }
 
-      failure = {
-        errorClass: 'verify-miss',
-        message: check.passed
-          ? 'verify passed but the branch carries no commit — the worker must commit its work'
-          : `goal-check failed (exit ${check.status})`,
-      };
+      // tsk-53o: a timeout is not a real verify failure — distinct
+      // errorClass so the eventual retry-exhausted park (resolveAction
+      // above) never reports it as the worker's own code being wrong.
+      failure = check.timedOut
+        ? { errorClass: 'verify-timeout', message: `goal-check timed out after ${config.timeoutMs}ms — not a verify failure` }
+        : {
+            errorClass: 'verify-miss',
+            message: check.passed
+              ? 'verify passed but the branch carries no commit — the worker must commit its work'
+              : `goal-check failed (exit ${check.status})`,
+          };
       breaker.recordMiss(item.id);
       log(`fgos-runner: goal-check miss for "${item.id}" (attempt ${attempt}): ${failure.message}`);
       log(`fgos-runner: verify tail:\n${tailLines(check.output)}`);

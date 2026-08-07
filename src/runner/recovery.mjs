@@ -18,6 +18,14 @@
  *   - verify-miss        — the runner's own goal-check (item.verify) failed
  *                          after the worker returned; the worker's report is
  *                          never trusted on its own (per D3).
+ *   - verify-timeout     — the runner's own goal-check (item.verify) ran out
+ *                          of its time budget rather than actually failing
+ *                          (tsk-53o) — the machine may simply have been
+ *                          under load; distinct from `verify-miss` so a
+ *                          timeout is never reported or recorded as proof
+ *                          the item's own work is broken. Same retry policy
+ *                          as `verify-miss` (a transient condition is
+ *                          exactly what a retry is for).
  *   - worktree-fail      — isolated branch/worktree setup or teardown failed.
  *   - corrupt-log        — the event log failed to parse (readEvents threw
  *                          EventLogError('corrupt-log')); never auto-repaired.
@@ -39,6 +47,7 @@ export const ERROR_CLASSES = Object.freeze([
   'worker-spawn-fail',
   'worker-timeout',
   'verify-miss',
+  'verify-timeout',
   'worktree-fail',
   'corrupt-log',
   'reject-returned',
@@ -75,6 +84,7 @@ export const RECOVERY = Object.freeze({
   'worker-spawn-fail': Object.freeze({ action: 'retry', maxRetries: DEFAULT_MAX_RETRIES }),
   'worker-timeout': Object.freeze({ action: 'retry', maxRetries: DEFAULT_MAX_RETRIES }),
   'verify-miss': Object.freeze({ action: 'retry', maxRetries: DEFAULT_MAX_RETRIES }),
+  'verify-timeout': Object.freeze({ action: 'retry', maxRetries: DEFAULT_MAX_RETRIES }),
   'worktree-fail': Object.freeze({ action: 'retry', maxRetries: DEFAULT_MAX_RETRIES }),
   'corrupt-log': Object.freeze({ action: 'halt' }),
   'reject-returned': Object.freeze({ action: 'retry', maxRetries: DEFAULT_MAX_RETRIES }),
