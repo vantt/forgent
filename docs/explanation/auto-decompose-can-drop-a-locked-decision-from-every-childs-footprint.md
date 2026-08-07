@@ -117,3 +117,36 @@ Verified with a real command
 (`node --test test/intake/decompose.test.mjs`), not just code review.
 Source: `tsk-gio`, filed as an independent code-review finding after
 `tsk-1gr` merged — `fgos show tsk-gio` has the full record.
+
+## Second round of follow-up fixes (`tsk-297`): a crash risk, and directory-coverage's mirror gap
+
+A second independent review round, after `tsk-gio` merged, found two more
+real issues in the same `findUncoveredLockedDecisions` mechanism:
+
+- **`isCoveredByDirectory` could crash on a non-string footprint
+  entry** — calling `.replace` on a `null` (or otherwise non-string)
+  footprint value throws a real `TypeError`. Because this call sat inside
+  the `try/catch` `tsk-gio` had just added around the advisory
+  `addDecision` call, the crash was silently swallowed there instead of
+  surfacing — the never-blocks stance held, but the advisory check simply
+  stopped running with no visible sign anything went wrong. Fixed at the
+  source: filter for actual strings when building the `covered` `Set`,
+  so a malformed footprint entry never reaches `.replace` in the first
+  place, rather than relying on the catch to paper over it.
+- **Directory coverage only worked in one direction.** `tsk-gio` fixed
+  the case where a decision names a specific file (`src/foo.js`) and a
+  child's footprint declares the containing directory (`src/`) — that
+  direction now correctly counts as covered. This item found the mirror
+  case still broken: a decision whose own text names a *directory*
+  (e.g. `src/intake/`) was still flagged as uncovered even when a
+  child's footprint declared a specific file *inside* that directory
+  (e.g. `src/intake/decompose.mjs`) — the exact reverse direction of the
+  same coverage question. Fixed to check both directions symmetrically.
+  Verified against the real corpus, not a synthetic case: 20+ real
+  instances of this exact directory-names-a-decision shape were found in
+  actual `CONTEXT.md` files across the repo.
+
+Verified with a real command
+(`node --test test/intake/decompose.test.mjs`), not just code review.
+Source: `tsk-297`, filed as an independent code-review finding after
+`tsk-gio` merged — `fgos show tsk-297` has the full record.
