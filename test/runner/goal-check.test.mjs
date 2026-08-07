@@ -27,6 +27,7 @@ test('runGoalCheck resolves {passed:true, status:0} when verify exits 0', async 
   const result = await runGoalCheck(makeItem('exit 0'), cwd);
   assert.equal(result.passed, true);
   assert.equal(result.status, 0);
+  assert.equal(result.timedOut, false);
 });
 
 test('runGoalCheck runs the verify command inside the given cwd', async () => {
@@ -44,6 +45,25 @@ test('runGoalCheck resolves {passed:false, status:<nonzero>} when verify exits n
   const result = await runGoalCheck(makeItem('exit 7'), cwd);
   assert.equal(result.passed, false);
   assert.equal(result.status, 7);
+  // tsk-53o: a genuine verify failure must never be reported as a timeout —
+  // this is the "not passed:true, but also not a timeout" boundary the
+  // whole point of `timedOut` exists to distinguish from a real fail.
+  assert.equal(result.timedOut, false);
+});
+
+test('runGoalCheck resolves {timedOut:false} on a genuine spawn failure (statusless, but not a timeout)', async () => {
+  // A cwd that does not exist fails the underlying spawn syscall itself
+  // (ENOENT) before any shell ever starts, even with shell:true — this hits
+  // goal-check.mjs's `child.on('error', ...)` branch, the one OTHER
+  // statusless outcome besides a real timeout. `timedOut` must distinguish
+  // the two: this is the exact ambiguity tsk-53o's bug report describes
+  // (return could not tell a real timeout apart from any other statusless
+  // failure).
+  const cwd = path.join(mkTempDir(), 'does-not-exist');
+  const result = await runGoalCheck(makeItem('exit 0'), cwd);
+  assert.equal(result.passed, false);
+  assert.equal(result.status, null);
+  assert.equal(result.timedOut, false);
 });
 
 // --- timeout: a defined RESOLVED outcome, never a throw/reject -------------
@@ -67,6 +87,10 @@ test('runGoalCheck resolves (never throws/rejects) {passed:false, status:null} o
   const result = await runGoalCheck(makeItem(`${process.execPath} ${JSON.stringify(scriptPath)}`), cwd, 200);
   assert.equal(result.passed, false);
   assert.equal(result.status, null);
+  // tsk-53o: this is the field this whole item exists to add — a timeout
+  // must be distinguishable from a genuine verify failure, which the
+  // pre-fix {passed:false, status:null} shape alone could never prove.
+  assert.equal(result.timedOut, true);
 });
 
 // --- output: both stdout and stderr are captured ---------------------------

@@ -2372,17 +2372,23 @@ async function runVerb(verb, flags, positional, dir) {
           return { id, from: 'doing', to: 'awaiting-approval', source: 'branch', branch, aheadCount: branchAheadCount, passed: true, seq: event.seq, output: check.output, frozenJudgeHits: frozenJudge, footprintDiffHits: footprintDiff };
         }
 
-        moveWork(dir, { id, to: 'blocked', expectedStatus: 'doing', reason: 'verify-fail', role: 'system' });
-        addOutcome(dir, { id, actual: { outcome: 'blocked', passed: false, attempts: 1, errorClass: 'verify-miss', aheadCount: branchAheadCount } });
+        // tsk-53o: a timeout is not proof the item's verify failed (the
+        // machine may simply have been under load) — never let it park as
+        // an indistinguishable 'verify-fail'/'verify-miss', and never state
+        // "(exit null)" as if that were a real exit code.
+        moveWork(dir, { id, to: 'blocked', expectedStatus: 'doing', reason: check.timedOut ? 'verify-timeout' : 'verify-fail', role: 'system' });
+        addOutcome(dir, { id, actual: { outcome: 'blocked', passed: false, attempts: 1, errorClass: check.timedOut ? 'verify-timeout' : 'verify-miss', aheadCount: branchAheadCount } });
         addFriction(dir, {
           id,
           disposition: 'blocked',
-          errorClass: 'verify-miss',
+          errorClass: check.timedOut ? 'verify-timeout' : 'verify-miss',
           layer: 'verification',
           attempts: 1,
-          detail: `goal-check failed on branch "${branch}" (exit ${check.status})`,
+          detail: check.timedOut
+            ? `goal-check on branch "${branch}" timed out after ${timeoutMs}ms — not a verify failure, rerun return`
+            : `goal-check failed on branch "${branch}" (exit ${check.status})`,
         });
-        return { id, from: 'doing', to: 'blocked', source: 'branch', branch, aheadCount: branchAheadCount, passed: false, exitStatus: check.status, output: check.output };
+        return { id, from: 'doing', to: 'blocked', source: 'branch', branch, aheadCount: branchAheadCount, passed: false, timedOut: check.timedOut, exitStatus: check.status, output: check.output };
       }
 
       if (typeof item.headAtTake !== 'string' || !item.headAtTake) {
@@ -2432,22 +2438,26 @@ async function runVerb(verb, flags, positional, dir) {
         return { id, from: 'doing', to: 'awaiting-approval', source: 'main', aheadCount, passed: true, seq: event.seq, output: check.output, frozenJudgeHits: frozenJudge, footprintDiffHits: footprintDiff };
       }
 
-      moveWork(dir, { id, to: 'blocked', expectedStatus: 'doing', reason: 'verify-fail', role: 'system' });
-      addOutcome(dir, { id, actual: { outcome: 'blocked', passed: false, attempts: 1, errorClass: 'verify-miss', aheadCount } });
+      // tsk-53o: same timeout/fail distinction as the branch-source path
+      // above — a timeout is not proof the item's verify failed.
+      moveWork(dir, { id, to: 'blocked', expectedStatus: 'doing', reason: check.timedOut ? 'verify-timeout' : 'verify-fail', role: 'system' });
+      addOutcome(dir, { id, actual: { outcome: 'blocked', passed: false, attempts: 1, errorClass: check.timedOut ? 'verify-timeout' : 'verify-miss', aheadCount } });
       addFriction(dir, {
         id,
         disposition: 'blocked',
-        errorClass: 'verify-miss',
+        errorClass: check.timedOut ? 'verify-timeout' : 'verify-miss',
         layer: 'verification',
         attempts: 1,
-        detail: `goal-check failed (exit ${check.status})`,
+        detail: check.timedOut
+          ? `goal-check timed out after ${timeoutMs}ms — not a verify failure, rerun return`
+          : `goal-check failed (exit ${check.status})`,
       });
       // Same early-release as the passing branch above (tsk-45z D1/D2) — a
       // failed verify still means this session is done touching the main
       // checkout; the item settling to `blocked` is just as much "done with
       // the checkout" as settling to `proposed`.
       releaseMainCheckoutLockIfOwn(dir, resolveWriterIdentity(dir).id);
-      return { id, from: 'doing', to: 'blocked', source: 'main', aheadCount, passed: false, exitStatus: check.status, output: check.output };
+      return { id, from: 'doing', to: 'blocked', source: 'main', aheadCount, passed: false, timedOut: check.timedOut, exitStatus: check.status, output: check.output };
     }
 
     // Cổng duyệt PR nội bộ (pr-lifecycle D1/D4): a proposed item's diff,
@@ -2903,16 +2913,22 @@ async function runVerb(verb, flags, positional, dir) {
             }
 
             if (result.outcome === 'verify-fail') {
-              moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: 'verify-fail-post-merge', role: 'system' });
+              // tsk-53o: a timeout during the post-merge check is not proof
+              // the merge is bad — park under a distinct, catchup-resolvable
+              // reason instead of the misleading merge-fail label.
+              const mergeReason = result.check.timedOut ? 'verify-timeout-post-merge' : 'verify-fail-post-merge';
+              moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: mergeReason, role: 'system' });
               addFriction(dir, {
                 id,
                 disposition: 'blocked',
-                errorClass: 'verify-miss',
+                errorClass: result.check.timedOut ? 'verify-timeout' : 'verify-miss',
                 layer: 'verification',
                 attempts: 1,
-                detail: `goal-check failed on staged merge into ${rootBranch} (exit ${result.check.status}); merge aborted, ${rootBranch} unchanged`,
+                detail: result.check.timedOut
+                  ? `goal-check timed out on staged merge into ${rootBranch} after ${timeoutMs}ms — not a verify failure; merge aborted, ${rootBranch} unchanged, rerun catchup`
+                  : `goal-check failed on staged merge into ${rootBranch} (exit ${result.check.status}); merge aborted, ${rootBranch} unchanged`,
               });
-              return { id, mode: 'merge', to: 'blocked', reason: 'verify-fail-post-merge', target: rootBranch, exitStatus: result.check.status, output: result.check.output };
+              return { id, mode: 'merge', to: 'blocked', reason: mergeReason, target: rootBranch, timedOut: result.check.timedOut, exitStatus: result.check.status, output: result.check.output };
             }
 
             // Merged: land the leaf's work on its root's branch. The
@@ -3018,20 +3034,25 @@ async function runVerb(verb, flags, positional, dir) {
         }
 
         if (result.outcome === 'verify-fail') {
-          const reason = hadChildren ? 'integration-drift' : 'verify-fail-post-merge';
-          const detail = hadChildren
-            ? `cross-root integration drift at main@${currentHead(repoRoot)}; goal-check failed on staged merge (exit ${result.check.status}); merge aborted, main unchanged`
-            : `goal-check failed on staged merge (exit ${result.check.status}); merge aborted, main unchanged`;
+          // tsk-53o: a timeout is neither a real verify failure nor evidence
+          // of cross-root drift — it gets its own reason regardless of
+          // hadChildren, distinct from both branches below.
+          const reason = result.check.timedOut ? 'verify-timeout-post-merge' : hadChildren ? 'integration-drift' : 'verify-fail-post-merge';
+          const detail = result.check.timedOut
+            ? `goal-check timed out on staged merge after ${timeoutMs}ms — not a verify failure; merge aborted, main unchanged, rerun catchup`
+            : hadChildren
+              ? `cross-root integration drift at main@${currentHead(repoRoot)}; goal-check failed on staged merge (exit ${result.check.status}); merge aborted, main unchanged`
+              : `goal-check failed on staged merge (exit ${result.check.status}); merge aborted, main unchanged`;
           moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason, role: 'system' });
           addFriction(dir, {
             id,
             disposition: 'blocked',
-            errorClass: 'verify-miss',
+            errorClass: result.check.timedOut ? 'verify-timeout' : 'verify-miss',
             layer: 'verification',
             attempts: 1,
             detail,
           });
-          return { id, mode: 'merge', to: 'blocked', reason, target: 'main', exitStatus: result.check.status, output: result.check.output };
+          return { id, mode: 'merge', to: 'blocked', reason, target: 'main', timedOut: result.check.timedOut, exitStatus: result.check.status, output: result.check.output };
         }
 
         // tsk-480: cleanup used to run either way relative to this write
@@ -3068,16 +3089,20 @@ async function runVerb(verb, flags, positional, dir) {
       // tree, exactly the goal-check contract `return` already uses.
       const check = await runGoalCheck(item, repoRoot, timeoutMs);
       if (!check.passed) {
-        moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: 'verify-fail', role: 'system' });
+        // tsk-53o: same timeout/fail distinction as `return` — a timeout is
+        // not proof the item's verify failed.
+        moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: check.timedOut ? 'verify-timeout' : 'verify-fail', role: 'system' });
         addFriction(dir, {
           id,
           disposition: 'blocked',
-          errorClass: 'verify-miss',
+          errorClass: check.timedOut ? 'verify-timeout' : 'verify-miss',
           layer: 'verification',
           attempts: 1,
-          detail: `goal-check failed on main (exit ${check.status})`,
+          detail: check.timedOut
+            ? `goal-check on main timed out after ${timeoutMs}ms — not a verify failure, rerun approve`
+            : `goal-check failed on main (exit ${check.status})`,
         });
-        return { id, mode: 'verify-only', to: 'blocked', reason: 'verify-fail', exitStatus: check.status, output: check.output };
+        return { id, mode: 'verify-only', to: 'blocked', reason: check.timedOut ? 'verify-timeout' : 'verify-fail', timedOut: check.timedOut, exitStatus: check.status, output: check.output };
       }
       // tsk-480: no real merge lands on this path (code is already on
       // main), so a moveWork failure here only desyncs status rather than
@@ -3178,15 +3203,18 @@ async function runVerb(verb, flags, positional, dir) {
           return { id, mode: 'sync-root', outcome: 'blocked', reason: 'fgos-write-rejected', target: targetBranch, branch, paths: result.paths };
         }
         if (result.outcome === 'verify-fail') {
+          // tsk-53o: a timeout is not proof the staged merge's verify failed.
           addFriction(dir, {
             id,
             disposition: 'blocked',
-            errorClass: 'verify-miss',
+            errorClass: result.check.timedOut ? 'verify-timeout' : 'verify-miss',
             layer: 'verification',
             attempts: 1,
-            detail: `sync-root: goal-check failed on staged merge of ${branch} into ${targetBranch} (exit ${result.check.status}); merge aborted, ${targetBranch} unchanged`,
+            detail: result.check.timedOut
+              ? `sync-root: goal-check timed out on staged merge of ${branch} into ${targetBranch} after ${timeoutMs}ms — not a verify failure; merge aborted, ${targetBranch} unchanged`
+              : `sync-root: goal-check failed on staged merge of ${branch} into ${targetBranch} (exit ${result.check.status}); merge aborted, ${targetBranch} unchanged`,
           });
-          return { id, mode: 'sync-root', outcome: 'blocked', reason: 'verify-fail', target: targetBranch, branch, exitStatus: result.check.status, output: result.check.output };
+          return { id, mode: 'sync-root', outcome: 'blocked', reason: result.check.timedOut ? 'verify-timeout' : 'verify-fail', timedOut: result.check.timedOut, target: targetBranch, branch, exitStatus: result.check.status, output: result.check.output };
         }
 
         // Success — status/stage of `id` is deliberately UNTOUCHED (the
@@ -3389,11 +3417,15 @@ async function runVerb(verb, flags, positional, dir) {
       // simply re-attempting the merge (which is exactly what catchup
       // does) may just succeed once whatever transient condition caused it
       // has passed.
-      const CATCHUP_REASONS = new Set(['merge-conflict', 'verify-fail-post-merge', 'integration-drift', 'merge-failed-unclassified']);
+      // tsk-53o: 'verify-timeout-post-merge' joins this set deliberately —
+      // a timed-out post-merge check is exactly the transient condition
+      // this comment already describes, and catchup (a retry) is the
+      // correct next step for it, not a manual rework.
+      const CATCHUP_REASONS = new Set(['merge-conflict', 'verify-fail-post-merge', 'verify-timeout-post-merge', 'integration-drift', 'merge-failed-unclassified']);
       if (!CATCHUP_REASONS.has(item.reason)) {
         throw new StoreError(
           'validation',
-          `catchup: work "${id}" is blocked for reason "${item.reason ?? '(none)'}" — catchup only resolves a merge-related park (merge-conflict/verify-fail-post-merge/integration-drift/merge-failed-unclassified); use take/return for a manual rework instead.`,
+          `catchup: work "${id}" is blocked for reason "${item.reason ?? '(none)'}" — catchup only resolves a merge-related park (merge-conflict/verify-fail-post-merge/verify-timeout-post-merge/integration-drift/merge-failed-unclassified); use take/return for a manual rework instead.`,
         );
       }
 
@@ -3452,7 +3484,10 @@ async function runVerb(verb, flags, positional, dir) {
           if (!caughtUpCheck.passed) {
             // No `git merge --abort` on this path — no merge was started, and
             // aborting without MERGE_HEAD fails outright.
-            return { id, outcome: 'verify-fail', target, branch: ownBranch, exitStatus: caughtUpCheck.status, output: caughtUpCheck.output };
+            // tsk-53o: item stays 'blocked' either way here (no moveWork on
+            // this path) — surface `timedOut` so the CLI-facing outcome
+            // does not read as a real verify failure when it was a timeout.
+            return { id, outcome: 'verify-fail', timedOut: caughtUpCheck.timedOut, target, branch: ownBranch, exitStatus: caughtUpCheck.status, output: caughtUpCheck.output };
           }
           const { event } = moveWork(dir, { id, to: 'awaiting-approval', expectedStatus: 'blocked', role: 'runner' });
           return {
@@ -3514,7 +3549,10 @@ async function runVerb(verb, flags, positional, dir) {
           } catch (abortErr) {
             throw abortErr;
           }
-          return { id, outcome: 'verify-fail', target, branch: ownBranch, exitStatus: check.status, output: check.output };
+          // tsk-53o: item stays 'blocked' either way (no moveWork on this
+          // path) — surface `timedOut` so this outcome doesn't read as a
+          // real verify failure when it was a timeout.
+          return { id, outcome: 'verify-fail', timedOut: check.timedOut, target, branch: ownBranch, exitStatus: check.status, output: check.output };
         }
 
         execFileSync('git', ['commit', '-m', `catch-up: merge ${target} into ${ownBranch}`], { cwd: ephemeral.path, encoding: 'utf8', shell: false });
