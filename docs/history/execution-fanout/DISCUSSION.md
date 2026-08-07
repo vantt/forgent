@@ -5,6 +5,31 @@
 
 ## 1. Trạng thái hiện tại
 
+**Vòng 4 (2026-08-07) — ĐÍNH CHÍNH vòng 3, và người dùng đúng ở cả hai
+vế.** Vòng 3 kết luận "con không phải nguyên nhân messy" dựa trên **một
+lỗi số học của tôi**: câu *"xoá sạch mọi con: 237 → 226, giảm 4.6%"* lấy
+nhầm **11 con đang sống** vào một câu nói về **toàn bộ con**. Số đúng:
+open children = **59/237 = 25%**, xoá hết thì **237 → 178, giảm 25%**.
+
+Sai thứ hai: khuyến nghị "rút hàng đợi là xong". Đo ra **0/99 item trong
+pool `cleanup` đã hết TTL 7 ngày** — không rút được cái nào. Rút hết
+những gì rút được ngay (54 dòng `retrospective`, không có TTL) chỉ đưa
+237 → **183**, không phải → 84. Và **0 worktree** thu hồi được ⇒ ~2GB bị
+giữ có cấu trúc suốt 7 ngày.
+
+Và thứ tôi chưa từng đo — **chi phí hành chính thật** — giờ có số: con đi
+đường hiện đại tốn **5-6 chuyển trạng thái**, **trung vị 2 lượt role
+`human`**, **7 ngày nằm trong `cleanup`**, **20MB worktree giữ suốt thời
+gian đó**. Nhân với N. Người dùng bổ sung: thuật toán tách chưa
+implement nên N hôm nay còn nhỏ (3.27); tách tốt thì N sẽ lớn hơn nhiều.
+
+⇒ **Cả hai phiền phức đều thật.** Nhưng lời giải **không phải B2**: đo kỹ
+thì ba khoản chi phí đó **không khoản nào là bản chất của việc-là-work-
+item** — chúng là *chính sách sau merge* (TTL toàn cục + approve từng lá).
+Và chính code đã mời sửa: comment ở `registrations.mjs:540-544` ghi TTL
+global là **"YAGNI — no demonstrated need yet"**. Phép đo này chính là
+demonstrated need đó. Hướng thứ tư ở §5 vòng 4.
+
 **Vòng 3 (2026-08-07) — đo thật, và động cơ thật của đề xuất không đứng
 vững.** Người dùng nói rõ lý do đặt vấn đề: *danh sách task con show ra quá
 nhiều gây messy task-list* — tức bài toán **không phải chi phí hành chính**
@@ -119,6 +144,15 @@ chuyện gì xảy ra khi một worker chết giữa chừng.
 | 19 | Phép thử tách ca (2) khỏi ca (3) **không phải "việc to hay nhỏ"** mà là: *mảnh này có cần ranh giới rollback/verify riêng không?* — cơ học, đo được. Còn "có đáng thành work item không" là cảm giác | **Chưa rõ — đề xuất vòng 2** | §5 vòng 2 |
 | 20 | Ca (2) thuộc phạm vi `tsk-umc` hay là item riêng? Tiền lệ đã có: hàng 39 của rubric đẩy ô review-class ra ngoài vì *"không liên quan gì tới fan-out"* | **Chưa rõ** | `fanout-and-delegation-rubric` §3:39 |
 | 21 | **Động cơ thật của đề xuất là NHIỄU DANH SÁCH, không phải chi phí hành chính** — người dùng nói thẳng vòng 3. Hai bài toán khác hẳn nhau, và bài nhiễu danh sách chưa từng được đo | **Rõ** | §5 vòng 3 |
+| 22-SAI | ~~**Đo thật: con KHÔNG phải nguyên nhân messy.** Xoá sạch mọi con: 237 → 226, giảm 4.6%~~ — **SAI, đính chính hàng 30**. Lỗi: lấy 11 con *đang sống* vào câu nói về *toàn bộ* con | **BỊ BÁC — vòng 4** | §5 vòng 4 |
+| 30 | **Số đúng: con chiếm 25% danh sách.** open 237 · **open children 59 (25%)** · non-children 178. Xoá sạch mọi con: **237 → 178, giảm 25%**. Trong 59 con đó: 48 nằm trong hàng đợi TTL, 11 sống | **Rõ — đo lại vòng 4** | `.fgos` 2026-08-07 |
+| 31 | **"Rút hàng đợi là xong" cũng SAI.** `cleanup` TTL = **7 ngày** (`DEFAULT_CLEANUP_TTL_DAYS = 7`), và đo ra **0/99 item đã hết hạn** ⇒ không rút được cái nào, **0 worktree** thu hồi được. `retrospective` **không có TTL** ⇒ rút được cả 54. Rút hết những gì rút được ngay: 237 → **183**, không phải → 84 | **Rõ — đo vòng 4** | `src/setup/registrations.mjs:545`; `src/state/retro-pool.mjs:6-10`; đo TTL trên `.fgos` |
+| 32 | **Chi phí hành chính THẬT của một con, đo chứ không phán** (39/121 con đã đi đường hiện đại `doing → awaiting-approval → delivered → retrospective → cleanup`): **5-6 chuyển trạng thái** · **trung vị 2 lượt role `human`** (212 lượt trên 121 con = 1.75/con) · **7 ngày cư trú bắt buộc trong `cleanup`** · **20MB worktree giữ suốt 7 ngày đó**. Nhân với N | **Rõ — đo vòng 4** | `.fgos/events.jsonl`, `work.move` theo role |
+| 33 | **N sẽ lớn hơn nhiều.** Thuật toán tách chưa implement nên trung bình hôm nay mới 3.27 con/parent; tách tốt thì số con tăng mạnh. Cảnh báo ở hàng 29 không còn là giả định — người dùng xác nhận vòng 4 | **Rõ** | người dùng nêu vòng 4 |
+| 34 | **Nhưng KHÔNG khoản nào trong ba khoản đó là bản chất của việc-là-work-item.** 7 ngày × N dòng ← `cleanup.ttlDays` là **config toàn cục** · 2 lượt người × N ← mỗi lá cần `approve` riêng (chính sách gate) · 20MB × N × 7 ngày ← hệ quả của TTL. Phần *bản chất* của vòng đời (claim/verify/merge = cách ly · quy trách nhiệm · đường bytes về) **không nằm trong ba dòng đó** | **Rõ — nêu vòng 4** | §5 vòng 4 |
+| 35 | **Chính code đã mời sửa.** `registrations.mjs:540-544`: *"the cleanup-stage TTL is global config, not per-item/per-domain (**YAGNI — no demonstrated need yet**)"* (D7 của `work-item-status-delivered-retrospective-cleanup`). Phép đo vòng 4 **chính là** demonstrated need đó. Cấp bằng chứng cho D7 **không** mở lại D4, **không** đụng `0026` | **Rõ — nêu vòng 4** | `src/setup/registrations.mjs:540-545` |
+| 36 | **Hướng thứ tư**: giữ con là work item thật, làm rẻ **chính sách sau merge cho LÁ** — TTL nhận biết lá (lá ngắn/0, root giữ 7 ngày) + gộp approve ở cấp cha thay vì N lượt lá. Đánh trúng cả hai khoản đo được, giữ nguyên toàn bộ bảng "mất gì" (hàng 26) | **Chưa rõ — đề xuất vòng 4** | §5 vòng 4 |
+| 37 | **Chưa kiểm**: TTL 7 ngày tồn tại để làm gì? Nếu nó là lưới an toàn chống xoá nhánh sớm thì lá **an toàn hơn root** (nội dung lá đã merge vào `fgw/<root>`, mà nhánh root vẫn còn) — nhưng đó là suy luận, chưa đọc lý do gốc. Phải xác minh trước khi rút ngắn TTL cho lá | **Chưa rõ** | `docs/history/work-item-status-delivered-retrospective-cleanup/` chưa đọc |
 | 22 | **Đo thật: con KHÔNG phải nguyên nhân messy.** `fgos list` mặc định 237 dòng → **153 (65%) là hàng đợi TTL sau merge** (cleanup 99 + retrospective 54), sống thật 84, **con sống chỉ 11** (todo 6 · doing 4 · delivered 1). Xoá sạch mọi con: 237 → 226, giảm **4.6%**. Con không sống 73 dòng | **Rõ — đo vòng 3** | `.fgos` state, 2026-08-07; 425 item tổng, 121 có `parent`, 37 parent, trung bình 3.27 con |
 | 23 | **Một hàng đợi chưa rút giải thích cả hai triệu chứng.** `fgos cleanup <id>` gọi `cleanupMergedBranch` ⇒ `reclaimOrphanedCheckout` (`git worktree remove --force`) + `git branch -D`, rồi đẩy item sang `done` (rơi khỏi view mặc định). 99 item pool cleanup ≈ **104 worktree đang tồn tại** (~20MB/cái ≈ 2GB đĩa). Rút hàng đợi trả lại **cả 153 dòng lẫn ~2GB**, không đổi một dòng thiết kế nào | **Rõ — đo vòng 3** | `bin/fgos.mjs:1203-1209`; `src/runner/merge.mjs` `cleanupMergedBranch`; `git worktree list` = 104 |
 | 24 | **`fgos list` hôm nay chỉ có ĐÚNG HAI chế độ**: mặc định (ẩn `done`/`wontfix`) và `--all`. **Không** bộ lọc status, **không** gộp con dưới cha, **không** cách nào ẩn hàng đợi TTL. Đây mới là lỗ hổng thật ứng với cái đau người dùng mô tả — và nó là lỗ hổng **VIEW**, không phải lỗ hổng **MÔ HÌNH** | **Rõ — đo vòng 3** | `bin/fgos.mjs` case `'list'`, chỉ `flags.all` + `flags.id` |
@@ -464,6 +498,141 @@ việc thay thế, theo thứ tự:
 3. Chốt hướng "không đổi mô hình" (§3 hàng 28) chứ? Nếu chốt, ba câu vòng
    1 (ai claim · `selectWave` bị loại · gom kết quả về) trở lại thành
    đường chính và `tsk-umc` đi tiếp trên nền con-là-work-item-thật.
+
+### 2026-08-07 — Vòng 4: đính chính vòng 3, và chi phí hành chính thật
+
+**Người dùng:** *"sự thật thì nó là cả 2 phiền phức, cả chi phí hành chính
+và tasklist messy"* — kèm bổ sung sau đó: *"thuật toán tách chưa implement
+nên số con chia có thể ít, sau này nếu chia tốt thì số con sẽ rất nhiều."*
+
+#### Đính chính 1 — số học vòng 3 sai
+
+Vòng 3 tôi viết:
+
+> ~~"Xoá sạch mọi work item con khỏi hệ thống thì danh sách đi từ 237
+> xuống 226 — giảm 4.6%."~~
+
+Sai. Tôi lấy **11 con đang sống** vào một câu nói về **toàn bộ con**. Số
+đúng:
+
+| | |
+|---|---|
+| open rows | 237 |
+| **open children** | **59 = 25%** |
+| non-children | 178 |
+| **xoá sạch mọi con** | **237 → 178, giảm 25%** |
+
+Trong 59 con: 48 nằm trong hàng đợi TTL, 11 sống. Con chiếm **một phần
+tư** danh sách, không phải 4.6%.
+
+#### Đính chính 2 — "rút hàng đợi là xong" cũng sai
+
+`cleanup` có TTL **7 ngày** (`DEFAULT_CLEANUP_TTL_DAYS = 7`). Đo trên
+`.fgos` thật:
+
+| Pool | Số dòng | Rút được ngay? |
+|---|---|---|
+| `retrospective` | 54 | **được cả 54** — không có TTL (`retro-pool.mjs:6-10`) |
+| `cleanup` | 99 | **0/99** — chưa item nào hết 7 ngày |
+
+⇒ rút hết những gì rút được ngay: **237 → 183**, không phải → 84. Và
+**0 worktree** thu hồi được — ~2GB bị giữ **có cấu trúc** suốt 7 ngày,
+không phải do ai lười rút.
+
+Khuyến nghị #1 của vòng 3 dựa trên giả định sai. Nó không cứu được bài
+toán.
+
+#### Cái tôi chưa từng đo, giờ có số: chi phí hành chính một con
+
+39/121 con đã đi đường hiện đại. Đo từ `.fgos/events.jsonl`:
+
+```
+tsk-3go-2 : doing -> awaiting-approval -> delivered -> retrospective -> cleanup -> done
+```
+
+| Khoản | Số đo |
+|---|---|
+| chuyển trạng thái | **5-6** mỗi con |
+| **lượt role `human`** | **trung vị 2/con** (212 lượt trên 121 con = 1.75 trung bình) |
+| cư trú `cleanup` | **7 ngày bắt buộc** |
+| worktree giữ | **20MB suốt 7 ngày đó** |
+
+**Nhân với N.** Hôm nay N trung bình 3.27 ⇒ một lần decompose ≈ 6-7 lượt
+người, 23 dòng-ngày, 65MB. Người dùng vừa xác nhận N sẽ lớn hơn nhiều khi
+thuật toán tách chạy tốt. Ở N=10: **20 lượt người, 70 dòng-ngày, 200MB**
+cho một lần decompose.
+
+**Anh đúng ở cả hai vế. Vòng 3 tôi kết luận sai trên một con số sai.**
+
+#### Nhưng lời giải vẫn không phải B2 — vì không khoản nào là bản chất
+
+Bóc ba khoản chi phí ra theo nguồn:
+
+| Chi phí | Nguồn thật | Có phải bản chất của "là work item" không? |
+|---|---|---|
+| 7 ngày × N dòng | `cleanup.ttlDays` — **config toàn cục** | **Không.** Một cái knob |
+| 2 lượt người × N | mỗi lá cần `approve` riêng | **Không.** Chính sách gate |
+| 20MB × N × 7 ngày | worktree giữ tới cleanup | **Không.** Hệ quả của TTL bên trên |
+
+Phần **bản chất** của vòng đời — claim (cách ly), verify (quy trách
+nhiệm), merge (đường bytes về) — **không nằm trong ba dòng nào ở trên**.
+Nó tốn 0.18s và 20MB *trong lúc chạy*. Tất cả phần đắt là **hậu kỳ**, và
+hậu kỳ là chính sách, không phải mô hình.
+
+Bỏ vòng đời (B2) để né chi phí hậu kỳ là **trả giá sai chỗ**: mất toàn bộ
+bảng hàng 26 (cha chết mất sạch · không resume · vô hình với
+stale/merge-list/conflicts/graph · không retry từng mảnh) để tiết kiệm ba
+thứ vốn chỉnh được bằng config.
+
+#### Và chính code đã mời sửa
+
+`src/setup/registrations.mjs:540-544`, nguyên văn:
+
+> *"work-item-status-delivered-retrospective-cleanup D7: the cleanup-stage
+> TTL is global config, **not per-item/per-domain (YAGNI — no demonstrated
+> need yet)**."*
+
+D7 không đóng cửa — nó nói *chưa có nhu cầu được chứng minh*. **Phép đo
+vòng 4 chính là nhu cầu đó**: 25% danh sách là con, 0/99 rút được, N sắp
+tăng mạnh. Cấp bằng chứng cho D7 **không mở lại D4, không đụng `0026`** —
+nó thoả một điều kiện mà một quyết định đang sống đã cố ý để ngỏ.
+
+Đối chiếu: D9 của D4 đòi *≥2 ca thật cha cần con GHI file mà việc đó không
+đáng thành work item*. Vòng 4 vẫn **không** cấp ca nào cho D9 — cái đau đo
+được là *hậu kỳ của item*, không phải *chi phí tồn tại của item*. Hai cửa
+khác nhau, và vòng 4 gõ đúng cửa D7.
+
+#### Hướng thứ tư
+
+> **Giữ con là work item thật. Làm rẻ CHÍNH SÁCH SAU MERGE cho lá.**
+>
+> - **TTL nhận biết lá** — lá TTL ngắn hoặc 0; root giữ 7 ngày.
+> - **Gộp approve ở cấp cha** — một lượt người cho cả cụm thay vì N lượt lá.
+
+Đánh trúng đúng hai khoản đo được (7 ngày × N, 2 lượt người × N), giữ
+nguyên toàn bộ bảng "mất gì". Và nó là **item riêng, không thuộc
+`tsk-umc`** — `tsk-umc` là execution fan-out; chính sách hậu kỳ của lá là
+việc khác. Nhưng hai cái **phải đi cùng nhau**: bật fan-out B mà không hạ
+chi phí hậu kỳ thì đúng là nhân N lần cái đau người dùng đang tả.
+
+#### Chưa kiểm — phải xác minh trước khi rút ngắn TTL
+
+TTL 7 ngày **tồn tại để làm gì**? Suy luận (chưa xác minh): nếu nó là lưới
+an toàn chống xoá nhánh sớm thì **lá an toàn hơn root** — nội dung lá đã
+merge vào `fgw/<root>`, mà nhánh root vẫn còn nguyên, nên xoá nhánh lá sớm
+mất ít hơn xoá nhánh root sớm. Nhưng đó mới là suy luận; chưa đọc
+`docs/history/work-item-status-delivered-retrospective-cleanup/`. **Không
+được rút ngắn TTL trước khi đọc lý do gốc** (§3 hàng 37).
+
+**Câu hỏi vòng 4:**
+
+1. Hướng thứ tư (TTL nhận biết lá + gộp approve ở cha) có đúng thứ anh
+   cần không? Nó giữ con là item thật nhưng bỏ đúng phần đắt.
+2. Nếu đúng: mở item riêng cho nó ngay, hay để `tsk-umc` mang luôn? Tôi
+   nghiêng **item riêng, `mergeAfter` với `tsk-umc`** — nhưng phải làm,
+   không phải "để sau", vì fan-out B nhân N lần cái đau này.
+3. Gộp approve ở cấp cha — anh chấp nhận **không xem từng lá** trước khi
+   merge chứ? Đây là đổi mức kiểm soát thật, không phải dọn dẹp.
 
 ## 6. Thiết kế đã chốt {#design}
 
