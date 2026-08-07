@@ -77,6 +77,38 @@ locally. `cycles` now reports a real cycle through any of those three
 edge types, not `deps` alone — verified with a real command
 (`node --test test/state/graph-metrics.test.mjs`), not just review.
 
+## Real-world proof (`tsk-1sj`): computed waves actually run concurrently, not just on paper
+
+`tsk-1sj` split into two children with deliberately disjoint footprints —
+`tsk-30z` (`src/util/format-duration.mjs`) and `tsk-50ic`
+(`src/util/format-bytes.mjs`), no file shared between them — specifically
+to test whether a computed wave (no footprint overlap, so both eligible
+for the same wave per step 2 above) results in genuinely concurrent
+execution, not just an advisory schedule nobody actually dispatches in
+parallel. Dispatched via 2 concurrent Agent subagents, each running
+`/fgOS:pick` + `fgos-code-implement` independently.
+
+Measured directly from `.fgos/events.jsonl`, not simulated: `tsk-30z`/
+`tsk-50ic` claims landed 2s apart, returns landed 5s apart, with ~184s of
+genuinely overlapping `doing` status between them — hard evidence the two
+items were worked at the same time, not sequentially.
+
+**A real, separate finding surfaced along the way**: `fgos-runner`'s own
+automated wave dispatch (the `Promise.allSettled` fan-out that would
+consume `computeSchedule`'s waves automatically) has zero real
+`capacity.dispatch` events in this repo's history — the demo's actual
+parallelism came from manually spawning 2 Agent subagents against the
+computed wave, not from `fgos-runner` itself executing it. `fgos-runner`'s
+automated consumption of a computed wave remains unexercised in
+practice, deferred to a later item.
+
+This evidence is deliberately kept live rather than cleaned up as demo
+cruft: `docs/history/parallel-dispatch-demo-format-utils/` and the
+`tsk-1sj`/`tsk-30z`/`tsk-50ic` items themselves are the reproducible,
+citable proof that `computeSchedule`'s waves (step 2 above) mean real
+concurrency when actually dispatched, not just a plausible-looking JSON
+array.
+
 The same review also found `fgos schedule` itself missing from
 `bin/fgos.mjs`'s `STORE_MISSING_WARNING_VERBS` set — the "eight read
 verbs" `docs/how-to/run-a-state-verb-from-inside-a-worktree.md` describes
