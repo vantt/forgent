@@ -67,6 +67,44 @@ themselves, and then "red" would just mean "the old tests still pass
 against old code," which proves nothing about whether the new
 implementation is what makes the new tests pass.
 
+## Watch out for: running `classifyIronLaw` before committing gives a false "not required" negative
+
+`tsk-2l0` found a real timing bug in `fgos-code-implement`'s own Execute-
+stage step 4: the skill instructed running the Iron Law check, but never
+said this had to happen *after* `git add`/`git commit` — and
+`classifyIronLaw`'s own `changedFiles()` reads the real committed diff.
+Reproduced live on `tsk-5cf`: running the check right after writing code
+but *before* committing returned `{"required": false, "matchedFlags":
+[], "matchedModules": []}`, because `changedFiles` came back empty —
+nothing had been committed yet on the branch beyond the parent's own
+`plan.md`-only commit. `fgos return` then proceeded with no Iron Law
+evidence doc at all.
+
+The false negative didn't stay hidden — `approve`'s own separate gate in
+`bin/fgos.mjs` re-runs `classifyIronLaw` against the real committed diff
+at merge time, and correctly reported `{"required": true,
+"matchedModules": [...]}`, refusing to merge without
+`--acknowledge-iron-law`. But by then the evidence-production window
+(step 2 above, get honestly to red before implementing) had already
+closed — the implementation was already committed and green, so
+producing real failing-test-first evidence meant a retroactive scramble:
+stashing the already-committed implementation to reconstruct the "red"
+state after the fact, exactly what happened on `tsk-5cf`. Worse, in a
+less careful session, this gap could tempt passing
+`--acknowledge-iron-law` with no real evidence backing it at all — a
+bare, unverified assertion silently defeating the whole failing-test-
+first proof requirement this gate exists to enforce.
+
+**The fix**: `fgos-code-implement`'s step 4 now says explicitly to run
+`classifyIronLaw` *after* `git add`/`git commit` (or otherwise ensure
+`changedFiles()` reflects the real diff), never right after writing code
+and before it's committed. Run the check too early in your own session
+and you'll get the same silent, plausible-looking false negative — worth
+double-checking `matchedModules`/`matchedFlags` are non-empty against
+your own knowledge of which files you touched, not just trusting an
+empty result at face value if you touched a module on
+`src/evolve/iron-law.mjs`'s `MODULE_RULES` list.
+
 ## Why this survives review even without re-running it
 
 A reviewer (human or a later session) reading `iron-law-evidence.md` gets
