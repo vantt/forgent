@@ -162,6 +162,27 @@ a signal to observe, not a judgment call made in advance.
   *is* that mechanism, so nothing about the existing rule needed to
   change.
 
+## Implementation (`tsk-1w7`, P4 of this design): why adding two stages didn't need a wider footprint
+
+Adding `discovery`/`exploring` to `DOMAINS.coding`'s stage list needed
+its `skillMap` to point at real skill files — which is why this piece
+depended on P1 (`fgos-researching`) and P2 (`fgos-clarifying`) already
+existing, rather than adding stages ahead of the skills that back them.
+
+A real cross-check at `fgos-validating` bounded the footprint precisely
+rather than by guess: `getDomain`/`skillForStage` have 9 real consumer
+files (`store.mjs`, `frontier.mjs`, `stage-fsm.mjs`, `decompose.mjs`,
+`dispatch.mjs`, `loop.mjs`, `anti-loop.mjs`, `discovery.mjs`,
+`bin/fgos.mjs`), but only `frontier.mjs` and `stage-fsm.mjs` read
+`domain.stages` *generically* (no hardcoded stage names) — the other
+consumers read stage information in ways unaffected by adding new stage
+names to the list. `dispatch.mjs`/`anti-loop.mjs` specifically hardcode
+the literal string `'executing'`, but D10 (the locked stage array
+above) never reused or renamed that stage, so those two files needed no
+change at all to keep behaving correctly. This confirmed the fix could
+stay scoped to the stage-graph definition itself, without widening the
+footprint into files whose behavior the new stages didn't actually touch.
+
 ## Implementation (`tsk-1x3`, P3 of this design): `judge-executor.mjs` was deleted outright, not just unused
 
 The verb-reversion + judge-removal half of this design (D1, D9, D6 above)
