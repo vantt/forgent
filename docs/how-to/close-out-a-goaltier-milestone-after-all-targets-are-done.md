@@ -10,8 +10,14 @@ source_capture_ids: [tsk-u9k]
 Use this when a `goalTier: "milestone"` (or `"mvp"`) item's `targets` array
 are all `status: "done"`, but the milestone item itself still sits at
 `status: "todo"` and never shows up in `fgos merge list`'s `ready` array —
-`fgos rollup` does not read the `targets` field at all, so a goalTier item
-never closes itself just because its targets finished.
+nothing closes a goalTier item just because its targets finished; that
+remains a deliberate manual step, the one this page walks through.
+
+`fgos rollup <milestone-id>` now *reports* the targets (a `targets` array
+plus a `targetDoneCount`/`targetTotalCount` pair — see
+[check-rollup-progress](check-rollup-progress.md)), which is the fastest way
+to confirm they really are all `done` before starting. Reporting is all it
+does: `rollup` is read-only and still moves nothing.
 
 ## If the milestone was created via `fgos submit` instead of `fgos add`
 
@@ -45,7 +51,15 @@ retrofit it onto an existing item, submitted or added, at any time.
 
 ## Steps
 
-1. Confirm every target is actually done:
+1. Confirm every target is actually done — one command reads all of them:
+   ```
+   fgos rollup <milestone-id>        # targetDoneCount == targetTotalCount?
+   ```
+   A target row printed with `"status": null` is an id in `targets` that
+   matches no work item at all (entries are not validated at write time) —
+   fix the id before going further, rather than reading it as pending.
+
+   The longer per-target walk still works if you want it:
    ```
    fgos show <milestone-id> --json   # read .data.work.targets
    fgos list --id <target-id> --json # for each target, check .status
