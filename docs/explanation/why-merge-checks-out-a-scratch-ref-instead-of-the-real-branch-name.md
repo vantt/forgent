@@ -191,3 +191,84 @@ hoc retry mechanism bolted onto `merge.mjs` itself.
 
 Full decision record: `docs/history/merge-ephemeral-branch-force-race/CONTEXT.md`
 (D1-D2).
+
+## Third-order effect (`tsk-2cd`): the final `git branch -f` never resyncs a root's own long-lived claim worktree
+
+A third bug in the same mechanism, again real and reproduced live —
+this time hitting the very worktree this documentation family was
+itself being written in. `withMergeEphemeralWorktree`'s final `git
+branch -f branch endCommit` (the step both fixes above already discuss)
+moves the branch *ref* forward, but does nothing to resync any *other*
+worktree already checked out on that branch — including a root item's
+own long-lived claim worktree, the one a live session might be sitting
+in and running `verify` against.
+
+**Real repro**: a root's claim worktree (`git rev-parse HEAD` =
+`b4f9417`, correctly showing all 6 children already merged) had files on
+disk still matching an *earlier* commit (`18e0f1c`, before the
+decompose that created those children). Ref moved; files didn't.
+`verify` failed with 4 structural checks failing (expected new skill
+files, expected new stage-array entries) even though `npm test` itself
+passed clean — the failures were an artifact of running verify against a
+stale tree, not a real regression. `git status --short` showed a wall of
+phantom `D`/`A` entries — not real changes, just the difference between
+the index and a moved `HEAD` the on-disk files never caught up to.
+
+**Root cause, confirmed by directly reading the code, not by
+assumption**: this is a real *different* mechanism from the prior fix
+(`tsk-5yp`)'s own worktree-reclaim path. That original suspicion was
+checked and ruled out — the actual cause is that nothing in
+`withMergeEphemeralWorktree`'s final ref-move step ever touches any
+worktree other than its own ephemeral one. A stale inline comment in
+`bin/fgos.mjs` (dating from before the `tsk-5yp` fix) still misattributed
+this class of drift to the old force-reclaim path — corrected in the
+same pass, since leaving it would mislead the next person investigating
+the same symptom.
+
+**The fix reuses this repo's own established safe-reset discipline**
+(`docs/how-to/safely-reset-the-main-checkout.md`'s pattern — full-tree
+status first, confirm no commit is actually lost via ancestry, refuse
+and ask a person rather than blindly resetting) — applied to a *claimed
+item's own worktree* rather than the main checkout, which that existing
+guard explicitly doesn't cover (it protects a different, structurally
+distinct target).
+
+A new primitive, `resyncClaimWorktree`, runs at `createClaimWorktree`'s
+existing `reused: true` reattach path (the moment a session re-claims a
+worktree it — or a prior session — already had open): if the worktree's
+HEAD already equals the branch's live tip, it's a no-op. If the tip has
+moved *and* the ancestry check confirms nothing would be lost *and* the
+tree is clean, it auto-resyncs. If the tree is dirty **and** genuinely
+behind, it refuses outright rather than guessing — the same
+never-auto-discard-uncommitted-work stance the main-checkout guard
+already established.
+
+**A real design correction found empirically, not assumed**: the
+original plan for detecting "has the branch moved" compared the
+worktree's live `rev-parse HEAD` directly against the branch tip — this
+was tested in a real scratch repo and **confirmed not to work**, because
+both values resolve against the same, already-moved ref once `git
+branch -f` has run — there's no longer a way to tell "was I here before
+the force-move" from a live HEAD read alone. The fix replaced this with
+a `lastSynced` value read from the worktree's own **reflog** instead —
+a record of where *this worktree* actually was, independent of what the
+shared branch ref currently points at.
+
+**Verified against an existing regression, not just new tests**: a prior
+test (`"createClaimWorktree reattaches a DIRTY checkout with its
+uncommitted work intact"`) already asserted a dirty reattach must
+succeed — the new guard could not be allowed to break it. Traced rather
+than assumed: that test never moves the branch ref externally, so
+`worktreeHead === branchTip` already holds and the guard's own first
+check (no-op when HEAD matches the tip) returns before the dirty/ancestor
+check is ever reached — provably a no-op on that exact test. A new,
+separate test was added alongside it rather than relying on the trace
+alone: a third, detached checkout of the same branch — the same
+technique `withMergeEphemeralWorktree` itself uses in production — force-
+moves the branch ref forward while the claim worktree is left dirty and
+genuinely behind, asserting the guard refuses rather than silently
+resyncing over real uncommitted work.
+
+Full decision record: `docs/history/root-worktree-drift-after-child-merge/CONTEXT.md`
+(D1-D2) and `plan.md` (the `resyncClaimWorktree` design, the reflog
+correction, and the regression-trace proof above).
