@@ -34,6 +34,32 @@ plus a `targetDoneCount`/`targetTotalCount` pair — see
 to confirm they really are all `done` before starting. Reporting is all it
 does: `rollup` is read-only and still moves nothing.
 
+## Watch out for: `rollup`'s plain `doneCount`/`totalCount` reads `0/0` for a targets-based milestone — that's not the field to check
+
+`tsk-4bc` (a 4-milestone MVP tracked via `targets`, not `children`) flagged
+this as a real tooling trap: `fgos rollup <id>` prints **two** separate
+progress pairs in the same JSON — `doneCount`/`totalCount` (computed from
+the item's `children` array) and `targetDoneCount`/`targetTotalCount`
+(computed from `targets`). For a `goalTier` milestone tracked purely via
+`targets`, `children` is genuinely empty, so `doneCount`/`totalCount`
+always reads `0/0` — that's correct, not a bug, but it's easy to misread
+as "rollup isn't seeing my targets at all" if you're only looking at the
+first pair. The real progress signal is `targetDoneCount`/
+`targetTotalCount` (and the `targets` array itself, each entry carrying
+its own live `status`) — always check those fields specifically for a
+targets-based milestone, not the children-based pair.
+
+A second, related trap: `targetDoneCount` counts only the literal
+`status: "done"` — it does **not** apply the "a target sitting in
+`cleanup`/`retrospective`/`delivered` has already delivered" resolved-
+status reasoning the lesson further down this page locks. A milestone
+whose targets have all genuinely landed but haven't finished their TTL
+sweep to `done` yet will show `targetDoneCount: 0` even though every
+target's real work is complete — read each target's individual `status`
+in the `targets` array, not just whether `targetDoneCount ==
+targetTotalCount`, to judge real readiness the same way the resolved-
+status lesson below already recommends for the milestone's own `verify`.
+
 ## If the milestone was created via `fgos submit` instead of `fgos add`
 
 Before `tsk-5fs`, `goalTier` could only ever be set at creation time via
