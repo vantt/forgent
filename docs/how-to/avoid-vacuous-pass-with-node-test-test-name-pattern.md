@@ -109,6 +109,41 @@ deliberately-renamed pattern (reproducing the vacuous-pass scenario) and
 confirming it correctly fails. Full evidence:
 `docs/history/tsk-5mc-verify-vacuous-pass-multiglob/CONTEXT.md`.
 
+## Update (tsk-12t): the reporter-format variant of this trap is now mechanically rejected
+
+The specific mistake at the top of this doc — grepping for a TAP-style
+`^# pass`/`^# fail` line that Node's default `node --test` reporter never
+emits — no longer has to be caught by a human or an LLM reviewer noticing
+it live. `judgeVerifySemanticCorrectness` (`src/intake/judge-executor.mjs`,
+the shared second-pass verify judge both `resolveDiscovery`/`clarify` and
+`resolveDecompose`/`decompose` call) now runs a cheap mechanical check
+before ever spawning the LLM judge: any proposed verify string that
+targets `node --test`/`--test-name-pattern` AND matches the wrong-reporter
+grep shape (`/\^#\s*(pass|fail)\b/`) is rejected immediately, citing this
+how-to doc in the rejection reason.
+
+This was added specifically because `tsk-4sz`'s own verify authoring
+proposed exactly this mistake (`grep -qE "^# pass [1-9]"`) live during
+`fgos-exploring` — the second-pass LLM judge disputed that same verify
+three separate times over content/coverage concerns (missing call-site
+coverage, testing the wrong file) but never once caught the format bug
+itself; it only surfaced when `fgos return`'s real spawn ran the command
+under Node v24.18.0's actual `ℹ`-prefixed reporter and it silently failed.
+Relying on an LLM to notice a known, purely-syntactic anti-pattern every
+single time it appears is exactly the gap a cheap mechanical pre-check
+closes.
+
+**This specific rejection cannot be bypassed with `--force`** — unlike an
+ordinary LLM disagreement, it is a syntactic fact about what Node's
+reporter does and does not print, not a judgement call an LLM (or
+`--force`) could plausibly override. The narrower **vacuous-match**
+trap this doc's other sections describe (a pattern matching zero real
+tests, or the multi-file-glob variant above) is deliberately NOT covered
+by this mechanical check — neither is detectable by a fixed regex, so
+catching those still depends on the LLM judge, an executed-and-verified
+test run, or a human reading the command closely. Full decision record:
+`docs/history/tsk-12t-verify-known-bad-pattern-check/CONTEXT.md`.
+
 ## Related
 
 - `docs/history/tsk-5t3-iron-law-evidence-contract/CONTEXT.md` — the
