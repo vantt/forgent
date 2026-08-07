@@ -1,12 +1,14 @@
 # Execution fan-out — CONTEXT
 
-`tsk-umc` · tier `heavy` · risk `heavy` · kind `feature` · stage `clarify`
-`refs` = `docs/history/execution-fanout/DISCUSSION.md#tasks` ·
-`mergeAfter` = `tsk-4fg`
+`tsk-umc` · tier `heavy` · risk `heavy` · kind `feature` · stage
+`decompose` (qua cửa `clarify`→`decompose` 2026-08-07, `fgos discover
+--verdict clear`) · `refs` = `docs/history/execution-fanout/DISCUSSION.md#tasks`
+· `mergeAfter` = `tsk-4fg` · `verify` = `npm test && node
+scripts/verify-fanout-overlap.mjs`
 
 Quyết định D1-D6 được chốt trong `DISCUSSION.md` (mười vòng thảo luận,
-2026-08-07) và ghi thật qua `fgos decision --id tsk-umc`. D7-D9 chốt ở
-pha clarify này. Bảng dưới là bản duy nhất mọi bước sau đọc.
+2026-08-07) và ghi thật qua `fgos decision --id tsk-umc`. D7-D10 chốt ở
+pha clarify. Bảng dưới là bản duy nhất mọi bước sau đọc.
 
 ## Ranh giới tính năng
 
