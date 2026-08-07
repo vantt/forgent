@@ -21,7 +21,7 @@ Canonical references below).
 | ID | Decision |
 |----|----------|
 | D1 | Root cause: `withMergeEphemeralWorktree`'s `git branch -f <branch> <endCommit>` ref-move (`src/runner/worktree.mjs:652`) advances `fgw/<rootId>` in the shared `.git` dir without touching any *other* worktree already checked out on that same branch. `HEAD` in the root's long-lived claim worktree is a symbolic ref that resolves live (so `git rev-parse HEAD` looks current), but the worktree's index/working files are never re-checked-out — they stay at whatever commit they were last actually synced to. This supersedes the item's own original suspicion (`createWorktree`'s branch-reuse force-reclaim path) — that mechanism was replaced by `createDetachedMergeWorktree` specifically to fix a prior, different bug (see D3/Canonical references) and is no longer what runs during a leaf→root merge. Confirmed by the person filing this item. |
-| D2 | Fix scope includes correcting the stale `bin/fgos.mjs:2798-2804` inline comment, which currently misattributes the drift to the old force-reclaim mechanism. Small, directly tied to this bug's own root cause — left uncorrected it would mislead the next reader chasing this same symptom. Confirmed by the person filing this item. |
+| D2 | Fix scope includes correcting the stale `bin/fgos.mjs:2836-2845` inline comment (the "force-reclaims" claim itself at line 2842), which currently misattributes the drift to the old force-reclaim mechanism. Small, directly tied to this bug's own root cause — left uncorrected it would mislead the next reader chasing this same symptom. Confirmed by the person filing this item. Line range corrected from the item's own original `2798-2804` citation during `fgos-validating`'s repo-fit check (tsk-2cd) — the file has moved since that description was written; re-grep before editing rather than trusting either citation blind. |
 | D3 | The required guard behavior (already specified in the item's own description, formalized here for traceability, not re-derived): before a claimed worktree is used to run verify, check it against its branch's current tip — `git merge-base --is-ancestor <worktree's HEAD> <branch tip>` to prove no commits would be lost, then `git status` on the **whole tree** (never just files of interest) to prove it is clean. Auto-resync (`git reset --hard <branch tip>`) only when BOTH hold. If the tree has real uncommitted changes, or the ancestor check fails, refuse and report to the person — never auto-reset blind. This mirrors the existing main-checkout safety discipline (`docs/how-to/safely-reset-the-main-checkout.md`, `src/runner/main-checkout-reset-guard.mjs`) but must be its own guard, not a reuse of that module — that module's job is protecting the main checkout specifically, a different target. |
 
 No open product-facing gray areas remain beyond D1-D3 — the item's own
@@ -44,7 +44,8 @@ job was confirming the actual mechanism (D1) and formalizing scope (D2).
 
 - `bin/fgos.mjs:2793-2853` — `approve`'s leaf→root merge path; calls
   `withMergeEphemeralWorktree(repoRoot, rootId, ...)`; the stale comment at
-  `2798-2804` is D2's target.
+  `2836-2845` (force-reclaims claim at 2842) is D2's target — re-grep
+  before editing, line numbers drift as the file changes.
 - `src/runner/worktree.mjs:596-658` — `createDetachedMergeWorktree` +
   `withMergeEphemeralWorktree`; line 652 (`git branch -f`) is D1's exact
   culprit.

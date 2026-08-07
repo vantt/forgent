@@ -29,7 +29,9 @@ decision with no git access of its own, unit-testable without a real repo)
 plus a git-shelling caller in `src/runner/worktree.mjs`, wired into
 `createClaimWorktree`'s existing `reused: true` reattach branch
 (`worktree.mjs:575-586`). Also corrects the stale inline comment at
-`bin/fgos.mjs:2798-2804` (CONTEXT.md D2).
+`bin/fgos.mjs:2836-2845` (CONTEXT.md D2 — corrected during `fgos-
+validating`'s repo-fit check from the item's own original `2798-2804`
+citation; re-grep before editing).
 
 **Why `createClaimWorktree`'s reattach path, not `fgos-code-implement`'s
 Orient step (CONTEXT.md's other named candidate).** Scout during this
@@ -105,7 +107,7 @@ records the posture.
 | Component | Risk | Proof point (for `fgos-validating`) |
 |---|---|---|
 | New resync-decision logic (ancestor+clean → resync vs refuse) | medium — subtle git semantics, easy to get the ancestor direction backwards | Unit tests in `test/runner/worktree.test.mjs` covering: same-tip no-op, ancestor+clean auto-resync, dirty tree refuses, non-ancestor (diverged) refuses — simulating the real mechanism by advancing a branch via `git branch -f` from a second checkout while the first stays behind, the same operation `withMergeEphemeralWorktree` performs in production |
-| Wiring into `createClaimWorktree`'s `reused: true` branch | medium — this is a shared primitive (`pick`'s CLI case and any other reattach caller) | Full `npm test` green — the existing reattach/tsk-65n test coverage in `test/runner/worktree.test.mjs` must keep passing unchanged for the ordinary (non-drifted) reattach case |
+| Wiring into `createClaimWorktree`'s `reused: true` branch | medium — this is a shared primitive (`pick`'s CLI case and any other reattach caller); found during `fgos-validating`: an existing test (`test/runner/worktree.test.mjs:527`, "createClaimWorktree reattaches a DIRTY checkout with its uncommitted work intact") asserts a dirty reattach must still succeed — the new guard must never regress it | Traced: that test never moves `fgw/reattach-dirty`'s branch ref (no external merge happens in it), so `worktreeHead === branchTip` holds and the guard's own first check (no-op when the worktree's HEAD already equals the branch tip) returns before the dirty/ancestor check is ever reached — the guard is provably a no-op on that exact test. Add an explicit new test alongside it (not just rely on the trace): a THIRD checkout of the same branch, detached (same technique `withMergeEphemeralWorktree` uses in production, empirically confirmed this session — see below), commits and force-moves the branch ref forward while the claim worktree is left dirty and behind — asserts the guard refuses rather than silently resyncing over real uncommitted work. |
 | `bin/fgos.mjs:2798-2804` comment correction | low — text only | Read-diff at review; no functional check needed |
 
 ## Files likely touched
@@ -113,11 +115,17 @@ records the posture.
 - `src/runner/worktree.mjs` — add the resync-decision + git-shelling
   functions; call the resync from `createClaimWorktree`'s `reused: true`
   branch before returning the existing checkout.
-- `bin/fgos.mjs` — correct the stale comment at lines 2798-2804 (CONTEXT.md
+- `bin/fgos.mjs` — correct the stale comment at lines 2836-2845 (CONTEXT.md
   D2); no behavior change in this file.
-- `test/runner/worktree.test.mjs` — new tests for the resync guard
-  (same-tip/ancestor-clean/dirty/diverged), plus a regression test that
-  `createClaimWorktree`'s ordinary reattach path is unaffected.
+- `test/runner/worktree.test.mjs` — new tests for the resync guard:
+  same-tip no-op, ancestor+clean auto-resync (branch force-moved forward
+  by a separate detached checkout, same mechanism `withMergeEphemeralWorktree`
+  uses — `git branch -f` after a detached `git worktree add --detach`,
+  confirmed constructible this session, see Assumptions), dirty-and-behind
+  refuses, diverged (non-ancestor) refuses, and dirty-but-NOT-behind
+  (`worktreeHead === branchTip`) still succeeds unchanged — the exact
+  shape of the existing `reattach-dirty` test at line 527, added as a new
+  case rather than relying on the trace alone.
 
 Order: guard logic + its own tests first (self-contained, no wiring
 dependency), then wire into `createClaimWorktree`, then the comment fix
@@ -129,14 +137,20 @@ no multi-item ordering decision for graph output to inform here.
 
 ## Assumptions
 
-- `git merge-base --is-ancestor` exits non-zero (not an error) when the
-  first commit is NOT an ancestor of the second — this is documented git
-  behavior, not re-verified against this repo's own git binary here;
-  `fgos-validating` should confirm it empirically as part of proving the
-  unit tests above (a `spawnSync`/`execFileSync` call with a non-ancestor
-  pair, checked for a clean non-throwing non-zero exit) since a wrong
-  assumption here would make the guard either always refuse or never
-  refuse.
+- `git merge-base --is-ancestor` exits non-zero (not an error/exception —
+  a plain exit 1) when the first commit is NOT an ancestor of the second,
+  and exit 0 when it is. CONFIRMED empirically during `fgos-validating`
+  (real git binary, this machine): built a 3-commit scratch repo (linear
+  c1->c2, and a diverged c3 off c1), ran `git merge-base --is-ancestor c1
+  c2` (exit 0) and `git merge-base --is-ancestor c3 c2` (exit 1, clean,
+  no thrown error) — matches the algorithm's assumption exactly.
+- Two checkouts of the same branch can coexist as long as one is detached
+  (`git worktree add --detach <path> <commit>`), with the branch ref then
+  force-moved (`git branch -f <branch> <newCommit>`) from the repo root
+  without touching the OTHER (non-detached) checkout's files — this is the
+  exact mechanism `withMergeEphemeralWorktree` already uses in production
+  (`worktree.mjs:610-658`) and this bug's own D1 root cause; the new tests
+  reproduce it deliberately to exercise the guard, not as a novel claim.
 - The item's own verify command (`npm test`, set below) is sufficient
   proof for both the guard and the comment fix — the comment fix itself
   has no automated check, covered instead by review reading the diff.
