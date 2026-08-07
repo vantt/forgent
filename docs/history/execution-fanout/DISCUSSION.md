@@ -5,6 +5,32 @@
 
 ## 1. Trạng thái hiện tại
 
+**Vòng 7 (2026-08-07) — "cha merge" không phải lựa chọn, code đã cưỡng
+chế; và điều đó quyết luôn câu "ai claim".** `approve` **từ chối chạy từ
+bên trong worktree** bằng hai guard riêng biệt, nguyên văn *"approve must
+land on the main checkout, which a session worktree structurally is not"*.
+⇒ một agent con sống trong worktree của nó **về cấu trúc không thể tự
+merge**. Merge lá bắt buộc do một bên đứng trên main checkout làm — tức
+**cha**, đúng như trực giác người dùng.
+
+Hệ quả cho câu "ai claim": cha **buộc phải sống suốt fan-out** trên main
+checkout để merge từng lá xong. Nên cha-claim **không thêm vai trò mới**,
+nó gộp một vai vốn đã bắt buộc tồn tại. Cộng với: cha biết mình claim gì
+⇒ dọn được khi con chết (`startupReap` **cố ý** bỏ qua claim session) ·
+không tranh lock · và **runner đã implement đúng khuôn này** —
+`claimAndDispatch` rồi `spawnWorker(item, config, wt.path, …)`. Giá phải
+trả: cần **một cửa vào mới cho con** (con không chạy `/fgOS:pick` được nữa
+vì item đã `doing`). Phân tích đầy đủ ở §5 vòng 7.
+
+Về autonomy (người dùng hỏi tư vấn): khuyến nghị **tự động approve LÁ, giữ
+cổng ROOT bắt buộc**. Ba chỗ tựa: `return` **vẫn chạy verify** và block
+khi đỏ ⇒ bỏ approve lá là bỏ một **lượt review**, không bỏ **bằng chứng** ·
+lá merge vào `fgw/<root>`, **không bao giờ chạm main** · cổng root lên main
+vẫn còn, muộn hơn và bao quát hơn. Cổng lá là **cổng trùng hạ một tầng**.
+
+Người dùng **chưa chốt**. Chưa mint D-ID — nhưng ba điểm đã đủ chín, chỉ
+chờ một câu xác nhận (§3 hàng 43, 62, 63).
+
 **Vòng 6 (2026-08-07) — harness cho chuỗi tuần tự ĐÃ CÓ ĐỦ; thứ thiếu
 đúng bằng `tsk-umc`.** Người dùng mô tả cấu trúc thật của decompose: một
 **đồ thị phụ thuộc**, tiến trình hỗn hợp tuần tự + song song — A xong,
@@ -202,6 +228,15 @@ chuyện gì xảy ra khi một worker chết giữa chừng.
 | 19 | Phép thử tách ca (2) khỏi ca (3) **không phải "việc to hay nhỏ"** mà là: *mảnh này có cần ranh giới rollback/verify riêng không?* — cơ học, đo được. Còn "có đáng thành work item không" là cảm giác | **Chưa rõ — đề xuất vòng 2** | §5 vòng 2 |
 | 20 | Ca (2) thuộc phạm vi `tsk-umc` hay là item riêng? Tiền lệ đã có: hàng 39 của rubric đẩy ô review-class ra ngoài vì *"không liên quan gì tới fan-out"* | **Chưa rõ** | `fanout-and-delegation-rubric` §3:39 |
 | 21 | **Động cơ thật của đề xuất là NHIỄU DANH SÁCH, không phải chi phí hành chính** — người dùng nói thẳng vòng 3. Hai bài toán khác hẳn nhau, và bài nhiễu danh sách chưa từng được đo | **Rõ** | §5 vòng 3 |
+| 56 | **`approve` CƯỠNG CHẾ chạy trên main checkout** — hai guard riêng: từ chối khi cwd là session worktree (*"approve must land on the main checkout, which a session worktree structurally is not"*) và từ chối khi cwd là bất kỳ worktree nào. ⇒ agent con sống trong worktree của nó **về cấu trúc không thể tự merge**. "Cha merge lá" **không phải lựa chọn thiết kế, là ràng buộc đã có** | **Rõ — scout vòng 7** | `bin/fgos.mjs` case `approve`, hai nhánh `refusing to run` |
+| 57 | ⇒ **Cha buộc phải sống suốt fan-out** trên main checkout để merge từng lá xong. Nên **cha-claim không thêm vai trò mới**, nó gộp một vai vốn bắt buộc tồn tại. Đây là lập luận quyết định cho §3 hàng 3, mạnh hơn mọi lập luận vòng 1 | **Rõ — vòng 7** | hàng 56 |
+| 58 | **Runner đã implement đúng khuôn cha-claim**: `claimAndDispatch` (claim trước, từ chối thì để poll sau) rồi `spawnWorker(item, config, wt.path, …)` — **truyền thẳng đường dẫn worktree cho worker**. Mẫu bàn giao worktree đã có, không phải phát minh | **Rõ — vòng 7** | `src/runner/loop.mjs:938`, `:707` |
+| 59 | **Giá của cha-claim: cần MỘT CỬA VÀO MỚI CHO CON.** Cha claim rồi thì con không chạy `/fgOS:pick <id>` được nữa (item đã `doing`) — cần lối vào kiểu "worktree đã dựng ở `<path>`, vào đó thi công". Ngược lại con-tự-claim **dùng lại `/fgOS:pick` nguyên vẹn** (đúng đường demo `tsk-1sj`) | **Rõ — vòng 7** | `plugins/fgOS/skills/pick/SKILL.md`; hàng 58 |
+| 60 | **`return` VẪN CHẠY VERIFY và block khi đỏ** (`resolveVerifyTimeoutMs('return', …)`, và có hẳn how-to *diagnose-a-blocked-return-from-an-unrelated-verify-failure*). ⇒ tự động approve lá là bỏ một **lượt REVIEW**, không bỏ **BẰNG CHỨNG** | **Rõ — scout vòng 7** | `bin/fgos.mjs:2229-2231`; `docs/how-to/diagnose-a-blocked-return-from-an-unrelated-verify-failure.md` |
+| 61 | **Cổng approve của lá là cổng TRÙNG hạ một tầng**: lá merge vào `fgw/<root>` không bao giờ chạm main (hàng 39); cổng root lên main **muộn hơn và bao quát hơn**, vẫn còn nguyên. Hai cổng bảo vệ cùng một thứ | **Rõ — vòng 7** | hàng 39 + hàng 60 |
+| 62 | **Khuyến nghị autonomy: tự động approve LÁ, giữ cổng ROOT bắt buộc và có người.** Đúng Ship Faster #1 mà không bỏ một lớp bảo vệ thật nào (verify còn, cổng root còn) | **Chưa chốt — tư vấn vòng 7 theo yêu cầu người dùng** | hàng 60/61 |
+| 63 | **Giá thật của khuyến nghị 62 — độ mịn review**, không phải an toàn: người xem **một diff hợp nhất** ở root thay vì N diff nhỏ. Union to thì review kém đi. Giảm nhẹ (chi tiết cho planning): approve của root hiển thị diff **theo từng lá** | **Rõ — vòng 7** | §5 vòng 7 |
+| 64 | **Ngoại lệ duy nhất nên giữ**: risk-keyword ghi đè cứng của `gateBypass` D4 — lá chạm vùng risk vẫn hỏi. Gần như miễn phí, và giữ nhất quán với một quyết định đang khoá thay vì mở một đường tự-động thứ hai không cùng luật | **Chưa chốt — đề xuất vòng 7** | `gate-bypass.mjs:1-14` |
 | 45 | **Decompose sinh ra một ĐỒ THỊ PHỤ THUỘC, tiến trình hỗn hợp tuần tự+song song** — A xong, merge vào cha, B mới fork và dùng code đã merge của A; nhánh độc lập chạy song song merge tuỳ thích; cuối cùng cha nhận hết | **Rõ — người dùng nêu vòng 6** | §5 vòng 6 |
 | 46 | **Harness cho chuỗi tuần tự ĐÃ CÓ ĐỦ, không phải xây.** `claim-port.mjs:158-166` từ chối claim lá còn dep chưa `done` (`ClaimError('deps-not-merged')`), nguyên văn *"forking from `<rootBranch>` now risks missing their content; approve/merge them into `<rootBranch>` first"*. Cộng: `decompose.mjs:992` sinh sẵn `deps` giữa các con · lá fork từ `fgw/<root>` (đã chứa nội dung A) · `frontier` loại item còn dep chưa xong | **Rõ — scout vòng 6** | `src/runner/claim-port.mjs:158-166`; `src/intake/decompose.mjs:992`; `src/state/frontier.mjs` |
 | 47 | **Hai tầng lọc đã đúng chỗ, không chồng nhau**: `frontier` lo **deps** (thứ tự), `computeSchedule` lo **footprint** (đụng file). Nên bộ chọn wave của fan-out B = `computeSchedule` ∩ `children(parent)` — khớp đúng phát hiện vòng 1 (hàng 8/9) | **Rõ — vòng 6** | `graph-metrics.mjs:704`; hàng 46 |
@@ -930,6 +965,111 @@ tạo. Fix A gỡ đúng khoản giữ mà không phải trả lại tính cách
    "gom kết quả về". Câu **ai claim** giờ có thêm dữ kiện: `claim-port`
    là cửa duy nhất và nó **đã** biết từ chối lá có dep chưa merge — nên
    cha claim trước hay con tự claim, cả hai đều đi qua đúng guard đó.
+
+### 2026-08-07 — Vòng 7: "cha merge" là ràng buộc đã có, và nó quyết luôn "ai claim"
+
+**Người dùng:** (1) phạm vi dispatcher — **đủ**. (2) muốn **autonomous
+nhiều nhất có thể** (thiết kế đã duyệt · mới chỉ merge về cha · toàn colab
+nội bộ · hỏi nhiều thì mệt và phạm Ship Faster) nhưng tự nhận chưa đủ dữ
+kiện để quyết, xin tư vấn. (3) cảm nhận **cha claim** — và hỏi thẳng: *khi
+fan-out thì tiến trình cha vẫn còn đó, thậm chí việc merge khi một lá xong
+cũng phải do cha làm đúng không?*
+
+#### (3) — đúng, và nó không phải lựa chọn: code đã cưỡng chế
+
+`bin/fgos.mjs`, case `approve`, **hai guard riêng biệt**:
+
+> *"approve: refusing to run from inside session `<id>` worktree at
+> `<path>` — **approve must land on the main checkout, which a session
+> worktree structurally is not**."*
+>
+> *"approve: refusing to run from `<repoRoot>` — this is a git worktree,
+> not the repository's main working tree, whether or not it was created
+> through `fgos session start`."*
+
+Một agent con sống trong worktree của nó **về cấu trúc không thể tự
+merge**. Merge lá bắt buộc do một bên đứng trên **main checkout** làm.
+Trong một fan-out, bên đó là **cha**.
+
+> Trực giác của anh đúng, và mạnh hơn một cảm nhận: đây là ràng buộc đã
+> được cưỡng chế trong code, không phải một phương án đang cân nhắc.
+
+#### Và điều đó quyết luôn câu "ai claim"
+
+Vì cha **buộc phải sống suốt fan-out** trên main checkout để merge từng lá
+xong, cha đã là một điều phối viên dài hạn **dù muốn hay không**. Nên
+cha-claim **không thêm vai trò mới** — nó gộp một vai vốn bắt buộc tồn
+tại. Lập luận này mạnh hơn mọi lập luận ở vòng 1.
+
+**Phân tích lợi hại đầy đủ:**
+
+| | **Cha claim** (bee) | **Con tự claim** (demo `tsk-1sj`) |
+|---|---|---|
+| Vai trò cha | đã bắt buộc tồn tại (phải merge) ⇒ **không thêm gì** | vẫn phải tồn tại để merge — nên **cũng không tiết kiệm được vai nào** |
+| Con chết giữa chừng | cha biết đã claim gì ⇒ **dọn được** | item kẹt `doing`; `startupReap` **cố ý** bỏ qua claim session ⇒ chờ người + `/fgOS:stale` |
+| Tranh lock | tuần tự trong một tiến trình ⇒ **không tranh** | N tiến trình tranh `main-checkout.lock`, có backoff nên không deadlock nhưng chậm hơn |
+| Guard `deps-not-merged` | cha claim ⇒ **biết ngay** con nào chưa claim được, không bắn nhầm | con bắn ra rồi mới chết ở claim — tốn một vòng spawn vô ích |
+| Code đã có chưa | **có, đúng khuôn**: `claimAndDispatch` (`loop.mjs:938`) rồi `spawnWorker(item, config, wt.path, …)` (`:707`) — bàn giao worktree bằng đường dẫn | có: `/fgOS:pick <id>` nguyên vẹn |
+| **Giá phải trả** | **cần một cửa vào mới cho con** — cha claim rồi thì con không `/fgOS:pick` được nữa (item đã `doing`); cần lối "worktree đã dựng ở `<path>`, vào đó thi công" | **không cần gì mới** — đây chính là đường demo đã chạy thật |
+
+**Khuyến nghị: cha claim.** Điểm quyết định không phải lock cũng không
+phải tốc độ — mà là **cha đã bị ghim vào main checkout suốt fan-out để
+merge**, nên nó là bên duy nhất có thể vừa claim vừa dọn một cách nhất
+quán. Cái giá (một cửa vào mới cho con) là **đúng một mảnh việc**, và
+runner đã chứng minh mẫu bàn giao worktree-bằng-đường-dẫn hoạt động.
+
+#### (2) — tư vấn về autonomy
+
+Anh hỏi thẳng nên tôi trả lời thẳng: **tự động approve LÁ, giữ cổng ROOT
+bắt buộc và có người.**
+
+Ba chỗ tựa, không phải cảm tính:
+
+1. **`return` vẫn chạy verify và block khi đỏ.** `bin/fgos.mjs:2229-2231`
+   resolve verify timeout ngay ở case `return`, và repo có hẳn how-to
+   *diagnose-a-blocked-return-from-an-unrelated-verify-failure*. ⇒ bỏ
+   approve lá là bỏ một **lượt review**, **không** bỏ **bằng chứng**. DoD
+   (ưu tiên #2) không bị đụng.
+2. **Lá merge vào `fgw/<root>`, không bao giờ chạm main** (vòng 5). Một lá
+   xấu bẩn đúng nhánh root, không ra ngoài.
+3. **Cổng root lên main vẫn còn** — muộn hơn, bao quát hơn. Cổng lá và
+   cổng root **bảo vệ cùng một thứ**; cổng lá là **cổng trùng hạ một
+   tầng**.
+
+Ghép ba lại: tự động approve lá **không gỡ một lớp bảo vệ nào**, nó gỡ một
+lớp **lặp**. Đúng lập luận của anh — thiết kế đã duyệt, đây là colab nội
+bộ — và đúng Ship Faster #1.
+
+**Giá thật, nói rõ: độ mịn review, không phải an toàn.** Người sẽ xem
+**một diff hợp nhất** ở root thay vì N diff nhỏ. Union to thì chất lượng
+review giảm — đó là chi phí có thật, chỉ không phải chi phí *an toàn*.
+Giảm nhẹ (chi tiết để planning lo): approve của root hiển thị diff **theo
+từng lá** thay vì một khối.
+
+**Một ngoại lệ nên giữ:** risk-keyword ghi đè cứng của `gateBypass` D4 —
+lá chạm vùng risk vẫn hỏi. Gần như miễn phí, và giữ nhất quán với một
+quyết định đang khoá thay vì mở một đường tự-động thứ hai không cùng luật.
+Bốn tính chất kia của gateBypass (bậc theo tier · cơ học · fail closed) là
+**hình dạng** đáng mượn; ngoại lệ risk là thứ đáng **giữ nguyên**.
+
+#### Ba điểm đã đủ chín để mint D-ID
+
+| Điểm | Nêu vòng | Trạng thái |
+|---|---|---|
+| Fan-out B giữ **con là work item thật** | 3 | đứng 4 vòng, khung case-1/case-2 của người dùng cũng giả định vậy |
+| **Cha claim** | 1 (câu hỏi) → 7 (có lập luận quyết định) | người dùng cảm nhận vậy; giờ có ràng buộc code đứng sau |
+| **Tự động approve lá, giữ cổng root** | 7 | mới nêu — cần một vòng nữa theo luật |
+
+Chưa mint gì. Chờ anh xác nhận.
+
+**Câu hỏi vòng 7:**
+
+1. Chốt **cha claim** chứ? Giá là một cửa vào mới cho con ("worktree đã
+   dựng ở `<path>`, vào đó thi công") thay cho `/fgOS:pick`.
+2. Khuyến nghị autonomy (tự động lá · giữ cổng root · chừa ngoại lệ risk)
+   — nhận nguyên, hay anh muốn bỏ luôn cả ngoại lệ risk?
+3. Chốt luôn **"con là work item thật"** để mint D1 chứ? Nó đã đứng bốn
+   vòng và không còn bị thách thức từ vòng nào.
 
 ## 6. Thiết kế đã chốt {#design}
 
