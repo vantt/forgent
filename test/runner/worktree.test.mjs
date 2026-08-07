@@ -14,6 +14,7 @@ import {
   branchNameFor,
   reclaimOrphanedCheckout,
   provisionDependencies,
+  resyncClaimWorktree,
   WorktreeError,
 } from '../../src/runner/worktree.mjs';
 
@@ -41,6 +42,27 @@ function commitOnWorktree(worktreePath, filename, contents) {
   fs.writeFileSync(path.join(worktreePath, filename), contents);
   execFileSync('git', ['add', filename], { cwd: worktreePath });
   execFileSync('git', ['commit', '-q', '-m', `worker: ${filename}`], { cwd: worktreePath });
+}
+
+/**
+ * Advances `branch` the same way `withMergeEphemeralWorktree` lands a merge
+ * in production (tsk-2cd): a DETACHED checkout at the branch's current tip,
+ * a real commit made there, then a plain `git branch -f` ref update — never
+ * a checkout of `branch` itself, so this never collides with any existing
+ * non-detached checkout of it (e.g. a claim worktree already reattached to
+ * it). Returns the new tip commit.
+ */
+function advanceBranchExternally(repoRoot, branch, filename, contents) {
+  const startTip = execFileSync('git', ['rev-parse', branch], { cwd: repoRoot, encoding: 'utf8' }).trim();
+  const detachedPath = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-worktree-test-detached-'));
+  execFileSync('git', ['worktree', 'add', '--detach', detachedPath, startTip], { cwd: repoRoot });
+  fs.writeFileSync(path.join(detachedPath, filename), contents);
+  execFileSync('git', ['add', filename], { cwd: detachedPath });
+  execFileSync('git', ['commit', '-q', '-m', `external advance: ${filename}`], { cwd: detachedPath });
+  const newTip = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: detachedPath, encoding: 'utf8' }).trim();
+  execFileSync('git', ['branch', '-f', branch, newTip], { cwd: repoRoot });
+  execFileSync('git', ['worktree', 'remove', '--force', detachedPath], { cwd: repoRoot });
+  return newTip;
 }
 
 /** A tiny local package (tsk-2vd) — an absolute `file:` dependency resolves
@@ -539,6 +561,112 @@ test('createClaimWorktree reattaches a DIRTY checkout with its uncommitted work 
   // the same call through the low-level primitive still refuses — the guard
   // it relies on is untouched, the claim wrapper just never reaches it
   assert.throws(() => createWorktree(repoRoot, 'reattach-dirty', { worktreeDir }), WorktreeError);
+
+  removeWorktree(repoRoot, first.path, { force: true });
+});
+
+// --- resync guard: a reattached claim worktree may have fallen behind its
+// own branch (tsk-2cd) — a child merge lands via a plain ref update on a
+// DETACHED checkout, never touching this worktree's own files, so its
+// branch can advance while this checkout sits exactly where it was ---------
+
+test('resyncClaimWorktree is a no-op when the worktree is already at its branch tip', () => {
+  const repoRoot = initTempRepo();
+  const worktreeDir = mkWorktreeDir();
+  const wt = createClaimWorktree(repoRoot, 'resync-same-tip', { worktreeDir });
+  commitOnWorktree(wt.path, 'context.md', '# decisions\n');
+
+  const result = resyncClaimWorktree(repoRoot, wt.path, branchNameFor('resync-same-tip'));
+
+  assert.equal(result.resynced, false);
+  removeWorktree(repoRoot, wt.path, { force: true });
+});
+
+test('createClaimWorktree auto-resyncs a clean reattach whose branch advanced via an external (merge-style) ref update', () => {
+  const repoRoot = initTempRepo();
+  const worktreeDir = mkWorktreeDir();
+  const branch = branchNameFor('resync-clean');
+  const first = createClaimWorktree(repoRoot, 'resync-clean', { worktreeDir });
+  commitOnWorktree(first.path, 'context.md', '# decisions\n');
+
+  const newTip = advanceBranchExternally(repoRoot, branch, 'plan.md', '# plan\n');
+  // sanity: the checkout's own files have NOT changed yet — proves the
+  // external advance really did bypass this worktree
+  assert.equal(fs.existsSync(path.join(first.path, 'plan.md')), false);
+
+  const second = createClaimWorktree(repoRoot, 'resync-clean', { worktreeDir });
+
+  assert.equal(second.path, first.path);
+  assert.equal(second.reused, true);
+  assert.equal(fs.existsSync(path.join(second.path, 'plan.md')), true, 'reattach must resync to the branch\'s current tip');
+  assert.equal(
+    execFileSync('git', ['rev-parse', 'HEAD'], { cwd: second.path, encoding: 'utf8' }).trim(),
+    newTip,
+  );
+
+  removeWorktree(repoRoot, second.path, { force: true });
+});
+
+test('createClaimWorktree refuses to resync (and never resets) a reattach that is both behind its branch AND has real uncommitted work', () => {
+  const repoRoot = initTempRepo();
+  const worktreeDir = mkWorktreeDir();
+  const branch = branchNameFor('resync-dirty-behind');
+  const first = createClaimWorktree(repoRoot, 'resync-dirty-behind', { worktreeDir });
+  commitOnWorktree(first.path, 'context.md', '# decisions\n');
+
+  advanceBranchExternally(repoRoot, branch, 'plan.md', '# plan\n');
+  fs.writeFileSync(path.join(first.path, 'in-progress.txt'), 'not yet committed\n');
+
+  assert.throws(
+    () => createClaimWorktree(repoRoot, 'resync-dirty-behind', { worktreeDir }),
+    WorktreeError,
+  );
+  // the uncommitted work must survive the refusal untouched — never reset
+  // over real work
+  assert.equal(fs.readFileSync(path.join(first.path, 'in-progress.txt'), 'utf8'), 'not yet committed\n');
+  assert.equal(fs.existsSync(path.join(first.path, 'plan.md')), false, 'a refused resync must never partially apply');
+
+  removeWorktree(repoRoot, first.path, { force: true });
+});
+
+test('createClaimWorktree refuses to resync a reattach whose last-synced commit is not an ancestor of the branch\'s current tip (a rewrite/divergence)', () => {
+  const repoRoot = initTempRepo();
+  const worktreeDir = mkWorktreeDir();
+  const branch = branchNameFor('resync-diverged');
+  const first = createClaimWorktree(repoRoot, 'resync-diverged', { worktreeDir });
+  commitOnWorktree(first.path, 'context.md', '# decisions\n');
+  const lastSynced = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: first.path, encoding: 'utf8' }).trim();
+
+  // rewrite the branch to a sibling of lastSynced's parent instead of a
+  // descendant of lastSynced itself -- simulates a history rewrite, not an
+  // ordinary forward merge
+  const parentTip = execFileSync('git', ['rev-parse', `${lastSynced}^`], { cwd: repoRoot, encoding: 'utf8' }).trim();
+  execFileSync('git', ['branch', '-f', branch, parentTip], { cwd: repoRoot });
+  advanceBranchExternally(repoRoot, branch, 'sibling.md', '# sibling\n');
+
+  assert.throws(
+    () => createClaimWorktree(repoRoot, 'resync-diverged', { worktreeDir }),
+    WorktreeError,
+  );
+
+  removeWorktree(repoRoot, first.path, { force: true });
+});
+
+test('createClaimWorktree still reattaches a DIRTY checkout whose branch never moved -- the resync guard is a no-op, not a new refusal (tsk-2cd)', () => {
+  const repoRoot = initTempRepo();
+  const worktreeDir = mkWorktreeDir();
+  const first = createClaimWorktree(repoRoot, 'resync-dirty-not-behind', { worktreeDir });
+  commitOnWorktree(first.path, 'context.md', '# decisions\n');
+  fs.writeFileSync(path.join(first.path, 'in-progress.txt'), 'not yet committed\n');
+
+  // no advanceBranchExternally call here -- the branch tip is exactly what
+  // this worktree was last synced to, so the guard must not even reach its
+  // own dirty check
+  const second = createClaimWorktree(repoRoot, 'resync-dirty-not-behind', { worktreeDir });
+
+  assert.equal(second.path, first.path);
+  assert.equal(second.reused, true);
+  assert.equal(fs.readFileSync(path.join(first.path, 'in-progress.txt'), 'utf8'), 'not yet committed\n');
 
   removeWorktree(repoRoot, first.path, { force: true });
 });
