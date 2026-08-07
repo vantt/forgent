@@ -46,8 +46,15 @@ the fix only widens what counts as "wired," it never narrows it.
 - `src/setup/git-hooks.mjs` — the fix itself (all 3 functions).
 - `test/setup/checks.test.mjs` — new `mainCheckoutHookWired`
   absolute-path case, alongside the existing 4.
-- `test/scripts/install-git-hooks.test.mjs` — new `installGitHooks` and
-  `uninstallGitHooks` absolute-path cases.
+- `test/scripts/install-git-hooks.test.mjs` — new `installGitHooks`
+  absolute-path case (existing coverage: `installGitHooks sets
+  core.hooksPath...`, `...is idempotent...`, etc.).
+- `test/setup/uninstall-wiring.test.mjs` — new `uninstallGitHooks`
+  absolute-path case (existing coverage confirmed by `fgos-validating`'s
+  reality gate — 4 tests: unwire+delete, custom-path-untouched,
+  no-op-when-unset, refuse-when-not-exactly-`.githooks` — plan's original
+  claim that this coverage lived in `install-git-hooks.test.mjs` was
+  wrong; corrected here).
 
 No other files: `checkMainCheckoutHookWired`
 (`src/setup/registrations.mjs:321-326`) and its doctor registration
@@ -67,12 +74,16 @@ does not proceed as a decomposed set of children.
 
 ## Verify
 
-`node --test test/setup/checks.test.mjs test/scripts/install-git-hooks.test.mjs`
+`node --test test/setup/checks.test.mjs test/scripts/install-git-hooks.test.mjs test/setup/uninstall-wiring.test.mjs`
 — must include the new cases named in CONTEXT.md D4:
 - `mainCheckoutHookWired is true when core.hooksPath is an absolute path
   resolving to repoRoot/.githooks` (`checks.test.mjs`)
-- matching absolute-path-equivalence cases for `installGitHooks` and
-  `uninstallGitHooks` (`install-git-hooks.test.mjs`)
+- an absolute-path-equivalence case for `installGitHooks`
+  (`install-git-hooks.test.mjs`)
+- an absolute-path-equivalence case for `uninstallGitHooks`
+  (`uninstall-wiring.test.mjs` — corrected by `fgos-validating`'s reality
+  gate; the plan originally cited `install-git-hooks.test.mjs` for this
+  case, which has no `uninstallGitHooks` coverage at all)
 
 Same command as the item's own `verify` field (CONTEXT.md D4) — this plan
 does not redesign Execute's proof mechanism, per this skill's own "leave
