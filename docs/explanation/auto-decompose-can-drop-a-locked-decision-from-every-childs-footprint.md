@@ -50,3 +50,36 @@ step — writing what actually got built, not what was originally planned —
 is a natural point to catch this, because it's the first point that looks
 at the finished set of children against the original decision list rather
 than at any one child in isolation.
+
+## The gap now has a check, at decompose time
+
+`tsk-1gr` closed the "never actually detected" half of this: `fgos
+decompose` now cross-references every locked decision in the parent's
+`CONTEXT.md` against the combined `footprint` of every child it just
+generated, right when the children are created — not only after the fact
+in a synthesis document like this one. `findUncoveredLockedDecisions`
+(`src/intake/decompose.mjs`) is the mechanism.
+
+This check is deliberately narrower than "does every decision get done":
+it flags only decisions whose own text names a **path-shaped token** —
+a substring that looks like a file path and resolves via
+`fs.existsSync` to a real file already in the repo at decompose time.
+Exactly the `tsk-2ta` shape above: "move `.fgos-runner.json` to
+`.fgos/config.json`" names two real paths, and no child's footprint
+touched either one. A decision that describes new, self-contained
+behavior with no existing-file reference (like `tsk-2ta-1`'s "read and
+merge a global config") is out of scope for this check by construction —
+there's no path to look for, so nothing is flagged.
+
+The check is **advisory, not blocking**. This is a deliberate asymmetry
+with the sibling collision gate (`footprintOverlapAmong`, which checks
+two children's footprints against *each other* and blocks outright on a
+real overlap): that gate is purely mechanical with zero false-positive
+risk, because two children's declared footprints either share a file or
+they don't. This completeness check has to match a decision's *prose*
+against a footprint, which carries real false-positive risk — blocking
+decompose on a wrong guess costs more than the value of catching the gap
+a little earlier. Flagging it advisory, right at decompose instead of
+only ever showing up (or never showing up) in a much later synthesis
+document, is already the improvement; blocking is left as a future
+option if the advisory signal proves trustworthy in practice.
