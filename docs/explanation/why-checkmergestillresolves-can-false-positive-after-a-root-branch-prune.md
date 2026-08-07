@@ -84,3 +84,52 @@ addressed.
 
 Full decision record:
 `docs/history/tsk-577-cleanup-checkmergestillresolves-false-positive/CONTEXT.md`.
+
+## A third case (`tsk-3ft`): a genuine TRUE positive — the branch itself was reset, not pruned
+
+While remediating `tsk-577`'s 14 stranded items, one (`tsk-47e`) still
+failed after the fix: `checkMergeStillResolves` reported the same "no
+longer reachable from HEAD" error, but `tsk-47e` is a standalone item
+(`parent: None`) — its merge check runs directly against `HEAD`, not
+against a `fgw/<rootId>` ref, so neither of `tsk-577`'s two fixes (branch-
+prune prevention, ref-missing tolerance) applies to this case at all.
+
+Direct investigation (`git reflog show fgw/tsk-47e`, `git diff main
+fgw/tsk-47e`, `git merge-base --is-ancestor` in both directions) found
+something different from `tsk-577`'s prune scenario: `fgw/tsk-47e` still
+existed, but its tip commit was genuinely a *different, diverged* history
+from the sha recorded in the item's own `branchHeadAtReturn` — neither an
+ancestor nor a descendant of it. Something (an ordinary-looking commit
+message, "resync branch state files to current main tip") had reset the
+branch to a different point after the item had already returned, with
+nothing keeping the store's recorded sha in sync with that reset.
+
+**This time, `checkMergeStillResolves` was not wrong.** Unlike the prune
+case above, this is exactly the ancestry check doing its documented job —
+catching a genuinely rewritten branch history. What made it safe to
+unblock was a separate, manual confirmation: `git diff main fgw/tsk-47e`
+on the item's own declared paths came back empty — the real content was
+byte-identical to what already landed on `main`, just reachable through a
+different, reset history rather than the original recorded one. The
+"resync" commit itself turned out to be benign housekeeping, not a
+destructive tool; the real gap was that nothing kept
+`branchHeadAtReturn` synchronized when the branch was reset out from
+under it after `return`.
+
+**The fix stays diagnostic, never auto-recovering.** The same
+conservative stance the ref-missing tolerance above took: distinguish
+"branch reset to a divergent-but-possibly-safe history" from "branch
+pruned/genuinely lost" in the failure message, so a person reading it
+knows which investigation to run — but never auto-unblock based on an
+inferred content match. A wrong content-match heuristic silently masking
+a real loss would be worse than the friction this diagnostic-only stance
+costs. `tsk-47e` itself was manually unblocked as part of the same item,
+once its content was directly confirmed safe — not by teaching the check
+to do that confirmation itself.
+
+Whether this same reset-divergence pattern can recur on other `fgw/*`
+branches, and what process produces "resync branch state files" commits
+in the first place, was named as still open — `tsk-47e` was the item
+that surfaced it, not a claim that the scope was fully bounded. Full
+decision record: `fgos show tsk-3ft` (`docsRef` not filed as a separate
+`docs/history/` doc for this item).
