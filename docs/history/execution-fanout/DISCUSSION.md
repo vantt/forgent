@@ -5,6 +5,36 @@
 
 ## 1. Trạng thái hiện tại
 
+**Vòng 6 (2026-08-07) — harness cho chuỗi tuần tự ĐÃ CÓ ĐỦ; thứ thiếu
+đúng bằng `tsk-umc`.** Người dùng mô tả cấu trúc thật của decompose: một
+**đồ thị phụ thuộc**, tiến trình hỗn hợp tuần tự + song song — A xong,
+merge vào cha, rồi B mới fork và dùng code đã merge của A; nhánh không phụ
+thuộc chạy song song, merge tuỳ thích; cuối cùng cha nhận hết. Và: **tiến
+trình này không cần hỏi người** vì mọi hình thái thiết kế đã chốt ở các
+khâu trước.
+
+Scout: **toàn bộ cấu trúc đó đã được mô hình hoá VÀ cưỡng chế rồi.**
+`claim-port.mjs:158-166` từ chối claim một lá còn dep chưa `done` với lỗi
+`deps-not-merged`, nói thẳng *"forking from `<rootBranch>` now risks
+missing their content; approve/merge them into `<rootBranch>` first"* —
+đúng kịch bản A-trước-B. `decompose.mjs:992` đã sinh sẵn `deps` giữa các
+con. `frontier` lọc dep chưa xong, `computeSchedule` lọc footprint — hai
+tầng đã đúng chỗ. **Thiếu duy nhất bộ dispatcher chạy phần song song đồng
+thời — đúng bằng `tsk-umc`.**
+
+Về "không cần hỏi người": `gate-bypass.mjs` đã tự động hoá **cổng thiết kế**
+(exploring/planning) nhưng **cố ý không đụng** `approve`. Nên lượt người
+duy nhất còn lại trong một fan-out chính là **approve từng lá** — đúng nửa
+sau của Fix A, giờ có thêm lý lẽ của người dùng đứng sau.
+
+Về câu hỏi phụ (wave không đụng file thì cần worktree riêng không): trả
+lời ở §5 vòng 6 — footprint là **tự khai, không cưỡng chế**; và chính yêu
+cầu A-merge-rồi-B-fork ở trên **đòi phải có nhánh riêng** mới thực hiện
+được. Chi phí anh cảm thấy nằm ở **thời gian giữ** (TTL 7 ngày), không ở
+**việc tạo** (0.18s/20MB) — Fix A gỡ đúng chỗ đó mà không phải bỏ cách ly.
+
+Người dùng **chưa chốt** (còn mảnh chi tiết chưa soi). Chưa mint D-ID nào.
+
 **Vòng 5 (2026-08-07) — người dùng đặt trục đúng: ĐƠN VỊ MERGE.** Không
 phải "mảnh có cần rollback riêng không" (trục tôi đề vòng 2) mà: **đơn vị
 merge cuối cùng là cha hay là từng con?** Case 1 (phần lớn) — chia để chạy
@@ -172,6 +202,17 @@ chuyện gì xảy ra khi một worker chết giữa chừng.
 | 19 | Phép thử tách ca (2) khỏi ca (3) **không phải "việc to hay nhỏ"** mà là: *mảnh này có cần ranh giới rollback/verify riêng không?* — cơ học, đo được. Còn "có đáng thành work item không" là cảm giác | **Chưa rõ — đề xuất vòng 2** | §5 vòng 2 |
 | 20 | Ca (2) thuộc phạm vi `tsk-umc` hay là item riêng? Tiền lệ đã có: hàng 39 của rubric đẩy ô review-class ra ngoài vì *"không liên quan gì tới fan-out"* | **Chưa rõ** | `fanout-and-delegation-rubric` §3:39 |
 | 21 | **Động cơ thật của đề xuất là NHIỄU DANH SÁCH, không phải chi phí hành chính** — người dùng nói thẳng vòng 3. Hai bài toán khác hẳn nhau, và bài nhiễu danh sách chưa từng được đo | **Rõ** | §5 vòng 3 |
+| 45 | **Decompose sinh ra một ĐỒ THỊ PHỤ THUỘC, tiến trình hỗn hợp tuần tự+song song** — A xong, merge vào cha, B mới fork và dùng code đã merge của A; nhánh độc lập chạy song song merge tuỳ thích; cuối cùng cha nhận hết | **Rõ — người dùng nêu vòng 6** | §5 vòng 6 |
+| 46 | **Harness cho chuỗi tuần tự ĐÃ CÓ ĐỦ, không phải xây.** `claim-port.mjs:158-166` từ chối claim lá còn dep chưa `done` (`ClaimError('deps-not-merged')`), nguyên văn *"forking from `<rootBranch>` now risks missing their content; approve/merge them into `<rootBranch>` first"*. Cộng: `decompose.mjs:992` sinh sẵn `deps` giữa các con · lá fork từ `fgw/<root>` (đã chứa nội dung A) · `frontier` loại item còn dep chưa xong | **Rõ — scout vòng 6** | `src/runner/claim-port.mjs:158-166`; `src/intake/decompose.mjs:992`; `src/state/frontier.mjs` |
+| 47 | **Hai tầng lọc đã đúng chỗ, không chồng nhau**: `frontier` lo **deps** (thứ tự), `computeSchedule` lo **footprint** (đụng file). Nên bộ chọn wave của fan-out B = `computeSchedule` ∩ `children(parent)` — khớp đúng phát hiện vòng 1 (hàng 8/9) | **Rõ — vòng 6** | `graph-metrics.mjs:704`; hàng 46 |
+| 48 | ⇒ **Thứ thiếu duy nhất là bộ dispatcher chạy phần song song đồng thời** — đúng bằng phạm vi `tsk-umc`, không hơn. Mô hình, cưỡng chế thứ tự, topology nhánh: đủ cả | **Rõ — vòng 6** | hàng 46/47 |
+| 49 | **"Không cần hỏi người" — fgOS đã tự động hoá cổng thiết kế, cố ý chừa `approve`.** `gate-bypass.mjs` auto-approve *"fgos-exploring's 'Approve CONTEXT.md?', fgos-planning's 'Approve work shape?'"*, và *"Never touches the `awaiting-human` park"*; không chỗ nào đụng `approve`. ⇒ lượt người duy nhất còn lại trong một fan-out là **approve từng lá** = đúng nửa sau Fix A | **Rõ — scout vòng 6** | `src/state/gate-bypass.mjs:1-14` |
+| 50 | **Nếu tự động hoá approve của lá thì phải theo hình dạng gateBypass đã có**, không phải "không bao giờ hỏi": có **bậc** theo tier (`LEVELS = ['off', ...TIERS]`) · **cơ học** chứ không đọc-độ-tự-tin (D2: zero open items) · **fail closed** (mọi lỗi đọc rơi về an toàn nhất) · **risk-keyword ghi đè cứng** (D4). Đây là tiền lệ ràng buộc, không phải gợi ý | **Rõ — vòng 6** | `gate-bypass.mjs:1-14,23-26` |
+| 51 | **Footprint là TỰ KHAI, không cưỡng chế** — `footprintOverlapAmong` là *"advisory, never blocking"*, và *"an item with no declared footprint never conflicts with anything"*. Nên "wave không đụng file" là **lời khai của agent**, không phải sự thật đã kiểm | **Rõ — vòng 6** | `src/state/graph-metrics.mjs:690-701` |
+| 52 | **Dựa vào footprint tự khai để bỏ cách ly = đúng thứ `D8` của two-layer-dispatch đã bác** cho một field khác: *"một cờ tự khai là chỗ DUY NHẤT agent tự phong, mà người viết cờ chính là agent muốn qua cổng"*. Cùng một sai lầm, hạ xuống tầng an toàn | **Rõ — vòng 6** | `two-layer-dispatch/DISCUSSION.md` §4 D8 |
+| 53 | **Kể cả file thật sự rời nhau, một cây làm việc vẫn không an toàn**: chung git index (race `add`/`commit`) · một HEAD ⇒ mọi con commit lên cùng một nhánh, mất quy trách nhiệm + rollback từng con · **verify chạy trong cây** — footprint nói về file được SỬA, không nói về code CHẠY lúc verify; hai con sửa file rời nhau vẫn chạy chung một test suite trên cùng một cây nửa-viết | **Rõ — vòng 6** | §5 vòng 6 |
+| 54 | **Bỏ worktree mâu thuẫn với chính yêu cầu ở hàng 45**: "A merge vào cha xong rồi B mới fork và dùng code của A" **đòi phải có nhánh riêng** — không có nhánh per-con thì không có bước "merge A vào cha" để B đứng lên | **Rõ — vòng 6** | hàng 45 + hàng 46 |
+| 55 | **Chi phí worktree nằm ở THỜI GIAN GIỮ, không ở việc TẠO**: tạo 0.18s + 20MB (đo vòng 3); đắt là 20MB × N × **7 ngày** vì TTL (đo vòng 4). Fix A gỡ đúng khoản giữ mà không phải bỏ cách ly ⇒ trực giác của người dùng đúng chỗ đau, sai chỗ chữa | **Rõ — vòng 6** | hàng 25 + hàng 32 |
 | 38 | **Trục đúng là ĐƠN VỊ MERGE, không phải "cần rollback riêng không"** (trục tôi đề vòng 2, bỏ). Case 1 (phần lớn): chia để chạy song song, **merge ở cha**. Case 2: con dần thành item độc lập liên kết như epic, **con merge riêng** | **Rõ — người dùng nêu vòng 5** | §5 vòng 5 |
 | 39 | **Case 1 đã được implement sẵn.** `resolveRoot` (`root-affinity.mjs:66-78`) chỉ đi theo `parent`; lá fork từ `fgw/<root>`, và `approve` của lá merge vào `fgw/<root>` **không phải main** — comment nguyên văn *"leaf→root and root→main share this one branch path"*. Đơn vị merge đã là cha | **Rõ — scout vòng 5** | `src/runner/root-affinity.mjs:66`; `bin/fgos.mjs` case `approve`, nhánh `rootId !== id`; `claim-port.mjs:130-160` |
 | 40 | **Hệ quả cho hàng 37 (TTL 7 ngày để làm gì)**: với LÁ, lý lẽ an toàn yếu hẳn — nhánh lá **thừa ngay sau khi merge vào `fgw/<root>`**, vì nội dung đã nằm trên một nhánh **sống lâu hơn nó** (root chưa merge lên main). Đây là lý lẽ từ topology, không còn là phỏng đoán như vòng 4. Vẫn phải đọc lý do gốc trước khi sửa | **Gần rõ — vòng 5** | hàng 39 + `bin/fgos.mjs:1203-1209` |
@@ -769,6 +810,126 @@ Chưa mint — người dùng nói rõ chưa chốt. Chờ một câu xác nhậ
    có khớp cái anh gặp không?
 3. Chốt "fan-out B giữ con là work item thật" (§3 hàng 43) để mint D1 chứ?
    Chốt xong thì ba câu vòng 1 trở lại đường chính và `tsk-umc` đi tiếp.
+
+### 2026-08-07 — Vòng 6: harness đã có đủ, và câu hỏi worktree
+
+**Người dùng, bốn ý:** (1) con merge cha là đúng, nhưng chưa rõ đã có
+harness chưa; (2) decompose thật ra sinh **một đồ thị phụ thuộc** — tuần
+tự chỗ cần (A merge vào cha rồi B mới dùng code của A), song song chỗ
+không phụ thuộc, cuối cùng cha nhận hết; (3) **tiến trình này không cần
+hỏi người** — thiết kế đã chốt ở khâu trước, đây là chỗ agent tự biến task
+thành chiến lược nhanh nhất; (4) bàn riêng, không phủ định: nếu đã có
+thuật toán tính parallel-wave thì file không đụng nhau — **không đụng thì
+có cần worktree riêng không?**
+
+#### (1)+(2) — harness đã có ĐỦ. Thiếu đúng bộ dispatcher.
+
+`src/runner/claim-port.mjs:158-166`:
+
+```js
+if (isolate && isLeaf) {
+  const unmergedDeps = (item.deps ?? []).filter((dep) => !isResolvedStatus(view.work[dep]));
+  if (unmergedDeps.length > 0) {
+    throw new ClaimError('deps-not-merged',
+      `leaf "${id}" has dep(s) not yet status:done — ${unmergedDeps.join(', ')} — `
+    + `forking from "${rootBranch}" now risks missing their content; `
+    + `approve/merge them into "${rootBranch}" first.`);
+  }
+}
+```
+
+Đây **đúng nguyên văn kịch bản của anh**: B không claim được chừng nào A
+chưa `done` (= chưa merge vào `fgw/<root>`); và khi B claim được, nó fork
+từ `fgw/<root>` — nhánh **đã chứa** nội dung A.
+
+Ghép đủ bốn mảnh, cả đồ thị đã sống:
+
+| Mảnh | Ở đâu |
+|---|---|
+| decompose sinh `deps` giữa các con | `decompose.mjs:992` — `deps: child.deps.map(i => childIds[i])` |
+| item còn dep chưa xong bị loại khỏi frontier | `frontier.mjs` |
+| lá còn dep chưa merge **bị từ chối claim** | `claim-port.mjs:158-166` |
+| lá fork từ `fgw/<root>`, approve merge ngược vào đó | `claim-port.mjs:130-160`; `bin/fgos.mjs` nhánh `rootId !== id` |
+
+Và hai tầng lọc **không chồng nhau, đã đúng chỗ**: `frontier` lo **thứ tự**
+(deps), `computeSchedule` lo **đụng file** (footprint). Nên bộ chọn wave
+của fan-out B = `computeSchedule` ∩ `children(parent)` — khớp đúng phát
+hiện vòng 1.
+
+> **Kết luận: mô hình có, cưỡng chế thứ tự có, topology nhánh có. Thiếu
+> duy nhất bộ dispatcher chạy phần song song đồng thời — đúng bằng
+> `tsk-umc`, không hơn một chữ.**
+
+#### (3) — fgOS đã tự động hoá cổng thiết kế, cố ý chừa `approve`
+
+`src/state/gate-bypass.mjs:1-14` nói rõ phạm vi: auto-approve *"fgos-
+exploring's 'Approve CONTEXT.md?', fgos-planning's 'Approve work shape?'"*,
+và *"Never touches the `awaiting-human` park"*. Không dòng nào đụng
+`approve`.
+
+Tức lập luận của anh — *thiết kế đã chốt ở các khâu trước nên không cần hỏi
+lại* — **chính là phạm vi gateBypass đã tự nhận**. Lượt người duy nhất còn
+sót trong một fan-out là **`approve` từng lá**. Đúng nửa sau của Fix A.
+
+**Nhưng nếu tự động hoá nó thì phải theo hình dạng gateBypass đã đặt**, chứ
+không phải "không bao giờ hỏi":
+
+- **có bậc** theo tier (`LEVELS = ['off', ...TIERS]`)
+- **cơ học**, không đọc-độ-tự-tin (D2: zero open items)
+- **fail closed** — mọi lỗi đọc rơi về an toàn nhất
+- **risk-keyword ghi đè cứng** (D4), thắng cả hai trục trên
+
+Đây là tiền lệ ràng buộc, không phải gợi ý. Một cổng lá tự động mà không
+mang bốn tính chất này là mở rộng quyền, không phải tái dùng cơ chế.
+
+#### (4) — worktree: câu hỏi hay, ba lớp trả lời
+
+**Lớp 1 — footprint là TỰ KHAI, không phải sự thật đã kiểm.**
+`graph-metrics.mjs:690-701` nói thẳng: `footprintOverlapAmong` là
+*"advisory, never blocking"*, và *"an item with no declared footprint never
+conflicts with anything"*. Nên "wave không đụng file" là **lời khai của
+agent viết ra item**, không phải kết quả kiểm chứng.
+
+Dựa vào lời khai đó để **bỏ cách ly** chính là thứ `D8` của
+two-layer-dispatch đã bác cho một field khác: *"một cờ tự khai là chỗ DUY
+NHẤT agent tự phong, mà người viết cờ chính là agent muốn qua cổng."* Cùng
+một sai lầm, chỉ hạ xuống tầng an toàn — nơi giá của việc sai cao hơn.
+
+**Lớp 2 — kể cả file thật sự rời nhau, một cây vẫn không an toàn.**
+
+| Vấn đề | Vì sao footprint không cứu được |
+|---|---|
+| chung git index | hai con `git add`/`commit` đồng thời là race, không liên quan file nào bị sửa |
+| một HEAD | mọi con commit lên cùng một nhánh ⇒ mất quy trách nhiệm và rollback từng con |
+| **verify chạy trong cây** | footprint nói về file **được SỬA**, không nói về code **CHẠY lúc verify**. Hai con sửa file rời nhau vẫn chạy chung một test suite, trên một cây đang nửa-viết |
+
+Lớp thứ ba là lớp giết: hai con hoàn toàn không đụng file của nhau vẫn có
+thể làm hỏng verify của nhau.
+
+**Lớp 3 — và nó mâu thuẫn với chính yêu cầu (2) của anh.**
+"A merge vào cha xong rồi B mới fork và dùng code đã merge của A" **đòi
+phải có nhánh riêng**. Không có nhánh per-con thì không tồn tại bước "merge
+A vào cha" để B đứng lên. Bỏ worktree là bỏ luôn chuỗi tuần tự vừa mô tả.
+
+**Nhưng trực giác của anh đúng chỗ đau — chỉ sai chỗ chữa.** Đo lại hai số
+đã có: **tạo** worktree = 0.18s + 20MB (vòng 3); **giữ** worktree = 20MB ×
+N × **7 ngày** (vòng 4). Cái đắt là **thời gian giữ**, không phải việc
+tạo. Fix A gỡ đúng khoản giữ mà không phải trả lại tính cách ly.
+
+**Câu hỏi vòng 6:**
+
+1. Harness chuỗi tuần tự đã có đủ (hàng 46) — vậy `tsk-umc` thu về đúng
+   **bộ dispatcher**: chọn wave = `computeSchedule` ∩ children, bắn N
+   Agent, đợi, lặp wave sau. Phạm vi đó **đủ chưa, hay còn thiếu gì** anh
+   đang thấy?
+2. Approve lá tự động theo hình dạng gateBypass (có bậc · cơ học · fail
+   closed · risk ghi đè) — chấp nhận ràng buộc đó chứ, hay anh muốn thẳng
+   "fan-out không bao giờ hỏi"?
+3. Ba câu vòng 1 giờ mới là chỗ nghẽn thật: **ai claim** · bộ chọn wave
+   (đã rõ hình dạng: `computeSchedule` ∩ children, bỏ `selectWave`) ·
+   "gom kết quả về". Câu **ai claim** giờ có thêm dữ kiện: `claim-port`
+   là cửa duy nhất và nó **đã** biết từ chối lá có dep chưa merge — nên
+   cha claim trước hay con tự claim, cả hai đều đi qua đúng guard đó.
 
 ## 6. Thiết kế đã chốt {#design}
 
