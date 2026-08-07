@@ -15,6 +15,17 @@ only affects the Claude Code plugin surface (the `/fgOS:*` skills you run
 inside a Claude Code session) — it is unrelated to the `fgos`/`fgos-runner`
 npm binaries, which install through the normal npm distribution path.
 
+**`fgos setup` alone now closes this gap too.** `setup` runs every
+registered doctor fix unconditionally as part of the same run — the
+identical `runFixes()` call `doctor --fix` makes, with no separate
+command and no confirmation prompt (consistent with `setup`'s existing
+"acts and then reports" contract: it already never asked before writing
+shell-rc lines or config defaults, so gating this one fix behind a prompt
+would have been new, inconsistent behavior for this verb). A fresh
+project that only ever runs `fgos setup` gets the plugin installed
+automatically — the manual steps below are for confirming the state, or
+for fixing it later without re-running all of `setup`.
+
 ## Steps
 
 1. **Run the check.**
