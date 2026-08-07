@@ -83,3 +83,37 @@ a little earlier. Flagging it advisory, right at decompose instead of
 only ever showing up (or never showing up) in a much later synthesis
 document, is already the improvement; blocking is left as a future
 option if the advisory signal proves trustworthy in practice.
+
+## Follow-up fixes (`tsk-gio`): the check itself had gaps
+
+An independent code review after `tsk-1gr` merged found three real bugs
+in `findUncoveredLockedDecisions`'s own implementation — none of them
+changed the advisory-vs-blocking design above, all of them made the check
+actually catch what it was built to catch:
+
+- **Repo-root dotfiles were silently exempted.** `PATH_TOKEN_PATTERN`
+  (the regex that spots a path-shaped token in a decision's prose) missed
+  a leading dot on a bare repo-root filename — exactly the `tsk-2ta` case
+  this check exists for: `.fgos-runner.json` lost its leading `.` when
+  matched, `fs.existsSync` then failed to find the (differently-named)
+  file, and the decision was silently treated as "no path referenced" —
+  the exact silent-miss failure mode this whole mechanism exists to
+  prevent, reproduced inside the mechanism itself.
+- **No `try/catch` around the new advisory `addDecision` call.** Every
+  other write in `decompose.mjs` around this area (`:685-699`) already
+  follows a try/catch convention specifically so a write-time failure
+  degrades gracefully instead of aborting the whole decompose — the
+  never-blocks stance (D1 above) has to hold even when *recording* the
+  advisory itself fails, not just when the detection logic runs cleanly.
+  An unguarded `addDecision` call risked turning an advisory-only check
+  into an accidental hard failure of decompose.
+- **Directory-shaped footprints weren't recognized as covering their own
+  contents.** A footprint entry like `src/` or `test/` is meant to cover
+  every path underneath it, but the coverage check only did exact string
+  matching — a decision naming `src/foo.js` wasn't recognized as covered
+  by a child footprint that declared `src/` rather than the exact file.
+
+Verified with a real command
+(`node --test test/intake/decompose.test.mjs`), not just code review.
+Source: `tsk-gio`, filed as an independent code-review finding after
+`tsk-1gr` merged — `fgos show tsk-gio` has the full record.
