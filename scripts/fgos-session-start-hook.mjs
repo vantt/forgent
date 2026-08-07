@@ -9,11 +9,11 @@
 // rather than blocking or noising up every session opened in this repo.
 
 import os from 'node:os';
-import { resolveRepoRoot, fgosDirFromRoot, resolveLogsDir, resolveSkillRoot } from '../src/runner/paths.mjs';
+import { resolveMainCheckoutRoot, fgosDirFromRoot, resolveLogsDir, resolveSkillRoot } from '../src/runner/paths.mjs';
 import { detectRcFiles } from '../src/setup/shell-rc.mjs';
 
 function main() {
-  const repoRoot = resolveRepoRoot();
+  const repoRoot = resolveMainCheckoutRoot();
   const fgosDir = fgosDirFromRoot(repoRoot);
   const logsDir = resolveLogsDir(fgosDir);
   const skillRoot = resolveSkillRoot();
