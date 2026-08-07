@@ -254,7 +254,7 @@ test(
     // needs to prove the worker branch (executing-stage dispatch, unaffected
     // by this item).
     //
-    // A real `.fgos-runner.json` must exist BEFORE either CLI call: even
+    // A real runner config must exist BEFORE either CLI call: even
     // with an explicit --verdict, `discover`/`decompose`'s own bin/fgos.mjs
     // case still unconditionally calls `ensureRunnerConfigForDir` to resolve
     // `cfg` (unused inside resolveDiscovery/resolveDecompose now, but the
