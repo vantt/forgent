@@ -145,6 +145,46 @@ resolutions in the same handler is exactly how a fix like `--dir` support
 stops covering the whole handler. Full evidence and the locked decisions:
 `docs/history/docs-index-repo-root-fix/CONTEXT.md` (D1).
 
+## A fourth case: `STORE_MISSING_WARNING_VERBS` missing an entry can silently return the WRONG safety answer, not just an empty one
+
+The "read verbs warn" set in step 3 above isn't fixed forever — a verb
+missing from `STORE_MISSING_WARNING_VERBS` doesn't always fail safe with
+an empty-looking view. `tsk-3u2` first found `fgos schedule` itself
+missing from the set (fixed there, and in
+`docs/how-to/compute-a-parallel-dispatch-wave-schedule.md`'s own
+"Update (tsk-3u2)" section). A follow-up review (`tsk-3g5`, filed right
+after `tsk-3u2` merged) found three more verbs with the same gap —
+`gate-bypass`, `doc-sources`, `lock-status` — and one of them is a
+materially worse failure shape than the original:
+
+- **`gate-bypass` from a worktree with no `.fgos/` silently returned
+  `level: "off"`** — while the real main checkout's actual level was
+  `"standard"`. This is not an honest-looking empty result the way a
+  missing store normally reads; it is a **silently wrong safety answer**,
+  confirmed by running the command directly and comparing outputs. A
+  caller trusting the worktree's own answer would believe gate-bypass
+  was disabled when it genuinely was not.
+- **`doc-sources` silently returned `count: 0`** from a worktree — reads
+  exactly like "no other captures are linked to this doc path," the same
+  empty-but-plausible-looking failure shape `docs-index`'s bug (the third
+  case above) already showed.
+- **`lock-status` always reported `"free"`** from a worktree, regardless
+  of the real lock state in the main checkout — another case where the
+  wrong answer looks like a normal, safe-sounding one instead of an
+  obvious error.
+
+All three are `requiresExistingStore: false` verbs (so they don't refuse
+outright like the `requiresExistingStore: true` category above) but were
+simply missing from `STORE_MISSING_WARNING_VERBS`, unlike the already-
+covered read verbs. Fixed by adding all three to that set — the same
+`--dir <mainRoot>` fix already described above applies. The generalized
+lesson: any verb reading state without `requiresExistingStore: true`
+needs a deliberate check that it's either in `STORE_MISSING_WARNING_VERBS`
+or has some other honest way of signaling "this may not be the real
+answer" — omission from that set is not a neutral default, since some
+verbs' own empty/off/free-looking defaults are indistinguishable from a
+genuine, confidently wrong answer.
+
 ## Related
 
 - `docs/decisions/0020-chan-fgos-khoi-worktree-worker.md` — why a linked
@@ -160,3 +200,6 @@ stops covering the whole handler. Full evidence and the locked decisions:
   writes a real file, so it now flags the case.
 - `docs/history/docs-index-repo-root-fix/CONTEXT.md` — the full D1-D4
   decision trail behind the third case above.
+- `docs/how-to/compute-a-parallel-dispatch-wave-schedule.md` — the
+  `fgos schedule` instance of the `STORE_MISSING_WARNING_VERBS` gap that
+  the fourth case above generalizes from.
