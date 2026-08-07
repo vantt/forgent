@@ -183,3 +183,39 @@ disagreement-parks-not-retries stance from the section above stays the
 default; `--force` only ever fires when a caller has already reasoned
 live through the specific disagreement and chooses to proceed anyway,
 with that choice recorded, never inferred.
+
+## `--force` overriding the verdict is not the same as clearing the park it caused
+
+`tsk-nfa` found a real gap in `--force`'s own contract, reproduced live on
+`tsk-4y2`: the *first* `discover` call that hits a verify dispute parks
+the item in `awaiting-human` via `putInAwaiting` (as this doc already
+describes above), correctly. A *second* `discover --force` call on that
+same, now-parked item successfully overrides the verdict and advances the
+item's `stage` — but never touches `work.status`, which stays
+`awaiting-human`. The item ends up mid-stage with a park status still
+attached, and `fgos return`'s own guard then refuses with `work "<id>" is
+"awaiting-human", not "doing" — nothing to return`. The only way out used
+to be a manual `fgos answer` call the person had no signal to expect.
+
+The fix keeps `--force`'s override narrow rather than widening it to also
+clear the park: `discover --force` now refuses outright when the item's
+live `status` is already `awaiting-human`, pointing at `fgos answer <id>
+--text ...` as the resume path, instead of silently advancing stage while
+leaving status inconsistent:
+
+> `discover --force: work "<id>" is already "awaiting-human" -- run "fgos
+> answer <id> --text ..." to resume it before retrying --force.`
+
+The rejected alternative — having `--force` auto-resume the park itself,
+reusing the item's own `statusAtAsk` snapshot the same way `answerAwaiting`
+already does — was rejected specifically because it would need a
+synthetic `answer` string manufactured by `--force` itself to satisfy the
+same FSM requirement `answerAwaiting` enforces, which would blur the audit
+trail (it would look like a person answered the park question when only
+`--force` ran) and bundle two different kinds of override — verify-trust
+and status-park — behind one flag. Status transitions stay exclusively
+behind the existing ask/answer door; the cost is a two-command resume
+(`fgos answer`, then re-run `discover --force`) in exchange for keeping
+the override boundary honest — the same "never silently overridden"
+stance this document already states for the verdict itself, now extended
+to cover the park status a prior dispute round leaves behind.
