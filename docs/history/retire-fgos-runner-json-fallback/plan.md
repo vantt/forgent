@@ -70,12 +70,38 @@ as one piece, in this order:
    update the `config-not-stale` check's registered `description` string
    to stop naming ".fgos-runner.json fallback" (~line 370).
 4. `scripts/project-agents.mjs` — `readRunnerModels()`: replace the direct
-   `fs.readFileSync(path.join(repoRoot, '.fgos-runner.json'))` with a read
-   through `.fgos/config.json` — reuse `readSharedConfig` from
-   `src/config/shared-config-file.mjs` (already returns `{runner: {...}}`
-   shape post-step-1) rather than hand-rolling a second JSON parse here.
-   This is the item's original root bug, closed by construction: there is
-   no longer a second file for it to diverge from.
+   `fs.readFileSync(path.join(repoRoot, '.fgos-runner.json'))` with
+   `readSharedConfig` from `src/config/shared-config-file.mjs` (already
+   returns `{runner: {...}}` shape post-step-1) rather than hand-rolling a
+   second JSON parse here. This is the item's original root bug, closed by
+   construction: there is no longer a second file for it to diverge from.
+
+   **Correction (fgos-validating round 1, FAIL — repo fit / proof
+   surface):** `readRunnerModels(repoRoot)` must NOT be called with the
+   module's own `REPO_ROOT = path.resolve(import.meta.dirname, '..')`
+   (line ~33) for this lookup. `.fgos/` is unconditionally wiped from
+   every freshly-created worktree (ADR0020) — confirmed live:
+   `.fgos/config.json` does not exist in this item's own worktree
+   (`ENOENT`), only at the main checkout. The legacy `.fgos-runner.json`
+   never had this problem because it was a normal git-tracked file that
+   survived worktree creation. `project-agents.mjs` genuinely runs inside
+   disposable `/tmp/fgos-return-*` worktrees during real `npm test` verify
+   runs (`docs/history/worktree-dependency-provisioning/CONTEXT.md`) — so
+   an unfixed naive lookup would silently fall back to `DEFAULT_MODELS` on
+   every such run, defeating the point of reading real config at all, with
+   nothing in today's test suite positioned to catch it (`test/scripts/
+   project-agents.test.mjs` calls `projectAgentMarkdown` directly with an
+   explicit `models` argument — it never exercises `readRunnerModels`/
+   `REPO_ROOT`).
+
+   Fix: pass `resolveRepoRoot()` from `src/runner/paths.mjs` (already
+   exported, already the exact main-checkout-resolving helper
+   `dispatch.mjs` and five other modules use — no new helper) as the root
+   for the `.fgos/config.json` lookup specifically, while
+   `project-agents.mjs`'s own existing `REPO_ROOT` (`import.meta.dirname`-
+   based) stays exactly as-is for locating `agents/`/`.claude/agents/` —
+   those are git-tracked source directories that correctly follow the
+   worktree's own checked-out branch, unlike `.fgos/`.
 5. `.claude/skills/_shared/capacity-dispatch-fallback.md` **and**
    `.agents/skills/_shared/capacity-dispatch-fallback.md` — identical
    edit, both files (confirmed byte-identical, hand-maintained, no
@@ -119,7 +145,7 @@ so there is nothing for it to rank.
 |---|---|---|
 | `readSharedConfig()` legacy branch removed | MEDIUM (impact: 8 upstream, 5 direct) | `npm test` green on `test/config/shared-config-file.test.mjs`, `test/config/global-config.test.mjs`, `test/setup/registrations.test.mjs`, `test/runner/dispatch.test.mjs`, `test/runner/loop.test.mjs` — the 5 depth-1 callers `impact()` named |
 | `legacyRunnerConfigPath` export removed | MEDIUM (impact: 15 upstream across 3 depths) | item's own NEGATIVE verify clause — zero repo-wide hits for the literal string post-change (scoped exclusions per CONTEXT.md) |
-| `project-agents.mjs` direct-read bug closed | LOW (impact: 2 upstream, contained) | `test/scripts/project-agents.test.mjs` green + item's POSITIVE clause `grep -q 'config.json' scripts/project-agents.mjs` |
+| `project-agents.mjs` direct-read bug closed, root resolved via `resolveRepoRoot()` not naive `REPO_ROOT` | LOW (impact: 2 upstream, contained), but a wrong root-resolution is invisible to today's tests (see Approach step 4 correction) | `test/scripts/project-agents.test.mjs` green + item's POSITIVE clause `grep -q 'resolveRepoRoot' scripts/project-agents.mjs && grep -q "runner/paths.mjs" scripts/project-agents.mjs` — pins the specific correct helper/import, not just the string "config.json" (which a broken naive-`REPO_ROOT` implementation would also contain) |
 | Repo-root file deleted (D2) | LOW, but visible | item's POSITIVE clause `test ! -e .fgos-runner.json` |
 | Skill-prose fragment edit (2 identical files) | MEDIUM — prose, not statically provable at runtime | per `docs/how-to/write-verify-for-a-skill-prose-change.md`: POSITIVE (`grep -q 'config.json'` in both files) + repo-wide NEGATIVE is the correct and *sufficient* proof surface for a skill-prose change — no live agy/capacity-dispatch smoke run required as a blocking proof point here (that doc's standing rebuttal to `judgeVerifySemanticCorrectness`'s runtime-comprehension demand) |
 | Doc updates (~15 files) | LOW — prose only | reviewed for accuracy at PR time; `docs.maxLoc` respected; no automated proof beyond that |
@@ -155,23 +181,24 @@ proceeds as itself.
 
 ## Verify
 
-Already locked on the item at `clarify` (discover outcome `clear`,
-2026-08-07T05:04:44Z) — restated here as this plan's authoritative,
-un-split verify:
+Strengthened after `fgos-validating` round 1's FAIL (proof surface): the
+`project-agents.mjs` POSITIVE clause now pins the specific correct
+helper/import, not just the string "config.json":
 
 ```
-npm test && test ! -e .fgos-runner.json && grep -q 'config.json' scripts/project-agents.mjs && grep -q 'config.json' .claude/skills/_shared/capacity-dispatch-fallback.md && grep -q 'config.json' .agents/skills/_shared/capacity-dispatch-fallback.md && ! rg --hidden -l '\.fgos-runner\.json' --glob '!.git' --glob '!node_modules' --glob '!.claude/worktrees/**' --glob '!.fgos/events.jsonl*' --glob '!docs/history/**' --glob '!docs/decisions/**' --glob '!src/intake/decompose.mjs' .
+npm test && test ! -e .fgos-runner.json && grep -q 'resolveRepoRoot' scripts/project-agents.mjs && grep -q "runner/paths.mjs" scripts/project-agents.mjs && grep -q 'config.json' .claude/skills/_shared/capacity-dispatch-fallback.md && grep -q 'config.json' .agents/skills/_shared/capacity-dispatch-fallback.md && ! rg --hidden -l '\.fgos-runner\.json' --glob '!.git' --glob '!node_modules' --glob '!.claude/worktrees/**' --glob '!.fgos/events.jsonl*' --glob '!docs/history/**' --glob '!docs/decisions/**' --glob '!src/intake/decompose.mjs' .
 ```
 
-## Assumptions (unproven, flagged for `fgos-validating`)
+## Assumptions
 
 - The skill-fragment shape note in Approach step 5 (legacy top-level
-  `capacities` → shared file's nested `runner.capacities`) is stated as
-  fact from direct file reads of both JSON files during `fgos-exploring`,
-  not re-verified here — `fgos-validating` should confirm this against
-  the actual files at execution time, since they could have moved between
-  clarify and execute.
+  `capacities` → shared file's nested `runner.capacities`) — **proven** at
+  `fgos-validating` round 1 by reading both `.fgos-runner.json` and the
+  main checkout's `.fgos/config.json` live: confirmed exactly as stated
+  (`capacities` at legacy top level; `runner.capacities` nested in the
+  shared file).
 - `readRunnerModels`'s reuse of `readSharedConfig` (step 4) assumes that
   function's returned shape after step 1 lands is exactly `{runner:
   {models: {...}, ...}}` — same shape it already returns for the
-  shared-file case today. Not re-verified here.
+  shared-file case today. Not re-verified here — remains open for
+  `fgos-validating`'s next pass or for execution itself to confirm.
