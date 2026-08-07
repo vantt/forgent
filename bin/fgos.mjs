@@ -2836,13 +2836,27 @@ async function runVerb(verb, flags, positional, dir) {
           // Ephemeral worktree checked out on fgw/<rootId> (guaranteed to
           // exist by the time a leaf reaches "awaiting-approval" — dispatch-side
           // wiring, cell fan-out-parallel-9) — never the human's own main
-          // checkout. ASSUMPTION (acknowledged, not fixed in this cell):
-          // this races a concurrent approval of a sibling leaf of the same
-          // root, or the runner's own dispatch of that root, since
-          // createWorktree's branch-reuse path force-reclaims any existing
-          // checkout of fgw/<rootId>; low-likelihood under single-operator
-          // P6, D16's per-root merge-mutex lives in the runner's
-          // write-queue, not this human-driven CLI verb.
+          // checkout, and never a literal checkout of fgw/<rootId> itself:
+          // withMergeEphemeralWorktree stands up a DETACHED checkout at the
+          // branch's current tip commit, merges there, then lands the
+          // result via a plain `git branch -f` ref update (worktree.mjs,
+          // docs/history/merge-worktree-reclaim-clobbers-kept-checkout/
+          // CONTEXT.md D1 — this replaces an earlier version of this
+          // comment that attributed the race below to createWorktree's
+          // branch-reuse path force-reclaiming any existing checkout of
+          // fgw/<rootId>; that mechanism no longer runs here). ASSUMPTION
+          // (acknowledged, not fixed in this cell): the ref update itself
+          // still races a concurrent approval of a sibling leaf of the same
+          // root, or the runner's own dispatch of that root — two
+          // concurrent merges both reading the same start tip and
+          // force-moving the branch to their own end commit would silently
+          // lose whichever one loses the race; low-likelihood under
+          // single-operator P6, D16's per-root merge-mutex lives in the
+          // runner's write-queue, not this human-driven CLI verb. A
+          // long-lived claim worktree checked out on fgw/<rootId> falling
+          // behind this same ref update is a separate, guarded concern —
+          // see resyncClaimWorktree (worktree.mjs), which runs when that
+          // worktree is next reattached to.
           //
           // withMergeEphemeralWorktree's own finally (worktree.mjs) removes
           // the checkout on every exit path below (conflict, verify-fail,
