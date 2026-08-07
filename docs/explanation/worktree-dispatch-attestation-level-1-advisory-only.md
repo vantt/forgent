@@ -93,6 +93,41 @@ above) is unchanged by this fix — this only makes the existing advisory
 signal actually reach the right ref and the real `return` path, not a
 scope change.
 
+## Second follow-up (`tsk-x5r`): a real test failure on `main`, and `footprintDiffHits` flagging fgOS's own state files
+
+A second independent review round, right after `tsk-4hl` merged, found
+two more issues — one an active blocker, the other a real false-positive
+in the newly-wired `footprintDiffHits`:
+
+- **`test/runner/loop.test.mjs` was failing on `main` at the time this
+  was found** — a genuine DoD violation (`npm test` must stay green).
+  Its assertion still did a `deepEqual` against the *entire* capacity-
+  dispatch event payload as a fixed literal, unaware that `tsk-4hl` had
+  just added `baseCommit`/`headRef` onto that same payload — the new
+  fields broke the exact-equality check. Fixed by asserting shape
+  instead of exact value: a sha-shaped regex for `baseCommit`, and the
+  real current branch name for `headRef` — resilient to the payload
+  gaining more fields later, the same way the rest of this attestation
+  capture is meant to evolve without breaking every consumer.
+- **`footprintDiffHits` (wired into the `return` verb by `tsk-4hl`) was
+  flagging fgOS's own `.fgos/*` state files as unexpected out-of-
+  footprint changes.** `.fgos/` is genuinely git-tracked, and a
+  concurrent session's own commits to `.fgos/events.jsonl`/
+  `.fgos/state.json` can land inside another item's `doing` window on
+  the shared main-source path — a real, already-solved problem
+  elsewhere: `isWorkingTreeClean` (`merge.mjs`) already exempts exactly
+  this case via `isFgosOnlyStatusLine`, precisely because these files
+  changing concurrently is expected, not a sign of scope creep.
+  `footprintDiffHits` had no equivalent exclusion, so it flagged what
+  `isWorkingTreeClean` already knew to ignore. Fixed by applying the same
+  exclusion. Verified with a real two-direction repro: before the fix,
+  `.fgos/events.jsonl` and `.fgos/state.json` were flagged; after,
+  the same diff came back clean.
+
+Both fixed and verified with real commands
+(`node --test test/runner/loop.test.mjs test/runner/frozen-judge.test.mjs`
+and `node --test test/cli/fgos.test.mjs`), not just code review.
+
 ## Why level 1, and why advisory rather than a gate
 
 Real breakage is already caught by `merge.mjs`'s existing staged
