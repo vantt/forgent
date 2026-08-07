@@ -7,9 +7,18 @@ Flags counted (per `fgos-routing`'s Mode gate): **public contracts**
 shape literally — see D1) and **existing covered behavior**
 (`test/cli/fgos.test.mjs` already tests `list`'s current two modes). 2
 flags → **standard** lane. No auth/authorization/data-model/audit-security/
-cross-platform/multi-domain flags apply; `impact-analysis: full` (GitNexus
-present, freshly checked, no stale-index warning this session) so no weak-
-proof flag either.
+cross-platform/multi-domain flags apply.
+
+`impact-analysis: degraded` — `fgos tool query --capability impact-analysis
+--status present` reports gitnexus `present`, but this session's own Bash
+hook repeatedly surfaced `GitNexus index is stale (last indexed: 251d0b5)`
+against the current HEAD. Per `CLAUDE.md`'s three-way gate, `present` but
+flagged stale is degraded, not full — corrected here from an earlier,
+inaccurate `full` claim (`fgos-validating`'s reality gate). No risk-map row
+below leans on GitNexus blast-radius evidence (each proof point is a new
+test, not an `impact()` call), so this correction does not invalidate any
+row — it is recorded for honesty per the reality-gate dimension, not
+because it gates anything in this item's own scope.
 
 `CONTEXT.md` for this item: `docs/history/execution-fanout/CONTEXT-tsk-4fg.md`
 (D1, D2).
