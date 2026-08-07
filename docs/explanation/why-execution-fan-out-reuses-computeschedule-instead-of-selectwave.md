@@ -163,6 +163,34 @@ finishes" (which would need the 5-cap reinterpreted as a cap on
 *in-flight* count rather than *wave size*); and the exact default tier
 for leaf auto-approval within the existing `gate-bypass` levels scale.
 
+## Implementation (`tsk-66d`): wiring fan-out into the shared anchor-report contract, not a new command
+
+The final integration piece implemented D8's "capability, not entry
+point" design decision directly: the contract for what a caller must do
+with an `anchored-by-open-children` report lives in exactly one place —
+`fgos-coding-driving`'s own `SKILL.md` — and `/fgOS:cook` was made the
+first concrete caller to actually act on it, replacing what had been a
+quick fix of pushing each child id onto the front of a sequential queue.
+
+**This item's own highest-named risk**: `fgos-coding-driving`'s caller
+table lists **five** callers that all read this same contract —
+`/fgOS:cook`, `/fgOS:pick`, and three sweep skills (clarify/planning/
+execution). The item required listing all five explicitly and stating,
+for each one, whether its behavior changed or not — not just fixing
+`/fgOS:cook` and assuming the rest were fine by omission. Four of the
+five inherit the contract but were deliberately **not** modified in this
+item; if `fgos-validating`'s own reality check judged that an oversight
+rather than a real scope boundary, the item's own scope would have had
+to widen — flagged explicitly as an open question in its plan rather
+than silently decided either way.
+
+`scripts/verify-fanout-overlap.mjs` — the script D10's own verify
+command depends on, proving real time-overlapping `doing` windows from
+`.fgos/events.jsonl` — was placed in this same item specifically because
+only once fan-out is actually wired into a real caller does genuine
+overlap exist to measure; the script couldn't have been meaningfully
+written any earlier in the sequence.
+
 ## Implementation (`tsk-ik3`): `computeSchedule` gains an explicit candidate-set parameter
 
 The design above already named a "candidate set" the wave selector
