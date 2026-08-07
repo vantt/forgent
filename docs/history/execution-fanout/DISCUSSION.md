@@ -5,6 +5,34 @@
 
 ## 1. Trạng thái hiện tại
 
+**Vòng 5 (2026-08-07) — người dùng đặt trục đúng: ĐƠN VỊ MERGE.** Không
+phải "mảnh có cần rollback riêng không" (trục tôi đề vòng 2) mà: **đơn vị
+merge cuối cùng là cha hay là từng con?** Case 1 (phần lớn) — chia để chạy
+song song cho nhanh, **merge ở cha**. Case 2 — qua thảo luận con dần thành
+item độc lập liên kết nhau như epic, **con merge riêng**.
+
+Scout ra hai điều:
+
+1. **Case 1 fgOS ĐÃ implement sẵn.** `resolveRoot` (`root-affinity.mjs:66`)
+   đi theo `parent`; lá fork từ `fgw/<root>` và `approve` của lá **merge
+   vào `fgw/<root>`, không phải main** — comment trong `bin/fgos.mjs` gọi
+   thẳng là *"leaf→root and root→main share this one branch path"*. Đơn vị
+   merge đã là cha rồi.
+2. **Case 2 vướng đúng một chỗ**: `parent` đang **gánh hai việc** —
+   (a) lineage/gộp nhóm (`hasOpenDescendant`, `rollup`, epic) và (b)
+   topology merge (fork/merge vào `fgw/<root>`). Case 2 cần (a) **không**
+   cần (b). Bỏ `parent` thì được (b) đúng ý nhưng **mất (a)**.
+
+⇒ Hướng 4 được củng cố và **tách làm hai**, chi phí rất khác nhau:
+**Fix A** (case 1, phần lớn) — chính sách hậu kỳ của lá, và giờ có lý lẽ
+từ topology chứ không phải phỏng đoán: nhánh lá **thừa ngay sau khi merge
+vào `fgw/<root>`** vì nội dung đã nằm trên một nhánh sống lâu hơn nó.
+**Fix B** (case 2) — tách lineage khỏi merge-topology, đụng mô hình cạnh
+của `0012`, và **không cần cho `tsk-umc`**.
+
+Người dùng nói rõ **chưa chốt**. Vẫn chưa mint D-ID nào — nhưng có **một
+điểm đã đủ chín** để mint nếu anh xác nhận (§3 hàng 43).
+
 **Vòng 4 (2026-08-07) — ĐÍNH CHÍNH vòng 3, và người dùng đúng ở cả hai
 vế.** Vòng 3 kết luận "con không phải nguyên nhân messy" dựa trên **một
 lỗi số học của tôi**: câu *"xoá sạch mọi con: 237 → 226, giảm 4.6%"* lấy
@@ -144,6 +172,13 @@ chuyện gì xảy ra khi một worker chết giữa chừng.
 | 19 | Phép thử tách ca (2) khỏi ca (3) **không phải "việc to hay nhỏ"** mà là: *mảnh này có cần ranh giới rollback/verify riêng không?* — cơ học, đo được. Còn "có đáng thành work item không" là cảm giác | **Chưa rõ — đề xuất vòng 2** | §5 vòng 2 |
 | 20 | Ca (2) thuộc phạm vi `tsk-umc` hay là item riêng? Tiền lệ đã có: hàng 39 của rubric đẩy ô review-class ra ngoài vì *"không liên quan gì tới fan-out"* | **Chưa rõ** | `fanout-and-delegation-rubric` §3:39 |
 | 21 | **Động cơ thật của đề xuất là NHIỄU DANH SÁCH, không phải chi phí hành chính** — người dùng nói thẳng vòng 3. Hai bài toán khác hẳn nhau, và bài nhiễu danh sách chưa từng được đo | **Rõ** | §5 vòng 3 |
+| 38 | **Trục đúng là ĐƠN VỊ MERGE, không phải "cần rollback riêng không"** (trục tôi đề vòng 2, bỏ). Case 1 (phần lớn): chia để chạy song song, **merge ở cha**. Case 2: con dần thành item độc lập liên kết như epic, **con merge riêng** | **Rõ — người dùng nêu vòng 5** | §5 vòng 5 |
+| 39 | **Case 1 đã được implement sẵn.** `resolveRoot` (`root-affinity.mjs:66-78`) chỉ đi theo `parent`; lá fork từ `fgw/<root>`, và `approve` của lá merge vào `fgw/<root>` **không phải main** — comment nguyên văn *"leaf→root and root→main share this one branch path"*. Đơn vị merge đã là cha | **Rõ — scout vòng 5** | `src/runner/root-affinity.mjs:66`; `bin/fgos.mjs` case `approve`, nhánh `rootId !== id`; `claim-port.mjs:130-160` |
+| 40 | **Hệ quả cho hàng 37 (TTL 7 ngày để làm gì)**: với LÁ, lý lẽ an toàn yếu hẳn — nhánh lá **thừa ngay sau khi merge vào `fgw/<root>`**, vì nội dung đã nằm trên một nhánh **sống lâu hơn nó** (root chưa merge lên main). Đây là lý lẽ từ topology, không còn là phỏng đoán như vòng 4. Vẫn phải đọc lý do gốc trước khi sửa | **Gần rõ — vòng 5** | hàng 39 + `bin/fgos.mjs:1203-1209` |
+| 41 | **`parent` đang gánh HAI việc**: (a) lineage/gộp nhóm — `frontier.hasOpenDescendant`, `fgos rollup`, cái nhìn epic; (b) **topology merge** — `resolveRoot` quyết lá fork từ đâu và merge vào đâu. Case 1 cần cả hai. **Case 2 cần (a) mà không cần (b)** — và hôm nay không diễn đạt được: bỏ `parent` thì được (b) đúng ý nhưng mất sạch (a) | **Rõ — nêu vòng 5** | `root-affinity.mjs:66-78`; `0012` (deps/parent tách về lưu trữ+ngữ nghĩa, hợp nhất chỉ để cycle-check) |
+| 42 | **Case 2 hôm nay vẫn làm được, chỉ mất phần gộp nhóm** — submit thành item gốc riêng, xâu bằng `deps`/`mergeAfter` (`work.mjs:278-288`, field đã có). Chính `tsk-5kn`/`tsk-umc` là ca case-2 thật: xuất phát từ một câu hỏi fan-out, tách thành hai item gốc độc lập, **không dùng `parent`**. Nên lỗ hổng của case 2 hẹp hơn nó nghe: không phải "không merge riêng được" mà là "**merge riêng thì mất rollup/epic**" | **Rõ — nêu vòng 5** | `tsk-5kn`/`tsk-umc` đều `parent` rỗng |
+| 43 | **Đã đủ chín để mint D-ID nếu người dùng xác nhận**: *fan-out B giữ con là work item thật* — nêu vòng 3, giữ qua vòng 4 (đo lại vẫn đứng), và **chính khung case-1/case-2 của người dùng vòng 5 đã giả định con LÀ item** ở cả hai ca (chỉ khác đơn vị merge). Đứng qua ba vòng không bị sửa | **Chờ xác nhận** | §5 vòng 3/4/5 |
+| 44 | **Fix A và Fix B chi phí rất khác nhau, và Fix B KHÔNG cần cho `tsk-umc`.** Fan-out B chỉ lo *N con chạy đồng thời*; con merge vào root hay lên main là **trục vuông góc** với chuyện chạy song song | **Rõ — nêu vòng 5** | §5 vòng 5 |
 | 22-SAI | ~~**Đo thật: con KHÔNG phải nguyên nhân messy.** Xoá sạch mọi con: 237 → 226, giảm 4.6%~~ — **SAI, đính chính hàng 30**. Lỗi: lấy 11 con *đang sống* vào câu nói về *toàn bộ* con | **BỊ BÁC — vòng 4** | §5 vòng 4 |
 | 30 | **Số đúng: con chiếm 25% danh sách.** open 237 · **open children 59 (25%)** · non-children 178. Xoá sạch mọi con: **237 → 178, giảm 25%**. Trong 59 con đó: 48 nằm trong hàng đợi TTL, 11 sống | **Rõ — đo lại vòng 4** | `.fgos` 2026-08-07 |
 | 31 | **"Rút hàng đợi là xong" cũng SAI.** `cleanup` TTL = **7 ngày** (`DEFAULT_CLEANUP_TTL_DAYS = 7`), và đo ra **0/99 item đã hết hạn** ⇒ không rút được cái nào, **0 worktree** thu hồi được. `retrospective` **không có TTL** ⇒ rút được cả 54. Rút hết những gì rút được ngay: 237 → **183**, không phải → 84 | **Rõ — đo vòng 4** | `src/setup/registrations.mjs:545`; `src/state/retro-pool.mjs:6-10`; đo TTL trên `.fgos` |
@@ -633,6 +668,107 @@ mất ít hơn xoá nhánh root sớm. Nhưng đó mới là suy luận; chưa �
    không phải "để sau", vì fan-out B nhân N lần cái đau này.
 3. Gộp approve ở cấp cha — anh chấp nhận **không xem từng lá** trước khi
    merge chứ? Đây là đổi mức kiểm soát thật, không phải dọn dẹp.
+
+### 2026-08-07 — Vòng 5: trục đúng là ĐƠN VỊ MERGE, và case 1 đã có sẵn
+
+**Người dùng:** chưa chốt, nhưng cảm nhận hướng 4 đúng — và đặt lại trục
+bằng hai ca:
+
+> **Case 1 (phần lớn):** chia nhỏ để đẩy song song cho nhanh, nhưng **đơn
+> vị merge cuối cùng là work item cha**, không phải từng con.
+> **Case 2:** xuất phát từ một cha, nhưng qua thảo luận dần thành các item
+> độc lập vẫn liên kết nhau như một component lớn/epic — khi này **con cần
+> merge riêng**.
+
+Trục này **sắc hơn trục tôi đề ở vòng 2** ("mảnh có cần ranh giới rollback
+riêng không"). Bỏ trục cũ. Trục đúng là **đơn vị merge**.
+
+#### Phát hiện 1 — case 1 fgOS đã implement sẵn, không phải xây
+
+`resolveRoot` (`src/runner/root-affinity.mjs:66-78`) leo **duy nhất theo
+`parent`**:
+
+```js
+const parent = item?.parent;
+if (!parent || !work[parent]) return current;
+current = parent;
+```
+
+Và `approve` của một lá (`bin/fgos.mjs`, nhánh `rootId !== id`) merge vào
+`fgw/<rootId>`, **không phải main**. Comment ngay tại chỗ nói thẳng:
+*"leaf→root and root→main share this one branch path."* `claim-port.mjs`
+khớp đầu kia: lá **fork từ** `fgw/<root>`.
+
+> **Case 1 — "đơn vị merge là cha" — đã là hành vi hôm nay.** Không phải
+> thứ cần thiết kế. Con merge vào nhánh cha; chỉ cha chạm main.
+
+#### Phát hiện 2 — điều này trả lời luôn câu treo ở hàng 37
+
+Vòng 4 tôi để ngỏ: *TTL 7 ngày tồn tại để làm gì, và lá có an toàn hơn
+root không?* — lúc đó mới là suy luận. Giờ topology trả lời:
+
+Ngay sau khi lá merge vào `fgw/<root>`, **nhánh của lá là thừa** — nội
+dung của nó đã nằm trên một nhánh **sống lâu hơn nó** (root chưa merge lên
+main, nhánh root vẫn còn nguyên). Xoá nhánh lá sớm mất **không gì cả**;
+xoá nhánh root sớm mới mất thật.
+
+⇒ Lý lẽ an toàn của TTL 7 ngày **rất yếu với lá, mạnh với root**. Đúng
+hình dạng của Fix A. *(Vẫn phải đọc lý do gốc ở
+`docs/history/work-item-status-delivered-retrospective-cleanup/` trước khi
+sửa — có bằng chứng ủng hộ không đồng nghĩa với được bỏ qua bước đọc.)*
+
+#### Phát hiện 3 — case 2 vướng đúng một chỗ: `parent` gánh hai việc
+
+| `parent` đang làm | Cơ chế | Case 1 cần? | Case 2 cần? |
+|---|---|---|---|
+| **(a) lineage / gộp nhóm** | `frontier.hasOpenDescendant` (cha bị chặn tới khi con xong), `fgos rollup`, cái nhìn epic | có | **có** |
+| **(b) topology merge** | `resolveRoot` ⇒ lá fork từ và merge vào `fgw/<root>` | có | **không** |
+
+Case 2 cần (a) mà không cần (b). **Hôm nay không diễn đạt được** — hai
+việc dính vào cùng một trường.
+
+Nhưng lỗ hổng **hẹp hơn nó nghe**: case 2 vẫn làm được hôm nay bằng cách
+submit thành item gốc riêng, xâu bằng `deps`/`mergeAfter` (field đã có,
+`work.mjs:278-288`). Bằng chứng sống: **`tsk-5kn` và `tsk-umc` chính là
+một ca case-2 thật** — xuất phát từ đúng một câu hỏi fan-out, qua bảy vòng
+thảo luận tách thành hai item gốc độc lập, `parent` rỗng cả hai, merge
+riêng. Nó hoạt động.
+
+Cái mất là **rollup/epic**: hai item đó không gộp nhóm được, không có
+`fgos rollup` chung, không nhìn thấy nhau như một component. Đó mới là
+lỗ hổng thật của case 2 — **không phải "không merge riêng được"**.
+
+#### Hướng 4, chỉnh lại theo trục mới — tách làm hai, chi phí rất khác
+
+**Fix A — case 1 (phần lớn). Chính sách hậu kỳ của lá.**
+Đánh đúng ba khoản đo được ở vòng 4, và giờ có lý lẽ topology:
+- TTL nhận biết lá (lá ngắn/0 — nhánh đã thừa; root giữ 7 ngày)
+- gộp approve ở cấp cha (lá approve vốn là **cổng review**, không phải
+  quyết định merge — quyết định merge thật nằm ở lúc root lên main)
+
+**Fix B — case 2 (thiểu số). Tách lineage khỏi merge-topology.**
+Đụng mô hình cạnh của `0012`, đắt hơn hẳn. Và **không cần cho `tsk-umc`**:
+fan-out B chỉ lo *N con chạy đồng thời*; chuyện con merge vào root hay lên
+main là **trục vuông góc** với chuyện chạy song song.
+
+#### Một điểm đã đủ chín để mint D-ID
+
+*"Fan-out B giữ con là work item thật"* — nêu vòng 3, giữ qua vòng 4 (đo
+lại vẫn đứng dù hai số bị đính chính), và vòng 5 **chính khung case-1/
+case-2 của người dùng đã giả định con LÀ item** ở cả hai ca, chỉ khác đơn
+vị merge. Đứng ba vòng, chưa lần nào bị sửa.
+
+Chưa mint — người dùng nói rõ chưa chốt. Chờ một câu xác nhận.
+
+**Câu hỏi vòng 5:**
+
+1. Case 1 đã là hành vi hôm nay (con merge vào nhánh cha) — **đúng thứ anh
+   mô tả chứ**, hay anh muốn hơn thế (con thậm chí không có nhánh riêng)?
+2. Lỗ hổng case 2 tôi đọc ra là **mất rollup/epic**, không phải mất khả
+   năng merge riêng (`tsk-5kn`/`tsk-umc` đang chạy đúng kiểu đó). Đọc vậy
+   có khớp cái anh gặp không?
+3. Chốt "fan-out B giữ con là work item thật" (§3 hàng 43) để mint D1 chứ?
+   Chốt xong thì ba câu vòng 1 trở lại đường chính và `tsk-umc` đi tiếp.
 
 ## 6. Thiết kế đã chốt {#design}
 
