@@ -125,7 +125,7 @@ Tạo thật lúc `fgos-validating` (bị bỏ sót lúc planning — sửa tạ
 ### P1 — `tsk-2t9` — skill `fgos-researching`
 
 - **Verify**: `npm test && test -f .claude/skills/fgos-researching/SKILL.md && grep -q "^name: fgos-researching$" .claude/skills/fgos-researching/SKILL.md && rg -q --hidden "docs/history/<feature>/RESEARCH.md" .claude/skills/fgos-researching/SKILL.md && rg -q --hidden "WebSearch/WebFetch" .claude/skills/fgos-researching/SKILL.md && ! rg -q --hidden "có biết cái này không" .claude/skills/fgos-researching/SKILL.md`
-- **Footprint**: `.claude/skills/fgos-researching/SKILL.md`
+- **Footprint**: `.claude/skills/fgos-researching/SKILL.md,.agents/skills/fgos-researching/SKILL.md` (mở rộng lúc `fgos-code-implement`: `test/skills/fgos-mirror.test.mjs` đòi mọi `.claude/skills/fgos-*/` mirror byte-identical sang `.agents/skills/fgos-*/`; bản đầu bỏ sót nhánh `.agents/`, `npm test` bắt được thật khi chạy trực tiếp — output nền bị cắt ngắn nên không thấy lỗi, phải chạy lại targeted mới lộ ra)
 - **D-ID**: D4, D5, D8, D2
 
 #### Child plan (`fgos-planning`, mức riêng của `tsk-2t9`)
