@@ -94,6 +94,35 @@ See `docs/explanation/discovery-decompose-reporoot-verify-overwrite.md`
 for the repoRoot bug this complements (not replaces — `readLockedContext`
 stays the fallback for callers that pass no explicit verdict).
 
+## Watch out for: children already created via `fgos add --parent` need `pass-through`, never `decompose --children`
+
+`tsk-1x7` found a real trap for the case where `fgos-planning`'s own
+split step already created real child work items (via `fgos add --parent
+--footprint ...`), and the root item is now at `fgos-validating`'s Gate,
+deciding which decompose verdict to fire.
+
+`decompose <id> --verdict decompose --children [...]` is for the case
+where the children **don't exist yet** — its `addWork` call
+(`decompose.mjs`, `addWork` loop) is unconditional, with no idempotency
+or existing-children check. Firing `decompose --children [...]` for
+children that were already created as real items produces two failures
+at once: **duplicate** positional-id children get created fresh (the
+`--children` JSON blob), while the **real, already-existing** children
+get silently orphaned — their `parent` field still correctly points at
+the root, but the FSM's own decompose-verdict record never references
+them, since the verdict call never named them.
+
+**The correct verdict when children already exist as real items**:
+`decompose <id> --verdict pass-through --reason "<cites the already-
+existing children>"` — never `--verdict decompose --children [...]`.
+`pass-through` says "no split needed *by this call*" — which is true,
+because the split already happened earlier in `fgos-planning`'s own
+step. Real precedent: `tsk-66o` (children `tsk-3c7`/`tsk-2ig` created via
+`fgos add --parent` during planning) fired `pass-through` at its own
+Gate, not `decompose --children` — the same pattern independently
+re-derived and verified for `tsk-1sj`/`tsk-30z`/`tsk-50ic` (the parallel-
+dispatch demo family kept as living evidence).
+
 ## Related
 
 - `docs/history/caller-verdict-protocol-discover-decompose/CONTEXT.md` —
