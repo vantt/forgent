@@ -163,6 +163,36 @@ finishes" (which would need the 5-cap reinterpreted as a cap on
 *in-flight* count rather than *wave size*); and the exact default tier
 for leaf auto-approval within the existing `gate-bypass` levels scale.
 
+## Companion fix (`tsk-4fg`, D3): `fgos list` needed a view lever, not a model change
+
+Fan-out amplifies a real UX gap that already existed before it: real
+usage measured on `.fgos` (2026-08-07) showed `fgos list`'s default view
+rendering 237 rows, of which 59 (25%) were children showing up as flat
+individual rows, and 153 rows (65%) were purely a post-merge cleanup-TTL
+queue with no distinguishing signal — `fgos list` only ever had two
+modes (default, which hides `done`/`wontfix`, and `--all`, which hides
+nothing), no filter by status, no grouping of children under their
+parent, and no way to collapse the TTL queue at all.
+
+This is explicitly a **view** gap, not a model gap: it doesn't touch D4
+of `two-layer-dispatch` or decision 0026 — nothing about what a child
+*is* changes, only how the list surface renders it. Fan-out makes the
+gap materially worse, though, not just theoretically worse: once a
+decompose that splits well routinely produces N children running
+concurrently, N grows sharply, and every one of them would otherwise add
+its own flat row to the default view. This is why this fix was locked to
+merge before or alongside `tsk-umc` itself, rather than as an
+independent, unordered cleanup.
+
+**The fix**: collapse children out of the flat list, replacing them with
+a progress indicator on the parent's own row (e.g. `tsk-38t 3/8`) —
+reusing the same counting `fgos rollup` already computes, just surfaced
+one layer up into the list view itself, rather than inventing a new
+computation. The explicit constraint that made this safe: removing
+children from the flat list *must* be paired with that parent-row
+indicator, or the ability to see cluster progress at a glance is lost
+entirely, not just moved.
+
 Full decision record (D1-D10), the ten-round shaping discussion, and the
 existing infrastructure inventory this design deliberately reused rather
 than rebuilt: `docs/history/execution-fanout/CONTEXT.md` and
