@@ -229,6 +229,35 @@ touching the code: **read the original TTL decision record first** — the
 real evidence justifying a shorter leaf TTL now doesn't mean skipping
 understanding why the global 7-day default existed in the first place.
 
+## Third companion fix (`tsk-1ug`): `fgos rollup` learns to read `targets`, not just `parent`
+
+The last remaining gap for D4's case 2 (an epic-shaped cluster using
+`goalTier` milestone + `targets`, each target merging independently onto
+`main`): `fgos rollup` only ever filtered by `w.parent === id`, so a
+cluster organized via `targets` had no progress view at all —
+`rollup`'s own accounting never looked at that field.
+
+The fix confirmed something already true architecturally rather than
+requiring a new one: `targets` (from `str67-goal-directed-planning` D2)
+is defined as "the set of items this item considers part of it," and
+deliberately never routes through `resolveRoot` the way `parent` does —
+each target keeps its own independent root and merges on its own onto
+`main`. The separation between *lineage* (who considers what part of
+what) and *merge topology* (which branch actually merges where) already
+existed as this second edge type — nothing about decision 0012's typed-
+edge model needed to change. The only real gap was that `rollup` simply
+never read the second edge at all.
+
+Fixed by having `rollup` also read and report on `targets`, alongside
+its existing `parent`-based accounting — giving case-2 clusters the same
+progress visibility case-1 (decomposed, `parent`-linked) clusters already
+had. `docs/how-to/close-out-a-goaltier-milestone-after-all-targets-are-
+done.md` already documented the reader-facing side of this exact
+capability (its own "Watch out for" section on reading
+`targetDoneCount`/`targetTotalCount` separately from the children-based
+`doneCount`/`totalCount` pair) — this item is the implementation behind
+that documented behavior.
+
 Full decision record (D1-D10), the ten-round shaping discussion, and the
 existing infrastructure inventory this design deliberately reused rather
 than rebuilt: `docs/history/execution-fanout/CONTEXT.md` and
