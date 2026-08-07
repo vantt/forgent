@@ -86,6 +86,28 @@ the terminal doing the actual rendering may be further from the process
 than a direct local session. ANSI-16 degrades safely everywhere;
 truecolor does not.
 
+## Implementation (`tsk-64z`): Work Items panel color-coding, guidance not hard-lock
+
+The child item that actually built the Work Items panel (tabs + 7-column
+table, D1/D2/D7/D8 above) added Status-column color-coding as *guidance*,
+explicitly not a hard-locked spec the way the layout decisions above are:
+
+| Status | Color |
+|---|---|
+| `todo` | default (no special color) |
+| `doing` | yellow — reuses the existing convention already in `herdr-plugin/src/ui.rs:155`, not a new color choice |
+| `blocked` / `awaiting-human` | dark red |
+| `awaiting-approval` | green |
+| `delivered` / `retrospective` / `cleanup` / `done` / `wontfix` | dim/gray |
+
+Still ANSI-16 only, per the palette rule above (`tsk-jo1`). Confirmed
+shipped as real code, not just decided: `herdr-plugin/src/fgos.rs`
+(`triage_row_carries_status_stage_blocked_by_blocks_priority`),
+`herdr-plugin/src/app.rs` (`work_items_sorted_by_priority_ascending`),
+and `herdr-plugin/src/ui.rs`
+(`work_items_panel_renders_four_tabs_todo_doing_review_done`) — real,
+named `cargo test` functions, not just a design note.
+
 ## Left deliberately open (implementer's call, not locked here)
 
 - Exact key bindings for switching Work Items tabs and cycling focus
