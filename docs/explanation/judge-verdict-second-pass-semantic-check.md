@@ -219,3 +219,62 @@ behind the existing ask/answer door; the cost is a two-command resume
 the override boundary honest — the same "never silently overridden"
 stance this document already states for the verdict itself, now extended
 to cover the park status a prior dispute round leaves behind.
+
+## Second live contradiction (`tsk-25g`): single-round context wasn't enough, full history was
+
+`tsk-5cf`'s stabilization fix above (single-most-recent-round
+`priorRejection` threading) shipped, but a second live reproduction —
+while working `tsk-5mc` — showed the exact same contradictory-criteria
+failure mode `tsk-4xg` originally exposed, even with the fix active: 7
+consecutive rounds, where round 4 demanded real execution proof over
+structural text-presence checks, round 5 then demanded structural
+text-presence checks *back* over the execution proof round 4 had just
+asked for, round 6 combined both per round 5's own request, and round 7
+still disputed on a narrower point. Two independent live occurrences
+(`tsk-4xg` at 10 rounds, `tsk-5mc` at 7) of the same contradiction shape
+was read as evidence this may be structural to an independent-judge-pass
+design, not a one-off prompt gap — worth one more bounded stabilization
+attempt, then treat `--force` as the accepted permanent answer either way
+(product priority order, `docs/decisions/0025`, ranks Ship Faster over
+further Polish on an already-shipped mitigation).
+
+**Root cause of why the first fix wasn't enough**: `view.gates[id].ask`
+(the slot `resolveDiscovery` threaded into `priorRejection`) is a
+single-most-recent-value slot, not an accumulated history — each new
+round only ever saw the *immediately prior* round's own objection, never
+the full chain before it. A judge with no memory of round 2's stated
+criteria has nothing stopping it from reversing round 2's own position by
+round 4.
+
+**The fix**: extend `priorRejection` from a single last-round string to
+the full accumulated rejection history (`replay.mjs`'s `askHistory` fold,
+threaded through `discovery.mjs`'s `resolveDiscovery`) — the judge now
+sees every round's own prior stated objection, not just the latest one.
+The same gap existed on the decompose path too: `resolveDecompose`'s
+per-child `judgeVerifySemanticCorrectness` call (`decompose.mjs:703`) had
+neither the context-threading half nor the `--force` override at all — a
+child item disputed at decompose time had zero escape path, unlike a
+clarify-stage item. Folded into the same fix rather than filed as a
+separate near-identical follow-up, since it's the same root function and
+the same already-designed fix shape.
+
+**Empirical re-verification, not just a code review**: rather than trust
+the fix by inspection, this item ran two real judge-round reproduction
+attempts through the actual `fgos discover` pathway (`tsk-2wp` and
+`tsk-4bl`, both discarded scratch items used purely to force real judge
+rounds). Neither attempt managed to force a *true* adjacent-round
+reversal synthetically — the failure mode has only ever been observed
+serendipitously on real work, not reproduced to order in either of two
+tries — but the second attempt (`tsk-4bl`, 3 real rounds) showed the
+full-history mechanism actively working as designed: round B's own real
+response explicitly named its objection "same core defect as round 1",
+proving the judge was reading and integrating the accumulated history,
+not just receiving it inertly. Combined with a full green test suite
+(2605 passing), the full-history mechanism was kept as shipped, with the
+residual honest caveat that the exact adjacent-round-reversal shape still
+hasn't been forced under direct test — only observed live, twice, before
+either fix.
+
+Full round-by-round evidence:
+`docs/history/tsk-25g-judge-verify-stabilization-audit/` and
+`docs/history/tsk-5mc-verify-vacuous-pass-multiglob/CONTEXT.md`.
