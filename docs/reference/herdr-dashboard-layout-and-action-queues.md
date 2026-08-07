@@ -161,6 +161,32 @@ Confirmed shipped as real code: `herdr-plugin/src/fgos.rs`
 `herdr-plugin/src/ui.rs` (`process_status_renders_three_separate_boxes`)
 — real, named `cargo test` functions.
 
+## Bug fix (`tsk-1pg`): `NEED ANSWER`/`AFTER DELIVER` boxes were always empty on real data
+
+Found against real data, not a synthetic case: `WorkItemRaw.stage`
+(`herdr-plugin/src/fgos.rs`) was a required field, but real items exist
+without a `stage` field at all (e.g. `tsk-mvp-test-1`, `status:
+wontfix`) — parsing the full `fgos list --all --json` output crashed on
+any such item, which silently emptied both `NEED ANSWER` and
+`AFTER DELIVER`. A second, compounding bug: `refresh_from_fgos` fetches
+each box's data in sequence and overwrites a single shared `last_error`
+field — since `fetch_merge_list` runs last, a successful `MERGE LIST`
+fetch silently wiped out any error `parse_need_answer`/
+`parse_after_deliver` had already recorded, so even the crash above left
+no visible error in the status bar.
+
+Fixed: `stage` changed to `Option<String>` in `WorkItemRaw`, defaulting
+the same way the JS engine already does (`item.stage ?? 'executing'`).
+`refresh_from_fgos` changed so a later successful source can no longer
+overwrite an earlier source's already-recorded `last_error` — first
+error wins, not last fetch. Verified against real data: `node
+bin/fgos.mjs list --all --json --dir .` confirmed `tsk-mvp-test-1` has
+no `stage` field and that `parse_need_answer`/`parse_after_deliver` were
+returning `Err missing field stage` before the fix. Confirmed shipped as
+real code: `need_answer_survives_missing_stage` and
+`last_error_first_error_wins` (`herdr-plugin/src/fgos.rs`), plus a real
+`cargo build --release`.
+
 ## Left deliberately open (implementer's call, not locked here)
 
 - Exact key bindings for switching Work Items tabs and cycling focus
