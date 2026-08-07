@@ -43,10 +43,12 @@ never re-implements a dev-skill's substance inline; it invokes them.
   work happens on the item while it is still `todo`, exactly as the driver
   already handles it.
 - **Reuse, never duplicate.** `fgos-exploring`, `fgos-planning`,
-  `fgos-validating`, and `fgos-coding-driving` (tsk-19j-4) already define
-  the Socratic/shaping/proving/driving substance — invoke them (Skill tool)
-  for their real work; this skill only owns the id QUEUE the driver has no
-  concept of.
+  `fgos-validating`, `fgos-coding-driving` (tsk-19j-4), and `fgos-fanout`
+  (tsk-66d, invoked per `fgos-coding-driving`'s own caller contract on an
+  anchored-by-open-children report) already define the Socratic/shaping/
+  proving/driving/fan-out substance — invoke them (Skill tool) for their
+  real work; this skill only owns the id QUEUE the driver has no concept
+  of.
 - **Never bypass the driver's own claim step with a raw `git checkout
   <fgw/branch>` on the main checkout** (tsk-4hk: `docs/journals/260803-1612-
   main-checkout-direct-branch-checkout-tsk-4hk.md`) — the main checkout is
@@ -88,12 +90,17 @@ never re-implements a dev-skill's substance inline; it invokes them.
    - **`awaiting-approval` reached** — the id is done for this pass. Pop it
      off the queue and continue draining.
    - **anchored by open children** — the driver just reports which child
-     ids are open (it never resolves this itself, by design). Push every
-     one of those child ids onto the FRONT of the queue, ahead of the id
-     that just anchored (which stays on the queue, behind them, to
-     naturally clear once they're all done) — same "children before root"
-     order this step always kept, now driven by the driver's own anchor
-     report instead of `decompose`'s raw `childIds`. Continue draining.
+     ids are open (it never resolves this itself, by design). Follow
+     `fgos-coding-driving`'s own "Caller contract: what to do with an
+     anchored-by-open-children report" section (tsk-66d): invoke the
+     `fgos-fanout` skill with `parentId` = the id that just anchored and
+     `candidateIds` = the reported open child ids, let it run every child
+     concurrently to its own stop, then invoke `fgos-coding-driving` again
+     on that SAME parent id — its anchor clears once every child reaches a
+     terminal status, and this step's queue continues draining from there.
+     This replaces the prior sequential push-children-first behavior: every
+     child an anchor surfaces now runs through `fgos-fanout`'s own wave
+     dispatch instead of one at a time.
    - **a person-shaped stop (`status: awaiting-human`)** — read the parked
      question (`data.work[id]`'s own gate, or `data.discovery["<id>"]`'s
      latest entry) and ask the user directly in this chat. Get a real
