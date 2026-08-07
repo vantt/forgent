@@ -5,6 +5,33 @@
 
 ## 1. Trạng thái hiện tại
 
+**Vòng 3 (2026-08-07) — đo thật, và động cơ thật của đề xuất không đứng
+vững.** Người dùng nói rõ lý do đặt vấn đề: *danh sách task con show ra quá
+nhiều gây messy task-list* — tức bài toán **không phải chi phí hành chính**
+mà là **nhiễu danh sách**; đồng thời tự nêu phản biện (cách hiện tại cho
+phép con được pick và thi công độc lập bởi bất kỳ worker nào) và mời đo để
+cân nhắc **không đổi**.
+
+Đo `.fgos` thật: `fgos list` mặc định hiện **237 dòng**, trong đó **153
+dòng (65%) là hàng đợi TTL sau merge** (cleanup 99 + retrospective 54) —
+việc đã xong, chờ hai loop cơ học rút. Sống thật: 84. **Con của decompose
+chỉ chiếm 11 trong 84 dòng sống — 4.6% của 237.** Xoá sạch mọi con khỏi hệ
+thống thì danh sách đi từ 237 xuống 226. **Con không phải nguyên nhân
+messy.**
+
+Cùng một nguyên nhân giải thích luôn cả đĩa: 104 worktree đang tồn tại
+(~20MB/cái ≈ 2GB), mà `fgos cleanup` chính là thứ gỡ worktree + xoá nhánh
++ đẩy item sang `done` (rơi khỏi view mặc định). **Một hàng đợi chưa rút,
+hai triệu chứng.**
+
+Giá worktree đo thật: **0.18s, 20MB** một cái — không phải điểm nghẽn.
+
+⇒ Hướng đang nghiêng (chưa mint D-ID, chờ giữ qua một vòng nữa): **không
+đổi mô hình**; fan-out B giữ nguyên con-là-work-item-thật. Bài messy giải
+bằng *rút hàng đợi* (không đổi thiết kế) và nếu còn thì bằng *cần gạt
+view* — mà `fgos list` hôm nay chỉ có đúng hai chế độ, không có bộ lọc nào
+(§3 hàng 24). Chi tiết §5 vòng 3.
+
 **Vòng 2 (2026-08-07) — ba câu của vòng 1 vẫn treo, và một trục mới mở
 ra.** Người dùng nêu: có ca children là *vấn đề hoàn toàn độc lập* ⇒ đáng
 thành work item thật; có ca cha chỉ chẻ ra *mảnh việc* giao con ⇒ không
@@ -91,6 +118,15 @@ chuyện gì xảy ra khi một worker chết giữa chừng.
 | 18 | **Giá của ca (2), nói thẳng**: không rollback theo mảnh (undo duy nhất của cha là cả cây) · verify all-or-nothing trên hợp của các mảnh, không quy được lỗi về mảnh nào · mảnh chết giữa chừng để lại file dở **không dấu vết** · tranh git index nếu mảnh nào chạm git. Bốn thứ đó đúng là bốn thứ worktree+branch+verify+merge mua về | **Rõ — nêu vòng 2** | §5 vòng 2 |
 | 19 | Phép thử tách ca (2) khỏi ca (3) **không phải "việc to hay nhỏ"** mà là: *mảnh này có cần ranh giới rollback/verify riêng không?* — cơ học, đo được. Còn "có đáng thành work item không" là cảm giác | **Chưa rõ — đề xuất vòng 2** | §5 vòng 2 |
 | 20 | Ca (2) thuộc phạm vi `tsk-umc` hay là item riêng? Tiền lệ đã có: hàng 39 của rubric đẩy ô review-class ra ngoài vì *"không liên quan gì tới fan-out"* | **Chưa rõ** | `fanout-and-delegation-rubric` §3:39 |
+| 21 | **Động cơ thật của đề xuất là NHIỄU DANH SÁCH, không phải chi phí hành chính** — người dùng nói thẳng vòng 3. Hai bài toán khác hẳn nhau, và bài nhiễu danh sách chưa từng được đo | **Rõ** | §5 vòng 3 |
+| 22 | **Đo thật: con KHÔNG phải nguyên nhân messy.** `fgos list` mặc định 237 dòng → **153 (65%) là hàng đợi TTL sau merge** (cleanup 99 + retrospective 54), sống thật 84, **con sống chỉ 11** (todo 6 · doing 4 · delivered 1). Xoá sạch mọi con: 237 → 226, giảm **4.6%**. Con không sống 73 dòng | **Rõ — đo vòng 3** | `.fgos` state, 2026-08-07; 425 item tổng, 121 có `parent`, 37 parent, trung bình 3.27 con |
+| 23 | **Một hàng đợi chưa rút giải thích cả hai triệu chứng.** `fgos cleanup <id>` gọi `cleanupMergedBranch` ⇒ `reclaimOrphanedCheckout` (`git worktree remove --force`) + `git branch -D`, rồi đẩy item sang `done` (rơi khỏi view mặc định). 99 item pool cleanup ≈ **104 worktree đang tồn tại** (~20MB/cái ≈ 2GB đĩa). Rút hàng đợi trả lại **cả 153 dòng lẫn ~2GB**, không đổi một dòng thiết kế nào | **Rõ — đo vòng 3** | `bin/fgos.mjs:1203-1209`; `src/runner/merge.mjs` `cleanupMergedBranch`; `git worktree list` = 104 |
+| 24 | **`fgos list` hôm nay chỉ có ĐÚNG HAI chế độ**: mặc định (ẩn `done`/`wontfix`) và `--all`. **Không** bộ lọc status, **không** gộp con dưới cha, **không** cách nào ẩn hàng đợi TTL. Đây mới là lỗ hổng thật ứng với cái đau người dùng mô tả — và nó là lỗ hổng **VIEW**, không phải lỗ hổng **MÔ HÌNH** | **Rõ — đo vòng 3** | `bin/fgos.mjs` case `'list'`, chỉ `flags.all` + `flags.id` |
+| 25 | Giá worktree **đo thật**: `git worktree add` + `remove` = **0.18s wall, 20MB đĩa**. Fan-out 4-8 con ≈ 1.5s và 80-160MB, tạm thời, thu hồi lúc cleanup. Không phải điểm nghẽn | **Rõ — đo vòng 3** | đo trực tiếp trên repo này, 2026-08-07 |
+| 26 | **Thứ mô hình cha-tự-spawn-một-luồng đánh mất** (chính người dùng nêu nửa đầu): cha chết ⇒ mất sạch (mảnh không claim, không nhánh, không dấu) · không resume qua phiên/ngày · vô hình với `/fgOS:stale`, `/fgOS:merge-list`, `/fgOS:conflicts`, `/fgOS:graph` (đều khoá theo item thật) · không retry được từng mảnh · không xếp thứ tự merge bằng `mergeAfter`/`deps` | **Rõ** | §5 vòng 3 |
+| 27 | **Vòng 3 làm GIẢM bằng chứng mở lại D4, không tăng.** D9 vế (b) đòi ≥2 ca thật *cha cần con ghi file mà việc đó không đáng thành work item*. Ca số 1 vừa được kiểm tra và **không phải ca thật** — cái đau truy về housekeeping, không về chi phí item con | **Rõ — nêu vòng 3** | §3 hàng 22/23; `two-layer-dispatch` D9 |
+| 28 | Hướng: **không đổi mô hình**, fan-out B giữ con-là-work-item-thật; bài messy giải bằng rút hàng đợi + cần gạt view, và **cần gạt view là item riêng**, không thuộc `tsk-umc` | **Gần rõ (vòng 3)** — chờ giữ qua một vòng trước khi mint D-ID | §5 vòng 3 |
+| 29 | **Cảnh báo về chính phép đo**: đây là ảnh chụp backlog HÔM NAY, khi con phần lớn tạo thủ công/tuần tự. Nếu fan-out B thành đường mặc định thì tốc độ sinh con tăng, con số 11 sẽ lớn lên. Không được tuyên bố thắng dựa trên số cũ — nhưng cách chữa vẫn là view, không phải mô hình | **Rõ — nêu vòng 3** | §5 vòng 3 |
 
 ## 4. Quyết định đã chốt
 
@@ -294,6 +330,140 @@ Cơ học, trả lời được, không phụ thuộc ai đang cầm bút.
 
 *(Ba câu vòng 1 — ai claim · `selectWave` bị loại · "gom kết quả về" nghĩa
 là gì — vẫn treo, chưa được trả lời.)*
+
+### 2026-08-07 — Vòng 3: đo cái đau thật, và nó không nằm ở chỗ đang đào
+
+**Người dùng cung cấp động cơ thật:** *"lý do tôi đặt vấn đề này là gì:
+danh sách task con showup ra quá nhiều gây messy task-list"* — kèm phản
+biện tự nêu (*"cách làm hiện tại có thể được orches tại chính cha và có
+thể được pick và thực hiện độc lập với bất kỳ worker độc lập nào"*) và một
+lời mời thẳng: nếu đo được rằng cách hiện tại không tốn thêm bao nhiêu thì
+**cân nhắc để không thay đổi**.
+
+Đây là đổi khung, không phải làm rõ. Vòng 2 tưởng bài toán là **chi phí
+hành chính**; bài toán thật là **nhiễu danh sách**. Hai thứ đó không cùng
+lời giải — và cái thứ hai chưa từng được đo. Nên vòng 3 đi đo.
+
+#### Đo 1 — con có phải nguyên nhân messy không? Không.
+
+`.fgos` thật, 2026-08-07: 425 item tổng, 121 mang `parent`, 37 parent khác
+nhau, trung bình 3.27 con/parent.
+
+Nhưng `fgos list` mặc định không hiện 425 — nó ẩn `done`/`wontfix`, còn
+**237 dòng**. Bóc 237 đó ra:
+
+| Nhóm | Số dòng | |
+|---|---|---|
+| **Hàng đợi TTL sau merge** (`cleanup` 99 + `retrospective` 54) | **153** | **65%** — việc đã merge xong, chờ hai loop cơ học rút, không có người trong vòng |
+| Sống thật | 84 | todo 61 · awaiting-human 8 · doing 7 · delivered 6 · blocked 1 · awaiting-approval 1 |
+
+Và trong 84 dòng sống đó, **con của decompose chỉ có 11** — todo 6, doing
+4, delivered 1. Dòng sống KHÔNG phải con: 73.
+
+> **Xoá sạch mọi work item con khỏi hệ thống thì danh sách đi từ 237 xuống
+> 226 — giảm 4.6%.**
+
+Con không gây ra messy. 65% nhiễu là **việc đã xong mà không ai rút hàng
+đợi**.
+
+#### Đo 2 — một hàng đợi chưa rút, hai triệu chứng
+
+`git worktree list` = **104 worktree** đang tồn tại, ~20MB/cái ≈ **2GB**.
+Số này gần khớp 99 item trong pool `cleanup`. Không trùng hợp — đọc
+`bin/fgos.mjs:1203-1209`:
+
+```js
+if (domain.worktreeBacked) {
+  const branch = branchNameFor(id);
+  if (branchExists(repoRoot, branch)) {
+    const result = cleanupMergedBranch(repoRoot, branch);   // git worktree remove --force + git branch -D
+  }
+}
+const { event } = moveWork(dir, { id, to: 'done', ... });   // rơi khỏi view mặc định
+```
+
+`fgos cleanup <id>` làm cả ba việc một lúc: gỡ worktree, xoá nhánh, đẩy
+item sang `done`. Nên **cùng một hàng đợi chưa rút vừa tạo 153 dòng nhiễu
+vừa giữ ~2GB đĩa**. Rút nó (`/fgOS:retro-loop` rồi `/fgOS:cleanup-loop` —
+cả hai đã tồn tại, cơ học, FIFO, không cần người) trả lại cả hai, **không
+đổi một dòng thiết kế nào**.
+
+#### Đo 3 — giá worktree, đo chứ không phán
+
+`git worktree add --detach` + `git worktree remove --force` trên chính
+repo này: **0.18s wall, 20MB đĩa**. Fan-out 4-8 con ≈ 1.5s, 80-160MB, tạm
+thời, thu hồi lúc cleanup. Không phải điểm nghẽn.
+
+*(Đính chính nhỏ: vòng 1 tôi nói hạ tầng worktree **đã có sẵn, không phải
+xây** — không nói nó rẻ. Giờ mới có số thật để nói.)*
+
+#### Phản biện của chính người dùng là phản biện đúng, và mạnh hơn người
+dùng nói
+
+*"có thể được pick và thực hiện độc lập với bất kỳ worker độc lập nào"* —
+đúng, và đó chính là thứ mô hình cha-tự-chia-tự-spawn-tự-tổng-hợp-một-luồng
+đánh mất. Cụ thể:
+
+| Mất gì | Vì sao |
+|---|---|
+| **Cha chết = mất sạch** | mảnh không claim, không nhánh, không dấu vết — không có gì để phiên sau nhặt. Con thật: cha chết vẫn để lại N item claim được |
+| **Không resume qua phiên/ngày** | cả cụm sống trong một luồng; đóng máy là hết |
+| **Vô hình với công cụ** | `/fgOS:stale`, `/fgOS:merge-list`, `/fgOS:conflicts`, `/fgOS:graph` đều khoá theo item thật. Mảnh không xuất hiện ở đâu cả |
+| **Không retry từng mảnh** | một mảnh hỏng ⇒ chạy lại cả cha |
+| **Không xếp thứ tự merge** | `mergeAfter`/`deps` là thuộc tính của item |
+
+Trớ trêu: đề xuất sinh ra để **giảm chi phí**, nhưng nó đổi lấy **mất khả
+năng phục hồi song song** — cho một cái messy mà đo ra thì không do con
+gây ra.
+
+#### Lỗ hổng thật, và nó là lỗ VIEW
+
+Cái đau người dùng mô tả có thật. Chỉ là nó nằm ở tầng khác: `fgos list`
+hôm nay có **đúng hai chế độ** — mặc định (ẩn `done`/`wontfix`) và
+`--all`. Không lọc theo status, không gộp con dưới cha, **không cách nào
+ẩn hàng đợi TTL**. Một cái đau về *cách nhìn danh sách* mà cần gạt duy
+nhất là một cờ nhị phân.
+
+Đó là lỗ hổng **view**, không phải lỗ hổng **mô hình**. Vá nó không đụng
+`D4`, không đụng `0026`, không đụng gì trong file này.
+
+#### Hệ quả cho D9
+
+`D9` vế (b) đòi **≥2 ca thật** *cha cần con GHI file mà việc đó không đáng
+thành work item*. Ca số 1 vừa được đem ra kiểm tra và **không phải ca
+thật** — cái đau truy về housekeeping chứ không về chi phí item con. Nên
+vòng 3 **làm giảm** bằng chứng mở lại D4, không tăng. D4 giữ nguyên, đúng
+tinh thần *"đo bằng ca thật chứ không phải cảm giác"*.
+
+#### Cảnh báo về chính phép đo này
+
+Đây là ảnh chụp backlog **hôm nay**, khi con phần lớn được tạo thủ công và
+chạy tuần tự. Nếu fan-out B thành đường mặc định thì tốc độ sinh con tăng
+và con số 11 sẽ lớn lên. Không được tuyên bố thắng dựa trên số cũ. Nhưng
+kể cả khi nó lớn lên, cách chữa vẫn là **cần gạt view**, không phải bỏ
+vòng đời — vì mọi thứ ở bảng "mất gì" bên trên không hề rẻ đi.
+
+#### Khuyến nghị vòng 3
+
+**Không đổi mô hình.** Fan-out B giữ nguyên con-là-work-item-thật. Hai
+việc thay thế, theo thứ tự:
+
+1. **Rút hàng đợi** — `/fgOS:retro-loop` rồi `/fgOS:cleanup-loop`. Không
+   đổi thiết kế. 237 → ~84 dòng, và ~2GB đĩa về.
+2. **Nếu 84 vẫn ồn** — thêm cần gạt view cho `fgos list` (lọc status, gộp
+   con dưới cha). **Item riêng**, không thuộc `tsk-umc`: `tsk-umc` là
+   execution fan-out, một bộ lọc danh sách không phải fan-out. Tiền lệ
+   đúng là hàng 39 của rubric.
+
+**Câu hỏi vòng 3:**
+
+1. Chạy `/fgOS:retro-loop` + `/fgOS:cleanup-loop` ngay bây giờ để xác nhận
+   237 → ~84 chứ? Đó là phép thử rẻ nhất cho cả chẩn đoán này.
+2. Sau khi rút, nếu danh sách vẫn ồn thì cần gạt view nào đúng ý anh: lọc
+   theo status · gộp con dưới cha (một dòng cha + đếm) · cả hai?
+3. Chốt hướng "không đổi mô hình" (§3 hàng 28) chứ? Nếu chốt, ba câu vòng
+   1 (ai claim · `selectWave` bị loại · gom kết quả về) trở lại thành
+   đường chính và `tsk-umc` đi tiếp trên nền con-là-work-item-thật.
 
 ## 6. Thiết kế đã chốt {#design}
 
