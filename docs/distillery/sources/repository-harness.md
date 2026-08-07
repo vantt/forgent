@@ -3,14 +3,14 @@ name: repository-harness
 type: git-repo
 url: https://github.com/hoangnb24/repository-harness
 local: upstreams/repository-harness
-last_analyzed_commit: 9cc306d
-last_analyzed_date: 2026-07-13
+last_analyzed_commit: 0a79bbe
+last_analyzed_date: 2026-08-07
 domains_covered: [harness, skills, hooks, workflow, orchestration, context-memory, planning, quality-gates, docs-style, tooling, config-packaging, repo-layout, safety, self-improvement, ux, testing-evals, routing, integration-contract]
 ---
 
 # Repository Harness — Feature Index
 
-"Repo-level operating system" cho AI-assisted development: policy docs (markdown) + durable layer (SQLite qua Rust CLI). Triết lý: "Coding agents do not only need better prompts. They need better repositories." Maturity: H3–H4 partial, Phase 5 (self-improvement) đang chạy. Inventory gốc: `plans/reports/ref-scan-inventory-260713-1224-harness-*.md`; delta 94 commits (`14e6f10..9cc306d`, 2026-07-13): `plans/reports/ref-scan-delta-260713-1311-harness-*.md`.
+"Repo-level operating system" cho AI-assisted development: policy docs (markdown) + durable layer (SQLite qua Rust CLI). Triết lý: "Coding agents do not only need better prompts. They need better repositories." Maturity: H3–H4 partial, Phase 5 (self-improvement) đang chạy. Inventory gốc: `plans/reports/ref-scan-inventory-260713-1224-harness-*.md`; delta 94 commits (`14e6f10..9cc306d`, 2026-07-13): `plans/reports/ref-scan-delta-260713-1311-harness-*.md`; delta 60 commits (`9cc306d..0a79bbe`, 2026-08-07, chủ đề: crate `harness` Rust clean-architecture thay bash installer, 4 skill mới onboarding/audit/wisdom, Phase 1-5 repository-centered workflow, reproducible core-state): `plans/reports/distill-repository-harness-260807-0935-*.md`.
 
 > **Biến cố lớn @9cc306d (E11, decision 0009):** Symphony (isolated runner, auto mode, PR automation, web board) tách sang repo riêng **github.com/hoangnb24/symphony**; impeccable + intake-griller skills bị gỡ khỏi template (commit b4c3c89). Repo này trở lại thuần "reusable harness template + CLI". Các entry bị ảnh hưởng đánh dấu `Status: moved-to-symphony` / `removed` — giữ lại vì giá trị học vẫn nguyên, và symphony đã vào intake queue làm nguồn mới.
 
@@ -42,8 +42,9 @@ domains_covered: [harness, skills, hooks, workflow, orchestration, context-memor
 
 ### maturity-ladder-h0-h5
 - **What:** Thang trưởng thành H0 (bare) → H5 (self-improving) với tiêu chí kiểm chứng được, file bắt buộc, và chỉ số benchmark từng mức; mỗi Phase roadmap nhắm một bậc.
-- **Where:** `docs/HARNESS_MATURITY.md`, `PHASE2.md`–`PHASE5.md`
+- **Where:** `docs/HARNESS_MATURITY.md` (PHASE2.md–PHASE5.md gốc đã removed, xem Status)
 - **Notable:** tiến hóa harness được đo bằng benchmark ngoài (compliance %, trace quality, lane accuracy), không tự phán.
+- **Status:** PHASE2.md/PHASE5.md removed @0a79bbe (Phase 1-2, 5 hoàn tất; nội dung roadmap SQLite-centric cũ dồn vào `docs/compatibility/phase-*-legacy.md`); PHASE3.md/PHASE4.md cũng removed từ root, thay bằng roadmap repository-centered mới (xem `repository-centered-default-workflow`, `control-plane-freeze-staged-runway` ở domain workflow) + bản cũ lưu `docs/compatibility/phase-3-active-observability-legacy.md`, `phase-4-mechanical-verification-legacy.md`
 - **Seen:** 14e6f10
 
 ### instruction-level-enforcement
@@ -67,6 +68,30 @@ domains_covered: [harness, skills, hooks, workflow, orchestration, context-memor
 - **Notable:** skill = cả một hệ công cụ executable, không chỉ văn bản hướng dẫn; ban-list theo model là ý tưởng độc đáo.
 - **Status:** removed @9cc306d (b4c3c89 — "optional tools must be externally installable and cleanly absent")
 - **Seen:** 14e6f10
+
+### engineering-wisdom-evidence-heuristic-review
+- **What:** Skill explicit-only (`$engineering-wisdom`), review theo heuristic Clean-Code/SOLID/testing/architecture nhưng bắt buộc tách 5 trường riêng cho mỗi finding: Observation (fact có path/symbol cụ thể) / Heuristic (rule + điều kiện áp dụng) / Trade-off (counter-pressure) / Proposed repository-owned enforcement (owner/authority/mechanism/removal condition) / Verification. Cấm tự ý thêm interface/layer/test/linter/coverage-target khi chưa có repository authority.
+- **Where:** `.agents/skills/engineering-wisdom/SKILL.md`, `references/heuristics.md` (8 mục, mỗi heuristic có helps-when/can-hurt/example/verification), `references/sources.md`
+- **Notable:** nguồn cảm hứng (Robert C. Martin) ghi rõ "inspiration, not repository authority" — chặn agent áp style ngoại lai thành luật; tách Observation khỏi Heuristic ngăn quan sát 1 lần bị thăng cấp thành rule phổ quát.
+- **Seen:** 0a79bbe
+
+### onboard-repository-evidence-capsule
+- **What:** Skill khám phá repo lạ (brownfield), dò đúng 1 operational path thật (prerequisites → start → readiness → exercise → evidence → cleanup), phân loại mọi claim Authoritative/Observed/Derived/Decision-required/Unknown, đề xuất patch nhỏ nhất kèm "evidence capsule v2" tự-xác-thực. Patch KHÔNG viết tay diff: build full after-image trong memory, pipe qua `render_patch.py` (đọc before-bytes qua `git show`, tự sinh unified diff + SHA-256). First pass luôn read-only-propose; apply chỉ sau khi user approve từng patch.
+- **Where:** `.agents/skills/onboard-repository/SKILL.md`, `scripts/emit_evidence_bundle.py`, `scripts/render_patch.py`, `references/evidence-capsule-v2.md`, decision 0026
+- **Notable:** "non-materializing pipeline" — không tạo file tạm bao giờ, mọi hash tính trên bytes thật từ git blob, không phải string agent tự gõ; digest ngăn transcription error kinh điển của patch tự tay viết.
+- **Seen:** 0a79bbe
+
+### improve-harness-fresh-rerun-gate
+- **What:** Skill sửa harness (docs/tool/runbook) chỉ khi có baseline lỗi quan sát được thật (không phải 1 lần agent lỡ tay). Trước khi sửa, bắt buộc viết statement dạng "Nếu thêm X tại owner Y, agent mới sẽ Z trên job W, vì cơ chế M. Bằng chứng phản bác:". Sau sửa, bắt buộc chạy lại bằng session hoàn toàn mới, điều kiện giữ nguyên, rồi mới được quyết Keep/Revise/Remove.
+- **Where:** `.agents/skills/improve-harness/SKILL.md`, `docs/templates/harness-improvement.md`
+- **Notable:** "Remove" là 1 trong 3 outcome hợp lệ — thiết kế chống agent tự khen cải tiến của chính mình mà không kiểm chứng độc lập; dogfood thật ghi tại `docs/plans/completed/harness-improvement-engineering-boundary-wisdom.md` (Keep, rerun độc lập tìm thêm 6 rủi ro thật).
+- **Seen:** 0a79bbe
+
+### audit-onboarding-counterexample-pass
+- **What:** Skill audit độc lập (read-only) cho onboard-repository, 3 mode (patch-admissibility / corrected-reissue / full-audit). Mỗi hunk qua "Patch Verification Worksheet" (destination/structural-comparison/atomic-clauses/source-chain/conditions-preserved — mọi ô bắt buộc) rồi "Counterexample Pass" chủ động tìm phản chứng theo 8 loại lỗi cụ thể (điều kiện bị phát biểu vô điều kiện, thiếu teardown bị coi còn sống, sentinel-check bị thổi thành đảm bảo toàn cục, CI command bị đôn thành local guidance...). Ô worksheet thiếu hoặc counterexample chưa chạy → tự động NO_APPLY.
+- **Where:** `.agents/skills/audit-onboarding-proposal/SKILL.md`, `scripts/validate_evidence_capsule.py` (apply patch trong memory, tự tính before/after SHA-256 từ git blob thật)
+- **Notable:** fail-closed by design — không tin lời khai producer, không tự tính điểm hộ; "reviewer confidence" tường minh bị cấm dùng để lấp ô thiếu.
+- **Seen:** 0a79bbe
 
 ## hooks
 
@@ -96,6 +121,24 @@ domains_covered: [harness, skills, hooks, workflow, orchestration, context-memor
 - **Where:** `docs/HARNESS.md` §Spec Lifecycle, decision 0002, `docs/demo/README.md`
 - **Notable:** demo walkthrough 8 bước minh họa trọn lifecycle — tài liệu dạy bằng ví dụ.
 - **Seen:** 14e6f10
+
+### repository-centered-default-workflow
+- **What:** Phase 1-2 (2026-07-20/21) bỏ hẳn SQLite/CLI khỏi default path: 3 câu hỏi độc lập thay 1 lane (durable-memory? human-judgment? validation-proof?); default install co lại đúng 10 file core (`AGENTS.md`, `WORKFLOW.md`, `docs/plans/`, `docs/decisions/` + templates); CLI+DB thành add-on cần flag `--with-cli`/`-WithCli` riêng, không tự kéo theo.
+- **Where:** `docs/plans/completed/phase-1-workflow-decoupling.md`, `docs/plans/completed/phase-2-knowledge-boundary-and-payload-reduction.md`, `docs/product/installation-profiles.md`, decision 0019, 0020
+- **Notable:** đo được bằng số, không chỉ tuyên bố: context bắt buộc giảm 59% (997 vs 2.413 từ); 8/8 rồi 6/6 validation gate pass trước khi activate.
+- **Seen:** 0a79bbe
+
+### control-plane-freeze-staged-runway
+- **What:** Phase 4 (2026-07-21) đóng băng ghi SQLite lifecycle mặc định theo lộ trình 4 bước warn → inventory → require-explicit-intent (`--compatibility-write`) → freeze; TRƯỚC khi khoá, audit toàn bộ write-consumer thật (không đoán) — kết luận: không consumer nào hiện tại chỉ tồn tại trong SQLite; protocol-v1 orchestrator và profile core+CLI được miễn (đã chọn compatibility tường minh).
+- **Where:** `docs/compatibility/phase-4-write-consumer-inventory.md`, decision 0022
+- **Notable:** khoá có runway/rollback thay vì cắt cứng; bảng write-consumer tách rõ ai bị khoá ai không thay vì khoá đồng loạt.
+- **Seen:** 0a79bbe
+
+### symphony-ownership-boundary-enforced-by-test
+- **What:** Phase 5 (2026-07-21, decision 0023) biến ranh giới "Symphony sở hữu orchestration, harness core không cài evaluation/orchestration machinery" (đã quyết @9cc306d, xem `symphony-isolated-runner` moved-to-symphony) thành assertion CI thật: install-boundary test kiểm default payload không chứa surface đó; chỉ còn generic atomic primitives (work-graph read, compare-and-set, changeset apply) ở lại như compatibility-only.
+- **Where:** decision 0023, `tests/boundary/test-phase5-optional-consumer-split.sh`
+- **Notable:** biến "chúng tôi đã tách" (lời hứa doc) thành gate cơ học không thể trôi ngầm.
+- **Seen:** 0a79bbe
 
 ## orchestration
 
@@ -188,8 +231,9 @@ domains_covered: [harness, skills, hooks, workflow, orchestration, context-memor
 
 ### phase-documents-benchmark-deltas
 - **What:** Roadmap dạng PHASE-N.md: mỗi phase khai báo target maturity delta, stories theo dependency order, VÀ expected benchmark deltas (vd "compliance 74% → 85-90%"); friction findings từ benchmark quay lại thành decision record.
-- **Where:** `PHASE2.md`–`PHASE5.md`, decision 0006
+- **Where:** `docs/decisions/0006-phase-4-benchmark-triage.md` (PHASE2.md–PHASE5.md gốc đã removed, xem Status)
 - **Notable:** plan có tiêu chí đo lường trước khi làm — falsifiable roadmap.
+- **Status:** superseded @0a79bbe — root PHASE*.md không còn; Phase 1-5 giờ là plan file trong `docs/plans/completed/phase-*.md` (mục tiêu behavior-observable như "e-inna replay pass", không còn benchmark-% style cũ); bản cũ giữ ở `docs/compatibility/phase-*-legacy.md` làm compatibility history
 - **Seen:** 14e6f10
 
 ### epic-story-hierarchy
@@ -310,6 +354,25 @@ domains_covered: [harness, skills, hooks, workflow, orchestration, context-memor
 - **Notable:** học từ sự cố thật (run 29222332569 để lại tag v0.1.16 không asset): "historical baseline không được chấm bằng contract hiện tại" — bug so-sánh-lệch-version kinh điển.
 - **Seen:** 9cc306d
 
+### rust-clean-architecture-core-installer
+- **What:** Crate `crates/harness/` mới (khác `harness-cli` cũ) thay hẳn cơ chế "awk marker-replace" bằng installer/updater thật theo clean architecture 4 tầng (domain/application/infrastructure/interface, `main.rs` là composition root). Test `clean_architecture.rs` enforce chiều phụ thuộc bằng cách grep cấm import ngược tầng (domain không được import application/infra/interface/serde/clap/fs/process). `EmbeddedCoreDistribution` nhúng 23 file lúc compile-time qua `include_bytes!` (AGENTS.md + skills + docs templates). Update so 3 chiều base(đã cài)/local(workspace hiện tại)/upstream(bản mới): giống nhau thì im; consumer sửa mà upstream không đổi thì giữ; cả hai đổi thì gọi `git merge-file --diff3` tự merge; merge lỗi thì stage 4 bản BASE/LOCAL/UPSTREAM/RESOLVED dưới `.harness-core/update/` cho người sửa tay rồi `harness update --continue`.
+- **Where:** `crates/harness/src/{domain,application,infrastructure,interface}/*.rs`, `crates/harness/tests/clean_architecture.rs`, decision 0024
+- **Notable:** nâng cấp từ "sync script" (chỉ biết ghi đè block giữa marker) lên "installer có conflict-resolution thật" — transaction journal + atomic apply (temp-file rename) + rollback-on-error tự động + từ chối symlink ở mọi path quản lý; đúng câu hỏi gốc "có compiler nào không" — có, và nó KHÔNG PHẢI template engine mà là ba-chiều-so-sánh + merge engine.
+- **Keywords:** three-way merge, install/update CLI, embedded distribution
+- **Seen:** 0a79bbe
+
+### self-update-binary-from-github-release
+- **What:** `SelfUpdateApplication` tự phát hiện release mới nhất qua 1 pointer file trên GitHub (`scripts/harness-release-tag`), tải binary + sidecar SHA-256, verify checksum, dùng crate `self_replace` thay atomic chính executable đang chạy. Candidate version không bao giờ được cũ hơn core đã cài (`CoreDowngrade` error); `--continue --dry-run` preview mà không xoá session pending; nếu bị ngắt giữa chừng, `.harness-core/update-candidate/` giữ bản đã verify để lần chạy sau tự phục hồi thay vì tải lại.
+- **Where:** `crates/harness/src/application/self_update.rs`, `crates/harness/src/infrastructure/release_handoff.rs`, decision 0025
+- **Notable:** phân biệt rõ 2 version độc lập (core đã cài vs binary đang chạy) — `executable_outdated` là trạng thái báo riêng, không gộp chung với "core outdated".
+- **Seen:** 0a79bbe
+
+### reproducible-core-state-snapshot-plus-changesets
+- **What:** SQLite baseline (trước đây binary blob không diff được trong git, worktree không tin cậy) tách thành: snapshot read-only committed (`.harness/core-state/harness.db`) + JSONL changesets committed riêng theo thời gian; mỗi worktree tự `materialize-core-state.sh` ghi ra bản `harness.db` writable-ignored từ 2 nguồn commit đó. `publish-core-snapshot.sh` sinh manifest (file/logical SHA-256, schema version, danh sách changeset) khi cần chốt lại; `verify-core-snapshot.sh` kiểm không WAL sidecar, checksum khớp, KHÔNG lộ secret (regex quét private-key/token/absolute-path) trước khi cho publish.
+- **Where:** `scripts/materialize-core-state.sh`, `scripts/publish-core-snapshot.sh`, `scripts/verify-core-snapshot.sh`, decision 0011
+- **Notable:** tách "phần bất biến" (snapshot) khỏi "phần tăng trưởng" (changeset log) thay vì commit thẳng DB đổi liên tục; mutation trên stale revision bị CHẶN REPLAY chứ không âm thầm merge.
+- **Seen:** 0a79bbe
+
 ## repo-layout
 
 ### policy-vs-durable-separation
@@ -320,8 +383,9 @@ domains_covered: [harness, skills, hooks, workflow, orchestration, context-memor
 
 ### repo-separation-playbook
 - **What:** Playbook tách product khỏi template (E11, 12 stories): provenance-preserving filtered import (không snapshot mù); bootstrap + validate ở đích TRƯỚC khi xóa nguồn; cross-repo story handoff bằng non-runnable source proxies + checksummed target receipts ("never retire source row to make dependency appear satisfied"); parity suite + recoverable tag/bundle làm điều kiện xóa; boundary tests assert cây sạch hai phía; changesets sống không phải test fixture — thay bằng synthetic fixtures.
-- **Where:** decision 0009, `docs/stories/epics/E11-*/` (migration-manifest.md), `tests/boundary/`, `tests/cutover/`
+- **Where:** decision 0009, `docs/stories/epics/E11-*/` (migration-manifest.md), `tests/boundary/`
 - **Notable:** trọn bộ kỷ luật "tách repo mà không mất truth" — hiếm thấy được document + test kỹ thế này.
+- **Status:** `tests/cutover/` removed @0a79bbe — cutover (Symphony repo-split) đã hoàn tất và ổn định, test tạm thời phục vụ migration bị dọn theo `docs/plans/completed/repository-cleanup.md`; kỷ luật playbook (provenance-preserving import, parity-trước-khi-xoá) vẫn còn giá trị học dù test đã gỡ.
 - **Seen:** 9cc306d
 
 ### gitattributes-line-endings
@@ -354,7 +418,7 @@ domains_covered: [harness, skills, hooks, workflow, orchestration, context-memor
 
 ### audit-propose-pipeline
 - **What:** Phase 5 pipeline 3 nhánh: validate (`score-context` + `audit` entropy/drift) → check (`verify-all`) → improve (`propose` sinh improvement proposals từ pattern friction + intervention). Từ 9cc306d: `propose` là read-only, bulk `--commit` bị cấm — xem proposal-lifecycle-explicit.
-- **Where:** `PHASE5.md`, decisions 0007/0008, CLI `audit`/`propose`
+- **Where:** `docs/decisions/0007-improvement-proposal-rules.md`, decision 0008, CLI `audit`/`propose` (PHASE5.md gốc đã removed, xem `maturity-ladder-h0-h5`.Status)
 - **Notable:** self-improvement là pipeline cơ học audit được, không phải "agent tự nghĩ cách tốt hơn".
 - **Seen:** 9cc306d
 
@@ -376,7 +440,7 @@ domains_covered: [harness, skills, hooks, workflow, orchestration, context-memor
 
 ### external-benchmark-repo
 - **What:** Repo `harness-benchmark` riêng đo từng phase: harness compliance %, trace quality score, lane accuracy (6/6), friction captured (N/6 tasks); phase chỉ được coi là đạt khi benchmark xác nhận.
-- **Where:** `PHASE2.md`–`PHASE5.md` (expected deltas), CHANGELOG
+- **Where:** `CHANGELOG.md` (PHASE2.md–PHASE5.md gốc mang expected-deltas đã removed, xem `maturity-ladder-h0-h5`.Status)
 - **Notable:** eval harness bằng benchmark ngoài, có baseline và delta kỳ vọng khai báo trước — mức trưởng thành eval cao nhất trong 2 reference.
 - **Seen:** 14e6f10
 

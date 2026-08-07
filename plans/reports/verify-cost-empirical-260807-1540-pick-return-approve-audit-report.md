@@ -1,6 +1,6 @@
 # Chi phí verify thực đo — pick/return/approve (tsk-vms)
 
-Nguồn: `.fgos/events.jsonl` (9321 dòng tại thời điểm chạy). Số liệu thật, không suy đoán — xem `docs/history/tsk-vms-verify-cost-audit/` cho phương pháp đầy đủ.
+Nguồn: `.fgos/events.jsonl` (9331 dòng tại thời điểm chạy). Số liệu thật, không suy đoán — xem `docs/history/tsk-vms-verify-cost-audit/` cho phương pháp đầy đủ.
 
 ## (1) Số vòng pick trên một item, tới khi delivered
 
@@ -12,8 +12,8 @@ Nguồn: `.fgos/events.jsonl` (9321 dòng tại thời điểm chạy). Số li�
 
 ## (2) Số vòng return, % trả về blocked
 
-- Tổng vòng return: **424** (`from:'doing'` → `blocked`/`awaiting-approval'`).
-- Về `blocked`: **59** (**13.9%**). Về `awaiting-approval`: **365** (**86.1%**).
+- Tổng vòng return: **425** (`from:'doing'` → `blocked`/`awaiting-approval'`).
+- Về `blocked`: **59** (**13.9%**). Về `awaiting-approval`: **366** (**86.1%**).
 - Trung bình mỗi item có return: **1.23** vòng, trung vị **1**.
 
 ### Approve rounds (bổ sung, không nằm trong "return" nhưng cùng vòng đời)
@@ -37,7 +37,7 @@ Nguồn: `.fgos/events.jsonl` (9321 dòng tại thời điểm chạy). Số li�
 
 ## (4) Số lần chạy full verify (npm test) — tổng và ước lượng
 
-- Tổng số lần chạy full verify trên toàn bộ log: **680** (từ return: 424, từ approve: 256).
+- Tổng số lần chạy full verify trên toàn bộ log: **681** (từ return: 425, từ approve: 256).
 - fromApprove giả định mọi approve chạy lại verify cục bộ (đúng khi không dùng --github); log không phân biệt được approve --github (không chạy verify cục bộ) khỏi approve nội bộ ở transition to:delivered — số liệu này có thể hơi CAO hơn thực tế nếu từng có approve --github, không phải cận dưới.
 - Thời lượng mỗi lần chạy KHÔNG được suy ra từ chênh lệch timestamp trong log (nhiễu bởi thời gian người suy nghĩ giữa các bước) — dùng khung 161–370s đã biết (mô tả item gốc) làm hệ số nhân định tính, không phải số đo trực tiếp.
 

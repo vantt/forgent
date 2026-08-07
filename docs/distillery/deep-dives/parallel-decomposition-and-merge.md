@@ -1,12 +1,14 @@
 ---
 topic: parallel-decomposition-and-merge
 date: 2026-08-05
-based_on: [bee@1.18.3, beegog@05a131f, symphony@2f0b257, repository-harness@9cc306d, beads@777d24b87, beads-viewer-rust@7f96da4]
+based_on: [bee@1.18.3, beegog@05a131f, symphony@2f0b257, repository-harness@0a79bbe, beads@777d24b87, beads-viewer-rust@7f96da4]
 entries: [bee:cell-schema, bee:worktree-protected-attestation, bee:goal-check-every-done-yourself, bee:fleet-dispatch-and-merge-loop, bee:unattended-agent-accepted-risk-posture, bee:fan-out-cost-tiering-rubric, bee:three-tier-model-rubric-with-pinned-agent-types, beegog:cell-task-unit, beegog:orchestrator-assigns-workers, beegog:independent-feature-worktrees, beegog:computed-parallel-schedule, beegog:worktree-merge-staged-verify-gate, beegog:frozen-judge-file-scope, beegog:cross-session-atomic-claims, symphony:isolated-run-contract, repository-harness:orchestration-protocol-v1, beads:multiagent-routing-and-slots, beads-viewer-rust:mcp-agent-mail-coordination]
 updated: 2026-08-06
 ---
 
 # Deep-dive: chia task con song song + tránh xung đột footprint + hợp nhất cha/con
+
+> stale vs repository-harness@0a79bbe (9cc306d→0a79bbe, 2026-08-07) — cited `orchestration-protocol-v1` explicitly RETAINED KHÔNG ĐỔI (decision 0022/0023 miễn protocol-v1 khỏi control-plane freeze); Phase 5 chỉ siết ranh giới Symphony bằng 1 CI test mới (`tests/boundary/test-phase5-optional-consumer-split.sh`), không đổi protocol/contract. Kết luận + 3 khoảng-trống của dive này KHÔNG cần cập nhật.
 
 **Bottom Line:** forgentX đã hội tụ độc lập với phần lớn "cell" của bee — footprint khai báo, `acceptance` clause đòi evidence, và merge dàn trận verify-trước-commit (`src/runner/merge.mjs`) đều đã có, không phải khoảng trống. Câu hỏi thật của user (Claude tự điều phối song song trong-phiên = học mô hình cell; đẩy việc ra ngoài cho agy/opencode = giữ cách chia hiện tại) tách đúng: forgentX đang và nên đi theo nhánh THỨ HAI — không phải bee's in-chat cell-swarm (giả định worker là subagent Claude cùng phiên), mà là symphony/bee-herding's isolated-run-contract (giả định worker là một tiến trình NGOÀI, kém tin cậy hơn). Khoảng trống thật, xếp theo giá trị: (1) footprint hiện chỉ là cố vấn tiền-dispatch giữa các item READY và một frozen-judge hẹp (chỉ file dạng test/CI/lockfile) — chưa có gác NGAY LÚC merge kiểm diff thực so với footprint khai cho MỌI file, việc này quan trọng hơn khi executor là agy/opencode (kém tin hơn subagent Claude cùng nhà); (2) không có attestation danh tính worktree (baseCommit/headRef) chụp TRƯỚC dispatch bởi chính orchestrator — hiện chỉ kiểm tại merge; (3) không có lịch sóng-song-song TÍNH ĐƯỢC (Kahn/Tarjan) — `fgos ready`/`fgos graph` cho biết cái gì sẵn sàng nhưng không tính được "sóng nào chạy được cùng lúc, sóng nào phải đợi vì chồng footprint". Không khoảng trống nào đòi kiến trúc mới; cả ba đều là phần mở rộng của máy đã có (`frozen-judge.mjs`, `graph-metrics.mjs`, `merge.mjs`).
 
