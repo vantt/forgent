@@ -1,5 +1,17 @@
 # Close out a decomposed root item after all its children are done
 
+**Update (tsk-580):** step 3's own verify command, when it needs to check
+that every child actually resolved, no longer has to be hand-written —
+`fgos edit <root-id> --verify-from-children` generates a `jq` check
+against every item whose `parent === <root-id>` automatically (the same
+resolved-status set — `delivered`/`retrospective`/`cleanup`/`done` — the
+sibling milestone how-to's own "don't wait out cleanup's TTL" lesson
+settled on), resolving the repo root itself and refusing outright if no
+child is found (rather than writing a vacuously-true `jq` `all()` over an
+empty list). Mutually exclusive with `--verify-from-targets` (the
+milestone/MVP shortcut in the sibling doc) — pick whichever matches
+whether this item's own scope is `children` or `targets`.
+
 **Update (tsk-3bn, docs/history/tsk-3bn-merge-conductor-harness-v2/):** the
 manual `git merge --no-ff` workaround this doc originally had to invent for
 the "Trap" section below is now a real, supported verb —

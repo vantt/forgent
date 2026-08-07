@@ -7,6 +7,21 @@ source_capture_ids: [tsk-u9k]
 ---
 # How to close out a goalTier milestone/MVP item once all its targets are done
 
+**Update (tsk-580):** step 2's manual `jq` command below is now a real,
+supported shortcut — `fgos edit <milestone-id> --verify-from-targets`
+generates the exact same check automatically, reading the item's own
+`targets` array and resolving the repo root itself, so neither the
+`--dir <repo-root>` gotcha nor the id-list typing below has to be done by
+hand. It refuses outright if `targets` is empty, rather than writing a
+`jq`  `all()` over an empty array (which is vacuously always `true`), and
+it accepts the same resolved-status set (`delivered`/`retrospective`/
+`cleanup`/`done`) the "target sitting in `cleanup`" lesson below already
+settled on — not the stricter literal `done` the original manual recipe
+used. The manual command stays below as what the flag actually generates,
+and as the fallback for a milestone whose real condition needs more than
+a status check (the content-assertion lesson further down, which the flag
+does not attempt to replace).
+
 Use this when a `goalTier: "milestone"` (or `"mvp"`) item's `targets` array
 are all `status: "done"`, but the milestone item itself still sits at
 `status: "todo"` and never shows up in `fgos merge list`'s `ready` array —
