@@ -16,11 +16,29 @@
 // once, not that the mechanism merely looks correct on paper.
 
 import path from 'node:path';
+import { execFileSync } from 'node:child_process';
 import { readEvents } from '../src/state/events.mjs';
 import { listWork } from '../src/state/store.mjs';
 import { footprintOverlapAmong } from '../src/state/graph-metrics.mjs';
 
-const repoRoot = process.argv[2] ?? process.cwd();
+// This item's own `verify` (CONTEXT.md D10) runs this script with no
+// argument, and `return`/`approve` both run `verify` with cwd set to a
+// worktree checkout — which never carries its own `.fgos/` by design
+// (ADR0020). `process.cwd()` alone would silently read an empty/missing
+// log there. Resolve the MAIN checkout root instead, the same
+// `git rev-parse --git-common-dir` pattern every skill in this feature
+// already uses, so the recorded verify command works unmodified whether
+// run from the main checkout or from any item's own worktree.
+function resolveMainCheckoutRoot() {
+  const gitCommonDir = execFileSync(
+    'git',
+    ['rev-parse', '--path-format=absolute', '--git-common-dir'],
+    { encoding: 'utf8' },
+  ).trim();
+  return path.dirname(gitCommonDir);
+}
+
+const repoRoot = process.argv[2] ?? resolveMainCheckoutRoot();
 const dotFgosDir = path.join(repoRoot, '.fgos');
 
 const view = listWork(dotFgosDir);
