@@ -113,3 +113,37 @@ was ultimately performed on any of the 26.
 
 Full decision record: `docs/history/add-stage-default-gap/CONTEXT.md`
 (D1-D6).
+
+## A related but distinct gap (`tsk-4zj`): even a correctly-defaulted stage was invisible on read
+
+`tsk-621` above fixed the *mechanism* — which lane an item lands in.
+`tsk-4zj` found a separate problem with *visibility*: even once `stage`
+correctly reads lazily as `executing` for an item that never had it
+explicitly written, `fgos list` (and every other read surface — `ready`,
+`show`, `triage`, `rollup`) returned the record with **no `stage` key at
+all** for such an item. Confirmed live on the same three items
+(`tsk-2sl`/`tsk-2k1`/`tsk-503`) that surfaced `tsk-621`: nothing in any
+read surface's output told a person or an agent that these items were
+sitting at `executing`, having skipped `clarify`/`decompose`/
+`validating` entirely.
+
+The development-UX consequence: a genuinely large decision — this item
+will never pass through a reality check — was being communicated purely
+through the **absence** of a field. An absent field communicates nothing
+at all; a reader has no way to distinguish "this item's stage was never
+computed" from "this item is fine, nothing to see here."
+
+**The fix stays scoped to the read layer only**, deliberately not
+touching the write-side lazy-default (D8) `tsk-621`'s own fix left
+alone: every read surface now renders the *derived* effective stage
+instead of leaving it blank — distinguishing an explicit `executing`
+from an implicit one (e.g. "executing (default, not stated)") — while
+the storage layer keeps the exact same absent-stays-absent contract it
+already had. This is a read-layer projection change, not a write-layer
+default change, so it doesn't reopen or interact with D8 at all.
+
+The two items are related but answer different questions: `tsk-621` is
+about the *mechanism* that assigns an item's lane; `tsk-4zj` is about
+whether that lane, once assigned, is actually visible to whoever reads
+the item afterward. Full decision record:
+`docs/history/read-surface-effective-stage/CONTEXT.md`.
