@@ -5,6 +5,31 @@
 
 ## 1. Trạng thái hiện tại
 
+**Vòng 8 (2026-08-07) — ba D-ID đầu tiên đã chốt, và case 2 hoá ra đã có
+nhà sẵn.** Người dùng chốt: con là work item thật (**D1**), autonomy giữ
+nguyên khuyến nghị vòng 7 (**D2**), bài messy giải bằng cần gạt view
+(**D3**). Cả ba đã ghi thật qua `fgos decision --id tsk-umc` (seq 8896/
+8897/8898).
+
+Câu mới của người dùng — *cụm component/epic thì quản lý và triển khai thế
+nào, cha fan-out cho con dạng đó được không* — scout ra câu trả lời tốt
+hơn dự đoán: **`goalTier` + `targets` (str67) đã là đúng cạnh đó**.
+`targets` **không đi qua `resolveRoot`** nên mỗi target giữ root riêng và
+merge độc lập lên main — chính xác case 2. ⇒ **"Fix B" đề xuất ở vòng 5 là
+thừa**; sự tách lineage-khỏi-merge-topology đã tồn tại sẵn dưới dạng cạnh
+thứ hai. Lỗ hổng còn lại thu về đúng một chỗ: `fgos rollup` chỉ hiểu
+`parent`, chưa hiểu `targets`.
+
+Và **cha fan-out được cho cả hai ca**: dispatcher chỉ cần một **tập ứng
+viên** rồi `computeSchedule` ∩ tập đó — case 1 lấy `children(parent)`,
+case 2 lấy `targets`, runner lấy cả frontier. Một dispatcher, tập ứng viên
+cắm được. Điều này cũng **sửa lại hàng 9 của vòng 1**: `computeSchedule`
+chạy trên toàn frontier là mặc định *đúng*, không phải khiếm khuyết.
+
+Còn treo: **ai claim** (người dùng nghiêng cha; tôi đã kể đủ giá ở §5 vòng
+8, gồm chỗ vòng 7 tôi nói chưa công bằng — cha-claim **đổi hình dạng** rủi
+ro sập chứ không giảm) và **"gom kết quả về"**.
+
 **Vòng 7 (2026-08-07) — "cha merge" không phải lựa chọn, code đã cưỡng
 chế; và điều đó quyết luôn câu "ai claim".** `approve` **từ chối chạy từ
 bên trong worktree** bằng hai guard riêng biệt, nguyên văn *"approve must
@@ -228,6 +253,14 @@ chuyện gì xảy ra khi một worker chết giữa chừng.
 | 19 | Phép thử tách ca (2) khỏi ca (3) **không phải "việc to hay nhỏ"** mà là: *mảnh này có cần ranh giới rollback/verify riêng không?* — cơ học, đo được. Còn "có đáng thành work item không" là cảm giác | **Chưa rõ — đề xuất vòng 2** | §5 vòng 2 |
 | 20 | Ca (2) thuộc phạm vi `tsk-umc` hay là item riêng? Tiền lệ đã có: hàng 39 của rubric đẩy ô review-class ra ngoài vì *"không liên quan gì tới fan-out"* | **Chưa rõ** | `fanout-and-delegation-rubric` §3:39 |
 | 21 | **Động cơ thật của đề xuất là NHIỄU DANH SÁCH, không phải chi phí hành chính** — người dùng nói thẳng vòng 3. Hai bài toán khác hẳn nhau, và bài nhiễu danh sách chưa từng được đo | **Rõ** | §5 vòng 3 |
+| 65 | **CASE 2 ĐÃ CÓ NHÀ, và không phải `parent`.** `goalTier` + `targets` (str67-goal-directed-planning D1/D2): `targets` là *"the set of items this item considers 'part of' it — a milestone's targets are ordinary work ids"*. **`targets` KHÔNG đi qua `resolveRoot`** ⇒ mỗi target giữ root riêng ⇒ **merge độc lập lên main**. Đúng định nghĩa case 2: gộp nhóm mà không dính topology merge | **Rõ — scout vòng 8** | `src/state/work.mjs:567-577`; `docs/how-to/close-out-a-goaltier-milestone-after-all-targets-are-done.md` |
+| 66 | ⇒ **"Fix B — tách lineage khỏi merge-topology" (đề xuất vòng 5) LÀ THỪA.** Sự tách đó **đã tồn tại sẵn dưới dạng cạnh thứ hai**. Không cần đổi mô hình cạnh của `0012` | **Rõ — sửa lại hàng 41/44 vòng 8** | hàng 65 |
+| 67 | **Lỗ hổng còn lại của case 2 chỉ còn MỘT: `fgos rollup` chỉ hiểu `parent`** (`bin/fgos.mjs:729`, `w.parent === id`), không hiểu `targets`. Nhỏ hơn hẳn "Fix B" ước lượng ở vòng 5 | **Rõ — vòng 8** | `bin/fgos.mjs:729` |
+| 68 | **Cha FAN-OUT được cho cụm case-2.** Dispatcher không quan tâm cạnh nào định nghĩa cụm — nó cần một **tập ứng viên**, rồi `computeSchedule` ∩ tập đó. Case 1 ⇒ `children(parent)`, merge về `fgw/<root>` · Case 2 ⇒ `targets` của milestone, merge lên main từng cái · runner hôm nay ⇒ cả frontier. **Một dispatcher, tập ứng viên cắm được** | **Rõ — vòng 8** | hàng 47 + hàng 65 |
+| 69 | **Sửa lại hàng 9**: `computeSchedule` chạy trên **toàn frontier không phải khiếm khuyết** — đó là mặc định ĐÚNG cho case 2 và cho runner; case 1 chỉ cần giao thêm với `children(parent)` | **Rõ — sửa vòng 8** | hàng 68 |
+| 70 | **Chuỗi tuần tự vẫn chạy trong case 2**: A merge lên main, B fork từ main HEAD ⇒ đã có A. `deps` + `frontier` lo thứ tự y hệt case 1, chỉ khác đích merge | **Rõ — vòng 8** | hàng 46 + hàng 65 |
+| 71 | **Giá của cha-claim, kể đủ (sửa lại chỗ vòng 7 nói chưa công bằng)**: (a) **cần cửa vào mới cho con** — con không `/fgOS:pick` được item đã `doing` · (b) **rủi ro sập bị TẬP TRUNG vào cha** — con tự claim: một con chết, một item kẹt; cha claim: **cha chết, cả N item kẹt cùng lúc**; `startupReap` bỏ qua claim session ở **cả hai** đường · (c) **hai đường claim cùng tồn tại** (`/fgOS:pick` cho người + đường fan-out), rủi ro phân kỳ về sau · (d) bàn giao worktree — mẫu đã có nhưng mới với phiên tương tác | **Rõ — vòng 8** | §5 vòng 8 |
+| 72 | ⇒ **Lý do đúng để chọn cha-claim không phải "an toàn hơn khi sập"** (hàng 71b cho thấy nó đổi hình dạng rủi ro chứ không giảm), mà là **cha đã bị ghim vào main checkout suốt fan-out để merge** (hàng 56/57) — nên nó là bên duy nhất vừa claim vừa dọn nhất quán được, và là **một chỗ biết cả cụm** | **Gần rõ — vòng 8, chờ người dùng chốt** | hàng 56/57/71 |
 | 56 | **`approve` CƯỠNG CHẾ chạy trên main checkout** — hai guard riêng: từ chối khi cwd là session worktree (*"approve must land on the main checkout, which a session worktree structurally is not"*) và từ chối khi cwd là bất kỳ worktree nào. ⇒ agent con sống trong worktree của nó **về cấu trúc không thể tự merge**. "Cha merge lá" **không phải lựa chọn thiết kế, là ràng buộc đã có** | **Rõ — scout vòng 7** | `bin/fgos.mjs` case `approve`, hai nhánh `refusing to run` |
 | 57 | ⇒ **Cha buộc phải sống suốt fan-out** trên main checkout để merge từng lá xong. Nên **cha-claim không thêm vai trò mới**, nó gộp một vai vốn bắt buộc tồn tại. Đây là lập luận quyết định cho §3 hàng 3, mạnh hơn mọi lập luận vòng 1 | **Rõ — vòng 7** | hàng 56 |
 | 58 | **Runner đã implement đúng khuôn cha-claim**: `claimAndDispatch` (claim trước, từ chối thì để poll sau) rồi `spawnWorker(item, config, wt.path, …)` — **truyền thẳng đường dẫn worktree cho worker**. Mẫu bàn giao worktree đã có, không phải phát minh | **Rõ — vòng 7** | `src/runner/loop.mjs:938`, `:707` |
@@ -275,12 +308,14 @@ chuyện gì xảy ra khi một worker chết giữa chừng.
 
 ## 4. Quyết định đã chốt
 
-*(Chưa có. Vòng 1 chưa chốt gì — luật của skill này: không mint D-ID từ
-một câu trả lời đơn lẻ, phải giữ nguyên qua hơn một vòng.)*
+Item mang việc này: **`tsk-umc`**. Mỗi D-ID dưới đây đã được ghi thật qua
+`fgos decision --id tsk-umc`.
 
 | D-ID | Quyết định | Vòng chốt |
 |---|---|---|
-| — | — | — |
+| **D1** | **Fan-out B giữ con là work item thật** — không mở ô exec-packet/B2 mà `D4` của `two-layer-dispatch` đang gác. Chi phí một con (5-6 chuyển trạng thái · trung vị 2 lượt người · 7 ngày `cleanup` · 20MB worktree) là **chính sách hậu kỳ**, chỉnh được bằng config; phần *bản chất* (claim/verify/merge) chỉ tốn 0.18s + 20MB lúc chạy. Bỏ vòng đời để né hậu kỳ là trả giá sai chỗ | nêu vòng 3, đứng qua 4/5/6/7, người dùng chốt vòng 8. `fgos decision` seq **8896** |
+| **D2** | **Tự động approve LÁ; giữ cổng ROOT bắt buộc và có người; giữ nguyên ngoại lệ risk-keyword của `gateBypass` D4.** `return` vẫn chạy verify và block khi đỏ ⇒ bỏ approve lá là bỏ một *lượt review*, không bỏ *bằng chứng*. Lá merge vào `fgw/<root>`, không chạm main; cổng root vẫn còn, muộn hơn và bao quát hơn ⇒ cổng lá là **cổng trùng hạ một tầng**. Giá thật là **độ mịn review**, không phải an toàn | nêu vòng 7, người dùng giữ nguyên vòng 8. `fgos decision` seq **8897** |
+| **D3** | **Bài messy task-list giải bằng CẦN GẠT VIEW (list/view loại con khỏi danh sách), không bằng đổi mô hình — và là ITEM RIÊNG, không thuộc `tsk-umc`.** Con chiếm 59/237 = 25% danh sách mở; `fgos list` chỉ có đúng hai chế độ, không lọc status, không gộp con dưới cha. Rút hàng đợi không cứu được: 0/99 item `cleanup` đã hết TTL 7 ngày | nêu vòng 3, giữ qua 4/5, người dùng chốt và làm sắc vòng 8. `fgos decision` seq **8898** |
 
 ## 5. Q&A log
 
@@ -1070,6 +1105,95 @@ Chưa mint gì. Chờ anh xác nhận.
    — nhận nguyên, hay anh muốn bỏ luôn cả ngoại lệ risk?
 3. Chốt luôn **"con là work item thật"** để mint D1 chứ? Nó đã đứng bốn
    vòng và không còn bị thách thức từ vòng nào.
+
+### 2026-08-07 — Vòng 8: ba D-ID đầu tiên, và case 2 đã có nhà sẵn
+
+**Người dùng:** (1) hỏi **giá của cha-claim là gì**, và đặt câu mới: *một
+work item ban đầu bị chia thành nhiều item liên quan theo hình thái
+component/epic thì xử lý sao để quản lý và triển khai thành cụm — cha có
+fan-out cho các con dạng đó được không?* (2) autonomy — **giữ nguyên**.
+(3) **OK** con là work item thật ⇒ việc cần làm là **sửa list/view để loại
+con khỏi danh sách**.
+
+⇒ Mint **D1, D2, D3** (§4), mỗi cái một lời gọi `fgos decision --id
+tsk-umc` thật: seq 8896, 8897, 8898.
+
+#### (1a) — giá của cha-claim, kể đủ, kể cả chỗ vòng 7 tôi nói chưa công bằng
+
+| Giá | Nội dung |
+|---|---|
+| **(a) cửa vào mới cho con** | cha claim rồi thì con **không `/fgOS:pick` được nữa** (item đã `doing`). Cần lối "worktree đã dựng ở `<path>`, vào đó thi công". Đây là mảnh việc thật, không phải thủ tục |
+| **(b) rủi ro sập bị TẬP TRUNG** | vòng 7 tôi ghi cha-claim "dọn được khi con chết" như một thắng lợi rõ. **Chưa công bằng.** Con tự claim: một con chết ⇒ **một** item kẹt. Cha claim: cha chết ⇒ **cả N item đã claim kẹt cùng lúc**. Và `startupReap` **cố ý bỏ qua claim session ở cả hai đường**. Nó **đổi hình dạng rủi ro**, không giảm rủi ro |
+| **(c) hai đường claim cùng tồn tại** | `/fgOS:pick` (người) + đường cha-claim (fan-out). Hai đường cho cùng một việc là rủi ro phân kỳ về sau |
+| **(d) bàn giao worktree** | mẫu đã có (`spawnWorker(item, config, wt.path, …)`) nhưng chưa dùng cho phiên tương tác bao giờ |
+
+**Nên lý do đúng để chọn cha-claim không phải "an toàn hơn khi sập"** —
+(b) cho thấy không phải vậy. Lý do đúng là **cha đã bị ghim vào main
+checkout suốt fan-out để merge** (vòng 7): nó là bên duy nhất vừa claim
+vừa dọn nhất quán được, và là **một chỗ biết cả cụm** thay vì N chỗ mỗi
+chỗ biết một mảnh.
+
+#### (1b) — câu epic: fgOS ĐÃ CÓ NHÀ cho case 2, và không phải `parent`
+
+`src/state/work.mjs:567-577`, `goalTier` + `targets`
+(str67-goal-directed-planning D1/D2):
+
+> *"the set of items this item considers **'part of' it** (an MVP's targets
+> are milestone ids; a milestone's targets are ordinary work ids)"*
+
+Và có sẵn how-to `close-out-a-goaltier-milestone-after-all-targets-are-done`.
+
+Điểm quyết định: **`targets` KHÔNG đi qua `resolveRoot`** — chỉ `parent`
+mới đi (vòng 5). Nên mỗi target **giữ root của chính nó** ⇒ **merge độc
+lập lên main**.
+
+> **Đó chính xác là case 2: gộp nhóm mà không dính topology merge.**
+> Cái tôi gọi là "Fix B — tách lineage khỏi merge-topology" ở vòng 5 **là
+> thừa** — sự tách đó **đã tồn tại sẵn dưới dạng cạnh thứ hai**. Không cần
+> đụng mô hình cạnh của `0012`.
+
+Lỗ hổng còn lại của case 2 thu về **đúng một chỗ**: `fgos rollup` chỉ hiểu
+`parent` (`bin/fgos.mjs:729`, `w.parent === id`), không hiểu `targets`.
+Nhỏ hơn hẳn ước lượng vòng 5.
+
+#### Và cha fan-out được cho cụm dạng đó — ĐƯỢC
+
+Dispatcher **không quan tâm cạnh nào định nghĩa cụm**. Nó cần đúng hai
+thứ: một **tập ứng viên**, rồi `computeSchedule` ∩ tập đó.
+
+| Ca | Tập ứng viên | Con merge về |
+|---|---|---|
+| **Case 1** (children) | `children(parent)` | `fgw/<root>` — cha gom |
+| **Case 2** (epic/milestone) | `targets` của milestone | **main, từng cái** |
+| runner hôm nay | cả frontier | tuỳ root từng cái |
+
+**Một dispatcher, tập ứng viên cắm được.** Ba ca chỉ khác ở dòng đầu tiên.
+
+Và điều này **sửa lại phát hiện vòng 1** (hàng 9): `computeSchedule` chạy
+trên toàn frontier **không phải khiếm khuyết** — đó là mặc định *đúng* cho
+case 2 và cho runner; case 1 chỉ cần giao thêm.
+
+Chuỗi tuần tự vẫn chạy trong case 2: A merge lên main, B fork từ main HEAD
+⇒ đã có A. `deps` + `frontier` lo thứ tự y hệt, chỉ khác đích merge.
+
+#### (3) — view lever, đã chốt thành D3
+
+Hình dạng anh nói ("loại con ra khỏi danh sách") đã ghi vào D3. Lưu ý một
+chi tiết cho item đó: **loại con thì phải thay bằng chỉ báo ở dòng cha**
+(ví dụ `tsk-38t (3/8)`), không thì mất luôn khả năng thấy tiến độ cụm —
+đúng cái `fgos rollup` đang làm, chỉ đưa lên tầng list.
+
+**Câu hỏi vòng 8:**
+
+1. Với (b) ở trên — rủi ro sập bị tập trung vào cha — anh vẫn chọn
+   **cha-claim** chứ? Nếu có, mint D4 vòng sau.
+2. Case 2 dùng `goalTier: milestone` + `targets` (đã có sẵn) thay vì đẻ
+   cạnh mới — khớp ý anh không? Nếu khớp thì lỗ hổng duy nhất là **rollup
+   hiểu `targets`**, và đó là item riêng nhỏ.
+3. Ba câu vòng 1 giờ còn đúng **một**: **"gom kết quả về"** nghĩa là gì —
+   cha đợi rồi đọc lại state, hay cần giao thức báo cáo riêng? (ai claim
+   đang ở câu 1 trên; bộ chọn wave đã rõ: `computeSchedule` ∩ tập ứng
+   viên, bỏ `selectWave`.)
 
 ## 6. Thiết kế đã chốt {#design}
 
