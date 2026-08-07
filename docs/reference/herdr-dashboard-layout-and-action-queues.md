@@ -49,6 +49,19 @@ Exactly 2 fixed action buttons: **Pick**, **Discover**. `Discover` is
 disabled/dimmed — never hidden, so the layout never shifts — when the
 selected item's `stage != clarify`.
 
+### Implementation (`tsk-1e3`): dim, not hidden
+
+`Pick` keeps the existing `Reversed` style convention already used for
+an active button (`ui.rs:230`). `Discover` uses that same style when
+enabled, and switches to dim/gray (`Style::default().add_modifier(
+Modifier::DIM)` or `Color::DarkGray`) when the selected item's stage
+isn't `clarify` — a color change only, never a layout change or hiding
+the button, matching D4's "disabled, never hidden" rule exactly.
+Confirmed shipped as real code:
+`detail_modal_renders_pick_and_discover_buttons` and
+`discover_button_disabled_when_stage_not_clarify`
+(`herdr-plugin/src/ui.rs`).
+
 ## Mouse support
 
 Real mouse handling added: `EnableMouseCapture`/`DisableMouseCapture` on
