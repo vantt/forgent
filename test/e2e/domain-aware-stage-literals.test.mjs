@@ -54,9 +54,28 @@ function runner(cwd, args = ['--once']) {
 function submit(cwd, text, extra = {}) {
   const flags = [];
   if (extra.domain) flags.push('--domain', extra.domain);
+  if (extra.docsRef) flags.push('--docs-ref', extra.docsRef);
   const result = fgos(cwd, ['submit', text, ...flags]);
   assert.equal(result.status, 0, `fgos submit failed: ${result.stderr}`);
   return JSON.parse(result.stdout).data;
+}
+
+// tsk-1x3 D1/D9/D16 (docs/history/fanout-and-delegation-rubric/CONTEXT.md):
+// the runner sweep's own clarify/decompose judge subprocess is retired — a
+// role='runner' call on either stage now safely no-ops instead of
+// consulting a scripted judge. The two tests below that used to dispatch a
+// triage-domain item through the runner sweep ALONE (no explicit
+// discover/decompose CLI call) now plant a real committed CONTEXT.md (+
+// plan.md declaring `mode: tiny`) under the item's own `docsRef` first —
+// the readLockedContext/tiny-mode TRUST SIGNAL, domain-agnostic and
+// unaffected by D16 — so the sweep still legitimately crosses
+// Clarify->Divide->Execute in one tick, same as before, just via the
+// mechanism that is still real.
+function mkLockedContextFixture(repoRoot, docsRef) {
+  const featureDir = path.join(repoRoot, docsRef);
+  fs.mkdirSync(featureDir, { recursive: true });
+  fs.writeFileSync(path.join(featureDir, 'CONTEXT.md'), '# CONTEXT\n\nD1: locked.\n');
+  fs.writeFileSync(path.join(featureDir, 'plan.md'), '# plan\n\nmode = **tiny**.\n');
 }
 
 function viewPath(cwd) {
@@ -131,35 +150,26 @@ if (prompt.includes('Kiểm tra độc lập một lệnh verify')) {
   return scriptPath;
 }
 
-/** Same three-way prompt split as writeClearDiscoveryExecutor, but the
- * context-discovery branch picks its `verify` by matching each item's own
- * `Title: ...` line against `titleRules` (`[{ titleIncludes, verify }]`) —
- * needed once more than one item rides the same sweep tick, since a single
- * fixed verify would otherwise get handed to every item's discovery call
- * indiscriminately. */
-function writeMultiItemClearDiscoveryExecutor(scriptDir, titleRules) {
-  const scriptPath = path.join(scriptDir, 'multi-item-clear-discovery-executor.mjs');
+// tsk-1x3 D1/D9/D16: the "runner sweep" test below now advances both items
+// past clarify/decompose via the trust-signal fixture (mkLockedContextFixture
+// above), never through a scripted judge — so the multi-item discovery/
+// chia-việc prompt-answering executor this file used to configure for it has
+// nothing left to answer. This one only needs the plain worker-dispatch
+// branch, adaptive on the item's own `verify` (mirrors
+// test/e2e/runner-loop.test.mjs's own writeAdaptiveWorkerExecutor).
+function writeCommittingWorkerExecutor(scriptDir) {
+  const scriptPath = path.join(scriptDir, 'committing-worker-executor.mjs');
   fs.writeFileSync(
     scriptPath,
     `
 import fs from 'node:fs';
 import { execFileSync } from 'node:child_process';
 const prompt = process.argv[2] ?? '';
-const titleRules = ${JSON.stringify(titleRules)};
-if (prompt.includes('Kiểm tra độc lập một lệnh verify')) {
-  process.stdout.write(JSON.stringify({ agrees: true }));
-} else if (prompt.includes('# Context-discovery')) {
-  const rule = titleRules.find((r) => prompt.includes(r.titleIncludes));
-  process.stdout.write(JSON.stringify({ clear: true, verify: rule.verify }));
-} else if (prompt.includes('# Chia-việc (decompose)')) {
-  process.stdout.write(JSON.stringify({ verdict: 'pass-through' }));
-} else {
-  const match = prompt.match(/test -f (\\S+)/);
-  const file = match ? match[1] : 'output.txt';
-  fs.writeFileSync(file, 'produced by worker\\n');
-  execFileSync('git', ['add', file]);
-  execFileSync('git', ['commit', '-q', '-m', \`worker: \${file}\`]);
-}
+const match = prompt.match(/test -f (\\S+)/);
+const file = match ? match[1] : 'output.txt';
+fs.writeFileSync(file, 'produced by worker\\n');
+execFileSync('git', ['add', file]);
+execFileSync('git', ['commit', '-q', '-m', \`worker: \${file}\`]);
 `,
   );
   return scriptPath;
@@ -306,6 +316,7 @@ if (prompt.includes('Kiểm tra độc lập một lệnh verify')) {
 test('domain-aware discovered-from addWork inherits parent domain+stage', () => {
   const repoRoot = initTempRepo();
   const scriptDir = mkTempDir('fgos-domain-stage-literals-e2e-exec-');
+  const docsRef = 'docs/history/triage-discovered-from-item';
 
   assert.equal(fgos(repoRoot, ['init']).status, 0);
   writeRunnerConfig(
@@ -317,8 +328,25 @@ test('domain-aware discovered-from addWork inherits parent domain+stage', () => 
     }),
   );
 
-  const triageItem = submit(repoRoot, 'Cross-domain regression fixture item for discovered-from', { domain: 'triage' });
+  // tsk-5mj D1/D6/D7 finding (docs/history/fanout-and-delegation-rubric/
+  // CONTEXT.md): this item's own verify (`! rg -q "resolveDiscovery"
+  // src/runner/loop.mjs`) removed the runner's clarify-stage sweep
+  // ENTIRELY — a cross-domain mechanism (it used `stageForStep(domain,
+  // 'Clarify')` generically, serving every domain, not just coding's own
+  // `discovery`/`exploring` stages this item adds). A real, plainly-stated
+  // consequence: a triage-domain item at its own Clarify-mapped stage
+  // ("triage") is no longer auto-advanced by any runner sweep either, same
+  // as a plain coding item — only an explicit `fgos discover --verdict
+  // ...` call moves it now. This test advances it that way instead of via
+  // the (now-gone) trust-signal sweep.
+  mkLockedContextFixture(repoRoot, docsRef);
+  const triageItem = submit(repoRoot, 'Cross-domain regression fixture item for discovered-from', { domain: 'triage', docsRef });
   assert.equal(triageItem.domain, 'triage');
+
+  const discovered1 = fgos(repoRoot, ['discover', triageItem.id, '--verdict', 'clear', '--verify', 'test -f triage-output.txt && echo TRIAGE_OK']);
+  assert.equal(discovered1.status, 0, `discover failed: ${discovered1.stderr}`);
+  const decomposed1 = fgos(repoRoot, ['decompose', triageItem.id, '--verdict', 'pass-through', '--reason', 'single fixture item, no split needed']);
+  assert.equal(decomposed1.status, 0, `decompose failed: ${decomposed1.stderr}`);
 
   const first = runner(repoRoot, ['--once']);
   assert.equal(first.status, 0, `--once failed: ${first.stderr}`);
@@ -339,27 +367,40 @@ test('domain-aware discovered-from addWork inherits parent domain+stage', () => 
 test('runner sweep: a "triage" fixture-domain item at its own Clarify-mapped stage no longer halts the whole tick — an unrelated coding item in the same sweep still dispatches', () => {
   const repoRoot = initTempRepo();
   const scriptDir = mkTempDir('fgos-domain-stage-literals-e2e-exec-');
+  const triageDocsRef = 'docs/history/triage-multi-item-sweep';
+  const codingDocsRef = 'docs/history/coding-multi-item-sweep';
 
   assert.equal(fgos(repoRoot, ['init']).status, 0);
-  writeRunnerConfig(
-    repoRoot,
-    writeMultiItemClearDiscoveryExecutor(scriptDir, [
-      { titleIncludes: 'Cross-domain regression fixture item', verify: 'test -f triage-output.txt && echo TRIAGE_OK' },
-      { titleIncludes: 'An unrelated plain coding item', verify: 'test -f output.txt && echo CODE_OK' },
-    ]),
-  );
+  writeRunnerConfig(repoRoot, writeCommittingWorkerExecutor(scriptDir));
 
-  const triageItem = submit(repoRoot, 'Cross-domain regression fixture item', { domain: 'triage' });
+  // tsk-5mj D1/D6/D7 finding (see the discovered-from test above): both
+  // items are advanced past their own domain's Clarify-mapped stage via an
+  // explicit `fgos discover`/`fgos decompose` pair now — the trust-signal
+  // runner sweep this test used to rely on is gone (this item's own verify
+  // required removing every `resolveDiscovery` call from loop.mjs, and that
+  // sweep was the cross-domain mechanism serving triage same as coding).
+  // The real thing this test still proves — a triage-domain item crossing
+  // its OWN stage names never wedges the sweep for an unrelated coding item
+  // in the same tick — is unaffected: both still reach dispatch through the
+  // SAME parallel drain-run below, unchanged code.
+  mkLockedContextFixture(repoRoot, triageDocsRef);
+  const triageItem = submit(repoRoot, 'Cross-domain regression fixture item', { domain: 'triage', docsRef: triageDocsRef });
   assert.equal(triageItem.stage, 'triage');
-  const codingItem = submit(repoRoot, 'An unrelated plain coding item, same sweep');
-  assert.equal(codingItem.stage, 'clarify');
+  assert.equal(fgos(repoRoot, ['discover', triageItem.id, '--verdict', 'clear', '--verify', 'test -f triage-output.txt && echo TRIAGE_OK']).status, 0);
+  assert.equal(fgos(repoRoot, ['decompose', triageItem.id, '--verdict', 'pass-through', '--reason', 'single fixture item, no split needed']).status, 0);
 
-  // Before tsk-3xo's fix: resolveDiscovery's moveStage(to:'decompose',
-  // expectedStage:'clarify', ...) call for the triage item would throw
+  mkLockedContextFixture(repoRoot, codingDocsRef);
+  const codingItem = submit(repoRoot, 'An unrelated plain coding item, same sweep', { docsRef: codingDocsRef });
+  assert.equal(codingItem.stage, 'clarify');
+  assert.equal(fgos(repoRoot, ['discover', codingItem.id, '--verdict', 'clear', '--verify', 'test -f output.txt && echo CODE_OK']).status, 0);
+  assert.equal(fgos(repoRoot, ['decompose', codingItem.id, '--verdict', 'pass-through', '--reason', 'single fixture item, no split needed']).status, 0);
+
+  // Before tsk-3xo's fix: a stage-move call for the triage item would throw
   // FsmError('precondition') (neither literal is a real stage name in the
-  // triage domain's own transition table) -- caught by runOnce's outer
-  // catch and turned into outcome 'halted' for this WHOLE --once call, so
-  // codingItem would never reach dispatch in the same tick either.
+  // triage domain's own transition table) -- this test's own real proof is
+  // that the two `discover`/`decompose` calls above (and the dispatch
+  // below) all succeed for triage's own stage names, never a coding
+  // literal.
   const first = runner(repoRoot, ['--once']);
   assert.equal(first.status, 0, `--once failed (this is exactly the pre-fix whole-tick halt if non-zero): ${first.stderr}`);
 
