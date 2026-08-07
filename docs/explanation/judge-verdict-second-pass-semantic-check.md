@@ -257,6 +257,63 @@ clearing it here doesn't cross the ask/answer boundary the way `--force`
 auto-resuming would have; it's the natural continuation of the same
 discover call succeeding where it previously disputed.
 
+## A new root cause for repeated disputes (`tsk-3jy`): the judge wasn't told what stage it's grading
+
+Every prior contradictory-dispute case above (`tsk-4xg`, `tsk-5mc`) was
+explained as the judge losing track of its own prior-round criteria —
+fixed by threading fuller rejection history. `tsk-3jy` found a
+*different* root cause producing the same symptom, observed live during
+`tsk-5iv`'s own `discover` call: the judge demanded post-implementation
+evidence for a `verify` command proposed at stage `clarify`, before any
+code existed to prove it against — a category error, not a memory gap.
+
+Real transcript: `tsk-5iv` was a fully-specified multi-file bugfix batch
+with real file:line evidence for every fix already locked — only the
+`verify` command itself was under dispute. Round 1 correctly rejected a
+placeholder. Round 2 correctly rejected a full-suite-only check (a green
+suite proves nothing if zero lines changed) — a legitimate complaint,
+properly incorporated: round 3 added grep assertions targeting each
+fix's expected code shape. But rounds 3 and 4 kept disputing anyway, now
+demanding "git diff showing actual code changes" — evidence that cannot
+exist yet at the `clarify` stage, since the `verify` command being
+evaluated is a *specification* for what `fgos-code-implement`/`fgos
+return` will run *later*, not something run now. Every round's counter-
+demand was answerable only by writing the implementation first, which
+defeats the entire purpose of proposing `verify` during shaping.
+
+**Root cause**: `buildVerifyCheckPrompt` never told the judge what stage
+this evaluation happens at. Without that context, the judge implicitly
+graded as though code already existed — and had no cap on how many
+rounds of tightening it would accept before either agreeing or naming a
+specific missing check, so it kept repeating a generic "need more proof"
+rather than engaging with the already-improved command on its own terms.
+
+**Why this matters beyond one item's 4 wasted rounds**: `--force` exists
+and worked exactly as designed here — logged, with the disagreement
+reason recorded, the documented escape valve this document already
+covers above. The real risk is what happens *without* an operator who
+knows to reach for `--force`: an agent that gives up and weakens its
+`verify` to whatever the judge will accept produces a **worse** verify
+command than the one that kept getting correctly-shaped-but-rejected —
+the judge's own repeated pressure could select for weaker verification,
+not stronger.
+
+Fix: `buildVerifyCheckPrompt` now states explicitly that the verify is
+proposed *before* any code exists, and the judge is required to name a
+new, concrete, specific gap on disagreement rather than repeating a
+generic "not enough proof" — closing off the goalpost-moving pattern
+without touching the legitimate round-2-style complaint (a check that
+proves nothing at all) this same mechanism must still catch.
+
+A secondary, unconfirmed observation surfaced in the same session
+(recorded here for anyone who hits it again, not chased down by this
+item): mid-way through `tsk-5iv`'s background `fgos catchup`, that
+session's linked worktree directory was found deleted while the item's
+status was still `blocked` (not yet `delivered`). Root cause unconfirmed
+— possibly `cleanupMergedBranch` firing from an earlier "merged" catchup
+outcome that then got superseded by a concurrent session's own advance
+on `main`, racing with this session's own status check.
+
 ## Second live contradiction (`tsk-25g`): single-round context wasn't enough, full history was
 
 `tsk-5cf`'s stabilization fix above (single-most-recent-round
