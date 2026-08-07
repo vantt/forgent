@@ -563,7 +563,7 @@ export const COMMAND_REGISTRY = [
   {
     name: 'rollup',
     invoke: 'fgos rollup',
-    description: "Rollup view of a root item's direct children: done/total count and each child's status.",
+    description: "Rollup view of a root item's direct children and a goalTier item's targets: a done/total count and each member's status, counted separately per relationship.",
     parameters: {
       type: 'object',
       properties: {

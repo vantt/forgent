@@ -2510,6 +2510,105 @@ test('rollup never mutates state: no event is appended and no children of an unr
   assert.deepEqual(eventLines(cwd), before);
 });
 
+// --- rollup reads `targets`, not just `parent` (tsk-1ug) --------------------
+//
+// A goalTier milestone's `targets` are a different relationship from a
+// decomposed root's children: they never go through `resolveRoot`, so each
+// one merges independently onto main (execution-fanout CONTEXT.md D4).
+// They therefore get their own array and their own count pair, leaving
+// `doneCount`/`totalCount` meaning exactly what they always meant.
+
+test('rollup on a milestone counts its targets in targetDoneCount/targetTotalCount and leaves the children counts at 0', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'seed-item');
+  const dir = path.join(cwd, '.fgos');
+  addWork(dir, { id: 'target-a', title: 'Target A', kind: 'task', status: 'done', deps: [], risk: 'low', refs: [], verify: 'npm test' });
+  addWork(dir, { id: 'target-b', title: 'Target B', kind: 'task', status: 'done', deps: [], risk: 'low', refs: [], verify: 'npm test' });
+  addWork(dir, { id: 'target-c', title: 'Target C', kind: 'task', status: 'todo', deps: [], risk: 'low', refs: [], verify: 'npm test' });
+  addWork(dir, { id: 'milestone-x', title: 'Milestone X', kind: 'task', status: 'todo', deps: [], risk: 'low', refs: [], verify: 'npm test', goalTier: 'milestone', targets: ['target-a', 'target-b', 'target-c'] });
+
+  const result = run(cwd, ['rollup', 'milestone-x']);
+  assert.equal(result.status, 0);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.targetDoneCount, 2);
+  assert.equal(data.targetTotalCount, 3);
+  assert.deepEqual(data.targets, [
+    { id: 'target-a', title: 'Target A', status: 'done' },
+    { id: 'target-b', title: 'Target B', status: 'done' },
+    { id: 'target-c', title: 'Target C', status: 'todo' },
+  ]);
+  // The children pair keeps its own meaning -- a milestone has none.
+  assert.equal(data.doneCount, 0);
+  assert.equal(data.totalCount, 0);
+  assert.deepEqual(data.children, []);
+});
+
+test('rollup on an item with no targets reports an empty targets array and 0/0, leaving the children counts untouched', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'root-item');
+  const dir = path.join(cwd, '.fgos');
+  addWork(dir, { id: 'child-a', title: 'Child A', kind: 'task', status: 'done', deps: [], risk: 'low', refs: [], verify: 'npm test', parent: 'root-item' });
+
+  const result = run(cwd, ['rollup', 'root-item']);
+  assert.equal(result.status, 0);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.doneCount, 1);
+  assert.equal(data.totalCount, 1);
+  assert.equal(data.targetDoneCount, 0);
+  assert.equal(data.targetTotalCount, 0);
+  assert.deepEqual(data.targets, []);
+});
+
+test('rollup reports a target id that matches no work item as a null-title/null-status row, counted as not done, exit 0', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'seed-item');
+  const dir = path.join(cwd, '.fgos');
+  addWork(dir, { id: 'target-a', title: 'Target A', kind: 'task', status: 'done', deps: [], risk: 'low', refs: [], verify: 'npm test' });
+  addWork(dir, { id: 'milestone-x', title: 'Milestone X', kind: 'task', status: 'todo', deps: [], risk: 'low', refs: [], verify: 'npm test', goalTier: 'milestone', targets: ['target-a', 'no-such-target'] });
+
+  const result = run(cwd, ['rollup', 'milestone-x']);
+  assert.equal(result.status, 0);
+  const data = envelopeData(result.stdout);
+  assert.deepEqual(data.targets, [
+    { id: 'target-a', title: 'Target A', status: 'done' },
+    { id: 'no-such-target', title: null, status: null },
+  ]);
+  assert.equal(data.targetDoneCount, 1);
+  assert.equal(data.targetTotalCount, 2);
+});
+
+test('rollup on an item carrying both children and targets keeps the two count pairs independent', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'seed-item');
+  const dir = path.join(cwd, '.fgos');
+  addWork(dir, { id: 'target-a', title: 'Target A', kind: 'task', status: 'done', deps: [], risk: 'low', refs: [], verify: 'npm test' });
+  addWork(dir, { id: 'both-item', title: 'Both', kind: 'task', status: 'todo', deps: [], risk: 'low', refs: [], verify: 'npm test', goalTier: 'milestone', targets: ['target-a'] });
+  addWork(dir, { id: 'child-a', title: 'Child A', kind: 'task', status: 'todo', deps: [], risk: 'low', refs: [], verify: 'npm test', parent: 'both-item' });
+
+  const result = run(cwd, ['rollup', 'both-item']);
+  assert.equal(result.status, 0);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.doneCount, 0);
+  assert.equal(data.totalCount, 1);
+  assert.equal(data.targetDoneCount, 1);
+  assert.equal(data.targetTotalCount, 1);
+  assert.deepEqual(data.children, [{ id: 'child-a', title: 'Child A', status: 'todo' }]);
+  assert.deepEqual(data.targets, [{ id: 'target-a', title: 'Target A', status: 'done' }]);
+});
+
+test('rollup reading targets never mutates state: no event is appended', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'seed-item');
+  const dir = path.join(cwd, '.fgos');
+  addWork(dir, { id: 'target-a', title: 'Target A', kind: 'task', status: 'todo', deps: [], risk: 'low', refs: [], verify: 'npm test' });
+  addWork(dir, { id: 'milestone-x', title: 'Milestone X', kind: 'task', status: 'todo', deps: [], risk: 'low', refs: [], verify: 'npm test', goalTier: 'milestone', targets: ['target-a'] });
+
+  const before = eventLines(cwd);
+  const result = run(cwd, ['rollup', 'milestone-x']);
+  assert.equal(result.status, 0);
+  assert.deepEqual(eventLines(cwd), before);
+});
+
 // --- fgos show: scoped single-task full detail ------------------------------
 //
 // Unlike `list --id`, which only scopes the `work` map and leaves every

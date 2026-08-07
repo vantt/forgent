@@ -725,6 +725,40 @@ function childrenOf(view, id) {
   return Object.values(view.work).filter((w) => w.parent === id);
 }
 
+// The second membership edge a rollup has to read (tsk-1ug): `targets`
+// (str67-goal-directed-planning D2, src/state/work.mjs:567-588) is the set
+// of items a goalTier milestone/MVP considers part of it. Unlike `parent`
+// it never goes through `resolveRoot`, so each target keeps its own root
+// and merges independently onto main -- a genuinely DIFFERENT relationship
+// from a decomposed root's children, not a second way of spelling the same
+// one, which is why the two stay separate arrays with separate counts
+// rather than being folded into one (execution-fanout CONTEXT.md D4; the
+// same split `edit --verify-from-children`/`--verify-from-targets` already
+// keeps below).
+//
+// A target id with no matching work item is reported as a row with null
+// `title`/`status` rather than dropped: `targets` deliberately skips
+// validateDeps (work.mjs:571-575), so a typo'd id is reachable, and
+// silently dropping it would let a milestone read as complete when one of
+// its targets does not exist at all. Such a row counts toward
+// `targetTotalCount` and never toward `targetDoneCount`.
+//
+// Single level, same as `childrenOf` above: a target that is itself a
+// milestone is reported as one row, never recursed into.
+// `graph-metrics.mjs`'s `targetsClosure` already exists for the transitive
+// job (a different one -- scoping a goal, not reporting progress).
+function targetsOf(view, item) {
+  const ids = Array.isArray(item.targets) ? item.targets : [];
+  return ids.map((targetId) => {
+    const target = view.work?.[targetId];
+    return {
+      id: targetId,
+      title: target?.title ?? null,
+      status: target?.status ?? null,
+    };
+  });
+}
+
 function collectRollupData(view, id) {
   const item = view.work?.[id];
   if (!item) {
@@ -732,13 +766,21 @@ function collectRollupData(view, id) {
   }
   const children = childrenOf(view, id);
   const done = children.filter((w) => w.status === 'done').length;
+  const targets = targetsOf(view, item);
   return {
     id,
     title: item.title,
     status: item.status,
+    // Children-only, unchanged by tsk-1ug: every already-published
+    // consumer of these two fields keeps reading exactly the number it
+    // read before. A milestone's own progress lives in the `target*` pair
+    // below instead of changing what these two mean.
     doneCount: done,
     totalCount: children.length,
     children: children.map((c) => ({ id: c.id, title: c.title, status: c.status })),
+    targetDoneCount: targets.filter((t) => t.status === 'done').length,
+    targetTotalCount: targets.length,
+    targets,
   };
 }
 
