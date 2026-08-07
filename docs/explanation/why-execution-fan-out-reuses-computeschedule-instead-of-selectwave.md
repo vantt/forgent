@@ -163,6 +163,41 @@ finishes" (which would need the 5-cap reinterpreted as a cap on
 *in-flight* count rather than *wave size*); and the exact default tier
 for leaf auto-approval within the existing `gate-bypass` levels scale.
 
+## Follow-up finding (`tsk-4so`): the advisory verbs were already blind to any item not at `executing`
+
+A bug found live while validating this very item family, not filed for
+a new feature: `ready`, `conflicts`, and `computeSchedule` underneath
+them were only ever looking at the `Execute` frontier, regardless of
+what stage an item was actually at.
+
+Three real symptoms confirmed on 2026-08-07: **(1)** the `ready` verb
+calls `readyWork(dir)` without passing `step` at all — `fgos ready
+--step Divide`, `--step Clarify`, and no flag at all all returned the
+*same* 6-item set, silently swallowing the flag even though `frontier`
+had already supported per-step filtering since `tsk-19j` D9. **(2)**
+`footprintOverlap(view)` is defined as `footprintOverlapAmong
+(frontier(view))` — the `conflicts` verb reported **0** overlapping
+pairs at a moment when `tsk-4fg`, `tsk-59x`, and `tsk-1ug` (three items
+from this very fan-out companion-fix family, all documented above) all
+touched `bin/fgos.mjs`, two of them also touching
+`test/cli/fgos.test.mjs` — a real overlap, reported by no tool at all.
+**(3)** the direct, concrete consequence: three of fan-out's own children
+(`tsk-ik3`, `tsk-1q2`, `tsk-66d`) sitting at stage `decompose` were
+**invisible** to `fgos ready` — a person scanning the frontier the normal
+way would never see them; only looking them up directly by id, or
+running `fgos rollup tsk-umc`/`fgos list`, would surface them.
+
+This is the "MISS a user would worry about" class of bug — a real
+capability quietly not doing its job, discovered by working the same
+feature family it happened to affect, not a coincidence: the fan-out
+companion items above were exactly the kind of pre-`executing`-stage
+churn that made the blind spot observable. Confirmed explicitly *not*
+affecting fan-out's own real dispatch mechanism, though — fan-out's own
+children are generated straight at stage `executing`
+(`decompose.mjs:1008`), so the actual fan-out dispatch path never
+touches this blind spot; only advisory tooling looking at earlier-stage
+items (`clarify`/`decompose`) was affected.
+
 ## Implementation (`tsk-66d`): wiring fan-out into the shared anchor-report contract, not a new command
 
 The final integration piece implemented D8's "capability, not entry
