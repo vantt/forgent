@@ -71,6 +71,20 @@ dropped every mouse event). Button hit-testing needs each frame's
 rendered `Rect`s for Pick/Discover stored on `App`, since `draw()` was a
 pure render function with no persisted layout before this item.
 
+### Implementation (`tsk-40t`): mouse wiring, no new color/style
+
+Confirmed feasible against the actual pinned dependency
+(`crossterm 0.29.0`, `Cargo.lock`) before implementation: `event.rs:318`
+has a real `EnableMouseCapture`, `event.rs:558` a real
+`Event::Mouse(MouseEvent)`, and `event.rs:777-786` a real
+`MouseEvent { kind, column, row, modifiers }` — not a hoped-for API.
+Depended on `tsk-1e3` (the Pick/Discover buttons had to exist first for
+their `Rect`s to be hit-testable). Pure interaction wiring — no new
+color or style introduced here. Confirmed shipped as real code: a real
+`mouse_click_inside_pick_button_rect_fires_pick` test
+(`herdr-plugin/src/main.rs`), plus `EnableMouseCapture` and
+`Event::Mouse` both present in `herdr-plugin/src/ui.rs`.
+
 ## Pane-jump behavior
 
 `Enter` → live herdr pane (the existing jump-to-pane behavior) applies to
