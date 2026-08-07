@@ -1019,8 +1019,8 @@ export async function runOnce(options = {}) {
     // use (CONTEXT.md's own instruction), just pointed at `fgos-researching`
     // via `opts.stage: 'discovery'` (dispatch.mjs). Discovery is a pure
     // machine-alone pass (D3 — "pha máy-một-mình tách khỏi pha máy+người"):
-    // there is no verdict to gate the transition on here, unlike
-    // `resolveDiscovery`'s own clarify->decompose edge — the worker records
+    // there is no verdict to gate the transition on here, unlike the
+    // clarify->decompose engine's own edge — the worker records
     // its findings in `RESEARCH.md` and the item unconditionally advances
     // `discovery -> exploring` once dispatch settles; the human-facing
     // decision-lock happens at `exploring`, not here. Sequential (mirrors
