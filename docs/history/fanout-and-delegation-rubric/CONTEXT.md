@@ -66,6 +66,7 @@ Vòng `clarify` của chính item này bổ sung D9–D14. Vòng `decompose` c�
 | D-ID | Quyết định |
 |---|---|
 | D16 | `resolveDecompose` **không đối xứng** với `resolveDiscovery` — nhánh không-verdict của nó rơi vào `judgeDecompose` thật (chỉ miễn khi `plan.md` ghi `tiny`/`small`). `runOnce` (`loop.mjs:1051`) là caller **duy nhất** không truyền verdict. Quyết định: `callerVerdict` bắt buộc; nhánh không-verdict thành **no-op an toàn** (không throw, không gọi judge) — không phải lỗi. Áp dụng cùng logic D6 đã dùng cho discovery: runner chưa từng chạy thật, no-op không đổi hành vi quan sát được nào trong dogfood history hôm nay; throw mới là regression thật nếu ai đó bật runner sau này |
+| D17 | `judgeVerifySemanticCorrectness` chạy **không điều kiện** trên mọi `verdict.clear`, kể cả `callerVerdict` — khác hẳn `judgeDiscovery`/`judgeDecompose` (đọc `discovery.mjs:671`/`decompose.mjs:893` xác nhận). Bằng chứng sống: cả 2 dispute thật hôm nay trên `tsk-5kn` xảy ra dù luôn truyền `--verdict`. Quyết định: **giữ nhánh mechanical** (`matchesKnownBadVerifyPattern`, không subprocess) **trong verb**; **gỡ hẳn nhánh LLM-fallback** (gọi `runJudgeExecutor`) — verb là hàm Node thuần, không gọi Task được, cùng giới hạn cấu trúc D1 đã chỉ ra. Chi phí thật: verb không còn tự bắt được lỗi kiểu dispute #2 (regex false-negative theo cấu trúc) — trách nhiệm chuyển sang skill gọi verb + kỷ luật `fgos-validating` |
 
 ## Thuật ngữ đã ghim
 

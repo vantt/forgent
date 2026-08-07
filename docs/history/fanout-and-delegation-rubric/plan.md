@@ -171,11 +171,34 @@ Hard-gate có mặt ⇒ **heavy** bất kể số đếm còn lại. `impact-ana
 3. **Giữ nguyên đường trust-signal** — `readLockedContext`/`resolveContentRoot`
    (định nghĩa trong `decompose.mjs`, dùng chung cả hai file) không đụng tới:
    không phụ thuộc `runJudgeExecutor`, là nhánh B1 độc lập (`tsk-ozl`).
-4. **Gỡ `judgeVerifySemanticCorrectness`** khỏi `runJudgeExecutor` — theo D9
-   giả định 3 của `tsk-5kn`: **chuyển thành lời gọi từ soul**, không xoá
-   trắng — nó bắt được 2 lỗi thật ngay trong vòng `clarify` của chính item
-   này (verify placeholder, regex false-negative). Xoá trắng là mất một lớp
-   đang hoạt động.
+4. **`judgeVerifySemanticCorrectness` — SỬA LẠI, đọc code thật lúc
+   `fgos-validating` lật ra sai lầm ở đây.** Approach bản đầu coi nó song
+   song với `judgeDiscovery`/`judgeDecompose` (gọi khi thiếu callerVerdict).
+   **Sai** — đọc `discovery.mjs:671`/`decompose.mjs:893` xác nhận nó chạy
+   **KHÔNG ĐIỀU KIỆN** trên mọi `verdict.clear`, kể cả khi verdict đến từ
+   `callerVerdict` (không nằm trong nhánh `else` của judge cũ). Đây chính
+   là cơ chế đã bắt cả 2 dispute thật của `tsk-5kn` hôm nay — cả hai lần
+   em đều truyền `--verdict` tường minh, và vẫn bị từ chối bởi đúng hàm
+   này.
+
+   Hàm có 2 nhánh: **mechanical** (`matchesKnownBadVerifyPattern`, dò
+   pattern `node --test` sai cách grep TAP — thuần cú pháp, không gọi
+   subprocess) và **LLM-fallback** (gọi `runJudgeExecutor`). Cả 2 dispute
+   thật hôm nay đều ra từ nhánh LLM, không phải nhánh mechanical — tức
+   nhánh LLM đang làm việc thật, bắt đúng 2 lỗi khác nhau.
+
+   Quyết định (thay giả định 3 cũ): **nhánh mechanical Ở LẠI trong verb**
+   (rẻ, tất định, không subprocess, đúng tinh thần D1 "verb chỉ ghi" vì nó
+   không judgment — chỉ so pattern). **Nhánh LLM-fallback BỊ GỠ HẲN** khỏi
+   verb, không chuyển thành lời gọi từ soul bên trong verb (verb là hàm
+   Node thuần, không gọi Task được — đúng giới hạn cấu trúc D1 đã chỉ ra
+   cho 2 hàm kia, áp y hệt ở đây). **Chi phí thật, không giấu:** verb sẽ
+   không còn tự bắt được loại lỗi như dispute #2 hôm nay (regex
+   false-negative theo cấu trúc) — trách nhiệm đó chuyển sang skill gọi
+   verb (đọc kết quả `verify-disputed` cũ đã chứng minh cơ chế dispute vẫn
+   hoạt động, chỉ là người/soul phải tự phán thay vì verb tự phán) và kỷ
+   luật `fgos-validating`'s reality gate (chính cơ chế vừa bắt ra phát
+   hiện này).
 5. **Xoá `judge-executor.mjs` + `judge-fail-log.mjs`** sau khi cả ba hàm
    không còn consumer nào.
 6. **Chia lại 244 test case thành ba loại** (không đoán trước tại planning —
@@ -203,17 +226,26 @@ hợp đồng của 2 hàm + dọn hạ tầng dùng chung). Ca biên bắt bu�
   bắt được đúng 2 ca đã xảy ra thật: verify placeholder rỗng, và regex
   false-negative theo cấu trúc.
 
-**Giả định chưa chứng minh, để `fgos-validating` xác nhận:**
+**Giả định — trạng thái sau `fgos-validating`:**
 
-1. Xoá `judge-executor.mjs`/`judge-fail-log.mjs` hoàn toàn không để lại
-   import treo — cần `rg` toàn repo sau khi sửa, không chỉ trong 4 file
-   footprint đã khai.
-2. 244 test case chia đúng ba loại như Approach bước 6 mà không sót ca nào
-   assert nhầm hành vi cũ.
-3. `judgeVerifySemanticCorrectness` chuyển thành lời gọi từ soul **không**
-   làm mất khả năng chạy headless của `fgos-code-implement` (skill này chạy
-   "effectively headless", không chờ người) — cần soi lại cách gọi cụ thể
-   lúc implement, chưa thiết kế ở đây.
+1. ~~Xoá `judge-executor.mjs`/`judge-fail-log.mjs` không để lại import
+   treo~~ — **ĐÃ CHỨNG MINH**: `rg -l "judge-executor" --glob "*.mjs" .`
+   toàn repo cho đúng 9 file — 8 file đã nằm trong footprint (sau khi sửa
+   mirror ở P1), cộng `test/cli/fgos.test.mjs` chỉ nhắc trong **comment**
+   (`grep -n "^import.*judge-executor"` rỗng) — không cần sửa, không phải
+   import thật.
+2. 244 test case chia đúng ba loại như Approach bước 6 — **để nguyên,
+   không đoán trước**: đây là công việc implement per-test, không phải
+   giả định feasibility (không có "chứng minh trước" nào hợp lý cho việc
+   sẽ làm đúng khi làm — giống mọi task code khác).
+3. ~~`judgeVerifySemanticCorrectness` chuyển thành lời gọi từ soul~~ —
+   **THAY BẰNG quyết định thật ở Approach bước 4** (đọc code lúc
+   validating lật ra: hàm chạy không điều kiện, không gọi soul được vì
+   verb là hàm Node thuần — giữ nhánh mechanical trong verb, gỡ hẳn nhánh
+   LLM, chi phí đã nêu rõ). Vị trí đặt `matchesKnownBadVerifyPattern` sau
+   khi tách khỏi `judge-executor.mjs` (inline vào `discovery.mjs`/
+   `decompose.mjs`, hay module riêng nhỏ) — chi tiết implement, không
+   quyết ở đây.
 
 ### P4 — `tsk-1w7` — stage machine: thêm `discovery` + `exploring`
 
