@@ -131,3 +131,55 @@ failure shape — not just "names the wrong target" but "isn't valid shell
 at all because of appended prose" — both fall under the same
 semantic-correctness judgment pass described above, rather than needing
 two separate mechanisms.
+
+## When the second pass disagrees with itself, not just the first pass
+
+The design above assumed the second pass's own judgment, whatever it is,
+stays consistent for a given item's claim across rounds. `tsk-5cf`
+reproduced a case where it didn't: on `tsk-4xg`, across 10 rounds of
+proposing a corrected `verify` in response to each round's stated
+objection, the judge's own criteria flatly reversed — round 6 rejected a
+direct keyword grep as "too generic/just word presence"; round 8
+explicitly demanded that same direct-grep approach back; round 9 rejected
+a more specific phrase-grep as "too specific," the opposite of round 6's
+complaint. With no CLI escape hatch, a genuine two-judge disagreement
+(or, as this showed, a judge disagreeing with its own prior verdict)
+could strand an item in the `awaiting-human`/`doing` park indefinitely.
+
+The root cause traced to `buildVerifyCheckPrompt`: each round's prompt
+was built fresh from only `{title, description, proposedVerify}` — zero
+memory of the judge's own prior-round verdicts or stated reasons. Each
+round was free to invent new unstated criteria with no continuity to the
+round before it.
+
+The fix (`b47f03f`) closed both halves locked as in-scope together:
+
+- **Stabilize**: `resolveDiscovery` now threads
+  `view.gates[id].ask` — the immediately-prior round's own dispute text,
+  persisted by `replay.mjs`'s ask/answer fold as a single
+  most-recent-value slot — into the next round's
+  `judgeVerifySemanticCorrectness` call as a `priorRejection` argument,
+  the same "give the judge its own prior context" shape
+  `buildDiscoveryPrompt` already used for `view.discovery[id]`.
+- **Override**: `fgos discover --force` lets a caller proceed past a
+  disputed second-pass verdict instead of parking forever — never a
+  silent bypass. Every use is logged as a real decision record naming
+  the disagreement it overrode:
+
+  ```js
+  addDecision(dir, {
+    id,
+    text: `discover --force overrode a disputed verify: "${verdict.verify}"`,
+    source: 'resolveDiscovery',
+    rationale: `second pass disagreed: ${secondPass.reason}`,
+  });
+  ```
+
+This override is a narrower escape valve than it might look: it exists
+for the residual case where two independent judgment passes simply never
+converge — a real possibility for an LLM-backed second pass, not a
+deterministic check — not a general "skip the check" switch. The
+disagreement-parks-not-retries stance from the section above stays the
+default; `--force` only ever fires when a caller has already reasoned
+live through the specific disagreement and chooses to proceed anyway,
+with that choice recorded, never inferred.
