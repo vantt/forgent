@@ -37,7 +37,7 @@ test('DOMAINS.coding.stages adds "discovery" and "exploring" between clarify and
   assert.deepEqual(DOMAINS.coding.stages, ['clarify', 'discovery', 'exploring', 'decompose', 'executing']);
 });
 
-test('DOMAINS.coding.transitions keeps the three pre-existing edges byte-for-byte (discovery.mjs/decompose.mjs are untouched by tsk-1w7, still fire them) and adds the three new D10 edges', () => {
+test('DOMAINS.coding.transitions keeps the three pre-existing edges byte-for-byte (discovery.mjs/decompose.mjs are untouched by tsk-1w7, still fire them) and adds the three new D10 edges, plus tsk-puz D12\'s direct clarify->exploring migration jump', () => {
   assert.deepEqual(DOMAINS.coding.transitions, [
     { from: 'clarify', to: 'executing' },
     { from: 'clarify', to: 'decompose' },
@@ -45,6 +45,7 @@ test('DOMAINS.coding.transitions keeps the three pre-existing edges byte-for-byt
     { from: 'clarify', to: 'discovery' },
     { from: 'discovery', to: 'exploring' },
     { from: 'exploring', to: 'decompose' },
+    { from: 'clarify', to: 'exploring' },
   ]);
 });
 
@@ -211,6 +212,7 @@ test('adding "synthetic" leaves DOMAINS.coding unchanged', () => {
     { from: 'clarify', to: 'discovery' },
     { from: 'discovery', to: 'exploring' },
     { from: 'exploring', to: 'decompose' },
+    { from: 'clarify', to: 'exploring' },
   ]);
 });
 

@@ -397,9 +397,30 @@ script, worktree/branch thật) trong `test/e2e/runner-loop.test.mjs`.
 ### P6 — `tsk-puz` — migration 57 item đang ở `clarify`
 
 - **Verify**: `npm test`
-- **Footprint**: `scripts/migrate-clarify-split.mjs,test/state/migrate-clarify-split.test.mjs`
+- **Footprint đã sửa lúc planning** (bằng chứng bên dưới):
+  `scripts/migrate-clarify-split.mjs,test/state/migrate-clarify-split.test.mjs,src/state/workflow-stage-graphs.mjs,test/state/workflow-stage-graphs.test.mjs`
 - **D-ID**: D12
 - **Chờ**: P4
+
+**Approach (viết lúc fgos-planning tsk-puz):**
+
+D12: chưa ai đụng → giữ `clarify`; đã có D-ID (quyết định thật đã log) → `discovery`; đang park `awaiting-human` (giữa vòng hỏi-đáp) → `exploring`.
+
+Tín hiệu mechanical, đọc thẳng từ view đã replay (không đoán, không LLM):
+- `status === 'awaiting-human'` ⇒ đích `exploring`.
+- `decisionsById[id]?.length > 0` HOẶC `docsRef` trỏ tới `CONTEXT.md` có nội dung thật (`readLockedContext`, tái dùng từ `decompose.mjs`, đã export) ⇒ đích `discovery`.
+- Còn lại (chưa đụng gì) ⇒ đích `clarify` — no-op, không ghi gì.
+
+**Phát hiện thật lúc planning, sửa footprint tại chỗ:** đích `exploring` cần cạnh chuyển `clarify -> exploring` TRỰC TIẾP trong `DOMAINS.coding.transitions` — tsk-1w7 (P4) chỉ thêm `clarify -> discovery`, `discovery -> exploring`, `exploring -> decompose` (đúng luồng tuần tự cho item MỚI), không có cạnh nhảy thẳng `clarify -> exploring` cho item ĐANG PARK migrate vào. Đi qua `discovery` trước rồi mới `exploring` sai về ngữ nghĩa: `discovery` là research thuần máy (D3), một item đang park giữa câu hỏi cho người không nên bị coi là "đi research" — nó đã ở đúng chỗ máy+người rồi. Thêm 1 dòng transition mới vào `workflow-stage-graphs.mjs` (không đổi `stepMap`, không đổi stage nào khác).
+
+Script `scripts/migrate-clarify-split.mjs` theo đúng khuôn `migrate-status-proposed-to-awaiting-approval.mjs`/`migrate-actor-to-role.mjs` đã có (lock qua `events.mjs`, `--backup` bắt buộc, đọc lại backup trước khi ghi) nhưng khác chỗ quan trọng: hai script cũ REWRITE RAW LOG (string substitution trên value), còn migration này cần ĐỌC VIEW ĐÃ REPLAY (`listWork`) để biết `status`/`decisionsById`/`docsRef` của từng item rồi GHI QUA CỬA THẬT (`moveStage`, `role: 'system'`, cùng quy ước `retrospective` verb dùng cho sweep hàng loạt) — không rewrite log trực tiếp. Idempotent tự nhiên: item đã ở đúng đích thì `moveStage`'s `expectedStage` không khớp `clarify` nữa, bỏ qua (không throw, không ghi lại).
+
+**Reality gate riêng cho P6** (không lặp lại phần chung của tsk-5kn):
+- Repo fit PASS: `readLockedContext`/`decisionsById` đều đã export/tồn tại thật (đọc `decompose.mjs`, `store.mjs`).
+- Assumption rủi ro trung bình: "idempotent" — chứng minh bằng chính code (CAS qua `expectedStage`), không phải giả định suông.
+- Proof surface: verify `npm test` — cần test thật cho script (dry-run + apply + idempotent-rerun), viết lúc `fgos-code-implement`.
+
+Verdict: READY WITH CONSTRAINTS (constraint: thêm 1 transition edge vào P4's schema, ngoài footprint gốc nhưng cùng file P4 đã sửa — rủi ro thấp, chỉ thêm 1 dòng dữ liệu, không đổi hành vi cạnh cũ).
 
 ## Giả định đã ghim (chưa chứng minh — việc của `fgos-validating`)
 

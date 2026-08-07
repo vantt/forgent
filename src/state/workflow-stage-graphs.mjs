@@ -77,14 +77,20 @@ export const DOMAINS = Object.freeze({
     }),
     // Pre-retrofit stage-fsm.mjs STAGE_TRANSITIONS value — the
     // executing -> compound-learn edge is retired along with the stage
-    // itself (D11) — PLUS three new edges for the D10 chain (tsk-1w7):
-    // `clarify -> discovery -> exploring -> decompose`. The three
-    // pre-existing edges stay exactly as they were: `clarify -> executing`
-    // is still dormant-but-legal (stage-fsm.mjs's own header comment), and
-    // `clarify -> decompose` / `decompose -> executing` are still the
-    // literal edges discovery.mjs/decompose.mjs fire today — this item's
-    // own declared footprint never touches either file, so both edges must
-    // stay legal exactly as-is.
+    // itself (D11) — PLUS four new edges for the D10 chain (tsk-1w7/
+    // tsk-puz): `clarify -> discovery -> exploring -> decompose`, the
+    // sequential chain a NEW item walks, and one direct `clarify ->
+    // exploring` jump (tsk-puz D12) for a PRE-EXISTING item being migrated
+    // straight into `exploring` because it is already parked mid-Socratic-
+    // question (`status: 'awaiting-human'`) — such an item is already at
+    // the machine+human decision-lock stage; routing it through `discovery`
+    // first would misrepresent it as needing a machine-alone research pass
+    // it never asked for. The three pre-existing edges stay exactly as they
+    // were: `clarify -> executing` is still dormant-but-legal (stage-fsm.mjs's
+    // own header comment), and `clarify -> decompose` / `decompose ->
+    // executing` are still the literal edges discovery.mjs/decompose.mjs
+    // fire today — neither file is in tsk-1w7's or tsk-puz's own declared
+    // footprint, so both edges must stay legal exactly as-is.
     transitions: Object.freeze([
       Object.freeze({ from: 'clarify', to: 'executing' }),
       Object.freeze({ from: 'clarify', to: 'decompose' }),
@@ -92,6 +98,7 @@ export const DOMAINS = Object.freeze({
       Object.freeze({ from: 'clarify', to: 'discovery' }),
       Object.freeze({ from: 'discovery', to: 'exploring' }),
       Object.freeze({ from: 'exploring', to: 'decompose' }),
+      Object.freeze({ from: 'clarify', to: 'exploring' }),
     ]),
     // Which fgOS skill a session should load for each stage (str89-fgos-
     // domain-skills D3/D4) — `null` means "no skill, mechanical" (today's
