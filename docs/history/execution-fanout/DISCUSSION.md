@@ -5,6 +5,25 @@
 
 ## 1. Trạng thái hiện tại
 
+**Vòng 10 (2026-08-07) — HỘI TỤ.** Người dùng chốt hai câu cuối ⇒ mint
+**D5** (phương án C: cha tiền-kiểm, con claim qua `/fgOS:pick` nguyên vẹn,
+cha merge) và **D6** (gom = đọc state + approve theo ranking verb `merge`,
+không giao thức báo cáo; lá `blocked` là điểm dừng thật).
+
+Sáu D-ID đủ để dựng hình. **§6 đã regenerate lần đầu** kèm sơ đồ vòng
+wave; **§7 chia ba hạng mục**: `#task-wave-selector` (thuần, làm trước
+được) → `#task-fanout-skill` → `#task-cook-wiring`.
+
+Kết luận lớn của mười vòng: **gần như toàn bộ hạ tầng đã có** — decompose
+đã sinh `deps`, con đã sinh thẳng ở `executing` mang `action`, `frontier`
+đã lọc thứ tự, `claim-port` đã cưỡng chế `deps-not-merged`, lá đã fork từ
+và merge về `fgw/<root>`, `computeSchedule` đã xếp wave, verb `merge` đã
+xếp hạng, `targets` đã lo cụm epic. **Thiếu duy nhất bộ dispatcher.** Phần
+lớn công sức của item này là *đừng xây lại*.
+
+Ba việc liền kề cố ý để ngoài: cần gạt view (D3) · TTL nhận biết lá ·
+`rollup` hiểu `targets`.
+
 **Vòng 9 (2026-08-07) — D4 chốt, và một phương án thứ ba cho câu "ai
 claim".** Người dùng đồng ý case 2 dùng `goalTier`+`targets` ⇒ mint **D4**
 (seq 8919). Hai câu còn lại người dùng xin tư vấn.
@@ -336,6 +355,8 @@ Item mang việc này: **`tsk-umc`**. Mỗi D-ID dưới đây đã được ghi
 |---|---|---|
 | **D1** | **Fan-out B giữ con là work item thật** — không mở ô exec-packet/B2 mà `D4` của `two-layer-dispatch` đang gác. Chi phí một con (5-6 chuyển trạng thái · trung vị 2 lượt người · 7 ngày `cleanup` · 20MB worktree) là **chính sách hậu kỳ**, chỉnh được bằng config; phần *bản chất* (claim/verify/merge) chỉ tốn 0.18s + 20MB lúc chạy. Bỏ vòng đời để né hậu kỳ là trả giá sai chỗ | nêu vòng 3, đứng qua 4/5/6/7, người dùng chốt vòng 8. `fgos decision` seq **8896** |
 | **D2** | **Tự động approve LÁ; giữ cổng ROOT bắt buộc và có người; giữ nguyên ngoại lệ risk-keyword của `gateBypass` D4.** `return` vẫn chạy verify và block khi đỏ ⇒ bỏ approve lá là bỏ một *lượt review*, không bỏ *bằng chứng*. Lá merge vào `fgw/<root>`, không chạm main; cổng root vẫn còn, muộn hơn và bao quát hơn ⇒ cổng lá là **cổng trùng hạ một tầng**. Giá thật là **độ mịn review**, không phải an toàn | nêu vòng 7, người dùng giữ nguyên vòng 8. `fgos decision` seq **8897** |
+| **D5** | **Phương án C — cha tiền-kiểm, con claim, cha merge.** Nhị phân cha-claim/con-claim là giả: `claimWork` chạy vào cùng một store ở cả hai, khác biệt chỉ là tiến trình nào gọi. Cha cần ba thứ, chỉ **một** đòi gọi claim ⇒ cha lọc bằng hàm thuần đã có, con chạy `/fgOS:pick` nguyên vẹn. Không cửa vào mới, một đường claim, sập cứng kẹt 1 thay vì N. Quyền làm chủ nằm ở **merge**, không ở claim | nêu vòng 9, người dùng chốt vòng 10. `fgos decision` seq **8924** |
+| **D6** | **Gom kết quả về = cha đọc STATE rồi approve theo ranking của verb `merge`.** Không giao thức báo cáo: Agent trả về đã là tín hiệu, state đáng tin hơn lời tự thuật (D8), và `mergeAfter` đã có bộ xếp hạng sẵn. **Lá `blocked` là điểm dừng thật, không tự thử lại** — D2 tự động hoá *review*, không tự động hoá *chữa lỗi* | nêu vòng 9, người dùng chốt vòng 10. `fgos decision` seq **8925** |
 | **D4** | **Case 2 (cụm component/epic, con merge riêng) dùng `goalTier` + `targets` đã có sẵn** — không đẻ cạnh mới, không tách lineage khỏi merge-topology. `targets` **không đi qua `resolveRoot`** ⇒ mỗi target giữ root riêng ⇒ merge độc lập lên main. "Fix B" đề xuất vòng 5 là **thừa**. Lỗ hổng còn lại thu về đúng một chỗ: `fgos rollup` chỉ hiểu `parent` | nêu vòng 8, người dùng đồng ý vòng 9. `fgos decision` seq **8919** |
 | **D3** | **Bài messy task-list giải bằng CẦN GẠT VIEW (list/view loại con khỏi danh sách), không bằng đổi mô hình — và là ITEM RIÊNG, không thuộc `tsk-umc`.** Con chiếm 59/237 = 25% danh sách mở; `fgos list` chỉ có đúng hai chế độ, không lọc status, không gộp con dưới cha. Rút hàng đợi không cứu được: 0/99 item `cleanup` đã hết TTL 7 ngày | nêu vòng 3, giữ qua 4/5, người dùng chốt và làm sắc vòng 8. `fgos decision` seq **8898** |
 
@@ -1341,11 +1362,204 @@ lỗi**. Verify đỏ ⇒ báo người.
 3. Chốt xong hai câu này là §6 dựng được và §7 chia hạng mục — hết vòng
    thảo luận, sang `fgos-exploring`/`fgos-planning`.
 
+### 2026-08-07 — Vòng 10: hội tụ
+
+**Người dùng chốt cả hai câu cuối** ⇒ mint **D5** (phương án C) và **D6**
+(gom = đọc state + ranking `merge`), seq 8924/8925.
+
+Sáu D-ID đủ để dựng hình. **§6 regenerate lần đầu** (trước đó cố ý để
+trống — hình dạng chưa thật), kèm sơ đồ vòng wave. **§7 chia ba hạng mục**:
+bộ chọn wave (thuần, làm trước được) → skill dispatcher → nối vào
+`/fgOS:cook`. Ba việc liền kề cố ý để ngoài item này: cần gạt view (D3),
+TTL nhận biết lá, `rollup` hiểu `targets`.
+
+Không câu hỏi mở nào còn lại trong phạm vi `tsk-umc`. Ba câu vòng 1 đã
+trả lời hết: **ai claim** ⇒ D5 · **bộ chọn wave** ⇒ `computeSchedule` ∩
+tập ứng viên, bỏ `selectWave` · **gom kết quả về** ⇒ D6.
+
 ## 6. Thiết kế đã chốt {#design}
 
-*(Chưa dựng. Hình dạng chưa thật — chờ câu "ai claim" và bộ chọn wave.
-Sẽ regenerate toàn bộ ở vòng đầu tiên có D-ID làm đổi hình dạng.)*
+*(Dựng lần đầu ở vòng 10, sau khi D1-D6 đủ. Viết cho người đọc không có
+lịch sử chat.)*
+
+### Vấn đề
+
+Khi một work item được `decompose`, nó sinh ra N item con. fgOS hôm nay
+**luôn chạy N con đó tuần tự**: `/fgOS:cook` đẩy chúng lên đầu một hàng
+đợi rồi rút từng cái, và `fgos-coding-driving` gặp con đang mở thì dừng
+hẳn, trả danh sách id về cho caller. Không luật nào cấm chạy song song —
+đã có bằng chứng chạy thật (`tsk-1sj` → `tsk-30z`/`tsk-50ic`, hai Agent
+chồng lấn ~184s) nhưng **làm bằng tay**.
+
+### Thứ hoá ra ĐÃ CÓ
+
+Điều tra vòng 6-8 cho thấy gần như toàn bộ hạ tầng đã tồn tại, và phần
+lớn công sức của item này là **đừng xây lại**:
+
+| Đã có | Ở đâu |
+|---|---|
+| decompose sinh `deps` giữa các con | `src/intake/decompose.mjs:992` |
+| con sinh thẳng ở `stage: executing`, mang `action` prose | `decompose.mjs:1001,1008` |
+| item còn dep chưa xong bị loại khỏi frontier | `src/state/frontier.mjs` |
+| **lá còn dep chưa merge bị TỪ CHỐI claim** | `src/runner/claim-port.mjs:158-166` (`deps-not-merged`) |
+| lá fork từ `fgw/<root>`; approve của lá merge **ngược vào đó**, không phải main | `claim-port.mjs:130-160`; `bin/fgos.mjs` case `approve` |
+| xếp wave không đụng footprint | `src/state/graph-metrics.mjs:703` `computeSchedule` |
+| xếp hạng cái nào sẵn sàng merge | verb `merge` (`/fgOS:merge-list`) |
+| cụm epic không dính topology merge | `goalTier` + `targets` (`work.mjs:567-577`) |
+
+⇒ **Thiếu duy nhất một bộ dispatcher** chạy phần song song đồng thời.
+
+### Hai ràng buộc cưỡng chế định hình mọi thứ
+
+1. **`approve` buộc chạy trên main checkout.** Hai guard riêng biệt trong
+   `bin/fgos.mjs` từ chối khi cwd là worktree: *"approve must land on the
+   main checkout, which a session worktree structurally is not."* ⇒ một
+   agent con sống trong worktree của nó **về cấu trúc không thể tự
+   merge**. Merge lá bắt buộc do cha làm.
+2. **`claim-port.mjs` là cửa claim duy nhất**, và nó đã tự biết từ chối
+   một lá có dep chưa merge. Mọi phương án claim đều đi qua đúng guard đó.
+
+### Thiết kế
+
+**Cha giữ vai điều phối; con giữ vòng đời của chính nó.**
+
+- **Con là work item thật** (D1). Không mở ô "mảnh việc không vòng đời" —
+  chi phí đắt của một con nằm ở *chính sách hậu kỳ* (TTL 7 ngày, approve
+  từng lá), không ở *bản chất* claim/verify/merge (0.18s + 20MB lúc chạy).
+- **Cha chọn wave** = `computeSchedule` ∩ **tập ứng viên**. Tập ứng viên
+  cắm được: `children(parent)` cho case 1, `targets` của milestone cho
+  case 2 (D4), cả frontier cho runner. Một dispatcher, ba ca.
+  `selectWave` của runner **không dùng** — nó xếp theo root affinity với
+  trần `maxRoots`, mà fan-out là *một root nhiều lá*, nên nó bóp wave sai
+  hướng.
+- **Cha tiền-kiểm, con claim** (D5). Cha lọc bằng hai hàm thuần đã có
+  (`frontier`, `isResolvedStatus`) để không bắn ra con không claim được;
+  rồi mỗi con chạy `/fgOS:pick <id>` **nguyên vẹn**. Tiền-kiểm là
+  *advisory*; `claimWork` mới là *thẩm quyền* — cùng hướng fail-safe
+  `footprintOverlapAmong` đã dùng. Quyền làm chủ của cha nằm ở **merge**,
+  không ở claim.
+- **Gom = đọc state, không nghe kể** (D6). Agent trả về *là* tín hiệu
+  hoàn thành; nội dung đọc từ state (`awaiting-approval` chỉ đạt được sau
+  verify xanh). Không giao thức báo cáo — lời tự thuật của con là thứ
+  fgOS vốn không tin.
+- **Cha approve theo ranking của verb `merge`** (D6), không theo thứ tự
+  về đích — `mergeAfter` là ràng buộc thật và bộ xếp hạng đã có sẵn.
+- **Approve lá tự động; cổng root giữ nguyên có người** (D2). Lá merge
+  vào `fgw/<root>` chứ không chạm main, và cổng root lên main muộn hơn +
+  bao quát hơn ⇒ cổng lá là **cổng trùng hạ một tầng**. Ngoại lệ giữ
+  nguyên: lá chạm risk-keyword vẫn hỏi (`gateBypass` D4).
+- **Lá `blocked` là điểm dừng thật.** D2 tự động hoá *review*, không tự
+  động hoá *chữa lỗi*. Verify đỏ ⇒ báo người, không tự thử lại.
+
+```mermaid
+flowchart TD
+    A["cha: fgos-coding-driving dừng<br/>anchored-by-open-children<br/>+ danh sách con đang mở"] --> B
+
+    subgraph W["một WAVE"]
+        B["chọn wave<br/>computeSchedule ∩ tập ứng viên"] --> C["tiền-kiểm (advisory)<br/>frontier · isResolvedStatus"]
+        C --> D1["Agent 1<br/>/fgOS:pick c1"]
+        C --> D2["Agent 2<br/>/fgOS:pick c2"]
+        C --> D3["Agent N<br/>/fgOS:pick cN"]
+        D1 --> E["mỗi con: claim → worktree<br/>thi công → fgos return<br/>(verify chạy tại đây)"]
+        D2 --> E
+        D3 --> E
+        E --> F{"state của từng con"}
+        F -->|awaiting-approval| G["cha approve<br/>theo ranking verb merge"]
+        F -->|blocked| H["dừng thật<br/>báo người"]
+        G --> I["merge vào fgw/&lt;root&gt;"]
+    end
+
+    I --> J{"còn con mở?"}
+    J -->|có| B
+    J -->|hết| K["cha tự return<br/>→ cổng root lên main (CÓ NGƯỜI)"]
+    H --> K
+```
+
+### Cái này KHÔNG làm
+
+- Không mở ô exec-packet/B2 mà `D4` của `two-layer-dispatch` đang gác —
+  `D9` đòi ≥2 ca thật, và cuộc đo ở vòng 3-4 **không** cấp ca nào (cái đau
+  truy về *hậu kỳ của item*, không về *chi phí tồn tại của item*).
+- Không đổi mô hình cạnh của `0012` — case 2 đã có `targets`.
+- Không bỏ worktree riêng: footprint là **tự khai, advisory**; và chuỗi
+  A-merge-rồi-B-fork **đòi phải có nhánh**.
+- Không cần `fgos-runner` chạy được trước — đây là đường cho phiên tương
+  tác; runner là cơ chế phụ.
+
+### Việc liền kề, cố ý để NGOÀI item này
+
+| Việc | Vì sao ngoài |
+|---|---|
+| **Cần gạt view** cho `fgos list` (loại con khỏi danh sách, thay bằng chỉ báo tiến độ ở dòng cha) — D3 | bộ lọc danh sách không phải fan-out. Nhưng **phải làm cùng đợt**: fan-out nhân N lần cái đau này |
+| **TTL nhận biết lá** (Fix A) — lá TTL ngắn/0, root giữ 7 ngày | chính sách hậu kỳ, không phải dispatch. Lý lẽ đã có: nhánh lá **thừa ngay sau khi merge vào `fgw/<root>`** vì nội dung nằm trên một nhánh sống lâu hơn nó. **Phải đọc `docs/history/work-item-status-delivered-retrospective-cleanup/` trước khi sửa** |
+| **`fgos rollup` hiểu `targets`** | lỗ hổng duy nhất còn lại của case 2 |
 
 ## 7. Danh mục hạng mục / task {#tasks}
 
-*(Chưa chia. §6 phải thật trước.)*
+### Bộ chọn wave scope-theo-tập-ứng-viên {#task-wave-selector}
+
+**Mục tiêu.** Cho `computeSchedule` xếp wave trên một **tập ứng viên cho
+trước** thay vì luôn trên toàn frontier.
+
+**Trích §6.** *"Cha chọn wave = `computeSchedule` ∩ tập ứng viên. Tập ứng
+viên cắm được: `children(parent)` cho case 1, `targets` của milestone cho
+case 2, cả frontier cho runner."* — và: *"`computeSchedule` chạy trên toàn
+frontier **không phải khiếm khuyết** — đó là mặc định đúng cho case 2 và
+runner; case 1 chỉ cần giao thêm."*
+
+**D-ID áp dụng.** D4 (tập ứng viên là `targets` hay `children`), và ràng
+buộc "không dùng `selectWave`" (§3 hàng 8).
+
+**Quan hệ anh em.** Là đầu vào thuần của `#task-fanout-skill`. Không phụ
+thuộc hai cái kia; làm trước được.
+
+**Verify nháp.** `npm test -- test/state/graph-metrics.test.mjs` — thêm ca:
+tập ứng viên rỗng ⇒ không wave; tập con của frontier ⇒ chỉ xếp trong tập
+đó; item ngoài tập không bao giờ lọt vào wave.
+
+---
+
+### Skill fan-out dispatcher {#task-fanout-skill}
+
+**Mục tiêu.** Skill nhận (id cha + tập ứng viên), chạy vòng wave: tiền-kiểm
+→ bắn N Agent → đợi → đọc state → approve theo ranking verb `merge` → lặp
+tới khi hết con mở.
+
+**Trích §6.** *"Cha tiền-kiểm, con claim. Cha lọc bằng hai hàm thuần đã có
+để không bắn ra con không claim được; rồi mỗi con chạy `/fgOS:pick <id>`
+nguyên vẹn."* · *"Gom = đọc state, không nghe kể — Agent trả về là tín
+hiệu, nội dung đọc từ state."* · *"Cha approve theo ranking của verb
+`merge`."* · *"Lá `blocked` là điểm dừng thật."*
+
+**D-ID áp dụng.** D1 (con là item thật) · D2 (tự động approve lá, giữ
+ngoại lệ risk-keyword) · D5 (tiền-kiểm advisory, claim là thẩm quyền) ·
+D6 (đọc state, ranking `merge`, blocked là dừng thật).
+
+**Quan hệ anh em.** Phụ thuộc `#task-wave-selector`. Là thứ
+`#task-cook-wiring` gọi vào.
+
+**Verify nháp.** Chạy lại kịch bản `tsk-1sj` không dùng tay: một cha có 2
+con footprint rời nhau ⇒ `.fgos/events.jsonl` cho thấy hai `work.move` sang
+`doing` chồng lấn thời gian, cả hai đạt `awaiting-approval`, cả hai được
+approve vào `fgw/<root>`, và không có lượt hỏi người nào ngoài cổng root.
+
+---
+
+### Nối dispatcher vào `/fgOS:cook` {#task-cook-wiring}
+
+**Mục tiêu.** Thay nhánh "anchored by open children" của `/fgOS:cook` —
+hiện đẩy mọi child id lên **đầu một hàng đợi tuần tự** — bằng lời gọi
+`#task-fanout-skill`.
+
+**Trích §6.** *"fgOS hôm nay luôn chạy N con đó tuần tự: `/fgOS:cook` đẩy
+chúng lên đầu một hàng đợi rồi rút từng cái."* — chỗ móc vào chỉ có một, và
+`fgos-coding-driving` đã trả sẵn đúng danh sách cần (`SKILL.md:86-102`,
+*"the caller decides whether to drive each open child next"*).
+
+**D-ID áp dụng.** D5 (cha điều phối, con tự claim) — `/fgOS:cook` là cha.
+
+**Quan hệ anh em.** Phụ thuộc `#task-fanout-skill`. Làm cuối.
+
+**Verify nháp.** `/fgOS:cook` trên một mô tả tách được thành ≥2 con không
+đụng footprint ⇒ hai con vào `doing` chồng lấn (đo từ `events.jsonl`), thay
+vì tuần tự như hôm nay. `npm test` xanh toàn bộ.
