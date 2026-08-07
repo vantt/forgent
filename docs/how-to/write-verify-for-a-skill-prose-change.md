@@ -154,3 +154,29 @@ would actually work if followed" — đúng ca `content coherence` ở mục
 > CONTEXT.md: chất lượng nội dung thuộc review lúc merge + fgos-validating,
 > không thuộc verify field. Verify giữ nguyên..., chuyển sang đường
 > lockedContext vì CONTEXT.md đã khoá/duyệt/commit."
+
+## Cập nhật (`tsk-rlv`): tài liệu này giờ tự trồi lên đúng thời điểm cần
+
+`tsk-1x7` (một item chỉ sửa `fgos-validating/SKILL.md`) tự viết verify
+riêng — 2 lệnh grep, không `npm test`, không cấu trúc POSITIVE/NEGATIVE —
+mà không hề biết tài liệu chuẩn này đã tồn tại. Kết quả: đúng 3 vòng
+dispute-park-force, một phần lẽ ra tránh được nếu trích dẫn thẳng tài
+liệu này từ đầu.
+
+Nguồn gốc bug được thu hẹp phạm vi trong `docs/history/judge-verify-check
+-missing-stage-context/CONTEXT.md` (D1/D2): đề xuất ban đầu là sửa
+`judgeVerifySemanticCorrectness` để bỏ qua khiếu nại "comprehension" cho
+diff chỉ-đụng-docs — nhưng sau khi `tsk-3jy` (anti-repeat prompt fix
+chung, đã giao) hạ cánh và tài liệu chuẩn này được tìm thấy đã tồn tại
+sẵn, sửa đúng chỗ hoá ra không phải sửa code judge mà là **làm cho
+session thấy tài liệu này TRƯỚC khi tự viết verify**, không phải sau khi
+đã tự viết sai.
+
+Sửa: `fgos-exploring/SKILL.md` và `fgos-planning/SKILL.md` giờ trỏ thẳng
+về tài liệu này ngay tại điểm viết `verify`, có điều kiện: khi item đang
+làm đụng một đường dẫn `SKILL.md` (`.claude/skills/**/SKILL.md`,
+`.agents/skills/**/SKILL.md`, `plugins/fgOS/skills/**/SKILL.md`) — đúng
+phạm vi tài liệu này tự khai ở đầu. Một session viết verify cho item
+skill-prose giờ được trỏ tới chuẩn có sẵn ngay trong luồng
+`fgos-exploring`/`fgos-planning` của chính nó, không cần đã biết trước
+tài liệu này tồn tại.
