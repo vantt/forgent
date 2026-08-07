@@ -455,6 +455,34 @@ test('mainCheckoutHookWired is true once core.hooksPath is set to .githooks', ()
   fs.rmSync(cwd, { recursive: true, force: true });
 });
 
+test('mainCheckoutHookWired is true when core.hooksPath is an absolute path resolving to repoRoot/.githooks', () => {
+  const cwd = mkTemp('doctor-hook-absolute-');
+  execFileSync('git', ['init', '-q'], { cwd });
+  execFileSync('git', ['config', 'core.hooksPath', path.join(cwd, '.githooks')], { cwd });
+  assert.equal(mainCheckoutHookWired(cwd), true);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+test('mainCheckoutHookWired is true from inside a linked worktree when the main checkout has an absolute core.hooksPath, not just from the main checkout itself', () => {
+  const mainCheckout = mkTemp('doctor-hook-absolute-worktree-main-');
+  execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: mainCheckout });
+  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: mainCheckout });
+  execFileSync('git', ['config', 'user.name', 'Test'], { cwd: mainCheckout });
+  fs.writeFileSync(path.join(mainCheckout, 'file.txt'), 'x');
+  execFileSync('git', ['add', 'file.txt'], { cwd: mainCheckout });
+  execFileSync('git', ['commit', '-q', '-m', 'init'], { cwd: mainCheckout });
+  execFileSync('git', ['config', 'core.hooksPath', path.join(mainCheckout, '.githooks')], { cwd: mainCheckout });
+
+  const worktreeDir = mkTemp('doctor-hook-absolute-worktree-linked-');
+  fs.rmdirSync(worktreeDir);
+  execFileSync('git', ['worktree', 'add', '-q', '-b', 'wt-branch', worktreeDir], { cwd: mainCheckout });
+
+  assert.equal(mainCheckoutHookWired(worktreeDir), true, 'must resolve against the main checkout root, not the worktree cwd it was called from');
+
+  execFileSync('git', ['worktree', 'remove', '--force', worktreeDir], { cwd: mainCheckout });
+  fs.rmSync(mainCheckout, { recursive: true, force: true });
+});
+
 test('main-checkout-hook-wired doctor check reports passed/failed matching mainCheckoutHookWired, with an actionable message', () => {
   const cwd = mkTemp('doctor-hook-check-');
   execFileSync('git', ['init', '-q'], { cwd });
