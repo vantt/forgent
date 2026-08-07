@@ -68,13 +68,23 @@ existing precedent (same file, same helper, same file).
    `stalePostDeliveryAdvisory`/`classifyStalePostDelivery` with only
    `ttlDays`, same as today.
 
-   `pickNextCleanupItem`'s own two callers (`/fgOS:cleanup-next`/
-   `/fgOS:cleanup-loop`'s skill-level plumbing, wherever they resolve
-   `ttlDays` from shared config today) need the same `leafTtlDays` read
-   added at their own call site — grep for `pickNextCleanupItem(` at
-   implementation time to find every caller; not enumerated here since
-   this plan's own file list (below) is a citation, not a promise no
-   other caller exists.
+5. **`plugins/fgOS/skills/cleanup-next/SKILL.md`** (found at
+   `fgos-validating` via `grep -rn "pickNextCleanupItem(" bin src plugins
+   .claude` — the plan's own risk-map row anticipating this): the ONLY
+   real caller of `pickNextCleanupItem`, an inline `node -e` script
+   (lines 39-54) that reads `ttlDays` the same way `bin/fgos.mjs`'s
+   `case 'cleanup'` does and calls `pickNextCleanupItem(view, rawEvents,
+   { ttlDays })`. Add the same `leafTtlDays` read (importing
+   `DEFAULT_CLEANUP_LEAF_TTL_DAYS` alongside the existing
+   `DEFAULT_CLEANUP_TTL_DAYS` import) and pass it through:
+   `pickNextCleanupItem(view, rawEvents, { ttlDays, leafTtlDays })`. This
+   is a skill-prose path (`plugins/fgOS/skills/**/SKILL.md`) — per
+   `docs/how-to/write-verify-for-a-skill-prose-change.md`, the edit here
+   is a literal embedded script (deterministic, not LLM-interpreted
+   prose), so a grep-based POSITIVE/NEGATIVE pair is sufficient proof,
+   folded into the item's own verify command (below) rather than a
+   separate smoke-test doc — this is a small supporting edit within a
+   feature item, not itself a dedicated skill-behavior-change item.
 
 **Rejected alternative:** changing `checkCleanupTTLElapsed`'s own
 signature to take `view` directly, resolving leaf-ness internally.
@@ -103,10 +113,27 @@ untouched (zero risk to its own 24 existing tests).
   `assessCleanupReadiness` gains optional `leafTtlDays`
 - `src/state/cleanup-pool.mjs` — `pickNextCleanupItem` gains optional
   `leafTtlDays`
-- `bin/fgos.mjs` — `case 'cleanup'` reads and threads `leafTtlDays`;
-  `pickNextCleanupItem`'s own caller(s), located at implementation time
+- `bin/fgos.mjs` — `case 'cleanup'` reads and threads `leafTtlDays`
+- `plugins/fgOS/skills/cleanup-next/SKILL.md` — its own inline script
+  threads `leafTtlDays` through to `pickNextCleanupItem` (found at
+  `fgos-validating`, confirmed the only real caller)
 - `test/state/cleanup-harness.test.mjs`, `test/state/cleanup-pool.test.mjs`
   — new cases per risk map above
+
+## Verify (revised at `fgos-validating`)
+
+```
+node --test test/state/cleanup-harness.test.mjs && npm test && grep -q "leafTtlDays" plugins/fgOS/skills/cleanup-next/SKILL.md && ! grep -q "pickNextCleanupItem(view, rawEvents, { ttlDays })" plugins/fgOS/skills/cleanup-next/SKILL.md
+```
+
+The two grep clauses are the POSITIVE/NEGATIVE pair
+`write-verify-for-a-skill-prose-change.md` requires for any item touching
+a `plugins/fgOS/skills/**/SKILL.md` path: POSITIVE proves the new
+`leafTtlDays` threading landed in the skill's own script; NEGATIVE proves
+the old ttlDays-only call signature is gone (not just added alongside it).
+The original verify (`node --test ... && npm test`) already existed and
+covers every `.mjs` file above; this revision only adds the two grep
+clauses for the newly-found `SKILL.md` file.
 
 ## Assumptions
 
