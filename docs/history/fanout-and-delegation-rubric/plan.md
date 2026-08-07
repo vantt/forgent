@@ -374,6 +374,26 @@ Footprint gốc (`loop.mjs` + 1 test file) không đủ để giao thật — b�
    chưa test end-to-end thật nào. Cần `fgos-validating` tự chạy thử một
    dispatch discovery thật (script giả lập worker) trước khi chốt READY.
 
+**Sửa lại lúc `fgos-code-implement` (D-ID thêm: không có verdict ở stage
+discovery):** ý (3)/(4) ở trên (worker báo verdict qua fenced block, runner
+gọi `resolveDiscovery`) SAI — đọc lại kỹ hơn thì `resolveDiscovery` chỉ xử
+lý cạnh `clarify -> decompose`, không có hàm engine nào xử lý cạnh
+`discovery -> exploring` cả (không phải `resolveDiscovery`, không phải
+`resolveDecompose`). Verify của chính item này (`! rg -q "resolveDiscovery"
+src/runner/loop.mjs`) thực ra đã ngầm xác nhận điều này — cấm dùng
+`resolveDiscovery` nghĩa là cơ chế thật KHÔNG được dựa vào nó. Thiết kế
+cuối: **discovery không có verdict, không có judgment gate** — đúng tinh
+thần D3 ("pha máy-một-mình", không có câu hỏi cho người ở stage này, câu
+hỏi thật chỉ xảy ra ở `exploring`). Worker chạy `fgos-researching`, ghi
+`RESEARCH.md`, commit — RUNNER kiểm có commit thật hay không
+(`branchFacts(...).aheadCount > 0`, cùng kỷ luật `facts.aheadCount > 0` của
+dispatch `executing`) rồi **advance thẳng** `discovery -> exploring` qua
+`moveStage` trực tiếp (literal, không qua `stageForStep` vì hai stage này
+không map step nào cả — tsk-1w7 D10). Không cần kênh fenced-block verdict
+mới; kênh `fgos-discovered` (report-not-write) vẫn giữ nguyên cho việc con
+phát sinh ngoài ý, không đổi shape. Đã test thật end-to-end (fake worker
+script, worktree/branch thật) trong `test/e2e/runner-loop.test.mjs`.
+
 ### P6 — `tsk-puz` — migration 57 item đang ở `clarify`
 
 - **Verify**: `npm test`
