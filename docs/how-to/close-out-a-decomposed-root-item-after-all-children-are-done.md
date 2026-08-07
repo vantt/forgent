@@ -185,3 +185,44 @@ item's own branch first — the same operation this how-to's own earlier
 "Trap" section describes for re-syncing `main`, just run one level lower,
 against whichever branch the children's `fgos approve` output actually
 named as `target`.
+
+## Bug (tsk-1ia): `--verify-from-children`'s generated `jq` was vacuously true
+
+The `jq` check `fgos edit --verify-from-children`/`--verify-from-targets`
+generates (step 1's tsk-580 update above) originally read:
+
+```
+all(["delivered","retrospective","cleanup","done"] | index(.) != null)
+```
+
+This is always `true`, regardless of the actual child status being
+checked. The bug is precedence: `index(.)` inside `all(...)` binds `.` to
+the array literal on its own left (`["delivered",...] | index(.)`, i.e.
+"does this array contain itself"), never to the individual status string
+`all()` is iterating over. Confirmed by running it directly:
+
+```
+echo '["todo","doing"]' | jq 'all(["delivered","retrospective","cleanup","done"] | index(.) != null)'
+# => true   (wrong — neither "todo" nor "doing" is a resolved status)
+```
+
+Fix — bind the iterated value to a named variable first, so `index($s)`
+resolves against the actual status being checked, not the array literal:
+
+```
+all(. as $s | ["delivered","retrospective","cleanup","done"] | index($s) != null)
+```
+
+This is the same pattern `tsk-2jc` already used correctly elsewhere
+(`.data.work[id].status as $s | [...] | index($s) != null`) — worth
+matching from the start rather than re-deriving it.
+
+**Watch out for: a `grep`-based test on the generated `jq` string can pass
+while the underlying `jq` logic is still broken.** The original test
+coverage only checked that the generated verify command contained the
+right substrings, never executed it. The fix required a test that actually
+spawns `jq` (e.g. via `spawnSync`) against a real fixture array of
+unresolved statuses and asserts the real boolean result — a test that
+only inspects the generated command text as a string cannot catch a
+precedence bug like this one, since the wrong expression still "looks
+right" as text.
