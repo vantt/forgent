@@ -340,10 +340,15 @@ test('graphMetrics umbrella completes P43: components + criticalPath + staleBloc
   const m1 = graphMetrics(view);
   const m2 = graphMetrics(view);
   assert.deepEqual(m1, m2); // deterministic -> stable data_hash
-  assert.deepEqual(Object.keys(m1), ['order_version', 'frame', 'componentCount', 'components', 'criticalPath', 'staleBlocked', 'topUnblock']);
+  assert.deepEqual(Object.keys(m1), ['order_version', 'frame', 'componentCount', 'components', 'criticalPath', 'staleBlocked', 'topUnblock', 'stageByItem']);
   assert.deepEqual(m1.criticalPath, { depth: 2, path: ['b', 'a'] });
   assert.deepEqual(m1.staleBlocked, [{ id: 'b', status: 'todo', blockedBy: ['a'] }]);
   assert.deepEqual(m1.topUnblock[0], { id: 'a', unblocks: 1, newlyUnblocks: 2 });
+  // tsk-4zj D6: stageByItem covers every id in the work map, regardless of
+  // whether that id appears in components/criticalPath/staleBlocked/
+  // topUnblock above — a's own stage is absent (never explicitly set), so
+  // it defaults to coding's Execute-mapped stage, same as b.
+  assert.deepEqual(m1.stageByItem, { a: 'executing', b: 'executing' });
 });
 
 // --- S7: what-if + architecture frame --------------------------------------
@@ -356,7 +361,7 @@ test('whatIf: completing a chain root unblocks its transitive downstream; newlyR
       c: item('c', { deps: ['a', 'b'] }), // also waits on b -> NOT newly ready
     },
   };
-  assert.deepEqual(whatIf(view, 'a'), { id: 'a', exists: true, unblocksTransitive: 2, newlyReady: ['b'] });
+  assert.deepEqual(whatIf(view, 'a'), { id: 'a', exists: true, unblocksTransitive: 2, newlyReady: ['b'], stageByItem: { a: 'executing', b: 'executing' } });
 });
 
 test('whatIf: completing a child unblocks its open parent, the same way completing a deps target would', () => {
@@ -372,7 +377,7 @@ test('whatIf: completing a child unblocks its open parent, the same way completi
   // `deps` array is empty, so it reads as vacuously deps-satisfied — the same
   // pre-existing, unrelated-to-this-fix behavior any item with no `deps`
   // would show for any `id` queried, not something this change introduces.
-  assert.deepEqual(whatIf(view, 'child'), { id: 'child', exists: true, unblocksTransitive: 1, newlyReady: ['root'] });
+  assert.deepEqual(whatIf(view, 'child'), { id: 'child', exists: true, unblocksTransitive: 1, newlyReady: ['root'], stageByItem: { child: 'executing', root: 'executing' } });
 });
 
 test('whatIf: an unknown id is exists:false with zero impact', () => {
@@ -381,7 +386,7 @@ test('whatIf: an unknown id is exists:false with zero impact', () => {
 
 test('whatIf: a done dependent is never counted as newly-unblocked', () => {
   const view = { work: { root: item('root'), done: item('done', { status: 'done', deps: ['root'] }) } };
-  assert.deepEqual(whatIf(view, 'root'), { id: 'root', exists: true, unblocksTransitive: 0, newlyReady: [] });
+  assert.deepEqual(whatIf(view, 'root'), { id: 'root', exists: true, unblocksTransitive: 0, newlyReady: [], stageByItem: { root: 'executing' } });
 });
 
 // wontfix-terminal-status-filter-consistency D2: a wontfix item is RESOLVED
@@ -390,7 +395,7 @@ test('whatIf: a done dependent is never counted as newly-unblocked', () => {
 // newly-ready.
 test('whatIf: a wontfix dependent is never counted as newly-unblocked, same as done', () => {
   const view = { work: { root: item('root'), closed: item('closed', { status: 'wontfix', deps: ['root'] }) } };
-  assert.deepEqual(whatIf(view, 'root'), { id: 'root', exists: true, unblocksTransitive: 0, newlyReady: [] });
+  assert.deepEqual(whatIf(view, 'root'), { id: 'root', exists: true, unblocksTransitive: 0, newlyReady: [], stageByItem: { root: 'executing' } });
 });
 
 test('whatIf: newlyReady still includes a dependent whose OTHER dep is already wontfix, same as done', () => {

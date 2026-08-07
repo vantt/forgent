@@ -60,7 +60,7 @@ import { createSession, endSession, listSessions, reclaimOrphanedSessions, Sessi
 import { resolveRoot } from '../src/runner/root-affinity.mjs';
 import { visitCount } from '../src/runner/anti-loop.mjs';
 import { DEFAULTS } from '../src/state/work.mjs';
-import { getDomain, stageForStep } from '../src/state/workflow-stage-graphs.mjs';
+import { getDomain, stageForStep, effectiveStage } from '../src/state/workflow-stage-graphs.mjs';
 import { writeCoexistenceManifest } from '../src/install/coexist.mjs';
 import { MANIFEST_SCHEMA_VERSION, COMMAND_REGISTRY } from '../src/cli/command-registry.mjs';
 import { recordInvocationFault } from '../src/cli/invocation-fault-log.mjs';
@@ -450,6 +450,17 @@ function readPaginationFlags(flags, verbLabel) {
 // (per D35: the four paginated verbs' default output stays byte-identical to
 // before this cell). `order` is this verb's own literal order tag (e.g.
 // 'ready-v1'), named once at the call site.
+// tsk-4zj D1/D4: additive-only projection — never mutates `item`, never
+// touches `stage` itself (stays absent when never explicitly set, per the
+// D8 lazy-default contract `test/state/frontier.test.mjs:205`/
+// `test/state/backward-compat.test.mjs:277` lock at the storage layer).
+// Read-verb print sites spread this onto whatever they already return so a
+// reader can tell "explicitly at this stage" from "defaulted here" instead
+// of seeing an absent field with no explanation either way.
+function withStageEffective(item) {
+  return { ...item, stageEffective: effectiveStage(item, getDomain(item.domain)) };
+}
+
 function paginateVerbResult(items, flags, order, verbLabel) {
   const { cursor, limit } = readPaginationFlags(flags, verbLabel);
   if (cursor === undefined && limit === undefined) return items;
@@ -732,9 +743,15 @@ function collectRollupData(view, id) {
     id,
     title: item.title,
     status: item.status,
+    stageEffective: effectiveStage(item, getDomain(item.domain)),
     doneCount: done,
     totalCount: children.length,
-    children: children.map((c) => ({ id: c.id, title: c.title, status: c.status })),
+    children: children.map((c) => ({
+      id: c.id,
+      title: c.title,
+      status: c.status,
+      stageEffective: effectiveStage(c, getDomain(c.domain)),
+    })),
   };
 }
 
@@ -1613,7 +1630,7 @@ async function runVerb(verb, flags, positional, dir) {
         const scopedById = (section) => (section?.[id] !== undefined ? { [id]: section[id] } : {});
         const singleView = {
           ...rawView,
-          work: { [id]: item },
+          work: { [id]: withStageEffective(item) },
           decisions: (rawView.decisions ?? []).filter((d) => d.id === id),
           discovery: scopedById(rawView.discovery),
           gates: scopedById(rawView.gates),
@@ -1636,9 +1653,13 @@ async function runVerb(verb, flags, positional, dir) {
       // map changes shape here — every other view key (decisions/gates/
       // settlements/etc.) is untouched either way.
       const showAll = Boolean(flags.all);
-      const view = showAll
-        ? rawView
-        : { ...rawView, work: Object.fromEntries(Object.entries(rawView.work).filter(([, item]) => !isResolvedStatus(item))) };
+      const filteredWork = showAll
+        ? rawView.work
+        : Object.fromEntries(Object.entries(rawView.work).filter(([, item]) => !isResolvedStatus(item)));
+      const view = {
+        ...rawView,
+        work: Object.fromEntries(Object.entries(filteredWork).map(([id, item]) => [id, withStageEffective(item)])),
+      };
       // Parent-anchored context (str61 D1/D2/D3): additive-only key,
       // computed fresh from `view` on every read (D1 — never a persisted
       // "session"), never touching store.listWork itself. Only
@@ -1686,7 +1707,7 @@ async function runVerb(verb, flags, positional, dir) {
         throw new StoreError('validation', `show: work "${id}" not found.`);
       }
       return {
-        work: item,
+        work: withStageEffective(item),
         discovery: rawView.discovery?.[id] ?? [],
         decisions: rawView.decisionsById?.[id] ?? [],
         gates: rawView.gates?.[id] ?? null,
@@ -1702,7 +1723,7 @@ async function runVerb(verb, flags, positional, dir) {
     // through store.readyWork only; this file never imports frontier.mjs
     // directly (per this cell's key_links).
     case 'ready': {
-      return paginateVerbResult(readyWork(dir), flags, 'ready-v1', 'ready');
+      return paginateVerbResult(readyWork(dir).map(withStageEffective), flags, 'ready-v1', 'ready');
     }
 
     // Request-class per D1 (same contract as `ready`/`list`): a pure read —

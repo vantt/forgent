@@ -14,6 +14,7 @@
 import { buildUnifiedEdges } from './dep-graph.mjs';
 import { FRONTIER_ORDER_VERSION, frontier, isResolvedStatus } from './frontier.mjs';
 import { viewRevision } from './replay.mjs';
+import { effectiveStage, getDomain } from './workflow-stage-graphs.mjs';
 
 /**
  * Connected components of the UNDIRECTED unified graph (blocks + parent-child
@@ -405,7 +406,14 @@ export function whatIf(view, id) {
     if (item.status !== 'todo') return false;
     return (Array.isArray(item.deps) ? item.deps : []).every((d) => d === id || isResolvedStatus(work[d]));
   });
-  return { id, exists: true, unblocksTransitive: downstream.size, newlyReady };
+  // tsk-4zj D6: `newlyReady` entries are `status: 'todo'`, which spans
+  // every stage — same reasoning as `graphMetrics`'s own `stageByItem`,
+  // scoped here to just `id` itself plus `newlyReady`'s members rather
+  // than the whole work map (this answer is already single-id-scoped).
+  const stageByItem = Object.fromEntries(
+    [id, ...newlyReady].map((itemId) => [itemId, effectiveStage(work[itemId], getDomain(work[itemId].domain))]),
+  );
+  return { id, exists: true, unblocksTransitive: downstream.size, newlyReady, stageByItem };
 }
 
 // Default node ceiling above which the expensive greedy (topUnblock) is
@@ -445,6 +453,7 @@ export function metricsFrame(view, { maxNodesForGreedy = DEFAULT_MAX_NODES_FOR_G
 export function graphMetrics(view, opts = {}) {
   const { componentCount, components } = connectedComponents(view);
   const frame = metricsFrame(view, opts);
+  const work = view?.work ?? {};
   return {
     order_version: FRONTIER_ORDER_VERSION,
     frame,
@@ -453,6 +462,16 @@ export function graphMetrics(view, opts = {}) {
     criticalPath: criticalPath(view),
     staleBlocked: staleBlocked(view),
     topUnblock: frame.skipped.includes('topUnblock') ? [] : greedyTopUnblock(view),
+    // tsk-4zj D6: `components[].items`/`criticalPath`/`topUnblock` are
+    // arrays of bare id strings, `staleBlocked` entries reference ids too
+    // — none of them carry `stage` today. Rather than changing any of
+    // those id-array shapes to object-arrays (a real breaking change,
+    // per CONTEXT.md's Scout evidence on the existing `assert.deepEqual`
+    // coverage of `components[0].items`), this adds one flat side-map a
+    // reader cross-references any id in the output against.
+    stageByItem: Object.fromEntries(
+      Object.keys(work).map((id) => [id, effectiveStage(work[id], getDomain(work[id].domain))]),
+    ),
   };
 }
 

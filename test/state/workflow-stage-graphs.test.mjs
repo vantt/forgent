@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { DOMAINS, DEFAULT_DOMAIN, resolveDomainName, getDomain, stageForStep, skillForStage, parkReasonForStatus } from '../../src/state/workflow-stage-graphs.mjs';
+import { DOMAINS, DEFAULT_DOMAIN, resolveDomainName, getDomain, stageForStep, skillForStage, parkReasonForStatus, effectiveStage } from '../../src/state/workflow-stage-graphs.mjs';
 import { rebuildView } from '../../src/state/replay.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -272,6 +272,18 @@ test('stageForStep returns undefined for a step the domain never declares (Init 
   // Compound-learn is retired as a stage (D11) — the synthesis it used to
   // gate is now the status `retrospective` instead.
   assert.equal(stageForStep(DOMAINS.coding, 'Compound-learn'), undefined);
+});
+
+// --- effectiveStage (tsk-4zj D1/D4) ---
+
+test('effectiveStage returns the explicit stage as-is when present', () => {
+  assert.equal(effectiveStage({ stage: 'clarify' }, DOMAINS.coding), 'clarify');
+  assert.equal(effectiveStage({ stage: 'decompose' }, DOMAINS.coding), 'decompose');
+});
+
+test('effectiveStage defaults to the domain\'s Execute-mapped stage when stage is absent', () => {
+  assert.equal(effectiveStage({}, DOMAINS.coding), 'executing');
+  assert.equal(effectiveStage({}, DOMAINS.synthetic), 'assembling');
 });
 
 // --- rebuild-determinism (must_have): replaying an event log with zero
