@@ -360,46 +360,41 @@ test('runOnce stamps role "runner" on every claim/propose work.move it writes', 
   }
 });
 
-/** A discovery-and-chia-việc-aware executor (stage-clarify D4/D5/D13 +
- * stage-decompose D2, mirroring test/e2e/runner-loop.test.mjs's own
- * helper): the same configured executor serves THREE call sites — the
- * context-discovery verdict call (discovery.mjs's prompt, "# Context-
- * discovery"), the chia-việc verdict call (decompose.mjs's prompt, "#
- * Chia-việc (decompose)" — answered pass-through here so a clarify-pass
- * item chains straight on to `executing` in the same sweep, per
- * stage-decompose D2), and the worker dispatch call — told apart by their
- * fixed prefixes. */
-function writeClearDiscoveryExecutor(scriptDir, counterFile, { verify, produce = 'output.txt' } = {}) {
-  const scriptPath = path.join(scriptDir, 'clear-discovery-executor.mjs');
-  fs.writeFileSync(
-    scriptPath,
-    `
-import fs from 'node:fs';
-import { execFileSync } from 'node:child_process';
-const prompt = process.argv[2] ?? '';
-if (prompt.includes('Kiểm tra độc lập một lệnh verify')) {
-  // tsk-5q5-1: judgeVerifySemanticCorrectness's own second-pass call —
-  // answered separately so it never falls through to the worker branch below.
-  process.stdout.write(JSON.stringify({ agrees: true }));
-} else if (prompt.includes('# Context-discovery')) {
-  process.stdout.write(JSON.stringify({ clear: true, verify: ${JSON.stringify(verify)} }));
-} else if (prompt.includes('# Chia-việc (decompose)')) {
-  process.stdout.write(JSON.stringify({ verdict: 'pass-through' }));
-} else {
-  fs.appendFileSync(${JSON.stringify(counterFile)}, 'run\\n');
-  fs.writeFileSync(${JSON.stringify(produce)}, 'produced by worker\\n');
-  execFileSync('git', ['add', ${JSON.stringify(produce)}]);
-  execFileSync('git', ['commit', '-q', '-m', ${JSON.stringify('worker: output.txt')}]);
-}
-`,
-  );
-  return scriptPath;
+// tsk-1x3 D1/D9/D16 (docs/history/fanout-and-delegation-rubric/CONTEXT.md):
+// the clarify/decompose sweeps' own judge subprocess is retired — a
+// role='runner' call on either stage now safely no-ops instead of
+// consulting a scripted judge, so `writeClearDiscoveryExecutor`'s
+// discovery/chia-việc prompt-answering branches (above `writeCommittingExecutor`'s
+// plain worker-dispatch shape) have nothing left to answer. The three tests
+// below that used to configure it now drive clarify/decompose via the
+// readLockedContext/tiny-mode TRUST SIGNAL instead (unaffected by D16 — the
+// one remaining way a `role: 'runner'` sweep can still legitimately advance
+// an item past clarify/decompose without a live caller): a real committed
+// CONTEXT.md (discovery's skip) plus a plan.md declaring `mode: tiny`
+// (decompose's own skip-and-advance) reproduces the exact same
+// "clarify+decompose chain to executing in one runOnce pass" shape these
+// tests always proved, just via the mechanism that is still real.
+
+/** Plants a real, committed-shaped CONTEXT.md (+ plan.md when `mode` is
+ * given) directly under `repoRoot/docsRef` — no git commit needed here,
+ * since `resolveContentRoot`'s own stateRoot fallback branch finds it by
+ * construction (`dir` is always `repoRoot/.fgos` in this file's `setup()`,
+ * so stateRoot and this content live under the same repoRoot). */
+function mkLockedContextFixture(repoRoot, docsRef, { mode } = {}) {
+  const featureDir = path.join(repoRoot, docsRef);
+  fs.mkdirSync(featureDir, { recursive: true });
+  fs.writeFileSync(path.join(featureDir, 'CONTEXT.md'), '# CONTEXT\n\nD1: locked.\n');
+  if (mode) {
+    fs.writeFileSync(path.join(featureDir, 'plan.md'), `# plan\n\nmode = **${mode}**.\n`);
+  }
 }
 
-test('runOnce clarify sweep records a clarify-pass settlement stamped role "runner"; the decompose sweep right after it pass-throughs the item on to executing in the same pass', async () => {
+test('runOnce clarify sweep advances a clarify item via its own committed CONTEXT.md trust signal, records a clarify-pass settlement stamped role "runner"; the decompose sweep right after it pass-throughs the item on to executing in the same pass (tsk-1x3 D16: the sweep itself never spawns a judge)', async () => {
   const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
-  seedItem(dir, { id: 'item-clarify', stage: 'clarify', verify: 'test -f output.txt' });
-  const config = configFor(writeClearDiscoveryExecutor(scriptDir, counterFile, { verify: 'test -f output.txt' }));
+  const docsRef = 'docs/history/item-clarify';
+  mkLockedContextFixture(repoRoot, docsRef, { mode: 'tiny' });
+  seedItem(dir, { id: 'item-clarify', stage: 'clarify', verify: 'test -f output.txt', docsRef });
+  const config = configFor(writeCommittingExecutor(scriptDir, counterFile));
 
   const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
@@ -428,6 +423,8 @@ test('runOnce clarify sweep records a clarify-pass settlement stamped role "runn
 
 test('runOnce clarify+decompose sweeps fold an unrecognized item.domain to "coding" (fail-safe), logging a warning instead of throwing', async () => {
   const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
+  const docsRef = 'docs/history/item-clarify';
+  mkLockedContextFixture(repoRoot, docsRef, { mode: 'tiny' });
   appendEvent(path.join(dir, 'events.jsonl'), {
     type: 'work.add',
     payload: {
@@ -441,9 +438,10 @@ test('runOnce clarify+decompose sweeps fold an unrecognized item.domain to "codi
       verify: 'test -f output.txt',
       stage: 'clarify',
       domain: 'bogus-domain',
+      docsRef,
     },
   });
-  const config = configFor(writeClearDiscoveryExecutor(scriptDir, counterFile, { verify: 'test -f output.txt' }));
+  const config = configFor(writeCommittingExecutor(scriptDir, counterFile));
   const lines = [];
   const capture = (msg) => lines.push(msg);
 
@@ -490,8 +488,10 @@ test('runOnce clarify+decompose sweeps never touch a synthetic-domain item with 
 
 test('runOnce clarify+decompose sweeps still fire normally for a coding-domain item at stage "clarify" (no behavior change for coding)', async () => {
   const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
-  seedItem(dir, { id: 'item-coding-clarify', stage: 'clarify', verify: 'test -f output.txt' });
-  const config = configFor(writeClearDiscoveryExecutor(scriptDir, counterFile, { verify: 'test -f output.txt' }));
+  const docsRef = 'docs/history/item-coding-clarify';
+  mkLockedContextFixture(repoRoot, docsRef, { mode: 'tiny' });
+  seedItem(dir, { id: 'item-coding-clarify', stage: 'clarify', verify: 'test -f output.txt', docsRef });
+  const config = configFor(writeCommittingExecutor(scriptDir, counterFile));
 
   const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
