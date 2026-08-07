@@ -319,9 +319,60 @@ hợp đồng của 2 hàm + dọn hạ tầng dùng chung). Ca biên bắt bu�
 ### P5 — `tsk-5mj` — runner giao stage `discovery` cho worker chạy skill research
 
 - **Verify**: `npm test && ! rg -q "resolveDiscovery" src/runner/loop.mjs`
-- **Footprint**: `src/runner/loop.mjs,test/e2e/runner-loop.test.mjs`
-- **D-ID**: D6, D1
+- **Footprint đã sửa lúc planning** (bằng chứng thật, xem bên dưới):
+  `src/runner/loop.mjs,src/runner/dispatch.mjs,src/runner/prompt-templates.mjs,src/runner/prompt-templates/worker-prompt-discovery.txt,test/e2e/runner-loop.test.mjs,test/runner/dispatch.test.mjs`
+- **D-ID**: D6, D1, D7
 - **Chờ**: P1, P4
+
+**Approach (viết lúc fgos-planning tsk-5mj, chưa có trong bản shaping gốc):**
+
+Footprint gốc (`loop.mjs` + 1 test file) không đủ để giao thật — bằng chứng
+đọc code trực tiếp:
+
+1. `dispatch.mjs:139` — `buildPrompt` LUÔN gọi `skillForStage(domainObj,
+   'executing')`, hardcode literal `'executing'`, bất kể item đang ở stage
+   nào. `spawnWorker` (dòng 1068) luôn gọi `buildPrompt` nội bộ, không có
+   cách nào truyền prompt khác từ ngoài. ⇒ dispatch thẳng một item
+   `discovery` qua `spawnWorker` không sửa gì sẽ ra prompt SAI (bảo worker
+   chạy `fgos-code-implement`, không phải `fgos-researching`).
+2. `prompt-templates/worker-prompt-skill-pointer.txt` dòng 30-31: **"Never
+   call `fgos` yourself... the runner is the sole writer through that door
+   during this dispatch."** — worker bị CẤM tự gọi `fgos discover`. Đường
+   worker tự gọi verb (giống `fgos-code-implement` tự gọi `fgos return`)
+   KHÔNG áp dụng được ở đây — vi phạm luật đã có.
+3. Cơ chế đúng, suy ra từ (2) + kênh `fgos-discovered` đã có sẵn (cùng
+   file, dòng 35-48, "report, not write"): worker chạy `fgos-researching`,
+   đạt verdict `{clear, verify?, question?}` (đúng shape
+   `readScoutNotes`... không, đúng shape `callerVerdict` của
+   `resolveDiscovery`, tsk-27y), **báo verdict đó ra stdout dưới dạng
+   fenced block DATA-ONLY** (không gọi `fgos`) — RUNNER đọc block này sau
+   khi worker thoát rồi TỰ gọi
+   `resolveDiscovery(dir, item.id, config, 'runner', callerVerdict)` —
+   role `'runner'` + `callerVerdict` thật, tổ hợp hợp lệ chưa ai dùng
+   trước đây (tsk-1x3 D16 chỉ dùng role runner KHÔNG verdict, rơi vào
+   no-op) nhưng code hiện tại của `resolveDiscovery` đã hỗ trợ sẵn (kiểm
+   `callerVerdict` trước, không quan tâm role khi có).
+4. Cần: (a) template mới `worker-prompt-discovery.txt` (khác
+   `worker-prompt-skill-pointer.txt` — trỏ skill `fgos-researching` thay
+   vì skill của stage `executing`, thêm hướng dẫn báo verdict qua fenced
+   block mới, VD `` ```fgos-discovery-verdict ``, KHÔNG tái dùng
+   `fgos-discovered` vì shape khác nhau: verdict là quyết định cho CHÍNH
+   item, discovered-work là item MỚI); (b) `dispatch.mjs` cần một cách
+   chọn template/skillPath theo stage thay vì hardcode `'executing'` —
+   thêm tham số `stage` cho `buildPrompt`/route riêng, KHÔNG đổi hành vi
+   mặc định (mọi call site hiện có vẫn ngầm định `'executing'`, zero
+   regression); (c) `loop.mjs` thêm vòng "DISCOVERY DISPATCH" song song
+   CLARIFY/DECOMPOSE SWEEP hiện có — quét `stage: discovery, status: todo`,
+   dựng worktree qua `createDispatchWorktree` (dùng lại, không viết mới),
+   gọi `spawnWorker` với route mới, parse fenced verdict block từ
+   `worker.stdout` sau khi thoát, gọi `resolveDiscovery` với verdict đó.
+   Không cần goal-check (stage `discovery` không phải điểm chứng minh cuối
+   — đó vẫn là việc của `executing`); không move sang `awaiting-approval`
+   — `resolveDiscovery` tự quyết định stage/status tiếp theo giống mọi
+   caller khác.
+5. Rủi ro: **cao** — cơ chế báo-verdict-qua-fenced-block hoàn toàn mới,
+   chưa test end-to-end thật nào. Cần `fgos-validating` tự chạy thử một
+   dispatch discovery thật (script giả lập worker) trước khi chốt READY.
 
 ### P6 — `tsk-puz` — migration 57 item đang ở `clarify`
 
