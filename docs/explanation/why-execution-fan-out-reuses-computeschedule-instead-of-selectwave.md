@@ -163,6 +163,32 @@ finishes" (which would need the 5-cap reinterpreted as a cap on
 *in-flight* count rather than *wave size*); and the exact default tier
 for leaf auto-approval within the existing `gate-bypass` levels scale.
 
+## Implementation (`tsk-ik3`): `computeSchedule` gains an explicit candidate-set parameter
+
+The design above already named a "candidate set" the wave selector
+draws from — case 1 uses `children(parent)`, case 2 uses a milestone's
+`targets`, the runner uses the whole frontier: one selector function,
+three different input sets. `tsk-ik3` implemented that parameter
+directly on `computeSchedule` itself, rather than adding a second
+function or a wrapper.
+
+**Backward compatibility was locked as a hard requirement, not a nice-
+to-have**: a call with no candidate set supplied must keep behaving
+exactly as it does today — packing waves over the *entire* frontier.
+This isn't a temporary compatibility shim to be removed later; it's the
+genuinely correct default for both case 2 and the runner's own existing
+usage, which never pass a narrowed candidate set at all.
+
+This item is also where "reuse `computeSchedule`, not `selectWave`"
+(explained above) got its concrete caller-scoping proof: with
+`impact-analysis` sitting in a **degraded** posture at the time (GitNexus
+present but its index behind current `HEAD`), the item's own scout
+step didn't trust GitNexus alone — it cross-checked with a real repo-wide
+`grep`/`rg` to find `computeSchedule`'s actual known caller
+(`src/state/store.mjs:1100`), following this repo's own gate rule that a
+degraded impact-analysis posture requires a grep-based cross-check
+before its answers are trusted.
+
 ## Companion fix (`tsk-4fg`, D3): `fgos list` needed a view lever, not a model change
 
 Fan-out amplifies a real UX gap that already existed before it: real
