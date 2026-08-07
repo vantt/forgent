@@ -522,6 +522,76 @@ test('list --all restores the wontfix item alongside the open one', () => {
   assert.ok(work['closed-item']);
 });
 
+// tsk-4fg D1/D2: default `list` drops a child row once its parent is also
+// visible in the same default view, replacing it with a `childProgress`
+// badge on the parent -- reusing the same doneCount rule `rollup` already
+// uses (proven live against this repo's own tsk-19y/tsk-5lr mixed set
+// during fgos-validating). `--all` stays byte-identical/raw (D1).
+test('list by default drops a child whose parent is visible, and badges the parent with childProgress', () => {
+  const cwd = tmpCwd();
+  const dir = path.join(cwd, '.fgos');
+  addOk(cwd, 'root-item', { title: 'Root Item' });
+  addWork(dir, { id: 'child-a', title: 'Child A', kind: 'task', status: 'done', deps: [], risk: 'low', refs: [], verify: 'npm test', parent: 'root-item' });
+  addWork(dir, { id: 'child-b', title: 'Child B', kind: 'task', status: 'doing', deps: [], risk: 'low', refs: [], verify: 'npm test', parent: 'root-item' });
+  addWork(dir, { id: 'child-c', title: 'Child C', kind: 'task', status: 'todo', deps: [], risk: 'low', refs: [], verify: 'npm test', parent: 'root-item' });
+
+  const work = envelopeData(run(cwd, ['list', '--json']).stdout).work;
+  assert.equal(work['child-a'], undefined);
+  assert.equal(work['child-b'], undefined);
+  assert.equal(work['child-c'], undefined);
+  assert.ok(work['root-item']);
+  assert.deepEqual(work['root-item'].childProgress, { done: 1, total: 3 });
+});
+
+// D2: a child whose parent is resolved (done/wontfix) and therefore hidden
+// from the default view has no parent row left to carry a badge -- it falls
+// back to showing as a normal top-level row, exactly as if it had no
+// `parent`. Proven live against tsk-19y (done) and its still-open children
+// tsk-5lr/tsk-3v2/tsk-4n7 during this item's own fgos-validating pass.
+test('list by default falls back to showing a child as a top-level row when its parent is resolved and hidden', () => {
+  const cwd = tmpCwd();
+  const dir = path.join(cwd, '.fgos');
+  addWork(dir, { id: 'root-item', title: 'Root Item', kind: 'task', status: 'done', deps: [], risk: 'low', refs: [], verify: 'npm test' });
+  addWork(dir, { id: 'orphan-child', title: 'Orphan Child', kind: 'task', status: 'doing', deps: [], risk: 'low', refs: [], verify: 'npm test', parent: 'root-item' });
+
+  const work = envelopeData(run(cwd, ['list', '--json']).stdout).work;
+  assert.equal(work['root-item'], undefined, 'resolved parent stays hidden by the pre-existing isResolvedStatus filter');
+  assert.ok(work['orphan-child'], 'child with no visible parent falls back to a normal top-level row');
+  assert.equal(work['orphan-child'].childProgress, undefined);
+});
+
+// A parked `awaiting-human` child must never be hidden by this filter --
+// str61's own parent-anchored `awaitingContext` reporting depends on it
+// still being present in the default view's `work` map.
+test('list by default never hides an awaiting-human child, even when its parent is visible', () => {
+  const cwd = tmpCwd();
+  const dir = path.join(cwd, '.fgos');
+  addOk(cwd, 'root-item', { title: 'Root Item' });
+  addWork(dir, { id: 'parked-child', title: 'Parked Child', kind: 'task', status: 'awaiting-human', deps: [], risk: 'low', refs: [], verify: 'npm test', parent: 'root-item' });
+
+  const work = envelopeData(run(cwd, ['list', '--json']).stdout).work;
+  assert.ok(work['parked-child'], 'awaiting-human child stays visible regardless of parent visibility');
+  assert.ok(work['root-item']);
+  assert.deepEqual(work['root-item'].childProgress, { done: 0, total: 1 });
+});
+
+// D1: `--all` is untouched -- byte-identical shape to before this item, no
+// child dropped, no childProgress badge added. This is the one flagged
+// public-contract risk (herdr-plugin parses `list --all --json` literally).
+test('list --all is untouched by the child-view gate: no rows dropped, no childProgress added', () => {
+  const cwd = tmpCwd();
+  const dir = path.join(cwd, '.fgos');
+  addOk(cwd, 'root-item', { title: 'Root Item' });
+  addWork(dir, { id: 'child-a', title: 'Child A', kind: 'task', status: 'done', deps: [], risk: 'low', refs: [], verify: 'npm test', parent: 'root-item' });
+  addWork(dir, { id: 'child-b', title: 'Child B', kind: 'task', status: 'doing', deps: [], risk: 'low', refs: [], verify: 'npm test', parent: 'root-item' });
+
+  const work = envelopeData(run(cwd, ['list', '--all', '--json']).stdout).work;
+  assert.ok(work['root-item']);
+  assert.ok(work['child-a']);
+  assert.ok(work['child-b']);
+  assert.equal(work['root-item'].childProgress, undefined);
+});
+
 // tsk-48i D1: parkReason (parkReasonForStatus, workflow-stage-graphs.mjs)
 // stamped at write time, mirroring statusCategory's own precedent -- lets
 // a domain-agnostic consumer of `list --json` (e.g. herdr-plugin) tell a
@@ -3473,10 +3543,20 @@ test('decompose --verdict decompose --children writes real children', () => {
   assert.equal(result.status, 0);
   assert.equal(JSON.parse(result.stdout).data.outcome, 'decompose');
 
-  const view = envelopeData(run(cwd, ['list']).stdout);
-  assert.equal(view.work[id].stage, 'executing');
-  assert.equal(view.work[`${id}-1`].title, 'Build parser');
-  assert.equal(view.work[`${id}-2`].title, 'Build renderer');
+  // tsk-4fg D1/D2: default `list` now hides a child whose parent is still
+  // visible, replacing it with a `childProgress` badge on the parent --
+  // `--all` is the untouched, byte-identical-shape view where split
+  // children stay visible, so that is what proves the real children were
+  // written with the right ids/titles.
+  const defaultView = envelopeData(run(cwd, ['list']).stdout);
+  assert.equal(defaultView.work[id].stage, 'executing');
+  assert.equal(defaultView.work[`${id}-1`], undefined);
+  assert.equal(defaultView.work[`${id}-2`], undefined);
+  assert.deepEqual(defaultView.work[id].childProgress, { done: 0, total: 2 });
+
+  const allView = envelopeData(run(cwd, ['list', '--all']).stdout);
+  assert.equal(allView.work[`${id}-1`].title, 'Build parser');
+  assert.equal(allView.work[`${id}-2`].title, 'Build renderer');
 });
 
 test('decompose --verdict decompose with malformed --children JSON is rejected as validation, exit 4', () => {
