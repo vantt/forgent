@@ -131,3 +131,63 @@ Full decision record: `docs/history/merge-worktree-reclaim-clobbers-kept-checkou
 (D1) and `plan.md` (the scratch-ref-then-fast-forward implementation
 approach, risk map, and the concrete regression cases proved against —
 including the exact "3 approves in a row" repro shape).
+
+## Second-order regression (`tsk-46a`): the fix traded a loud failure for a silent one under concurrency
+
+Removing the literal-checkout requirement above closed the original
+worktree-clobbering bug, but introduced a different, more dangerous
+failure mode: **two concurrent merges into the same root branch can now
+silently overwrite each other**, with no error, no conflict, and both
+sessions reporting success.
+
+**Why the old code accidentally serialized concurrent merges, and the
+new code doesn't.** Before `tsk-5yp`'s fix, two sessions merging into the
+same branch at nearly the same time would collide on git's own
+one-checkout-per-branch constraint — one would hit an "already checked
+out" or dirty-checkout guard and fail loudly. That serialization was
+never designed; it was a side effect of needing the literal branch
+checked out. Once the fix removed that need (each merge runs in its own
+detached scratch checkout), the accidental mutual exclusion disappeared
+along with it.
+
+**The race, concretely**: `withMergeEphemeralWorktree` captures
+`startCommit` — the branch's tip at that moment — *before* acquiring any
+lock. The main-checkout lock only wraps the merge+commit step inside the
+ephemeral checkout, then releases before control returns. The final
+`git branch -f branch endCommit` that lands the result runs completely
+outside any lock, with no check that the branch's live tip still equals
+the `startCommit` this session captured. Two sessions (A and B) merging
+different leaves into the same root at nearly the same time both capture
+the same starting tip; both merge successfully in their own isolated
+checkouts; whichever session's `branch -f` runs *second* silently
+overwrites the branch, making the first session's real commit
+unreachable — with both sessions still reporting `outcome: merged`.
+Verified empirically with real git commands (two detached worktrees off
+the same tip, force-moving the branch twice, then confirming via
+`merge-base --is-ancestor` that the first commit was no longer reachable
+from the final tip).
+
+**The fix: a compare-and-swap check, not a wider lock.** Immediately
+before the final `git branch -f`, the branch's live tip is re-read; the
+force-move only proceeds if it still equals the `startCommit` captured
+at the start. If the branch has moved, the merge is stale and must not
+overwrite it. Widening the main-checkout lock to cover the *entire*
+`withMergeEphemeralWorktree` call (including the merge/verify step
+inside it, which can run a full test suite — seconds to minutes) was
+explicitly rejected: the lock is a single *global*, not per-branch,
+lock, explicitly designed to be held briefly — bottlenecking every
+writer in the repo for however long one merge's verify step takes would
+cost far more than the race actually costs. A CAS check matches the
+fix's scope to the bug's real scope: one line, one race window.
+
+**On a CAS mismatch, fail loudly — no automatic retry inside this
+layer.** An automatic in-function retry would silently re-run the
+merge's own goal-check/verify a second time — potentially expensive
+(network calls, a full test suite) with zero visibility to the caller
+that it happened twice. `merge-loop` already owns retry/stop semantics
+for exactly this shape of failure (its "same item blocked twice in a
+row" rule) — that is the correct layer to own retries, not a second, ad
+hoc retry mechanism bolted onto `merge.mjs` itself.
+
+Full decision record: `docs/history/merge-ephemeral-branch-force-race/CONTEXT.md`
+(D1-D2).
