@@ -131,8 +131,35 @@ Tạo thật lúc `fgos-validating` (bị bỏ sót lúc planning — sửa tạ
 ### P2 — `tsk-v4b` — skill `fgos-clarifying`
 
 - **Verify**: `npm test && test -f .claude/skills/fgos-clarifying/SKILL.md && grep -q "^name: fgos-clarifying$" .claude/skills/fgos-clarifying/SKILL.md && rg -q --hidden "chỉ hỏi khi không hiểu" .claude/skills/fgos-clarifying/SKILL.md && rg -q --hidden "áp thẳng rồi báo lại một dòng" .claude/skills/fgos-clarifying/SKILL.md`
-- **Footprint**: `.claude/skills/fgos-clarifying/SKILL.md`
+- **Footprint**: `.claude/skills/fgos-clarifying/SKILL.md,.agents/skills/fgos-clarifying/SKILL.md` (bài học từ `tsk-2t9`: `test/skills/fgos-mirror.test.mjs` đòi mirror byte-identical; `npm test` trong verify đã đủ generic để bắt lỗi này, không cần sửa verify field — chỉ cần tạo cả hai file lúc implement)
 - **D-ID**: D13, D14
+
+#### Child plan (`fgos-planning`, mức riêng của `tsk-v4b`)
+
+**Mode: tiny.** Cùng lý luận với `tsk-2t9`: 0/10 cờ ở mức child — 1 file mới
+(×2 với mirror), không public contract nào sống trỏ vào `fgos-clarifying`
+(`rg` rỗng), không hành vi hiện có bị đe doạ. Posture impact-analysis:
+`degraded` (D15 ở `tsk-5kn`), không cần — không có blast radius để soi.
+
+**Approach.** Viết `.claude/skills/fgos-clarifying/SKILL.md` +
+`.agents/skills/fgos-clarifying/SKILL.md` (byte-identical, mirror bắt buộc).
+Nội dung mang hai hợp đồng đã khoá:
+
+- **D13** — soul tự phán hiểu-hay-không-hiểu **ý định** (khác `fgos-researching`:
+  đây là decide-altitude, đối thoại với người, không phải gather-altitude).
+  Mặc định: đọc mô tả, tự đánh giá đã đủ để thi công chưa. **Chỉ hỏi người khi
+  không hiểu** — không phải quy trình "vào là hỏi" như `fgos-exploring` hiện
+  tại (bước 1 của nó: một lượt `rg` rồi luôn sinh câu hỏi). Mục tiêu: tự động
+  tối đa — item rõ ràng thì đi thẳng, không phiền ai.
+- **D14** — được phép viết lại `title`/`description` mơ hồ thành bản rõ hơn.
+  **Áp thẳng rồi báo lại một dòng**, không chờ duyệt (khác đề xuất-rồi-chờ).
+  An toàn nhờ `.fgos/events.jsonl` append-only — bản gốc không mất, hoàn tác
+  được. Không đổi nếu bản gốc đã đủ rõ ("không đổi chỉ để đổi").
+
+**Shape.** Không split — hai file mirror, một verify. Ca biên: (a) mô tả đã
+rất rõ ⇒ không hỏi, không viết lại, đi thẳng; (b) mô tả mơ hồ nhưng viết lại
+được ngay ⇒ áp + báo một dòng, không park; (c) mô tả mơ hồ và không đủ dữ
+kiện để tự viết lại ⇒ hỏi đúng một câu cụ thể, park đợi người.
 
 ### P3 — `tsk-1x3` — verb về cửa ghi thuần, gỡ judge cả ba consumer
 
