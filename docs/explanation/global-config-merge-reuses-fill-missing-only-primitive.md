@@ -13,8 +13,8 @@ one case. It didn't need to.
 existed, already named the future need:
 
 > "Designed for reuse by any config shape (not hardcoded to
-> `.fgos-runner.json`'s own fields) — today's one caller is
-> `runner/dispatch.mjs`'s `ensureRunnerConfig`, **a future caller may be a
+> the runner config's own fields) — today's one caller is
+> `runner/dispatch.mjs`'s `ensureRunnerConfigForDir`, **a future caller may be a
 > user-level config file**."
 
 `mergeConfigDefaults(existingConfig, defaultConfig)` is a fill-missing-only

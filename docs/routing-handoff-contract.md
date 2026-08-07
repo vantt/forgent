@@ -36,7 +36,7 @@ runner đọc bảng này để biết vào từ đâu — không có một đi�
 | Skill giám sát vòng runner (dashboard/report) | `fgos list` / `fgos ready` (đọc, không ghi, per request-class D1) | Đọc `state.json` hoặc gọi `ready` | Không suy luận frontier bằng danh sách tay — luôn derive (RUL5 (platform-foundations)) |
 | Skill duyệt đề xuất (review `proposed` → `done`) | Nhánh `fgw/<id>` + báo cáo worker | `fgos move <id> --to done --expect proposed` | Không tự động merge khi review chưa chạy (per D4 — người/vòng review quyết) |
 | Worker kế tiếp trong chain con (agent nối tiếp) | Chính work item đã dispatch (title/kind/refs/verify) | Nhận đúng bốn phần prompt ở trên, không phần nào khác | Không tự gọi `fgos`; không giả định trạng thái ngoài những gì prompt nói |
-| Executor mới (đổi agent CLI, ví dụ `codex exec`) | `.fgos/config.json`'s `runner` section (fallback `.fgos-runner.json`) — `executor.command`/`args`, template `{prompt}`/`{model}` | Sửa config, không sửa `dispatch.mjs` | Không nối chuỗi prompt vào một lệnh shell (luôn argv, `shell: false`) |
+| Executor mới (đổi agent CLI, ví dụ `codex exec`) | `.fgos/config.json`'s `runner` section — `executor.command`/`args`, template `{prompt}`/`{model}` | Sửa config, không sửa `dispatch.mjs` | Không nối chuỗi prompt vào một lệnh shell (luôn argv, `shell: false`) |
 
 ## Câu handoff chuẩn
 
@@ -67,7 +67,7 @@ Ba bất biến, tách bạch rõ để không ai đọc nhầm đây là sandbo
   nguồn không được rà soát là một injection vector trước khi tới dispatch.
   Không bao giờ nối một intake path bên ngoài/không tin cậy vào `work` mà
   thiếu một cửa review ở giữa.
-- **`.fgos/config.json`'s `runner` section (fallback `.fgos-runner.json`) là
+- **`.fgos/config.json`'s `runner` section là
   config THỰC THI ĐƯỢC, không phải dữ liệu thụ động.** Ai sửa được file này
   quyết định runner spawn tiến trình gì, với argument gì (per
   `dispatch.mjs`'s "TRUSTED-CONFIG NOTE"). File này committed (D2 — bền

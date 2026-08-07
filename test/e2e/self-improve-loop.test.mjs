@@ -136,12 +136,15 @@ function worktreeCount(repoRoot) {
 }
 
 function writeRunnerConfig(repoRoot, executorScript) {
+  fs.mkdirSync(path.join(repoRoot, '.fgos'), { recursive: true });
   fs.writeFileSync(
-    path.join(repoRoot, '.fgos-runner.json'),
+    path.join(repoRoot, '.fgos', 'config.json'),
     JSON.stringify({
-      executor: { command: process.execPath, args: [executorScript, '{prompt}', '--model', '{model}'] },
-      models: { light: 'haiku', standard: 'sonnet', heavy: 'opus' },
-      timeoutMs: 15000,
+      runner: {
+        executor: { command: process.execPath, args: [executorScript, '{prompt}', '--model', '{model}'] },
+        models: { light: 'haiku', standard: 'sonnet', heavy: 'opus' },
+        timeoutMs: 15000,
+      },
     }),
   );
 }
@@ -251,7 +254,7 @@ test(
     // needs to prove the worker branch (executing-stage dispatch, unaffected
     // by this item).
     //
-    // A real `.fgos-runner.json` must exist BEFORE either CLI call: even
+    // A real runner config must exist BEFORE either CLI call: even
     // with an explicit --verdict, `discover`/`decompose`'s own bin/fgos.mjs
     // case still unconditionally calls `ensureRunnerConfigForDir` to resolve
     // `cfg` (unused inside resolveDiscovery/resolveDecompose now, but the

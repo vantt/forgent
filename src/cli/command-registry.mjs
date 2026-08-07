@@ -37,7 +37,7 @@
 // param). A verb can be `touchesState: true` without this — `session`
 // writes `.fgos/sessions.json` through its own independent, git-resolved
 // path (session.mjs, D10 symlink actor), never through `dir`, and `setup`
-// touches `.fgos-runner.json`/shell rc files/git hooks, never `.fgos/` at
+// touches the shared config file/shell rc files/git hooks, never `.fgos/` at
 // all — so gating either of those on `dir`'s existence would refuse for a
 // reason that has nothing to do with what they actually do. `init` is also
 // `false` here despite being the one verb that legitimately creates
@@ -143,7 +143,7 @@ export const COMMAND_REGISTRY = [
       type: 'object',
       properties: {
         id: { type: 'string', description: 'Work item id (positional or --id).' },
-        config: { type: 'string', description: 'Path to the runner config (default .fgos-runner.json in cwd).' },
+        config: { type: 'string', description: 'Path to the runner config (default .fgos/config.json in cwd).' },
         verdict: { type: 'string', description: 'Optional caller-supplied verdict: "clear" or "unclear". Omit to run the normal judgeDiscovery subprocess judge (or the readLockedContext trust-signal skip, if applicable).' },
         verify: { type: 'string', description: 'Required with --verdict clear: the real, runnable verify command for this item.' },
         question: { type: 'string', description: 'Required with --verdict unclear: the question to park the item on in awaiting-human.' },
@@ -167,7 +167,7 @@ export const COMMAND_REGISTRY = [
       type: 'object',
       properties: {
         id: { type: 'string', description: 'Work item id (positional or --id).' },
-        config: { type: 'string', description: 'Path to the runner config (default .fgos-runner.json in cwd).' },
+        config: { type: 'string', description: 'Path to the runner config (default .fgos/config.json in cwd).' },
         verdict: { type: 'string', description: 'Optional caller-supplied verdict: "pass-through", "need-human", or "decompose". Omit to run the normal judgeDecompose subprocess judge (or the plan.md tiny/small mode skip-and-advance heuristic, if applicable).' },
         reason: { type: 'string', description: 'Required with --verdict need-human or --verdict decompose (optional with pass-through): why this call is verdicting the way it is.' },
         children: { type: 'string', description: 'Required with --verdict decompose: JSON-encoded array of child objects ({title, verify, kind?, risk?, refs?, footprint?, deps?}), same shape judgeDecompose itself produces.', multiValueFormat: 'json-array' },
@@ -446,7 +446,7 @@ export const COMMAND_REGISTRY = [
   {
     name: 'gate-bypass',
     invoke: 'fgos gate-bypass',
-    description: 'Read-only status: the configured gate-bypass level (off/light/standard/heavy) from .fgos/gate-bypass.json, defaulting to "off" when the file is missing or malformed. Determines whether skill-embedded confirmation gates may auto-approve instead of asking (docs/history/gate-bypass/CONTEXT.md D1-D5) — never the awaiting-human park. No CLI setter: edit the file by hand, mirroring .fgos-runner.json\'s own no-CLI-setter pattern.',
+    description: 'Read-only status: the configured gate-bypass level (off/light/standard/heavy) from .fgos/gate-bypass.json, defaulting to "off" when the file is missing or malformed. Determines whether skill-embedded confirmation gates may auto-approve instead of asking (docs/history/gate-bypass/CONTEXT.md D1-D5) — never the awaiting-human park. No CLI setter: edit the file by hand, mirroring .fgos/config.json\'s own no-CLI-setter pattern.',
     parameters: { type: 'object', properties: {}, required: [] },
     examples: ['fgos gate-bypass'],
     touchesState: false,
@@ -956,7 +956,7 @@ export const COMMAND_REGISTRY = [
   {
     name: 'setup',
     invoke: 'fgos setup',
-    description: 'Insert the fgos shell-integration source line into detected shell rc file(s) (bash/zsh), ensure the shared config file (.fgos/config.json, migrating a legacy .fgos-runner.json when present) has every current default key via the extensible registry, and wire core.hooksPath to .githooks (the str65 main-checkout lock hook) — do-and-announce, never asks first.',
+    description: 'Insert the fgos shell-integration source line into detected shell rc file(s) (bash/zsh), ensure the shared config file (.fgos/config.json) has every current default key via the extensible registry, and wire core.hooksPath to .githooks (the str65 main-checkout lock hook) — do-and-announce, never asks first.',
     parameters: {
       type: 'object',
       properties: {

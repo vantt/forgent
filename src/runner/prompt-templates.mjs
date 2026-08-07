@@ -73,7 +73,7 @@ function readTemplate(name) {
 
 /** Read a template file's raw content (memoized — templates are committed,
  * static for the process lifetime, same trust-at-load discipline
- * `.fgos-runner.json` already uses). */
+ * the runner config already uses). */
 export function loadTemplate(name) {
   return readTemplate(name);
 }

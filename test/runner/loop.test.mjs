@@ -1214,12 +1214,15 @@ test('bin/fgos-runner.mjs run from a SUBDIRECTORY of another repo operates on th
   const { repoRoot, dir, scriptDir, counterFile } = setup();
   seedItem(dir, { id: 'item-cli' });
   const scriptPath = writeCommittingExecutor(scriptDir, counterFile);
+  fs.mkdirSync(path.join(repoRoot, '.fgos'), { recursive: true });
   fs.writeFileSync(
-    path.join(repoRoot, '.fgos-runner.json'),
+    path.join(repoRoot, '.fgos', 'config.json'),
     JSON.stringify({
-      executor: { command: process.execPath, args: [scriptPath, '{prompt}', '--model', '{model}'] },
-      models: { light: 'haiku', standard: 'sonnet', heavy: 'opus' },
-      timeoutMs: 30000,
+      runner: {
+        executor: { command: process.execPath, args: [scriptPath, '{prompt}', '--model', '{model}'] },
+        models: { light: 'haiku', standard: 'sonnet', heavy: 'opus' },
+        timeoutMs: 30000,
+      },
     }),
   );
   const nested = path.join(repoRoot, 'nested');

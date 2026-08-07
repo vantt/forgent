@@ -318,7 +318,7 @@ function buildReport({ totalEvents, picks, returns, approves, causes, fullVerify
   lines.push('');
   lines.push('## Không thuộc phạm vi báo cáo này');
   lines.push('');
-  lines.push('Báo cáo này KHÔNG kết luận về câu hỏi D7 (DISCUSSION.md dòng 34) hay về `parallel.maxRoots`/`maxLeavesPerRoot` trong `.fgos-runner.json` — chỉ cung cấp số liệu làm input cho phiên quyết định riêng.');
+  lines.push('Báo cáo này KHÔNG kết luận về câu hỏi D7 (DISCUSSION.md dòng 34) hay về `parallel.maxRoots`/`maxLeavesPerRoot` trong `.fgos/config.json` — chỉ cung cấp số liệu làm input cho phiên quyết định riêng.');
   lines.push('');
 
   return lines.join('\n');

@@ -37,10 +37,9 @@ const CONFIG_FILE_NAME = 'gate-bypass.json';
  * registry entry, `registrations.mjs`); `readSharedConfig` takes the repo
  * root (`.fgos`'s parent), not `.fgos` itself, so that's resolved here via
  * `path.dirname(dir)`. Falls back to the legacy standalone
- * `<dir>/gate-bypass.json` (never deleted, same "read the old file until a
- * real migration writes the new one" discipline `readSharedConfig` itself
- * already applies to `.fgos-runner.json`) when the shared file has no valid
- * `gateBypass` entry yet.
+ * `<dir>/gate-bypass.json` (never deleted, a "read the old file until a real
+ * migration writes the new one" discipline) when the shared file has no
+ * valid `gateBypass` entry yet.
  *
  * Fails closed to `DEFAULT_LEVEL` on a missing file, invalid JSON, or a
  * shape/value that isn't a recognized level, at either layer — never

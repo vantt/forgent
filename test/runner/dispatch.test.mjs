@@ -7,7 +7,6 @@ import { spawnSync, execFileSync } from 'node:child_process';
 import {
   buildPrompt,
   loadRunnerConfig,
-  ensureRunnerConfig,
   loadRunnerConfigFromDir,
   ensureRunnerConfigForDir,
   DEFAULT_RUNNER_CONFIG,
@@ -27,6 +26,7 @@ import {
 } from '../../src/runner/dispatch.mjs';
 import { initStore, registerTool } from '../../src/state/store.mjs';
 import { writeLocalStatus, findExecutableOnPath } from '../../src/state/tool-registry.mjs';
+import { resolveMainCheckoutRoot } from '../../src/runner/paths.mjs';
 
 // Fake executors only — every "command" spawned here is a node script this
 // file writes to a mkdtemp directory at test time. No real agent CLI is
@@ -291,7 +291,7 @@ test('buildPrompt handles a work item with empty refs', () => {
 
 test('loadRunnerConfig parses a valid committed-shaped config', () => {
   const dir = mkTempDir();
-  const configPath = path.join(dir, '.fgos-runner.json');
+  const configPath = path.join(dir, 'runner-config.json');
   fs.writeFileSync(
     configPath,
     JSON.stringify({
@@ -307,7 +307,7 @@ test('loadRunnerConfig parses a valid committed-shaped config', () => {
 });
 
 test('loadRunnerConfig rejects a missing file', () => {
-  assert.throws(() => loadRunnerConfig('/nonexistent/.fgos-runner.json'), RunnerConfigError);
+  assert.throws(() => loadRunnerConfig('/nonexistent/runner-config.json'), RunnerConfigError);
 });
 
 test('loadRunnerConfig rejects invalid JSON', () => {
@@ -585,15 +585,27 @@ test('EXECUTOR_ADAPTERS registers exactly one adapter today: cli-spawn (the RPC/
   assert.equal(DEFAULT_ADAPTER, 'cli-spawn');
 });
 
-test('the committed .fgos-runner.json at repo root loads and is well-formed', () => {
-  const repoRoot = path.resolve(import.meta.dirname, '..', '..');
-  const cfg = loadRunnerConfig(path.join(repoRoot, '.fgos-runner.json'));
+/** Read the committed `.fgos/config.json`'s `runner` section directly
+ * (never through `loadRunnerConfigFromDir`, which also merges in
+ * `~/.fgos/config.json` -- these tests assert the REPO's own committed
+ * content, not whatever a given test machine's global config adds). */
+function committedRunnerConfig() {
+  // Main-checkout-resolved, not `import.meta.dirname`-relative: this test
+  // suite itself may be running from inside a worktree, whose `.fgos/` is
+  // unconditionally wiped (ADR0020) -- only the main checkout carries the
+  // real committed `.fgos/config.json`.
+  const repoRoot = resolveMainCheckoutRoot(path.resolve(import.meta.dirname, '..', '..'));
+  const parsed = JSON.parse(fs.readFileSync(path.join(repoRoot, '.fgos', 'config.json'), 'utf8'));
+  return parsed.runner;
+}
+
+test('the committed .fgos/config.json runner section loads and is well-formed', () => {
+  const cfg = committedRunnerConfig();
   assert.deepEqual(Object.keys(cfg.models).sort(), ['heavy', 'light', 'standard']);
 });
 
-test('the committed .fgos-runner.json grants the worker exactly acceptEdits + git add/commit — no wider (per spike B)', () => {
-  const repoRoot = path.resolve(import.meta.dirname, '..', '..');
-  const cfg = loadRunnerConfig(path.join(repoRoot, '.fgos-runner.json'));
+test('the committed .fgos/config.json runner section grants the worker exactly acceptEdits + git add/commit — no wider (per spike B)', () => {
+  const cfg = committedRunnerConfig();
   const { args } = cfg.executor;
   assert.ok(args.includes('--permission-mode'));
   assert.equal(args[args.indexOf('--permission-mode') + 1], 'acceptEdits');
@@ -602,9 +614,8 @@ test('the committed .fgos-runner.json grants the worker exactly acceptEdits + gi
   assert.ok(!args.includes('--dangerously-skip-permissions'));
 });
 
-test('the committed .fgos-runner.json declares the submit-assist-classify capacity per CONTEXT.md D1/D7 (tsk-5l2-2): kind cli, adapter cli-spawn, tier light, allowCrossProvider true (tsk-32n D1 -- supersedes the earlier sensitiveData field name, which had inverted polarity against the restrictive-by-default requirement), and its args are a well-formed {prompt}/{model} template', () => {
-  const repoRoot = path.resolve(import.meta.dirname, '..', '..');
-  const cfg = loadRunnerConfig(path.join(repoRoot, '.fgos-runner.json'));
+test('the committed .fgos/config.json runner section declares the submit-assist-classify capacity per CONTEXT.md D1/D7 (tsk-5l2-2): kind cli, adapter cli-spawn, tier light, allowCrossProvider true (tsk-32n D1 -- supersedes the earlier sensitiveData field name, which had inverted polarity against the restrictive-by-default requirement), and its args are a well-formed {prompt}/{model} template', () => {
+  const cfg = committedRunnerConfig();
   const capacity = cfg.capacities?.['submit-assist-classify'];
   assert.ok(capacity, 'capacities.submit-assist-classify must exist');
   assert.equal(capacity.kind, 'cli');
@@ -614,8 +625,6 @@ test('the committed .fgos-runner.json declares the submit-assist-classify capaci
   assert.ok(typeof capacity.command === 'string' && capacity.command.length > 0);
   assert.ok(Array.isArray(capacity.args) && capacity.args.includes('{prompt}') && capacity.args.includes('{model}'));
 });
-
-// --- ensureRunnerConfig: D1/D3 default-write bootstrap wrapper ----------
 
 /** Capture what's written to process.stderr during `fn()`; restores the
  * original `write` afterward even if `fn` throws. */
@@ -638,9 +647,9 @@ function captureStderr(fn) {
  * named `names`, prepend it to `process.env.PATH` for the duration of
  * `fn()`, and always restore the original PATH afterward (even if `fn`
  * throws) — same restore-in-finally pattern as `captureStderr`. Used so
- * `ensureRunnerConfig`'s PATH-dependent `detectAssistantCli()` call inside
- * these tests is deterministic regardless of what's actually installed on
- * the host machine running the suite (str82). */
+ * `ensureRunnerConfigForDir`'s PATH-dependent `detectAssistantCli()` call
+ * inside these tests is deterministic regardless of what's actually
+ * installed on the host machine running the suite (str82). */
 function withKnownCliOnPath(names, fn) {
   const dir = mkTempDir();
   for (const name of names) {
@@ -655,187 +664,17 @@ function withKnownCliOnPath(names, fn) {
   }
 }
 
-test('ensureRunnerConfig on a missing path writes DEFAULT_RUNNER_CONFIG, announces it, and returns a loaded config', () => {
-  withKnownCliOnPath(['claude'], () => {
-    const dir = mkTempDir();
-    const configPath = path.join(dir, '.fgos-runner.json');
-    assert.equal(fs.existsSync(configPath), false);
+// --- loadRunnerConfigFromDir / ensureRunnerConfigForDir: shared config ---
+// file (tsk-2ta D1 amended / tsk-5vf D1/D2/D4; legacy fallback retired
+// per tsk-5hv D1) ----------------------------------------------------------
 
-    let cfg;
-    const stderr = captureStderr(() => {
-      cfg = ensureRunnerConfig(configPath);
-    });
-
-    assert.equal(fs.existsSync(configPath), true);
-    assert.deepEqual(JSON.parse(fs.readFileSync(configPath, 'utf8')), DEFAULT_RUNNER_CONFIG);
-    assert.match(stderr, /wrote a default/);
-    assert.match(stderr, /executor: claude/);
-    assert.match(stderr, new RegExp(configPath.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
-    assert.deepEqual(cfg, DEFAULT_RUNNER_CONFIG);
-  });
-});
-
-test('ensureRunnerConfig on a missing path with no known assistant CLI on PATH writes a self-documenting placeholder executor and names it in stderr', () => {
+test('loadRunnerConfigFromDir throws RunnerConfigError when the shared file does not exist', () => {
   const dir = mkTempDir();
-  const configPath = path.join(dir, '.fgos-runner.json');
-  const emptyPathDir = mkTempDir();
-  const originalPath = process.env.PATH;
-  process.env.PATH = emptyPathDir;
-
-  let cfg;
-  let stderr;
-  try {
-    stderr = captureStderr(() => {
-      cfg = ensureRunnerConfig(configPath);
-    });
-  } finally {
-    process.env.PATH = originalPath;
-  }
-
-  assert.equal(cfg.executor.command, 'NO_ASSISTANT_CLI_FOUND__edit_.fgos-runner.json');
-  assert.deepEqual(cfg.executor.args, ['{prompt}']);
-  // Every other default field is unaffected by the missing-CLI placeholder.
-  assert.deepEqual(cfg.models, DEFAULT_RUNNER_CONFIG.models);
-  assert.equal(cfg.timeoutMs, DEFAULT_RUNNER_CONFIG.timeoutMs);
-  assert.deepEqual(cfg.parallel, DEFAULT_RUNNER_CONFIG.parallel);
-  assert.match(stderr, /no known assistant CLI found on PATH/);
-  assert.match(stderr, /NO_ASSISTANT_CLI_FOUND__edit_\.fgos-runner\.json/);
-  assert.deepEqual(JSON.parse(fs.readFileSync(configPath, 'utf8')), cfg);
+  assert.throws(() => loadRunnerConfigFromDir(dir), RunnerConfigError);
 });
 
-test('ensureRunnerConfig on an already-existing, already-up-to-date path does not rewrite the file or announce anything', () => {
+test('loadRunnerConfigFromDir reads the runner section of the shared file', () => {
   const dir = mkTempDir();
-  const configPath = path.join(dir, '.fgos-runner.json');
-  const existing = JSON.parse(JSON.stringify(DEFAULT_RUNNER_CONFIG));
-  fs.writeFileSync(configPath, JSON.stringify(existing));
-  const before = fs.statSync(configPath).mtimeMs;
-
-  let cfg;
-  const stderr = captureStderr(() => {
-    cfg = ensureRunnerConfig(configPath);
-  });
-
-  assert.equal(stderr, '');
-  assert.equal(fs.statSync(configPath).mtimeMs, before);
-  assert.deepEqual(cfg, existing);
-});
-
-// --- ensureRunnerConfig: D3 config-merge on an existing but stale file --
-
-test('ensureRunnerConfig on an existing file missing newly-added default keys adds them, announces which, and rewrites the file — without touching keys already set', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, '.fgos-runner.json');
-  // A pre-D3 config: has the older fields, but predates DEFAULT_RUNNER_CONFIG
-  // growing a "parallel" block and a fuller "models" map (str87 D3's exact
-  // motivating gap).
-  const existing = {
-    executor: { command: 'claude', args: ['{prompt}'] },
-    models: { standard: 'sonnet' },
-    timeoutMs: 1000,
-  };
-  fs.writeFileSync(configPath, JSON.stringify(existing));
-
-  let cfg;
-  const stderr = captureStderr(() => {
-    cfg = ensureRunnerConfig(configPath);
-  });
-
-  assert.match(stderr, /added missing default config keys/);
-  assert.match(stderr, /models\.light/);
-  assert.match(stderr, /models\.heavy/);
-  assert.match(stderr, /parallel/);
-  // Values the user already set are untouched.
-  assert.equal(cfg.executor.command, 'claude');
-  assert.deepEqual(cfg.executor.args, ['{prompt}']);
-  assert.equal(cfg.models.standard, 'sonnet');
-  assert.equal(cfg.timeoutMs, 1000);
-  // Missing default keys were filled in.
-  assert.equal(cfg.models.light, DEFAULT_RUNNER_CONFIG.models.light);
-  assert.equal(cfg.models.heavy, DEFAULT_RUNNER_CONFIG.models.heavy);
-  assert.deepEqual(cfg.parallel, DEFAULT_RUNNER_CONFIG.parallel);
-  // The file on disk reflects the merge, not just the in-memory return.
-  assert.deepEqual(JSON.parse(fs.readFileSync(configPath, 'utf8')), cfg);
-});
-
-test('ensureRunnerConfig never overwrites a value the user already customized, even when a sibling default key is missing', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, '.fgos-runner.json');
-  const existing = {
-    executor: { command: 'my-custom-cli', args: ['{prompt}'] },
-    models: { standard: 'opus' },
-    timeoutMs: 42,
-  };
-  fs.writeFileSync(configPath, JSON.stringify(existing));
-
-  const cfg = ensureRunnerConfig(configPath);
-
-  assert.equal(cfg.executor.command, 'my-custom-cli');
-  assert.deepEqual(cfg.executor.args, ['{prompt}']);
-  assert.equal(cfg.models.standard, 'opus');
-  assert.equal(cfg.timeoutMs, 42);
-});
-
-test('ensureRunnerConfig is idempotent: a second call on the now-existing default path returns the same config without rewriting or re-announcing', () => {
-  withKnownCliOnPath(['claude'], () => {
-    const dir = mkTempDir();
-    const configPath = path.join(dir, '.fgos-runner.json');
-
-    captureStderr(() => ensureRunnerConfig(configPath));
-    const writtenAfterFirst = fs.readFileSync(configPath, 'utf8');
-
-    let cfg;
-    const stderr = captureStderr(() => {
-      cfg = ensureRunnerConfig(configPath);
-    });
-
-    assert.equal(stderr, '');
-    assert.equal(fs.readFileSync(configPath, 'utf8'), writtenAfterFirst);
-    assert.deepEqual(cfg, DEFAULT_RUNNER_CONFIG);
-  });
-});
-
-test('ensureRunnerConfig propagates a write failure as a thrown error instead of silently swallowing it', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'missing-subdir', '.fgos-runner.json');
-  // The parent directory does not exist, so fs.writeFileSync throws ENOENT —
-  // this must reach the caller, never be caught-and-ignored.
-  assert.throws(() => ensureRunnerConfig(configPath));
-  assert.equal(fs.existsSync(configPath), false);
-});
-
-test('ensureRunnerConfig delegates shape validation to loadRunnerConfig, never re-implementing it', () => {
-  withKnownCliOnPath(['claude'], () => {
-    // DEFAULT_RUNNER_CONFIG must itself satisfy loadRunnerConfig's own shape
-    // rules — proven by loading it back through the real (unmocked) function.
-    const dir = mkTempDir();
-    const configPath = path.join(dir, '.fgos-runner.json');
-    captureStderr(() => ensureRunnerConfig(configPath));
-    const cfg = loadRunnerConfig(configPath);
-    assert.deepEqual(cfg, DEFAULT_RUNNER_CONFIG);
-  });
-});
-
-// --- loadRunnerConfigFromDir / ensureRunnerConfigForDir: shared-file ----
-// retarget (tsk-2ta D1 amended / tsk-5vf D1/D2/D4) ------------------------
-
-test('loadRunnerConfigFromDir falls back to loadRunnerConfig on the legacy path, byte-identical, when the shared file does not exist', () => {
-  const dir = mkTempDir();
-  const legacyConfig = {
-    executor: { command: 'claude', args: ['{prompt}'] },
-    models: { standard: 'sonnet' },
-    timeoutMs: 5000,
-  };
-  fs.writeFileSync(path.join(dir, '.fgos-runner.json'), JSON.stringify(legacyConfig));
-
-  const viaDir = loadRunnerConfigFromDir(dir);
-  const viaLegacyDirect = loadRunnerConfig(path.join(dir, '.fgos-runner.json'));
-  assert.deepEqual(viaDir, viaLegacyDirect);
-  assert.equal(viaDir.executor.command, 'claude');
-});
-
-test('loadRunnerConfigFromDir reads the runner section of the shared file when it exists, ignoring the legacy file', () => {
-  const dir = mkTempDir();
-  fs.writeFileSync(path.join(dir, '.fgos-runner.json'), JSON.stringify({ executor: { command: 'stale', args: [] }, models: {}, timeoutMs: 1 }));
   fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
   fs.writeFileSync(
     path.join(dir, '.fgos', 'config.json'),
@@ -880,40 +719,17 @@ test('loadRunnerConfigFromDir merges a project runner section against ~/.fgos/co
   assert.equal(cfg.retries, 3);
 });
 
-test('ensureRunnerConfigForDir bootstraps straight into the shared file on a true first run, never writing .fgos-runner.json', () => {
+test('ensureRunnerConfigForDir bootstraps straight into the shared file on a true first run', () => {
   withKnownCliOnPath(['claude'], () => {
     const dir = mkTempDir();
-    assert.equal(fs.existsSync(path.join(dir, '.fgos-runner.json')), false);
     assert.equal(fs.existsSync(path.join(dir, '.fgos', 'config.json')), false);
 
     const cfg = ensureRunnerConfigForDir(dir);
 
-    assert.equal(fs.existsSync(path.join(dir, '.fgos-runner.json')), false, 'must never write the legacy path on a fresh install');
     assert.equal(fs.existsSync(path.join(dir, '.fgos', 'config.json')), true);
     const written = JSON.parse(fs.readFileSync(path.join(dir, '.fgos', 'config.json'), 'utf8'));
     assert.deepEqual(written.runner, cfg);
     assert.equal(cfg.executor.command, 'claude');
-  });
-});
-
-test('ensureRunnerConfigForDir delegates to the unchanged legacy ensureRunnerConfig when only .fgos-runner.json exists (byte-for-byte parity)', () => {
-  withKnownCliOnPath(['claude'], () => {
-    const dir = mkTempDir();
-    const legacyPath = path.join(dir, '.fgos-runner.json');
-    // A COMPLETE, already-default-shaped config -- nothing for
-    // ensureRunnerConfig's own mergeConfigDefaults step to add -- proves
-    // this delegates through unchanged rather than diverging, without
-    // conflating it with ensureRunnerConfig's separate (already-tested)
-    // fill-missing-keys behavior.
-    const existing = JSON.parse(JSON.stringify(DEFAULT_RUNNER_CONFIG));
-    fs.writeFileSync(legacyPath, JSON.stringify(existing));
-
-    const viaDir = ensureRunnerConfigForDir(dir);
-    const viaLegacyDirect = ensureRunnerConfig(legacyPath);
-    // Confirm it took the legacy path: the shared file was never created.
-    assert.equal(fs.existsSync(path.join(dir, '.fgos', 'config.json')), false);
-    assert.deepEqual(viaDir, viaLegacyDirect);
-    assert.deepEqual(viaDir, existing);
   });
 });
 
@@ -1938,7 +1754,8 @@ test('resolveExecutorCommand throws for a non-Claude "cli" capacity even when fg
 // instead of a real git checkout.
 
 function writeRunnerConfigFixture(root, cfg) {
-  fs.writeFileSync(path.join(root, '.fgos-runner.json'), JSON.stringify(cfg, null, 2));
+  fs.mkdirSync(path.join(root, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(root, '.fgos', 'config.json'), JSON.stringify({ runner: cfg }, null, 2));
 }
 
 test('resolveCapacityCli rejects with a usage RunnerConfigError when capacityId is missing', async () => {
@@ -2045,13 +1862,12 @@ test('the "resolve" CLI entry point honors --model, overriding the computed defa
 
 test('the "resolve" CLI entry point honors --tier, changing which configured model resolves (tsk-2k1, D10)', () => {
   const dispatchPath = path.resolve('src/runner/dispatch.mjs');
-  // This checkout's own committed runner config (legacy `.fgos-runner.json`
-  // — the file `ensureRunnerConfigForDir` actually reads here: a worktree
-  // never carries its own `.fgos/config.json`, ADR0020) is the same file
-  // the spawned CLI process below will resolve against, so read the
-  // expected model from it directly rather than hardcoding a value that
-  // would silently drift from the real config.
-  const cfg = JSON.parse(fs.readFileSync(path.resolve('.fgos-runner.json'), 'utf8'));
+  // The MAIN CHECKOUT's committed runner config is the same file the
+  // spawned CLI process below will resolve against (`resolveCapacityCli`
+  // resolves via `resolveMainCheckoutRoot`, not this test's own cwd), so
+  // read the expected model from there directly rather than hardcoding a
+  // value that would silently drift from the real config.
+  const cfg = committedRunnerConfig();
   const lightModel = cfg.models.light;
   const result = spawnSync(
     process.execPath,

@@ -2,7 +2,7 @@
 
 `tsk-2ta` locked two decisions in its `CONTEXT.md` during `fgos-exploring`:
 D1 (global config at `~/.fgos/config.json`, project always wins), and D1
-amended (move the project config file from `.fgos-runner.json` to
+amended (move the project config file from its old legacy flat filename to
 `.fgos/config.json` to match the global path's shape). `fgos decompose`
 then split the item into four children automatically. None of the four —
 `tsk-2ta-1` (global read+merge), `tsk-2ta-2` (doctor check), `tsk-2ta-3`
@@ -18,10 +18,12 @@ touch where the project file lives to do that. `tsk-2ta-2` added a doctor
 check reporting on both levels' presence — also unaffected by which exact
 path the project level uses. Both were implemented correctly, verified,
 and merged. And yet the sum of "every child done" does not equal "every
-locked decision implemented" — `.fgos-runner.json` is still sitting at the
-project root today, not at `.fgos/config.json`, despite D1 amended being a
-real, explicitly locked decision in the same `CONTEXT.md` all four
-children point back to.
+locked decision implemented" — the legacy flat config file sat at the
+project root for a long time afterward, never actually moved to
+`.fgos/config.json`, despite D1 amended being a real, explicitly locked
+decision in the same `CONTEXT.md` all four children point back to. (The
+gap was eventually closed — the legacy file was retired outright, not just
+moved — by `tsk-5hv`.)
 
 ## Why this is worth naming, not just quietly fixing
 

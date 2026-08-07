@@ -87,8 +87,8 @@ test('e2e: npm pack -> npm install -g -> fgos init from a fresh external cwd', (
     );
     assert.equal(install.status, 0, `npm install -g failed: ${install.stderr}`);
 
-    // (3) content-scoping: the installed package tree excludes .fgos/,
-    // .fgos-runner.json, and test/ (the `files` allowlist actually took effect).
+    // (3) content-scoping: the installed package tree excludes .fgos/ and
+    // test/ (the `files` allowlist actually took effect).
     // Windows global installs place the package straight under
     // <prefix>/node_modules (no `lib` folder) and drop executable shims
     // (.cmd/extensionless/.ps1) directly in <prefix>/, never a `bin/`
@@ -99,7 +99,6 @@ test('e2e: npm pack -> npm install -g -> fgos init from a fresh external cwd', (
       : path.join(installPrefix, 'lib', 'node_modules', 'forgent');
     assert.ok(fs.existsSync(installedPkgDir), `installed package dir not found at ${installedPkgDir}`);
     assert.equal(fs.existsSync(path.join(installedPkgDir, '.fgos')), false, '.fgos/ must not ship in the installed package');
-    assert.equal(fs.existsSync(path.join(installedPkgDir, '.fgos-runner.json')), false, '.fgos-runner.json must not ship');
     assert.equal(fs.existsSync(path.join(installedPkgDir, 'test')), false, 'test/ must not ship');
 
     // (4) invoke the installed binary's `init` verb from a SEPARATE fresh
