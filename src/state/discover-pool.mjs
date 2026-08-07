@@ -6,7 +6,18 @@
 // clarify/decompose pool `frontier()` deliberately excludes.
 import { rankImpact } from './impact.mjs';
 
-const CANDIDATE_STAGES = new Set(['clarify', 'decompose']);
+// tsk-1w7 D10: `discovery`/`exploring` sit between `clarify` and
+// `decompose` now — both join the pool as ordinary clarify-shaped
+// candidates (see compareClarifyOrder below) rather than a third bucket,
+// since nothing yet exists to route `discovery`-stage items to a runner
+// worker instead (that dispatch mechanism is a separate item's own scope,
+// per plan.md's P5 row — `! rg -q "resolveDiscovery" src/runner/loop.mjs`
+// is P5's own verify, not this item's). Forward-compatible, zero regression
+// today: no item can reach `discovery`/`exploring` yet (nothing in this
+// item's own footprint fires those new transitions either), so this only
+// widens coverage for whenever something later does.
+const CLARIFY_SHAPED_STAGES = new Set(['clarify', 'discovery', 'exploring']);
+const CANDIDATE_STAGES = new Set([...CLARIFY_SHAPED_STAGES, 'decompose']);
 
 function isCandidate(item) {
   return item.status === 'todo' && CANDIDATE_STAGES.has(item.stage);
@@ -45,11 +56,16 @@ function compareDecomposeOrder(a, b) {
 
 /**
  * Pick the single next item for a discover-loop iteration to act on, or
- * `null` when no `stage: clarify`/`stage: decompose` item is `status:
- * todo`. `stage: clarify` candidates always win over `stage: decompose`
- * ones when both pools are non-empty (matches the original description's
- * "prioritizing clarify first" — clarify-stage ambiguity blocks everything
+ * `null` when no clarify-shaped (`clarify`/`discovery`/`exploring`, tsk-1w7
+ * D10) or `decompose`-stage item is `status: todo`. Clarify-shaped
+ * candidates always win over `decompose` ones when both pools are non-empty
+ * (matches the original description's "prioritizing clarify first" —
+ * ambiguity anywhere in that pre-decompose chain blocks everything
  * downstream for that item, including its own eventual decompose pass).
+ * The returned `stage` is always the item's OWN real stage — never a
+ * hardcoded 'clarify' literal — so a caller branching on it (e.g.
+ * `/fgOS:discover-next`'s own ceiling logic) sees the truth even once
+ * something starts landing items on `discovery`/`exploring` for real.
  */
 export function pickNextDiscoverItem(view) {
   const work = view?.work ?? {};
@@ -58,14 +74,14 @@ export function pickNextDiscoverItem(view) {
   for (const id of Object.keys(work)) {
     const item = work[id];
     if (!isCandidate(item)) continue;
-    if (item.stage === 'clarify') clarify.push(item);
+    if (CLARIFY_SHAPED_STAGES.has(item.stage)) clarify.push(item);
     else decompose.push(item);
   }
 
   if (clarify.length > 0) {
     const blocksById = new Map(rankImpact(view).map((row) => [row.id, row.blocks]));
     clarify.sort(compareClarifyOrder(blocksById));
-    return { id: clarify[0].id, stage: 'clarify' };
+    return { id: clarify[0].id, stage: clarify[0].stage };
   }
 
   if (decompose.length > 0) {
