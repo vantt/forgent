@@ -1377,6 +1377,35 @@ Không câu hỏi mở nào còn lại trong phạm vi `tsk-umc`. Ba câu vòng 
 trả lời hết: **ai claim** ⇒ D5 · **bộ chọn wave** ⇒ `computeSchedule` ∩
 tập ứng viên, bỏ `selectWave` · **gom kết quả về** ⇒ D6.
 
+### 2026-08-07 — Vòng 11: chống bỏ sót ba việc liền kề
+
+**Người dùng xác nhận hội tụ**, và hỏi đúng câu đáng hỏi: *làm sao để không
+miss 3 việc phụ mới?*
+
+Câu trả lời không phải "ghi kỹ hơn trong file này" — một mục trong file
+thảo luận **không phải backlog**, không xuất hiện ở `fgos list`/`ready`/
+`triage`, nên chắc chắn bị bỏ sót. Cùng logic của **D1**: thứ cần được
+theo dõi thì phải là **work item thật**.
+
+⇒ Submit cả ba, kèm bằng chứng đo được và đường dẫn ngữ cảnh trong chính
+`description`:
+
+| Item | tier | Việc |
+|---|---|---|
+| `tsk-4fg` | light | cần gạt view cho `fgos list` (D3) |
+| `tsk-59x` | light | TTL nhận biết lá |
+| `tsk-1ug` | light | `fgos rollup` hiểu `targets` (D4) |
+
+Cả ba mang `docsRef` = `docs/history/execution-fanout/` ⇒ tìm lại cùng
+nhau được, và một phiên nguội mở bất kỳ cái nào cũng về đúng file này.
+
+**Ràng buộc thứ tự đã cưỡng chế, không để trong văn xuôi**: §6 ghi view
+lever *"phải làm cùng đợt"* — nhưng một câu trong doc không chặn được gì.
+Đã chạy `fgos edit tsk-umc --merge-after tsk-4fg` (seq 8946): fan-out
+không merge trước khi danh sách biết ẩn con. `mergeAfter` chỉ xếp thứ tự
+**lúc merge** (`work.mjs:278-288`) nên hai item vẫn clarify/plan/thi công
+song song — không mất tốc độ, đúng tiền lệ D1 của `two-layer-dispatch`.
+
 ## 6. Thiết kế đã chốt {#design}
 
 *(Dựng lần đầu ở vòng 10, sau khi D1-D6 đủ. Viết cho người đọc không có
@@ -1488,11 +1517,15 @@ flowchart TD
 
 ### Việc liền kề, cố ý để NGOÀI item này
 
-| Việc | Vì sao ngoài |
-|---|---|
-| **Cần gạt view** cho `fgos list` (loại con khỏi danh sách, thay bằng chỉ báo tiến độ ở dòng cha) — D3 | bộ lọc danh sách không phải fan-out. Nhưng **phải làm cùng đợt**: fan-out nhân N lần cái đau này |
-| **TTL nhận biết lá** (Fix A) — lá TTL ngắn/0, root giữ 7 ngày | chính sách hậu kỳ, không phải dispatch. Lý lẽ đã có: nhánh lá **thừa ngay sau khi merge vào `fgw/<root>`** vì nội dung nằm trên một nhánh sống lâu hơn nó. **Phải đọc `docs/history/work-item-status-delivered-retrospective-cleanup/` trước khi sửa** |
-| **`fgos rollup` hiểu `targets`** | lỗ hổng duy nhất còn lại của case 2 |
+Cả ba **đã được submit thành work item thật** (vòng 11) — một ghi chú trong
+file thảo luận không phải backlog và chắc chắn sẽ bị bỏ sót. Cả ba mang
+`docsRef` = `docs/history/execution-fanout/` nên tìm lại cùng nhau được.
+
+| Item | Việc | Vì sao ngoài `tsk-umc` |
+|---|---|---|
+| **`tsk-4fg`** | **Cần gạt view** cho `fgos list` — loại con khỏi danh sách, thay bằng chỉ báo tiến độ ở dòng cha (D3) | bộ lọc danh sách không phải fan-out. Nhưng **phải làm cùng đợt**: fan-out nhân N lần cái đau này ⇒ đã cưỡng chế bằng `fgos edit tsk-umc --merge-after tsk-4fg` (seq 8946) — `mergeAfter` chỉ xếp thứ tự lúc merge, hai item vẫn clarify/plan/thi công song song |
+| **`tsk-59x`** | **TTL nhận biết lá** — lá TTL ngắn/0, root giữ 7 ngày | chính sách hậu kỳ, không phải dispatch. Lý lẽ đã có: nhánh lá **thừa ngay sau khi merge vào `fgw/<root>`** vì nội dung nằm trên một nhánh sống lâu hơn nó. **Phải đọc `docs/history/work-item-status-delivered-retrospective-cleanup/` trước khi sửa** |
+| **`tsk-1ug`** | **`fgos rollup` hiểu `targets`** | lỗ hổng duy nhất còn lại của case 2 (D4) |
 
 ## 7. Danh mục hạng mục / task {#tasks}
 
