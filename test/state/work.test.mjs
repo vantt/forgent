@@ -406,8 +406,8 @@ test('DEFAULTS.tier is itself a member of TIERS, and SCHEMA_VERSION is a positiv
   assert.ok(Number.isInteger(SCHEMA_VERSION) && SCHEMA_VERSION > 0);
 });
 
-test('STAGES includes "decompose" between clarify and executing — compound-learn is retired (D11)', () => {
-  assert.deepEqual(STAGES, ['clarify', 'decompose', 'executing']);
+test('STAGES includes "decompose" between clarify and executing — compound-learn is retired (D11); "discovery"/"exploring" now sit between clarify and decompose (tsk-1w7 D10)', () => {
+  assert.deepEqual(STAGES, ['clarify', 'discovery', 'exploring', 'decompose', 'executing']);
 });
 
 test('validateWork accepts every stage in STAGES', () => {

@@ -31,11 +31,12 @@ import { detectRcFiles, hasSourceLine, deadSourceLines } from './shell-rc.mjs';
 import { mergeConfigDefaults } from './config-merge.mjs';
 import { mainCheckoutHookWired } from './git-hooks.mjs';
 import { DEFAULT_RUNNER_CONFIG } from '../runner/dispatch.mjs';
+import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
 import { listWork } from '../state/store.mjs';
 import { driftStatus } from '../state/drift-status.mjs';
 import { readLocalStatus, classifyRegistryPosture } from '../state/tool-registry.mjs';
 import { describeConfigAwareness } from '../config/global-config.mjs';
-import { sharedConfigFilePath, legacyRunnerConfigPath, readSharedConfig, writeSharedConfig } from '../config/shared-config-file.mjs';
+import { sharedConfigFilePath, readSharedConfig, writeSharedConfig } from '../config/shared-config-file.mjs';
 import { DEFAULT_LEVEL, LEVELS } from '../state/gate-bypass.mjs';
 
 export { mainCheckoutHookWired } from './git-hooks.mjs';
@@ -150,13 +151,12 @@ function assembleRegistryDefaults() {
 
 /**
  * Registry-driven bootstrap for the shared config file (tsk-5vf D4): reads
- * whatever is currently at `dir` (the new file, or its legacy
- * `.fgos-runner.json` fallback wrapped as `{runner: ...}` -- `readSharedConfig`),
- * fills in any key any registered entry's default shape has that the
- * current content is missing, at any depth, and writes back only when a
- * key was actually added or the shared file did not exist yet. Never
- * deletes the legacy file. This is the write path `fgos setup` calls
- * (RUL9: doctor checks stay read-only; `setup` is the one write verb).
+ * whatever is currently at `dir` (`readSharedConfig`), fills in any key any
+ * registered entry's default shape has that the current content is
+ * missing, at any depth, and writes back only when a key was actually
+ * added or the shared file did not exist yet. This is the write path
+ * `fgos setup` calls (RUL9: doctor checks stay read-only; `setup` is the
+ * one write verb).
  */
 export function ensureSharedConfigDefaults(dir) {
   const existing = readSharedConfig(dir);
@@ -181,21 +181,14 @@ export function ensureSharedConfigDefaults(dir) {
  * at the main checkout's `.git` from anywhere in the repo, so its parent is
  * the one location stable enough for a user's rc file to name. Same
  * resolution `scripts/fgos-shell-integration.sh` already uses, and the same
- * common-dir-parent shape as `merge.mjs`'s `isMainWorktree`.
+ * common-dir-parent shape as `merge.mjs`'s `isMainWorktree`. Delegates to
+ * `paths.mjs`'s `resolveMainCheckoutRoot` (tsk-5hv: extracted there so
+ * `dispatch.mjs`/`scripts/project-agents.mjs` can reuse the identical
+ * resolution without a circular import back into this module) — this
+ * export's own name/signature stay unchanged for its existing callers.
  */
 export function resolveMainCheckout(dir) {
-  let commonDir;
-  try {
-    commonDir = execFileSync('git', ['rev-parse', '--path-format=absolute', '--git-common-dir'], {
-      cwd: dir,
-      encoding: 'utf8',
-      shell: false,
-      stdio: ['ignore', 'pipe', 'pipe'],
-    }).trim();
-  } catch {
-    return null;
-  }
-  return commonDir ? path.dirname(commonDir) : null;
+  return resolveMainCheckoutRoot(dir);
 }
 
 /**
@@ -297,16 +290,14 @@ function checkShellIntegrationSourced() {
 // calls fs.existsSync/readFileSync, never `ensureSharedConfigDefaults` or
 // `ensureRunnerConfig` — doctor never writes.
 //
-// Retargeted at the shared config file (`.fgos/config.json`, tsk-2ta D1
-// amended) with a legacy-`.fgos-runner.json` read fallback baked into
-// `readSharedConfig` itself, and made generic over every registered entry
-// (tsk-5vf D4/D5) — the `registerConfigDefault` follow-up
+// Targeted at the shared config file (`.fgos/config.json`) alone (tsk-5hv
+// D1: the legacy runner config file was retired, no fallback), made generic over every
+// registered entry (tsk-5vf D4/D5) — the `registerConfigDefault` follow-up
 // `docs/history/setup-doctor-config-registry/plan.md`'s "Real blast radius"
 // note deferred to once the shared file was real.
 function checkConfigNotStale(cwd) {
   const sharedPath = sharedConfigFilePath(cwd);
-  const legacyPath = legacyRunnerConfigPath(cwd);
-  if (!fs.existsSync(sharedPath) && !fs.existsSync(legacyPath)) {
+  if (!fs.existsSync(sharedPath)) {
     return { passed: false, message: 'not yet configured -- run fgos setup' };
   }
   const existingConfig = readSharedConfig(cwd);
@@ -315,7 +306,7 @@ function checkConfigNotStale(cwd) {
   if (addedKeys.length > 0) {
     return { passed: false, message: `stale config — missing keys: ${addedKeys.join(', ')} — run fgos setup` };
   }
-  return { passed: true, message: `config up to date at ${fs.existsSync(sharedPath) ? sharedPath : legacyPath}` };
+  return { passed: true, message: `config up to date at ${sharedPath}` };
 }
 
 function checkMainCheckoutHookWired(cwd) {
@@ -367,7 +358,7 @@ registerCheck({
 
 registerCheck({
   id: 'config-not-stale',
-  description: '.fgos/config.json (or its legacy .fgos-runner.json fallback) exists and has every current registered default key',
+  description: '.fgos/config.json exists and has every current registered default key',
   check: (cwd) => checkConfigNotStale(cwd),
 });
 
@@ -544,10 +535,19 @@ registerConfigDefault({
 // default, same shape as gateBypass's own registration immediately above.
 export const DEFAULT_CLEANUP_TTL_DAYS = 7;
 
+// tsk-59x D1: supersedes D7's global-only premise for the leaf/root axis
+// specifically, now that the demonstrated need D7 flagged as missing
+// exists (25% of open list is children, 0/99 cleanup-pool items ever
+// elapse the 7-day TTL). A leaf's own content already lives on its
+// still-alive root branch the moment it merges, so reclaiming its
+// worktree/branch immediately loses nothing. Root items are unaffected —
+// they keep DEFAULT_CLEANUP_TTL_DAYS above.
+export const DEFAULT_CLEANUP_LEAF_TTL_DAYS = 0;
+
 registerConfigDefault({
   id: 'cleanup',
   key: 'cleanup',
-  shape: { ttlDays: DEFAULT_CLEANUP_TTL_DAYS },
+  shape: { ttlDays: DEFAULT_CLEANUP_TTL_DAYS, leafTtlDays: DEFAULT_CLEANUP_LEAF_TTL_DAYS },
 });
 
 registerCheck({

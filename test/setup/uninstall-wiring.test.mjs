@@ -58,6 +58,22 @@ test('uninstallGitHooks unwires and deletes .githooks/pre-commit + the now-empty
   fs.rmSync(cwd, { recursive: true, force: true });
 });
 
+test('uninstallGitHooks unwires an absolute core.hooksPath resolving to repoRoot/.githooks, same as the relative form', () => {
+  const cwd = mkTemp('uninstall-hooks-absolute-');
+  initGitRepo(cwd);
+  fs.mkdirSync(path.join(cwd, '.githooks'));
+  fs.writeFileSync(path.join(cwd, '.githooks', 'pre-commit'), '#!/bin/sh\nexit 0\n');
+  execFileSync('git', ['config', 'core.hooksPath', path.join(cwd, '.githooks')], { cwd });
+
+  const result = uninstallGitHooks(cwd);
+
+  assert.deepEqual(result, { unwired: true, skippedExisting: null });
+  assert.throws(() => execFileSync('git', ['config', '--get', 'core.hooksPath'], { cwd, encoding: 'utf8' }));
+  assert.equal(fs.existsSync(path.join(cwd, '.githooks', 'pre-commit')), false);
+  assert.equal(fs.existsSync(path.join(cwd, '.githooks')), false);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
 test('uninstallGitHooks leaves a custom hooksPath completely untouched', () => {
   const cwd = mkTemp('uninstall-hooks-custom-');
   initGitRepo(cwd);

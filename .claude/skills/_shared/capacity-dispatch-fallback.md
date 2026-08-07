@@ -12,7 +12,7 @@ Point at this file from a consumer `SKILL.md` by relative path (e.g.
 `../_shared/capacity-dispatch-fallback.md`), filling in these three
 parameters where the consuming skill's own reasoning step lives:
 
-- **`<CAPACITY_ID>`** — the `.fgos/config.json`/`.fgos-runner.json`
+- **`<CAPACITY_ID>`** — the `.fgos/config.json`
   `runner.capacities.<id>` key this step dispatches through (real example:
   `submit-assist-classify`).
 - **`<PROMPT_TEMPLATE>`** — the fixed prompt text to send (so every
@@ -49,8 +49,8 @@ behavior below.
 ```bash
 root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
 node -e "
-const cfg = JSON.parse(require('node:fs').readFileSync('$root/.fgos-runner.json', 'utf8'));
-console.log(cfg.capacities?.['<CAPACITY_ID>'] ? 'configured' : 'not-configured');
+const cfg = JSON.parse(require('node:fs').readFileSync('$root/.fgos/config.json', 'utf8'));
+console.log(cfg.runner?.capacities?.['<CAPACITY_ID>'] ? 'configured' : 'not-configured');
 "
 ```
 
@@ -101,8 +101,21 @@ guess.) Prints `{"mechanism": "native"|"cli-spawn"[, "agentType": "<name>"]}`.
   pattern's one real live consumer today — cross-provider, always
   cli/spawn), every `kind:"task"` capacity when you lack live Task access,
   and any capacity whose config forces cli/spawn (`forceCliSpawn`).
-- **`mechanism: "native"`** — skip Step C's `exec` entirely. Call your own
-  Agent/Task tool directly instead: `subagent_type` is this same JSON's
+- **`mechanism: "native"`** — skip Step C's `exec` entirely. Print the
+  same announce line Step C.3 prints for cli-spawn, so a dispatch is
+  visible on the chat transcript regardless of which branch fired
+  (observability parity — before this, only the cli-spawn branch
+  announced anything):
+
+  ```
+  <CAPACITY_ID> - native - <agentType> - <model>
+  ```
+
+  where `<model>` is whichever model the Agent/Task call actually resolves
+  to (the target agent definition's own pinned `model:`, an explicit
+  override you pass, or — when neither applies — the current session's own
+  model, since native dispatch is same-provider by construction). Then
+  call your own Agent/Task tool: `subagent_type` is this same JSON's
   `agentType`, the prompt is `<PROMPT_TEMPLATE>` (the exact same prompt
   Step C would have built — never a different or re-worded one). Read the
   response the same way Step C's own consumer reads a dispatched answer —
@@ -200,7 +213,7 @@ field), continue at Step C.1 below, substituting the packet for
    re-templated):
 
    ```
-   <CAPACITY_ID> - <provider> - <model>
+   <CAPACITY_ID> - cli-spawn - <provider> - <model>
    ```
 
 4. Read the response — Step D covers what "malformed" means for it.

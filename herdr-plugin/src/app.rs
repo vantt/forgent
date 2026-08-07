@@ -48,7 +48,7 @@ pub struct WorkItem {
     /// at `"clarify"`.
     pub stage: String,
     /// tsk-64z D1: raw status literal — drives the Status column and the
-    /// tab membership check (`Tab::matches`, below).
+    /// tab membership check (`WorkTab::matches`, below).
     pub status: String,
     /// tsk-64z D1: "Blocked By" column source.
     pub blocked_by: Vec<String>,
@@ -61,14 +61,14 @@ pub struct WorkItem {
 /// tsk-64z D1/D7: the Work Items panel's 4 tabs — a pure classification
 /// over `WorkItem.status`, never a second copy of the item list.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Tab {
+pub enum WorkTab {
     Todo,
     Doing,
     Review,
     Done,
 }
 
-impl Tab {
+impl WorkTab {
     /// D1: `todo` only. D1: `doing`/`blocked`/`awaiting-human` — the same
     /// `in-progress` `statusCategory` grouping `workflow-stage-graphs.mjs`
     /// already uses for the `coding` domain. D1: `awaiting-approval` only.
@@ -76,10 +76,10 @@ impl Tab {
     /// `wontfix` (D7 explicitly folds canceled items into this tab too).
     fn matches(self, status: &str) -> bool {
         match self {
-            Tab::Todo => status == "todo",
-            Tab::Doing => matches!(status, "doing" | "blocked" | "awaiting-human"),
-            Tab::Review => status == "awaiting-approval",
-            Tab::Done => matches!(
+            WorkTab::Todo => status == "todo",
+            WorkTab::Doing => matches!(status, "doing" | "blocked" | "awaiting-human"),
+            WorkTab::Review => status == "awaiting-approval",
+            WorkTab::Done => matches!(
                 status,
                 "delivered" | "retrospective" | "cleanup" | "done" | "wontfix"
             ),
@@ -88,38 +88,70 @@ impl Tab {
 
     pub fn label(self) -> &'static str {
         match self {
-            Tab::Todo => "TODO",
-            Tab::Doing => "DOING",
-            Tab::Review => "REVIEW",
-            Tab::Done => "DONE",
+            WorkTab::Todo => "TODO",
+            WorkTab::Doing => "DOING",
+            WorkTab::Review => "REVIEW",
+            WorkTab::Done => "DONE",
         }
     }
 
     fn next(self) -> Self {
         match self {
-            Tab::Todo => Tab::Doing,
-            Tab::Doing => Tab::Review,
-            Tab::Review => Tab::Done,
-            Tab::Done => Tab::Todo,
+            WorkTab::Todo => WorkTab::Doing,
+            WorkTab::Doing => WorkTab::Review,
+            WorkTab::Review => WorkTab::Done,
+            WorkTab::Done => WorkTab::Todo,
         }
     }
 
     fn prev(self) -> Self {
         match self {
-            Tab::Todo => Tab::Done,
-            Tab::Doing => Tab::Todo,
-            Tab::Review => Tab::Doing,
-            Tab::Done => Tab::Review,
+            WorkTab::Todo => WorkTab::Done,
+            WorkTab::Doing => WorkTab::Todo,
+            WorkTab::Review => WorkTab::Doing,
+            WorkTab::Done => WorkTab::Review,
         }
     }
 }
 
 /// Which list currently has keyboard focus (tsk-1eu D1) — `Up`/`Down`/
 /// `Enter` always apply to whichever panel this names.
+///
+/// tsk-3wl D1: `NeedAnswer`/`MergeList`/`AfterDeliver` are focusable but
+/// read-only — `Up`/`Down` scroll them (see `scroll_need_answer_down` and
+/// its siblings below), `Enter` does nothing while one of them is
+/// focused. Variant order is the same top-to-bottom, left-to-right order
+/// the layout already renders in (`ui.rs`'s `columns`/`right_column`
+/// split), so `next`/`prev` below cycle in reading order.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Panel {
     WorkItems,
     InProcess,
+    NeedAnswer,
+    MergeList,
+    AfterDeliver,
+}
+
+impl Panel {
+    fn next(self) -> Self {
+        match self {
+            Panel::WorkItems => Panel::InProcess,
+            Panel::InProcess => Panel::NeedAnswer,
+            Panel::NeedAnswer => Panel::MergeList,
+            Panel::MergeList => Panel::AfterDeliver,
+            Panel::AfterDeliver => Panel::WorkItems,
+        }
+    }
+
+    fn prev(self) -> Self {
+        match self {
+            Panel::WorkItems => Panel::AfterDeliver,
+            Panel::InProcess => Panel::WorkItems,
+            Panel::NeedAnswer => Panel::InProcess,
+            Panel::MergeList => Panel::NeedAnswer,
+            Panel::AfterDeliver => Panel::MergeList,
+        }
+    }
 }
 
 /// D4: an fgOS item with `status: doing` — always "doing" by definition, so
@@ -155,7 +187,7 @@ pub struct App {
     /// open, Up/Down/Tab are inert and Esc closes it without quitting.
     pub detail_modal_open: bool,
     /// tsk-64z D1: which of the 4 Work Items tabs is active.
-    pub active_tab: Tab,
+    pub active_tab: WorkTab,
     /// tsk-64z D8: true while the `/` filter input is being typed —
     /// applies to the Work Items panel only, never the right-side boxes.
     pub filter_input_active: bool,
@@ -177,6 +209,23 @@ pub struct App {
     pub pick_button_rect: Option<ButtonRect>,
     /// tsk-40t D5: same idea as `pick_button_rect`, for Discover.
     pub discover_button_rect: Option<ButtonRect>,
+    /// tsk-3wl D1: scroll offset (lines) into the NEED ANSWER box's
+    /// `Paragraph` — this box has no row-select, only scroll.
+    pub need_answer_scroll: u16,
+    /// tsk-3wl D1: same idea as `need_answer_scroll`, for MERGE LIST.
+    pub merge_list_scroll: u16,
+    /// tsk-3wl D1: same idea as `need_answer_scroll`, for AFTER DELIVER.
+    pub after_deliver_scroll: u16,
+    /// tsk-bvh D1: each box's own on-screen rectangle, written by `ui.rs`'s
+    /// `draw` every frame — same "domain-safe `Rect` copy" pattern
+    /// `pick_button_rect`/`discover_button_rect` already use for the
+    /// modal's two buttons, widened here to all 5 boxes so `poll_event`
+    /// can hit-test a click against any of them, not just the modal.
+    pub work_items_rect: Option<ButtonRect>,
+    pub in_process_rect: Option<ButtonRect>,
+    pub need_answer_rect: Option<ButtonRect>,
+    pub merge_list_rect: Option<ButtonRect>,
+    pub after_deliver_rect: Option<ButtonRect>,
 }
 
 impl App {
@@ -190,7 +239,7 @@ impl App {
             focused_panel: Panel::WorkItems,
             pick_status: None,
             detail_modal_open: false,
-            active_tab: Tab::Todo,
+            active_tab: WorkTab::Todo,
             filter_input_active: false,
             filter_query: String::new(),
             need_answer: Vec::new(),
@@ -198,6 +247,14 @@ impl App {
             merge_list: MergeListSummary::default(),
             pick_button_rect: None,
             discover_button_rect: None,
+            need_answer_scroll: 0,
+            merge_list_scroll: 0,
+            after_deliver_scroll: 0,
+            work_items_rect: None,
+            in_process_rect: None,
+            need_answer_rect: None,
+            merge_list_rect: None,
+            after_deliver_rect: None,
         }
     }
 
@@ -373,12 +430,49 @@ impl App {
         }
     }
 
-    /// tsk-1eu D1: toggles which panel has keyboard focus.
+    /// tsk-1eu D1 / tsk-3wl D1: cycles keyboard focus forward through all
+    /// 5 boxes (was WorkItems/InProcess-only before tsk-3wl).
     pub fn switch_panel(&mut self) {
-        self.focused_panel = match self.focused_panel {
-            Panel::WorkItems => Panel::InProcess,
-            Panel::InProcess => Panel::WorkItems,
-        };
+        self.focused_panel = self.focused_panel.next();
+    }
+
+    /// tsk-3wl D1: same cycle, backward — the Shift+Tab counterpart.
+    pub fn switch_panel_prev(&mut self) {
+        self.focused_panel = self.focused_panel.prev();
+    }
+
+    /// tsk-3wl D1: NeedAnswer/MergeList/AfterDeliver have no row-select
+    /// (they stay view-only) — Up/Down instead scroll their `Paragraph`
+    /// down by one line, clamped so the offset never runs past the last
+    /// row (scrolling further would just show blank space).
+    pub fn scroll_need_answer_down(&mut self) {
+        let max = self.need_answer.len().saturating_sub(1) as u16;
+        self.need_answer_scroll = (self.need_answer_scroll + 1).min(max);
+    }
+
+    pub fn scroll_need_answer_up(&mut self) {
+        self.need_answer_scroll = self.need_answer_scroll.saturating_sub(1);
+    }
+
+    pub fn scroll_merge_list_down(&mut self) {
+        let len = self.merge_list.ready.len()
+            + self.merge_list.waiting.len()
+            + self.merge_list.blocked_on_sync.len();
+        let max = len.saturating_sub(1) as u16;
+        self.merge_list_scroll = (self.merge_list_scroll + 1).min(max);
+    }
+
+    pub fn scroll_merge_list_up(&mut self) {
+        self.merge_list_scroll = self.merge_list_scroll.saturating_sub(1);
+    }
+
+    pub fn scroll_after_deliver_down(&mut self) {
+        let max = self.after_deliver.len().saturating_sub(1) as u16;
+        self.after_deliver_scroll = (self.after_deliver_scroll + 1).min(max);
+    }
+
+    pub fn scroll_after_deliver_up(&mut self) {
+        self.after_deliver_scroll = self.after_deliver_scroll.saturating_sub(1);
     }
 
     /// Fake/hardcoded rows — kept only for offline rendering smoke tests
@@ -429,7 +523,7 @@ impl App {
             focused_panel: Panel::WorkItems,
             pick_status: None,
             detail_modal_open: false,
-            active_tab: Tab::Todo,
+            active_tab: WorkTab::Todo,
             filter_input_active: false,
             filter_query: String::new(),
             need_answer: vec![NeedAnswerTask {
@@ -449,6 +543,14 @@ impl App {
             },
             pick_button_rect: None,
             discover_button_rect: None,
+            need_answer_scroll: 0,
+            merge_list_scroll: 0,
+            after_deliver_scroll: 0,
+            work_items_rect: None,
+            in_process_rect: None,
+            need_answer_rect: None,
+            merge_list_rect: None,
+            after_deliver_rect: None,
         }
     }
 
@@ -781,26 +883,26 @@ mod tests {
         let mut app = App::empty();
         app.refresh_from_fgos(&source);
 
-        app.active_tab = Tab::Todo;
+        app.active_tab = WorkTab::Todo;
         assert_eq!(
             app.visible_work_items().iter().map(|i| i.id.as_str()).collect::<Vec<_>>(),
             vec!["tsk-todo"]
         );
 
-        app.active_tab = Tab::Doing;
+        app.active_tab = WorkTab::Doing;
         let doing_ids: Vec<&str> = app.visible_work_items().iter().map(|i| i.id.as_str()).collect();
         assert_eq!(doing_ids.len(), 3);
         assert!(doing_ids.contains(&"tsk-doing"));
         assert!(doing_ids.contains(&"tsk-blocked"));
         assert!(doing_ids.contains(&"tsk-awaiting-human"));
 
-        app.active_tab = Tab::Review;
+        app.active_tab = WorkTab::Review;
         assert_eq!(
             app.visible_work_items().iter().map(|i| i.id.as_str()).collect::<Vec<_>>(),
             vec!["tsk-review"]
         );
 
-        app.active_tab = Tab::Done;
+        app.active_tab = WorkTab::Done;
         let done_ids: Vec<&str> = app.visible_work_items().iter().map(|i| i.id.as_str()).collect();
         assert_eq!(done_ids.len(), 2);
         assert!(done_ids.contains(&"tsk-delivered"));
@@ -813,15 +915,74 @@ mod tests {
     #[test]
     fn next_tab_and_prev_tab_cycle_and_reset_selection() {
         let mut app = App::empty();
-        assert_eq!(app.active_tab, Tab::Todo);
+        assert_eq!(app.active_tab, WorkTab::Todo);
         app.next_tab();
-        assert_eq!(app.active_tab, Tab::Doing);
+        assert_eq!(app.active_tab, WorkTab::Doing);
         app.next_tab();
         app.next_tab();
         app.next_tab();
-        assert_eq!(app.active_tab, Tab::Todo, "wraps around after DONE");
+        assert_eq!(app.active_tab, WorkTab::Todo, "wraps around after DONE");
         app.prev_tab();
-        assert_eq!(app.active_tab, Tab::Done, "wraps around backward before TODO");
+        assert_eq!(app.active_tab, WorkTab::Done, "wraps around backward before TODO");
+    }
+
+    /// tsk-3wl D1: `switch_panel` (Tab) must reach all 5 boxes, not just
+    /// WorkItems/InProcess — in the same top-to-bottom, left-to-right
+    /// spatial order the layout renders in (`ui.rs`'s `columns`/
+    /// `right_column` split).
+    #[test]
+    fn focus_cycle_visits_all_five_panels_in_spatial_order_and_wraps() {
+        let mut app = App::empty();
+        assert_eq!(app.focused_panel, Panel::WorkItems);
+        app.switch_panel();
+        assert_eq!(app.focused_panel, Panel::InProcess);
+        app.switch_panel();
+        assert_eq!(app.focused_panel, Panel::NeedAnswer);
+        app.switch_panel();
+        assert_eq!(app.focused_panel, Panel::MergeList);
+        app.switch_panel();
+        assert_eq!(app.focused_panel, Panel::AfterDeliver);
+        app.switch_panel();
+        assert_eq!(app.focused_panel, Panel::WorkItems, "wraps around after AfterDeliver");
+    }
+
+    /// tsk-3wl D1: Shift+Tab (`switch_panel_prev`) is the exact reverse of
+    /// `switch_panel` — including the wrap at the other end.
+    #[test]
+    fn focus_cycle_shift_tab_reverses_the_forward_cycle() {
+        let mut app = App::empty();
+        assert_eq!(app.focused_panel, Panel::WorkItems);
+        app.switch_panel_prev();
+        assert_eq!(app.focused_panel, Panel::AfterDeliver, "wraps backward before WorkItems");
+        app.switch_panel_prev();
+        assert_eq!(app.focused_panel, Panel::MergeList);
+        app.switch_panel_prev();
+        assert_eq!(app.focused_panel, Panel::NeedAnswer);
+        app.switch_panel_prev();
+        assert_eq!(app.focused_panel, Panel::InProcess);
+        app.switch_panel_prev();
+        assert_eq!(app.focused_panel, Panel::WorkItems);
+    }
+
+    /// tsk-3wl D1: NeedAnswer/MergeList/AfterDeliver have no row-select —
+    /// scroll offset moves by one line per Up/Down, clamped at both ends
+    /// (never negative via `saturating_sub`, never past the last row).
+    #[test]
+    fn focus_cycle_scroll_boxes_clamp_at_both_ends() {
+        let mut app = App::empty();
+        app.need_answer = vec![
+            NeedAnswerTask { id: "a".into(), title: "A".into(), status: "blocked".into() },
+            NeedAnswerTask { id: "b".into(), title: "B".into(), status: "awaiting-human".into() },
+        ];
+        assert_eq!(app.need_answer_scroll, 0);
+        app.scroll_need_answer_up();
+        assert_eq!(app.need_answer_scroll, 0, "never goes negative");
+        app.scroll_need_answer_down();
+        assert_eq!(app.need_answer_scroll, 1);
+        app.scroll_need_answer_down();
+        assert_eq!(app.need_answer_scroll, 1, "clamped at len - 1");
+        app.scroll_need_answer_up();
+        assert_eq!(app.need_answer_scroll, 0);
     }
 
     /// tsk-64z D8: filter matches id OR title, case-insensitively, and

@@ -16,9 +16,8 @@ nothing is configured.
 
 ## Before you start
 
-- This assumes `.fgos/config.json`'s `runner.capacities` schema (legacy
-  `.fgos-runner.json` still read as a fallback for a project that hasn't
-  run `fgos setup` since the move, `tsk-5vf` D2) and `dispatch.mjs`'s
+- This assumes `.fgos/config.json`'s `runner.capacities` schema and
+  `dispatch.mjs`'s
   `resolveExecutorConfig`/`resolveExecutorCommand` already exist
   (`tsk-62v`) — this how-to is about wiring a *consumer* skill through an
   existing capacity, not building the capacity mechanism itself.

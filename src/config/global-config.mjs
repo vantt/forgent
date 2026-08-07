@@ -13,7 +13,7 @@ import os from 'node:os';
 import path from 'node:path';
 
 import { mergeConfigDefaults } from '../setup/config-merge.mjs';
-import { sharedConfigFilePath, legacyRunnerConfigPath } from './shared-config-file.mjs';
+import { sharedConfigFilePath } from './shared-config-file.mjs';
 
 // A function, not a module-load-time const: os.homedir() must be read fresh
 // on every call, not frozen the first time this module is imported --
@@ -58,18 +58,13 @@ export function mergeWithGlobalConfig(projectConfig, globalConfigPath = defaultG
  * when present, per D1), and whether the other level is also present --
  * the awareness data `fgos doctor`'s config-awareness check reports on.
  *
- * `projectPresent` treats EITHER the shared file (`.fgos/config.json`) or
- * the legacy `.fgos-runner.json` as "project config active" (tsk-5vf D2):
- * an install that hasn't re-run `fgos setup` since the move is still
- * genuinely configured, not "none". `projectConfigPath` in the returned
- * shape always names the NEW location -- the one a person should act on --
- * even when what's actually present on disk today is still the legacy
- * file.
+ * `projectPresent` reflects the shared file (`.fgos/config.json`) alone
+ * (tsk-5hv D1: the legacy runner config file was retired, no fallback).
  */
 export function describeConfigAwareness(cwd, { globalConfigPath = defaultGlobalConfigPath(), projectConfigPath } = {}) {
   const resolvedProjectPath = projectConfigPath ?? sharedConfigFilePath(cwd);
   const globalPresent = fs.existsSync(globalConfigPath);
-  const projectPresent = fs.existsSync(resolvedProjectPath) || fs.existsSync(legacyRunnerConfigPath(cwd));
+  const projectPresent = fs.existsSync(resolvedProjectPath);
   const active = projectPresent ? 'project' : globalPresent ? 'global' : 'none';
   return {
     active,

@@ -522,6 +522,76 @@ test('list --all restores the wontfix item alongside the open one', () => {
   assert.ok(work['closed-item']);
 });
 
+// tsk-4fg D1/D2: default `list` drops a child row once its parent is also
+// visible in the same default view, replacing it with a `childProgress`
+// badge on the parent -- reusing the same doneCount rule `rollup` already
+// uses (proven live against this repo's own tsk-19y/tsk-5lr mixed set
+// during fgos-validating). `--all` stays byte-identical/raw (D1).
+test('list by default drops a child whose parent is visible, and badges the parent with childProgress', () => {
+  const cwd = tmpCwd();
+  const dir = path.join(cwd, '.fgos');
+  addOk(cwd, 'root-item', { title: 'Root Item' });
+  addWork(dir, { id: 'child-a', title: 'Child A', kind: 'task', status: 'done', deps: [], risk: 'low', refs: [], verify: 'npm test', parent: 'root-item' });
+  addWork(dir, { id: 'child-b', title: 'Child B', kind: 'task', status: 'doing', deps: [], risk: 'low', refs: [], verify: 'npm test', parent: 'root-item' });
+  addWork(dir, { id: 'child-c', title: 'Child C', kind: 'task', status: 'todo', deps: [], risk: 'low', refs: [], verify: 'npm test', parent: 'root-item' });
+
+  const work = envelopeData(run(cwd, ['list', '--json']).stdout).work;
+  assert.equal(work['child-a'], undefined);
+  assert.equal(work['child-b'], undefined);
+  assert.equal(work['child-c'], undefined);
+  assert.ok(work['root-item']);
+  assert.deepEqual(work['root-item'].childProgress, { done: 1, total: 3 });
+});
+
+// D2: a child whose parent is resolved (done/wontfix) and therefore hidden
+// from the default view has no parent row left to carry a badge -- it falls
+// back to showing as a normal top-level row, exactly as if it had no
+// `parent`. Proven live against tsk-19y (done) and its still-open children
+// tsk-5lr/tsk-3v2/tsk-4n7 during this item's own fgos-validating pass.
+test('list by default falls back to showing a child as a top-level row when its parent is resolved and hidden', () => {
+  const cwd = tmpCwd();
+  const dir = path.join(cwd, '.fgos');
+  addWork(dir, { id: 'root-item', title: 'Root Item', kind: 'task', status: 'done', deps: [], risk: 'low', refs: [], verify: 'npm test' });
+  addWork(dir, { id: 'orphan-child', title: 'Orphan Child', kind: 'task', status: 'doing', deps: [], risk: 'low', refs: [], verify: 'npm test', parent: 'root-item' });
+
+  const work = envelopeData(run(cwd, ['list', '--json']).stdout).work;
+  assert.equal(work['root-item'], undefined, 'resolved parent stays hidden by the pre-existing isResolvedStatus filter');
+  assert.ok(work['orphan-child'], 'child with no visible parent falls back to a normal top-level row');
+  assert.equal(work['orphan-child'].childProgress, undefined);
+});
+
+// A parked `awaiting-human` child must never be hidden by this filter --
+// str61's own parent-anchored `awaitingContext` reporting depends on it
+// still being present in the default view's `work` map.
+test('list by default never hides an awaiting-human child, even when its parent is visible', () => {
+  const cwd = tmpCwd();
+  const dir = path.join(cwd, '.fgos');
+  addOk(cwd, 'root-item', { title: 'Root Item' });
+  addWork(dir, { id: 'parked-child', title: 'Parked Child', kind: 'task', status: 'awaiting-human', deps: [], risk: 'low', refs: [], verify: 'npm test', parent: 'root-item' });
+
+  const work = envelopeData(run(cwd, ['list', '--json']).stdout).work;
+  assert.ok(work['parked-child'], 'awaiting-human child stays visible regardless of parent visibility');
+  assert.ok(work['root-item']);
+  assert.deepEqual(work['root-item'].childProgress, { done: 0, total: 1 });
+});
+
+// D1: `--all` is untouched -- byte-identical shape to before this item, no
+// child dropped, no childProgress badge added. This is the one flagged
+// public-contract risk (herdr-plugin parses `list --all --json` literally).
+test('list --all is untouched by the child-view gate: no rows dropped, no childProgress added', () => {
+  const cwd = tmpCwd();
+  const dir = path.join(cwd, '.fgos');
+  addOk(cwd, 'root-item', { title: 'Root Item' });
+  addWork(dir, { id: 'child-a', title: 'Child A', kind: 'task', status: 'done', deps: [], risk: 'low', refs: [], verify: 'npm test', parent: 'root-item' });
+  addWork(dir, { id: 'child-b', title: 'Child B', kind: 'task', status: 'doing', deps: [], risk: 'low', refs: [], verify: 'npm test', parent: 'root-item' });
+
+  const work = envelopeData(run(cwd, ['list', '--all', '--json']).stdout).work;
+  assert.ok(work['root-item']);
+  assert.ok(work['child-a']);
+  assert.ok(work['child-b']);
+  assert.equal(work['root-item'].childProgress, undefined);
+});
+
 // tsk-48i D1: parkReason (parkReasonForStatus, workflow-stage-graphs.mjs)
 // stamped at write time, mirroring statusCategory's own precedent -- lets
 // a domain-agnostic consumer of `list --json` (e.g. herdr-plugin) tell a
@@ -2147,6 +2217,33 @@ test('ready on a corrupt log is refused as corrupt-log, exit 5', () => {
   assert.equal(result.status, 5);
 });
 
+// --- tsk-4so D1: `ready --step` wiring (docs/history/execution-fanout/
+// CONTEXT-tsk-4so.md) -- the flag existed in `frontier.mjs` since tsk-19j
+// D9 but was silently swallowed by the CLI/store layer until now ---------
+
+test('ready --step Clarify returns only clarify-stage items, not the default Execute frontier', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'atclarify', { stage: 'clarify' });
+  addOk(cwd, 'atexecuting', { stage: 'executing' });
+
+  const clarify = envelopeData(run(cwd, ['ready', '--step', 'Clarify']).stdout);
+  assert.deepEqual(clarify.map((i) => i.id), ['atclarify']);
+
+  const divide = envelopeData(run(cwd, ['ready', '--step', 'Divide']).stdout);
+  assert.deepEqual(divide, []);
+});
+
+test('ready with no --step defaults to Execute, byte-identical to before --step wiring existed', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'atclarify', { stage: 'clarify' });
+  addOk(cwd, 'atexecuting', { stage: 'executing' });
+
+  const bare = envelopeData(run(cwd, ['ready']).stdout);
+  const explicitExecute = envelopeData(run(cwd, ['ready', '--step', 'Execute']).stdout);
+  assert.deepEqual(bare.map((i) => i.id), ['atexecuting']);
+  assert.deepEqual(bare, explicitExecute);
+});
+
 test('GOLDEN request-class: running ready twice never appends to events.jsonl, and the view file is untouched too', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'golden-a');
@@ -2429,6 +2526,105 @@ test('rollup never mutates state: no event is appended and no children of an unr
   assert.equal(data.doneCount, 1);
   assert.equal(data.totalCount, 1);
   assert.ok(!data.children.some((c) => c.id === 'unrelated-item'));
+  assert.deepEqual(eventLines(cwd), before);
+});
+
+// --- rollup reads `targets`, not just `parent` (tsk-1ug) --------------------
+//
+// A goalTier milestone's `targets` are a different relationship from a
+// decomposed root's children: they never go through `resolveRoot`, so each
+// one merges independently onto main (execution-fanout CONTEXT.md D4).
+// They therefore get their own array and their own count pair, leaving
+// `doneCount`/`totalCount` meaning exactly what they always meant.
+
+test('rollup on a milestone counts its targets in targetDoneCount/targetTotalCount and leaves the children counts at 0', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'seed-item');
+  const dir = path.join(cwd, '.fgos');
+  addWork(dir, { id: 'target-a', title: 'Target A', kind: 'task', status: 'done', deps: [], risk: 'low', refs: [], verify: 'npm test' });
+  addWork(dir, { id: 'target-b', title: 'Target B', kind: 'task', status: 'done', deps: [], risk: 'low', refs: [], verify: 'npm test' });
+  addWork(dir, { id: 'target-c', title: 'Target C', kind: 'task', status: 'todo', deps: [], risk: 'low', refs: [], verify: 'npm test' });
+  addWork(dir, { id: 'milestone-x', title: 'Milestone X', kind: 'task', status: 'todo', deps: [], risk: 'low', refs: [], verify: 'npm test', goalTier: 'milestone', targets: ['target-a', 'target-b', 'target-c'] });
+
+  const result = run(cwd, ['rollup', 'milestone-x']);
+  assert.equal(result.status, 0);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.targetDoneCount, 2);
+  assert.equal(data.targetTotalCount, 3);
+  assert.deepEqual(data.targets, [
+    { id: 'target-a', title: 'Target A', status: 'done' },
+    { id: 'target-b', title: 'Target B', status: 'done' },
+    { id: 'target-c', title: 'Target C', status: 'todo' },
+  ]);
+  // The children pair keeps its own meaning -- a milestone has none.
+  assert.equal(data.doneCount, 0);
+  assert.equal(data.totalCount, 0);
+  assert.deepEqual(data.children, []);
+});
+
+test('rollup on an item with no targets reports an empty targets array and 0/0, leaving the children counts untouched', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'root-item');
+  const dir = path.join(cwd, '.fgos');
+  addWork(dir, { id: 'child-a', title: 'Child A', kind: 'task', status: 'done', deps: [], risk: 'low', refs: [], verify: 'npm test', parent: 'root-item' });
+
+  const result = run(cwd, ['rollup', 'root-item']);
+  assert.equal(result.status, 0);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.doneCount, 1);
+  assert.equal(data.totalCount, 1);
+  assert.equal(data.targetDoneCount, 0);
+  assert.equal(data.targetTotalCount, 0);
+  assert.deepEqual(data.targets, []);
+});
+
+test('rollup reports a target id that matches no work item as a null-title/null-status row, counted as not done, exit 0', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'seed-item');
+  const dir = path.join(cwd, '.fgos');
+  addWork(dir, { id: 'target-a', title: 'Target A', kind: 'task', status: 'done', deps: [], risk: 'low', refs: [], verify: 'npm test' });
+  addWork(dir, { id: 'milestone-x', title: 'Milestone X', kind: 'task', status: 'todo', deps: [], risk: 'low', refs: [], verify: 'npm test', goalTier: 'milestone', targets: ['target-a', 'no-such-target'] });
+
+  const result = run(cwd, ['rollup', 'milestone-x']);
+  assert.equal(result.status, 0);
+  const data = envelopeData(result.stdout);
+  assert.deepEqual(data.targets, [
+    { id: 'target-a', title: 'Target A', status: 'done' },
+    { id: 'no-such-target', title: null, status: null },
+  ]);
+  assert.equal(data.targetDoneCount, 1);
+  assert.equal(data.targetTotalCount, 2);
+});
+
+test('rollup on an item carrying both children and targets keeps the two count pairs independent', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'seed-item');
+  const dir = path.join(cwd, '.fgos');
+  addWork(dir, { id: 'target-a', title: 'Target A', kind: 'task', status: 'done', deps: [], risk: 'low', refs: [], verify: 'npm test' });
+  addWork(dir, { id: 'both-item', title: 'Both', kind: 'task', status: 'todo', deps: [], risk: 'low', refs: [], verify: 'npm test', goalTier: 'milestone', targets: ['target-a'] });
+  addWork(dir, { id: 'child-a', title: 'Child A', kind: 'task', status: 'todo', deps: [], risk: 'low', refs: [], verify: 'npm test', parent: 'both-item' });
+
+  const result = run(cwd, ['rollup', 'both-item']);
+  assert.equal(result.status, 0);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.doneCount, 0);
+  assert.equal(data.totalCount, 1);
+  assert.equal(data.targetDoneCount, 1);
+  assert.equal(data.targetTotalCount, 1);
+  assert.deepEqual(data.children, [{ id: 'child-a', title: 'Child A', status: 'todo' }]);
+  assert.deepEqual(data.targets, [{ id: 'target-a', title: 'Target A', status: 'done' }]);
+});
+
+test('rollup reading targets never mutates state: no event is appended', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'seed-item');
+  const dir = path.join(cwd, '.fgos');
+  addWork(dir, { id: 'target-a', title: 'Target A', kind: 'task', status: 'todo', deps: [], risk: 'low', refs: [], verify: 'npm test' });
+  addWork(dir, { id: 'milestone-x', title: 'Milestone X', kind: 'task', status: 'todo', deps: [], risk: 'low', refs: [], verify: 'npm test', goalTier: 'milestone', targets: ['target-a'] });
+
+  const before = eventLines(cwd);
+  const result = run(cwd, ['rollup', 'milestone-x']);
+  assert.equal(result.status, 0);
   assert.deepEqual(eventLines(cwd), before);
 });
 
@@ -3057,7 +3253,8 @@ function writeRunnerConfig(cwd, verdict) {
     models: { light: 'haiku', standard: 'sonnet', heavy: 'opus' },
     timeoutMs: 5000,
   };
-  fs.writeFileSync(path.join(cwd, '.fgos-runner.json'), JSON.stringify(cfg));
+  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ runner: cfg }));
 }
 
 test("submit tags the new item with stage:'clarify', visible via list", () => {
@@ -3261,12 +3458,15 @@ test('submit --docs-ref persists docsRef, exit 0 -- an item created through the 
 // is the next stop before executing. This assertion changed its expected
 // destination from `executing` to `decompose` for exactly that reason (per
 // D2, an intentional contract change, not a test nerf).
-test('discover on a clear verdict moves the submitted item to stage decompose with the model-proposed verify', () => {
+test('discover on a clear verdict moves the submitted item to stage decompose with the caller-supplied verify', () => {
   const cwd = tmpCwd();
-  writeRunnerConfig(cwd, { clear: true, verify: 'npm test -- proven' });
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
 
-  const result = run(cwd, ['discover', id]);
+  // tsk-1x3 D1/D9/D16: the judge subprocess this test used to configure via
+  // writeRunnerConfig is retired -- a session-role caller with nothing to
+  // go on now refuses instead of guessing, so an explicit --verdict is the
+  // only way left to reach a clear outcome.
+  const result = run(cwd, ['discover', id, '--verdict', 'clear', '--verify', 'npm test -- proven']);
   assert.equal(result.status, 0);
   const envelope = JSON.parse(result.stdout);
   assert.equal(envelope.contract, 'fgos.v1');
@@ -3284,25 +3484,22 @@ test('discover on a clear verdict moves the submitted item to stage decompose wi
 // removed the old dynamic-dispatch fallback, not just renamed it.
 test("decompose on an item sitting at stage decompose dispatches to resolveDecompose and pass-throughs it on to executing (sync/async parity)", () => {
   const cwd = tmpCwd();
-  writeRunnerConfig(cwd, { clear: true, verify: 'npm test -- proven' });
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
 
-  run(cwd, ['discover', id]);
+  run(cwd, ['discover', id, '--verdict', 'clear', '--verify', 'npm test -- proven']);
   assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'decompose');
 
-  // Same scripted executor's `{clear:true, verify:...}` reply is not a
-  // valid chia-việc verdict shape (no `verdict` key) — judgeDecompose's
-  // fail-safe folds it to `invalid`, and resolveDecompose leaves the item
-  // exactly where it was for the next sweep/call to retry (mẫu C9).
-  const invalidAttempt = run(cwd, ['decompose', id]);
+  // A caller-supplied decompose verdict with a child missing `verify` is
+  // not a valid shape — resolveCallerDecomposeVerdict folds it to
+  // `invalid`, and resolveDecompose leaves the item exactly where it was
+  // for the next call to retry (mẫu C9, unchanged since tsk-1x3).
+  const invalidAttempt = run(cwd, ['decompose', id, '--verdict', 'decompose', '--reason', 'x', '--children', '[{"title":"x"}]']);
   assert.equal(invalidAttempt.status, 0);
   assert.equal(JSON.parse(invalidAttempt.stdout).data.outcome, 'invalid');
   assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'decompose', 'invalid verdict leaves the item untouched, not silently advanced');
 
-  // Rewrite the executor config with a real pass-through chia-việc verdict
-  // and call `decompose` again — now it carries the item the rest of the way.
-  writeRunnerConfig(cwd, { verdict: 'pass-through' });
-  const passThrough = run(cwd, ['decompose', id]);
+  // A real pass-through verdict carries the item the rest of the way.
+  const passThrough = run(cwd, ['decompose', id, '--verdict', 'pass-through', '--reason', 'single cohesive change']);
   assert.equal(passThrough.status, 0);
   assert.equal(JSON.parse(passThrough.stdout).data.outcome, 'pass-through');
   assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'executing');
@@ -3310,10 +3507,9 @@ test("decompose on an item sitting at stage decompose dispatches to resolveDecom
 
 test('discover on a decompose-stage item errors instead of silently dispatching to resolveDecompose (tsk-2b0 D1: hard split, no fallback)', () => {
   const cwd = tmpCwd();
-  writeRunnerConfig(cwd, { clear: true, verify: 'npm test -- proven' });
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
 
-  run(cwd, ['discover', id]);
+  run(cwd, ['discover', id, '--verdict', 'clear', '--verify', 'npm test -- proven']);
   assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'decompose');
 
   const result = run(cwd, ['discover', id]);
@@ -3343,10 +3539,9 @@ test('decompose with no id is rejected as validation, exit 4', () => {
 
 test('discover on an unclear verdict parks the submitted item in awaiting-human with the question, still stage clarify', () => {
   const cwd = tmpCwd();
-  writeRunnerConfig(cwd, { clear: false, question: 'Which service?' });
   const id = JSON.parse(run(cwd, ['submit', 'Do the ambiguous work']).stdout).data.id;
 
-  const result = run(cwd, ['discover', id]);
+  const result = run(cwd, ['discover', id, '--verdict', 'unclear', '--question', 'Which service?']);
   assert.equal(result.status, 0);
   assert.equal(JSON.parse(result.stdout).data.outcome, 'unclear');
 
@@ -3362,14 +3557,16 @@ test('discover with no id is rejected as validation, exit 4', () => {
   assert.equal(result.status, 4);
 });
 
-// str76-runner-bootstrap-e3: a fresh cwd with no .fgos-runner.json used to
+// str76-runner-bootstrap-e3: a fresh cwd with no runner config used to
 // crash `discover` with RunnerConfigError/ENOENT (the bug this feature
-// fixes) — it now bootstraps the D1 default config instead. PATH is
-// neutralized to exclude the real `claude` binary (baked-in default
-// executor, D1) so judge-executor's spawnSync fails fast (spawn-fail) on the
-// nested judge call, never invoking a live agent; judgeDiscovery's fail-safe
-// (discovery.mjs) then parks the item as unclear, not a bare "success".
-test('discover on a fresh cwd with no runner config bootstraps the default config into the shared file instead of crashing on ENOENT', () => {
+// fixes) — it now bootstraps the D1 default config instead, BEFORE
+// resolveDiscovery is ever called (bin/fgos.mjs's own `discover` case reads
+// `cfg` first). tsk-1x3 D1/D9/D16: the config bootstrap still happens
+// unconditionally, but resolveDiscovery itself no longer spawns a judge
+// against it for a bare (no --verdict) session-role call — it refuses
+// loudly instead. PATH is still neutralized here to prove the bootstrap
+// path is exercised the same way (no live agent invoked either way).
+test('discover on a fresh cwd with no runner config bootstraps the default config into the shared file instead of crashing on ENOENT, then still refuses without --verdict (D16)', () => {
   const cwd = tmpCwd();
   const configPath = path.join(cwd, '.fgos', 'config.json');
   assert.equal(fs.existsSync(configPath), false);
@@ -3377,13 +3574,13 @@ test('discover on a fresh cwd with no runner config bootstraps the default confi
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing with no config yet']).stdout).data.id;
 
   const result = run(cwd, ['discover', id], { PATH: '/usr/bin:/bin' });
-  assert.equal(result.status, 0, `expected no RunnerConfigError/ENOENT crash, got stderr: ${result.stderr}`);
-  assert.equal(JSON.parse(result.stdout).data.outcome, 'unclear');
+  assert.equal(result.status, 4, `expected the D16 refusal, not a RunnerConfigError/ENOENT crash: ${result.stderr}`);
+  assert.match(result.stderr, /no committed CONTEXT.md and no --verdict was given/);
 
-  assert.equal(fs.existsSync(configPath), true, 'discover should have auto-written the default runner section into .fgos/config.json');
+  assert.equal(fs.existsSync(configPath), true, 'discover should have auto-written the default runner section into .fgos/config.json BEFORE refusing');
 
   const view = envelopeData(run(cwd, ['list']).stdout);
-  assert.equal(view.work[id].status, 'awaiting-human');
+  assert.equal(view.work[id].status, 'todo', 'the refused call must never mutate the item');
   assert.equal(view.work[id].stage, 'clarify');
 });
 
@@ -3450,14 +3647,12 @@ test('discover --verdict with an unrecognized value is rejected as validation, e
   assert.match(result.stderr, /"clear" or "unclear"/);
 });
 
-test('decompose --verdict pass-through moves the item to executing, bypassing the configured (opposite) judge verdict', () => {
+test('decompose --verdict pass-through moves the item to executing', () => {
   const cwd = tmpCwd();
-  writeRunnerConfig(cwd, { clear: true, verify: 'npm test -- proven' });
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
-  run(cwd, ['discover', id]);
+  run(cwd, ['discover', id, '--verdict', 'clear', '--verify', 'npm test -- proven']);
   assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'decompose');
 
-  writeRunnerConfig(cwd, { verdict: 'decompose', reason: 'SHOULD NEVER SURFACE', children: [{ title: 'x', verify: 'npm test' }] });
   const result = run(cwd, ['decompose', id, '--verdict', 'pass-through', '--reason', 'single-piece, no split needed']);
   assert.equal(result.status, 0);
   assert.equal(JSON.parse(result.stdout).data.outcome, 'pass-through');
@@ -3467,13 +3662,11 @@ test('decompose --verdict pass-through moves the item to executing, bypassing th
   assert.equal(Object.values(view.work).some((item) => item.parent === id), false);
 });
 
-test('decompose --verdict need-human --reason parks in awaiting-human with that exact reason, bypassing the configured (opposite) judge verdict', () => {
+test('decompose --verdict need-human --reason parks in awaiting-human with that exact reason', () => {
   const cwd = tmpCwd();
-  writeRunnerConfig(cwd, { clear: true, verify: 'npm test -- proven' });
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
-  run(cwd, ['discover', id]);
+  run(cwd, ['discover', id, '--verdict', 'clear', '--verify', 'npm test -- proven']);
 
-  writeRunnerConfig(cwd, { verdict: 'pass-through' });
   const result = run(cwd, ['decompose', id, '--verdict', 'need-human', '--reason', 'Which auth provider?']);
   assert.equal(result.status, 0);
   assert.equal(JSON.parse(result.stdout).data.outcome, 'need-human');
@@ -3483,13 +3676,11 @@ test('decompose --verdict need-human --reason parks in awaiting-human with that 
   assert.match(view.gates[id].ask, /Which auth provider\?/);
 });
 
-test('decompose --verdict decompose --children writes real children, bypassing the configured (opposite) judge verdict', () => {
+test('decompose --verdict decompose --children writes real children', () => {
   const cwd = tmpCwd();
-  writeRunnerConfig(cwd, { clear: true, verify: 'npm test -- proven' });
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
-  run(cwd, ['discover', id]);
+  run(cwd, ['discover', id, '--verdict', 'clear', '--verify', 'npm test -- proven']);
 
-  writeRunnerConfig(cwd, { verdict: 'pass-through' });
   const children = JSON.stringify([
     { title: 'Build parser', verify: 'npm test -- parser', action: 'tsk-3xd fixture: implement the parser.' },
     { title: 'Build renderer', verify: 'npm test -- renderer', action: 'tsk-3xd fixture: implement the renderer.' },
@@ -3498,10 +3689,20 @@ test('decompose --verdict decompose --children writes real children, bypassing t
   assert.equal(result.status, 0);
   assert.equal(JSON.parse(result.stdout).data.outcome, 'decompose');
 
-  const view = envelopeData(run(cwd, ['list']).stdout);
-  assert.equal(view.work[id].stage, 'executing');
-  assert.equal(view.work[`${id}-1`].title, 'Build parser');
-  assert.equal(view.work[`${id}-2`].title, 'Build renderer');
+  // tsk-4fg D1/D2: default `list` now hides a child whose parent is still
+  // visible, replacing it with a `childProgress` badge on the parent --
+  // `--all` is the untouched, byte-identical-shape view where split
+  // children stay visible, so that is what proves the real children were
+  // written with the right ids/titles.
+  const defaultView = envelopeData(run(cwd, ['list']).stdout);
+  assert.equal(defaultView.work[id].stage, 'executing');
+  assert.equal(defaultView.work[`${id}-1`], undefined);
+  assert.equal(defaultView.work[`${id}-2`], undefined);
+  assert.deepEqual(defaultView.work[id].childProgress, { done: 0, total: 2 });
+
+  const allView = envelopeData(run(cwd, ['list', '--all']).stdout);
+  assert.equal(allView.work[`${id}-1`].title, 'Build parser');
+  assert.equal(allView.work[`${id}-2`].title, 'Build renderer');
 });
 
 test('decompose --verdict decompose with malformed --children JSON is rejected as validation, exit 4', () => {
@@ -3593,10 +3794,9 @@ test('move to done via the real CLI stamps role "human" on the event payload and
 
 test('discover (sync verb) on a clear verdict stamps role "session" on the work.stage event and folds into a clarify-pass settlement', () => {
   const cwd = tmpCwd();
-  writeRunnerConfig(cwd, { clear: true, verify: 'npm test -- proven' });
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
 
-  const result = run(cwd, ['discover', id]);
+  const result = run(cwd, ['discover', id, '--verdict', 'clear', '--verify', 'npm test -- proven']);
   assert.equal(result.status, 0);
 
   const lines = eventLines(cwd);
@@ -4790,14 +4990,14 @@ test('return --timeout with a non-numeric or non-positive value is rejected as v
 // tsk-3vo D2/D3/D5: omitting --timeout on return/approve/catchup used to
 // mean an unbounded verify, silently diverging from the runner loop's own
 // runGoalCheck call (which always passes config.timeoutMs). It now falls
-// back to .fgos-runner.json's own timeoutMs instead -- --no-timeout is the
+// back to the runner config's own timeoutMs instead -- --no-timeout is the
 // only way left to actually opt into unbounded. `hang.mjs` (same style as
 // goal-check.test.mjs's own timeout test) sleeps 1.5s, well past the 200ms
 // config timeout below, so a fallback that fires kills it and a real
 // --no-timeout override does not.
 function writeShortRunnerConfig(cwd, timeoutMs) {
   // Every DEFAULT_RUNNER_CONFIG key present (dispatch.mjs) so
-  // ensureRunnerConfig's mergeConfigDefaults finds nothing missing to
+  // ensureRunnerConfigForDir's mergeConfigDefaults finds nothing missing to
   // rewrite -- an in-call rewrite would dirty the working tree and trip
   // return's own clean-tree check, unrelated to what this test proves.
   const cfg = {
@@ -4806,7 +5006,8 @@ function writeShortRunnerConfig(cwd, timeoutMs) {
     timeoutMs,
     parallel: { maxRoots: 4, maxLeavesPerRoot: 4 },
   };
-  fs.writeFileSync(path.join(cwd, '.fgos-runner.json'), JSON.stringify(cfg));
+  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ runner: cfg }));
 }
 
 function writeHangScript(cwd, ms) {
@@ -4815,7 +5016,7 @@ function writeHangScript(cwd, ms) {
   return scriptPath;
 }
 
-test('return omitting --timeout falls back to .fgos-runner.json\'s timeoutMs, blocking a verify that outlives it', () => {
+test('return omitting --timeout falls back to the runner config\'s timeoutMs, blocking a verify that outlives it', () => {
   const cwd = initGitCwd();
   run(cwd, ['init']);
   writeShortRunnerConfig(cwd, 200);
@@ -8078,7 +8279,12 @@ test('conflicts verb: two ready items sharing a footprint path are flagged with 
   const result = run(cwd, ['conflicts']);
   assert.equal(result.status, 0);
   const data = envelopeData(result.stdout);
-  assert.deepEqual(data, [{ a: 'a', b: 'b', shared: ['src/y.mjs'], suggestions: ['sequence', 'hoist', 're-slice'] }]);
+  // tsk-4zj D7: conflicts' output wraps into {conflicts, stageByItem} --
+  // a/b/c were all added with --stage executing above.
+  assert.deepEqual(data, {
+    conflicts: [{ a: 'a', b: 'b', shared: ['src/y.mjs'], suggestions: ['sequence', 'hoist', 're-slice'] }],
+    stageByItem: { a: 'executing', b: 'executing' },
+  });
   assert.equal(eventLines(cwd).length, before, 'conflicts must not append any event');
 });
 
@@ -8086,7 +8292,39 @@ test('conflicts verb on a store with no overlaps: empty list, exit 0', () => {
   const cwd = tmpCwd();
   assert.equal(run(cwd, ['init']).status, 0);
   assert.equal(addOk(cwd, 'a').status, 0); // no footprint
-  assert.deepEqual(envelopeData(run(cwd, ['conflicts']).stdout), []);
+  assert.deepEqual(envelopeData(run(cwd, ['conflicts']).stdout), { conflicts: [], stageByItem: {} });
+});
+
+// --- tsk-4so D1: conflicts must catch overlap ACROSS steps, not just within
+// Execute (docs/history/execution-fanout/CONTEXT-tsk-4so.md) -------------
+
+test('conflicts verb: items at DIFFERENT stages sharing a footprint are flagged (the real gap: a single-step frontier never saw this)', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0);
+  assert.equal(run(cwd, ['add', 'atdecompose', '--title', 'A', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--footprint', 'bin/fgos.mjs', '--stage', 'decompose', '--description', 'tsk-4so fixture description.']).status, 0);
+  assert.equal(run(cwd, ['add', 'atexecuting', '--title', 'B', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--footprint', 'bin/fgos.mjs', '--stage', 'executing', '--description', 'tsk-4so fixture description.']).status, 0);
+
+  const data = envelopeData(run(cwd, ['conflicts']).stdout);
+  // tsk-4zj D7: this is exactly the scenario D7 corrects D6 for -- the two
+  // conflicting items are at DIFFERENT stages, so stageByItem is genuinely
+  // informative here, not a constant.
+  assert.deepEqual(data, {
+    conflicts: [{ a: 'atdecompose', b: 'atexecuting', shared: ['bin/fgos.mjs'], suggestions: ['sequence', 'hoist', 're-slice'] }],
+    stageByItem: { atdecompose: 'decompose', atexecuting: 'executing' },
+  });
+});
+
+test('conflicts verb: a clarify-stage item and an executing-stage item sharing a footprint are also flagged', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0);
+  assert.equal(run(cwd, ['add', 'atclarify', '--title', 'A', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--footprint', 'src/shared.mjs', '--stage', 'clarify', '--description', 'tsk-4so fixture description.']).status, 0);
+  assert.equal(run(cwd, ['add', 'atexecuting', '--title', 'B', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--footprint', 'src/shared.mjs', '--stage', 'executing', '--description', 'tsk-4so fixture description.']).status, 0);
+
+  const data = envelopeData(run(cwd, ['conflicts']).stdout);
+  assert.deepEqual(data, {
+    conflicts: [{ a: 'atclarify', b: 'atexecuting', shared: ['src/shared.mjs'], suggestions: ['sequence', 'hoist', 're-slice'] }],
+    stageByItem: { atclarify: 'clarify', atexecuting: 'executing' },
+  });
 });
 
 // --- tsk-4j9-3: `fgos merge list` (merge-readiness ranking) ---------------

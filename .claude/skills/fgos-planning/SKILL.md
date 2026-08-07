@@ -218,6 +218,15 @@ stage values — the same way `fgos-routing` describes it.
    design or re-plan any of that — it only needs to name, for each piece it
    describes, the one command that proves it done.
 
+   If a piece touches a skill-prose path (`.claude/skills/**/SKILL.md`,
+   `.agents/skills/**/SKILL.md`, `plugins/fgOS/skills/**/SKILL.md`), read
+   `docs/how-to/write-verify-for-a-skill-prose-change.md` before naming
+   its verify command — it documents the correct `npm test && POSITIVE &&
+   NEGATIVE` shape and the standing rebuttal for when the second-pass
+   judge (`judgeVerifySemanticCorrectness`) demands proof of prose
+   comprehension, a demand the doc says verify must never be asked to
+   satisfy.
+
 6. **Mid-planning `CONTEXT.md` gap.** If, at any step above, `CONTEXT.md`'s
    locked decisions turn out to be silent on something this plan actually
    needs, apply the same material/grounded/answerable filter

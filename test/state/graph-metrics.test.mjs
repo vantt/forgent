@@ -738,3 +738,58 @@ test('computeSchedule: a non-ready item (unmet dep) never appears in any wave', 
   };
   assert.deepEqual(computeSchedule(view), { waves: [['a']] });
 });
+
+// --- tsk-ik3: computeSchedule scoped to a given candidate set ---------------
+
+test('computeSchedule: omitting candidateIds preserves default behavior (whole frontier)', () => {
+  const view = {
+    work: {
+      a: item('a', { footprint: ['src/x.mjs'] }),
+      b: item('b', { footprint: ['src/y.mjs'] }),
+    },
+  };
+  assert.deepEqual(computeSchedule(view), computeSchedule(view, undefined));
+});
+
+test('computeSchedule: candidateIds scopes packing so a foreign item outside the set cannot steal a wave slot from an item inside it', () => {
+  const view = {
+    work: {
+      x: item('x', { footprint: ['src/shared.mjs'] }), // outside the candidate set
+      y: item('y', { footprint: ['src/shared.mjs'] }), // inside the candidate set
+    },
+  };
+  // Unscoped: x lands in wave 0 first (frontier order), pushing y to wave 1.
+  assert.deepEqual(computeSchedule(view), { waves: [['x'], ['y']] });
+  // Scoped to just y: x is never a candidate at all, so it cannot occupy
+  // wave 0 and defer y -- y packs into wave 0 on its own.
+  assert.deepEqual(computeSchedule(view, ['y']), { waves: [['y']] });
+});
+
+test('computeSchedule: an empty candidateIds array yields no waves', () => {
+  const view = {
+    work: {
+      a: item('a'),
+      b: item('b'),
+    },
+  };
+  assert.deepEqual(computeSchedule(view, []), { waves: [] });
+});
+
+test('computeSchedule: a candidateId naming an item that is not itself ready (unmet dep) is simply excluded, never phantomed in', () => {
+  const view = {
+    work: {
+      a: item('a'),
+      b: item('b', { deps: ['a'] }), // blocked on a -> not in frontier
+    },
+  };
+  assert.deepEqual(computeSchedule(view, ['a', 'b']), { waves: [['a']] });
+});
+
+test('computeSchedule: candidateIds naming an unknown id is simply excluded, never phantomed in', () => {
+  const view = {
+    work: {
+      a: item('a'),
+    },
+  };
+  assert.deepEqual(computeSchedule(view, ['a', 'does-not-exist']), { waves: [['a']] });
+});

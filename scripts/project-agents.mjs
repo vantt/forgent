@@ -17,10 +17,10 @@
 // grant for the projected agent-type's Task-tool dispatch -- it is written
 // straight into the generated .md's `tools:` frontmatter below, unfiltered.
 // This is a SEPARATE axis from tsk-62v's `capacities.<id>.allowedTools`
-// (.fgos-runner.json), which gates a different dispatch path (domain-1
-// headless CLI spawn), keyed by capacityId rather than agent-type name.
-// Neither field is descriptive-only; neither is dropped; they never
-// collide because they key differently.
+// (the shared config file's `runner` section), which gates a different
+// dispatch path (domain-1 headless CLI spawn), keyed by capacityId rather
+// than agent-type name. Neither field is descriptive-only; neither is
+// dropped; they never collide because they key differently.
 //
 // Copy/convert only -- not a converter engine (CONTEXT.md Feature boundary).
 // One platform target exists today (Claude Code); a second platform gets
@@ -29,6 +29,9 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { parse as parseYaml } from 'yaml';
+
+import { resolveMainCheckoutRoot } from '../src/runner/paths.mjs';
+import { readSharedConfig } from '../src/config/shared-config-file.mjs';
 
 const REPO_ROOT = path.resolve(import.meta.dirname, '..');
 const SOURCE_DIR = path.join(REPO_ROOT, 'agents');
@@ -42,22 +45,29 @@ const FORBIDDEN_PLATFORM_NAMES = ['claude', 'codex', 'anthropic'];
 
 const REQUIRED_FIELDS = ['name', 'version', 'description', 'role', 'persona', 'decision_boundary', 'model_tier', 'tool-scope'];
 
-// Matches .fgos-runner.json's own `models` block + dispatch.mjs's
+// Matches the shared config file's own `runner.models` block + dispatch.mjs's
 // modelForTier default fallback -- reused as-is, not a second mapping.
 export const DEFAULT_MODELS = { light: 'haiku', standard: 'sonnet', heavy: 'opus' };
 
 export class AgentDefinitionError extends Error {}
 
-function readRunnerModels(repoRoot) {
-  const runnerConfigPath = path.join(repoRoot, '.fgos-runner.json');
-  try {
-    const raw = fs.readFileSync(runnerConfigPath, 'utf8');
-    const cfg = JSON.parse(raw);
-    if (cfg && typeof cfg.models === 'object' && cfg.models !== null) {
-      return { ...DEFAULT_MODELS, ...cfg.models };
-    }
-  } catch {
-    // absent or unreadable .fgos-runner.json -- fall back to defaults
+// Reads the shared config file at the MAIN CHECKOUT, not at REPO_ROOT
+// (this script's own on-disk location -- correct for agents/.claude/agents,
+// wrong here): `.fgos/` is unconditionally wiped from every freshly-created
+// worktree (ADR0020), so a worktree-local REPO_ROOT would silently find
+// nothing and fall back to defaults on every run inside one, defeating the
+// point of reading real config at all (tsk-5hv, found by fgos-validating).
+// `resolveMainCheckoutRoot` (not `resolveRepoRoot`, both `src/runner/
+// paths.mjs`: `resolveRepoRoot` shells out to `--show-toplevel` and
+// returns a worktree's own root unchanged, not its main checkout) is the
+// one helper that actually resolves via `--git-common-dir` the way this
+// needs.
+function readRunnerModels() {
+  const mainCheckoutRoot = resolveMainCheckoutRoot(REPO_ROOT) ?? REPO_ROOT;
+  const cfg = readSharedConfig(mainCheckoutRoot);
+  const models = cfg.runner?.models;
+  if (models && typeof models === 'object') {
+    return { ...DEFAULT_MODELS, ...models };
   }
   return DEFAULT_MODELS;
 }
@@ -128,7 +138,7 @@ function main() {
     console.log(`no agents/ directory -- nothing to project.`);
     return;
   }
-  const models = readRunnerModels(REPO_ROOT);
+  const models = readRunnerModels();
   const sourceFiles = fs.readdirSync(SOURCE_DIR).filter((f) => f.endsWith('.yaml'));
   fs.mkdirSync(TARGET_DIR, { recursive: true });
 

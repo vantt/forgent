@@ -307,13 +307,16 @@ if (prompt.includes('# Context-discovery')) {
 }
 `,
   );
+  fs.mkdirSync(path.join(fx, '.fgos'), { recursive: true });
   fs.writeFileSync(
-    path.join(fx, '.fgos-runner.json'),
+    path.join(fx, '.fgos', 'config.json'),
     JSON.stringify({
-      executor: { command: process.execPath, args: [executorPath, '{prompt}', '--model', '{model}'] },
-      models: { light: 'haiku', standard: 'sonnet', heavy: 'opus' },
-      timeoutMs: 15000,
-      parallel: { maxRoots: 4, maxLeavesPerRoot: 4 },
+      runner: {
+        executor: { command: process.execPath, args: [executorPath, '{prompt}', '--model', '{model}'] },
+        models: { light: 'haiku', standard: 'sonnet', heavy: 'opus' },
+        timeoutMs: 15000,
+        parallel: { maxRoots: 4, maxLeavesPerRoot: 4 },
+      },
     }),
   );
 
