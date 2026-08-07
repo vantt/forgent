@@ -92,7 +92,52 @@ Gate step. The broader four-skill audit and the fuller `/ck:plan`+`/ck:cook`
 comparison the item originally asked for stayed explicitly deferred — not
 forgotten, just judged non-material to landing these two evidenced fixes.
 
+## Follow-up (`tsk-da1`): four real gaps left by the D1/D2 move
+
+An independent code review after `tsk-3uz`/`tsk-5ay` merged found the
+mode-gate move above had left the skill docs themselves in a state that
+didn't fully hold up:
+
+1. **The Decide-the-split example command failed if actually run.** The
+   worked example in that step used the item's title as `fgos add`'s
+   positional id argument and was missing 4 other required fields — it
+   read as a real example but would fail on a real terminal. Fixed to a
+   command that actually runs (`fgos add --title ...`).
+2. **Stale step-number references survived the renumbering.**
+   Moving the mode gate out of `fgos-planning/SKILL.md` renumbered its
+   remaining steps, but `fgos-validating/SKILL.md` and
+   `fgos-coding-shaping/SKILL.md` still pointed at the *old* step numbers
+   ("step 3"/"step 5") for cross-references into `fgos-planning` — a
+   classic renumbering-leaves-stale-external-references gap, since the
+   grep-verified fixes in the original D1/D2 work only checked
+   `fgos-planning`'s own file, not every other skill referencing it by
+   number.
+3. **No fallback lane when entered directly, bypassing `fgos-routing`.**
+   D1's whole premise was "decide the lane in `fgos-routing`, before the
+   heavy skill loads" — but `fgos-planning` can also be entered directly
+   from `fgos-exploring`/`fgos-validating` without ever passing through
+   `fgos-routing`'s own mode gate first, and nothing computed a lane in
+   that case. Fixed by adding a fallback that computes the lane locally
+   when no hand-off lane was received, rather than assuming
+   `fgos-routing` is always the entry point.
+4. **The "saves load" framing overstated what actually landed.** D1's own
+   stated benefit was that `fgos-routing` could skip loading
+   `fgos-planning` entirely for lanes that don't need it — but
+   `fgos-routing` still unconditionally routes every decompose-shaping
+   item into `fgos-planning` regardless of lane, so that savings claim
+   was aspirational, not yet real. The docs were reworded to state this
+   plainly rather than imply an optimization that hadn't actually
+   shipped.
+
+Applied to both dual-root skill copies (`.claude/skills/` and
+`.agents/skills/`), per this repo's dual-root convention. Verified with
+real greps against the actual file contents, not just review — including
+a negative check that the fallback-lane addition didn't accidentally
+reintroduce the old inline mode-gate text D1 had deliberately removed.
+
 ---
 
 **Source:** `docs/history/fgos-planning-mode-gate-and-gate-traceability/CONTEXT.md`
-(tsk-5ay, D1-D2); work-item capture via `fgos check tsk-5ay`.
+(tsk-5ay, D1-D2); work-item capture via `fgos check tsk-5ay`. Follow-up
+fixes: `tsk-da1` (`fgos check tsk-da1`), filed as an independent code
+review after `tsk-3uz`/`tsk-5ay` merged.
