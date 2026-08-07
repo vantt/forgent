@@ -2611,7 +2611,7 @@ test('rollup on an item carrying both children and targets keeps the two count p
   assert.equal(data.totalCount, 1);
   assert.equal(data.targetDoneCount, 1);
   assert.equal(data.targetTotalCount, 1);
-  assert.deepEqual(data.children, [{ id: 'child-a', title: 'Child A', status: 'todo' }]);
+  assert.deepEqual(data.children, [{ id: 'child-a', title: 'Child A', status: 'todo', stageEffective: 'executing' }]);
   assert.deepEqual(data.targets, [{ id: 'target-a', title: 'Target A', status: 'done' }]);
 });
 
