@@ -278,3 +278,18 @@ either fix.
 Full round-by-round evidence:
 `docs/history/tsk-25g-judge-verify-stabilization-audit/` and
 `docs/history/tsk-5mc-verify-vacuous-pass-multiglob/CONTEXT.md`.
+
+## Test-coverage gap closed (`tsk-5ld`): `resolveDiscovery`'s `--force` had shipped code with no test
+
+`resolveDecompose`'s own `--force` override (the per-child parallel of
+`resolveDiscovery`'s override described above) already had test coverage
+for both its success and refusal paths (`tsk-25g`, `decompose.test.mjs`).
+`resolveDiscovery`'s own equivalent `--force` logic (`discovery.mjs:
+669-691`) had shipped with the same two behaviors — overriding a genuine
+non-mechanical disagreement and logging the override decision; refusing
+outright when the item is already `awaiting-human` — but neither path had
+a test of its own, only `priorRejection` threading and the mechanical-
+disagreement exemption were covered
+(`test/intake/judge-verify-second-pass-stability.test.mjs`). `tsk-5ld`
+closed that gap by mirroring the exact same two test cases already
+proven for `resolveDecompose`, applied to `resolveDiscovery` instead.
