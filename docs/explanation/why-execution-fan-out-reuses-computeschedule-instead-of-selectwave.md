@@ -193,6 +193,42 @@ children from the flat list *must* be paired with that parent-row
 indicator, or the ability to see cluster progress at a glance is lost
 entirely, not just moved.
 
+## Second companion fix (`tsk-59x`): leaf `cleanup` TTL should be short/zero, not the same 7 days as a root
+
+Today's `cleanup`-stage TTL (`DEFAULT_CLEANUP_TTL_DAYS = 7`) is global
+config for every item, per an explicit prior decision (D7 of
+`docs/history/work-item-status-delivered-retrospective-cleanup/`) — that
+decision's own comment names the reasoning plainly: "the cleanup-stage
+TTL is global config, not per-item/per-domain (YAGNI — no demonstrated
+need yet)."
+
+Fan-out demonstrates the need that decision was waiting for. Measured
+against real `.fgos` data (2026-08-07): children already made up 25% of
+the open list before fan-out even shipped; 0 of 99 items in the cleanup
+pool had cleared their TTL, meaning nothing could be pruned yet and 0
+worktrees had been reclaimed — roughly 2GB held **structurally** for the
+full 7 days regardless of whether any of it was still needed. The real
+cost of one leaf sitting in that queue: 5-6 status transitions, a median
+of 2 human-role touches, a full 7-day cleanup residency, and a ~20MB
+worktree — multiplied by N, with N about to grow sharply once fan-out is
+actually dispatching multiple children concurrently.
+
+**The topology argument for why a leaf's TTL can safely be much
+shorter**: a leaf's own branch becomes redundant the moment it merges
+into `fgw/<root>` — its content now lives on a branch that will
+necessarily outlive it (the root, not yet merged to `main`). Deleting the
+leaf's branch early loses nothing real; deleting the *root's* branch
+early is what would actually lose something. This is the same
+underlying reasoning `docs/explanation/why-checkmergestillresolves-can-
+false-positive-after-a-root-branch-prune.md` documents from the opposite
+angle — a root branch pruned too early is the dangerous direction,
+never a leaf.
+
+This item's own description carried an explicit prerequisite before
+touching the code: **read the original TTL decision record first** — the
+real evidence justifying a shorter leaf TTL now doesn't mean skipping
+understanding why the global 7-day default existed in the first place.
+
 Full decision record (D1-D10), the ten-round shaping discussion, and the
 existing infrastructure inventory this design deliberately reused rather
 than rebuilt: `docs/history/execution-fanout/CONTEXT.md` and
