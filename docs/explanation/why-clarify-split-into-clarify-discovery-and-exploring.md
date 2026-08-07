@@ -162,6 +162,61 @@ a signal to observe, not a judgment call made in advance.
   *is* that mechanism, so nothing about the existing rule needed to
   change.
 
+## Implementation (`tsk-1x3`, P3 of this design): `judge-executor.mjs` was deleted outright, not just unused
+
+The verb-reversion + judge-removal half of this design (D1, D9, D6 above)
+landed as its own implementation piece. The removal went further than
+leaving dead code behind: `src/intake/judge-executor.mjs` — the shared
+subprocess-spawning core all three judge consumers used — was **deleted
+from the repo entirely**, confirmed by the item's own verify command
+asserting `! test -f src/intake/judge-executor.mjs`. Nothing was left
+half-removed for a future cleanup to find.
+
+**A real footprint-discovery gap surfaced during `fgos-validating`**:
+scouting with `rg` found 3 test files —
+`judge-verify-second-pass-stability.test.mjs`, `discovery.test.mjs`,
+`decompose.test.mjs` — importing `readScoutNotes`/
+`judgeVerifySemanticCorrectness` directly from `judge-executor.mjs`, a
+dependency the item's original footprint had missed. Left unfixed,
+deleting the file would have broken `npm test` immediately on the very
+next run. Caught and fixed in the same pass, before the removal landed —
+the reality-check gate doing exactly the job it exists for.
+
+### `resolveDecompose` turned out asymmetric with `resolveDiscovery` (D16)
+
+A design assumption from the shaping discussion didn't survive contact
+with the real code: `resolveDecompose`'s own no-verdict branch genuinely
+falls through to a real `judgeDecompose` call (only skipped when
+`plan.md` itself states `tiny`/`small`) — it isn't a mirror of
+`resolveDiscovery`'s equivalent branch. Scouting found `runOnce`
+(`loop.mjs`) is the **only** caller that never supplies a verdict at
+all. Rather than making that branch throw (which would be a real
+regression, since the runner has never actually executed this path in
+this repo's dogfood history — no observable behavior would change), the
+no-verdict branch became a safe no-op instead: never throws, never calls
+the now-removed judge. This applies the same reasoning D6 already used
+for the discovery side: since the runner has never run for real here, a
+no-op changes nothing observable today, while a throw would be the
+actual regression if someone enables the runner later.
+
+### `judgeVerifySemanticCorrectness` behaves differently from its two siblings (D17)
+
+Reading `discovery.mjs`/`decompose.mjs` directly confirmed
+`judgeVerifySemanticCorrectness` runs **unconditionally** on every
+`verdict.clear` — including a caller-supplied one — unlike
+`judgeDiscovery`/`judgeDecompose`, which only fire absent a caller
+verdict. This wasn't theoretical: two real disputes happened on
+`tsk-5kn` itself, on the same day, despite `--verdict` always being
+passed explicitly. The fix kept the mechanical,
+non-subprocess check (`matchesKnownBadVerifyPattern`) living directly in
+the verb — a verb structurally cannot call the Task tool, the same limit
+motivating the whole D1 write-door reframing — while removing the
+LLM-fallback branch (the actual `runJudgeExecutor` call) outright. The
+real, named cost: the verb itself can no longer catch a structural
+false-negative in that mechanical regex check on its own — that
+responsibility moves outward, to the calling skill and to
+`fgos-validating`'s own discipline, rather than staying inside the verb.
+
 Full decision record (D1-D17), the 7-round shaping discussion, and the
 scout evidence behind each locked decision:
 `docs/history/fanout-and-delegation-rubric/CONTEXT.md` and
