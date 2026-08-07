@@ -162,3 +162,50 @@ có thêm chữ mới.
 Mảnh 2 và 3 chạm skill-prose ⇒ verify theo đúng khuôn
 `docs/how-to/write-verify-for-a-skill-prose-change.md`: `npm test &&
 POSITIVE && NEGATIVE`, cả hai vế bắt buộc.
+
+## Validating — reality gate & feasibility matrix (2026-08-07)
+
+Verdict: **READY WITH CONSTRAINTS**.
+
+| Chiều | Kết quả | Bằng chứng |
+|---|---|---|
+| Mode fit | PASS | 4 cờ đếm lại đúng. Bỏ cờ hard-gate ra vẫn còn 3 ⇒ `standard`; lane treo vào cách đọc D2 là "removing a validation", đã nói thẳng ở § Mode |
+| Repo fit | PASS | `test/state/graph-metrics.test.mjs` tồn tại (32KB, đã sẵn 4 test `computeSchedule`) · `scripts/` tồn tại · bảng caller `fgos-coding-driving/SKILL.md:277-283` đúng 5 dòng · `onto the FRONT of the queue` xuất hiện đúng 1 lần trong `cook/SKILL.md` |
+| Assumptions | PASS | A1 nâng lên bằng chứng (dưới); A2/A3 vẫn chưa chứng minh, đã gắn cờ kèm hệ quả |
+| Smaller path | PASS | xem § dưới |
+| Proof surface | PASS | ba verify chạy được thật; `npm test` baseline **2732 test, 2727 pass, 0 fail, 5 skip** ⇒ tiền tố `npm test &&` có nghĩa, không che đỏ sẵn có |
+| Impact-analysis posture | PASS | live: 1 provider `gitnexus` `present`, index sau HEAD (`251d0b5`) ⇒ **degraded**, khớp § Mode |
+
+### Đường nhỏ hơn đã xét — và vì sao nó SAI, không chỉ xấu
+
+Có một đường nhỏ hơn § Approach bỏ sót: để dispatcher tự **giao kết quả**
+`computeSchedule(view)` với tập ứng viên, **không** đổi chữ ký — tránh hẳn
+mảnh 1 và tránh đụng public contract.
+
+Nó **sai về hành vi**, không chỉ kém đẹp. `computeSchedule` gói **toàn
+frontier** theo footprint: một item **ngoài** tập ứng viên có thể chiếm chỗ
+wave 0 và đẩy một con **trong** tập xuống wave 1 (`graph-metrics.mjs:
+703-733` — deferred, không refused). Lọc **sau khi gói** giữ nguyên vị trí
+wave sai đó ⇒ sinh wave thừa và chạy chậm hơn thực tế cần. Scope **trước
+khi gói** mới cho wave đúng.
+
+Đây là lý lẽ mạnh nhất cho mảnh 1 (`tsk-ik3`) mà § Approach chưa viết ra.
+
+### Feasibility matrix
+
+| Giả định | Rủi ro | Bằng chứng tìm được | Kết quả |
+|---|---|---|---|
+| Đổi chữ ký `computeSchedule` không gãy caller | medium | `grep -rn computeSchedule src bin test`: đúng **một** caller production (`store.mjs:32` import, `:1100` gọi) + file test. Baseline xanh | **PASS** — gap nêu thẳng: posture degraded nên đây là bằng chứng **grep**, không phải blast-radius |
+| Hợp đồng anchor 5 caller | high | đọc thật `SKILL.md:277-283`: `/fgOS:cook` · `/fgOS:pick` · clarify sweep · planning sweep · execution sweep | **PASS CÓ RÀNG BUỘC** — Open Question #1 chưa đóng |
+| Tự động approve lá không rò lên main | medium | `gate-bypass.mjs:1-14` phạm vi chỉ cổng exploring/planning, *"Never touches the awaiting-human park"*, không đụng `approve`; lá merge vào `fgw/<root>` | **PASS** |
+| Đường song song chưa từng chạy thật | high | đếm theo **type**: `capacity.dispatch` = **0**. (Grep thô cho 73 — nhưng đó là chuỗi xuất hiện trong prose của chính các doc này, không phải sự kiện. Ghi lại vì đúng loại số đáng ngờ mà `CLAUDE.md` bảo phải đối chiếu trước khi tin) | **PASS** — rủi ro xác nhận có thật |
+| A1: subagent chạy được `/fgOS:pick` | giả định của plan | `.fgos/events.jsonl`: `tsk-50ic` → `doing` 04:27:32.774Z; `tsk-30z` → `doing` 04:27:34.837Z (**cách 2.06s**); chồng lấn **184.2s**; cả hai `role: session`; cả hai đạt `awaiting-approval` | **PASS — nâng từ giả định lên bằng chứng** |
+
+### Ràng buộc mang theo sang executing
+
+1. **Open Question #1 chưa đóng** — bốn caller ngoài `/fgOS:cook` kế thừa
+   hợp đồng anchor mà không được sửa trong item này. Nếu lúc thi công mảnh
+   3 thấy đó là **bỏ sót** chứ không phải phạm vi, mảnh 3 phải rộng ra.
+2. **A2 chưa chứng minh** — "đợi hết wave rồi bắn wave sau". Nếu đổi sang
+   bù-chỗ-trống thì trần 5 (D7) phải áp lên *số đang bay*, không phải
+   *kích thước wave*.
