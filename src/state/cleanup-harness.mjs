@@ -40,6 +40,20 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { resolveRoot } from '../runner/root-affinity.mjs';
 
+/**
+ * tsk-59x D1: which TTL applies to `id` — the leaf value when `id` has a
+ * real parent (`resolveRoot(view, id) !== id`, same leaf test
+ * `checkMergeStillResolves` above already uses), the root value otherwise.
+ * `leafTtlDays` omitted entirely falls back to `ttlDays` for every item,
+ * root or leaf — keeps every existing caller that doesn't pass it
+ * byte-identical to pre-tsk-59x behavior.
+ */
+export function resolveTtlDaysForItem(view, id, { ttlDays, leafTtlDays } = {}) {
+  if (leafTtlDays === undefined) return ttlDays;
+  const isLeaf = resolveRoot(view, id) !== id;
+  return isLeaf ? leafTtlDays : ttlDays;
+}
+
 function git(repoRoot, args) {
   return execFileSync('git', args, {
     cwd: repoRoot,
@@ -210,12 +224,18 @@ export function checkCleanupTTLElapsed(rawEvents, id, { ttlDays, now = Date.now(
  * `failed` holds every D8 gate-check failure detail (never just the
  * first), so a `cleanup -> blocked` park still carries a complete
  * `reason` when `failed` is non-empty.
+ *
+ * tsk-59x D1: `leafTtlDays`, when supplied alongside `ttlDays`, resolves
+ * per-item via `resolveTtlDaysForItem` before the TTL check runs — a leaf
+ * item gets `leafTtlDays`, a root item keeps `ttlDays`. Omitted entirely,
+ * behavior is byte-identical to before this item.
  */
-export function assessCleanupReadiness({ view, rawEvents, id, repoRoot, worktreeBacked, ttlDays, now }) {
+export function assessCleanupReadiness({ view, rawEvents, id, repoRoot, worktreeBacked, ttlDays, leafTtlDays, now }) {
   const notReadyYet = [];
   const failed = [];
 
-  const ttl = checkCleanupTTLElapsed(rawEvents, id, { ttlDays, now });
+  const resolvedTtlDays = resolveTtlDaysForItem(view, id, { ttlDays, leafTtlDays });
+  const ttl = checkCleanupTTLElapsed(rawEvents, id, { ttlDays: resolvedTtlDays, now });
   if (!ttl.ok) notReadyYet.push(ttl.detail);
 
   const content = checkRetrospectiveContent(view, id, repoRoot);

@@ -544,10 +544,19 @@ registerConfigDefault({
 // default, same shape as gateBypass's own registration immediately above.
 export const DEFAULT_CLEANUP_TTL_DAYS = 7;
 
+// tsk-59x D1: supersedes D7's global-only premise for the leaf/root axis
+// specifically, now that the demonstrated need D7 flagged as missing
+// exists (25% of open list is children, 0/99 cleanup-pool items ever
+// elapse the 7-day TTL). A leaf's own content already lives on its
+// still-alive root branch the moment it merges, so reclaiming its
+// worktree/branch immediately loses nothing. Root items are unaffected —
+// they keep DEFAULT_CLEANUP_TTL_DAYS above.
+export const DEFAULT_CLEANUP_LEAF_TTL_DAYS = 0;
+
 registerConfigDefault({
   id: 'cleanup',
   key: 'cleanup',
-  shape: { ttlDays: DEFAULT_CLEANUP_TTL_DAYS },
+  shape: { ttlDays: DEFAULT_CLEANUP_TTL_DAYS, leafTtlDays: DEFAULT_CLEANUP_LEAF_TTL_DAYS },
 });
 
 registerCheck({
