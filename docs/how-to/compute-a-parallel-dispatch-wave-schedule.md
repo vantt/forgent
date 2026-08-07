@@ -62,3 +62,30 @@ separate, purpose-built Kahn-layering-style greedy wave-pack plus its own
 Tarjan cycle check, rather than stretching the merge-side logic to also
 answer the dispatch-side question, kept each algorithm honest about what
 it actually proves.
+
+## Update (tsk-3u2): `cycles` now also catches `parent`/`mergeAfter` cycles, not just `deps`
+
+Step 3 above originally described `cycles` as scoped to `deps` edges
+only. An independent code review after `tsk-3c7` merged found
+`detectCycles` (`src/state/graph-metrics.mjs`) really was that narrow —
+it built its own adjacency looking only at `deps`, missing a cycle formed
+through `parent`/`mergeAfter` edges that `dep-graph.mjs`'s
+`findUnifiedCycle` already knew how to detect. Fixed by reusing that
+existing unified adjacency (which already folds `deps`, `parent`, and
+`mergeAfter` into one graph) instead of re-implementing a narrower one
+locally. `cycles` now reports a real cycle through any of those three
+edge types, not `deps` alone — verified with a real command
+(`node --test test/state/graph-metrics.test.mjs`), not just review.
+
+The same review also found `fgos schedule` itself missing from
+`bin/fgos.mjs`'s `STORE_MISSING_WARNING_VERBS` set — the "eight read
+verbs" `docs/how-to/run-a-state-verb-from-inside-a-worktree.md` describes
+that warn (rather than silently returning an empty view) when run bare
+from inside a linked worktree with no `.fgos/` of its own. Before this
+fix, `fgos schedule` run from a worktree returned a silent, empty
+false-clear `{waves: [], cycles: []}` instead of the same ADR0020 warning
+`conflicts`/`ready` already print — indistinguishable from "nothing is
+ready to dispatch" when the real cause was "this command can't see the
+real store from here." Fixed by adding `schedule` to that set; the same
+`--dir <mainRoot>` fix that doc already describes for the other read
+verbs applies here too.
