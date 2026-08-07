@@ -108,6 +108,32 @@ and `herdr-plugin/src/ui.rs`
 (`work_items_panel_renders_four_tabs_todo_doing_review_done`) — real,
 named `cargo test` functions, not just a design note.
 
+## Implementation (`tsk-417`): right-side box tags
+
+The child item that built the 3 right-side boxes (D3/D9 above) resolved
+the "left deliberately open" question below about `NEED ANSWER`'s two
+sub-reasons — they get distinct bracketed text tags, not just distinct
+row text:
+
+| Box | Tag | Color | Meaning |
+|---|---|---|---|
+| `NEED ANSWER` | `[ERR]` | dark red | `status: blocked`, `parkReason: system-error` |
+| `NEED ANSWER` | `[ASK]` | magenta | `status: awaiting-human`, `parkReason: human-question` |
+| `MERGE LIST` | `[MRG]` | green | no sub-tag needed — one meaning per row |
+| `AFTER DELIVER` | `[RTR]` | cyan | `status: retrospective` |
+| `AFTER DELIVER` | `[POL]` | dim/gray | `status: cleanup` — deliberately the lowest-priority visual weight, matching `AGENTS.md`'s own Polish-Sau-DoD product-priority ordering (`docs/decisions/0025`) |
+
+Tags use square-bracket text (`[ERR]`, `[ASK]`, etc.), never emoji —
+terminal column width for emoji isn't consistent across terminals, which
+would break table alignment.
+
+Confirmed shipped as real code: `herdr-plugin/src/fgos.rs`
+(`fetch_need_answer_includes_blocked_and_awaiting_human`,
+`fetch_merge_list_mirrors_fgos_merge_list_json`,
+`fetch_after_deliver_includes_retrospective_and_cleanup`) and
+`herdr-plugin/src/ui.rs` (`process_status_renders_three_separate_boxes`)
+— real, named `cargo test` functions.
+
 ## Left deliberately open (implementer's call, not locked here)
 
 - Exact key bindings for switching Work Items tabs and cycling focus
@@ -115,9 +141,6 @@ named `cargo test` functions, not just a design note.
   total, up from the prior 2).
 - Column width/truncation strategy for the 7-column Work Items table on
   a narrow pane.
-- Whether `NEED ANSWER`'s two sub-reasons (`system-error` vs
-  `human-question`) get visually distinct tags/colors within the one box,
-  or just distinct row text.
 
 Full decision record, scout evidence, and the related `tsk-jo1` palette
 item's own decision: `docs/history/herdr-dashboard-layout-and-action-queues/CONTEXT.md`.
