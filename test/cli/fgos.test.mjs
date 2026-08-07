@@ -3242,12 +3242,15 @@ test('submit --docs-ref persists docsRef, exit 0 -- an item created through the 
 // is the next stop before executing. This assertion changed its expected
 // destination from `executing` to `decompose` for exactly that reason (per
 // D2, an intentional contract change, not a test nerf).
-test('discover on a clear verdict moves the submitted item to stage decompose with the model-proposed verify', () => {
+test('discover on a clear verdict moves the submitted item to stage decompose with the caller-supplied verify', () => {
   const cwd = tmpCwd();
-  writeRunnerConfig(cwd, { clear: true, verify: 'npm test -- proven' });
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
 
-  const result = run(cwd, ['discover', id]);
+  // tsk-1x3 D1/D9/D16: the judge subprocess this test used to configure via
+  // writeRunnerConfig is retired -- a session-role caller with nothing to
+  // go on now refuses instead of guessing, so an explicit --verdict is the
+  // only way left to reach a clear outcome.
+  const result = run(cwd, ['discover', id, '--verdict', 'clear', '--verify', 'npm test -- proven']);
   assert.equal(result.status, 0);
   const envelope = JSON.parse(result.stdout);
   assert.equal(envelope.contract, 'fgos.v1');
@@ -3265,25 +3268,22 @@ test('discover on a clear verdict moves the submitted item to stage decompose wi
 // removed the old dynamic-dispatch fallback, not just renamed it.
 test("decompose on an item sitting at stage decompose dispatches to resolveDecompose and pass-throughs it on to executing (sync/async parity)", () => {
   const cwd = tmpCwd();
-  writeRunnerConfig(cwd, { clear: true, verify: 'npm test -- proven' });
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
 
-  run(cwd, ['discover', id]);
+  run(cwd, ['discover', id, '--verdict', 'clear', '--verify', 'npm test -- proven']);
   assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'decompose');
 
-  // Same scripted executor's `{clear:true, verify:...}` reply is not a
-  // valid chia-việc verdict shape (no `verdict` key) — judgeDecompose's
-  // fail-safe folds it to `invalid`, and resolveDecompose leaves the item
-  // exactly where it was for the next sweep/call to retry (mẫu C9).
-  const invalidAttempt = run(cwd, ['decompose', id]);
+  // A caller-supplied decompose verdict with a child missing `verify` is
+  // not a valid shape — resolveCallerDecomposeVerdict folds it to
+  // `invalid`, and resolveDecompose leaves the item exactly where it was
+  // for the next call to retry (mẫu C9, unchanged since tsk-1x3).
+  const invalidAttempt = run(cwd, ['decompose', id, '--verdict', 'decompose', '--reason', 'x', '--children', '[{"title":"x"}]']);
   assert.equal(invalidAttempt.status, 0);
   assert.equal(JSON.parse(invalidAttempt.stdout).data.outcome, 'invalid');
   assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'decompose', 'invalid verdict leaves the item untouched, not silently advanced');
 
-  // Rewrite the executor config with a real pass-through chia-việc verdict
-  // and call `decompose` again — now it carries the item the rest of the way.
-  writeRunnerConfig(cwd, { verdict: 'pass-through' });
-  const passThrough = run(cwd, ['decompose', id]);
+  // A real pass-through verdict carries the item the rest of the way.
+  const passThrough = run(cwd, ['decompose', id, '--verdict', 'pass-through', '--reason', 'single cohesive change']);
   assert.equal(passThrough.status, 0);
   assert.equal(JSON.parse(passThrough.stdout).data.outcome, 'pass-through');
   assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'executing');
@@ -3291,10 +3291,9 @@ test("decompose on an item sitting at stage decompose dispatches to resolveDecom
 
 test('discover on a decompose-stage item errors instead of silently dispatching to resolveDecompose (tsk-2b0 D1: hard split, no fallback)', () => {
   const cwd = tmpCwd();
-  writeRunnerConfig(cwd, { clear: true, verify: 'npm test -- proven' });
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
 
-  run(cwd, ['discover', id]);
+  run(cwd, ['discover', id, '--verdict', 'clear', '--verify', 'npm test -- proven']);
   assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'decompose');
 
   const result = run(cwd, ['discover', id]);
@@ -3324,10 +3323,9 @@ test('decompose with no id is rejected as validation, exit 4', () => {
 
 test('discover on an unclear verdict parks the submitted item in awaiting-human with the question, still stage clarify', () => {
   const cwd = tmpCwd();
-  writeRunnerConfig(cwd, { clear: false, question: 'Which service?' });
   const id = JSON.parse(run(cwd, ['submit', 'Do the ambiguous work']).stdout).data.id;
 
-  const result = run(cwd, ['discover', id]);
+  const result = run(cwd, ['discover', id, '--verdict', 'unclear', '--question', 'Which service?']);
   assert.equal(result.status, 0);
   assert.equal(JSON.parse(result.stdout).data.outcome, 'unclear');
 
@@ -3345,12 +3343,14 @@ test('discover with no id is rejected as validation, exit 4', () => {
 
 // str76-runner-bootstrap-e3: a fresh cwd with no .fgos-runner.json used to
 // crash `discover` with RunnerConfigError/ENOENT (the bug this feature
-// fixes) — it now bootstraps the D1 default config instead. PATH is
-// neutralized to exclude the real `claude` binary (baked-in default
-// executor, D1) so judge-executor's spawnSync fails fast (spawn-fail) on the
-// nested judge call, never invoking a live agent; judgeDiscovery's fail-safe
-// (discovery.mjs) then parks the item as unclear, not a bare "success".
-test('discover on a fresh cwd with no runner config bootstraps the default config into the shared file instead of crashing on ENOENT', () => {
+// fixes) — it now bootstraps the D1 default config instead, BEFORE
+// resolveDiscovery is ever called (bin/fgos.mjs's own `discover` case reads
+// `cfg` first). tsk-1x3 D1/D9/D16: the config bootstrap still happens
+// unconditionally, but resolveDiscovery itself no longer spawns a judge
+// against it for a bare (no --verdict) session-role call — it refuses
+// loudly instead. PATH is still neutralized here to prove the bootstrap
+// path is exercised the same way (no live agent invoked either way).
+test('discover on a fresh cwd with no runner config bootstraps the default config into the shared file instead of crashing on ENOENT, then still refuses without --verdict (D16)', () => {
   const cwd = tmpCwd();
   const configPath = path.join(cwd, '.fgos', 'config.json');
   assert.equal(fs.existsSync(configPath), false);
@@ -3358,13 +3358,13 @@ test('discover on a fresh cwd with no runner config bootstraps the default confi
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing with no config yet']).stdout).data.id;
 
   const result = run(cwd, ['discover', id], { PATH: '/usr/bin:/bin' });
-  assert.equal(result.status, 0, `expected no RunnerConfigError/ENOENT crash, got stderr: ${result.stderr}`);
-  assert.equal(JSON.parse(result.stdout).data.outcome, 'unclear');
+  assert.equal(result.status, 4, `expected the D16 refusal, not a RunnerConfigError/ENOENT crash: ${result.stderr}`);
+  assert.match(result.stderr, /no committed CONTEXT.md and no --verdict was given/);
 
-  assert.equal(fs.existsSync(configPath), true, 'discover should have auto-written the default runner section into .fgos/config.json');
+  assert.equal(fs.existsSync(configPath), true, 'discover should have auto-written the default runner section into .fgos/config.json BEFORE refusing');
 
   const view = envelopeData(run(cwd, ['list']).stdout);
-  assert.equal(view.work[id].status, 'awaiting-human');
+  assert.equal(view.work[id].status, 'todo', 'the refused call must never mutate the item');
   assert.equal(view.work[id].stage, 'clarify');
 });
 
@@ -3431,14 +3431,12 @@ test('discover --verdict with an unrecognized value is rejected as validation, e
   assert.match(result.stderr, /"clear" or "unclear"/);
 });
 
-test('decompose --verdict pass-through moves the item to executing, bypassing the configured (opposite) judge verdict', () => {
+test('decompose --verdict pass-through moves the item to executing', () => {
   const cwd = tmpCwd();
-  writeRunnerConfig(cwd, { clear: true, verify: 'npm test -- proven' });
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
-  run(cwd, ['discover', id]);
+  run(cwd, ['discover', id, '--verdict', 'clear', '--verify', 'npm test -- proven']);
   assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'decompose');
 
-  writeRunnerConfig(cwd, { verdict: 'decompose', reason: 'SHOULD NEVER SURFACE', children: [{ title: 'x', verify: 'npm test' }] });
   const result = run(cwd, ['decompose', id, '--verdict', 'pass-through', '--reason', 'single-piece, no split needed']);
   assert.equal(result.status, 0);
   assert.equal(JSON.parse(result.stdout).data.outcome, 'pass-through');
@@ -3448,13 +3446,11 @@ test('decompose --verdict pass-through moves the item to executing, bypassing th
   assert.equal(Object.values(view.work).some((item) => item.parent === id), false);
 });
 
-test('decompose --verdict need-human --reason parks in awaiting-human with that exact reason, bypassing the configured (opposite) judge verdict', () => {
+test('decompose --verdict need-human --reason parks in awaiting-human with that exact reason', () => {
   const cwd = tmpCwd();
-  writeRunnerConfig(cwd, { clear: true, verify: 'npm test -- proven' });
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
-  run(cwd, ['discover', id]);
+  run(cwd, ['discover', id, '--verdict', 'clear', '--verify', 'npm test -- proven']);
 
-  writeRunnerConfig(cwd, { verdict: 'pass-through' });
   const result = run(cwd, ['decompose', id, '--verdict', 'need-human', '--reason', 'Which auth provider?']);
   assert.equal(result.status, 0);
   assert.equal(JSON.parse(result.stdout).data.outcome, 'need-human');
@@ -3464,13 +3460,11 @@ test('decompose --verdict need-human --reason parks in awaiting-human with that 
   assert.match(view.gates[id].ask, /Which auth provider\?/);
 });
 
-test('decompose --verdict decompose --children writes real children, bypassing the configured (opposite) judge verdict', () => {
+test('decompose --verdict decompose --children writes real children', () => {
   const cwd = tmpCwd();
-  writeRunnerConfig(cwd, { clear: true, verify: 'npm test -- proven' });
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
-  run(cwd, ['discover', id]);
+  run(cwd, ['discover', id, '--verdict', 'clear', '--verify', 'npm test -- proven']);
 
-  writeRunnerConfig(cwd, { verdict: 'pass-through' });
   const children = JSON.stringify([
     { title: 'Build parser', verify: 'npm test -- parser', action: 'tsk-3xd fixture: implement the parser.' },
     { title: 'Build renderer', verify: 'npm test -- renderer', action: 'tsk-3xd fixture: implement the renderer.' },
@@ -3574,10 +3568,9 @@ test('move to done via the real CLI stamps role "human" on the event payload and
 
 test('discover (sync verb) on a clear verdict stamps role "session" on the work.stage event and folds into a clarify-pass settlement', () => {
   const cwd = tmpCwd();
-  writeRunnerConfig(cwd, { clear: true, verify: 'npm test -- proven' });
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
 
-  const result = run(cwd, ['discover', id]);
+  const result = run(cwd, ['discover', id, '--verdict', 'clear', '--verify', 'npm test -- proven']);
   assert.equal(result.status, 0);
 
   const lines = eventLines(cwd);
