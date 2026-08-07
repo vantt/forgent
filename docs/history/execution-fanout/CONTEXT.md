@@ -38,6 +38,7 @@ chọn wave, vòng bắn/đợi/gom, và chỗ nối để năng lực này tự
 | **D7** | **Trần đồng thời = 5 Agent.** Fan-out không bao giờ bắn quá 5 cùng lúc, kể cả khi nhiều con hơn đều sẵn sàng và không đụng footprint | 8952 |
 | **D8** | **Fan-out là NĂNG LỰC tự kích hoạt, không phải cửa vào.** Không đẻ `/fgOS:fanout`. Chỗ nối là **chỗ xử lý báo cáo anchored-by-open-children của `fgos-coding-driving`**, không riêng `/fgOS:cook` — để mọi caller hiện có và tương lai đều được fan-out | 8953 |
 | **D9** | **Lá `blocked`: anh em độc lập chạy hết; chỉ không bắn anh em phụ thuộc A.** Không hủy việc đang dở | 8954 |
+| **D10** | **`verify` = `npm test && node scripts/verify-fanout-overlap.mjs`** — script khẳng định một cha decompose ra ≥2 con footprint rời nhau thì `.fgos/events.jsonl` có ≥2 `work.move` sang `doing` **từ cùng một lần chạy**, các khoảng `doing` **chồng lấn thời gian**, cả hai đạt `awaiting-approval`, và không có lượt hỏi người nào ngoài cổng root. Chứng minh **chồng lấn thật**, không chỉ chứng minh file skill tồn tại | 8967 |
 
 ## Thuật ngữ đã ghim
 
@@ -103,6 +104,24 @@ ai thử. Không cần logic hủy mới.
 - `docs/decisions/0012` — mô hình cạnh định kiểu (`deps` vs `parent`)
 - `docs/history/gate-bypass/CONTEXT.md` D1-D5 — hình dạng của một cổng tự
   động (bậc · cơ học · fail closed · risk ghi đè)
+
+## Ghi chú về cửa clarify→decompose
+
+Lần gọi `fgos discover` đầu tiên **bị engine bác**: first pass clear nhưng
+`judgeVerifySemanticCorrectness` không đồng ý, nguyên văn *"Lệnh verify là
+chuỗi rỗng/placeholder ('chưa xác định — P15 bổ sung'), không phải lệnh
+shell nào cả"*. Item bị park sang `awaiting-human`, `stage` giữ nguyên
+`clarify`.
+
+Judge đúng: item được submit với verify placeholder, và `fgos-exploring`
+theo luật của chính nó chỉ **chụp lại** verify item đang mang chứ không tự
+thiết kế verify mới. Điểm dừng này cần người, và người đã duyệt hình dạng
+verify ở D10 (`fgos answer` seq 8960, `fgos edit --verify` seq 8961). Lần
+`discover` thứ hai: `outcome: clear`, `stage` → `decompose`.
+
+Bài học để lại: một item submit qua `fgos submit` mang verify placeholder
+**sẽ luôn bị chặn ở cửa này** cho tới khi có người đặt verify thật — đó là
+hành vi đúng, không phải lỗi.
 
 ## Câu để lại cho planning
 
