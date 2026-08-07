@@ -247,6 +247,27 @@ fn run(
                 UiEvent::FilterBackspace => app.filter_backspace(),
                 UiEvent::FilterSubmit => app.filter_submit(),
                 UiEvent::FilterCancel => app.filter_cancel(),
+                // tsk-bvh D1: `poll_event` only ever produces either of
+                // these while the modal is closed (its own mouse-handling
+                // branch returns early on `app.detail_modal_open`), so
+                // there is no modal guard to repeat here.
+                UiEvent::ClickFocus(panel) => {
+                    app.pick_status = None;
+                    app.focused_panel = panel;
+                }
+                UiEvent::ClickSelectRow(panel, index) => {
+                    app.pick_status = None;
+                    app.focused_panel = panel;
+                    match panel {
+                        Panel::WorkItems => app.selected = Some(index),
+                        Panel::InProcess => app.in_process_selected = Some(index),
+                        // D1: `poll_event`'s `click_target` never produces
+                        // this for the 3 view-only boxes — defensive no-op
+                        // if that ever changes, matching `UiEvent::Pick`'s
+                        // own D1 no-op arm above.
+                        Panel::NeedAnswer | Panel::MergeList | Panel::AfterDeliver => {}
+                    }
+                }
             }
         }
 

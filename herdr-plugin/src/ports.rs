@@ -79,6 +79,16 @@ pub enum UiEvent {
     /// Esc while filtering (tsk-64z D8) — leaves input mode AND clears the
     /// query.
     FilterCancel,
+    /// tsk-bvh D1: left-click inside a box's `Rect` (outside the modal,
+    /// and not on a WorkItems/InProcess row) — focuses that box, same
+    /// effect Tab already produces for it.
+    ClickFocus(crate::app::Panel),
+    /// tsk-bvh D1: left-click on a specific row inside the WorkItems or
+    /// InProcess box — focuses that box AND selects the row ("click item
+    /// = select" from the original ask). Never produced for
+    /// NeedAnswer/MergeList/AfterDeliver (CONTEXT.md D1: those stay
+    /// view-only, `ClickFocus` is the only event they ever produce).
+    ClickSelectRow(crate::app::Panel, usize),
     Quit,
 }
 
