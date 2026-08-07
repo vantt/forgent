@@ -50,6 +50,49 @@ Same shape of function, opposite fallback, because the two checks answer
 different-scoped questions with very different false-positive profiles
 once the footprint itself is missing.
 
+## Follow-up (`tsk-4hl`): the capture was pointed at the wrong ref, and neither half was actually wired in
+
+An independent code review after `tsk-2ig` merged found the feature above
+had shipped only partially connected:
+
+- **`captureDispatchAttestation` snapshotted the wrong `HEAD`.**
+  `loop.mjs` passes the *main checkout's* own `.fgos` into
+  `spawnWorker`, so `git rev-parse HEAD` inside
+  `captureDispatchAttestation` (`dispatch.mjs`) captured main's tip, not
+  the tip of the worktree branch the worker was actually about to run on
+  — the exact ref `loop.mjs:653`'s own `dispatchBaseline` had already
+  correctly computed elsewhere, just never threaded through to the
+  attestation capture itself. Fixed by wiring the capture to read
+  `dispatchBaseline`'s already-correct ref instead of re-deriving its own
+  (wrong) one.
+- **The capture was computed and then discarded.** `baseCommit`/
+  `headRef` were captured but never persisted anywhere — dropped after
+  the function returned, sitting next to the existing
+  `branchHeadAtTake` field on the event payload with nothing carrying
+  them into it. Fixed by persisting both fields onto the event payload
+  alongside `branchHeadAtTake`, so the attestation capture this doc
+  describes is actually retrievable later, not just computed and thrown
+  away.
+- **`footprintDiffHits` was implemented but never called from the real
+  `return` path.** The broadened diff check existed as a function with
+  its own passing tests, but `bin/fgos.mjs`'s `return` verb only ever
+  called the narrower `frozenJudgeHits`, never the new sibling — the
+  advisory signal this doc describes never actually reached a real
+  `fgos return` run. Wired in alongside the existing `frozenJudgeHits`
+  call, with one added self-exclusion: the `iron-law-evidence.md` file
+  that `return`'s own flow generates as part of the same run is excluded
+  from `footprintDiffHits`'s scan, so the check doesn't flag its own
+  generated evidence file as an unexpected out-of-footprint change.
+
+The direction — wire the two halves in for real, rather than remove them
+as dead code — was an explicit user choice, not a default. Verified with
+real commands
+(`node --test test/runner/dispatch.test.mjs test/runner/frozen-judge.test.mjs test/cli/fgos.test.mjs`),
+not just code review. Level 1's advisory-only posture (never a gate,
+above) is unchanged by this fix — this only makes the existing advisory
+signal actually reach the right ref and the real `return` path, not a
+scope change.
+
 ## Why level 1, and why advisory rather than a gate
 
 Real breakage is already caught by `merge.mjs`'s existing staged
