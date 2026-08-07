@@ -10,12 +10,12 @@ function item(id, status, deps = [], extra = {}) {
 }
 
 test('mergeReadiness on an empty view returns empty ready/waiting/conflicts/mergeSets/blockedOnSync/mergeTier/supersededOut', () => {
-  assert.deepEqual(mergeReadiness({ work: {} }), { ready: [], waiting: [], conflicts: [], mergeSets: [], blockedOnSync: [], mergeTier: {}, supersededOut: [] });
+  assert.deepEqual(mergeReadiness({ work: {} }), { ready: [], waiting: [], conflicts: [], mergeSets: [], blockedOnSync: [], mergeTier: {}, supersededOut: [], stageByItem: {} });
 });
 
 test('mergeReadiness: a proposed item with no deps is ready', () => {
   const view = { work: { a: item('a', 'awaiting-approval') } };
-  assert.deepEqual(mergeReadiness(view), { ready: ['a'], waiting: [], conflicts: [], mergeSets: [], blockedOnSync: [], mergeTier: { a: 'root-to-main' }, supersededOut: [] });
+  assert.deepEqual(mergeReadiness(view), { ready: ['a'], waiting: [], conflicts: [], mergeSets: [], blockedOnSync: [], mergeTier: { a: 'root-to-main' }, supersededOut: [], stageByItem: { a: 'executing' } });
 });
 
 test('mergeReadiness: a proposed item whose dep is NOT done waits, never ready', () => {
@@ -37,7 +37,7 @@ test('mergeReadiness: a proposed item whose dep IS done is ready, not waiting', 
       leaf: item('leaf', 'awaiting-approval', ['dep']),
     },
   };
-  assert.deepEqual(mergeReadiness(view), { ready: ['leaf'], waiting: [], conflicts: [], mergeSets: [], blockedOnSync: [], mergeTier: { leaf: 'root-to-main' }, supersededOut: [] });
+  assert.deepEqual(mergeReadiness(view), { ready: ['leaf'], waiting: [], conflicts: [], mergeSets: [], blockedOnSync: [], mergeTier: { leaf: 'root-to-main' }, supersededOut: [], stageByItem: { dep: 'executing', leaf: 'executing' } });
 });
 
 test('mergeReadiness: only proposed items are considered — todo/doing/done/blocked never appear in ready or waiting', () => {
@@ -50,7 +50,7 @@ test('mergeReadiness: only proposed items are considered — todo/doing/done/blo
       e: item('e', 'awaiting-approval'),
     },
   };
-  assert.deepEqual(mergeReadiness(view), { ready: ['e'], waiting: [], conflicts: [], mergeSets: [], blockedOnSync: [], mergeTier: { e: 'root-to-main' }, supersededOut: [] });
+  assert.deepEqual(mergeReadiness(view), { ready: ['e'], waiting: [], conflicts: [], mergeSets: [], blockedOnSync: [], mergeTier: { e: 'root-to-main' }, supersededOut: [], stageByItem: { a: 'executing', b: 'executing', c: 'executing', d: 'executing', e: 'executing' } });
 });
 
 test('mergeReadiness: two dep-clear proposed items sharing a footprint conflict are excluded from ready, not counted as waiting', () => {

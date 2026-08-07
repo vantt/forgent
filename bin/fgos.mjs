@@ -60,7 +60,7 @@ import { createSession, endSession, listSessions, reclaimOrphanedSessions, Sessi
 import { resolveRoot } from '../src/runner/root-affinity.mjs';
 import { visitCount } from '../src/runner/anti-loop.mjs';
 import { DEFAULTS } from '../src/state/work.mjs';
-import { getDomain, stageForStep } from '../src/state/workflow-stage-graphs.mjs';
+import { getDomain, stageForStep, effectiveStage } from '../src/state/workflow-stage-graphs.mjs';
 import { writeCoexistenceManifest } from '../src/install/coexist.mjs';
 import { MANIFEST_SCHEMA_VERSION, COMMAND_REGISTRY } from '../src/cli/command-registry.mjs';
 import { recordInvocationFault } from '../src/cli/invocation-fault-log.mjs';
@@ -455,6 +455,17 @@ function readPaginationFlags(flags, verbLabel) {
 // (per D35: the four paginated verbs' default output stays byte-identical to
 // before this cell). `order` is this verb's own literal order tag (e.g.
 // 'ready-v1'), named once at the call site.
+// tsk-4zj D1/D4: additive-only projection — never mutates `item`, never
+// touches `stage` itself (stays absent when never explicitly set, per the
+// D8 lazy-default contract `test/state/frontier.test.mjs:205`/
+// `test/state/backward-compat.test.mjs:277` lock at the storage layer).
+// Read-verb print sites spread this onto whatever they already return so a
+// reader can tell "explicitly at this stage" from "defaulted here" instead
+// of seeing an absent field with no explanation either way.
+function withStageEffective(item) {
+  return { ...item, stageEffective: effectiveStage(item, getDomain(item.domain)) };
+}
+
 function paginateVerbResult(items, flags, order, verbLabel) {
   const { cursor, limit } = readPaginationFlags(flags, verbLabel);
   if (cursor === undefined && limit === undefined) return items;
@@ -776,13 +787,19 @@ function collectRollupData(view, id) {
     id,
     title: item.title,
     status: item.status,
+    stageEffective: effectiveStage(item, getDomain(item.domain)),
     // Children-only, unchanged by tsk-1ug: every already-published
     // consumer of these two fields keeps reading exactly the number it
     // read before. A milestone's own progress lives in the `target*` pair
     // below instead of changing what these two mean.
     doneCount: done,
     totalCount: children.length,
-    children: children.map((c) => ({ id: c.id, title: c.title, status: c.status })),
+    children: children.map((c) => ({
+      id: c.id,
+      title: c.title,
+      status: c.status,
+      stageEffective: effectiveStage(c, getDomain(c.domain)),
+    })),
     targetDoneCount: targets.filter((t) => t.status === 'done').length,
     targetTotalCount: targets.length,
     targets,
@@ -1679,7 +1696,7 @@ async function runVerb(verb, flags, positional, dir) {
         const scopedById = (section) => (section?.[id] !== undefined ? { [id]: section[id] } : {});
         const singleView = {
           ...rawView,
-          work: { [id]: item },
+          work: { [id]: withStageEffective(item) },
           decisions: (rawView.decisions ?? []).filter((d) => d.id === id),
           discovery: scopedById(rawView.discovery),
           gates: scopedById(rawView.gates),
@@ -1702,9 +1719,17 @@ async function runVerb(verb, flags, positional, dir) {
       // map changes shape here — every other view key (decisions/gates/
       // settlements/etc.) is untouched either way.
       const showAll = Boolean(flags.all);
-      const view = showAll
-        ? rawView
-        : { ...rawView, work: Object.fromEntries(Object.entries(rawView.work).filter(([, item]) => !isResolvedStatus(item))) };
+      // tsk-4zj D3: stageEffective is applied to every item in `view.work`
+      // up front, both branches -- additive-only, so it never disturbs
+      // herdr-plugin's `--all` byte-identical contract (tsk-4fg D1 below);
+      // the childProgress spread further down preserves it automatically.
+      const filteredWork = showAll
+        ? rawView.work
+        : Object.fromEntries(Object.entries(rawView.work).filter(([, item]) => !isResolvedStatus(item)));
+      const view = {
+        ...rawView,
+        work: Object.fromEntries(Object.entries(filteredWork).map(([id, item]) => [id, withStageEffective(item)])),
+      };
       // Child-view gate (tsk-4fg D1/D2): DEFAULT view only -- `--all`
       // stays byte-identical/raw (D1), preserving herdr-plugin's own
       // `list --all --json` contract (bin/fgos.mjs comment above, `case
@@ -1785,7 +1810,7 @@ async function runVerb(verb, flags, positional, dir) {
         throw new StoreError('validation', `show: work "${id}" not found.`);
       }
       return {
-        work: item,
+        work: withStageEffective(item),
         discovery: rawView.discovery?.[id] ?? [],
         decisions: rawView.decisionsById?.[id] ?? [],
         gates: rawView.gates?.[id] ?? null,
@@ -1805,7 +1830,7 @@ async function runVerb(verb, flags, positional, dir) {
     // omitted, readyWork's own default (`Execute`) applies, byte-identical
     // to every pre-existing caller.
     case 'ready': {
-      return paginateVerbResult(readyWork(dir, flags.step ? { step: flags.step } : undefined), flags, 'ready-v1', 'ready');
+      return paginateVerbResult(readyWork(dir, flags.step ? { step: flags.step } : undefined).map(withStageEffective), flags, 'ready-v1', 'ready');
     }
 
     // Request-class per D1 (same contract as `ready`/`list`): a pure read —
@@ -1858,7 +1883,23 @@ async function runVerb(verb, flags, positional, dir) {
     // parallel dispatch would risk a file conflict. Suggests sequence/hoist/
     // re-slice; never mutates anything.
     case 'conflicts': {
-      return footprintConflicts(dir);
+      // tsk-4zj D7: footprintConflicts' candidate set now spans multiple
+      // stages (tsk-4so's frontierAcrossSteps), so stageEffective is real
+      // information here, not a constant -- wrapped in a side-map (same
+      // pattern as graph's/merge's stageByItem) rather than adding fields
+      // to each {a,b,shared,suggestions} pair, which would break the same
+      // exact-shape tests either way.
+      const conflicts = footprintConflicts(dir);
+      const conflictsView = listWork(dir);
+      const ids = new Set();
+      for (const { a, b } of conflicts) {
+        ids.add(a);
+        ids.add(b);
+      }
+      const stageByItem = Object.fromEntries(
+        [...ids].map((id) => [id, effectiveStage(conflictsView.work[id], getDomain(conflictsView.work[id].domain))]),
+      );
+      return { conflicts, stageByItem };
     }
 
     // Read-only (tsk-3c7): which frontier items can dispatch in parallel

@@ -411,6 +411,17 @@ export function stageForStep(domain, step) {
   return Object.keys(domain.stepMap).find((stage) => domain.stepMap[stage] === step);
 }
 
+/** The stage `item` should be treated as being at, whether or not `stage`
+ * was ever explicitly written (D8 lazy-default) — `item.stage ??
+ * stageForStep(domain, 'Execute')`, the same expression `frontier.mjs`/
+ * `stage-fsm.mjs`/`impact.mjs` already apply independently. Read-surface
+ * verbs (`bin/fgos.mjs`) call this so a reader can tell "explicitly at
+ * this stage" from "defaulted here because `stage` was never set" instead
+ * of seeing an absent field with no explanation either way. */
+export function effectiveStage(item, domain) {
+  return item.stage ?? stageForStep(domain, 'Execute');
+}
+
 /** Which fgOS skill (if any) a session should load for `stage` within
  * `domain` (str89-fgos-domain-skills D3/D4) — `null` both when the domain
  * declares no skill for that stage (today's exact default) and when the

@@ -2460,9 +2460,28 @@ test('rollup on a root with n children, k done, prints k/n and lists every child
   assert.equal(data.doneCount, 2);
   assert.equal(data.totalCount, 3);
   assert.deepEqual(data.children, [
-    { id: 'child-a', title: 'Child A', status: 'done' },
-    { id: 'child-b', title: 'Child B', status: 'todo' },
-    { id: 'child-c', title: 'Child C', status: 'done' },
+    { id: 'child-a', title: 'Child A', status: 'done', stageEffective: 'executing' },
+    { id: 'child-b', title: 'Child B', status: 'todo', stageEffective: 'executing' },
+    { id: 'child-c', title: 'Child C', status: 'done', stageEffective: 'executing' },
+  ]);
+});
+
+test('rollup renders stageEffective on the root and on each child independently, mixing explicit and defaulted stages (tsk-4zj D6)', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'root-item', { title: 'Root Item' });
+  const dir = path.join(cwd, '.fgos');
+  addWork(dir, { id: 'child-a', title: 'Child A', kind: 'task', status: 'todo', deps: [], risk: 'low', refs: [], verify: 'npm test', parent: 'root-item', stage: 'clarify' });
+  addWork(dir, { id: 'child-b', title: 'Child B', kind: 'task', status: 'doing', deps: [], risk: 'low', refs: [], verify: 'npm test', parent: 'root-item', stage: 'decompose' });
+  addWork(dir, { id: 'child-c', title: 'Child C', kind: 'task', status: 'todo', deps: [], risk: 'low', refs: [], verify: 'npm test', parent: 'root-item' });
+
+  const result = run(cwd, ['rollup', 'root-item']);
+  assert.equal(result.status, 0);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.stageEffective, 'executing');
+  assert.deepEqual(data.children, [
+    { id: 'child-a', title: 'Child A', status: 'todo', stageEffective: 'clarify' },
+    { id: 'child-b', title: 'Child B', status: 'doing', stageEffective: 'decompose' },
+    { id: 'child-c', title: 'Child C', status: 'todo', stageEffective: 'executing' },
   ]);
 });
 
@@ -2592,7 +2611,7 @@ test('rollup on an item carrying both children and targets keeps the two count p
   assert.equal(data.totalCount, 1);
   assert.equal(data.targetDoneCount, 1);
   assert.equal(data.targetTotalCount, 1);
-  assert.deepEqual(data.children, [{ id: 'child-a', title: 'Child A', status: 'todo' }]);
+  assert.deepEqual(data.children, [{ id: 'child-a', title: 'Child A', status: 'todo', stageEffective: 'executing' }]);
   assert.deepEqual(data.targets, [{ id: 'target-a', title: 'Target A', status: 'done' }]);
 });
 
@@ -8140,10 +8159,14 @@ test('graph verb: reports connected components (independent parallel tracks) in 
 
   // S6: the umbrella completes P43's stated acceptance — critical path,
   // stale-blocked, and greedy top-k-unblock. S7 adds the architecture frame.
-  assert.deepEqual(Object.keys(data), ['order_version', 'frame', 'componentCount', 'components', 'criticalPath', 'staleBlocked', 'topUnblock']);
+  assert.deepEqual(Object.keys(data), ['order_version', 'frame', 'componentCount', 'components', 'criticalPath', 'staleBlocked', 'topUnblock', 'stageByItem']);
   assert.deepEqual(data.criticalPath, { depth: 2, path: ['b', 'a'] });
   assert.deepEqual(data.staleBlocked, [{ id: 'b', status: 'todo', blockedBy: ['a'] }]);
   assert.deepEqual(data.topUnblock[0], { id: 'a', unblocks: 1, newlyUnblocks: 2 });
+  // tsk-4zj D6: a/c via addOk carry addOk's own explicit --stage executing
+  // default; b via the raw CLI `add` (no --stage) stamps 'clarify' by
+  // default (add-stage-default-gap D1/D2).
+  assert.deepEqual(data.stageByItem, { a: 'executing', b: 'clarify', c: 'executing' });
   assert.match(data.frame.revision, /^[0-9a-f]{64}$/);
   assert.equal(data.frame.nodeCount, 3);
   assert.deepEqual(data.frame.skipped, []);
@@ -8162,7 +8185,10 @@ test('graph --what-if <id>: reports what completing that item unblocks, in a fgo
   const result = run(cwd, ['graph', '--what-if', 'a']);
   assert.equal(result.status, 0);
   const data = envelopeData(result.stdout);
-  assert.deepEqual(data, { id: 'a', exists: true, unblocksTransitive: 1, newlyReady: ['b'] });
+  // tsk-4zj D6: a via addOk carries addOk's own explicit --stage executing
+  // default; b via the raw CLI `add` (no --stage) stamps 'clarify' by
+  // default (add-stage-default-gap D1/D2).
+  assert.deepEqual(data, { id: 'a', exists: true, unblocksTransitive: 1, newlyReady: ['b'], stageByItem: { a: 'executing', b: 'clarify' } });
   assert.equal(eventLines(cwd).length, before, 'what-if must not append any event');
 });
 
@@ -8253,7 +8279,12 @@ test('conflicts verb: two ready items sharing a footprint path are flagged with 
   const result = run(cwd, ['conflicts']);
   assert.equal(result.status, 0);
   const data = envelopeData(result.stdout);
-  assert.deepEqual(data, [{ a: 'a', b: 'b', shared: ['src/y.mjs'], suggestions: ['sequence', 'hoist', 're-slice'] }]);
+  // tsk-4zj D7: conflicts' output wraps into {conflicts, stageByItem} --
+  // a/b/c were all added with --stage executing above.
+  assert.deepEqual(data, {
+    conflicts: [{ a: 'a', b: 'b', shared: ['src/y.mjs'], suggestions: ['sequence', 'hoist', 're-slice'] }],
+    stageByItem: { a: 'executing', b: 'executing' },
+  });
   assert.equal(eventLines(cwd).length, before, 'conflicts must not append any event');
 });
 
@@ -8261,7 +8292,7 @@ test('conflicts verb on a store with no overlaps: empty list, exit 0', () => {
   const cwd = tmpCwd();
   assert.equal(run(cwd, ['init']).status, 0);
   assert.equal(addOk(cwd, 'a').status, 0); // no footprint
-  assert.deepEqual(envelopeData(run(cwd, ['conflicts']).stdout), []);
+  assert.deepEqual(envelopeData(run(cwd, ['conflicts']).stdout), { conflicts: [], stageByItem: {} });
 });
 
 // --- tsk-4so D1: conflicts must catch overlap ACROSS steps, not just within
@@ -8274,7 +8305,13 @@ test('conflicts verb: items at DIFFERENT stages sharing a footprint are flagged 
   assert.equal(run(cwd, ['add', 'atexecuting', '--title', 'B', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--footprint', 'bin/fgos.mjs', '--stage', 'executing', '--description', 'tsk-4so fixture description.']).status, 0);
 
   const data = envelopeData(run(cwd, ['conflicts']).stdout);
-  assert.deepEqual(data, [{ a: 'atdecompose', b: 'atexecuting', shared: ['bin/fgos.mjs'], suggestions: ['sequence', 'hoist', 're-slice'] }]);
+  // tsk-4zj D7: this is exactly the scenario D7 corrects D6 for -- the two
+  // conflicting items are at DIFFERENT stages, so stageByItem is genuinely
+  // informative here, not a constant.
+  assert.deepEqual(data, {
+    conflicts: [{ a: 'atdecompose', b: 'atexecuting', shared: ['bin/fgos.mjs'], suggestions: ['sequence', 'hoist', 're-slice'] }],
+    stageByItem: { atdecompose: 'decompose', atexecuting: 'executing' },
+  });
 });
 
 test('conflicts verb: a clarify-stage item and an executing-stage item sharing a footprint are also flagged', () => {
@@ -8284,7 +8321,10 @@ test('conflicts verb: a clarify-stage item and an executing-stage item sharing a
   assert.equal(run(cwd, ['add', 'atexecuting', '--title', 'B', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--footprint', 'src/shared.mjs', '--stage', 'executing', '--description', 'tsk-4so fixture description.']).status, 0);
 
   const data = envelopeData(run(cwd, ['conflicts']).stdout);
-  assert.deepEqual(data, [{ a: 'atclarify', b: 'atexecuting', shared: ['src/shared.mjs'], suggestions: ['sequence', 'hoist', 're-slice'] }]);
+  assert.deepEqual(data, {
+    conflicts: [{ a: 'atclarify', b: 'atexecuting', shared: ['src/shared.mjs'], suggestions: ['sequence', 'hoist', 're-slice'] }],
+    stageByItem: { atclarify: 'clarify', atexecuting: 'executing' },
+  });
 });
 
 // --- tsk-4j9-3: `fgos merge list` (merge-readiness ranking) ---------------
@@ -8338,7 +8378,7 @@ test('merge list on an empty store: empty ready/waiting/conflicts, exit 0, no ev
   const before = eventLines(cwd).length;
   const result = run(cwd, ['merge', 'list']);
   assert.equal(result.status, 0);
-  assert.deepEqual(envelopeData(result.stdout), { ready: [], waiting: [], conflicts: [], mergeSets: [], blockedOnSync: [], mergeTier: {}, supersededOut: [] });
+  assert.deepEqual(envelopeData(result.stdout), { ready: [], waiting: [], conflicts: [], mergeSets: [], blockedOnSync: [], mergeTier: {}, supersededOut: [], stageByItem: {} });
   assert.equal(eventLines(cwd).length, before, 'merge list must not append any event');
 });
 
@@ -8363,7 +8403,12 @@ test('merge list: a proposed item whose dep is already done is ready', () => {
   assert.equal(run(cwd, ['add', 'leaf', '--title', 'Leaf', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--deps', 'dep', '--description', 'tsk-535 fixture description.']).status, 0);
   toProposed(cwd, 'leaf');
   const data = envelopeData(run(cwd, ['merge', 'list']).stdout);
-  assert.deepEqual(data, { ready: ['leaf'], waiting: [], conflicts: [], mergeSets: [], blockedOnSync: [], mergeTier: { leaf: 'root-to-main' }, supersededOut: [] });
+  assert.deepEqual(data, { ready: ['leaf'], waiting: [], conflicts: [], mergeSets: [], blockedOnSync: [], mergeTier: { leaf: 'root-to-main' }, supersededOut: [], stageByItem: data.stageByItem });
+  // tsk-4zj D6: both dep and leaf were `add`ed directly (no --stage),
+  // which stamps an explicit 'clarify' by default (add-stage-default-gap
+  // D1/D2); every subsequent `move`/`approve`/toProposed step only ever
+  // touches `status`, never `stage`, so both stay at 'clarify'.
+  assert.deepEqual(data.stageByItem, { dep: 'clarify', leaf: 'clarify' });
 });
 
 test('merge list: a proposed item whose dep is NOT done waits, never ready', () => {
@@ -8373,7 +8418,13 @@ test('merge list: a proposed item whose dep is NOT done waits, never ready', () 
   assert.equal(run(cwd, ['add', 'leaf', '--title', 'Leaf', '--kind', 'task', '--risk', 'low', '--verify', 'true', '--deps', 'dep', '--description', 'tsk-535 fixture description.']).status, 0);
   toProposed(cwd, 'leaf');
   const data = envelopeData(run(cwd, ['merge', 'list']).stdout);
-  assert.deepEqual(data, { ready: [], waiting: ['leaf'], conflicts: [], mergeSets: [], blockedOnSync: [], mergeTier: { leaf: 'root-to-main' }, supersededOut: [] });
+  assert.deepEqual(data, { ready: [], waiting: ['leaf'], conflicts: [], mergeSets: [], blockedOnSync: [], mergeTier: { leaf: 'root-to-main' }, supersededOut: [], stageByItem: data.stageByItem });
+  // tsk-4zj D6: dep via addOk carries addOk's own explicit --stage
+  // executing default; leaf was added via the raw CLI `add` (no --stage),
+  // which stamps 'clarify' by default (add-stage-default-gap D1/D2) —
+  // toProposed's internal addOk(cwd,'leaf') fails silently (leaf already
+  // exists) so only `status` moves, `stage` stays at its original 'clarify'.
+  assert.deepEqual(data.stageByItem, { dep: 'executing', leaf: 'clarify' });
 });
 
 test('merge list: two dep-clear proposed items sharing a footprint are excluded from ready and listed as conflicts', () => {
