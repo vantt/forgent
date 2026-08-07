@@ -4,7 +4,8 @@ Tách `clarify` thành ba stage, thêm skill research tái dùng, trả verb
 `discover`/`decompose` về đúng vai cửa ghi sổ thuần.
 
 Nguồn thảo luận: `DISCUSSION.md` cùng thư mục (7 vòng shaping, D1–D8).
-Vòng `clarify` của chính item này bổ sung D9–D14.
+Vòng `clarify` của chính item này bổ sung D9–D14. Vòng `decompose` của
+`tsk-1x3` (P3) bổ sung D16.
 
 ## Feature boundary
 
@@ -59,6 +60,12 @@ Vòng `clarify` của chính item này bổ sung D9–D14.
 | D12 | Migration 57 item ở `clarify`: chưa ai đụng → `clarify`; đã có D-ID → `discovery`; đang park `awaiting-human` → `exploring` |
 | D13 | Skill ở `clarify` là một **soul tự phán** hiểu-hay-không-hiểu ý định; **chỉ hỏi khi không hiểu**, không phải vào là hỏi |
 | D14 | Soul ở `clarify` được viết lại `title`/`description` — **áp thẳng rồi báo lại một dòng**, không chờ duyệt |
+
+### Từ vòng `decompose` của `tsk-1x3` (P3)
+
+| D-ID | Quyết định |
+|---|---|
+| D16 | `resolveDecompose` **không đối xứng** với `resolveDiscovery` — nhánh không-verdict của nó rơi vào `judgeDecompose` thật (chỉ miễn khi `plan.md` ghi `tiny`/`small`). `runOnce` (`loop.mjs:1051`) là caller **duy nhất** không truyền verdict. Quyết định: `callerVerdict` bắt buộc; nhánh không-verdict thành **no-op an toàn** (không throw, không gọi judge) — không phải lỗi. Áp dụng cùng logic D6 đã dùng cho discovery: runner chưa từng chạy thật, no-op không đổi hành vi quan sát được nào trong dogfood history hôm nay; throw mới là regression thật nếu ai đó bật runner sau này |
 
 ## Thuật ngữ đã ghim
 

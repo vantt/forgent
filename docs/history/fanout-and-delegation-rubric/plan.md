@@ -138,7 +138,82 @@ Tạo thật lúc `fgos-validating` (bị bỏ sót lúc planning — sửa tạ
 
 - **Verify**: `npm test && ! rg -q "runJudgeExecutor" src/intake/discovery.mjs src/intake/decompose.mjs && ! test -f src/intake/judge-executor.mjs`
 - **Footprint**: `src/intake/discovery.mjs,src/intake/decompose.mjs,src/intake/judge-executor.mjs,src/intake/judge-fail-log.mjs,test/intake/judge-executor.test.mjs,test/intake/judge-verify-second-pass-stability.test.mjs,test/intake/discovery.test.mjs,test/intake/decompose.test.mjs` (mở rộng lúc `fgos-validating`: `rg` tìm ra 3 test file import `readScoutNotes`/`judgeVerifySemanticCorrectness` từ `judge-executor.mjs` mà bản đầu bỏ sót — `npm test` sẽ vỡ ngay nếu không sửa cùng lúc)
-- **D-ID**: D1, D6, D9
+- **D-ID**: D1, D6, D9, D16
+
+#### Child plan (`fgos-planning`, mức riêng của `tsk-1x3`)
+
+**Mode: heavy.** Khác hẳn P1/P2 (tiny, file mới thuần). Đếm cờ mode-gate ở
+mức child này:
+
+| Cờ | Áp dụng | Vì sao |
+|---|---|---|
+| public contracts | **có** | `resolveDiscovery`/`resolveDecompose` là API nội bộ có caller thật ngoài chính file (`bin/fgos.mjs`, `src/runner/loop.mjs`) |
+| existing covered behavior | **có** | 244 test case trong 4 file footprint (81 discovery + 114 decompose + 39 judge-executor + 10 judge-verify-second-pass, đếm bằng `grep -c "^test("`); ít nhất 24 lệnh gọi `resolveDiscovery` và 8 lệnh `resolveDecompose` **không** kèm verdict — đang test trực tiếp đường judge cũ |
+| **hard-gate: removing a validation** | **có** | Gỡ `judgeVerifySemanticCorrectness` — đúng cờ hard-gate đã làm `tsk-5kn` thành high-risk, lặp lại ở mức child này |
+
+Hard-gate có mặt ⇒ **heavy** bất kể số đếm còn lại. `impact-analysis: degraded`
+(D15 kế thừa từ `tsk-5kn`, GitNexus stale 474 commit) — cross-check bằng
+`rg`/GitNexus đã làm ở vòng validating của `tsk-5kn`: `runJudgeExecutor` có
+đúng 3 consumer (`judgeDiscovery`, `judgeDecompose`,
+`judgeVerifySemanticCorrectness`), không consumer nào khác ngoài
+`src/intake/`.
+
+**Approach.**
+
+1. **Đảo mặc định** (D1): `resolveDiscovery(dir, id, cfg, role, callerVerdict)`
+   và `resolveDecompose(dir, id, cfg, role, callerVerdict)` — làm
+   `callerVerdict` **bắt buộc**. Bỏ nhánh gọi `judgeDiscovery`/`judgeDecompose`
+   khi thiếu verdict.
+2. **Xử lý caller duy nhất không truyền verdict** (D16): `runOnce`
+   (`src/runner/loop.mjs:1031,1051`) — thay lời gọi trực tiếp bằng nhánh
+   **no-op an toàn** khi không có verdict, không throw, không gọi judge.
+   Runner chưa từng chạy thật (D6) nên hành vi quan sát được không đổi.
+3. **Giữ nguyên đường trust-signal** — `readLockedContext`/`resolveContentRoot`
+   (định nghĩa trong `decompose.mjs`, dùng chung cả hai file) không đụng tới:
+   không phụ thuộc `runJudgeExecutor`, là nhánh B1 độc lập (`tsk-ozl`).
+4. **Gỡ `judgeVerifySemanticCorrectness`** khỏi `runJudgeExecutor` — theo D9
+   giả định 3 của `tsk-5kn`: **chuyển thành lời gọi từ soul**, không xoá
+   trắng — nó bắt được 2 lỗi thật ngay trong vòng `clarify` của chính item
+   này (verify placeholder, regex false-negative). Xoá trắng là mất một lớp
+   đang hoạt động.
+5. **Xoá `judge-executor.mjs` + `judge-fail-log.mjs`** sau khi cả ba hàm
+   không còn consumer nào.
+6. **Chia lại 244 test case thành ba loại** (không đoán trước tại planning —
+   quyết định per-test lúc implement):
+   - Test hành vi **riêng** của `judgeDiscovery`/`judgeDecompose`/
+     `runJudgeExecutor` (retry, fail-safe, JSON parse) → **xoá cùng hàm**.
+   - Test hành vi **khác** của `resolveDiscovery`/`resolveDecompose`
+     (re-entrancy, trust-signal, claim release) tình cờ đi qua đường
+     judge cũ để dựng fixture → **viết lại dùng `callerVerdict`**, giữ
+     nguyên hành vi đang test.
+   - Test khẳng định đúng **hành vi mặc định gọi judge** → **đảo khẳng
+     định** theo D1/D16 (mặc định giờ là bắt buộc verdict / no-op ở runner).
+
+**Shape.** Không split thêm — một mảnh, phạm vi lớn nhưng liền mạch (đổi
+hợp đồng của 2 hàm + dọn hạ tầng dùng chung). Ca biên bắt buộc test:
+
+- `resolveDiscovery`/`resolveDecompose` gọi **không** verdict, từ context
+  `role: 'session'`/`'human'` → phải **từ chối rõ ràng** (không phải im
+  lặng rơi vào judge như trước).
+- `runOnce` gặp item ở `discovery`/`decompose` mà không có verdict → no-op,
+  item giữ nguyên stage/status, không throw, không crash cả vòng quét.
+- `readLockedContext` có `CONTEXT.md` hợp lệ → vẫn đi nhánh B1 y hệt trước,
+  không bị đụng.
+- `judgeVerifySemanticCorrectness` (dạng chuyển thành lời gọi từ soul) vẫn
+  bắt được đúng 2 ca đã xảy ra thật: verify placeholder rỗng, và regex
+  false-negative theo cấu trúc.
+
+**Giả định chưa chứng minh, để `fgos-validating` xác nhận:**
+
+1. Xoá `judge-executor.mjs`/`judge-fail-log.mjs` hoàn toàn không để lại
+   import treo — cần `rg` toàn repo sau khi sửa, không chỉ trong 4 file
+   footprint đã khai.
+2. 244 test case chia đúng ba loại như Approach bước 6 mà không sót ca nào
+   assert nhầm hành vi cũ.
+3. `judgeVerifySemanticCorrectness` chuyển thành lời gọi từ soul **không**
+   làm mất khả năng chạy headless của `fgos-code-implement` (skill này chạy
+   "effectively headless", không chờ người) — cần soi lại cách gọi cụ thể
+   lúc implement, chưa thiết kế ở đây.
 
 ### P4 — `tsk-1w7` — stage machine: thêm `discovery` + `exploring`
 
