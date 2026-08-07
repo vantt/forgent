@@ -10,6 +10,7 @@ import { appendEvent } from '../../src/state/events.mjs';
 import { MAX_TITLE_LENGTH } from '../../src/state/work.mjs';
 import { createWorktree, removeWorktree, createBranchRef, branchNameFor } from '../../src/runner/worktree.mjs';
 import { runOnce, runWatch, resolveRepoRoot } from '../../src/runner/loop.mjs';
+import { resolveDiscovery } from '../../src/intake/discovery.mjs';
 import { createMissBreaker } from '../../src/runner/anti-loop.mjs';
 
 // Fake executors only — every "worker" spawned here is a node script this
@@ -389,27 +390,40 @@ function mkLockedContextFixture(repoRoot, docsRef, { mode } = {}) {
   }
 }
 
-test('runOnce clarify sweep advances a clarify item via its own committed CONTEXT.md trust signal, records a clarify-pass settlement stamped role "runner"; the decompose sweep right after it pass-throughs the item on to executing in the same pass (tsk-1x3 D16: the sweep itself never spawns a judge)', async () => {
+// tsk-5mj D1/D6/D7 finding (docs/history/fanout-and-delegation-rubric/
+// CONTEXT.md): this item's own verify (`! rg -q "resolveDiscovery"
+// src/runner/loop.mjs`) required removing the runner's OWN clarify-stage
+// sweep entirely (it replaced with the new DISCOVERY DISPATCH, a different
+// stage) — not just the tsk-1x3 D16 no-op path, the readLockedContext
+// trust-signal skip too, since that skip only ever fired THROUGH a
+// `resolveDiscovery` call, and loop.mjs no longer makes one at all for
+// stage `clarify`. A real, structural consequence, stated plainly: a
+// clarify-stage item with a real committed CONTEXT.md is no longer
+// auto-advanced by any runner sweep — only an explicit `fgos discover
+// --verdict ...` call (role `'session'`) can move it now, same as an item
+// with no trust signal at all. The clarify-pass settlement's `role` field
+// can therefore only ever read `'session'` today; no live path produces
+// `role: 'runner'` on it anymore. This test now advances the item past
+// clarify itself (mirroring the one live way left) before proving what IS
+// still real: the decompose sweep + dispatch chain the same runOnce pass.
+test('runOnce: an item already advanced to decompose (via an explicit prior discover call, the only live path left post-tsk-5mj) still gets swept to executing and dispatched in the SAME runOnce pass; the clarify-pass settlement recorded at that prior call reads role "session"', async () => {
   const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
   const docsRef = 'docs/history/item-clarify';
   mkLockedContextFixture(repoRoot, docsRef, { mode: 'tiny' });
   seedItem(dir, { id: 'item-clarify', stage: 'clarify', verify: 'test -f output.txt', docsRef });
+  resolveDiscovery(dir, 'item-clarify', {}, 'session', { clear: true, verify: 'test -f output.txt' });
   const config = configFor(writeCommittingExecutor(scriptDir, counterFile));
 
   const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
-  assert.equal(result.outcome, 'drained', 'the clarify+decompose sweeps clear the item before the frontier dispatches it in the same pass');
+  assert.equal(result.outcome, 'drained', 'the decompose sweep clears the item before the frontier dispatches it in the same pass');
   assert.equal(result.dispatched[0].outcome, 'awaiting-approval');
   assert.equal(result.dispatched[0].id, 'item-clarify');
   const view = listWork(dir);
   assert.equal(view.work['item-clarify'].stage, 'executing');
-  // must_haves truth 4: the clarify-pass settlement (cell 1's re-guard on
-  // from === 'clarify') still fires even though clarify's own destination is
-  // now `decompose`, not `executing` — this is what proves the re-guard,
-  // not the eventual (decompose-driven) stage the item lands on.
   assert.equal(view.settlements['item-clarify'].length, 1);
   assert.equal(view.settlements['item-clarify'][0].kind, 'clarify-pass');
-  assert.equal(view.settlements['item-clarify'][0].role, 'runner');
+  assert.equal(view.settlements['item-clarify'][0].role, 'session');
 });
 
 // --- domain-aware sweeps (per base-workflow-model D2/D3): an unrecognized
@@ -421,7 +435,14 @@ test('runOnce clarify sweep advances a clarify item via its own committed CONTEX
 // (approach.md's rollback plan). Exercised here via a raw appended event,
 // bypassing addWork's validation on purpose. ---
 
-test('runOnce clarify+decompose sweeps fold an unrecognized item.domain to "coding" (fail-safe), logging a warning instead of throwing', async () => {
+// tsk-5mj D1/D6/D7 finding (see the test above): the clarify-stage sweep is
+// gone from loop.mjs entirely, so this item is advanced past clarify with a
+// direct `resolveDiscovery` call (the one live path left) before ever
+// reaching `runOnce` — the domain-fold behavior this test proves still gets
+// a real, live exercise from the DECOMPOSE sweep right after (unchanged
+// code, `domain: 'bogus-domain'` rides along on the item unaffected by the
+// stage move).
+test('runOnce decompose sweep folds an unrecognized item.domain to "coding" (fail-safe), logging a warning instead of throwing', async () => {
   const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
   const docsRef = 'docs/history/item-clarify';
   mkLockedContextFixture(repoRoot, docsRef, { mode: 'tiny' });
@@ -441,13 +462,14 @@ test('runOnce clarify+decompose sweeps fold an unrecognized item.domain to "codi
       docsRef,
     },
   });
+  resolveDiscovery(dir, 'item-clarify', {}, 'session', { clear: true, verify: 'test -f output.txt' });
   const config = configFor(writeCommittingExecutor(scriptDir, counterFile));
   const lines = [];
   const capture = (msg) => lines.push(msg);
 
   const result = await runOnce({ repoRoot, config, worktreeDir, log: capture });
 
-  assert.equal(result.outcome, 'drained', 'the sweeps still clear the item despite the unrecognized domain');
+  assert.equal(result.outcome, 'drained', 'the decompose sweep still clears the item despite the unrecognized domain');
   assert.equal(result.dispatched[0].id, 'item-clarify');
   assert.ok(
     lines.some((line) => /unrecognized domain "bogus-domain"/.test(line)),
@@ -486,11 +508,12 @@ test('runOnce clarify+decompose sweeps never touch a synthetic-domain item with 
   assert.ok(!events.some((e) => e.type === 'work.discovery' || e.type === 'work.stage'));
 });
 
-test('runOnce clarify+decompose sweeps still fire normally for a coding-domain item at stage "clarify" (no behavior change for coding)', async () => {
+test('runOnce decompose sweep still fires normally for a coding-domain item advanced to decompose (no behavior change for coding)', async () => {
   const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
   const docsRef = 'docs/history/item-coding-clarify';
   mkLockedContextFixture(repoRoot, docsRef, { mode: 'tiny' });
   seedItem(dir, { id: 'item-coding-clarify', stage: 'clarify', verify: 'test -f output.txt', docsRef });
+  resolveDiscovery(dir, 'item-coding-clarify', {}, 'session', { clear: true, verify: 'test -f output.txt' });
   const config = configFor(writeCommittingExecutor(scriptDir, counterFile));
 
   const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });

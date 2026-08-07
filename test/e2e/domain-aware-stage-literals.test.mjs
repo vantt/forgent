@@ -328,13 +328,25 @@ test('domain-aware discovered-from addWork inherits parent domain+stage', () => 
     }),
   );
 
+  // tsk-5mj D1/D6/D7 finding (docs/history/fanout-and-delegation-rubric/
+  // CONTEXT.md): this item's own verify (`! rg -q "resolveDiscovery"
+  // src/runner/loop.mjs`) removed the runner's clarify-stage sweep
+  // ENTIRELY — a cross-domain mechanism (it used `stageForStep(domain,
+  // 'Clarify')` generically, serving every domain, not just coding's own
+  // `discovery`/`exploring` stages this item adds). A real, plainly-stated
+  // consequence: a triage-domain item at its own Clarify-mapped stage
+  // ("triage") is no longer auto-advanced by any runner sweep either, same
+  // as a plain coding item — only an explicit `fgos discover --verdict
+  // ...` call moves it now. This test advances it that way instead of via
+  // the (now-gone) trust-signal sweep.
   mkLockedContextFixture(repoRoot, docsRef);
   const triageItem = submit(repoRoot, 'Cross-domain regression fixture item for discovered-from', { domain: 'triage', docsRef });
   assert.equal(triageItem.domain, 'triage');
-  assert.equal(
-    fgos(repoRoot, ['gate-approve', triageItem.id, '--gate', 'contextApprove', '--actor', 'bypass', '--verify', 'test -f triage-output.txt && echo TRIAGE_OK']).status,
-    0,
-  );
+
+  const discovered1 = fgos(repoRoot, ['discover', triageItem.id, '--verdict', 'clear', '--verify', 'test -f triage-output.txt && echo TRIAGE_OK']);
+  assert.equal(discovered1.status, 0, `discover failed: ${discovered1.stderr}`);
+  const decomposed1 = fgos(repoRoot, ['decompose', triageItem.id, '--verdict', 'pass-through', '--reason', 'single fixture item, no split needed']);
+  assert.equal(decomposed1.status, 0, `decompose failed: ${decomposed1.stderr}`);
 
   const first = runner(repoRoot, ['--once']);
   assert.equal(first.status, 0, `--once failed: ${first.stderr}`);
@@ -361,28 +373,34 @@ test('runner sweep: a "triage" fixture-domain item at its own Clarify-mapped sta
   assert.equal(fgos(repoRoot, ['init']).status, 0);
   writeRunnerConfig(repoRoot, writeCommittingWorkerExecutor(scriptDir));
 
+  // tsk-5mj D1/D6/D7 finding (see the discovered-from test above): both
+  // items are advanced past their own domain's Clarify-mapped stage via an
+  // explicit `fgos discover`/`fgos decompose` pair now — the trust-signal
+  // runner sweep this test used to rely on is gone (this item's own verify
+  // required removing every `resolveDiscovery` call from loop.mjs, and that
+  // sweep was the cross-domain mechanism serving triage same as coding).
+  // The real thing this test still proves — a triage-domain item crossing
+  // its OWN stage names never wedges the sweep for an unrelated coding item
+  // in the same tick — is unaffected: both still reach dispatch through the
+  // SAME parallel drain-run below, unchanged code.
   mkLockedContextFixture(repoRoot, triageDocsRef);
   const triageItem = submit(repoRoot, 'Cross-domain regression fixture item', { domain: 'triage', docsRef: triageDocsRef });
   assert.equal(triageItem.stage, 'triage');
-  assert.equal(
-    fgos(repoRoot, ['gate-approve', triageItem.id, '--gate', 'contextApprove', '--actor', 'bypass', '--verify', 'test -f triage-output.txt && echo TRIAGE_OK']).status,
-    0,
-  );
+  assert.equal(fgos(repoRoot, ['discover', triageItem.id, '--verdict', 'clear', '--verify', 'test -f triage-output.txt && echo TRIAGE_OK']).status, 0);
+  assert.equal(fgos(repoRoot, ['decompose', triageItem.id, '--verdict', 'pass-through', '--reason', 'single fixture item, no split needed']).status, 0);
 
   mkLockedContextFixture(repoRoot, codingDocsRef);
   const codingItem = submit(repoRoot, 'An unrelated plain coding item, same sweep', { docsRef: codingDocsRef });
   assert.equal(codingItem.stage, 'clarify');
-  assert.equal(
-    fgos(repoRoot, ['gate-approve', codingItem.id, '--gate', 'contextApprove', '--actor', 'bypass', '--verify', 'test -f output.txt && echo CODE_OK']).status,
-    0,
-  );
+  assert.equal(fgos(repoRoot, ['discover', codingItem.id, '--verdict', 'clear', '--verify', 'test -f output.txt && echo CODE_OK']).status, 0);
+  assert.equal(fgos(repoRoot, ['decompose', codingItem.id, '--verdict', 'pass-through', '--reason', 'single fixture item, no split needed']).status, 0);
 
-  // Before tsk-3xo's fix: resolveDiscovery's moveStage(to:'decompose',
-  // expectedStage:'clarify', ...) call for the triage item would throw
+  // Before tsk-3xo's fix: a stage-move call for the triage item would throw
   // FsmError('precondition') (neither literal is a real stage name in the
-  // triage domain's own transition table) -- caught by runOnce's outer
-  // catch and turned into outcome 'halted' for this WHOLE --once call, so
-  // codingItem would never reach dispatch in the same tick either.
+  // triage domain's own transition table) -- this test's own real proof is
+  // that the two `discover`/`decompose` calls above (and the dispatch
+  // below) all succeed for triage's own stage names, never a coding
+  // literal.
   const first = runner(repoRoot, ['--once']);
   assert.equal(first.status, 0, `--once failed (this is exactly the pre-fix whole-tick halt if non-zero): ${first.stderr}`);
 

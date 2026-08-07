@@ -447,6 +447,77 @@ test('e2e stage-decompose (c) ambiguous verdict: an explicit decompose --verdict
   assert.equal(view.work[submitted.id].stage, 'decompose');
 });
 
+// --- stage-discovery e2e (tsk-5mj D1/D6/D7): the runner dispatches a
+// stage:discovery item to a real worker running fgos-researching, via the
+// same spawnWorker/createDispatchWorktree pair stage:executing already
+// uses. No verdict to gate this — discovery is a pure machine-alone pass
+// (D3); the item unconditionally advances discovery -> exploring once
+// dispatch settles. -----------------------------------------------------
+
+/** A fake research worker: writes RESEARCH.md under the item's own feature
+ * dir and commits it on the dispatch branch -- proves the runner actually
+ * checked the worker out on an isolated worktree/branch (same discipline
+ * writeCommittingExecutor already proves for stage:executing), never that
+ * fgos-researching's own real content shape is followed (out of this
+ * item's scope -- that skill's own job). */
+function writeResearchWorkerExecutor(scriptDir, featureDir) {
+  const scriptPath = path.join(scriptDir, 'research-worker-executor.mjs');
+  fs.writeFileSync(
+    scriptPath,
+    `
+import fs from 'node:fs';
+import { execFileSync } from 'node:child_process';
+fs.mkdirSync(${JSON.stringify(featureDir)}, { recursive: true });
+fs.writeFileSync(${JSON.stringify(path.posix.join(featureDir, 'RESEARCH.md'))}, '## Round 1\\n\\nFound: nothing blocking.\\n');
+execFileSync('git', ['add', ${JSON.stringify(path.posix.join(featureDir, 'RESEARCH.md'))}]);
+execFileSync('git', ['commit', '-q', '-m', 'research: round 1']);
+`,
+  );
+  return scriptPath;
+}
+
+test('e2e stage-discovery: --once dispatches a stage:discovery item to a real worker (isolated worktree/branch), which writes+commits RESEARCH.md; the item advances discovery -> exploring, status stays todo (never claimed/proposed)', () => {
+  const repoRoot = initTempRepo();
+  const scriptDir = mkTempDir('fgos-runner-e2e-discovery-dispatch-');
+  const featureDir = 'docs/history/discovery-dispatch-item';
+
+  assert.equal(fgos(repoRoot, ['init']).status, 0);
+  writeRunnerConfig(repoRoot, writeResearchWorkerExecutor(scriptDir, featureDir));
+
+  add(repoRoot, 'item-research', { stage: 'discovery', verify: 'test -f later.txt' });
+  assert.equal(stateView(repoRoot).work['item-research'].stage, 'discovery');
+
+  const result = runner(repoRoot, ['--once']);
+  assert.equal(result.status, 0, `--once failed: ${result.stderr}`);
+
+  const view = stateView(repoRoot);
+  const item = view.work['item-research'];
+  assert.equal(item.stage, 'exploring', 'the item advanced discovery -> exploring once the research worker finished');
+  assert.equal(item.status, 'todo', 'discovery dispatch never claims/proposes -- exploring is the next stop, not a terminal one');
+  assert.equal(branchExists(repoRoot, 'fgw/item-research'), true, 'the worker ran on its own real dispatch branch');
+  assert.match(branchLog(repoRoot, 'fgw/item-research'), /research: round 1/);
+});
+
+test('e2e stage-discovery fail-safe: a worker that crashes leaves the item at stage:discovery, status:todo for the next sweep to retry -- never stuck, never silently advanced', () => {
+  const repoRoot = initTempRepo();
+  const scriptDir = mkTempDir('fgos-runner-e2e-discovery-dispatch-crash-');
+  const crashingScript = path.join(scriptDir, 'crashing-executor.mjs');
+  fs.writeFileSync(crashingScript, `process.exit(1);`);
+
+  assert.equal(fgos(repoRoot, ['init']).status, 0);
+  writeRunnerConfig(repoRoot, crashingScript);
+
+  add(repoRoot, 'item-research-crash', { stage: 'discovery', verify: 'test -f later.txt' });
+
+  const result = runner(repoRoot, ['--once']);
+  assert.equal(result.status, 0, `--once must still exit 0 -- one item's failed research dispatch never halts the whole tick: ${result.stderr}`);
+
+  const view = stateView(repoRoot);
+  const item = view.work['item-research-crash'];
+  assert.equal(item.stage, 'discovery', 'left exactly where it was for the next sweep to retry');
+  assert.equal(item.status, 'todo');
+});
+
 // --- stage-decompose S2-pull e2e: cửa pull take/return through real fgos +
 // fgos-runner binaries (stage-decompose-4, cell action (5)) ----------------
 
