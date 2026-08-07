@@ -135,9 +135,64 @@ real greps against the actual file contents, not just review — including
 a negative check that the fallback-lane addition didn't accidentally
 reintroduce the old inline mode-gate text D1 had deliberately removed.
 
+## Second follow-up (`tsk-59a`): the mode→lane rename left a real regression, not just a docs gap
+
+A second independent review round, after `tsk-da1` merged, found five
+more issues — the first a genuine functional regression, not just a
+prose gap:
+
+1. **Real regression: a literal-token match broke silently.**
+   `decompose.mjs:675`'s regex needs the literal token `Mode:` present in
+   `plan.md` to skip an unnecessary model call for a `tiny`/`small` item
+   — a cheap mechanical shortcut. `fgos-planning`'s own Bootstrap step,
+   after the mode→lane terminology rename (the D1 move this doc already
+   describes), had stopped instructing sessions to write that literal
+   `Mode:` line at all — it now wrote lane information under different
+   wording. Measured against the real corpus: 25 of 153 real `plan.md`
+   files that should have matched no longer did, silently falling through
+   to the more expensive model-call path every time. This is the kind of
+   regression that costs real money/latency per occurrence without ever
+   throwing an error — nothing crashes, it just gets slower on every
+   affected item. Fixed by restoring the instruction to write the exact
+   literal `Mode: <lane>` line, keeping the mode→lane terminology rename
+   everywhere else.
+2. **The same broken `fgos add` example from `tsk-da1` existed
+   untouched in a second skill file.** `fgos-exploring/SKILL.md:196` had
+   the identical broken-command bug `tsk-da1` had just fixed in
+   `fgos-planning`'s own copy — nobody had checked whether the same
+   pattern was duplicated elsewhere. Fixed the same way: a command that
+   actually runs.
+3. **`tsk-da1`'s own fallback-lane addition (D1-follow-up gap 3 above)
+   quietly dropped real logic while claiming to be "the exact same
+   rule."** The fallback computed the lane locally when entered directly,
+   but left out the tie-breaker and the enumeration hard-gate flags that
+   `fgos-routing`'s real Mode-gate section actually has — a lossy
+   restatement, not a faithful mirror. Fixed by pointing the fallback
+   directly at `fgos-routing`'s own Mode-gate section instead of
+   re-describing it inline, so there's one canonical copy of the real
+   rule rather than two that can drift.
+4. **A stale attribution survived the D1 move.** `fgos-validating`
+   still referred to "`fgos-planning`'s flag count" — after D1 moved the
+   mode gate (and its flag-counting logic) to `fgos-routing`, that
+   attribution should have moved with it. Fixed to name the right owner.
+5. **A worked example referenced a variable before it was assigned.**
+   The split-step example command used `--dir "$root"`, but `$root` was
+   only actually assigned in the separate Gate block further down the
+   same file — a reader following the split-step example literally would
+   hit an undefined variable. Fixed by assigning `$root` directly inside
+   the example that uses it.
+
+Applied to both dual-root skill copies (`.claude/skills/` and
+`.agents/skills/`), matching this repo's existing dual-root convention.
+Verified with real greps plus a real test run
+(`node --test test/intake/decompose.test.mjs`), not just review — the
+regression in particular was confirmed by measuring the real corpus
+match rate, not just re-reading the regex.
+
 ---
 
 **Source:** `docs/history/fgos-planning-mode-gate-and-gate-traceability/CONTEXT.md`
 (tsk-5ay, D1-D2); work-item capture via `fgos check tsk-5ay`. Follow-up
 fixes: `tsk-da1` (`fgos check tsk-da1`), filed as an independent code
-review after `tsk-3uz`/`tsk-5ay` merged.
+review after `tsk-3uz`/`tsk-5ay` merged; `tsk-59a` (`fgos check tsk-59a`),
+a second independent review round after `tsk-da1` merged.
