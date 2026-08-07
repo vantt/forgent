@@ -220,6 +220,43 @@ the override boundary honest — the same "never silently overridden"
 stance this document already states for the verdict itself, now extended
 to cover the park status a prior dispute round leaves behind.
 
+## The mirror gap (`tsk-60r`): a genuinely SUCCESSFUL re-run also left a stale park behind
+
+`tsk-nfa` above covers `--force` overriding a disputed verdict without
+clearing the resulting park. `tsk-60r` found the mirror case: a park left
+by a dispute, then resolved the *ordinary* way — no `--force` involved at
+all — still went stale.
+
+Repro: `fgos discover <id> --verdict clear --verify "<placeholder>"`
+where the verify is a non-concrete placeholder gets disputed by the
+second pass (`outcome: verify-disputed`), auto-parking the item to
+`status: awaiting-human` with the round-1/round-2 dispute text recorded
+as the `ask`. Fixing the verify to a real, runnable command and re-
+running `fgos discover <id> --verdict clear --verify "<real command>"`
+returns `outcome: clear` and genuinely advances the stage (e.g.
+`clarify` → `decompose`) — but the item's `status` field stayed stuck at
+`awaiting-human`, with the now-stale dispute `ask` still attached. A
+manual `fgos answer <id> --text ...` was still required to unpark it,
+even though the underlying dispute the park existed for had already been
+resolved by the successful re-run itself.
+
+This mattered beyond mere tidiness: `fgos-coding-driving`'s own hard rule
+treats any `status: awaiting-human` as a live human-question stop
+(`parkReasonForStatus === 'human-question'`) that a driving loop must
+never answer on its own. A headless/automated driving loop would
+incorrectly halt on an already-resolved dispute, mistaking a stale
+leftover park for a real open question — the opposite failure direction
+from `tsk-nfa`'s gap, but the same underlying cause: nothing connected a
+successful `resolveDiscovery` outcome back to clearing the park state a
+prior round of the very same function had set.
+
+Fixed to clear the stale `awaiting-human` park automatically once
+`resolveDiscovery` itself produces a genuine `clear` outcome on a retry —
+the resolution came from the same call site that caused the park, so
+clearing it here doesn't cross the ask/answer boundary the way `--force`
+auto-resuming would have; it's the natural continuation of the same
+discover call succeeding where it previously disputed.
+
 ## Second live contradiction (`tsk-25g`): single-round context wasn't enough, full history was
 
 `tsk-5cf`'s stabilization fix above (single-most-recent-round
