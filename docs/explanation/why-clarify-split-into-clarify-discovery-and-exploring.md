@@ -183,6 +183,21 @@ change at all to keep behaving correctly. This confirmed the fix could
 stay scoped to the stage-graph definition itself, without widening the
 footprint into files whose behavior the new stages didn't actually touch.
 
+## Implementation (`tsk-5mj`, P5 of this design): the runner dispatches `discovery` the same way it already dispatches `executing`
+
+The final piece wired `fgos-runner` to actually hand off `discovery`-
+stage items to a worker running `fgos-researching`, via the same
+`spawnWorker`/`createWorktree` machinery already used for `executing`
+work (D6/D1 above) — no new dispatch mechanism, reusing the existing
+worker-spawn path end to end. The old call site —
+`resolveDiscovery` at `loop.mjs:1031`, invoked with no caller verdict —
+was removed outright, confirmed by the item's own verify asserting
+`! rg -q "resolveDiscovery" src/runner/loop.mjs`. This is the concrete
+runner-side counterpart to D16 above (`resolveDiscovery`'s no-verdict
+branch becoming a safe no-op): once the runner no longer calls
+`resolveDiscovery` at all for this path, dispatching the real research
+skill through the worker mechanism is what actually replaced it.
+
 ## Implementation (`tsk-1x3`, P3 of this design): `judge-executor.mjs` was deleted outright, not just unused
 
 The verb-reversion + judge-removal half of this design (D1, D9, D6 above)
