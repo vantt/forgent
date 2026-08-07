@@ -136,12 +136,15 @@ function worktreeCount(repoRoot) {
 }
 
 function writeRunnerConfig(repoRoot, executorScript) {
+  fs.mkdirSync(path.join(repoRoot, '.fgos'), { recursive: true });
   fs.writeFileSync(
-    path.join(repoRoot, '.fgos-runner.json'),
+    path.join(repoRoot, '.fgos', 'config.json'),
     JSON.stringify({
-      executor: { command: process.execPath, args: [executorScript, '{prompt}', '--model', '{model}'] },
-      models: { light: 'haiku', standard: 'sonnet', heavy: 'opus' },
-      timeoutMs: 15000,
+      runner: {
+        executor: { command: process.execPath, args: [executorScript, '{prompt}', '--model', '{model}'] },
+        models: { light: 'haiku', standard: 'sonnet', heavy: 'opus' },
+        timeoutMs: 15000,
+      },
     }),
   );
 }

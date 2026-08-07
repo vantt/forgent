@@ -277,13 +277,18 @@ function parseWaitFlags(flags, verbName) {
   return { noWait, waitMs };
 }
 
-// Shared --timeout/--no-timeout resolution for return/approve/catchup
-// (tsk-3vo D2/D3/D5): omitting both falls back to .fgos-runner.json's own
-// timeoutMs -- the same value and the same runGoalCheck primitive the
-// runner loop already uses at loop.mjs -- instead of silently running
-// verify unbounded, which used to leave a hung verify command with no
-// diagnosis and the main-checkout lock held until TTL expiry. --no-timeout
-// is the only way left to opt into an actually-unbounded verify run.
+// Shared --timeout/--no-timeout resolution for return/approve/sync-root/
+// catchup (tsk-3vo D2/D3/D5): omitting both falls back to the runner
+// config's own timeoutMs -- the same value and the same runGoalCheck
+// primitive the runner loop already uses at loop.mjs -- instead of
+// silently running verify unbounded, which used to leave a hung verify
+// command with no diagnosis and the main-checkout lock held until TTL
+// expiry. --no-timeout is the only way left to opt into an actually-
+// unbounded verify run. Every call site passes `path.dirname(dir)`, not
+// `process.cwd()` (tsk-5hv, found by fgos-code-implement): same
+// worktree-blindness fix as `discover`/`decompose` above -- `dir` already
+// reflects `--dir` when a skill passes it explicitly, `process.cwd()`
+// never does.
 function resolveVerifyTimeoutMs(verb, flags, repoRoot) {
   const timeoutFlag = optionalField(
     flags.timeout,
@@ -1078,9 +1083,18 @@ async function runVerb(verb, flags, positional, dir) {
       // An explicit --config path stays a loud, unmodified failure on ENOENT
       // (loadRunnerConfig); only the default, unflagged path bootstraps a
       // missing config (D1/D3, ensureRunnerConfigForDir — tsk-5vf D1/D2).
+      // `path.dirname(dir)`, not `process.cwd()` (tsk-5hv, found by
+      // fgos-code-implement): `dir` already reflects `--dir` when given
+      // (every skill's own hard rule: resolve the main checkout and pass
+      // it explicitly) or `process.cwd()` when omitted (dataDir()'s own
+      // documented cwd-strict contract) -- reusing it here instead of a
+      // bare `process.cwd()` is what keeps this call correct for a
+      // worktree-resident session, since `.fgos/config.json` is
+      // unconditionally wiped from every freshly-created worktree
+      // (ADR0020) and a bare cwd would silently resolve to nothing there.
       const cfg = flags.config
         ? loadRunnerConfig(flags.config)
-        : ensureRunnerConfigForDir(process.cwd());
+        : ensureRunnerConfigForDir(path.dirname(dir));
       const callerVerdict = parseDiscoverCallerVerdict(flags);
       return resolveDiscovery(dir, id, cfg, 'session', callerVerdict);
     }
@@ -1101,9 +1115,11 @@ async function runVerb(verb, flags, positional, dir) {
       if (stage !== decomposeStage) {
         throw new StoreError('validation', `decompose: work "${id}" is at stage "${stage}", not "${decomposeStage}" -- use "fgos discover ${id}" instead.`);
       }
+      // path.dirname(dir), not process.cwd() -- see the discover case above
+      // for why (tsk-5hv, found by fgos-code-implement).
       const cfg = flags.config
         ? loadRunnerConfig(flags.config)
-        : ensureRunnerConfigForDir(process.cwd());
+        : ensureRunnerConfigForDir(path.dirname(dir));
       const callerVerdict = parseDecomposeCallerVerdict(flags);
       return resolveDecompose(dir, id, cfg, 'session', callerVerdict);
     }
@@ -1729,7 +1745,7 @@ async function runVerb(verb, flags, positional, dir) {
     // only role, and it never reclaims a person's claim).
     // Request-class per D1: a pure read, never touches state.json. Reports
     // the configured gate-bypass level (docs/history/gate-bypass/CONTEXT.md
-    // D1-D5) — no CLI setter, mirroring .fgos-runner.json's own
+    // D1-D5) — no CLI setter, mirroring .fgos/config.json's own
     // edit-the-file-by-hand pattern.
     case 'gate-bypass': {
       return { level: readGateBypassLevel(dir) };
@@ -2228,7 +2244,7 @@ async function runVerb(verb, flags, positional, dir) {
     // doing->blocked + friction (mirrors the runner's own park path).
     case 'return': {
       const id = requireField(positional[0] ?? flags.id, 'return requires an id: fgos return <id> [--timeout <ms>|--no-timeout] [--no-new-commits-ok]');
-      const timeoutMs = resolveVerifyTimeoutMs('return', flags, process.cwd());
+      const timeoutMs = resolveVerifyTimeoutMs('return', flags, path.dirname(dir));
       // tsk-4on D1-D3: explicit escape hatch for work already fully done
       // BEFORE this claim (e.g. a parent whose children's merged content
       // already sits on its own branch from a prior session) — return's
@@ -2561,7 +2577,7 @@ async function runVerb(verb, flags, positional, dir) {
     // the settlement, the merge itself is only the mechanical consequence).
     case 'approve': {
       const id = requireField(positional[0] ?? flags.id, 'approve requires an id: fgos approve <id> [--timeout <ms>|--no-timeout]');
-      const timeoutMs = resolveVerifyTimeoutMs('approve', flags, process.cwd());
+      const timeoutMs = resolveVerifyTimeoutMs('approve', flags, path.dirname(dir));
       const { noWait, waitMs } = parseWaitFlags(flags, 'approve');
       const runMerge = (mergeFn) => (noWait ? mergeFn() : withLockRetry(mergeFn, { waitMs }));
 
@@ -3107,7 +3123,7 @@ async function runVerb(verb, flags, positional, dir) {
         );
       }
 
-      const timeoutMs = resolveVerifyTimeoutMs('sync-root', flags, process.cwd());
+      const timeoutMs = resolveVerifyTimeoutMs('sync-root', flags, path.dirname(dir));
       const { noWait, waitMs } = parseWaitFlags(flags, 'sync-root');
       const runMerge = (mergeFn) => (noWait ? mergeFn() : withLockRetry(mergeFn, { waitMs }));
 
@@ -3328,7 +3344,7 @@ async function runVerb(verb, flags, positional, dir) {
     // verify -> commit-or-abort, verify strictly before any commit).
     case 'catchup': {
       const id = requireField(positional[0] ?? flags.id, 'catchup requires an id: fgos catchup <id> [--timeout <ms>|--no-timeout]');
-      const timeoutMs = resolveVerifyTimeoutMs('catchup', flags, process.cwd());
+      const timeoutMs = resolveVerifyTimeoutMs('catchup', flags, path.dirname(dir));
 
       const view = listWork(dir);
       const item = view.work[id];
@@ -3690,11 +3706,7 @@ async function runVerb(verb, flags, positional, dir) {
     // ensures the shared config file (`.fgos/config.json`) exists and has
     // every current default key from EVERY registered `registerConfigDefault`
     // entry, via `ensureSharedConfigDefaults` (the one write path allowed
-    // here; `doctor`, unlike `setup`, never calls it). This is also the verb
-    // that performs the actual move off the legacy `.fgos-runner.json`
-    // (tsk-5vf D2) — `ensureSharedConfigDefaults` reads it as a fallback via
-    // `readSharedConfig` and writes the assembled result to the NEW location,
-    // never deleting the old file.
+    // here; `doctor`, unlike `setup`, never calls it).
     case 'setup': {
       const repoRoot = process.cwd();
       const scriptPath = integrationScriptPath();

@@ -116,7 +116,7 @@ export const EXIT_BUSY = 6;
 
 export const LOCK_FILE = 'runner.lock';
 
-/** Two-tier parallelism defaults (D10), applied when `.fgos-runner.json`
+/** Two-tier parallelism defaults (D10), applied when the runner config
  * declares no `parallel` block at all — every existing config keeps working
  * with zero changes. `maxRoots` caps concurrent ROOTS in flight; the wave a
  * single poll dispatches is bounded by `maxRoots * maxLeavesPerRoot`, and

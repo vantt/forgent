@@ -25,8 +25,8 @@ changed. That's why the branch logic now lives in one shared file instead.
 
 1. **Wire the config/registration steps first**, following
    `docs/how-to/wire-a-skills-classify-step-through-an-agent-executor-capacity.md`
-   steps 1–3 (unchanged, still skill-agnostic): add a `.fgos/config.json`/
-   `.fgos-runner.json` `runner.capacities.<id>` entry, `fgos tool register`
+   steps 1–3 (unchanged, still skill-agnostic): add a `.fgos/config.json`
+   `runner.capacities.<id>` entry, `fgos tool register`
    it, and confirm it resolves via `dispatch.mjs`'s `resolve` CLI
    subcommand.
 

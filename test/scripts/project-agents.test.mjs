@@ -34,7 +34,7 @@ test('tool-scope maps exactly into the generated tools: frontmatter -- no silent
   assert.equal(toolsLine, 'tools: Read, Grep, Bash');
 });
 
-test('model_tier resolves through the same tier->model map .fgos-runner.json/dispatch.mjs already use', () => {
+test('model_tier resolves through the same tier->model map the shared config file/dispatch.mjs already use', () => {
   const markdown = projectAgentMarkdown('test-agent', VALID_YAML, DEFAULT_MODELS);
   const modelLine = markdown.split('\n').find((line) => line.startsWith('model:'));
   assert.equal(modelLine, 'model: haiku');

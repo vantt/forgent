@@ -63,7 +63,8 @@ function writeDisagreeingRunnerConfig(cwd, reason, firstPassVerdict = { clear: t
     models: { light: 'haiku', standard: 'sonnet', heavy: 'opus' },
     timeoutMs: 5000,
   };
-  fs.writeFileSync(path.join(cwd, '.fgos-runner.json'), JSON.stringify(cfg));
+  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ runner: cfg }));
 }
 
 test('discover --verdict clear without --force still parks in awaiting-human on a disputed verify (regression: unchanged default)', () => {

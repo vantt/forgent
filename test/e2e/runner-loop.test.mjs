@@ -108,14 +108,32 @@ function events(cwd) {
 }
 
 function writeRunnerConfig(repoRoot, executorScript) {
+  fs.mkdirSync(path.join(repoRoot, '.fgos'), { recursive: true });
   fs.writeFileSync(
-    path.join(repoRoot, '.fgos-runner.json'),
+    path.join(repoRoot, '.fgos', 'config.json'),
+    JSON.stringify({
+      runner: {
+        executor: { command: process.execPath, args: [executorScript, '{prompt}', '--model', '{model}'] },
+        models: { light: 'haiku', standard: 'sonnet', heavy: 'opus' },
+        timeoutMs: 15000,
+      },
+    }),
+  );
+}
+
+/** For the explicit `--config <path>` tests below (independent of the
+ * shared `.fgos/config.json` -- `--config` names an arbitrary file). */
+function writeExplicitRunnerConfigFile(repoRoot, executorScript) {
+  const configPath = path.join(repoRoot, 'runner-config.json');
+  fs.writeFileSync(
+    configPath,
     JSON.stringify({
       executor: { command: process.execPath, args: [executorScript, '{prompt}', '--model', '{model}'] },
       models: { light: 'haiku', standard: 'sonnet', heavy: 'opus' },
       timeoutMs: 15000,
     }),
   );
+  return configPath;
 }
 
 function branchLog(repoRoot, branch) {
@@ -857,14 +875,14 @@ test('e2e crash-idempotency: runner killed mid-item (after doing, before propose
 
   assert.equal(fgos(repoRoot, ['init']).status, 0);
   add(repoRoot, 'item-crash', { verify: 'test -f output.txt' });
-  writeRunnerConfig(repoRoot, writeParentKillingExecutor(scriptDir, 'output.txt'));
+  const configPath = writeExplicitRunnerConfigFile(repoRoot, writeParentKillingExecutor(scriptDir, 'output.txt'));
 
   // First --once: the worker commits, then SIGKILLs its own parent (the
   // runner) before the runner can write `proposed`. The runner process
   // dies mid-dispatch — its own worktree teardown (in a `finally`) never
   // runs, so `fgw/item-crash` is left checked out at whatever path the
   // runner allocated for this attempt.
-  const first = runner(repoRoot, ['--once', '--config', path.join(repoRoot, '.fgos-runner.json')]);
+  const first = runner(repoRoot, ['--once', '--config', configPath]);
   // Killed by SIGKILL: no graceful exit code, no controlled stdout.
   assert.equal(first.status, null);
   assert.equal(first.signal, 'SIGKILL');
@@ -878,14 +896,14 @@ test('e2e crash-idempotency: runner killed mid-item (after doing, before propose
   // Second --once: the killed runner left its runner.lock behind, so this
   // run cleans the stale lock and yields busy (exit 6) — the reclaimer
   // never acquires on the path it just deleted (clean-and-yield).
-  const second = runner(repoRoot, ['--once', '--config', path.join(repoRoot, '.fgos-runner.json')]);
+  const second = runner(repoRoot, ['--once', '--config', configPath]);
   assert.equal(second.status, 6, `expected busy (stale lock cleaned): ${second.stderr}`);
   assert.equal(fs.existsSync(path.join(repoRoot, '.fgos', 'runner.lock')), false);
 
   // Third --once: acquires a clean lock; startup reap resolves the stale
   // `doing` item to a defined state (proposed, since the branch's commit
   // passes verify) — crash recovery lands within two ticks.
-  const third = runner(repoRoot, ['--once', '--config', path.join(repoRoot, '.fgos-runner.json')]);
+  const third = runner(repoRoot, ['--once', '--config', configPath]);
   assert.equal(third.status, 0, `post-clean --once did not recover cleanly: ${third.stderr}`);
 
   const finalStatus = stateView(repoRoot).work['item-crash'].status;

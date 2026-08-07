@@ -180,21 +180,6 @@ test('ensureSharedConfigDefaults on an already-complete shared file does not rew
   assert.equal(fs.statSync(sharedPath).mtimeMs, before);
 });
 
-test('ensureSharedConfigDefaults migrates a legacy .fgos-runner.json into the runner section without deleting the old file', () => {
-  const dir = mkTempDir();
-  const legacyRunner = { executor: { command: 'claude', args: ['{prompt}'] }, models: { standard: 'sonnet' }, timeoutMs: 5000 };
-  fs.writeFileSync(path.join(dir, '.fgos-runner.json'), JSON.stringify(legacyRunner));
-
-  const { config } = ensureSharedConfigDefaults(dir);
-
-  assert.equal(config.runner.executor.command, 'claude');
-  assert.equal(config.runner.timeoutMs, 5000);
-  // Defaults fill in whatever the legacy file didn't have (e.g. "parallel").
-  assert.deepEqual(config.runner.parallel, DEFAULT_RUNNER_CONFIG.parallel);
-  assert.equal(fs.existsSync(path.join(dir, '.fgos-runner.json')), true, 'the legacy file is never deleted');
-  assert.equal(fs.existsSync(path.join(dir, '.fgos', 'config.json')), true, 'the real move actually happened');
-});
-
 // ─── spec/registry agreement. Data Dictionary #7 and #7b used to say the
 // list "grows without a spec update whenever a module registers a new one",
 // which let it rot: a module registered `claude-plugin-marketplace` as both

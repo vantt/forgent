@@ -12,7 +12,7 @@ Point at this file from a consumer `SKILL.md` by relative path (e.g.
 `../_shared/capacity-dispatch-fallback.md`), filling in these three
 parameters where the consuming skill's own reasoning step lives:
 
-- **`<CAPACITY_ID>`** — the `.fgos/config.json`/`.fgos-runner.json`
+- **`<CAPACITY_ID>`** — the `.fgos/config.json`
   `runner.capacities.<id>` key this step dispatches through (real example:
   `submit-assist-classify`).
 - **`<PROMPT_TEMPLATE>`** — the fixed prompt text to send (so every
@@ -49,8 +49,8 @@ behavior below.
 ```bash
 root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
 node -e "
-const cfg = JSON.parse(require('node:fs').readFileSync('$root/.fgos-runner.json', 'utf8'));
-console.log(cfg.capacities?.['<CAPACITY_ID>'] ? 'configured' : 'not-configured');
+const cfg = JSON.parse(require('node:fs').readFileSync('$root/.fgos/config.json', 'utf8'));
+console.log(cfg.runner?.capacities?.['<CAPACITY_ID>'] ? 'configured' : 'not-configured');
 "
 ```
 

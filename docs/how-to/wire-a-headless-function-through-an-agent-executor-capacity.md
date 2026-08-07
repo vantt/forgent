@@ -13,10 +13,8 @@ cli-dispatch — already spawns a subprocess directly (e.g. via
 `spawnSync`/`resolveExecutorCommand`) with a hardcoded `tier`, and you want
 to give it an *optional* path to resolve through `capacities.<id>` instead
 (`.fgos/config.json`'s `runner.capacities.<id>` > `executors.<tier>` >
-`executor` precedence, `tsk-62v`; legacy `.fgos-runner.json` still read as
-a fallback for a project that hasn't run `fgos setup` since the move,
-`tsk-5vf` D2), while keeping today's behavior byte-identical when nothing
-is configured.
+`executor` precedence, `tsk-62v`), while keeping today's behavior
+byte-identical when nothing is configured.
 
 This is distinct from
 `docs/how-to/wire-a-skills-classify-step-through-an-agent-executor-capacity.md`,

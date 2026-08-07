@@ -94,14 +94,33 @@ as one piece, in this order:
    explicit `models` argument — it never exercises `readRunnerModels`/
    `REPO_ROOT`).
 
-   Fix: pass `resolveRepoRoot()` from `src/runner/paths.mjs` (already
-   exported, already the exact main-checkout-resolving helper
-   `dispatch.mjs` and five other modules use — no new helper) as the root
-   for the `.fgos/config.json` lookup specifically, while
-   `project-agents.mjs`'s own existing `REPO_ROOT` (`import.meta.dirname`-
-   based) stays exactly as-is for locating `agents/`/`.claude/agents/` —
-   those are git-tracked source directories that correctly follow the
-   worktree's own checked-out branch, unlike `.fgos/`.
+   Fix: pass a main-checkout-resolving helper as the root for the
+   `.fgos/config.json` lookup specifically, while `project-agents.mjs`'s
+   own existing `REPO_ROOT` (`import.meta.dirname`-based) stays exactly
+   as-is for locating `agents/`/`.claude/agents/` — those are git-tracked
+   source directories that correctly follow the worktree's own
+   checked-out branch, unlike `.fgos/`.
+
+   **Second correction (found during Implement itself, not by
+   fgos-validating — the plan's first fix was ALSO wrong):**
+   `resolveRepoRoot()` (`src/runner/paths.mjs`) does not actually resolve
+   the main checkout — tested live and confirmed it returns
+   `git rev-parse --show-toplevel`, which inside a worktree is the
+   worktree's OWN root, not its main checkout (its own doc comment says
+   "works correctly from inside a worktree", which is true for its actual
+   callers but not the same claim as "resolves to the main checkout" —
+   the plan conflated the two). The real fix: `resolveMainCheckoutRoot()`,
+   a NEW function added to `src/runner/paths.mjs` during this item
+   (`--git-common-dir`-based, extracted from `src/setup/registrations.mjs`'s
+   pre-existing `resolveMainCheckout`, which now delegates to it instead of
+   duplicating the git shell-out — avoids a circular import back into
+   `registrations.mjs` from `dispatch.mjs`/`project-agents.mjs`, both of
+   which needed the identical resolution and had the identical latent bug:
+   `dispatch.mjs`'s `resolveCapacityCli`/`decideCapacityCli` and
+   `bin/fgos.mjs`'s `discover`/`decompose` cases were ALSO calling
+   `ensureRunnerConfigForDir` with a worktree-blind root
+   — `resolveRepoRoot(cwd)` and a bare `process.cwd()` respectively — for
+   the exact same reason, fixed the same way here).
 5. `.claude/skills/_shared/capacity-dispatch-fallback.md` **and**
    `.agents/skills/_shared/capacity-dispatch-fallback.md` — identical
    edit, both files (confirmed byte-identical, hand-maintained, no
@@ -121,10 +140,18 @@ as one piece, in this order:
    `src/state/gate-bypass.mjs`, `src/runner/loop.mjs`,
    `src/runner/prompt-templates.mjs`, `bin/fgos.mjs` (3 spots) — reword
    historical/illustrative references to cite `.fgos/config.json` instead.
-   **Exception (locked in CONTEXT.md):** `src/intake/decompose.mjs`'s
-   dotfile-tokenizer example comment keeps `.fgos-runner.json` as an
-   illustrative dotfile name — it demonstrates generic tokenizer behavior
-   on dotfiles, not this file's existence.
+   **Exception (locked in CONTEXT.md, extended during Implement):**
+   `src/intake/decompose.mjs`'s dotfile-tokenizer example comment keeps
+   `.fgos-runner.json` as an illustrative dotfile name — it demonstrates
+   generic tokenizer behavior on dotfiles, not this file's existence. Its
+   own test file, `test/intake/decompose.test.mjs`, carries the same
+   exception for the same reason: its `findUncoveredLockedDecisions`
+   dotfile-tokenizer regression tests (`tsk-gio`, citing "the tsk-2ta
+   case") reproduce a real historical bug report that used
+   `.fgos-runner.json` as its motivating example — rewriting the filename
+   would lose that historical fidelity for no behavioral gain, since the
+   test exercises generic dotfile-tokenizing, not this item's config
+   resolution.
 8. `git rm .fgos-runner.json` (D2).
 9. Update the 17 test files CONTEXT.md enumerates. Each one's
    "legacy-file-present, shared-file-absent" fixture case either gets
@@ -145,7 +172,7 @@ so there is nothing for it to rank.
 |---|---|---|
 | `readSharedConfig()` legacy branch removed | MEDIUM (impact: 8 upstream, 5 direct) | `npm test` green on `test/config/shared-config-file.test.mjs`, `test/config/global-config.test.mjs`, `test/setup/registrations.test.mjs`, `test/runner/dispatch.test.mjs`, `test/runner/loop.test.mjs` — the 5 depth-1 callers `impact()` named |
 | `legacyRunnerConfigPath` export removed | MEDIUM (impact: 15 upstream across 3 depths) | item's own NEGATIVE verify clause — zero repo-wide hits for the literal string post-change (scoped exclusions per CONTEXT.md) |
-| `project-agents.mjs` direct-read bug closed, root resolved via `resolveRepoRoot()` not naive `REPO_ROOT` | LOW (impact: 2 upstream, contained), but a wrong root-resolution is invisible to today's tests (see Approach step 4 correction) | `test/scripts/project-agents.test.mjs` green + item's POSITIVE clause `grep -q 'resolveRepoRoot' scripts/project-agents.mjs && grep -q "runner/paths.mjs" scripts/project-agents.mjs` — pins the specific correct helper/import, not just the string "config.json" (which a broken naive-`REPO_ROOT` implementation would also contain) |
+| `project-agents.mjs` direct-read bug closed, root resolved via `resolveMainCheckoutRoot()` not naive `REPO_ROOT` (nor `resolveRepoRoot()`, the plan's own first, also-wrong fix attempt) | LOW (impact: 2 upstream, contained), but a wrong root-resolution is invisible to today's tests (see Approach step 4 correction) | `test/scripts/project-agents.test.mjs` green + item's POSITIVE clause `grep -q 'resolveMainCheckoutRoot' scripts/project-agents.mjs && grep -q "runner/paths.mjs" scripts/project-agents.mjs` — pins the specific correct helper/import, not just the string "config.json" (which a broken naive-`REPO_ROOT` implementation would also contain) |
 | Repo-root file deleted (D2) | LOW, but visible | item's POSITIVE clause `test ! -e .fgos-runner.json` |
 | Skill-prose fragment edit (2 identical files) | MEDIUM — prose, not statically provable at runtime | per `docs/how-to/write-verify-for-a-skill-prose-change.md`: POSITIVE (`grep -q 'config.json'` in both files) + repo-wide NEGATIVE is the correct and *sufficient* proof surface for a skill-prose change — no live agy/capacity-dispatch smoke run required as a blocking proof point here (that doc's standing rebuttal to `judgeVerifySemanticCorrectness`'s runtime-comprehension demand) |
 | Doc updates (~15 files) | LOW — prose only | reviewed for accuracy at PR time; `docs.maxLoc` respected; no automated proof beyond that |
@@ -186,7 +213,7 @@ Strengthened after `fgos-validating` round 1's FAIL (proof surface): the
 helper/import, not just the string "config.json":
 
 ```
-npm test && test ! -e .fgos-runner.json && grep -q 'resolveRepoRoot' scripts/project-agents.mjs && grep -q "runner/paths.mjs" scripts/project-agents.mjs && grep -q 'config.json' .claude/skills/_shared/capacity-dispatch-fallback.md && grep -q 'config.json' .agents/skills/_shared/capacity-dispatch-fallback.md && ! rg --hidden -l '\.fgos-runner\.json' --glob '!.git' --glob '!node_modules' --glob '!.claude/worktrees/**' --glob '!.fgos/events.jsonl*' --glob '!docs/history/**' --glob '!docs/decisions/**' --glob '!src/intake/decompose.mjs' .
+npm test && test ! -e .fgos-runner.json && grep -q 'resolveMainCheckoutRoot' scripts/project-agents.mjs && grep -q "runner/paths.mjs" scripts/project-agents.mjs && grep -q 'config.json' .claude/skills/_shared/capacity-dispatch-fallback.md && grep -q 'config.json' .agents/skills/_shared/capacity-dispatch-fallback.md && ! rg --hidden -l '\.fgos-runner\.json' --glob '!.git' --glob '!node_modules' --glob '!.claude/worktrees/**' --glob '!.fgos/events.jsonl*' --glob '!docs/history/**' --glob '!docs/decisions/**' --glob '!plans/reports/**' --glob '!src/intake/decompose.mjs' --glob '!test/intake/decompose.test.mjs' --glob '!docs/how-to/fix-fgos-write-rejected-merge-block.md' --glob '!docs/backlog.md' .
 ```
 
 ## Assumptions

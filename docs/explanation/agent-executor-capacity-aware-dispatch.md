@@ -9,9 +9,8 @@ one specific job meant editing dispatch code, not config.
 The goal: unify how forgent dispatches a "capacity" (an LLM/tool/composite
 unit of work) to the right backend/model/tool-scope, at the cheapest cost
 for adequate quality, through one config point — `capacities.<id>` in
-`.fgos/config.json`'s `runner` section (legacy `.fgos-runner.json` still
-read as a fallback for a project that hasn't run `fgos setup` since the
-move, `tsk-5vf` D2) — instead of per-skill hardcoded logic.
+`.fgos/config.json`'s `runner` section (the sole config source since
+`tsk-5hv` D1 retired the legacy fallback) — instead of per-skill hardcoded logic.
 
 ## The four pieces, and what each one actually proved
 

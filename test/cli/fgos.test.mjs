@@ -3038,7 +3038,8 @@ function writeRunnerConfig(cwd, verdict) {
     models: { light: 'haiku', standard: 'sonnet', heavy: 'opus' },
     timeoutMs: 5000,
   };
-  fs.writeFileSync(path.join(cwd, '.fgos-runner.json'), JSON.stringify(cfg));
+  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ runner: cfg }));
 }
 
 test("submit tags the new item with stage:'clarify', visible via list", () => {
@@ -3343,7 +3344,7 @@ test('discover with no id is rejected as validation, exit 4', () => {
   assert.equal(result.status, 4);
 });
 
-// str76-runner-bootstrap-e3: a fresh cwd with no .fgos-runner.json used to
+// str76-runner-bootstrap-e3: a fresh cwd with no runner config used to
 // crash `discover` with RunnerConfigError/ENOENT (the bug this feature
 // fixes) — it now bootstraps the D1 default config instead. PATH is
 // neutralized to exclude the real `claude` binary (baked-in default
@@ -4771,14 +4772,14 @@ test('return --timeout with a non-numeric or non-positive value is rejected as v
 // tsk-3vo D2/D3/D5: omitting --timeout on return/approve/catchup used to
 // mean an unbounded verify, silently diverging from the runner loop's own
 // runGoalCheck call (which always passes config.timeoutMs). It now falls
-// back to .fgos-runner.json's own timeoutMs instead -- --no-timeout is the
+// back to the runner config's own timeoutMs instead -- --no-timeout is the
 // only way left to actually opt into unbounded. `hang.mjs` (same style as
 // goal-check.test.mjs's own timeout test) sleeps 1.5s, well past the 200ms
 // config timeout below, so a fallback that fires kills it and a real
 // --no-timeout override does not.
 function writeShortRunnerConfig(cwd, timeoutMs) {
   // Every DEFAULT_RUNNER_CONFIG key present (dispatch.mjs) so
-  // ensureRunnerConfig's mergeConfigDefaults finds nothing missing to
+  // ensureRunnerConfigForDir's mergeConfigDefaults finds nothing missing to
   // rewrite -- an in-call rewrite would dirty the working tree and trip
   // return's own clean-tree check, unrelated to what this test proves.
   const cfg = {
@@ -4787,7 +4788,8 @@ function writeShortRunnerConfig(cwd, timeoutMs) {
     timeoutMs,
     parallel: { maxRoots: 4, maxLeavesPerRoot: 4 },
   };
-  fs.writeFileSync(path.join(cwd, '.fgos-runner.json'), JSON.stringify(cfg));
+  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ runner: cfg }));
 }
 
 function writeHangScript(cwd, ms) {
@@ -4796,7 +4798,7 @@ function writeHangScript(cwd, ms) {
   return scriptPath;
 }
 
-test('return omitting --timeout falls back to .fgos-runner.json\'s timeoutMs, blocking a verify that outlives it', () => {
+test('return omitting --timeout falls back to the runner config\'s timeoutMs, blocking a verify that outlives it', () => {
   const cwd = initGitCwd();
   run(cwd, ['init']);
   writeShortRunnerConfig(cwd, 200);
