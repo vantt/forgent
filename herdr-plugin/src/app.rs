@@ -216,6 +216,16 @@ pub struct App {
     pub merge_list_scroll: u16,
     /// tsk-3wl D1: same idea as `need_answer_scroll`, for AFTER DELIVER.
     pub after_deliver_scroll: u16,
+    /// tsk-bvh D1: each box's own on-screen rectangle, written by `ui.rs`'s
+    /// `draw` every frame — same "domain-safe `Rect` copy" pattern
+    /// `pick_button_rect`/`discover_button_rect` already use for the
+    /// modal's two buttons, widened here to all 5 boxes so `poll_event`
+    /// can hit-test a click against any of them, not just the modal.
+    pub work_items_rect: Option<ButtonRect>,
+    pub in_process_rect: Option<ButtonRect>,
+    pub need_answer_rect: Option<ButtonRect>,
+    pub merge_list_rect: Option<ButtonRect>,
+    pub after_deliver_rect: Option<ButtonRect>,
 }
 
 impl App {
@@ -240,6 +250,11 @@ impl App {
             need_answer_scroll: 0,
             merge_list_scroll: 0,
             after_deliver_scroll: 0,
+            work_items_rect: None,
+            in_process_rect: None,
+            need_answer_rect: None,
+            merge_list_rect: None,
+            after_deliver_rect: None,
         }
     }
 
@@ -531,6 +546,11 @@ impl App {
             need_answer_scroll: 0,
             merge_list_scroll: 0,
             after_deliver_scroll: 0,
+            work_items_rect: None,
+            in_process_rect: None,
+            need_answer_rect: None,
+            merge_list_rect: None,
+            after_deliver_rect: None,
         }
     }
 

@@ -46,6 +46,65 @@ fn box_border_style(app: &App, panel: Panel) -> Style {
     }
 }
 
+/// tsk-bvh D1: same `ratatui::layout::Rect` → domain `ButtonRect` copy
+/// `draw_detail_modal`'s `pick_button_rect`/`discover_button_rect`
+/// already do inline (`ui.rs:605-610`) — pulled into one helper here
+/// since 5 boxes need it instead of 2 buttons.
+fn rect_of(area: Rect) -> crate::app::ButtonRect {
+    crate::app::ButtonRect {
+        x: area.x,
+        y: area.y,
+        width: area.width,
+        height: area.height,
+    }
+}
+
+/// tsk-bvh D1: hit-tests a left-click against every box's own `Rect`
+/// (`app.*_rect`, written every frame `draw` renders below), in the same
+/// spatial order `Panel::next`/`prev` already cycle through. `None` when
+/// the click landed outside all 5 (e.g. the bottom status bar).
+fn click_target(app: &App, col: u16, row: u16) -> Option<UiEvent> {
+    if let Some(rect) = app.work_items_rect {
+        if rect.contains(col, row) {
+            return Some(row_click_event(Panel::WorkItems, rect, row, app.visible_work_items().len()));
+        }
+    }
+    if let Some(rect) = app.in_process_rect {
+        if rect.contains(col, row) {
+            return Some(row_click_event(Panel::InProcess, rect, row, app.in_process.len()));
+        }
+    }
+    if app.need_answer_rect.is_some_and(|rect| rect.contains(col, row)) {
+        return Some(UiEvent::ClickFocus(Panel::NeedAnswer));
+    }
+    if app.merge_list_rect.is_some_and(|rect| rect.contains(col, row)) {
+        return Some(UiEvent::ClickFocus(Panel::MergeList));
+    }
+    if app.after_deliver_rect.is_some_and(|rect| rect.contains(col, row)) {
+        return Some(UiEvent::ClickFocus(Panel::AfterDeliver));
+    }
+    None
+}
+
+/// tsk-bvh D1: WorkItems/InProcess only — "click item = select" from the
+/// original ask. Row data starts 2 lines below the box's own top border
+/// (1 border line + 1 header line, both tables render a header via
+/// `.header(...)`); a click above that (the border/header itself) or past
+/// the last visible row still focuses the box, just without selecting a
+/// row — same as clicking empty space inside a box with no rows at all.
+fn row_click_event(panel: Panel, rect: crate::app::ButtonRect, click_row: u16, visible_len: usize) -> UiEvent {
+    let first_row_y = rect.y + 2;
+    if click_row < first_row_y {
+        return UiEvent::ClickFocus(panel);
+    }
+    let index = (click_row - first_row_y) as usize;
+    if index < visible_len {
+        UiEvent::ClickSelectRow(panel, index)
+    } else {
+        UiEvent::ClickFocus(panel)
+    }
+}
+
 /// tsk-4zo D2: an orphaned task (no matching herdr pane found by the most
 /// recent scan) gets an explicit `[pane missing]` badge in its Title cell
 /// — no jump-to-pane affordance exists yet for any row (that's
@@ -122,9 +181,10 @@ impl TerminalUiPort for RatatuiTerminalUi {
         // modal is open; a click anywhere else (or with no button
         // `Rect` recorded) is inert.
         if let Event::Mouse(mouse) = event {
-            if mouse.kind == MouseEventKind::Down(crossterm::event::MouseButton::Left)
-                && app.detail_modal_open
-            {
+            if mouse.kind != MouseEventKind::Down(crossterm::event::MouseButton::Left) {
+                return Ok(None);
+            }
+            if app.detail_modal_open {
                 if app
                     .pick_button_rect
                     .is_some_and(|rect| rect.contains(mouse.column, mouse.row))
@@ -137,8 +197,14 @@ impl TerminalUiPort for RatatuiTerminalUi {
                 {
                     return Ok(Some(UiEvent::Discover));
                 }
+                return Ok(None);
             }
-            return Ok(None);
+            // tsk-bvh D1: same domain-event discipline as the modal click
+            // above — a hit only ever produces `ClickFocus`/
+            // `ClickSelectRow`, never mutates `app` here (`poll_event`
+            // only has `&App`; `main.rs`'s run loop is the one place
+            // either input method's effect is decided).
+            return Ok(click_target(app, mouse.column, mouse.row));
         }
 
         let Event::Key(key) = event else {
@@ -288,6 +354,9 @@ pub fn draw(frame: &mut Frame, app: &mut App) {
         work_items_area[1],
         &mut work_items_state,
     );
+    // tsk-bvh D1: recorded every frame — click-to-focus/click-to-select
+    // hit-tests against this in `poll_event`'s `click_target`.
+    app.work_items_rect = Some(rect_of(work_items_area[1]));
 
     // tsk-417 D3: the right column stacks the existing In-process panel
     // above 3 NEW, separate action-queue boxes — never merged into one
@@ -336,10 +405,14 @@ pub fn draw(frame: &mut Frame, app: &mut App) {
         right_column[0],
         &mut in_process_state,
     );
+    app.in_process_rect = Some(rect_of(right_column[0]));
 
     draw_need_answer_box(frame, app, right_column[1]);
+    app.need_answer_rect = Some(rect_of(right_column[1]));
     draw_merge_list_box(frame, app, right_column[2]);
+    app.merge_list_rect = Some(rect_of(right_column[2]));
     draw_after_deliver_box(frame, app, right_column[3]);
+    app.after_deliver_rect = Some(rect_of(right_column[3]));
 
     // tsk-64z D8: while typing, the filter input takes over the bottom
     // bar entirely (never a permanent fixture — bung 1 dòng đè status bar
@@ -358,11 +431,12 @@ pub fn draw(frame: &mut Frame, app: &mut App) {
         ))
         .style(Style::default().fg(Color::Yellow))
     } else {
-        // tsk-3wl D1: Tab/Shift+Tab now cycle all 5 boxes (was WorkItems/
-        // InProcess-only) — the footer names every keybinding in play so
-        // this doesn't have to be discovered by trial and error.
+        // tsk-3wl D1 / tsk-bvh D1: Tab/Shift+Tab cycle all 5 boxes, click
+        // focuses/selects the same way — the footer names every
+        // keybinding (keyboard AND mouse) in play so none of it has to be
+        // discovered by trial and error.
         Paragraph::new(
-            "Tab/Shift+Tab: cycle boxes · ↑/↓ select/scroll · Enter: details · [/]: tabs · /: filter · q/Esc: quit",
+            "Tab/Shift+Tab or click: focus box · ↑/↓ select/scroll · click row: select · Enter: details · [/]: tabs · /: filter · q/Esc: quit",
         )
     };
     frame.render_widget(status, rows[1]);
@@ -642,6 +716,48 @@ mod tests {
         assert!(content.contains("[ERR]"), "mock has a blocked row: {content}");
         assert!(content.contains("[MRG]"), "mock has a ready-to-merge row: {content}");
         assert!(content.contains("[RTR]"), "mock has a retrospective row: {content}");
+    }
+
+    /// tsk-bvh D1: clicking inside NEED ANSWER (no row-select, per
+    /// CONTEXT.md D1) focuses the box — never selects, since there is no
+    /// row state to select.
+    #[test]
+    fn mouse_click_to_focus_on_need_answer_box_focuses_without_selecting() {
+        let mut app = App::mock();
+        let backend = TestBackend::new(140, 40);
+        let mut terminal = Terminal::new(backend).expect("terminal init");
+        terminal.draw(|frame| draw(frame, &mut app)).expect("draw should not panic");
+        let rect = app.need_answer_rect.expect("NEED ANSWER box must record its rect after draw");
+        let event = click_target(&app, rect.x + 1, rect.y + 1);
+        assert_eq!(event, Some(UiEvent::ClickFocus(Panel::NeedAnswer)));
+    }
+
+    /// tsk-bvh D1: clicking a WorkItems row focuses the box AND selects
+    /// that row — "click item = select" from the original ask.
+    #[test]
+    fn mouse_click_to_focus_on_work_items_row_selects_it() {
+        let mut app = App::mock();
+        let backend = TestBackend::new(140, 40);
+        let mut terminal = Terminal::new(backend).expect("terminal init");
+        terminal.draw(|frame| draw(frame, &mut app)).expect("draw should not panic");
+        let rect = app.work_items_rect.expect("WorkItems box must record its rect after draw");
+        // Row 0's data starts 2 lines below the box's own top-left corner
+        // (1 border line + 1 header line) — `App::mock`'s default
+        // `active_tab` (Todo) shows exactly one row, `tsk-19y-1`.
+        let event = click_target(&app, rect.x + 1, rect.y + 2);
+        assert_eq!(event, Some(UiEvent::ClickSelectRow(Panel::WorkItems, 0)));
+    }
+
+    /// tsk-bvh D1: a click landing on none of the 5 boxes (e.g. the
+    /// bottom status bar) is inert.
+    #[test]
+    fn mouse_click_to_focus_outside_every_box_is_inert() {
+        let mut app = App::mock();
+        let backend = TestBackend::new(140, 40);
+        let mut terminal = Terminal::new(backend).expect("terminal init");
+        terminal.draw(|frame| draw(frame, &mut app)).expect("draw should not panic");
+        let event = click_target(&app, 0, 39);
+        assert_eq!(event, None);
     }
 
     fn render_modal_buffer(stage: &str) -> ratatui::buffer::Buffer {
