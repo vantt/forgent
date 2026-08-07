@@ -24,8 +24,16 @@ export const TEMPLATE_DIR = path.join(import.meta.dirname, 'prompt-templates');
  * also `DEFAULT_DOMAIN`, so this rule fires for effectively all of today's
  * real dispatches. Add a further rule ahead of the wildcard when another
  * domain grows its own skill chain.
+ *
+ * `domain: 'coding', stage: 'discovery'` (tsk-5mj D1/D6/D7) sits ahead of
+ * the bare `domain: 'coding'` rule (more specific first, same ordering
+ * discipline every other rule here already follows) — every pre-tsk-5mj
+ * caller never passes `stage` at all, so `input.stage` stays `undefined`
+ * and this rule's own `stage: 'discovery'` never matches for them; zero
+ * regression.
  */
 const TEMPLATE_RULES = [
+  { match: { domain: 'coding', stage: 'discovery' }, template: 'worker-prompt-discovery.txt' },
   { match: { domain: 'coding' }, template: 'worker-prompt-skill-pointer.txt' },
   { match: {}, template: 'worker-prompt-default.txt' },
 ];
@@ -35,16 +43,20 @@ function ruleMatches(match, input) {
 }
 
 /**
- * Mechanical kind/tier/domain -> template-file-name lookup. Pure and
+ * Mechanical kind/tier/domain/stage -> template-file-name lookup. Pure and
  * synchronous — no model call, ever (R42).
  *
  * The incoming `domain` is folded via `resolveDomainName` (undefined or an
  * unrecognized string both fold to `'coding'`, str91 D7) IN HERE — the ONLY
  * fold point. Callers (`buildPrompt`, `spawnWorker`) always pass the item's
  * raw `work.domain` unchanged, so the two call sites can never diverge.
+ *
+ * `stage` (tsk-5mj D1/D6/D7, optional): omitted or `undefined` behaves
+ * byte-identical to every pre-tsk-5mj call — only an explicit
+ * `stage: 'discovery'` picks the new rule above.
  */
-export function selectTemplate({ kind, tier, domain } = {}) {
-  const input = { kind, tier, domain: resolveDomainName(domain) };
+export function selectTemplate({ kind, tier, domain, stage } = {}) {
+  const input = { kind, tier, domain: resolveDomainName(domain), stage };
   const rule = TEMPLATE_RULES.find((r) => ruleMatches(r.match, input));
   return rule.template;
 }

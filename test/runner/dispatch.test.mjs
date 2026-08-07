@@ -177,6 +177,19 @@ test('buildPrompt for a coding-domain (or no-domain) work item also contains a n
   assert.ok(prompt.includes('.claude/skills/fgos-code-implement/SKILL.md'));
 });
 
+// --- tsk-5mj D1/D6/D7: stage-aware buildPrompt (discovery dispatch) ------
+
+test('buildPrompt omitting stage defaults to "executing", byte-identical to every pre-tsk-5mj call', () => {
+  assert.equal(buildPrompt(sampleWork()), buildPrompt(sampleWork(), undefined, 'executing'));
+});
+
+test('buildPrompt with stage:"discovery" points the Agent skill section at fgos-researching\'s SKILL.md and selects the discovery template', () => {
+  const prompt = buildPrompt(sampleWork(), undefined, 'discovery');
+  assert.match(prompt, /# Agent skill/);
+  assert.ok(prompt.includes('.claude/skills/fgos-researching/SKILL.md'));
+  assert.match(prompt, /discovery stage/);
+});
+
 test('buildPrompt describes the fgos-discovered report-not-write channel while keeping the never-call-fgos constraint (wgi-8)', () => {
   const prompt = buildPrompt(sampleWork());
   assert.match(prompt, /# Reporting discovered work/);
@@ -1333,6 +1346,24 @@ test('spawnWorker logs the same templateName that buildPrompt actually rendered 
   assert.equal(result.templateName, 'worker-prompt-skill-pointer.txt');
   const payload = JSON.parse(result.stdout);
   assert.equal(payload.args[0], buildPrompt(work));
+});
+
+// tsk-5mj D1/D6/D7: opts.stage threads through spawnWorker into buildPrompt,
+// picking the discovery-flavored prompt/template instead of the default
+// executing one — same "never a diverging pick" proof as the test above,
+// now for the new stage-aware path.
+test('spawnWorker with opts.stage:"discovery" logs the discovery templateName and sends the fgos-researching-pointed prompt — never a diverging pick between the two call sites', async () => {
+  const dir = mkTempDir();
+  const scriptPath = writeEchoExecutor(dir);
+  const cfg = baseConfig([scriptPath, '{prompt}']);
+  const work = sampleWork();
+
+  const result = await spawnWorker(work, cfg, mkTempDir(), { stage: 'discovery' });
+
+  assert.equal(result.templateName, 'worker-prompt-discovery.txt');
+  const payload = JSON.parse(result.stdout);
+  assert.equal(payload.args[0], buildPrompt(work, undefined, 'discovery'));
+  assert.ok(payload.args[0].includes('.claude/skills/fgos-researching/SKILL.md'));
 });
 
 test('spawnWorker defaults to the standard tier when the work item omits tier', async () => {

@@ -69,7 +69,7 @@ import { computeAwaitingContext } from '../src/state/awaiting-context.mjs';
 import { DOCTOR_CHECKS, integrationScriptPath, ensureSharedConfigDefaults, runFixes } from '../src/setup/checks.mjs';
 import { sharedConfigFilePath, readSharedConfig } from '../src/config/shared-config-file.mjs';
 import { assessCleanupReadiness } from '../src/state/cleanup-harness.mjs';
-import { DEFAULT_CLEANUP_TTL_DAYS } from '../src/setup/registrations.mjs';
+import { DEFAULT_CLEANUP_TTL_DAYS, DEFAULT_CLEANUP_LEAF_TTL_DAYS } from '../src/setup/registrations.mjs';
 import { installGitHooks, uninstallGitHooks } from '../src/setup/git-hooks.mjs';
 import { detectRcFiles, insertSourceLine, hasSourceLine } from '../src/setup/shell-rc.mjs';
 import { formatCheck, bold } from '../src/setup/ansi.mjs';
@@ -726,12 +726,16 @@ function collectCheckData(view, id, dir) {
 // complexity with nothing real to show yet (YAGNI over frontier.mjs's
 // multi-level `hasOpenDescendant` walk, which exists for a different job —
 // gating the frontier, not reporting progress).
+function childrenOf(view, id) {
+  return Object.values(view.work).filter((w) => w.parent === id);
+}
+
 function collectRollupData(view, id) {
   const item = view.work?.[id];
   if (!item) {
     throw new StoreError('validation', `rollup: work "${id}" not found.`);
   }
-  const children = Object.values(view.work).filter((w) => w.parent === id);
+  const children = childrenOf(view, id);
   const done = children.filter((w) => w.status === 'done').length;
   return {
     id,
@@ -1195,6 +1199,9 @@ async function runVerb(verb, flags, positional, dir) {
       const repoRoot = process.cwd();
       const sharedConfig = readSharedConfig(repoRoot);
       const ttlDays = sharedConfig?.cleanup?.ttlDays ?? DEFAULT_CLEANUP_TTL_DAYS;
+      // tsk-59x D1: a leaf gets this shorter/zero TTL instead of ttlDays --
+      // resolved per-item inside assessCleanupReadiness (resolveTtlDaysForItem).
+      const leafTtlDays = sharedConfig?.cleanup?.leafTtlDays ?? DEFAULT_CLEANUP_LEAF_TTL_DAYS;
 
       const assessment = assessCleanupReadiness({
         view,
@@ -1203,6 +1210,7 @@ async function runVerb(verb, flags, positional, dir) {
         repoRoot,
         worktreeBacked: domain.worktreeBacked ?? false,
         ttlDays,
+        leafTtlDays,
       });
 
       if (assessment.failed.length > 0) {
@@ -1655,6 +1663,39 @@ async function runVerb(verb, flags, positional, dir) {
       const view = showAll
         ? rawView
         : { ...rawView, work: Object.fromEntries(Object.entries(rawView.work).filter(([, item]) => !isResolvedStatus(item))) };
+      // Child-view gate (tsk-4fg D1/D2): DEFAULT view only -- `--all`
+      // stays byte-identical/raw (D1), preserving herdr-plugin's own
+      // `list --all --json` contract (bin/fgos.mjs comment above, `case
+      // 'list'`). A row is dropped from the default view only when its
+      // `parent` is itself present in this SAME filtered set -- a child
+      // whose parent already got filtered out (resolved/hidden) falls
+      // back to a normal top-level row instead of vanishing with no
+      // parent left to carry its progress (D2; proven live against
+      // tsk-19y's still-open children). An `awaiting-human` child is
+      // never dropped either, regardless of parent visibility, so a
+      // parked question can never be silently hidden by this filter --
+      // the parent-anchored `awaitingContext` loop just below this block
+      // depends on `view.work` still carrying every `awaiting-human` row.
+      // Every dropped child's parent gets a `childProgress` badge instead,
+      // reusing `childrenOf`/the same `doneCount` rule `collectRollupData`
+      // already uses -- computed from ALL of that parent's children in
+      // `rawView`, not just the ones still visible after filtering, so a
+      // parent with e.g. 3 already-`done` (hidden) children and 3 still-
+      // open ones reports an honest `3/6`, not `0/3`.
+      if (!showAll) {
+        const isHideableChild = (item) =>
+          item.parent !== undefined && item.parent !== null && item.parent in view.work && item.status !== 'awaiting-human';
+        view.work = Object.fromEntries(
+          Object.entries(view.work)
+            .filter(([, item]) => !isHideableChild(item))
+            .map(([id, item]) => {
+              const children = childrenOf(rawView, id);
+              if (children.length === 0) return [id, item];
+              const done = children.filter((w) => w.status === 'done').length;
+              return [id, { ...item, childProgress: { done, total: children.length } }];
+            }),
+        );
+      }
       // Parent-anchored context (str61 D1/D2/D3): additive-only key,
       // computed fresh from `view` on every read (D1 — never a persisted
       // "session"), never touching store.listWork itself. Only

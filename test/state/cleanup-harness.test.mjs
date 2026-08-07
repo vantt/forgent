@@ -9,6 +9,7 @@ import {
   checkRetrospectiveContent,
   checkCleanupTTLElapsed,
   assessCleanupReadiness,
+  resolveTtlDaysForItem,
 } from '../../src/state/cleanup-harness.mjs';
 
 // Every test here creates its own disposable git repo (mirrors
@@ -264,6 +265,32 @@ test('checkCleanupTTLElapsed: uses the LATEST cleanup entry if an item somehow r
   assert.equal(result.ok, false, 'must use the LATEST cleanup entry, not the first');
 });
 
+// --- resolveTtlDaysForItem (tsk-59x D1) ----------------------------------
+
+test('resolveTtlDaysForItem: a root item (no parent) resolves to ttlDays, never leafTtlDays', () => {
+  const view = { work: { 'root-item': {} } };
+  const result = resolveTtlDaysForItem(view, 'root-item', { ttlDays: 7, leafTtlDays: 0 });
+  assert.equal(result, 7);
+});
+
+test('resolveTtlDaysForItem: a leaf item (parent present in view) resolves to leafTtlDays', () => {
+  const view = { work: { 'root-item': {}, 'leaf-item': { parent: 'root-item' } } };
+  const result = resolveTtlDaysForItem(view, 'leaf-item', { ttlDays: 7, leafTtlDays: 0 });
+  assert.equal(result, 0);
+});
+
+test('resolveTtlDaysForItem: a dangling-parent item (parent id not in view.work) resolves as a root, matching resolveRoot/checkMergeStillResolves precedent', () => {
+  const view = { work: { 'orphaned-item': { parent: 'missing-parent' } } };
+  const result = resolveTtlDaysForItem(view, 'orphaned-item', { ttlDays: 7, leafTtlDays: 0 });
+  assert.equal(result, 7);
+});
+
+test('resolveTtlDaysForItem: leafTtlDays omitted entirely falls back to ttlDays for both a root AND a leaf -- byte-identical to before tsk-59x', () => {
+  const view = { work: { 'root-item': {}, 'leaf-item': { parent: 'root-item' } } };
+  assert.equal(resolveTtlDaysForItem(view, 'root-item', { ttlDays: 7 }), 7);
+  assert.equal(resolveTtlDaysForItem(view, 'leaf-item', { ttlDays: 7 }), 7);
+});
+
 // --- assessCleanupReadiness (combined) -----------------------------------
 //
 // tsk-4jf: TTL (D7, a park precondition) and the two D8 gate checks are
@@ -327,6 +354,37 @@ test('assessCleanupReadiness: TTL not elapsed + D8 checks fail -> ready:false, B
   assert.equal(result.ready, false);
   assert.equal(result.notReadyYet.length, 1, 'TTL failure must be listed in notReadyYet');
   assert.equal(result.failed.length, 1, 'content failure must be listed in failed');
+});
+
+test('assessCleanupReadiness: a leaf item at 1 day in cleanup is TTL-ready under leafTtlDays:0, while a root item at the same age under the same call is not', () => {
+  const repoRoot = initRepo();
+  const rootSha = commitFile(repoRoot, 'root.txt');
+  const leafSha = commitFile(repoRoot, 'leaf.txt');
+  const now = Date.now();
+  const enteredAt = new Date(now - 1 * 86400000).toISOString(); // 1 day ago -- under root's 7d TTL, over leaf's 0d TTL
+  const view = {
+    work: {
+      'root-item': { branchHeadAtReturn: rootSha },
+      'leaf-item': { parent: 'root-item', branchHeadAtReturn: leafSha },
+    },
+    decisionsById: {
+      'root-item': [{ text: 'x', rationale: 'y' }],
+      'leaf-item': [{ text: 'x', rationale: 'y' }],
+    },
+  };
+  const rawEventsFor = (id) => [{ type: 'work.move', payload: { id, to: 'cleanup' }, ts: enteredAt }];
+
+  const rootResult = assessCleanupReadiness({
+    view, rawEvents: rawEventsFor('root-item'), id: 'root-item', repoRoot, worktreeBacked: true, ttlDays: 7, leafTtlDays: 0, now,
+  });
+  assert.equal(rootResult.ready, false, 'root item must still wait out the full 7-day TTL');
+  assert.equal(rootResult.notReadyYet.length, 1);
+
+  const leafResult = assessCleanupReadiness({
+    view, rawEvents: rawEventsFor('leaf-item'), id: 'leaf-item', repoRoot, worktreeBacked: true, ttlDays: 7, leafTtlDays: 0, now,
+  });
+  assert.equal(leafResult.ready, true, 'leaf item must be TTL-ready immediately under leafTtlDays:0');
+  assert.deepEqual(leafResult.notReadyYet, []);
 });
 
 test('assessCleanupReadiness: skips the merge-resolves check entirely when worktreeBacked is false (synthetic domain, D5)', () => {

@@ -98,8 +98,16 @@ export class DispatchError extends Error {
  * item's raw `work.domain` unchanged — the domain fold lives ONLY inside
  * `selectTemplate` itself (D7), so this function's call site can never
  * diverge from `spawnWorker`'s identical call.
+ *
+ * `stage` (tsk-5mj D1/D6/D7): which of the item's own domain stages this
+ * dispatch is FOR — defaults to `'executing'`, byte-identical to every
+ * pre-tsk-5mj call site (none of which ever passed a third argument).
+ * Resolves `skillPath` via `skillForStage(domainObj, stage)` instead of the
+ * old hardcoded `'executing'` literal, and threads `stage` into
+ * `selectTemplate` so a non-executing dispatch (today: `'discovery'`) picks
+ * its own template instead of the executing-flavored one.
  */
-export function buildPrompt(work, feedback) {
+export function buildPrompt(work, feedback, stage = 'executing') {
   const refs = Array.isArray(work.refs) && work.refs.length ? work.refs.join(', ') : '(none)';
 
   // Human feedback (worker-feedback): when the item carries a human answer
@@ -137,10 +145,10 @@ export function buildPrompt(work, feedback) {
   // genuinely unrecognized) is the only one buildPrompt triggers.
   const domainName = resolveDomainName(work.domain);
   const domainObj = DOMAINS[domainName];
-  const skillName = skillForStage(domainObj, 'executing');
+  const skillName = skillForStage(domainObj, stage);
   const skillPath = `.claude/skills/${skillName}/SKILL.md`;
 
-  const templateName = selectTemplate({ kind: work.kind, tier: work.tier ?? DEFAULTS.tier, domain: work.domain });
+  const templateName = selectTemplate({ kind: work.kind, tier: work.tier ?? DEFAULTS.tier, domain: work.domain, stage });
   return renderTemplate(templateName, {
     title: work.title,
     kind: work.kind,
@@ -973,6 +981,10 @@ function capacityIdForWork(work) {
  * non-zero exit status from a process that *did* run is NOT an error here —
  * that is the runner's goal-check's concern (per D3: the worker's own exit
  * status/report is never trusted on its own; only `verify` decides).
+ *
+ * `opts.stage` (tsk-5mj D1/D6/D7, optional): threaded straight through to
+ * `buildPrompt`'s own `stage` parameter — omitted (every pre-tsk-5mj call
+ * site) keeps the default `'executing'` prompt byte-identical.
  */
 export function spawnWorker(work, cfg, cwd, opts = {}) {
   // Setup stays synchronous and OUTSIDE the adapter call on purpose: a
@@ -983,7 +995,7 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
   // any spawn" test pins.
   const tier = work.tier ?? DEFAULTS.tier;
   const model = modelForTier(cfg, tier);
-  const prompt = buildPrompt(work, opts.feedback);
+  const prompt = buildPrompt(work, opts.feedback, opts.stage);
   const capacityId = capacityIdForWork(work);
   const { command, args, adapter, provider, baseCommit, headRef } = resolveExecutorCommand(cfg, {
     prompt,
@@ -1005,8 +1017,10 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
 
   // P49: same mechanical selection buildPrompt used internally, called again
   // here (cheap, deterministic, no duplicated LOGIC) purely so the dispatch
-  // log can record which template + version produced this prompt.
-  const templateName = selectTemplate({ kind: work.kind, tier, domain: work.domain });
+  // log can record which template + version produced this prompt. tsk-5mj:
+  // threads `opts.stage` through same as buildPrompt's own call, so this
+  // log-only selection never drifts from the template actually rendered.
+  const templateName = selectTemplate({ kind: work.kind, tier, domain: work.domain, stage: opts.stage });
   const templateHash = hashTemplate(templateName);
 
   return adapterFn(command, args, cwd, {

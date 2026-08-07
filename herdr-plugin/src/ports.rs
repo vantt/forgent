@@ -49,8 +49,11 @@ pub enum UiEvent {
     /// "Work items" runs the existing pick action, "In process" jumps to
     /// the selected task's pane.
     Pick,
-    /// Tab — switches which panel has keyboard focus (tsk-1eu D1).
+    /// Tab — cycles keyboard focus forward through all 5 boxes (tsk-1eu
+    /// D1; widened from WorkItems/InProcess-only by tsk-3wl D1).
     SwitchPanel,
+    /// Shift+Tab — same cycle, backward (tsk-3wl D1).
+    SwitchPanelPrev,
     /// `d` while the detail modal is open — fires the Discover button
     /// (tsk-1e3 D4). Inert everywhere else; inert even in the modal when
     /// the selected item's `stage != "clarify"` (checked by the caller,
@@ -76,6 +79,16 @@ pub enum UiEvent {
     /// Esc while filtering (tsk-64z D8) — leaves input mode AND clears the
     /// query.
     FilterCancel,
+    /// tsk-bvh D1: left-click inside a box's `Rect` (outside the modal,
+    /// and not on a WorkItems/InProcess row) — focuses that box, same
+    /// effect Tab already produces for it.
+    ClickFocus(crate::app::Panel),
+    /// tsk-bvh D1: left-click on a specific row inside the WorkItems or
+    /// InProcess box — focuses that box AND selects the row ("click item
+    /// = select" from the original ask). Never produced for
+    /// NeedAnswer/MergeList/AfterDeliver (CONTEXT.md D1: those stay
+    /// view-only, `ClickFocus` is the only event they ever produce).
+    ClickSelectRow(crate::app::Panel, usize),
     Quit,
 }
 

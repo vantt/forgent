@@ -149,35 +149,22 @@ function writeRunnerConfig(repoRoot, executorScript) {
   );
 }
 
-/** Discovery-aware executor (mirrors runner-loop.test.mjs's
- * writeClearDiscoveryExecutor exactly): the SAME configured executor serves
- * THREE call sites — context-discovery ("# Context-discovery"), chia-việc
- * ("# Chia-việc (decompose)", answered pass-through so a simple item chains
- * straight through), and the worker dispatch ("# Goal") — told apart by
- * their fixed prompt prefixes. `evolve --submit`'s item starts at stage
- * clarify (not executing), so this three-call-site executor is required —
- * pr-gate.test.mjs's plain committing executor (worker-only) would leave the
- * item stuck in clarify/decompose forever. */
-function writeClearDiscoveryExecutor(scriptDir, { verify, produce = 'output.txt' }) {
-  const scriptPath = path.join(scriptDir, 'clear-discovery-executor.mjs');
+// tsk-1x3 D1/D9/D16 (docs/history/fanout-and-delegation-rubric/CONTEXT.md):
+// the runner sweep's own clarify/decompose judge subprocess is retired —
+// `evolve --submit`'s item now crosses clarify->decompose via explicit
+// `fgos discover`/`fgos decompose --verdict ...` CLI calls (see the test
+// below), so the runner's own configured executor only ever needs to serve
+// the plain worker-dispatch call.
+function writeCommittingExecutor(scriptDir, produce = 'output.txt') {
+  const scriptPath = path.join(scriptDir, 'committing-executor.mjs');
   fs.writeFileSync(
     scriptPath,
     `
 import fs from 'node:fs';
 import { execFileSync } from 'node:child_process';
-const prompt = process.argv[2] ?? '';
-if (prompt.includes('Kiểm tra độc lập một lệnh verify')) {
-  // tsk-5q5-1: judgeVerifySemanticCorrectness's own second-pass call.
-  process.stdout.write(JSON.stringify({ agrees: true }));
-} else if (prompt.includes('# Context-discovery')) {
-  process.stdout.write(JSON.stringify({ clear: true, verify: ${JSON.stringify(verify)} }));
-} else if (prompt.includes('# Chia-việc (decompose)')) {
-  process.stdout.write(JSON.stringify({ verdict: 'pass-through' }));
-} else {
-  fs.writeFileSync(${JSON.stringify(produce)}, 'produced by worker\\n');
-  execFileSync('git', ['add', ${JSON.stringify(produce)}]);
-  execFileSync('git', ['commit', '-q', '-m', ${JSON.stringify(`worker: ${produce}`)}]);
-}
+fs.writeFileSync(${JSON.stringify(produce)}, 'produced by worker\\n');
+execFileSync('git', ['add', ${JSON.stringify(produce)}]);
+execFileSync('git', ['commit', '-q', '-m', ${JSON.stringify(`worker: ${produce}`)}]);
 `,
   );
   return scriptPath;
@@ -259,15 +246,31 @@ test(
     assert.equal(edited.status, 0, `edit --risk failed: ${edited.stderr}`);
     commitPending(repoRoot, `state: edit ${submitted.id} risk`);
 
-    // (5) real runner dispatch: the discovery-aware executor answers all 3
-    // call sites (context-discovery, chia-việc, worker) within one --once,
-    // per runner-loop.test.mjs's stage-clarify (a) / stage-decompose (a)
-    // precedent — the item chains clarify->decompose->executing->awaiting-approval in
-    // one call.
-    writeRunnerConfig(
-      repoRoot,
-      writeClearDiscoveryExecutor(scriptDir, { verify: 'test -f fixed.txt && echo FIX_OK', produce: 'fixed.txt' }),
-    );
+    // (5) tsk-1x3 D1/D9/D16 (docs/history/fanout-and-delegation-rubric/
+    // CONTEXT.md): the runner sweep's own clarify/decompose judge subprocess
+    // is retired — chain clarify->decompose->executing explicitly via the
+    // two CLI verbs first (mirrors test/cli/fgos.test.mjs's own
+    // discover/decompose --verdict pattern), then real runner dispatch only
+    // needs to prove the worker branch (executing-stage dispatch, unaffected
+    // by this item).
+    //
+    // A real `.fgos-runner.json` must exist BEFORE either CLI call: even
+    // with an explicit --verdict, `discover`/`decompose`'s own bin/fgos.mjs
+    // case still unconditionally calls `ensureRunnerConfigForDir` to resolve
+    // `cfg` (unused inside resolveDiscovery/resolveDecompose now, but the
+    // parameter itself is still threaded through, per this item's own D9
+    // finding) — with no config on disk yet, that bootstraps a DEFAULT one
+    // into `.fgos/config.json` pointed at whatever real agent CLI it
+    // auto-detects on PATH, which would then get invoked for real at
+    // dispatch time instead of this test's own fake worker script.
+    writeRunnerConfig(repoRoot, writeCommittingExecutor(scriptDir, 'fixed.txt'));
+
+    const discovered = fgos(repoRoot, ['discover', submitted.id, '--verdict', 'clear', '--verify', 'test -f fixed.txt && echo FIX_OK']);
+    assert.equal(discovered.status, 0, `discover failed: ${discovered.stderr}`);
+    const decomposed = fgos(repoRoot, ['decompose', submitted.id, '--verdict', 'pass-through', '--reason', 'single self-improve fix, no split needed']);
+    assert.equal(decomposed.status, 0, `decompose failed: ${decomposed.stderr}`);
+    commitPending(repoRoot, `state: discover+decompose ${submitted.id}`);
+
     const dispatch = runner(repoRoot, ['--once']);
     assert.equal(dispatch.status, 0, `--once failed: ${dispatch.stderr}`);
 
