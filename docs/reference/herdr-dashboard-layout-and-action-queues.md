@@ -187,11 +187,30 @@ real code: `need_answer_survives_missing_stage` and
 `last_error_first_error_wins` (`herdr-plugin/src/fgos.rs`), plus a real
 `cargo build --release`.
 
+## Implementation (`tsk-3wl`): keyboard/mouse focus across all 5 boxes
+
+Resolves the key-binding question left open below. `Tab`/`Shift+Tab`
+cycle focus through all 5 boxes (Work Items, In Process, `NEED ANSWER`,
+`MERGE LIST`, `AFTER DELIVER`) in the existing spatial order. The 3
+newly-focusable right-side boxes only accept border-highlight +
+Up/Down scroll once focused — no row-select/Enter action on them (D1),
+distinguishing "look at this box" from "act on a row inside it," which
+stays exclusive to the Work Items panel's own tabs.
+
+Because `Tab` was claimed as the focus-cycle key, the existing status-
+column `Tab` enum (`TODO`/`DOING`/`REVIEW`/`DONE`) had to be renamed to
+avoid colliding with it — done via GitNexus's `rename` tool, with
+`impact()` run first per this repo's own Always-Do rule, rather than a
+find-and-replace. `]`/`[` remain the existing shortcuts (unaffected by
+this rename); the on-screen hint line was updated to list all of
+`Tab`/`Shift+Tab`, `]`/`[`, and mouse together.
+
+Confirmed shipped as real code: a real `cargo test --manifest-path
+herdr-plugin/Cargo.toml focus_cycle` test plus a real `cargo build
+--release`.
+
 ## Left deliberately open (implementer's call, not locked here)
 
-- Exact key bindings for switching Work Items tabs and cycling focus
-  between the left panel and the 3 right boxes (5 focusable regions
-  total, up from the prior 2).
 - Column width/truncation strategy for the 7-column Work Items table on
   a narrow pane.
 
