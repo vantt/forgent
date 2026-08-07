@@ -24,9 +24,8 @@ specifically need one of them to run an unbounded `verify` on purpose.
 Omitting `--timeout` entirely no longer means unbounded. It now falls back
 to the runner config's own `timeoutMs` — the same value and the same
 `runGoalCheck` call the runner loop itself already uses. That config lives
-at `.fgos/config.json`'s `runner` section (tsk-5vf; the legacy
-`.fgos-runner.json` still works as a fallback for a repo that hasn't run
-`fgos setup` since the move). If neither sets one yet,
+at `.fgos/config.json`'s `runner` section (tsk-5vf; the sole config source
+since tsk-5hv D1 retired the legacy fallback). If it doesn't set one yet,
 `ensureRunnerConfigForDir` bootstraps the default (`900000`, 15 minutes)
 the first time any of these verbs runs.
 
@@ -85,10 +84,10 @@ another writer to act while the stuck verify was technically still
 ## Real example
 
 Item `tsk-3vo` (this change itself) proved the fix with a real hung-verify
-scenario: a `.fgos-runner.json` configured with a 200ms `timeoutMs`, and a
+scenario: a runner config with a 200ms `timeoutMs`, and a
 `verify` command that busy-waits 1.5s before exiting.
 
-> `"return omitting --timeout falls back to .fgos-runner.json's timeoutMs,
+> `"return omitting --timeout falls back to the runner config's timeoutMs,
 > blocking a verify that outlives it"` — checked out against the commit
 > just before this fix landed, the same test genuinely failed:
 > `AssertionError: the 200ms fallback timeout should have killed the 1.5s

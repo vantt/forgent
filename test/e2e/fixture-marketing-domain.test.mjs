@@ -82,6 +82,14 @@ function add(cwd, id, extra = {}) {
     '--kind', extra.kind ?? 'task',
     '--risk', extra.risk ?? 'low',
     '--verify', extra.verify ?? 'true',
+    // tsk-535: --description is required at add's CLI layer.
+    '--description', extra.description ?? `Title ${id}`,
+    // add-stage-default-gap D1/D2: add now defaults to stage 'clarify'
+    // instead of the old implicit 'executing' -- every test in this file
+    // needs its item immediately dispatchable/ready, and 'fixture-marketing'
+    // reuses coding's literal stage names (workflow-stage-graphs.mjs), so
+    // 'executing' is correct here the same way it is for the coding domain.
+    '--stage', extra.stage ?? 'executing',
   ];
   if (extra.domain) flags.push('--domain', extra.domain);
   if (extra.deps) flags.push('--deps', extra.deps.join(','));
@@ -136,7 +144,7 @@ test("DOMAINS['fixture-marketing'] declares its OWN statusLabels/skillMap.retros
 });
 
 test('adding "fixture-marketing" leaves DOMAINS.coding completely unchanged (RUL11 — purely additive)', () => {
-  assert.deepEqual(DOMAINS.coding.stages, ['clarify', 'decompose', 'executing']);
+  assert.deepEqual(DOMAINS.coding.stages, ['clarify', 'discovery', 'exploring', 'decompose', 'executing']);
   assert.deepEqual(DOMAINS.coding.statusLabels, {
     todo: 'todo',
     doing: 'in-progress',

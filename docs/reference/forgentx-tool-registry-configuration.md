@@ -100,7 +100,7 @@ registered tool is `present`; existing MUST behavior stays unchanged.)
 ## Registering a capacity for capacity-aware dispatch (tsk-62v)
 
 > The runner config's optional `capacities.<capacityId>` block (D1, in
-> `.fgos/config.json`'s `runner` section, fallback `.fgos-runner.json`) can
+> `.fgos/config.json`'s `runner` section) can
 > declare `"kind": "cli"` for a capacity dispatched through `dispatch.mjs`'s
 > `resolveExecutorConfig`. When it does, presence is checked by consulting
 > this SAME registry (`fgos tool query`'s own functions, called

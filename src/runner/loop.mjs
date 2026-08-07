@@ -56,6 +56,7 @@ import { execFileSync } from 'node:child_process';
 import {
   listWork,
   moveWork,
+  moveStage,
   addWork,
   readyWork,
   readRawEvents,
@@ -84,7 +85,7 @@ import { createWriteQueue } from './write-queue.mjs';
 import { createOwnershipStore, resolveRoot, claimRoot, steerFrontier } from './root-affinity.mjs';
 import { claimWork, ClaimError } from './claim-port.mjs';
 import { resolveRepoRoot, fgosDirFromRoot } from './paths.mjs';
-import { resolveDiscovery, FALLBACK_VERIFY } from '../intake/discovery.mjs';
+import { FALLBACK_VERIFY } from '../intake/discovery.mjs';
 import { resolveDecompose } from '../intake/decompose.mjs';
 import { classify, generateId } from '../intake/classify.mjs';
 import { setTimeout as delay } from 'node:timers/promises';
@@ -98,6 +99,7 @@ import { setTimeout as delay } from 'node:timers/promises';
 // actionable default: re-read what the task asked for).
 const FRICTION_LAYER = Object.freeze({
   'verify-miss': 'verification',
+  'verify-timeout': 'verification',
   'worker-spawn-fail': 'environment',
   'worker-timeout': 'environment',
   'worktree-fail': 'environment',
@@ -116,7 +118,7 @@ export const EXIT_BUSY = 6;
 
 export const LOCK_FILE = 'runner.lock';
 
-/** Two-tier parallelism defaults (D10), applied when `.fgos-runner.json`
+/** Two-tier parallelism defaults (D10), applied when the runner config
  * declares no `parallel` block at all — every existing config keeps working
  * with zero changes. `maxRoots` caps concurrent ROOTS in flight; the wave a
  * single poll dispatches is bounded by `maxRoots * maxLeavesPerRoot`, and
@@ -379,12 +381,19 @@ export async function startupReap({ repoRoot, dir, worktreeDir, verifyTimeoutMs,
     }
 
     let verifyPassed = false;
+    let verifyTimedOut = false;
     let worktreeFailed = false;
     if (hasCommit) {
       let wt = null;
       try {
         wt = createDispatchWorktree(repoRoot, id, { worktreeDir });
-        verifyPassed = (await runGoalCheck(item, wt.path, verifyTimeoutMs)).passed;
+        // tsk-53o: read `timedOut` alongside `passed` — a timeout still
+        // reclaims to 'blocked' the same as any other non-pass (unchanged
+        // FSM behavior, resolveStaleDoing's own contract), but the log line
+        // below must say so rather than implying a real verify failure.
+        const goalCheck = await runGoalCheck(item, wt.path, verifyTimeoutMs);
+        verifyPassed = goalCheck.passed;
+        verifyTimedOut = goalCheck.timedOut;
       } catch (err) {
         // A worktree-fail here (e.g. this branch is irreconcilably checked
         // out somewhere even after the reclaim in worktree.mjs) must never
@@ -406,7 +415,8 @@ export async function startupReap({ repoRoot, dir, worktreeDir, verifyTimeoutMs,
       ? { to: 'blocked', reason: 'runner-crash-reclaim' }
       : resolveStaleDoing({ hasCommit, verifyPassed });
     moveWork(dir, { id, to: resolution.to, expectedStatus: 'doing', reason: resolution.reason, role: 'runner' });
-    log(`fgos-runner: reaped stale doing "${id}" -> ${resolution.to}${resolution.reason ? ` (${resolution.reason})` : ''}`);
+    const timeoutNote = verifyTimedOut ? ' (goal-check timed out, not a real verify failure)' : '';
+    log(`fgos-runner: reaped stale doing "${id}" -> ${resolution.to}${resolution.reason ? ` (${resolution.reason})` : ''}${timeoutNote}`);
     resolutions.push({ id, to: resolution.to, reason: resolution.reason ?? null });
   }
 
@@ -792,12 +802,17 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
         return { outcome: 'awaiting-approval', id: item.id, branch: wt.branch, attempts: attempt, exitCode: 0 };
       }
 
-      failure = {
-        errorClass: 'verify-miss',
-        message: check.passed
-          ? 'verify passed but the branch carries no commit — the worker must commit its work'
-          : `goal-check failed (exit ${check.status})`,
-      };
+      // tsk-53o: a timeout is not a real verify failure — distinct
+      // errorClass so the eventual retry-exhausted park (resolveAction
+      // above) never reports it as the worker's own code being wrong.
+      failure = check.timedOut
+        ? { errorClass: 'verify-timeout', message: `goal-check timed out after ${config.timeoutMs}ms — not a verify failure` }
+        : {
+            errorClass: 'verify-miss',
+            message: check.passed
+              ? 'verify passed but the branch carries no commit — the worker must commit its work'
+              : `goal-check failed (exit ${check.status})`,
+          };
       breaker.recordMiss(item.id);
       log(`fgos-runner: goal-check miss for "${item.id}" (attempt ${attempt}): ${failure.message}`);
       log(`fgos-runner: verify tail:\n${tailLines(check.output)}`);
@@ -1001,44 +1016,106 @@ export async function runOnce(options = {}) {
 
   try {
     const reap = await startupReap({ repoRoot, dir, worktreeDir, verifyTimeoutMs: config?.timeoutMs, log, dryRun });
+    // Hoisted above its original DRAIN RUN position (tsk-5mj): the new
+    // DISCOVERY DISPATCH sweep right below also writes through this same
+    // queue (captureDiscoveredWork's own discovered-item creation) — one
+    // write-queue for the whole run still holds (D13/D16), just created
+    // earlier so both this sweep and the drain run below share it.
+    const queue = options.queue ?? createWriteQueue();
 
-    // CLARIFY SWEEP (D13): the safety net for context-discovery. Before any
-    // executing item is dispatched, resolve every clarify+todo item —
-    // regardless of its `mode` (mode is a calling-convention signal about who
-    // is expected to run `discover` first, never a runtime branch, D5). Only
-    // `todo` is touched: an item already in `awaiting-human` is waiting on a
-    // person and must never be swept again (R15). No sweep under dry-run —
-    // resolveDiscovery calls the model and writes state. A clear verdict now
-    // lands the item on stage `decompose` (stage-decompose D2 retarget), not
-    // `executing` — the DECOMPOSE SWEEP right below is what carries it the
-    // rest of the way.
+    // DISCOVERY DISPATCH (tsk-5mj D1/D6/D7, docs/history/fanout-and-
+    // delegation-rubric/CONTEXT.md): replaces the old CLARIFY SWEEP's blind
+    // discovery-engine call — tsk-1x3 D1/D9/D16 already retired that engine's
+    // own judge subprocess, leaving a `role: 'runner'` call a pure no-op, so
+    // sweeping every clarify item through it every tick did nothing. `stage:
+    // discovery` items are dispatched to a real worker instead — the SAME
+    // `spawnWorker`/`createDispatchWorktree` pair `executing` items already
+    // use (CONTEXT.md's own instruction), just pointed at `fgos-researching`
+    // via `opts.stage: 'discovery'` (dispatch.mjs). Discovery is a pure
+    // machine-alone pass (D3 — "pha máy-một-mình tách khỏi pha máy+người"):
+    // there is no verdict to gate the transition on here, unlike the
+    // clarify->decompose engine's own edge — the worker records
+    // its findings in `RESEARCH.md` and the item unconditionally advances
+    // `discovery -> exploring` once dispatch settles; the human-facing
+    // decision-lock happens at `exploring`, not here. Sequential (mirrors
+    // this sweep's own pre-tsk-5mj simplicity), not the parallel drain-run
+    // below — that stays scoped to `stage: executing` only, unchanged. No
+    // dispatch under dry-run, same rule the old sweep already followed.
+    // Only `todo` is touched (R15) — an item already claimed (`doing`, e.g.
+    // a human `fgos pick`) is left alone.
     if (!dryRun) {
-      // Domain-aware per base-workflow-model D2/D3: each item's own domain
-      // (lazily read, absent -> 'coding') decides which stage name means
-      // "at the Clarify step" / "at the Divide step" — 'clarify'/'decompose'
-      // for the 'coding' domain, byte-for-byte the literal checks this sweep
-      // used before the retrofit. An unrecognized item.domain never throws
-      // here (workflow-stage-graphs.mjs's fail-safe) — it folds to 'coding' with a
-      // diagnostic log line instead, so a corrupt/rolled-back domain value
-      // can never wedge the sweep.
+      // No `getDomain`/`stageForStep` fold needed here (unlike the
+      // Clarify/Divide/Execute sweeps below): 'discovery' is a
+      // coding-domain-specific literal with no cross-domain symbolic
+      // equivalent (tsk-1w7 D10) — no other registered domain ever declares
+      // a stage named 'discovery' at all, so this direct literal comparison
+      // can never wrongly match a non-coding item.
       for (const item of Object.values(listWork(dir).work)) {
-        const domain = getDomain(item.domain, {
-          onUnrecognized: (bad) =>
-            log(`fgos-runner: work "${item.id}" has unrecognized domain "${bad}" — folding to "coding".`),
-        });
-        const clarifyStage = stageForStep(domain, 'Clarify');
-        if (clarifyStage !== undefined && item.stage === clarifyStage && item.status === 'todo') {
-          resolveDiscovery(dir, item.id, config, 'runner');
-          log(`fgos-runner: context-discovery swept clarify item "${item.id}"`);
+        if (item.stage !== 'discovery' || item.status !== 'todo') continue;
+        let wt = null;
+        try {
+          wt = createDispatchWorktree(repoRoot, item.id, { worktreeDir });
+          const feedbackView = listWork(dir);
+          const worker = await spawnWorker(item, config, wt.path, {
+            fgosDir: dir,
+            stage: 'discovery',
+            feedback: {
+              answer: feedbackView.gates?.[item.id]?.answer,
+              reason: feedbackView.work?.[item.id]?.reason,
+            },
+            onChunk: (stream, chunk) => appendWorkerLogChunk(dir, item.id, chunk),
+          });
+          log(`fgos-runner: research worker for "${item.id}" exited ${worker.status ?? `signal ${worker.signal}`} (tier ${worker.tier} -> ${worker.model})`);
+          appendWorkerLog(dir, item.id, {
+            tier: worker.tier,
+            model: worker.model,
+            templateName: worker.templateName,
+            templateHash: worker.templateHash,
+            status: worker.status,
+            signal: worker.signal,
+            stdout: worker.stdout,
+            stderr: worker.stderr,
+          });
+          await captureDiscoveredWork({ output: worker.stdout ?? '', item, queue, dir, log });
+          // No goal-check (discovery has no `verify` of its own to prove —
+          // that stays executing's job), but a real commit is still the
+          // minimum bar: a worker that exited non-zero, or exited 0 but
+          // never actually wrote/committed anything (a hang, a crash before
+          // its first commit), must never be treated as "research done" —
+          // mirrors dispatchClaimedItem's own `facts.aheadCount > 0` check
+          // for stage:executing, just without a verify command to also run.
+          const facts = branchFacts(repoRoot, wt.branch);
+          if (facts.aheadCount === 0) {
+            log(`fgos-runner: research worker for "${item.id}" produced no commit — left at stage discovery, status todo, for the next sweep to retry`);
+          } else {
+            // 'discovery'/'exploring' are coding-domain-specific stages with
+            // no base-workflow step of their own (workflow-stage-graphs.mjs's
+            // own coding.stepMap, tsk-1w7 D10) — there is no `stageForStep`
+            // symbolic name to resolve 'exploring' through, unlike the
+            // Clarify/Divide/Execute edges every domain declares. This whole
+            // dispatch loop already only ever matches a real `stage ===
+            // 'discovery'` literal (no other registered domain declares that
+            // stage name at all), so the literal target here is equally safe.
+            moveStage(dir, { id: item.id, to: 'exploring', expectedStage: 'discovery', role: 'runner' });
+            log(`fgos-runner: discovery dispatch advanced "${item.id}" to exploring`);
+          }
+        } catch (err) {
+          // Fail-safe (matches the old sweep's own never-halt-the-whole-tick
+          // stance): a spawn/timeout/store failure for one item's research
+          // dispatch is logged and the sweep moves on to the next item,
+          // never bubbling out to abort the rest of this runOnce pass.
+          log(`fgos-runner: discovery dispatch failed for "${item.id}" (left at stage discovery, status todo, for the next sweep to retry): ${err.message}`);
+        } finally {
+          if (wt) removeDispatchWorktree(repoRoot, wt.path, log);
         }
       }
 
-      // DECOMPOSE SWEEP (stage-decompose D2/D4, mirrors the clarify sweep
-      // above one stage over): re-reads the view FRESH rather than reusing
-      // the clarify sweep's snapshot, so an item the clarify sweep just
-      // moved into `decompose` this same tick is swept in the same `--once`
-      // pass too (the chain must not wait a full extra tick to continue).
-      // Only `todo` is touched, same R15 rule as the clarify sweep — an item
+      // DECOMPOSE SWEEP (stage-decompose D2/D4, mirrors the discovery
+      // dispatch above one stage over): re-reads the view FRESH rather than
+      // reusing the loop above's snapshot, so an item this same tick already
+      // carried through clarify/discovery/exploring is swept in the same
+      // `--once` pass too (the chain must not wait a full extra tick to
+      // continue). Only `todo` is touched, same R15 rule as above — an item
       // already parked in `awaiting-human` (D3's need-human/risk-heavy gate)
       // is never re-swept.
       for (const item of Object.values(listWork(dir).work)) {
@@ -1085,11 +1162,11 @@ export async function runOnce(options = {}) {
     }
 
     // DRAIN RUN. One ownership store + one write-queue for the whole run
-    // (D13/D16). Each wave is awaited to full settlement before the next poll,
-    // so "in-flight" is 0 at every poll boundary and the exit condition
-    // reduces to "no dispatchable wave remains" (D15).
+    // (D13/D16 — `queue` itself is now created earlier, above the DISCOVERY
+    // DISPATCH sweep, tsk-5mj). Each wave is awaited to full settlement
+    // before the next poll, so "in-flight" is 0 at every poll boundary and
+    // the exit condition reduces to "no dispatchable wave remains" (D15).
     const ownershipStore = createOwnershipStore();
-    const queue = options.queue ?? createWriteQueue();
     const ownerIdentity = options.ownerIdentity ?? RUNNER_OWNER_IDENTITY;
     const parallel = resolveParallel(config);
     const dispatched = [];

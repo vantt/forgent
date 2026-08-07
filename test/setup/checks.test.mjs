@@ -14,7 +14,7 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { DOCTOR_CHECKS, FIX_REGISTRATIONS, integrationScriptPath, mainCheckoutHookWired, resolveMainCheckout } from '../../src/setup/checks.mjs';
 import { DEFAULT_RUNNER_CONFIG } from '../../src/runner/dispatch.mjs';
 import { DEFAULT_LEVEL } from '../../src/state/gate-bypass.mjs';
-import { DEFAULT_CLEANUP_TTL_DAYS } from '../../src/setup/registrations.mjs';
+import { DEFAULT_CLEANUP_TTL_DAYS, DEFAULT_CLEANUP_LEAF_TTL_DAYS } from '../../src/setup/registrations.mjs';
 import { initStore, addWork } from '../../src/state/store.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -183,20 +183,15 @@ test('shell-integration-sourced passes when every detected rc file already has t
   }
 });
 
-test('config-not-stale reports failed/not-configured, without creating .fgos-runner.json, when absent', () => {
+test('config-not-stale reports failed/not-configured when the shared file is absent', () => {
   const cwd = mkTemp('doctor-config-absent-');
   const { passed, message } = checkById('config-not-stale').check(cwd);
   assert.equal(passed, false);
   assert.match(message, /not yet configured/);
-  assert.equal(fs.existsSync(path.join(cwd, '.fgos-runner.json')), false);
   fs.rmSync(cwd, { recursive: true, force: true });
 });
 
 test('config-not-stale passes when the existing config already has every default key', () => {
-  // Written as the SHARED file directly, not the legacy .fgos-runner.json:
-  // a legacy file structurally can never carry a `gateBypass` key (D1/D3,
-  // tsk-2qz-2), so it can no longer satisfy "every default key" once
-  // gateBypass is a registered default alongside runner.
   const cwd = mkTemp('doctor-config-full-');
   fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
   fs.writeFileSync(
@@ -204,7 +199,7 @@ test('config-not-stale passes when the existing config already has every default
     JSON.stringify({
       runner: DEFAULT_RUNNER_CONFIG,
       gateBypass: { level: 'off' },
-      cleanup: { ttlDays: DEFAULT_CLEANUP_TTL_DAYS },
+      cleanup: { ttlDays: DEFAULT_CLEANUP_TTL_DAYS, leafTtlDays: DEFAULT_CLEANUP_LEAF_TTL_DAYS },
     }),
   );
   const { passed } = checkById('config-not-stale').check(cwd);
@@ -212,9 +207,10 @@ test('config-not-stale passes when the existing config already has every default
   fs.rmSync(cwd, { recursive: true, force: true });
 });
 
-test('config-not-stale fails when the legacy-only .fgos-runner.json is complete but the shared file has no gateBypass key', () => {
-  const cwd = mkTemp('doctor-config-legacy-only-');
-  fs.writeFileSync(path.join(cwd, '.fgos-runner.json'), JSON.stringify(DEFAULT_RUNNER_CONFIG));
+test('config-not-stale fails when the shared file is complete except gateBypass', () => {
+  const cwd = mkTemp('doctor-config-no-gatebypass-');
+  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ runner: DEFAULT_RUNNER_CONFIG }));
   const { passed, message } = checkById('config-not-stale').check(cwd);
   assert.equal(passed, false);
   assert.match(message, /gateBypass/);
@@ -223,7 +219,8 @@ test('config-not-stale fails when the legacy-only .fgos-runner.json is complete 
 
 test('config-not-stale fails when the existing config is missing a default key', () => {
   const cwd = mkTemp('doctor-config-stale-');
-  fs.writeFileSync(path.join(cwd, '.fgos-runner.json'), JSON.stringify({ executor: { command: 'claude', args: [] } }));
+  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ runner: { executor: { command: 'claude', args: [] } } }));
   const { passed, message } = checkById('config-not-stale').check(cwd);
   assert.equal(passed, false);
   assert.match(message, /stale config/);
@@ -345,7 +342,7 @@ test('fgos doctor --fix --pretty (CLI e2e) renders a fix line green even when th
 // which level is in play. Every case overrides HOME (same pattern the
 // shell-integration-sourced tests above already use) so this never touches
 // the real ~/.fgos/config.json; project config is checked at the temp cwd's
-// own .fgos-runner.json, matching describeConfigAwareness's real defaults.
+// own .fgos/config.json, matching describeConfigAwareness's real defaults.
 
 function withHome(homeDir, fn) {
   const prevHome = process.env.HOME;
@@ -378,7 +375,8 @@ test('config-awareness reports "none" when neither project nor global config exi
 test('config-awareness reports project active with global not present, when only project config exists', () => {
   const homeDir = mkTemp('doctor-awareness-project-only-home-');
   const cwd = mkTemp('doctor-awareness-project-only-cwd-');
-  fs.writeFileSync(path.join(cwd, '.fgos-runner.json'), '{}');
+  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), '{}');
   withHome(homeDir, () => {
     const { passed, message } = checkById('config-awareness').check(cwd);
     assert.equal(passed, true);
@@ -394,7 +392,8 @@ test('config-awareness reports project active with global also present, when bot
   fs.mkdirSync(path.join(homeDir, '.fgos'), { recursive: true });
   fs.writeFileSync(path.join(homeDir, '.fgos', 'config.json'), '{}');
   const cwd = mkTemp('doctor-awareness-both-cwd-');
-  fs.writeFileSync(path.join(cwd, '.fgos-runner.json'), '{}');
+  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), '{}');
   withHome(homeDir, () => {
     const { passed, message } = checkById('config-awareness').check(cwd);
     assert.equal(passed, true);
@@ -453,6 +452,34 @@ test('mainCheckoutHookWired is true once core.hooksPath is set to .githooks', ()
   execFileSync('git', ['config', 'core.hooksPath', '.githooks'], { cwd });
   assert.equal(mainCheckoutHookWired(cwd), true);
   fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+test('mainCheckoutHookWired is true when core.hooksPath is an absolute path resolving to repoRoot/.githooks', () => {
+  const cwd = mkTemp('doctor-hook-absolute-');
+  execFileSync('git', ['init', '-q'], { cwd });
+  execFileSync('git', ['config', 'core.hooksPath', path.join(cwd, '.githooks')], { cwd });
+  assert.equal(mainCheckoutHookWired(cwd), true);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+test('mainCheckoutHookWired is true from inside a linked worktree when the main checkout has an absolute core.hooksPath, not just from the main checkout itself', () => {
+  const mainCheckout = mkTemp('doctor-hook-absolute-worktree-main-');
+  execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: mainCheckout });
+  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: mainCheckout });
+  execFileSync('git', ['config', 'user.name', 'Test'], { cwd: mainCheckout });
+  fs.writeFileSync(path.join(mainCheckout, 'file.txt'), 'x');
+  execFileSync('git', ['add', 'file.txt'], { cwd: mainCheckout });
+  execFileSync('git', ['commit', '-q', '-m', 'init'], { cwd: mainCheckout });
+  execFileSync('git', ['config', 'core.hooksPath', path.join(mainCheckout, '.githooks')], { cwd: mainCheckout });
+
+  const worktreeDir = mkTemp('doctor-hook-absolute-worktree-linked-');
+  fs.rmdirSync(worktreeDir);
+  execFileSync('git', ['worktree', 'add', '-q', '-b', 'wt-branch', worktreeDir], { cwd: mainCheckout });
+
+  assert.equal(mainCheckoutHookWired(worktreeDir), true, 'must resolve against the main checkout root, not the worktree cwd it was called from');
+
+  execFileSync('git', ['worktree', 'remove', '--force', worktreeDir], { cwd: mainCheckout });
+  fs.rmSync(mainCheckout, { recursive: true, force: true });
 });
 
 test('main-checkout-hook-wired doctor check reports passed/failed matching mainCheckoutHookWired, with an actionable message', () => {

@@ -66,8 +66,16 @@ function add(cwd, id, extra = {}) {
     '--kind', extra.kind ?? 'task',
     '--risk', extra.risk ?? 'low',
     '--verify', extra.verify ?? 'test -f output.txt',
+    // tsk-535: --description is required at add's CLI layer.
+    '--description', extra.description ?? `Title ${id}`,
   ];
   if (extra.domain) flags.push('--domain', extra.domain);
+  // add-stage-default-gap D1/D2: --stage stays opt-in per call here (no
+  // helper-wide default) -- this file's whole point is exercising each
+  // domain's OWN Execute-mapped stage via add's bare default (e.g.
+  // synthetic's 'assembling'), so a hardcoded helper default would be
+  // wrong for exactly the domain this file cares about most.
+  if (extra.stage) flags.push('--stage', extra.stage);
   const result = fgos(cwd, ['add', id, ...flags]);
   assert.equal(result.status, 0, `fgos add ${id} failed: ${result.stderr}`);
   return result;
@@ -90,13 +98,16 @@ function stateView(cwd) {
 }
 
 function writeRunnerConfig(repoRoot, executorScript) {
+  fs.mkdirSync(path.join(repoRoot, '.fgos'), { recursive: true });
   fs.writeFileSync(
-    path.join(repoRoot, '.fgos-runner.json'),
+    path.join(repoRoot, '.fgos', 'config.json'),
     JSON.stringify({
-      executor: { command: process.execPath, args: [executorScript, '{prompt}', '--model', '{model}'] },
-      models: { light: 'haiku', standard: 'sonnet', heavy: 'opus' },
-      timeoutMs: 15000,
-      parallel: { maxRoots: 4, maxLeavesPerRoot: 4 },
+      runner: {
+        executor: { command: process.execPath, args: [executorScript, '{prompt}', '--model', '{model}'] },
+        models: { light: 'haiku', standard: 'sonnet', heavy: 'opus' },
+        timeoutMs: 15000,
+        parallel: { maxRoots: 4, maxLeavesPerRoot: 4 },
+      },
     }),
   );
 }
@@ -157,6 +168,14 @@ test('e2e synthetic domain: add --domain synthetic (no --stage) dispatches throu
   });
   add(repoRoot, 'coding-item', {
     verify: 'test -f coding-output.txt && echo CODE_OK',
+    // add-stage-default-gap D1/D2: add now defaults to stage 'clarify'
+    // instead of the old implicit 'executing' -- unlike synth-item above,
+    // this coding-item call needs an explicit --stage to stay immediately
+    // dispatchable; the synthetic domain's own Execute-mapped stage
+    // ('assembling', not 'executing') is still exercised via its bare
+    // default, deliberately untouched, since that fallback resolution is
+    // this test's whole point.
+    stage: 'executing',
   });
 
   // Both items are independent roots (no deps between them), so a single

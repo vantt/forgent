@@ -6,8 +6,8 @@ non-Claude backend.
 
 ## Field
 
-`capacities.<id>.allowCrossProvider` — boolean, on a `.fgos-runner.json`
-`capacities.<id>` entry. Optional.
+`capacities.<id>.allowCrossProvider` — boolean, on a `.fgos/config.json`
+`runner.capacities.<id>` entry. Optional.
 
 | Value | Effect |
 |---|---|

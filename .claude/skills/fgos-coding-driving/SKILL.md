@@ -288,6 +288,58 @@ prose is a separate, explicit step (tsk-19j-4: see
 `plugins/fgOS/skills/cook/SKILL.md` and `plugins/fgOS/skills/pick/SKILL.md`
 for how each one actually calls this skill today).
 
+## Caller contract: what to do with an anchored-by-open-children report
+
+Fan-out is a CAPABILITY a caller opts into, never a second entry point this
+skill provides itself (D8, `docs/history/execution-fanout/CONTEXT.md`) —
+this skill still never resolves an anchor on its own (see the hard rule
+above). This is the one place that contract is written down; every caller
+in the table above reads it from here, never keeps its own copy.
+
+When this skill reports **anchored by open children**, the caller already
+holds a real candidate set for free: the reported `openChildren` list IS
+`children(parentId)` — case 1's own candidate-set definition
+(`docs/history/execution-fanout/CONTEXT.md` § Thuật ngữ, "tập ứng viên").
+A caller MAY still drive each child sequentially — nothing about an anchor
+report requires concurrency — but when it wants them run concurrently
+instead of one at a time, the contract is:
+
+1. Invoke the `fgos-fanout` skill with `parentId` = the item that just
+   anchored and `candidateIds` = the reported `openChildren` list,
+   unchanged, no re-derivation.
+2. Let `fgos-fanout` run to its own stop (every candidate reaches a
+   terminal status, or is reported back needing a person) — this skill
+   never re-implements or peeks inside that loop; `fgos-fanout` owns it
+   completely, the same "the invoked skill does its own job completely"
+   stance this skill already holds for a stage-skill.
+3. Once `fgos-fanout` returns, invoke THIS skill again on the original
+   `parentId`. The anchor either clears (every child reached a terminal
+   status, so the parent's own lifecycle continues) or it still reports
+   the same or a smaller `openChildren` set (some child came back
+   `blocked` or needing a person) — either way, re-entering this skill on
+   `parentId` is the same fresh-read discipline every other iteration of
+   this loop already follows, never a special case.
+
+### Five callers, one contract — what changes here
+
+The caller table above lists five readers of this same anchor report. This
+item (tsk-66d) wires exactly ONE of them into the contract above; the
+other four inherit it as written but are NOT touched in this item —
+carried forward from `docs/history/execution-fanout/plan.md`'s own Open
+Question:
+
+| Caller | Changed in this item? |
+|---|---|
+| `/fgOS:cook` | **Yes** — its own anchored-by-open-children step (`plugins/fgOS/skills/cook/SKILL.md`) now follows the contract above, invoking `fgos-fanout` in place of the old sequential front-of-queue push |
+| `/fgOS:pick` | No — it still drives exactly the one id it was given; an anchor there means that ONE claimed item split into children, a legitimate stop for a single-id claim to report as-is |
+| a clarify-only sweep | No — inherits the contract, unmodified this item |
+| a planning-only sweep | No — inherits the contract, unmodified this item |
+| an execution-only sweep | No — inherits the contract, unmodified this item |
+
+If a later session finds one of the four "No" rows above is a real gap
+rather than legitimate scope, that is new evidence for a follow-up item —
+`plan.md` already named this as an open question, not a silent omission.
+
 ## Red flags
 
 - resolving a stage's skill from anything other than the live

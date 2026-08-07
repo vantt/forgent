@@ -9,7 +9,7 @@
 // TTL-not-elapsed item is harmless either way — this filter exists only
 // to skip a verb call already known in advance to be a no-op, saving the
 // wasted round trip, not to prevent a bad outcome.
-import { checkCleanupTTLElapsed } from './cleanup-harness.mjs';
+import { checkCleanupTTLElapsed, resolveTtlDaysForItem } from './cleanup-harness.mjs';
 
 function isCandidate(item) {
   return item.status === 'cleanup';
@@ -33,14 +33,22 @@ function latestCleanupEntry(rawEvents, id) {
  * (docs/history/fgos-cleanup-loop/CONTEXT.md): FIFO by the item's own
  * `retrospective -> cleanup` entry timestamp, oldest first — no priority/
  * tier weighting, cleanup is housekeeping, not merge-readiness.
+ *
+ * tsk-59x D2: `leafTtlDays`, when supplied alongside `ttlDays`, resolves
+ * per-item the same way `assessCleanupReadiness` does — a leaf's own TTL
+ * check uses `leafTtlDays`, a root's uses `ttlDays`. This is the actual
+ * fix for the item's own demonstrated pain (leaves never elapsing the
+ * picker's own TTL filter); omitted entirely, behavior is byte-identical
+ * to before this item.
  */
-export function pickNextCleanupItem(view, rawEvents, { ttlDays, now } = {}) {
+export function pickNextCleanupItem(view, rawEvents, { ttlDays, leafTtlDays, now } = {}) {
   const work = view?.work ?? {};
   const candidates = [];
   for (const id of Object.keys(work)) {
     const item = work[id];
     if (!isCandidate(item)) continue;
-    const ttl = checkCleanupTTLElapsed(rawEvents, id, { ttlDays, now });
+    const resolvedTtlDays = resolveTtlDaysForItem(view, id, { ttlDays, leafTtlDays });
+    const ttl = checkCleanupTTLElapsed(rawEvents, id, { ttlDays: resolvedTtlDays, now });
     if (!ttl.ok) continue;
     const entered = latestCleanupEntry(rawEvents, id);
     candidates.push({ id, enteredAt: new Date(entered.ts).getTime() });

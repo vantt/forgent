@@ -29,14 +29,14 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { appendEvent, readEvents, withEventsLock, appendEventLocked } from './events.mjs';
 import { rebuildView, viewRevision } from './replay.mjs';
-import { graphMetrics as computeGraphMetrics, whatIf as computeWhatIf, classifyStaleDoing, classifyStalePostDelivery, footprintOverlap, goalScopedCriticalPath, goalScopedGreedyTopUnblock, computeSchedule, detectCycles } from './graph-metrics.mjs';
+import { graphMetrics as computeGraphMetrics, whatIf as computeWhatIf, classifyStaleDoing, classifyStalePostDelivery, footprintOverlapAmong, goalScopedCriticalPath, goalScopedGreedyTopUnblock, computeSchedule, detectCycles } from './graph-metrics.mjs';
 import { transitionWork, FsmError } from './status-fsm.mjs';
 import { transitionStage } from './stage-fsm.mjs';
 import { validateWork, validateDomainFields, checkAcceptanceEvidenceTraceable, WorkValidationError, DEFAULTS, GOAL_TIERS, truncateTitle } from './work.mjs';
 import { getDomain, statusCategoryFor, parkReasonForStatus } from './workflow-stage-graphs.mjs';
 import { EventLogError } from './events.mjs';
 import { validateToolRegistration, ToolRegistryError } from './tool-registry.mjs';
-import { frontier, isDepsAndLineageReady as depsAndLineageReadyView } from './frontier.mjs';
+import { frontier, frontierAcrossSteps, isDepsAndLineageReady as depsAndLineageReadyView } from './frontier.mjs';
 import { assertNoCycle, assertNoUnifiedCycle } from './dep-graph.mjs';
 import { resolveWriterIdentity } from '../runner/session-identity.mjs';
 
@@ -287,16 +287,33 @@ export function editWork(dir, { id, patch, role } = {}) {
       : patch;
 
     const candidate = { ...work, ...normalizedPatch };
-    validateWork(candidate, Object.keys(before.work));
+    // tsk-1ne D1/D2: re-validate only the fields this patch actually
+    // touches, not the whole merged candidate — a legacy item can carry a
+    // field that predates a since-tightened rule (e.g. a `stage` value no
+    // longer in the enum, an over-length `id`) and was never rejected by
+    // this door before this check existed; re-validating it on every
+    // UNRELATED edit blocked that item from being edited AT ALL. `id`/
+    // `stage`/`status`/`domain` can never be in `patch` in the first place
+    // (rejected by the EDITABLE_FIELDS loop above), so this only ever
+    // grandfathers a field the patch could never have touched anyway —
+    // never a field the patch is actually trying to change.
+    const touchedFields = new Set(Object.keys(patch));
+    validateWork(candidate, Object.keys(before.work), touchedFields);
     // domainFields fieldSchema (decision record 0027, D6): same narrower
-    // per-domain check addWork runs above — only reachable here when
-    // patch.domainFields is present (EDITABLE_FIELDS), so an edit touching
-    // any other field never pays this check.
-    validateDomainFields(candidate, getDomain(candidate.domain));
-    // tsk-5q5-2 (D1/D3): same narrow check addWork applies above — only
-    // reachable here when `patch.acceptance` is present (EDITABLE_FIELDS),
-    // so an edit touching any other field never pays this check.
-    checkAcceptanceEvidenceTraceable(candidate, path.dirname(dir));
+    // per-domain check addWork runs above — only actually reachable when
+    // `patch.domainFields` is present, same tsk-1ne scoping as validateWork
+    // above (no domain declares a fieldSchema today, so this is dormant
+    // either way — gated for the same general reason, not observed impact).
+    if (touchedFields.has('domainFields')) {
+      validateDomainFields(candidate, getDomain(candidate.domain));
+    }
+    // tsk-5q5-2 (D1/D3): same narrow check addWork applies above — gated to
+    // only run when `patch.acceptance` is present (tsk-1ne D1/D2): an item
+    // with a pre-existing non-traceable `acceptance` clause would otherwise
+    // block every unrelated edit the same way the stage/id bug did.
+    if (touchedFields.has('acceptance')) {
+      checkAcceptanceEvidenceTraceable(candidate, path.dirname(dir));
+    }
     // Same guard pair as addWork above. deps-only first (work-graph-intelligence
     // S1) — this is the gap that used to close silently: a patch introducing an
     // A<->B cycle through `deps` (an EDITABLE_FIELDS entry) went straight
@@ -948,10 +965,14 @@ export function listWork(dir) {
  * so `frontier` on it returns `[]` — never an error, exit 0, exactly like
  * `listWork` on an uninitialized dir. A corrupt log throws the same
  * `EventLogError('corrupt-log')` `rebuildView`/`listWork` already throw.
+ * `step` (tsk-4so, optional): which domain step counts as "ready to start"
+ * — passed straight through to `frontier`'s own `step` option
+ * (`'Clarify'`/`'Divide'`/`'Execute'`); omitted, `frontier`'s own default
+ * (`'Execute'`) applies, byte-identical to every pre-existing caller.
  */
-export function readyWork(dir) {
+export function readyWork(dir, { step } = {}) {
   const { logPath } = paths(dir);
-  return frontier(rebuildView(logPath));
+  return frontier(rebuildView(logPath), step ? { step } : undefined);
 }
 
 /**
@@ -1062,10 +1083,19 @@ export function stalePostDeliveryAdvisory(dir, opts = {}) {
  * pairs of ready items whose declared file footprints overlap, so a parallel
  * dispatch would risk a file conflict. Same read-facade shape as graphMetrics;
  * the Domain core finds the overlaps and suggests resolutions.
+ * Candidates come from `frontierAcrossSteps` (tsk-4so D1, docs/history/
+ * execution-fanout/CONTEXT-tsk-4so.md), not the single-step `frontier` —
+ * two items at DIFFERENT steps (e.g. one at `decompose`, one at
+ * `executing`) sharing a footprint is a real risk this advisory must catch,
+ * not just two items both currently at `executing`. `footprintOverlap`
+ * (the Execute-only single-step wrapper other decision docs already cite
+ * by name as its contract) is intentionally left untouched — this reuses
+ * the underlying `footprintOverlapAmong` pairwise comparison directly
+ * instead.
  */
 export function footprintConflicts(dir) {
   const { logPath } = paths(dir);
-  return footprintOverlap(rebuildView(logPath));
+  return footprintOverlapAmong(frontierAcrossSteps(rebuildView(logPath)));
 }
 
 /**

@@ -77,6 +77,18 @@ re-shapes the work; that already happened at `clarify`/`decompose`.
    all is legitimately small enough that the title and `verify` command
    are the whole spec — do not manufacture ceremony it doesn't need.
 
+   If this session did not arrive here via the `fgos-coding-driving` loop
+   (which already re-checks claim status fresh right before invoking this
+   skill) — for example, a session driving stage-by-stage by hand, straight
+   from `fgos-validating`'s own `fgos decompose` call — re-check the item's
+   live `status` (`fgos list --id <id> --json`) before doing anything else:
+   the `decompose`→`executing` edge releases the claim back to `todo`
+   (`releaseClaimOnExecuting`, `src/intake/decompose.mjs:488-494`,
+   claim-lock §3b), so the claim may already be released. If `status` reads
+   `todo`, re-claim (`fgos pick <id>`) before Implementing — proceeding
+   without a live claim risks `fgos return` refusing later with "is todo,
+   not doing".
+
 2. **Implement.** Make the real change the item describes, reading every
    file before editing it. Before editing a symbol, apply `CLAUDE.md`'s
    impact-analysis capability gate rather than assuming GitNexus is on this
@@ -109,12 +121,31 @@ re-shapes the work; that already happened at `clarify`/`decompose`.
    command — never weaken the command or swap in an easier one to make it
    pass.
 
-4. **Iron Law evidence (when applicable).** Before returning, check whether
-   this item's own diff will trip the Iron Law gate at `approve` — compute
-   the exact file set the gate itself uses (`changedFiles`,
-   `src/runner/merge.mjs`) and classify it the same way (`classifyIronLaw`,
-   `src/evolve/iron-law.mjs`), never a separate early-prediction heuristic
-   (`docs/history/tsk-5t3-iron-law-evidence-contract/CONTEXT.md` D2):
+4. **Commit, then check Iron Law evidence (when applicable).** The Iron Law
+   gate's own file-set computation (`changedFiles`, `src/runner/merge.mjs`)
+   diffs `trunk...branch` — COMMITTED history only, the exact same
+   committed-ref shape `approve`/`sync-root`'s own gate diffs at merge time
+   (`docs/history/tsk-5t3-iron-law-evidence-contract/CONTEXT.md` D2: the
+   trigger must reuse the real classifier against the real diff, never an
+   early-prediction heuristic). Running this check before committing the
+   implementation is a false negative, not a skip — the diff sees only
+   whatever was already committed (typically just the earlier
+   `plan.md`/`CONTEXT.md` commits), so the classification comes back
+   `{required:false}` even when the real diff would trip the gate, silently
+   skipping `iron-law-evidence.md` and forcing a retroactive scramble to
+   reconstruct proof once `approve` correctly catches it later (`tsk-2l0`,
+   reproduced live on `tsk-1ne` the session immediately before this fix was
+   written). So: `git add` and `git commit` the real implementation (and
+   its now-passing verify from step 3) FIRST —
+
+   ```bash
+   git add <files this item actually changed>
+   git commit -m "<conventional-commit message, item id included>"
+   ```
+
+   — THEN compute the exact file set the gate itself uses and classify it
+   the same way (`classifyIronLaw`, `src/evolve/iron-law.mjs`), against
+   that now-real committed diff:
 
    ```bash
    root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
@@ -132,10 +163,13 @@ re-shapes the work; that already happened at `clarify`/`decompose`.
    `docs/history/<id>/iron-law-evidence.md` — the matched flags/modules
    from that same result, the test command step 3 already ran, and its
    real failing-before/passing-after transcript excerpts (the
-   "failing-test-first proof" `CONTEXT.md` D1 pins) — and commit it in
-   the same commit as the implementation (the "one commit per item" rule
-   above). When `required` is `false`, write nothing; this cost is only
-   paid for the items the gate will actually apply to.
+   "failing-test-first proof" `CONTEXT.md` D1 pins) — and commit it as its
+   own follow-up commit (the implementation already landed in its own
+   commit above; the "one commit per item" rule above is about the
+   implementation itself, not a ban on this small additive evidence
+   commit that necessarily comes after it). When `required` is `false`,
+   write nothing; this cost is only paid for the items the gate will
+   actually apply to.
 
 5. **Return.** Hand the item back with:
 

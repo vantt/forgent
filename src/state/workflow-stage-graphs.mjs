@@ -50,14 +50,26 @@ export const DEFAULT_DOMAIN = 'coding';
 
 export const DOMAINS = Object.freeze({
   coding: Object.freeze({
-    // Pre-retrofit work.mjs STAGES value — 'compound-learn' retired (D11):
-    // the synthesis layer it used to gate is now the status `retrospective`
-    // (status-fsm.mjs), not a stage entry here.
-    stages: Object.freeze(['clarify', 'decompose', 'executing']),
+    // tsk-1w7 D10 (docs/history/fanout-and-delegation-rubric/CONTEXT.md):
+    // two new stages sit between `clarify` and `decompose` — `discovery`
+    // (machine-alone research, fgos-researching) and `exploring` (the
+    // machine+human Socratic decision-lock D3 calls the "pha máy+người"
+    // half — the deep-dive work `clarify` itself used to do before this
+    // item). `clarify` is KEPT (D10 — never renamed), but its own SKILL
+    // changes below: it now runs the lighter self-judging pass D13
+    // describes, not the old Socratic lock.
+    stages: Object.freeze(['clarify', 'discovery', 'exploring', 'decompose', 'executing']),
     // Maps each of coding's stages to the base-workflow step it satisfies.
     // Init and Compound-learn are the two base-workflow steps that now
     // happen outside `stage` entirely (intake before any stage exists;
-    // synthesis on the status axis, per D11).
+    // synthesis on the status axis, per D11). `discovery`/`exploring` are
+    // NEW coding-specific intermediate stages with no base-workflow step of
+    // their own (tsk-1w7 D10) — same "outside the 5-step vocabulary"
+    // treatment Init/Compound-learn already get, so they carry no entry
+    // here at all rather than colliding with `clarify`'s own 'Clarify' key
+    // (`stageForStep`'s `Object.keys(stepMap).find(...)` only ever needs
+    // ONE stage per step to stay unambiguous — verified by reading its body
+    // directly, tsk-1w7 impact-analysis posture: degraded).
     stepMap: Object.freeze({
       clarify: 'Clarify',
       decompose: 'Divide',
@@ -65,11 +77,28 @@ export const DOMAINS = Object.freeze({
     }),
     // Pre-retrofit stage-fsm.mjs STAGE_TRANSITIONS value — the
     // executing -> compound-learn edge is retired along with the stage
-    // itself (D11).
+    // itself (D11) — PLUS four new edges for the D10 chain (tsk-1w7/
+    // tsk-puz): `clarify -> discovery -> exploring -> decompose`, the
+    // sequential chain a NEW item walks, and one direct `clarify ->
+    // exploring` jump (tsk-puz D12) for a PRE-EXISTING item being migrated
+    // straight into `exploring` because it is already parked mid-Socratic-
+    // question (`status: 'awaiting-human'`) — such an item is already at
+    // the machine+human decision-lock stage; routing it through `discovery`
+    // first would misrepresent it as needing a machine-alone research pass
+    // it never asked for. The three pre-existing edges stay exactly as they
+    // were: `clarify -> executing` is still dormant-but-legal (stage-fsm.mjs's
+    // own header comment), and `clarify -> decompose` / `decompose ->
+    // executing` are still the literal edges discovery.mjs/decompose.mjs
+    // fire today — neither file is in tsk-1w7's or tsk-puz's own declared
+    // footprint, so both edges must stay legal exactly as-is.
     transitions: Object.freeze([
       Object.freeze({ from: 'clarify', to: 'executing' }),
       Object.freeze({ from: 'clarify', to: 'decompose' }),
       Object.freeze({ from: 'decompose', to: 'executing' }),
+      Object.freeze({ from: 'clarify', to: 'discovery' }),
+      Object.freeze({ from: 'discovery', to: 'exploring' }),
+      Object.freeze({ from: 'exploring', to: 'decompose' }),
+      Object.freeze({ from: 'clarify', to: 'exploring' }),
     ]),
     // Which fgOS skill a session should load for each stage (str89-fgos-
     // domain-skills D3/D4) — `null` means "no skill, mechanical" (today's
@@ -107,8 +136,18 @@ export const DOMAINS = Object.freeze({
     // in `bin/fgos.mjs`/`cleanup-harness.mjs`): it is pure harness, no skill
     // ever loads for it, and its own per-domain difference is already fully
     // carried by the existing `worktreeBacked` field below.
+    // tsk-1w7 D10/D13: `clarify` now runs the NEW lightweight self-judging
+    // skill (`fgos-clarifying`, tsk-v4b/P2 — "chỉ hỏi khi không hiểu", D13)
+    // instead of the old deep Socratic lock; that old behavior lives on
+    // under the NEW `exploring` stage name instead, still served by the
+    // SAME unchanged `fgos-exploring` skill file. `discovery` runs the new
+    // stage-agnostic research skill (`fgos-researching`, tsk-2t9/P1). Both
+    // skill files already exist on disk (P1/P2 merged before this item —
+    // exactly the dependency plan.md's own P4 row records: "Chờ: P1, P2").
     skillMap: Object.freeze({
-      clarify: 'fgos-exploring',
+      clarify: 'fgos-clarifying',
+      discovery: 'fgos-researching',
+      exploring: 'fgos-exploring',
       decompose: 'fgos-planning',
       executing: 'fgos-code-implement',
       retrospective: 'fgos-compounding',

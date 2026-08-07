@@ -69,7 +69,7 @@ import { computeAwaitingContext } from '../src/state/awaiting-context.mjs';
 import { DOCTOR_CHECKS, integrationScriptPath, ensureSharedConfigDefaults, runFixes } from '../src/setup/checks.mjs';
 import { sharedConfigFilePath, readSharedConfig } from '../src/config/shared-config-file.mjs';
 import { assessCleanupReadiness } from '../src/state/cleanup-harness.mjs';
-import { DEFAULT_CLEANUP_TTL_DAYS } from '../src/setup/registrations.mjs';
+import { DEFAULT_CLEANUP_TTL_DAYS, DEFAULT_CLEANUP_LEAF_TTL_DAYS } from '../src/setup/registrations.mjs';
 import { installGitHooks, uninstallGitHooks } from '../src/setup/git-hooks.mjs';
 import { detectRcFiles, insertSourceLine, hasSourceLine } from '../src/setup/shell-rc.mjs';
 import { formatCheck, bold } from '../src/setup/ansi.mjs';
@@ -277,13 +277,18 @@ function parseWaitFlags(flags, verbName) {
   return { noWait, waitMs };
 }
 
-// Shared --timeout/--no-timeout resolution for return/approve/catchup
-// (tsk-3vo D2/D3/D5): omitting both falls back to .fgos-runner.json's own
-// timeoutMs -- the same value and the same runGoalCheck primitive the
-// runner loop already uses at loop.mjs -- instead of silently running
-// verify unbounded, which used to leave a hung verify command with no
-// diagnosis and the main-checkout lock held until TTL expiry. --no-timeout
-// is the only way left to opt into an actually-unbounded verify run.
+// Shared --timeout/--no-timeout resolution for return/approve/sync-root/
+// catchup (tsk-3vo D2/D3/D5): omitting both falls back to the runner
+// config's own timeoutMs -- the same value and the same runGoalCheck
+// primitive the runner loop already uses at loop.mjs -- instead of
+// silently running verify unbounded, which used to leave a hung verify
+// command with no diagnosis and the main-checkout lock held until TTL
+// expiry. --no-timeout is the only way left to opt into an actually-
+// unbounded verify run. Every call site passes `path.dirname(dir)`, not
+// `process.cwd()` (tsk-5hv, found by fgos-code-implement): same
+// worktree-blindness fix as `discover`/`decompose` above -- `dir` already
+// reflects `--dir` when a skill passes it explicitly, `process.cwd()`
+// never does.
 function resolveVerifyTimeoutMs(verb, flags, repoRoot) {
   const timeoutFlag = optionalField(
     flags.timeout,
@@ -721,20 +726,66 @@ function collectCheckData(view, id, dir) {
 // complexity with nothing real to show yet (YAGNI over frontier.mjs's
 // multi-level `hasOpenDescendant` walk, which exists for a different job —
 // gating the frontier, not reporting progress).
+function childrenOf(view, id) {
+  return Object.values(view.work).filter((w) => w.parent === id);
+}
+
+// The second membership edge a rollup has to read (tsk-1ug): `targets`
+// (str67-goal-directed-planning D2, src/state/work.mjs:567-588) is the set
+// of items a goalTier milestone/MVP considers part of it. Unlike `parent`
+// it never goes through `resolveRoot`, so each target keeps its own root
+// and merges independently onto main -- a genuinely DIFFERENT relationship
+// from a decomposed root's children, not a second way of spelling the same
+// one, which is why the two stay separate arrays with separate counts
+// rather than being folded into one (execution-fanout CONTEXT.md D4; the
+// same split `edit --verify-from-children`/`--verify-from-targets` already
+// keeps below).
+//
+// A target id with no matching work item is reported as a row with null
+// `title`/`status` rather than dropped: `targets` deliberately skips
+// validateDeps (work.mjs:571-575), so a typo'd id is reachable, and
+// silently dropping it would let a milestone read as complete when one of
+// its targets does not exist at all. Such a row counts toward
+// `targetTotalCount` and never toward `targetDoneCount`.
+//
+// Single level, same as `childrenOf` above: a target that is itself a
+// milestone is reported as one row, never recursed into.
+// `graph-metrics.mjs`'s `targetsClosure` already exists for the transitive
+// job (a different one -- scoping a goal, not reporting progress).
+function targetsOf(view, item) {
+  const ids = Array.isArray(item.targets) ? item.targets : [];
+  return ids.map((targetId) => {
+    const target = view.work?.[targetId];
+    return {
+      id: targetId,
+      title: target?.title ?? null,
+      status: target?.status ?? null,
+    };
+  });
+}
+
 function collectRollupData(view, id) {
   const item = view.work?.[id];
   if (!item) {
     throw new StoreError('validation', `rollup: work "${id}" not found.`);
   }
-  const children = Object.values(view.work).filter((w) => w.parent === id);
+  const children = childrenOf(view, id);
   const done = children.filter((w) => w.status === 'done').length;
+  const targets = targetsOf(view, item);
   return {
     id,
     title: item.title,
     status: item.status,
+    // Children-only, unchanged by tsk-1ug: every already-published
+    // consumer of these two fields keeps reading exactly the number it
+    // read before. A milestone's own progress lives in the `target*` pair
+    // below instead of changing what these two mean.
     doneCount: done,
     totalCount: children.length,
     children: children.map((c) => ({ id: c.id, title: c.title, status: c.status })),
+    targetDoneCount: targets.filter((t) => t.status === 'done').length,
+    targetTotalCount: targets.length,
+    targets,
   };
 }
 
@@ -919,9 +970,22 @@ async function runVerb(verb, flags, positional, dir) {
         // through unrejected here — work.mjs's validateWorkShape is the single
         // source for the DOMAINS registry and rejects it as validation, so
         // that rule is never duplicated here (same discipline as --tier/TIERS).
-        // No --stage flag: omitting stage already resolves per-domain via the
-        // existing lazy default (item.stage ?? domain's Execute-mapped stage).
         domain: optionalField(flags.domain, 'add --domain requires a domain name (e.g. coding/synthetic); omit --domain entirely to use the default.'),
+        // Per D1/D2 (docs/history/add-stage-default-gap/CONTEXT.md): add now
+        // stamps an entry stage the same way submit always has (line ~822
+        // above) instead of leaving stage undefined -- explicit --stage
+        // overrides; omitting it defaults to the domain's Clarify-mapped
+        // stage (byte-identical 'clarify' for the default/omitted coding
+        // case). Same silenced onUnrecognized as submit's own call: an
+        // out-of-registry --domain is about to be rejected by addWork's
+        // validateWork below anyway, so this must not fire a spurious
+        // "folding to coding" warning first. An out-of-enum --stage value
+        // is rejected downstream by store.mjs's validateWorkShape (the
+        // single source for the STAGES domain), same "don't duplicate the
+        // validation source" discipline --domain/--tier already follow.
+        stage: optionalField(flags.stage, 'add --stage requires a stage value (e.g. clarify/decompose/executing); omit --stage entirely to use the default.')
+          ?? stageForStep(getDomain(flags.domain, { onUnrecognized: () => {} }), 'Clarify')
+          ?? getDomain(flags.domain, { onUnrecognized: () => {} }).stages[0],
         // Per work-graph-intelligence S2b (producer A): --discovered-from is
         // an explicit, optional scalar provenance flag — same omitted-leaves-
         // undefined shape as --domain/--tier above. work.mjs's
@@ -1065,9 +1129,18 @@ async function runVerb(verb, flags, positional, dir) {
       // An explicit --config path stays a loud, unmodified failure on ENOENT
       // (loadRunnerConfig); only the default, unflagged path bootstraps a
       // missing config (D1/D3, ensureRunnerConfigForDir — tsk-5vf D1/D2).
+      // `path.dirname(dir)`, not `process.cwd()` (tsk-5hv, found by
+      // fgos-code-implement): `dir` already reflects `--dir` when given
+      // (every skill's own hard rule: resolve the main checkout and pass
+      // it explicitly) or `process.cwd()` when omitted (dataDir()'s own
+      // documented cwd-strict contract) -- reusing it here instead of a
+      // bare `process.cwd()` is what keeps this call correct for a
+      // worktree-resident session, since `.fgos/config.json` is
+      // unconditionally wiped from every freshly-created worktree
+      // (ADR0020) and a bare cwd would silently resolve to nothing there.
       const cfg = flags.config
         ? loadRunnerConfig(flags.config)
-        : ensureRunnerConfigForDir(process.cwd());
+        : ensureRunnerConfigForDir(path.dirname(dir));
       const callerVerdict = parseDiscoverCallerVerdict(flags);
       return resolveDiscovery(dir, id, cfg, 'session', callerVerdict);
     }
@@ -1088,9 +1161,11 @@ async function runVerb(verb, flags, positional, dir) {
       if (stage !== decomposeStage) {
         throw new StoreError('validation', `decompose: work "${id}" is at stage "${stage}", not "${decomposeStage}" -- use "fgos discover ${id}" instead.`);
       }
+      // path.dirname(dir), not process.cwd() -- see the discover case above
+      // for why (tsk-5hv, found by fgos-code-implement).
       const cfg = flags.config
         ? loadRunnerConfig(flags.config)
-        : ensureRunnerConfigForDir(process.cwd());
+        : ensureRunnerConfigForDir(path.dirname(dir));
       const callerVerdict = parseDecomposeCallerVerdict(flags);
       return resolveDecompose(dir, id, cfg, 'session', callerVerdict);
     }
@@ -1166,6 +1241,9 @@ async function runVerb(verb, flags, positional, dir) {
       const repoRoot = process.cwd();
       const sharedConfig = readSharedConfig(repoRoot);
       const ttlDays = sharedConfig?.cleanup?.ttlDays ?? DEFAULT_CLEANUP_TTL_DAYS;
+      // tsk-59x D1: a leaf gets this shorter/zero TTL instead of ttlDays --
+      // resolved per-item inside assessCleanupReadiness (resolveTtlDaysForItem).
+      const leafTtlDays = sharedConfig?.cleanup?.leafTtlDays ?? DEFAULT_CLEANUP_LEAF_TTL_DAYS;
 
       const assessment = assessCleanupReadiness({
         view,
@@ -1174,6 +1252,7 @@ async function runVerb(verb, flags, positional, dir) {
         repoRoot,
         worktreeBacked: domain.worktreeBacked ?? false,
         ttlDays,
+        leafTtlDays,
       });
 
       if (assessment.failed.length > 0) {
@@ -1626,6 +1705,39 @@ async function runVerb(verb, flags, positional, dir) {
       const view = showAll
         ? rawView
         : { ...rawView, work: Object.fromEntries(Object.entries(rawView.work).filter(([, item]) => !isResolvedStatus(item))) };
+      // Child-view gate (tsk-4fg D1/D2): DEFAULT view only -- `--all`
+      // stays byte-identical/raw (D1), preserving herdr-plugin's own
+      // `list --all --json` contract (bin/fgos.mjs comment above, `case
+      // 'list'`). A row is dropped from the default view only when its
+      // `parent` is itself present in this SAME filtered set -- a child
+      // whose parent already got filtered out (resolved/hidden) falls
+      // back to a normal top-level row instead of vanishing with no
+      // parent left to carry its progress (D2; proven live against
+      // tsk-19y's still-open children). An `awaiting-human` child is
+      // never dropped either, regardless of parent visibility, so a
+      // parked question can never be silently hidden by this filter --
+      // the parent-anchored `awaitingContext` loop just below this block
+      // depends on `view.work` still carrying every `awaiting-human` row.
+      // Every dropped child's parent gets a `childProgress` badge instead,
+      // reusing `childrenOf`/the same `doneCount` rule `collectRollupData`
+      // already uses -- computed from ALL of that parent's children in
+      // `rawView`, not just the ones still visible after filtering, so a
+      // parent with e.g. 3 already-`done` (hidden) children and 3 still-
+      // open ones reports an honest `3/6`, not `0/3`.
+      if (!showAll) {
+        const isHideableChild = (item) =>
+          item.parent !== undefined && item.parent !== null && item.parent in view.work && item.status !== 'awaiting-human';
+        view.work = Object.fromEntries(
+          Object.entries(view.work)
+            .filter(([, item]) => !isHideableChild(item))
+            .map(([id, item]) => {
+              const children = childrenOf(rawView, id);
+              if (children.length === 0) return [id, item];
+              const done = children.filter((w) => w.status === 'done').length;
+              return [id, { ...item, childProgress: { done, total: children.length } }];
+            }),
+        );
+      }
       // Parent-anchored context (str61 D1/D2/D3): additive-only key,
       // computed fresh from `view` on every read (D1 — never a persisted
       // "session"), never touching store.listWork itself. Only
@@ -1688,8 +1800,12 @@ async function runVerb(verb, flags, positional, dir) {
     // touches state.json, never creates `.fgos/` if it's missing. Goes
     // through store.readyWork only; this file never imports frontier.mjs
     // directly (per this cell's key_links).
+    // `--step` (tsk-4so, docs/history/execution-fanout/CONTEXT-tsk-4so.md):
+    // which domain step's frontier to read (`Clarify`/`Divide`/`Execute`);
+    // omitted, readyWork's own default (`Execute`) applies, byte-identical
+    // to every pre-existing caller.
     case 'ready': {
-      return paginateVerbResult(readyWork(dir), flags, 'ready-v1', 'ready');
+      return paginateVerbResult(readyWork(dir, flags.step ? { step: flags.step } : undefined), flags, 'ready-v1', 'ready');
     }
 
     // Request-class per D1 (same contract as `ready`/`list`): a pure read —
@@ -1716,7 +1832,7 @@ async function runVerb(verb, flags, positional, dir) {
     // only role, and it never reclaims a person's claim).
     // Request-class per D1: a pure read, never touches state.json. Reports
     // the configured gate-bypass level (docs/history/gate-bypass/CONTEXT.md
-    // D1-D5) — no CLI setter, mirroring .fgos-runner.json's own
+    // D1-D5) — no CLI setter, mirroring .fgos/config.json's own
     // edit-the-file-by-hand pattern.
     case 'gate-bypass': {
       return { level: readGateBypassLevel(dir) };
@@ -2215,7 +2331,7 @@ async function runVerb(verb, flags, positional, dir) {
     // doing->blocked + friction (mirrors the runner's own park path).
     case 'return': {
       const id = requireField(positional[0] ?? flags.id, 'return requires an id: fgos return <id> [--timeout <ms>|--no-timeout] [--no-new-commits-ok]');
-      const timeoutMs = resolveVerifyTimeoutMs('return', flags, process.cwd());
+      const timeoutMs = resolveVerifyTimeoutMs('return', flags, path.dirname(dir));
       // tsk-4on D1-D3: explicit escape hatch for work already fully done
       // BEFORE this claim (e.g. a parent whose children's merged content
       // already sits on its own branch from a prior session) — return's
@@ -2318,17 +2434,23 @@ async function runVerb(verb, flags, positional, dir) {
           return { id, from: 'doing', to: 'awaiting-approval', source: 'branch', branch, aheadCount: branchAheadCount, passed: true, seq: event.seq, output: check.output, frozenJudgeHits: frozenJudge, footprintDiffHits: footprintDiff };
         }
 
-        moveWork(dir, { id, to: 'blocked', expectedStatus: 'doing', reason: 'verify-fail', role: 'system' });
-        addOutcome(dir, { id, actual: { outcome: 'blocked', passed: false, attempts: 1, errorClass: 'verify-miss', aheadCount: branchAheadCount } });
+        // tsk-53o: a timeout is not proof the item's verify failed (the
+        // machine may simply have been under load) — never let it park as
+        // an indistinguishable 'verify-fail'/'verify-miss', and never state
+        // "(exit null)" as if that were a real exit code.
+        moveWork(dir, { id, to: 'blocked', expectedStatus: 'doing', reason: check.timedOut ? 'verify-timeout' : 'verify-fail', role: 'system' });
+        addOutcome(dir, { id, actual: { outcome: 'blocked', passed: false, attempts: 1, errorClass: check.timedOut ? 'verify-timeout' : 'verify-miss', aheadCount: branchAheadCount } });
         addFriction(dir, {
           id,
           disposition: 'blocked',
-          errorClass: 'verify-miss',
+          errorClass: check.timedOut ? 'verify-timeout' : 'verify-miss',
           layer: 'verification',
           attempts: 1,
-          detail: `goal-check failed on branch "${branch}" (exit ${check.status})`,
+          detail: check.timedOut
+            ? `goal-check on branch "${branch}" timed out after ${timeoutMs}ms — not a verify failure, rerun return`
+            : `goal-check failed on branch "${branch}" (exit ${check.status})`,
         });
-        return { id, from: 'doing', to: 'blocked', source: 'branch', branch, aheadCount: branchAheadCount, passed: false, exitStatus: check.status, output: check.output };
+        return { id, from: 'doing', to: 'blocked', source: 'branch', branch, aheadCount: branchAheadCount, passed: false, timedOut: check.timedOut, exitStatus: check.status, output: check.output };
       }
 
       if (typeof item.headAtTake !== 'string' || !item.headAtTake) {
@@ -2378,22 +2500,26 @@ async function runVerb(verb, flags, positional, dir) {
         return { id, from: 'doing', to: 'awaiting-approval', source: 'main', aheadCount, passed: true, seq: event.seq, output: check.output, frozenJudgeHits: frozenJudge, footprintDiffHits: footprintDiff };
       }
 
-      moveWork(dir, { id, to: 'blocked', expectedStatus: 'doing', reason: 'verify-fail', role: 'system' });
-      addOutcome(dir, { id, actual: { outcome: 'blocked', passed: false, attempts: 1, errorClass: 'verify-miss', aheadCount } });
+      // tsk-53o: same timeout/fail distinction as the branch-source path
+      // above — a timeout is not proof the item's verify failed.
+      moveWork(dir, { id, to: 'blocked', expectedStatus: 'doing', reason: check.timedOut ? 'verify-timeout' : 'verify-fail', role: 'system' });
+      addOutcome(dir, { id, actual: { outcome: 'blocked', passed: false, attempts: 1, errorClass: check.timedOut ? 'verify-timeout' : 'verify-miss', aheadCount } });
       addFriction(dir, {
         id,
         disposition: 'blocked',
-        errorClass: 'verify-miss',
+        errorClass: check.timedOut ? 'verify-timeout' : 'verify-miss',
         layer: 'verification',
         attempts: 1,
-        detail: `goal-check failed (exit ${check.status})`,
+        detail: check.timedOut
+          ? `goal-check timed out after ${timeoutMs}ms — not a verify failure, rerun return`
+          : `goal-check failed (exit ${check.status})`,
       });
       // Same early-release as the passing branch above (tsk-45z D1/D2) — a
       // failed verify still means this session is done touching the main
       // checkout; the item settling to `blocked` is just as much "done with
       // the checkout" as settling to `proposed`.
       releaseMainCheckoutLockIfOwn(dir, resolveWriterIdentity(dir).id);
-      return { id, from: 'doing', to: 'blocked', source: 'main', aheadCount, passed: false, exitStatus: check.status, output: check.output };
+      return { id, from: 'doing', to: 'blocked', source: 'main', aheadCount, passed: false, timedOut: check.timedOut, exitStatus: check.status, output: check.output };
     }
 
     // Cổng duyệt PR nội bộ (pr-lifecycle D1/D4): a proposed item's diff,
@@ -2548,7 +2674,7 @@ async function runVerb(verb, flags, positional, dir) {
     // the settlement, the merge itself is only the mechanical consequence).
     case 'approve': {
       const id = requireField(positional[0] ?? flags.id, 'approve requires an id: fgos approve <id> [--timeout <ms>|--no-timeout]');
-      const timeoutMs = resolveVerifyTimeoutMs('approve', flags, process.cwd());
+      const timeoutMs = resolveVerifyTimeoutMs('approve', flags, path.dirname(dir));
       const { noWait, waitMs } = parseWaitFlags(flags, 'approve');
       const runMerge = (mergeFn) => (noWait ? mergeFn() : withLockRetry(mergeFn, { waitMs }));
 
@@ -2782,18 +2908,31 @@ async function runVerb(verb, flags, positional, dir) {
           // Ephemeral worktree checked out on fgw/<rootId> (guaranteed to
           // exist by the time a leaf reaches "awaiting-approval" — dispatch-side
           // wiring, cell fan-out-parallel-9) — never the human's own main
-          // checkout. This still races a concurrent approval of a sibling
-          // leaf of the same root, or the runner's own dispatch of that
-          // root — D16's per-root merge-mutex lives in the runner's
-          // write-queue, not this human-driven CLI verb, so nothing here
-          // prevents two such merges from overlapping. What changed
-          // (tsk-46a, docs/history/merge-ephemeral-branch-force-race/
-          // CONTEXT.md): withMergeEphemeralWorktree's own CAS guard now
-          // catches the overlap at the ref-move step and makes the losing
-          // side fail loudly instead of silently overwriting the winner's
-          // commit — the race can still happen, but it is no longer a
-          // silent data-loss risk; the losing `approve` call just needs a
-          // retry against the new tip.
+          // checkout, and never a literal checkout of fgw/<rootId> itself:
+          // withMergeEphemeralWorktree stands up a DETACHED checkout at the
+          // branch's current tip commit, merges there, then lands the
+          // result via a plain `git branch -f` ref update (worktree.mjs,
+          // docs/history/merge-worktree-reclaim-clobbers-kept-checkout/
+          // CONTEXT.md D1 — this replaces an earlier version of this
+          // comment that attributed the race below to createWorktree's
+          // branch-reuse path force-reclaiming any existing checkout of
+          // fgw/<rootId>; that mechanism no longer runs here). This still
+          // races a concurrent approval of a sibling leaf of the same
+          // root, or the runner's own dispatch of that root — D16's
+          // per-root merge-mutex lives in the runner's write-queue, not
+          // this human-driven CLI verb, so nothing here prevents two such
+          // merges from overlapping. What changed (tsk-46a, docs/history/
+          // merge-ephemeral-branch-force-race/CONTEXT.md):
+          // withMergeEphemeralWorktree's own CAS guard now catches the
+          // overlap at the ref-move step and makes the losing side fail
+          // loudly instead of silently overwriting the winner's commit —
+          // the race can still happen, but it is no longer a silent
+          // data-loss risk; the losing `approve` call just needs a retry
+          // against the new tip. A long-lived claim worktree checked out
+          // on fgw/<rootId> falling behind this same ref update is a
+          // separate, guarded concern — see resyncClaimWorktree
+          // (worktree.mjs), which runs when that worktree is next
+          // reattached to.
           //
           // withMergeEphemeralWorktree's own finally (worktree.mjs) removes
           // the checkout on every exit path below (conflict, verify-fail,
@@ -2854,16 +2993,22 @@ async function runVerb(verb, flags, positional, dir) {
             }
 
             if (result.outcome === 'verify-fail') {
-              moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: 'verify-fail-post-merge', role: 'system' });
+              // tsk-53o: a timeout during the post-merge check is not proof
+              // the merge is bad — park under a distinct, catchup-resolvable
+              // reason instead of the misleading merge-fail label.
+              const mergeReason = result.check.timedOut ? 'verify-timeout-post-merge' : 'verify-fail-post-merge';
+              moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: mergeReason, role: 'system' });
               addFriction(dir, {
                 id,
                 disposition: 'blocked',
-                errorClass: 'verify-miss',
+                errorClass: result.check.timedOut ? 'verify-timeout' : 'verify-miss',
                 layer: 'verification',
                 attempts: 1,
-                detail: `goal-check failed on staged merge into ${rootBranch} (exit ${result.check.status}); merge aborted, ${rootBranch} unchanged`,
+                detail: result.check.timedOut
+                  ? `goal-check timed out on staged merge into ${rootBranch} after ${timeoutMs}ms — not a verify failure; merge aborted, ${rootBranch} unchanged, rerun catchup`
+                  : `goal-check failed on staged merge into ${rootBranch} (exit ${result.check.status}); merge aborted, ${rootBranch} unchanged`,
               });
-              return { id, mode: 'merge', to: 'blocked', reason: 'verify-fail-post-merge', target: rootBranch, exitStatus: result.check.status, output: result.check.output };
+              return { id, mode: 'merge', to: 'blocked', reason: mergeReason, target: rootBranch, timedOut: result.check.timedOut, exitStatus: result.check.status, output: result.check.output };
             }
 
             // Merged: land the leaf's work on its root's branch. The
@@ -2969,20 +3114,25 @@ async function runVerb(verb, flags, positional, dir) {
         }
 
         if (result.outcome === 'verify-fail') {
-          const reason = hadChildren ? 'integration-drift' : 'verify-fail-post-merge';
-          const detail = hadChildren
-            ? `cross-root integration drift at main@${currentHead(repoRoot)}; goal-check failed on staged merge (exit ${result.check.status}); merge aborted, main unchanged`
-            : `goal-check failed on staged merge (exit ${result.check.status}); merge aborted, main unchanged`;
+          // tsk-53o: a timeout is neither a real verify failure nor evidence
+          // of cross-root drift — it gets its own reason regardless of
+          // hadChildren, distinct from both branches below.
+          const reason = result.check.timedOut ? 'verify-timeout-post-merge' : hadChildren ? 'integration-drift' : 'verify-fail-post-merge';
+          const detail = result.check.timedOut
+            ? `goal-check timed out on staged merge after ${timeoutMs}ms — not a verify failure; merge aborted, main unchanged, rerun catchup`
+            : hadChildren
+              ? `cross-root integration drift at main@${currentHead(repoRoot)}; goal-check failed on staged merge (exit ${result.check.status}); merge aborted, main unchanged`
+              : `goal-check failed on staged merge (exit ${result.check.status}); merge aborted, main unchanged`;
           moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason, role: 'system' });
           addFriction(dir, {
             id,
             disposition: 'blocked',
-            errorClass: 'verify-miss',
+            errorClass: result.check.timedOut ? 'verify-timeout' : 'verify-miss',
             layer: 'verification',
             attempts: 1,
             detail,
           });
-          return { id, mode: 'merge', to: 'blocked', reason, target: 'main', exitStatus: result.check.status, output: result.check.output };
+          return { id, mode: 'merge', to: 'blocked', reason, target: 'main', timedOut: result.check.timedOut, exitStatus: result.check.status, output: result.check.output };
         }
 
         // tsk-480: cleanup used to run either way relative to this write
@@ -3019,16 +3169,20 @@ async function runVerb(verb, flags, positional, dir) {
       // tree, exactly the goal-check contract `return` already uses.
       const check = await runGoalCheck(item, repoRoot, timeoutMs);
       if (!check.passed) {
-        moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: 'verify-fail', role: 'system' });
+        // tsk-53o: same timeout/fail distinction as `return` — a timeout is
+        // not proof the item's verify failed.
+        moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: check.timedOut ? 'verify-timeout' : 'verify-fail', role: 'system' });
         addFriction(dir, {
           id,
           disposition: 'blocked',
-          errorClass: 'verify-miss',
+          errorClass: check.timedOut ? 'verify-timeout' : 'verify-miss',
           layer: 'verification',
           attempts: 1,
-          detail: `goal-check failed on main (exit ${check.status})`,
+          detail: check.timedOut
+            ? `goal-check on main timed out after ${timeoutMs}ms — not a verify failure, rerun approve`
+            : `goal-check failed on main (exit ${check.status})`,
         });
-        return { id, mode: 'verify-only', to: 'blocked', reason: 'verify-fail', exitStatus: check.status, output: check.output };
+        return { id, mode: 'verify-only', to: 'blocked', reason: check.timedOut ? 'verify-timeout' : 'verify-fail', timedOut: check.timedOut, exitStatus: check.status, output: check.output };
       }
       // tsk-480: no real merge lands on this path (code is already on
       // main), so a moveWork failure here only desyncs status rather than
@@ -3099,7 +3253,7 @@ async function runVerb(verb, flags, positional, dir) {
         );
       }
 
-      const timeoutMs = resolveVerifyTimeoutMs('sync-root', flags, process.cwd());
+      const timeoutMs = resolveVerifyTimeoutMs('sync-root', flags, path.dirname(dir));
       const { noWait, waitMs } = parseWaitFlags(flags, 'sync-root');
       const runMerge = (mergeFn) => (noWait ? mergeFn() : withLockRetry(mergeFn, { waitMs }));
 
@@ -3129,15 +3283,18 @@ async function runVerb(verb, flags, positional, dir) {
           return { id, mode: 'sync-root', outcome: 'blocked', reason: 'fgos-write-rejected', target: targetBranch, branch, paths: result.paths };
         }
         if (result.outcome === 'verify-fail') {
+          // tsk-53o: a timeout is not proof the staged merge's verify failed.
           addFriction(dir, {
             id,
             disposition: 'blocked',
-            errorClass: 'verify-miss',
+            errorClass: result.check.timedOut ? 'verify-timeout' : 'verify-miss',
             layer: 'verification',
             attempts: 1,
-            detail: `sync-root: goal-check failed on staged merge of ${branch} into ${targetBranch} (exit ${result.check.status}); merge aborted, ${targetBranch} unchanged`,
+            detail: result.check.timedOut
+              ? `sync-root: goal-check timed out on staged merge of ${branch} into ${targetBranch} after ${timeoutMs}ms — not a verify failure; merge aborted, ${targetBranch} unchanged`
+              : `sync-root: goal-check failed on staged merge of ${branch} into ${targetBranch} (exit ${result.check.status}); merge aborted, ${targetBranch} unchanged`,
           });
-          return { id, mode: 'sync-root', outcome: 'blocked', reason: 'verify-fail', target: targetBranch, branch, exitStatus: result.check.status, output: result.check.output };
+          return { id, mode: 'sync-root', outcome: 'blocked', reason: result.check.timedOut ? 'verify-timeout' : 'verify-fail', timedOut: result.check.timedOut, target: targetBranch, branch, exitStatus: result.check.status, output: result.check.output };
         }
 
         // Success — status/stage of `id` is deliberately UNTOUCHED (the
@@ -3320,7 +3477,7 @@ async function runVerb(verb, flags, positional, dir) {
     // verify -> commit-or-abort, verify strictly before any commit).
     case 'catchup': {
       const id = requireField(positional[0] ?? flags.id, 'catchup requires an id: fgos catchup <id> [--timeout <ms>|--no-timeout]');
-      const timeoutMs = resolveVerifyTimeoutMs('catchup', flags, process.cwd());
+      const timeoutMs = resolveVerifyTimeoutMs('catchup', flags, path.dirname(dir));
 
       const view = listWork(dir);
       const item = view.work[id];
@@ -3340,11 +3497,15 @@ async function runVerb(verb, flags, positional, dir) {
       // simply re-attempting the merge (which is exactly what catchup
       // does) may just succeed once whatever transient condition caused it
       // has passed.
-      const CATCHUP_REASONS = new Set(['merge-conflict', 'verify-fail-post-merge', 'integration-drift', 'merge-failed-unclassified']);
+      // tsk-53o: 'verify-timeout-post-merge' joins this set deliberately —
+      // a timed-out post-merge check is exactly the transient condition
+      // this comment already describes, and catchup (a retry) is the
+      // correct next step for it, not a manual rework.
+      const CATCHUP_REASONS = new Set(['merge-conflict', 'verify-fail-post-merge', 'verify-timeout-post-merge', 'integration-drift', 'merge-failed-unclassified']);
       if (!CATCHUP_REASONS.has(item.reason)) {
         throw new StoreError(
           'validation',
-          `catchup: work "${id}" is blocked for reason "${item.reason ?? '(none)'}" — catchup only resolves a merge-related park (merge-conflict/verify-fail-post-merge/integration-drift/merge-failed-unclassified); use take/return for a manual rework instead.`,
+          `catchup: work "${id}" is blocked for reason "${item.reason ?? '(none)'}" — catchup only resolves a merge-related park (merge-conflict/verify-fail-post-merge/verify-timeout-post-merge/integration-drift/merge-failed-unclassified); use take/return for a manual rework instead.`,
         );
       }
 
@@ -3403,7 +3564,10 @@ async function runVerb(verb, flags, positional, dir) {
           if (!caughtUpCheck.passed) {
             // No `git merge --abort` on this path — no merge was started, and
             // aborting without MERGE_HEAD fails outright.
-            return { id, outcome: 'verify-fail', target, branch: ownBranch, exitStatus: caughtUpCheck.status, output: caughtUpCheck.output };
+            // tsk-53o: item stays 'blocked' either way here (no moveWork on
+            // this path) — surface `timedOut` so the CLI-facing outcome
+            // does not read as a real verify failure when it was a timeout.
+            return { id, outcome: 'verify-fail', timedOut: caughtUpCheck.timedOut, target, branch: ownBranch, exitStatus: caughtUpCheck.status, output: caughtUpCheck.output };
           }
           const { event } = moveWork(dir, { id, to: 'awaiting-approval', expectedStatus: 'blocked', role: 'runner' });
           return {
@@ -3465,7 +3629,10 @@ async function runVerb(verb, flags, positional, dir) {
           } catch (abortErr) {
             throw abortErr;
           }
-          return { id, outcome: 'verify-fail', target, branch: ownBranch, exitStatus: check.status, output: check.output };
+          // tsk-53o: item stays 'blocked' either way (no moveWork on this
+          // path) — surface `timedOut` so this outcome doesn't read as a
+          // real verify failure when it was a timeout.
+          return { id, outcome: 'verify-fail', timedOut: check.timedOut, target, branch: ownBranch, exitStatus: check.status, output: check.output };
         }
 
         execFileSync('git', ['commit', '-m', `catch-up: merge ${target} into ${ownBranch}`], { cwd: ephemeral.path, encoding: 'utf8', shell: false });
@@ -3682,11 +3849,7 @@ async function runVerb(verb, flags, positional, dir) {
     // ensures the shared config file (`.fgos/config.json`) exists and has
     // every current default key from EVERY registered `registerConfigDefault`
     // entry, via `ensureSharedConfigDefaults` (the one write path allowed
-    // here; `doctor`, unlike `setup`, never calls it). This is also the verb
-    // that performs the actual move off the legacy `.fgos-runner.json`
-    // (tsk-5vf D2) — `ensureSharedConfigDefaults` reads it as a fallback via
-    // `readSharedConfig` and writes the assembled result to the NEW location,
-    // never deleting the old file.
+    // here; `doctor`, unlike `setup`, never calls it).
     case 'setup': {
       const repoRoot = process.cwd();
       const scriptPath = integrationScriptPath();

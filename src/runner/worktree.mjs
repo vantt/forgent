@@ -551,12 +551,134 @@ function reattachableCheckout(repoRoot, branch, baseDir) {
 }
 
 /**
+ * The commit a reattached claim worktree's own files/index are ACTUALLY
+ * synced to — never `git -C worktreePath rev-parse HEAD` (tsk-2cd): `HEAD`
+ * is a symbolic ref that resolves live through the branch it's checked out
+ * on, so once that branch has been force-moved from elsewhere (`git branch
+ * -f`, the mechanism `withMergeEphemeralWorktree` below uses to land a
+ * merge — see its own doc comment), `rev-parse HEAD` immediately reports
+ * the NEW tip even though the worktree's actual files/index were never
+ * touched. The worktree's own PER-WORKTREE `HEAD` reflog is the right
+ * signal instead: it only gains an entry when a real operation (checkout,
+ * commit, reset) runs FROM INSIDE this specific worktree, so its most
+ * recent entry survives an external `git branch -f` on the branch itself
+ * untouched (empirically confirmed, `docs/history/root-worktree-drift-
+ * after-child-merge/plan.md`'s Approach section). Returns `null` when the
+ * reflog is empty or unreadable — the caller fails closed on that, never
+ * assumes a sync point it could not actually read.
+ */
+function lastSyncedCommit(repoRoot, worktreePath) {
+  let output;
+  try {
+    output = git(repoRoot, ['-C', worktreePath, 'reflog', 'show', 'HEAD', '-n', '1', '--format=%H']).trim();
+  } catch {
+    return null;
+  }
+  return output || null;
+}
+
+/**
+ * Whether `worktreePath` has any real uncommitted change relative to
+ * `lastSynced` — deliberately NOT `isCheckoutDirty` above (tsk-2cd):
+ * `isCheckoutDirty` compares against live `HEAD`, which after an external
+ * `git branch -f` no longer reflects what this worktree's files were last
+ * synced to, so it would report the drift itself as "dirty" (index still
+ * holds `lastSynced`'s tree, HEAD now names a different commit) even when
+ * nothing was actually edited. Two checks against `lastSynced` instead:
+ * `git diff --quiet` for already-tracked files (catches modified/deleted/
+ * staged-new tracked content), plus a plain `--porcelain` scan for `??`
+ * lines for untracked files (`git diff <commit>` never reports those,
+ * regardless of which commit it's compared against). Fails closed (dirty)
+ * on an unreadable status, same stance `isCheckoutDirty` already takes.
+ */
+function isDirtyRelativeToSync(repoRoot, worktreePath, lastSynced) {
+  try {
+    git(repoRoot, ['-C', worktreePath, 'diff', '--quiet', lastSynced, '--', ':!.fgos']);
+  } catch {
+    return true;
+  }
+  let status;
+  try {
+    status = git(repoRoot, ['-C', worktreePath, 'status', '--porcelain', '--', ':!.fgos']);
+  } catch {
+    return true;
+  }
+  return status.split('\n').some((line) => line.startsWith('??'));
+}
+
+/**
+ * Resync a reattached claim worktree to its branch's current tip when safe
+ * (tsk-2cd, `docs/history/root-worktree-drift-after-child-merge/CONTEXT.md`
+ * D1/D3): `approve`'s leaf→root merge lands via a plain ref update from a
+ * DETACHED ephemeral checkout (`withMergeEphemeralWorktree` below) — it
+ * never touches any OTHER worktree already checked out on that branch, so
+ * a long-lived claim worktree (this function's own caller,
+ * `createClaimWorktree`'s reattach path) can silently fall behind: the
+ * branch has advanced, but this worktree's files/index stay exactly where
+ * they were the last time something ran inside it.
+ *
+ * Auto-resyncs (`git reset --hard <branchTip>`) only when BOTH hold: the
+ * worktree's own last-synced commit is a proven ancestor of the branch's
+ * current tip (`git merge-base --is-ancestor` — no commit would be lost),
+ * and the worktree has no real uncommitted changes relative to that same
+ * last-synced commit. Refuses loudly otherwise — never resets blind, the
+ * same discipline `docs/how-to/safely-reset-the-main-checkout.md` already
+ * documents for the main checkout, applied here to a claim worktree
+ * instead (a different protected target — this stays its own guard, not a
+ * reuse of `main-checkout-reset-guard.mjs`). A worktree already at its
+ * branch's tip is a no-op before either check runs, so the ordinary
+ * dirty-but-not-behind reattach (`createClaimWorktree`'s own reattach
+ * exists for exactly this — a session resuming its own in-progress work)
+ * is completely unaffected.
+ */
+export function resyncClaimWorktree(repoRoot, worktreePath, branch) {
+  const lastSynced = lastSyncedCommit(repoRoot, worktreePath);
+  if (!lastSynced) {
+    throw new WorktreeError(
+      `refusing to resync claim worktree "${worktreePath}" on "${branch}" — could not read its own HEAD reflog to determine what commit it was last synced to. Inspect "${worktreePath}" by hand before claiming "${branch}" again.`,
+      { branch, worktreePath },
+    );
+  }
+
+  const branchTip = git(repoRoot, ['rev-parse', branch]).trim();
+  if (lastSynced === branchTip) return { resynced: false };
+
+  let isAncestor = true;
+  try {
+    git(repoRoot, ['merge-base', '--is-ancestor', lastSynced, branchTip]);
+  } catch {
+    isAncestor = false;
+  }
+
+  if (!isAncestor) {
+    throw new WorktreeError(
+      `refusing to resync claim worktree "${worktreePath}" on "${branch}" — its last-synced commit (${lastSynced}) is not an ancestor of the branch's current tip (${branchTip}), so a reset would risk losing commits. Inspect "${worktreePath}" and reconcile by hand before claiming "${branch}" again.`,
+      { branch, worktreePath, lastSynced, branchTip },
+    );
+  }
+
+  if (isDirtyRelativeToSync(repoRoot, worktreePath, lastSynced)) {
+    throw new WorktreeError(
+      `refusing to resync claim worktree "${worktreePath}" on "${branch}" — its last-synced commit (${lastSynced}) is behind the branch's current tip (${branchTip}, likely from a child merge landing since this worktree was last synced) and the tree has uncommitted changes. Commit or discard the work in "${worktreePath}" before claiming "${branch}" again — never auto-reset over uncommitted work.`,
+      { branch, worktreePath, lastSynced, branchTip },
+    );
+  }
+
+  git(repoRoot, ['-C', worktreePath, 'reset', '--hard', branchTip]);
+  return { resynced: true, from: lastSynced, to: branchTip };
+}
+
+/**
  * claim-isolate: the worktree returned here IS the work — it outlives this
  * call, and its owning claim (`claim-port.mjs`'s `claimWork`) tears it down
  * later at return/reject time, never inline here.
  *
  * REATTACH (tsk-65n): a claim whose `fgw/<id>` checkout is still standing
- * gets that same checkout back, untouched. The case is routine rather than
+ * gets that same checkout back, resynced to the branch's current tip when
+ * that's provably safe (tsk-2cd: `resyncClaimWorktree` above — the branch
+ * may have advanced past this checkout via a child merge while this
+ * worktree sat claimed-but-anchored; see that function's own doc for why
+ * "untouched" was the bug, not the fix). The case is routine rather than
  * exotic — an item's claim is released back to `todo` the moment it reaches
  * stage `executing` (`decompose.mjs`'s `releaseClaimOnExecuting`), and the
  * session that held it then claims it again to do the work, from inside the
@@ -580,7 +702,10 @@ export function createClaimWorktree(repoRoot, id, opts = {}) {
     // `reused: true` is the same answer the add-on-an-existing-branch path
     // already gives, and means the same thing to a caller: this claim did not
     // fork a new branch.
-    if (existing) return { path: existing, branch, reused: true };
+    if (existing) {
+      resyncClaimWorktree(repoRoot, existing, branch);
+      return { path: existing, branch, reused: true };
+    }
   }
   return createWorktree(repoRoot, id, opts);
 }

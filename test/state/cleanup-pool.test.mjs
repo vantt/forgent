@@ -69,3 +69,28 @@ test('only the specific latest retrospective->cleanup event for the id is read, 
   ];
   assert.equal(pickNextCleanupItem(view, rawEvents, { ttlDays: TTL_DAYS, now: NOW }), null);
 });
+
+// --- leafTtlDays (tsk-59x D2) -- the actual fix for the item's own
+// demonstrated pain: a leaf's TTL check must use leafTtlDays, not the
+// picker sitting on root's TTL for every candidate regardless of lineage.
+
+test('a leaf item (parent present in view) 1 day into cleanup is picked under leafTtlDays:0, even though root TTL is 7d', () => {
+  const view = { work: { root: item('root', 'delivered'), leaf: item('leaf', 'cleanup', { parent: 'root' }) } };
+  const rawEvents = [cleanupEntry('leaf', '2026-01-14T00:00:00.000Z')]; // 1 day ago
+  assert.deepEqual(
+    pickNextCleanupItem(view, rawEvents, { ttlDays: TTL_DAYS, leafTtlDays: 0, now: NOW }),
+    { id: 'leaf' },
+  );
+});
+
+test('a root item (no parent) 1 day into cleanup is still excluded under leafTtlDays:0 -- root keeps the full 7d TTL', () => {
+  const view = { work: { root: item('root', 'cleanup') } };
+  const rawEvents = [cleanupEntry('root', '2026-01-14T00:00:00.000Z')]; // 1 day ago
+  assert.equal(pickNextCleanupItem(view, rawEvents, { ttlDays: TTL_DAYS, leafTtlDays: 0, now: NOW }), null);
+});
+
+test('leafTtlDays omitted entirely: a leaf 1 day into cleanup is still excluded, byte-identical to before tsk-59x', () => {
+  const view = { work: { root: item('root', 'delivered'), leaf: item('leaf', 'cleanup', { parent: 'root' }) } };
+  const rawEvents = [cleanupEntry('leaf', '2026-01-14T00:00:00.000Z')]; // 1 day ago
+  assert.equal(pickNextCleanupItem(view, rawEvents, { ttlDays: TTL_DAYS, now: NOW }), null);
+});

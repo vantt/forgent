@@ -3,12 +3,13 @@
 // worker prompt from a work item, resolves tier -> model via the committed
 // runner config, and spawns the headless executor.
 //
-// TRUSTED-CONFIG NOTE (security panel): `.fgos-runner.json` is an
-// EXECUTABLE config, not passive data — whoever can edit it controls what
-// process this module spawns and with what arguments. It is committed
-// (per D2's durability policy) so it is reviewable like any other source
-// file, but that also means it carries the same trust level as code: only
-// apply it from a checkout you already trust.
+// TRUSTED-CONFIG NOTE (security panel): the shared config file's `runner`
+// section (`.fgos/config.json`) is an EXECUTABLE config, not passive data —
+// whoever can edit it controls what process this module spawns and with
+// what arguments. It is committed (per D2's durability policy) so it is
+// reviewable like any other source file, but that also means it carries
+// the same trust level as code: only apply it from a checkout you already
+// trust.
 //
 // TRUST INVARIANT: this module assumes the `work` item it is given (title,
 // kind, refs, and especially `verify`) was authored by the repo's own user,
@@ -40,11 +41,11 @@ import { DEFAULTS } from '../state/work.mjs';
 import { DOMAINS, resolveDomainName, skillForStage } from '../state/workflow-stage-graphs.mjs';
 import { selectTemplate, renderTemplate, hashTemplate } from './prompt-templates.mjs';
 import { mergeConfigDefaults } from '../setup/config-merge.mjs';
-import { sharedConfigFilePath, legacyRunnerConfigPath } from '../config/shared-config-file.mjs';
+import { sharedConfigFilePath } from '../config/shared-config-file.mjs';
 import { mergeWithGlobalConfig } from '../config/global-config.mjs';
 import { KINDS, findExecutableOnPath, resolvedStatus, readLocalStatus } from '../state/tool-registry.mjs';
 import { listWork } from '../state/store.mjs';
-import { resolveRepoRoot, fgosDirFromRoot } from './paths.mjs';
+import { resolveRepoRoot, resolveMainCheckoutRoot, fgosDirFromRoot } from './paths.mjs';
 
 /** Raised for malformed runner config or an unresolvable tier -> model
  * lookup. `category` follows the same CLI-facing vocabulary as
@@ -97,8 +98,16 @@ export class DispatchError extends Error {
  * item's raw `work.domain` unchanged — the domain fold lives ONLY inside
  * `selectTemplate` itself (D7), so this function's call site can never
  * diverge from `spawnWorker`'s identical call.
+ *
+ * `stage` (tsk-5mj D1/D6/D7): which of the item's own domain stages this
+ * dispatch is FOR — defaults to `'executing'`, byte-identical to every
+ * pre-tsk-5mj call site (none of which ever passed a third argument).
+ * Resolves `skillPath` via `skillForStage(domainObj, stage)` instead of the
+ * old hardcoded `'executing'` literal, and threads `stage` into
+ * `selectTemplate` so a non-executing dispatch (today: `'discovery'`) picks
+ * its own template instead of the executing-flavored one.
  */
-export function buildPrompt(work, feedback) {
+export function buildPrompt(work, feedback, stage = 'executing') {
   const refs = Array.isArray(work.refs) && work.refs.length ? work.refs.join(', ') : '(none)';
 
   // Human feedback (worker-feedback): when the item carries a human answer
@@ -136,10 +145,10 @@ export function buildPrompt(work, feedback) {
   // genuinely unrecognized) is the only one buildPrompt triggers.
   const domainName = resolveDomainName(work.domain);
   const domainObj = DOMAINS[domainName];
-  const skillName = skillForStage(domainObj, 'executing');
+  const skillName = skillForStage(domainObj, stage);
   const skillPath = `.claude/skills/${skillName}/SKILL.md`;
 
-  const templateName = selectTemplate({ kind: work.kind, tier: work.tier ?? DEFAULTS.tier, domain: work.domain });
+  const templateName = selectTemplate({ kind: work.kind, tier: work.tier ?? DEFAULTS.tier, domain: work.domain, stage });
   return renderTemplate(templateName, {
     title: work.title,
     kind: work.kind,
@@ -155,7 +164,7 @@ export function buildPrompt(work, feedback) {
 }
 
 /**
- * Read and validate `.fgos-runner.json` at `configPath`. Throws
+ * Read and validate a runner config file at `configPath`. Throws
  * `RunnerConfigError` for anything short of the minimal committed shape:
  * `executor.command` (string), `executor.args` (array of strings),
  * `models` (object), `timeoutMs` (positive number).
@@ -181,7 +190,7 @@ export function loadRunnerConfig(configPath) {
 
 /**
  * CLI names this module knows how to recognize when auto-detecting an
- * assistant CLI on PATH for a fresh `.fgos-runner.json` (str82). Order
+ * assistant CLI on PATH for a fresh runner config (str82). Order
  * matters: earlier names win when more than one is present on PATH. `codex`
  * is listed here for a clearer "found X, but no verified template" message
  * only — it has no entry in `SUPPORTED_EXECUTOR_TEMPLATES` below (no
@@ -210,9 +219,10 @@ export function detectAssistantCli(candidateNames = KNOWN_ASSISTANT_CLI_NAMES, p
 }
 
 /**
- * D1's baked-in default `.fgos-runner.json` payload — mirrors this repo's own
- * tracked `.fgos-runner.json` verbatim, so the auto-generated default is
- * provably identical to what already works in this repo's own dogfood loop.
+ * D1's baked-in default runner payload — mirrors this repo's own tracked
+ * `.fgos/config.json`'s `runner` section verbatim, so the auto-generated
+ * default is provably identical to what already works in this repo's own
+ * dogfood loop.
  */
 export const DEFAULT_RUNNER_CONFIG = {
   executor: {
@@ -242,7 +252,7 @@ export const DEFAULT_RUNNER_CONFIG = {
 
 /**
  * Executor templates this module has actually verified for the missing-path
- * bootstrap in `ensureRunnerConfig` (str82). Only `claude` has one — it is
+ * bootstrap in `ensureRunnerConfigForDir` (str82). Only `claude` has one — it is
  * literally `DEFAULT_RUNNER_CONFIG.executor`, so detecting `claude` on PATH
  * writes a byte-identical config to today's unconditional default. There is
  * deliberately no `codex` (or other) entry: no verified working argv shape
@@ -253,90 +263,20 @@ export const DEFAULT_RUNNER_CONFIG = {
 export const SUPPORTED_EXECUTOR_TEMPLATES = { claude: DEFAULT_RUNNER_CONFIG.executor };
 
 /**
- * Bootstrap wrapper (D1/D3) around `loadRunnerConfig`: when `configPath` does
- * not exist, auto-detects a known assistant CLI on PATH (str82,
- * `detectAssistantCli`) and writes a default `.fgos-runner.json` there,
- * announcing what it detected (or didn't) and the executor it wrote, before
- * loading it. `loadRunnerConfig` itself is never modified — its "rejects a
- * missing file" contract stays intact for any caller (e.g. an explicit
- * `--config` path) that still wants a loud failure on ENOENT; this wrapper
- * is the one place that instead treats a missing default path as "first
- * run, bootstrap it."
- *
- * The written executor depends on what `detectAssistantCli` finds: `claude`
- * on PATH writes `SUPPORTED_EXECUTOR_TEMPLATES.claude` (byte-identical to
- * `DEFAULT_RUNNER_CONFIG.executor`, since that IS the verified claude
- * template — so this stays byte-identical to the pre-str82 unconditional
- * default whenever claude is present). A detected CLI with no verified
- * template (e.g. `codex`), or no known CLI at all, writes a
- * self-documenting placeholder `executor.command` instead of a
- * fabricated/guessed argv shape, naming what to fix by hand in
- * `.fgos-runner.json`. Every other `DEFAULT_RUNNER_CONFIG` field
- * (models/timeoutMs/parallel) is unaffected either way.
- *
- * When `configPath` already exists (str87-fgos-setup-doctor D3), it is
- * merged against `DEFAULT_RUNNER_CONFIG` via `mergeConfigDefaults` instead of
- * left untouched: any default key the user's file is missing gets filled in
- * and the file is rewritten + the added keys announced; a file that already
- * has every default key is never rewritten. This branch is unaffected by
- * str82 — it never runs `detectAssistantCli`.
- *
- * A write failure (permissions, read-only fs, disk full) is never caught —
- * it propagates as a normal thrown error, since a failed bootstrap write IS
- * the whole point of this call, not a side effect to shrug off.
- */
-export function ensureRunnerConfig(configPath) {
-  if (!fs.existsSync(configPath)) {
-    const detected = detectAssistantCli();
-    const executor =
-      detected && detected in SUPPORTED_EXECUTOR_TEMPLATES
-        ? SUPPORTED_EXECUTOR_TEMPLATES[detected]
-        : {
-            command: detected
-              ? `NO_VERIFIED_TEMPLATE_FOR_${detected.toUpperCase()}__edit_.fgos-runner.json`
-              : 'NO_ASSISTANT_CLI_FOUND__edit_.fgos-runner.json',
-            args: ['{prompt}'],
-          };
-    const config = { ...DEFAULT_RUNNER_CONFIG, executor };
-    fs.writeFileSync(configPath, `${JSON.stringify(config, null, 2)}\n`);
-    process.stderr.write(
-      `fgos: no .fgos-runner.json found — ${
-        detected ? `detected "${detected}" on PATH` : 'no known assistant CLI found on PATH'
-      }; wrote a default (executor: ${executor.command}) at ${configPath}; edit .fgos-runner.json by hand to change.\n`,
-    );
-    return loadRunnerConfig(configPath);
-  }
-
-  const existingConfig = loadRunnerConfig(configPath);
-  const { merged, addedKeys } = mergeConfigDefaults(existingConfig, DEFAULT_RUNNER_CONFIG);
-  if (addedKeys.length === 0) {
-    return existingConfig;
-  }
-
-  fs.writeFileSync(configPath, `${JSON.stringify(merged, null, 2)}\n`);
-  process.stderr.write(
-    `fgos: added missing default config keys to ${configPath}: ${addedKeys.join(', ')}\n`,
-  );
-  return loadRunnerConfig(configPath);
-}
-
-/**
  * Resolve+validate the runner section of the shared project config file at
- * `dir` (`.fgos/config.json`'s `runner` key), falling back to the legacy
- * `.fgos-runner.json` at `dir` — via `loadRunnerConfig` itself, unchanged —
- * when the shared file doesn't exist yet (tsk-2ta D1 amended / tsk-5vf D2).
- * The legacy-fallback branch stays byte-identical to before this item (no
- * global-config merge) — that is the deliberate parity net for any install
- * that hasn't run `fgos setup` since the move. Once the shared file is
- * real, its content is merged against `~/.fgos/config.json` via
- * `mergeWithGlobalConfig` (project wins any key present in both, tsk-5vf
- * D2's "global config has real runtime effect" half of the gap) before the
- * `runner` section is extracted and validated.
+ * `dir` (`.fgos/config.json`'s `runner` key, the sole config source since
+ * tsk-5hv D1 retired the legacy fallback). Its content is merged against
+ * `~/.fgos/config.json` via `mergeWithGlobalConfig` (project wins any key
+ * present in both, tsk-5vf D2's "global config has real runtime effect"
+ * half of the gap) before the `runner` section is extracted and validated.
+ * Throws `RunnerConfigError` when the shared file itself does not exist —
+ * `ensureRunnerConfigForDir` below is the bootstrap-if-missing wrapper
+ * around this.
  */
 export function loadRunnerConfigFromDir(dir) {
   const sharedPath = sharedConfigFilePath(dir);
   if (!fs.existsSync(sharedPath)) {
-    return loadRunnerConfig(legacyRunnerConfigPath(dir));
+    throw new RunnerConfigError(`cannot read runner config at "${sharedPath}": no such file`);
   }
   const raw = fs.readFileSync(sharedPath, 'utf8');
   let parsed;
@@ -353,11 +293,11 @@ export function loadRunnerConfigFromDir(dir) {
 
 /**
  * Build the default executor block for a fresh runner-config bootstrap
- * (str82's `detectAssistantCli` logic, factored out so both the legacy
- * `ensureRunnerConfig` bootstrap branch above and `ensureRunnerConfigForDir`
- * below produce the identical shape/messages for the same detected CLI —
- * `pathHint` is the literal string named in the placeholder command / stderr
- * message when no verified template exists).
+ * (str82's `detectAssistantCli` logic, factored out of `ensureRunnerConfigForDir`
+ * below so a future second bootstrap wrapper could reuse the identical
+ * shape/messages for the same detected CLI — `pathHint` is the literal
+ * string named in the placeholder command / stderr message when no
+ * verified template exists).
  */
 function bootstrapDefaultExecutor(pathHint) {
   const detected = detectAssistantCli();
@@ -374,28 +314,18 @@ function bootstrapDefaultExecutor(pathHint) {
 }
 
 /**
- * Bootstrap wrapper (retargeted per tsk-2ta D1 amended / tsk-5vf D1/D2/D4)
- * around `loadRunnerConfigFromDir`: the shared-file counterpart to
- * `ensureRunnerConfig` above, resolved against `dir` instead of a single
- * file path.
+ * Bootstrap wrapper (retargeted per tsk-2ta D1 amended / tsk-5vf D1/D2/D4;
+ * legacy fallback removed per tsk-5hv D1) around `loadRunnerConfigFromDir`.
  *
  * - Shared file (`.fgos/config.json`) already exists: fills any default
- *   key its `runner` section is missing (same `mergeConfigDefaults`
- *   discipline as `ensureRunnerConfig`), rewrites only when a key was
+ *   key its `runner` section is missing, rewrites only when a key was
  *   actually added, merges the result against `~/.fgos/config.json` via
  *   `mergeWithGlobalConfig` (project wins), and validates the merged
  *   `runner` section.
- * - Shared file absent but the legacy `.fgos-runner.json` exists: delegates
- *   to `ensureRunnerConfig` on the legacy path UNCHANGED — fills/writes the
- *   OLD file in place. The physical move to the new location only happens
- *   through `fgos setup`'s own explicit `ensureSharedConfigDefaults` call
- *   (tsk-5vf D2) — never implicitly here.
- * - Neither exists (true first run): bootstraps straight into the new
- *   shared file, never writing a fresh `.fgos-runner.json` again.
+ * - Shared file absent (true first run): bootstraps straight into it.
  */
 export function ensureRunnerConfigForDir(dir) {
   const sharedPath = sharedConfigFilePath(dir);
-  const legacyPath = legacyRunnerConfigPath(dir);
 
   if (fs.existsSync(sharedPath)) {
     const parsed = JSON.parse(fs.readFileSync(sharedPath, 'utf8'));
@@ -413,10 +343,6 @@ export function ensureRunnerConfigForDir(dir) {
     const runnerCfg = withGlobal.runner ?? {};
     validateRunnerConfigShape(runnerCfg, `${sharedPath}#runner`);
     return runnerCfg;
-  }
-
-  if (fs.existsSync(legacyPath)) {
-    return ensureRunnerConfig(legacyPath);
   }
 
   const { detected, executor } = bootstrapDefaultExecutor('.fgos/config.json');
@@ -578,7 +504,7 @@ function validateRunnerConfigShape(cfg, sourceLabel) {
   // additive-optional way every field above is: absent entirely is fine (the
   // runner falls back to in-code defaults), but when present it must be an
   // object whose `maxRoots`/`maxLeavesPerRoot`, if given, are positive
-  // integers. This keeps every existing `.fgos-runner.json` valid untouched.
+  // integers. This keeps every existing runner config valid untouched.
   if (cfg.parallel !== undefined) {
     if (!cfg.parallel || typeof cfg.parallel !== 'object' || Array.isArray(cfg.parallel)) {
       throw new RunnerConfigError(`runner config (${sourceLabel}) "parallel" must be an object when present.`);
@@ -1055,6 +981,10 @@ function capacityIdForWork(work) {
  * non-zero exit status from a process that *did* run is NOT an error here —
  * that is the runner's goal-check's concern (per D3: the worker's own exit
  * status/report is never trusted on its own; only `verify` decides).
+ *
+ * `opts.stage` (tsk-5mj D1/D6/D7, optional): threaded straight through to
+ * `buildPrompt`'s own `stage` parameter — omitted (every pre-tsk-5mj call
+ * site) keeps the default `'executing'` prompt byte-identical.
  */
 export function spawnWorker(work, cfg, cwd, opts = {}) {
   // Setup stays synchronous and OUTSIDE the adapter call on purpose: a
@@ -1065,7 +995,7 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
   // any spawn" test pins.
   const tier = work.tier ?? DEFAULTS.tier;
   const model = modelForTier(cfg, tier);
-  const prompt = buildPrompt(work, opts.feedback);
+  const prompt = buildPrompt(work, opts.feedback, opts.stage);
   const capacityId = capacityIdForWork(work);
   const { command, args, adapter, provider, baseCommit, headRef } = resolveExecutorCommand(cfg, {
     prompt,
@@ -1087,8 +1017,10 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
 
   // P49: same mechanical selection buildPrompt used internally, called again
   // here (cheap, deterministic, no duplicated LOGIC) purely so the dispatch
-  // log can record which template + version produced this prompt.
-  const templateName = selectTemplate({ kind: work.kind, tier, domain: work.domain });
+  // log can record which template + version produced this prompt. tsk-5mj:
+  // threads `opts.stage` through same as buildPrompt's own call, so this
+  // log-only selection never drifts from the template actually rendered.
+  const templateName = selectTemplate({ kind: work.kind, tier, domain: work.domain, stage: opts.stage });
   const templateHash = hashTemplate(templateName);
 
   return adapterFn(command, args, cwd, {
@@ -1131,7 +1063,7 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
  * `resolveExecutorConfig` already raises for cli-dispatch, not a new error
  * vocabulary invented for this entry point.
  *
- * `repoRoot`, when given, skips the git-based `resolveRepoRoot` lookup
+ * `repoRoot`, when given, skips the git-based main-checkout lookup
  * entirely (tests pass a plain `mkdtemp` fixture dir here, the same way
  * every other test in `dispatch.test.mjs` points `fgosDir`/config paths at
  * a temp dir rather than a real git checkout).
@@ -1156,14 +1088,16 @@ export async function resolveCapacityCli(
       'usage: node src/runner/dispatch.mjs resolve <capacityId> [--prompt <text>] [--model <name>] [--tier <name>]',
     );
   }
-  const root = repoRoot ?? resolveRepoRoot(cwd);
+  // MAIN CHECKOUT root, not `resolveRepoRoot`'s worktree-own root (tsk-5hv,
+  // found by fgos-code-implement): `ensureRunnerConfigForDir` reads
+  // `.fgos/config.json`, which is unconditionally wiped from every
+  // freshly-created worktree (ADR0020) — resolving to a worktree's own
+  // root here would silently bootstrap a throwaway default config instead
+  // of the real one on every worktree-resident call. `resolveRepoRoot` is
+  // still the fallback for a non-git-common-dir environment (its own
+  // validation-error contract preserved unchanged).
+  const root = repoRoot ?? resolveMainCheckoutRoot(cwd) ?? resolveRepoRoot(cwd);
   const fgosDir = fgosDirFromRoot(root);
-  // Was a direct `ensureRunnerConfig(path.join(root, '.fgos-runner.json'))`
-  // call, bypassing the shared-config-first resolution every other caller
-  // in this file already uses — the one entry point still writing to the
-  // legacy file even after `fgos setup` had already migrated a project to
-  // `.fgos/config.json` (tsk-5vf D2). Fixed to match `bin/fgos.mjs`'s own
-  // callers.
   const cfg = ensureRunnerConfigForDir(root);
   const capacity = cfg.capacities?.[capacityId];
   const tier = tierOverride ?? capacity?.tier ?? DEFAULTS.tier;
@@ -1200,7 +1134,8 @@ export async function decideCapacityCli(capacityId, { cwd = process.cwd(), repoR
   if (!capacityId) {
     throw new RunnerConfigError('usage: node src/runner/dispatch.mjs decide <capacityId> [--has-live-task-access]');
   }
-  const root = repoRoot ?? resolveRepoRoot(cwd);
+  // Same main-checkout resolution as resolveCapacityCli above, same reason.
+  const root = repoRoot ?? resolveMainCheckoutRoot(cwd) ?? resolveRepoRoot(cwd);
   const cfg = ensureRunnerConfigForDir(root);
   const mechanism = decideCapacityDispatchMechanism(cfg, capacityId, { hasLiveTaskAccess });
   const agentType = cfg.capacities?.[capacityId]?.agentType;

@@ -82,6 +82,19 @@ test('installGitHooks never overwrites a pre-existing custom core.hooksPath -- f
   fs.rmSync(repoRoot, { recursive: true, force: true });
 });
 
+test('installGitHooks treats a pre-existing absolute core.hooksPath resolving to repoRoot/.githooks as already wired, not a foreign custom hook', () => {
+  const repoRoot = mkTempDir('install-git-hooks-absolute-');
+  execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: repoRoot });
+  execFileSync('git', ['config', 'core.hooksPath', path.join(repoRoot, '.githooks')], { cwd: repoRoot });
+
+  assert.deepEqual(installGitHooks(repoRoot), { wired: true, skippedExisting: null });
+
+  const hooksPath = execFileSync('git', ['config', '--get', 'core.hooksPath'], { cwd: repoRoot, encoding: 'utf8' }).trim();
+  assert.equal(hooksPath, path.join(repoRoot, '.githooks'), 'must not be silently rewritten to the relative form');
+
+  fs.rmSync(repoRoot, { recursive: true, force: true });
+});
+
 // --- CLI: real end-to-end run, mirroring the production <repoRoot>/scripts/ layout ---
 
 const gitHooksModulePath = fileURLToPath(new URL('../../src/setup/git-hooks.mjs', import.meta.url));

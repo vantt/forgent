@@ -111,6 +111,29 @@ export function frontier(view, { step = 'Execute' } = {}) {
   return ready;
 }
 
+// Union of `frontier(view, {step})` across multiple steps (tsk-4so D1,
+// docs/history/execution-fanout/CONTEXT-tsk-4so.md): a footprint-overlap
+// advisory that only ever looks at one step is structurally blind to two
+// items at DIFFERENT steps sharing a footprint — the real gap this exists
+// to close (tsk-1ug at `decompose` vs tsk-4fg/tsk-59x at `executing`, all
+// three declaring the same file, `fgos conflicts` reporting zero pairs).
+// Dedupes by id: an item with no `stage` field matches EVERY step's
+// `executeStage` fallback (`item.stage ?? executeStage` above), so without
+// dedup it would appear once per step in `steps` instead of once overall.
+// Re-sorts the deduped set once with `compareReadyOrder` — concatenating
+// three already-sorted arrays would NOT preserve `FRONTIER_ORDER_VERSION`'s
+// priority/intent ordering across the combined set. PURE: same read-only
+// contract as `frontier`.
+export function frontierAcrossSteps(view, steps = ['Clarify', 'Divide', 'Execute']) {
+  const seen = new Map();
+  for (const step of steps) {
+    for (const item of frontier(view, { step })) {
+      if (!seen.has(item.id)) seen.set(item.id, item);
+    }
+  }
+  return [...seen.values()].sort(compareReadyOrder);
+}
+
 // True when `item` is at the front-segment "not yet started" bucket (per
 // decision record 0027, D2/D3: statusCategory 'todo') — used by the `ready`
 // filter above so a domain that relabels its "not started" status away from

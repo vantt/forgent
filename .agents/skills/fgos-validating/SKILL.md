@@ -201,6 +201,8 @@ node "$root/bin/fgos.mjs" decompose "<item-id>" --verdict pass-through --reason 
 # shape judgeDecompose itself produces ({title, verify, kind?, risk?, refs?,
 # footprint?, deps?}):
 node "$root/bin/fgos.mjs" decompose "<item-id>" --verdict decompose --reason "<why plan.md called for a split>" --children '<JSON array from plan.md>' --dir "$root"
+# plan.md's step 4's listed child pieces were already created as real work items during fgos-planning's own step 4 (`fgos add --parent --footprint`), not a fresh `--children` blob still to be materialized -- cite them by id, never `--verdict decompose --children` here: that write is unconditional (decompose.mjs's addWork loop, ~929-945) and would create duplicate positional-id children while orphaning the real ones:
+node "$root/bin/fgos.mjs" decompose "<item-id>" --verdict pass-through --reason "<cite the existing child ids plan.md's step 4 already created via fgos add --parent>" --dir "$root"
 ```
 
 The verdict reached at the Gate above does not, by itself, move the item
@@ -216,6 +218,18 @@ its `decompose`→`executing` edge — loading `fgos-routing` next reads the
 item's stage (now `executing`) and points at the right place. A `NOT READY`
 verdict hands the item back to `fgos-planning` instead, with the matrix
 attached, never onward, and never fires the `fgos decompose` call.
+
+**The `fgos decompose` call above also releases the item's claim back to
+`todo`** (`releaseClaimOnExecuting`, `src/intake/decompose.mjs:488-494`,
+claim-lock §3b) the moment the item reaches `executing` — this is expected
+and correct, but any path that continues from here WITHOUT going back
+through the `fgos-coding-driving` loop (which re-checks claim status fresh
+right before invoking the `executing`-stage skill) is not automatically
+safe: the claim may already be released, so a session driving stage-by-stage
+by hand must re-read the item's live `status` itself and re-claim
+(`fgos pick <id>`) before calling `fgos-code-implement` directly. Skipping
+this re-check risks implementing against an item that no longer holds its
+claim, and `fgos return` will simply refuse later with "is todo, not doing".
 
 ## Red flags
 
