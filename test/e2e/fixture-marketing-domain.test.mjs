@@ -144,7 +144,7 @@ test("DOMAINS['fixture-marketing'] declares its OWN statusLabels/skillMap.retros
 });
 
 test('adding "fixture-marketing" leaves DOMAINS.coding completely unchanged (RUL11 — purely additive)', () => {
-  assert.deepEqual(DOMAINS.coding.stages, ['clarify', 'decompose', 'executing']);
+  assert.deepEqual(DOMAINS.coding.stages, ['clarify', 'discovery', 'exploring', 'decompose', 'executing']);
   assert.deepEqual(DOMAINS.coding.statusLabels, {
     todo: 'todo',
     doing: 'in-progress',
