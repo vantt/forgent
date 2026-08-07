@@ -125,8 +125,43 @@ Tạo thật lúc `fgos-validating` (bị bỏ sót lúc planning — sửa tạ
 ### P1 — `tsk-2t9` — skill `fgos-researching`
 
 - **Verify**: `npm test && test -f .claude/skills/fgos-researching/SKILL.md && grep -q "^name: fgos-researching$" .claude/skills/fgos-researching/SKILL.md && rg -q --hidden "docs/history/<feature>/RESEARCH.md" .claude/skills/fgos-researching/SKILL.md && rg -q --hidden "WebSearch/WebFetch" .claude/skills/fgos-researching/SKILL.md && ! rg -q --hidden "có biết cái này không" .claude/skills/fgos-researching/SKILL.md`
-- **Footprint**: `.claude/skills/fgos-researching/SKILL.md`
+- **Footprint**: `.claude/skills/fgos-researching/SKILL.md,.agents/skills/fgos-researching/SKILL.md` (mở rộng lúc `fgos-code-implement`: `test/skills/fgos-mirror.test.mjs` đòi mọi `.claude/skills/fgos-*/` mirror byte-identical sang `.agents/skills/fgos-*/`; bản đầu bỏ sót nhánh `.agents/`, `npm test` bắt được thật khi chạy trực tiếp — output nền bị cắt ngắn nên không thấy lỗi, phải chạy lại targeted mới lộ ra)
 - **D-ID**: D4, D5, D8, D2
+
+#### Child plan (`fgos-planning`, mức riêng của `tsk-2t9`)
+
+**Mode: tiny.** Đếm cờ mode-gate riêng cho child này (không phải phạm vi
+`tsk-5kn` tổng thể — chỉ dòng `Mode: high-risk` trên là aggregate, không có
+dòng riêng cho từng con): 1 file mới, không đụng data model, không đụng
+public contract nào đang sống (chưa skill nào trỏ vào `fgos-researching`
+tới khi P4/P5 wire — nằm ngoài phạm vi item này), không hành vi hiện có bị
+đe doạ (file chưa tồn tại, không test nào phủ). 0/10 cờ ⇒ tiny. Posture
+impact-analysis: `degraded` (như D15 đã ghi ở `tsk-5kn`), nhưng không cần —
+item này tạo file mới, không có blast radius để soi.
+
+**Approach.** Viết đúng một file: `.claude/skills/fgos-researching/SKILL.md`.
+Nội dung phải mang các hợp đồng đã khoá ở `CONTEXT.md`:
+
+- **D4** — stage-agnostic: skill nhận *(mô tả + những gì đã biết tới giờ)*,
+  trả *(lời giải cụ thể + verdict rõ/chưa rõ)*, không tự biết mình bị gọi
+  từ stage nào.
+- **D8** — luật chọn đường **hai nhánh cơ học**, bỏ hẳn self-test "có biết
+  cái này không": tên riêng **có** trong repo/docs ⇒ đọc tại chỗ
+  (`rg`/Read/Grep); **không có** ⇒ tra ngoài (WebSearch/WebFetch). Verify
+  của item này assert trực tiếp cụm cấm — phải tránh viết đúng cụm đó dù
+  là để phủ định.
+- **D5** — ghi `docs/history/<feature>/RESEARCH.md`, **tích luỹ theo
+  vòng**, không ghi đè (khác `writeScoutNotes` cũ); bắt cả kết quả
+  WebSearch/WebFetch, không chỉ lệnh `rg`.
+- **D2** — fan-out khi câu hỏi có nhiều nhánh độc lập đi qua cơ chế dispatch
+  có hợp đồng (không phải ad-hoc Task call) — đúng cửa `tsk-29i` đã kê sẵn.
+
+**Shape.** Không split — một mảnh, một file, một verify. Ca biên đáng viết
+vào skill: (a) mô tả không có tên riêng nào ⇒ không research, trả verdict
+thẳng từ dữ liệu sẵn có; (b) tên riêng trùng cả trong-repo lẫn cần tra
+ngoài (vd một pattern có tên trùng thư viện ngoài) ⇒ làm cả hai nhánh, không
+chọn một; (c) `RESEARCH.md` chưa tồn tại ⇒ tạo mới với đúng hình tích luỹ
+ngay từ vòng đầu, không phải "tạo trống rồi ghi đè sau".
 
 ### P2 — `tsk-v4b` — skill `fgos-clarifying`
 
