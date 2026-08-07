@@ -77,6 +77,18 @@ re-shapes the work; that already happened at `clarify`/`decompose`.
    all is legitimately small enough that the title and `verify` command
    are the whole spec — do not manufacture ceremony it doesn't need.
 
+   If this session did not arrive here via the `fgos-coding-driving` loop
+   (which already re-checks claim status fresh right before invoking this
+   skill) — for example, a session driving stage-by-stage by hand, straight
+   from `fgos-validating`'s own `fgos decompose` call — re-check the item's
+   live `status` (`fgos list --id <id> --json`) before doing anything else:
+   the `decompose`→`executing` edge releases the claim back to `todo`
+   (`releaseClaimOnExecuting`, `src/intake/decompose.mjs:488-494`,
+   claim-lock §3b), so the claim may already be released. If `status` reads
+   `todo`, re-claim (`fgos pick <id>`) before Implementing — proceeding
+   without a live claim risks `fgos return` refusing later with "is todo,
+   not doing".
+
 2. **Implement.** Make the real change the item describes, reading every
    file before editing it. Before editing a symbol, apply `CLAUDE.md`'s
    impact-analysis capability gate rather than assuming GitNexus is on this
