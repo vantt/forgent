@@ -58,9 +58,14 @@ missing. Changing the release behavior would be a different, larger item.
 | Warning lands in the right section, both mirrors | low — pure text insertion, no logic | `grep -c` on all 4 files confirms the anchor phrase appears exactly once each |
 | Wording stays accurate to the real mechanism | low — cites real file:line (`decompose.mjs:488-494`) already read for this plan | manual read at review, no automated check needed (prose-comprehension proof is explicitly NOT verify's job per `docs/how-to/write-verify-for-a-skill-prose-change.md`) |
 
-Impact-analysis posture: `inactive` — no code symbol is being edited (pure
-SKILL.md prose), so `CLAUDE.md`'s impact-analysis gate does not apply to
-this item's own footprint.
+Impact-analysis posture: not applicable — `fgos tool query --capability
+impact-analysis --status present` shows GitNexus registered and `present`
+(1 provider), so the gate's own vocabulary would call this `full`, not
+`inactive` (an earlier pass of this plan mislabeled it, corrected at
+`fgos-validating`). It stays not-applicable in practice regardless: the
+MUST-run-impact rule triggers "before modifying a function, class, or
+method" — this item's footprint is pure `SKILL.md` prose, zero code
+symbols, so the rule's own precondition never fires here.
 
 ## Files touched
 
