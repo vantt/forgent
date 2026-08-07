@@ -208,6 +208,42 @@ is added. Left as a documented option for a future item, not implemented
 here — the immediate real gap (two more silently-wrong-answer verbs) was
 fixed directly instead.
 
+## A sixth case: a non-verb *script* resolving the wrong root, cosmetic but still worth fixing
+
+`tsk-5ma` found the same `resolveRepoRoot()`-vs-main-checkout mistake in
+a place that isn't a CLI verb at all: `scripts/fgos-session-start-hook.mjs`
+— the hook that prints "fgOS canonical paths" context when a session
+starts. Line 16 called `resolveRepoRoot()` (`git rev-parse
+--show-toplevel`, which returns whichever checkout `cwd` is currently
+in) instead of `resolveMainCheckoutRoot()`, then derived the storage
+path from that. Confirmed live from inside a linked worktree:
+`resolveRepoRoot()` returned the worktree's own path
+(`.claude/worktrees/tsk-5hv-P9OLdR`); `resolveMainCheckoutRoot()`
+correctly returned the real main checkout. Since `.fgos/` is
+unconditionally wiped from every freshly-created worktree (ADR0020), the
+wrong root silently produces a path to a directory that simply doesn't
+exist.
+
+Found while fixing 8 other instances of the exact same bug class during
+`tsk-5hv`'s `.fgos-runner.json` retirement — this was the one remaining
+real instance, confirmed by auditing every other `resolveRepoRoot()`
+caller in the codebase. Two other callers were checked and confirmed
+**not** the same bug: `bin/fgos-runner.mjs`'s and `loop.mjs`'s own uses
+are intentional per the runner's documented contract (operate on
+whichever checkout it's invoked from); `git-hooks.mjs`'s
+`resolvesToGithooks` genuinely needs the worktree's own root, since
+`core.hooksPath` wiring has to resolve correctly from *any* worktree,
+not just the main checkout.
+
+**Impact stayed narrow, by the hook's own design**: its own header
+comment states it "NEVER THROWS, ALWAYS EXITS 0... path injection is
+pure convenience, never load-bearing" — so this bug never broke
+anything functionally. It only misled whoever read the printed
+"canonical paths" context at the start of a session that happened to
+start fresh with `cwd` already inside a `.claude/worktrees/*` directory
+— not the common `/fgOS:pick` mid-session-switch case, which runs this
+hook only once, before the switch, and was never affected.
+
 ## Related
 
 - `docs/decisions/0020-chan-fgos-khoi-worktree-worker.md` — why a linked
