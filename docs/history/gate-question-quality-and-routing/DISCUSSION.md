@@ -1,25 +1,30 @@
 # Chất lượng và định tuyến câu hỏi gate — DISCUSSION
 
 **Items:** `tsk-65i` (STR71b, định tuyến) · `tsk-539` (STR71, trình bày)
-**Bắt đầu:** 2026-08-08 · **Vòng gần nhất:** 1
+**Bắt đầu:** 2026-08-08 · **Vòng gần nhất:** 2
 
 ---
 
 ## 1. Trạng thái hiện tại
 
-Vòng 1 vừa xong. Đây là vòng **đưa bằng chứng lên bàn**, chưa chốt thiết kế nào.
+Vòng 2 vừa xong. Vòng 1 đưa **bằng chứng đo được** lên bàn; vòng 2 đào xuống **code thật** của
+`ask`/`answer` và tìm ra gốc kỹ thuật của từng con số.
 
-**Đã có:** một bộ số đo trực tiếp từ `.fgos/state.json` (445 work item, 314 lượt hỏi người thật)
-định lượng được vấn đề mà STR71 mô tả bằng cảm nhận. Số đo cho thấy vấn đề **rộng hơn** phạm vi
-STR71 đang giữ: STR71 lo *câu hỏi khó hiểu* (trình bày), nhưng phần lớn khối lượng nằm ở *câu hỏi
-lẽ ra không nên tới người* (định tuyến) và *câu hỏi sai định dạng* (yes/no cho thứ không phải
-yes/no).
+**Đổi lớn ở vòng 2:** hình dạng vấn đề từ **ba tầng** thành **bốn tầng**. Vòng 1 xếp vấn đề ở tầng
+nội dung câu hỏi (định tuyến / định dạng / bối cảnh). Vòng 2 phát hiện một **tầng 0 nằm dưới cả
+ba**: lược đồ dữ liệu và hợp đồng của chính `gates[id]`. Bốn con số lớn nhất ở §3 đều có gốc ở
+tầng 0, nên sửa ở tầng skill/prompt sẽ **không đủ**.
 
-**Đang mở:** toàn bộ phần thiết kế. Chưa chốt luật định tuyến, chưa chốt trần hỏi lại, chưa chốt
-định dạng câu hỏi bắt buộc, chưa chốt cái này sống ở lớp nào (contract CTR004 / verb / skill prose).
+**Đã chốt:** D1 — ràng buộc thứ tự với STR48 (kênh chú-ý đi sau hoặc đồng thời, không bao giờ
+trước). Điểm này đứng vững qua cả hai vòng không bị sửa.
 
-**Vòng sau cần:** người chủ sản phẩm xác nhận cách phân ranh giới giữa "đừng hỏi" và "hỏi cho tốt",
-vì nó quyết định `tsk-65i` và `tsk-539` là hai item hay một.
+**Đã bị sửa (đúng như dự kiến của luật D-ID):** khung "ba tầng" của vòng 1 — may là chưa cấp D-ID.
+
+**Đang mở:** Q1–Q7 của vòng 1 vẫn mở, cộng Q8–Q11 mới về tầng 0. Q5 ("sống ở lớp nào") đã có
+hướng: **phải chạm lược đồ, không chỉ prose.**
+
+**Vòng sau cần:** người chủ sản phẩm quyết Q1 (ranh giới đừng-hỏi vs hỏi-cho-tốt) và Q8 (tầng 0 là
+item riêng hay điều kiện tiên quyết của hai item hiện có).
 
 ---
 
@@ -102,6 +107,41 @@ Nguồn: `.fgos/state.json` (`gates`, `work`, `frictions`, `settlements`), đo n
 
   Hai phương án đặt tên, mỗi cái neo vào một thứ đã tồn tại trong repo để so sánh.
 
+### Đã rõ — bảy vấn đề cấu trúc của `ask`/`answer` (vòng 2, đọc code trực tiếp)
+
+Nguồn: `src/state/replay.mjs:196-230` (fold gate), `src/intake/decompose.mjs:625-655` (bypass),
+grep toàn `src/`.
+
+| # | Vấn đề cấu trúc | Bằng chứng |
+|---|---|---|
+| S1 | **Không có cơ chế chung "câu trả lời này giải phóng câu hỏi kia"** — chỉ 2 cổng tự vá tay (`keywordRiskGate`, `blastRadiusGate`); cổng tranh chấp verify (64% khối lượng) **không có kiểm nào** | `decompose.mjs:638,646` |
+| S2 | **So khớp chuỗi làm hợp đồng** — điều kiện giải phóng là `gate.ask.includes("<literal>")`; đổi câu chữ câu hỏi thì câu trả lời cũ thôi tác dụng | `decompose.mjs:638` |
+| S3 | **`askHistory` có, `answerHistory` KHÔNG** — grep toàn `src/` ra 0. `tsk-48i` giữ đủ 23 câu hỏi nhưng **chỉ còn câu trả lời cuối**; 22 quyết định của người đã bốc hơi | `replay.mjs:214` vs grep |
+| S4 | **Không có liên kết câu hỏi ↔ câu trả lời** — hai ô độc lập trên cùng object, không id, không con trỏ. Hỏi đè trước khi người kịp trả lời ⇒ câu trả lời gắn vào câu hỏi **mới** trong khi người đang đọc câu **cũ** | `replay.mjs:202,215` |
+| S5 | **Một item chỉ hỏi được một câu tại một thời điểm** — `gates[id]` một object, một ô `ask`. Session có 3 câu hỏi độc lập phải tuần tự hoá thành 3 vòng người-quay-lại | `replay.mjs:200` |
+| S6 | **Câu hỏi không có kiểu** — `ask` là văn xuôi tự do. Không định tuyến/gộp/render phương án/tự-trả-lời-một-lớp/validate-trước-khi-đậu được | không có trường `kind` trong fold |
+| S7 | **Người trả lời không phải người hỏi** — `answer` đưa item về `todo`; session đã hỏi đã chết, một session **lạnh** khác tiêu thụ câu trả lời. Nên **câu trả lời cũng phải tự đứng được**, vế chưa ai nhìn | `store.mjs` `answerAwaiting` |
+
+**Tiền lệ đã được ghi trong chính code.** Comment tại `decompose.mjs:630-635` mô tả đúng sự cố mà
+R9 đo lại được, và đã từng vá một lần:
+
+> *"this hard risk gate used to re-fire unconditionally on every call — a human answering
+> `fgos answer` never released it, **re-parking the exact same question forever** (dogfood,
+> 2026-07-28)"*
+
+Bản vá đó **chỉ áp cho 2 cổng**, bằng so khớp chuỗi. Cổng chiếm 64% khối lượng không được vá.
+
+**Ánh xạ ngược: mọi con số lớn đều có gốc ở tầng dữ liệu**
+
+| Số đo (§3 trên) | Gốc cấu trúc |
+|---|---|
+| R9 — 23 lần hỏi trên một item | S1 thiếu cơ chế giải phóng chung |
+| R2 — 82% dạng yes/no | S6 không có kiểu câu hỏi để chọn |
+| R3 — trả lời median 295 ký tự | S7 người đang bù ngữ cảnh cho một người đọc vô hình |
+| R8 — 34 item bị hỏi ≥3 lần | S5 một câu hỏi mỗi lượt |
+
+Đây là lý do vòng 2 kết luận **sửa ở tầng skill/prompt không đủ**.
+
 ### Chưa rõ — cần bàn
 
 | # | Câu hỏi mở | Vì sao chưa quyết được |
@@ -113,23 +153,30 @@ Nguồn: `.fgos/state.json` (`gates`, `work`, `frictions`, `settlements`), đo n
 | Q5 | **Cái này sống ở lớp nào?** | Contract CTR004 (ask/answer) / verb `ask` tự validate / skill prose / judge-executor. Ảnh hưởng tới việc nó có phải thay đổi hợp đồng hay không. |
 | Q6 | **Sửa gốc `verify` có làm Q2 thành thừa không?** | Nếu `verify` sinh ra đủ tốt thì hai judge hết cãi, 64% tự biến mất. Có thể luật định tuyến chỉ là lưới an toàn, không phải giải pháp chính. Chưa biết tỉ trọng. |
 | Q7 | **Quan hệ với STR70a/STR70b/tsk-42i?** | Cụm gate-dialogue đã có sẵn, nhưng nguồn thiết kế của nó (`gate-dialogue-continuity/CONTEXT.md`) **chưa bao giờ vào git** (`git log --all` rỗng) — 5 item và 2 dòng backlog đang trích một file không tồn tại. Cần biết phần nào của cụm đó còn đứng vững. |
+| Q8 | **Tầng 0 là item riêng, hay điều kiện tiên quyết của `tsk-65i`/`tsk-539`?** | S1–S7 nằm ở lược đồ dữ liệu, sâu hơn cả hai item hiện có. Nếu là tiên quyết thì hai item kia bị chặn cho tới khi nó xong; nếu là item riêng song song thì phải chốt phần giao. |
+| Q9 | **Sửa tầng 0 có phải đổi hợp đồng CTR004 không, và nếu có thì theo luật nào?** | Thêm `answerHistory`/liên kết hỏi-đáp/kiểu câu hỏi đều là mở rộng lược đồ event. L10 (add-through-not-alongside) bắt mở rộng QUA cửa hiện có; `0011` bắt mọi contract khai version tường minh. Chưa rõ đây là bump version CTR004 hay chỉ thêm trường tuỳ chọn. |
+| Q10 | **Cơ chế giải phóng chung (S1) hình dạng thế nào?** | Thay `ask.includes(<literal>)` bằng gì: một `gateId` ổn định trên mỗi ask? Một `releases` trỏ ngược? Chưa bàn. Đây là thứ quyết định `tsk-65i` là luật định tuyến hay là một cơ chế dữ liệu. |
+| Q11 | **Câu trả lời tự-đứng-được (S7) có cần cấu trúc không?** | STR70a đã dựng `rationale`/`alternatives`/`source` cho answer — có thể phần này đã giải quyết một nửa S7. Cần đọc `checkpoint-distillate-gate-provenance/` xem còn thiếu gì, trước khi thiết kế mới. |
 
 ---
 
 ## 4. Quyết định đã chốt
 
-*(Trống — vòng 1. Theo luật của skill này, một điểm chỉ được cấp D-ID sau khi đứng vững qua hơn một
-vòng mà không bị sửa. Mọi thứ ở §3 hiện là **bằng chứng** hoặc **đề xuất**, chưa phải quyết định.)*
-
 | D-ID | Quyết định | Vòng chốt | `fgos decision` |
 |---|---|---|---|
-| — | — | — | — |
+| **D1** | **Kênh chú-ý (STR48) đi SAU hoặc ĐỒNG THỜI với việc sửa chất lượng/định tuyến câu hỏi — không bao giờ trước.** Kênh push khuếch đại chất lượng câu hỏi theo cả hai chiều; đẩy câu hỏi hiện tại lên điện thoại làm trải nghiệm tệ hơn hiện tại, không tốt hơn. | 2 (nêu V1, không bị sửa ở V2) | ✅ `tsk-65i` |
 
-**Ứng viên D-ID cho vòng 2** (đã nêu ở vòng 1, chờ đứng vững thêm một vòng):
+**Ứng viên D-ID cho vòng 3** (chưa đứng đủ vững):
 
-- Ràng buộc thứ tự với STR48: kênh chú-ý phải đi **sau hoặc đồng thời**, không bao giờ trước.
-- Tranh chấp về pattern/lệnh không escalate lên người.
+- Tranh chấp về pattern/lệnh không escalate lên người — *đang lung lay*: vòng 2 (S1) cho thấy cách
+  sửa có thể là một **cơ chế giải phóng** ở tầng dữ liệu chứ không phải một **luật định tuyến** ở
+  tầng nội dung. Chờ Q10.
 - Mỗi câu hỏi phải tự đứng được mà không cần mở file khác.
+- Sửa tầng skill/prompt là không đủ; phải chạm lược đồ dữ liệu — *mới nêu ở vòng 2, chờ một vòng.*
+
+**Đã bị sửa, không cấp D-ID** (ghi lại để thấy luật D-ID hoạt động đúng):
+
+- Khung "ba tầng" của vòng 1 → thành **bốn tầng** ở vòng 2. May là chưa cấp D-ID cho nó.
 
 ---
 
@@ -212,66 +259,159 @@ giả thuyết — nó đã xảy ra, đúng trong khu vực này, và đang ch�
 
 → file này.
 
+### 2026-08-08 — Vòng 2: đào xuống code `ask`/`answer`
+
+**Người chủ sản phẩm hỏi:**
+
+> *"như vậy phát sinh mấy vấn đề lớn phải giải quyết liên quan đến việc ask/answer?"*
+
+**Scout: đọc code thật thay vì suy đoán.** `src/state/replay.mjs:196-230` (fold gate),
+`src/intake/decompose.mjs:625-655` (bypass), grep `answerHistory` toàn `src/`.
+
+**Kết quả: bảy vấn đề cấu trúc S1–S7** (bảng ở §3). Điểm quan trọng nhất không phải số lượng mà là
+**vị trí**: cả bảy nằm ở **lược đồ dữ liệu**, dưới tầng nội dung câu hỏi mà vòng 1 đang bàn.
+
+**Bằng chứng đắt nhất — code tự ghi lại tiền lệ.** `decompose.mjs:630-635`:
+
+> *"this hard risk gate used to re-fire unconditionally on every call — a human answering
+> `fgos answer` never released it, re-parking the exact same question forever (dogfood,
+> 2026-07-28)"*
+
+Tức pattern "hỏi 23 lần" của R9 **đã xảy ra trước đây và đã được vá một lần** — nhưng vá riêng cho
+2 cổng, bằng `ask.includes(<chuỗi literal>)`. Cổng tranh chấp verify, chiếm 64% khối lượng, không
+được vá. Đó là gốc kỹ thuật trực tiếp của `tsk-48i` bị hỏi 23 lần.
+
+**Phát hiện phụ đáng lo riêng:** `askHistory` là mảng (giữ đủ 23 câu hỏi) nhưng **`answerHistory`
+không tồn tại** — grep ra 0 trong toàn `src/`. Nên đọc lại được cả 23 câu hỏi mà chỉ còn **câu trả
+lời cuối cùng**. 22 quyết định của người đã mất. Cùng loại "đánh mất bối cảnh" đã thúc đẩy việc tạo
+file này, nhưng ở tầng dữ liệu chứ không phải tầng tài liệu — và lần này mất thứ do **người** tạo
+ra, không phải do agent.
+
+**Ánh xạ ngược** (bảng ở §3): R9→S1, R2→S6, R3→S7, R8→S5. Mọi con số lớn ở vòng 1 đều có gốc ở
+tầng dữ liệu.
+
+**Hệ quả lên khung vòng 1.** Khung "ba tầng" bị sửa thành **bốn tầng** — thêm tầng 0 (lược đồ dữ
+liệu) nằm dưới cả ba. Kết luận: **sửa ở tầng skill/prompt không đủ.** Q5 của vòng 1 ("cái này sống
+ở lớp nào") nay có hướng: phải chạm lược đồ.
+
+**Chốt D1.** Ràng buộc thứ tự với STR48 nêu ở vòng 1, không bị sửa ở vòng 2 → đủ điều kiện cấp
+D-ID. Ghi qua `fgos decision --id tsk-65i` (seq 9733).
+
+**Không chốt ứng viên còn lại.** "Tranh chấp pattern không escalate lên người" đang lung lay: S1
+gợi ý cách sửa có thể là một *cơ chế giải phóng* ở tầng dữ liệu chứ không phải một *luật định
+tuyến* ở tầng nội dung. Để mở thành Q10.
+
+**Bốn câu hỏi mở mới:** Q8 (tầng 0 là item riêng hay tiên quyết), Q9 (có phải bump CTR004 không,
+theo L10/`0011`), Q10 (hình dạng cơ chế giải phóng), Q11 (STR70a's `rationale`/`alternatives`/
+`source` đã giải quyết bao nhiêu phần của S7).
+
 ---
 
 ## 6. Thiết kế đã chốt {#design}
 
-**Chưa có thiết kế để chốt.** Vòng 1 mới dựng xong đề bài và bằng chứng; mọi câu hỏi thiết kế
-(Q1–Q7 ở §3) còn mở. Viết một §6 giả vờ đã hội tụ ở đây sẽ vi phạm đúng tinh thần của skill này.
+**Chưa có giải pháp để chốt** — Q1–Q11 còn mở. Nhưng **hình dạng vấn đề** đã đủ vững để một người
+lạ đọc và làm việc được, và nó đã thay đổi ở vòng 2.
 
-Cái **đã** đứng vững đủ để một người lạ đọc và hiểu ngay, và cần giữ nguyên qua các vòng sau:
+### Hình dạng vấn đề — bốn tầng, không phải ba
 
-### Hình dạng vấn đề
-
-Câu hỏi gate hỏng ở **ba tầng độc lập nhau**, và ba tầng này cần ba loại giải pháp khác nhau —
-gộp chúng lại là lý do STR71 bị hẹp:
+Câu hỏi gate hỏng ở bốn tầng cần bốn loại giải pháp khác nhau. Ba tầng trên nằm ở **nội dung câu
+hỏi**; tầng 0 nằm ở **lược đồ dữ liệu** và đỡ cả ba tầng kia.
 
 ```mermaid
 flowchart TD
-    A["Một điểm cần quyết ở gate"] --> B{"Tầng 1 — ĐỊNH TUYẾN<br/>có cần người không?"}
-    B -->|"máy tự phán được<br/>(64% ca thật: tranh chấp pattern)"| C["Máy quyết<br/>KHÔNG hỏi người"]
-    B -->|"cần phán đoán người"| D{"Tầng 2 — ĐỊNH DẠNG<br/>hỏi kiểu gì?"}
-    D -->|"yes/no cho thứ cần cả đoạn<br/>(82% hỏi y/n, trả lời median 295 ký tự)"| E["Sai định dạng<br/>người phải viết luận"]
-    D -->|"phương án đặt tên<br/>(chỉ 21% làm được)"| F{"Tầng 3 — BỐI CẢNH<br/>tự đứng được không?"}
-    F -->|"phải mở file khác mới hiểu<br/>(55% không nhắc lại item)"| G["Người mở vòng chat<br/>chỉ để hiểu câu hỏi"]
-    F -->|"tự đủ"| H["Trả lời trong 10 giây<br/>(mẫu tsk-1an)"]
+    A["Một điểm cần quyết ở gate"] --> B{"Tầng 1 · ĐỊNH TUYẾN<br/>có cần người không?"}
+    B -->|"máy tự phán được<br/>64% ca thật: tranh chấp pattern"| C["Máy quyết, KHÔNG hỏi người"]
+    B -->|"cần phán đoán người"| D{"Tầng 2 · ĐỊNH DẠNG<br/>hỏi kiểu gì?"}
+    D -->|"yes/no cho thứ cần cả đoạn<br/>82% y/n, trả lời median 295 ký tự"| E["Sai định dạng<br/>người phải viết luận"]
+    D -->|"phương án đặt tên<br/>chỉ 21% làm được"| F{"Tầng 3 · BỐI CẢNH<br/>tự đứng được không?"}
+    F -->|"phải mở thứ khác mới hiểu<br/>55% không nhắc lại item"| G["Người mở vòng chat<br/>chỉ để hiểu câu hỏi"]
+    F -->|"tự đủ"| H["Trả lời trong 10 giây<br/>mẫu tsk-1an"]
 
-    C -.->|"thiếu trần hỏi lại"| I["Hỏi lại 23 lần<br/>người thành vòng retry"]
+    subgraph T0["Tầng 0 · LƯỢC ĐỒ gates id — đỡ cả ba tầng trên"]
+      S1["S1 không có cơ chế giải phóng chung<br/>chỉ 2 cổng tự vá bằng so khớp chuỗi"]
+      S5["S5 một ô ask — một câu hỏi mỗi lượt"]
+      S6["S6 ask là văn xuôi tự do — không có kiểu"]
+      S3["S3 có askHistory, KHÔNG có answerHistory<br/>23 câu hỏi còn 1 câu trả lời"]
+      S4["S4 không liên kết hỏi ↔ đáp — race khi hỏi đè"]
+      S7["S7 người trả lời không phải người hỏi<br/>session lạnh tiêu thụ câu trả lời"]
+    end
+
+    S1 -.->|"gốc của"| I["Hỏi lại 23 lần<br/>người thành vòng retry"]
+    S6 -.->|"gốc của"| E
+    S5 -.->|"gốc của"| J["34 item bị hỏi ≥3 lần"]
+    S7 -.->|"gốc của"| K["Trả lời phình 295 ký tự"]
 
     style C fill:#e0ede2,stroke:#3B7A4B
     style H fill:#e0ede2,stroke:#3B7A4B
     style E fill:#f5e2df,stroke:#9E3A30
     style G fill:#f5e2df,stroke:#9E3A30
     style I fill:#f5e2df,stroke:#9E3A30
+    style J fill:#f5e2df,stroke:#9E3A30
+    style K fill:#f5e2df,stroke:#9E3A30
+    style T0 fill:#f2e9d8,stroke:#8E6318
 ```
 
-- **Tầng 1 · Định tuyến** — `tsk-65i`. Chỗ 64% khối lượng nằm. Chưa item nào từng phủ.
-- **Tầng 2 · Định dạng** — chưa item nào phủ rõ; phát hiện mới ở vòng 1 (R2/R3).
-- **Tầng 3 · Bối cảnh** — `tsk-539` / STR71. Đã có item.
-- **Trần hỏi lại** — cắt ngang cả ba tầng, chưa item nào phủ.
+| Tầng | Nội dung | Item phủ | Ghi chú |
+|---|---|---|---|
+| **0 · Lược đồ** | S1–S7 trên `gates[id]` | **chưa có** | Sâu nhất; mọi con số lớn đều có gốc ở đây |
+| 1 · Định tuyến | có nên hỏi người không (64%) | `tsk-65i` | Cách sửa có thể là cơ chế tầng 0, không phải luật tầng 1 (Q10) |
+| 2 · Định dạng | yes/no cho thứ không phải yes/no | **chưa có** | Phát hiện vòng 1 (R2/R3); gốc là S6 |
+| 3 · Bối cảnh | câu hỏi tự đứng được | `tsk-539` | Phạm vi hiện tại của STR71 |
+| ⊥ Trần hỏi lại | không ai chặn ở lần 23 | **chưa có** | Cắt ngang; gốc là S1 |
 
-### Ràng buộc thứ tự đã nhận diện
+### Vì sao tầng 0 quyết định phạm vi cả cụm
 
-Không được xây kênh chú-ý STR48 trước khi xử lý tầng 1 và 2 — kênh push **khuếch đại** chất lượng
-câu hỏi theo cả hai chiều. Đẩy 23 thông báo về `grep` lên điện thoại làm trải nghiệm tệ hơn hiện
-tại, không tốt hơn.
+Vòng 1 xếp `tsk-65i` là "luật định tuyến" — một quy tắc nói *khi nào được escalate*. Vòng 2 cho
+thấy vấn đề có thể không phải thiếu quy tắc, mà là **thiếu chỗ để ghi quy tắc đó vào**: không có
+`gateId` ổn định để một câu trả lời trỏ vào, nên hai cổng duy nhất từng vá phải so khớp chuỗi câu
+hỏi. Nếu vậy thì `tsk-65i` không phải một luật, mà là một **cơ chế dữ liệu** — và điều đó đổi hẳn
+hình dạng công việc. Đây là Q10, và nó chặn việc chốt phạm vi `tsk-65i`.
 
-Ràng buộc này đứng độc lập với việc chọn giải pháp nào cho từng tầng, nên nó là ứng viên D-ID
-mạnh nhất cho vòng 2.
+Tương tự với `tsk-539`: viết `ask` tự đứng được là việc tầng 3, nhưng nếu `ask` vẫn là một ô văn
+xuôi tự do bị ghi đè (S5/S6) thì không có chỗ nào để **cưỡng chế** yêu cầu đó — chỉ còn cách nhắc
+trong prose, tức đúng cơ chế đã không hoạt động suốt 152 lần.
+
+### Ràng buộc thứ tự đã chốt (D1)
+
+Không xây kênh chú-ý STR48 trước khi xử lý tầng 0/1/2. Kênh push **khuếch đại** chất lượng câu hỏi
+theo cả hai chiều: đẩy nguyên trạng hiện tại lên điện thoại (23 thông báo về `grep` trên một item)
+làm trải nghiệm **tệ hơn** hiện tại.
+
+Ràng buộc này độc lập với mọi lựa chọn giải pháp bên trong bốn tầng, nên nó chốt được sớm trong
+khi phần còn lại vẫn mở.
 
 ### Neo vào tiêu chí sản phẩm
 
-Cụm này thuộc **tiêu chí 1 (Ship Faster)** — cụ thể hai vế *"không đoán mò"* và *"ít chờ đợi"*.
-Theo `docs/decisions/0025`, thước đo là tốc độ của **project đang dùng fgOS**, và khi một lựa chọn
-rẻ cho fgOS làm người vận hành chậm hơn thì chọn vế người vận hành. Hoãn cụm này để ưu tiên STR48
-là đúng loại đánh đổi mà `0025` bảo không được làm.
+Cụm này thuộc **tiêu chí 1 (Ship Faster)** — hai vế *"không đoán mò"* và *"ít chờ đợi"*. Theo
+`docs/decisions/0025`, thước đo là tốc độ của **project đang dùng fgOS**, và khi một lựa chọn rẻ
+cho fgOS làm người vận hành chậm hơn thì chọn vế người vận hành. Hoãn cụm này để ưu tiên STR48 là
+đúng loại đánh đổi mà `0025` bảo không được làm.
+
+Một lưu ý về mức độ nghiêm trọng của S3: hệ đang **mất dữ liệu do người tạo ra** (22/23 câu trả
+lời), không chỉ dữ liệu do agent tạo ra. Xét theo tiêu chí 2 (DoD — *evidence-linked
+documentation*), đây là lỗ hổng bằng chứng, không chỉ lỗ hổng trải nghiệm.
 
 ---
 
 ## 7. Danh mục hạng mục / task {#tasks}
 
-*(Tạm thời, theo hình dạng ba tầng ở §6. Sẽ chốt lại sau khi Q1 ngã ngũ — Q1 quyết định đây là hai
-item hay một.)*
+*(Tạm thời, theo hình dạng bốn tầng ở §6. Chốt lại sau khi Q1 và Q8 ngã ngũ.)*
+
+### Chưa có item · Lược đồ gate — tầng 0 {#task-gate-schema}
+
+- **Mục tiêu:** cho `gates[id]` đủ cấu trúc để ba tầng trên **cưỡng chế được** thay vì chỉ nhắc
+  trong prose. Ứng viên: `gateId` ổn định để câu trả lời trỏ vào (thay `ask.includes(<literal>)`),
+  `answerHistory` đối xứng với `askHistory`, liên kết hỏi↔đáp, trường `kind` cho câu hỏi.
+- **Trích §6:** subgraph "Tầng 0", cộng bảng ánh xạ ngược R9→S1 / R2→S6 / R3→S7 / R8→S5.
+- **D-ID áp dụng:** chưa có.
+- **Quan hệ anh em:** nằm **dưới** cả `tsk-65i` và `tsk-539`. Q8 quyết định nó là điều kiện tiên
+  quyết (chặn hai item kia) hay item song song có phần giao phải chốt.
+- **Câu hỏi mở riêng:** Q8 (riêng hay tiên quyết), Q9 (có bump CTR004 không, theo L10 và `0011`),
+  Q10 (hình dạng cơ chế giải phóng), Q11 (STR70a đã giải quyết bao nhiêu phần của S7).
+- **Rủi ro riêng:** đây là thay đổi lược đồ event trên một log append-only bất khả xoá (L3/RUL11) —
+  không sửa lại được sau khi phát hành. Cần `fgos-validating` thật sự, không chỉ plan.
+- **Chưa submit** — chờ Q8.
+- **Draft verify:** chưa xác định — chờ Q9 (phạm vi hợp đồng quyết định cái gì kiểm được).
 
 ### tsk-65i · Định tuyến câu hỏi {#task-routing}
 
@@ -279,9 +419,11 @@ item hay một.)*
 - **Trích §6:** tầng 1 trong sơ đồ; nhánh "máy tự phán được".
 - **D-ID áp dụng:** chưa có (vòng 1).
 - **Quan hệ anh em:** đứng **trước** `tsk-539` trong luồng — chỉ thứ lọt qua tầng 1 mới cần tầng
-  2/3. Nếu Q1 kết luận ranh giới mờ thì gộp với `tsk-539`.
-- **Câu hỏi mở riêng:** Q2 (phát biểu luật), Q6 (sửa gốc verify có làm luật này thành thừa không).
-- **Draft verify:** chưa xác định — phải chờ Q5 (cái này sống ở lớp nào) mới viết được lệnh thật.
+  2/3. Nằm **trên** `#task-gate-schema`. Nếu Q1 kết luận ranh giới mờ thì gộp với `tsk-539`.
+- **Câu hỏi mở riêng:** Q2 (phát biểu luật), Q6 (sửa gốc verify có làm luật này thành thừa không),
+  Q10 (**quan trọng nhất** — nếu đây là cơ chế dữ liệu chứ không phải luật thì item này đổi hẳn
+  hình dạng, có thể tan vào tầng 0).
+- **Draft verify:** chưa xác định — phải chờ Q5/Q10 mới viết được lệnh thật.
   *Cố ý để trống thay vì bịa một lệnh `grep`, đúng thứ item này đang phê phán.*
 
 ### tsk-539 · Bối cảnh và định dạng câu hỏi {#task-self-sufficiency}
@@ -295,6 +437,9 @@ item hay một.)*
 - **Câu hỏi mở riêng:** Q4 (có cưỡng chế định dạng bằng máy không).
 - **Ghi chú:** phạm vi hiện tại của item chỉ ôm tầng 3. Tầng 2 (định dạng yes/no lệch, R2/R3) là
   phát hiện mới — cần quyết cho vào đây hay tách.
+- **Chặn ngầm bởi tầng 0:** không có chỗ nào **cưỡng chế** được yêu cầu "tự đứng được" khi `ask`
+  vẫn là ô văn xuôi tự do bị ghi đè (S5/S6) — chỉ còn cách nhắc trong prose, tức đúng cơ chế đã
+  không hoạt động suốt 152 lần. Q4 và Q8 gắn nhau.
 - **Draft verify:** chưa xác định — chờ Q4.
 
 ### Chưa có item · Trần hỏi lại {#task-reask-cap}
