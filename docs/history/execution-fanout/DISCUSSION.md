@@ -254,7 +254,7 @@ rút từng cái một, `fgos-coding-driving` gặp children mở thì dừng h�
 trả danh sách id về cho caller chứ không tự chạy tiếp. Trong khi đó không
 luật nào cấm chạy song song: children của decompose là work item thật, tức
 rootTask thật, nên dispatch N cái đồng thời chính là kích hoạt N rootTask —
-đúng định nghĩa orchestrator của `docs/decisions/0026`, và đã có bằng
+đúng định nghĩa launcher của `docs/decisions/0026`, và đã có bằng
 chứng chạy thật (`tsk-1sj` → `tsk-30z`/`tsk-50ic`, hai Agent chồng lấn
 ~184s ở trạng thái `doing`) nhưng làm hoàn toàn bằng tay. Việc cần làm là
 biến cơ chế đã chứng minh bằng tay đó thành **đường đi mặc định**: một

@@ -26,7 +26,7 @@ between them — they can be built in parallel.
 `two-layer-dispatch`'s own design (`tsk-2t6`) gated a lighter, ephemeral
 "exec packet" category (B2) behind real evidence of need. `tsk-umc`'s D1
 confirms that gate stays shut here too: a decompose's children are
-already real work items — real `rootTask`s, per the orchestrator
+already real work items — real `rootTask`s, per the launcher
 definition in decision 0026 — so dispatching N of them concurrently
 *is* activating N real root tasks, not something requiring a new,
 cheaper identity shape. The real cost of a child isn't in the
@@ -353,5 +353,5 @@ than rebuilt: `docs/history/execution-fanout/CONTEXT.md` and
 `DISCUSSION.md`. Related: `docs/history/fanout-and-delegation-rubric/`
 (the fan-out A/B boundary), `docs/history/two-layer-dispatch/` (the
 exec-packet gate this item confirmed stays shut), and
-`docs/decisions/0026` (the orchestrator/rootTask definition this design
+`docs/decisions/0026` (the launcher/rootTask definition this design
 relies on directly).

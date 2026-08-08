@@ -709,7 +709,7 @@ export function decideCapacityDispatchMechanism(cfg, capacityId, { hasLiveTaskAc
  * Worktree-dispatch attestation (tsk-2ig, D1/D3 of docs/history/parallel-
  * decomposition-footprint-avoidance/CONTEXT.md — mức 1, advisory-only):
  * chụp `baseCommit`/`headRef` NGAY TRƯỚC khi dispatch — captured by the
- * orchestrator itself, never trusted from whatever the dispatched executor
+ * launcher itself, never trusted from whatever the dispatched executor
  * later reports.
  *
  * `attestRoot`, when given, is read instead of `fgosDir`'s own root

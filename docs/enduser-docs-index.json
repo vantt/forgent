@@ -212,7 +212,7 @@
     "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
     "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/decisions/0026-vision-orchestrator-roottask-capacity-native-vs-cli-spawn.md",
-    "title": "0026 — Native-First Dispatch Doctrine: orchestrator/rootTask/capacity",
+    "title": "0026 — Native-First Dispatch Doctrine: launcher/rootTask/capacity",
     "sourceCaptureId": null
   },
   {

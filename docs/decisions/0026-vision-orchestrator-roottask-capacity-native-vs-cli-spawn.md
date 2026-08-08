@@ -1,20 +1,21 @@
 ---
 type: explanation
-title: "0026 — Native-First Dispatch Doctrine: orchestrator/rootTask/capacity"
+title: "0026 — Native-First Dispatch Doctrine: launcher/rootTask/capacity"
 tags: []
 timestamp: 2026-08-03T10:33:57.000Z
 source_capture_ids: []
 date: 2026-08-03
 status: accepted
+superseded_by: 0028
 extends: []
 relates_specs: [runner]
 ---
 
-# 0026 — Native-First Dispatch Doctrine: orchestrator/rootTask/capacity
+# 0026 — Native-First Dispatch Doctrine: launcher/rootTask/capacity
 
 **Pinned term: "Native-First Dispatch Doctrine"** — dùng tên này khi
 tham chiếu tới toàn bộ vision trong quyết định này (vocabulary
-orchestrator/rootTask/subTask/capacity + 4 quy tắc chọn native vs
+launcher/rootTask/subTask/capacity + 4 quy tắc chọn native vs
 cli/spawn dispatch bên dưới), thay vì lặp lại toàn bộ nội dung.
 
 ## Bối cảnh
@@ -31,28 +32,28 @@ implement gì).
 
 ## Đơn vị vận hành (vocabulary, chốt dùng xuyên suốt từ đây)
 
-- **orchestrator** — tiến trình/cơ chế QUYẾT ĐỊNH kích hoạt 1 rootTask,
+- **launcher** — tiến trình/cơ chế QUYẾT ĐỊNH kích hoạt 1 rootTask,
   qua HOẶC 1 agent-terminal (tương tác) HOẶC 1 headless/non-interactive
   agent process (spawn/cli). Là 1 VAI TRÒ, không phải 1 phần mềm cụ thể
   duy nhất — nhiều cơ chế khác nhau đều đóng vai này:
   - Người dùng tự tay mở 1 session Claude Code/Codex/agy tương tác —
-    chính người dùng là orchestrator.
+    chính người dùng là launcher.
   - `/fgOS:pick`, `/fgOS:merge-loop`, `/fgOS:discover-loop`,
     `/fgOS:cleanup-loop`, `/fgOS:retro-loop` — các skill lặp, chạy BÊN
     TRONG 1 session tương tác đang sống, lần lượt kích hoạt/đưa nhiều
     rootTask qua vòng đời của chúng.
-  - `fgos-runner` (`bin/fgos-runner.mjs`/`loop.mjs`) — orchestrator
+  - `fgos-runner` (`bin/fgos-runner.mjs`/`loop.mjs`) — launcher
     HEADLESS, không cần người ngồi terminal — hình dung là tương lai khi
     không cần thao tác tay nhiều nữa, tự claim + spawn worker headless
     cho từng rootTask.
   - `herdr-plugin` (quản lý pane/tab terminal) — hạ tầng để đứng 1
-    agent-terminal lên (tìm/mở pane), CÓ THỂ được 1 orchestrator dùng để
-    đứng rootTask lên, và tự nó cũng có thể được bọc thành 1 orchestrator
+    agent-terminal lên (tìm/mở pane), CÓ THỂ được 1 launcher dùng để
+    đứng rootTask lên, và tự nó cũng có thể được bọc thành 1 launcher
     (ví dụ 1 automation dùng herdr mở N pane, mỗi pane chạy 1 rootTask).
-  - **Vai trò orchestrator KHÔNG CẦN soul** — logic chọn "item nào tiếp
+  - **Vai trò launcher KHÔNG CẦN soul** — logic chọn "item nào tiếp
     theo" (FIFO picker, frontier, priority ranking...) giữ THUẦN CƠ HỌC,
     đúng tinh thần "trí tuệ không cầm picker" (`fgos-routing`'s own D8
-    stance) đã có sẵn trong repo. Soul chỉ vào cuộc SAU KHI orchestrator
+    stance) đã có sẵn trong repo. Soul chỉ vào cuộc SAU KHI launcher
     đã quyết định kích hoạt rootTask nào.
 
 - **rootTask** — công việc gốc đang làm, được bao bọc/vận hành bởi 1
@@ -76,7 +77,7 @@ implement gì).
   **subTask và capacity KHÔNG gộp thành 1 khái niệm** (đính chính lại
   phát biểu ban đầu) — chúng khác nhau thật về bản chất (1 bên là
   rootTask đệ quy, 1 bên là helper). Cái GIỐNG NHAU, và là điều đáng nói,
-  là **CƠ CHẾ DISPATCH/ORCHESTRATE**: quyết định "kích hoạt bằng gì" (native
+  là **CƠ CHẾ DISPATCH/LAUNCH**: quyết định "kích hoạt bằng gì" (native
   hay cli/spawn, theo 4 quy tắc dưới) áp dụng Y HỆT cho cả 2 — bên kích
   hoạt không cần quan tâm target là 1 rootTask-con hay 1 helper, chỉ cần
   biết: có cần soul không, cùng provider không, có cơ chế native tương
@@ -149,25 +150,25 @@ access"*).
 - Cả 2 item đó và gap `tsk-1ni` đều chỉ là MẢNH GHÉP hẹp (cơ chế
   `capacities.<id>` config riêng của fgOS) của bức tranh rộng hơn tầm
   nhìn này vẽ ra (gộp cả việc tự gọi Task tool ngoài cơ chế
-  `capacities.<id>`, gộp cả khái niệm orchestrator tường minh).
+  `capacities.<id>`, gộp cả khái niệm launcher tường minh).
 
 ## Ranh giới quan sát được (observability) — tránh ngộ nhận
 
 Ưu tiên native (quy tắc 2) có 2 lý do ĐỘC LẬP, không phải 1: (a) tránh
 lãng phí/sai lệch khi soul mù re-derive 1 phán đoán soul sống đã làm rồi
-(đúng bug `tsk-1ni`) — lý do này ĐÚNG ở CẢ orchestrator tương tác lẫn
+(đúng bug `tsk-1ni`) — lý do này ĐÚNG ở CẢ launcher tương tác lẫn
 headless; (b) quan sát được trực tiếp (agent-terminal tương tác cho thấy
-pane/subagent sống) — lý do này CHỈ đúng khi orchestrator đang tương tác.
+pane/subagent sống) — lý do này CHỈ đúng khi launcher đang tương tác.
 Khi rootTask tự nó chạy headless (spawn bởi `fgos-runner`), dùng native
 bên trong nó (nested Task) VẪN tránh được lãng phí (a) nhưng KHÔNG cho
 quan sát sống (b) — vẫn chỉ ghi lại post-hoc, có điều kiện, qua
 scout-notes.md (đã trace thật trong buổi thảo luận này). Không đánh đồng
 "dùng native" với "quan sát được" — 2 lợi ích tách biệt, chỉ trùng nhau
-khi orchestrator vốn đã tương tác.
+khi launcher vốn đã tương tác.
 
 ## Việc chưa quyết, để lại cho item build lớp quyết định thật
 
-- Tín hiệu phát hiện "orchestrator hiện tại có phải soul sống cùng
+- Tín hiệu phát hiện "launcher hiện tại có phải soul sống cùng
   provider không" cho từng provider (Claude: `CLAUDECODE` env var đã xác
   nhận tồn tại; agy/Codex: chưa verify tín hiệu tương đương).
 - Cơ chế tường minh nào áp CÙNG 1 quyết định dispatch (quy tắc 1-4) cho

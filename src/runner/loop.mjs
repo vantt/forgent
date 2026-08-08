@@ -34,7 +34,7 @@
 // outside the store facade's own `.fgos/` writes.
 // SUPERSEDED (D1, worker-dispatch-log) — narrowed, not repealed: worker
 // stdout/stderr is now ALSO persisted to `.fgos/logs/` (git-ignored, per D4)
-// via the sibling worker-log.mjs facade, so an orchestrator can recover what
+// via the sibling worker-log.mjs facade, so a launcher can recover what
 // a worker did after the console tail scrolls past. The guarantee that
 // actually mattered still holds exactly — worker output never lands in a
 // committed/git-tracked path. Verify/goal-check output stays console-only
