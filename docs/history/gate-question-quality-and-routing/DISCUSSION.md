@@ -1,7 +1,7 @@
 # Chất lượng và định tuyến câu hỏi gate — DISCUSSION
 
 **Items:** `tsk-65i` (STR71b, định tuyến) · `tsk-539` (STR71, trình bày)
-**Bắt đầu:** 2026-08-08 · **Vòng gần nhất:** 5
+**Bắt đầu:** 2026-08-08 · **Vòng gần nhất:** 6
 
 ---
 
@@ -19,6 +19,13 @@ hành nào khiến câu hỏi gate trở nên trả lời được"*.
 | 3 | Yêu cầu hai trục (lịch sử + nhận thức) → S8/S9/S10; **tự sửa một kết luận sai của vòng 1** |
 | 4 | Đề xuất kiến trúc: một binary Rust = launcher + webserver + TUI, điều phối herdr/runner |
 | 5 | Phản biện có bằng chứng → sửa lại thứ tự; **launcher và tầng 0 là cùng một việc** |
+| 6 | Kiểm Q12 → **judge thứ hai ĐÃ bị khai tử trước cuộc bàn này**; 64% là ảnh chụp một cửa sổ đã đóng |
+
+**⚠️ Đọc §3 "Bị lật ở vòng 6" TRƯỚC khi dùng bất kỳ con số nào ở dưới.** Con số **64% hỏi sai
+người** — cột chống lớn nhất của cả vòng 1 — là **ảnh chụp một cửa sổ đã đóng**. LLM judge gây ra
+nó đã bị `tsk-1x3` khai tử lúc **2026-08-07 11:39 +07** (commit `794df20`), giữa lúc dữ liệu được
+đo. Tỉ lệ hỏi người sau đó giảm **65%**, tranh chấp verify về **0**. Sáu trên bảy vấn đề lược đồ
+vẫn nguyên; chỉ vấn đề *định tuyến* là đã tự khỏi.
 
 **Kết luận lớn nhất tới giờ (vòng 5):** một-tiến-trình-một-item (thiết kế launcher) biến S7 từ
 *khuyết điểm* thành *bất biến cấu trúc*. Cắt ngữ cảnh giữa các item cũng cắt luôn ngữ cảnh giữa
@@ -229,6 +236,63 @@ headless gãy. `0026` luật 1–4 nói về *kế thừa ngữ cảnh*, hoàn t
 người*. Một `claude -p` có đủ soul mà không có cửa hỏi — nên pane herdr không phải để **xem**, mà
 là **cửa hỏi** cho một tiến trình vốn không có cửa nào.
 
+### 🔴 BỊ LẬT Ở VÒNG 6 — judge thứ hai đã bị khai tử trước cuộc bàn này
+
+Kiểm Q12 bằng cách đọc code. Kết quả lật cột chống lớn nhất của vòng 1.
+
+**`judgeVerifySemanticCorrectness` hôm nay KHÔNG còn là LLM judge.** Nó là một hàm cơ học 14 dòng
+(`src/intake/verify-pattern-check.mjs`) kiểm đúng **một** bẫy có tài liệu (`node --test` kèm grep
+`^# pass`/`^# fail`), còn lại trả `{agrees: true}`. Header file tự khai:
+
+> *"mechanical-only replacement for the **retired** judgeVerifySemanticCorrectness LLM second-pass
+> (tsk-1x3 D17). The old function ran unconditionally on every accepted verdict… D9 retires
+> runJudgeExecutor's every consumer."*
+
+Commit `794df20`, **2026-08-07 11:39 +07**. `tsk-1x3` status `done`.
+
+| # | Bằng chứng | Con số |
+|---|---|---|
+| R24 | Tranh chấp verify theo ngày | 08-03: 8 · 08-04: 33 · **08-05: 120** · 08-06: 33 · 08-07: 8 · **08-08: 0** |
+| R25 | Tranh chấp sau giờ commit (04:39 UTC ngày 08-07) | **3**, đều trong 2 giờ đầu — session còn chạy code cũ |
+| R26 | Tranh chấp trong ~26 giờ gần nhất | **0** |
+| R27 | Hệ có đứng im không? | **Không** — 783 event, **33 item tiến stage** sau khi gỡ |
+| R28 | Tỉ lệ hỏi người, chuẩn hoá theo `work.stage` | **trước 0,53 → sau 0,18 · giảm 65%** |
+
+**Hệ quả — cái gì đổ, cái gì đứng:**
+
+| Phát biểu vòng 1–2 | Sau vòng 6 |
+|---|---|
+| R1 — 64% lượt hỏi là tranh chấp verify máy-vs-máy | 🔴 **lịch sử** — nguyên nhân đã gỡ |
+| R11 — 70/152 item dính tranh chấp | 🔴 **lịch sử** |
+| R17 — 31% item đã rõ vẫn bị judge 2 chặn | 🔴 **lịch sử** |
+| R9 — một item bị hỏi 23 lần | 🟡 **còn**, nhưng nguyên nhân nay khác: S1 (thiếu cơ chế giải phóng) vẫn nguyên, chỉ là nguồn sinh câu hỏi đã bớt |
+| R2/R3 — 82% yes/no, trả lời 295 ký tự | 🟢 **còn nguyên** — không liên quan judge |
+| R4/R5/R7 — 21% có phương án, 45% nhắc lại item | 🟢 **còn nguyên** |
+| R8 — 34 item bị hỏi ≥3 lần | 🟢 **còn nguyên** |
+| S1, S3, S4, S5, S6, S7, S8, S9, S10 | 🟢 **còn nguyên** — không cái nào đụng tới judge |
+| S2 — so khớp chuỗi làm hợp đồng | 🟢 **còn nguyên** |
+
+**Tóm lại: tầng 1 (định tuyến) đã tự khỏi phần lớn; tầng 0, 2, 3 còn nguyên vẹn.**
+
+**D2 vẫn đứng, dù mất một cột chống.** D2 dựa trên bốn ánh xạ R9→S1, R2→S6, R3→S10, R8→S5. Ba cái
+sau còn nguyên; R9 còn nhưng đổi nguyên nhân. Prose vẫn không ép được S2–S10.
+
+**Một cái giá đã được khai báo, chưa được kiểm.** Chính file thay thế ghi thẳng:
+
+> *"this file does **NOT** catch the class of defect the old LLM branch caught **twice, live** — a
+> verify that is syntactically fine shell but targets the wrong claim. That responsibility now
+> belongs to whichever skill calls `fgos discover`/`fgos decompose`, backed by `fgos-validating`'s
+> own reality-gate discipline."*
+
+Trách nhiệm **chuyển**, không biến mất — từ một subprocess mù sang một phiên sống (vốn hỏi tốt hơn
+nhiều). Hướng đúng, nhưng 26 giờ chưa đủ để nói nó bắt được. `verify-miss` (R14: 87/141 = 62%
+friction) chính là loại lỗi đó → thành Q16.
+
+**Bài học phương pháp, đáng giữ:** cả cuộc bàn suýt thiết kế một cơ chế lớn cho một vấn đề đã được
+vá ba ngày trước, vì đo state mà không đọc code. Số đo nói *cái gì đã xảy ra*, không nói *hôm nay
+còn xảy ra không*. Với một repo đổi nhanh như repo này, **mọi số đo cần một mốc "code tại thời
+điểm nào"** kèm theo.
+
 ### Chưa rõ — cần bàn
 
 | # | Câu hỏi mở | Vì sao chưa quyết được |
@@ -244,7 +308,8 @@ là **cửa hỏi** cho một tiến trình vốn không có cửa nào.
 | Q9 | **Sửa tầng 0 có phải đổi hợp đồng CTR004 không, và nếu có thì theo luật nào?** | Thêm `answerHistory`/liên kết hỏi-đáp/kiểu câu hỏi đều là mở rộng lược đồ event. L10 (add-through-not-alongside) bắt mở rộng QUA cửa hiện có; `0011` bắt mọi contract khai version tường minh. Chưa rõ đây là bump version CTR004 hay chỉ thêm trường tuỳ chọn. |
 | Q10 | **Cơ chế giải phóng chung (S1) hình dạng thế nào?** | Thay `ask.includes(<literal>)` bằng gì: một `gateId` ổn định trên mỗi ask? Một `releases` trỏ ngược? Chưa bàn. Đây là thứ quyết định `tsk-65i` là luật định tuyến hay là một cơ chế dữ liệu. |
 | Q11 | **Câu trả lời tự-đứng-được (S7) có cần cấu trúc không?** | STR70a đã dựng `rationale`/`alternatives`/`source` cho answer — có thể phần này đã giải quyết một nửa S7. Cần đọc `checkpoint-distillate-gate-provenance/` xem còn thiếu gì, trước khi thiết kế mới. |
-| **Q12** | **Judge thứ hai có đang thẩm định SAI TẦNG không?** — nó thẩm định *lệnh verify*, trong khi thứ đáng thẩm định là *mục tiêu verify*. R17 (31% item đã rõ đầu bài vẫn bị chặn) là dấu hiệu mạnh. | **Giả thuyết RẺ NHẤT của cả cuộc bàn**: nếu đúng, phần lớn 64% biến mất bằng cách sửa một judge — không cần luật định tuyến mới, không cần lược đồ mới. Chưa kiểm. Phải kiểm trước khi thiết kế bất cứ thứ gì ở tầng 0. |
+| ~~Q12~~ | ~~Judge thứ hai có đang thẩm định sai tầng không?~~ | ✅ **ĐÓNG ở vòng 6 — câu hỏi lỗi thời.** LLM judge đã bị `tsk-1x3` khai tử 2026-08-07 (commit `794df20`); thứ còn lại là hàm cơ học 14 dòng. Không cần sửa gì. Chi tiết + số đo: §3 "Bị lật ở vòng 6". |
+| **Q16** | **Cái giá `tsk-1x3` khai báo có thành hiện thực không?** — bản thay thế cơ học tự khai KHÔNG bắt được "verify đúng cú pháp nhưng nhắm sai mục tiêu"; trách nhiệm chuyển sang skill gọi + `fgos-validating`. | Thay Q12. Đo bằng xu hướng `verify-miss` (nền: 87/141 = 62% friction, tính tới 2026-08-08). Nếu tăng sau vài ngày ⇒ việc chuyển trách nhiệm chưa được đỡ. **Chỉ đo được bằng thời gian**, không đọc code ra được. |
 | **Q13** | **Web UI nên là binary Rust thứ hai dùng chung `fgos.rs`, hay tiến trình Node cạnh CLI?** | Node gần core hơn (cùng ngôn ngữ, dùng lại lib sau khi `p-09351985` tách core); Rust tái dùng được `ports.rs`/`WorkItemSource` đã có nhưng nhân đôi khoảng cách tới core. Chưa quyết. |
 | **Q14** | **"Một item một lần" nghĩa là một-tiến-trình-một-item (vẫn song song), hay tuần tự thật?** | Config đang khai `parallel: {maxRoots:4, maxLeavesPerRoot:4}` và `fgos schedule` đã tính sẵn sóng song song theo footprint. Tuần tự thật làm hai thứ đó chết và tụt throughput (~40 item/ngày hiện tại) — chấp nhận được nếu là lựa chọn có ý thức, không phải hệ quả phụ. Đề xuất: một tiến trình một item, nhiều tiến trình song song theo `schedule`. |
 | **Q15** | **Launcher có tự chạy mặc định không?** | Tự chạy gỡ được tắc nghẽn nhưng biến nó thành thứ hành động không ai giám sát trên repo thật — mà `p-73d99989` (force-xoá worktree, hạng CRITICAL) **vẫn chưa vá**. |
@@ -514,6 +579,40 @@ là đúng chỗ `ask` cắn mạnh nhất (84% park, 31% clear-vẫn-chặn) �
 **Giả thuyết rẻ nhất bật ra, chưa kiểm** → Q12: judge thứ hai có đang thẩm định *lệnh* thay vì
 *mục tiêu* không? Nếu đúng, phần lớn 64% biến mất bằng cách sửa một judge.
 
+### 2026-08-08 — Vòng 6: kiểm Q12, và cột chống lớn nhất đổ
+
+**Người chủ sản phẩm:** *"Kiểm tra giúp nhé."*
+
+**Đọc code thay vì đo state** → `src/intake/verify-pattern-check.mjs`. LLM second-pass đã bị khai
+tử bởi `tsk-1x3` (commit `794df20`, 2026-08-07 11:39 +07). Thứ còn lại là hàm cơ học 14 dòng.
+
+**Kiểm chứng bằng dữ liệu** (R24–R28 ở §3): tranh chấp verify đạt đỉnh 120 ca ngày 08-05, còn 8 ca
+ngày 08-07 (3 ca cuối sau giờ commit, từ session còn chạy code cũ), và **0 ca** suốt 26 giờ gần
+nhất. Loại trừ khả năng "hệ đứng im": 783 event, 33 item tiến stage sau khi gỡ. Chuẩn hoá theo
+`work.stage`, tỉ lệ hỏi người **giảm 65%** (0,53 → 0,18).
+
+**Kết luận:** Q12 lỗi thời — không có gì để sửa. Con số 64% là ảnh chụp một cửa sổ đã đóng; bản vá
+rơi đúng vào ngày áp chót của cửa sổ đo.
+
+**Cái gì đổ, cái gì đứng** (bảng đầy đủ ở §3): tầng 1 (định tuyến) tự khỏi phần lớn — R1/R11/R17
+thành lịch sử. Tầng 0/2/3 còn nguyên vẹn: S1–S10 không cái nào đụng tới judge, và R2/R3/R4/R5/R7/R8
+không liên quan judge.
+
+**D2 vẫn đứng** dù mất một trong bốn cột chống — ba ánh xạ còn lại (R2→S6, R3→S10, R8→S5) nguyên vẹn.
+
+**Hệ quả lên `tsk-65i`** (STR71b): item được submit dựa trên chính con số 64%. Luận cứ tiêu đề của
+nó nay đã bốc hơi. Còn lại hai mảnh thật: **trần hỏi lại** (chưa ai chặn ở lần 23, gốc S1) và **D1**
+(thứ tự với STR48). Cả hai đều là chuyện tầng 0, nên item nhiều khả năng phải **tan vào
+`#task-gate-schema`** thay vì đứng riêng — chờ Q8.
+
+**Cái giá chưa kiểm được → Q16.** `tsk-1x3` tự khai bản thay thế không bắt được "verify đúng cú
+pháp nhưng nhắm sai mục tiêu"; trách nhiệm chuyển sang skill gọi. Hướng đúng (subprocess mù →
+phiên sống), nhưng phải đo bằng xu hướng `verify-miss` sau vài ngày.
+
+**Bài học phương pháp** (ghi ở §3, đáng giữ ngoài phạm vi cụm này): cả cuộc bàn suýt thiết kế một
+cơ chế lớn cho một vấn đề đã được vá ba ngày trước, vì **đo state mà không đọc code**. Mọi số đo
+trong repo này cần kèm một mốc "code tại thời điểm nào".
+
 ---
 
 ## 6. Thiết kế đã chốt {#design}
@@ -560,13 +659,16 @@ flowchart TD
     style T0 fill:#f2e9d8,stroke:#8E6318
 ```
 
-| Tầng | Nội dung | Item phủ | Ghi chú |
+| Tầng | Nội dung | Item phủ | Trạng thái sau vòng 6 |
 |---|---|---|---|
-| **0 · Lược đồ** | S1–S7 trên `gates[id]` | **chưa có** | Sâu nhất; mọi con số lớn đều có gốc ở đây |
-| 1 · Định tuyến | có nên hỏi người không (64%) | `tsk-65i` | Cách sửa có thể là cơ chế tầng 0, không phải luật tầng 1 (Q10) |
-| 2 · Định dạng | yes/no cho thứ không phải yes/no | **chưa có** | Phát hiện vòng 1 (R2/R3); gốc là S6 |
-| 3 · Bối cảnh | câu hỏi tự đứng được | `tsk-539` | Phạm vi hiện tại của STR71 |
-| ⊥ Trần hỏi lại | không ai chặn ở lần 23 | **chưa có** | Cắt ngang; gốc là S1 |
+| **0 · Lược đồ** | S1–S10 trên `gates[id]` | **chưa có** | 🟢 **còn nguyên** — sâu nhất, không cái nào đụng tới judge |
+| 1 · Định tuyến | có nên hỏi người không | `tsk-65i` | 🔴 **phần lớn tự khỏi** — `tsk-1x3` gỡ LLM judge 2026-08-07; còn lại chỉ **trần hỏi lại**, vốn là chuyện tầng 0 |
+| 2 · Định dạng | yes/no cho thứ không phải yes/no | **chưa có** | 🟢 **còn nguyên** (R2/R3); gốc là S6 |
+| 3 · Bối cảnh | câu hỏi tự đứng được | `tsk-539` | 🟢 **còn nguyên** (R4/R5/R7); phạm vi hiện tại của STR71 |
+| ⊥ Trần hỏi lại | không ai chặn ở lần 23 | **chưa có** | 🟢 **còn nguyên** — gốc S1, cắt ngang, nay là mảnh chính còn lại của `tsk-65i` |
+
+**Sau vòng 6, hình dạng nghiêng hẳn về tầng 0.** Tầng 1 vốn được xem là chỗ khối lượng lớn nhất
+nằm, nay gần rỗng. Ba tầng còn lại đều truy về lược đồ.
 
 ### Hai trục mà một câu hỏi phải mang theo (vòng 3)
 
@@ -630,14 +732,18 @@ nó là **hạ tầng của launcher**, và S8/S9/S10 chính là thứ tiến tr
 | # | Việc | Phụ thuộc | Vì sao ở vị trí này |
 |---|---|---|---|
 | 0 | Vá `p-73d99989` (force-xoá worktree) | — | CRITICAL, chưa vá; launcher tự chạy sẽ tăng tần suất gặp (Q15) |
-| 1 | **Kiểm Q12** — judge 2 thẩm định sai tầng? | — | Giả thuyết rẻ nhất; nếu đúng, 64% biến mất mà không cần lược đồ mới |
+| ~~1~~ | ~~Kiểm Q12~~ | — | ✅ **xong ở vòng 6** — judge đã bị gỡ từ trước, không có gì để sửa |
 | 2 | Launcher chạy `cleanup-loop` | — | Thuần cơ học, gỡ 112 item, không đụng gate |
 | 3 | Headless `code-implement` | — | Median 0,3h, chỉ 9 park — chạy được ngay |
-| 4 | Tầng 0 — lược đồ `gates[id]` | Q12 | Hạ tầng của launcher; dùng bản vẽ UI làm công cụ sinh đặc tả |
+| 4 | Tầng 0 — lược đồ `gates[id]` | ~~Q12~~ **đã gỡ chặn** | Hạ tầng của launcher; dùng bản vẽ UI làm công cụ sinh đặc tả |
 | 5 | Pane herdr làm cửa hỏi | 4 | Mở đường cho headless clarify |
-| 6 | Headless `clarify` | 1, 4, 5 | 84% park nằm ở đây; chỉ chạy được sau khi judge 2 sửa |
+| 6 | Headless `clarify` | 4, 5 | 84% park nằm ở đây — **nhưng số này đo trước khi gỡ judge, cần đo lại** |
 | 7 | Hai tầng UI | 4 | Dựng trên `WorkItemSource` đã có; giờ mới có dữ liệu hai trục để hiện |
 | 8 | Kênh chú-ý (STR48) | 4, 6 | **D1** — không bao giờ trước |
+| ↻ | **Theo dõi Q16** — xu hướng `verify-miss` | — | Chạy song song mọi thứ; chỉ đo được bằng thời gian |
+
+**Vòng 6 gỡ chặn bước 4 và 6.** Q12 từng chặn cả hai; nay đóng. Bước 6 vẫn cần đo lại vì con số
+84% park-tại-clarify được đo trước khi judge bị gỡ.
 
 ### Ràng buộc bảo mật phải nằm trong thiết kế từ đầu
 
@@ -684,16 +790,21 @@ documentation*), đây là lỗ hổng bằng chứng, không chỉ lỗ hổng 
 
 *(Tạm thời, theo §6. Chốt lại sau khi Q12 được kiểm và Q1/Q8/Q14 ngã ngũ.)*
 
-### Chưa có item · Kiểm giả thuyết judge-2-sai-tầng {#task-judge2-hypothesis}
+### ✅ ĐÃ ĐÓNG · Kiểm giả thuyết judge-2-sai-tầng {#task-judge2-hypothesis}
 
-- **Mục tiêu:** trả lời Q12 — `judgeVerifySemanticCorrectness` đang thẩm định *lệnh verify* hay
-  *mục tiêu verify*? Nếu là lệnh, phần lớn 64% tranh chấp là bug của một judge, không phải thiếu
-  luật định tuyến hay thiếu lược đồ.
-- **Trích §6:** dòng 1 của bảng thứ tự triển khai.
-- **Quan hệ anh em:** **chặn** `#task-gate-schema`, `#task-routing`, và mọi việc headless clarify.
-  Rẻ nhất, làm trước tất cả.
-- **Draft verify:** đọc được, không phải sửa — kết quả là một ghi nhận vào file này, không phải
-  code. Có thể chỉ cần một vòng scout, không cần item riêng nếu làm ngay trong cuộc bàn.
+Làm ngay trong cuộc bàn ở vòng 6, không cần item. **Kết quả: câu hỏi lỗi thời** — LLM judge đã bị
+`tsk-1x3` khai tử 2026-08-07 (commit `794df20`). Không gỡ chặn bằng cách sửa, mà bằng cách phát
+hiện nó đã được sửa. Chi tiết §3 "Bị lật ở vòng 6".
+
+### Chưa có item · Theo dõi cái giá của `tsk-1x3` {#task-verify-miss-watch}
+
+- **Mục tiêu:** trả lời Q16 — bản thay thế cơ học tự khai KHÔNG bắt được "verify đúng cú pháp nhưng
+  nhắm sai mục tiêu"; trách nhiệm chuyển sang skill gọi + `fgos-validating`. Cái giá đó có thành
+  hiện thực không?
+- **Nền để so:** `verify-miss` 87/141 = 62% toàn bộ friction, tính tới 2026-08-08.
+- **Quan hệ anh em:** không chặn gì, chạy song song mọi thứ.
+- **Đặc thù:** **chỉ đo được bằng thời gian** — đọc code không ra. Cần một mốc đo lại sau vài ngày.
+- **Chưa submit** — có thể chỉ là một dòng nhắc trong file này, không cần item riêng.
 
 ### Chưa có item · Launcher — orchestrator cơ học {#task-launcher}
 
@@ -739,7 +850,12 @@ documentation*), đây là lỗ hổng bằng chứng, không chỉ lỗ hổng 
 
 ### tsk-65i · Định tuyến câu hỏi {#task-routing}
 
-- **Mục tiêu:** câu hỏi chỉ tới người khi thật sự cần phán đoán người. Cắt phần lớn 64% ở R1.
+> ⚠️ **VÒNG 6 LÀM RỖNG PHẦN LỚN ITEM NÀY.** Item được submit dựa trên con số 64% (R1), mà nguyên
+> nhân đã bị `tsk-1x3` gỡ từ 2026-08-07. Còn lại đúng hai mảnh: **trần hỏi lại** (gốc S1) và **D1**
+> (thứ tự với STR48). Cả hai đều là chuyện tầng 0 → item nhiều khả năng phải **tan vào
+> `#task-gate-schema`** thay vì đứng riêng. Chờ Q8. Cân nhắc `wontfix` nếu Q8 chọn gộp.
+
+- **Mục tiêu (đã hẹp lại):** trần hỏi lại + cơ chế giải phóng câu hỏi. ~~Cắt 64% ở R1~~ — đã tự khỏi.
 - **Trích §6:** tầng 1 trong sơ đồ; nhánh "máy tự phán được".
 - **D-ID áp dụng:** chưa có (vòng 1).
 - **Quan hệ anh em:** đứng **trước** `tsk-539` trong luồng — chỉ thứ lọt qua tầng 1 mới cần tầng
