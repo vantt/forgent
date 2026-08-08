@@ -11,11 +11,10 @@ Vòng 8 (2026-08-08). **D1 và D2 vẫn là hai D-ID duy nhất đã mint** — 
 giữ qua bảy vòng không bị lật, và vòng 6 còn củng cố chúng thêm (xem dưới).
 Mọi thứ vòng 5–8 nêu ra đều **mới một vòng, chưa mint**.
 
-> ⚠ **§6 chưa gấp vòng 5–8 vào.** Vòng 6 lật cách vòng 5 khung hoá quan hệ
-> capacity↔capability, nhưng chưa D-ID nào rơi, nên §6 giữ nguyên bản vòng 4
-> theo luật "§6 regenerate khi có quyết định đổi hình dạng". Người đọc lại
-> file này: đọc §5 vòng 6–8 **sau** khi đọc §6, và biết rằng phần "phía cung"
-> chưa có trong §6.
+> ✅ **§6 đã regenerate (lần 2, bản sau vòng 8)** — vòng 5–8 đã gấp vào, kể cả
+> phần "phía cung" trước đây thiếu hẳn. Đọc **§6 là đủ** để hiểu thiết kế; §5
+> chỉ cần khi muốn nguyên văn Q&A một vòng cụ thể. §6 ghi rõ độ chín từng mục
+> ([KHOÁ] / [HỘI TỤ] / [HỞ]) vì phần lớn nội dung ở đó **chưa mint**.
 
 Đường đi tám vòng:
 
@@ -470,26 +469,79 @@ chưa đụng *số giá trị*. Nghiêng: phiên này **ghi nhận**, để `ts
 
 ## 6. Thiết kế đã chốt {#design}
 
-### Khung: bốn chiều khai báo + một kết quả dẫn xuất
+> **Regenerate lần 2 — bản sau vòng 8.** Bản trước là bản vòng 4; vòng 5–8 đã
+> được gấp vào đây. Hợp nhất, **không thêm ý mới**.
+>
+> Độ chín ghi rõ ở từng mục, vì §6 này phần lớn **chưa khoá**:
+> **[KHOÁ]** = đã mint D-ID, giữ qua nhiều vòng · **[HỘI TỤ]** = mới một vòng,
+> chưa mint, được phép lật · **[HỞ]** = biết là sai hoặc thiếu, chưa quyết cách
+> sửa.
+>
+> Đọc §6 là đủ để hiểu thiết kế. §5 chỉ cần khi muốn nguyên văn Q&A một vòng.
 
-*(Bản vòng 3 gọi đây là "năm câu hỏi độc lập". **Sai, đã sửa ở vòng 4** —
-người dùng hỏi thẳng #3 và #4 có trùng nhau không, và code xác nhận #3 là
-DẪN XUẤT của #4, không độc lập. Xem §5 vòng 4.)*
+### 6.1 Một lần dispatch trả lời những câu gì
 
-Một câu chuyện duy nhất — *ai đó giao một đơn vị việc đi, qua đường nào, chạy
-trên tài nguyên gì* — tách thành **bốn chiều khai báo được** cộng **một kết quả
-tính ra tại thời điểm dispatch**:
+fgOS giao việc đi bằng một chuỗi câu hỏi, không phải bằng một phân loại duy
+nhất. Một lần dispatch trả lời: **ai** giao (#1), giao **cái gì** (#2), **ai
+làm được** việc đó (phía cung: `capability` → `tool`), đi **đường** nào (#4),
+chạy **trên tài nguyên** gì (#5). Câu thứ sáu — **cơ chế** (#3) — không ai khai
+báo được; nó là kết quả tính ra tại thời điểm dispatch.
 
-**Khai báo / quan sát được** (tĩnh trong config hoặc đọc được từ state):
+Toàn bộ cảm giác lộn xộn về từ vựng tầng này đến từ đúng một chuyện, và nó lặp
+lại **ba lần ở ba chỗ khác nhau** trong phiên (vòng 4, vòng 6, vòng 8): **một ô
+mang câu trả lời cho hai câu hỏi.** Ba lần cùng một khuôn — `kind` bị đọc lẫn
+với `mechanism`; `capacity` vừa là lớp việc vừa là bản ghi cấu hình; `#1` vừa
+nói *một hay nhiều* vừa nói *buông hay ở lại*. Không lần nào là lỗi đặt tên đơn
+thuần.
+
+### 6.2 Khung bao trùm: một quan hệ, hai phía [HỘI TỤ — vòng 6]
+
+Không phải nhiều trục song song. Là **một quan hệ dispatch có hai phía**, và
+`capability` là chỗ khớp:
+
+| | phía **CẦU** (ai cần việc làm) | phía **CUNG** (ai làm được) |
+|---|---|---|
+| trừu tượng | **#2 work-unit** — `rootTask` · `capacity`{`gather`,`judge`} | **`capability`** |
+| cụ thể | một work item / một capacity id | **`tool`** (= provider) |
+| bản ghi buộc hai phía | `capacities.<id>` — mang **#4 + #5** | |
+
+Luật khớp nối là luật fgOS **tự viết lúc port** registry
+(`docs/distillery/deep-dives/tool-registry.md:27`, US-027): *"the core consults
+capabilities, never tools"* — một bước workflow chỉ tham chiếu `capability`,
+**không bao giờ** tham chiếu tên tool cụ thể.
+
+Tên trục phía cầu là **`work-unit`** [HỘI TỤ — vòng 5b], với một ràng buộc để
+không va `0003`: `work` là giá trị **được lưu** duy nhất trên trục, không phải
+cả trục. `capacity` không phải entity — nó là config, không bao giờ có
+`work.<id>`. Giá phải trả: sửa `docs/specs/system-overview.md:31` một dòng.
+
+**Vì sao tin khung này** — năm suy dẫn độc lập, từ năm hướng không liên quan
+nhau, cùng rơi vào một kết luận (A3, mục 6.10): (i) `KINDS` không có `task` ·
+(ii) hn tách outbound/inbound · (iii) `hasNativeMechanism === (kind==='task')` ·
+(iv) `judge-discovery` và `submit-assist-classify` cùng lớp `judge` nhưng khác
+nhà cung cấp · (v) adapter `rpc` đã deferred. Riêng (iv) còn chứng minh **D1/D2
+sống nguyên**: đổi nhà cung cấp mà lớp không đổi ⇒ hai phía độc lập thật.
+
+Ba hệ (fgOS · bee · repository-harness) **không hệ nào có trục riêng** — chỉ
+khác **độ phủ hai phía**: bee chỉ đặt tên phía cầu (mọi nhà cung cấp đều ở
+trong, toàn `task`-kind, nên không có phía cung để đặt tên); hn đặt tên cả hai
+và khớp bằng `capability`; fgOS đặt tên cả hai nhưng **nối sai chỗ** (A2).
+
+### 6.3 Bốn chiều khai báo + một kết quả dẫn xuất
+
+*(Bản vòng 3 gọi đây là "năm câu hỏi độc lập" — **sai, sửa ở vòng 4**: #3 là
+dẫn xuất của #4, không độc lập.)*
+
+**Khai báo / quan sát được:**
 
 | # | Câu hỏi | Từ vựng | Giá trị | Nằm ở đâu |
 |---|---|---|---|---|
-| 1 | **AI** giao? | vai trò | `launcher` · `driver` · `orchestrator` | Vai trò của bên GỌI — tầng khác hẳn ba chiều dưới, vốn là thuộc tính của cái BỊ gọi |
-| 2 | Giao **CÁI GÌ**? | lớp đơn vị việc | `rootTask` · `capacity` → `class: gather\|judge` | `capacities.<id>.class` |
-| 4 | Đi qua **ĐƯỜNG** nào? | kind (transport) | `cli` `binary` `mcp` `skill` `http` `task` | `capacities.<id>.kind` |
-| 5 | Chạy **TRÊN GÌ**? | executor | command + args + provider + model (qua `tier`) | `capacities.<id>` / `executors[tier]` / `executor` |
+| 1 | **AI** giao? | vai trò bên gọi | `launcher` · `driver` (+ `orchestrator`, xem 6.5) | thuộc tính của bên **GỌI** — tầng khác hẳn ba chiều dưới, vốn là thuộc tính của cái **BỊ** gọi |
+| 2 | Giao **CÁI GÌ**? | lớp work-unit | `rootTask` · `capacity` → `class: gather\|judge` | `capacities.<id>.class` — ⚠ `class` **chưa tồn tại trong code** (0 hit) |
+| 4 | Đi qua **ĐƯỜNG** nào? | `kind` (transport) | `cli` `binary` `mcp` `skill` `http` `task` | `capacities.<id>.kind` |
+| 5 | Chạy **TRÊN GÌ**? | executor | **cổng**: `adapter` · **tải**: command + args + provider + model (qua `tier`) | `capacities.<id>` / `executors[tier]` / `executor` |
 
-**Dẫn xuất** (không khai báo được — tính ra mỗi lần dispatch):
+**Dẫn xuất** — không khai báo được, tính lại mỗi lần dispatch:
 
 | # | Kết quả | Giá trị | Tính từ |
 |---|---|---|---|
@@ -506,34 +558,22 @@ Bảng thật (`decideDispatchMechanism`/`decideCapacityDispatchMechanism`,
 | `cli`/`binary`/`mcp`/`skill`/`http` | bất kỳ | — | cli-spawn (luôn) |
 | *(chưa configured, hoặc backend không present)* | — | — | **inline** |
 
-```mermaid
-flowchart TB
-    subgraph declared["KHAI BÁO / QUAN SÁT ĐƯỢC"]
-        Q1["#1 AI giao?<br/>launcher · driver · orchestrator"]
-        Q2["#2 Giao CÁI GÌ?<br/>class: gather | judge"]
-        Q4["#4 ĐƯỜNG nào?<br/>kind: cli/binary/mcp/skill/http/task"]
-        Q5["#5 Chạy TRÊN GÌ?<br/>executor: command+args+provider+model"]
-    end
-    RT["runtime: có live Task access?<br/>config: forceCliSpawn?<br/>capacity configured + present?"]
-    Q3["#3 CƠ CHẾ (DẪN XUẤT)<br/>native | cli-spawn | inline"]
-
-    Q4 --> Q3
-    RT --> Q3
-```
-
 **Hệ quả của việc #3 là dẫn xuất** — giải thích được hai thứ trước nay chỉ ghi
 nhận mà chưa lý giải:
 
-- **Vì sao `EXECUTOR_ADAPTERS` không bao giờ có key `native`** (§3 hàng 2):
-  vì `native` không phải một *loại đường*, nó là một *kết quả*. Adapter là
-  chiều #4; mechanism là chiều #3.
-- **Vì sao `inline` khó thành "giá trị hạng nhất"** (§3 hàng 10): nó cũng là
-  kết quả — cái xảy ra khi capacity chưa configured hoặc backend không
-  present. Muốn log/đo được `inline` thì phải log **kết quả dẫn xuất**, không
-  phải thêm một giá trị khai báo. Đây là cùng khuôn `derived-never-stored`
-  fgOS đã dùng cho `frontier`/`computeSchedule`/`footprintOverlap`.
+- **Vì sao `EXECUTOR_ADAPTERS` không bao giờ có key `native`**: `native` không
+  phải một *loại đường*, nó là một *kết quả*. Adapter thuộc #5; mechanism là #3.
+- **Vì sao `inline` khó thành "giá trị hạng nhất"**: nó cũng là kết quả — cái
+  xảy ra khi capacity chưa configured hoặc backend không present. Muốn log/đo
+  `inline` thì phải **ghi lại kết quả dẫn xuất** tại mỗi lần dispatch, không
+  phải thêm một giá trị khai báo. Cùng khuôn `derived-never-stored` fgOS đã dùng
+  cho `frontier` / `computeSchedule` / `footprintOverlap`.
 
-### Câu #2 chi tiết — phạm vi duy nhất phiên này đụng tới (D1, D2)
+Cách đọc lại theo 6.2: **#2 là phía cầu; #4 + #5 là phía cung.** Năm chiều
+**không chiều nào bị xoá** — reframe vòng 6 chỉ thêm một cách đọc (kiểm kê đầy
+đủ ở vòng 7).
+
+### 6.4 Câu #2 chi tiết — phần duy nhất đã KHOÁ (D1, D2)
 
 ```mermaid
 flowchart TB
@@ -545,25 +585,111 @@ flowchart TB
     B -->|"verdict (phán quyết)"| J["class: judge"]
 ```
 
-**Tầng 1 (D1)** — `authority + state effects`. Có thì mang vòng đời đầy đủ
-(claim → worktree → verify → merge), vì vòng đời tồn tại chính là để bảo vệ
-những state effects đó. Không có thì không cần vòng đời nào cả.
+**Tầng 1 [KHOÁ — D1]** — tiêu chí là `authority + state effects`, mượn thẳng
+bee (*"distinguished by authority and state effects, not by task size"*), **không
+phải** *"vòng đời đầy đủ"*. Vòng đời (claim → worktree → verify → merge) tồn tại
+**chính vì** có state effects cần bảo vệ ⇒ trục cũ lấy *hệ quả* làm tiêu chí,
+bee lấy *nguyên nhân*. Hình là **cây hai tầng**, **không phải** hai trục vuông
+góc — một `rootTask` không bao giờ có thể là gather.
 
-**Tầng 2 (D2)** — chỉ áp cho nhánh KHÔNG-authority, phân theo *cái trả về*:
+**Tầng 2 [KHOÁ — D2]** — chỉ áp cho nhánh KHÔNG-authority, phân theo *cái trả
+về*:
 
 | `class` | Trả về | Sai thì sai kiểu gì | Sửa bằng cách nào |
 |---|---|---|---|
 | `gather` | `digest` — dữ liệu, có `file:line` anchor | đọc thiếu | đọc lại / mở rộng phạm vi |
 | `judge` | `verdict` — phán quyết | phán sai | người vào cuộc, hoặc đổi tiêu chí |
 
-### Vì sao nhìn vào config lại thấy lẫn
+Hai loại lỗi khác nhau ⇒ hai cách sửa khác nhau; trộn lại thì mất tín hiệu sửa
+lỗi. Tên **không phát minh mới**: `judge`/`verdict` đã vào code (38 + 186 hit),
+`gather`/`digest` đã ghim ở doc (`tsk-5kn`).
 
-Một khối `capacities.<id>` **mang câu trả lời cho ba câu hỏi khác nhau**:
+**Phép thử cơ học cho D1** [HỘI TỤ — vòng 6]: state effects → cần vòng đời bảo
+vệ → cần id ổn định gắn vòng đời → **nằm trong `.fgos/events.jsonl`**. Nên
+*"có id trong event log"* không cạnh tranh với D1 — nó là **đầu quan sát được**
+của chính D1.
+
+**Vòng đời không phải một tầng riêng**: nó treo dưới `rootTask` và chỉ ở đó.
+Nhánh `capacity` không có mắt xích nào trong chuỗi ⇒ không claim, không
+worktree, không verify, không merge.
+
+**`subTask` sau D1/D2**: vẫn **không** phải lớp riêng — D1 củng cố `0026` (0026
+lý giải bằng *cùng vòng đời* = hệ quả; D1 bằng *cùng câu trả lời authority* =
+nguyên nhân). Nhưng chữ này nói *ai giao* ⇒ nó thuộc **#1**, và là từ **quan
+hệ** (field `work.parent`, `work.mjs:414`), không phải từ **phân lớp**.
+
+### 6.5 #1 gộp hai câu hỏi [HỘI TỤ — vòng 8] ⚠ đụng `tsk-2cw`
+
+`0028` (accepted) đã lập luận sẵn hai tính chất **độc lập** của vai trò bên gọi:
+**arity** (1 hay N đơn vị) và **engagement** (bước ra hẳn, hay giữ liên hệ liên
+tục). Xếp ra bảng:
+
+| | **buông** | **ở lại** |
+|---|---|---|
+| **1 đơn vị** | `launcher` | `driver` |
+| **N đơn vị** | *(trống)* | `orchestrator` |
+
+Nhu-cầu-phán-đoán bám theo **cột**, không theo arity — `0026`: *"Vai trò
+launcher KHÔNG CẦN soul … THUẦN CƠ HỌC"*.
+
+Và `orchestrator` **không phải ô thứ ba** mà là **tầng hợp thành**:
+`fgos-fanout` spawn N Agent, **mỗi Agent chạy `/fgOS:pick` end-to-end** ⇒ mỗi
+cái là một `driver`. Orchestrator = N lần dấn thân con, không phải anh em ngang
+hàng.
+
+⇒ Đề xuất: #1 rút về **2 giá trị**, `orchestrator` ra khỏi enum lên tầng hợp
+thành — đúng chỗ `tsk-2cw` đang chừa. **Chưa chốt: `tsk-2cw` sở hữu chiều #1**,
+và `0028` mới đổi *tên*, chưa đụng *số giá trị*.
+
+### 6.6 `dispatch` là cạnh, không phải nút [HỘI TỤ — vòng 8]
+
+`dispatch` không xuất hiện như một ô trong hình vì nó **là mấy mũi tên**:
+cầu → binding → cung → chạy. Tách làm hai nửa:
+
+| nửa | làm gì | phục vụ mechanism nào |
+|---|---|---|
+| **resolve** | tìm binding, gác governance, ra executor | **cả hai** |
+| **invoke** | chạy thật | ngoài: qua cổng `adapter` · trong: Task tool của chính session |
+
+Hai hệ quả:
+
+- **Giải câu "nửa native không có module nhà"** — nửa nạc nửa mỡ: `invoke`
+  native là **bản chất** (session gọi tool của chính nó, không có biên để bắc
+  cầu ⇒ không đóng gói được); `resolve` native là **thiếu sót** (đóng gói được,
+  nhưng đang nằm trong module đặt tên theo cả act và định hình chỉ cho nhánh
+  external).
+- **Chẩn đoán `dispatch.mjs` sửa lại** — *"1186 dòng / 6 trách nhiệm"* là
+  **triệu chứng**, không phải bệnh. Bệnh: trộn `resolve` (dùng chung) với
+  `invoke-external` (một mechanism) rồi đặt tên theo cả act. Bằng chứng khớp:
+  `decideDispatchMechanism` là hàm thuần **không đọc config** (= thuần resolve)
+  và là export duy nhất phục vụ cả hai mechanism. **Đường cắt đúng:
+  resolve/invoke, không phải "chia 6".**
+
+### 6.7 `adapter` là cổng — #5 tách cổng/tải [HỘI TỤ — vòng 8]
+
+Doc comment tự khai (`dispatch.mjs:818-830`): *"the executor **port** is now a
+NAMED interface"*, và *"an `rpc`/`app-server` adapter … is **deferred** — only
+the interface's name is bought now, not a second adapter."* `EXECUTOR_ADAPTERS`
+hôm nay đúng **một** key.
+
+⇒ #5 tách đôi: **cổng** (`adapter`) + **tải** (`command`/`args`/`model` qua
+`tier`).
+
+⚠ Và `DEFAULT_ADAPTER = 'cli-spawn'` **trùng chuỗi** với giá trị mechanism #3
+(dẫn xuất). Hai tầng khác nhau đội chung một chuỗi — hôm nay không phân biệt
+được vì chỉ có một adapter. Ngày `rpc` được đăng ký: nhà cung cấp vẫn **ngoài**
+nhưng adapter là `rpc` ⇒ tên `cli-spawn` cho **mechanism** thành sai. Đây là
+suy dẫn thứ năm xác nhận A3.
+
+### 6.8 Vì sao nhìn vào config lại thấy lẫn
+
+Một khối `capacities.<id>` **mang câu trả lời cho ba câu hỏi khác nhau cùng
+lúc**:
 
 ```jsonc
 "capacities": {
   "judge-discovery": {
-    "class":   "judge",     // câu #2 — giao cái gì
+    "class":   "judge",     // câu #2 — giao cái gì   (⚠ chưa tồn tại trong code)
     "kind":    "task",      // câu #4 — đi đường nào
     "command": "claude",    // câu #5 — chạy trên gì
     "args":    ["..."]      //         (tier/model cũng ở đây)
@@ -571,28 +697,71 @@ Một khối `capacities.<id>` **mang câu trả lời cho ba câu hỏi khác n
 }
 ```
 
-Đây là **bản khai nhiều chiều**, không phải một phân loại. Nhận ra điều này là
+Đây là **bản khai nhiều chiều**, không phải một phân loại — và theo 6.2, nó
+chính là **bản ghi binding** buộc phía cầu vào phía cung. Nhận ra điều này là
 cách duy nhất để đọc config mà không lẫn.
 
-### Trạng thái năm câu, tính đến vòng 3
+### 6.9 Hình tổng — có tầng, có cạnh
+
+```mermaid
+flowchart TB
+    ORCH["<b>HỢP THÀNH</b> — orchestrator<br/><i>N lần dispatch + hợp nhất. KHÔNG phải giá trị của #1</i>"]
+    ENG["<b>#1 DẤN THÂN</b> — launcher (buông) | driver (ở lại)<br/><i>hình dạng của MỘT lần dispatch</i>"]
+    DEM["<b>#2 CẦU</b> — work-unit: rootTask | capacity{gather,judge}"]
+    BIND["<b>BINDING</b> — capacities.&lt;id&gt;"]
+    SUP["<b>CUNG</b> — capability → tool → #4 kind + #5 (cổng: adapter · tải: command/args/model)"]
+
+    ORCH -->|"gồm N"| ENG
+    ENG ==>|"<b>dispatch · nửa RESOLVE</b><br/>dùng chung cả hai mechanism"| DEM
+    DEM ==> BIND
+    BIND ==> SUP
+    SUP ==>|"<b>dispatch · nửa INVOKE</b><br/>ngoài: qua cổng adapter<br/>trong: Task tool của chính session — không đóng gói được"| RUN["chạy"]
+
+    MECH["#3 <b>CƠ CHẾ</b> (dẫn xuất)<br/>cung ở TRONG | cung ở NGOÀI"]
+    SUP -.-> MECH
+    MECH -.-> RUN
+
+    GOV["<b>GÁC</b> (cắt ngang) — presence · allowCrossProvider · forceCliSpawn"]
+    GOV -.-> BIND
+    GOV -.-> SUP
+```
+
+### 6.10 Năm điều chỉnh A1–A5 [HỘI TỤ — vòng 6]
+
+| | Nội dung | Trạng thái |
+|---|---|---|
+| **A1** | `capacity` mang **hai nghĩa**: (a) lớp work-unit · (b) bản ghi binding. **Khác tập hợp** — gather của `fgos-researching` là (a) mà **không có** (b) ⇒ khác khái niệm, không phải hai cách gọi một thứ | — |
+| **A2** | Binding nối bằng **`name`** chứ không phải `capability` (`dispatch.mjs:604` `if (!tools[capacityId])`, `tools` keyed theo name) ⇒ vi phạm đúng luật US-027 khiến registry đáng port. Hệ quả đo được: **provider thứ hai của cùng capability không bao giờ thoả được một capacity** | **SỐNG** |
+| **A3** | #3 phát biểu lại: mechanism thật ra là *nhà cung cấp ở **TRONG** hay **NGOÀI***. `native`/`cli-spawn` chỉ đặt tên cho cái vỏ. `task` = nhà cung cấp chính là session đang gọi — kind duy nhất không đăng ký được, vì không ai đăng ký chính mình | — |
+| **A4** | Presence check gác theo **vận chuyển** (`kind === 'cli'`, `dispatch.mjs:603` + `:630`), đáng lẽ gác theo **nhà cung cấp có ở ngoài không** (`kind !== 'task'`) — **đúng vị từ của A3**. Capacity `mcp`/`skill`/`http`/`binary` hôm nay dispatch với **zero** presence check và **zero** cross-provider check | latent |
+| **A5** | `capacities.<id>` và `tools.<name>` tả **cùng một backend**, nối bằng name, **không so khớp**. Lệch thì dispatch dùng bản capacity, probe dùng bản tool | latent |
+
+A4 **rơi ra miễn phí** từ A3 (cùng vị từ) — dấu hiệu khung đúng.
+
+**Bốn chỗ đầu cùng một gốc**: binding chưa được coi là binding, nên chưa ai hỏi
+*"nhà cung cấp này ở trong hay ở ngoài, và nó hứa gì"*. Vá gốc thì A2/A4/A5 rơi
+ra cùng lúc.
+
+### 6.11 Ô trống và chỗ hở
+
+| Chỗ | Trạng thái |
+|---|---|
+| `class: gather` có **0 consumer đăng ký** | nhưng **có ca sống**: fan-out của `fgos-researching` chạy hoàn toàn ngoài cơ chế capacity — không config, không presence check, không log (xác nhận `tsk-o4l`, 2026-08-08). Bee cũng **chưa** đóng được (*"a Bash-launched gather emits zero `dispatch.jsonl` rows"*) ⇒ nếu fgOS làm, đây là chỗ **vượt** upstream |
+| `class` field | **chưa tồn tại trong code** (0 hit) ⇒ toàn bộ #2 vẫn là đề xuất thuần |
+| `class: transform` — lớp thứ ba? | **chưa tìm ra ca sống nào** ⇒ chưa rõ, khác hẳn gather (0 đăng ký nhưng có ca sống) |
+| Ô có-state-effects / không-authority (exec packet B2) | D1 gộp `authority + state effects` thành **một** vị từ; B2 rơi đúng khe giữa. Đang gated (`tsk-2t6` D4/D9, điều kiện ≥2 ca thật **chưa thỏa**) ⇒ chưa sống. Ngày B2 mở, vị từ D1 phải tách đôi |
+| Nợ doc | `why-fgos-dispatch-splits-…md:64` còn nói *"two orthogonal axes"* — D1 đã bác thẳng. `system-overview.md:31` cần sửa một dòng cho `work-unit` |
+
+### 6.12 Trạng thái năm chiều, tính đến vòng 8
 
 | Chiều | Tình trạng |
 |---|---|
-| #1 AI giao | Đang sửa ở `tsk-2cw` (`orchestrator`→`launcher`; `orchestrator` giữ chỗ cho tầng điều phối N đơn vị) |
-| #2 giao cái gì | **Phiên này** — D1/D2 đã chốt; `capacity` + `class` đang hội tụ (§3 hàng 8e) |
-| #4 đường nào | Ổn (`kind`, 6 giá trị) — không ai đề nghị đổi |
-| #5 tài nguyên | Từ vựng ổn. Vấn đề còn lại là **kiến trúc**, không phải tên: `resolveExecutorConfig` nhồi 3 concern, blast radius CRITICAL (§3 hàng 3) |
-| #3 cơ chế *(dẫn xuất)* | `native`/`cli-spawn` đã tính đúng. **`inline` chưa được tính/ghi ở đâu cả** ⇒ không đo được. Vòng 4 làm rõ đây là bài toán *ghi lại kết quả dẫn xuất*, không phải *thêm một giá trị khai báo* (§3 hàng 10) |
-
-### Ô trống lộ ra khi áp khung này
-
-`class: gather` hôm nay có **0 consumer đăng ký**. Gather thật của fgOS —
-fan-out hai nhánh độc lập của `fgos-researching` — chạy hoàn toàn ngoài cơ chế
-capacity: không config, không presence check, không log (xác nhận sống bằng
-`tsk-o4l`, 2026-08-08). Đáng nói thêm: bee cũng **chưa** đóng được chỗ này,
-tự ghi *"Known measurement gap [...] a Bash-launched gather emits zero
-`dispatch.jsonl` rows (W-d)"*. Nếu fgOS làm, đây là chỗ **vượt** upstream chứ
-không phải bắt kịp.
+| #1 AI giao | `tsk-2cw` sở hữu (`orchestrator`→`launcher`). Vòng 8: chiều này **gộp arity với engagement**; đề xuất rút về 2 giá trị — **chờ người dùng**, đụng `tsk-2cw` |
+| #2 giao cái gì | **Phiên này.** D1/D2 **đã khoá**; `capacity` + `class` đang hội tụ; A1 (hai nghĩa) chờ chốt |
+| #4 đường nào | Từ vựng ổn (`kind`, 6 giá trị). Vấn đề không ở tên mà ở **vị từ gác sai** (A4) |
+| #5 tài nguyên | Từ vựng ổn, và vòng 8 tách được **cổng** (`adapter`) khỏi **tải**. Vấn đề còn lại là **kiến trúc**: `resolveExecutorConfig` nhồi 3 concern, blast radius CRITICAL |
+| #3 cơ chế *(dẫn xuất)* | `native`/`cli-spawn` tính đúng. **`inline` chưa được tính/ghi ở đâu cả** ⇒ không đo được. A3: tên hai giá trị này đặt theo cái vỏ, không theo vị trí nhà cung cấp |
+| *(cắt ngang)* phía cung | **Chưa bao giờ được đặt tên** trước vòng 6 — đó là lý do `capability` trông như một trục lạc loài |
 
 ## 7. Danh mục hạng mục / task {#tasks}
 
