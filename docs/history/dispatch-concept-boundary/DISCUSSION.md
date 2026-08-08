@@ -7,7 +7,7 @@ Item: `tsk-5td`. Liên quan: `tsk-2cw` (đổi `orchestrator`→`launcher`, gi�
 
 ## 1. Trạng thái hiện tại
 
-Vòng 1 (2026-08-08). Vừa mở phiên. Chưa mint D-ID nào — đúng kỷ luật: chưa
+Vòng 2 (2026-08-08). Chưa mint D-ID nào — đúng kỷ luật: chưa
 điểm nào giữ qua hai vòng.
 
 Vòng này làm ba việc: (a) chốt lại bằng chứng đã quét về `dispatch.mjs`;
@@ -49,7 +49,9 @@ không mở lại những quyết định các item khác đã khoá.
 | 5 | Tiêu chí phân định của bee | **Rõ** | *"distinguished from the I/O-offload worker by **authority and state effects**, not by task size"* — sắc hơn hẳn tiêu chí "vòng đời đầy đủ hay không" của trục A |
 | 6 | Cả 3 capacity fgOS đều là review-class | **Rõ** | `judge-discovery` (phán clear/không) · `judge-decompose` (phán split/không) · `submit-assist-classify` (phán tier/kind/risk) — cả ba trả **phán quyết**, không trả **digest dữ liệu** |
 | 7 | Gather của fgOS không có chỗ trong trục A | **Rõ** | `fgos-researching`'s D2 fan-out gọi thẳng Agent tool, không qua `capacities.<id>`, không config check, không log. Xác nhận sống bằng `tsk-o4l` (2026-08-08) |
-| 8 | Trục A nhận chiều gather/execute thế nào | **Chưa rõ** | Chiều thứ hai vuông góc, hay chia lại chính trục A? Câu chính của phiên |
+| 8 | Trục A nhận chiều gather/execute thế nào | **Đang hội tụ** (nêu vòng 1, không bị lật vòng 2) | Không phải hai trục vuông góc — ra hình **cây hai tầng**: tầng 1 hỏi *có authority + state effects không*; tầng 2 (chỉ nhánh không-authority) hỏi *trả về cái gì* |
+| 8b | Tách review khỏi gather | **Rõ** (người dùng xác nhận vòng 2) | Hai loại lỗi khác nhau ⇒ hai cách sửa khác nhau: digest sai vì *đọc thiếu*, verdict sai vì *phán sai* |
+| 8c | Tên hai lớp con | **Đang hội tụ** | Cả hai cặp từ **đã sống sẵn** trong repo, không cần phát minh — xem §5 vòng 2 |
 | 9 | Gác theo mục đích vs gác theo target | **Chưa rõ** | Bee gác `for:'gather'`; fgOS gác theo capacity id. Liên đới cổng `allowCrossProvider` per-capacity → per-dispatch (đã ghi nhận cần sửa, chưa xác nhận đã sửa) |
 | 10 | `inline` có thành mechanism hạng nhất | **Chưa rõ** | Hiện là "trạng thái vắng mặt" ⇒ không log được, không đo được |
 | 11 | `dispatch` giữ nghĩa hẹp hay rộng | **Chưa rõ** | Nếu hẹp thì subsystem cần tên gì |
@@ -130,6 +132,25 @@ trả **phán quyết**, không trả **digest** ⇒ theo phân loại bee, cả
 đó gather thật của fgOS — fan-out hai nhánh độc lập của `fgos-researching` —
 không đi qua cơ chế capacity chút nào. Nghĩa là trục A hiện **không có ô nào**
 cho gather-work.
+
+### Vòng 2 — 2026-08-08
+
+**Người dùng:** *"Review và gather tách làm hai đúng rồi. Mà thành 2 cái gì"* —
+xác nhận tách, hỏi tên.
+
+**Scout từ vựng sẵn có trong repo (để không phát minh từ mới):**
+
+| Cụm | Trong code (`src/`, `bin/`) | Trong prose | Kết luận |
+|---|---|---|---|
+| `verdict` | **186 lần** — `--verdict` CLI flag, `callerVerdict`, `resolveDiscovery`/`resolveDecompose` | `fgos-validating` 16, `fgos-researching` 12, `fgos-exploring` 6, `fgos-clarifying` 4 | Đã là **identifier thật**, khoá chặt |
+| `judge` | **38** + `judgeDiscovery` 10, `judgeDecompose` 10, `judgeVerifySemanticCorrectness` 7, `runJudgeExecutor`, `frozenJudge` 4/`frozenJudgeHits` 11 | — | Đã là **prefix tên thật** của 2/3 capacity |
+| `gather` | **0** | `tsk-5kn` DISCUSSION 15, `execution-fanout/CONTEXT.md` ghim *"fan-out A / gather"*, distillery (trích bee) | Đã là **thuật ngữ ghim** ở tầng doc, chưa vào code |
+| `digest` | **0** | `tsk-5kn` DISCUSSION 16, `two-layer-dispatch` 8, distillery (trích bee) | Như trên |
+
+Đối xứng lộ ra: fgOS **đã có sẵn cả hai cặp** `<lớp> → <cái nó trả về>`, chỉ là
+chưa bao giờ nâng chúng lên thành tên lớp chính thức trong trục A. Bên
+`judge`/`verdict` đã chín tới mức thành code; bên `gather`/`digest` mới ở tầng
+doc — đúng khớp với §3 hàng 7 (gather chưa có ô nào trong trục A).
 
 ## 6. Thiết kế đã chốt {#design}
 
