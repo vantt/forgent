@@ -571,7 +571,7 @@ thật" cho tình trạng hiện tại.
 | 1 | Backlog status trước todo | Làm, NHƯNG như 1 **category** chung (`backlog`), không phải giá trị phẳng nhét cạnh `wontfix`/`awaiting-approval` | MEDIUM | KHÔNG làm đúng vậy — `statusCategory` thật (0027) không có category `backlog`; 6 status đoạn đầu map vào `todo/in-progress/review/canceled`, không có nhóm `backlog` riêng |
 | 2 | Type hierarchy | Tách `kind`(task/bug/epic-nhãn) khỏi `goalTier`(mvp/milestone) đã có; đừng chain tuyến tính; nếu enum hóa `kind`, áp category/label như status | LOW (nếu tách đúng trục) | CHƯA làm — `kind` vẫn free text, ngoài phạm vi `0027` |
 | 3 | Nested domain fields | Làm — nhất quán `DOMAINS` registry pattern sẵn có, `domainFields` optional-additive, ghi đè toàn object mỗi lần edit | LOW-MEDIUM | **ĐÃ SHIP** — `tsk-38t-6`, field `domainFields` đúng shape đề xuất |
-| 4 | Status flow theo domain | **CHỐT (round 4):** LÀM — domain sở hữu bảng transition riêng (full fidelity, không lủng); `statusCategory` KHÔNG dùng để validate move, chỉ phục vụ cơ chế domain-agnostic (mục 6) | HIGH — supersede thật D1-D3, cần decision record + audit toàn bộ consumer `fsm.mjs` | **ĐÃ SHIP, NHƯNG THU HẸP** — chỉ 6 status đoạn đầu domain sở hữu (đúng round-4 KHÔNG phải "toàn bộ bảng"); 4 status đoạn đuôi (`delivered/retrospective/cleanup/done`) là chuỗi phổ quát MỚI, report round 1-12 chưa từng nghĩ tới — xem `0027` |
+| 4 | Status flow theo domain | **CHỐT (round 4):** LÀM — domain sở hữu bảng transition riêng (full fidelity, không lủng); `statusCategory` KHÔNG dùng để validate move, chỉ phục vụ cơ chế domain-agnostic (mục 6) | HIGH — supersede thật D1-D3, cần decision record + audit toàn bộ consumer `fsm.mjs` | **ĐÃ SHIP, NHƯNG THU HẸP HƠN round-4 ĐỀ XUẤT** — domain KHÔNG sở hữu bảng transition (`TRANSITIONS` vẫn 1 bảng CHUNG, DISCUSSION.md §1/§6 tự nhận đã BÁC khung round-4 gốc); domain chỉ sở hữu `statusLabels` (map 6 status đầu → `statusCategory`, KHÔNG phải literal status/cạnh chuyển). 4 status đoạn đuôi (`delivered/retrospective/cleanup/done`) là chuỗi phổ quát MỚI, report round 1-12 chưa từng nghĩ tới — xem `0027` |
 | 6 mới | Tách `status` (label, domain sở hữu, dùng validate move) khỏi `statusCategory` (foundation, dùng cho compound-learn/frontier/rollup/outcome...) | Nên làm cùng đợt với #4 — 2 field bổ trợ nhau, không tách rời được nữa sau round 4 | MEDIUM-HIGH (đổi mọi consumer domain-agnostic sang đọc category, xem danh sách mục 6) | **ĐÃ SHIP** — `tsk-38t-2`/`tsk-38t-4`, `statusCategory` đóng băng lúc ghi, không dùng validate move (đúng thiết kế), domain thật thứ 2 `fixture-marketing` chứng minh end-to-end (`tsk-38t-7`) |
 
 **Về câu hỏi riêng "skill fgos-planning coi lại việc dùng harness ghi task
@@ -867,14 +867,29 @@ khung RỘNG HƠN record này thật sự chốt").
 kết quả của phiên `fgos-exploring` THU HẸP phạm vi đúng lúc):**
 
 - 10 status hôm nay (không phải 7): `todo/doing/blocked/awaiting-human/
-  awaiting-approval/wontfix` (**6 status ĐẦU — domain sở hữu**, đúng round 4)
-  cộng `delivered/retrospective/cleanup/done` (**4 status ĐUÔI — chuỗi tuyến
-  tính PHỔ QUÁT, KHÔNG domain nào relabel** — khái niệm hoàn toàn mới, round
-  1-12 của report này chưa từng nghĩ tới).
+  awaiting-approval/wontfix` (**6 status ĐẦU**) cộng `delivered/retrospective/
+  cleanup/done` (**4 status ĐUÔI — chuỗi tuyến tính PHỔ QUÁT, KHÔNG domain
+  nào relabel** — khái niệm hoàn toàn mới, round 1-12 của report này chưa
+  từng nghĩ tới).
+- **SỬA LẠI (đọc sai lúc viết round 13 lần đầu, phát hiện lúc file task
+  `backlog`):** domain KHÔNG sở hữu bảng TRANSITION, kể cả 6 status đầu.
+  Đọc thẳng `workflow-stage-graphs.mjs` (comment trong entry
+  `fixture-marketing`) xác nhận: *"`status-fsm.mjs`'s TRANSITIONS is ONE
+  shared flat table for every domain (0027's own 'Quyết định' section...) —
+  no domain can introduce a genuinely new status literal... only D1-D3's
+  original 'domain sở hữu TOÀN BỘ bảng transition' framing, explicitly
+  REJECTED in DISCUSSION.md §1/§6, would have allowed that."* Cái domain
+  THẬT SỰ sở hữu chỉ là **`statusLabels`** — bảng map 6 status đầu →
+  `statusCategory` (vd `fixture-marketing` map `blocked→canceled` thay vì
+  `blocked→in-progress` của coding) — KHÔNG phải literal status value, KHÔNG
+  phải cạnh chuyển hợp lệ. 10 status + cạnh chuyển vẫn 1 bảng CHUNG cho mọi
+  domain (`status-fsm.mjs`'s `TRANSITIONS`, `work.mjs`'s `STATUSES`). Hệ quả
+  trực tiếp: muốn thêm 1 status MỚI (vd `backlog`) phải sửa 2 file GLOBAL
+  này — không có đường "domain tự khai status riêng".
 - `statusCategory` implement ĐÚNG thiết kế round 3-4: field riêng đóng băng
   lúc ghi, KHÔNG dùng validate move (đúng lỗ hổng `blocked→awaiting-human`
   round 4 tự tìm ra — `status-fsm.mjs` vẫn giữ bảng transition đầy đủ mịn
-  riêng).
+  riêng, dùng chung mọi domain).
 - `domainFields` ship đúng shape đề xuất mục 3 (`tsk-38t-6`).
 - Domain thật thứ 2 để test: `fixture-marketing`
   (`src/state/workflow-stage-graphs.mjs` dòng ~300) — đóng đúng gap tự flag
