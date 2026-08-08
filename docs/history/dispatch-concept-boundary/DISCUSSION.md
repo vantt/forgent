@@ -7,17 +7,17 @@ Item: `tsk-5td`. Liên quan: `tsk-2cw` (đổi `orchestrator`→`launcher`, gi�
 
 ## 1. Trạng thái hiện tại
 
-Vòng 7 (2026-08-08). **D1 và D2 vẫn là hai D-ID duy nhất đã mint** — cả hai
+Vòng 8 (2026-08-08). **D1 và D2 vẫn là hai D-ID duy nhất đã mint** — cả hai
 giữ qua bảy vòng không bị lật, và vòng 6 còn củng cố chúng thêm (xem dưới).
-Mọi thứ vòng 5–7 nêu ra đều **mới một vòng, chưa mint**.
+Mọi thứ vòng 5–8 nêu ra đều **mới một vòng, chưa mint**.
 
-> ⚠ **§6 chưa gấp vòng 5–7 vào.** Vòng 6 lật cách vòng 5 khung hoá quan hệ
+> ⚠ **§6 chưa gấp vòng 5–8 vào.** Vòng 6 lật cách vòng 5 khung hoá quan hệ
 > capacity↔capability, nhưng chưa D-ID nào rơi, nên §6 giữ nguyên bản vòng 4
 > theo luật "§6 regenerate khi có quyết định đổi hình dạng". Người đọc lại
-> file này: đọc §5 vòng 6–7 **sau** khi đọc §6, và biết rằng phần "phía cung"
+> file này: đọc §5 vòng 6–8 **sau** khi đọc §6, và biết rằng phần "phía cung"
 > chưa có trong §6.
 
-Đường đi bảy vòng:
+Đường đi tám vòng:
 
 | Vòng | Việc | Kết quả |
 |---|---|---|
@@ -25,11 +25,11 @@ Mọi thứ vòng 5–7 nêu ra đều **mới một vòng, chưa mint**.
 | 2 | Người dùng xác nhận tách gather khỏi judge; scout từ vựng sẵn có | Không cần phát minh tên — `judge`/`verdict` đã vào **code** (186 + 38 hit), `gather`/`digest` đã ghim ở **doc** (`tsk-5kn`). Bất đối xứng này tự xác nhận chẩn đoán vòng 1 |
 | 3 | Người dùng báo bị lẫn *"đang phân loại cái gì"* ⇒ lùi lại dựng khung high-level | Lộ ra gốc của lộn xộn: **không phải một phân loại**, mà nhiều chiều bị đọc chung; một khối `capacities.<id>` mang câu trả lời cho nhiều chiều cùng lúc. Khung được xác nhận khớp ⇒ thành xương sống §6 |
 | 4 | Người dùng hỏi *"#3 và #4 có trùng nhau không"* | **Lật một phần khung vòng 3.** Code xác nhận `hasNativeMechanism = capacity.kind === 'task'` ⇒ #3 là **dẫn xuất** của #4, không độc lập. Khung sửa thành **bốn chiều khai báo + một kết quả dẫn xuất**. Đổi lại: lý giải được vì sao `EXECUTOR_ADAPTERS` không có key `native`, và vì sao `inline` khó thành giá trị hạng nhất |
-
 | 5 | Kiểm kê lại theo yêu cầu người dùng: phân định `rootTask`/`subTask`/`capacity` và ranh giới với `capability` | Scout lật một phần tiền đề: chồng lấn **không** nằm ở `capability` mà ở `name` — `capability` chỉ được đọc ở 3 chỗ, **không chỗ nào là dispatch**. Khung đề xuất: hai trục (đơn vị việc / capability). Đặt tên trục I |
 | 5b | Người dùng chọn `work-unit` làm tên trục I | Va chạm: 0003 + system-overview đã khoá *"đơn vị việc"* = entity `work`, *"duy nhất"*. Giải bằng cách siết: `work` là giá trị **được lưu** duy nhất trên trục, không phải cả trục |
 | 6 | Người dùng: *"trục 1 và trục 2 overlap; trục 2 là backend của trục 1"* | **Lật khung vòng 5.** Deep-dive tự viết của fgOS mang câu luật gốc (US-027): *"the core consults capabilities, never tools"*. Không phải hai trục — là **một quan hệ, hai phía**: cầu (#2) và cung (#4+#5), `capability` là khớp nối hợp lệ duy nhất. Bốn suy dẫn độc lập hội tụ. Lộ ra 5 điều chỉnh A1–A5, trong đó A2 là khiếm khuyết **sống** |
 | 7 | Người dùng yêu cầu vẽ lại tổng quan theo khung tạm | Kiểm kê đầy đủ cái còn / cái mất / cái hở. Xác nhận: **không chiều nào trong năm chiều bị xoá** — reframe chỉ thêm một cách đọc |
+| 8 | Người dùng hỏi ba chỗ hình vòng 7 im lặng: *dispatch đi đâu · adapter ở đâu · launcher/driver/orchestrator không cùng layer* | **Cùng một bệnh, lần thứ ba** (sau vòng 4 và vòng 6): một ô mang hai câu trả lời. `dispatch` = **cạnh**, tách `resolve`/`invoke` ⇒ giải luôn §3 hàng 12 và sửa chẩn đoán hàng 1–2. `adapter` = **cổng**, và trùng-chuỗi `'cli-spawn'` với mechanism cho **suy dẫn thứ 5** xác nhận A3. `#1` gộp **arity** với **engagement**; `orchestrator` là **hợp thành**, không phải ô thứ ba |
 
 **Điểm quan trọng nhất để một người quay lại đọc:** mọi tranh luận trong phiên
 này chỉ đụng **câu hỏi #2** của khung §6 (*giao cái gì*) và cách #2 nối sang
@@ -85,6 +85,13 @@ không mở lại những quyết định các item khác đã khoá.
 | 22 | Phép thử cơ học cho D1 | **Đang hội tụ** (vòng 6) | Chuỗi nhân quả: state effects → cần vòng đời bảo vệ → cần id ổn định gắn vòng đời → **nằm trong event log**. Nên *"có id trong `.fgos/events.jsonl`"* không cạnh tranh với D1 — nó là **đầu quan sát được** của chính D1. Trả lời thẳng yêu cầu "tiêu chí test được" |
 | 23 | `subTask` sau D1/D2 | **Đang hội tụ** (vòng 5) | Vẫn **không** phải lớp riêng — D1 củng cố 0026 (0026 lý giải bằng *cùng vòng đời* = hệ quả; D1 bằng *cùng câu trả lời authority* = nguyên nhân). Nhưng chữ này nói *ai giao* ⇒ thuộc **#1**, là từ **quan hệ** (field `work.parent`, `work.mjs:414`), không phải từ **phân lớp** |
 | 24 | `class: transform` — lớp thứ ba? | **Chưa rõ** | Ứng viên: nhận input, trả **dạng dẫn xuất của chính input**, không đọc state ngoài (khác gather), không áp tiêu chí phán (khác judge). **Chưa tìm ra ca sống nào** — khác gather (0 đăng ký nhưng có ca sống `tsk-o4l`) |
+| 26 | `dispatch` là gì trong khung | **Đang hội tụ** (vòng 8) | Là **cạnh**, không phải nút — mấy mũi tên cầu→binding→cung→chạy. Tách hai nửa: **resolve** (dùng chung cả hai mechanism) và **invoke** (external qua adapter; internal là Task tool của chính session) |
+| 27 | Chẩn đoán `dispatch.mjs` sửa lại | **Đang hội tụ** (vòng 8) | "1186 dòng / 6 trách nhiệm" (hàng 1–2) là **triệu chứng**. Bệnh: trộn `resolve` (dùng chung) với `invoke-external` (một mechanism), rồi đặt tên theo cả act. Bằng chứng khớp: `decideDispatchMechanism` là hàm thuần **không đọc config** (= thuần resolve) và là export duy nhất phục vụ cả hai. Đường cắt đúng: **resolve/invoke**, không phải "chia 6" |
+| 12b | Nửa native không có module nhà (giải hàng 12) | **Đang hội tụ** (vòng 8) | **Nửa nạc nửa mỡ**: `invoke` native là **bản chất** (session gọi tool của chính nó, không có biên để bắc cầu ⇒ không đóng gói được); `resolve` native là **thiếu sót** (đóng gói được, nhưng đang nằm trong module đặt tên theo cả act và định hình chỉ cho nhánh external) |
+| 28 | `adapter` là gì | **Đang hội tụ** (vòng 8) | Là **cổng** (port) — doc comment tự khai *"the executor **port** is now a NAMED interface"* (`dispatch.mjs:818-830`). ⇒ #5 tách đôi: **cổng** (`adapter`) + **tải** (`command`/`args`/`model` qua `tier`) |
+| 29 | `adapter` — suy dẫn thứ 5 cho A3 | **Rõ** (vòng 8) | `EXECUTOR_ADAPTERS` đúng 1 key, `DEFAULT_ADAPTER = 'cli-spawn'` — **trùng chuỗi** với giá trị mechanism #3 (dẫn xuất). Hai tầng khác nhau đội chung một chuỗi, hôm nay không phân biệt được vì chỉ có một adapter. Ngày `rpc`/`app-server` (đã deferred, cùng doc comment) được đăng ký: nhà cung cấp vẫn **ngoài** nhưng adapter là `rpc` ⇒ tên `cli-spawn` cho **mechanism** thành sai. Xác nhận A3 từ hướng hoàn toàn khác |
+| 30 | #1 gộp hai câu hỏi | **Đang hội tụ** (vòng 8) — **đụng `tsk-2cw`, chờ người dùng** | `0028` (accepted, supersedes 0026) đã lập luận sẵn hai tính chất độc lập: **arity** (1 vs N) và **có ở lại không** (bước ra vs giữ liên hệ liên tục). Bảng: (1,buông)=`launcher` · (1,ở lại)=`driver` · (N,ở lại)=`orchestrator` · (N,buông)=**trống**. `0026`: *"Vai trò launcher KHÔNG CẦN soul ... THUẦN CƠ HỌC"* ⇒ nhu-cầu-phán-đoán bám theo **cột**, không theo arity |
+| 31 | `orchestrator` là tầng trên, không phải ô thứ ba | **Đang hội tụ** (vòng 8) | `fgos-fanout` spawn N Agent, **mỗi Agent chạy `/fgOS:pick` end-to-end** ⇒ mỗi cái là một `driver`. Nên orchestrator = **hợp thành** (N lần dấn thân con), không phải anh em ngang hàng. Đề xuất: #1 rút về **2 giá trị**, `orchestrator` ra khỏi enum lên tầng hợp thành — đúng chỗ `tsk-2cw` đang chừa |
 | 25 | Ô trống có-state-effects / không-authority (B2) | **Chưa rõ, latent** | D1 gộp `authority + state effects` thành MỘT vị từ. exec packet B2 rơi đúng khe giữa. Đang gated (`tsk-2t6` D4/D9, điều kiện (b) chưa thỏa) ⇒ chưa sống. Ngày B2 mở, vị từ D1 phải tách đôi |
 
 ## 4. Quyết định đã chốt
@@ -410,6 +417,56 @@ cùng lúc.
    nghĩa.
 3. A4 thuộc phiên này (chốt **vị từ đúng**) hay tách item (sửa **code**)?
    (Nghiêng: chốt vị từ ở đây, sửa code tách item.)
+
+### Vòng 8 — 2026-08-08
+
+**Người dùng:** *"vậy dispatch đi đâu? adapter ở đâu? launcher / driver /
+orchestrator thật sự không nằm chung layer."*
+
+Ba câu, cùng một bệnh — **lần thứ ba trong phiên**: vòng 4 `kind` bị đọc lẫn
+với `mechanism`; vòng 6 `capacity` mang hai nghĩa; vòng 8 `#1` gộp hai câu
+hỏi. Cùng khuôn: một ô mang câu trả lời cho hai câu.
+
+**`dispatch` là cạnh, không phải nút** (§3 hàng 26–27, 12b). Nó không xuất
+hiện trong hình vì nó *là mấy mũi tên*. Tách hai nửa `resolve` / `invoke` giải
+được cả hàng 12 lẫn chẩn đoán hàng 1–2.
+
+**`adapter` là cổng** (§3 hàng 28–29) ⇒ #5 tách đôi cổng/tải. Và trùng-chuỗi
+`'cli-spawn'` giữa adapter (khai báo) và mechanism (dẫn xuất) cho **suy dẫn
+thứ năm** xác nhận A3.
+
+**#1 gộp arity với engagement** (§3 hàng 30–31). `0028` đã lập luận sẵn hai
+tính chất; `fgos-fanout` chứng minh `orchestrator` là **hợp thành**, không phải
+ô thứ ba.
+
+**Khung vẽ lại — có tầng, có cạnh:**
+
+```mermaid
+flowchart TB
+    ORCH["<b>HỢP THÀNH</b> — orchestrator<br/><i>N lần dispatch + hợp nhất. KHÔNG phải giá trị của #1</i>"]
+    ENG["<b>#1 DẤN THÂN</b> — launcher (buông) | driver (ở lại)<br/><i>hình dạng của MỘT lần dispatch</i>"]
+    DEM["<b>#2 CẦU</b> — work-unit: rootTask | capacity{gather,judge}"]
+    BIND["<b>BINDING</b> — capacities.&lt;id&gt;"]
+    SUP["<b>CUNG</b> — capability → tool → #4 kind + #5 (cổng: adapter · tải: command/args/model)"]
+
+    ORCH -->|"gồm N"| ENG
+    ENG ==>|"<b>dispatch · nửa RESOLVE</b><br/>dùng chung cả hai mechanism"| DEM
+    DEM ==> BIND
+    BIND ==> SUP
+    SUP ==>|"<b>dispatch · nửa INVOKE</b><br/>ngoài: qua cổng adapter<br/>trong: Task tool của chính session — không đóng gói được"| RUN["chạy"]
+
+    MECH["#3 <b>CƠ CHẾ</b> (dẫn xuất)<br/>cung ở TRONG | cung ở NGOÀI"]
+    SUP -.-> MECH
+    MECH -.-> RUN
+
+    GOV["<b>GÁC</b> (cắt ngang) — presence · allowCrossProvider · forceCliSpawn"]
+    GOV -.-> BIND
+    GOV -.-> SUP
+```
+
+**Câu chờ người dùng (thứ tư, cộng vào ba câu vòng 7):** #1 rút về 2 giá trị
+có thuộc phiên này không? `tsk-2cw` đang sở hữu chiều #1; `0028` mới đổi *tên*,
+chưa đụng *số giá trị*. Nghiêng: phiên này **ghi nhận**, để `tsk-2cw` quyết.
 
 ## 6. Thiết kế đã chốt {#design}
 
