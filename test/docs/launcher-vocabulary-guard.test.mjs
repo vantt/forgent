@@ -60,6 +60,7 @@ const ALLOWED_DIR_PREFIXES = [
   'herdr-plugin/src/', // PaneOrchestrator -- a Rust terminal-pane trait, unrelated concept
   'docs/distillery/', // verbatim upstream extraction, never edited to match fgOS's own vocab
   'plans/reports/', // historical records, per this item's own "khong sua nguoc" rule
+  '.fgos/', // the committed, append-only event/state store (decision 0001) -- old fgos-decision text/backups legitimately quote the retired term forever; never rewritten (docs/how-to/write-verify-for-a-skill-prose-change.md trap #2)
 ];
 const HERDR_HISTORY_DOC = /^docs\/history\/herdr-/; // herdr's own PaneOrchestrator, same reasoning
 
@@ -79,6 +80,7 @@ const ALLOWED_FILES = new Map([
   ['docs/history/fgos-terminal-close-autoclose/CONTEXT.md', 'cites work-item title "herdr-orchestrator" (tsk-2xt) and fgos-runner\'s unattended-loop sense, not 0026\'s role'],
   ['docs/history/launcher-vocabulary-rename/CONTEXT.md', 'this item\'s own decision record -- discusses the old term while explaining the rename'],
   ['docs/history/launcher-vocabulary-rename/plan.md', 'this item\'s own plan -- discusses the old term while explaining the rename'],
+  ['docs/history/launcher-vocabulary-rename/iron-law-evidence.md', 'this item\'s own Iron Law evidence -- quotes the old term inside real failing-before test transcript excerpts'],
   ['docs/history/tsk-18a-merge-conflict-misclassification/repro-notes.md', 'cites a repro script\'s literal filename (tsk-18a-repro-orchestrator.mjs), never committed to the repo'],
   ['docs/history/two-layer-dispatch/DISCUSSION.md', 'cites bee-swarming/SKILL.md\'s own upstream terminology verbatim'],
   ['docs/specs/work-state.md', 'same fleet-orchestrator reserved-future sense as docs/backlog.md STR27'],
@@ -126,6 +128,7 @@ test('NEGATIVE self-check: real allowlisted paths are not vacuously exempted (tr
   assert.equal(isDirAllowed('herdr-plugin/src/main.rs'), true);
   assert.equal(isDirAllowed('docs/distillery/sources/bee.md'), true);
   assert.equal(isDirAllowed('plans/reports/internal-research-260801-1823-merge-mechanism-grand-orchestrator-design-report.md'), true);
+  assert.equal(isDirAllowed('.fgos/events.jsonl'), true);
   assert.equal(isDirAllowed('docs/history/herdr-dashboard-pane-tracking/CONTEXT.md'), true);
   assert.equal(isDirAllowed('docs/decisions/0026-vision-orchestrator-roottask-capacity-native-vs-cli-spawn.md'), false, 'the decision file itself is not dir-allowlisted -- it clears only via the frozen-filename strip');
   assert.equal(ALLOWED_FILES.has('docs/backlog.md'), true);
