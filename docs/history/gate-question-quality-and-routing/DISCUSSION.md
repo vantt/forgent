@@ -395,6 +395,20 @@ hành, **giả định mặc định phải là đo thiếu kênh**, không ph�
 > **không tin echo của lệnh ghi — đọc ngược để xác minh.** Trong checkout dùng chung, `seq` in ra
 > có thể thuộc về writer khác.
 
+> **Sự cố thứ hai, vòng 8 — suýt ship một verify vacuous-pass.** Lúc viết `verify` cho `tsk-5hg`,
+> bản đầu dùng `node -e "import(...).then(async m => { … throw … })"`. Chạy thử thì phần kiểm
+> **thất bại đúng như mong đợi** (skill chưa có quy ước) nhưng tiến trình trả **`exit=0`** — throw
+> nằm trong callback `.then()` async nên Node không truyền mã lỗi ra. Verify sẽ báo **xanh dù kiểm
+> hỏng**.
+>
+> Đây đúng lớp lỗi `verify-miss` (R14: 87/141 = 62% toàn bộ friction) mà chính cụm này đang bàn —
+> và nó suýt lọt vào item sinh ra để sửa chất lượng câu hỏi. Chỉ bắt được vì **chạy thử**, không
+> phải vì đọc lại.
+>
+> Bản đã sửa được chứng minh **cả hai chiều** trước khi ghi vào item: đỏ (`exit=1`) khi skill chưa
+> có quy ước, xanh (`exit=0`) khi có. Bài học: **một `verify` chưa từng chạy đỏ thì chưa phải một
+> `verify`** — chứng minh cả hai chiều, không chỉ chiều xanh.
+
 **Ứng viên D-ID cho vòng 8** (chưa đứng đủ vững):
 
 - Bypass chết vì quy ước `## Outstanding questions` chưa được nối vào hai skill viết artifact —
@@ -943,6 +957,15 @@ hiện nó đã được sửa. Chi tiết §3 "Bị lật ở vòng 6".
   clarify — không chặn submit.
 - **Draft verify:** đo lại tỉ lệ `contextApprove/bypass` và `planApprove/bypass` trên event log sau
   N item — phải > 0, hiện là 0.
+- **Bằng chứng thêm cho Q17 (vòng 8):** quy ước **chưa hề thống nhất** ngay trong repo.
+  `docs/history/context-md-enforcement-scope/CONTEXT.md:83` dùng
+  `## Outstanding, deferred to a follow-up item` — khác hẳn `## Outstanding questions` mà
+  `hasOpenItems` đòi. Nên Q17 không chỉ là "tiếng Anh hay tiếng Việt", mà là **chuẩn hoá một
+  heading đang tồn tại ở nhiều biến thể**.
+- **Hàng xóm, không trùng:** `tsk-47e` (`docs/history/context-md-enforcement-scope/`, đang
+  `executing`) ép item **có** `CONTEXT.md` (docsRef enforcement). `tsk-5hg` ép **nội dung bên
+  trong** có mục mà `hasOpenItems` đòi. Hai lớp khác nhau của cùng một kỷ luật artifact — nên đọc
+  `tsk-47e` D1–D4 trước khi shape `tsk-5hg`.
 - **✅ Đã submit `tsk-5hg`** (tier `light`, kind `bug`, `todo/clarify`, `refs` trỏ về anchor này).
   Kiểm trùng trước khi submit: `tsk-6bx`/`tsk-6bx-1`/`tsk-6bx-2` đều đã `done` — chúng dựng **cơ
   chế** bypass, không cái nào dạy skill viết ra cái mục mà cơ chế đó đòi. Không trùng.
