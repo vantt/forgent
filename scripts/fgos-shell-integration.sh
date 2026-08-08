@@ -29,10 +29,16 @@ fgos() {
   local root real_bin
   root=$(_fgos_repo_root) || return 1
   if [ ! -f "$root/bin/fgos.mjs" ]; then
-    real_bin=$(type -P fgos 2>/dev/null) || {
+    # `type -P` is bash-only and silently fails under zsh, which always trips
+    # this "no PATH install" branch even when one exists. `unset -f` inside
+    # the command substitution only affects that subshell, so it un-shadows
+    # this very function just long enough for `command -v` to do a plain
+    # PATH lookup -- portable across bash and zsh alike.
+    real_bin=$(unset -f fgos 2>/dev/null; command -v fgos)
+    if [ -z "$real_bin" ]; then
       echo "fgos: no bin/fgos.mjs at $root (not a forgent checkout) and no global fgos install on PATH" >&2
       return 1
-    }
+    fi
     "$real_bin" "$@"
     return $?
   fi
@@ -43,10 +49,11 @@ fgos-runner() {
   local root real_bin
   root=$(_fgos_repo_root) || return 1
   if [ ! -f "$root/bin/fgos-runner.mjs" ]; then
-    real_bin=$(type -P fgos-runner 2>/dev/null) || {
+    real_bin=$(unset -f fgos-runner 2>/dev/null; command -v fgos-runner)
+    if [ -z "$real_bin" ]; then
       echo "fgos-runner: no bin/fgos-runner.mjs at $root (not a forgent checkout) and no global fgos-runner install on PATH" >&2
       return 1
-    }
+    fi
     "$real_bin" "$@"
     return $?
   fi

@@ -35,6 +35,10 @@ function runBash(cwd, script) {
   return execFileSync('bash', ['-c', script], { cwd, encoding: 'utf8' });
 }
 
+function runZsh(cwd, script) {
+  return execFileSync('zsh', ['-c', script], { cwd, encoding: 'utf8' });
+}
+
 function writePathStub(dir, name, marker) {
   fs.mkdirSync(dir, { recursive: true });
   const stubPath = path.join(dir, name);
@@ -134,6 +138,34 @@ test('fgos-runner falls back to a real PATH install when the resolved root has n
   writePathStub(pathStubDir, 'fgos-runner', 'PATH_FGOS_RUNNER_MARKER');
 
   const out = runBash(repoRoot, `export PATH="${pathStubDir}:$PATH"; source "${scriptPath}"; fgos-runner --w`);
+
+  assert.match(out, /PATH_FGOS_RUNNER_MARKER/);
+  assert.match(out, /--w/);
+
+  fs.rmSync(repoRoot, { recursive: true, force: true });
+  fs.rmSync(pathStubDir, { recursive: true, force: true });
+});
+
+test('fgos falls back to a real PATH install under zsh, not just bash (regression: `type -P` is bash-only and silently breaks this branch under zsh)', () => {
+  const repoRoot = setupRepoWithoutBin('fgos-shell-integration-no-bin-');
+  const pathStubDir = mkTempDir('fgos-shell-integration-pathstub-');
+  writePathStub(pathStubDir, 'fgos', 'PATH_FGOS_MARKER');
+
+  const out = runZsh(repoRoot, `export PATH="${pathStubDir}:$PATH"; source "${scriptPath}"; fgos --w`);
+
+  assert.match(out, /PATH_FGOS_MARKER/);
+  assert.match(out, /--w/);
+
+  fs.rmSync(repoRoot, { recursive: true, force: true });
+  fs.rmSync(pathStubDir, { recursive: true, force: true });
+});
+
+test('fgos-runner falls back to a real PATH install under zsh, not just bash', () => {
+  const repoRoot = setupRepoWithoutBin('fgos-shell-integration-no-bin-');
+  const pathStubDir = mkTempDir('fgos-shell-integration-pathstub-');
+  writePathStub(pathStubDir, 'fgos-runner', 'PATH_FGOS_RUNNER_MARKER');
+
+  const out = runZsh(repoRoot, `export PATH="${pathStubDir}:$PATH"; source "${scriptPath}"; fgos-runner --w`);
 
   assert.match(out, /PATH_FGOS_RUNNER_MARKER/);
   assert.match(out, /--w/);
