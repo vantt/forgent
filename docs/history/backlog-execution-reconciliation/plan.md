@@ -105,7 +105,7 @@ Two artifacts, one item:
 | Component | Risk | What would prove it |
 |---|---|---|
 | Verdict correctness per PBI row (is it *really* resolved?) | **Medium** — the item exists because plausible-looking records were wrong twice in one day | Each `resolved`/`partial` verdict cites a `path:line` read in this worktree, not a state field or a prior report. `fgos-validating` spot-proves a sample, starting with the item's own worked case `p-73d99989` → `src/runner/worktree.mjs:201`. |
-| Checker parsing `docs/backlog.md` | Low | Run it against today's file: it must find exactly 30 `proposed` ids. A parser that silently finds 0 would pass a vacuous check, so the script fails loudly when the extracted set is empty. |
+| Checker parsing `docs/backlog.md` | **Medium** (upgraded from Low at the reality gate — proven, not hypothetical) | Run it against today's file: it must find exactly 30 `proposed` ids. See the binding constraint below. |
 | Scope creep into flipping PBI status | Low | Footprint contains no backlog/`.bee` write path; the deliverable is additive only. |
 
 impact-analysis: **full** (`fgos tool query --capability impact-analysis
@@ -115,6 +115,29 @@ and edits no existing symbol, so no caller graph is disturbed. A `present`
 status is not a freshness guarantee (tsk-j7y), which does not matter at
 this blast radius.
 
+## Binding constraint from the reality gate (2026-08-08)
+
+Measured in this worktree, not assumed: a naive `line.split('|')[3]` status
+lookup extracts **29** `proposed` rows, while a whole-file scan for the
+literal `| proposed |` finds **30**. The row for `STR70b` carries a literal
+`|` inside its Story cell (6 cells, not 5), so its status lands past index 3
+and the row is silently dropped.
+
+A checker written that way would report green while never checking one of
+the 30 — the exact class of quietly-untrue record this item exists to end.
+
+The checker therefore MUST:
+
+1. Read the status cell **counting from the right** (or otherwise tolerate
+   pipe-bearing cells), never a fixed left-hand index.
+2. Cross-check its own extraction: the count of rows it classified
+   `proposed` must equal a whole-file `| proposed |` scan. A mismatch is a
+   hard failure naming both numbers — a parser that disagrees with itself
+   must never produce a passing run.
+
+The ID column is safe as `cells[0]`: all 30 extracted ids match
+`^[A-Za-z0-9-]+$` with no exceptions.
+
 ## Cases worth proving against
 
 - A `proposed` row whose PBI id appears nowhere in `RECONCILIATION.md` →
@@ -122,6 +145,9 @@ this blast radius.
 - A `resolved` row citing an item id but no `path:line` → checker fails.
 - Zero `proposed` ids extracted (backlog format changed) → checker fails
   loudly rather than passing on an empty set.
+- A row with a literal `|` inside a cell (`STR70b` today) → still
+  classified and still required to be covered, per the binding constraint
+  above.
 - `STR73`, the one `in-flight` row, is out of the checked set — it is not
   `proposed`, and the item's own text says this work is *input to* STR73,
   not a duplicate of it.
