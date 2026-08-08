@@ -550,6 +550,58 @@ test('fgos setup leaves a pre-existing custom core.hooksPath untouched — fill-
   fs.rmSync(homeDir, { recursive: true, force: true });
 });
 
+test('fgos setup initializes ~/.fgos/config.json with the full default shape (tsk-1ri D1) when it does not exist', () => {
+  const cwd = mkTemp('setup-cli-global-config-');
+  const homeDir = mkTemp('setup-cli-global-config-home-');
+  const result = spawnSync(process.execPath, [FGOS, 'setup'], { cwd, encoding: 'utf8', env: { ...process.env, HOME: homeDir } });
+  assert.equal(result.status, 0, result.stderr);
+  const envelope = JSON.parse(result.stdout);
+  const expectedGlobalPath = path.join(homeDir, '.fgos', 'config.json');
+  assert.equal(envelope.data.globalConfigPath, expectedGlobalPath);
+  assert.equal(envelope.data.globalConfigCreated, true);
+  assert.ok(fs.existsSync(expectedGlobalPath));
+  const written = JSON.parse(fs.readFileSync(expectedGlobalPath, 'utf8'));
+  assert.deepEqual(written.runner, DEFAULT_RUNNER_CONFIG);
+  fs.rmSync(cwd, { recursive: true, force: true });
+  fs.rmSync(homeDir, { recursive: true, force: true });
+});
+
+test('fgos setup run twice does not rewrite an already-complete ~/.fgos/config.json (tsk-1ri D2, fill-missing-only)', () => {
+  const cwd = mkTemp('setup-cli-global-config-repeat-');
+  const homeDir = mkTemp('setup-cli-global-config-repeat-home-');
+  const env = { ...process.env, HOME: homeDir };
+  const first = spawnSync(process.execPath, [FGOS, 'setup'], { cwd, encoding: 'utf8', env });
+  assert.equal(first.status, 0, first.stderr);
+  const globalPath = JSON.parse(first.stdout).data.globalConfigPath;
+  const mtimeBefore = fs.statSync(globalPath).mtimeMs;
+
+  const second = spawnSync(process.execPath, [FGOS, 'setup'], { cwd, encoding: 'utf8', env });
+  assert.equal(second.status, 0, second.stderr);
+  const envelope = JSON.parse(second.stdout);
+  assert.equal(envelope.data.globalConfigCreated, false);
+  assert.deepEqual(envelope.data.globalConfigAddedKeys, []);
+  assert.equal(fs.statSync(globalPath).mtimeMs, mtimeBefore, 'must not rewrite a file that already has every default key');
+  fs.rmSync(cwd, { recursive: true, force: true });
+  fs.rmSync(homeDir, { recursive: true, force: true });
+});
+
+test('fgos setup fills a missing default key into an existing ~/.fgos/config.json without touching a key the user already customized (tsk-1ri D1)', () => {
+  const cwd = mkTemp('setup-cli-global-config-fill-');
+  const homeDir = mkTemp('setup-cli-global-config-fill-home-');
+  const globalDir = path.join(homeDir, '.fgos');
+  fs.mkdirSync(globalDir, { recursive: true });
+  const globalPath = path.join(globalDir, 'config.json');
+  const customized = { runner: { ...DEFAULT_RUNNER_CONFIG, executor: { command: 'my-custom-cli', args: ['{prompt}'] } } };
+  fs.writeFileSync(globalPath, `${JSON.stringify(customized, null, 2)}\n`);
+
+  const result = spawnSync(process.execPath, [FGOS, 'setup'], { cwd, encoding: 'utf8', env: { ...process.env, HOME: homeDir } });
+  assert.equal(result.status, 0, result.stderr);
+  const written = JSON.parse(fs.readFileSync(globalPath, 'utf8'));
+  assert.equal(written.runner.executor.command, 'my-custom-cli', 'a value the user already customized must never be overwritten');
+  fs.rmSync(cwd, { recursive: true, force: true });
+  fs.rmSync(homeDir, { recursive: true, force: true });
+});
+
 test('fgos doctor (no flags) produces valid wrapEnvelope-shaped JSON on stdout', () => {
   const cwd = mkTemp('doctor-cli-json-');
   const homeDir = mkTemp('doctor-cli-json-home-');

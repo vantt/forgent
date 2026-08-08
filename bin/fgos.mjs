@@ -3890,7 +3890,13 @@ async function runVerb(verb, flags, positional, dir) {
     // ensures the shared config file (`.fgos/config.json`) exists and has
     // every current default key from EVERY registered `registerConfigDefault`
     // entry, via `ensureSharedConfigDefaults` (the one write path allowed
-    // here; `doctor`, unlike `setup`, never calls it).
+    // here; `doctor`, unlike `setup`, never calls it). tsk-1ri: also ensures
+    // the GLOBAL config file (`~/.fgos/config.json`) the same way —
+    // `ensureSharedConfigDefaults` is already generic over its `dir`
+    // argument (`sharedConfigFilePath(os.homedir())` resolves to the exact
+    // same path `src/config/global-config.mjs`'s `defaultGlobalConfigPath()`
+    // uses), so this reuses it as-is rather than adding a parallel
+    // global-specific writer.
     case 'setup': {
       const repoRoot = process.cwd();
       const scriptPath = integrationScriptPath();
@@ -3917,6 +3923,9 @@ async function runVerb(verb, flags, positional, dir) {
       const configPath = sharedConfigFilePath(repoRoot);
       const configExisted = fs.existsSync(configPath);
       const { addedKeys } = ensureSharedConfigDefaults(repoRoot);
+      const globalConfigPath = sharedConfigFilePath(os.homedir());
+      const globalConfigExisted = fs.existsSync(globalConfigPath);
+      const { addedKeys: globalAddedKeys } = ensureSharedConfigDefaults(os.homedir());
       // str65-6/str88: wires core.hooksPath the same way `npm run setup:hooks`
       // does — a second, non-npm-lifecycle-dependent activation path for the
       // main-checkout lock hook, since pnpm 10+ blocks `prepare` for a
@@ -3940,6 +3949,9 @@ async function runVerb(verb, flags, positional, dir) {
         configPath,
         configCreated: !configExisted,
         configAddedKeys: configExisted ? addedKeys : [],
+        globalConfigPath,
+        globalConfigCreated: !globalConfigExisted,
+        globalConfigAddedKeys: globalConfigExisted ? globalAddedKeys : [],
         hooksWired,
         hooksSkippedExisting,
         fixed,

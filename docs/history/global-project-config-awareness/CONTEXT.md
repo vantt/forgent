@@ -1,11 +1,19 @@
 # CONTEXT: fgOS awareness hai cấp cài đặt global vs project (+ context thứ 3: dev-checkout self-hosting)
 
-**Item:** tsk-2ta
-**Trạng thái:** D1 core + D1's doctor check + D2 đã thi công và merge
-(`tsk-2ta-1`, `tsk-2ta-2`, `tsk-2ta-3`, xem §"Kết quả thi công thật" bên
-dưới). D1 amended (di dời `.fgos-runner.json` → `.fgos/config.json`) và
-wiring vào runtime thật (`src/runner/dispatch.mjs`) **chưa** thi công — gap
-thật, xem §"Chưa làm — khác Outstanding cũ".
+**Item:** tsk-2ta (+ tsk-1ri, `fgos setup` global-init follow-up)
+**Trạng thái (cập nhật 2026-08-08, tsk-1ri):** Toàn bộ D1/D1-amended/D2 đã
+thi công và merge — **§"Chưa làm" bên dưới đã lỗi thời, để nguyên làm dấu
+vết lịch sử, không xoá.** Thực tế xác nhận bằng đọc code trực tiếp: D1
+amended (di dời `.fgos-runner.json` → `.fgos/config.json`) đã xong —
+`src/config/shared-config-file.mjs`'s `sharedConfigFilePath` là nguồn DUY
+NHẤT, không còn đọc file cũ nào. Wiring runtime thật cũng đã xong —
+`src/runner/dispatch.mjs:288,342`'s `loadRunnerConfigFromDir`/
+`ensureRunnerConfigForDir` gọi `mergeWithGlobalConfig` trước khi validate,
+đây là đường THẬT mọi `fgos`/`fgos-runner` chạy qua, không chỉ chẩn đoán.
+`tsk-1ri` đóng nốt gap thật duy nhất còn sót của Outstanding cũ bên dưới:
+`fgos setup` giờ cũng init `~/.fgos/config.json` (không chỉ `doctor` đọc
+read-only) — xem `docs/history/fgos-setup-global-config-init/CONTEXT.md`
+D1/D2.
 **Nguồn:** docs/distribution-vision.md §2 trụ cột 6, §3, §5 câu hỏi mở 2 + 2b
 
 ## Feature boundary
@@ -105,32 +113,32 @@ cho doctor checks/config defaults (trụ cột 4, §5-Q1) — thuộc `tsk-2cs`,
   `docs/explanation/shell-fallback-detection-needs-type-p-not-command-v.md`).
   3 test case mới thêm vào case thứ 3 D2 nhắc ở Scout evidence.
 
-## Chưa làm — khác Outstanding cũ, đây là gap thật đã xác nhận
+## Chưa làm (LỊCH SỬ — đã xong, xem đầu file) — khác Outstanding cũ
 
-- **D1 amended (di dời `.fgos-runner.json` → `.fgos/config.json`) chưa thi
-  công.** Không con nào trong 4 con `fgos decompose` tự tách (`tsk-2ta-1..4`)
-  có việc này trong footprint — `tsk-2ta-1` chỉ thêm module đọc **global**,
-  không đổi vị trí file **project**. Project config hôm nay vẫn nằm ở
-  `.fgos-runner.json` tại cwd gốc, chưa dời vào `.fgos/`.
-- **Global config chưa được wire vào runtime thật.** `src/runner/dispatch.mjs`'s
-  `ensureRunnerConfig`/`loadRunnerConfig` — đường mà `fgos`/`fgos-runner`
-  thật sự chạy qua — vẫn chỉ đọc `.fgos-runner.json`, chưa gọi
-  `mergeWithGlobalConfig`. `~/.fgos/config.json` hiện đọc được (qua
-  `describeConfigAwareness`, hiển thị trong `fgos doctor`) nhưng **không ảnh
-  hưởng hành vi thật** của `fgos`/`fgos-runner` khi chạy — chỉ có tác dụng
-  chẩn đoán, chưa có tác dụng vận hành. Đã ghi rõ trong commit message
-  `tsk-2ta-1` (`feat: add global config read+merge primitive`) lúc thi công,
-  nhắc lại ở đây để không mất khi đọc riêng CONTEXT.md.
-- Hai gap trên là việc thật còn lại của trụ cột 6 (global/project không xung
-  đột) — hiện tại global chỉ "nhìn thấy được" (visible), chưa "có hiệu lực"
-  (effective). Cần item mới nếu muốn đóng nốt (ngoài phạm vi `tsk-2ta` bốn
-  con hiện tại).
+**Cập nhật 2026-08-08 (tsk-1ri):** cả hai gap dưới đây đã được thi công từ
+trước khi `tsk-1ri` bắt đầu — mục này giữ nguyên làm dấu vết lịch sử
+(snapshot lúc viết), không mô tả trạng thái hiện tại. Xem đầu file (§
+Trạng thái) cho tình trạng thật.
 
-## Outstanding cũ — vẫn còn treo, chưa ai quyết khi thi công
+- ~~**D1 amended (di dời `.fgos-runner.json` → `.fgos/config.json`) chưa thi
+  công.**~~ Đã xong — `src/config/shared-config-file.mjs`'s
+  `sharedConfigFilePath` là nguồn duy nhất hôm nay, `.fgos-runner.json` chỉ
+  còn sót trong một fixture test không liên quan
+  (`test/intake/decompose.test.mjs`), không còn cơ chế đọc file cũ nào.
+- ~~**Global config chưa được wire vào runtime thật.**~~ Đã xong —
+  `src/runner/dispatch.mjs:288,342`'s `loadRunnerConfigFromDir`/
+  `ensureRunnerConfigForDir` gọi `mergeWithGlobalConfig` trước khi validate
+  `runner` — đường thật mọi `fgos`/`fgos-runner` chạy qua, có hiệu lực vận
+  hành, không chỉ chẩn đoán.
 
-- Có cần `fgos setup` cũng ghi/khởi tạo `~/.fgos/config.json` hay chỉ `doctor` đọc
-  read-only — chưa quyết, vì runtime wiring (mục trên) còn chưa có nên câu hỏi
-  này chưa tới lượt.
-- Đường migrate cụ thể cho ai đã có `.fgos-runner.json` cũ khi D1 amended thi
-  công thật (auto-migrate lúc `fgos setup` chạy, hay đọc file cũ làm fallback)
-  — chưa tới lượt vì D1 amended tự nó chưa thi công.
+## Outstanding cũ — đã trả lời (tsk-1ri)
+
+- ~~Có cần `fgos setup` cũng ghi/khởi tạo `~/.fgos/config.json` hay chỉ
+  `doctor` đọc read-only?~~ **Trả lời: có** — xem
+  `docs/history/fgos-setup-global-config-init/CONTEXT.md` D1 (ghi full
+  default shape, giống hệt project) và D2 (mọi lần `fgos setup` chạy,
+  không cần cờ riêng). Đã thi công (`bin/fgos.mjs`'s `setup` case).
+- Đường migrate cụ thể cho ai đã có `.fgos-runner.json` cũ — **đã moot**,
+  không còn cơ chế đọc file cũ nào để migrate từ (xem mục trên). Không có
+  ai thật sự cần migrate vì fallback đã bị xoá hẳn từ `tsk-5hv` D1 thay vì
+  giữ lại đường đọc cũ.
