@@ -382,7 +382,18 @@ hành, **giả định mặc định phải là đo thiếu kênh**, không ph�
 | **D2** | **Sửa ở tầng skill/prompt là không đủ — phải chạm lược đồ `gates[id]`.** Mọi con số lớn đều truy về lược đồ: R9→S1, R2→S6, R3→S10, R8→S5. Prose đã không ép được suốt 152 lần. | 5 (nêu V2, không bị sửa ở V3/V4/V5) | ✅ seq 9744 |
 | **D3** | **Launcher là orchestrator cơ học không-soul** — thi hành lời khuyên của verb đọc (`ready`/`schedule`/`conflicts`/`triage`/`graph`), không tự phán, và **không tự giữ trạng thái "ai đang chạy"** (đọc `sessions.json`/`runner.lock`/`main-checkout.lock`/event log). Tự phán hoặc tự cache = nguồn sự thật thứ hai, đúng loại lỗi đã gây bug production với herdr `agent_status`. | 5 (nêu V4, người chủ sản phẩm khẳng định lại V5) | ✅ seq 9745 |
 
-| **D4** | **Gánh nặng yes/no nằm chủ yếu ở kênh `work.gate-approve` (ba cổng skill), không phải `gates[id].ask`.** Sau khi gỡ judge: 48 gate-approve vs 6 ask — gấp 8 lần. Ba cổng này là yes/no **theo cấu trúc**, nên hướng đi là ***hỏi ít hơn*** (sửa bypass), không phải *hỏi cho tốt hơn*. | 7 (đo trực tiếp, người chủ sản phẩm nêu từ cảm nhận vận hành) | ✅ seq 9759 |
+| **D4** | **Gánh nặng yes/no nằm chủ yếu ở kênh `work.gate-approve` (ba cổng skill), không phải `gates[id].ask`.** Sau khi gỡ judge: 48 gate-approve vs 6 ask — gấp 8 lần. Ba cổng này là yes/no **theo cấu trúc**, nên hướng đi là ***hỏi ít hơn*** (sửa bypass), không phải *hỏi cho tốt hơn*. | 7 (đo trực tiếp, người chủ sản phẩm nêu từ cảm nhận vận hành) | ✅ seq **9771** (`tsk-539`) |
+
+> **Sự cố ghi nhận, vòng 8 — đúng thứ §4 sinh ra để chặn.** Lần ghi D4 đầu tiên **không vào được
+> event log**. Lệnh `fgos decision` in ra `seq 9759`, nhưng đọc ngược thì seq đó thuộc về
+> `decompose verdict` của `tsk-1ri` — một session khác. Ghi thất bại đúng lúc main-checkout lock
+> đang bị session khác giữ (cùng thời điểm commit vòng 7 bị guard chặn). Suốt ~2 giờ, D4 chỉ tồn
+> tại trong prose; `fgos show tsk-539` báo **0 decisions**.
+>
+> Phát hiện được nhờ kiểm tra thật thay vì tin trí nhớ. Bài học vận hành, đúng tinh thần luật của
+> §4 (*"machine-readable safety net… independent of anyone re-reading the prose correctly"*):
+> **không tin echo của lệnh ghi — đọc ngược để xác minh.** Trong checkout dùng chung, `seq` in ra
+> có thể thuộc về writer khác.
 
 **Ứng viên D-ID cho vòng 8** (chưa đứng đủ vững):
 
