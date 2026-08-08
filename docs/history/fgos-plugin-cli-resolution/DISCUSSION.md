@@ -17,9 +17,19 @@ self-locate (không chỉ "chưa đủ bằng chứng" như round 2 kết luận
 một nội dung file chạy cả hai nơi). Hướng còn lại: quay về D3 đã khoá ở
 `tsk-1no` (PATH-fallback, mirror `scripts/fgos-shell-integration.sh`).
 
-`tsk-1ri` thu hẹp phạm vi còn lại đúng như đã dự kiến ở round 2: chỉ còn
-câu hỏi pillar 6 "global/project/dev-checkout priority" (vấn đề #5 ở §3),
-chưa bắt đầu round nào cho nó.
+Round 4 xong, **D2 đã khoá**: hoá ra pillar 6 (câu hỏi #5 ở §3) đã được
+code + wire vào runtime thật từ trước (`tsk-2ta` cũ) — round-1 scout ban
+đầu của discussion này (trước cả khi mở DISCUSSION.md) kết luận sai "chưa
+có tầng global config nào" vì chỉ grep 2 file (`config-merge.mjs`,
+`shell-rc.mjs`), bỏ sót hẳn `src/config/global-config.mjs`. Đọc trực tiếp
+`src/config/global-config.mjs` + `src/runner/dispatch.mjs:288,342` xác
+nhận: global config đọc được, merge project-thắng-global có hiệu lực vận
+hành thật (không chỉ chẩn đoán), có doctor check, có test thật. `tsk-1ri`
+giờ đóng hẳn discussion, thu hẹp còn đúng 1 gap cụ thể còn sót lại —
+`fgos setup` không init `~/.fgos/config.json` — cộng việc sửa
+`docs/history/global-project-config-awareness/CONTEXT.md` đang stale.
+Không còn câu hỏi kiến trúc mở nào — sẵn sàng giao `fgos-exploring`/
+`fgos-planning`.
 
 Item nền `tsk-1no` (fix hẹp 23 file, PATH-fallback) đang đứng chờ approve
 gate riêng, độc lập với discussion này — không bị ảnh hưởng bởi kết luận
@@ -46,7 +56,7 @@ forgent dev-checkout (tự dogfood) — không xung đột, theo đúng pillar 6
 | 2 | **Rõ** | `claude plugin marketplace add <github-repo>` clone toàn bộ source repo (xác nhận thật bằng cách đọc `~/.claude/plugins/marketplaces/caveman/` trên máy dev — có `bin/`, `.git/`, toàn bộ cây, không chỉ phần plugin khai báo) |
 | 3 | **Rõ (round 2)** | `${CLAUDE_PLUGIN_ROOT}` KHÔNG an toàn dùng trong skill prose — spike thật (§5 round 2) cho thấy nó âm thầm xoá cả block chứa nó thay vì substitute hay báo lỗi. Loại bỏ hướng marketplace-self-locate qua token này. |
 | 4 | Đã loại bỏ cùng #3 | *(không còn áp dụng — không đi hướng này nữa)* |
-| 5 | **Chưa rõ** | Cơ chế "project ghi đè global" (pillar 6) — hiện KHÔNG có tầng global config nào tồn tại trong code (`src/setup/config-merge.mjs` chỉ merge fill-missing-only cho MỘT file `.fgos/config.json` per-project, không đọc `~/.fgos/config.json` hay biến môi trường global nào). `docs/coexistence.md` là doctrine khác (fgOS chạy cạnh MỘT HARNESS KHÁC trong cùng project, không phải fgOS-vs-fgOS giữa nhiều cấp cài đặt) |
+| 5 | **Rõ (round 4) — đính chính round 1** | Cơ chế "project ghi đè global" (pillar 6) **đã có, đã wire vào runtime thật** — `src/config/global-config.mjs` + `src/runner/dispatch.mjs:288,342`. Kết luận round 1 ("chưa có tầng global config nào") SAI, do scout thiếu (chỉ đọc `src/setup/config-merge.mjs`/`shell-rc.mjs`, bỏ sót `src/config/`). Gap thật còn lại chỉ có 1: `fgos setup` không init `~/.fgos/config.json` (chỉ `doctor` đọc). |
 | 6 | **Rõ (round 2)** | Không còn câu hỏi "thay thế hay ưu tiên trước" — PATH-fallback (D3, tsk-1no) là hướng duy nhất còn lại cho phần "skill tự locate CLI" |
 
 ## 4. Quyết định đã chốt
@@ -54,6 +64,7 @@ forgent dev-checkout (tự dogfood) — không xung đột, theo đúng pillar 6
 | ID | Quyết định |
 |----|---|
 | D1 | Token `${VAR}`/`$VAR` trần (không có cú pháp bash default-expansion `:+`) không có giá trị resolve được sẽ làm harness **im lặng xoá cả step đánh số chứa nó** khỏi bản render skill prose — không đặc thù riêng namespace `CLAUDE_PLUGIN_*`, áp dụng cho BẤT KỲ token trần nào. Cú pháp `${VAR:+default}` (như `FGOS_NESTED_PREFIX` đang dùng) KHÔNG bị ảnh hưởng — để nguyên literal. Kết luận: loại bỏ hẳn `${CLAUDE_PLUGIN_ROOT}`/`${CLAUDE_PLUGIN_DATA}` khỏi mọi thiết kế cho plugin skill prose — không phải "chưa đủ chứng cứ" mà là "chủ động không an toàn", vì cùng một nội dung file chạy trên cả kiểu cài `directory` (dev, đã test trực tiếp) lẫn `github` (case herdr-gateway thật) — một token an toàn ở nơi này nhưng xoá nội dung im lặng ở nơi kia là một cái bẫy không chấp nhận được, bất kể hành vi thật trên `github`-source ra sao. |
+| D2 | Pillar 6 (global/project/dev-checkout coexistence, `docs/distribution-vision.md` §2 trụ cột 6) đã code xong và có hiệu lực vận hành thật — không phải gap cần thiết kế. Bằng chứng: `src/config/global-config.mjs` (`loadGlobalConfig`/`mergeWithGlobalConfig`/`describeConfigAwareness`, test thật `test/config/global-config.test.mjs`), wire thật vào `src/runner/dispatch.mjs`'s `loadRunnerConfigFromDir`/`ensureRunnerConfigForDir` (đường mọi `fgos`/`fgos-runner` chạy qua), doctor check `config-awareness`, và `scripts/fgos-shell-integration.sh`'s D2 fallback (đã fix). `tsk-1ri` thu hẹp còn đúng 1 gap cụ thể: `fgos setup` chưa init `~/.fgos/config.json` (chỉ `doctor` đọc, không ai ghi/khởi tạo) — cộng sửa `docs/history/global-project-config-awareness/CONTEXT.md` đang stale (mục "Chưa làm" của nó nói sai, việc đã xong). Loại bỏ nốt 2 "Outstanding cũ" cũ của CONTEXT.md đó khỏi phạm vi thật: migrate `.fgos-runner.json` cũ đã moot (fallback bị xoá hẳn từ tsk-5hv D1, không còn cơ chế đọc file cũ nào để migrate). |
 
 ## 5. Q&A log
 
@@ -204,6 +215,45 @@ thật (nếu có) không thể đổi kết luận này, vì bản thân `direc
 giải file, độc lập với nguồn cài. Hướng duy nhất còn lại là D3 (tsk-1no,
 PATH-fallback).
 
+**[2026-08-08 07:38] Round 4 (session):**
+Mở round 4 cho vấn đề #5 (pillar 6). Trước khi đặt câu hỏi mới, scout lại
+theo đúng kỷ luật "scout trước khi hỏi" — đọc `src/setup/registrations.mjs`
+để tìm danh sách doctor check đầy đủ, phát hiện check `config-awareness`
+(dòng 432-436) đã tồn tại, dẫn tới đọc `src/config/global-config.mjs` và
+`docs/history/global-project-config-awareness/CONTEXT.md` (tsk-2ta).
+
+Phát hiện: kết luận round-1 của chính discussion này ("không có tầng
+global config nào") **sai** — chỉ grep `src/setup/config-merge.mjs` +
+`src/setup/shell-rc.mjs`, bỏ sót hẳn thư mục `src/config/`. Đọc trực tiếp
+(không qua GitNexus — index đang stale, tsk-1lg) xác nhận:
+- `src/config/global-config.mjs` — `loadGlobalConfig` (đọc
+  `~/.fgos/config.json`, thiếu file không lỗi), `mergeWithGlobalConfig`
+  (tái dùng `mergeConfigDefaults` có sẵn, project thắng theo key),
+  `describeConfigAwareness` (báo bản nào đang active).
+- `src/runner/dispatch.mjs:288` (`loadRunnerConfigFromDir`) và `:342`
+  (`ensureRunnerConfigForDir`) — cả hai đều gọi `mergeWithGlobalConfig`
+  TRƯỚC khi validate config `runner` — đây là đường THẬT mọi lệnh
+  `fgos`/`fgos-runner` chạy qua (không phải nhánh phụ). GitNexus (dù index
+  stale về mặt lịch sử commit) cũng xác nhận đúng caller graph này khi
+  được hỏi, khớp với đọc code trực tiếp.
+- Project config đã dời hẳn sang `.fgos/config.json` từ trước (không còn
+  `.fgos-runner.json` nào được đọc thật trong code sản phẩm — chỉ còn sót
+  trong một fixture test không liên quan, `test/intake/decompose.test.mjs`).
+- `scripts/fgos-shell-integration.sh` đã có fallback D2 (`command fgos`)
+  từ trước — không phải gap.
+
+Gap thật DUY NHẤT còn sót lại: `rg "GLOBAL_CONFIG_PATH|defaultGlobalConfigPath|~/.fgos"
+bin/fgos.mjs src/setup/*.mjs` → **không có kết quả nào** — `fgos setup`
+không hề ghi/khởi tạo `~/.fgos/config.json`, chỉ `doctor` đọc read-only.
+Người dùng muốn có global config phải tự tay tạo file, không được hướng
+dẫn hay tự động hoá.
+
+Trình bày phát hiện này cho người trước khi hỏi tiếp (đúng D6). Hỏi
+người: đóng hẳn tsk-1ri (mục tiêu herdr-gateway đã đạt qua tsk-1no rồi),
+hay thu hẹp còn đúng gap setup-init + sửa doc stale, hay vẫn muốn đào sâu
+thêm góc nào khác của pillar 6. **Người chọn: thu hẹp về đúng gap +
+doc-refresh, đóng discussion, giao fgos-exploring/fgos-planning.**
+
 ## 6. Thiết kế đã chốt {#design}
 
 **Kết luận cho phần "skill tự locate CLI thật ở đâu":** giải quyết xong,
@@ -230,18 +280,65 @@ flowchart TD
     style F fill:#1a3a4d,stroke:#2980b9,color:#fff
 ```
 
-**Phạm vi còn lại của `tsk-1ri`, sau khi §3 vấn đề #1-4/#6 đã đóng bởi D1:**
-chỉ còn duy nhất vấn đề #5 — pillar 6 "global/project/dev-checkout
-priority" (không có tầng global config nào tồn tại trong code hôm nay,
-`src/setup/config-merge.mjs` chỉ merge fill-missing-only cho MỘT file
-per-project). Chưa mở round nào cho phần này — round 4 trở đi sẽ đi vào
-đây khi người sẵn sàng tiếp tục.
+**Kết luận cho phần "global/project/dev-checkout priority" (pillar 6):**
+đã code xong từ trước (`tsk-2ta`), có hiệu lực vận hành thật, không phải
+gap cần thiết kế mới. `tsk-1ri` không còn giữ vai trò "thiết kế pillar 6"
+như tên gốc — thu hẹp thành một việc cụ thể, nhỏ, đã đủ hình dạng để giao
+thẳng thực thi, không cần thảo luận mở thêm:
+
+```mermaid
+flowchart LR
+    subgraph "Đã có (tsk-2ta, xong)"
+        G["~/.fgos/config.json\n(global, optional)"] -->|"mergeWithGlobalConfig\nproject thắng theo key"| M["Config hiệu lực thật"]
+        P["project .fgos/config.json"] --> M
+        M --> R["dispatch.mjs:\nloadRunnerConfigFromDir\nensureRunnerConfigForDir"]
+        M -.->|"báo trạng thái"| DC["doctor check\nconfig-awareness"]
+    end
+    subgraph "Gap còn lại (tsk-1ri)"
+        S["fgos setup"] -.->|"KHÔNG init"| G
+        S -->|"cần thêm"| INIT["init ~/.fgos/config.json\nkhi chưa có"]
+    end
+
+    style INIT fill:#5a4a1a,stroke:#c9971c,color:#fff
+    style S fill:#1a3a4d,stroke:#2980b9,color:#fff
+```
+
+Hai phần việc gộp trong cùng 1 task (§7): (1) `fgos setup` init
+`~/.fgos/config.json` khi chưa tồn tại (cùng discipline "chỉ ghi field
+còn thiếu, không đè field đã có" mà `mergeConfigDefaults`/`fgos setup`
+project-local đã dùng — tái dùng nguyên xi, không viết logic mới); (2) sửa
+`docs/history/global-project-config-awareness/CONTEXT.md`'s mục "Chưa
+làm" cho khớp thực tế (wiring đã xong), đồng thời xoá 2 "Outstanding cũ"
+đã moot (migrate `.fgos-runner.json` — không còn cơ chế đọc file cũ nào để
+migrate từ).
 
 ## 7. Danh mục hạng mục / task
 
-*(chưa có — §6 mới giải quyết một nhánh (CLI-resolution, giao lại cho
-tsk-1no), nhánh còn lại (pillar 6 priority) chưa đủ hình dạng cụ thể để
-tách task)*
+### {#task-setup-init-global-config}
+
+**Mục tiêu:** `fgos setup` tự init `~/.fgos/config.json` khi file này chưa
+tồn tại (giữ nguyên nếu đã có, không đè field người dùng đã tự chỉnh) —
+đóng nốt gap duy nhất còn lại của pillar 6, cộng cập nhật
+`docs/history/global-project-config-awareness/CONTEXT.md` cho khớp trạng
+thái thật.
+
+**Trích §6:** xem sơ đồ trên — nhánh "Gap còn lại (tsk-1ri)".
+
+**D-ID áp dụng:** D2.
+
+**Quan hệ với task khác:** không có sibling task — thiết kế 1 mảnh, 1 mục
+`§7` duy nhất (D5, `fgos-coding-shaping`'s own rule). Không phụ thuộc/liên
+quan `tsk-1no` (D1-D3, khác file khác lớp — CLI path resolution vs config
+init).
+
+**Draft verify:**
+```
+npm test && node bin/fgos.mjs setup --dir <tmp-empty-project> && test -f ~/.fgos/config.json
+```
+(chính xác hoá path/cách test global config không đụng máy thật khi
+`fgos-planning` thi công — cần cô lập `HOME`/`os.homedir()` giống cách
+`test/config/global-config.test.mjs` đã làm, không chạy trực tiếp lên
+`~/.fgos/config.json` thật của máy dev).
 
 ## 7. Danh mục hạng mục / task
 
