@@ -54,6 +54,22 @@ verdict; it never guesses past a gap.
   for exactly this — contracted dispatch, never an unscoped Task call). A
   single-branch question, or branches that depend on each other's result,
   stay inline and sequential — no dispatch at all.
+- **Announce every branch before dispatching it.** This skill always runs
+  in-session with live Task access, so a fan-out dispatch is always
+  `native` — no config check, no `<CAPACITY_ID>` lookup, this is not a
+  registered capacity. Print one line per branch, same shape
+  `_shared/capacity-dispatch-fallback.md`'s own Step B.5/C.3 already use
+  for observability parity across every dispatch path in the repo:
+
+  ```
+  <packet id> - native - <agentType> - <model>
+  ```
+
+  where `<agentType>` is whichever Agent type this dispatch actually uses
+  for that branch and `<model>` is whichever model that call resolves to
+  (an explicit override, or the current session's own model when none is
+  given) — this skill never pins a fixed agent type/model itself, the
+  announce line reports whatever was actually chosen for that branch.
 - **Record every round durably, never silently (D5).** Append findings to
   `docs/history/<feature>/RESEARCH.md` — **accumulate, never overwrite** an
   earlier round. Each call gets its own dated section: what was asked, what
@@ -117,6 +133,7 @@ verdict; it never guesses past a gap.
   findings from the record
 - an ad hoc Task dispatch with no stated goal, inputs, boundary, expected
   shape, and return contract
+- dispatching a branch without printing its announce line first
 - proposing architecture, writing code, or making a product decision
   instead of returning a finding for the caller to act on
 - treating a research verdict as if it overrides a person's own answer
