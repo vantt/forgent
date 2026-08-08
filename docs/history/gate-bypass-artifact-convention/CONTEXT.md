@@ -35,7 +35,22 @@ an intentional, already-decided design (D2/D4,
 |----|----------|
 | D1 | The `## Outstanding questions` heading stays literal English, unchanged, in both `CONTEXT.md` and `plan.md` — never translated or reworded. `hasOpenItems`'s regex is fixed (out of this item's scope to edit) and already the dominant convention: 128/197 existing `CONTEXT.md` files match it exactly, including `docs/history/gate-bypass/CONTEXT.md` itself (the mechanism's own decision doc). The one near-miss found in scout (`docs/history/context-md-enforcement-scope/CONTEXT.md:83`, `## Outstanding, deferred to a follow-up item`) is a pre-existing outlier that never matched the regex either — left untouched, not this item's footprint. |
 | D2 | `plan.md` follows the identical section shape as `CONTEXT.md`: a trailing `## Outstanding questions` heading (nothing appended on that line) with body `None` when nothing is outstanding, or a list of real open items otherwise. `hasOpenItems` is the same generic function applied to whichever artifact text is passed — there is no separate convention to invent for `plan.md`. Only 1/189 `plan.md` files match today (`docs/history/gate-approve-vs-movenext-semantics/plan.md`); the near-miss `docs/history/tsk-49a-runner-claim-race/plan.md` uses `## Outstanding questions carried to fgos-validating`, which fails the regex's end-of-line anchor — direct proof the heading must be literal, not merely "start with the phrase." In the common case this section reads `None` in `plan.md`, since `fgos-planning`'s own step 6 (Mid-planning `CONTEXT.md` gap) already routes any newly-discovered *material* question back into `CONTEXT.md`'s decision log before `plan.md`'s own gate is reached; only non-material, un-Assumption-worthy leftovers would ever populate this section with real content. |
-| D3 | Tighten the item's `verify` field to match `docs/how-to/write-verify-for-a-skill-prose-change.md`'s required shape (`npm test && POSITIVE && NEGATIVE`), since this item edits `.claude/skills/**/SKILL.md` paths: `npm test` (full suite — the glob `test/**/*.test.mjs` already includes `test/state/gate-bypass.test.mjs`, so the item's original narrower `node --test test/state/gate-bypass.test.mjs` added nothing `npm test` doesn't already cover, and `npm test` is this repo's standard DoD proof per `AGENTS.md`) `&&` a heading-anchored grep in each `SKILL.md` (`grep -q "^## Outstanding questions"`, tighter than a bare phrase per the how-to's trap #5 — a bare `"Outstanding questions"` match could theoretically hit incidental prose, not just a real section heading) `&&` a NEGATIVE proving `src/state/gate-bypass.mjs` itself was never touched by this item's diff — a mechanical, verifiable enforcement of this item's own "never loosen `hasOpenItems`" constraint, not just a stated intent. |
+| D3 | Tighten the item's `verify` field to match `docs/how-to/write-verify-for-a-skill-prose-change.md`'s required shape (`npm test && POSITIVE && NEGATIVE`), since this item edits `.claude/skills/**/SKILL.md` paths: `npm test` (full suite — the glob `test/**/*.test.mjs` already includes `test/state/gate-bypass.test.mjs`, so the item's original narrower `node --test test/state/gate-bypass.test.mjs` added nothing `npm test` doesn't already cover, and `npm test` is this repo's standard DoD proof per `AGENTS.md`) `&&` a heading-anchored grep in each `SKILL.md` `&&` a NEGATIVE proving `src/state/gate-bypass.mjs` itself was never touched by this item's diff — a mechanical, verifiable enforcement of this item's own "never loosen `hasOpenItems`" constraint, not just a stated intent. |
+
+**Implementation-time correction to D3:** the heading-anchored grep first
+written as `grep -q "^## Outstanding questions"` only matches a heading at
+true column 0. The instruction each `SKILL.md` needed to carry a literal
+example of the heading to stay unambiguous (trap #5), and that example is
+naturally indented inside a numbered-list code block (3 spaces, matching
+this repo's own list-continuation style) — so the real line in each
+`SKILL.md` reads `   ## Outstanding questions`, which the original anchor
+never matched. Corrected to `grep -Eq "^[[:space:]]*## Outstanding
+questions[[:space:]]*$"` — still a heading-shaped-line-only match (trap #5
+still honored: a bare, unanchored `"Outstanding questions"` substring check
+would have been weaker), just tolerant of leading indentation. This does
+not touch `hasOpenItems` itself or D1/D2 — `hasOpenItems`'s own regex reads
+`CONTEXT.md`/`plan.md` at column 0 (a real top-level artifact section,
+never inside a numbered list), so it was never affected by this bug.
 
 ## Pinned terms
 

@@ -84,10 +84,12 @@ the item's own declared footprint, nothing more.
 ## Verify
 
 The item's own `verify` field (tightened in `CONTEXT.md` D3, set via
-`fgos edit`):
+`fgos edit`; the anchor was corrected during Implement to tolerate the
+indented heading example each `SKILL.md` now carries — see D3's
+implementation-time correction note):
 
 ```
-npm test && grep -q "^## Outstanding questions" .claude/skills/fgos-exploring/SKILL.md && grep -q "^## Outstanding questions" .claude/skills/fgos-planning/SKILL.md && ! git diff --name-only main...HEAD | grep -q "^src/state/gate-bypass\.mjs$"
+npm test && grep -Eq "^[[:space:]]*## Outstanding questions[[:space:]]*$" .claude/skills/fgos-exploring/SKILL.md && grep -Eq "^[[:space:]]*## Outstanding questions[[:space:]]*$" .claude/skills/fgos-planning/SKILL.md && ! git diff --name-only main...HEAD | grep -q "^src/state/gate-bypass\.mjs$"
 ```
 
 Per `docs/how-to/write-verify-for-a-skill-prose-change.md`: `npm test` is

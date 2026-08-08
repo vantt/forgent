@@ -212,6 +212,24 @@ never moves it.
    and any outstanding questions deferred to planning. Concrete language
    only — no placeholders, no TODOs, no vague preferences.
 
+   End the doc with a section using this exact heading (nothing appended
+   on that line), body `None` when every candidate question was locked or
+   deferred, or a real list of what is still open for `fgos-planning`
+   otherwise:
+
+   ```markdown
+   ## Outstanding questions
+
+   None
+   ```
+
+   This is the section `gate-bypass.mjs`'s `hasOpenItems` reads to decide
+   whether this skill's own Gate below can auto-approve instead of asking a
+   person (`docs/history/gate-bypass-artifact-convention/CONTEXT.md` D1) —
+   a missing or misworded heading, or a body that doesn't start `None`,
+   fails that check closed and forces the question every time, even when
+   nothing is actually outstanding.
+
    Point the claimed item at this doc the same way any item points at its
    own decision record: if the item does not yet carry a `docsRef`, record
    one at creation time —
