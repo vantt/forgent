@@ -8,18 +8,12 @@ timestamp: 2026-08-08T06:55:00.000Z
 
 ## 1. Trạng thái hiện tại
 
-Vừa mở round 1. Một scout mới (§5 round 1) tìm ra một khả năng thiết kế
-chưa từng cân nhắc trong tsk-1no (fix hẹp đã khoá D1-D3, xem
-`docs/history/plugin-skill-cli-path-fallback/CONTEXT.md`): plugin fgOS khi
-cài qua `claude plugin marketplace add vantt/forgent` thực ra kéo về **toàn
-bộ repo forgent** (không chỉ subdirectory `plugins/fgOS/`), nằm tại
-`~/.claude/plugins/marketplaces/fgos-plugins/` — bao gồm cả `bin/fgos.mjs`
-thật, luôn khớp version với skill prose. Nếu skill prose truy cập được thư
-mục cài của chính plugin (`${CLAUDE_PLUGIN_ROOT}`, biến chính thức Claude
-Code), plugin có thể tự trỏ tới CLI thật của chính nó — không cần global
-npm install, không cần PATH fallback, không cần dev-checkout nào cả. Chưa
-xác nhận được cơ chế này có hoạt động cho bash nhúng trong SKILL.md hay
-không — xem câu hỏi round 1 bên dưới.
+Round 2 xong: spike thật đã **loại bỏ** hướng `${CLAUDE_PLUGIN_ROOT}`
+(xem §5 round 2) — không an toàn để dùng trong skill prose, im lặng xoá
+mất cả block chứa nó thay vì báo lỗi hay để nguyên token. Kết luận đề xuất:
+quay lại D3 đã khoá ở `tsk-1no` (PATH-fallback, mirror
+`scripts/fgos-shell-integration.sh`) làm hướng duy nhất — chờ người xác
+nhận trước khi khoá D-ID.
 
 Item nền `tsk-1no` (fix hẹp 23 file, PATH-fallback) đang đứng chờ approve
 gate riêng, độc lập với discussion này — không bị ảnh hưởng bởi hướng
@@ -44,10 +38,10 @@ forgent dev-checkout (tự dogfood) — không xung đột, theo đúng pillar 6
 |---|---|---|
 | 1 | **Rõ** | Plugin fgOS chỉ là UX kích hoạt `/fgOS:*`, không tự ý bundle CLI vào `plugin.json`'s declared content (D1, tsk-1no, chủ sản phẩm đã xác nhận) |
 | 2 | **Rõ** | `claude plugin marketplace add <github-repo>` clone toàn bộ source repo (xác nhận thật bằng cách đọc `~/.claude/plugins/marketplaces/caveman/` trên máy dev — có `bin/`, `.git/`, toàn bộ cây, không chỉ phần plugin khai báo) |
-| 3 | **Chưa rõ** | `${CLAUDE_PLUGIN_ROOT}` (biến chính thức, trỏ tới thư mục cài của chính plugin) có thực sự substitute được trong bash nhúng ở SKILL.md khi Claude chạy qua Bash tool hay không — tài liệu chính thức (Plugins reference § Environment variables) chỉ xác nhận biến này export cho **hook process và MCP/LSP subprocess**, không nói rõ cho skill-embedded bash. Test thật trong phiên này: `env \| grep CLAUDE_PLUGIN` không thấy gì khi đang chạy giữa một plugin skill — nhưng test đó không loại trừ khả năng Claude làm text-substitution trước khi gửi lệnh cho Bash tool (giống cách `${CLAUDE_PROJECT_DIR}` hiện đang hoạt động thật trong 23 file plugin — cơ chế chính xác của biến ĐÓ cũng chưa từng được verify tận gốc, chỉ biết nó chạy được). |
-| 4 | **Chưa rõ** | Nếu #3 đúng (substitute được), path chính xác `${CLAUDE_PLUGIN_ROOT}` trỏ tới là gì — thư mục con `plugins/fgOS/` hay root của cả bản clone repo? Cần đi lên bao nhiêu cấp (`../../bin/fgos.mjs` hay khác) để chạm `bin/fgos.mjs` thật |
+| 3 | **Rõ (round 2)** | `${CLAUDE_PLUGIN_ROOT}` KHÔNG an toàn dùng trong skill prose — spike thật (§5 round 2) cho thấy nó âm thầm xoá cả block chứa nó thay vì substitute hay báo lỗi. Loại bỏ hướng marketplace-self-locate qua token này. |
+| 4 | Đã loại bỏ cùng #3 | *(không còn áp dụng — không đi hướng này nữa)* |
 | 5 | **Chưa rõ** | Cơ chế "project ghi đè global" (pillar 6) — hiện KHÔNG có tầng global config nào tồn tại trong code (`src/setup/config-merge.mjs` chỉ merge fill-missing-only cho MỘT file `.fgos/config.json` per-project, không đọc `~/.fgos/config.json` hay biến môi trường global nào). `docs/coexistence.md` là doctrine khác (fgOS chạy cạnh MỘT HARNESS KHÁC trong cùng project, không phải fgOS-vs-fgOS giữa nhiều cấp cài đặt) |
-| 6 | **Chưa rõ** | Nếu hướng `${CLAUDE_PLUGIN_ROOT}` (marketplace self-locate) đi được, nó có thay thế hoàn toàn PATH-fallback (D3, tsk-1no) hay chỉ là ưu tiên thử trước, PATH-fallback vẫn giữ làm lớp cuối (cho case người dùng KHÔNG qua Claude Code plugin — vd terminal thuần, agy, codex sau này)? |
+| 6 | **Rõ (round 2)** | Không còn câu hỏi "thay thế hay ưu tiên trước" — PATH-fallback (D3, tsk-1no) là hướng duy nhất còn lại cho phần "skill tự locate CLI" |
 
 ## 4. Quyết định đã chốt
 
@@ -103,6 +97,53 @@ Không tận dụng được marketplace-clone dù nó có sẵn.
 (c) **Cả hai** — thử `${CLAUDE_PLUGIN_ROOT}` trước, PATH-fallback (D3) làm
 lớp dự phòng cuối nếu (a) không substitute hoặc người dùng không qua
 Claude Code plugin.
+
+**Người chọn (a).**
+
+**[2026-08-08 07:14] Spike (session, round 2):**
+Test thật trên 2 file plugin skill riêng biệt, mỗi lần dùng skill CHƯA
+từng gọi trong phiên này (Skill tool dedup theo tên skill trong phiên —
+gọi lại cùng tên không re-render file, phải dùng tên mới mỗi lần thử):
+
+- Lần 1 (`plugins/fgOS/skills/ready/SKILL.md`): thêm step số "0." (lệch
+  dãy số 1,2,3 gốc) chứa `echo "SPIKE_PLUGIN_ROOT=[${CLAUDE_PLUGIN_ROOT}]"`.
+  Gọi `/fgOS:ready` → step "0." biến mất hoàn toàn khỏi bản render, nhảy
+  thẳng từ header "## Steps" sang "1. **Ignore...**". Confound: có thể do
+  số thứ tự lệch dãy, không chắc do `CLAUDE_PLUGIN_ROOT`.
+- Lần 2 (`plugins/fgOS/skills/stale/SKILL.md`, chưa gọi lần nào trong
+  phiên): thêm đúng step số "4." (nối tiếp dãy 1,2,3 gốc, không lệch số)
+  cùng nội dung echo `${CLAUDE_PLUGIN_ROOT}`. Gọi `/fgOS:stale` → step "4."
+  **vẫn biến mất hoàn toàn**, dù đúng dãy số liên tục. Cùng bản render đó,
+  `${CLAUDE_PROJECT_DIR}` ở step 2 substitute đúng thành
+  `/home/vantt/projects/forgentX`, `$ARGUMENTS` ở step 1 substitute thành
+  rỗng — hai token khác hoạt động bình thường ngay trong cùng file.
+
+Loại trừ được confound số thứ tự. Kết luận: `${CLAUDE_PLUGIN_ROOT}` là
+token có thật (harness nhận diện, đúng như docs chính thức) nhưng ở kiểu
+cài `"source": "directory"` (dev/local, đúng case máy này — plugin trỏ
+thẳng checkout, không qua clone marketplace thật) không có giá trị thật để
+gán, và thay vì để nguyên token hay báo lỗi, harness **âm thầm xoá cả
+block chứa nó**. Failure mode này tệ hơn bug gốc của tsk-1no (crash rõ
+ràng) — mất instruction hoàn toàn không dấu vết, agent chạy tiếp mà không
+biết thiếu bước.
+
+Cả 2 file spike đã `git checkout --` revert sạch ngay sau test, xác nhận
+`git status --short` trống trên cả hai.
+
+**Giới hạn của kết luận này:** chỉ test được trên kiểu cài
+`"source": "directory"` (máy dev). Chưa test được trên kiểu cài thật
+`"source": "github"` (case herdr-gateway thật sẽ dùng, qua `fgos doctor
+--fix`) — có khả năng (dù không chắc) hành vi khác khi plugin thật sự nằm
+trong `~/.claude/plugins/marketplaces/<name>/` thay vì trỏ thẳng dev
+checkout. Test đó cần một máy/project cài thật qua github source, ngoài
+tầm một spike rẻ trong phiên này.
+
+**Đề xuất round 2:** loại bỏ hướng (a)/(c) cho tới khi có bằng chứng khác
+từ một cài đặt github-source thật. Đi theo (b) — giữ nguyên D3 đã khoá ở
+`tsk-1no` (PATH-fallback) làm hướng duy nhất cho câu hỏi "skill tự locate
+CLI thật ở đâu". `tsk-1ri` thu hẹp phạm vi lại đúng như tên: chỉ còn giải
+quyết pillar 6 phần "global/project/dev-checkout priority" (vấn đề #5 ở
+§3), tách biệt khỏi câu hỏi CLI-resolution mà `tsk-1no` đã khoá xong.
 
 ## 6. Thiết kế đã chốt
 
