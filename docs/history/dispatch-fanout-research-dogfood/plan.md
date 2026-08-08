@@ -52,11 +52,19 @@ watching per this item's own request):
 test -f docs/history/dispatch-fanout-research-dogfood/RESEARCH.md
 ```
 
-Risk map: none — no code path touched, no regression surface. Impact-
-analysis capability gate checked (`fgos tool query --capability
+Risk map (regression risk: none — no code path touched. Evidence risk:
+medium on both rows below — this item's entire proof burden IS P1/P2,
+so `fgos-validating`'s feasibility matrix must not skip them):
+
+| Component | How risky | What would prove it |
+|---|---|---|
+| P1 (repo claim) | medium — unproven until read | real `file:line` citations from an actual repo search |
+| P2 (external claim) | medium — unproven until read | a real external source, cited |
+
+Impact-analysis capability gate checked (`fgos tool query --capability
 impact-analysis --status present`): GitNexus present, posture `full` — not
-load-bearing here, there is no blast radius to assess for an
-observation-only item.
+load-bearing here, neither row needs blast-radius evidence, both need
+direct-read/external-source evidence instead.
 
 ## Assumptions
 
