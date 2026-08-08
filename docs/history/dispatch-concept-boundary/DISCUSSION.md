@@ -7,11 +7,17 @@ Item: `tsk-5td`. Liên quan: `tsk-2cw` (đổi `orchestrator`→`launcher`, gi�
 
 ## 1. Trạng thái hiện tại
 
-Vòng 4 (2026-08-08). **D1 và D2 đã mint** — cả hai giữ qua bốn vòng không bị
-lật. Khung §6 vừa **bị sửa ở vòng 4** (bản vòng 3 phát biểu sai), nên chưa
-mint; các điểm khác cũng mới một vòng.
+Vòng 7 (2026-08-08). **D1 và D2 vẫn là hai D-ID duy nhất đã mint** — cả hai
+giữ qua bảy vòng không bị lật, và vòng 6 còn củng cố chúng thêm (xem dưới).
+Mọi thứ vòng 5–7 nêu ra đều **mới một vòng, chưa mint**.
 
-Đường đi ba vòng:
+> ⚠ **§6 chưa gấp vòng 5–7 vào.** Vòng 6 lật cách vòng 5 khung hoá quan hệ
+> capacity↔capability, nhưng chưa D-ID nào rơi, nên §6 giữ nguyên bản vòng 4
+> theo luật "§6 regenerate khi có quyết định đổi hình dạng". Người đọc lại
+> file này: đọc §5 vòng 6–7 **sau** khi đọc §6, và biết rằng phần "phía cung"
+> chưa có trong §6.
+
+Đường đi bảy vòng:
 
 | Vòng | Việc | Kết quả |
 |---|---|---|
@@ -20,10 +26,15 @@ mint; các điểm khác cũng mới một vòng.
 | 3 | Người dùng báo bị lẫn *"đang phân loại cái gì"* ⇒ lùi lại dựng khung high-level | Lộ ra gốc của lộn xộn: **không phải một phân loại**, mà nhiều chiều bị đọc chung; một khối `capacities.<id>` mang câu trả lời cho nhiều chiều cùng lúc. Khung được xác nhận khớp ⇒ thành xương sống §6 |
 | 4 | Người dùng hỏi *"#3 và #4 có trùng nhau không"* | **Lật một phần khung vòng 3.** Code xác nhận `hasNativeMechanism = capacity.kind === 'task'` ⇒ #3 là **dẫn xuất** của #4, không độc lập. Khung sửa thành **bốn chiều khai báo + một kết quả dẫn xuất**. Đổi lại: lý giải được vì sao `EXECUTOR_ADAPTERS` không có key `native`, và vì sao `inline` khó thành giá trị hạng nhất |
 
+| 5 | Kiểm kê lại theo yêu cầu người dùng: phân định `rootTask`/`subTask`/`capacity` và ranh giới với `capability` | Scout lật một phần tiền đề: chồng lấn **không** nằm ở `capability` mà ở `name` — `capability` chỉ được đọc ở 3 chỗ, **không chỗ nào là dispatch**. Khung đề xuất: hai trục (đơn vị việc / capability). Đặt tên trục I |
+| 5b | Người dùng chọn `work-unit` làm tên trục I | Va chạm: 0003 + system-overview đã khoá *"đơn vị việc"* = entity `work`, *"duy nhất"*. Giải bằng cách siết: `work` là giá trị **được lưu** duy nhất trên trục, không phải cả trục |
+| 6 | Người dùng: *"trục 1 và trục 2 overlap; trục 2 là backend của trục 1"* | **Lật khung vòng 5.** Deep-dive tự viết của fgOS mang câu luật gốc (US-027): *"the core consults capabilities, never tools"*. Không phải hai trục — là **một quan hệ, hai phía**: cầu (#2) và cung (#4+#5), `capability` là khớp nối hợp lệ duy nhất. Bốn suy dẫn độc lập hội tụ. Lộ ra 5 điều chỉnh A1–A5, trong đó A2 là khiếm khuyết **sống** |
+| 7 | Người dùng yêu cầu vẽ lại tổng quan theo khung tạm | Kiểm kê đầy đủ cái còn / cái mất / cái hở. Xác nhận: **không chiều nào trong năm chiều bị xoá** — reframe chỉ thêm một cách đọc |
+
 **Điểm quan trọng nhất để một người quay lại đọc:** mọi tranh luận trong phiên
-này chỉ đụng **câu hỏi #2** của khung §6 (*giao cái gì*). Bốn câu còn lại
-không bị phiên này đổi. Trước khi bàn tiếp bất cứ điều gì, nói rõ đang bàn
-câu số mấy.
+này chỉ đụng **câu hỏi #2** của khung §6 (*giao cái gì*) và cách #2 nối sang
+#4/#5. Chiều #1 (`tsk-2cw`) không bị đụng, và không chiều nào bị xoá. Trước khi
+bàn tiếp bất cứ điều gì, nói rõ đang bàn câu số mấy.
 
 ## 2. Mục tiêu & đề bài
 
@@ -63,6 +74,18 @@ không mở lại những quyết định các item khác đã khoá.
 | 11 | `dispatch` giữ nghĩa hẹp hay rộng | **Chưa rõ** | Nếu hẹp thì subsystem cần tên gì |
 | 12 | Nửa native không có module nhà | **Chưa rõ** | Thiếu sót, hay bản chất (native = trong session, không đóng gói được)? |
 | 13 | Tách config khỏi `dispatch.mjs` | **Chưa rõ** | Đã có `src/config/` + `src/setup/config-merge.mjs`. Có thuộc phiên này không? |
+| 14 | Chồng lấn `capacity`/`capability` nằm ở đâu | **Rõ** (vòng 5) | **Không** ở `capability`. `capability` chỉ đọc ở 3 chỗ (`tool-registry.mjs:84` normalize · `command-registry.mjs:934` khai flag · `bin/fgos.mjs:3873` filter của `tool query`) — **không chỗ nào là dispatch**. Khoá nối thật là **`name`**: `dispatch.mjs:604` `if (!tools[capacityId])`, và `tools` keyed theo `name` |
+| 15 | Tên trục phía cầu = `work-unit` | **Đang hội tụ** (vòng 5b, mới một vòng) | Va chạm với `0003:24` (*"Entity đơn vị việc = `work`"*) + `system-overview.md:31` (*"Đơn vị việc DUY NHẤT"*). Giải: 0003 nói về **entity được lưu**, không nói về trục ⇒ `work` là giá trị **được-lưu** duy nhất trên trục. Phải sửa `system-overview:31` một dòng |
+| 16 | Quan hệ cầu↔cung: không phải hai trục | **Đang hội tụ** (vòng 6, mới một vòng) | Một quan hệ hai phía. `capability` = khớp nối hợp lệ duy nhất (US-027, `deep-dives/tool-registry.md:27`). Bốn suy dẫn độc lập hội tụ — xem §5 vòng 6 |
+| 17 | `capacity` mang hai nghĩa (A1) | **Đang hội tụ** (vòng 6) | (a) lớp work-unit (D1/D2) · (b) bản ghi binding `capacities.<id>` mang #4+#5. **Khác tập hợp**: gather của `fgos-researching` là (a) mà không có (b) ⇒ khác khái niệm |
+| 18 | Binding nối bằng `name`, không phải `capability` (A2) | **Rõ, là khiếm khuyết SỐNG** (vòng 6) | Vi phạm đúng luật khiến registry đáng port. Hệ quả đo được: provider thứ hai của cùng capability **không bao giờ** thoả được một capacity. Câu CLAUDE.md tự hứa (*"not the only one this gate can ever recognize"*) đúng với prose, **sai với dispatch** |
+| 19 | #3 phát biểu lại: cung ở trong hay ngoài (A3) | **Đang hội tụ** (vòng 6) | `native` = nhà cung cấp là chính session gọi; `cli-spawn` = tiến trình khác. Bằng chứng: `KINDS` **không có** `task` (`CAPACITY_KINDS = [...KINDS, 'task']`) — `task` là kind duy nhất không đăng ký được, vì không ai đăng ký chính mình |
+| 20 | Presence check gác theo vận chuyển, không theo nhà cung cấp (A4) | **Rõ, latent** (vòng 6) | `dispatch.mjs:603` + `:630` đều gác `kind === 'cli'`. Capacity `mcp`/`skill`/`http`/`binary` dispatch với **zero** presence check và **zero** cross-provider check. Vị từ đúng là `kind !== 'task'` — **đúng vị từ của A3**. Latent: chưa capacity nào thuộc 4 kind đó |
+| 21 | Hai sổ tả cùng backend, không đối chiếu (A5) | **Rõ, latent** (vòng 6) | `capacities.submit-assist-classify` (kind cli, command agy) và `tools.submit-assist-classify` (kind cli, command agy) nối bằng name, **không so khớp**. Lệch thì dispatch dùng bản capacity, probe dùng bản tool |
+| 22 | Phép thử cơ học cho D1 | **Đang hội tụ** (vòng 6) | Chuỗi nhân quả: state effects → cần vòng đời bảo vệ → cần id ổn định gắn vòng đời → **nằm trong event log**. Nên *"có id trong `.fgos/events.jsonl`"* không cạnh tranh với D1 — nó là **đầu quan sát được** của chính D1. Trả lời thẳng yêu cầu "tiêu chí test được" |
+| 23 | `subTask` sau D1/D2 | **Đang hội tụ** (vòng 5) | Vẫn **không** phải lớp riêng — D1 củng cố 0026 (0026 lý giải bằng *cùng vòng đời* = hệ quả; D1 bằng *cùng câu trả lời authority* = nguyên nhân). Nhưng chữ này nói *ai giao* ⇒ thuộc **#1**, là từ **quan hệ** (field `work.parent`, `work.mjs:414`), không phải từ **phân lớp** |
+| 24 | `class: transform` — lớp thứ ba? | **Chưa rõ** | Ứng viên: nhận input, trả **dạng dẫn xuất của chính input**, không đọc state ngoài (khác gather), không áp tiêu chí phán (khác judge). **Chưa tìm ra ca sống nào** — khác gather (0 đăng ký nhưng có ca sống `tsk-o4l`) |
+| 25 | Ô trống có-state-effects / không-authority (B2) | **Chưa rõ, latent** | D1 gộp `authority + state effects` thành MỘT vị từ. exec packet B2 rơi đúng khe giữa. Đang gated (`tsk-2t6` D4/D9, điều kiện (b) chưa thỏa) ⇒ chưa sống. Ngày B2 mở, vị từ D1 phải tách đôi |
 
 ## 4. Quyết định đã chốt
 
@@ -213,6 +236,180 @@ một kết quả dẫn xuất.
 Đổi lại được hai thứ trước nay chỉ ghi nhận mà chưa lý giải: vì sao
 `EXECUTOR_ADAPTERS` không bao giờ có key `native`, và vì sao `inline` khó
 thành "giá trị hạng nhất" (§6, phần Hệ quả).
+
+### Vòng 5 — 2026-08-08
+
+**Người dùng** mở lại đề bài với một bản kiểm kê đầy đủ: phân định dứt điểm
+`rootTask`/`subTask`/`capacity`, làm rõ ranh giới với `capability`, và xếp cả
+ba hệ (fgOS · bee · repository-harness) vào một khung chung. Kèm chẩn đoán:
+vòng trước **trượt** vì đếm lá của cây phân loại rồi kết luận "có 3 lớp:
+rootTask, gather, judge" — làm `capacity` rơi khỏi danh sách.
+
+**Scout lật một phần tiền đề của chính đề bài.** Đề bài nói
+`submit-assist-classify` *"vừa là capacity vừa là tool mang capability trùng
+tên"*. Code nói khác — `capability` chỉ được đọc ở đúng ba chỗ:
+
+- `tool-registry.mjs:84` — normalize lúc register
+- `command-registry.mjs:934` — khai flag
+- `bin/fgos.mjs:3873` — `.filter((tool) => ... tool.capability === normalizedCapability)`
+
+Hết. **Không chỗ nào là dispatch.** Cái `resolveExecutorConfig` join là `name`:
+
+```js
+// dispatch.mjs:604-609
+const tools = listWork(fgosDir).tools ?? {};
+if (!tools[capacityId]) { throw ... }   // keyed theo NAME
+```
+
+Nên `kind:"cli"` capacity **buộc** `capacity id === tool name`. Chuyện tool đó
+cũng mang `capability: "submit-assist-classify"` là **ngẫu nhiên** — đặt
+`capability: "classification"` thì dispatch chạy y hệt.
+
+Ba điểm khác chốt được trong vòng này:
+
+- **Q3 (`subTask`)** — không cần phát biểu lại (§3 hàng 23).
+- **Q4 (discovery vs presence)** — cùng vị trí nghi thức (gác trước effect),
+  **khác mệnh đề**: hn hỏi *"mày có hứa `stories.write.v1` không"* (versioned,
+  xuyên máy); fgOS hỏi *"binary có trên máy này không"* (không version,
+  máy-local — presence nằm ở file gitignored, header `tool-registry.mjs` ghi
+  rõ). Không phải một thứ đội hai tên. Khoảng trống thật: fgOS **không có**
+  cách kiểm lời hứa, chỉ kiểm tồn tại — CLAUDE.md `tsk-j7y` đã tự thú đúng
+  điểm này.
+- **`class` chưa tồn tại trong code** (0 hit) ⇒ §3 hàng 8e vẫn là đề xuất
+  thuần.
+
+**Khung đề xuất (sẽ bị lật ở vòng 6):** hai trục — trục I *đơn vị việc*, trục
+II *capability* — với fgOS là hệ duy nhất mang cả hai.
+
+### Vòng 5b — 2026-08-08, đặt tên trục I
+
+**Người dùng:** *"ok thống nhất gọi trục 1 là work-unit (hay unit of work)?"*
+
+Khái niệm đúng, **chữ đã có chủ**:
+
+```
+docs/decisions/0003-dat-ten-va-bo-cuc-du-lieu.md:24  **Entity đơn vị việc = `work`.**
+docs/specs/system-overview.md:31                     Work item (`work`) | Đơn vị việc DUY NHẤT của forgent
+```
+
+Nếu `capacity` là một giá trị trên trục `work-unit` thì nó thành một
+work-unit — mâu thuẫn với *"duy nhất"*. Giải được bằng cách tách chỗ 0003 thật
+sự nói: 0003 là quyết định **bố cục dữ liệu**, *"entity duy nhất"* nghĩa là
+**entity được lưu** duy nhất. `capacity` không phải entity — nó là config,
+không bao giờ có `work.<id>`.
+
+Ràng buộc "duy nhất" chuyển từ **trục** xuống **một nhánh của trục**: hẹp hơn
+nhưng vẫn đúng nguyên văn. Giá phải trả: sửa `system-overview:31` một dòng.
+
+Một món nợ lộ ra, đằng nào cũng phải trả:
+
+```
+docs/explanation/why-fgos-dispatch-splits-into-gather-packets-and-a-gated-exec-packet.md:64
+  along two orthogonal axes: does this unit of work carry a real ...
+```
+
+Doc này (a) đã dùng *"unit of work"* theo nghĩa rộng ⇒ drift có sẵn, không do
+phiên này tạo ra; và (b) nói **"orthogonal axes"**, thứ D1 đã bác thẳng.
+
+**Người dùng chọn `work-unit`.** Chưa mint — mới một vòng.
+
+### Vòng 6 — 2026-08-08 — LẬT KHUNG VÒNG 5
+
+**Người dùng:** *"tôi thấy trục 1 và trục 2 đều có cái gì đó overlap. tôi thấy
+trục 2 là backend của trục 1."*
+
+Đúng. Và câu luật gốc nằm ngay trong deep-dive **fgOS tự viết lúc port**:
+
+```
+docs/distillery/deep-dives/tool-registry.md:27
+  `--capability` ... Đây là điểm khớp DUY NHẤT giữa 1 bước workflow và 1 tool
+  — bước chỉ tham chiếu capability, KHÔNG BAO GIỜ tham chiếu tên tool cụ thể
+  (US-027 Design Notes: "the core consults capabilities, never tools")
+```
+
+Nên khung vòng 5 sai. **Không phải hai trục song song — là một quan hệ, hai
+phía**, và `capability` chính là chỗ khớp:
+
+| | phía CẦU | phía CUNG |
+|---|---|---|
+| trừu tượng | **#2 work-unit** — `rootTask` · `capacity`{`gather`,`judge`} | **`capability`** |
+| cụ thể | một item / một capacity id | **`tool`** (= provider) |
+| bản ghi buộc hai phía | `capacities.<id>` — mang **#4 + #5** | |
+
+Năm chiều **không đổi**, chỉ đọc lại: #2 là phía cầu; #4+#5 là phía cung.
+Trước nay phía cung chưa bao giờ được đặt tên ⇒ `capability` trông như một
+trục lạc loài.
+
+**Bốn suy dẫn độc lập hội tụ** (lý do tin khung này đúng, không phải khớp ép):
+
+1. `KINDS = [cli, binary, mcp, skill, http]` — **không có `task`**;
+   `CAPACITY_KINDS = [...KINDS, 'task']` (`dispatch.mjs:395`).
+2. hn tách **outbound** (lệnh compiled của chính harness, luôn có) vs
+   **inbound** (tool project tự đăng ký, có thể vắng) — deep-dive dòng 12.
+3. `hasNativeMechanism === (capacity.kind === 'task')` (`dispatch.mjs:688`).
+4. `judge-discovery` (kind task, backend claude) và `submit-assist-classify`
+   (kind cli, backend agy) — **cùng lớp `judge`, khác nhà cung cấp**.
+
+Cả bốn nói cùng một câu: **`task` nghĩa là nhà cung cấp chính là session đang
+gọi** — không đăng ký được vì không ai đăng ký chính mình. Và suy dẫn 4 chứng
+minh **D1/D2 sống nguyên**: hai phía độc lập thật, đổi nhà cung cấp mà lớp
+không đổi.
+
+**3e giải xong.** Không hệ nào có trục riêng — chỉ khác **độ phủ hai phía**:
+bee chỉ đặt tên phía cầu (mọi nhà cung cấp đều ở trong, toàn `task`-kind, nên
+không có phía cung để đặt tên); hn đặt tên cả hai và khớp bằng `capability`
+(story cần capability X → `audit` kiểm có provider present không, US-072);
+fgOS đặt tên cả hai nhưng **nối sai chỗ**.
+
+Năm điều chỉnh đề xuất — chi tiết ở §3 hàng 17–21 (A1 hai nghĩa của
+`capacity` · A2 nối bằng `name` · A3 #3 là trong-hay-ngoài · A4 presence gác
+sai vị từ · A5 hai sổ không đối chiếu). A4 **rơi ra miễn phí** từ A3 (cùng vị
+từ `kind !== 'task'`) — dấu hiệu khung đúng.
+
+Và một phép thử cơ học cho D1 (§3 hàng 22) — trả lời thẳng yêu cầu *"ranh giới
+phát biểu bằng tiêu chí test được"*.
+
+### Vòng 7 — 2026-08-08
+
+**Người dùng:** *"chưa chốt, nhưng nếu tạm đồng ý theo cách này thì vẽ lại
+tổng quan mô hình mấy lớp của chúng ta sẽ còn lại những gì?"*
+
+Kiểm kê đầy đủ theo khung tạm. Kết quả quan trọng nhất: **không chiều nào
+trong năm chiều bị xoá** — reframe chỉ thêm một cách đọc.
+
+Cái **biến mất** là bốn thứ, không cái nào thuộc năm chiều:
+
+| Biến mất | Vì sao |
+|---|---|
+| "trục II" | Không phải trục — là **phía cung** của cùng một quan hệ (vòng 6) |
+| `subTask` như một lớp #2 | Cùng câu trả lời authority với `rootTask` ⇒ cùng nhánh. Nó nói *ai giao* ⇒ thuộc #1 |
+| `native`/`cli-spawn` như "loại đường" | Đường là #4. Chúng đặt tên cho *vị trí nhà cung cấp* |
+| "ba hệ ba trục" (3e) | Khác **độ phủ hai phía**, không khác trục |
+
+(`inline` như giá trị cơ chế đã chết từ vòng 4 — ba tình huống khác nhau, không
+phải một cơ chế.)
+
+**Vòng đời không phải một tầng riêng** — nó treo dưới `rootTask` và chỉ ở đó,
+theo chuỗi nhân quả ở §3 hàng 22. Nhánh `capacity` không có mắt xích nào trong
+chuỗi ⇒ không claim, không worktree, không verify, không merge.
+
+**Sáu chỗ còn hở**, xếp theo sống/latent: A2 **sống**; A4 · A5 · B2 latent;
+`transform` chưa có ca sống; `class` field chưa tồn tại trong code. Bốn chỗ
+đầu **cùng một gốc**: binding chưa được coi là binding, nên chưa ai hỏi *"nhà
+cung cấp này ở trong hay ở ngoài, và nó hứa gì"*. Vá gốc thì A2/A4/A5 rơi ra
+cùng lúc.
+
+**Ba câu đang chờ người dùng trả lời** (nêu cuối vòng 6, chưa có câu trả lời):
+
+1. fgOS có nhận luật US-027 (*"core consults capabilities, never tools"*) làm
+   luật của mình không? Nếu nhận ⇒ A2 thành khiếm khuyết đã biết, phải mở item
+   sửa. (Nghiêng: nhận — fgOS đã dán luật đó vào CLAUDE.md rồi, chỉ là code
+   chưa theo.)
+2. A1 — `capacity` giữ nghĩa lớp work-unit, `capacities.<id>` đọc lại thành
+   binding? Nếu gật thì D1/D2 không cần sửa chữ nào, chỉ thêm một dòng định
+   nghĩa.
+3. A4 thuộc phiên này (chốt **vị từ đúng**) hay tách item (sửa **code**)?
+   (Nghiêng: chốt vị từ ở đây, sửa code tách item.)
 
 ## 6. Thiết kế đã chốt {#design}
 
