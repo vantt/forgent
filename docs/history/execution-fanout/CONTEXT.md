@@ -102,7 +102,7 @@ ai thử. Không cần logic hủy mới.
   §5 vòng 7 — ranh giới fan-out A / fan-out B
 - `docs/history/two-layer-dispatch/DISCUSSION.md` §4 — D4 (gác exec
   packet), D8 (không tin cờ tự khai), D9 (điều kiện mở lại D4)
-- `docs/decisions/0026` — orchestrator/rootTask, native-vs-cli-spawn
+- `docs/decisions/0026` — launcher/rootTask, native-vs-cli-spawn
 - `docs/decisions/0012` — mô hình cạnh định kiểu (`deps` vs `parent`)
 - `docs/history/gate-bypass/CONTEXT.md` D1-D5 — hình dạng của một cổng tự
   động (bậc · cơ học · fail closed · risk ghi đè)

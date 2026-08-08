@@ -63,8 +63,8 @@ Rather than "three kinds of dispatch" as a flat enumeration, the design
 locks dispatch as two layers (L1 decides *what and who*, L2 infers
 *how*) along two orthogonal axes: does this unit of work carry a real
 lifecycle, and is its prompt pre-registered ahead of time or composed at
-the moment of dispatch. L2 is deliberately never called an
-"orchestrator" — a naming discipline to avoid implying a central
+the moment of dispatch. L2 is deliberately never called a
+"launcher" — a naming discipline to avoid implying a central
 scheduler that doesn't exist.
 
 Concretely, the parts that shipped:

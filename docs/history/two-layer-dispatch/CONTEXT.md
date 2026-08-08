@@ -30,7 +30,7 @@ pool, no retro/cleanup, dies when the parent is done).
 | D2 | Add "runs in parallel / shortens wall-clock time" as the fourth valid reason to dispatch a step out of the session instead of inline |
 | D3 | Open an ad-hoc capacity layer: a runtime-composed prompt packet, not just a pre-registered fixed `<PROMPT_TEMPLATE>` |
 | D4 | **B2 (exec packet, file-writing, ephemeral id) stays gated** — no third category between a rootTask and a `capacity`; revisit only when D9's two conditions both hold |
-| D5 | Dispatch described as two layers L1/L2, L1 along two orthogonal axes (lifecycle-bearing? / registered-ahead-of-time or composed-at-dispatch?) instead of three discrete kinds; L1 decides what+who, L2 infers how; L2 is never called "orchestrator" |
+| D5 | Dispatch described as two layers L1/L2, L1 along two orthogonal axes (lifecycle-bearing? / registered-ahead-of-time or composed-at-dispatch?) instead of three discrete kinds; L1 decides what+who, L2 infers how; L2 is never called "launcher" |
 | D6/D6b | A dynamic packet needs six required fields (id, goal, inputs, boundary, expected shape, return contract); id shape `<scope>#p<n>`, structurally invalid as a work-item id (`#` breaks `ID_PATTERN`) — reference id, never a lifecycle id, D4 stays gated |
 | D7 | The three follow-on tasks (parallelism-reason, ad-hoc-capacity, tier-judged-at-dispatch) live as three separate items chained by `mergeAfter`, since all three touch `_shared/capacity-dispatch-fallback.md` |
 | D8 | No `selfSufficient` field — derive dispatch-readiness from existing mechanical signals (prose + runnable verify + footprint), never a self-declared flag |

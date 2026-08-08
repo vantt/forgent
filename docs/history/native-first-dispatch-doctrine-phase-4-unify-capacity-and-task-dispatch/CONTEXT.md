@@ -42,7 +42,7 @@ correction; only "how do we decide native vs cli/spawn" is shared).
   cli-dispatch is the `resolveCapacityCli`/`spawnWorker` subprocess-spawn
   mechanism; task-dispatch is native Agent/Task tool use inside a live
   Claude Code session.
-- **orchestrator / rootTask / subTask / capacity** — per 0026's own
+- **launcher / rootTask / subTask / capacity** — per 0026's own
   vocabulary section; subTask and capacity remain distinct concepts, only
   the dispatch-decision mechanism is shared between them.
 

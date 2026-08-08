@@ -164,7 +164,7 @@ thật qua `fgos decision --id tsk-5kn`.
 - `upstreams/beegog/skills/bee-hive/references/routing-and-contracts.md:262-284` — Delegation contract nguyên văn: 3 lớp dispatch (I/O worker · execution worker · review-class), phân biệt bằng **thẩm quyền + tác dụng lên state, không phải kích thước việc**; D2 rubric ">3 files HOẶC digest-not-verbatim"; digest contract; cli gather branch với delimiter `<<<BEE_DIGEST`.
 - `upstreams/beegog/AGENTS.md` rule 13 — luật đặt ở tầng luôn nạp, lý do nêu: *"'no skill is running' is exactly when the rule is most often forgotten"*.
 - `docs/history/two-layer-dispatch/{CONTEXT,DISCUSSION}.md` — D1-D12 đầy đủ.
-- `docs/decisions/0026-*.md` — 4 quy tắc native-vs-cli/spawn, vocabulary orchestrator/rootTask/subTask/capacity.
+- `docs/decisions/0026-*.md` — 4 quy tắc native-vs-cli/spawn, vocabulary launcher/rootTask/subTask/capacity.
 - `.claude/skills/_shared/capacity-dispatch-fallback.md` — Step A/B/B.5/C/D + gói ad-hoc 6 ô.
 - `docs/history/fgos-stage-skills-task-delegation-audit/CONTEXT.md` — **phát hiện lật tiền đề**, xem dưới.
 - `.claude/skills/fgos-{exploring,planning,validating,code-implement}/SKILL.md` — nguyên văn luật cấm delegation.
@@ -362,11 +362,18 @@ Nên lý do L1-thuần duy nhất bị rơi mất: **tiết kiệm context windo
 | tầng | trên vòng đời (chọn việc) | trong 1 việc (chọn delegate gì) |
 
 Đã có lệnh dành riêng chữ này: `two-layer-dispatch/CONTEXT.md:33` —
-*"L2 is never called \"orchestrator\""*; `DISCUSSION.md:102` —
-*"**Rõ — đừng gọi \"orchestrator\"** | 0026 dòng 34-56 đã gán
-\"orchestrator\" cho vai trò quyết định kích hoạt rootTask nào — tầng CAO
+*"L2 is never called \"launcher\""*; `DISCUSSION.md:102` —
+*"**Rõ — đừng gọi \"launcher\"** | 0026 dòng 34-56 đã gán
+\"launcher\" cho vai trò quyết định kích hoạt rootTask nào — tầng CAO
 hơn, không phải transport. Thuật ngữ sẵn có cho L2 là **\"cơ chế
 dispatch\"**; **\"executor\"** để dành cho backend đích"*.
+
+(Ghi chú 2026-08-08, `tsk-2cw`: đoạn trích trên phản ánh nội dung
+`two-layer-dispatch/CONTEXT.md`/`DISCUSSION.md` **sau** khi `0028` đổi tên
+"orchestrator" → "launcher" — xem `0028-doi-ten-orchestrator-thanh-
+launcher.md`. Toàn bộ phần còn lại của mục F này (và §3 hàng 3, dòng 88) mô
+tả VÒNG THẢO LUẬN LỊCH SỬ về va chạm từ vựng giữa fgOS và bee — giữ nguyên
+chữ "orchestrator" có chủ đích vì đó chính là chủ đề đang được phân tích.)
 
 Tên fgOS-native đề xuất cho khái niệm của bee: **rootTask host** — `0026:58-65`
 đã tự viết chữ "host": *"bất kỳ ai đang là 'host' thực thi cho 1 việc, tại
@@ -415,7 +422,7 @@ already knows"* — đúng lớp lãng phí `tsk-1ni` tìm ra.
   skill nào làm.
 - **Fan-out execute N children** — **không luật nào chặn**. Children của
   decompose **là work item thật = rootTask thật**; dispatch song song =
-  kích hoạt N rootTask, đúng định nghĩa orchestrator của `0026`. Demo
+  kích hoạt N rootTask, đúng định nghĩa launcher của `0026`. Demo
   `tsk-1sj`→`tsk-30z`/`tsk-50ic` đã chạy thật (~184s overlap đo được từ
   `.fgos/events.jsonl`). Thiếu: chưa skill nào tự làm — mọi loop skill hiện
   tại đều *"lần lượt"* (tuần tự).
