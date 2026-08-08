@@ -1,7 +1,7 @@
 # Chất lượng và định tuyến câu hỏi gate — DISCUSSION
 
 **Items:** `tsk-65i` (STR71b, định tuyến) · `tsk-539` (STR71, trình bày)
-**Bắt đầu:** 2026-08-08 · **Vòng gần nhất:** 6
+**Bắt đầu:** 2026-08-08 · **Vòng gần nhất:** 7
 
 ---
 
@@ -20,12 +20,17 @@ hành nào khiến câu hỏi gate trở nên trả lời được"*.
 | 4 | Đề xuất kiến trúc: một binary Rust = launcher + webserver + TUI, điều phối herdr/runner |
 | 5 | Phản biện có bằng chứng → sửa lại thứ tự; **launcher và tầng 0 là cùng một việc** |
 | 6 | Kiểm Q12 → **judge thứ hai ĐÃ bị khai tử trước cuộc bàn này**; 64% là ảnh chụp một cửa sổ đã đóng |
+| 7 | Người chủ sản phẩm bác kết luận vòng 6 → **đo nhầm kênh**; yes/no thật nằm ở `gate-approve`, gấp 8 lần, và cơ chế giảm nó đã chết |
 
-**⚠️ Đọc §3 "Bị lật ở vòng 6" TRƯỚC khi dùng bất kỳ con số nào ở dưới.** Con số **64% hỏi sai
-người** — cột chống lớn nhất của cả vòng 1 — là **ảnh chụp một cửa sổ đã đóng**. LLM judge gây ra
-nó đã bị `tsk-1x3` khai tử lúc **2026-08-07 11:39 +07** (commit `794df20`), giữa lúc dữ liệu được
-đo. Tỉ lệ hỏi người sau đó giảm **65%**, tranh chấp verify về **0**. Sáu trên bảy vấn đề lược đồ
-vẫn nguyên; chỉ vấn đề *định tuyến* là đã tự khỏi.
+**⚠️ Hai chỗ phải đọc trước khi dùng bất kỳ con số nào ở dưới — §3 "Bị lật ở vòng 6" và "Bị lật ở
+vòng 7".**
+
+- **Vòng 6:** con số **64% hỏi sai người** là ảnh chụp một cửa sổ đã đóng — LLM judge gây ra nó đã
+  bị `tsk-1x3` khai tử **2026-08-07 11:39 +07** (commit `794df20`), giữa lúc dữ liệu được đo.
+- **Vòng 7:** kết luận "vấn đề đã tự khỏi" của vòng 6 **cũng sai** — nó đo kênh `gates[id].ask` rồi
+  tuyên bố về toàn bộ gánh nặng yes/no. Kênh thật là **`work.gate-approve`** (ba cổng skill), lớn
+  **gấp 8 lần** và vẫn sống. Cơ chế `gate-bypass` sinh ra để giảm nó **đã bật nhưng gần như không
+  bao giờ chạy được**: 1,6% trên toàn lịch sử, 0% kể từ 2026-08-07.
 
 **Kết luận lớn nhất tới giờ (vòng 5):** một-tiến-trình-một-item (thiết kế launcher) biến S7 từ
 *khuyết điểm* thành *bất biến cấu trúc*. Cắt ngữ cảnh giữa các item cũng cắt luôn ngữ cảnh giữa
@@ -293,6 +298,57 @@ vá ba ngày trước, vì đo state mà không đọc code. Số đo nói *cái
 còn xảy ra không*. Với một repo đổi nhanh như repo này, **mọi số đo cần một mốc "code tại thời
 điểm nào"** kèm theo.
 
+### 🔴 BỊ LẬT Ở VÒNG 7 — đo nhầm kênh; yes/no thật nằm ở `gate-approve`
+
+Người chủ sản phẩm bác kết luận vòng 6: *"sai sót 64% tôi vẫn cảm thấy vẫn còn vì còn quá nhiều
+câu hỏi dạng yes no vẫn còn bị hỏi."* Kiểm lại — **đúng, và vòng 1–6 đã đo sai kênh.**
+
+Toàn bộ số đo từ vòng 1 tới vòng 6 đọc `gates[id].ask`. Nhưng ba cổng skill —
+`contextApprove` / `planApprove` / `validateApprove` — **không đi qua `ask`**. Chúng đi qua event
+`work.gate-approve`, một kênh riêng chưa từng được xét.
+
+| # | Bằng chứng | Con số |
+|---|---|---|
+| R29 | `gate-approve` **trước** gỡ judge | 318 (`contextApprove` 132+6bypass · `planApprove` 95 · `validateApprove` 85) |
+| R30 | `gate-approve` **sau** gỡ judge | **48** (`contextApprove` 8 · `planApprove` 19 · `validateApprove` 21) — so với **6** lượt `ask` cùng kỳ |
+| R31 | Tỉ lệ bypass thực tế toàn lịch sử | **6/366 = 1,6%**; **0** kể từ 2026-08-07 |
+| R32 | `CONTEXT.md` qua được `hasOpenItems` | **21/197 = 11%** (chặn: thiếu mục 142 · TODO/FIXME 34) |
+| R33 | `plan.md` qua được `hasOpenItems` | **1/189 = 1%** (chặn: thiếu mục 161 · TODO/FIXME 27) |
+
+**Gánh nặng yes/no thật lớn gấp 8 lần kênh đã đo** — và đây là dạng yes/no thuần tuý nhất, hỏi
+trên **mỗi item** đi qua exploring/planning/validating.
+
+**Vì sao cơ chế giảm nó không chạy.** `.fgos/gate-bypass.json` = `{"level":"standard"}` (bật, phủ
+tier light+standard ≈ 82% item). Nhưng `canAutoApprove` đòi ba điều kiện, và `hasOpenItems` chặn
+gần hết: nó yêu cầu artifact có mục **đúng chữ** `## Outstanding questions` với body **đúng chữ**
+`None`.
+
+**Nguyên nhân gốc:** `fgos-exploring/SKILL.md` và `fgos-planning/SKILL.md` **không hề nhắc tới
+`Outstanding questions`**. Skill viết artifact không biết mình phải viết mục đó.
+`gate-bypass.mjs` tự ghi *"the convention this item's own CONTEXT.md/plan.md already follow"* —
+tác giả tưởng quy ước đã được tuân thủ; thực tế 89% `CONTEXT.md` và **99% `plan.md`** không có.
+
+**Ba mảnh, độ khó khác nhau:**
+
+| Mảnh | Bản chất | Sửa |
+|---|---|---|
+| Bypass chết vì thiếu quy ước (R32/R33 "thiếu mục") | **bug thật** — hai lớp không khớp nhau | Rẻ nhất: nối quy ước vào hai skill viết artifact. Không nới luật an toàn nào — fail-closed khi thiếu mục là **đúng** |
+| `TODO`/`FIXME` chặn 34+27 ca | **không phải bug** | Artifact còn TODO thì không nên tự duyệt |
+| `validateApprove` không bao giờ bypass được | **thiết kế có chủ ý** — `actor` hardcode `human` | Chiếm **21/48 = 44%** cổng gần đây. Kể cả sửa xong mảnh 1, ~1/3 cổng vẫn là người. Câu hỏi thiết kế thật → Q18 |
+
+**Hệ quả lên khung bốn tầng:** ba cổng này là yes/no **theo cấu trúc**, không do viết kém — chúng
+chỉ có thể là duyệt/không-duyệt, không thể thành câu hỏi có phương án. Nên với chúng, hướng đi
+không phải *"hỏi cho tốt hơn"* (tầng 2/3) mà là ***"hỏi ít hơn"*** — tức đúng cơ chế bypass đang
+chết. Đây là một nhánh riêng của tầng 2, chưa từng có trong khung.
+
+**Và nó sửa lại kết luận vòng 6:** *"tầng 1 đã tự khỏi"* chỉ đúng cho kênh `ask`. Tính cả
+`gate-approve`, gánh nặng hỏi người **không hề giảm** — chỉ chuyển kênh trong mắt người đo.
+
+**Bài học phương pháp thứ hai, bổ sung cho vòng 6:** vòng 6 dạy *"đo state phải kèm mốc code"*.
+Vòng 7 dạy *"đo một kênh rồi kết luận về toàn bộ hiện tượng là sai"* — người dùng cảm nhận **tổng**
+gánh nặng, không cảm nhận theo từng bảng dữ liệu. Khi số đo mâu thuẫn với cảm nhận của người vận
+hành, **giả định mặc định phải là đo thiếu kênh**, không phải người nhớ nhầm.
+
 ### Chưa rõ — cần bàn
 
 | # | Câu hỏi mở | Vì sao chưa quyết được |
@@ -309,6 +365,8 @@ còn xảy ra không*. Với một repo đổi nhanh như repo này, **mọi s�
 | Q10 | **Cơ chế giải phóng chung (S1) hình dạng thế nào?** | Thay `ask.includes(<literal>)` bằng gì: một `gateId` ổn định trên mỗi ask? Một `releases` trỏ ngược? Chưa bàn. Đây là thứ quyết định `tsk-65i` là luật định tuyến hay là một cơ chế dữ liệu. |
 | Q11 | **Câu trả lời tự-đứng-được (S7) có cần cấu trúc không?** | STR70a đã dựng `rationale`/`alternatives`/`source` cho answer — có thể phần này đã giải quyết một nửa S7. Cần đọc `checkpoint-distillate-gate-provenance/` xem còn thiếu gì, trước khi thiết kế mới. |
 | ~~Q12~~ | ~~Judge thứ hai có đang thẩm định sai tầng không?~~ | ✅ **ĐÓNG ở vòng 6 — câu hỏi lỗi thời.** LLM judge đã bị `tsk-1x3` khai tử 2026-08-07 (commit `794df20`); thứ còn lại là hàm cơ học 14 dòng. Không cần sửa gì. Chi tiết + số đo: §3 "Bị lật ở vòng 6". |
+| **Q17** | **Nối quy ước `## Outstanding questions` vào hai skill viết artifact — đủ chưa, hay `hasOpenItems` cũng cần nới?** | Sửa phía skill là đúng hướng (giữ nguyên fail-closed). Nhưng chưa rõ: quy ước tiếng Anh cứng có hợp lý trong repo viết artifact bằng tiếng Việt không? Và `plan.md` có nên dùng cùng một mục với `CONTEXT.md`, hay mục riêng? |
+| **Q18** | **`validateApprove` có đáng luôn luôn cần người không?** | `actor` hardcode `human`, không có đường bypass nào (skills-scanner xác nhận). Chiếm **44%** số cổng gần đây. Đây là gate chứng-minh-khả-thi — lập luận giữ người rất mạnh (nó là chốt chặn cuối trước khi tiêu tiền thật vào executing). Nhưng nếu giữ, thì trần dưới của gánh nặng yes/no là ~1/3, và mọi nỗ lực khác chỉ chạm được 2/3 còn lại. **Quyết định sản phẩm, không phải kỹ thuật.** |
 | **Q16** | **Cái giá `tsk-1x3` khai báo có thành hiện thực không?** — bản thay thế cơ học tự khai KHÔNG bắt được "verify đúng cú pháp nhưng nhắm sai mục tiêu"; trách nhiệm chuyển sang skill gọi + `fgos-validating`. | Thay Q12. Đo bằng xu hướng `verify-miss` (nền: 87/141 = 62% friction, tính tới 2026-08-08). Nếu tăng sau vài ngày ⇒ việc chuyển trách nhiệm chưa được đỡ. **Chỉ đo được bằng thời gian**, không đọc code ra được. |
 | **Q13** | **Web UI nên là binary Rust thứ hai dùng chung `fgos.rs`, hay tiến trình Node cạnh CLI?** | Node gần core hơn (cùng ngôn ngữ, dùng lại lib sau khi `p-09351985` tách core); Rust tái dùng được `ports.rs`/`WorkItemSource` đã có nhưng nhân đôi khoảng cách tới core. Chưa quyết. |
 | **Q14** | **"Một item một lần" nghĩa là một-tiến-trình-một-item (vẫn song song), hay tuần tự thật?** | Config đang khai `parallel: {maxRoots:4, maxLeavesPerRoot:4}` và `fgos schedule` đã tính sẵn sóng song song theo footprint. Tuần tự thật làm hai thứ đó chết và tụt throughput (~40 item/ngày hiện tại) — chấp nhận được nếu là lựa chọn có ý thức, không phải hệ quả phụ. Đề xuất: một tiến trình một item, nhiều tiến trình song song theo `schedule`. |
@@ -324,7 +382,14 @@ còn xảy ra không*. Với một repo đổi nhanh như repo này, **mọi s�
 | **D2** | **Sửa ở tầng skill/prompt là không đủ — phải chạm lược đồ `gates[id]`.** Mọi con số lớn đều truy về lược đồ: R9→S1, R2→S6, R3→S10, R8→S5. Prose đã không ép được suốt 152 lần. | 5 (nêu V2, không bị sửa ở V3/V4/V5) | ✅ seq 9744 |
 | **D3** | **Launcher là orchestrator cơ học không-soul** — thi hành lời khuyên của verb đọc (`ready`/`schedule`/`conflicts`/`triage`/`graph`), không tự phán, và **không tự giữ trạng thái "ai đang chạy"** (đọc `sessions.json`/`runner.lock`/`main-checkout.lock`/event log). Tự phán hoặc tự cache = nguồn sự thật thứ hai, đúng loại lỗi đã gây bug production với herdr `agent_status`. | 5 (nêu V4, người chủ sản phẩm khẳng định lại V5) | ✅ seq 9745 |
 
-**Ứng viên D-ID cho vòng 6** (chưa đứng đủ vững):
+| **D4** | **Gánh nặng yes/no nằm chủ yếu ở kênh `work.gate-approve` (ba cổng skill), không phải `gates[id].ask`.** Sau khi gỡ judge: 48 gate-approve vs 6 ask — gấp 8 lần. Ba cổng này là yes/no **theo cấu trúc**, nên hướng đi là ***hỏi ít hơn*** (sửa bypass), không phải *hỏi cho tốt hơn*. | 7 (đo trực tiếp, người chủ sản phẩm nêu từ cảm nhận vận hành) | ✅ seq 9759 |
+
+**Ứng viên D-ID cho vòng 8** (chưa đứng đủ vững):
+
+- Bypass chết vì quy ước `## Outstanding questions` chưa được nối vào hai skill viết artifact —
+  *mới ở V7, nhưng là sự thật đo được (R32/R33) hơn là một quyết định.*
+
+**Ứng viên cũ từ vòng 5** (vẫn chờ):
 
 - Một-tiến-trình-một-item biến S7 thành bất biến cấu trúc ⇒ `gates[id]` chịu lực — *mới ở V5.*
 - Pane herdr là **cửa hỏi**, không phải cửa sổ xem — *mới ở V5.*
@@ -341,6 +406,8 @@ còn xảy ra không*. Với một repo đổi nhanh như repo này, **mọi s�
 | "Người bị dùng làm vòng retry" | 1 | 3 | **sai** — người đang gỡ lỗi thật, tìm ra root cause và một bug thật |
 | "Launcher chạy loop gỡ được 51+128" | 4 | 5 | **sai một nửa** — chỉ đúng với `cleanup-loop` (112); `discover-loop` park 31% |
 | "Launcher không làm được luật 2 của 0026" | 4 | 5 | **sai khung** — luật 2 chưa bao giờ là việc của launcher, nó áp dụng bên trong con Claude được spawn |
+| "64% đã tự khỏi, vấn đề hỏi-sai-người hết" | 6 | **7** | **đo nhầm kênh** — chỉ đúng cho `ask`; kênh `gate-approve` lớn gấp 8 lần và vẫn sống |
+| "Tầng 1 (định tuyến) đã tự khỏi phần lớn" | 6 | **7** | chỉ đúng cho `ask`; tính cả `gate-approve` thì gánh nặng hỏi người **không giảm** |
 
 ---
 
@@ -613,6 +680,41 @@ phiên sống), nhưng phải đo bằng xu hướng `verify-miss` sau vài ngà
 cơ chế lớn cho một vấn đề đã được vá ba ngày trước, vì **đo state mà không đọc code**. Mọi số đo
 trong repo này cần kèm một mốc "code tại thời điểm nào".
 
+### 2026-08-08 — Vòng 7: người vận hành bác số đo, và đúng
+
+**Người chủ sản phẩm, sau khi đọc kết luận vòng 6:**
+
+> *"Thật ra sai sót 64% tôi vẫn cảm thấy vẫn còn vì còn quá nhiều câu hỏi dạng yes no vẫn còn bị
+> hỏi."*
+
+**Kiểm — và vòng 1 tới 6 đã đo sai kênh.** Toàn bộ số đo đọc `gates[id].ask`. Nhưng ba cổng skill
+đi qua event `work.gate-approve`, một kênh riêng chưa từng được xét: **48 lượt sau khi gỡ judge, so
+với 6 lượt `ask`** — gấp 8 lần (R29/R30).
+
+**Đào tiếp vì sao cơ chế giảm nó không chạy** → R31/R32/R33. `gate-bypass` đã bật ở mức `standard`
+(phủ ~82% item theo tier) nhưng chỉ chạy được **1,6%** toàn lịch sử và **0%** kể từ 2026-08-07.
+Nguyên nhân: `hasOpenItems` đòi mục đúng chữ `## Outstanding questions`, mà **hai skill viết
+artifact không hề nhắc tới nó** — chỉ 11% `CONTEXT.md` và **1% `plan.md`** qua được.
+
+Đây là **hai lớp không khớp nhau**: lớp kiểm giả định một quy ước, lớp sinh artifact không biết quy
+ước đó tồn tại. `gate-bypass.mjs` tự ghi *"the convention this item's own CONTEXT.md/plan.md already
+follow"* — giả định sai.
+
+**Tách ba mảnh** (bảng ở §3): bug thật (quy ước chưa nối) · không phải bug (`TODO`/`FIXME` chặn là
+đúng) · quyết định sản phẩm (`validateApprove` hardcode human, 44% số cổng).
+
+**Đóng góp khái niệm của vòng này:** ba cổng skill là yes/no **theo cấu trúc** — chúng không thể
+thành câu hỏi có phương án, chỉ có thể là duyệt/không-duyệt. Nên với chúng, hướng đi không phải
+*"hỏi cho tốt hơn"* (tầng 2/3 của khung) mà là ***"hỏi ít hơn"***. Đó là một nhánh riêng của tầng
+2, chưa từng có trong khung → chốt thành **D4**.
+
+**Sửa lại vòng 6:** *"tầng 1 đã tự khỏi"* chỉ đúng cho kênh `ask`. Tính cả `gate-approve`, gánh
+nặng hỏi người **không hề giảm** — chỉ chuyển kênh trong mắt người đo.
+
+**Bài học phương pháp thứ hai** (ghi ở §3): khi số đo mâu thuẫn với cảm nhận của người vận hành,
+giả định mặc định phải là **đo thiếu kênh**, không phải người nhớ nhầm. Vòng 6 dạy "đo state phải
+kèm mốc code"; vòng 7 dạy "đo một kênh rồi kết luận về toàn bộ hiện tượng là sai".
+
 ---
 
 ## 6. Thiết kế đã chốt {#design}
@@ -659,16 +761,30 @@ flowchart TD
     style T0 fill:#f2e9d8,stroke:#8E6318
 ```
 
-| Tầng | Nội dung | Item phủ | Trạng thái sau vòng 6 |
-|---|---|---|---|
-| **0 · Lược đồ** | S1–S10 trên `gates[id]` | **chưa có** | 🟢 **còn nguyên** — sâu nhất, không cái nào đụng tới judge |
-| 1 · Định tuyến | có nên hỏi người không | `tsk-65i` | 🔴 **phần lớn tự khỏi** — `tsk-1x3` gỡ LLM judge 2026-08-07; còn lại chỉ **trần hỏi lại**, vốn là chuyện tầng 0 |
-| 2 · Định dạng | yes/no cho thứ không phải yes/no | **chưa có** | 🟢 **còn nguyên** (R2/R3); gốc là S6 |
-| 3 · Bối cảnh | câu hỏi tự đứng được | `tsk-539` | 🟢 **còn nguyên** (R4/R5/R7); phạm vi hiện tại của STR71 |
-| ⊥ Trần hỏi lại | không ai chặn ở lần 23 | **chưa có** | 🟢 **còn nguyên** — gốc S1, cắt ngang, nay là mảnh chính còn lại của `tsk-65i` |
+| Tầng | Nội dung | Kênh | Item phủ | Trạng thái sau vòng 7 |
+|---|---|---|---|---|
+| **0 · Lược đồ** | S1–S10 trên `gates[id]` | `ask` | **chưa có** | 🟢 **còn nguyên** |
+| 1 · Định tuyến | có nên hỏi người không | `ask` | `tsk-65i` | 🔴 **phần lớn tự khỏi** — `tsk-1x3` gỡ LLM judge; còn lại chỉ **trần hỏi lại** (gốc S1) |
+| 2 · Định dạng | yes/no cho thứ không phải yes/no | `ask` | **chưa có** | 🟢 **còn nguyên** (R2/R3); gốc S6 |
+| **2b · Hỏi ít hơn** ⭐ | ba cổng skill — yes/no **theo cấu trúc**, không sửa được bằng cách viết hay hơn | **`gate-approve`** | **chưa có** | 🔴 **MỚI, VÒNG 7 — chỗ khối lượng thật.** 48 vs 6 lượt `ask`. Bypass đã bật nhưng chạy 1,6% |
+| 3 · Bối cảnh | câu hỏi tự đứng được | `ask` | `tsk-539` | 🟢 **còn nguyên** (R4/R5/R7) |
+| ⊥ Trần hỏi lại | không ai chặn ở lần 23 | `ask` | **chưa có** | 🟢 **còn nguyên** — gốc S1 |
 
-**Sau vòng 6, hình dạng nghiêng hẳn về tầng 0.** Tầng 1 vốn được xem là chỗ khối lượng lớn nhất
-nằm, nay gần rỗng. Ba tầng còn lại đều truy về lược đồ.
+**Vòng 7 đảo lại trọng tâm.** Vòng 6 kết luận hình dạng nghiêng về tầng 0 (kênh `ask`). Nhưng cả
+sáu dòng trên trừ 2b đều nằm trong **một kênh chiếm 6/54 lượt hỏi người gần đây**. Tầng 2b — kênh
+`gate-approve` — chiếm **48/54**, và chưa item nào phủ.
+
+**Hai hướng khác hẳn nhau, không được trộn:**
+
+| | Tầng 0/1/2/3 (kênh `ask`) | Tầng 2b (kênh `gate-approve`) |
+|---|---|---|
+| Bản chất câu hỏi | văn xuôi tự do, sửa được bằng cách hỏi hay hơn | yes/no **theo cấu trúc**, không thể thành câu hỏi có phương án |
+| Hướng đi | **hỏi cho tốt hơn** — lược đồ, kiểu, bối cảnh | **hỏi ít hơn** — sửa bypass |
+| Khối lượng gần đây | 6/54 | **48/54** |
+| Chi phí sửa | lớn (đổi lược đồ event append-only) | **nhỏ** (nối một quy ước vào hai skill) |
+
+Nghịch lý: **phần rẻ nhất lại là phần chiếm khối lượng lớn nhất**, và nó chưa từng có trong khung
+cho tới vòng 7.
 
 ### Hai trục mà một câu hỏi phải mang theo (vòng 3)
 
@@ -732,6 +848,7 @@ nó là **hạ tầng của launcher**, và S8/S9/S10 chính là thứ tiến tr
 | # | Việc | Phụ thuộc | Vì sao ở vị trí này |
 |---|---|---|---|
 | 0 | Vá `p-73d99989` (force-xoá worktree) | — | CRITICAL, chưa vá; launcher tự chạy sẽ tăng tần suất gặp (Q15) |
+| **0b** | **Nối quy ước `## Outstanding questions` vào `fgos-exploring` + `fgos-planning`** | — | ⭐ **VÒNG 7 — đòn bẩy tốt nhất của cả bảng.** Chạm 48/54 lượt hỏi gần đây, chi phí gần bằng không, không nới luật an toàn nào. Chờ Q17 về hình dạng quy ước |
 | ~~1~~ | ~~Kiểm Q12~~ | — | ✅ **xong ở vòng 6** — judge đã bị gỡ từ trước, không có gì để sửa |
 | 2 | Launcher chạy `cleanup-loop` | — | Thuần cơ học, gỡ 112 item, không đụng gate |
 | 3 | Headless `code-implement` | — | Median 0,3h, chỉ 9 park — chạy được ngay |
@@ -795,6 +912,26 @@ documentation*), đây là lỗ hổng bằng chứng, không chỉ lỗ hổng 
 Làm ngay trong cuộc bàn ở vòng 6, không cần item. **Kết quả: câu hỏi lỗi thời** — LLM judge đã bị
 `tsk-1x3` khai tử 2026-08-07 (commit `794df20`). Không gỡ chặn bằng cách sửa, mà bằng cách phát
 hiện nó đã được sửa. Chi tiết §3 "Bị lật ở vòng 6".
+
+### ⭐ Chưa có item · Hồi sinh gate-bypass {#task-revive-gate-bypass}
+
+- **Mục tiêu:** làm `gate-bypass` chạy được thật. Hiện đã bật (`level: standard`, phủ ~82% item
+  theo tier) nhưng chỉ chạy **1,6%** toàn lịch sử, **0%** kể từ 2026-08-07.
+- **Nguyên nhân đã xác minh:** `hasOpenItems` đòi mục đúng chữ `## Outstanding questions`; hai skill
+  viết artifact không hề nhắc tới nó. Chỉ **21/197** `CONTEXT.md` và **1/189** `plan.md` qua được
+  (R32/R33).
+- **Trích §6:** tầng **2b** — nhánh "hỏi ít hơn"; bảng "hai hướng khác hẳn nhau".
+- **D-ID áp dụng:** **D4**.
+- **Vì sao đây là đòn bẩy tốt nhất:** chạm **48/54** lượt hỏi người gần đây, chi phí gần bằng
+  không (thêm một mục vào hai file SKILL.md), và **không nới luật an toàn nào** — fail-closed khi
+  thiếu mục là đúng, chỉ là chưa ai dạy skill viết mục đó.
+- **Không đụng tới:** `TODO`/`FIXME` vẫn chặn (đúng), `validateApprove` vẫn hardcode human (Q18).
+  Nên trần trên của hiệu quả là ~56% số cổng, không phải 100%.
+- **Câu hỏi mở riêng:** Q17 (hình dạng quy ước — tiếng Anh cứng trong repo viết tiếng Việt?
+  `plan.md` dùng chung mục với `CONTEXT.md` hay mục riêng?).
+- **Draft verify:** đo lại tỉ lệ `contextApprove/bypass` và `planApprove/bypass` trên event log sau
+  N item — phải > 0, hiện là 0.
+- **Chưa submit** — chờ Q17.
 
 ### Chưa có item · Theo dõi cái giá của `tsk-1x3` {#task-verify-miss-watch}
 
