@@ -78,6 +78,7 @@ const ALLOWED_FILES = new Map([
   ['docs/history/execution-fanout/DISCUSSION.md', 'cites bee\'s own claim-first-then-spawn pattern ("cách bee"), a different upstream concept'],
   ['docs/history/fanout-and-delegation-rubric/DISCUSSION.md', 'section F is a historical record of the fgOS-vs-bee vocabulary clash itself, plus direct bee citations -- rewriting either would falsify the discussion it documents'],
   ['docs/history/fgos-terminal-close-autoclose/CONTEXT.md', 'cites work-item title "herdr-orchestrator" (tsk-2xt) and fgos-runner\'s unattended-loop sense, not 0026\'s role'],
+  ['docs/history/gate-question-quality-and-routing/DISCUSSION.md', 'a concurrent item\'s discussion, authored against 0026\'s pre-rename text -- describes 0026\'s OLD state as observed at the time (same historical-record reasoning as this item\'s own CONTEXT.md/plan.md); also independently converges on "Launcher" as the name for the same herdr-side role, unprompted -- not this item\'s prose to rewrite'],
   ['docs/history/launcher-vocabulary-rename/CONTEXT.md', 'this item\'s own decision record -- discusses the old term while explaining the rename'],
   ['docs/history/launcher-vocabulary-rename/plan.md', 'this item\'s own plan -- discusses the old term while explaining the rename'],
   ['docs/history/launcher-vocabulary-rename/iron-law-evidence.md', 'this item\'s own Iron Law evidence -- quotes the old term inside real failing-before test transcript excerpts'],
