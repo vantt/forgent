@@ -859,7 +859,7 @@ nó là **hạ tầng của launcher**, và S8/S9/S10 chính là thứ tiến tr
 | # | Việc | Phụ thuộc | Vì sao ở vị trí này |
 |---|---|---|---|
 | 0 | Vá `p-73d99989` (force-xoá worktree) | — | CRITICAL, chưa vá; launcher tự chạy sẽ tăng tần suất gặp (Q15) |
-| **0b** | **Nối quy ước `## Outstanding questions` vào `fgos-exploring` + `fgos-planning`** | — | ⭐ **VÒNG 7 — đòn bẩy tốt nhất của cả bảng.** Chạm 48/54 lượt hỏi gần đây, chi phí gần bằng không, không nới luật an toàn nào. Chờ Q17 về hình dạng quy ước |
+| **0b** | **Nối quy ước `## Outstanding questions` vào `fgos-exploring` + `fgos-planning`** — **`tsk-5hg`** | — | ⭐ **Đòn bẩy tốt nhất của cả bảng.** Chạm 48/54 lượt hỏi gần đây, chi phí gần bằng không, không nới luật an toàn nào. Q17 đi kèm item, trả lời lúc clarify |
 | ~~1~~ | ~~Kiểm Q12~~ | — | ✅ **xong ở vòng 6** — judge đã bị gỡ từ trước, không có gì để sửa |
 | 2 | Launcher chạy `cleanup-loop` | — | Thuần cơ học, gỡ 112 item, không đụng gate |
 | 3 | Headless `code-implement` | — | Median 0,3h, chỉ 9 park — chạy được ngay |
@@ -924,7 +924,7 @@ Làm ngay trong cuộc bàn ở vòng 6, không cần item. **Kết quả: câu 
 `tsk-1x3` khai tử 2026-08-07 (commit `794df20`). Không gỡ chặn bằng cách sửa, mà bằng cách phát
 hiện nó đã được sửa. Chi tiết §3 "Bị lật ở vòng 6".
 
-### ⭐ Chưa có item · Hồi sinh gate-bypass {#task-revive-gate-bypass}
+### ⭐ `tsk-5hg` · Hồi sinh gate-bypass {#task-revive-gate-bypass}
 
 - **Mục tiêu:** làm `gate-bypass` chạy được thật. Hiện đã bật (`level: standard`, phủ ~82% item
   theo tier) nhưng chỉ chạy **1,6%** toàn lịch sử, **0%** kể từ 2026-08-07.
@@ -939,10 +939,17 @@ hiện nó đã được sửa. Chi tiết §3 "Bị lật ở vòng 6".
 - **Không đụng tới:** `TODO`/`FIXME` vẫn chặn (đúng), `validateApprove` vẫn hardcode human (Q18).
   Nên trần trên của hiệu quả là ~56% số cổng, không phải 100%.
 - **Câu hỏi mở riêng:** Q17 (hình dạng quy ước — tiếng Anh cứng trong repo viết tiếng Việt?
-  `plan.md` dùng chung mục với `CONTEXT.md` hay mục riêng?).
+  `plan.md` dùng chung mục với `CONTEXT.md` hay mục riêng?). **Mang vào mô tả item**, trả lời lúc
+  clarify — không chặn submit.
 - **Draft verify:** đo lại tỉ lệ `contextApprove/bypass` và `planApprove/bypass` trên event log sau
   N item — phải > 0, hiện là 0.
-- **Chưa submit** — chờ Q17.
+- **✅ Đã submit `tsk-5hg`** (tier `light`, kind `bug`, `todo/clarify`, `refs` trỏ về anchor này).
+  Kiểm trùng trước khi submit: `tsk-6bx`/`tsk-6bx-1`/`tsk-6bx-2` đều đã `done` — chúng dựng **cơ
+  chế** bypass, không cái nào dạy skill viết ra cái mục mà cơ chế đó đòi. Không trùng.
+- **Sửa một phán đoán của vòng 7:** file này từng ghi "chưa submit — chờ Q17". Sai — Q17 là câu hỏi
+  của khâu clarify, không phải điều kiện để submit. Và để nó nằm dạng prose là đúng rủi ro vừa xảy
+  ra với D4 (mất 2 giờ vì chỉ có trong prose): `fgos ready`/`triage`/`list` không thấy thứ chỉ sống
+  trong `DISCUSSION.md`.
 
 ### Chưa có item · Theo dõi cái giá của `tsk-1x3` {#task-verify-miss-watch}
 
