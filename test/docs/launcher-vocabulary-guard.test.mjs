@@ -68,6 +68,8 @@ const HERDR_HISTORY_DOC = /^docs\/history\/herdr-/; // herdr's own PaneOrchestra
 // reason (docs/history/launcher-vocabulary-rename/CONTEXT.md's own scout
 // evidence) -- never a blanket skip.
 const ALLOWED_FILES = new Map([
+  ['docs/decisions/0028-doi-ten-orchestrator-thanh-launcher.md', 'the decision record ABOUT the rename -- its filename and body legitimately discuss the old term while explaining why/how it was retired'],
+  ['test/docs/launcher-vocabulary-guard.test.mjs', 'this file itself -- its own source must reference the literal word as pattern-matching data (frozen filenames, allowlist reasons, self-check assertions), not as prose deploying the pinned term'],
   ['docs/architecture-map.md', 'CTR003 gloss + runner-loop ORCHESTRATION label describe the continuous fgos-runner supervision loop (industry sense), not 0026\'s one-shot role -- reserved for the future meaning, not renamed'],
   ['docs/backlog.md', 'STR27/STR42/STR51/STR60 describe a continuous fleet/mechanical-picker loop (industry sense) -- reserved for the future meaning, not renamed'],
   ['docs/decisions/0013-discovered-from-runner-report-channel.md', 'CTR003 gloss, same continuous-loop sense as architecture-map.md'],
