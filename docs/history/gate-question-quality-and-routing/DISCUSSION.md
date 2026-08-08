@@ -1,30 +1,44 @@
 # Chất lượng và định tuyến câu hỏi gate — DISCUSSION
 
 **Items:** `tsk-65i` (STR71b, định tuyến) · `tsk-539` (STR71, trình bày)
-**Bắt đầu:** 2026-08-08 · **Vòng gần nhất:** 2
+**Bắt đầu:** 2026-08-08 · **Vòng gần nhất:** 5
 
 ---
 
 ## 1. Trạng thái hiện tại
 
-Vòng 2 vừa xong. Vòng 1 đưa **bằng chứng đo được** lên bàn; vòng 2 đào xuống **code thật** của
-`ask`/`answer` và tìm ra gốc kỹ thuật của từng con số.
+Năm vòng, cùng một ngày. Cuộc bàn đã mở rộng từ *"câu hỏi gate viết kém"* thành *"kiến trúc vận
+hành nào khiến câu hỏi gate trở nên trả lời được"*.
 
-**Đổi lớn ở vòng 2:** hình dạng vấn đề từ **ba tầng** thành **bốn tầng**. Vòng 1 xếp vấn đề ở tầng
-nội dung câu hỏi (định tuyến / định dạng / bối cảnh). Vòng 2 phát hiện một **tầng 0 nằm dưới cả
-ba**: lược đồ dữ liệu và hợp đồng của chính `gates[id]`. Bốn con số lớn nhất ở §3 đều có gốc ở
-tầng 0, nên sửa ở tầng skill/prompt sẽ **không đủ**.
+**Đường đi của cuộc bàn:**
 
-**Đã chốt:** D1 — ràng buộc thứ tự với STR48 (kênh chú-ý đi sau hoặc đồng thời, không bao giờ
-trước). Điểm này đứng vững qua cả hai vòng không bị sửa.
+| Vòng | Đưa vào |
+|---|---|
+| 1 | Số đo trên 314 lượt hỏi thật — vấn đề rộng hơn phạm vi STR71 |
+| 2 | Đọc code `ask`/`answer` → bảy vấn đề lược đồ S1–S7; khung ba tầng thành **bốn tầng** |
+| 3 | Yêu cầu hai trục (lịch sử + nhận thức) → S8/S9/S10; **tự sửa một kết luận sai của vòng 1** |
+| 4 | Đề xuất kiến trúc: một binary Rust = launcher + webserver + TUI, điều phối herdr/runner |
+| 5 | Phản biện có bằng chứng → sửa lại thứ tự; **launcher và tầng 0 là cùng một việc** |
 
-**Đã bị sửa (đúng như dự kiến của luật D-ID):** khung "ba tầng" của vòng 1 — may là chưa cấp D-ID.
+**Kết luận lớn nhất tới giờ (vòng 5):** một-tiến-trình-một-item (thiết kế launcher) biến S7 từ
+*khuyết điểm* thành *bất biến cấu trúc*. Cắt ngữ cảnh giữa các item cũng cắt luôn ngữ cảnh giữa
+câu hỏi và câu trả lời. Nên `gates[id]` chuyển từ "nên đầy đủ" thành **chịu lực** — nó là kênh
+truyền ngữ cảnh **duy nhất** giữa tiến trình hỏi và tiến trình đọc câu trả lời. Tầng 0 không phải
+nhánh song song với launcher; nó là **hạ tầng của launcher**.
 
-**Đang mở:** Q1–Q7 của vòng 1 vẫn mở, cộng Q8–Q11 mới về tầng 0. Q5 ("sống ở lớp nào") đã có
-hướng: **phải chạm lược đồ, không chỉ prose.**
+**Đã chốt:** D1 (thứ tự với STR48), D2 (phải chạm lược đồ, không chỉ prose), D3 (launcher là
+orchestrator cơ học không-soul).
 
-**Vòng sau cần:** người chủ sản phẩm quyết Q1 (ranh giới đừng-hỏi vs hỏi-cho-tốt) và Q8 (tầng 0 là
-item riêng hay điều kiện tiên quyết của hai item hiện có).
+**Đã bị sửa, không cấp D-ID** — bằng chứng luật D-ID hoạt động đúng:
+- khung "ba tầng" (V1) → bốn tầng (V2)
+- *"người bị dùng làm vòng retry"* (V1) → **sai**, người đang gỡ lỗi thật (V3)
+- *"launcher chạy loop gỡ được 51+128"* (V4) → **sai một nửa**, chỉ đúng với cleanup (V5)
+- *"launcher không làm được luật 2 của 0026"* (V4) → **phát biểu sai khung** (V5)
+
+**Đang mở:** Q1–Q11, cộng Q12–Q15 mới.
+
+**Vòng sau cần:** (a) kiểm giả thuyết rẻ nhất — judge thứ hai đang thẩm định *lệnh* thay vì *mục
+tiêu*; (b) người chủ sản phẩm chốt Q14 (một tiến trình một item = song song hay tuần tự thật).
 
 ---
 
@@ -142,6 +156,79 @@ Bản vá đó **chỉ áp cho 2 cổng**, bằng so khớp chuỗi. Cổng chi�
 
 Đây là lý do vòng 2 kết luận **sửa ở tầng skill/prompt không đủ**.
 
+### Đã rõ — ba lỗ của trục thời gian và trục nhận thức (vòng 3)
+
+Bật ra từ yêu cầu: *"phải tổ chức trình bày câu hỏi step by step theo tiến trình lịch sử và tiến
+trình nhận thức (mức độ rõ ràng) dẫn tới câu hỏi hiện tại."*
+
+| # | Vấn đề | Bằng chứng |
+|---|---|---|
+| S8 | **`askHistory` trong view là chuỗi trần** — không `ts`, không `seq`, không ghép được với `discovery`/`decisions`/timeline. Event log **có** đủ `ts`; chính bước fold làm rơi | `replay.mjs:214` vs `discovery` entries có `ts` |
+| S9 | **Không có trục "mức độ rõ ràng"** — `discovery.clear` là boolean phát lại mỗi vòng, không phải đại lượng tiến hoá. `tsk-48i`: 27 entry, ba entry đầu đều `clear:true` trong 60 giây trong khi verify vẫn đang đổi | `state.discovery['tsk-48i']` |
+| S10 | **Câu hỏi không tích luỹ nhận thức** — **23/23** ask mở đầu `"vòng 1 đề xuất"`; vòng thứ 17 vẫn tự giới thiệu là vòng 1. **0/23** ask nhắc lại thứ người đã phát hiện (`tier`/`Haiku`/`Opus`/`binary path`) | `gates['tsk-48i'].askHistory` |
+
+**S10 giải thích R3 tốt hơn S7.** Câu trả lời phình 295 ký tự vì mỗi vòng người phải dựng lại ngữ
+cảnh từ đầu cho một câu hỏi vừa quên sạch.
+
+**Tự sửa một kết luận của vòng 1.** Vòng 1 viết *"người bị dùng làm vòng retry chứ không phải người
+ra quyết định"*. Đọc 46 event thật của `tsk-48i` (03:12→03:52, 23 cặp ask/answer) thì **sai**:
+
+| Thời điểm | Người phát hiện |
+|---|---|
+| 03:21 | đổi hướng — item phải tách thành 2 con |
+| **03:25** | **root cause: tier `light` dùng judge Haiku, không đủ ổn định** |
+| **03:36** | **bug thật: `parkReasonFor('doing')` là `undefined`** |
+| 03:41 | nâng tier lên `heavy` — `standard` vẫn chưa đủ |
+| 03:46 | binary path cứng trỏ main checkout thay vì code thật |
+
+Đây là một phiên gỡ lỗi thật, không phải 23 lần bấm nút. **Thứ hỏng không phải người bị hỏi lại —
+mà là 23 vòng suy luận của người bị nén còn 1 ô.** Điều này làm S3 nặng hơn nhiều so với đánh giá
+vòng 2: 22 thứ mất đi gồm cả một chẩn đoán root cause và một bug thật.
+
+### Đã rõ — vì sao loop không dùng được, và runner đứng ở đâu (vòng 5)
+
+| # | Sự thật đo được | Con số |
+|---|---|---|
+| R17 | **Item đã được phán rõ đầu bài VẪN bị judge thứ hai chặn** | **70/227 · 31%** |
+| R18 | Item ở clarify chưa từng có discovery entry | **0/51** — chưa ai chạm |
+| R19 | `triage` hôm nay: phân bố `blocks` | **70/77 = 0**, chỉ 7 item = 1 |
+| R20 | Runner chọn item bằng | **FIFO thuần** (`loop.mjs:3,979`), không dùng `triage`/`schedule` |
+| R21 | `--once` rút bao nhiêu item | **bounded drain nhiều item**, tới `maxRoots`×`maxLeavesPerRoot` |
+| R22 | Chi phí spawn một verb đọc | **0,13s** (đo 3 lần, ổn định) |
+| R23 | Park theo stage | clarify 265 (84%) · decompose 40 · **executing 9** |
+
+**Cơ chế thật khiến `discover-loop` bị bỏ.** Spec ghi rõ park *"never a reason to stop"* — nên loop
+**không** tự tắt vì park (auto-stop thật chỉ có: pool rỗng, lock-timeout, trần 15 vòng). Nhưng có
+**hai judge nối tiếp**: judge 1 (`discovery.clear`) pass 88%, rồi judge 2 (verify semantic check)
+vẫn chặn **31%** số đã pass. `tsk-48i` là ca mẫu — 27 entry discovery đều `clear:true`, mà vẫn 23
+câu hỏi. Người chạy loop thấy cứ 3 item thì 1 cái đậu với câu hỏi `grep` không trả lời được, năng
+suất sụp, rồi bỏ. R18 là dấu vết: 51 item chưa từng được chạm.
+
+**Hệ quả cho thiết kế launcher:**
+
+| Loop | Launcher cơ học gỡ được? |
+|---|---|
+| `cleanup-loop` | ✅ toàn cơ học (TTL/nội dung/merge-ancestry), không judge LLM, không hỏi — chính vì vậy nó **không có trần vòng lặp**. Gỡ trọn 112 item |
+| `discover-loop` | ❌ 31% park; launcher chỉ sinh câu hỏi không người trả lời nhanh hơn |
+| `merge-loop` | ⚠️ phần lớn cơ học, Iron Law block vẫn cần người |
+
+**`code-implement` headless hoá được ngay:** `doing → awaiting-approval` median **0,3h**, park ở
+executing chỉ **9 lần** (R23). Khâu này không chờ gì cả.
+
+**Về `0026` luật 2 — sửa một phát biểu sai của vòng 4.** Vòng 4 viết *"launcher không làm được luật
+2"*. Sai khung. `claude -p` là một tiến trình agent **đầy đủ tool và quyền**; thứ duy nhất nó thiếu
+so với interactive là **cửa hỏi người**. Nên:
+
+- Ở biên **Rust → Claude**, luật 2 không áp dụng — không có soul nào ở trên để kế thừa ngữ cảnh.
+- Con Claude vừa spawn **chính là soul sống**; khi nó cần một capacity, luật 2 áp dụng **bên trong
+  nó**, thấp hơn một tầng.
+- Launcher không hụt gì so với `0026`.
+
+**Và điều này chứng minh ngược lại điểm về loop:** cơ chế `ask` là thứ **duy nhất** làm vận hành
+headless gãy. `0026` luật 1–4 nói về *kế thừa ngữ cảnh*, hoàn toàn trực giao với vấn đề *kênh
+người*. Một `claude -p` có đủ soul mà không có cửa hỏi — nên pane herdr không phải để **xem**, mà
+là **cửa hỏi** cho một tiến trình vốn không có cửa nào.
+
 ### Chưa rõ — cần bàn
 
 | # | Câu hỏi mở | Vì sao chưa quyết được |
@@ -157,6 +244,10 @@ Bản vá đó **chỉ áp cho 2 cổng**, bằng so khớp chuỗi. Cổng chi�
 | Q9 | **Sửa tầng 0 có phải đổi hợp đồng CTR004 không, và nếu có thì theo luật nào?** | Thêm `answerHistory`/liên kết hỏi-đáp/kiểu câu hỏi đều là mở rộng lược đồ event. L10 (add-through-not-alongside) bắt mở rộng QUA cửa hiện có; `0011` bắt mọi contract khai version tường minh. Chưa rõ đây là bump version CTR004 hay chỉ thêm trường tuỳ chọn. |
 | Q10 | **Cơ chế giải phóng chung (S1) hình dạng thế nào?** | Thay `ask.includes(<literal>)` bằng gì: một `gateId` ổn định trên mỗi ask? Một `releases` trỏ ngược? Chưa bàn. Đây là thứ quyết định `tsk-65i` là luật định tuyến hay là một cơ chế dữ liệu. |
 | Q11 | **Câu trả lời tự-đứng-được (S7) có cần cấu trúc không?** | STR70a đã dựng `rationale`/`alternatives`/`source` cho answer — có thể phần này đã giải quyết một nửa S7. Cần đọc `checkpoint-distillate-gate-provenance/` xem còn thiếu gì, trước khi thiết kế mới. |
+| **Q12** | **Judge thứ hai có đang thẩm định SAI TẦNG không?** — nó thẩm định *lệnh verify*, trong khi thứ đáng thẩm định là *mục tiêu verify*. R17 (31% item đã rõ đầu bài vẫn bị chặn) là dấu hiệu mạnh. | **Giả thuyết RẺ NHẤT của cả cuộc bàn**: nếu đúng, phần lớn 64% biến mất bằng cách sửa một judge — không cần luật định tuyến mới, không cần lược đồ mới. Chưa kiểm. Phải kiểm trước khi thiết kế bất cứ thứ gì ở tầng 0. |
+| **Q13** | **Web UI nên là binary Rust thứ hai dùng chung `fgos.rs`, hay tiến trình Node cạnh CLI?** | Node gần core hơn (cùng ngôn ngữ, dùng lại lib sau khi `p-09351985` tách core); Rust tái dùng được `ports.rs`/`WorkItemSource` đã có nhưng nhân đôi khoảng cách tới core. Chưa quyết. |
+| **Q14** | **"Một item một lần" nghĩa là một-tiến-trình-một-item (vẫn song song), hay tuần tự thật?** | Config đang khai `parallel: {maxRoots:4, maxLeavesPerRoot:4}` và `fgos schedule` đã tính sẵn sóng song song theo footprint. Tuần tự thật làm hai thứ đó chết và tụt throughput (~40 item/ngày hiện tại) — chấp nhận được nếu là lựa chọn có ý thức, không phải hệ quả phụ. Đề xuất: một tiến trình một item, nhiều tiến trình song song theo `schedule`. |
+| **Q15** | **Launcher có tự chạy mặc định không?** | Tự chạy gỡ được tắc nghẽn nhưng biến nó thành thứ hành động không ai giám sát trên repo thật — mà `p-73d99989` (force-xoá worktree, hạng CRITICAL) **vẫn chưa vá**. |
 
 ---
 
@@ -164,19 +255,27 @@ Bản vá đó **chỉ áp cho 2 cổng**, bằng so khớp chuỗi. Cổng chi�
 
 | D-ID | Quyết định | Vòng chốt | `fgos decision` |
 |---|---|---|---|
-| **D1** | **Kênh chú-ý (STR48) đi SAU hoặc ĐỒNG THỜI với việc sửa chất lượng/định tuyến câu hỏi — không bao giờ trước.** Kênh push khuếch đại chất lượng câu hỏi theo cả hai chiều; đẩy câu hỏi hiện tại lên điện thoại làm trải nghiệm tệ hơn hiện tại, không tốt hơn. | 2 (nêu V1, không bị sửa ở V2) | ✅ `tsk-65i` |
+| **D1** | **Kênh chú-ý (STR48) đi SAU hoặc ĐỒNG THỜI với việc sửa chất lượng/định tuyến câu hỏi — không bao giờ trước.** Kênh push khuếch đại chất lượng câu hỏi theo cả hai chiều; đẩy câu hỏi hiện tại lên điện thoại làm trải nghiệm tệ hơn hiện tại, không tốt hơn. | 2 (nêu V1, không bị sửa ở V2) | ✅ seq 9733 |
+| **D2** | **Sửa ở tầng skill/prompt là không đủ — phải chạm lược đồ `gates[id]`.** Mọi con số lớn đều truy về lược đồ: R9→S1, R2→S6, R3→S10, R8→S5. Prose đã không ép được suốt 152 lần. | 5 (nêu V2, không bị sửa ở V3/V4/V5) | ✅ seq 9744 |
+| **D3** | **Launcher là orchestrator cơ học không-soul** — thi hành lời khuyên của verb đọc (`ready`/`schedule`/`conflicts`/`triage`/`graph`), không tự phán, và **không tự giữ trạng thái "ai đang chạy"** (đọc `sessions.json`/`runner.lock`/`main-checkout.lock`/event log). Tự phán hoặc tự cache = nguồn sự thật thứ hai, đúng loại lỗi đã gây bug production với herdr `agent_status`. | 5 (nêu V4, người chủ sản phẩm khẳng định lại V5) | ✅ seq 9745 |
 
-**Ứng viên D-ID cho vòng 3** (chưa đứng đủ vững):
+**Ứng viên D-ID cho vòng 6** (chưa đứng đủ vững):
 
-- Tranh chấp về pattern/lệnh không escalate lên người — *đang lung lay*: vòng 2 (S1) cho thấy cách
-  sửa có thể là một **cơ chế giải phóng** ở tầng dữ liệu chứ không phải một **luật định tuyến** ở
-  tầng nội dung. Chờ Q10.
+- Một-tiến-trình-một-item biến S7 thành bất biến cấu trúc ⇒ `gates[id]` chịu lực — *mới ở V5.*
+- Pane herdr là **cửa hỏi**, không phải cửa sổ xem — *mới ở V5.*
+- Vẽ UI làm công cụ sinh đặc tả cho tầng 0 — *nêu V4, chưa được khẳng định tường minh.*
 - Mỗi câu hỏi phải tự đứng được mà không cần mở file khác.
-- Sửa tầng skill/prompt là không đủ; phải chạm lược đồ dữ liệu — *mới nêu ở vòng 2, chờ một vòng.*
+- Tranh chấp về pattern/lệnh không escalate lên người — *vẫn lung lay*, chờ Q12: nếu judge thứ hai
+  đang thẩm định sai tầng thì đây không phải luật định tuyến mà là bug của một judge.
 
-**Đã bị sửa, không cấp D-ID** (ghi lại để thấy luật D-ID hoạt động đúng):
+**Đã bị sửa, không cấp D-ID** — bằng chứng luật D-ID hoạt động đúng, giữ lại làm hồ sơ:
 
-- Khung "ba tầng" của vòng 1 → thành **bốn tầng** ở vòng 2. May là chưa cấp D-ID cho nó.
+| Phát biểu | Vòng nêu | Vòng sửa | Sửa thành |
+|---|---|---|---|
+| Khung "ba tầng" | 1 | 2 | bốn tầng — thêm tầng 0 lược đồ |
+| "Người bị dùng làm vòng retry" | 1 | 3 | **sai** — người đang gỡ lỗi thật, tìm ra root cause và một bug thật |
+| "Launcher chạy loop gỡ được 51+128" | 4 | 5 | **sai một nửa** — chỉ đúng với `cleanup-loop` (112); `discover-loop` park 31% |
+| "Launcher không làm được luật 2 của 0026" | 4 | 5 | **sai khung** — luật 2 chưa bao giờ là việc của launcher, nó áp dụng bên trong con Claude được spawn |
 
 ---
 
@@ -305,6 +404,116 @@ tuyến* ở tầng nội dung. Để mở thành Q10.
 theo L10/`0011`), Q10 (hình dạng cơ chế giải phóng), Q11 (STR70a's `rationale`/`alternatives`/
 `source` đã giải quyết bao nhiêu phần của S7).
 
+### 2026-08-08 — Vòng 3: hai trục, và một kết luận sai bị lật
+
+**Người chủ sản phẩm bổ sung yêu cầu:**
+
+> *"Thêm là phải tổ chức trình bày câu hỏi, vấn đề nền step by step theo tiến trình lịch sử và
+> tiến trình nhận thức (mức độ rõ ràng) dẫn tới câu hỏi hiện tại."*
+
+**Scout để xem dữ liệu có đủ dựng hai trục không** → S8/S9/S10 (bảng ở §3).
+
+**Trong lúc scout, đọc 46 event thật của `tsk-48i` và phát hiện vòng 1 đã kết luận sai.** Vòng 1
+viết *"người bị dùng làm vòng retry"*. Thực tế: một phiên gỡ lỗi 40 phút, người tìm ra root cause
+(judge tier `light` dùng Haiku không đủ ổn định), tìm ra một bug thật (`parkReasonFor('doing')` là
+`undefined`), và đổi hướng decompose. Đã ghi lại nguyên văn ở §3.
+
+Kết luận sửa lại: **thứ hỏng không phải người bị hỏi lại, mà là 23 vòng suy luận của người bị nén
+còn 1 ô.** S3 nặng hơn đánh giá vòng 2 rất nhiều.
+
+**Đảo giá trị của UI.** Vòng 4 sẽ bàn UI; nhưng vòng 3 đã đặt nền: một dòng `ask` trong terminal
+không bao giờ trình bày được hai trục. Nên UI **không** còn là lớp trang trí trên lược đồ hỏng —
+nó là **lý do lược đồ phải đổi**.
+
+**Ba backlog row chồng lấn, phải tra trước khi thiết kế:** STR69b (*vệt event gần nhất + diff giàu
+hơn khi người quay lại gate* → trục lịch sử), **STR70a đã `done`** (distillate `{đã-loại,
+còn-treo}` → phôi thai của trục nhận thức), STR61 (*context continuity khi ngắt quãng dài*).
+Vì STR70a đã done, có thể một phần trục nhận thức đã tồn tại mà `tsk-48i` (chạy 2026-08-05) không
+dùng — Q11 từ vòng 2 nay thành chặn.
+
+### 2026-08-08 — Vòng 4: đề xuất kiến trúc launcher
+
+**Người chủ sản phẩm đề xuất:**
+
+> *"liệu chúng ta mở rộng herdr-plugin, biến nó thành 1 webserver nhỏ, cung cấp ui để xem task và
+> trả lời câu hỏi"* … *"một rust đóng gói khi chạy mở webserver và điều phối cả tui, thật ra là 2
+> mức độ ui, một launcher điều phối thông minh sử dụng herdr hoặc runner."*
+
+**Scout — ba phát hiện làm đề xuất vững hơn dự kiến:**
+
+1. **`ports.rs` đã có sẵn đúng seam cần thiết**: `trait WorkItemSource` (`fetch_triage`/
+   `fetch_doing`/`fetch_need_answer`/`fetch_after_deliver`/`fetch_merge_list`) và
+   `trait PaneRegistry`. Comment: *"fgOS data source seam (tsk-3t9 D1) — the domain asks for rows
+   through this trait instead of importing `crate::fgos` directly."* Hai tầng UI dùng chung một
+   lõi **không phải viết lại**.
+2. **Kỷ luật "herdr là chrome" đã nằm trong code**, không chỉ runbook: `fgos.rs:48` — *"never
+   herdr's own `agent_status` either way"*. Mọi chỗ `agent_status` xuất hiện đều là test fixture.
+3. **Chi phí spawn 0,13s/verb** (R22) — kiến trúc "Rust spawn `fgos`" chạy được thật.
+
+**Khớp hai quyết định đã khoá.** `0026`: orchestrator là một **vai trò**, đã liệt kê sẵn
+`fgos-runner` và `herdr-plugin`; và vai trò đó **không cần soul**. `0014`: daemon ngoài core, nói
+qua CLI, mọi UI không-phải-terminal là client của daemon. Launcher Rust spawn `fgos` = đúng khuôn.
+
+**Phản biện đưa ra ở vòng này:** "điều phối thông minh" phải định nghĩa lại — launcher **không**
+thông minh, nó thi hành lời khuyên của chính fgOS qua verb đọc. Ba ràng buộc: không tự giữ trạng
+thái "ai đang chạy"; identity gate trước khi mở cổng HTTP (STR38 tự ghi: `verify` chạy như shell ⇒
+injection vector); `fgos.rs` đang literal-match chuỗi status, không đọc `statusCategory` (`0027`).
+
+→ thành D3 ở vòng 5.
+
+### 2026-08-08 — Vòng 5: hai phản biện của người chủ sản phẩm, cả hai đúng
+
+**Phản biện (1):**
+
+> *"Launcher cơ học, người không dùng vì vướng đúng cơ chế bị hỏi. Nó cứ dừng lại hỏi liên tục và
+> tự tắt loop. Có là dùng herdr như là một loop riêng, bật pane để xử lý từng item."*
+
+**Kiểm:** spec `discover-loop` ghi park *"never a reason to stop"* — nên loop **không** tự tắt vì
+park. Nhưng đo ra cơ chế thật và nó tệ hơn: **hai judge nối tiếp**, judge 2 chặn **31%** số item
+judge 1 đã phán rõ (R17). Bằng chứng người đã bỏ: **0/51** item clarify từng có discovery entry
+(R18).
+
+→ *"Launcher chạy loop gỡ được 51+128"* của vòng 4 **sai một nửa**: đúng với `cleanup-loop` (thuần
+cơ học, không trần vòng lặp, gỡ 112), sai với `discover-loop`. Và **giải pháp herdr-pane của người
+chủ sản phẩm đúng hơn**: pane là **cửa hỏi** cho tiến trình headless, không phải cửa sổ xem.
+
+**Phản biện (2):**
+
+> *"rust là process control, khi nó bật Claude thì Claude vẫn là một tiến trình agent với đầy đủ
+> tool và quyền chỉ là không interactive?"*
+
+**Đúng, và vòng 4 đã phát biểu sai khung.** Chi tiết ở §3. Điểm quan trọng rút ra: thứ **duy nhất**
+headless Claude mất là **cửa hỏi người** — nên cơ chế `ask` chính xác là thứ duy nhất làm vận hành
+headless gãy. Phản biện (2) chứng minh phản biện (1).
+
+**Người chủ sản phẩm làm rõ hướng tiến hoá:**
+
+> *"headless runner sẽ và nên được dùng để xử lý các tiến trình không cần người như: clarifying,
+> code-implement khi mọi thứ đã rõ ràng… dần sẽ tiến tới không dùng loop mà sẽ có launcher tổng để
+> bật và làm từng item, xong từng cái một, nếu không tự xử lý được thì cũng ghi nhận đợi human và
+> tắt process đó. Launcher thực chất đóng vai trò như loop cơ học, dùng harness như ready hoặc
+> triage để chọn item."*
+
+**Scout runner hiện tại** → R19–R23. Ba thứ còn thiếu so với thiết kế: picker vẫn **FIFO thuần**
+(`triage`/`schedule` tồn tại nhưng runner không dùng); `--once` là **bounded drain nhiều item**
+chứ không một-item-một-tiến-trình; park xong chạy tiếp thay vì tắt tiến trình.
+
+**Đóng góp lớn nhất của vòng này — mối nối launcher ↔ tầng 0:**
+
+Một-tiến-trình-một-item biến S7 từ *khuyết điểm* thành **bất biến cấu trúc**. Nếu tiến trình chết
+khi park thì câu trả lời **luôn luôn** được tiêu thụ bởi một tiến trình lạnh. Context sạch (ưu
+điểm) và câu-trả-lời-cho-người-lạ (nhược điểm) là hai mặt cùng một đồng xu. Hệ quả: `gates[id]`
+chuyển từ "nên đầy đủ" thành **chịu lực** — kênh truyền ngữ cảnh duy nhất giữa tiến trình hỏi và
+tiến trình đọc. **Tầng 0 là hạ tầng của launcher, không phải nhánh song song.**
+
+**Hai cảnh báo đo được:** `triage` hôm nay gần như không có tín hiệu (R19: 70/77 item `blocks=0`),
+nên dùng làm picker thì thứ tự đến từ `goalTier` chứ không từ đòn bẩy thật. Và headless *clarify*
+là đúng chỗ `ask` cắn mạnh nhất (84% park, 31% clear-vẫn-chặn) — chỉ chạy được sau khi judge 2
+được sửa; trong khi headless *code-implement* chạy được **ngay** (median 0,3h, chỉ 9 park).
+
+**Giả thuyết rẻ nhất bật ra, chưa kiểm** → Q12: judge thứ hai có đang thẩm định *lệnh* thay vì
+*mục tiêu* không? Nếu đúng, phần lớn 64% biến mất bằng cách sửa một judge.
+
 ---
 
 ## 6. Thiết kế đã chốt {#design}
@@ -359,6 +568,84 @@ flowchart TD
 | 3 · Bối cảnh | câu hỏi tự đứng được | `tsk-539` | Phạm vi hiện tại của STR71 |
 | ⊥ Trần hỏi lại | không ai chặn ở lần 23 | **chưa có** | Cắt ngang; gốc là S1 |
 
+### Hai trục mà một câu hỏi phải mang theo (vòng 3)
+
+Câu hỏi hiện tại chỉ trả lời được khi người đọc thấy **đường đi tới nó**, trên hai trục:
+
+| Trục | Dữ liệu cần | Tình trạng |
+|---|---|---|
+| **Lịch sử** | mỗi ask/answer có `ts`+`seq`, ghép được với discovery/decisions/stage | **có trong event log, rơi ở bước fold** (S8) — rẻ, chỉ là ngừng làm mất |
+| **Nhận thức** | cái gì đã chốt ở vòng nào, cái gì còn mờ, ask mang theo tích luỹ | **chưa có gì** (S9, S10) — thiết kế mới thật |
+
+`tsk-48i` là ca kiểm chứng: người tìm ra root cause lúc 03:25, nhưng câu hỏi lúc 03:34, 03:41,
+03:52 vẫn mở đầu *"vòng 1 đề xuất"*. Hệ mất trí nhớ, không phải người lặp lại.
+
+### Kiến trúc vận hành (vòng 4–5)
+
+Ba vai, ranh giới rõ:
+
+```mermaid
+flowchart LR
+    L["LAUNCHER · Rust<br/>orchestrator cơ học, KHÔNG soul (D3)"]
+    L -->|"đọc lời khuyên"| V["verb đọc của fgOS<br/>ready · schedule · conflicts · triage · graph"]
+    L -->|"đọc, không cache"| T["trạng thái ai-đang-chạy<br/>sessions.json · runner.lock<br/>main-checkout.lock · event log"]
+    L -->|"spawn 1 tiến trình / 1 item"| P["claude -p<br/>soul đầy đủ, tool đầy đủ<br/>THIẾU DUY NHẤT: cửa hỏi người"]
+    P -->|"tự xử được"| D["xong → tiến trình chết"]
+    P -->|"không tự xử được"| K["park + ghi gates id<br/>→ tiến trình chết"]
+    K -.->|"câu trả lời tới sau,<br/>tiến trình LẠNH đọc"| G[("gates id<br/>KÊNH TRUYỀN NGỮ CẢNH DUY NHẤT")]
+    L -->|"cần cửa hỏi tương tác"| H["herdr pane<br/>CỬA HỎI, không phải cửa sổ xem"]
+    L --> U["2 tầng UI dùng chung<br/>trait WorkItemSource (đã có)"]
+
+    style G fill:#f5e2df,stroke:#9E3A30,stroke-width:2px
+    style L fill:#ddeded,stroke:#186E71
+    style H fill:#f2e9d8,stroke:#8E6318
+```
+
+**Launcher** thay `--watch` daemon và thay loop: chọn item qua verb đọc, bật **một tiến trình một
+item**, tiến trình chết khi xong hoặc khi park. `fgos-runner --once` đã là phôi, còn thiếu ba thứ:
+picker vẫn FIFO (R20), `--once` rút nhiều item chứ không một (R21), park xong chạy tiếp thay vì
+tắt.
+
+**Tiến trình con** (`claude -p`) có soul đầy đủ. Thiếu **duy nhất** cửa hỏi người — đó là toàn bộ
+lý do vận hành headless gãy hôm nay.
+
+**Pane herdr** là **cửa hỏi**, không phải cửa sổ xem. Đây là chỗ herdr thôi là chrome thuần: nó
+cấp cho tiến trình headless cái cửa mà bản thân tiến trình không có. Kỷ luật cũ vẫn giữ nguyên —
+mọi tín hiệu trạng thái đến từ event log, không bao giờ từ `agent_status` của herdr.
+
+### Mối nối quyết định: launcher làm tầng 0 thành chịu lực
+
+Đây là kết luận trung tâm của toàn bộ cuộc bàn tới giờ.
+
+Một-tiến-trình-một-item cho context sạch — nhưng **cắt ngữ cảnh giữa các item cũng cắt luôn ngữ
+cảnh giữa câu hỏi và câu trả lời**. Nếu tiến trình chết khi park, thì S7 (người lạ tiêu thụ câu
+trả lời) không còn là trường hợp xấu mà là **bất biến của thiết kế**.
+
+Hệ quả: `gates[id]` là **kênh truyền ngữ cảnh duy nhất** giữa tiến trình hỏi và tiến trình đọc.
+Mọi thứ không nằm trong đó là mất vĩnh viễn. Nên tầng 0 không phải nhánh song song với launcher —
+nó là **hạ tầng của launcher**, và S8/S9/S10 chính là thứ tiến trình lạnh cần để nối lại mạch.
+
+### Thứ tự triển khai (sửa lại ở vòng 5)
+
+| # | Việc | Phụ thuộc | Vì sao ở vị trí này |
+|---|---|---|---|
+| 0 | Vá `p-73d99989` (force-xoá worktree) | — | CRITICAL, chưa vá; launcher tự chạy sẽ tăng tần suất gặp (Q15) |
+| 1 | **Kiểm Q12** — judge 2 thẩm định sai tầng? | — | Giả thuyết rẻ nhất; nếu đúng, 64% biến mất mà không cần lược đồ mới |
+| 2 | Launcher chạy `cleanup-loop` | — | Thuần cơ học, gỡ 112 item, không đụng gate |
+| 3 | Headless `code-implement` | — | Median 0,3h, chỉ 9 park — chạy được ngay |
+| 4 | Tầng 0 — lược đồ `gates[id]` | Q12 | Hạ tầng của launcher; dùng bản vẽ UI làm công cụ sinh đặc tả |
+| 5 | Pane herdr làm cửa hỏi | 4 | Mở đường cho headless clarify |
+| 6 | Headless `clarify` | 1, 4, 5 | 84% park nằm ở đây; chỉ chạy được sau khi judge 2 sửa |
+| 7 | Hai tầng UI | 4 | Dựng trên `WorkItemSource` đã có; giờ mới có dữ liệu hai trục để hiện |
+| 8 | Kênh chú-ý (STR48) | 4, 6 | **D1** — không bao giờ trước |
+
+### Ràng buộc bảo mật phải nằm trong thiết kế từ đầu
+
+`verify` chạy như một lệnh shell (`dispatch.mjs`). Hôm nay `fgos` chỉ nghe từ terminal của chính
+người dùng. Mở cổng HTTP đổi hẳn threat model: ai tới được cổng đó đều ghi được `verify`, và
+`verify` được thực thi. STR38 đã tự ghi yêu cầu identity gate *"ai được nói verb nào"* trước khi
+dịch xuống CTR001 — không vá sau được.
+
 ### Vì sao tầng 0 quyết định phạm vi cả cụm
 
 Vòng 1 xếp `tsk-65i` là "luật định tuyến" — một quy tắc nói *khi nào được escalate*. Vòng 2 cho
@@ -395,7 +682,44 @@ documentation*), đây là lỗ hổng bằng chứng, không chỉ lỗ hổng 
 
 ## 7. Danh mục hạng mục / task {#tasks}
 
-*(Tạm thời, theo hình dạng bốn tầng ở §6. Chốt lại sau khi Q1 và Q8 ngã ngũ.)*
+*(Tạm thời, theo §6. Chốt lại sau khi Q12 được kiểm và Q1/Q8/Q14 ngã ngũ.)*
+
+### Chưa có item · Kiểm giả thuyết judge-2-sai-tầng {#task-judge2-hypothesis}
+
+- **Mục tiêu:** trả lời Q12 — `judgeVerifySemanticCorrectness` đang thẩm định *lệnh verify* hay
+  *mục tiêu verify*? Nếu là lệnh, phần lớn 64% tranh chấp là bug của một judge, không phải thiếu
+  luật định tuyến hay thiếu lược đồ.
+- **Trích §6:** dòng 1 của bảng thứ tự triển khai.
+- **Quan hệ anh em:** **chặn** `#task-gate-schema`, `#task-routing`, và mọi việc headless clarify.
+  Rẻ nhất, làm trước tất cả.
+- **Draft verify:** đọc được, không phải sửa — kết quả là một ghi nhận vào file này, không phải
+  code. Có thể chỉ cần một vòng scout, không cần item riêng nếu làm ngay trong cuộc bàn.
+
+### Chưa có item · Launcher — orchestrator cơ học {#task-launcher}
+
+- **Mục tiêu:** thay `--watch`/loop bằng launcher chọn item qua verb đọc, bật **một tiến trình một
+  item**, tiến trình chết khi xong hoặc khi park.
+- **Trích §6:** sơ đồ kiến trúc vận hành + mối nối "launcher làm tầng 0 thành chịu lực".
+- **D-ID áp dụng:** **D3** (không-soul, không cache trạng thái).
+- **Đã có phôi:** `fgos-runner --once`. Thiếu ba thứ: picker FIFO → `triage`/`schedule` (R20);
+  bounded drain → một item (R21); park xong chạy tiếp → tắt tiến trình.
+- **Câu hỏi mở riêng:** Q14 (song song hay tuần tự thật), Q15 (tự chạy mặc định không).
+- **Cảnh báo:** `triage` hôm nay 70/77 item có `blocks=0` (R19) — làm picker thì thứ tự đến từ
+  `goalTier`, không từ đòn bẩy thật.
+- **Lát cắt đầu chạy được ngay, không phụ thuộc gì:** launcher chỉ chạy `cleanup-loop` (112 item).
+- **Chưa submit** — chờ Q14.
+
+### Chưa có item · Hai tầng UI + cửa hỏi {#task-ui-tiers}
+
+- **Mục tiêu:** TUI và web dùng chung `trait WorkItemSource` (đã có ở `ports.rs`); pane herdr làm
+  **cửa hỏi** cho tiến trình headless.
+- **Trích §6:** sơ đồ kiến trúc; bảng hai trục.
+- **Phụ thuộc cứng:** `#task-gate-schema` — không có dữ liệu hai trục thì màn hình không hiện được
+  gì ngoài thứ hôm nay đã có.
+- **Câu hỏi mở riêng:** Q13 (Rust thứ hai hay tiến trình Node).
+- **Ràng buộc bảo mật:** identity gate trước khi mở cổng HTTP — `verify` chạy như shell.
+- **Dùng ngược làm công cụ:** vẽ màn hình trước, không code — bản vẽ sinh ra đặc tả cho tầng 0.
+- **Chưa submit** — chờ tầng 0.
 
 ### Chưa có item · Lược đồ gate — tầng 0 {#task-gate-schema}
 
