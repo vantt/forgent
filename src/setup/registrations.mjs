@@ -731,3 +731,57 @@ registerCheck({
   description: 'a fgos CLI is reachable from this project (local bin/fgos.mjs or a global PATH install)',
   check: (cwd) => checkPluginSkillCliReachable(cwd),
 });
+
+// tsk-3ip (docs/history/automated-changelog-compound-learn/DISCUSSION.md
+// §6.1/§6.4): observe/remind only -- never judges whether a change
+// deserved an entry, never blocks merge (R2, tsk-28x §6.4). Exported so
+// `bin/fgos.mjs`'s `collectChangelogNag` can reuse the identical
+// extraction/detection logic rather than duplicating it (the doctor check
+// here and the `fgos check` nag both need the same "does Unreleased have
+// a real entry" read).
+//
+// Purely structural: looks for a `- ` bullet line inside the `##
+// [Unreleased]` section, never judges the bullet's content. The exact
+// heading string (with brackets) matches what the sibling bootstrap task
+// (tsk-469) writes into CHANGELOG.md.
+export function extractUnreleasedSection(content) {
+  const heading = '## [Unreleased]';
+  const idx = content.indexOf(heading);
+  if (idx === -1) return '';
+  const rest = content.slice(idx + heading.length);
+  const nextHeadingIdx = rest.search(/\n## /);
+  return nextHeadingIdx === -1 ? rest : rest.slice(0, nextHeadingIdx);
+}
+
+export function unreleasedHasEntries(content) {
+  return /^-\s+\S/m.test(extractUnreleasedSection(content));
+}
+
+// READ-ONLY by construction (same as every other check here) -- only
+// fs.existsSync/readFileSync, never writes. A missing CHANGELOG.md is a
+// normal state (a fresh fgOS consumer hasn't adopted one yet), never an
+// error -- same "absent capability = clean skip" contract
+// `checkToolRegistryConfigured`/`checkDependenciesInstalled` already give
+// their own missing-prerequisite cases.
+function checkChangelogUnreleasedStale(cwd) {
+  const mainCheckout = resolveMainCheckout(cwd);
+  const root = mainCheckout ?? cwd;
+  const changelogPath = path.join(root, 'CHANGELOG.md');
+  if (!fs.existsSync(changelogPath)) {
+    return { passed: true, message: 'CHANGELOG.md not found -- nothing to check (project has not adopted a changelog yet)' };
+  }
+  const content = fs.readFileSync(changelogPath, 'utf8');
+  if (unreleasedHasEntries(content)) {
+    return { passed: true, message: '## [Unreleased] has pending entr(ies) -- up to date' };
+  }
+  return {
+    passed: false,
+    message: '## [Unreleased] has no pending entries -- reminder only: add a line here when your next user-visible change merges (never blocks merge)',
+  };
+}
+
+registerCheck({
+  id: 'changelog-unreleased-stale',
+  description: 'CHANGELOG.md ## [Unreleased] section has at least one pending entry (observe/remind only, never blocks merge -- tsk-3ip)',
+  check: (cwd) => checkChangelogUnreleasedStale(cwd),
+});

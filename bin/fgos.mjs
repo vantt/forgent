@@ -40,6 +40,7 @@ import { createGitHubPR, mergeGitHubPR, viewGitHubPRStatus } from '../src/runner
 import { assertSafeMainCheckoutReset } from '../src/runner/main-checkout-reset-guard.mjs';
 import { classifyIronLaw } from '../src/evolve/iron-law.mjs';
 import { driftStatus } from '../src/state/drift-status.mjs';
+import { unreleasedHasEntries } from '../src/setup/registrations.mjs';
 import { branchNameFor, branchExists, withMergeEphemeralWorktree, provisionDependencies } from '../src/runner/worktree.mjs';
 import { resolveIntegrationBranch, retargetMember } from '../src/runner/promote-engine.mjs';
 import { claimWork, ClaimError } from '../src/runner/claim-port.mjs';
@@ -633,6 +634,40 @@ function collectMissingOutcomeNag(view, id) {
   return { count: missing.length, ids: missing };
 }
 
+// tsk-3ip (docs/history/automated-changelog-compound-learn/DISCUSSION.md
+// §6.1/§6.4): observe/remind only, never blocks merge (R2, tsk-28x §6.4).
+// `unreleasedHasEntries` (registrations.mjs) is the same structural read
+// the `changelog-unreleased-stale` doctor check uses, so both surfaces
+// agree on what "has an entry" means.
+function changelogNagHistoryPath(dir) {
+  return path.join(dir, 'changelog-nag-history.jsonl');
+}
+
+// Appends one snapshot per `check` run — same append-only, never-read-back
+// discipline `appendHistoryEntry` (entropy, below) already uses. This file
+// is the item's own required "bộ đếm": raw {ts, hasEntries, deliveredCount}
+// data points that, read back across N real runs spread over N real
+// merges, are what let a person later derive the three numbers the item's
+// description says are currently guesses. This function only records the
+// data point — it never computes a rate itself ("đếm, đừng mắng").
+function appendChangelogNagHistoryEntry(dir, entry) {
+  fs.mkdirSync(dir, { recursive: true });
+  fs.appendFileSync(changelogNagHistoryPath(dir), `${JSON.stringify(entry)}\n`, 'utf8');
+}
+
+function collectChangelogNag(view, dir) {
+  const root = path.dirname(dir);
+  const changelogPath = path.join(root, 'CHANGELOG.md');
+  if (!fs.existsSync(changelogPath)) {
+    return { fileExists: false };
+  }
+  const content = fs.readFileSync(changelogPath, 'utf8');
+  const hasEntries = unreleasedHasEntries(content);
+  const deliveredCount = Object.values(view.work ?? {}).filter((w) => w.status === 'delivered').length;
+  appendChangelogNagHistoryEntry(dir, { ts: new Date().toISOString(), hasEntries, deliveredCount });
+  return { fileExists: true, hasEntries, deliveredCount };
+}
+
 // Entropy-trend history path (per this cell's action (2) / must_haves: MUST
 // live in the SAME data dir as the store's own events.jsonl — never
 // hardcoded to `repo/.fgos`). `dir` here is always the caller's resolved
@@ -724,6 +759,9 @@ function collectCheckData(view, id, dir) {
     settlement: collectSettlementData(view, id),
     learning: collectLearningData(view, id),
     missingOutcomeNag: collectMissingOutcomeNag(view, id),
+    // Changelog observe/remind nag (tsk-3ip): a whole-work-state summary,
+    // not scoped to `id`, same as `entropy` below.
+    changelogNag: collectChangelogNag(view, dir),
     // Entropy-trend + seal-digest: a whole-work-state summary, not scoped to
     // `id` like the fields above — it reports on the learning area as a
     // whole even when `check <id>` was called for one item.
