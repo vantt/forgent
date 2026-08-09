@@ -41,7 +41,7 @@ thuộc phạm vi thảo luận này.
 | 3 | Model "grow vs create" (additive, không xoá/rút gọn) | RÕ, tái dùng được | Khớp tự nhiên bản chất changelog — mỗi entry cộng dồn |
 | A | Vị trí file `CHANGELOG.md` | **D-tsk12m-A** | Chốt: repo root. `fgos-compounding` SKILL.md cần sửa câu chữ hard rule (exemption cho changelog) khi vào giai đoạn planning |
 | B | Điểm quyết "có đáng ghi changelog không" nằm ở đâu | **D-tsk12m-B** | Mở rộng `fgos-compounding`, hình dạng registry mở-rộng-được (tiền lệ `registerCheck`/`registerFix`). Phạm vi/thiết kế registry cụ thể → tách sang `docs/history/compound-learn-artifact-registry/DISCUSSION.md` |
-| C | Version heading cho entry mới | **D-tsk12m-C** | `## Unreleased`, cắt-release là bước thủ công riêng, ngoài phạm vi `tsk-12m` |
+| C | Version heading cho entry mới | **D-tsk12m-C** | Chuỗi chính xác **`## [Unreleased]`** (có ngoặc vuông, đúng chuẩn Keep a Changelog mà D-tsk12m-A đã cam kết). Cắt-release là bước thủ công riêng, ngoài phạm vi `tsk-12m`. *Làm rõ 2026-08-09: các dòng ghi tắt `## Unreleased` không ngoặc trong văn xuôi §5 là cùng một thứ viết gọn, không phải quyết định khác — pin lại ở đây vì `tsk-3ip` PARSE đúng chuỗi này, sai một ký tự là check đọc trượt.* |
 | D | "User-visible" định nghĩa bằng gì | TRẢ LỜI V3 (chưa D-ID, chờ vòng 4) | Chốt D2: session tự phán đoán có bằng chứng ngay lúc retrospective, cùng kỷ luật chọn quadrant (không mặc định, không coin-flip) — hệ quả tự nhiên của D-tsk12m-B |
 | E | Tầm nhìn compound-learn đa-audience | TÁCH RA | Chuyển sang discussion riêng `docs/history/compound-learn-artifact-registry/DISCUSSION.md` (yêu cầu chủ sản phẩm, 2026-08-07 vòng 3) — không còn theo dõi ở đây |
 | F | **Ranh giới: cơ chế nào làm được TRƯỚC khi chốt phương án tổng thể** | RÕ (vòng 4) | Không phải chia theo "chặng", mà theo **cơ chế đó LÀM GÌ**. Loại **quan sát/nhắc** (nag, doctor check, bộ đếm) không quyết gì, không viết gì, không chặn ai → độc lập hoàn toàn với câu hỏi phương án của `tsk-28x`. Loại **quyết/viết/chặn** (phán đoán changelog-worthy, sinh nội dung entry, chặn merge khi thiếu entry) → kẹt sau nó. Xem §6 |
@@ -197,4 +197,64 @@ một đường.
 
 ## 7. Danh mục hạng mục / task {#tasks}
 
-(chưa chia — chờ §6)
+Hai task đã submit thật 2026-08-09, enrich đầy đủ để chạy không cần hỏi
+lại. **Chạy song song được** — `fgos conflicts` xác nhận footprint rời
+hẳn, không cặp xung đột nào giữa hai cái.
+
+### tsk-469 — bootstrap CHANGELOG.md thủ công {#task-manual-changelog-bootstrap}
+
+**Mục tiêu:** dựng `CHANGELOG.md` ở repo root theo Keep a Changelog, cắt
+baseline `## [0.1.0]` gộp, thêm câu hỏi bắt buộc vào gate sẵn có trong
+`AGENTS.md`. Không tự động hoá gì.
+
+**Trích §6 áp dụng:** §6.2 (4 bước) và §6.3 (điểm yếu cố hữu — bản thủ
+công phụ thuộc việc có người nhớ; bước 4 chỉ làm bớt quên chứ không loại
+bỏ, và đó chính là lý do `tsk-3ip` tồn tại).
+
+**D-ID áp dụng:** D-tsk12m-A (root), D-tsk12m-C (`## [Unreleased]`,
+cắt-release ngoài phạm vi).
+
+**Quan hệ anh em:** không phụ thuộc `tsk-3ip`, chạy song song được.
+Cung cấp cho `tsk-3ip` chuỗi heading mà nó parse — nhưng `tsk-3ip` phải
+xử lý được cả trường hợp file chưa tồn tại, nên không phải dependency
+cứng.
+
+**Footprint:** `CHANGELOG.md`, `AGENTS.md`.
+**Verify:** `test -f CHANGELOG.md && grep -qF '## [Unreleased]' CHANGELOG.md && grep -qF '## [0.1.0]' CHANGELOG.md && grep -qF 'CHANGELOG.md' AGENTS.md && echo PASS`
+
+### tsk-3ip — cơ chế quan sát/nhắc + bộ đếm {#task-changelog-observe-remind}
+
+**Mục tiêu:** nag gộp qua `fgos check`, doctor check đăng ký qua
+`registerCheck`, bộ đếm tỉ lệ quên. Chỉ quan sát và nhắc.
+
+**Trích §6 áp dụng:** §6.1 (ranh giới quan-sát/nhắc vs quyết/viết/chặn —
+lý do task này làm được ngay dù câu hỏi phương án còn treo, và lý do nó
+sống sót qua mọi câu trả lời), §6.4 (chặng 2 là thứ biến chặng 1 thành
+chặng đo thật; nag phải **đếm, đừng mắng**).
+
+**Ràng buộc ngoài áp vào:** R2 của `tsk-28x` §6.4 — quyền quyết định của
+người phải đạt được KHÔNG bằng cửa chặn, nên tuyệt đối không chặn merge.
+
+**Số liệu bắt buộc tôn trọng:** ~25 lượt vào `delivered`/ngày, ~176/tuần
+(đo `.fgos/events.jsonl`, 2026-08-01→08). Nag per-merge = 176 lần làm
+phiền/tuần → chết vì nhiễu. Bắt buộc gộp.
+
+**Quan hệ anh em:** song song với `tsk-469`. **Nhưng xung đột footprint
+với `tsk-3cb`** trên `bin/fgos.mjs` (`fgos conflicts` phát hiện; cả hai
+đang `todo/clarify`, chưa cái nào chạy) — đừng chạy đồng thời hai cái đó.
+
+**Footprint:** `bin/fgos.mjs`, `src/setup/registrations.mjs`,
+`test/setup/checks.test.mjs`.
+**Verify:** `node --test test/setup/checks.test.mjs`
+
+### Quan hệ với `tsk-12m` (chặng 3)
+
+`tsk-12m` (tự động hoá thật) **phụ thuộc cả hai** — cần file tồn tại
+(`tsk-469`) và cần số đo để trả lời câu hỏi phương án (`tsk-3ip`). Đã gắn
+`deps` thật 2026-08-09.
+
+### Nằm NGOÀI phạm vi hai task này
+
+Nửa marketing-storytelling của câu hỏi phương án. Nó cần phép thử riêng
+(`tsk-28x` §6.4 Cách 1 — mặt đọc trên vỉa ask/tranh cãi), độc lập, chạy
+song song được, **chưa submit thành item**.
