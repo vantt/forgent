@@ -103,6 +103,7 @@ không mở lại những quyết định các item khác đã khoá.
 | 29 | `adapter` — suy dẫn thứ 5 cho A3 | **Rõ** (vòng 8) | `EXECUTOR_ADAPTERS` đúng 1 key, `DEFAULT_ADAPTER = 'cli-spawn'` — **trùng chuỗi** với giá trị mechanism #3 (dẫn xuất). Hai tầng khác nhau đội chung một chuỗi, hôm nay không phân biệt được vì chỉ có một adapter. Ngày `rpc`/`app-server` (đã deferred, cùng doc comment) được đăng ký: nhà cung cấp vẫn **ngoài** nhưng adapter là `rpc` ⇒ tên `cli-spawn` cho **mechanism** thành sai. Xác nhận A3 từ hướng hoàn toàn khác |
 | 30 | #1 gộp hai câu hỏi | **Đang hội tụ** (vòng 8) — **đụng `tsk-2cw`, chờ người dùng** | `0028` (accepted, supersedes 0026) đã lập luận sẵn hai tính chất độc lập: **arity** (1 vs N) và **có ở lại không** (bước ra vs giữ liên hệ liên tục). Bảng: (1,buông)=`launcher` · (1,ở lại)=`driver` · (N,ở lại)=`orchestrator` · (N,buông)=**trống**. `0026`: *"Vai trò launcher KHÔNG CẦN soul ... THUẦN CƠ HỌC"* ⇒ nhu-cầu-phán-đoán bám theo **cột**, không theo arity |
 | 31 | `orchestrator` là tầng trên, không phải ô thứ ba | **Đang hội tụ** (vòng 8) | `fgos-fanout` spawn N Agent, **mỗi Agent chạy `/fgOS:pick` end-to-end** ⇒ mỗi cái là một `driver`. Nên orchestrator = **hợp thành** (N lần dấn thân con), không phải anh em ngang hàng. Đề xuất: #1 rút về **2 giá trị**, `orchestrator` ra khỏi enum lên tầng hợp thành — đúng chỗ `tsk-2cw` đang chừa |
+| 40 | Nhận luật US-027 hay không (P5) | **Đề nghị: NHẬN** (vòng 12) — treo từ vòng 6 | Name-keying là **hệ quả tất yếu** của phía cầu câm, không phải lười. Nhận luật = bắt phía cầu tự khai ⇒ **gộp** với "món to nhất" của kho hn. Bên cầu phải khai **hai** field: `needs` (capability → chọn provider) + `for` (purpose → chọn lane). Hai cửa hôm nay: prose tuân, máy không. §6.4 |
 | 39 | Phép thử thứ ba của D2: **ai sở hữu tiêu chí** | **Đề nghị** (vòng 11) | Dùng khi một response mang cả digest lẫn nhãn phán. `gather` = tiêu chí ở **bên gọi** · `judge` = tiêu chí ở **bên được gọi**, bên gọi **tuân**. Ca thử: `impact()` của gitnexus trả cả caller-list lẫn `risk` — nhưng `CLAUDE.md` bắt **cross-check trước khi tin** ⇒ không tuân ⇒ **gather**, `risk` là *verdict giả*. Kiểm ngược: `judge-discovery` bên gọi tuân ⇒ judge thật. §6.3 |
 | 38 | 11 capability của hn xếp đâu | **Đề nghị** (vòng 11) | **T4 phía cung**, không ngang `gather`/`judge` (thuộc tính của nhà cung cấp, không của một lần dispatch). Cũng **không ngang `gitnexus`**: cả 11 tả **chính cái sổ**, do harness CLI tự khai qua `query.contract`. Ô tương ứng của fgOS — *sổ tự khai năng lực + dải schema* — **đang trống**, latent thật vì global/project install có thể lệch version. §6.5 |
 | 34 | Ô "mục tiêu ngoài sổ" đã có tên | **Đang hội tụ** (vòng 10) | **`errand`** — quét sạch 0 hit ở `src/`, `docs/`, `upstreams/`. Bác `cell` (false friend: bee's cell CÓ claim/reservation/registry) và `packet` (kéo theo khung *"orthogonal axes"* D1 đã bác). Bốn phép thử ở §6.3, sắc nhất: **không sở hữu branch/merge riêng**. Vẫn gated `tsk-2t6` |
@@ -584,6 +585,30 @@ Kết: **gather**, `risk` là verdict giả. Bằng chứng là chính `CLAUDE.m
 cross-check trước khi tin, và luật viết *"HIGH thì cảnh báo người dùng"* chứ
 không phải *"HIGH thì dừng"*.
 
+### Vòng 12 — 2026-08-09 — F: luật US-027
+
+**Người dùng:** *"giờ giải thích rõ F"* — câu treo từ vòng 6: fgOS có nhận luật
+*"the core consults capabilities, never tools"* làm luật của mình không?
+
+**Kiểm thật trước:** `fgos tool query --capability impact-analysis` → đúng
+**một** provider (`gitnexus`, kind `mcp`, `present`).
+
+Ba thứ mới rơi ra khi giải thích, không phải nhắc lại cái cũ:
+
+1. **Name-keying không phải lười — nó tất yếu.** Khớp nối chỉ có một đầu: phía
+   cung khai `capability`, phía cầu **không khai gì cả**. Không có gì để khớp
+   ⇒ code buộc rơi về cái tên.
+2. ⇒ **F và "món to nhất" (phía cầu tự khai capability) là MỘT việc** nhìn từ
+   hai đầu. Hai hạng mục trong kiểm kê gộp làm một.
+3. **Bên cầu phải khai HAI field, không phải một** — chỗ để mập mờ từ vòng 6:
+   `needs` (capability, chọn *provider nào*) và `for` (purpose, chọn *lane
+   nào*). Chúng phân biệt ở chỗ khác nhau, không cạnh tranh nhau. Cả hai đang
+   thiếu.
+
+Kèm bảng "hai cửa" (prose tuân luật, máy không) và ca cắn cụ thể: provider thứ
+hai cho việc phân loại **buộc phải mang tên `submit-assist-classify`** ⇒ không
+thể. Chi tiết + P5 ở §6.4.
+
 ## 6. Thiết kế đã chốt {#design}
 
 > **Regenerate lần 3 — bản sau vòng 10.** Vòng 10 đổi hình dạng thật (T2 thành
@@ -861,6 +886,68 @@ ký được; nội dung không cần và không thể.
 khai** (`for: gather` / `for: judge`), không theo tên target. Phiên này chỉ chốt
 **vị từ**; sửa code là **item riêng** (`resolveExecutorConfig`, blast radius
 CRITICAL, 8 upstream symbol).
+
+#### Vì sao name-keying không phải lười — khớp nối chỉ có MỘT đầu [ĐỀ NGHỊ — vòng 12]
+
+| Phía | Khai gì | Có không |
+|---|---|---|
+| **CUNG** (`tool`) | *"tôi hứa làm được `impact-analysis`"* | **có** |
+| **CẦU** (work item / capacity block) | *"tôi cần một thứ làm được X"* | **KHÔNG** |
+
+Không bên cầu nào nói mình cần gì ⇒ chẳng có gì để khớp với `capability` ⇒ code
+buộc phải rơi về thứ duy nhất còn lại: **cái tên**. Name-keying là **hệ quả tất
+yếu** của việc phía cầu câm, không phải một lựa chọn cẩu thả.
+
+⇒ Nhận luật US-027 **chính là** bắt phía cầu tự khai — hai hạng mục tưởng riêng
+(*"nhận US-027 không"* và *"phía cầu tự khai capability nó cần"*, món to nhất
+trong kho hn) **là một việc nhìn từ hai đầu**.
+
+**Và bên cầu phải khai HAI thứ, không phải một** — chỗ này bị để mập mờ từ vòng
+6 đến vòng 11:
+
+| Field | Bên cầu khai gì | Chọn cái gì | Ví dụ |
+|---|---|---|---|
+| **`needs:`** = capability (US-027) | tôi cần **năng lực** gì | **provider nào** | `impact-analysis` · `classification` |
+| **`for:`** = purpose (P2, bee) | lần dispatch này thuộc **lớp T2** nào | **lane / nghi thức nào** | `gather` · `judge` |
+
+Chúng phân biệt ở chỗ khác nhau: hỏi `gitnexus` thì `for` **luôn** là `gather`,
+`needs` mới là thứ phân biệt; với helper thì `needs` gần như hằng số (*"chạy một
+prompt, trả text"*), `for` mới phân biệt. Thiếu một trong hai là mất một chiều.
+**Cả hai đều đang thiếu.**
+
+#### Hai cửa, chỉ một cửa tuân luật [ĐỀ NGHỊ — vòng 12]
+
+| Cửa | Ai đi qua | Khoá bằng | Tuân? |
+|---|---|---|---|
+| **prose** — gate trong `CLAUDE.md` | agent đọc rồi chạy `fgos tool query --capability impact-analysis --status present` | **capability** | ✅ |
+| **máy** — `dispatch.mjs:604` | mọi capacity `kind:"cli"` | **name** | ❌ |
+
+Hai cửa **chưa đụng nhau** vì đang phục vụ hai capability khác nhau (prose lo
+`impact-analysis` — kiểm thật 2026-08-09: đúng **một** provider `gitnexus`, kind
+`mcp`, `present`; máy lo `submit-assist-classify`). Vi phạm còn latent.
+
+**Chỗ nó cắn, cụ thể:** muốn thêm provider thứ hai cho việc phân loại (một model
+local thay `agy`), đúng luật thì đăng ký tool mới với `capability:
+"classification"` rồi để hệ chọn cái nào `present`. Thực tế: provider mới
+**buộc phải mang tên `submit-assist-classify`** vì `dispatch.mjs:604` tra
+`tools[capacityId]` — tên đã có chủ ⇒ **không thể**. Đường duy nhất: đẻ capacity
+id mới và sửa mọi chỗ gọi. Đó là A2, phát biểu bằng hệ quả đo được.
+
+**[ĐỀ NGHỊ P5 — nhận luật US-027]**, ba lý do: (i) fgOS **đã dán luật đó vào
+`CLAUDE.md`**, không nhận thì phải đi gỡ một lời hứa đang treo (*"GitNexus là
+provider đầu tiên, không phải provider duy nhất gate này có thể nhận"* — đúng
+với prose, **sai với dispatch**); (ii) giá di trú đang thấp nhất nó từng có —
+đúng **một** capacity bị ảnh hưởng; (iii) nhận thì mở được ô `gather`, vốn
+không phải *chưa làm* mà là **bất khả** với khoá tên.
+
+Phạm vi chốt trong phiên từ vựng: **chỉ vị từ** — *bên cầu khai `needs` +
+`for`; binding khớp bằng hai thứ đó, không bằng tên*. Sửa code, đổi config
+schema, di trú: **item riêng**, mở ở Bước 5.
+
+**Nếu BÁC P5** thì phải tuyên bố tường minh ba câu, nếu không lần sau lại có
+người đi vá: (1) `capability` **chỉ** dùng cho cửa prose, không bao giờ cho
+dispatch; (2) một capability **cố ý** chỉ có một provider; (3) sửa câu tự hứa
+trong `CLAUDE.md` cho khỏi hứa hão.
 
 ### 6.5 T4 · CUNG — ai làm được, ở đâu, chạy bằng gì
 
