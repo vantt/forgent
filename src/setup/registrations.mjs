@@ -34,6 +34,7 @@ import { DEFAULT_RUNNER_CONFIG } from '../runner/dispatch.mjs';
 import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
 import { listWork } from '../state/store.mjs';
 import { driftStatus } from '../state/drift-status.mjs';
+import { computeEnduserDocsIndex, generateEnduserDocsIndex, manifestPathFor } from '../report/enduser-index-generate.mjs';
 import { readLocalStatus, classifyRegistryPosture } from '../state/tool-registry.mjs';
 import { describeConfigAwareness } from '../config/global-config.mjs';
 import { sharedConfigFilePath, readSharedConfig, writeSharedConfig } from '../config/shared-config-file.mjs';
@@ -784,4 +785,70 @@ registerCheck({
   id: 'changelog-unreleased-stale',
   description: 'CHANGELOG.md ## [Unreleased] section has at least one pending entry (observe/remind only, never blocks merge -- tsk-3ip)',
   check: (cwd) => checkChangelogUnreleasedStale(cwd),
+});
+
+// tsk-1m0 (docs/history/doctor-check-enduser-docs-index-stale/CONTEXT.md):
+// the fgos-indexing skill's whole job is regenerating
+// docs/enduser-docs-index.json after every compound-learn doc write, but
+// nothing ever verified it actually ran -- real measurement showed drift
+// growing from 32% to 36% of on-disk end-user docs missing from the index
+// in one day, unflagged. READ-ONLY by construction (same as every other
+// check here): `computeEnduserDocsIndex` enumerates docs/ and folds the
+// event log but never writes -- it is the read-only half of the same
+// generation path `fgos docs-index` and `fixEnduserDocsIndexStale` below
+// both use, so this check never reimplements or diverges from what a real
+// `docs-index` run would compute. One-directional (CONTEXT.md D2): reports
+// on-disk docs missing from the index, never the reverse (a stale index
+// entry whose doc was deleted) -- real measured drift has always been zero
+// of the latter, out of scope for this item. A missing manifest or missing
+// quadrant dir is a normal, common state (CONTEXT.md D5) -- same
+// "absent capability = clean skip" contract `checkChangelogUnreleasedStale`
+// already gives a missing CHANGELOG.md.
+function checkEnduserDocsIndexStale(cwd) {
+  const mainCheckout = resolveMainCheckout(cwd);
+  const root = mainCheckout ?? cwd;
+  const fgosDir = path.join(root, '.fgos');
+  const { entries, previousContent } = computeEnduserDocsIndex(root, fgosDir);
+  if (previousContent === undefined) {
+    return {
+      passed: true,
+      message: `${manifestPathFor(root)} not found -- nothing to check (project has not generated an end-user doc index yet)`,
+    };
+  }
+  const indexedPaths = new Set(JSON.parse(previousContent).map((e) => e.docPath));
+  const total = entries.length;
+  const missing = entries.filter((e) => !indexedPaths.has(e.docPath)).length;
+  if (missing === 0) {
+    return { passed: true, message: `${total}/${total} tài liệu end-user có trong index -- up to date` };
+  }
+  return {
+    passed: false,
+    message: `${missing}/${total} tài liệu end-user chưa có trong index -- chạy fgos docs-index`,
+  };
+}
+
+// Idempotent (same discipline `fixGateBypassConfigured` already uses):
+// reuses `generateEnduserDocsIndex` -- the exact same generation path
+// `fgos docs-index` runs -- so fix output is byte-identical to running
+// that verb directly (CONTEXT.md D4), never a reimplementation.
+function fixEnduserDocsIndexStale(cwd) {
+  const mainCheckout = resolveMainCheckout(cwd);
+  const root = mainCheckout ?? cwd;
+  const fgosDir = path.join(root, '.fgos');
+  const { path: manifestRelPath, count, changed } = generateEnduserDocsIndex(root, fgosDir);
+  if (!changed) {
+    return { changed: false, message: `${manifestRelPath} already up to date (${count} tài liệu)` };
+  }
+  return { changed: true, message: `regenerated ${manifestRelPath} (${count} tài liệu)` };
+}
+
+registerCheck({
+  id: 'enduser-docs-index-stale',
+  description: 'docs/enduser-docs-index.json covers every on-disk end-user doc (tsk-1m0)',
+  check: (cwd) => checkEnduserDocsIndexStale(cwd),
+});
+
+registerFix({
+  id: 'enduser-docs-index-stale',
+  fix: (cwd) => fixEnduserDocsIndexStale(cwd),
 });
