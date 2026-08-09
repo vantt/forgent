@@ -183,6 +183,41 @@ of the fix in full. Two independently-caused blocks on the same item is not
 a special case this recipe needs new steps for — each is fixed by its own
 already-documented recipe, applied in turn.
 
+## Example: `tsk-4eu` — the block recurs when the fix itself must edit `.fgos/config.json`
+
+`tsk-4eu` differs from the two cases above: its own footprint legitimately
+included `.fgos/config.json` — the fix moved a config block
+(`executors.judge`) up to `capacities.judge-decompose`, so the live config
+file itself was the intended target of the change, not an accidental
+byproduct:
+
+> `"footprint":["src/runner/dispatch.mjs",".fgos/config.json","test/runner/dispatch.test.mjs"]`
+> — real work item footprint, id `tsk-4eu`
+
+That produced the same `fgos-write-blocked` rejection as the cases above:
+
+> `"errorClass":"fgos-write-blocked","layer":"state","detail":"fgw/tsk-4eu staged a change under .fgos/ (.fgos/config.json); merge aborted, main unchanged — ADR0020"`
+> — real `work.friction` capture, id `tsk-4eu`
+
+But two of the retry attempts right after that hit a *different* git
+failure signature for the same underlying cause — `errorClass:
+"merge-failed-unclassified"`, exit 128, from a dirty main-checkout working
+tree rather than the branch's own staged commit:
+
+> `"errorClass":"merge-failed-unclassified","layer":"state","detail":"git merge --no-commit --no-ff fgw/tsk-4eu failed without a real conflict (exit 128): error: Your local changes to the following files would be overwritten by merge:\n\t.fgos/config.json\nPlease commit your changes or stash them before you merge.\nAborting\n; merge aborted, main unchanged"`
+> — real `work.friction` capture, id `tsk-4eu` (recorded twice, one retry apart)
+
+The lesson this adds to the recipe above: when the fix genuinely needs a
+`.fgos/` config change, that change still can't ride the branch's commit
+(step 3–4 above apply exactly the same — restore the path, amend it out).
+The config-file edit itself has to be re-applied as a separate operator
+action directly against the main checkout, per step 5's existing rule —
+and if a retry after a `fgos-write-blocked` block starts hitting
+`merge-failed-unclassified` (exit 128, "local changes... would be
+overwritten") on that same path instead of the clean ADR0020 message,
+check the main checkout's own working tree for leftover uncommitted
+changes to that path before re-attempting the merge.
+
 ## Related
 
 - `fgos check <id>` — shows the `fgos-write-blocked` friction entry quoted
@@ -241,3 +276,24 @@ also carried the code creating it:
 If a later item hits this same block, the export skill accumulates its
 capture here too, additively, without losing this section or anything
 above it.
+
+A third capture, gathered the same way (`fgos doc-sources
+docs/how-to/fix-fgos-write-rejected-merge-block.md`), links `tsk-4eu` to
+this same doc path:
+
+> ```json
+> {
+>   "id": "tsk-4eu",
+>   "predicted": {"tier":"standard","deps":0,"priorVisits":7,"role":"session","branchHeadAtTake":"77cf03c4fa835c5318e82274cfac67fd46b320d6"},
+>   "actual": {"outcome":"awaiting-approval","passed":true,"attempts":1,"errorClass":null,"aheadCount":7},
+>   "docType": "how-to",
+>   "docPath": "docs/how-to/fix-fgos-write-rejected-merge-block.md"
+> }
+> ```
+> — real `work.outcome` capture, id `tsk-4eu`
+
+That capture's own work item is the task that hit this block while its fix
+itself needed to move a config block within `.fgos/config.json`:
+
+> "Bug: `executors.<key>` khong phai tier thi chet IM — hau qua that la judge-decompose cli-spawn chay khong co Read"
+> — real work item title, id `tsk-4eu`
