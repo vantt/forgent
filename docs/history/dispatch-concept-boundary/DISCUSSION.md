@@ -1633,6 +1633,31 @@ phải drift; registered nhưng missing → chạy tiếp, cờ weak proof; tấ
 → full) fgOS **đã có**, ở prose `CLAUDE.md` — cần ghi vào hệ, không cần phát
 minh.
 
+#### Hai đính chính, rút từ code `tsk-1o7` đã merge (vòng 29)
+
+**1 · "Tập giá trị phải khai rõ" — tôi dặn quá rộng.** Luật đúng:
+
+| | Cách gác | Ví dụ đã merge |
+|---|---|---|
+| **tập ĐÓNG** | **enum**, validate lúc config-load | `for` — `CAPACITY_PURPOSES` (`gather`\|`judge`), sai là ném ngay |
+| **tập MỞ** | chuỗi tự do, nhưng **resolve phải NỔ ỒN** | `needs` — bất kỳ tool nào cũng khai được capability bất kỳ nên enum **bất khả**; guard là `candidates.length === 0` ⇒ ném kèm **câu lệnh sửa** |
+
+Khác hẳn `kind`/`risk`: chuỗi tự do **và không bao giờ nổ** — 5 ca sai liên
+tiếp. ⇒ `carries` là tập **đóng** nên enum vẫn đúng, **nhưng vì lý do này**,
+không phải vì *"mọi field đều phải có enum"*.
+
+**2 · D15 "chỉ ship cùng lúc với thứ đọc nó" — có ngoại lệ hợp lệ.** Code đã
+merge ship `for` **khi chưa consumer nào đọc**. Nó an toàn nhờ **hai** lớp, và
+phải có **cả hai**:
+
+| | `executors.judge` (chết) | `sensitiveData` (chết) | `for` (an toàn) |
+|---|---|---|---|
+| (a) validate được, không thể mang giá trị sai | ✗ chỉ kiểm shape của **value**, không kiểm **key** | ✗ không ship | ✓ enum + throw |
+| (b) có **item consumer được nêu tên** | ✗ | ✗ | ✓ comment ghi thẳng *"`tsk-2ie5` is named as the first real one"* |
+
+⇒ Siết D15: *khai-mà-chưa-đọc chấp nhận được **khi và chỉ khi** có đủ (a) và
+(b)*. Thiếu một là mục.
+
 ⚠ **A4:** presence check hôm nay gác theo **vận chuyển** (`kind === 'cli'`,
 `dispatch.mjs:603` + `:630`), đáng lẽ gác theo **nhà cung cấp có ở ngoài không**
 (`kind !== 'task'`) — **đúng vị từ của A3**. Capacity `mcp`/`skill`/`http`/
