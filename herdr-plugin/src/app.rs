@@ -226,6 +226,13 @@ pub struct App {
     pub need_answer_rect: Option<ButtonRect>,
     pub merge_list_rect: Option<ButtonRect>,
     pub after_deliver_rect: Option<ButtonRect>,
+    /// tsk-5lr CONTEXT.md D1/D2: the fixed `fg:operation` tab's left
+    /// (merge-loop) pane id, `None` until `main()`'s startup call to
+    /// `layout::ensure_operation_tab` resolves it. A plain data carrier —
+    /// which loop launches into it is tsk-2xt's own scope, not this item's.
+    pub operation_left_pane_id: Option<String>,
+    /// Same as `operation_left_pane_id`, for the right (retro/cleanup) slot.
+    pub operation_right_pane_id: Option<String>,
 }
 
 impl App {
@@ -255,6 +262,8 @@ impl App {
             need_answer_rect: None,
             merge_list_rect: None,
             after_deliver_rect: None,
+            operation_left_pane_id: None,
+            operation_right_pane_id: None,
         }
     }
 
@@ -551,6 +560,8 @@ impl App {
             need_answer_rect: None,
             merge_list_rect: None,
             after_deliver_rect: None,
+            operation_left_pane_id: None,
+            operation_right_pane_id: None,
         }
     }
 
