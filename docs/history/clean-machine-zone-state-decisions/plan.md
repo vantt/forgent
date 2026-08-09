@@ -79,9 +79,38 @@ immediately on landing, on legacy records — exactly what "KHÔNG SỬA NGƯỢ
 forbids fixing retroactively. The mechanical check therefore **counts and
 prints** how many post-2026-08-01 design decisions lack a citation
 (satisfies the item's own "đếm được" wording) without throwing on that
-count; only the `kind`-field completeness check throws. Real citation
-enforcement stays a convention from here, tightened later by a follow-up
-item if warranted — never silently dropped, recorded here so it is not lost.
+count.
+
+**Round-3 finding (fgos-code-implement found this, running the real verify
+against the real, live log during Implement):** the SAME staleness problem
+also breaks the item's own `kind`-completeness check — the one blocking
+gate this plan had kept as-is from the original submission. The item was
+authored assuming implementation would land at or shortly after the
+2026-08-01 cutoff; it actually landed 2026-08-09. In that gap, **1420 real
+decisions were appended to the log — all before `addDecision` gained the
+`kind` default this item ships — and all permanently lack `kind`** (same
+append-only, cannot-fix-retroactively constraint). Re-running the
+`ts > '2026-08-01'` check against live state confirmed the count grew from
+1410 to 1420 within this single implementation session, proving the cutoff
+is not a fixed historical fact but a moving target relative to whenever
+code actually ships — any fixed wall-clock date embedded in the item's own
+description has this same failure mode, including "today" (decisions were
+already appended earlier today, before this fix existed).
+
+**Resolution (confirmed with the product owner, same reasoning as the
+citation-check decision above):** the `kind`-completeness scan is demoted
+from a blocking gate to a reporting-only count too. The actual proof that
+`addDecision` defaults `kind` correctly now comes from the two new,
+deterministic unit tests in `store.test.mjs` (isolated `tmpDir()`, no
+wall-clock dependency) — `node --test` still blocks on those. The global
+log scan (both `noKind` and `uncited` counts) is diagnostic only, printed
+by the verify script, never thrown on. This is the only sound design for a
+completeness check against an ever-growing, append-only log when the gap
+between authoring and shipping is not controllable in advance — the same
+root cause the citation-check decision already identified, now shown to
+apply to `kind` too, not just citations. Real citation enforcement stays a
+convention from here, tightened later by a follow-up item if warranted —
+never silently dropped, recorded here so it is not lost.
 
 ## Shape
 
@@ -115,7 +144,7 @@ item if warranted — never silently dropped, recorded here so it is not lost.
    non-blocking citation count from the Decision above:
 
    ```bash
-   node --test test/state/store.test.mjs test/intake/discovery.test.mjs test/intake/decompose.test.mjs && node -e "const cp=require('child_process');const fs=require('fs');const path=require('path');const gitCommonDir=cp.execSync('git rev-parse --path-format=absolute --git-common-dir',{encoding:'utf8'}).trim();const stateFile=path.join(path.dirname(gitCommonDir),'.fgos','state.json');const s=JSON.parse(fs.readFileSync(stateFile,'utf8'));const CITATION=/([\\w.\\/-]+\\.(mjs|js|ts|md|json):\\d+)|(\\bseq\\b[^a-zA-Z]{0,3}\\d+)|(\\d+(\\.\\d+)?\\s?%)|(\\b\\d+[\\d,.]*\\s*(files?|records?|b[aả]n|tokens?|d[oò]ng|k[yý]\\s?t[uự]))/i;const d=s.decisions.filter(x=>x.ts>'2026-08-01');const noKind=d.filter(x=>!x.kind);const uncited=d.filter(x=>x.kind!=='engine'&&!CITATION.test(x.rationale||''));console.log('post-2026-08-01: '+d.length+' decisions, '+uncited.length+' design decision(s) without a detectable citation (reporting only, not blocking)');if(noKind.length)throw new Error(noKind.length+' decision sau 2026-08-01 thieu truong kind')"
+   node --test test/state/store.test.mjs test/intake/discovery.test.mjs test/intake/decompose.test.mjs && node -e "const cp=require('child_process');const fs=require('fs');const path=require('path');const gitCommonDir=cp.execSync('git rev-parse --path-format=absolute --git-common-dir',{encoding:'utf8'}).trim();const stateFile=path.join(path.dirname(gitCommonDir),'.fgos','state.json');const s=JSON.parse(fs.readFileSync(stateFile,'utf8'));const CITATION=/([\\w.\\/-]+\\.(mjs|js|ts|md|json):\\d+)|(\\bseq\\b[^a-zA-Z]{0,3}\\d+)|(\\d+(\\.\\d+)?\\s?%)|(\\b\\d+[\\d,.]*\\s*(files?|records?|b[aả]n|tokens?|d[oò]ng|k[yý]\\s?t[uự]))/i;const d=s.decisions.filter(x=>x.ts>'2026-08-01');const noKind=d.filter(x=>!x.kind);const uncited=d.filter(x=>x.kind!=='engine'&&!CITATION.test(x.rationale||''));console.log('post-2026-08-01: '+d.length+' decisions, '+noKind.length+' missing kind, '+uncited.length+' design decision(s) without a detectable citation (both counts reporting only, not blocking -- see plan.md Round-3 finding)')"
    ```
 
    **Round-2 fix (fgos-validating found this):** the item's own
@@ -127,10 +156,13 @@ item if warranted — never silently dropped, recorded here so it is not lost.
    when actually run from a worktree. The script above instead resolves the
    real path via `git rev-parse --path-format=absolute --git-common-dir`
    first — re-ran from this item's own worktree and confirmed it reads
-   state.json correctly (no ENOENT) and reports real counts. The `noKind`
-   check still throws with the same message/condition as originally
-   submitted; only the path resolution changed. The citation count is a
-   `console.log`, never a throw.
+   state.json correctly (no ENOENT) and reports real counts.
+
+   **Round-3 fix (fgos-code-implement found this, see the Decision above):**
+   the `noKind` check no longer throws either — both `noKind` and `uncited`
+   are now `console.log`-only diagnostics. The actual blocking proof that
+   `addDecision` defaults `kind` correctly is the two new `store.test.mjs`
+   unit tests, exercised by the `node --test` half of this command.
 
 **No split.** Single cohesive piece: one field, 8 call-site edits, 2 new
 unit tests, one expanded verify command. Splitting would just add
