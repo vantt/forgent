@@ -3,7 +3,7 @@ type: how-to
 title: How to fix a `fgos-write-rejected` merge block on a `.fgos/` change
 tags: []
 timestamp: 2026-07-30T00:00:00.000Z
-source_capture_ids: [tsk-n4i-1, tsk-5vf, tsk-4eu, tsk-5ge]
+source_capture_ids: [tsk-n4i-1, tsk-5vf, tsk-4eu, tsk-5ge, tsk-53n]
 ---
 # How to fix a `fgos-write-rejected` merge block on a `.fgos/` change
 
@@ -293,6 +293,46 @@ changed that file for unrelated work — `node --test
 --test-skip-pattern="declares the submit-assist-classify capacity" ...`
 was the fix here, naming the one test to skip rather than weakening the
 command wholesale.
+
+## Example: `tsk-53n` — a fourth reason to narrow `verify`: an unrelated pre-existing red test at the fork point
+
+`tsk-53n` is `tsk-1o7`'s own split child (same shape as `tsk-5ge`/`tsk-28o`
+above) — its whole job was hand-editing `.fgos/config.json` directly on
+the main checkout to add `needs`/`for` to the real `judge-discovery`,
+`judge-decompose`, and `submit-assist-classify` capacity blocks, per step
+5's rule: never through the branch's own commit.
+
+Its own `verify` needed narrowing for two separate reasons stacked
+together — the by-now-familiar `.fgos/`-path check that can't survive
+`fgos return`'s detached re-verify worktree, plus a new, fourth reason
+this doc's earlier examples (`tsk-5vf`'s unrelated dependency stack,
+`tsk-4eu`'s config-move, `tsk-28o`'s live-shared-state test) hadn't hit
+yet: a test that was already failing at the branch's own unmodified fork
+point, for a cause with nothing to do with this item at all:
+
+> "narrowed verify: dropped the `.fgos/config.json` readFileSync
+> field-check and excluded `test/docs/launcher-vocabulary-guard.test.mjs`
+> ... `launcher-vocabulary-guard.test.mjs` is excluded because it fails
+> identically on this branch's own unmodified fork point
+> (`branchHeadAtTake`, before any tsk-53n change) -- confirmed by
+> re-running it there -- for an unrelated 'orchestrator' term leak already
+> being tracked by a separate in-flight effort."
+> — real `work.decision` capture, id `tsk-53n`
+
+The distinction from `tsk-28o`'s third reason matters: `tsk-28o`'s test
+went red *during* implementation because a concurrent session changed
+the live, shared file the test asserted against. `tsk-53n`'s test was
+already red *before* any change on this branch — proven by re-running it
+at the fork commit itself, not inferred. Both land on the same fix shape
+step 5 already gives (name the one test to exclude/skip rather than
+weakening the whole verify command), but the proof obligation differs:
+a pre-existing failure needs a re-run at the unmodified fork point as
+evidence it isn't this item's own regression, where a concurrency-caused
+failure only needs the shared-state explanation. The real `.fgos/`
+config content change itself landed the same way `tsk-5ge`'s did:
+applied directly against the main checkout as an operator action, with
+the full original verify (field-check `&&` `npm test`) run and passed
+there before the branch's own verify was narrowed.
 
 ## Related
 
