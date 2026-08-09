@@ -83,17 +83,24 @@ Chosen path: two independent-mechanism actions inside this one item, run in
 a specific order because they land through two different doors with two
 different timings.
 
-1. **Pick the real capability label.** `classification` — matches the
-   tool's own already-registered `responsibility: "Classification"` field,
-   and matches the `docs/history/dispatch-concept-boundary/DISCUSSION.md`
-   §7.2 draft the parent `plan.md`'s Assumptions section cited (that doc
-   currently lives on `tsk-5td`'s own unmerged branch, not this one — this
-   item does not depend on it, only cites it as the prior naming lean).
-   Rejected alternative: keep `submit-assist-classify` as both the tool
-   name and its capability — this is the literal name/capability
-   coincidence `tsk-1o7`'s own description flagged as the bug this whole
-   migration exists to fix; keeping it here would defeat the item's own
-   purpose.
+1. **Pick the real capability label.** `classification` — this is not a
+   fresh pick, it is already load-bearing in the repo: `tsk-1o7`'s own
+   landed test suite (`test/runner/dispatch.test.mjs:1094-1138`, both
+   `needs`-resolution tests added for this exact migration) fixtures the
+   `submit-assist-classify` capacity as `needs: 'classification'` against
+   tools registered with `capability: 'classification'` — direct evidence
+   read from the file, not inferred. It also matches the tool's own
+   already-registered `responsibility: "Classification"` field, and the
+   `docs/history/dispatch-concept-boundary/DISCUSSION.md` §7.2 draft the
+   parent `plan.md`'s Assumptions section cited (that doc currently lives
+   on `tsk-5td`'s own unmerged branch, not this one — cited only as the
+   prior naming lean, not a dependency). Rejected alternative: keep
+   `submit-assist-classify` as both the tool name and its capability — this
+   is the literal name/capability coincidence `tsk-1o7`'s own description
+   flagged as the bug this whole migration exists to fix, and it is the
+   exact case `tsk-1o7`'s own tests were written to prove no longer holds;
+   keeping it here would defeat the item's own purpose and leave those
+   tests as the only place `classification` is ever real.
 
 2. **Re-register the tool under the new capability** (event-log write,
    `fgos tool remove`/`fgos tool register` — "safe on a branch" per the
@@ -157,7 +164,7 @@ different timings.
 
 | Component | Risk | Proof point |
 |---|---|---|
-| `submit-assist-classify` needs-resolution window | MEDIUM — a real dispatch between the config edit and a matching tool registration throws `RunnerConfigError` | Step 2 (tool re-register) merged and confirmed present via `fgos tool query` BEFORE step 4 (config edit) touches the real file; item's own `verify` script re-checks all three `needs`/`for` fields are set post-edit |
+| `submit-assist-classify` needs-resolution window | MEDIUM — a real dispatch between the config edit and a matching tool registration throws `RunnerConfigError` | `test/runner/dispatch.test.mjs:1094-1138` already proves the resolution mechanism itself works for `needs: 'classification'` against a `capability: 'classification'` tool; `fgos tool query --capability classification --status present` returned `[]` on 2026-08-09 (clean slate, no stale/duplicate registration risk); step 2 (tool re-register) merged and reconfirmed present via the same query BEFORE step 4 (config edit) touches the real file; item's own `verify` script re-checks all three `needs`/`for` fields are set post-edit |
 | `judge-discovery`/`judge-decompose` `needs`/`for` | LOW — confirmed zero functional consumer today (`dispatch.mjs:651` excludes `kind:"task"`) | Reading the gate condition directly (done above); `npm test` (item's own verify) stays green since no existing test exercises a `kind:"task"` capacity through the presence-check path |
 | Tool remove/register sequencing | LOW | `fgos tool query --capability classification --status present` after step 2, before step 4 |
 
