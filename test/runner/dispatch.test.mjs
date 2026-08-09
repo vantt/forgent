@@ -643,16 +643,9 @@ test('the committed .fgos/config.json runner section grants the worker exactly a
   assert.ok(!args.includes('--dangerously-skip-permissions'));
 });
 
-test('the committed .fgos/config.json runner section declares the coding-classify-intake capacity per CONTEXT.md D1/D7 (tsk-5l2-2, renamed from submit-assist-classify): kind cli, adapter cli-spawn, tier light, allowCrossProvider true (tsk-32n D1 -- supersedes the earlier sensitiveData field name, which had inverted polarity against the restrictive-by-default requirement), and its args are a well-formed {prompt}/{model} template', () => {
+test('the committed .fgos/config.json runner section no longer declares a coding-classify-intake capacity (tsk-49u): tsk-4ns already stripped its only consumer (fgos-submit-assist\'s dispatch-fallback branch), leaving the config entry orphaned, so it was removed via the same ADR0020 hand-commit-to-main path its own rename (tsk-3fj) originally used', () => {
   const cfg = committedRunnerConfig();
-  const capacity = cfg.capacities?.['coding-classify-intake'];
-  assert.ok(capacity, 'capacities.coding-classify-intake must exist');
-  assert.equal(capacity.kind, 'cli');
-  assert.equal(capacity.adapter, 'cli-spawn');
-  assert.equal(capacity.tier, 'light');
-  assert.equal(capacity.allowCrossProvider, true);
-  assert.ok(typeof capacity.command === 'string' && capacity.command.length > 0);
-  assert.ok(Array.isArray(capacity.args) && capacity.args.includes('{prompt}') && capacity.args.includes('{model}'));
+  assert.equal(cfg.capacities?.['coding-classify-intake'], undefined, 'capacities.coding-classify-intake should no longer exist -- retired after tsk-4ns removed its only consumer');
 });
 
 test('the committed .fgos/config.json runner section declares the gather capacity (tsk-28o): for "gather", needs "prompt-completion", carries "repo-content" (D1, gather-capacity-purpose-binding CONTEXT.md), kind cli, allowCrossProvider true, well-formed {prompt}/{model} args', () => {
