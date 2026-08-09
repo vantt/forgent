@@ -407,6 +407,32 @@ test('loadRunnerConfig rejects an "executors.<tier>" entry missing args', () => 
   assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
 });
 
+// --- tsk-4eu: "executors" keys must be tiers — a non-tier key (e.g. a
+// capacity id like "judge") silently fell through to the global executor
+// with no error, which is the live bug this pins.
+test('loadRunnerConfig rejects an "executors" key that is not a tier, naming the bad key and the valid tier set', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'non-tier-executors-key.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      executors: { judge: { command: 'claude', args: ['{prompt}'] } },
+      models: {},
+      timeoutMs: 1000,
+    }),
+  );
+  assert.throws(
+    () => loadRunnerConfig(configPath),
+    (err) =>
+      err instanceof RunnerConfigError &&
+      err.message.includes('judge') &&
+      err.message.includes('light') &&
+      err.message.includes('standard') &&
+      err.message.includes('heavy'),
+  );
+});
+
 test('loadRunnerConfig rejects an unknown "adapter" value on the global executor', () => {
   const dir = mkTempDir();
   const configPath = path.join(dir, 'bad-adapter-global.json');
@@ -951,6 +977,28 @@ test('resolveExecutorCommand falls back to executors.<tier> when the capacities 
   };
   const resolved = resolveExecutorCommand(cfg, { prompt: 'p', model: 'opus', tier: 'heavy', capacityId: 'fgos-code-implement' });
   assert.equal(resolved.command, '/heavy/executor');
+});
+
+// --- tsk-4eu: regression proof for the live symptom — "judge-decompose"
+// used to fall through to the global executor (no "Read"), because its
+// old home (executors.judge, a non-tier key) was never reachable by the
+// tier-keyed lookup. Its own command/args (mirroring judge-discovery's
+// already-correct shape) must now resolve directly via capacities.
+test('resolveExecutorCommand resolves "judge-decompose" through its own capacities entry, args containing "Read"', () => {
+  const cfg = {
+    executor: { command: 'claude', args: ['{prompt}', '--allowedTools', 'Bash(git add:*),Bash(git commit:*)'] },
+    capacities: {
+      'judge-decompose': {
+        kind: 'task',
+        command: 'claude',
+        args: ['{prompt}', '--allowedTools', 'Task,WebSearch,WebFetch,Read,Bash(rg:*),Bash(git add:*),Bash(git commit:*)'],
+      },
+    },
+    models: { light: 'haiku', standard: 'sonnet', heavy: 'opus' },
+    timeoutMs: 5000,
+  };
+  const resolved = resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', capacityId: 'judge-decompose' });
+  assert.ok(resolved.args.some((arg) => arg.includes('Read')));
 });
 
 test('resolveExecutorCommand with a capacities block present but no matching capacityId stays on today\'s tier/global behavior, byte-identical', () => {
