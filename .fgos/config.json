@@ -16,6 +16,8 @@
     "capacities": {
       "judge-discovery": {
         "kind": "task",
+        "needs": "llm-judgment",
+        "for": "judge",
         "command": "claude",
         "args": [
           "-p",
@@ -30,6 +32,8 @@
       },
       "judge-decompose": {
         "kind": "task",
+        "needs": "llm-judgment",
+        "for": "judge",
         "command": "claude",
         "args": [
           "-p",
@@ -44,6 +48,7 @@
       },
       "submit-assist-classify": {
         "kind": "cli",
+        "needs": "classification",
         "adapter": "cli-spawn",
         "command": "agy",
         "provider": "agy",
