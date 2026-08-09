@@ -34,6 +34,8 @@ import { DEFAULT_RUNNER_CONFIG } from '../runner/dispatch.mjs';
 import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
 import { listWork } from '../state/store.mjs';
 import { driftStatus } from '../state/drift-status.mjs';
+import { isResolvedStatus } from '../state/frontier.mjs';
+import { getDomain } from '../state/workflow-stage-graphs.mjs';
 import { readLocalStatus, classifyRegistryPosture } from '../state/tool-registry.mjs';
 import { describeConfigAwareness } from '../config/global-config.mjs';
 import { sharedConfigFilePath, readSharedConfig, writeSharedConfig } from '../config/shared-config-file.mjs';
@@ -399,6 +401,50 @@ function checkRootDrift(cwd) {
     message: `drifted root branch(es) need syncing: ${summary} — run fgos sync-root <root-id>`,
   };
 }
+
+// tsk-6ax: tsk-5wz declared the coding domain's risk/kind vocabulary
+// (DOMAINS.coding.classification) and enforced it at the write door
+// (validateWorkShape's touchedFields grandfathering), but that only blocks
+// NEW writes — 68 items already on disk kept a pre-vocabulary risk value
+// (low/medium/high), silently degrading decompose.mjs's heavy-risk gate and
+// priority-formula.mjs's risk discount. This check makes that class of
+// drift visible to `fgos doctor` going forward, same as root-drift above.
+// Scoped to OPEN items only (`!isResolvedStatus`, the one shared open/
+// closed definition frontier.mjs already exports) — a resolved item's
+// stale classification no longer feeds any live gate or formula, so
+// flagging it here would just be noise.
+function checkWorkClassificationVocabulary(cwd) {
+  const mainCheckout = resolveMainCheckout(cwd);
+  if (mainCheckout === null) {
+    return { passed: true, message: 'not inside a git checkout — nothing to check' };
+  }
+  const view = listWork(path.join(mainCheckout, '.fgos'));
+  const violations = [];
+  for (const item of Object.values(view.work)) {
+    if (isResolvedStatus(item)) continue;
+    const classification = getDomain(item.domain).classification;
+    if (!classification) continue;
+    if (classification.kind && !classification.kind.includes(item.kind)) {
+      violations.push(`${item.id} (kind: "${item.kind}")`);
+    }
+    if (classification.risk && !classification.risk.includes(item.risk)) {
+      violations.push(`${item.id} (risk: "${item.risk}")`);
+    }
+  }
+  if (violations.length === 0) {
+    return { passed: true, message: "every open item's risk/kind matches its domain's classification vocabulary" };
+  }
+  return {
+    passed: false,
+    message: `${violations.length} open item(s) outside their domain's classification vocabulary: ${violations.join(', ')} — run fgos edit <id> --risk/--kind <value>`,
+  };
+}
+
+registerCheck({
+  id: 'work-classification-vocabulary',
+  description: "every open item's risk/kind matches its domain's declared classification vocabulary (tsk-6ax)",
+  check: (cwd) => checkWorkClassificationVocabulary(cwd),
+});
 
 registerCheck({
   id: 'root-drift',
