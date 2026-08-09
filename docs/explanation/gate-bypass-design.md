@@ -92,3 +92,36 @@ questions this design asks: (1) is the trigger a mechanical, inspectable
 fact, not a live confidence read, and (2) does raising the ceiling still
 leave the existing hard-gate floor untouched? A change that answers "no"
 to either isn't really the same feature anymore.
+
+## A mechanical check is only as live as the artifact it reads (tsk-5hg)
+
+D2's `hasOpenItems` check is mechanical, but mechanical still means it
+reads something a producer wrote — and for months after this design
+shipped, nothing wrote it. `tsk-5hg` found and fixed a real gap: the
+skills that actually write `CONTEXT.md`/`plan.md`
+(`.claude/skills/fgos-exploring/SKILL.md`,
+`.claude/skills/fgos-planning/SKILL.md`) never mentioned the `##
+Outstanding questions` convention `hasOpenItems` depends on —
+`gate-bypass.mjs` itself asserts it's "the convention this item's own
+CONTEXT.md/plan.md already follow," but nothing wired that convention
+into the skills doing the actual writing. Two layers that were supposed
+to agree silently didn't.
+
+The measured effect: only 21/197 (11%) of real `CONTEXT.md` files and
+1/189 (1%) of real `plan.md` files passed `hasOpenItems` — blocked mostly
+by the missing heading (142 and 161 cases respectively), not by genuine
+open TODOs/FIXMEs (34 and 27). The bypass mechanism actually fired 6/366
+times across its whole history (1.6%), and zero times in the week before
+this item. D4's hard-gate floor was never the bottleneck; the mechanism
+was fail-closed by a missing convention wire-up, not by design.
+
+The fix was narrow on purpose, and the item's own locked constraint says
+why: `hasOpenItems` itself was never loosened (that would have undermined
+D2's whole point — a mechanical, inspectable trigger, not a widened one).
+Only the two producing `SKILL.md` files gained the missing instruction to
+actually write the heading. The lesson generalizes past this one gate: a
+mechanical/inspectable check is a contract between a reader and a writer,
+and proving the reader-side logic is sound (D2-D5 above) says nothing
+about whether anything upstream is actually writing to that contract —
+that has to be checked separately, against the real artifacts, not
+assumed from the check's own code comment.
