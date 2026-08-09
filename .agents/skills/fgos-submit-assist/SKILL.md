@@ -45,44 +45,16 @@ is genuinely too thin to name what's being touched, that's worth surfacing to
 whoever is filing it before submitting, not silently classifying tier/kind/
 risk around a title no one will be able to read later.
 
-## 2. Classify tier, kind, and risk — via `submit-assist-classify` when available, otherwise yourself
+## 2. Classify tier, kind, and risk yourself
 
-Follow `../_shared/capacity-dispatch-fallback.md` (tsk-53h — this pattern's
-shared fragment, extracted from this exact step so a second skill can
-reuse it without copy-pasting it) with:
-
-- `<CAPACITY_ID>` = `submit-assist-classify`
-- `<INLINE_FALLBACK_HEADING>` = "Classify it yourself" (below)
-- `<PROMPT_TEMPLATE>`:
-
-  ```
-  Classify this backlog ask's tier (light/standard/heavy), kind (bug/feature/chore/task), and risk (low/medium/high), plus one line of reasoning. Respond with exactly this format, one field per line, nothing else:
-  tier: <value or "unsure">
-  kind: <value or "unsure">
-  risk: <value or "unsure">
-  reasoning: <one line>
-
-  Rubric:
-  - tier: light = small contained change (typo, one-line log, rename, doc fix). standard = default weight, real implementation within one area. heavy = multi-system/file, public contract or data-shape change, new architecture, or genuinely vague scope.
-  - kind: bug = something that used to/should work and doesn't (a real symptom, not just the word "fix"). feature = new capability from the user's point of view. chore = maintenance, no user-visible behavior change. task = the honest fallback when none of the above cleanly fits.
-  - risk: independent of tier — how bad and how reversible is being wrong? auth/payments/data-integrity/hard-to-undo = higher risk regardless of size.
-
-  Ask: "<the free-text ask, verbatim>"
-  ```
-
-Reading the response (this skill's own field-level rule, since the shared
-fragment's Step D only covers the generic "malformed" case): if it cleanly
-gives a `tier`/`kind`/`risk` value matching the vocabularies above
-(`"unsure"` or an unrecognized value means treat that one field as
-omitted, same as "On confidence, per field" below), use that suggestion in
-place of your own reasoning and continue to step 3. Missing/unparseable/
-no-real-value for *any* field is the fragment's Step D malformed case —
-fall back to "Classify it yourself" below for this ask entirely, exactly
-as if the capacity were absent. Either way the output is
-non-authoritative: a wrong external suggestion is exactly as cheap to fix
-later via `fgos edit` as a wrong inline one.
-
-### Classify it yourself
+(tsk-4ns: this step used to optionally dispatch to a `submit-assist-classify`
+capacity via `../_shared/capacity-dispatch-fallback.md` — retired. None of
+that fragment's own "Valid reasons to dispatch" ever applied here: the ask's
+full text is already in this session's own context, and spawning a
+subprocess only added latency at the exact moment a person is waiting,
+`AGENTS.md`'s priority #1. See `../_shared/capacity-dispatch-fallback.md`'s
+own Precedent section for the retirement note; that fragment stays in
+place for the six other stage skills that still cite its 4-reason list.)
 
 You are the classifier here — there is no subprocess or external model call
 to make, no command to shell out to for this step. Reason about the text the
