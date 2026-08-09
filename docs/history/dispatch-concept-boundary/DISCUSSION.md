@@ -103,6 +103,7 @@ không mở lại những quyết định các item khác đã khoá.
 | 29 | `adapter` — suy dẫn thứ 5 cho A3 | **Rõ** (vòng 8) | `EXECUTOR_ADAPTERS` đúng 1 key, `DEFAULT_ADAPTER = 'cli-spawn'` — **trùng chuỗi** với giá trị mechanism #3 (dẫn xuất). Hai tầng khác nhau đội chung một chuỗi, hôm nay không phân biệt được vì chỉ có một adapter. Ngày `rpc`/`app-server` (đã deferred, cùng doc comment) được đăng ký: nhà cung cấp vẫn **ngoài** nhưng adapter là `rpc` ⇒ tên `cli-spawn` cho **mechanism** thành sai. Xác nhận A3 từ hướng hoàn toàn khác |
 | 30 | #1 gộp hai câu hỏi | **Đang hội tụ** (vòng 8) — **đụng `tsk-2cw`, chờ người dùng** | `0028` (accepted, supersedes 0026) đã lập luận sẵn hai tính chất độc lập: **arity** (1 vs N) và **có ở lại không** (bước ra vs giữ liên hệ liên tục). Bảng: (1,buông)=`launcher` · (1,ở lại)=`driver` · (N,ở lại)=`orchestrator` · (N,buông)=**trống**. `0026`: *"Vai trò launcher KHÔNG CẦN soul ... THUẦN CƠ HỌC"* ⇒ nhu-cầu-phán-đoán bám theo **cột**, không theo arity |
 | 31 | `orchestrator` là tầng trên, không phải ô thứ ba | **Đang hội tụ** (vòng 8) | `fgos-fanout` spawn N Agent, **mỗi Agent chạy `/fgOS:pick` end-to-end** ⇒ mỗi cái là một `driver`. Nên orchestrator = **hợp thành** (N lần dấn thân con), không phải anh em ngang hàng. Đề xuất: #1 rút về **2 giá trị**, `orchestrator` ra khỏi enum lên tầng hợp thành — đúng chỗ `tsk-2cw` đang chừa |
+| 38 | 11 capability của hn xếp đâu | **Đề nghị** (vòng 11) | **T4 phía cung**, không ngang `gather`/`judge` (thuộc tính của nhà cung cấp, không của một lần dispatch). Cũng **không ngang `gitnexus`**: cả 11 tả **chính cái sổ**, do harness CLI tự khai qua `query.contract`. Ô tương ứng của fgOS — *sổ tự khai năng lực + dải schema* — **đang trống**, latent thật vì global/project install có thể lệch version. §6.5 |
 | 34 | Ô "mục tiêu ngoài sổ" đã có tên | **Đang hội tụ** (vòng 10) | **`errand`** — quét sạch 0 hit ở `src/`, `docs/`, `upstreams/`. Bác `cell` (false friend: bee's cell CÓ claim/reservation/registry) và `packet` (kéo theo khung *"orthogonal axes"* D1 đã bác). Bốn phép thử ở §6.3, sắc nhất: **không sở hữu branch/merge riêng**. Vẫn gated `tsk-2t6` |
 | 35 | `capacity` rút về một nghĩa (P1) | **Đề nghị** (vòng 10) | Chỉ còn **bản ghi binding** T3. Giết A1 bằng cấu trúc, config không breaking. ⚠ supersede định nghĩa `capacity` của `0026` |
 | 36 | Bỏ `rootTask`/`subTask` (P3) | **Đề nghị** (vòng 10) | 0 identifier trong code; `0026` tự gọi cả hai là *vai trò* / *tên gọi tương đối*. Thay: `work` + vai trò T1 · `child work` · "một `work`/`errand` khác" |
@@ -547,6 +548,22 @@ vì doc gốc của chữ đó dựng trên khung *"two orthogonal axes"* mà D1
 **§6 regenerate lần 3**, đổi xương sống "năm chiều" → **bảy tầng**, và lần đầu
 xếp đủ **cả 23 chữ** (§6.10) kèm bốn đề nghị P1–P4 (§6.11).
 
+### Vòng 11 — 2026-08-09 — 11 capability của hn xếp đâu
+
+**Người dùng:** *"11 loại của harness thì ngang hàng hay xếp vào 2 thứ đó?"*
+
+**Không cái nào — khác phía.** Phép thử: `gather`/`judge` là thuộc tính của
+**một lần dispatch** (cùng `claude` lúc này gather, lát sau judge); 11 capability
+là thuộc tính **đứng yên của nhà cung cấp**, hỏi được cả khi không dispatch
+(`query.contract`). Hai cột không giao ở tính chất nào.
+
+Và một chỗ tôi viết chưa tới ở §6.3 bản trước: chúng cũng **không ngang hàng
+`gitnexus`**. Cả 11 chữ đều tả **chính cái sổ**, do harness CLI **tự khai về
+mình** — kèm `cli_version`, `schema_minimum/maximum`, `database_state`. Ánh xạ
+đúng sang fgOS là `fgos` CLI + `.fgos/` tự khai, chứ không phải một tool ngoài
+được đăng ký. Ô đó của fgOS **đang trống**, và latent thật (global vs project
+install lệch version). Phân tích + bảng rà kho đặt tại §6.5.
+
 ## 6. Thiết kế đã chốt {#design}
 
 > **Regenerate lần 3 — bản sau vòng 10.** Vòng 10 đổi hình dạng thật (T2 thành
@@ -808,6 +825,50 @@ Luật khớp nối là luật fgOS **tự viết lúc port** registry
 (`docs/distillery/deep-dives/tool-registry.md:27`, US-027): *"the core consults
 capabilities, never tools"* — một bước workflow chỉ tham chiếu `capability`,
 **không bao giờ** tham chiếu tên tool cụ thể. Hôm nay code làm ngược (A2, 6.4).
+
+#### 11 capability của hn xếp vào đâu [ĐỀ NGHỊ — vòng 11]
+
+Câu hỏi hay gặp: *"11 loại của harness ngang hàng `gather`/`judge`, hay xếp vào
+hai thứ đó?"* — **Không cái nào.** Chúng ở **phía CUNG (T4)**, cùng ô với
+`capability`.
+
+Phép thử tách hai phía — hỏi *"thuộc tính này của ai"*:
+
+| | `gather` / `judge` (T2) | 11 capability của hn (T4) |
+|---|---|---|
+| thuộc tính của | **một lần dispatch** | **nhà cung cấp**, đứng yên |
+| đổi khi nào | mỗi lần gọi — cùng `claude` lúc này là `gather`, lát sau là `judge` | chỉ khi cài bản CLI khác |
+| hỏi được lúc **không** dispatch? | **không** | **được** — `query.contract` trả bất cứ lúc nào |
+
+Nhưng chúng cũng **không ngang hàng `gitnexus`**. Đọc kỹ cả 11 (`stories.read`,
+`stories.write`, `work-graph.read`, `story-dependencies`, `story-hierarchy`,
+`changesets.apply`, `changesets.status-sha`, `entity-revision-conflicts`,
+`isolated-db`, `isolated-db-snapshot`, `semantic-operation-log`): **không chữ
+nào là "một công cụ ngoài giúp làm việc gì đó"** — cả 11 tả **chính cái sổ**.
+Và chính harness CLI tự khai chúng qua `query.contract`, kèm `cli_version`,
+`schema_minimum/maximum`, `database_state`.
+
+| Vai | fgOS hôm nay | hn |
+|---|---|---|
+| công cụ ngoài mà hệ đi hỏi | `gitnexus` → `impact-analysis` | inbound tool project tự đăng ký |
+| **bản thân sổ, tự khai năng lực + dải schema** | **TRỐNG** — `fgos` CLI được giả định luôn có mặt, luôn đúng version | **11 capability này** |
+
+Ô trống đó **latent, không giả thuyết**: `docs/distribution-vision.md` cho phép
+cài global và cài project cùng tồn tại (project ghi đè global) ⇒ hai bản `fgos`
+khác version cùng đọc một `events.jsonl` là lệch schema thật. hn giải bằng
+`database_state` + dải schema; fgOS giải bằng `fgos doctor` — kiểm **tồn tại**,
+không kiểm **lời hứa** (đúng chỗ `tsk-j7y` tự thú).
+
+Rà kho, dòng này:
+
+| Món | Phán | Xếp đâu |
+|---|---|---|
+| số 11 / danh sách cụ thể | **không lấy** — API của hn, không phải của fgOS | — |
+| *"capability là **lời hứa hành vi**, không phải tên sản phẩm"* | **lấy** | T4, siết định nghĩa |
+| versioned `.v1` | **lấy có điều kiện** — chỉ đáng khi hai bên khác nhịp release (`fgos`↔`fgos` có; `fgos`↔`gitnexus` chưa chắc) | T4 |
+| *"missing required capability = hard failure **before mutation**"* | **lấy** — fgOS mới có nửa (throw trước spawn, nhưng kiểm tồn tại chứ không kiểm lời hứa) | TG |
+| *"unknown capabilities / unknown additive fields must be ignored"* | **lấy** — luật rẻ, chống vỡ khi hai version gặp nhau | TG |
+| sổ tự khai mình (`query.contract`) | **ghi nhận ô trống**, chưa lấy — cần ca thật về lệch version trước | T4 |
 
 #### `kind` không phải transport, cũng không phải protocol [ĐỀ NGHỊ — vòng 9]
 
