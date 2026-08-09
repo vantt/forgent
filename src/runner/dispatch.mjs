@@ -37,7 +37,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { spawn, execFileSync } from 'node:child_process';
-import { DEFAULTS } from '../state/work.mjs';
+import { DEFAULTS, TIERS } from '../state/work.mjs';
 import { DOMAINS, resolveDomainName, skillForStage } from '../state/workflow-stage-graphs.mjs';
 import { selectTemplate, renderTemplate, hashTemplate } from './prompt-templates.mjs';
 import { mergeConfigDefaults } from '../setup/config-merge.mjs';
@@ -480,6 +480,11 @@ function validateRunnerConfigShape(cfg, sourceLabel) {
       throw new RunnerConfigError(`runner config (${sourceLabel}) "executors" must be an object mapping tier -> executor when present.`);
     }
     for (const [tier, executor] of Object.entries(cfg.executors)) {
+      if (!TIERS.includes(tier)) {
+        throw new RunnerConfigError(
+          `runner config (${sourceLabel}) "executors" key "${tier}" is not a tier — valid keys are ${TIERS.join('/')}.`,
+        );
+      }
       validateExecutorShape(executor, `${sourceLabel} executors.${tier}`);
     }
   }
