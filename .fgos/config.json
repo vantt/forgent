@@ -46,22 +46,6 @@
           "Task,WebSearch,WebFetch,Read,Bash(rg:*),Bash(git add:*),Bash(git commit:*)"
         ]
       },
-      "coding-classify-intake": {
-        "kind": "cli",
-        "needs": "classification",
-        "adapter": "cli-spawn",
-        "command": "agy",
-        "provider": "agy",
-        "args": [
-          "-p",
-          "{prompt}",
-          "--model",
-          "{model}"
-        ],
-        "tier": "light",
-        "model": "Gemini 3.5 Flash (Medium)",
-        "allowCrossProvider": true
-      },
       "gather": {
         "kind": "cli",
         "for": "gather",
