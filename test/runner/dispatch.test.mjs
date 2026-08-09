@@ -1151,6 +1151,58 @@ test('resolveExecutorCommand still skips both the presence check and the cross-p
   );
 });
 
+// --- capacities.<id>.needs/for (D5/D6, tsk-1o7): US-027 -- binding matches
+// by capability promise, never by tool name. A capacity that declares
+// `needs` resolves its presence check against the tools registry's own
+// `capability` field, not against whether the capacity's own id happens to
+// match a registered tool's name ---
+
+test('resolveExecutorCommand resolves a kind:"cli" capacity declaring needs+for through capability match, with no name coincidence between the capacity id and the registered tool name', () => {
+  const dir = mkTempDir();
+  initStore(dir);
+  registerTool(dir, { name: 'agy-classify', kind: 'cli', capability: 'classification', command: 'agy' });
+  writeLocalStatus(dir, { 'agy-classify': { status: 'present', checkedAt: new Date().toISOString() } });
+  const cfg = {
+    executor: { command: '/global/executor', args: ['{prompt}'] },
+    capacities: {
+      'submit-assist-classify': { kind: 'cli', needs: 'classification', for: 'judge', command: 'agy', args: ['{prompt}'], allowCrossProvider: true },
+    },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  };
+  // Old tools[capacityId] lookup would fail here: no tool is registered
+  // under the name "submit-assist-classify" at all.
+  assert.equal(Object.prototype.hasOwnProperty.call(cfg.capacities['submit-assist-classify'], 'needs'), true);
+  assert.doesNotThrow(() =>
+    resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', capacityId: 'submit-assist-classify', fgosDir: dir }),
+  );
+});
+
+test('resolveExecutorCommand resolves a needs-declaring capacity when a second provider is registered under the same capability but a different name', () => {
+  const dir = mkTempDir();
+  initStore(dir);
+  registerTool(dir, { name: 'agy', kind: 'cli', capability: 'classification', command: 'agy' });
+  registerTool(dir, { name: 'gemini-cli', kind: 'cli', capability: 'classification', command: 'gemini' });
+  writeLocalStatus(dir, {
+    agy: { status: 'missing', checkedAt: new Date().toISOString() },
+    'gemini-cli': { status: 'present', checkedAt: new Date().toISOString() },
+  });
+  const cfg = {
+    executor: { command: '/global/executor', args: ['{prompt}'] },
+    capacities: {
+      'submit-assist-classify': { kind: 'cli', needs: 'classification', command: 'gemini', args: ['{prompt}'], allowCrossProvider: true },
+    },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  };
+  // The first-registered provider ("agy") is missing; the second one under
+  // the SAME capability ("gemini-cli") is present -- the capacity itself
+  // never had to be renamed or repointed to pick that up.
+  assert.doesNotThrow(() =>
+    resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', capacityId: 'submit-assist-classify', fgosDir: dir }),
+  );
+});
+
 // --- capacities.<id>.agentType (D1/D2, tsk-3sw): kind:"task" capacity with
 // no own command/args resolves via a synthesized executor, Claude-only ---
 

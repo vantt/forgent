@@ -28,7 +28,16 @@ verb (one-door-write, CTR001).
 2. **Ask the item.** Run:
 
    ```
-   node ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs ask <id> --text "<text>" --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
+   # fgos CLI fallback (tsk-1no D3)
+   FGOS_BIN="${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs"
+   if [ -f "$FGOS_BIN" ]; then
+     node "$FGOS_BIN" ask <id> --text "<text>" --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
+   elif command -v fgos >/dev/null 2>&1; then
+     fgos ask <id> --text "<text>" --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
+   else
+     echo "fgos: no bin/fgos.mjs at ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX} (not a forgent checkout) and no global fgos install on PATH" >&2
+     exit 1
+   fi
    ```
 
    substituting the id and text parsed in step 1, with `<text>`

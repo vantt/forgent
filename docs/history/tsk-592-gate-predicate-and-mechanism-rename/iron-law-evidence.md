@@ -86,7 +86,8 @@ line, now made literal and backed by this item's new pinned tests). Then
 narrowed again to `node --test test/runner/dispatch.test.mjs
 test/skills/fgos-mirror.test.mjs` once a full `npm test` run showed its
 only failure was `test/docs/launcher-vocabulary-guard.test.mjs`, flagging
-`"orchestrator"` in five paths this item never touches
+its own pinned term (the pre-launcher-rename name for the orchestration
+role, see decision record 0028) in five paths this item never touches
 (`docs/history/backlog-execution-reconciliation/RECONCILIATION.md`,
 `docs/history/tsk-33w-.../iron-law-evidence.md`,
 `docs/history/tsk-4eu-.../iron-law-evidence.md`,

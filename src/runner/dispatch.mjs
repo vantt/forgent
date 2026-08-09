@@ -394,6 +394,16 @@ function validateExecutorShape(executor, label) {
  */
 export const CAPACITY_KINDS = Object.freeze([...KINDS, 'task']);
 
+/** purpose vocabulary `capacities.<id>.for` may take (D2/D6, tsk-1o7): the
+ * T2 review-class split, `gather` (returns a digest) vs `judge` (returns a
+ * verdict) — the demand side's own self-declared lane, alongside `needs`
+ * (which provider). No code consumer resolves on this yet (`tsk-2ie5` is
+ * named as the first real one) — declaring it here only lets
+ * `validateCapacityShape` accept and shape-check it now, ahead of that
+ * consumer landing.
+ */
+export const CAPACITY_PURPOSES = Object.freeze(['gather', 'judge']);
+
 /**
  * CLI commands recognized as staying within the Claude ecosystem for
  * cross-provider governance (D2, tsk-32n). Deliberately NOT
@@ -463,6 +473,18 @@ function validateCapacityShape(capacity, label) {
   }
   if (capacity.forceCliSpawn !== undefined && typeof capacity.forceCliSpawn !== 'boolean') {
     throw new RunnerConfigError(`runner config (${label}) "forceCliSpawn" must be a boolean when present.`);
+  }
+  // D6/tsk-1o7: demand-side self-declaration, additive and optional --
+  // absent keeps every pre-tsk-1o7 capacity byte-identical (same style as
+  // every sibling optional field above). `needs` is the real match key
+  // `resolveExecutorConfig` below now consults for a `kind:"cli"`
+  // capacity's presence check; `for` has no code consumer yet (see
+  // CAPACITY_PURPOSES's own comment) and is validated here only.
+  if (capacity.needs !== undefined && (typeof capacity.needs !== 'string' || capacity.needs.length === 0)) {
+    throw new RunnerConfigError(`runner config (${label}) "needs" must be a non-empty string when present.`);
+  }
+  if (capacity.for !== undefined && !CAPACITY_PURPOSES.includes(capacity.for)) {
+    throw new RunnerConfigError(`runner config (${label}) "for" must be one of ${CAPACITY_PURPOSES.join('/')}, got: ${JSON.stringify(capacity.for)}.`);
   }
 }
 
@@ -563,6 +585,12 @@ export function modelForTier(cfg, tier) {
  * `fgosDir` (`spawnWorker`'s optional `opts.fgosDir`); omitted `fgosDir`
  * skips it entirely — every pre-tsk-62v call site never passes it.
  *
+ * US-027/D5/D6 (tsk-1o7): when the capacity also declares `needs` (the
+ * capability it requires), that presence check matches by the registered
+ * tool's own `capability` field, never by name coincidence with
+ * `capacityId` — a capacity naming no `needs` yet keeps the pre-tsk-1o7
+ * `tools[capacityId]` name lookup unchanged.
+ *
  * Cross-provider governance (D2/D3, tsk-32n): once the winning `executor`
  * is resolved below, a `kind: "cli"` capacity whose FINAL resolved
  * `command` is not in `CLAUDE_CLI_COMMANDS` requires
@@ -605,18 +633,48 @@ function buildAgentTypeExecutor(baseExecutor, agentType) {
 function resolveExecutorConfig(cfg, tier, capacityId, fgosDir) {
   const capacity = capacityId && cfg && cfg.capacities && typeof cfg.capacities === 'object' ? cfg.capacities[capacityId] : undefined;
 
+  // D5/D6/tsk-1o7: US-027 -- binding matches by capability promise, never
+  // by tool name. When the capacity declares `needs`, the presence gate
+  // below searches the tools registry for a provider whose OWN declared
+  // `capability` matches `capacity.needs`, instead of assuming the
+  // capacity's own id is also the registered tool's name. A capacity
+  // naming no `needs` yet keeps today's exact `tools[capacityId]` name
+  // lookup, byte-identical -- the backward-compat seam that lets this
+  // land before any real capacity in `.fgos/config.json` actually
+  // declares `needs` (tsk-53n, split off per ADR0020).
+  //
+  // D13/tsk-592: gate widened from `kind === 'cli'` to `kind !== 'task'` --
+  // mcp/skill/http/binary capacities now get the same presence check a
+  // `cli` capacity always had (latent until a capacity of one of those
+  // kinds is registered; `kind === 'task'` still excludes the one kind
+  // with no real out-of-process provider to check presence for).
   if (capacity && capacity.kind !== 'task' && fgosDir) {
     const tools = listWork(fgosDir).tools ?? {};
-    if (!tools[capacityId]) {
+    if (capacity.needs) {
+      const localStatus = readLocalStatus(fgosDir);
+      const candidates = Object.values(tools).filter((tool) => tool.capability === capacity.needs);
+      if (candidates.length === 0) {
+        throw new RunnerConfigError(
+          `capacity "${capacityId}" needs capability "${capacity.needs}" but no tool is registered with that capability — run "fgos tool register --name <tool> --kind cli --command <cmd> --capability ${capacity.needs}" first.`,
+        );
+      }
+      const present = candidates.some((tool) => resolvedStatus(tool.name, localStatus) === 'present');
+      if (!present) {
+        throw new RunnerConfigError(
+          `capacity "${capacityId}" needs capability "${capacity.needs}" but no provider registered for it is present on this machine — run "fgos tool check --name <tool>" to refresh, or install one.`,
+        );
+      }
+    } else if (!tools[capacityId]) {
       throw new RunnerConfigError(
         `capacity "${capacityId}" declares kind "${capacity.kind}" but is not registered — run "fgos tool register --name ${capacityId} --kind ${capacity.kind} --command <cmd> --capability <label>" first.`,
       );
-    }
-    const status = resolvedStatus(capacityId, readLocalStatus(fgosDir));
-    if (status !== 'present') {
-      throw new RunnerConfigError(
-        `capacity "${capacityId}" is registered but not present on this machine (status: "${status}") — run "fgos tool check --name ${capacityId}" to refresh, or install it.`,
-      );
+    } else {
+      const status = resolvedStatus(capacityId, readLocalStatus(fgosDir));
+      if (status !== 'present') {
+        throw new RunnerConfigError(
+          `capacity "${capacityId}" is registered but not present on this machine (status: "${status}") — run "fgos tool check --name ${capacityId}" to refresh, or install it.`,
+        );
+      }
     }
   }
 

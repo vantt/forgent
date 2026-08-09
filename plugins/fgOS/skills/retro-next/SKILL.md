@@ -110,7 +110,16 @@ surface (`fgos compound`), and never re-implements that skill's synthesis
    own step 5, for the resolution every domain uses today), run:
 
    ```
-   node ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs move <id> --to cleanup --dir "$root"
+   # fgos CLI fallback (tsk-1no D3)
+   FGOS_BIN="${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs"
+   if [ -f "$FGOS_BIN" ]; then
+     node "$FGOS_BIN" move <id> --to cleanup --dir "$root"
+   elif command -v fgos >/dev/null 2>&1; then
+     fgos move <id> --to cleanup --dir "$root"
+   else
+     echo "fgos: no bin/fgos.mjs at ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX} (not a forgent checkout) and no global fgos install on PATH" >&2
+     exit 1
+   fi
    ```
 
    substituting `<id>` from step 2's output. Capture both the command's

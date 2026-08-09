@@ -23,6 +23,8 @@ hành nào khiến câu hỏi gate trở nên trả lời được"*.
 | 7 | Người chủ sản phẩm bác kết luận vòng 6 → **đo nhầm kênh**; yes/no thật nằm ở `gate-approve`, gấp 8 lần, và cơ chế giảm nó đã chết |
 | 8-9 | `tsk-5hg` giao và **tự chứng minh chính nó**; `tsk-3vv` đo độ trôi backlog; ràng buộc đa ngôn ngữ hoá ra vốn đã nới |
 | 10 | `contextApprove` sạch sau khi gỡ judge; Q16 trả lời; **`validateApprove` không phải cổng sản phẩm** — người chủ sản phẩm sửa tôi |
+| 11 | D6 chốt; red-check + bài toán chọn test ghi nhận |
+| 12 | Quay về nhu cầu gốc: **hai vùng lưu trữ cho hai người đọc**. Q8 chốt hoãn. **D7** |
 
 **⚠️ Hai chỗ phải đọc trước khi dùng bất kỳ con số nào ở dưới — §3 "Bị lật ở vòng 6" và "Bị lật ở
 vòng 7".**
@@ -541,6 +543,67 @@ không bao giờ nghĩa là index còn tươi"* — bộ chọn test dựa trên
 không nó sẽ im lặng bỏ sót test. Chính phiên này vừa gặp: index hỏng FTS, `analyze` báo **exit 0
 dù thất bại**.
 
+### H. Hai vùng lưu trữ cho hai người đọc (vòng 12)
+
+Người chủ sản phẩm quay về nhu cầu gốc của cả phiên, và tách nó thành **hai bài toán song song**:
+
+> *"1) cung cấp thông tin rõ ràng và chi tiết, phong cách viết tường minh, narrative, trình bày
+> thoáng, đẹp dễ đọc giúp cho người nhanh nắm bắt vấn đề và quyết định — đây là giảm gánh nặng nhận
+> thức, là vấn đề UX; 2) đồng thời cùng loại và lượng thông tin đó, đôi khi chúng ta cần 1 version
+> nó cô đọng hơn ngắn gọn, đủ, chính xác dành cho agent để giảm context và token."*
+
+**Phát hiện: hai vùng ĐÃ tồn tại, và vùng máy-đọc không ai đọc.**
+
+| Vùng | Kích thước | Ai đọc |
+|---|---|---|
+| `CONTEXT.md` (người) | 199 file · **~1.973 token**/file · cao nhất 4.978 | **mọi skill** — `fgos-planning`, `fgos-validating` |
+| `state.decisions` (máy) | **1.711 bản ghi** · ~100 token/bản | **0 skill** — chỉ `fgos show` (`bin/fgos.mjs:1700`) và một bộ đếm (`:2015`) |
+
+Chênh **~20 lần**. Chi phí token **đang bị trả rồi**: mỗi lượt clarify/planning, agent nuốt ~2.000
+token văn xuôi viết cho người để lấy thứ đã có sẵn dạng ~100 token có cấu trúc.
+
+`fgos-coding-shaping` §4 đã phát biểu đúng nguyên tắc từ lâu — *"machine-readable safety net for a
+cold pickup later, **independent of anyone re-reading the prose correctly**"* — nhưng chưa ai thi hành.
+
+**Đây là lần thứ BA trong cùng phiên gặp cùng một bệnh:**
+
+| Thứ được ghi tử tế | Người đọc |
+|---|---|
+| quy ước `## Outstanding questions` | skill không biết nó tồn tại (đến `tsk-5hg`) |
+| `askHistory` — 314 entry, 184KB | **0** |
+| `state.decisions` — 1.711 bản | **0 skill** |
+
+Cả ba đều là *"ghi trước, nối dây sau"* — và dây không bao giờ được nối.
+
+**Vì sao gộp hai mục đích vào một file làm hỏng cả hai.** `CONTEXT.md` hôm nay phải phục vụ cả người
+lẫn máy, nên nó không dám dài dòng tường minh (agent phải đọc) mà cũng không dám cô đọng (người phải
+hiểu). Kết quả là thứ ở giữa — đúng lời phàn nàn gốc: *"agent cứ mỗi lần hỏi là trích một đoạn ngắn
+thiếu thông tin, khó hiểu"*.
+
+**Tách audience ra thì cả hai được tự do tối ưu.**
+
+### I. Chất lượng vùng máy hiện tại — chỗ phải siết
+
+Người chủ sản phẩm cảnh báo đúng: *"phải làm thật chặt không thì `state.decisions` lại không còn
+thông tin gì cho agent"*. Đo thử:
+
+| | Số | Tỉ lệ |
+|---|---|---|
+| **Ghi-sổ máy móc** (`discovery caller-supplied`, `decompose verdict`, `auto-approved`…) | **592** | **35%** |
+| Quyết định thật | 1.119 | 65% |
+| — không có `rationale` | 130 | 12% của phần thật |
+| — `rationale` mỏng (<80 ký tự) | 180 | 16% |
+
+Độ dài quyết định thật: median **288 ký tự (~82 token)**, p10 171, p90 854.
+
+**Tin tốt: kích thước đã đúng ngưỡng anh muốn.** Vấn đề không phải dài dòng — là **lẫn tạp và thiếu
+bằng chứng**.
+
+**Lỗ hổng cưỡng chế:** `fgos decision` khai `--rationale` là **bắt buộc**, nhưng 130 bản ghi rỗng
+vẫn lọt — tất cả đều **không khai `source`**, và có cả D-ID thật (`D1/D2/D3 (tsk-64s)`).
+`store.mjs:835` `appendEvent({type:'decision'})` không cưỡng chế, nên bất cứ ai gọi thẳng store
+facade đều lách được validation của CLI.
+
 ### Chưa rõ — cần bàn
 
 | # | Câu hỏi mở | Vì sao chưa quyết được |
@@ -552,7 +615,7 @@ dù thất bại**.
 | Q5 | **Cái này sống ở lớp nào?** | Contract CTR004 (ask/answer) / verb `ask` tự validate / skill prose / judge-executor. Ảnh hưởng tới việc nó có phải thay đổi hợp đồng hay không. |
 | Q6 | **Sửa gốc `verify` có làm Q2 thành thừa không?** | Nếu `verify` sinh ra đủ tốt thì hai judge hết cãi, 64% tự biến mất. Có thể luật định tuyến chỉ là lưới an toàn, không phải giải pháp chính. Chưa biết tỉ trọng. |
 | Q7 | **Quan hệ với STR70a/STR70b/tsk-42i?** | Cụm gate-dialogue đã có sẵn, nhưng nguồn thiết kế của nó (`gate-dialogue-continuity/CONTEXT.md`) **chưa bao giờ vào git** (`git log --all` rỗng) — 5 item và 2 dòng backlog đang trích một file không tồn tại. Cần biết phần nào của cụm đó còn đứng vững. |
-| Q8 | **Tầng 0 là item riêng, hay điều kiện tiên quyết của `tsk-65i`/`tsk-539`?** | S1–S7 nằm ở lược đồ dữ liệu, sâu hơn cả hai item hiện có. Nếu là tiên quyết thì hai item kia bị chặn cho tới khi nó xong; nếu là item riêng song song thì phải chốt phần giao. |
+| ~~Q8~~ | ~~Tầng 0 là item riêng hay điều kiện tiên quyết?~~ | ✅ **ĐÓNG ở vòng 12 — HOÃN tầng 0 như một khối.** Phân loại lại S1–S10: chỉ **S2/S5 đau hôm nay**; **S3/S8/S9/S10 phục vụ một màn hình chưa vẽ**; S1/S7 đã co lại sau khi gỡ judge; S4/S6 chỉ đau khi có consumer chưa có. Đổi lược đồ event append-only là quyết định **một chiều** — `askHistory` đã chứng minh bằng thực nghiệm điều gì xảy ra khi làm trước khi có người đọc (314 entry, 184KB, **0 reader**). Nhu cầu thật nằm ở **tầng 3 + hai vùng lưu trữ** (§3-H), không phải `gates[id]`. Tách riêng **S2** nếu trần-hỏi-lại được làm — nó là hợp đồng giải phóng cổng, hỏng thật, và sửa được mà **không** đụng lược đồ event. |
 | Q9 | **Sửa tầng 0 có phải đổi hợp đồng CTR004 không, và nếu có thì theo luật nào?** | Thêm `answerHistory`/liên kết hỏi-đáp/kiểu câu hỏi đều là mở rộng lược đồ event. L10 (add-through-not-alongside) bắt mở rộng QUA cửa hiện có; `0011` bắt mọi contract khai version tường minh. Chưa rõ đây là bump version CTR004 hay chỉ thêm trường tuỳ chọn. |
 | Q10 | **Cơ chế giải phóng chung (S1) hình dạng thế nào?** | Thay `ask.includes(<literal>)` bằng gì: một `gateId` ổn định trên mỗi ask? Một `releases` trỏ ngược? Chưa bàn. Đây là thứ quyết định `tsk-65i` là luật định tuyến hay là một cơ chế dữ liệu. |
 | Q11 | **Câu trả lời tự-đứng-được (S7) có cần cấu trúc không?** | STR70a đã dựng `rationale`/`alternatives`/`source` cho answer — có thể phần này đã giải quyết một nửa S7. Cần đọc `checkpoint-distillate-gate-provenance/` xem còn thiếu gì, trước khi thiết kế mới. |
@@ -606,6 +669,8 @@ dù thất bại**.
 | **D5** | **Đọc qua verb, ghi qua verb — ngôn ngữ hoàn toàn tự do.** Mọi consumer ngoài CLI/TUI-local gọi `fgos <verb>` cho cả hai chiều; không link lib, không fold log thô, không ghi thẳng `events.jsonl`. Hoà giải `0014` chốt 1 (polyglot) với chốt 4 (đi qua cửa CLI), và làm `p-09351985` thành **không-chặn**. | 10 (nêu V9, không bị sửa ở V10) | prose (chưa ghi event — xem ghi chú dưới) |
 | **D6** | **`validateApprove` bypass khi reality gate KHÔNG sinh ra ràng buộc nào; có bất kỳ ràng buộc nào → hỏi người.** Khớp chính xác dữ liệu: 94/108 (87%) không ràng buộc, 13 ca có ràng buộc đúng là những ca đáng hỏi, 0 lần phải hỏi lại. Chọn một-trục-tự-báo-cáo thay vì năm-trục-đoán-trước, vì hai trong ba ca cần phán đoán (#2, #4) **không phát hiện được từ trước** — chúng chỉ lộ khi skill viết verdict, mà chính skill là bên biết. Tái dùng nguyên `canAutoApprove`, chỉ thay `hasOpenItems`. | 10 (người chủ sản phẩm chọn phương án 5) | ✅ seq **9891** (`tsk-539`) |
 
+| **D7** | **Hai vùng lưu trữ cho hai người đọc.** `state.decisions` là nguồn **authoritative cho agent** (ngắn, đủ bằng chứng); `CONTEXT.md` tự do tối ưu **cho người** (narrative, thoáng, markdown đầy đủ). **Ràng buộc thứ tự là phần chính của quyết định**: KHÔNG nối skill vào `state.decisions` cho tới khi phép kiểm độ sạch xanh — hiện 35% là ghi-sổ máy móc và 12% quyết định thật thiếu `rationale`. | 12 (người chủ sản phẩm nêu nhu cầu, số đo xác nhận) | ✅ seq **10187** (`tsk-539`) |
+
 **Ứng viên D-ID cho vòng 8** (chưa đứng đủ vững):
 
 - Bypass chết vì quy ước `## Outstanding questions` chưa được nối vào hai skill viết artifact —
@@ -630,6 +695,10 @@ dù thất bại**.
 | "Launcher không làm được luật 2 của 0026" | 4 | 5 | **sai khung** — luật 2 chưa bao giờ là việc của launcher, nó áp dụng bên trong con Claude được spawn |
 | "64% đã tự khỏi, vấn đề hỏi-sai-người hết" | 6 | **7** | **đo nhầm kênh** — chỉ đúng cho `ask`; kênh `gate-approve` lớn gấp 8 lần và vẫn sống |
 | "Tầng 1 (định tuyến) đã tự khỏi phần lớn" | 6 | **7** | chỉ đúng cho `ask`; tính cả `gate-approve` thì gánh nặng hỏi người **không giảm** |
+| "`validateApprove` là quyết định sản phẩm" | 7 | **10** | **sai** — kiểm khả thi, dùng lại verify của planApprove, `NOT READY` bỏ qua câu hỏi |
+| "Cưỡng chế verify phải chạy xanh ở validate gate" | 10 | **11** | **vô nghĩa** — chưa viết dòng code nào thì verify đương nhiên đỏ; phép kiểm đúng là *chạy được* + *đang đỏ* |
+| "Cần `answerHistory`, 22/23 câu trả lời bốc hơi" | 12 | **12** | **quá lời, tự rút lại cùng vòng** — log append-only giữ nguyên; và `askHistory` có **0 nơi đọc** |
+| "Tóm tắt 3 tầng có cấu trúc trong artifact" | 12 | **12** | **sai hướng** — lại nhét cấu trúc-cho-máy vào file-cho-người; thứ đúng là **gỡ buộc** hai audience |
 
 ---
 
@@ -937,6 +1006,54 @@ nặng hỏi người **không hề giảm** — chỉ chuyển kênh trong mắ
 giả định mặc định phải là **đo thiếu kênh**, không phải người nhớ nhầm. Vòng 6 dạy "đo state phải
 kèm mốc code"; vòng 7 dạy "đo một kênh rồi kết luận về toàn bộ hiện tượng là sai".
 
+### 2026-08-09 — Vòng 12: quay về nhu cầu gốc, và tìm ra hai vùng đã có sẵn
+
+**Người chủ sản phẩm kéo cuộc bàn về điểm xuất phát:**
+
+> *"từ đầu phiên là chúng ta có nhu cầu để làm webui giúp việc trả lời câu hỏi được rõ ràng và tự
+> tin dễ hiểu hơn. hiện nay agent cứ mỗi lần hỏi là trích một đoạn ngắn thiếu thông tin, khó hiểu.
+> tôi muốn bằng một cách nào đó thì trong quá trình làm ghi đầy đủ chi tiết, sắp xếp theo một trình
+> tự nào đó mở ra từ từ theo tiến trình… nếu dung lượng quá lớn thì ở bước retro/cleanup có thể
+> tổng hợp thành 1 bản cuối cùng rồi cleanup các thứ dư thừa?"*
+
+**Đề xuất này đã có tiền lệ bị chặn: `STR70b`** (*"Raw backstop cho cuộc bàn ở gate"*, đào
+2026-07-21). Ba nhà đã bị loại: O1 event core (log append-only bất khả xâm phạm, **không có cơ chế
+redact/prune/TTL** ⇒ *"drop khi chốt"* bất khả thi) · O2 kho phụ trong core (vướng L1) · O3
+daemon-consumer (đúng nhà theo `0014` nhưng **chưa tồn tại**).
+
+**Tôi đề xuất nhà thứ tư rồi tự rút lại.** Đọc L1 thì thấy nó tự nêu ví dụ cho cả hai vật lý **và
+cả hai đều nằm trong cây docs** (`plans/reports/` là Log, `docs/distillery/sources/*.md` là State)
+— nên `docs/history/` là nhà hợp lệ, với file = State (nén được) và lịch sử git = Log (giữ vĩnh
+viễn, `git log -p`). Không cần mở L1, không cần chờ daemon.
+
+Nhưng rút lại vì: artifact đã mang detail sẵn; thêm file thứ tư mỗi feature là tăng dung lượng
+không tăng thông tin; và `askHistory` là bằng chứng sống về việc ghi trước khi có người đọc.
+
+**Người chủ sản phẩm tách nhu cầu thành hai bài toán song song** — UX cho người vs token cho agent
+— và hỏi có nên tách vùng lưu trữ. **Kiểm thì hai vùng đã tồn tại sẵn** (§3-H): `CONTEXT.md`
+~1.973 token/file mọi skill đọc, `state.decisions` 1.711 bản ~100 token/bản **0 skill đọc**.
+Chi phí token đang bị trả rồi.
+
+**Tôi rút lại khuyến nghị của chính mình ở lượt trước** (*"tóm tắt 3 tầng có cấu trúc trong
+artifact"*) — sai hướng: nó lại nhét thêm cấu trúc-cho-máy vào file-cho-người, tức làm nặng đúng
+chỗ đang bị buộc. Thứ đúng là **gỡ buộc**, không phải thêm tầng.
+
+**Người chủ sản phẩm đặt ràng buộc quyết định:** *"phải làm thật chặt không thì `state.decisions`
+lại không còn thông tin gì cho agent… phiên bản máy đọc cũng cần đủ thông tin, đủ bằng chứng nhưng
+ngắn gọn không dài dòng."* Đo thử (§3-I): 35% ghi-sổ máy móc, 12% thiếu `rationale`, nhưng
+**kích thước đã đúng** (median ~82 token). Truy được lỗ hổng cưỡng chế: `store.mjs:835` không bắt
+`rationale` dù CLI khai bắt buộc.
+
+→ **D7** (seq 10187), kèm ràng buộc thứ tự làm phần chính: bước 4 (kiểm độ sạch xanh) là **cổng**
+trước khi nối skill.
+
+**Q8 chốt HOÃN.** Phân loại lại S1–S10: chỉ S2/S5 đau hôm nay; S3/S8/S9/S10 phục vụ màn hình chưa
+vẽ. Nhu cầu thật nằm ở hai vùng lưu trữ, không phải `gates[id]`.
+
+**Ghi nhận thêm:** `answerHistory` — tôi đề xuất rồi tự rút lại trong cùng một vòng, sau khi grep
+ra `askHistory` có **0 nơi đọc** và `priorRejection` (consumer duy nhất nó nêu tên) đã biến mất
+cùng judge. Dữ liệu **không** mất — log append-only giữ nguyên; tôi nói "bốc hơi" là quá lời.
+
 ---
 
 ## 6. Thiết kế đã chốt {#design}
@@ -1118,6 +1235,59 @@ Cả năm điều kiện "hỏi người" đều **đo được**, không phải
 Điểm mạnh nhất của hình dạng này: nó giữ đúng ca #8 (plan trỏ sai file) trong vùng máy bắt được —
 "symbol plan nhắc có nằm trong file plan nói không" là một phép grep, không phải phán đoán.
 
+### Hợp đồng hai vùng (D7, vòng 12)
+
+Trục này **cắt ngang** khung sáu tầng ở trên — nó không thuộc tầng nào, nó nói **thông tin sống ở
+đâu và ai đọc**.
+
+```mermaid
+flowchart LR
+    W["Lúc làm việc<br/>skill lock một quyết định"]
+    W -->|"~100 token<br/>có D-ID, có rationale trích được"| M[("state.decisions<br/>VÙNG MÁY<br/>authoritative cho agent")]
+    W -->|"dài tuỳ nội dung<br/>narrative, thoáng"| H[("CONTEXT.md<br/>VÙNG NGƯỜI<br/>git-versioned")]
+    M -->|"skill đọc — SAU khi sạch"| S["fgos-planning<br/>fgos-validating"]
+    H -->|"người duyệt đọc"| P["Người ở gate"]
+    H -->|"render sau này"| U["Web UI"]
+
+    style M fill:#ddeded,stroke:#186E71
+    style H fill:#f2e9d8,stroke:#8E6318
+```
+
+| | Vùng máy | Vùng người |
+|---|---|---|
+| Nhà | `state.decisions` (event log) | `docs/history/<feature>/CONTEXT.md` (git) |
+| Kích thước mục tiêu | **median ~288 ký tự / ~82 token**, trần mềm ~850 (p90 hiện tại) | không giới hạn |
+| Tiêu chuẩn | đủ bằng chứng, trích được `file:line`/`seq`/số đo | người nắm nhanh, quyết được |
+| Phong cách | cô đọng, chính xác, không dài dòng | narrative, tường minh, markdown đầy đủ |
+| Đọc bởi | skill (sau khi sạch) | người ở gate · web UI sau này |
+
+**Bốn luật của vùng máy — mỗi luật phải kiểm được bằng máy:**
+
+1. **Tách ghi-sổ máy móc khỏi quyết định thiết kế** — thêm `kind: engine|design`, hoặc engine
+   ngừng dùng kênh này. Hiện 592/1.711 = **35% nhiễu**.
+2. **`rationale` bắt buộc, cưỡng chế ở tầng store** — không chỉ ở CLI; 130 bản đã lách qua
+   `store.mjs:835`.
+3. **`rationale` phải trích được thứ kiểm lại được** — `file:line`, `seq`, hoặc số đo. Không trích
+   dẫn thì là ý kiến, không phải bằng chứng.
+4. **Giữ kích thước hiện tại** — median 288 ký tự đã đúng ngưỡng. Đừng nới.
+
+**Thứ tự triển khai — bước 4 là cổng:**
+
+```
+1. Thêm kind: engine|design, tách 592 bản nhiễu
+2. Cưỡng chế rationale ở tầng store
+3. Thêm kiểm "rationale có trích dẫn kiểm được không"
+4. Chạy kiểm — phải XANH trên toàn bộ 1.119 quyết định thật   ← CỔNG
+5. Chỉ khi đó mới đổi fgos-planning sang đọc state.decisions
+6. Giải phóng CONTEXT.md cho người
+```
+
+Nếu 130 bản thiếu `rationale` không vá ngược được (item cũ), luật áp cho bản ghi **mới** và phép
+kiểm chỉ soi từ một mốc thời gian trở đi — vẫn chặt, không phải đi sửa lịch sử.
+
+**Vì sao thứ tự này, không phải thứ tự ngược:** ba lần trong cùng phiên đã thấy mô-típ *"ghi trước,
+nối dây sau"* mà dây không bao giờ được nối (§3-H). Bước 4 tồn tại đúng để chặn việc lặp lại.
+
 ### Ràng buộc thứ tự đã chốt (D1)
 
 Không xây kênh chú-ý STR48 trước khi xử lý tầng 0/1/2. Kênh push **khuếch đại** chất lượng câu hỏi
@@ -1264,7 +1434,33 @@ hiện nó đã được sửa. Chi tiết §3 "Bị lật ở vòng 6".
 - **Dùng ngược làm công cụ:** vẽ màn hình trước, không code — bản vẽ sinh ra đặc tả cho tầng 0.
 - **Chưa submit** — chờ tầng 0.
 
+### ⭐ Chưa có item · Làm sạch vùng máy (D7 bước 1–4) {#task-clean-machine-zone}
+
+- **Mục tiêu:** đưa `state.decisions` đủ sạch để skill đọc thay `CONTEXT.md`. Bốn luật ở §6
+  "Hợp đồng hai vùng".
+- **D-ID áp dụng:** **D7** (seq 10187).
+- **Số đo nền:** 1.711 bản · 592 (35%) ghi-sổ máy móc · 130/1.119 (12%) thiếu `rationale` ·
+  median 288 ký tự (~82 token) — kích thước **đã đúng**, chỉ cần lọc tạp và siết bằng chứng.
+- **Lỗ hổng cưỡng chế phải vá:** `store.mjs:835` `appendEvent({type:'decision'})` không cưỡng chế
+  `rationale`; CLI khai bắt buộc nhưng gọi thẳng store facade thì lách được.
+- **Là CỔNG cho:** `#task-wire-machine-zone` bên dưới. Không xong thì không được nối.
+- **Chưa submit.**
+
+### Chưa có item · Nối skill vào vùng máy (D7 bước 5–6) {#task-wire-machine-zone}
+
+- **Mục tiêu:** `fgos-planning`/`fgos-validating` đọc quyết định từ `state.decisions` thay vì parse
+  `CONTEXT.md`. Cắt ~1.900 token mỗi lượt.
+- **Phụ thuộc CỨNG:** `#task-clean-machine-zone` phải xanh trước. Nối sớm = agent nhận 35% nhiễu.
+- **Kéo theo:** `CONTEXT.md` được giải phóng — viết narrative, thoáng, markdown đầy đủ, dài tuỳ nội
+  dung, mở dần theo tiến trình. Đây là thứ web UI render sau này, không cần xây thêm gì.
+- **Chưa submit.**
+
 ### Chưa có item · Lược đồ gate — tầng 0 {#task-gate-schema}
+
+> ⛔ **Q8 chốt HOÃN ở vòng 12.** Không đổi lược đồ event append-only cho consumer chưa tồn tại.
+> Chỉ **S2** (so khớp chuỗi làm hợp đồng giải phóng cổng) đáng tách riêng nếu trần-hỏi-lại được
+> làm — và nó sửa được **không** đụng lược đồ event.
+
 
 - **Mục tiêu:** cho `gates[id]` đủ cấu trúc để ba tầng trên **cưỡng chế được** thay vì chỉ nhắc
   trong prose. Ứng viên: `gateId` ổn định để câu trả lời trỏ vào (thay `ask.includes(<literal>)`),

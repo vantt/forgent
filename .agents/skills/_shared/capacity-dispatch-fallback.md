@@ -62,8 +62,19 @@ console.log(cfg.runner?.capacities?.['<CAPACITY_ID>'] ? 'configured' : 'not-conf
 
 ## Step B — presence check
 
+US-027/D5/D6 (tsk-1o7): query by the capacity's own declared `needs`
+(its real capability) — never by `<CAPACITY_ID>` itself, which is a
+name, not a capability. A capacity that hasn't migrated to `needs` yet
+falls back to querying `<CAPACITY_ID>` unchanged, so this step still
+works for it exactly as before.
+
 ```bash
-node "$root/bin/fgos.mjs" tool query --capability <CAPACITY_ID> --status present --dir "$root"
+CAPABILITY=$(node -e "
+const cfg = JSON.parse(require('node:fs').readFileSync('$root/.fgos/config.json', 'utf8'));
+const needs = cfg.runner?.capacities?.['<CAPACITY_ID>']?.needs;
+console.log(needs || '<CAPACITY_ID>');
+")
+node "$root/bin/fgos.mjs" tool query --capability "$CAPABILITY" --status present --dir "$root"
 ```
 
 - **Empty `providers` array (registered but not present, or never
