@@ -1930,14 +1930,29 @@ LÀN 1 — sau khi tsk-33w nhả dispatch.mjs
 LÀN 2
 └── tsk-1o7   di trú needs/for                     ← MỘT MÌNH trên dispatch.mjs
 
-════════ chặn: tsk-5td phải đóng ════════
-
 LÀN 3
-└── tsk-2ie5  gather thành mẫu vật + carries
+└── tsk-2ie5  gather thành mẫu vật + carries    (deps: tsk-1o7)
 
 LÀN 4
-└── tsk-5wz   tối ưu intake               (mergeAfter tsk-2ie5)
+└── tsk-5wz   tối ưu intake                     (mergeAfter tsk-2ie5)
 ```
+
+> **Đính chính (vòng 28).** Bản đầu gắn `deps: tsk-5td` lên `tsk-2ie5` và
+> `tsk-5wz`, kèm một vạch *"chặn: `tsk-5td` phải đóng"*. **Sai.** Hai item đó
+> dựa vào **D6/D12/D13/D15**, mà bốn quyết định ấy **đã mint** — nằm trong
+> `events.jsonl`, không phải đang chờ. `tsk-5td` đóng hay không **không thêm gì**
+> cho chúng. Đó là chặn theo **nghi thức**, không theo **điều kiện thật**.
+>
+> Dep thật đã sửa lại: `tsk-2ie5` **`deps: [tsk-1o7]`** — vì `for:` là thứ
+> `tsk-1o7` dựng và `tsk-2ie5` là **consumer đầu tiên** của nó. `tsk-5wz` bỏ
+> dep hẳn, chỉ giữ `mergeAfter: tsk-2ie5` (bước rút dispatch không được land
+> trước khi có thứ thay thế).
+>
+> Provenance **không mất**: cả hai vẫn `refs` vào anchor §7 của chính chúng.
+>
+> Không đặt `deps` cho cặp `tsk-592` → `tsk-1o7`: thứ tự đó là **rẻ hơn một
+> chiều**, không phải **đúng-sai**. Footprint chồng nhau đã chặn chạy song song;
+> lý do chọn chiều nào ghi ngay dưới đây là đủ.
 
 **Vì sao `tsk-592` trước `tsk-1o7`.** `592` đổi chuỗi `native`/`cli-spawn` →
 `in-process`/`out-of-process`. Làm `1o7` trước thì `592` phải đi đổi lại đúng
