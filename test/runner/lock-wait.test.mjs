@@ -124,3 +124,36 @@ test('withLockRetry: explicit waitMs past remainingTtlMs still gives up once its
   assert.ok(elapsed >= 900, `must have waited out the full explicit waitMs, past the remainingTtlMs snapshot (took ${elapsed}ms)`);
   assert.ok(calls >= 2);
 });
+
+test('withLockRetry: prints a progress line on the default (no explicit waitMs) path (tsk-mgb)', async () => {
+  const stderrChunks = [];
+  const originalWrite = process.stderr.write;
+  process.stderr.write = (chunk) => {
+    stderrChunks.push(String(chunk));
+    return true;
+  };
+  try {
+    await assert.rejects(
+      () => withLockRetry(() => {
+        throw lockHeldError(900); // long enough for at least one real backoff sleep
+      }),
+    );
+  } finally {
+    process.stderr.write = originalWrite;
+  }
+  assert.ok(
+    stderrChunks.some((line) => /still waiting on main-checkout lock/.test(line)),
+    'the default (no --wait) path must still print at least one progress line during a real backoff wait',
+  );
+});
+
+test('withLockRetry: does not busy-spin in the BOUNDARY_GRACE_MS tail -- bounded call count even for a tiny budget (tsk-mgb)', async () => {
+  let calls = 0;
+  await assert.rejects(
+    () => withLockRetry(() => {
+      calls += 1;
+      throw lockHeldError(10); // tiny budget -- a negative/near-zero delay busy-spins hundreds of times in the grace tail
+    }),
+  );
+  assert.ok(calls <= 10, `must not busy-spin in the grace-window tail (made ${calls} calls for a 10ms budget)`);
+});
