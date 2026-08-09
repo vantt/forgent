@@ -146,6 +146,7 @@ không mở lại những quyết định các item khác đã khoá.
 | **D14** | **Phép thử thứ ba của D2 — AI SỞ HỮU TIÊU CHÍ**: `gather` = tiêu chí ở **bên gọi**, tự áp lên dữ liệu nhận được · `judge` = tiêu chí ở **bên được gọi**, bên gọi **TUÂN**. Kèm khái niệm **verdict giả** — nhãn phán do nhà cung cấp tính sẵn nhưng bên gọi đối xử như **bằng chứng**. Hai phép thử đầu không phân được response mang cả hai; ca thử thật `impact()` của gitnexus (caller-list + `risk`) phân được nhờ chính `CLAUDE.md` bắt **cross-check trước khi tin** = không tuân ⇒ **gather**. Kiểm ngược: `judge-discovery` bên gọi tuân ⇒ judge thật | 11b → 22 |
 | **D15** | **`capacity` khai BA thứ, không phải hai** — `for` (lớp T2) + `needs` (capability) + **`carries`** (lớp **nội dung** nó được phép nhận). `carries` **phải có tập giá trị khai rõ, không bao giờ chuỗi tự do**, và **chỉ ship cùng lúc với thứ đọc nó** (gate ở TG). **Supersede D7** của `agent-executor-submit-assist-classify`. Hình: D8 đã đặt `capacity` là năng lực tự khai mình **LÀ** gì và **CẦN** gì ⇒ khai luôn mình được nhận **NỘI DUNG** loại nào là cùng một hình. Cụm ba mảnh: `allowCrossProvider` = *có được ra không* · `carries` = *cái gì được ra* · D9 = *đã ra tới đâu*. Tập khởi điểm (`tsk-2ie5` chốt lại trên nội dung gather thật): `user-text` · `repo-content`; `secrets`/credentials **không bao giờ** là giá trị hợp lệ. D7 **không sai, bị sự kiện vượt qua**: entry nó nhắm sắp bị dời (`tsk-5wz`), điều kiện YAGNI của chính nó (*"until a second, riskier cross-provider capacity exists"*) thoả bởi `tsk-2ie5`, và **metadata không ai đọc là pattern đã biết là xấu** — hai ca sống cùng phiên: `executors.judge` nằm chết, và chính `sensitiveData` biến mất dù đã khoá | 21 → 23 |
 | **D16** | **Giá trị mechanism đổi `native`/`cli-spawn` → `in-process`/`out-of-process`.** Prose vẫn gọi **trong/ngoài** (*internal/external*), với ranh giới **ghim một lần: LUÔN so với tiến trình của BÊN GỌI**. Tên cũ tả **sai thứ** — `native` nói *cách*, `cli-spawn` nói *phương tiện*, không tên nào nói *vị trí*, trong khi D13 đã chốt mechanism **chính là** vị trí. Ngày adapter `rpc` đăng ký: nhà cung cấp vẫn **ngoài** nhưng **không có spawn nào** ⇒ `cli-spawn` sai, `out-of-process` vẫn đúng. Phép thử sờ được: *có phải dựng thêm một tiến trình, hoặc nối sang tiến trình khác, mới làm được việc này không?* **Loại** `in-session`/`out-of-session` (`session` = chữ tầng runtime, không có trong config, không kiểm được bằng máy, Claude-riêng) · **loại** `internal`/`external` **làm enum** (repo có **ba** ranh giới sống cùng lúc, và 8 comment trong `src/` dùng `internal` theo nghĩa *"của chính fgOS"* ⇒ một MCP tool do fgOS ship là *internal* theo **sở hữu** nhưng *external* theo **vị trí**) · **không mượn** `inbound`/`outbound` của hn (hn hỏi *của ai*, fgOS hỏi *ở đâu*; mượn thì tên **chạy ngược** trực giác: `kind:"task"` ở **trong** mà hn gọi là **out**bound) · **loại** mọi bản rút gọn (`out-process` không phải tiếng Anh · `in-proc`/`out-proc` viết tắt tự chế · `local`/`remote` sai vì tiến trình con cùng máy không phải remote · `self`/`spawned` **chết cùng `rpc`**). Là giá trị **dẫn xuất** — không ai gõ vào config — nên độ dài không phải chi phí thật. **Đổi chuỗi code trả về ⇒ item riêng** | 8 → 24 |
+| **D17** | **T1 rút về ĐÚNG HAI giá trị — `launcher` (buông) và `driver` (ở lại).** `orchestrator` **không** phải giá trị của T1 mà là **tầng hợp thành T0**: N lần dấn thân con, hợp nhất kết quả. `0028` đổi **tên**, `tsk-2cw` đã **thi hành xong** (status `cleanup`) — **cả hai không đụng SỐ GIÁ TRỊ**, nên câu này **chưa từng có chủ**. Chính tiêu đề `tsk-2cw` ghi mục đích thứ hai: *"giải phóng từ `orchestrator` để dành cho **mục đích khác**"* rồi để trống; D17 **điền vào chỗ trống ấy**. Bằng chứng: `0028` đã lập luận sẵn hai tính chất độc lập — **arity** (1 vs N) và **engagement** (bước ra vs giữ liên hệ); nhu-cầu-phán-đoán bám theo **cột**, không theo arity (`0026`: *"launcher KHÔNG CẦN soul … THUẦN CƠ HỌC"*). `fgos-fanout` spawn N Agent, **mỗi Agent chạy `/fgOS:pick` end-to-end** ⇒ mỗi cái là một `driver` ⇒ `orchestrator` là **N lần dấn thân con** hợp lại. Ô (N, buông) trống **không phải vì thiếu**: buông N đơn vị cùng lúc thì không còn ai hợp nhất kết quả — đó là `launcher` chạy N lần, không phải vai trò mới | 8 → 25 |
 | **D2** | **Nhánh không-authority tách làm hai lớp: `gather` (trả `digest`) và `judge` (trả `verdict`)** — không phải một. Lý do tách: hai loại lỗi khác nhau ⇒ hai cách sửa khác nhau (digest sai vì *đọc thiếu* → đọc lại/rộng hơn; verdict sai vì *phán sai* → cần người hoặc đổi tiêu chí); trộn lại thì mất tín hiệu sửa lỗi. Tên **không phát minh mới** — cả hai cặp `<lớp> → <cái nó trả về>` đã sống sẵn trong repo (§5 vòng 2). Bee cũng tách đúng chỗ này, gọi review-class là *"neither class"* | 1 → 3 |
 
 ## 5. Q&A log
@@ -846,6 +847,23 @@ Chốt **`in-process`/`out-of-process`** cho enum, giữ **trong/ngoài** cho v�
 xuôi, kèm **một câu ghim ranh giới**. Mọi bản rút gọn đều bị loại có lý do.
 Mint **D16**.
 
+### Vòng 25 — 2026-08-09 — T1 hai giá trị, và một đính chính về quyền sở hữu
+
+**Người dùng:** *"nếu chốt thì không cần làm `tsk-2cw`?"*
+
+Câu hỏi lộ ra tôi đã **ghi sai quyền sở hữu suốt từ vòng 8**. Kiểm thật:
+`tsk-2cw` ở `status: cleanup` — **đã xong** — và phạm vi nó là **đổi tên**
+(`orchestrator`→`launcher`, ~15 chỗ trong `0026` + history + how-to + 3 comment
+`src/runner/*`, kèm allowlist giữ `PaneOrchestrator` của herdr). Nó **không**
+đụng số giá trị của T1; `0028` cũng vậy.
+
+⇒ Không có xung đột phạm vi nào cả. Và đúng hơn nữa: chính tiêu đề `tsk-2cw`
+ghi mục đích thứ hai — *"giải phóng từ `orchestrator` để dành cho **mục đích
+khác**"* — rồi **để trống**. Phiên này trả lời đúng chỗ trống đó.
+
+Mint **D17**. Cũng set `refs` của `tsk-2cw` trỏ về `DISCUSSION.md` này, để một
+người đọc lại `tsk-2cw` thấy được cái tên nó giải phóng đã đi về đâu.
+
 ## 6. Thiết kế đã chốt {#design}
 
 > **Regenerate lần 3 — bản sau vòng 10.** Vòng 10 đổi hình dạng thật (T2 thành
@@ -1499,7 +1517,7 @@ kết quả tính ra tại mỗi lần dispatch, không phải thêm một giá 
 Cùng khuôn `derived-never-stored` đã dùng cho `frontier` / `computeSchedule` /
 `footprintOverlap`.
 
-### 6.7 T0 và T1 — vai trò bên gọi [ĐỀ NGHỊ — vòng 8] ⚠ đụng `tsk-2cw`
+### 6.7 T0 và T1 — vai trò bên gọi [KHOÁ — D17]
 
 `0028` (accepted) đã lập luận sẵn hai tính chất **độc lập**: **arity** (1 hay N)
 và **engagement** (bước ra hẳn, hay giữ liên hệ liên tục).
@@ -1514,9 +1532,19 @@ launcher KHÔNG CẦN soul … THUẦN CƠ HỌC"*.
 
 `orchestrator` **không phải ô thứ ba** mà là **tầng hợp thành (T0)**:
 `fgos-fanout` spawn N Agent, **mỗi Agent chạy `/fgOS:pick` end-to-end** ⇒ mỗi
-cái là một `driver`. ⇒ T1 chỉ có **hai** giá trị; `orchestrator` lên T0 — đúng
-chỗ `tsk-2cw` đang chừa. `tsk-2cw` sở hữu chiều này, `0028` mới đổi *tên* chứ
-chưa đụng *số giá trị*.
+cái là một `driver`. ⇒ T1 chỉ có **hai** giá trị.
+
+Ô **(N, buông) trống không phải vì thiếu**: buông N đơn vị cùng lúc thì không
+còn ai hợp nhất kết quả — đó là `launcher` chạy N lần, không phải một vai trò
+mới.
+
+> **Đính chính (vòng 25):** các bản trước ghi *"⚠ đụng `tsk-2cw`, item đó sở
+> hữu chiều này"* — **sai**. Kiểm thật: `tsk-2cw` ở `status: cleanup` (đã xong),
+> và phạm vi nó là **đổi tên** `orchestrator`→`launcher`, không đụng **số giá
+> trị**. `0028` cũng chỉ đổi tên. ⇒ Câu *"T1 có 2 hay 3 giá trị"* **chưa từng
+> có chủ**. Hơn nữa chính tiêu đề `tsk-2cw` ghi mục đích thứ hai — *"giải phóng
+> từ `orchestrator` để dành cho **mục đích khác**"* — rồi để trống. D17 **điền
+> vào chỗ trống đó**, không đè lên ai.
 
 ### 6.8 `dispatch` là cạnh, không phải tầng
 
