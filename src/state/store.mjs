@@ -822,6 +822,13 @@ export function recordGateApprove(dir, { id, gate, actor, verify } = {}) {
  * (seq 1206, renumbered by tsk-n4i-1; was 1190) and, when present,
  * additionally folds this decision into a
  * per-item view alongside the existing global log (replay.mjs).
+ *
+ * `kind` (tsk-1ud D7 step 1): `'engine' | 'design'`, optional free text (no
+ * enum, same posture as `source`), defaulting to `'design'` when omitted —
+ * lets a consumer separate the engine's own bookkeeping records
+ * (`resolveDiscovery`/`resolveDecompose`, which pass `kind: 'engine'`
+ * explicitly) from real design decisions without matching on `text`
+ * prefixes.
  */
 export function addDecision(dir, payload) {
   const { logPath } = paths(dir);
@@ -831,7 +838,7 @@ export function addDecision(dir, payload) {
   if (typeof payload.rationale !== 'string' || !payload.rationale.trim()) {
     throw new StoreError('validation', 'decision requires a non-empty "rationale".');
   }
-  const eventPayload = { ...payload, source: payload.source ?? 'session' };
+  const eventPayload = { ...payload, source: payload.source ?? 'session', kind: payload.kind ?? 'design' };
   const event = appendEvent(logPath, { type: 'decision', payload: eventPayload });
   const view = refreshView(dir);
   return { event, view };

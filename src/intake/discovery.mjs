@@ -152,6 +152,7 @@ export function resolveDiscovery(dir, id, cfg, role, callerVerdict) {
       id,
       text: `discovery caller-supplied: clear=${verdict.clear}`,
       source: 'resolveDiscovery',
+      kind: 'engine',
       rationale:
         'tsk-27y D2: caller-supplied verdict — session already reasoned live (fgos-exploring), skipping the readLockedContext trust-signal check',
     });
@@ -167,6 +168,7 @@ export function resolveDiscovery(dir, id, cfg, role, callerVerdict) {
         id,
         text: 'discovery skip: trusted committed CONTEXT.md, no verdict required',
         source: 'resolveDiscovery',
+        kind: 'engine',
         rationale:
           'docsRef points at a non-empty CONTEXT.md (D2 trust signal, tsk-ozl) — advancing without re-deriving a decision already locked and approved',
       });
@@ -275,6 +277,7 @@ export function resolveDiscovery(dir, id, cfg, role, callerVerdict) {
             id,
             text: `discover --force overrode a disputed verify: "${verdict.verify}"`,
             source: 'resolveDiscovery',
+            kind: 'engine',
             rationale: `second pass disagreed: ${secondPass.reason}`,
           });
         } else {

@@ -17,7 +17,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fork } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { addWork, editWork, moveWork, moveStage, addOutcome, addFriction, recordGateApprove, listWork, readRawEvents, setFocus, StoreError } from '../../src/state/store.mjs';
+import { addWork, editWork, moveWork, moveStage, addOutcome, addFriction, addDecision, recordGateApprove, listWork, readRawEvents, setFocus, StoreError } from '../../src/state/store.mjs';
 import { appendEvent } from '../../src/state/events.mjs';
 import { REGISTRY, ENV, PID, UNRESOLVED } from "../../src/runner/session-identity.mjs";
 import { MAX_TITLE_LENGTH } from '../../src/state/work.mjs';
@@ -90,6 +90,29 @@ function addSampleWork(dir, id, overrides = {}) {
     ...overrides,
   });
 }
+
+// --- addDecision kind field (tsk-1ud D7 step 1): separates engine
+// bookkeeping records from real design decisions without matching on
+// `text` prefixes. Mirrors the existing `source` default-to-'session'
+// coverage right next to it. ---
+
+test('addDecision defaults kind to "design" when the caller omits it', () => {
+  const dir = tmpDir();
+  addDecision(dir, { text: 'a real design decision', rationale: 'because reasons, cited at file.mjs:1' });
+
+  const view = listWork(dir);
+  const last = view.decisions.at(-1);
+  assert.equal(last.kind, 'design');
+});
+
+test('addDecision keeps an explicit kind (e.g. "engine") unchanged', () => {
+  const dir = tmpDir();
+  addDecision(dir, { text: 'discovery caller-supplied: clear=true', source: 'resolveDiscovery', kind: 'engine', rationale: 'engine bookkeeping' });
+
+  const view = listWork(dir);
+  const last = view.decisions.at(-1);
+  assert.equal(last.kind, 'engine');
+});
 
 test('moveWork doing->done composes a learning record reflecting the item\'s actual outcome, friction (by layer), and settlement (by kind/role)', () => {
   const dir = tmpDir();
