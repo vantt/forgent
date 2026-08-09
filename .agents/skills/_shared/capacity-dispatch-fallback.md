@@ -13,8 +13,9 @@ Point at this file from a consumer `SKILL.md` by relative path (e.g.
 parameters where the consuming skill's own reasoning step lives:
 
 - **`<CAPACITY_ID>`** — the `.fgos/config.json`
-  `runner.capacities.<id>` key this step dispatches through (real example:
-  `submit-assist-classify`).
+  `runner.capacities.<id>` key this step dispatches through (no live
+  consumer of this fragment's own Steps A-D exists today, tsk-4ns — see
+  Precedent below).
 - **`<PROMPT_TEMPLATE>`** — the fixed prompt text to send (so every
   dispatch asks the model the exact same thing, never a paraphrase that
   drifts call to call), with the caller's own free-text input spliced in
@@ -108,10 +109,9 @@ NOT currently have live Agent/Task tool access — never pass the flag on a
 guess.) Prints `{"mechanism": "in-process"|"out-of-process"[, "agentType": "<name>"]}`.
 
 - **`mechanism: "out-of-process"`** — proceed to Step C exactly as before.
-  This is every `kind:"cli"` capacity (e.g. `submit-assist-classify`, this
-  pattern's one real live consumer today — cross-provider, always
-  cli/spawn), every `kind:"task"` capacity when you lack live Task access,
-  and any capacity whose config forces cli/spawn (`forceCliSpawn`).
+  This is every `kind:"cli"` capacity that forces cross-provider cli/spawn,
+  every `kind:"task"` capacity when you lack live Task access, and any
+  capacity whose config forces cli/spawn (`forceCliSpawn`).
 - **`mechanism: "in-process"`** — skip Step C's `exec` entirely. Print the
   same announce line Step C.3 prints for out-of-process, so a dispatch is
   visible on the chat transcript regardless of which branch fired
@@ -316,11 +316,19 @@ scarcity signal needs the full denominator, not just the misses.
   — the how-to this fragment's own branch logic was extracted from; still
   the reference for config-entry/registration steps (1–3 there), which
   this fragment does not repeat.
-- `fgos-submit-assist/SKILL.md` — the real, live consumer of this fragment
-  (`<CAPACITY_ID>` = `submit-assist-classify`, always `out-of-process` — no
-  live `kind:"task"` consumer exists yet to exercise Step B.5's
-  `in-process` branch end-to-end; that branch is proven by
+- No live consumer of this fragment's own Steps A-D remains today (tsk-4ns
+  retired `fgos-submit-assist/SKILL.md`'s own dispatch to
+  `submit-assist-classify` — its classify step never had a real reason to
+  dispatch per the "Valid reasons to dispatch" list above: the input was
+  already in the caller's own context, and spawning added latency at the
+  exact moment a person is waiting, `AGENTS.md`'s priority #1). This
+  fragment stays in place: six other stage skills
+  (`fgos-validating`/`fgos-code-implement`/`fgos-fanout`/`fgos-planning`/
+  `fgos-exploring`/`fgos-researching`) cite its "Valid reasons to dispatch"
+  list directly when explaining their own never-delegate-reasoning rule,
+  and it remains the ready-made pattern for the next real cross-provider
+  consumer. Step B.5's `in-process` branch is proven by
   `src/runner/dispatch.mjs`'s own unit tests instead, per
-  `docs/history/tsk-3ik-3/iron-law-evidence.md` if applicable).
+  `docs/history/tsk-3ik-3/iron-law-evidence.md` if applicable.
 - `docs/decisions/0026-vision-orchestrator-roottask-capacity-native-vs-cli-spawn.md`
   — Native-First Dispatch Doctrine, Step B.5's own governing rules 1/2/4.
