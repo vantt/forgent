@@ -1131,6 +1131,14 @@
     "quadrant": "reference",
     "purpose": "Describe the machinery accurately and completely for lookup.",
     "audience": "A user who needs precise facts about a specific field/command/API.",
+    "docPath": "docs/reference/fgos-participant-contract.md",
+    "title": "fgOS participant contract — what it takes to be a full participant in any language",
+    "sourceCaptureId": null
+  },
+  {
+    "quadrant": "reference",
+    "purpose": "Describe the machinery accurately and completely for lookup.",
+    "audience": "A user who needs precise facts about a specific field/command/API.",
     "docPath": "docs/reference/fgos-show-verb-output-fields.md",
     "title": "`fgos show <id>` output fields",
     "sourceCaptureId": "tsk-2fw"
