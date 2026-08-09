@@ -108,7 +108,7 @@ không mở lại những quyết định các item khác đã khoá.
 | 38 | 11 capability của hn xếp đâu | **Đề nghị** (vòng 11) | **T4 phía cung**, không ngang `gather`/`judge` (thuộc tính của nhà cung cấp, không của một lần dispatch). Cũng **không ngang `gitnexus`**: cả 11 tả **chính cái sổ**, do harness CLI tự khai qua `query.contract`. Ô tương ứng của fgOS — *sổ tự khai năng lực + dải schema* — **đang trống**, latent thật vì global/project install có thể lệch version. §6.5 |
 | 34 | Ô "mục tiêu ngoài sổ" đã có tên | **Đang hội tụ** (vòng 10) | **`errand`** — quét sạch 0 hit ở `src/`, `docs/`, `upstreams/`. Bác `cell` (false friend: bee's cell CÓ claim/reservation/registry) và `packet` (kéo theo khung *"orthogonal axes"* D1 đã bác). Bốn phép thử ở §6.3, sắc nhất: **không sở hữu branch/merge riêng**. Vẫn gated `tsk-2t6` |
 | 35 | `capacity` rút về một nghĩa | **CHỐT → D8** (vòng 18; bản P1 vòng 10 đã bị thay bởi P1′ vòng 15) | Một nghĩa = **năng lực có tên của fgOS**, cặp *behavior-promise / functional-helper* (= D2 + D1 đọc thành định nghĩa). `capacities.<id>` là **bản khai**, không phải bản thân nó; `binding` là **cạnh** T3→T4. Bản P1 đầu sai vì bỏ mất lời hứa hành vi mà không cất vào đâu. `0026` **làm rõ**, không lật |
-| 49 | `provider` xếp sai | **Rõ, ĐÃ SỬA** (vòng 19) | Là **chrome** (nhãn log), không phải danh tính T4 — cổng cross-provider **cố ý không đọc** nó (`dispatch.mjs:570`), nó đọc `executor.command`. Và mang **hai nghĩa**: nhãn hiển thị vs `{providers}` của `tool query`. Bệnh cũ lần thứ **sáu**. §6.14 |
+| 49 | `provider` xếp sai | **Rõ, ĐÃ SỬA** (vòng 19-20) | Là **chrome mang tính BẰNG CHỨNG**, không phải danh tính T4. Cổng cross-provider **cố ý không đọc** nó (`dispatch.mjs:570`) — đúng. Nhưng nó **được ghi vào `events.jsonl`** (`loop.mjs:744-758`, event `capacity.dispatch`) làm bản ghi audit, và **khai báo thắng thực tế** (`:777`). Phép thử nói dối: `command:"agy"` + `provider:"claude"` ⇒ **cổng an toàn, sổ nói dối**. Cộng `sensitiveData` chưa ship ⇒ governance cross-provider **có cổng, không có sổ đáng tin**. Đề nghị: `provider` thành **dẫn xuất từ `command`**. Mang hai nghĩa: nhãn vs `{providers}` của `tool query` — bệnh cũ lần thứ **sáu**. §6.14 |
 | 50 | Status token của bee | **Đề nghị: LẤY** (vòng 19) | Là hợp đồng trả về của **`errand`**, không phải của `work`: `work` báo bằng đổi state vì **có sổ**; `errand` **không có sổ** nên buộc phải trả về. Khép kín đối xứng T2. §6.14 |
 | 51 | `digest` bắt buộc `file:line` anchor | **Đề nghị: LẤY** (vòng 19) | Không phải chữ mới — **siết hợp đồng `digest`** của D2. Đi kèm `tsk-2ie5`. Quét: 1 hit prose duy nhất |
 | 52 | Degrade ladder Inactive/Degraded/Full | **Đề nghị: LẤY** (vòng 19) | 0 hit trong code, chỉ prose `CLAUDE.md`. **D6 làm nó bắt buộc**: `needs: X` ⇒ resolver phải trả lời "mấy provider của X present" — đúng ba mức. Xếp **TG**, gộp theo capability không theo tên tool |
@@ -1533,11 +1533,40 @@ cross-provider"*. **Sai.** `dispatch.mjs:570` tự khai:
 > and **never on `provider`**) … `provider` is a **freely-overridable display
 > alias**, not the command actually spawned
 
-`:777` — `provider: executor.provider ?? executor.command` — chỉ để in log
-(`loop.mjs:742`: `capacityId — provider — model`).
+`:777` — `provider: executor.provider ?? executor.command`. **Khai luôn thắng**:
+khai thì lấy khai, không khai mới lấy `command`.
 
-⇒ `provider` là **chrome**, không phải danh tính phía cung. Và là **lần thứ
-sáu** của bệnh một-chuỗi-hai-nghĩa:
+**Nó không chỉ là dòng console — nó là bản ghi AUDIT.** Hai chỗ đọc nó, cả hai
+đều là *ghi chép*, không chỗ nào là *quyết định*:
+
+```js
+// loop.mjs:742 — dòng in ra
+log(`fgos-runner: ${worker.capacityId} — ${worker.provider} — ${worker.model}`);
+// loop.mjs:744-758 — GHI VÀO events.jsonl
+appendEvent(..., { type: 'capacity.dispatch',
+  payload: { id, capacityId, provider: worker.provider, model, baseCommit, headRef } });
+```
+
+**Phép thử nói dối** — đặt `"command": "agy"`, `"provider": "claude"`:
+
+| | Kết quả |
+|---|---|
+| Cổng cross-provider | **KHÔNG bị lừa** — vẫn đọc `command:"agy"`, vẫn đòi `allowCrossProvider` |
+| Tiến trình chạy thật | `agy` |
+| **`events.jsonl`** | ghi `provider: "claude"` |
+
+⇒ **Cổng an toàn. Sổ nói dối.** Và đó là chuyện lớn chứ không phải chi tiết
+chrome: `allowCrossProvider` tồn tại để kiểm soát đúng một chuyện — theo chính
+thông báo lỗi của nó, *"prompt content would **leave the Claude ecosystem**"*.
+Quyết định ấy được **thi hành** trên `command` ✓, nhưng **bằng chứng** nó đã
+xảy ra ở đâu lại nằm ở `provider` — chuỗi tự do, không ai đối chiếu ✗. Cộng
+`sensitiveData` (D7 khoá, **chưa bao giờ ship**): governance cross-provider của
+fgOS hiện là **có cổng, không có sổ đáng tin, và không có từ vựng nói *cái gì*
+được phép ra**.
+
+⇒ `provider` là **chrome MANG TÍNH BẰNG CHỨNG** — không thuộc T4, nhưng cũng
+không vô hại như một nhãn UI. Và là **lần thứ sáu** của bệnh
+một-chuỗi-hai-nghĩa:
 
 | chỗ | nghĩa |
 |---|---|
@@ -1545,7 +1574,15 @@ sáu** của bệnh một-chuỗi-hai-nghĩa:
 | `fgos tool query` → `{providers: [...]}` | tool **đã đăng ký** thoả một capability — danh tính thật |
 
 **Phép thử `provider` vs `tool`:** `tool` **probe được sự tồn tại**;
-`provider` (nghĩa 1) chỉ là chuỗi in ra màn hình — ghi sai cũng không ai biết.
+`provider` (nghĩa 1) không kiểm được gì — ghi sai cũng không ai biết, kể cả
+người đọc lại `events.jsonl` sau này.
+
+**Đề nghị sửa (Bước 5, không sửa trong phiên từ vựng):** `provider` phải là
+**dẫn xuất, không khai báo** — luôn suy từ `command` đã resolve, không bao giờ
+lấy chuỗi người viết. Hôm nay `executor.provider ?? executor.command` cho
+**khai báo thắng thực tế**; lật lại thì nó không nói dối được nữa. Đúng khuôn
+`derived-never-stored` §6.6 đã đặt tên (`frontier`/`computeSchedule`/
+`footprintOverlap`). Gắn cùng cụm governance với `sensitiveData`.
 
 #### Status token — **LẤY**, và nó lấp đúng ô hợp đồng trả về của `errand`
 
