@@ -145,6 +145,7 @@ không mở lại những quyết định các item khác đã khoá.
 | **D13** | **mechanism = nhà cung cấp ở TRONG hay NGOÀI (A3)**, và presence/cross-provider gate phải gác theo **đúng vị từ đó — `kind !== 'task'`, không phải `kind === 'cli'` (A4)**. Sáu suy dẫn độc lập hội tụ (§6.6). A4 **rơi ra miễn phí** từ A3 vì cùng vị từ — dấu hiệu khung đúng. Hôm nay `dispatch.mjs:603`/`:630` gác `kind==='cli'` nên capacity `mcp`/`skill`/`http`/`binary` dispatch với **zero** presence check và **zero** cross-provider check (latent). **Chốt vị từ ở đây; sửa code là item riêng** | 6 → 22 |
 | **D14** | **Phép thử thứ ba của D2 — AI SỞ HỮU TIÊU CHÍ**: `gather` = tiêu chí ở **bên gọi**, tự áp lên dữ liệu nhận được · `judge` = tiêu chí ở **bên được gọi**, bên gọi **TUÂN**. Kèm khái niệm **verdict giả** — nhãn phán do nhà cung cấp tính sẵn nhưng bên gọi đối xử như **bằng chứng**. Hai phép thử đầu không phân được response mang cả hai; ca thử thật `impact()` của gitnexus (caller-list + `risk`) phân được nhờ chính `CLAUDE.md` bắt **cross-check trước khi tin** = không tuân ⇒ **gather**. Kiểm ngược: `judge-discovery` bên gọi tuân ⇒ judge thật | 11b → 22 |
 | **D15** | **`capacity` khai BA thứ, không phải hai** — `for` (lớp T2) + `needs` (capability) + **`carries`** (lớp **nội dung** nó được phép nhận). `carries` **phải có tập giá trị khai rõ, không bao giờ chuỗi tự do**, và **chỉ ship cùng lúc với thứ đọc nó** (gate ở TG). **Supersede D7** của `agent-executor-submit-assist-classify`. Hình: D8 đã đặt `capacity` là năng lực tự khai mình **LÀ** gì và **CẦN** gì ⇒ khai luôn mình được nhận **NỘI DUNG** loại nào là cùng một hình. Cụm ba mảnh: `allowCrossProvider` = *có được ra không* · `carries` = *cái gì được ra* · D9 = *đã ra tới đâu*. Tập khởi điểm (`tsk-2ie5` chốt lại trên nội dung gather thật): `user-text` · `repo-content`; `secrets`/credentials **không bao giờ** là giá trị hợp lệ. D7 **không sai, bị sự kiện vượt qua**: entry nó nhắm sắp bị dời (`tsk-5wz`), điều kiện YAGNI của chính nó (*"until a second, riskier cross-provider capacity exists"*) thoả bởi `tsk-2ie5`, và **metadata không ai đọc là pattern đã biết là xấu** — hai ca sống cùng phiên: `executors.judge` nằm chết, và chính `sensitiveData` biến mất dù đã khoá | 21 → 23 |
+| **D16** | **Giá trị mechanism đổi `native`/`cli-spawn` → `in-process`/`out-of-process`.** Prose vẫn gọi **trong/ngoài** (*internal/external*), với ranh giới **ghim một lần: LUÔN so với tiến trình của BÊN GỌI**. Tên cũ tả **sai thứ** — `native` nói *cách*, `cli-spawn` nói *phương tiện*, không tên nào nói *vị trí*, trong khi D13 đã chốt mechanism **chính là** vị trí. Ngày adapter `rpc` đăng ký: nhà cung cấp vẫn **ngoài** nhưng **không có spawn nào** ⇒ `cli-spawn` sai, `out-of-process` vẫn đúng. Phép thử sờ được: *có phải dựng thêm một tiến trình, hoặc nối sang tiến trình khác, mới làm được việc này không?* **Loại** `in-session`/`out-of-session` (`session` = chữ tầng runtime, không có trong config, không kiểm được bằng máy, Claude-riêng) · **loại** `internal`/`external` **làm enum** (repo có **ba** ranh giới sống cùng lúc, và 8 comment trong `src/` dùng `internal` theo nghĩa *"của chính fgOS"* ⇒ một MCP tool do fgOS ship là *internal* theo **sở hữu** nhưng *external* theo **vị trí**) · **không mượn** `inbound`/`outbound` của hn (hn hỏi *của ai*, fgOS hỏi *ở đâu*; mượn thì tên **chạy ngược** trực giác: `kind:"task"` ở **trong** mà hn gọi là **out**bound) · **loại** mọi bản rút gọn (`out-process` không phải tiếng Anh · `in-proc`/`out-proc` viết tắt tự chế · `local`/`remote` sai vì tiến trình con cùng máy không phải remote · `self`/`spawned` **chết cùng `rpc`**). Là giá trị **dẫn xuất** — không ai gõ vào config — nên độ dài không phải chi phí thật. **Đổi chuỗi code trả về ⇒ item riêng** | 8 → 24 |
 | **D2** | **Nhánh không-authority tách làm hai lớp: `gather` (trả `digest`) và `judge` (trả `verdict`)** — không phải một. Lý do tách: hai loại lỗi khác nhau ⇒ hai cách sửa khác nhau (digest sai vì *đọc thiếu* → đọc lại/rộng hơn; verdict sai vì *phán sai* → cần người hoặc đổi tiêu chí); trộn lại thì mất tín hiệu sửa lỗi. Tên **không phát minh mới** — cả hai cặp `<lớp> → <cái nó trả về>` đã sống sẵn trong repo (§5 vòng 2). Bee cũng tách đúng chỗ này, gọi review-class là *"neither class"* | 1 → 3 |
 
 ## 5. Q&A log
@@ -822,6 +823,29 @@ quyết định khoá đang bị vi phạm im lặng.
 Cụm governance giờ đủ ba mảnh, và **không đẻ item mới**: `carries` gộp vào
 `tsk-2ie5` (desc 7210 ký tự, 10 dòng verify), D9 đã ở `tsk-33w`.
 
+### Vòng 24 — 2026-08-09 — tên đúng cho mechanism
+
+Người dùng hỏi thẳng hai chỗ khó: *"inbound/outbound vs in-session/out-of-session
+— sao dùng `session` thì khó hiểu"*, rồi *"`internal`/`external` thì sao"*, rồi
+*"gọn được không"*.
+
+Ba câu đó lần lượt loại ba ứng viên, và mỗi lần loại đều ra một bài học chung:
+
+1. **`inbound`/`outbound` của hn** — hn hỏi *năng lực này **của ai*** (sở hữu),
+   fgOS hỏi *nhà cung cấp **ở đâu*** (vị trí). Hai trục khác nhau, tương quan
+   hôm nay chỉ vì fgOS mới có hai ca. Mượn thì tên **chạy ngược** trực giác.
+2. **`session`** — chữ của tầng runtime agent, **không xuất hiện trong config**,
+   không kiểm được bằng máy, và Claude-riêng.
+3. **`internal`/`external` làm enum** — quét thật: `external` 6 chỗ prose,
+   `internal` 8 chỗ prose và gần như luôn nghĩa *"của chính fgOS"*. Repo đang
+   có **ba** ranh giới sống cùng lúc. Ca đọc sai cụ thể: một MCP tool do fgOS
+   ship là *internal* theo **sở hữu** nhưng *external* theo **vị trí** — đúng
+   cái bẫy đã loại `inbound`/`outbound`.
+
+Chốt **`in-process`/`out-of-process`** cho enum, giữ **trong/ngoài** cho văn
+xuôi, kèm **một câu ghim ranh giới**. Mọi bản rút gọn đều bị loại có lý do.
+Mint **D16**.
+
 ## 6. Thiết kế đã chốt {#design}
 
 > **Regenerate lần 3 — bản sau vòng 10.** Vòng 10 đổi hình dạng thật (T2 thành
@@ -1457,9 +1481,17 @@ cung cấp** · (v) adapter `rpc` deferred ⇒ ngày đó "ngoài" và "spawn" t
 (vi) `kind` = nơi ở, mechanism = phép chiếu của nó. Riêng (iv) còn chứng minh
 **D1/D2 sống nguyên**: đổi nhà cung cấp mà lớp T2 không đổi.
 
-**[ĐỀ NGHỊ P4, độ chắc vừa]** đổi giá trị mechanism `native`/`cli-spawn` →
-`in-session`/`out-of-session`, đúng nghĩa và miễn nhiễm với ngày `rpc` đăng ký.
-Đây là đổi chuỗi code trả về ⇒ **item riêng**, không làm trong phiên từ vựng.
+**[KHOÁ — D16]** giá trị mechanism đổi `native`/`cli-spawn` →
+**`in-process`/`out-of-process`**. Đổi chuỗi code trả về ⇒ **item riêng**, không
+làm trong phiên từ vựng.
+
+> **Ghim ranh giới, đọc một lần cho cả tài liệu:** `internal`/`external` (và
+> "trong/ngoài" trong văn xuôi) ở đây **luôn là so với tiến trình của BÊN GỌI**
+> — không phải so với fgOS, cũng không phải so với hệ sinh thái vendor.
+
+Prose giữ **trong/ngoài**; enum dùng `in-process`/`out-of-process`. Không phải
+hai từ vựng cho một thứ — một khái niệm, một **tên máy** (chính xác) và một
+**cách gọi trong văn** (dễ đọc), nối bằng đúng câu ghim trên.
 
 **Vì sao `inline` chưa đo được:** nó cũng là kết quả dẫn xuất, và fgOS chưa bao
 giờ **ghi kết quả dẫn xuất** xuống đâu cả. Muốn log/đo `inline` thì phải ghi
@@ -1745,6 +1777,7 @@ nào đòi**. Ghi rõ lý do không lấy, không phải bỏ qua im lặng.
 | | Đề nghị | Độ chắc | Đụng |
 |---|---|---|---|
 | ~~P1~~ → ~~P1′~~ | `capacity` = **năng lực có tên**, cặp *behavior-promise / functional-helper* | **đã khoá → D8** | `0026` **làm rõ**, không lật; nhãn sơ đồ D1 (nhánh KHÔNG: `capacity` → thẳng `gather`/`judge`). **Bước 5: gộp chung MỘT decision doc với D7** — cùng sửa một mục định nghĩa của `0026` |
+| ~~**P4**~~ | mechanism → `in-process`/`out-of-process` | **đã khoá → D16** | đổi chuỗi code trả về ⇒ item riêng ở Bước 5 |
 | ~~**P2**~~ | Binding khoá theo **mục đích** | **đã khoá → D6** | sửa code = item riêng (`resolveExecutorConfig`, CRITICAL) |
 | ~~**P3**~~ | Bỏ `rootTask`/`subTask` khỏi từ vựng | **đã khoá → D7** | supersede `0026` (Bước 5: mở decision doc); chỉ đổi **nhãn** trên sơ đồ D1 |
 | **P4** | mechanism → `in-session`/`out-of-session` | vừa | đổi chuỗi code trả về ⇒ item riêng |
