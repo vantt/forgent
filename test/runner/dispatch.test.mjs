@@ -14,6 +14,8 @@ import {
   modelForTier,
   resolveExecutorCommand,
   resolveCapacityCli,
+  resolveCapacityIdForPurpose,
+  logCapacityDispatch,
   decideDispatchMechanism,
   decideCapacityDispatchMechanism,
   decideCapacityCli,
@@ -23,6 +25,7 @@ import {
   EXECUTOR_ADAPTERS,
   DEFAULT_ADAPTER,
   CAPACITY_KINDS,
+  CAPACITY_CARRIES,
 } from '../../src/runner/dispatch.mjs';
 import { initStore, registerTool } from '../../src/state/store.mjs';
 import { writeLocalStatus, findExecutableOnPath } from '../../src/state/tool-registry.mjs';
@@ -2069,4 +2072,288 @@ test('the "resolve" CLI entry point exits non-zero with a usage message when cap
   const result = spawnSync(process.execPath, [dispatchPath, 'resolve'], { encoding: 'utf8' });
   assert.notEqual(result.status, 0);
   assert.match(result.stderr, /usage: node src\/runner\/dispatch\.mjs resolve/);
+});
+
+// --- capacities.<id>.carries (D15, tsk-5td; first real consumer tsk-2ie5/
+// tsk-2c1) — closed enum at config-load, plus a real pre-dispatch gate on
+// the ACTUAL content class a caller declares it's sending ------------------
+
+test('CAPACITY_CARRIES is exactly the two D15-locked values, never a free string vocabulary', () => {
+  assert.deepEqual(CAPACITY_CARRIES, ['user-text', 'repo-content']);
+});
+
+test('loadRunnerConfig accepts a "capacities.<id>" entry with a valid carries value', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'carries-ok.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      capacities: { gather: { kind: 'cli', command: 'agy', args: ['{prompt}'], for: 'gather', carries: 'repo-content', allowCrossProvider: true } },
+      models: { standard: 'sonnet' },
+      timeoutMs: 1000,
+    }),
+  );
+  assert.doesNotThrow(() => loadRunnerConfig(configPath));
+});
+
+test('loadRunnerConfig rejects a "capacities.<id>" entry whose carries is not one of CAPACITY_CARRIES', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'bad-carries.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      capacities: { gather: { kind: 'cli', command: 'agy', args: ['{prompt}'], carries: 'secrets' } },
+      models: { standard: 'sonnet' },
+      timeoutMs: 1000,
+    }),
+  );
+  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
+});
+
+function carriesCfg(carries) {
+  return {
+    executor: { command: '/global/executor', args: ['{prompt}'] },
+    capacities: { gather: { kind: 'cli', command: 'agy', args: ['{prompt}'], for: 'gather', carries, allowCrossProvider: true } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  };
+}
+
+test('resolveExecutorCommand throws when a capacity declares carries but the caller declares no contentCarries at all (fail closed, never silently allow)', () => {
+  const cfg = carriesCfg('user-text');
+  assert.throws(
+    () => resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', capacityId: 'gather' }),
+    RunnerConfigError,
+  );
+});
+
+test('resolveExecutorCommand throws when contentCarries is not one of CAPACITY_CARRIES', () => {
+  const cfg = carriesCfg('repo-content');
+  assert.throws(
+    () => resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', capacityId: 'gather', contentCarries: 'nonsense' }),
+    RunnerConfigError,
+  );
+});
+
+test('resolveExecutorCommand refuses a "carries: user-text" capacity handed repo-content — refused before spawn (D15 verify item 8)', () => {
+  const cfg = carriesCfg('user-text');
+  assert.throws(
+    () => resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', capacityId: 'gather', contentCarries: 'repo-content' }),
+    RunnerConfigError,
+  );
+});
+
+test('resolveExecutorCommand accepts a "carries: user-text" capacity handed user-text (exact match)', () => {
+  const cfg = carriesCfg('user-text');
+  assert.doesNotThrow(() =>
+    resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', capacityId: 'gather', contentCarries: 'user-text' }),
+  );
+});
+
+test('resolveExecutorCommand accepts a "carries: repo-content" capacity handed EITHER content class — the wider permission covers both', () => {
+  const cfg = carriesCfg('repo-content');
+  assert.doesNotThrow(() =>
+    resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', capacityId: 'gather', contentCarries: 'user-text' }),
+  );
+  assert.doesNotThrow(() =>
+    resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', capacityId: 'gather', contentCarries: 'repo-content' }),
+  );
+});
+
+test('resolveExecutorCommand never triggers the carries gate for a capacity that declares no carries at all — byte-identical to every pre-D15 capacity', () => {
+  const cfg = {
+    executor: { command: '/global/executor', args: ['{prompt}'] },
+    capacities: { 'submit-assist-classify': { kind: 'cli', command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  };
+  assert.doesNotThrow(() =>
+    resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', capacityId: 'submit-assist-classify' }),
+  );
+});
+
+// --- resolveCapacityIdForPurpose (D5/D6, tsk-1o7; first real consumer
+// tsk-2ie5/tsk-2c1) — purpose-based binding, never by name ------------------
+
+test('resolveCapacityIdForPurpose finds the capacity whose own "for" matches the purpose, regardless of the capacity id\'s own name', () => {
+  const cfg = {
+    capacities: {
+      'totally-unrelated-name': { kind: 'cli', for: 'gather', command: 'agy' },
+      'judge-decompose': { kind: 'task', for: 'judge' },
+    },
+  };
+  assert.equal(resolveCapacityIdForPurpose(cfg, 'gather'), 'totally-unrelated-name');
+});
+
+test('resolveCapacityIdForPurpose returns null when no capacity declares that purpose — a legitimate state, never thrown', () => {
+  const cfg = { capacities: { 'judge-decompose': { kind: 'task', for: 'judge' } } };
+  assert.equal(resolveCapacityIdForPurpose(cfg, 'gather'), null);
+});
+
+test('resolveCapacityIdForPurpose returns null against an empty/missing capacities block', () => {
+  assert.equal(resolveCapacityIdForPurpose({}, 'gather'), null);
+  assert.equal(resolveCapacityIdForPurpose({ capacities: {} }, 'gather'), null);
+});
+
+// --- resolveCapacityCli / decideCapacityCli: purpose-based (--for) binding,
+// the mechanism a runtime-composed gather prompt actually resolves through
+// since it has no pre-registered capacityId to name (tsk-2c1) --------------
+
+test('decideCapacityCli resolves "unavailable" when nothing is registered for the given purpose — the expected default state before any gather capacity exists', async () => {
+  const root = mkTempDir();
+  writeRunnerConfigFixture(root, {
+    executor: { command: 'claude', args: ['{prompt}'] },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+  const decided = await decideCapacityCli(undefined, { repoRoot: root, for: 'gather', hasLiveTaskAccess: true });
+  assert.deepEqual(decided, { mechanism: 'unavailable' });
+});
+
+test('decideCapacityCli resolves purpose-based (--for) to the same result a positional capacityId would, plus the resolved capacityId', async () => {
+  const root = mkTempDir();
+  writeRunnerConfigFixture(root, {
+    executor: { command: 'claude', args: ['{prompt}'] },
+    capacities: { gather: { kind: 'cli', for: 'gather', command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+  const byPurpose = await decideCapacityCli(undefined, { repoRoot: root, for: 'gather', hasLiveTaskAccess: true });
+  const byName = await decideCapacityCli('gather', { repoRoot: root, hasLiveTaskAccess: true });
+  assert.deepEqual(byPurpose, { mechanism: 'out-of-process', capacityId: 'gather' });
+  // Positional-id path stays byte-identical (no capacityId field) — every
+  // pre-tsk-2c1 caller/test already asserts this exact shape.
+  assert.deepEqual(byName, { mechanism: 'out-of-process' });
+});
+
+test('resolveCapacityCli rejects with a usage RunnerConfigError when both capacityId and --for are missing', async () => {
+  await assert.rejects(() => resolveCapacityCli(undefined, { repoRoot: mkTempDir() }), RunnerConfigError);
+});
+
+test('resolveCapacityCli throws when no capacity is registered for the given purpose — nothing left to resolve', async () => {
+  const root = mkTempDir();
+  writeRunnerConfigFixture(root, {
+    executor: { command: 'claude', args: ['{prompt}'] },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+  await assert.rejects(() => resolveCapacityCli(undefined, { repoRoot: root, for: 'gather', prompt: 'x' }), RunnerConfigError);
+});
+
+test('resolveCapacityCli resolves purpose-based (--for) to the same command a positional capacityId would, plus the resolved capacityId; carries repo-content clears the gate', async () => {
+  const root = mkTempDir();
+  const fgosDir = path.join(root, '.fgos');
+  initStore(fgosDir);
+  registerTool(fgosDir, { name: 'gather', kind: 'cli', capability: 'gather', command: 'agy' });
+  writeLocalStatus(fgosDir, { gather: { status: 'present', checkedAt: new Date().toISOString() } });
+  writeRunnerConfigFixture(root, {
+    executor: { command: '/global/executor', args: ['{prompt}'] },
+    capacities: { gather: { kind: 'cli', for: 'gather', carries: 'repo-content', command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+  const byPurpose = await resolveCapacityCli(undefined, { repoRoot: root, for: 'gather', carries: 'repo-content', prompt: 'p' });
+  const byName = await resolveCapacityCli('gather', { repoRoot: root, carries: 'repo-content', prompt: 'p' });
+  assert.deepEqual(byPurpose, { command: 'agy', args: ['p'], provider: 'agy', model: 'sonnet', capacityId: 'gather' });
+  assert.deepEqual(byName, { command: 'agy', args: ['p'], provider: 'agy', model: 'sonnet' });
+});
+
+test('resolveCapacityCli propagates the carries refusal for a purpose-resolved capacity exactly like a name-resolved one', async () => {
+  const root = mkTempDir();
+  writeRunnerConfigFixture(root, {
+    executor: { command: '/global/executor', args: ['{prompt}'] },
+    capacities: { gather: { kind: 'cli', for: 'gather', carries: 'user-text', command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+  await assert.rejects(
+    () => resolveCapacityCli(undefined, { repoRoot: root, for: 'gather', carries: 'repo-content', prompt: 'p' }),
+    RunnerConfigError,
+  );
+});
+
+// --- CLI entry point: --for / --carries / the new "log" subcommand --------
+
+test('the "decide" CLI entry point resolves --for <purpose> the same way as a positional capacityId', () => {
+  const dispatchPath = path.resolve('src/runner/dispatch.mjs');
+  const result = spawnSync(process.execPath, [dispatchPath, 'decide', '--for', 'no-such-purpose-configured'], { encoding: 'utf8' });
+  assert.equal(result.status, 0, result.stderr);
+  assert.deepEqual(JSON.parse(result.stdout), { mechanism: 'unavailable' });
+});
+
+test('the "resolve" CLI entry point honors --carries, threading it through end to end', () => {
+  const dispatchPath = path.resolve('src/runner/dispatch.mjs');
+  const result = spawnSync(
+    process.execPath,
+    [dispatchPath, 'resolve', 'no-such-capacity-configured', '--prompt', 'hello', '--carries', 'repo-content'],
+    { encoding: 'utf8' },
+  );
+  assert.equal(result.status, 0, result.stderr);
+  const parsed = JSON.parse(result.stdout);
+  assert.ok(typeof parsed.command === 'string');
+});
+
+test('the "log" CLI entry point appends a capacity.dispatch event and prints it as JSON', () => {
+  const { repoRoot } = mkTempGitRepo();
+  fs.mkdirSync(path.join(repoRoot, '.fgos'), { recursive: true });
+  const dispatchPath = path.resolve('src/runner/dispatch.mjs');
+  const result = spawnSync(
+    process.execPath,
+    [dispatchPath, 'log', 'gather', '--id', 'tsk-2c1', '--provider', 'agy', '--command', 'agy', '--model', 'gemini-flash'],
+    { encoding: 'utf8', cwd: repoRoot },
+  );
+  assert.equal(result.status, 0, result.stderr);
+  const printed = JSON.parse(result.stdout);
+  assert.equal(printed.type, 'capacity.dispatch');
+  assert.equal(printed.payload.id, 'tsk-2c1');
+  assert.equal(printed.payload.capacityId, 'gather');
+  assert.equal(printed.payload.provider, 'agy');
+  assert.equal(printed.payload.command, 'agy');
+  assert.equal(printed.payload.model, 'gemini-flash');
+  const raw = fs.readFileSync(path.join(repoRoot, '.fgos', 'events.jsonl'), 'utf8');
+  const lines = raw.trim().split('\n');
+  const logged = JSON.parse(lines[lines.length - 1]);
+  assert.equal(logged.type, 'capacity.dispatch');
+  assert.equal(logged.payload.id, 'tsk-2c1');
+});
+
+test('the "log" CLI entry point exits non-zero with a usage message when a required flag is missing', () => {
+  const dispatchPath = path.resolve('src/runner/dispatch.mjs');
+  const result = spawnSync(process.execPath, [dispatchPath, 'log', 'gather', '--id', 'tsk-2c1'], { encoding: 'utf8' });
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /usage: node src\/runner\/dispatch\.mjs log/);
+});
+
+// --- logCapacityDispatch (D9-shaped audit line for an IN-SESSION capacity
+// call — the sibling loop.mjs's own capacity.dispatch event has no claim to
+// attach to; closes bee's own named gap, tsk-2ie5/tsk-2c1) -----------------
+
+test('logCapacityDispatch appends a capacity.dispatch event with baseCommit/headRef always null (no worktree attestation applies in-session)', () => {
+  const { fgosDir } = mkTempGitRepo();
+  const event = logCapacityDispatch(fgosDir, {
+    id: 'tsk-2c1',
+    capacityId: 'gather',
+    provider: 'agy',
+    command: 'agy',
+    model: 'gemini-flash',
+  });
+  assert.equal(event.type, 'capacity.dispatch');
+  assert.equal(event.payload.baseCommit, null);
+  assert.equal(event.payload.headRef, null);
+  const raw = fs.readFileSync(path.join(fgosDir, 'events.jsonl'), 'utf8');
+  const lines = raw.trim().split('\n');
+  assert.equal(lines.length, 1);
+});
+
+test('logCapacityDispatch appends multiple sequential calls without corrupting the log — sequential seq, no duplicate/dropped lines (parallel gather branches must never race the write)', () => {
+  const { fgosDir } = mkTempGitRepo();
+  const events = [1, 2, 3, 4].map((n) =>
+    logCapacityDispatch(fgosDir, { id: 'tsk-2c1', capacityId: 'gather', provider: 'agy', command: 'agy', model: `m${n}` }),
+  );
+  const seqs = events.map((e) => e.seq);
+  assert.deepEqual(seqs, [...new Set(seqs)].sort((a, b) => a - b), 'no duplicate seq');
+  const raw = fs.readFileSync(path.join(fgosDir, 'events.jsonl'), 'utf8');
+  assert.equal(raw.trim().split('\n').length, 4);
 });
