@@ -1,6 +1,6 @@
 ---
 type: explanation
-source_capture_ids: [tsk-6bx]
+source_capture_ids: [tsk-6bx, tsk-1ds]
 ---
 
 # Why gate-bypass is shaped the way it is
@@ -125,3 +125,56 @@ and proving the reader-side logic is sound (D2-D5 above) says nothing
 about whether anything upstream is actually writing to that contract —
 that has to be checked separately, against the real artifacts, not
 assumed from the check's own code comment.
+
+## The third gate needed a different axis, not the same one reused (D6, tsk-1ds)
+
+`validateApprove` (`fgos-validating`'s own Gate) was, until `tsk-1ds`, the
+one gate of the three skill gates with no bypass path at all —
+`.claude/skills/fgos-validating/SKILL.md` used to hardcode "No
+auto-approve path exists for this Gate today ... actor is always human
+here," even after `contextApprove` and `planApprove` both gained
+`canAutoApprove`.
+
+The measured case for closing that gap (`.fgos/events.jsonl`, 2026-08-09):
+108 items had passed through `validateApprove` — 1 rejection (NOT READY),
+13 `READY WITH CONSTRAINTS`, and ~94 (87%) with no constraints at all.
+`validateApprove` had never once needed a second round with a human
+(0/108) — the only one of the three gates with that record
+(`contextApprove` 27/99, `planApprove` 10/105 needed a repeat ask). By
+2026-08-07 it accounted for 23/53 (43%) of all gate-approve calls, the
+remaining ceiling on yes/no gate load after `tsk-5hg` fixed the other
+two gates' bypass wiring.
+
+**Why `hasOpenItems` itself wasn't reused for this gate.** A multi-condition
+axis modeled on `hasOpenItems` (every reality-gate row PASS, verify
+runnable, a real test surface exists, tier covered, no risk keyword) was
+considered and rejected: reading the 13 real constraints recorded against
+`validateApprove` showed 10 were mechanical but 3 needed judgment (is a
+smoke test sufficient coverage for an external tool; is deferring a
+migration risk to post-merge acceptable; does prose-only work genuinely
+have no test surface) — and two of those three were not detectable in
+advance, only visible once the skill actually wrote its verdict. The skill
+computing the verdict is the party that already knows whether it recorded
+a constraint. A self-reported axis was judged more honest than five axes
+that would have had to guess ahead of time.
+
+**The mechanism.** Not a content-inspection check like `hasOpenItems` —
+the axis is `fgos-validating`'s own already-computed verdict:
+
+- verdict `READY` (no constraints) → bypass, `actor: bypass`
+- verdict `READY WITH CONSTRAINTS` → ask a human, `actor: human`
+- verdict `NOT READY` → unchanged: skip the question entirely, return to
+  `fgos-planning`
+
+This keeps the same self-reported trade-off `hasOpenItems` already
+carries (a skill could under-report constraints to earn a bypass) rather
+than introducing a new one — the repo had already accepted that same risk
+shape for the other two gates.
+
+`src/state/gate-bypass.mjs` gained a new export,
+`canAutoApproveValidate(item, verdict, level)`, reusing exactly the first
+two axes `canAutoApprove` already used (the `HEAVY_KEYWORDS` floor, D4;
+`isTierCovered`) and swapping the third for `verdict === 'READY'`. The
+existing `canAutoApprove` — still driving `contextApprove`/`planApprove`
+— was left untouched rather than parameterized, so neither of those two
+gates' behavior could shift as a side effect.
