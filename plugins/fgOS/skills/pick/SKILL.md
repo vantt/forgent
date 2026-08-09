@@ -19,10 +19,17 @@ state or touches git worktrees directly — every write goes through the
 
 ## Steps
 
-1. **Read the optional id argument.** `$ARGUMENTS` is the work item id to
-   claim, or empty to claim the current frontier head. Either way, pass it
-   straight through to the verb in step 2 — do not validate or guess an id
-   yourself; `pick` already does frontier-head defaulting and id validation.
+1. **Read the optional id argument, and the optional `--autoClose` flag.**
+   `$ARGUMENTS` is the work item id to claim, or empty to claim the current
+   frontier head, plus an optional trailing `--autoClose` token
+   (`docs/history/fgos-terminal-close-autoclose/CONTEXT.md` D1: opt-in
+   only, never a new default). Strip a trailing `--autoClose` token from
+   `$ARGUMENTS` before passing the rest through to the verb in step 2 —
+   when absent, `$ARGUMENTS` is unchanged and this skill's behavior is
+   byte-identical to before this option existed. Do not validate or guess
+   the id itself; `pick` already does frontier-head defaulting and id
+   validation. Remember whether `--autoClose` was present — it is read
+   again at step 6.
 
 2. **Claim the item and stand up its worktree.** Run:
 
@@ -191,3 +198,21 @@ state or touches git worktrees directly — every write goes through the
    Do not add a separate report step of your own beyond relaying the
    driver's own stop reason. Do not reimplement or orchestrate the item's
    lifecycle beyond this.
+
+   **If `--autoClose` was passed (step 1) and the driver's stop is one of
+   `awaiting-approval` reached, anchored by open children, or
+   `awaiting-human`** — an advance or a legitimate park, per
+   `docs/history/fgos-terminal-close-autoclose/CONTEXT.md` D2 — call
+   `/fgOS:terminal-close` as the literal last action of this skill's own
+   flow, invoked directly here the same way step 3 already calls
+   `terminal/rename.sh` rather than through a second slash-command round
+   trip:
+
+   ```
+   bash ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/plugins/fgOS/skills/terminal-close/close.sh
+   ```
+
+   Never call this on `blocked` or no-progress — the pane must stay open
+   for a person to debug (D2). Never call it if `--autoClose` was not
+   passed. Nothing runs after this call — it is unconditionally the final
+   statement of this skill's flow when it fires, with no delay before it.
