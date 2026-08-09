@@ -6,9 +6,10 @@ report-only, no code changed.
 
 **Method note.** Every entry below carries `file:LINE` or a command that
 actually ran. Anything without that evidence is in **Unproven suspicions**,
-never in the ranked list — read that section as "not yet real". Five of the
-six areas reported; `src/state/` internals are a **coverage gap**, named at
-the bottom.
+never in the ranked list — read that section as "not yet real". All six
+areas reported (the sixth, `src/state/`, landed after the first draft was
+committed; its findings are Tier 1.5 and it closed the coverage gap that
+draft declared).
 
 ## Headline
 
@@ -70,10 +71,43 @@ Reproduced live by this scan's own session:
 The holder being a string is the proof it was the hook, not the claim —
 `claimWork` writes `identity: process.pid`, a number.
 
+**It was never hung — it was waiting silently, and the "still waiting" line
+is structurally unreachable on that path.** `src/runner/lock-wait.mjs:76`
+guards the progress print with `delayMs > 0 && elapsedMs >=
+originalRemainingTtlMs`. With no `--wait`, `budgetMs ===
+originalRemainingTtlMs` (`:56`), so `elapsedMs >= originalRemainingTtlMs`
+implies `budgetMs - elapsedMs <= 0` implies `delayMs <= 0` (`:67`) — the two
+conjuncts are **mutually exclusive**. Measured:
+
+```
+no --wait, ttl=3000  : attempts=233 elapsed=3251ms progressLines=0*
+no --wait, ttl=10000 : attempts=234 elapsed=10250ms progressLines=0
+explicit waitMs=6000 : attempts=235 elapsed=6250ms progressLines=2
+   > "still waiting on main-checkout lock (holder pid 4242, 4s elapsed)"
+   * the one line on the default path is a Node TimeoutNegativeWarning
+     from sleep(negative) — not a message anyone wrote
+```
+
+Secondary: the backoff (500/1000/2000) exhausts the budget in 3 sleeps then
+**busy-spins** — 233 full `claimWork` attempts for a 3-second wait.
+
+**And `fgos unlock` cannot clear it.** `bin/fgos.mjs:4062-4079` — a dead
+*numeric* pid is stale-reclaimed fine, but a **string identity within TTL
+returns HELD and `unlock` refuses with exit 7**. That is exactly the case
+the hook creates. Worse, `bin/fgos.mjs:4070` refuses with *"held by a LIVE
+session"* — for a string identity, liveness was never checked
+(`main-checkout-lock.mjs:206-217` documents it as undecidable). The verb
+asserts a fact it did not establish, and tells the operator to wait on a
+session that may have exited hours ago.
+
 *Cost:* commit-then-claim is the single most common sequence in this repo's
 own workflow (every skill commits an artifact, then the next stage claims).
-It stalls up to 3 minutes, with no message saying why. A killed claim looks
-like a hang, so the natural reaction is to retry — which blocks again.
+Measured commit cadence over the last 60 commits: median gap **95s**, and
+**68% of gaps are under the 180s TTL** — each commit *refreshes* the lock
+(self-recognition, `:195-198`), so during active work the main checkout is
+locked roughly two-thirds of the time under one session's identity. Any
+other session's `pick`/`take`/`approve` blocks on it, silently, with no
+progress line and no working escape hatch.
 
 ---
 
@@ -365,12 +399,17 @@ tsk-5ma [audit]  -> "...already done -- audited every other remaining caller..."
 tsk-1tm [delete] -> "...shows these 6 as \" D\" (deleted) in git status."
 ```
 
-12 items whose tier is already covered are falsely refused.
+Two agents counted this independently, on different denominators and both
+agree: **21 of all 482 items** fire the substring floor but not
+`matchesKeyword`; **12** of those are items whose tier `standard` already
+covers, so tier is not what refuses them. `canAutoApprove:133` checks
+`hardGateHit` **first** and returns false unconditionally, so they can never
+auto-approve at any tier.
 
 *Cost:* three gates each (`contextApprove`, `planApprove`, `validateApprove`)
-→ ~36 unnecessary human interrupts across these 12 alone. `fgos-fanout`
-inherits the same floor, so those leaves fall out of fan-out auto-approval
-too.
+→ up to **63** unnecessary human interrupts across the 21 (~36 across the 12
+tier-covered ones). `fgos-fanout` inherits the same floor, so those leaves
+fall out of fan-out auto-approval too.
 
 ---
 
@@ -397,6 +436,191 @@ the rule a reader reaches **first**.
 *Encountered live:* this scan hit the gate, got `true`, and followed `cook`
 — presenting both gates to the user. Two questions asked that the repo's own
 configured policy says were not needed.
+
+### Tier 1.5 — the state layer (reported late; nobody else could see these)
+
+---
+
+**12b. [INSTABILITY] `priority` — the frontier's primary sort key — is
+degenerate on 69% of every item it has ever scored, and the "refined" pass
+is strictly less informed than the rough one**
+
+Severity: **high** · Dedupe: **NEW** (supersedes `tsk-sq9`'s framing)
+
+`src/state/priority-formula.mjs:80` returns `Math.round(PRIORITY_SCALE /
+(raw + 1))` with `PRIORITY_SCALE = 10000`. At `impact === 0` that is exactly
+**10000** — the worst possible value under the ASC-absent-last contract,
+ranked behind every scored item.
+
+The two automated writers disagree on their inputs:
+
+- `src/intake/discovery.mjs:218-221` (rough, at `clarify`) passes **both**
+  axes: `blocks` *and* `semanticRelatedness`.
+- `src/intake/decompose.mjs:609` (documented at `:600-606` as *"the REFINED
+  pass"*) passes `blocks` and `blastRadius` — **no `semanticRelatedness`**.
+
+So the pass that runs second silently discards a component the first one
+supplied. For a leaf with no blockers and no recorded blast radius, impact
+collapses to 0 and priority becomes 10000. The live log shows exactly that:
+
+```
+items whose priority was rewritten : 162   (438 overwrite events)
+  tsk-4y8: 449  --> 10000
+  tsk-62d: 278 --> 323 --> 10000
+  tsk-2ta: 192 --> 209 --> 10000
+
+current distribution: {(absent): 293, 10000 (worst possible): 131, other: 58}
+```
+
+**131 of the 189 items ever scored (69%) now sit at the single worst
+value.** `src/state/replay.mjs:308` folds with unconditional
+`Object.assign(item, patch)` — latest wins, prior value never read.
+
+---
+
+**12c. [INSTABILITY] Two of the three priority axes are dead in practice**
+
+Severity: **high** · Dedupe: **NEW**
+
+```
+work.urgent : {(absent): 476, low: 1, critical: 3, high: 2}
+   -> weightForUrgency(undefined) = 1 for 476/482. The axis is a constant.
+
+work.risk   : standard 210 | light 140 | heavy 65   (recognized: 415/482)
+              medium 32, low 18, high 17 -> silently fold to standard (0.85)
+```
+
+Data Dictionary #6 declares `risk` as **free text**, so 67 items carry
+values the formula cannot read, folded with a silent `??` (`:32`, `:36`).
+With `urgent` constant and `risk` near-constant, priority reduces to roughly
+`10000/(blocks + semanticRelatedness + 1)` — and per 12b the second pass
+drops the second term.
+
+The formula's own header calls its inversion *"the single highest-consequence
+correctness risk in this feature"*. The inversion is correct. **The inputs
+collapsed.** Live frontier right now: 5 items, all with `priority` absent —
+so dispatch order currently falls through to declaration order entirely.
+
+---
+
+**12d. [INSTABILITY] Both automated priority writes swallow every error
+with a bare `catch {}`**
+
+Severity: medium · Dedupe: **NEW**
+
+`src/intake/discovery.mjs:227-229` and `src/intake/decompose.mjs:616-619`.
+A `lock-timeout` (finding 1) or any write-door rejection drops the priority
+write with zero signal. A run where every priority write failed looks
+identical to one where they all succeeded — which is why 12b and 12c were
+invisible in operation.
+
+---
+
+**12e. [SHIP-FASTER] Every read and every mutation replays the entire
+10,539-event log; nothing is cached even within one call**
+
+Severity: **high** for velocity · Dedupe: **NEW**
+
+`src/state/replay.mjs:523-526` — `rebuildView` = `foldEvents(readEvents())`,
+no snapshot, no incremental fold. `src/state/events.mjs:351` re-reads the
+whole log **again** just to derive `seq`. Instrumented against a copy:
+
+```
+ONE moveWork (todo->doing) : 166ms,  3 full log reads (13.1MB parsed)
+claimWork's state-layer seq: 274ms,  7 full log reads (30.6MB parsed)
+```
+
+`events.jsonl` is 4.5MB / 10,539 events and grows unboundedly.
+
+---
+
+**12f. [SHIP-FASTER] `.fgos/state.json` is write-only, costs ~86ms per
+mutation, and is serialized twice**
+
+Severity: medium · Dedupe: **NEW**
+
+`src/state/store.mjs:100-101` writes `{...view, revision: viewRevision(view)}`
+— and `viewRevision` (`replay.mjs:542-544`) does its **own**
+`JSON.stringify` of the same 3.66MB object. Measured: 25.2ms + 17.7ms +
+11.8ms write + 31ms rebuild. No production code reads the file (grep across
+`src/` and `bin/` finds only comments; only `test/` reads it). It is also
+written **outside** the lock (`:673` closes the lock scope, `:674` calls
+`refreshView`) with a bare `writeFileSync`, no tmp+rename — so it can both
+regress and be observed half-written, meaning it is not a usable recovery
+artifact either.
+
+---
+
+**12g. [INSTABILITY] `events.lock`'s critical section is 65-88ms against a
+2s timeout explicitly sized for "sub-millisecond to low-ms"**
+
+Severity: medium · Dedupe: **matches `tsk-r87`** — which understates the cause
+
+`src/state/events.mjs:41-51` states that assumption verbatim.
+`src/state/store.mjs:457-673` then widened the section to include a full
+`rebuildView` (`:458`) and `resolveWriterIdentity` (`:509`). Timed on the
+live log: **65ms** with a session env var, **88ms / 78ms** in a bare
+terminal or the git hook — so the 2s budget covers only ~22-35 serialized
+holders, against configured parallelism of 4×4 = 16 workers. `tsk-r87` frames
+this as "the timeout doesn't fit all operation types"; the real cause is
+that the **one** operation the number was sized for now takes 60-90× its
+documented estimate, and degrades as the log grows.
+
+---
+
+**12h. [INSTABILITY] `moveWork` spawns up to 3 `ps` subprocesses inside the
+held global write lock**
+
+Severity: medium · Dedupe: **NEW**
+
+`src/state/store.mjs:509` calls `resolveWriterIdentity(dir)` inside the
+`withEventsLock` closure opened at `:457`;
+`src/runner/session-identity.mjs:136-143` walks `MAX_HOPS = 3` via
+`execFileSync('ps', …)` **with no timeout**. Measured 0.2ms with a session
+env var, **31.7ms** without (bare terminal, git hook, CI). A slow or hanging
+`ps` stalls the single global write door for every `fgos` process.
+
+---
+
+**12i. [INSTABILITY] `porting-store.mjs` does read-check-append outside the
+lock while its own comment claims parity with `store.mjs`**
+
+Severity: medium · Dedupe: **NEW**
+
+`src/state/porting-store.mjs:112-118` (dup-id) and `:130-140` (`movePorting`
+CAS) call `rebuildViewFromLog` → check → bare `appendEvent`, which locks
+only the append. `store.mjs:142-228` wraps read-check-append in **one**
+`withEventsLock` scope precisely so the precondition cannot go stale. Two
+concurrent `addPorting` on one id can both pass line 113. Low-traffic, small
+blast radius — but the comment at `:103-104` asserts a guarantee that isn't
+there, which is how the next reader gets it wrong.
+
+---
+
+**12j. [SHIP-FASTER] FSM refusals name only the illegal edge; `wontfix` is
+unreachable from 7 of 10 statuses**
+
+Severity: medium · Dedupe: **matches `tsk-2lc`**, whose description is wrong
+in one respect and narrow in another
+
+`src/state/status-fsm.mjs:213-218` builds the refusal from `from`/`to` only,
+with the full `TRANSITIONS` table at `:99-152` in scope. Probed:
+
+```
+todo / doing / blocked            -> wontfix : OK
+awaiting-approval                 -> wontfix : precondition
+awaiting-human                    -> wontfix : precondition
+delivered / retrospective / cleanup / done -> wontfix : precondition
+```
+
+`tsk-2lc` names a status `proposed` — **no such status exists**, it is
+`awaiting-approval`. And the gap covers `awaiting-human` (7 live items) plus
+the whole delivered→cleanup tail. Closing a parked item that turned out moot
+requires inventing an `answer` string (`:245-253`) to reach `todo`, then a
+second write — a fabricated entry in the permanent log.
+
+*(`src/state/cursor.mjs:24,27` is the one place in the state layer whose
+error messages state a remedy — use it as the template for the fix.)*
 
 ### Tier 3 — rot and waste
 
@@ -442,6 +666,25 @@ Not findings. Each names what would settle it.
 - **`distillery.md` may describe an area with no implementation here.**
 - **`fgos doctor --fix` behavior unverified** — it writes; the read-only
   mandate held.
+- **`.fgos/state.json` may regress under concurrency.** The window is real
+  at code level (`store.mjs:673` ends the lock, `:674` rebuilds-then-writes,
+  ~31ms between). **Could not reproduce** — 12, 40 and 60 concurrent
+  `addWork` processes against a *fresh* store all matched the log exactly;
+  on a fresh store the rebuild is sub-ms so the window barely exists.
+  *Settle it:* same driver seeded with the real 4.5MB log and ≥4 writers.
+  Likely no user-visible effect given 12f.
+- **138 of 482 items (29%) are parked at `status: cleanup` behind a 7-day
+  TTL** (oldest entry 6.8d; `.fgos/config.json` carries no `cleanup` key so
+  the default applies; all 138 resolve as roots so `leafTtlDays: 0` never
+  applies, and `pickNextCleanupItem` returns null). All 138 are re-serialized
+  into the 3.66MB `state.json` on every mutation. Whether a 7-day park on
+  29% of the backlog is intended design or accumulation nobody chose is a
+  **product call**, not a defect anyone can assert.
+- **`cleanup-harness.mjs:205`** computes `ttlMs = ttlDays * 86400000` with
+  no numeric guard — `undefined` yields `NaN`, and `ageMs >= NaN` is always
+  false, so it fails silently as "never ready" rather than erroring. Every
+  in-repo caller supplies a real value (`bin/fgos.mjs:1260-1263`), so there
+  is **no reachable path** today.
 
 ## Refuted — open items whose premise no longer holds
 
@@ -484,15 +727,36 @@ Worth not regressing, and worth knowing nobody needs to look here:
   keys; it leaks only on shelled-out binaries (finding 22).
 - **`compound-learn`, a retired stage, still sits on 158 items — all
   `status: done`.** Pure historical residue, nothing live. Cosmetic only.
+- **Event-log integrity is clean, verified empirically rather than by
+  reading:** `events=10539 dupSeq=0 nonMonotonic=0 seqGaps=0 missingSeq=0`,
+  seq 1→10539 contiguous. Across 3,205 `work.move` + 1,777 `work.edit` +
+  1,489 `work.outcome` events written by many concurrent sessions, not one
+  duplicate or out-of-order seq. The lock primitive itself
+  (`events.mjs:226-242` link-atomic create, re-read-before-unlink
+  `:263-273`) is correct — findings 12g/12h are about the timeout constant
+  and what callers do *inside* the lock, never the primitive.
+- **Store CAS is correct where it is used** — `status-fsm.mjs:204-218`
+  checks `expectedStatus` before the transition-table lookup, so a stale
+  caller gets `conflict`, not a coincidental `precondition`.
+  `addWork`/`editWork`/`moveWork`/`moveStage`/`registerTool`/`removeTool`
+  all hold the lock across read-check-append. Only `porting-store.mjs`
+  (12i) deviates.
+- **Frontier and lineage are clean** — the FIFO/priority/intent ordering
+  contract (`frontier.mjs:175-187`), `hasOpenDescendant`'s cycle guard
+  (`:260-272`), `isResolvedStatus`'s hybrid read (`:247-252`). Also
+  `cursor.mjs`, `retro-pool.mjs`, `cleanup-pool.mjs` (whose apparently
+  unguarded `entered.ts` at `:54` is genuinely unreachable —
+  `checkCleanupTTLElapsed:201-203` already returns `ok:false`; **not** a
+  bug).
 
-## Coverage gap
+## Coverage
 
-`src/state/` internals — event-log append/fold integrity, FSM transition
-gaps, store CAS correctness, frontier/lineage edge cases, priority
-clobbering — were assigned but **not reported**. Findings 1, 5, 6 and 8
-touch that area from the outside (via runner, registry, and drift-status),
-so it is not unexamined, but it is not audited either. Treat any claim about
-the state layer's internals as unverified by this scan.
+All six areas reported. Remaining **uncovered** inside the state layer —
+read but not exhaustively audited, so treat as neither clean nor
+implicated: `graph-metrics.mjs` (768 lines), `replay.mjs`'s remaining
+per-event fold cases, `dep-graph.mjs`, `impact.mjs`, `drift-status.mjs`
+(beyond finding 8), `tool-registry.mjs`, `awaiting-context.mjs`,
+`discover-pool.mjs`.
 
 ## Suggested filing
 
