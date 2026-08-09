@@ -108,6 +108,8 @@ không mở lại những quyết định các item khác đã khoá.
 | 38 | 11 capability của hn xếp đâu | **Đề nghị** (vòng 11) | **T4 phía cung**, không ngang `gather`/`judge` (thuộc tính của nhà cung cấp, không của một lần dispatch). Cũng **không ngang `gitnexus`**: cả 11 tả **chính cái sổ**, do harness CLI tự khai qua `query.contract`. Ô tương ứng của fgOS — *sổ tự khai năng lực + dải schema* — **đang trống**, latent thật vì global/project install có thể lệch version. §6.5 |
 | 34 | Ô "mục tiêu ngoài sổ" đã có tên | **Đang hội tụ** (vòng 10) | **`errand`** — quét sạch 0 hit ở `src/`, `docs/`, `upstreams/`. Bác `cell` (false friend: bee's cell CÓ claim/reservation/registry) và `packet` (kéo theo khung *"orthogonal axes"* D1 đã bác). Bốn phép thử ở §6.3, sắc nhất: **không sở hữu branch/merge riêng**. Vẫn gated `tsk-2t6` |
 | 35 | `capacity` rút về một nghĩa | **Đề nghị P1′** (vòng 15; bản P1 vòng 10 **đã bị thay**) | Một nghĩa = **năng lực có tên của fgOS**, cặp *behavior-promise / functional-helper* (= D2 + D1 đọc thành định nghĩa). `capacities.<id>` là **bản khai**, không phải bản thân nó; `binding` là **cạnh** T3→T4. Bản P1 đầu sai vì bỏ mất lời hứa hành vi mà không cất vào đâu. `0026` **làm rõ**, không lật |
+| 42 | `submit-assist-classify` vướng gì | **Rõ** (vòng 16) | (a) dispatch bằng **prose**, 0 hit trong code ⇒ fgOS có hai đường dispatch song song · (b) biến trùng-tên ngẫu nhiên thành thứ **chịu lực**: làm đúng D5 thì presence query trả rỗng và skill **âm thầm** rơi về inline · (c) capacity `kind:"cli"` **duy nhất** ⇒ gánh một mình cả ba cổng gác lẫn A2 · (d) `tier:"light"` nhưng `capacity.model` đè ⇒ ca sống của hai-nghĩa-`tier`. §6.4 |
+| 43 | `executors.judge` là config **CHẾT** | **Rõ, là LỖI** (vòng 16) | `cfg.executors[tier]` với `tier ∈ {light,standard,heavy}`; validation chỉ kiểm shape, không kiểm key là tier thật ⇒ pass rồi không bao giờ đọc. Hệ quả: `judge-decompose` khi cli-spawn rơi xuống global executor, chạy **không có `Read`**. Cũng là **bằng chứng độc lập cho D6**: có người đã sờ tới `for:` trước khi nó có tên. **Bước 5 mở item** |
 | 41 | `capacity` và `capability` có cùng loại vật thể không | **Chưa xếp** (vòng 15) | A5 gợi ý có: `submit-assist-classify` nằm **cả hai sổ**, cùng tên, cùng `kind:"cli"`, cùng `command:"agy"` — có thể là **một thứ ghi hai lần vì fgOS có hai sổ cho một khái niệm**, không phải "trùng lặp không đối chiếu". Chưa đủ bằng chứng để đề nghị gộp. Không đào ở vòng này |
 | 36 | Bỏ `rootTask`/`subTask` | **CHỐT → D7** (vòng 14) | 0 identifier trong code; `0026` tự gọi cả hai là *vai trò* / *tên gọi tương đối*. Thay: `work` + vai trò T1 · `child work` · "một `work`/`errand` khác" |
 | 37 | Khung bảy tầng (Bước 1) | **Đề nghị** (vòng 10) | T0 hợp thành · T1 dấn thân · T2 cầu · T3 binding · T4 cung · TG cổng gác (cắt ngang) · TD dẫn xuất; `dispatch`/`spawn`/`worker`/`child work` là **cạnh**, không phải tầng. §6.1 |
@@ -670,6 +672,26 @@ phải bằng chứng `capacity` là bản ghi suông.
 Ô chưa xếp mới: `capacity` và `capability` có cùng loại vật thể không (§3 hàng
 41) — không đào ở vòng này.
 
+### Vòng 16 — 2026-08-09 — mổ ca sống `submit-assist-classify`
+
+**Người dùng:** *"bàn tiếp submit-assist-classify nó đang bị vướng vấn đề gì"*.
+
+Bốn chỗ vướng (a–d) + một chỗ hàng xóm (e), chi tiết và bằng chứng đặt tại
+§6.4. Hai thứ đáng nhớ nhất:
+
+**(b)** — nó biến sự trùng-tên **ngẫu nhiên** (capacity id == tool name ==
+capability) thành thứ **chịu lực** trong một skill. Nên **làm đúng D5 sẽ làm
+hệ hỏng, và hỏng IM LẶNG**: presence query trả rỗng, skill rơi về inline,
+không lỗi. Di trú D5 vì thế phải sửa `_shared/capacity-dispatch-fallback.md`
+cùng lúc, không được sửa mỗi registry.
+
+**(e)** — `executors.judge` là **config chết**: resolver chỉ đọc
+`cfg.executors[tier]`, mà `judge` không phải tier; validation chỉ kiểm shape
+nên nó pass rồi bị nuốt im. Hệ quả thật: `judge-decompose` khi phải cli-spawn
+chạy bằng global executor, **không có `Read`**. Và nó là **bằng chứng độc lập
+cho D6** — có người đã muốn lane theo *mục đích* và viết vào config trước khi
+khái niệm `for:` có tên.
+
 ## 6. Thiết kế đã chốt {#design}
 
 > **Regenerate lần 3 — bản sau vòng 10.** Vòng 10 đổi hình dạng thật (T2 thành
@@ -1037,6 +1059,54 @@ Chúng phân biệt ở chỗ khác nhau: hỏi `gitnexus` thì `for` **luôn** 
 `needs` mới là thứ phân biệt; với helper thì `needs` gần như hằng số (*"chạy một
 prompt, trả text"*), `for` mới phân biệt. Thiếu một trong hai là mất một chiều.
 **Cả hai đều đang thiếu.**
+
+#### Ca sống `submit-assist-classify` — bốn chỗ vướng, cộng một chỗ hàng xóm [vòng 16]
+
+**a. Dispatch bằng PROSE, không bằng code.** `rg "submit-assist-classify" src/
+bin/` → **0 hit**. Đường duy nhất là skill đọc markdown rồi tự gõ lệnh
+(`fgos-submit-assist/SKILL.md` → `_shared/capacity-dispatch-fallback.md`:
+Step A config check → Step B presence → Step B.5 `dispatch.mjs decide` → Step C
+exec). Đối chiếu: `judge-discovery`/`judge-decompose` do **code thật** gọi
+(`runJudgeExecutor`). ⇒ fgOS có **hai đường dispatch song song** — đường code và
+đường prose — và khối `capacities` là thứ duy nhất chúng dùng chung.
+
+**b. Nó biến trùng-tên ngẫu nhiên thành thứ CHỊU LỰC.** Step B chạy
+`tool query --capability submit-assist-classify --status present`. Vòng 5 đã
+chứng minh việc tool này mang `capability` trùng tên capacity id là **ngẫu
+nhiên**. Giờ một skill dựa vào sự trùng đó. ⇒ **làm đúng D5** (đăng ký lại
+`capability: "classification"` để provider thứ hai vào được) thì Step B trả
+`providers: []`, skill in *"backend isn't available"* rồi **âm thầm rơi về tự
+phân loại** — không lỗi, không cảnh báo. **Làm đúng luật thì hệ hỏng, và hỏng
+im lặng.**
+
+**c. Là capacity `kind:"cli"` DUY NHẤT** ⇒ vừa là bằng chứng sống duy nhất ba
+cổng gác chạy được (registered → present → allowCrossProvider), vừa là chỗ duy
+nhất A2 cắn.
+
+**d. `tier:"light"` nhưng `model` bị đè.** `capacity.model ?? modelForTier(cfg,
+tier)` (`dispatch.mjs:1104`) ⇒ `tier` ở đây chỉ còn tác dụng **nghi thức**,
+nghĩa **model** vô hiệu. **Ca sống** của hai-nghĩa-`tier` mà `tsk-503` cố ý
+khoá — không phải lỗi, nhưng là ví dụ thật.
+
+**e. Hàng xóm: `executors.judge` là config CHẾT — và là bằng chứng độc lập cho
+D6.** Resolver chỉ có một đường đọc `executors` (`dispatch.mjs:624`):
+`cfg.executors[tier]`, với `tier ∈ {light, standard, heavy}`. `judge` **không
+phải tier**. Validation (`:478-483`) chỉ kiểm **shape** của giá trị, **không
+kiểm key có phải tier thật** ⇒ khối pass config-load rồi **không bao giờ được
+đọc**.
+
+Hệ quả thật: `judge-decompose` khai `{kind:"task"}`, không `command`/`args`
+riêng ⇒ `byCapacity` undefined ⇒ trượt `executors[tier]` ⇒ rơi xuống **global
+`executor`**, vốn chỉ có `--allowedTools Bash(git add:*),Bash(git commit:*)`.
+Mỗi lần `judge-decompose` thiếu live Task access và phải cli-spawn, nó chạy như
+**một judge không đọc được file**, chứ không phải bộ args rộng ai đó đã viết
+sẵn trong `executors.judge`.
+
+⇒ Ai đó đã **muốn** lane khoá theo **mục đích** (`judge`), đã viết nó vào
+config, nhưng resolver chỉ biết khoá theo `tier` và config **im lặng nuốt
+mất**. Một người đã sờ tới `for:` trước khi nó có tên. **Bước 5: mở item** —
+(i) validate key của `executors` phải là tier thật (chết-ồn thay vì chết-im),
+(ii) `judge-decompose`'s cli-spawn fallback đang thiếu `Read`.
 
 #### Hai cửa, chỉ một cửa tuân luật [ĐỀ NGHỊ — vòng 12]
 
