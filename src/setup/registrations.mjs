@@ -701,3 +701,33 @@ registerFix({
   id: 'claude-plugin-marketplace',
   fix: (cwd) => fixClaudePluginMarketplace(cwd),
 });
+
+// tsk-1no D3: the plugin skill layer (`plugins/fgOS/skills/*/SKILL.md`)
+// resolves its own CLI independently of this file's other checks -- a
+// local `bin/fgos.mjs` first, else a PATH-resolved `fgos` (same fallback
+// `scripts/fgos-shell-integration.sh:29-46` already proves correct for the
+// shell-function surface). No shared PATH-lookup helper exists elsewhere in
+// this file to reuse (checkNodeAndGit's own `git` check is a one-off
+// execFileSync try/catch, not a generic utility) -- this check follows that
+// same try/catch shape rather than inventing a new one.
+function checkPluginSkillCliReachable(cwd) {
+  const localBin = path.join(cwd, 'bin', 'fgos.mjs');
+  if (fs.existsSync(localBin)) {
+    return { passed: true, message: `local bin/fgos.mjs found at ${localBin}` };
+  }
+  try {
+    const onPath = execFileSync('sh', ['-c', 'command -v fgos'], { encoding: 'utf8' }).trim();
+    return { passed: true, message: `fgos resolved from PATH at ${onPath}` };
+  } catch {
+    return {
+      passed: false,
+      message: `no bin/fgos.mjs at ${cwd} and no global fgos install on PATH -- every /fgOS:* slash command will fail on first use (run: npm install -g github:vantt/forgent)`,
+    };
+  }
+}
+
+registerCheck({
+  id: 'plugin-skill-cli-reachable',
+  description: 'a fgos CLI is reachable from this project (local bin/fgos.mjs or a global PATH install)',
+  check: (cwd) => checkPluginSkillCliReachable(cwd),
+});

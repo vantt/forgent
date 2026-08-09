@@ -26,7 +26,16 @@ CTR001).
 2. **Return the item.** Run:
 
    ```
-   node ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs return <id> --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
+   # fgos CLI fallback (tsk-1no D3)
+   FGOS_BIN="${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs"
+   if [ -f "$FGOS_BIN" ]; then
+     node "$FGOS_BIN" return <id> --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
+   elif command -v fgos >/dev/null 2>&1; then
+     fgos return <id> --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
+   else
+     echo "fgos: no bin/fgos.mjs at ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX} (not a forgent checkout) and no global fgos install on PATH" >&2
+     exit 1
+   fi
    ```
 
    substituting the id from step 1. Always use the literal
