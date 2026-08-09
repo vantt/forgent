@@ -139,6 +139,11 @@ không mở lại những quyết định các item khác đã khoá.
 | **D7** | **Bỏ `rootTask` và `subTask` khỏi từ vựng dispatch** — dùng `work` (T2) + vai trò bên gọi (T1) cho cái thứ nhất, `child work` cho cái thứ hai. **Supersede phần từ vựng của `0026`.** Cả hai có **0 identifier trong code**; `0026` tự gọi `rootTask` là *vai trò* (*"công việc gốc **đang làm** … **Vai trò này** có tính ĐỆ QUY/fractal"*) và tự gọi `subTask` là *tên gọi **tương đối, nhìn từ góc của bên kích hoạt***. Phép thử: `tsk-5td` nằm backlog là `work`; một launcher đứng nó lên thì **cùng dòng, cùng id, state không đổi một byte** mà đổi tên gọi ⇒ từ vai trò, không phải từ phân lớp. `subTask` còn đội hai nghĩa khác tập: (a) work con do decompose, **được lưu** ⇒ `child work` (D4); (b) target của một lần dispatch đệ quy, **thoáng qua** ⇒ chỉ là một `work`/`errand` khác. **D7 chỉ đổi NHÃN trên sơ đồ D1** (nhánh CÓ: `rootTask`→`work`); **tiêu chí D1 không đổi một chữ** | 10 → 14 |
 | **D8** | **`capacity` = một NĂNG LỰC CÓ TÊN của chính fgOS — cặp *behavior-promise / functional-helper*.** `capacities.<id>` là **bản khai** của nó, không phải bản thân nó; `binding` là **CẠNH** T3→T4, không phải tên tầng; T3 đổi tên **BINDING → NĂNG LỰC CÓ TÊN**. Cặp chữ là **D2 + D1 đọc thành một định nghĩa**: *behavior-promise* = nó **hứa** gì (`digest` hay `verdict`, D2) · *functional-helper* = nó **là** gì (hẹp, không authority, phục vụ mục tiêu người khác, D1). Một mình `functional-helper` thì hụt hợp đồng — đúng lý do `0026` trôi sang tiêu chí cấu trúc mà D1 đã bác; một mình `behavior-promise` thì không phân biệt được với `tool`. Bằng chứng từ D6: **một dòng config vô hồn không đi khai *nó cần gì*** — chỉ thứ có lời hứa riêng mới khai được `for`/`needs`. **A1 chết** (giờ đúng một nghĩa). **Không breaking**: config key và code giữ nguyên. `0026` chỉ **làm rõ** một mệnh đề (tiêu chí phân định → authority + state effects, D1 đã làm), **không lật** | 10 → 18 |
 | **D9** | **Audit ghi CẢ HAI: `provider` (nhãn, tự do đặt) VÀ `command` (lệnh thật sự spawn)** trong event `capacity.dispatch`. Hôm nay `events.jsonl` chỉ ghi `provider`, mà `provider = executor.provider ?? executor.command` (`:777`) nên **khai báo thắng thực tế** — đặt `command:"agy"` + `provider:"claude"` thì `agy` chạy, sổ ghi `claude`, không lỗi không cảnh báo. Cổng cross-provider **không bị lừa** (đọc `executor.command`, `:630`; doc comment `:566-570` nói rõ cố ý không đọc `provider`) ⇒ **không phải lỗ hổng bảo mật mà là lỗ hổng SỔ SÁCH**. Ba đường đã cân: (A) bỏ field — thật tuyệt đối, log xấu · (B) giữ field + bảng ánh xạ vendor — đẹp và thật, phải nuôi bảng · **(C) giữ nhãn, ghi cả hai** — không bỏ gì, không nuôi bảng, nhãn sai thì `command` bên cạnh vẫn nói thật. Giá: payload dài thêm một field | 19 → 21 |
+| **D10** | **Khung BẢY TẦNG**: T0 hợp thành (`orchestrator`) · T1 dấn thân (`launcher`\|`driver`) · T2 cầu (`work`\|`errand`\|`gather`\|`judge`) · T3 năng lực có tên (`capacity`) · T4 cung (`capability`\|`tool`\|`kind`\|`executor`) · TG cổng gác (cắt ngang) · TD dẫn xuất (mechanism). **`dispatch`, `spawn`, `worker`, `child work` là CẠNH**, không phải tầng. Xương sống cũ *"năm chiều"* gộp T0 với T1 làm một và **không có chỗ cho cạnh**, nên `dispatch` bị đặt tên theo nút. Năm chiều cũ **không mất cái nào** — chúng nằm gọn trong bảy tầng (#1→T0+T1 · #2→T2 · #4,#5→T4 · #3→TD) | 10 → 22 |
+| **D11** | **`errand`** — đơn vị mang mục tiêu của chính nó nhưng **NGOÀI SỔ** (không dòng nào trong `events.jsonl`, id ephemeral phạm vi cha). **Vẫn gated** theo `tsk-2t6` D4/D9. Bốn phép thử, sắc nhất là thứ tư: **không sở hữu branch/merge riêng** — ghi vào worktree của cha, đi ké merge cha; kiểm được bằng máy. Tên quét ra **0 hit** ở `src/`, `docs/`, `upstreams/`. Bác `cell` của bee vì **false friend** (cell của bee CÓ claim, CÓ reservation, CÓ registry — đúng ba thứ ô này cố ý không có); bác `packet` vì doc gốc của chữ đó dựng trên khung *"two orthogonal axes"* mà D1 đã bác | 10 → 22 |
+| **D12** | **Ranh giới ngoài cùng**: **input đã nằm trong context bên gọi ⇒ KHÔNG phải một lần dispatch**, mà là **suy nghĩ của chính session**. Cổng chính thức: bốn lý do hợp lệ (model rẻ hơn · provider khác · cách ly tài nguyên · chạy song song); trượt cả bốn thì ở lại inline. Bảy tầng tả *một lần dispatch* nhưng không tả thứ nằm **ngoài** nó, nên việc không-phải-dispatch bị ép vào tầng dispatch rồi đẻ ra mẫu vật mỏng (`submit-assist-classify`). `fgos-clarifying` đã tự viết luật này ở dạng khoá. Hệ quả: soul work của intake **không có T2 unit nào, không có capacity nào** | 17 → 22 |
+| **D13** | **mechanism = nhà cung cấp ở TRONG hay NGOÀI (A3)**, và presence/cross-provider gate phải gác theo **đúng vị từ đó — `kind !== 'task'`, không phải `kind === 'cli'` (A4)**. Sáu suy dẫn độc lập hội tụ (§6.6). A4 **rơi ra miễn phí** từ A3 vì cùng vị từ — dấu hiệu khung đúng. Hôm nay `dispatch.mjs:603`/`:630` gác `kind==='cli'` nên capacity `mcp`/`skill`/`http`/`binary` dispatch với **zero** presence check và **zero** cross-provider check (latent). **Chốt vị từ ở đây; sửa code là item riêng** | 6 → 22 |
+| **D14** | **Phép thử thứ ba của D2 — AI SỞ HỮU TIÊU CHÍ**: `gather` = tiêu chí ở **bên gọi**, tự áp lên dữ liệu nhận được · `judge` = tiêu chí ở **bên được gọi**, bên gọi **TUÂN**. Kèm khái niệm **verdict giả** — nhãn phán do nhà cung cấp tính sẵn nhưng bên gọi đối xử như **bằng chứng**. Hai phép thử đầu không phân được response mang cả hai; ca thử thật `impact()` của gitnexus (caller-list + `risk`) phân được nhờ chính `CLAUDE.md` bắt **cross-check trước khi tin** = không tuân ⇒ **gather**. Kiểm ngược: `judge-discovery` bên gọi tuân ⇒ judge thật | 11b → 22 |
 | **D2** | **Nhánh không-authority tách làm hai lớp: `gather` (trả `digest`) và `judge` (trả `verdict`)** — không phải một. Lý do tách: hai loại lỗi khác nhau ⇒ hai cách sửa khác nhau (digest sai vì *đọc thiếu* → đọc lại/rộng hơn; verdict sai vì *phán sai* → cần người hoặc đổi tiêu chí); trộn lại thì mất tín hiệu sửa lỗi. Tên **không phát minh mới** — cả hai cặp `<lớp> → <cái nó trả về>` đã sống sẵn trong repo (§5 vòng 2). Bee cũng tách đúng chỗ này, gọi review-class là *"neither class"* | 1 → 3 |
 
 ## 5. Q&A log
@@ -784,6 +789,20 @@ chứng nhưng không tách được *"cái gì cần người quyết"* khỏi 
 xếp được"*, nên người đọc phải tự lọc. Câu hỏi đúng chỉ có một dòng, và ba
 lựa chọn.
 
+### Vòng 22 — 2026-08-09 — mint xương sống
+
+Phiên có 9 D-ID nhưng **xương sống thì chưa mint**: bảy tầng, `errand`, ranh
+giới ngoài cùng đều còn nhãn *[ĐỀ NGHỊ]*, dù đã đứng 11 vòng không ai lật. Một
+session lạnh đọc lại sẽ tưởng khung còn lung lay.
+
+Mint **D10–D14** theo đúng luật của skill (*giữ qua hơn một vòng mà không bị
+sửa*) — các điểm này đứng lâu hơn cả D3–D9 lúc được mint.
+
+**Không mint, có lý do:** T1 rút về 2 giá trị — `tsk-2cw` **sở hữu** chiều đó,
+không giành. P4 (đổi tên giá trị mechanism) — độ chắc *vừa* và là đổi chuỗi code
+trả về ⇒ item riêng. Bảng 23 chữ — **sản phẩm dẫn xuất** của D10, không phải
+quyết định riêng.
+
 ## 6. Thiết kế đã chốt {#design}
 
 > **Regenerate lần 3 — bản sau vòng 10.** Vòng 10 đổi hình dạng thật (T2 thành
@@ -793,6 +812,11 @@ lựa chọn.
 >
 > Độ chín ghi ở từng mục: **[KHOÁ]** = đã mint D-ID · **[ĐỀ NGHỊ]** = bản này
 > đề xuất, chưa ai bác, chưa mint · **[HỞ]** = biết thiếu, chưa quyết.
+>
+> Sau vòng 22, **xương sống đã khoá**: khung bảy tầng (D10), `errand` (D11),
+> ranh giới ngoài cùng (D12), vị từ mechanism/presence (D13), phép thử thứ ba
+> (D14). Còn để mở có chủ ý: **T1 rút về 2 giá trị** (`tsk-2cw` sở hữu) và
+> **P4** đổi tên giá trị mechanism (đổi chuỗi code ⇒ item riêng).
 
 ### 6.1 Đọc trong một phút — bảy tầng
 
@@ -891,7 +915,7 @@ lỗi. Tên **không phát minh mới**: `judge`/`verdict` đã vào code (38 + 
 `gather`/`digest` đã ghim ở doc (`tsk-5kn`).
 
 **Phép thử thứ ba, dùng khi một response mang cả hai kiểu: *ai sở hữu tiêu
-chí?*** [ĐỀ NGHỊ — vòng 11]
+chí?*** [KHOÁ — D14]
 
 | | tiêu chí nằm ở đâu | bên gọi làm gì với kết quả |
 |---|---|---|
@@ -921,7 +945,7 @@ clear/không-clear và bên gọi **tuân** (`fgos discover` ghi thẳng vào st
 T2. Hỏi *"`impact-analysis` là gather hay judge"* là sai tầng — nó ngang hàng
 `submit-assist-classify`. Cái **là** `gather` là **lần dispatch** đi hỏi nó.
 
-#### `errand` — ô mục tiêu ngoài sổ [ĐỀ NGHỊ — vòng 10] ⛔ vẫn gated
+#### `errand` — ô mục tiêu ngoài sổ [KHOÁ — D11] ⛔ vẫn gated
 
 Ba hệ, ba câu trả lời cho **cùng một áp lực** (có việc mang mục tiêu mà không
 làm phình sổ chính):
@@ -1482,7 +1506,7 @@ minh.
 `binary` hôm nay dispatch với **zero** presence check và **zero** cross-provider
 check. Latent: chưa capacity nào thuộc bốn kind đó.
 
-### 6.13 Ranh giới ngoài cùng: cái gì KHÔNG phải một lần dispatch [ĐỀ NGHỊ — vòng 17]
+### 6.13 Ranh giới ngoài cùng: cái gì KHÔNG phải một lần dispatch [KHOÁ — D12]
 
 Bảy tầng tả **một lần dispatch**. Chúng không tả thứ nằm **ngoài** nó — và
 thiếu ranh giới đó thì người ta ép việc không-phải-dispatch vào tầng dispatch,
