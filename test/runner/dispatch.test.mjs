@@ -1477,6 +1477,25 @@ test('spawnWorker result carries capacityId and provider alongside every existin
   assert.equal(typeof result.templateHash, 'string');
 });
 
+// --- tsk-33w D9: spawnWorker's additive command result field ---
+
+test('spawnWorker result carries command (the real spawned executable) alongside every existing field, additive only', async () => {
+  const dir = mkTempDir();
+  const scriptPath = writeEchoExecutor(dir);
+  const cfg = baseConfig([scriptPath, '{prompt}', '--model', '{model}']);
+
+  const result = await spawnWorker(sampleWork(), cfg, mkTempDir());
+
+  assert.equal(result.command, process.execPath);
+  // every pre-tsk-33w field still present, unchanged
+  assert.equal(result.capacityId, 'fgos-code-implement');
+  assert.equal(result.provider, process.execPath);
+  assert.equal(result.tier, 'standard');
+  assert.equal(result.model, 'sonnet');
+  assert.equal(typeof result.templateName, 'string');
+  assert.equal(typeof result.templateHash, 'string');
+});
+
 test('spawnWorker attests its OWN cwd (the dispatch worktree), never opts.fgosDir\'s root (tsk-4hl fix)', async () => {
   const dir = mkTempDir();
   const scriptPath = writeEchoExecutor(dir);

@@ -754,6 +754,12 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
             id: item.id,
             capacityId: worker.capacityId,
             provider: worker.provider,
+            // command (tsk-33w D9): the command actually spawned, alongside
+            // the freely-overridable `provider` label above -- so this audit
+            // entry can never lie about which one really ran (dispatch.mjs's
+            // own resolveExecutorCommand docstring: `provider` is a display
+            // alias, not what gets spawned).
+            command: worker.command,
             model: worker.model,
             baseCommit: worker.baseCommit,
             headRef: worker.headRef,
