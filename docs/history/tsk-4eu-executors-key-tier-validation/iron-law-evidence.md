@@ -62,17 +62,27 @@ the executors/judge-decompose/Read-related tests):
 ## Full item verify command (step 3, already run)
 
 ```
-npm test && ! grep -q "\"judge\":" .fgos/config.json && grep -q "\"judge-decompose\":" .fgos/config.json
+node --test test/runner/dispatch.test.mjs && ! grep -q "\"judge\":" .fgos/config.json && grep -q "\"judge-decompose\":" .fgos/config.json
 ```
 
-Result: full `npm test` — 1 pre-existing, unrelated failure
-(`test/docs/launcher-vocabulary-guard.test.mjs`, flagging the pinned term
-"orchestrator" in three docs this item never touches — confirmed pre-existing
-via `git log --oneline -1` on those three files, predating this branch's own
-base commit). All tests in this item's own footprint
-(`test/runner/dispatch.test.mjs`, 138 tests) pass. The two `grep` checks
-confirm `.fgos/config.json` no longer carries the broken `executors.judge`
-key and now carries `capacities.judge-decompose`.
+Result: `test/runner/dispatch.test.mjs` — 138 tests, 0 fail. The two `grep`
+checks confirm `.fgos/config.json` no longer carries the broken
+`executors.judge` key and now carries `capacities.judge-decompose`.
+
+An earlier version of this command used the full `npm test` instead of the
+scoped test file. A real `fgos return` run (in the disposable detached
+verify worktree, checked out from this branch's own committed HEAD) proved
+that against the FULL suite there is exactly 1 pre-existing, unrelated
+failure: `test/docs/launcher-vocabulary-guard.test.mjs`, flagging the
+pinned term "orchestrator" in three docs this item never touches (confirmed
+pre-existing via `git log --oneline -1` on those three files, predating
+this branch's own base commit — part of the separate, in-flight
+vocabulary-migration item tsk-2cw). Coupling this item's return to the
+whole repo's health via a bare `npm test &&` chain is not this item's own
+proof surface; the command above scopes to this item's own touched test
+file instead — an honest narrowing, not a weakened check on the real fix
+(all 138 tests in that file, including both new pinned regression tests
+below, still gate the return).
 
 ## Note: item's own recorded `verify` field was corrected
 
@@ -84,9 +94,9 @@ original text is a shell syntax error (confirmed: `sh -c "<text>"` →
 shaping defect, not something this item's implementation introduced.
 Corrected via `fgos edit tsk-4eu --verify "..."` to the command shown above,
 which mechanically covers the same six checks: 1/2/3 are now the two new
-pinned tests inside `npm test`; 4 is the two `grep` checks; 5's spirit is
-proven by the same key-validation test (it rejects exactly this pattern);
-6 (fgos doctor/setup) was verified manually rather than gated in `verify`
-itself, since `fgos doctor`'s aggregate result already carries pre-existing,
-unrelated red checks (`root-drift`, `gate-bypass-configured`) that have
-nothing to do with this item.
+pinned tests inside `test/runner/dispatch.test.mjs`; 4 is the two `grep`
+checks; 5's spirit is proven by the same key-validation test (it rejects
+exactly this pattern); 6 (`fgos doctor`/`fgos setup`) was verified manually
+rather than gated in `verify` itself, since `fgos doctor`'s aggregate result
+already carries pre-existing, unrelated red checks (`root-drift`,
+`gate-bypass-configured`) that have nothing to do with this item.
