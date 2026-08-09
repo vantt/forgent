@@ -170,22 +170,57 @@ pass to keep the item moving.
 
 ## Gate
 
-Before handing off, present the reality gate result and the feasibility
-matrix in plain language — what was checked, what evidence backs it, what it
-would cost to be wrong — with `plan.md` linked, then ask exactly: "Feasibility
-validated. Approve moving to executing?" A `NOT READY` verdict skips this
-question entirely; it returns to `fgos-planning` instead of asking anything.
+A `NOT READY` verdict skips this Gate entirely; it returns to
+`fgos-planning` instead of asking anything or checking bypass.
 
-Once the person approves (`READY` or `READY WITH CONSTRAINTS`), record a
-structured approve record (tsk-19j D1/D11) — separate from, and in addition
-to, any `fgos decision` line this session already logged: `fgos gate-approve
-<item-id> --gate validateApprove --actor human --verify "<verify>"`. No
-auto-approve path exists for this Gate today (unlike fgos-exploring/
-fgos-planning's gate-bypass check above) — `actor` is always `human` here.
-`verify` reuses `gates[id].planApprove.verify` (`fgos list --id <item-id>
---json`'s `data.gates[id].planApprove.verify`, read fresh) — this skill
-proves the plan's existing verify still holds against reality, it does not
-design a new one (per this skill's own "leave execution alone" rule).
+For `READY` or `READY WITH CONSTRAINTS`, check whether this gate can
+auto-approve instead (`docs/history/gate-bypass/CONTEXT.md` D6 — reuses
+D1-D5's mechanism, never the `awaiting-human` park, only this
+skill-embedded question):
+
+```bash
+root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
+node -e "
+Promise.all([import('./src/state/store.mjs'), import('./src/state/gate-bypass.mjs')]).then(([{ listWork }, { canAutoApproveValidate, readGateBypassLevel }]) => {
+  const fgosDir = process.argv[1] + '/.fgos';
+  const item = listWork(fgosDir).work[process.argv[2]];
+  const level = readGateBypassLevel(fgosDir);
+  console.log(canAutoApproveValidate(item, process.argv[3], level) ? 'true' : 'false');
+});
+" -- "$root" "<item-id>" "<READY|READY WITH CONSTRAINTS>"
+```
+
+`<READY|READY WITH CONSTRAINTS>` is this skill's own already-computed
+verdict from the Flow above, passed directly — never re-derived or
+re-read from a file (D6: the axis is the verdict itself, not an artifact
+scan). Treat anything other than exactly `true` on stdout — `false`, empty
+output, a thrown error — as `false`: fail closed, never skip the question
+on a check that couldn't run cleanly.
+
+Either branch below records a structured approve record (tsk-19j D1/D11) —
+separate from, and in addition to, any `fgos decision` line this session
+already logged: `fgos gate-approve <item-id> --gate validateApprove --actor
+<human|bypass> --verify "<verify>"`. `verify` reuses `gates[id].planApprove.
+verify` (`fgos list --id <item-id> --json`'s `data.gates[id].planApprove.
+verify`, read fresh) — this skill proves the plan's existing verify still
+holds against reality, it does not design a new one (per this skill's own
+"leave execution alone" rule).
+
+- **`true`** — skip the question. Post the non-question line
+  `auto-approved: validateApprove (gate-bypass level <level>)`, log it
+  (`fgos decision --text "auto-approved validateApprove gate for
+  <item-id> at level <level>" --rationale "gate-bypass level <level>
+  permits auto-approval per docs/history/gate-bypass/CONTEXT.md D6"`, D3's
+  audit trail), record it (`fgos gate-approve <item-id> --gate
+  validateApprove --actor bypass --verify "..."`, per above), then
+  continue straight to the `decompose`→`executing` engine call below.
+- **`false`** — present the reality gate result and the feasibility matrix
+  in plain language — what was checked, what evidence backs it, what it
+  would cost to be wrong — with `plan.md` linked, then ask exactly:
+  "Feasibility validated. Approve moving to executing?" Once the person
+  approves, record it (`fgos gate-approve <item-id> --gate validateApprove
+  --actor human --verify "..."`, per above), then continue to the
+  `decompose`→`executing` engine call below.
 
 Immediately after that gate-approve record, fire the `decompose`→`executing`
 engine call itself (tsk-27y D1/D2, per the Hard rule above), reading the

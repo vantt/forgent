@@ -16,6 +16,8 @@
     "capacities": {
       "judge-discovery": {
         "kind": "task",
+        "needs": "llm-judgment",
+        "for": "judge",
         "command": "claude",
         "args": [
           "-p",
@@ -30,6 +32,8 @@
       },
       "judge-decompose": {
         "kind": "task",
+        "needs": "llm-judgment",
+        "for": "judge",
         "command": "claude",
         "args": [
           "-p",
@@ -42,8 +46,9 @@
           "Task,WebSearch,WebFetch,Read,Bash(rg:*),Bash(git add:*),Bash(git commit:*)"
         ]
       },
-      "submit-assist-classify": {
+      "coding-classify-intake": {
         "kind": "cli",
+        "needs": "classification",
         "adapter": "cli-spawn",
         "command": "agy",
         "provider": "agy",

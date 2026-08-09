@@ -39,6 +39,7 @@ human-set ceiling, never by the session's own say-so alone.
 | D3 | A skipped gate stays visible: post a short non-question "auto-approved: ..." line and log a decision entry (`fgos decision`) every time a gate is skipped. Never a fully silent skip. |
 | D4 | Hard-gate/high-risk items (RUL34 risk-keyword/module flags, `src/intake/risk-keywords.mjs`) always still stop for a human regardless of bypass setting. This floor is non-negotiable — mirrors bee's own non-negotiable floor for its riskiest lane. |
 | D5 | The gate check requires two independent axes, both true, before a skip is allowed: (a) D2's mechanical zero-open-items check, and (b) the item's existing `tier` field (`light`/`standard`/`heavy`, `src/state/work.mjs:45`, already assigned by `src/intake/classify.mjs`) covered by a repo-wide config level. D4's floor overrides both axes unconditionally. This reuses tier/hard-gate infra fgOS already has rather than inventing bee's four-level scheme from scratch. |
+| D6 | (seq 9891, tsk-539 — extends this feature to the third gate this feature's own "Deferred to planning" section below flagged as an open question: `fgos-validating`'s `validateApprove`.) `validateApprove` gets its own mechanical bypass axis: bypass when `fgos-validating`'s own reality-gate verdict is `READY` (zero constraints); always ask a human when the verdict is `READY WITH CONSTRAINTS` (any constraint at all). Measured on `.fgos/events.jsonl` (108 items through `validateApprove` as of 2026-08-09): 1 `NOT READY`, 13 `READY WITH CONSTRAINTS`, ~94 (87%) zero constraints, 0/108 ever re-asked — the only one of the three skill-embedded gates never repeated. A multi-condition axis (reality-gate-PASS + verify-runs + test-surface-exists + tier + no risk-keyword) was considered and rejected: 3 of 13 real constraints needed judgment, and 2 of those 3 were undetectable in advance — they only surface once the skill itself writes the verdict, and the skill is exactly the party that already knows it is recording a constraint. A self-reported axis (the verdict itself) fits that better than a five-way axis that has to guess ahead of time. `NOT READY` is unchanged: skips the question entirely and returns to `fgos-planning`, same as today. D4's hard-gate floor and D5's tier-coverage axis both still apply unchanged, reusing `canAutoApprove`'s first two checks verbatim — only the third axis (`hasOpenItems` → verdict `!== 'READY'`) differs, via a new `canAutoApproveValidate(item, verdict, level)` export that never modifies the existing `canAutoApprove`. |
 
 ## Pinned assumptions (implementer-level, deferred to `fgos-planning`)
 
@@ -82,5 +83,7 @@ human-set ceiling, never by the session's own say-so alone.
 
 ## Outstanding questions
 
-None — all material product decisions locked (D1-D5). Implementation
-shape is `fgos-planning`'s job.
+None — all material product decisions locked (D1-D6). Implementation
+shape is `fgos-planning`'s job. D6 (2026-08-09) resolves the "possibly
+fgos-validating" open question this file's own "Deferred to planning"
+section above used to carry.

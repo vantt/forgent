@@ -63,6 +63,8 @@ cài đặt/setup/doctor story. Before any change is done, ask:
   all, read `docs/distribution-vision.md` and `docs/specs/distribution.md`
   first — a new module gets a spec/config-registry entry before it gets
   code, same bar as a new product area (question 2 above).
+- Does this change something a user of fgOS would see? If yes, add a line
+  to `## [Unreleased]` in `CHANGELOG.md`.
 
 ## Changing a locked law
 
@@ -90,7 +92,7 @@ when the tree is dirty.
 <!-- gitnexus:start -->
 # GitNexus — Code Intelligence
 
-This project is indexed by GitNexus as **forgent** (11620 symbols, 16622 relationships, 300 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
+This project is indexed by GitNexus as **forgent** (11761 symbols, 16765 relationships, 300 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
 
 > Index stale? Run `node .gitnexus/run.cjs analyze` from the project root — it auto-selects an available runner. No `.gitnexus/run.cjs` yet? `npx gitnexus analyze` (npm 11 crash → `npm i -g gitnexus`; #1939).
 

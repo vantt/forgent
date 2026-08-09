@@ -1,6 +1,6 @@
 # Research Report: Nâng cấp schema work-item (status branch, type hierarchy, nested domain fields, per-domain status flow)
 
-**Thời điểm nghiên cứu:** 2026-07-30 09:31 (Asia/Saigon), cập nhật 10:10, 10:35 (chốt kiến trúc round 4), 15:10 (milestone `tsk-3w3`), 2026-08-01 09:58 (round 11 — file `tsk-38t`, sửa lỗi `goalTier`), 14:47 (round 12 — re-audit `tsk-2rp`: phát hiện verb `catchup` bị bỏ sót, 9 call site không phải 8), 2026-08-07 17:31 (round 13 — scan lại codebase: `tsk-38t` đã ship qua decision `0027`, `tsk-2rp`/`tsk-3p1` đóng `wontfix`)
+**Thời điểm nghiên cứu:** 2026-07-30 09:31 (Asia/Saigon), cập nhật 10:10, 10:35 (chốt kiến trúc round 4), 15:10 (milestone `tsk-3w3`), 2026-08-01 09:58 (round 11 — file `tsk-38t`, sửa lỗi `goalTier`), 14:47 (round 12 — re-audit `tsk-2rp`: phát hiện verb `catchup` bị bỏ sót, 9 call site không phải 8), 2026-08-07 17:31 (round 13 — scan lại codebase: `tsk-38t` đã ship qua decision `0027`, `tsk-2rp`/`tsk-3p1` đóng `wontfix`), 2026-08-09 14:15-14:46 (file `tsk-5wr`/`tsk-3m6` cho status `backlog` + pre-submit domain classify; round 14 — nhánh `epic` của ask #2 đã giải qua `goalTier`+`targets`, decision `D4`/`tsk-umc`, vá xong qua `tsk-1ug`)
 
 **Task chính quản lý cụm này:** `tsk-3w3` (`deps: [tsk-2rp, tsk-3p1, tsk-38t]`) —
 coi là đạt khi cả 3 dep xong: `tsk-2rp` (Phase 1, `verifyKind`), `tsk-3p1`
@@ -205,6 +205,21 @@ Industry precedent (GitHub Projects, Linear): "Backlog" là 1 cột status riên
   consumer đọc `STATUSES`/`fsm.mjs` (không chỉ frontier).
 
 ### 2. Type hierarchy: mvp > milestone > task > bug (+ epic?)
+
+**CẬP NHẬT (round 14, 2026-08-09) — nhánh `epic` của mục này ĐÃ QUYẾT + ĐÃ
+SHIP, độc lập với report này, tìm ra lúc quét lại codebase:**
+`docs/history/execution-fanout/DISCUSSION.md` (tsk-umc, round 8, decision
+`D4`, `fgos decision` seq `8919`, 2026-08-07) — câu hỏi "cụm component/epic
+quản lý/triển khai thế nào" — chốt: dùng **`goalTier` + `targets` đã có
+sẵn** (không đẻ field/cạnh mới): `targets` không đi qua `resolveRoot` ⇒ mỗi
+target giữ root riêng ⇒ merge độc lập lên main, đúng shape "epic gồm nhiều
+item độc lập, mỗi cái tự merge". Lỗ hổng duy nhất tìm ra lúc đó (`fgos
+rollup` chỉ hiểu `parent`, không hiểu `targets`) đã vá — `tsk-1ug` ("fgos
+rollup hiểu targets, không chỉ parent"), status `cleanup` (ship thật).
+Khớp hướng round 1 dưới đây ("epic không cần field mới") nhưng khác cơ chế
+thật: là `goalTier`+`targets`, không phải `parent`/`deps` như round 1 đoán.
+**Phần `kind` enum (task/bug) của mục này VẪN CHƯA GIẢI** — không tìm thấy
+commit/decision nào liên quan, xem câu hỏi #3 cập nhật dưới.
 
 Search ngoài xác nhận: Jira/Linear/GitHub xếp **epic là CHA** của
 story/task/bug — 3 loại này là PEER cùng cấp dưới epic, KHÔNG phải một mắt
@@ -796,7 +811,9 @@ compound-learn xong", RUL50 gate cả 2 lối vào `done` bằng compound-learn)
    riêng cho phân loại cứng (task/bug/epic-label)? Ảnh hưởng: mọi item cũ
    đang có `kind` free-text tùy ý.
 3. Quan hệ giữa các type (khi xét sau) — DAG kiểu Jira (epic→{story,task,bug}
-   peer) hay hình dạng khác fgOS tự chọn?
+   peer) hay hình dạng khác fgOS tự chọn? **Nhánh `epic` ĐÃ GIẢI (round
+   14)** — dùng `goalTier`+`targets`, xem mục 2 ở trên. Còn lại thuần
+   `task`/`bug` (kind enum), chưa ai chạm.
 4. `domainFields`/`fieldSchema` per-domain: có cần migrate field hiện đang
    nằm top-level (nếu có field nào chỉ dùng cho `coding`) vào namespace mới,
    hay chỉ áp cho field MỚI thêm từ nay?

@@ -48,7 +48,7 @@ function fixById(id) {
 
 // ─── Unit tests: DOCTOR_CHECKS ─────────────────────────────────────────────
 
-test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-checkout-hook-wired, tool-registry-configured, config-awareness, dependencies-installed, gate-bypass-configured, root-drift, claude-plugin-marketplace, and plugin-skill-cli-reachable', () => {
+test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-checkout-hook-wired, tool-registry-configured, config-awareness, dependencies-installed, gate-bypass-configured, root-drift, claude-plugin-marketplace, plugin-skill-cli-reachable, and changelog-unreleased-stale', () => {
   assert.deepEqual(
     DOCTOR_CHECKS.map((c) => c.id).sort(),
     [
@@ -63,6 +63,7 @@ test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-ch
       'root-drift',
       'claude-plugin-marketplace',
       'plugin-skill-cli-reachable',
+      'changelog-unreleased-stale',
     ].sort(),
   );
 });
@@ -127,6 +128,73 @@ test('dependencies-installed passes when every declared dependency is present in
   assert.equal(passed, true);
   assert.match(message, /1 dependency installed/);
   fs.rmSync(tmp, { recursive: true, force: true });
+});
+
+// ─── changelog-unreleased-stale (tsk-3ip, docs/history/ ────────────────────
+// automated-changelog-compound-learn/DISCUSSION.md §6.1/§6.4): observe/
+// remind only, never blocks merge. Three required branches per the item's
+// own acceptance criteria: no CHANGELOG.md (normal, not an error); file
+// present with a pending Unreleased entry; file present with Unreleased
+// still empty.
+
+test('changelog-unreleased-stale passes when CHANGELOG.md does not exist', () => {
+  const tmp = mkTemp('fgos-changelog-check-');
+  const { passed, message } = checkById('changelog-unreleased-stale').check(tmp);
+  assert.equal(passed, true);
+  assert.match(message, /not found/);
+  fs.rmSync(tmp, { recursive: true, force: true });
+});
+
+test('changelog-unreleased-stale fails when CHANGELOG.md exists but ## [Unreleased] has no pending entries', () => {
+  const tmp = mkTemp('fgos-changelog-check-');
+  fs.writeFileSync(
+    path.join(tmp, 'CHANGELOG.md'),
+    '# Changelog\n\n## [Unreleased]\n\n### Added\n\n### Changed\n\n### Fixed\n\n### Removed\n\n## [0.1.0]\n\n### Added\n\n- baseline\n',
+  );
+  const { passed, message } = checkById('changelog-unreleased-stale').check(tmp);
+  assert.equal(passed, false);
+  assert.match(message, /no pending entries/);
+  assert.match(message, /never blocks merge/);
+  fs.rmSync(tmp, { recursive: true, force: true });
+});
+
+test('changelog-unreleased-stale passes when ## [Unreleased] has a pending entry', () => {
+  const tmp = mkTemp('fgos-changelog-check-');
+  fs.writeFileSync(
+    path.join(tmp, 'CHANGELOG.md'),
+    '# Changelog\n\n## [Unreleased]\n\n### Added\n\n- new thing\n\n### Changed\n\n### Fixed\n\n### Removed\n\n## [0.1.0]\n\n### Added\n\n- baseline\n',
+  );
+  const { passed, message } = checkById('changelog-unreleased-stale').check(tmp);
+  assert.equal(passed, true);
+  assert.match(message, /pending entr/);
+  fs.rmSync(tmp, { recursive: true, force: true });
+});
+
+test('fgos check (CLI e2e) reports changelogNag and appends a checkpoint to changelog-nag-history.jsonl', () => {
+  const cwd = mkTemp('fgos-changelog-nag-cli-');
+  execFileSync('git', ['init', '-q'], { cwd, encoding: 'utf8' });
+  const fgosDir = path.join(cwd, '.fgos');
+  initStore(fgosDir);
+  addWork(fgosDir, { id: 'delivered-item', title: 'delivered', kind: 'feature', risk: 'light', verify: 'true', status: 'delivered', deps: [], refs: [] });
+  fs.writeFileSync(
+    path.join(cwd, 'CHANGELOG.md'),
+    '# Changelog\n\n## [Unreleased]\n\n### Added\n\n### Changed\n\n### Fixed\n\n### Removed\n\n## [0.1.0]\n\n### Added\n\n- baseline\n',
+  );
+
+  const result = spawnSync(process.execPath, [FGOS, 'check'], { cwd, encoding: 'utf8', env: NO_CLAUDE_ENV });
+  assert.equal(result.status, 0, `fgos check failed: ${result.stderr}`);
+  const { data } = JSON.parse(result.stdout);
+  assert.deepEqual(data.changelogNag, { fileExists: true, hasEntries: false, deliveredCount: 1 });
+
+  const historyLines = fs
+    .readFileSync(path.join(fgosDir, 'changelog-nag-history.jsonl'), 'utf8')
+    .split('\n')
+    .filter(Boolean)
+    .map((l) => JSON.parse(l));
+  assert.equal(historyLines.length, 1);
+  assert.equal(historyLines[0].hasEntries, false);
+  assert.equal(historyLines[0].deliveredCount, 1);
+  fs.rmSync(cwd, { recursive: true, force: true });
 });
 
 test('tool-registry-configured always passes — inactive is a clean skip, never a failure', () => {
