@@ -254,6 +254,46 @@ its branch's merge is attempted — the ADR0020 wall and a merely-dirty
 working tree produce the same exit-128 symptom, and both need clearing
 before retrying.
 
+## Example: `tsk-28o` — a child item forked from an already-merged sibling inherits that sibling's own diff
+
+`tsk-28o` is `tsk-2c1`'s own sibling: both are children of the same parent
+(`tsk-2ie5`), split apart specifically because of this doc's own rule —
+`tsk-2c1` carried the code (`src/runner/dispatch.mjs`), `tsk-28o` carries
+only the `.fgos/config.json` registration, landed as a direct,
+single-parent commit on main (`7c86305`), same shape as `tsk-5ge`'s
+`5ca7a58` above. One new wrinkle this pairing surfaced that the `tsk-4eu`/
+`tsk-5ge` case never hit: `fgw/tsk-28o` forked from `fgw/tsk-2ie5` *after*
+`tsk-2c1` had already merged into it, so `changedFiles(repoRoot, item)`
+against trunk shows `tsk-2c1`'s entire `dispatch.mjs` diff as part of
+`tsk-28o`'s own — Iron Law's `matchedModules` names a file this item never
+touched:
+
+> `{"required":true,"matchedFlags":[],"matchedModules":["src/runner/dispatch.mjs"]}`
+> — real `classifyIronLaw` result, id `tsk-28o`
+
+The fix is not to silence or dispute the classifier — it's reading the
+real diff correctly, since a merge of this branch WOULD carry that file.
+The failing-test-first proof still only needs to cover what this item
+itself is actually responsible for: a new pinned test asserting the
+committed config's `capacities.gather` shape, temporarily reverted to
+`7c86305`'s own parent to prove it fails first, then restored to prove it
+passes — the same "prove it against reality, not against plausibility"
+discipline this doc's every other example already uses, just scoped
+narrower than the full inherited diff. `dispatch.mjs`'s own proof stays
+where it was actually produced: `docs/history/tsk-2c1/iron-law-evidence.md`,
+cited rather than re-derived.
+
+This item's own `verify` also needed the same narrowing step 5 already
+describes, for a THIRD reason beyond the two `tsk-5vf`/`tsk-4eu` already
+found (a `.fgos/`-path check that can't survive `fgos return`'s detached
+re-verify worktree; a second, unrelated pre-existing red test): a test
+asserting on the *live, shared* main-checkout `.fgos/config.json`'s
+content can go red mid-implementation because a concurrent session
+changed that file for unrelated work — `node --test
+--test-skip-pattern="declares the submit-assist-classify capacity" ...`
+was the fix here, naming the one test to skip rather than weakening the
+command wholesale.
+
 ## Related
 
 - `fgos check <id>` — shows the `fgos-write-blocked` friction entry quoted
@@ -355,3 +395,24 @@ config content change on main:
 > "Hand-edit .fgos/config.json: move runner.executors.judge into
 > runner.capacities.judge-decompose,"
 > — real work item title, id `tsk-5ge`
+
+A fifth capture, gathered the same way (`fgos doc-sources
+docs/how-to/fix-fgos-write-rejected-merge-block.md`), links `tsk-28o` to
+this same doc path:
+
+> ```json
+> {
+>   "id": "tsk-28o",
+>   "predicted": {"tier":"standard","deps":1,"priorVisits":0,"role":"session","branchHeadAtTake":"ea1096f621ca6aac59310324fd4af071defa08f0"},
+>   "actual": {"outcome":"awaiting-approval","passed":true,"attempts":1,"errorClass":null,"aheadCount":1},
+>   "docType": "how-to",
+>   "docPath": "docs/how-to/fix-fgos-write-rejected-merge-block.md"
+> }
+> ```
+> — real `work.outcome` capture, id `tsk-28o`
+
+That capture's own work item is `tsk-2c1`'s sibling — the config-half child
+that surfaced the inherited-diff wrinkle the new example above describes:
+
+> "Hand-edit .fgos/config.json: register the gather capacity (for/needs/carries)"
+> — real work item title, id `tsk-28o`
