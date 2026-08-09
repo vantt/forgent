@@ -42,11 +42,24 @@ real; the scan is the work.
 `gitnexus` registered and `present`.
 
 Posture: **degraded**, not full. `present` only means installed, never
-that the index is fresh (`CLAUDE.md`'s own gate, tsk-j7y). Item `tsk-1lg`
-records this index as 434 commits behind HEAD (last indexed `251d0b5`)
-and documents it returning a wrong "0 upstream callers" for
-`impact({target:"withMergeEphemeralWorktree"})` when grep found 4 real
-call sites.
+that the index is fresh (`CLAUDE.md`'s own gate, tsk-j7y).
+
+Corrected during execution: an earlier draft of this section said the
+index was 805 commits behind, taken from item `tsk-1lg`'s claim that
+`251d0b5` was the indexed commit. That was never checked against the real
+`.gitnexus/meta.json`, and it is wrong. Live: `lastCommit
+4ce7a967862bb14ad1d71a00589d26459a73727a`, `indexedAt
+2026-08-09T08:20:39.545Z` — re-indexed this morning, **39** commits
+behind `main`. `tsk-1lg`'s premise is stale; that item should be re-read
+before anyone works it.
+
+The posture verdict is unchanged — 39 commits behind is still `degraded`,
+and the harness itself reports "GitNexus index is stale" — but the
+durable problem `tsk-1lg` points at is not the number. It is that nothing
+reports the number: `fgos tool query` returns `status: present` with no
+freshness field, and doctor's `tool-registry-configured` check cannot
+return `passed: false` at all (`src/setup/registrations.mjs:326-345` —
+all three return paths are `passed: true`).
 
 This costs this item nothing: no proof point below leans on blast-radius
 evidence, because the item changes no symbols. Scan agents that consult
