@@ -1907,6 +1907,54 @@ D-ID chống lưng.
 
 ---
 
+### 7.0 Thứ tự triển khai {#task-order}
+
+Tính từ **chồng lấn footprint thật**, không phải từ độ ưu tiên cảm tính.
+
+| File | Ai đụng |
+|---|---|
+| **`src/runner/dispatch.mjs`** | `tsk-33w` · `tsk-592` · `tsk-1o7` · `tsk-2ie5` |
+| **`.fgos/config.json`** | `tsk-1o7` · `tsk-2ie5` · `tsk-5wz` |
+| `_shared/capacity-dispatch-fallback.md` | `tsk-592` · `tsk-1o7` |
+| `test/runner/dispatch.test.mjs` | bốn item trên |
+
+```
+LÀN 0 — song song, zero chồng lấn
+├── tsk-5wf   decision doc 0029           docs/decisions/      ← chạy ngay
+├── tsk-15d   sửa doc trôi nghĩa          docs/explanation/    ← chạy ngay
+└── tsk-33w   audit ghi command           (đang doing)         ← đang giữ dispatch.mjs
+
+LÀN 1 — sau khi tsk-33w nhả dispatch.mjs
+└── tsk-592   vị từ gác + đổi tên mechanism        ← MỘT MÌNH trên dispatch.mjs
+
+LÀN 2
+└── tsk-1o7   di trú needs/for                     ← MỘT MÌNH trên dispatch.mjs
+
+════════ chặn: tsk-5td phải đóng ════════
+
+LÀN 3
+└── tsk-2ie5  gather thành mẫu vật + carries
+
+LÀN 4
+└── tsk-5wz   tối ưu intake               (mergeAfter tsk-2ie5)
+```
+
+**Vì sao `tsk-592` trước `tsk-1o7`.** `592` đổi chuỗi `native`/`cli-spawn` →
+`in-process`/`out-of-process`. Làm `1o7` trước thì `592` phải đi đổi lại đúng
+những chuỗi `1o7` vừa viết; làm `592` trước thì `1o7` chỉ rebase lên tên mới.
+Rẻ hơn **một chiều**.
+
+**Vì sao `tsk-1o7` trước `tsk-2ie5`.** `for:` là thứ `1o7` dựng; `2ie5` là
+**consumer đầu tiên** của nó. Và `592` phải xong trước `2ie5` vì `2ie5` có thể
+tạo ra capacity kind ngoài-`cli` **đầu tiên** — đúng cái vị từ `592` sửa.
+
+**⚠ Ràng buộc chéo — ADR0020.** Ba item chạm `.fgos/config.json` (`tsk-1o7` ·
+`tsk-2ie5` · `tsk-5wz`) sẽ đụng `fgos-write-rejected` guard: một nhánh
+`fgw/<id>` **không bao giờ** mang được thay đổi `.fgos/` qua `fgos approve`.
+`tsk-4eu` vừa dính và phải tách `tsk-5ge` ra hand-edit trên main checkout.
+⇒ **Mỗi item trong ba cái đó phải tách phần config thành item con NGAY TỪ LÚC
+PLAN**, không để tới lúc merge mới phát hiện. Đã ghi vào cả ba.
+
 ### 7.1 Decision doc supersede `0026` {#task-decision-doc-0026}
 
 **Mục tiêu.** Một decision doc mới supersede **phần từ vựng** của `0026`, gộp
