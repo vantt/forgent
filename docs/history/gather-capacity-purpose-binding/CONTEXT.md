@@ -161,8 +161,13 @@ assuming the DISCUSSION.md file, since it is not reachable from here.
   reachable from this branch — see note above).
 - Impact-analysis capability gate (per `CLAUDE.md`): `fgos tool query
   --capability impact-analysis --status present` → gitnexus registered,
-  status `present` → posture **full**. `fgos-planning`'s proof points for
-  `dispatch.mjs`/`loop.mjs` blast radius should use it at full strength.
+  status `present` — but the index itself is stale (hook-reported: "last
+  indexed: 4ce7a96", predates this session's own commits on this branch)
+  → posture **degraded** per `CLAUDE.md`'s own three-way framing (`present`
+  only means installed, never that the index is fresh). `fgos-planning`'s
+  proof points may still use GitNexus output, but must mark that evidence
+  weak and cross-check any zero-result/"not found" answer with a direct
+  `rg`/`grep` pass before trusting it.
 
 ## Canonical references
 
