@@ -15,6 +15,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { spawnSync } from 'node:child_process';
 
 const RC_FILE_NAMES = ['.bashrc', '.zshrc'];
 
@@ -87,4 +88,41 @@ export function insertSourceLine(rcFilePath, integrationScriptPath) {
   const sourceLine = `source "${integrationScriptPath}"`;
   fs.appendFileSync(rcFilePath, `\n${comment}\n${sourceLine}\n`);
   return true;
+}
+
+/**
+ * Actually invokes `fgos --help` in a disposable subshell after sourcing
+ * `scriptPath`, having first stripped whichever underscore-prefixed
+ * functions sourcing introduced (tsk-2wpi) — simulating what a harness's
+ * shell-function snapshot can do to a real agent session (tsk-3k2's own
+ * incident: `fgos`/`fgos-runner` survive such a snapshot, but a
+ * `_`-prefixed helper they depend on does not). This is deliberately NOT a
+ * plain "source then call" probe: that alone never reproduces the failure
+ * (verified empirically -- a vanilla subprocess never strips underscore
+ * functions on its own), so the strip step is what makes this test the
+ * real defect instead of passing trivially both before and after a fix.
+ *
+ * Generalized rather than hardcoding `_fgos_repo_root`'s name: diffs the
+ * function table before/after sourcing to find exactly what the script
+ * itself introduced, so this stays a real regression guard against any
+ * future underscore-prefixed helper the script might grow, not just
+ * today's one instance.
+ *
+ * Never touches the user's own rc file or real shell state -- everything
+ * happens inside one throwaway `bash -c` subprocess.
+ */
+export function probeShellIntegrationInvocation(scriptPath) {
+  const script = `
+before=$(declare -F | awk '{print $3}')
+source "${scriptPath}" 2>/dev/null || exit 2
+after=$(declare -F | awk '{print $3}')
+introduced=$(comm -13 <(echo "$before" | sort) <(echo "$after" | sort) | grep '^_' || true)
+for fn in $introduced; do unset -f "$fn"; done
+echo "STRIPPED:$introduced"
+fgos --help >/dev/null 2>&1
+`;
+  const result = spawnSync('bash', ['-c', script], { encoding: 'utf8' });
+  const strippedLine = (result.stdout ?? '').split('\n').find((line) => line.startsWith('STRIPPED:')) ?? 'STRIPPED:';
+  const strippedFunctions = strippedLine.slice('STRIPPED:'.length).trim().split(/\s+/).filter(Boolean);
+  return { ok: result.status === 0, strippedFunctions };
 }
