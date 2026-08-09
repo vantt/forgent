@@ -491,6 +491,56 @@ Cơ học hoá được. Và ba ca cần người đều có **dấu hiệu máy
 | #4 chấp nhận rủi ro | verdict có hoãn-sang-sau-merge / best-effort |
 | #13 tool degraded | `fgos tool query` báo stale |
 
+### G. Red-check và bài toán chọn test (vòng 11 — ghi nhận là việc cần làm)
+
+**Sửa một phát biểu sai của tôi ở vòng 10.** Tôi đề xuất "cưỡng chế verify phải chạy xanh" như một
+trục của Q18. Người chủ sản phẩm bác: *"verify việc gì khi mà chưa làm gì hết?"* — **đúng.** Tại
+`validateApprove`, item ở `decompose` sắp sang `executing`, **chưa viết dòng code nào**. Verify
+đương nhiên đỏ.
+
+**Phép kiểm đúng không phải "xanh chưa" mà là:**
+
+1. **Verify có chạy được không** — lệnh parse được, file test nó nhắc có tồn tại, binary có thật.
+   Không hỏi kết quả, chỉ hỏi nó có cho ra phán quyết dứt khoát không.
+2. **Verify có ĐỎ không** — một verify **đã xanh sẵn trước khi làm gì cả là một verify vô nghĩa**;
+   nó không đo cái thay đổi. Đây chính là lớp `verify-miss`, và là bẫy phiên này tự sa vào sáng
+   2026-08-08 khi viết verify cho `tsk-5hg` (throw trong `.then()` async ⇒ `exit=0` dù kiểm hỏng).
+
+Đây là **thời điểm cuối cùng bắt được nó với giá rẻ**, trước khi đổ công vào `executing`. Và nó
+nhắm đúng lớp friction lớn nhất còn lại: `verify-miss` **0,43/item, 75% toàn bộ friction** sau khi
+gỡ judge.
+
+**Tách bạch với D6:** D6 giải quyết *gánh nặng yes/no* (43% → ~6%). Red-check giải quyết
+*`verify-miss`*. Hai vấn đề khác nhau, D6 đứng vững một mình.
+
+**Chi phí, và bài toán người chủ sản phẩm muốn giải.** Nhiều verify bắt đầu bằng `npm test` —
+**186 giây, 2.638 test**. Chạy toàn bộ suite ở mọi cổng cho một item chỉ đụng một file là lãng phí
+thấy được.
+
+> *"ngay từ những giai đoạn đầu anh đã từng phát hiện là một thay đổi nhỏ phải test hết cả bộ, bài
+> toán anh vẫn muốn giải là liệu có một loại graph/filter để xác định cụ thể một nhóm test liên
+> quan cần chạy thôi."*
+
+**Nguyên liệu đã có sẵn, chưa ai nối:**
+
+| Có sẵn | Cho gì |
+|---|---|
+| GitNexus `impact({target, direction})` | blast radius của một symbol — file nào, flow nào bị ảnh hưởng |
+| GitNexus `detect_changes()` | thay đổi này chạm symbol/flow nào |
+| `fgos` item's `footprint` | file item dự kiến chạm, **khai sẵn lúc submit** |
+| `fgos tool query --capability impact-analysis` | biết graph có present/stale không |
+
+Đường nối còn thiếu: **`footprint` → symbol → caller → file test**. Cả bốn mảnh đều tồn tại; chưa
+có ai ghép chúng thành một bộ chọn test.
+
+**Không trùng `tsk-3wr`** (done) — item đó về test **thừa và khó đọc** (34/70 file nhúng mã quyết
+định vào tên test), không phải test **chọn lọc**. Vấn đề này chưa ai giữ.
+
+**Cảnh báo đã ghi trong `AGENTS.md`:** trạng thái `present` của GitNexus *"chỉ nghĩa là tool đã cài,
+không bao giờ nghĩa là index còn tươi"* — bộ chọn test dựa trên graph **phải** xử lý ca stale, nếu
+không nó sẽ im lặng bỏ sót test. Chính phiên này vừa gặp: index hỏng FTS, `analyze` báo **exit 0
+dù thất bại**.
+
 ### Chưa rõ — cần bàn
 
 | # | Câu hỏi mở | Vì sao chưa quyết được |
@@ -507,6 +557,7 @@ Cơ học hoá được. Và ba ca cần người đều có **dấu hiệu máy
 | Q10 | **Cơ chế giải phóng chung (S1) hình dạng thế nào?** | Thay `ask.includes(<literal>)` bằng gì: một `gateId` ổn định trên mỗi ask? Một `releases` trỏ ngược? Chưa bàn. Đây là thứ quyết định `tsk-65i` là luật định tuyến hay là một cơ chế dữ liệu. |
 | Q11 | **Câu trả lời tự-đứng-được (S7) có cần cấu trúc không?** | STR70a đã dựng `rationale`/`alternatives`/`source` cho answer — có thể phần này đã giải quyết một nửa S7. Cần đọc `checkpoint-distillate-gate-provenance/` xem còn thiếu gì, trước khi thiết kế mới. |
 | ~~Q12~~ | ~~Judge thứ hai có đang thẩm định sai tầng không?~~ | ✅ **ĐÓNG ở vòng 6 — câu hỏi lỗi thời.** LLM judge đã bị `tsk-1x3` khai tử 2026-08-07 (commit `794df20`); thứ còn lại là hàm cơ học 14 dòng. Không cần sửa gì. Chi tiết + số đo: §3 "Bị lật ở vòng 6". |
+| **Q19** | **Red-check: verify phải chạy được VÀ đỏ trước khi vào `executing`** — và bài toán tối ưu đi kèm: có graph/filter nào xác định được **nhóm test liên quan** thay vì chạy cả bộ? | **Ghi nhận vòng 11 là việc CẦN LÀM.** Xem §3-G. |
 | **Q17** | **Nối quy ước `## Outstanding questions` vào hai skill viết artifact — đủ chưa, hay `hasOpenItems` cũng cần nới?** | Sửa phía skill là đúng hướng (giữ nguyên fail-closed). Nhưng chưa rõ: quy ước tiếng Anh cứng có hợp lý trong repo viết artifact bằng tiếng Việt không? Và `plan.md` có nên dùng cùng một mục với `CONTEXT.md`, hay mục riêng? |
 | **Q18** | **Trục cơ học nào cho phép `validateApprove` bypass?** *(viết lại ở vòng 10 — bản cũ hỏi "có đáng luôn cần người không" và gọi nhầm là quyết định sản phẩm)* | Không phải cổng sản phẩm: nó kiểm **khả thi**, dùng lại `planApprove.verify`, `NOT READY` bỏ qua câu hỏi. Hai cổng kia có `hasOpenItems` làm trục cơ học; cổng này **không có gì tương đương** nên nhảy thẳng sang "luôn hỏi người". Phân loại 13 ràng buộc (§3-E): ~9 máy làm được, ~3 cần người — và cả ba đều có dấu hiệu máy đọc được. Cần chốt: bộ trục cụ thể, và có cưỡng chế "verify phải chạy xanh thật" không. |
 | ~~Q16~~ | ~~Cái giá `tsk-1x3` khai báo có thành hiện thực không?~~ | ✅ **ĐÓNG ở vòng 10 — chưa.** `verify-miss`/item delivered: trước **0,45** → sau **0,43**, phẳng. Judge đó là chi phí thuần. Phạm vi: 28 item, ~1,5 ngày. Chi tiết §3-B. |
@@ -552,12 +603,8 @@ Cơ học hoá được. Và ba ca cần người đều có **dấu hiệu máy
 > có quy ước, xanh (`exit=0`) khi có. Bài học: **một `verify` chưa từng chạy đỏ thì chưa phải một
 > `verify`** — chứng minh cả hai chiều, không chỉ chiều xanh.
 
-**Ứng viên D-ID cho vòng 10** (nêu ở vòng 9, chờ một vòng):
-
-- **Đọc qua verb, ghi qua verb — ngôn ngữ hoàn toàn tự do.** Mọi consumer ngoài CLI/TUI-local gọi
-  `fgos <verb>` cho cả hai chiều; không link lib, không fold log thô, không ghi thẳng
-  `events.jsonl`. Đây là cách hoà giải `0014` chốt 1 (polyglot) với chốt 4 (đi qua cửa CLI), và nó
-  làm `p-09351985` thành không-chặn.
+| **D5** | **Đọc qua verb, ghi qua verb — ngôn ngữ hoàn toàn tự do.** Mọi consumer ngoài CLI/TUI-local gọi `fgos <verb>` cho cả hai chiều; không link lib, không fold log thô, không ghi thẳng `events.jsonl`. Hoà giải `0014` chốt 1 (polyglot) với chốt 4 (đi qua cửa CLI), và làm `p-09351985` thành **không-chặn**. | 10 (nêu V9, không bị sửa ở V10) | prose (chưa ghi event — xem ghi chú dưới) |
+| **D6** | **`validateApprove` bypass khi reality gate KHÔNG sinh ra ràng buộc nào; có bất kỳ ràng buộc nào → hỏi người.** Khớp chính xác dữ liệu: 94/108 (87%) không ràng buộc, 13 ca có ràng buộc đúng là những ca đáng hỏi, 0 lần phải hỏi lại. Chọn một-trục-tự-báo-cáo thay vì năm-trục-đoán-trước, vì hai trong ba ca cần phán đoán (#2, #4) **không phát hiện được từ trước** — chúng chỉ lộ khi skill viết verdict, mà chính skill là bên biết. Tái dùng nguyên `canAutoApprove`, chỉ thay `hasOpenItems`. | 10 (người chủ sản phẩm chọn phương án 5) | ✅ seq **9891** (`tsk-539`) |
 
 **Ứng viên D-ID cho vòng 8** (chưa đứng đủ vững):
 
@@ -1138,6 +1185,36 @@ hiện nó đã được sửa. Chi tiết §3 "Bị lật ở vòng 6".
   của khâu clarify, không phải điều kiện để submit. Và để nó nằm dạng prose là đúng rủi ro vừa xảy
   ra với D4 (mất 2 giờ vì chỉ có trong prose): `fgos ready`/`triage`/`list` không thấy thứ chỉ sống
   trong `DISCUSSION.md`.
+
+### Chưa có item · `validateApprove` bypass theo D6 {#task-validate-bypass}
+
+- **Mục tiêu:** cho `validateApprove` một trục cơ học — bypass khi reality gate không sinh ràng
+  buộc nào. Hạ 43% số cổng xuống ~6%.
+- **D-ID áp dụng:** **D6** (seq 9891).
+- **Tái dùng:** nguyên `canAutoApprove` (`src/state/gate-bypass.mjs`), chỉ thay `hasOpenItems` bằng
+  trục "verdict có ràng buộc không". Không luật mới, không lược đồ mới.
+- **Sửa ở:** `.claude/skills/fgos-validating/SKILL.md` khối `## Gate` (hiện hardcode
+  `--actor human`, dòng 182-184).
+- **Giữ nguyên, không đụng:** `NOT READY` vẫn bỏ qua câu hỏi và trả về planning; từ khoá rủi ro
+  vẫn override; tier vẫn phải được phủ.
+- **Draft verify:** chưa xác định — cần một test trên trục mới, tương tự
+  `test/state/gate-bypass.test.mjs` đã có cho `hasOpenItems`.
+- **Việc rẻ tách riêng, lộ ra từ phân loại:** ca #1 và #7 là **`deps` bị viết thành văn xuôi**. Nếu
+  ràng buộc dạng "chờ item X xong" luôn khai thành `deps`, chúng biến mất khỏi cổng — engine đã
+  cưỡng chế sẵn.
+- **Chưa submit.**
+
+### Chưa có item · Red-check + bộ chọn test {#task-red-check}
+
+- **Mục tiêu:** (1) verify phải **chạy được và đỏ** trước khi vào `executing`; (2) một graph/filter
+  chọn **nhóm test liên quan** thay vì chạy cả 2.638 test.
+- **Trích §3-G.**
+- **Quan hệ:** độc lập D6. Nhắm `verify-miss` (0,43/item, 75% friction), không nhắm gánh nặng gate.
+- **Nguyên liệu đã có:** GitNexus `impact`/`detect_changes` · `footprint` của item ·
+  `fgos tool query`. Đường nối thiếu: `footprint → symbol → caller → file test`.
+- **Rủi ro phải xử lý từ đầu:** index stale ⇒ bỏ sót test im lặng. `AGENTS.md` đã cảnh báo
+  `present ≠ tươi`; phiên này vừa gặp ca `analyze` báo exit 0 dù thất bại.
+- **Chưa submit** — cần đo chi phí thật trước (bao nhiêu verify chứa `npm test`).
 
 ### `tsk-64e` · Trang hợp đồng participant {#task-participant-contract}
 
