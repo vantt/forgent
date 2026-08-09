@@ -103,6 +103,7 @@ không mở lại những quyết định các item khác đã khoá.
 | 29 | `adapter` — suy dẫn thứ 5 cho A3 | **Rõ** (vòng 8) | `EXECUTOR_ADAPTERS` đúng 1 key, `DEFAULT_ADAPTER = 'cli-spawn'` — **trùng chuỗi** với giá trị mechanism #3 (dẫn xuất). Hai tầng khác nhau đội chung một chuỗi, hôm nay không phân biệt được vì chỉ có một adapter. Ngày `rpc`/`app-server` (đã deferred, cùng doc comment) được đăng ký: nhà cung cấp vẫn **ngoài** nhưng adapter là `rpc` ⇒ tên `cli-spawn` cho **mechanism** thành sai. Xác nhận A3 từ hướng hoàn toàn khác |
 | 30 | #1 gộp hai câu hỏi | **Đang hội tụ** (vòng 8) — **đụng `tsk-2cw`, chờ người dùng** | `0028` (accepted, supersedes 0026) đã lập luận sẵn hai tính chất độc lập: **arity** (1 vs N) và **có ở lại không** (bước ra vs giữ liên hệ liên tục). Bảng: (1,buông)=`launcher` · (1,ở lại)=`driver` · (N,ở lại)=`orchestrator` · (N,buông)=**trống**. `0026`: *"Vai trò launcher KHÔNG CẦN soul ... THUẦN CƠ HỌC"* ⇒ nhu-cầu-phán-đoán bám theo **cột**, không theo arity |
 | 31 | `orchestrator` là tầng trên, không phải ô thứ ba | **Đang hội tụ** (vòng 8) | `fgos-fanout` spawn N Agent, **mỗi Agent chạy `/fgOS:pick` end-to-end** ⇒ mỗi cái là một `driver`. Nên orchestrator = **hợp thành** (N lần dấn thân con), không phải anh em ngang hàng. Đề xuất: #1 rút về **2 giá trị**, `orchestrator` ra khỏi enum lên tầng hợp thành — đúng chỗ `tsk-2cw` đang chừa |
+| 39 | Phép thử thứ ba của D2: **ai sở hữu tiêu chí** | **Đề nghị** (vòng 11) | Dùng khi một response mang cả digest lẫn nhãn phán. `gather` = tiêu chí ở **bên gọi** · `judge` = tiêu chí ở **bên được gọi**, bên gọi **tuân**. Ca thử: `impact()` của gitnexus trả cả caller-list lẫn `risk` — nhưng `CLAUDE.md` bắt **cross-check trước khi tin** ⇒ không tuân ⇒ **gather**, `risk` là *verdict giả*. Kiểm ngược: `judge-discovery` bên gọi tuân ⇒ judge thật. §6.3 |
 | 38 | 11 capability của hn xếp đâu | **Đề nghị** (vòng 11) | **T4 phía cung**, không ngang `gather`/`judge` (thuộc tính của nhà cung cấp, không của một lần dispatch). Cũng **không ngang `gitnexus`**: cả 11 tả **chính cái sổ**, do harness CLI tự khai qua `query.contract`. Ô tương ứng của fgOS — *sổ tự khai năng lực + dải schema* — **đang trống**, latent thật vì global/project install có thể lệch version. §6.5 |
 | 34 | Ô "mục tiêu ngoài sổ" đã có tên | **Đang hội tụ** (vòng 10) | **`errand`** — quét sạch 0 hit ở `src/`, `docs/`, `upstreams/`. Bác `cell` (false friend: bee's cell CÓ claim/reservation/registry) và `packet` (kéo theo khung *"orthogonal axes"* D1 đã bác). Bốn phép thử ở §6.3, sắc nhất: **không sở hữu branch/merge riêng**. Vẫn gated `tsk-2t6` |
 | 35 | `capacity` rút về một nghĩa (P1) | **Đề nghị** (vòng 10) | Chỉ còn **bản ghi binding** T3. Giết A1 bằng cấu trúc, config không breaking. ⚠ supersede định nghĩa `capacity` của `0026` |
@@ -564,6 +565,23 @@ mình** — kèm `cli_version`, `schema_minimum/maximum`, `database_state`. Ánh
 được đăng ký. Ô đó của fgOS **đang trống**, và latent thật (global vs project
 install lệch version). Phân tích + bảng rà kho đặt tại §6.5.
 
+### Vòng 11b — 2026-08-09 — `impact-analysis` là gather hay judge?
+
+**Người dùng:** *"như vậy impact-analysis là gì, gather or verdict?"*
+
+Hai lớp trả lời. **Nghiêm ngặt: sai tầng** — `impact-analysis` là một
+`capability` (T4), ngang hàng `submit-assist-classify`, không ngang `gather`/
+`judge` (T2). Cái *là* gather là **lần dispatch** đi hỏi nó.
+
+**Nhưng lần dispatch đó là gì thì hai phép thử cũ của D2 không phân được**:
+`impact()` trả cả danh sách caller (digest) lẫn `risk: HIGH/CRITICAL` (trông
+như verdict), và cả hai kiểu lỗi đều có thật. Sinh ra **phép thử thứ ba: ai sở
+hữu tiêu chí** — chi tiết và ca kiểm hai chiều đặt tại §6.3.
+
+Kết: **gather**, `risk` là verdict giả. Bằng chứng là chính `CLAUDE.md` bắt
+cross-check trước khi tin, và luật viết *"HIGH thì cảnh báo người dùng"* chứ
+không phải *"HIGH thì dừng"*.
+
 ## 6. Thiết kế đã chốt {#design}
 
 > **Regenerate lần 3 — bản sau vòng 10.** Vòng 10 đổi hình dạng thật (T2 thành
@@ -669,6 +687,37 @@ dùng khi nói chuyện; bản D1 dùng khi cần kiểm.
 Hai loại lỗi khác nhau ⇒ hai cách sửa khác nhau; trộn lại thì mất tín hiệu sửa
 lỗi. Tên **không phát minh mới**: `judge`/`verdict` đã vào code (38 + 186 hit),
 `gather`/`digest` đã ghim ở doc (`tsk-5kn`).
+
+**Phép thử thứ ba, dùng khi một response mang cả hai kiểu: *ai sở hữu tiêu
+chí?*** [ĐỀ NGHỊ — vòng 11]
+
+| | tiêu chí nằm ở đâu | bên gọi làm gì với kết quả |
+|---|---|---|
+| `gather` | ở **bên gọi** | tự áp tiêu chí lên dữ liệu nhận được |
+| `judge` | ở **bên được gọi** | **tuân** kết quả |
+
+Ca thử thật — hỏi `gitnexus` blast radius. `impact()` trả về *"direct callers,
+affected processes, **risk level**"*: danh sách caller là **digest**; trường
+`risk: HIGH/CRITICAL` trông như **verdict**. Hai kiểu lỗi cũng đều có thật
+(thiếu caller vì index cũ → sửa bằng reindex; `risk` sai → đổi tiêu chí hoặc
+người vào cuộc) ⇒ hai phép thử đầu không phân được.
+
+Phép thử thứ ba phân được, và bằng chứng nằm ngay trong `CLAUDE.md` của repo
+này: một *"suspicious zero-result … is worth a quick grep/rg **cross-check**
+before being trusted"*, cộng `tsk-j7y` (`present` không bao giờ nghĩa *index
+còn tươi*). **Đối chiếu chéo trước khi tin = không tuân** ⇒ tiêu chí nằm ở bên
+gọi ⇒ **`impact()` là một `gather`**, và trường `risk` là **verdict giả** —
+một nhãn nhà cung cấp tính sẵn nhưng fgOS đối xử như **bằng chứng**. Luật viết
+*"HIGH thì **cảnh báo người dùng**"*, không phải *"HIGH thì dừng"* — người mới
+là bên phán.
+
+Chạy ngược lại để kiểm phép thử: `judge-discovery` sở hữu tiêu chí
+clear/không-clear và bên gọi **tuân** (`fgos discover` ghi thẳng vào state)
+⇒ `judge` thật. Phép thử đúng cả hai chiều.
+
+⚠ Kèm theo: `impact-analysis` là một **`capability`** (T4), không phải giá trị
+T2. Hỏi *"`impact-analysis` là gather hay judge"* là sai tầng — nó ngang hàng
+`submit-assist-classify`. Cái **là** `gather` là **lần dispatch** đi hỏi nó.
 
 #### `errand` — ô mục tiêu ngoài sổ [ĐỀ NGHỊ — vòng 10] ⛔ vẫn gated
 
