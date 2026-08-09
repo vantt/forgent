@@ -21,6 +21,8 @@ hành nào khiến câu hỏi gate trở nên trả lời được"*.
 | 5 | Phản biện có bằng chứng → sửa lại thứ tự; **launcher và tầng 0 là cùng một việc** |
 | 6 | Kiểm Q12 → **judge thứ hai ĐÃ bị khai tử trước cuộc bàn này**; 64% là ảnh chụp một cửa sổ đã đóng |
 | 7 | Người chủ sản phẩm bác kết luận vòng 6 → **đo nhầm kênh**; yes/no thật nằm ở `gate-approve`, gấp 8 lần, và cơ chế giảm nó đã chết |
+| 8-9 | `tsk-5hg` giao và **tự chứng minh chính nó**; `tsk-3vv` đo độ trôi backlog; ràng buộc đa ngôn ngữ hoá ra vốn đã nới |
+| 10 | `contextApprove` sạch sau khi gỡ judge; Q16 trả lời; **`validateApprove` không phải cổng sản phẩm** — người chủ sản phẩm sửa tôi |
 
 **⚠️ Hai chỗ phải đọc trước khi dùng bất kỳ con số nào ở dưới — §3 "Bị lật ở vòng 6" và "Bị lật ở
 vòng 7".**
@@ -398,6 +400,97 @@ khả năng đó cho mọi consumer ngoài CLI và TUI-local.
 rồi tự suy ra. Một trang gom bốn thứ đó lại biến chốt 1 của `0014` từ **tuyên bố** thành **dùng
 được**. → item **`tsk-64e`** (kind `docs`, `todo/clarify`).
 
+### Vòng 10 — `contextApprove` đã sạch, và `validateApprove` bị hiểu sai
+
+**A. `contextApprove` lặp 30% — cũng là judge, cũng đã hết.**
+
+| | Item | Bị hỏi lại | Nhiều nhất |
+|---|---|---|---|
+| Trước gỡ judge | 90 | **27 · 30%** | 6 lần |
+| Sau gỡ judge | 9 | **0 · 0%** | 1 lần |
+
+Cơ chế truy được tận gốc từ `tsk-f38` (04-08, 6 lần trong 14 phút — tất cả **trước** khi stage tiến,
+nên **không** phải quay lại từ planning):
+
+```
+gate contextApprove (người duyệt)
+  → discover --verdict clear
+    → park: "Đề xuất verify bị nghi ngờ…"        ← judge verify chặn
+      → người sửa lệnh verify
+        → discover lại → park lại → … 6 vòng
+```
+
+Người bị hỏi *"context đủ chưa"* đúng **một lần**; năm lần sau là bị kéo lại vì một judge **khác**
+chặn ở downstream, và mỗi lần quay lại thì gate bị đóng dấu lại từ đầu.
+
+**Trả lời câu hỏi "context đầy đủ sau bước nào":** sau bước 3 của `fgos-exploring` — gate đặt
+**đúng chỗ**. Thứ chưa đủ không phải context mà là lệnh `verify`. Khớp với `validateApprove`
+**0/108 lần lặp** — tới đó verify đã chốt.
+
+**B. Q16 trả lời: cái giá `tsk-1x3` khai báo KHÔNG thành hiện thực.**
+
+`verify-miss` trên mỗi item `delivered`: **trước 0,45 → sau 0,43**. Phẳng.
+
+Nên LLM judge đó là **chi phí thuần** — tạo ra 202 lượt hỏi người và 30% `contextApprove` lặp lại,
+trong khi chất lượng verify không nhờ nó. Lưu ý phạm vi: 28 item sau khi gỡ, ~1,5 ngày; đủ để nói
+"không tệ đi", chưa đủ để nói "không bao giờ".
+
+`verify-miss` vẫn là lớp friction lớn nhất — **12/16 = 75%** friction sau khi gỡ judge. Không tệ
+đi, nhưng cao. Đó là chuyện **chất lượng viết verify lúc submit/clarify**, không phải chuyện judge.
+
+**C. `validateApprove` KHÔNG phải cổng quyết-định-sản-phẩm — sửa phát biểu của vòng 7.**
+
+Người chủ sản phẩm bác: *"validate này là shape để execute thôi đúng không, đâu còn gì cần quyết
+định về tiêu chí sản phẩm?"* — **đúng**, và skill tự nói vậy:
+
+- Câu hỏi nguyên văn: *"**Feasibility** validated. Approve moving to executing?"*
+- **Dùng lại** `planApprove.verify`, *"does not design a new one"*
+- `NOT READY` **bỏ qua câu hỏi hoàn toàn**, trả về `fgos-planning`
+
+Quyết định sản phẩm đã chốt ở `contextApprove`; hình dạng ở `planApprove`. Tới đây chỉ còn *"bằng
+chứng có đủ không"* — phán đoán **kỹ thuật/bằng chứng**, không phải sản phẩm.
+
+**D. Cổng này có bao giờ nói không chưa — gần như không.**
+
+| | |
+|---|---|
+| Item qua `planApprove` | 105 |
+| Item qua `validateApprove` | 108 |
+| Qua plan nhưng **không** qua validate | **1** (`tsk-38t`) |
+| Verdict `NOT READY` | **1** |
+| `READY WITH CONSTRAINTS` | 13 |
+
+**1/105 lần từ chối.** Nhưng 13 ca `READY WITH CONSTRAINTS` cho thấy cổng **không** phải con dấu
+trắng — giá trị của nó là **ghi ràng buộc**, không phải **chặn**.
+
+**E. Phân loại 13 ràng buộc đó** (đọc được đầy đủ 8/13; 5 ca không ghi chi tiết — tỉ lệ dưới là
+ước lượng, cần đọc lại từ `docs/history/*/plan.md` trước khi thi công):
+
+| Máy làm được — 9 | Bằng chứng |
+|---|---|
+| #1 | *"blocked on tsk-4j9… **engine-enforced via deps**"* — **thừa**, deps đã cưỡng chế |
+| #3 | *"~11 decompose test fixtures need reason field"* — đếm được |
+| **#8** | *"Reality gate **initially FAILED** repo-fit — plan misattributed `checkConfigNotStale` to `checks.mjs`; real home is `registrations.mjs`"* — **bắt lỗi sự thật trong plan**, kiểm bằng grep |
+| #10 | *"all PASS with real evidence… live `node --test`: 172/172 pass"* — verify chạy xanh |
+| #12 | *"mode fit PASS, repo fit PASS (`bin/fgos.mjs:3713` confirmed live), assumptions PASS, smaller-path PASS, proof surface PASS"* — 5 check có trích file:line |
+| #13 | *"GitNexus **degraded** (474 commit stale), cross-check bằng `rg`"* — trạng thái tool đo được |
+
+| Cần người — 3 | Vì sao |
+|---|---|
+| #2 | *"real herdr smoke test… confirm `min_herdr_version`"* — thế nào là đủ |
+| #4 | *"Pha B chạy thủ công sau merge, best-effort, **rủi ro đã đo THẤP, tự-chữa-lành**"* — **chấp nhận rủi ro** |
+| #9 | *"SKILL.md's classify-branch proof **necessarily live-walkthrough + prose review**"* — thuần prose, **không có bề mặt test** |
+
+**F. Reality gate vốn đã là checklist có tên.** Ca #10/#12 liệt kê 5–6 mục (*mode fit · repo fit ·
+assumptions · smaller path · proof surface · impact-analysis posture*), mỗi mục PASS kèm trích dẫn.
+Cơ học hoá được. Và ba ca cần người đều có **dấu hiệu máy đọc được**:
+
+| Ca | Dấu hiệu |
+|---|---|
+| #9 prose-only | `footprint` chỉ gồm `*.md`/`SKILL.md` → không bề mặt test |
+| #4 chấp nhận rủi ro | verdict có hoãn-sang-sau-merge / best-effort |
+| #13 tool degraded | `fgos tool query` báo stale |
+
 ### Chưa rõ — cần bàn
 
 | # | Câu hỏi mở | Vì sao chưa quyết được |
@@ -415,8 +508,9 @@ rồi tự suy ra. Một trang gom bốn thứ đó lại biến chốt 1 của 
 | Q11 | **Câu trả lời tự-đứng-được (S7) có cần cấu trúc không?** | STR70a đã dựng `rationale`/`alternatives`/`source` cho answer — có thể phần này đã giải quyết một nửa S7. Cần đọc `checkpoint-distillate-gate-provenance/` xem còn thiếu gì, trước khi thiết kế mới. |
 | ~~Q12~~ | ~~Judge thứ hai có đang thẩm định sai tầng không?~~ | ✅ **ĐÓNG ở vòng 6 — câu hỏi lỗi thời.** LLM judge đã bị `tsk-1x3` khai tử 2026-08-07 (commit `794df20`); thứ còn lại là hàm cơ học 14 dòng. Không cần sửa gì. Chi tiết + số đo: §3 "Bị lật ở vòng 6". |
 | **Q17** | **Nối quy ước `## Outstanding questions` vào hai skill viết artifact — đủ chưa, hay `hasOpenItems` cũng cần nới?** | Sửa phía skill là đúng hướng (giữ nguyên fail-closed). Nhưng chưa rõ: quy ước tiếng Anh cứng có hợp lý trong repo viết artifact bằng tiếng Việt không? Và `plan.md` có nên dùng cùng một mục với `CONTEXT.md`, hay mục riêng? |
-| **Q18** | **`validateApprove` có đáng luôn luôn cần người không?** | `actor` hardcode `human`, không có đường bypass nào (skills-scanner xác nhận). Chiếm **44%** số cổng gần đây. Đây là gate chứng-minh-khả-thi — lập luận giữ người rất mạnh (nó là chốt chặn cuối trước khi tiêu tiền thật vào executing). Nhưng nếu giữ, thì trần dưới của gánh nặng yes/no là ~1/3, và mọi nỗ lực khác chỉ chạm được 2/3 còn lại. **Quyết định sản phẩm, không phải kỹ thuật.** |
-| **Q16** | **Cái giá `tsk-1x3` khai báo có thành hiện thực không?** — bản thay thế cơ học tự khai KHÔNG bắt được "verify đúng cú pháp nhưng nhắm sai mục tiêu"; trách nhiệm chuyển sang skill gọi + `fgos-validating`. | Thay Q12. Đo bằng xu hướng `verify-miss` (nền: 87/141 = 62% friction, tính tới 2026-08-08). Nếu tăng sau vài ngày ⇒ việc chuyển trách nhiệm chưa được đỡ. **Chỉ đo được bằng thời gian**, không đọc code ra được. |
+| **Q18** | **Trục cơ học nào cho phép `validateApprove` bypass?** *(viết lại ở vòng 10 — bản cũ hỏi "có đáng luôn cần người không" và gọi nhầm là quyết định sản phẩm)* | Không phải cổng sản phẩm: nó kiểm **khả thi**, dùng lại `planApprove.verify`, `NOT READY` bỏ qua câu hỏi. Hai cổng kia có `hasOpenItems` làm trục cơ học; cổng này **không có gì tương đương** nên nhảy thẳng sang "luôn hỏi người". Phân loại 13 ràng buộc (§3-E): ~9 máy làm được, ~3 cần người — và cả ba đều có dấu hiệu máy đọc được. Cần chốt: bộ trục cụ thể, và có cưỡng chế "verify phải chạy xanh thật" không. |
+| ~~Q16~~ | ~~Cái giá `tsk-1x3` khai báo có thành hiện thực không?~~ | ✅ **ĐÓNG ở vòng 10 — chưa.** `verify-miss`/item delivered: trước **0,45** → sau **0,43**, phẳng. Judge đó là chi phí thuần. Phạm vi: 28 item, ~1,5 ngày. Chi tiết §3-B. |
+| ~~Q16-cũ~~ | ~~(bản gốc, giữ để tra ngược)~~ — bản thay thế cơ học tự khai KHÔNG bắt được "verify đúng cú pháp nhưng nhắm sai mục tiêu"; trách nhiệm chuyển sang skill gọi + `fgos-validating`. | Thay Q12. Đo bằng xu hướng `verify-miss` (nền: 87/141 = 62% friction, tính tới 2026-08-08). Nếu tăng sau vài ngày ⇒ việc chuyển trách nhiệm chưa được đỡ. **Chỉ đo được bằng thời gian**, không đọc code ra được. |
 | ~~Q13~~ | ~~Web UI nên là Rust thứ hai hay tiến trình Node cạnh CLI?~~ | ✅ **ĐÓNG ở vòng 9 — câu hỏi đặt sai tiền đề.** Lựa chọn **không** phụ thuộc `p-09351985` như vòng 4 giả định: theo `0014` chốt 4, kể cả chọn Node thì web server vẫn phải spawn `fgos <verb>`, **không được link lib**. Ngôn ngữ hoàn toàn tự do — tiêu chí thật chỉ là tái dùng `ports.rs`/`WorkItemSource` đã có. Chi tiết §3 "Làm rõ ở vòng 9". |
 | **Q14** | **"Một item một lần" nghĩa là một-tiến-trình-một-item (vẫn song song), hay tuần tự thật?** | Config đang khai `parallel: {maxRoots:4, maxLeavesPerRoot:4}` và `fgos schedule` đã tính sẵn sóng song song theo footprint. Tuần tự thật làm hai thứ đó chết và tụt throughput (~40 item/ngày hiện tại) — chấp nhận được nếu là lựa chọn có ý thức, không phải hệ quả phụ. Đề xuất: một tiến trình một item, nhiều tiến trình song song theo `schedule`. |
 | **Q15** | **Launcher có tự chạy mặc định không?** | Tự chạy gỡ được tắc nghẽn nhưng biến nó thành thứ hành động không ai giám sát trên repo thật — mà `p-73d99989` (force-xoá worktree, hạng CRITICAL) **vẫn chưa vá**. |
@@ -961,6 +1055,21 @@ hình dạng công việc. Đây là Q10, và nó chặn việc chốt phạm vi
 Tương tự với `tsk-539`: viết `ask` tự đứng được là việc tầng 3, nhưng nếu `ask` vẫn là một ô văn
 xuôi tự do bị ghi đè (S5/S6) thì không có chỗ nào để **cưỡng chế** yêu cầu đó — chỉ còn cách nhắc
 trong prose, tức đúng cơ chế đã không hoạt động suốt 152 lần.
+
+### Hình dạng đề xuất cho `validateApprove` (vòng 10, chưa chốt)
+
+Đối xứng với hai cổng kia, **tái dùng nguyên `canAutoApprove`** — chỉ thay `hasOpenItems` bằng một
+trục mới. Không luật mới, không lược đồ mới.
+
+| | Điều kiện |
+|---|---|
+| **Bypass** | mọi mục reality gate PASS · verify **chạy xanh thật** · tier được phủ · không trúng từ khoá rủi ro · footprint **có bề mặt test** (không prose-only) |
+| **Hỏi người** | bất kỳ mục nào FAIL · verify đỏ hoặc chưa chạy · có hoãn-sang-sau-merge/best-effort · prose-only · `heavy` · tool impact-analysis degraded |
+
+Cả năm điều kiện "hỏi người" đều **đo được**, không phải cảm nhận — xem bảng dấu hiệu ở §3-F.
+
+Điểm mạnh nhất của hình dạng này: nó giữ đúng ca #8 (plan trỏ sai file) trong vùng máy bắt được —
+"symbol plan nhắc có nằm trong file plan nói không" là một phép grep, không phải phán đoán.
 
 ### Ràng buộc thứ tự đã chốt (D1)
 
