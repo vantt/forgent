@@ -63,6 +63,8 @@ cài đặt/setup/doctor story. Before any change is done, ask:
   all, read `docs/distribution-vision.md` and `docs/specs/distribution.md`
   first — a new module gets a spec/config-registry entry before it gets
   code, same bar as a new product area (question 2 above).
+- Does this change something a user of fgOS would see? If yes, add a line
+  to `## [Unreleased]` in `CHANGELOG.md`.
 
 ## Changing a locked law
 
