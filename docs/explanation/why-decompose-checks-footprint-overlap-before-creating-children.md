@@ -78,6 +78,41 @@ footprint-overlap gate doesn't need that: it's re-derived from a
 next `judgeDecompose` call toward proposing non-overlapping children, the
 check simply passes on its own — no separate bypass constant required.
 
+## The same rule, applied live by a session instead of the automatic gate (`tsk-36i`)
+
+The gate above fires inside `judgeDecompose`'s own model-backed pass. A
+session reasoning live at `decompose` (a caller-supplied pass-through
+verdict, not a `judgeDecompose` call) hits the identical footprint-overlap
+fact and has to apply the same rule itself, with no gate to catch it
+automatically.
+
+`tsk-36i` — a read-only, multi-area project scan producing one ranked
+findings report — considered and rejected splitting into six per-area
+fgOS child items, for exactly this reason:
+
+> "Một sáu-way split into fgOS child items was considered and rejected --
+> every child would carry its own worktree and human merge gate for a
+> read-only investigation that changes no code, and all six would declare
+> the same single report file as footprint, which
+> `src/intake/decompose.mjs:741`'s `footprintOverlapAmong` flags as a real
+> sibling collision."
+> — real `work.decision` capture, id `tsk-36i`
+
+The resolution kept the parallelism the item actually wanted — several
+independent scan agents fanning out by area — but at the *agent* level
+inside a single `executing` stage, not as separate fgOS backlog children
+each racing to write the same report file. Real findings that warranted
+their own follow-up work were filed afterward as new, separate items, one
+per evidence-backed finding, rather than as pre-declared children that
+would have collided on footprint before any of them had real content to
+split by.
+
+This is the same lesson the automatic gate above encodes, reached the
+same way a human reviewing a proposed split would: two children (or six)
+that would declare the same file as footprint are a collision waiting to
+happen at merge time, whether a person notices it during live planning or
+`footprintOverlapAmong` catches it mechanically inside `judgeDecompose`.
+
 ## Why this stayed a single, unsplit change
 
 `judgeDecompose` returned pass-through: one file, one function (the
