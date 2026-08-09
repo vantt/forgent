@@ -93,6 +93,21 @@ instead of by tier) is D6 of tsk-5td (`for:`) and tsk-2ie5's scope — not
 touched here. This item only makes the wrong config fail loudly and
 routes `judge-decompose` to the right args.
 
+## Correction during executing: `.fgos/config.json` cannot ship on this branch
+
+Discovered at `fgos approve` time, not planning time: `merge.mjs`'s
+`fgos-write-rejected` guard (ADR0020) permanently refuses any `fgw/<id>`
+branch merge that stages a change under `.fgos/`. See
+`iron-law-evidence.md`'s own section on this for the full recipe
+(`docs/how-to/fix-fgos-write-rejected-merge-block.md`, precedent
+`tsk-5vf`/`tsk-n4i-1`). `.fgos/config.json`'s content fix
+(`executors.judge` → `capacities.judge-decompose`) was dropped from this
+branch entirely (commit `97d54a1`) and must land as a separate, direct
+operator commit on the main checkout — outside this item's own merge.
+This item's own delivered scope narrows to: the `TIERS`-key validation in
+`src/runner/dispatch.mjs`, and the two pinned regression tests in
+`test/runner/dispatch.test.mjs`.
+
 ## Outstanding questions
 
 None

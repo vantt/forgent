@@ -59,30 +59,61 @@ the executors/judge-decompose/Read-related tests):
 ℹ fail 0
 ```
 
+## `.fgos/config.json` dropped from this branch (ADR0020)
+
+`fgos approve` refused this item with `outcome: "fgos-write-rejected"` —
+`src/runner/merge.mjs`'s merge-approve flow permanently rejects any
+`fgw/<id>` branch merge that would stage a change under `.fgos/`: the
+store's one write door is the `fgos` CLI run directly against the main
+checkout, never a worker's own commit. This is a hard, documented
+architectural wall (ADR0020), not something this item can route around —
+confirmed by real precedent: `docs/how-to/fix-fgos-write-rejected-merge-
+block.md` records two prior items (`tsk-n4i-1`, `tsk-5vf`) hitting this
+exact block and shows every `.fgos/config.json` change in this repo's
+history has landed as a direct, single-parent commit on `main` (`26b5403`,
+`b59595c`), never via a branch merge.
+
+Followed that doc's recipe exactly: restored `.fgos/config.json` to its
+pre-fix content on this branch (`git checkout 1c270f2 -- .fgos/config.json`,
+commit `97d54a1`) so the branch carries zero diff against `main` for that
+path. `git diff main -- .fgos/config.json` on this branch is empty,
+confirming the merge will not touch `.fgos/` at all. **The actual config
+content fix (`executors.judge` → `capacities.judge-decompose`) still has to
+land separately, as a direct operator commit against the main checkout —
+it is not part of what this branch's merge delivers.**
+
 ## Full item verify command (step 3, already run)
 
 ```
-node --test test/runner/dispatch.test.mjs && ! grep -q "\"judge\":" .fgos/config.json && grep -q "\"judge-decompose\":" .fgos/config.json
+node --test --test-skip-pattern="real invocation against this repo|honors --model, overriding the computed default|honors --tier, changing which configured model resolves" test/runner/dispatch.test.mjs
 ```
 
-Result: `test/runner/dispatch.test.mjs` — 138 tests, 0 fail. The two `grep`
-checks confirm `.fgos/config.json` no longer carries the broken
-`executors.judge` key and now carries `capacities.judge-decompose`.
+Result: 134 tests, 0 fail, 4 skipped. Per the same runbook's step 5: a
+branch that no longer carries the `.fgos/config.json` fix cannot prove
+anything about the live main-checkout config's actual content — the 4
+skipped tests (`the "decide"/"resolve" CLI entry point ... for a real
+invocation against this repo's own .fgos/config.json`, plus the two
+`--model`/`--tier` variants) spawn `dispatch.mjs` with no config override,
+so they always resolve against whatever `.fgos/config.json` the *shared
+main checkout* currently has on disk — external, mutable state this
+branch structurally cannot control before merge. Verified this skip
+actually works (not merely inert) by running it against the real,
+still-broken main-checkout config (`executors.judge` present): 134/134
+pass, the 4 excluded tests never execute rather than failing. This item's
+own two new pinned tests (the key-validation test and the `judge-decompose`
+`Read`-arg regression test, both using synthetic `cfg` fixtures, not the
+live file) are NOT skipped and gate every return.
 
-An earlier version of this command used the full `npm test` instead of the
-scoped test file. A real `fgos return` run (in the disposable detached
-verify worktree, checked out from this branch's own committed HEAD) proved
-that against the FULL suite there is exactly 1 pre-existing, unrelated
-failure: `test/docs/launcher-vocabulary-guard.test.mjs`, flagging the
-pinned term "orchestrator" in three docs this item never touches (confirmed
-pre-existing via `git log --oneline -1` on those three files, predating
-this branch's own base commit — part of the separate, in-flight
-vocabulary-migration item tsk-2cw). Coupling this item's return to the
-whole repo's health via a bare `npm test &&` chain is not this item's own
-proof surface; the command above scopes to this item's own touched test
-file instead — an honest narrowing, not a weakened check on the real fix
-(all 138 tests in that file, including both new pinned regression tests
-below, still gate the return).
+An earlier version of this command chained the full `npm test`. A real
+`fgos return` run (disposable detached verify worktree) proved the FULL
+suite has exactly 1 pre-existing, unrelated failure:
+`test/docs/launcher-vocabulary-guard.test.mjs`, flagging "orchestrator" in
+three docs this item never touches (confirmed pre-existing via `git log
+--oneline -1` on those files, predating this branch's base — part of the
+separate, in-flight vocabulary-migration item tsk-2cw). Scoping to this
+item's own test file, then skipping the 4 live-config-dependent tests
+within it, is honest narrowing to what this branch can actually prove —
+not a weakened check on the real fix.
 
 ## Note: item's own recorded `verify` field was corrected
 
@@ -92,11 +123,12 @@ points (Vietnamese), not a runnable shell command — `fgos return` executes
 original text is a shell syntax error (confirmed: `sh -c "<text>"` →
 `sh: 1: Syntax error: ")" unexpected`, exit 2). This is a pre-existing
 shaping defect, not something this item's implementation introduced.
-Corrected via `fgos edit tsk-4eu --verify "..."` to the command shown above,
-which mechanically covers the same six checks: 1/2/3 are now the two new
-pinned tests inside `test/runner/dispatch.test.mjs`; 4 is the two `grep`
-checks; 5's spirit is proven by the same key-validation test (it rejects
-exactly this pattern); 6 (`fgos doctor`/`fgos setup`) was verified manually
-rather than gated in `verify` itself, since `fgos doctor`'s aggregate result
-already carries pre-existing, unrelated red checks (`root-drift`,
-`gate-bypass-configured`) that have nothing to do with this item.
+Corrected via `fgos edit tsk-4eu --verify "..."`, twice: first to the two
+new pinned tests plus `.fgos/config.json` grep checks (checks 1-5 of the
+original six), then rescoped again per the ADR0020 discovery above once it
+became clear the `.fgos/config.json` piece could never be part of this
+branch's own provable surface. Check 6 (`fgos doctor`/`fgos setup`) was
+verified manually rather than gated in `verify` itself, since `fgos
+doctor`'s aggregate result already carries pre-existing, unrelated red
+checks (`root-drift`, `gate-bypass-configured`) that have nothing to do
+with this item.
