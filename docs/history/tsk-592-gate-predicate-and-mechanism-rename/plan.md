@@ -15,10 +15,16 @@ tsk-5td-pqXr9j/docs/history/dispatch-concept-boundary/DISCUSSION.md`).
 Citations below are D-IDs from that doc, per §7.3 (anchor
 `#task-gate-predicate-and-rename`), §6.6 (mechanism), §6.9 (gate).
 
-Impact-analysis posture: **full** — GitNexus registered and `present`
+Impact-analysis posture: **degraded** — GitNexus registered and `present`
 (`fgos tool query --capability impact-analysis --status present` returned
-the `gitnexus` provider). `fgos-code-implement` runs `impact()` on each
-touched symbol before editing, per `CLAUDE.md`'s binding gate.
+the `gitnexus` provider), but its index is behind current HEAD (last
+indexed `19bc5e4`, several commits stale as of this plan) — blast radius
+may be stale. None of this plan's own proof points lean on GitNexus
+blast-radius evidence (every risk-map row below cites a real `rg`/`npm
+test` command instead), so this posture change does not weaken any of
+them; `fgos-code-implement` still runs `impact()` on each touched symbol
+per `CLAUDE.md`'s binding gate, treating its result as weak proof per the
+degraded ladder rather than skipping it.
 
 ## Approach
 
